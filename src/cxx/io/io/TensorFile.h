@@ -20,14 +20,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IO_TENSORFILE_H
-#define TORCH_IO_TENSORFILE_H
+#ifndef BOB_IO_TENSORFILE_H
+#define BOB_IO_TENSORFILE_H
 
 #include "core/blitz_array.h"
 #include "io/TensorFileHeader.h"
 #include "io/Exception.h"
 
-namespace Torch { namespace io {
+namespace bob { namespace io {
 
   /**
    * Defines the flags that might be used when loading/storing a file
@@ -88,25 +88,25 @@ namespace Torch { namespace io {
        * @warning: Please convert your files to HDF5, this format is
        * deprecated starting on 16.04.2011 - AA
        */
-      void write(const Torch::core::array::interface& data);
+      void write(const bob::core::array::interface& data);
 
       /**
-       * Reads the file data into a Torch::core::array::interface - this variant reads the next
-       * variable. The Torch::core::array::interface size will be reset if required.
+       * Reads the file data into a bob::core::array::interface - this variant reads the next
+       * variable. The bob::core::array::interface size will be reset if required.
        */
-      void read(Torch::core::array::interface& data); 
+      void read(bob::core::array::interface& data); 
 
       /**
-       * Reads the file data into a Torch::core::array::interface - this variant allows the
-       * specification of a position to read data from. The Torch::core::array::interface size will be
+       * Reads the file data into a bob::core::array::interface - this variant allows the
+       * specification of a position to read data from. The bob::core::array::interface size will be
        * reset if required.
        */
-      void read (size_t index, Torch::core::array::interface& data);
+      void read (size_t index, bob::core::array::interface& data);
 
       /**
        * Peeks the file and returns the currently set typeinfo
        */
-      void peek(Torch::core::array::typeinfo& info) const;
+      void peek(bob::core::array::typeinfo& info) const;
 
       /**
        * Gets the number of samples/arrays written so far
@@ -140,7 +140,7 @@ namespace Torch { namespace io {
       /**
        * Initializes the tensor file with the given type and shape.
        */
-      inline void initTensorFile(const Torch::core::array::typeinfo& info) {
+      inline void initTensorFile(const bob::core::array::typeinfo& info) {
         initHeader(info);
       }
 
@@ -166,7 +166,7 @@ namespace Torch { namespace io {
        * Initializes the header of the (output) stream with the given type
        * and shape
        */
-      void initHeader(const Torch::core::array::typeinfo& info);
+      void initHeader(const bob::core::array::typeinfo& info);
 
     public:
 
@@ -183,7 +183,7 @@ namespace Torch { namespace io {
        */
       template <typename T, int D> 
         inline void write(blitz::Array<T,D>& bz) {
-          write(Torch::core::array::blitz_array(bz));
+          write(bob::core::array::blitz_array(bz));
         }
 
       /**
@@ -191,20 +191,20 @@ namespace Torch { namespace io {
        * multiarrays saved have the same dimensions.
        */
       template <typename T, int D> inline blitz::Array<T,D> read() {
-        Torch::core::array::typeinfo info;
+        bob::core::array::typeinfo info;
         peek(info);
-        Torch::core::array::blitz_array buf(info);
+        bob::core::array::blitz_array buf(info);
         read(buf);
-        return Torch::core::array::cast<T,D>(buf);
+        return bob::core::array::cast<T,D>(buf);
       }
 
       template <typename T, int D> inline blitz::Array<T,D> read(size_t
           index) { 
-        Torch::core::array::typeinfo info;
+        bob::core::array::typeinfo info;
         peek(info);
-        Torch::core::array::blitz_array buf(info);
+        bob::core::array::blitz_array buf(info);
         read(index, buf);
-        return Torch::core::array::cast<T,D>(buf);
+        return bob::core::array::cast<T,D>(buf);
       }
 
     private: //representation
@@ -248,4 +248,4 @@ namespace Torch { namespace io {
 
 } }
 
-#endif /* TORCH_IO_BINFILE_H */
+#endif /* BOB_IO_BINFILE_H */

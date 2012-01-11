@@ -3,7 +3,7 @@
  * @date Wed Jun 22 17:50:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
- * @brief Torch support for HDF5 files. HDF5 is a open standard for
+ * @brief bob support for HDF5 files. HDF5 is a open standard for
  * self-describing data files. You can get more information in this webpage:
  * http://www.hdfgroup.org/HDF5
  *
@@ -22,8 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IO_HDF5FILE_H 
-#define TORCH_IO_HDF5FILE_H
+#ifndef BOB_IO_HDF5FILE_H 
+#define BOB_IO_HDF5FILE_H
 
 #include <vector>
 
@@ -35,10 +35,10 @@
 #include "core/array.h"
 #include "io/HDF5Utils.h"
 
-namespace Torch { namespace io {
+namespace bob { namespace io {
 
   /**
-   * This is the main type for interfacing Torch with HDF5. It allows the user
+   * This is the main type for interfacing bob with HDF5. It allows the user
    * to create, delete and modify data objects using a very-level API. The
    * total functionality provided by this API is, of course, much smaller than
    * what is provided if you use the HDF5 C-APIs directly, but is much simpler
@@ -153,7 +153,7 @@ namespace Torch { namespace io {
         void read(const std::string& path, size_t pos, T& value) {
         std::string absolute = resolve(path);
         if (!contains(absolute)) 
-          throw Torch::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
+          throw bob::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
         m_index[absolute]->read(pos, value);
       }
 
@@ -164,7 +164,7 @@ namespace Torch { namespace io {
       template <typename T> T read(const std::string& path, size_t pos) {
         std::string absolute = resolve(path);
         if (!contains(absolute)) 
-          throw Torch::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
+          throw bob::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
         return m_index[absolute]->read<T>(pos);
       }
 
@@ -185,7 +185,7 @@ namespace Torch { namespace io {
           size_t pos, blitz::Array<T,N>& value) {
         std::string absolute = resolve(path);
         if (!contains(absolute)) 
-          throw Torch::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
+          throw bob::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
         m_index[absolute]->readArray(pos, value);
       }
 
@@ -198,7 +198,7 @@ namespace Torch { namespace io {
         (const std::string& path, size_t pos) {
         std::string absolute = resolve(path);
         if (!contains(absolute)) 
-          throw Torch::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
+          throw bob::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
         return m_index[absolute]->readArray<T,N>(pos);
       }
 
@@ -231,7 +231,7 @@ namespace Torch { namespace io {
           const T& value) {
         std::string absolute = resolve(path);
         if (!contains(absolute)) 
-          throw Torch::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
+          throw bob::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
         m_index[absolute]->replace(pos, value);
       }
 
@@ -253,7 +253,7 @@ namespace Torch { namespace io {
           size_t pos, const T& value) {
         std::string absolute = resolve(path);
         if (!contains(absolute)) 
-          throw Torch::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
+          throw bob::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
         m_index[absolute]->replaceArray(pos, value);
       }
 
@@ -277,7 +277,7 @@ namespace Torch { namespace io {
         if (!contains(absolute)) { //create dataset
           m_index[absolute] =
             boost::make_shared<detail::hdf5::Dataset>(boost::ref(m_file),
-              absolute, Torch::io::HDF5Type(value), true, 0);
+              absolute, bob::io::HDF5Type(value), true, 0);
         }
         m_index[absolute]->add(value);
       }
@@ -298,7 +298,7 @@ namespace Torch { namespace io {
         if (!contains(absolute)) { //create dataset
           m_index[absolute] =
             boost::make_shared<detail::hdf5::Dataset>(boost::ref(m_file),
-              absolute, Torch::io::HDF5Type(value), true, compression);
+              absolute, bob::io::HDF5Type(value), true, compression);
         }
         m_index[absolute]->addArray(value);
       }
@@ -313,7 +313,7 @@ namespace Torch { namespace io {
         if (!contains(absolute)) { //create dataset
           m_index[absolute] =
             boost::make_shared<detail::hdf5::Dataset>(boost::ref(m_file),
-              absolute, Torch::io::HDF5Type(value), false, 0);
+              absolute, bob::io::HDF5Type(value), false, 0);
         }
         m_index[absolute]->replace(0, value);
       }
@@ -335,7 +335,7 @@ namespace Torch { namespace io {
         if (!contains(absolute)) { //create dataset
           m_index[absolute] =
             boost::make_shared<detail::hdf5::Dataset>(boost::ref(m_file),
-              absolute, Torch::io::HDF5Type(value), false, compression);
+              absolute, bob::io::HDF5Type(value), false, compression);
         }
         m_index[absolute]->replaceArray(0, value);
       }
@@ -347,7 +347,7 @@ namespace Torch { namespace io {
        * existing data is compatible with the required type.
        */
       void create (const std::string& path,
-          const Torch::core::array::typeinfo& dest, bool list,
+          const bob::core::array::typeinfo& dest, bool list,
           size_t compression);
 
       /**
@@ -357,20 +357,20 @@ namespace Torch { namespace io {
        * file. Relative paths are accepted.
        */
       void read_buffer (const std::string& path, size_t pos,
-          Torch::core::array::interface& b);
+          bob::core::array::interface& b);
 
       /**
        * writes the contents of a given buffer into the file. the area that the
        * data will occupy should have been selected beforehand.
        */
       void write_buffer (const std::string& path, size_t pos,
-          const Torch::core::array::interface& b);
+          const bob::core::array::interface& b);
 
       /**
        * extend the dataset with one extra variable.
        */
       void extend_buffer (const std::string& path,
-          const Torch::core::array::interface& b);
+          const bob::core::array::interface& b);
 
     private: //not implemented
 
@@ -402,4 +402,4 @@ namespace Torch { namespace io {
 
 }}
 
-#endif /* TORCH_IO_HDF5FILE_H */
+#endif /* BOB_IO_HDF5FILE_H */

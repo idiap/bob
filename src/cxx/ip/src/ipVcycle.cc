@@ -36,7 +36,7 @@ extern "C" void dgesv_( int *N, int *NRHS, double *A, int *lda, int *ipiv,
 						double *B, int *ldb, int *info);
 
 
-namespace Torch {
+namespace bob {
 
 
 
@@ -62,7 +62,7 @@ ipVcycle::~ipVcycle()
 
 bool ipVcycle::checkInput(const Tensor& input) const
 {
-	// Accept only 3D tensors of Torch::Image type
+	// Accept only 3D tensors of bob::Image type
 	if (	input.nDimension() != 3 ||
 		input.getDatatype() != Tensor::Short)
 	{

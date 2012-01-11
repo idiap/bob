@@ -22,7 +22,7 @@
 
 #include "ip/FaceEyesNorm.h"
 
-namespace ip = Torch::ip;
+namespace ip = bob::ip;
 
 ip::FaceEyesNorm::FaceEyesNorm( const int eyes_distance, 
   const int crop_height, const int crop_width, const int crop_offset_h,

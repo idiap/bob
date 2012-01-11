@@ -22,7 +22,7 @@
 
 #include "ip/vision.h"
 
-namespace Torch {
+namespace bob {
 
 /** This class is designed to handle complex numbers
 

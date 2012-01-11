@@ -7,27 +7,27 @@
 """
 
 import os, sys, unittest
-import torch
+import bob
 
 class ExceptionTest(unittest.TestCase):
   """Performs various exception tests."""
   
   def test01_can_catch_from_cpp(self):
-    self.assertRaises(RuntimeError, torch.core.throw_exception)
+    self.assertRaises(RuntimeError, bob.core.throw_exception)
   """
   def test02_can_catch_from_another_module(self):
-    self.assertRaises(RuntimeError, torch.ip.throw_exception)
+    self.assertRaises(RuntimeError, bob.ip.throw_exception)
   """
 
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()

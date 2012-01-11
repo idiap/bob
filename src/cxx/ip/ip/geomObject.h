@@ -27,7 +27,7 @@
 #include "X.h"
 #endif
 
-namespace Torch {
+namespace bob {
 
 	/** This class is designed to handle geometry objects and algorithms
 

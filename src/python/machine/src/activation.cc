@@ -24,7 +24,7 @@
 #include "machine/Activation.h"
 
 using namespace boost::python;
-namespace mach = Torch::machine;
+namespace mach = bob::machine;
 
 void bind_machine_activation() {
   enum_<mach::Activation>("Activation")

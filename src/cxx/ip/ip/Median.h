@@ -5,8 +5,8 @@
  * @brief This file provides a class to filter an image with a median filter
  */
 
-#ifndef TORCH5SPRO_IP_MEDIAN_H
-#define TORCH5SPRO_IP_MEDIAN_H
+#ifndef BOB5SPRO_IP_MEDIAN_H
+#define BOB5SPRO_IP_MEDIAN_H
 
 #include <boost/shared_ptr.hpp>
 #include <list>
@@ -15,7 +15,7 @@
 #include "sp/convolution.h"
 #include "ip/Exception.h"
 
-namespace Torch {
+namespace bob {
 
 	/**
 	 * \ingroup libip_api
@@ -52,7 +52,7 @@ namespace Torch {
         int c=0;
         for( ; it!=l.end(); ++it, ++c)
           if( c==pos) return (*it)->value;
-        throw Torch::ip::Exception();
+        throw bob::ip::Exception();
       }
     
       template <typename T>
@@ -143,25 +143,25 @@ namespace Torch {
     };
 
     template <typename T>
-    void Torch::ip::Median<T>::initLists(const blitz::Array<T,2>& src)
+    void bob::ip::Median<T>::initLists(const blitz::Array<T,2>& src)
     {
       // Clears content
       m_list_first_col.clear();
       m_list_current.clear();
-      typedef struct Torch::ip::detail::Pixel<T> Pix;
+      typedef struct bob::ip::detail::Pixel<T> Pix;
       typedef typename std::list<boost::shared_ptr<Pix> >::iterator ListIterator;
       for(int j=0; j<2*m_radius_y+1; ++j)
         for(int i=0; i<2*m_radius_x+1; ++i)
         {
           boost::shared_ptr<Pix> pix(new Pix(j,i,src(j,i)));
-          Torch::ip::detail::listInsertPixel(pix, m_list_first_col);
+          bob::ip::detail::listInsertPixel(pix, m_list_first_col);
         }
       m_list_current = m_list_first_col;
     }
 
 
     template <typename T>
-    void Torch::ip::Median<T>::listRemoveAddColumn(const int j, const int i,
+    void bob::ip::Median<T>::listRemoveAddColumn(const int j, const int i,
                   const blitz::Array<T,2>& src,
                   std::list<boost::shared_ptr<struct detail::Pixel<T> > >& l)
     {
@@ -178,12 +178,12 @@ namespace Torch {
       {
         boost::shared_ptr<struct detail::Pixel<T> > pix(
           new struct detail::Pixel<T>(j+k,i+2*m_radius_x+1,src(j+k,i+2*m_radius_x+1)));
-        Torch::ip::detail::listInsertPixel(pix, l);
+        bob::ip::detail::listInsertPixel(pix, l);
       }
     }
 
     template <typename T>
-    void Torch::ip::Median<T>::listRemoveAddRow(const int j, const int i,
+    void bob::ip::Median<T>::listRemoveAddRow(const int j, const int i,
                   const blitz::Array<T,2>& src,
                   std::list<boost::shared_ptr<struct detail::Pixel<T> > >& l)
     {
@@ -200,21 +200,21 @@ namespace Torch {
       {
         boost::shared_ptr<struct detail::Pixel<T> > pix(
           new struct detail::Pixel<T>(j+2*m_radius_y+1,i+k,src(j+2*m_radius_y+1,i+k)));
-        Torch::ip::detail::listInsertPixel(pix, l);
+        bob::ip::detail::listInsertPixel(pix, l);
       }
     }
 
     template <typename T> 
-    void Torch::ip::Median<T>::operator()(const blitz::Array<T,2>& src, 
+    void bob::ip::Median<T>::operator()(const blitz::Array<T,2>& src, 
       blitz::Array<T,2>& dst)
     {
       // Checks
-      Torch::core::array::assertZeroBase(src);
-      Torch::core::array::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(dst);
       blitz::TinyVector<int,2> dst_size;
       dst_size(0) = src.extent(0) - 2 * m_radius_y;
       dst_size(1) = src.extent(1) - 2 * m_radius_x;
-      Torch::core::array::assertSameShape(dst, dst_size);
+      bob::core::array::assertSameShape(dst, dst_size);
 
       // Initializes the lists
       initLists(src);
@@ -224,7 +224,7 @@ namespace Torch {
       {
         for(int i=0; i<dst.extent(1); ++i)
         {
-          dst(j,i) = Torch::ip::detail::listGetValueAtPosition( m_median_pos, m_list_current);
+          dst(j,i) = bob::ip::detail::listGetValueAtPosition( m_median_pos, m_list_current);
           // Updates current ordered list
           if( i<dst.extent(1) - 1) {
             listRemoveAddColumn(j, i, src, m_list_current);
@@ -237,7 +237,7 @@ namespace Torch {
     }
 
     template <typename T> 
-    void Torch::ip::Median<T>::operator()(const blitz::Array<T,3>& src, 
+    void bob::ip::Median<T>::operator()(const blitz::Array<T,3>& src, 
       blitz::Array<T,3>& dst)
     {
       for( int p=0; p<dst.extent(0); ++p) {

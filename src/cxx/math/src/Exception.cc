@@ -3,7 +3,7 @@
  * @date Mon Jun 6 11:49:35 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
-  * @brief Implements a generic exception for the math subsystem of Torch
+  * @brief Implements a generic exception for the math subsystem of bob
  * @brief
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
@@ -24,7 +24,7 @@
 #include "math/Exception.h"
 #include <boost/format.hpp>
 
-namespace math = Torch::math;
+namespace math = bob::math;
 
 math::Exception::Exception() throw() {
 }

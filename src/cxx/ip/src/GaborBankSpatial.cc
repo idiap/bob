@@ -23,7 +23,7 @@
 #include "ip/GaborBankSpatial.h"
 #include "core/array_assert.h"
 
-namespace ip = Torch::ip;
+namespace ip = bob::ip;
 
 ip::GaborBankSpatial::GaborBankSpatial( const int n_orient, const int n_freq,
   const double fmax, const bool orientation_full, const double k, 

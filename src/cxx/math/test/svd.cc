@@ -74,7 +74,7 @@ void checkBlitzEqual( blitz::Array<T,1>& t1, blitz::Array<U,1>& t2)
 {
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
-    BOOST_CHECK_EQUAL(t1(i), Torch::core::cast<T>(t2(i)));
+    BOOST_CHECK_EQUAL(t1(i), bob::core::cast<T>(t2(i)));
 }
 
 template<typename T, typename U>  
@@ -83,7 +83,7 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
-      BOOST_CHECK_EQUAL(t1(i,j), Torch::core::cast<T>(t2(i,j)));
+      BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
 template<typename T, typename U>  
@@ -93,7 +93,7 @@ void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
       for( int k=0; k<t1.extent(2); ++k)
-        BOOST_CHECK_EQUAL(t1(i,j,k), Torch::core::cast<T>(t2(i,j,k)));
+        BOOST_CHECK_EQUAL(t1(i,j,k), bob::core::cast<T>(t2(i,j,k)));
 }
 
 template<typename T>  
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE( test_svd_3x3 )
   blitz::Array<double,2> V(3,3);
 
   // Full SVD function
-  Torch::math::svd(A33_1, U, S, V);
+  bob::math::svd(A33_1, U, S, V);
 //  checkBlitzClose(U33_1, U, eps); 
   checkBlitzClose(S3_1, S, eps);
 //  checkBlitzClose(V33_1, V, eps); 
@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE( test_svd_3x3 )
   // Note that the singular vectors are not unique
 
   // Economic SVD function 
-  Torch::math::svd(A33_1, U, S);
+  bob::math::svd(A33_1, U, S);
   checkBlitzClose(S3_1, S, eps);
 }
   
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE( test_svd_2x4 )
   blitz::Array<double,2> V(4,4);
 
   // Full SVD function
-  Torch::math::svd(A24_1, U, S, V);
+  bob::math::svd(A24_1, U, S, V);
 //  checkBlitzClose(U22_1, U, eps); 
   checkBlitzClose(S2_1, S, eps);
 //  checkBlitzClose(V44_1, V, eps); 
@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE( test_svd_2x4 )
   // Note that the singular vectors are not unique
 
   // Economic SVD function 
-  Torch::math::svd(A24_1, U, S);
+  bob::math::svd(A24_1, U, S);
   checkBlitzClose(S2_1, S, eps);
 }
 

@@ -24,13 +24,13 @@
 #include "ip/histo.h"
 
 using namespace boost::python;
-namespace ip = Torch::ip;
-namespace tp = Torch::python;
-namespace ca = Torch::core::array;
+namespace ip = bob::ip;
+namespace tp = bob::python;
+namespace ca = bob::core::array;
 
 template <typename T>
 static object inner_histo1 (tp::const_ndarray input) {
-  int size = Torch::ip::detail::getHistoSize<T>();
+  int size = bob::ip::detail::getHistoSize<T>();
   tp::ndarray out(ca::t_uint64, size);
   blitz::Array<uint64_t,1> out_ = out.bz<uint64_t,1>();
   ip::histogram(input.bz<T,2>(), out_, false);

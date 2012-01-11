@@ -21,7 +21,7 @@
 #include "math/linear.h"
 #include "core/array_assert.h"
 
-namespace math = Torch::math;
+namespace math = bob::math;
 
 void math::cgsolveSympos(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
   const blitz::Array<double,1>& b, const double acc, const int max_iter)
@@ -30,14 +30,14 @@ void math::cgsolveSympos(const blitz::Array<double,2>& A, blitz::Array<double,1>
   int N = b.extent(0);
 
   // Check x and b
-  Torch::core::array::assertZeroBase(x);
-  Torch::core::array::assertZeroBase(b);
-  Torch::core::array::assertSameDimensionLength(x.extent(0), N);
+  bob::core::array::assertZeroBase(x);
+  bob::core::array::assertZeroBase(b);
+  bob::core::array::assertSameDimensionLength(x.extent(0), N);
   
   // Check A
-  Torch::core::array::assertZeroBase(A);
-  Torch::core::array::assertSameDimensionLength(A.extent(0), N);
-  Torch::core::array::assertSameDimensionLength(A.extent(1), N);
+  bob::core::array::assertZeroBase(A);
+  bob::core::array::assertSameDimensionLength(A.extent(0), N);
+  bob::core::array::assertSameDimensionLength(A.extent(1), N);
 
   math::cgsolveSympos_(A, x, b, acc, max_iter);
 }

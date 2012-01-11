@@ -6,7 +6,7 @@
 """
 import os, sys, tempfile, shutil, math
 import unittest
-import torch
+import bob
 import numpy
 
 def normalizeBlocks(src):
@@ -37,9 +37,9 @@ def normalizeDCT(src):
 def dctfeatures(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W, 
     A_N_DCT_COEF, norm_before, norm_after, add_xy):
   
-  blockShape = torch.ip.getBlockShape(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
+  blockShape = bob.ip.getBlockShape(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
   blocks = numpy.ndarray(blockShape, 'float64')
-  torch.ip.block(prep, blocks, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
+  bob.ip.block(prep, blocks, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
 
   if norm_before:
     normalizeBlocks(blocks)
@@ -51,7 +51,7 @@ def dctfeatures(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W,
 
   
   # Initialize cropper and destination array
-  DCTF = torch.ip.DCTFeatures(A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W, real_DCT_coef)
+  DCTF = bob.ip.DCTFeatures(A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W, real_DCT_coef)
   
   # Call the preprocessing algorithm
   dct_blocks = DCTF(blocks)
@@ -73,7 +73,7 @@ def dctfeatures(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W,
   
   TMP_tensor = numpy.ndarray((n_blocks, TMP_tensor_max), 'float64')
   
-  nBlocks = torch.ip.getNBlocks(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
+  nBlocks = bob.ip.getNBlocks(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
   for by in range(nBlocks[0]):
     for bx in range(nBlocks[1]):
       bi = bx + by * nBlocks[1]
@@ -113,25 +113,25 @@ def face_normalized(img_input, pos_input, features_output):
   N_DCT_COEF = 15
 
   # Initialize cropper and destination array
-  FEN = torch.ip.FaceEyesNorm( CROP_EYES_D, CROP_H, CROP_W, CROP_OH, CROP_OW)
+  FEN = bob.ip.FaceEyesNorm( CROP_EYES_D, CROP_H, CROP_W, CROP_OH, CROP_OW)
   cropped_img = numpy.ndarray((CROP_H, CROP_W), 'float64')
 
   # Initialize the Tan and Triggs preprocessing
-  TT = torch.ip.TanTriggs( GAMMA, SIGMA0, SIGMA1, SIZE, THRESHOLD, ALPHA)
+  TT = bob.ip.TanTriggs( GAMMA, SIGMA0, SIGMA1, SIZE, THRESHOLD, ALPHA)
   preprocessed_img = numpy.ndarray((CROP_H, CROP_W), 'float64')
 
   # Initialize the DCT feature extractor
-  DCTF = torch.ip.DCTFeatures( BLOCK_H, BLOCK_W, OVERLAP_H, OVERLAP_W, N_DCT_COEF)
+  DCTF = bob.ip.DCTFeatures( BLOCK_H, BLOCK_W, OVERLAP_H, OVERLAP_W, N_DCT_COEF)
 
   # process the 'dictionary of files'
   for k in img_input:
     # input image file
-    img_rgb = torch.io.load( str(img_input[k]) )
+    img_rgb = bob.io.load( str(img_input[k]) )
     # input eyes position file
     LW, LH, RW, RH = [int(j.strip()) for j in open(pos_input[k]).read().split()]
 
     # convert to grayscale
-    img = torch.ip.rgb_to_gray(img_rgb)
+    img = bob.ip.rgb_to_gray(img_rgb)
     # extract and crop a face 
     FEN(img, cropped_img, LH, LW, RH, RW) 
     # preprocess a face using Tan and Triggs
@@ -141,24 +141,24 @@ def face_normalized(img_input, pos_input, features_output):
       True, True, False)
 
     # save
-    torch.io.Array(dct_blocks).save(str(features_output[k]))
+    bob.io.Array(dct_blocks).save(str(features_output[k]))
 
 
 def stats_computation(img_input, img_output, ubm):
   """Computes GMMStats against a world model"""
   
-  ubm = torch.machine.GMMMachine(torch.io.HDF5File(ubm))
-  gmmstats = torch.machine.GMMStats(ubm.nGaussians, ubm.nInputs)
+  ubm = bob.machine.GMMMachine(bob.io.HDF5File(ubm))
+  gmmstats = bob.machine.GMMStats(ubm.nGaussians, ubm.nInputs)
 
   # process the 'dictionary of files'
   for k in img_input:
     # input image file
-    img = torch.io.Arrayset( str(img_input[k]) )
+    img = bob.io.Arrayset( str(img_input[k]) )
     # accumulates statistics
     gmmstats.init()
     ubm.accStatistics(img, gmmstats)
     # save statistics
-    gmmstats.save(torch.io.HDF5File( str(img_output[k]) ) ) 
+    gmmstats.save(bob.io.HDF5File( str(img_output[k]) ) ) 
   
 
 
@@ -183,7 +183,7 @@ def NormalizeStdArrayset(arrayset):
   std -= (mean ** 2)
   std = std ** 0.5 # sqrt(std)
 
-  arStd = torch.io.Arrayset()
+  arStd = bob.io.Arrayset()
   for array in arrayset:
     arStd.append(array.get().astype('float64') / std)
 
@@ -197,9 +197,9 @@ def multiplyVectorsByFactors(matrix, vector):
 
 
 def loadData(files):
-  data = torch.io.Arrayset()
+  data = bob.io.Arrayset()
   for f in files:
-    data.extend(torch.io.Array(str(f)).get())
+    data.extend(bob.io.Array(str(f)).get())
 
   return data
 
@@ -218,11 +218,11 @@ def trainGMM(data, n_gaussians=32, iterk=25, iterg=25, convergence_threshold=1e-
     (normalizedAr,stdAr) = NormalizeStdArrayset(ar)
     
   # Create the machines
-  kmeans = torch.machine.KMeansMachine(n_gaussians, input_size)
-  gmm = torch.machine.GMMMachine(n_gaussians, input_size)
+  kmeans = bob.machine.KMeansMachine(n_gaussians, input_size)
+  gmm = bob.machine.GMMMachine(n_gaussians, input_size)
 
   # Create the KMeansTrainer
-  kmeansTrainer = torch.trainer.KMeansTrainer()
+  kmeansTrainer = bob.trainer.KMeansTrainer()
   kmeansTrainer.convergenceThreshold = convergence_threshold
   kmeansTrainer.maxIterations = iterk
 
@@ -244,7 +244,7 @@ def trainGMM(data, n_gaussians=32, iterk=25, iterg=25, convergence_threshold=1e-
   gmm.weights = weights
 
   # Train gmm
-  trainer = torch.trainer.ML_GMMTrainer(update_means, update_variances, update_weights)
+  trainer = bob.trainer.ML_GMMTrainer(update_means, update_variances, update_weights)
   trainer.convergenceThreshold = convergence_threshold
   trainer.maxIterations = iterg
   trainer.train(gmm, ar)
@@ -253,7 +253,7 @@ def trainGMM(data, n_gaussians=32, iterk=25, iterg=25, convergence_threshold=1e-
 
 
 
-def adaptGMM(data, prior_gmm, iterg=25, convergence_threshold=1e-5, variance_threshold=0.001, adapt_weight=False, adapt_variance=False, relevance_factor=0.001, responsibilities_threshold=0, torch3_map=False, alpha_torch3=0.5):
+def adaptGMM(data, prior_gmm, iterg=25, convergence_threshold=1e-5, variance_threshold=0.001, adapt_weight=False, adapt_variance=False, relevance_factor=0.001, responsibilities_threshold=0, bob3_map=False, alpha_bob3=0.5):
 
   ar=data
 
@@ -262,18 +262,18 @@ def adaptGMM(data, prior_gmm, iterg=25, convergence_threshold=1e-5, variance_thr
 
   # Create trainer
   if responsibilities_threshold == 0.:
-    trainer = torch.trainer.MAP_GMMTrainer(relevance_factor, True, adapt_variance, adapt_weight)
+    trainer = bob.trainer.MAP_GMMTrainer(relevance_factor, True, adapt_variance, adapt_weight)
   else:
-    trainer = torch.trainer.MAP_GMMTrainer(relevance_factor, True, adapt_variance, adapt_weight, responsibilities_threshold)
+    trainer = bob.trainer.MAP_GMMTrainer(relevance_factor, True, adapt_variance, adapt_weight, responsibilities_threshold)
   trainer.convergenceThreshold = convergence_threshold
   trainer.maxIterations = iterg
   trainer.setPriorGMM(prior_gmm)
 
-  if torch3_map:
-    trainer.setT3MAP(alpha_torch3)
+  if bob3_map:
+    trainer.setT3MAP(alpha_bob3)
 
   # Load gmm
-  gmm = torch.machine.GMMMachine(prior_gmm)
+  gmm = bob.machine.GMMMachine(prior_gmm)
   gmm.setVarianceThresholds(variance_threshold)
 
   # Train gmm
@@ -320,13 +320,13 @@ class GMMExperiment:
         [file_basename, x] = os.path.splitext(os.path.basename(f))
         stat_path =  os.path.join(self.models_dir, "statswm_" + file_basename + "_" + str(c) + ".hdf5")
         if os.path.exists(stat_path):
-          stats = torch.machine.GMMStats(torch.io.HDF5File(str(stat_path)))
+          stats = bob.machine.GMMStats(bob.io.HDF5File(str(stat_path)))
         else:
           data = loadData([f])
-          stats = torch.machine.GMMStats(self.wm.nGaussians, self.wm.nInputs)
+          stats = bob.machine.GMMStats(self.wm.nGaussians, self.wm.nInputs)
           stats.init()
           self.wm.accStatistics(data, stats)
-          stats.save(torch.io.HDF5File(str(stat_path)))
+          stats.save(bob.io.HDF5File(str(stat_path)))
 
         self.znorm_tests.append(stats)
         #tnorm_clients_ext.append(c)
@@ -336,7 +336,7 @@ class GMMExperiment:
       i += 1
 
 
-    self.D = torch.machine.linearScoring(self.tnorm_models, self.wm, self.znorm_tests)
+    self.D = bob.machine.linearScoring(self.tnorm_models, self.wm, self.znorm_tests)
     tnorm_real_ids = []
     for c in tnorm_clients:
       r_id = self.db.getRealIdFromTNormId(c)
@@ -379,10 +379,10 @@ class GMMExperiment:
     if not model_id in self.client_models:
       model_path = os.path.join(self.models_dir, str(model_id) + ".hdf5")
       if os.path.exists(model_path):
-        self.client_models[model_id] = torch.machine.GMMMachine(torch.io.HDF5File(model_path))
+        self.client_models[model_id] = bob.machine.GMMMachine(bob.io.HDF5File(model_path))
       else:
         self.client_models[model_id] = self.train(model_id)
-        self.client_models[model_id].save(torch.io.HDF5File(model_path))
+        self.client_models[model_id].save(bob.io.HDF5File(model_path))
     
     return self.client_models[model_id]
     
@@ -392,11 +392,11 @@ class GMMExperiment:
       list_stats=[]
       for f in files :
         data = loadData([f])
-        stats = torch.machine.GMMStats(self.wm.nGaussians, self.wm.nInputs)
+        stats = bob.machine.GMMStats(self.wm.nGaussians, self.wm.nInputs)
         self.wm.accStatistics(data, stats)
         list_stats.append(stats)
       
-      scores = torch.machine.linearScoring(models, self.wm, list_stats)
+      scores = bob.machine.linearScoring(models, self.wm, list_stats)
     else:
       scores = numpy.ndarray((len(models), len(files)), 'float64')
       
@@ -421,11 +421,11 @@ class GMMExperiment:
       n_blocks = 4161
       A = scores / n_blocks
       #print "A: " + str(A)
-      B = torch.machine.linearScoring(models, self.wm, self.znorm_tests) / n_blocks
+      B = bob.machine.linearScoring(models, self.wm, self.znorm_tests) / n_blocks
       #print "B: " + str(B)
-      C = torch.machine.linearScoring(self.tnorm_models, self.wm, list_stats) / n_blocks 
+      C = bob.machine.linearScoring(self.tnorm_models, self.wm, list_stats) / n_blocks 
       #print "C: " + str(C)
-      scores = torch.machine.ztnorm(A, B, C, self.D/n_blocks, self.D_sameValue)
+      scores = bob.machine.ztnorm(A, B, C, self.D/n_blocks, self.D_sameValue)
     return scores
 
   def convert_score_to_list(self, scores, probes):
@@ -486,32 +486,32 @@ def jfa_enrol(features_c, ubm, jfa_base, output_machine, n_iter):
   # Initialize a python list for the GMMStats
   for k in features_c:
     # Process one file
-    stats = torch.machine.GMMStats( torch.io.HDF5File(str(features_c[k])) )
+    stats = bob.machine.GMMStats( bob.io.HDF5File(str(features_c[k])) )
     # append in the list
     gmmstats_c.append(stats)
 
-  ubm_machine = torch.machine.GMMMachine(torch.io.HDF5File(ubm))
-  base_machine = torch.machine.JFABaseMachine(torch.io.HDF5File(jfa_base))
+  ubm_machine = bob.machine.GMMMachine(bob.io.HDF5File(ubm))
+  base_machine = bob.machine.JFABaseMachine(bob.io.HDF5File(jfa_base))
   base_machine.ubm = ubm_machine
-  machine = torch.machine.JFAMachine(base_machine)
-  base_trainer = torch.trainer.JFABaseTrainer(base_machine)
-  trainer = torch.trainer.JFATrainer(machine, base_trainer)
+  machine = bob.machine.JFAMachine(base_machine)
+  base_trainer = bob.trainer.JFABaseTrainer(base_machine)
+  trainer = bob.trainer.JFATrainer(machine, base_trainer)
   trainer.enrol(gmmstats_c, n_iter)
-  machine.save(torch.io.HDF5File(output_machine))
+  machine.save(bob.io.HDF5File(output_machine))
 
 def compute_scores(db, group, gmmstats_dir, extension, protocol, clientmodel_dir, ubm, jfa_base, jfa_model_ext, jfa_enrol_n_iter):
   models = db.models(groups=group)
   client_scores = []
   impostor_scores = []
-  ubm_machine = torch.machine.GMMMachine(torch.io.HDF5File(ubm))
-  base_machine = torch.machine.JFABaseMachine(torch.io.HDF5File(jfa_base))
+  ubm_machine = bob.machine.GMMMachine(bob.io.HDF5File(ubm))
+  base_machine = bob.machine.JFABaseMachine(bob.io.HDF5File(jfa_base))
   base_machine.ubm = ubm_machine
   for c in models:
     # 1/ enrol
     features_c = db.files(directory=gmmstats_dir, extension=extension, protocol=protocol, model_ids=(c,), purposes='enrol')
     client_model_filename = os.path.join(clientmodel_dir,str(c)+str(jfa_model_ext))
     jfa_enrol(features_c, ubm, jfa_base, client_model_filename, jfa_enrol_n_iter)
-    machine = torch.machine.JFAMachine(torch.io.HDF5File(client_model_filename))
+    machine = bob.machine.JFAMachine(bob.io.HDF5File(client_model_filename))
     machine.jfa_base = base_machine
 
     # 2/ probe: client accesses
@@ -519,7 +519,7 @@ def compute_scores(db, group, gmmstats_dir, extension, protocol, clientmodel_dir
     # compute the score for each probe
     scores_c = []
     for k in client_probes:
-      probe = torch.machine.GMMStats( torch.io.HDF5File(str(client_probes[k][0])) )
+      probe = bob.machine.GMMStats( bob.io.HDF5File(str(client_probes[k][0])) )
       new_score = machine.forward(probe)
       scores_c.append( new_score )
     client_scores.extend(scores_c)
@@ -529,7 +529,7 @@ def compute_scores(db, group, gmmstats_dir, extension, protocol, clientmodel_dir
     # compute the score for each probe
     scores_i = []
     for k in client_probes:
-      probe = torch.machine.GMMStats( torch.io.HDF5File(str(client_probes[k][0])) )
+      probe = bob.machine.GMMStats( bob.io.HDF5File(str(client_probes[k][0])) )
       new_score = machine.forward(probe)
       scores_i.append( new_score )
     impostor_scores.extend(scores_i)
@@ -543,14 +543,14 @@ class TestBancaSmall(unittest.TestCase):
   def test01_features(self):
     """Creates the features in a temporary directory"""
     # Creates a temporary directory
-    output_dir = os.environ['TORCH_FACE_VERIF_TEMP_DIRECTORY']
+    output_dir = os.environ['BOB_FACE_VERIF_TEMP_DIRECTORY']
     if os.path.exists(output_dir):
       shutil.rmtree(output_dir)
     self.assertTrue( not os.path.exists(output_dir) )
     os.makedirs(output_dir)
     
     # define some database-related variables 
-    db = torch.db.banca_small.Database()
+    db = bob.db.banca_small.Database()
     extension='.hdf5'
 
     # Get the directory where the images and the UBM are stored
@@ -569,10 +569,10 @@ class TestBancaSmall(unittest.TestCase):
     """GMM toolchain experiments with ZT-norm"""
 
     # define some database-related variables 
-    db = torch.db.banca_small.Database()
+    db = bob.db.banca_small.Database()
     protocol='P'
     extension='.hdf5'
-    output_dir = os.environ['TORCH_FACE_VERIF_TEMP_DIRECTORY']
+    output_dir = os.environ['BOB_FACE_VERIF_TEMP_DIRECTORY']
     features_dir = os.path.join(output_dir, 'features')
 
     # Get the directory where the images and the UBM are stored
@@ -585,7 +585,7 @@ class TestBancaSmall(unittest.TestCase):
 
     # loads the UBM model
     wm_path = os.path.join(data_dir, "ubmT5_new.hdf5")
-    wm = torch.machine.GMMMachine(torch.io.HDF5File(wm_path))
+    wm = bob.machine.GMMMachine(bob.io.HDF5File(wm_path))
 
     # creates a GMM experiments using Linear Scoring and ZT-norm
     exp = GMMExperiment(db, features_dir, extension, protocol, wm, models_dir, True, True)
@@ -614,10 +614,10 @@ class TestBancaSmall(unittest.TestCase):
     """Tests JFA"""
 
     # define some database-related variables 
-    db = torch.db.banca_small.Database()
+    db = bob.db.banca_small.Database()
     protocol='P'
     extension='.hdf5'
-    output_dir = os.environ['TORCH_FACE_VERIF_TEMP_DIRECTORY']
+    output_dir = os.environ['BOB_FACE_VERIF_TEMP_DIRECTORY']
     features_dir = os.path.join(output_dir, 'features')
     gmmstats_dir = os.path.join(output_dir, 'gmmstats')
     if not os.path.exists(gmmstats_dir):
@@ -628,7 +628,7 @@ class TestBancaSmall(unittest.TestCase):
     
     # loads the UBM model
     wm_path = os.path.join(data_dir, "ubmT5_new.hdf5")
-    ubm_model = torch.machine.GMMMachine(torch.io.HDF5File(wm_path))
+    ubm_model = bob.machine.GMMMachine(bob.io.HDF5File(wm_path))
 
     img_input = db.files(directory=features_dir, extension=extension)
     img_output = db.files(directory=gmmstats_dir, extension=extension)
@@ -639,11 +639,11 @@ class TestBancaSmall(unittest.TestCase):
     jfa_rv = 2 
     jfa_train_n_iter = 10
     jfa_train_relevance_factor = 4
-    base_machine = torch.machine.JFABaseMachine(ubm_model, jfa_ru, jfa_rv) 
-    T = torch.trainer.JFABaseTrainer(base_machine)
-    Vinit = torch.io.load(os.path.join(data_dir, 'jfa_Vinit.hdf5'))
-    Uinit = torch.io.load(os.path.join(data_dir, 'jfa_Uinit.hdf5'))
-    Dinit = torch.io.load(os.path.join(data_dir, 'jfa_Dinit.hdf5'))
+    base_machine = bob.machine.JFABaseMachine(ubm_model, jfa_ru, jfa_rv) 
+    T = bob.trainer.JFABaseTrainer(base_machine)
+    Vinit = bob.io.load(os.path.join(data_dir, 'jfa_Vinit.hdf5'))
+    Uinit = bob.io.load(os.path.join(data_dir, 'jfa_Uinit.hdf5'))
+    Dinit = bob.io.load(os.path.join(data_dir, 'jfa_Dinit.hdf5'))
     base_machine.V = Vinit
     base_machine.U = Uinit
     base_machine.D = Dinit
@@ -656,13 +656,13 @@ class TestBancaSmall(unittest.TestCase):
       gmmstats_c = []
       for k in world_features_c:
         # Process one file
-        stats = torch.machine.GMMStats( torch.io.HDF5File(str(world_features_c[k])) )
+        stats = bob.machine.GMMStats( bob.io.HDF5File(str(world_features_c[k])) )
         # append in the list
         gmmstats_c.append(stats)
       gmmstats.append(gmmstats_c)
     T.trainNoInit(gmmstats, jfa_train_n_iter)
     output_machine = os.path.join(output_dir, 'jfa_model_UVD.hdf5')
-    base_machine.save(torch.io.HDF5File(output_machine))
+    base_machine.save(bob.io.HDF5File(output_machine))
     # TODO: compare trained and enrolled values?
  
     jfa_enrol_n_iter = 1 
@@ -682,7 +682,7 @@ class TestBancaSmall(unittest.TestCase):
     """Cleanup temporary directory"""
 
     # Remove output directory
-    output_dir = os.environ['TORCH_FACE_VERIF_TEMP_DIRECTORY']
+    output_dir = os.environ['BOB_FACE_VERIF_TEMP_DIRECTORY']
     if os.path.exists(output_dir):
       shutil.rmtree(output_dir)
     self.assertTrue( not os.path.exists(output_dir) )
@@ -690,13 +690,13 @@ class TestBancaSmall(unittest.TestCase):
 
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()

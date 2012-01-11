@@ -50,12 +50,12 @@ void test_fct1D( const blitz::Array<double,1> t, double eps)
 {
   // process using FCT
   blitz::Array<double,1> t_fct(t.extent(0)), t_dct(t.extent(0));
-  Torch::sp::DCT1D fct(t.extent(0));
+  bob::sp::DCT1D fct(t.extent(0));
   fct(t, t_fct);
   BOOST_REQUIRE_EQUAL(t_fct.extent(0), t.extent(0));
 
   // get DCT answer and compare with FCT
-  Torch::sp::detail::DCT1DNaive dct_new_naive(t.extent(0));
+  bob::sp::detail::DCT1DNaive dct_new_naive(t.extent(0));
   dct_new_naive(t, t_dct);
   // Compare
   for(int i=0; i < t_fct.extent(0); ++i)
@@ -63,7 +63,7 @@ void test_fct1D( const blitz::Array<double,1> t, double eps)
   
   // process using inverse FCT
   blitz::Array<double,1> t_fct_ifct(t.extent(0));
-  Torch::sp::IDCT1D ifct(t.extent(0));
+  bob::sp::IDCT1D ifct(t.extent(0));
   ifct(t_fct, t_fct_ifct);
   BOOST_REQUIRE_EQUAL(t_fct_ifct.extent(0), t.extent(0));
 
@@ -73,7 +73,7 @@ void test_fct1D( const blitz::Array<double,1> t, double eps)
 
   // process using inverse DCT
   blitz::Array<double,1> t_dct_idct(t.extent(0));
-  Torch::sp::detail::IDCT1DNaive idct_naive(t.extent(0));
+  bob::sp::detail::IDCT1DNaive idct_naive(t.extent(0));
   ifct(t_dct, t_dct_idct);
   BOOST_REQUIRE_EQUAL(t_dct_idct.extent(0), t.extent(0));
 
@@ -88,13 +88,13 @@ void test_fct2D( const blitz::Array<double,2> t, double eps)
   // process using FCT
   blitz::Array<double,2> t_fct(t.extent(0), t.extent(1)), 
     t_dct(t.extent(0), t.extent(1));
-  Torch::sp::DCT2D fct(t.extent(0), t.extent(1));
+  bob::sp::DCT2D fct(t.extent(0), t.extent(1));
   fct(t, t_fct);
   BOOST_REQUIRE_EQUAL(t_fct.extent(0), t.extent(0));
   BOOST_REQUIRE_EQUAL(t_fct.extent(1), t.extent(1));
 
   // get DCT answer and compare with FCT
-  Torch::sp::detail::DCT2DNaive dct_new_naive(t.extent(0), t.extent(1));
+  bob::sp::detail::DCT2DNaive dct_new_naive(t.extent(0), t.extent(1));
   dct_new_naive(t, t_dct);
   // Compare
   for(int i=0; i < t_fct.extent(0); ++i)
@@ -103,7 +103,7 @@ void test_fct2D( const blitz::Array<double,2> t, double eps)
 
   // process using inverse FCT
   blitz::Array<double,2> t_fct_ifct(t.extent(0), t.extent(1));
-  Torch::sp::IDCT2D ifct(t.extent(0), t.extent(1));
+  bob::sp::IDCT2D ifct(t.extent(0), t.extent(1));
   ifct(t_fct, t_fct_ifct);
   BOOST_REQUIRE_EQUAL(t_fct_ifct.extent(0), t.extent(0));
   BOOST_REQUIRE_EQUAL(t_fct_ifct.extent(1), t.extent(1));
@@ -115,7 +115,7 @@ void test_fct2D( const blitz::Array<double,2> t, double eps)
 
   // process using inverse DCT
   blitz::Array<double,2> t_dct_idct(t.extent(0), t.extent(1));
-  Torch::sp::detail::IDCT2DNaive idct_naive(t.extent(0), t.extent(1));
+  bob::sp::detail::IDCT2DNaive idct_naive(t.extent(0), t.extent(1));
   ifct(t_dct, t_dct_idct);
   BOOST_REQUIRE_EQUAL(t_dct_idct.extent(0), t.extent(0));
   BOOST_REQUIRE_EQUAL(t_dct_idct.extent(1), t.extent(1));
@@ -130,12 +130,12 @@ void test_fft1D( const blitz::Array<std::complex<double>,1> t, double eps)
 {
   // process using FFT
   blitz::Array<std::complex<double>,1> t_fft(t.extent(0)), t_dft(t.extent(0));
-  Torch::sp::FFT1D fft(t.extent(0));
+  bob::sp::FFT1D fft(t.extent(0));
   fft(t, t_fft);
   BOOST_REQUIRE_EQUAL(t_fft.extent(0), t.extent(0));
 
   // get DFT answer and compare with FFT
-  Torch::sp::detail::FFT1DNaive dft_new_naive(t.extent(0));
+  bob::sp::detail::FFT1DNaive dft_new_naive(t.extent(0));
   dft_new_naive(t, t_dft);
   // Compare
   for(int i=0; i < t_fft.extent(0); ++i)
@@ -143,7 +143,7 @@ void test_fft1D( const blitz::Array<std::complex<double>,1> t, double eps)
 
   // process using inverse FFT
   blitz::Array<std::complex<double>,1> t_fft_ifft(t.extent(0));
-  Torch::sp::IFFT1D ifft(t.extent(0));
+  bob::sp::IFFT1D ifft(t.extent(0));
   ifft(t_fft, t_fft_ifft);
   BOOST_REQUIRE_EQUAL(t_fft_ifft.extent(0), t.extent(0));
 
@@ -158,13 +158,13 @@ void test_fft2D( const blitz::Array<std::complex<double>,2> t, double eps)
   // process using FFT
   blitz::Array<std::complex<double>,2> t_fft(t.extent(0), t.extent(1)),
     t_dft(t.extent(0), t.extent(1));
-  Torch::sp::FFT2D fft(t.extent(0), t.extent(1));
+  bob::sp::FFT2D fft(t.extent(0), t.extent(1));
   fft(t, t_fft);
   BOOST_REQUIRE_EQUAL(t_fft.extent(0), t.extent(0));
   BOOST_REQUIRE_EQUAL(t_fft.extent(1), t.extent(1));
 
   // get DFT answer and compare with FFT
-  Torch::sp::detail::FFT2DNaive dft_new_naive(t.extent(0), t.extent(1));
+  bob::sp::detail::FFT2DNaive dft_new_naive(t.extent(0), t.extent(1));
   dft_new_naive(t, t_dft);
   // Compare
   for(int i=0; i < t_fft.extent(0); ++i)
@@ -173,7 +173,7 @@ void test_fft2D( const blitz::Array<std::complex<double>,2> t, double eps)
 
   // process using inverse FFT
   blitz::Array<std::complex<double>,2> t_fft_ifft(t.extent(0), t.extent(1));
-  Torch::sp::IFFT2D ifft(t.extent(0), t.extent(1));
+  bob::sp::IFFT2D ifft(t.extent(0), t.extent(1));
   ifft(t_fft, t_fft_ifft);
   BOOST_REQUIRE_EQUAL(t_fft_ifft.extent(0), t.extent(0));
   BOOST_REQUIRE_EQUAL(t_fft_ifft.extent(1), t.extent(1));
@@ -188,12 +188,12 @@ void test_fftshift( const blitz::Array<std::complex<double>,1> t, double eps)
 {
   // process using fftshift
   blitz::Array<std::complex<double>,1> t_fft(t.extent(0));
-  Torch::sp::fftshift<std::complex<double> >(t, t_fft);
+  bob::sp::fftshift<std::complex<double> >(t, t_fft);
   BOOST_REQUIRE_EQUAL(t_fft.extent(0), t.extent(0));
 
   // process using ifftshift
   blitz::Array<std::complex<double>,1> t_fft_ifft(t.extent(0));
-  Torch::sp::ifftshift<std::complex<double> >(t_fft, t_fft_ifft);
+  bob::sp::ifftshift<std::complex<double> >(t_fft, t_fft_ifft);
   BOOST_REQUIRE_EQUAL(t_fft_ifft.extent(0), t.extent(0));
 
   // Compare to original
@@ -205,13 +205,13 @@ void test_fftshift( const blitz::Array<std::complex<double>,2> t, double eps)
 {
   // process using fftshift
   blitz::Array<std::complex<double>,2> t_fft(t.extent(0), t.extent(1));
-  Torch::sp::fftshift<std::complex<double> >(t, t_fft);
+  bob::sp::fftshift<std::complex<double> >(t, t_fft);
   BOOST_REQUIRE_EQUAL(t_fft.extent(0), t.extent(0));
   BOOST_REQUIRE_EQUAL(t_fft.extent(1), t.extent(1));
 
   // process using ifftshift
   blitz::Array<std::complex<double>,2> t_fft_ifft(t.extent(0), t.extent(1));
-  Torch::sp::ifftshift<std::complex<double> >(t_fft, t_fft_ifft);
+  bob::sp::ifftshift<std::complex<double> >(t_fft, t_fft_ifft);
   BOOST_REQUIRE_EQUAL(t_fft_ifft.extent(0), t.extent(0));
   BOOST_REQUIRE_EQUAL(t_fft_ifft.extent(1), t.extent(1));
 
@@ -375,26 +375,26 @@ BOOST_AUTO_TEST_CASE( test_fftshift1D_simple )
 
   // 1/ Process t4
   blitz::Array<std::complex<double>,1> t4_s(4);
-  Torch::sp::fftshift(t4, t4_s);
+  bob::sp::fftshift(t4, t4_s);
   // Compare to reference
   for(int i=0; i < t4.extent(0); ++i)
     BOOST_CHECK_SMALL( abs(t4_s(i)-t4_s_ref(i)), eps);
   
   blitz::Array<std::complex<double>,1> t4_si(4);
-  Torch::sp::ifftshift(t4_s, t4_si);
+  bob::sp::ifftshift(t4_s, t4_si);
   // Compare to original
   for(int i=0; i < t4.extent(0); ++i)
     BOOST_CHECK_SMALL( abs(t4_si(i)-t4(i)), eps);
 
   // 2/ Process t5
   blitz::Array<std::complex<double>,1> t5_s(5);
-  Torch::sp::fftshift(t5, t5_s);
+  bob::sp::fftshift(t5, t5_s);
   // Compare to reference
   for(int i=0; i < t5.extent(0); ++i)
     BOOST_CHECK_SMALL( abs(t5_s(i)-t5_s_ref(i)), eps);
   
   blitz::Array<std::complex<double>,1> t5_si(5);
-  Torch::sp::ifftshift(t5_s, t5_si);
+  bob::sp::ifftshift(t5_s, t5_si);
   // Compare to original
   for(int i=0; i < t5.extent(0); ++i)
     BOOST_CHECK_SMALL( abs(t5_si(i)-t5(i)), eps);
@@ -408,14 +408,14 @@ BOOST_AUTO_TEST_CASE( test_fftshift2D_simple )
   t_s_ref = 10, 11, 8, 9, 2, 3, 0, 1, 6, 7, 4, 5;
 
   blitz::Array<std::complex<double>,2> t_s(3,4);
-  Torch::sp::fftshift(t, t_s);
+  bob::sp::fftshift(t, t_s);
   // Compare to reference
   for(int i=0; i < t.extent(0); ++i)
     for(int j=0; j < t.extent(1); ++j)
       BOOST_CHECK_SMALL( abs(t_s(i,j)-t_s_ref(i,j)), eps);
   
   blitz::Array<std::complex<double>,2> t_si(3,4);
-  Torch::sp::ifftshift(t_s, t_si);
+  bob::sp::ifftshift(t_s, t_si);
   // Compare to original
   for(int i=0; i < t.extent(0); ++i)
     for(int j=0; j < t.extent(1); ++j)

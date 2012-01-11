@@ -21,7 +21,7 @@
 #include "ip/OldColor.h"
 #include "ip/vision.h"
 
-namespace Torch {
+namespace bob {
 
   Image::Image(int width, int height, int n_planes)
     :	ShortTensor(height, width, n_planes),
@@ -40,7 +40,7 @@ namespace Torch {
     // Check parameters
     if (	width < 1 || height < 1 || (n_planes != 1 && n_planes != 3)) {
       // Suport only images with one (gray) or 3 (RGB like) components
-      Torch::message("Torch::Image::resize - invalid parameters!\n");
+      bob::message("bob::Image::resize - invalid parameters!\n");
       return false;
     }
 
@@ -65,12 +65,12 @@ namespace Torch {
   {
     // Check parameters
     if (data.nDimension() != nDimension()) {
-      Torch::message("Torch::Image::copyFrom - invalid parameters!\n");
+      bob::message("bob::Image::copyFrom - invalid parameters!\n");
       return false;
     }
     for (int i = 0; i < data.nDimension(); i ++)
       if (data.size(i) != size(i)) {
-        Torch::message("Torch::Image::copyFrom - invalid parameters!\n");
+        bob::message("bob::Image::copyFrom - invalid parameters!\n");
         return false;
       }
 
@@ -85,7 +85,7 @@ namespace Torch {
     // Check parameters
     if ( getWidth() != image.getWidth() ||
         getHeight() != image.getHeight()) {
-      Torch::message("Torch::Image::copyFrom - invalid image!\n");
+      bob::message("bob::Image::copyFrom - invalid image!\n");
       return false;
     }
 

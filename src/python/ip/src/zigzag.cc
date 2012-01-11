@@ -24,9 +24,9 @@
 #include "ip/zigzag.h"
 
 using namespace boost::python;
-namespace tp = Torch::python;
-namespace ip = Torch::ip;
-namespace ca = Torch::core::array;
+namespace tp = bob::python;
+namespace ip = bob::ip;
+namespace ca = bob::core::array;
 
 template <typename T>
 static void inner_zigzag(tp::const_ndarray src, tp::ndarray dst, int nc,

@@ -26,9 +26,9 @@
 #include "core/convert.h"
 
 using namespace boost::python;
-namespace tp = Torch::python;
-namespace ca = Torch::core::array;
-namespace tc = Torch::core;
+namespace tp = bob::python;
+namespace ca = bob::core::array;
+namespace tc = bob::core;
 
 template <typename Tdst, typename Tsrc, int N>
 static object inner_convert (tp::const_ndarray src,

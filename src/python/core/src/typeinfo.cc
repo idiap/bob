@@ -23,8 +23,8 @@
 #include "core/python/ndarray.h"
 
 using namespace boost::python;
-namespace tp = Torch::python;
-namespace ca = Torch::core::array;
+namespace tp = bob::python;
+namespace ca = bob::core::array;
 
 static object typeinfo_dtype (const ca::typeinfo& info) {
   return tp::dtype(info.dtype).self();
@@ -45,7 +45,7 @@ static tuple ti_stride(const ca::typeinfo& ti) {
 
 void bind_core_array_typeinfo() {
   
-  class_<ca::typeinfo>("typeinfo", "Type information for Torch C++ data", 
+  class_<ca::typeinfo>("typeinfo", "Type information for bob C++ data", 
       no_init)
     .add_property("dtype", &typeinfo_dtype)
     .def_readonly("cxxtype", &ca::typeinfo::dtype)

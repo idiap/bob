@@ -24,9 +24,9 @@
 
 void bind_measure_error();
 
-BOOST_PYTHON_MODULE(libpytorch_measure) {
+BOOST_PYTHON_MODULE(libpybob_measure) {
 
-  Torch::python::setup_python("Torch error measure classes and sub-classes");
+  bob::python::setup_python("bob error measure classes and sub-classes");
 
   bind_measure_error();
 }

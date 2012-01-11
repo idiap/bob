@@ -22,7 +22,7 @@
 #include "core/array_old.h"
 #include "core/array_assert.h"
 
-namespace math = Torch::math;
+namespace math = bob::math;
 
 // Declaration of the external LAPACK function (Linear system solvers)
 extern "C" void dgesv_( int *N, int *NRHS, double *A, int *lda, int *ipiv, 
@@ -34,14 +34,14 @@ void math::linsolve(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
   const blitz::Array<double,1>& b)
 {
   // Check x and b
-  Torch::core::array::assertZeroBase(x);
-  Torch::core::array::assertZeroBase(b);
-  Torch::core::array::assertSameDimensionLength(x.extent(0), b.extent(0));
+  bob::core::array::assertZeroBase(x);
+  bob::core::array::assertZeroBase(b);
+  bob::core::array::assertSameDimensionLength(x.extent(0), b.extent(0));
   
   // Check A
-  Torch::core::array::assertZeroBase(A);
-  Torch::core::array::assertSameDimensionLength(A.extent(0), A.extent(1));
-  Torch::core::array::assertSameDimensionLength(A.extent(1), b.extent(0));
+  bob::core::array::assertZeroBase(A);
+  bob::core::array::assertSameDimensionLength(A.extent(0), A.extent(1));
+  bob::core::array::assertSameDimensionLength(A.extent(1), b.extent(0));
 
   math::linsolve_(A, x, b);
 }
@@ -79,7 +79,7 @@ void math::linsolve_(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
  
   // Check info variable
   if( info != 0)
-    throw Torch::math::LapackError("The LAPACK dgesv function returned a non-zero value.");
+    throw bob::math::LapackError("The LAPACK dgesv function returned a non-zero value.");
 
   // Copy result back to x if required
   if( !x_direct_use )
@@ -98,14 +98,14 @@ void math::linsolveSympos(const blitz::Array<double,2>& A,
   blitz::Array<double,1>& x, const blitz::Array<double,1>& b)
 {
   // Check x and b
-  Torch::core::array::assertZeroBase(x);
-  Torch::core::array::assertZeroBase(b);
-  Torch::core::array::assertSameDimensionLength(x.extent(0), b.extent(0));
+  bob::core::array::assertZeroBase(x);
+  bob::core::array::assertZeroBase(b);
+  bob::core::array::assertSameDimensionLength(x.extent(0), b.extent(0));
   
   // Check A
-  Torch::core::array::assertZeroBase(A);
-  Torch::core::array::assertSameDimensionLength(A.extent(0), A.extent(1));
-  Torch::core::array::assertSameDimensionLength(A.extent(1), b.extent(0));
+  bob::core::array::assertZeroBase(A);
+  bob::core::array::assertSameDimensionLength(A.extent(0), A.extent(1));
+  bob::core::array::assertSameDimensionLength(A.extent(1), b.extent(0));
 
   math::linsolveSympos_(A, x, b);
 }
@@ -143,7 +143,7 @@ void math::linsolveSympos_(const blitz::Array<double,2>& A,
  
   // Check info variable
   if( info != 0)
-    throw Torch::math::LapackError("The LAPACK dposv function returned a \
+    throw bob::math::LapackError("The LAPACK dposv function returned a \
       non-zero value. This might be caused by a non-symmetric definite \
       positive matrix.");
 

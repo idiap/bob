@@ -21,14 +21,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IO_TENSORFILEHEADER_H
-#define TORCH_IO_TENSORFILEHEADER_H
+#ifndef BOB_IO_TENSORFILEHEADER_H
+#define BOB_IO_TENSORFILEHEADER_H
 
 #include <fstream>
 #include <blitz/array.h>
 #include "core/array.h"
 
-namespace Torch { namespace io { 
+namespace bob { namespace io { 
 
   // TensorType
   enum TensorType
@@ -41,8 +41,8 @@ namespace Torch { namespace io {
     Double
   };
 
-  TensorType arrayTypeToTensorType(Torch::core::array::ElementType eltype);
-  Torch::core::array::ElementType tensorTypeToArrayType(Torch::io::TensorType tensortype);
+  TensorType arrayTypeToTensorType(bob::core::array::ElementType eltype);
+  bob::core::array::ElementType tensorTypeToArrayType(bob::io::TensorType tensortype);
 
   namespace detail {
     /**
@@ -97,11 +97,11 @@ namespace Torch { namespace io {
 
       //representation
       TensorType m_tensor_type; ///< array element type 
-      Torch::core::array::typeinfo m_type; ///< the type information
+      bob::core::array::typeinfo m_type; ///< the type information
       size_t m_n_samples; ///< total number of arrays in the file
       size_t m_tensor_size; ///< the number of dimensions in each array
     };
 
 } } }
 
-#endif /* TORCH_IO_TENSORFILEHEADER_H */
+#endif /* BOB_IO_TENSORFILEHEADER_H */

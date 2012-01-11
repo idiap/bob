@@ -26,7 +26,7 @@
 #include <core/logging.h>
 
 
-namespace Torch {
+namespace bob {
 namespace trainer {
   
 /// @brief This class implements the general expectation-maximisation algorithm.
@@ -40,12 +40,12 @@ public:
   
 
   virtual void train(T_machine& machine, const T_sampler& sampler) {
-    Torch::core::info << "# EMTrainer:" << std::endl;
+    bob::core::info << "# EMTrainer:" << std::endl;
     
     /*
     // Check that the machine and dataset have the same feature dimensionality
     if (!checkForDimensionalityMatch()) {
-      Torch::core::error << "Mismatch in dimensionality of dataset and machine" << endl;
+      bob::core::error << "Mismatch in dimensionality of dataset and machine" << endl;
       return false;
     }
     */
@@ -68,19 +68,19 @@ public:
       // - eStep (and re-calculate average output)
       average_output = eStep(machine, sampler);
       
-      Torch::core::info << "# Iter " << iter << ": " 
+      bob::core::info << "# Iter " << iter << ": " 
         << average_output_previous << " -> " 
         << average_output << std::endl;
       
       // - terminate if converged 
       if (fabs((average_output_previous - average_output)/average_output_previous) <= convergence_threshold) {
-        Torch::core::info << "# EM terminated: likelihood converged" << std::endl;
+        bob::core::info << "# EM terminated: likelihood converged" << std::endl;
         break;
       }
       
        // - terminate if done max iterations 
       if (max_iterations > 0 && iter >= max_iterations-1) {
-        Torch::core::info << "# EM terminated: maximum number of iterations reached." << std::endl;
+        bob::core::info << "# EM terminated: maximum number of iterations reached." << std::endl;
         break;
       }
     }

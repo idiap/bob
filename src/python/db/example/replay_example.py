@@ -1,4 +1,4 @@
-#!/idiap/home/aanjos/work/torch/main/bin/shell.py -- python
+#!/idiap/home/aanjos/work/bob/main/bin/shell.py -- python
 # vim: set fileencoding=utf-8 :
 # Andre Anjos <andre.dos.anjos@gmail.com>
 # Wed 18 May 09:59:13 2011 
@@ -6,9 +6,9 @@
 """Examplifies how to use the replay attack database.
 """
 
-import torch
+import bob
 
-db = torch.db.replay.Database()
+db = bob.db.replay.Database()
 rawdata = "/idiap/group/replay/database/protocols"
 processed = "gray27"
 extension = ".jpg"
@@ -23,7 +23,7 @@ data.update(db.files(directory=rawdata, extension='.mov', device='print',
 
 for key, value in data:
   print "Processing %s" % value
-  snapshot = torch.database.VideoReader(value)[27]
+  snapshot = bob.database.VideoReader(value)[27]
   gray = snapshot.grayAs()
-  torch.ip.rgb_to_gray(snapshot, gray)
+  bob.ip.rgb_to_gray(snapshot, gray)
   db.save_one(key, gray, processed, extension)

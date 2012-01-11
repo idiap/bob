@@ -40,8 +40,8 @@
 #include "io/VideoWriter.h"
 #include "io/VideoException.h"
 
-namespace io = Torch::io;
-namespace ca = Torch::core::array;
+namespace io = bob::io;
+namespace ca = bob::core::array;
 
 io::VideoWriter::VideoWriter(const std::string& filename, size_t height,
     size_t width, float framerate, float bitrate, size_t gop):
@@ -67,7 +67,7 @@ io::VideoWriter::VideoWriter(const std::string& filename, size_t height,
   m_sws_context(0)
 {
   //sets up the io layer typeinfo
-  m_typeinfo_video.dtype = m_typeinfo_frame.dtype = Torch::core::array::t_uint8;
+  m_typeinfo_video.dtype = m_typeinfo_frame.dtype = bob::core::array::t_uint8;
   m_typeinfo_video.nd = 4;
   m_typeinfo_frame.nd = 4;
   m_typeinfo_video.shape[0] = 0;
@@ -321,7 +321,7 @@ void io::VideoWriter::open_video() {
 
 /**
  * Very chaotic implementation extracted from the old Video implementation in
- * Torch. Seems to work, but is probably doing too many memcpy's.
+ * bob. Seems to work, but is probably doing too many memcpy's.
  */
 void io::VideoWriter::write_video_frame(const blitz::Array<uint8_t,3>& data) {
   int out_size, ret;
@@ -451,7 +451,7 @@ void io::VideoWriter::append(const ca::interface& data) {
 
   const ca::typeinfo& type = data.type();
 
-  if ( type.dtype != Torch::core::array::t_uint8 ) {
+  if ( type.dtype != bob::core::array::t_uint8 ) {
     throw io::FFmpegException(m_filename.c_str(), 
         "input data type does not conform with video specifications");
   }

@@ -19,7 +19,7 @@
  */
 #include "ip/Convert.h"
 
-namespace Torch {
+namespace bob {
 
 unsigned char rgb_to_gray(unsigned char r, unsigned char g, unsigned char b)
 {

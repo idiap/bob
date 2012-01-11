@@ -3,15 +3,15 @@
  * @date Mon 29 Sep 2011
  */
 
-#ifndef TORCH_MACHINE_WIENERMACHINE_H
-#define TORCH_MACHINE_WIENERMACHINE_H
+#ifndef BOB_MACHINE_WIENERMACHINE_H
+#define BOB_MACHINE_WIENERMACHINE_H
 
 #include <blitz/array.h>
 #include <complex>
 #include "io/HDF5File.h"
 #include "sp/FFT2D.h"
 
-namespace Torch { namespace machine {
+namespace bob { namespace machine {
 
   /**
    * A Wiener machine, which can be used to denoise a signal,
@@ -58,7 +58,7 @@ namespace Torch { namespace machine {
       /**
        * Starts a new WienerMachine from an existing Configuration object.
        */
-      WienerMachine (Torch::io::HDF5File& config);
+      WienerMachine (bob::io::HDF5File& config);
 
       /**
        * Just to virtualise the destructor
@@ -74,12 +74,12 @@ namespace Torch { namespace machine {
        * Loads data from an existing configuration object. Resets the current
        * state.
        */
-      void load (Torch::io::HDF5File& config);
+      void load (bob::io::HDF5File& config);
 
       /**
        * Saves an existing machine to a Configuration object.
        */
-      void save (Torch::io::HDF5File& config) const;
+      void save (bob::io::HDF5File& config) const;
 
       /**
        * Forwards data through the machine.
@@ -169,8 +169,8 @@ namespace Torch { namespace machine {
                                    ///  (to avoid division by zero)
       double m_Pn; ///< variance of the noise
       blitz::Array<double, 2> m_W; ///< Wiener filter in the frequency domain (W=1/(1+Pn/Ps))
-      boost::shared_ptr<Torch::sp::FFT2D> m_fft;
-      boost::shared_ptr<Torch::sp::IFFT2D> m_ifft;
+      boost::shared_ptr<bob::sp::FFT2D> m_fft;
+      boost::shared_ptr<bob::sp::IFFT2D> m_ifft;
 
       mutable blitz::Array<std::complex<double>, 2> m_buffer1; ///< a buffer for speed
       mutable blitz::Array<std::complex<double>, 2> m_buffer2; ///< a buffer for speed
@@ -179,4 +179,4 @@ namespace Torch { namespace machine {
 
 }}
 
-#endif /* TORCH_MACHINE_WIENERMACHINE_H */
+#endif /* BOB_MACHINE_WIENERMACHINE_H */

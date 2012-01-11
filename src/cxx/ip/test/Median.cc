@@ -47,7 +47,7 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
-      BOOST_CHECK_EQUAL(t1(i,j), Torch::core::cast<T>(t2(i,j)));
+      BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
 template<typename T, typename U>  
@@ -57,7 +57,7 @@ void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
       for( int k=0; k<t1.extent(2); ++k)
-        BOOST_CHECK_EQUAL(t1(i,j,k), Torch::core::cast<T>(t2(i,j,k)));
+        BOOST_CHECK_EQUAL(t1(i,j,k), bob::core::cast<T>(t2(i,j,k)));
 }
 
 
@@ -103,7 +103,7 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
 BOOST_AUTO_TEST_CASE( test_median_2d )
 {
-  Torch::ip::Median<uint8_t> g_filter(1,1);
+  bob::ip::Median<uint8_t> g_filter(1,1);
   blitz::Array<uint8_t,2> src(4,5), ref(2,3);
   src = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20;
   ref = 7, 8, 9, 12, 13, 14;

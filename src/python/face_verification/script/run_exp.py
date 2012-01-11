@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import torch
+import bob
 import train_gmm
 import os
 from optparse import OptionParser
@@ -91,11 +91,11 @@ if not os.path.exists(models_dir):
   os.mkdir(models_dir)
 
 wm_path = os.path.join(options.output_dir, "wm.hdf5")
-db = torch.db.banca.Database()
+db = bob.db.banca.Database()
 
 if os.path.exists(wm_path):
   print "Loading world model"
-  wm = torch.machine.GMMMachine(torch.io.HDF5File(wm_path))
+  wm = bob.machine.GMMMachine(bob.io.HDF5File(wm_path))
 else:
   print "Training world model"
   train_files = db.files(directory=options.features_dir, extension=extension,
@@ -108,7 +108,7 @@ else:
                               options.iterg, options.end_acc, options.var_thd,
                               True, True, True, True)
 
-  wm.save(torch.io.HDF5File(wm_path))
+  wm.save(bob.io.HDF5File(wm_path))
  
 
 exp = train_gmm.GMMExperiment(db, options.features_dir, extension, protocol, wm, models_dir, options.linear_scoring, options.ztnorm)

@@ -4,7 +4,7 @@
  * @author André Anjos <andre.anjos@idiap.ch>
  *
  * @brief This file contains contructions for logging and its configuration
- * within torch. All streams and filters are heavily based on the boost
+ * within bob. All streams and filters are heavily based on the boost
  * iostreams framework. Manual here:
  * http://www.boost.org/doc/libs/release/libs/iostreams/doc/index.html
  *
@@ -23,8 +23,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_CORE_LOGGING_H
-#define TORCH_CORE_LOGGING_H
+#ifndef BOB_CORE_LOGGING_H
+#define BOB_CORE_LOGGING_H
 
 #include <string>
 #include <boost/iostreams/stream.hpp>
@@ -35,7 +35,7 @@
 
 #include "core/blitz_io_overload.h"
 
-namespace Torch {
+namespace bob {
 
   namespace core {
 
@@ -84,7 +84,7 @@ namespace Torch {
     };
 
     /**
-     * Use this sink always in Torch C++ programs. You can configure it to send
+     * Use this sink always in bob C++ programs. You can configure it to send
      * messages to stdout, stderr, to a file or discard them. 
      */
     class AutoOutputDevice: public boost::iostreams::sink { 
@@ -150,7 +150,7 @@ namespace Torch {
     };
 
     /**
-     * Use this source always in Torch C++ programs. You can configure it to
+     * Use this source always in bob C++ programs. You can configure it to
      * read messages from stdin or a file.
      */
     class AutoInputDevice: public boost::iostreams::source { 
@@ -216,7 +216,7 @@ namespace Torch {
     /**
      * Usage example: Re-setting the output error stream
      *
-     * Torch::core::error->reset("null");
+     * bob::core::error->reset("null");
      */
     struct OutputStream: public boost::iostreams::stream<AutoOutputDevice> {
 
@@ -251,7 +251,7 @@ namespace Torch {
     };
 
     /**
-     * Create streams of this type to input data into Torch5spro
+     * Create streams of this type to input data into bob
      */
     struct InputStream: public boost::iostreams::stream<AutoInputDevice> {
 
@@ -295,7 +295,7 @@ namespace Torch {
      * level set in the environment is enough to print the current debug
      * message.
      *
-     * If TORCH_DEBUG is defined and has an integer value of 1, 2 or 3, this
+     * If BOB_DEBUG is defined and has an integer value of 1, 2 or 3, this
      * method will return 'true', if the value of 'i' is smaller or equal to
      * the value collected from the environment. Otherwise, returns false.
      */
@@ -329,14 +329,14 @@ namespace Torch {
 #define TMARKER TLOCATION << ", " << TNOW << ": "
 #endif
 
-#ifdef TORCH_DEBUG
-#define TDEBUG1(v) if (Torch::core::debug_level(1)) { Torch::core::debug << "DEBUG1@" << TMARKER << v << std::endl; }
-#define TDEBUG2(v) if (Torch::core::debug_level(2)) { Torch::core::debug << "DEBUG2@" << TMARKER << v << std::endl; }
-#define TDEBUG3(v) if (Torch::core::debug_level(3)) { Torch::core::debug << "DEBUG3@" << TMARKER << v << std::endl; }
+#ifdef BOB_DEBUG
+#define TDEBUG1(v) if (bob::core::debug_level(1)) { bob::core::debug << "DEBUG1@" << TMARKER << v << std::endl; }
+#define TDEBUG2(v) if (bob::core::debug_level(2)) { bob::core::debug << "DEBUG2@" << TMARKER << v << std::endl; }
+#define TDEBUG3(v) if (bob::core::debug_level(3)) { bob::core::debug << "DEBUG3@" << TMARKER << v << std::endl; }
 #else
 #define TDEBUG1(v)
 #define TDEBUG2(v)
 #define TDEBUG3(v)
 #endif
 
-#endif /* TORCH_CORE_LOGGING_H */
+#endif /* BOB_CORE_LOGGING_H */

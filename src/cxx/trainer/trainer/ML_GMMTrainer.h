@@ -29,7 +29,7 @@
 #include "GMMTrainer.h"
 #include <limits>
 
-namespace Torch {
+namespace bob {
 namespace trainer {
 /// @brief This class implements the maximum likelihood M-step of the expectation-maximisation algorithm for a GMM Machine.
 /// @details See Section 9.2.2 of Bishop, "Pattern recognition and machine learning", 2006
@@ -46,7 +46,7 @@ class ML_GMMTrainer : public GMMTrainer {
     /// Performs a maximum likelihood (ML) update of the GMM parameters
     /// using the accumulated statistics in m_ss
     /// Implements EMTrainer::mStep()
-    void mStep (Torch::machine::GMMMachine& gmm, const Torch::io::Arrayset& data);
+    void mStep (bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data);
   
   private:
 

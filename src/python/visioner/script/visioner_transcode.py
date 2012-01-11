@@ -7,7 +7,7 @@
 """
 
 import argparse
-import torch
+import bob
 
 __epilog__ = """Example usage:
 
@@ -31,7 +31,7 @@ def main():
   
   args = parser.parse_args()
 
-  torch.visioner.model_transcode(args.input, args.output)
+  bob.visioner.model_transcode(args.input, args.output)
 
 if __name__ == '__main__':
   main()

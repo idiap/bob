@@ -112,7 +112,7 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
-      BOOST_CHECK_EQUAL(t1(i,j), Torch::core::cast<T>(t2(i,j)));
+      BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
 template<typename T, typename U>  
@@ -122,7 +122,7 @@ void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
       for( int k=0; k<t1.extent(2); ++k)
-        BOOST_CHECK_EQUAL(t1(i,j,k), Torch::core::cast<T>(t2(i,j,k)));
+        BOOST_CHECK_EQUAL(t1(i,j,k), bob::core::cast<T>(t2(i,j,k)));
 }
 
 template<typename T, int N>  
@@ -136,13 +136,13 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
 BOOST_AUTO_TEST_CASE( test_extrapolate )
 {
-  Torch::ip::extrapolateMask( a2_5_1, i2_5_1 );
+  bob::ip::extrapolateMask( a2_5_1, i2_5_1 );
   checkBlitzEqual( i2_5_1, s2_5_1);
 
-  Torch::ip::extrapolateMask( a2_5_2, i2_5_2 );
+  bob::ip::extrapolateMask( a2_5_2, i2_5_2 );
   checkBlitzEqual( i2_5_2, s2_5_2);
 
-  Torch::ip::extrapolateMask( a2_5_3, i2_5_3 );
+  bob::ip::extrapolateMask( a2_5_3, i2_5_3 );
   checkBlitzEqual( i2_5_3, s2_5_3);
 }
   

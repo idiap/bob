@@ -2,7 +2,7 @@
 .. Andre Anjos <andre.dos.anjos@gmail.com>
 .. Sun  3 Apr 17:13:14 2011 
 
-.. Index file for the Python Torch::core bindings
+.. Index file for the Python bob::core bindings
 
 ====================
  Core Functionality
@@ -12,5 +12,6 @@
    :maxdepth: 2
 
    UsingBlitzArrays
+   ErrorReportingAndLogging
 
    random

@@ -72,7 +72,7 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
-      BOOST_CHECK_EQUAL(t1(i,j), Torch::core::cast<T>(t2(i,j)));
+      BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
 template<typename T, typename U>  
@@ -82,7 +82,7 @@ void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
       for( int k=0; k<t1.extent(2); ++k)
-        BOOST_CHECK_EQUAL(t1(i,j,k), Torch::core::cast<T>(t2(i,j,k)));
+        BOOST_CHECK_EQUAL(t1(i,j,k), bob::core::cast<T>(t2(i,j,k)));
 }
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE( test_integral_2d )
 {
   blitz::Array<uint32_t,2> b2(4,4);
   // Integral image computation
-  Torch::ip::integral(a2, b2);
+  bob::ip::integral(a2, b2);
   checkBlitzEqual(a2s, b2); 
 }
 
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE( test_integral_2d_addZeroBorder )
 {
   blitz::Array<uint32_t,2> b2(5,5);
   // Integral image computation
-  Torch::ip::integral(a2, b2, true);
+  bob::ip::integral(a2, b2, true);
   checkBlitzEqual(a2s_b, b2); 
 }
 

@@ -3,7 +3,7 @@
 # Andre Anjos <andre.anjos@idiap.ch> 
 # Sun 24 Jul 17:50:01 2011 CEST
 
-from libpytorch_visioner import *
+from libpybob_visioner import *
 from os import path
 
 DEFAULT_CMODEL = path.join(path.dirname(__file__), 'Face.MCT9.gz')
@@ -18,7 +18,7 @@ DEFAULT_LMODEL_MP = path.join(path.dirname(__file__), 'Facial.MCT9.TMaxBoost.Mul
 centers, eye corners, nose tip, nostrils, mouth corners."""
 
 class MaxDetector:
-  """A class that bridges the Visioner to torch so as to detect the most
+  """A class that bridges the Visioner to bob so as to detect the most
   face-like object in still images or video frames"""
 
   def __init__(self, cmodel_file=None, scan_levels=0, scale_var=8):
@@ -53,7 +53,7 @@ class MaxDetector:
     return detect_max(self.cmodel, self.scan_levels, self.cscanner)
 
 class Detector:
-  """A class that bridges the Visioner to torch so as to detect faces in 
+  """A class that bridges the Visioner to bob so as to detect faces in 
   still images or video frames"""
 
   def __init__(self, cmodel_file=None, threshold=0., 
@@ -98,7 +98,7 @@ class Detector:
         self.cluster, self.cscanner)
 
 class Localizer:
-  """A class that bridges the Visioner to torch so as to localize face in 
+  """A class that bridges the Visioner to bob so as to localize face in 
   still images or video frames"""
 
   def __init__(self, cmodel_file=None, lmodel_file=None, scan_levels=0, scale_var=8):

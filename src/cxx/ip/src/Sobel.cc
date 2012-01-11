@@ -22,7 +22,7 @@
 
 #include "ip/Sobel.h"
 
-namespace ip = Torch::ip;
+namespace ip = bob::ip;
 
 ip::Sobel::Sobel( const bool up_positive, const bool left_positive,
     const enum sp::Convolution::SizeOption size_opt,

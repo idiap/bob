@@ -17,17 +17,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _TORCHVISION_IP_SOBEL_H_
-#define _TORCHVISION_IP_SOBEL_H_
+#ifndef _BOBVISION_IP_SOBEL_H_
+#define _BOBVISION_IP_SOBEL_H_
 
-#include "ip/ipCore.h"		// <ipSobel> is a <Torch::ipCore>
+#include "ip/ipCore.h"		// <ipSobel> is a <bob::ipCore>
 #include "ip/vision.h"		// <sRect2D> definition
 #include "core/Tensor.h"
 
-namespace Torch
+namespace bob
 {
 	/////////////////////////////////////////////////////////////////////////
-	// Torch::ipSobel
+	// bob::ipSobel
 	//	This class is designed to convolve a sobel mask with an image.
 	//	The result is 3 tensors of the INT storage type:
 	//		the Ox gradient, the Oy gradient and the edge magnitude.

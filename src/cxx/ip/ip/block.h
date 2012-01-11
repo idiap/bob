@@ -20,14 +20,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_IP_BLOCK_H
-#define TORCH5SPRO_IP_BLOCK_H
+#ifndef BOB5SPRO_IP_BLOCK_H
+#define BOB5SPRO_IP_BLOCK_H
 
 #include "core/array_assert.h"
 #include "ip/Exception.h"
 #include "ip/crop.h"
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libip_api
  * @{
@@ -95,7 +95,7 @@ namespace Torch {
           const int block_w, const int overlap_h, const int overlap_w)
       {
         // Checks that the src array has zero base indices
-        Torch::core::array::assertZeroBase( src);
+        bob::core::array::assertZeroBase( src);
 
         // Check parameters and throw exception if required
         if( block_h<1)
@@ -205,7 +205,7 @@ namespace Torch {
       detail::blockCheckInput( src, block_h, block_w, overlap_h, overlap_w);
       blitz::TinyVector<int,3> shape = 
         getBlockShape(src, block_h, block_w, overlap_h, overlap_w);
-      Torch::core::array::assertSameShape( dst, shape);
+      bob::core::array::assertSameShape( dst, shape);
 
       // Crop the 2D array
       detail::blockNoCheck(src, dst, block_h, block_w, overlap_h, overlap_w);
@@ -249,4 +249,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_IP_BLOCK_H */
+#endif /* BOB5SPRO_IP_BLOCK_H */

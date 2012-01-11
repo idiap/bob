@@ -83,15 +83,15 @@ specific platforms.
 +----------------------+--------------+------------------------------------+
 
 
-Description |project| Dependencies
-==================================
+Description of |project| Dependencies
+-------------------------------------
 
-In order to compile and develop against Torch, you must have a few tools
+In order to compile and develop against bob, you must have a few tools
 installed. Here is a brief description of what you need.
 
 .. note::
    If you are at Idiap you **don't** need to install any of the packages
-   mentioned on this wiki. Instead, follow the `TorchIdiapGuide`_ (special
+   mentioned on this wiki. Instead, follow the `bobIdiapGuide`_ (special
    instructions for Idiap users).
 
 Platforms
@@ -111,7 +111,7 @@ report`_ so we can try to help you.
 Core dependencies
 =================
 
-* `Blitz++`_: replaces the old Torch Tensor system with C++ templated
+* `Blitz++`_: replaces the old bob Tensor system with C++ templated
   versions that offer equivalent speed, more documentation and stability. You
   should use version 0.9 or superior. '''Please note that if you want to
   allocate very big arrays (> 2^31^ ''elements'' or 2G ''elements''), it is
@@ -139,17 +139,17 @@ Data access
 * `SqlAlchemy`_: A Python SQL toolkit and Object Relational Mapper. This is
   used for storing and querying more complex databases. You need at least
   version 0.5.
-* `FFMpeg`_: is used to give Torch support for input and output videos.
-  Torch distributions will be compiled and shipped against version 0.6 or
+* `FFMpeg`_: is used to give bob support for input and output videos.
+  bob distributions will be compiled and shipped against version 0.6 or
   superior because of licensing incompatibilities. That being said, for
-  '''private development''', you can use version 0.5.1 and above. Torch will
-  work seemlessly. Please note that if you decide to distribute Torch compiled
+  '''private development''', you can use version 0.5.1 and above. bob will
+  work seemlessly. Please note that if you decide to distribute bob compiled
   with a version of ffmpeg prior to 0.6, then the whole package becomes GPL'ed;
 * `ImageMagick`_: is used for reading and writing image output. We
   currently compile against version 6.6.7, but other versions should work.
   Please note we make use of the C++ API (a.k.a. ImageMagick++).
 * `HDF5`_: HDF5 is the format of choice for binary representation of data
-  or configuration items in Torch. We currently compile against version 1.8.6,
+  or configuration items in bob. We currently compile against version 1.8.6,
   Version 1.8.4 (and before) might not work.
 * `MatIO`_: is used for reading and writing Matlab compatible (.mat) files.
   Our nightly builds compile against version 1.34, but version 1.33 is known to
@@ -172,7 +172,7 @@ during runtime.
 
 * `Git`_: is used as our version control system. You need it if you want to
   perform a fresh checkout of sources beforem compiling;
-* `CMake`_: is used to build Torch and to compile examples. You need at
+* `CMake`_: is used to build bob and to compile examples. You need at
   least version 2.8;
 * `Google Perftools`_: if you want to compile profiling extensions. We have
   used version 1.6, but version 1.5 will do the work as well. Please note that
@@ -181,7 +181,7 @@ during runtime.
   guide. We use the latest available version of Sphinx, but earlier versions
   should work.
 * `Doxygen`_: is used for extracting C/C++ documentation strings from code
-  and building a system of webpages describing the C/C++ Torch API.
+  and building a system of webpages describing the C/C++ bob API.
 * `Dvipng`_: is required for LaTeX-like code conversion to HTML. Not having it
   will cause equations to be displayed using LaTeX-code instead of being nicely
   formatted.
@@ -201,9 +201,9 @@ during runtime.
 Extra packages we recommend
 ===========================
 
-These are packages that are *not* required to compile or run torch examples,
+These are packages that are *not* required to compile or run bob examples,
 but make a nice complement to the installation and provides you with the
-ability to plot and interact with Torch:
+ability to plot and interact with bob:
 
 * `Scipy`_: A set of scientific-related python-based utilities
 * `IPython`_: A powerful replacement for your python shell that provides bells
@@ -277,14 +277,14 @@ A single command line that will install all required packages under Ubuntu
 Mac OSX
 =======
 
-This is a recipe for compiling Torch under your Mac OSX using Snow Leopard. It
+This is a recipe for compiling bob under your Mac OSX using Snow Leopard. It
 should be possible, but remains untested, to execute similar steps under OSX
 Leopard (10.5.X). We would like to hear if you have a success story or problems
 `submit a new bug report`_.
 
 This recipe assumes you have already gone through the standard,
 well-documented, `MacPorts installation instructions`_ and has a prompt just in
-front of you and a checkout of torch you want to try out. Then, just do, at
+front of you and a checkout of bob you want to try out. Then, just do, at
 your shell prompt:
 
 .. code-block:: sh
@@ -303,7 +303,7 @@ You can also install git if you want to submit patches to us:
 
    $ sudo port install  git-core +python26
 
-For compiling Torch under OSX, we recommend the use of "llvm-gcc" instead of
+For compiling bob under OSX, we recommend the use of "llvm-gcc" instead of
 plain gcc. After running the command above, do the following:
 
 .. code-block:: sh
@@ -323,7 +323,7 @@ plain gcc. After running the command above, do the following:
      $ sudo gcc_select mp-llvm-gcc42
 
 .. warning::
-   * Torch/Blitz python bindings will not compile in **release** mode with plain
+   * bob/Blitz python bindings will not compile in **release** mode with plain
      gcc-4.2 (blitz causes a segmentation fault at the compiler). This is why
      we recommend to use the llvm gcc bridge instead.
 
@@ -331,21 +331,21 @@ plain gcc. After running the command above, do the following:
      than gcc-4.2.
 
 After you have gone through these installation steps, you can proceed with the
-normal TorchCompilation instructions. If you have followed the
+normal bobCompilation instructions. If you have followed the
 `MacPorts`_ installation guide to the letter, your environment should be
 correctly set. You **don't** need to setup any other environment variable.
 
 Obtaining the code
 ------------------
 
-To install Torch you need first to set your mind on what to install. You can
-choose between a released stable version from :doc:`TorchDistribution` or
-checkout and build yourself following :ref:`section-compilation`.
+To install bob you need first to set your mind on what to install. You can
+choose between a released stable version from `Bob's website` or checkout and
+build yourself following :ref:`section-compilation`.
 
 .. warning::
 
   *Make sure to read  and install all requirements defined in*
-  :ref:`section-dependencies`, *prior to running Torch applications.*
+  :ref:`section-dependencies`, *prior to running bob applications.*
 
 Grab a tarball and change into the directory of your choice, let's say
 ``WORKDIR``:
@@ -353,20 +353,20 @@ Grab a tarball and change into the directory of your choice, let's say
 .. code-block:: sh
 
   $ cd WORKDIR
-  $ wget |torchweb|/nightlies/torch-nightly-latest.tar.gz
-  $ tar xvfz torch-nightly-latest.tar.gz
+  $ wget |bobweb|/nightlies/bob-nightly-latest.tar.gz
+  $ tar xvfz bob-nightly-latest.tar.gz
 
 .. _section-checkout:
 
-Checking out |project|
-----------------------
+Cloning/Checking out |project|
+------------------------------
 
 To checkout you currently need access to Idiap's internal filesystem (to be
-open-sourced soon!):
+publicly available soon!):
 
 .. code-block:: sh
 
-   $ git clone username@machine.idiap.ch:/idiap/group/torch5spro/git/torch5spro.git
+   $ git clone username@machine.idiap.ch:/idiap/group/bob/git/bob.git
 
 You have to fill the ``username`` and ``machine`` bits with your Idiap username
 and the machine you want to use for ssh. Please note that in order to push
@@ -385,7 +385,7 @@ in the destination machine before using it. Just execute:
 
 .. code-block:: sh
    
-   $ cd torch5spro-x.y
+   $ cd bob-x.y
    $ bin/debug.sh
    # or
    $ bin/release.sh
@@ -416,7 +416,7 @@ versions of the external dependencies so we can try to reproduce the failure.
 .. _macports: http://www.macports.org
 .. _macports installation instructions: http://www.macports.org/install.php
 .. _fink: http://www.finkproject.org
-.. _submit a new bug report: https://www.idiap.ch/software/torch5spro/newticket
+.. _submit a new bug report: https://www.idiap.ch/software/bob/newticket
 .. _blitz++: http://www.oonumerics.org/blitz
 .. _cmake: http://www.cmake.org
 .. _ffmpeg: http://www.ffmpeg.org
@@ -436,9 +436,9 @@ versions of the external dependencies so we can try to reproduce the failure.
 .. _h5py: http://code.google.com/p/h5py/
 .. _tables: http://www.pytables.org
 .. _matplotlib: http://matplotlib.sourceforge.net
-.. _torchidiapguide: https://www.idiap.ch/software/torch5spro/wiki/TorchIdiapGuide
+.. _bobidiapguide: https://www.idiap.ch/software/bob/wiki/BobIdiapGuide
 .. _buildbot: http://trac.buildbot.net
-.. _the Ubuntu 10.04 ticket: http://www.idiap.ch/software/torch5spro/ticket/89/
+.. _the Ubuntu 10.04 ticket: http://www.idiap.ch/software/bob/ticket/89/
 .. _argparse: http://code.google.com/p/argparse/
 .. _sqlalchemy: http://www.sqlalchemy.org/
 .. _dvipng: http://savannah.nongnu.org/projects/dvipng/
@@ -447,3 +447,4 @@ versions of the external dependencies so we can try to reproduce the failure.
 .. _vlfeat: http://www.vlfeat.org/
 .. _vlfeat launchpad webpage: https://launchpad.net/~gezakovacs/+archive/vlfeat
 .. _fftw: http://www.fftw.org/
+.. _Bob's website: https://www.idiap.ch/software/bob

@@ -28,8 +28,8 @@
 #include "core/convert.h"
 #include "io/Array.h"
 
-namespace ip = Torch::ip;
-namespace tca = Torch::core::array;
+namespace ip = bob::ip;
+namespace tca = bob::core::array;
 
 ip::VLSIFT::VLSIFT(const int height, const int width, const int n_intervals,
     const int n_octaves, const int octave_min,

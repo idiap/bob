@@ -20,14 +20,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_MACHINE_MLPEXCEPTION_H 
-#define TORCH_MACHINE_MLPEXCEPTION_H
+#ifndef BOB_MACHINE_MLPEXCEPTION_H 
+#define BOB_MACHINE_MLPEXCEPTION_H
 
 #include <blitz/array.h>
 #include "machine/Exception.h"
 #include "machine/Activation.h"
 
-namespace Torch { namespace machine {
+namespace bob { namespace machine {
 
   /**
    * Exception raised when the resizing shape has less than 2 components
@@ -97,16 +97,16 @@ namespace Torch { namespace machine {
    */
   class UnsupportedActivation: public Exception {
     public:
-      UnsupportedActivation(Torch::machine::Activation act) throw();
+      UnsupportedActivation(bob::machine::Activation act) throw();
       virtual ~UnsupportedActivation() throw();
       virtual const char* what() const throw();
       
     private:
-      Torch::machine::Activation m_act;
+      bob::machine::Activation m_act;
       mutable std::string m_message;
   };
 
 }}
 
-#endif /* TORCH_MACHINE_MLPEXCEPTION_H */
+#endif /* BOB_MACHINE_MLPEXCEPTION_H */
 

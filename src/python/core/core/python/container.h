@@ -28,12 +28,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_CORE_PYTHON_CONTAINER_H 
-#define TORCH_CORE_PYTHON_CONTAINER_H
+#ifndef BOB_CORE_PYTHON_CONTAINER_H 
+#define BOB_CORE_PYTHON_CONTAINER_H
 
 #include <boost/python.hpp>
 
-namespace Torch { namespace python {
+namespace bob { namespace python {
 
   template <typename ContainerType>
   struct to_tuple
@@ -319,6 +319,6 @@ namespace Torch { namespace python {
     }
   };
 
-}} // namespace Torch::python
+}} // namespace bob::python
 
-#endif /* TORCH_CORE_PYTHON_CONTAINER_H */
+#endif /* BOB_CORE_PYTHON_CONTAINER_H */

@@ -17,15 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _TORCH5SPRO_IP_MSR_SQI_GAUSSIAN_H_
-#define _TORCH5SPRO_IP_MSR_SQI_GAUSSIAN_H_
+#ifndef _BOB5SPRO_IP_MSR_SQI_GAUSSIAN_H_
+#define _BOB5SPRO_IP_MSR_SQI_GAUSSIAN_H_
 
-#include "ip/ipCore.h"		// <ipMSRSQIGaussian> is a <Torch::ipCore>
+#include "ip/ipCore.h"		// <ipMSRSQIGaussian> is a <bob::ipCore>
 
-namespace Torch {
+namespace bob {
 
 	/////////////////////////////////////////////////////////////////////////
-	// Torch::ipMSRSQIGaussian
+	// bob::ipMSRSQIGaussian
 	//	This class is designed to apply a normalize Gaussian or Weighed Gaussian filtering 
 	//	        to an image (3D ShortTensor)
 	//		by convolving a NxM Gaussian or Weighed Gaussianfilter.

@@ -46,17 +46,17 @@ can detect problems and take actions. Fatal errors should be reported with
 exception throwing. If you are unsure on how to classify your problems, please
 read :ref:`case-study` bellow. 
 
-Exceptions in Torch are arranged in an exception tree, all inheriting from
-``Torch::core::Exception``, which in turn inherits from ``std::exception``. You
-should not throw a ``Torch::core::Exception`` ever. They are there just to
-provide a convenient way to catch any non-covered Torch exceptions in a
+Exceptions in bob are arranged in an exception tree, all inheriting from
+``bob::core::Exception``, which in turn inherits from ``std::exception``. You
+should not throw a ``bob::core::Exception`` ever. They are there just to
+provide a convenient way to catch any non-covered bob exceptions in a
 try/catch clause. If you want to report a specific problem in your code, that
 you think may be solvable upstream, you can inherit from
-``Torch::core::Exception`` to make your problem specific:
+``bob::core::Exception`` to make your problem specific:
 
 .. code-block:: c++
 
-  class MySpecialProblem: public Torch::core::Exception {
+  class MySpecialProblem: public bob::core::Exception {
     
     MySpecialProblem(type1 param1, type2 param2)  throw(): m_param1(param1), m_param2(param2) { }
 
@@ -106,7 +106,7 @@ what is really important.
 
 Here are some advices:
 
-* If you are a library developer avoid to inject messages into the Torch
+* If you are a library developer avoid to inject messages into the bob
   logging system. Messages are computationally expensive. They require strings
   to be built, possibly formatted and memory to be allocated. If you do that
   often, it will slow-down your processing;
@@ -137,7 +137,7 @@ How to inject TDEBUG messages
 These messages will be compiled out in release builds. If you want to display
 them, you have to compile your code in debug mode or use the debug build from
 one of the installed releases. After setting up, make sure that the
-``TORCH_DEBUG`` environment variable is set on your environment with one of the
+``BOB_DEBUG`` environment variable is set on your environment with one of the
 3 values:
 
 * **1**: In this case only messages with level 1 will be displayed;
@@ -170,9 +170,9 @@ Here is some sample C++ code:
   #include "core/logging.h"
   ...
 
-  Torch::core::info << "This is an INFO message" << std::endl;
-  Torch::core::warn << "This is a WARNING message" << std::endl;
-  Torch::core::error << "This is an ERROR message" << std::endl;
+  bob::core::info << "This is an INFO message" << std::endl;
+  bob::core::warn << "This is a WARNING message" << std::endl;
+  bob::core::error << "This is an ERROR message" << std::endl;
 
 We also provide marker macros that help you marking the output so you know
 where it comes from. We use those consistently when you use our ``TDEBUG*``
@@ -183,7 +183,7 @@ macros. You can also make use of those for your messages:
   #include "core/logging.h"
   ...
 
-  Torch::core::warn << TMARKER << "This message will be marked" << std::endl;
+  bob::core::warn << TMARKER << "This message will be marked" << std::endl;
 
 This should printout something like:
 
@@ -207,7 +207,7 @@ How to configure streams
 
 If you are an application developer, it maybe upon you to decide how to stream
 information from the code you are calling into the appropriate stream. The
-Torch defaults are:
+bob defaults are:
 
 * debug-style messages and info message go to ``stdout``;
 * warning and error messages are re-directed to ``stderr``.
@@ -220,10 +220,10 @@ way:
   #include "core/logging.h"
   ...
   //diverges, globally, debug messages to go to stderr
-  Torch::core::debug.reset("stderr");
+  bob::core::debug.reset("stderr");
 
   //suppresses, globally, all info messages
-  Torch::core::info.reset("null");
+  bob::core::info.reset("null");
 
 It is illegal to use these calls in library code, only ``main()`` loops should
 be able to configure how to diverge the streams as its developer is the
@@ -365,7 +365,7 @@ and get you a core dump you can debug problems from, with the precise stack
 trace that lead you to this problem.
 
 The application developer is also responsible for determining what to do with
-messages that may be logged by its callees into the Torch logging system. As
+messages that may be logged by its callees into the bob logging system. As
 the application master, you can decide to suppress all messages or let them be
 printed to screen (the default), if you can afford them. Be sure to familiarize
 yourself with our logging API for the language you are programming at.
@@ -373,5 +373,5 @@ yourself with our logging API for the language you are programming at.
 .. Place your references here:
 .. _some guidelines on error reporting and handling: http://www.boost.org/community/error_handling.html
 .. _here is some lengthier explanation of why: http://www.gotw.ca/publications/mill22.htm
-.. _io/Exception.h: http://www.idiap.ch/software/torch5spro/browser/src/cxx/io/io/Exception.h
-.. _io/src/Exception.cc: http://www.idiap.ch/software/torch5spro/browser/src/cxx/io/src/Exception.cc
+.. _io/Exception.h: http://www.idiap.ch/software/bob/browser/src/cxx/io/io/Exception.h
+.. _io/src/Exception.cc: http://www.idiap.ch/software/bob/browser/src/cxx/io/src/Exception.cc

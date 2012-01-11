@@ -33,14 +33,14 @@
 #include <string>
 #include <iostream>
 
-using namespace Torch::core;
+using namespace bob::core;
 
 /**
  * Generates a unique temporary filename
  */
 std::string temp_file() {
-  std::string tpl = Torch::core::tmpdir();
-  tpl += "/torchtest_core_loggingXXXXXX";
+  std::string tpl = bob::core::tmpdir();
+  tpl += "/bobtest_core_loggingXXXXXX";
   boost::shared_array<char> char_tpl(new char[tpl.size()+1]);
   strcpy(char_tpl.get(), tpl.c_str());
   int fd = mkstemp(char_tpl.get());
@@ -53,14 +53,14 @@ std::string temp_file() {
 BOOST_AUTO_TEST_CASE( test_basic )
 {
   TDEBUG1("NOT SUPPOSED TO BE PRINTED!");
-  setenv("TORCH_DEBUG", "3", 1); ///< after this, all messages should be printed
+  setenv("BOB_DEBUG", "3", 1); ///< after this, all messages should be printed
   TDEBUG1("This is a debug message, level 1. " << "I can also stream!");
   TDEBUG2("This is a debug message, level 2. ");
   TDEBUG3("This is a debug message, level 3. ");
   info << "This is an info message." << std::endl;
   warn << "This is a warning message." << std::endl;
   error << "This is an error message." << std::endl;
-  unsetenv("TORCH_DEBUG");
+  unsetenv("BOB_DEBUG");
 }
 
 /**
@@ -114,11 +114,11 @@ BOOST_AUTO_TEST_CASE( test_switch )
 BOOST_AUTO_TEST_CASE( test_input )
 {
   std::string testfilename = temp_file();
-  Torch::core::OutputStream ofile(testfilename);
+  bob::core::OutputStream ofile(testfilename);
   std::string testdata = "12345678,a_single_sentence";
   ofile << testdata << std::endl;
   ofile.close();
-  Torch::core::InputStream ifile(testfilename);
+  bob::core::InputStream ifile(testfilename);
   std::string back;
   ifile >> back;
   BOOST_CHECK_EQUAL(testdata, back);
@@ -130,11 +130,11 @@ BOOST_AUTO_TEST_CASE( test_input )
 BOOST_AUTO_TEST_CASE( test_compressed_input )
 {
   std::string testfilename = temp_file() + ".gz";
-  Torch::core::OutputStream ofile(testfilename);
+  bob::core::OutputStream ofile(testfilename);
   std::string testdata = "12345678,a_single_sentence";
   ofile << testdata << std::endl;
   ofile.close();
-  Torch::core::InputStream ifile(testfilename);
+  bob::core::InputStream ifile(testfilename);
   std::string back;
   ifile >> back;
   BOOST_CHECK_EQUAL(testdata, back);

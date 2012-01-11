@@ -19,8 +19,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_MACHINE_SVM_H 
-#define TORCH_MACHINE_SVM_H
+#ifndef BOB_MACHINE_SVM_H 
+#define BOB_MACHINE_SVM_H
 
 #include <svm.h>
 #include <boost/shared_ptr.hpp>
@@ -28,7 +28,7 @@
 #include <blitz/array.h>
 #include <fstream>
 
-namespace Torch { namespace machine {
+namespace bob { namespace machine {
 
   /**
    * Loads a given libsvm data file. The data file format, as defined on the
@@ -257,4 +257,4 @@ namespace Torch { namespace machine {
 
 }}
 
-#endif /* TORCH_MACHINE_SVM_H */
+#endif /* BOB_MACHINE_SVM_H */

@@ -4,7 +4,7 @@
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Implementation of the exceptions used throughout the IP subsystem of
- * Torch.
+ * bob.
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -24,8 +24,8 @@
 #include <boost/format.hpp>
 #include "ip/Exception.h"
 
-namespace ip = Torch::ip;
-namespace core = Torch::core;
+namespace ip = bob::ip;
+namespace core = bob::core;
 
 ip::Exception::Exception() throw() {
 }

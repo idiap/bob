@@ -25,9 +25,9 @@
 #include "ip/maxRectInMask.h"
 
 using namespace boost::python;
-namespace ip = Torch::ip;
-namespace tp = Torch::python;
-namespace ca = Torch::core::array;
+namespace ip = bob::ip;
+namespace tp = bob::python;
+namespace ca = bob::core::array;
 
 static const char* GEOMNORM_DOC = "Objects of this class, after configuration, can perform a geometric normalization.";
 static const char* MAXRECTINMASK2D_DOC = "Given a 2D mask (a 2D blitz array of booleans), compute the maximum rectangle which only contains true values.";
@@ -90,5 +90,5 @@ void bind_ip_geomnorm() {
   .def("__call__", &call2, (arg("input"), arg("input_mask"), arg("output"), arg("output_mask"), arg("rotation_center_y"), arg("rotation_center_x"), arg("crop_ref_y"), arg("crop_ref_x")), "Call an object of this type to perform a geometric normalization of an image wrt. the two given points, taking mask into account.")
     ;
 
-  def("maxRectInMask", (const blitz::TinyVector<int,4> (*)(const blitz::Array<bool,2>&))&Torch::ip::maxRectInMask, (("src")), MAXRECTINMASK2D_DOC); 
+  def("maxRectInMask", (const blitz::TinyVector<int,4> (*)(const blitz::Array<bool,2>&))&bob::ip::maxRectInMask, (("src")), MAXRECTINMASK2D_DOC); 
 }

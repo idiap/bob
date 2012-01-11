@@ -9,7 +9,7 @@
 
 import os
 import sys
-import torch
+import bob
 import optparse
 import tempfile #for package tests
 import numpy
@@ -44,11 +44,11 @@ def generate_testdata(data, target):
 def create_machine(data, training_steps):
   """Creates the machine given the training data"""
 
-  mlp = torch.machine.MLP((4, 4, len(data)))
-  mlp.activation = torch.machine.Activation.TANH
+  mlp = bob.machine.MLP((4, 4, len(data)))
+  mlp.activation = bob.machine.Activation.TANH
   mlp.randomize() #reset weights and biases to a value between -0.1 and +0.1
   BATCH = 50
-  trainer = torch.trainer.MLPRPropTrainer(mlp, BATCH)
+  trainer = bob.trainer.MLPRPropTrainer(mlp, BATCH)
   trainer.trainBiases = True #this is the default, but just to clarify!
 
   targets = [ #we choose the approximate Fisher response!
@@ -64,10 +64,10 @@ def create_machine(data, training_steps):
   AllData, AllTargets = generate_testdata(datalist, targets)
   
   # A helper to select and shuffle the data
-  S = torch.trainer.DataShuffler(datalist, targets)
+  S = bob.trainer.DataShuffler(datalist, targets)
 
   # We now iterate for several steps, look for the convergence
-  retval = [torch.machine.MLP(mlp)]
+  retval = [bob.machine.MLP(mlp)]
 
   for k in range(training_steps):
     
@@ -78,8 +78,8 @@ def create_machine(data, training_steps):
     # choosing the wrong approach.
     trainer.train_(mlp, input, target)
     print "|RMSE| @%d:" % k,
-    print numpy.linalg.norm(torch.measure.rmse(mlp(AllData), AllTargets))
-    retval.append(torch.machine.MLP(mlp))
+    print numpy.linalg.norm(bob.measure.rmse(mlp(AllData), AllTargets))
+    retval.append(bob.machine.MLP(mlp))
 
   return retval #all machines => nice plotting!
 
@@ -115,8 +115,8 @@ def plot(output):
     positives = histo[i][O].copy() #make it C-style contiguous
     negatives = numpy.hstack([histo[i][k] for k in order if k != O])
     # note: threshold a posteriori! (don't do this at home, kids ;-)
-    thres = torch.measure.eerThreshold(negatives, positives)
-    far, frr = torch.measure.farfrr(negatives, positives, thres)
+    thres = bob.measure.eerThreshold(negatives, positives)
+    far, frr = bob.measure.farfrr(negatives, positives, thres)
     FAR.append(far)
     FRR.append(frr)
     THRES.append(thres)
@@ -179,7 +179,7 @@ def makemovie(machines, data, filename=None):
     refimage = fig2bzarray(mpl.gcf())
     orows = 2*(refimage.shape[1]/2)
     ocols = 2*(refimage.shape[2]/2)
-    output = torch.io.VideoWriter(filename, orows, ocols, 5) #5 Hz
+    output = bob.io.VideoWriter(filename, orows, ocols, 5) #5 Hz
     print "Saving %d frames to to %s" % (len(machines), filename)
 
   for i, k in enumerate(machines):
@@ -215,11 +215,11 @@ if __name__ == '__main__':
   options, args = parser.parse_args()
 
   # Loads the dataset and performs LDA
-  data = torch.db.iris.data()
+  data = bob.db.iris.data()
   machines = create_machine(data, options.steps)
 
   if options.selftest:
-    (fd, filename) = tempfile.mkstemp('.avi', 'torchtest_')
+    (fd, filename) = tempfile.mkstemp('.avi', 'bobtest_')
     os.close(fd)
     os.unlink(filename)
     makemovie(machines, data, filename)

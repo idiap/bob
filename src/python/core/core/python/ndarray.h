@@ -4,7 +4,7 @@
  * @author André Anjos <andre.anjos@idiap.ch>
  *
  * @brief A boost::python extension object that plays the role of a NumPy
- * ndarray (PyArrayObject*) and Torch::core::array::interface at the same time.
+ * ndarray (PyArrayObject*) and bob::core::array::interface at the same time.
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_PYTHON_NDARRAY_H 
-#define TORCH_PYTHON_NDARRAY_H
+#ifndef BOB_PYTHON_NDARRAY_H 
+#define BOB_PYTHON_NDARRAY_H
 
 #include <boost/python.hpp> //this has to come before the next declaration!
 #include <boost/format.hpp>
@@ -33,11 +33,11 @@
 
 // Defines a unique symbol for the API
 #if !defined(PY_ARRAY_UNIQUE_SYMBOL)
-#define PY_ARRAY_UNIQUE_SYMBOL torch_NUMPY_ARRAY_API
+#define PY_ARRAY_UNIQUE_SYMBOL bob_NUMPY_ARRAY_API
 #endif
 
-// Normally, don't import_array(), except if torch_IMPORT_ARRAY is defined.
-#if !defined(torch_IMPORT_ARRAY) and !defined(NO_IMPORT_ARRAY)
+// Normally, don't import_array(), except if bob_IMPORT_ARRAY is defined.
+#if !defined(bob_IMPORT_ARRAY) and !defined(NO_IMPORT_ARRAY)
 #define NO_IMPORT_ARRAY
 #endif
 
@@ -69,7 +69,7 @@
 #  define SIZE_T_FMT "%u"
 #endif
 
-namespace Torch { namespace python {
+namespace bob { namespace python {
 
   /**
    * Initializes numpy and boost bindings. Should be called once per module.
@@ -80,14 +80,14 @@ namespace Torch { namespace python {
   void setup_python(const char* module_docstring);
 
   /**
-   * A generic method to convert from ndarray type_num to torch's ElementType
+   * A generic method to convert from ndarray type_num to bob's ElementType
    */
-  Torch::core::array::ElementType num_to_type(int num);
+  bob::core::array::ElementType num_to_type(int num);
 
   /**
    * A method to retrieve the type of element of an array
    */
-  Torch::core::array::ElementType array_to_type(const boost::python::numeric::array& a);
+  bob::core::array::ElementType array_to_type(const boost::python::numeric::array& a);
 
   /**
    * Retrieves the number of dimensions in an array
@@ -98,7 +98,7 @@ namespace Torch { namespace python {
    * Converts from C/C++ type to ndarray type_num.
    */
   template <typename T> int ctype_to_num(void) {
-    PYTHON_ERROR(TypeError, "unsupported C/C++ type (%s)", Torch::core::array::stringize<T>());
+    PYTHON_ERROR(TypeError, "unsupported C/C++ type (%s)", bob::core::array::stringize<T>());
   }
 
   // The C/C++ types we support should be declared here.
@@ -125,9 +125,9 @@ namespace Torch { namespace python {
 #endif
 
   /**
-   * Converts from torch's Element type to ndarray type_num
+   * Converts from bob's Element type to ndarray type_num
    */
-  int type_to_num(Torch::core::array::ElementType type);
+  int type_to_num(bob::core::array::ElementType type);
 
   /**
    * Handles conversion checking possibilities
@@ -145,14 +145,14 @@ namespace Torch { namespace python {
    * ndarray. An exception may be thrown otherwise.
    */
   void typeinfo_ndarray (const boost::python::object& o, 
-      Torch::core::array::typeinfo& i);
+      bob::core::array::typeinfo& i);
 
   /**
    * This is the same as above, but does not run any check on the input object
    * "o".
    */
   void typeinfo_ndarray_ (const boost::python::object& o, 
-      Torch::core::array::typeinfo& i);
+      bob::core::array::typeinfo& i);
 
   /**
    * Checks if an array-like object is convertible to become a NumPy ndarray
@@ -191,7 +191,7 @@ namespace Torch { namespace python {
    *             be able to implement write-back.
    */
   convert_t convertible(boost::python::object array_like, 
-      Torch::core::array::typeinfo& info, bool writeable=true,
+      bob::core::array::typeinfo& info, bool writeable=true,
       bool behaved=true);
 
   /**
@@ -206,7 +206,7 @@ namespace Torch { namespace python {
    * 3. If 2. holds, shape values are checked if has_valid_shape() is 'true'
    */
   convert_t convertible_to (boost::python::object array_like,
-      const Torch::core::array::typeinfo& info, bool writeable=true,
+      const bob::core::array::typeinfo& info, bool writeable=true,
       bool behaved=true);
 
   /**
@@ -244,9 +244,9 @@ namespace Torch { namespace python {
       dtype(int npy_typenum);
 
       /**
-       * Builds a new dtype object from a torch element type
+       * Builds a new dtype object from a bob element type
        */
-      dtype(Torch::core::array::ElementType eltype);
+      dtype(bob::core::array::ElementType eltype);
 
       /**
        * Copy constructor
@@ -272,12 +272,12 @@ namespace Torch { namespace python {
        * Somme checks
        */
       bool has_native_byteorder() const; ///< byte order is native
-      bool has_type(Torch::core::array::ElementType eltype) const; ///< matches
+      bool has_type(bob::core::array::ElementType eltype) const; ///< matches
 
       /**
        * Returns the current element type
        */
-      Torch::core::array::ElementType eltype() const;
+      bob::core::array::ElementType eltype() const;
 
       /**
        * Returns the current type num or -1, if I'm None
@@ -305,7 +305,7 @@ namespace Torch { namespace python {
 
   };
 
-  class py_array: public Torch::core::array::interface {
+  class py_array: public bob::core::array::interface {
 
     public: //api
 
@@ -325,43 +325,43 @@ namespace Torch { namespace python {
       /**
        * Builds a new array copying the data of an existing buffer.
        */
-      py_array(const Torch::core::array::interface& buffer);
+      py_array(const bob::core::array::interface& buffer);
 
       /**
        * Builds a new array by referring to the data of an existing buffer.
        */
-      py_array(boost::shared_ptr<Torch::core::array::interface> buffer);
+      py_array(boost::shared_ptr<bob::core::array::interface> buffer);
 
       /**
        * Builds a new array from scratch using the typeinfo. This array will be
        * a NumPy ndarray internally.
        */
-      py_array(const Torch::core::array::typeinfo& info);
+      py_array(const bob::core::array::typeinfo& info);
 
       template <typename T>
-      py_array(Torch::core::array::ElementType t, T d0) {
-        set(Torch::core::array::typeinfo(t, (T)1, &d0));
+      py_array(bob::core::array::ElementType t, T d0) {
+        set(bob::core::array::typeinfo(t, (T)1, &d0));
       }
       template <typename T>
-      py_array(Torch::core::array::ElementType t, T d0, T d1) {
+      py_array(bob::core::array::ElementType t, T d0, T d1) {
         T shape[2] = {d0, d1};
-        set(Torch::core::array::typeinfo(t, (T)2, &shape[0]));
+        set(bob::core::array::typeinfo(t, (T)2, &shape[0]));
       }
       template <typename T>
-      py_array(Torch::core::array::ElementType t, T d0, T d1, T d2) {
+      py_array(bob::core::array::ElementType t, T d0, T d1, T d2) {
         T shape[3] = {d0, d1, d2};
-        set(Torch::core::array::typeinfo(t, (T)3, &shape[0]));
+        set(bob::core::array::typeinfo(t, (T)3, &shape[0]));
       }
       template <typename T>
-      py_array(Torch::core::array::ElementType t, T d0, T d1, T d2, T d3) {
+      py_array(bob::core::array::ElementType t, T d0, T d1, T d2, T d3) {
         T shape[4] = {d0, d1, d2, d3};
-        set(Torch::core::array::typeinfo(t, (T)4, &shape[0]));
+        set(bob::core::array::typeinfo(t, (T)4, &shape[0]));
       }
       template <typename T>
-      py_array(Torch::core::array::ElementType t, T d0, T d1, T d2, T d3, T d4) 
+      py_array(bob::core::array::ElementType t, T d0, T d1, T d2, T d3, T d4) 
       {
         T shape[5] = {d0, d1, d2, d3, d4};
-        set(Torch::core::array::typeinfo(t, (T)5, &shape[0]));
+        set(bob::core::array::typeinfo(t, (T)5, &shape[0]));
       }
       
       /**
@@ -372,23 +372,23 @@ namespace Torch { namespace python {
       /**
        * Copies the data from another buffer.
        */
-      virtual void set(const Torch::core::array::interface& buffer);
+      virtual void set(const bob::core::array::interface& buffer);
 
       /**
        * Refers to the data of another buffer.
        */
-      virtual void set(boost::shared_ptr<Torch::core::array::interface> buffer);
+      virtual void set(boost::shared_ptr<bob::core::array::interface> buffer);
 
       /**
        * Re-allocates this buffer taking into consideration new requirements.
        * The internal memory should be considered uninitialized.
        */
-      virtual void set (const Torch::core::array::typeinfo& req);
+      virtual void set (const bob::core::array::typeinfo& req);
 
       /**
        * Type information for this buffer.
        */
-      virtual const Torch::core::array::typeinfo& type() const { return m_type; }
+      virtual const bob::core::array::typeinfo& type() const { return m_type; }
 
       /**
        * Borrows a reference from the underlying memory. This means this object
@@ -430,7 +430,7 @@ namespace Torch { namespace python {
 
     private: //representation
 
-      Torch::core::array::typeinfo m_type; ///< type information
+      bob::core::array::typeinfo m_type; ///< type information
       void* m_ptr; ///< pointer to the data
       bool m_is_numpy; ///< true if initiated with a NumPy array
       boost::shared_ptr<void> m_data; ///< Pointer to the data owner
@@ -471,22 +471,22 @@ namespace Torch { namespace python {
       /**
        * Builds a new array from scratch using a type and shape
        */
-      ndarray(const Torch::core::array::typeinfo& info);
+      ndarray(const bob::core::array::typeinfo& info);
 
       template <typename T>
-      ndarray(Torch::core::array::ElementType t, T d0)
+      ndarray(bob::core::array::ElementType t, T d0)
         : px(new py_array(t, d0)) { }
       template <typename T>
-      ndarray(Torch::core::array::ElementType t, T d0, T d1) 
+      ndarray(bob::core::array::ElementType t, T d0, T d1) 
         : px(new py_array(t, d0, d1)) { }
       template <typename T>
-      ndarray(Torch::core::array::ElementType t, T d0, T d1, T d2)
+      ndarray(bob::core::array::ElementType t, T d0, T d1, T d2)
         : px(new py_array(t, d0, d1, d2)) { }
       template <typename T>
-      ndarray(Torch::core::array::ElementType t, T d0, T d1, T d2, T d3) 
+      ndarray(bob::core::array::ElementType t, T d0, T d1, T d2, T d3) 
         : px(new py_array(t, d0, d1, d2, d3)) { }
       template <typename T>
-      ndarray(Torch::core::array::ElementType t, T d0, T d1, T d2, T d3, T d4) 
+      ndarray(bob::core::array::ElementType t, T d0, T d1, T d2, T d3, T d4) 
         : px(new py_array(t, d0, d1, d2, d3, d4)) { }
       
       /**
@@ -497,7 +497,7 @@ namespace Torch { namespace python {
       /**
        * Returns the type information
        */
-      virtual const Torch::core::array::typeinfo& type() const;
+      virtual const bob::core::array::typeinfo& type() const;
 
       /**
        * Returns the underlying python representation.
@@ -517,19 +517,19 @@ namespace Torch { namespace python {
         typedef blitz::Array<T,N> array_type;
         typedef blitz::TinyVector<int,N> shape_type;
 
-        const Torch::core::array::typeinfo& info = px->type();
+        const bob::core::array::typeinfo& info = px->type();
 
         if (info.nd != N) {
           boost::format mesg("cannot wrap numpy.ndarray(%s,%d) as blitz::Array<%s,%s> - dimensions do not match");
-          mesg % Torch::core::array::stringize(info.dtype) % info.nd;
-          mesg % Torch::core::array::stringize<T>() % N;
+          mesg % bob::core::array::stringize(info.dtype) % info.nd;
+          mesg % bob::core::array::stringize<T>() % N;
           throw std::invalid_argument(mesg.str().c_str());
         }
 
-        if (info.dtype != Torch::core::array::getElementType<T>()) {
+        if (info.dtype != bob::core::array::getElementType<T>()) {
           boost::format mesg("cannot wrap numpy.ndarray(%s,%d) as blitz::Array<%s,%s> - data type does not match");
-          mesg % Torch::core::array::stringize(info.dtype) % info.nd;
-          mesg % Torch::core::array::stringize<T>() % N;
+          mesg % bob::core::array::stringize(info.dtype) % info.nd;
+          mesg % bob::core::array::stringize<T>() % N;
           throw std::invalid_argument(mesg.str().c_str());
         }
 
@@ -594,4 +594,4 @@ namespace Torch { namespace python {
 
 }}
 
-#endif /* TORCH_PYTHON_NDARRAY_H */
+#endif /* BOB_PYTHON_NDARRAY_H */

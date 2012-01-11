@@ -4,7 +4,7 @@
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * Implements a class to read Video files and convert the frames into something
- * that torch can understand (i.e. blitz::Array<>'s). This implementation is
+ * that bob can understand (i.e. blitz::Array<>'s). This implementation is
  * heavily based on FFmpeg and the excellent tutorial here:
  * http://dranger.com/ffmpeg/, with some personal modifications. In doubt,
  * consult the ffmpeg documentation: http://ffmpeg.org/documentation.html
@@ -24,8 +24,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IO_DETAIL_VIDEOREADER_H
-#define TORCH_IO_DETAIL_VIDEOREADER_H
+#ifndef BOB_IO_DETAIL_VIDEOREADER_H
+#define BOB_IO_DETAIL_VIDEOREADER_H
 
 #include <string>
 #include <blitz/array.h>
@@ -38,7 +38,7 @@ extern "C" {
 #include <libswscale/swscale.h>
 }
 
-namespace Torch { namespace io {
+namespace bob { namespace io {
 
   /**
    * VideoReader objects can read data from video files. The current
@@ -49,7 +49,7 @@ namespace Torch { namespace io {
    *
    * The maximum precision FFMPEG will output is a 24-bit (8-bit per band)
    * representation of each pixel (32-bit with transparency when supported by
-   * Torch, which is not the case presently). So, the input of data using this
+   * bob, which is not the case presently). So, the input of data using this
    * class uses uint8_t as base element type. Output will be colored using the
    * RGB standard, with each band varying between 0 and 255, with zero meaning
    * pure black and 255, pure white (color).
@@ -128,13 +128,13 @@ namespace Torch { namespace io {
       /**
        * Returns the typing information for this video
        */
-      inline const Torch::core::array::typeinfo& video_type() const 
+      inline const bob::core::array::typeinfo& video_type() const 
       { return m_typeinfo_video; }
 
       /**
        * Returns the typing information for this video
        */
-      inline const Torch::core::array::typeinfo& frame_type() const 
+      inline const bob::core::array::typeinfo& frame_type() const 
       { return m_typeinfo_frame; }
 
       /**
@@ -148,7 +148,7 @@ namespace Torch { namespace io {
        * Loads all of the video stream in a buffer. Resizes the buffer if
        * the space and type are not good.
        */
-      void load(Torch::core::array::interface& b) const;
+      void load(bob::core::array::interface& b) const;
 
     private: //methods
 
@@ -236,7 +236,7 @@ namespace Torch { namespace io {
            * position, an exception is raised if you try to read() the
            * iterator.
            */
-          void read (Torch::core::array::interface& b);
+          void read (bob::core::array::interface& b);
 
           /**
            * Reads the currently pointed frame and advances one position.
@@ -334,10 +334,10 @@ namespace Torch { namespace io {
       std::string m_codecname; ///< the name of the ffmpeg codec to be used
       std::string m_codecname_long; ///< long version of m_codecname
       std::string m_formatted_info; ///< printable information about the video
-      Torch::core::array::typeinfo m_typeinfo_video; ///< read whole video type
-      Torch::core::array::typeinfo m_typeinfo_frame; ///< read single frame type
+      bob::core::array::typeinfo m_typeinfo_video; ///< read whole video type
+      bob::core::array::typeinfo m_typeinfo_frame; ///< read single frame type
   };
 
 }}
 
-#endif //TORCH_IO_DETAIL_VIDEOREADER_H
+#endif //BOB_IO_DETAIL_VIDEOREADER_H

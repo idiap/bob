@@ -42,17 +42,17 @@
 #warning Disabling MT locks because Boost < 1.35!
 #endif
 
-Torch::core::OutputDevice::~OutputDevice() {}
-Torch::core::InputDevice::~InputDevice() {}
+bob::core::OutputDevice::~OutputDevice() {}
+bob::core::InputDevice::~InputDevice() {}
     
-struct NullOutputDevice: public Torch::core::OutputDevice {
+struct NullOutputDevice: public bob::core::OutputDevice {
   virtual ~NullOutputDevice() {}
   virtual std::streamsize write(const char*, std::streamsize n) {
     return n;
   }
 };
 
-struct StdoutOutputDevice: public Torch::core::OutputDevice {
+struct StdoutOutputDevice: public bob::core::OutputDevice {
   virtual ~StdoutOutputDevice() {}
   virtual std::streamsize write(const char* s, std::streamsize n) {
     static boost::mutex mutex;
@@ -64,7 +64,7 @@ struct StdoutOutputDevice: public Torch::core::OutputDevice {
   }
 };
 
-struct StderrOutputDevice: public Torch::core::OutputDevice {
+struct StderrOutputDevice: public bob::core::OutputDevice {
   virtual ~StderrOutputDevice() {}
   virtual std::streamsize write(const char* s, std::streamsize n) {
     static boost::mutex mutex;
@@ -76,7 +76,7 @@ struct StderrOutputDevice: public Torch::core::OutputDevice {
   }
 };
 
-struct StdinInputDevice: public Torch::core::InputDevice {
+struct StdinInputDevice: public bob::core::InputDevice {
   virtual ~StdinInputDevice() {}
   virtual std::streamsize read(char* s, std::streamsize n) {
     static boost::mutex mutex;
@@ -97,7 +97,7 @@ inline static bool is_dot_gz(const std::string& filename) {
   return boost::filesystem::extension(filename) == ".gz";
 }
 
-struct FileOutputDevice: public Torch::core::OutputDevice {
+struct FileOutputDevice: public bob::core::OutputDevice {
   FileOutputDevice(const std::string& filename)
     : m_filename(filename),
       m_file(),
@@ -132,7 +132,7 @@ struct FileOutputDevice: public Torch::core::OutputDevice {
 
 };
 
-struct FileInputDevice: public Torch::core::InputDevice {
+struct FileInputDevice: public bob::core::InputDevice {
   FileInputDevice(const std::string& filename)
     : m_filename(filename),
       m_file(),
@@ -167,8 +167,8 @@ struct FileInputDevice: public Torch::core::InputDevice {
 
 };
 
-bool Torch::core::debug_level(unsigned int i) {
-  const char* value = getenv("TORCH_DEBUG");
+bool bob::core::debug_level(unsigned int i) {
+  const char* value = getenv("BOB_DEBUG");
   if (!value) return false;
   unsigned long v = strtoul(value, 0, 0);
   if (v < 1 || v > 3) v = 0;
@@ -176,27 +176,27 @@ bool Torch::core::debug_level(unsigned int i) {
 }
 
 
-Torch::core::AutoOutputDevice::AutoOutputDevice()
+bob::core::AutoOutputDevice::AutoOutputDevice()
 : m_device(new NullOutputDevice)
 {}
 
-Torch::core::AutoOutputDevice::AutoOutputDevice(const Torch::core::AutoOutputDevice& other)
+bob::core::AutoOutputDevice::AutoOutputDevice(const bob::core::AutoOutputDevice& other)
 : m_device(other.m_device)
 {}
 
-Torch::core::AutoOutputDevice::AutoOutputDevice(const boost::shared_ptr<Torch::core::OutputDevice>& device)
+bob::core::AutoOutputDevice::AutoOutputDevice(const boost::shared_ptr<bob::core::OutputDevice>& device)
 : m_device(device)
 {}
 
-Torch::core::AutoOutputDevice::AutoOutputDevice(const std::string& configuration) 
+bob::core::AutoOutputDevice::AutoOutputDevice(const std::string& configuration) 
 : m_device()
 {
   reset(configuration);
 }
 
-Torch::core::AutoOutputDevice::~AutoOutputDevice() {}
+bob::core::AutoOutputDevice::~AutoOutputDevice() {}
 
-void Torch::core::AutoOutputDevice::reset(const std::string& configuration) {
+void bob::core::AutoOutputDevice::reset(const std::string& configuration) {
   std::string str(configuration);
   str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end());
   if (str == "null" || str.size()==0) m_device.reset(new NullOutputDevice);
@@ -205,67 +205,67 @@ void Torch::core::AutoOutputDevice::reset(const std::string& configuration) {
   else m_device.reset(new FileOutputDevice(configuration));
 }
 
-void Torch::core::AutoOutputDevice::reset(const boost::shared_ptr<Torch::core::OutputDevice>& device) {
+void bob::core::AutoOutputDevice::reset(const boost::shared_ptr<bob::core::OutputDevice>& device) {
   m_device = device;
 }
 
-std::streamsize Torch::core::AutoOutputDevice::write(const char* s, std::streamsize n) {
+std::streamsize bob::core::AutoOutputDevice::write(const char* s, std::streamsize n) {
   return m_device->write(s, n);
 }
 
-void Torch::core::AutoOutputDevice::close() {
+void bob::core::AutoOutputDevice::close() {
   m_device->close();
 }
 
-Torch::core::OutputStream::~OutputStream() {}
+bob::core::OutputStream::~OutputStream() {}
 
-Torch::core::AutoInputDevice::AutoInputDevice()
+bob::core::AutoInputDevice::AutoInputDevice()
 : m_device(new StdinInputDevice)
 {}
 
-Torch::core::AutoInputDevice::AutoInputDevice(const Torch::core::AutoInputDevice& other)
+bob::core::AutoInputDevice::AutoInputDevice(const bob::core::AutoInputDevice& other)
 : m_device(other.m_device)
 {}
 
-Torch::core::AutoInputDevice::AutoInputDevice(const boost::shared_ptr<Torch::core::InputDevice>& device)
+bob::core::AutoInputDevice::AutoInputDevice(const boost::shared_ptr<bob::core::InputDevice>& device)
 : m_device(device)
 {}
 
-Torch::core::AutoInputDevice::AutoInputDevice(const std::string& configuration) 
+bob::core::AutoInputDevice::AutoInputDevice(const std::string& configuration) 
 : m_device()
 {
   reset(configuration);
 }
 
-Torch::core::AutoInputDevice::~AutoInputDevice() {}
+bob::core::AutoInputDevice::~AutoInputDevice() {}
 
-void Torch::core::AutoInputDevice::reset(const std::string& configuration) {
+void bob::core::AutoInputDevice::reset(const std::string& configuration) {
   std::string str(configuration);
   str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end());
   if (str == "stdin" || str.size() == 0) m_device.reset(new StdinInputDevice);
   else m_device.reset(new FileInputDevice(configuration));
 }
 
-void Torch::core::AutoInputDevice::reset(const boost::shared_ptr<Torch::core::InputDevice>& device) {
+void bob::core::AutoInputDevice::reset(const boost::shared_ptr<bob::core::InputDevice>& device) {
   m_device = device;
 }
 
-std::streamsize Torch::core::AutoInputDevice::read(char* s, std::streamsize n) {
+std::streamsize bob::core::AutoInputDevice::read(char* s, std::streamsize n) {
   return m_device->read(s, n);
 }
 
-void Torch::core::AutoInputDevice::close() {
+void bob::core::AutoInputDevice::close() {
   m_device->close();
 }
 
-Torch::core::InputStream::~InputStream() {}
+bob::core::InputStream::~InputStream() {}
 
-Torch::core::OutputStream Torch::core::debug("stdout");
-Torch::core::OutputStream Torch::core::info("stdout");
-Torch::core::OutputStream Torch::core::warn("stderr");
-Torch::core::OutputStream Torch::core::error("stderr");
+bob::core::OutputStream bob::core::debug("stdout");
+bob::core::OutputStream bob::core::info("stdout");
+bob::core::OutputStream bob::core::warn("stderr");
+bob::core::OutputStream bob::core::error("stderr");
 
-std::string Torch::core::tmpdir() {
+std::string bob::core::tmpdir() {
   const char* value = getenv("TMPDIR");
   if (value) return value;
   else return "/tmp";

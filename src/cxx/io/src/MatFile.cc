@@ -30,8 +30,8 @@
 #include "io/Exception.h"
 
 namespace fs = boost::filesystem;
-namespace io = Torch::io;
-namespace ca = Torch::core::array;
+namespace io = bob::io;
+namespace ca = bob::core::array;
 
 /**
  * TODO:
@@ -68,8 +68,8 @@ class MatFile: public io::File {
 
         //double checks some parameters
         if (m_type.nd == 0 || m_type.nd > 4) 
-          throw io::DimensionError(m_type.nd, TORCH_MAX_DIM);
-        if (m_type.dtype == Torch::core::array::t_unknown) 
+          throw io::DimensionError(m_type.nd, BOB_MAX_DIM);
+        if (m_type.dtype == bob::core::array::t_unknown) 
           throw io::UnsupportedTypeError(m_type.dtype);
       }
     }
@@ -219,7 +219,7 @@ class MatFile: public io::File {
 
 };
 
-std::string MatFile::s_codecname = "torch.matlab";
+std::string MatFile::s_codecname = "bob.matlab";
 
 /**
  * From this point onwards we have the registration procedure. If you are

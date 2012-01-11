@@ -126,7 +126,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-namespace Torch
+namespace bob
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -366,7 +366,7 @@ bool ipLBP4R::saveFile(File& file) const
 	int idCore = getID();
 	if (file.taggedWrite(&idCore, 1, "CoreID") != 1)
 	{
-		Torch::message("ipLBP4R::save - failed to write <CoreID> field!\n");
+		bob::message("ipLBP4R::save - failed to write <CoreID> field!\n");
 		return false;
 	}
 
@@ -374,13 +374,13 @@ bool ipLBP4R::saveFile(File& file) const
 	//  m_modelSize[0]
 	if (file.taggedWrite(&m_modelSize.size[1],1, "Width") != 1)
 	{
-		Torch::message("ipLBP4R::save - failed to write <Width> field!\n");
+		bob::message("ipLBP4R::save - failed to write <Width> field!\n");
 		return false;
 	}
 
 	if (file.taggedWrite(&m_modelSize.size[0], 1, "Height") != 1)
 	{
-		Torch::message("ipLBP4R::save - failed to write <height> field!\n");
+		bob::message("ipLBP4R::save - failed to write <height> field!\n");
 		return false;
 	}
 
@@ -388,28 +388,28 @@ bool ipLBP4R::saveFile(File& file) const
 	//m_P
 	if (file.taggedWrite(&m_P, 1, "P") != 1)
 	{
-		Torch::message("ipLBP4R::save - failed to write <P> field!\n");
+		bob::message("ipLBP4R::save - failed to write <P> field!\n");
 		return false;
 	}
 
 	//m_R
 	if (file.taggedWrite(&m_R, 1, "Radius") != 1)
 	{
-		Torch::message("ipLBP4R::save - failed to write <Radius> field!\n");
+		bob::message("ipLBP4R::save - failed to write <Radius> field!\n");
 		return false;
 	}
 
 	//m_x
 	if (file.taggedWrite(&m_x,  1, "LocationX") != 1)
 	{
-		Torch::message("ipLBP4R::save - failed to write <LocationX> field!\n");
+		bob::message("ipLBP4R::save - failed to write <LocationX> field!\n");
 		return false;
 	}
 
 	//m_y
 	if (file.taggedWrite(&m_y, 1, "LocationY") != 1)
 	{
-		Torch::message("ipLBP4R::save - failed to write <LocationY> field!\n");
+		bob::message("ipLBP4R::save - failed to write <LocationY> field!\n");
 		return false;
 	}
 
@@ -417,7 +417,7 @@ bool ipLBP4R::saveFile(File& file) const
 	//m_toAverage
 	if (file.taggedWrite(&m_toAverage, 1, "m_toAverage") != 1)
 	{
-		Torch::message("ipLBP4R::save - failed to write <m_toAverage> field!\n");
+		bob::message("ipLBP4R::save - failed to write <m_toAverage> field!\n");
 		return false;
 	}
 
@@ -425,20 +425,20 @@ bool ipLBP4R::saveFile(File& file) const
 	//m_addAvgBit
 	if (file.taggedWrite(&m_addAvgBit, 1, "m_addAvgBit") != 1)
 	{
-		Torch::message("ipLBP4R::save - failed to write <m_addAvgBit> field!\n");
+		bob::message("ipLBP4R::save - failed to write <m_addAvgBit> field!\n");
 		return false;
 	}
 
 	//m_toAverage
 	if (file.taggedWrite(&m_uniform,1, "m_uniform") != 1)
 	{
-		Torch::message("ipLBP4R::save - failed to write <m_uniform> field!\n");
+		bob::message("ipLBP4R::save - failed to write <m_uniform> field!\n");
 		return false;
 	}
 	//m_rot_invariant
 	if (file.taggedWrite(&m_rot_invariant, 1, "m_rot_invariant") != 1)
 	{
-		Torch::message("ipLBP4R::save - failed to write <m_rot_invariant> field!\n");
+		bob::message("ipLBP4R::save - failed to write <m_rot_invariant> field!\n");
 		return false;
 	}
 
@@ -459,7 +459,7 @@ bool ipLBP4R::loadFile(File& file)
 	// int idCore =3; //should be written somewhere
 //        if (file.taggedWrite(&idCore, sizeof(int), 1, "CoreID") != 1)
 //        {
-//            Torch::message("ipLBP4R::save - failed to write <CoreID> field!\n");
+//            bob::message("ipLBP4R::save - failed to write <CoreID> field!\n");
 //            return false;
 //        }
 
@@ -469,13 +469,13 @@ bool ipLBP4R::loadFile(File& file)
 	//  m_modelSize[0]
 	if (file.taggedRead(&w, 1, "Width") != 1)
 	{
-		Torch::message("ipLBP4R::load - failed to Read <Width> field!\n");
+		bob::message("ipLBP4R::load - failed to Read <Width> field!\n");
 		return false;
 	}
 
 	if (file.taggedRead(&h, 1, "Height") != 1)
 	{
-		Torch::message("ipLBP4R::load - failed to Read <height> field!\n");
+		bob::message("ipLBP4R::load - failed to Read <height> field!\n");
 		return false;
 	}
 
@@ -484,28 +484,28 @@ bool ipLBP4R::loadFile(File& file)
 	//m_P
 	if (file.taggedRead(&m_P, 1, "P") != 1)
 	{
-		Torch::message("ipLBP4R::load - failed to Read <P> field!\n");
+		bob::message("ipLBP4R::load - failed to Read <P> field!\n");
 		return false;
 	}
 
 	//m_R
 	if (file.taggedRead(&m_R, 1, "Radius") != 1)
 	{
-		Torch::message("ipLBP4R::load - failed to Read <Radius> field!\n");
+		bob::message("ipLBP4R::load - failed to Read <Radius> field!\n");
 		return false;
 	}
 
 	//m_x
 	if (file.taggedRead(&m_x, 1, "LocationX") != 1)
 	{
-		Torch::message("ipLBP4R::load - failed to Read <LocationX> field!\n");
+		bob::message("ipLBP4R::load - failed to Read <LocationX> field!\n");
 		return false;
 	}
 
 	//m_y
 	if (file.taggedRead(&m_y, 1, "LocationY") != 1)
 	{
-		Torch::message("ipLBP4R::load - failed to Read <LocationY> field!\n");
+		bob::message("ipLBP4R::load - failed to Read <LocationY> field!\n");
 		return false;
 	}
 
@@ -515,7 +515,7 @@ bool ipLBP4R::loadFile(File& file)
 	//m_toAverage
 	if (file.taggedRead(&mavg, 1, "m_toAverage") != 1)
 	{
-		Torch::message("ipLBP4R::load - failed toRead <m_toAverage> field!\n");
+		bob::message("ipLBP4R::load - failed toRead <m_toAverage> field!\n");
 		return false;
 	}
 
@@ -523,20 +523,20 @@ bool ipLBP4R::loadFile(File& file)
 	//m_addAvgBit
 	if (file.taggedRead(&maddavg, 1, "m_addAvgBit") != 1)
 	{
-		Torch::message("ipLBP4R::load - failed to Read <m_addAvgBit> field!\n");
+		bob::message("ipLBP4R::load - failed to Read <m_addAvgBit> field!\n");
 		return false;
 	}
 
 	//m_toAverage
 	if (file.taggedRead(&muni, 1, "m_uniform") != 1)
 	{
-		Torch::message("ipLBP4R::load - failed to Read <m_uniform> field!\n");
+		bob::message("ipLBP4R::load - failed to Read <m_uniform> field!\n");
 		return false;
 	}
 	//m_rot_invariant
 	if (file.taggedRead(&mroti, 1, "m_rot_invariant") != 1)
 	{
-		Torch::message("ipLBP4R::load - failed to Read <m_rot_invariant> field!\n");
+		bob::message("ipLBP4R::load - failed to Read <m_rot_invariant> field!\n");
 		return false;
 	}
 

@@ -33,7 +33,7 @@
 #include "visioner/proc/detection.h"
 
 using namespace boost::python;
-namespace array = Torch::core::array;
+namespace array = bob::core::array;
 
 static void load(visioner::SWScanner& s, 
     const blitz::Array<int16_t,2>& grayimage) {

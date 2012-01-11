@@ -22,7 +22,7 @@
 
 #include "core/Object.h"
 
-namespace Torch
+namespace bob
 {
 	struct TensorSize;
 

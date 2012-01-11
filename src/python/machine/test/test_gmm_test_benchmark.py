@@ -8,7 +8,7 @@
 import os, sys
 import unittest
 import numpy
-import torch
+import bob
 import itertools
 
 def my_strip(str):
@@ -44,8 +44,8 @@ class MachineTest(unittest.TestCase):
   def test01_GMMMachine(self):
     """Test a GMMMachine"""
 
-    sampler = torch.trainer.SimpleFrameSampler(torch.io.Arrayset("data/1028_m_g1_s03_1028_en_2.bindata"))
-    gmm = torch.machine.GMMMachine(3, 91)
+    sampler = bob.trainer.SimpleFrameSampler(bob.io.Arrayset("data/1028_m_g1_s03_1028_en_2.bindata"))
+    gmm = bob.machine.GMMMachine(3, 91)
 
     weis, means, varis = read_lightsaber("data/tan-triggs-64x80-normalised-D91-gmm512-B24-BANCA.data.s")
     print means
@@ -58,19 +58,19 @@ class MachineTest(unittest.TestCase):
 
     gmm.forward(sampler)
 
-    stats = torch.machine.GMMStats(3, 91)
+    stats = bob.machine.GMMStats(3, 91)
     gmm.accStatistics(sampler, stats)
     stats.print_()
 
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()

@@ -54,9 +54,9 @@ void bind_ip_spatiotempgrad();
 void bind_ip_vlsift();
 #endif
 
-BOOST_PYTHON_MODULE(libpytorch_ip) {
+BOOST_PYTHON_MODULE(libpybob_ip) {
 
-  Torch::python::setup_python("Torch image processing classes and sub-classes");
+  bob::python::setup_python("bob image processing classes and sub-classes");
 
   bind_ip_version();
   bind_ip_ipcore();

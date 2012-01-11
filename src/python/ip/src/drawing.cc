@@ -24,9 +24,9 @@
 #include "ip/drawing.h"
 
 using namespace boost::python;
-namespace ip = Torch::ip;
-namespace tp = Torch::python;
-namespace ca = Torch::core::array;
+namespace ip = bob::ip;
+namespace tp = bob::python;
+namespace ca = bob::core::array;
 
 template <typename T>
 static void inner_draw_point_ (tp::ndarray image, int x, int y, object color) {

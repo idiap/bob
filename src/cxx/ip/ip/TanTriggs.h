@@ -20,15 +20,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_TAN_TRIGGS_H
-#define TORCH5SPRO_TAN_TRIGGS_H 1
+#ifndef BOB5SPRO_TAN_TRIGGS_H
+#define BOB5SPRO_TAN_TRIGGS_H 1
 
 #include "core/logging.h"
 #include "ip/Exception.h"
 #include "ip/gammaCorrection.h"
 #include "sp/convolution.h"
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libip_api
  * @{
@@ -119,7 +119,7 @@ namespace Torch {
 
     // 1/ Perform gamma correction
     if( m_gamma > 0.)
-      Torch::ip::gammaCorrection( src, m_img_tmp, m_gamma);
+      bob::ip::gammaCorrection( src, m_img_tmp, m_gamma);
     else
     {
       blitz::Range src_y( src.lbound(0), src.ubound(0)),
@@ -130,7 +130,7 @@ namespace Torch {
     }
 
     // 2/ Convolution with the DoG Filter
-    Torch::sp::convolve( m_img_tmp, m_kernel, dst, 
+    bob::sp::convolve( m_img_tmp, m_kernel, dst, 
       m_size_opt, m_border_opt);
 
     // 3/ Perform contrast equalization
@@ -139,4 +139,4 @@ namespace Torch {
 
 }}
 
-#endif /* TORCH5SPRO_TAN_TRIGGS_H */
+#endif /* BOB5SPRO_TAN_TRIGGS_H */

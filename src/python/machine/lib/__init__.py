@@ -1,7 +1,7 @@
-from libpytorch_machine import *
+from libpybob_machine import *
 
 def linearmachine_repr(self):
-  """A funky way to display a torch Linear Machine"""
+  """A funky way to display a bob Linear Machine"""
   if self.activation == Activation.LINEAR:
     return '<LinearMachine %s@%s>' % (self.weights.dtype, self.weights.shape)
   else:
@@ -10,7 +10,7 @@ LinearMachine.__repr__ = linearmachine_repr
 del linearmachine_repr
 
 def linearmachine_str(self):
-  """A funky way to print a torch Linear Machine"""
+  """A funky way to print a bob Linear Machine"""
   act = ""
   if self.activation != Activation.LINEAR:
     act = " [act: %s]" % self.activation
@@ -31,7 +31,7 @@ LinearMachine.__str__ = linearmachine_str
 del linearmachine_str
 
 def mlp_repr(self):
-  """A funky way to display a torch MLP"""
+  """A funky way to display a bob MLP"""
   bias = False
   for i, k in enumerate(self.biases): 
     if not (k == 0.0).all(): bias = True
@@ -40,7 +40,7 @@ MLP.__repr__ = mlp_repr
 del mlp_repr
 
 def mlp_str(self):
-  """A funky way to print a torch MLP"""
+  """A funky way to print a bob MLP"""
   act = "[act: %s]" % self.activation
   sub = ""
   if not (self.input_subtract == 0.0).all():

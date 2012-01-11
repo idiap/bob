@@ -74,7 +74,7 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
-      BOOST_CHECK_EQUAL(t1(i,j), Torch::core::cast<T>(t2(i,j)));
+      BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
 template<typename T, typename U>  
@@ -84,7 +84,7 @@ void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
       for( int k=0; k<t1.extent(2); ++k)
-        BOOST_CHECK_EQUAL(t1(i,j,k), Torch::core::cast<T>(t2(i,j,k)));
+        BOOST_CHECK_EQUAL(t1(i,j,k), bob::core::cast<T>(t2(i,j,k)));
 }
 
 
@@ -99,7 +99,7 @@ void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2,
   double diff = 0.;
   for( int i=0; i<y_min; ++i)
     for( int j=0; j<x_min; ++j)
-      diff += abs( t1(i,j) - Torch::core::cast<T>(t2(i,j)) );
+      diff += abs( t1(i,j) - bob::core::cast<T>(t2(i,j)) );
   diff = (diff/(y_min*x_min)) / 
     (std::numeric_limits<T>::max()-std::numeric_limits<T>::min()+1);
   BOOST_CHECK_SMALL( diff, eps );
@@ -119,7 +119,7 @@ void checkBlitzClose( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2,
   for( int i=0; i<p_min; ++i)
     for( int j=0; j<y_min; ++j)
       for( int k=0; k<x_min; ++k)
-        diff += abs( t1(i,j,k) - Torch::core::cast<T>(t2(i,j,k)) );
+        diff += abs( t1(i,j,k) - bob::core::cast<T>(t2(i,j,k)) );
   diff = (diff/(y_min*x_min*p_min)) / 
     (std::numeric_limits<T>::max()-std::numeric_limits<T>::min()+1);
   BOOST_CHECK_SMALL( diff, eps );
@@ -131,17 +131,17 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
 {
 // Get path to the XML Schema definition
-  char *testdata_cpath = getenv("TORCH_IP_TESTDATA_DIR");
+  char *testdata_cpath = getenv("BOB_IP_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    Torch::core::error << "Environment variable $TORCH_IP_TESTDATA_DIR " <<
+    bob::core::error << "Environment variable $BOB_IP_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
   }
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "image.pgm";
-  Torch::io::Array ar_img(testdata_path_img.string());
+  bob::io::Array ar_img(testdata_path_img.string());
   blitz::Array<uint8_t,2> img = ar_img.get<uint8_t,2>();
   blitz::Array<double,2> img_processed;
 
@@ -150,34 +150,34 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
 
   // 137x137
   img_processed.resize(137,137); 
-  Torch::ip::scale( img, img_processed, Torch::ip::Rescale::BilinearInterp);
+  bob::ip::scale( img, img_processed, bob::ip::Rescale::BilinearInterp);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_s137x137.pgm";
-  Torch::io::Array ar_img_s137(testdata_path_img.string());
+  bob::io::Array ar_img_s137(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_s137 = ar_img_s137.get<uint8_t,2>();
   checkBlitzClose( img_ref_s137, img_processed, eps);
 
   // 77x77
   img_processed.resize(77,77); 
-  Torch::ip::scale( img, img_processed, Torch::ip::Rescale::BilinearInterp);
+  bob::ip::scale( img, img_processed, bob::ip::Rescale::BilinearInterp);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_s77x77.pgm";
-  Torch::io::Array ar_img_s77(testdata_path_img.string());
+  bob::io::Array ar_img_s77(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_s77 = ar_img_s77.get<uint8_t,2>();
   checkBlitzClose( img_ref_s77, img_processed, eps);
 
   // 125x75
   img_processed.resize(125,75);
-  Torch::ip::scale( img, img_processed, Torch::ip::Rescale::BilinearInterp);
+  bob::ip::scale( img, img_processed, bob::ip::Rescale::BilinearInterp);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_s125x75.pgm";
-  Torch::io::Array ar_img_s125x75(testdata_path_img.string());
+  bob::io::Array ar_img_s125x75(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_s125x75 = ar_img_s125x75.get<uint8_t,2>();
   checkBlitzClose( img_ref_s125x75, img_processed, eps);
 
   // 100x100
   img_processed.resize(100,100); 
-  Torch::ip::scale( img, img_processed, Torch::ip::Rescale::BilinearInterp);
+  bob::ip::scale( img, img_processed, bob::ip::Rescale::BilinearInterp);
   checkBlitzClose( img, img_processed, eps);
 }
 
@@ -185,7 +185,7 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_mask )
 {
   blitz::Array<double,2> b2(2,2);
   blitz::Array<bool,2> b2_mask(2,2);
-  Torch::ip::scale( img_44, img_m44, b2, b2_mask, Torch::ip::Rescale::BilinearInterp);
+  bob::ip::scale( img_44, img_m44, b2, b2_mask, bob::ip::Rescale::BilinearInterp);
   checkBlitzEqual( img_22, b2);
   checkBlitzEqual( img_m22, b2_mask);
 }

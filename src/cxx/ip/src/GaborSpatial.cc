@@ -23,9 +23,9 @@
 #include "ip/GaborSpatial.h"
 #include "core/array_assert.h"
 
-namespace tca = Torch::core::array;
-namespace ip = Torch::ip;
-namespace sp = Torch::sp;
+namespace tca = bob::core::array;
+namespace ip = bob::ip;
+namespace sp = bob::sp;
 
 ip::GaborSpatial::GaborSpatial( const double f, const double theta, 
   const double gamma, const double eta, const int spatial_size, 

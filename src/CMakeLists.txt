@@ -1,12 +1,12 @@
-# Configures and builds torch
+# Configures and builds bob
 # Andre Anjos - 13.august.2010
 
-project(torch5spro)
+project(bob)
 cmake_minimum_required(VERSION 2.6)
 
 # The central database version and location
-set(TORCH_DATABASE_URL "http://www.idiap.ch/software/torch5spro/chrome/site/databases/")
-set(TORCH_DATABASE_VERSION "nightlies/last")
+set(BOB_DATABASE_URL "http://www.idiap.ch/software/bob/chrome/site/databases/")
+set(BOB_DATABASE_VERSION "nightlies/last")
 
 # Force __LP64__ scheme on Mac OSX
 if(APPLE)
@@ -25,7 +25,7 @@ if (CMAKE_COMPILER_IS_GNUCC)
 
   set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -O2 -mtune=generic")
 
-  set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -DTORCH_DEBUG")
+  set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -DBOB_DEBUG")
 
   set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
   set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
@@ -35,7 +35,7 @@ else (CMAKE_COMPILER_IS_GNUCC)
   # Then, it must be clang/clang++
   set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -O2 -mtune=generic")
 
-  set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -DTORCH_DEBUG")
+  set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -DBOB_DEBUG")
 
   set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
   set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
@@ -58,37 +58,37 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(cmakedir share/cmake)
 
 # Setup BOOST pre-conditions
-if ("${TORCH_LINKAGE}" STREQUAL static)
+if ("${BOB_LINKAGE}" STREQUAL static)
   set(Boost_USE_STATIC_LIBS ON)
-endif ("${TORCH_LINKAGE}" STREQUAL static)
+endif ("${BOB_LINKAGE}" STREQUAL static)
 
 # Sets up externals and install the central dependency file
-include(cmake/torch-external.cmake)
-foreach(ext ${torch_DEPENDENCIES})
+include(cmake/bob-external.cmake)
+foreach(ext ${bob_DEPENDENCIES})
   find_package(${ext} REQUIRED PATHS external)
   install(FILES external/${ext}Config.cmake DESTINATION ${cmakedir})
-endforeach(ext ${torch_DEPENDENCIES})
-foreach(ext ${torch_OPTIONALS})
+endforeach(ext ${bob_DEPENDENCIES})
+foreach(ext ${bob_OPTIONALS})
   find_package(${ext} PATHS external)
   install(FILES external/${ext}Config.cmake DESTINATION ${cmakedir})
-endforeach(ext ${torch_OPTIONALS})
-install(FILES cmake/torch-external.cmake DESTINATION ${cmakedir})
+endforeach(ext ${bob_OPTIONALS})
+install(FILES cmake/bob-external.cmake DESTINATION ${cmakedir})
 
 # Enables the testing framework
 enable_testing()
 
 # This makes sure we have all headers within reach before starting to compile
-include_directories(${CMAKE_INSTALL_PREFIX}/include/torch)
+include_directories(${CMAKE_INSTALL_PREFIX}/include/bob)
 
 # Some common definitions
 add_definitions("-DHAVE_LBFGS=1")
 
-if (TORCH_CXX)
+if (BOB_CXX)
   add_subdirectory(cxx)
-endif (TORCH_CXX)
-if (TORCH_PYTHON)
+endif (BOB_CXX)
+if (BOB_PYTHON)
   add_subdirectory(python)
-endif (TORCH_PYTHON)
+endif (BOB_PYTHON)
 
-install(EXPORT torch DESTINATION ${cmakedir})
-install(FILES cmake/torchConfig.cmake DESTINATION ${cmakedir})
+install(EXPORT bob DESTINATION ${cmakedir})
+install(FILES cmake/bobConfig.cmake DESTINATION ${cmakedir})

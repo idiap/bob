@@ -22,39 +22,39 @@
 
 using namespace std;
 
-Torch::machine::KMeansMachine::KMeansMachine(int n_means, int n_inputs): m_n_means(n_means), 
+bob::machine::KMeansMachine::KMeansMachine(int n_means, int n_inputs): m_n_means(n_means), 
     m_n_inputs(n_inputs), m_means(n_means, n_inputs), m_cache_means(n_means, n_inputs) {
   m_means = 0;
 }
 
-Torch::machine::KMeansMachine::~KMeansMachine() { 
+bob::machine::KMeansMachine::~KMeansMachine() { 
   
 }
 
-void Torch::machine::KMeansMachine::setMeans(const blitz::Array<double,2> &means) {
+void bob::machine::KMeansMachine::setMeans(const blitz::Array<double,2> &means) {
   m_means = means;
 }
 
-void Torch::machine::KMeansMachine::setMean(int i, const blitz::Array<double,1> &mean) {
+void bob::machine::KMeansMachine::setMean(int i, const blitz::Array<double,1> &mean) {
   m_means(i,blitz::Range::all()) = mean;
 }
 
-void Torch::machine::KMeansMachine::getMean(int i, blitz::Array<double,1> &mean) const {
+void bob::machine::KMeansMachine::getMean(int i, blitz::Array<double,1> &mean) const {
   mean.resize(m_n_inputs);
   mean = m_means(i,blitz::Range::all());
 }
 
-void Torch::machine::KMeansMachine::getMeans(blitz::Array<double,2> &means) const {
+void bob::machine::KMeansMachine::getMeans(blitz::Array<double,2> &means) const {
   means.resize(m_n_means,m_n_inputs);
   means = m_means;
 }
 
 
-double Torch::machine::KMeansMachine::getDistanceFromMean(const blitz::Array<double,1> &x, int i) const {
+double bob::machine::KMeansMachine::getDistanceFromMean(const blitz::Array<double,1> &x, int i) const {
   return blitz::sum(blitz::pow2(m_means(i,blitz::Range::all()) - x));
 }
 
-void Torch::machine::KMeansMachine::getClosestMean(const blitz::Array<double,1> &x, int &closest_mean, double &min_distance) const {
+void bob::machine::KMeansMachine::getClosestMean(const blitz::Array<double,1> &x, int &closest_mean, double &min_distance) const {
   
   min_distance = DBL_MAX;
   
@@ -68,14 +68,14 @@ void Torch::machine::KMeansMachine::getClosestMean(const blitz::Array<double,1> 
   
 }
 
-double Torch::machine::KMeansMachine::getMinDistance(const blitz::Array<double,1> &input) const {
+double bob::machine::KMeansMachine::getMinDistance(const blitz::Array<double,1> &input) const {
   int closest_mean = -1;
   double min_distance = -1;
   getClosestMean(input,closest_mean,min_distance);
   return min_distance;
 }
 
-void Torch::machine::KMeansMachine::getVariancesAndWeightsForEachCluster(const Torch::io::Arrayset &ar, blitz::Array<double,2> &variances, blitz::Array<double,1> &weights) const {
+void bob::machine::KMeansMachine::getVariancesAndWeightsForEachCluster(const bob::io::Arrayset &ar, blitz::Array<double,2> &variances, blitz::Array<double,1> &weights) const {
   // initialise output arrays
   variances.resize(m_n_means, m_n_inputs);
   weights.resize(m_n_means);
@@ -117,21 +117,21 @@ void Torch::machine::KMeansMachine::getVariancesAndWeightsForEachCluster(const T
   weights = weights / blitz::sum(weights);
 }
 
-void Torch::machine::KMeansMachine::forward(const blitz::Array<double,1>& input, double& output) const {
+void bob::machine::KMeansMachine::forward(const blitz::Array<double,1>& input, double& output) const {
   if (input.extent(0) != m_n_inputs) {
     throw NInputsMismatch(m_n_inputs, input.extent(0));
   }
   forward_(input,output); 
 }
 
-void Torch::machine::KMeansMachine::forward_(const blitz::Array<double,1>& input, double& output) const {
+void bob::machine::KMeansMachine::forward_(const blitz::Array<double,1>& input, double& output) const {
   output = getMinDistance(input);
 }
 
-int Torch::machine::KMeansMachine::getNMeans() const {
+int bob::machine::KMeansMachine::getNMeans() const {
   return m_n_means;
 }
 
-int Torch::machine::KMeansMachine::getNInputs() const {
+int bob::machine::KMeansMachine::getNInputs() const {
   return m_n_inputs;
 }

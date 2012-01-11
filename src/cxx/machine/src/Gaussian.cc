@@ -23,7 +23,7 @@
 #include <io/Arrayset.h>
 #include <machine/Exception.h>
 
-double Torch::machine::Log::LogAdd(double log_a, double log_b) {
+double bob::machine::Log::LogAdd(double log_a, double log_b) {
   double minusdif;
 
   if (log_a < log_b)
@@ -37,26 +37,26 @@ double Torch::machine::Log::LogAdd(double log_a, double log_b) {
   //#ifdef DEBUG
   if (std::isnan(minusdif)) {
     printf("LogAdd: minusdif (%f) log_b (%f) or log_a (%f) is nan\n", minusdif, log_b, log_a);
-    throw Torch::machine::Exception();
+    throw bob::machine::Exception();
   }
   //#endif
   if (minusdif < MINUS_LOG_THRESHOLD) return log_a;
   else return log_a + log1p(exp(minusdif));
 }
 
-double Torch::machine::Log::LogSub(double log_a, double log_b) {
+double bob::machine::Log::LogSub(double log_a, double log_b) {
   double minusdif;
 
   if (log_a < log_b) {
     printf("LogSub: log_a (%f) should be greater than log_b (%f)", log_a, log_b);
-    throw Torch::machine::Exception();
+    throw bob::machine::Exception();
   }
 
   minusdif = log_b - log_a;
   //#ifdef DEBUG
   if (std::isnan(minusdif)) {
     printf("LogSub: minusdif (%f) log_b (%f) or log_a (%f) is nan", minusdif, log_b, log_a);
-    throw Torch::machine::Exception();
+    throw bob::machine::Exception();
   }
   //#endif
   if (log_a == log_b) return LogZero;
@@ -66,26 +66,26 @@ double Torch::machine::Log::LogSub(double log_a, double log_b) {
 
 
 
-Torch::machine::Gaussian::Gaussian() {
+bob::machine::Gaussian::Gaussian() {
   resize(0);
 }
 
-Torch::machine::Gaussian::Gaussian(int n_inputs) {
+bob::machine::Gaussian::Gaussian(int n_inputs) {
   resize(n_inputs);
 }
 
-Torch::machine::Gaussian::Gaussian(Torch::io::HDF5File& config) {
+bob::machine::Gaussian::Gaussian(bob::io::HDF5File& config) {
   load(config);
 }
 
-Torch::machine::Gaussian::~Gaussian() {
+bob::machine::Gaussian::~Gaussian() {
 }
 
-Torch::machine::Gaussian::Gaussian(const Gaussian& other) {
+bob::machine::Gaussian::Gaussian(const Gaussian& other) {
   copy(other);
 }
 
-Torch::machine::Gaussian& Torch::machine::Gaussian::operator=(const Gaussian &other) {
+bob::machine::Gaussian& bob::machine::Gaussian::operator=(const Gaussian &other) {
   if (this != &other) {
     copy(other);
   }
@@ -93,7 +93,7 @@ Torch::machine::Gaussian& Torch::machine::Gaussian::operator=(const Gaussian &ot
   return *this;
 }
 
-bool Torch::machine::Gaussian::operator==(const Gaussian& b) const {
+bool bob::machine::Gaussian::operator==(const Gaussian& b) const {
   return m_n_inputs == b.m_n_inputs &&
          blitz::all(m_mean == b.m_mean) &&
          blitz::all(m_variance == b.m_variance) &&
@@ -101,7 +101,7 @@ bool Torch::machine::Gaussian::operator==(const Gaussian& b) const {
 }
 
 
-void Torch::machine::Gaussian::copy(const Gaussian& other) {
+void bob::machine::Gaussian::copy(const Gaussian& other) {
   m_n_inputs = other.m_n_inputs;
 
   m_mean.resize(m_n_inputs);
@@ -116,16 +116,16 @@ void Torch::machine::Gaussian::copy(const Gaussian& other) {
   g_norm = other.g_norm;
 }
 
-void Torch::machine::Gaussian::setNInputs(int n_inputs) {
+void bob::machine::Gaussian::setNInputs(int n_inputs) {
   resize(n_inputs);
 }
 
 
-int Torch::machine::Gaussian::getNInputs() {
+int bob::machine::Gaussian::getNInputs() {
   return m_n_inputs;
 }
 
-void Torch::machine::Gaussian::resize(int n_inputs) {
+void bob::machine::Gaussian::resize(int n_inputs) {
   m_n_inputs = n_inputs;
   m_mean.resize(m_n_inputs);
   m_mean = 0;
@@ -139,11 +139,11 @@ void Torch::machine::Gaussian::resize(int n_inputs) {
   preComputeConstants();
 }
 
-void Torch::machine::Gaussian::setMean(const blitz::Array<double,1> &mean) {
+void bob::machine::Gaussian::setMean(const blitz::Array<double,1> &mean) {
   m_mean = mean;
 }
 
-void Torch::machine::Gaussian::setVariance(const blitz::Array<double,1> &variance) {
+void bob::machine::Gaussian::setVariance(const blitz::Array<double,1> &variance) {
 
   m_variance = variance;
 
@@ -156,49 +156,49 @@ void Torch::machine::Gaussian::setVariance(const blitz::Array<double,1> &varianc
   preComputeConstants();
 }
 
-void Torch::machine::Gaussian::setVarianceThresholds(const blitz::Array<double,1> &variance_thresholds) {
+void bob::machine::Gaussian::setVarianceThresholds(const blitz::Array<double,1> &variance_thresholds) {
   m_variance_thresholds = variance_thresholds;
 
   // setVariance() will reset the variances that are now too small
   setVariance(m_variance);
 }
 
-void Torch::machine::Gaussian::setVarianceThresholds(double factor) {
+void bob::machine::Gaussian::setVarianceThresholds(double factor) {
   blitz::Array<double,1> variance_thresholds(m_n_inputs);
   variance_thresholds = m_variance * factor;
   setVarianceThresholds(variance_thresholds);
 }
 
-double Torch::machine::Gaussian::logLikelihood(const blitz::Array<double,1> &x) const {
+double bob::machine::Gaussian::logLikelihood(const blitz::Array<double,1> &x) const {
   double z = blitz::sum(blitz::pow2(x - m_mean) / m_variance);
 
   // Log Likelihood
   return (-0.5 * (g_norm + z));
 }
 
-void Torch::machine::Gaussian::getVarianceThresholds(blitz::Array<double,1> &variance_thresholds) const {
+void bob::machine::Gaussian::getVarianceThresholds(blitz::Array<double,1> &variance_thresholds) const {
   variance_thresholds.resize(m_n_inputs);
   variance_thresholds = m_variance_thresholds;
 }
 
-void Torch::machine::Gaussian::getMean(blitz::Array<double,1> &mean) const {
+void bob::machine::Gaussian::getMean(blitz::Array<double,1> &mean) const {
   mean.resize(m_n_inputs);
   mean = m_mean;
 }
 
-void Torch::machine::Gaussian::getVariance(blitz::Array<double,1> &variance) const {
+void bob::machine::Gaussian::getVariance(blitz::Array<double,1> &variance) const {
   variance.resize(m_n_inputs);
   variance = m_variance;
 }
 
-void Torch::machine::Gaussian::preComputeConstants() {
+void bob::machine::Gaussian::preComputeConstants() {
   double c = m_n_inputs * Log::Log2Pi;
   double log_det = blitz::sum(blitz::log(m_variance));
   g_norm = c + log_det;
 }
 
 
-void Torch::machine::Gaussian::save(Torch::io::HDF5File& config) const {
+void bob::machine::Gaussian::save(bob::io::HDF5File& config) const {
   config.setArray("m_mean", m_mean);
   config.setArray("m_variance", m_variance);
   config.setArray("m_variance_thresholds", m_variance_thresholds);
@@ -206,7 +206,7 @@ void Torch::machine::Gaussian::save(Torch::io::HDF5File& config) const {
   config.set("m_n_inputs", m_n_inputs);
 }
 
-void Torch::machine::Gaussian::load(Torch::io::HDF5File& config) {
+void bob::machine::Gaussian::load(bob::io::HDF5File& config) {
   m_n_inputs = config.read<int64_t>("m_n_inputs");
   
   m_mean.resize(m_n_inputs);
@@ -220,7 +220,7 @@ void Torch::machine::Gaussian::load(Torch::io::HDF5File& config) {
   g_norm = config.read<double>("g_norm");
 }
 
-namespace Torch{
+namespace bob{
   namespace machine{
     std::ostream& operator<<(std::ostream& os, const Gaussian& g) {
       os << "Mean = " << g.m_mean << std::endl;

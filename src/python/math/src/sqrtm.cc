@@ -10,9 +10,9 @@
 #include "math/sqrtm.h"
 
 using namespace boost::python;
-namespace math = Torch::math;
-namespace tp = Torch::python;
-namespace ca = Torch::core::array;
+namespace math = bob::math;
+namespace tp = bob::python;
+namespace ca = bob::core::array;
 
 static const char* SQRTSYMREAL_DOC = "Returns the square root of a real symmetric positive-definite real matrix!";
 

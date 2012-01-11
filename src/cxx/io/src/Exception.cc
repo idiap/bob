@@ -23,9 +23,9 @@
 #include <boost/format.hpp>
 #include "io/Exception.h"
 
-namespace io = Torch::io;
-namespace core = Torch::core;
-namespace array = Torch::core::array;
+namespace io = bob::io;
+namespace core = bob::core;
+namespace array = bob::core::array;
 
 io::Exception::Exception() throw() {
 }
@@ -94,8 +94,8 @@ const char* io::DimensionError::what() const throw() {
   }
 }
 
-io::TypeError::TypeError(Torch::core::array::ElementType got, 
-    Torch::core::array::ElementType expected) throw() :
+io::TypeError::TypeError(bob::core::array::ElementType got, 
+    bob::core::array::ElementType expected) throw() :
   m_got(got),
   m_expected(expected)
 {
@@ -115,7 +115,7 @@ const char* io::TypeError::what() const throw() {
   }
 }
 
-io::UnsupportedTypeError::UnsupportedTypeError(Torch::core::array::ElementType eltype) throw() :
+io::UnsupportedTypeError::UnsupportedTypeError(bob::core::array::ElementType eltype) throw() :
   m_eltype(eltype)
 {
 }
@@ -249,7 +249,7 @@ const char* io::ImageUnsupportedDimension::what() const throw() {
 }
 
 io::ImageUnsupportedType::ImageUnsupportedType(
-    const Torch::core::array::ElementType el_type) throw() :
+    const bob::core::array::ElementType el_type) throw() :
   m_el_type(el_type)
 {
 }

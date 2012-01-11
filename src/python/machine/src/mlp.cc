@@ -27,10 +27,10 @@
 #include "machine/MLPException.h"
 
 using namespace boost::python;
-namespace mach = Torch::machine;
-namespace io = Torch::io;
-namespace tp = Torch::python;
-namespace ca = Torch::core::array;
+namespace mach = bob::machine;
+namespace io = bob::io;
+namespace tp = bob::python;
+namespace ca = bob::core::array;
 
 static tuple get_shape(const mach::MLP& m) {
   list retval;
@@ -209,20 +209,20 @@ static void set_bias(mach::MLP& m, object o) {
   }
 }
 
-static void random0(Torch::machine::MLP& M) {
+static void random0(bob::machine::MLP& M) {
   M.randomize();
 }
 
-static void random1(Torch::machine::MLP& M,
+static void random1(bob::machine::MLP& M,
     double lower_bound, double upper_bound) {
   M.randomize(lower_bound, upper_bound);
 }
 
-static void random2(Torch::machine::MLP& M, boost::mt19937& rng) {
+static void random2(bob::machine::MLP& M, boost::mt19937& rng) {
   M.randomize(rng);
 }
 
-static void random3(Torch::machine::MLP& M,
+static void random3(bob::machine::MLP& M,
    boost::mt19937& rng, double lower_bound, double upper_bound) {
   M.randomize(rng, lower_bound, upper_bound);
 }

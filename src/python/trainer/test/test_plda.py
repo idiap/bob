@@ -8,7 +8,7 @@
 
 import os, sys
 import unittest
-import torch
+import bob
 import random
 import numpy
 
@@ -25,13 +25,13 @@ class PLDATrainerTest(unittest.TestCase):
     nf = 2
     ng = 3
     # first identity (4 samples)
-    a = torch.io.Arrayset()
+    a = bob.io.Arrayset()
     a.append(numpy.array([1,2,3,4,5,6,7], 'float64'))
     a.append(numpy.array([7,8,3,3,1,8,2], 'float64'))
     a.append(numpy.array([3,2,1,4,5,1,7], 'float64'))
     a.append(numpy.array([9,0,3,2,1,4,6], 'float64'))
     # second identity (3 samples)
-    b = torch.io.Arrayset()
+    b = bob.io.Arrayset()
     b.append(numpy.array([5,6,3,4,2,0,2], 'float64'))
     b.append(numpy.array([1,7,8,9,4,4,8], 'float64'))
     b.append(numpy.array([8,7,2,5,1,1,1], 'float64'))
@@ -146,9 +146,9 @@ class PLDATrainerTest(unittest.TestCase):
 
     # Runs the PLDA trainer EM-steps (2 steps)
     # Defines base trainer and machine
-    t = torch.trainer.PLDABaseTrainer(nf,ng)
+    t = bob.trainer.PLDABaseTrainer(nf,ng)
     # TODO: constructor without argument
-    m = torch.machine.PLDABaseMachine(D,nf,ng)
+    m = bob.machine.PLDABaseMachine(D,nf,ng)
 
     # Calls the initialization methods and resets randomly initialized values
     # to new reference ones (to make the tests deterministic)
@@ -213,7 +213,7 @@ class PLDATrainerTest(unittest.TestCase):
     mean_zero = numpy.zeros((D,), 'float64')
 
     # base machine
-    mb = torch.machine.PLDABaseMachine(D,nf,ng)
+    mb = bob.machine.PLDABaseMachine(D,nf,ng)
     mb.sigma = sigma_init
     mb.G = G_init
     mb.F = F_init
@@ -227,7 +227,7 @@ class PLDATrainerTest(unittest.TestCase):
     X[0,:] = x1
     X[1,:] = x2
     X[2,:] = x3
-    a = torch.io.Arrayset()
+    a = bob.io.Arrayset()
     a.append(x1)
     a.append(x2)
     a.append(x3)
@@ -236,7 +236,7 @@ class PLDATrainerTest(unittest.TestCase):
     ll_ref = -182.8880743535197
 
     # machine
-    m = torch.machine.PLDAMachine(mb)
+    m = bob.machine.PLDAMachine(mb)
     ll = m.computeLikelihood(X)
     self.assertTrue(abs(ll - ll_ref) < 1e-10)
 
@@ -282,7 +282,7 @@ class PLDATrainerTest(unittest.TestCase):
     mean_zero = numpy.zeros((D,), 'float64')
 
     # base machine
-    mb = torch.machine.PLDABaseMachine(D,nf,ng)
+    mb = bob.machine.PLDABaseMachine(D,nf,ng)
     mb.sigma = sigma_init
     mb.G = G_init
     mb.F = F_init
@@ -292,7 +292,7 @@ class PLDATrainerTest(unittest.TestCase):
     x1 = numpy.array([0.8032, 0.3503, 0.4587, 0.9511, 0.1330, 0.0703, 0.7061])
     x2 = numpy.array([0.9317, 0.1089, 0.6517, 0.1461, 0.6940, 0.6256, 0.0437])
     x3 = numpy.array([0.7979, 0.9862, 0.4367, 0.3447, 0.0488, 0.2252, 0.5810])
-    a_enrol = torch.io.Arrayset()
+    a_enrol = bob.io.Arrayset()
     a_enrol.append(x1)
     a_enrol.append(x2)
 
@@ -301,8 +301,8 @@ class PLDATrainerTest(unittest.TestCase):
 
     # Computes the likelihood using x1 and x2 as enrollment samples
     # and x3 as a probe sample
-    m = torch.machine.PLDAMachine(mb)
-    t = torch.trainer.PLDATrainer(m)
+    m = bob.machine.PLDAMachine(mb)
+    t = bob.trainer.PLDATrainer(m)
     t.enrol(a_enrol)
     ll = m.computeLikelihood(x3)
     self.assertTrue(abs(ll - ll_ref) < 1e-10)
@@ -316,13 +316,13 @@ class PLDATrainerTest(unittest.TestCase):
 
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()

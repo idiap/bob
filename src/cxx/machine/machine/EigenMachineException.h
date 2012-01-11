@@ -3,7 +3,7 @@
  * @date Fri May 13 20:22:43 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
-  * @brief Exceptions used throughout the machine subsystem of Torch
+  * @brief Exceptions used throughout the machine subsystem of bob
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -20,13 +20,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_MACHINE_EIGENMACHINEEXCEPTION_H 
-#define TORCH5SPRO_MACHINE_EIGENMACHINEEXCEPTION_H
+#ifndef BOB5SPRO_MACHINE_EIGENMACHINEEXCEPTION_H 
+#define BOB5SPRO_MACHINE_EIGENMACHINEEXCEPTION_H
 
 #include <cstdlib>
 #include "machine/Exception.h"
 
-namespace Torch { namespace machine {
+namespace bob { namespace machine {
 
   class EigenMachineNOutputsTooLarge: public Exception {
     public:
@@ -42,4 +42,4 @@ namespace Torch { namespace machine {
 
 }}
 
-#endif /* TORCH5SPRO_MACHINE_EIGENMACHINEEXCEPTION_H */
+#endif /* BOB5SPRO_MACHINE_EIGENMACHINEEXCEPTION_H */

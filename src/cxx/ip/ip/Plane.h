@@ -23,7 +23,7 @@
 #include "ip/Point3D.h"
 #include "ip/Vector3D.h"
 
-namespace Torch {
+namespace bob {
 
 	/** This class is designed to handle a plane
 

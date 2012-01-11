@@ -25,9 +25,9 @@
 void bind_trainer_kmeans_wrappers();
 void bind_trainer_gmm_wrappers();
 
-BOOST_PYTHON_MODULE(libpytorch_trainer_overload) {
+BOOST_PYTHON_MODULE(libpybob_trainer_overload) {
 
-  Torch::python::setup_python("Torch classes and sub-classes for overloading trainers");
+  bob::python::setup_python("bob classes and sub-classes for overloading trainers");
   
   bind_trainer_kmeans_wrappers();
   bind_trainer_gmm_wrappers();

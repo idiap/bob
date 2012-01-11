@@ -23,8 +23,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_TRAINER_MLPRPROPTRAINER_H 
-#define TORCH_TRAINER_MLPRPROPTRAINER_H
+#ifndef BOB_TRAINER_MLPRPROPTRAINER_H 
+#define BOB_TRAINER_MLPRPROPTRAINER_H
 
 #include <vector>
 #include <boost/function.hpp>
@@ -32,7 +32,7 @@
 #include "io/Arrayset.h"
 #include "machine/MLP.h"
 
-namespace Torch { namespace trainer {
+namespace bob { namespace trainer {
 
   /**
    * Sets an MLP to perform discrimination based on RProp: A Direct Adaptive
@@ -51,7 +51,7 @@ namespace Torch { namespace trainer {
        * Good values for batch sizes are tens of samples. RProp is a "batch"
        * training algorithm. Do not try to set batch_size to a too-low value.
        */
-      MLPRPropTrainer(const Torch::machine::MLP& machine, size_t batch_size);
+      MLPRPropTrainer(const bob::machine::MLP& machine, size_t batch_size);
 
       /**
        * Destructor virtualisation
@@ -99,7 +99,7 @@ namespace Torch { namespace trainer {
       /**
        * Checks if a given machine is compatible with my inner settings.
        */
-      bool isCompatible(const Torch::machine::MLP& machine) const;
+      bool isCompatible(const bob::machine::MLP& machine) const;
 
       /**
        * Trains the MLP to perform discrimination. The training is executed
@@ -124,7 +124,7 @@ namespace Torch { namespace trainer {
        * outside the scope of this trainer and to this type to focus only on
        input, target applying the training when requested to.
        */
-      void train(Torch::machine::MLP& machine, 
+      void train(bob::machine::MLP& machine, 
           const blitz::Array<double,2>& input,
           const blitz::Array<double,2>& target);
 
@@ -132,7 +132,7 @@ namespace Torch { namespace trainer {
        * This is a version of the train() method above, which does no
        * compatibility check on the input machine.
        */
-      void train_(Torch::machine::MLP& machine, 
+      void train_(bob::machine::MLP& machine, 
           const blitz::Array<double,2>& input,
           const blitz::Array<double,2>& target);
 
@@ -192,8 +192,8 @@ namespace Torch { namespace trainer {
       std::vector<blitz::Array<double,2> > m_prev_deriv; ///< prev.weight deriv.
       std::vector<blitz::Array<double,1> > m_prev_deriv_bias; ///< pr.bias der.
   
-      Torch::machine::MLP::actfun_t m_actfun; ///< activation function
-      Torch::machine::MLP::actfun_t m_bwdfun; ///< (back) activation function
+      bob::machine::MLP::actfun_t m_actfun; ///< activation function
+      bob::machine::MLP::actfun_t m_bwdfun; ///< (back) activation function
   
       /// buffers that are dependent on the batch_size
       blitz::Array<double,2> m_target; ///< target vectors
@@ -203,4 +203,4 @@ namespace Torch { namespace trainer {
 
 } }
 
-#endif /* TORCH_TRAINER_MLPRPROPTRAINER_H */
+#endif /* BOB_TRAINER_MLPRPROPTRAINER_H */

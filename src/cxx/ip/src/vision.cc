@@ -19,7 +19,7 @@
  */
 #include "ip/vision.h"
 
-namespace Torch {
+namespace bob {
 
    void foo()
    {

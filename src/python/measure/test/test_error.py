@@ -3,17 +3,17 @@
 # Andre Anjos <andre.anjos@idiap.ch>
 # Wed 20 Apr 2011 15:30:23 CEST 
 
-"""Basic tests for the error measuring system of Torch
+"""Basic tests for the error measuring system of bob
 """
 
 import os, sys
 import unittest
 import numpy
-import torch
+import bob
 
 def load(fname):
   """Loads a single array from the 'data' directory."""
-  return torch.io.Array(os.path.join('data', fname)).get()
+  return bob.io.Array(os.path.join('data', fname)).get()
 
 def count(array, value=True):
   """Counts occurrences of a certain value in an array"""
@@ -21,7 +21,7 @@ def count(array, value=True):
 
 def save(fname, data):
   """Saves a single array into a file in the 'data' directory."""
-  torch.io.Array(data).save(os.path.join('data', fname))
+  bob.io.Array(data).save(os.path.join('data', fname))
 
 class ErrorTest(unittest.TestCase):
   """Various measure package tests for error evaluation."""
@@ -39,19 +39,19 @@ class ErrorTest(unittest.TestCase):
 
     # If we take a threshold on the minimum, the FAR should be 1.0 and the FRR
     # should be 0.0.
-    far, frr = torch.measure.farfrr(negatives, positives, minimum-0.1)
+    far, frr = bob.measure.farfrr(negatives, positives, minimum-0.1)
     self.assertEqual(far, 1.0)
     self.assertEqual(frr, 0.0)
 
     # Similarly, if we take a threshold on the maximum, the FRR should be 1.0
     # while the FAR should be 0.0
-    far, frr = torch.measure.farfrr(negatives, positives, maximum+0.1)
+    far, frr = bob.measure.farfrr(negatives, positives, maximum+0.1)
     self.assertEqual(far, 0.0)
     self.assertEqual(frr, 1.0)
 
     # If we choose the appropriate threshold, we should get 0.0 for both FAR
     # and FRR.
-    far, frr = torch.measure.farfrr(negatives, positives, 3.0)
+    far, frr = bob.measure.farfrr(negatives, positives, 3.0)
     self.assertEqual(far, 0.0)
     self.assertEqual(frr, 0.0)
 
@@ -68,21 +68,21 @@ class ErrorTest(unittest.TestCase):
     # If the threshold is minimum, we should have all positive samples
     # correctly classified and none of the negative samples correctly
     # classified.
-    self.assertTrue(torch.measure.correctlyClassifiedPositives(positives,
+    self.assertTrue(bob.measure.correctlyClassifiedPositives(positives,
       minimum-0.1).all())
-    self.assertFalse(torch.measure.correctlyClassifiedNegatives(negatives,
+    self.assertFalse(bob.measure.correctlyClassifiedNegatives(negatives,
       minimum-0.1).any())
 
     # The inverse is true if the threshold is a bit above the maximum.
-    self.assertFalse(torch.measure.correctlyClassifiedPositives(positives,
+    self.assertFalse(bob.measure.correctlyClassifiedPositives(positives,
       maximum+0.1).any())
-    self.assertTrue(torch.measure.correctlyClassifiedNegatives(negatives,
+    self.assertTrue(bob.measure.correctlyClassifiedNegatives(negatives,
       maximum+0.1).all())
 
     # If the threshold separates the sets, than all should be correctly
     # classified.
-    self.assertTrue(torch.measure.correctlyClassifiedPositives(positives, 3).all())
-    self.assertTrue(torch.measure.correctlyClassifiedNegatives(negatives, 3).all())
+    self.assertTrue(bob.measure.correctlyClassifiedPositives(positives, 3).all())
+    self.assertTrue(bob.measure.correctlyClassifiedNegatives(negatives, 3).all())
 
   def test03_thresholding(self):
 
@@ -92,11 +92,11 @@ class ErrorTest(unittest.TestCase):
     # This test set is not separable.
     positives = load('nonsep-positives.hdf5')
     negatives = load('nonsep-negatives.hdf5')
-    threshold = torch.measure.eerThreshold(negatives, positives)
+    threshold = bob.measure.eerThreshold(negatives, positives)
 
     # Of course we have to make sure that will set the EER correctly:
-    ccp = count(torch.measure.correctlyClassifiedPositives(positives,threshold))
-    ccn = count(torch.measure.correctlyClassifiedNegatives(negatives,threshold))
+    ccp = count(bob.measure.correctlyClassifiedPositives(positives,threshold))
+    ccn = count(bob.measure.correctlyClassifiedNegatives(negatives,threshold))
     self.assertTrue( (ccp - ccn) <= 1 )
 
     # If the set is separable, the calculation of the threshold is a little bit
@@ -105,23 +105,23 @@ class ErrorTest(unittest.TestCase):
     # do better. Let's verify
     positives = load('linsep-positives.hdf5')
     negatives = load('linsep-negatives.hdf5')
-    threshold = torch.measure.eerThreshold(negatives, positives)
+    threshold = bob.measure.eerThreshold(negatives, positives)
     # the result here is 3.242 (which is what is expect ;-)
 
     # Of course we have to make sure that will set the EER correctly:
-    ccp = count(torch.measure.correctlyClassifiedPositives(positives,threshold))
-    ccn = count(torch.measure.correctlyClassifiedNegatives(negatives,threshold))
+    ccp = count(bob.measure.correctlyClassifiedPositives(positives,threshold))
+    ccn = count(bob.measure.correctlyClassifiedNegatives(negatives,threshold))
     self.assertEqual(ccp, ccn)
 
     # The second option for the calculation of the threshold is to use the
     # minimum HTER.
-    threshold2 = torch.measure.minHterThreshold(negatives, positives)
+    threshold2 = bob.measure.minHterThreshold(negatives, positives)
     # the result here is 3.242 (which is what is expect ;-)
     self.assertEqual(threshold, threshold2) #in this particular case
 
     # Of course we have to make sure that will set the EER correctly:
-    ccp = count(torch.measure.correctlyClassifiedPositives(positives,threshold2))
-    ccn = count(torch.measure.correctlyClassifiedNegatives(negatives,threshold2))
+    ccp = count(bob.measure.correctlyClassifiedPositives(positives,threshold2))
+    ccn = count(bob.measure.correctlyClassifiedNegatives(negatives,threshold2))
     self.assertEqual(ccp, ccn)
 
   def test04_plots(self):
@@ -129,17 +129,17 @@ class ErrorTest(unittest.TestCase):
     # This test set is not separable.
     positives = load('nonsep-positives.hdf5')
     negatives = load('nonsep-negatives.hdf5')
-    threshold = torch.measure.eerThreshold(negatives, positives)
+    threshold = bob.measure.eerThreshold(negatives, positives)
 
     # This example will test the ROC plot calculation functionality.
-    xy = torch.measure.roc(negatives, positives, 100)
+    xy = bob.measure.roc(negatives, positives, 100)
     # uncomment the next line to save a reference value
     # save('nonsep-roc.hdf5', xy)
     xyref = load('nonsep-roc.hdf5')
     self.assertTrue( numpy.array_equal(xy, xyref) )
 
     # This example will test the DET plot calculation functionality.
-    det_xyzw = torch.measure.det(negatives, positives, 100)
+    det_xyzw = bob.measure.det(negatives, positives, 100)
     # uncomment the next line to save a reference value
     # save('nonsep-det.hdf5', det_xyzw)
     det_xyzw_ref = load('nonsep-det.hdf5')
@@ -153,7 +153,7 @@ class ErrorTest(unittest.TestCase):
     test_negatives = negatives[(negatives.shape[0]/2):]
     dev_positives = positives[:(positives.shape[0]/2)]
     test_positives = positives[(positives.shape[0]/2):]
-    xy = torch.measure.epc(dev_negatives, dev_positives, 
+    xy = bob.measure.epc(dev_negatives, dev_positives, 
         test_negatives, test_positives, 100)
     # uncomment the next line to save a reference value
     # save('nonsep-epc.hdf5', xy)
@@ -162,13 +162,13 @@ class ErrorTest(unittest.TestCase):
 
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()

@@ -22,7 +22,7 @@
 
 #include "ip/Matrix2D.h"
 
-namespace Torch {
+namespace bob {
 
 	/** This class is designed to handle a rotation matrix in 2D
 

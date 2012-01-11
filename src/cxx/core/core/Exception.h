@@ -3,7 +3,7 @@
  * @date Tue Jan 18 17:07:26 2011 +0100
  * @author André Anjos <andre.anjos@idiap.ch>
  *
- * @brief A torch-based exception
+ * @brief A bob-based exception
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -20,24 +20,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_CORE_EXCEPTION_H 
-#define TORCH5SPRO_CORE_EXCEPTION_H
+#ifndef BOB5SPRO_CORE_EXCEPTION_H 
+#define BOB5SPRO_CORE_EXCEPTION_H
 
 #include <stdexcept>
 
-namespace Torch { 
+namespace bob { 
   
   namespace core {
 
     /**
-     * The stock Torch exception class should be used as a base of any other
-     * exception type in Torch. There are no input parameters you can specify
+     * The stock bob exception class should be used as a base of any other
+     * exception type in bob. There are no input parameters you can specify
      * and that is on purpose. If you need to be specific about a problem,
      * derive from this one, virtually.
      *
      * Example: My filter only accepts gray-scaled images.
      *
-     * class NotGrayScaleImage: virtual Torch::core::Exception {
+     * class NotGrayScaleImage: virtual bob::core::Exception {
      * ...
      * }
      *
@@ -93,4 +93,4 @@ namespace Torch {
 
 }
 
-#endif /* TORCH5SPRO_CORE_EXCEPTION_H */
+#endif /* BOB5SPRO_CORE_EXCEPTION_H */

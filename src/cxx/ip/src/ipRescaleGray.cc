@@ -19,7 +19,7 @@
  */
 #include "ip/ipRescaleGray.h"
 
-namespace Torch {
+namespace bob {
 
 template <typename T> void computeRescaleGray(const Tensor& input, ShortTensor& t_output)
 {

@@ -19,17 +19,17 @@
  */
 #include "trainer/ML_GMMTrainer.h"
 
-Torch::trainer::ML_GMMTrainer::ML_GMMTrainer(bool update_means, bool update_variances, 
+bob::trainer::ML_GMMTrainer::ML_GMMTrainer(bool update_means, bool update_variances, 
     bool update_weights, double mean_var_update_responsibilities_threshold): 
   GMMTrainer(update_means, update_variances, update_weights, mean_var_update_responsibilities_threshold) {
 
 }
 
-Torch::trainer::ML_GMMTrainer::~ML_GMMTrainer() {
+bob::trainer::ML_GMMTrainer::~ML_GMMTrainer() {
   
 }
 
-void Torch::trainer::ML_GMMTrainer::mStep(Torch::machine::GMMMachine& gmm, const Torch::io::Arrayset& data) {
+void bob::trainer::ML_GMMTrainer::mStep(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data) {
   // Read options and variables
   int n_gaussians = gmm.getNGaussians();
   int n_inputs = gmm.getNInputs();

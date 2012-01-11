@@ -23,16 +23,16 @@
 #include <boost/format.hpp>
 #include "core/repmat_exception.h"
 
-Torch::core::RepmatNonMultipleLength::RepmatNonMultipleLength( 
+bob::core::RepmatNonMultipleLength::RepmatNonMultipleLength( 
   const int src_dim, const int dst_dim) throw(): 
     m_src_dim(src_dim), m_dst_dim(dst_dim) 
 {
 }
 
-Torch::core::RepmatNonMultipleLength::~RepmatNonMultipleLength() throw() {
+bob::core::RepmatNonMultipleLength::~RepmatNonMultipleLength() throw() {
 }
 
-const char* Torch::core::RepmatNonMultipleLength::what() const throw() {
+const char* bob::core::RepmatNonMultipleLength::what() const throw() {
   try {
     boost::format message(
       "The 2D src array has a dimension of length '%d', whereas the 2D dst\

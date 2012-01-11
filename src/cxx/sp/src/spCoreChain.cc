@@ -19,7 +19,7 @@
  */
 #include "sp/spCoreChain.h"
 
-namespace Torch {
+namespace bob {
 
 ////////////////////////////////////////////////////////////////////
 // Constructor

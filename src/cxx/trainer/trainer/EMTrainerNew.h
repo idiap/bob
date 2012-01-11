@@ -6,8 +6,8 @@
  */
 
 
-#ifndef TORCH5SPRO_TRAINER_EMTRAINERNEW_H
-#define TORCH5SPRO_TRAINER_EMTRAINERNEW_H
+#ifndef BOB5SPRO_TRAINER_EMTRAINERNEW_H
+#define BOB5SPRO_TRAINER_EMTRAINERNEW_H
 
 #include "trainer/Trainer.h"
 
@@ -15,7 +15,7 @@
 #include "core/logging.h"
 
 
-namespace Torch { namespace trainer {
+namespace bob { namespace trainer {
   
   /**
     * @brief This class implements the general Expectation-maximization algorithm.
@@ -30,13 +30,13 @@ namespace Torch { namespace trainer {
     
     virtual void train(T_machine& machine, const T_sampler& sampler) 
     {
-      Torch::core::info << "# EMTrainerNew:" << std::endl;
+      bob::core::info << "# EMTrainerNew:" << std::endl;
       
       /*
       // Check that the machine and dataset have the same feature dimensionality
       if (!checkForDimensionalityMatch()) 
       {
-        Torch::core::error << "Mismatch in dimensionality of dataset and machine" << endl;
+        bob::core::error << "Mismatch in dimensionality of dataset and machine" << endl;
         return false;
       }
       */
@@ -63,22 +63,22 @@ namespace Torch { namespace trainer {
         if(m_compute_likelihood) {
           average_output = computeLikelihood(machine, sampler);
         
-          Torch::core::info << "# Iteration " << iter+1 << ": " 
+          bob::core::info << "# Iteration " << iter+1 << ": " 
             << average_output_previous << " -> " 
             << average_output << std::endl;
         
           // - Terminates if converged (and likelihood computation is set)
           if(fabs((average_output_previous - average_output)/average_output_previous) <= m_convergence_threshold) {
-            Torch::core::info << "# EM terminated: likelihood converged" << std::endl;
+            bob::core::info << "# EM terminated: likelihood converged" << std::endl;
             break;
           }
         }
         else
-          Torch::core::info << "# Iteration " << iter+1 << std::endl;
+          bob::core::info << "# Iteration " << iter+1 << std::endl;
         
         // - Terminates if maximum number of iterations has been reached
         if(m_max_iterations > 0 && iter+1 >= m_max_iterations) {
-          Torch::core::info << "# EM terminated: maximum number of iterations reached." << std::endl;
+          bob::core::info << "# EM terminated: maximum number of iterations reached." << std::endl;
           break;
         }
       }
@@ -178,4 +178,4 @@ namespace Torch { namespace trainer {
 
 }}
 
-#endif // TORCH5SPRO_TRAINER_EMTRAINERNEW_H
+#endif // BOB5SPRO_TRAINER_EMTRAINERNEW_H

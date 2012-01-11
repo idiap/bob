@@ -2,7 +2,7 @@ project(sp-cxx)
 cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
-set(deps core) #other torch subprojects
+set(deps core) #other bob subprojects
 set(shared "${FFTW3_LIBRARY}")
 
 # This defines the list of source files inside this package.
@@ -19,13 +19,13 @@ set(src
     "src/DCT2DNaive.cc")
 
 include(../../cmake/macros.cmake)
-torch_header_install(sp-cxx sp "torch::sp")
-torch_library(sp "${src}" "${deps}" "${shared}")
-add_dependencies(torch_sp sp-cxx_header_install)
+bob_header_install(sp-cxx sp "bob::sp")
+bob_library(sp "${src}" "${deps}" "${shared}")
+add_dependencies(bob_sp sp-cxx_header_install)
 
 # Defines tests for this package
-#torch_test(sp dftdct_naive test/dftdctnaive.cc)
-#torch_test(sp fftfct_fftpack test/fftfctfftpack.cc)
-torch_test(sp convolution test/convolution.cc)
-#torch_test(sp extrapolation test/extrapolation.cc)
-torch_test(sp fft_fct test/fft_fct.cc)
+#bob_test(sp dftdct_naive test/dftdctnaive.cc)
+#bob_test(sp fftfct_fftpack test/fftfctfftpack.cc)
+bob_test(sp convolution test/convolution.cc)
+#bob_test(sp extrapolation test/extrapolation.cc)
+bob_test(sp fft_fct test/fft_fct.cc)

@@ -23,8 +23,8 @@
 #include "core/python/ndarray.h"
 
 namespace bp = boost::python;
-namespace tp = Torch::python;
-namespace ca = Torch::core::array;
+namespace tp = bob::python;
+namespace ca = bob::core::array;
       
 template<typename T, int N>
 void npy_copy_cast(blitz::Array<T,N>& bz, PyArrayObject* arrobj) {
@@ -208,7 +208,7 @@ void bind_core_bz_numpy () {
    *
    * Avoid passing by non-const reference in your methods.
    */
-#  define BOOST_PP_LOCAL_LIMITS (1, TORCH_MAX_DIM)
+#  define BOOST_PP_LOCAL_LIMITS (1, BOB_MAX_DIM)
 #  define BOOST_PP_LOCAL_MACRO(D) \
    bz_from_npy<bool,D>();\
    bz_from_npy<int8_t,D>();\
@@ -231,7 +231,7 @@ void bind_core_bz_numpy () {
    * The following struct constructors will make C++ return values of type
    * blitz::Array<T,N> to show up in the python side as numpy arrays.
    */
-#  define BOOST_PP_LOCAL_LIMITS (1, TORCH_MAX_DIM)
+#  define BOOST_PP_LOCAL_LIMITS (1, BOB_MAX_DIM)
 #  define BOOST_PP_LOCAL_MACRO(D) \
    register_bz_to_npy<bool,D>();\
    register_bz_to_npy<int8_t,D>();\

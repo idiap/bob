@@ -8,7 +8,7 @@
 
 import os, sys
 import unittest
-import torch
+import bob
 import numpy
 
 def equal(x, y, epsilon):
@@ -21,9 +21,9 @@ class VLSiftTest(unittest.TestCase):
   """Performs various tests"""
 
   def test01_VLSiftPython(self):
-    img = torch.io.load(os.path.join("data", "sift", "vlimg_ref.pgm"))
-    ref = torch.io.Arrayset(os.path.join("data", "sift", "vlsift_ref.hdf5"))
-    mysift1 = torch.ip.VLSIFT(478,640, 3, 6, -1)
+    img = bob.io.load(os.path.join("data", "sift", "vlimg_ref.pgm"))
+    ref = bob.io.Arrayset(os.path.join("data", "sift", "vlsift_ref.hdf5"))
+    mysift1 = bob.ip.VLSIFT(478,640, 3, 6, -1)
     out = mysift1(img)
     self.assertTrue(len(out) == len(ref))
     for i in range(len(out)):
@@ -34,13 +34,13 @@ class VLSiftTest(unittest.TestCase):
     
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()

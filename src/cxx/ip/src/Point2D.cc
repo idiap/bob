@@ -22,7 +22,7 @@
 #include "ip/Matrix2D.h"
 #include "ip/OldColor.h"
 
-namespace Torch {
+namespace bob {
 
 //------------------------------------------------------------------
 // Constructors

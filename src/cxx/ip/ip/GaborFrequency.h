@@ -21,15 +21,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_IP_GABOR_FREQUENCY_H
-#define TORCH5SPRO_IP_GABOR_FREQUENCY_H
+#ifndef BOB5SPRO_IP_GABOR_FREQUENCY_H
+#define BOB5SPRO_IP_GABOR_FREQUENCY_H
 
 #include <boost/shared_ptr.hpp>
 #include "ip/Exception.h"
 #include "sp/FFT2D.h"
 #include <complex>
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libip_api
  * @{
@@ -192,9 +192,9 @@ namespace Torch {
         // Intermediate working arrays
         blitz::Array<std::complex<double>, 2> m_work1;
         blitz::Array<std::complex<double>, 2> m_work2;
-        boost::shared_ptr<Torch::sp::FFT2D> m_fft;
-        boost::shared_ptr<Torch::sp::IFFT2D> m_ifft;
+        boost::shared_ptr<bob::sp::FFT2D> m_fft;
+        boost::shared_ptr<bob::sp::IFFT2D> m_ifft;
     };
 }}
 
-#endif /* TORCH5SPRO_IP_GABOR_FREQUENCY_H */
+#endif /* BOB5SPRO_IP_GABOR_FREQUENCY_H */

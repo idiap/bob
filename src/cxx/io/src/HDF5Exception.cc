@@ -24,7 +24,7 @@
 #include "io/HDF5Exception.h"
 #include "io/HDF5Types.h"
 
-namespace io = Torch::io;
+namespace io = bob::io;
 
 io::HDF5Exception::HDF5Exception() throw()
 {
@@ -90,7 +90,7 @@ io::HDF5UnsupportedDimensionError::~HDF5UnsupportedDimensionError() throw() { }
 const char* io::HDF5UnsupportedDimensionError::what() const throw() {
   try {
     boost::format message("Got an array with %u dimensions, but we only support up to %d dimensions");
-    message % m_n_dim % Torch::core::array::N_MAX_DIMENSIONS_ARRAY;
+    message % m_n_dim % bob::core::array::N_MAX_DIMENSIONS_ARRAY;
     m_message = message.str();
     return m_message.c_str();
   } catch (...) {

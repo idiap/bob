@@ -23,33 +23,33 @@ if(LIBSVM_FOUND)
   set(pysrc "src/svm.cc;${pysrc}")
 endif()
 
-torch_python_package_bindings(machine "${pysrc}")
+bob_python_package_bindings(machine "${pysrc}")
 
-add_dependencies(pytorch_machine python-core_header_install)
-target_link_libraries(pytorch_machine pytorch_core_ndarray)
+add_dependencies(pybob_machine python-core_header_install)
+target_link_libraries(pybob_machine pybob_core_ndarray)
 
-torch_python_install(machine)
+bob_python_install(machine)
   
 # Our test units
-torch_python_add_test(python-machine-kmeans-tests 
+bob_python_add_test(python-machine-kmeans-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_machine.py)
-torch_python_add_test(python-machine-linear-tests
+bob_python_add_test(python-machine-linear-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_linear.py)
-torch_python_add_test(python-machine-mlp-tests
+bob_python_add_test(python-machine-mlp-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_mlp.py)
-torch_python_add_test(python-machine-linearscoring-tests
+bob_python_add_test(python-machine-linearscoring-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_linearscoring.py)
-torch_python_add_test(python-machine-plda-tests 
+bob_python_add_test(python-machine-plda-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_plda.py)
-torch_python_add_test(python-machine-ztnorm-tests
+bob_python_add_test(python-machine-ztnorm-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_ztnorm.py)
-torch_python_add_test(python-machine-svm-tests
+bob_python_add_test(python-machine-svm-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_svm.py)
 
 # Installs all python scripts
 #file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")
 
 # Our examples (run and install)
-torch_python_add_test(python-machine-xml2hdf5-example
+bob_python_add_test(python-machine-xml2hdf5-example
   ${CMAKE_CURRENT_SOURCE_DIR}/example/xml2hdf5.py ignore --self-test)
-torch_example_install("python" "machine" example/xml2hdf5.py)
+bob_example_install("python" "machine" example/xml2hdf5.py)

@@ -2,7 +2,7 @@
 .. Andre Anjos <andre.anjos@idiap.ch>
 .. Fri 12 Aug 2011 11:47:43 CEST
 
-.. Index file for the Python Torch::visioner bindings
+.. Index file for the Python bob::visioner bindings
 
 ==========
  Visioner
@@ -15,7 +15,7 @@ detection and localization. You can incorporate a call to the Visioner
 detection system in 3-ways on your script:
 
 1. Use simple (single) face detection with
-   :py:class:`torch.visioner.MaxDetector`:
+   :py:class:`bob.visioner.MaxDetector`:
 
    In this mode, the Visioner will only detect the most likely face object in
    a given image. It returns a tuple containing the detection bounding box
@@ -23,8 +23,8 @@ detection system in 3-ways on your script:
 
    .. code-block:: python
 
-      detect_max = torch.visioner.MaxDetector()
-      image = torch.core.array.load(...)
+      detect_max = bob.visioner.MaxDetector()
+      image = bob.core.array.load(...)
       bbox = detect_max(image)
 
    With this technique you can control: 
@@ -34,7 +34,7 @@ detection system in 3-ways on your script:
         
    Look at the user manual using :py:func:`help()` for operational details.
 
-2. Use simple face detection with :py:class:`torch.visioner.Detector`:
+2. Use simple face detection with :py:class:`bob.visioner.Detector`:
 
    In this mode, the Visioner will return all bounding boxes above a given
    threshold in the image.  It returns a tuple of tuples (descending threshold
@@ -43,8 +43,8 @@ detection system in 3-ways on your script:
 
    .. code-block:: python
 
-      detect = torch.visioner.Detector()
-      image = torch.core.array.load(...)
+      detect = bob.visioner.Detector()
+      image = bob.core.array.load(...)
       bboxes = detect(image) #note this is a tuple of tuples
 
    With this technique you can control: 
@@ -56,22 +56,22 @@ detection system in 3-ways on your script:
         
    Look at the user manual using :py:func:`help()` for operational details.
 
-3. Use key-point localization with :py:class:`torch.visioner.Localizer`:
+3. Use key-point localization with :py:class:`bob.visioner.Localizer`:
 
    In this mode, the Visioner will return a single bounding box and the x and y
    coordinates of every detected land mark in the image. The number of
    landmarks following the bounding box is determined by the loaded model. In
    |project|, we ship with two basic models:
 
-   * :py:const:`torch.visioner.DEFAULT_LMODEL_EC`: this is the default model
+   * :py:const:`bob.visioner.DEFAULT_LMODEL_EC`: this is the default model
      used for keypoint localization if you don't provide anything to the
-     :py:const:`torch.visioner.Localizer` constructor. A call to the function
+     :py:const:`bob.visioner.Localizer` constructor. A call to the function
      operator (:py:meth:`__call__()`) will return the bounding box followed by
      the coordinates of the left and right eyes respectively. The format is
      (top-left b.box x, top-left b.box y, b.box width, b.box height, left-eye
      x, left-eye y, right-eye x, right-eye y).
 
-   * :py:const:`torch.visioner.DEFAULT_LMODEL_MP`: this is an alternative model
+   * :py:const:`bob.visioner.DEFAULT_LMODEL_MP`: this is an alternative model
      that can be used for keypoint localization. A call to the function
      operator with a Localizer equipped with this model will return the
      bounding box followed by the coordinates of the eye centers, eye corners,
@@ -87,8 +87,8 @@ detection system in 3-ways on your script:
 
      .. code-block:: python
 
-        locate = torch.visioner.Localizer()
-        image = torch.core.array.load(...)
+        locate = bob.visioner.Localizer()
+        image = bob.core.array.load(...)
         bbx_points = locate(image) #note (x, y, width, height, x1, y1, x2, y2...)
 
    With this technique you can control:
@@ -105,7 +105,7 @@ We provide 3 applications that are shipped with |project|:
 
 * visioner_facebox.py: This application takes as input either a video or image
   file and can output bounding boxes for faces detected on those files. It uses
-  :py:class:`torch.visioner.MaxDetector` for this purpose. You can configure,
+  :py:class:`bob.visioner.MaxDetector` for this purpose. You can configure,
   via command-line parameters, the number of scanning levels or the use of a
   user-provided classification model for face localization;
 
@@ -125,15 +125,15 @@ drawned, for debugging purposes.
 Reference Manual
 ----------------
 
-.. autodata:: torch.visioner.DEFAULT_CMODEL
-.. autodata:: torch.visioner.DEFAULT_LMODEL_EC
-.. autodata:: torch.visioner.DEFAULT_LMODEL_MP
-.. autoclass:: torch.visioner.MaxDetector
+.. autodata:: bob.visioner.DEFAULT_CMODEL
+.. autodata:: bob.visioner.DEFAULT_LMODEL_EC
+.. autodata:: bob.visioner.DEFAULT_LMODEL_MP
+.. autoclass:: bob.visioner.MaxDetector
   :members:
   :undoc-members:
-.. autoclass:: torch.visioner.Detector
+.. autoclass:: bob.visioner.Detector
   :members:
   :undoc-members:
-.. autoclass:: torch.visioner.Localizer
+.. autoclass:: bob.visioner.Localizer
   :members:
   :undoc-members:

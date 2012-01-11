@@ -91,7 +91,7 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
-      BOOST_CHECK_EQUAL(t1(i,j), Torch::core::cast<T>(t2(i,j)));
+      BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
 template<typename T, typename U>  
@@ -101,7 +101,7 @@ void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
       for( int k=0; k<t1.extent(2); ++k)
-        BOOST_CHECK_EQUAL(t1(i,j,k), Torch::core::cast<T>(t2(i,j,k)));
+        BOOST_CHECK_EQUAL(t1(i,j,k), bob::core::cast<T>(t2(i,j,k)));
 }
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
@@ -110,19 +110,19 @@ BOOST_AUTO_TEST_CASE( test_shift_2d_uint8 )
 {
   blitz::Array<uint32_t,2> b2(a2.shape());
   // "No" shift +0 +0
-  Torch::ip::shift(a2, b2, 0, 0);
+  bob::ip::shift(a2, b2, 0, 0);
   checkBlitzEqual(a2, b2); 
 
   // Shift fully out and check exception
-  BOOST_CHECK_THROW( Torch::ip::shift(a2, b2, 4, 0),
-    Torch::ip::ParamOutOfBoundaryError );
+  BOOST_CHECK_THROW( bob::ip::shift(a2, b2, 4, 0),
+    bob::ip::ParamOutOfBoundaryError );
 
   // Shift +2y +1x (fill with zero)
-  Torch::ip::shift(a2, b2, 2, 1, false, true);
+  bob::ip::shift(a2, b2, 2, 1, false, true);
   checkBlitzEqual(a2s_1, b2); 
 
   // Shift +2y +1x (fill with closest neighbour)
-  Torch::ip::shift(a2, b2, 2, 1);
+  bob::ip::shift(a2, b2, 2, 1);
   checkBlitzEqual(a2s_2, b2); 
 }
   
@@ -130,19 +130,19 @@ BOOST_AUTO_TEST_CASE( test_shift_3d_uint8 )
 {
   blitz::Array<uint32_t,3> b3(a3.shape());
   // "No" shift +0 +0 
-  Torch::ip::shift(a3, b3, 0, 0);
+  bob::ip::shift(a3, b3, 0, 0);
   checkBlitzEqual(a3, b3); 
 
   // Shift fully out and check exception
-  BOOST_CHECK_THROW( Torch::ip::shift(a3, b3, 4, 0),
-    Torch::ip::ParamOutOfBoundaryError );
+  BOOST_CHECK_THROW( bob::ip::shift(a3, b3, 4, 0),
+    bob::ip::ParamOutOfBoundaryError );
 
   // Shift +2y +1x (fill with zero)
-  Torch::ip::shift(a3, b3, 2, 1, false, true);
+  bob::ip::shift(a3, b3, 2, 1, false, true);
   checkBlitzEqual(a3s_1, b3);
 
   // Shift +2y +1x (fill with closest neighbour)
-  Torch::ip::shift(a3, b3, 2, 1);
+  bob::ip::shift(a3, b3, 2, 1);
   checkBlitzEqual(a3s_2, b3); 
 }
 
@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE( test_shift_2d_mask_uint8 )
   blitz::Array<uint32_t,2> b2(a2.shape());
   blitz::Array<bool,2> b2_mask(b2.shape());
   // Shift +2y +1x (fill with zero)
-  Torch::ip::shift(a2, a2_m1, b2, b2_mask, 2, 1, false, true);
+  bob::ip::shift(a2, a2_m1, b2, b2_mask, 2, 1, false, true);
   checkBlitzEqual(a2s_1, b2); 
   checkBlitzEqual(a2_m2, b2); 
 }

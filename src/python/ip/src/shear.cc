@@ -24,9 +24,9 @@
 #include "ip/shear.h"
 
 using namespace boost::python;
-namespace tp = Torch::python;
-namespace ip = Torch::ip;
-namespace ca = Torch::core::array;
+namespace tp = bob::python;
+namespace ip = bob::ip;
+namespace ca = bob::core::array;
 
 template <typename T, int N>
 static object inner_shear_x_shape (tp::const_ndarray src, double s) {

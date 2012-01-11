@@ -29,8 +29,8 @@ void bind_core_array_typeinfo();
 //void bind_core_array_examples(); ///< examples
 void bind_core_array_convert();
 
-BOOST_PYTHON_MODULE(libpytorch_core_ndarray) {
-  Torch::python::setup_python("Torch core classes and sub-classes for array manipulation");
+BOOST_PYTHON_MODULE(libpybob_core_ndarray) {
+  bob::python::setup_python("bob core classes and sub-classes for array manipulation");
 
   bind_core_bz_numpy();
   bind_core_ndarray_numpy();

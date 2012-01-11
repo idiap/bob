@@ -26,9 +26,9 @@
 #include "core/python/ndarray.h"
 
 using namespace boost::python;
-namespace tp = Torch::python;
-namespace math = Torch::math;
-namespace ca = Torch::core::array;
+namespace tp = bob::python;
+namespace math = bob::math;
+namespace ca = bob::core::array;
 
 static const char* SCATTER_DOC1 = "Computes the scatter matrix of a 2D array considering data is organized column-wise (each sample is a column, each feature is a row). The resulting matrix 'S' has to be square with extents equal to the number of rows in A.";
 

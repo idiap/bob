@@ -23,9 +23,9 @@
 #include "machine/SVM.h"
 
 using namespace boost::python;
-namespace tp = Torch::python;
-namespace ca = Torch::core::array;
-namespace mach = Torch::machine;
+namespace tp = bob::python;
+namespace ca = bob::core::array;
+namespace mach = bob::machine;
 
 static tuple get_shape(const mach::SupportVector& m) {
   return make_tuple(m.inputSize(), m.outputSize());

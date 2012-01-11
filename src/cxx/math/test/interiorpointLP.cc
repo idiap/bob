@@ -54,7 +54,7 @@ void checkBlitzEqual( blitz::Array<T,1>& t1, blitz::Array<U,1>& t2)
 {
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
-    BOOST_CHECK_EQUAL(t1(i), Torch::core::cast<T>(t2(i)));
+    BOOST_CHECK_EQUAL(t1(i), bob::core::cast<T>(t2(i)));
 }
 
 template<typename T, typename U>  
@@ -63,7 +63,7 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
-      BOOST_CHECK_EQUAL(t1(i,j), Torch::core::cast<T>(t2(i,j)));
+      BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
 template<typename T, typename U>  
@@ -73,7 +73,7 @@ void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
       for( int k=0; k<t1.extent(2); ++k)
-        BOOST_CHECK_EQUAL(t1(i,j,k), Torch::core::cast<T>(t2(i,j,k)));
+        BOOST_CHECK_EQUAL(t1(i,j,k), bob::core::cast<T>(t2(i,j,k)));
 }
 
 template<typename T>  
@@ -89,10 +89,10 @@ void generateProblem( const int n, blitz::Array<double,2>& A,
   blitz::Array<double,1>& b, blitz::Array<double,1>& c, 
   blitz::Array<double,1>& x0)
 {
-  Torch::core::array::reindexAndResize( A, 0, 0, n, 2*n);
-  Torch::core::array::reindexAndResize( b, 0, n);
-  Torch::core::array::reindexAndResize( c, 0, 2*n);
-  Torch::core::array::reindexAndResize( x0, 0, 2*n);
+  bob::core::array::reindexAndResize( A, 0, 0, n, 2*n);
+  bob::core::array::reindexAndResize( b, 0, n);
+  bob::core::array::reindexAndResize( c, 0, 2*n);
+  bob::core::array::reindexAndResize( x0, 0, 2*n);
   A = 0.;
   c = 0.;
   for( int i=0; i<n; ++i) {
@@ -108,7 +108,7 @@ void generateProblem( const int n, blitz::Array<double,2>& A,
   blitz::Array<double,1> ones(n);
   ones = 1.;
   blitz::Array<double,1> A1_1(n);
-  Torch::math::prod(A1, ones, A1_1);
+  bob::math::prod(A1, ones, A1_1);
   for( int i=0; i<n; ++i) {
     x0(n+i) = b(i) - A1_1(i);
   }
@@ -134,21 +134,21 @@ BOOST_AUTO_TEST_CASE( test_solve_3x3 )
     sol(n-1) = pow(5., n); // Solution to problem 1 is [0 ... 0 5^n] 
 
     // Short step
-    blitz::Array<double,1> x2(Torch::core::array::ccopy(x0));
-    Torch::math::interiorpointShortstepLP(A, b, c, 0.4, x2, 1e-6);
+    blitz::Array<double,1> x2(bob::core::array::ccopy(x0));
+    bob::math::interiorpointShortstepLP(A, b, c, 0.4, x2, 1e-6);
     for( int i=0; i<n; ++i)
       BOOST_CHECK_SMALL( fabs( x2(i+x2.lbound(0))-sol(i)), eps);
 
     // Predictor corrector
-    blitz::Array<double,1> x3(Torch::core::array::ccopy(x0));
-    Torch::math::interiorpointPredictorCorrectorLP(
+    blitz::Array<double,1> x3(bob::core::array::ccopy(x0));
+    bob::math::interiorpointPredictorCorrectorLP(
       A, b, c, 0.5, 0.25, x3, 1e-6);
     for( int i=0; i<n; ++i)
       BOOST_CHECK_SMALL( fabs( x3(i+x3.lbound(0))-sol(i)), eps);
 
     // Long step
-    blitz::Array<double,1> x4(Torch::core::array::ccopy(x0));
-    Torch::math::interiorpointLongstepLP(A, b, c, 1e-3, 0.1, x4, 1e-6);
+    blitz::Array<double,1> x4(bob::core::array::ccopy(x0));
+    bob::math::interiorpointLongstepLP(A, b, c, 1e-3, 0.1, x4, 1e-6);
     for( int i=0; i<n; ++i)
       BOOST_CHECK_SMALL( fabs( x4(i+x4.lbound(0))-sol(i)), eps);
   }
@@ -159,9 +159,9 @@ BOOST_AUTO_TEST_CASE( test_detail_neighborhood )
   // Test math::detail::isPositive
   blitz::Array<double,1> a1(4), a2(5);
   a1 = 2., 1., 0.1, 0.2;
-  BOOST_CHECK_EQUAL( true, Torch::math::detail::isPositive(a1) );
+  BOOST_CHECK_EQUAL( true, bob::math::detail::isPositive(a1) );
   a2 = -2., -1., 0.1, 0.2, -0.6;
-  BOOST_CHECK_EQUAL( false, Torch::math::detail::isPositive(a2) );
+  BOOST_CHECK_EQUAL( false, bob::math::detail::isPositive(a2) );
 
   // Test math::detail::isFeasible
   blitz::Array<double,2> A;
@@ -177,16 +177,16 @@ BOOST_AUTO_TEST_CASE( test_detail_neighborhood )
   mu1 = 12.6859, 2.2922, 1.5172, 3.2922;
   mu2 = 12.6859, 2.2922, 1.5172, 7.2922;
   BOOST_CHECK_EQUAL( true, 
-    Torch::math::detail::isFeasible(A,b,c,x,lambda,mu1,eps) );
+    bob::math::detail::isFeasible(A,b,c,x,lambda,mu1,eps) );
   BOOST_CHECK_EQUAL( false, 
-    Torch::math::detail::isFeasible(A,b,c,x,lambda,mu2,eps) );
+    bob::math::detail::isFeasible(A,b,c,x,lambda,mu2,eps) );
 
   // Test math::detail::isInVinf
   const double gamma1=1e-3, gamma2=1;
   BOOST_CHECK_EQUAL( true,
-    Torch::math::detail::isInVinf(x,mu1,gamma1) );
+    bob::math::detail::isInVinf(x,mu1,gamma1) );
   BOOST_CHECK_EQUAL( false,
-    Torch::math::detail::isInVinf(x,mu1,gamma2) );
+    bob::math::detail::isInVinf(x,mu1,gamma2) );
 
   // Test math::detail::isInV2
   const double theta1=0.5, theta2=0.03;
@@ -194,9 +194,9 @@ BOOST_AUTO_TEST_CASE( test_detail_neighborhood )
   x3 = 0.5562, 21.5427, 4.4438, 1.2327;
   mu3 = 2.4616, 0.0506, 0.2590, 1.0506;
   BOOST_CHECK_EQUAL( true,
-    Torch::math::detail::isInV2(x3,mu3,theta1) );
+    bob::math::detail::isInV2(x3,mu3,theta1) );
   BOOST_CHECK_EQUAL( false,
-    Torch::math::detail::isInV2(x3,mu3,theta2) );
+    bob::math::detail::isInV2(x3,mu3,theta2) );
 }
 
 BOOST_AUTO_TEST_CASE( test_detail_barrier )
@@ -211,15 +211,15 @@ BOOST_AUTO_TEST_CASE( test_detail_barrier )
   // Check logBarrier
   blitz::Array<double,1> lambda(n);
   lambda = -2., -6.;
-  BOOST_CHECK_SMALL( fabs(Torch::math::detail::logBarrierLP( 
+  BOOST_CHECK_SMALL( fabs(bob::math::detail::logBarrierLP( 
       A.transpose(1,0), c, lambda) - -7.272398394), eps);
 
   // Check gradientLogBarrier
   blitz::Array<double,1> d_matlab(n);
   d_matlab = -0.54166666, -0.53333333;
-  blitz::Array<double,1> work_ar = Torch::core::array::ccopy(c);
-  blitz::Array<double,1> d = Torch::core::array::ccopy(lambda);
-  Torch::math::detail::gradientLogBarrierLP(A, c, lambda, work_ar, d);
+  blitz::Array<double,1> work_ar = bob::core::array::ccopy(c);
+  blitz::Array<double,1> d = bob::core::array::ccopy(lambda);
+  bob::math::detail::gradientLogBarrierLP(A, c, lambda, work_ar, d);
   for( int i=0; i<n; ++i)
     BOOST_CHECK_SMALL( fabs(d_matlab(i)-d(i+d.lbound(0))), eps);
 }
@@ -236,7 +236,7 @@ BOOST_AUTO_TEST_CASE( test_dual_variables_init )
   mu = 0.;
 
   // Initialize lambda and mu
-  Torch::math::detail::initializeDualLambdaMuLP( A, c, lambda, mu);
+  bob::math::detail::initializeDualLambdaMuLP( A, c, lambda, mu);
   // Check that the point found fulfill the constraints:
   //  mu>=0 and transpose(A)*lambda+mu=c
   for( int i=mu.lbound(0); i<=mu.ubound(0); ++i )
@@ -244,7 +244,7 @@ BOOST_AUTO_TEST_CASE( test_dual_variables_init )
   //  transpose(A)*lambda+mu=c
   blitz::Array<double,2> A_t = A.transpose(1,0);
   blitz::Array<double,1> left_vec(A_t.extent(0));
-  Torch::math::prod( A_t, lambda, left_vec);
+  bob::math::prod( A_t, lambda, left_vec);
   left_vec += mu;
   for( int i=c.lbound(0); i<=c.ubound(0); ++i )
     BOOST_CHECK_SMALL( fabs(left_vec(i)-c(i)), eps);
@@ -252,7 +252,7 @@ BOOST_AUTO_TEST_CASE( test_dual_variables_init )
   blitz::Array<double,2> A_l;
   blitz::Array<double,1> b_l;
   blitz::Array<double,1> x_l;
-  Torch::math::detail::initializeLargeSystem( A, A_l, b_l, x_l);
+  bob::math::detail::initializeLargeSystem( A, A_l, b_l, x_l);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

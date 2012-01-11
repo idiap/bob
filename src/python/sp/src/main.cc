@@ -28,9 +28,9 @@ void bind_sp_convolution();
 void bind_sp_extrapolate();
 void bind_sp_fft_dct();
 
-BOOST_PYTHON_MODULE(libpytorch_sp) {
+BOOST_PYTHON_MODULE(libpybob_sp) {
 
-  Torch::python::setup_python("Torch signal processing classes and sub-classes");
+  bob::python::setup_python("bob signal processing classes and sub-classes");
 
   bind_sp_version();
   bind_sp_spcore();

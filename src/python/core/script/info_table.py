@@ -3,12 +3,12 @@
 # Andre Anjos <andre.dos.anjos@gmail.com>
 # Wed 27 Apr 22:59:28 2011 
 
-"""Prints the version of Torch and exits.
+"""Prints the version of bob and exits.
 """
 
 import os
 import sys
-import torch
+import bob
 import numpy
 
 def version_table():
@@ -20,21 +20,21 @@ def version_table():
   descsize = 55 
 
   version_dict = {}
-  version_dict.update(torch.core.version)
-  version_dict.update(torch.io.version)
-  version_dict.update(torch.sp.version)
-  version_dict.update(torch.ip.version)
-  if hasattr(torch.machine, 'version'): 
-    version_dict.update(torch.machine.version)
+  version_dict.update(bob.core.version)
+  version_dict.update(bob.io.version)
+  version_dict.update(bob.sp.version)
+  version_dict.update(bob.ip.version)
+  if hasattr(bob.machine, 'version'): 
+    version_dict.update(bob.machine.version)
 
   try: #the visioner may be compiled in, or not
-    version_dict.update(torch.visioner.version)
+    version_dict.update(bob.visioner.version)
   except AttributeError:
     pass
 
-  torch_version = "%(TORCH_VERSION)s (%(TORCH_PLATFORM)s)" % os.environ
+  bob_version = "%(BOB_VERSION)s (%(BOB_PLATFORM)s)" % os.environ
   print 75*'='
-  print (" Torch5spro version %s" % torch_version).center(75)
+  print (" bob version %s" % bob_version).center(75)
   print 75*'='
   print ""
 
@@ -75,8 +75,8 @@ def print_codecs():
   print fmt % ('Extension'.ljust(packsize), 'Description'.ljust(descsize))
   print sep
 
-  for k in sorted(torch.io.extensions().keys()):
-    v = torch.io.extensions()[k]
+  for k in sorted(bob.io.extensions().keys()):
+    v = bob.io.extensions()[k]
     print fmt % (k.ljust(packsize), v.ljust(descsize))
   print sep
 

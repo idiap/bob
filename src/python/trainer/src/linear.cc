@@ -26,9 +26,9 @@
 #include "trainer/FisherLDATrainer.h"
 
 using namespace boost::python;
-namespace io = Torch::io;
-namespace mach = Torch::machine;
-namespace train = Torch::trainer;
+namespace io = bob::io;
+namespace mach = bob::machine;
+namespace train = bob::trainer;
 
 tuple eig_train1 (const train::SVDPCATrainer& t, const io::Arrayset& data) {
   blitz::Array<double,1> eig_val(data.getShape()[0]);

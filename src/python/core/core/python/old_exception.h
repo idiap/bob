@@ -20,12 +20,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_CORE_PYTHON_OLD_EXCEPTION_H 
-#define TORCH_CORE_PYTHON_OLD_EXCEPTION_H 
+#ifndef BOB_CORE_PYTHON_OLD_EXCEPTION_H 
+#define BOB_CORE_PYTHON_OLD_EXCEPTION_H 
 
 #include <boost/python.hpp>
 
-namespace Torch { namespace core { namespace python {
+namespace bob { namespace core { namespace python {
 
   /**
    * The following lines of code implement exception translation from C++ into
@@ -241,4 +241,4 @@ namespace Torch { namespace core { namespace python {
 
 }}}
 
-#endif /* TORCH_CORE_PYTHON_OLD_EXCEPTION_H */
+#endif /* BOB_CORE_PYTHON_OLD_EXCEPTION_H */

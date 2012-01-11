@@ -11,10 +11,10 @@ Our goal is to take an image, in our case a 2D uint8 array, and crop it.
 
 .. code-block:: python
 
-   import torch
+   import bob
 
    # create an psuedo image (instead of loading an image)
-   image = torch.core.array.uint8_2(80, 64)
+   image = bob.core.array.uint8_2(80, 64)
    image.ones() 
    
    # Some of the ip functionality is a simple function call
@@ -26,18 +26,18 @@ Our goal is to take an image, in our case a 2D uint8 array, and crop it.
    # example of destination
    crop_height = 40
    crop_width  = 32
-   my_crop = torch.core.array.uint8_2(crop_height, crop_width)
+   my_crop = bob.core.array.uint8_2(crop_height, crop_width)
 
    # crop the image and store in my_crop (which acts as our destination)
    top_left_height  = 0
    top_left_width   = 0
-   torch.ip.crop(image, my_crop, top_left_height, top_left_width, crop_height, crop_width)
+   bob.ip.crop(image, my_crop, top_left_height, top_left_width, crop_height, crop_width)
 
 Now let's see a more complete ip function: Face crop + normalization.
 
 .. code-block:: python
 
-   import torch
+   import bob
 
    # Because this operation is a bit more complicated than just cropping, we
    # need to create an object (instance of the FaceEyesNorm class).
@@ -47,17 +47,17 @@ Now let's see a more complete ip function: Face crop + normalization.
    final_width  = 64
    overlap_h    = 0 # used if we need a bigger crop (height)
    overlap_w    = 0 # used if we need a bigger crop (width)
-   my_face_normer = torch.ip.FaceEyesNorm(eye_distance, final_height, final_width, overlap_h, overlap_w) 
+   my_face_normer = bob.ip.FaceEyesNorm(eye_distance, final_height, final_width, overlap_h, overlap_w) 
 
    # create an pseudo image (instead of loading an image)
    
-   image = torch.core.array.uint8_2(240, 320)
+   image = bob.core.array.uint8_2(240, 320)
    image.ones() 
 
    # as with all ip functions, we need to create the destination
    # our selves
 
-   dst = torch.core.array.uint8_2(final_height, final_width)
+   dst = bob.core.array.uint8_2(final_height, final_width)
 
    # lets crop and normalize the image using eye locations
    # first we will start by specifying the eye locations

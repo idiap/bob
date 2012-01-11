@@ -24,9 +24,9 @@
 #include "ip/VLSIFT.h"
 
 using namespace boost::python;
-namespace tp = Torch::python;
-namespace ip = Torch::ip;
-namespace ca = Torch::core::array;
+namespace tp = bob::python;
+namespace ip = bob::ip;
+namespace ca = bob::core::array;
 
 
 static object call_vlsift(ip::VLSIFT& op, tp::const_ndarray src) {

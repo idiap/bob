@@ -28,14 +28,14 @@
 #include "core/convert_exception.h"
 #include "core/python/exception.h"
 
-using namespace Torch::python;
+using namespace bob::python;
 using namespace boost::python;
 
 /**
  * This method is only useful to test exception throwing in Python code.
  */
 static void throw_exception(void) {
-  throw Torch::core::Exception();
+  throw bob::core::Exception();
 }
 
 void bind_core_exception() {
@@ -53,7 +53,7 @@ void bind_core_exception() {
   register_exception_translator<std::overflow_error>(PyExc_OverflowError);
   register_exception_translator<std::underflow_error>(PyExc_ArithmeticError);
 
-  register_exception_translator<Torch::core::Exception>(PyExc_RuntimeError);
+  register_exception_translator<bob::core::Exception>(PyExc_RuntimeError);
 
   // note: only register exceptions to which you need specific behavior not
   // covered by catching RuntimeError

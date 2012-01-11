@@ -22,7 +22,7 @@
 
 #include "ip/Point2D.h"
 
-namespace Torch {
+namespace bob {
 
 	/** This class is designed to handle a 2D circle
 

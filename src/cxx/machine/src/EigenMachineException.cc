@@ -23,7 +23,7 @@
 #include "machine/EigenMachineException.h"
 #include <boost/format.hpp>
 
-namespace machine = Torch::machine;
+namespace machine = bob::machine;
 
 machine::EigenMachineNOutputsTooLarge::EigenMachineNOutputsTooLarge(const int n_outputs, const int n_outputs_max) throw(): 
   m_n_outputs(n_outputs), m_n_outputs_max(n_outputs_max) 

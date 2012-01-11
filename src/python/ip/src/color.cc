@@ -24,9 +24,9 @@
 #include "core/python/ndarray.h"
 
 using namespace boost::python;
-namespace ip = Torch::ip;
-namespace tp = Torch::python;
-namespace ca = Torch::core::array;
+namespace ip = bob::ip;
+namespace tp = bob::python;
+namespace ca = bob::core::array;
 
 template <typename T> static tuple rgb_to_hsv_one_python(T r, T g, T b) {
   T h, s, v;

@@ -18,17 +18,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_IP_FACE_EYES_NORM_H
-#define TORCH5SPRO_IP_FACE_EYES_NORM_H
+#ifndef BOB5SPRO_IP_FACE_EYES_NORM_H
+#define BOB5SPRO_IP_FACE_EYES_NORM_H
 
 #include <boost/shared_ptr.hpp>
 #include "core/array_assert.h"
 #include "core/array_check.h"
 #include "ip/GeomNorm.h"
 
-namespace tca = Torch::core::array;
+namespace tca = bob::core::array;
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libip_api
  * @{
@@ -184,4 +184,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_IP_FACE_EYES_NORM_H */
+#endif /* BOB5SPRO_IP_FACE_EYES_NORM_H */

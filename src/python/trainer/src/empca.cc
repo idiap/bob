@@ -4,9 +4,9 @@
 #include "trainer/EMPCATrainer.h"
 
 using namespace boost::python;
-namespace train = Torch::trainer;
-namespace mach = Torch::machine;
-namespace io = Torch::io;
+namespace train = bob::trainer;
+namespace mach = bob::machine;
+namespace io = bob::io;
 
 object ppca_train(train::EMPCATrainer& t, const io::Arrayset& data) {
   mach::LinearMachine m;

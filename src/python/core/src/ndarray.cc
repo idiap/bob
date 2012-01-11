@@ -25,16 +25,16 @@
 #include <stdexcept>
 #include <dlfcn.h>
 
-#define torch_IMPORT_ARRAY
+#define bob_IMPORT_ARRAY
 #include "core/python/ndarray.h"
-#undef torch_IMPORT_ARRAY
+#undef bob_IMPORT_ARRAY
 
 #include "core/logging.h"
 
 namespace bp = boost::python;
-namespace tp = Torch::python;
-namespace ca = Torch::core::array;
-namespace tc = Torch::core;
+namespace tp = bob::python;
+namespace ca = bob::core::array;
+namespace tc = bob::core;
 
 #define TP_ARRAY(x) ((PyArrayObject*)x.ptr())
 #define TP_OBJECT(x) (x.ptr())
@@ -46,7 +46,7 @@ void tp::setup_python(const char* module_docstring) {
 
   // Documentation options
   bp::docstring_options docopt;
-# if !defined(TORCH_DEBUG)
+# if !defined(BOB_DEBUG)
   docopt.disable_cpp_signatures();
 # endif
   if (module_docstring) bp::scope().attr("__doc__") = module_docstring;
@@ -636,7 +636,7 @@ static boost::shared_ptr<void> shared_from_ndarray (bp::object& o) {
 tp::py_array::py_array(bp::object o, bp::object _dtype):
   m_is_numpy(true)
 {
-  if (TPY_ISNONE(o)) PYTHON_ERROR(TypeError, "You cannot pass 'None' as input parameter to C++-bound Torch methods that expect NumPy ndarrays (or blitz::Array<T,N>'s). Double-check your input!");
+  if (TPY_ISNONE(o)) PYTHON_ERROR(TypeError, "You cannot pass 'None' as input parameter to C++-bound bob methods that expect NumPy ndarrays (or blitz::Array<T,N>'s). Double-check your input!");
 
   bp::object mine = try_refer_ndarray(o, _dtype);
 
@@ -757,7 +757,7 @@ void tp::py_array::set(boost::shared_ptr<ca::interface> other) {
 }
 
 /**
- * Creates a new numpy array from a Torch::io::typeinfo object.
+ * Creates a new numpy array from a bob::io::typeinfo object.
  */
 static bp::object new_from_type (const ca::typeinfo& ti) {
   npy_intp shape[NPY_MAXDIMS];

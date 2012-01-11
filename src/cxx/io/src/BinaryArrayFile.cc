@@ -25,8 +25,8 @@
 #include "io/BinFile.h"
 #include "io/CodecRegistry.h"
 
-namespace io = Torch::io;
-namespace ca = Torch::core::array;
+namespace io = bob::io;
+namespace ca = bob::core::array;
 
 class BinaryArrayFile: public io::File {
 
@@ -106,7 +106,7 @@ class BinaryArrayFile: public io::File {
 
 };
 
-std::string BinaryArrayFile::s_codecname = "torch.binary";
+std::string BinaryArrayFile::s_codecname = "bob.binary";
 
 /**
  * From this point onwards we have the registration procedure. If you are
@@ -155,7 +155,7 @@ static bool register_codec() {
   boost::shared_ptr<io::CodecRegistry> instance =
     io::CodecRegistry::instance();
   
-  instance->registerExtension(".bin", "Torch5spro alpha binary data format (DEPRECATED)", &make_file);
+  instance->registerExtension(".bin", "bob alpha binary data format (DEPRECATED)", &make_file);
 
   return true;
 

@@ -6,7 +6,7 @@
 """Array additions
 """
 
-from libpytorch_io import Array
+from libpybob_io import Array
 
 def array_cast(self, dtype):
   """Returns a array object with the required element type"""

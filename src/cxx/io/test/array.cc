@@ -30,7 +30,7 @@
 #include <blitz/array.h>
 #include <complex>
 #include <string>
-#include "core/logging.h" // for Torch::core::tmpdir()
+#include "core/logging.h" // for bob::core::tmpdir()
 #include "core/cast.h"
 #include "io/Array.h"
 
@@ -78,8 +78,8 @@ struct T {
  * descriptor
  */
 std::string temp_file() {
-  boost::filesystem::path tpl = Torch::core::tmpdir();
-  tpl /= "torchtest_core_binformatXXXXXX.hdf5";
+  boost::filesystem::path tpl = bob::core::tmpdir();
+  tpl /= "bobtest_core_binformatXXXXXX.hdf5";
   boost::shared_array<char> char_tpl(new char[tpl.file_string().size()+1]);
   strcpy(char_tpl.get(), tpl.file_string().c_str());
   int fd = mkstemps(char_tpl.get(),5);
@@ -89,14 +89,14 @@ std::string temp_file() {
   return res;
 }
 
-const char* CODEC_NAME = "torch.hdf5";
+const char* CODEC_NAME = "bob.hdf5";
 
 template<typename T, typename U> 
 void check_equal(const blitz::Array<T,1>& a, const blitz::Array<U,1>& b) 
 {
   BOOST_REQUIRE_EQUAL(a.extent(0), b.extent(0));
   for (int i=0; i<a.extent(0); ++i) {
-    BOOST_CHECK_EQUAL(a(i), Torch::core::cast<T>(b(i)) );
+    BOOST_CHECK_EQUAL(a(i), bob::core::cast<T>(b(i)) );
   }
 }
 
@@ -107,7 +107,7 @@ void check_equal(const blitz::Array<T,2>& a, const blitz::Array<U,2>& b)
   BOOST_REQUIRE_EQUAL(a.extent(1), b.extent(1));
   for (int i=0; i<a.extent(0); ++i) {
     for (int j=0; j<a.extent(1); ++j) {
-      BOOST_CHECK_EQUAL(a(i,j), Torch::core::cast<T>(b(i,j)));
+      BOOST_CHECK_EQUAL(a(i,j), bob::core::cast<T>(b(i,j)));
     }
   }
 }
@@ -123,7 +123,7 @@ void check_equal(const blitz::Array<T,4>& a, const blitz::Array<U,4>& b)
     for (int j=0; j<a.extent(1); ++j) {
       for (int k=0; k<a.extent(2); ++k) {
         for (int l=0; l<a.extent(3); ++l) {
-          BOOST_CHECK_EQUAL(a(i,j,k,l), Torch::core::cast<T>(b(i,j,k,l)));
+          BOOST_CHECK_EQUAL(a(i,j,k,l), bob::core::cast<T>(b(i,j,k,l)));
         }
       }
     }
@@ -137,9 +137,9 @@ BOOST_AUTO_TEST_CASE( dbArray_construction_get )
   // Create io Arrays from blitz::arrays and check properties
 
   // double,1
-  Torch::io::Array db_a(a);
+  bob::io::Array db_a(a);
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
-  BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
+  BOOST_CHECK_EQUAL(db_a.getElementType(), bob::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), true);
   BOOST_CHECK_EQUAL(db_a.getFilename().size(), 0);
   BOOST_CHECK_EQUAL(db_a.getCodec().use_count(), 0);
@@ -148,9 +148,9 @@ BOOST_AUTO_TEST_CASE( dbArray_construction_get )
   check_equal( db_a.get<double,1>(), a );
 
   // float,2
-  Torch::io::Array db_d(d);
+  bob::io::Array db_d(d);
   BOOST_CHECK_EQUAL(db_d.getNDim(), d.dimensions());
-  BOOST_CHECK_EQUAL(db_d.getElementType(), Torch::core::array::t_float32);
+  BOOST_CHECK_EQUAL(db_d.getElementType(), bob::core::array::t_float32);
   BOOST_CHECK_EQUAL(db_d.isLoaded(), true);
   BOOST_CHECK_EQUAL(db_d.getFilename().size(), 0);
   BOOST_CHECK_EQUAL(db_d.getCodec().use_count(), 0);
@@ -159,9 +159,9 @@ BOOST_AUTO_TEST_CASE( dbArray_construction_get )
   check_equal( db_d.get<float,2>(), d );
 
   // double,4
-  Torch::io::Array db_g(g);
+  bob::io::Array db_g(g);
   BOOST_CHECK_EQUAL(db_g.getNDim(), g.dimensions());
-  BOOST_CHECK_EQUAL(db_g.getElementType(), Torch::core::array::t_float64);
+  BOOST_CHECK_EQUAL(db_g.getElementType(), bob::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_g.isLoaded(), true);
   BOOST_CHECK_EQUAL(db_g.getFilename().size(), 0);
   BOOST_CHECK_EQUAL(db_g.getCodec().use_count(), 0);
@@ -170,9 +170,9 @@ BOOST_AUTO_TEST_CASE( dbArray_construction_get )
   check_equal( db_g.get<double,4>(), g );
 
   // Copy constructor
-  Torch::io::Array db_g2(db_g);
+  bob::io::Array db_g2(db_g);
   BOOST_CHECK_EQUAL(db_g2.getNDim(), g.dimensions());
-  BOOST_CHECK_EQUAL(db_g2.getElementType(), Torch::core::array::t_float64);
+  BOOST_CHECK_EQUAL(db_g2.getElementType(), bob::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_g2.isLoaded(), true);
   BOOST_CHECK_EQUAL(db_g2.getFilename().size(), 0);
   BOOST_CHECK_EQUAL(db_g2.getCodec().use_count(), 0);
@@ -181,10 +181,10 @@ BOOST_AUTO_TEST_CASE( dbArray_construction_get )
   check_equal( db_g2.get<double,4>(), g );
   
   // Assignment
-  Torch::io::Array db_g3(a);
+  bob::io::Array db_g3(a);
   db_g3 = db_g;
   BOOST_CHECK_EQUAL(db_g3.getNDim(), g.dimensions());
-  BOOST_CHECK_EQUAL(db_g3.getElementType(), Torch::core::array::t_float64);
+  BOOST_CHECK_EQUAL(db_g3.getElementType(), bob::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_g3.isLoaded(), true);
   BOOST_CHECK_EQUAL(db_g3.getFilename().size(), 0);
   BOOST_CHECK_EQUAL(db_g3.getCodec().use_count(), 0);
@@ -199,7 +199,7 @@ BOOST_AUTO_TEST_CASE( dbArray_cast_blitz )
   // Create io Arrays from blitz::arrays and check properties
 
   // "Cast" to std::complex<double>,1
-  Torch::io::Array db_cd1(cd1);
+  bob::io::Array db_cd1(cd1);
   cd2.resize(cd1.shape());
   cd2 = db_cd1.cast<std::complex<double>,1>();
   // Compare to initial array
@@ -215,18 +215,18 @@ BOOST_AUTO_TEST_CASE( dbArray_cast_blitz )
 BOOST_AUTO_TEST_CASE( dbArray_creation_binaryfile )
 {
   // Create a io Array from a blitz::array and save it to a binary file
-  BOOST_REQUIRE_NO_THROW(Torch::io::Array db_a(a));
-  Torch::io::Array db_a(a);
+  BOOST_REQUIRE_NO_THROW(bob::io::Array db_a(a));
+  bob::io::Array db_a(a);
 
   std::string tmp_file = temp_file();
   BOOST_REQUIRE_NO_THROW(db_a.save( tmp_file));
 
   // Create a io Array from a binary file and check its properties
-  BOOST_REQUIRE_NO_THROW(Torch::io::Array db_a_read(tmp_file));
-  Torch::io::Array db_a_read(tmp_file);
+  BOOST_REQUIRE_NO_THROW(bob::io::Array db_a_read(tmp_file));
+  bob::io::Array db_a_read(tmp_file);
 
   BOOST_CHECK_EQUAL(db_a_read.getNDim(), a.dimensions());
-  BOOST_CHECK_EQUAL(db_a_read.getElementType(), Torch::core::array::t_float64);
+  BOOST_CHECK_EQUAL(db_a_read.getElementType(), bob::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a_read.isLoaded(), false);
   BOOST_CHECK_EQUAL(db_a_read.getFilename().compare(tmp_file), 0);
   BOOST_CHECK_EQUAL(
@@ -244,11 +244,11 @@ BOOST_AUTO_TEST_CASE( dbArray_creation_binaryfile )
 BOOST_AUTO_TEST_CASE( dbArray_transform_getload )
 {
   // Create a io Array from a blitz::array
-  BOOST_REQUIRE_NO_THROW(Torch::io::Array db_a(a));
-  Torch::io::Array db_a(a);
+  BOOST_REQUIRE_NO_THROW(bob::io::Array db_a(a));
+  bob::io::Array db_a(a);
 
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
-  BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
+  BOOST_CHECK_EQUAL(db_a.getElementType(), bob::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), true);
   BOOST_CHECK_EQUAL(db_a.getFilename().size(), 0);
   BOOST_CHECK_EQUAL(db_a.getCodec().use_count(), 0);
@@ -259,7 +259,7 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_getload )
   std::string tmp_file = temp_file();
   BOOST_REQUIRE_NO_THROW(db_a.save( tmp_file));
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
-  BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
+  BOOST_CHECK_EQUAL(db_a.getElementType(), bob::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), false);
   BOOST_CHECK_EQUAL(db_a.getFilename().compare(tmp_file), 0);
   BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare(CODEC_NAME), 0);
@@ -269,7 +269,7 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_getload )
   // Call the get function and check that properties remain unchanged
   blitz::Array<double,1> a_get = db_a.get<double,1>();
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
-  BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
+  BOOST_CHECK_EQUAL(db_a.getElementType(), bob::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), false);
   BOOST_CHECK_EQUAL(db_a.getFilename().compare(tmp_file), 0);
   BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare(CODEC_NAME), 0);
@@ -281,7 +281,7 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_getload )
   // Call the load function and check that properties are updated
   BOOST_REQUIRE_NO_THROW(db_a.load());
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
-  BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
+  BOOST_CHECK_EQUAL(db_a.getElementType(), bob::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), true);
   BOOST_CHECK_EQUAL(db_a.getFilename().size(), 0);
   BOOST_CHECK_EQUAL(db_a.getCodec().use_count(), 0);
@@ -295,11 +295,11 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_getload )
 BOOST_AUTO_TEST_CASE( dbArray_transform_move )
 {
   // Create a io Array from a blitz::array
-  BOOST_REQUIRE_NO_THROW(Torch::io::Array db_a(a));
-  Torch::io::Array db_a(a);
+  BOOST_REQUIRE_NO_THROW(bob::io::Array db_a(a));
+  bob::io::Array db_a(a);
 
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
-  BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
+  BOOST_CHECK_EQUAL(db_a.getElementType(), bob::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), true);
   BOOST_CHECK_EQUAL(db_a.getFilename().size(), 0);
   BOOST_CHECK_EQUAL(db_a.getCodec().use_count(), 0);
@@ -310,7 +310,7 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_move )
   std::string tmp_file = temp_file();
   BOOST_REQUIRE_NO_THROW(db_a.save( tmp_file));
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
-  BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
+  BOOST_CHECK_EQUAL(db_a.getElementType(), bob::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), false);
   BOOST_CHECK_EQUAL(db_a.getFilename().compare(tmp_file), 0);
   BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare(CODEC_NAME), 0);
@@ -323,7 +323,7 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_move )
   std::string tmp_file2 = temp_file();
   BOOST_REQUIRE_NO_THROW(db_a.save( tmp_file2));
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
-  BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
+  BOOST_CHECK_EQUAL(db_a.getElementType(), bob::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), false);
   BOOST_CHECK_EQUAL(db_a.getFilename().compare(tmp_file2), 0);
   BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare(CODEC_NAME), 0);
@@ -335,8 +335,8 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_move )
 BOOST_AUTO_TEST_CASE( dbArray_cast_inline )
 {
   // Create a io Array from a blitz::array
-  BOOST_REQUIRE_NO_THROW(Torch::io::Array db_a(a));
-  Torch::io::Array db_a(a);
+  BOOST_REQUIRE_NO_THROW(bob::io::Array db_a(a));
+  bob::io::Array db_a(a);
 
   // Call the cast function and check that properties remain unchanged
   blitz::Array<uint8_t,1> a_get_uint8 = db_a.cast<uint8_t,1>();
@@ -344,7 +344,7 @@ BOOST_AUTO_TEST_CASE( dbArray_cast_inline )
   check_equal( a_get_uint8, a_get_float);
 
   // Create a io Array from a blitz::array
-  Torch::io::Array db_g(g);
+  bob::io::Array db_g(g);
 
   // Call the cast function and check that properties remain unchanged
   blitz::Array<uint8_t,4> g_get_uint8 = db_g.cast<uint8_t,4>();
@@ -355,8 +355,8 @@ BOOST_AUTO_TEST_CASE( dbArray_cast_inline )
 BOOST_AUTO_TEST_CASE( dbArray_cast_external )
 {
   // Create a io Array from a blitz::array
-  BOOST_REQUIRE_NO_THROW(Torch::io::Array db_a(a));
-  Torch::io::Array db_a(a);
+  BOOST_REQUIRE_NO_THROW(bob::io::Array db_a(a));
+  bob::io::Array db_a(a);
   // Save it to a binary file
   std::string tmp_file_a = temp_file();
   BOOST_REQUIRE_NO_THROW(db_a.save( tmp_file_a));
@@ -367,8 +367,8 @@ BOOST_AUTO_TEST_CASE( dbArray_cast_external )
   check_equal( a_get_uint8, a_get_float);
 
   // Create a io Array from a blitz::array
-  BOOST_REQUIRE_NO_THROW(Torch::io::Array db_g(g));
-  Torch::io::Array db_g(g);
+  BOOST_REQUIRE_NO_THROW(bob::io::Array db_g(g));
+  bob::io::Array db_g(g);
   // Save it to a binary file
   std::string tmp_file_g = temp_file();
   BOOST_REQUIRE_NO_THROW(db_a.save( tmp_file_g));
@@ -382,7 +382,7 @@ BOOST_AUTO_TEST_CASE( dbArray_cast_external )
 BOOST_AUTO_TEST_CASE( dbArray_set )
 {
   // Create a io Array from a blitz::array
-  Torch::io::Array db_a(a);
+  bob::io::Array db_a(a);
   check_equal( a, db_a.get<double,1>() );
 
   // Initialize a new blitz array
@@ -401,7 +401,7 @@ BOOST_AUTO_TEST_CASE( dbArray_set )
 
 
   // Create a io Array from a blitz::array
-  Torch::io::Array db_g(g);
+  bob::io::Array db_g(g);
   check_equal( g, db_g.get<double,4>() );
 
   // Initialize a new blitz array
@@ -422,11 +422,11 @@ BOOST_AUTO_TEST_CASE( dbArray_set )
 BOOST_AUTO_TEST_CASE( dbArray_copy_constructor_inline )
 {
   // Create a io Array from a blitz::array
-  BOOST_CHECK_NO_THROW(Torch::io::Array db_a(a));
-  Torch::io::Array db_a(a);
+  BOOST_CHECK_NO_THROW(bob::io::Array db_a(a));
+  bob::io::Array db_a(a);
 
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
-  BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
+  BOOST_CHECK_EQUAL(db_a.getElementType(), bob::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), true);
   BOOST_CHECK_EQUAL(db_a.getFilename().size(), 0);
   BOOST_CHECK_EQUAL(db_a.getCodec().use_count(), 0);
@@ -434,8 +434,8 @@ BOOST_AUTO_TEST_CASE( dbArray_copy_constructor_inline )
     BOOST_CHECK_EQUAL(db_a.getShape()[i], a.extent(i));
 
   // Test copy constructor
-  BOOST_CHECK_NO_THROW(Torch::io::Array db_a_copy1(db_a));
-  Torch::io::Array db_a_copy1(db_a);
+  BOOST_CHECK_NO_THROW(bob::io::Array db_a_copy1(db_a));
+  bob::io::Array db_a_copy1(db_a);
 
   BOOST_CHECK_EQUAL(db_a.getNDim(), db_a_copy1.getNDim());
   BOOST_CHECK_EQUAL(db_a.getElementType(), db_a_copy1.getElementType());
@@ -449,7 +449,7 @@ BOOST_AUTO_TEST_CASE( dbArray_copy_constructor_inline )
   check_equal( db_a.get<double,1>(), db_a_copy1.get<double,1>() );
 
   // Test copy constructor (assignment)
-  Torch::io::Array db_a_copy2 = db_a;
+  bob::io::Array db_a_copy2 = db_a;
   BOOST_CHECK_EQUAL(db_a.getNDim(), db_a_copy2.getNDim());
   BOOST_CHECK_EQUAL(db_a.getElementType(), db_a_copy2.getElementType());
   BOOST_CHECK_EQUAL(db_a.isLoaded(), db_a_copy2.isLoaded());
@@ -465,12 +465,12 @@ BOOST_AUTO_TEST_CASE( dbArray_copy_constructor_inline )
 BOOST_AUTO_TEST_CASE( dbArray_copy_constructor_external )
 {
   // Create a io Array from a blitz::array
-  BOOST_REQUIRE_NO_THROW(Torch::io::Array db_a(a));
-  Torch::io::Array db_a(a);
+  BOOST_REQUIRE_NO_THROW(bob::io::Array db_a(a));
+  bob::io::Array db_a(a);
   std::string tmp_file = temp_file();
   BOOST_REQUIRE_NO_THROW(db_a.save( tmp_file));
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
-  BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
+  BOOST_CHECK_EQUAL(db_a.getElementType(), bob::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), false);
   BOOST_CHECK_EQUAL(db_a.getFilename().compare(tmp_file), 0);
   BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare(CODEC_NAME), 0);
@@ -478,8 +478,8 @@ BOOST_AUTO_TEST_CASE( dbArray_copy_constructor_external )
     BOOST_CHECK_EQUAL(db_a.getShape()[i], a.extent(i));
 
   // Test copy constructor
-  BOOST_REQUIRE_NO_THROW(Torch::io::Array db_a_copy1(db_a));
-  Torch::io::Array db_a_copy1(db_a);
+  BOOST_REQUIRE_NO_THROW(bob::io::Array db_a_copy1(db_a));
+  bob::io::Array db_a_copy1(db_a);
   BOOST_CHECK_EQUAL(db_a.getNDim(), db_a_copy1.getNDim());
   BOOST_CHECK_EQUAL(db_a.getElementType(), db_a_copy1.getElementType());
   BOOST_CHECK_EQUAL(db_a.isLoaded(), db_a_copy1.isLoaded());
@@ -492,8 +492,8 @@ BOOST_AUTO_TEST_CASE( dbArray_copy_constructor_external )
   check_equal( db_a.get<double,1>(), db_a_copy1.get<double,1>() );
 
   // Test copy constructor (assignment)
-  BOOST_REQUIRE_NO_THROW(Torch::io::Array db_a_copy2 = db_a);
-  Torch::io::Array db_a_copy2 = db_a;
+  BOOST_REQUIRE_NO_THROW(bob::io::Array db_a_copy2 = db_a);
+  bob::io::Array db_a_copy2 = db_a;
   BOOST_CHECK_EQUAL(db_a.getNDim(), db_a_copy2.getNDim());
   BOOST_CHECK_EQUAL(db_a.getElementType(), db_a_copy2.getElementType());
   BOOST_CHECK_EQUAL(db_a.isLoaded(), db_a_copy2.isLoaded());

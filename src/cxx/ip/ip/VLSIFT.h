@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_IP_VLSIFT_H
-#define TORCH5SPRO_IP_VLSIFT_H
+#ifndef BOB5SPRO_IP_VLSIFT_H
+#define BOB5SPRO_IP_VLSIFT_H
 
 #include <blitz/array.h>
 #include <stdint.h> // uint16_t declaration
@@ -30,7 +30,7 @@
 #include <vl/generic.h>
 #include <vl/sift.h>
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libip_api
  * @{
@@ -88,4 +88,4 @@ namespace Torch {
   }
 }
 
-#endif /* TORCH5SPRO_IP_VLSIFT_H */
+#endif /* BOB5SPRO_IP_VLSIFT_H */

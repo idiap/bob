@@ -26,8 +26,8 @@
 #include <fftw3.h>
 
 
-namespace tca = Torch::core::array;
-namespace sp = Torch::sp;
+namespace tca = bob::core::array;
+namespace sp = bob::sp;
 
 sp::DCT1DAbstract::DCT1DAbstract( const int length):
   m_length(length)

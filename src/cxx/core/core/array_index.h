@@ -20,14 +20,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_CORE_ARRAY_INDEX_H
-#define TORCH_CORE_ARRAY_INDEX_H
+#ifndef BOB_CORE_ARRAY_INDEX_H
+#define BOB_CORE_ARRAY_INDEX_H
 
 #include <stdint.h>
 #include <cstdlib>
 #include <complex>
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libcore_api
  * @{
@@ -67,4 +67,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH_CORE_ARRAY_INDEX_H */
+#endif /* BOB_CORE_ARRAY_INDEX_H */

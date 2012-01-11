@@ -30,24 +30,24 @@ set(pysrc_random
 
 include(../../cmake/macros.cmake)
 
-torch_python_package_bindings(core "${pysrc}")
+bob_python_package_bindings(core "${pysrc}")
 
-torch_header_install(python-core core "torch::python::core")
+bob_header_install(python-core core "bob::python::core")
 
-torch_python_submodule_bindings(core ndarray "${pysrc_ndarray}")
-add_dependencies(pytorch_core_ndarray python-core_header_install)
+bob_python_submodule_bindings(core ndarray "${pysrc_ndarray}")
+add_dependencies(pybob_core_ndarray python-core_header_install)
 
-torch_python_submodule_bindings(core random "${pysrc_random}")
-add_dependencies(pytorch_core_random python-core_header_install)
+bob_python_submodule_bindings(core random "${pysrc_random}")
+add_dependencies(pybob_core_random python-core_header_install)
 
-torch_python_install(core)
+bob_python_install(core)
 
 # Our test units
-torch_python_add_test(python-core-exception-tests 
+bob_python_add_test(python-core-exception-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_exception.py)
-torch_python_add_test(python-core-conversion-tests 
+bob_python_add_test(python-core-conversion-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_convert.py)
-torch_python_add_test(python-core-info-table-test 
+bob_python_add_test(python-core-info-table-test 
   ${CMAKE_CURRENT_SOURCE_DIR}/script/info_table.py)
 
 # Installs all python scripts

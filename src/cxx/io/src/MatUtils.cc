@@ -25,9 +25,9 @@
 #include "io/MatUtils.h"
 #include "io/reorder.h"
 
-namespace io = Torch::io;
+namespace io = bob::io;
 namespace iod = io::detail;
-namespace ca = Torch::core::array;
+namespace ca = bob::core::array;
 
 boost::shared_ptr<mat_t> iod::make_matfile(const std::string& filename,
     int flags) {
@@ -147,7 +147,7 @@ static enum matio_types mio_data_type (ca::ElementType i) {
  * Returns the ElementType given the matio MAT_T_* enum and a flag indicating
  * if the array is complex or not (also returned by matio at matvar_t)
  */
-static ca::ElementType torch_element_type (int mio_type, bool is_complex) {
+static ca::ElementType bob_element_type (int mio_type, bool is_complex) {
 
   ca::ElementType eltype = ca::t_unknown;
 
@@ -204,7 +204,7 @@ boost::shared_ptr<matvar_t> make_matvar
   void* fdata = static_cast<void*>(new char[info.buffer_size()]);
   
   //matio gets dimensions as integers
-  int mio_dims[TORCH_MAX_DIM];
+  int mio_dims[BOB_MAX_DIM];
   for (size_t i=0; i<info.nd; ++i) mio_dims[i] = info.shape[i];
 
   switch (info.dtype) {
@@ -240,7 +240,7 @@ boost::shared_ptr<matvar_t> make_matvar
  */
 static void assign_array (boost::shared_ptr<matvar_t> matvar, ca::interface& buf) {
 
-  ca::typeinfo info(torch_element_type(matvar->data_type, matvar->isComplex),
+  ca::typeinfo info(bob_element_type(matvar->data_type, matvar->isComplex),
       matvar->rank, matvar->dims);
 
   if(!buf.type().is_compatible(info)) buf.set(info);
@@ -259,7 +259,7 @@ void iod::read_array (boost::shared_ptr<mat_t> file, ca::interface& buf,
   boost::shared_ptr<matvar_t> matvar;
   if (varname.size()) matvar = make_matvar(file, varname);
   else matvar = make_matvar(file);
-  if (!matvar) throw Torch::io::Uninitialized();
+  if (!matvar) throw bob::io::Uninitialized();
   assign_array(matvar, buf);
 
 }
@@ -277,7 +277,7 @@ void iod::write_array(boost::shared_ptr<mat_t> file,
  */
 static void get_var_info(boost::shared_ptr<const matvar_t> matvar,
     ca::typeinfo& info) {
-  info.set(torch_element_type(matvar->data_type, matvar->isComplex),
+  info.set(bob_element_type(matvar->data_type, matvar->isComplex),
       matvar->rank, matvar->dims);
 }
 

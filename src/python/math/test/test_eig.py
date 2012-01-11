@@ -3,12 +3,12 @@
 # Andre Anjos <andre.anjos@idiap.ch>
 # Laurent El Shafey <laurent.el-shafey@idiap.ch>
 
-"""Tests Torch eigenvalue decomposition.
+"""Tests bob eigenvalue decomposition.
 """
 
 import os, sys
 import unittest
-import torch
+import bob
 import numpy
 
 class EigTest(unittest.TestCase):
@@ -22,7 +22,7 @@ class EigTest(unittest.TestCase):
     A = [[1.,2.,3.],[2.,4.,5.],[3.,5.,6.]]
 
     # Do the decomposition
-    V, D = torch.math.eigSymReal(A)
+    V, D = bob.math.eigSymReal(A)
 
     # Compare eigenvalues to matlab reference
     ref=numpy.array([-0.5157, 0.1709, 11.3448], 'float64')
@@ -41,7 +41,7 @@ class EigTest(unittest.TestCase):
     B = [[2.,-1.,0.],[-1.,2.,-1.],[0.,-1.,2.]]
 
     # Do the decomposition
-    V, D = torch.math.eigSym(A,B)
+    V, D = bob.math.eigSym(A,B)
 
     # Compare eigenvalues to matlab reference
     ref=numpy.array([17.9718,0.510,-0.2728], 'float64')
@@ -64,7 +64,7 @@ class EigTest(unittest.TestCase):
     D = numpy.zeros((3,), 'float64')
 
     # Do the decomposition
-    torch.math.eig(A, B, V, D)
+    bob.math.eig(A, B, V, D)
 
     # Compare eigenvalues to matlab reference
     ref=numpy.array([-0.2728,0.0510,17.9718], 'float64')
@@ -77,14 +77,14 @@ class EigTest(unittest.TestCase):
 
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   #os.chdir('data')
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()

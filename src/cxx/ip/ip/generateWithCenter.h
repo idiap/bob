@@ -21,15 +21,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_IP_GENERATE_WITH_CENTER_H
-#define TORCH5SPRO_IP_GENERATE_WITH_CENTER_H
+#ifndef BOB5SPRO_IP_GENERATE_WITH_CENTER_H
+#define BOB5SPRO_IP_GENERATE_WITH_CENTER_H
 
 #include "ip/shift.h"
 #include "core/array_assert.h"
 
-namespace tca = Torch::core::array;
+namespace tca = bob::core::array;
 
-namespace Torch {
+namespace bob {
 	/**
 	 * \ingroup libip_api
 	 * @{
@@ -202,4 +202,4 @@ namespace Torch {
 	 */
 }
 
-#endif // TORCH5SPRO_IP_GENERATE_WITH_CENTER_H
+#endif // BOB5SPRO_IP_GENERATE_WITH_CENTER_H

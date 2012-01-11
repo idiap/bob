@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IO_ARRAY_H 
-#define TORCH_IO_ARRAY_H
+#ifndef BOB_IO_ARRAY_H 
+#define BOB_IO_ARRAY_H
 
 #include <cstdlib>
 #include <stdint.h>
@@ -32,7 +32,7 @@
 #include "core/blitz_array.h"
 #include "io/File.h"
 
-namespace Torch {
+namespace bob {
 
   namespace io {
 
@@ -47,12 +47,12 @@ namespace Torch {
         /**
          * Starts a new array with in-memory content, copies the data.
          */
-        Array(const Torch::core::array::interface& data);
+        Array(const bob::core::array::interface& data);
 
         /**
          * Starts a new array with in-memory content, refers to the data.
          */
-        Array(boost::shared_ptr<Torch::core::array::interface> data);
+        Array(boost::shared_ptr<bob::core::array::interface> data);
 
         /**
          * Reads all the data from the file into this Array.
@@ -103,21 +103,21 @@ namespace Torch {
          * This is a non-templated version of the get() method that returns a
          * generic array, used for typeless manipulations. 
          */
-        boost::shared_ptr<Torch::core::array::interface> get() const;
+        boost::shared_ptr<bob::core::array::interface> get() const;
 
         /**
          * Sets the current data to the given array.
          */
-        void set(boost::shared_ptr<Torch::core::array::interface> data); //refer to data
-        void set(const Torch::core::array::interface& data); //copy data
+        void set(boost::shared_ptr<bob::core::array::interface> data); //refer to data
+        void set(const bob::core::array::interface& data); //copy data
 
-        inline const Torch::core::array::typeinfo& type() const {
+        inline const bob::core::array::typeinfo& type() const {
           return (m_inlined)?m_inlined->type(): external_type();
         }
 
         inline size_t getNDim() const { return type().nd; }
         
-        inline Torch::core::array::ElementType getElementType() const {
+        inline bob::core::array::ElementType getElementType() const {
           return type().dtype; 
         }
 
@@ -167,13 +167,13 @@ namespace Torch {
          * Starts a new array with in-memory content, refers to the data
          */
         template <typename T, int N> Array(blitz::Array<T,N>& data):
-          m_inlined(boost::make_shared<Torch::core::array::blitz_array>(boost::make_shared<blitz::Array<T,N> >(data))) { }
+          m_inlined(boost::make_shared<bob::core::array::blitz_array>(boost::make_shared<blitz::Array<T,N> >(data))) { }
 
         /**
          * Starts a new array with in-memory content, copies the data.
          */
         template <typename T, int N> Array(const blitz::Array<T,N>& data): 
-          m_inlined(boost::make_shared<Torch::core::array::blitz_array>(data)) { }
+          m_inlined(boost::make_shared<bob::core::array::blitz_array>(data)) { }
 
         /**
          * If the array is already in memory, we return a copy of it in the
@@ -182,13 +182,13 @@ namespace Torch {
          */
         template <typename T, int N> blitz::Array<T,N> cast() const {
           if (!m_inlined) {
-            const Torch::core::array::typeinfo& info = external_type();
-            Torch::core::array::blitz_array tmp(info);
+            const bob::core::array::typeinfo& info = external_type();
+            bob::core::array::blitz_array tmp(info);
             if (m_loadsall) m_external->array_read(tmp);
             else m_external->arrayset_read(tmp, m_index);
             return tmp.cast<T,N>();
           }
-          else return Torch::core::array::cast<T,N>(*m_inlined);
+          else return bob::core::array::cast<T,N>(*m_inlined);
         }
 
         /**
@@ -198,13 +198,13 @@ namespace Torch {
          */
         template <typename T, int N> blitz::Array<T,N> get() const {
           if (!m_inlined) {
-            const Torch::core::array::typeinfo& info = external_type();
-            Torch::core::array::blitz_array tmp(info);
+            const bob::core::array::typeinfo& info = external_type();
+            bob::core::array::blitz_array tmp(info);
             if (m_loadsall) m_external->array_read(tmp);
             else m_external->arrayset_read(tmp, m_index);
             return tmp.get<T,N>();
           }
-          else return Torch::core::array::wrap<T,N>(*m_inlined);
+          else return bob::core::array::wrap<T,N>(*m_inlined);
         }
 
         /**
@@ -223,7 +223,7 @@ namespace Torch {
         template <typename T, int N> 
           void set(const blitz::Array<T,N>& bzarray) {
             //we copy the data only once!
-            set(boost::make_shared<Torch::core::array::blitz_array>(bzarray));
+            set(boost::make_shared<bob::core::array::blitz_array>(bzarray));
         }
 
         /**
@@ -232,17 +232,17 @@ namespace Torch {
         template <typename T, int N> 
           void set(boost::shared_ptr<blitz::Array<T,N> >& bzarray) {
             //no data copying...
-            set(boost::make_shared<Torch::core::array::blitz_array>(bzarray));
+            set(boost::make_shared<bob::core::array::blitz_array>(bzarray));
         }
 
       private: //useful methods
 
-        inline const Torch::core::array::typeinfo& external_type() const {
+        inline const bob::core::array::typeinfo& external_type() const {
           return m_loadsall? m_external->array_type() : m_external->arrayset_type();
         }
 
       private: //representation
-        boost::shared_ptr<Torch::core::array::interface> m_inlined;
+        boost::shared_ptr<bob::core::array::interface> m_inlined;
         boost::shared_ptr<File> m_external;
         ptrdiff_t m_index; ///< position on a file.
         bool m_loadsall; ///< loads all data in file in one shot.
@@ -250,6 +250,6 @@ namespace Torch {
 
   } //closes namespace io
 
-} //closes namespace Torch
+} //closes namespace bob
 
-#endif /* TORCH_IO_ARRAY_H */
+#endif /* BOB_IO_ARRAY_H */

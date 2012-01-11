@@ -23,13 +23,13 @@
 #include <boost/format.hpp>
 #include "core/convert_exception.h"
 
-Torch::core::ConvertZeroInputRange::ConvertZeroInputRange() throw() {
+bob::core::ConvertZeroInputRange::ConvertZeroInputRange() throw() {
 }
 
-Torch::core::ConvertZeroInputRange::~ConvertZeroInputRange() throw() {
+bob::core::ConvertZeroInputRange::~ConvertZeroInputRange() throw() {
 }
 
-const char* Torch::core::ConvertZeroInputRange::what() const throw() {
+const char* bob::core::ConvertZeroInputRange::what() const throw() {
   try {
     boost::format message("Cannot convert an array with a zero width input range.");
     m_message = message.str();
@@ -40,15 +40,15 @@ const char* Torch::core::ConvertZeroInputRange::what() const throw() {
   }
 }
 
-Torch::core::ConvertInputAboveMaxRange::ConvertInputAboveMaxRange(const double v, const double m) throw():
+bob::core::ConvertInputAboveMaxRange::ConvertInputAboveMaxRange(const double v, const double m) throw():
   m_val(v), m_max(m)
 {
 }
 
-Torch::core::ConvertInputAboveMaxRange::~ConvertInputAboveMaxRange() throw() {
+bob::core::ConvertInputAboveMaxRange::~ConvertInputAboveMaxRange() throw() {
 }
 
-const char* Torch::core::ConvertInputAboveMaxRange::what() const throw() {
+const char* bob::core::ConvertInputAboveMaxRange::what() const throw() {
   try {
     boost::format message("The value %f of the input array is above the maximum %f of the given input range.");
     message % m_val;
@@ -61,15 +61,15 @@ const char* Torch::core::ConvertInputAboveMaxRange::what() const throw() {
   }
 }
 
-Torch::core::ConvertInputBelowMinRange::ConvertInputBelowMinRange(const double v, const double m) throw():
+bob::core::ConvertInputBelowMinRange::ConvertInputBelowMinRange(const double v, const double m) throw():
   m_val(v), m_min(m)
 {
 }
 
-Torch::core::ConvertInputBelowMinRange::~ConvertInputBelowMinRange() throw() {
+bob::core::ConvertInputBelowMinRange::~ConvertInputBelowMinRange() throw() {
 }
 
-const char* Torch::core::ConvertInputBelowMinRange::what() const throw() {
+const char* bob::core::ConvertInputBelowMinRange::what() const throw() {
   try {
     boost::format message("The value %f of the input array is below the minimum %f of the given input range.");
     message % m_val;

@@ -22,7 +22,7 @@
 
 #include "ip/Point2D.h"
 
-namespace Torch {
+namespace bob {
 
 	/** This class is designed to handle a triangle in 2D
 
@@ -69,10 +69,10 @@ namespace Torch {
 		//-----
 
 		/// compute the angle (in radian) of 2 lines (P0,P1) and (P0,P2)
-		double angle() { return Torch::angle(P0, P1, P2); };
+		double angle() { return bob::angle(P0, P1, P2); };
 
 		/// test the orientation of a triangle (angle direction of vectors (P0,P1) and (P0,P2))
-		int ccw() { return Torch::ccw(P0, P1, P2); };
+		int ccw() { return bob::ccw(P0, P1, P2); };
 	};
 
 }

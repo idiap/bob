@@ -17,16 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _TORCHVISION_IP_SCALE_YX_H_
-#define _TORCHVISION_IP_SCALE_YX_H_
+#ifndef _BOBVISION_IP_SCALE_YX_H_
+#define _BOBVISION_IP_SCALE_YX_H_
 
-#include "ip/ipCore.h"		// <ipScaleYX> is a <Torch::ipCore>
+#include "ip/ipCore.h"		// <ipScaleYX> is a <bob::ipCore>
 #include "ip/vision.h"
 
-namespace Torch
+namespace bob
 {
 	/////////////////////////////////////////////////////////////////////////
-	// Torch::ipScaleYX
+	// bob::ipScaleYX
 	//	This class is designed to scale an image.
 	//	The result is a tensor of the same storage type.
 	//

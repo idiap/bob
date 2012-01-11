@@ -19,7 +19,7 @@
  */
 #include "ip/Vector3D.h"
 
-namespace Torch {
+namespace bob {
 
 //------------------------------------------------------------------
 //  Unary Ops

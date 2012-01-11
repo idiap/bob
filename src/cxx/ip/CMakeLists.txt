@@ -2,7 +2,7 @@ PROJECT(ip-cxx)
 cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
-set(deps core io math sp) #other torch subprojects
+set(deps core io math sp) #other bob subprojects
 set(shared "")
 
 # This defines the list of source files inside this package.
@@ -95,51 +95,51 @@ if(VLFEAT_FOUND)
 endif(VLFEAT_FOUND)
 
 include(../../cmake/macros.cmake)
-torch_header_install(ip-cxx ip "torch::ip")
-torch_library(ip "${src}" "${deps}" "${shared}")
-add_dependencies(torch_ip ip-cxx_header_install)
+bob_header_install(ip-cxx ip "bob::ip")
+bob_library(ip "${src}" "${deps}" "${shared}")
+add_dependencies(bob_ip ip-cxx_header_install)
 
 # Defines tests for this package
-torch_test(ip block test/block.cc)
-torch_test(ip crop test/crop.cc)
-torch_test(ip dctfeatures test/dctfeatures.cc)
-torch_test(ip extrapolateMask test/extrapolateMask.cc)
-torch_test(ip flipflop test/flipflop.cc)
-torch_test(ip gabor test/Gabor.cc)
-torch_test(ip gaussian test/Gaussian.cc)
-torch_test(ip median test/Median.cc)
-torch_test(ip gammaCorrection test/gammaCorrection.cc)
-#torch_test(ip geomnorm test/geomnorm.cc)
-torch_test(ip facenorm test/facenorm.cc)
-torch_test(ip integral test/integral.cc)
-torch_test(ip lbp test/LBP.cc)
-torch_test(ip lbphsfeatures test/lbphsfeatures.cc)
-torch_test(ip maxRectInMask test/maxRectInMask.cc)
-torch_test(ip msr test/MSR.cc)
-torch_test(ip rotate test/rotate.cc)
-torch_test(ip scale test/scale.cc)
-torch_test(ip shear test/shear.cc)
-torch_test(ip shift test/shift.cc)
-torch_test(ip generatewithcenter test/generatewithcenter.cc)
-torch_test(ip tantriggs test/TanTriggs.cc)
-torch_test(ip sobel test/Sobel.cc)
-torch_test(ip zigzag test/zigzag.cc)
+bob_test(ip block test/block.cc)
+bob_test(ip crop test/crop.cc)
+bob_test(ip dctfeatures test/dctfeatures.cc)
+bob_test(ip extrapolateMask test/extrapolateMask.cc)
+bob_test(ip flipflop test/flipflop.cc)
+bob_test(ip gabor test/Gabor.cc)
+bob_test(ip gaussian test/Gaussian.cc)
+bob_test(ip median test/Median.cc)
+bob_test(ip gammaCorrection test/gammaCorrection.cc)
+#bob_test(ip geomnorm test/geomnorm.cc)
+bob_test(ip facenorm test/facenorm.cc)
+bob_test(ip integral test/integral.cc)
+bob_test(ip lbp test/LBP.cc)
+bob_test(ip lbphsfeatures test/lbphsfeatures.cc)
+bob_test(ip maxRectInMask test/maxRectInMask.cc)
+bob_test(ip msr test/MSR.cc)
+bob_test(ip rotate test/rotate.cc)
+bob_test(ip scale test/scale.cc)
+bob_test(ip shear test/shear.cc)
+bob_test(ip shift test/shift.cc)
+bob_test(ip generatewithcenter test/generatewithcenter.cc)
+bob_test(ip tantriggs test/TanTriggs.cc)
+bob_test(ip sobel test/Sobel.cc)
+bob_test(ip zigzag test/zigzag.cc)
 
 # Defines environment variable used to localize data for the tests
 set_property(TEST cxx-ip-gabor APPEND PROPERTY ENVIRONMENT
-  "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+  "BOB_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 #set_property(TEST cxx-ip-geomnorm APPEND PROPERTY ENVIRONMENT
-#  "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+#  "BOB_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 set_property(TEST cxx-ip-facenorm APPEND PROPERTY ENVIRONMENT
-  "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+  "BOB_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 set_property(TEST cxx-ip-gaussian APPEND PROPERTY ENVIRONMENT
-  "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+  "BOB_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 set_property(TEST cxx-ip-msr APPEND PROPERTY ENVIRONMENT
-  "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+  "BOB_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 set_property(TEST cxx-ip-rotate APPEND PROPERTY ENVIRONMENT
-  "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+  "BOB_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 set_property(TEST cxx-ip-scale APPEND PROPERTY ENVIRONMENT
-  "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+  "BOB_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 set_property(TEST cxx-ip-tantriggs APPEND PROPERTY ENVIRONMENT
-  "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+  "BOB_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 

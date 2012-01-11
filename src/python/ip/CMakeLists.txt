@@ -41,45 +41,45 @@ if(VLFEAT_FOUND)
   set(pysrc "src/vlsift.cc;${pysrc}")
 endif()
 
-torch_python_package_bindings(ip "${pysrc}")
+bob_python_package_bindings(ip "${pysrc}")
 
-add_dependencies(pytorch_ip python-core_header_install)
-target_link_libraries(pytorch_ip pytorch_core_ndarray)
+add_dependencies(pybob_ip python-core_header_install)
+target_link_libraries(pybob_ip pybob_core_ndarray)
 
-torch_python_install(ip)
+bob_python_install(ip)
   
 # Our test units
-torch_python_add_test(python-ip-lbp-tests 
+bob_python_add_test(python-ip-lbp-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_lbp_new.py)
-torch_python_add_test(python-ip-filter_new-tests 
+bob_python_add_test(python-ip-filter_new-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_filters_new.py)
-torch_python_add_test(python-ip-optflow-tests
+bob_python_add_test(python-ip-optflow-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_flow.py)
-torch_python_add_test(python-ip-spatio-temporal-gradient-tests
+bob_python_add_test(python-ip-spatio-temporal-gradient-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_tempgrad.py)
-torch_python_add_test(python-ip-color-tests
+bob_python_add_test(python-ip-color-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_color.py)
-torch_python_add_test(python-ip-drawing-tests
+bob_python_add_test(python-ip-drawing-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_drawing.py)
-torch_python_add_test(python-ip-histo-tests
+bob_python_add_test(python-ip-histo-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_histo.py)
 # If we have VLFeat installed, enable the test of relevant modules
 if(VLFEAT_FOUND)
-torch_python_add_test(python-ip-vlsift-tests
+bob_python_add_test(python-ip-vlsift-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_vlsift.py)
 endif()
 
-torch_python_add_test(python-ip-facenorm
+bob_python_add_test(python-ip-facenorm
   ${CMAKE_CURRENT_SOURCE_DIR}/script/facenorm.py --self-test)
-torch_python_add_test(python-ip-tantriggs
+bob_python_add_test(python-ip-tantriggs
   ${CMAKE_CURRENT_SOURCE_DIR}/script/tantriggs.py --self-test)
-torch_python_add_test(python-ip-blockDCT
+bob_python_add_test(python-ip-blockDCT
   ${CMAKE_CURRENT_SOURCE_DIR}/script/blockDCT.py --self-test)
 
 # Installs all python scripts
 file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")
 
 # Our examples (run and install)
-torch_python_add_test(python-ip-optflowHS-example
+bob_python_add_test(python-ip-optflowHS-example
   ${CMAKE_CURRENT_SOURCE_DIR}/example/optflowHS.py --test)
-torch_example_install("python" "ip" example/optflowHS.py)
+bob_example_install("python" "ip" example/optflowHS.py)

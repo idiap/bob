@@ -3,7 +3,7 @@
 # Andre Anjos <andre.anjos@idiap.ch>
 # Thu 12 Aug 2010 13:16:09 CEST 
 
-"""Tools for building torch.
+"""Tools for building bob.
 """
 
 import os
@@ -117,24 +117,24 @@ def cmake(option):
   if option.graphviz: cmake_options['--graphviz'] = "dependencies.dot"
   cmake_options['-DCMAKE_BUILD_TYPE'] = option.build_type
   cmake_options['-DCMAKE_INSTALL_PREFIX'] = option.install_prefix
-  cmake_options['-DTORCH_LINKAGE'] = 'dynamic'
-  if option.static_linkage: cmake_options['-DTORCH_LINKAGE'] = 'static'
+  cmake_options['-DBOB_LINKAGE'] = 'dynamic'
+  if option.static_linkage: cmake_options['-DBOB_LINKAGE'] = 'static'
   
   if option.build_block == 'all':
-    cmake_options['-DTORCH_CXX'] = 'ON'
-    cmake_options['-DTORCH_PYTHON'] = 'ON'
+    cmake_options['-DBOB_CXX'] = 'ON'
+    cmake_options['-DBOB_PYTHON'] = 'ON'
   else: 
-    cmake_options['-DTORCH_%s' % option.build_block.upper()] = 'ON'
+    cmake_options['-DBOB_%s' % option.build_block.upper()] = 'ON'
   
   if option.createdb:
-    cmake_options['-DTORCH_CREATE_DATABASES'] = 'ON'
+    cmake_options['-DBOB_CREATE_DATABASES'] = 'ON'
   else:
-    cmake_options['-DTORCH_CREATE_DATABASES'] = 'OFF'
+    cmake_options['-DBOB_CREATE_DATABASES'] = 'OFF'
 
   if option.db_prefix:
-    cmake_options['-DTORCH_DB_INSTALL_PREFIX'] = option.db_prefix
+    cmake_options['-DBOB_DB_INSTALL_PREFIX'] = option.db_prefix
   else:
-    cmake_options['-DTORCH_DB_INSTALL_PREFIX'] = 'OFF'
+    cmake_options['-DBOB_DB_INSTALL_PREFIX'] = 'OFF'
 
   if option.createdb and option.db_prefix and os.path.exists(option.db_prefix):
     # touch it so to modify the last modification time
@@ -545,7 +545,7 @@ def untemplatize_path(path, option):
   descriptor and returns a fully resolved string.
   """
   replacements = {
-      'name': 'torch5spro',
+      'name': 'bob',
       'version': option.version,
       'date': time.strftime("%d.%m.%Y"),
       'weekday': time.strftime("%A").lower(),
@@ -561,7 +561,7 @@ def untemplatize_path(path, option):
 
 def untemplatize_version(version, option):
   replacements = {
-      'name': 'torch5spro',
+      'name': 'bob',
       'date': time.strftime("%d.%m.%Y"),
       'weekday': time.strftime("%A").lower(),
       'platform': option.platform,

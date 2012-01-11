@@ -1,4 +1,4 @@
-"""Torch::adm is a toolkit for helping you to build and maintain torch in an easy way
+"""bob::adm is a toolkit for helping you to build and maintain bob in an easy way
 """
 from . import build, environment
 

@@ -24,9 +24,9 @@
 #include "ip/scale.h"
 
 using namespace boost::python;
-namespace tp = Torch::python;
-namespace ip = Torch::ip;
-namespace ca = Torch::core::array;
+namespace tp = bob::python;
+namespace ip = bob::ip;
+namespace ca = bob::core::array;
 
 template <typename T, int N>
 static void inner_scale (tp::const_ndarray src, tp::ndarray dst,
@@ -121,9 +121,9 @@ static object scale_as (tp::const_ndarray src, double f) {
 BOOST_PYTHON_FUNCTION_OVERLOADS(scale2_overloads, scale2, 4, 5)
 
 void bind_ip_scale() {
-  enum_<Torch::ip::Rescale::Algorithm>("RescaleAlgorithm")
-    .value("NearesetNeighbour", Torch::ip::Rescale::NearestNeighbour)
-    .value("BilinearInterp", Torch::ip::Rescale::BilinearInterp)
+  enum_<bob::ip::Rescale::Algorithm>("RescaleAlgorithm")
+    .value("NearesetNeighbour", bob::ip::Rescale::NearestNeighbour)
+    .value("BilinearInterp", bob::ip::Rescale::BilinearInterp)
     ;
 
   def("scale", &scale, scale_overloads((arg("src"), arg("dst"), arg("algorithm")="BilinearInterp"), "Rescale a 2D array/image with the given dimensions."));

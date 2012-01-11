@@ -22,7 +22,7 @@
 
 #include "core/Tensor.h"
 
-namespace Torch {
+namespace bob {
 
 	// class ImageFile; // @deprecated
 	class Color;

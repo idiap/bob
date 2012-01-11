@@ -24,9 +24,9 @@
 #include "core/python/ndarray.h"
 
 using namespace boost::python;
-namespace ip = Torch::ip;
-namespace tp = Torch::python;
-namespace ca = Torch::core::array;
+namespace ip = bob::ip;
+namespace tp = bob::python;
+namespace ca = bob::core::array;
 
 static const char* faceeyesnorm_doc = "Objects of this class, after configuration, can extract and normalize faces, given their eye center coordinates.";
 

@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_TRAINER_DATASHUFFLER_H
-#define TORCH_TRAINER_DATASHUFFLER_H
+#ifndef BOB_TRAINER_DATASHUFFLER_H
+#define BOB_TRAINER_DATASHUFFLER_H
 
 #include <vector>
 #include <blitz/array.h>
@@ -30,7 +30,7 @@
 #include <boost/random.hpp>
 #include "io/Arrayset.h"
 
-namespace Torch { namespace trainer {
+namespace bob { namespace trainer {
 
   /**
    * A data shuffler is capable of being populated with data from one or
@@ -49,7 +49,7 @@ namespace Torch { namespace trainer {
        * targets. The Arraysets are concatenated and data is copied internally
        * for faster access.
        */
-      DataShuffler(const std::vector<Torch::io::Arrayset>& data,
+      DataShuffler(const std::vector<bob::io::Arrayset>& data,
           const std::vector<blitz::Array<double,1> >& target);
 
       /**
@@ -148,4 +148,4 @@ namespace Torch { namespace trainer {
 
 }}
 
-#endif /* TORCH_TRAINER_DATASHUFFLER_H */
+#endif /* BOB_TRAINER_DATASHUFFLER_H */

@@ -25,10 +25,10 @@
 #include "core/python/ndarray.h"
 
 using namespace boost::python;
-namespace ip = Torch::ip;
-namespace tp = Torch::python;
-namespace ca = Torch::core::array;
-namespace tc = Torch::core;
+namespace ip = bob::ip;
+namespace tp = bob::python;
+namespace ca = bob::core::array;
+namespace tc = bob::core;
 
 static tuple forward_gradient_1(const ip::ForwardGradient& g, 
     tp::const_ndarray i) {

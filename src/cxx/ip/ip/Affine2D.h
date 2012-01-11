@@ -24,7 +24,7 @@
 #include "ip/Vector2D.h"
 #include "ip/Rectangle2D.h"
 
-namespace Torch {
+namespace bob {
 
 	/** This class is designed to handle 2D affine (rotation, scale and translation) transformations
 

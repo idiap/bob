@@ -22,7 +22,7 @@
 
 #include "ip/Rotate.h"
 
-namespace ip = Torch::ip;
+namespace ip = bob::ip;
 
 ip::Rotate::Rotate( const double angle, 
   const ip::Rotate::Algorithm algo):

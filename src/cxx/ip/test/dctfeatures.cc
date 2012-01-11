@@ -72,7 +72,7 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 BOOST_AUTO_TEST_CASE( test_dct_feature_extract )
 {
   std::vector<blitz::Array<double,1> > dst;
-  Torch::ip::DCTFeatures dctfeatures( 3, 4, 0, 0, 6);
+  bob::ip::DCTFeatures dctfeatures( 3, 4, 0, 0, 6);
 
   dctfeatures( src, dst);
   // Iterate over the blocks and compare the vector of DCT coefficients with 
@@ -89,17 +89,17 @@ BOOST_AUTO_TEST_CASE( test_dct_feature_extract )
 BOOST_AUTO_TEST_CASE( test_dct_feature_extract_norm )
 {
   // Get the block shape
-  blitz::TinyVector<int, 3> shape = Torch::ip::getBlockShape(src, 3, 4, 0, 0);
+  blitz::TinyVector<int, 3> shape = bob::ip::getBlockShape(src, 3, 4, 0, 0);
 
   // Get the blocks
   blitz::Array<double, 3> block_dst(shape);
-  Torch::ip::block(Torch::core::cast<double>(src), block_dst, 3, 4 , 0, 0);
+  bob::ip::block(bob::core::cast<double>(src), block_dst, 3, 4 , 0, 0);
 
   // Initialize the destination
   blitz::Array<double, 2> dst;
 
   // Compute the DCT
-  Torch::ip::DCTFeatures dctfeatures(3, 4, 0, 0, 6);
+  bob::ip::DCTFeatures dctfeatures(3, 4, 0, 0, 6);
   dctfeatures(block_dst, dst);
 
   // Iterate over the blocks and compare the vector of DCT coefficients with

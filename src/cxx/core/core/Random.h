@@ -20,13 +20,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_CORE_RANDOM_H
-#define TORCH5SPRO_CORE_RANDOM_H 1
+#ifndef BOB5SPRO_CORE_RANDOM_H
+#define BOB5SPRO_CORE_RANDOM_H 1
 
 #include <boost/random.hpp>
 #include <boost/scoped_ptr.hpp>
 
-namespace Torch {
+namespace bob {
 
   namespace core {
 
@@ -45,21 +45,21 @@ namespace Torch {
       template <typename T> struct uniform_int {
         T operator()(const T& min_arg, const T& max_arg) {
           boost::uniform_int<T> rng(min_arg, max_arg);
-          return rng(Torch::core::random::generator::instance());
+          return rng(bob::core::random::generator::instance());
         }
       };
 
       template <typename T> struct uniform_uint {
         T operator()(const T& i) {
           boost::uniform_int<T> rng(0, i-1);
-          return rng(Torch::core::random::generator::instance());
+          return rng(bob::core::random::generator::instance());
         }
       };
 
       template <typename T> struct uniform_real {
         T operator()(const T& min_arg, const T& max_arg) {
           boost::uniform_real<T> rng(min_arg, max_arg);
-          return rng(Torch::core::random::generator::instance());
+          return rng(bob::core::random::generator::instance());
         }
       };
 

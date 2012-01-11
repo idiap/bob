@@ -3,7 +3,7 @@
  * @date Tue Jan 18 17:07:26 2011 +0100
  * @author André Anjos <andre.anjos@idiap.ch>
  *
- * @brief Torch::Tensor implementation using blitz::Array
+ * @brief bob::Tensor implementation using blitz::Array
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -20,12 +20,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_CORE_TENSOR_BLITZ_TEMPLATE_H
-#define TORCH5SPRO_CORE_TENSOR_BLITZ_TEMPLATE_H
+#ifndef BOB5SPRO_CORE_TENSOR_BLITZ_TEMPLATE_H
+#define BOB5SPRO_CORE_TENSOR_BLITZ_TEMPLATE_H
 
 #include <cstdarg>
 
-namespace Torch 
+namespace bob 
 {
   /**
    * @brief The template Tensor class
@@ -268,7 +268,7 @@ namespace Torch
       /**
        * Set the datatype of a Tensor
        * This function has specializations and call the parent function
-       * Torch::Tensor::setDataTypeMain()
+       * bob::Tensor::setDataTypeMain()
        */
       virtual void setDataType();
 
@@ -318,7 +318,7 @@ namespace Torch
 
 }
 
-template <typename T> Torch::TensorTemplate<T>::TensorTemplate(): 
+template <typename T> bob::TensorTemplate<T>::TensorTemplate(): 
   m_n_dimensions(0), 
   m_array_1D(0), 
   m_array_2D(0), 
@@ -329,7 +329,7 @@ template <typename T> Torch::TensorTemplate<T>::TensorTemplate():
   setDataType();
 }
 
-template <typename T> Torch::TensorTemplate<T>::TensorTemplate(long dim0): 
+template <typename T> bob::TensorTemplate<T>::TensorTemplate(long dim0): 
   m_n_dimensions(1), 
   m_array_1D(0), 
   m_array_2D(0), 
@@ -341,7 +341,7 @@ template <typename T> Torch::TensorTemplate<T>::TensorTemplate(long dim0):
   m_array_1D = new blitz::Array<T,1>((int)dim0);
 }
 
-template <typename T> Torch::TensorTemplate<T>::TensorTemplate(long dim0,
+template <typename T> bob::TensorTemplate<T>::TensorTemplate(long dim0,
     long dim1): 
   m_n_dimensions(2), 
   m_array_1D(0), 
@@ -354,7 +354,7 @@ template <typename T> Torch::TensorTemplate<T>::TensorTemplate(long dim0,
   m_array_2D = new blitz::Array<T,2>((int)dim0, (int)dim1);
 }
 
-template <typename T> Torch::TensorTemplate<T>::TensorTemplate(long dim0,
+template <typename T> bob::TensorTemplate<T>::TensorTemplate(long dim0,
     long dim1, long dim2): 
   m_n_dimensions(3), 
   m_array_1D(0), 
@@ -367,7 +367,7 @@ template <typename T> Torch::TensorTemplate<T>::TensorTemplate(long dim0,
   m_array_3D = new blitz::Array<T,3>((int)dim0, (int)dim1, (int)dim2);
 }
 
-template <typename T> Torch::TensorTemplate<T>::TensorTemplate(long dim0, 
+template <typename T> bob::TensorTemplate<T>::TensorTemplate(long dim0, 
     long dim1, long dim2, long dim3): 
   m_n_dimensions(4), 
   m_array_1D(0), 
@@ -381,7 +381,7 @@ template <typename T> Torch::TensorTemplate<T>::TensorTemplate(long dim0,
       (int)dim3);
 }
 
-template <typename T> void Torch::TensorTemplate<T>::cleanup() {
+template <typename T> void bob::TensorTemplate<T>::cleanup() {
   delete m_array_1D;
   m_array_1D = 0;
   delete m_array_2D;
@@ -395,12 +395,12 @@ template <typename T> void Torch::TensorTemplate<T>::cleanup() {
   m_n_dimensions = 0;
 }
 
-template <typename T> Torch::TensorTemplate<T>::~TensorTemplate() {
+template <typename T> bob::TensorTemplate<T>::~TensorTemplate() {
   cleanup();
 }
 
 template <typename T> long
-Torch::TensorTemplate<T>::size(int dimension) const {
+bob::TensorTemplate<T>::size(int dimension) const {
   switch(m_n_dimensions) {
     case 1: return m_array_1D->extent(dimension);
     case 2: return m_array_2D->extent(dimension);
@@ -410,7 +410,7 @@ Torch::TensorTemplate<T>::size(int dimension) const {
   }
 }
 
-template <typename T> long Torch::TensorTemplate<T>::sizeAll() const {
+template <typename T> long bob::TensorTemplate<T>::sizeAll() const {
   switch(m_n_dimensions) {
     case 1: return m_array_1D->size();
     case 2: return m_array_2D->size();
@@ -421,7 +421,7 @@ template <typename T> long Torch::TensorTemplate<T>::sizeAll() const {
 }
 
 template <typename T> void 
-Torch::TensorTemplate<T>::setTensor(const Torch::TensorTemplate<T> *src) {
+bob::TensorTemplate<T>::setTensor(const bob::TensorTemplate<T> *src) {
   cleanup();
   m_n_dimensions = src->nDimension();
   switch(m_n_dimensions) {
@@ -441,7 +441,7 @@ Torch::TensorTemplate<T>::setTensor(const Torch::TensorTemplate<T> *src) {
 }
 
 template <typename T> template <typename U> void 
-Torch::TensorTemplate<T>::copy(const Torch::TensorTemplate<U> *src) {
+bob::TensorTemplate<T>::copy(const bob::TensorTemplate<U> *src) {
   cleanup();
   m_n_dimensions = src->nDimension();
   switch(m_n_dimensions) {
@@ -488,8 +488,8 @@ Torch::TensorTemplate<T>::copy(const Torch::TensorTemplate<U> *src) {
   }
 }
 
-template <typename T> void Torch::TensorTemplate<T>::transpose
-(const Torch::TensorTemplate<T> *src, int dimension1, int dimension2) {
+template <typename T> void bob::TensorTemplate<T>::transpose
+(const bob::TensorTemplate<T> *src, int dimension1, int dimension2) {
   setTensor(src);
   switch(m_n_dimensions) {
     case 2:
@@ -514,13 +514,13 @@ template <typename T> void Torch::TensorTemplate<T>::transpose
   }
 }
 
-template <typename T> void Torch::TensorTemplate<T>::print (const char *name)
+template <typename T> void bob::TensorTemplate<T>::print (const char *name)
   const {
   if(name != NULL) std::cout << "Tensor " << name << ":" << std::endl;
   Tprint();
 }
 
-template <typename T> void Torch::TensorTemplate<T>::sprint 
+template <typename T> void bob::TensorTemplate<T>::sprint 
 (const char *name, ...) const {
   if(name != NULL) {
     char _msg[512];
@@ -534,7 +534,7 @@ template <typename T> void Torch::TensorTemplate<T>::sprint
   Tprint();
 }
 
-template <typename T> void Torch::TensorTemplate<T>::Tprint() const {
+template <typename T> void bob::TensorTemplate<T>::Tprint() const {
   switch(m_n_dimensions) {
     case 0:
       std::cout << "Oops !! I can't print a 0D tensor :-(" << std::endl;
@@ -555,7 +555,7 @@ template <typename T> void Torch::TensorTemplate<T>::Tprint() const {
 }
 
 template <typename T> template <typename U> void
-Torch::TensorTemplate<T>::resizeAs(const Torch::TensorTemplate<U> &src) {
+bob::TensorTemplate<T>::resizeAs(const bob::TensorTemplate<U> &src) {
   cleanup();
   m_n_dimensions = src.nDimension();
   switch(m_n_dimensions) {
@@ -576,27 +576,27 @@ Torch::TensorTemplate<T>::resizeAs(const Torch::TensorTemplate<U> &src) {
   }
 }
 
-template <typename T> void Torch::TensorTemplate<T>::resize(long size0) {
+template <typename T> void bob::TensorTemplate<T>::resize(long size0) {
   cleanup();
   m_n_dimensions = 1;
   m_array_1D = new blitz::Array<T,1>((int)size0);
 }
 
 template <typename T> void
-Torch::TensorTemplate<T>::resize(long size0, long size1) {
+bob::TensorTemplate<T>::resize(long size0, long size1) {
   cleanup();
   m_n_dimensions = 2;
   m_array_2D = new blitz::Array<T,2>((int)size0, (int)size1);
 }
 
-template <typename T> void Torch::TensorTemplate<T>::resize
+template <typename T> void bob::TensorTemplate<T>::resize
 (long size0, long size1, long size2) {
   cleanup();
   m_n_dimensions = 3;
   m_array_3D = new blitz::Array<T,3>((int)size0, (int)size1, (int)size2);
 }
 
-template <typename T> void Torch::TensorTemplate<T>::resize
+template <typename T> void bob::TensorTemplate<T>::resize
 (long size0, long size1, long size2, long size3) {
   cleanup();
   m_n_dimensions = 4;
@@ -604,7 +604,7 @@ template <typename T> void Torch::TensorTemplate<T>::resize
       (int)size3);
 }
 
-template <typename T> T Torch::TensorTemplate<T>::sum() const {
+template <typename T> T bob::TensorTemplate<T>::sum() const {
   switch(m_n_dimensions) {
     case 1:
       return blitz::sum(*m_array_1D);
@@ -620,7 +620,7 @@ template <typename T> T Torch::TensorTemplate<T>::sum() const {
   return 0;
 }
 
-template <typename T> T& Torch::TensorTemplate<T>::operator()(long dim0) {
+template <typename T> T& bob::TensorTemplate<T>::operator()(long dim0) {
   switch(m_n_dimensions) {
     case 1:
       return (*m_array_1D)((int)dim0);
@@ -660,7 +660,7 @@ template <typename T> T& Torch::TensorTemplate<T>::operator()(long dim0) {
   }
 }
 
-template <typename T> const T& Torch::TensorTemplate<T>::operator()(long dim0) const {
+template <typename T> const T& bob::TensorTemplate<T>::operator()(long dim0) const {
   switch(m_n_dimensions) {
     case 1:
       return (*m_array_1D)((int)dim0);
@@ -700,7 +700,7 @@ template <typename T> const T& Torch::TensorTemplate<T>::operator()(long dim0) c
   }
 }
 
-template <typename T> void Torch::TensorTemplate<T>::computeDataRW() {
+template <typename T> void bob::TensorTemplate<T>::computeDataRW() {
   switch(m_n_dimensions)
   {
     case 1:
@@ -746,8 +746,8 @@ template <typename T> void Torch::TensorTemplate<T>::computeDataRW() {
   }
 }
 
-template <typename T> const T* Torch::TensorTemplate<T>::dataR() const {
-  Torch::TensorTemplate<T>* self = const_cast<Torch::TensorTemplate<T>*>(this);
+template <typename T> const T* bob::TensorTemplate<T>::dataR() const {
+  bob::TensorTemplate<T>* self = const_cast<bob::TensorTemplate<T>*>(this);
   size_t array_length = sizeAll();
   if (self->m_data_RW) delete[] self->m_data_RW;
   self->m_data_RW = new T[array_length];
@@ -756,7 +756,7 @@ template <typename T> const T* Torch::TensorTemplate<T>::dataR() const {
   return self->m_data_RW;
 }
 
-template <typename T> T* Torch::TensorTemplate<T>::dataW() {
+template <typename T> T* bob::TensorTemplate<T>::dataW() {
   size_t array_length = sizeAll();
   if(m_data_RW) delete[] m_data_RW;
   m_data_RW = new T[array_length];
@@ -765,8 +765,8 @@ template <typename T> T* Torch::TensorTemplate<T>::dataW() {
   return m_data_RW;
 }
 
-template <typename T> void Torch::TensorTemplate<T>::computeStride() const {
-  Torch::TensorTemplate<T>* self = const_cast<Torch::TensorTemplate<T>*>(this);
+template <typename T> void bob::TensorTemplate<T>::computeStride() const {
+  bob::TensorTemplate<T>* self = const_cast<bob::TensorTemplate<T>*>(this);
   switch(m_n_dimensions) {
     case 1:
       self->m_stride[0] = 1;
@@ -793,12 +793,12 @@ template <typename T> void Torch::TensorTemplate<T>::computeStride() const {
   }
 }
 
-template <typename T> long Torch::TensorTemplate<T>::stride(int dim) const {
+template <typename T> long bob::TensorTemplate<T>::stride(int dim) const {
   computeStride();
   return m_stride[(size_t)dim];
 }
 
-template <typename T> void Torch::TensorTemplate<T>::resetFromData() {
+template <typename T> void bob::TensorTemplate<T>::resetFromData() {
   switch(m_n_dimensions) {
     case 1:
       {
@@ -843,8 +843,8 @@ template <typename T> void Torch::TensorTemplate<T>::resetFromData() {
   }
 }
 
-template <typename T> void Torch::TensorTemplate<T>::narrow
-(const Torch::TensorTemplate<T> *src, int dimension, long firstIndex, 
+template <typename T> void bob::TensorTemplate<T>::narrow
+(const bob::TensorTemplate<T> *src, int dimension, long firstIndex, 
  long size) {
   cleanup();
   blitz::Range all_range = blitz::Range::all();
@@ -903,8 +903,8 @@ template <typename T> void Torch::TensorTemplate<T>::narrow
   }
 }
 
-template <typename T> void Torch::TensorTemplate<T>::select
-(const Torch::TensorTemplate<T> *src, int dimension, long sliceIndex) {
+template <typename T> void bob::TensorTemplate<T>::select
+(const bob::TensorTemplate<T> *src, int dimension, long sliceIndex) {
   cleanup();
   blitz::Range all_range = blitz::Range::all();
   switch(src->m_n_dimensions) {
@@ -963,14 +963,14 @@ template <typename T> void Torch::TensorTemplate<T>::select
   }
 }
 
-template <typename T> Torch::TensorTemplate<T>* 
-Torch::TensorTemplate<T>::select(int dimension, long sliceIndex) const {
-  Torch::TensorTemplate<T>* result = new Torch::TensorTemplate<T>();
+template <typename T> bob::TensorTemplate<T>* 
+bob::TensorTemplate<T>::select(int dimension, long sliceIndex) const {
+  bob::TensorTemplate<T>* result = new bob::TensorTemplate<T>();
   result->select(this, dimension, sliceIndex);
   return result;
 }
 
-template <typename T> void Torch::TensorTemplate<T>::fill(T val) {
+template <typename T> void bob::TensorTemplate<T>::fill(T val) {
   switch(m_n_dimensions) {
     case 1:
       (*m_array_1D) = val;
@@ -987,4 +987,4 @@ template <typename T> void Torch::TensorTemplate<T>::fill(T val) {
   }
 }
 
-#endif /* TORCH5SPRO_CORE_TENSOR_BLITZ_TEMPLATE_H */
+#endif /* BOB5SPRO_CORE_TENSOR_BLITZ_TEMPLATE_H */

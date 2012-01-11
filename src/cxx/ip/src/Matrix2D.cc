@@ -19,7 +19,7 @@
  */
 #include "ip/Matrix2D.h"
 
-namespace Torch {
+namespace bob {
 
 Matrix2D::Matrix2D() : DoubleTensor(2, 2)
 {

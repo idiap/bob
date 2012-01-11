@@ -28,7 +28,7 @@
 #include <utility>
 #include <algorithm>
 
-namespace math = Torch::math;
+namespace math = bob::math;
 
 // Declaration of the external LAPACK functions
 // Eigenvalue decomposition of real symmetric matrix (dsyev)
@@ -51,13 +51,13 @@ void math::eigSymReal(const blitz::Array<double,2>& A,
   int N = A.extent(0);
   const blitz::TinyVector<int,1> shape1(N);
   const blitz::TinyVector<int,2> shape2(N,N);
-  Torch::core::array::assertZeroBase(A);
-  Torch::core::array::assertZeroBase(V);
-  Torch::core::array::assertZeroBase(D);
+  bob::core::array::assertZeroBase(A);
+  bob::core::array::assertZeroBase(V);
+  bob::core::array::assertZeroBase(D);
 
-  Torch::core::array::assertSameShape(A,shape2);
-  Torch::core::array::assertSameShape(A,V);
-  Torch::core::array::assertSameShape(D,shape1);
+  bob::core::array::assertSameShape(A,shape2);
+  bob::core::array::assertSameShape(A,V);
+  bob::core::array::assertSameShape(D,shape1);
 
   math::eigSymReal_(A, V, D);
 }
@@ -97,7 +97,7 @@ void math::eigSymReal_(const blitz::Array<double,2>& A,
  
   // Check info variable
   if( info != 0)
-    throw Torch::math::LapackError("The LAPACK dsyev function returned a non-zero value.");
+    throw bob::math::LapackError("The LAPACK dsyev function returned a non-zero value.");
 
   // Copy singular vectors back to V (column-major order)
   for(int j=0; j<N; ++j)
@@ -124,15 +124,15 @@ void math::eigSym(const blitz::Array<double,2>& A, const blitz::Array<double,2>&
   int N = A.extent(0);
   const blitz::TinyVector<int,1> shape1(N);
   const blitz::TinyVector<int,2> shape2(N,N);
-  Torch::core::array::assertZeroBase(A);
-  Torch::core::array::assertZeroBase(B);
-  Torch::core::array::assertZeroBase(V);
-  Torch::core::array::assertZeroBase(D);
+  bob::core::array::assertZeroBase(A);
+  bob::core::array::assertZeroBase(B);
+  bob::core::array::assertZeroBase(V);
+  bob::core::array::assertZeroBase(D);
 
-  Torch::core::array::assertSameShape(A,shape2);
-  Torch::core::array::assertSameShape(B,shape2);
-  Torch::core::array::assertSameShape(A,V);
-  Torch::core::array::assertSameShape(D,shape1);
+  bob::core::array::assertSameShape(A,shape2);
+  bob::core::array::assertSameShape(B,shape2);
+  bob::core::array::assertSameShape(A,V);
+  bob::core::array::assertSameShape(D,shape1);
 
   math::eigSym_(A, B, V, D);
 }
@@ -179,7 +179,7 @@ void math::eigSym_(const blitz::Array<double,2>& A, const blitz::Array<double,2>
 
   // Check info variable
   if( info != 0)
-    throw Torch::math::LapackError("The LAPACK dsygv function returned a \
+    throw bob::math::LapackError("The LAPACK dsygv function returned a \
       non-zero value. This might be caused by a non-positive definite B \
       matrix.");
  
@@ -220,15 +220,15 @@ void math::eig(const blitz::Array<double,2>& A, const blitz::Array<double,2>& B,
   int N = A.extent(0);
   const blitz::TinyVector<int,1> shape1(N);
   const blitz::TinyVector<int,2> shape2(N,N);
-  Torch::core::array::assertZeroBase(A);
-  Torch::core::array::assertZeroBase(B);
-  Torch::core::array::assertZeroBase(V);
-  Torch::core::array::assertZeroBase(D);
+  bob::core::array::assertZeroBase(A);
+  bob::core::array::assertZeroBase(B);
+  bob::core::array::assertZeroBase(V);
+  bob::core::array::assertZeroBase(D);
 
-  Torch::core::array::assertSameShape(A,shape2);
-  Torch::core::array::assertSameShape(B,shape2);
-  Torch::core::array::assertSameShape(A,V);
-  Torch::core::array::assertSameShape(D,shape1);
+  bob::core::array::assertSameShape(A,shape2);
+  bob::core::array::assertSameShape(B,shape2);
+  bob::core::array::assertSameShape(A,V);
+  bob::core::array::assertSameShape(D,shape1);
 
   math::eig_(A, B, V, D);
 }
@@ -275,7 +275,7 @@ void math::eig_(const blitz::Array<double,2>& A, const blitz::Array<double,2>& B
 
   // Check info variable
   if( info != 0)
-    throw Torch::math::LapackError("The LAPACK dggev function returned a \
+    throw bob::math::LapackError("The LAPACK dggev function returned a \
       non-zero value.");
 
   // AA: Re-ordering using std::vector<std::pair<value, index> >
@@ -283,7 +283,7 @@ void math::eig_(const blitz::Array<double,2>& A, const blitz::Array<double,2>& B
   for(int i=0; i<N; ++i) {
     // TODO: Check that alphai is zero (otherwise complex eigenvalue)
     if( alphai[i]>1e-12 )
-      throw Torch::math::LapackError("The LAPACK dggev function returned a \
+      throw bob::math::LapackError("The LAPACK dggev function returned a \
         non-real (i.e. complex) eigenvalue.");
     eigv_index[i].first = alphar[i] / beta[i];
     eigv_index[i].second = i;

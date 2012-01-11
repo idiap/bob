@@ -8,7 +8,7 @@
 
 import os, sys
 import unittest
-import torch
+import bob
 import random, tempfile
 import numpy
 
@@ -71,7 +71,7 @@ class PLDAMachineTest(unittest.TestCase):
       -0.000000012993151,  0.999999999999996], 'float64').reshape(nf,nf)
 
     # Defines base machine
-    m = torch.machine.PLDABaseMachine(D,nf,ng)
+    m = bob.machine.PLDABaseMachine(D,nf,ng)
     # Sets the current F, G and sigma 
     # WARNING: order does matter, as this implies some precomputations
     m.sigma = sigma
@@ -98,8 +98,8 @@ class PLDAMachineTest(unittest.TestCase):
 
     # Saves to file, loads and compares to original
     filename = str(tempfile.mkstemp(".hdf5")[1])
-    m.save(torch.io.HDF5File(filename))
-    m_loaded = torch.machine.PLDABaseMachine(torch.io.HDF5File(filename))
+    m.save(bob.io.HDF5File(filename))
+    m_loaded = bob.machine.PLDABaseMachine(bob.io.HDF5File(filename))
 
     # Compares the values loaded with the former ones
     self.assertTrue(equals(m_loaded.sigma, sigma, 1e-10))
@@ -147,7 +147,7 @@ class PLDAMachineTest(unittest.TestCase):
     mu.fill(0)
 
     # Defines base machine
-    mb = torch.machine.PLDABaseMachine(D,nf,ng)
+    mb = bob.machine.PLDABaseMachine(D,nf,ng)
     # Sets the current F, G and sigma 
     # WARNING: order does matter, as this implies some precomputations
     mb.sigma = sigma
@@ -156,7 +156,7 @@ class PLDAMachineTest(unittest.TestCase):
     mb.mu = mu
 
     # Defines machine
-    m = torch.machine.PLDAMachine(mb)
+    m = bob.machine.PLDAMachine(mb)
     n_samples = 2
     WSumXitBetaXi = 0.37
     weightedSum = numpy.array([1.39,0.54], 'float64')
@@ -172,8 +172,8 @@ class PLDAMachineTest(unittest.TestCase):
 
     # Saves to file, loads and compares to original
     filename = str(tempfile.mkstemp(".hdf5")[1])
-    m.save(torch.io.HDF5File(filename))
-    m_loaded = torch.machine.PLDAMachine(torch.io.HDF5File(filename))
+    m.save(bob.io.HDF5File(filename))
+    m_loaded = bob.machine.PLDAMachine(bob.io.HDF5File(filename))
     m_loaded.plda_base = mb
 
     # Compares the values loaded with the former ones
@@ -189,13 +189,13 @@ class PLDAMachineTest(unittest.TestCase):
 
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()

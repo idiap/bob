@@ -86,7 +86,7 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 BOOST_AUTO_TEST_CASE( test_lbphs_feature_extract )
 {
 	std::vector<blitz::Array<uint64_t,1> > dst;
-	Torch::ip::LBPHSFeatures lbphsfeatures( 5, 5, 0, 0, 1., 4, false, false, 
+	bob::ip::LBPHSFeatures lbphsfeatures( 5, 5, 0, 0, 1., 4, false, false, 
     false, false, false);
 
   lbphsfeatures( src, dst);

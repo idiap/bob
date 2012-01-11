@@ -28,8 +28,8 @@
 #include "core/python/ndarray.h"
 
 using namespace boost::python;
-namespace io = Torch::io;
-namespace tp = Torch::python;
+namespace io = bob::io;
+namespace tp = bob::python;
 
 /**
  * Helper method for the the iterator wrapping
@@ -159,12 +159,12 @@ static void videowriter_append(io::VideoWriter& writer, object a) {
 
 void bind_io_video() {
   //special exceptions for videos
-  tp::register_exception_translator<Torch::io::VideoIsClosed>(PyExc_IOError);
+  tp::register_exception_translator<bob::io::VideoIsClosed>(PyExc_IOError);
 
   iterator_wrapper().wrap(); //wraps io::VideoReader::const_iterator
 
   class_<io::VideoReader, boost::shared_ptr<io::VideoReader> >("VideoReader",
-      "VideoReader objects can read data from video files. The current implementation uses FFMPEG which is a stable freely available implementation for these tasks. You can read an entire video in memory by using the 'load()' method or use video iterators to read frame-by-frame and avoid overloading your machine's memory. The maximum precision FFMPEG will output is a 24-bit (8-bit per band) representation of each pixel (32-bit with transparency when supported by Torch, which is not the case presently). So, the input of data using this class uses uint8_t as base element type. Output will be colored using the RGB standard, with each band varying between 0 and 255, with zero meaning pure black and 255, pure white (color).", init<const std::string&>((arg("filename")), "Initializes a new VideoReader object by giving the input file name to read"))
+      "VideoReader objects can read data from video files. The current implementation uses FFMPEG which is a stable freely available implementation for these tasks. You can read an entire video in memory by using the 'load()' method or use video iterators to read frame-by-frame and avoid overloading your machine's memory. The maximum precision FFMPEG will output is a 24-bit (8-bit per band) representation of each pixel (32-bit with transparency when supported by bob, which is not the case presently). So, the input of data using this class uses uint8_t as base element type. Output will be colored using the RGB standard, with each band varying between 0 and 255, with zero meaning pure black and 255, pure white (color).", init<const std::string&>((arg("filename")), "Initializes a new VideoReader object by giving the input file name to read"))
     .add_property("filename", make_function(&io::VideoReader::filename, return_value_policy<copy_const_reference>()))
     .add_property("height", &io::VideoReader::height)
     .add_property("width", &io::VideoReader::width)

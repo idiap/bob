@@ -20,16 +20,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_IP_FLIPFLOP_H
-#define TORCH5SPRO_IP_FLIPFLOP_H
+#ifndef BOB5SPRO_IP_FLIPFLOP_H
+#define BOB5SPRO_IP_FLIPFLOP_H
 
 #include "core/array_assert.h"
 #include "ip/Exception.h"
 #include "ip/common.h"
 
-namespace tca = Torch::core::array;
+namespace tca = bob::core::array;
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libip_api
  * @{
@@ -167,4 +167,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_IP_FLIPFLOP_H */
+#endif /* BOB5SPRO_IP_FLIPFLOP_H */

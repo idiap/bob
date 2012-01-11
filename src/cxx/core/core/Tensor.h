@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef TORCH5SPRO_CORE_TENSOR_H
-#define TORCH5SPRO_CORE_TENSOR_H
+#ifndef BOB5SPRO_CORE_TENSOR_H
+#define BOB5SPRO_CORE_TENSOR_H
 
 //#include "core/array_common.h"
 #include <blitz/array.h>
@@ -31,7 +31,7 @@
  *  The libCore API.
  */
 
-namespace Torch 
+namespace bob 
 {
   /**
    *  @brief Specify the size of some tensor
@@ -147,11 +147,11 @@ namespace Torch
  */
 
 /**
-  @page libCore Core: The Core module of Torch
+  @page libCore Core: The Core module of bob
 
   @section intro Introduction
 
-  Core contains the core entities of the Torch library.
+  Core contains the core entities of the bob library.
 
   @section api Documentation
   - @ref libcore_api "libCore API"

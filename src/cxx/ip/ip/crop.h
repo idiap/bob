@@ -20,15 +20,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_IP_CROP_H
-#define TORCH5SPRO_IP_CROP_H
+#ifndef BOB5SPRO_IP_CROP_H
+#define BOB5SPRO_IP_CROP_H
 
 #include "core/array_assert.h"
 #include "core/array_index.h"
 
-namespace tca = Torch::core::array;
+namespace tca = bob::core::array;
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libip_api
  * @{
@@ -360,4 +360,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_IP_CROP_H */
+#endif /* BOB5SPRO_IP_CROP_H */

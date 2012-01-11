@@ -22,7 +22,7 @@
 
 #include "ip/Gaussian.h"
 
-namespace ip = Torch::ip;
+namespace ip = bob::ip;
 
 void ip::Gaussian::computeKernel()
 {
@@ -46,8 +46,8 @@ void ip::Gaussian::computeKernel()
 
 void ip::Gaussian::reset(const int radius_y, const int radius_x,
   const double sigma_y, const double sigma_x, 
-  const enum Torch::sp::Convolution::SizeOption size_opt,
-  const enum Torch::sp::Convolution::BorderOption border_opt)
+  const enum bob::sp::Convolution::SizeOption size_opt,
+  const enum bob::sp::Convolution::BorderOption border_opt)
 {
   m_radius_y = radius_y;
   m_radius_x = radius_x;
@@ -63,10 +63,10 @@ template <>
 void ip::Gaussian::operator()<double>(const blitz::Array<double,2>& src,
    blitz::Array<double,2>& dst)
 {
-  m_tmp_int.resize(Torch::sp::getConvolveSepOutputSize(src, m_kernel_y, 0, m_conv_size));
+  m_tmp_int.resize(bob::sp::getConvolveSepOutputSize(src, m_kernel_y, 0, m_conv_size));
   // Checks are postponed to the convolution function.
-  Torch::sp::convolveSep(src, m_kernel_y, m_tmp_int, 0,
+  bob::sp::convolveSep(src, m_kernel_y, m_tmp_int, 0,
     m_conv_size, m_conv_border);
-  Torch::sp::convolveSep(m_tmp_int, m_kernel_x, dst, 1,
+  bob::sp::convolveSep(m_tmp_int, m_kernel_x, dst, 1,
     m_conv_size, m_conv_border);
 }

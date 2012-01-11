@@ -21,7 +21,7 @@
 #include "math/eig.h"
 #include "math/linear.h"
 
-void Torch::trainer::TwoDPCATrainer::train(Torch::machine::TwoDPCAMachine& machine, const Torch::io::Arrayset& data) 
+void bob::trainer::TwoDPCATrainer::train(bob::machine::TwoDPCAMachine& machine, const bob::io::Arrayset& data) 
 {
   int n_samples = data.size();
   int m = data.getShape()[0];
@@ -44,7 +44,7 @@ void Torch::trainer::TwoDPCATrainer::train(Torch::machine::TwoDPCAMachine& machi
     sample_nomean = data.get<double,2>(i) - mean;
     blitz::Array<double,2> sample_nomean_t = sample_nomean.transpose(1,0);
     // Compute tmp_i=(Aj-Am)'*(Aj-Am)
-    Torch::math::prod(sample_nomean_t, sample_nomean, tmp_i);
+    bob::math::prod(sample_nomean_t, sample_nomean, tmp_i);
     // Update G_mat
     G_mat = G_mat + tmp_i; 
   } 
@@ -53,7 +53,7 @@ void Torch::trainer::TwoDPCATrainer::train(Torch::machine::TwoDPCAMachine& machi
   // 3/ Compute the eigenvalue decomposition of G_mat
   blitz::Array<double,1> sigma(n);
   blitz::Array<double,2> V(n,n);
-  Torch::math::eigSymReal(G_mat, V, sigma);
+  bob::math::eigSymReal(G_mat, V, sigma);
 
   // 4/ Sort the eigenvalues/eigenvectors (no blitz++ way unfortunately)
   std::vector< std::pair<double,int> > eigenvalues_sort;

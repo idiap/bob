@@ -17,13 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _TORCH5SPRO_OBJECT_H_
-#define _TORCH5SPRO_OBJECT_H_
+#ifndef _BOB5SPRO_OBJECT_H_
+#define _BOB5SPRO_OBJECT_H_
 
 #include "core/general.h"
 #include "core/VariableCollector.h"
 
-namespace Torch
+namespace bob
 {
    	class VariableCollector;
 

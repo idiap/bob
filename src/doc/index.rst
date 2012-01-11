@@ -11,14 +11,14 @@
  The |project| Project
 =======================
 
-|project| is a signal-processing and machine learning toolbox for vision and
-speech processing developed at  `Idiap`_, in Switzerland. The toolbox is
-written in C++ and is designed to be efficient. To learn about this project's
-history, please visit :doc:`TorchHistory`.
+|project| is a signal-processing and machine learning toolbox for Biometrics
+developed at  `Idiap`_, in Switzerland. The toolbox is written in C++ and is
+designed to be efficient. To learn about this project's history, please visit
+:doc:`BobHistory`.
 
 We believe in free software and development standards. |project| is a
-open-sourced and licensed under the  FreeBSD license terms. For more
-information on licensing, please visit our :doc:`TorchLicensing`.
+open-sourced and licensed under the GPL version 3 license terms. For more
+information on licensing, please visit our :doc:`BobLicensing`.
 
 Enjoy!
 The |project| Team
@@ -29,10 +29,10 @@ Practicalities
 .. toctree::
    :maxdepth: 2
 
-   TorchHistory
-   TorchLicensing
-   TorchInstallation
-   TorchTicketReporting
+   BobLicensing
+   BobInstallation
+   BobTicketReporting
+   BobHistory
 
 User Guide
 ----------
@@ -40,7 +40,7 @@ User Guide
 .. toctree::
    :maxdepth: 2
 
-   StartUpUsingTorch
+   StartUpUsingBob
    ../cxx/doc/index
    ../python/doc/index
 
@@ -52,7 +52,7 @@ Developer's Guide
 
    GoldenRules
    CodingGuidelines
-   OptimizingTorch
+   OptimizingBob
 
 Indices and tables
 ------------------

@@ -29,9 +29,9 @@
 #include "ip/GaborBankFrequency.h"
 
 using namespace boost::python;
-namespace ip = Torch::ip;
-namespace tp = Torch::python;
-namespace ca = Torch::core::array;
+namespace ip = bob::ip;
+namespace tp = bob::python;
+namespace ca = bob::core::array;
 
 static const char* gabor_spatial_doc = "Objects of this class, after configuration, can filter images with a Gabor kernel, performing the operation in the spatial domain.";
 static const char* gabor_bank_spatial_doc = "Objects of this class, after configuration, can filter images with a bank of Gabor kernels, performing the operation in the spatial domain.";
@@ -67,13 +67,13 @@ static void call_gabbfreq(ip::GaborBankFrequency& op, tp::const_ndarray input,
 }
 
 void bind_ip_gabor() {
-  enum_<Torch::ip::Gabor::NormOption>("GaborNorm")
-    .value("NoNorm", Torch::ip::Gabor::NoNorm)
-    .value("SpatialFactor", Torch::ip::Gabor::SpatialFactor)
-    .value("ZeroMeanUnitVar", Torch::ip::Gabor::ZeroMeanUnitVar)
+  enum_<bob::ip::Gabor::NormOption>("GaborNorm")
+    .value("NoNorm", bob::ip::Gabor::NoNorm)
+    .value("SpatialFactor", bob::ip::Gabor::SpatialFactor)
+    .value("ZeroMeanUnitVar", bob::ip::Gabor::ZeroMeanUnitVar)
     ;
 
-  class_<ip::GaborSpatial, boost::shared_ptr<ip::GaborSpatial> >("GaborSpatial", gabor_spatial_doc, init<optional<const double, const double, const double, const double, const int, const bool, const enum Torch::ip::Gabor::NormOption, const enum Torch::sp::Convolution::BorderOption> >((arg("f")=0.25, arg("theta")=0., arg("gamma")=1., arg("eta")=1., arg("spatial_size")=35, arg("cancel_dc")=false, arg("norm")=ip::Gabor::SpatialFactor, arg("border_opt")=Torch::sp::Convolution::Mirror), "Constructs a new Gabor filter in the spatial domain."))
+  class_<ip::GaborSpatial, boost::shared_ptr<ip::GaborSpatial> >("GaborSpatial", gabor_spatial_doc, init<optional<const double, const double, const double, const double, const int, const bool, const enum bob::ip::Gabor::NormOption, const enum bob::sp::Convolution::BorderOption> >((arg("f")=0.25, arg("theta")=0., arg("gamma")=1., arg("eta")=1., arg("spatial_size")=35, arg("cancel_dc")=false, arg("norm")=ip::Gabor::SpatialFactor, arg("border_opt")=bob::sp::Convolution::Mirror), "Constructs a new Gabor filter in the spatial domain."))
     .add_property("f", &ip::GaborSpatial::getF, &ip::GaborSpatial::setF)
     .add_property("theta", &ip::GaborSpatial::getTheta, &ip::GaborSpatial::setTheta)
     .add_property("gamma", &ip::GaborSpatial::getGamma, &ip::GaborSpatial::setGamma)
@@ -102,7 +102,7 @@ void bind_ip_gabor() {
     .def("__call__", &call_gabfreq, "Call an object of this type to filter an image.")
     ;
 
-  class_<ip::GaborBankSpatial, boost::shared_ptr<ip::GaborBankSpatial> >("GaborBankSpatial", gabor_bank_spatial_doc, init<optional<const int, const int, const double, const bool, const double, const double, const double, const double, const int, const bool, const enum Torch::ip::Gabor::NormOption, const enum Torch::sp::Convolution::BorderOption> >((arg("n_orient"), arg("n_freq"), arg("fmax")=0.25, arg("orientation_full")=false, arg("k")=1.414, arg("p")=0.5, arg("gamma")=1., arg("eta")=1., arg("spatial_size")=35, arg("cancel_dc")=false, arg("norm")=ip::Gabor::SpatialFactor, arg("border_opt")=Torch::sp::Convolution::Mirror), "Constructs a new Gabor filter bank in the spatial domain."))
+  class_<ip::GaborBankSpatial, boost::shared_ptr<ip::GaborBankSpatial> >("GaborBankSpatial", gabor_bank_spatial_doc, init<optional<const int, const int, const double, const bool, const double, const double, const double, const double, const int, const bool, const enum bob::ip::Gabor::NormOption, const enum bob::sp::Convolution::BorderOption> >((arg("n_orient"), arg("n_freq"), arg("fmax")=0.25, arg("orientation_full")=false, arg("k")=1.414, arg("p")=0.5, arg("gamma")=1., arg("eta")=1., arg("spatial_size")=35, arg("cancel_dc")=false, arg("norm")=ip::Gabor::SpatialFactor, arg("border_opt")=bob::sp::Convolution::Mirror), "Constructs a new Gabor filter bank in the spatial domain."))
     .add_property("n_orient", &ip::GaborBankSpatial::getNOrient, &ip::GaborBankSpatial::setNOrient)
     .add_property("n_freq", &ip::GaborBankSpatial::getNFreq, &ip::GaborBankSpatial::setNFreq)
     .add_property("fmax", &ip::GaborBankSpatial::getFmax, &ip::GaborBankSpatial::setFmax)

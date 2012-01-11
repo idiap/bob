@@ -20,22 +20,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_CORE_ARRAY_TYPE_H
-#define TORCH_CORE_ARRAY_TYPE_H
+#ifndef BOB_CORE_ARRAY_TYPE_H
+#define BOB_CORE_ARRAY_TYPE_H
 
 #include <stdint.h>
 #include <cstdlib>
 #include <complex>
 
 /**
- * This macro defines the maximum number of dimensions supported by torch. A
- * variable in the Torch.core.array namespace is created from this macro
+ * This macro defines the maximum number of dimensions supported by bob. A
+ * variable in the bob.core.array namespace is created from this macro
  * receiving the same value. Use that variable on your programs, or this macro
  * on your preprocessor code.
  */
-#define TORCH_MAX_DIM 4
+#define BOB_MAX_DIM 4
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libcore_api
  * @{
@@ -71,7 +71,7 @@ namespace Torch {
      * @brief Maximum number of supported dimensions for multidimensional 
      * arrays.
      */
-    const size_t N_MAX_DIMENSIONS_ARRAY = TORCH_MAX_DIM;
+    const size_t N_MAX_DIMENSIONS_ARRAY = BOB_MAX_DIM;
 
     /**
      * These are some type to element type conversions
@@ -180,4 +180,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH_CORE_ARRAY_TYPE_H */
+#endif /* BOB_CORE_ARRAY_TYPE_H */

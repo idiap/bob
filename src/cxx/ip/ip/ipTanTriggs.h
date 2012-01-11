@@ -22,7 +22,7 @@
 
 #include "ip/ipCore.h"
 
-namespace Torch {
+namespace bob {
 
 	/** This class is designed to perform the preprocessing chain of Tan and Triggs
 	 *  to normalize images

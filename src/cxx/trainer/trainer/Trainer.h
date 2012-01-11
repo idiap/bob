@@ -20,7 +20,7 @@
 #ifndef TRAINER_H
 #define TRAINER_H
 
-namespace Torch {
+namespace bob {
 namespace trainer {
 
 /**

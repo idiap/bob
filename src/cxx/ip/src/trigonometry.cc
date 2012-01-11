@@ -19,7 +19,7 @@
  */
 #include "ip/trigonometry.h"
 
-namespace Torch
+namespace bob
 {
 
 double degree2radian(double d)

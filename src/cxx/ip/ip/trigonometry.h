@@ -22,7 +22,7 @@
 
 #include "core/general.h"
 
-namespace Torch
+namespace bob
 {
 
 #ifndef M_PI

@@ -3,14 +3,14 @@
 # Andre Anjos <andre.anjos@idiap.ch>
 # Fri 06 Aug 2010 08:39:26 CEST 
 
-"""This script is used by Buildbot to build full torch releases. It knows how
-to handle all construction phases. If you are looking for a way to build torch
+"""This script is used by Buildbot to build full bob releases. It knows how
+to handle all construction phases. If you are looking for a way to build bob
 locally, look at build.py or aliases "release.sh" and "debug.sh".
 
-This program should be prefixed in a torch-enabled shell environment. You can
+This program should be prefixed in a bob-enabled shell environment. You can
 create such an environment by calling this program like this:
 
-  <torch-root-installation>/bin/shell.py -x "build.py <command>"
+  <bob-root-installation>/bin/shell.py -x "build.py <command>"
 """
 
 import os

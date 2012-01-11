@@ -20,13 +20,13 @@
 #include "machine/GMMLLRMachine.h"
 #include "machine/Exception.h"
 
-using namespace Torch::machine::Log;
+using namespace bob::machine::Log;
 
-Torch::machine::GMMLLRMachine::GMMLLRMachine(Torch::io::HDF5File& config) {
+bob::machine::GMMLLRMachine::GMMLLRMachine(bob::io::HDF5File& config) {
   load(config);
 }
 
-Torch::machine::GMMLLRMachine::GMMLLRMachine(Torch::io::HDF5File& client, Torch::io::HDF5File& ubm) {
+bob::machine::GMMLLRMachine::GMMLLRMachine(bob::io::HDF5File& client, bob::io::HDF5File& ubm) {
   m_gmm_client = new GMMMachine();
   m_gmm_client->load(client);
   m_gmm_ubm = new GMMMachine();
@@ -38,7 +38,7 @@ Torch::machine::GMMLLRMachine::GMMLLRMachine(Torch::io::HDF5File& client, Torch:
   m_n_inputs = m_gmm_client->getNInputs();
 }
 
-Torch::machine::GMMLLRMachine::GMMLLRMachine(const Torch::machine::GMMMachine& client, const Torch::machine::GMMMachine& ubm) {
+bob::machine::GMMLLRMachine::GMMLLRMachine(const bob::machine::GMMMachine& client, const bob::machine::GMMMachine& ubm) {
   // check and assign n_inputs
   if(client.getNInputs() != ubm.getNInputs())
     throw NInputsMismatch(client.getNInputs(), ubm.getNInputs());
@@ -50,11 +50,11 @@ Torch::machine::GMMLLRMachine::GMMLLRMachine(const Torch::machine::GMMMachine& c
   *m_gmm_ubm = ubm;
 }
 
-Torch::machine::GMMLLRMachine::GMMLLRMachine(const GMMLLRMachine& other): Machine<blitz::Array<double,1>, double>(other) {
+bob::machine::GMMLLRMachine::GMMLLRMachine(const GMMLLRMachine& other): Machine<blitz::Array<double,1>, double>(other) {
   copy(other);
 }
 
-Torch::machine::GMMLLRMachine & Torch::machine::GMMLLRMachine::operator= (const GMMLLRMachine &other) {
+bob::machine::GMMLLRMachine & bob::machine::GMMLLRMachine::operator= (const GMMLLRMachine &other) {
   // protect against invalid self-assignment
   if (this != &other) {
     copy(other);
@@ -64,7 +64,7 @@ Torch::machine::GMMLLRMachine & Torch::machine::GMMLLRMachine::operator= (const 
   return *this;
 }
 
-bool Torch::machine::GMMLLRMachine::operator==(const Torch::machine::GMMLLRMachine& b) const {
+bool bob::machine::GMMLLRMachine::operator==(const bob::machine::GMMLLRMachine& b) const {
   if(m_n_inputs != b.m_n_inputs) {
     return false;
   }
@@ -78,7 +78,7 @@ bool Torch::machine::GMMLLRMachine::operator==(const Torch::machine::GMMLLRMachi
   return true;
 }
 
-void Torch::machine::GMMLLRMachine::copy(const GMMLLRMachine& other) {
+void bob::machine::GMMLLRMachine::copy(const GMMLLRMachine& other) {
   m_n_inputs = other.m_n_inputs;
 
   // Initialize GMMMachines
@@ -86,38 +86,38 @@ void Torch::machine::GMMLLRMachine::copy(const GMMLLRMachine& other) {
   *m_gmm_ubm = *(other.m_gmm_ubm);
 }
 
-Torch::machine::GMMLLRMachine::~GMMLLRMachine() {
+bob::machine::GMMLLRMachine::~GMMLLRMachine() {
   delete m_gmm_client;
   delete m_gmm_ubm;
 }
 
-int Torch::machine::GMMLLRMachine::getNInputs() const {
+int bob::machine::GMMLLRMachine::getNInputs() const {
   return m_n_inputs;
 }
 
-void Torch::machine::GMMLLRMachine::forward(const blitz::Array<double,1>& input, double& output) const {
+void bob::machine::GMMLLRMachine::forward(const blitz::Array<double,1>& input, double& output) const {
   if (input.extent(0) != m_n_inputs) {
     throw NInputsMismatch(m_n_inputs, input.extent(0));
   }
   forward_(input,output);
 }
 
-void Torch::machine::GMMLLRMachine::forward_(const blitz::Array<double,1>& input, double& output) const {
+void bob::machine::GMMLLRMachine::forward_(const blitz::Array<double,1>& input, double& output) const {
   double s_u;
   m_gmm_client->forward(input,output);
   m_gmm_ubm->forward(input, s_u);
   output -= s_u;
 }
 
-Torch::machine::GMMMachine* Torch::machine::GMMLLRMachine::getGMMClient() const {
+bob::machine::GMMMachine* bob::machine::GMMLLRMachine::getGMMClient() const {
   return m_gmm_client;
 }
 
-Torch::machine::GMMMachine* Torch::machine::GMMLLRMachine::getGMMUBM() const {
+bob::machine::GMMMachine* bob::machine::GMMLLRMachine::getGMMUBM() const {
   return m_gmm_ubm;
 }
 
-void Torch::machine::GMMLLRMachine::save(Torch::io::HDF5File& config) const {
+void bob::machine::GMMLLRMachine::save(bob::io::HDF5File& config) const {
   config.set("m_n_inputs", m_n_inputs);
 
   std::ostringstream oss_client;
@@ -133,7 +133,7 @@ void Torch::machine::GMMLLRMachine::save(Torch::io::HDF5File& config) const {
   config.cd("..");
 }
 
-void Torch::machine::GMMLLRMachine::load(Torch::io::HDF5File& config) {
+void bob::machine::GMMLLRMachine::load(bob::io::HDF5File& config) {
   m_n_inputs = config.read<int64_t>("m_n_inputs");
 
   std::ostringstream oss_client;
@@ -151,7 +151,7 @@ void Torch::machine::GMMLLRMachine::load(Torch::io::HDF5File& config) {
   config.cd("..");
 }
 
-namespace Torch {
+namespace bob {
   namespace machine {
     std::ostream& operator<<(std::ostream& os, const GMMLLRMachine& machine) {
       os << "n_inputs = " << machine.m_n_inputs << std::endl;

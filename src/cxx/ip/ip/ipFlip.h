@@ -17,16 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _TORCHVISION_IP_FLIP_H_
-#define _TORCHVISION_IP_FLIP_H_
+#ifndef _BOBVISION_IP_FLIP_H_
+#define _BOBVISION_IP_FLIP_H_
 
-#include "ip/ipCore.h"		// <ipFlip> is a <Torch::ipCore>
+#include "ip/ipCore.h"		// <ipFlip> is a <bob::ipCore>
 #include "ip/vision.h"		// <sRect2D> definition
 
-namespace Torch
+namespace bob
 {
 	/////////////////////////////////////////////////////////////////////////
-	// Torch::ipFlip
+	// bob::ipFlip
 	//	This class is designed to crop an image.
 	//	The result is a tensor of the same storage type.
 	//

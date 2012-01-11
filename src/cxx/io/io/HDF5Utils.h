@@ -37,8 +37,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IO_HDF5UTILS_H 
-#define TORCH_IO_HDF5UTILS_H
+#ifndef BOB_IO_HDF5UTILS_H 
+#define BOB_IO_HDF5UTILS_H
 
 #include <map>
 #include <vector>
@@ -58,7 +58,7 @@
 #include "io/HDF5Exception.h"
 #include "io/HDF5Types.h"
 
-namespace Torch { namespace io { namespace detail { namespace hdf5 {
+namespace bob { namespace io { namespace detail { namespace hdf5 {
 
   //Forward declaration for File
   class Dataset;
@@ -154,7 +154,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
        * list operations.
        */
       Dataset(boost::shared_ptr<File>& f, const std::string&, 
-          const Torch::io::HDF5Type& type, bool list=true,
+          const bob::io::HDF5Type& type, bool list=true,
           size_t compression=0);
 
       /**
@@ -173,7 +173,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
        * perspective of the default compatible type. If the given type is not
        * compatible, raises a type error.
        */
-      size_t size(const Torch::io::HDF5Type& type) const;
+      size_t size(const bob::io::HDF5Type& type) const;
 
       /**
        * DATA READING FUNCTIONALITY
@@ -191,7 +191,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
        * If the indexed position does not exist, raises an index error.
        */
       template <typename T> void read(size_t index, T& value) {
-        Torch::io::HDF5Type dest_type(value);
+        bob::io::HDF5Type dest_type(value);
         read_buffer(index, dest_type, reinterpret_cast<void*>(&value));
       }
 
@@ -238,8 +238,8 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
        */
       template <typename T, int N> 
         void readArray(size_t index, blitz::Array<T,N>& value) {
-          Torch::core::array::assertCZeroBaseContiguous(value);
-          Torch::io::HDF5Type dest_type(value);
+          bob::core::array::assertCZeroBaseContiguous(value);
+          bob::io::HDF5Type dest_type(value);
           read_buffer(index, dest_type, reinterpret_cast<void*>(value.data()));
         }
 
@@ -253,7 +253,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
       template <typename T, int N> 
         blitz::Array<T,N> readArray(size_t index) {
           for (size_t k=m_descr.size(); k>0; --k) {
-            const Torch::io::HDF5Shape& S = m_descr[k-1].type.shape();
+            const bob::io::HDF5Shape& S = m_descr[k-1].type.shape();
             if(S.n() == N) {
               blitz::TinyVector<int,N> shape;
               S.set(shape);
@@ -262,7 +262,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
               return retval;
             }
           }
-          throw Torch::io::HDF5IncompatibleIO(m_parent->m_path.string(), 
+          throw bob::io::HDF5IncompatibleIO(m_parent->m_path.string(), 
               m_path, m_descr[0].type.str(), "dynamic shape unknown");
         }
 
@@ -309,7 +309,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
        * If the above conditions are not met, an exception is raised.
        */
       template <typename T> void replace(size_t index, const T& value) {
-        Torch::io::HDF5Type dest_type(value);
+        bob::io::HDF5Type dest_type(value);
         write_buffer(index, dest_type, reinterpret_cast<const void*>(&value));
       }
 
@@ -336,7 +336,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
        * If the above conditions are not met, an exception is raised.
        */
       template <typename T> void add(const T& value) {
-        Torch::io::HDF5Type dest_type(value);
+        bob::io::HDF5Type dest_type(value);
         extend_buffer(dest_type, reinterpret_cast<const void*>(&value));
       }
 
@@ -364,9 +364,9 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
        */
       template <typename T, int N> 
         void replaceArray(size_t index, const blitz::Array<T,N>& value) {
-          Torch::io::HDF5Type dest_type(value);
-          if(!Torch::core::array::isCZeroBaseContiguous(value)) {
-            blitz::Array<T,N> tmp = Torch::core::array::ccopy(value);
+          bob::io::HDF5Type dest_type(value);
+          if(!bob::core::array::isCZeroBaseContiguous(value)) {
+            blitz::Array<T,N> tmp = bob::core::array::ccopy(value);
             write_buffer(index, dest_type, reinterpret_cast<const void*>(tmp.data()));
           }
           else {
@@ -400,9 +400,9 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
        */
       template <typename T, int N> 
         void addArray(const blitz::Array<T,N>& value) {
-          Torch::io::HDF5Type dest_type(value);
-          if(!Torch::core::array::isCZeroBaseContiguous(value)) {
-            blitz::Array<T,N> tmp = Torch::core::array::ccopy(value);
+          bob::io::HDF5Type dest_type(value);
+          if(!bob::core::array::isCZeroBaseContiguous(value)) {
+            blitz::Array<T,N> tmp = bob::core::array::ccopy(value);
             extend_buffer(dest_type, reinterpret_cast<const void*>(tmp.data()));
           }
           else {
@@ -425,27 +425,27 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
        * The index is checked for existence as well as the consistence of the
        * destination type.
        */
-      std::vector<Torch::io::HDF5Descriptor>::iterator select (size_t index,
-          const Torch::io::HDF5Type& dest);
+      std::vector<bob::io::HDF5Descriptor>::iterator select (size_t index,
+          const bob::io::HDF5Type& dest);
 
     public: //direct access for other bindings -- don't use these!
 
       /**
        * Reads a previously selected area into the given (user) buffer.
        */
-      void read_buffer (size_t index, const Torch::io::HDF5Type& dest, void* buffer);
+      void read_buffer (size_t index, const bob::io::HDF5Type& dest, void* buffer);
 
       /**
        * Writes the contents of a given buffer into the file. The area that the
        * data will occupy should have been selected beforehand.
        */
-      void write_buffer (size_t index, const Torch::io::HDF5Type& dest, 
+      void write_buffer (size_t index, const bob::io::HDF5Type& dest, 
           const void* buffer);
 
       /**
        * Extend the dataset with one extra variable.
        */
-      void extend_buffer (const Torch::io::HDF5Type& dest, const void* buffer);
+      void extend_buffer (const bob::io::HDF5Type& dest, const void* buffer);
 
     public: //representation
   
@@ -454,7 +454,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
       boost::shared_ptr<hid_t> m_id; ///< the HDF5 Dataset this type points to
       boost::shared_ptr<hid_t> m_dt; ///< the datatype of this Dataset
       boost::shared_ptr<hid_t> m_filespace; ///< the "file" space for this set
-      std::vector<Torch::io::HDF5Descriptor> m_descr; ///< read/write descr.'s
+      std::vector<bob::io::HDF5Descriptor> m_descr; ///< read/write descr.'s
       boost::shared_ptr<hid_t> m_memspace; ///< read/write space
 
   };
@@ -468,4 +468,4 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
 
 }}}}
 
-#endif /* TORCH_IO_HDF5UTILS_H */
+#endif /* BOB_IO_HDF5UTILS_H */

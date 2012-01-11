@@ -2,7 +2,7 @@
 .. Andre Anjos <andre.anjos@idiap.ch>
 .. Thu 23 Jun 11:46:16 2011 CEST
 
-.. Index file for the torch databases
+.. Index file for the bob databases
 
 ===========
  Databases
@@ -11,66 +11,66 @@
 Reference
 ---------
 
-.. automodule:: torch.db
+.. automodule:: bob.db
 
 BANCA Database
 ==============
 
-.. automodule:: torch.db.banca
+.. automodule:: bob.db.banca
 
-.. autoclass:: torch.db.banca.Database
+.. autoclass:: bob.db.banca.Database
   :members:
 
 Biosecure Database
 ==================
 
-.. automodule:: torch.db.biosecure
+.. automodule:: bob.db.biosecure
 
-.. autoclass:: torch.db.biosecure.Database
+.. autoclass:: bob.db.biosecure.Database
   :members:
 
 MOBIO Database
 ==============
 
-.. automodule:: torch.db.mobio
+.. automodule:: bob.db.mobio
 
-.. autoclass:: torch.db.mobio.Database
+.. autoclass:: bob.db.mobio.Database
   :members:
 
 Multipie Database
 =================
 
-.. automodule:: torch.db.multipie
+.. automodule:: bob.db.multipie
 
-.. autoclass:: torch.db.multipie.Database
+.. autoclass:: bob.db.multipie.Database
   :members:
 
 Replay Attack Database
 ======================
 
-.. automodule:: torch.db.replay
+.. automodule:: bob.db.replay
 
-.. autoclass:: torch.db.replay.Database
+.. autoclass:: bob.db.replay.Database
   :members:
 
 SCface Database
 ===============
 
-.. automodule:: torch.db.scface
+.. automodule:: bob.db.scface
 
-.. autoclass:: torch.db.scface.Database
+.. autoclass:: bob.db.scface.Database
   :members:
 
 Iris Database
 =============
 
-.. automodule:: torch.db.iris
+.. automodule:: bob.db.iris
   :members:
 
 XM2VTS Database
 ===============
 
-.. automodule:: torch.db.xm2vts
+.. automodule:: bob.db.xm2vts
 
-.. autoclass:: torch.db.xm2vts.Database
+.. autoclass:: bob.db.xm2vts.Database
   :members:

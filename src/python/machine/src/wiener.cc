@@ -9,8 +9,8 @@
 #include "machine/WienerMachine.h"
 
 using namespace boost::python;
-namespace mach = Torch::machine;
-namespace io = Torch::io;
+namespace mach = bob::machine;
+namespace io = bob::io;
 
 static blitz::Array<double,2> forward(const mach::WienerMachine& m,
     const blitz::Array<double,2>& input) {

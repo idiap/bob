@@ -27,14 +27,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_MACHINE_LINEARMACHINE_H
-#define TORCH_MACHINE_LINEARMACHINE_H
+#ifndef BOB_MACHINE_LINEARMACHINE_H
+#define BOB_MACHINE_LINEARMACHINE_H
 
 #include <blitz/array.h>
 #include "io/HDF5File.h"
 #include "machine/Activation.h"
 
-namespace Torch { namespace machine {
+namespace bob { namespace machine {
 
   /**
    * A linear classifier. See C. M. Bishop, "Pattern Recognition and Machine
@@ -75,7 +75,7 @@ namespace Torch { namespace machine {
       /**
        * Starts a new LinearMachine from an existing Configuration object.
        */
-      LinearMachine (Torch::io::HDF5File& config);
+      LinearMachine (bob::io::HDF5File& config);
 
       /**
        * Just to virtualise the destructor
@@ -91,12 +91,12 @@ namespace Torch { namespace machine {
        * Loads data from an existing configuration object. Resets the current
        * state.
        */
-      void load (Torch::io::HDF5File& config);
+      void load (bob::io::HDF5File& config);
 
       /**
        * Saves an existing machine to a Configuration object.
        */
-      void save (Torch::io::HDF5File& config) const;
+      void save (bob::io::HDF5File& config) const;
 
       /**
        * Forwards data through the network, outputs the values of each linear
@@ -262,4 +262,4 @@ namespace Torch { namespace machine {
 
 }}
 
-#endif /* TORCH_MACHINE_LINEARMACHINE_H */
+#endif /* BOB_MACHINE_LINEARMACHINE_H */

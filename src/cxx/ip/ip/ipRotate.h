@@ -17,18 +17,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _TORCHVISION_IP_ROTATE_H_
-#define _TORCHVISION_IP_ROTATE_H_
+#ifndef _BOBVISION_IP_ROTATE_H_
+#define _BOBVISION_IP_ROTATE_H_
 
-#include "ip/ipCore.h"		// <ipRotate> is a <Torch::ipCore>
+#include "ip/ipCore.h"		// <ipRotate> is a <bob::ipCore>
 #include "ip/RotationMatrix2D.h"
 #include "ip/ipShift.h"
 #include "core/Tensor.h"
 
-namespace Torch
+namespace bob
 {
 	/////////////////////////////////////////////////////////////////////////
-	// Torch::ipRotate
+	// bob::ipRotate
 	//	This class is designed to rotate an image.
 	//	The result is a tensor of the same storage type, but may have a different size.
 	//

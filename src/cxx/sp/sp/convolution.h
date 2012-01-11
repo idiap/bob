@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_SP_CONVOLVE_H
-#define TORCH5SPRO_SP_CONVOLVE_H
+#ifndef BOB5SPRO_SP_CONVOLVE_H
+#define BOB5SPRO_SP_CONVOLVE_H
 
 #include "core/Exception.h"
 #include "core/array_assert.h"
@@ -30,9 +30,9 @@
 #include <algorithm>
 #include <blitz/array.h>
 
-namespace tca = Torch::core::array;
+namespace tca = bob::core::array;
 
-namespace Torch {
+namespace bob {
   /**
    * \ingroup libsp_api
    * @{
@@ -164,7 +164,7 @@ namespace Torch {
       }
       else 
       {
-        throw Torch::core::Exception();
+        throw bob::core::Exception();
       }
       return res;
     }
@@ -250,7 +250,7 @@ namespace Torch {
         }
         // Should be impossible to reach this point
         else
-          throw Torch::core::Exception();
+          throw bob::core::Exception();
       }
     }
 
@@ -362,7 +362,7 @@ namespace Torch {
           }
           // Should be impossible to reach this point
           else
-            throw Torch::core::Exception();
+            throw bob::core::Exception();
         }
       }
     }
@@ -450,12 +450,12 @@ namespace Torch {
         detail::convolveSep( B, C, A, size_opt, border_opt);
       else if(dim<N)
       {
-        const blitz::Array<T,N> Bp = (Torch::core::array::ccopy(B)).transpose(dim,0);
+        const blitz::Array<T,N> Bp = (bob::core::array::ccopy(B)).transpose(dim,0);
         blitz::Array<T,N> Ap = A.transpose(dim,0);
         detail::convolveSep( Bp, C, Ap, size_opt, border_opt);
       }
       else
-        throw Torch::core::Exception();
+        throw bob::core::Exception();
     }
 
   }
@@ -464,4 +464,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_SP_CONVOLVE_H */
+#endif /* BOB5SPRO_SP_CONVOLVE_H */

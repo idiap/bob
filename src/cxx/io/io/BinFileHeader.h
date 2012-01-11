@@ -21,14 +21,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IO_BINFILEHEADER_H
-#define TORCH_IO_BINFILEHEADER_H
+#ifndef BOB_IO_BINFILEHEADER_H
+#define BOB_IO_BINFILEHEADER_H
 
 #include <fstream>
 #include <blitz/array.h>
 #include "core/array_type.h"
 
-namespace Torch { namespace io { namespace detail {
+namespace bob { namespace io { namespace detail {
 
     extern const uint32_t MAGIC_ENDIAN_DW;
     extern const uint8_t FORMAT_VERSION;
@@ -110,16 +110,16 @@ namespace Torch { namespace io { namespace detail {
 
       //representation
       uint8_t m_version; ///< current version being read
-      Torch::core::array::ElementType m_elem_type; ///< array element type 
+      bob::core::array::ElementType m_elem_type; ///< array element type 
       uint8_t m_elem_sizeof; ///< the syze in bytes of the element
       uint32_t m_endianness; ///< the endianness of data recorded in the file
       uint8_t m_n_dimensions; ///< the number of dimensions in each array
-      size_t m_shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY]; ///< shape of data
+      size_t m_shape[bob::core::array::N_MAX_DIMENSIONS_ARRAY]; ///< shape of data
       uint64_t m_n_samples; ///< total number of arrays in the file
       uint64_t m_n_elements; ///< number of elements per array == PROD(shape)
     };
 
 } } }
 
-#endif /* TORCH_IO_BINFILEHEADER_H */
+#endif /* BOB_IO_BINFILEHEADER_H */
 

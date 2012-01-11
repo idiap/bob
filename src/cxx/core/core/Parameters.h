@@ -17,13 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _TORCH5SPRO_PARAMETERS_H_
-#define _TORCH5SPRO_PARAMETERS_H_
+#ifndef _BOB5SPRO_PARAMETERS_H_
+#define _BOB5SPRO_PARAMETERS_H_
 
 #include "core/Object.h"
 #include "core/File.h"
 
-namespace Torch
+namespace bob
 {
 	/** Parameter class
 

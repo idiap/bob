@@ -25,7 +25,7 @@
 #include "math/Exception.h"
 #include <cmath>
 
-namespace math = Torch::math;
+namespace math = bob::math;
 
 double math::norminv(const double p, const double mu, const double sigma)
 {
@@ -71,7 +71,7 @@ double math::normsinv(const double p)
 	// Error p should be between 0 and 1
 	if (p < 0 || p > 1)
   {
-    throw Torch::math::NorminvPNotInRangeError(p);
+    throw bob::math::NorminvPNotInRangeError(p);
   }
 	// Rational approximation for lower region.
 	else if (0 < p && p < p_low)

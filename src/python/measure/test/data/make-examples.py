@@ -8,7 +8,7 @@
 For separability information, please consult: http://en.wikipedia.org/wiki/File:Anderson%27s_Iris_data_set.png
 """
 
-import torch
+import bob
 
 iris_columns = {
     'sepal.length': 0,
@@ -43,8 +43,8 @@ def example1():
   Separation threshold is about 3.
   """
   data = loaddata('iris.data', 'petal.length')
-  torch.io.Array(torch.core.array.array(data['setosa'])).save('linsep-negatives.hdf5')
-  torch.io.Array(torch.core.array.array(data['virginica'])).save('linsep-positives.hdf5')
+  bob.io.Array(bob.core.array.array(data['setosa'])).save('linsep-negatives.hdf5')
+  bob.io.Array(bob.core.array.array(data['virginica'])).save('linsep-positives.hdf5')
 
 def example2():
   """In the second example we will get a non-linearly separable set of scores:
@@ -56,8 +56,8 @@ def example2():
   Separation threshold is about 5 (min. HTER).
   """
   data = loaddata('iris.data', 'sepal.length')
-  torch.io.Array(torch.core.array.array(data['setosa'])).save('nonsep-negatives.hdf5')
-  torch.io.Array(torch.core.array.array(data['versicolor'])).save('nonsep-positives.hdf5')
+  bob.io.Array(bob.core.array.array(data['setosa'])).save('nonsep-negatives.hdf5')
+  bob.io.Array(bob.core.array.array(data['versicolor'])).save('nonsep-positives.hdf5')
 
 def main():
   """Generates data for all examples."""

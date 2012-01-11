@@ -21,7 +21,7 @@
 #include "ip/shift.h"
 #include "ip/Exception.h"
 
-namespace ipd = Torch::ip::detail;
+namespace ipd = bob::ip::detail;
 
 void ipd::shiftParameterCheck( const int shift_y, const int shift_x,
   const int src_height, const int src_width)

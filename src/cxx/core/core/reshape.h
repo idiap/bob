@@ -22,15 +22,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_CORE_RESHAPE_H
-#define TORCH5SPRO_CORE_RESHAPE_H
+#ifndef BOB5SPRO_CORE_RESHAPE_H
+#define BOB5SPRO_CORE_RESHAPE_H
 
 #include <limits>
 #include <blitz/array.h>
 #include "core/array_assert.h"
 #include "core/reshape_exception.h"
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libcore_api
  * @{
@@ -79,9 +79,9 @@ namespace Torch {
     template<typename T> 
     void reshape(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst) 
     {
-      Torch::core::array::assertZeroBase(src);
-      Torch::core::array::assertZeroBase(dst);
-      Torch::core::ReshapeDifferentNumberOfElements(
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(dst);
+      bob::core::ReshapeDifferentNumberOfElements(
         src.extent(0)*src.extent(1), dst.extent(0)*dst.extent(1));
       reshape_(src, dst);
     }
@@ -118,9 +118,9 @@ namespace Torch {
     template<typename T> 
     void reshape(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst) 
     {
-      Torch::core::array::assertZeroBase(src);
-      Torch::core::array::assertZeroBase(dst);
-      Torch::core::ReshapeDifferentNumberOfElements(
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(dst);
+      bob::core::ReshapeDifferentNumberOfElements(
         src.extent(0)*src.extent(1), dst.extent(0));
       reshape_(src, dst);
     }
@@ -157,9 +157,9 @@ namespace Torch {
     template<typename T> 
     void reshape(const blitz::Array<T,1>& src, blitz::Array<T,2>& dst) 
     {
-      Torch::core::array::assertZeroBase(src);
-      Torch::core::array::assertZeroBase(dst);
-      Torch::core::ReshapeDifferentNumberOfElements(
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(dst);
+      bob::core::ReshapeDifferentNumberOfElements(
         src.extent(0)*src.extent(1), dst.extent(0));
       reshape_(src, dst);
     }
@@ -170,4 +170,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_CORE_RESHAPE_H */
+#endif /* BOB5SPRO_CORE_RESHAPE_H */

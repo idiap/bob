@@ -23,7 +23,7 @@
 #include "core/general.h"
 #include "core/Tensor.h"
 
-namespace Torch {
+namespace bob {
 
 	/** This class is designed to handle a 2D matrix for geometric operations
 

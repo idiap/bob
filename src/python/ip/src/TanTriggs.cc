@@ -24,9 +24,9 @@
 #include "core/python/ndarray.h"
 
 using namespace boost::python;
-namespace ip = Torch::ip;
-namespace tp = Torch::python;
-namespace ca = Torch::core::array;
+namespace ip = bob::ip;
+namespace tp = bob::python;
+namespace ca = bob::core::array;
 
 static const char* ttdoc = "Objects of this class, after configuration, can preprocess images. It does this using the method described by Tan and Triggs in the paper titled \" Enhanced_Local_Texture_Feature_Sets for_Face_Recognition_Under_Difficult_Lighting_Conditions\", published in 2007";
 

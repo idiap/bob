@@ -23,8 +23,8 @@
 #include "sp/DCT2DNaive.h"
 #include "core/array_assert.h"
 
-namespace tca = Torch::core::array;
-namespace spd = Torch::sp::detail;
+namespace tca = bob::core::array;
+namespace spd = bob::sp::detail;
 
 spd::DCT2DNaiveAbstract::DCT2DNaiveAbstract( const int height, 
   const int width): m_height(height), m_width(width), 

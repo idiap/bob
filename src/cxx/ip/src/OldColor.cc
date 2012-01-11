@@ -19,7 +19,7 @@
  */
 #include "ip/OldColor.h"
 
-namespace Torch {
+namespace bob {
 
 Color black(0, 0, 0);
 Color white(255, 255, 255);

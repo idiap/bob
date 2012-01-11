@@ -2,7 +2,7 @@ project(core-cxx)
 cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
-set(deps "") #other torch subprojects
+set(deps "") #other bob subprojects
 set(shared "${Boost_SYSTEM_LIBRARY_RELEASE};${Boost_THREAD_LIBRARY_RELEASE};${Boost_FILESYSTEM_LIBRARY_RELEASE};${Boost_IOSTREAMS_LIBRARY_RELEASE};${Boost_DATE_TIME_LIBRARY_RELEASE};${cblas_LIBRARIES};${Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE}")
 
 # If we have google-perftools installed, enable the HAS_GOOGLE_PERFTOOLS flag,
@@ -34,22 +34,22 @@ set(src
     )
 
 include(../../cmake/macros.cmake)
-torch_header_install(core-cxx core "torch::core")
-torch_library(core "${src}" "${deps}" "${shared}")
-add_dependencies(torch_core core-cxx_header_install)
+bob_header_install(core-cxx core "bob::core")
+bob_library(core "${src}" "${deps}" "${shared}")
+add_dependencies(bob_core core-cxx_header_install)
 
 # Defines tests for this package
-torch_test(core tensor test/tensor.cc)
-torch_test(core adapter test/blitzAdapter.cc)
-torch_test(core logging test/logging.cc)
-torch_test(core blitzarray test/blitzArray.cc)
-torch_test(core convertarray test/convert.cc)
-torch_test(core repmat test/repmat.cc)
-torch_test(core reshape test/reshape.cc)
+bob_test(core tensor test/tensor.cc)
+bob_test(core adapter test/blitzAdapter.cc)
+bob_test(core logging test/logging.cc)
+bob_test(core blitzarray test/blitzArray.cc)
+bob_test(core convertarray test/convert.cc)
+bob_test(core repmat test/repmat.cc)
+bob_test(core reshape test/reshape.cc)
 if((${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
-  target_link_libraries(torchtest_core_blitzarray "-framework CoreServices")
+  target_link_libraries(bobtest_core_blitzarray "-framework CoreServices")
 endif((${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
 
 # Defines benchmarks we make available
-torch_benchmark(core bigtensor2d "benchmark/bigtensor2d.cc")
-torch_example_install("cxx" "core" "benchmark/bigtensor2d.cc")
+bob_benchmark(core bigtensor2d "benchmark/bigtensor2d.cc")
+bob_example_install("cxx" "core" "benchmark/bigtensor2d.cc")

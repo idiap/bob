@@ -14,16 +14,16 @@ set(pysrc
  
 include(../../cmake/macros.cmake)
 
-torch_python_package_bindings(math "${pysrc}")
-add_dependencies(pytorch_math python-core_header_install)
-target_link_libraries(pytorch_math pytorch_core_ndarray)
+bob_python_package_bindings(math "${pysrc}")
+add_dependencies(pybob_math python-core_header_install)
+target_link_libraries(pybob_math pybob_core_ndarray)
 
-torch_python_install(math)
+bob_python_install(math)
 
 # Our test units
-torch_python_add_test(python-math-eigenvalue-tests 
+bob_python_add_test(python-math-eigenvalue-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_eig.py)
-torch_python_add_test(python-math-sqrtm-tests 
+bob_python_add_test(python-math-sqrtm-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_sqrtm.py)
-torch_python_add_test(python-math-stats-tests 
+bob_python_add_test(python-math-stats-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_stats.py)

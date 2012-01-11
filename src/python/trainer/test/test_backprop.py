@@ -9,7 +9,7 @@
 import os, sys
 import math
 import unittest
-import torch
+import bob
 import numpy
 
 class PythonBackProp:
@@ -61,13 +61,13 @@ class PythonBackProp:
     W = machine.weights #weights
     B = machine.biases #biases
 
-    if machine.activation == torch.machine.Activation.TANH:
+    if machine.activation == bob.machine.Activation.TANH:
       forward = tanh
       backward = tanh_bwd
-    elif machine.activation == torch.machine.Activation.LOG:
+    elif machine.activation == bob.machine.Activation.LOG:
       forward = logistic
       backward = logistic_bwd
-    elif machine.activation == torch.machine.Activation.LINEAR:
+    elif machine.activation == bob.machine.Activation.LINEAR:
       forward = linear
       backward = linear_bwd
     else:
@@ -125,15 +125,15 @@ class BackPropTest(unittest.TestCase):
 
     # Initializes an MLPBackPropTrainer and checks all seems consistent
     # with the proposed API.
-    machine = torch.machine.MLP((4, 1))
-    machine.activation = torch.machine.Activation.LINEAR
+    machine = bob.machine.MLP((4, 1))
+    machine.activation = bob.machine.Activation.LINEAR
     B = 10
-    trainer = torch.trainer.MLPBackPropTrainer(machine, B)
+    trainer = bob.trainer.MLPBackPropTrainer(machine, B)
     self.assertEqual( trainer.batchSize, B )
     self.assertTrue ( trainer.isCompatible(machine) )
     self.assertTrue ( trainer.trainBiases )
 
-    machine = torch.machine.MLP((7, 2))
+    machine = bob.machine.MLP((7, 2))
     self.assertFalse ( trainer.isCompatible(machine) )
 
     trainer.trainBiases = False
@@ -144,20 +144,20 @@ class BackPropTest(unittest.TestCase):
     # Trains a simple network with one single step, verifies
     # the training works as expected by calculating the same
     # as the trainer should do using python.
-    machine = torch.machine.MLP((2, 2, 1))
-    machine.activation = torch.machine.Activation.LOG
+    machine = bob.machine.MLP((2, 2, 1))
+    machine.activation = bob.machine.Activation.LOG
     machine.biases = 0
     w0 = numpy.array([[.23, .1],[-0.79, 0.21]])
     w1 = numpy.array([[-.12], [-0.88]])
     machine.weights = [w0, w1]
-    trainer = torch.trainer.MLPBackPropTrainer(machine, 1)
+    trainer = bob.trainer.MLPBackPropTrainer(machine, 1)
     trainer.trainBiases = False
     d0 = numpy.array([[.3, .7]])
     t0 = numpy.array([[.0]])
 
     # trains in python first
     pytrainer = PythonBackProp(train_biases=trainer.trainBiases)
-    pymachine = torch.machine.MLP(machine) #a copy
+    pymachine = bob.machine.MLP(machine) #a copy
     pytrainer.train(pymachine, d0, t0)
 
     # trains with our C++ implementation
@@ -171,10 +171,10 @@ class BackPropTest(unittest.TestCase):
 
     N = 50
 
-    machine = torch.machine.MLP((4, 4, 3))
-    machine.activation = torch.machine.Activation.TANH
+    machine = bob.machine.MLP((4, 4, 3))
+    machine.activation = bob.machine.Activation.TANH
     machine.randomize()
-    trainer = torch.trainer.MLPBackPropTrainer(machine, N)
+    trainer = bob.trainer.MLPBackPropTrainer(machine, N)
     trainer.trainBiases = True
 
     # A helper to select and shuffle the data
@@ -184,22 +184,22 @@ class BackPropTest(unittest.TestCase):
         numpy.array([-1., -1., +1.]), #virginica
         ]
     # Associate the data to targets, by setting the arrayset order explicetly
-    data = torch.db.iris.data()
+    data = bob.db.iris.data()
     datalist = [data['setosa'], data['versicolor'], data['virginica']]
 
-    S = torch.trainer.DataShuffler(datalist, targets)
+    S = bob.trainer.DataShuffler(datalist, targets)
 
     # trains in python first
     pytrainer = PythonBackProp(train_biases=trainer.trainBiases)
-    pymachine = torch.machine.MLP(machine) #a copy
+    pymachine = bob.machine.MLP(machine) #a copy
 
     # We now iterate for several steps, look for the convergence
     for k in range(50):
       input, target = S(N)
       pytrainer.train(pymachine, input, target)
       trainer.train_(machine, input, target)
-      #print "[Python] |RMSE|@%d:" % k, numpy.linalg.norm(torch.measure.rmse(pymachine(input), target))
-      #print "[C++] |RMSE|@%d:" % k, numpy.linalg.norm(torch.measure.rmse(machine(input), target))
+      #print "[Python] |RMSE|@%d:" % k, numpy.linalg.norm(bob.measure.rmse(pymachine(input), target))
+      #print "[C++] |RMSE|@%d:" % k, numpy.linalg.norm(bob.measure.rmse(machine(input), target))
       # Note we will face precision problems when comparing to the Pythonic
       # implementation. So, let's not be too demanding here. If all values are
       # approximately equal to 1e-10, we consider this is OK.
@@ -215,10 +215,10 @@ class BackPropTest(unittest.TestCase):
 
     N = 50
 
-    machine = torch.machine.MLP((4, 3, 3, 1))
-    machine.activation = torch.machine.Activation.TANH
+    machine = bob.machine.MLP((4, 3, 3, 1))
+    machine.activation = bob.machine.Activation.TANH
     machine.randomize()
-    trainer = torch.trainer.MLPBackPropTrainer(machine, N)
+    trainer = bob.trainer.MLPBackPropTrainer(machine, N)
     trainer.trainBiases = True
 
     # A helper to select and shuffle the data
@@ -228,22 +228,22 @@ class BackPropTest(unittest.TestCase):
         numpy.array([+1.0]), #virginica
         ]
     # Associate the data to targets, by setting the arrayset order explicetly
-    data = torch.db.iris.data()
+    data = bob.db.iris.data()
     datalist = [data['setosa'], data['versicolor'], data['virginica']]
 
-    S = torch.trainer.DataShuffler(datalist, targets)
+    S = bob.trainer.DataShuffler(datalist, targets)
 
     # trains in python first
     pytrainer = PythonBackProp(train_biases=trainer.trainBiases)
-    pymachine = torch.machine.MLP(machine) #a copy
+    pymachine = bob.machine.MLP(machine) #a copy
 
     # We now iterate for several steps, look for the convergence
     for k in range(50):
       input, target = S(N)
       pytrainer.train(pymachine, input, target)
       trainer.train_(machine, input, target)
-      #print "[Python] MSE:", torch.measure.mse(pymachine(input), target).sqrt()
-      #print "[C++] MSE:", torch.measure.mse(machine(input), target).sqrt()
+      #print "[Python] MSE:", bob.measure.mse(pymachine(input), target).sqrt()
+      #print "[C++] MSE:", bob.measure.mse(machine(input), target).sqrt()
       # Note we will face precision problems when comparing to the Pythonic
       # implementation. So, let's not be too demanding here. If all values are
       # approximately equal to 1e-10, we consider this is OK.
@@ -259,10 +259,10 @@ class BackPropTest(unittest.TestCase):
 
     N = 50
 
-    machine = torch.machine.MLP((4, 3, 3, 1))
-    machine.activation = torch.machine.Activation.TANH
+    machine = bob.machine.MLP((4, 3, 3, 1))
+    machine.activation = bob.machine.Activation.TANH
     machine.randomize()
-    trainer = torch.trainer.MLPBackPropTrainer(machine, N)
+    trainer = bob.trainer.MLPBackPropTrainer(machine, N)
     trainer.trainBiases = True
     trainer.momentum = 0.99
 
@@ -273,14 +273,14 @@ class BackPropTest(unittest.TestCase):
         numpy.array([+1.0]), #virginica
         ]
     # Associate the data to targets, by setting the arrayset order explicetly
-    data = torch.db.iris.data()
+    data = bob.db.iris.data()
     datalist = [data['setosa'], data['versicolor'], data['virginica']]
 
-    S = torch.trainer.DataShuffler(datalist, targets)
+    S = bob.trainer.DataShuffler(datalist, targets)
 
     # trains in python first
     pytrainer = PythonBackProp(train_biases=trainer.trainBiases)
-    pymachine = torch.machine.MLP(machine) #a copy
+    pymachine = bob.machine.MLP(machine) #a copy
     pytrainer.momentum = 0.99
 
     # We now iterate for several steps, look for the convergence
@@ -288,8 +288,8 @@ class BackPropTest(unittest.TestCase):
       input, target = S(N)
       pytrainer.train(pymachine, input, target)
       trainer.train_(machine, input, target)
-      #print "[Python] MSE:", torch.measure.mse(pymachine(input), target).sqrt()
-      #print "[C++] MSE:", torch.measure.mse(machine(input), target).sqrt()
+      #print "[Python] MSE:", bob.measure.mse(pymachine(input), target).sqrt()
+      #print "[C++] MSE:", bob.measure.mse(machine(input), target).sqrt()
       # Note we will face precision problems when comparing to the Pythonic
       # implementation. So, let's not be too demanding here. If all values are
       # approximately equal to 1e-10, we consider this is OK.
@@ -300,15 +300,15 @@ class BackPropTest(unittest.TestCase):
 
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()
 
 

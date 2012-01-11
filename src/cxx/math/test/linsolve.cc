@@ -65,7 +65,7 @@ void checkBlitzEqual( blitz::Array<T,1>& t1, blitz::Array<U,1>& t2)
 {
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
-    BOOST_CHECK_EQUAL(t1(i), Torch::core::cast<T>(t2(i)));
+    BOOST_CHECK_EQUAL(t1(i), bob::core::cast<T>(t2(i)));
 }
 
 template<typename T, typename U>  
@@ -74,7 +74,7 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
-      BOOST_CHECK_EQUAL(t1(i,j), Torch::core::cast<T>(t2(i,j)));
+      BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
 template<typename T, typename U>  
@@ -84,7 +84,7 @@ void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
       for( int k=0; k<t1.extent(2); ++k)
-        BOOST_CHECK_EQUAL(t1(i,j,k), Torch::core::cast<T>(t2(i,j,k)));
+        BOOST_CHECK_EQUAL(t1(i,j,k), bob::core::cast<T>(t2(i,j,k)));
 }
 
 template<typename T>  
@@ -103,13 +103,13 @@ BOOST_AUTO_TEST_CASE( test_solve_3x3 )
 {
   blitz::Array<double,1> x(3);
 
-  Torch::math::linsolve(A33_1, x, b3_1);
+  bob::math::linsolve(A33_1, x, b3_1);
   checkBlitzClose(s3_1, x, eps); 
 
-  Torch::math::linsolve(A33_2, x, b3_2);
+  bob::math::linsolve(A33_2, x, b3_2);
   checkBlitzClose(s3_2, x, eps); 
 
-  Torch::math::linsolve(A33_3, x, b3_1);
+  bob::math::linsolve(A33_3, x, b3_1);
   checkBlitzClose(s3_3, x, eps); 
 }
 
@@ -117,10 +117,10 @@ BOOST_AUTO_TEST_CASE( test_solveSympos_3x3 )
 {
   blitz::Array<double,1> x(3);
 
-  Torch::math::linsolveSympos(A33_1, x, b3_1);
+  bob::math::linsolveSympos(A33_1, x, b3_1);
   checkBlitzClose(s3_1, x, eps); 
 
-  Torch::math::linsolveSympos(A33_3, x, b3_1);
+  bob::math::linsolveSympos(A33_3, x, b3_1);
   checkBlitzClose(s3_3, x, eps); 
 }
 
@@ -128,10 +128,10 @@ BOOST_AUTO_TEST_CASE( test_cgsolve_3x3 )
 {
   blitz::Array<double,1> x(3);
 
-  Torch::math::cgsolveSympos(A33_1, x, b3_1, 1e-6, 1000);
+  bob::math::cgsolveSympos(A33_1, x, b3_1, 1e-6, 1000);
   checkBlitzClose(s3_1, x, eps);
 
-  Torch::math::cgsolveSympos(A33_3, x, b3_1, 1e-6, 1000);
+  bob::math::cgsolveSympos(A33_3, x, b3_1, 1e-6, 1000);
   checkBlitzClose(s3_3, x, eps);
 }
 

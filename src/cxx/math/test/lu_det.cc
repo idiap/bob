@@ -77,7 +77,7 @@ void checkBlitzEqual( blitz::Array<T,1>& t1, blitz::Array<U,1>& t2)
 {
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
-    BOOST_CHECK_EQUAL(t1(i), Torch::core::cast<T>(t2(i)));
+    BOOST_CHECK_EQUAL(t1(i), bob::core::cast<T>(t2(i)));
 }
 
 template<typename T, typename U>  
@@ -86,7 +86,7 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
-      BOOST_CHECK_EQUAL(t1(i,j), Torch::core::cast<T>(t2(i,j)));
+      BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
 template<typename T, typename U>  
@@ -96,7 +96,7 @@ void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
       for( int k=0; k<t1.extent(2); ++k)
-        BOOST_CHECK_EQUAL(t1(i,j,k), Torch::core::cast<T>(t2(i,j,k)));
+        BOOST_CHECK_EQUAL(t1(i,j,k), bob::core::cast<T>(t2(i,j,k)));
 }
 
 template<typename T>  
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE( test_lu_3x3 )
   blitz::Array<double,2> U(3,3);
   blitz::Array<double,2> P(3,3);
 
-  Torch::math::lu(A33_1, L, U, P);
+  bob::math::lu(A33_1, L, U, P);
 
   checkBlitzClose(L, L33_1, eps);
   checkBlitzClose(U, U33_1, eps);
@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE( test_lu_2x4 )
   blitz::Array<double,2> U(2,4);
   blitz::Array<double,2> P(2,2);
 
-  Torch::math::lu(A24_1, L, U, P);
+  bob::math::lu(A24_1, L, U, P);
 
   checkBlitzClose(L, L24_1, eps);
   checkBlitzClose(U, U24_1, eps);
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE( test_det_3x3 )
 {
   blitz::Array<double,2> det(3,3);
 
-  BOOST_CHECK_SMALL( fabs(Torch::math::det(A33_1) - det_A33_1), eps);
+  BOOST_CHECK_SMALL( fabs(bob::math::det(A33_1) - det_A33_1), eps);
 }
 
 BOOST_AUTO_TEST_CASE( test_inv_3x3 )
@@ -158,11 +158,11 @@ BOOST_AUTO_TEST_CASE( test_inv_3x3 )
   blitz::Array<double,2> inv(3,3);
 
   // Invert a matrix and compare to reference
-  Torch::math::inv(A33_1, inv);
+  bob::math::inv(A33_1, inv);
   checkBlitzClose(inv, A33_1_inv, eps);
 
   blitz::Array<double,2> I(3,3);
-  Torch::math::prod(A33_1, inv, I);
+  bob::math::prod(A33_1, inv, I);
   checkBlitzClose(I, I33, eps);
 }
 

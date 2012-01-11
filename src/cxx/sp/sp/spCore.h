@@ -24,7 +24,7 @@
 #include "core/Tensor.h"
 #include "core/File.h"
 
-namespace Torch
+namespace bob
 {
 /**
  * \defgroup libsp_api libSP API
@@ -35,7 +35,7 @@ namespace Torch
 	class Tensor;
 
 	//////////////////////////////////////////////////////////////////////////////////////
-	// Torch::spCore:
+	// bob::spCore:
 	//      //
 	//
 	// TODO: doxygen header!
@@ -111,7 +111,7 @@ namespace Torch
 	};
 
 	//////////////////////////////////////////////////////////////////////////////////////
-	// Torch::spCoreManager:
+	// bob::spCoreManager:
 	//	Keeps track of the IDs of each spCore.
 	//	Given some ID (e.g. found in a model file), it's possible to retrieve a
 	//		spCore associated with this ID.
@@ -181,7 +181,7 @@ namespace Torch
 
 @section intro Introduction
 
-SP is the Signal Processing module of Torch.
+SP is the Signal Processing module of bob.
 
 @section api Documentation
 - @ref libsp_api "libSP API"

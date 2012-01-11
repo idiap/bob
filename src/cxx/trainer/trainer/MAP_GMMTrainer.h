@@ -30,7 +30,7 @@
 #include <limits>
 #include <core/Exception.h>
 
-namespace Torch {
+namespace bob {
 namespace trainer {
 
 /// @brief This class implements the maximum a posteriori M-step of the expectation-maximisation algorithm for a GMM Machine. The prior parameters are encoded in the form of a GMM (e.g. a universal background model). The EM algorithm thus performs GMM adaptation.
@@ -46,20 +46,20 @@ class MAP_GMMTrainer : public GMMTrainer {
     virtual ~MAP_GMMTrainer();
 
     /// Initialization
-    virtual void initialization(Torch::machine::GMMMachine& gmm, const Torch::io::Arrayset& data);
+    virtual void initialization(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data);
 
     /// Set the GMM to use as a prior for MAP adaptation.
     /// Generally, this is a "universal background model" (UBM),
     /// also referred to as a "world model".
-    bool setPriorGMM(Torch::machine::GMMMachine *prior_gmm);
+    bool setPriorGMM(bob::machine::GMMMachine *prior_gmm);
 
     /// Performs a maximum a posteriori (MAP) update of the GMM parameters
     /// using the accumulated statistics in m_ss and the 
     /// parameters of the prior model
     /// Implements EMTrainer::mStep()
-    void mStep(Torch::machine::GMMMachine& gmm, const Torch::io::Arrayset& data);
+    void mStep(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data);
 
-    /// Use a Torch3-like adaptation rule rather than Reynolds'one
+    /// Use a bob3-like adaptation rule rather than Reynolds'one
     /// In this case, alpha is a configuration variable rather than a function of the zeroth 
     /// order statistics and a relevance factor (should be in range [0,1])
     void setT3MAP(const double alpha) { m_T3_adaptation = true; m_T3_alpha = alpha; }
@@ -73,11 +73,11 @@ class MAP_GMMTrainer : public GMMTrainer {
     /// The GMM to use as a prior for MAP adaptation.
     /// Generally, this is a "universal background model" (UBM),
     /// also referred to as a "world model"
-    Torch::machine::GMMMachine *m_prior_gmm;
+    bob::machine::GMMMachine *m_prior_gmm;
 
-    /// The alpha for the Torch3-like adaptation
+    /// The alpha for the bob3-like adaptation
     double m_T3_alpha;
-    /// Whether Torch3-like adaptation should be used or not
+    /// Whether bob3-like adaptation should be used or not
     bool m_T3_adaptation;
 
   private:

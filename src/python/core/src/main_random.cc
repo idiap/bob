@@ -26,11 +26,11 @@ using namespace boost::python;
 
 void bind_core_random();
 
-BOOST_PYTHON_MODULE(libpytorch_core_random) {
+BOOST_PYTHON_MODULE(libpybob_core_random) {
   docstring_options docopt; 
-# if !defined(TORCH_DEBUG)
+# if !defined(BOB_DEBUG)
   docopt.disable_cpp_signatures();
 # endif
-  scope().attr("__doc__") = "Torch core classes and sub-classes for accessing boost::random objects from python";
+  scope().attr("__doc__") = "bob core classes and sub-classes for accessing boost::random objects from python";
   bind_core_random();
 }

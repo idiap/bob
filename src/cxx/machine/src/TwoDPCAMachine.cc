@@ -27,19 +27,19 @@
 #include "core/logging.h"
 #include "math/linear.h"
 
-Torch::machine::TwoDPCAMachine::TwoDPCAMachine():
+bob::machine::TwoDPCAMachine::TwoDPCAMachine():
   m_dim_outputs(0), m_p_variance(0.), m_n_outputs(0), m_eigenvalues(0), 
   m_eigenvectors(0), m_pre_mean(0)
 {
 }
 
-Torch::machine::TwoDPCAMachine::TwoDPCAMachine(int dim_outputs):
+bob::machine::TwoDPCAMachine::TwoDPCAMachine(int dim_outputs):
   m_dim_outputs(dim_outputs), m_p_variance(0.), m_n_outputs(0), 
   m_eigenvalues(0), m_eigenvectors(0), m_pre_mean(0)
 {
 }
 
-Torch::machine::TwoDPCAMachine::TwoDPCAMachine(
+bob::machine::TwoDPCAMachine::TwoDPCAMachine(
     int dim_outputs, const blitz::Array<double,1>& eigenvalues, 
     const blitz::Array<double,2>& eigenvectors):
   m_dim_outputs(dim_outputs), m_p_variance(0.), m_n_outputs(0)
@@ -48,19 +48,19 @@ Torch::machine::TwoDPCAMachine::TwoDPCAMachine(
   m_n_outputs = m_eigenvectors.extent(1);
 }
 
-Torch::machine::TwoDPCAMachine::TwoDPCAMachine(
+bob::machine::TwoDPCAMachine::TwoDPCAMachine(
     int dim_outputs, const blitz::Array<double,1>& eigenvalues, 
     const blitz::Array<double,2>& eigenvectors, int n_outputs):
   m_dim_outputs(dim_outputs), m_p_variance(0.)
 {
   if( n_outputs > m_eigenvectors.extent(1))
-    throw Torch::machine::EigenMachineNOutputsTooLarge(n_outputs, m_eigenvectors.extent(1));
+    throw bob::machine::EigenMachineNOutputsTooLarge(n_outputs, m_eigenvectors.extent(1));
   else
     m_n_outputs = n_outputs;
   setEigenvaluesvectors(eigenvalues, eigenvectors);
 }
 
-Torch::machine::TwoDPCAMachine::TwoDPCAMachine(
+bob::machine::TwoDPCAMachine::TwoDPCAMachine(
     int dim_outputs, const blitz::Array<double,1>& eigenvalues, 
     const blitz::Array<double,2>& eigenvectors, double p_variance):
   m_dim_outputs(dim_outputs), m_p_variance(p_variance)
@@ -71,13 +71,13 @@ Torch::machine::TwoDPCAMachine::TwoDPCAMachine(
   setPVariance(p_variance);
 }
 
-Torch::machine::TwoDPCAMachine::TwoDPCAMachine(const TwoDPCAMachine& other): 
+bob::machine::TwoDPCAMachine::TwoDPCAMachine(const TwoDPCAMachine& other): 
   Machine<blitz::Array<double,2>, blitz::Array<double,2> >(other) 
 {
   copy(other);
 }
 
-Torch::machine::TwoDPCAMachine& Torch::machine::TwoDPCAMachine::operator=(const TwoDPCAMachine &other) 
+bob::machine::TwoDPCAMachine& bob::machine::TwoDPCAMachine::operator=(const TwoDPCAMachine &other) 
 {
   // protect against invalid self-assignment
   if (this != &other) {
@@ -88,7 +88,7 @@ Torch::machine::TwoDPCAMachine& Torch::machine::TwoDPCAMachine::operator=(const 
   return *this;
 }
 
-void Torch::machine::TwoDPCAMachine::copy(const TwoDPCAMachine& other) 
+void bob::machine::TwoDPCAMachine::copy(const TwoDPCAMachine& other) 
 {
   m_dim_outputs = other.m_dim_outputs;
   m_p_variance = other.m_p_variance;
@@ -96,31 +96,31 @@ void Torch::machine::TwoDPCAMachine::copy(const TwoDPCAMachine& other)
   setEigenvaluesvectors(other.m_eigenvalues, other.m_eigenvectors);
 }
 
-Torch::machine::TwoDPCAMachine::~TwoDPCAMachine() 
+bob::machine::TwoDPCAMachine::~TwoDPCAMachine() 
 {
 }
 
-void Torch::machine::TwoDPCAMachine::setDimOutputs(int dim_outputs) 
+void bob::machine::TwoDPCAMachine::setDimOutputs(int dim_outputs) 
 {
   m_dim_outputs = dim_outputs;
 }
 
-void Torch::machine::TwoDPCAMachine::setNOutputs(int n_outputs) 
+void bob::machine::TwoDPCAMachine::setNOutputs(int n_outputs) 
 {
   if( n_outputs > m_eigenvectors.extent(0))
-    throw Torch::machine::EigenMachineNOutputsTooLarge(n_outputs, m_eigenvectors.extent(0));
+    throw bob::machine::EigenMachineNOutputsTooLarge(n_outputs, m_eigenvectors.extent(0));
   else
     m_n_outputs = n_outputs;
 }
 
-void Torch::machine::TwoDPCAMachine::setPVariance(double p_variance) 
+void bob::machine::TwoDPCAMachine::setPVariance(double p_variance) 
 {
   double current_var = 0.;
   int current_index = 0;
   while(current_var < m_p_variance)
   {
     if( current_index >= m_eigenvalues.extent(0) )
-      throw Torch::machine::EigenMachineNOutputsTooLarge(current_index+1, m_eigenvalues.extent(0));
+      throw bob::machine::EigenMachineNOutputsTooLarge(current_index+1, m_eigenvalues.extent(0));
     current_var += m_eigenvalues(current_index);
     ++current_index;
   }
@@ -128,12 +128,12 @@ void Torch::machine::TwoDPCAMachine::setPVariance(double p_variance)
   setNOutputs(current_index);
 }
 
-void Torch::machine::TwoDPCAMachine::setEigenvaluesvectors( 
+void bob::machine::TwoDPCAMachine::setEigenvaluesvectors( 
   const blitz::Array<double,1>& eigenvalues, 
   const blitz::Array<double,2>& eigenvectors)
 {
   if( eigenvectors.extent(1) != eigenvalues.extent(0) )
-    throw Torch::machine::NOutputsMismatch(eigenvectors.extent(1), eigenvalues.extent(0));
+    throw bob::machine::NOutputsMismatch(eigenvectors.extent(1), eigenvalues.extent(0));
   m_eigenvalues.resize(eigenvalues.shape());
   m_eigenvalues = eigenvalues;
   m_eigenvectors.resize(eigenvectors.shape());
@@ -146,59 +146,59 @@ void Torch::machine::TwoDPCAMachine::setEigenvaluesvectors(
     m_n_outputs = m_eigenvectors.extent(1);
 }
 
-int Torch::machine::TwoDPCAMachine::getDimOutputs() const 
+int bob::machine::TwoDPCAMachine::getDimOutputs() const 
 {
   return m_dim_outputs;
 }
 
-int Torch::machine::TwoDPCAMachine::getNOutputs() const 
+int bob::machine::TwoDPCAMachine::getNOutputs() const 
 {
   return m_n_outputs;
 }
 
-double Torch::machine::TwoDPCAMachine::getPVariance() const 
+double bob::machine::TwoDPCAMachine::getPVariance() const 
 {
   return m_p_variance;
 }
 
-const blitz::Array<double,1>& Torch::machine::TwoDPCAMachine::getEigenvalues() const
+const blitz::Array<double,1>& bob::machine::TwoDPCAMachine::getEigenvalues() const
 {
   return m_eigenvalues;
 }
 
-const blitz::Array<double,2>& Torch::machine::TwoDPCAMachine::getEigenvectors() const
+const blitz::Array<double,2>& bob::machine::TwoDPCAMachine::getEigenvectors() const
 {
   return m_eigenvectors;
 }
 
-void Torch::machine::TwoDPCAMachine::setPreMean( const blitz::Array<double,2>& pre_mean)
+void bob::machine::TwoDPCAMachine::setPreMean( const blitz::Array<double,2>& pre_mean)
 {
   m_pre_mean.resize(pre_mean.shape());
   if( m_dim_outputs != m_pre_mean.extent(1) )
-    throw Torch::machine::NInputsMismatch(m_dim_outputs, m_pre_mean.extent(0));
+    throw bob::machine::NInputsMismatch(m_dim_outputs, m_pre_mean.extent(0));
   if( m_eigenvectors.extent(0) != m_pre_mean.extent(1) )
-    throw Torch::machine::NInputsMismatch(m_eigenvectors.extent(0), m_pre_mean.extent(1));
+    throw bob::machine::NInputsMismatch(m_eigenvectors.extent(0), m_pre_mean.extent(1));
   m_pre_mean = pre_mean;
 }
  
-const blitz::Array<double,2>& Torch::machine::TwoDPCAMachine::getPreMean() const
+const blitz::Array<double,2>& bob::machine::TwoDPCAMachine::getPreMean() const
 {
   return m_pre_mean;
 }
 
-void Torch::machine::TwoDPCAMachine::forward(const blitz::Array<double,2>& input, blitz::Array<double,2>& output) const
+void bob::machine::TwoDPCAMachine::forward(const blitz::Array<double,2>& input, blitz::Array<double,2>& output) const
 {
   output.resize(m_dim_outputs, m_n_outputs);
   const blitz::Array<double,2> mat=m_eigenvectors(blitz::Range::all(), blitz::Range(0,m_n_outputs-1));
   blitz::Array<double,2> input_nomean(m_pre_mean.extent(0), m_pre_mean.extent(1));
   input_nomean = input - m_pre_mean;
-  Torch::math::prod(input_nomean, mat, output);
+  bob::math::prod(input_nomean, mat, output);
 }
 
-void Torch::machine::TwoDPCAMachine::print() const 
+void bob::machine::TwoDPCAMachine::print() const 
 {
-  Torch::core::info << "Output dimensionality = " << m_dim_outputs << "x" << m_n_outputs << std::endl;
-  Torch::core::info << "Eigenvalues = " << std::endl << m_eigenvalues << std::endl;
-  Torch::core::info << "Eigenvectors = " << std::endl << m_eigenvectors << std::endl;
+  bob::core::info << "Output dimensionality = " << m_dim_outputs << "x" << m_n_outputs << std::endl;
+  bob::core::info << "Eigenvalues = " << std::endl << m_eigenvalues << std::endl;
+  bob::core::info << "Eigenvectors = " << std::endl << m_eigenvectors << std::endl;
 }
 

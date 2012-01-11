@@ -20,20 +20,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IO_HDF5EXCEPTION_H 
-#define TORCH_IO_HDF5EXCEPTION_H
+#ifndef BOB_IO_HDF5EXCEPTION_H 
+#define BOB_IO_HDF5EXCEPTION_H
 
 #include <hdf5.h>
 #include "io/Exception.h"
 
-namespace Torch { namespace io {
+namespace bob { namespace io {
 
   /**
    * This is a generic exception for HDF5 errors. You should not throw it, but
    * since all others inherit from this one, you can catch by reference and
    * treat HDF5 problems in a generic way.
    */
-  class HDF5Exception: public Torch::io::Exception {
+  class HDF5Exception: public bob::io::Exception {
     public:
       HDF5Exception() throw();
       virtual ~HDF5Exception() throw();
@@ -192,4 +192,4 @@ namespace Torch { namespace io {
 
 }}
 
-#endif /* TORCH_IO_HDF5EXCEPTION_H */
+#endif /* BOB_IO_HDF5EXCEPTION_H */

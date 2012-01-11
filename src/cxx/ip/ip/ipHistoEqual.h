@@ -17,12 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _TORCH5SPRO_IP_HISTO_EQUAL_H_
-#define _TORCH5SPRO_IP_HISTO_EQUAL_H_
+#ifndef _BOB5SPRO_IP_HISTO_EQUAL_H_
+#define _BOB5SPRO_IP_HISTO_EQUAL_H_
 
 #include "ip/ipCore.h"
 
-namespace Torch {
+namespace bob {
 
 	/** This class is designed to enhance an image using histogram equalisation
 

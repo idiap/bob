@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Torch5spro documentation build configuration file, created by
+# Bob documentation build configuration file, created by
 # sphinx-quickstart on Mon Mar 21 18:07:34 2011.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -57,7 +57,7 @@ source_suffix = '.rst'
 master_doc = 'doc/index'
 
 # General information about the project.
-project = u'Torch5spro'
+project = u'Bob'
 import time
 copyright = u'%s, Idiap Research Institute' % time.strftime('%Y')
 
@@ -109,7 +109,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'default'
+html_theme = 'nature'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -182,7 +182,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Torch5sprodoc'
+htmlhelp_basename = 'bobdoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -196,7 +196,7 @@ htmlhelp_basename = 'Torch5sprodoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'Torch5spro.tex', u'Torch5spro Documentation',
+  ('index', 'bob.tex', u'Bob Documentation',
    u'Idiap Research Institute', 'manual'),
 ]
 
@@ -226,8 +226,8 @@ latex_documents = [
 # Included after all input documents
 rst_epilog = """
 .. Some variables
-.. |project| replace:: Torch5spro
-.. |torchweb| replace:: http://www.idiap.ch/software/torch5spro
+.. |project| replace:: Bob
+.. |homepage| replace:: https://www.idiap.ch/software/bob
 .. |current-year| date:: %Y
 """
 
@@ -236,8 +236,7 @@ rst_epilog = """
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'torch5spro', u'Torch5spro Documentation',
-     [u'Idiap Research Institute'], 1)
+    ('index', 'bob', u'Bob Documentation', [u'Idiap Research Institute'], 1)
 ]
 
 # Skips selected members in auto-generated documentation. Unfortunately, old

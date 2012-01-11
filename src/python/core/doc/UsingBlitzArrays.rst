@@ -121,4 +121,4 @@ machine learning algorithms and signal processing utilities.
 .. Place here your references
 .. _blitz: http://www.oonumerics.org/blitz
 .. _numpy: http://http://numpy.scipy.org
-.. _here: http://www.idiap.ch/software/torch5spro/wiki/TorchDatabaseBindata#Binaryfileformatheader
+.. _here: http://www.idiap.ch/software/bob/wiki/bobDatabaseBindata#Binaryfileformatheader

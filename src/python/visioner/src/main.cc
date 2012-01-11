@@ -25,9 +25,9 @@
 void bind_visioner_version();
 void bind_visioner_localize();
 
-BOOST_PYTHON_MODULE(libpytorch_visioner) {
+BOOST_PYTHON_MODULE(libpybob_visioner) {
   
-  Torch::python::setup_python("Torch face localization bridge for visioner");
+  bob::python::setup_python("bob face localization bridge for visioner");
 
   bind_visioner_version();
   bind_visioner_localize();

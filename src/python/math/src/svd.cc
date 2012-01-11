@@ -28,9 +28,9 @@
 #include "core/python/ndarray.h"
 
 using namespace boost::python;
-namespace tp = Torch::python;
-namespace math = Torch::math;
-namespace ca = Torch::core::array;
+namespace tp = bob::python;
+namespace math = bob::math;
+namespace ca = bob::core::array;
 
 static void svd1(tp::const_ndarray A, tp::ndarray U, tp::ndarray S,
     tp::ndarray V) {
@@ -51,13 +51,13 @@ static void svd1_(tp::const_ndarray A, tp::ndarray U, tp::ndarray S,
 static void svd2(tp::const_ndarray A, tp::ndarray U, tp::ndarray S) {
   blitz::Array<double,2> U_ = U.bz<double,2>();
   blitz::Array<double,1> S_ = S.bz<double,1>();
-  Torch::math::svd(A.bz<double,2>(), U_, S_);
+  bob::math::svd(A.bz<double,2>(), U_, S_);
 }
 
 static void svd2_(tp::const_ndarray A, tp::ndarray U, tp::ndarray S) {
   blitz::Array<double,2> U_ = U.bz<double,2>();
   blitz::Array<double,1> S_ = S.bz<double,1>();
-  Torch::math::svd_(A.bz<double,2>(), U_, S_);
+  bob::math::svd_(A.bz<double,2>(), U_, S_);
 }
 
 static tuple svd3(tp::const_ndarray A) {
@@ -73,7 +73,7 @@ static tuple svd3(tp::const_ndarray A) {
   blitz::Array<double,1> S_ = S.bz<double,1>();
   tp::ndarray V(ca::t_float64, N, N);
   blitz::Array<double,2> V_ = V.bz<double,2>();
-  Torch::math::svd_(A.bz<double,2>(), U_, S_, V_);
+  bob::math::svd_(A.bz<double,2>(), U_, S_, V_);
   return make_tuple(U.self(), S.self(), V.self());
 }
 

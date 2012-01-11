@@ -31,14 +31,14 @@ using namespace boost::python;
 
 void bind_sp_spcore()
 {
-  class_<Torch::spCore, bases<Torch::Object>, boost::noncopyable>("spCore", "A base type for all signal processing operators", no_init)
-    .def("loadFile", &Torch::spCore::loadFile, (arg("self"), arg("file")), "Loads the content from files (not options)")
-    .def("saveFile", &Torch::spCore::saveFile, (arg("self"), arg("file")), "Saves content into file (not options)")
-    .def("process", &Torch::spCore::process, (arg("self"), arg("input")), "Processes an input tensor, stores the results internally")
-    .def("setRegion", &Torch::spCore::setRegion, (arg("self"), arg("region")), "Subselects a region to be processed instead of the whole input tensor")
-    .def("setModelSize", &Torch::spCore::setModelSize, (arg("self"), arg("model_size")), "changes the model size (if used with some machine)")
-    .def("getID", &Torch::spCore::getID, (arg("self")), "Gets my own identifier")
-    .def("getNOutputs", &Torch::spCore::getNOutputs, (arg("self")), "Returns the number of outputs generated during the processing")
-    .def("getOutput", &Torch::spCore::getOutput, return_internal_reference<>(), (arg("self"), arg("index")), "Gets a specific output tensor.")
+  class_<bob::spCore, bases<bob::Object>, boost::noncopyable>("spCore", "A base type for all signal processing operators", no_init)
+    .def("loadFile", &bob::spCore::loadFile, (arg("self"), arg("file")), "Loads the content from files (not options)")
+    .def("saveFile", &bob::spCore::saveFile, (arg("self"), arg("file")), "Saves content into file (not options)")
+    .def("process", &bob::spCore::process, (arg("self"), arg("input")), "Processes an input tensor, stores the results internally")
+    .def("setRegion", &bob::spCore::setRegion, (arg("self"), arg("region")), "Subselects a region to be processed instead of the whole input tensor")
+    .def("setModelSize", &bob::spCore::setModelSize, (arg("self"), arg("model_size")), "changes the model size (if used with some machine)")
+    .def("getID", &bob::spCore::getID, (arg("self")), "Gets my own identifier")
+    .def("getNOutputs", &bob::spCore::getNOutputs, (arg("self")), "Returns the number of outputs generated during the processing")
+    .def("getOutput", &bob::spCore::getOutput, return_internal_reference<>(), (arg("self"), arg("index")), "Gets a specific output tensor.")
     ;
 }

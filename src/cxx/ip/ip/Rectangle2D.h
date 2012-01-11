@@ -23,7 +23,7 @@
 #include "ip/Point2D.h"
 #include "ip/Vector2D.h"
 
-namespace Torch {
+namespace bob {
 
 	class Matrix2D;
 

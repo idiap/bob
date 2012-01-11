@@ -23,7 +23,7 @@
 #include "trainer/Exception.h"
 #include <boost/format.hpp>
 
-namespace train = Torch::trainer;
+namespace train = bob::trainer;
 
 train::Exception::Exception() throw() {
 }

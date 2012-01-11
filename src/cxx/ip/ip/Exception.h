@@ -3,7 +3,7 @@
  * @date Tue Mar 8 12:06:10 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * @brief Exceptions used throughout the IP subsystem of Torch
+ * @brief Exceptions used throughout the IP subsystem of bob
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -20,15 +20,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IP_EXCEPTION_H 
-#define TORCH_IP_EXCEPTION_H
+#ifndef BOB_IP_EXCEPTION_H 
+#define BOB_IP_EXCEPTION_H
 
 #include <cstdlib>
 #include "core/Exception.h"
 
-namespace Torch { namespace ip {
+namespace bob { namespace ip {
 
-  class Exception: public Torch::core::Exception {
+  class Exception: public bob::core::Exception {
 
     public:
       Exception() throw();
@@ -89,4 +89,4 @@ namespace Torch { namespace ip {
 
 }}
 
-#endif /* TORCH_IP_EXCEPTION_H */
+#endif /* BOB_IP_EXCEPTION_H */

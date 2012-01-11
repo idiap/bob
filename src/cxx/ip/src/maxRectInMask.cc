@@ -20,8 +20,8 @@
 
 #include "ip/maxRectInMask.h"
 
-namespace ip = Torch::ip;
-namespace ipd = Torch::ip::detail;
+namespace ip = bob::ip;
+namespace ipd = bob::ip::detail;
 
 bool
 ipd::isTrue( const blitz::Array<bool,2>& src, int y0, int x0, int y1, int x1)

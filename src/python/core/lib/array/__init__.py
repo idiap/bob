@@ -1,1 +1,1 @@
-from libpytorch_core_ndarray import *
+from libpybob_core_ndarray import *

@@ -2,7 +2,7 @@ PROJECT(math-cxx)
 cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
-set(deps "core") #other torch subprojects
+set(deps "core") #other bob subprojects
 set(shared "")
 
 # This defines the list of source files inside this package.
@@ -35,14 +35,14 @@ set(src
    "${src_optimization}")
 
 include(../../cmake/macros.cmake)
-torch_header_install(math-cxx math "torch::math")
-torch_library(math "${src}" "${deps}" "${shared}")
-add_dependencies(torch_math math-cxx_header_install)
+bob_header_install(math-cxx math "bob::math")
+bob_library(math "${src}" "${deps}" "${shared}")
+add_dependencies(bob_math math-cxx_header_install)
 
 # Defines tests for this package
-torch_test(math linear test/linear.cc)
-torch_test(math linsolve test/linsolve.cc)
-torch_test(math lu_det test/lu_det.cc)
-torch_test(math norminv test/norminv.cc)
-torch_test(math svd test/svd.cc)
-torch_test(math interiorpointLP test/interiorpointLP.cc)
+bob_test(math linear test/linear.cc)
+bob_test(math linsolve test/linsolve.cc)
+bob_test(math lu_det test/lu_det.cc)
+bob_test(math norminv test/norminv.cc)
+bob_test(math svd test/svd.cc)
+bob_test(math interiorpointLP test/interiorpointLP.cc)

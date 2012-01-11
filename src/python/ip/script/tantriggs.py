@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import torch
+import bob
 import os, sys
 import optparse
 import math
@@ -10,10 +10,10 @@ def tantriggs(line, A_OUTPUT_DIR, A_OUT_H, A_OUT_W,
   A_GAMMA, A_SIGMA0, A_SIGMA1, A_SIZE, A_THRESHOLD, A_ALPHA):
 
   # Initialize cropper and destination array
-  TT = torch.ip.TanTriggs(A_GAMMA, A_SIGMA0, A_SIGMA1, A_SIZE, A_THRESHOLD, A_ALPHA)
+  TT = bob.ip.TanTriggs(A_GAMMA, A_SIGMA0, A_SIGMA1, A_SIZE, A_THRESHOLD, A_ALPHA)
 
   # Process one file
-  img = torch.io.Array(line).get()
+  img = bob.io.Array(line).get()
   preprocessed_img = numpy.ndarray(img.shape, 'float64')
   
   # Display file processed
@@ -25,7 +25,7 @@ def tantriggs(line, A_OUTPUT_DIR, A_OUT_H, A_OUT_W,
   output_file = os.path.join(A_OUTPUT_DIR, os.path.splitext(os.path.basename(line))[0] + ".hdf5")
 
   # Save output file
-  torch.io.Array(torch.core.array.convert(preprocessed_img, 'uint8', sourceRange=(preprocessed_img.min(), preprocessed_img.max()))).save(output_file)
+  bob.io.Array(bob.core.array.convert(preprocessed_img, 'uint8', sourceRange=(preprocessed_img.min(), preprocessed_img.max()))).save(output_file)
   print output_file
 
 
@@ -127,7 +127,7 @@ if options.test:
     [80,81,82,83,84,85,86,87,88,89,80,81,82,83,84,85,86,87,88,89],
     [90,91,92,93,94,95,96,97,98,99,90,91,92,93,94,95,96,97,98,99]], 'uint8')
 
-  torch.io.Array(array).save("/tmp/input.hdf5")
+  bob.io.Array(array).save("/tmp/input.hdf5")
 
   f = open("/tmp/input.lst", 'w')
   f.write("/tmp/input.hdf5\n")

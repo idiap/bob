@@ -9,11 +9,11 @@
 import os, sys
 import unittest
 import math
-import torch
+import bob
 import numpy
 import tempfile
 
-def tempname(suffix, prefix='torchtest_'):
+def tempname(suffix, prefix='bobtest_'):
   (fd, name) = tempfile.mkstemp(suffix, prefix)
   os.close(fd)
   os.unlink(name)
@@ -73,10 +73,10 @@ class SvmTest(unittest.TestCase):
 
   def test01_can_load(self):
 
-    machine = torch.machine.SupportVector(HEART_MACHINE)
+    machine = bob.machine.SupportVector(HEART_MACHINE)
     self.assertEqual(machine.shape, (13,1))
-    self.assertEqual(machine.kernel_type, torch.machine.svm_kernel_type.RBF)
-    self.assertEqual(machine.machine_type, torch.machine.svm_type.C_SVC)
+    self.assertEqual(machine.kernel_type, bob.machine.svm_kernel_type.RBF)
+    self.assertEqual(machine.machine_type, bob.machine.svm_type.C_SVC)
     self.assertEqual(len(machine.labels), 2)
     self.assertTrue( -1 in machine.labels )
     self.assertTrue( +1 in machine.labels )
@@ -84,16 +84,16 @@ class SvmTest(unittest.TestCase):
 
   def test02_can_save(self):
 
-    machine = torch.machine.SupportVector(HEART_MACHINE)
+    machine = bob.machine.SupportVector(HEART_MACHINE)
     tmp = tempname('.model')
     machine.save(tmp)
     del machine
 
     # make sure that the save machine is the same as before
-    machine = torch.machine.SupportVector(tmp)
+    machine = bob.machine.SupportVector(tmp)
     self.assertEqual(machine.shape, (13,1))
-    self.assertEqual(machine.kernel_type, torch.machine.svm_kernel_type.RBF)
-    self.assertEqual(machine.machine_type, torch.machine.svm_type.C_SVC)
+    self.assertEqual(machine.kernel_type, bob.machine.svm_kernel_type.RBF)
+    self.assertEqual(machine.machine_type, bob.machine.svm_type.C_SVC)
     self.assertEqual(len(machine.labels), 2)
     self.assertTrue( -1 in machine.labels )
     self.assertTrue( +1 in machine.labels )
@@ -102,7 +102,7 @@ class SvmTest(unittest.TestCase):
   def test03_data_loading(self):
 
     #tests if I can load data in libsvm format using SVMFile
-    data = torch.machine.SVMFile(HEART_DATA, 13)
+    data = bob.machine.SVMFile(HEART_DATA, 13)
     self.assertEqual(data.shape, (13,))
     self.assertEqual(data.good(), True)
     self.assertEqual(data.fail(), False)
@@ -156,8 +156,8 @@ class SvmTest(unittest.TestCase):
 
     #tests that the normal machine raises because probabilities are not
     #supported on that model
-    machine = torch.machine.SupportVector(TEST_MACHINE_NO_PROBS)
-    labels, data = torch.machine.SVMFile(HEART_DATA,
+    machine = bob.machine.SupportVector(TEST_MACHINE_NO_PROBS)
+    labels, data = bob.machine.SVMFile(HEART_DATA,
         machine.shape[0]).read_all()
     data = numpy.vstack(data)
     self.assertRaises(RuntimeError, machine.predictClassesAndProbabilities,
@@ -166,8 +166,8 @@ class SvmTest(unittest.TestCase):
   def test05_correctness_heart(self):
 
     #tests the correctness of the libSVM bindings
-    machine = torch.machine.SupportVector(HEART_MACHINE)
-    labels, data = torch.machine.SVMFile(HEART_DATA,
+    machine = bob.machine.SupportVector(HEART_MACHINE)
+    labels, data = bob.machine.SVMFile(HEART_DATA,
         machine.shape[0]).read_all()
     data = numpy.vstack(data)
 
@@ -205,8 +205,8 @@ class SvmTest(unittest.TestCase):
   def test06_correctness_iris(self):
 
     #same test as above, but with a 3-class problem.
-    machine = torch.machine.SupportVector(IRIS_MACHINE)
-    labels, data = torch.machine.SVMFile(IRIS_DATA, machine.shape[0]).read_all()
+    machine = bob.machine.SupportVector(IRIS_MACHINE)
+    labels, data = bob.machine.SVMFile(IRIS_DATA, machine.shape[0]).read_all()
     data = numpy.vstack(data)
 
     pred_label = machine.predictClasses(data)
@@ -234,13 +234,13 @@ class SvmTest(unittest.TestCase):
 
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()

@@ -3,7 +3,7 @@
 # Andre Anjos <andre.anjos@idiap.ch>
 # Thu 12 May 08:33:24 2011 
 
-"""Some utilities to talk to torch SQLite databases.
+"""Some utilities to talk to bob SQLite databases.
 """
 
 import os, sys, errno
@@ -20,10 +20,10 @@ class null(object):
 def location(dbname):
   """Returns the location of the database. The location of the database, by
   default, is the directory containing the database library. If the environment
-  variable $TORCH_DB_DIR is defined, it is used as the base-location of the
+  variable $BOB_DB_DIR is defined, it is used as the base-location of the
   file."""
   
-  envvar = 'TORCH_DB_DIR'
+  envvar = 'BOB_DB_DIR'
 
   if os.environ.has_key(envvar) and os.environ[envvar].strip():
     dirname = os.path.realpath(os.environ[envvar])
@@ -124,8 +124,8 @@ def download(options):
 def download_command(subparsers):
   """Adds a new download subcommand to your subparser"""
   
-  DOWNLOAD_URL = 'http://www.idiap.ch/software/torch5spro/chrome/site/databases/'
-  """Location from where to download Torch databases"""
+  DOWNLOAD_URL = 'http://www.idiap.ch/software/bob/chrome/site/databases/'
+  """Location from where to download bob databases"""
 
   DOWNLOAD_VERSION = 'nightlies/last'
   """The default version to use for the databases"""

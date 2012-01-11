@@ -26,11 +26,11 @@
 #include "trainer/Exception.h"
 #include "trainer/DataShuffler.h"
 
-namespace array = Torch::core::array;
-namespace train = Torch::trainer;
+namespace array = bob::core::array;
+namespace train = bob::trainer;
 
 train::DataShuffler::DataShuffler
-(const std::vector<Torch::io::Arrayset>& data,
+(const std::vector<bob::io::Arrayset>& data,
  const std::vector<blitz::Array<double,1> >& target):
   m_data(data.size()),
   m_target(target.size()),
@@ -65,7 +65,7 @@ train::DataShuffler::DataShuffler
           data[k].getShape()[0]));
     for (size_t i=0; i<data[k].size(); ++i)
       m_data[k](i,all) = data[k].get<double,1>(i);
-    m_target[k].reference(Torch::core::array::ccopy(target[k]));
+    m_target[k].reference(bob::core::array::ccopy(target[k]));
   }
 
   // creates one range tailored for the range of each data object
@@ -105,8 +105,8 @@ train::DataShuffler::DataShuffler
 
   // copies the target data to my own variable
   for (size_t k=0; k<target.size(); ++k) {
-    m_data[k].reference(Torch::core::array::ccopy(data[k]));
-    m_target[k].reference(Torch::core::array::ccopy(target[k]));
+    m_data[k].reference(bob::core::array::ccopy(data[k]));
+    m_target[k].reference(bob::core::array::ccopy(target[k]));
   }
 
   // creates one range tailored for the range of each data object
@@ -120,12 +120,12 @@ train::DataShuffler::DataShuffler(const train::DataShuffler& other):
   m_target(other.m_target.size()),
   m_range(other.m_range),
   m_do_stdnorm(other.m_do_stdnorm),
-  m_mean(Torch::core::array::ccopy(other.m_mean)),
-  m_stddev(Torch::core::array::ccopy(other.m_stddev))
+  m_mean(bob::core::array::ccopy(other.m_mean)),
+  m_stddev(bob::core::array::ccopy(other.m_stddev))
 {
   for (size_t k=0; k<m_target.size(); ++k) {
-    m_data[k].reference(Torch::core::array::ccopy(other.m_data[k]));
-    m_target[k].reference(Torch::core::array::ccopy(other.m_target[k]));
+    m_data[k].reference(bob::core::array::ccopy(other.m_data[k]));
+    m_target[k].reference(bob::core::array::ccopy(other.m_target[k]));
   }
 }
 
@@ -138,14 +138,14 @@ train::DataShuffler& train::DataShuffler::operator=
   m_target.resize(other.m_target.size());
 
   for (size_t k=0; k<m_target.size(); ++k) {
-    m_data[k].reference(Torch::core::array::ccopy(other.m_data[k]));
-    m_target[k].reference(Torch::core::array::ccopy(other.m_target[k]));
+    m_data[k].reference(bob::core::array::ccopy(other.m_data[k]));
+    m_target[k].reference(bob::core::array::ccopy(other.m_target[k]));
   }
 
   m_range = other.m_range;
  
-  m_mean.reference(Torch::core::array::ccopy(other.m_mean));
-  m_stddev.reference(Torch::core::array::ccopy(other.m_stddev));
+  m_mean.reference(bob::core::array::ccopy(other.m_mean));
+  m_stddev.reference(bob::core::array::ccopy(other.m_stddev));
   m_do_stdnorm = other.m_do_stdnorm;
 
   return *this;
@@ -219,8 +219,8 @@ void train::DataShuffler::setAutoStdNorm(bool s) {
 void train::DataShuffler::getStdNorm(blitz::Array<double,1>& mean,
     blitz::Array<double,1>& stddev) const {
   if (m_do_stdnorm) {
-    mean.reference(Torch::core::array::ccopy(m_mean));
-    stddev.reference(Torch::core::array::ccopy(m_stddev));
+    mean.reference(bob::core::array::ccopy(m_mean));
+    stddev.reference(bob::core::array::ccopy(m_stddev));
   }
   else { //do it on-the-fly
     evaluateStdNormParameters(m_data, mean, stddev);

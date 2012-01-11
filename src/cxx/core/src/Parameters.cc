@@ -19,7 +19,7 @@
  */
 #include "core/Parameters.h"
 
-namespace Torch
+namespace bob
 {
 
 // Constructor
@@ -126,7 +126,7 @@ double* Parameters::getDarray(const char* name, bool* ok)
 
 void Parameters::print(const char *name)
 {
-	if(name != NULL) Torch::print("Parameters %s:\n", name);
+	if(name != NULL) bob::print("Parameters %s:\n", name);
 	m_parameters->print();
 }
 

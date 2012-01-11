@@ -7,13 +7,13 @@
  * 
  */
 
-#ifndef TORCH5SPRO_MATH_SQRTM_H
-#define TORCH5SPRO_MATH_SQRTM_H
+#ifndef BOB5SPRO_MATH_SQRTM_H
+#define BOB5SPRO_MATH_SQRTM_H
 
 #include <blitz/array.h>
 #include "eig.h"
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libmath_api
  * @{
@@ -37,4 +37,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_MATH_SQRTM_H */
+#endif /* BOB5SPRO_MATH_SQRTM_H */

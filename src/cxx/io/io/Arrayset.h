@@ -3,7 +3,7 @@
  * @date Wed Jun 22 17:50:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
- * @brief A torch representation of an Arrayset for a Dataset.
+ * @brief A bob representation of an Arrayset for a Dataset.
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IO_ARRAYSET_H
-#define TORCH_IO_ARRAYSET_H
+#ifndef BOB_IO_ARRAYSET_H
+#define BOB_IO_ARRAYSET_H
 
 #include <string>
 #include <limits>
@@ -30,7 +30,7 @@
 
 #include "io/Array.h"
 
-namespace Torch { namespace io {
+namespace bob { namespace io {
     
   /**
    * The arrayset class for a dataset. It is responsible for holding and
@@ -140,11 +140,11 @@ namespace Torch { namespace io {
        */
       void remove (size_t id);
 
-      inline const Torch::core::array::typeinfo& type() const { return m_info; }
+      inline const bob::core::array::typeinfo& type() const { return m_info; }
 
       inline size_t getNDim() const { return type().nd; }
 
-      inline Torch::core::array::ElementType getElementType() const {
+      inline bob::core::array::ElementType getElementType() const {
         return type().dtype; 
       }
 
@@ -188,10 +188,10 @@ namespace Torch { namespace io {
 
     private:
       std::vector<Array> m_data; ///< data pointer
-      Torch::core::array::typeinfo m_info; ///< information about arrays stored
+      bob::core::array::typeinfo m_info; ///< information about arrays stored
 
   };
 
 }}
 
-#endif /* TORCH_IO_ARRAYSET_H */
+#endif /* BOB_IO_ARRAYSET_H */

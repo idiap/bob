@@ -495,6 +495,7 @@ class Database(object):
       - 2: the claimed id attached to the model
       - 3: the real id
       - 4: the "stem" path (basename of the file)
+
     considering allthe filtering criteria. The keys of the dictionary are 
     unique identities for each file in the Multi-PIE database. Conserve these 
     numbers if you wish to save processing results later on.
@@ -545,6 +546,7 @@ class Database(object):
       - 2: the claimed id attached to the model
       - 3: the real id
       - 4: the "stem" path (basename of the file)
+
     considering allthe filtering criteria. The keys of the dictionary are 
     unique identities for each file in the Multi-PIE database. Conserve these 
     numbers if you wish to save processing results later on.
@@ -589,6 +591,7 @@ class Database(object):
       - 0: the resolved filenames 
       - 1: the client id
       - 2: the "stem" path (basename of the file)
+
     considering allthe filtering criteria. The keys of the dictionary are 
     unique identities for each file in the Multi-PIE database. Conserve these
     numbers if you wish to save processing results later on.
@@ -643,6 +646,7 @@ class Database(object):
       - 0: the resolved filenames 
       - 1: the client id
       - 2: the "stem" path (basename of the file)
+
     considering allthe filtering criteria. The keys of the dictionary are 
     unique identities for each file in the Multi-PIE database. Conserve these 
     numbers if you wish to save processing results later on.
@@ -656,7 +660,7 @@ class Database(object):
 
 
   def save_one(self, id, obj, directory, extension):
-    """Saves a single object supporting the torch save() protocol.
+    """Saves a single object supporting the bob save() protocol.
 
     This method will call save() on the the given object using the correct
     database filename stem for the given id.
@@ -667,7 +671,7 @@ class Database(object):
       The id of the object in the database table "file".
 
     obj
-      The object that needs to be saved, respecting the torch save() protocol.
+      The object that needs to be saved, respecting the bob save() protocol.
 
     directory
       This is the base directory to which you want to save the data. The
@@ -688,7 +692,7 @@ class Database(object):
     save(obj, fullpath)
 
   def save(self, data, directory, extension):
-    """This method takes a dictionary of blitz arrays or torch.database.Array's
+    """This method takes a dictionary of blitz arrays or bob.database.Array's
     and saves the data respecting the original arrangement as returned by
     files().
 
@@ -697,7 +701,7 @@ class Database(object):
     data
       A dictionary with two keys 'real' and 'attack', each containing a
       dictionary mapping file ids from the original database to an object that
-      supports the Torch "save()" protocol.
+      supports the bob "save()" protocol.
 
     directory
       This is the base directory to which you want to save the data. The

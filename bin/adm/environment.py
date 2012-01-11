@@ -4,7 +4,7 @@
 # Thu 08 Jul 2010 09:18:28 CEST 
 
 """This program is able to start a new shell session or program with all 
-required Torch variables already set. It will respect your shell choices 
+required bob variables already set. It will respect your shell choices 
 and add to it."""
 
 import sys, os, time
@@ -14,7 +14,7 @@ import subprocess
 epilog = """
 Examples:
 
-  To create a new (sub) shell with torch configured just type:
+  To create a new (sub) shell with bob configured just type:
   $ %(prog)s
 
   Leaving that shell will bring you to the place you are now, clearing all of
@@ -124,7 +124,7 @@ def parse_args(argv):
                     action="store_true",
                     dest="env_manipulation",
                     default=False,
-                    help="Makes this program change your executable behavior to be more torch friendly, if it can"
+                    help="Makes this program change your executable behavior to be more bob friendly, if it can"
                    )
   parser.add_option("-r", "--root-dir",
                     action="store",
@@ -308,14 +308,14 @@ def generate_environment(options):
     if options.arch.split('-')[0] == 'macosx': # we are under OSX
       P.before('DYLD_LIBRARY_PATH', JIA('lib'))
     P.before('CMAKE_PREFIX_PATH', JIA('share', 'cmake'))
-    #P.before('TORCH_SCHEMA_PATH', JIA('share', 'torch', 'schema'))
+    #P.before('BOB_SCHEMA_PATH', JIA('share', 'bob', 'schema'))
 
-  #this will place a few TORCH_ variables into the game, so the user can make
+  #this will place a few BOB_ variables into the game, so the user can make
   #adjust its shell behavior accordinly, if he/she ever wants it.
 
-  P.set('TORCH_INSTALL_DIR', root)
-  P.set('TORCH_VERSION', version(root, False))
-  P.set('TORCH_PLATFORM', options.arch)
+  P.set('BOB_INSTALL_DIR', root)
+  P.set('BOB_VERSION', version(root, False))
+  P.set('BOB_PLATFORM', options.arch)
 
   return P.consolidate()
 
@@ -324,8 +324,8 @@ def set_prompt(arguments, environ):
   also depend on if we can make a better setting of the user environment or
   not."""
   executable = os.path.basename(arguments[0])
-  J = PathJoiner(environ['TORCH_INSTALL_DIR'])
-  JIA = PathJoiner(J('install', environ['TORCH_PLATFORM'])) #install_dir
+  J = PathJoiner(environ['BOB_INSTALL_DIR'])
+  JIA = PathJoiner(J('install', environ['BOB_PLATFORM'])) #install_dir
 
   #this should be a gigantic switch covering all cases we know about:
   if executable in ('bash',):
@@ -338,7 +338,7 @@ def untemplatize_path(path, options):
   descriptor and returns a fully resolved string.
   """
   replacements = {
-      'name': 'torch5spro',
+      'name': 'bob',
       'version': 'alpha',
       'date': time.strftime("%d.%m.%Y"),
       'weekday': time.strftime("%A").lower(),

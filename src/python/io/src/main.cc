@@ -32,9 +32,9 @@ void bind_io_hdf5_extras();
 void bind_io_datetime();
 void bind_io_video();
 
-BOOST_PYTHON_MODULE(libpytorch_io) {
+BOOST_PYTHON_MODULE(libpybob_io) {
 
-  Torch::python::setup_python("Torch classes and sub-classes for io access");
+  bob::python::setup_python("bob classes and sub-classes for io access");
 
   bind_io_version();
   bind_io_exception();

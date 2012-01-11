@@ -113,7 +113,7 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
-      BOOST_CHECK_EQUAL(t1(i,j), Torch::core::cast<T>(t2(i,j)));
+      BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
 template<typename T, typename U>  
@@ -123,7 +123,7 @@ void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
       for( int k=0; k<t1.extent(2); ++k)
-        BOOST_CHECK_EQUAL(t1(i,j,k), Torch::core::cast<T>(t2(i,j,k)));
+        BOOST_CHECK_EQUAL(t1(i,j,k), bob::core::cast<T>(t2(i,j,k)));
 }
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
@@ -132,12 +132,12 @@ BOOST_AUTO_TEST_CASE( test_shearX_2d_uint32 )
 {
   blitz::Array<double,2> b2;
   // X-axis Shear +2px
-  b2.resize(Torch::ip::getShearXShape(a2, 2./7.));
-  Torch::ip::shearX( a2, b2, 2./7., false);
+  b2.resize(bob::ip::getShearXShape(a2, 2./7.));
+  bob::ip::shearX( a2, b2, 2./7., false);
   checkBlitzEqual( a2sX_p27, b2);
   // X-axis Shear -2px
-  b2.resize(Torch::ip::getShearXShape(a2, -2./7.));
-  Torch::ip::shearX( a2, b2, -2./7., false);
+  b2.resize(bob::ip::getShearXShape(a2, -2./7.));
+  bob::ip::shearX( a2, b2, -2./7., false);
   checkBlitzEqual( a2sX_m27, b2);
 }
 
@@ -145,12 +145,12 @@ BOOST_AUTO_TEST_CASE( test_shearY_2d_uint32 )
 {
   blitz::Array<double,2> b2;  
   // Y-axis Shear +2px
-  b2.resize(Torch::ip::getShearYShape(a2, 2./7.));
-  Torch::ip::shearY( a2, b2, 2./7., false);
+  b2.resize(bob::ip::getShearYShape(a2, 2./7.));
+  bob::ip::shearY( a2, b2, 2./7., false);
   checkBlitzEqual( a2sY_p27, b2);
   // Y-axis Shear -2px
-  b2.resize(Torch::ip::getShearYShape(a2, -2./7.));
-  Torch::ip::shearY( a2, b2, -2./7., false);
+  b2.resize(bob::ip::getShearYShape(a2, -2./7.));
+  bob::ip::shearY( a2, b2, -2./7., false);
   checkBlitzEqual( a2sY_m27, b2);
 }
 
@@ -160,8 +160,8 @@ BOOST_AUTO_TEST_CASE( test_shearX_2d_uint32_mask )
   blitz::Array<bool,2> a2_mask(8,8), b2_mask(8,10);
   a2_mask = true;
   // X-axis Shear +2px
-  b2.resize(Torch::ip::getShearXShape(a2, 2./7.));
-  Torch::ip::shearX( a2, a2_mask, b2, b2_mask, 2./7., false);
+  b2.resize(bob::ip::getShearXShape(a2, 2./7.));
+  bob::ip::shearX( a2, a2_mask, b2, b2_mask, 2./7., false);
   checkBlitzEqual( a2sX_p27, b2);
   checkBlitzEqual( b2sX_m27, b2_mask);
 }
@@ -182,21 +182,21 @@ BOOST_AUTO_TEST_CASE( test_shearXY_2d_double_random )
   blitz::Array<double,2> tmp2, out2, out2_crop;  
 
   // X-axis Shear +m px
-  tmp2.resize(Torch::ip::getShearXShape(in2, (double)m/(Ny-1)));
-  Torch::ip::shearX( in2, tmp2, (double)m/(Ny-1), false);
+  tmp2.resize(bob::ip::getShearXShape(in2, (double)m/(Ny-1)));
+  bob::ip::shearX( in2, tmp2, (double)m/(Ny-1), false);
   // X-axis Shear -m px
-  out2.resize(Torch::ip::getShearXShape(tmp2, -(double)m/(Ny-1)));
-  Torch::ip::shearX( tmp2, out2, -(double)m/(Ny-1), false);
+  out2.resize(bob::ip::getShearXShape(tmp2, -(double)m/(Ny-1)));
+  bob::ip::shearX( tmp2, out2, -(double)m/(Ny-1), false);
   // Crop and compare with input
   out2_crop.reference( out2( blitz::Range::all(), blitz::Range(m,m+Nx-1) ) );
   checkBlitzEqual( in2, out2_crop);
   
   // Y-axis Shear +m px
-  tmp2.resize(Torch::ip::getShearYShape(in2, (double)m/(Nx-1)));
-  Torch::ip::shearY( in2, tmp2, (double)m/(Nx-1), false);
+  tmp2.resize(bob::ip::getShearYShape(in2, (double)m/(Nx-1)));
+  bob::ip::shearY( in2, tmp2, (double)m/(Nx-1), false);
   // X-axis Shear -m px
-  out2.resize(Torch::ip::getShearYShape(tmp2, -(double)m/(Nx-1)));
-  Torch::ip::shearY( tmp2, out2, -(double)m/(Nx-1), false);
+  out2.resize(bob::ip::getShearYShape(tmp2, -(double)m/(Nx-1)));
+  bob::ip::shearY( tmp2, out2, -(double)m/(Nx-1), false);
   // Crop and compare with input
   out2_crop.reference( out2( blitz::Range(m,m+Ny-1), blitz::Range::all() ) );
   checkBlitzEqual( in2, out2_crop);  

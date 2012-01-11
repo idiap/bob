@@ -3,7 +3,7 @@
  * @date Wed Apr 20 08:19:36 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
- * @brief Implements python bindings to the Torch configuration system
+ * @brief Implements python bindings to the bob configuration system
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -24,8 +24,8 @@
 #include "core/python/ndarray.h"
 
 using namespace boost::python;
-namespace err = Torch::measure;
-namespace tp = Torch::python;
+namespace err = bob::measure;
+namespace tp = bob::python;
 
 /**
  * A nicer python wrapper for the FAR x FRR computation

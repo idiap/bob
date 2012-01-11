@@ -17,17 +17,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _TORCHVISION_IP_INTEGRAL_H_
-#define _TORCHVISION_IP_INTEGRAL_H_
+#ifndef _BOBVISION_IP_INTEGRAL_H_
+#define _BOBVISION_IP_INTEGRAL_H_
 
-#include "ip/ipCore.h"		// <ipIntegral> is a <Torch::ipCore>
+#include "ip/ipCore.h"		// <ipIntegral> is a <bob::ipCore>
 
-namespace Torch
+namespace bob
 {
         class Tensor;
 
         /////////////////////////////////////////////////////////////////////////
-	// Torch::ipIntegral:
+	// bob::ipIntegral:
 	//	This class is designed to compute the integral image of any 2D/3D tensor type:
 	//              (height x width [x color channels/modes])
         //      The result will have the same dimensions and size/dimension as the input,

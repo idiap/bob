@@ -31,12 +31,12 @@ void bind_core_object();
 void bind_core_tensor();
 void bind_core_profiler();
 
-BOOST_PYTHON_MODULE(libpytorch_core) {
+BOOST_PYTHON_MODULE(libpybob_core) {
   docstring_options docopt; 
-# if !defined(TORCH_DEBUG)
+# if !defined(BOB_DEBUG)
   docopt.disable_cpp_signatures();
 # endif
-  scope().attr("__doc__") = "Torch core classes and sub-classes";
+  scope().attr("__doc__") = "bob core classes and sub-classes";
 
   bind_core_version();
   bind_core_exception();

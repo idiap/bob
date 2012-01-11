@@ -21,13 +21,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_CORE_BLITZ_ADAPTER_H
-#define TORCH5SPRO_CORE_BLITZ_ADAPTER_H
+#ifndef BOB5SPRO_CORE_BLITZ_ADAPTER_H
+#define BOB5SPRO_CORE_BLITZ_ADAPTER_H
 
 #include <iostream>
 #include <typeinfo>
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libcore_api
  * @{
@@ -124,5 +124,5 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_CORE_BLITZ_ADAPTER_H */
+#endif /* BOB5SPRO_CORE_BLITZ_ADAPTER_H */
 

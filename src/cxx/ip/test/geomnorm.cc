@@ -70,7 +70,7 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
-      BOOST_CHECK_EQUAL(t1(i,j), Torch::core::cast<T>(t2(i,j)));
+      BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
 template<typename T>  
@@ -88,49 +88,49 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
 BOOST_AUTO_TEST_CASE( test_generateWithCenter )
 {
-	blitz::Array<uint32_t,2> b2(Torch::ip::getGenerateWithCenterShape(a2,1,1));
+	blitz::Array<uint32_t,2> b2(bob::ip::getGenerateWithCenterShape(a2,1,1));
   BOOST_CHECK_EQUAL( b2.extent(0), a2_centered.extent(0));
   BOOST_CHECK_EQUAL( b2.extent(1), a2_centered.extent(1));
-	Torch::ip::generateWithCenter(a2, b2, 1, 1);
+	bob::ip::generateWithCenter(a2, b2, 1, 1);
 	checkBlitzEqual(a2_centered, b2); 
 }
 
 BOOST_AUTO_TEST_CASE( test_geomnorm )
 {
   // Get path to the XML Schema definition
-  char *testdata_cpath = getenv("TORCH_IP_TESTDATA_DIR");
+  char *testdata_cpath = getenv("BOB_IP_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    Torch::core::error << "Environment variable $TORCH_IP_TESTDATA_DIR " <<
+    bob::core::error << "Environment variable $BOB_IP_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
   }
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "image_r10.pgm";
-  Torch::io::Array ar_img(testdata_path_img.string());
+  bob::io::Array ar_img(testdata_path_img.string());
   blitz::Array<uint8_t,2> img = ar_img.get<uint8_t,2>();
   blitz::Array<double,2> img_processed_d(40,40);
   
 
-  Torch::ip::GeomNorm geomnorm(20,40,40,0,0);
+  bob::ip::GeomNorm geomnorm(20,40,40,0,0);
 
   // Process giving the coordinates of the eyes
   geomnorm(img,img_processed_d,67,47,62,71);
-  blitz::Array<uint8_t,2> img_processed = Torch::core::convertFromRange<uint8_t>( img_processed_d, 0., 255.);
+  blitz::Array<uint8_t,2> img_processed = bob::core::convertFromRange<uint8_t>( img_processed_d, 0., 255.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r10_geomnorm.pgm";
-  Torch::io::Array ar_img_geomnorm(testdata_path_img.string());
+  bob::io::Array ar_img_geomnorm(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_geomnorm = ar_img_geomnorm.get<uint8_t,2>();
   checkBlitzClose( img_ref_geomnorm, img_processed, eps);
 
-  Torch::ip::GeomNorm geomnorm2(20,40,40,0,0);
+  bob::ip::GeomNorm geomnorm2(20,40,40,0,0);
   img_processed_d.resize(40,40);
   geomnorm2(img,img_processed_d,67,47,62,71);
-  blitz::Array<uint8_t,2> img_processed2 = Torch::core::convertFromRange<uint8_t>( img_processed_d, 0., 255.);
+  blitz::Array<uint8_t,2> img_processed2 = bob::core::convertFromRange<uint8_t>( img_processed_d, 0., 255.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r10_geomnorm_BORDER25x0.pgm";
-  Torch::io::Array ar_img_geomnorm2(img_processed2);
+  bob::io::Array ar_img_geomnorm2(img_processed2);
   ar_img_geomnorm2.save(testdata_path_img.string());
 }
 

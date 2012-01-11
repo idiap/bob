@@ -17,15 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _TORCHVISION_IP_SMOOTH_GAUSSIAN_H_
-#define _TORCHVISION_IP_SMOOTH_GAUSSIAN_H_
+#ifndef _BOBVISION_IP_SMOOTH_GAUSSIAN_H_
+#define _BOBVISION_IP_SMOOTH_GAUSSIAN_H_
 
-#include "ip/ipCore.h"		// <ipSmoothGaussian> is a <Torch::ipCore>
+#include "ip/ipCore.h"		// <ipSmoothGaussian> is a <bob::ipCore>
 
-namespace Torch {
+namespace bob {
 
 	/////////////////////////////////////////////////////////////////////////
-	// Torch::ipSmoothGaussian
+	// bob::ipSmoothGaussian
 	//	This class is designed to smooth an image (3D ShortTensor)
 	//		by convolving a NxM Gaussian filter.
 	//	The result will be a 3D ShortTensor image having the same number of planes.

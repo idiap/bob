@@ -9,7 +9,7 @@
 import os
 import sys
 import unittest
-import torch
+import bob
 
 TEST_VIDEO = "../../io/test/data/test.mov"
 
@@ -20,11 +20,11 @@ class Loader:
 
   def setUp(self):
     if not hasattr(self, 'processor'):
-      self.processor = torch.visioner.MaxDetector()
+      self.processor = bob.visioner.MaxDetector()
 
     if not hasattr(self, 'video'):
-      self.video = torch.io.VideoReader(TEST_VIDEO)
-      self.images = [torch.ip.rgb_to_gray(k).astype('int16') for k in self.video[:100]]
+      self.video = bob.io.VideoReader(TEST_VIDEO)
+      self.images = [bob.ip.rgb_to_gray(k).astype('int16') for k in self.video[:100]]
 
 data = Loader()
 
@@ -69,13 +69,13 @@ class DetectionTest(unittest.TestCase):
 
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()

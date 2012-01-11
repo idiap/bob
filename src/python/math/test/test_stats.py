@@ -8,20 +8,20 @@
 
 import os, sys
 import unittest
-import torch
+import bob
 import numpy
 
 class StatsTest(unittest.TestCase):
-  """Tests some statistical APIs for Torch"""
+  """Tests some statistical APIs for bob"""
 
   def setUp(self):
 
-    self.data = numpy.vstack(torch.db.iris.data()['setosa'])
+    self.data = numpy.vstack(bob.db.iris.data()['setosa'])
  
   def test01_scatter(self):
 
-    # This test demonstrates how to use the scatter matrix function of Torch.
-    S, M = torch.math.scatter(self.data)
+    # This test demonstrates how to use the scatter matrix function of bob.
+    S, M = bob.math.scatter(self.data)
     S /= (self.data.shape[1]-1)
 
     # Do the same with numpy and compare. Note that with numpy we are computing
@@ -31,16 +31,16 @@ class StatsTest(unittest.TestCase):
 
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()
 
 
 

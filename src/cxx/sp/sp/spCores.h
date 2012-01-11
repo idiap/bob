@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _TORCH5SPRO_SP_CORES_H_
-#define _TORCH5SPRO_SP_CORES_H_
+#ifndef _BOB5SPRO_SP_CORES_H_
+#define _BOB5SPRO_SP_CORES_H_
 
 //////////////////////////////////////////////////////////////////////////////////
 

@@ -1,10 +1,10 @@
-from libpytorch_core_vector import *
+from libpybob_core_vector import *
 __all__ = dir()
 
 # adjustments to the __getitem__/__setitem__ mess
 def get_vector_types():
   import inspect
-  import libpytorch_core_vector
+  import libpybob_core_vector
 
   def is_vector(t):
     if not inspect.isclass(t): return False
@@ -12,7 +12,7 @@ def get_vector_types():
     if cparts[:3] in ('boo','int','uin','flo','com'): return True
     return False
 
-  return inspect.getmembers(libpytorch_core_vector, is_vector)
+  return inspect.getmembers(libpybob_core_vector, is_vector)
 
 class __StdVectorTypeTester__(object):
   """A tester for std::vector<> types."""

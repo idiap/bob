@@ -20,7 +20,7 @@
 #include "ip/Vector2D.h"
 #include "ip/Matrix2D.h"
 
-namespace Torch {
+namespace bob {
 
 //------------------------------------------------------------------
 // vector length

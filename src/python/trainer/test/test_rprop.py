@@ -8,7 +8,7 @@
 
 import os, sys
 import unittest
-import torch
+import bob
 import numpy
 
 class PythonRProp:
@@ -75,13 +75,13 @@ class PythonRProp:
     W = machine.weights #weights
     B = machine.biases #biases
 
-    if machine.activation == torch.machine.Activation.TANH:
+    if machine.activation == bob.machine.Activation.TANH:
       forward = tanh
       backward = tanh_bwd
-    elif machine.activation == torch.machine.Activation.LOG:
+    elif machine.activation == bob.machine.Activation.LOG:
       forward = logistic
       backward = logistic_bwd
-    elif machine.activation == torch.machine.Activation.LINEAR:
+    elif machine.activation == bob.machine.Activation.LINEAR:
       forward = linear
       backward = linear_bwd
     else:
@@ -168,15 +168,15 @@ class RPropTest(unittest.TestCase):
 
     # Initializes an MLPRPropTrainer and checks all seems consistent
     # with the proposed API.
-    machine = torch.machine.MLP((4, 1))
-    machine.activation = torch.machine.Activation.LINEAR
+    machine = bob.machine.MLP((4, 1))
+    machine.activation = bob.machine.Activation.LINEAR
     B = 10
-    trainer = torch.trainer.MLPRPropTrainer(machine, B)
+    trainer = bob.trainer.MLPRPropTrainer(machine, B)
     self.assertEqual( trainer.batchSize, B )
     self.assertTrue ( trainer.isCompatible(machine) )
     self.assertTrue ( trainer.trainBiases )
 
-    machine = torch.machine.MLP((7, 2))
+    machine = bob.machine.MLP((7, 2))
     self.assertFalse ( trainer.isCompatible(machine) )
 
     trainer.trainBiases = False
@@ -187,19 +187,19 @@ class RPropTest(unittest.TestCase):
     # Trains a simple network with one single step, verifies
     # the training works as expected by calculating the same
     # as the trainer should do using python.
-    machine = torch.machine.MLP((4, 1))
-    machine.activation = torch.machine.Activation.LINEAR
+    machine = bob.machine.MLP((4, 1))
+    machine.activation = bob.machine.Activation.LINEAR
     machine.biases = 0
     w0 = numpy.array([[.1],[.2],[-.1],[-.05]])
     machine.weights = [w0]
-    trainer = torch.trainer.MLPRPropTrainer(machine, 1)
+    trainer = bob.trainer.MLPRPropTrainer(machine, 1)
     trainer.trainBiases = False
     d0 = numpy.array([[1., 2., 0., 2.]])
     t0 = numpy.array([[1.]])
 
     # trains in python first
     pytrainer = PythonRProp(train_biases=trainer.trainBiases)
-    pymachine = torch.machine.MLP(machine) #a copy
+    pymachine = bob.machine.MLP(machine) #a copy
     pytrainer.train(pymachine, d0, t0)
 
     # trains with our C++ implementation
@@ -228,11 +228,11 @@ class RPropTest(unittest.TestCase):
 
     N = 60
 
-    machine = torch.machine.MLP((4, 1))
-    machine.activation = torch.machine.Activation.LINEAR
+    machine = bob.machine.MLP((4, 1))
+    machine.activation = bob.machine.Activation.LINEAR
     machine.randomize()
     machine.biases = 0
-    trainer = torch.trainer.MLPRPropTrainer(machine, N)
+    trainer = bob.trainer.MLPRPropTrainer(machine, N)
     trainer.trainBiases = False
 
     # A helper to select and shuffle the data
@@ -242,22 +242,22 @@ class RPropTest(unittest.TestCase):
         numpy.array([0.5]), #virginica
         ]
     # Associate the data to targets, by setting the arrayset order explicetly
-    data = torch.db.iris.data()
+    data = bob.db.iris.data()
     datalist = [data['setosa'], data['versicolor'], data['virginica']]
 
-    S = torch.trainer.DataShuffler(datalist, targets)
+    S = bob.trainer.DataShuffler(datalist, targets)
 
     # trains in python first
     pytrainer = PythonRProp(train_biases=trainer.trainBiases)
-    pymachine = torch.machine.MLP(machine) #a copy
+    pymachine = bob.machine.MLP(machine) #a copy
 
     # We now iterate for several steps, look for the convergence
     for k in range(100):
       input, target = S(N)
       pytrainer.train(pymachine, input, target)
       trainer.train_(machine, input, target)
-      #print "[Python] MSE:", torch.measure.mse(pymachine(input), target).sqrt()
-      #print "[C++] MSE:", torch.measure.mse(machine(input), target).sqrt()
+      #print "[Python] MSE:", bob.measure.mse(pymachine(input), target).sqrt()
+      #print "[C++] MSE:", bob.measure.mse(machine(input), target).sqrt()
       self.assertTrue( numpy.array_equal(pymachine.weights[0], machine.weights[0]) )
 
   def test04_Fisher(self):
@@ -268,10 +268,10 @@ class RPropTest(unittest.TestCase):
 
     N = 60
 
-    machine = torch.machine.MLP((4, 1))
-    machine.activation = torch.machine.Activation.LINEAR
+    machine = bob.machine.MLP((4, 1))
+    machine.activation = bob.machine.Activation.LINEAR
     machine.randomize()
-    trainer = torch.trainer.MLPRPropTrainer(machine, N)
+    trainer = bob.trainer.MLPRPropTrainer(machine, N)
     trainer.trainBiases = True
 
     # A helper to select and shuffle the data
@@ -281,22 +281,22 @@ class RPropTest(unittest.TestCase):
         numpy.array([0.5]), #virginica
         ]
     # Associate the data to targets, by setting the arrayset order explicetly
-    data = torch.db.iris.data()
+    data = bob.db.iris.data()
     datalist = [data['setosa'], data['versicolor'], data['virginica']]
 
-    S = torch.trainer.DataShuffler(datalist, targets)
+    S = bob.trainer.DataShuffler(datalist, targets)
 
     # trains in python first
     pytrainer = PythonRProp(train_biases=trainer.trainBiases)
-    pymachine = torch.machine.MLP(machine) #a copy
+    pymachine = bob.machine.MLP(machine) #a copy
 
     # We now iterate for several steps, look for the convergence
     for k in range(100):
       input, target = S(N)
       pytrainer.train(pymachine, input, target)
       trainer.train_(machine, input, target)
-      #print "[Python] MSE:", torch.measure.mse(pymachine(input), target).sqrt()
-      #print "[C++] MSE:", torch.measure.mse(machine(input), target).sqrt()
+      #print "[Python] MSE:", bob.measure.mse(pymachine(input), target).sqrt()
+      #print "[C++] MSE:", bob.measure.mse(machine(input), target).sqrt()
       self.assertTrue( numpy.array_equal(pymachine.weights[0], machine.weights[0]) )
       self.assertTrue( numpy.array_equal(pymachine.biases[0], machine.biases[0]) )
 
@@ -307,10 +307,10 @@ class RPropTest(unittest.TestCase):
 
     N = 50
 
-    machine = torch.machine.MLP((4, 4, 3))
-    machine.activation = torch.machine.Activation.TANH
+    machine = bob.machine.MLP((4, 4, 3))
+    machine.activation = bob.machine.Activation.TANH
     machine.randomize()
-    trainer = torch.trainer.MLPRPropTrainer(machine, N)
+    trainer = bob.trainer.MLPRPropTrainer(machine, N)
     trainer.trainBiases = True
 
     # A helper to select and shuffle the data
@@ -320,22 +320,22 @@ class RPropTest(unittest.TestCase):
         numpy.array([-1., -1., +1.]), #virginica
         ]
     # Associate the data to targets, by setting the arrayset order explicetly
-    data = torch.db.iris.data()
+    data = bob.db.iris.data()
     datalist = [data['setosa'], data['versicolor'], data['virginica']]
 
-    S = torch.trainer.DataShuffler(datalist, targets)
+    S = bob.trainer.DataShuffler(datalist, targets)
 
     # trains in python first
     pytrainer = PythonRProp(train_biases=trainer.trainBiases)
-    pymachine = torch.machine.MLP(machine) #a copy
+    pymachine = bob.machine.MLP(machine) #a copy
 
     # We now iterate for several steps, look for the convergence
     for k in range(50):
       input, target = S(N)
       pytrainer.train(pymachine, input, target)
       trainer.train_(machine, input, target)
-      #print "[Python] |RMSE|:", numpy.linalg.norm(torch.measure.rmse(pymachine(input), target))
-      #print "[C++] |RMSE|:", numpy.linalg.norm(torch.measure.rmse(machine(input), target))
+      #print "[Python] |RMSE|:", numpy.linalg.norm(bob.measure.rmse(pymachine(input), target))
+      #print "[C++] |RMSE|:", numpy.linalg.norm(bob.measure.rmse(machine(input), target))
       for i, w in enumerate(pymachine.weights):
         self.assertTrue( numpy.array_equal(w, machine.weights[i]) )
       for i, b in enumerate(pymachine.biases):
@@ -348,10 +348,10 @@ class RPropTest(unittest.TestCase):
 
     N = 50
 
-    machine = torch.machine.MLP((4, 3, 3, 1))
-    machine.activation = torch.machine.Activation.TANH
+    machine = bob.machine.MLP((4, 3, 3, 1))
+    machine.activation = bob.machine.Activation.TANH
     machine.randomize()
-    trainer = torch.trainer.MLPRPropTrainer(machine, N)
+    trainer = bob.trainer.MLPRPropTrainer(machine, N)
     trainer.trainBiases = True
 
     # A helper to select and shuffle the data
@@ -361,22 +361,22 @@ class RPropTest(unittest.TestCase):
         numpy.array([+1.0]), #virginica
         ]
     # Associate the data to targets, by setting the arrayset order explicetly
-    data = torch.db.iris.data()
+    data = bob.db.iris.data()
     datalist = [data['setosa'], data['versicolor'], data['virginica']]
 
-    S = torch.trainer.DataShuffler(datalist, targets)
+    S = bob.trainer.DataShuffler(datalist, targets)
 
     # trains in python first
     pytrainer = PythonRProp(train_biases=trainer.trainBiases)
-    pymachine = torch.machine.MLP(machine) #a copy
+    pymachine = bob.machine.MLP(machine) #a copy
 
     # We now iterate for several steps, look for the convergence
     for k in range(50):
       input, target = S(N)
       pytrainer.train(pymachine, input, target)
       trainer.train_(machine, input, target)
-      #print "[Python] MSE:", torch.measure.mse(pymachine(input), target).sqrt()
-      #print "[C++] MSE:", torch.measure.mse(machine(input), target).sqrt()
+      #print "[Python] MSE:", bob.measure.mse(pymachine(input), target).sqrt()
+      #print "[C++] MSE:", bob.measure.mse(machine(input), target).sqrt()
       for i, w in enumerate(pymachine.weights):
         self.assertTrue( numpy.array_equal(w, machine.weights[i]) )
       for i, b in enumerate(pymachine.biases):
@@ -384,15 +384,15 @@ class RPropTest(unittest.TestCase):
 
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()
 
 

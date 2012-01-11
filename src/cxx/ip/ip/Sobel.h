@@ -20,15 +20,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_IP_SOBEL_H
-#define TORCH5SPRO_IP_SOBEL_H
+#ifndef BOB5SPRO_IP_SOBEL_H
+#define BOB5SPRO_IP_SOBEL_H
 
 #include "core/array_assert.h"
 #include "core/cast.h"
 #include "ip/Exception.h"
 #include "sp/convolution.h"
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libip_api
  * @{
@@ -86,18 +86,18 @@ namespace Torch {
   { 
     // Check that dst has two planes
     if( dst.extent(0) != 2 )
-      throw Torch::ip::Exception();
+      throw bob::ip::Exception();
     // Check that dst has zero bases
-    Torch::core::array::assertZeroBase(dst);
+    bob::core::array::assertZeroBase(dst);
 
     // Define slices for y and x
     blitz::Array<T,2> dst_y = dst(0, blitz::Range::all(), blitz::Range::all());
     blitz::Array<T,2> dst_x = dst(1, blitz::Range::all(), blitz::Range::all());
     // TODO: improve the way we deal with types
-    Torch::sp::convolve(src, Torch::core::cast<T>(m_kernel_y), dst_y, m_size_opt, m_border_opt);
-    Torch::sp::convolve(src, Torch::core::cast<T>(m_kernel_x), dst_x, m_size_opt, m_border_opt);
+    bob::sp::convolve(src, bob::core::cast<T>(m_kernel_y), dst_y, m_size_opt, m_border_opt);
+    bob::sp::convolve(src, bob::core::cast<T>(m_kernel_x), dst_x, m_size_opt, m_border_opt);
   }
 
 }}
 
-#endif /* TORCH5SPRO_SOBEL_H */
+#endif /* BOB5SPRO_SOBEL_H */

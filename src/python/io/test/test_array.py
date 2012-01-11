@@ -9,24 +9,24 @@
 import os
 import sys
 import unittest
-import torch
+import bob
 import numpy
 import tempfile
 
-def tempname(suffix, prefix='torchtest_'):
+def tempname(suffix, prefix='bobtest_'):
   (fd, name) = tempfile.mkstemp(suffix, prefix)
   os.close(fd)
   os.unlink(name)
   return name
 
 class ArrayTest(unittest.TestCase):
-  """Performs various tests for the Torch::io::Array objects"""
+  """Performs various tests for the bob::io::Array objects"""
 
   def test01_init_onthefly(self):
 
     # You can initialize io.Array's with NumPy ndarrays:
     a1 = numpy.array(range(4), 'float32').reshape(2,2)
-    A1 = torch.io.Array(a1)
+    A1 = bob.io.Array(a1)
 
     # Use the .get() operator to retrieve the data as a NumPy ndarray
     self.assertTrue( numpy.array_equal(a1, A1.get()) )
@@ -44,7 +44,7 @@ class ArrayTest(unittest.TestCase):
     self.assertTrue ( (a1_ref[0,1] - 3.14) < 1e-6 )
 
     # Optionally, you can construct the Array using any array-like object:
-    A2 = torch.io.Array([[3, 5], [7, 9]])
+    A2 = bob.io.Array([[3, 5], [7, 9]])
 
     # That, of course, creates a new reference and a copy to the data, creating
     # internally its own numpy.ndarray and storing that.
@@ -53,14 +53,14 @@ class ArrayTest(unittest.TestCase):
     # The form for creating an Array as above does not say anything about the
     # data type. We can do it by specifying it. Anything that is acceptable by
     # numpy.dtype() can be put in there:
-    A3 = torch.io.Array([[3, 5], [7, 9]], 'float64')
+    A3 = bob.io.Array([[3, 5], [7, 9]], 'float64')
     self.assertEqual ( A3.get().dtype, numpy.dtype('float64') )
 
   def test02_init_fromfiles(self):
 
     # Initialization from files is possible using the io.File object.
-    f = torch.io.open('test1.hdf5', 'r')
-    A1 = torch.io.Array(f) # reads all contents.
+    f = bob.io.open('test1.hdf5', 'r')
+    A1 = bob.io.Array(f) # reads all contents.
 
     self.assertEqual ( A1.shape, (3, 3) )
     self.assertEqual ( A1.dtype, numpy.dtype('uint16') )
@@ -71,7 +71,7 @@ class ArrayTest(unittest.TestCase):
     # array [1, 2], [3, 4] at position 1 will actually only extract the 1D
     # array [3, 4]. See this:
 
-    A1 = torch.io.Array(f, 1)
+    A1 = bob.io.Array(f, 1)
     
     self.assertEqual ( A1.shape, (3,) )
     self.assertEqual ( A1.dtype, numpy.dtype('uint16') )
@@ -80,7 +80,7 @@ class ArrayTest(unittest.TestCase):
     # Initializing by giving a filename is also possible, it is the same as
     # just giving the file, i.e., it is a shortcut
 
-    A1 = torch.io.Array('test1.hdf5')
+    A1 = bob.io.Array('test1.hdf5')
 
     self.assertEqual ( A1.shape, (3, 3) )
     self.assertEqual ( A1.dtype, numpy.dtype('uint16') )
@@ -91,7 +91,7 @@ class ArrayTest(unittest.TestCase):
     # There is an interface for setting and getting the data within the Array
     # object. Here is how to use it.
 
-    A = torch.io.Array([complex(1,1), complex(2,3.2), complex(3,5)], 'complex64')
+    A = bob.io.Array([complex(1,1), complex(2,3.2), complex(3,5)], 'complex64')
 
     self.assertEqual ( A.shape, (3,) )
     self.assertEqual ( A.dtype, numpy.dtype('complex64') )
@@ -108,7 +108,7 @@ class ArrayTest(unittest.TestCase):
 
     # You can save and load an Array from a file. 
 
-    A1 = torch.io.Array('test1.hdf5')
+    A1 = bob.io.Array('test1.hdf5')
 
     self.assertTrue  (A1.loadsAll)
     self.assertEqual (A1.filename, 'test1.hdf5')
@@ -181,19 +181,19 @@ if __name__ == '__main__':
           print "defined in file:", filename
   
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   os.chdir('data')
 
   suite = unittest.TestLoader().loadTestsFromTestCase(ArrayTest)
   unittest.TextTestRunner(verbosity=2).run(suite)
   
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()
 
   #dumpObjects()

@@ -20,13 +20,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IO_REORDER_H 
-#define TORCH_IO_REORDER_H
+#ifndef BOB_IO_REORDER_H 
+#define BOB_IO_REORDER_H
 
 #include "core/array.h"
 #include <stdint.h>
 
-namespace Torch { namespace io {
+namespace bob { namespace io {
 
   /**
    * Returns, on the first argument, the linear indexes by calculating the
@@ -68,16 +68,16 @@ namespace Torch { namespace io {
    * size and the type information.
    */
   void row_to_col_order(const void* src_, void* dst_, 
-      const Torch::core::array::typeinfo& info);
+      const bob::core::array::typeinfo& info);
 
   /**
    * Converts the data from column-major order (Fortran-Style) to row major
-   * order (C style), which is required by torch. Input parameters are the src
+   * order (C style), which is required by bob. Input parameters are the src
    * data in column-major order, the destination (pre-allocated) array of the
    * same size and the type information.
    */
   void col_to_row_order(const void* src_, void* dst_, 
-      const Torch::core::array::typeinfo& info);
+      const bob::core::array::typeinfo& info);
 
   /**
    * Converts the data from row-major order (C-Style) to column major order
@@ -86,17 +86,17 @@ namespace Torch { namespace io {
    * size and the type information.
    */
   void row_to_col_order_complex(const void* src_, void* dst_re_,
-      void* dst_im_, const Torch::core::array::typeinfo& info);
+      void* dst_im_, const bob::core::array::typeinfo& info);
 
   /**
    * Converts the data from column-major order (Fortran-Style) to row major
-   * order (C style), which is required by torch. Input parameters are the src
+   * order (C style), which is required by bob. Input parameters are the src
    * data in column-major order, the destination (pre-allocated) array of the
    * same size and the type information.
    */
   void col_to_row_order_complex(const void* src_re_, const void* src_im_,
-      void* dst_, const Torch::core::array::typeinfo& info);
+      void* dst_, const bob::core::array::typeinfo& info);
   
 }}
 
-#endif /* TORCH_IO_REORDER_H */
+#endif /* BOB_IO_REORDER_H */

@@ -10,18 +10,18 @@ python.
 import os, sys
 import unittest
 import tempfile
-import torch
+import bob
 import numpy
 import random
 
 DEFAULT_EXTENSION = '.hdf5' # define here the codec you trust
 
 # This test implements a generalized framework for testing codecs. It
-# loads files in the codec native format, convert into torch native binary
+# loads files in the codec native format, convert into bob native binary
 # format and back, comparing the outcomes at every stage. We believe in the
 # quality of the binary codec because that is covered in other tests.
 
-def tempname(suffix, prefix='torchtest_'):
+def tempname(suffix, prefix='bobtest_'):
   (fd, name) = tempfile.mkstemp(suffix, prefix)
   os.close(fd)
   os.unlink(name)
@@ -34,21 +34,21 @@ def testcase_transcode(self, filename):
 
   try:
     # transcode from test format into the test format -- test array access modes
-    orig_data = torch.io.open(filename, 'r').read()
-    torch.io.open(tmpname, 'w').write(orig_data)
-    rewritten_data = torch.io.open(tmpname, 'r').read()
+    orig_data = bob.io.open(filename, 'r').read()
+    bob.io.open(tmpname, 'w').write(orig_data)
+    rewritten_data = bob.io.open(tmpname, 'r').read()
 
     self.assertTrue( numpy.array_equal(orig_data, rewritten_data) )
 
     # transcode to test format -- test arrayset access modes
-    trans_file = torch.io.open(tmpname, 'w')
+    trans_file = bob.io.open(tmpname, 'w')
     index = [slice(orig_data.shape[k]) for k in range(len(orig_data.shape))]
     for k in range(orig_data.shape[0]):
       index[0] = k
       trans_file.append(orig_data[index]) #slice from first dimension
     del trans_file
 
-    rewritten_file = torch.io.open(tmpname, 'r')
+    rewritten_file = bob.io.open(tmpname, 'r')
 
     for k in range(orig_data.shape[0]):
       rewritten_data = rewritten_file.read(k)
@@ -67,10 +67,10 @@ def testcase_array_readwrite(self, extension, arr):
   """Runs a read/write verify step using the given numpy data"""
   tmpname = tempname(extension)
   try:
-    f = torch.io.open(tmpname, 'w')
+    f = bob.io.open(tmpname, 'w')
     f.write(arr)
     del f
-    f = torch.io.open(tmpname, 'r')
+    f = bob.io.open(tmpname, 'r')
     reloaded = f.read() #read the contents
     self.assertTrue(numpy.array_equal(arr, reloaded))
   finally:
@@ -83,11 +83,11 @@ def testcase_arrayset_readwrite(self, extension, arrays):
   """Runs a read/write verify step using the given numpy data"""
   tmpname = tempname(extension)
   try:
-    f = torch.io.open(tmpname, 'w')
+    f = bob.io.open(tmpname, 'w')
     for k in arrays: 
       f.append(k)
     del f
-    f = torch.io.open(tmpname, 'r')
+    f = bob.io.open(tmpname, 'r')
     for k, array in enumerate(arrays):
       reloaded = f.read(k) #read the contents
       self.assertTrue(numpy.array_equal(array, reloaded))
@@ -98,7 +98,7 @@ def testcase_arrayset_readwrite(self, extension, arrays):
 unittest.TestCase.arrayset_readwrite = testcase_arrayset_readwrite
 
 class FileTest(unittest.TestCase):
-  """Performs various tests for the Torch::io::*File types."""
+  """Performs various tests for the bob::io::*File types."""
 
   def test00_hdf5(self):
 
@@ -239,14 +239,14 @@ class FileTest(unittest.TestCase):
 
       try:
         # complete transcoding test
-        image = torch.io.open(filename, 'r').read()
+        image = bob.io.open(filename, 'r').read()
 
         # save with the same extension
-        outfile = torch.io.open(filename, 'w')
+        outfile = bob.io.open(filename, 'w')
         outfile.write(image)
 
         # reload the image from the file
-        image2 = torch.io.open(filename, 'r').read()
+        image2 = bob.io.open(filename, 'r').read()
 
         self.assertTrue ( numpy.array_equal(image, image2) )
 
@@ -291,14 +291,14 @@ class FileTest(unittest.TestCase):
 
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   os.chdir('data')
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()

@@ -25,9 +25,9 @@
 #include "core/python/ndarray.h"
 
 using namespace boost::python;
-namespace ip = Torch::ip;
-namespace tp = Torch::python;
-namespace ca = Torch::core::array;
+namespace ip = bob::ip;
+namespace tp = bob::python;
+namespace ca = bob::core::array;
 
 static const char* rotate_doc = "Objects of this class, after configuration, can perform a rotation.";
 static const char* angle_to_horizontal_doc = "Get the angle needed to level out (horizontally) two points.";
@@ -134,12 +134,12 @@ static void call4 (ip::Rotate& obj, tp::const_ndarray input,
 }
 
 void bind_ip_rotate() {
-  enum_<Torch::ip::Rotate::Algorithm>("RotateAlgorithm")
-    .value("Shearing", Torch::ip::Rotate::Shearing)
-    .value("BilinearInterp", Torch::ip::Rotate::BilinearInterp)
+  enum_<bob::ip::Rotate::Algorithm>("RotateAlgorithm")
+    .value("Shearing", bob::ip::Rotate::Shearing)
+    .value("BilinearInterp", bob::ip::Rotate::BilinearInterp)
     ;
 
-  class_<ip::Rotate, boost::shared_ptr<ip::Rotate> >("Rotate", rotate_doc, init<const double, optional<const Torch::ip::Rotate::Algorithm> >((arg("rotation_angle"), arg("rotation_algorithm")="Shearing"), "Constructs a Rotate object."))
+  class_<ip::Rotate, boost::shared_ptr<ip::Rotate> >("Rotate", rotate_doc, init<const double, optional<const bob::ip::Rotate::Algorithm> >((arg("rotation_angle"), arg("rotation_algorithm")="Shearing"), "Constructs a Rotate object."))
     .add_property("angle", &ip::Rotate::getAngle, &ip::Rotate::setAngle)
     .add_property("algorithm", &ip::Rotate::getAlgorithm, &ip::Rotate::setAlgorithm)
     .def("__call__", &call1, (arg("self"), arg("input"), arg("output")), "Call an object of this type to perform a rotation of an image.") 
@@ -153,6 +153,6 @@ void bind_ip_rotate() {
     .staticmethod("getOutputShape")
     ;
 
-  def("getAngleToHorizontal", (const double (*)(const int, const int, const int, const int))&Torch::ip::getAngleToHorizontal, (arg("left_h"), arg("left_w"), arg("right_h"), arg("right_w")), angle_to_horizontal_doc)
+  def("getAngleToHorizontal", (const double (*)(const int, const int, const int, const int))&bob::ip::getAngleToHorizontal, (arg("left_h"), arg("left_w"), arg("right_h"), arg("right_w")), angle_to_horizontal_doc)
     ;
 }

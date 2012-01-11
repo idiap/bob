@@ -21,13 +21,13 @@
 /// @author <a href="mailto:Roy.Wallace@idiap.ch">Roy Wallace</a> 
 /// @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
 
-#ifndef TORCH5SPRO_MACHINE_GMMSTATS_H
-#define TORCH5SPRO_MACHINE_GMMSTATS_H
+#ifndef BOB5SPRO_MACHINE_GMMSTATS_H
+#define BOB5SPRO_MACHINE_GMMSTATS_H
 
 #include <blitz/array.h>
 #include "io/HDF5File.h"
 
-namespace Torch {
+namespace bob {
 namespace machine {
 
 /// @brief A container for GMM statistics.
@@ -53,7 +53,7 @@ class GMMStats {
     GMMStats(const GMMStats& other);
 
     /// Constructor
-    GMMStats(Torch::io::HDF5File& config);
+    GMMStats(bob::io::HDF5File& config);
     
     /// Assigment
     GMMStats& operator=(const GMMStats& other);
@@ -88,10 +88,10 @@ class GMMStats {
     blitz::Array<double,2> sumPxx;
 
     /// Save to a Configuration
-    void save(Torch::io::HDF5File& config) const;
+    void save(bob::io::HDF5File& config) const;
     
     /// Load from a Configuration
-    void load(Torch::io::HDF5File& config);
+    void load(bob::io::HDF5File& config);
     
     friend std::ostream& operator<<(std::ostream& os, const GMMStats& g);
 

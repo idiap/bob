@@ -25,9 +25,9 @@
 
 #include "io/BinFile.h"
 
-namespace io = Torch::io;
-namespace core = Torch::core;
-namespace ca = Torch::core::array;
+namespace io = bob::io;
+namespace core = bob::core;
+namespace ca = bob::core::array;
 
 io::BinFile::BinFile(const std::string& filename, io::BinFile::openmode flag):
   m_header_init(false),
@@ -94,18 +94,18 @@ void io::BinFile::close() {
   m_stream.close();
 }
 
-void io::BinFile::initHeader(const Torch::core::array::ElementType type, 
+void io::BinFile::initHeader(const bob::core::array::ElementType type, 
     size_t ndim, const size_t* shape) {
   // Check that data have not already been written
   if (m_n_arrays_written > 0 ) {
-    Torch::core::error << "Cannot init the header of an output stream in which data" <<
+    bob::core::error << "Cannot init the header of an output stream in which data" <<
       " have already been written." << std::endl;
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
   }
 
   // Initialize header
   m_header.m_elem_type = type;
-  m_header.m_elem_sizeof = Torch::core::array::getElementSize(type);
+  m_header.m_elem_sizeof = bob::core::array::getElementSize(type);
   m_header.setShape(ndim, shape);
   m_header.write(m_stream);
   m_header_init = true;

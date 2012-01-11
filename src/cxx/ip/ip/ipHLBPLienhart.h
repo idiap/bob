@@ -17,17 +17,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _TORCH5SPRO_IP_HLBP_LIENHART_H_
-#define _TORCH5SPRO_IP_HLBP_LIENHART_H_
+#ifndef _BOB5SPRO_IP_HLBP_LIENHART_H_
+#define _BOB5SPRO_IP_HLBP_LIENHART_H_
 
 #include "ip/ipCore.h"
 #include "core/Tensor.h"
 #include "sp/spCores.h"
 
-namespace Torch
+namespace bob
 {
 	/////////////////////////////////////////////////////////////////////////
-	// Torch::ipHLBP_Lienhart
+	// bob::ipHLBP_Lienhart
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////

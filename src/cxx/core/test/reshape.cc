@@ -71,25 +71,25 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 BOOST_AUTO_TEST_CASE( test_reshape_2d_2d )
 {
   blitz::Array<uint32_t,2> a32(3, 2);
-  Torch::core::reshape(a23, a32);
+  bob::core::reshape(a23, a32);
   checkBlitzEqual(a32, a32_s);
  
   blitz::Array<uint32_t,2> a16(1, 6);
-  Torch::core::reshape(a23, a16);
+  bob::core::reshape(a23, a16);
   checkBlitzEqual(a16, a16_s);
 }
 
 BOOST_AUTO_TEST_CASE( test_reshape_2d_1d )
 {
   blitz::Array<uint32_t,1> c6(6);
-  Torch::core::reshape(a23, c6);
+  bob::core::reshape(a23, c6);
   checkBlitzEqual(c6, b6);
 }
 
 BOOST_AUTO_TEST_CASE( test_reshape )
 {
   blitz::Array<uint32_t,2> c23(2,3);
-  Torch::core::reshape(b6, c23);
+  bob::core::reshape(b6, c23);
   checkBlitzEqual(c23, a23);
 }
 

@@ -4,7 +4,7 @@
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * Implements a class to read and write Video files and convert the frames into
- * something that torch can understand. This implementation is heavily based on
+ * something that bob can understand. This implementation is heavily based on
  * the excellent tutorial here: http://dranger.com/ffmpeg/, with some personal
  * modifications.
  * FFMpeg versions for your reference
@@ -51,8 +51,8 @@ extern "C" {
 #include "io/VideoException.h"
 #include "core/blitz_array.h"
 
-namespace io = Torch::io;
-namespace ca = Torch::core::array;
+namespace io = bob::io;
+namespace ca = bob::core::array;
 
 /**
  * When called, initializes the ffmpeg library
@@ -524,7 +524,7 @@ void io::VideoReader::const_iterator::read(ca::interface& data) {
     av_free_packet(&packet);
   }
 
-  // Copies the data into the destination array. Here is some background: Torch
+  // Copies the data into the destination array. Here is some background: bob
   // arranges the data for a colored image like: (color-bands, height, width).
   // That makes it easy to extract a given band from the image as its memory is
   // contiguous. FFmpeg prefers the following encoding (height, width,

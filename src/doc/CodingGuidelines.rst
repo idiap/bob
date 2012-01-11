@@ -7,7 +7,80 @@ few websites to get you started. Don't take everything to the letter, but
 observe good practices from the software that already exists and derive from
 there.
 
-C++ Coding Guidelines:
+Git Tips
+--------
+
+For Bob development we use the Git_ version control system. If you don't have a
+clue on how to use Git, please refer to the official `Git tutorial`_. In here,
+we assume you have already gone through all introductory material on Git and is
+ready to get your hands dirty with Bob.
+
+Before you start
+================
+
+Make sure you have git installed on your system and configure your name and
+email address:
+
+.. code-block:: sh
+
+  $ git config --global user.name "Your Name"
+  $ git config --global user.email "you@example.com"
+
+Cloning the central Torch repository
+====================================
+
+To clone the central Bob repository, just do:
+
+.. code-block:: sh
+
+  $ git clone /idiap/group/torch5spro/git/bob.git
+
+This clones the repository into a newly created directory, creates
+remote-tracking branches for each branch in the cloned repository (visible
+using ``git branch -r``).
+
+Working with branches
+=====================
+
+After cloning our repository, you should be sitting in the ``master`` branch.
+You can list all available branches like this:
+
+.. code-block:: sh
+
+  $ git branch
+
+To switch to another branch just do:
+
+.. code-block:: sh
+
+  $ git checkout <wanted-branch>
+
+Pushing your changes
+====================
+
+If you are an authorized developer, you can push your changes back into the
+central repository. Please, **make sure you comment your commits** and have
+your global email and name configurations set as described above. Also
+double-check your changes compile without problems and all of the
+:doc:`GoldenRules` have been respected. Then, from your cloned repository, do:
+
+.. code-block:: sh
+
+  $ git push
+
+Tagging and Branching
+=====================
+
+For Bob development, we adopt the following scheme for tagging and branching:
+
+* Tagging can be done on the master branch when milestones are reached,
+  important steps have been accomplished or in the event of releases;
+* Branching is only allowed when releasing an new version of Torch. Avoid
+  pushing local branches forked for your private development into the main
+  repository. Only push branches that should belong to the project history.
+
+C++ Coding Guidelines
+---------------------
 
 * `C++ FAQ`_: A must if you want to write reliable code
 * `C++ Coding Standard`_
@@ -18,7 +91,7 @@ C++ Coding Guidelines:
 Here are some C++ tips we have found useful:
 
 * Optimization: **Don't**. If you still want to do it, please make sure you
-  fully read :doc:`OptimizingTorch`.
+  fully read :doc:`OptimizingBob`.
 * DRY: means `Don't repeat yourself`_. You should apply this principle at
   **all** moments while you are coding to avoid repeating bugs or only
   partially fixing them
@@ -46,7 +119,8 @@ Here are some C++ tips we have found useful:
   always better to say it again: document, document, document! Undocumented
   code is useless.
 
-Python Coding Guidelines:
+Python Coding Guidelines
+------------------------
 
 * `The Google Python Style Guide`_
 
@@ -58,3 +132,5 @@ Python Coding Guidelines:
 .. _`the cern c++ style`: http://pst.cern.ch/HandBookWorkBook/Handbook/Programming/CodingStandard/c++standard.pdf
 .. _`the google python style guide`: http://google-styleguide.googlecode.com/svn/trunk/pyguide.html
 .. _`don't repeat yourself`: http://en.wikipedia.org/wiki/Don't_repeat_yourself
+.. _`Git`: http://git-scm.com/
+.. _`Git Tutorial`: http://schacon.github.com/git/gittutorial.html

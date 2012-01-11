@@ -5,8 +5,8 @@
 #include "math/linear.h"
 
 
-namespace tca = Torch::core::array;
-namespace math = Torch::math;
+namespace tca = bob::core::array;
+namespace math = bob::math;
 
 
 void math::sqrtSymReal(const blitz::Array<double,2>& A, 
@@ -15,11 +15,11 @@ void math::sqrtSymReal(const blitz::Array<double,2>& A,
   // Size variable
   int N = A.extent(0);
   const blitz::TinyVector<int,2> shape(N,N);
-  Torch::core::array::assertZeroBase(A);
-  Torch::core::array::assertZeroBase(B);
+  bob::core::array::assertZeroBase(A);
+  bob::core::array::assertZeroBase(B);
 
-  Torch::core::array::assertSameShape(A,shape);
-  Torch::core::array::assertSameShape(B,shape);
+  bob::core::array::assertSameShape(A,shape);
+  bob::core::array::assertSameShape(B,shape);
 
   math::sqrtSymReal_(A, B);
 }

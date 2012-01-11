@@ -29,9 +29,9 @@
 #include "io/Exception.h"
 #include "core/array_type.h"
 
-namespace io = Torch::io;
-namespace mach = Torch::machine;
-namespace train = Torch::trainer;
+namespace io = bob::io;
+namespace mach = bob::machine;
+namespace train = bob::trainer;
 
 train::SVDPCATrainer::SVDPCATrainer(bool zscore_convert)
   : m_zscore_convert(zscore_convert) {
@@ -53,16 +53,16 @@ train::SVDPCATrainer& train::SVDPCATrainer::operator=
   return *this;
 }
 
-void train::SVDPCATrainer::train(Torch::machine::LinearMachine& machine, 
+void train::SVDPCATrainer::train(bob::machine::LinearMachine& machine, 
     blitz::Array<double,1>& eigen_values, const io::Arrayset& ar) const {
 
   // checks for arrayset data type and shape once
-  if (ar.getElementType() != Torch::core::array::t_float64) {
-    throw Torch::io::TypeError(ar.getElementType(),
-        Torch::core::array::t_float64);
+  if (ar.getElementType() != bob::core::array::t_float64) {
+    throw bob::io::TypeError(ar.getElementType(),
+        bob::core::array::t_float64);
   }
   if (ar.getNDim() != 1) {
-    throw Torch::io::DimensionError(ar.getNDim(), 1);
+    throw bob::io::DimensionError(ar.getNDim(), 1);
   }
 
   // data is checked now and conforms, just proceed w/o any further checks.
@@ -94,7 +94,7 @@ void train::SVDPCATrainer::train(Torch::machine::LinearMachine& machine,
   const int n_sigma = std::min(n_features, n_samples);
   blitz::Array<double,2> U(n_features, n_sigma);
   blitz::Array<double,1> sigma(n_sigma);
-  Torch::math::svd_(data, U, sigma);
+  bob::math::svd_(data, U, sigma);
 
   /**
    * sets the linear machine with the results:
@@ -123,7 +123,7 @@ void train::SVDPCATrainer::train(Torch::machine::LinearMachine& machine,
   }
 }
 
-void train::SVDPCATrainer::train(Torch::machine::LinearMachine& machine, 
+void train::SVDPCATrainer::train(bob::machine::LinearMachine& machine, 
     const io::Arrayset& ar) const {
   blitz::Array<double,1> throw_away;
   train(machine, throw_away, ar);

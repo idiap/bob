@@ -25,9 +25,9 @@
 #include "ip/gammaCorrection.h"
 
 using namespace boost::python;
-namespace tp = Torch::python;
-namespace ip = Torch::ip;
-namespace ca = Torch::core::array;
+namespace tp = bob::python;
+namespace ip = bob::ip;
+namespace ca = bob::core::array;
 
 template <typename T, int N>
 static void inner_gammaCorrection (tp::const_ndarray src, tp::ndarray dst,

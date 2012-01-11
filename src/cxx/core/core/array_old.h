@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_CORE_ARRAY_OLD_H
-#define TORCH_CORE_ARRAY_OLD_H
+#ifndef BOB_CORE_ARRAY_OLD_H
+#define BOB_CORE_ARRAY_OLD_H
 
 #include <cstdlib>
 #include <blitz/array.h>
@@ -202,4 +202,4 @@ Array<T,4> copySafedata( const Array<T,4>& src)
 
 BZ_NAMESPACE_END
 
-#endif /* TORCH_CORE_ARRAY_OLD_H */
+#endif /* BOB_CORE_ARRAY_OLD_H */

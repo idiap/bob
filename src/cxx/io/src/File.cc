@@ -20,6 +20,6 @@
 
 #include "io/File.h"
 
-namespace io = Torch::io;
+namespace io = bob::io;
 
 io::File::~File() { }

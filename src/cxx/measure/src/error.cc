@@ -24,7 +24,7 @@
 #include "measure/error.h"
 #include "core/blitz_compat.h"
 
-namespace err = Torch::measure;
+namespace err = bob::measure;
 
 std::pair<double, double> err::farfrr(const blitz::Array<double,1>& negatives, 
     const blitz::Array<double,1>& positives, double threshold) {

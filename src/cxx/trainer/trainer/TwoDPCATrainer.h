@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef TORCH5SPRO_TRAINER_TWODPCA_TRAINER_H
-#define TORCH5SPRO_TRAINER_TWODPCA_TRAINER_H
+#ifndef BOB5SPRO_TRAINER_TWODPCA_TRAINER_H
+#define BOB5SPRO_TRAINER_TWODPCA_TRAINER_H
 
 #include "Trainer.h"
 #include "core/logging.h"
@@ -28,18 +28,18 @@
 #include <utility>
 #include <vector>
 
-namespace Torch 
+namespace bob 
 {
   namespace trainer 
   {
   
-    class TwoDPCATrainer : virtual public Trainer<Torch::machine::TwoDPCAMachine, Torch::io::Arrayset>
+    class TwoDPCATrainer : virtual public Trainer<bob::machine::TwoDPCAMachine, bob::io::Arrayset>
     {
       public:
         TwoDPCATrainer() {}
         virtual ~TwoDPCATrainer() {}
   
-        void train(Torch::machine::TwoDPCAMachine& machine, const Torch::io::Arrayset& data); 
+        void train(bob::machine::TwoDPCAMachine& machine, const bob::io::Arrayset& data); 
 
       protected:
 
@@ -48,4 +48,4 @@ namespace Torch
   }
 }
 
-#endif /* TORCH5SPRO_TRAINER_TWODPCA_TRAINER_H */
+#endif /* BOB5SPRO_TRAINER_TWODPCA_TRAINER_H */

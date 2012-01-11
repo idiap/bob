@@ -18,8 +18,8 @@
 
 #include "core/logging.h"
 
-namespace mach = Torch::machine;
-namespace tca = Torch::core::array;
+namespace mach = bob::machine;
+namespace tca = bob::core::array;
 
 mach::PLDABaseMachine::PLDABaseMachine():
   m_F(0,0), m_G(0,0), m_sigma(0), m_mu(0), 
@@ -63,7 +63,7 @@ mach::PLDABaseMachine::PLDABaseMachine(const mach::PLDABaseMachine& other):
   tca::ccopy(other.m_gamma, m_gamma);
 }
 
-mach::PLDABaseMachine::PLDABaseMachine(Torch::io::HDF5File& config) {
+mach::PLDABaseMachine::PLDABaseMachine(bob::io::HDF5File& config) {
   load(config);
 }
 
@@ -92,7 +92,7 @@ mach::PLDABaseMachine& mach::PLDABaseMachine::operator=
   return *this;
 }
 
-void mach::PLDABaseMachine::load(Torch::io::HDF5File& config) {
+void mach::PLDABaseMachine::load(bob::io::HDF5File& config) {
   //reads all data directly into the member variables
   m_F.reference(config.readArray<double,2>("F"));
   m_G.reference(config.readArray<double,2>("G"));
@@ -127,7 +127,7 @@ void mach::PLDABaseMachine::load(Torch::io::HDF5File& config) {
   m_cache_ng_ng_1.resize(ng,ng);
 }
 
-void mach::PLDABaseMachine::save(Torch::io::HDF5File& config) const {
+void mach::PLDABaseMachine::save(bob::io::HDF5File& config) const {
   config.setArray("F", m_F);
   config.setArray("G", m_G);
   config.setArray("sigma", m_sigma);
@@ -180,14 +180,14 @@ void mach::PLDABaseMachine::resize(const size_t d, const size_t nf,
 
 void mach::PLDABaseMachine::setF(const blitz::Array<double,2>& F) {
   tca::assertSameShape(F, m_F);
-  m_F.reference(Torch::core::array::ccopy(F));
+  m_F.reference(bob::core::array::ccopy(F));
   // Precomputes useful matrices
   precompute();
 }
 
 void mach::PLDABaseMachine::setG(const blitz::Array<double,2>& G) {
   tca::assertSameShape(G, m_G);
-  m_G.reference(Torch::core::array::ccopy(G));
+  m_G.reference(bob::core::array::ccopy(G));
   // Precomputes useful matrices and values
   precompute();
   precomputeLogDetAlpha();
@@ -195,7 +195,7 @@ void mach::PLDABaseMachine::setG(const blitz::Array<double,2>& G) {
 
 void mach::PLDABaseMachine::setSigma(const blitz::Array<double,1>& sigma) {
   tca::assertSameShape(sigma, m_sigma);
-  m_sigma.reference(Torch::core::array::ccopy(sigma));
+  m_sigma.reference(bob::core::array::ccopy(sigma));
   // Precomputes useful matrices and values
   precompute();
   precomputeLogDetAlpha();
@@ -204,13 +204,13 @@ void mach::PLDABaseMachine::setSigma(const blitz::Array<double,1>& sigma) {
 
 void mach::PLDABaseMachine::setMu(const blitz::Array<double,1>& mu) {
   tca::assertSameShape(mu, m_mu);
-  m_mu.reference(Torch::core::array::ccopy(mu));
+  m_mu.reference(bob::core::array::ccopy(mu));
 }
 
 blitz::Array<double,2>& mach::PLDABaseMachine::getGamma(const size_t a)
 {
   // TODO: specialized exception
-  if(!hasGamma(a)) throw Torch::machine::Exception();
+  if(!hasGamma(a)) throw bob::machine::Exception();
   return m_gamma[a];
 }
 
@@ -222,8 +222,8 @@ blitz::Array<double,2>& mach::PLDABaseMachine::getAddGamma(const size_t a)
 
 void mach::PLDABaseMachine::initFGSigma() {
   // To avoid problems related to precomputation
-  Torch::math::eye(m_F);
-  Torch::math::eye(m_G);
+  bob::math::eye(m_F);
+  bob::math::eye(m_G);
   m_sigma = 1.;
 }
 
@@ -260,11 +260,11 @@ void mach::PLDABaseMachine::precomputeAlpha() {
   // alpha = (Id + G^T.sigma^-1.G)^-1
 
   // m_cache_ng_ng_1 = G^T.sigma^-1.G
-  Torch::math::prod(m_Gt_isigma, m_G, m_cache_ng_ng_1);
+  bob::math::prod(m_Gt_isigma, m_G, m_cache_ng_ng_1);
   // m_cache_ng_ng_1 = Id + G^T.sigma^-1.G
   for(int i=0; i<m_cache_ng_ng_1.extent(0); ++i) m_cache_ng_ng_1(i,i) += 1;
   // m_alpha = (Id + G^T.sigma^-1.G)^-1
-  Torch::math::inv(m_cache_ng_ng_1, m_alpha);
+  bob::math::inv(m_cache_ng_ng_1, m_alpha);
 }
 
 void mach::PLDABaseMachine::precomputeBeta() {
@@ -275,9 +275,9 @@ void mach::PLDABaseMachine::precomputeBeta() {
   
   blitz::Array<double,2> GtISigmaT = m_Gt_isigma.transpose(1,0);
   // m_cache_d_ng_1 = sigma^-1.G.alpha
-  Torch::math::prod(GtISigmaT, m_alpha, m_cache_d_ng_1);
+  bob::math::prod(GtISigmaT, m_alpha, m_cache_d_ng_1);
   // m_beta = -sigma^-1.G.alpha.G^T.sigma^-1
-  Torch::math::prod(m_cache_d_ng_1, m_Gt_isigma, m_beta);
+  bob::math::prod(m_cache_d_ng_1, m_Gt_isigma, m_beta);
   m_beta = -m_beta;
   // m_beta = sigma^-1 - sigma^-1.G.alpha.G^T.sigma^-1
   for(int i=0; i<m_beta.extent(0); ++i) m_beta(i,i) += m_isigma(i);
@@ -294,7 +294,7 @@ void mach::PLDABaseMachine::precomputeGamma(const size_t a)
 void mach::PLDABaseMachine::precomputeFtBeta() {
   // m_Ft_beta = F^T.beta = F^T.(sigma + G.G^T)^-1 
   blitz::Array<double,2> Ft = m_F.transpose(1,0);
-  Torch::math::prod(Ft, m_beta, m_Ft_beta);
+  bob::math::prod(Ft, m_beta, m_Ft_beta);
 }
 
 void mach::PLDABaseMachine::computeGamma(const size_t a, 
@@ -305,19 +305,19 @@ void mach::PLDABaseMachine::computeGamma(const size_t a,
   // Checks destination size
   tca::assertSameShape(res, m_cache_nf_nf_1);
   // m_cache_nf_nf_1 = F^T.beta.F
-  Torch::math::prod(m_Ft_beta, m_F, m_cache_nf_nf_1);
+  bob::math::prod(m_Ft_beta, m_F, m_cache_nf_nf_1);
    // m_cache_nf_nf_1 = a.F^T.beta.F
   m_cache_nf_nf_1 *= static_cast<double>(a);
   // m_cache_nf_nf_1 = Id + a.F^T.beta.F
   for(int i=0; i<m_cache_nf_nf_1.extent(0); ++i) m_cache_nf_nf_1(i,i) += 1;
 
   // res = (Id + a.F^T.beta.F)^-1
-  Torch::math::inv(m_cache_nf_nf_1, res);
+  bob::math::inv(m_cache_nf_nf_1, res);
 }
 
 void mach::PLDABaseMachine::precomputeLogDetAlpha()
 {
-  m_logdet_alpha = log(fabs(Torch::math::det(m_alpha)));
+  m_logdet_alpha = log(fabs(bob::math::det(m_alpha)));
 }
 
 void mach::PLDABaseMachine::precomputeLogDetSigma()
@@ -330,7 +330,7 @@ double mach::PLDABaseMachine::computeLogLikeConstTerm(const size_t a,
 {
   // loglike_constterm[a] = a/2 * 
   //  ( -D*log(2*pi) -log|sigma| +log|alpha| +log|gamma_a|)
-  double logdet_gamma_a = log(fabs(Torch::math::det(gamma_a)));
+  double logdet_gamma_a = log(fabs(bob::math::det(gamma_a)));
   double ah = static_cast<double>(a)/2.;
   double res = ( -ah*static_cast<double>(getDimD())*log(2*M_PI) - 
       ah*m_logdet_sigma + ah*m_logdet_alpha + logdet_gamma_a/2.);
@@ -352,7 +352,7 @@ void mach::PLDABaseMachine::precomputeLogLikeConstTerm(const size_t a)
 double mach::PLDABaseMachine::getLogLikeConstTerm(const size_t a)
 {
   // TODO: specialized exception
-  if(!hasLogLikeConstTerm(a)) throw Torch::machine::Exception();
+  if(!hasLogLikeConstTerm(a)) throw bob::machine::Exception();
   return m_loglike_constterm[a];
 }
 
@@ -370,14 +370,14 @@ void mach::PLDABaseMachine::clearMaps()
 
 
 mach::PLDAMachine::PLDAMachine():
-  m_plda_base(boost::shared_ptr<Torch::machine::PLDABaseMachine>()),
+  m_plda_base(boost::shared_ptr<bob::machine::PLDABaseMachine>()),
   m_n_samples(0), m_nh_sum_xit_beta_xi(0), m_weighted_sum(0), 
   m_loglikelihood(0), m_gamma(), m_loglike_constterm(),
   m_cache_d_1(0), m_cache_d_2(0), m_cache_nf_1(0), m_cache_nf_2(0)
 {
 }
 
-mach::PLDAMachine::PLDAMachine(const boost::shared_ptr<Torch::machine::PLDABaseMachine> plda_base): 
+mach::PLDAMachine::PLDAMachine(const boost::shared_ptr<bob::machine::PLDABaseMachine> plda_base): 
   m_plda_base(plda_base),
   m_n_samples(0), m_nh_sum_xit_beta_xi(0), m_weighted_sum(plda_base->getDimF()),
   m_loglikelihood(0), m_gamma(), m_loglike_constterm(),
@@ -402,8 +402,8 @@ mach::PLDAMachine::PLDAMachine(const mach::PLDAMachine& other):
   tca::ccopy(other.m_gamma, m_gamma);
 }
 
-mach::PLDAMachine::PLDAMachine(Torch::io::HDF5File& config):
-  m_plda_base(boost::shared_ptr<Torch::machine::PLDABaseMachine>())
+mach::PLDAMachine::PLDAMachine(bob::io::HDF5File& config):
+  m_plda_base(boost::shared_ptr<bob::machine::PLDABaseMachine>())
 {
   load(config);
 }
@@ -427,7 +427,7 @@ mach::PLDAMachine& mach::PLDAMachine::operator=
   return *this;
 }
 
-void mach::PLDAMachine::load(Torch::io::HDF5File& config) {
+void mach::PLDAMachine::load(bob::io::HDF5File& config) {
   //reads all data directly into the member variables
   m_n_samples = config.read<uint64_t>("n_samples");
   m_nh_sum_xit_beta_xi = config.read<double>("nh_sum_xit_beta_xi");
@@ -448,7 +448,7 @@ void mach::PLDAMachine::load(Torch::io::HDF5File& config) {
   }
 }
 
-void mach::PLDAMachine::save(Torch::io::HDF5File& config) const {
+void mach::PLDAMachine::save(bob::io::HDF5File& config) const {
   config.set("n_samples", m_n_samples);
   config.set("nh_sum_xit_beta_xi", m_nh_sum_xit_beta_xi);
   config.setArray("weighted_sum", m_weighted_sum);
@@ -485,7 +485,7 @@ void mach::PLDAMachine::resize(const size_t d, const size_t nf,
   m_cache_nf_2.resize(nf);
 }
 
-void mach::PLDAMachine::setPLDABase(const boost::shared_ptr<Torch::machine::PLDABaseMachine> plda_base) {
+void mach::PLDAMachine::setPLDABase(const boost::shared_ptr<bob::machine::PLDABaseMachine> plda_base) {
   m_plda_base = plda_base; 
   m_weighted_sum.resizeAndPreserve(getDimF());
   m_cache_d_1.resize(getDimD());
@@ -508,7 +508,7 @@ blitz::Array<double,2>& mach::PLDAMachine::getGamma(const size_t a)
   // Checks in both base machine and this machine
   if(m_plda_base->hasGamma(a)) return m_plda_base->getGamma(a);
   // TODO: specialized exception
-  else if(!hasGamma(a)) throw Torch::machine::Exception();
+  else if(!hasGamma(a)) throw bob::machine::Exception();
   return m_gamma[a];
 }
 
@@ -528,7 +528,7 @@ double mach::PLDAMachine::getLogLikeConstTerm(const size_t a)
   // Checks in both base machine and this machine
   if(m_plda_base->hasLogLikeConstTerm(a)) return m_plda_base->getLogLikeConstTerm(a);
   // TODO: specialized exception
-  else if(!hasLogLikeConstTerm(a)) throw Torch::machine::Exception();
+  else if(!hasLogLikeConstTerm(a)) throw bob::machine::Exception();
   return m_loglike_constterm[a];
 }
 
@@ -568,15 +568,15 @@ double mach::PLDAMachine::computeLikelihood(const blitz::Array<double,1>& sample
   
   // terma += -1 / 2. * (xi^t*beta*xi)
   m_cache_d_1 = sample - mu;
-  Torch::math::prod(beta, m_cache_d_1, m_cache_d_2);
+  bob::math::prod(beta, m_cache_d_1, m_cache_d_2);
   terma += -1 / 2. * (blitz::sum(m_cache_d_1*m_cache_d_2));
     
   // sumWeighted
-  Torch::math::prod(Ft_beta, m_cache_d_1, m_cache_nf_2);
+  bob::math::prod(Ft_beta, m_cache_d_1, m_cache_nf_2);
   m_cache_nf_1 += m_cache_nf_2;
 
   blitz::Array<double,2> gamma_a = getAddGamma(n_samples);
-  Torch::math::prod(gamma_a, m_cache_nf_1, m_cache_nf_2);
+  bob::math::prod(gamma_a, m_cache_nf_1, m_cache_nf_2);
   double termb = 1 / 2. * (blitz::sum(m_cache_nf_1*m_cache_nf_2));
   
   log_likelihood += terma + termb;
@@ -611,16 +611,16 @@ double mach::PLDAMachine::computeLikelihood(const blitz::Array<double,2>& sample
     blitz::Array<double,1> samp = samples(k,blitz::Range::all());
     m_cache_d_1 = samp - mu;
     // terma += -1 / 2. * (xi^t*beta*xi)
-    Torch::math::prod(beta, m_cache_d_1, m_cache_d_2);
+    bob::math::prod(beta, m_cache_d_1, m_cache_d_2);
     terma += -1 / 2. * (blitz::sum(m_cache_d_1*m_cache_d_2));
     
     // sumWeighted
-    Torch::math::prod(Ft_beta, m_cache_d_1, m_cache_nf_2);
+    bob::math::prod(Ft_beta, m_cache_d_1, m_cache_nf_2);
     m_cache_nf_1 += m_cache_nf_2;
   }
 
   blitz::Array<double,2> gamma_a = getAddGamma(n_samples);
-  Torch::math::prod(gamma_a, m_cache_nf_1, m_cache_nf_2);
+  bob::math::prod(gamma_a, m_cache_nf_1, m_cache_nf_2);
   double termb = 1 / 2. * (blitz::sum(m_cache_nf_1*m_cache_nf_2));
   
   log_likelihood += terma + termb;

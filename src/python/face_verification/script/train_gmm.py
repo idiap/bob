@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-import torch.core
-import torch.io
-import torch.machine
-import torch.trainer
+import bob.core
+import bob.io
+import bob.machine
+import bob.trainer
 import os, sys
 
 def NormalizeStdArrayset(arrayset):
@@ -10,8 +10,8 @@ def NormalizeStdArrayset(arrayset):
 
   length = arrayset.shape[0]
   n_samples = len(arrayset)
-  mean = torch.core.array.float64_1(length)
-  std = torch.core.array.float64_1(length)
+  mean = bob.core.array.float64_1(length)
+  std = bob.core.array.float64_1(length)
 
   mean.fill(0)
   std.fill(0)
@@ -26,7 +26,7 @@ def NormalizeStdArrayset(arrayset):
   std -= (mean ** 2)
   std = std ** 0.5 # sqrt(std)
 
-  arStd = torch.io.Arrayset()
+  arStd = bob.io.Arrayset()
   for array in arrayset:
     arStd.append(array.get().cast('float64') / std)
 
@@ -40,9 +40,9 @@ def multiplyVectorsByFactors(matrix, vector):
 
 
 def loadData(files):
-  data = torch.io.Arrayset()
+  data = bob.io.Arrayset()
   for f in files:
-    data.extend(torch.io.Array(str(f)))
+    data.extend(bob.io.Array(str(f)))
 
   return data
 
@@ -61,11 +61,11 @@ def trainGMM(data, n_gaussians=5, iterk=25, iterg=25, convergence_threshold=1e-5
     (normalizedAr,stdAr) = NormalizeStdArrayset(ar)
     
   # Create the machines
-  kmeans = torch.machine.KMeansMachine(n_gaussians, input_size)
-  gmm = torch.machine.GMMMachine(n_gaussians, input_size)
+  kmeans = bob.machine.KMeansMachine(n_gaussians, input_size)
+  gmm = bob.machine.GMMMachine(n_gaussians, input_size)
 
   # Create the KMeansTrainer
-  kmeansTrainer = torch.trainer.KMeansTrainer()
+  kmeansTrainer = bob.trainer.KMeansTrainer()
   kmeansTrainer.convergenceThreshold = convergence_threshold
   kmeansTrainer.maxIterations = iterk
 
@@ -87,7 +87,7 @@ def trainGMM(data, n_gaussians=5, iterk=25, iterg=25, convergence_threshold=1e-5
   gmm.setVarianceThresholds(variance_threshold)
 
   # Train gmm
-  trainer = torch.trainer.ML_GMMTrainer(update_means, update_variances, update_weights)
+  trainer = bob.trainer.ML_GMMTrainer(update_means, update_variances, update_weights)
   trainer.convergenceThreshold = convergence_threshold
   trainer.maxIterations = iterg
   trainer.train(gmm, ar)
@@ -96,7 +96,7 @@ def trainGMM(data, n_gaussians=5, iterk=25, iterg=25, convergence_threshold=1e-5
 
 
 
-def adaptGMM(data, prior_gmm, iterg=25, convergence_threshold=1e-5, variance_threshold=0.001, adapt_weight=False, adapt_variance=False, relevance_factor=0.001, responsibilities_threshold=0, torch3_map=False, alpha_torch3=0.5):
+def adaptGMM(data, prior_gmm, iterg=25, convergence_threshold=1e-5, variance_threshold=0.001, adapt_weight=False, adapt_variance=False, relevance_factor=0.001, responsibilities_threshold=0, bob3_map=False, alpha_bob3=0.5):
 
   ar=data
 
@@ -105,18 +105,18 @@ def adaptGMM(data, prior_gmm, iterg=25, convergence_threshold=1e-5, variance_thr
 
   # Create trainer
   if responsibilities_threshold == 0.:
-    trainer = torch.trainer.MAP_GMMTrainer(relevance_factor, True, adapt_variance, adapt_weight)
+    trainer = bob.trainer.MAP_GMMTrainer(relevance_factor, True, adapt_variance, adapt_weight)
   else:
-    trainer = torch.trainer.MAP_GMMTrainer(relevance_factor, True, adapt_variance, adapt_weight, responsibilities_threshold)
+    trainer = bob.trainer.MAP_GMMTrainer(relevance_factor, True, adapt_variance, adapt_weight, responsibilities_threshold)
   trainer.convergenceThreshold = convergence_threshold
   trainer.maxIterations = iterg
   trainer.setPriorGMM(prior_gmm)
 
-  if torch3_map:
-    trainer.setT3MAP(alpha_torch3)
+  if bob3_map:
+    trainer.setT3MAP(alpha_bob3)
 
   # Load gmm
-  gmm = torch.machine.GMMMachine(prior_gmm)
+  gmm = bob.machine.GMMMachine(prior_gmm)
   gmm.setVarianceThresholds(variance_threshold)
 
   # Train gmm
@@ -166,12 +166,12 @@ class GMMExperiment:
         [file_basename, x] = os.path.splitext(os.path.basename(f))
         stat_path =  os.path.join(self.models_dir, "statswm_" + file_basename + "_" + str(c) + ".hdf5")
         if os.path.exists(stat_path):
-          stats = torch.machine.GMMStats(torch.io.HDF5File(str(stat_path)))
+          stats = bob.machine.GMMStats(bob.io.HDF5File(str(stat_path)))
         else:
           data = loadData([f])
-          stats = torch.machine.GMMStats(self.wm.nGaussians, self.wm.nInputs)
+          stats = bob.machine.GMMStats(self.wm.nGaussians, self.wm.nInputs)
           self.wm.accStatistics(data, stats)
-          stats.save(torch.io.HDF5File(str(stat_path)))
+          stats.save(bob.io.HDF5File(str(stat_path)))
 
         self.znorm_tests.append(stats)
         tnorm_clients_ext.append(c)
@@ -184,13 +184,13 @@ class GMMExperiment:
     #print self.tnorm_models[0]
     #print "znorm_tests"
     #print self.znorm_tests[0]
-    self.D = torch.machine.linearScoring(self.tnorm_models, self.wm, self.znorm_tests)
+    self.D = bob.machine.linearScoring(self.tnorm_models, self.wm, self.znorm_tests)
     self.D_sameValue = self.sameValue(znorm_clients, tnorm_clients_ext)
 
     print "Loading data for ZTnorm ... done"
     
   def sameValue(self, vect_A, vect_B):
-    sameMatrix = torch.core.array.bool_2(len(vect_A), len(vect_B))
+    sameMatrix = bob.core.array.bool_2(len(vect_A), len(vect_B))
 
     for j in range(len(vect_A)):
       for i in range(len(vect_B)):
@@ -229,10 +229,10 @@ class GMMExperiment:
     if not model_id in self.client_models:
       model_path = os.path.join(self.models_dir, str(model_id) + ".hdf5")
       if os.path.exists(model_path):
-        self.client_models[model_id] = torch.machine.GMMMachine(torch.io.HDF5File(model_path))
+        self.client_models[model_id] = bob.machine.GMMMachine(bob.io.HDF5File(model_path))
       else:
         self.client_models[model_id] = self.train(model_id)
-        self.client_models[model_id].save(torch.io.HDF5File(model_path))
+        self.client_models[model_id].save(bob.io.HDF5File(model_path))
     
     return self.client_models[model_id]
     
@@ -242,13 +242,13 @@ class GMMExperiment:
       list_stats=[]
       for f in files :
         data = loadData([f])
-        stats = torch.machine.GMMStats(self.wm.nGaussians, self.wm.nInputs)
+        stats = bob.machine.GMMStats(self.wm.nGaussians, self.wm.nInputs)
         self.wm.accStatistics(data, stats)
         list_stats.append(stats)
       
-      scores = torch.machine.linearScoring(models, self.wm, list_stats)
+      scores = bob.machine.linearScoring(models, self.wm, list_stats)
     else:
-      scores = torch.core.array.float64_2(len(models), len(files))
+      scores = bob.core.array.float64_2(len(models), len(files))
       
       nb_scores = len(models)*len(files)
       i=0
@@ -271,9 +271,9 @@ class GMMExperiment:
     
     if self.ztnorm:
       A = scores
-      B = torch.machine.linearScoring(models, self.wm, self.znorm_tests)
-      C = torch.machine.linearScoring(self.tnorm_models, self.wm, list_stats)
-      scores = torch.machine.ztnorm(A, B, C, self.D, self.D_sameValue)
+      B = bob.machine.linearScoring(models, self.wm, self.znorm_tests)
+      C = bob.machine.linearScoring(self.tnorm_models, self.wm, list_stats)
+      scores = bob.machine.ztnorm(A, B, C, self.D, self.D_sameValue)
     return scores
 
   def convert_score_to_list(self, scores, probes):

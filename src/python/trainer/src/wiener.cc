@@ -10,9 +10,9 @@
 #include "trainer/WienerTrainer.h"
 
 using namespace boost::python;
-namespace io = Torch::io;
-namespace mach = Torch::machine;
-namespace train = Torch::trainer;
+namespace io = bob::io;
+namespace mach = bob::machine;
+namespace train = bob::trainer;
 
 boost::shared_ptr<mach::WienerMachine> wiener_train1 (const train::WienerTrainer& t, const io::Arrayset& data) {
   boost::shared_ptr<mach::WienerMachine> m;

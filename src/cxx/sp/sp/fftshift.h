@@ -20,16 +20,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_SP_FFTSHIFT_H
-#define TORCH5SPRO_SP_FFTSHIFT_H
+#ifndef BOB5SPRO_SP_FFTSHIFT_H
+#define BOB5SPRO_SP_FFTSHIFT_H
 
 #include <complex>
 #include <blitz/array.h>
 #include "core/array_assert.h"
 
-namespace tca = Torch::core::array;
+namespace tca = bob::core::array;
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libsp_api
  * @{
@@ -176,4 +176,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_SP_FFTSHIFT_H */
+#endif /* BOB5SPRO_SP_FFTSHIFT_H */

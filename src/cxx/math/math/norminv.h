@@ -22,10 +22,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_MATH_NORMINV_H
-#define TORCH5SPRO_MATH_NORMINV_H
+#ifndef BOB5SPRO_MATH_NORMINV_H
+#define BOB5SPRO_MATH_NORMINV_H
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libmath_api
  * @{
@@ -67,4 +67,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_MATH_NORMINV_H */
+#endif /* BOB5SPRO_MATH_NORMINV_H */

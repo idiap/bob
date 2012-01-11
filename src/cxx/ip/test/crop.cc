@@ -103,7 +103,7 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
-      BOOST_CHECK_EQUAL(t1(i,j), Torch::core::cast<T>(t2(i,j)));
+      BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
 template<typename T, typename U>  
@@ -113,7 +113,7 @@ void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
       for( int k=0; k<t1.extent(2); ++k)
-        BOOST_CHECK_EQUAL(t1(i,j,k), Torch::core::cast<T>(t2(i,j,k)));
+        BOOST_CHECK_EQUAL(t1(i,j,k), bob::core::cast<T>(t2(i,j,k)));
 }
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
@@ -122,25 +122,25 @@ BOOST_AUTO_TEST_CASE( test_crop_2d_uint8 )
 {
   blitz::Array<uint32_t,2> b2(4,4);
   // Full crop
-  Torch::ip::crop(a2, b2, 0, 0, 4, 4);
+  bob::ip::crop(a2, b2, 0, 0, 4, 4);
   checkBlitzEqual(a2, b2); 
 
   // Crop the middle part
   b2.resize(2,2);
-  Torch::ip::crop(a2, b2, 1, 1, 2, 2);
+  bob::ip::crop(a2, b2, 1, 1, 2, 2);
   checkBlitzEqual(a2c_1, b2); 
 
   // Crop the middle part with out of boundary and check exception
   b2.resize(2,6);
-  BOOST_CHECK_THROW( Torch::ip::crop(a2, b2, 1, -1, 2, 6), 
-    Torch::ip::ParamOutOfBoundaryError );
+  BOOST_CHECK_THROW( bob::ip::crop(a2, b2, 1, -1, 2, 6), 
+    bob::ip::ParamOutOfBoundaryError );
 
   // Crop the middle part with out of boundary (fill with zero)
-  Torch::ip::crop(a2, b2, 1, -1, 2, 6, true, true);
+  bob::ip::crop(a2, b2, 1, -1, 2, 6, true, true);
   checkBlitzEqual(a2c_2, b2); 
 
   // Crop the middle part with out of boundary (fill with closest neighbour)
-  Torch::ip::crop(a2, b2, 1, -1, 2, 6, true);
+  bob::ip::crop(a2, b2, 1, -1, 2, 6, true);
   checkBlitzEqual(a2c_3, b2); 
 }
   
@@ -148,25 +148,25 @@ BOOST_AUTO_TEST_CASE( test_crop_3d_uint8 )
 {
   blitz::Array<uint32_t,3> b3(3,4,4);
   // Full crop
-  Torch::ip::crop(a3, b3, 0, 0, 4, 4);
+  bob::ip::crop(a3, b3, 0, 0, 4, 4);
   checkBlitzEqual(a3, b3); 
 
   // Crop the middle part
   b3.resize(3,2,2);
-  Torch::ip::crop(a3, b3, 1, 1, 2, 2);
+  bob::ip::crop(a3, b3, 1, 1, 2, 2);
   checkBlitzEqual(a3c_1, b3); 
 
   // Crop the middle part with out of boundary and check exception
   b3.resize(3,2,6);
-  BOOST_CHECK_THROW( Torch::ip::crop(a3, b3, 1, -1, 2, 6), 
-    Torch::ip::ParamOutOfBoundaryError );
+  BOOST_CHECK_THROW( bob::ip::crop(a3, b3, 1, -1, 2, 6), 
+    bob::ip::ParamOutOfBoundaryError );
 
   // Crop the middle part with out of boundary (fill with zero)
-  Torch::ip::crop(a3, b3, 1, -1, 2, 6, true, true);
+  bob::ip::crop(a3, b3, 1, -1, 2, 6, true, true);
   checkBlitzEqual(a3c_2, b3); 
 
   // Crop the middle part with out of boundary (fill with closest neighbour)
-  Torch::ip::crop(a3, b3, 1, -1, 2, 6, true);
+  bob::ip::crop(a3, b3, 1, -1, 2, 6, true);
   checkBlitzEqual(a3c_3, b3); 
 }
 
@@ -174,11 +174,11 @@ BOOST_AUTO_TEST_CASE( test_crop_2d_ref )
 {
   blitz::Array<uint32_t,2> b2;
   // Full crop
-  Torch::ip::cropReference(a2, b2, 0, 0, 4, 4);
+  bob::ip::cropReference(a2, b2, 0, 0, 4, 4);
   checkBlitzEqual(a2, b2); 
 
   // Crop the middle part
-  Torch::ip::cropReference(a2, b2, 1, 1, 2, 2);
+  bob::ip::cropReference(a2, b2, 1, 1, 2, 2);
   checkBlitzEqual(a2c_1, b2); 
 }
 
@@ -187,21 +187,21 @@ BOOST_AUTO_TEST_CASE( test_crop_2d_mask_uint8 )
   blitz::Array<uint32_t,2> b2(4,4);
   blitz::Array<bool,2> b2_mask(4,4);
   // Full crop
-  Torch::ip::crop(a2, a2_m44, b2, b2_mask, 0, 0, 4, 4);
+  bob::ip::crop(a2, a2_m44, b2, b2_mask, 0, 0, 4, 4);
   checkBlitzEqual(a2, b2); 
   checkBlitzEqual(a2_m44, b2_mask); 
 
   // Crop the middle part
   b2.resize(2,2);
   b2_mask.resize(2,2);
-  Torch::ip::crop(a2, a2_m44, b2, b2_mask, 1, 1, 2, 2);
+  bob::ip::crop(a2, a2_m44, b2, b2_mask, 1, 1, 2, 2);
   checkBlitzEqual(a2c_1, b2); 
   checkBlitzEqual(a2_m22, b2_mask); 
 
   // Crop the upper left part
   b2.resize(3,3);
   b2_mask.resize(3,3);
-  Torch::ip::crop(a2, a2_m44, b2, b2_mask, -2, -2, 3, 3, true, true);
+  bob::ip::crop(a2, a2_m44, b2, b2_mask, -2, -2, 3, 3, true, true);
   checkBlitzEqual(a2c_4, b2);
   checkBlitzEqual(a2_m33, b2_mask);
 }

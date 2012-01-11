@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_CORE_PYTHON_BLITZ_EXTRA_H 
-#define TORCH_CORE_PYTHON_BLITZ_EXTRA_H
+#ifndef BOB_CORE_PYTHON_BLITZ_EXTRA_H 
+#define BOB_CORE_PYTHON_BLITZ_EXTRA_H
 
 #include <blitz/array.h>
 #include <stdint.h>
@@ -91,4 +91,4 @@ namespace blitz {
 
 }
 
-#endif /* TORCH_CORE_PYTHON_BLITZ_EXTRA_H */
+#endif /* BOB_CORE_PYTHON_BLITZ_EXTRA_H */

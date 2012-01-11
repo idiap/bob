@@ -21,13 +21,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_TRAINER_SVDPCA_TRAINER_H
-#define TORCH5SPRO_TRAINER_SVDPCA_TRAINER_H
+#ifndef BOB5SPRO_TRAINER_SVDPCA_TRAINER_H
+#define BOB5SPRO_TRAINER_SVDPCA_TRAINER_H
 
 #include "machine/LinearMachine.h"
 #include "io/Arrayset.h"
 
-namespace Torch { namespace trainer {
+namespace bob { namespace trainer {
   
   /**
    * Sets a linear machine to perform the Karhunen-Loève Transform (KLT) on a
@@ -84,8 +84,8 @@ namespace Torch { namespace trainer {
        * will have the eigen-vectors of the covariance matrix arranged by
        * decreasing energy automatically. You don't need to sort the results.
        */
-      virtual void train(Torch::machine::LinearMachine& machine, 
-          const Torch::io::Arrayset& data) const;
+      virtual void train(bob::machine::LinearMachine& machine, 
+          const bob::io::Arrayset& data) const;
 
       /**
        * Trains the LinearMachine to perform the KLT. The resulting machine
@@ -94,9 +94,9 @@ namespace Torch { namespace trainer {
        * Also returns the eigen values of the covariance matrix so you can use
        * that to choose which components to keep.
        */
-      virtual void train(Torch::machine::LinearMachine& machine,
+      virtual void train(bob::machine::LinearMachine& machine,
           blitz::Array<double,1>& eigen_values,
-          const Torch::io::Arrayset& data) const;
+          const bob::io::Arrayset& data) const;
 
     private: //representation
 
@@ -106,4 +106,4 @@ namespace Torch { namespace trainer {
 
 }}
 
-#endif /* TORCH5SPRO_TRAINER_SVDPCA_TRAINER_H */
+#endif /* BOB5SPRO_TRAINER_SVDPCA_TRAINER_H */

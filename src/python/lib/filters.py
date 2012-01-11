@@ -9,14 +9,14 @@ bellow.
 """
 
 import os
-import torch
+import bob
 
 def map_variable_types(v):
   """Returns the standard python types for variables defined"""
-  if v.type == torch.core.VariableType.Int: return 'int'
-  elif v.type in (torch.core.VariableType.Float, torch.core.VariableType.Double): return 'float'
-  elif v.type == torch.core.VariableType.Bool: return 'bool'
-  elif v.type == torch.core.VariableType.String: return 'str'
+  if v.type == bob.core.VariableType.Int: return 'int'
+  elif v.type in (bob.core.VariableType.Float, bob.core.VariableType.Double): return 'float'
+  elif v.type == bob.core.VariableType.Bool: return 'bool'
+  elif v.type == bob.core.VariableType.String: return 'str'
   raise RuntimeError, 'Unsupported mapping from type %s' % v.type
 
 def generate_option_dict(o, var):
@@ -41,9 +41,9 @@ def generate_option_dict(o, var):
     default = o.getSOption(var)
   elif t == 'int':
     default = o.getIOption(var)
-  if v.type == torch.core.VariableType.Float:
+  if v.type == bob.core.VariableType.Float:
     default = o.getFOption(var)
-  if v.type == torch.core.VariableType.Double:
+  if v.type == bob.core.VariableType.Double:
     default = o.getDOption(var)
 
   if metavar:
@@ -55,15 +55,15 @@ def generate_option_dict(o, var):
 def customize_filter(filter, options):
   for k, v in filter.variable_dict().iteritems():
     if hasattr(options, k):
-      if v.type == torch.core.VariableType.Bool:
+      if v.type == bob.core.VariableType.Bool:
         filter.setBOption(k, getattr(options, k))
-      elif v.type == torch.core.VariableType.Int:
+      elif v.type == bob.core.VariableType.Int:
         filter.setIOption(k, getattr(options, k))
-      elif v.type == torch.core.VariableType.Float:
+      elif v.type == bob.core.VariableType.Float:
         filter.setFOption(k, getattr(options, k))
-      elif v.type == torch.core.VariableType.Double:
+      elif v.type == bob.core.VariableType.Double:
         filter.setDOption(k, getattr(options, k))
-      elif v.type == torch.core.VariableType.String:
+      elif v.type == bob.core.VariableType.String:
         filter.setSOption(k, getattr(options, k))
       else:
         raise RuntimeError, 'I cannot customize option of type %s' % v.type
@@ -71,13 +71,13 @@ def customize_filter(filter, options):
 def apply_filter_from_instance(filter, input, output, planes):
   if not os.path.exists(input):
     raise RuntimeError, 'I cannot read input file "%s"' % input
-  i = torch.ip.Image(1, 1, planes)
+  i = bob.ip.Image(1, 1, planes)
   i.load(input)
   if not filter.process(i):
     raise RuntimeError, 'Processing of "%s" has failed' % input
   if not filter.getNOutputs() == 1:
     raise RuntimeError, 'Filter "%s" returned more than 1 output?' % filter
-  torch.ip.Image(filter.getOutput(0)).save(output)
+  bob.ip.Image(filter.getOutput(0)).save(output)
 
 def apply_image_filter(cls, options, input, output, planes=3):
   filter = cls()
@@ -89,11 +89,11 @@ def apply_image_processor(cls, options, input, output, planes=3):
   customize_filter(filter, options)
   if not os.path.exists(input):
     raise RuntimeError, 'I cannot read input file "%s"' % input
-  i = torch.ip.Image(1, 1, planes)
+  i = bob.ip.Image(1, 1, planes)
   i.load(input)
   if not filter.process(i):
     raise RuntimeError, 'Processing of "%s" has failed' % input
-  o = torch.core.TensorFile()
+  o = bob.core.TensorFile()
   otensor = filter.getOutput(0)
   if options.append: o.openAppend(output)
   else: o.openWrite(output, otensor)
@@ -109,7 +109,7 @@ class Filter(object):
   pass
 
 class Crop(Filter):
-  tmp = torch.ip.ipCrop()
+  tmp = bob.ip.ipCrop()
 
   doc = tmp.__doc__
 
@@ -127,10 +127,10 @@ class Crop(Filter):
   def __call__(self, options, args):
     if options.w == 0 or options.h == 0:
       raise RuntimeError, 'I cannot crop an image to have zero dimensions, please revise your options!'
-    apply_image_filter(torch.ip.ipCrop, options, args[0], args[1], planes=3)
+    apply_image_filter(bob.ip.ipCrop, options, args[0], args[1], planes=3)
 
 class Flip(Filter):
-  tmp = torch.ip.ipFlip()
+  tmp = bob.ip.ipFlip()
 
   doc = tmp.__doc__
 
@@ -143,10 +143,10 @@ class Flip(Filter):
   arguments = ['input-image', 'output-image']
       
   def __call__(self, options, args):
-    apply_image_filter(torch.ip.ipFlip, options, args[0], args[1], planes=3)
+    apply_image_filter(bob.ip.ipFlip, options, args[0], args[1], planes=3)
 
 class Histo(Filter):
-  tmp = torch.ip.ipHisto()
+  tmp = bob.ip.ipHisto()
 
   doc = tmp.__doc__
 
@@ -157,11 +157,11 @@ class Histo(Filter):
   arguments = ['input-image', 'output-tensor']
       
   def __call__(self, options, args):
-    apply_image_processor(torch.ip.ipHisto, options, 
+    apply_image_processor(bob.ip.ipHisto, options, 
         args[0], args[1], planes=3)
 
 class HistoEqual(Filter):
-  tmp = torch.ip.ipHistoEqual()
+  tmp = bob.ip.ipHistoEqual()
 
   doc = tmp.__doc__
 
@@ -172,11 +172,11 @@ class HistoEqual(Filter):
   arguments = ['input-image', 'output-image']
       
   def __call__(self, options, args):
-    apply_image_filter(torch.ip.ipHistoEqual, options, 
+    apply_image_filter(bob.ip.ipHistoEqual, options, 
         args[0], args[1], planes=1)
 
 class Integral(Filter):
-  tmp = torch.ip.ipIntegral()
+  tmp = bob.ip.ipIntegral()
 
   doc = tmp.__doc__
 
@@ -187,11 +187,11 @@ class Integral(Filter):
   arguments = ['input-image', 'output-tensor']
       
   def __call__(self, options, args):
-    apply_image_processor(torch.ip.ipIntegral, options, 
+    apply_image_processor(bob.ip.ipIntegral, options, 
         args[0], args[1], planes=3)
 
 class lbp8R(Filter):
-  tmp = torch.ip.ipLBP8R()
+  tmp = bob.ip.ipLBP8R()
 
   doc = tmp.__doc__
 
@@ -210,12 +210,12 @@ class lbp8R(Filter):
   arguments = ['input-image', 'output-image']
       
   def __call__(self, options, args):
-    #the LBP implementation in torch requires special handling.
-    filter = torch.ip.ipLBP8R(options.radius)
+    #the LBP implementation in bob requires special handling.
+    filter = bob.ip.ipLBP8R(options.radius)
     customize_filter(filter, options)
     if not os.path.exists(args[0]):
       raise RuntimeError, 'I cannot read input file "%s"' % args[0]
-    i = torch.ip.Image(1, 1, 3)
+    i = bob.ip.Image(1, 1, 3)
     i.load(args[0])
     o = filter.batch(i)
     if not o:
@@ -223,7 +223,7 @@ class lbp8R(Filter):
     o.save(args[1])
 
 class lbp4R(Filter):
-  tmp = torch.ip.ipLBP4R()
+  tmp = bob.ip.ipLBP4R()
 
   doc = tmp.__doc__
 
@@ -242,12 +242,12 @@ class lbp4R(Filter):
   arguments = ['input-image', 'output-image']
       
   def __call__(self, options, args):
-    #the LBP implementation in torch requires special handling.
-    filter = torch.ip.ipLBP4R(options.radius)
+    #the LBP implementation in bob requires special handling.
+    filter = bob.ip.ipLBP4R(options.radius)
     customize_filter(filter, options)
     if not os.path.exists(args[0]):
       raise RuntimeError, 'I cannot read input file "%s"' % args[0]
-    i = torch.ip.Image(1, 1, 3)
+    i = bob.ip.Image(1, 1, 3)
     i.load(args[0])
     o = filter.batch(i)
     if not o:
@@ -255,7 +255,7 @@ class lbp4R(Filter):
     o.save(args[1])
 
 class MSRSQIGaussian(Filter):
-  tmp = torch.ip.ipMSRSQIGaussian()
+  tmp = bob.ip.ipMSRSQIGaussian()
 
   doc = tmp.__doc__
 
@@ -271,11 +271,11 @@ class MSRSQIGaussian(Filter):
   arguments = ['input-image', 'output-image']
       
   def __call__(self, options, args):
-    apply_image_filter(torch.ip.ipMSRSQIGaussian, options, args[0], args[1], 
+    apply_image_filter(bob.ip.ipMSRSQIGaussian, options, args[0], args[1], 
         planes=3) 
 
 class MultiscaleRetinex(Filter):
-  tmp = torch.ip.ipMultiscaleRetinex()
+  tmp = bob.ip.ipMultiscaleRetinex()
 
   doc = tmp.__doc__
 
@@ -291,10 +291,10 @@ class MultiscaleRetinex(Filter):
   arguments = ['input-image', 'output-image']
       
   def __call__(self, options, args):
-    apply_image_filter(torch.ip.ipMultiscaleRetinex, options, args[0], args[1], planes=1)
+    apply_image_filter(bob.ip.ipMultiscaleRetinex, options, args[0], args[1], planes=1)
 
 class Relaxation(Filter):
-  tmp = torch.ip.ipRelaxation()
+  tmp = bob.ip.ipRelaxation()
 
   doc = tmp.__doc__
 
@@ -309,10 +309,10 @@ class Relaxation(Filter):
   arguments = ['input-image', 'output-image']
       
   def __call__(self, options, args):
-    apply_image_filter(torch.ip.ipRelaxation, options, args[0], args[1], planes=1)
+    apply_image_filter(bob.ip.ipRelaxation, options, args[0], args[1], planes=1)
 
 class Rotate(Filter):
-  tmp = torch.ip.ipRotate()
+  tmp = bob.ip.ipRotate()
 
   doc = tmp.__doc__
 
@@ -327,10 +327,10 @@ class Rotate(Filter):
   arguments = ['input-image', 'output-image']
       
   def __call__(self, options, args):
-    apply_image_filter(torch.ip.ipRotate, options, args[0], args[1], planes=3)
+    apply_image_filter(bob.ip.ipRotate, options, args[0], args[1], planes=3)
 
 class ScaleYX(Filter):
-  tmp = torch.ip.ipScaleYX()
+  tmp = bob.ip.ipScaleYX()
 
   doc = tmp.__doc__
 
@@ -344,10 +344,10 @@ class ScaleYX(Filter):
   arguments = ['input-image', 'output-image']
       
   def __call__(self, options, args):
-    apply_image_filter(torch.ip.ipScaleYX, options, args[0], args[1], planes=3)
+    apply_image_filter(bob.ip.ipScaleYX, options, args[0], args[1], planes=3)
 
 class SelfQuotient(Filter):
-  tmp = torch.ip.ipSelfQuotientImage()
+  tmp = bob.ip.ipSelfQuotientImage()
 
   doc = tmp.__doc__
 
@@ -363,10 +363,10 @@ class SelfQuotient(Filter):
   arguments = ['input-image', 'output-image']
       
   def __call__(self, options, args):
-    apply_image_filter(torch.ip.ipSelfQuotientImage, options, args[0], args[1], planes=1)
+    apply_image_filter(bob.ip.ipSelfQuotientImage, options, args[0], args[1], planes=1)
 
 class Shift(Filter):
-  tmp = torch.ip.ipShift()
+  tmp = bob.ip.ipShift()
 
   doc = tmp.__doc__
 
@@ -380,10 +380,10 @@ class Shift(Filter):
   arguments = ['input-image', 'output-image']
       
   def __call__(self, options, args):
-    apply_image_filter(torch.ip.ipShift, options, args[0], args[1], planes=3)
+    apply_image_filter(bob.ip.ipShift, options, args[0], args[1], planes=3)
 
 class SmoothGaussian(Filter):
-  tmp = torch.ip.ipSmoothGaussian()
+  tmp = bob.ip.ipSmoothGaussian()
 
   doc = tmp.__doc__
 
@@ -397,10 +397,10 @@ class SmoothGaussian(Filter):
   arguments = ['input-image', 'output-image']
       
   def __call__(self, options, args):
-    apply_image_filter(torch.ip.ipSmoothGaussian, options, args[0], args[1], planes=3)
+    apply_image_filter(bob.ip.ipSmoothGaussian, options, args[0], args[1], planes=3)
 
 class Sobel(Filter):
-  tmp = torch.ip.ipSobel()
+  tmp = bob.ip.ipSobel()
 
   doc = tmp.__doc__
 
@@ -411,10 +411,10 @@ class Sobel(Filter):
   arguments = ['input-image', 'output-image']
       
   def __call__(self, options, args):
-    apply_image_filter(torch.ip.ipSobel, options, args[0], args[1], planes=3)
+    apply_image_filter(bob.ip.ipSobel, options, args[0], args[1], planes=3)
 
 class TanTriggs(Filter):
-  tmp = torch.ip.ipTanTriggs()
+  tmp = bob.ip.ipTanTriggs()
 
   doc = tmp.__doc__
 
@@ -433,10 +433,10 @@ class TanTriggs(Filter):
   arguments = ['input-image', 'output-image']
       
   def __call__(self, options, args):
-    apply_image_filter(torch.ip.ipTanTriggs, options, args[0], args[1], planes=1)
+    apply_image_filter(bob.ip.ipTanTriggs, options, args[0], args[1], planes=1)
 
 class Vcycle(Filter):
-  tmp = torch.ip.ipVcycle()
+  tmp = bob.ip.ipVcycle()
 
   doc = tmp.__doc__
 
@@ -451,7 +451,7 @@ class Vcycle(Filter):
   arguments = ['input-image', 'output-image']
       
   def __call__(self, options, args):
-    apply_image_filter(torch.ip.ipVcycle, options, args[0], args[1], planes=3)
+    apply_image_filter(bob.ip.ipVcycle, options, args[0], args[1], planes=3)
 
 # This is some black-instrospection-magic to get all filters declared in this
 # submodule automatically. Don't touch it. If you want to include a new filter

@@ -23,8 +23,8 @@
 #include <boost/make_shared.hpp>
 #include "io/HDF5Utils.h"
 
-namespace h5 = Torch::io::detail::hdf5;
-namespace io = Torch::io;
+namespace h5 = bob::io::detail::hdf5;
+namespace io = bob::io;
 
 /**
  * Opens an "auto-destructible" HDF5 dataset
@@ -296,7 +296,7 @@ size_t h5::Dataset::size (const io::HDF5Type& type) const {
   for (size_t k=0; k<m_descr.size(); ++k) {
     if (m_descr[k].type == type) return m_descr[k].size;
   }
-  throw Torch::io::HDF5IncompatibleIO(m_parent->m_path.string(), 
+  throw bob::io::HDF5IncompatibleIO(m_parent->m_path.string(), 
       m_path, m_descr[0].type.str(), type.str());
 }
 
@@ -321,12 +321,12 @@ h5::Dataset::select (size_t index, const io::HDF5Type& dest) {
 
   //if we cannot find a compatible type, we throw
   if (it == m_descr.end()) 
-    throw Torch::io::HDF5IncompatibleIO(m_parent->m_path.string(), 
+    throw bob::io::HDF5IncompatibleIO(m_parent->m_path.string(), 
         m_path, m_descr[0].type.str(), dest.str());
 
   //checks indexing
   if (index >= it->size)
-    throw Torch::io::HDF5IndexError(m_parent->m_path.string(), m_path,
+    throw bob::io::HDF5IndexError(m_parent->m_path.string(), m_path,
         it->size, index);
 
   set_memspace(m_memspace, it->type);
@@ -361,14 +361,14 @@ void h5::Dataset::write_buffer (size_t index, const io::HDF5Type& dest,
   if (status < 0) throw io::HDF5StatusError("H5Dwrite", status);
 }
     
-void h5::Dataset::extend_buffer (const Torch::io::HDF5Type& dest, const void* buffer) {
+void h5::Dataset::extend_buffer (const bob::io::HDF5Type& dest, const void* buffer) {
   
   //finds compatibility type
   std::vector<io::HDF5Descriptor>::iterator it = find_type_index(m_descr, dest);
 
   //if we cannot find a compatible type, we throw
   if (it == m_descr.end()) 
-    throw Torch::io::HDF5IncompatibleIO(m_parent->m_path.string(), 
+    throw bob::io::HDF5IncompatibleIO(m_parent->m_path.string(), 
         m_path, m_descr[0].type.str(), dest.str());
 
   if (!it->expandable)

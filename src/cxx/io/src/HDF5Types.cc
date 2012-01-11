@@ -27,7 +27,7 @@
 #include "io/HDF5Types.h"
 #include "io/HDF5Exception.h"
 
-namespace io = Torch::io;
+namespace io = bob::io;
 
 const char* io::stringize (hdf5type t) {
   switch (t) {
@@ -368,7 +368,7 @@ static io::hdf5type get_datatype
   throw io::HDF5UnsupportedTypeError(dt);
 }
 
-bool io::HDF5Type::compatible (const Torch::core::array::typeinfo& value) const
+bool io::HDF5Type::compatible (const bob::core::array::typeinfo& value) const
 {
   return *this == HDF5Type(value);
 }
@@ -462,7 +462,7 @@ DEFINE_SUPPORT(std::string,io::s)
     (const blitz::Array<T,N>& value): \
       m_type(E), \
       m_shape(value.shape()) { \
-        if (N > Torch::core::array::N_MAX_DIMENSIONS_ARRAY) \
+        if (N > bob::core::array::N_MAX_DIMENSIONS_ARRAY) \
         throw io::HDF5UnsupportedDimensionError(N); \
       }
 
@@ -509,51 +509,51 @@ io::HDF5Type::HDF5Type(io::hdf5type type, const io::HDF5Shape& extents):
 {
 }
 
-static io::hdf5type array_to_hdf5 (Torch::core::array::ElementType eltype) {
+static io::hdf5type array_to_hdf5 (bob::core::array::ElementType eltype) {
   switch(eltype) {
-    case Torch::core::array::t_unknown:
+    case bob::core::array::t_unknown:
       return io::unsupported;
-    case Torch::core::array::t_bool:
+    case bob::core::array::t_bool:
       return io::u8;
-    case Torch::core::array::t_int8:
+    case bob::core::array::t_int8:
       return io::i8;
-    case Torch::core::array::t_int16:
+    case bob::core::array::t_int16:
       return io::i16;
-    case Torch::core::array::t_int32:
+    case bob::core::array::t_int32:
       return io::i32;
-    case Torch::core::array::t_int64:
+    case bob::core::array::t_int64:
       return io::i64;
-    case Torch::core::array::t_uint8:
+    case bob::core::array::t_uint8:
       return io::u8;
-    case Torch::core::array::t_uint16:
+    case bob::core::array::t_uint16:
       return io::u16;
-    case Torch::core::array::t_uint32:
+    case bob::core::array::t_uint32:
       return io::u32;
-    case Torch::core::array::t_uint64:
+    case bob::core::array::t_uint64:
       return io::u64;
-    case Torch::core::array::t_float32:
+    case bob::core::array::t_float32:
       return io::f32;
-    case Torch::core::array::t_float64:
+    case bob::core::array::t_float64:
       return io::f64;
-    case Torch::core::array::t_float128:
+    case bob::core::array::t_float128:
       return io::f128;
-    case Torch::core::array::t_complex64:
+    case bob::core::array::t_complex64:
       return io::c64;
-    case Torch::core::array::t_complex128:
+    case bob::core::array::t_complex128:
       return io::c128;
-    case Torch::core::array::t_complex256:
+    case bob::core::array::t_complex256:
       return io::c256;
   }
   throw std::runtime_error("unsupported dtyle <=> hdf5 type conversion -- debug me");
 }
 
-io::HDF5Type::HDF5Type(const Torch::core::array::typeinfo& ti): 
+io::HDF5Type::HDF5Type(const bob::core::array::typeinfo& ti): 
   m_type(array_to_hdf5(ti.dtype)),
   m_shape(ti.nd, ti.shape)
 {
 }
 
-io::HDF5Type::HDF5Type(Torch::core::array::ElementType eltype, 
+io::HDF5Type::HDF5Type(bob::core::array::ElementType eltype, 
     const HDF5Shape& extents): 
   m_type(array_to_hdf5(eltype)),
   m_shape(extents)
@@ -596,48 +596,48 @@ std::string io::HDF5Type::str() const {
   return retval.str();
 }
 
-Torch::core::array::ElementType io::HDF5Type::element_type() const {
+bob::core::array::ElementType io::HDF5Type::element_type() const {
   switch (m_type) {
     case i8:
-      return Torch::core::array::t_int8;
+      return bob::core::array::t_int8;
     case i16:
-      return Torch::core::array::t_int16;
+      return bob::core::array::t_int16;
     case i32:
-      return Torch::core::array::t_int32;
+      return bob::core::array::t_int32;
     case i64:
-      return Torch::core::array::t_int64;
+      return bob::core::array::t_int64;
     case u8:
-      return Torch::core::array::t_uint8;
+      return bob::core::array::t_uint8;
     case u16:
-      return Torch::core::array::t_uint16;
+      return bob::core::array::t_uint16;
     case u32:
-      return Torch::core::array::t_uint32;
+      return bob::core::array::t_uint32;
     case u64:
-      return Torch::core::array::t_uint64;
+      return bob::core::array::t_uint64;
     case f32:
-      return Torch::core::array::t_float32;
+      return bob::core::array::t_float32;
     case f64:
-      return Torch::core::array::t_float64;
+      return bob::core::array::t_float64;
     case f128:
-      return Torch::core::array::t_float128;
+      return bob::core::array::t_float128;
     case c64:
-      return Torch::core::array::t_complex64;
+      return bob::core::array::t_complex64;
     case c128:
-      return Torch::core::array::t_complex128;
+      return bob::core::array::t_complex128;
     case c256:
-      return Torch::core::array::t_complex256;
+      return bob::core::array::t_complex256;
     default:
       break;
   }
-  return Torch::core::array::t_unknown;
+  return bob::core::array::t_unknown;
 }
 
-void io::HDF5Type::copy_to (Torch::core::array::typeinfo& ti) const {
+void io::HDF5Type::copy_to (bob::core::array::typeinfo& ti) const {
   ti.dtype = element_type();
   ti.nd = shape().n();
-  if (ti.nd > (TORCH_MAX_DIM+1)) {
+  if (ti.nd > (BOB_MAX_DIM+1)) {
     boost::format f("HDF5 type has more (%d) than the allowed maximum number of dimensions (%d)");
-    f % ti.nd % (TORCH_MAX_DIM+1);
+    f % ti.nd % (BOB_MAX_DIM+1);
     throw std::runtime_error(f.str().c_str());
   }
   for (size_t i=0; i<ti.nd; ++i) ti.shape[i] = shape()[i];

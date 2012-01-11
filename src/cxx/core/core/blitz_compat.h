@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_CORE_BLITZ_COMPAT_H
-#define TORCH_CORE_BLITZ_COMPAT_H
+#ifndef BOB_CORE_BLITZ_COMPAT_H
+#define BOB_CORE_BLITZ_COMPAT_H
 
 /**
  * Defines the diffType and sizeType in case blitz (old) don't have it defined
@@ -34,4 +34,4 @@ namespace blitz {
 }
 #endif
 
-#endif /* TORCH_CORE_BLITZ_COMPAT_H */
+#endif /* BOB_CORE_BLITZ_COMPAT_H */

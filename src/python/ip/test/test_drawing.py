@@ -8,7 +8,7 @@
 
 import os, sys
 import unittest
-import torch
+import bob
 import numpy
 
 class DrawingTest(unittest.TestCase):
@@ -21,16 +21,16 @@ class DrawingTest(unittest.TestCase):
     image.fill(0)
 
     # Draws a white point on the middle
-    torch.ip.draw_point(image, 50, 50, 255)
+    bob.ip.draw_point(image, 50, 50, 255)
     self.assertEqual(image[50, 50], 255)
 
     # Try drawing on an unexisting location, should not raise
     imcopy = image.copy()
-    torch.ip.try_draw_point(imcopy, 100, 100, 255)
+    bob.ip.try_draw_point(imcopy, 100, 100, 255)
     self.assertTrue( numpy.array_equal(image, imcopy) ) # no change is made
 
     # Try drawing with draw_point on an unexisting location, should raise
-    self.assertRaises(IndexError, torch.ip.draw_point, imcopy, 100, 100, 255) 
+    self.assertRaises(IndexError, bob.ip.draw_point, imcopy, 100, 100, 255) 
 
   def test02_color_point(self):
 
@@ -44,16 +44,16 @@ class DrawingTest(unittest.TestCase):
     image.fill(0)
 
     # Draws a white point on the middle
-    torch.ip.draw_point(image, 50, 50, white)
+    bob.ip.draw_point(image, 50, 50, white)
     self.assertTrue(numpy.array_equal(image[:,50, 50],a1))
 
     # Try drawing on an unexisting location, should not raise
     imcopy = image.copy()
-    torch.ip.try_draw_point(imcopy, 100, 100, white)
+    bob.ip.try_draw_point(imcopy, 100, 100, white)
     self.assertTrue(numpy.array_equal(image, imcopy)) # no change is made
 
     # Try drawing with draw_point on an unexisting location, should raise
-    self.assertRaises(IndexError, torch.ip.draw_point, imcopy, 100, 100, white)
+    self.assertRaises(IndexError, bob.ip.draw_point, imcopy, 100, 100, white)
 
   def test03_line(self):
 
@@ -64,22 +64,22 @@ class DrawingTest(unittest.TestCase):
     image.fill(0)
 
     # Draws a white line on the middle (horizontal)
-    torch.ip.draw_line(image, 50, 50, 50, 70, 255)
+    bob.ip.draw_line(image, 50, 50, 50, 70, 255)
     for k in range(50,70):
       self.assertEqual(image[k,50], 255)
 
     # Draws a white line on the middle (vertical)
-    torch.ip.draw_line(image, 50, 50, 70, 50, 230)
+    bob.ip.draw_line(image, 50, 50, 70, 50, 230)
     for k in range(50,70):
       self.assertEqual(image[50,k], 230)
 
     # Draws a white line on the middle (horizontal, backwards)
-    torch.ip.draw_line(image, 50, 70, 50, 50, 128)
+    bob.ip.draw_line(image, 50, 70, 50, 50, 128)
     for k in range(50,70):
       self.assertEqual(image[k,50], 128)
 
     # Draws a white line on the middle (vertical, backwards)
-    torch.ip.draw_line(image, 70, 50, 50, 50, 65)
+    bob.ip.draw_line(image, 70, 50, 50, 50, 65)
     for k in range(50,70):
       self.assertEqual(image[50,k], 65)
 
@@ -92,7 +92,7 @@ class DrawingTest(unittest.TestCase):
     image.fill(0)
 
     # Draws a white line on the middle (horizontal)
-    torch.ip.draw_box(image, 50, 50, 20, 20, 255)
+    bob.ip.draw_box(image, 50, 50, 20, 20, 255)
 
     for k in range(50,70):
       self.assertEqual(image[k,50], 255)
@@ -102,14 +102,14 @@ class DrawingTest(unittest.TestCase):
 
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()
 

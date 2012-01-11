@@ -11,20 +11,20 @@ A little help for you to migrate:
 
   There are operations that don't need migration such as sum() or mean() as
   NumPy also implements them on the ndarray object.
-* Differences between torch.core.array.*  and numpy.ndarray:
+* Differences between bob.core.array.*  and numpy.ndarray:
   
   ============= ========================
-   torch         NumPy
+   bob           NumPy
   ============= ========================
    a.shape()      a.shape
    a.rank()       len(a.shape)
-   a.save(...)    torch.io.save(a, ...)
+   a.save(...)    bob.io.save(a, ...)
    a.cast(...)    a.astype(...)
   ============= ========================
 
-* The construction torch.core.array.*.convert() is deprecated: use
-  torch.core.convert(array...)
-* The construction torch.core.array.numeq() is depreated: use
+* The construction bob.core.array.*.convert() is deprecated: use
+  bob.core.convert(array...)
+* The construction bob.core.array.numeq() is depreated: use
   numpy.array_equal(a, b)
 * For array constructions:
   numpy.ndarray(shape, type) -- uninitialzed numpy ndarray
@@ -45,4 +45,4 @@ A little help for you to migrate:
 
   numpy.ndarray([1,2,3]).fill(4) => array now is [4]
 
-  This is different from the old torch.core.array blitz bindings.
+  This is different from the old bob.core.array blitz bindings.

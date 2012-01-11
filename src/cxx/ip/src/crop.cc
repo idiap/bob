@@ -21,7 +21,7 @@
 #include "ip/crop.h"
 #include "ip/Exception.h"
 
-namespace ipd = Torch::ip::detail;
+namespace ipd = bob::ip::detail;
 
 void ipd::cropParameterCheck( const int crop_y, const int crop_x,
   const int crop_h, const int crop_w, const int src_height, 

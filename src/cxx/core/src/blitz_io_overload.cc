@@ -26,7 +26,7 @@
 
 BZ_NAMESPACE(blitz)
 // TODO
-#ifdef TORCH_NEEDS_REVISION
+#ifdef BOB_NEEDS_REVISION
 
 /** 
  * @brief specialization of operator << for int8_t in 1D

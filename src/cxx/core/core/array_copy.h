@@ -5,8 +5,8 @@
  * @brief This file defines deep copy functions for blitz++ arrays
  */
 
-#ifndef TORCH_CORE_ARRAY_COPY_H
-#define TORCH_CORE_ARRAY_COPY_H
+#ifndef BOB_CORE_ARRAY_COPY_H
+#define BOB_CORE_ARRAY_COPY_H
 
 #include <blitz/array.h>
 #if !defined (HAVE_BLITZ_TINYVEC2_H)
@@ -15,7 +15,7 @@
 #include <map>
 #include <vector>
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libcore_api
  * @{
@@ -71,4 +71,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_CORE_ARRAY_COPY_H */
+#endif /* BOB5SPRO_CORE_ARRAY_COPY_H */

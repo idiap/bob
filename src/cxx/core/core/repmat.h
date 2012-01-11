@@ -22,15 +22,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_CORE_REPMAT_H
-#define TORCH5SPRO_CORE_REPMAT_H
+#ifndef BOB5SPRO_CORE_REPMAT_H
+#define BOB5SPRO_CORE_REPMAT_H
 
 #include <limits>
 #include <blitz/array.h>
 #include "core/repmat_exception.h"
 #include "core/array_assert.h"
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libcore_api
  * @{
@@ -74,12 +74,12 @@ namespace Torch {
     template<typename T> 
     void repmat(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst) 
     {
-      Torch::core::array::assertZeroBase(src);
-      Torch::core::array::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(dst);
       if(dst.extent(0) % src.extent(0) != 0)
-        throw Torch::core::RepmatNonMultipleLength(src.extent(0), dst.extent(0));
+        throw bob::core::RepmatNonMultipleLength(src.extent(0), dst.extent(0));
       if(dst.extent(1) % src.extent(1) != 0)
-        throw Torch::core::RepmatNonMultipleLength(src.extent(1), dst.extent(1));
+        throw bob::core::RepmatNonMultipleLength(src.extent(1), dst.extent(1));
       repmat_(src, dst);
     }
 
@@ -133,18 +133,18 @@ namespace Torch {
     void repmat(const blitz::Array<T,1>& src, blitz::Array<T,2>& dst, 
       bool row_vector_src=false)
     {
-      Torch::core::array::assertZeroBase(src);
-      Torch::core::array::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(dst);
       // Check dst length
       if(row_vector_src)
       {
         if(dst.extent(1) % src.extent(0) != 0)
-          throw Torch::core::RepmatNonMultipleLength(src.extent(0), dst.extent(1));
+          throw bob::core::RepmatNonMultipleLength(src.extent(0), dst.extent(1));
       }
       else // src is a column vector
       {
         if(dst.extent(0) % src.extent(0) != 0)
-          throw Torch::core::RepmatNonMultipleLength(src.extent(0), dst.extent(0));
+          throw bob::core::RepmatNonMultipleLength(src.extent(0), dst.extent(0));
       }
       repmat_(src, dst, row_vector_src);
     }
@@ -181,10 +181,10 @@ namespace Torch {
     template<typename T> 
     void repvec(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
     {
-      Torch::core::array::assertZeroBase(src);
-      Torch::core::array::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(dst);
       if(dst.extent(0) % src.extent(0) != 0)
-        throw Torch::core::RepmatNonMultipleLength(src.extent(0), dst.extent(0));
+        throw bob::core::RepmatNonMultipleLength(src.extent(0), dst.extent(0));
       repvec_(src,dst);
     }
 
@@ -222,10 +222,10 @@ namespace Torch {
     template<typename T> 
     void repelem(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
     {
-      Torch::core::array::assertZeroBase(src);
-      Torch::core::array::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(dst);
       if(dst.extent(0) % src.extent(0) != 0)
-        throw Torch::core::RepmatNonMultipleLength(src.extent(0), dst.extent(0));
+        throw bob::core::RepmatNonMultipleLength(src.extent(0), dst.extent(0));
       repelem_(src,dst);
     }
 
@@ -235,4 +235,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_CORE_REPMAT_H */
+#endif /* BOB5SPRO_CORE_REPMAT_H */

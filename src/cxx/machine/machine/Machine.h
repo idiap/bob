@@ -17,11 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef TORCH5SPRO_MACHINE_MACHINE_H
-#define TORCH5SPRO_MACHINE_MACHINE_H
+#ifndef BOB5SPRO_MACHINE_MACHINE_H
+#define BOB5SPRO_MACHINE_MACHINE_H
 #include <cstring>
 
-namespace Torch {
+namespace bob {
 namespace machine {
 
 
@@ -56,4 +56,4 @@ public:
 
 }
 }
-#endif // TORCH5SPRO_MACHINE_MACHINE_H
+#endif // BOB5SPRO_MACHINE_MACHINE_H

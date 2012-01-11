@@ -20,7 +20,7 @@
 #include "ip/Circle2D.h"
 #include "ip/OldColor.h"
 
-namespace Torch {
+namespace bob {
 
 Circle2D::Circle2D()
 {

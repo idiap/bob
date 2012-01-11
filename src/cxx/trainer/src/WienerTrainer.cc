@@ -12,9 +12,9 @@
 #include "core/cast.h"
 #include "sp/FFT2D.h"
 
-namespace io = Torch::io;
-namespace mach = Torch::machine;
-namespace train = Torch::trainer;
+namespace io = bob::io;
+namespace mach = bob::machine;
+namespace train = bob::trainer;
 
 train::WienerTrainer::WienerTrainer()
 {
@@ -34,16 +34,16 @@ train::WienerTrainer& train::WienerTrainer::operator=
   return *this;
 }
 
-void train::WienerTrainer::train(Torch::machine::WienerMachine& machine, 
+void train::WienerTrainer::train(bob::machine::WienerMachine& machine, 
     const io::Arrayset& ar) const 
 {
   // Checks for arrayset data type and shape once
-  if (ar.getElementType() != Torch::core::array::t_float64) {
-    throw Torch::io::TypeError(ar.getElementType(),
-        Torch::core::array::t_float64);
+  if (ar.getElementType() != bob::core::array::t_float64) {
+    throw bob::io::TypeError(ar.getElementType(),
+        bob::core::array::t_float64);
   }
   if (ar.getNDim() != 2) {
-    throw Torch::io::DimensionError(ar.getNDim(), 2);
+    throw bob::io::DimensionError(ar.getNDim(), 2);
   }
 
   // Data is checked now and conforms, just proceed w/o any further checks.
@@ -52,7 +52,7 @@ void train::WienerTrainer::train(Torch::machine::WienerMachine& machine,
   size_t width = ar.getShape()[1];
 
   // FFT2D
-  Torch::sp::FFT2D fft2d(height, width);
+  bob::sp::FFT2D fft2d(height, width);
 
   // Loads the data
   blitz::Array<double,3> data(height, width, n_samples);
@@ -60,7 +60,7 @@ void train::WienerTrainer::train(Torch::machine::WienerMachine& machine,
   blitz::Range all = blitz::Range::all();
   for (size_t i=0; i<n_samples; ++i) {
     blitz::Array<double,2> sample = ar.get<double,2>(i);
-    blitz::Array<std::complex<double>,2> sample_c = Torch::core::cast<std::complex<double> >(sample);
+    blitz::Array<std::complex<double>,2> sample_c = bob::core::cast<std::complex<double> >(sample);
     fft2d(sample_c, sample_fft);
     data(all,all,i) = blitz::abs(sample_fft);
   }

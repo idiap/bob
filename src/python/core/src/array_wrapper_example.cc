@@ -23,7 +23,7 @@
 #include "core/python/ndarray.h"
 
 using namespace boost::python;
-namespace tp = Torch::python;
+namespace tp = bob::python;
 
 /**
  * These are example methods we will bind to python. All other use-cases will

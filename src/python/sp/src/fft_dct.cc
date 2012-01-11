@@ -36,9 +36,9 @@
 #include "core/python/ndarray.h"
 
 using namespace boost::python;
-namespace sp = Torch::sp;
-namespace tp = Torch::python;
-namespace ca = Torch::core::array;
+namespace sp = bob::sp;
+namespace tp = bob::python;
+namespace ca = bob::core::array;
 
 // documentation for classes
 static const char* FFT1D_DOC = "Objects of this class, after configuration, can compute the direct FFT of a 1D array/signal.";
@@ -71,14 +71,14 @@ static object script_fft(tp::const_ndarray ar) {
   switch (info.nd) {
     case 1:
       {
-        Torch::sp::FFT1D op(info.shape[0]);
+        bob::sp::FFT1D op(info.shape[0]);
         blitz::Array<dcplx,1> res_ = res.bz<dcplx,1>();
         op(ar.bz<dcplx,1>(), res_);
       }
       break;
     case 2:
       {
-        Torch::sp::FFT2D op(info.shape[0], info.shape[1]);
+        bob::sp::FFT2D op(info.shape[0], info.shape[1]);
         blitz::Array<dcplx,2> res_ = res.bz<dcplx,2>();
         op(ar.bz<dcplx,2>(), res_);
       }
@@ -99,14 +99,14 @@ static object script_ifft(tp::const_ndarray ar) {
   switch (info.nd) {
     case 1:
       {
-        Torch::sp::IFFT1D op(info.shape[0]);
+        bob::sp::IFFT1D op(info.shape[0]);
         blitz::Array<dcplx,1> res_ = res.bz<dcplx,1>();
         op(ar.bz<dcplx,1>(), res_);
       }
       break;
     case 2:
       {
-        Torch::sp::IFFT2D op(info.shape[0], info.shape[1]);
+        bob::sp::IFFT2D op(info.shape[0], info.shape[1]);
         blitz::Array<dcplx,2> res_ = res.bz<dcplx,2>();
         op(ar.bz<dcplx,2>(), res_);
       }
@@ -126,14 +126,14 @@ static object script_dct(tp::const_ndarray ar) {
   switch (info.nd) {
     case 1:
       {
-        Torch::sp::DCT1D op(info.shape[0]);
+        bob::sp::DCT1D op(info.shape[0]);
         blitz::Array<double,1> res_ = res.bz<double,1>();
         op(ar.bz<double,1>(), res_);
       }
       break;
     case 2:
       {
-        Torch::sp::DCT2D op(info.shape[0], info.shape[1]);
+        bob::sp::DCT2D op(info.shape[0], info.shape[1]);
         blitz::Array<double,2> res_ = res.bz<double,2>();
         op(ar.bz<double,2>(), res_);
       }
@@ -153,14 +153,14 @@ static object script_idct(tp::const_ndarray ar) {
   switch (info.nd) {
     case 1:
       {
-        Torch::sp::IDCT1D op(info.shape[0]);
+        bob::sp::IDCT1D op(info.shape[0]);
         blitz::Array<double,1> res_ = res.bz<double,1>();
         op(ar.bz<double,1>(), res_);
       }
       break;
     case 2:
       {
-        Torch::sp::IDCT2D op(info.shape[0], info.shape[1]);
+        bob::sp::IDCT2D op(info.shape[0], info.shape[1]);
         blitz::Array<double,2> res_ = res.bz<double,2>();
         op(ar.bz<double,2>(), res_);
       }

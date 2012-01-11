@@ -11,9 +11,9 @@
 #include "trainer/PLDATrainer.h"
 
 using namespace boost::python;
-namespace train = Torch::trainer;
-namespace mach = Torch::machine;
-namespace io = Torch::io;
+namespace train = bob::trainer;
+namespace mach = bob::machine;
+namespace io = bob::io;
 
 
 static void plda_train(train::PLDABaseTrainer& t, mach::PLDABaseMachine& m, list l_arraysets)

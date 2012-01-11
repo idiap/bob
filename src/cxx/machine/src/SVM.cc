@@ -50,8 +50,8 @@ struct svm_model {
 };
 #endif
 
-namespace mach = Torch::machine;
-namespace array = Torch::core::array;
+namespace mach = bob::machine;
+namespace array = bob::core::array;
 
 mach::SVMFile::SVMFile (const std::string& filename, size_t shape):
   m_filename(filename),

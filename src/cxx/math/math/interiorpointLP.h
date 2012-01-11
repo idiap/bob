@@ -21,14 +21,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_MATH_INTERIOR_POINT_LP_H
-#define TORCH5SPRO_MATH_INTERIOR_POINT_LP_H 1
+#ifndef BOB5SPRO_MATH_INTERIOR_POINT_LP_H
+#define BOB5SPRO_MATH_INTERIOR_POINT_LP_H 1
 
 #include "core/logging.h"
 #include "core/Exception.h"
 //#include "math/Exception.h"
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libmath_api
  * @{
@@ -334,4 +334,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_MATH_INTERIOR_POINT_LP_H */
+#endif /* BOB5SPRO_MATH_INTERIOR_POINT_LP_H */

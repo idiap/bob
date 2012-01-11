@@ -24,9 +24,9 @@
 #include "sp/extrapolate.h"
 
 using namespace boost::python;
-namespace tp = Torch::python;
-namespace sp = Torch::sp;
-namespace ca = Torch::core::array;
+namespace tp = bob::python;
+namespace sp = bob::sp;
+namespace ca = bob::core::array;
 
 template <typename T, int N>
 static void inner_extrapolateConstant_dim_size(tp::const_ndarray a,

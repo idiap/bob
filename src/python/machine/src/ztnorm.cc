@@ -26,7 +26,7 @@
 #include <machine/ZTNorm.h>
 
 using namespace boost::python;
-namespace tp = Torch::python;
+namespace tp = bob::python;
 
 static object ztnorm1(
     tp::const_ndarray eval_tests_on_eval_models,
@@ -48,7 +48,7 @@ static object ztnorm1(
   blitz::Array<bool,2> znorm_tests_tnorm_models_same_spk_ids_ =
     znorm_tests_tnorm_models_same_spk_ids.bz<bool,2>();
 
-  Torch::machine::ztNorm(eval_tests_on_eval_models_,
+  bob::machine::ztNorm(eval_tests_on_eval_models_,
                          znorm_tests_on_eval_models_,
                          eval_tests_on_tnorm_models_,
                          znorm_tests_on_tnorm_models_,
@@ -75,7 +75,7 @@ static object ztnorm2(
 
   blitz::Array<double, 2> ret; //full copy!
 
-  Torch::machine::ztNorm(eval_tests_on_eval_models_,
+  bob::machine::ztNorm(eval_tests_on_eval_models_,
                          znorm_tests_on_eval_models_,
                          eval_tests_on_tnorm_models_,
                          znorm_tests_on_tnorm_models_,

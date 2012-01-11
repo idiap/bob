@@ -14,10 +14,10 @@ include(FindPythonInterp)
 
 # A trick, to make FindPythonLibs work in the expected way in the presence of
 # externally compiled python versions.
-get_filename_component(TORCH_PYTHON_PREFIX1 ${PYTHON_EXECUTABLE} PATH)
-get_filename_component(TORCH_PYTHON_PREFIX ${TORCH_PYTHON_PREFIX1} PATH)
+get_filename_component(BOB_PYTHON_PREFIX1 ${PYTHON_EXECUTABLE} PATH)
+get_filename_component(BOB_PYTHON_PREFIX ${BOB_PYTHON_PREFIX1} PATH)
 set(CMAKE_SYSTEM_PREFIX_OLD ${CMAKE_SYSTEM_PREFIX_PATH}) #memorize old path
-set(CMAKE_SYSTEM_PREFIX_PATH "${TORCH_PYTHON_PREFIX};${CMAKE_SYSTEM_PREFIX_PATH}")
+set(CMAKE_SYSTEM_PREFIX_PATH "${BOB_PYTHON_PREFIX};${CMAKE_SYSTEM_PREFIX_PATH}")
 include(FindPythonLibs)
 set(CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_SYSTEM_PREFIX_OLD}) #reset to old path
 

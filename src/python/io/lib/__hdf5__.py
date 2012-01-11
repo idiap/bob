@@ -6,7 +6,7 @@
 """HDF5 additions
 """
 
-from libpytorch_io import HDF5Type, HDF5File
+from libpybob_io import HDF5Type, HDF5File
 import numpy
 
 # Some HDF5 addons
@@ -48,7 +48,7 @@ def hdf5file_append(self, path, data, compression=0, dtype=None):
 
   dtype
     Is an optional parameter that forces the conversion from the type given in
-    'data' to one of the supported torch element types. Please note that the
+    'data' to one of the supported bob element types. Please note that the
     data has to be convertible to the given type by means of boost::python
     otherwise an error is raised. Also note this has no effect in case data are
     composed of arrays (in which case the selection is automatic).
@@ -106,7 +106,7 @@ def hdf5file_set(self, path, data, compression=0, dtype=None):
 
   dtype
     Is an optional parameter that forces the conversion from the type given in
-    'data' to one of the supported torch element types. Please note that the
+    'data' to one of the supported bob element types. Please note that the
     data has to be convertible to the given type by means of boost::python
     otherwise an error is raised. Also note this has no effect in case data are
     composed of arrays (in which case the selection is automatic).
@@ -143,7 +143,7 @@ def hdf5file_replace(self, path, pos, data, dtype=None):
   pos -- This is the position we should replace
   data -- This is the data that will be appended. 
   dtype -- Is an optional parameter that forces the conversion from the type
-  given in 'data' to one of the supported torch element types. Please note that
+  given in 'data' to one of the supported bob element types. Please note that
   the data has to be convertible to the given type by means of boost::python
   otherwise an error is raised. Also note this has no effect in case data are
   composed of arrays (in which case the selection is automatic).

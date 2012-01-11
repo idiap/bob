@@ -6,7 +6,7 @@
 
 import os, sys
 import unittest
-import torch
+import bob
 import numpy
 import random
 
@@ -21,12 +21,12 @@ def compare(v1, v2, width):
 def test_dct1D(N, t, eps, obj):
   # process using DCT
   u_dct = numpy.zeros((N,), 'float64')
-  dct = torch.sp.DCT1D(N)
+  dct = bob.sp.DCT1D(N)
   dct(t,u_dct)
 
   # process using inverse DCT 
   u_dct_idct = numpy.zeros((N,), 'float64')
-  idct = torch.sp.IDCT1D(N)
+  idct = bob.sp.IDCT1D(N)
   idct(u_dct,u_dct_idct)
 
   # get answer and compare to original
@@ -36,12 +36,12 @@ def test_dct1D(N, t, eps, obj):
 def test_dct2D(M, N, t, eps, obj):
   # process using DCT
   u_dct = numpy.zeros((M,N), 'float64')
-  dct = torch.sp.DCT2D(M,N)
+  dct = bob.sp.DCT2D(M,N)
   dct(t,u_dct)
 
   # process using inverse DCT 
   u_dct_idct = numpy.zeros((M,N), 'float64')
-  idct = torch.sp.IDCT2D(M,N)
+  idct = bob.sp.IDCT2D(M,N)
   idct(u_dct,u_dct_idct)
 
   # get answer and compare to original
@@ -53,12 +53,12 @@ def test_dct2D(M, N, t, eps, obj):
 def test_fft1D(N, t, eps, obj):
   # process using FFT
   u_fft = numpy.zeros((N,), 'complex128')
-  fft = torch.sp.FFT1D(N)
+  fft = bob.sp.FFT1D(N)
   fft(t,u_fft)
 
   # process using inverse FFT 
   u_fft_ifft = numpy.zeros((N,), 'complex128')
-  ifft = torch.sp.IFFT1D(N)
+  ifft = bob.sp.IFFT1D(N)
   ifft(u_fft,u_fft_ifft)
 
   # get answer and compare to original
@@ -69,12 +69,12 @@ def test_fft1D(N, t, eps, obj):
 def test_fft2D(M, N, t, eps, obj):
   # process using FFT
   u_fft = numpy.zeros((M,N), 'complex128')
-  fft = torch.sp.FFT2D(M,N)
+  fft = bob.sp.FFT2D(M,N)
   fft(t,u_fft)
 
   # process using inverse FFT 
   u_fft_ifft = numpy.zeros((M,N), 'complex128')
-  ifft = torch.sp.IFFT2D(M,N)
+  ifft = bob.sp.IFFT2D(M,N)
   ifft(u_fft,u_fft_ifft)
 
   # get answer and compare to original
@@ -211,14 +211,14 @@ class TransformTest(unittest.TestCase):
 ##################### Main ##################  
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()
 

@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_IP_SCALE_H
-#define TORCH5SPRO_IP_SCALE_H
+#ifndef BOB5SPRO_IP_SCALE_H
+#define BOB5SPRO_IP_SCALE_H
 
 #include "core/array_assert.h"
 #include "core/array_index.h"
@@ -29,9 +29,9 @@
 #include "ip/Exception.h"
 #include "ip/common.h"
 
-namespace tca = Torch::core::array;
+namespace tca = bob::core::array;
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libip_api
  * @{
@@ -131,7 +131,7 @@ namespace Torch {
       if( height==src.extent(0) && width==src.extent(1)) {
         for( int y=0; y<src.extent(0); ++y)
           for( int x=0; x<src.extent(1); ++x)
-            dst(y,x) = Torch::core::cast<double>(src(y,x));
+            dst(y,x) = bob::core::cast<double>(src(y,x));
       }
       // Otherwise, do the rescaling
       else
@@ -147,7 +147,7 @@ namespace Torch {
             }
             break;
           default:
-            throw Torch::ip::UnknownScalingAlgorithm();
+            throw bob::ip::UnknownScalingAlgorithm();
         }
       }
     }
@@ -192,7 +192,7 @@ namespace Torch {
       if( height==src.extent(0) && width==src.extent(1)) {
         for( int y=0; y<src.extent(0); ++y)
           for( int x=0; x<src.extent(1); ++x)
-            dst(y,x) = Torch::core::cast<double>(src(y,x));
+            dst(y,x) = bob::core::cast<double>(src(y,x));
         detail::copyNoCheck(src_mask,dst_mask); 
       }
       // Otherwise, do the rescaling
@@ -208,7 +208,7 @@ namespace Torch {
             }
             break;
           default:
-            throw Torch::ip::UnknownScalingAlgorithm();
+            throw bob::ip::UnknownScalingAlgorithm();
         }
       }
     }
@@ -237,4 +237,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_IP_SCALE_H */
+#endif /* BOB5SPRO_IP_SCALE_H */

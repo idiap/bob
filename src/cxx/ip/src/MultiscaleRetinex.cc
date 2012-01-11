@@ -22,7 +22,7 @@
 
 #include "ip/MultiscaleRetinex.h"
 
-namespace ip = Torch::ip;
+namespace ip = bob::ip;
 
 void ip::MultiscaleRetinex::computeKernels()
 {
@@ -34,6 +34,6 @@ void ip::MultiscaleRetinex::computeKernels()
     double s_sigma = m_sigma * s_size / m_size_min;
     // Initialize the Gaussian
     m_gaussians[s].reset(s_size, s_size, s_sigma, s_sigma, 
-      Torch::sp::Convolution::Same, m_conv_border);
+      bob::sp::Convolution::Same, m_conv_border);
   }
 }

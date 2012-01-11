@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IP_COLOR_H 
-#define TORCH_IP_COLOR_H
+#ifndef BOB_IP_COLOR_H 
+#define BOB_IP_COLOR_H
 
 #include <stdint.h>
 #include <boost/tuple/tuple.hpp>
@@ -35,21 +35,21 @@
 #include "core/array_type.h"
 #include "core/array_assert.h"
 
-namespace Torch { namespace ip {
+namespace bob { namespace ip {
 
   /**
    * This exception is thrown when the color conversion for a particular type
-   * is not implemented in torch
+   * is not implemented in bob
    */
   class UnsupportedTypeForColorConversion: public ip::Exception {
     public:
-      UnsupportedTypeForColorConversion(Torch::core::array::ElementType eltype) throw(); 
+      UnsupportedTypeForColorConversion(bob::core::array::ElementType eltype) throw(); 
       virtual ~UnsupportedTypeForColorConversion() throw();
       virtual const char* what() const throw();
 
     private:
 
-      Torch::core::array::ElementType m_eltype;
+      bob::core::array::ElementType m_eltype;
       mutable std::string m_message;
   };
 
@@ -82,7 +82,7 @@ namespace Torch { namespace ip {
    * implementations in this file to understand supported types.
    */
   template <typename T> void rgb_to_hsv_one (T r, T g, T b, T& h, T& s, T& v) {
-    throw UnsupportedTypeForColorConversion(Torch::core::array::getElementType<T>());
+    throw UnsupportedTypeForColorConversion(bob::core::array::getElementType<T>());
   }
 
   /**
@@ -117,7 +117,7 @@ namespace Torch { namespace ip {
    * implementations in this file to understand supported types.
    */
   template <typename T> void hsv_to_rgb_one (T h, T s, T v, T& r, T& g, T& b) {
-    throw UnsupportedTypeForColorConversion(Torch::core::array::getElementType<T>());
+    throw UnsupportedTypeForColorConversion(bob::core::array::getElementType<T>());
   }
 
   /**
@@ -153,7 +153,7 @@ namespace Torch { namespace ip {
    * implementations in this file to understand supported types.
    */
   template <typename T> void rgb_to_hsl_one (T r, T g, T b, T& h, T& s, T& l) {
-    throw UnsupportedTypeForColorConversion(Torch::core::array::getElementType<T>());
+    throw UnsupportedTypeForColorConversion(bob::core::array::getElementType<T>());
   }
 
   /**
@@ -185,7 +185,7 @@ namespace Torch { namespace ip {
    * implementations in this file to understand supported types.
    */
   template <typename T> void hsl_to_rgb_one (T h, T s, T l, T& r, T& g, T& b) {
-    throw UnsupportedTypeForColorConversion(Torch::core::array::getElementType<T>());
+    throw UnsupportedTypeForColorConversion(bob::core::array::getElementType<T>());
   }
   
   /**
@@ -222,7 +222,7 @@ namespace Torch { namespace ip {
    * implementations in this file to understand supported types.
    */
   template <typename T> void rgb_to_yuv_one (T r, T g, T b, T& y, T& u, T& v) {
-    throw UnsupportedTypeForColorConversion(Torch::core::array::getElementType<T>());
+    throw UnsupportedTypeForColorConversion(bob::core::array::getElementType<T>());
   }
 
   /**
@@ -272,7 +272,7 @@ namespace Torch { namespace ip {
    * implementations in this file to understand supported types.
    */
   template <typename T> void yuv_to_rgb_one (T y, T u, T v, T& r, T& g, T& b) {
-    throw UnsupportedTypeForColorConversion(Torch::core::array::getElementType<T>());
+    throw UnsupportedTypeForColorConversion(bob::core::array::getElementType<T>());
   }
   
   /**
@@ -314,7 +314,7 @@ namespace Torch { namespace ip {
    * implementations in this file to understand supported types.
    */
   template <typename T> void rgb_to_gray_one (T r, T g, T b, T& gray) {
-    throw UnsupportedTypeForColorConversion(Torch::core::array::getElementType<T>());
+    throw UnsupportedTypeForColorConversion(bob::core::array::getElementType<T>());
   }
   
   /**
@@ -363,7 +363,7 @@ namespace Torch { namespace ip {
   template <typename T> void rgb_to_hsv (const blitz::Array<T,3>& from,
       blitz::Array<T,3>& to) {
     if (from.extent(0) != 3) throw UnsupportedRowExtent(3, from.extent(0));
-    Torch::core::array::assertSameShape(from, to);
+    bob::core::array::assertSameShape(from, to);
     for (int j=0; j<from.extent(1); ++j) 
       for (int k=0; k<from.extent(2); ++k)
         rgb_to_hsv_one(from(0,j,k), from(1,j,k), from(2,j,k), 
@@ -382,7 +382,7 @@ namespace Torch { namespace ip {
   template <typename T> void hsv_to_rgb (const blitz::Array<T,3>& from,
       blitz::Array<T,3>& to) {
     if (from.extent(0) != 3) throw UnsupportedRowExtent(3, from.extent(0));
-    Torch::core::array::assertSameShape(from, to);
+    bob::core::array::assertSameShape(from, to);
     for (int j=0; j<from.extent(1); ++j) 
       for (int k=0; k<from.extent(2); ++k)
         hsv_to_rgb_one(from(0,j,k), from(1,j,k), from(2,j,k), 
@@ -401,7 +401,7 @@ namespace Torch { namespace ip {
   template <typename T> void rgb_to_hsl (const blitz::Array<T,3>& from,
       blitz::Array<T,3>& to) {
     if (from.extent(0) != 3) throw UnsupportedRowExtent(3, from.extent(0));
-    Torch::core::array::assertSameShape(from, to);
+    bob::core::array::assertSameShape(from, to);
     for (int j=0; j<from.extent(1); ++j) 
       for (int k=0; k<from.extent(2); ++k)
         rgb_to_hsl_one(from(0,j,k), from(1,j,k), from(2,j,k), 
@@ -420,7 +420,7 @@ namespace Torch { namespace ip {
   template <typename T> void hsl_to_rgb (const blitz::Array<T,3>& from,
       blitz::Array<T,3>& to) {
     if (from.extent(0) != 3) throw UnsupportedRowExtent(3, from.extent(0));
-    Torch::core::array::assertSameShape(from, to);
+    bob::core::array::assertSameShape(from, to);
     for (int j=0; j<from.extent(1); ++j) 
       for (int k=0; k<from.extent(2); ++k)
         hsl_to_rgb_one(from(0,j,k), from(1,j,k), from(2,j,k), 
@@ -440,7 +440,7 @@ namespace Torch { namespace ip {
   template <typename T> void rgb_to_yuv (const blitz::Array<T,3>& from,
       blitz::Array<T,3>& to) {
     if (from.extent(0) != 3) throw UnsupportedRowExtent(3, from.extent(0));
-    Torch::core::array::assertSameShape(from, to);
+    bob::core::array::assertSameShape(from, to);
     for (int j=0; j<from.extent(1); ++j) 
       for (int k=0; k<from.extent(2); ++k)
         rgb_to_yuv_one(from(0,j,k), from(1,j,k), from(2,j,k), 
@@ -460,7 +460,7 @@ namespace Torch { namespace ip {
   template <typename T> void yuv_to_rgb (const blitz::Array<T,3>& from,
       blitz::Array<T,3>& to) {
     if (from.extent(0) != 3) throw UnsupportedRowExtent(3, from.extent(0));
-    Torch::core::array::assertSameShape(from, to);
+    bob::core::array::assertSameShape(from, to);
     for (int j=0; j<from.extent(1); ++j) 
       for (int k=0; k<from.extent(2); ++k)
         yuv_to_rgb_one(from(0,j,k), from(1,j,k), from(2,j,k), 
@@ -480,8 +480,8 @@ namespace Torch { namespace ip {
   template <typename T> void rgb_to_gray (const blitz::Array<T,3>& from,
       blitz::Array<T,2>& to) {
     if (from.extent(0) != 3) throw UnsupportedRowExtent(3, from.extent(0));
-    Torch::core::array::assertSameDimensionLength(from.extent(1), to.extent(0));
-    Torch::core::array::assertSameDimensionLength(from.extent(2), to.extent(1));
+    bob::core::array::assertSameDimensionLength(from.extent(1), to.extent(0));
+    bob::core::array::assertSameDimensionLength(from.extent(2), to.extent(1));
     for (int j=0; j<from.extent(1); ++j)
       for (int k=0; k<from.extent(2); ++k)
         rgb_to_gray_one(from(0,j,k), from(1,j,k), from(2,j,k), to(j,k));
@@ -497,8 +497,8 @@ namespace Torch { namespace ip {
   template <typename T> void gray_to_rgb (const blitz::Array<T,2>& from,
       blitz::Array<T,3>& to) {
     if (to.extent(0) != 3) throw UnsupportedRowExtent(3, to.extent(0));
-    Torch::core::array::assertSameDimensionLength(to.extent(1), from.extent(0));
-    Torch::core::array::assertSameDimensionLength(to.extent(2), from.extent(1));
+    bob::core::array::assertSameDimensionLength(to.extent(1), from.extent(0));
+    bob::core::array::assertSameDimensionLength(to.extent(2), from.extent(1));
     for (int j=0; j<from.extent(1); ++j) 
       for (int k=0; k<from.extent(2); ++k)
         gray_to_rgb_one(from(j,k), to(0,j,k), to(1,j,k), to(2,j,k));
@@ -506,4 +506,4 @@ namespace Torch { namespace ip {
 
 }}
 
-#endif /* TORCH_IP_COLOR_H */
+#endif /* BOB_IP_COLOR_H */

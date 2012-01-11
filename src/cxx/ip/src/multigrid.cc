@@ -39,7 +39,7 @@
 //************************************************************************************
 
 
-namespace Torch {
+namespace bob {
 
 
 	void restriction(const DoubleTensor& data, DoubleTensor& restricted )

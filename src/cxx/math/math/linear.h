@@ -21,13 +21,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_MATH_LINEAR_H
-#define TORCH_MATH_LINEAR_H
+#ifndef BOB_MATH_LINEAR_H
+#define BOB_MATH_LINEAR_H
 
 #include <blitz/array.h>
 #include "core/array_assert.h"
 
-namespace Torch { namespace math {
+namespace bob { namespace math {
 
   /**
    * Performs the matrix multiplication C=A*B
@@ -64,14 +64,14 @@ namespace Torch { namespace math {
     void prod(const blitz::Array<T1,2>& A, const blitz::Array<T2,2>& B,
         blitz::Array<T3,2>& C) {
       // Check inputs
-      Torch::core::array::assertZeroBase(A);
-      Torch::core::array::assertZeroBase(B);
-      Torch::core::array::assertSameDimensionLength(A.extent(1),B.extent(0));
+      bob::core::array::assertZeroBase(A);
+      bob::core::array::assertZeroBase(B);
+      bob::core::array::assertSameDimensionLength(A.extent(1),B.extent(0));
 
       // Check output
-      Torch::core::array::assertZeroBase(C);
-      Torch::core::array::assertSameDimensionLength(A.extent(0), C.extent(0));
-      Torch::core::array::assertSameDimensionLength(B.extent(1), C.extent(1));
+      bob::core::array::assertZeroBase(C);
+      bob::core::array::assertSameDimensionLength(A.extent(0), C.extent(0));
+      bob::core::array::assertSameDimensionLength(B.extent(1), C.extent(1));
 
       prod_(A, B, C);
     }
@@ -110,13 +110,13 @@ namespace Torch { namespace math {
     void prod(const blitz::Array<T1,2>& A, const blitz::Array<T2,1>& b,
         blitz::Array<T3,1>& c) {
       // Check inputs
-      Torch::core::array::assertZeroBase(A);
-      Torch::core::array::assertZeroBase(b);
-      Torch::core::array::assertSameDimensionLength(A.extent(1),b.extent(0));
+      bob::core::array::assertZeroBase(A);
+      bob::core::array::assertZeroBase(b);
+      bob::core::array::assertSameDimensionLength(A.extent(1),b.extent(0));
 
       // Check output
-      Torch::core::array::assertZeroBase(c);
-      Torch::core::array::assertSameDimensionLength(c.extent(0), A.extent(0));
+      bob::core::array::assertZeroBase(c);
+      bob::core::array::assertSameDimensionLength(c.extent(0), A.extent(0));
 
       prod_(A, b, c);
     }
@@ -155,13 +155,13 @@ namespace Torch { namespace math {
     void prod(const blitz::Array<T1,1>& a, const blitz::Array<T2,2>& B,
         blitz::Array<T3,1>& c) {
       // Check inputs
-      Torch::core::array::assertZeroBase(a);
-      Torch::core::array::assertZeroBase(B);
-      Torch::core::array::assertSameDimensionLength(a.extent(0),B.extent(0));
+      bob::core::array::assertZeroBase(a);
+      bob::core::array::assertZeroBase(B);
+      bob::core::array::assertSameDimensionLength(a.extent(0),B.extent(0));
 
       // Check output
-      Torch::core::array::assertZeroBase(c);
-      Torch::core::array::assertSameDimensionLength(c.extent(0), B.extent(1));
+      bob::core::array::assertZeroBase(c);
+      bob::core::array::assertSameDimensionLength(c.extent(0), B.extent(1));
 
       prod_(a, B, c);
     }
@@ -200,13 +200,13 @@ namespace Torch { namespace math {
     void prod(const blitz::Array<T1,1>& a, const blitz::Array<T2,1>& b,
         blitz::Array<T3,2>& C) {
       // Check inputs
-      Torch::core::array::assertZeroBase(a);
-      Torch::core::array::assertZeroBase(b);
+      bob::core::array::assertZeroBase(a);
+      bob::core::array::assertZeroBase(b);
 
       // Check output
-      Torch::core::array::assertZeroBase(C);
-      Torch::core::array::assertSameDimensionLength(C.extent(0), a.extent(0));
-      Torch::core::array::assertSameDimensionLength(C.extent(1), b.extent(0));
+      bob::core::array::assertZeroBase(C);
+      bob::core::array::assertSameDimensionLength(C.extent(0), a.extent(0));
+      bob::core::array::assertSameDimensionLength(C.extent(1), b.extent(0));
 
       prod_(a, b, C);
     }
@@ -242,9 +242,9 @@ namespace Torch { namespace math {
   template<typename T1, typename T2>
     T1 dot(const blitz::Array<T1,1>& a, const blitz::Array<T2,1>& b) {
       // Check inputs
-      Torch::core::array::assertZeroBase(a);
-      Torch::core::array::assertZeroBase(b);
-      Torch::core::array::assertSameDimensionLength(a.extent(0),b.extent(0));
+      bob::core::array::assertZeroBase(a);
+      bob::core::array::assertZeroBase(b);
+      bob::core::array::assertSameDimensionLength(a.extent(0),b.extent(0));
 
       return dot_(a, b);
     }
@@ -276,8 +276,8 @@ namespace Torch { namespace math {
    */
   template<typename T> T trace(const blitz::Array<T,2>& A) {
     // Check input
-    Torch::core::array::assertZeroBase(A);
-    Torch::core::array::assertSameDimensionLength(A.extent(0),A.extent(1));
+    bob::core::array::assertZeroBase(A);
+    bob::core::array::assertSameDimensionLength(A.extent(0),A.extent(1));
 
     return trace_(A);
   }
@@ -321,7 +321,7 @@ namespace Torch { namespace math {
   template<typename T1, typename T2> void normalize(const blitz::Array<T1,1>& i,
       blitz::Array<T2,1>& o) {
     // Check input
-    Torch::core::array::assertSameDimensionLength(i.extent(0),o.extent(0));
+    bob::core::array::assertSameDimensionLength(i.extent(0),o.extent(0));
     normalize_(i, o);
   }
 
@@ -350,7 +350,7 @@ namespace Torch { namespace math {
    */
   template<typename T>
     void eye(blitz::Array<T,2>& A) {
-      Torch::core::array::assertZeroBase(A);
+      bob::core::array::assertZeroBase(A);
       eye_(A);
     }
 
@@ -379,13 +379,13 @@ namespace Torch { namespace math {
    */
   template<typename T>
     void diag(const blitz::Array<T,1>& d, blitz::Array<T,2>& A) {
-      Torch::core::array::assertZeroBase(d);
-      Torch::core::array::assertZeroBase(A);
-      Torch::core::array::assertSameDimensionLength(d.extent(0),A.extent(0));
-      Torch::core::array::assertSameDimensionLength(A.extent(0),A.extent(1));
+      bob::core::array::assertZeroBase(d);
+      bob::core::array::assertZeroBase(A);
+      bob::core::array::assertSameDimensionLength(d.extent(0),A.extent(0));
+      bob::core::array::assertSameDimensionLength(A.extent(0),A.extent(1));
       diag_(d, A);
     }
 
 }}
 
-#endif /* TORCH_MATH_LINEAR_H */
+#endif /* BOB_MATH_LINEAR_H */

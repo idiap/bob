@@ -28,10 +28,10 @@
 #include "trainer/Exception.h"
 #include "trainer/MLPRPropTrainer.h"
 
-namespace array = Torch::core::array;
-namespace mach = Torch::machine;
-namespace math = Torch::math;
-namespace train = Torch::trainer;
+namespace array = bob::core::array;
+namespace mach = bob::machine;
+namespace math = bob::math;
+namespace train = bob::trainer;
 
 train::MLPRPropTrainer::MLPRPropTrainer(const mach::MLP& machine,
     size_t batch_size):
@@ -99,21 +99,21 @@ train::MLPRPropTrainer::MLPRPropTrainer(const MLPRPropTrainer& other):
   m_prev_deriv_bias(m_H + 1),
   m_actfun(other.m_actfun),
   m_bwdfun(other.m_bwdfun),
-  m_target(Torch::core::array::ccopy(other.m_target)),
+  m_target(bob::core::array::ccopy(other.m_target)),
   m_error(m_H + 1),
   m_output(m_H + 2)
 {
   for (size_t k=0; k<(m_H + 1); ++k) {
-    m_delta[k].reference(Torch::core::array::ccopy(other.m_delta[k]));
-    m_delta_bias[k].reference(Torch::core::array::ccopy(other.m_delta_bias[k]));
-    m_deriv[k].reference(Torch::core::array::ccopy(other.m_deriv[k]));
-    m_deriv_bias[k].reference(Torch::core::array::ccopy(other.m_deriv_bias[k]));
-    m_prev_deriv[k].reference(Torch::core::array::ccopy(other.m_prev_deriv[k]));
-    m_prev_deriv_bias[k].reference(Torch::core::array::ccopy(other.m_prev_deriv_bias[k]));
-    m_error[k].reference(Torch::core::array::ccopy(other.m_error[k]));
-    m_output[k].reference(Torch::core::array::ccopy(other.m_output[k]));
+    m_delta[k].reference(bob::core::array::ccopy(other.m_delta[k]));
+    m_delta_bias[k].reference(bob::core::array::ccopy(other.m_delta_bias[k]));
+    m_deriv[k].reference(bob::core::array::ccopy(other.m_deriv[k]));
+    m_deriv_bias[k].reference(bob::core::array::ccopy(other.m_deriv_bias[k]));
+    m_prev_deriv[k].reference(bob::core::array::ccopy(other.m_prev_deriv[k]));
+    m_prev_deriv_bias[k].reference(bob::core::array::ccopy(other.m_prev_deriv_bias[k]));
+    m_error[k].reference(bob::core::array::ccopy(other.m_error[k]));
+    m_output[k].reference(bob::core::array::ccopy(other.m_output[k]));
   }
-  m_output[m_H + 1].reference(Torch::core::array::ccopy(other.m_output[m_H + 1]));
+  m_output[m_H + 1].reference(bob::core::array::ccopy(other.m_output[m_H + 1]));
 }
 
 train::MLPRPropTrainer& train::MLPRPropTrainer::operator=
@@ -130,21 +130,21 @@ train::MLPRPropTrainer& train::MLPRPropTrainer::operator=
   m_prev_deriv_bias.resize(m_H + 1);
   m_actfun = other.m_actfun;
   m_bwdfun = other.m_bwdfun;
-  m_target.reference(Torch::core::array::ccopy(other.m_target));
+  m_target.reference(bob::core::array::ccopy(other.m_target));
   m_error.resize(m_H + 1);
   m_output.resize(m_H + 2);
 
   for (size_t k=0; k<(m_H + 1); ++k) {
-    m_delta[k].reference(Torch::core::array::ccopy(other.m_delta[k]));
-    m_delta_bias[k].reference(Torch::core::array::ccopy(other.m_delta_bias[k]));
-    m_deriv[k].reference(Torch::core::array::ccopy(other.m_deriv[k]));
-    m_deriv_bias[k].reference(Torch::core::array::ccopy(other.m_deriv_bias[k]));
-    m_prev_deriv[k].reference(Torch::core::array::ccopy(other.m_prev_deriv[k]));
-    m_prev_deriv_bias[k].reference(Torch::core::array::ccopy(other.m_prev_deriv_bias[k]));
-    m_error[k].reference(Torch::core::array::ccopy(other.m_error[k]));
-    m_output[k].reference(Torch::core::array::ccopy(other.m_output[k]));
+    m_delta[k].reference(bob::core::array::ccopy(other.m_delta[k]));
+    m_delta_bias[k].reference(bob::core::array::ccopy(other.m_delta_bias[k]));
+    m_deriv[k].reference(bob::core::array::ccopy(other.m_deriv[k]));
+    m_deriv_bias[k].reference(bob::core::array::ccopy(other.m_deriv_bias[k]));
+    m_prev_deriv[k].reference(bob::core::array::ccopy(other.m_prev_deriv[k]));
+    m_prev_deriv_bias[k].reference(bob::core::array::ccopy(other.m_prev_deriv_bias[k]));
+    m_error[k].reference(bob::core::array::ccopy(other.m_error[k]));
+    m_output[k].reference(bob::core::array::ccopy(other.m_output[k]));
   }
-  m_output[m_H + 1].reference(Torch::core::array::ccopy(other.m_output[m_H + 1]));
+  m_output[m_H + 1].reference(bob::core::array::ccopy(other.m_output[m_H + 1]));
 
   return *this;
 }
@@ -305,7 +305,7 @@ void train::MLPRPropTrainer::rprop_weight_update() {
   }
 }
 
-void train::MLPRPropTrainer::train(Torch::machine::MLP& machine,
+void train::MLPRPropTrainer::train(bob::machine::MLP& machine,
     const blitz::Array<double,2>& input,
     const blitz::Array<double,2>& target) {
   if (!isCompatible(machine)) throw train::IncompatibleMachine();
@@ -314,7 +314,7 @@ void train::MLPRPropTrainer::train(Torch::machine::MLP& machine,
   train_(machine, input, target);
 }
 
-void train::MLPRPropTrainer::train_(Torch::machine::MLP& machine,
+void train::MLPRPropTrainer::train_(bob::machine::MLP& machine,
     const blitz::Array<double,2>& input,
     const blitz::Array<double,2>& target) {
 

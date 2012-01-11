@@ -26,11 +26,11 @@
 #include "core/python/ndarray.h"
 
 using namespace boost::python;
-namespace math = Torch::math;
-namespace tp = Torch::python;
-namespace ca = Torch::core::array;
+namespace math = bob::math;
+namespace tp = bob::python;
+namespace ca = bob::core::array;
 
-namespace math = Torch::math;
+namespace math = bob::math;
 
 static const char* LU_DOC = "Decompose a matrix A into L and U, s.t P*A = L*U. The decomposition is performed using the LAPACK library.";
 static const char* LU_P_DOC = "Decompose a matrix A into L and U, s.t P*A = L*U. The decomposition is performed using the LAPACK library. This function will allocate the resulting arrays 'L', 'U' an d 'P' internally every time it is called.";
@@ -91,8 +91,8 @@ void bind_math_lu_det() {
   def("lu_", &lu_, (arg("A"), arg("L"), arg("U"), arg("P")), LU_DOC);
   def("lu", &py_lu, (arg("A")), LU_P_DOC);
   // Compute the determinant of a square matrix, based on an LU decomposition
-  def("det_", (double (*)(const blitz::Array<double,2>& A))&Torch::math::det_, (arg("A")), DET_DOC);
-  def("det", (double (*)(const blitz::Array<double,2>& A))&Torch::math::det, (arg("A")), DET_DOC);
+  def("det_", (double (*)(const blitz::Array<double,2>& A))&bob::math::det_, (arg("A")), DET_DOC);
+  def("det", (double (*)(const blitz::Array<double,2>& A))&bob::math::det, (arg("A")), DET_DOC);
   // Compute the inverse of a square matrix, based on an LU decomposition
   def("inv", &inv, (arg("A"), arg("B")), INV_DOC);
   def("inv_", &inv_, (arg("A"), arg("B")), INV_DOC);

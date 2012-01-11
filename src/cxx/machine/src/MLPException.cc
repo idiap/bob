@@ -23,7 +23,7 @@
 #include <boost/format.hpp>
 #include "machine/MLPException.h"
 
-namespace mach = Torch::machine;
+namespace mach = bob::machine;
 
 mach::InvalidShape::InvalidShape() throw() {
 }

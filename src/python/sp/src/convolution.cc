@@ -24,21 +24,21 @@
 #include "core/python/ndarray.h"
 
 using namespace boost::python;
-namespace tp = Torch::python;
-namespace ca = Torch::core::array;
+namespace tp = bob::python;
+namespace ca = bob::core::array;
 
 template <typename T, int N> static void inner_convolve_type_dim
 (tp::const_ndarray a, tp::const_ndarray b, tp::ndarray c, 
- const enum Torch::sp::Convolution::SizeOption d, 
- const enum Torch::sp::Convolution::BorderOption e) {
+ const enum bob::sp::Convolution::SizeOption d, 
+ const enum bob::sp::Convolution::BorderOption e) {
   blitz::Array<T,N> c_ = c.bz<T,N>();
-  Torch::sp::convolve(a.bz<T,N>(), b.bz<T,N>(), c_, d, e);
+  bob::sp::convolve(a.bz<T,N>(), b.bz<T,N>(), c_, d, e);
 }
 
 template <typename T> static void inner_convolve_dim
 (size_t nd, tp::const_ndarray a, tp::const_ndarray b, tp::ndarray c,
- const enum Torch::sp::Convolution::SizeOption d, 
- const enum Torch::sp::Convolution::BorderOption e) {
+ const enum bob::sp::Convolution::SizeOption d, 
+ const enum bob::sp::Convolution::BorderOption e) {
   switch (nd) {
     case 1: return inner_convolve_type_dim<T,1>(a,b,c,d,e);
     case 2: return inner_convolve_type_dim<T,2>(a,b,c,d,e);
@@ -47,8 +47,8 @@ template <typename T> static void inner_convolve_dim
 }
 
 static void convolve(tp::const_ndarray a, tp::const_ndarray b, tp::ndarray c, 
- const enum Torch::sp::Convolution::SizeOption d=Torch::sp::Convolution::Full, 
- const enum Torch::sp::Convolution::BorderOption e=Torch::sp::Convolution::Zero)
+ const enum bob::sp::Convolution::SizeOption d=bob::sp::Convolution::Full, 
+ const enum bob::sp::Convolution::BorderOption e=bob::sp::Convolution::Zero)
 {
   const ca::typeinfo& info = a.type();
   switch (info.dtype) {
@@ -84,13 +84,13 @@ static void convolve(tp::const_ndarray a, tp::const_ndarray b, tp::ndarray c,
 
 template <typename T, int N> static object inner_convolve_size_type_dim
 (tp::const_ndarray b, tp::const_ndarray c, 
- const enum Torch::sp::Convolution::SizeOption d) {
-  return object(Torch::sp::getConvolveOutputSize(b.bz<T,N>(), c.bz<T,N>(), d));
+ const enum bob::sp::Convolution::SizeOption d) {
+  return object(bob::sp::getConvolveOutputSize(b.bz<T,N>(), c.bz<T,N>(), d));
 }
 
 template <typename T> static object inner_convolve_size_dim
 (size_t nd, tp::const_ndarray b, tp::const_ndarray c,
- const enum Torch::sp::Convolution::SizeOption d) {
+ const enum bob::sp::Convolution::SizeOption d) {
   switch (nd) {
     case 1: return inner_convolve_size_type_dim<T,1>(b,c,d);
     case 2: return inner_convolve_size_type_dim<T,2>(b,c,d);
@@ -99,7 +99,7 @@ template <typename T> static object inner_convolve_size_dim
 }
 
 static object convolve_size(tp::const_ndarray b, tp::const_ndarray c, 
- const enum Torch::sp::Convolution::SizeOption d=Torch::sp::Convolution::Full)
+ const enum bob::sp::Convolution::SizeOption d=bob::sp::Convolution::Full)
 {
   const ca::typeinfo& info = b.type();
   switch (info.dtype) {
@@ -135,16 +135,16 @@ static object convolve_size(tp::const_ndarray b, tp::const_ndarray c,
 
 template <typename T, int N> static void inner_convolve_sep_type_dim
 (tp::const_ndarray a, tp::const_ndarray b, tp::ndarray c, int dim,
- const enum Torch::sp::Convolution::SizeOption d, 
- const enum Torch::sp::Convolution::BorderOption e) {
+ const enum bob::sp::Convolution::SizeOption d, 
+ const enum bob::sp::Convolution::BorderOption e) {
   blitz::Array<T,N> c_ = c.bz<T,N>();
-  Torch::sp::convolveSep(a.bz<T,N>(), b.bz<T,1>(), c_, dim, d, e);
+  bob::sp::convolveSep(a.bz<T,N>(), b.bz<T,1>(), c_, dim, d, e);
 }
 
 template <typename T> static void inner_convolve_sep_dim
 (size_t nd, tp::const_ndarray a, tp::const_ndarray b, tp::ndarray c, int dim,
- const enum Torch::sp::Convolution::SizeOption d, 
- const enum Torch::sp::Convolution::BorderOption e) {
+ const enum bob::sp::Convolution::SizeOption d, 
+ const enum bob::sp::Convolution::BorderOption e) {
   switch (nd) {
     case 2: return inner_convolve_sep_type_dim<T,2>(a,b,c,dim,d,e);
     case 3: return inner_convolve_sep_type_dim<T,3>(a,b,c,dim,d,e);
@@ -155,8 +155,8 @@ template <typename T> static void inner_convolve_sep_dim
 
 static void convolve_sep(tp::const_ndarray a, tp::const_ndarray b,
  tp::ndarray c, int dim,
- const enum Torch::sp::Convolution::SizeOption d=Torch::sp::Convolution::Full, 
- const enum Torch::sp::Convolution::BorderOption e=Torch::sp::Convolution::Zero)
+ const enum bob::sp::Convolution::SizeOption d=bob::sp::Convolution::Full, 
+ const enum bob::sp::Convolution::BorderOption e=bob::sp::Convolution::Zero)
 {
   const ca::typeinfo& info = a.type();
   switch (info.dtype) {
@@ -192,14 +192,14 @@ static void convolve_sep(tp::const_ndarray a, tp::const_ndarray b,
 
 template <typename T, int N> static object inner_convolve_sep_size_type_dim
 (tp::const_ndarray b, tp::const_ndarray c, int dim,
- const enum Torch::sp::Convolution::SizeOption d) {
-  return object(Torch::sp::getConvolveSepOutputSize(b.bz<T,N>(), c.bz<T,1>(), 
+ const enum bob::sp::Convolution::SizeOption d) {
+  return object(bob::sp::getConvolveSepOutputSize(b.bz<T,N>(), c.bz<T,1>(), 
         dim, d));
 }
 
 template <typename T> static object inner_convolve_sep_size_dim
 (size_t nd, tp::const_ndarray b, tp::const_ndarray c, int dim,
- const enum Torch::sp::Convolution::SizeOption d) {
+ const enum bob::sp::Convolution::SizeOption d) {
   switch (nd) {
     case 2: return inner_convolve_sep_size_type_dim<T,2>(b,c,dim,d);
     case 3: return inner_convolve_sep_size_type_dim<T,3>(b,c,dim,d);
@@ -209,7 +209,7 @@ template <typename T> static object inner_convolve_sep_size_dim
 }
 
 static object convolve_sep_size(tp::const_ndarray b, tp::const_ndarray c,
- int dim, const enum Torch::sp::Convolution::SizeOption d=Torch::sp::Convolution::Full)
+ int dim, const enum bob::sp::Convolution::SizeOption d=bob::sp::Convolution::Full)
 {
   const ca::typeinfo& info = b.type();
   switch (info.dtype) {
@@ -250,17 +250,17 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(convolve_sep_size_overloads, convolve_sep_size, 
 
 void bind_sp_convolution()
 {
-  enum_<Torch::sp::Convolution::SizeOption>("ConvolutionSize")
-    .value("Full", Torch::sp::Convolution::Full)
-    .value("Same", Torch::sp::Convolution::Same)
-    .value("Valid", Torch::sp::Convolution::Valid)
+  enum_<bob::sp::Convolution::SizeOption>("ConvolutionSize")
+    .value("Full", bob::sp::Convolution::Full)
+    .value("Same", bob::sp::Convolution::Same)
+    .value("Valid", bob::sp::Convolution::Valid)
     ;
  
-  enum_<Torch::sp::Convolution::BorderOption>("ConvolutionBorder")
-    .value("Zero", Torch::sp::Convolution::Zero)
-    .value("NearestNeighbour", Torch::sp::Convolution::NearestNeighbour)
-    .value("Circular", Torch::sp::Convolution::Circular)
-    .value("Mirror", Torch::sp::Convolution::Mirror)
+  enum_<bob::sp::Convolution::BorderOption>("ConvolutionBorder")
+    .value("Zero", bob::sp::Convolution::Zero)
+    .value("NearestNeighbour", bob::sp::Convolution::NearestNeighbour)
+    .value("Circular", bob::sp::Convolution::Circular)
+    .value("Mirror", bob::sp::Convolution::Mirror)
     ;
  
   def("convolve", &convolve, convolve_overloads((arg("b"), arg("c"), arg("a"), arg("size_opt")="Full", arg("border_opt")="Zero"), "Compute the convolution product of two blitz arrays using zero padding and return the results as a blitz array. The option field allows to give information about the size of the output (FULL, SAME, VALID)"));

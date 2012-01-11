@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IO_HDF5TYPES_H
-#define TORCH_IO_HDF5TYPES_H
+#ifndef BOB_IO_HDF5TYPES_H
+#define BOB_IO_HDF5TYPES_H
 
 #include <vector>
 #include <string>
@@ -45,7 +45,7 @@
 
 #include "core/array.h"
 
-namespace Torch { namespace io {
+namespace bob { namespace io {
 
   /**
    * Supported types
@@ -411,14 +411,14 @@ namespace Torch { namespace io {
       HDF5Type(hdf5type type);
 
       /**
-       * Creates a HDF5Type from an Torch::core::array::typeinfo
+       * Creates a HDF5Type from an bob::core::array::typeinfo
        */
-      HDF5Type(const Torch::core::array::typeinfo& ti);
+      HDF5Type(const bob::core::array::typeinfo& ti);
 
       /**
        * Creates a HDF5Type from a type enumeration and an explicit shape
        */
-      HDF5Type(Torch::core::array::ElementType eltype, const HDF5Shape& extents);
+      HDF5Type(bob::core::array::ElementType eltype, const HDF5Shape& extents);
 
       /**
        * Creates a HDF5Type from a type enumeration and an explicit shape
@@ -466,7 +466,7 @@ namespace Torch { namespace io {
       /**
        * Checks if an existing object is compatible with my type
        */
-      bool compatible (const Torch::core::array::typeinfo& value) const;
+      bool compatible (const bob::core::array::typeinfo& value) const;
 
       /**
        * Returns the HDF5Shape of this type
@@ -500,14 +500,14 @@ namespace Torch { namespace io {
 
       /**
        * Returns a mapping between the current type and the supported element
-       * types in Torch::core::array
+       * types in bob::core::array
        */
-      Torch::core::array::ElementType element_type() const;
+      bob::core::array::ElementType element_type() const;
 
       /**
-       * Copies this type information to a stock Torch::core::array::typeinfo
+       * Copies this type information to a stock bob::core::array::typeinfo
        */
-      void copy_to (Torch::core::array::typeinfo& ti) const;
+      void copy_to (bob::core::array::typeinfo& ti) const;
 
     private: //representation
 
@@ -565,4 +565,4 @@ namespace Torch { namespace io {
 
 }}
 
-#endif /* TORCH_IO_HDF5TYPES_H */
+#endif /* BOB_IO_HDF5TYPES_H */

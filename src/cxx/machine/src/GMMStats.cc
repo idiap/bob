@@ -20,7 +20,7 @@
 #include "machine/GMMStats.h"
 #include "core/logging.h"
 
-namespace mach = Torch::machine;
+namespace mach = bob::machine;
 
 mach::GMMStats::GMMStats() {
   resize(0,0);
@@ -30,7 +30,7 @@ mach::GMMStats::GMMStats(int n_gaussians, int n_inputs) {
   resize(n_gaussians,n_inputs);
 }
 
-mach::GMMStats::GMMStats(Torch::io::HDF5File& config) {
+mach::GMMStats::GMMStats(bob::io::HDF5File& config) {
   load(config);
 }
 
@@ -92,7 +92,7 @@ void mach::GMMStats::init() {
   sumPxx = 0.0;
 }
 
-void mach::GMMStats::save(Torch::io::HDF5File& config) const {
+void mach::GMMStats::save(bob::io::HDF5File& config) const {
   //please note we fix the output values to be of a precise type so they can be
   //retrieved at any platform with the exact same precision.
   int64_t sumpx_shape_0 = sumPx.shape()[0];
@@ -106,7 +106,7 @@ void mach::GMMStats::save(Torch::io::HDF5File& config) const {
   config.setArray("sumPxx", sumPxx); //Array2d
 }
 
-void mach::GMMStats::load(Torch::io::HDF5File& config) {
+void mach::GMMStats::load(bob::io::HDF5File& config) {
   log_likelihood = config.read<double>("log_liklihood");
   int64_t n_gaussians = config.read<int64_t>("n_gaussians");
   int64_t n_inputs = config.read<int64_t>("n_inputs");
@@ -123,7 +123,7 @@ void mach::GMMStats::load(Torch::io::HDF5File& config) {
   config.readArray("sumPxx", sumPxx);
 }
 
-namespace Torch {
+namespace bob {
   namespace machine {
     std::ostream& operator<<(std::ostream& os, const GMMStats& g) {
       os << "log_likelihood = " << g.log_likelihood << std::endl;

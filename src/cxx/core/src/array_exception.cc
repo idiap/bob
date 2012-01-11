@@ -23,16 +23,16 @@
 #include <boost/format.hpp>
 #include "core/array_exception.h"
 
-Torch::core::NonZeroBaseError::NonZeroBaseError( const int dim, 
+bob::core::NonZeroBaseError::NonZeroBaseError( const int dim, 
   const int base) throw(): 
     m_dim(dim), m_base(base) 
 {
 }
 
-Torch::core::NonZeroBaseError::~NonZeroBaseError() throw() {
+bob::core::NonZeroBaseError::~NonZeroBaseError() throw() {
 }
 
-const char* Torch::core::NonZeroBaseError::what() const throw() {
+const char* bob::core::NonZeroBaseError::what() const throw() {
   try {
     boost::format message(
       "The input array has dimension '%d' with a non-zero base index (base=%d).");
@@ -48,16 +48,16 @@ const char* Torch::core::NonZeroBaseError::what() const throw() {
 }
 
 
-Torch::core::NonOneBaseError::NonOneBaseError( const int dim, 
+bob::core::NonOneBaseError::NonOneBaseError( const int dim, 
   const int base) throw(): 
     m_dim(dim), m_base(base) 
 {
 }
 
-Torch::core::NonOneBaseError::~NonOneBaseError() throw() {
+bob::core::NonOneBaseError::~NonOneBaseError() throw() {
 }
 
-const char* Torch::core::NonOneBaseError::what() const throw() {
+const char* bob::core::NonOneBaseError::what() const throw() {
   try {
     boost::format message(
       "The input array has dimension '%d' with a non-one base index (base=%d).");
@@ -73,13 +73,13 @@ const char* Torch::core::NonOneBaseError::what() const throw() {
 }
 
 
-Torch::core::NonCContiguousError::NonCContiguousError() throw() {
+bob::core::NonCContiguousError::NonCContiguousError() throw() {
 }
 
-Torch::core::NonCContiguousError::~NonCContiguousError() throw() {
+bob::core::NonCContiguousError::~NonCContiguousError() throw() {
 }
 
-const char* Torch::core::NonCContiguousError::what() const throw() {
+const char* bob::core::NonCContiguousError::what() const throw() {
   try {
     boost::format message(
       "The input array is not a C-style array (row-major order) stored in contiguous memory area.");
@@ -93,13 +93,13 @@ const char* Torch::core::NonCContiguousError::what() const throw() {
 }
 
 
-Torch::core::NonFortranContiguousError::NonFortranContiguousError() throw() {
+bob::core::NonFortranContiguousError::NonFortranContiguousError() throw() {
 }
 
-Torch::core::NonFortranContiguousError::~NonFortranContiguousError() throw() {
+bob::core::NonFortranContiguousError::~NonFortranContiguousError() throw() {
 }
 
-const char* Torch::core::NonFortranContiguousError::what() const throw() {
+const char* bob::core::NonFortranContiguousError::what() const throw() {
   try {
     boost::format message(
       "The input array is not a Fortran-style array (column-major order) stored in contiguous memory area.");
@@ -113,13 +113,13 @@ const char* Torch::core::NonFortranContiguousError::what() const throw() {
 }
 
 
-Torch::core::UnexpectedShapeError::UnexpectedShapeError() throw() {
+bob::core::UnexpectedShapeError::UnexpectedShapeError() throw() {
 }
 
-Torch::core::UnexpectedShapeError::~UnexpectedShapeError() throw() {
+bob::core::UnexpectedShapeError::~UnexpectedShapeError() throw() {
 }
 
-const char* Torch::core::UnexpectedShapeError::what() const throw() {
+const char* bob::core::UnexpectedShapeError::what() const throw() {
   try {
     boost::format message(
       "The array does not have the expected size.");
@@ -133,13 +133,13 @@ const char* Torch::core::UnexpectedShapeError::what() const throw() {
 }
 
 
-Torch::core::DifferentBaseError::DifferentBaseError() throw() {
+bob::core::DifferentBaseError::DifferentBaseError() throw() {
 }
 
-Torch::core::DifferentBaseError::~DifferentBaseError() throw() {
+bob::core::DifferentBaseError::~DifferentBaseError() throw() {
 }
 
-const char* Torch::core::DifferentBaseError::what() const throw() {
+const char* bob::core::DifferentBaseError::what() const throw() {
   try {
     boost::format message(
       "The array does not have the expected size.");

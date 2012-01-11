@@ -24,12 +24,12 @@ You can easily copy this script like this:
   $ vim %(prog)s
 """
 
-import sys, os, torch
+import sys, os, bob
 
 def apthres(neg, pos, thres):
   """Prints a single output line that contains all info for the threshold"""
 
-  far, frr = torch.measure.farfrr(neg, pos, thres)
+  far, frr = bob.measure.farfrr(neg, pos, thres)
   hter = (far + frr)/2.0
 
   ni = neg.shape[0] #number of impostors
@@ -64,7 +64,7 @@ def get_options():
   parser.add_option('-t', '--threshold', dest='thres', default=None,
       type='float', help="The threshold value to apply", metavar="FLOAT")
   parser.add_option('-p', '--parser', dest="parser", default="4column",
-      help="Name of a known parser or of a python-importable function that can parse your input files and return a tuple (negatives, positives) as blitz 1-D arrays of 64-bit floats. Consult the API of torch.measure.load.split_four_column() for details", metavar="NAME.FUNCTION")
+      help="Name of a known parser or of a python-importable function that can parse your input files and return a tuple (negatives, positives) as blitz 1-D arrays of 64-bit floats. Consult the API of bob.measure.load.split_four_column() for details", metavar="NAME.FUNCTION")
   
   # This option is not normally shown to the user...
   parser.add_option("--self-test",
@@ -88,9 +88,9 @@ def get_options():
 
   #parse the score-parser
   if options.parser.lower() in ('4column', '4col'):
-    options.parser = torch.measure.load.split_four_column
+    options.parser = bob.measure.load.split_four_column
   elif options.parser.lower() in ('5column', '5col'):
-    options.parser = torch.measure.load.split_five_column
+    options.parser = bob.measure.load.split_five_column
   else: #try an import
     if options.parser.find('.') == -1:
       parser.error("parser module should be either '4column', '5column' or a valid python function identifier in the format 'module.function': '%s' is invalid" % options.parser)

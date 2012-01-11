@@ -22,7 +22,7 @@
 
 #include "ip/TanTriggs.h"
 
-namespace ip = Torch::ip;
+namespace ip = bob::ip;
 
 ip::TanTriggs::TanTriggs( const double gamma, const double sigma0, 
   const double sigma1, const int size, const double threshold, 

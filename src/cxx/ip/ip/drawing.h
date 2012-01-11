@@ -20,14 +20,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IP_DRAWING_H 
-#define TORCH_IP_DRAWING_H
+#ifndef BOB_IP_DRAWING_H 
+#define BOB_IP_DRAWING_H
 
 #include <stdexcept>
 #include <algorithm>
 #include <blitz/array.h>
 
-namespace Torch { namespace ip {
+namespace bob { namespace ip {
 
   /**
    * Draws a point in the 2D gray-scale image. No checks, if you try to access
@@ -283,4 +283,4 @@ namespace Torch { namespace ip {
 
 }}
 
-#endif /* TORCH_IP_DRAWING_H */
+#endif /* BOB_IP_DRAWING_H */

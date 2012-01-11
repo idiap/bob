@@ -26,8 +26,8 @@
 
 #include <iostream>
 
-namespace tca = Torch::core::array;
-namespace ip = Torch::ip;
+namespace tca = bob::core::array;
+namespace ip = bob::ip;
 
 ip::GaborBankFrequency::GaborBankFrequency( const int height, const int width,
   const int n_orient, const int n_freq, const double fmax, 
@@ -52,8 +52,8 @@ ip::GaborBankFrequency::GaborBankFrequency(const GaborBankFrequency& other):
   m_optimal_gamma_eta(other.m_optimal_gamma_eta), m_gamma(other.m_gamma), m_eta(other.m_eta), 
   m_pf(other.m_pf), m_cancel_dc(other.m_cancel_dc), m_use_envelope(other.m_use_envelope), 
   m_output_in_frequency(other.m_output_in_frequency),
-  m_freqs(Torch::core::array::ccopy(other.m_freqs)),
-  m_orients(Torch::core::array::ccopy(other.m_orients))
+  m_freqs(bob::core::array::ccopy(other.m_freqs)),
+  m_orients(bob::core::array::ccopy(other.m_orients))
 {
   for(size_t i=0; i<other.m_filters.size(); ++i) {
     boost::shared_ptr<ip::GaborFrequency> ptr(new ip::GaborFrequency(*(other.m_filters[i])) );

@@ -17,16 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _TORCH5SPRO_IP_LBP_H_
-#define _TORCH5SPRO_IP_LBP_H_
+#ifndef _BOB5SPRO_IP_LBP_H_
+#define _BOB5SPRO_IP_LBP_H_
 
 #include "ip/ipCore.h"		// <ipLBP> is an <ipCore>
 #include "ip/vision.h"
 #include "core/Tensor.h"
-namespace Torch
+namespace bob
 {
 	/////////////////////////////////////////////////////////////////////////
-	// Torch::ipLBP
+	// bob::ipLBP
 	//	This class computes the LBP code at a given location in the image.
 	//	The input tensor can be a 2D/3D tensor of any type.
 	//	The result is a 1D IntTensor with a single value (the LBP code).

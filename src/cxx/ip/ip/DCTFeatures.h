@@ -23,8 +23,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_IP_DCT_FEATURES_H
-#define TORCH5SPRO_IP_DCT_FEATURES_H
+#ifndef BOB5SPRO_IP_DCT_FEATURES_H
+#define BOB5SPRO_IP_DCT_FEATURES_H
 
 #include "core/cast.h"
 #include "core/array_copy.h"
@@ -37,7 +37,7 @@
 #include "ip/zigzag.h"
 
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libip_api
  * @{
@@ -64,7 +64,7 @@ namespace Torch {
           m_block_h(block_h), m_block_w(block_w), m_overlap_h(overlap_h), 
           m_overlap_w(overlap_w), m_n_dct_coefs(n_dct_coefs)
       {
-        m_dct2d = new Torch::sp::DCT2D(block_h, block_w);
+        m_dct2d = new bob::sp::DCT2D(block_h, block_w);
       }
 
 	  	/**
@@ -106,7 +106,7 @@ namespace Torch {
       /**
         * Attributes
         */
-      Torch::sp::DCT2D *m_dct2d;
+      bob::sp::DCT2D *m_dct2d;
       int m_block_h;
       int m_block_w;
       int m_overlap_h;
@@ -119,7 +119,7 @@ namespace Torch {
     U& dst) 
   { 
     // cast to double
-    blitz::Array<double,2> double_version = Torch::core::cast<double>(src);
+    blitz::Array<double,2> double_version = bob::core::cast<double>(src);
 
     // get all the blocks
     std::list<blitz::Array<double,2> > blocks;
@@ -133,7 +133,7 @@ namespace Torch {
       // extract dct using operator()
       blitz::Array<double,2> dct_tmp_block(m_block_h, m_block_w);
       // TODO: avoid the copy if possible
-      m_dct2d->operator()(Torch::core::array::ccopy(*it), dct_tmp_block);
+      m_dct2d->operator()(bob::core::array::ccopy(*it), dct_tmp_block);
 
       // extract the required number of coefficients using the zigzag pattern
       blitz::Array<double,1> dct_block_zigzag(m_n_dct_coefs);
@@ -148,9 +148,9 @@ namespace Torch {
   void DCTFeatures::operator()(const blitz::Array<T,3>& src, blitz::Array<double, 2>& dst) const
   { 
     // Cast to double
-    blitz::Array<double,3> double_version = Torch::core::cast<double>(src);
+    blitz::Array<double,3> double_version = bob::core::cast<double>(src);
 
-    Torch::core::array::assertSameShape(src, blitz::TinyVector<int, 3>(src.extent(0), m_block_h, m_block_w));
+    bob::core::array::assertSameShape(src, blitz::TinyVector<int, 3>(src.extent(0), m_block_h, m_block_w));
     dst.resize(src.extent(0), m_n_dct_coefs);
     
     // Dct extract each block
@@ -183,4 +183,4 @@ namespace Torch {
 
 }}
 
-#endif /* TORCH5SPRO_IP_DCT_FEATURES_H */
+#endif /* BOB5SPRO_IP_DCT_FEATURES_H */

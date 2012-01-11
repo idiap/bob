@@ -23,8 +23,8 @@
 #include "io/TensorFile.h"
 #include "io/CodecRegistry.h"
 
-namespace io = Torch::io;
-namespace ca = Torch::core::array;
+namespace io = bob::io;
+namespace ca = bob::core::array;
 
 class TensorArrayFile: public io::File {
 
@@ -103,7 +103,7 @@ class TensorArrayFile: public io::File {
 
 };
 
-std::string TensorArrayFile::s_codecname = "torch.tensor";
+std::string TensorArrayFile::s_codecname = "bob.tensor";
 
 /**
  * From this point onwards we have the registration procedure. If you are
@@ -152,7 +152,7 @@ static bool register_codec() {
   boost::shared_ptr<io::CodecRegistry> instance =
     io::CodecRegistry::instance();
   
-  instance->registerExtension(".tensor", "Torch3vision v2.1 tensor files", &make_file);
+  instance->registerExtension(".tensor", "bob3vision v2.1 tensor files", &make_file);
 
   return true;
 

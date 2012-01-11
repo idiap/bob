@@ -20,7 +20,7 @@
 #include "ip/ipLBP.h"
 #include "core/Tensor.h"
 
-namespace Torch {
+namespace bob {
 
 /////////////////////////////////////////////////////////////////////////
 // Resize to a new model size

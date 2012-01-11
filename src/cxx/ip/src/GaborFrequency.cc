@@ -28,8 +28,8 @@
 #include "sp/fftshift.h"
 #include "math/norminv.h"
 
-namespace ip = Torch::ip;
-namespace tca = Torch::core::array;
+namespace ip = bob::ip;
+namespace tca = bob::core::array;
 
 ip::GaborFrequency::GaborFrequency( const int height, const int width,
   const double f, const double theta,  const double gamma, const double eta, 
@@ -40,8 +40,8 @@ ip::GaborFrequency::GaborFrequency( const int height, const int width,
   m_output_in_frequency(output_in_frequency),
   m_kernel_shifted(height,width), m_kernel(height,width),
   m_work1(height,width), m_work2(height,width), 
-  m_fft(new Torch::sp::FFT2D(height,width)), 
-  m_ifft(new Torch::sp::IFFT2D(height,width))
+  m_fft(new bob::sp::FFT2D(height,width)), 
+  m_ifft(new bob::sp::IFFT2D(height,width))
 {
   computeFilter();
   initWorkArrays();
@@ -51,14 +51,14 @@ ip::GaborFrequency::GaborFrequency( const ip::GaborFrequency& other):
   m_height(other.m_height), m_width(other.m_width), m_f(other.m_f), m_theta(other.m_theta), m_gamma(other.m_gamma),
   m_eta(other.m_eta), m_pf(other.m_pf), m_cancel_dc(other.m_cancel_dc), m_use_envelope(other.m_use_envelope),
   m_output_in_frequency(other.m_output_in_frequency),
-  m_kernel_shifted(Torch::core::array::ccopy(other.m_kernel_shifted)),
-  m_kernel(Torch::core::array::ccopy(other.m_kernel)),
+  m_kernel_shifted(bob::core::array::ccopy(other.m_kernel_shifted)),
+  m_kernel(bob::core::array::ccopy(other.m_kernel)),
   m_env_height(other.m_env_height), m_env_width(other.m_env_width),
   m_env_y_min(other.m_env_y_min), m_env_y_max(other.m_env_y_max),
   m_env_x_min(other.m_env_x_min), m_env_x_max(other.m_env_x_max),
   m_env_y_offset(other.m_env_y_offset), m_env_x_offset(other.m_env_x_offset),
-  m_fft(new Torch::sp::FFT2D(other.m_height,other.m_width)), 
-  m_ifft(new Torch::sp::IFFT2D(other.m_height,other.m_width))
+  m_fft(new bob::sp::FFT2D(other.m_height,other.m_width)), 
+  m_ifft(new bob::sp::IFFT2D(other.m_height,other.m_width))
 {
   initWorkArrays();
 }
@@ -93,7 +93,7 @@ void ip::GaborFrequency::operator()(
   {
     // 1/ Computes FFT
     m_fft->operator()( src, m_work1);
-    Torch::sp::fftshift<std::complex<double> >( m_work1, m_work2); // m_work2 <-> src_fft_shift
+    bob::sp::fftshift<std::complex<double> >( m_work1, m_work2); // m_work2 <-> src_fft_shift
 
     // 2/ Filters in the frequency domain 
     //    (elementwise multiplication of the non-zero area)
@@ -108,7 +108,7 @@ void ip::GaborFrequency::operator()(
     work1_s = work2_s * kernel_shifted_s;
 
     // 3/ Output back in the spatial domain (IFFT)
-    Torch::sp::ifftshift<std::complex<double> >( m_work1, m_work2); // m_work2 <-> dst_fft
+    bob::sp::ifftshift<std::complex<double> >( m_work1, m_work2); // m_work2 <-> dst_fft
     m_ifft->operator()( m_work2, dst);
   }
 }
@@ -207,7 +207,7 @@ void ip::GaborFrequency::computeFilter()
   }
 
   // Computes the non_shifted version
-  Torch::sp::ifftshift<std::complex<double> >( m_kernel_shifted, m_kernel );
+  bob::sp::ifftshift<std::complex<double> >( m_kernel_shifted, m_kernel );
 }
 
 // TODO: Needs to be refactored: Geometry module/functions: Rotation, ellipsoid
@@ -217,8 +217,8 @@ void ip::GaborFrequency::computeEnvelope()
   double sq_pf=sqrt(m_pf);
 
   // Defines the envelope
-  double major_env_max = Torch::math::norminv((1.+sq_pf)/2., 0., m_f/m_gamma/(sqrt(2) * M_PI) );
-  double minor_env_max = Torch::math::norminv((1.+sq_pf)/2., 0., m_f/m_eta/(sqrt(2) * M_PI) );
+  double major_env_max = bob::math::norminv((1.+sq_pf)/2., 0., m_f/m_gamma/(sqrt(2) * M_PI) );
+  double minor_env_max = bob::math::norminv((1.+sq_pf)/2., 0., m_f/m_eta/(sqrt(2) * M_PI) );
 
   // doubles which absolute values are below EPSILON are considered to be equal to zero
   double EPSILON = 1000 * std::numeric_limits<double>::epsilon();

@@ -13,7 +13,7 @@ def test_file(name):
   """Returns the path to the filename for this test."""
   return os.path.join("data", name)
 
-def get_tempfilename(prefix='torchtest_', suffix='.avi'):
+def get_tempfilename(prefix='bobtest_', suffix='.avi'):
   (fd, name) = tempfile.mkstemp(suffix, prefix)
   os.unlink(name)
   return name
@@ -24,7 +24,7 @@ OUTPUT_VIDEO = get_tempfilename()
 
 import unittest
 import numpy
-import torch
+import bob
 
 class VideoTest(unittest.TestCase):
   """Performs various combined read/write tests on video files"""
@@ -34,7 +34,7 @@ class VideoTest(unittest.TestCase):
     # This test opens and verifies some properties of the test video available.
     # It examplifies how to directly call the VideoReader and how to access
     # some of its properties.
-    v = torch.io.VideoReader(INPUT_VIDEO)
+    v = bob.io.VideoReader(INPUT_VIDEO)
     self.assertEqual(v.height, 240)
     self.assertEqual(v.width, 320)
     self.assertEqual(v.duration, 15000000) #microseconds
@@ -45,11 +45,11 @@ class VideoTest(unittest.TestCase):
   def test02_CanReadImages(self):
 
     # This test shows how you can read image frames from a VideoReader
-    v = torch.io.VideoReader(INPUT_VIDEO)
+    v = bob.io.VideoReader(INPUT_VIDEO)
     for frame in v:
       # Note that when you iterate, the frames are blitz::Array<> objects
       # So, you can use them as you please. The organization of the data
-      # follows the other encoding systems in torch: (color-bands, height,
+      # follows the other encoding systems in bob: (color-bands, height,
       # width).
       self.assertTrue(isinstance(frame, numpy.ndarray))
       self.assertEqual(len(frame.shape), 3)
@@ -61,7 +61,7 @@ class VideoTest(unittest.TestCase):
 
     # This test shows how to get specific frames from a VideoReader
 
-    v = torch.io.VideoReader(INPUT_VIDEO)
+    v = bob.io.VideoReader(INPUT_VIDEO)
 
     # get frame 27 (we start counting at zero)
     f27 = v[27]
@@ -89,8 +89,8 @@ class VideoTest(unittest.TestCase):
 
     # This test reads all frames in sequence from a initial video and records
     # them into an output video, possibly transcoding it.
-    iv = torch.io.VideoReader(INPUT_VIDEO)
-    ov = torch.io.VideoWriter(OUTPUT_VIDEO, iv.height, iv.width)
+    iv = bob.io.VideoReader(INPUT_VIDEO)
+    ov = bob.io.VideoWriter(OUTPUT_VIDEO, iv.height, iv.width)
     for k, frame in enumerate(iv): ov.append(frame)
    
     # We verify that both videos have similar properties
@@ -100,7 +100,7 @@ class VideoTest(unittest.TestCase):
     
     del ov # trigger closing of the output video stream
 
-    iv2 = torch.io.VideoReader(OUTPUT_VIDEO)
+    iv2 = bob.io.VideoReader(OUTPUT_VIDEO)
 
     # We verify that both videos have similar frames
     for orig, copied in zip(iv.__iter__(), iv2.__iter__()):
@@ -113,8 +113,8 @@ class VideoTest(unittest.TestCase):
 
     # This shows you can use the array interface to read an entire video
     # sequence in a single shot
-    array = torch.io.load(INPUT_VIDEO)
-    iv = torch.io.VideoReader(INPUT_VIDEO)
+    array = bob.io.load(INPUT_VIDEO)
+    iv = bob.io.VideoReader(INPUT_VIDEO)
    
     for frame_id, frame in zip(range(array.shape[0]), iv.__iter__()):
       self.assertTrue ( numpy.array_equal(array[frame_id,:,:,:], frame) )
@@ -122,13 +122,13 @@ class VideoTest(unittest.TestCase):
 if __name__ == '__main__':
   import sys
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()

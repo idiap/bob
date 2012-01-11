@@ -18,19 +18,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_ZTNORM_H
-#define TORCH_ZTNORM_H
+#ifndef BOB_ZTNORM_H
+#define BOB_ZTNORM_H
 
 #include <blitz/array.h>
 #include <machine/GMMMachine.h>
 #include <vector>
 
-namespace Torch { namespace machine {
+namespace bob { namespace machine {
 
   /**
    * Normalize the evaluation scores with ZT-Norm
    *
-   * @exception Torch::core::UnexpectedShapeError matrix sizes are not consistent
+   * @exception bob::core::UnexpectedShapeError matrix sizes are not consistent
    * 
    * @param eval_tests_on_eval_models
    * @param znorm_tests_on_eval_models
@@ -50,7 +50,7 @@ namespace Torch { namespace machine {
    * Normalize the evaluation scores with ZT-Norm.
    * Assume that znorm and tnorm have no common subject id.
    *
-   * @exception Torch::core::UnexpectedShapeError matrix sizes are not consistent
+   * @exception bob::core::UnexpectedShapeError matrix sizes are not consistent
    *
    * @param eval_tests_on_eval_models
    * @param znorm_tests_on_eval_models
@@ -66,4 +66,4 @@ namespace Torch { namespace machine {
 }
 }
 
-#endif /* TORCH_ZTNORM_H */
+#endif /* BOB_ZTNORM_H */

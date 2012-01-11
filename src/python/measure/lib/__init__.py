@@ -1,4 +1,4 @@
-from libpytorch_measure import *
+from libpybob_measure import *
 from . import plot
 from . import load
 import numpy

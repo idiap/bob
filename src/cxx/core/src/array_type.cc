@@ -23,7 +23,7 @@
 #include "core/array_type.h"
 #include "core/Exception.h"
 
-namespace tca = Torch::core::array;
+namespace tca = bob::core::array;
 
 static const char* t_bool_string = "bool";
 static const char* t_int8_string = "int8";

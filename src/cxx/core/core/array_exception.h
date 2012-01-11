@@ -20,12 +20,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_CORE_ARRAY_EXCEPTION_H 
-#define TORCH5SPRO_CORE_ARRAY_EXCEPTION_H
+#ifndef BOB5SPRO_CORE_ARRAY_EXCEPTION_H 
+#define BOB5SPRO_CORE_ARRAY_EXCEPTION_H
 
 #include "core/Exception.h"
 
-namespace Torch { 
+namespace bob { 
   
   namespace core {
 
@@ -130,4 +130,4 @@ namespace Torch {
 
 }
 
-#endif /* TORCH_CORE_EXCEPTION_H */
+#endif /* BOB_CORE_EXCEPTION_H */

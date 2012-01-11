@@ -21,7 +21,7 @@
 #include "ip/Matrix2D.h"
 #include "ip/OldColor.h"
 
-namespace Torch {
+namespace bob {
 
 Rectangle2D::Rectangle2D(const Point2D& P0_, int w_, int h_)
 {

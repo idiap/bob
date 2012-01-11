@@ -20,14 +20,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_GAUSSIAN_H
-#define TORCH5SPRO_GAUSSIAN_H
+#ifndef BOB5SPRO_GAUSSIAN_H
+#define BOB5SPRO_GAUSSIAN_H
 
 #include "core/array_assert.h"
 #include "core/cast.h"
 #include "sp/convolution.h"
 
-namespace Torch {
+namespace bob {
 
 	/**
 	 * \ingroup libip_api
@@ -52,10 +52,10 @@ namespace Torch {
 			   */
 	  		Gaussian(const int radius_y=1, const int radius_x=1, 
             const double sigma_y=5., const double sigma_x=5.,
-            const enum Torch::sp::Convolution::SizeOption size_opt =
-              Torch::sp::Convolution::Same,
-            const enum Torch::sp::Convolution::BorderOption border_opt =
-              Torch::sp::Convolution::Mirror):
+            const enum bob::sp::Convolution::SizeOption size_opt =
+              bob::sp::Convolution::Same,
+            const enum bob::sp::Convolution::BorderOption border_opt =
+              bob::sp::Convolution::Mirror):
           m_radius_y(radius_y), m_radius_x(radius_x), m_sigma_y(sigma_y),
           m_sigma_x(sigma_x), m_conv_size(size_opt), m_conv_border(border_opt)
   			{
@@ -64,10 +64,10 @@ namespace Torch {
 
         void reset( const int radius_y=1, const int radius_x=1,
           const double sigma_y=5., const double sigma_x=5.,
-          const enum Torch::sp::Convolution::SizeOption size_opt =
-            Torch::sp::Convolution::Same,
-          const enum Torch::sp::Convolution::BorderOption border_opt =
-            Torch::sp::Convolution::Mirror);
+          const enum bob::sp::Convolution::SizeOption size_opt =
+            bob::sp::Convolution::Same,
+          const enum bob::sp::Convolution::BorderOption border_opt =
+            bob::sp::Convolution::Mirror);
 
         /**
          * @brief Process a 2D blitz Array/Image
@@ -97,8 +97,8 @@ namespace Torch {
         int m_radius_x;
         double m_sigma_y;
         double m_sigma_x;
-        enum Torch::sp::Convolution::SizeOption m_conv_size;
-        enum Torch::sp::Convolution::BorderOption m_conv_border;
+        enum bob::sp::Convolution::SizeOption m_conv_size;
+        enum bob::sp::Convolution::BorderOption m_conv_border;
 
         blitz::Array<double, 1> m_kernel_y;
         blitz::Array<double, 1> m_kernel_x;
@@ -108,24 +108,24 @@ namespace Torch {
 
     // Declare template method full specialization
     template <> 
-    void Torch::ip::Gaussian::operator()<double>(const blitz::Array<double,2>& src, 
+    void bob::ip::Gaussian::operator()<double>(const blitz::Array<double,2>& src, 
       blitz::Array<double,2>& dst);
 
     template <typename T> 
-    void Torch::ip::Gaussian::operator()(const blitz::Array<T,2>& src, 
+    void bob::ip::Gaussian::operator()(const blitz::Array<T,2>& src, 
       blitz::Array<double,2>& dst)
     {
-      blitz::Array<double,2> src_d = Torch::core::cast<double>(src);
-      m_tmp_int.resize(Torch::sp::getConvolveSepOutputSize(src_d, m_kernel_y, 0, m_conv_size));
+      blitz::Array<double,2> src_d = bob::core::cast<double>(src);
+      m_tmp_int.resize(bob::sp::getConvolveSepOutputSize(src_d, m_kernel_y, 0, m_conv_size));
       // Checks are postponed to the convolution function.
-      Torch::sp::convolveSep(src_d, m_kernel_y, m_tmp_int, 0,
+      bob::sp::convolveSep(src_d, m_kernel_y, m_tmp_int, 0,
         m_conv_size, m_conv_border);
-      Torch::sp::convolveSep(m_tmp_int, m_kernel_x, dst, 1,
+      bob::sp::convolveSep(m_tmp_int, m_kernel_x, dst, 1,
         m_conv_size, m_conv_border);
     }
 
     template <typename T> 
-    void Torch::ip::Gaussian::operator()(const blitz::Array<T,3>& src, 
+    void bob::ip::Gaussian::operator()(const blitz::Array<T,3>& src, 
       blitz::Array<double,3>& dst)
     {
       for( int p=0; p<dst.extent(0); ++p) {

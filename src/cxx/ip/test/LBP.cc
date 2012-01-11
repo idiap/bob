@@ -87,12 +87,12 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 BOOST_AUTO_TEST_CASE( test_lbp41_2d_uint8 )
 {
   // LBP 4,1
-  Torch::ip::LBP4R lbp;
+  bob::ip::LBP4R lbp;
 
   BOOST_CHECK_EQUAL( b1, lbp(a1,1,1) );
   BOOST_CHECK_EQUAL( b2, lbp(a2,1,1) );
 
-  Torch::ip::LBP4R lbpcirc(1.,true);
+  bob::ip::LBP4R lbpcirc(1.,true);
   BOOST_CHECK_EQUAL( b1, lbpcirc(a1,1,1) );
   BOOST_CHECK_EQUAL( b2, lbpcirc(a2,1,1) );
 }
@@ -100,12 +100,12 @@ BOOST_AUTO_TEST_CASE( test_lbp41_2d_uint8 )
 BOOST_AUTO_TEST_CASE( test_lbp81_2d_uint8 )
 {
   // LBP 8,1
-  Torch::ip::LBP8R lbp;
+  bob::ip::LBP8R lbp;
 
   BOOST_CHECK_EQUAL( c1, lbp(a1,1,1) );
   BOOST_CHECK_EQUAL( c2, lbp(a2,1,1) );
 
-  Torch::ip::LBP8R lbpcirc(1.,true);
+  bob::ip::LBP8R lbpcirc(1.,true);
   BOOST_CHECK_EQUAL( c1, lbpcirc(a1,1,1) );
   BOOST_CHECK_EQUAL( c2, lbpcirc(a2,1,1) );
 }

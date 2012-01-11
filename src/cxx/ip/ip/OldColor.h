@@ -22,7 +22,7 @@
 
 #include "ip/Convert.h"
 
-namespace Torch {
+namespace bob {
 
 	/** This class is designed to handle colors
 

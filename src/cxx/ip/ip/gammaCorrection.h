@@ -21,15 +21,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_IP_GAMMA_CORRECTION_H
-#define TORCH5SPRO_IP_GAMMA_CORRECTION_H
+#ifndef BOB5SPRO_IP_GAMMA_CORRECTION_H
+#define BOB5SPRO_IP_GAMMA_CORRECTION_H
 
 #include <blitz/array.h>
 #include <cmath>
 #include "core/array_assert.h"
 #include "ip/Exception.h"
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libip_api
  * @{
@@ -78,8 +78,8 @@ namespace Torch {
       blitz::Array<double,2>& dst, const double gamma)
     {
       // Check output
-      Torch::core::array::assertZeroBase(dst);
-      Torch::core::array::assertSameShape(dst, src); 
+      bob::core::array::assertZeroBase(dst);
+      bob::core::array::assertSameShape(dst, src); 
 
       // Check parameters and throw exception if required
       if( gamma < 0.) 
@@ -97,4 +97,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_IP_GAMMA_CORRECTION_H */
+#endif /* BOB5SPRO_IP_GAMMA_CORRECTION_H */

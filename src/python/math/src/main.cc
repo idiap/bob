@@ -30,9 +30,9 @@ void bind_math_sqrtm();
 void bind_math_svd();
 void bind_math_stats();
 
-BOOST_PYTHON_MODULE(libpytorch_math) {
+BOOST_PYTHON_MODULE(libpybob_math) {
 
-  Torch::python::setup_python("Torch mathematical classes and sub-classes");
+  bob::python::setup_python("bob mathematical classes and sub-classes");
 
   bind_math_eig();
   bind_math_linsolve();

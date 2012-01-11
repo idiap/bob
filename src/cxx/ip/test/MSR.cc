@@ -60,7 +60,7 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
-      BOOST_CHECK_EQUAL(t1(i,j), Torch::core::cast<T>(t2(i,j)));
+      BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
 template<typename T, typename U>  
@@ -70,7 +70,7 @@ void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
       for( int k=0; k<t1.extent(2); ++k)
-        BOOST_CHECK_EQUAL(t1(i,j,k), Torch::core::cast<T>(t2(i,j,k)));
+        BOOST_CHECK_EQUAL(t1(i,j,k), bob::core::cast<T>(t2(i,j,k)));
 }
 
 
@@ -117,29 +117,29 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 BOOST_AUTO_TEST_CASE( test_multiscaleRetinex_2d )
 {
 // Get path to the XML Schema definition
-  char *testdata_cpath = getenv("TORCH_IP_TESTDATA_DIR");
+  char *testdata_cpath = getenv("BOB_IP_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    Torch::core::error << "Environment variable $TORCH_IP_TESTDATA_DIR " <<
+    bob::core::error << "Environment variable $BOB_IP_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
   }
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "image.pgm";
-  Torch::io::Array ar_img(testdata_path_img.string());
+  bob::io::Array ar_img(testdata_path_img.string());
   blitz::Array<uint8_t,2> img = ar_img.get<uint8_t,2>();
-  blitz::Array<double,2> img_d = Torch::core::cast<double>(img);
+  blitz::Array<double,2> img_d = bob::core::cast<double>(img);
   blitz::Array<double,2> img_processed_d(img.extent(0),img.extent(1));
-  Torch::ip::MultiscaleRetinex msr_filter(3);
+  bob::ip::MultiscaleRetinex msr_filter(3);
   msr_filter(img_d,img_processed_d);
-  blitz::Array<uint8_t,2> img_processed = Torch::core::convertFromRange<uint8_t>(
+  blitz::Array<uint8_t,2> img_processed = bob::core::convertFromRange<uint8_t>(
       img_processed_d, blitz::min(img_processed_d), blitz::max(img_processed_d));
 
   // Compare to reference image
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_msr_3scales.pgm";
-  Torch::io::Array ar_img_ref(testdata_path_img.string());
+  bob::io::Array ar_img_ref(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref = ar_img_ref.get<uint8_t,2>();
   checkBlitzClose( img_processed, img_ref, eps);
 }

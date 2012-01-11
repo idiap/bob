@@ -22,7 +22,7 @@
 
 #include "ip/GeomNorm.h"
 
-namespace ip = Torch::ip;
+namespace ip = bob::ip;
 
 ip::GeomNorm::GeomNorm( const double rotation_angle, const double scaling_factor,
   const int crop_height, const int crop_width, const int crop_offset_h, 

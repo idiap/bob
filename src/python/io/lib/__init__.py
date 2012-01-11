@@ -1,4 +1,4 @@
-from libpytorch_io import *
+from libpybob_io import *
 
 from . import __arrayset__
 from . import __array__

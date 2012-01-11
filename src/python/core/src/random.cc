@@ -145,7 +145,7 @@ static void binomial_distribution(const char* vartype) {
   boost::format name("binomial_%s");
   name % vartype;
 
-  boost::format doc("The distribution class %s (boost::binomial_distribution<%s>) models a random distribution. The binomial distribution is an integer valued distribution with two parameters, 't' and 'p'. The values of the distribution are within the range [0,t]. The probability that the distribution produces a value k is :math:`{t \\choose k}p^k(1-p)^{t-k}\\`.");
+  boost::format doc("The distribution class %s (boost::binomial_distribution<%s>) models a random distribution. The binomial distribution is an integer valued distribution with two parameters, 't' and 'p'. The values of the distribution are within the range [0,t]. The probability that the distribution produces a value k is :math:`{{t}\\choose{k}}p^k(1-p)^{t-k}`.");
   doc % name.str() % vartype;
 
   class_<D>(name.str().c_str(), doc.str().c_str(), no_init)

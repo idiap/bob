@@ -24,14 +24,14 @@
 #include <core/logging.h>
 #include <boost/random.hpp>
 
-using namespace Torch::machine;
+using namespace bob::machine;
 
-Torch::trainer::KMeansTrainer::KMeansTrainer(double convergence_threshold, int max_iterations) :
-  EMTrainer<KMeansMachine, Torch::io::Arrayset>(convergence_threshold, max_iterations) {
+bob::trainer::KMeansTrainer::KMeansTrainer(double convergence_threshold, int max_iterations) :
+  EMTrainer<KMeansMachine, bob::io::Arrayset>(convergence_threshold, max_iterations) {
   seed = -1;
 }
   
-void Torch::trainer::KMeansTrainer::initialization(KMeansMachine& kMeansMachine, const Torch::io::Arrayset& ar) {
+void bob::trainer::KMeansTrainer::initialization(KMeansMachine& kMeansMachine, const bob::io::Arrayset& ar) {
   // split data into as many chunks as there are means
   size_t n_data = ar.size();
   unsigned int n_chunk = n_data / kMeansMachine.getNMeans();
@@ -57,7 +57,7 @@ void Torch::trainer::KMeansTrainer::initialization(KMeansMachine& kMeansMachine,
   } 
 }
 
-double Torch::trainer::KMeansTrainer::eStep(KMeansMachine& kmeans, const Torch::io::Arrayset& ar) {
+double bob::trainer::KMeansTrainer::eStep(KMeansMachine& kmeans, const bob::io::Arrayset& ar) {
     // initialise the accumulators
     double average_min_distance = 0;
     resetAccumulators(kmeans);
@@ -82,7 +82,7 @@ double Torch::trainer::KMeansTrainer::eStep(KMeansMachine& kmeans, const Torch::
     return average_min_distance;
 }
 
-void Torch::trainer::KMeansTrainer::mStep(KMeansMachine& kmeans, const Torch::io::Arrayset&) {
+void bob::trainer::KMeansTrainer::mStep(KMeansMachine& kmeans, const bob::io::Arrayset&) {
     m_cache_newMeans.resize(kmeans.getNMeans(),kmeans.getNInputs());
     blitz::firstIndex i;
     blitz::secondIndex j;
@@ -90,7 +90,7 @@ void Torch::trainer::KMeansTrainer::mStep(KMeansMachine& kmeans, const Torch::io
     kmeans.setMeans(m_cache_newMeans);
 }
 
-bool Torch::trainer::KMeansTrainer::resetAccumulators(KMeansMachine& kMeansMachine) {
+bool bob::trainer::KMeansTrainer::resetAccumulators(KMeansMachine& kMeansMachine) {
   m_zeroethOrderStats.resize(kMeansMachine.getNMeans());
   m_zeroethOrderStats = 0;
   m_firstOrderStats.resize(kMeansMachine.getNMeans(), kMeansMachine.getNInputs());
@@ -98,11 +98,11 @@ bool Torch::trainer::KMeansTrainer::resetAccumulators(KMeansMachine& kMeansMachi
   return true;
 }
 
-void Torch::trainer::KMeansTrainer::setSeed(int seed) {
+void bob::trainer::KMeansTrainer::setSeed(int seed) {
   this->seed = seed;
 }
 
-int Torch::trainer::KMeansTrainer::getSeed() {
+int bob::trainer::KMeansTrainer::getSeed() {
   return seed;
 }
 

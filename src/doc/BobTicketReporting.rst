@@ -53,7 +53,7 @@ bug report:
   suck. Oh, that is also the opinion of other folks down here. Thx 4 fixing
   theze bugz."
 * **Useful report**: "|project| crashes immediately each time I try to use the
-  Torch::LBP4R type, using version 2.1.4 on a Mac OS X 10.5.4 system.  It
+  bob::LBP4R type, using version 2.1.4 on a Mac OS X 10.5.4 system.  It
   crashes upon the initialization of the class. I am attaching the crash
   reports here, together with a small program that I wrote that can reproduce
   the issue."
@@ -94,5 +94,5 @@ A few things to note:
 
 .. _Eric Raymond's How To Ask Questions The Smart Way: http://www.catb.org/~esr/faqs/smart-questions.html
 .. _Simon Tatham's How to Report Bugs Effectively: http://www.chiark.greenend.org.uk/~sgtatham/bugs.html
-.. _search: http://www.idiap.ch/software/torch5spro/search
-.. _new ticket: http://www.idiap.ch/software/torch5spro/newticket
+.. _search: https://www.idiap.ch/software/bob/search
+.. _new ticket: https://www.idiap.ch/software/bob/newticket

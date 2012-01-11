@@ -29,7 +29,7 @@
 
 #include<iostream>
 
-namespace io = Torch::io;
+namespace io = bob::io;
 
 boost::shared_ptr<io::CodecRegistry> io::CodecRegistry::instance() {
   static boost::shared_ptr<io::CodecRegistry> s_instance(new CodecRegistry());

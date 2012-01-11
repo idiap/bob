@@ -29,9 +29,9 @@
 #include "trainer/Exception.h"
 #include "trainer/FisherLDATrainer.h"
 
-namespace train = Torch::trainer;
-namespace mach = Torch::machine;
-namespace io = Torch::io;
+namespace train = bob::trainer;
+namespace mach = bob::machine;
+namespace io = bob::io;
 
 train::FisherLDATrainer::FisherLDATrainer() { }
 
@@ -126,7 +126,7 @@ static void evalTotalScatter (const std::vector<io::Arrayset>& data,
  * no effect on this normalization as they are normalized in the euclidean
  * sense (||a|| = 1) so that does not change those.
  *
- * This method was designed based on the previous design at Torch3Vision 2.1,
+ * This method was designed based on the previous design at bob3Vision 2.1,
  * by SM.
  */
 static void evalScatters (const std::vector<io::Arrayset>& data,
@@ -178,7 +178,7 @@ static void evalScatters (const std::vector<io::Arrayset>& data,
 
 void train::FisherLDATrainer::train(mach::LinearMachine& machine,
     blitz::Array<double,1>& eigen_values,
-    const std::vector<Torch::io::Arrayset>& data) const {
+    const std::vector<bob::io::Arrayset>& data) const {
 
   // if #classes < 2, then throw
   if (data.size() < 2) throw train::WrongNumberOfClasses(data.size());
@@ -187,15 +187,15 @@ void train::FisherLDATrainer::train(mach::LinearMachine& machine,
   int n_features = data[0].getShape()[0];
 
   for (size_t cl=0; cl<data.size(); ++cl) {
-    if (data[cl].getElementType() != Torch::core::array::t_float64) {
+    if (data[cl].getElementType() != bob::core::array::t_float64) {
       throw io::TypeError(data[cl].getElementType(),
-          Torch::core::array::t_float64);
+          bob::core::array::t_float64);
     }
     if (data[cl].getNDim() != 1) {
-      throw Torch::io::DimensionError(data[cl].getNDim(), 1);
+      throw bob::io::DimensionError(data[cl].getNDim(), 1);
     }
     if (data[cl].getShape()[0] != (size_t)n_features) {
-      throw Torch::trainer::WrongNumberOfFeatures(data[cl].getShape()[0],
+      throw bob::trainer::WrongNumberOfFeatures(data[cl].getShape()[0],
           n_features, cl);
     }
   }
@@ -210,7 +210,7 @@ void train::FisherLDATrainer::train(mach::LinearMachine& machine,
   blitz::Array<double,2> V(n_features, n_features);
   eigen_values.resize(n_features);
   eigen_values = 0;
-  Torch::math::eigSym(Sb, Sw, V, eigen_values);
+  bob::math::eigSym(Sb, Sw, V, eigen_values);
   eigen_values.resizeAndPreserve(n_features-1);
 
   // updates the machine
@@ -230,7 +230,7 @@ void train::FisherLDATrainer::train(mach::LinearMachine& machine,
 }
 
 void train::FisherLDATrainer::train(mach::LinearMachine& machine,
-    const std::vector<Torch::io::Arrayset>& data) const {
+    const std::vector<bob::io::Arrayset>& data) const {
   blitz::Array<double,1> throw_away;
   train(machine, throw_away, data);
 }

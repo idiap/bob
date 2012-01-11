@@ -23,8 +23,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_IP_MULTISCALE_RETINEX_H
-#define TORCH5SPRO_IP_MULTISCALE_RETINEX_H
+#ifndef BOB5SPRO_IP_MULTISCALE_RETINEX_H
+#define BOB5SPRO_IP_MULTISCALE_RETINEX_H
 
 #include "core/array_assert.h"
 #include "core/cast.h"
@@ -32,7 +32,7 @@
 #include "ip/Gaussian.h"
 #include <boost/shared_array.hpp>
 
-namespace Torch {
+namespace bob {
 
 	/**
 	 * \ingroup libip_api
@@ -64,11 +64,11 @@ namespace Torch {
 			   */
 	  		MultiscaleRetinex(const size_t n_scales=1, const int size_min=1, 
             const int size_step=1, const double sigma=5.,
-            const enum Torch::sp::Convolution::BorderOption border_opt =
-              Torch::sp::Convolution::Mirror):
+            const enum bob::sp::Convolution::BorderOption border_opt =
+              bob::sp::Convolution::Mirror):
           m_n_scales(n_scales), m_size_min(size_min), m_size_step(size_step),
           m_sigma(sigma), m_conv_border(border_opt),
-          m_gaussians(new Torch::ip::Gaussian[m_n_scales])
+          m_gaussians(new bob::ip::Gaussian[m_n_scales])
   			{
           computeKernels();
         }
@@ -99,14 +99,14 @@ namespace Torch {
         int m_size_min;
         int m_size_step;
         double m_sigma;
-        enum Torch::sp::Convolution::BorderOption m_conv_border;
+        enum bob::sp::Convolution::BorderOption m_conv_border;
 
-        boost::shared_array<Torch::ip::Gaussian> m_gaussians;
+        boost::shared_array<bob::ip::Gaussian> m_gaussians;
         blitz::Array<double,2> m_tmp;
     };
 
     template <typename T> 
-    void Torch::ip::MultiscaleRetinex::operator()(const blitz::Array<T,2>& src, 
+    void bob::ip::MultiscaleRetinex::operator()(const blitz::Array<T,2>& src, 
       blitz::Array<double,2>& dst)
     {
       // Checks are postponed to the Gaussian operator() function.
@@ -121,7 +121,7 @@ namespace Torch {
     }
 
     template <typename T> 
-    void Torch::ip::MultiscaleRetinex::operator()(const blitz::Array<T,3>& src, 
+    void bob::ip::MultiscaleRetinex::operator()(const blitz::Array<T,3>& src, 
       blitz::Array<double,3>& dst)
     {
       for( int p=0; p<dst.extent(0); ++p) {
@@ -138,4 +138,4 @@ namespace Torch {
 	}
 }
 
-#endif /* TORCH5SPRO_IP_MULTISCALE_RETINEX_H */
+#endif /* BOB5SPRO_IP_MULTISCALE_RETINEX_H */

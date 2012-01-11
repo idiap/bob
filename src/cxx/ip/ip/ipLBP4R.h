@@ -17,16 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _TORCHVISION_IP_LBP_4R_H_
-#define _TORCHVISION_IP_LBP_4R_H_
+#ifndef _BOBVISION_IP_LBP_4R_H_
+#define _BOBVISION_IP_LBP_4R_H_
 
 #include "ip/ipLBP.h"		// <ipLBP4R> is an <ipLBP>
 #include "sp/spCores.h"
 
-namespace Torch
+namespace bob
 {
 	/////////////////////////////////////////////////////////////////////////
-	// Torch::ipLBP4R
+	// bob::ipLBP4R
 	//	This class implements LBP4R operators, where R is the radius.
 	//	Uses the "Uniform" and "RotInvariant" boolean options.
 	//

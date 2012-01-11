@@ -23,8 +23,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_TRAINER_FISHER_LDA_TRAINER_H
-#define TORCH5SPRO_TRAINER_FISHER_LDA_TRAINER_H
+#ifndef BOB5SPRO_TRAINER_FISHER_LDA_TRAINER_H
+#define BOB5SPRO_TRAINER_FISHER_LDA_TRAINER_H
 
 #include <vector>
 
@@ -32,7 +32,7 @@
 #include "machine/LinearMachine.h"
 #include "io/Arrayset.h"
 
-namespace Torch { namespace trainer {
+namespace bob { namespace trainer {
   
   /**
    * Sets a linear machine to perform the Fisher/LDA decomposition. References:
@@ -77,8 +77,8 @@ namespace Torch { namespace trainer {
        * last eigen value should be zero anyway. You can compress the machine
        * output further using resize() if necessary.
        */
-      virtual void train(Torch::machine::LinearMachine& machine, 
-          const std::vector<Torch::io::Arrayset>& data) const;
+      virtual void train(bob::machine::LinearMachine& machine, 
+          const std::vector<bob::io::Arrayset>& data) const;
 
       /**
        * Trains the LinearMachine to perform Fisher/LDA discrimination. The
@@ -93,12 +93,12 @@ namespace Torch { namespace trainer {
        * last eigen value should be zero anyway. You can compress the machine
        * output further using resize() if necessary.
        */
-      virtual void train(Torch::machine::LinearMachine& machine,
+      virtual void train(bob::machine::LinearMachine& machine,
           blitz::Array<double,1>& eigen_values,
-          const std::vector<Torch::io::Arrayset>& data) const;
+          const std::vector<bob::io::Arrayset>& data) const;
 
   };
 
 } }
 
-#endif /* TORCH5SPRO_TRAINER_FISHER_LDA_TRAINER_H */
+#endif /* BOB5SPRO_TRAINER_FISHER_LDA_TRAINER_H */

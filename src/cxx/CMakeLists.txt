@@ -1,7 +1,7 @@
-# Configures and builds the C++ bit of torch
+# Configures and builds the C++ bit of bob
 # Andre Anjos - 18.january.2011
 
-project(torch-cxx)
+project(bob-cxx)
 cmake_minimum_required(VERSION 2.6)
 
 add_subdirectory(lbfgs)

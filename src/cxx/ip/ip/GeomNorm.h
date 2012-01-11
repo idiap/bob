@@ -25,8 +25,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_IP_GEOM_NORM_H
-#define TORCH5SPRO_IP_GROM_NORM_H
+#ifndef BOB5SPRO_IP_GEOM_NORM_H
+#define BOB5SPRO_IP_GROM_NORM_H
 
 #include <boost/shared_ptr.hpp>
 #include "core/array_assert.h"
@@ -38,9 +38,9 @@
 #include "ip/scale.h"
 #include "ip/crop.h"
 
-namespace tca = Torch::core::array;
+namespace tca = bob::core::array;
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libip_api
  * @{
@@ -192,7 +192,7 @@ namespace Torch {
       const int crop_ref_y, const int crop_ref_x) 
     { 
       // 0/ Cast input to double
-      blitz::Array<double,2> src_d = Torch::core::cast<double>(src);
+      blitz::Array<double,2> src_d = bob::core::cast<double>(src);
  
       // 1/ Expand the image such the the point (yc,xc) is at the center
       blitz::TinyVector<int,2> shape = 
@@ -264,4 +264,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_IP_GEOM_NORM_H */
+#endif /* BOB5SPRO_IP_GEOM_NORM_H */

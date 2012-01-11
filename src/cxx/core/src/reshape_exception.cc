@@ -23,16 +23,16 @@
 #include <boost/format.hpp>
 #include "core/reshape_exception.h"
 
-Torch::core::ReshapeDifferentNumberOfElements::ReshapeDifferentNumberOfElements( 
+bob::core::ReshapeDifferentNumberOfElements::ReshapeDifferentNumberOfElements( 
   const int expected, const int got) throw(): 
     m_expected(expected), m_got(got) 
 {
 }
 
-Torch::core::ReshapeDifferentNumberOfElements::~ReshapeDifferentNumberOfElements() throw() {
+bob::core::ReshapeDifferentNumberOfElements::~ReshapeDifferentNumberOfElements() throw() {
 }
 
-const char* Torch::core::ReshapeDifferentNumberOfElements::what() const throw() {
+const char* bob::core::ReshapeDifferentNumberOfElements::what() const throw() {
   try {
     boost::format message(
       "The 2D dst array has '%d' elements whereas tje 2D src array as '%d' elements.");

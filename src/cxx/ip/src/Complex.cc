@@ -21,7 +21,7 @@
 
 #include "ip/Complex.h"
 
-namespace Torch {
+namespace bob {
 
 sComplex Complex::get()
 {

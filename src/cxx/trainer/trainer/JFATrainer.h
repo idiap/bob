@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_TRAINER_JFATRAINER_H
-#define TORCH5SPRO_TRAINER_JFATRAINER_H
+#ifndef BOB5SPRO_TRAINER_JFATRAINER_H
+#define BOB5SPRO_TRAINER_JFATRAINER_H
 
 #include <blitz/array.h>
 #include <map>
@@ -33,7 +33,7 @@
 
 #include "core/logging.h"
 
-namespace Torch { namespace trainer { namespace jfa {
+namespace bob { namespace trainer { namespace jfa {
 
 /**
   C++ port of the JFA Cookbook
@@ -148,7 +148,7 @@ class JFABaseTrainer {
      * Initializes a new JFABaseTrainer. This implementation is consistent with the 
      * JFA cookbook implementation. 
      */
-    JFABaseTrainer(Torch::machine::JFABaseMachine& jfa_machine);
+    JFABaseTrainer(bob::machine::JFABaseMachine& jfa_machine);
 
     /**
      * Destructor virtualisation
@@ -306,7 +306,7 @@ class JFABaseTrainer {
     void train(const std::vector<blitz::Array<double,2> >& N,
       const std::vector<blitz::Array<double,2> >& F, 
       const size_t n_iter); 
-    void train(const std::vector<std::vector<const Torch::machine::GMMStats*> >& features,
+    void train(const std::vector<std::vector<const bob::machine::GMMStats*> >& features,
       const size_t n_iter); 
     /**
       * Trains the oint Factor Analysis without initializing U, V and D
@@ -314,7 +314,7 @@ class JFABaseTrainer {
     void trainNoInit(const std::vector<blitz::Array<double,2> >& N,
       const std::vector<blitz::Array<double,2> >& F, 
       const size_t n_iter); 
-    void trainNoInit(const std::vector<std::vector<const Torch::machine::GMMStats*> >& features,
+    void trainNoInit(const std::vector<std::vector<const bob::machine::GMMStats*> >& features,
       const size_t n_iter); 
 
     /**
@@ -323,7 +323,7 @@ class JFABaseTrainer {
     void trainISV(const std::vector<blitz::Array<double,2> >& N,
       const std::vector<blitz::Array<double,2> >& F, 
       const size_t n_iter, const double relevance_factor); 
-    void trainISV(const std::vector<std::vector<const Torch::machine::GMMStats*> >& features,
+    void trainISV(const std::vector<std::vector<const bob::machine::GMMStats*> >& features,
       const size_t n_iter, const double relevance_factor); 
     /**
       * Trains the Inter Session Variability model without initializing U
@@ -331,7 +331,7 @@ class JFABaseTrainer {
     void trainISVNoInit(const std::vector<blitz::Array<double,2> >& N,
       const std::vector<blitz::Array<double,2> >& F, 
       const size_t n_iter, const double relevance_factor); 
-    void trainISVNoInit(const std::vector<std::vector<const Torch::machine::GMMStats*> >& features,
+    void trainISVNoInit(const std::vector<std::vector<const bob::machine::GMMStats*> >& features,
       const size_t n_iter, const double relevance_factor); 
 
     /**
@@ -428,15 +428,15 @@ class JFABaseTrainer {
     blitz::Array<double,2>& updateA2_y()
     { return m_cache_A2_y; }
     void setVtSigmaInv(const blitz::Array<double,2>& VtSigmaInv)
-    { m_cache_VtSigmaInv.reference(Torch::core::array::ccopy(VtSigmaInv)); }
+    { m_cache_VtSigmaInv.reference(bob::core::array::ccopy(VtSigmaInv)); }
     void setIdPlusVProd_i(const blitz::Array<double,2>& IdPlusVProd_i)
-    { m_cache_IdPlusVProd_i.reference(Torch::core::array::ccopy(IdPlusVProd_i)); }
+    { m_cache_IdPlusVProd_i.reference(bob::core::array::ccopy(IdPlusVProd_i)); }
     void setFn_y_i(const blitz::Array<double,1>& Fn_y_i)
-    { m_cache_Fn_y_i.reference(Torch::core::array::ccopy(Fn_y_i)); }
+    { m_cache_Fn_y_i.reference(bob::core::array::ccopy(Fn_y_i)); }
     void setA1_y(const blitz::Array<double,3>& A1_y)
-    { m_cache_A1_y.reference(Torch::core::array::ccopy(A1_y)); }
+    { m_cache_A1_y.reference(bob::core::array::ccopy(A1_y)); }
     void setA2_y(const blitz::Array<double,2>& A2_y)
-    { m_cache_A2_y.reference(Torch::core::array::ccopy(A2_y)); }
+    { m_cache_A2_y.reference(bob::core::array::ccopy(A2_y)); }
 
 
   private:
@@ -450,7 +450,7 @@ class JFABaseTrainer {
     void initializeRandom(blitz::Array<double,2>& matrix);
 
 
-    Torch::machine::JFABaseMachine& m_jfa_machine; // JFABaseMachine
+    bob::machine::JFABaseMachine& m_jfa_machine; // JFABaseMachine
     size_t m_Nid; // Number of identities
     std::vector<blitz::Array<double,2> > m_N; // Zeroth order statistics
     std::vector<blitz::Array<double,2> > m_F; // First order statistics
@@ -508,7 +508,7 @@ class JFATrainer {
      * Initializes a new JFA trainer. This implementation is consistent with the 
      * JFA cookbook implementation. 
      */
-    JFATrainer(Torch::machine::JFAMachine& jfa_machine, Torch::trainer::JFABaseTrainer& base_trainer);
+    JFATrainer(bob::machine::JFAMachine& jfa_machine, bob::trainer::JFABaseTrainer& base_trainer);
 
     /**
      * Destructor virtualisation
@@ -520,16 +520,16 @@ class JFATrainer {
       */
     void enrol(const blitz::Array<double,2>& N, const blitz::Array<double,2>& F,
       const size_t n_iter);
-    void enrol(const std::vector<const Torch::machine::GMMStats*>& features,
+    void enrol(const std::vector<const bob::machine::GMMStats*>& features,
       const size_t n_iter);
 
   private:
 
-    Torch::machine::JFAMachine& m_jfa_machine; // JFAMachine
-    Torch::trainer::JFABaseTrainer& m_base_trainer; // JFABaseTrainer
+    bob::machine::JFAMachine& m_jfa_machine; // JFAMachine
+    bob::trainer::JFABaseTrainer& m_base_trainer; // JFABaseTrainer
 };
 
 
 }}
 
-#endif /* TORCH5SPRO_TRAINER_JFATRAINER_H */
+#endif /* BOB5SPRO_TRAINER_JFATRAINER_H */

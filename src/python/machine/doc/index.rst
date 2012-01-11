@@ -2,11 +2,11 @@
 .. Andre Anjos <andre.anjos@idiap.ch>
 .. Thu 01 Dec 2011 11:39:11 CET
 
-.. Index file for the Python Torch::machine bindings
+.. Index file for the Python bob::machine bindings
 
 ==========
  Machines
 ==========
 
-.. automodule:: torch.machine
+.. automodule:: bob.machine
    :members:

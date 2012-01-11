@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-#ifndef TORCH_MACHINE_GMMLLRMACHINE_H
-#define TORCH_MACHINE_GMMLLRMACHINE_H
+#ifndef BOB_MACHINE_GMMLLRMACHINE_H
+#define BOB_MACHINE_GMMLLRMACHINE_H
 
 #include "io/Arrayset.h"
 #include "machine/Machine.h"
@@ -31,7 +31,7 @@
 #include "io/HDF5File.h"
 #include <iostream>
 
-namespace Torch { namespace machine {
+namespace bob { namespace machine {
 
 
     
@@ -39,11 +39,11 @@ namespace Torch { namespace machine {
     public:
 
       /// Constructor from a Configuration
-      GMMLLRMachine(Torch::io::HDF5File& config);
-      GMMLLRMachine(Torch::io::HDF5File& client, Torch::io::HDF5File& ubm);
+      GMMLLRMachine(bob::io::HDF5File& config);
+      GMMLLRMachine(bob::io::HDF5File& client, bob::io::HDF5File& ubm);
 
       /// Constructor from two GMMMachines
-      GMMLLRMachine(const Torch::machine::GMMMachine& client, const Torch::machine::GMMMachine& ubm);
+      GMMLLRMachine(const bob::machine::GMMMachine& client, const bob::machine::GMMMachine& ubm);
 
       /// Copy constructor
       /// (Needed because the GMM points to its constituent Gaussian members)
@@ -70,10 +70,10 @@ namespace Torch { namespace machine {
       GMMMachine* getGMMUBM() const;
 
         /// Save to a Configuration
-      void save(Torch::io::HDF5File& config) const;
+      void save(bob::io::HDF5File& config) const;
       
       /// Load from a Configuration
-      void load(Torch::io::HDF5File& config);
+      void load(bob::io::HDF5File& config);
       
       friend std::ostream& operator<<(std::ostream& os, const GMMLLRMachine& machine);
       
@@ -92,4 +92,4 @@ namespace Torch { namespace machine {
 
 }}
 
-#endif /* TORCH_MACHINE_GMMLLRMACHINE_H */
+#endif /* BOB_MACHINE_GMMLLRMACHINE_H */

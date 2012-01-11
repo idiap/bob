@@ -8,13 +8,13 @@
  *   ICCV'2007
  */
 
-#ifndef TORCH_MACHINE_PLDAMACHINE_H
-#define TORCH_MACHINE_PLDAMACHINE_H
+#ifndef BOB_MACHINE_PLDAMACHINE_H
+#define BOB_MACHINE_PLDAMACHINE_H
 
 #include <blitz/array.h>
 #include "io/HDF5File.h"
 
-namespace Torch { namespace machine {
+namespace bob { namespace machine {
   
   /**
    * A PLDA Base machine which contains F, G and sigma matrices as well as mu.
@@ -47,7 +47,7 @@ namespace Torch { namespace machine {
       /**
        * Starts a new PLDABaseMachine from an existing Configuration object.
        */
-      PLDABaseMachine(Torch::io::HDF5File& config);
+      PLDABaseMachine(bob::io::HDF5File& config);
 
       /**
        * Just to virtualize the destructor
@@ -63,12 +63,12 @@ namespace Torch { namespace machine {
        * Loads data from an existing configuration object. Resets the current
        * state.
        */
-      void load(Torch::io::HDF5File& config);
+      void load(bob::io::HDF5File& config);
 
       /**
        * Saves an existing machine to a Configuration object.
        */
-      void save(Torch::io::HDF5File& config) const;
+      void save(bob::io::HDF5File& config) const;
 
       /** 
        * Resizes the PLDA Machine. F, G, sigma and mu will should be 
@@ -381,7 +381,7 @@ namespace Torch { namespace machine {
       /**
        * Constructor, builds a new PLDA machine, setting a PLDABaseMachine. 
        */ 
-      PLDAMachine(const boost::shared_ptr<Torch::machine::PLDABaseMachine> pldabase);
+      PLDAMachine(const boost::shared_ptr<bob::machine::PLDABaseMachine> pldabase);
 
       /**
        * Copies another machine
@@ -391,7 +391,7 @@ namespace Torch { namespace machine {
       /**
        * Starts a new PLDAMachine from an existing Configuration object.
        */
-      PLDAMachine(Torch::io::HDF5File& config);
+      PLDAMachine(bob::io::HDF5File& config);
 
       /**
        * Just to virtualise the destructor
@@ -407,7 +407,7 @@ namespace Torch { namespace machine {
        * Loads data from an existing configuration object. Resets the current
        * state.
        */
-      void load(Torch::io::HDF5File& config);
+      void load(bob::io::HDF5File& config);
 
       /** 
        * Resizes the PLDA Machine.
@@ -417,12 +417,12 @@ namespace Torch { namespace machine {
       /**
        * Saves an existing machine to a Configuration object.
        */
-      void save(Torch::io::HDF5File& config) const;
+      void save(bob::io::HDF5File& config) const;
 
       /**
         * Get the PLDABaseMachine
         */
-      const boost::shared_ptr<Torch::machine::PLDABaseMachine> getPLDABase() const 
+      const boost::shared_ptr<bob::machine::PLDABaseMachine> getPLDABase() const 
       { return m_plda_base; }
 
       /**
@@ -494,7 +494,7 @@ namespace Torch { namespace machine {
       /**
         * Set the PLDABaseMachine
         */
-      void setPLDABase(const boost::shared_ptr<Torch::machine::PLDABaseMachine> plda_base);
+      void setPLDABase(const boost::shared_ptr<bob::machine::PLDABaseMachine> plda_base);
 
 
       /**
@@ -576,7 +576,7 @@ namespace Torch { namespace machine {
       /**
         * Base PLDA Machine containing the model (F, G and sigma)
         */
-      boost::shared_ptr<Torch::machine::PLDABaseMachine> m_plda_base;
+      boost::shared_ptr<bob::machine::PLDABaseMachine> m_plda_base;
 
       /**
         * Number of enrollement samples

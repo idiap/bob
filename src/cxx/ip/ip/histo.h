@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef TORCH5SPRO_IP_HISTO_H
-#define TORCH5SPRO_IP_HISTO_H
+#ifndef BOB5SPRO_IP_HISTO_H
+#define BOB5SPRO_IP_HISTO_H
 
 #include <stdint.h>
 #include <blitz/array.h>
@@ -27,28 +27,28 @@
 #include "core/array_assert.h"
 #include "core/array_type.h"
 
-namespace tca = Torch::core::array;
-namespace Torch { 
+namespace tca = bob::core::array;
+namespace bob { 
   namespace ip {
     /**
-     * This exception is thrown when the histogram computation for a particular type is not implemented in torch
+     * This exception is thrown when the histogram computation for a particular type is not implemented in bob
      */
-    class UnsupportedTypeForHistogram: public Torch::core::Exception {
+    class UnsupportedTypeForHistogram: public bob::core::Exception {
     public:
-      UnsupportedTypeForHistogram(Torch::core::array::ElementType elementType)  throw();
+      UnsupportedTypeForHistogram(bob::core::array::ElementType elementType)  throw();
       UnsupportedTypeForHistogram(const UnsupportedTypeForHistogram& other) throw();
       
       virtual ~UnsupportedTypeForHistogram() throw();
       virtual const char* what() const throw();
     private:
-      Torch::core::array::ElementType elementType;
+      bob::core::array::ElementType elementType;
       char description[500];
     };
     
     /**
      * This exception is thrown when a function argument is invalid
      */
-    class InvalidArgument: public Torch::core::Exception {
+    class InvalidArgument: public bob::core::Exception {
     public:
       InvalidArgument()  throw();
       InvalidArgument(const InvalidArgument& other) throw();
@@ -67,7 +67,7 @@ namespace Torch {
       template<typename T>
       int getHistoSize() {
         int histo_size = 0;
-        tca::ElementType element_type = Torch::core::array::getElementType<T>();
+        tca::ElementType element_type = bob::core::array::getElementType<T>();
         switch(element_type) {
           case tca::t_uint8:
             histo_size = 256;
@@ -155,10 +155,10 @@ namespace Torch {
  * Warning: Reductions *must* be declared inside the blitz namespace...
  */
 namespace blitz {
-  BZ_DECL_ARRAY_FULL_REDUCE(histo, Torch::ip::detail::ReduceHisto)
+  BZ_DECL_ARRAY_FULL_REDUCE(histo, bob::ip::detail::ReduceHisto)
 }
 
-namespace Torch { 
+namespace bob { 
   namespace ip {
     
     
@@ -209,7 +209,7 @@ namespace Torch {
      */
     template<typename T>
     void histogram(const blitz::Array<T, 2>& src, blitz::Array<uint64_t, 1>& histo, T min, T max, uint32_t nb_bins, bool accumulate = false) {
-      tca::ElementType element_type = Torch::core::array::getElementType<T>();
+      tca::ElementType element_type = bob::core::array::getElementType<T>();
       
       // Check that the given type is supported
       switch (element_type) {
@@ -273,4 +273,4 @@ namespace Torch {
   }
 }
 
-#endif /* TORCH5SPRO_IP_HISTO_H */
+#endif /* BOB5SPRO_IP_HISTO_H */

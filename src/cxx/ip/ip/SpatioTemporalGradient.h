@@ -20,12 +20,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IP_SPATIOTEMPORALGRADIENT_H 
-#define TORCH_IP_SPATIOTEMPORALGRADIENT_H
+#ifndef BOB_IP_SPATIOTEMPORALGRADIENT_H 
+#define BOB_IP_SPATIOTEMPORALGRADIENT_H
 
 #include <blitz/array.h>
 
-namespace Torch { namespace ip {
+namespace bob { namespace ip {
 
   /**
    * This class computes the spatio-temporal gradient using a 2-term
@@ -354,4 +354,4 @@ namespace Torch { namespace ip {
 
 }}
 
-#endif /* TORCH_IP_SPATIOTEMPORALGRADIENT_H */
+#endif /* BOB_IP_SPATIOTEMPORALGRADIENT_H */

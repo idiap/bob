@@ -19,11 +19,11 @@
 #include "math/lu_det.h"
 #include "math/stats.h"
 
-namespace io = Torch::io;
-namespace mach = Torch::machine;
-namespace math = Torch::math;
-namespace train = Torch::trainer;
-namespace tca = Torch::core::array;
+namespace io = bob::io;
+namespace mach = bob::machine;
+namespace math = bob::math;
+namespace train = bob::trainer;
+namespace tca = bob::core::array;
 
 train::EMPCATrainer::EMPCATrainer(int dimensionality, 
     double convergence_threshold, int max_iterations, bool compute_likelihood):
@@ -97,12 +97,12 @@ void train::EMPCATrainer::initialization(mach::LinearMachine& machine,
   const io::Arrayset& ar) 
 {
   // checks for arrayset data type and shape once
-  if(ar.getElementType() != Torch::core::array::t_float64) {
-    throw Torch::io::TypeError(ar.getElementType(),
-        Torch::core::array::t_float64);
+  if(ar.getElementType() != bob::core::array::t_float64) {
+    throw bob::io::TypeError(ar.getElementType(),
+        bob::core::array::t_float64);
   }
   if(ar.getNDim() != 1) {
-    throw Torch::io::DimensionError(ar.getNDim(), 1);
+    throw bob::io::DimensionError(ar.getNDim(), 1);
   }
 
   // Gets dimension
@@ -228,10 +228,10 @@ void train::EMPCATrainer::computeWtW(mach::LinearMachine& machine)
 void train::EMPCATrainer::computeInvM() 
 {
   // Compute inverse(M), where M = W^T * W + sigma2 * Id
-  Torch::math::eye(m_cache_dxd_1); // m_cache_dxd_1 = Id
+  bob::math::eye(m_cache_dxd_1); // m_cache_dxd_1 = Id
   m_cache_dxd_1 *= m_sigma2; // m_cache_dxd_1 = sigma2 * Id
   m_cache_dxd_1 += m_inW; // m_cache_dxd_1 = M = W^T * W + sigma2 * Id
-  Torch::math::inv(m_cache_dxd_1, m_invM); // m_invM = inv(M)  
+  bob::math::inv(m_cache_dxd_1, m_invM); // m_invM = inv(M)  
 }
  
 
@@ -250,16 +250,16 @@ void train::EMPCATrainer::eStep(mach::LinearMachine& machine, const io::Arrayset
     // m_cache_f = t (sample) - mu (normalized sample)
     m_cache_f = ar.get<double,1>(i) - mu;
     // m_cache_dxf = inv(M) * W^T
-    Torch::math::prod(m_invM, Wt, m_cache_dxf);
+    bob::math::prod(m_invM, Wt, m_cache_dxf);
     blitz::Array<double,1> z_first_order_i = m_z_first_order(i,blitz::Range::all());
     // z_first_order_i = inv(M) * W^T * (t - mu)
-    Torch::math::prod(m_cache_dxf, m_cache_f, z_first_order_i);
+    bob::math::prod(m_cache_dxf, m_cache_f, z_first_order_i);
 
     /// 2/ Second order statistics: 
     ///     z_second_order_i = sigma2 * inv(M) + z_first_order_i * z_first_order_i^T
     blitz::Array<double,2> z_second_order_i = m_z_second_order(i,blitz::Range::all(),blitz::Range::all());
     // m_cache_dxd = z_first_order_i * z_first_order_i^T
-    Torch::math::prod(z_first_order_i, z_first_order_i, m_cache_dxd_1); // outer product
+    bob::math::prod(z_first_order_i, z_first_order_i, m_cache_dxd_1); // outer product
     // z_second_order_i = sigma2 * inv(M)
     z_second_order_i = m_invM;
     z_second_order_i *= m_sigma2;
@@ -296,7 +296,7 @@ void train::EMPCATrainer::updateW(mach::LinearMachine& machine, const io::Arrays
     // first order statistics of sample i
     blitz::Array<double,1> z_first_order_i = m_z_first_order(i,blitz::Range::all());
     // m_cache_fxd_2 = (t - mu)*z_first_order_i
-    Torch::math::prod(m_cache_f, z_first_order_i, m_cache_fxd_2);
+    bob::math::prod(m_cache_f, z_first_order_i, m_cache_fxd_2);
     m_cache_fxd_1 += m_cache_fxd_2;
 
     // second order statistics of sample i
@@ -305,9 +305,9 @@ void train::EMPCATrainer::updateW(mach::LinearMachine& machine, const io::Arrays
   }
 
   // m_cache_dxd_2 = inv( sum(E(x_i.x_i^T)) )
-  Torch::math::inv(m_cache_dxd_1, m_cache_dxd_2);
+  bob::math::inv(m_cache_dxd_1, m_cache_dxd_2);
   // New estimates of W
-  Torch::math::prod(m_cache_fxd_1, m_cache_dxd_2, W);
+  bob::math::prod(m_cache_fxd_1, m_cache_dxd_2, W);
   // Updates W'*W as well
   math::prod(Wt, W, m_inW);
 }
@@ -329,19 +329,19 @@ void train::EMPCATrainer::updateSigma2(mach::LinearMachine& machine, const io::A
 
     // b. sigma2 -= 2*E(x_i)^T*W^T*(t - mu)
     // m_cache_d = W^T*(t - mu)
-    Torch::math::prod(Wt, m_cache_f, m_cache_d);
+    bob::math::prod(Wt, m_cache_f, m_cache_d);
     // first order of i
     blitz::Array<double,1> z_first_order_i = m_z_first_order(i,blitz::Range::all());
     // sigma2 -= 2*E(x_i)^T*W^T*(t - mu)
-    m_sigma2 -= 2*Torch::math::dot(z_first_order_i, m_cache_d);
+    m_sigma2 -= 2*bob::math::dot(z_first_order_i, m_cache_d);
 
     // c. sigma2 += trace( E(x_i.x_i^T)*W^T*W )
     // second order of i
     blitz::Array<double,2> z_second_order_i = m_z_second_order(i,blitz::Range::all(),blitz::Range::all());
     // m_cache_dxd_1 = E(x_i.x_i^T)*W^T*W
-    Torch::math::prod(z_second_order_i, m_inW, m_cache_dxd_1);
+    bob::math::prod(z_second_order_i, m_inW, m_cache_dxd_1);
     // sigma2 += trace( E(x_i.x_i^T)*W^T*W )
-    m_sigma2 += Torch::math::trace(m_cache_dxd_1);
+    m_sigma2 += bob::math::trace(m_cache_dxd_1);
   }
   // Normalization factor
   m_sigma2 /= (static_cast<double>(ar.size()) * mu.extent(0));
@@ -365,15 +365,15 @@ double train::EMPCATrainer::computeLikelihood(mach::LinearMachine& machine, cons
   // detC = sigma2^n_features 
   double detC = pow(m_sigma2, n_features);
   // m_cache_dxd_1 = Id
-  Torch::math::eye(m_cache_dxd_1);
+  bob::math::eye(m_cache_dxd_1);
   // m_cache_dxd_2 = W^T.W
-  Torch::math::prod(Wt, W, m_cache_dxd_2);
+  bob::math::prod(Wt, W, m_cache_dxd_2);
   // m_cache_dxd_2 = W^T.W / sigma2
   m_cache_dxd_2 /= m_sigma2;
   // m_cache_dxd_1 = Id + W^T.W / sigma2
   m_cache_dxd_1 += m_cache_dxd_2;
   // detC = sigma2^n_features * det(I + W^T.W/sigma2)
-  detC *= Torch::math::det(m_cache_dxd_1);
+  detC *= bob::math::det(m_cache_dxd_1);
 
   // 2/ Compute inv(C), where C = sigma2.I + W.W^T
   //    We are using the following identity (Property C.7 of Bishop's book)
@@ -383,22 +383,22 @@ double train::EMPCATrainer::computeLikelihood(mach::LinearMachine& machine, cons
   // Compute inverse(M), where M = Wt * W + sigma2 * Id
   computeInvM();
   // m_cache_fxf_1 = I = eye(n_features) 
-  Torch::math::eye(m_cache_fxf_1);
+  bob::math::eye(m_cache_fxf_1);
   // m_cache_fxd_1 = W * inv(M)
-  Torch::math::prod(W, m_invM, m_cache_fxd_1);
+  bob::math::prod(W, m_invM, m_cache_fxd_1);
   // m_cache_fxf_2 = (W * inv(M) * Wt)
-  Torch::math::prod(m_cache_fxd_1, Wt, m_cache_fxf_2);
+  bob::math::prod(m_cache_fxd_1, Wt, m_cache_fxf_2);
   // m_cache_fxd_1 = inv(C) = (I - W.M^-1.W^T) / sigma2
   m_cache_fxf_1 -= m_cache_fxf_2;
   m_cache_fxf_1 /= m_sigma2;
 
   // 3/ Compute inv(C).S
-  Torch::math::prod(m_cache_fxf_1, m_S, m_cache_fxf_2);
+  bob::math::prod(m_cache_fxf_1, m_S, m_cache_fxf_2);
 
   // 4/ Use previous values to compute the log likelihood:
   // Log likelihood =  - N/2*{ d*ln(2*PI) + ln |detC| + tr(C^-1.S) }
   double llh = - static_cast<double>(ar.size()) / 2. * 
-    ( m_f_log2pi + log(fabs(detC)) + Torch::math::trace(m_cache_fxf_2) ); 
+    ( m_f_log2pi + log(fabs(detC)) + bob::math::trace(m_cache_fxf_2) ); 
 
   return llh;
 }

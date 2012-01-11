@@ -9,7 +9,7 @@
 import os, sys
 import unittest
 import math
-import torch
+import bob
 import numpy
 
 MACHINE = 'data/linear-test.hdf5'
@@ -20,7 +20,7 @@ class MachineTest(unittest.TestCase):
   def test01_Initialization(self):
 
     # Two inputs and 1 output
-    m = torch.machine.LinearMachine(2,1)
+    m = bob.machine.LinearMachine(2,1)
     self.assertTrue( (m.weights == 0.0).all() )
     self.assertEqual( m.weights.shape, (2,1) )
     self.assertTrue( (m.biases == 0.0).all() )
@@ -28,33 +28,33 @@ class MachineTest(unittest.TestCase):
 
     # Start by providing the data
     w = numpy.array([[0.4, 0.1], [0.4, 0.2], [0.2, 0.7]], 'float64')
-    m = torch.machine.LinearMachine(w)
+    m = bob.machine.LinearMachine(w)
     b = numpy.array([0.3, -3.0], 'float64')
     isub = numpy.array([0., 0.5, 0.5], 'float64')
     idiv = numpy.array([0.5, 1.0, 1.0], 'float64')
     m.input_subtract = isub
     m.input_divide = idiv
     m.biases = b
-    m.activation = torch.machine.Activation.TANH
+    m.activation = bob.machine.Activation.TANH
 
     self.assertTrue( (m.input_subtract == isub).all() )
     self.assertTrue( (m.input_divide == idiv).all() )
     self.assertTrue( (m.weights == w).all() )
     self.assertTrue( (m.biases == b). all() )
-    self.assertEqual(m.activation, torch.machine.Activation.TANH)
+    self.assertEqual(m.activation, bob.machine.Activation.TANH)
     # Save to file
-    # c = torch.io.HDF5File("bla.hdf5")
+    # c = bob.io.HDF5File("bla.hdf5")
     # m.save(c)
 
     # Start by reading data from a file
-    c = torch.io.HDF5File(MACHINE)
-    m = torch.machine.LinearMachine(c)
+    c = bob.io.HDF5File(MACHINE)
+    m = bob.machine.LinearMachine(c)
     self.assertTrue( (m.weights == w).all() )
     self.assertTrue( (m.biases == b). all() )
 
     # Makes sure we cannot stuff incompatible data
     w = numpy.array([[0.4, 0.4, 0.2], [0.1, 0.2, 0.7]], 'float64')
-    m = torch.machine.LinearMachine(w)
+    m = bob.machine.LinearMachine(w)
     b = numpy.array([0.3, -3.0, 2.7, -18, 52], 'float64') #wrong
     self.assertRaises(RuntimeError, setattr, m, 'biases', b)
     self.assertRaises(RuntimeError, setattr, m, 'input_subtract', b)
@@ -63,8 +63,8 @@ class MachineTest(unittest.TestCase):
   def test02_Correctness(self):
 
     # Tests the correctness of a linear machine
-    c = torch.io.HDF5File(MACHINE)
-    m = torch.machine.LinearMachine(c)
+    c = bob.io.HDF5File(MACHINE)
+    m = bob.machine.LinearMachine(c)
 
     def presumed(ivalue):
       """Calculates, by hand, the presumed output given the input"""
@@ -93,13 +93,13 @@ class MachineTest(unittest.TestCase):
 
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()

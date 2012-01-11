@@ -20,13 +20,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IO_VIDEOEXCEPTION_H 
-#define TORCH_IO_VIDEOEXCEPTION_H
+#ifndef BOB_IO_VIDEOEXCEPTION_H 
+#define BOB_IO_VIDEOEXCEPTION_H
 
 #include <string>
 #include "io/Exception.h"
 
-namespace Torch { namespace io {
+namespace bob { namespace io {
 
   /**
    * Thrown when there is a problem with a Video file
@@ -62,4 +62,4 @@ namespace Torch { namespace io {
 
 }}
 
-#endif /* TORCH_IO_VIDEOEXCEPTION_H */
+#endif /* BOB_IO_VIDEOEXCEPTION_H */

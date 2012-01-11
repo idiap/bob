@@ -136,8 +136,8 @@ namespace blitz {
 /// Help message
 const char *help = "\
 progname: bigblitz2d.cc\n\
-code2html: This program is a torch5spro program to show how to manip a big blitz.\n\
-version: Torch5spro\n\
+code2html: This program is a bob program to show how to manip a big blitz.\n\
+version: bob\n\
 date: Feb 2010\n\
 author: Sebastien Marcel (marcel@idiap.ch) and Andre Anjos (andre.anjos@idiap.ch) 2010\n";
 

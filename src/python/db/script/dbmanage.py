@@ -13,7 +13,7 @@ epilog = """  For a list of available databases:
   >>> %(prog)s <database-name> --help
 """
 
-from torch.db.manage import *
+from bob.db.manage import *
 
 if __name__ == '__main__':
 

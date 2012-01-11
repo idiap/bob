@@ -26,9 +26,9 @@
 #include "io/TensorFileHeader.h"
 #include "io/Exception.h"
 
-namespace io = Torch::io;
+namespace io = bob::io;
 namespace iod = io::detail;
-namespace core = Torch::core;
+namespace core = bob::core;
 
 iod::TensorFileHeader::TensorFileHeader()
   : m_tensor_type(io::Char),
@@ -60,7 +60,7 @@ void iod::TensorFileHeader::read(std::istream& str) {
   int nd;
   str.read(reinterpret_cast<char*>(&nd), sizeof(int));
 
-  int shape[TORCH_MAX_DIM];
+  int shape[BOB_MAX_DIM];
   
   str.read( reinterpret_cast<char*>(&val), sizeof(int));
   shape[0] = (size_t)val;

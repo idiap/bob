@@ -37,7 +37,7 @@
 #include <values.h>
 #endif
 
-namespace Torch {
+namespace bob {
 
 //-----------------------------------
 

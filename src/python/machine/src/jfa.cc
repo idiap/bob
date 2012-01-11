@@ -27,17 +27,17 @@
 #include "machine/GMMMachine.h"
 
 using namespace boost::python;
-namespace mach = Torch::machine;
-namespace io = Torch::io;
-namespace tp = Torch::python;
+namespace mach = bob::machine;
+namespace io = bob::io;
+namespace tp = bob::python;
 
 static void jfa_forward_list(mach::JFAMachine& m, list stats, tp::ndarray score)
 {
   // Extracts the vector of pointers from the python list
   int n_samples = len(stats);
-  std::vector<const Torch::machine::GMMStats*> gmm_stats;
+  std::vector<const bob::machine::GMMStats*> gmm_stats;
   for(int s=0; s<n_samples; ++s)
-    gmm_stats.push_back(extract<const Torch::machine::GMMStats*>(stats[s]));
+    gmm_stats.push_back(extract<const bob::machine::GMMStats*>(stats[s]));
 
   // Calls the forward function
   blitz::Array<double,1> score_ = score.bz<double,1>();
@@ -45,7 +45,7 @@ static void jfa_forward_list(mach::JFAMachine& m, list stats, tp::ndarray score)
 }
 
 static double jfa_forward_sample(mach::JFAMachine& m, 
-    const Torch::machine::GMMStats& stats) {
+    const bob::machine::GMMStats& stats) {
   double score;
   // Calls the forward function
   m.forward(&stats, score);

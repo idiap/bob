@@ -25,11 +25,11 @@
 #include "core/cast.h"
 
 using namespace boost::python;
-namespace ip = Torch::ip;
-namespace tp = Torch::python;
-namespace ca = Torch::core::array;
-namespace tc = Torch::core;
-namespace of = Torch::ip::optflow;
+namespace ip = bob::ip;
+namespace tp = bob::python;
+namespace ca = bob::core::array;
+namespace tc = bob::core;
+namespace of = bob::ip::optflow;
 
 static tuple vanillahs_call(const of::VanillaHornAndSchunckFlow& f,
     double alpha, size_t iterations, tp::const_ndarray i1,

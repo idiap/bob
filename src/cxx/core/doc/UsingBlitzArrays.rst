@@ -86,7 +86,7 @@ An example, on how to use this adapter to save and read a array from a stream
   BAd2 bl1(2,2); // create a multiarray
   bl1 = 1.1, 0.5, 
         0.3, 1.4; // initialize the multiarray
-  Torch::core::BlitzAdapter<BAd2> X(bl1); // create and initialize the BlitzAdapter
+  bob::core::BlitzAdapter<BAd2> X(bl1); // create and initialize the BlitzAdapter
   std::ofstream out_d("multiarray.blitz"); // An output file stream
   out_d << X; // save the blitzarray
   out_d.close(); // close the output stream
@@ -94,7 +94,7 @@ An example, on how to use this adapter to save and read a array from a stream
   // Read the blitz array from a file
   BAd2 bl2(2,2); // create a multiarray
   std::ifstream in_d("multiarray.blitz"); // An input file stream
-  Torch::core::BlitzAdapter<BAd2> Y(bl2); // create and initialize the BlitzAdapter
+  bob::core::BlitzAdapter<BAd2> Y(bl2); // create and initialize the BlitzAdapter
   in_d >> Y; // read the blitz array and put it in bl2
   in_d.close(); // close the input stream
 
@@ -106,10 +106,10 @@ file, the creation of a Blitz adapter should be done as follow:
 .. code-block:: c++
   
   typedef blitz::Array<double,2> BAd2; BAd2 bl(2,2); // creates a array
-  Torch::core::BlitzAdapter<BAd2> Y(bl, false); // creates a Blitz adapter which will not perform type checking 
+  bob::core::BlitzAdapter<BAd2> Y(bl, false); // creates a Blitz adapter which will not perform type checking 
                                                 // (second argument of the constructor set to false, whereas default value is true)
 
-You can make use of our ``Torch::core::In/OutputStream`` to input and output
+You can make use of our ``bob::core::In/OutputStream`` to input and output
 data in compressed format (as with gzip), which might save you some space.
 Please read InputOutput for details.
 

@@ -20,7 +20,7 @@
 #include "ip/Triangle2D.h"
 #include "ip/OldColor.h"
 
-namespace Torch {
+namespace bob {
 
 void Triangle2D::draw(Image *image, Color color)
 {

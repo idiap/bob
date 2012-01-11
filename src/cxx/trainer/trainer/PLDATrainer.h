@@ -6,8 +6,8 @@
  * Expectation Maximization.
  */
 
-#ifndef TORCH5SPRO_TRAINER_PLDA_TRAINER_H
-#define TORCH5SPRO_TRAINER_PLDA_TRAINER_H
+#ifndef BOB5SPRO_TRAINER_PLDA_TRAINER_H
+#define BOB5SPRO_TRAINER_PLDA_TRAINER_H
 
 #include <blitz/array.h>
 #include <map>
@@ -16,12 +16,12 @@
 #include "machine/PLDAMachine.h"
 #include "io/Arrayset.h"
 
-namespace Torch { namespace trainer {
+namespace bob { namespace trainer {
   
   /**
     */
-  class PLDABaseTrainer: public EMTrainerNew<Torch::machine::PLDABaseMachine, 
-                                             std::vector<Torch::io::Arrayset> >
+  class PLDABaseTrainer: public EMTrainerNew<bob::machine::PLDABaseMachine, 
+                                             std::vector<bob::io::Arrayset> >
   {
     public: //api
       /**
@@ -50,14 +50,14 @@ namespace Torch { namespace trainer {
       /**
         * This methods performs some initialization before the E- and M-steps.
         */
-      virtual void initialization(Torch::machine::PLDABaseMachine& machine, 
-        const std::vector<Torch::io::Arrayset>& v_ar);
+      virtual void initialization(bob::machine::PLDABaseMachine& machine, 
+        const std::vector<bob::io::Arrayset>& v_ar);
       /**
         * This methods performs some actions after the end of the E- and 
         * M-steps.
         */
-      virtual void finalization(Torch::machine::PLDABaseMachine& machine, 
-        const std::vector<Torch::io::Arrayset>& v_ar);
+      virtual void finalization(bob::machine::PLDABaseMachine& machine, 
+        const std::vector<bob::io::Arrayset>& v_ar);
       
       /**
         * Calculates and saves statistics across the dataset, and saves these 
@@ -65,21 +65,21 @@ namespace Torch { namespace trainer {
         * 
         * The statistics will be used in the mStep() that follows.
         */
-      virtual void eStep(Torch::machine::PLDABaseMachine& machine, 
-        const std::vector<Torch::io::Arrayset>& v_ar);
+      virtual void eStep(bob::machine::PLDABaseMachine& machine, 
+        const std::vector<bob::io::Arrayset>& v_ar);
 
       /**
         * Performs a maximization step to update the parameters of the 
         */
-      virtual void mStep(Torch::machine::PLDABaseMachine& machine,
-         const std::vector<Torch::io::Arrayset>& v_ar);
+      virtual void mStep(bob::machine::PLDABaseMachine& machine,
+         const std::vector<bob::io::Arrayset>& v_ar);
 
       /**
         * Computes the average log likelihood using the current estimates of 
         * the latent variables. 
         */
-      virtual double computeLikelihood(Torch::machine::PLDABaseMachine& machine,
-         const std::vector<Torch::io::Arrayset>& v_ar);
+      virtual double computeLikelihood(bob::machine::PLDABaseMachine& machine,
+         const std::vector<bob::io::Arrayset>& v_ar);
 
       /**
         * Sets the seed used to generate pseudo-random numbers 
@@ -207,28 +207,28 @@ namespace Torch { namespace trainer {
       mutable blitz::Array<double,2> m_cache_D_nfng_2; // D=nb features, nfng=nf+ng
 
       // internal methods
-      void computeMeanVariance(Torch::machine::PLDABaseMachine& machine,
-        const std::vector<Torch::io::Arrayset>& v_ar);
-      void initMembers(const std::vector<Torch::io::Arrayset>& v_ar);
-      void initFGSigma(Torch::machine::PLDABaseMachine& machine, 
-        const std::vector<Torch::io::Arrayset>& v_ar);
-      void initF(Torch::machine::PLDABaseMachine& machine, 
-        const std::vector<Torch::io::Arrayset>& v_ar);
-      void initG(Torch::machine::PLDABaseMachine& machine, 
-        const std::vector<Torch::io::Arrayset>& v_ar);
-      void initSigma(Torch::machine::PLDABaseMachine& machine, 
-        const std::vector<Torch::io::Arrayset>& v_ar);
-      void initRandomFGSigma(Torch::machine::PLDABaseMachine& machine);
+      void computeMeanVariance(bob::machine::PLDABaseMachine& machine,
+        const std::vector<bob::io::Arrayset>& v_ar);
+      void initMembers(const std::vector<bob::io::Arrayset>& v_ar);
+      void initFGSigma(bob::machine::PLDABaseMachine& machine, 
+        const std::vector<bob::io::Arrayset>& v_ar);
+      void initF(bob::machine::PLDABaseMachine& machine, 
+        const std::vector<bob::io::Arrayset>& v_ar);
+      void initG(bob::machine::PLDABaseMachine& machine, 
+        const std::vector<bob::io::Arrayset>& v_ar);
+      void initSigma(bob::machine::PLDABaseMachine& machine, 
+        const std::vector<bob::io::Arrayset>& v_ar);
+      void initRandomFGSigma(bob::machine::PLDABaseMachine& machine);
 
-      void checkTrainingData(const std::vector<Torch::io::Arrayset>& v_ar);
-      void precomputeFromFGSigma(Torch::machine::PLDABaseMachine& machine);
-      void precomputeLogLike(Torch::machine::PLDABaseMachine& machine, 
-        const std::vector<Torch::io::Arrayset>& v_ar);
+      void checkTrainingData(const std::vector<bob::io::Arrayset>& v_ar);
+      void precomputeFromFGSigma(bob::machine::PLDABaseMachine& machine);
+      void precomputeLogLike(bob::machine::PLDABaseMachine& machine, 
+        const std::vector<bob::io::Arrayset>& v_ar);
 
-      void updateFG(Torch::machine::PLDABaseMachine& machine,
-        const std::vector<Torch::io::Arrayset>& v_ar);
-      void updateSigma(Torch::machine::PLDABaseMachine& machine,
-        const std::vector<Torch::io::Arrayset>& v_ar);
+      void updateFG(bob::machine::PLDABaseMachine& machine,
+        const std::vector<bob::io::Arrayset>& v_ar);
+      void updateSigma(bob::machine::PLDABaseMachine& machine,
+        const std::vector<bob::io::Arrayset>& v_ar);
   };
 
 
@@ -239,7 +239,7 @@ namespace Torch { namespace trainer {
       /**
        * Initializes a new PLDA trainer.
        */
-      PLDATrainer(Torch::machine::PLDAMachine& plda_machine);
+      PLDATrainer(bob::machine::PLDAMachine& plda_machine);
 
       /**
         * Copy constructor.
@@ -259,11 +259,11 @@ namespace Torch { namespace trainer {
       /**
         * Main procedure for enrolling with this PLDA trainer
         */
-      void enrol(const Torch::io::Arrayset& ar);
+      void enrol(const bob::io::Arrayset& ar);
 
     private:
 
-      Torch::machine::PLDAMachine& m_plda_machine; // PLDAMachine
+      bob::machine::PLDAMachine& m_plda_machine; // PLDAMachine
 
       // cache
       mutable blitz::Array<double,1> m_cache_D_1; // D=nb features 
@@ -273,4 +273,4 @@ namespace Torch { namespace trainer {
 
 }}
 
-#endif /* TORCH5SPRO_TRAINER_PLDA_TRAINER_H */
+#endif /* BOB5SPRO_TRAINER_PLDA_TRAINER_H */

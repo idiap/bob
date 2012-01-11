@@ -28,7 +28,7 @@
   */
 // Complex to regular
 #define COMPLEX_TO_REGULAR(COMP, REG) template<> \
-  REG Torch::core::cast<REG, COMP>( const COMP& in) \
+  REG bob::core::cast<REG, COMP>( const COMP& in) \
   { \
     return static_cast<REG>(in.real()); \
   }
@@ -53,7 +53,7 @@
 
 // Complex to complex
 #define COMPLEX_TO_COMPLEX(FROM, TO) template<> \
-  TO Torch::core::cast<TO, FROM>( const FROM& in) \
+  TO bob::core::cast<TO, FROM>( const FROM& in) \
   { \
     return static_cast<TO>(in); \
   }

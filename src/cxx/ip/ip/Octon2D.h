@@ -22,7 +22,7 @@
 
 #include "ip/Point2D.h"
 
-namespace Torch {
+namespace bob {
 
 	/** This class is designed to handle an octon in 2D
 

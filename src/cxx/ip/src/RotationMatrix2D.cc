@@ -19,7 +19,7 @@
  */
 #include "ip/RotationMatrix2D.h"
 
-namespace Torch {
+namespace bob {
 
 double ccwAngle(double degAngle_)
 {

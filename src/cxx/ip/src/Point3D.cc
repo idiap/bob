@@ -21,7 +21,7 @@
 #include "ip/Vector3D.h"
 #include "ip/OldColor.h"
 
-namespace Torch {
+namespace bob {
 
 //------------------------------------------------------------------
 // Constructors

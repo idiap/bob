@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import torch
+import bob
 import os, sys
 import optparse
 import math
@@ -39,11 +39,11 @@ def dctfeatures(line, A_OUTPUT_DIR, A_OUTPUT_EXTENSION,
   print >> sys.stderr, "DCT: " + line
   
   # Process one file
-  prep = torch.io.Array(line).get().astype('float64')
+  prep = bob.io.Array(line).get().astype('float64')
 
-  blockShape = torch.ip.getBlockShape(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
+  blockShape = bob.ip.getBlockShape(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
   blocks = numpy.ndarray(blockShape, 'float64')
-  torch.ip.block(prep, blocks, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
+  bob.ip.block(prep, blocks, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
 
   if norm_before:
     normalizeBlocks(blocks)
@@ -55,7 +55,7 @@ def dctfeatures(line, A_OUTPUT_DIR, A_OUTPUT_EXTENSION,
 
   
   # Initialize cropper and destination array
-  DCTF = torch.ip.DCTFeatures(A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W, real_DCT_coef)
+  DCTF = bob.ip.DCTFeatures(A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W, real_DCT_coef)
   
   # Call the preprocessing algorithm
   dct_blocks = DCTF(blocks)
@@ -77,7 +77,7 @@ def dctfeatures(line, A_OUTPUT_DIR, A_OUTPUT_EXTENSION,
   
   TMP_tensor = numpy.ndarray((n_blocks, TMP_tensor_max), 'float64')
   
-  nBlocks = torch.ip.getNBlocks(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
+  nBlocks = bob.ip.getNBlocks(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
   for by in range(nBlocks[0]):
     for bx in range(nBlocks[1]):
       bi = bx + by * nBlocks[1]
@@ -91,7 +91,7 @@ def dctfeatures(line, A_OUTPUT_DIR, A_OUTPUT_EXTENSION,
     normalizeDCT(TMP_tensor)
 
   output_file = os.path.join(A_OUTPUT_DIR, os.path.splitext(os.path.basename(line))[0] + ".hdf5")
-  torch.io.Array(TMP_tensor).save(output_file)
+  bob.io.Array(TMP_tensor).save(output_file)
 
   print os.path.join(output_file)
   
@@ -201,7 +201,7 @@ if options.test:
                        [90, 91, 92, 93, 94, 95, 96, 97, 98, 99]],
                        'uint8')
 
-  torch.io.Array(array).save("/tmp/input.hdf5")
+  bob.io.Array(array).save("/tmp/input.hdf5")
 
   f = open("/tmp/input.lst", 'w')
   f.write("/tmp/input.hdf5\n")

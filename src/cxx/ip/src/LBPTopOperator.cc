@@ -26,7 +26,7 @@
 #include "ip/LBP8R.h"
 #include "ip/Exception.h"
 
-namespace ip = Torch::ip;
+namespace ip = bob::ip;
 
 /**
  * A little helper to create the LBP operators in an homogene way.
@@ -36,8 +36,8 @@ static ip::LBP* make_lbp(int radius, int points)
   ip::LBP* retval = 0;
   if (points != 4 && points != 8) {
     // TODO
-    throw Torch::ip::Exception();
-  /*  Torch::error("Cannot create %d-point LBP operator (use 4 or 8 only)!",
+    throw bob::ip::Exception();
+  /*  bob::error("Cannot create %d-point LBP operator (use 4 or 8 only)!",
         points);*/
   }
   else {

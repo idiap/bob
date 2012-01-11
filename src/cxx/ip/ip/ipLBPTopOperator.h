@@ -23,15 +23,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IPLBPTOP_OPERATOR_H 
-#define TORCH_IPLBPTOP_OPERATOR_H
+#ifndef BOB_IPLBPTOP_OPERATOR_H 
+#define BOB_IPLBPTOP_OPERATOR_H
 
 #include "core/Object.h"
 #include "core/Tensor.h"
 #include "ip/Image.h"
 #include "ip/ipLBP.h"
 
-namespace Torch {
+namespace bob {
 
   /**
    * The ipLBPTopOperator class is designed to calculate the LBP-Top
@@ -47,7 +47,7 @@ namespace Torch {
    * 4. After pushing an image, you read the current LBP-Top coefficients and
    * may save it somewhere.
    */
-  class ipLBPTopOperator: public Torch::Object {
+  class ipLBPTopOperator: public bob::Object {
 
     public:
   
@@ -62,11 +62,11 @@ namespace Torch {
      * direction. The radius in T is taken from the number of frames input, so
      * it is dependent on the input to ipLBPTopOperator::process().
      *
-     * All input parameters are changeable throught the Torch::Object
+     * All input parameters are changeable throught the bob::Object
      * interface, following the same nomenclature as for the variables in this
      * constructor.
      *
-     * @warning The current number of points supported in torch is either 8 or
+     * @warning The current number of points supported in bob is either 8 or
      * 4. Any values differing from that need implementation of specialized
      * functionality.
      *
@@ -120,13 +120,13 @@ namespace Torch {
      *
      * @return true if the processing went just fine.
      */
-    bool process (const Torch::ShortTensor& tensor,
-                  Torch::Image& xy,
-                  Torch::Image& xt,
-                  Torch::Image& yt) const;
+    bool process (const bob::ShortTensor& tensor,
+                  bob::Image& xy,
+                  bob::Image& xt,
+                  bob::Image& yt) const;
 
     /**
-     * Updates internal variables, using the Torch::Object method.
+     * Updates internal variables, using the bob::Object method.
      *
      * @param name The name of the parameter changed.
      */
@@ -140,12 +140,12 @@ namespace Torch {
     int m_points_xt; ///< The number of points in the XT LBPu2,i
     int m_radius_yt; ///< The LBPu2,i radius in YT
     int m_points_yt; ///< The number of points in the YT LBPu2,i
-    Torch::ipLBP* m_lbp_xy; ///< The operator for the XY calculation
-    Torch::ipLBP* m_lbp_xt; ///< The operator for the XT calculation
-    Torch::ipLBP* m_lbp_yt; ///< The operator for the YT calculation
+    bob::ipLBP* m_lbp_xy; ///< The operator for the XY calculation
+    bob::ipLBP* m_lbp_xt; ///< The operator for the XT calculation
+    bob::ipLBP* m_lbp_yt; ///< The operator for the YT calculation
 
   };
 
 }
 
-#endif /* TORCH_IPLBPTOP_OPERATOR_H */
+#endif /* BOB_IPLBPTOP_OPERATOR_H */

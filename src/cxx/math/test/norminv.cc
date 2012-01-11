@@ -28,7 +28,7 @@
 #include "math/norminv.h"
 #include <cmath>
 
-namespace math = Torch::math;
+namespace math = bob::math;
 
 struct T {
   double sols_d05, sols_d25, sols_d50, sols_d75, sols_d95;

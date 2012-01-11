@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_CORE_ARRAY_UTILS_H 
-#define TORCH_CORE_ARRAY_UTILS_H
+#ifndef BOB_CORE_ARRAY_UTILS_H 
+#define BOB_CORE_ARRAY_UTILS_H
 
 #include <blitz/array.h>
 #include <stdint.h>
@@ -31,7 +31,7 @@
 #include "core/array.h"
 #include "core/cast.h"
 
-namespace Torch { namespace core { namespace array {
+namespace bob { namespace core { namespace array {
 
   /**
    * Fills in shape and stride starting from a typeinfo object
@@ -59,7 +59,7 @@ namespace Torch { namespace core { namespace array {
 
     if (!buf.ptr()) throw std::runtime_error("empty buffer");
 
-    if (type.dtype != Torch::core::array::getElementType<T>()) throw std::runtime_error("cannot efficiently retrieve blitz::Array<> from buffer containing a different dtype");
+    if (type.dtype != bob::core::array::getElementType<T>()) throw std::runtime_error("cannot efficiently retrieve blitz::Array<> from buffer containing a different dtype");
 
     if (type.nd != N) throw std::runtime_error("cannot retrieve blitz::Array<> from buffer containing different dimensionality");
 
@@ -89,36 +89,36 @@ namespace Torch { namespace core { namespace array {
     if (type.nd != N) throw std::runtime_error("cannot cast blitz::Array<> from buffer containing different dimensionality");
 
     switch (type.dtype) {
-      case Torch::core::array::t_bool: 
-        return Torch::core::cast<T>(wrap<bool,N>(buf));
-      case Torch::core::array::t_int8: 
-        return Torch::core::cast<T>(wrap<int8_t,N>(buf));
-      case Torch::core::array::t_int16: 
-        return Torch::core::cast<T>(wrap<int16_t,N>(buf));
-      case Torch::core::array::t_int32: 
-        return Torch::core::cast<T>(wrap<int32_t,N>(buf));
-      case Torch::core::array::t_int64: 
-        return Torch::core::cast<T>(wrap<int64_t,N>(buf));
-      case Torch::core::array::t_uint8: 
-        return Torch::core::cast<T>(wrap<uint8_t,N>(buf));
-      case Torch::core::array::t_uint16: 
-        return Torch::core::cast<T>(wrap<uint16_t,N>(buf));
-      case Torch::core::array::t_uint32: 
-        return Torch::core::cast<T>(wrap<uint32_t,N>(buf));
-      case Torch::core::array::t_uint64: 
-        return Torch::core::cast<T>(wrap<uint64_t,N>(buf));
-      case Torch::core::array::t_float32: 
-        return Torch::core::cast<T>(wrap<float,N>(buf));
-      case Torch::core::array::t_float64: 
-        return Torch::core::cast<T>(wrap<double,N>(buf));
-      case Torch::core::array::t_float128: 
-        return Torch::core::cast<T>(wrap<long double,N>(buf));
-      case Torch::core::array::t_complex64: 
-        return Torch::core::cast<T>(wrap<std::complex<float>,N>(buf));
-      case Torch::core::array::t_complex128: 
-        return Torch::core::cast<T>(wrap<std::complex<double>,N>(buf));
-      case Torch::core::array::t_complex256: 
-        return Torch::core::cast<T>(wrap<std::complex<long double>,N>(buf));
+      case bob::core::array::t_bool: 
+        return bob::core::cast<T>(wrap<bool,N>(buf));
+      case bob::core::array::t_int8: 
+        return bob::core::cast<T>(wrap<int8_t,N>(buf));
+      case bob::core::array::t_int16: 
+        return bob::core::cast<T>(wrap<int16_t,N>(buf));
+      case bob::core::array::t_int32: 
+        return bob::core::cast<T>(wrap<int32_t,N>(buf));
+      case bob::core::array::t_int64: 
+        return bob::core::cast<T>(wrap<int64_t,N>(buf));
+      case bob::core::array::t_uint8: 
+        return bob::core::cast<T>(wrap<uint8_t,N>(buf));
+      case bob::core::array::t_uint16: 
+        return bob::core::cast<T>(wrap<uint16_t,N>(buf));
+      case bob::core::array::t_uint32: 
+        return bob::core::cast<T>(wrap<uint32_t,N>(buf));
+      case bob::core::array::t_uint64: 
+        return bob::core::cast<T>(wrap<uint64_t,N>(buf));
+      case bob::core::array::t_float32: 
+        return bob::core::cast<T>(wrap<float,N>(buf));
+      case bob::core::array::t_float64: 
+        return bob::core::cast<T>(wrap<double,N>(buf));
+      case bob::core::array::t_float128: 
+        return bob::core::cast<T>(wrap<long double,N>(buf));
+      case bob::core::array::t_complex64: 
+        return bob::core::cast<T>(wrap<std::complex<float>,N>(buf));
+      case bob::core::array::t_complex128: 
+        return bob::core::cast<T>(wrap<std::complex<double>,N>(buf));
+      case bob::core::array::t_complex256: 
+        return bob::core::cast<T>(wrap<std::complex<long double>,N>(buf));
       default:
         break;
   }
@@ -130,4 +130,4 @@ namespace Torch { namespace core { namespace array {
 
 }}}
 
-#endif /* TORCH_CORE_ARRAY_UTILS_H */
+#endif /* BOB_CORE_ARRAY_UTILS_H */

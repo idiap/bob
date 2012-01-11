@@ -59,7 +59,7 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
-      BOOST_CHECK_EQUAL(t1(i,j), Torch::core::cast<T>(t2(i,j)));
+      BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
 template<typename T, typename U>  
@@ -69,7 +69,7 @@ void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
       for( int k=0; k<t1.extent(2); ++k)
-        BOOST_CHECK_EQUAL(t1(i,j,k), Torch::core::cast<T>(t2(i,j,k)));
+        BOOST_CHECK_EQUAL(t1(i,j,k), bob::core::cast<T>(t2(i,j,k)));
 }
 
 
@@ -116,41 +116,41 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 BOOST_AUTO_TEST_CASE( test_tantriggs_2d )
 {
 // Get path to the XML Schema definition
-  char *testdata_cpath = getenv("TORCH_IP_TESTDATA_DIR");
+  char *testdata_cpath = getenv("BOB_IP_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    Torch::core::error << "Environment variable $TORCH_IP_TESTDATA_DIR " <<
+    bob::core::error << "Environment variable $BOB_IP_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
   }
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "image.pgm";
-  Torch::io::Array ar_img(testdata_path_img.string());
+  bob::io::Array ar_img(testdata_path_img.string());
   blitz::Array<uint8_t,2> img = ar_img.get<uint8_t,2>();
   blitz::Array<double,2> img_processed(img.shape());
-  Torch::ip::TanTriggs tt_filter;
+  bob::ip::TanTriggs tt_filter;
   tt_filter(img,img_processed);
 
   // First test
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_tantriggs.pgm";
-  Torch::io::Array ar_img_ref(testdata_path_img.string());
+  bob::io::Array ar_img_ref(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref = ar_img_ref.get<uint8_t,2>();
-  blitz::Array<uint8_t,2> img_processed_u = Torch::core::convertFromRange<uint8_t>(
+  blitz::Array<uint8_t,2> img_processed_u = bob::core::convertFromRange<uint8_t>(
       img_processed, blitz::min(img_processed), blitz::max(img_processed));
   checkBlitzClose( img_processed_u, img_ref, eps);
 
   // Second test (comparison with matlab implementation from X. Tan)
-  Torch::ip::TanTriggs tt_filter2(0.2, 1., 2., 6, 10., 0.1, 
-    Torch::sp::Convolution::Same, Torch::sp::Convolution::Mirror);
+  bob::ip::TanTriggs tt_filter2(0.2, 1., 2., 6, 10., 0.1, 
+    bob::sp::Convolution::Same, bob::sp::Convolution::Mirror);
   tt_filter2(img,img_processed);
 
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_tantriggs_MATLABREF.pgm";
-  Torch::io::Array ar_img_ref2(testdata_path_img.string());
+  bob::io::Array ar_img_ref2(testdata_path_img.string());
   img_ref = ar_img_ref2.get<uint8_t,2>();
-  img_processed_u = Torch::core::convertFromRange<uint8_t>(
+  img_processed_u = bob::core::convertFromRange<uint8_t>(
       img_processed, blitz::min(img_processed), blitz::max(img_processed));
   checkBlitzClose( img_processed_u, img_ref, eps); 
 }

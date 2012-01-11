@@ -26,9 +26,9 @@ Below is an example of the |project| database syntax.
 
      <!-- The three images in our database of size 576 times 720-->
      <arrayset id="1" role="Pattern" elementtype="uint8" shape="576 720">
-       <external-array id="1" codec="torch.image" file="1001_f_g1_s01_1001_en_1.jpg"/>
-       <external-array id="2" codec="torch.image" file="1001_f_g1_s01_1001_en_2.jpg"/>
-       <external-array id="3" codec="torch.image" file="1001_f_g1_s01_1001_en_3.jpg"/>
+       <external-array id="1" codec="bob.image" file="1001_f_g1_s01_1001_en_1.jpg"/>
+       <external-array id="2" codec="bob.image" file="1001_f_g1_s01_1001_en_2.jpg"/>
+       <external-array id="3" codec="bob.image" file="1001_f_g1_s01_1001_en_3.jpg"/>
      </arrayset>
 
      <!-- Eye-center coordinates corresponding to the thee images above -->
@@ -58,7 +58,7 @@ However, we want to give a larger example how to but everything together.
   import os, sys
   import unittest
 
-  import torch
+  import bob
 
   def width_to_eye_distance(width):
       """ A function to calculate the eye-distance given a width of the face """
@@ -79,7 +79,7 @@ However, we want to give a larger example how to but everything together.
       """      
 
       def __init__(self, xml_file, crop_height = 80, crop_width = 64):
-          self.db  = torch.io.Dataset(xml_file)
+          self.db  = bob.io.Dataset(xml_file)
   
           # cropping parameters
           self.H  = crop_height
@@ -96,7 +96,7 @@ However, we want to give a larger example how to but everything together.
           self.EYECENTERS_SET_INDEX = 2
   
           # The actual instance of the "Face normalizer"
-          self.GN = torch.ip.FaceEyesNorm(self.ED, self.H, self.W, self.OH, self.OW)
+          self.GN = bob.ip.FaceEyesNorm(self.ED, self.H, self.W, self.OH, self.OW)
   
       def size(self):
           """ Return the size of the array, this is not very stabile """
@@ -104,7 +104,7 @@ However, we want to give a larger example how to but everything together.
   
       def new_dst(self):
           # the dst shape is stolen from the cxx file.
-          return torch.core.array.float64_2(self.H, self.W)
+          return bob.core.array.float64_2(self.H, self.W)
   
       def index(self, index):
           """ Extract only one image (cropped/normalized) from the dataset """
@@ -116,7 +116,7 @@ However, we want to give a larger example how to but everything together.
           # turn the RGB image to gray if needed
           global img
           if 3 == tmp_img.dimensions():
-              img = torch.ip.rgb_to_gray(tmp_img)
+              img = bob.ip.rgb_to_gray(tmp_img)
           else:
               img = tmp_img
   

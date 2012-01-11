@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_MACHINE_MLP_H 
-#define TORCH_MACHINE_MLP_H
+#ifndef BOB_MACHINE_MLP_H 
+#define BOB_MACHINE_MLP_H
 
 #include <boost/random.hpp>
 #include <blitz/array.h>
@@ -29,7 +29,7 @@
 #include "io/HDF5File.h"
 #include "machine/Activation.h"
 
-namespace Torch { namespace machine {
+namespace bob { namespace machine {
 
   /**
    * An MLP object is a representation of a Multi-Layer Perceptron. This
@@ -103,7 +103,7 @@ namespace Torch { namespace machine {
       /**
        * Starts a new MLP from an existing Configuration object.
        */
-      MLP (Torch::io::HDF5File& config);
+      MLP (bob::io::HDF5File& config);
 
       /**
        * Just to virtualise the destructor
@@ -119,12 +119,12 @@ namespace Torch { namespace machine {
        * Loads data from an existing configuration object. Resets the current
        * state.
        */
-      void load (Torch::io::HDF5File& config);
+      void load (bob::io::HDF5File& config);
 
       /**
        * Saves an existing machine to a Configuration object.
        */
-      void save (Torch::io::HDF5File& config) const;
+      void save (bob::io::HDF5File& config) const;
 
       /**
        * Forwards data through the network, outputs the values of each output
@@ -345,4 +345,4 @@ namespace Torch { namespace machine {
 
 }}
 
-#endif /* TORCH_MACHINE_MLP_H */
+#endif /* BOB_MACHINE_MLP_H */

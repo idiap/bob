@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_MACHINE_JFAMACHINE_H
-#define TORCH_MACHINE_JFAMACHINE_H
+#ifndef BOB_MACHINE_JFAMACHINE_H
+#define BOB_MACHINE_JFAMACHINE_H
 
 #include <boost/shared_ptr.hpp>
 
@@ -30,7 +30,7 @@
 #include "machine/GMMMachine.h"
 #include "machine/LinearScoring.h"
 
-namespace Torch { namespace machine {
+namespace bob { namespace machine {
   
   /**
    * A JFA Base machine which contains U, V and D matrices
@@ -55,7 +55,7 @@ namespace Torch { namespace machine {
        * @param ru size of U (CD x ru)
        * @param rv size of U (CD x rv)
        */ 
-      JFABaseMachine(const boost::shared_ptr<Torch::machine::GMMMachine> ubm, int ru, int rv);
+      JFABaseMachine(const boost::shared_ptr<bob::machine::GMMMachine> ubm, int ru, int rv);
 
       /**
        * Copies another machine
@@ -65,7 +65,7 @@ namespace Torch { namespace machine {
       /**
        * Starts a new JFAMachine from an existing Configuration object.
        */
-      JFABaseMachine(Torch::io::HDF5File& config);
+      JFABaseMachine(bob::io::HDF5File& config);
 
       /**
        * Just to virtualise the destructor
@@ -81,17 +81,17 @@ namespace Torch { namespace machine {
        * Loads data from an existing configuration object. Resets the current
        * state.
        */
-      void load(Torch::io::HDF5File& config);
+      void load(bob::io::HDF5File& config);
 
       /**
        * Saves an existing machine to a Configuration object.
        */
-      void save(Torch::io::HDF5File& config) const;
+      void save(bob::io::HDF5File& config) const;
 
       /**
         * Get the UBM
         */
-      const boost::shared_ptr<Torch::machine::GMMMachine> getUbm() const 
+      const boost::shared_ptr<bob::machine::GMMMachine> getUbm() const 
       { return m_ubm; }
 
       /**
@@ -165,7 +165,7 @@ namespace Torch { namespace machine {
       /**
         * Set the mean supervector of the UBM
         */
-      void setUbm(const boost::shared_ptr<Torch::machine::GMMMachine> ubm);
+      void setUbm(const boost::shared_ptr<bob::machine::GMMMachine> ubm);
 
       /**
         * Set the U matrix
@@ -185,7 +185,7 @@ namespace Torch { namespace machine {
     private:
 
       // UBM
-      boost::shared_ptr<Torch::machine::GMMMachine> m_ubm;
+      boost::shared_ptr<bob::machine::GMMMachine> m_ubm;
 
       // dimensionality
       int m_ru; // size of U (CD x ru)
@@ -216,7 +216,7 @@ namespace Torch { namespace machine {
        * Constructor, builds a new jfa machine, setting a JFABaseMachine. 
        * y and z are not initialized.
        */ 
-      JFAMachine(const boost::shared_ptr<Torch::machine::JFABaseMachine> jfabase);
+      JFAMachine(const boost::shared_ptr<bob::machine::JFABaseMachine> jfabase);
 
       /**
        * Copies another machine
@@ -226,7 +226,7 @@ namespace Torch { namespace machine {
       /**
        * Starts a new JFAMachine from an existing Configuration object.
        */
-      JFAMachine(Torch::io::HDF5File& config);
+      JFAMachine(bob::io::HDF5File& config);
 
       /**
        * Just to virtualise the destructor
@@ -242,17 +242,17 @@ namespace Torch { namespace machine {
        * Loads data from an existing configuration object. Resets the current
        * state.
        */
-      void load(Torch::io::HDF5File& config);
+      void load(bob::io::HDF5File& config);
 
       /**
        * Saves an existing machine to a Configuration object.
        */
-      void save(Torch::io::HDF5File& config) const;
+      void save(bob::io::HDF5File& config) const;
 
       /**
         * Get the JFABaseMachine
         */
-      const boost::shared_ptr<Torch::machine::JFABaseMachine> getJFABase() const 
+      const boost::shared_ptr<bob::machine::JFABaseMachine> getJFABase() const 
       { return m_jfa_base; }
 
       /**
@@ -323,15 +323,15 @@ namespace Torch { namespace machine {
       /**
         * Set the JFABaseMachine
         */
-      void setJFABase(const boost::shared_ptr<Torch::machine::JFABaseMachine> jfa_base);
+      void setJFABase(const boost::shared_ptr<bob::machine::JFABaseMachine> jfa_base);
 
 
       /**
         * Estimates from a 2D blitz::Array
         */
-      void forward(const Torch::machine::GMMStats* gmm_stats, double& score);
-      void forward(const std::vector<const Torch::machine::GMMStats*>& samples, blitz::Array<double,1>& scores);
-      void estimateX(const Torch::machine::GMMStats* gmm_stats);
+      void forward(const bob::machine::GMMStats* gmm_stats, double& score);
+      void forward(const std::vector<const bob::machine::GMMStats*>& samples, blitz::Array<double,1>& scores);
+      void estimateX(const bob::machine::GMMStats* gmm_stats);
       void updateX(const blitz::Array<double,1>& N, const blitz::Array<double,1>& F);
       void computeUtSigmaInv();
       void computeUProd();
@@ -341,7 +341,7 @@ namespace Torch { namespace machine {
 
     private:
 
-      boost::shared_ptr<Torch::machine::JFABaseMachine> m_jfa_base;
+      boost::shared_ptr<bob::machine::JFABaseMachine> m_jfa_base;
 
       /**
         * y and z vectors learned during the enrolment procedure
@@ -360,7 +360,7 @@ namespace Torch { namespace machine {
       /**
         * data cached used to improve performance
         */
-      mutable Torch::machine::GMMStats m_cache_gmmstats;
+      mutable bob::machine::GMMStats m_cache_gmmstats;
       mutable blitz::Array<double,1> m_cache_Ux;
       mutable blitz::Array<double,1> m_cache_mVyDz;
 

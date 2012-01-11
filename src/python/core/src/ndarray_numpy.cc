@@ -23,7 +23,7 @@
 #include "core/python/ndarray.h"
 
 namespace bp = boost::python;
-namespace tp = Torch::python;
+namespace tp = bob::python;
  
 /**
  * Objects of this type create a binding between tp::ndarray and

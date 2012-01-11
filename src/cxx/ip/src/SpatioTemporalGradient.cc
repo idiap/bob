@@ -26,8 +26,8 @@
 #include "sp/convolution.h"
 #include "core/array_assert.h"
 
-namespace ip = Torch::ip;
-namespace sp = Torch::sp;
+namespace ip = bob::ip;
+namespace sp = bob::sp;
 
 static inline void fastconv(const blitz::Array<double,2>& image,
     const blitz::Array<double,1>& kernel,
@@ -45,8 +45,8 @@ ip::ForwardGradient::ForwardGradient(const blitz::Array<double,1>& diff_kernel,
   m_buffer2(shape)
 {
   blitz::TinyVector<int,1> required_shape(2);
-  Torch::core::array::assertSameShape(m_diff_kernel, required_shape);
-  Torch::core::array::assertSameShape(m_avg_kernel, required_shape);
+  bob::core::array::assertSameShape(m_diff_kernel, required_shape);
+  bob::core::array::assertSameShape(m_avg_kernel, required_shape);
 }
 
 ip::ForwardGradient::ForwardGradient(const ip::ForwardGradient& other) :
@@ -73,12 +73,12 @@ void ip::ForwardGradient::setShape(const blitz::TinyVector<int,2>& shape) {
 }
 
 void ip::ForwardGradient::setDiffKernel(const blitz::Array<double,1>& k) {
-  Torch::core::array::assertSameDimensionLength(k.extent(0), 2);
+  bob::core::array::assertSameDimensionLength(k.extent(0), 2);
   m_diff_kernel.reference(k.copy());
 }
 
 void ip::ForwardGradient::setAvgKernel(const blitz::Array<double,1>& k) {
-  Torch::core::array::assertSameDimensionLength(k.extent(0), 2);
+  bob::core::array::assertSameDimensionLength(k.extent(0), 2);
   m_avg_kernel.reference(k.copy());
 }
 
@@ -87,11 +87,11 @@ void ip::ForwardGradient::operator()(const blitz::Array<double,2>& i1,
     blitz::Array<double,2>& Ey, blitz::Array<double,2>& Et) const {
 
   // all arrays have to have the same shape
-  Torch::core::array::assertSameShape(i1, i2);
-  Torch::core::array::assertSameShape(Ex, Ey);
-  Torch::core::array::assertSameShape(Ey, Et);
-  Torch::core::array::assertSameShape(i1, Ex);
-  Torch::core::array::assertSameShape(m_buffer1, i1);
+  bob::core::array::assertSameShape(i1, i2);
+  bob::core::array::assertSameShape(Ex, Ey);
+  bob::core::array::assertSameShape(Ey, Et);
+  bob::core::array::assertSameShape(i1, Ex);
+  bob::core::array::assertSameShape(m_buffer1, i1);
 
   // Notation:
   // DK - difference kernel
@@ -152,8 +152,8 @@ ip::CentralGradient::CentralGradient(const blitz::Array<double,1>& diff_kernel,
   m_buffer3(shape)
 {
   blitz::TinyVector<int,1> required_shape(3);
-  Torch::core::array::assertSameShape(m_diff_kernel, required_shape);
-  Torch::core::array::assertSameShape(m_avg_kernel, required_shape);
+  bob::core::array::assertSameShape(m_diff_kernel, required_shape);
+  bob::core::array::assertSameShape(m_avg_kernel, required_shape);
 }
 
 ip::CentralGradient::CentralGradient(const ip::CentralGradient& other) :
@@ -183,12 +183,12 @@ void ip::CentralGradient::setShape(const blitz::TinyVector<int,2>& shape) {
 }
 
 void ip::CentralGradient::setDiffKernel(const blitz::Array<double,1>& k) {
-  Torch::core::array::assertSameDimensionLength(k.extent(0), 3);
+  bob::core::array::assertSameDimensionLength(k.extent(0), 3);
   m_diff_kernel.reference(k.copy());
 }
 
 void ip::CentralGradient::setAvgKernel(const blitz::Array<double,1>& k) {
-  Torch::core::array::assertSameDimensionLength(k.extent(0), 3);
+  bob::core::array::assertSameDimensionLength(k.extent(0), 3);
   m_avg_kernel.reference(k.copy());
 }
 
@@ -198,12 +198,12 @@ void ip::CentralGradient::operator() (const blitz::Array<double,2>& i1,
     blitz::Array<double,2>& Et) const {
   
   // all arrays have to have the same shape
-  Torch::core::array::assertSameShape(i1, i2);
-  Torch::core::array::assertSameShape(i2, i3);
-  Torch::core::array::assertSameShape(Ex, Ey);
-  Torch::core::array::assertSameShape(Ey, Et);
-  Torch::core::array::assertSameShape(i1, Ex);
-  Torch::core::array::assertSameShape(m_buffer1, i1);
+  bob::core::array::assertSameShape(i1, i2);
+  bob::core::array::assertSameShape(i2, i3);
+  bob::core::array::assertSameShape(Ex, Ey);
+  bob::core::array::assertSameShape(Ey, Et);
+  bob::core::array::assertSameShape(i1, Ex);
+  bob::core::array::assertSameShape(m_buffer1, i1);
 
   // Notation:
   // DK - difference kernel

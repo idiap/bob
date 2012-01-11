@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_PYTHON_BLITZ_WRAP_H 
-#define TORCH_PYTHON_BLITZ_WRAP_H
+#ifndef BOB_PYTHON_BLITZ_WRAP_H 
+#define BOB_PYTHON_BLITZ_WRAP_H
 
 #include <boost/python.hpp>
 #include <boost/python/numeric.hpp>
@@ -32,7 +32,7 @@
 
 #include "core/python/ndarray.h"
 
-namespace Torch { namespace python {
+namespace bob { namespace python {
 
   /**
    * Use this method to check wrap-ability for blitz::Array<T,N>
@@ -80,7 +80,7 @@ namespace Torch { namespace python {
 
     if (PyArray_NDIM(arr) != N) {
       boost::format mesg("cannot wrap as blitz::Array<%s,%s>, ndarray %d dimensions.");
-      mesg % Torch::core::array::stringize<T>() % N % PyArray_NDIM(arr);
+      mesg % bob::core::array::stringize<T>() % N % PyArray_NDIM(arr);
       throw std::runtime_error(mesg.str().c_str());
     }
 
@@ -90,8 +90,8 @@ namespace Torch { namespace python {
         
     if (arr->descr->type_num != ctype_to_num<T>()) {
       boost::format mesg("cannot wrap blitz::Array<%s,%d> with ndarray having elements of type %s");
-      mesg % Torch::core::array::stringize<T>() % N;
-      mesg % Torch::core::array::stringize(num_to_type(arr->descr->type_num));
+      mesg % bob::core::array::stringize<T>() % N;
+      mesg % bob::core::array::stringize(num_to_type(arr->descr->type_num));
       throw std::runtime_error(mesg.str().c_str());
     }
 
@@ -114,4 +114,4 @@ namespace Torch { namespace python {
 
 }}
 
-#endif /* TORCH_PYTHON_BLITZ_WRAP_H */
+#endif /* BOB_PYTHON_BLITZ_WRAP_H */

@@ -38,20 +38,20 @@ this:
   $ vim %(prog)s
 """
 
-import sys, os, torch
+import sys, os, bob
 
 def print_crit(dev_neg, dev_pos, test_neg, test_pos, crit):
   """Prints a single output line that contains all info for a given criterium"""
 
   if crit == 'EER':
-    thres = torch.measure.eerThreshold(dev_neg, dev_pos)
+    thres = bob.measure.eerThreshold(dev_neg, dev_pos)
   else:
-    thres = torch.measure.minHterThreshold(dev_neg, dev_pos)
+    thres = bob.measure.minHterThreshold(dev_neg, dev_pos)
 
-  dev_far, dev_frr = torch.measure.farfrr(dev_neg, dev_pos, thres)
+  dev_far, dev_frr = bob.measure.farfrr(dev_neg, dev_pos, thres)
   dev_hter = (dev_far + dev_frr)/2.0
 
-  test_far, test_frr = torch.measure.farfrr(test_neg, test_pos, thres)
+  test_far, test_frr = bob.measure.farfrr(test_neg, test_pos, thres)
   test_hter = (test_far + test_frr)/2.0
 
   print("[Min. criterium: %s] Threshold on Development set: %e" % (crit, thres))
@@ -98,9 +98,9 @@ def plots(dev_neg, dev_pos, test_neg, test_pos, npoints, filename):
 
   # ROC
   fig = mpl.figure()
-  torch.measure.plot.roc(dev_neg, dev_pos, npoints, color=(0.3,0.3,0.3), 
+  bob.measure.plot.roc(dev_neg, dev_pos, npoints, color=(0.3,0.3,0.3), 
       linestyle='--', dashes=(6,2), label='development')
-  torch.measure.plot.roc(test_neg, test_pos, npoints, color=(0,0,0),
+  bob.measure.plot.roc(test_neg, test_pos, npoints, color=(0,0,0),
       linestyle='-', label='test')
   mpl.axis([0,40,0,40])
   mpl.title("ROC Curve")
@@ -112,11 +112,11 @@ def plots(dev_neg, dev_pos, test_neg, test_pos, npoints, filename):
 
   # DET
   fig = mpl.figure()
-  torch.measure.plot.det(dev_neg, dev_pos, npoints, color=(0.3,0.3,0.3), 
+  bob.measure.plot.det(dev_neg, dev_pos, npoints, color=(0.3,0.3,0.3), 
       linestyle='--', dashes=(6,2), label='development')
-  torch.measure.plot.det(test_neg, test_pos, npoints, color=(0,0,0),
+  bob.measure.plot.det(test_neg, test_pos, npoints, color=(0,0,0),
       linestyle='-', label='test')
-  torch.measure.plot.det_axis([0.01, 40, 0.01, 40])
+  bob.measure.plot.det_axis([0.01, 40, 0.01, 40])
   mpl.title("DET Curve")
   mpl.xlabel('FRR (%)')
   mpl.ylabel('FAR (%)')
@@ -126,7 +126,7 @@ def plots(dev_neg, dev_pos, test_neg, test_pos, npoints, filename):
 
   # EPC
   fig = mpl.figure()
-  torch.measure.plot.epc(dev_neg, dev_pos, test_neg, test_pos, npoints, 
+  bob.measure.plot.epc(dev_neg, dev_pos, test_neg, test_pos, npoints, 
       color=(0,0,0), linestyle='-')
   mpl.title('EPC Curve')
   mpl.xlabel('Cost')
@@ -165,7 +165,7 @@ def get_options():
   parser.add_option('-x', '--no-plot', dest="doplot", default=True,
       action='store_false', help="If set, then I'll execute no plotting")
   parser.add_option('-p', '--parser', dest="parser", default="4column",
-      help="Name of a known parser or of a python-importable function that can parse your input files and return a tuple (negatives, positives) as blitz 1-D arrays of 64-bit floats. Consult the API of torch.measure.load.split_four_column() for details", metavar="NAME.FUNCTION")
+      help="Name of a known parser or of a python-importable function that can parse your input files and return a tuple (negatives, positives) as blitz 1-D arrays of 64-bit floats. Consult the API of bob.measure.load.split_four_column() for details", metavar="NAME.FUNCTION")
   
   # This option is not normally shown to the user...
   parser.add_option("--self-test",
@@ -193,9 +193,9 @@ def get_options():
 
   #parse the score-parser
   if options.parser.lower() in ('4column', '4col'):
-    options.parser = torch.measure.load.split_four_column
+    options.parser = bob.measure.load.split_four_column
   elif options.parser.lower() in ('5column', '5col'):
-    options.parser = torch.measure.load.split_five_column
+    options.parser = bob.measure.load.split_five_column
   else: #try an import
     if options.parser.find('.') == -1:
       parser.error("parser module should be either '4column', '5column' or a valid python function identifier in the format 'module.function': '%s' is invalid" % options.parser)

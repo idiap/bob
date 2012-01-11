@@ -27,10 +27,10 @@
 #include "trainer/Exception.h"
 #include "trainer/MLPBackPropTrainer.h"
 
-namespace array = Torch::core::array;
-namespace mach = Torch::machine;
-namespace math = Torch::math;
-namespace train = Torch::trainer;
+namespace array = bob::core::array;
+namespace mach = bob::machine;
+namespace math = bob::math;
+namespace train = bob::trainer;
 
 train::MLPBackPropTrainer::MLPBackPropTrainer(const mach::MLP& machine,
     size_t batch_size):
@@ -96,19 +96,19 @@ train::MLPBackPropTrainer::MLPBackPropTrainer(const MLPBackPropTrainer& other):
   m_prev_delta_bias(m_H + 1),
   m_actfun(other.m_actfun),
   m_bwdfun(other.m_bwdfun),
-  m_target(Torch::core::array::ccopy(other.m_target)),
+  m_target(bob::core::array::ccopy(other.m_target)),
   m_error(m_H + 1),
   m_output(m_H + 2)
 {
   for (size_t k=0; k<(m_H + 1); ++k) {
-    m_delta[k].reference(Torch::core::array::ccopy(other.m_delta[k]));
-    m_delta_bias[k].reference(Torch::core::array::ccopy(other.m_delta_bias[k]));
-    m_prev_delta[k].reference(Torch::core::array::ccopy(other.m_prev_delta[k]));
-    m_prev_delta_bias[k].reference(Torch::core::array::ccopy(other.m_prev_delta_bias[k]));
-    m_error[k].reference(Torch::core::array::ccopy(other.m_error[k]));
-    m_output[k].reference(Torch::core::array::ccopy(other.m_output[k]));
+    m_delta[k].reference(bob::core::array::ccopy(other.m_delta[k]));
+    m_delta_bias[k].reference(bob::core::array::ccopy(other.m_delta_bias[k]));
+    m_prev_delta[k].reference(bob::core::array::ccopy(other.m_prev_delta[k]));
+    m_prev_delta_bias[k].reference(bob::core::array::ccopy(other.m_prev_delta_bias[k]));
+    m_error[k].reference(bob::core::array::ccopy(other.m_error[k]));
+    m_output[k].reference(bob::core::array::ccopy(other.m_output[k]));
   }
-  m_output[m_H + 1].reference(Torch::core::array::ccopy(other.m_output[m_H + 1]));
+  m_output[m_H + 1].reference(bob::core::array::ccopy(other.m_output[m_H + 1]));
 }
 
 train::MLPBackPropTrainer& train::MLPBackPropTrainer::operator=
@@ -125,19 +125,19 @@ train::MLPBackPropTrainer& train::MLPBackPropTrainer::operator=
   m_prev_delta_bias.resize(m_H + 1);
   m_actfun = other.m_actfun;
   m_bwdfun = other.m_bwdfun;
-  m_target.reference(Torch::core::array::ccopy(other.m_target));
+  m_target.reference(bob::core::array::ccopy(other.m_target));
   m_error.resize(m_H + 1);
   m_output.resize(m_H + 2);
 
   for (size_t k=0; k<(m_H + 1); ++k) {
-    m_delta[k].reference(Torch::core::array::ccopy(other.m_delta[k]));
-    m_delta_bias[k].reference(Torch::core::array::ccopy(other.m_delta_bias[k]));
-    m_prev_delta[k].reference(Torch::core::array::ccopy(other.m_prev_delta[k]));
-    m_prev_delta_bias[k].reference(Torch::core::array::ccopy(other.m_prev_delta_bias[k]));
-    m_error[k].reference(Torch::core::array::ccopy(other.m_error[k]));
-    m_output[k].reference(Torch::core::array::ccopy(other.m_output[k]));
+    m_delta[k].reference(bob::core::array::ccopy(other.m_delta[k]));
+    m_delta_bias[k].reference(bob::core::array::ccopy(other.m_delta_bias[k]));
+    m_prev_delta[k].reference(bob::core::array::ccopy(other.m_prev_delta[k]));
+    m_prev_delta_bias[k].reference(bob::core::array::ccopy(other.m_prev_delta_bias[k]));
+    m_error[k].reference(bob::core::array::ccopy(other.m_error[k]));
+    m_output[k].reference(bob::core::array::ccopy(other.m_output[k]));
   }
-  m_output[m_H + 1].reference(Torch::core::array::ccopy(other.m_output[m_H + 1]));
+  m_output[m_H + 1].reference(bob::core::array::ccopy(other.m_output[m_H + 1]));
 
   return *this;
 }
@@ -243,7 +243,7 @@ void train::MLPBackPropTrainer::backprop_weight_update() {
   }
 }
 
-void train::MLPBackPropTrainer::train(Torch::machine::MLP& machine,
+void train::MLPBackPropTrainer::train(bob::machine::MLP& machine,
     const blitz::Array<double,2>& input,
     const blitz::Array<double,2>& target) {
   if (!isCompatible(machine)) throw train::IncompatibleMachine();
@@ -252,7 +252,7 @@ void train::MLPBackPropTrainer::train(Torch::machine::MLP& machine,
   train_(machine, input, target);
 }
 
-void train::MLPBackPropTrainer::train_(Torch::machine::MLP& machine,
+void train::MLPBackPropTrainer::train_(bob::machine::MLP& machine,
     const blitz::Array<double,2>& input,
     const blitz::Array<double,2>& target) {
 

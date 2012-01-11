@@ -11,10 +11,10 @@ import os
 import sys
 
 try:
-  import torch
+  import bob
 except ImportError, ex:
   print "Python module ImportError: %s" % ex
-  print "Tip: have you properly setup your torch environment?"
+  print "Tip: have you properly setup your bob environment?"
   sys.exit(2)
 
 def print_codecs():
@@ -24,7 +24,7 @@ def print_codecs():
   print "----------------+" + 60 * '-'
   print " %-14s | %s" % ("Extension", "Description")
   print "----------------+" + 60 * '-'
-  for k, v in torch.io.extensions().iteritems():
+  for k, v in bob.io.extensions().iteritems():
     print " %-14s | %s" % (k, v)
   print "----------------+" + 60 * '-'
 
@@ -34,7 +34,7 @@ if len(sys.argv) != 3:
   print_codecs()
   sys.exit(1)
 
-infile = torch.io.open(sys.argv[1], 'r')
-outfile = torch.io.open(sys.argv[2], 'w')
+infile = bob.io.open(sys.argv[1], 'r')
+outfile = bob.io.open(sys.argv[2], 'w')
 for k in range(len(infile)):
   outfile.append(infile.read(k))

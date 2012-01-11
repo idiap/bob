@@ -2,7 +2,7 @@
 .. Andre Anjos <andre.dos.anjos@gmail.com>
 .. Sun  3 Apr 17:13:14 2011 
 
-.. Index file for the Python Torch::ip bindings
+.. Index file for the Python bob::ip bindings
 
 ==================
  Image Processing
@@ -15,6 +15,6 @@
 
    Practical01
    
-.. automodule:: torch.ip
+.. automodule:: bob.ip
    :members:
    

@@ -30,7 +30,7 @@
 #include <blitz/array.h>
 #include <complex>
 #include <string>
-#include "core/logging.h" // for Torch::core::tmpdir()
+#include "core/logging.h" // for bob::core::tmpdir()
 #include "core/cast.h"
 #include "io/HDF5File.h"
 
@@ -56,8 +56,8 @@ struct T {
  * descriptor
  */
 std::string temp_file() {
-  boost::filesystem::path tpl = Torch::core::tmpdir();
-  tpl /= "torchtest_core_hdf5XXXXXX.hdf5";
+  boost::filesystem::path tpl = bob::core::tmpdir();
+  tpl /= "bobtest_core_hdf5XXXXXX.hdf5";
   boost::shared_array<char> char_tpl(new char[tpl.file_string().size()+1]);
   strcpy(char_tpl.get(), tpl.file_string().c_str());
   int fd = mkstemps(char_tpl.get(),5);
@@ -72,7 +72,7 @@ void check_equal(const blitz::Array<T,1>& a, const blitz::Array<U,1>& b)
 {
   BOOST_REQUIRE_EQUAL(a.extent(0), b.extent(0));
   for (int i=0; i<a.extent(0); ++i) {
-    BOOST_CHECK_EQUAL(a(i), Torch::core::cast<T>(b(i)) );
+    BOOST_CHECK_EQUAL(a(i), bob::core::cast<T>(b(i)) );
   }
 }
 
@@ -83,7 +83,7 @@ void check_equal(const blitz::Array<T,2>& a, const blitz::Array<U,2>& b)
   BOOST_REQUIRE_EQUAL(a.extent(1), b.extent(1));
   for (int i=0; i<a.extent(0); ++i) {
     for (int j=0; j<a.extent(1); ++j) {
-      BOOST_CHECK_EQUAL(a(i,j), Torch::core::cast<T>(b(i,j)));
+      BOOST_CHECK_EQUAL(a(i,j), bob::core::cast<T>(b(i,j)));
     }
   }
 }
@@ -99,7 +99,7 @@ void check_equal(const blitz::Array<T,4>& a, const blitz::Array<U,4>& b)
     for (int j=0; j<a.extent(1); ++j) {
       for (int k=0; k<a.extent(2); ++k) {
         for (int l=0; l<a.extent(3); ++l) {
-          BOOST_CHECK_EQUAL(a(i,j,k,l), Torch::core::cast<T>(b(i,j,k,l)));
+          BOOST_CHECK_EQUAL(a(i,j,k,l), bob::core::cast<T>(b(i,j,k,l)));
         }
       }
     }
@@ -112,8 +112,8 @@ BOOST_AUTO_TEST_CASE( hdf5_1d_save_read )
 {
   // Put a 1D array in a HDF5File
   const std::string filename = temp_file();
-  Torch::io::HDF5File::mode_t flag = Torch::io::HDF5File::inout;
-  Torch::io::HDF5File config(filename, flag);
+  bob::io::HDF5File::mode_t flag = bob::io::HDF5File::inout;
+  bob::io::HDF5File config(filename, flag);
   config.setArray("c", c);
 
   // Read it and compare to original
@@ -126,8 +126,8 @@ BOOST_AUTO_TEST_CASE( hdf5_2d_save_read )
 {
   // Put a 2D array in a HDF5File
   const std::string filename = temp_file();
-  Torch::io::HDF5File::mode_t flag = Torch::io::HDF5File::inout;
-  Torch::io::HDF5File config(filename, flag);
+  bob::io::HDF5File::mode_t flag = bob::io::HDF5File::inout;
+  bob::io::HDF5File config(filename, flag);
   blitz::Array<double,2> at = a.transpose(1,0);
   config.setArray("at", at);
 

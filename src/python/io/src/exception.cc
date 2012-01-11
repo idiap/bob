@@ -23,8 +23,8 @@
 #include "io/Exception.h"
 #include "core/python/exception.h"
 
-using namespace Torch::python;
-namespace io = Torch::io;
+using namespace bob::python;
+namespace io = bob::io;
 
 void bind_io_exception() {
   register_exception_translator<io::IndexError>(PyExc_IndexError);

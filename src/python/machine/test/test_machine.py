@@ -8,7 +8,7 @@
 import os, sys
 import unittest
 import numpy
-import torch
+import bob
 
 def equals(x, y, epsilon):
   return (abs(x - y) < epsilon)
@@ -18,7 +18,7 @@ class MachineTest(unittest.TestCase):
 
   def test01_Gaussian(self):
     """Test Gaussian"""
-    gaussian = torch.machine.Gaussian(2)
+    gaussian = bob.machine.Gaussian(2)
 
     logLH = gaussian.logLikelihood(numpy.array([0.4, 0.2], 'float64'))
     self.assertTrue(equals(logLH, -1.93787706641, 1e-11))
@@ -26,20 +26,20 @@ class MachineTest(unittest.TestCase):
   def test02_GMMMachine(self):
     """Test a GMMMachine (statistics)"""
 
-    arrayset = torch.io.Arrayset("data/faithful.torch3_f64.hdf5")
-    gmm = torch.machine.GMMMachine(2, 2)
+    arrayset = bob.io.Arrayset("data/faithful.torch3_f64.hdf5")
+    gmm = bob.machine.GMMMachine(2, 2)
     gmm.weights   = numpy.array([0.5, 0.5], 'float64')
     gmm.means     = numpy.array([[3, 70], [4, 72]], 'float64')
     gmm.variances = numpy.array([[1, 10], [2, 5]], 'float64')
     gmm.varianceThresholds = numpy.array([[0, 0], [0, 0]], 'float64')
 
-    stats = torch.machine.GMMStats(2, 2)
+    stats = bob.machine.GMMStats(2, 2)
     gmm.accStatistics(arrayset, stats)
     
-    #config = torch.io.HDF5File("data/stats.hdf5")
+    #config = bob.io.HDF5File("data/stats.hdf5")
     #stats.save(config)
 
-    stats_ref = torch.machine.GMMStats(torch.io.HDF5File("data/stats.hdf5"))
+    stats_ref = bob.machine.GMMStats(bob.io.HDF5File("data/stats.hdf5"))
 
     self.assertTrue(stats.T == stats_ref.T)
     self.assertTrue( numpy.allclose(stats.n, stats_ref.n, atol=1e-10) )
@@ -51,11 +51,11 @@ class MachineTest(unittest.TestCase):
   def test03_GMMMachine(self):
     """Test a GMMMachine (log-likelihood computation)"""
     
-    data = torch.io.Array('data/data.hdf5').get()
-    gmm = torch.machine.GMMMachine(2, 50)
-    gmm.weights   = torch.io.Array('data/weights.hdf5').get()
-    gmm.means     = torch.io.Array('data/means.hdf5').get()
-    gmm.variances = torch.io.Array('data/variances.hdf5').get()
+    data = bob.io.Array('data/data.hdf5').get()
+    gmm = bob.machine.GMMMachine(2, 50)
+    gmm.weights   = bob.io.Array('data/weights.hdf5').get()
+    gmm.means     = bob.io.Array('data/means.hdf5').get()
+    gmm.variances = bob.io.Array('data/variances.hdf5').get()
 
     # Compare the log-likelihood with the one obtained using Chris Matlab 
     # implementation
@@ -65,7 +65,7 @@ class MachineTest(unittest.TestCase):
   def test04_GMMMachine(self):
     """Test a GMMMachine (Supervectors)"""
 
-    gmm = torch.machine.GMMMachine(2, 3)
+    gmm = bob.machine.GMMMachine(2, 3)
     gmm.weights   = numpy.array([0.5, 0.5], 'float64')
     gmm.means     = numpy.array([[3, 70, 5], [4, 72, 14]], 'float64')
     gmm.variances = numpy.array([[1, 10, 9], [2, 5, 5]], 'float64')
@@ -84,13 +84,13 @@ class MachineTest(unittest.TestCase):
 
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()

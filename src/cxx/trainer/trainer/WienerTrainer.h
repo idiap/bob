@@ -5,13 +5,13 @@
  * @brief Trainer for the Wiener Machine
  */
 
-#ifndef TORCH5SPRO_TRAINER_WIENER_TRAINER_H
-#define TORCH5SPRO_TRAINER_WIENER_TRAINER_H
+#ifndef BOB5SPRO_TRAINER_WIENER_TRAINER_H
+#define BOB5SPRO_TRAINER_WIENER_TRAINER_H
 
 #include "machine/WienerMachine.h"
 #include "io/Arrayset.h"
 
-namespace Torch { namespace trainer {
+namespace bob { namespace trainer {
   
   /**
    * Sets a Wiener machine to perform a Wiener filtering, using the Fourier
@@ -48,8 +48,8 @@ namespace Torch { namespace trainer {
       /**
        * Trains the WienerMachine to perform the filtering. 
        */
-      virtual void train(Torch::machine::WienerMachine& machine, 
-          const Torch::io::Arrayset& data) const;
+      virtual void train(bob::machine::WienerMachine& machine, 
+          const bob::io::Arrayset& data) const;
 
     private: //representation
 
@@ -57,4 +57,4 @@ namespace Torch { namespace trainer {
 
 }}
 
-#endif /* TORCH5SPRO_TRAINER_WIENER_TRAINER_H */
+#endif /* BOB5SPRO_TRAINER_WIENER_TRAINER_H */

@@ -23,7 +23,7 @@
 #include <boost/format.hpp>
 #include "core/array.h"
 
-namespace ca = Torch::core::array;
+namespace ca = bob::core::array;
 
 ca::typeinfo::typeinfo():
   dtype(ca::t_unknown),
@@ -49,7 +49,7 @@ void ca::typeinfo::reset() {
 }
 
 bool ca::typeinfo::is_valid() const {
-  return (dtype != ca::t_unknown) && (nd > 0) && (nd <= (TORCH_MAX_DIM+1)) && has_valid_shape();
+  return (dtype != ca::t_unknown) && (nd > 0) && (nd <= (BOB_MAX_DIM+1)) && has_valid_shape();
 }
 
 void ca::typeinfo::update_strides() {

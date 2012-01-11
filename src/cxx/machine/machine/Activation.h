@@ -20,11 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_MACHINE_ACTIVATION_H 
-#define TORCH_MACHINE_ACTIVATION_H
+#ifndef BOB_MACHINE_ACTIVATION_H 
+#define BOB_MACHINE_ACTIVATION_H
 
 
-namespace Torch { namespace machine {
+namespace bob { namespace machine {
 
   typedef enum Activation {
     LINEAR = 0, //Linear: y = x [this is the default]
@@ -53,5 +53,5 @@ namespace Torch { namespace machine {
 
 }}
       
-#endif /* TORCH_MACHINE_ACTIVATION_H */
+#endif /* BOB_MACHINE_ACTIVATION_H */
 

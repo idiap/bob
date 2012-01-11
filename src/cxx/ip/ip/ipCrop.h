@@ -17,15 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _TORCHVISION_IP_CROP_H_
-#define _TORCHVISION_IP_CROP_H_
+#ifndef _BOBVISION_IP_CROP_H_
+#define _BOBVISION_IP_CROP_H_
 
-#include "ip/ipCore.h"		// <ipCrop> is a <Torch::ipCore>
+#include "ip/ipCore.h"		// <ipCrop> is a <bob::ipCore>
 
-namespace Torch
+namespace bob
 {
 	/////////////////////////////////////////////////////////////////////////
-	// Torch::ipCrop
+	// bob::ipCrop
 	//	This class is designed to crop an image.
 	//	The result is a tensor of the same storage type.
 	//

@@ -30,9 +30,9 @@
 #include "io/HDF5File.h"
 
 using namespace boost::python;
-namespace io = Torch::io;
-namespace tp = Torch::python;
-namespace ca = Torch::core::array;
+namespace io = bob::io;
+namespace tp = bob::python;
+namespace ca = bob::core::array;
 
 /**
  * Allows us to write HDF5File("filename.hdf5", "rb")
@@ -178,7 +178,7 @@ static void hdf5file_set_array(io::HDF5File& f,
 }
 
 void bind_io_hdf5() {
-  class_<io::HDF5File, boost::shared_ptr<io::HDF5File>, boost::noncopyable>("HDF5File", "A HDF5File allows users to read and write data from and to files containing standard Torch binary coded data in HDF5 format. For an introduction to HDF5, please visit http://www.hdfgroup.org/HDF5.", no_init)
+  class_<io::HDF5File, boost::shared_ptr<io::HDF5File>, boost::noncopyable>("HDF5File", "A HDF5File allows users to read and write data from and to files containing standard bob binary coded data in HDF5 format. For an introduction to HDF5, please visit http://www.hdfgroup.org/HDF5.", no_init)
     .def("__init__", make_constructor(hdf5file_make_fromstr, default_call_policies(), (arg("filename"), arg("openmode_string"))), "Opens a new file in one of these supported modes: 'r' (read-only), 'w' (read/write/append), 't' (read/write/truncate) or 'x' (read/write/exclusive)")
     .def("__init__", make_constructor(hdf5file_make_readwrite, default_call_policies(), (arg("filename"))), "Opens a new HDF5File for reading and writing.")
     .def("cd", &io::HDF5File::cd, (arg("self"), arg("path")), "Changes the current prefix path. When this object is started, the prefix path is empty, which means all following paths to data objects should be given using the full path. If you set this to a different value, it will be used as a prefix to any subsequent operation until you reset it. If path starts with '/', it is treated as an absolute path. '..' and '.' are supported. This object should be a std::string. If the value is relative, it is added to the current path. If it is absolute, it causes the prefix to be reset. Note all operations taking a relative path, following a cd(), will be considered relative to the value defined by the 'cwd' property of this object.")

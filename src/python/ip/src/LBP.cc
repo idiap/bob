@@ -31,9 +31,9 @@
 #include "ip/LBPHSFeatures.h"
 
 using namespace boost::python;
-namespace ip = Torch::ip;
-namespace tp = Torch::python;
-namespace ca = Torch::core::array;
+namespace ip = bob::ip;
+namespace tp = bob::python;
+namespace ca = bob::core::array;
 
 static const char* lbp4r_doc = "Objects of this class, after configuration, can compute Local Binary Features using 4 neighbour pixels.";
 static const char* lbp8r_doc = "Objects of this class, after configuration, can compute Local Binary Features using 8 neighbour pixels.";
@@ -181,7 +181,7 @@ void bind_ip_lbp_new() {
     ;
 
   class_<ip::LBPTopOperator, boost::shared_ptr<ip::LBPTopOperator> >("LBPTopOperator",
- "Constructs a new LBPTopOperator object starting from the algorithm configuration. Please note this object will always produce rotation invariant 2D codes, also taking into consideration pattern uniformity (u2 variant).\n\nThe radius in X (width) direction is combined with the radius in the Y (height) direction for the calculation of the LBP on the XY (frame) direction. The radius in T is taken from the number of frames input, so it is dependent on the input to LBPTopOperator::operator().\n\nThe current number of points supported in torch is either 8 or 4. Any values differing from that need implementation of specialized functionality.", init<int, int, int, int, int, int>((arg("radius_xy"), arg("points_xy"), arg("radius_xt"), arg("points_xt"),  arg("radius_yt"), arg("points_yt")), "Constructs a new ipLBPTopOperator"))
+ "Constructs a new LBPTopOperator object starting from the algorithm configuration. Please note this object will always produce rotation invariant 2D codes, also taking into consideration pattern uniformity (u2 variant).\n\nThe radius in X (width) direction is combined with the radius in the Y (height) direction for the calculation of the LBP on the XY (frame) direction. The radius in T is taken from the number of frames input, so it is dependent on the input to LBPTopOperator::operator().\n\nThe current number of points supported in bob is either 8 or 4. Any values differing from that need implementation of specialized functionality.", init<int, int, int, int, int, int>((arg("radius_xy"), arg("points_xy"), arg("radius_xt"), arg("points_xt"),  arg("radius_yt"), arg("points_yt")), "Constructs a new ipLBPTopOperator"))
     .def("__call__", &call_lbptop, (arg("self"),arg("input"), arg("xy"), arg("xt"), arg("yt")), "Processes a 3D array representing a set of <b>grayscale</b> images and returns (by argument) the three LBP planes calculated. The 3D array has to be arranged in this way:\n\n1st dimension => frame height\n2nd dimension => frame width\n4th dimension => time\n\nThe number of frames in the array has to be always an odd number. The central frame is taken as the frame where the LBP planes have to be calculated from. The radius in dimension T (3rd dimension) is taken to be (N-1)/2 where N is the number of frames input.")
     ;
 

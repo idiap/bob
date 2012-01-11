@@ -24,8 +24,8 @@
 #include "io/reorder.h"
 #include "io/Exception.h"
 
-namespace io = Torch::io;
-namespace ca = Torch::core::array;
+namespace io = bob::io;
+namespace ca = bob::core::array;
 
 void io::rc2d(size_t& row, size_t& col, const size_t i, const size_t j,
     const size_t* shape) {
@@ -97,7 +97,7 @@ void io::row_to_col_order(const void* src_, void* dst_,
       break;
 
     default:
-      throw io::DimensionError(info.nd, TORCH_MAX_DIM);
+      throw io::DimensionError(info.nd, BOB_MAX_DIM);
   }
 }
   
@@ -153,7 +153,7 @@ void io::col_to_row_order(const void* src_, void* dst_,
       break;
 
     default:
-      throw io::DimensionError(info.nd, TORCH_MAX_DIM);
+      throw io::DimensionError(info.nd, BOB_MAX_DIM);
   }
 }
 
@@ -217,7 +217,7 @@ void io::row_to_col_order_complex(const void* src_, void* dst_re_,
       break;
 
     default:
-      throw io::DimensionError(info.nd, TORCH_MAX_DIM);
+      throw io::DimensionError(info.nd, BOB_MAX_DIM);
   }
 }
   
@@ -281,7 +281,7 @@ void io::col_to_row_order_complex(const void* src_re_, const void* src_im_,
       break;
 
     default:
-      throw io::DimensionError(info.nd, TORCH_MAX_DIM);
+      throw io::DimensionError(info.nd, BOB_MAX_DIM);
   }
 }
   

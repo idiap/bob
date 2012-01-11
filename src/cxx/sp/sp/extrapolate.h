@@ -21,15 +21,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_SP_EXTRAPOLATE_H
-#define TORCH5SPRO_SP_EXTRAPOLATE_H
+#ifndef BOB5SPRO_SP_EXTRAPOLATE_H
+#define BOB5SPRO_SP_EXTRAPOLATE_H
 
 #include <blitz/array.h>
 #include "core/Exception.h"
 #include "core/array_assert.h"
 #include "core/array_index.h"
 
-namespace Torch {
+namespace bob {
   /**
    * \ingroup libsp_api
    * @{
@@ -45,11 +45,11 @@ namespace Torch {
       const T value)
     {
       // Checks zero base
-      Torch::core::array::assertZeroBase(src);
-      Torch::core::array::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(dst);
 
       if(src.extent(0) > dst.extent(0))
-        throw Torch::core::Exception();
+        throw bob::core::Exception();
 
       // Sets value everywhere
       dst = value;
@@ -69,11 +69,11 @@ namespace Torch {
       const T value)
     {
       // Checks zero base
-      Torch::core::array::assertZeroBase(src);
-      Torch::core::array::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(dst);
 
       if(src.extent(0) > dst.extent(0) || src.extent(1) > dst.extent(1))
-        throw Torch::core::Exception();
+        throw bob::core::Exception();
 
       // Sets value everywhere
       dst = value;
@@ -96,7 +96,7 @@ namespace Torch {
     {
       // Calls extrapolate with the constant set to 0
       T zero = 0;
-      Torch::sp::extrapolateConstant(src, dst, zero);
+      bob::sp::extrapolateConstant(src, dst, zero);
     }
 
     /**
@@ -107,7 +107,7 @@ namespace Torch {
     {
       // Calls extrapolate with the constant set to 0
       T zero = 0;
-      Torch::sp::extrapolateConstant(src, dst, zero);
+      bob::sp::extrapolateConstant(src, dst, zero);
     }
 
 
@@ -118,13 +118,13 @@ namespace Torch {
     void extrapolateNearest(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
     {
       // Checks zero base
-      Torch::core::array::assertZeroBase(src);
-      Torch::core::array::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(dst);
 
       // Computes offsets
       int offset = (dst.extent(0) - src.extent(0)) / 2;
       for(int i=0; i<dst.extent(0); ++i)
-        dst(i) = src( Torch::core::array::keepInRange(i-offset, 0, src.extent(0)-1));
+        dst(i) = src( bob::core::array::keepInRange(i-offset, 0, src.extent(0)-1));
     }
 
     /**
@@ -134,16 +134,16 @@ namespace Torch {
     void extrapolateNearest(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
     {
       // Checks zero base
-      Torch::core::array::assertZeroBase(src);
-      Torch::core::array::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(dst);
 
       // Computes offsets
       int offset_y = (dst.extent(0) - src.extent(0)) / 2;
       int offset_x = (dst.extent(1) - src.extent(1)) / 2;
       for(int j=0; j<dst.extent(0); ++j)
         for(int i=0; i<dst.extent(1); ++i)
-          dst(j,i) = src( Torch::core::array::keepInRange(j-offset_y, 0, src.extent(0)-1),
-                          Torch::core::array::keepInRange(i-offset_x, 0, src.extent(1)-1));
+          dst(j,i) = src( bob::core::array::keepInRange(j-offset_y, 0, src.extent(0)-1),
+                          bob::core::array::keepInRange(i-offset_x, 0, src.extent(1)-1));
     }
     
 
@@ -154,8 +154,8 @@ namespace Torch {
     void extrapolateCircular(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
     {
       // Checks zero base
-      Torch::core::array::assertZeroBase(src);
-      Torch::core::array::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(dst);
 
       // Computes offset
       int offset = (dst.extent(0) - src.extent(0)) / 2;
@@ -172,8 +172,8 @@ namespace Torch {
     void extrapolateCircular(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
     {
       // Checks zero base
-      Torch::core::array::assertZeroBase(src);
-      Torch::core::array::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(dst);
 
       // Computes offset
       int offset_y = (dst.extent(0) - src.extent(0)) / 2;
@@ -194,15 +194,15 @@ namespace Torch {
     void extrapolateMirror(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
     {
       // Checks zero base
-      Torch::core::array::assertZeroBase(src);
-      Torch::core::array::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(dst);
 
       // Computes offsets
       int offset = (dst.extent(0) - src.extent(0)) / 2;
 
       // Sets left values
       for(int i=0; i<dst.extent(0); ++i)
-        dst(i) = src( Torch::core::array::mirrorInRange(i-offset, 0, src.extent(0)-1));
+        dst(i) = src( bob::core::array::mirrorInRange(i-offset, 0, src.extent(0)-1));
     }
 
     /**
@@ -212,8 +212,8 @@ namespace Torch {
     void extrapolateMirror(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
     {
       // Checks zero base
-      Torch::core::array::assertZeroBase(src);
-      Torch::core::array::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(dst);
 
       // Computes offsets
       int offset_y = (dst.extent(0) - src.extent(0)) / 2;
@@ -222,8 +222,8 @@ namespace Torch {
       // Sets left values
       for(int j=0; j<dst.extent(0); ++j)
         for(int i=0; i<dst.extent(0); ++i)
-          dst(j,i) = src( Torch::core::array::mirrorInRange(j-offset_y, 0, src.extent(0)-1),
-                          Torch::core::array::mirrorInRange(i-offset_x, 0, src.extent(1)-1));
+          dst(j,i) = src( bob::core::array::mirrorInRange(j-offset_y, 0, src.extent(0)-1),
+                          bob::core::array::mirrorInRange(i-offset_x, 0, src.extent(1)-1));
     }
  
   }
@@ -232,4 +232,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_SP_INTERPOLATE_H */
+#endif /* BOB5SPRO_SP_INTERPOLATE_H */

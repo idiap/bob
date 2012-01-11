@@ -9,7 +9,7 @@
 
 import os, sys
 import unittest
-import torch
+import bob
 import math
 import numpy
 
@@ -17,12 +17,12 @@ def load_gray(relative_filename):
   # Please note our PNG loader will always load in RGB, but since that is a
   # grayscaled version of the image, I just select one of the planes. 
   filename = os.path.join("data", "flow", relative_filename)
-  array = torch.io.Array(filename)
+  array = bob.io.Array(filename)
   return array.get()[0,:,:] 
 
 def load_known_flow(relative_filename):
   filename = os.path.join("data", "flow", relative_filename)
-  array = torch.io.Array(filename)
+  array = bob.io.Array(filename)
   data = array.get()
   return data[:,:,0].astype('float64'), data[:,:,1].astype('float64')
 
@@ -158,12 +158,12 @@ def Central_Ex(im1, im2, im3):
   c2 = numpy.ndarray(im2.shape, 'float64')
   c3 = numpy.ndarray(im3.shape, 'float64')
 
-  torch.sp.convolve(im1.astype('float64'), Kx, c1, 
-      torch.sp.ConvolutionSize.Same, torch.sp.ConvolutionBorder.Mirror)
-  torch.sp.convolve(im2.astype('float64'), Kx, c2,
-      torch.sp.ConvolutionSize.Same, torch.sp.ConvolutionBorder.Mirror)
-  torch.sp.convolve(im3.astype('float64'), Kx, c3,
-      torch.sp.ConvolutionSize.Same, torch.sp.ConvolutionBorder.Mirror)
+  bob.sp.convolve(im1.astype('float64'), Kx, c1, 
+      bob.sp.ConvolutionSize.Same, bob.sp.ConvolutionBorder.Mirror)
+  bob.sp.convolve(im2.astype('float64'), Kx, c2,
+      bob.sp.ConvolutionSize.Same, bob.sp.ConvolutionBorder.Mirror)
+  bob.sp.convolve(im3.astype('float64'), Kx, c3,
+      bob.sp.ConvolutionSize.Same, bob.sp.ConvolutionBorder.Mirror)
 
   return c1 + 2*c2 + c3
 
@@ -176,12 +176,12 @@ def Central_Ey(im1, im2, im3):
   c2 = numpy.ndarray(im2.shape, 'float64')
   c3 = numpy.ndarray(im3.shape, 'float64')
 
-  torch.sp.convolve(im1.astype('float64'), Ky, c1,
-      torch.sp.ConvolutionSize.Same, torch.sp.ConvolutionBorder.Mirror)
-  torch.sp.convolve(im2.astype('float64'), Ky, c2,
-      torch.sp.ConvolutionSize.Same, torch.sp.ConvolutionBorder.Mirror)
-  torch.sp.convolve(im3.astype('float64'), Ky, c3,
-      torch.sp.ConvolutionSize.Same, torch.sp.ConvolutionBorder.Mirror)
+  bob.sp.convolve(im1.astype('float64'), Ky, c1,
+      bob.sp.ConvolutionSize.Same, bob.sp.ConvolutionBorder.Mirror)
+  bob.sp.convolve(im2.astype('float64'), Ky, c2,
+      bob.sp.ConvolutionSize.Same, bob.sp.ConvolutionBorder.Mirror)
+  bob.sp.convolve(im3.astype('float64'), Ky, c3,
+      bob.sp.ConvolutionSize.Same, bob.sp.ConvolutionBorder.Mirror)
 
   return c1 + 2*c2 + c3
 
@@ -193,10 +193,10 @@ def Central_Et(im1, im2, im3):
   c1 = numpy.zeros(im1.shape, 'float64')
   c3 = numpy.zeros(im3.shape, 'float64')
 
-  torch.sp.convolve(im1.astype('float64'), Kt, c1,
-      torch.sp.ConvolutionSize.Same, torch.sp.ConvolutionBorder.Mirror)
-  torch.sp.convolve(im3.astype('float64'), Kt, c3,
-      torch.sp.ConvolutionSize.Same, torch.sp.ConvolutionBorder.Mirror)
+  bob.sp.convolve(im1.astype('float64'), Kt, c1,
+      bob.sp.ConvolutionSize.Same, bob.sp.ConvolutionBorder.Mirror)
+  bob.sp.convolve(im3.astype('float64'), Kt, c3,
+      bob.sp.ConvolutionSize.Same, bob.sp.ConvolutionBorder.Mirror)
 
   return c3 - c1
 
@@ -206,7 +206,7 @@ class GradientTest(unittest.TestCase):
   def test01_HornAndSchunckCxxAgainstPythonSynthetic(self):
     
     i1, i2 = make_image_pair_1()
-    grad = torch.ip.HornAndSchunckGradient(i1.shape)
+    grad = bob.ip.HornAndSchunckGradient(i1.shape)
     ex_cxx, ey_cxx, et_cxx = grad(i1, i2)
     ex_python = Forward_Ex(i1, i2)
     ey_python = Forward_Ey(i1, i2)
@@ -228,7 +228,7 @@ class GradientTest(unittest.TestCase):
   def test02_SobelCxxAgainstPythonSynthetic(self):
     
     i1, i2, i3 = make_image_tripplet_1()
-    grad = torch.ip.SobelGradient(i1.shape)
+    grad = bob.ip.SobelGradient(i1.shape)
     ex_python = Central_Ex(i1, i2, i3)
     ey_python = Central_Ey(i1, i2, i3)
     et_python = Central_Et(i1, i2, i3)
@@ -239,14 +239,14 @@ class GradientTest(unittest.TestCase):
 
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()
 

@@ -6,7 +6,7 @@
 """Arrayset additions
 """
 
-from libpytorch_io import Arrayset
+from libpybob_io import Arrayset
 import numpy
 
 def arrayset_iter(self):

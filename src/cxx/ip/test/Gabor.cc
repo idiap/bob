@@ -82,27 +82,27 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 BOOST_AUTO_TEST_CASE( test_Gabor_2d_spatial )
 {
 // Get path to the XML Schema definition
-  char *testdata_cpath = getenv("TORCH_IP_TESTDATA_DIR");
+  char *testdata_cpath = getenv("BOB_IP_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    Torch::core::error << "Environment variable $TORCH_IP_TESTDATA_DIR " <<
+    bob::core::error << "Environment variable $BOB_IP_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
   }
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "image.pgm";
-  Torch::io::Array ar_img(testdata_path_img.string());
+  bob::io::Array ar_img(testdata_path_img.string());
   blitz::Array<uint8_t,2> img = ar_img.get<uint8_t,2>();
   blitz::Array<std::complex<double>,2> img_processed(img.shape());
   blitz::Array<std::complex<double>,2> img_src = 
-    Torch::core::cast<std::complex<double> >(img);
-  Torch::ip::GaborSpatial GS_filter;
+    bob::core::cast<std::complex<double> >(img);
+  bob::ip::GaborSpatial GS_filter;
 
   // Check the kernel
   boost::filesystem::path path_kernel_ref( testdata_cpath);
   path_kernel_ref /= "Gabor/gabor_spatial_filter.hdf5";
-  Torch::io::Array ar_spatial_kernel(path_kernel_ref.string());
+  bob::io::Array ar_spatial_kernel(path_kernel_ref.string());
   blitz::Array<std::complex<double>,2> ref_kernel = ar_spatial_kernel.get<std::complex<double>,2>();
   checkBlitzClose( GS_filter.getKernel(), ref_kernel, eps1);
 
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE( test_Gabor_2d_spatial )
   GS_filter(img_src,img_processed);
   boost::filesystem::path path_img_ref( testdata_cpath);
   path_img_ref /= "Gabor/gabor_spatial_filtered.hdf5";
-  Torch::io::Array ar_spatial_image(path_img_ref.string());
+  bob::io::Array ar_spatial_image(path_img_ref.string());
   blitz::Array<std::complex<double>,2> ref_image = ar_spatial_image.get<std::complex<double>,2>();
   checkBlitzClose( img_processed, ref_image, eps1);
 }
@@ -118,27 +118,27 @@ BOOST_AUTO_TEST_CASE( test_Gabor_2d_spatial )
 BOOST_AUTO_TEST_CASE( test_Gabor_2d_frequency )
 {
 // Get path to the XML Schema definition
-  char *testdata_cpath = getenv("TORCH_IP_TESTDATA_DIR");
+  char *testdata_cpath = getenv("BOB_IP_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    Torch::core::error << "Environment variable $TORCH_IP_TESTDATA_DIR " <<
+    bob::core::error << "Environment variable $BOB_IP_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
   }
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "image.pgm";
-  Torch::io::Array ar_img(testdata_path_img.string());
+  bob::io::Array ar_img(testdata_path_img.string());
   blitz::Array<uint8_t,2> img = ar_img.get<uint8_t,2>();
   blitz::Array<std::complex<double>,2> img_processed( img.shape());
   blitz::Array<std::complex<double>,2> img_src = 
-    Torch::core::cast<std::complex<double> >(img);
-  Torch::ip::GaborFrequency GF_filter(img.extent(0),img.extent(1));
+    bob::core::cast<std::complex<double> >(img);
+  bob::ip::GaborFrequency GF_filter(img.extent(0),img.extent(1));
 
   // Check the kernel
   boost::filesystem::path path_kernel_ref( testdata_cpath);
   path_kernel_ref /= "Gabor/gabor_frequency_filter.hdf5";
-  Torch::io::Array ar_frequency_kernel(path_kernel_ref.string());
+  bob::io::Array ar_frequency_kernel(path_kernel_ref.string());
   blitz::Array<std::complex<double>,2> ref_kernel = ar_frequency_kernel.get<std::complex<double>,2>();
   checkBlitzClose( GF_filter.getKernelShifted(), ref_kernel, eps1);
 
@@ -146,7 +146,7 @@ BOOST_AUTO_TEST_CASE( test_Gabor_2d_frequency )
   GF_filter(img_src,img_processed);
   boost::filesystem::path path_img_ref( testdata_cpath);
   path_img_ref /= "Gabor/gabor_frequency_filtered.hdf5";
-  Torch::io::Array ar_frequency_image(path_img_ref.string());
+  bob::io::Array ar_frequency_image(path_img_ref.string());
   blitz::Array<std::complex<double>,2> ref_image = ar_frequency_image.get<std::complex<double>,2>();
   checkBlitzClose( img_processed, ref_image, eps2);
 
@@ -155,11 +155,11 @@ BOOST_AUTO_TEST_CASE( test_Gabor_2d_frequency )
   blitz::Range  i0(img_processed.lbound(0), img_processed.ubound(0)),
                 i1(img_processed.lbound(1), img_processed.ubound(1));
   img_mag(i0,i1) = abs(img_processed(i0,i1));
-  blitz::Array<uint8_t,2> img_mag_uint = Torch::core::convertFromRange<uint8_t>(
+  blitz::Array<uint8_t,2> img_mag_uint = bob::core::convertFromRange<uint8_t>(
     img_mag, min(img_mag), max(img_mag) );
   boost::filesystem::path path_img_ref_pgm( testdata_cpath);
   path_img_ref_pgm /= "Gabor/gabor_frequency_filtered.pgm";
-  Torch::io::Array ar_frequency_image_pgm(path_img_ref_pgm.string());
+  bob::io::Array ar_frequency_image_pgm(path_img_ref_pgm.string());
   blitz::Array<uint8_t,2> img_ref_pgm = ar_frequency_image_pgm.get<uint8_t,2>();
   checkBlitzMeanClose( img_mag_uint, img_ref_pgm, eps3);
 }
@@ -167,27 +167,27 @@ BOOST_AUTO_TEST_CASE( test_Gabor_2d_frequency )
 BOOST_AUTO_TEST_CASE( test_Gabor_2d_frequency_envelope )
 {
 // Get path to the XML Schema definition
-  char *testdata_cpath = getenv("TORCH_IP_TESTDATA_DIR");
+  char *testdata_cpath = getenv("BOB_IP_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    Torch::core::error << "Environment variable $TORCH_IP_TESTDATA_DIR " <<
+    bob::core::error << "Environment variable $BOB_IP_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
   }
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "image.pgm";
-  Torch::io::Array ar_img(testdata_path_img.string());
+  bob::io::Array ar_img(testdata_path_img.string());
   blitz::Array<uint8_t,2> img = ar_img.get<uint8_t,2>();
   blitz::Array<std::complex<double>,2> img_processed(img.shape());
   blitz::Array<std::complex<double>,2> img_src = 
-    Torch::core::cast<std::complex<double> >(img);
-  Torch::ip::GaborFrequency GF_filter(img.extent(0),img.extent(1), 0.25, 0., 1., 1., 0.99, false, true);
+    bob::core::cast<std::complex<double> >(img);
+  bob::ip::GaborFrequency GF_filter(img.extent(0),img.extent(1), 0.25, 0., 1., 1., 0.99, false, true);
 
   // Check the kernel
   boost::filesystem::path path_kernel_ref( testdata_cpath);
   path_kernel_ref /= "Gabor/gabor_frequency_filter.hdf5";
-  Torch::io::Array ar_frequency_kernel(path_kernel_ref.string());
+  bob::io::Array ar_frequency_kernel(path_kernel_ref.string());
   blitz::Array<std::complex<double>,2> ref_kernel = ar_frequency_kernel.get<std::complex<double>,2>();
   checkBlitzClose( GF_filter.getKernelShifted(), ref_kernel, eps1);
 
@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE( test_Gabor_2d_frequency_envelope )
   GF_filter(img_src,img_processed);
   boost::filesystem::path path_img_ref( testdata_cpath);
   path_img_ref /= "Gabor/gabor_frequency_filtered.hdf5";
-  Torch::io::Array ar_frequency_image(path_img_ref.string());
+  bob::io::Array ar_frequency_image(path_img_ref.string());
   blitz::Array<std::complex<double>,2> ref_image = ar_frequency_image.get<std::complex<double>,2>();
   checkBlitzClose( img_processed, ref_image, eps2);
 
@@ -204,11 +204,11 @@ BOOST_AUTO_TEST_CASE( test_Gabor_2d_frequency_envelope )
   blitz::Range  i0(img_processed.lbound(0), img_processed.ubound(0)),
                 i1(img_processed.lbound(1), img_processed.ubound(1));
   img_mag(i0,i1) = abs(img_processed(i0,i1));
-  blitz::Array<uint8_t,2> img_mag_uint = Torch::core::convertFromRange<uint8_t>(
+  blitz::Array<uint8_t,2> img_mag_uint = bob::core::convertFromRange<uint8_t>(
     img_mag, min(img_mag), max(img_mag) );
   boost::filesystem::path path_img_ref_pgm( testdata_cpath);
   path_img_ref_pgm /= "Gabor/gabor_frequency_filtered.pgm";
-  Torch::io::Array ar_frequency_image_pgm(path_img_ref_pgm.string());
+  bob::io::Array ar_frequency_image_pgm(path_img_ref_pgm.string());
   blitz::Array<uint8_t,2> img_ref_pgm = ar_frequency_image_pgm.get<uint8_t,2>();
   checkBlitzMeanClose( img_mag_uint, img_ref_pgm, eps3);
 }

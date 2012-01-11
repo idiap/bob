@@ -20,7 +20,7 @@
 #include "ip/Octon2D.h"
 #include "ip/OldColor.h"
 
-namespace Torch {
+namespace bob {
 
 Octon2D::~Octon2D()
 {

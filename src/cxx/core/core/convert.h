@@ -7,7 +7,7 @@
  * blitz array of a given type into a blitz array of an other type. Typically,
  * this can be used to rescale a 16 bit precision grayscale image (2d array)
  * into an 8 bit precision grayscale image.
- * @see Torch::core::cast
+ * @see bob::core::cast
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -24,14 +24,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_CORE_CONVERT_H
-#define TORCH5SPRO_CORE_CONVERT_H
+#ifndef BOB5SPRO_CORE_CONVERT_H
+#define BOB5SPRO_CORE_CONVERT_H
 
 #include <limits>
 #include <blitz/array.h>
 #include "core/convert_exception.h"
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libcore_api
  * @{
@@ -49,14 +49,14 @@ namespace Torch {
     {
       blitz::Array<T,1> dst( src.extent(0) );
       if( src_min == src_max)
-        throw Torch::core::ConvertZeroInputRange();
+        throw bob::core::ConvertZeroInputRange();
       double src_ratio = 1. / ( src_max - src_min);
       T dst_diff = dst_max - dst_min;
       for( int i=0; i<src.extent(0); ++i) {
         if( src(i+src.lbound(0)) < src_min)
-          throw Torch::core::ConvertInputBelowMinRange(src(i+src.lbound(0)), src_min);
+          throw bob::core::ConvertInputBelowMinRange(src(i+src.lbound(0)), src_min);
         if( src(i+src.lbound(0)) > src_max)
-          throw Torch::core::ConvertInputAboveMaxRange(src(i+src.lbound(0)), src_max);
+          throw bob::core::ConvertInputAboveMaxRange(src(i+src.lbound(0)), src_max);
         // If the destination is an integer-like type, we need to add 0.5 s.t.
         // the round done by the implicit conversion is correct
         dst(i) = dst_min + (((src(i+src.lbound(0))-src_min)*src_ratio) * 
@@ -75,15 +75,15 @@ namespace Torch {
     {
       blitz::Array<T,2> dst( src.extent(0), src.extent(1) );
       if( src_min == src_max)
-        throw Torch::core::ConvertZeroInputRange();
+        throw bob::core::ConvertZeroInputRange();
       double src_ratio = 1. / ( src_max - src_min);
       T dst_diff = dst_max - dst_min;
       for( int i=0; i<src.extent(0); ++i) 
         for( int j=0; j<src.extent(1); ++j) {
           if( src(i+src.lbound(0),j+src.lbound(1)) < src_min)
-            throw Torch::core::ConvertInputBelowMinRange(src(i+src.lbound(0),j+src.lbound(1)), src_min); 
+            throw bob::core::ConvertInputBelowMinRange(src(i+src.lbound(0),j+src.lbound(1)), src_min); 
           if( src(i+src.lbound(0),j+src.lbound(1)) > src_max )
-            throw Torch::core::ConvertInputAboveMaxRange(src(i+src.lbound(0),j+src.lbound(1)), src_max);
+            throw bob::core::ConvertInputAboveMaxRange(src(i+src.lbound(0),j+src.lbound(1)), src_max);
           // If the destination is an integer-like type, we need to add 0.5 
           // s.t. the round done by the implicit conversion is correct
           dst(i,j) = dst_min + (((src(i+src.lbound(0),j+src.lbound(1))-src_min)*src_ratio) * 
@@ -102,16 +102,16 @@ namespace Torch {
     {
       blitz::Array<T,3> dst( src.extent(0), src.extent(1), src.extent(2) );
       if( src_min == src_max)
-        throw Torch::core::ConvertZeroInputRange();
+        throw bob::core::ConvertZeroInputRange();
       double src_ratio = 1. / ( src_max - src_min);
       T dst_diff = dst_max - dst_min;
       for( int i=0; i<src.extent(0); ++i)
         for( int j=0; j<src.extent(1); ++j) 
           for( int k=0; k<src.extent(2); ++k) {
             if( src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2)) < src_min)
-              throw Torch::core::ConvertInputBelowMinRange(src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2)), src_min); 
+              throw bob::core::ConvertInputBelowMinRange(src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2)), src_min); 
             if( src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2)) > src_max )
-              throw Torch::core::ConvertInputAboveMaxRange(src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2)), src_max);
+              throw bob::core::ConvertInputAboveMaxRange(src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2)), src_max);
             // If the destination is an integer-like type, we need to add 0.5 
             // s.t. the round done by the implicit conversion is correct
             dst(i,j,k) = dst_min + (((src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2))-src_min)*src_ratio) * 
@@ -131,7 +131,7 @@ namespace Torch {
       blitz::Array<T,4> dst( src.extent(0), src.extent(1), src.extent(2),
         src.extent(3) );
       if( src_min == src_max)
-        throw Torch::core::ConvertZeroInputRange();
+        throw bob::core::ConvertZeroInputRange();
       double src_ratio = 1. / ( src_max - src_min);
       T dst_diff = dst_max - dst_min;
       for( int i=0; i<src.extent(0); ++i)
@@ -139,9 +139,9 @@ namespace Torch {
           for( int k=0; k<src.extent(2); ++k)
             for( int l=0; l<src.extent(3); ++l) {
               if( src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2),l+src.lbound(3)) < src_min)
-                throw Torch::core::ConvertInputBelowMinRange(src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2),l+src.lbound(3)), src_min); 
+                throw bob::core::ConvertInputBelowMinRange(src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2),l+src.lbound(3)), src_min); 
               if( src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2),l+src.lbound(3)) > src_max )
-                throw Torch::core::ConvertInputAboveMaxRange(src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2),l+src.lbound(3)), src_max);
+                throw bob::core::ConvertInputAboveMaxRange(src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2),l+src.lbound(3)), src_max);
               // If the destination is an integer-like type, we need to add 0.5
               // s.t. the round done by the implicit conversion is correct
               dst(i,j,k,l) = dst_min + (((src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2),l+src.lbound(3))-src_min)*src_ratio) *
@@ -202,5 +202,5 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_CORE_CAST_H */
+#endif /* BOB5SPRO_CORE_CAST_H */
 

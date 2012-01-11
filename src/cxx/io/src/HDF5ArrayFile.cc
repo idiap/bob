@@ -30,8 +30,8 @@
 #include "io/HDF5Exception.h"
 
 namespace fs = boost::filesystem;
-namespace io = Torch::io;
-namespace ca = Torch::core::array;
+namespace io = bob::io;
+namespace ca = bob::core::array;
 
 /**
  * Required initialization by the HDF5 sub-system
@@ -181,7 +181,7 @@ class HDF5ArrayFile: public io::File {
 
 };
 
-std::string HDF5ArrayFile::s_codecname = "torch.hdf5";
+std::string HDF5ArrayFile::s_codecname = "bob.hdf5";
 
 /**
  * From this point onwards we have the registration procedure. If you are

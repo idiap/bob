@@ -1,7 +1,7 @@
 /**
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
- * @brief Implements a Torch3vision bindata reader/writer
+ * @brief Implements a bob3vision bindata reader/writer
  *
  * The format, as described in the old source code goes like this.
  *
@@ -30,7 +30,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-namespace io = Torch::io;
+namespace io = bob::io;
 
 static inline size_t get_filesize(const std::string& filename) {
   struct stat filestatus;
@@ -47,7 +47,7 @@ static bool register_codec() {
 static bool codec_registered = register_codec();
 
 io::T3BinaryArrayCodec::T3BinaryArrayCodec()
-  : m_name("torch3.array.binary"),
+  : m_name("bob3.array.binary"),
     m_extensions()
 { 
   m_extensions.push_back(".bindata");
@@ -56,7 +56,7 @@ io::T3BinaryArrayCodec::T3BinaryArrayCodec()
 io::T3BinaryArrayCodec::~T3BinaryArrayCodec() { }
 
 void io::T3BinaryArrayCodec::peek(const std::string& filename, 
-    Torch::core::array::ElementType& eltype, size_t& ndim,
+    bob::core::array::ElementType& eltype, size_t& ndim,
     size_t* shape) const {
   size_t fsize = get_filesize(filename);
   fsize -= 8; // remove the first two entries
@@ -69,9 +69,9 @@ void io::T3BinaryArrayCodec::peek(const std::string& filename,
   ifile.read((char*)&framesize, sizeof(uint32_t));
   ifile.close();
   // are those floats or doubles?
-  if (fsize == (nsamples*framesize*sizeof(float))) eltype = Torch::core::array::t_float32;
-  else if (fsize == (nsamples*framesize*sizeof(double))) eltype = Torch::core::array::t_float64;
-  else throw io::TypeError(Torch::core::array::t_float32, Torch::core::array::t_unknown);
+  if (fsize == (nsamples*framesize*sizeof(float))) eltype = bob::core::array::t_float32;
+  else if (fsize == (nsamples*framesize*sizeof(double))) eltype = bob::core::array::t_float64;
+  else throw io::TypeError(bob::core::array::t_float32, bob::core::array::t_unknown);
   ndim = 2;
   shape[0] = nsamples;
   shape[1] = framesize;
@@ -101,7 +101,7 @@ io::T3BinaryArrayCodec::load(const std::string& filename) const {
   }
   else {
     ifile.close();
-    throw io::TypeError(Torch::core::array::t_unknown, Torch::core::array::t_float32);
+    throw io::TypeError(bob::core::array::t_unknown, bob::core::array::t_float32);
   }
 }
 
@@ -111,8 +111,8 @@ void io::T3BinaryArrayCodec::save (const std::string& filename,
   if (data.getNDim() != 2) throw io::DimensionError(data.getNDim(), 2);
 
   //can only save float32 or float64, otherwise, throw.
-  if ((data.getElementType() != Torch::core::array::t_float32) && 
-      (data.getElementType() != Torch::core::array::t_float64)) {
+  if ((data.getElementType() != bob::core::array::t_float32) && 
+      (data.getElementType() != bob::core::array::t_float64)) {
     throw io::UnsupportedTypeError(data.getElementType()); 
   }
 
@@ -121,14 +121,14 @@ void io::T3BinaryArrayCodec::save (const std::string& filename,
   const uint32_t framesize = data.getShape()[1];
   ofile.write((const char*)&nsamples, sizeof(uint32_t));
   ofile.write((const char*)&framesize, sizeof(uint32_t));
-  if (data.getElementType() == Torch::core::array::t_float32) {
+  if (data.getElementType() == bob::core::array::t_float32) {
     blitz::Array<float, 2> save = data.get<float,2>();
-    if (!save.isStorageContiguous()) save.reference(Torch::core::array::ccopy(save));
+    if (!save.isStorageContiguous()) save.reference(bob::core::array::ccopy(save));
     ofile.write((const char*)save.data(), save.extent(0)*save.extent(1)*sizeof(float));
   }
   else { //it is a t_float64
     blitz::Array<double, 2> save = data.get<double,2>();
-    if (!save.isStorageContiguous()) save.reference(Torch::core::array::ccopy(save));
+    if (!save.isStorageContiguous()) save.reference(bob::core::array::ccopy(save));
     ofile.write((const char*)save.data(), save.extent(0)*save.extent(1)*sizeof(double));
   }
   ofile.close();

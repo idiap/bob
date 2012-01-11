@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IO_DETAIL_VIDEOWRITER_H 
-#define TORCH_IO_DETAIL_VIDEOWRITER_H
+#ifndef BOB_IO_DETAIL_VIDEOWRITER_H 
+#define BOB_IO_DETAIL_VIDEOWRITER_H
 
 #include <string>
 #include <blitz/array.h>
@@ -35,7 +35,7 @@ extern "C" {
 #include <libswscale/swscale.h>
 }
 
-namespace Torch { namespace io {
+namespace bob { namespace io {
 
   /**
    * Use objects of this class to create and write video files.
@@ -139,13 +139,13 @@ namespace Torch { namespace io {
       /**
        * Compatibility layer type information
        */ 
-      const Torch::core::array::typeinfo& video_type() const 
+      const bob::core::array::typeinfo& video_type() const 
       { return m_typeinfo_video; }
 
       /**
        * Compatibility layer type information
        */ 
-      const Torch::core::array::typeinfo& frame_type() const 
+      const bob::core::array::typeinfo& frame_type() const 
       { return m_typeinfo_frame; }
 
       /**
@@ -172,10 +172,10 @@ namespace Torch { namespace io {
 
       /**
        * Writes a set of frames to the file. The frame set should be setup as a
-       * Torch::core::array::interface organized this way: (frame-number, 
+       * bob::core::array::interface organized this way: (frame-number, 
        * RGB color-bands, height, width) or (RGB color-bands, height, width).
        */
-      void append(const Torch::core::array::interface& data);
+      void append(const bob::core::array::interface& data);
     
     private: //not implemented
 
@@ -221,8 +221,8 @@ namespace Torch { namespace io {
       size_t m_gop;
       std::string m_codecname;
       std::string m_codecname_long;
-      Torch::core::array::typeinfo m_typeinfo_video;
-      Torch::core::array::typeinfo m_typeinfo_frame;
+      bob::core::array::typeinfo m_typeinfo_video;
+      bob::core::array::typeinfo m_typeinfo_frame;
 
       AVOutputFormat* m_oformat_ctxt;
       AVFormatContext* m_format_ctxt;
@@ -240,4 +240,4 @@ namespace Torch { namespace io {
 
 }}
 
-#endif /* TORCH_IO_DETAIL_VIDEOWRITER_H */
+#endif /* BOB_IO_DETAIL_VIDEOWRITER_H */

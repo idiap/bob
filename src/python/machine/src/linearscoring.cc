@@ -24,37 +24,37 @@
 #include "core/python/ndarray.h"
 
 using namespace boost::python;
-namespace tp = Torch::python;
+namespace tp = bob::python;
 
 static blitz::Array<double, 2> linearScoring(list models,
-    Torch::machine::GMMMachine& ubm,
+    bob::machine::GMMMachine& ubm,
     list test_stats,
     object test_channelOffset = object(), //None
     bool frame_length_normalisation = false) {
 
   int size_models = len(models);
-  std::vector<Torch::machine::GMMMachine*> models_c;
+  std::vector<bob::machine::GMMMachine*> models_c;
 
   for(int i = 0; i < size_models; i++) {
-    models_c.push_back(extract<Torch::machine::GMMMachine*>(models[i]));
+    models_c.push_back(extract<bob::machine::GMMMachine*>(models[i]));
   }
 
   int size_test_stats = len(test_stats);
-  std::vector<Torch::machine::GMMStats*> test_stats_c;
+  std::vector<bob::machine::GMMStats*> test_stats_c;
 
   for(int i = 0; i < size_test_stats; i++) {
-    test_stats_c.push_back(extract<Torch::machine::GMMStats*>(test_stats[i]));
+    test_stats_c.push_back(extract<bob::machine::GMMStats*>(test_stats[i]));
   }
 
   blitz::Array<double, 2> ret;
    
   if (test_channelOffset.ptr() == object().ptr()) { //object is None
-    Torch::machine::linearScoring(models_c, ubm, test_stats_c, 0, frame_length_normalisation, ret);
+    bob::machine::linearScoring(models_c, ubm, test_stats_c, 0, frame_length_normalisation, ret);
   }
   else { //object is not None => must by a 2D double array
     tp::ndarray tmp = extract<tp::ndarray>(test_channelOffset);
     blitz::Array<double, 2> test_channelOffset_ = tmp.bz<double,2>(); //wrap
-    Torch::machine::linearScoring(models_c, ubm, test_stats_c, &test_channelOffset_, frame_length_normalisation, ret);
+    bob::machine::linearScoring(models_c, ubm, test_stats_c, &test_channelOffset_, frame_length_normalisation, ret);
   }
   
   return ret;
@@ -67,10 +67,10 @@ static void convertGMMMeanList(list models, std::vector<blitz::Array<double,1> >
   }
 }
 
-static void convertGMMStatsList(list test_stats, std::vector<const Torch::machine::GMMStats*>& test_stats_c) {
+static void convertGMMStatsList(list test_stats, std::vector<const bob::machine::GMMStats*>& test_stats_c) {
   int size_test_stats = len(test_stats);
   for(int i=0; i<size_test_stats; ++i) {
-    test_stats_c.push_back(extract<const Torch::machine::GMMStats*>(test_stats[i]));
+    test_stats_c.push_back(extract<const bob::machine::GMMStats*>(test_stats[i]));
   }
 }
 
@@ -81,10 +81,10 @@ static void convertChannelOffsetList(list test_channelOffset, std::vector<blitz:
   }
 }
 
-static void convertGMMMachineList(list models, std::vector<const Torch::machine::GMMMachine*>& models_c) {
+static void convertGMMMachineList(list models, std::vector<const bob::machine::GMMMachine*>& models_c) {
   int size_models = len(models);
   for(int i=0; i<size_models; ++i) {
-    models_c.push_back(extract<const Torch::machine::GMMMachine*>(models[i]));
+    models_c.push_back(extract<const bob::machine::GMMMachine*>(models[i]));
   }
 }
 
@@ -97,7 +97,7 @@ static blitz::Array<double, 2> linearScoring1(list models,
   std::vector<blitz::Array<double,1> > models_c;
   convertGMMMeanList(models, models_c);
 
-  std::vector<const Torch::machine::GMMStats*> test_stats_c;
+  std::vector<const bob::machine::GMMStats*> test_stats_c;
   convertGMMStatsList(test_stats, test_stats_c);
 
   std::vector<blitz::Array<double,1> > test_channelOffset_c;
@@ -105,7 +105,7 @@ static blitz::Array<double, 2> linearScoring1(list models,
 
   blitz::Array<double, 2> ret;
   
-  Torch::machine::linearScoring(models_c, ubm_mean, ubm_variance, test_stats_c, test_channelOffset_c, frame_length_normalisation, ret);
+  bob::machine::linearScoring(models_c, ubm_mean, ubm_variance, test_stats_c, test_channelOffset_c, frame_length_normalisation, ret);
   
   return ret;
 }
@@ -120,31 +120,31 @@ static blitz::Array<double, 2> linearScoring2(list models,
   std::vector<blitz::Array<double,1> > models_c;
   convertGMMMeanList(models, models_c);
 
-  std::vector<const Torch::machine::GMMStats*> test_stats_c;
+  std::vector<const bob::machine::GMMStats*> test_stats_c;
   convertGMMStatsList(test_stats, test_stats_c);
 
   blitz::Array<double, 2> ret;
  
-  Torch::machine::linearScoring(models_c, ubm_mean, ubm_variance, test_stats_c, frame_length_normalisation, ret);
+  bob::machine::linearScoring(models_c, ubm_mean, ubm_variance, test_stats_c, frame_length_normalisation, ret);
   
   return ret;
 }
 
 
 static blitz::Array<double, 2> linearScoring3(list models,
-    Torch::machine::GMMMachine& ubm,
+    bob::machine::GMMMachine& ubm,
     list test_stats,
     bool frame_length_normalisation = false) {
 
-  std::vector<const Torch::machine::GMMMachine*> models_c;
+  std::vector<const bob::machine::GMMMachine*> models_c;
   convertGMMMachineList(models, models_c);
 
-  std::vector<const Torch::machine::GMMStats*> test_stats_c;
+  std::vector<const bob::machine::GMMStats*> test_stats_c;
   convertGMMStatsList(test_stats, test_stats_c);
 
   blitz::Array<double, 2> ret;
   
-  Torch::machine::linearScoring(models_c, ubm, test_stats_c, frame_length_normalisation, ret);
+  bob::machine::linearScoring(models_c, ubm, test_stats_c, frame_length_normalisation, ret);
   
   return ret;
 }

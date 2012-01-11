@@ -20,12 +20,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_SP_DCT2D_NAIVE_H
-#define TORCH5SPRO_SP_DCT2D_NAIVE_H
+#ifndef BOB5SPRO_SP_DCT2D_NAIVE_H
+#define BOB5SPRO_SP_DCT2D_NAIVE_H
 
 #include <blitz/array.h>
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libsp_api
  * @{
@@ -168,4 +168,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_SP_DCT2D_NAIVE_H */
+#endif /* BOB5SPRO_SP_DCT2D_NAIVE_H */

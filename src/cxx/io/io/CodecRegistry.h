@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IO_CODECREGISTRY_H 
-#define TORCH_IO_CODECREGISTRY_H
+#ifndef BOB_IO_CODECREGISTRY_H 
+#define BOB_IO_CODECREGISTRY_H
 
 #include <map>
 #include <string>
@@ -29,7 +29,7 @@
 
 #include "io/File.h"
 
-namespace Torch { namespace io {
+namespace bob { namespace io {
 
   /**
    * The CodecRegistry holds registered converters for different types of
@@ -86,5 +86,5 @@ namespace Torch { namespace io {
 
 }}
 
-#endif /* TORCH_IO_CODECREGISTRY_H */
+#endif /* BOB_IO_CODECREGISTRY_H */
 

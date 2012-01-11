@@ -3,7 +3,7 @@
  * @date Wed Jun 22 17:50:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
- * @brief Python bindings for torch::io::Array
+ * @brief Python bindings for bob::io::Array
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -29,10 +29,10 @@
 #include "core/python/ndarray.h"
 
 using namespace boost::python;
-namespace io = Torch::io;
-namespace core = Torch::core;
-namespace ca = Torch::core::array;
-namespace tp = Torch::python;
+namespace io = bob::io;
+namespace core = bob::core;
+namespace ca = bob::core::array;
+namespace tp = bob::python;
 
 /**
  * Creates a new io::Array from a NumPy ndarray

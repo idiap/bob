@@ -8,19 +8,19 @@
 
 import os, sys
 import unittest
-import torch
+import bob
 import numpy
 
 def load_gray(relative_filename):
   # Please note our PNG loader will always load in RGB, but since that is a
   # grayscaled version of the image, I just select one of the planes. 
   filename = os.path.join("data", "flow", relative_filename)
-  array = torch.io.Array(filename)
+  array = bob.io.Array(filename)
   return array.get()[0,:,:] 
 
 def load_known_flow(relative_filename):
   filename = os.path.join("data", "flow", relative_filename)
-  array = torch.io.Array(filename)
+  array = bob.io.Array(filename)
   data = array.get()
   return data[:,:,0].astype('float64'), data[:,:,1].astype('float64')
 
@@ -44,10 +44,10 @@ def make_image_tripplet():
 
 def HornAndSchunckFlowPython(alpha, im1, im2, im3, u0, v0):
   """Calculates the H&S flow in pure python"""
-  grad = torch.ip.HornAndSchunckGradient(im1.shape)
+  grad = bob.ip.HornAndSchunckGradient(im1.shape)
   ex, ey, et = grad(im1, im2)
-  u = torch.ip.laplacian_avg_hs(u0)
-  v = torch.ip.laplacian_avg_hs(v0)
+  u = bob.ip.laplacian_avg_hs(u0)
+  v = bob.ip.laplacian_avg_hs(v0)
   common_term = (ex*u + ey*v + et) / (ex**2 + ey**2 + alpha**2)
   return u - ex*common_term, v - ey*common_term
 
@@ -62,7 +62,7 @@ def compute_flow_opencv(alpha, iterations, ifile1, ifile2):
   l = 1.0/(alpha**2)
   cv.CalcOpticalFlowHS(i1, i2, 0, u, v, l, (cv.CV_TERMCRIT_ITER, iterations, 0))
   # return blitz arrays
-  return torch.core.array.array(u, 'float64'), torch.core.array.array(v, 'float64')
+  return bob.core.array.array(u, 'float64'), bob.core.array.array(v, 'float64')
 
 class FlowTest(unittest.TestCase):
   """Performs various combined optical flow tests."""
@@ -85,7 +85,7 @@ class FlowTest(unittest.TestCase):
     v_cxx = numpy.zeros(i1.shape, 'float64')
     u_py  = numpy.zeros(i1.shape, 'float64')
     v_py  = numpy.zeros(i1.shape, 'float64')
-    flow  = torch.ip.VanillaHornAndSchunckFlow(i1.shape)
+    flow  = bob.ip.VanillaHornAndSchunckFlow(i1.shape)
     for i in range(N):
       flow(alpha, 1, i1, i2, u_cxx, v_cxx)
       u_py, v_py = HornAndSchunckFlowPython(alpha, i1, i2, i3, u_py, v_py)
@@ -122,10 +122,10 @@ class FlowTest(unittest.TestCase):
 
     u = numpy.zeros(i1.shape, 'float64')
     v = numpy.zeros(i1.shape, 'float64')
-    flow = torch.ip.VanillaHornAndSchunckFlow(i1.shape)
+    flow = bob.ip.VanillaHornAndSchunckFlow(i1.shape)
     for i in range(N): 
       flow(alpha, 1, i1, i2, u, v)
-      #array = (255.0*torch.ip.flowutils.flow2hsv(u,v)).astype('uint8')
+      #array = (255.0*bob.ip.flowutils.flow2hsv(u,v)).astype('uint8')
       #array.save("hs_rubberwhale-%d.png" % i)
       se2 = flow.evalEc2(u, v)
       be = flow.evalEb(i1, i2, u, v)
@@ -137,7 +137,7 @@ class FlowTest(unittest.TestCase):
            be.sum(), 
            avg_err**0.5,
           )
-      #print "error:", (torch.ip.flowError(i1, i2, u, v)**2).sum()
+      #print "error:", (bob.ip.flowError(i1, i2, u, v)**2).sum()
 
   def notest03_VanillaHornAndSchunckAgainstOpenCV(self):
     
@@ -165,12 +165,12 @@ class FlowTest(unittest.TestCase):
 
     u_cxx = numpy.zeros(i1.shape, 'float64')
     v_cxx = numpy.zeros(i1.shape, 'float64')
-    flow = torch.ip.VanillaHornAndSchunckFlow(i1.shape)
+    flow = bob.ip.VanillaHornAndSchunckFlow(i1.shape)
     flow(alpha, N, i1, i2, u_cxx, v_cxx)
     se2 = flow.evalEc2(u_cxx, v_cxx)
     be = flow.evalEb(i1, i2, u_cxx, v_cxx)
     avg_err = (se2 * (alpha**2) + be**2).sum()
-    print "Torch H&S Error (%2d iterations) : %.3e %.3e %.3e" % (N, se2.sum()**0.5, be.sum(), avg_err**0.5)
+    print "bob H&S Error (%2d iterations) : %.3e %.3e %.3e" % (N, se2.sum()**0.5, be.sum(), avg_err**0.5)
 
     u_ocv1, v_ocv1 = compute_flow_opencv(alpha, N/4, if1, if2)
     u_ocv2, v_ocv2 = compute_flow_opencv(alpha, N/2, if1, if2)
@@ -189,13 +189,13 @@ class FlowTest(unittest.TestCase):
 
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()

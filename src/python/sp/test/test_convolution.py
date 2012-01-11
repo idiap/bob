@@ -6,7 +6,7 @@
 
 import os, sys
 import unittest
-import torch
+import bob
 import numpy
 
 #############################################################################
@@ -152,8 +152,8 @@ def compare(v1, v2, width):
 
 def test_convolve_1D_nopt(A, b, res, reference, obj):
   # Compute the convolution product
-  res = numpy.zeros( torch.sp.getConvolveOutputSize(A, b), 'float64' )
-  torch.sp.convolve(A, b, res)
+  res = numpy.zeros( bob.sp.getConvolveOutputSize(A, b), 'float64' )
+  bob.sp.convolve(A, b, res)
   
   obj.assertEqual(res.shape, reference.shape)
   for i in range(res.shape[0]):
@@ -161,8 +161,8 @@ def test_convolve_1D_nopt(A, b, res, reference, obj):
 
 def test_convolve_1D(A, b, res, reference, obj, option):
   # Compute the convolution product
-  res = numpy.zeros( torch.sp.getConvolveOutputSize(A, b, option), 'float64' )
-  torch.sp.convolve(A, b, res, option)
+  res = numpy.zeros( bob.sp.getConvolveOutputSize(A, b, option), 'float64' )
+  bob.sp.convolve(A, b, res, option)
 
   obj.assertEqual(res.shape, reference.shape)
   for i in range(res.shape[0]):
@@ -170,8 +170,8 @@ def test_convolve_1D(A, b, res, reference, obj, option):
 
 def test_convolve_2D_nopt(A, b, res, reference, obj):
   # Compute the convolution product
-  res = numpy.zeros( torch.sp.getConvolveOutputSize(A, b), 'float64' )
-  torch.sp.convolve(A, b, res)
+  res = numpy.zeros( bob.sp.getConvolveOutputSize(A, b), 'float64' )
+  bob.sp.convolve(A, b, res)
   
   obj.assertEqual(res.shape, reference.shape)
   for i in range(res.shape[0]):
@@ -180,8 +180,8 @@ def test_convolve_2D_nopt(A, b, res, reference, obj):
 
 def test_convolve_2D(A, b, res, reference, obj, option):
   # Compute the convolution product
-  res = numpy.zeros( torch.sp.getConvolveOutputSize(A, b, option), 'float64' )
-  torch.sp.convolve(A, b, res, option)
+  res = numpy.zeros( bob.sp.getConvolveOutputSize(A, b, option), 'float64' )
+  bob.sp.convolve(A, b, res, option)
 
   obj.assertEqual(res.shape, reference.shape)
   for i in range(res.shape[0]):
@@ -199,79 +199,79 @@ class ConvolutionTest(unittest.TestCase):
 
   def test_convolution_1D_10_3_F(self):
     test_convolve_1D( A10, b1_3, RES_1, RES_A1_10_b1_3_full, self, 
-      torch.sp.ConvolutionSize.Full)
+      bob.sp.ConvolutionSize.Full)
 
   def test_convolution_1D_10_3_S(self):
     test_convolve_1D( A10, b1_3, RES_1, RES_A1_10_b1_3_same, self, 
-      torch.sp.ConvolutionSize.Same)
+      bob.sp.ConvolutionSize.Same)
 
   def test_convolution_1D_10_3_V(self):
     test_convolve_1D( A10, b1_3, RES_1, RES_A1_10_b1_3_valid, self, 
-      torch.sp.ConvolutionSize.Valid)
+      bob.sp.ConvolutionSize.Valid)
 
   def test_convolution_1D_10_4_n(self):
     test_convolve_1D_nopt( A10, b1_4, RES_1, RES_A1_10_b1_4_full, self)
 
   def test_convolution_1D_10_4_F(self):
     test_convolve_1D( A10, b1_4, RES_1, RES_A1_10_b1_4_full, self, 
-      torch.sp.ConvolutionSize.Full)
+      bob.sp.ConvolutionSize.Full)
 
   def test_convolution_1D_10_4_S(self):
     test_convolve_1D( A10, b1_4, RES_1, RES_A1_10_b1_4_same, self, 
-      torch.sp.ConvolutionSize.Same)
+      bob.sp.ConvolutionSize.Same)
 
   def test_convolution_1D_10_4_V(self):
     test_convolve_1D( A10, b1_4, RES_1, RES_A1_10_b1_4_valid, self, 
-      torch.sp.ConvolutionSize.Valid)
+      bob.sp.ConvolutionSize.Valid)
 
   def test_convolution_1D_10_5_n(self):
     test_convolve_1D_nopt( A10, b1_5, RES_1, RES_A1_10_b1_5_full, self)
 
   def test_convolution_1D_10_5_F(self):
     test_convolve_1D( A10, b1_5, RES_1, RES_A1_10_b1_5_full, self, 
-      torch.sp.ConvolutionSize.Full)
+      bob.sp.ConvolutionSize.Full)
 
   def test_convolution_1D_10_5_S(self):
     test_convolve_1D( A10, b1_5, RES_1, RES_A1_10_b1_5_same, self, 
-      torch.sp.ConvolutionSize.Same)
+      bob.sp.ConvolutionSize.Same)
 
   def test_convolution_1D_10_5_V(self):
     test_convolve_1D( A10, b1_5, RES_1, RES_A1_10_b1_5_valid, self, 
-      torch.sp.ConvolutionSize.Valid)
+      bob.sp.ConvolutionSize.Valid)
 
   def test_convolution_2D_5_2_n(self):
     test_convolve_2D_nopt( A2_5, b2_2, RES_2, RES_A2_5_b2_2_full, self)
 
   def test_convolution_2D_5_2_F(self):
     test_convolve_2D( A2_5, b2_2, RES_2, RES_A2_5_b2_2_full, self, 
-      torch.sp.ConvolutionSize.Full)
+      bob.sp.ConvolutionSize.Full)
 
   def test_convolution_2D_5_2_S(self):
     test_convolve_2D( A2_5, b2_2, RES_2, RES_A2_5_b2_2_same, self, 
-      torch.sp.ConvolutionSize.Same)
+      bob.sp.ConvolutionSize.Same)
 
   def test_convolution_2D_5_2_V(self):
     test_convolve_2D( A2_5, b2_2, RES_2, RES_A2_5_b2_2_valid, self, 
-      torch.sp.ConvolutionSize.Valid)
+      bob.sp.ConvolutionSize.Valid)
 
   def test_convolution_2D_5_3_n(self):
     test_convolve_2D_nopt( A2_5, b2_3, RES_2, RES_A2_5_b2_3_full, self)
 
   def test_convolution_2D_5_3_F(self):
     test_convolve_2D( A2_5, b2_3, RES_2, RES_A2_5_b2_3_full, self, 
-      torch.sp.ConvolutionSize.Full)
+      bob.sp.ConvolutionSize.Full)
 
   def test_convolution_2D_5_3_S(self):
     test_convolve_2D( A2_5, b2_3, RES_2, RES_A2_5_b2_3_same, self, 
-      torch.sp.ConvolutionSize.Same)
+      bob.sp.ConvolutionSize.Same)
 
   def test_convolution_2D_5_3_V(self):
     test_convolve_2D( A2_5, b2_3, RES_2, RES_A2_5_b2_3_valid, self, 
-      torch.sp.ConvolutionSize.Valid)
+      bob.sp.ConvolutionSize.Valid)
 
   def test_convolution_2D_sep_0d(self):
     res0 = numpy.zeros((7,5), 'float64')
-    torch.sp.convolveSep(A2_5, b1_3, res0, 0, torch.sp.ConvolutionSize.Full)
+    bob.sp.convolveSep(A2_5, b1_3, res0, 0, bob.sp.ConvolutionSize.Full)
     self.assertEqual(res0.shape, RES_A2_5_b1_3_0d_full.shape)
     for i in range(res0.shape[0]):
       for j in range(res0.shape[1]):
@@ -279,7 +279,7 @@ class ConvolutionTest(unittest.TestCase):
 
   def test_convolution_2D_sep_1d(self):
     res1 = numpy.zeros((5,7), 'float64')
-    torch.sp.convolveSep(A2_5, b1_3, res1, 1, torch.sp.ConvolutionSize.Full)
+    bob.sp.convolveSep(A2_5, b1_3, res1, 1, bob.sp.ConvolutionSize.Full)
     self.assertEqual(res1.shape, RES_A2_5_b1_3_1d_full.shape)
     for i in range(res1.shape[0]):
       for j in range(res1.shape[1]):
@@ -287,7 +287,7 @@ class ConvolutionTest(unittest.TestCase):
 
   def test_convolution_4D_sep_0d(self):
     res0 = numpy.zeros((7,5,1,1), 'float64')
-    torch.sp.convolveSep(A4_5, b1_3, res0, 0, torch.sp.ConvolutionSize.Full)
+    bob.sp.convolveSep(A4_5, b1_3, res0, 0, bob.sp.ConvolutionSize.Full)
     self.assertEqual(res0.shape, RES_A4_5_b1_3_0d_full.shape)
     for i in range(res0.shape[0]):
       for j in range(res0.shape[1]):
@@ -299,14 +299,14 @@ class ConvolutionTest(unittest.TestCase):
 ##################### Main ##################  
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()
 

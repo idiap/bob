@@ -23,8 +23,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_IP_LBPTOPOPERATOR_H 
-#define TORCH5SPRO_IP_LBPTOPOPERATOR_H
+#ifndef BOB5SPRO_IP_LBPTOPOPERATOR_H 
+#define BOB5SPRO_IP_LBPTOPOPERATOR_H
 
 #include <blitz/array.h>
 #include <algorithm>
@@ -33,7 +33,7 @@
 #include "ip/LBP8R.h"
 #include "ip/Exception.h"
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libip_api
  * @{
@@ -70,7 +70,7 @@ namespace Torch {
          * frames input, so it is dependent on the input to 
          * LBPTopOperator:operator().
          *
-         * @warning The current number of points supported in torch is either
+         * @warning The current number of points supported in bob is either
          * 8 or 4. Any values differing from that need implementation of 
          * specialized functionality.
          *
@@ -151,13 +151,13 @@ namespace Torch {
         int m_points_xt; ///< The number of points in the XT LBPu2,i
         int m_radius_yt; ///< The LBPu2,i radius in YT
         int m_points_yt; ///< The number of points in the YT LBPu2,i
-        Torch::ip::LBP* m_lbp_xy; ///< The operator for the XY calculation
-        Torch::ip::LBP* m_lbp_xt; ///< The operator for the XT calculation
-        Torch::ip::LBP* m_lbp_yt; ///< The operator for the YT calculation
+        bob::ip::LBP* m_lbp_xy; ///< The operator for the XY calculation
+        bob::ip::LBP* m_lbp_xt; ///< The operator for the XT calculation
+        bob::ip::LBP* m_lbp_yt; ///< The operator for the YT calculation
     };
 
     template <typename T>
-    void Torch::ip::LBPTopOperator::process(const blitz::Array<T,3>& src,
+    void bob::ip::LBPTopOperator::process(const blitz::Array<T,3>& src,
       blitz::Array<uint16_t,2>& xy,
       blitz::Array<uint16_t,2>& xt,
       blitz::Array<uint16_t,2>& yt) const
@@ -167,15 +167,15 @@ namespace Torch {
 
       // we need an odd number, at (2N+1), where N = std::max(radius_xt, radius_yt)
       if(src.extent(2)%2 == 0) {
-        // Torch::warning("Cannot process a even-numbered set of frames");
+        // bob::warning("Cannot process a even-numbered set of frames");
         // TODO
-        throw Torch::ip::Exception();
+        throw bob::ip::Exception();
       }
       const int N = std::max(m_radius_xt, m_radius_yt);
       if(src.extent(2) != (2*N+1) ) {
-        // Torch::warning("The number of input frames should be %d", 2*N+1);
+        // bob::warning("The number of input frames should be %d", 2*N+1);
         // TODO
-        throw Torch::ip::Exception();
+        throw bob::ip::Exception();
       }
 
       // XY plane calculation
@@ -203,9 +203,9 @@ namespace Torch {
         blitz::Array<T,2> k = 
           src( y, blitz::Range::all(), blitz::Range::all());
         k.transposeSelf(1,0);
-        //Torch::ShortTensor k;
+        //bob::ShortTensor k;
         //k.select(&tensor, 0, y);
-        //Torch::ShortTensor kt;
+        //bob::ShortTensor kt;
         //kt.transpose(&k, 1, 2); //get the gray levels on the last dimension
         for (int x = m_radius_xt; x < (width-m_radius_xt); ++x) {
           //m_lbp_xt->setXY(x, 2*N);
@@ -224,9 +224,9 @@ namespace Torch {
         blitz::Array<T,2> k = 
           src( blitz::Range::all(), x, blitz::Range::all());
         k.transposeSelf(1,0);
-        //Torch::ShortTensor k;
+        //bob::ShortTensor k;
         //k.select(&tensor, 1, x);
-        //Torch::ShortTensor kt;
+        //bob::ShortTensor kt;
         //kt.transpose(&k, 1, 2); //get the gray levels on the last dimension
         for (int y = m_radius_yt; y < (height-m_radius_yt); ++y) {
           //m_lbp_yt->setXY(y, 2*N);
@@ -242,4 +242,4 @@ namespace Torch {
   }
 }
 
-#endif /* TORCH5SPRO_IP_LBPTOPOPERATOR_H */
+#endif /* BOB5SPRO_IP_LBPTOPOPERATOR_H */

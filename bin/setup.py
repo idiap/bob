@@ -15,7 +15,7 @@ if __name__ == '__main__':
   new_environ = adm.environment.generate_environment(options)
 
   #echo what will be setup
-  setupline = 'Setting-up current shell for torch5spro (%s/%s)'
+  setupline = 'Setting-up current shell for bob (%s/%s)'
   print adm.environment.shell_echo(setupline % (options.version, options.arch))
 
   for key, value in new_environ.iteritems():

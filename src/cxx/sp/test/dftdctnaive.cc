@@ -37,29 +37,29 @@ struct T {
   ~T() {}
 };
 
-void test_dct1D(const int N, const Torch::FloatTensor& t, const float mat[],
+void test_dct1D(const int N, const bob::FloatTensor& t, const float mat[],
   float eps) 
 {
   // process using DCT
-  Torch::spDCT *dct = new Torch::spDCT();
+  bob::spDCT *dct = new bob::spDCT();
   dct->process(t);
   BOOST_REQUIRE_EQUAL(dct->getNOutputs(), 1);
 
   // get answer and compare to matlabs dct
-  const Torch::FloatTensor &dt = 
-    ((const Torch::FloatTensor&)dct->getOutput(0));
+  const bob::FloatTensor &dt = 
+    ((const bob::FloatTensor&)dct->getOutput(0));
 
   for(int i=0; i < N; ++i)
     BOOST_CHECK_SMALL(dt.get(i)-mat[i], eps);
 
   // process using inverse DCT
-  Torch::spDCT *idct = new Torch::spDCT(true);
+  bob::spDCT *idct = new bob::spDCT(true);
   idct->process(dt);
   BOOST_REQUIRE_EQUAL(idct->getNOutputs(), 1);
 
   // get answer and compare to original
-  const Torch::FloatTensor &idt = 
-    ((const Torch::FloatTensor&)idct->getOutput(0));
+  const bob::FloatTensor &idt = 
+    ((const bob::FloatTensor&)idct->getOutput(0));
   for(int i=0; i < N; ++i)
     BOOST_CHECK_SMALL(idt.get(i)-t.get(i), eps);
 
@@ -68,30 +68,30 @@ void test_dct1D(const int N, const Torch::FloatTensor& t, const float mat[],
 }
 
 
-void test_dct2D(const int M, const int N, const Torch::FloatTensor& t, 
+void test_dct2D(const int M, const int N, const bob::FloatTensor& t, 
   const float mat[], float eps) 
 {
   // process using DCT
-  Torch::spDCT *dct = new Torch::spDCT();
+  bob::spDCT *dct = new bob::spDCT();
   dct->process(t);
   BOOST_REQUIRE_EQUAL(dct->getNOutputs(), 1);
 
   // get answer and compare to matlabs dct
-  const Torch::FloatTensor &dt = 
-    ((const Torch::FloatTensor&)dct->getOutput(0));
+  const bob::FloatTensor &dt = 
+    ((const bob::FloatTensor&)dct->getOutput(0));
 
   for(int i=0; i < M; ++i)
     for(int j=0; j < N; ++j)
       BOOST_CHECK_SMALL(dt.get(i,j)-mat[i*N+j], eps);
 
   // process using inverse DCT
-  Torch::spDCT *idct = new Torch::spDCT(true);
+  bob::spDCT *idct = new bob::spDCT(true);
   idct->process(dt);
   BOOST_REQUIRE_EQUAL(idct->getNOutputs(), 1);
 
   // get answer and compare to original
-  const Torch::FloatTensor &idt = 
-    ((const Torch::FloatTensor&)idct->getOutput(0));
+  const bob::FloatTensor &idt = 
+    ((const bob::FloatTensor&)idct->getOutput(0));
   for(int i=0; i < M; ++i)
     for(int j=0; j < N; ++j)
       BOOST_CHECK_SMALL(idt.get(i,j)-t.get(i,j), eps);
@@ -100,30 +100,30 @@ void test_dct2D(const int M, const int N, const Torch::FloatTensor& t,
   delete idct;
 }
 
-void test_dft1D(const int N, const Torch::FloatTensor& t, const float mat[],
+void test_dft1D(const int N, const bob::FloatTensor& t, const float mat[],
   float eps) 
 {
   // process using DFT
-  Torch::spDFT *dft = new Torch::spDFT();
+  bob::spDFT *dft = new bob::spDFT();
   dft->process(t);
   BOOST_REQUIRE_EQUAL(dft->getNOutputs(), 1);
 
   // get answer and compare to matlabs dct
-  const Torch::FloatTensor &dt = 
-    ((const Torch::FloatTensor&)dft->getOutput(0));
+  const bob::FloatTensor &dt = 
+    ((const bob::FloatTensor&)dft->getOutput(0));
 
   for(int i=0; i < N; ++i)
     for(int j=0; j < 2; ++j)
       BOOST_CHECK_SMALL(dt.get(i,j)-mat[i*2+j], eps);
 
   // process using inverse DFT
-  Torch::spDFT *idft = new Torch::spDFT(true);
+  bob::spDFT *idft = new bob::spDFT(true);
   idft->process(dt);
   BOOST_REQUIRE_EQUAL(idft->getNOutputs(), 1);
 
   // get answer and compare to original
-  const Torch::FloatTensor &idt = 
-    ((const Torch::FloatTensor&)idft->getOutput(0));
+  const bob::FloatTensor &idt = 
+    ((const bob::FloatTensor&)idft->getOutput(0));
   for(int i=0; i < N; ++i)
     BOOST_CHECK_SMALL(idt.get(i)-t.get(i), eps);
 
@@ -131,17 +131,17 @@ void test_dft1D(const int N, const Torch::FloatTensor& t, const float mat[],
   delete idft;
 }
 
-void test_dft2D(const int M, const int N, const Torch::FloatTensor& t,
+void test_dft2D(const int M, const int N, const bob::FloatTensor& t,
   const float mat[], float eps)
 {
   // process using DFT
-  Torch::spDFT *dft = new Torch::spDFT();
+  bob::spDFT *dft = new bob::spDFT();
   dft->process(t);
   BOOST_REQUIRE_EQUAL(dft->getNOutputs(), 1);
 
   // get answer and compare to matlabs dct
-  const Torch::FloatTensor &dt = 
-    ((const Torch::FloatTensor&)dft->getOutput(0));
+  const bob::FloatTensor &dt = 
+    ((const bob::FloatTensor&)dft->getOutput(0));
 
   for(int i=0; i < M; ++i)
     for(int j=0; j < N; ++j)
@@ -149,13 +149,13 @@ void test_dft2D(const int M, const int N, const Torch::FloatTensor& t,
         BOOST_CHECK_SMALL(dt.get(i,j,k)-mat[i*2*N+j*2+k], eps);
 
   // process using inverse DFT
-  Torch::spDFT *idft = new Torch::spDFT(true);
+  bob::spDFT *idft = new bob::spDFT(true);
   idft->process(dt);
   BOOST_REQUIRE_EQUAL(idft->getNOutputs(), 1);
 
   // get answer and compare to original
-  const Torch::FloatTensor &idt = 
-    ((const Torch::FloatTensor&)idft->getOutput(0));
+  const bob::FloatTensor &idt = 
+    ((const bob::FloatTensor&)idft->getOutput(0));
   for(int i=0; i < M; ++i)
     for(int j=0; j < N; ++j)
       BOOST_CHECK_SMALL(idt.get(i,j)-t.get(i,j), eps);
@@ -175,7 +175,7 @@ BOOST_AUTO_TEST_CASE( test_dct1D_3 )
   const int N = 3;
 
   // set up simple 1D tensor
-  Torch::FloatTensor t(N);
+  bob::FloatTensor t(N);
   for( int i=0; i < N; ++i)
     t.set(i, 1.0f+i);
 
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE( test_dct1D_5 )
   const int N = 5;
 
   // set up simple 1D tensor
-  Torch::FloatTensor t(N);
+  bob::FloatTensor t(N);
   for( int i=0; i < N; ++i)
     t.set(i, 1.0f+i);
 
@@ -209,7 +209,7 @@ BOOST_AUTO_TEST_CASE( test_dct1D_8 )
   const int N = 8;
 
   // set up simple 1D tensor
-  Torch::FloatTensor t(N);
+  bob::FloatTensor t(N);
   for( int i=0; i < N; ++i)
     t.set(i, 1.0f+i);
 
@@ -228,7 +228,7 @@ BOOST_AUTO_TEST_CASE( test_dct1D_17 )
   const int N = 17;
 
   // set up simple 1D tensor
-  Torch::FloatTensor t(N);
+  bob::FloatTensor t(N);
   for( int i=0; i < N; ++i)
     t.set(i, 1.0f+i);
 
@@ -249,7 +249,7 @@ BOOST_AUTO_TEST_CASE( test_dct2D_2x2a )
   const int N = 2;
 
   // set up simple 1D tensor
-  Torch::FloatTensor t(M,N);
+  bob::FloatTensor t(M,N);
   t.set(0, 0, 1.0f);
   t.set(0, 1, 0.0f);
   t.set(1, 0, 0.0f);
@@ -269,7 +269,7 @@ BOOST_AUTO_TEST_CASE( test_dct2D_2x2b )
   const int N = 2;
 
   // set up simple 1D tensor
-  Torch::FloatTensor t(M,N);
+  bob::FloatTensor t(M,N);
   t.set(0, 0, 3.2f);
   t.set(0, 1, 4.7f);
   t.set(1, 0, 5.4f);
@@ -289,7 +289,7 @@ BOOST_AUTO_TEST_CASE( test_dct2D_4x4 )
   const int N = 4;
 
   // set up simple 1D tensor
-  Torch::FloatTensor t(M,N);
+  bob::FloatTensor t(M,N);
   for( int i=0; i < M; ++i)
     for( int j=0; j < N; ++j)
       t.set(i, j, 1.0f+i+j);
@@ -310,7 +310,7 @@ BOOST_AUTO_TEST_CASE( test_dct2D_8x8 )
   const int N = 8;
 
   // set up simple 1D tensor
-  Torch::FloatTensor t(M,N);
+  bob::FloatTensor t(M,N);
   for( int i=0; i < M; ++i)
     for( int j=0; j < N; ++j)
       t.set(i, j, 1.0f+i+j);
@@ -337,7 +337,7 @@ BOOST_AUTO_TEST_CASE( test_dct2D_16x16 )
   const int N = 16;
 
   // set up simple 1D tensor
-  Torch::FloatTensor t(M,N);
+  bob::FloatTensor t(M,N);
   for( int i=0; i < M; ++i)
     for( int j=0; j < N; ++j)
       t.set(i, j, 1.0f+i+j);
@@ -388,7 +388,7 @@ BOOST_AUTO_TEST_CASE( test_dft1D_2 )
   const int N = 2;
 
   // set up simple 1D tensor
-  Torch::FloatTensor t(N);
+  bob::FloatTensor t(N);
   for( int i=0; i < N; ++i)
     t.set(i, 1.0f+i);
 
@@ -405,7 +405,7 @@ BOOST_AUTO_TEST_CASE( test_dft1D_3 )
   const int N = 3;
 
   // set up simple 1D tensor
-  Torch::FloatTensor t(N);
+  bob::FloatTensor t(N);
   for( int i=0; i < N; ++i)
     t.set(i, 1.0f+i);
 
@@ -422,7 +422,7 @@ BOOST_AUTO_TEST_CASE( test_dft1D_4 )
   const int N = 4;
 
   // set up simple 1D tensor
-  Torch::FloatTensor t(N);
+  bob::FloatTensor t(N);
   for( int i=0; i < N; ++i)
     t.set(i, 1.0f+i);
 
@@ -439,7 +439,7 @@ BOOST_AUTO_TEST_CASE( test_dft1D_8 )
   const int N = 8;
 
   // set up simple 1D tensor
-  Torch::FloatTensor t(N);
+  bob::FloatTensor t(N);
   for( int i=0; i < N; ++i)
     t.set(i, 1.0f+i);
 
@@ -458,7 +458,7 @@ BOOST_AUTO_TEST_CASE( test_dft1D_16 )
   const int N = 16;
 
   // set up simple 1D tensor
-  Torch::FloatTensor t(N);
+  bob::FloatTensor t(N);
   for( int i=0; i < N; ++i)
     t.set(i, 1.0f+i);
 
@@ -479,7 +479,7 @@ BOOST_AUTO_TEST_CASE( test_dft1D_17 )
   const int N = 17;
 
   // set up simple 1D tensor
-  Torch::FloatTensor t(N);
+  bob::FloatTensor t(N);
   for( int i=0; i < N; ++i)
     t.set(i, 1.0f+i);
 
@@ -502,7 +502,7 @@ BOOST_AUTO_TEST_CASE( test_dft2D_2x2a )
   const int N = 2;
 
   // set up simple 1D tensor
-  Torch::FloatTensor t(M,N);
+  bob::FloatTensor t(M,N);
   for( int i=0; i < M; ++i)
     for( int j=0; j < N; ++j)
       t.set(i,j, 1.0f+i+j);
@@ -521,7 +521,7 @@ BOOST_AUTO_TEST_CASE( test_dft2D_2x2b )
   const int N = 2;
 
   // set up simple 1D tensor
-  Torch::FloatTensor t(M,N);
+  bob::FloatTensor t(M,N);
   t.set(0, 0, 3.2f);
   t.set(0, 1, 4.7f);
   t.set(1, 0, 5.4f);
@@ -542,7 +542,7 @@ BOOST_AUTO_TEST_CASE( test_dft2D_3x3 )
   const int N = 3;
 
   // set up simple 1D tensor
-  Torch::FloatTensor t(M,N);
+  bob::FloatTensor t(M,N);
   for( int i=0; i < M; ++i)
     for( int j=0; j < N; ++j)
       t.set(i,j, 1.0f+i+j);
@@ -564,7 +564,7 @@ BOOST_AUTO_TEST_CASE( test_dft2D_4x4 )
   const int N = 4;
 
   // set up simple 1D tensor
-  Torch::FloatTensor t(M,N);
+  bob::FloatTensor t(M,N);
   for( int i=0; i < M; ++i)
     for( int j=0; j < N; ++j)
       t.set(i,j, 1.0f+i+j);

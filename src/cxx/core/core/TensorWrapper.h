@@ -20,18 +20,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_CORE_TENSOR_WRAPPER_H
-#define TORCH5SPRO_CORE_TENSOR_WRAPPER_H
+#ifndef BOB5SPRO_CORE_TENSOR_WRAPPER_H
+#define BOB5SPRO_CORE_TENSOR_WRAPPER_H
 
 #include <cstdlib> //exit function
 #include <string>
 #include <iostream>
 
-namespace Torch {
+namespace bob {
 
   /**
    * @brief The Generic Tensor class 
-   * (Wrapper from boost::multi_array to the former Torch5spro Tensor class)
+   * (Wrapper from boost::multi_array to the former bob Tensor class)
    * unfold() is not supported
    */
   class Tensor {
@@ -39,7 +39,7 @@ namespace Torch {
     public:
       /**
        * Enumeration of the possible types of a Tensor
-       * The Undefined type was added in comparison to the former Torch5spro
+       * The Undefined type was added in comparison to the former bob
        * Tensor class
        */
       enum Type
@@ -200,17 +200,17 @@ namespace Torch {
 
 #include "core/TensorBlitzTemplate.h"
 
-namespace Torch {
-  typedef Torch::TensorTemplate<char>    CharTensor;
-  typedef Torch::TensorTemplate<short>   ShortTensor;
-  typedef Torch::TensorTemplate<int>     IntTensor;
-  typedef Torch::TensorTemplate<long>    LongTensor;
-  typedef Torch::TensorTemplate<float>   FloatTensor;
-  typedef Torch::TensorTemplate<double>  DoubleTensor;
+namespace bob {
+  typedef bob::TensorTemplate<char>    CharTensor;
+  typedef bob::TensorTemplate<short>   ShortTensor;
+  typedef bob::TensorTemplate<int>     IntTensor;
+  typedef bob::TensorTemplate<long>    LongTensor;
+  typedef bob::TensorTemplate<float>   FloatTensor;
+  typedef bob::TensorTemplate<double>  DoubleTensor;
 }
 
 /**
  * @}
  */
 
-#endif /* TORCH5SPRO_CORE_TENSOR_WRAPPER_H */
+#endif /* BOB5SPRO_CORE_TENSOR_WRAPPER_H */

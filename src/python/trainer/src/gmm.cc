@@ -24,9 +24,9 @@
 #include "trainer/ML_GMMTrainer.h"
 
 using namespace boost::python;
-namespace train = Torch::trainer;
-namespace mach = Torch::machine;
-namespace io = Torch::io;
+namespace train = bob::trainer;
+namespace mach = bob::machine;
+namespace io = bob::io;
 
 void bind_trainer_gmm() {
 
@@ -63,9 +63,9 @@ void bind_trainer_gmm() {
       "Generally, this is a \"universal background model\" (UBM), "
       "also referred to as a \"world model\".")
     .def("setT3MAP", &train::MAP_GMMTrainer::setT3MAP,
-      "Use a Torch3-like MAP adaptation rule instead of Reynolds'one.")
+      "Use a bob3-like MAP adaptation rule instead of Reynolds'one.")
     .def("unsetT3MAP", &train::MAP_GMMTrainer::unsetT3MAP,
-      "Use a Reynolds' MAP adaptation (rather than Torch3-like).")
+      "Use a Reynolds' MAP adaptation (rather than bob3-like).")
   ;
  
   class_<train::ML_GMMTrainer, boost::noncopyable, bases<train::GMMTrainer> >("ML_GMMTrainer",

@@ -24,7 +24,7 @@
 #include "ip/trigonometry.h"
 #include "core/Tensor.h"
 
-namespace Torch {
+namespace bob {
 
 	//-----------------------------------
 	// Error codes

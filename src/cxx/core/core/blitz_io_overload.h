@@ -22,8 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_CORE_BLITZ_IO_OVERLOAD_H
-#define TORCH_CORE_BLITZ_IO_OVERLOAD_H
+#ifndef BOB_CORE_BLITZ_IO_OVERLOAD_H
+#define BOB_CORE_BLITZ_IO_OVERLOAD_H
 
 #include <cstdlib>
 #include <blitz/array.h>
@@ -31,7 +31,7 @@
 BZ_NAMESPACE(blitz)
 
 //TODO
-#ifdef TORCH_NEEDS_REVISION
+#ifdef BOB_NEEDS_REVISION
 /**
  * @brief Local function for outputting a 1D int8/uint8 Blitz++ array,
  * by converting it to a printable type (int16/uint16)
@@ -307,4 +307,4 @@ istream& operator>>(istream& is, Array<uint8_t,N_rank>& x)
 #endif
 BZ_NAMESPACE_END
 
-#endif /* TORCH_CORE_BLITZ_IO_OVERLOAD_H */
+#endif /* BOB_CORE_BLITZ_IO_OVERLOAD_H */

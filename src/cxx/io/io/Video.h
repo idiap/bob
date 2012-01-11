@@ -3,7 +3,7 @@
  * @date Wed Jun 22 17:50:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
- * Implementation of video reading and writing in Torch
+ * Implementation of video reading and writing in bob
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -20,11 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IO_VIDEO_H 
-#define TORCH_IO_VIDEO_H
+#ifndef BOB_IO_VIDEO_H 
+#define BOB_IO_VIDEO_H
 
 #include "io/VideoException.h"
 #include "io/VideoReader.h"
 #include "io/VideoWriter.h"
 
-#endif //TORCH_IO_VIDEO_H
+#endif //BOB_IO_VIDEO_H

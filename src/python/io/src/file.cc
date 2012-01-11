@@ -27,9 +27,9 @@
 #include "core/python/ndarray.h"
 
 using namespace boost::python;
-namespace tp = Torch::python;
-namespace io = Torch::io;
-namespace ca = Torch::core::array;
+namespace tp = bob::python;
+namespace io = bob::io;
+namespace ca = bob::core::array;
 
 static object file_array_read(io::File& f) {
   tp::py_array a(f.array_type());

@@ -8,14 +8,14 @@
 
 import os, sys
 import unittest
-import torch
+import bob
 
 class ReplayDatabaseTest(unittest.TestCase):
   """Performs various tests on the replay attack database."""
 
   def test01_queryRealAccesses(self):
 
-    db = torch.db.replay.Database()
+    db = bob.db.replay.Database()
     f = db.files(cls='real')
     self.assertEqual(len(set(f.values())), 200) #200 unique auth sessions
     for k,v in f.items():
@@ -38,7 +38,7 @@ class ReplayDatabaseTest(unittest.TestCase):
 
   def queryAttackType(self, protocol, N):
 
-    db = torch.db.replay.Database()
+    db = bob.db.replay.Database()
     f = db.files(cls='attack', protocol=protocol)
 
     self.assertEqual(len(set(f.values())), N) 
@@ -84,7 +84,7 @@ class ReplayDatabaseTest(unittest.TestCase):
   
   def test08_queryEnrollments(self):
 
-    db = torch.db.replay.Database()
+    db = bob.db.replay.Database()
     f = db.files(cls='enroll')
     self.assertEqual(len(set(f.values())), 100) #50 clients, 2 conditions
     for k,v in f.items():
@@ -92,14 +92,14 @@ class ReplayDatabaseTest(unittest.TestCase):
 
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   #os.chdir('data')
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()

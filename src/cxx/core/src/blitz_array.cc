@@ -23,7 +23,7 @@
 #include "core/blitz_array.h"
 #include "core/logging.h"
 
-namespace ca = Torch::core::array;
+namespace ca = bob::core::array;
 
 ca::blitz_array::blitz_array(boost::shared_ptr<ca::blitz_array> other) {
   set(other);

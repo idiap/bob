@@ -102,11 +102,11 @@ BOOST_AUTO_TEST_CASE( test_flipflop_2d_uint8 )
 {
   blitz::Array<uint32_t,2> b2(a2.shape());
   // Flip
-  Torch::ip::flip(a2, b2);
+  bob::ip::flip(a2, b2);
   checkBlitzEqual(a2_flip, b2); 
 
   // Flop
-  Torch::ip::flop(a2, b2);
+  bob::ip::flop(a2, b2);
   checkBlitzEqual(a2_flop, b2); 
 }
   
@@ -114,11 +114,11 @@ BOOST_AUTO_TEST_CASE( test_flipflop_3d_uint8 )
 {
   blitz::Array<uint32_t,3> b3(a3.shape());
   // Flip
-  Torch::ip::flip(a3, b3);
+  bob::ip::flip(a3, b3);
   checkBlitzEqual(a3_flip, b3); 
 
   // Flop
-  Torch::ip::flop(a3, b3);
+  bob::ip::flop(a3, b3);
   checkBlitzEqual(a3_flop, b3);
 }
 

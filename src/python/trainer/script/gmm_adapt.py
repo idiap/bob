@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import torch
+import bob
 import os, sys
 import optparse
 import math
@@ -63,14 +63,14 @@ parser.add_option("--responsibilities-threshold",
                   help="Mean and variance update responsibilities threshold",
                   type="float",
                   default=0.)
-parser.add_option("--set-torch3-map",
+parser.add_option("--set-bob3-map",
                   action="store_true",
-                  dest="torch3_map",
-                  help="Use torch3-like MAP adaptation rather than Reynolds'one",
+                  dest="bob3_map",
+                  help="Use bob3-like MAP adaptation rather than Reynolds'one",
                   default=False)
-parser.add_option("--alpha-torch3-map",
-                  dest="alpha_torch3",
-                  help="Set alpha to use with torch3-like MAP adaptation",
+parser.add_option("--alpha-bob3-map",
+                  dest="alpha_bob3",
+                  help="Set alpha to use with bob3-like MAP adaptation",
                   type="float",
                   default=0.5)
 
@@ -83,36 +83,36 @@ for line in fileinput.input(args):
   filelist.append(line.rstrip('\r\n'))
 
 # Create a sampler for the input files
-ar = torch.io.Arrayset()
+ar = bob.io.Arrayset()
 for myfile in filelist:
-  myarrayset = torch.io.Arrayset(myfile)
+  myarrayset = bob.io.Arrayset(myfile)
   n_blocks = len(myarrayset)
   for b in range(0,n_blocks):
     x = myarrayset[b].get()
     ar.append(x)
 
 # Load prior gmm
-prior_gmm = torch.machine.GMMMachine(torch.io.HDF5File(options.prior_model))
+prior_gmm = bob.machine.GMMMachine(bob.io.HDF5File(options.prior_model))
 prior_gmm.setVarianceThresholds(options.variance_threshold)
 
 # Create trainer
 if options.responsibilities_threshold == 0.:
-  trainer = torch.trainer.MAP_GMMTrainer(options.relevance_factor, True, options.adapt_variance, options.adapt_weight)
+  trainer = bob.trainer.MAP_GMMTrainer(options.relevance_factor, True, options.adapt_variance, options.adapt_weight)
 else:
-  trainer = torch.trainer.MAP_GMMTrainer(options.relevance_factor, True, options.adapt_variance, options.adapt_weight, options.responsibilities_threshold)
+  trainer = bob.trainer.MAP_GMMTrainer(options.relevance_factor, True, options.adapt_variance, options.adapt_weight, options.responsibilities_threshold)
 trainer.convergenceThreshold = options.convergence_threshold
 trainer.maxIterations = options.iterg
 trainer.setPriorGMM(prior_gmm)
 
-if options.torch3_map:
-  trainer.setT3MAP(options.alpha_torch3)
+if options.bob3_map:
+  trainer.setT3MAP(options.alpha_bob3)
 
 # Load gmm
-gmm = torch.machine.GMMMachine(torch.io.HDF5File(options.prior_model))
+gmm = bob.machine.GMMMachine(bob.io.HDF5File(options.prior_model))
 gmm.setVarianceThresholds(options.variance_threshold)
 
 # Train gmm
 trainer.train(gmm, ar)
 
 # Save gmm
-gmm.save(torch.io.HDF5File(options.output_file))
+gmm.save(bob.io.HDF5File(options.output_file))

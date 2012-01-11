@@ -9,7 +9,7 @@ LBP codes.
 
 import os, sys
 import unittest
-import torch
+import bob
 import math
 import numpy
 
@@ -53,7 +53,7 @@ def calculate_lbp8r_rotinvariant_value(v):
 
 def calculate_lbp8r_rotinvariant_table():
   retval = []
-  map = {} #map into torch values
+  map = {} #map into bob values
   last = 0
   for k in range(256):
     v = calculate_lbp8r_rotinvariant_value(k)
@@ -79,7 +79,7 @@ def uniformity(v):
 
 def calculate_lbp8r_u2_table():
   retval = []
-  map = {} #map into torch values
+  map = {} #map into bob values
   last = 1
   for k in range(256):
     if uniformity(k) <= 2: 
@@ -122,13 +122,13 @@ def bin(s, m=1):
   return str(m*s) if s<=1 else bin(s>>1, m) + str(m*(s&1))
 
 class LBPTest(unittest.TestCase):
-  """Performs various tests for the Torch::ipLBP and friends types."""
+  """Performs various tests for the bob::ipLBP and friends types."""
  
   def test01_vanilla_4p1r(self):
-    op = torch.ip.LBP4R(1)
+    op = bob.ip.LBP4R(1)
     proc = Processor(op, generate_3x3_image, (1,1))
     self.assertEqual(proc('011111111'), 0xf)
-    #please note that the Torch implementation of LBPs is slightly different
+    #please note that the bob implementation of LBPs is slightly different
     #then that of the original LBP paper:
     # s(x) >= 0 => LBP digit = 1
     # s(x) <  0 => LBO digit = 0
@@ -151,9 +151,9 @@ class LBPTest(unittest.TestCase):
     self.assertEqual(op.max_label, 0x10) # this is set to 16!
 
   def test02_rotinvariant_4p1r(self):
-    op = torch.ip.LBP4R(1,False,False,False,False,True)
+    op = bob.ip.LBP4R(1,False,False,False,False,True)
     proc = Processor(op, generate_3x3_image, (1,1))
-    #torch's implementation start labelling the patterns from 0
+    #bob's implementation start labelling the patterns from 0
     self.assertEqual(proc('100000000'), 0x0) #0x0
     self.assertEqual(proc('102000000'), 0x1) #0x1
     self.assertEqual(proc('100020000'), 0x1) #0x1
@@ -173,7 +173,7 @@ class LBPTest(unittest.TestCase):
     self.assertEqual(op.max_label, 0x6) # this is set to 6!
 
   def test03_u2_4p1r(self):
-    op = torch.ip.LBP4R(1,False,False,False,True)
+    op = bob.ip.LBP4R(1,False,False,False,True)
     proc = Processor(op, generate_3x3_image, (1,1))
     self.assertEqual(proc('100000000'), 0x1) #0x0
     self.assertEqual(proc('102000000'), 0x2) #0x8
@@ -194,7 +194,7 @@ class LBPTest(unittest.TestCase):
     self.assertEqual(op.max_label, 0xf) # this is set to 15!
 
   def test04_rotinvariant_u2_4p1r(self):
-    op = torch.ip.LBP4R(1,False,False,False,True,True)
+    op = bob.ip.LBP4R(1,False,False,False,True,True)
     proc = Processor(op, generate_3x3_image, (1,1))
     self.assertEqual(proc('100000000'), 0x1) #0x0
     self.assertEqual(proc('102000000'), 0x2) #0x8
@@ -204,18 +204,18 @@ class LBPTest(unittest.TestCase):
     self.assertEqual(proc('102020000'), 0x3) #0xc
     self.assertEqual(proc('100020200'), 0x3) #0x6
     self.assertEqual(proc('100000202'), 0x3) #0x3
-    self.assertEqual(proc('102000002'), 0x3) #0x9 #missing from torch
+    self.assertEqual(proc('102000002'), 0x3) #0x9 #missing from bob
     self.assertEqual(proc('102020200'), 0x4) #0xe
     self.assertEqual(proc('100020202'), 0x4) #0x7
-    self.assertEqual(proc('102000202'), 0x4) #0xb #missing from torch
-    self.assertEqual(proc('102020002'), 0x4) #0xd #missing from torch
+    self.assertEqual(proc('102000202'), 0x4) #0xb #missing from bob
+    self.assertEqual(proc('102020002'), 0x4) #0xd #missing from bob
     self.assertEqual(proc('100020002'), 0x0) #non-uniform(2) => 0x0
     self.assertEqual(proc('102000200'), 0x0) #non-uniform(2) => 0x0
     self.assertEqual(proc('102020202'), 0x5) #0xf
     self.assertEqual(op.max_label, 0x6) # this is set to 6!
 
   def test05_vanilla_4p1r_toaverage(self):
-    op = torch.ip.LBP4R(1,False,True)
+    op = bob.ip.LBP4R(1,False,True)
     proc = Processor(op, generate_3x3_image, (1,1))
     self.assertEqual(proc('100000000'), 0x0) #average is 0.2
     self.assertEqual(proc('102000000'), 0x8) #average is 0.6
@@ -236,14 +236,14 @@ class LBPTest(unittest.TestCase):
     self.assertEqual(op.max_label, 0x10) # this is set to 16!
 
   def test06_vanilla_8p1r(self):
-    op = torch.ip.LBP8R(1)
+    op = bob.ip.LBP8R(1)
     proc = Processor(op, generate_3x3_image, (1,1))
     for i in range(256):
       v = ('1%8s' % bin(i, 2)).replace(' ', '0')
       self.assertEqual(proc(v), i)
 
   def test07_rotinvariant_8p1r(self):
-    op = torch.ip.LBP8R(1,False,False,False,False,True)
+    op = bob.ip.LBP8R(1,False,False,False,False,True)
     proc = Processor(op, generate_3x3_image, (1,1))
     table = calculate_lbp8r_rotinvariant_table()
     for i in range(256):
@@ -251,7 +251,7 @@ class LBPTest(unittest.TestCase):
       self.assertEqual(proc(v), table[i])
 
   def test08_u2_8p1r(self):
-    op = torch.ip.LBP8R(1,False,False,False,True,False)
+    op = bob.ip.LBP8R(1,False,False,False,True,False)
     proc = Processor(op, generate_3x3_image, (1,1))
     table = calculate_lbp8r_u2_table()
     values = []
@@ -265,7 +265,7 @@ class LBPTest(unittest.TestCase):
     self.assertEqual(len(set(values)), len(set(table))+1)
 
   def test09_riu2_8p1r(self):
-    op = torch.ip.LBP8R(1,False,False,False,True,True)
+    op = bob.ip.LBP8R(1,False,False,False,True,True)
     proc = Processor(op, generate_3x3_image, (1,1))
     table = calculate_lbp8r_riu2_table()
     values = []
@@ -280,13 +280,13 @@ class LBPTest(unittest.TestCase):
 
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()

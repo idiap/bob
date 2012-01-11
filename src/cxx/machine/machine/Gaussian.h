@@ -28,7 +28,7 @@
 #include <cfloat>
 #include <io/HDF5File.h>
 
-namespace Torch {
+namespace bob {
 namespace machine {
 
 namespace Log
@@ -55,7 +55,7 @@ class Gaussian {
     Gaussian(int n_inputs);
 
     /// Constructor
-    Gaussian(Torch::io::HDF5File& config);
+    Gaussian(bob::io::HDF5File& config);
 
     /// Destructor
     virtual ~Gaussian();
@@ -110,10 +110,10 @@ class Gaussian {
     double logLikelihood(const blitz::Array<double, 1> &x) const;
 
     /// Save to a Configuration
-    void save(Torch::io::HDF5File& config) const;
+    void save(bob::io::HDF5File& config) const;
     
     /// Load from a Configuration
-    void load(Torch::io::HDF5File& config);
+    void load(bob::io::HDF5File& config);
 
     friend std::ostream& operator<<(std::ostream& os, const Gaussian& g);
     

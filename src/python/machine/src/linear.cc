@@ -24,10 +24,10 @@
 #include "machine/LinearMachine.h"
 
 using namespace boost::python;
-namespace tp = Torch::python;
-namespace ca = Torch::core::array;
-namespace mach = Torch::machine;
-namespace io = Torch::io;
+namespace tp = bob::python;
+namespace ca = bob::core::array;
+namespace mach = bob::machine;
+namespace io = bob::io;
 
 static object forward(const mach::LinearMachine& m, tp::const_ndarray input) {
   tp::ndarray output(ca::t_float64, m.outputSize());

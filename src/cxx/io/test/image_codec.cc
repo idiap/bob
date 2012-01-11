@@ -59,8 +59,8 @@ struct T {
  * descriptor
  */
 std::string temp_file(const std::string& ext) {
-  boost::filesystem::path tpl = Torch::core::tmpdir();
-  std::string filename("torchtest_core_binformatXXXXXX");
+  boost::filesystem::path tpl = bob::core::tmpdir();
+  std::string filename("bobtest_core_binformatXXXXXX");
   filename.append(ext);
   tpl /= filename;
   boost::shared_array<char> char_tpl(new char[tpl.file_string().size()+1]);
@@ -79,7 +79,7 @@ void check_equal(const blitz::Array<T,2>& a, const blitz::Array<U,2>& b)
   BOOST_REQUIRE_EQUAL(a.extent(1), b.extent(1));
   for (int i=0; i<a.extent(0); ++i) {
     for (int j=0; j<a.extent(1); ++j) {
-      BOOST_CHECK_EQUAL(a(i,j), Torch::core::cast<T>(b(i,j)));
+      BOOST_CHECK_EQUAL(a(i,j), bob::core::cast<T>(b(i,j)));
     }
   }
 }
@@ -93,7 +93,7 @@ void check_equal(const blitz::Array<T,3>& a, const blitz::Array<U,3>& b)
   for (int i=0; i<a.extent(0); ++i) {
     for (int j=0; j<a.extent(1); ++j) {
       for (int k=0; k<a.extent(2); ++k) {
-        BOOST_CHECK_EQUAL(a(i,j,k), Torch::core::cast<T>(b(i,j,k)));
+        BOOST_CHECK_EQUAL(a(i,j,k), bob::core::cast<T>(b(i,j,k)));
       }
     }
   }
@@ -104,9 +104,9 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 BOOST_AUTO_TEST_CASE( image_gif ) 
 {
   // Prepare io Array from blitz array
-  Torch::io::Array db_b(b);
+  bob::io::Array db_b(b);
   BOOST_CHECK_EQUAL(db_b.getNDim(), b.dimensions());
-  BOOST_CHECK_EQUAL(db_b.getElementType(), Torch::core::array::t_uint8);
+  BOOST_CHECK_EQUAL(db_b.getElementType(), bob::core::array::t_uint8);
   BOOST_CHECK_EQUAL(db_b.isLoaded(), true);
   BOOST_CHECK_EQUAL(db_b.getFilename().size(), 0);
   BOOST_CHECK_EQUAL(db_b.getCodec().use_count(), 0);
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE( image_gif )
   db_b.save( filename);
 
   // Load from gif image
-  Torch::io::Array db_b_read( filename);
+  bob::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
 }
@@ -127,9 +127,9 @@ BOOST_AUTO_TEST_CASE( image_gif )
 BOOST_AUTO_TEST_CASE( image_bmp )
 {
   // Prepare io Array from blitz array
-  Torch::io::Array db_b(b);
+  bob::io::Array db_b(b);
   BOOST_CHECK_EQUAL(db_b.getNDim(), b.dimensions());
-  BOOST_CHECK_EQUAL(db_b.getElementType(), Torch::core::array::t_uint8);
+  BOOST_CHECK_EQUAL(db_b.getElementType(), bob::core::array::t_uint8);
   BOOST_CHECK_EQUAL(db_b.isLoaded(), true);
   BOOST_CHECK_EQUAL(db_b.getFilename().size(), 0);
   BOOST_CHECK_EQUAL(db_b.getCodec().use_count(), 0);
@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE( image_bmp )
   db_b.save( filename);
 
   // Load from bmp image
-  Torch::io::Array db_b_read( filename);
+  bob::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
 }
@@ -151,9 +151,9 @@ BOOST_AUTO_TEST_CASE( image_bmp )
 BOOST_AUTO_TEST_CASE( image_jpg )
 {
   // Prepare io Array from blitz array
-  Torch::io::Array db_b(b);
+  bob::io::Array db_b(b);
   BOOST_CHECK_EQUAL(db_b.getNDim(), b.dimensions());
-  BOOST_CHECK_EQUAL(db_b.getElementType(), Torch::core::array::t_uint8);
+  BOOST_CHECK_EQUAL(db_b.getElementType(), bob::core::array::t_uint8);
   BOOST_CHECK_EQUAL(db_b.isLoaded(), true);
   BOOST_CHECK_EQUAL(db_b.getFilename().size(), 0);
   BOOST_CHECK_EQUAL(db_b.getCodec().use_count(), 0);
@@ -166,7 +166,7 @@ BOOST_AUTO_TEST_CASE( image_jpg )
   db_b.save( filename);
 
   // Load from jpg image
-  Torch::io::Array db_b_read( filename);
+  bob::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
 }
@@ -175,9 +175,9 @@ BOOST_AUTO_TEST_CASE( image_jpg )
 BOOST_AUTO_TEST_CASE( image_pbm )
 {
   // Prepare io Array from blitz array
-  Torch::io::Array db_a(a);
+  bob::io::Array db_a(a);
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
-  BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_uint8);
+  BOOST_CHECK_EQUAL(db_a.getElementType(), bob::core::array::t_uint8);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), true);
   BOOST_CHECK_EQUAL(db_a.getFilename().size(), 0);
   BOOST_CHECK_EQUAL(db_a.getCodec().use_count(), 0);
@@ -190,16 +190,16 @@ BOOST_AUTO_TEST_CASE( image_pbm )
   db_a.save( filename);
 
   // Load from pbm image
-  Torch::io::Array db_a_read( filename);
+  bob::io::Array db_a_read( filename);
 //  check_equal( db_a_read.get<uint8_t,2>(), a );
 }
 
 BOOST_AUTO_TEST_CASE( image_pgm )
 {
   // Prepare io Array from blitz array
-  Torch::io::Array db_a(a);
+  bob::io::Array db_a(a);
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
-  BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_uint8);
+  BOOST_CHECK_EQUAL(db_a.getElementType(), bob::core::array::t_uint8);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), true);
   BOOST_CHECK_EQUAL(db_a.getFilename().size(), 0);
   BOOST_CHECK_EQUAL(db_a.getCodec().use_count(), 0);
@@ -212,16 +212,16 @@ BOOST_AUTO_TEST_CASE( image_pgm )
   db_a.save( filename);
 
   // Load from pgm image
-  Torch::io::Array db_a_read( filename);
+  bob::io::Array db_a_read( filename);
   check_equal( db_a_read.get<uint8_t,2>(), a );
 }
 
 BOOST_AUTO_TEST_CASE( image_png )
 {
   // Prepare io Array from blitz array
-  Torch::io::Array db_b(b);
+  bob::io::Array db_b(b);
   BOOST_CHECK_EQUAL(db_b.getNDim(), b.dimensions());
-  BOOST_CHECK_EQUAL(db_b.getElementType(), Torch::core::array::t_uint8);
+  BOOST_CHECK_EQUAL(db_b.getElementType(), bob::core::array::t_uint8);
   BOOST_CHECK_EQUAL(db_b.isLoaded(), true);
   BOOST_CHECK_EQUAL(db_b.getFilename().size(), 0);
   BOOST_CHECK_EQUAL(db_b.getCodec().use_count(), 0);
@@ -234,7 +234,7 @@ BOOST_AUTO_TEST_CASE( image_png )
   db_b.save( filename);
 
   // Load from png image
-  Torch::io::Array db_b_read( filename);
+  bob::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
 }
@@ -242,9 +242,9 @@ BOOST_AUTO_TEST_CASE( image_png )
 BOOST_AUTO_TEST_CASE( image_ppm )
 {
   // Prepare io Array from blitz array
-  Torch::io::Array db_b(b);
+  bob::io::Array db_b(b);
   BOOST_CHECK_EQUAL(db_b.getNDim(), b.dimensions());
-  BOOST_CHECK_EQUAL(db_b.getElementType(), Torch::core::array::t_uint8);
+  BOOST_CHECK_EQUAL(db_b.getElementType(), bob::core::array::t_uint8);
   BOOST_CHECK_EQUAL(db_b.isLoaded(), true);
   BOOST_CHECK_EQUAL(db_b.getFilename().size(), 0);
   BOOST_CHECK_EQUAL(db_b.getCodec().use_count(), 0);
@@ -257,7 +257,7 @@ BOOST_AUTO_TEST_CASE( image_ppm )
   db_b.save( filename);
 
   // Load from ppm image
-  Torch::io::Array db_b_read( filename);
+  bob::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
 }
@@ -265,9 +265,9 @@ BOOST_AUTO_TEST_CASE( image_ppm )
 BOOST_AUTO_TEST_CASE( image_tiff ) 
 {
   // Prepare io Array from blitz array
-  Torch::io::Array db_b(b);
+  bob::io::Array db_b(b);
   BOOST_CHECK_EQUAL(db_b.getNDim(), b.dimensions());
-  BOOST_CHECK_EQUAL(db_b.getElementType(), Torch::core::array::t_uint8);
+  BOOST_CHECK_EQUAL(db_b.getElementType(), bob::core::array::t_uint8);
   BOOST_CHECK_EQUAL(db_b.isLoaded(), true);
   BOOST_CHECK_EQUAL(db_b.getFilename().size(), 0);
   BOOST_CHECK_EQUAL(db_b.getCodec().use_count(), 0);
@@ -280,7 +280,7 @@ BOOST_AUTO_TEST_CASE( image_tiff )
   db_b.save( filename);
 
   // Load from tiff image
-  Torch::io::Array db_b_read( filename);
+  bob::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
 }
@@ -289,9 +289,9 @@ BOOST_AUTO_TEST_CASE( image_tiff )
 BOOST_AUTO_TEST_CASE( image_xcf ) 
 {
   // Prepare io Array from blitz array
-  Torch::io::Array db_b(b);
+  bob::io::Array db_b(b);
   BOOST_CHECK_EQUAL(db_b.getNDim(), b.dimensions());
-  BOOST_CHECK_EQUAL(db_b.getElementType(), Torch::core::array::t_uint8);
+  BOOST_CHECK_EQUAL(db_b.getElementType(), bob::core::array::t_uint8);
   BOOST_CHECK_EQUAL(db_b.isLoaded(), true);
   BOOST_CHECK_EQUAL(db_b.getFilename().size(), 0);
   BOOST_CHECK_EQUAL(db_b.getCodec().use_count(), 0);
@@ -304,7 +304,7 @@ BOOST_AUTO_TEST_CASE( image_xcf )
   db_b.save( filename);
 
   // Load from xcf image
-  Torch::io::Array db_b_read( filename);
+  bob::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
 }

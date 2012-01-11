@@ -23,8 +23,8 @@
 #include "io/Array.h"
 #include "io/CodecRegistry.h"
 
-namespace io = Torch::io;
-namespace ca = Torch::core::array;
+namespace io = bob::io;
+namespace ca = bob::core::array;
 
 io::Array::Array(const ca::interface& data):
   m_inlined(new ca::blitz_array(data)),

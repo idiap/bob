@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import torch
+import bob
 import os, sys
 import optparse
 import math
@@ -27,7 +27,7 @@ def NormalizeStdArrayset(arrayset):
   std -= (mean ** 2)
   std = std ** 0.5 # sqrt(std)
 
-  arStd = torch.io.Arrayset()
+  arStd = bob.io.Arrayset()
   for array in arrayset:
     arStd.append(array.astype('float64') / std)
 
@@ -115,7 +115,7 @@ if options.test:
     os.remove("/tmp/input.hdf5")
   
   options.output_file = "/tmp/wm.hdf5"
-  arrayset = torch.io.Arrayset()
+  arrayset = bob.io.Arrayset()
   array1 = numpy.array([ 0,  1,  2,  3], 'float64')
   arrayset.append(array1)
   array2 = numpy.array([ 3,  1,  5,  2], 'float64')
@@ -143,9 +143,9 @@ for line in fileinput.input(args):
   filelist.append(line.rstrip('\r\n'))
 
 # Create an arrayset from the input files
-ar = torch.io.Arrayset()
+ar = bob.io.Arrayset()
 for myfile in filelist:
-  myarrayset = torch.io.Arrayset(myfile)
+  myarrayset = bob.io.Arrayset(myfile)
   n_blocks = len(myarrayset)
   for b in range(0,n_blocks): ar.append(myarrayset[b])
 
@@ -159,11 +159,11 @@ else:
 	(normalizedAr,stdAr) = NormalizeStdArrayset(ar)
 	
 # Create the machines
-kmeans = torch.machine.KMeansMachine(options.n_gaussians, input_size)
-gmm = torch.machine.GMMMachine(options.n_gaussians, input_size)
+kmeans = bob.machine.KMeansMachine(options.n_gaussians, input_size)
+gmm = bob.machine.GMMMachine(options.n_gaussians, input_size)
 
 # Create the KMeansTrainer
-kmeansTrainer = torch.trainer.KMeansTrainer()
+kmeansTrainer = bob.trainer.KMeansTrainer()
 kmeansTrainer.convergenceThreshold = options.convergence_threshold
 kmeansTrainer.maxIterations = options.iterk
 
@@ -185,13 +185,13 @@ gmm.weights = weights
 gmm.setVarianceThresholds(options.variance_threshold)
 
 # Train gmm
-trainer = torch.trainer.ML_GMMTrainer(not options.no_update_means, not options.no_update_variances, not options.no_update_weights)
+trainer = bob.trainer.ML_GMMTrainer(not options.no_update_means, not options.no_update_variances, not options.no_update_weights)
 trainer.convergenceThreshold = options.convergence_threshold
 trainer.maxIterations = options.iterg
 trainer.train(gmm, ar)
 
 # Save gmm
-config = torch.io.HDF5File(options.output_file)
+config = bob.io.HDF5File(options.output_file)
 gmm.save(config)
 
 if options.test:

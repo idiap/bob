@@ -27,9 +27,9 @@
 #include "core/python/ndarray.h"
 
 using namespace boost::python;
-namespace io = Torch::io;
-namespace mach = Torch::machine;
-namespace tp = Torch::python;
+namespace io = bob::io;
+namespace mach = bob::machine;
+namespace tp = bob::python;
 
 static tuple getVariancesAndWeightsForEachCluster(const mach::KMeansMachine& machine, io::Arrayset& ar) {
   blitz::Array<double, 2> variances;
@@ -145,7 +145,7 @@ void bind_machine_gmm() {
                    init<>())
   .def(init<int>(args("n_inputs")))
   .def(init<mach::Gaussian&>(args("other")))
-  .def(init<Torch::io::HDF5File&>(args("config")))
+  .def(init<bob::io::HDF5File&>(args("config")))
   .def(self == self)
   .add_property("nInputs",
                 &mach::Gaussian::getNInputs,
@@ -183,7 +183,7 @@ void bind_machine_gmm() {
                    "Eq (10) is sumPxx(i) / n(i)\n",
                    init<>())
   .def(init<int, int>(args("n_gaussians","n_inputs")))
-  .def(init<Torch::io::HDF5File&>(args("config")))
+  .def(init<bob::io::HDF5File&>(args("config")))
   .def_readwrite("log_likelihood",
                  &mach::GMMStats::log_likelihood,
                  "The accumulated log likelihood of all samples")
@@ -213,7 +213,7 @@ void bind_machine_gmm() {
                                                             "See Section 2.3.9 of Bishop, \"Pattern recognition and machine learning\", 2006",
                                                             init<int, int>(args("n_gaussians", "n_inputs")))
   .def(init<mach::GMMMachine&>())
-  .def(init<Torch::io::HDF5File&>(args("config")))
+  .def(init<bob::io::HDF5File&>(args("config")))
   .def(self == self)
   .add_property("nInputs",
                 &mach::GMMMachine::getNInputs,
@@ -304,8 +304,8 @@ void bind_machine_gmm() {
        "This class implements computes log likelihood ratio, given a client and a UBM GMM.\n",
         no_init)
   .def(init<mach::GMMLLRMachine&>())
-  .def(init<Torch::io::HDF5File&>(args("config")))
-  .def(init<Torch::io::HDF5File&,Torch::io::HDF5File&>(args("client", "ubm")))
+  .def(init<bob::io::HDF5File&>(args("config")))
+  .def(init<bob::io::HDF5File&,bob::io::HDF5File&>(args("client", "ubm")))
   .def(init<mach::GMMMachine&,mach::GMMMachine&>(args("client", "ubm")))
   .def(self == self)
   .def("getGMMClient",

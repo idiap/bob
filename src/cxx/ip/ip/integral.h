@@ -21,14 +21,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_IP_INTEGRAL_H
-#define TORCH5SPRO_IP_INTEGRAL_H
+#ifndef BOB5SPRO_IP_INTEGRAL_H
+#define BOB5SPRO_IP_INTEGRAL_H
 
 #include "core/array_assert.h"
 #include "core/array_index.h"
 #include "core/cast.h"
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libip_api
  * @{
@@ -50,18 +50,18 @@ namespace Torch {
       void integralNoCheck(const blitz::Array<T,2>& src,
         blitz::Array<U,2>& dst)
       {
-        dst(0,0) = Torch::core::cast<U>(src(0,0));
+        dst(0,0) = bob::core::cast<U>(src(0,0));
         // Compute first row
         for(int x=1; x<src.extent(1); ++x)
-          dst(0,x) = dst(0,x-1) + Torch::core::cast<U>(src(0,x));
+          dst(0,x) = dst(0,x-1) + bob::core::cast<U>(src(0,x));
         // Compute remaining part
         for(int y=1; y<src.extent(0); ++y)
         {
-          dst(y,0) = dst(y-1,0) + Torch::core::cast<U>(src(y,0));
+          dst(y,0) = dst(y-1,0) + bob::core::cast<U>(src(y,0));
           U row_sum_cur = src(y,0);
           for(int x=1; x<src.extent(1); ++x) 
           {
-            row_sum_cur += Torch::core::cast<U>(src(y,x));
+            row_sum_cur += bob::core::cast<U>(src(y,x));
             dst(y,x) = dst(y-1,x) + row_sum_cur;
           }
         }
@@ -88,16 +88,16 @@ namespace Torch {
       const bool addZeroBorder=false)
     {
       // Checks that the src/dst arrays have zero base indices
-      Torch::core::array::assertZeroBase(src);
-      Torch::core::array::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(dst);
       if(addZeroBorder)
       {
         blitz::TinyVector<int,2> shape = src.shape();
         shape += 1;
-        Torch::core::array::assertSameShape(dst,shape);
+        bob::core::array::assertSameShape(dst,shape);
       }
       else
-        Torch::core::array::assertSameShape(src,dst);
+        bob::core::array::assertSameShape(src,dst);
 
       // Compute the integral image of the 2D array
       if(addZeroBorder)
@@ -120,4 +120,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_IP_INTEGRAL_H */
+#endif /* BOB5SPRO_IP_INTEGRAL_H */

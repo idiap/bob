@@ -19,7 +19,7 @@
  */
 #include "ip/Affine2D.h"
 
-namespace Torch {
+namespace bob {
 	
 Affine2D::Affine2D(Matrix2D &rs_, Vector2D &t_)
 { 

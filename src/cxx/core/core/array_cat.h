@@ -22,8 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_CORE_ARRAY_CAT_H 
-#define TORCH_CORE_ARRAY_CAT_H
+#ifndef BOB_CORE_ARRAY_CAT_H 
+#define BOB_CORE_ARRAY_CAT_H
 
 #include <vector>
 #include <blitz/array.h>
@@ -32,7 +32,7 @@
 #endif
 #include <core/Exception.h>
 
-namespace Torch { namespace core { namespace array {
+namespace bob { namespace core { namespace array {
 
   /**
    * Copies the data of one array into the other, specifying a precise position
@@ -305,4 +305,4 @@ namespace Torch { namespace core { namespace array {
 
 }}}
 
-#endif /* TORCH_CORE_ARRAY_CAT_H */
+#endif /* BOB_CORE_ARRAY_CAT_H */

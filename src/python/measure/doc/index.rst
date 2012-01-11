@@ -2,13 +2,13 @@
 .. Andre Anjos <andre.dos.anjos@gmail.com>
 .. Tue 19 Apr 19:00:07 2011 CEST
 
-.. Index file for the Python Torch::measure bindings
+.. Index file for the Python bob::measure bindings
 
 ========================
  Performance Evaluation
 ========================
 
-Methods in the :py:mod:`torch.measure` module help you evaluating error in
+Methods in the :py:mod:`bob.measure` module help you evaluating error in
 multi-class or binary classification problems. If you are not yet familiarized
 with aspects of performance evaluation, we recommend the following papers
 for an overview of some of the methods implemented.
@@ -67,7 +67,7 @@ defined in the first equation.
 .. note::
 
   Most of the methods availabe in this module require as input a set of 2
-  :py:class:`torch.core.array.float64_1` objects that contain the scores
+  :py:class:`bob.core.array.float64_1` objects that contain the scores
   obtained by the classification system to be evaluated, without specific
   order. The first set, refered in this manual as the **negatives** represents
   the impostor attacks or noise response of the classifier. The second set,
@@ -81,7 +81,7 @@ defined in the first equation.
   While it is not possible to provide a parser for every individual file that
   may be generated in different experiment frameworks, we do provide a few
   parsers for formats we use the most. Please refer to the documentation of
-  :py:mod:`torch.measure.load` for a list of formats and details.
+  :py:mod:`bob.measure.load` for a list of formats and details.
 
   In the reminder of this section we assume you have successfuly parsed and
   loaded your scores in two 1-D float64 vectors and are ready to evaluate the
@@ -95,19 +95,19 @@ the following techniques:
 
 .. code-block:: python
 
-  import torch
+  import bob
   negatives, positives = parse_my_scores(...) #write parser if not provided!
   T = 0.0 #Threshold: later we explain how one can calculate these
-  correct_negatives = torch.measure.correctlyClassifiedNegatives(negatives, T)
+  correct_negatives = bob.measure.correctlyClassifiedNegatives(negatives, T)
   FAR = 1 - (float(correct_negatives.extent(0))/negatives.extent(0))
-  correct_positives = torch.measure.correctlyClassifiedPositives(positives, T)
+  correct_positives = bob.measure.correctlyClassifiedPositives(positives, T)
   FRR = 1 - (float(correct_positives.extent(0))/positives.extent(0))
 
 We do provide a method to calculate the FAR and FRR in a single shot:
 
 .. code-block:: python
 
-  FAR, FRR = torch.measure.farfrr(negatives, positives, T)
+  FAR, FRR = bob.measure.farfrr(negatives, positives, T)
 
 The threshold ``T`` is normally calculated by looking at the distribution of
 negatives and positives in a development (or validation) set, selecting a
@@ -120,13 +120,13 @@ threshold:
 
   .. code-block:: python
 
-    T = torch.measure.eerThreshold(negatives, positives)
+    T = bob.measure.eerThreshold(negatives, positives)
 
 * Threshold for the minimum HTER
   
   .. code-block:: python
 
-    T = torch.measure.minHterThreshold(negatives, positives)
+    T = bob.measure.minHterThreshold(negatives, positives)
 
 * Threshold for the minimum weighted error rate (MWER) given a certain cost
   :math:`\beta`.
@@ -134,12 +134,12 @@ threshold:
   .. code-block:: python
 
     cost = 0.3 #or "beta"
-    T = torch.measure.minWeightedErrorRateThreshold(negatives, positives, cost)
+    T = bob.measure.minWeightedErrorRateThreshold(negatives, positives, cost)
 
   .. note::
 
     By setting cost to 0.5 is equivalent to use
-    :py:meth:`torch.measure.minHterThreshold`.
+    :py:meth:`bob.measure.minHterThreshold`.
 
 Plotting
 --------
@@ -160,16 +160,16 @@ town. To plot a ROC curve, in possession of your **negatives** and
   import matplotlib.pyplot as mpl
   # we assume you have your negatives and positives already split
   npoints = 100
-  torch.measure.plot.roc(negatives, positives, npoints, color=(0,0,0),
+  bob.measure.plot.roc(negatives, positives, npoints, color=(0,0,0),
       linestyle='-', label='test')
   mpl.xlabel('FRR (%)')
   mpl.ylabel('FAR (%)')
   mpl.grid(True)
 
 As can be observed, plotting methods live in the namespace
-:py:mod:`torch.measure.plot`. They work like `Matplotlib`_'s `plot()`_ method
+:py:mod:`bob.measure.plot`. They work like `Matplotlib`_'s `plot()`_ method
 itself, except that instead of receiving the x and y point coordinates as
-parameters, they receive the two :py:class:`torch.core.array.float64_1` arrays
+parameters, they receive the two :py:class:`bob.core.array.float64_1` arrays
 with negatives and positives, as well as an indication of the number of points
 the curve must contain. 
 
@@ -190,7 +190,7 @@ A DET curve can be drawn using commands such as the ones for the ROC curve:
   import matplotlib.pyplot as mpl
   # we assume you have your negatives and positives already split
   npoints = 100
-  torch.measure.plot.det(negatives, positives, npoints, color=(0,0,0),
+  bob.measure.plot.det(negatives, positives, npoints, color=(0,0,0),
       linestyle='-', label='test')
   mpl.xlabel('FRR (%)')
   mpl.ylabel('FAR (%)')
@@ -201,20 +201,20 @@ A DET curve can be drawn using commands such as the ones for the ROC curve:
   If you wish to reset axis zooming, you must use the gaussian scale rather
   than the visual marks showed at the plot, which are just there for
   displaying purposes. The real axis scale is based on the
-  ``torch.measure.ppndf()`` method. For example, if you wish to set the x and y
+  ``bob.measure.ppndf()`` method. For example, if you wish to set the x and y
   axis to display data between 1% and 40% here is the recipe:
 
   .. code-block:: python
 
     #AFTER you plot the DET curve, just set the axis in this way:
-    mpl.axis([torch.measure.ppndf(k/100.0) for k in (1, 40, 1, 40)])
+    mpl.axis([bob.measure.ppndf(k/100.0) for k in (1, 40, 1, 40)])
 
   We provide a convenient way for you to do the above in this module. So,
-  optionally, you may use the ``torch.measure.plot.det_axis`` method like this:
+  optionally, you may use the ``bob.measure.plot.det_axis`` method like this:
 
   .. code-block:: python
 
-    torch.measure.plot.det_axis([1, 40, 1, 40])
+    bob.measure.plot.det_axis([1, 40, 1, 40])
 
 EPC
 ===
@@ -225,17 +225,17 @@ slightly modified:
 
 .. code-block:: python
 
-  torch.measure.plot.epc(dev_neg, dev_pos, test_neg, test_pos, npoints, 
+  bob.measure.plot.epc(dev_neg, dev_pos, test_neg, test_pos, npoints, 
       color=(0,0,0), linestyle='-')
 
 Fine-tunning
 ============
 
-The methods inside :py:mod:`torch.measure.plot` are only provided as a
-`Matplotlib`_ wrapper to equivalent methods in :py:mod:`torch.measure` that can
+The methods inside :py:mod:`bob.measure.plot` are only provided as a
+`Matplotlib`_ wrapper to equivalent methods in :py:mod:`bob.measure` that can
 only calculate the points without doing any plotting. You may prefer to tweak
 the plotting or even use a different plotting system such as gnuplot. Have a
-look at the implementations at :py:mod:`torch.measure.plot` to understand how
+look at the implementations at :py:mod:`bob.measure.plot` to understand how
 to use the |project| methods to compute the curves and interlace that in the
 way that best suites you.
 
@@ -245,8 +245,8 @@ Full Applications
 We do provide a few scripts that can be used to quickly evaluate a set of
 scores. We present these scripts in this section. The scripts take as input
 either a 4-column or 5-column data format as specified in the documentation of
-:py:mod:`torch.measure.load.four_column` or
-:py:mod:`torch.measure.load.five_column`.
+:py:mod:`bob.measure.load.four_column` or
+:py:mod:`bob.measure.load.five_column`.
 
 To calculate the threshold using a certain criteria (EER, min.HTER or weighted
 Error Rate) on a set, after setting up |project|, just do:
@@ -309,19 +309,19 @@ References
 Core
 ====
 
-.. automodule:: torch.measure
+.. automodule:: bob.measure
    :members:
 
 Plotting
 ========
 
-.. automodule:: torch.measure.plot
+.. automodule:: bob.measure.plot
    :members:
 
 File Parsing and Loading
 ========================
 
-.. automodule:: torch.measure.load
+.. automodule:: bob.measure.load
    :members:
 
 .. Place youre references here:

@@ -32,9 +32,9 @@
 #include "machine/MLPException.h"
 #include "math/linear.h"
 
-namespace mach = Torch::machine;
-namespace math = Torch::math;
-namespace array = Torch::core::array;
+namespace mach = bob::machine;
+namespace math = bob::math;
+namespace array = bob::core::array;
 
 mach::MLP::MLP (size_t input, size_t output):
   m_input_sub(input),
@@ -96,8 +96,8 @@ mach::MLP::MLP (const std::vector<size_t>& shape):
 }
 
 mach::MLP::MLP (const mach::MLP& other):
-  m_input_sub(Torch::core::array::ccopy(other.m_input_sub)),
-  m_input_div(Torch::core::array::ccopy(other.m_input_div)),
+  m_input_sub(bob::core::array::ccopy(other.m_input_sub)),
+  m_input_div(bob::core::array::ccopy(other.m_input_div)),
   m_weight(other.m_weight.size()),
   m_bias(other.m_bias.size()),
   m_activation(other.m_activation),
@@ -105,35 +105,35 @@ mach::MLP::MLP (const mach::MLP& other):
   m_buffer(other.m_buffer.size())
 {
   for (size_t i=0; i<other.m_weight.size(); ++i) {
-    m_weight[i].reference(Torch::core::array::ccopy(other.m_weight[i]));
-    m_bias[i].reference(Torch::core::array::ccopy(other.m_bias[i]));
-    m_buffer[i].reference(Torch::core::array::ccopy(other.m_buffer[i]));
+    m_weight[i].reference(bob::core::array::ccopy(other.m_weight[i]));
+    m_bias[i].reference(bob::core::array::ccopy(other.m_bias[i]));
+    m_buffer[i].reference(bob::core::array::ccopy(other.m_buffer[i]));
   }
 }
 
-mach::MLP::MLP (Torch::io::HDF5File& config) {
+mach::MLP::MLP (bob::io::HDF5File& config) {
   load(config);
 }
 
 mach::MLP::~MLP() { }
 
 mach::MLP& mach::MLP::operator= (const MLP& other) {
-  m_input_sub.reference(Torch::core::array::ccopy(other.m_input_sub));
-  m_input_div.reference(Torch::core::array::ccopy(other.m_input_div));
+  m_input_sub.reference(bob::core::array::ccopy(other.m_input_sub));
+  m_input_div.reference(bob::core::array::ccopy(other.m_input_div));
   m_weight.resize(other.m_weight.size());
   m_bias.resize(other.m_bias.size());
   m_activation = other.m_activation;
   m_actfun = other.m_actfun;
   m_buffer.resize(other.m_buffer.size());
   for (size_t i=0; i<other.m_weight.size(); ++i) {
-    m_weight[i].reference(Torch::core::array::ccopy(other.m_weight[i]));
-    m_bias[i].reference(Torch::core::array::ccopy(other.m_bias[i]));
-    m_buffer[i].reference(Torch::core::array::ccopy(other.m_buffer[i]));
+    m_weight[i].reference(bob::core::array::ccopy(other.m_weight[i]));
+    m_bias[i].reference(bob::core::array::ccopy(other.m_bias[i]));
+    m_buffer[i].reference(bob::core::array::ccopy(other.m_buffer[i]));
   }
   return *this;
 }
 
-void mach::MLP::load (Torch::io::HDF5File& config) {
+void mach::MLP::load (bob::io::HDF5File& config) {
   uint8_t nhidden = config.read<uint8_t>("nhidden");
   m_weight.resize(nhidden+1);
   m_bias.resize(nhidden+1);
@@ -165,7 +165,7 @@ void mach::MLP::load (Torch::io::HDF5File& config) {
   }
 }
 
-void mach::MLP::save (Torch::io::HDF5File& config) const {
+void mach::MLP::save (bob::io::HDF5File& config) const {
   config.setArray("input_sub", m_input_sub);
   config.setArray("input_div", m_input_div);
   config.set("nhidden", (uint8_t)(m_weight.size()-1));
@@ -177,7 +177,7 @@ void mach::MLP::save (Torch::io::HDF5File& config) const {
     config.setArray(weight.str(), m_weight[i]);
     config.setArray(bias.str(), m_bias[i]);
   }
-  //torch's hdf5 implementation does not support enumerations yet...
+  //bob's hdf5 implementation does not support enumerations yet...
   config.set("activation", static_cast<uint32_t>(m_activation));
 }
 
@@ -315,14 +315,14 @@ void mach::MLP::setInputSubtraction(const blitz::Array<double,1>& v) {
   if (m_weight.front().extent(0) != v.extent(0)) {
     throw mach::NInputsMismatch(m_weight.front().extent(0), v.extent(0));
   }
-  m_input_sub.reference(Torch::core::array::ccopy(v));
+  m_input_sub.reference(bob::core::array::ccopy(v));
 }
 
 void mach::MLP::setInputDivision(const blitz::Array<double,1>& v) {
   if (m_weight.front().extent(0) != v.extent(0)) {
     throw mach::NInputsMismatch(m_weight.front().extent(0), v.extent(0));
   }
-  m_input_div.reference(Torch::core::array::ccopy(v));
+  m_input_div.reference(bob::core::array::ccopy(v));
 }
 
 void mach::MLP::setWeights(const std::vector<blitz::Array<double,2> >& weight) {

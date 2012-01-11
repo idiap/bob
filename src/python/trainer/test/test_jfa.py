@@ -8,7 +8,7 @@
 
 import os, sys
 import unittest
-import torch
+import bob
 import random
 import numpy
 
@@ -32,7 +32,7 @@ class JFATrainerTest(unittest.TestCase):
     uv = numpy.ndarray((3,8), 'float64')
 
     # call the update_u function
-    torch.trainer.jfa_updateEigen(A,C,uv)
+    bob.trainer.jfa_updateEigen(A,C,uv)
     # Expected results (JFA cookbook, matlab)
     uv_ref = numpy.array([-0.3120, 0.8754, 0.7009, 0.5404, -0.9020, -5.2395,
       -1.3741, 0.4054, -1.2266, 20.2066, 7.6548, 5.4262, 1.4229, 6.7651,
@@ -65,7 +65,7 @@ class JFATrainerTest(unittest.TestCase):
     spk_ids = numpy.array([0,0,1,1], 'uint32')
 
     # call the estimateXandU function
-    torch.trainer.jfa_estimateXandU(F,N,m,E,d,v,u,z,y,x,spk_ids)
+    bob.trainer.jfa_estimateXandU(F,N,m,E,d,v,u,z,y,x,spk_ids)
     # Expected results(JFA cookbook, matlab)
     x_ref = numpy.array([0.2143, 3.1979, 1.8275, 0.1227, -1.3861, 5.3326,
       0.2359,  -0.7914]).reshape(4,2)
@@ -103,7 +103,7 @@ class JFATrainerTest(unittest.TestCase):
     spk_ids= numpy.array([0,0,1,1], 'uint32')
 
     # call the estimateXandU function
-    torch.trainer.jfa_estimateYandV(F,N,m,E,d,v,u,z,y,x,spk_ids)
+    bob.trainer.jfa_estimateYandV(F,N,m,E,d,v,u,z,y,x,spk_ids)
 
     # Expected results(JFA cookbook, matlab)
     y_ref = numpy.array( [0.9630, 1.3868, 0.04255, -0.3721]).reshape((2,2))
@@ -132,7 +132,7 @@ class JFATrainerTest(unittest.TestCase):
     spk_ids = numpy.array([0,0,1,1], 'uint32')
 
     # call the estimateXandU function
-    torch.trainer.jfa_estimateZandD(F,N,m,E,d,v,u,z,y,x,spk_ids)
+    bob.trainer.jfa_estimateZandD(F,N,m,E,d,v,u,z,y,x,spk_ids)
 
     # Expected results(JFA cookbook, matlab)
     z_ref = numpy.array( [0.3256, 1.8633, 0.6480, 0.8085, -0.0432, 0.2885,
@@ -178,14 +178,14 @@ class JFATrainerTest(unittest.TestCase):
     x=[x1, x2]
 
     # call the updateY function
-    ubm = torch.machine.GMMMachine(2,3)
+    ubm = bob.machine.GMMMachine(2,3)
     ubm.meanSupervector = m
     ubm.varianceSupervector = E
-    jfam = torch.machine.JFABaseMachine(ubm,2,2)
+    jfam = bob.machine.JFABaseMachine(ubm,2,2)
     jfam.U = u
     jfam.V = v
     jfam.D = d
-    jfat = torch.trainer.JFABaseTrainer(jfam)
+    jfat = bob.trainer.JFABaseTrainer(jfam)
 
     jfat.setStatistics(N, F)
     jfat.setSpeakerFactors(x,y,z)
@@ -239,14 +239,14 @@ class JFATrainerTest(unittest.TestCase):
     x  = [x1, x2]
 
     # call the updateX function
-    ubm = torch.machine.GMMMachine(2,3)
+    ubm = bob.machine.GMMMachine(2,3)
     ubm.meanSupervector = m
     ubm.varianceSupervector = E
-    jfam = torch.machine.JFABaseMachine(ubm,2,2)
+    jfam = bob.machine.JFABaseMachine(ubm,2,2)
     jfam.U = u
     jfam.V = v
     jfam.D = d
-    jfat = torch.trainer.JFABaseTrainer(jfam)
+    jfat = bob.trainer.JFABaseTrainer(jfam)
 
     jfat.setStatistics(N, F)
     jfat.setSpeakerFactors(x,y,z)
@@ -298,14 +298,14 @@ class JFATrainerTest(unittest.TestCase):
     x=[x1, x2]
 
     # call the updateZ function
-    ubm = torch.machine.GMMMachine(2,3)
+    ubm = bob.machine.GMMMachine(2,3)
     ubm.meanSupervector = m
     ubm.varianceSupervector = E
-    jfam = torch.machine.JFABaseMachine(ubm,2,2)
+    jfam = bob.machine.JFABaseMachine(ubm,2,2)
     jfam.U = u
     jfam.V = v
     jfam.D = d
-    jfat = torch.trainer.JFABaseTrainer(jfam)
+    jfat = bob.trainer.JFABaseTrainer(jfam)
 
     jfat.setStatistics(N, F)
     jfat.setSpeakerFactors(x,y,z)
@@ -344,25 +344,25 @@ class JFATrainerTest(unittest.TestCase):
       0.4134, 0.3545, 0.2177, 0.9713, 0.1257]).reshape((6,2))
 
     # call the train function
-    ubm = torch.machine.GMMMachine(2,3)
+    ubm = bob.machine.GMMMachine(2,3)
     ubm.meanSupervector = m
     ubm.varianceSupervector = E
-    jfam = torch.machine.JFABaseMachine(ubm,2,2)
+    jfam = bob.machine.JFABaseMachine(ubm,2,2)
     jfam.U = u
     jfam.V = v
     jfam.D = d
-    jfat = torch.trainer.JFABaseTrainer(jfam)
+    jfat = bob.trainer.JFABaseTrainer(jfam)
     jfat.train(N,F,5)
 
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()

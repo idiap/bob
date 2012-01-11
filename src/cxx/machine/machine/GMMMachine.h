@@ -23,8 +23,8 @@
 /// @brief This class implements a multivariate diagonal Gaussian distribution.
 /// @details See Section 2.3.9 of Bishop, "Pattern recognition and machine learning", 2006
 
-#ifndef TORCH5SPRO_MACHINE_GMMMACHINE_H
-#define TORCH5SPRO_MACHINE_GMMMACHINE_H
+#ifndef BOB5SPRO_MACHINE_GMMMACHINE_H
+#define BOB5SPRO_MACHINE_GMMMACHINE_H
 
 #include "io/Arrayset.h"
 #include "machine/Machine.h"
@@ -33,7 +33,7 @@
 #include "io/HDF5File.h"
 #include <iostream>
 
-namespace Torch {
+namespace bob {
 namespace machine {
   
 /// @brief This class implements a multivariate diagonal Gaussian distribution.
@@ -50,7 +50,7 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double> {
     GMMMachine(int n_gaussians, int n_inputs);
 
     /// Constructor from a Configuration
-    GMMMachine(Torch::io::HDF5File& config);
+    GMMMachine(bob::io::HDF5File& config);
 
     /// Copy constructor
     /// (Needed because the GMM points to its constituent Gaussian members)
@@ -141,7 +141,7 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double> {
     
     /// Accumulates the GMM statistics over a set of samples.
     /// @see bool accStatistics(const blitz::Array<double,1> &x, GMMStats stats)
-    void accStatistics(const Torch::io::Arrayset &arrayset, GMMStats &stats) const;
+    void accStatistics(const bob::io::Arrayset &arrayset, GMMStats &stats) const;
 
     /// Accumulate the GMM statistics for this sample.
     ///
@@ -163,10 +163,10 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double> {
     int getNGaussians() const;
 
     /// Save to a Configuration
-    void save(Torch::io::HDF5File& config) const;
+    void save(bob::io::HDF5File& config) const;
     
     /// Load from a Configuration
-    void load(Torch::io::HDF5File& config);
+    void load(bob::io::HDF5File& config);
 
     /// Load/Reload mean/variance supervector in cache
     void reloadCacheSupervectors() const;

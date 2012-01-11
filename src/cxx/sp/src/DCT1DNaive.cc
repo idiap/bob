@@ -23,8 +23,8 @@
 #include "sp/DCT1DNaive.h"
 #include "core/array_assert.h"
 
-namespace tca = Torch::core::array;
-namespace spd = Torch::sp::detail;
+namespace tca = bob::core::array;
+namespace spd = bob::sp::detail;
 
 spd::DCT1DNaiveAbstract::DCT1DNaiveAbstract( const int length):
   m_length(length), m_wsave(0)

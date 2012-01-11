@@ -81,7 +81,7 @@ void checkBlitzEqual( const blitz::Array<T,2>& t1, const blitz::Array<U,2>& t2)
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
-      BOOST_CHECK_EQUAL(t1(i,j), Torch::core::cast<T>(t2(i,j)));
+      BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
 template<typename T, typename U>  
@@ -91,7 +91,7 @@ void checkBlitzEqual( const blitz::Array<T,3>& t1, const blitz::Array<U,3>& t2)
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
       for( int k=0; k<t1.extent(2); ++k)
-        BOOST_CHECK_EQUAL(t1(i,j,k), Torch::core::cast<T>(t2(i,j,k)));
+        BOOST_CHECK_EQUAL(t1(i,j,k), bob::core::cast<T>(t2(i,j,k)));
 }
 
 template<typename T>  
@@ -120,7 +120,7 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 BOOST_AUTO_TEST_CASE( test_estimateXandU )
 {
   // estimateXandU
-  Torch::trainer::jfa::estimateXandU(F,N,m,E,d,v,u,z,y,x,spk_ids);
+  bob::trainer::jfa::estimateXandU(F,N,m,E,d,v,u,z,y,x,spk_ids);
 
   // JFA cookbook reference
   blitz::Array<double,2> x_ref(4,2);
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE( test_estimateXandU )
 BOOST_AUTO_TEST_CASE( test_estimateYandV )
 {
   // estimateXandU
-  Torch::trainer::jfa::estimateYandV(F,N,m,E,d,v,u,z,y,x,spk_ids);
+  bob::trainer::jfa::estimateYandV(F,N,m,E,d,v,u,z,y,x,spk_ids);
 
   // JFA cookbook reference
   blitz::Array<double,2> y_ref(2,2);
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE( test_estimateYandV )
 BOOST_AUTO_TEST_CASE( test_estimateZandD )
 {
   // estimateXandU
-  Torch::trainer::jfa::estimateZandD(F,N,m,E,d,v,u,z,y,x,spk_ids);
+  bob::trainer::jfa::estimateZandD(F,N,m,E,d,v,u,z,y,x,spk_ids);
 
   // JFA cookbook reference
   blitz::Array<double,2> z_ref(2,6);
@@ -196,14 +196,14 @@ BOOST_AUTO_TEST_CASE( test_JFATrainer_updateYandV )
   xt.push_back(x2);
 
   // updateYandV
-  boost::shared_ptr<Torch::machine::GMMMachine> ubm(new Torch::machine::GMMMachine(2,3));
+  boost::shared_ptr<bob::machine::GMMMachine> ubm(new bob::machine::GMMMachine(2,3));
   ubm->setMeanSupervector(m);
   ubm->setVarianceSupervector(E);
-  Torch::machine::JFABaseMachine jfa_base_m(ubm, 2, 2);
+  bob::machine::JFABaseMachine jfa_base_m(ubm, 2, 2);
   jfa_base_m.setU(ut);
   jfa_base_m.setV(vt);
   jfa_base_m.setD(d);
-  Torch::trainer::JFABaseTrainer jfa_base_t(jfa_base_m);
+  bob::trainer::JFABaseTrainer jfa_base_t(jfa_base_m);
   jfa_base_t.setStatistics(Nt,Ft);
   jfa_base_t.setSpeakerFactors(xt,yt,zt);
   jfa_base_t.precomputeSumStatisticsN();
@@ -270,14 +270,14 @@ BOOST_AUTO_TEST_CASE( test_JFATrainer_updateXandU )
   xt.push_back(x2);
 
   // updateXandU
-  boost::shared_ptr<Torch::machine::GMMMachine> ubm(new Torch::machine::GMMMachine(2,3));
+  boost::shared_ptr<bob::machine::GMMMachine> ubm(new bob::machine::GMMMachine(2,3));
   ubm->setMeanSupervector(m);
   ubm->setVarianceSupervector(E);
-  Torch::machine::JFABaseMachine jfa_base_m(ubm, 2, 2);
+  bob::machine::JFABaseMachine jfa_base_m(ubm, 2, 2);
   jfa_base_m.setU(ut);
   jfa_base_m.setV(vt);
   jfa_base_m.setD(d);
-  Torch::trainer::JFABaseTrainer jfa_base_t(jfa_base_m);
+  bob::trainer::JFABaseTrainer jfa_base_t(jfa_base_m);
   jfa_base_t.setStatistics(Nt,Ft);
   jfa_base_t.setSpeakerFactors(xt,yt,zt);
   jfa_base_t.precomputeSumStatisticsN();
@@ -346,14 +346,14 @@ BOOST_AUTO_TEST_CASE( test_JFATrainer_updateZandD )
   xt.push_back(x2);
 
   // updateZandD
-  boost::shared_ptr<Torch::machine::GMMMachine> ubm(new Torch::machine::GMMMachine(2,3));
+  boost::shared_ptr<bob::machine::GMMMachine> ubm(new bob::machine::GMMMachine(2,3));
   ubm->setMeanSupervector(m);
   ubm->setVarianceSupervector(E);
-  Torch::machine::JFABaseMachine jfa_base_m(ubm, 2, 2);
+  bob::machine::JFABaseMachine jfa_base_m(ubm, 2, 2);
   jfa_base_m.setU(ut);
   jfa_base_m.setV(vt);
   jfa_base_m.setD(d);
-  Torch::trainer::JFABaseTrainer jfa_base_t(jfa_base_m);
+  bob::trainer::JFABaseTrainer jfa_base_t(jfa_base_m);
   jfa_base_t.setStatistics(Nt,Ft);
   jfa_base_t.setSpeakerFactors(xt,yt,zt);
   jfa_base_t.precomputeSumStatisticsN();
@@ -415,14 +415,14 @@ BOOST_AUTO_TEST_CASE( test_JFATrainer_train )
   xt.push_back(x2);
 
   // train
-  boost::shared_ptr<Torch::machine::GMMMachine> ubm(new Torch::machine::GMMMachine(2,3));
+  boost::shared_ptr<bob::machine::GMMMachine> ubm(new bob::machine::GMMMachine(2,3));
   ubm->setMeanSupervector(m);
   ubm->setVarianceSupervector(E);
-  Torch::machine::JFABaseMachine jfa_base_m(ubm, 2, 2);
+  bob::machine::JFABaseMachine jfa_base_m(ubm, 2, 2);
   jfa_base_m.setU(ut);
   jfa_base_m.setV(vt);
   jfa_base_m.setD(d);
-  Torch::trainer::JFABaseTrainer jfa_base_t(jfa_base_m);
+  bob::trainer::JFABaseTrainer jfa_base_t(jfa_base_m);
   jfa_base_t.train(Nt,Ft,1);
 }
 
@@ -462,22 +462,22 @@ BOOST_AUTO_TEST_CASE( test_JFATrainer_enrol )
   xt.push_back(x2);
 
   // enrol
-  boost::shared_ptr<Torch::machine::GMMMachine> ubm(new Torch::machine::GMMMachine(2,3));
+  boost::shared_ptr<bob::machine::GMMMachine> ubm(new bob::machine::GMMMachine(2,3));
   ubm->setMeanSupervector(m);
   ubm->setVarianceSupervector(E);
-  boost::shared_ptr<Torch::machine::JFABaseMachine> jfa_base_m(new Torch::machine::JFABaseMachine(ubm, 2, 2));
+  boost::shared_ptr<bob::machine::JFABaseMachine> jfa_base_m(new bob::machine::JFABaseMachine(ubm, 2, 2));
   jfa_base_m->setU(ut);
   jfa_base_m->setV(vt);
   jfa_base_m->setD(d);
-  Torch::trainer::JFABaseTrainer jfa_base_t(*jfa_base_m);
+  bob::trainer::JFABaseTrainer jfa_base_t(*jfa_base_m);
 
-  Torch::machine::JFAMachine jfa_m(jfa_base_m);
+  bob::machine::JFAMachine jfa_m(jfa_base_m);
 
-  Torch::trainer::JFATrainer jfa_t(jfa_m, jfa_base_t);
+  bob::trainer::JFATrainer jfa_t(jfa_m, jfa_base_t);
   jfa_t.enrol(N1,F1,5);
 
   double score;
-  Torch::machine::GMMStats sample(2,3);
+  bob::machine::GMMStats sample(2,3);
   sample.T = 50;
   sample.log_likelihood = -233;
   sample.n = N1(blitz::Range::all(),0);

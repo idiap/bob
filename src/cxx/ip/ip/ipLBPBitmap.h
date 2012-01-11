@@ -17,18 +17,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _TORCH5SPRO_IP_LBPBITMAP_H_
-#define _TORCH5SPRO_IP_LBPBITMAP_H_
+#ifndef _BOB5SPRO_IP_LBPBITMAP_H_
+#define _BOB5SPRO_IP_LBPBITMAP_H_
 
 #include "ip/ipCore.h"		// <ipLBPBitmap> is an <ipCore>
 #include "sp/spCores.h"
 
-namespace Torch
+namespace bob
 {
 
 	//================================================================================================
 	//
-	//Torch::ipLBPBitmap
+	//bob::ipLBPBitmap
 	//	This class is designed as a preprocessing for the calculation of HLBP features.
 	//      It should be associated with one particular ipLBP object. Let N_L be the number of possible labels of this ipLBP.
 	//

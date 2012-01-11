@@ -3,7 +3,7 @@
  * @date Wed Jun 22 17:50:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
- * @brief Python bindings for torch::io::Arrayset
+ * @brief Python bindings for bob::io::Arrayset
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -35,10 +35,10 @@
 #include "core/python/ndarray.h"
 
 using namespace boost::python;
-namespace io = Torch::io;
-namespace core = Torch::core;
-namespace ca = Torch::core::array;
-namespace tp = Torch::python;
+namespace io = bob::io;
+namespace core = bob::core;
+namespace ca = bob::core::array;
+namespace tp = bob::python;
 
 static object arrayset_dtype (const io::Arrayset& s) {
   const ca::typeinfo& info = s.type();
@@ -73,8 +73,8 @@ static void extend_with_ndarray(io::Arrayset& s, numeric::array a, size_t D) {
     PYTHON_ERROR(RuntimeError, "the minimum number of dimensions for the input array has to be 2");
   }
 
-  if (ndim > (TORCH_MAX_DIM+1)) {
-    PYTHON_ERROR(RuntimeError, "the maximum number of dimensions for the array to be iterated on is TORCH_MAX_DIM+1 - you have exceeded that value");
+  if (ndim > (BOB_MAX_DIM+1)) {
+    PYTHON_ERROR(RuntimeError, "the maximum number of dimensions for the array to be iterated on is BOB_MAX_DIM+1 - you have exceeded that value");
   }
 
   //reads the default type, if any

@@ -20,13 +20,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_MACHINE_TWODPCAMACHINE_H
-#define TORCH5SPRO_MACHINE_TWODPCAMACHINE_H
+#ifndef BOB5SPRO_MACHINE_TWODPCAMACHINE_H
+#define BOB5SPRO_MACHINE_TWODPCAMACHINE_H
 
 #include <blitz/array.h>
 #include "machine/Machine.h"
 
-namespace Torch {
+namespace bob {
 /**
   * \ingroup libmachine_api
   * @{

@@ -20,7 +20,7 @@
 #include "ip/Plane.h"
 #include "ip/OldColor.h"
 
-namespace Torch {
+namespace bob {
 
 void Plane::draw(Image *image, Color color)
 {

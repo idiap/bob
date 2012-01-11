@@ -17,15 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _TORCH5SPRO_IP_RESCALE_GRAY_H_
-#define _TORCH5SPRO_IP_RESCALE_GRAY_H_
+#ifndef _BOB5SPRO_IP_RESCALE_GRAY_H_
+#define _BOB5SPRO_IP_RESCALE_GRAY_H_
 
-#include "ip/ipCore.h"		// <ipRescaleGray> is a <Torch::ipCore>
+#include "ip/ipCore.h"		// <ipRescaleGray> is a <bob::ipCore>
 
-namespace Torch
+namespace bob
 {
 	/////////////////////////////////////////////////////////////////////////
-	// Torch::ipRescaleGray
+	// bob::ipRescaleGray
 	//	This class is designed to rescale any Tensor into a "short" image (0 to 255).
 	//	The result is thus a short tensor
 	//

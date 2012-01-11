@@ -1,4 +1,4 @@
-from libpytorch_ip import *
+from libpybob_ip import *
 import flowutils
 
 __all__ = dir()

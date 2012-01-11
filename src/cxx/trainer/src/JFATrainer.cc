@@ -31,7 +31,7 @@
 
 #include "core/logging.h"
 
-namespace train = Torch::trainer;
+namespace train = bob::trainer;
 
 void train::jfa::updateEigen(const blitz::Array<double,3> &A, 
   const blitz::Array<double,2> &C, blitz::Array<double,2> &uv)
@@ -39,16 +39,16 @@ void train::jfa::updateEigen(const blitz::Array<double,3> &A,
   // Check dimensions: ru
   int ru = A.extent(1);
   if(A.extent(2) != ru || C.extent(0) != ru || uv.extent(0) != ru)
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
 
   // Supervector length
   if(C.extent(1) != uv.extent(1))
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
 
   // Number of Gaussian components
   int Ng = A.extent(0); // Number of Gaussians
   if(C.extent(1) % Ng != 0)
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
 
   // Dimensionality, where cd = 
   //   c (Number of Gaussians) * d (Dimensionality of each Gaussian)
@@ -67,8 +67,8 @@ void train::jfa::updateEigen(const blitz::Array<double,3> &A,
       blitz::Range(c*D, (c+1)*D-1));
     blitz::Array<double,2> A_c = A(c,blitz::Range::all(),blitz::Range::all());
     // Compute inverse of A
-    Torch::math::inv(A_c, tmp);
-    Torch::math::prod(tmp, c_elements, uv_elements);
+    bob::math::inv(A_c, tmp);
+    bob::math::prod(tmp, c_elements, uv_elements);
   }
 }
 
@@ -86,29 +86,29 @@ void train::jfa::estimateXandU(const blitz::Array<double,2> &F, const blitz::Arr
   // Dimensionality
   int CD = F.extent(1);
   if( CD % C != 0)
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
   int D = CD / C;
 
   // Number of training segments
   int T = F.extent(0);
   if(N.extent(0) != T || spk_ids.extent(0) != T || x.extent(0) != T)
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
 
   // Supervector length
   if(m.extent(0) != CD || E.extent(0) != CD || d.extent(0) != CD || 
       v.extent(1) != CD || u.extent(1) != CD || z.extent(1) != CD)
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
 
   // rv and ru lengths
   int rv = v.extent(0);
   int ru = u.extent(0);
   if(y.extent(1) != rv || x.extent(1) != ru)
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
    
   // N speakers
   int Nspk = z.extent(0);
   if(y.extent(0) != Nspk)
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
   
   //index_map = reshape(repmat(1:size(N,2), dim,1),size(F,2),1);
   //x = zeros(size(spk_ids,1), size(u,1));
@@ -128,7 +128,7 @@ void train::jfa::estimateXandU(const blitz::Array<double,2> &F, const blitz::Arr
     tmp1 = u_elements(i,j) / e_elements(j);
     blitz::Array<double,2> u_transposed = u_elements.transpose(1,0);
     
-    Torch::math::prod(tmp1, u_transposed, uEuT_c);
+    bob::math::prod(tmp1, u_transposed, uEuT_c);
   }
 
   // 3/ Determine the vector of speaker ids
@@ -182,7 +182,7 @@ void train::jfa::estimateXandU(const blitz::Array<double,2> &F, const blitz::Arr
     // b/ Compute speaker shift
     spk_shift = m;
     blitz::Array<double,1> y_ii = y(cur_elem,blitz::Range::all());
-    Torch::math::prod(y_ii, v, tmp2);
+    bob::math::prod(y_ii, v, tmp2);
     spk_shift += tmp2;
     blitz::Array<double,1> z_ii = z(cur_elem,blitz::Range::all());
     spk_shift += z_ii * d;
@@ -191,7 +191,7 @@ void train::jfa::estimateXandU(const blitz::Array<double,2> &F, const blitz::Arr
     for(int jj=cur_start_ind; jj<=cur_end_ind; ++jj)
     {
       blitz::Array<double,1> Nhint = N(jj, blitz::Range::all());
-      Torch::core::repelem(Nhint, tmp2);  
+      bob::core::repelem(Nhint, tmp2);  
       Fh = F(jj, blitz::Range::all()) - tmp2 * spk_shift;
       
       // L=Identity
@@ -206,15 +206,15 @@ void train::jfa::estimateXandU(const blitz::Array<double,2> &F, const blitz::Arr
       }
 
       // inverse L
-      Torch::math::inv(L, Linv);
+      bob::math::inv(L, Linv);
 
       // update x
       blitz::Array<double,1> x_jj = x(jj,blitz::Range::all());
       Fh /= E;
       blitz::Array<double,2> uu = u(blitz::Range::all(), blitz::Range::all());
       blitz::Array<double,2> u_t = uu.transpose(1,0);
-      Torch::math::prod(Fh, u_t, tmp3);
-      Torch::math::prod(tmp3, Linv, x_jj);
+      bob::math::prod(Fh, u_t, tmp3);
+      bob::math::prod(tmp3, Linv, x_jj);
     }
   }
 }
@@ -234,29 +234,29 @@ void train::jfa::estimateYandV(const blitz::Array<double,2> &F, const blitz::Arr
   // Dimensionality
   int CD = F.extent(1);
   if( CD % C != 0)
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
   int D = CD / C;
 
   // Number of training segments
   int T = F.extent(0);
   if(N.extent(0) != T || spk_ids.extent(0) != T || x.extent(0) != T)
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
 
   // Supervector length
   if(m.extent(0) != CD || E.extent(0) != CD || d.extent(0) != CD || 
       v.extent(1) != CD || u.extent(1) != CD || z.extent(1) != CD)
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
 
   // rv and ru lengths
   int rv = v.extent(0);
   int ru = u.extent(0);
   if(y.extent(1) != rv || x.extent(1) != ru)
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
    
   // N speakers
   int Nspk = z.extent(0);
   if(y.extent(0) != Nspk)
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
 
 
   blitz::Array<double,3> vEvT(C, rv, rv);
@@ -272,7 +272,7 @@ void train::jfa::estimateYandV(const blitz::Array<double,2> &F, const blitz::Arr
 
     tmp1 = v_elements(i,j) / e_elements(j);
     blitz::Array<double,2> v_transposed = v_elements.transpose(1,0);
-    Torch::math::prod(tmp1, v_transposed, vEvT_c);
+    bob::math::prod(tmp1, v_transposed, vEvT_c);
   }
 
   // Determine a vector of speaker ids
@@ -331,7 +331,7 @@ void train::jfa::estimateYandV(const blitz::Array<double,2> &F, const blitz::Arr
     blitz::secondIndex j;
     Fs = blitz::sum(Fs_sessions(j,i), j);
     Nss = blitz::sum(Nss_sessions(j,i), j);
-    Torch::core::repelem(Nss, Ns);
+    bob::core::repelem(Nss, Ns);
 
     blitz::Array<double,1> z_ii = z(cur_elem,blitz::Range::all());
     Fs -= ((m + z_ii * d) * Ns);
@@ -341,9 +341,9 @@ void train::jfa::estimateYandV(const blitz::Array<double,2> &F, const blitz::Arr
     {
       // update x
       blitz::Array<double,1> x_jj = x(jj,blitz::Range::all());
-      Torch::math::prod(x_jj, u, tmp2);
+      bob::math::prod(x_jj, u, tmp2);
       blitz::Array<double,1> N_jj = N(jj,blitz::Range::all());
-      Torch::core::repelem(N_jj, tmp4);
+      bob::core::repelem(N_jj, tmp4);
       Fs -= tmp2 * tmp4;
     }
 
@@ -359,15 +359,15 @@ void train::jfa::estimateYandV(const blitz::Array<double,2> &F, const blitz::Arr
     }
 
     // inverse L
-    Torch::math::inv(L, Linv);
+    bob::math::inv(L, Linv);
 
     // update y
     blitz::Array<double,1> y_ii = y(cur_elem,blitz::Range::all());
     Fs /= E;
     blitz::Array<double,2> vv = v(blitz::Range::all(), blitz::Range::all());
     blitz::Array<double,2> v_t = vv.transpose(1,0);
-    Torch::math::prod(Fs, v_t, tmp3);
-    Torch::math::prod(tmp3, Linv, y_ii);
+    bob::math::prod(Fs, v_t, tmp3);
+    bob::math::prod(tmp3, Linv, y_ii);
   }    
 }
 
@@ -388,29 +388,29 @@ void train::jfa::estimateZandD(const blitz::Array<double,2> &F, const blitz::Arr
   // Dimensionality
   int CD = F.extent(1);
   if( CD % C != 0)
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
   //int D = CD / C;
 
   // Number of training segments
   int T = F.extent(0);
   if(N.extent(0) != T || spk_ids.extent(0) != T || x.extent(0) != T)
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
 
   // Supervector length
   if(m.extent(0) != CD || E.extent(0) != CD || d.extent(0) != CD || 
       v.extent(1) != CD || u.extent(1) != CD || z.extent(1) != CD)
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
 
   // rv and ru lengths
   int rv = v.extent(0);
   int ru = u.extent(0);
   if(y.extent(1) != rv || x.extent(1) != ru)
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
    
   // N speakers
   int Nspk = z.extent(0);
   if(y.extent(0) != Nspk)
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
 
   // Determine a vector of speaker ids
   std::vector<uint32_t> ids;
@@ -466,12 +466,12 @@ void train::jfa::estimateZandD(const blitz::Array<double,2> &F, const blitz::Arr
     blitz::secondIndex j;
     Fs = blitz::sum(Fs_sessions(j,i), j);
     Nss = blitz::sum(Nss_sessions(j,i), j);
-    Torch::core::repelem(Nss, Ns);
+    bob::core::repelem(Nss, Ns);
 
     // Compute shift
     shift = m;
     blitz::Array<double,1> y_ii = y(cur_elem,blitz::Range::all());
-    Torch::math::prod(y_ii, v, tmp1);
+    bob::math::prod(y_ii, v, tmp1);
     shift += tmp1;
     Fs -= shift * Ns;
 
@@ -480,9 +480,9 @@ void train::jfa::estimateZandD(const blitz::Array<double,2> &F, const blitz::Arr
     {
       // update x
       blitz::Array<double,1> x_jj = x(jj,blitz::Range::all());
-      Torch::math::prod(x_jj, u, shift);
+      bob::math::prod(x_jj, u, shift);
       blitz::Array<double,1> N_jj = N(jj,blitz::Range::all());
-      Torch::core::repelem(N_jj, tmp1);
+      bob::core::repelem(N_jj, tmp1);
       Fs -= shift * tmp1;
     }
 
@@ -502,7 +502,7 @@ void train::jfa::estimateZandD(const blitz::Array<double,2> &F, const blitz::Arr
 ////// JFATrainer class methods ////////
 ////////////////////////////////////////
 
-train::JFABaseTrainer::JFABaseTrainer(Torch::machine::JFABaseMachine& m): 
+train::JFABaseTrainer::JFABaseTrainer(bob::machine::JFABaseMachine& m): 
   m_jfa_machine(m), 
   m_Nid(0), m_N(0), m_F(0), m_x(0),  m_y(0), m_z(0), m_Nacc(0), m_Facc(0), 
   m_cache_ubm_mean(0), m_cache_ubm_var(0),
@@ -528,7 +528,7 @@ void train::JFABaseTrainer::setStatistics(const std::vector<blitz::Array<double,
   // Number of people
   m_Nid = N.size();
   if(m_Nid != F.size())
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
   m_N.resize(m_Nid);
   m_F.resize(m_Nid);
 
@@ -537,15 +537,15 @@ void train::JFABaseTrainer::setStatistics(const std::vector<blitz::Array<double,
   // Check dimensionality
   for(size_t i=0; i<m_Nid; ++i) {
     if(N[i].extent(0) != m_jfa_machine.getDimC())
-      throw Torch::core::Exception();
+      throw bob::core::Exception();
     if(F[i].extent(0) != m_jfa_machine.getDimCD())
-      throw Torch::core::Exception();
+      throw bob::core::Exception();
   }
 
   // Copy the vectors
   for(size_t i=0; i<m_Nid; ++i) {
-    m_N[i].reference(Torch::core::array::ccopy(N[i]));
-    m_F[i].reference(Torch::core::array::ccopy(F[i]));
+    m_N[i].reference(bob::core::array::ccopy(N[i]));
+    m_F[i].reference(bob::core::array::ccopy(F[i]));
   }
 }
 
@@ -555,7 +555,7 @@ void train::JFABaseTrainer::setSpeakerFactors(const std::vector<blitz::Array<dou
 {
   // Number of people
   if(y.size() != m_Nid || z.size() != m_Nid)
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
   m_x.resize(x.size());
   m_y.resize(y.size());
   m_z.resize(z.size());
@@ -563,21 +563,21 @@ void train::JFABaseTrainer::setSpeakerFactors(const std::vector<blitz::Array<dou
 
   for(size_t i=0; i<m_x.size(); ++i) 
     if(x[i].extent(0) != m_jfa_machine.getDimRu())
-      throw Torch::core::Exception();
+      throw bob::core::Exception();
     
   for(size_t i=0; i<m_Nid; ++i) {
     if(y[i].extent(0) != m_jfa_machine.getDimRv())
-      throw Torch::core::Exception();
+      throw bob::core::Exception();
     if(z[i].extent(0) != m_jfa_machine.getDimCD())
-      throw Torch::core::Exception();
+      throw bob::core::Exception();
   }
 
   // Copy the vectors
   for(size_t i=0; i<m_x.size(); ++i) 
-    m_x[i].reference(Torch::core::array::ccopy(x[i]));
+    m_x[i].reference(bob::core::array::ccopy(x[i]));
   for(size_t i=0; i<m_Nid; ++i) {
-    m_y[i].reference(Torch::core::array::ccopy(y[i]));
-    m_z[i].reference(Torch::core::array::ccopy(z[i]));
+    m_y[i].reference(bob::core::array::ccopy(y[i]));
+    m_z[i].reference(bob::core::array::ccopy(z[i]));
   }
 }
 
@@ -623,7 +623,7 @@ void train::JFABaseTrainer::precomputeSumStatisticsN()
   blitz::secondIndex j;
   for(size_t id=0; id<m_N.size(); ++id) {
     Nsum = blitz::sum(m_N[id], j);
-    m_Nacc.push_back(Torch::core::array::ccopy(Nsum));
+    m_Nacc.push_back(bob::core::array::ccopy(Nsum));
   }
 }
 
@@ -635,7 +635,7 @@ void train::JFABaseTrainer::precomputeSumStatisticsF()
   blitz::secondIndex j;
   for(size_t id=0; id<m_F.size(); ++id) {
     Fsum = blitz::sum(m_F[id], j);
-    m_Facc.push_back(Torch::core::array::ccopy(Fsum));
+    m_Facc.push_back(bob::core::array::ccopy(Fsum));
   }
 }
 
@@ -667,7 +667,7 @@ void train::JFABaseTrainer::computeVProd()
     const blitz::Array<double,1>& sigma = m_cache_ubm_var;
     blitz::Array<double,1> sigma_c = sigma(blitz::Range(c*m_jfa_machine.getDimD(),(c+1)*m_jfa_machine.getDimD()-1));
     m_tmp_rvD = Vt_c(i,j) / sigma_c(j); // Vt_c * diag(sigma)^-1 
-    Torch::math::prod(m_tmp_rvD, Vv_c, VProd_c);
+    bob::math::prod(m_tmp_rvD, Vv_c, VProd_c);
   }
 }
 
@@ -678,12 +678,12 @@ void train::JFABaseTrainer::computeIdPlusVProd_i(const int id)
   blitz::secondIndex j;
   blitz::Array<double,1> Ni = m_Nacc[id];
   m_tmp_rvrv.resize(m_jfa_machine.getDimRv(), m_jfa_machine.getDimRv());
-  Torch::math::eye(m_tmp_rvrv); // m_tmp_rvrv = I
+  bob::math::eye(m_tmp_rvrv); // m_tmp_rvrv = I
   for(int c=0; c<m_jfa_machine.getDimC(); ++c) {
     blitz::Array<double,2> VProd_c = m_cache_VProd(c,blitz::Range::all(),blitz::Range::all());
     m_tmp_rvrv += VProd_c * Ni(c);
   }
-  Torch::math::inv(m_tmp_rvrv, m_cache_IdPlusVProd_i); // m_cache_IdPlusVProd_i = ( I+Vt*diag(sigma)^-1*Ni*V)^-1
+  bob::math::inv(m_tmp_rvrv, m_cache_IdPlusVProd_i); // m_cache_IdPlusVProd_i = ( I+Vt*diag(sigma)^-1*Ni*V)^-1
 }
 
 void train::JFABaseTrainer::computeFn_y_i(const int id)
@@ -695,7 +695,7 @@ void train::JFABaseTrainer::computeFn_y_i(const int id)
   const blitz::Array<double,1>& d = m_jfa_machine.getD();
   blitz::Array<double,1> z = m_z[id];
   m_tmp_CD.resize(m_jfa_machine.getDimCD());
-  Torch::core::repelem(m_Nacc[id], m_tmp_CD);
+  bob::core::repelem(m_Nacc[id], m_tmp_CD);
   m_cache_Fn_y_i = Fi - m_tmp_CD * (m + d * z); // Fn_yi = sum_{sessions h}(N_{i,h}*(o_{i,h} - m - D*z_{i}) 
   blitz::Array<double,2> X = m_x[id];
   const blitz::Array<double,2>& U = m_jfa_machine.getU();
@@ -705,9 +705,9 @@ void train::JFABaseTrainer::computeFn_y_i(const int id)
   for(int h=0; h<X.extent(1); ++h) // Loop over the sessions
   {
     blitz::Array<double,1> Xh = X(blitz::Range::all(), h); // Xh = x_{i,h} (length: ru)
-    Torch::math::prod(U, Xh, m_tmp_CD_b); // m_tmp_CD_b = U*x_{i,h}
+    bob::math::prod(U, Xh, m_tmp_CD_b); // m_tmp_CD_b = U*x_{i,h}
     blitz::Array<double,1> Nih = m_N[id](blitz::Range::all(), h);
-    Torch::core::repelem(Nih, m_tmp_CD);
+    bob::core::repelem(Nih, m_tmp_CD);
     m_cache_Fn_y_i -= m_tmp_CD * m_tmp_CD_b; // N_{i,h} * U * x_{i,h}
   }
   // Fn_yi = sum_{sessions h}(N_{i,h}*(o_{i,h} - m - D*z_{i} - U*x_{i,h})
@@ -719,8 +719,8 @@ void train::JFABaseTrainer::updateY_i(const int id)
   blitz::Array<double,1> y = m_y[id];
   m_tmp_rv.resize(m_jfa_machine.getDimRv());
   // m_tmp_rv = m_cache_VtSigmaInv * m_cache_Fn_y_i = Vt*diag(sigma)^-1 * sum_{sessions h}(N_{i,h}*(o_{i,h} - m - D*z_{i} - U*x_{i,h})
-  Torch::math::prod(m_cache_VtSigmaInv, m_cache_Fn_y_i, m_tmp_rv); 
-  Torch::math::prod(m_cache_IdPlusVProd_i, m_tmp_rv, y);
+  bob::math::prod(m_cache_VtSigmaInv, m_cache_Fn_y_i, m_tmp_rv); 
+  bob::math::prod(m_cache_IdPlusVProd_i, m_tmp_rv, y);
 
   // Needs to return values to be accumulated for estimating V
   blitz::firstIndex i;
@@ -763,11 +763,11 @@ void train::JFABaseTrainer::updateV()
   for(int c=0; c<m_jfa_machine.getDimC(); ++c)
   {
     const blitz::Array<double,2> A1 = m_cache_A1_y(c,blitz::Range::all(),blitz::Range::all());
-    Torch::math::inv(A1, m_tmp_rvrv);
+    bob::math::inv(A1, m_tmp_rvrv);
     const blitz::Array<double,2> A2 = m_cache_A2_y(blitz::Range(c*dim,(c+1)*dim-1), blitz::Range::all());
     blitz::Array<double,2>& V = m_jfa_machine.updateV();
     blitz::Array<double,2> V_c = V(blitz::Range(c*dim,(c+1)*dim-1), blitz::Range::all());
-    Torch::math::prod(A2, m_tmp_rvrv, V_c);
+    bob::math::prod(A2, m_tmp_rvrv, V_c);
   }
 }
 
@@ -799,7 +799,7 @@ void train::JFABaseTrainer::computeUProd()
     const blitz::Array<double,1>& sigma = m_cache_ubm_var;
     blitz::Array<double,1> sigma_c = sigma(blitz::Range(c*m_jfa_machine.getDimD(),(c+1)*m_jfa_machine.getDimD()-1));
     m_tmp_ruD = Ut_c(i,j) / sigma_c(j); // Ut_c * diag(sigma)^-1 
-    Torch::math::prod(m_tmp_ruD, Uu_c, UProd_c);
+    bob::math::prod(m_tmp_ruD, Uu_c, UProd_c);
   }
 }
 
@@ -810,12 +810,12 @@ void train::JFABaseTrainer::computeIdPlusUProd_ih(const int id, const int h)
   blitz::secondIndex j;
   blitz::Array<double,1> Nih = m_N[id](blitz::Range::all(), h);
   m_tmp_ruru.resize(m_jfa_machine.getDimRu(), m_jfa_machine.getDimRu());
-  Torch::math::eye(m_tmp_ruru); // m_tmp_ruru = I
+  bob::math::eye(m_tmp_ruru); // m_tmp_ruru = I
   for(int c=0; c<m_jfa_machine.getDimC(); ++c) {
     blitz::Array<double,2> UProd_c = m_cache_UProd(c,blitz::Range::all(),blitz::Range::all());
     m_tmp_ruru += UProd_c * Nih(c);
   }
-  Torch::math::inv(m_tmp_ruru, m_cache_IdPlusUProd_ih); // m_cache_IdPlusUProd_ih = ( I+Ut*diag(sigma)^-1*Ni*U)^-1
+  bob::math::inv(m_tmp_ruru, m_cache_IdPlusUProd_ih); // m_cache_IdPlusUProd_ih = ( I+Ut*diag(sigma)^-1*Ni*U)^-1
 }
 
 void train::JFABaseTrainer::computeFn_x_ih(const int id, const int h)
@@ -828,7 +828,7 @@ void train::JFABaseTrainer::computeFn_x_ih(const int id, const int h)
   blitz::Array<double,1> z = m_z[id];
   m_tmp_CD.resize(m_jfa_machine.getDimCD());
   blitz::Array<double,1> Nih = m_N[id](blitz::Range::all(), h);
-  Torch::core::repelem(Nih, m_tmp_CD);
+  bob::core::repelem(Nih, m_tmp_CD);
   m_cache_Fn_x_ih = Fih - m_tmp_CD * (m + d * z); // Fn_x_ih = N_{i,h}*(o_{i,h} - m - D*z_{i}) 
 
   blitz::Array<double,1> y = m_y[id];
@@ -836,7 +836,7 @@ void train::JFABaseTrainer::computeFn_x_ih(const int id, const int h)
   blitz::firstIndex i;
   blitz::secondIndex j;
   m_tmp_CD_b.resize(m_jfa_machine.getDimCD());
-  Torch::math::prod(V, y, m_tmp_CD_b);
+  bob::math::prod(V, y, m_tmp_CD_b);
   m_cache_Fn_x_ih -= m_tmp_CD * m_tmp_CD_b;
   // Fn_x_ih = N_{i,h}*(o_{i,h} - m - D*z_{i} - V*y_{i})
 }
@@ -847,8 +847,8 @@ void train::JFABaseTrainer::updateX_ih(const int id, const int h)
   blitz::Array<double,1> x = m_x[id](blitz::Range::all(), h);
   m_tmp_ru.resize(m_jfa_machine.getDimRu());
   // m_tmp_ru = m_cache_UtSigmaInv * m_cache_Fn_x_ih = Ut*diag(sigma)^-1 * N_{i,h}*(o_{i,h} - m - D*z_{i} - V*y_{i})
-  Torch::math::prod(m_cache_UtSigmaInv, m_cache_Fn_x_ih, m_tmp_ru); 
-  Torch::math::prod(m_cache_IdPlusUProd_ih, m_tmp_ru, x);
+  bob::math::prod(m_cache_UtSigmaInv, m_cache_Fn_x_ih, m_tmp_ru); 
+  bob::math::prod(m_cache_IdPlusUProd_ih, m_tmp_ru, x);
 
   // Needs to return values to be accumulated for estimating U
   blitz::firstIndex i;
@@ -888,19 +888,19 @@ void train::JFABaseTrainer::updateX()
 
 void train::JFABaseTrainer::updateU()
 {
-  //Torch::math::inv(m_cache_A1_x, m_tmp_ruru);
+  //bob::math::inv(m_cache_A1_x, m_tmp_ruru);
   //blitz::Array<double,2>& U = m_jfa_machine.updateU();
-  //Torch::math::prod(m_cache_A2_x, m_tmp_ruru, U);
+  //bob::math::prod(m_cache_A2_x, m_tmp_ruru, U);
   int dim = m_jfa_machine.getDimD();
   m_tmp_ruru.resize(m_jfa_machine.getDimRu(),m_jfa_machine.getDimRu());
   for(int c=0; c<m_jfa_machine.getDimC(); ++c)
   {
     const blitz::Array<double,2> A1 = m_cache_A1_x(c,blitz::Range::all(),blitz::Range::all());
-    Torch::math::inv(A1, m_tmp_ruru);
+    bob::math::inv(A1, m_tmp_ruru);
     const blitz::Array<double,2> A2 = m_cache_A2_x(blitz::Range(c*dim,(c+1)*dim-1),blitz::Range::all());
     blitz::Array<double,2>& U = m_jfa_machine.updateU();
     blitz::Array<double,2> U_c = U(blitz::Range(c*dim,(c+1)*dim-1),blitz::Range::all());
-    Torch::math::prod(A2, m_tmp_ruru, U_c);
+    bob::math::prod(A2, m_tmp_ruru, U_c);
   }
 }
 
@@ -925,7 +925,7 @@ void train::JFABaseTrainer::computeIdPlusDProd_i(const int id)
   m_cache_IdPlusDProd_i.resizeAndPreserve(m_jfa_machine.getDimCD());
   blitz::Array<double,1> Ni = m_Nacc[id];
   m_tmp_CD.resize(m_jfa_machine.getDimCD());
-  Torch::core::repelem(Ni, m_tmp_CD); // m_tmp_CD = Ni 'repmat'
+  bob::core::repelem(Ni, m_tmp_CD); // m_tmp_CD = Ni 'repmat'
   m_cache_IdPlusDProd_i = 1.; // m_cache_IdPlusDProd_i = Id
   m_cache_IdPlusDProd_i += m_cache_DProd * m_tmp_CD; // m_cache_IdPlusDProd_i = I+Dt*diag(sigma)^-1*Ni*D
   m_cache_IdPlusDProd_i = 1 / m_cache_IdPlusDProd_i; // m_cache_IdPlusVProd_i = (I+Dt*diag(sigma)^-1*Ni*D)^-1
@@ -941,8 +941,8 @@ void train::JFABaseTrainer::computeFn_z_i(const int id)
   blitz::Array<double,1> y = m_y[id];
   m_tmp_CD.resize(m_jfa_machine.getDimCD());
   m_tmp_CD_b.resize(m_jfa_machine.getDimCD());
-  Torch::core::repelem(m_Nacc[id], m_tmp_CD);
-  Torch::math::prod(V, y, m_tmp_CD_b); // m_tmp_CD_b = V * y
+  bob::core::repelem(m_Nacc[id], m_tmp_CD);
+  bob::math::prod(V, y, m_tmp_CD_b); // m_tmp_CD_b = V * y
   m_cache_Fn_z_i = Fi - m_tmp_CD * (m + m_tmp_CD_b); // Fn_yi = sum_{sessions h}(N_{i,h}*(o_{i,h} - m - V*y_{i}) 
 
   blitz::Array<double,2> X = m_x[id];
@@ -952,9 +952,9 @@ void train::JFABaseTrainer::computeFn_z_i(const int id)
   for(int h=0; h<X.extent(1); ++h) // Loop over the sessions
   {
     blitz::Array<double,1> Nh = m_N[id](blitz::Range::all(), h); // Nh = N_{i,h} (length: C)
-    Torch::core::repelem(Nh, m_tmp_CD);
+    bob::core::repelem(Nh, m_tmp_CD);
     blitz::Array<double,1> Xh = X(blitz::Range::all(), h); // Xh = x_{i,h} (length: ru)
-    Torch::math::prod(U, Xh, m_tmp_CD_b);
+    bob::math::prod(U, Xh, m_tmp_CD_b);
     blitz::Array<double,1> mm(m_jfa_machine.getDimCD());
     mm = m_tmp_CD * m_tmp_CD_b;
     m_cache_Fn_z_i -= m_tmp_CD * m_tmp_CD_b;
@@ -974,7 +974,7 @@ void train::JFABaseTrainer::updateZ_i(const int id)
   blitz::firstIndex i;
   blitz::secondIndex j; 
   m_tmp_CD.resize(m_jfa_machine.getDimCD());
-  Torch::core::repelem(m_Nacc[id], m_tmp_CD);
+  bob::core::repelem(m_Nacc[id], m_tmp_CD);
   m_cache_A1_z += (m_cache_IdPlusDProd_i + z * z) * m_tmp_CD;
   m_cache_A2_z += m_cache_Fn_z_i * z;
   //m_cache_A1_z += z(i) * z(j) + m_tmp_CD(i,j);
@@ -1004,10 +1004,10 @@ void train::JFABaseTrainer::updateD()
   blitz::Array<double,1>& d = m_jfa_machine.updateD();
   d = m_cache_A2_z / m_cache_A1_z;
 /*
-  Torch::math::inv(m_cache_A1_z, m_tmp_CDCD);
+  bob::math::inv(m_cache_A1_z, m_tmp_CDCD);
   blitz::Array<double,1>& d = m_jfa_machine.updateD();
   // TODO: Keep accumulator A1_z ?
-  Torch::math::prod(m_cache_A2_z, m_tmp_CDCD, m_cache_A1_z); 
+  bob::math::prod(m_cache_A2_z, m_tmp_CDCD, m_cache_A1_z); 
   // TODO: check that it is really diagonal
   for(int i=0; i<m_jfa_machine.getDimCD(); ++i)
     d(i) = m_cache_A1_z(i,i);
@@ -1087,21 +1087,21 @@ void train::JFABaseTrainer::initializeXYZ()
   x0 = 0;
   for(size_t i=0; i<m_Nid; ++i)
   {
-    z.push_back(Torch::core::array::ccopy(z0));
-    y.push_back(Torch::core::array::ccopy(y0));
+    z.push_back(bob::core::array::ccopy(z0));
+    y.push_back(bob::core::array::ccopy(y0));
     x0.resize(m_jfa_machine.getDimRu(),m_N[i].extent(1));
     x0 = 0;
-    x.push_back(Torch::core::array::ccopy(x0));
+    x.push_back(bob::core::array::ccopy(x0));
   }
   setSpeakerFactors(x,y,z);
 }
 
-void train::JFABaseTrainer::train(const std::vector<std::vector<const Torch::machine::GMMStats*> >& vec,
+void train::JFABaseTrainer::train(const std::vector<std::vector<const bob::machine::GMMStats*> >& vec,
   const size_t n_iter)
 {
   std::vector<blitz::Array<double,2> > vec_N;
   std::vector<blitz::Array<double,2> > vec_F;
-  boost::shared_ptr<Torch::machine::GMMMachine> ubm(m_jfa_machine.getUbm());
+  boost::shared_ptr<bob::machine::GMMMachine> ubm(m_jfa_machine.getUbm());
   for(size_t id=0; id<vec.size(); ++id)
   {
     blitz::Array<double,2> Nid(ubm->getNGaussians(), vec[id].size());
@@ -1111,7 +1111,7 @@ void train::JFABaseTrainer::train(const std::vector<std::vector<const Torch::mac
       // TODO: check type/dimensions?
       blitz::Array<double,1> Nid_s = Nid(blitz::Range::all(),s);
       blitz::Array<double,1> Fid_s = Fid(blitz::Range::all(),s);
-      const Torch::machine::GMMStats* stats = vec[id][s];
+      const bob::machine::GMMStats* stats = vec[id][s];
       Nid_s = stats->n;
       for(int g=0; g<ubm->getNGaussians(); ++g)
       {
@@ -1125,12 +1125,12 @@ void train::JFABaseTrainer::train(const std::vector<std::vector<const Torch::mac
   train(vec_N, vec_F, n_iter);
 }
 
-void train::JFABaseTrainer::trainNoInit(const std::vector<std::vector<const Torch::machine::GMMStats*> >& vec,
+void train::JFABaseTrainer::trainNoInit(const std::vector<std::vector<const bob::machine::GMMStats*> >& vec,
   const size_t n_iter)
 {
   std::vector<blitz::Array<double,2> > vec_N;
   std::vector<blitz::Array<double,2> > vec_F;
-  boost::shared_ptr<Torch::machine::GMMMachine> ubm(m_jfa_machine.getUbm());
+  boost::shared_ptr<bob::machine::GMMMachine> ubm(m_jfa_machine.getUbm());
   for(size_t id=0; id<vec.size(); ++id)
   {
     blitz::Array<double,2> Nid(ubm->getNGaussians(), vec[id].size());
@@ -1140,7 +1140,7 @@ void train::JFABaseTrainer::trainNoInit(const std::vector<std::vector<const Torc
       // TODO: check type/dimensions?
       blitz::Array<double,1> Nid_s = Nid(blitz::Range::all(),s);
       blitz::Array<double,1> Fid_s = Fid(blitz::Range::all(),s);
-      const Torch::machine::GMMStats* stats = vec[id][s];
+      const bob::machine::GMMStats* stats = vec[id][s];
       Nid_s = stats->n;
       for(int g=0; g<ubm->getNGaussians(); ++g)
       {
@@ -1187,12 +1187,12 @@ void train::JFABaseTrainer::trainISV(const std::vector<blitz::Array<double,2> >&
 
 
 
-void train::JFABaseTrainer::trainISV(const std::vector<std::vector<const Torch::machine::GMMStats*> >& vec,
+void train::JFABaseTrainer::trainISV(const std::vector<std::vector<const bob::machine::GMMStats*> >& vec,
   const size_t n_iter, const double relevance_factor)
 {
   std::vector<blitz::Array<double,2> > vec_N;
   std::vector<blitz::Array<double,2> > vec_F;
-  boost::shared_ptr<Torch::machine::GMMMachine> ubm(m_jfa_machine.getUbm());
+  boost::shared_ptr<bob::machine::GMMMachine> ubm(m_jfa_machine.getUbm());
   for(size_t id=0; id<vec.size(); ++id)
   {
     blitz::Array<double,2> Nid(ubm->getNGaussians(), vec[id].size());
@@ -1202,7 +1202,7 @@ void train::JFABaseTrainer::trainISV(const std::vector<std::vector<const Torch::
       // TODO: check type/dimensions?
       blitz::Array<double,1> Nid_s = Nid(blitz::Range::all(),s);
       blitz::Array<double,1> Fid_s = Fid(blitz::Range::all(),s);
-      const Torch::machine::GMMStats* stats = vec[id][s];
+      const bob::machine::GMMStats* stats = vec[id][s];
       Nid_s = stats->n;
       for(int g=0; g<ubm->getNGaussians(); ++g)
       {
@@ -1235,12 +1235,12 @@ void train::JFABaseTrainer::trainISVNoInit(const std::vector<blitz::Array<double
 
 
 
-void train::JFABaseTrainer::trainISVNoInit(const std::vector<std::vector<const Torch::machine::GMMStats*> >& vec,
+void train::JFABaseTrainer::trainISVNoInit(const std::vector<std::vector<const bob::machine::GMMStats*> >& vec,
   const size_t n_iter, const double relevance_factor)
 {
   std::vector<blitz::Array<double,2> > vec_N;
   std::vector<blitz::Array<double,2> > vec_F;
-  boost::shared_ptr<Torch::machine::GMMMachine> ubm(m_jfa_machine.getUbm());
+  boost::shared_ptr<bob::machine::GMMMachine> ubm(m_jfa_machine.getUbm());
   for(size_t id=0; id<vec.size(); ++id)
   {
     blitz::Array<double,2> Nid(ubm->getNGaussians(), vec[id].size());
@@ -1250,7 +1250,7 @@ void train::JFABaseTrainer::trainISVNoInit(const std::vector<std::vector<const T
       // TODO: check type/dimensions?
       blitz::Array<double,1> Nid_s = Nid(blitz::Range::all(),s);
       blitz::Array<double,1> Fid_s = Fid(blitz::Range::all(),s);
-      const Torch::machine::GMMStats* stats = vec[id][s];
+      const bob::machine::GMMStats* stats = vec[id][s];
       Nid_s = stats->n;
       for(int g=0; g<ubm->getNGaussians(); ++g)
       {
@@ -1266,7 +1266,7 @@ void train::JFABaseTrainer::trainISVNoInit(const std::vector<std::vector<const T
 
 
 
-train::JFATrainer::JFATrainer(Torch::machine::JFAMachine& jfa_machine, Torch::trainer::JFABaseTrainer& base_trainer): 
+train::JFATrainer::JFATrainer(bob::machine::JFAMachine& jfa_machine, bob::trainer::JFABaseTrainer& base_trainer): 
   m_jfa_machine(jfa_machine),
   m_base_trainer(base_trainer)
 {
@@ -1276,9 +1276,9 @@ void train::JFATrainer::enrol(const blitz::Array<double,2>& N,
   const blitz::Array<double,2>& F, const size_t n_iter)
 {
   std::vector<blitz::Array<double,2> > Nv;
-  Nv.push_back(Torch::core::array::ccopy(N));
+  Nv.push_back(bob::core::array::ccopy(N));
   std::vector<blitz::Array<double,2> > Fv;
-  Fv.push_back(Torch::core::array::ccopy(F));
+  Fv.push_back(bob::core::array::ccopy(F));
   m_base_trainer.setStatistics(Nv,Fv);
   m_base_trainer.precomputeSumStatisticsN();
   m_base_trainer.precomputeSumStatisticsF();
@@ -1297,11 +1297,11 @@ void train::JFATrainer::enrol(const blitz::Array<double,2>& N,
   m_jfa_machine.setZ(z);
 }
 
-void train::JFATrainer::enrol(const std::vector<const Torch::machine::GMMStats*>& vec,
+void train::JFATrainer::enrol(const std::vector<const bob::machine::GMMStats*>& vec,
   const size_t n_iter)
 {
-  boost::shared_ptr<Torch::machine::GMMMachine> ubm(m_jfa_machine.getJFABase()->getUbm());
-  //Torch::machine::GMMStats stats(ubm->getNGaussians(),ubm->getNInputs()); 
+  boost::shared_ptr<bob::machine::GMMMachine> ubm(m_jfa_machine.getJFABase()->getUbm());
+  //bob::machine::GMMStats stats(ubm->getNGaussians(),ubm->getNInputs()); 
   blitz::Array<double,2> N(ubm->getNGaussians(), vec.size());
   blitz::Array<double,2> F(ubm->getNGaussians()*ubm->getNInputs(), vec.size());
   for(size_t s=0; s<vec.size(); ++s)
@@ -1309,7 +1309,7 @@ void train::JFATrainer::enrol(const std::vector<const Torch::machine::GMMStats*>
     // TODO: check type/dimensions?
     blitz::Array<double,1> N_s = N(blitz::Range::all(),s);
     blitz::Array<double,1> F_s = F(blitz::Range::all(),s);
-    const Torch::machine::GMMStats* stats = vec[s];
+    const bob::machine::GMMStats* stats = vec[s];
     N_s = stats->n;
     for(int g=0; g<ubm->getNGaussians(); ++g)
     {

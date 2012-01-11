@@ -24,14 +24,14 @@
 #include "sp/convolution.h"
 #include "ip/HornAndSchunckFlow.h"
 
-namespace of = Torch::ip::optflow;
+namespace of = bob::ip::optflow;
 
 static const double LAPLACIAN_014_KERNEL_DATA[] = {0,.25,0,.25,0,.25,0,.25,0};
 static const blitz::Array<double,2> LAPLACIAN_014_KERNEL(const_cast<double*>(LAPLACIAN_014_KERNEL_DATA), blitz::shape(3,3), blitz::neverDeleteData);
 
 void of::laplacian_avg_hs_opencv(const blitz::Array<double,2>& input,
     blitz::Array<double,2>& output) {
-  Torch::sp::convolve(input, LAPLACIAN_014_KERNEL, output,
+  bob::sp::convolve(input, LAPLACIAN_014_KERNEL, output,
       sp::Convolution::Same, sp::Convolution::Mirror);
 }
 
@@ -42,7 +42,7 @@ static const blitz::Array<double,2> LAPLACIAN_12_KERNEL(const_cast<double*>(LAPL
 
 void of::laplacian_avg_hs(const blitz::Array<double,2>& input,
     blitz::Array<double,2>& output) {
-  Torch::sp::convolve(input, LAPLACIAN_12_KERNEL, output,
+  bob::sp::convolve(input, LAPLACIAN_12_KERNEL, output,
       sp::Convolution::Same, sp::Convolution::Mirror);
 }
 of::VanillaHornAndSchunckFlow::VanillaHornAndSchunckFlow
@@ -75,10 +75,10 @@ void of::VanillaHornAndSchunckFlow::operator() (double alpha,
     const blitz::Array<double,2>& i2, blitz::Array<double,2>& u0,
     blitz::Array<double,2>& v0) const {
 
-  Torch::core::array::assertSameShape(i1, i2);
-  Torch::core::array::assertSameShape(i1, m_ex);
-  Torch::core::array::assertSameShape(u0, m_u);
-  Torch::core::array::assertSameShape(v0, m_v);
+  bob::core::array::assertSameShape(i1, i2);
+  bob::core::array::assertSameShape(i1, m_ex);
+  bob::core::array::assertSameShape(u0, m_u);
+  bob::core::array::assertSameShape(v0, m_v);
 
   m_gradient(i1, i2, m_ex, m_ey, m_et);
   double a2 = std::pow(alpha, 2);
@@ -96,9 +96,9 @@ void of::VanillaHornAndSchunckFlow::evalEc2
 (const blitz::Array<double,2>& u, const blitz::Array<double,2>& v,
  blitz::Array<double,2>& error) const {
   
-  Torch::core::array::assertSameShape(u, v);
-  Torch::core::array::assertSameShape(u, error);
-  Torch::core::array::assertSameShape(u, m_u);
+  bob::core::array::assertSameShape(u, v);
+  bob::core::array::assertSameShape(u, error);
+  bob::core::array::assertSameShape(u, m_u);
 
   laplacian_avg_hs(u, m_u);
   laplacian_avg_hs(v, m_u);
@@ -111,10 +111,10 @@ void of::VanillaHornAndSchunckFlow::evalEb
  const blitz::Array<double,2>& u, const blitz::Array<double,2>& v,
  blitz::Array<double,2>& error) const {
   
-  Torch::core::array::assertSameShape(i1, i2);
-  Torch::core::array::assertSameShape(u, v);
-  Torch::core::array::assertSameShape(u, error);
-  Torch::core::array::assertSameShape(error, m_u);
+  bob::core::array::assertSameShape(i1, i2);
+  bob::core::array::assertSameShape(u, v);
+  bob::core::array::assertSameShape(u, error);
+  bob::core::array::assertSameShape(error, m_u);
   m_gradient(i1, i2, m_ex, m_ey, m_et);
   error = m_ex*u + m_ey*v + m_et;
 
@@ -150,11 +150,11 @@ void of::HornAndSchunckFlow::operator() (double alpha,
     const blitz::Array<double,2>& i2, const blitz::Array<double,2>& i3,
     blitz::Array<double,2>& u0, blitz::Array<double,2>& v0) const {
 
-  Torch::core::array::assertSameShape(i1, i2);
-  Torch::core::array::assertSameShape(i2, i3);
-  Torch::core::array::assertSameShape(i1, m_ex);
-  Torch::core::array::assertSameShape(u0, m_u);
-  Torch::core::array::assertSameShape(v0, m_v);
+  bob::core::array::assertSameShape(i1, i2);
+  bob::core::array::assertSameShape(i2, i3);
+  bob::core::array::assertSameShape(i1, m_ex);
+  bob::core::array::assertSameShape(u0, m_u);
+  bob::core::array::assertSameShape(v0, m_v);
 
   m_gradient(i1, i2, i3, m_ex, m_ey, m_et);
   double a2 = std::pow(alpha, 2);
@@ -172,9 +172,9 @@ void of::HornAndSchunckFlow::evalEc2
 (const blitz::Array<double,2>& u, const blitz::Array<double,2>& v,
  blitz::Array<double,2>& error) const {
   
-  Torch::core::array::assertSameShape(u, v);
-  Torch::core::array::assertSameShape(u, error);
-  Torch::core::array::assertSameShape(u, m_u);
+  bob::core::array::assertSameShape(u, v);
+  bob::core::array::assertSameShape(u, error);
+  bob::core::array::assertSameShape(u, m_u);
 
   laplacian_avg_hs_opencv(u, m_u);
   laplacian_avg_hs_opencv(v, m_u);
@@ -187,11 +187,11 @@ void of::HornAndSchunckFlow::evalEb
  const blitz::Array<double,2>& i3, const blitz::Array<double,2>& u,
  const blitz::Array<double,2>& v, blitz::Array<double,2>& error) const {
   
-  Torch::core::array::assertSameShape(i1, i2);
-  Torch::core::array::assertSameShape(i2, i3);
-  Torch::core::array::assertSameShape(u, v);
-  Torch::core::array::assertSameShape(u, error);
-  Torch::core::array::assertSameShape(error, m_u);
+  bob::core::array::assertSameShape(i1, i2);
+  bob::core::array::assertSameShape(i2, i3);
+  bob::core::array::assertSameShape(u, v);
+  bob::core::array::assertSameShape(u, error);
+  bob::core::array::assertSameShape(error, m_u);
 
   m_gradient(i1, i2, i3, m_ex, m_ey, m_et);
   error = m_ex*u + m_ey*v + m_et;
@@ -201,10 +201,10 @@ void of::HornAndSchunckFlow::evalEb
 void of::flowError (const blitz::Array<double,2>& i1,
     const blitz::Array<double,2>& i2, const blitz::Array<double,2>& u, 
     const blitz::Array<double,2>& v, blitz::Array<double,2>& error) {
-  Torch::core::array::assertSameShape(i1, i2);
-  Torch::core::array::assertSameShape(u, v);
-  Torch::core::array::assertSameShape(i1, u);
-  Torch::core::array::assertSameShape(i1, error);
+  bob::core::array::assertSameShape(i1, i2);
+  bob::core::array::assertSameShape(u, v);
+  bob::core::array::assertSameShape(i1, u);
+  bob::core::array::assertSameShape(i1, error);
   error = 0;
   for (int i=0; i<i1.extent(1); ++i) {
     for (int j=0; j<i1.extent(0); ++j) {

@@ -30,8 +30,8 @@
 #include "io/Video.h"
 
 namespace fs = boost::filesystem;
-namespace io = Torch::io;
-namespace ca = Torch::core::array;
+namespace io = bob::io;
+namespace ca = bob::core::array;
 
 class VideoFile: public io::File {
 
@@ -140,7 +140,7 @@ class VideoFile: public io::File {
 
 };
 
-std::string VideoFile::s_codecname = "torch.video";
+std::string VideoFile::s_codecname = "bob.video";
 
 /**
  * From this point onwards we have the registration procedure. If you are

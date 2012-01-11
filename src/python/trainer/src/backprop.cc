@@ -24,9 +24,9 @@
 #include "trainer/MLPBackPropTrainer.h"
 
 using namespace boost::python;
-namespace io = Torch::io;
-namespace mach = Torch::machine;
-namespace train = Torch::trainer;
+namespace io = bob::io;
+namespace mach = bob::machine;
+namespace train = bob::trainer;
 
 void bind_trainer_backprop() {
   class_<train::MLPBackPropTrainer>("MLPBackPropTrainer", "Sets an MLP to perform discrimination based on vanilla error back-propagation as defined in 'Pattern Recognition and Machine Learning' by C.M. Bishop, chapter 5 or else, 'Pattern Classification' by Duda, Hart and Stork, chapter 6.", init<const mach::MLP&, size_t>((arg("machine"), arg("batch_size")), "Initializes a new MLPBackPropTrainer trainer according to a given machine settings and a training batch size.\n\nGood values for batch sizes are tens of samples. BackProp is not necessarily a 'batch' training algorithm, but performs in a smoother if the batch size is larger. This may also affect the convergence.\n\n You can also change default values for the learning rate and momentum. By default we train w/o any momenta.\n\nIf you want to adjust a potential learning rate decay, you can and should do it outside the scope of this trainer, in your own way."))

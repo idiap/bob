@@ -29,5 +29,5 @@ using namespace boost::python;
 
 void bind_ip_ipcore()
 {
-  class_<Torch::ipCore, bases<Torch::spCore>, boost::noncopyable>("ipCore", "The base type for all image processing operators", no_init);
+  class_<bob::ipCore, bases<bob::spCore>, boost::noncopyable>("ipCore", "The base type for all image processing operators", no_init);
 }

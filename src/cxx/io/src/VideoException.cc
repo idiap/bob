@@ -23,7 +23,7 @@
 #include <boost/format.hpp>
 #include "io/VideoException.h"
 
-namespace io = Torch::io;
+namespace io = bob::io;
 
 io::FFmpegException::FFmpegException(const char* filename,
     const char* issue) throw(): 

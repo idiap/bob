@@ -25,9 +25,9 @@
 #include <boost/format.hpp>
 #include "ip/color.h"
 
-namespace ip = Torch::ip;
+namespace ip = bob::ip;
 
-ip::UnsupportedTypeForColorConversion::UnsupportedTypeForColorConversion(Torch::core::array::ElementType eltype) throw(): m_eltype(eltype) {
+ip::UnsupportedTypeForColorConversion::UnsupportedTypeForColorConversion(bob::core::array::ElementType eltype) throw(): m_eltype(eltype) {
 }
 
 ip::UnsupportedTypeForColorConversion::~UnsupportedTypeForColorConversion() throw() {
@@ -36,7 +36,7 @@ ip::UnsupportedTypeForColorConversion::~UnsupportedTypeForColorConversion() thro
 const char* ip::UnsupportedTypeForColorConversion::what() const throw() {
   try {
     boost::format message("Color conversion for type '%s' is not supported");
-    message % Torch::core::array::stringize(m_eltype);
+    message % bob::core::array::stringize(m_eltype);
     m_message = message.str();
     return m_message.c_str();
   } catch (...) {

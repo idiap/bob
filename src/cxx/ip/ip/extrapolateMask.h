@@ -20,15 +20,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_IP_EXTRAPOLATE_MASK_H
-#define TORCH5SPRO_IP_EXTRAPOLATE_MASK_H
+#ifndef BOB5SPRO_IP_EXTRAPOLATE_MASK_H
+#define BOB5SPRO_IP_EXTRAPOLATE_MASK_H
 
 #include <blitz/array.h>
 #include "core/array_assert.h"
 
 #include <iostream>
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libip_api
  * @{
@@ -58,9 +58,9 @@ namespace Torch {
       blitz::Array<T,2>& img)
     {
       // Check input and output size
-      Torch::core::array::assertSameShape(src_mask, img);
-      Torch::core::array::assertZeroBase(src_mask);
-      Torch::core::array::assertZeroBase(img);
+      bob::core::array::assertSameShape(src_mask, img);
+      bob::core::array::assertZeroBase(src_mask);
+      bob::core::array::assertZeroBase(img);
       
       // TODO: check that the input mask is convex
 
@@ -109,4 +109,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_IP_EXTRAPOLATE_MASK_H */
+#endif /* BOB5SPRO_IP_EXTRAPOLATE_MASK_H */

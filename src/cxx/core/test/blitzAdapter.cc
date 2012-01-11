@@ -92,10 +92,10 @@ BOOST_AUTO_TEST_CASE( test_write_read )
   // 1/ 2D double array
   // Save
   std::stringstream stream_d;
-  Torch::core::BlitzAdapter<BAd2> X(bl1);
+  bob::core::BlitzAdapter<BAd2> X(bl1);
   stream_d << X;
   // Load
-  Torch::core::BlitzAdapter<BAd2> Y(bl2);
+  bob::core::BlitzAdapter<BAd2> Y(bl2);
   stream_d >> Y;
   // Compare
   check_equal2d( bl1, bl2);
@@ -103,10 +103,10 @@ BOOST_AUTO_TEST_CASE( test_write_read )
   // 2/ 3D int array
   // Save
   std::stringstream stream_i;
-  Torch::core::BlitzAdapter<BAi3> Z(bl3);
+  bob::core::BlitzAdapter<BAi3> Z(bl3);
   stream_i << Z;
   // Load
-  Torch::core::BlitzAdapter<BAi3> T(bl4);
+  bob::core::BlitzAdapter<BAi3> T(bl4);
   stream_i >> T;
   // Compare
   check_equal3d( bl3, bl4);
@@ -120,10 +120,10 @@ BOOST_AUTO_TEST_CASE( test_write_read_int8_uint8 )
   // 2D/ int8_t array
   // Save
   std::stringstream stream_i;
-  Torch::core::BlitzAdapter<BAi8_2> A(bl6);
+  bob::core::BlitzAdapter<BAi8_2> A(bl6);
   stream_i << A;
   // Load
-  Torch::core::BlitzAdapter<BAi8_2> B(bl7);
+  bob::core::BlitzAdapter<BAi8_2> B(bl7);
   stream_i >> B;
   // Compare
   check_equal2d( bl6, bl7);
@@ -131,10 +131,10 @@ BOOST_AUTO_TEST_CASE( test_write_read_int8_uint8 )
   // 2D/ uint8_t array
   // Save
   std::stringstream stream_u;
-  Torch::core::BlitzAdapter<BAui8_2> C(bl8);
+  bob::core::BlitzAdapter<BAui8_2> C(bl8);
   stream_u << C;
   // Load
-  Torch::core::BlitzAdapter<BAui8_2> D(bl9);
+  bob::core::BlitzAdapter<BAui8_2> D(bl9);
   stream_u >> D;
   // Compare
   check_equal2d( bl8, bl9);
@@ -146,10 +146,10 @@ BOOST_AUTO_TEST_CASE( test_write_convertread )
   // 1/ 3D array: Load an int array into a double array
   // Save
   std::stringstream stream_i;
-  Torch::core::BlitzAdapter<BAi3> X(bl3);
+  bob::core::BlitzAdapter<BAi3> X(bl3);
   stream_i << X;
   // Load
-  Torch::core::BlitzAdapter<BAd3> Y(bl5, false);
+  bob::core::BlitzAdapter<BAd3> Y(bl5, false);
   stream_i >> Y;
   // Compare
   check_equal3d( bl3, bl5);

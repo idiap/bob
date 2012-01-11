@@ -32,8 +32,8 @@
 #include "io/Exception.h"
 
 namespace fs = boost::filesystem;
-namespace io = Torch::io;
-namespace ca = Torch::core::array;
+namespace io = bob::io;
+namespace ca = bob::core::array;
 
 static int im_peek(Magick::Image& image, ca::typeinfo& info) {
   int retval = 0;
@@ -69,8 +69,8 @@ static int im_peek(Magick::Image& image, ca::typeinfo& info) {
     }
 
     // Set depth
-    if (image.depth() <= 8) info.dtype = Torch::core::array::t_uint8;
-    else if (image.depth() <= 16) info.dtype = Torch::core::array::t_uint16;
+    if (image.depth() <= 8) info.dtype = bob::core::array::t_uint8;
+    else if (image.depth() <= 16) info.dtype = bob::core::array::t_uint16;
     else throw std::runtime_error("unsupported image depth when reading file");
 
   return retval;
@@ -168,13 +168,13 @@ static void im_load (Magick::Image& image, ca::interface& b) {
 
   const ca::typeinfo& info = b.type();
 
-  if (info.dtype == Torch::core::array::t_uint8) {
+  if (info.dtype == bob::core::array::t_uint8) {
     if(info.nd == 2) im_load_gray<uint8_t>(image, b);
     else if( info.nd == 3) im_load_color<uint8_t>(image, b); 
     else throw io::ImageUnsupportedDimension(info.nd);
   }
 
-  else if (info.dtype == Torch::core::array::t_uint16) {
+  else if (info.dtype == bob::core::array::t_uint16) {
     if(info.nd == 2) im_load_gray<uint16_t>(image, b);
     else if( info.nd == 3) im_load_color<uint16_t>(image, b); 
     else throw io::ImageUnsupportedDimension(info.nd);
@@ -187,7 +187,7 @@ static void im_save (const std::string& filename, const ca::interface& array) {
 
   const ca::typeinfo& info = array.type();
 
-  if(info.dtype == Torch::core::array::t_uint8) {
+  if(info.dtype == bob::core::array::t_uint8) {
 
     if(info.nd == 2) im_save_gray<uint8_t>(array, filename);
     else if(info.nd == 3) {
@@ -198,7 +198,7 @@ static void im_save (const std::string& filename, const ca::interface& array) {
 
   }
 
-  else if(info.dtype == Torch::core::array::t_uint16) {
+  else if(info.dtype == bob::core::array::t_uint16) {
 
     if(info.nd == 2) im_save_gray<uint16_t>(array, filename);
     else if(info.nd == 3) {
@@ -321,7 +321,7 @@ class ImageFile: public io::File {
 
 };
 
-std::string ImageFile::s_codecname = "torch.image";
+std::string ImageFile::s_codecname = "bob.image";
 
 /**
  * From this point onwards we have the registration procedure. If you are

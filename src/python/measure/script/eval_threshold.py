@@ -31,12 +31,12 @@ this script like this:
   $ vim %(prog)s
 """
 
-import sys, os, torch
+import sys, os, bob
 
 def apthres(neg, pos, thres):
   """Prints a single output line that contains all info for the threshold"""
 
-  far, frr = torch.measure.farfrr(neg, pos, thres)
+  far, frr = bob.measure.farfrr(neg, pos, thres)
   hter = (far + frr)/2.0
 
   ni = neg.shape[0] #number of impostors
@@ -52,12 +52,12 @@ def calculate(neg, pos, crit, cost):
   """Returns the threshold given a certain criteria"""
 
   if crit == 'eer':
-    return torch.measure.eerThreshold(neg, pos)
+    return bob.measure.eerThreshold(neg, pos)
   elif crit == 'mhter':
-    return torch.measure.minHterThreshold(neg, pos)
+    return bob.measure.minHterThreshold(neg, pos)
 
   # defaults to the minimum of the weighter error rate
-  return torch.measure.minWeightedErrorRateThreshold(neg, pos, cost)
+  return bob.measure.minWeightedErrorRateThreshold(neg, pos, cost)
 
 def get_options():
   """Parse the program options"""
@@ -85,7 +85,7 @@ def get_options():
   parser.add_option('-w', '--cost', dest='cost', default=0.5,
       type='float', help="The value w of the cost when minimizing using the minimum weighter error rate (mwer) criterium. This value is ignored for eer or mhter criteria.", metavar="FLOAT")
   parser.add_option('-p', '--parser', dest="parser", default="4column",
-      help="Name of a known parser or of a python-importable function that can parse your input files and return a tuple (negatives, positives) as blitz 1-D arrays of 64-bit floats. Consult the API of torch.measure.load.split_four_column() for details", metavar="NAME.FUNCTION")
+      help="Name of a known parser or of a python-importable function that can parse your input files and return a tuple (negatives, positives) as blitz 1-D arrays of 64-bit floats. Consult the API of bob.measure.load.split_four_column() for details", metavar="NAME.FUNCTION")
   
   # This option is not normally shown to the user...
   parser.add_option("--self-test",
@@ -108,9 +108,9 @@ def get_options():
 
   #parse the score-parser
   if options.parser.lower() in ('4column', '4col'):
-    options.parser = torch.measure.load.split_four_column
+    options.parser = bob.measure.load.split_four_column
   elif options.parser.lower() in ('5column', '5col'):
-    options.parser = torch.measure.load.split_five_column
+    options.parser = bob.measure.load.split_five_column
   else: #try an import
     if options.parser.find('.') == -1:
       parser.error("parser module should be either '4column', '5column' or a valid python function identifier in the format 'module.function': '%s' is invalid" % options.parser)

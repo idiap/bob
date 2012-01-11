@@ -32,7 +32,7 @@ import os
 import sys
 import time
 import argparse
-import torch
+import bob
 import tempfile #for package tests
 import numpy
 
@@ -48,7 +48,7 @@ def r(v):
 def process_video_data(args):
   """A more efficienty (memory-wise) way to process video data"""
 
-  input = torch.io.VideoReader(args.input)
+  input = bob.io.VideoReader(args.input)
   gray_buffer = numpy.ndarray((input.height, input.width), 'uint8')
   data = []
   total = 0
@@ -56,7 +56,7 @@ def process_video_data(args):
     sys.stdout.write("Detecting (single) faces in %d frames from file %s" % \
         (input.numberOfFrames, args.input))
   for k in input:
-    torch.ip.rgb_to_gray(k, gray_buffer)
+    bob.ip.rgb_to_gray(k, gray_buffer)
     int16_buffer = gray_buffer.astype('int16')
     start = time.clock()
     detection = args.processor(int16_buffer)
@@ -90,15 +90,15 @@ def process_video_data(args):
     color = (255, 0, 0) #red
     orows = 2*(input.height/2)
     ocolumns = 2*(input.width/2)
-    ov = torch.io.VideoWriter(args.output, orows, ocolumns, input.frameRate)
+    ov = bob.io.VideoWriter(args.output, orows, ocolumns, input.frameRate)
     for frame,bbox in zip(input,data):
       if bbox and sum(bbox) != 0:
         bbox = [r(v) for v in bbox[:4]]
         # 3-pixels width box
-        torch.ip.draw_box(frame, bbox[0], bbox[1], bbox[2], bbox[3], color)
-        torch.ip.draw_box(frame, bbox[0]-1, bbox[1]-1, bbox[2]+2, bbox[3]+2, 
+        bob.ip.draw_box(frame, bbox[0], bbox[1], bbox[2], bbox[3], color)
+        bob.ip.draw_box(frame, bbox[0]-1, bbox[1]-1, bbox[2]+2, bbox[3]+2, 
             color)
-        torch.ip.draw_box(frame, bbox[0]+1, bbox[1]+1, bbox[2]-2, bbox[3]-2, 
+        bob.ip.draw_box(frame, bbox[0]+1, bbox[1]+1, bbox[2]-2, bbox[3]-2, 
             color)
       ov.append(frame[:,:orows,:ocolumns])
       if args.verbose:
@@ -111,10 +111,10 @@ def process_image_data(args):
   """Process any kind of image data"""
 
   if args.verbose: print "Loading file %s..." % args.input
-  input = torch.io.load(args.input) #load the image
+  input = bob.io.load(args.input) #load the image
 
   if len(input.shape) == 3: #it is a color image
-    graydata = torch.ip.rgb_to_gray(input).astype('int16')
+    graydata = bob.ip.rgb_to_gray(input).astype('int16')
   elif len(input.shape) == 2: #it is a gray-scale image
     graydata = input.astype('int16')
 
@@ -140,13 +140,13 @@ def process_image_data(args):
       else: color = 255
       bbox = [r(v) for v in data[:4]]
       if sum(bbox):
-        torch.ip.draw_box(input, bbox[0], bbox[1], bbox[2], bbox[3], color)
-        torch.ip.draw_box(input, bbox[0]-1, bbox[1]-1, bbox[2]+2, bbox[3]+2,
+        bob.ip.draw_box(input, bbox[0], bbox[1], bbox[2], bbox[3], color)
+        bob.ip.draw_box(input, bbox[0]-1, bbox[1]-1, bbox[2]+2, bbox[3]+2,
             color)
-        torch.ip.draw_box(input, bbox[0]+1, bbox[1]+1, bbox[2]-2, bbox[3]-2,
+        bob.ip.draw_box(input, bbox[0]+1, bbox[1]+1, bbox[2]-2, bbox[3]-2,
             color)
 
-    torch.io.save(input, args.output)
+    bob.io.save(input, args.output)
 
     if args.verbose:
       print "Output file (with detections, if any) saved at %s" % args.output
@@ -181,14 +181,14 @@ def main():
 
   if args.selftest == 1:
     args.input = testfile('../../io/test/data/test.mov')
-    (fd, filename) = tempfile.mkstemp('.avi', 'torchtest_')
+    (fd, filename) = tempfile.mkstemp('.avi', 'bobtest_')
     os.close(fd)
     os.unlink(filename)
     args.output = filename
 
   elif args.selftest == 2:
     args.input = testfile('../../ip/test/data/faceextract/test-faces.jpg')
-    (fd, filename) = tempfile.mkstemp('.jpg', 'torchtest_')
+    (fd, filename) = tempfile.mkstemp('.jpg', 'bobtest_')
     os.close(fd)
     os.unlink(filename)
     args.output = filename
@@ -199,7 +199,7 @@ def main():
     args.scan_levels = 10
 
   start = time.clock() 
-  args.processor = torch.visioner.MaxDetector(cmodel_file=args.cmodel,
+  args.processor = bob.visioner.MaxDetector(cmodel_file=args.cmodel,
       scan_levels=args.scan_levels)
   total = time.clock() - start
 

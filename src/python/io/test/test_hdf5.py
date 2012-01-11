@@ -10,10 +10,10 @@ import os, sys
 import unittest
 import numpy
 import tempfile
-import torch
+import bob
 import random
 
-def get_tempfilename(prefix='torchtest_', suffix='.hdf5'):
+def get_tempfilename(prefix='bobtest_', suffix='.hdf5'):
   (fd, name) = tempfile.mkstemp(suffix, prefix)
   os.close(fd)
   os.unlink(name)
@@ -50,7 +50,7 @@ def readWriteTestArray(self, outfile, dtype):
 unittest.TestCase.readWriteTestArray = readWriteTestArray
 
 class HDF5FileTest(unittest.TestCase):
-  """Performs various tests for the Torch::io::HDF5File type."""
+  """Performs various tests for the bob::io::HDF5File type."""
  
   def test01_CanCreate(self):
     # This test demonstrates how to create HDF5 files from scratch,
@@ -70,12 +70,12 @@ class HDF5FileTest(unittest.TestCase):
     # Now we create a new binary output file in a temporary location and save
     # the data there.
     tmpname = get_tempfilename()
-    outfile = torch.io.HDF5File(tmpname)
+    outfile = bob.io.HDF5File(tmpname)
     outfile.append('testdata', arrays)
 
     # Data that is thrown in the file is immediately accessible, so you can
     # interleave read and write operations without any problems.
-    # There is a single variable in the file, which is a torch arrayset:
+    # There is a single variable in the file, which is a bob arrayset:
     self.assertEqual(outfile.paths(), ['/testdata'])
     
     # And all the data is *exactly* the same recorded, bit by bit
@@ -88,9 +88,9 @@ class HDF5FileTest(unittest.TestCase):
 
     # You can open the file in read-only mode using the 'r' flag. Writing
     # operations on this file will fail.
-    readonly = torch.io.HDF5File(tmpname, 'r')
+    readonly = bob.io.HDF5File(tmpname, 'r')
 
-    # There is a single variable in the file, which is a torch arrayset:
+    # There is a single variable in the file, which is a bob arrayset:
     self.assertEqual(readonly.paths(), ['/testdata'])
 
     # You can get an overview of what is in the HDF5 dataset using the
@@ -119,7 +119,7 @@ class HDF5FileTest(unittest.TestCase):
     N = 100 
 
     tmpname = get_tempfilename()
-    outfile = torch.io.HDF5File(tmpname)
+    outfile = bob.io.HDF5File(tmpname)
 
     data = [bool(int(random.uniform(0,2))) for z in range(N)]
     self.readWriteTest(outfile, 'bool_data', data)
@@ -143,7 +143,7 @@ class HDF5FileTest(unittest.TestCase):
     #fail. Python floats are actually double precision.
     #self.readWriteTest(outfile, 'float32_data', data, 'float32')
     self.readWriteTest(outfile, 'float64_data', data, 'float64')
-    #The next construction is not supported by Torch
+    #The next construction is not supported by bob
     #self.readWriteTest(outfile, 'float128_data', data, 'float128')
 
     data = [complex(random.uniform(0,1),random.uniform(-1,0)) for z in range(N)]
@@ -152,7 +152,7 @@ class HDF5FileTest(unittest.TestCase):
     #fail. Python floats are actually double precision.
     #self.readWriteTest(outfile, 'complex64_data', data, 'complex64')
     self.readWriteTest(outfile, 'complex128_data', data, 'complex128')
-    #The next construction is not supported by Torch
+    #The next construction is not supported by bob
     #self.readWriteTest(outfile, 'complex256_data', data, 'complex256')
 
     self.readWriteTestArray(outfile, 'int8')
@@ -181,7 +181,7 @@ class HDF5FileTest(unittest.TestCase):
     N = 100 
 
     tmpname = get_tempfilename()
-    outfile = torch.io.HDF5File(tmpname)
+    outfile = bob.io.HDF5File(tmpname)
 
     data = [int(random.uniform(0,N)) for z in range(N)]
     outfile.append('int_data', data)
@@ -266,19 +266,19 @@ class HDF5FileTest(unittest.TestCase):
 
     # Try to save a slice
     tmpname = get_tempfilename()
-    torch.io.save(array[:,0], tmpname)
+    bob.io.save(array[:,0], tmpname)
 
   def test06_canLoadMatlab(self):
 
     # shows we can load a 2D matlab array and interpret it as a bunch of 1D
     # arrays, correctly
 
-    t = torch.io.Arrayset('matlab_1d.hdf5')
+    t = bob.io.Arrayset('matlab_1d.hdf5')
     self.assertEqual( len(t), 512 )
     self.assertEqual( t.shape, (1,) )
     self.assertEqual( t.elementType.name, 'float64' )
 
-    t = torch.io.Arrayset('matlab_2d.hdf5')
+    t = bob.io.Arrayset('matlab_2d.hdf5')
     self.assertEqual( len(t), 512 )
     self.assertEqual( t.shape, (2,) )
     self.assertEqual( t.elementType.name, 'float64' )
@@ -286,31 +286,31 @@ class HDF5FileTest(unittest.TestCase):
     # interestingly enough, if you load those files as arrays, you will read
     # the whole data at once:
 
-    t = torch.io.Array('matlab_1d.hdf5')
+    t = bob.io.Array('matlab_1d.hdf5')
     self.assertEqual( t.shape, (512,) )
     self.assertEqual( t.elementType.name, 'float64' )
 
-    t = torch.io.Array('matlab_2d.hdf5')
+    t = bob.io.Array('matlab_2d.hdf5')
     self.assertEqual( t.shape, (512,2) )
     self.assertEqual( t.elementType.name, 'float64' )
 
   def test06_matlabImport(self):
 
     # This test verifies we can import HDF5 datasets generated in Matlab
-    mfile = torch.io.HDF5File('matlab_1d.hdf5')
+    mfile = bob.io.HDF5File('matlab_1d.hdf5')
     self.assertEqual ( mfile.paths(), ['/array'] )
 
 if __name__ == '__main__':
   sys.argv.insert(1, '-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   os.chdir('data')
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()
 

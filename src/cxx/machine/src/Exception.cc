@@ -3,7 +3,7 @@
  * @date Fri May 13 20:22:43 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
-  * @brief Implements a generic exception for the machine subsystem of Torch
+  * @brief Implements a generic exception for the machine subsystem of bob
  * @brief
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
@@ -24,7 +24,7 @@
 #include "machine/Exception.h"
 #include <boost/format.hpp>
 
-namespace machine = Torch::machine;
+namespace machine = bob::machine;
 
 machine::Exception::Exception() throw() {
 }

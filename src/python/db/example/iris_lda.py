@@ -10,7 +10,7 @@ Note: This example will consider all 3 classes for the LDA training. This is
 *not* what Fisher did on his paper entitled "The Use of Multiple Measurements
 in Taxonomic Problems", Annals of Eugenics, pp. 179-188, 1936. In that work
 Fisher does the "right" thing only for the first 2-class problem (setosa x
-versicolor). You can reproduce the 2-class LDA using Torch's LDA training
+versicolor). You can reproduce the 2-class LDA using bob's LDA training
 system w/o problems. When inserting the virginica class, Fisher decides for a
 different metric (4vi + ve -5se) and solves lambda for the matrices in the last
 row of Table VIII. 
@@ -25,7 +25,7 @@ showing that Fisher's solution was approximately correct.
 import os
 import sys
 import numpy
-import torch
+import bob
 import optparse
 import tempfile #for package tests
 
@@ -42,7 +42,7 @@ def choose_matplotlib_iteractive_backend():
 def create_machine(data):
   """Creates the machine given the training data"""
 
-  lda = torch.trainer.FisherLDATrainer()
+  lda = bob.trainer.FisherLDATrainer()
   machine, eigenValues = lda.train(data.values())
 
   return machine
@@ -102,12 +102,12 @@ if __name__ == '__main__':
   options, args = parser.parse_args()
 
   # Loads the dataset and performs LDA
-  data = torch.db.iris.data() #NOT RETURNING GOOD VALUES! STOPPED HERE!
+  data = bob.db.iris.data() #NOT RETURNING GOOD VALUES! STOPPED HERE!
   machine = create_machine(data)
   output = process_data(machine, data)
 
   if options.selftest:
-    (fd, filename) = tempfile.mkstemp('.pdf', 'torchtest_')
+    (fd, filename) = tempfile.mkstemp('.pdf', 'bobtest_')
     os.close(fd)
     os.unlink(filename)
     plotting(output, filename)

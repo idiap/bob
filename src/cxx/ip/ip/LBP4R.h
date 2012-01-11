@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_IP_LBP4R_H
-#define TORCH5SPRO_IP_LBP4R_H
+#ifndef BOB5SPRO_IP_LBP4R_H
+#define BOB5SPRO_IP_LBP4R_H
 
 #include <blitz/array.h>
 #include <algorithm>
@@ -31,7 +31,7 @@
 #include "ip/LBP.h"
 #include "sp/interpolate.h"
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libip_api
  * @{
@@ -143,18 +143,18 @@ namespace Torch {
     };
 
     template <typename T>
-    void Torch::ip::LBP4R::operator()(const blitz::Array<T,2>& src,  
+    void bob::ip::LBP4R::operator()(const blitz::Array<T,2>& src,  
       blitz::Array<uint16_t,2>& dst) const
     {
-      Torch::core::array::assertZeroBase(src);
-      Torch::core::array::assertZeroBase(dst);
-      Torch::core::array::assertSameShape(dst, getLBPShape(src) );
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(dst);
+      bob::core::array::assertSameShape(dst, getLBPShape(src) );
       if( m_circular)
       {
         for(int y=0; y<dst.extent(0); ++y)
           for(int x=0; x<dst.extent(1); ++x)
             dst(y,x) = 
-              Torch::ip::LBP4R::processNoCheck<T,true>(src, 
+              bob::ip::LBP4R::processNoCheck<T,true>(src, 
                 static_cast<int>(ceil(m_R))+y, static_cast<int>(ceil(m_R))+x);
       }
       else
@@ -162,16 +162,16 @@ namespace Torch {
         for(int y=0; y<dst.extent(0); ++y)
           for(int x=0; x<dst.extent(1); ++x)
             dst(y,x) = 
-              Torch::ip::LBP4R::processNoCheck<T,false>(src, 
+              bob::ip::LBP4R::processNoCheck<T,false>(src, 
                 static_cast<int>(m_R_rect)+y, static_cast<int>(m_R_rect)+x);
       }
     }
     
     template <typename T> 
-    uint16_t Torch::ip::LBP4R::operator()(const blitz::Array<T,2>& src, 
+    uint16_t bob::ip::LBP4R::operator()(const blitz::Array<T,2>& src, 
       int yc, int xc) const
     {
-      Torch::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(src);
       if( m_circular)
       {
         if( yc<ceil(m_R) )
@@ -182,7 +182,7 @@ namespace Torch {
           throw ParamOutOfBoundaryError("xc", false, xc, ceil(m_R));
         if( xc>=src.extent(1)-ceil(m_R) )
           throw ParamOutOfBoundaryError("xc", true, xc, src.extent(1)-ceil(m_R)-1);
-        return Torch::ip::LBP4R::processNoCheck<T,true>( src, yc, xc);
+        return bob::ip::LBP4R::processNoCheck<T,true>( src, yc, xc);
       }
       else
       {
@@ -194,21 +194,21 @@ namespace Torch {
           throw ParamOutOfBoundaryError("xc", false, xc, m_R_rect);
         if( xc>=src.extent(1)-m_R_rect )
           throw ParamOutOfBoundaryError("xc", true, xc, src.extent(1)-m_R_rect-1);
-        return Torch::ip::LBP4R::processNoCheck<T,false>( src, yc, xc);
+        return bob::ip::LBP4R::processNoCheck<T,false>( src, yc, xc);
       }
     }
     
     template <typename T, bool circular> 
-    uint16_t Torch::ip::LBP4R::processNoCheck( const blitz::Array<T,2>& src,
+    uint16_t bob::ip::LBP4R::processNoCheck( const blitz::Array<T,2>& src,
       int yc, int xc) const
     {
       double tab[4];
       if(circular)
       {
-        tab[0] = Torch::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R,xc);
-        tab[1] = Torch::sp::detail::bilinearInterpolationNoCheck(src,yc,xc+m_R);
-        tab[2] = Torch::sp::detail::bilinearInterpolationNoCheck(src,yc+m_R,xc);
-        tab[3] = Torch::sp::detail::bilinearInterpolationNoCheck(src,yc,xc-m_R);
+        tab[0] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R,xc);
+        tab[1] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc,xc+m_R);
+        tab[2] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+m_R,xc);
+        tab[3] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc,xc-m_R);
       }
       else
       {
@@ -242,7 +242,7 @@ namespace Torch {
 
     template <typename T>
     const blitz::TinyVector<int,2> 
-    Torch::ip::LBP4R::getLBPShape(const blitz::Array<T,2>& src) const
+    bob::ip::LBP4R::getLBPShape(const blitz::Array<T,2>& src) const
     {
       blitz::TinyVector<int,2> res;
       res(0) = std::max(0, src.extent(0)-2*static_cast<int>(ceil(m_R)));
@@ -253,4 +253,4 @@ namespace Torch {
   }
 }
 
-#endif /* TORCH5SPRO_IP_LBP4R_H */
+#endif /* BOB5SPRO_IP_LBP4R_H */

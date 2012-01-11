@@ -23,7 +23,7 @@
 #include "ip/geomObject.h"
 #include "core/Tensor.h"
 
-namespace Torch {
+namespace bob {
 
 	class Vector3D;
 

@@ -32,7 +32,7 @@ import os
 import sys
 import time
 import argparse
-import torch
+import bob
 import tempfile #for package tests
 import numpy
 
@@ -48,7 +48,7 @@ def r(v):
 def process_video_data(args):
   """A more efficienty (memory-wise) way to process video data"""
 
-  input = torch.io.VideoReader(args.input)
+  input = bob.io.VideoReader(args.input)
   gray_buffer = numpy.ndarray((input.height, input.width), 'uint8')
   data = []
   total = 0
@@ -56,7 +56,7 @@ def process_video_data(args):
     sys.stdout.write("Detecting (single) faces in %d frames from file %s" % \
         (input.numberOfFrames, args.input))
   for k in input:
-    torch.ip.rgb_to_gray(k, gray_buffer)
+    bob.ip.rgb_to_gray(k, gray_buffer)
     int16_buffer = gray_buffer.astype('int16')
     start = time.clock()
     detections = args.processor(int16_buffer)
@@ -94,22 +94,22 @@ def process_video_data(args):
     yellow = (255, 255, 0)
     orows = 2*(input.height/2)
     ocolumns = 2*(input.width/2)
-    ov = torch.io.VideoWriter(args.output, orows, ocolumns, input.frameRate)
+    ov = bob.io.VideoWriter(args.output, orows, ocolumns, input.frameRate)
 
     for frame,(bbox,points) in zip(input,data):
 
       if bbox and sum(bbox):
         bbox = [r(v) for v in bbox]
         # 3-pixels width box
-        torch.ip.draw_box(frame, bbox[0], bbox[1], bbox[2], bbox[3], red)
-        torch.ip.draw_box(frame, bbox[0]-1, bbox[1]-1, bbox[2]+2, bbox[3]+2, 
+        bob.ip.draw_box(frame, bbox[0], bbox[1], bbox[2], bbox[3], red)
+        bob.ip.draw_box(frame, bbox[0]-1, bbox[1]-1, bbox[2]+2, bbox[3]+2, 
             red)
-        torch.ip.draw_box(frame, bbox[0]+1, bbox[1]+1, bbox[2]-2, bbox[3]-2, 
+        bob.ip.draw_box(frame, bbox[0]+1, bbox[1]+1, bbox[2]-2, bbox[3]-2, 
             red)
 
         for p in points:
           p = [r(v) for v in p]
-          if sum(p): torch.ip.draw_cross(frame, p[0], p[1], 2, yellow)
+          if sum(p): bob.ip.draw_cross(frame, p[0], p[1], 2, yellow)
 
       ov.append(frame[:,:orows,:ocolumns])
 
@@ -123,10 +123,10 @@ def process_image_data(args):
   """Process any kind of image data"""
 
   if args.verbose: print "Loading file %s..." % args.input
-  input = torch.io.load(args.input) #load the image
+  input = bob.io.load(args.input) #load the image
 
   if len(input.shape) == 3: #it is a color image
-    graydata = torch.ip.rgb_to_gray(input).astype('int16')
+    graydata = bob.ip.rgb_to_gray(input).astype('int16')
   elif len(input.shape) == 2: #it is a gray-scale image
     graydata = input.astype('int16')
 
@@ -161,17 +161,17 @@ def process_image_data(args):
         face = 255
         cross = 255
 
-      torch.ip.draw_box(input, bbox[0], bbox[1], bbox[2], bbox[3], face)
-      torch.ip.draw_box(input, bbox[0]-1, bbox[1]-1, bbox[2]+2, bbox[3]+2,
+      bob.ip.draw_box(input, bbox[0], bbox[1], bbox[2], bbox[3], face)
+      bob.ip.draw_box(input, bbox[0]-1, bbox[1]-1, bbox[2]+2, bbox[3]+2,
           face)
-      torch.ip.draw_box(input, bbox[0]+1, bbox[1]+1, bbox[2]-2, bbox[3]-2,
+      bob.ip.draw_box(input, bbox[0]+1, bbox[1]+1, bbox[2]-2, bbox[3]-2,
           face)
 
       for p in points:
         p = tuple([r(v) for v in p])
-        torch.ip.draw_cross(input, p[0], p[1], 2, cross)
+        bob.ip.draw_cross(input, p[0], p[1], 2, cross)
 
-    torch.io.save(input, args.output)
+    bob.io.save(input, args.output)
 
     if args.verbose:
       print "Output file (with detections, if any) saved at %s" % args.output
@@ -206,14 +206,14 @@ def main():
 
   if args.selftest == 1:
     args.input = testfile('../../io/test/data/test.mov')
-    (fd, filename) = tempfile.mkstemp('.avi', 'torchtest_')
+    (fd, filename) = tempfile.mkstemp('.avi', 'bobtest_')
     os.close(fd)
     os.unlink(filename)
     args.output = filename
 
   elif args.selftest == 2:
     args.input = testfile('../../ip/test/data/faceextract/test-faces.jpg')
-    (fd, filename) = tempfile.mkstemp('.jpg', 'torchtest_')
+    (fd, filename) = tempfile.mkstemp('.jpg', 'bobtest_')
     os.close(fd)
     os.unlink(filename)
     args.output = filename
@@ -223,7 +223,7 @@ def main():
     args.scan_levels = 10
 
   start = time.clock() 
-  args.processor = torch.visioner.Localizer(cmodel_file=args.cmodel,
+  args.processor = bob.visioner.Localizer(cmodel_file=args.cmodel,
       lmodel_file=args.lmodel, scan_levels=args.scan_levels)
   total = time.clock() - start
 

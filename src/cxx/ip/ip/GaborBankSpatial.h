@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_IP_GABOR_BANK_SPATIAL_H
-#define TORCH5SPRO_IP_GABOR_BANK_SPATIAL_H 
+#ifndef BOB5SPRO_IP_GABOR_BANK_SPATIAL_H
+#define BOB5SPRO_IP_GABOR_BANK_SPATIAL_H 
 
 #include "core/cast.h"
 #include "ip/Exception.h"
@@ -30,7 +30,7 @@
 #include <boost/shared_ptr.hpp>
 #include <vector>
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libip_api
  * @{
@@ -147,10 +147,10 @@ namespace Torch {
         // enum sp::Convolution::SizeOption m_size_opt;
         enum sp::Convolution::BorderOption m_border_opt;
 
-        std::vector<boost::shared_ptr<Torch::ip::GaborSpatial> > m_filters;
+        std::vector<boost::shared_ptr<bob::ip::GaborSpatial> > m_filters;
         blitz::Array<double,1> m_freqs;
         blitz::Array<double,1> m_orients;
     };
 }}
 
-#endif /* TORCH5SPRO_IP_GABOR_BANK_SPATIAL_H */
+#endif /* BOB5SPRO_IP_GABOR_BANK_SPATIAL_H */

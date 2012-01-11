@@ -18,11 +18,11 @@
 #include "trainer/Exception.h"
 
 
-namespace tca = Torch::core::array;
-namespace io = Torch::io;
-namespace mach = Torch::machine;
-namespace math = Torch::math;
-namespace train = Torch::trainer;
+namespace tca = bob::core::array;
+namespace io = bob::io;
+namespace mach = bob::machine;
+namespace math = bob::math;
+namespace train = bob::trainer;
 
 train::PLDABaseTrainer::PLDABaseTrainer(int nf, int ng, 
     double convergence_threshold, int max_iterations, bool compute_likelihood):
@@ -146,22 +146,22 @@ void train::PLDABaseTrainer::checkTrainingData(const std::vector<io::Arrayset>& 
 {
   // Checks that the vector of Arraysets is not empty
   if(v_ar.size() == 0)
-    throw Torch::trainer::EmptyTrainingSet();
+    throw bob::trainer::EmptyTrainingSet();
 
   // Gets dimension (first Arrayset)
   size_t n_features = v_ar[0].getShape()[0];
   // Checks dimension consistency
   for(size_t i=0; i<v_ar.size(); ++i) {
     // Checks for arrayset data type and shape
-    if(v_ar[i].getElementType() != Torch::core::array::t_float64) {
-      throw Torch::io::TypeError(v_ar[i].getElementType(),
-        Torch::core::array::t_float64);
+    if(v_ar[i].getElementType() != bob::core::array::t_float64) {
+      throw bob::io::TypeError(v_ar[i].getElementType(),
+        bob::core::array::t_float64);
     }
     if(v_ar[i].getNDim() != 1) {
-      throw Torch::io::DimensionError(v_ar[i].getNDim(), 1);
+      throw bob::io::DimensionError(v_ar[i].getNDim(), 1);
     }
     if(v_ar[i].getShape()[0] != n_features)
-      throw Torch::trainer::WrongNumberOfFeatures(v_ar[i].getShape()[0], 
+      throw bob::trainer::WrongNumberOfFeatures(v_ar[i].getShape()[0], 
                                                   n_features, i);
   } 
 }
@@ -295,7 +295,7 @@ void train::PLDABaseTrainer::initF(mach::PLDABaseMachine& machine,
     int n_singular = std::min(machine.getDimD(),v_ar.size());
     blitz::Array<double,2> U(machine.getDimD(), n_singular);
     blitz::Array<double,1> sigma(n_singular);
-    Torch::math::svd(S, U, sigma);
+    bob::math::svd(S, U, sigma);
 
     // d/ Updates F
     blitz::Array<double,2> Uslice = U(blitz::Range::all(), blitz::Range(0,machine.getDimF()-1));
@@ -370,7 +370,7 @@ void train::PLDABaseTrainer::initG(mach::PLDABaseMachine& machine,
     // c/ SVD of the between-class scatter matrix
     blitz::Array<double,2> U(machine.getDimD(), std::min(machine.getDimD(),Nsamples));
     blitz::Array<double,1> sigma( std::min(machine.getDimD(),Nsamples) );
-    Torch::math::svd(S, U, sigma);
+    bob::math::svd(S, U, sigma);
 
     // d/ Updates G
     blitz::Array<double,2> Uslice = U(blitz::Range::all(), blitz::Range(0,machine.getDimG()-1));
@@ -512,17 +512,17 @@ void train::PLDABaseTrainer::eStep(mach::PLDABaseMachine& machine,
       m_cache_D_1 = v_ar[i].get<double,1>(j) - mu;
 
       // m_cache_nf_2 = F^T.beta.(x_sj-mu)
-      Torch::math::prod(FtBeta, m_cache_D_1, m_cache_nf_2);
+      bob::math::prod(FtBeta, m_cache_D_1, m_cache_nf_2);
       // m_cache_nf_1 = sum_j F^T.beta.(x_sj-mu)
       m_cache_nf_1 += m_cache_nf_2;
     }
     const blitz::Array<double,2>& gamma_a = machine.getAddGamma(v_ar[i].size());
     blitz::Range r_hi(0, m_nf-1);
     // m_cache_nf_2 = E(h_i) = gamma_A  sum_j F^T.beta.(x_sj-mu)
-    Torch::math::prod(gamma_a, m_cache_nf_1, m_cache_nf_2);
+    bob::math::prod(gamma_a, m_cache_nf_1, m_cache_nf_2);
 
     // 1/b/ Precomputes: m_cache_D_2 = F.E{h_i}
-    Torch::math::prod(F, m_cache_nf_2, m_cache_D_2);
+    bob::math::prod(F, m_cache_nf_2, m_cache_D_2);
 
     // 2/ First and second order statistics of z
     // Precomputed values 
@@ -541,10 +541,10 @@ void train::PLDABaseTrainer::eStep(mach::PLDABaseMachine& machine,
       // m_cache_D_1 = x_sj - mu - F.E{h_i}
       m_cache_D_1 = v_ar[i].get<double,1>(j) - mu - m_cache_D_2;
       // m_cache_ng_1 = G^T.sigma^-1.(x_sj-mu-fhi)
-      Torch::math::prod(GtISigma, m_cache_D_1, m_cache_ng_1);
+      bob::math::prod(GtISigma, m_cache_D_1, m_cache_ng_1);
       // z_first_order_ij_2 = (Id+G^T.sigma^-1.G)^-1.G^T.sigma^-1.(x_sj-mu) = E{w_ij}
       blitz::Array<double,1> z_first_order_ij_2 = m_z_first_order[i](j,r2);
-      Torch::math::prod(alpha, m_cache_ng_1, z_first_order_ij_2); 
+      bob::math::prod(alpha, m_cache_ng_1, z_first_order_ij_2); 
 
       // 2/ Second order statistics of z
       blitz::Array<double,2> z_so_11 = m_sum_z_second_order(r1,r1);
@@ -573,8 +573,8 @@ void train::PLDABaseTrainer::precomputeFromFGSigma(mach::PLDABaseMachine& machin
   blitz::secondIndex j;
 
   // Precomputes F, G and sigma-based expressions
-  Torch::math::prod(Ft, Gt_isigma_t, m_Ft_isigma_G);
-  Torch::math::prod(m_Ft_isigma_G, alpha, m_eta); 
+  bob::math::prod(Ft, Gt_isigma_t, m_Ft_isigma_G);
+  bob::math::prod(m_Ft_isigma_G, alpha, m_eta); 
   blitz::Array<double,2> etat = m_eta.transpose(1,0);
 
   // Reinitializes all the zeta_a and iota_a
@@ -594,8 +594,8 @@ void train::PLDABaseTrainer::precomputeFromFGSigma(mach::PLDABaseMachine& machin
       blitz::Array<double,2>& gamma_a = machine.getAddGamma(n_i);
       blitz::Array<double,2>& zeta_a = m_zeta[n_i];
       blitz::Array<double,2>& iota_a = m_iota[n_i];
-      Torch::math::prod(gamma_a, m_eta, iota_a);
-      Torch::math::prod(etat, iota_a, zeta_a);
+      bob::math::prod(gamma_a, m_eta, iota_a);
+      bob::math::prod(etat, iota_a, zeta_a);
       zeta_a += alpha;
       iota_a = - iota_a;
       // Now up to date
@@ -659,16 +659,16 @@ void train::PLDABaseTrainer::updateFG(mach::PLDABaseMachine& machine,
       // z_first_order_ij = E{z_ij}
       blitz::Array<double,1> z_first_order_ij = m_z_first_order[i](j, blitz::Range::all());
       // m_cache_D_nfng_1 = (x_sj-mu).E{z_ij}^T
-      Torch::math::prod(m_cache_D_1, z_first_order_ij, m_cache_D_nfng_1);
+      bob::math::prod(m_cache_D_1, z_first_order_ij, m_cache_D_nfng_1);
       m_cache_D_nfng_2 += m_cache_D_nfng_1;
     }
   }
 
   // 2/ Computes the denominator inv(sum_ij E{z_i.z_i^T})
-  Torch::math::inv(m_sum_z_second_order, m_cache_nfng_nfng);
+  bob::math::inv(m_sum_z_second_order, m_cache_nfng_nfng);
 
   // 3/ Computes numerator / denominator
-  Torch::math::prod(m_cache_D_nfng_2, m_cache_nfng_nfng, m_B);
+  bob::math::prod(m_cache_D_nfng_2, m_cache_nfng_nfng, m_B);
 
   // 4/ Updates the machine 
   // TODO: Use B as cache in the trainer, and only sets F and G when calling
@@ -704,7 +704,7 @@ void train::PLDABaseTrainer::updateSigma(mach::PLDABaseMachine& machine,
       // z_first_order_ij = E{z_ij}
       blitz::Array<double,1> z_first_order_ij = m_z_first_order[i](j, blitz::Range::all());
       // m_cache_D_2 = B.E{z_ij}
-      Torch::math::prod(m_B, z_first_order_ij, m_cache_D_2);
+      bob::math::prod(m_B, z_first_order_ij, m_cache_D_2);
       // sigma -= Diag{B.E{z_ij}.(x_ij-mu)
       sigma -= (m_cache_D_1 * m_cache_D_2);
       ++n_IJ;
@@ -761,17 +761,17 @@ void train::PLDATrainer::enrol(const io::Arrayset& ar)
   size_t n_samples = ar.size();
     
   // Checks for arrayset data type and shape
-  if(ar.getElementType() != Torch::core::array::t_float64) {
-    throw Torch::io::TypeError(ar.getElementType(),
-      Torch::core::array::t_float64);
+  if(ar.getElementType() != bob::core::array::t_float64) {
+    throw bob::io::TypeError(ar.getElementType(),
+      bob::core::array::t_float64);
   }
   if(ar.getNDim() != 1) {
-    throw Torch::io::DimensionError(ar.getNDim(), 1);
+    throw bob::io::DimensionError(ar.getNDim(), 1);
   }
   // TODO: Do a useful comparison against the dimensionality from the base 
   // trainer/machine
   if(ar.getShape()[0] != n_features)
-    throw Torch::trainer::WrongNumberOfFeatures(ar.getShape()[0], 
+    throw bob::trainer::WrongNumberOfFeatures(ar.getShape()[0], 
                                                 n_features, 0);
 
   // Useful values from the base machine
@@ -791,10 +791,10 @@ void train::PLDATrainer::enrol(const io::Arrayset& ar)
   for(size_t i=0; i<n_samples; ++i) {
     m_cache_D_1 =  ar.get<double,1>(i) - mu;
     // a/ weighted sum
-    Torch::math::prod(FtBeta, m_cache_D_1, m_cache_nf_1);
+    bob::math::prod(FtBeta, m_cache_D_1, m_cache_nf_1);
     weighted_sum += m_cache_nf_1;
     // b/ first xi dependent term of the log likelihood
-    Torch::math::prod(beta, m_cache_D_1, m_cache_D_2);
+    bob::math::prod(beta, m_cache_D_1, m_cache_D_2);
     terma += -1 / 2. * blitz::sum(m_cache_D_1 * m_cache_D_2);
   }
   m_plda_machine.setWSumXitBetaXi(terma);

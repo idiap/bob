@@ -24,8 +24,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_IP_ROTATE_H
-#define TORCH5SPRO_IP_ROTATE_H
+#ifndef BOB5SPRO_IP_ROTATE_H
+#define BOB5SPRO_IP_ROTATE_H
 
 #include <blitz/array.h>
 #include "core/array_assert.h"
@@ -34,7 +34,7 @@
 #include "ip/shear.h"
 #include "ip/crop.h"
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libip_api
  * @{
@@ -183,11 +183,11 @@ namespace Torch {
       blitz::Array<double,2>& dst)
     {
       // Check input
-      Torch::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(src);
 
       // Check output
-      Torch::core::array::assertZeroBase(dst);
-      Torch::core::array::assertSameShape(dst, getOutputShape(src,m_angle));
+      bob::core::array::assertZeroBase(dst);
+      bob::core::array::assertSameShape(dst, getOutputShape(src,m_angle));
 
       // Perform the rotation
       blitz::Array<bool,2> src_mask, dst_mask;
@@ -209,15 +209,15 @@ namespace Torch {
       blitz::Array<bool,2>& dst_mask)
     {
       // Check input
-      Torch::core::array::assertZeroBase(src);
-      Torch::core::array::assertZeroBase(src_mask);
-      Torch::core::array::assertSameShape(src, src_mask);
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(src_mask);
+      bob::core::array::assertSameShape(src, src_mask);
 
       // Check output
-      Torch::core::array::assertZeroBase(dst);
-      Torch::core::array::assertZeroBase(dst_mask);
-      Torch::core::array::assertSameShape(dst, dst_mask);
-      Torch::core::array::assertSameShape(dst, getOutputShape(src,m_angle));
+      bob::core::array::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(dst_mask);
+      bob::core::array::assertSameShape(dst, dst_mask);
+      bob::core::array::assertSameShape(dst, getOutputShape(src,m_angle));
 
       // Perform the rotation
       rotateNoCheck<T,true>(src, src_mask, dst, dst_mask);
@@ -237,11 +237,11 @@ namespace Torch {
       blitz::Array<double,3>& dst)
     {
       // Check input
-      Torch::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(src);
 
       // Check output
-      Torch::core::array::assertZeroBase(dst);
-      Torch::core::array::assertSameShape(dst, getOutputShape(src,m_angle));
+      bob::core::array::assertZeroBase(dst);
+      bob::core::array::assertSameShape(dst, getOutputShape(src,m_angle));
 
       // Perform the rotation
       for( int p=0; p<dst.extent(0); ++p) {
@@ -269,11 +269,11 @@ namespace Torch {
     { 
       for( int y=0; y<dst.extent(0); ++y)
         for( int x=0; x<dst.extent(1); ++x)
-          dst(y,x) = Torch::core::cast<double>(src(y,x));
+          dst(y,x) = bob::core::cast<double>(src(y,x));
       if(mask) {
         for( int y=0; y<dst.extent(0); ++y)
           for( int x=0; x<dst.extent(1); ++x)
-            dst_mask(y,x) = Torch::core::cast<double>(src_mask(y,x));
+            dst_mask(y,x) = bob::core::cast<double>(src_mask(y,x));
       }
     }
 
@@ -295,7 +295,7 @@ namespace Torch {
       if(mask) {
         for( int y=0; y<dst.extent(0); ++y)
           for( int x=0; x<dst.extent(1); ++x)
-            dst_mask(y,x) = Torch::core::cast<double>(
+            dst_mask(y,x) = bob::core::cast<double>(
                               src_mask(x, (src.extent(1)-1-y) ));
       }
     }
@@ -314,12 +314,12 @@ namespace Torch {
     { 
       for( int y=0; y<dst.extent(0); ++y)
         for( int x=0; x<dst.extent(1); ++x)
-          dst(y,x) = Torch::core::cast<double>(src( (src.extent(0)-1-y),
+          dst(y,x) = bob::core::cast<double>(src( (src.extent(0)-1-y),
                                               (src.extent(1)-1-x) ));
       if(mask) {
         for( int y=0; y<dst.extent(0); ++y)
           for( int x=0; x<dst.extent(1); ++x)
-            dst_mask(y,x) = Torch::core::cast<double>(
+            dst_mask(y,x) = bob::core::cast<double>(
                               src_mask( (src.extent(0)-1-y), 
                                         (src.extent(1)-1-x) ));
       }
@@ -339,11 +339,11 @@ namespace Torch {
     { 
       for( int y=0; y<dst.extent(0); ++y)
         for( int x=0; x<dst.extent(1); ++x)
-          dst(y,x) = Torch::core::cast<double>(src( (src.extent(0)-1-x), y ));
+          dst(y,x) = bob::core::cast<double>(src( (src.extent(0)-1-x), y ));
       if(mask) {
         for( int y=0; y<dst.extent(0); ++y)
           for( int x=0; x<dst.extent(1); ++x)
-            dst_mask(y,x) = Torch::core::cast<double>(
+            dst_mask(y,x) = bob::core::cast<double>(
                               src_mask( (src.extent(0)-1-x), y ));
       }
     }
@@ -396,7 +396,7 @@ namespace Torch {
             angle_norm);
           break;
         default:
-          throw Torch::ip::UnknownRotatingAlgorithm();
+          throw bob::ip::UnknownRotatingAlgorithm();
       }
     }
 
@@ -624,4 +624,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_IP_ROTATE_H */
+#endif /* BOB5SPRO_IP_ROTATE_H */

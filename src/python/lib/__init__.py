@@ -1,4 +1,4 @@
-"""Torch is a toolkit of biometric utilities for face and speech processing.
+"""A signal processing and machine learning toolkit for biometrics.
 """
 
 # This is a fix to the problem of using templates/static/exceptions/dynamic

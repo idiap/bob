@@ -23,77 +23,77 @@
 //#include "core/array_common.h"
 #include "core/Tensor.h"
 
-namespace Torch {
+namespace bob {
 
 const char *str_TensorTypeName[] = {"char", "short", "int", "long", "float", "double"};
 
 }
 
-void Torch::Tensor::raiseError(std::string msg) const {
+void bob::Tensor::raiseError(std::string msg) const {
   std::cerr << "Error: " << msg << std::endl;
 }
 
-void Torch::Tensor::raiseFatalError(std::string msg) const {
+void bob::Tensor::raiseFatalError(std::string msg) const {
   std::cerr << "Fatal Error: " << msg << std::endl;
   exit(-1);
 }
 
-void Torch::Tensor::setTensor( const Torch::Tensor *src) {
-  Torch::Tensor::Type type = m_datatype;
-  Torch::Tensor::Type src_type = src->getDatatype();
+void bob::Tensor::setTensor( const bob::Tensor *src) {
+  bob::Tensor::Type type = m_datatype;
+  bob::Tensor::Type src_type = src->getDatatype();
   // This seems to be reasonable (force the type to be specified before calling the function)
   if( src_type != type )
   {
-    std::string msg("Torch::Tensor::setTensor() don't know how to set a Tensor from a different type. Try a copy instead.");
+    std::string msg("bob::Tensor::setTensor() don't know how to set a Tensor from a different type. Try a copy instead.");
     raiseError(msg);
     return;
   }
 
   switch(src_type)
   {
-    case Torch::Tensor::Char:
-      const Torch::CharTensor* src_char;
-      Torch::CharTensor* this_char;
-      src_char = dynamic_cast<const Torch::CharTensor*>(src);
-      this_char = dynamic_cast<Torch::CharTensor*>(this);
+    case bob::Tensor::Char:
+      const bob::CharTensor* src_char;
+      bob::CharTensor* this_char;
+      src_char = dynamic_cast<const bob::CharTensor*>(src);
+      this_char = dynamic_cast<bob::CharTensor*>(this);
       this_char->setTensor( src_char);
       break;
-    case Torch::Tensor::Short:
-      const Torch::ShortTensor* src_short;
-      Torch::ShortTensor* this_short;
-      src_short = dynamic_cast<const Torch::ShortTensor*>(src);
-      this_short = dynamic_cast<Torch::ShortTensor*>(this);
+    case bob::Tensor::Short:
+      const bob::ShortTensor* src_short;
+      bob::ShortTensor* this_short;
+      src_short = dynamic_cast<const bob::ShortTensor*>(src);
+      this_short = dynamic_cast<bob::ShortTensor*>(this);
       this_short->setTensor( src_short);
       break;
-    case Torch::Tensor::Int:
-      const Torch::IntTensor* src_int;
-      Torch::IntTensor* this_int;
-      src_int = dynamic_cast<const Torch::IntTensor*>(src);
-      this_int = dynamic_cast<Torch::IntTensor*>(this);
+    case bob::Tensor::Int:
+      const bob::IntTensor* src_int;
+      bob::IntTensor* this_int;
+      src_int = dynamic_cast<const bob::IntTensor*>(src);
+      this_int = dynamic_cast<bob::IntTensor*>(this);
       this_int->setTensor( src_int);
       break;
-    case Torch::Tensor::Long:
-      const Torch::LongTensor* src_long;
-      Torch::LongTensor* this_long;
-      src_long = dynamic_cast<const Torch::LongTensor*>(src);
-      this_long = dynamic_cast<Torch::LongTensor*>(this);
+    case bob::Tensor::Long:
+      const bob::LongTensor* src_long;
+      bob::LongTensor* this_long;
+      src_long = dynamic_cast<const bob::LongTensor*>(src);
+      this_long = dynamic_cast<bob::LongTensor*>(this);
       this_long->setTensor( src_long);
       break;
-    case Torch::Tensor::Float:
-      const Torch::FloatTensor* src_float;
-      Torch::FloatTensor* this_float;
-      src_float = dynamic_cast<const Torch::FloatTensor*>(src);
-      this_float = dynamic_cast<Torch::FloatTensor*>(this);
+    case bob::Tensor::Float:
+      const bob::FloatTensor* src_float;
+      bob::FloatTensor* this_float;
+      src_float = dynamic_cast<const bob::FloatTensor*>(src);
+      this_float = dynamic_cast<bob::FloatTensor*>(this);
       this_float->setTensor( src_float);
       break;
-    case Torch::Tensor::Double:
-      const Torch::DoubleTensor* src_double;
-      Torch::DoubleTensor* this_double;
-      src_double = dynamic_cast<const Torch::DoubleTensor*>(src);
-      this_double = dynamic_cast<Torch::DoubleTensor*>(this);
+    case bob::Tensor::Double:
+      const bob::DoubleTensor* src_double;
+      bob::DoubleTensor* this_double;
+      src_double = dynamic_cast<const bob::DoubleTensor*>(src);
+      this_double = dynamic_cast<bob::DoubleTensor*>(this);
       this_double->setTensor( src_double);
       break;
-    case Torch::Tensor::Undefined:
+    case bob::Tensor::Undefined:
     default:
       std::string msg("Tensor::setTensor() don't know how to set a Tensor from a Undefined/Unknown type.");
       raiseError(msg);
@@ -101,11 +101,11 @@ void Torch::Tensor::setTensor( const Torch::Tensor *src) {
   }
 }
 
-void Torch::Tensor::copy(const Torch::Tensor *src) {
-  Torch::Tensor::Type type = m_datatype;
-  Torch::Tensor::Type src_type = src->getDatatype();
+void bob::Tensor::copy(const bob::Tensor *src) {
+  bob::Tensor::Type type = m_datatype;
+  bob::Tensor::Type src_type = src->getDatatype();
   // This seems to be reasonable (force the type to be specified before calling the function)
-  if( src_type == Torch::Tensor::Undefined || type == Torch::Tensor::Undefined )
+  if( src_type == bob::Tensor::Undefined || type == bob::Tensor::Undefined )
   {
     std::cerr << "Error: Tensor::copy() don't know how to copy from or to an \"Undefined type\" Tensor." << std::endl;
     return;
@@ -113,39 +113,39 @@ void Torch::Tensor::copy(const Torch::Tensor *src) {
 
   switch(src_type)
   {
-    case Torch::Tensor::Char:
-      const Torch::CharTensor* src_char;
-      src_char = dynamic_cast<const Torch::CharTensor*>(src);        
+    case bob::Tensor::Char:
+      const bob::CharTensor* src_char;
+      src_char = dynamic_cast<const bob::CharTensor*>(src);        
       switch(type)
       {
-        case Torch::Tensor::Char:
-          Torch::CharTensor* this_char;
-          this_char = dynamic_cast<Torch::CharTensor*>(this);
+        case bob::Tensor::Char:
+          bob::CharTensor* this_char;
+          this_char = dynamic_cast<bob::CharTensor*>(this);
           this_char->copy( src_char);
           break;
-        case Torch::Tensor::Short:
-          Torch::ShortTensor* this_short;
-          this_short = dynamic_cast<Torch::ShortTensor*>(this);
+        case bob::Tensor::Short:
+          bob::ShortTensor* this_short;
+          this_short = dynamic_cast<bob::ShortTensor*>(this);
           this_short->copy( src_char);
           break;
-        case Torch::Tensor::Int:
-          Torch::IntTensor* this_int;
-          this_int = dynamic_cast<Torch::IntTensor*>(this);
+        case bob::Tensor::Int:
+          bob::IntTensor* this_int;
+          this_int = dynamic_cast<bob::IntTensor*>(this);
           this_int->copy( src_char);
           break;
-        case Torch::Tensor::Long:
-          Torch::LongTensor* this_long;
-          this_long = dynamic_cast<Torch::LongTensor*>(this);
+        case bob::Tensor::Long:
+          bob::LongTensor* this_long;
+          this_long = dynamic_cast<bob::LongTensor*>(this);
           this_long->copy( src_char);
           break;
-        case Torch::Tensor::Float:
-          Torch::FloatTensor* this_float;
-          this_float = dynamic_cast<Torch::FloatTensor*>(this);
+        case bob::Tensor::Float:
+          bob::FloatTensor* this_float;
+          this_float = dynamic_cast<bob::FloatTensor*>(this);
           this_float->copy( src_char);
           break;
-        case Torch::Tensor::Double:
-          Torch::DoubleTensor* this_double;
-          this_double = dynamic_cast<Torch::DoubleTensor*>(this);
+        case bob::Tensor::Double:
+          bob::DoubleTensor* this_double;
+          this_double = dynamic_cast<bob::DoubleTensor*>(this);
           this_double->copy( src_char);
           break;
         default:
@@ -153,631 +153,631 @@ void Torch::Tensor::copy(const Torch::Tensor *src) {
       }
       break;
 
-    case Torch::Tensor::Short:
-      const Torch::ShortTensor* src_short;
-      src_short = dynamic_cast<const Torch::ShortTensor*>(src);
+    case bob::Tensor::Short:
+      const bob::ShortTensor* src_short;
+      src_short = dynamic_cast<const bob::ShortTensor*>(src);
       switch(type)
       {
-        case Torch::Tensor::Char:
-          Torch::CharTensor* this_char;
-          this_char = dynamic_cast<Torch::CharTensor*>(this);
+        case bob::Tensor::Char:
+          bob::CharTensor* this_char;
+          this_char = dynamic_cast<bob::CharTensor*>(this);
           this_char->copy( src_short);
           break;
-        case Torch::Tensor::Short:
-          Torch::ShortTensor* this_short;
-          this_short = dynamic_cast<Torch::ShortTensor*>(this);
+        case bob::Tensor::Short:
+          bob::ShortTensor* this_short;
+          this_short = dynamic_cast<bob::ShortTensor*>(this);
           this_short->copy( src_short);
           break;
-        case Torch::Tensor::Int:
-          Torch::IntTensor* this_int;
-          this_int = dynamic_cast<Torch::IntTensor*>(this);
+        case bob::Tensor::Int:
+          bob::IntTensor* this_int;
+          this_int = dynamic_cast<bob::IntTensor*>(this);
           this_int->copy( src_short);
           break;
-        case Torch::Tensor::Long:
-          Torch::LongTensor* this_long;
-          this_long = dynamic_cast<Torch::LongTensor*>(this);
+        case bob::Tensor::Long:
+          bob::LongTensor* this_long;
+          this_long = dynamic_cast<bob::LongTensor*>(this);
           this_long->copy( src_short);
           break;
-        case Torch::Tensor::Float:
-          Torch::FloatTensor* this_float;
-          this_float = dynamic_cast<Torch::FloatTensor*>(this);
+        case bob::Tensor::Float:
+          bob::FloatTensor* this_float;
+          this_float = dynamic_cast<bob::FloatTensor*>(this);
           this_float->copy( src_short);
           break;
-        case Torch::Tensor::Double:
-          Torch::DoubleTensor* this_double;
-          this_double = dynamic_cast<Torch::DoubleTensor*>(this);
+        case bob::Tensor::Double:
+          bob::DoubleTensor* this_double;
+          this_double = dynamic_cast<bob::DoubleTensor*>(this);
           this_double->copy( src_short);
           break;
         default:
           return;
       }
       break;
-    case Torch::Tensor::Int:
-      const Torch::IntTensor* src_int;
-      src_int = dynamic_cast<const Torch::IntTensor*>(src);
+    case bob::Tensor::Int:
+      const bob::IntTensor* src_int;
+      src_int = dynamic_cast<const bob::IntTensor*>(src);
       switch(type)
       {
-        case Torch::Tensor::Char:
-          Torch::CharTensor* this_char;
-          this_char = dynamic_cast<Torch::CharTensor*>(this);
+        case bob::Tensor::Char:
+          bob::CharTensor* this_char;
+          this_char = dynamic_cast<bob::CharTensor*>(this);
           this_char->copy( src_int);
           break;
-        case Torch::Tensor::Short:
-          Torch::ShortTensor* this_short;
-          this_short = dynamic_cast<Torch::ShortTensor*>(this);
+        case bob::Tensor::Short:
+          bob::ShortTensor* this_short;
+          this_short = dynamic_cast<bob::ShortTensor*>(this);
           this_short->copy( src_int);
           break;
-        case Torch::Tensor::Int:
-          Torch::IntTensor* this_int;
-          this_int = dynamic_cast<Torch::IntTensor*>(this);
+        case bob::Tensor::Int:
+          bob::IntTensor* this_int;
+          this_int = dynamic_cast<bob::IntTensor*>(this);
           this_int->copy( src_int);
           break;
-        case Torch::Tensor::Long:
-          Torch::LongTensor* this_long;
-          this_long = dynamic_cast<Torch::LongTensor*>(this);
+        case bob::Tensor::Long:
+          bob::LongTensor* this_long;
+          this_long = dynamic_cast<bob::LongTensor*>(this);
           this_long->copy( src_int);
           break;
-        case Torch::Tensor::Float:
-          Torch::FloatTensor* this_float;
-          this_float = dynamic_cast<Torch::FloatTensor*>(this);
+        case bob::Tensor::Float:
+          bob::FloatTensor* this_float;
+          this_float = dynamic_cast<bob::FloatTensor*>(this);
           this_float->copy( src_int);
           break;
-        case Torch::Tensor::Double:
-          Torch::DoubleTensor* this_double;
-          this_double = dynamic_cast<Torch::DoubleTensor*>(this);
+        case bob::Tensor::Double:
+          bob::DoubleTensor* this_double;
+          this_double = dynamic_cast<bob::DoubleTensor*>(this);
           this_double->copy( src_int);
           break;
         default:
           return;
       }
       break;
-    case Torch::Tensor::Long:
-      const Torch::LongTensor* src_long;
-      src_long = dynamic_cast<const Torch::LongTensor*>(src);
+    case bob::Tensor::Long:
+      const bob::LongTensor* src_long;
+      src_long = dynamic_cast<const bob::LongTensor*>(src);
       switch(type)
       {
-        case Torch::Tensor::Char:
-          Torch::CharTensor* this_char;
-          this_char = dynamic_cast<Torch::CharTensor*>(this);
+        case bob::Tensor::Char:
+          bob::CharTensor* this_char;
+          this_char = dynamic_cast<bob::CharTensor*>(this);
           this_char->copy( src_long);
           break;
-        case Torch::Tensor::Short:
-          Torch::ShortTensor* this_short;
-          this_short = dynamic_cast<Torch::ShortTensor*>(this);
+        case bob::Tensor::Short:
+          bob::ShortTensor* this_short;
+          this_short = dynamic_cast<bob::ShortTensor*>(this);
           this_short->copy( src_long);
           break;
-        case Torch::Tensor::Int:
-          Torch::IntTensor* this_int;
-          this_int = dynamic_cast<Torch::IntTensor*>(this);
+        case bob::Tensor::Int:
+          bob::IntTensor* this_int;
+          this_int = dynamic_cast<bob::IntTensor*>(this);
           this_int->copy( src_long);
           break;
-        case Torch::Tensor::Long:
-          Torch::LongTensor* this_long;
-          this_long = dynamic_cast<Torch::LongTensor*>(this);
+        case bob::Tensor::Long:
+          bob::LongTensor* this_long;
+          this_long = dynamic_cast<bob::LongTensor*>(this);
           this_long->copy( src_long);
           break;
-        case Torch::Tensor::Float:
-          Torch::FloatTensor* this_float;
-          this_float = dynamic_cast<Torch::FloatTensor*>(this);
+        case bob::Tensor::Float:
+          bob::FloatTensor* this_float;
+          this_float = dynamic_cast<bob::FloatTensor*>(this);
           this_float->copy( src_long);
           break;
-        case Torch::Tensor::Double:
-          Torch::DoubleTensor* this_double;
-          this_double = dynamic_cast<Torch::DoubleTensor*>(this);
+        case bob::Tensor::Double:
+          bob::DoubleTensor* this_double;
+          this_double = dynamic_cast<bob::DoubleTensor*>(this);
           this_double->copy( src_long);
           break;
         default:
           return;
       }
       break;
-    case Torch::Tensor::Float:
-      const Torch::FloatTensor* src_float;
-      src_float = dynamic_cast<const Torch::FloatTensor*>(src);
+    case bob::Tensor::Float:
+      const bob::FloatTensor* src_float;
+      src_float = dynamic_cast<const bob::FloatTensor*>(src);
       switch(type)
       {
-        case Torch::Tensor::Char:
-          Torch::CharTensor* this_char;
-          this_char = dynamic_cast<Torch::CharTensor*>(this);
+        case bob::Tensor::Char:
+          bob::CharTensor* this_char;
+          this_char = dynamic_cast<bob::CharTensor*>(this);
           this_char->copy( src_float);
           break;
-        case Torch::Tensor::Short:
-          Torch::ShortTensor* this_short;
-          this_short = dynamic_cast<Torch::ShortTensor*>(this);
+        case bob::Tensor::Short:
+          bob::ShortTensor* this_short;
+          this_short = dynamic_cast<bob::ShortTensor*>(this);
           this_short->copy( src_float);
           break;
-        case Torch::Tensor::Int:
-          Torch::IntTensor* this_int;
-          this_int = dynamic_cast<Torch::IntTensor*>(this);
+        case bob::Tensor::Int:
+          bob::IntTensor* this_int;
+          this_int = dynamic_cast<bob::IntTensor*>(this);
           this_int->copy( src_float);
           break;
-        case Torch::Tensor::Long:
-          Torch::LongTensor* this_long;
-          this_long = dynamic_cast<Torch::LongTensor*>(this);
+        case bob::Tensor::Long:
+          bob::LongTensor* this_long;
+          this_long = dynamic_cast<bob::LongTensor*>(this);
           this_long->copy( src_float);
           break;
-        case Torch::Tensor::Float:
-          Torch::FloatTensor* this_float;
-          this_float = dynamic_cast<Torch::FloatTensor*>(this);
+        case bob::Tensor::Float:
+          bob::FloatTensor* this_float;
+          this_float = dynamic_cast<bob::FloatTensor*>(this);
           this_float->copy( src_float);
           break;
-        case Torch::Tensor::Double:
-          Torch::DoubleTensor* this_double;
-          this_double = dynamic_cast<Torch::DoubleTensor*>(this);
+        case bob::Tensor::Double:
+          bob::DoubleTensor* this_double;
+          this_double = dynamic_cast<bob::DoubleTensor*>(this);
           this_double->copy( src_float);
           break;
         default:
           return;
       }
       break;
-    case Torch::Tensor::Double:
-      const Torch::DoubleTensor* src_double;
-      src_double = dynamic_cast<const Torch::DoubleTensor*>(src);
+    case bob::Tensor::Double:
+      const bob::DoubleTensor* src_double;
+      src_double = dynamic_cast<const bob::DoubleTensor*>(src);
       switch(type)
       {
-        case Torch::Tensor::Char:
-          Torch::CharTensor* this_char;
-          this_char = dynamic_cast<Torch::CharTensor*>(this);
+        case bob::Tensor::Char:
+          bob::CharTensor* this_char;
+          this_char = dynamic_cast<bob::CharTensor*>(this);
           this_char->copy( src_double);
           break;
-        case Torch::Tensor::Short:
-          Torch::ShortTensor* this_short;
-          this_short = dynamic_cast<Torch::ShortTensor*>(this);
+        case bob::Tensor::Short:
+          bob::ShortTensor* this_short;
+          this_short = dynamic_cast<bob::ShortTensor*>(this);
           this_short->copy( src_double);
           break;
-        case Torch::Tensor::Int:
-          Torch::IntTensor* this_int;
-          this_int = dynamic_cast<Torch::IntTensor*>(this);
+        case bob::Tensor::Int:
+          bob::IntTensor* this_int;
+          this_int = dynamic_cast<bob::IntTensor*>(this);
           this_int->copy( src_double);
           break;
-        case Torch::Tensor::Long:
-          Torch::LongTensor* this_long;
-          this_long = dynamic_cast<Torch::LongTensor*>(this);
+        case bob::Tensor::Long:
+          bob::LongTensor* this_long;
+          this_long = dynamic_cast<bob::LongTensor*>(this);
           this_long->copy( src_double);
           break;
-        case Torch::Tensor::Float:
-          Torch::FloatTensor* this_float;
-          this_float = dynamic_cast<Torch::FloatTensor*>(this);
+        case bob::Tensor::Float:
+          bob::FloatTensor* this_float;
+          this_float = dynamic_cast<bob::FloatTensor*>(this);
           this_float->copy( src_double);
           break;
-        case Torch::Tensor::Double:
-          Torch::DoubleTensor* this_double;
-          this_double = dynamic_cast<Torch::DoubleTensor*>(this);
+        case bob::Tensor::Double:
+          bob::DoubleTensor* this_double;
+          this_double = dynamic_cast<bob::DoubleTensor*>(this);
           this_double->copy( src_double);
           break;
         default:
           return;
       }
       break;
-    case Torch::Tensor::Undefined:
-      std::cerr << "Error: Torch::Tensor::copy() don't know how to set a Torch::Tensor from Undefined type." << std::endl;
+    case bob::Tensor::Undefined:
+      std::cerr << "Error: bob::Tensor::copy() don't know how to set a bob::Tensor from Undefined type." << std::endl;
     default:
       return;
   }
 }
 
-void Torch::Tensor::transpose( const Torch::Tensor *src, int dimension1, int dimension2) {
-  Torch::Tensor::Type type = m_datatype;
-  Torch::Tensor::Type src_type = src->getDatatype();
+void bob::Tensor::transpose( const bob::Tensor *src, int dimension1, int dimension2) {
+  bob::Tensor::Type type = m_datatype;
+  bob::Tensor::Type src_type = src->getDatatype();
   // This seems to be reasonable (force the type to be specified before calling the function)
   if( src_type != type )
   {
-    std::cerr << "Error: Torch::Tensor::transpose() don't know how to set a Torch::Tensor from a different type. Try a copy instead." << std::endl;
+    std::cerr << "Error: bob::Tensor::transpose() don't know how to set a bob::Tensor from a different type. Try a copy instead." << std::endl;
     return;
   }
 
   switch(src_type)
   {
-    case Torch::Tensor::Char:
-      const Torch::CharTensor* src_char;
-      Torch::CharTensor* this_char;
-      src_char = dynamic_cast<const Torch::CharTensor*>(src);
-      this_char = dynamic_cast<Torch::CharTensor*>(this);
+    case bob::Tensor::Char:
+      const bob::CharTensor* src_char;
+      bob::CharTensor* this_char;
+      src_char = dynamic_cast<const bob::CharTensor*>(src);
+      this_char = dynamic_cast<bob::CharTensor*>(this);
       this_char->transpose( src_char, dimension1, dimension2);
       break;
-    case Torch::Tensor::Short:
-      const Torch::ShortTensor* src_short;
-      Torch::ShortTensor* this_short;
-      src_short = dynamic_cast<const Torch::ShortTensor*>(src);
-      this_short = dynamic_cast<Torch::ShortTensor*>(this);
+    case bob::Tensor::Short:
+      const bob::ShortTensor* src_short;
+      bob::ShortTensor* this_short;
+      src_short = dynamic_cast<const bob::ShortTensor*>(src);
+      this_short = dynamic_cast<bob::ShortTensor*>(this);
       this_short->transpose( src_short, dimension1, dimension2);
       break;
-    case Torch::Tensor::Int:
-      const Torch::IntTensor* src_int;
-      Torch::IntTensor* this_int;
-      src_int = dynamic_cast<const Torch::IntTensor*>(src);
-      this_int = dynamic_cast<Torch::IntTensor*>(this);
+    case bob::Tensor::Int:
+      const bob::IntTensor* src_int;
+      bob::IntTensor* this_int;
+      src_int = dynamic_cast<const bob::IntTensor*>(src);
+      this_int = dynamic_cast<bob::IntTensor*>(this);
       this_int->transpose( src_int, dimension1, dimension2);
       break;
-    case Torch::Tensor::Long:
-      const Torch::LongTensor* src_long;
-      Torch::LongTensor* this_long;
-      src_long = dynamic_cast<const Torch::LongTensor*>(src);
-      this_long = dynamic_cast<Torch::LongTensor*>(this);
+    case bob::Tensor::Long:
+      const bob::LongTensor* src_long;
+      bob::LongTensor* this_long;
+      src_long = dynamic_cast<const bob::LongTensor*>(src);
+      this_long = dynamic_cast<bob::LongTensor*>(this);
       this_long->transpose( src_long, dimension1, dimension2);
       break;
-    case Torch::Tensor::Float:
-      const Torch::FloatTensor* src_float;
-      Torch::FloatTensor* this_float;
-      src_float = dynamic_cast<const Torch::FloatTensor*>(src);
-      this_float = dynamic_cast<Torch::FloatTensor*>(this);
+    case bob::Tensor::Float:
+      const bob::FloatTensor* src_float;
+      bob::FloatTensor* this_float;
+      src_float = dynamic_cast<const bob::FloatTensor*>(src);
+      this_float = dynamic_cast<bob::FloatTensor*>(this);
       this_float->transpose( src_float, dimension1, dimension2);
       break;
-    case Torch::Tensor::Double:
-      const Torch::DoubleTensor* src_double;
-      Torch::DoubleTensor* this_double;
-      src_double = dynamic_cast<const Torch::DoubleTensor*>(src);
-      this_double = dynamic_cast<Torch::DoubleTensor*>(this);
+    case bob::Tensor::Double:
+      const bob::DoubleTensor* src_double;
+      bob::DoubleTensor* this_double;
+      src_double = dynamic_cast<const bob::DoubleTensor*>(src);
+      this_double = dynamic_cast<bob::DoubleTensor*>(this);
       this_double->transpose( src_double, dimension1, dimension2);
       break;
-    case Torch::Tensor::Undefined:
-      std::cerr << "Error: Torch::Tensor::transpose() don't know how to set a Torch::Tensor from Undefined type." << std::endl;
+    case bob::Tensor::Undefined:
+      std::cerr << "Error: bob::Tensor::transpose() don't know how to set a bob::Tensor from Undefined type." << std::endl;
     default:
       return;
   }
 }
 
-void Torch::Tensor::narrow (const Torch::Tensor *src, int dimension, long firstIndex,
+void bob::Tensor::narrow (const bob::Tensor *src, int dimension, long firstIndex,
     long size) {
-  Torch::Tensor::Type type = m_datatype;
-  Torch::Tensor::Type src_type = src->getDatatype();
+  bob::Tensor::Type type = m_datatype;
+  bob::Tensor::Type src_type = src->getDatatype();
   // This seems to be reasonable (force the type to be specified before calling the function)
   if( src_type != type )
   {
-    std::cerr << "Error: Torch::Tensor::narrow() don't know how to set a Torch::Tensor from a different type. Try a copy instead." << std::endl;
+    std::cerr << "Error: bob::Tensor::narrow() don't know how to set a bob::Tensor from a different type. Try a copy instead." << std::endl;
     return;
   }
 
   switch(src_type)
   {
-    case Torch::Tensor::Char:
-      const Torch::CharTensor* src_char;
-      Torch::CharTensor* this_char;
-      src_char = dynamic_cast<const Torch::CharTensor*>(src);
-      this_char = dynamic_cast<Torch::CharTensor*>(this);
+    case bob::Tensor::Char:
+      const bob::CharTensor* src_char;
+      bob::CharTensor* this_char;
+      src_char = dynamic_cast<const bob::CharTensor*>(src);
+      this_char = dynamic_cast<bob::CharTensor*>(this);
       this_char->narrow( src_char, dimension, firstIndex, size);
       break;
-    case Torch::Tensor::Short:
-      const Torch::ShortTensor* src_short;
-      Torch::ShortTensor* this_short;
-      src_short = dynamic_cast<const Torch::ShortTensor*>(src);
-      this_short = dynamic_cast<Torch::ShortTensor*>(this);
+    case bob::Tensor::Short:
+      const bob::ShortTensor* src_short;
+      bob::ShortTensor* this_short;
+      src_short = dynamic_cast<const bob::ShortTensor*>(src);
+      this_short = dynamic_cast<bob::ShortTensor*>(this);
       this_short->narrow( src_short, dimension, firstIndex, size);
       break;
-    case Torch::Tensor::Int:
-      const Torch::IntTensor* src_int;
-      Torch::IntTensor* this_int;
-      src_int = dynamic_cast<const Torch::IntTensor*>(src);
-      this_int = dynamic_cast<Torch::IntTensor*>(this);
+    case bob::Tensor::Int:
+      const bob::IntTensor* src_int;
+      bob::IntTensor* this_int;
+      src_int = dynamic_cast<const bob::IntTensor*>(src);
+      this_int = dynamic_cast<bob::IntTensor*>(this);
       this_int->narrow( src_int, dimension, firstIndex, size);
       break;
-    case Torch::Tensor::Long:
-      const Torch::LongTensor* src_long;
-      Torch::LongTensor* this_long;
-      src_long = dynamic_cast<const Torch::LongTensor*>(src);
-      this_long = dynamic_cast<Torch::LongTensor*>(this);
+    case bob::Tensor::Long:
+      const bob::LongTensor* src_long;
+      bob::LongTensor* this_long;
+      src_long = dynamic_cast<const bob::LongTensor*>(src);
+      this_long = dynamic_cast<bob::LongTensor*>(this);
       this_long->narrow( src_long, dimension, firstIndex, size);
       break;
-    case Torch::Tensor::Float:
-      const Torch::FloatTensor* src_float;
-      Torch::FloatTensor* this_float;
-      src_float = dynamic_cast<const Torch::FloatTensor*>(src);
-      this_float = dynamic_cast<Torch::FloatTensor*>(this);
+    case bob::Tensor::Float:
+      const bob::FloatTensor* src_float;
+      bob::FloatTensor* this_float;
+      src_float = dynamic_cast<const bob::FloatTensor*>(src);
+      this_float = dynamic_cast<bob::FloatTensor*>(this);
       this_float->narrow( src_float, dimension, firstIndex, size);
       break;
-    case Torch::Tensor::Double:
-      const Torch::DoubleTensor* src_double;
-      Torch::DoubleTensor* this_double;
-      src_double = dynamic_cast<const Torch::DoubleTensor*>(src);
-      this_double = dynamic_cast<Torch::DoubleTensor*>(this);
+    case bob::Tensor::Double:
+      const bob::DoubleTensor* src_double;
+      bob::DoubleTensor* this_double;
+      src_double = dynamic_cast<const bob::DoubleTensor*>(src);
+      this_double = dynamic_cast<bob::DoubleTensor*>(this);
       this_double->narrow( src_double, dimension, firstIndex, size);
       break;
-    case Torch::Tensor::Undefined:
-      std::cerr << "Error: Torch::Tensor::narrow() don't know how to set a Torch::Tensor from Undefined type." << std::endl;
+    case bob::Tensor::Undefined:
+      std::cerr << "Error: bob::Tensor::narrow() don't know how to set a bob::Tensor from Undefined type." << std::endl;
     default:
       return;
   }
 }
 
-void Torch::Tensor::select( const Torch::Tensor* src, int dimension, long sliceIndex) {
-  Torch::Tensor::Type type = m_datatype;
-  Torch::Tensor::Type src_type = src->getDatatype();
+void bob::Tensor::select( const bob::Tensor* src, int dimension, long sliceIndex) {
+  bob::Tensor::Type type = m_datatype;
+  bob::Tensor::Type src_type = src->getDatatype();
   // This seems to be reasonable (force the type to be specified before calling the function)
   if( src_type != type )
   {
-    std::cerr << "Error: Torch::Tensor::select() don't know how to set a Torch::Tensor from a different type. Try a copy instead." << std::endl;
+    std::cerr << "Error: bob::Tensor::select() don't know how to set a bob::Tensor from a different type. Try a copy instead." << std::endl;
     return;
   }
 
   switch(src_type)
   {
-    case Torch::Tensor::Char:
-      const Torch::CharTensor* src_char;
-      Torch::CharTensor* this_char;
-      src_char = dynamic_cast<const Torch::CharTensor*>(src);
-      this_char = dynamic_cast<Torch::CharTensor*>(this);
+    case bob::Tensor::Char:
+      const bob::CharTensor* src_char;
+      bob::CharTensor* this_char;
+      src_char = dynamic_cast<const bob::CharTensor*>(src);
+      this_char = dynamic_cast<bob::CharTensor*>(this);
       this_char->select( src_char, dimension, sliceIndex);
       break;
-    case Torch::Tensor::Short:
-      const Torch::ShortTensor* src_short;
-      Torch::ShortTensor* this_short;
-      src_short = dynamic_cast<const Torch::ShortTensor*>(src);
-      this_short = dynamic_cast<Torch::ShortTensor*>(this);
+    case bob::Tensor::Short:
+      const bob::ShortTensor* src_short;
+      bob::ShortTensor* this_short;
+      src_short = dynamic_cast<const bob::ShortTensor*>(src);
+      this_short = dynamic_cast<bob::ShortTensor*>(this);
       this_short->select( src_short, dimension, sliceIndex);
       break;
-    case Torch::Tensor::Int:
-      const Torch::IntTensor* src_int;
-      Torch::IntTensor* this_int;
-      src_int = dynamic_cast<const Torch::IntTensor*>(src);
-      this_int = dynamic_cast<Torch::IntTensor*>(this);
+    case bob::Tensor::Int:
+      const bob::IntTensor* src_int;
+      bob::IntTensor* this_int;
+      src_int = dynamic_cast<const bob::IntTensor*>(src);
+      this_int = dynamic_cast<bob::IntTensor*>(this);
       this_int->select( src_int, dimension, sliceIndex);
       break;
-    case Torch::Tensor::Long:
-      const Torch::LongTensor* src_long;
-      Torch::LongTensor* this_long;
-      src_long = dynamic_cast<const Torch::LongTensor*>(src);
-      this_long = dynamic_cast<Torch::LongTensor*>(this);
+    case bob::Tensor::Long:
+      const bob::LongTensor* src_long;
+      bob::LongTensor* this_long;
+      src_long = dynamic_cast<const bob::LongTensor*>(src);
+      this_long = dynamic_cast<bob::LongTensor*>(this);
       this_long->select( src_long, dimension, sliceIndex);
       break;
-    case Torch::Tensor::Float:
-      const Torch::FloatTensor* src_float;
-      Torch::FloatTensor* this_float;
-      src_float = dynamic_cast<const Torch::FloatTensor*>(src);
-      this_float = dynamic_cast<Torch::FloatTensor*>(this);
+    case bob::Tensor::Float:
+      const bob::FloatTensor* src_float;
+      bob::FloatTensor* this_float;
+      src_float = dynamic_cast<const bob::FloatTensor*>(src);
+      this_float = dynamic_cast<bob::FloatTensor*>(this);
       this_float->select( src_float, dimension, sliceIndex);
       break;
-    case Torch::Tensor::Double:
-      const Torch::DoubleTensor* src_double;
-      Torch::DoubleTensor* this_double;
-      src_double = dynamic_cast<const Torch::DoubleTensor*>(src);
-      this_double = dynamic_cast<Torch::DoubleTensor*>(this);
+    case bob::Tensor::Double:
+      const bob::DoubleTensor* src_double;
+      bob::DoubleTensor* this_double;
+      src_double = dynamic_cast<const bob::DoubleTensor*>(src);
+      this_double = dynamic_cast<bob::DoubleTensor*>(this);
       this_double->select( src_double, dimension, sliceIndex);
       break;
-    case Torch::Tensor::Undefined:
-      std::cerr << "Error: Torch::Tensor::select() don't know how to set a Torch::Tensor from Undefined type." << std::endl;
+    case bob::Tensor::Undefined:
+      std::cerr << "Error: bob::Tensor::select() don't know how to set a bob::Tensor from Undefined type." << std::endl;
     default:
       return;
   }
 }
 
-Torch::Tensor* Torch::Tensor::select( int dimension, long sliceIndex) const {
-  Torch::Tensor* res = 0;
-  Torch::Tensor::Type type = m_datatype;
+bob::Tensor* bob::Tensor::select( int dimension, long sliceIndex) const {
+  bob::Tensor* res = 0;
+  bob::Tensor::Type type = m_datatype;
 
   switch(type)
   {
-    case Torch::Tensor::Char:
-      const Torch::CharTensor* this_char;
-      this_char = dynamic_cast<const Torch::CharTensor*>(this);
+    case bob::Tensor::Char:
+      const bob::CharTensor* this_char;
+      this_char = dynamic_cast<const bob::CharTensor*>(this);
       res = this_char->select( dimension, sliceIndex);
       break;
-    case Torch::Tensor::Short:
-      const Torch::ShortTensor* this_short;
-      this_short = dynamic_cast<const Torch::ShortTensor*>(this);
+    case bob::Tensor::Short:
+      const bob::ShortTensor* this_short;
+      this_short = dynamic_cast<const bob::ShortTensor*>(this);
       res = this_short->select( dimension, sliceIndex);
       break;
-    case Torch::Tensor::Int:
-      const Torch::IntTensor* this_int;
-      this_int = dynamic_cast<const Torch::IntTensor*>(this);
+    case bob::Tensor::Int:
+      const bob::IntTensor* this_int;
+      this_int = dynamic_cast<const bob::IntTensor*>(this);
       res = this_int->select( dimension, sliceIndex);
       break;
-    case Torch::Tensor::Long:
-      const Torch::LongTensor* this_long;
-      this_long = dynamic_cast<const Torch::LongTensor*>(this);
+    case bob::Tensor::Long:
+      const bob::LongTensor* this_long;
+      this_long = dynamic_cast<const bob::LongTensor*>(this);
       res = this_long->select( dimension, sliceIndex);
       break;
-    case Torch::Tensor::Float:
-      const Torch::FloatTensor* this_float;
-      this_float = dynamic_cast<const Torch::FloatTensor*>(this);
+    case bob::Tensor::Float:
+      const bob::FloatTensor* this_float;
+      this_float = dynamic_cast<const bob::FloatTensor*>(this);
       res = this_float->select( dimension, sliceIndex);
       break;
-    case Torch::Tensor::Double:
-      const Torch::DoubleTensor* this_double;
-      this_double = dynamic_cast<const Torch::DoubleTensor*>(this);
+    case bob::Tensor::Double:
+      const bob::DoubleTensor* this_double;
+      this_double = dynamic_cast<const bob::DoubleTensor*>(this);
       res = this_double->select( dimension, sliceIndex);
       break;
-    case Torch::Tensor::Undefined:
-      std::cerr << "Error: Torch::Tensor::select() don't know how to set a Torch::Tensor from Undefined type." << std::endl;
+    case bob::Tensor::Undefined:
+      std::cerr << "Error: bob::Tensor::select() don't know how to set a bob::Tensor from Undefined type." << std::endl;
     default:
       break;
   }
   return res;
 }
 
-int Torch::Tensor::typeSize() const {
+int bob::Tensor::typeSize() const {
   int res = 0;
-  Torch::Tensor::Type type = m_datatype;
+  bob::Tensor::Type type = m_datatype;
 
   switch(type)
   {
-    case Torch::Tensor::Char:
+    case bob::Tensor::Char:
       res = sizeof(char);
       break;
-    case Torch::Tensor::Short:
+    case bob::Tensor::Short:
       res = sizeof(short);
       break;
-    case Torch::Tensor::Int:
+    case bob::Tensor::Int:
       res = sizeof(int);
       break;
-    case Torch::Tensor::Long:
+    case bob::Tensor::Long:
       res = sizeof(long);
       break;
-    case Torch::Tensor::Float:
+    case bob::Tensor::Float:
       res = sizeof(float);
       break;
-    case Torch::Tensor::Double:
+    case bob::Tensor::Double:
       res = sizeof(double);
       break;
-    case Torch::Tensor::Undefined:
+    case bob::Tensor::Undefined:
     default:
       break;
   }
   return res;
 }
 
-const void* Torch::Tensor::dataR() const {
+const void* bob::Tensor::dataR() const {
   const void* res = 0;
-  Torch::Tensor::Type type = m_datatype;
+  bob::Tensor::Type type = m_datatype;
 
   switch(type)
   {
-    case Torch::Tensor::Char:
-      const Torch::CharTensor* this_char;
-      this_char = dynamic_cast<const Torch::CharTensor*>(this);
+    case bob::Tensor::Char:
+      const bob::CharTensor* this_char;
+      this_char = dynamic_cast<const bob::CharTensor*>(this);
       res = this_char->dataR();
       break;
-    case Torch::Tensor::Short:
-      const Torch::ShortTensor* this_short;
-      this_short = dynamic_cast<const Torch::ShortTensor*>(this);
+    case bob::Tensor::Short:
+      const bob::ShortTensor* this_short;
+      this_short = dynamic_cast<const bob::ShortTensor*>(this);
       res = this_short->dataR();
       break;
-    case Torch::Tensor::Int:
-      const Torch::IntTensor* this_int;
-      this_int = dynamic_cast<const Torch::IntTensor*>(this);
+    case bob::Tensor::Int:
+      const bob::IntTensor* this_int;
+      this_int = dynamic_cast<const bob::IntTensor*>(this);
       res = this_int->dataR();
       break;
-    case Torch::Tensor::Long:
-      const Torch::LongTensor* this_long;
-      this_long = dynamic_cast<const Torch::LongTensor*>(this);
+    case bob::Tensor::Long:
+      const bob::LongTensor* this_long;
+      this_long = dynamic_cast<const bob::LongTensor*>(this);
       res = this_long->dataR();
       break;
-    case Torch::Tensor::Float:
-      const Torch::FloatTensor* this_float;
-      this_float = dynamic_cast<const Torch::FloatTensor*>(this);
+    case bob::Tensor::Float:
+      const bob::FloatTensor* this_float;
+      this_float = dynamic_cast<const bob::FloatTensor*>(this);
       res = this_float->dataR();
       break;
-    case Torch::Tensor::Double:
-      const Torch::DoubleTensor* this_double;
-      this_double = dynamic_cast<const Torch::DoubleTensor*>(this);
+    case bob::Tensor::Double:
+      const bob::DoubleTensor* this_double;
+      this_double = dynamic_cast<const bob::DoubleTensor*>(this);
       res = this_double->dataR();
       break;
-    case Torch::Tensor::Undefined:
+    case bob::Tensor::Undefined:
     default:
       break;
   }
   return res;
 }
 
-void* Torch::Tensor::dataW() {
+void* bob::Tensor::dataW() {
   void* res = 0;
-  Torch::Tensor::Type type = m_datatype;
+  bob::Tensor::Type type = m_datatype;
 
   switch(type)
   {
-    case Torch::Tensor::Char:
-      Torch::CharTensor* this_char;
-      this_char = dynamic_cast<Torch::CharTensor*>(this);
+    case bob::Tensor::Char:
+      bob::CharTensor* this_char;
+      this_char = dynamic_cast<bob::CharTensor*>(this);
       res = this_char->dataW();
       break;
-    case Torch::Tensor::Short:
-      Torch::ShortTensor* this_short;
-      this_short = dynamic_cast<Torch::ShortTensor*>(this);
+    case bob::Tensor::Short:
+      bob::ShortTensor* this_short;
+      this_short = dynamic_cast<bob::ShortTensor*>(this);
       res = this_short->dataW();
       break;
-    case Torch::Tensor::Int:
-      Torch::IntTensor* this_int;
-      this_int = dynamic_cast<Torch::IntTensor*>(this);
+    case bob::Tensor::Int:
+      bob::IntTensor* this_int;
+      this_int = dynamic_cast<bob::IntTensor*>(this);
       res = this_int->dataW();
       break;
-    case Torch::Tensor::Long:
-      Torch::LongTensor* this_long;
-      this_long = dynamic_cast<Torch::LongTensor*>(this);
+    case bob::Tensor::Long:
+      bob::LongTensor* this_long;
+      this_long = dynamic_cast<bob::LongTensor*>(this);
       res = this_long->dataW();
       break;
-    case Torch::Tensor::Float:
-      Torch::FloatTensor* this_float;
-      this_float = dynamic_cast<Torch::FloatTensor*>(this);
+    case bob::Tensor::Float:
+      bob::FloatTensor* this_float;
+      this_float = dynamic_cast<bob::FloatTensor*>(this);
       res = this_float->dataW();
       break;
-    case Torch::Tensor::Double:
-      Torch::DoubleTensor* this_double;
-      this_double = dynamic_cast<Torch::DoubleTensor*>(this);
+    case bob::Tensor::Double:
+      bob::DoubleTensor* this_double;
+      this_double = dynamic_cast<bob::DoubleTensor*>(this);
       res = this_double->dataW();
       break;
-    case Torch::Tensor::Undefined:
+    case bob::Tensor::Undefined:
     default:
       break;
   }
   return res;
 }
 
-void Torch::Tensor::resetFromData() {
-  Torch::Tensor::Type type = m_datatype;
+void bob::Tensor::resetFromData() {
+  bob::Tensor::Type type = m_datatype;
 
   switch(type)
   {
-    case Torch::Tensor::Char:
-      Torch::CharTensor* this_char;
-      this_char = dynamic_cast<Torch::CharTensor*>(this);
+    case bob::Tensor::Char:
+      bob::CharTensor* this_char;
+      this_char = dynamic_cast<bob::CharTensor*>(this);
       this_char->resetFromData();
       break;
-    case Torch::Tensor::Short:
-      Torch::ShortTensor* this_short;
-      this_short = dynamic_cast<Torch::ShortTensor*>(this);
+    case bob::Tensor::Short:
+      bob::ShortTensor* this_short;
+      this_short = dynamic_cast<bob::ShortTensor*>(this);
       this_short->resetFromData();
       break;
-    case Torch::Tensor::Int:
-      Torch::IntTensor* this_int;
-      this_int = dynamic_cast<Torch::IntTensor*>(this);
+    case bob::Tensor::Int:
+      bob::IntTensor* this_int;
+      this_int = dynamic_cast<bob::IntTensor*>(this);
       this_int->resetFromData();
       break;
-    case Torch::Tensor::Long:
-      Torch::LongTensor* this_long;
-      this_long = dynamic_cast<Torch::LongTensor*>(this);
+    case bob::Tensor::Long:
+      bob::LongTensor* this_long;
+      this_long = dynamic_cast<bob::LongTensor*>(this);
       this_long->resetFromData();
       break;
-    case Torch::Tensor::Float:
-      Torch::FloatTensor* this_float;
-      this_float = dynamic_cast<Torch::FloatTensor*>(this);
+    case bob::Tensor::Float:
+      bob::FloatTensor* this_float;
+      this_float = dynamic_cast<bob::FloatTensor*>(this);
       this_float->resetFromData();
       break;
-    case Torch::Tensor::Double:
-      Torch::DoubleTensor* this_double;
-      this_double = dynamic_cast<Torch::DoubleTensor*>(this);
+    case bob::Tensor::Double:
+      bob::DoubleTensor* this_double;
+      this_double = dynamic_cast<bob::DoubleTensor*>(this);
       this_double->resetFromData();
       break;
-    case Torch::Tensor::Undefined:
+    case bob::Tensor::Undefined:
     default:
       break;
   }
 }
 
-long Torch::Tensor::stride(int dim) const {
+long bob::Tensor::stride(int dim) const {
   long res = 0;
-  Torch::Tensor::Type type = m_datatype;
+  bob::Tensor::Type type = m_datatype;
 
   switch(type)
   {
-    case Torch::Tensor::Char:
-      const Torch::CharTensor* this_char;
-      this_char = dynamic_cast<const Torch::CharTensor*>(this);
+    case bob::Tensor::Char:
+      const bob::CharTensor* this_char;
+      this_char = dynamic_cast<const bob::CharTensor*>(this);
       res = this_char->stride(dim);
       break;
-    case Torch::Tensor::Short:
-      const Torch::ShortTensor* this_short;
-      this_short = dynamic_cast<const Torch::ShortTensor*>(this);
+    case bob::Tensor::Short:
+      const bob::ShortTensor* this_short;
+      this_short = dynamic_cast<const bob::ShortTensor*>(this);
       res = this_short->stride(dim);
       break;
-    case Torch::Tensor::Int:
-      const Torch::IntTensor* this_int;
-      this_int = dynamic_cast<const Torch::IntTensor*>(this);
+    case bob::Tensor::Int:
+      const bob::IntTensor* this_int;
+      this_int = dynamic_cast<const bob::IntTensor*>(this);
       res = this_int->stride(dim);
       break;
-    case Torch::Tensor::Long:
-      const Torch::LongTensor* this_long;
-      this_long = dynamic_cast<const Torch::LongTensor*>(this);
+    case bob::Tensor::Long:
+      const bob::LongTensor* this_long;
+      this_long = dynamic_cast<const bob::LongTensor*>(this);
       res = this_long->stride(dim);
       break;
-    case Torch::Tensor::Float:
-      const Torch::FloatTensor* this_float;
-      this_float = dynamic_cast<const Torch::FloatTensor*>(this);
+    case bob::Tensor::Float:
+      const bob::FloatTensor* this_float;
+      this_float = dynamic_cast<const bob::FloatTensor*>(this);
       res = this_float->stride(dim);
       break;
-    case Torch::Tensor::Double:
-      const Torch::DoubleTensor* this_double;
-      this_double = dynamic_cast<const Torch::DoubleTensor*>(this);
+    case bob::Tensor::Double:
+      const bob::DoubleTensor* this_double;
+      this_double = dynamic_cast<const bob::DoubleTensor*>(this);
       res = this_double->stride(dim);
       break;
-    case Torch::Tensor::Undefined:
+    case bob::Tensor::Undefined:
     default:
       break;
   }

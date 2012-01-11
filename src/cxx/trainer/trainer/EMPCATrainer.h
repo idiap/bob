@@ -6,15 +6,15 @@
  * Expectation Maximization.
  */
 
-#ifndef TORCH5SPRO_TRAINER_EMPCA_TRAINER_H
-#define TORCH5SPRO_TRAINER_EMPCA_TRAINER_H
+#ifndef BOB5SPRO_TRAINER_EMPCA_TRAINER_H
+#define BOB5SPRO_TRAINER_EMPCA_TRAINER_H
 
 #include <blitz/array.h>
 #include "trainer/EMTrainerNew.h"
 #include "machine/LinearMachine.h"
 #include "io/Arrayset.h"
 
-namespace Torch { namespace trainer {
+namespace bob { namespace trainer {
   
   /**
     * Sets a linear machine to perform Expectation Maximization on a
@@ -32,8 +32,8 @@ namespace Torch { namespace trainer {
     *  - epsilon is the noise of the data (dimension f)
     *      Gaussian with zero-mean and covariance matrix sigma^2 * Id
     */
-  class EMPCATrainer: public EMTrainerNew<Torch::machine::LinearMachine, 
-                                          Torch::io::Arrayset> 
+  class EMPCATrainer: public EMTrainerNew<bob::machine::LinearMachine, 
+                                          bob::io::Arrayset> 
   {
     public: //api
       /**
@@ -62,14 +62,14 @@ namespace Torch { namespace trainer {
       /**
         * This methods performs some initialization before the E- and M-steps.
         */
-      virtual void initialization(Torch::machine::LinearMachine& machine, 
-        const Torch::io::Arrayset& ar);
+      virtual void initialization(bob::machine::LinearMachine& machine, 
+        const bob::io::Arrayset& ar);
       /**
         * This methods performs some actions after the end of the E- and 
         * M-steps.
         */
-      virtual void finalization(Torch::machine::LinearMachine& machine, 
-        const Torch::io::Arrayset& ar);
+      virtual void finalization(bob::machine::LinearMachine& machine, 
+        const bob::io::Arrayset& ar);
       
       /**
         * Calculates and saves statistics across the dataset, and saves these 
@@ -77,21 +77,21 @@ namespace Torch { namespace trainer {
         * 
         * The statistics will be used in the mStep() that follows.
         */
-      virtual void eStep(Torch::machine::LinearMachine& machine, 
-        const Torch::io::Arrayset& ar);
+      virtual void eStep(bob::machine::LinearMachine& machine, 
+        const bob::io::Arrayset& ar);
 
       /**
         * Performs a maximization step to update the parameters of the 
         */
-      virtual void mStep(Torch::machine::LinearMachine& machine,
-         const Torch::io::Arrayset& ar);
+      virtual void mStep(bob::machine::LinearMachine& machine,
+         const bob::io::Arrayset& ar);
 
       /**
         * Computes the average log likelihood using the current estimates of 
         * the latent variables. 
         */
-      virtual double computeLikelihood(Torch::machine::LinearMachine& machine,
-         const Torch::io::Arrayset& ar);
+      virtual double computeLikelihood(bob::machine::LinearMachine& machine,
+         const bob::io::Arrayset& ar);
 
       /**
         * Sets the seed used to generate pseudo-random numbers 
@@ -144,18 +144,18 @@ namespace Torch { namespace trainer {
       /**
         * Computes the mean and the variance (if required) of the training data
         */
-      void computeMeanVariance(Torch::machine::LinearMachine& machine, 
+      void computeMeanVariance(bob::machine::LinearMachine& machine, 
         const io::Arrayset& ar);
       /**
         * Random initialization of W and sigma2
         * W is the projection matrix (from the LinearMachine)
         */
-      void initRandomWSigma2(Torch::machine::LinearMachine& machine);
+      void initRandomWSigma2(bob::machine::LinearMachine& machine);
       /**
         * Computes the product W^T.W
         * W is the projection matrix (from the LinearMachine)
         */
-      void computeWtW(Torch::machine::LinearMachine& machine);
+      void computeWtW(bob::machine::LinearMachine& machine);
       /**
         * Computes the inverse of M matrix, where M = W^T.W + sigma2.Id
         * W is the projection matrix (from the LinearMachine)
@@ -165,16 +165,16 @@ namespace Torch { namespace trainer {
         * M-Step (part 1): Computes the new estimate of W using the new 
         * estimated statistics
         */
-      void updateW(Torch::machine::LinearMachine& machine,
-         const Torch::io::Arrayset& ar);
+      void updateW(bob::machine::LinearMachine& machine,
+         const bob::io::Arrayset& ar);
       /**
         * M-Step (part 2): Computes the new estimate of sigma2 using the new 
         * estimated statistics
         */
-      void updateSigma2(Torch::machine::LinearMachine& machine,
-         const Torch::io::Arrayset& ar);
+      void updateSigma2(bob::machine::LinearMachine& machine,
+         const bob::io::Arrayset& ar);
   };
 
 }}
 
-#endif /* TORCH5SPRO_TRAINER_EMPCA_TRAINER_H */
+#endif /* BOB5SPRO_TRAINER_EMPCA_TRAINER_H */

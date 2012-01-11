@@ -8,7 +8,7 @@
 
 import os, sys
 import unittest
-import torch
+import bob
 import numpy
 
 A_org    = numpy.array(range(1,17), 'float64').reshape((4,4))
@@ -21,21 +21,21 @@ class FilterNewTest(unittest.TestCase):
   def test01_zigzag(self):
 
     B = numpy.array((0, 0, 0), 'float64')
-    torch.ip.zigzag(A_org, B, 3)
+    bob.ip.zigzag(A_org, B, 3)
 
     self.assertEqual( (B == A_ans_3).all(), True)
     
   def test02_zigzag(self):
 
     B = numpy.array((0, 0, 0, 0, 0, 0), 'float64')
-    torch.ip.zigzag(A_org, B, 6)
+    bob.ip.zigzag(A_org, B, 6)
 
     self.assertEqual( (B == A_ans_6).all(), True)
 
   def test03_zigzag(self):
 
     B = numpy.array((0, 0, 0, 0, 0, 0, 0, 0, 0, 0), 'float64')
-    torch.ip.zigzag(A_org, B, 10)
+    bob.ip.zigzag(A_org, B, 10)
 
     self.assertEqual( (B == A_ans_10).all(), True)
 

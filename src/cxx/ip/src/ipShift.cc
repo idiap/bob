@@ -20,7 +20,7 @@
 #include "ip/ipShift.h"
 #include "core/Tensor.h"
 
-namespace Torch {
+namespace bob {
 
 /////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -44,7 +44,7 @@ ipShift::~ipShift()
 
 bool ipShift::checkInput(const Tensor& input) const
 {
-	// Accept only 3D tensors of Torch::Image type
+	// Accept only 3D tensors of bob::Image type
 	if (	input.nDimension() != 3 ||
 		input.getDatatype() != Tensor::Short)
 	{

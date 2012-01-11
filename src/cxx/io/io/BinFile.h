@@ -20,15 +20,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IO_BINFILE_H
-#define TORCH_IO_BINFILE_H
+#ifndef BOB_IO_BINFILE_H
+#define BOB_IO_BINFILE_H
 
 #include "core/cast.h"
 #include "core/array.h"
 #include "io/BinFileHeader.h"
 #include "io/Exception.h"
 
-namespace Torch { namespace io {
+namespace bob { namespace io {
 
   /**
    * Defines the flags that might be used when loading/storing a file
@@ -86,21 +86,21 @@ namespace Torch { namespace io {
        * @warning: Please convert your files to HDF5, this format is
        * deprecated starting on 16.04.2011 - AA
        */
-      void write(const Torch::core::array::interface& a);
+      void write(const bob::core::array::interface& a);
 
       /**
        * Loads a single array from the file. Checks if the array has the
        * necessary space, otherwise re-allocates it. 
        */
-      void read(Torch::core::array::interface& a);
-      void read(size_t index, Torch::core::array::interface& a);
+      void read(bob::core::array::interface& a);
+      void read(size_t index, bob::core::array::interface& a);
 
       /**
        * Gets the Element type
        *
        * @warning An exception is thrown if nothing was written so far
        */
-      inline Torch::core::array::ElementType getElementType() const { 
+      inline bob::core::array::ElementType getElementType() const { 
         headerInitialized(); 
         return m_header.m_elem_type; 
       }
@@ -168,7 +168,7 @@ namespace Torch { namespace io {
       /**
        * Initializes the binary file with the given type and shape.
        */
-      inline void initBinaryFile(Torch::core::array::ElementType type,
+      inline void initBinaryFile(bob::core::array::ElementType type,
           size_t ndim, const size_t* shape) {
         initHeader(type, ndim, shape);
       }
@@ -194,7 +194,7 @@ namespace Torch { namespace io {
        * Initializes the header of the (output) stream with the given type
        * and shape
        */
-      void initHeader(Torch::core::array::ElementType type, size_t ndim,
+      void initHeader(bob::core::array::ElementType type, size_t ndim,
           const size_t* shape);
 
     private: //representation
@@ -237,4 +237,4 @@ namespace Torch { namespace io {
 
 }}
 
-#endif /* TORCH_IO_BINFILE_H */
+#endif /* BOB_IO_BINFILE_H */

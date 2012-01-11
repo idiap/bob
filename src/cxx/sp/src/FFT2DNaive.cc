@@ -23,8 +23,8 @@
 #include "sp/FFT2DNaive.h"
 #include "core/array_assert.h"
 
-namespace tca = Torch::core::array;
-namespace spd = Torch::sp::detail;
+namespace tca = bob::core::array;
+namespace spd = bob::sp::detail;
 
 spd::FFT2DNaiveAbstract::FFT2DNaiveAbstract( const int height, const int width):
   m_height(height), m_width(width), m_wsave_h(0), m_wsave_w(0)

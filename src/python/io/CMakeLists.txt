@@ -20,34 +20,34 @@ if(FFMPEG_FOUND)
   set(pysrc "${pysrc};src/video.cc")
 endif(FFMPEG_FOUND)
 
-torch_python_package_bindings(io "${pysrc}")
+bob_python_package_bindings(io "${pysrc}")
 
-add_dependencies(pytorch_io python-core_header_install)
-target_link_libraries(pytorch_io pytorch_core_ndarray)
+add_dependencies(pybob_io python-core_header_install)
+target_link_libraries(pybob_io pybob_core_ndarray)
 
-torch_python_install(io)
+bob_python_install(io)
 
 # Installs all python scripts
 file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")
 
 # Our test units
-torch_python_add_test(python-io-array-tests
+bob_python_add_test(python-io-array-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_array.py)
-torch_python_add_test(python-io-arrayset-tests
+bob_python_add_test(python-io-arrayset-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_arrayset.py)
-torch_python_add_test(python-io-hdf5-tests
+bob_python_add_test(python-io-hdf5-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_hdf5.py)
-torch_python_add_test(python-io-file-tests
+bob_python_add_test(python-io-file-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_file.py)
 
 if(FFMPEG_FOUND)
-  torch_python_add_test(python-io-video-tests
+  bob_python_add_test(python-io-video-tests
     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_video.py)
 endif(FFMPEG_FOUND)
 
 if(FFMPEG_FOUND AND ImageMagick_FOUND)
 # Our examples (run and install)
-torch_python_add_test(python-io-video2frame-example
+bob_python_add_test(python-io-video2frame-example
   ${CMAKE_CURRENT_SOURCE_DIR}/example/video2frame.py --test)
-torch_example_install("python" "io" example/video2frame.py)
+bob_example_install("python" "io" example/video2frame.py)
 endif(FFMPEG_FOUND AND ImageMagick_FOUND)

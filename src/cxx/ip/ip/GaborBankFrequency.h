@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_IP_GABOR_BANK_FREQUENCY_H
-#define TORCH5SPRO_IP_GABOR_BANK_FREQUENCY_H
+#ifndef BOB5SPRO_IP_GABOR_BANK_FREQUENCY_H
+#define BOB5SPRO_IP_GABOR_BANK_FREQUENCY_H
 
 #include "core/cast.h"
 #include "ip/Exception.h"
@@ -30,7 +30,7 @@
 #include <boost/shared_ptr.hpp>
 #include <vector>
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libip_api
  * @{
@@ -172,10 +172,10 @@ namespace Torch {
         bool m_use_envelope;
         bool m_output_in_frequency;
 
-        std::vector<boost::shared_ptr<Torch::ip::GaborFrequency> > m_filters;
+        std::vector<boost::shared_ptr<bob::ip::GaborFrequency> > m_filters;
         blitz::Array<double,1> m_freqs;
         blitz::Array<double,1> m_orients;
     };
 }}
 
-#endif /* TORCH5SPRO_IP_GABOR_BANK_FREQUENCY_H */
+#endif /* BOB5SPRO_IP_GABOR_BANK_FREQUENCY_H */

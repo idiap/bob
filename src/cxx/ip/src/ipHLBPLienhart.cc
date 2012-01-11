@@ -19,7 +19,7 @@
  */
 #include "ip/ipHLBPLienhart.h"
 
-namespace Torch
+namespace bob
 {
 
 /////////////////////////////////////////////////////////////////////////
@@ -82,7 +82,7 @@ namespace Torch
         //for(int i=0;i<5;i++)
         if (Rec_>m_noRecs-1)
         {
-            Torch::error("ipHLBPLienhart::setRec() The rec parameters exceeds the number of Recs set");
+            bob::error("ipHLBPLienhart::setRec() The rec parameters exceeds the number of Recs set");
             return false;
         }
         int k = Rec_*m_nparams;
@@ -249,7 +249,7 @@ namespace Torch
     {
         if ( !(input.nDimension() == 2 ||  input.nDimension()==3))
         {
-            Torch::error("ipHLBPLienhart::checkInput() input should be 2D or 3D");
+            bob::error("ipHLBPLienhart::checkInput() input should be 2D or 3D");
             return false;
         }
 
@@ -412,14 +412,14 @@ namespace Torch
 
         if (file.taggedRead(&m_width, 1, "Width") != 1)
         {
-            Torch::message("ipHLBPLienhart::load - failed to read <Width> field!\n");
+            bob::message("ipHLBPLienhart::load - failed to read <Width> field!\n");
             return false;
         }
 
 
         if (file.taggedRead(&m_height, 1, "Height") != 1)
         {
-            Torch::message("ipHLBPLienhart::load - failed to read <Height> field!\n");
+            bob::message("ipHLBPLienhart::load - failed to read <Height> field!\n");
             return false;
         }
 
@@ -428,7 +428,7 @@ namespace Torch
 
         if (file.taggedRead(&m_noRecs, 1, "NoRecs") != 1)
         {
-            Torch::message("ipHLBPLienhart::load - failed to read <NoRecs> field!\n");
+            bob::message("ipHLBPLienhart::load - failed to read <NoRecs> field!\n");
             return false;
         }
 
@@ -438,7 +438,7 @@ namespace Torch
 
         if (file.taggedRead(m_parameters, nsize , "parameters") != nsize)
         {
-            Torch::message("ipHLBPLienhart::load - failed to read <parameters> field!\n");
+            bob::message("ipHLBPLienhart::load - failed to read <parameters> field!\n");
             return false;
         }
 
@@ -446,7 +446,7 @@ namespace Torch
         m_weight = new double[m_noRecs];
         if (file.taggedRead(m_weight, m_noRecs , "weight") != m_noRecs)
         {
-            Torch::message("ipHLBPLienhart::load - failed to read <weight> field!\n");
+            bob::message("ipHLBPLienhart::load - failed to read <weight> field!\n");
             return false;
         }
 
@@ -454,7 +454,7 @@ namespace Torch
 	///////////// ADDED TO INCLUDE HLBP FEATURES - SHOULD NOT AFFECT NORMAL HLBP FEATURE EXTRACTION IN ANY WAY ////////////////
 	if (file.taggedRead(&u_z, 1, "LBPLabel") != 1)
         {
-            Torch::message("ipHLBPLienhart::load - failed to read <LBPLabel> field!\n");
+            bob::message("ipHLBPLienhart::load - failed to read <LBPLabel> field!\n");
             return false;
         }
 	//////////// END OF ADDED PORTION /////////////////////////////////////////
@@ -487,7 +487,7 @@ namespace Torch
         int idCore = getID();
         if (file.taggedWrite(&idCore, 1, "CoreID") != 1)
         {
-            Torch::message("ipHLBPLienhart::save - failed to write <CoreID> field!\n");
+            bob::message("ipHLBPLienhart::save - failed to write <CoreID> field!\n");
             return false;
         }
 
@@ -495,39 +495,39 @@ namespace Torch
         //  m_modelSize[0]
         if (file.taggedWrite(&m_width, 1, "Width") != 1)
         {
-            Torch::message("ipHLBPLienhart::save - failed to write <Width> field!\n");
+            bob::message("ipHLBPLienhart::save - failed to write <Width> field!\n");
             return false;
         }
 
         if (file.taggedWrite(&m_height, 1, "Height") != 1)
         {
-            Torch::message("ipHLBPLienhart::save - failed to write <height> field!\n");
+            bob::message("ipHLBPLienhart::save - failed to write <height> field!\n");
             return false;
         }
 
         if (file.taggedWrite(&m_noRecs, 1, "NoRecs") != 1)
         {
-            Torch::message("ipHLBPLienhart::save - failed to write <NoRecs> field!\n");
+            bob::message("ipHLBPLienhart::save - failed to write <NoRecs> field!\n");
             return false;
         }
 
         int nsize = m_noRecs*m_nparams;
         if (file.taggedWrite(m_parameters, nsize, "parameters") != nsize)
         {
-            Torch::message("ipHLBPLienhart::save - failed to write <parameters> field!\n");
+            bob::message("ipHLBPLienhart::save - failed to write <parameters> field!\n");
             return false;
         }
 
         if (file.taggedWrite(m_weight, m_noRecs, "weight") != m_noRecs)
         {
-            Torch::message("ipHLBPLienhart::save - failed to write <weight> field!\n");
+            bob::message("ipHLBPLienhart::save - failed to write <weight> field!\n");
             return false;
         }
 	///////////////////////////////////////
 	///////////// ADDED TO INCLUDE HLBP FEATURES - SHOULD NOT AFFECT NORMAL HAAR FEATURE EXTRACTION IN ANY WAY ////////////////
 	if (file.taggedWrite(&u_z, 1, "LBPLabel") != 1)
         {
-            Torch::message("ipHLBPLienhart::save - failed to write <LBPLabel> field!\n");
+            bob::message("ipHLBPLienhart::save - failed to write <LBPLabel> field!\n");
             return false;
         }
 	//////////// END OF ADDED PORTION /////////////////////////////////////////

@@ -3,7 +3,7 @@
  * @date Mon Jun 6 11:49:35 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
-  * @brief Exceptions used throughout the math subsystem of Torch
+  * @brief Exceptions used throughout the math subsystem of bob
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -20,15 +20,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_MATH_EXCEPTION_H 
-#define TORCH5SPRO_MATH_EXCEPTION_H
+#ifndef BOB5SPRO_MATH_EXCEPTION_H 
+#define BOB5SPRO_MATH_EXCEPTION_H
 
 #include <cstdlib>
 #include "core/Exception.h"
 
-namespace Torch { namespace math {
+namespace bob { namespace math {
 
-  class Exception: public Torch::core::Exception {
+  class Exception: public bob::core::Exception {
     public:
       Exception() throw();
       virtual ~Exception() throw();
@@ -67,4 +67,4 @@ namespace Torch { namespace math {
 
 }}
 
-#endif /* TORCH5SPRO_MATH_EXCEPTION_H */
+#endif /* BOB5SPRO_MATH_EXCEPTION_H */

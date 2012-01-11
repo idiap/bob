@@ -27,10 +27,10 @@
 #include "trainer/MLPRPropTrainer.h"
 
 using namespace boost::python;
-namespace tp = Torch::python;
-namespace io = Torch::io;
-namespace mach = Torch::machine;
-namespace train = Torch::trainer;
+namespace tp = bob::python;
+namespace io = bob::io;
+namespace mach = bob::machine;
+namespace train = bob::trainer;
 
 static tuple call_shuffler1(train::DataShuffler& s, size_t N) {
   blitz::Array<double,2> data(N, s.getDataWidth());

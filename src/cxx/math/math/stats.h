@@ -20,13 +20,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_MATH_STATS_H 
-#define TORCH_MATH_STATS_H
+#ifndef BOB_MATH_STATS_H 
+#define BOB_MATH_STATS_H
 
 #include <blitz/array.h>
 #include "core/array_assert.h"
 
-namespace Torch { namespace math {
+namespace bob { namespace math {
 
     /**
      * Computes the scatter matrix of a 2D array considering data is
@@ -74,9 +74,9 @@ namespace Torch { namespace math {
         blitz::Array<T,1>& M) {
 
       // Check output
-      Torch::core::array::assertSameDimensionLength(A.extent(0), M.extent(0));
-      Torch::core::array::assertSameDimensionLength(A.extent(0), S.extent(0));
-      Torch::core::array::assertSameDimensionLength(A.extent(0), S.extent(1));
+      bob::core::array::assertSameDimensionLength(A.extent(0), M.extent(0));
+      bob::core::array::assertSameDimensionLength(A.extent(0), S.extent(0));
+      bob::core::array::assertSameDimensionLength(A.extent(0), S.extent(1));
 
       scatter_<T>(A, S, M);
     }
@@ -117,4 +117,4 @@ namespace Torch { namespace math {
 
 }}
 
-#endif /* TORCH_MATH_STATS_H */
+#endif /* BOB_MATH_STATS_H */

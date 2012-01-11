@@ -21,7 +21,7 @@
 #include "core/general.h"
 #include "core/Tensor.h"
 
-namespace Torch {
+namespace bob {
 
 ////////////////////////////////////////////////////////////////////
 // Constructor
@@ -64,14 +64,14 @@ bool spCore::process(const Tensor& input)
 	// Check if the input tensor has the right dimensions and type
 	if (checkInput(input) == false)
 	{
-		Torch::message("Torch::spCore::process - the input tensor is invalid!\n");
+		bob::message("bob::spCore::process - the input tensor is invalid!\n");
 		return false;
 	}
 
 	// Allocate (if needed) the output tensor given the input tensor dimensions
 	if (allocateOutput(input) == false)
 	{
-		Torch::message("Torch::spCore::process - cannot allocate output tensors!\n");
+		bob::message("bob::spCore::process - cannot allocate output tensors!\n");
 		return false;
 	}
 
@@ -91,7 +91,7 @@ const Tensor& spCore::getOutput(int index) const
 {
 	if (index < 0 || index >= m_n_outputs)
 	{
-		Torch::error("Torch::spCore::getOutput - invalid index!");
+		bob::error("bob::spCore::getOutput - invalid index!");
 	}
 	return *m_output[index];
 }
@@ -147,14 +147,14 @@ bool spCoreManager::add(spCore* core, const char* name)
 	// Check first if the parameters are ok
 	if (core == 0 || core->getID() < 1)
 	{
-		//Torch::message("spCoreManager::add - invalid parameters!\n");
+		//bob::message("spCoreManager::add - invalid parameters!\n");
 		return false;
 	}
 
 	// Check if the <id> is taken
 	if (find(core->getID()) >= 0) // the <id> is taken
 	{
-		//Torch::message("spCoreManager::add - the ID is taken!\n");
+		//bob::message("spCoreManager::add - the ID is taken!\n");
 		return false;
 	}
 

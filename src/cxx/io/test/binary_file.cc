@@ -71,8 +71,8 @@ struct T {
  * descriptor
  */
 std::string temp_file() {
-  boost::filesystem::path tpl = Torch::core::tmpdir();
-  tpl /= "torchtest_core_binformatXXXXXX.bin";
+  boost::filesystem::path tpl = bob::core::tmpdir();
+  tpl /= "bobtest_core_binformatXXXXXX.bin";
   boost::shared_array<char> char_tpl(new char[tpl.file_string().size()+1]);
   strcpy(char_tpl.get(), tpl.file_string().c_str());
   int fd = mkstemps(char_tpl.get(),4);
@@ -87,7 +87,7 @@ void check_equal_1d(const blitz::Array<T,1>& a, const blitz::Array<U,1>& b)
 {
   BOOST_REQUIRE_EQUAL(a.extent(0), b.extent(0));
   for (int i=0; i<a.extent(0); ++i) {
-    BOOST_CHECK_EQUAL(a(i), Torch::core::cast<T>(b(i)) );
+    BOOST_CHECK_EQUAL(a(i), bob::core::cast<T>(b(i)) );
   }
 }
 
@@ -98,7 +98,7 @@ void check_equal_2d(const blitz::Array<T,2>& a, const blitz::Array<U,2>& b)
   BOOST_REQUIRE_EQUAL(a.extent(1), b.extent(1));
   for (int i=0; i<a.extent(0); ++i) {
     for (int j=0; j<a.extent(1); ++j) {
-      BOOST_CHECK_EQUAL(a(i,j), Torch::core::cast<T>(b(i,j)));
+      BOOST_CHECK_EQUAL(a(i,j), bob::core::cast<T>(b(i,j)));
     }
   }
 }
@@ -114,7 +114,7 @@ void check_equal_4d(const blitz::Array<T,4>& a, const blitz::Array<U,4>& b)
     for (int j=0; j<a.extent(1); ++j) {
       for (int k=0; k<a.extent(2); ++k) {
         for (int l=0; l<a.extent(3); ++l) {
-          BOOST_CHECK_EQUAL(a(i,j,k,l), Torch::core::cast<T>(b(i,j,k,l)));
+          BOOST_CHECK_EQUAL(a(i,j,k,l), bob::core::cast<T>(b(i,j,k,l)));
         }
       }
     }
@@ -126,12 +126,12 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 BOOST_AUTO_TEST_CASE( blitz1d )
 {
   std::string tmp_file = temp_file();
-  Torch::io::BinFile out(tmp_file, Torch::io::BinFile::out);
+  bob::io::BinFile out(tmp_file, bob::io::BinFile::out);
 
   out.write( a);
   out.close();
 
-  Torch::io::BinFile in(tmp_file, Torch::io::BinFile::in);
+  bob::io::BinFile in(tmp_file, bob::io::BinFile::in);
   blitz::Array<double,1> a_read = in.read<double,1>();
 
   check_equal_1d( a, a_read);
@@ -141,12 +141,12 @@ BOOST_AUTO_TEST_CASE( blitz1d )
 BOOST_AUTO_TEST_CASE( blitz1d_withcast )
 {
   std::string tmp_file = temp_file();
-  Torch::io::BinFile out(tmp_file, Torch::io::BinFile::out);
+  bob::io::BinFile out(tmp_file, bob::io::BinFile::out);
 
   out.write( c);
   out.close();
 
-  Torch::io::BinFile in(tmp_file, Torch::io::BinFile::in);
+  bob::io::BinFile in(tmp_file, bob::io::BinFile::in);
   
   blitz::Array<double,1> c_read = in.read<double,1>();
   check_equal_1d( c, c_read);
@@ -156,12 +156,12 @@ BOOST_AUTO_TEST_CASE( blitz1d_withcast )
 BOOST_AUTO_TEST_CASE( blitz2d )
 {
   std::string tmp_file = temp_file();
-  Torch::io::BinFile out(tmp_file, Torch::io::BinFile::out);
+  bob::io::BinFile out(tmp_file, bob::io::BinFile::out);
 
   out.write( d);
   out.close();
 
-  Torch::io::BinFile in(tmp_file, Torch::io::BinFile::in);
+  bob::io::BinFile in(tmp_file, bob::io::BinFile::in);
   blitz::Array<float,2> d_read = in.read<float,2>();
 
   check_equal_2d( d, d_read);
@@ -171,13 +171,13 @@ BOOST_AUTO_TEST_CASE( blitz2d )
 BOOST_AUTO_TEST_CASE( blitz1d_inout )
 {
   std::string tmp_file = temp_file();
-  Torch::io::BinFile out(tmp_file, Torch::io::BinFile::out);
+  bob::io::BinFile out(tmp_file, bob::io::BinFile::out);
 
   out.write( a);
   out.close();
 
-  Torch::io::BinFile inoutap(tmp_file, Torch::io::BinFile::in | 
-    Torch::io::BinFile::out | Torch::io::BinFile::append);
+  bob::io::BinFile inoutap(tmp_file, bob::io::BinFile::in | 
+    bob::io::BinFile::out | bob::io::BinFile::append);
   
   inoutap.write( a);
   inoutap.write( a);
@@ -191,18 +191,18 @@ BOOST_AUTO_TEST_CASE( blitz1d_inout )
 BOOST_AUTO_TEST_CASE( blitz1d_append )
 {
   std::string tmp_file = temp_file();
-  Torch::io::BinFile out(tmp_file, Torch::io::BinFile::out);
+  bob::io::BinFile out(tmp_file, bob::io::BinFile::out);
 
   out.write( a);
   out.close();
 
-  Torch::io::BinFile outap(tmp_file, Torch::io::BinFile::out | 
-    Torch::io::BinFile::append);
+  bob::io::BinFile outap(tmp_file, bob::io::BinFile::out | 
+    bob::io::BinFile::append);
   
   outap.write( a);
   outap.close();
 
-  Torch::io::BinFile in(tmp_file, Torch::io::BinFile::in);
+  bob::io::BinFile in(tmp_file, bob::io::BinFile::in);
   blitz::Array<double,1> a_read1 = in.read<double,1>(0);
   check_equal_1d( a, a_read1);
   blitz::Array<double,1> a_read2 = in.read<double,1>(1);
@@ -213,12 +213,12 @@ BOOST_AUTO_TEST_CASE( blitz1d_append )
 BOOST_AUTO_TEST_CASE( blitz2d_withcast )
 {
   std::string tmp_file = temp_file();
-  Torch::io::BinFile out(tmp_file, Torch::io::BinFile::out);
+  bob::io::BinFile out(tmp_file, bob::io::BinFile::out);
 
   out.write( d);
   out.close();
 
-  Torch::io::BinFile in(tmp_file, Torch::io::BinFile::in);
+  bob::io::BinFile in(tmp_file, bob::io::BinFile::in);
   blitz::Array<uint32_t,2> d_read = in.read<uint32_t,2>();
 
   check_equal_2d( d, d_read);
@@ -228,14 +228,14 @@ BOOST_AUTO_TEST_CASE( blitz2d_withcast )
 BOOST_AUTO_TEST_CASE( blitz2d_directaccess )
 {
   std::string tmp_file = temp_file();
-  Torch::io::BinFile out(tmp_file, Torch::io::BinFile::out);
+  bob::io::BinFile out(tmp_file, bob::io::BinFile::out);
 
   out.write( d);
   out.write( e);
   out.write( d);
   out.close();
 
-  Torch::io::BinFile in(tmp_file, Torch::io::BinFile::in);
+  bob::io::BinFile in(tmp_file, bob::io::BinFile::in);
   blitz::Array<float,2> e_read = in.read<float,2>(1);
   
   check_equal_2d( e, e_read);
@@ -245,9 +245,9 @@ BOOST_AUTO_TEST_CASE( blitz2d_directaccess )
 BOOST_AUTO_TEST_CASE( blitz4d_slice )
 {
   std::string tmp_file1 = temp_file();
-  Torch::io::BinFile out1(tmp_file1, Torch::io::BinFile::out);
+  bob::io::BinFile out1(tmp_file1, bob::io::BinFile::out);
   std::string tmp_file2 = temp_file();
-  Torch::io::BinFile out2(tmp_file2, Torch::io::BinFile::out);
+  bob::io::BinFile out2(tmp_file2, bob::io::BinFile::out);
 
   for(int i=0; i<2;++i)
     for(int j=0; j<3;++j)
@@ -261,7 +261,7 @@ BOOST_AUTO_TEST_CASE( blitz4d_slice )
   out1.write( g_sliced1);
   out1.close();
 
-  Torch::io::BinFile in1(tmp_file1, Torch::io::BinFile::in);
+  bob::io::BinFile in1(tmp_file1, bob::io::BinFile::in);
   
   blitz::Array<double,4> g_sliced1_read = in1.read<double,4>();
   check_equal_4d( g_sliced1, g_sliced1_read);
@@ -273,7 +273,7 @@ BOOST_AUTO_TEST_CASE( blitz4d_slice )
   out2.write( g_sliced2);
   out2.close();
 
-  Torch::io::BinFile in2(tmp_file2, Torch::io::BinFile::in);
+  bob::io::BinFile in2(tmp_file2, bob::io::BinFile::in);
   
   blitz::Array<double,4> g_sliced2_read = in2.read<double,4>();
   check_equal_4d( g_sliced2, g_sliced2_read);

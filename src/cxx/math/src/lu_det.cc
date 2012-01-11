@@ -27,7 +27,7 @@
 #endif
 #include <algorithm>
 
-namespace math = Torch::math;
+namespace math = bob::math;
 
 // Declaration of the external LAPACK functions
 // LU decomposition of a general matrix (dgetrf)
@@ -48,14 +48,14 @@ void math::lu(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
   const blitz::TinyVector<int,2> shapeL(M,minMN);
   const blitz::TinyVector<int,2> shapeU(minMN,N);
   const blitz::TinyVector<int,2> shapeP(minMN,minMN);
-  Torch::core::array::assertZeroBase(A);
-  Torch::core::array::assertZeroBase(L);
-  Torch::core::array::assertZeroBase(U);
-  Torch::core::array::assertZeroBase(P);
+  bob::core::array::assertZeroBase(A);
+  bob::core::array::assertZeroBase(L);
+  bob::core::array::assertZeroBase(U);
+  bob::core::array::assertZeroBase(P);
 
-  Torch::core::array::assertSameShape(L,shapeL);
-  Torch::core::array::assertSameShape(U,shapeU);
-  Torch::core::array::assertSameShape(P,shapeP);
+  bob::core::array::assertSameShape(L,shapeL);
+  bob::core::array::assertSameShape(U,shapeU);
+  bob::core::array::assertSameShape(P,shapeP);
 
   math::lu_(A, L, U, P);
 }
@@ -88,7 +88,7 @@ void math::lu_(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
  
   // Check info variable
   if( info != 0)
-    throw Torch::math::LapackError("The LAPACK dgetrf function returned a non-zero value.");
+    throw bob::math::LapackError("The LAPACK dgetrf function returned a non-zero value.");
 
   // Copy result back to L
   L = 0.;
@@ -128,7 +128,7 @@ void math::lu_(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
 
 double math::det(const blitz::Array<double,2>& A)
 {
-  Torch::core::array::assertSameDimensionLength(A.extent(0),A.extent(1));
+  bob::core::array::assertSameDimensionLength(A.extent(0),A.extent(1));
   return math::det_(A);
 }
 
@@ -170,11 +170,11 @@ void math::inv(const blitz::Array<double,2>& A, blitz::Array<double,2>& B)
   // Size variable
   int N = A.extent(0);
   const blitz::TinyVector<int,2> shapeA(N,N);
-  Torch::core::array::assertZeroBase(A);
-  Torch::core::array::assertZeroBase(B);
+  bob::core::array::assertZeroBase(A);
+  bob::core::array::assertZeroBase(B);
 
-  Torch::core::array::assertSameShape(A,shapeA);
-  Torch::core::array::assertSameShape(B,shapeA);
+  bob::core::array::assertSameShape(A,shapeA);
+  bob::core::array::assertSameShape(B,shapeA);
 
   math::inv_(A, B);
 }
@@ -207,7 +207,7 @@ void math::inv_(const blitz::Array<double,2>& A, blitz::Array<double,2>& B)
  
   // Check info variable
   if( info != 0)
-    throw Torch::math::LapackError("The LAPACK dgetrf function returned a \
+    throw bob::math::LapackError("The LAPACK dgetrf function returned a \
       non-zero value.");
 
   // 2/ Compute the inverse
@@ -215,7 +215,7 @@ void math::inv_(const blitz::Array<double,2>& A, blitz::Array<double,2>& B)
  
   // Check info variable
   if( info != 0)
-    throw Torch::math::LapackError("The LAPACK dgetri function returned a \
+    throw bob::math::LapackError("The LAPACK dgetri function returned a \
       non-zero value. The matrix might not be invertible.");
 
   // Copy result back to B

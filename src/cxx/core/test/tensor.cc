@@ -29,12 +29,12 @@
 
 struct T {
 
-  Torch::DoubleTensor dt;
-  Torch::FloatTensor ft;
-  Torch::LongTensor lt;
-  Torch::IntTensor it;
-  Torch::ShortTensor st, st2;
-  Torch::CharTensor ct;
+  bob::DoubleTensor dt;
+  bob::FloatTensor ft;
+  bob::LongTensor lt;
+  bob::IntTensor it;
+  bob::ShortTensor st, st2;
+  bob::CharTensor ct;
 
   T(): dt(3,5), ft(5), lt(3,5), it(5, 5, 5), st(10, 9, 8, 7), st2(2, 2, 2, 2), ct(5) {
     dt.fill(1);
@@ -81,7 +81,7 @@ template<typename TTensor, typename TVal> void check_fill_4d(const TTensor& t,
         for (int l=0; l<t.size(3); ++l) 
           BOOST_CHECK_EQUAL(t.get(i, j, k, l), v);
 }
-void check_dimensions(Torch::Tensor& t, int s1, int s2=0, 
+void check_dimensions(bob::Tensor& t, int s1, int s2=0, 
                       int s3=0, int s4=0) {
   if (!s2) { //1-D
     BOOST_CHECK_EQUAL(t.nDimension(), 1);
@@ -106,32 +106,32 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 //this will check whether every tensor was initialized as expected
 BOOST_AUTO_TEST_CASE( test_init )
 {
-  BOOST_CHECK_EQUAL(dt.getDatatype(), Torch::Tensor::Double);
+  BOOST_CHECK_EQUAL(dt.getDatatype(), bob::Tensor::Double);
   BOOST_CHECK_EQUAL(dt.typeSize(), sizeof(double));
   BOOST_CHECK_EQUAL(dt.sizeAll(), 15);
   check_dimensions(dt, 3, 5);
   check_fill_2d(dt, 1.0);
-  BOOST_CHECK_EQUAL(ft.getDatatype(), Torch::Tensor::Float);
+  BOOST_CHECK_EQUAL(ft.getDatatype(), bob::Tensor::Float);
   BOOST_CHECK_EQUAL(ft.typeSize(), sizeof(float));
   BOOST_CHECK_EQUAL(ft.sizeAll(), 5);
   check_dimensions(ft, 5);
   check_fill_1d(ft, 2.0);
-  BOOST_CHECK_EQUAL(lt.getDatatype(), Torch::Tensor::Long);
+  BOOST_CHECK_EQUAL(lt.getDatatype(), bob::Tensor::Long);
   BOOST_CHECK_EQUAL(lt.typeSize(), sizeof(long));
   BOOST_CHECK_EQUAL(lt.sizeAll(), 15);
   check_dimensions(lt, 3, 5);
   check_fill_2d(lt, 3.0);
-  BOOST_CHECK_EQUAL(it.getDatatype(), Torch::Tensor::Int);
+  BOOST_CHECK_EQUAL(it.getDatatype(), bob::Tensor::Int);
   BOOST_CHECK_EQUAL(it.typeSize(), sizeof(int));
   BOOST_CHECK_EQUAL(it.sizeAll(), 125);
   check_dimensions(it, 5, 5, 5);
   check_fill_3d(it, 4);
-  BOOST_CHECK_EQUAL(st.getDatatype(), Torch::Tensor::Short);
+  BOOST_CHECK_EQUAL(st.getDatatype(), bob::Tensor::Short);
   BOOST_CHECK_EQUAL(st.typeSize(), sizeof(short));
   BOOST_CHECK_EQUAL(st.sizeAll(), 5040);
   check_dimensions(st, 10, 9, 8, 7);
   check_fill_4d(st, 5);
-  BOOST_CHECK_EQUAL(ct.getDatatype(), Torch::Tensor::Char);
+  BOOST_CHECK_EQUAL(ct.getDatatype(), bob::Tensor::Char);
   BOOST_CHECK_EQUAL(ct.typeSize(), sizeof(char));
   BOOST_CHECK_EQUAL(ct.sizeAll(), 5);
   check_dimensions(ct, 5);
@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_CASE( test_transpose )
       for (int k=0; k<st.size(2); ++k)
         for (int l=0; l<st.size(3); ++l)
           st(i, j, k, l) = counter++;
-  Torch::ShortTensor t2;
+  bob::ShortTensor t2;
   t2.transpose(&st, 0, 1);
   BOOST_CHECK(t2.isReference());
   check_dimensions(t2, 9, 10, 8, 7);
@@ -219,7 +219,7 @@ BOOST_AUTO_TEST_CASE( test_transpose )
       for (int k=0; k<t2.size(2); ++k)
         for (int l=0; l<t2.size(3); ++l)
           BOOST_CHECK_EQUAL(t2.get(j, i, k, l), st.get(i, j, k, l));
-  Torch::ShortTensor t3;
+  bob::ShortTensor t3;
   t3.transpose(&t2, 0, 1); //back to normal
   BOOST_CHECK(t3.isReference());
   check_dimensions(t3, 10, 9, 8, 7);
@@ -238,7 +238,7 @@ BOOST_AUTO_TEST_CASE( test_select )
       for (int k=0; k<st.size(2); ++k)
         for (int l=0; l<st.size(3); ++l)
           st(i, j, k, l) = counter++;
-  Torch::ShortTensor t2;
+  bob::ShortTensor t2;
   t2.select(&st, 0, 2); 
   BOOST_CHECK(t2.isReference());
   check_dimensions(t2, 9, 8, 7);
@@ -246,14 +246,14 @@ BOOST_AUTO_TEST_CASE( test_select )
     for (int k=0; k<t2.size(1); ++k)
       for (int l=0; l<t2.size(2); ++l)
         BOOST_CHECK_EQUAL(t2.get(j, k, l), st.get(2, j, k, l));
-  Torch::ShortTensor t3;
+  bob::ShortTensor t3;
   t3.select(&t2, 0, 4);
   BOOST_CHECK(t3.isReference());
   check_dimensions(t3, 8, 7);
   for (int k=0; k<t3.size(0); ++k)
     for (int l=0; l<t3.size(1); ++l)
       BOOST_CHECK_EQUAL(t3.get(k, l), st.get(2, 4, k, l));
-  Torch::ShortTensor t4;
+  bob::ShortTensor t4;
   t4.select(&t3, 0, 6);
   BOOST_CHECK(t4.isReference());
   check_dimensions(t4, 7);
@@ -269,7 +269,7 @@ BOOST_AUTO_TEST_CASE( test_narrow )
       for (int k=0; k<st.size(2); ++k)
         for (int l=0; l<st.size(3); ++l)
           st(i, j, k, l) = counter++;
-  Torch::ShortTensor t2;
+  bob::ShortTensor t2;
   t2.narrow(&st, 0, 0, 5);
   BOOST_CHECK(t2.isReference());
   check_dimensions(t2, 5, 9, 8, 7);
@@ -278,7 +278,7 @@ BOOST_AUTO_TEST_CASE( test_narrow )
       for (int k=0; k<t2.size(2); ++k)
         for (int l=0; l<t2.size(3); ++l)
           BOOST_CHECK_EQUAL(t2.get(i, j, k, l), st.get(i, j, k, l));
-  Torch::ShortTensor t3;
+  bob::ShortTensor t3;
   t3.narrow(&t2, 2, 0, 4);
   BOOST_CHECK(t3.isReference());
   check_dimensions(t3, 5, 9, 4, 7);

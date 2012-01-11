@@ -21,7 +21,7 @@
 #include "core/Tensor.h"
 #include <iostream>
 
-namespace Torch {
+namespace bob {
 
 /////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -43,7 +43,7 @@ ipFlip::~ipFlip()
 
 bool ipFlip::checkInput(const Tensor& input) const
 {
-	// Torch::Image type
+	// bob::Image type
 	if (input.getDatatype() != Tensor::Short &&
 		input.nDimension() != 3)
 	{

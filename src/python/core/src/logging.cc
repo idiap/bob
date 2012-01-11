@@ -28,12 +28,12 @@ using namespace boost::python;
 
 /**
  * Objects of this class are able to redirect the data injected into a
- * Torch::core::OutputStream to be re-injected in a given python callable object,
+ * bob::core::OutputStream to be re-injected in a given python callable object,
  * that is given upon construction. The key idea is that you feed in something
  * like logging.debug to the constructor, for the debug stream, logging.info
  * for the info stream and so on.
  */
-struct PythonLoggingOutputDevice: public Torch::core::OutputDevice {
+struct PythonLoggingOutputDevice: public bob::core::OutputDevice {
   public:
     /**
      * Builds a new OutputDevice from a given callable
@@ -67,28 +67,28 @@ struct PythonLoggingOutputDevice: public Torch::core::OutputDevice {
 /**
  * A test function for your python bindings 
  */
-static void log_message(Torch::core::OutputStream& s, const std::string& message) {
+static void log_message(bob::core::OutputStream& s, const std::string& message) {
   s << message << std::endl;
 }
 
 void bind_core_logging() {
-  class_<Torch::core::OutputDevice, boost::shared_ptr<Torch::core::OutputDevice>, boost::noncopyable>("OutputDevice", "OutputDevices act like sinks for the messages emitted from within C++", no_init); 
+  class_<bob::core::OutputDevice, boost::shared_ptr<bob::core::OutputDevice>, boost::noncopyable>("OutputDevice", "OutputDevices act like sinks for the messages emitted from within C++", no_init); 
 
-  class_<PythonLoggingOutputDevice, boost::shared_ptr<PythonLoggingOutputDevice>, bases<Torch::core::OutputDevice> >("PythonLoggingOutputDevice", "The PythonLoggingOutputDevice is the default logging class for torch.core.OutputStream objects to be used in python. It diverges the output of logged messages in C++ into the pythonic logging module.", init<object>("Initializes the PythonLoggingOutputDevice with a new callable that will be used to emit messages."));
+  class_<PythonLoggingOutputDevice, boost::shared_ptr<PythonLoggingOutputDevice>, bases<bob::core::OutputDevice> >("PythonLoggingOutputDevice", "The PythonLoggingOutputDevice is the default logging class for bob.core.OutputStream objects to be used in python. It diverges the output of logged messages in C++ into the pythonic logging module.", init<object>("Initializes the PythonLoggingOutputDevice with a new callable that will be used to emit messages."));
 
-  class_<Torch::core::OutputStream, boost::shared_ptr<Torch::core::OutputStream> >("OutputStream", "The OutputStream object represents a normal C++ stream and is used as the basis for configuring the message output re-direction inside Torch.", init<>("Constructs a new OutputStream using no parameters. Ignores any input received."))
+  class_<bob::core::OutputStream, boost::shared_ptr<bob::core::OutputStream> >("OutputStream", "The OutputStream object represents a normal C++ stream and is used as the basis for configuring the message output re-direction inside bob.", init<>("Constructs a new OutputStream using no parameters. Ignores any input received."))
     .def(init<const std::string&>((arg("configuration")), "Initializes this stream with one of the default C++ methods available: stdout, stderr, null or a filename (if the filename ends in '.gz', it will be compressed on the fly)."))
-    .def(init<boost::shared_ptr<Torch::core::OutputDevice> >((arg("device")), "Constructs a new OutputStream using the given existing OutputDevice."))
-    .def("reset", &Torch::core::OutputStream::reset<const std::string>, (arg("self"), arg("configuration")), "Resets the current stream to use a new method for output instead of the currently configured.")
-    .def("reset", &Torch::core::OutputStream::reset<boost::shared_ptr<Torch::core::OutputDevice> >, (arg("self"), arg("device")), "Resets the current stream to use a new method for output instead of the currently configured. This version of the API allows you to pass an existing OutputDevice to be used for output data.")
+    .def(init<boost::shared_ptr<bob::core::OutputDevice> >((arg("device")), "Constructs a new OutputStream using the given existing OutputDevice."))
+    .def("reset", &bob::core::OutputStream::reset<const std::string>, (arg("self"), arg("configuration")), "Resets the current stream to use a new method for output instead of the currently configured.")
+    .def("reset", &bob::core::OutputStream::reset<boost::shared_ptr<bob::core::OutputDevice> >, (arg("self"), arg("device")), "Resets the current stream to use a new method for output instead of the currently configured. This version of the API allows you to pass an existing OutputDevice to be used for output data.")
     .def("log", &log_message, (arg("self"), arg("message")), "This method logs an arbitrary message to the current log stream")
     ;
 
   //binds the standard C++ streams for logging output to python
-  scope().attr("debug") = &Torch::core::debug;
-  scope().attr("info") = &Torch::core::info;
-  scope().attr("warn") = &Torch::core::warn;
-  scope().attr("error") = &Torch::core::error;
+  scope().attr("debug") = &bob::core::debug;
+  scope().attr("info") = &bob::core::info;
+  scope().attr("warn") = &bob::core::warn;
+  scope().attr("error") = &bob::core::error;
 
   //a test function
 }

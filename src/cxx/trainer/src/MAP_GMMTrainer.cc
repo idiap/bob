@@ -20,18 +20,18 @@
 #include "trainer/MAP_GMMTrainer.h"
 #include "trainer/Exception.h"
 
-Torch::trainer::MAP_GMMTrainer::MAP_GMMTrainer(double relevance_factor, bool update_means, bool update_variances, 
+bob::trainer::MAP_GMMTrainer::MAP_GMMTrainer(double relevance_factor, bool update_means, bool update_variances, 
     bool update_weights, double mean_var_update_responsibilities_threshold): 
   GMMTrainer(update_means, update_variances, update_weights, mean_var_update_responsibilities_threshold), 
   relevance_factor(relevance_factor), m_prior_gmm(NULL), m_T3_alpha(0.), m_T3_adaptation(false) {
   
 }
 
-Torch::trainer::MAP_GMMTrainer::~MAP_GMMTrainer() {
+bob::trainer::MAP_GMMTrainer::~MAP_GMMTrainer() {
   
 }
 
-void Torch::trainer::MAP_GMMTrainer::initialization(Torch::machine::GMMMachine& gmm, const Torch::io::Arrayset& data) {
+void bob::trainer::MAP_GMMTrainer::initialization(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data) {
   // Allocate memory for the sufficient statistics and initialise
   m_ss.resize(gmm.getNGaussians(),gmm.getNInputs());
   blitz::Array<double,1> ar1(gmm.getNGaussians());
@@ -44,13 +44,13 @@ void Torch::trainer::MAP_GMMTrainer::initialization(Torch::machine::GMMMachine& 
   gmm.setVariances(ar2);
 }
 
-bool Torch::trainer::MAP_GMMTrainer::setPriorGMM(Torch::machine::GMMMachine *prior_gmm) {
+bool bob::trainer::MAP_GMMTrainer::setPriorGMM(bob::machine::GMMMachine *prior_gmm) {
   if (prior_gmm == NULL) return false;
   m_prior_gmm = prior_gmm;
   return true;
 }
 
-void Torch::trainer::MAP_GMMTrainer::mStep(Torch::machine::GMMMachine& gmm, const Torch::io::Arrayset& data) {
+void bob::trainer::MAP_GMMTrainer::mStep(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data) {
   // Read options and variables
   double n_gaussians = gmm.getNGaussians();
   double n_inputs = gmm.getNInputs();

@@ -20,7 +20,7 @@
 
 #include <machine/ZTNorm.h>
 
-namespace Torch { namespace machine {
+namespace bob { namespace machine {
 
   namespace detail {
 
@@ -43,21 +43,21 @@ namespace Torch { namespace machine {
       int size_znorm = B.extent(1);
 
       // Check the inputs
-      Torch::core::array::assertSameDimensionLength(A.extent(0), size_eval);
-      Torch::core::array::assertSameDimensionLength(A.extent(1), size_enroll);
+      bob::core::array::assertSameDimensionLength(A.extent(0), size_eval);
+      bob::core::array::assertSameDimensionLength(A.extent(1), size_enroll);
 
-      Torch::core::array::assertSameDimensionLength(B.extent(0), size_eval);
-      Torch::core::array::assertSameDimensionLength(B.extent(1), size_znorm);
+      bob::core::array::assertSameDimensionLength(B.extent(0), size_eval);
+      bob::core::array::assertSameDimensionLength(B.extent(1), size_znorm);
 
-      Torch::core::array::assertSameDimensionLength(C.extent(0), size_tnorm);
-      Torch::core::array::assertSameDimensionLength(C.extent(1), size_enroll);
+      bob::core::array::assertSameDimensionLength(C.extent(0), size_tnorm);
+      bob::core::array::assertSameDimensionLength(C.extent(1), size_enroll);
 
-      Torch::core::array::assertSameDimensionLength(D.extent(0), size_tnorm);
-      Torch::core::array::assertSameDimensionLength(D.extent(1), size_znorm);
+      bob::core::array::assertSameDimensionLength(D.extent(0), size_tnorm);
+      bob::core::array::assertSameDimensionLength(D.extent(1), size_znorm);
 
       if (znorm_tests_tnorm_models_same_spk_ids) {
-        Torch::core::array::assertSameDimensionLength(znorm_tests_tnorm_models_same_spk_ids->extent(0), size_tnorm);
-        Torch::core::array::assertSameDimensionLength(znorm_tests_tnorm_models_same_spk_ids->extent(1), size_znorm);
+        bob::core::array::assertSameDimensionLength(znorm_tests_tnorm_models_same_spk_ids->extent(0), size_tnorm);
+        bob::core::array::assertSameDimensionLength(znorm_tests_tnorm_models_same_spk_ids->extent(1), size_znorm);
       }
 
       // Declare needed IndexPlaceholder

@@ -21,7 +21,7 @@
 #include "core/array_assert.h"
 #include "core/array_old.h"
 
-namespace math = Torch::math;
+namespace math = bob::math;
 
 // Declaration of the external LAPACK function (Generic linear system solver)
 extern "C" void dgesvd_( char *jobu, char *jobvt, int *M, int *N, double *A, 
@@ -38,16 +38,16 @@ void math::svd(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   int nb_singular = std::min(M,N);
 
   // Checks zero base
-  Torch::core::array::assertZeroBase(A);
-  Torch::core::array::assertZeroBase(U);
-  Torch::core::array::assertZeroBase(sigma);
-  Torch::core::array::assertZeroBase(V);
+  bob::core::array::assertZeroBase(A);
+  bob::core::array::assertZeroBase(U);
+  bob::core::array::assertZeroBase(sigma);
+  bob::core::array::assertZeroBase(V);
   // Checks and resizes if required
-  Torch::core::array::assertSameDimensionLength(U.extent(0), M);
-  Torch::core::array::assertSameDimensionLength(U.extent(1), M);
-  Torch::core::array::assertSameDimensionLength(sigma.extent(0), nb_singular);
-  Torch::core::array::assertSameDimensionLength(V.extent(0), N);
-  Torch::core::array::assertSameDimensionLength(V.extent(1), N);
+  bob::core::array::assertSameDimensionLength(U.extent(0), M);
+  bob::core::array::assertSameDimensionLength(U.extent(1), M);
+  bob::core::array::assertSameDimensionLength(sigma.extent(0), nb_singular);
+  bob::core::array::assertSameDimensionLength(V.extent(0), N);
+  bob::core::array::assertSameDimensionLength(V.extent(1), N);
 
   math::svd_(A, U, sigma, V);
 }
@@ -124,13 +124,13 @@ void math::svd(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   int nb_singular = std::min(M,N);
 
   // Checks zero base
-  Torch::core::array::assertZeroBase(A);
-  Torch::core::array::assertZeroBase(U);
-  Torch::core::array::assertZeroBase(sigma);
+  bob::core::array::assertZeroBase(A);
+  bob::core::array::assertZeroBase(U);
+  bob::core::array::assertZeroBase(sigma);
   // Checks and resizes if required
-  Torch::core::array::assertSameDimensionLength(U.extent(0), M);
-  Torch::core::array::assertSameDimensionLength(U.extent(1), nb_singular);
-  Torch::core::array::assertSameDimensionLength(sigma.extent(0), nb_singular);
+  bob::core::array::assertSameDimensionLength(U.extent(0), M);
+  bob::core::array::assertSameDimensionLength(U.extent(1), nb_singular);
+  bob::core::array::assertSameDimensionLength(sigma.extent(0), nb_singular);
  
   math::svd_(A, U, sigma);
 }

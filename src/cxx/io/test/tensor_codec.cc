@@ -56,8 +56,8 @@ struct T {
  * Yes, I know this is not 100% secure...
  */
 std::string temp_file(const std::string& ext) {
-  boost::filesystem::path tpl = Torch::core::tmpdir();
-  std::string filename("torchtest_core_tensorformatXXXXXX");
+  boost::filesystem::path tpl = bob::core::tmpdir();
+  std::string filename("bobtest_core_tensorformatXXXXXX");
   filename.append(ext);
   tpl /= filename;
   boost::shared_array<char> char_tpl(new char[tpl.file_string().size()+1]);
@@ -76,7 +76,7 @@ void check_equal(const blitz::Array<T,2>& a, const blitz::Array<U,2>& b)
   BOOST_REQUIRE_EQUAL(a.extent(1), b.extent(1));
   for (int i=0; i<a.extent(0); ++i) {
     for (int j=0; j<a.extent(1); ++j) {
-      BOOST_CHECK_EQUAL(a(i,j), Torch::core::cast<T>(b(i,j)));
+      BOOST_CHECK_EQUAL(a(i,j), bob::core::cast<T>(b(i,j)));
     }
   }
 }
@@ -86,9 +86,9 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 BOOST_AUTO_TEST_CASE( tensor_2d )
 {
   // Prepare io Array from blitz array
-  Torch::io::Array db_a(a);
+  bob::io::Array db_a(a);
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
-  BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_int8);
+  BOOST_CHECK_EQUAL(db_a.getElementType(), bob::core::array::t_int8);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), true);
   BOOST_CHECK_EQUAL(db_a.getFilename().size(), 0);
   BOOST_CHECK_EQUAL(db_a.getCodec().use_count(), 0);
@@ -101,24 +101,24 @@ BOOST_AUTO_TEST_CASE( tensor_2d )
   db_a.save(filename);
 
   // Readd .tensor
-  Torch::io::Array db_a_read(filename);
+  bob::io::Array db_a_read(filename);
   check_equal( db_a_read.get<int8_t,2>(), a);
 }
 
 BOOST_AUTO_TEST_CASE( tensor_2d_read_T5alpha )
 {
   // Get path to the XML Schema definition
-  char *testdata_cpath = getenv("TORCH_TESTDATA_DIR");
+  char *testdata_cpath = getenv("BOB_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    throw std::runtime_error("Environment variable $TORCH_TESTDATA_DIR is not set. Have you setup your working environment correctly?");
+    throw std::runtime_error("Environment variable $BOB_TESTDATA_DIR is not set. Have you setup your working environment correctly?");
   }
   boost::filesystem::path testdata_path( testdata_cpath);
   testdata_path /= "tensor_char.tensor";
 
-  // Prepare io Array from Tensor file saved with Torch5 alpha
-  Torch::io::Array db_b(testdata_path.string());
+  // Prepare io Array from Tensor file saved with bob5 alpha
+  bob::io::Array db_b(testdata_path.string());
   BOOST_CHECK_EQUAL(db_b.getNDim(), b.dimensions());
-  BOOST_CHECK_EQUAL(db_b.getElementType(), Torch::core::array::t_int8);
+  BOOST_CHECK_EQUAL(db_b.getElementType(), bob::core::array::t_int8);
   BOOST_CHECK_EQUAL(db_b.isLoaded(), false);
   for(size_t i=0; i<db_b.getNDim(); ++i)
     BOOST_CHECK_EQUAL(db_b.getShape()[i], b.extent(i));

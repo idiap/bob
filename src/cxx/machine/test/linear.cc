@@ -39,7 +39,7 @@
  * Evalutes the presumed output of a linear machine through a different path.
  */
 static blitz::Array<double,1> presumed (const blitz::Array<double,1>& input) {
-  blitz::Array<double,1> buffer(Torch::core::array::ccopy(input));
+  blitz::Array<double,1> buffer(bob::core::array::ccopy(input));
   
   blitz::Array<double,2> weights(3,2);
   weights = 0.4, 0.1, 0.4, 0.2, 0.2, 0.7;
@@ -57,7 +57,7 @@ static blitz::Array<double,1> presumed (const blitz::Array<double,1>& input) {
   blitz::secondIndex j;
 
   blitz::Array<double,1> output(weights.extent(1));
-  Torch::math::prod(buffer, weights, output);
+  bob::math::prod(buffer, weights, output);
   output += biases;
   output = blitz::tanh(output);
   return output;
@@ -65,7 +65,7 @@ static blitz::Array<double,1> presumed (const blitz::Array<double,1>& input) {
 
 BOOST_AUTO_TEST_CASE( test_empty_initialization )
 {
-  Torch::machine::LinearMachine M(2,1);
+  bob::machine::LinearMachine M(2,1);
   BOOST_CHECK( blitz::all(M.getWeights() == 0.0) );
   BOOST_CHECK_EQUAL( M.getWeights().shape()[0], 2 );
   BOOST_CHECK_EQUAL( M.getWeights().shape()[1], 1 );
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE( test_initialization )
 {
   blitz::Array<double,2> weights(3,2);
   weights = 0.4, 0.1, 0.4, 0.2, 0.2, 0.7;
-  Torch::machine::LinearMachine M(weights);
+  bob::machine::LinearMachine M(weights);
 
   blitz::Array<double,1> biases(2);
   biases = 0.3, -3.0;
@@ -91,20 +91,20 @@ BOOST_AUTO_TEST_CASE( test_initialization )
   idiv = 0.5, 1.0, 1.0;
   M.setInputDivision(idiv);
 
-  M.setActivation(Torch::machine::TANH);
+  M.setActivation(bob::machine::TANH);
   
   //now load the same machine from the file and compare
-  char *testdata_cpath = getenv("TORCH_MACHINE_TESTDATA_DIR");
+  char *testdata_cpath = getenv("BOB_MACHINE_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    Torch::core::error << "Environment variable $TORCH_MACHINE_TESTDATA_DIR " <<
+    bob::core::error << "Environment variable $BOB_MACHINE_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
   }
   boost::filesystem::path testdata(testdata_cpath);
   testdata /= "linear-test.hdf5";
-  Torch::io::HDF5File config(testdata.string(), Torch::io::HDF5File::in);
-  Torch::machine::LinearMachine N(config);
+  bob::io::HDF5File config(testdata.string(), bob::io::HDF5File::in);
+  bob::machine::LinearMachine N(config);
 
   BOOST_CHECK( blitz::all(M.getWeights() == N.getWeights()) );
   BOOST_CHECK( blitz::all(M.getBiases() == N.getBiases()) );
@@ -116,17 +116,17 @@ BOOST_AUTO_TEST_CASE( test_initialization )
 BOOST_AUTO_TEST_CASE( test_error_check )
 {
   //loads a known machine from the file
-  char *testdata_cpath = getenv("TORCH_MACHINE_TESTDATA_DIR");
+  char *testdata_cpath = getenv("BOB_MACHINE_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    Torch::core::error << "Environment variable $TORCH_MACHINE_TESTDATA_DIR " <<
+    bob::core::error << "Environment variable $BOB_MACHINE_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
   }
   boost::filesystem::path testdata(testdata_cpath);
   testdata /= "linear-test.hdf5";
-  Torch::io::HDF5File config(testdata.string(), Torch::io::HDF5File::in);
-  Torch::machine::LinearMachine M(config);
+  bob::io::HDF5File config(testdata.string(), bob::io::HDF5File::in);
+  bob::machine::LinearMachine M(config);
 
   blitz::Array<double,2> W(2,3);
   W = 0.4, 0.1, 0.4, 0.2, 0.2, 0.7;
@@ -134,26 +134,26 @@ BOOST_AUTO_TEST_CASE( test_error_check )
   blitz::Array<double,1> X(5);
   X = 0.3, -3.0, 2.7, -18, 52;
 
-  BOOST_CHECK_THROW(M.setWeights(W), Torch::machine::NInputsMismatch);
-  BOOST_CHECK_THROW(M.setBiases(X), Torch::machine::NOutputsMismatch);
-  BOOST_CHECK_THROW(M.setInputSubtraction(X), Torch::machine::NInputsMismatch);
-  BOOST_CHECK_THROW(M.setInputDivision(X), Torch::machine::NInputsMismatch);
+  BOOST_CHECK_THROW(M.setWeights(W), bob::machine::NInputsMismatch);
+  BOOST_CHECK_THROW(M.setBiases(X), bob::machine::NOutputsMismatch);
+  BOOST_CHECK_THROW(M.setInputSubtraction(X), bob::machine::NInputsMismatch);
+  BOOST_CHECK_THROW(M.setInputDivision(X), bob::machine::NInputsMismatch);
 }
 
 BOOST_AUTO_TEST_CASE( test_correctness )
 {
   //loads a known machine from the file
-  char *testdata_cpath = getenv("TORCH_MACHINE_TESTDATA_DIR");
+  char *testdata_cpath = getenv("BOB_MACHINE_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    Torch::core::error << "Environment variable $TORCH_MACHINE_TESTDATA_DIR " <<
+    bob::core::error << "Environment variable $BOB_MACHINE_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
   }
   boost::filesystem::path testdata(testdata_cpath);
   testdata /= "linear-test.hdf5";
-  Torch::io::HDF5File config(testdata.string(), Torch::io::HDF5File::in);
-  Torch::machine::LinearMachine M(config);
+  bob::io::HDF5File config(testdata.string(), bob::io::HDF5File::in);
+  bob::machine::LinearMachine M(config);
 
   blitz::Array<double,2> in(4,3);
   in = 1, 1, 1, 

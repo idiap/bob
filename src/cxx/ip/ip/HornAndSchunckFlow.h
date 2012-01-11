@@ -20,15 +20,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IP_HORNANDSCHUNCKFLOW_H 
-#define TORCH_IP_HORNANDSCHUNCKFLOW_H
+#ifndef BOB_IP_HORNANDSCHUNCKFLOW_H 
+#define BOB_IP_HORNANDSCHUNCKFLOW_H
 
 #include <cstdlib>
 #include <stdint.h>
 #include <blitz/array.h>
 #include "ip/SpatioTemporalGradient.h"
 
-namespace Torch { namespace ip { namespace optflow {
+namespace bob { namespace ip { namespace optflow {
 
   /**
    * An approximation to the Laplacian (averaging) operator. Using the
@@ -184,7 +184,7 @@ namespace Torch { namespace ip { namespace optflow {
 
     private: //representation
 
-      Torch::ip::HornAndSchunckGradient m_gradient; ///< Gradient operator
+      bob::ip::HornAndSchunckGradient m_gradient; ///< Gradient operator
       mutable blitz::Array<double,2> m_ex; ///< Ex buffer
       mutable blitz::Array<double,2> m_ey; ///< Ey buffer
       mutable blitz::Array<double,2> m_et; ///< Et buffer
@@ -260,7 +260,7 @@ namespace Torch { namespace ip { namespace optflow {
 
     private: //representation
 
-      Torch::ip::SobelGradient m_gradient; ///< Gradient operator
+      bob::ip::SobelGradient m_gradient; ///< Gradient operator
       mutable blitz::Array<double,2> m_ex; ///< Ex buffer
       mutable blitz::Array<double,2> m_ey; ///< Ey buffer
       mutable blitz::Array<double,2> m_et; ///< Et buffer
@@ -281,4 +281,4 @@ namespace Torch { namespace ip { namespace optflow {
 
 }}}
 
-#endif /* TORCH_IP_HORNANDSCHUNCKFLOW_H */
+#endif /* BOB_IP_HORNANDSCHUNCKFLOW_H */

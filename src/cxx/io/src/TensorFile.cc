@@ -26,9 +26,9 @@
 #include "io/TensorFile.h"
 #include "io/reorder.h"
 
-namespace io = Torch::io;
-namespace core = Torch::core;
-namespace ca = Torch::core::array;
+namespace io = bob::io;
+namespace core = bob::core;
+namespace ca = bob::core::array;
 
 io::TensorFile::TensorFile(const std::string& filename, 
     io::TensorFile::openmode flag):
@@ -107,8 +107,8 @@ void io::TensorFile::close() {
 void io::TensorFile::initHeader(const ca::typeinfo& info) {
   // Check that data have not already been written
   if (m_n_arrays_written > 0 ) {
-    Torch::core::error << "Cannot init the header of an output stream in which data have already been written." << std::endl;
-    throw Torch::core::Exception();
+    bob::core::error << "Cannot init the header of an output stream in which data have already been written." << std::endl;
+    throw bob::core::Exception();
   }
 
   // Initialize header

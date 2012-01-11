@@ -10,10 +10,10 @@
 #include "core/python/ndarray.h"
 
 using namespace boost::python;
-namespace mach = Torch::machine;
-namespace io = Torch::io;
-namespace ca = Torch::core::array;
-namespace tp = Torch::python;
+namespace mach = bob::machine;
+namespace io = bob::io;
+namespace ca = bob::core::array;
+namespace tp = bob::python;
 
 static double computeLikelihood1(mach::PLDAMachine& plda, 
   const blitz::Array<double, 1>& sample, bool with_enrolled_samples=true)

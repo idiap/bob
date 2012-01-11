@@ -20,7 +20,7 @@
 #include "core/File.h"
 #include "core/Tensor.h"
 
-namespace Torch
+namespace bob
 {
 	///////////////////////////////////////////////////////////
 	// Constructor
@@ -103,7 +103,7 @@ namespace Torch
 		tag_[tag_size] = '\0';
 		if (scanf("%s", tag_) != 1)
 		{
-			Torch::message("File: sorry, the tag <%s> cannot be read!", tag);
+			bob::message("File: sorry, the tag <%s> cannot be read!", tag);
 			delete[] tag_;
 			return false;
 		}
@@ -111,7 +111,7 @@ namespace Torch
 		// Check the tag
 		if (strcmp(tag, tag_) != 0)
 		{
-			Torch::message("File: tag <%s> not found!", tag);
+			bob::message("File: tag <%s> not found!", tag);
 			delete[] tag_;
 			return false;
 		}
@@ -125,7 +125,7 @@ namespace Torch
 	{
 		if (printf("%s ", tag) != (int)strlen(tag) + 1)
 		{
-			Torch::message("File: sorry, the tag <%s> cannot be written!", tag);
+			bob::message("File: sorry, the tag <%s> cannot be written!", tag);
 			return false;
 		}
 
@@ -224,12 +224,12 @@ namespace Torch
 		int n_ = 0;
 		if (readValue(&n_) == false)
 		{
-			Torch::message("File:: cannot read the number of elements!\n");
+			bob::message("File:: cannot read the number of elements!\n");
 			return false;
 		}
 		if (n_ != n)
 		{
-			Torch::message("File: read <%d> elements and was given <%d> elements!\n", n_, n);
+			bob::message("File: read <%d> elements and was given <%d> elements!\n", n_, n);
 			return false;
 		}
 

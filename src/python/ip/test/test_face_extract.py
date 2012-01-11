@@ -9,7 +9,7 @@
 import math
 import os, sys
 import unittest
-import torch
+import bob
 import numpy
 
 # face data
@@ -26,7 +26,7 @@ class FilterNewTest(unittest.TestCase):
   def test01_shiftColorImage(self):
     print ""
 
-    img = torch.io.Array(os.path.join('data', 'faceextract', 'test_001.png'))
+    img = bob.io.Array(os.path.join('data', 'faceextract', 'test_001.png'))
     A = img.get()
     B = A.copy()
 
@@ -34,61 +34,61 @@ class FilterNewTest(unittest.TestCase):
     delta_w = 100
 
     # shift to center
-    torch.ip.shift(A, B, delta_h, delta_w);
+    bob.ip.shift(A, B, delta_h, delta_w);
 
     # save image
-    torch.io.Array(B).save(os.path.join('data', 'faceextract', 'test_001.shift.png'));
+    bob.io.Array(B).save(os.path.join('data', 'faceextract', 'test_001.shift.png'));
 
   def test02_shiftToCenterBlue(self):
     print ""
 
-    img = torch.io.Array(os.path.join('data', 'faceextract', 'test_001.png'))
+    img = bob.io.Array(os.path.join('data', 'faceextract', 'test_001.png'))
     A = img.get()
     B = A.copy()
 
     # shift to center
-    torch.ip.shiftToCenterOfPoints(A, B, LH, LW, RH, RW)
+    bob.ip.shiftToCenterOfPoints(A, B, LH, LW, RH, RW)
 
     # save image
-    torch.io.Array(B).save(os.path.join('data', 'faceextract', 'test_001.blue.answer.png'));
+    bob.io.Array(B).save(os.path.join('data', 'faceextract', 'test_001.blue.answer.png'));
 
   def test03_shiftToCenterBlue_And_LevelOut(self):
     print ""
 
-    img = torch.io.Array(os.path.join('data', 'faceextract', 'test_001.gray.png'))
+    img = bob.io.Array(os.path.join('data', 'faceextract', 'test_001.gray.png'))
     A = img.get()[1,:,:]
     B = A.copy()
 
     # shift to center
-    torch.ip.shiftToCenterOfPoints(A, B, LH, LW, RH, RW)
+    bob.ip.shiftToCenterOfPoints(A, B, LH, LW, RH, RW)
 
     # rotate
-    angle = torch.ip.getAngleToHorizontal(LH, LW, RH, RW)
-    shape = torch.ip.getShapeRotated(B, angle)
+    angle = bob.ip.getAngleToHorizontal(LH, LW, RH, RW)
+    shape = bob.ip.getShapeRotated(B, angle)
     C = B.copy()
     C.resize(shape)
-    torch.ip.rotate(B, C, angle)
+    bob.ip.rotate(B, C, angle)
     
     # save image
-    torch.io.Array(C).save(os.path.join('data', 'faceextract', 'test_001.blue.level.answer.png'));
+    bob.io.Array(C).save(os.path.join('data', 'faceextract', 'test_001.blue.level.answer.png'));
 
   def test04_geoNormBlue(self):
     print ""
 
     # read up image
-    img = torch.io.Array(os.path.join('data', 'faceextract', 'test_001.gray.png'))
+    img = bob.io.Array(os.path.join('data', 'faceextract', 'test_001.gray.png'))
     A = img.get()[1,:,:]
     B = A.copy()
 
     # shift to center
-    torch.ip.shiftToCenterOfPoints(A, B, LH, LW, RH, RW)
+    bob.ip.shiftToCenterOfPoints(A, B, LH, LW, RH, RW)
 
     # rotate
-    angle = torch.ip.getRotateAngleToLevelOutHorizontal(LH, LW, RH, RW)
-    shape = torch.ip.getShapeRotated(B, angle)
+    angle = bob.ip.getRotateAngleToLevelOutHorizontal(LH, LW, RH, RW)
+    shape = bob.ip.getShapeRotated(B, angle)
     C = B.copy()
     C.resize(shape)
-    torch.ip.rotate(B, C, angle)
+    bob.ip.rotate(B, C, angle)
 
     # normalise
     previous_eye_distance = math.sqrt((RH - LH) * (RH - LH) + (RW - LW) * (RW - LW))
@@ -97,14 +97,14 @@ class FilterNewTest(unittest.TestCase):
     scale_factor = GOAL_EYE_DISTANCE / previous_eye_distance;
 
     #
-    D = torch.ip.scaleAs(C, scale_factor)
-    torch.ip.scale(C, D)
+    D = bob.ip.scaleAs(C, scale_factor)
+    bob.ip.scale(C, D)
 
   def test05_geoNormFace(self):
     print ""
 
     # read up image
-    img = torch.io.Array(os.path.join('data', 'faceextract', 'test-faces.jpg'))
+    img = bob.io.Array(os.path.join('data', 'faceextract', 'test-faces.jpg'))
     A = img.get()[1,:,:]
 
     # read up the eye coordinates
@@ -119,14 +119,14 @@ class FilterNewTest(unittest.TestCase):
 
     # shift to center
     B = A.copy()
-    torch.ip.shiftToCenterOfPoints(A, B, LH, LW, RH, RW)
+    bob.ip.shiftToCenterOfPoints(A, B, LH, LW, RH, RW)
 
     # rotate
-    angle = torch.ip.getRotateAngleToLevelOutHorizontal(LH, LW, RH, RW)
-    shape = torch.ip.getShapeRotated(B, angle)
+    angle = bob.ip.getRotateAngleToLevelOutHorizontal(LH, LW, RH, RW)
+    shape = bob.ip.getShapeRotated(B, angle)
     C = B.copy()
     C.resize(shape)
-    torch.ip.rotate(B, C, angle)
+    bob.ip.rotate(B, C, angle)
 
     # normalise
     previous_eye_distance = math.sqrt((RH - LH) * (RH - LH) + (RW - LW) * (RW - LW))
@@ -135,15 +135,15 @@ class FilterNewTest(unittest.TestCase):
     scale_factor = GOAL_EYE_DISTANCE / previous_eye_distance
 
     #
-    D = torch.ip.scaleAs(C, scale_factor)
-    torch.ip.scale(C, D)
-    torch.io.Array(D).save(os.path.join('data', 'faceextract', 'test-faces.1.jpg'));
+    D = bob.ip.scaleAs(C, scale_factor)
+    bob.ip.scale(C, D)
+    bob.io.Array(D).save(os.path.join('data', 'faceextract', 'test-faces.1.jpg'));
 
     
     # crop face
-    E = torch.core.array.uint8_2(100, 100)
-    torch.ip.cropFace(D, E, 30)
-    torch.io.Array(E).save(os.path.join('data', 'faceextract', 'test-faces.E.jpg'));
+    E = bob.core.array.uint8_2(100, 100)
+    bob.ip.cropFace(D, E, 30)
+    bob.io.Array(E).save(os.path.join('data', 'faceextract', 'test-faces.E.jpg'));
 
 
 if __name__ == '__main__':

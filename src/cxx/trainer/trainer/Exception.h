@@ -17,14 +17,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef TORCH5SPRO_TRAINER_EXCEPTION_H
-#define TORCH5SPRO_TRAINER_EXCEPTION_H
+#ifndef BOB5SPRO_TRAINER_EXCEPTION_H
+#define BOB5SPRO_TRAINER_EXCEPTION_H
 
 #include "core/Exception.h"
 
-namespace Torch { namespace trainer {
+namespace bob { namespace trainer {
 
-  class Exception: public Torch::core::Exception {
+  class Exception: public bob::core::Exception {
 
     public:
       Exception() throw();
@@ -98,4 +98,4 @@ namespace Torch { namespace trainer {
 
 }}
 
-#endif /* TORCH5SPRO_TRAINER_EXCEPTION_H */
+#endif /* BOB5SPRO_TRAINER_EXCEPTION_H */

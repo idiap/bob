@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_CORE_ARRAY_ASSERT_H
-#define TORCH5SPRO_CORE_ARRAY_ASSERT_H
+#ifndef BOB5SPRO_CORE_ARRAY_ASSERT_H
+#define BOB5SPRO_CORE_ARRAY_ASSERT_H
 
 #include "core/array_check.h"
 #include "core/array_exception.h"
@@ -29,7 +29,7 @@
 #include <blitz/tinyvec-et.h>
 #endif
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libcore_api
  * @{
@@ -161,4 +161,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_ARRAY_ASSERT_H */
+#endif /* BOB5SPRO_ARRAY_ASSERT_H */

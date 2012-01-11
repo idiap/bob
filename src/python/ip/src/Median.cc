@@ -11,7 +11,7 @@
 #include "ip/Median.h"
 
 using namespace boost::python;
-namespace ip = Torch::ip;
+namespace ip = bob::ip;
 
 
 static const char* medianfilter_doc = "Objects of this class, after configuration, can perform a median filtering operation.";

@@ -17,14 +17,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _TORCH5SPRO_IP_VCYCLE_H_
-#define _TORCH5SPRO_IP_VCYCLE_H_
+#ifndef _BOB5SPRO_IP_VCYCLE_H_
+#define _BOB5SPRO_IP_VCYCLE_H_
 
 #include "ip/ipCore.h"
 
 #define IS_NEAR(var, value, delta) ((var >= (value - delta)) && (var <= (value + delta)))
 
-namespace Torch {
+namespace bob {
 
 /** This class implements the multigrid V-cycle algorithm
 

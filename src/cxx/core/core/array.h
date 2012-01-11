@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_CORE_ARRAY_INTERFACE_H 
-#define TORCH_CORE_ARRAY_INTERFACE_H
+#ifndef BOB_CORE_ARRAY_INTERFACE_H 
+#define BOB_CORE_ARRAY_INTERFACE_H
 
 #include <stdexcept>
 #include <string>
@@ -32,7 +32,7 @@
 
 #include "core/array_type.h"
 
-namespace Torch { namespace core { namespace array {
+namespace bob { namespace core { namespace array {
 
   /**
    * Encapsulation of special type information of interfaces.
@@ -41,8 +41,8 @@ namespace Torch { namespace core { namespace array {
 
     ElementType dtype; ///< data type
     size_t nd; ///< number of dimensions
-    size_t shape[TORCH_MAX_DIM+1]; ///< length along each dimension
-    size_t stride[TORCH_MAX_DIM+1]; ///< strides along each dimension
+    size_t shape[BOB_MAX_DIM+1]; ///< length along each dimension
+    size_t stride[BOB_MAX_DIM+1]; ///< strides along each dimension
 
     /**
      * Default constructor
@@ -126,7 +126,7 @@ namespace Torch { namespace core { namespace array {
      * sets the shape
      */
     template <typename T> void set_shape(T nd_, const T* shape_) {
-      if (nd_ > (TORCH_MAX_DIM+1))
+      if (nd_ > (BOB_MAX_DIM+1))
         throw std::invalid_argument("unsupported number of dimensions");
       nd = nd_;
       for (size_t k=0; k<nd; ++k) shape[k] = shape_[k];
@@ -254,4 +254,4 @@ namespace Torch { namespace core { namespace array {
 
 }}}
 
-#endif /* TORCH_CORE_ARRAY_INTERFACE_H */
+#endif /* BOB_CORE_ARRAY_INTERFACE_H */

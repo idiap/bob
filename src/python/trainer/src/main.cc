@@ -32,9 +32,9 @@ void bind_trainer_plda();
 void bind_trainer_wiener();
 void bind_trainer_empca();
 
-BOOST_PYTHON_MODULE(libpytorch_trainer) {
+BOOST_PYTHON_MODULE(libpybob_trainer) {
 
-  Torch::python::setup_python("Torch classes and sub-classes for trainers");
+  bob::python::setup_python("bob classes and sub-classes for trainers");
   
   bind_trainer_linear();
   bind_trainer_gmm();

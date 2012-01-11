@@ -25,9 +25,9 @@
 #include <limits>
 
 using namespace boost::python;
-namespace train = Torch::trainer;
-namespace mach = Torch::machine;
-namespace io = Torch::io;
+namespace train = bob::trainer;
+namespace mach = bob::machine;
+namespace io = bob::io;
 
 
 class EMTrainerGMMWrapper: public train::EMTrainer<mach::GMMMachine, io::Arrayset>, 

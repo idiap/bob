@@ -20,15 +20,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_CORE_ARRAY_CHECK_H
-#define TORCH_CORE_ARRAY_CHECK_H
+#ifndef BOB_CORE_ARRAY_CHECK_H
+#define BOB_CORE_ARRAY_CHECK_H
 
 #include <blitz/array.h>
 #if !defined (HAVE_BLITZ_TINYVEC2_H)
 #include <blitz/tinyvec-et.h>
 #endif
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libcore_api
  * @{
@@ -284,4 +284,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_CORE_ARRAY_CHECK_H */
+#endif /* BOB5SPRO_CORE_ARRAY_CHECK_H */

@@ -85,7 +85,7 @@ void checkBlitzEqual( blitz::Array<T,1>& t1, blitz::Array<U,1>& t2)
 {
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
-      BOOST_CHECK_EQUAL(t1(i), Torch::core::cast<T>(t2(i)));
+      BOOST_CHECK_EQUAL(t1(i), bob::core::cast<T>(t2(i)));
 }
 
 template<typename T, typename U>  
@@ -94,7 +94,7 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
-      BOOST_CHECK_EQUAL(t1(i,j), Torch::core::cast<T>(t2(i,j)));
+      BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
 template<typename T, typename U>  
@@ -104,7 +104,7 @@ void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
       for( int k=0; k<t1.extent(2); ++k)
-        BOOST_CHECK_EQUAL(t1(i,j,k), Torch::core::cast<T>(t2(i,j,k)));
+        BOOST_CHECK_EQUAL(t1(i,j,k), bob::core::cast<T>(t2(i,j,k)));
 }
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
@@ -115,27 +115,27 @@ BOOST_AUTO_TEST_CASE( test_zigzag_input1 )
 
   // Process src_a for various number of DCT coefficients
   dst.resize(3);
-	Torch::ip::zigzag(src_a, dst, 3);
+	bob::ip::zigzag(src_a, dst, 3);
 	checkBlitzEqual(dst, dst_a3);
 
   dst.resize(6);
-	Torch::ip::zigzag(src_a, dst, 6);
+	bob::ip::zigzag(src_a, dst, 6);
 	checkBlitzEqual(dst, dst_a6);
 
   dst.resize(10);
-	Torch::ip::zigzag(src_a, dst, 10);
+	bob::ip::zigzag(src_a, dst, 10);
 	checkBlitzEqual(dst, dst_a10);
 
   dst.resize(21);
-	Torch::ip::zigzag(src_a, dst, 21);
+	bob::ip::zigzag(src_a, dst, 21);
 	checkBlitzEqual(dst, dst_a21);
 
   dst.resize(26);
-	Torch::ip::zigzag(src_a, dst, 26);
+	bob::ip::zigzag(src_a, dst, 26);
 	checkBlitzEqual(dst, dst_a26);
  
   dst.resize(36);
-	Torch::ip::zigzag(src_a, dst, 36);
+	bob::ip::zigzag(src_a, dst, 36);
 	checkBlitzEqual(dst, dst_a36);
 }
 
@@ -145,27 +145,27 @@ BOOST_AUTO_TEST_CASE( test_zigzag_input2 )
 
   // Process src_b for various number of DCT coefficients
   dst.resize(2);
-	Torch::ip::zigzag(src_b, dst, 2);
+	bob::ip::zigzag(src_b, dst, 2);
 	checkBlitzEqual(dst, dst_b2);
 
   dst.resize(3);
-	Torch::ip::zigzag(src_b, dst, 3);
+	bob::ip::zigzag(src_b, dst, 3);
 	checkBlitzEqual(dst, dst_b3);
 
   dst.resize(6);
-	Torch::ip::zigzag(src_b, dst, 6);
+	bob::ip::zigzag(src_b, dst, 6);
 	checkBlitzEqual(dst, dst_b6);
 
   dst.resize(8);
-	Torch::ip::zigzag(src_b, dst, 8);
+	bob::ip::zigzag(src_b, dst, 8);
 	checkBlitzEqual(dst, dst_b8);
 
   // Process fully
-	Torch::ip::zigzag(src_b, dst);
+	bob::ip::zigzag(src_b, dst);
 	checkBlitzEqual(dst, dst_b8);
 
   // Reverse order
-	Torch::ip::zigzag(src_b, dst, 8, true);
+	bob::ip::zigzag(src_b, dst, 8, true);
 	checkBlitzEqual(dst, dst_b8r);
 }
   

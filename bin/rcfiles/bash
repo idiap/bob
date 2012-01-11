@@ -1,5 +1,5 @@
 #/bin/bash
-# This file complements the torch setup and has to used like this:
-# *torch*: --rcfile %(thisfile)s
+# This file complements the bob setup and has to used like this:
+# *bob*: --rcfile %(thisfile)s
 [ -e ~/.bashrc ] && source ~/.bashrc
-PS1="(torch5spro@${TORCH_VERSION} / ${TORCH_PLATFORM})\n${PS1}"
+PS1="(bob@${BOB_VERSION} / ${BOB_PLATFORM})\n${PS1}"

@@ -29,9 +29,9 @@
 #include "io/HDF5File.h"
 
 using namespace boost::python;
-namespace tp = Torch::python;
-namespace io = Torch::io;
-namespace ca = Torch::core::array;
+namespace tp = bob::python;
+namespace io = bob::io;
+namespace ca = bob::core::array;
 
 /**
  * Transforms the shape input into a tuple
@@ -83,7 +83,7 @@ void bind_io_hdf5_extras() {
     .def("compatible", &hdf5type_compatible, (arg("self"), arg("array")), "Tests compatibility of this type against a given array")
     .def("shape", &hdf5type_shape, (arg("self")), "Returns the shape of the elements described by this type")
     .def("type_str", &io::HDF5Type::type_str, (arg("self")), "Returns a stringified representation of the base element type")
-    .def("element_type", &io::HDF5Type::element_type, (arg("self")), "Returns a representation of the element type one of the Torch supported element types.")
+    .def("element_type", &io::HDF5Type::element_type, (arg("self")), "Returns a representation of the element type one of the bob supported element types.")
     ;
 
   //defines the descriptions returned by HDF5File::describe()

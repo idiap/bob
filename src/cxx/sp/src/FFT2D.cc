@@ -26,8 +26,8 @@
 #include <fftw3.h>
 
 
-namespace tca = Torch::core::array;
-namespace sp = Torch::sp;
+namespace tca = bob::core::array;
+namespace sp = bob::sp;
 
 sp::FFT2DAbstract::FFT2DAbstract( const int height, const int width):
   m_height(height), m_width(width)

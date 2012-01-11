@@ -6,7 +6,7 @@
 
 import os, sys
 import unittest
-import torch
+import bob
 import numpy
 
 #############################################################################
@@ -56,67 +56,67 @@ class ExtrapolationTest(unittest.TestCase):
 ##################### Convolution Tests ##################  
   def test_convolution_1D_zeros(self):
     b = numpy.zeros((14,), 'float64')
-    torch.sp.extrapolateZero(a5,b)
+    bob.sp.extrapolateZero(a5,b)
     test_extrapolate_1D(b,a14_zeros,self)
 
   def test_convolution_1D_twos(self):
     b = numpy.zeros((14,), 'float64')
-    torch.sp.extrapolateConstant(a5,b,2.)
+    bob.sp.extrapolateConstant(a5,b,2.)
     test_extrapolate_1D(b,a14_twos,self)
 
   def test_convolution_1D_nearest(self):
     b = numpy.zeros((14,), 'float64')
-    torch.sp.extrapolateNearest(a5,b)
+    bob.sp.extrapolateNearest(a5,b)
     test_extrapolate_1D(b,a14_nearest,self)
 
   def test_convolution_1D_circular(self):
     b = numpy.zeros((14,), 'float64')
-    torch.sp.extrapolateCircular(a5,b)
+    bob.sp.extrapolateCircular(a5,b)
     test_extrapolate_1D(b,a14_circular,self)
 
   def test_convolution_1D_mirror(self):
     b = numpy.zeros((14,), 'float64')
-    torch.sp.extrapolateMirror(a5,b)
+    bob.sp.extrapolateMirror(a5,b)
     test_extrapolate_1D(b,a14_mirror,self)
 
   def test_convolution_2D_zeros(self):
     B = numpy.zeros((4,4), 'float64')
-    torch.sp.extrapolateZero(A22,B)
+    bob.sp.extrapolateZero(A22,B)
     test_extrapolate_2D(B,A44_zeros,self)
 
   def test_convolution_2D_twos(self):
     B = numpy.zeros((4,4), 'float64')
-    torch.sp.extrapolateConstant(A22,B,2.)
+    bob.sp.extrapolateConstant(A22,B,2.)
     test_extrapolate_2D(B,A44_twos,self)
 
   def test_convolution_2D_nearest(self):
     B = numpy.zeros((4,4), 'float64')
-    torch.sp.extrapolateNearest(A22,B)
+    bob.sp.extrapolateNearest(A22,B)
     test_extrapolate_2D(B,A44_nearest,self)
   
   def test_convolution_2D_circular(self):
     B = numpy.zeros((4,4), 'float64')
-    torch.sp.extrapolateCircular(A22,B)
+    bob.sp.extrapolateCircular(A22,B)
     test_extrapolate_2D(B,A44_circular,self)
  
 
   def test_convolution_2D_mirror(self):
     B = numpy.zeros((4,4), 'float64')
-    torch.sp.extrapolateMirror(A22,B)
+    bob.sp.extrapolateMirror(A22,B)
     test_extrapolate_2D(B,A44_mirror,self)
 
 
 ##################### Main ##################  
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()
 

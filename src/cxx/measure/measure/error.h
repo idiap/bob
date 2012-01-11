@@ -20,14 +20,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_MEASURE_ERROR_H 
-#define TORCH_MEASURE_ERROR_H
+#ifndef BOB_MEASURE_ERROR_H 
+#define BOB_MEASURE_ERROR_H
 
 #include <blitz/array.h>
 #include <utility>
 #include <vector>
 
-namespace Torch { namespace measure {
+namespace bob { namespace measure {
 
   /**
    * Calculates the FA ratio and the FR ratio given positive and negative
@@ -155,7 +155,7 @@ namespace Torch { namespace measure {
    * This method can calculate a threshold based on a set of scores (positives
    * and negatives) given a certain minimization criteria, input as a
    * functional predicate. For a discussion on 'positive' and 'negative' see
-   * Torch::measure::fafr().
+   * bob::measure::fafr().
    *
    * The predicate method gives back the current minimum given false-acceptance
    * (FA) and false-rejection (FR) ratios for the input data. As a predicate,
@@ -298,4 +298,4 @@ namespace Torch { namespace measure {
 
 }}
 
-#endif /* TORCH_MEASURE_ERROR_H */
+#endif /* BOB_MEASURE_ERROR_H */

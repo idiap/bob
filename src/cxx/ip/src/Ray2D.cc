@@ -20,7 +20,7 @@
 #include "ip/Ray2D.h"
 #include "ip/OldColor.h"
 
-namespace Torch {
+namespace bob {
 
 void Ray2D::draw(Image *image, Color color)
 {

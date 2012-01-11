@@ -22,7 +22,7 @@
 
 #include "sp/spCore.h"
 
-namespace Torch
+namespace bob
 {
 /**
  * \ingroup libsp_api
@@ -31,7 +31,7 @@ namespace Torch
  */
 
 	//////////////////////////////////////////////////////////////////////////////////////
-	// Torch::spCoreChain:
+	// bob::spCoreChain:
 	//      - process some tensor given a list of spCores
 	//
 	// TODO: doxygen header!

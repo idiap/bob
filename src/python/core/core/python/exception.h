@@ -3,7 +3,7 @@
  * @date Fri Mar 25 15:21:36 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
- * @brief Implements a few classes that are useful for binding Torch exceptions
+ * @brief Implements a few classes that are useful for binding bob exceptions
  * to python.
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_PYTHON_CORE_EXCEPTION_H 
-#define TORCH_PYTHON_CORE_EXCEPTION_H
+#ifndef BOB_PYTHON_CORE_EXCEPTION_H 
+#define BOB_PYTHON_CORE_EXCEPTION_H
 
 #include <boost/python.hpp>
 
@@ -35,7 +35,7 @@
   throw boost::python::error_already_set(); \
 }
 
-namespace Torch { namespace python {
+namespace bob { namespace python {
 
   /**
    * This is a generalized exception translator for boost python. It simplifies
@@ -91,4 +91,4 @@ namespace Torch { namespace python {
 
 }}
 
-#endif /* TORCH_PYTHON_CORE_EXCEPTION_H */
+#endif /* BOB_PYTHON_CORE_EXCEPTION_H */

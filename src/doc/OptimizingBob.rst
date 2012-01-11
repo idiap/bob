@@ -63,7 +63,7 @@ Guidelines on building against Google perftools
   #endif
 
   int main(void) {
-    const char* profile_output = std::getenv("TORCH_PROFILE");
+    const char* profile_output = std::getenv("BOB_PROFILE");
     if (profile_output && std::strlen(profile_output)) {
   #ifdef HAVE_GOOGLE_PERFTOOLS
       std::cout << "Google perftools profile output set to " << profile_output << std::endl;
@@ -81,13 +81,13 @@ Guidelines on building against Google perftools
   }
 
 With this, you tie the execution of the profiling to the setting of an
-environment variable called ``TORCH_PROFILE``. If you don't set the variable,
+environment variable called ``BOB_PROFILE``. If you don't set the variable,
 code will execute in full speed. After compilation, to run your code in profile
 mode, just call your program in the following way:
 
 .. code-block:: sh
 
-  $ TORCH_PROFILE="profile_info.out" my_program
+  $ BOB_PROFILE="profile_info.out" my_program
 
 The file ``profile_info.out`` will contain the output of the profiling session.
 Use ``pprof`` as explained at Google's `PerfTool introduction to profiling`_ to
@@ -102,19 +102,19 @@ extensions should be easy. Here is a recipe:
 .. code-block:: sh
 
   #!python
-  import torch
+  import bob
 
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
 
   run_code_to_be_profiled();
 
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()
 
 .. Place here your links
 

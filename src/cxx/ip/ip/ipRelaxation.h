@@ -17,14 +17,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _TORCH5SPRO_IP_RELAXATION_H_
-#define _TORCH5SPRO_IP_RELAXATION_H_
+#ifndef _BOB5SPRO_IP_RELAXATION_H_
+#define _BOB5SPRO_IP_RELAXATION_H_
 
 #include "ip/ipCore.h"
 
 #define IS_NEAR(var, value, delta) ((var >= (value - delta)) && (var <= (value + delta)))
 
-namespace Torch {
+namespace bob {
 
 /** This class is designed to apply relaxation on the linear system induced by
     the discretization of an elliptic PDE (diffusion)

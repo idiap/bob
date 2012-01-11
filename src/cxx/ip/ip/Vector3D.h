@@ -22,7 +22,7 @@
 
 #include "ip/Point3D.h"
 
-namespace Torch {
+namespace bob {
 
 	class Matrix3D;
 

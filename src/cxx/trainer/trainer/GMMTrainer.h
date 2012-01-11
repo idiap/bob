@@ -32,12 +32,12 @@
 #include "machine/GMMStats.h"
 #include <limits>
 
-namespace Torch {
+namespace bob {
 namespace trainer {
 
 /// @brief This class implements the E-step of the expectation-maximisation algorithm for a GMM Machine.
 /// @details See Section 9.2.2 of Bishop, "Pattern recognition and machine learning", 2006
-class GMMTrainer : public EMTrainer<Torch::machine::GMMMachine, Torch::io::Arrayset> {
+class GMMTrainer : public EMTrainer<bob::machine::GMMMachine, bob::io::Arrayset> {
   public:
 
     /// Default constructor
@@ -47,7 +47,7 @@ class GMMTrainer : public EMTrainer<Torch::machine::GMMMachine, Torch::io::Array
     /// Destructor
     virtual ~GMMTrainer();
 
-    virtual void initialization(Torch::machine::GMMMachine& gmm, const Torch::io::Arrayset& data);
+    virtual void initialization(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data);
     
     /// Calculates and saves statistics across the dataset, 
     /// and saves these as m_ss. Calculates the average
@@ -56,14 +56,14 @@ class GMMTrainer : public EMTrainer<Torch::machine::GMMMachine, Torch::io::Array
     /// 
     /// The statistics, m_ss, will be used in the mStep() that follows.
     /// Implements EMTrainer::eStep(double &)
-    virtual double eStep(Torch::machine::GMMMachine& gmm, const Torch::io::Arrayset& data);
+    virtual double eStep(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data);
 
     
   protected:
 
     /// These are the sufficient statistics, calculated during the
     /// E-step and used during the M-step
-    Torch::machine::GMMStats m_ss;
+    bob::machine::GMMStats m_ss;
     
     /// update means on each iteration
     bool update_means;

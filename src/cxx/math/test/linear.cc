@@ -72,7 +72,7 @@ void checkBlitzEqual( blitz::Array<T,1>& t1, blitz::Array<U,1>& t2)
 {
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
-    BOOST_CHECK_EQUAL(t1(i), Torch::core::cast<T>(t2(i)));
+    BOOST_CHECK_EQUAL(t1(i), bob::core::cast<T>(t2(i)));
 }
 
 template<typename T, typename U>  
@@ -81,7 +81,7 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
-      BOOST_CHECK_EQUAL(t1(i,j), Torch::core::cast<T>(t2(i,j)));
+      BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
 template<typename T, typename U>  
@@ -91,7 +91,7 @@ void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
       for( int k=0; k<t1.extent(2); ++k)
-        BOOST_CHECK_EQUAL(t1(i,j,k), Torch::core::cast<T>(t2(i,j,k)));
+        BOOST_CHECK_EQUAL(t1(i,j,k), bob::core::cast<T>(t2(i,j,k)));
 }
 
 template<typename T>  
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE( test_matrix_matrix_prod )
 {
   blitz::Array<double,2> sol(2,3);
 
-  Torch::math::prod( A_24, A_43, sol);
+  bob::math::prod( A_24, A_43, sol);
   checkBlitzClose( A_23, sol, eps);
 }
 
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE( test_matrix_vector_prod )
 {
   blitz::Array<double,1> sol(2);
 
-  Torch::math::prod( A_24, b_4, sol);
+  bob::math::prod( A_24, b_4, sol);
   checkBlitzClose( b_2, sol, eps);
 }
 
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE( test_vector_matrix_prod )
 {
   blitz::Array<double,1> sol(2);
 
-  Torch::math::prod( b_4, A_24.transpose(1,0), sol);
+  bob::math::prod( b_4, A_24.transpose(1,0), sol);
   checkBlitzClose( b_2, sol, eps);
 }
 
@@ -143,32 +143,32 @@ BOOST_AUTO_TEST_CASE( test_vector_vector_prod )
 {
   blitz::Array<double,2> sol(4,4);
 
-  Torch::math::prod( b_4, b_4, sol);
+  bob::math::prod( b_4, b_4, sol);
   checkBlitzClose( Asol_44, sol, eps);
 }
 
 BOOST_AUTO_TEST_CASE( test_vector_vector_dot )
 {
-  double sol = Torch::math::dot( b_5a, b_5b);
+  double sol = bob::math::dot( b_5a, b_5b);
   BOOST_CHECK_SMALL( fabs(b5_dot - sol), eps);
 }
 
 BOOST_AUTO_TEST_CASE( test_matrix_trace )
 {
-  double sol = Torch::math::trace( Asol_44);
+  double sol = bob::math::trace( Asol_44);
   BOOST_CHECK_SMALL( fabs(tr_Asol_44 - sol), eps);
 }
 
 BOOST_AUTO_TEST_CASE( test_vector_norm )
 {
-  double sol = Torch::math::norm(b_4);
+  double sol = bob::math::norm(b_4);
   BOOST_CHECK_SMALL( fabs(ned_b_4 - sol), eps);
 }
 
 BOOST_AUTO_TEST_CASE( test_vector_normalized )
 {
   blitz::Array<double,1> sol(4);
-  Torch::math::normalize(b_4, sol);
+  bob::math::normalize(b_4, sol);
   checkBlitzClose( n_b_4, sol, eps);
 }
 

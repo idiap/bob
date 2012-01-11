@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IO_CARRAY_H
-#define TORCH_IO_CARRAY_H
+#ifndef BOB_IO_CARRAY_H
+#define BOB_IO_CARRAY_H
 
 #include <stdexcept>
 #include <boost/make_shared.hpp>
@@ -36,7 +36,7 @@
 #include "core/array_copy.h"
 #include "core/cast.h"
 
-namespace Torch { namespace core { namespace array {
+namespace bob { namespace core { namespace array {
 
   /**
    * A blitz::Array representation of an array.
@@ -154,7 +154,7 @@ namespace Torch { namespace core { namespace array {
           
           if (getElementType<T>() == t_unknown)
             throw std::invalid_argument("unsupported element type on blitz::Array<>");
-          if (N > TORCH_MAX_DIM) 
+          if (N > BOB_MAX_DIM) 
             throw std::invalid_argument("unsupported number of dimensions on blitz::Array<>");
 
           if (!isCContiguous(*data.get()))
@@ -209,7 +209,7 @@ namespace Torch { namespace core { namespace array {
         else {
         
           if (temporary) { //returns a temporary reference
-            return Torch::core::array::wrap<T,N>(*this);
+            return bob::core::array::wrap<T,N>(*this);
           }
           
           else {
@@ -226,7 +226,7 @@ namespace Torch { namespace core { namespace array {
        * data at. Only get the number of dimensions right!
        */
       template <typename T, int N> blitz::Array<T,N> cast() const {
-        return Torch::core::array::cast<T,N>(*this);
+        return bob::core::array::cast<T,N>(*this);
       }
 
     private: //representation
@@ -240,4 +240,4 @@ namespace Torch { namespace core { namespace array {
 
 }}}
 
-#endif /* TORCH_IO_CARRAY_H */
+#endif /* BOB_IO_CARRAY_H */

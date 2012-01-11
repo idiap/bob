@@ -21,14 +21,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_CORE_CAST_H
-#define TORCH5SPRO_CORE_CAST_H
+#ifndef BOB5SPRO_CORE_CAST_H
+#define BOB5SPRO_CORE_CAST_H
 
 #include <blitz/array.h>
 #include <stdint.h>
 #include <complex>
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libcore_api
  * @{
@@ -145,5 +145,5 @@ blitz::Array<T,4> cast(const blitz::Array<U,4>& in) {
  */
 }
 
-#endif /* TORCH5SPRO_CORE_CAST_H */
+#endif /* BOB5SPRO_CORE_CAST_H */
 

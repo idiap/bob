@@ -19,7 +19,7 @@
  */
 #include "core/general.h"
 
-namespace Torch {
+namespace bob {
 
 char msg[10000];
 

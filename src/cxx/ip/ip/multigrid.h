@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _TORCH5SPRO_MULTIGRID_H_
-#define _TORCH5SPRO_MULTIGRID_H_
+#ifndef _BOB5SPRO_MULTIGRID_H_
+#define _BOB5SPRO_MULTIGRID_H_
 
 #include "core/Tensor.h"
 #include "core/general.h"
@@ -32,7 +32,7 @@
 
 #define IS_NEAR(var, value, delta) ((var >= (value - delta)) && (var <= (value + delta)))
 
-namespace Torch {
+namespace bob {
 
 /** @name Useful functions for the multigrid framework
  

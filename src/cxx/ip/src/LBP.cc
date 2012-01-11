@@ -22,7 +22,7 @@
 
 #include "ip/LBP.h"
 
-namespace ip = Torch::ip;
+namespace ip = bob::ip;
 
 ip::LBP::LBP(const int P, const double R, const bool circular,
     const bool to_average,const bool add_average_bit, const bool uniform,

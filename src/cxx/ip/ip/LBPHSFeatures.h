@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH5SPRO_IP_LBPHS_FEATURES_H
-#define TORCH5SPRO_IP_LBPHS_FEATURES_H
+#ifndef BOB5SPRO_IP_LBPHS_FEATURES_H
+#define BOB5SPRO_IP_LBPHS_FEATURES_H
 
 #include "core/cast.h"
 #include "ip/Exception.h"
@@ -33,7 +33,7 @@
 #include "ip/LBP8R.h"
 #include <list>
 
-namespace Torch {
+namespace bob {
 /**
  * \ingroup libip_api
  * @{
@@ -64,13 +64,13 @@ namespace Torch {
         m_overlap_w(overlap_w), m_lbp_r(lbp_r), m_lbp_p(lbp_p)
       {
         if( m_lbp_p == 4 )
-          m_lbp = new Torch::ip::LBP4R(m_lbp_r, circular, to_average, 
+          m_lbp = new bob::ip::LBP4R(m_lbp_r, circular, to_average, 
             add_average_bit, uniform, rotation_invariant);
         else if( m_lbp_p == 8 )
-          m_lbp = new Torch::ip::LBP8R(m_lbp_r, circular, to_average, 
+          m_lbp = new bob::ip::LBP8R(m_lbp_r, circular, to_average, 
             add_average_bit, uniform, rotation_invariant);
         else
-          throw Torch::ip::LBPUnsupportedNNeighbours(m_lbp_p);
+          throw bob::ip::LBPUnsupportedNNeighbours(m_lbp_p);
       }
 
 	  	/**
@@ -109,7 +109,7 @@ namespace Torch {
       /**
         * Attributes
         */
-      Torch::ip::LBP *m_lbp;
+      bob::ip::LBP *m_lbp;
       int m_block_h;
       int m_block_w;
       int m_overlap_h;
@@ -123,7 +123,7 @@ namespace Torch {
     U& dst) 
   { 
     // cast to double
-    blitz::Array<double,2> double_version = Torch::core::cast<double>(src);
+    blitz::Array<double,2> double_version = bob::core::cast<double>(src);
 
     // get all the blocks
     std::list<blitz::Array<double,2> > blocks;
@@ -158,4 +158,4 @@ namespace Torch {
 
 }}
 
-#endif /* TORCH5SPRO_IP_LBPHS_FEATURES_H */
+#endif /* BOB5SPRO_IP_LBPHS_FEATURES_H */

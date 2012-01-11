@@ -9,7 +9,7 @@ converted to an HDF5-compatible neural network representation.
 
 .. note::
 
-  Torch currently only supports fully-connected feed-forward networks.
+  bob currently only supports fully-connected feed-forward networks.
 
 .. note::
 
@@ -17,18 +17,18 @@ converted to an HDF5-compatible neural network representation.
 """
 
 from xml.dom.minidom import parse as xml_parse
-import torch
+import bob
 import numpy
 
 def acttext_to_enum(s):
-  """Converts the XML activation representation to a torch value"""
+  """Converts the XML activation representation to a bob value"""
   
   if s.lower() == 'tanh':
-    return torch.machine.Activation.TANH
+    return bob.machine.Activation.TANH
   elif s.lower() == 'sigmoid':
-    return torch.machine.Activation.LOG
+    return bob.machine.Activation.LOG
   elif s.lower() == 'linear':
-    return torch.machine.Activation.LINEAR
+    return bob.machine.Activation.LINEAR
   else:
     raise RuntimeError, "unsupported activation %s" % s
 
@@ -176,7 +176,7 @@ def load_xml(filename, verbose):
   hidden = dom.getElementsByTagName('hidden')
   outputs = dom.getElementsByTagName('output')
 
-  mach = torch.machine.MLP((len(inputs), len(hidden), len(outputs)))
+  mach = bob.machine.MLP((len(inputs), len(hidden), len(outputs)))
 
   inputs = set_input(mach, inputs, verbose)
   hidden, activation = set_hidden(mach, hidden, verbose)
@@ -202,7 +202,7 @@ def convert(ifile, ofile, verbose):
   """Runs the full conversion from XML to HDF5"""
 
   machine = load_xml(ifile, verbose)
-  machine.save(torch.io.HDF5File(ofile))
+  machine.save(bob.io.HDF5File(ofile))
   if verbose: 
     print "MLP/HDF5 machine saved at %s" % ofile
     print machine
@@ -229,7 +229,7 @@ if __name__ == '__main__':
     import os
     import sys
     import tempfile
-    (fd, name) = tempfile.mkstemp(prefix="torch_example", suffix='.hdf5')
+    (fd, name) = tempfile.mkstemp(prefix="bob_example", suffix='.hdf5')
     os.close(fd)
     os.unlink(name)
     mydir = os.path.dirname(os.path.realpath(sys.argv[0]))

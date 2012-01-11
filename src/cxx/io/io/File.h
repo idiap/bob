@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IO_FILE_H 
-#define TORCH_IO_FILE_H
+#ifndef BOB_IO_FILE_H 
+#define BOB_IO_FILE_H
 
 #include <vector>
 #include <string>
@@ -31,7 +31,7 @@
 
 #include "core/array.h"
 
-namespace Torch { namespace io {
+namespace bob { namespace io {
       
   /**
    * Files deal with reading and writing multiple (homogeneous) array data to
@@ -52,13 +52,13 @@ namespace Torch { namespace io {
        * The typeinfo of data within this file, if it is supposed to be read as
        * a single array.
        */
-      virtual const Torch::core::array::typeinfo& array_type() const =0;
+      virtual const bob::core::array::typeinfo& array_type() const =0;
 
       /**
        * The typeinfo of data within this file, if it is supposed to be read as
        * as an array set.
        */
-      virtual const Torch::core::array::typeinfo& arrayset_type() const =0;
+      virtual const bob::core::array::typeinfo& arrayset_type() const =0;
 
       /**
        * The number of arrays available in this file, if it is supposed to be
@@ -79,7 +79,7 @@ namespace Torch { namespace io {
        * reseting the input array and putting the data read from the file
        * inside.
        */
-      virtual void array_read(Torch::core::array::interface& buffer) =0;
+      virtual void array_read(bob::core::array::interface& buffer) =0;
 
       /**
        * Loads the data of the array into memory. If an index is specified
@@ -91,7 +91,7 @@ namespace Torch { namespace io {
        * reseting the input array and putting the data read from the file
        * inside.
        */
-      virtual void arrayset_read(Torch::core::array::interface& buffer, 
+      virtual void arrayset_read(bob::core::array::interface& buffer, 
           size_t index) =0;
 
       /**
@@ -102,14 +102,14 @@ namespace Torch { namespace io {
        * Returns the current position of the newly written array.
        */
       virtual size_t arrayset_append 
-        (const Torch::core::array::interface& buffer) =0;
+        (const bob::core::array::interface& buffer) =0;
 
       /**
        * Writes the data from the given buffer into the file and act like it is
        * the only piece of data that will ever be written to such a file. Not
        * more data appending may happen after a call to this method.
        */
-      virtual void array_write (const Torch::core::array::interface& buffer) =0;
+      virtual void array_write (const bob::core::array::interface& buffer) =0;
 
   };
 
@@ -138,4 +138,4 @@ namespace Torch { namespace io {
 
 }}
 
-#endif /* TORCH_IO_FILE_H */
+#endif /* BOB_IO_FILE_H */

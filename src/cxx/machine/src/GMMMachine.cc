@@ -21,8 +21,8 @@
 #include "core/logging.h"
 #include "machine/Exception.h"
 
-namespace TLog = Torch::machine::Log;
-namespace mach = Torch::machine;
+namespace TLog = bob::machine::Log;
+namespace mach = bob::machine;
 
 mach::GMMMachine::GMMMachine(): m_gaussians(0), m_cache_supervector(false) {
   resize(0,0);
@@ -32,7 +32,7 @@ mach::GMMMachine::GMMMachine(int n_gaussians, int n_inputs): m_gaussians(0), m_c
   resize(n_gaussians,n_inputs);
 }
 
-mach::GMMMachine::GMMMachine(Torch::io::HDF5File& config): m_gaussians(0), m_cache_supervector(false) {
+mach::GMMMachine::GMMMachine(bob::io::HDF5File& config): m_gaussians(0), m_cache_supervector(false) {
   load(config);
 }
 
@@ -267,7 +267,7 @@ void mach::GMMMachine::forward_(const blitz::Array<double,1>& input, double& out
   output = logLikelihood(input);
 }
 
-void mach::GMMMachine::accStatistics(const Torch::io::Arrayset& ar, mach::GMMStats& stats) const {
+void mach::GMMMachine::accStatistics(const bob::io::Arrayset& ar, mach::GMMStats& stats) const {
   // iterate over data
   for(size_t i=0; i<ar.size(); ++i) {
 
@@ -336,7 +336,7 @@ int mach::GMMMachine::getNGaussians() const {
   return m_n_gaussians;
 }
 
-void mach::GMMMachine::save(Torch::io::HDF5File& config) const {
+void mach::GMMMachine::save(bob::io::HDF5File& config) const {
   config.set("m_n_gaussians", m_n_gaussians);
   config.set("m_n_inputs", m_n_inputs);
 
@@ -352,7 +352,7 @@ void mach::GMMMachine::save(Torch::io::HDF5File& config) const {
   config.setArray("m_weights", m_weights);
 }
 
-void mach::GMMMachine::load(Torch::io::HDF5File& config) {
+void mach::GMMMachine::load(bob::io::HDF5File& config) {
   m_n_gaussians = config.read<int64_t>("m_n_gaussians");
   m_n_inputs = config.read<int64_t>("m_n_inputs");
   
@@ -406,7 +406,7 @@ const blitz::Array<double,1>& mach::GMMMachine::getVarianceSupervector() const {
   return m_cache_variance_supervector;
 } 
 
-namespace Torch {
+namespace bob {
   namespace machine {
     std::ostream& operator<<(std::ostream& os, const GMMMachine& machine) {
       os << "Weights = " << machine.m_weights << std::endl;

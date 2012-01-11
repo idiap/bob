@@ -3,7 +3,7 @@
  * @date Wed Jun 22 17:50:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
- * @brief A torch representation of a list of Arrays
+ * @brief A bob representation of a list of Arrays
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -24,7 +24,7 @@
 #include "io/Arrayset.h"
 #include "io/CodecRegistry.h"
 
-namespace io = Torch::io;
+namespace io = bob::io;
 
 io::Arrayset::Arrayset ()
 {

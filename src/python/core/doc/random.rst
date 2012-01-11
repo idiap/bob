@@ -12,7 +12,7 @@ facilities. This allows you to generate random numbers in a variety of ways.
 Reference Manual
 ----------------
 
-.. automodule:: torch.core.random
+.. automodule:: bob.core.random
   :members:
 
 .. Place here your references

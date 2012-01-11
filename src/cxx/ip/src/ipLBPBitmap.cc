@@ -21,7 +21,7 @@
 #include "ip/ipLBP.h"
 #include "core/Tensor.h"
 
-namespace Torch {
+namespace bob {
 
 /////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -67,7 +67,7 @@ bool ipLBPBitmap::checkInput(const Tensor& input) const
 	// Should be type independent.
 	// Assume it is 2D now, no checking.
 
-	// Accept only 3D tensors of Torch::Image type
+	// Accept only 3D tensors of bob::Image type
 	//if (	input.nDimension() != 3 ||
 	//		input.getDatatype() != Tensor::Short)
 	//{

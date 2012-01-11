@@ -64,7 +64,7 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
-      BOOST_CHECK_EQUAL(t1(i,j), Torch::core::cast<T>(t2(i,j)));
+      BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
 template<typename T>  
@@ -83,11 +83,11 @@ BOOST_AUTO_TEST_CASE( test_gammacorrection_2d_uint32 )
   blitz::Array<double,2> b2(a2.shape());
   
   // gamma == 0.1
-  Torch::ip::gammaCorrection(a2, b2, 0.1);
+  bob::ip::gammaCorrection(a2, b2, 0.1);
   checkBlitzSmall(b2, a2_g01, eps); 
 
   // gamma == 1.1
-  Torch::ip::gammaCorrection(a2, b2, 1.1);
+  bob::ip::gammaCorrection(a2, b2, 1.1);
   checkBlitzSmall(b2, a2_g11, eps); 
 }
   

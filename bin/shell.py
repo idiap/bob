@@ -7,9 +7,9 @@ import sys, os, subprocess
 import shlex
 
 # Imports our admin toolkit.
-if os.environ.has_key('OVERWRITE_TORCH5SPRO_BINROOT'):
+if os.environ.has_key('OVERWRITE_BOB5SPRO_BINROOT'):
   # grid environments will use this variant:
-  install_dir = os.environ['OVERWRITE_TORCH5SPRO_BINROOT']
+  install_dir = os.environ['OVERWRITE_BOB5SPRO_BINROOT']
 else:
   # normal execution path:
   install_dir = os.path.realpath(os.path.dirname(sys.argv[0]))
@@ -28,7 +28,7 @@ if __name__ == '__main__':
   if not arguments: arguments = [os.environ['SHELL']]
 
   if options.verbose:
-    print("Starting '%s' inside torch5spro (%s/%s) environment" % \
+    print("Starting '%s' inside bob (%s/%s) environment" % \
       (os.path.basename(arguments[0]), options.version, options.arch))
   
   new_environ = adm.environment.generate_environment(options)
@@ -43,8 +43,8 @@ if __name__ == '__main__':
         print("Key:", key)
         print("=", new_environ[key])
 
-  # The next line will add options to the program if torch can, to customize
-  # the program behavior to torch environment specificities. This will be done
+  # The next line will add options to the program if bob can, to customize
+  # the program behavior to bob environment specificities. This will be done
   # unless the user says explicitely that it does not want prompt fiddling.
   if options.env_manipulation:
     adm.environment.set_prompt(arguments, new_environ)

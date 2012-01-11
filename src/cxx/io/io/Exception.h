@@ -3,7 +3,7 @@
  * @date Wed Jun 22 17:50:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
- * @brief Exceptions used throughout the IO subsystem of Torch
+ * @brief Exceptions used throughout the IO subsystem of bob
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -20,16 +20,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TORCH_IO_EXCEPTION_H 
-#define TORCH_IO_EXCEPTION_H
+#ifndef BOB_IO_EXCEPTION_H 
+#define BOB_IO_EXCEPTION_H
 
 #include <cstdlib>
 #include "core/Exception.h"
 #include "core/array_type.h"
 
-namespace Torch { namespace io {
+namespace bob { namespace io {
 
-  class Exception: public Torch::core::Exception {
+  class Exception: public bob::core::Exception {
 
     public:
       Exception() throw();
@@ -74,25 +74,25 @@ namespace Torch { namespace io {
 
   class TypeError: public Exception {
     public:
-      TypeError(Torch::core::array::ElementType got, 
-          Torch::core::array::ElementType expected) throw();
+      TypeError(bob::core::array::ElementType got, 
+          bob::core::array::ElementType expected) throw();
       virtual ~TypeError() throw();
       virtual const char* what() const throw();
 
     private:
-      Torch::core::array::ElementType m_got;
-      Torch::core::array::ElementType m_expected;
+      bob::core::array::ElementType m_got;
+      bob::core::array::ElementType m_expected;
       mutable std::string m_message;
   };
 
   class UnsupportedTypeError: public Exception {
     public:
-      UnsupportedTypeError(Torch::core::array::ElementType eltype) throw();
+      UnsupportedTypeError(bob::core::array::ElementType eltype) throw();
       virtual ~UnsupportedTypeError() throw();
       virtual const char* what() const throw();
 
     private:
-      Torch::core::array::ElementType m_eltype;
+      bob::core::array::ElementType m_eltype;
       mutable std::string m_message;
   };
 
@@ -167,13 +167,13 @@ namespace Torch { namespace io {
   
   class ImageUnsupportedType: public Exception {
     public:
-      ImageUnsupportedType(const Torch::core::array::ElementType el_type)
+      ImageUnsupportedType(const bob::core::array::ElementType el_type)
         throw();
       virtual ~ImageUnsupportedType() throw();
       virtual const char* what() const throw();
 
     private:
-      Torch::core::array::ElementType m_el_type;
+      bob::core::array::ElementType m_el_type;
       mutable std::string m_message;
   };
 
@@ -190,4 +190,4 @@ namespace Torch { namespace io {
 
 }}
 
-#endif /* TORCH_IO_EXCEPTION_H */
+#endif /* BOB_IO_EXCEPTION_H */

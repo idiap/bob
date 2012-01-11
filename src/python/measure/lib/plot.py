@@ -184,26 +184,26 @@ def det(negatives, positives, npoints=100, **kwargs):
     If you wish to reset axis zooming, you must use the gaussian scale rather
     than the visual marks showed at the plot, which are just there for
     displaying purposes. The real axis scale is based on the
-    torch.measure.ppndf() method. For example, if you wish to set the x and y
+    bob.measure.ppndf() method. For example, if you wish to set the x and y
     axis to display data between 1% and 40% here is the recipe:
 
     .. code-block:: python
 
-      import torch
+      import bob
       import matplotlib.pyplot as mpl
-      torch.measure.plot.det(...) #call this as many times as you need
+      bob.measure.plot.det(...) #call this as many times as you need
       #AFTER you plot the DET curve, just set the axis in this way:
-      mpl.axis([torch.measure.ppndf(k/100.0) for k in (1, 40, 1, 40)])
+      mpl.axis([bob.measure.ppndf(k/100.0) for k in (1, 40, 1, 40)])
 
     We provide a convenient way for you to do the above in this module. So,
-    optionally, you may use the torch.measure.plot.det_axis() method like this:
+    optionally, you may use the bob.measure.plot.det_axis() method like this:
 
     .. code-block:: python
 
-      import torch
-      torch.measure.plot.det(...)
+      import bob
+      bob.measure.plot.det(...)
       # please note we convert percentage values in det_axis()
-      torch.measure.plot.det_axis([1, 40, 1, 40])
+      bob.measure.plot.det_axis([1, 40, 1, 40])
 
   Return value is the matplotlib line that was added as defined by the
   matplotlib.pyplot.plot() command.
@@ -261,8 +261,8 @@ def det_axis(v, **kwargs):
   """Sets the axis in a DET plot.
 
   This method wraps the matplotlib.pyplot.axis() by calling
-  torch.measure.ppndf() on the values passed by the user so they are meaningful
-  in a DET plot as performed by torch.measure.plot.det().
+  bob.measure.ppndf() on the values passed by the user so they are meaningful
+  in a DET plot as performed by bob.measure.plot.det().
 
   Keyword parameters:
 

@@ -6,7 +6,7 @@ include("ExternalProject")
 # These are the basic variables to setup the visioner checkout from the proper
 # place and with the supported tag. It also provides basis in case we cannot
 # reach the directory ${VISIONER_REPO} directly.
-set(VISIONER_REPO "http://www.idiap.ch/software/torch5spro/git/visioner.git/")
+set(VISIONER_REPO "http://www.idiap.ch/software/bob/git/visioner.git/")
 
 # Accesses the git command
 find_program(GIT_EXECUTABLE NAMES git PATH_SUFFIXES Git/cmd Git/bin
@@ -21,6 +21,6 @@ ExternalProject_Add(visioner
   DOWNLOAD_COMMAND rm -rf visioner && ${GIT_EXECUTABLE} clone ${VISIONER_REPO}
   UPDATE_COMMAND git pull origin +HEAD
   PATCH_COMMAND ""
-  CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} -DTORCH_INCLUDE_DIR=${CMAKE_INSTALL_PREFIX}/include/torch -DTORCH_LIBRARY_DIR=${CMAKE_BINARY_DIR}/cxx/lbfgs
+  CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} -DLBFGS_INCLUDE_DIR=${CMAKE_INSTALL_PREFIX}/include/bob -DLBFGS_LIBRARY_DIR=${CMAKE_BINARY_DIR}/cxx/lbfgs
   )
-add_dependencies(visioner torch_lbfgs)
+add_dependencies(visioner bob_lbfgs)

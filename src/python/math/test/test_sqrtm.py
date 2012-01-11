@@ -2,12 +2,12 @@
 # vim: set fileencoding=utf-8 :
 # Laurent El Shafey <laurent.el-shafey@idiap.ch>
 
-"""Tests Torch square root of a matrix computation.
+"""Tests bob square root of a matrix computation.
 """
 
 import os, sys
 import unittest
-import torch
+import bob
 import numpy
 
 class SqrtmTest(unittest.TestCase):
@@ -26,8 +26,8 @@ class SqrtmTest(unittest.TestCase):
     C = numpy.ndarray((4,4), 'float64')
 
     # Computes the square root (using the two different python methods)
-    torch.math.sqrtSymReal(A,C)
-    B=torch.math.sqrtSymReal(A)
+    bob.math.sqrtSymReal(A,C)
+    B=bob.math.sqrtSymReal(A)
 
     # Compare square root to matlab reference
     ref=numpy.array(
@@ -40,13 +40,13 @@ class SqrtmTest(unittest.TestCase):
    
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()

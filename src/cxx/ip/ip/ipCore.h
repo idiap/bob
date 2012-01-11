@@ -22,7 +22,7 @@
 
 #include "sp/spCore.h"
 
-namespace Torch
+namespace bob
 {
 /**
  * \defgroup libip_api libIP API
@@ -32,7 +32,7 @@ namespace Torch
  */
 
 	//////////////////////////////////////////////////////////////////////////////////////
-	// Torch::ipCore:
+	// bob::ipCore:
 	//	- image processing interface
 	//
 	// TODO: doxygen header!
@@ -67,7 +67,7 @@ namespace Torch
 
 @section intro Introduction
 
-IP is the Image Processing module of Torch.
+IP is the Image Processing module of bob.
 
 @section api Documentation
 - @ref libip_api "libIP API"

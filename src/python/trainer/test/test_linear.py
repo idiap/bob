@@ -8,7 +8,7 @@
 
 import os, sys
 import unittest
-import torch
+import bob
 import random
 import numpy
 
@@ -18,7 +18,7 @@ class TrainerTest(unittest.TestCase):
   def test01a_pca_via_svd(self):
 
     # Tests our SVD/PCA extractor.
-    data = torch.io.Arrayset()
+    data = bob.io.Arrayset()
     data.append(numpy.array([2.5, 2.4]))
     data.append(numpy.array([0.5, 0.7]))
     data.append(numpy.array([2.2, 2.9]))
@@ -34,7 +34,7 @@ class TrainerTest(unittest.TestCase):
     eig_val_correct = numpy.array([1.28402771, 0.0490834], 'float64')
     eig_vec_correct = numpy.array([[-0.6778734, -0.73517866], [-0.73517866, 0.6778734]], 'float64')
 
-    T = torch.trainer.SVDPCATrainer()
+    T = bob.trainer.SVDPCATrainer()
     machine, eig_vals = T.train(data)
 
     # Makes sure results are good
@@ -44,7 +44,7 @@ class TrainerTest(unittest.TestCase):
   def test01b_pca_via_svd(self):
 
     # Tests our SVD/PCA extractor.
-    data = torch.io.Arrayset()
+    data = bob.io.Arrayset()
     data.append(numpy.array([1,2, 3,5,7], 'float64'))
     data.append(numpy.array([2,4,19,0,2], 'float64'))
     data.append(numpy.array([3,6, 5,3,3], 'float64'))
@@ -54,7 +54,7 @@ class TrainerTest(unittest.TestCase):
     eig_val_correct = numpy.array([61.9870996, 9.49613738, 1.85009634, 0.],
         'float64')
 
-    T = torch.trainer.SVDPCATrainer()
+    T = bob.trainer.SVDPCATrainer()
     machine, eig_vals = T.train(data)
 
     # Makes sure results are good
@@ -65,7 +65,7 @@ class TrainerTest(unittest.TestCase):
 
     # Tests our Fisher/LDA trainer for linear machines for a simple 2-class
     # "fake" problem:
-    data = [torch.io.Arrayset(), torch.io.Arrayset()]
+    data = [bob.io.Arrayset(), bob.io.Arrayset()]
     data[0].append(numpy.array([2.5, 2.4]))
     data[0].append(numpy.array([2.2, 2.9]))
     data[0].append(numpy.array([1.9, 2.2]))
@@ -86,7 +86,7 @@ class TrainerTest(unittest.TestCase):
     exp_val = numpy.array([24.27536526])
     exp_mach = numpy.array([[-0.291529], [0.956562]])
 
-    T = torch.trainer.FisherLDATrainer()
+    T = bob.trainer.FisherLDATrainer()
     machine, eig_vals = T.train(data)
 
     # Makes sure results are good
@@ -98,7 +98,7 @@ class TrainerTest(unittest.TestCase):
 
     # Tests our Probabilistic PCA trainer for linear machines for a simple 
     # problem:
-    ar=torch.io.Arrayset()
+    ar=bob.io.Arrayset()
     ar.append(numpy.array([1,2,3], 'float64'))
     ar.append(numpy.array([2,4,19], 'float64'))
     ar.append(numpy.array([3,6,5], 'float64'))
@@ -109,8 +109,8 @@ class TrainerTest(unittest.TestCase):
     exp_llh2 =  -30.8559
    
     # Do two iterations of EM to check the training procedure 
-    T = torch.trainer.EMPCATrainer(2)
-    m = torch.machine.LinearMachine()
+    T = bob.trainer.EMPCATrainer(2)
+    m = bob.machine.LinearMachine()
     # Initialization of the trainer
     T.initialization(m, ar)
     # Sets ('random') initialization values for test purposes
@@ -135,13 +135,13 @@ class TrainerTest(unittest.TestCase):
 
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStart'):
-    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStart'):
+    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('TORCH_PROFILE') and \
-      os.environ['TORCH_PROFILE'] and \
-      hasattr(torch.core, 'ProfilerStop'):
-    torch.core.ProfilerStop()
+  if os.environ.has_key('BOB_PROFILE') and \
+      os.environ['BOB_PROFILE'] and \
+      hasattr(bob.core, 'ProfilerStop'):
+    bob.core.ProfilerStop()

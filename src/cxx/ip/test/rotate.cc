@@ -103,7 +103,7 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
-      BOOST_CHECK_EQUAL(t1(i,j), Torch::core::cast<T>(t2(i,j)));
+      BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
 template<typename T, typename U>  
@@ -113,7 +113,7 @@ void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
       for( int k=0; k<t1.extent(2); ++k)
-        BOOST_CHECK_EQUAL(t1(i,j,k), Torch::core::cast<T>(t2(i,j,k)));
+        BOOST_CHECK_EQUAL(t1(i,j,k), bob::core::cast<T>(t2(i,j,k)));
 }
 
 
@@ -128,7 +128,7 @@ void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2,
   double diff = 0.;
   for( int i=0; i<y_min; ++i)
     for( int j=0; j<x_min; ++j)
-      diff += abs( t1(i,j) - Torch::core::cast<T>(t2(i,j)) );
+      diff += abs( t1(i,j) - bob::core::cast<T>(t2(i,j)) );
   diff = (diff/(y_min*x_min)) / 
     (std::numeric_limits<T>::max()-std::numeric_limits<T>::min()+1);
   BOOST_CHECK_SMALL( diff, eps );
@@ -148,7 +148,7 @@ void checkBlitzClose( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2,
   for( int i=0; i<p_min; ++i)
     for( int j=0; j<y_min; ++j)
       for( int k=0; k<x_min; ++k)
-        diff += abs( t1(i,j,k) - Torch::core::cast<T>(t2(i,j,k)) );
+        diff += abs( t1(i,j,k) - bob::core::cast<T>(t2(i,j,k)) );
   diff = (diff/(y_min*x_min*p_min)) / 
     (std::numeric_limits<T>::max()-std::numeric_limits<T>::min()+1);
   BOOST_CHECK_SMALL( diff, eps );
@@ -162,7 +162,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_mod90_uint32 )
   blitz::Array<double,2> b2;
 
   // Rotation of 0
-  Torch::ip::Rotate rotate(0.);
+  bob::ip::Rotate rotate(0.);
   b2.resize( rotate.getOutputShape(a2,0.) );
   rotate(a2, b2, 0.);
   checkBlitzEqual(a2, b2); 
@@ -187,30 +187,30 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_mod90_uint32 )
 BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
 {
   // Get path to the XML Schema definition
-  char *testdata_cpath = getenv("TORCH_IP_TESTDATA_DIR");
+  char *testdata_cpath = getenv("BOB_IP_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    Torch::core::error << "Environment variable $TORCH_IP_TESTDATA_DIR " <<
+    bob::core::error << "Environment variable $BOB_IP_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
   }
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "image.pgm";
-  Torch::io::Array ar_img(testdata_path_img.string());
+  bob::io::Array ar_img(testdata_path_img.string());
   blitz::Array<uint8_t,2> img = ar_img.get<uint8_t,2>();
   blitz::Array<double,2> img_processed;
 
   // Rotate original image and compare with ImageMagick reference image
   // Warning: ImageMagick considers opposite angles wrt. to us
-  Torch::ip::Rotate rotate(5., Torch::ip::Rotate::Shearing);
+  bob::ip::Rotate rotate(5., bob::ip::Rotate::Shearing);
 
   // 5 degrees
   img_processed.resize(rotate.getOutputShape(img,5.) ); 
   rotate( img, img_processed, 5.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r5.pgm";
-  Torch::io::Array ar_img_r5(testdata_path_img.string());
+  bob::io::Array ar_img_r5(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_r5 = ar_img_r5.get<uint8_t,2>();
   checkBlitzClose( img_ref_r5, img_processed, eps);
 
@@ -219,7 +219,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   rotate( img, img_processed, 10.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r10.pgm";
-  Torch::io::Array ar_img_r10(testdata_path_img.string());
+  bob::io::Array ar_img_r10(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_r10 = ar_img_r10.get<uint8_t,2>();
   checkBlitzClose( img_ref_r10, img_processed, eps);
 
@@ -228,7 +228,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   rotate( img, img_processed, 15.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r15.pgm";
-  Torch::io::Array ar_img_r15(testdata_path_img.string());
+  bob::io::Array ar_img_r15(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_r15 = ar_img_r15.get<uint8_t,2>();
   checkBlitzClose( img_ref_r15, img_processed, eps);
 
@@ -237,7 +237,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   rotate( img, img_processed, 30.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r30.pgm";
-  Torch::io::Array ar_img_r30(testdata_path_img.string());
+  bob::io::Array ar_img_r30(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_r30 = ar_img_r30.get<uint8_t,2>();
   checkBlitzClose( img_ref_r30, img_processed, eps);
 
@@ -246,7 +246,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   rotate( img, img_processed, 45.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r45.pgm";
-  Torch::io::Array ar_img_r45(testdata_path_img.string());
+  bob::io::Array ar_img_r45(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_r45 = ar_img_r45.get<uint8_t,2>();
   checkBlitzClose( img_ref_r45, img_processed, eps);
 
@@ -255,7 +255,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   rotate( img, img_processed, 70.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r70.pgm";
-  Torch::io::Array ar_img_r70(testdata_path_img.string());
+  bob::io::Array ar_img_r70(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_r70 = ar_img_r70.get<uint8_t,2>();
   checkBlitzClose( img_ref_r70, img_processed, eps);
 
@@ -264,7 +264,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   rotate( img, img_processed, 237.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r237.pgm";
-  Torch::io::Array ar_img_r237(testdata_path_img.string());
+  bob::io::Array ar_img_r237(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_r237 = ar_img_r237.get<uint8_t,2>();
   checkBlitzClose( img_ref_r237, img_processed, eps);
 
@@ -273,7 +273,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   rotate( img, img_processed, -25.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_rn25.pgm";
-  Torch::io::Array ar_img_rn25(testdata_path_img.string());
+  bob::io::Array ar_img_rn25(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_rn25 = ar_img_rn25.get<uint8_t,2>();
   checkBlitzClose( img_ref_rn25, img_processed, eps);
 }
@@ -281,27 +281,27 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
 BOOST_AUTO_TEST_CASE( test_rotate_3d_generic_uint32 )
 {
   // Get path to the XML Schema definition
-  char *testdata_cpath = getenv("TORCH_IP_TESTDATA_DIR");
+  char *testdata_cpath = getenv("BOB_IP_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    Torch::core::error << "Environment variable $TORCH_IP_TESTDATA_DIR " <<
+    bob::core::error << "Environment variable $BOB_IP_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw Torch::core::Exception();
+    throw bob::core::Exception();
   }
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "imageColor.ppm";
-  Torch::io::Array ar_img(testdata_path_img.string());
+  bob::io::Array ar_img(testdata_path_img.string());
   blitz::Array<uint8_t,3> img = ar_img.get<uint8_t,3>();
   blitz::Array<double,3> img_processed;
 
   // 5 degrees 
-  Torch::ip::Rotate rotate(5., Torch::ip::Rotate::Shearing);
+  bob::ip::Rotate rotate(5., bob::ip::Rotate::Shearing);
   img_processed.resize(rotate.getOutputShape(img,5.) ); 
   rotate( img, img_processed, 5.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "imageColor_r5.ppm";
-  Torch::io::Array ar_img_r5(testdata_path_img.string());
+  bob::io::Array ar_img_r5(testdata_path_img.string());
   blitz::Array<uint8_t,3> img_ref_r5 = ar_img_r5.get<uint8_t,3>();
   checkBlitzClose( img_ref_r5, img_processed, eps);
 }
@@ -312,7 +312,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_mask )
   blitz::Array<bool,2> b8_mask;
 
   // Rotation of 45
-  Torch::ip::Rotate rotate(45.);
+  bob::ip::Rotate rotate(45.);
   b8.resize( rotate.getOutputShape(a8, 45.) );
   b8_mask.resize( b8.shape() );
   rotate(a8, a8m, b8, b8_mask, 45.);

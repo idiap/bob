@@ -3,7 +3,7 @@
 # Andre Anjos <andre.anjos@idiap.ch>
 # Tue 27 Jul 2010 17:40:46 CEST 
 
-"""This example Torch application produces a video output that shows the
+"""This example bob application produces a video output that shows the
 Gradient Flow (using an HSL mapping) of a given input video. You should pass
 the input filename (movie) and the output filename (output) that will contain
 the resulting movie. It is possible that you use the string "%(stem)s" to imply
@@ -12,10 +12,10 @@ the original filename stem (basename minus extension). Example:
 
 import sys, os, optparse
 import tempfile, shutil #for package tests
-import torch
+import bob
 
 def eval_gradient(movie, gradtype, template):
-  """This method is the one you are interested, it shows how torch reads a
+  """This method is the one you are interested, it shows how bob reads a
   video file and computes the gradient flow using either forward or central
   differences, saving the output as a new video in the output directory (using
   a template based on the original movie filename stem (base filename minus
@@ -36,54 +36,54 @@ def eval_gradient(movie, gradtype, template):
   if not os.path.exists(outputdir): os.makedirs(outputdir)
 
   # To read the input we use the VideoReader class and its iterability
-  video = torch.io.VideoReader(movie)
+  video = bob.io.VideoReader(movie)
   print "Loading", video.info
 
   # The images for the optical flow computation must be grayscale
   previous = None
   
   # These are the output vectors from the flow computation
-  u = torch.core.array.float64_2(video.height, video.width)
-  v = torch.core.array.float64_2(video.height, video.width)
+  u = bob.core.array.float64_2(video.height, video.width)
+  v = bob.core.array.float64_2(video.height, video.width)
   
   # Creates the output video (frame rate by default)
-  outvideo = torch.io.VideoWriter(output, video.height, video.width)
+  outvideo = bob.io.VideoWriter(output, video.height, video.width)
 
   if gradtype == 'forward':
     print "Computing Forward Spatio-Temporal Gradient (size 2)"
-    grad = torch.ip.ForwardGradient((video.height, video.width))
+    grad = bob.ip.ForwardGradient((video.height, video.width))
   else:
     print "Computing Central Spatio-Temporal Gradient (Sobel Filter)"
-    grad = torch.ip.CentralGradient((video.height, video.width))
+    grad = bob.ip.CentralGradient((video.height, video.width))
 
   for k, frame in enumerate(video):
 
     if gradtype == 'forward':
       if previous is None:
         # Need 2 consecutive images to calculate the forward flow
-        previous = [torch.ip.rgb_to_gray(frame).convert('float64',
+        previous = [bob.ip.rgb_to_gray(frame).convert('float64',
             destRange=(0.,1.))]
         continue
 
     if gradtype == 'central':
       # Need 3 consecutive images to calculate the central flow
       if previous is None:
-        previous = [torch.ip.rgb_to_gray(frame).convert('float64',
+        previous = [bob.ip.rgb_to_gray(frame).convert('float64',
           destRange=(0.,1.))]
         continue
       elif previous and len(previous) == 1:
-        previous.append(torch.ip.rgb_to_gray(frame).convert('float64',
+        previous.append(bob.ip.rgb_to_gray(frame).convert('float64',
           destRange=(0.,1.)))
         continue
 
     # if you get to this point, we have two/three consecutive images
-    current = torch.ip.rgb_to_gray(frame).convert('float64', destRange=(0.,1.))
+    current = bob.ip.rgb_to_gray(frame).convert('float64', destRange=(0.,1.))
     args = previous + [current, u, v]
     grad(*args)
     
     # please note the algorithm output is as float64 and that the flow2hsv
     # method outputs in float32 (read respective documentations)
-    rgb = torch.ip.flowutils.flow2hsv(u,v).convert('uint8', sourceRange=(0.,1.))
+    rgb = bob.ip.flowutils.flow2hsv(u,v).convert('uint8', sourceRange=(0.,1.))
     outvideo.append(rgb)
 
     # reset the "previous" frame

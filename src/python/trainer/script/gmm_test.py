@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import torch
+import bob
 import os, sys
 import optparse
 import math
@@ -41,15 +41,15 @@ for line in fileinput.input(args):
   myfile = line.rstrip('\r\n')
 
   # Create data with only one file
-  ar = torch.io.Arrayset(myfile)
+  ar = bob.io.Arrayset(myfile)
 
   # Compute the number of blocks
   n_blocks = len(ar)
 
   # Load the gmm
   if not options.noworld:
-    prior_gmm = torch.machine.GMMMachine(torch.io.HDF5File(options.world_model))
-  gmm = torch.machine.GMMMachine(torch.io.HDF5File(options.model))
+    prior_gmm = bob.machine.GMMMachine(bob.io.HDF5File(options.world_model))
+  gmm = bob.machine.GMMMachine(bob.io.HDF5File(options.model))
 
   # Compute the score
   scoreCL = 0.
