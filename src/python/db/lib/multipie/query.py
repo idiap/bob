@@ -255,9 +255,9 @@ class Database(object):
       the model_ids is performed.
 
     groups
-      One of the groups ('dev', 'eval', 'world') or a tuple with several of them. 
-      If 'None' is given (this is the default), it is considered the same as a 
-      tuple with all possible values.
+      One of the groups ('dev', 'eval', 'world') or a tuple with several of
+      them.  If 'None' is given (this is the default), it is considered the
+      same as a tuple with all possible values.
 
     classes
       The classes (types of accesses) to be retrieved ('client', 'impostor') 
@@ -275,9 +275,9 @@ class Database(object):
 
     world_sampling
       Samples the files from the world data set. Keeps only files such as:
-        File.client_id + File.shot_id % world_sampling == 0
-      This argument should be an integer between 1 (keep everything) and 19.
-      It is not used if world_noflash is also set.
+      File.client_id + File.shot_id % world_sampling == 0. This argument should
+      be an integer between 1 (keep everything) and 19.  It is not used if
+      world_noflash is also set.
 
     world_noflash
       Keeps the files from the world dataset recorded without flash (shot 1)
@@ -417,9 +417,9 @@ class Database(object):
       the model_ids is performed.
 
     groups
-      One of the groups ('dev', 'eval', 'world') or a tuple with several of them. 
-      If 'None' is given (this is the default), it is considered the same as a 
-      tuple with all possible values.
+      One of the groups ('dev', 'eval', 'world') or a tuple with several of
+      them.  If 'None' is given (this is the default), it is considered the
+      same as a tuple with all possible values.
 
     classes
       The classes (types of accesses) to be retrieved ('client', 'impostor') 
@@ -434,17 +434,16 @@ class Database(object):
 
     world_sampling
       Samples the files from the world data set. Keeps only files such as:
-        File.client_id + File.shot_id % world_sampling == 0
-      This argument should be an integer between 1 (keep everything) and 20.
-      It is not used if world_noflash is also set.
+      File.client_id + File.shot_id % world_sampling == 0. This argument should
+      be an integer between 1 (keep everything) and 20.  It is not used if
+      world_noflash is also set.
 
     world_noflash
-      Keeps the files from the world dataset recorded without flash 
-      (shots 1 and 19)
+      Keeps the files from the world dataset recorded without flash (shots 1
+      and 19)
  
-    world_first
-      Only uses data from the first recorded session of each user of the world
-      dataset.
+    world_first Only uses data from the first recorded session of each user of
+    the world dataset.
 
     Returns: A dictionary containing the resolved filenames considering all
     the filtering criteria. The keys of the dictionary are unique identities 
