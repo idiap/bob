@@ -1,0 +1,225 @@
+/**
+ * @file cxx/ip/src/GaborFrequency.cc
+ * @date Wed Apr 13 20:12:03 2011 +0200
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
+ *
+ * @brief This file provides a class to perform a Gabor filtering in the
+ * frequency domain.
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "core/array_assert.h"
+#include "core/array_copy.h"
+#include "ip/GaborWaveletTransform.h"
+#include <numeric>
+
+static inline double sqr(double x){return x*x;}
+
+bob::ip::GaborKernel::GaborKernel(
+  std::pair<int, int> resolution,
+  std::pair<double, double> k,
+  double sigma,
+  double epsilon,
+  bool dc_free
+)
+: m_x_resolution(resolution.first),
+  m_y_resolution(resolution.second)
+{
+  // create Gabor wavelet with given parameters
+  int32_t start_x = - (int)m_x_resolution / 2, start_y = - (int)m_y_resolution / 2;
+  // take care of odd resolutions in the end points
+  int32_t end_x = m_x_resolution / 2 + m_x_resolution % 2, end_y = m_y_resolution / 2 + m_y_resolution % 2;
+
+  double k_x_factor = 2. * M_PI / m_x_resolution, k_y_factor = 2. * M_PI / m_y_resolution;
+
+  // iterate over all pixels of the images
+  for (int y = start_y; y < end_y; ++y){
+
+    // convert relative pixel coordinate into frequency coordinate
+    double omega_y = y * k_y_factor;
+
+    for (int x = start_x; x < end_x; ++x){
+
+      // convert relative pixel coordinate into frequency coordinate
+      double omega_x = x * k_x_factor;
+
+      // compute value of freqency kernel function
+      double omega_minus_k_squared = sqr(omega_x - k.first) + sqr(omega_y - k.second);
+      double sigma_square = sqr(sigma);
+      double k_square = sqr(k.first) + sqr(k.second);
+      // assign kernel value
+      double wavelet_value = exp(- sigma_square * omega_minus_k_squared / (2. * k_square));
+
+      if (! dc_free){
+        double omega_square = sqr(omega_x) + sqr(omega_y);
+
+        wavelet_value -= exp(-sigma_square * (omega_square + k_square) / (2. * k_square));
+      } // if ! dc_free
+
+      if (std::abs(wavelet_value) > epsilon){
+        m_kernel_pixel.push_back(std::make_pair(
+          blitz::TinyVector<int,2>((x + m_x_resolution) % m_x_resolution, (y + m_y_resolution) % m_y_resolution),
+          wavelet_value
+        ));
+      }
+    } // for x
+  } // for y
+}
+
+
+void bob::ip::GaborKernel::transform(
+  const blitz::Array<std::complex<double>,2>& frequency_domain_image,
+  blitz::Array<std::complex<double>,2>& transformed_frequency_domain_image
+) const
+{
+  // assert same size
+  bob::core::array::assertSameShape(frequency_domain_image, transformed_frequency_domain_image);
+  // clear resulting image first
+  transformed_frequency_domain_image = std::complex<double>(0);
+  // iterate through the kernel pixels and do the multiplication
+  std::vector<std::pair<blitz::TinyVector<int,2>, double> >::const_iterator it = m_kernel_pixel.begin(), it_end = m_kernel_pixel.end();
+  for (; it < it_end; ++it){
+    transformed_frequency_domain_image(it->first) = frequency_domain_image(it->first) * it->second;
+  }
+}
+
+
+/***********************************************************************************
+******************     GaborWaveletTransform      **********************************
+***********************************************************************************/
+bob::ip::GaborWaveletTransform::GaborWaveletTransform(
+  int number_of_scales,
+  int number_of_orientations,
+  double sigma,
+  double k_max,
+  double k_fac
+)
+: m_sigma(sigma),
+  m_fft(0,0),
+  m_ifft(0,0)
+{
+  // reserve enough space
+  m_kernel_frequencies.reserve(number_of_scales * number_of_orientations);
+  // initialize highest frequency
+  double k_abs = k_max;
+  // iterate over the scales
+  for (int s = 0; s < number_of_scales; ++s){
+
+    // iterate over the directions
+    for (int d = 0; d < number_of_orientations; ++d )
+    {
+      double angle = M_PI * d / number_of_orientations;
+      // compute center of kernel in frequency domain in cartesian coordinates
+      m_kernel_frequencies.push_back(
+        std::make_pair(k_abs * cos(angle), k_abs * sin(angle)));
+    } // for d
+
+    // move to the next frequency scale
+    k_abs *= k_fac;
+  } // for s
+}
+
+
+void bob::ip::GaborWaveletTransform::generateKernels(
+  std::pair<int,int> resolution
+)
+{
+  if (resolution.first != m_fft.getWidth() || resolution.second != m_fft.getHeight()){
+    // new kernels need to be generated
+    m_gabor_kernels.clear();
+    m_gabor_kernels.reserve(m_kernel_frequencies.size());
+
+    for (int j = 0; j < (int)m_kernel_frequencies.size(); ++j){
+      m_gabor_kernels.push_back(bob::ip::GaborKernel(resolution, m_kernel_frequencies[j], m_sigma));
+    }
+
+    // reset fft sizes
+    m_fft.reset(resolution.first, resolution.second);
+    m_ifft.reset(resolution.first, resolution.second);
+    m_temp_array.resize(blitz::shape(resolution.first,resolution.second));
+    m_frequency_image.resize(m_temp_array.shape());
+  }
+}
+
+
+void bob::ip::GaborWaveletTransform::gwt(
+  blitz::Array<std::complex<double>,3>& trafo_image,
+  const blitz::Array<std::complex<double>,2>& gray_image
+)
+{
+  // first, check if we need to reset the kernels
+  generateKernels(std::make_pair(gray_image.extent(0),gray_image.extent(1)));
+
+  // perform Fourier transformation to image
+  blitz::Array<std::complex<double>,2> frequency_image(gray_image.shape());
+  m_fft(gray_image, frequency_image);
+
+  // change size of the trafo image, if required
+  trafo_image.resize(blitz::shape(m_kernel_frequencies.size(),gray_image.extent(0),gray_image.extent(1)));
+
+  // now, let each kernel compute the transformation result
+  for (int j = 0; j < (int)m_gabor_kernels.size(); ++j){
+    // get a reference to the current layer of the trafo image
+    m_gabor_kernels[j].transform(frequency_image, m_temp_array);
+    // perform ifft on the trafo image layer
+    blitz::Array<std::complex<double>,2> layer(trafo_image(j, blitz::Range::all(), blitz::Range::all()));
+    m_ifft(m_temp_array, layer);
+  } // for j
+}
+
+void bob::ip::GaborWaveletTransform::jetImage(
+  blitz::Array<double,4>& jet_image,
+  const blitz::Array<std::complex<double>,2>& gray_image,
+  bool do_normalize
+)
+{
+  // first, check if we need to reset the kernels
+  generateKernels(std::make_pair(gray_image.extent(0),gray_image.extent(1)));
+
+  // perform Fourier transformation to image
+  blitz::Array<std::complex<double>,2> frequency_image(gray_image.shape());
+  m_fft(gray_image, frequency_image);
+
+  // re-shape jet image if necessary
+  jet_image.resize(blitz::shape(2, gray_image.extent(0), gray_image.extent(1), m_kernel_frequencies.size()));
+
+  // now, let each kernel compute the transformation result
+  for (int j = 0; j < (int)m_gabor_kernels.size(); ++j){
+    // get a reference to the current layer of the trafo image
+    m_gabor_kernels[j].transform(frequency_image, m_temp_array);
+    // perform ifft of transformed image
+    m_ifft(m_temp_array);
+    // convert into absolute and phase part
+    blitz::Array<double,2> abs_part(jet_image(0, blitz::Range::all(), blitz::Range::all(), j));
+    bob::core::getPart(abs_part, m_temp_array, bob::core::ABS_PART);
+    blitz::Array<double,2> phase_part(jet_image(1, blitz::Range::all(), blitz::Range::all(), j));
+    bob::core::getPart(phase_part, m_temp_array, bob::core::PHASE_PART);
+  } // for j
+
+  if (do_normalize){
+    // iterate the positions
+    for (int y = jet_image.extent(1); y--;){
+      for (int x = jet_image.extent(2); x--;){
+        // compute normalization values
+        blitz::Array<double,1> jet = jet_image(0,y,x,blitz::Range::all());
+        double norm = sqrt(std::inner_product(jet.begin(), jet.end(), jet.begin(), 0.));
+        // normalize the absolute parts of the jets
+        jet /= norm;
+      }
+    }
+  }
+}
+
