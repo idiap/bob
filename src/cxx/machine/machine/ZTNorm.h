@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/machine/ZTNorm.h
+ * @file src/cxx/machine/machine/ZTNorm.h
  * @date Tue Jul 19 15:33:20 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
  *
@@ -18,12 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB_ZTNORM_H
-#define BOB_ZTNORM_H
+#ifndef BOB_MACHINE_ZTNORM_H
+#define BOB_MACHINE_ZTNORM_H
 
 #include <blitz/array.h>
-#include <machine/GMMMachine.h>
-#include <vector>
 
 namespace bob { namespace machine {
 
@@ -38,12 +36,14 @@ namespace bob { namespace machine {
    * @param znorm_tests_on_tnorm_models
    * @param znorm_tests_tnorm_models_same_spk_ids
    * @param[out] scores normalized scores
+   * @warning The destination score array should have the correct size
+   *          (Same as eval_tests_on_eval_models)
    */
-  void ztNorm(blitz::Array<double, 2>& eval_tests_on_eval_models,
-              blitz::Array<double, 2>& znorm_tests_on_eval_models,
-              blitz::Array<double, 2>& eval_tests_on_tnorm_models,
-              blitz::Array<double, 2>& znorm_tests_on_tnorm_models,
-              blitz::Array<bool,   2>& znorm_tests_tnorm_models_same_spk_ids,
+  void ztNorm(const blitz::Array<double, 2>& eval_tests_on_eval_models,
+              const blitz::Array<double, 2>& znorm_tests_on_eval_models,
+              const blitz::Array<double, 2>& eval_tests_on_tnorm_models,
+              const blitz::Array<double, 2>& znorm_tests_on_tnorm_models,
+              const blitz::Array<bool,   2>& znorm_tests_tnorm_models_same_spk_ids,
               blitz::Array<double, 2>& scores);
   
   /**
@@ -57,13 +57,15 @@ namespace bob { namespace machine {
    * @param eval_tests_on_tnorm_models
    * @param znorm_tests_on_tnorm_models
    * @param[out] scores normalized scores
+   * @warning The destination score array should have the correct size
+   *          (Same as eval_tests_on_eval_models)
    */
-  void ztNorm(blitz::Array<double, 2>& eval_tests_on_eval_models,
-              blitz::Array<double, 2>& znorm_tests_on_eval_models,
-              blitz::Array<double, 2>& eval_tests_on_tnorm_models,
-              blitz::Array<double, 2>& znorm_tests_on_tnorm_models,
+  void ztNorm(const blitz::Array<double, 2>& eval_tests_on_eval_models,
+              const blitz::Array<double, 2>& znorm_tests_on_eval_models,
+              const blitz::Array<double, 2>& eval_tests_on_tnorm_models,
+              const blitz::Array<double, 2>& znorm_tests_on_tnorm_models,
               blitz::Array<double, 2>& scores);
 }
 }
 
-#endif /* BOB_ZTNORM_H */
+#endif /* BOB_MACHINE_ZTNORM_H */
