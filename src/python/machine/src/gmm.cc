@@ -30,40 +30,141 @@ using namespace boost::python;
 namespace io = bob::io;
 namespace mach = bob::machine;
 namespace tp = bob::python;
+namespace ca = bob::core::array;
 
 static tuple getVariancesAndWeightsForEachCluster(const mach::KMeansMachine& machine, io::Arrayset& ar) {
-  blitz::Array<double, 2> variances;
-  blitz::Array<double, 1> weights;
-  machine.getVariancesAndWeightsForEachCluster(ar, variances, weights);
-  return boost::python::make_tuple(variances, weights);
+  size_t n_means = machine.getNMeans();
+  size_t n_inputs = machine.getNInputs();
+  tp::ndarray variances(ca::t_float64, n_means, n_inputs);
+  tp::ndarray weights(ca::t_float64, n_means);
+  blitz::Array<double,2> variances_ = variances.bz<double,2>();
+  blitz::Array<double,1> weights_ = weights.bz<double,1>();
+  machine.getVariancesAndWeightsForEachCluster(ar, variances_, weights_);
+  return boost::python::make_tuple(variances.self(), weights.self());
 }
 
 
-#define GETTER(class, class_name, fct, type, dim) \
-static blitz::Array<type, dim> class_name##_##fct(const class& c) {\
-  blitz::Array<type, dim> v;\
-  c.fct(v);\
-  return v;\
+static object mach_KMeansMachine_getMean(const mach::KMeansMachine& kMeansMachine, const size_t i) {
+  size_t n_inputs = kMeansMachine.getNInputs();
+  tp::ndarray mean(ca::t_float64, n_inputs);
+  blitz::Array<double,1> mean_ = mean.bz<double,1>();
+  kMeansMachine.getMean(i, mean_);
+  return mean.self();
 }
 
-GETTER(mach::Gaussian, mach_Gaussian, getMean, double, 1)
-GETTER(mach::Gaussian, mach_Gaussian, getVariance, double, 1)
-GETTER(mach::Gaussian, mach_Gaussian, getVarianceThresholds, double, 1)
-
-GETTER(mach::KMeansMachine, mach_KMeansMachine, getMeans, double, 2)
-
-static blitz::Array<double, 1> mach_KMeansMachine_getMean(const mach::KMeansMachine& kMeansMachine, int i) {
-  blitz::Array<double, 1> mean;
-  kMeansMachine.getMean(i, mean);
-  return mean;
+static object mach_KMeansMachine_getMeans(const mach::KMeansMachine& kMeansMachine) {
+  size_t n_means = kMeansMachine.getNMeans();
+  size_t n_inputs = kMeansMachine.getNInputs();
+  tp::ndarray means(ca::t_float64, n_means, n_inputs);
+  blitz::Array<double,2> means_ = means.bz<double,2>();
+  means_ = kMeansMachine.getMeans();
+  return means.self();
 }
 
-GETTER(mach::GMMMachine, mach_GMMMachine, getMeans, double, 2)
-GETTER(mach::GMMMachine, mach_GMMMachine, getWeights, double, 1)
-GETTER(mach::GMMMachine, mach_GMMMachine, getVariances, double, 2)
-GETTER(mach::GMMMachine, mach_GMMMachine, getVarianceThresholds, double, 2)
-GETTER(mach::GMMMachine, mach_GMMMachine, getMeanSupervector, double, 1)
-GETTER(mach::GMMMachine, mach_GMMMachine, getVarianceSupervector, double, 1)
+
+static object mach_Gaussian_getMean(const mach::Gaussian& machine) {
+  size_t n_inputs = machine.getNInputs();
+  tp::ndarray mean(ca::t_float64, n_inputs);
+  blitz::Array<double,1> mean_ = mean.bz<double,1>();
+  mean_ = machine.getMean();
+  return mean.self();
+}
+
+static object mach_Gaussian_getVariance(const mach::Gaussian& machine) {
+  size_t n_inputs = machine.getNInputs();
+  tp::ndarray variance(ca::t_float64, n_inputs);
+  blitz::Array<double,1> variance_ = variance.bz<double,1>();
+  variance_ = machine.getVariance();
+  return variance.self();
+}
+
+static object mach_Gaussian_getVarianceThresholds(const mach::Gaussian& machine) {
+  size_t n_inputs = machine.getNInputs();
+  tp::ndarray varianceThresholds(ca::t_float64, n_inputs);
+  blitz::Array<double,1> varianceThresholds_ = varianceThresholds.bz<double,1>();
+  varianceThresholds_ = machine.getVarianceThresholds();
+  return varianceThresholds.self();
+}
+
+
+static blitz::Array<double,1> gmmstats_get_n(mach::GMMStats& s) {
+  return s.n;
+}
+ 
+static void gmmstats_set_n(mach::GMMStats& s, tp::const_ndarray n) {
+  s.n = n.bz<double,1>();
+}
+ 
+static blitz::Array<double,2> gmmstats_get_sumpx(mach::GMMStats& s) {
+  return s.sumPx;
+}
+
+static void gmmstats_set_sumpx(mach::GMMStats& s, tp::const_ndarray n) {
+  s.sumPx = n.bz<double,2>();
+}
+ 
+static blitz::Array<double,2> gmmstats_get_sumpxx(mach::GMMStats& s) {
+  return s.sumPxx;
+}
+ 
+static void gmmstats_set_sumpxx(mach::GMMStats& s, tp::const_ndarray n) {
+  s.sumPxx = n.bz<double,2>();
+}
+
+
+static object mach_GMMMachine_getWeights(const mach::GMMMachine& machine) {
+  size_t n_gaussians = machine.getNGaussians();
+  tp::ndarray weights(ca::t_float64, n_gaussians);
+  blitz::Array<double,1> weights_ = weights.bz<double,1>();
+  weights_ = machine.getWeights();
+  return weights.self();
+}
+
+static object mach_GMMMachine_getMeans(const mach::GMMMachine& machine) {
+  size_t n_gaussians = machine.getNGaussians();
+  size_t n_inputs = machine.getNInputs();
+  tp::ndarray means(ca::t_float64, n_gaussians, n_inputs);
+  blitz::Array<double,2> means_ = means.bz<double,2>();
+  machine.getMeans(means_);
+  return means.self();
+}
+
+static object mach_GMMMachine_getVariances(const mach::GMMMachine& machine) {
+  size_t n_gaussians = machine.getNGaussians();
+  size_t n_inputs = machine.getNInputs();
+  tp::ndarray variances(ca::t_float64, n_gaussians, n_inputs);
+  blitz::Array<double,2> variances_ = variances.bz<double,2>();
+  machine.getVariances(variances_);
+  return variances.self();
+}
+
+static object mach_GMMMachine_getVarianceThresholds(const mach::GMMMachine& machine) {
+  size_t n_gaussians = machine.getNGaussians();
+  size_t n_inputs = machine.getNInputs();
+  tp::ndarray varianceThresholds(ca::t_float64, n_gaussians, n_inputs);
+  blitz::Array<double,2> varianceThresholds_ = varianceThresholds.bz<double,2>();
+  machine.getVarianceThresholds(varianceThresholds_);
+  return varianceThresholds.self();
+}
+
+static object mach_GMMMachine_getMeanSupervector(const mach::GMMMachine& machine) {
+  size_t n_gaussians = machine.getNGaussians();
+  size_t n_inputs = machine.getNInputs();
+  tp::ndarray vec(ca::t_float64, n_gaussians * n_inputs);
+  blitz::Array<double,1> vec_ = vec.bz<double,1>();
+  vec_ = machine.getMeanSupervector();
+  return vec.self();
+}
+
+static object mach_GMMMachine_getVarianceSupervector(const mach::GMMMachine& machine) {
+  size_t n_gaussians = machine.getNGaussians();
+  size_t n_inputs = machine.getNInputs();
+  tp::ndarray vec(ca::t_float64, n_gaussians * n_inputs);
+  blitz::Array<double,1> vec_ = vec.bz<double,1>();
+  vec_ = machine.getVarianceSupervector();
+  return vec.self();
+}
+
 
 static double forward(const mach::Machine<blitz::Array<double,1>, double>& m,
     tp::const_ndarray input) {
@@ -72,41 +173,6 @@ static double forward(const mach::Machine<blitz::Array<double,1>, double>& m,
   return output;
 }
 
-static void gmmmach_getmeansupervector(const mach::GMMMachine& m,
-    tp::ndarray a) {
-  blitz::Array<double,1> a_ = a.bz<double,1>();
-  m.getMeanSupervector(a_);
-}
-
-static void gmmmach_getvariancesupervector(const mach::GMMMachine& m,
-    tp::ndarray a) {
-  blitz::Array<double,1> a_ = a.bz<double,1>();
-  m.getVarianceSupervector(a_);
-}
-
-static blitz::Array<double,1> gmmstats_get_n(mach::GMMStats& s) {
-  return s.n;
-}
-
-static void gmmstats_set_n(mach::GMMStats& s, tp::const_ndarray n) {
-  s.n = n.bz<double,1>();
-}
-
-static blitz::Array<double,2> gmmstats_get_sumpx(mach::GMMStats& s) {
-  return s.sumPx;
-}
-
-static void gmmstats_set_sumpx(mach::GMMStats& s, tp::const_ndarray n) {
-  s.sumPx = n.bz<double,2>();
-}
-
-static blitz::Array<double,2> gmmstats_get_sumpxx(mach::GMMStats& s) {
-  return s.sumPxx;
-}
-
-static void gmmstats_set_sumpxx(mach::GMMStats& s, tp::const_ndarray n) {
-  s.sumPxx = n.bz<double,2>();
-}
 
 void bind_machine_gmm() {
 
@@ -122,7 +188,7 @@ void bind_machine_gmm() {
   class_<mach::KMeansMachine, bases<mach::Machine<blitz::Array<double,1>, double> > >("KMeansMachine",
       "This class implements a k-means classifier.\n"
       "See Section 9.1 of Bishop, \"Pattern recognition and machine learning\", 2006",
-      init<int, int>(args("n_means", "n_inputs")))
+      init<size_t, size_t>(args("n_means", "n_inputs")))
     .add_property("means", &mach_KMeansMachine_getMeans, &mach::KMeansMachine::setMeans, "Means")
     .add_property("nInputs", &mach::KMeansMachine::getNInputs, "Number of inputs")
     .def("getMean", &mach_KMeansMachine_getMean, (arg("i"), arg("mean")), "Get the i'th mean")
@@ -143,7 +209,7 @@ void bind_machine_gmm() {
   class_<mach::Gaussian>("Gaussian",
                    "This class implements a multivariate diagonal mach::Gaussian distribution",
                    init<>())
-  .def(init<int>(args("n_inputs")))
+  .def(init<size_t>(args("n_inputs")))
   .def(init<mach::Gaussian&>(args("other")))
   .def(init<bob::io::HDF5File&>(args("config")))
   .def(self == self)
@@ -211,7 +277,7 @@ void bind_machine_gmm() {
   class_<mach::GMMMachine, bases<mach::Machine<blitz::Array<double,1>, double> > >("GMMMachine",
                                                             "This class implements a multivariate diagonal Gaussian distribution.\n"
                                                             "See Section 2.3.9 of Bishop, \"Pattern recognition and machine learning\", 2006",
-                                                            init<int, int>(args("n_gaussians", "n_inputs")))
+                                                            init<size_t, size_t>(args("n_gaussians", "n_inputs")))
   .def(init<mach::GMMMachine&>())
   .def(init<bob::io::HDF5File&>(args("config")))
   .def(self == self)
@@ -280,14 +346,16 @@ void bind_machine_gmm() {
        args("sampler", "stats"),
        "Accumulates the GMM statistics over a set of samples.")
   .def("getGaussian",
-       &mach::GMMMachine::getGaussian, return_value_policy<reference_existing_object>(),
+       &mach::GMMMachine::getGaussian,
        args("i"),
        "Get a pointer to a particular Gaussian component")
-  .def("getMeanSupervector", &gmmmach_getmeansupervector,
+  .def("getMeanSupervector",
+       (void (mach::GMMMachine::*)(blitz::Array<double,1>&) const)&mach::GMMMachine::getMeanSupervector,
        args("mean_supervector"),
        "Get the mean supervector of the GMMMachine "
        "(concatenation of the mean vectors of each Gaussian of the GMMMachine)")
-  .def("getVarianceSupervector", &gmmmach_getvariancesupervector,
+  .def("getVarianceSupervector",
+       (void (mach::GMMMachine::*)(blitz::Array<double,1>&) const)&mach::GMMMachine::getVarianceSupervector,
        args("variance_supervector"),
        "Get the variance supervector of the GMMMachine "
        "(concatenation of the variance vectors of each Gaussian of the GMMMachine)")

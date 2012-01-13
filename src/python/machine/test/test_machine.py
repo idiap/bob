@@ -73,13 +73,12 @@ class MachineTest(unittest.TestCase):
     mean_ref = numpy.array([3, 70, 5, 4, 72, 14], 'float64')
     var_ref = numpy.array([1, 10, 9, 2, 5, 5], 'float64')
 
-    array = numpy.ndarray((6,), 'float64')
     # Check mean supervector
-    gmm.getMeanSupervector(array)
+    array = gmm.meanSupervector
     self.assertTrue( numpy.array_equal(array, mean_ref) )
 
     # Check variance supervector
-    gmm.getVarianceSupervector(array)
+    array = gmm.varianceSupervector
     self.assertTrue( numpy.array_equal(array, var_ref) )
 
 if __name__ == '__main__':

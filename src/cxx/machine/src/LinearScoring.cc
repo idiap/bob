@@ -155,15 +155,15 @@ namespace bob { namespace machine {
     blitz::Array<double, 2> B(S, Tt);
 
     
-    blitz::Array<double, 1> ubm_meanSupervector;
+    blitz::Array<double, 1> ubm_meanSupervector(C*Dx);
     ubm.getMeanSupervector(ubm_meanSupervector);
   
-    blitz::Array<double, 1> ubm_varianceSupervector;
+    blitz::Array<double, 1> ubm_varianceSupervector(C*Dx);
     ubm.getVarianceSupervector(ubm_varianceSupervector);
 
     // 1) Compute A
     for(int t = 0; t < Tm; t++) {
-      blitz::Array<double, 1> model_meanSupervector;
+      blitz::Array<double, 1> model_meanSupervector(C*Dx);
       models[t]->getMeanSupervector(model_meanSupervector);
       
       blitz::Array<double, 1> tmp = A(t, blitz::Range::all());

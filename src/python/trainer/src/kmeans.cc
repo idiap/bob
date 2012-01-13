@@ -1,5 +1,5 @@
 /**
- * @file python/trainer/src/kmeans.cc
+ * @file src/python/trainer/src/kmeans.cc
  * @date Thu Jun 9 18:12:33 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -29,11 +29,12 @@ namespace io = bob::io;
 
 void bind_trainer_kmeans() {
 
-  typedef train::EMTrainer<mach::KMeansMachine, io::Arrayset> EMTrainerKMeansBase; 
+  typedef train::EMTrainerNew<mach::KMeansMachine, io::Arrayset> EMTrainerKMeansBase; 
 
   class_<EMTrainerKMeansBase, boost::noncopyable>("EMTrainerKMeans", "The base python class for all EM-based trainers.", no_init)
     .add_property("convergenceThreshold", &EMTrainerKMeansBase::getConvergenceThreshold, &EMTrainerKMeansBase::setConvergenceThreshold, "Convergence threshold")
     .add_property("maxIterations", &EMTrainerKMeansBase::getMaxIterations, &EMTrainerKMeansBase::setMaxIterations, "Max iterations")
+    .add_property("computeLikelihood", &EMTrainerKMeansBase::getComputeLikelihood, &EMTrainerKMeansBase::setComputeLikelihood, "Tells whether we compute the average min distance or not.")
     .def("train", &EMTrainerKMeansBase::train, (arg("machine"), arg("data")), "Train a machine using data")
     .def("initialization", &EMTrainerKMeansBase::initialization, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
     .def("eStep", &EMTrainerKMeansBase::eStep, (arg("machine"), arg("data")),
@@ -43,6 +44,8 @@ void bind_trainer_kmeans() {
        "The EM algorithm will terminate once the change in average_output "
        "is less than the convergence_threshold.")
     .def("mStep", &EMTrainerKMeansBase::mStep, (arg("machine"), arg("data")), "Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
+     .def("computeLikelihood", &EMTrainerKMeansBase::computeLikelihood, (arg("machine"), arg("data")), "Returns the average min distance")
+     .def("finalization", &EMTrainerKMeansBase::finalization, (arg("machine"), arg("data")), "This method is called after the EM algorithm")
   ;
 
   class_<train::KMeansTrainer, boost::noncopyable, bases<EMTrainerKMeansBase> >("KMeansTrainer",
@@ -51,7 +54,7 @@ void bind_trainer_kmeans() {
       "See Section 9.1 of Bishop, \"Pattern recognition and machine learning\", 2006\n"
       "It uses a random initialisation of the means followed by the expectation-maximization algorithm"
       )
-    .def(init<optional<double,int> >((arg("convergence_threshold")=0.001, arg("max_iterations")=10)))
+    .def(init<optional<double,int,bool> >((arg("convergence_threshold")=0.001, arg("max_iterations")=10, arg("compute_likelihood")=true)))
     .add_property("seed", &train::KMeansTrainer::getSeed, &train::KMeansTrainer::setSeed, "Seed used to genrated pseudo-random numbers")
   ;
 

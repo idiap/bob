@@ -1,7 +1,11 @@
 /**
- * @file cxx/trainer/trainer/ML_GMMTrainer.h
- * @date Tue May 10 11:35:58 2011 +0200
- * @author Francois Moulin <Francois.Moulin@idiap.ch>
+ * @file src/cxx/trainer/trainer/ML_GMMTrainer.h
+ * @author <a href="mailto:Roy.Wallace@idiap.ch">Roy Wallace</a> 
+ * @author <a href="mailto:Francois.Moulin@idiap.ch">Francois Moulin</a>
+ * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
+ *
+ * @brief This class implements the maximum likelihood M-step of the expectation-maximisation algorithm for a GMM Machine.
+ * @details See Section 9.2.2 of Bishop, "Pattern recognition and machine learning", 2006
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -17,14 +21,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/// @file ML_GMMTrainer.h
-/// @author <a href="mailto:Roy.Wallace@idiap.ch">Roy Wallace</a> 
-/// @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
-/// @brief This class implements the maximum likelihood M-step of the expectation-maximisation algorithm for a GMM Machine.
-/// @details See Section 9.2.2 of Bishop, "Pattern recognition and machine learning", 2006
 
-#ifndef _ML_GMMTRAINER_H
-#define _ML_GMMTRAINER_H
+#ifndef BOB_TRAINER_ML_GMMTRAINER_H
+#define BOB_TRAINER_ML_GMMTRAINER_H
 
 #include "GMMTrainer.h"
 #include <limits>

@@ -124,7 +124,8 @@ class TrainerTest(unittest.TestCase):
 
     machine = bob.machine.KMeansMachine(2, 2)
 
-    trainer = bob.trainer.KMeansTrainer()
+#trainer = bob.trainer.KMeansTrainer()
+    trainer = bob.trainer.KMeansTrainer(1e-3,4)
     #trainer.seed = 1337
     trainer.train(machine, arStd)
 
@@ -143,7 +144,7 @@ class TrainerTest(unittest.TestCase):
       means = flipRows(means)
       variances = flipRows(variances)
       weights = flipRows(weights)
-    
+   
     self.assertTrue(equals(means, gmmMeans, 1e-3))
     self.assertTrue(equals(weights, gmmWeights, 1e-3))
     self.assertTrue(equals(variances, gmmVariances, 1e-3))

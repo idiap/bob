@@ -1,7 +1,11 @@
 /**
- * @file cxx/trainer/trainer/MAP_GMMTrainer.h
- * @date Tue May 10 11:35:58 2011 +0200
- * @author Francois Moulin <Francois.Moulin@idiap.ch>
+ * @file src/cxx/trainer/trainer/MAP_GMMTrainer.h
+ * @author <a href="mailto:Roy.Wallace@idiap.ch">Roy Wallace</a> 
+ * @author <a href="mailto:Francois.Moulin@idiap.ch">Francois Moulin</a>
+ * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
+ *
+ * @brief This class implements the maximum a posteriori M-step of the expectation-maximisation algorithm for a GMM Machine. The prior parameters are encoded in the form of a GMM (e.g. a universal background model). The EM algorithm thus performs GMM adaptation.
+ * @details See Section 3.4 of Reynolds et al., "Speaker Verification Using Adapted Gaussian Mixture Models", Digital Signal Processing, 2000. We use a "single adaptation coefficient", alpha_i, and thus a single relevance factor, r.
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -17,18 +21,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/// @file MAP_GMMTrainer.h
-/// @author <a href="mailto:Roy.Wallace@idiap.ch">Roy Wallace</a> 
-/// @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
-/// @brief This class implements the maximum a posteriori M-step of the expectation-maximisation algorithm for a GMM Machine. The prior parameters are encoded in the form of a GMM (e.g. a universal background model). The EM algorithm thus performs GMM adaptation.
-/// @details See Section 3.4 of Reynolds et al., "Speaker Verification Using Adapted Gaussian Mixture Models", Digital Signal Processing, 2000. We use a "single adaptation coefficient", alpha_i, and thus a single relevance factor, r.
 
-#ifndef _MAP_GMMTRAINER_H
-#define _MAP_GMMTRAINER_H
+#ifndef BOB_TRAINER_MAP_GMMTRAINER_H
+#define BOB_TRAINER_MAP_GMMTRAINER_H
 
 #include "GMMTrainer.h"
 #include <limits>
-#include <core/Exception.h>
+#include "core/Exception.h"
 
 namespace bob {
 namespace trainer {
@@ -85,7 +84,6 @@ class MAP_GMMTrainer : public GMMTrainer {
     /// cache to avoid re-allocation
     mutable blitz::Array<double,1> m_cache_alpha;
     mutable blitz::Array<double,1> m_cache_ml_weights;
-    mutable blitz::Array<double,1> m_cache_prior_weights;
     mutable blitz::Array<double,1> m_cache_new_weights;
     mutable blitz::Array<double,2> m_cache_ml_means;
     mutable blitz::Array<double,2> m_cache_prior_means;

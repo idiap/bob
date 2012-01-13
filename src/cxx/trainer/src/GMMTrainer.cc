@@ -1,7 +1,8 @@
 /**
- * @file cxx/trainer/src/GMMTrainer.cc
- * @date Tue May 10 11:35:58 2011 +0200
- * @author Francois Moulin <Francois.Moulin@idiap.ch>
+ * @file src/cxx/trainer/src/GMMTrainer.cc
+ * @author <a href="mailto:Roy.Wallace@idiap.ch">Roy Wallace</a> 
+ * @author <a href="mailto:Francois.Moulin@idiap.ch">Francois Moulin</a>
+ * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
