@@ -26,45 +26,45 @@
 namespace bob { namespace machine {
 
   /**
-   * Normalize the evaluation scores with ZT-Norm
+   * Normalise raw scores with ZT-Norm
    *
    * @exception bob::core::UnexpectedShapeError matrix sizes are not consistent
    * 
-   * @param eval_tests_on_eval_models
-   * @param znorm_tests_on_eval_models
-   * @param eval_tests_on_tnorm_models
-   * @param znorm_tests_on_tnorm_models
-   * @param znorm_tests_tnorm_models_same_spk_ids
+   * @param rawscores_probes_vs_models
+   * @param rawscores_zprobes_vs_models
+   * @param rawscores_probes_vs_tmodels
+   * @param rawscores_zprobes_vs_tmodels
+   * @param mask_zprobes_tmodels_istruetrial
    * @param[out] scores normalized scores
    * @warning The destination score array should have the correct size
-   *          (Same as eval_tests_on_eval_models)
+   *          (Same size as rawscores_probes_vs_models)
    */
-  void ztNorm(const blitz::Array<double, 2>& eval_tests_on_eval_models,
-              const blitz::Array<double, 2>& znorm_tests_on_eval_models,
-              const blitz::Array<double, 2>& eval_tests_on_tnorm_models,
-              const blitz::Array<double, 2>& znorm_tests_on_tnorm_models,
-              const blitz::Array<bool,   2>& znorm_tests_tnorm_models_same_spk_ids,
-              blitz::Array<double, 2>& scores);
+  void ztNorm(const blitz::Array<double, 2>& rawscores_probes_vs_models,
+              const blitz::Array<double, 2>& rawscores_zprobes_vs_models,
+              const blitz::Array<double, 2>& rawscores_probes_vs_tmodels,
+              const blitz::Array<double, 2>& rawscores_zprobes_vs_tmodels,
+              const blitz::Array<bool,   2>& mask_zprobes_vs_tmodels_istruetrial,
+              blitz::Array<double, 2>& normalizedscores);
   
   /**
-   * Normalize the evaluation scores with ZT-Norm.
+   * Normalise raw scores with ZT-Norm.
    * Assume that znorm and tnorm have no common subject id.
    *
    * @exception bob::core::UnexpectedShapeError matrix sizes are not consistent
    *
-   * @param eval_tests_on_eval_models
-   * @param znorm_tests_on_eval_models
-   * @param eval_tests_on_tnorm_models
-   * @param znorm_tests_on_tnorm_models
+   * @param rawscores_probes_vs_models
+   * @param rawscores_zprobes_vs_models
+   * @param rawscores_probes_vs_tmodels
+   * @param rawscores_zprobes_vs_tmodels
    * @param[out] scores normalized scores
    * @warning The destination score array should have the correct size
-   *          (Same as eval_tests_on_eval_models)
+   *          (Same size as rawscores_probes_vs_models)
    */
-  void ztNorm(const blitz::Array<double, 2>& eval_tests_on_eval_models,
-              const blitz::Array<double, 2>& znorm_tests_on_eval_models,
-              const blitz::Array<double, 2>& eval_tests_on_tnorm_models,
-              const blitz::Array<double, 2>& znorm_tests_on_tnorm_models,
-              blitz::Array<double, 2>& scores);
+  void ztNorm(const blitz::Array<double, 2>& rawscores_probes_vs_models,
+              const blitz::Array<double, 2>& rawscores_zprobes_vs_models,
+              const blitz::Array<double, 2>& rawscores_probes_vs_tmodels,
+              const blitz::Array<double, 2>& rawscores_zprobes_vs_tmodels,
+              blitz::Array<double, 2>& normalizedscores);
 }
 }
 
