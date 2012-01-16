@@ -26,18 +26,18 @@ namespace bob {
 namespace machine {
 
 namespace detail {
-  void ztNorm(const blitz::Array<double, 2>& eval_tests_on_eval_models,
-              const blitz::Array<double, 2>& znorm_tests_on_eval_models,
-              const blitz::Array<double, 2>& eval_tests_on_tnorm_models,
-              const blitz::Array<double, 2>& znorm_tests_on_tnorm_models,
-              const blitz::Array<bool, 2>*  znorm_tests_tnorm_models_same_spk_ids,
+  void ztNorm(const blitz::Array<double, 2>& rawscores_probes_vs_models,
+              const blitz::Array<double, 2>& rawscores_zprobes_vs_models,
+              const blitz::Array<double, 2>& rawscores_probes_vs_tmodels,
+              const blitz::Array<double, 2>& rawscores_zprobes_vs_tmodels,
+              const blitz::Array<bool, 2>*  mask_zprobes_vs_tmodels_istruetrial,
               blitz::Array<double, 2>& scores) 
   {
     // Rename variables
-    const blitz::Array<double, 2>& A = eval_tests_on_eval_models;
-    const blitz::Array<double, 2>& B = znorm_tests_on_eval_models;
-    const blitz::Array<double, 2>& C = eval_tests_on_tnorm_models;
-    const blitz::Array<double, 2>& D = znorm_tests_on_tnorm_models;
+    const blitz::Array<double, 2>& A = rawscores_probes_vs_models;
+    const blitz::Array<double, 2>& B = rawscores_zprobes_vs_models;
+    const blitz::Array<double, 2>& C = rawscores_probes_vs_tmodels;
+    const blitz::Array<double, 2>& D = rawscores_zprobes_vs_tmodels;
 
     // Compute the sizes
     int size_eval  = A.extent(0);
@@ -58,9 +58,9 @@ namespace detail {
     bob::core::array::assertSameDimensionLength(D.extent(0), size_tnorm);
     bob::core::array::assertSameDimensionLength(D.extent(1), size_znorm);
 
-    if (znorm_tests_tnorm_models_same_spk_ids) {
-      bob::core::array::assertSameDimensionLength(znorm_tests_tnorm_models_same_spk_ids->extent(0), size_tnorm);
-      bob::core::array::assertSameDimensionLength(znorm_tests_tnorm_models_same_spk_ids->extent(1), size_znorm);
+    if (mask_zprobes_vs_tmodels_istruetrial) {
+      bob::core::array::assertSameDimensionLength(mask_zprobes_vs_tmodels_istruetrial->extent(0), size_tnorm);
+      bob::core::array::assertSameDimensionLength(mask_zprobes_vs_tmodels_istruetrial->extent(1), size_znorm);
     }
 
     bob::core::array::assertSameDimensionLength(scores.extent(0), size_eval);
@@ -88,8 +88,8 @@ namespace detail {
       double count = 0;
       for(int j = 0; j < size_znorm; ++j) {
         bool keep;
-        // The second part is never executed if znorm_tests_tnorm_models_same_spk_ids==NULL
-        keep = (znorm_tests_tnorm_models_same_spk_ids == NULL) || !(*znorm_tests_tnorm_models_same_spk_ids)(i, j); //tnorm_models_spk_ids(i) != znorm_tests_spk_ids(j);
+        // The second part is never executed if mask_zprobes_vs_tmodels_istruetrial==NULL
+        keep = (mask_zprobes_vs_tmodels_istruetrial == NULL) || !(*mask_zprobes_vs_tmodels_istruetrial)(i, j); //tnorm_models_spk_ids(i) != znorm_tests_spk_ids(j);
         
         double value = keep * D(i, j);
         sum += value;
@@ -118,25 +118,25 @@ namespace detail {
 }
 
 
-void ztNorm(const blitz::Array<double, 2>& eval_tests_on_eval_models,
-            const blitz::Array<double, 2>& znorm_tests_on_eval_models,
-            const blitz::Array<double, 2>& eval_tests_on_tnorm_models,
-            const blitz::Array<double, 2>& znorm_tests_on_tnorm_models,
-            const blitz::Array<bool,   2>& znorm_tests_tnorm_models_same_spk_ids,
+void ztNorm(const blitz::Array<double, 2>& rawscores_probes_vs_models,
+            const blitz::Array<double, 2>& rawscores_zprobes_vs_models,
+            const blitz::Array<double, 2>& rawscores_probes_vs_tmodels,
+            const blitz::Array<double, 2>& rawscores_zprobes_vs_tmodels,
+            const blitz::Array<bool,   2>& mask_zprobes_vs_tmodels_istruetrial,
             blitz::Array<double, 2>& scores) 
 {
-  detail::ztNorm(eval_tests_on_eval_models, znorm_tests_on_eval_models, eval_tests_on_tnorm_models,
-                 znorm_tests_on_tnorm_models, &znorm_tests_tnorm_models_same_spk_ids, scores);
+  detail::ztNorm(rawscores_probes_vs_models, rawscores_zprobes_vs_models, rawscores_probes_vs_tmodels,
+                 rawscores_zprobes_vs_tmodels, &mask_zprobes_vs_tmodels_istruetrial, scores);
 }
 
-void ztNorm(const blitz::Array<double, 2>& eval_tests_on_eval_models,
-            const blitz::Array<double, 2>& znorm_tests_on_eval_models,
-            const blitz::Array<double, 2>& eval_tests_on_tnorm_models,
-            const blitz::Array<double, 2>& znorm_tests_on_tnorm_models,
+void ztNorm(const blitz::Array<double, 2>& rawscores_probes_vs_models,
+            const blitz::Array<double, 2>& rawscores_zprobes_vs_models,
+            const blitz::Array<double, 2>& rawscores_probes_vs_tmodels,
+            const blitz::Array<double, 2>& rawscores_zprobes_vs_tmodels,
             blitz::Array<double, 2>& scores) 
 {
-  detail::ztNorm(eval_tests_on_eval_models, znorm_tests_on_eval_models, eval_tests_on_tnorm_models,
-                 znorm_tests_on_tnorm_models, NULL, scores);
+  detail::ztNorm(rawscores_probes_vs_models, rawscores_zprobes_vs_models, rawscores_probes_vs_tmodels,
+                 rawscores_zprobes_vs_tmodels, NULL, scores);
 }
 
 

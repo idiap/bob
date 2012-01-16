@@ -31,60 +31,60 @@ namespace tp = bob::python;
 namespace ca = bob::core::array;
 
 static object ztnorm1(
-    tp::const_ndarray eval_tests_on_eval_models,
-    tp::const_ndarray znorm_tests_on_eval_models,
-    tp::const_ndarray eval_tests_on_tnorm_models,
-    tp::const_ndarray znorm_tests_on_tnorm_models,
-    tp::const_ndarray znorm_tests_tnorm_models_same_spk_ids) 
+    tp::const_ndarray rawscores_probes_vs_models,
+    tp::const_ndarray rawscores_zprobes_vs_models,
+    tp::const_ndarray rawscores_probes_vs_tmodels,
+    tp::const_ndarray rawscores_zprobes_vs_tmodels,
+    tp::const_ndarray mask_zprobes_vs_tmodels_istruetrial) 
 {
-  const blitz::Array<double,2> eval_tests_on_eval_models_ = 
-    eval_tests_on_eval_models.bz<double,2>();
-  const blitz::Array<double,2> znorm_tests_on_eval_models_ =
-    znorm_tests_on_eval_models.bz<double,2>();
-  const blitz::Array<double,2> eval_tests_on_tnorm_models_ = 
-    eval_tests_on_tnorm_models.bz<double,2>();
-  const blitz::Array<double,2> znorm_tests_on_tnorm_models_ =
-    znorm_tests_on_tnorm_models.bz<double,2>();
-  const blitz::Array<bool,2> znorm_tests_tnorm_models_same_spk_ids_ =
-    znorm_tests_tnorm_models_same_spk_ids.bz<bool,2>();
+  const blitz::Array<double,2> rawscores_probes_vs_models_ = 
+    rawscores_probes_vs_models.bz<double,2>();
+  const blitz::Array<double,2> rawscores_zprobes_vs_models_ =
+    rawscores_zprobes_vs_models.bz<double,2>();
+  const blitz::Array<double,2> rawscores_probes_vs_tmodels_ = 
+    rawscores_probes_vs_tmodels.bz<double,2>();
+  const blitz::Array<double,2> rawscores_zprobes_vs_tmodels_ =
+    rawscores_zprobes_vs_tmodels.bz<double,2>();
+  const blitz::Array<bool,2> mask_zprobes_vs_tmodels_istruetrial_ =
+    mask_zprobes_vs_tmodels_istruetrial.bz<bool,2>();
 
   // allocate output
-  tp::ndarray ret(ca::t_float64, eval_tests_on_eval_models_.extent(0), eval_tests_on_eval_models_.extent(1));
+  tp::ndarray ret(ca::t_float64, rawscores_probes_vs_models_.extent(0), rawscores_probes_vs_models_.extent(1));
   blitz::Array<double, 2> ret_ = ret.bz<double,2>();
 
-  bob::machine::ztNorm(eval_tests_on_eval_models_,
-                         znorm_tests_on_eval_models_,
-                         eval_tests_on_tnorm_models_,
-                         znorm_tests_on_tnorm_models_,
-                         znorm_tests_tnorm_models_same_spk_ids_,
+  bob::machine::ztNorm(rawscores_probes_vs_models_,
+                         rawscores_zprobes_vs_models_,
+                         rawscores_probes_vs_tmodels_,
+                         rawscores_zprobes_vs_tmodels_,
+                         mask_zprobes_vs_tmodels_istruetrial_,
                          ret_);
 
   return ret.self();
 }
 
 static object ztnorm2(
-    tp::const_ndarray eval_tests_on_eval_models,
-    tp::const_ndarray znorm_tests_on_eval_models,
-    tp::const_ndarray eval_tests_on_tnorm_models,
-    tp::const_ndarray znorm_tests_on_tnorm_models) 
+    tp::const_ndarray rawscores_probes_vs_models,
+    tp::const_ndarray rawscores_zprobes_vs_models,
+    tp::const_ndarray rawscores_probes_vs_tmodels,
+    tp::const_ndarray rawscores_zprobes_vs_tmodels) 
 {
-  const blitz::Array<double,2> eval_tests_on_eval_models_ = 
-    eval_tests_on_eval_models.bz<double,2>();
-  const blitz::Array<double,2> znorm_tests_on_eval_models_ =
-    znorm_tests_on_eval_models.bz<double,2>();
-  const blitz::Array<double,2> eval_tests_on_tnorm_models_ = 
-    eval_tests_on_tnorm_models.bz<double,2>();
-  const blitz::Array<double,2> znorm_tests_on_tnorm_models_ =
-    znorm_tests_on_tnorm_models.bz<double,2>();
+  const blitz::Array<double,2> rawscores_probes_vs_models_ = 
+    rawscores_probes_vs_models.bz<double,2>();
+  const blitz::Array<double,2> rawscores_zprobes_vs_models_ =
+    rawscores_zprobes_vs_models.bz<double,2>();
+  const blitz::Array<double,2> rawscores_probes_vs_tmodels_ = 
+    rawscores_probes_vs_tmodels.bz<double,2>();
+  const blitz::Array<double,2> rawscores_zprobes_vs_tmodels_ =
+    rawscores_zprobes_vs_tmodels.bz<double,2>();
 
   // allocate output
-  tp::ndarray ret(ca::t_float64, eval_tests_on_eval_models_.extent(0), eval_tests_on_eval_models_.extent(1));
+  tp::ndarray ret(ca::t_float64, rawscores_probes_vs_models_.extent(0), rawscores_probes_vs_models_.extent(1));
   blitz::Array<double, 2> ret_ = ret.bz<double,2>();
 
-  bob::machine::ztNorm(eval_tests_on_eval_models_,
-                         znorm_tests_on_eval_models_,
-                         eval_tests_on_tnorm_models_,
-                         znorm_tests_on_tnorm_models_,
+  bob::machine::ztNorm(rawscores_probes_vs_models_,
+                         rawscores_zprobes_vs_models_,
+                         rawscores_probes_vs_tmodels_,
+                         rawscores_zprobes_vs_tmodels_,
                          ret_);
 
   return ret.self();
@@ -94,20 +94,20 @@ void bind_machine_ztnorm()
 {
   def("ztnorm",
       ztnorm1,
-      args("eval_tests_on_eval_models",
-           "znorm_tests_on_eval_models",
-           "eval_tests_on_tnorm_models",
-           "znorm_tests_on_tnorm_models",
-           "znorm_tests_tnorm_models_same_spk_ids"),
-      "Normalize the evaluation scores with ZT-Norm"
+      args("rawscores_probes_vs_models",
+           "rawscores_zprobes_vs_models",
+           "rawscores_probes_vs_tmodels",
+           "rawscores_zprobes_vs_tmodels",
+           "mask_zprobes_vs_tmodels_istruetrial"),
+      "Normalise raw scores with ZT-Norm"
      );
   
   def("ztnorm",
       ztnorm2,
-      args("eval_tests_on_eval_models",
-           "znorm_tests_on_eval_models",
-           "eval_tests_on_tnorm_models",
-           "znorm_tests_on_tnorm_models"),
-      "Normalize the evaluation scores with ZT-Norm. Assume that znorm and tnorm have no common subject id."
+      args("rawscores_probes_vs_models",
+           "rawscores_zprobes_vs_models",
+           "rawscores_probes_vs_tmodels",
+           "rawscores_zprobes_vs_tmodels"),
+      "Normalise raw scores with ZT-Norm. Assume that znorm and tnorm have no common subject id."
      );
 }
