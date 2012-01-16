@@ -714,8 +714,7 @@ void train::PLDABaseTrainer::updateSigma(mach::PLDABaseMachine& machine,
   sigma /= static_cast<double>(n_IJ);
 }
 
-double train::PLDABaseTrainer::computeLikelihood(mach::PLDABaseMachine& machine,
-  const std::vector<io::Arrayset>& v_ar)
+double train::PLDABaseTrainer::computeLikelihood(mach::PLDABaseMachine& machine)
 {
   double llh = 0.;
   // TODO: implement log likelihood computation

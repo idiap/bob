@@ -6,8 +6,8 @@
  */
 
 
-#ifndef BOB5SPRO_TRAINER_EMTRAINERNEW_H
-#define BOB5SPRO_TRAINER_EMTRAINERNEW_H
+#ifndef BOB_TRAINER_EMTRAINERNEW_H
+#define BOB_TRAINER_EMTRAINERNEW_H
 
 #include "trainer/Trainer.h"
 
@@ -47,21 +47,24 @@ namespace bob { namespace trainer {
       double average_output_previous = - std::numeric_limits<double>::max();
       double average_output = - std::numeric_limits<double>::max();
       
+      // - eStep
+      eStep(machine, sampler);
+   
       // - iterates...
       for(size_t iter=0; ; ++iter) {
         
         // - saves average output from last iteration
         average_output_previous = average_output;
        
-        // - eStep
-        eStep(machine, sampler);
-   
         // - mStep
         mStep(machine, sampler);
         
+        // - eStep
+        eStep(machine, sampler);
+   
         // - Computes log likelihood if required
         if(m_compute_likelihood) {
-          average_output = computeLikelihood(machine, sampler);
+          average_output = computeLikelihood(machine);
         
           bob::core::info << "# Iteration " << iter+1 << ": " 
             << average_output_previous << " -> " 
@@ -109,7 +112,7 @@ namespace bob { namespace trainer {
       *     The EM algorithm will terminate once the change in average_output
       *     is less than the convergence_threshold.
       */
-    virtual double computeLikelihood(T_machine& machine, const T_sampler& sampler) = 0;
+    virtual double computeLikelihood(T_machine& machine) = 0;
 
     /**
       * This method is called after the EM algorithm 
@@ -178,4 +181,4 @@ namespace bob { namespace trainer {
 
 }}
 
-#endif // BOB5SPRO_TRAINER_EMTRAINERNEW_H
+#endif // BOB_TRAINER_EMTRAINERNEW_H

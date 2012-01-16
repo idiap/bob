@@ -76,7 +76,7 @@ class KMeansTrainer: public EMTrainerNew<bob::machine::KMeansMachine, bob::io::A
      * This functions returns the average min distance (average distance to the
      * closest mean)
      */
-    virtual double computeLikelihood(bob::machine::KMeansMachine& kmeans, const bob::io::Arrayset& data);
+    virtual double computeLikelihood(bob::machine::KMeansMachine& kmeans);
 
     /**
      * Function called at the end of the training 

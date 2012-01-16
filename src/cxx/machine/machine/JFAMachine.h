@@ -329,9 +329,9 @@ namespace bob { namespace machine {
       /**
         * Estimates from a 2D blitz::Array
         */
-      void forward(const bob::machine::GMMStats* gmm_stats, double& score);
-      void forward(const std::vector<const bob::machine::GMMStats*>& samples, blitz::Array<double,1>& scores);
-      void estimateX(const bob::machine::GMMStats* gmm_stats);
+      void forward(boost::shared_ptr<const bob::machine::GMMStats> gmm_stats, double& score);
+      void forward(const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& samples, blitz::Array<double,1>& scores);
+      void estimateX(boost::shared_ptr<const bob::machine::GMMStats> gmm_stats);
       void updateX(const blitz::Array<double,1>& N, const blitz::Array<double,1>& F);
       void computeUtSigmaInv();
       void computeUProd();
@@ -360,7 +360,7 @@ namespace bob { namespace machine {
       /**
         * data cached used to improve performance
         */
-      mutable bob::machine::GMMStats m_cache_gmmstats;
+      mutable boost::shared_ptr<bob::machine::GMMStats> m_cache_gmmstats;
       mutable blitz::Array<double,1> m_cache_Ux;
       mutable blitz::Array<double,1> m_cache_mVyDz;
 

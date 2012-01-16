@@ -44,7 +44,7 @@ void bind_trainer_kmeans() {
        "The EM algorithm will terminate once the change in average_output "
        "is less than the convergence_threshold.")
     .def("mStep", &EMTrainerKMeansBase::mStep, (arg("machine"), arg("data")), "Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
-     .def("computeLikelihood", &EMTrainerKMeansBase::computeLikelihood, (arg("machine"), arg("data")), "Returns the average min distance")
+     .def("computeLikelihood", &EMTrainerKMeansBase::computeLikelihood, (arg("machine")), "Returns the average min distance")
      .def("finalization", &EMTrainerKMeansBase::finalization, (arg("machine"), arg("data")), "This method is called after the EM algorithm")
   ;
 

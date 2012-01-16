@@ -206,7 +206,7 @@ void bind_machine_gmm() {
         "2) the proportion of the samples represented by that subset (the cluster weight)")
   ;
   
-  class_<mach::Gaussian>("Gaussian",
+  class_<mach::Gaussian, boost::shared_ptr<mach::Gaussian> >("Gaussian",
                    "This class implements a multivariate diagonal mach::Gaussian distribution",
                    init<>())
   .def(init<size_t>(args("n_inputs")))
@@ -240,7 +240,7 @@ void bind_machine_gmm() {
     .def(self_ns::str(self_ns::self))
   ;
 
-  class_<mach::GMMStats>("GMMStats",
+  class_<mach::GMMStats, boost::shared_ptr<mach::GMMStats> >("GMMStats",
                    "A container for GMM statistics.\n"
                    "With respect to Reynolds, \"Speaker Verification Using Adapted "
                    "Gaussian Mixture Models\", DSP, 2000:\n"
@@ -274,7 +274,7 @@ void bind_machine_gmm() {
   .def(self_ns::str(self_ns::self))
   ;
   
-  class_<mach::GMMMachine, bases<mach::Machine<blitz::Array<double,1>, double> > >("GMMMachine",
+  class_<mach::GMMMachine, boost::shared_ptr<mach::GMMMachine>, bases<mach::Machine<blitz::Array<double,1>, double> > >("GMMMachine",
                                                             "This class implements a multivariate diagonal Gaussian distribution.\n"
                                                             "See Section 2.3.9 of Bishop, \"Pattern recognition and machine learning\", 2006",
                                                             init<size_t, size_t>(args("n_gaussians", "n_inputs")))

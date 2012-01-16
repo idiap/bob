@@ -26,7 +26,7 @@
 #define BOB_TRAINER_GMMTRAINER_H
 
 #include "io/Arrayset.h"
-#include "trainer/EMTrainer.h"
+#include "trainer/EMTrainerNew.h"
 #include "machine/GMMMachine.h"
 #include "machine/GMMStats.h"
 #include <limits>
@@ -36,7 +36,7 @@ namespace trainer {
 
 /// @brief This class implements the E-step of the expectation-maximisation algorithm for a GMM Machine.
 /// @details See Section 9.2.2 of Bishop, "Pattern recognition and machine learning", 2006
-class GMMTrainer : public EMTrainer<bob::machine::GMMMachine, bob::io::Arrayset> {
+class GMMTrainer : public EMTrainerNew<bob::machine::GMMMachine, bob::io::Arrayset> {
   public:
 
     /// Default constructor
@@ -55,8 +55,10 @@ class GMMTrainer : public EMTrainer<bob::machine::GMMMachine, bob::io::Arrayset>
     /// 
     /// The statistics, m_ss, will be used in the mStep() that follows.
     /// Implements EMTrainer::eStep(double &)
-    virtual double eStep(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data);
+    virtual void eStep(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data);
+    virtual double computeLikelihood(bob::machine::GMMMachine& gmm);
 
+    virtual void finalization(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data);
     
   protected:
 

@@ -24,7 +24,7 @@ using namespace bob::machine;
 
 bob::trainer::GMMTrainer::GMMTrainer(bool update_means, bool update_variances, bool update_weights, 
     double mean_var_update_responsibilities_threshold):
-  EMTrainer<GMMMachine, bob::io::Arrayset>(), update_means(update_means), update_variances(update_variances), 
+  EMTrainerNew<GMMMachine, bob::io::Arrayset>(), update_means(update_means), update_variances(update_variances), 
   update_weights(update_weights), m_mean_var_update_responsibilities_threshold(mean_var_update_responsibilities_threshold) {
 
 }
@@ -38,9 +38,15 @@ void bob::trainer::GMMTrainer::initialization(bob::machine::GMMMachine& gmm, con
   m_ss.resize(gmm.getNGaussians(),gmm.getNInputs());
 }
 
-double bob::trainer::GMMTrainer::eStep(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data) {
+void bob::trainer::GMMTrainer::eStep(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data) {
   m_ss.init();
   // Calculate the sufficient statistics and save in m_ss
   gmm.accStatistics(data, m_ss);
+}
+
+double bob::trainer::GMMTrainer::computeLikelihood(bob::machine::GMMMachine& gmm) {
   return m_ss.log_likelihood / m_ss.T;
+}
+
+void bob::trainer::GMMTrainer::finalization(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data) {
 }

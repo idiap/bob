@@ -347,12 +347,12 @@ void train::EMPCATrainer::updateSigma2(mach::LinearMachine& machine, const io::A
   m_sigma2 /= (static_cast<double>(ar.size()) * mu.extent(0));
 }
 
-double train::EMPCATrainer::computeLikelihood(mach::LinearMachine& machine, const io::Arrayset& ar)
+double train::EMPCATrainer::computeLikelihood(mach::LinearMachine& machine)
 {
   // Get W projection matrix
   blitz::Array<double,2>& W = machine.updateWeights();
   const blitz::Array<double,2> Wt = W.transpose(1,0); // W^T
-  size_t n_features = ar.getShape()[0];
+  size_t n_features = m_S.extent(0);
 
   // 1/ Compute det(C), where C = sigma2.I + W.W^T
   //            det(C) = det(sigma2 * C / sigma2) = det(sigma2 * Id) * det(C / sigma2)
@@ -397,7 +397,7 @@ double train::EMPCATrainer::computeLikelihood(mach::LinearMachine& machine, cons
 
   // 4/ Use previous values to compute the log likelihood:
   // Log likelihood =  - N/2*{ d*ln(2*PI) + ln |detC| + tr(C^-1.S) }
-  double llh = - static_cast<double>(ar.size()) / 2. * 
+  double llh = - static_cast<double>(m_z_first_order.extent(0)) / 2. * 
     ( m_f_log2pi + log(fabs(detC)) + bob::math::trace(m_cache_fxf_2) ); 
 
   return llh;

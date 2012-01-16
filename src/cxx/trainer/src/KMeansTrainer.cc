@@ -106,8 +106,7 @@ void train::KMeansTrainer::mStep(mach::KMeansMachine& kmeans,
   }
 }
 
-double train::KMeansTrainer::computeLikelihood(mach::KMeansMachine& kmeans,
-  const io::Arrayset& ar)
+double train::KMeansTrainer::computeLikelihood(mach::KMeansMachine& kmeans)
 {
   return m_average_min_distance;
 }

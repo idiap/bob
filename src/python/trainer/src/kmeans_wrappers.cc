@@ -48,8 +48,8 @@ public:
     this->get_override("mStep")(machine, data);
   }
 
-  virtual double computeLikelihood(mach::KMeansMachine& machine, const io::Arrayset& data) {
-    return this->get_override("computeLikelihood")(machine, data);
+  virtual double computeLikelihood(mach::KMeansMachine& machine) {
+    return this->get_override("computeLikelihood")(machine);
   }
 
   virtual void finalization(mach::KMeansMachine& machine, const io::Arrayset& data) {
@@ -109,13 +109,13 @@ public:
     train::KMeansTrainer::mStep(machine, data);
   }
 
-  double computeLikelihood(mach::KMeansMachine& machine, const io::Arrayset& data) {
-    if (override python_computeLikelihood = this->get_override("computeLikelihood")) return python_computeLikelihood(machine, data);
-    return train::KMeansTrainer::computeLikelihood(machine, data);
+  double computeLikelihood(mach::KMeansMachine& machine) {
+    if (override python_computeLikelihood = this->get_override("computeLikelihood")) return python_computeLikelihood(machine);
+    return train::KMeansTrainer::computeLikelihood(machine);
   }
   
-  double d_computeLikelihood(mach::KMeansMachine& machine, const io::Arrayset& data) {
-    return train::KMeansTrainer::computeLikelihood(machine, data);
+  double d_computeLikelihood(mach::KMeansMachine& machine) {
+    return train::KMeansTrainer::computeLikelihood(machine);
   }
 
   void finalization(mach::KMeansMachine& machine, const io::Arrayset& data) {
@@ -161,7 +161,7 @@ void bind_trainer_kmeans_wrappers() {
        "The EM algorithm will terminate once the change in average_output "
        "is less than the convergence_threshold.")
     .def("mStep", pure_virtual(&EMTrainerKMeansBase::mStep), (arg("machine"), arg("data")), "Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
-    .def("computeLikelihood", pure_virtual(&EMTrainerKMeansBase::computeLikelihood), (arg("machine"), arg("data")), "Returns the average min distance.")
+    .def("computeLikelihood", pure_virtual(&EMTrainerKMeansBase::computeLikelihood), (arg("machine")), "Returns the average min distance.")
     .def("finalization", pure_virtual(&EMTrainerKMeansBase::finalization), (arg("machine"), arg("data")), "This method is called after the EM algorithm")
   ;
 
@@ -179,7 +179,7 @@ void bind_trainer_kmeans_wrappers() {
     .def("initialization", &train::KMeansTrainer::initialization, &KMeansTrainerWrapper::d_initialization, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
     .def("eStep", &train::KMeansTrainer::eStep, &KMeansTrainerWrapper::d_eStep, (arg("machine"), arg("data")), "Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
     .def("mStep", &train::KMeansTrainer::mStep, &KMeansTrainerWrapper::d_mStep, (arg("machine"), arg("data")), "M-step of the EM-algorithm.")
-    .def("computeLikelihood", &train::KMeansTrainer::computeLikelihood, &KMeansTrainerWrapper::d_computeLikelihood, (arg("machine"), arg("data")), "Returns the average min distance.")
+    .def("computeLikelihood", &train::KMeansTrainer::computeLikelihood, &KMeansTrainerWrapper::d_computeLikelihood, (arg("machine")), "Returns the average min distance.")
     .def("finalization", &train::KMeansTrainer::finalization, &KMeansTrainerWrapper::d_finalization, (arg("machine"), arg("data")), "This method is called after the EM algorithm")
   ;
 

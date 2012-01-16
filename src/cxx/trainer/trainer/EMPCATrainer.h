@@ -90,8 +90,7 @@ namespace bob { namespace trainer {
         * Computes the average log likelihood using the current estimates of 
         * the latent variables. 
         */
-      virtual double computeLikelihood(bob::machine::LinearMachine& machine,
-         const bob::io::Arrayset& ar);
+      virtual double computeLikelihood(bob::machine::LinearMachine& machine);
 
       /**
         * Sets the seed used to generate pseudo-random numbers 

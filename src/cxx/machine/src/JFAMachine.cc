@@ -301,28 +301,26 @@ void mach::JFAMachine::updateX_fromCache()
   bob::math::prod(m_cache_IdPlusUProd, m_tmp_ru, m_x);
 }
 
-void mach::JFAMachine::estimateX(const mach::GMMStats* gmm_stats) {
+void mach::JFAMachine::estimateX(boost::shared_ptr<const mach::GMMStats> gmm_stats) {
   boost::shared_ptr<bob::machine::GMMMachine> ubm(getJFABase()->getUbm());
-  m_cache_gmmstats.resize(ubm->getNGaussians(),ubm->getNInputs()); 
   blitz::Array<double,1> N(ubm->getNGaussians());
   blitz::Array<double,1> F(ubm->getNGaussians()*ubm->getNInputs());
   // TODO: check type/dimensions?
-  m_cache_gmmstats = *gmm_stats;
-  N = m_cache_gmmstats.n;
+  N = gmm_stats->n;
   for(int g=0; g<ubm->getNGaussians(); ++g) {
     blitz::Array<double,1> F_g = F(blitz::Range(g*ubm->getNInputs(),(g+1)*ubm->getNInputs()-1));
-    F_g = m_cache_gmmstats.sumPx(g,blitz::Range::all());
+    F_g = gmm_stats->sumPx(g,blitz::Range::all());
   }
   updateX(N, F);
 }
 
 
-void mach::JFAMachine::forward(const mach::GMMStats* gmm_stats, double& score)
+void mach::JFAMachine::forward(boost::shared_ptr<const mach::GMMStats> gmm_stats, double& score)
 {
   // Ux and GMMStats
   estimateX(gmm_stats);
-  std::vector<const bob::machine::GMMStats*> stats;
-  stats.push_back(&m_cache_gmmstats);
+  std::vector<boost::shared_ptr<const bob::machine::GMMStats> > stats;
+  stats.push_back(gmm_stats);
   m_cache_Ux.resize(getDimCD());
   bob::math::prod(m_jfa_base->getU(), m_x, m_cache_Ux);
   std::vector<blitz::Array<double,1> > channelOffset;
@@ -343,7 +341,7 @@ void mach::JFAMachine::forward(const mach::GMMStats* gmm_stats, double& score)
   score = scores(0,0);
 }
 
-void mach::JFAMachine::forward(const std::vector<const mach::GMMStats*>& samples, blitz::Array<double,1>& score)
+void mach::JFAMachine::forward(const std::vector<boost::shared_ptr<const mach::GMMStats> >& samples, blitz::Array<double,1>& score)
 {
   std::vector<blitz::Array<double,1> > channelOffset;
   m_cache_Ux.resize(getDimCD());
