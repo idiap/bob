@@ -23,7 +23,7 @@
 
 #include "io/Arrayset.h"
 #include "machine/KMeansMachine.h"
-#include "trainer/EMTrainerNew.h"
+#include "trainer/EMTrainer.h"
 
 namespace bob {
 namespace trainer {
@@ -34,7 +34,7 @@ namespace trainer {
  * @details See Section 9.1 of Bishop, "Pattern recognition and machine learning", 2006
  *          It uses a random initialisation of the means followed by the expectation-maximization algorithm
  */
-class KMeansTrainer: public EMTrainerNew<bob::machine::KMeansMachine, bob::io::Arrayset>
+class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, bob::io::Arrayset>
 {
   public: 
     /**

@@ -31,7 +31,7 @@ namespace train = bob::trainer;
 
 train::KMeansTrainer::KMeansTrainer(double convergence_threshold,
     size_t max_iterations, bool compute_likelihood):
-  train::EMTrainerNew<mach::KMeansMachine, bob::io::Arrayset>(
+  train::EMTrainer<mach::KMeansMachine, bob::io::Arrayset>(
     convergence_threshold, max_iterations, compute_likelihood), 
   m_seed(-1), m_average_min_distance(0),
   m_zeroethOrderStats(0), m_firstOrderStats(0,0)

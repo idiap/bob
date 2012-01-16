@@ -29,7 +29,7 @@ namespace io = bob::io;
 
 void bind_trainer_kmeans() {
 
-  typedef train::EMTrainerNew<mach::KMeansMachine, io::Arrayset> EMTrainerKMeansBase; 
+  typedef train::EMTrainer<mach::KMeansMachine, io::Arrayset> EMTrainerKMeansBase; 
 
   class_<EMTrainerKMeansBase, boost::noncopyable>("EMTrainerKMeans", "The base python class for all EM-based trainers.", no_init)
     .add_property("convergenceThreshold", &EMTrainerKMeansBase::getConvergenceThreshold, &EMTrainerKMeansBase::setConvergenceThreshold, "Convergence threshold")

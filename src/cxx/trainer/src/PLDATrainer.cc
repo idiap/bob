@@ -26,7 +26,7 @@ namespace train = bob::trainer;
 
 train::PLDABaseTrainer::PLDABaseTrainer(int nf, int ng, 
     double convergence_threshold, int max_iterations, bool compute_likelihood):
-  EMTrainerNew<mach::PLDABaseMachine, std::vector<io::Arrayset> >
+  EMTrainer<mach::PLDABaseMachine, std::vector<io::Arrayset> >
     (convergence_threshold, max_iterations, compute_likelihood), 
   m_nf(nf), m_ng(ng), m_limited_memory(false), m_S(0,0),
   m_z_first_order(0), m_sum_z_second_order(0,0),
@@ -43,7 +43,7 @@ train::PLDABaseTrainer::PLDABaseTrainer(int nf, int ng,
 }
 
 train::PLDABaseTrainer::PLDABaseTrainer(const train::PLDABaseTrainer& other):
-  EMTrainerNew<mach::PLDABaseMachine, std::vector<io::Arrayset> >
+  EMTrainer<mach::PLDABaseMachine, std::vector<io::Arrayset> >
     (other.m_convergence_threshold, other.m_max_iterations, 
      other.m_compute_likelihood),
   m_nf(other.m_nf), m_ng(other.m_ng), m_limited_memory(other.m_limited_memory),

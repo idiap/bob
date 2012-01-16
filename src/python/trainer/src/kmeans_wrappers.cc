@@ -27,12 +27,12 @@ namespace mach = bob::machine;
 namespace io = bob::io;
 
 
-class EMTrainerKMeansWrapper: public train::EMTrainerNew<mach::KMeansMachine, io::Arrayset>, 
-                              public wrapper<train::EMTrainerNew<mach::KMeansMachine, io::Arrayset> > 
+class EMTrainerKMeansWrapper: public train::EMTrainer<mach::KMeansMachine, io::Arrayset>, 
+                              public wrapper<train::EMTrainer<mach::KMeansMachine, io::Arrayset> > 
 {
 public:
   EMTrainerKMeansWrapper(double convergence_threshold = 0.001, int max_iterations = 10, bool compute_likelihood=true):
-    train::EMTrainerNew<mach::KMeansMachine, io::Arrayset >(convergence_threshold, max_iterations, compute_likelihood) {}
+    train::EMTrainer<mach::KMeansMachine, io::Arrayset >(convergence_threshold, max_iterations, compute_likelihood) {}
 
   virtual ~EMTrainerKMeansWrapper() {}
  
@@ -60,11 +60,11 @@ public:
     if (override python_train = this->get_override("train")) 
       python_train(machine, data);
     else
-      train::EMTrainerNew<mach::KMeansMachine, io::Arrayset>::train(machine, data);
+      train::EMTrainer<mach::KMeansMachine, io::Arrayset>::train(machine, data);
   }
 
   virtual void d_train(mach::KMeansMachine& machine, const io::Arrayset& data) {
-    train::EMTrainerNew<mach::KMeansMachine, io::Arrayset>::train(machine, data);
+    train::EMTrainer<mach::KMeansMachine, io::Arrayset>::train(machine, data);
   }
 
 };
@@ -145,7 +145,7 @@ public:
 
 void bind_trainer_kmeans_wrappers() {
 
-  typedef train::EMTrainerNew<mach::KMeansMachine, io::Arrayset> EMTrainerKMeansBase; 
+  typedef train::EMTrainer<mach::KMeansMachine, io::Arrayset> EMTrainerKMeansBase; 
 
   class_<EMTrainerKMeansWrapper, boost::noncopyable>("EMTrainerKMeans", no_init)
     .def(init<optional<double, int, bool> >((arg("convergence_threshold")=0.001, arg("max_iterations")=10, arg("compute_likelihood")=true)))

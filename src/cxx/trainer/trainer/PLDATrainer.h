@@ -12,7 +12,7 @@
 #include <blitz/array.h>
 #include <map>
 #include <vector>
-#include "trainer/EMTrainerNew.h"
+#include "trainer/EMTrainer.h"
 #include "machine/PLDAMachine.h"
 #include "io/Arrayset.h"
 
@@ -20,7 +20,7 @@ namespace bob { namespace trainer {
   
   /**
     */
-  class PLDABaseTrainer: public EMTrainerNew<bob::machine::PLDABaseMachine, 
+  class PLDABaseTrainer: public EMTrainer<bob::machine::PLDABaseMachine, 
                                              std::vector<bob::io::Arrayset> >
   {
     public: //api

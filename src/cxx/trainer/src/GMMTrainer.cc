@@ -24,7 +24,7 @@ using namespace bob::machine;
 
 bob::trainer::GMMTrainer::GMMTrainer(bool update_means, bool update_variances, bool update_weights, 
     double mean_var_update_responsibilities_threshold):
-  EMTrainerNew<GMMMachine, bob::io::Arrayset>(), update_means(update_means), update_variances(update_variances), 
+  EMTrainer<GMMMachine, bob::io::Arrayset>(), update_means(update_means), update_variances(update_variances), 
   update_weights(update_weights), m_mean_var_update_responsibilities_threshold(mean_var_update_responsibilities_threshold) {
 
 }

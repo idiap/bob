@@ -6,8 +6,8 @@
  */
 
 
-#ifndef BOB_TRAINER_EMTRAINERNEW_H
-#define BOB_TRAINER_EMTRAINERNEW_H
+#ifndef BOB_TRAINER_EMTRAINER_H
+#define BOB_TRAINER_EMTRAINER_H
 
 #include "trainer/Trainer.h"
 
@@ -23,14 +23,14 @@ namespace bob { namespace trainer {
     * Derived classes must implement the initialization(), eStep(), mStep() and finalization() methods.
     */
   template<class T_machine, class T_sampler>
-  class EMTrainerNew: virtual public Trainer<T_machine, T_sampler>
+  class EMTrainer: virtual public Trainer<T_machine, T_sampler>
   {
   public:
-    virtual ~EMTrainerNew() {}
+    virtual ~EMTrainer() {}
     
     virtual void train(T_machine& machine, const T_sampler& sampler) 
     {
-      bob::core::info << "# EMTrainerNew:" << std::endl;
+      bob::core::info << "# EMTrainer:" << std::endl;
       
       /*
       // Check that the machine and dataset have the same feature dimensionality
@@ -170,7 +170,7 @@ namespace bob { namespace trainer {
       * Protected constructor to be called in the constructor of derived 
       * classes
       */
-    EMTrainerNew(double convergence_threshold = 0.001, 
+    EMTrainer(double convergence_threshold = 0.001, 
         size_t max_iterations = 10, bool compute_likelihood = true):
       m_compute_likelihood(compute_likelihood), 
       m_convergence_threshold(convergence_threshold), 
@@ -181,4 +181,4 @@ namespace bob { namespace trainer {
 
 }}
 
-#endif // BOB_TRAINER_EMTRAINERNEW_H
+#endif // BOB_TRAINER_EMTRAINER_H

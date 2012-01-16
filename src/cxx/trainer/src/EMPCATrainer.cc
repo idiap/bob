@@ -27,7 +27,7 @@ namespace tca = bob::core::array;
 
 train::EMPCATrainer::EMPCATrainer(int dimensionality, 
     double convergence_threshold, int max_iterations, bool compute_likelihood):
-  EMTrainerNew<mach::LinearMachine, io::Arrayset>(convergence_threshold, 
+  EMTrainer<mach::LinearMachine, io::Arrayset>(convergence_threshold, 
   max_iterations, compute_likelihood), 
   m_dimensionality(dimensionality), m_S(0,0),
   m_z_first_order(0,dimensionality), 
@@ -42,7 +42,7 @@ train::EMPCATrainer::EMPCATrainer(int dimensionality,
 }
 
 train::EMPCATrainer::EMPCATrainer(const train::EMPCATrainer& other):
-  EMTrainerNew<mach::LinearMachine, io::Arrayset>(other.m_convergence_threshold, 
+  EMTrainer<mach::LinearMachine, io::Arrayset>(other.m_convergence_threshold, 
     other.m_max_iterations, other.m_compute_likelihood),
   m_dimensionality(other.m_dimensionality), 
   m_S(tca::ccopy(other.m_S)),

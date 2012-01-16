@@ -16,7 +16,7 @@ object ppca_train(train::EMPCATrainer& t, const io::Arrayset& data) {
 
 void bind_trainer_empca() {
 
-  typedef train::EMTrainerNew<mach::LinearMachine, io::Arrayset> EMTrainerLinearBase; 
+  typedef train::EMTrainer<mach::LinearMachine, io::Arrayset> EMTrainerLinearBase; 
 
   class_<EMTrainerLinearBase, boost::noncopyable>("EMTrainerLinear", "The base python class for all EM-based trainers.", no_init)
     .add_property("convergenceThreshold", &EMTrainerLinearBase::getConvergenceThreshold, &EMTrainerLinearBase::setConvergenceThreshold, "Convergence threshold")

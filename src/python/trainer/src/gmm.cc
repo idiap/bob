@@ -30,7 +30,7 @@ namespace io = bob::io;
 
 void bind_trainer_gmm() {
 
-  typedef train::EMTrainerNew<mach::GMMMachine, io::Arrayset> EMTrainerGMMBase; 
+  typedef train::EMTrainer<mach::GMMMachine, io::Arrayset> EMTrainerGMMBase; 
 
   class_<EMTrainerGMMBase, boost::noncopyable>("EMTrainerGMM", "The base python class for all EM-based trainers.", no_init)
     .add_property("convergenceThreshold", &EMTrainerGMMBase::getConvergenceThreshold, &EMTrainerGMMBase::setConvergenceThreshold, "Convergence threshold")
