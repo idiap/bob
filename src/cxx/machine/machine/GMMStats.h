@@ -1,7 +1,8 @@
 /**
- * @file cxx/machine/machine/GMMStats.h
- * @date Tue May 10 11:35:58 2011 +0200
+ * @file src/cxx/machine/machine/GMMStats.h
+ * @author Roy Wallace <Roy.Wallace@idiap.ch>
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -17,12 +18,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/// @file GMMStats.h
-/// @author <a href="mailto:Roy.Wallace@idiap.ch">Roy Wallace</a> 
-/// @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
 
-#ifndef BOB5SPRO_MACHINE_GMMSTATS_H
-#define BOB5SPRO_MACHINE_GMMSTATS_H
+#ifndef BOB_MACHINE_GMMSTATS_H
+#define BOB_MACHINE_GMMSTATS_H
 
 #include <blitz/array.h>
 #include "io/HDF5File.h"
@@ -30,77 +28,113 @@
 namespace bob {
 namespace machine {
 
-/// @brief A container for GMM statistics.
-/// @see GMMMachine
-///
-/// With respect to Reynolds, "Speaker Verification Using Adapted
-/// Gaussian Mixture Models", DSP, 2000:
-/// Eq (8) is n(i)
-/// Eq (9) is sumPx(i) / n(i)
-/// Eq (10) is sumPxx(i) / n(i)
+/**
+ * @brief A container for GMM statistics.
+ * @see GMMMachine
+ *
+ * With respect to Reynolds, "Speaker Verification Using Adapted
+ * Gaussian Mixture Models", DSP, 2000:
+ * Eq (8) is n(i)
+ * Eq (9) is sumPx(i) / n(i)
+ * Eq (10) is sumPxx(i) / n(i)
+ */
 class GMMStats {
   public:
     
-    /// Default constructor.
+    /**
+     * Default constructor.
+     */
     GMMStats();
 
-    /// Constructor.
-    /// @param n_gaussians Number of Gaussians in the mixture model.
-    /// @param n_inputs    Feature dimensionality.
-    GMMStats(int n_gaussians, int n_inputs);
+    /**
+     * Constructor.
+     * @param n_gaussians Number of Gaussians in the mixture model.
+     * @param n_inputs    Feature dimensionality.
+     */
+    GMMStats(size_t n_gaussians, size_t n_inputs);
 
-    /// Copy constructor
+    /**
+     * Copy constructor
+     */
     GMMStats(const GMMStats& other);
 
-    /// Constructor
+    /**
+     * Constructor (from a Configuration)
+     */
     GMMStats(bob::io::HDF5File& config);
     
-    /// Assigment
+    /**
+     * Assigment
+     */
     GMMStats& operator=(const GMMStats& other);
 
-    /// Equal to
+    /**
+     * Equal to
+     */
     bool operator==(const GMMStats& b) const;
 
-    /// Destructor
+    /**
+     * Destructor
+     */
     ~GMMStats();
 
-    /// Allocates space for the statistics and resets to zero.
-    /// @param n_gaussians Number of Gaussians in the mixture model.
-    /// @param n_inputs    Feature dimensionality.
-    void resize(int n_gaussians, int n_inputs);
+    /**
+     * Allocates space for the statistics and resets to zero.
+     * @param n_gaussians Number of Gaussians in the mixture model.
+     * @param n_inputs    Feature dimensionality.
+     */
+    void resize(size_t n_gaussians, size_t n_inputs);
 
-    /// Resets statistics to zero.
+    /**
+     * Resets statistics to zero.
+     */
     void init();
  
-    /// The accumulated log likelihood of all samples
+    /**
+     * The accumulated log likelihood of all samples
+     */
     double log_likelihood;
 
-    /// The accumulated number of samples
-    int64_t T;
+    /**
+     * The accumulated number of samples
+     */
+    size_t T;
 
-    /// For each Gaussian, the accumulated sum of responsibilities, i.e. the sum of P(gaussian_i|x)
+    /**
+     * For each Gaussian, the accumulated sum of responsibilities, i.e. the sum of P(gaussian_i|x)
+     */
     blitz::Array<double,1> n;
 
-    /// For each Gaussian, the accumulated sum of responsibility times the sample 
+    /**
+     * For each Gaussian, the accumulated sum of responsibility times the sample 
+     */
     blitz::Array<double,2> sumPx;
 
-    /// For each Gaussian, the accumulated sum of responsibility times the sample squared
+    /**
+     * For each Gaussian, the accumulated sum of responsibility times the sample squared
+     */
     blitz::Array<double,2> sumPxx;
 
-    /// Save to a Configuration
+    /**
+     * Save to a Configuration
+     */
     void save(bob::io::HDF5File& config) const;
     
-    /// Load from a Configuration
+    /**
+     * Load from a Configuration
+     */
     void load(bob::io::HDF5File& config);
     
     friend std::ostream& operator<<(std::ostream& os, const GMMStats& g);
 
   protected:
-    /// Copy another GMMStats
+    /**
+     * Copy another GMMStats
+     */
     void copy(const GMMStats&);
 };
 
 }
 }
 
-#endif // _GMMSTATS_H
+#endif // BOB_MACHINE_GMMSTATS_H

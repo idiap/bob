@@ -249,30 +249,30 @@ void bind_machine_gmm() {
                    "Eq (9) is sumPx(i) / n(i)\n"
                    "Eq (10) is sumPxx(i) / n(i)\n",
                    init<>())
-  .def(init<int, int>(args("n_gaussians","n_inputs")))
-  .def(init<bob::io::HDF5File&>(args("config")))
-  .def_readwrite("log_likelihood",
-                 &mach::GMMStats::log_likelihood,
-                 "The accumulated log likelihood of all samples")
-  .def_readwrite("T",
-                 &mach::GMMStats::T,
-                 "The accumulated number of samples")
-  .add_property("n", &gmmstats_get_n, &gmmstats_set_n, "For each Gaussian, the accumulated sum of responsibilities, i.e. the sum of P(gaussian_i|x)")
-  .add_property("sumPx", &gmmstats_get_sumpx, &gmmstats_set_sumpx, "For each Gaussian, the accumulated sum of responsibility times the sample ")
-  .add_property("sumPxx", &gmmstats_get_sumpxx, &gmmstats_set_sumpxx, "For each Gaussian, the accumulated sum of responsibility times the sample squared")
-  .def("resize",
-       &mach::GMMStats::resize, args("n_gaussians", "n_inputs"),
-       " Allocates space for the statistics and resets to zero.")
-  .def("init",
-       &mach::GMMStats::init,
-       "Resets statistics to zero.")
-  .def("save",
-       &mach::GMMStats::save,
-       " Save to a Configuration")
-  .def("load",
-       &mach::GMMStats::load,
-       "Load from a Configuration")
-  .def(self_ns::str(self_ns::self))
+    .def(init<size_t, size_t>(args("n_gaussians","n_inputs")))
+    .def(init<bob::io::HDF5File&>(args("config")))
+    .def_readwrite("log_likelihood",
+                   &mach::GMMStats::log_likelihood,
+                   "The accumulated log likelihood of all samples")
+    .def_readwrite("T",
+                   &mach::GMMStats::T,
+                   "The accumulated number of samples")
+    .add_property("n", &gmmstats_get_n, &gmmstats_set_n, "For each Gaussian, the accumulated sum of responsibilities, i.e. the sum of P(gaussian_i|x)")
+    .add_property("sumPx", &gmmstats_get_sumpx, &gmmstats_set_sumpx, "For each Gaussian, the accumulated sum of responsibility times the sample ")
+    .add_property("sumPxx", &gmmstats_get_sumpxx, &gmmstats_set_sumpxx, "For each Gaussian, the accumulated sum of responsibility times the sample squared")
+    .def("resize",
+         &mach::GMMStats::resize, args("n_gaussians", "n_inputs"),
+         " Allocates space for the statistics and resets to zero.")
+    .def("init",
+         &mach::GMMStats::init,
+         "Resets statistics to zero.")
+    .def("save",
+         &mach::GMMStats::save,
+         " Save to a Configuration")
+    .def("load",
+         &mach::GMMStats::load,
+         "Load from a Configuration")
+    .def(self_ns::str(self_ns::self))
   ;
   
   class_<mach::GMMMachine, boost::shared_ptr<mach::GMMMachine>, bases<mach::Machine<blitz::Array<double,1>, double> > >("GMMMachine",
@@ -372,24 +372,24 @@ void bind_machine_gmm() {
   class_<mach::GMMLLRMachine, bases<mach::Machine<blitz::Array<double,1>, double> > >("GMMLLRMachine",
        "This class implements computes log likelihood ratio, given a client and a UBM GMM.\n",
         no_init)
-  .def(init<mach::GMMLLRMachine&>())
-  .def(init<bob::io::HDF5File&>(args("config")))
-  .def(init<bob::io::HDF5File&,bob::io::HDF5File&>(args("client", "ubm")))
-  .def(init<mach::GMMMachine&,mach::GMMMachine&>(args("client", "ubm")))
-  .def(self == self)
-  .def("getGMMClient",
-       &mach::GMMLLRMachine::getGMMClient, return_value_policy<reference_existing_object>(),
-       "Get a pointer to the client GMM")
-  .def("getGMMUBM",
-       &mach::GMMLLRMachine::getGMMUBM, return_value_policy<reference_existing_object>(),
-       "Get a pointer to the UBM GMM")
- .add_property("nInputs", &mach::GMMMachine::getNInputs, "The feature dimensionality")
-  .def("load",
-       &mach::GMMLLRMachine::load,
-       "Load from a Configuration")
-  .def("save",
-       &mach::GMMLLRMachine::save,
-       "Save to a Configuration")
-  .def(self_ns::str(self_ns::self))
+    .def(init<mach::GMMLLRMachine&>())
+    .def(init<bob::io::HDF5File&>(args("config")))
+    .def(init<bob::io::HDF5File&,bob::io::HDF5File&>(args("client", "ubm")))
+    .def(init<mach::GMMMachine&,mach::GMMMachine&>(args("client", "ubm")))
+    .def(self == self)
+    .def("getGMMClient",
+         &mach::GMMLLRMachine::getGMMClient, return_value_policy<reference_existing_object>(),
+         "Get a pointer to the client GMM")
+    .def("getGMMUBM",
+         &mach::GMMLLRMachine::getGMMUBM, return_value_policy<reference_existing_object>(),
+         "Get a pointer to the UBM GMM")
+   .add_property("nInputs", &mach::GMMMachine::getNInputs, "The feature dimensionality")
+    .def("load",
+         &mach::GMMLLRMachine::load,
+         "Load from a Configuration")
+    .def("save",
+         &mach::GMMLLRMachine::save,
+         "Save to a Configuration")
+    .def(self_ns::str(self_ns::self))
   ;
 }

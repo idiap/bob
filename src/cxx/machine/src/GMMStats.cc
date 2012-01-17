@@ -1,7 +1,8 @@
 /**
- * @file cxx/machine/src/GMMStats.cc
- * @date Tue May 10 11:35:58 2011 +0200
+ * @file src/cxx/machine/src/GMMStats.cc
+ * @author Roy Wallace <Roy.Wallace@idiap.ch>
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -26,7 +27,7 @@ mach::GMMStats::GMMStats() {
   resize(0,0);
 }
 
-mach::GMMStats::GMMStats(int n_gaussians, int n_inputs) {
+mach::GMMStats::GMMStats(size_t n_gaussians, size_t n_inputs) {
   resize(n_gaussians,n_inputs);
 }
 
@@ -35,7 +36,6 @@ mach::GMMStats::GMMStats(bob::io::HDF5File& config) {
 }
 
 mach::GMMStats::GMMStats(const mach::GMMStats& other) {
-  resize(other.sumPx.extent(0),other.sumPx.extent(1));
   copy(other);
 }
 
@@ -77,7 +77,7 @@ void mach::GMMStats::copy(const GMMStats& other) {
   sumPxx = other.sumPxx;
 }
 
-void mach::GMMStats::resize(int n_gaussians, int n_inputs) {
+void mach::GMMStats::resize(size_t n_gaussians, size_t n_inputs) {
   n.resize(n_gaussians);
   sumPx.resize(n_gaussians, n_inputs);
   sumPxx.resize(n_gaussians, n_inputs);
@@ -110,7 +110,7 @@ void mach::GMMStats::load(bob::io::HDF5File& config) {
   log_likelihood = config.read<double>("log_liklihood");
   int64_t n_gaussians = config.read<int64_t>("n_gaussians");
   int64_t n_inputs = config.read<int64_t>("n_inputs");
-  T = config.read<int64_t>("T");
+  T = static_cast<size_t>(config.read<int64_t>("T"));
   
   //resize arrays to prepare for HDF5 readout
   n.resize(n_gaussians);
