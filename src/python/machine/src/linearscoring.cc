@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <boost/python.hpp>
+#include <boost/shared_ptr.hpp>
 #include <machine/LinearScoring.h>
 #include <vector>
 
@@ -40,10 +41,10 @@ static blitz::Array<double, 2> linearScoring(list models,
   }
 
   int size_test_stats = len(test_stats);
-  std::vector<bob::machine::GMMStats*> test_stats_c;
+  std::vector<bob::machine::GMMStats* > test_stats_c;
 
   for(int i = 0; i < size_test_stats; i++) {
-    test_stats_c.push_back(extract<bob::machine::GMMStats*>(test_stats[i]));
+    test_stats_c.push_back(extract<bob::machine::GMMStats* >(test_stats[i]));
   }
 
   blitz::Array<double, 2> ret;
@@ -67,10 +68,10 @@ static void convertGMMMeanList(list models, std::vector<blitz::Array<double,1> >
   }
 }
 
-static void convertGMMStatsList(list test_stats, std::vector<const bob::machine::GMMStats*>& test_stats_c) {
+static void convertGMMStatsList(list test_stats, std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& test_stats_c) {
   int size_test_stats = len(test_stats);
   for(int i=0; i<size_test_stats; ++i) {
-    test_stats_c.push_back(extract<const bob::machine::GMMStats*>(test_stats[i]));
+    test_stats_c.push_back(boost::shared_ptr<const bob::machine::GMMStats>(new bob::machine::GMMStats(extract<bob::machine::GMMStats>(test_stats[i]))));
   }
 }
 
@@ -81,10 +82,10 @@ static void convertChannelOffsetList(list test_channelOffset, std::vector<blitz:
   }
 }
 
-static void convertGMMMachineList(list models, std::vector<const bob::machine::GMMMachine*>& models_c) {
+static void convertGMMMachineList(list models, std::vector<boost::shared_ptr<const bob::machine::GMMMachine> >& models_c) {
   int size_models = len(models);
   for(int i=0; i<size_models; ++i) {
-    models_c.push_back(extract<const bob::machine::GMMMachine*>(models[i]));
+    models_c.push_back(boost::shared_ptr<const bob::machine::GMMMachine>(new bob::machine::GMMMachine(extract<bob::machine::GMMMachine>(models[i]))));
   }
 }
 
@@ -97,7 +98,7 @@ static blitz::Array<double, 2> linearScoring1(list models,
   std::vector<blitz::Array<double,1> > models_c;
   convertGMMMeanList(models, models_c);
 
-  std::vector<const bob::machine::GMMStats*> test_stats_c;
+  std::vector<boost::shared_ptr<const bob::machine::GMMStats> > test_stats_c;
   convertGMMStatsList(test_stats, test_stats_c);
 
   std::vector<blitz::Array<double,1> > test_channelOffset_c;
@@ -120,7 +121,7 @@ static blitz::Array<double, 2> linearScoring2(list models,
   std::vector<blitz::Array<double,1> > models_c;
   convertGMMMeanList(models, models_c);
 
-  std::vector<const bob::machine::GMMStats*> test_stats_c;
+  std::vector<boost::shared_ptr<const bob::machine::GMMStats> > test_stats_c;
   convertGMMStatsList(test_stats, test_stats_c);
 
   blitz::Array<double, 2> ret;
@@ -136,10 +137,10 @@ static blitz::Array<double, 2> linearScoring3(list models,
     list test_stats,
     bool frame_length_normalisation = false) {
 
-  std::vector<const bob::machine::GMMMachine*> models_c;
+  std::vector<boost::shared_ptr<const bob::machine::GMMMachine> > models_c;
   convertGMMMachineList(models, models_c);
 
-  std::vector<const bob::machine::GMMStats*> test_stats_c;
+  std::vector<boost::shared_ptr<const bob::machine::GMMStats> > test_stats_c;
   convertGMMStatsList(test_stats, test_stats_c);
 
   blitz::Array<double, 2> ret;

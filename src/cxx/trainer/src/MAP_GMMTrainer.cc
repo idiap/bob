@@ -1,7 +1,8 @@
 /**
- * @file cxx/trainer/src/MAP_GMMTrainer.cc
- * @date Tue May 10 11:35:58 2011 +0200
- * @author Francois Moulin <Francois.Moulin@idiap.ch>
+ * @file src/cxx/trainer/src/MAP_GMMTrainer.cc
+ * @author <a href="mailto:Roy.Wallace@idiap.ch">Roy Wallace</a> 
+ * @author <a href="mailto:Francois.Moulin@idiap.ch">Francois Moulin</a>
+ * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -34,10 +35,8 @@ bob::trainer::MAP_GMMTrainer::~MAP_GMMTrainer() {
 void bob::trainer::MAP_GMMTrainer::initialization(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data) {
   // Allocate memory for the sufficient statistics and initialise
   m_ss.resize(gmm.getNGaussians(),gmm.getNInputs());
-  blitz::Array<double,1> ar1(gmm.getNGaussians());
   blitz::Array<double,2> ar2(gmm.getNGaussians(),gmm.getNInputs());
-  m_prior_gmm->getWeights(ar1);
-  gmm.setWeights(ar1);
+  gmm.setWeights(m_prior_gmm->getWeights());
   m_prior_gmm->getMeans(ar2);
   gmm.setMeans(ar2);
   m_prior_gmm->getVariances(ar2);
@@ -79,12 +78,11 @@ void bob::trainer::MAP_GMMTrainer::mStep(bob::machine::GMMMachine& gmm, const bo
     m_cache_ml_weights = m_ss.n / (int32_t)m_ss.T; //cast req. for linux/32-bits & osx
 
     // Get the prior weights
-    m_cache_prior_weights.resize(n_gaussians);
-    m_prior_gmm->getWeights(m_cache_prior_weights);
+    const blitz::Array<double,1>& prior_weights = m_prior_gmm->getWeights();
 
     // Calculate the new weights
     m_cache_new_weights.resize(n_gaussians);
-    m_cache_new_weights = m_cache_alpha * m_cache_ml_weights + (1-m_cache_alpha) * m_cache_prior_weights;
+    m_cache_new_weights = m_cache_alpha * m_cache_ml_weights + (1-m_cache_alpha) * prior_weights;
 
     // Apply the scale factor, gamma, to ensure the new weights sum to unity 
     double gamma = blitz::sum(m_cache_new_weights);

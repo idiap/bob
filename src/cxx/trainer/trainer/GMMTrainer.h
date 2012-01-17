@@ -1,7 +1,11 @@
 /**
- * @file cxx/trainer/trainer/GMMTrainer.h
- * @date Tue May 10 11:35:58 2011 +0200
- * @author Francois Moulin <Francois.Moulin@idiap.ch>
+ * @file src/cxx/trainer/trainer/GMMTrainer.h
+ * @author <a href="mailto:Roy.Wallace@idiap.ch">Roy Wallace</a> 
+ * @author <a href="mailto:Francois.Moulin@idiap.ch">Francois Moulin</a>
+ * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
+ *
+ * @brief This class implements the E-step of the expectation-maximisation algorithm for a GMM Machine.
+ * @details See Section 9.2.2 of Bishop, "Pattern recognition and machine learning", 2006
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -17,14 +21,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/// @file GMMTrainer.h
-/// @author <a href="mailto:Roy.Wallace@idiap.ch">Roy Wallace</a> 
-/// @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
-/// @brief This class implements the E-step of the expectation-maximisation algorithm for a GMM Machine.
-/// @details See Section 9.2.2 of Bishop, "Pattern recognition and machine learning", 2006
 
-#ifndef _GMMTRAINER_H
-#define _GMMTRAINER_H
+#ifndef BOB_TRAINER_GMMTRAINER_H
+#define BOB_TRAINER_GMMTRAINER_H
 
 #include "io/Arrayset.h"
 #include "trainer/EMTrainer.h"
@@ -56,8 +55,10 @@ class GMMTrainer : public EMTrainer<bob::machine::GMMMachine, bob::io::Arrayset>
     /// 
     /// The statistics, m_ss, will be used in the mStep() that follows.
     /// Implements EMTrainer::eStep(double &)
-    virtual double eStep(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data);
+    virtual void eStep(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data);
+    virtual double computeLikelihood(bob::machine::GMMMachine& gmm);
 
+    virtual void finalization(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data);
     
   protected:
 

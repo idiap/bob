@@ -37,12 +37,14 @@ void bind_trainer_gmm() {
     .add_property("maxIterations", &EMTrainerGMMBase::getMaxIterations, &EMTrainerGMMBase::setMaxIterations, "Max iterations")
     .def("train", &EMTrainerGMMBase::train, (arg("machine"), arg("data")), "Train a machine using data")
     .def("initialization", &EMTrainerGMMBase::initialization, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
+    .def("finalization", &EMTrainerGMMBase::finalization, (arg("machine"), arg("data")), "This method is called after the EM algorithm")
     .def("eStep", &EMTrainerGMMBase::eStep, (arg("machine"), arg("data")),
        "Update the hidden variable distribution (or the sufficient statistics) given the Machine parameters. "
        "Also, calculate the average output of the Machine given these parameters.\n"
        "Return the average output of the Machine across the dataset. "
        "The EM algorithm will terminate once the change in average_output "
        "is less than the convergence_threshold.")
+    .def("eStep", &EMTrainerGMMBase::computeLikelihood, (arg("machine")), "Returns the likelihood.")
     .def("mStep", &EMTrainerGMMBase::mStep, (arg("machine"), arg("data")), "Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
   ;
 

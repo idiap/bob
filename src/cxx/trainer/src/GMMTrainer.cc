@@ -1,7 +1,8 @@
 /**
- * @file cxx/trainer/src/GMMTrainer.cc
- * @date Tue May 10 11:35:58 2011 +0200
- * @author Francois Moulin <Francois.Moulin@idiap.ch>
+ * @file src/cxx/trainer/src/GMMTrainer.cc
+ * @author <a href="mailto:Roy.Wallace@idiap.ch">Roy Wallace</a> 
+ * @author <a href="mailto:Francois.Moulin@idiap.ch">Francois Moulin</a>
+ * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -37,9 +38,15 @@ void bob::trainer::GMMTrainer::initialization(bob::machine::GMMMachine& gmm, con
   m_ss.resize(gmm.getNGaussians(),gmm.getNInputs());
 }
 
-double bob::trainer::GMMTrainer::eStep(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data) {
+void bob::trainer::GMMTrainer::eStep(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data) {
   m_ss.init();
   // Calculate the sufficient statistics and save in m_ss
   gmm.accStatistics(data, m_ss);
+}
+
+double bob::trainer::GMMTrainer::computeLikelihood(bob::machine::GMMMachine& gmm) {
   return m_ss.log_likelihood / m_ss.T;
+}
+
+void bob::trainer::GMMTrainer::finalization(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data) {
 }

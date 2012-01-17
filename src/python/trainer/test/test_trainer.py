@@ -143,7 +143,7 @@ class TrainerTest(unittest.TestCase):
       means = flipRows(means)
       variances = flipRows(variances)
       weights = flipRows(weights)
-    
+   
     self.assertTrue(equals(means, gmmMeans, 1e-3))
     self.assertTrue(equals(weights, gmmWeights, 1e-3))
     self.assertTrue(equals(variances, gmmVariances, 1e-3))
@@ -164,7 +164,7 @@ class TrainerTest(unittest.TestCase):
     gmm_ref = bob.machine.GMMMachine(bob.io.HDF5File("data/gmm_ML.hdf5"))
     gmm_ref_32bit_debug = bob.machine.GMMMachine(bob.io.HDF5File("data/gmm_ML_32bit_debug.hdf5"))
     gmm_ref_32bit_release = bob.machine.GMMMachine(bob.io.HDF5File("data/gmm_ML_32bit_release.hdf5"))
-    
+
     self.assertTrue((gmm == gmm_ref) or (gmm == gmm_ref_32bit_release) or (gmm == gmm_ref_32bit_debug))
 
   def test03_gmm_ML(self):
@@ -183,7 +183,7 @@ class TrainerTest(unittest.TestCase):
     
     # Initialize ML Trainer
     prior = 0.001
-    max_iter_gmm = 25+1
+    max_iter_gmm = 25
     accuracy = 0.00001
     ml_gmmtrainer = bob.trainer.ML_GMMTrainer(True, True, True, prior)
     ml_gmmtrainer.maxIterations = max_iter_gmm
@@ -219,9 +219,9 @@ class TrainerTest(unittest.TestCase):
     #gmm.save(config)
     
     gmm_ref = bob.machine.GMMMachine(bob.io.HDF5File("data/gmm_MAP.hdf5"))
-    gmm_ref_32bit_release = bob.machine.GMMMachine(bob.io.HDF5File("data/gmm_MAP_32bit_release.hdf5"))
+    #gmm_ref_32bit_release = bob.machine.GMMMachine(bob.io.HDF5File("data/gmm_MAP_32bit_release.hdf5"))
 
-    self.assertTrue((gmm == gmm_ref) or (gmm == gmm_ref_32bit_release))
+    self.assertTrue((equals(gmm.means,gmm_ref.means,1e-3) and equals(gmm.variances,gmm_ref.variances,1e-3) and equals(gmm.weights,gmm_ref.weights,1e-3)))
     
   def test05_gmm_MAP(self):
     """Train a GMMMachine with MAP_GMMTrainer and compare with matlab reference"""
@@ -341,7 +341,6 @@ class TrainerTest(unittest.TestCase):
     mytrainer.train(machine, ar)
     
     for i in range(0, 2):
-      print machine.means[i,:]
       self.assertTrue((ar[i+1] == machine.means[i, :]).all())
 
   def test09_custom_initialization(self):

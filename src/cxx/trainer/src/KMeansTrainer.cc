@@ -1,7 +1,8 @@
 /**
- * @file cxx/trainer/src/KMeansTrainer.cc
- * @date Tue May 10 11:35:58 2011 +0200
+ * @file src/cxx/trainer/src/KMeansTrainer.cc
+ * @author Roy Wallace <Roy.Wallace@idiap.ch>
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -19,30 +20,38 @@
  */
 #include "trainer/KMeansTrainer.h"
 
-#include <io/Arrayset.h>
-#include <cfloat>
-#include <core/logging.h>
+#include "io/Arrayset.h"
+#include "core/logging.h"
 #include <boost/random.hpp>
 
-using namespace bob::machine;
+namespace io = bob::io;
+namespace mach = bob::machine;
+namespace train = bob::trainer;
 
-bob::trainer::KMeansTrainer::KMeansTrainer(double convergence_threshold, int max_iterations) :
-  EMTrainer<KMeansMachine, bob::io::Arrayset>(convergence_threshold, max_iterations) {
-  seed = -1;
+
+train::KMeansTrainer::KMeansTrainer(double convergence_threshold,
+    size_t max_iterations, bool compute_likelihood):
+  train::EMTrainer<mach::KMeansMachine, bob::io::Arrayset>(
+    convergence_threshold, max_iterations, compute_likelihood), 
+  m_seed(-1), m_average_min_distance(0),
+  m_zeroethOrderStats(0), m_firstOrderStats(0,0)
+{
 }
   
-void bob::trainer::KMeansTrainer::initialization(KMeansMachine& kMeansMachine, const bob::io::Arrayset& ar) {
+void train::KMeansTrainer::initialization(mach::KMeansMachine& kmeans,
+  const io::Arrayset& ar) 
+{
   // split data into as many chunks as there are means
   size_t n_data = ar.size();
-  unsigned int n_chunk = n_data / kMeansMachine.getNMeans();
+  unsigned int n_chunk = n_data / kmeans.getNMeans();
   
   boost::mt19937 rng;
-  if (seed != -1) {
-    rng.seed((uint32_t)seed);
-  }
+  if(m_seed != -1) rng.seed((uint32_t)m_seed);
   
   // assign the i'th mean to a random example within the i'th chunk
-  for(int i = 0; i < kMeansMachine.getNMeans(); i++) {
+  for(size_t i=0; i<kmeans.getNMeans(); ++i) 
+  {
+    // TODO: Check that samples are not equal?
     boost::uniform_int<> range(i*n_chunk, (i+1)*n_chunk-1);
     boost::variate_generator<boost::mt19937&, boost::uniform_int<> > die(rng, range);
     
@@ -53,58 +62,68 @@ void bob::trainer::KMeansTrainer::initialization(KMeansMachine& kMeansMachine, c
     const blitz::Array<double, 1>& mean = ar.get<double,1>(index);
     
     // set the mean
-    kMeansMachine.setMean(i, mean);
-  } 
+    kmeans.setMean(i, mean);
+  }
+
+  // Resize the accumulator
+  m_zeroethOrderStats.resize(kmeans.getNMeans());
+  m_firstOrderStats.resize(kmeans.getNMeans(), kmeans.getNInputs());
 }
 
-double bob::trainer::KMeansTrainer::eStep(KMeansMachine& kmeans, const bob::io::Arrayset& ar) {
-    // initialise the accumulators
-    double average_min_distance = 0;
-    resetAccumulators(kmeans);
+void train::KMeansTrainer::eStep(mach::KMeansMachine& kmeans, 
+  const io::Arrayset& ar)
+{
+  // initialise the accumulators
+  resetAccumulators(kmeans);
 
-    // iterate over data samples
-    for (size_t i=0; i < ar.size(); ++i) {
-      // get example
-      blitz::Array<double, 1> x(ar.get<double,1>(i));
+  // iterate over data samples
+  for(size_t i=0; i<ar.size(); ++i) 
+  {
+    // get example
+    blitz::Array<double, 1> x(ar.get<double,1>(i));
 
-      // find closest mean, and distance from that mean
-      int closest_mean = -1;
-      double min_distance = -1;
-      kmeans.getClosestMean(x,closest_mean,min_distance);
+    // find closest mean, and distance from that mean
+    size_t closest_mean = 0;
+    double min_distance = 0;
+    kmeans.getClosestMean(x,closest_mean,min_distance);
 
-      // accumulate the stats
-      average_min_distance += min_distance;
-      m_zeroethOrderStats(closest_mean)++;
-      m_firstOrderStats(closest_mean,blitz::Range::all()) += x;
-    }
-    average_min_distance /= ar.size();
-    
-    return average_min_distance;
+    // accumulate the stats
+    m_average_min_distance += min_distance;
+    ++m_zeroethOrderStats(closest_mean);
+    m_firstOrderStats(closest_mean,blitz::Range::all()) += x;
+  }
+  m_average_min_distance /= static_cast<double>(ar.size());
 }
 
-void bob::trainer::KMeansTrainer::mStep(KMeansMachine& kmeans, const bob::io::Arrayset&) {
-    m_cache_newMeans.resize(kmeans.getNMeans(),kmeans.getNInputs());
-    blitz::firstIndex i;
-    blitz::secondIndex j;
-    m_cache_newMeans = m_firstOrderStats(i,j) / m_zeroethOrderStats(i);
-    kmeans.setMeans(m_cache_newMeans);
+void train::KMeansTrainer::mStep(mach::KMeansMachine& kmeans, 
+  const io::Arrayset&) 
+{
+  blitz::Array<double,2>& means = kmeans.updateMeans();
+  for(size_t i=0; i<kmeans.getNMeans(); ++i)
+  {
+    means(i,blitz::Range::all()) = 
+      m_firstOrderStats(i,blitz::Range::all()) / m_zeroethOrderStats(i);
+  }
 }
 
-bool bob::trainer::KMeansTrainer::resetAccumulators(KMeansMachine& kMeansMachine) {
-  m_zeroethOrderStats.resize(kMeansMachine.getNMeans());
+double train::KMeansTrainer::computeLikelihood(mach::KMeansMachine& kmeans)
+{
+  return m_average_min_distance;
+}
+
+void train::KMeansTrainer::finalization(mach::KMeansMachine& kmeans,
+  const io::Arrayset& ar) 
+{
+}
+
+bool train::KMeansTrainer::resetAccumulators(mach::KMeansMachine& kmeans)
+{
+  m_average_min_distance = 0;
   m_zeroethOrderStats = 0;
-  m_firstOrderStats.resize(kMeansMachine.getNMeans(), kMeansMachine.getNInputs());
   m_firstOrderStats = 0;
   return true;
 }
 
-void bob::trainer::KMeansTrainer::setSeed(int seed) {
-  this->seed = seed;
+void train::KMeansTrainer::setSeed(int seed) {
+  m_seed = seed;
 }
-
-int bob::trainer::KMeansTrainer::getSeed() {
-  return seed;
-}
-
-
-

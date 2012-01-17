@@ -485,8 +485,9 @@ BOOST_AUTO_TEST_CASE( test_JFATrainer_enrol )
     blitz::Array<double,1> f = sample.sumPx(g,blitz::Range::all());
     f = F1(blitz::Range(g*3,(g+1)*3-1),0);
   }
+  boost::shared_ptr<const bob::machine::GMMStats> sample_(new bob::machine::GMMStats(sample));
 //  std::cout << sample.n << sample.sumPx;
-  jfa_m.forward(&sample, score);
+  jfa_m.forward(sample_, score);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
