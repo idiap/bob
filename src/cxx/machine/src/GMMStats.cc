@@ -100,7 +100,7 @@ void mach::GMMStats::save(bob::io::HDF5File& config) const {
   config.set("n_gaussians", sumpx_shape_0);
   config.set("n_inputs", sumpx_shape_1);
   config.set("log_liklihood", log_likelihood); //double
-  config.set("T", T);
+  config.set("T", static_cast<int64_t>(T));
   config.setArray("n", n); //Array1d
   config.setArray("sumPx", sumPx); //Array2d
   config.setArray("sumPxx", sumPxx); //Array2d
