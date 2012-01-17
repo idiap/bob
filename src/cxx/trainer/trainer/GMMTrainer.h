@@ -34,51 +34,79 @@
 namespace bob {
 namespace trainer {
 
-/// @brief This class implements the E-step of the expectation-maximisation algorithm for a GMM Machine.
-/// @details See Section 9.2.2 of Bishop, "Pattern recognition and machine learning", 2006
+/**
+ * @brief This class implements the E-step of the expectation-maximisation algorithm for a GMM Machine.
+ * @details See Section 9.2.2 of Bishop, "Pattern recognition and machine learning", 2006
+ */
 class GMMTrainer : public EMTrainer<bob::machine::GMMMachine, bob::io::Arrayset> {
   public:
 
-    /// Default constructor
+    /**
+     * Default constructor
+     */
     GMMTrainer(bool update_means = true, bool update_variances = false, bool update_weights = false,
       double mean_var_update_responsibilities_threshold = std::numeric_limits<double>::epsilon());
     
-    /// Destructor
+    /**
+     * Destructor
+     */
     virtual ~GMMTrainer();
 
+    /**
+     * Initialization before the EM steps
+     */
     virtual void initialization(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data);
     
-    /// Calculates and saves statistics across the dataset, 
-    /// and saves these as m_ss. Calculates the average
-    /// log likelihood of the observations given the GMM,
-    /// and returns this in average_log_likelihood.
-    /// 
-    /// The statistics, m_ss, will be used in the mStep() that follows.
-    /// Implements EMTrainer::eStep(double &)
+    /**
+     * Calculates and saves statistics across the dataset, 
+     * and saves these as m_ss. Calculates the average
+     * log likelihood of the observations given the GMM,
+     * and returns this in average_log_likelihood.
+     * 
+     * The statistics, m_ss, will be used in the mStep() that follows.
+     * Implements EMTrainer::eStep(double &)
+     */
     virtual void eStep(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data);
+
+    /**
+     * Computes the likelihood using current estimates of the latent variables
+     */
     virtual double computeLikelihood(bob::machine::GMMMachine& gmm);
 
+    /**
+     * Finalization after the EM steps
+     */
     virtual void finalization(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data);
     
   protected:
 
-    /// These are the sufficient statistics, calculated during the
-    /// E-step and used during the M-step
+    /**
+     * These are the sufficient statistics, calculated during the
+     * E-step and used during the M-step
+     */
     bob::machine::GMMStats m_ss;
     
-    /// update means on each iteration
+    /**
+     * update means on each iteration
+     */
     bool update_means;
     
-    /// update variances on each iteration
+    /**
+     * update variances on each iteration
+     */
     bool update_variances;
     
-    /// update weights on each iteration
+    /**
+     * update weights on each iteration
+     */
     bool update_weights;
 
-    /// threshold over the responsibilities of the Gaussians
-    /// Equations 9.24, 9.25 of Bishop, "Pattern recognition and machine learning", 2006
-    /// require a division by the responsibilities, which might be equal to zero
-    /// because of numerical issue. This threshold is used to avoid such divisions.
+    /**
+     * threshold over the responsibilities of the Gaussians
+     * Equations 9.24, 9.25 of Bishop, "Pattern recognition and machine learning", 2006
+     * require a division by the responsibilities, which might be equal to zero
+     * because of numerical issue. This threshold is used to avoid such divisions.
+     */
     double m_mean_var_update_responsibilities_threshold;
 };
 
