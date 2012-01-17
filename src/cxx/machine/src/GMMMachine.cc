@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/src/GMMMachine.cc
+ * @file src/cxx/machine/src/GMMMachine.cc
  * @author <a href="mailto:Roy.Wallace@idiap.ch">Roy Wallace</a> 
  * @author <a href="mailto:Francois.Moulin@idiap.ch">Francois Moulin</a>
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
@@ -23,29 +23,28 @@
 #include "core/logging.h"
 #include "machine/Exception.h"
 
-namespace bca = bob::core::array;
+namespace ca = bob::core::array;
 namespace TLog = bob::machine::Log;
 namespace mach = bob::machine;
 
-mach::GMMMachine::GMMMachine(): m_gaussians(0), m_cache_supervector(false) {
+mach::GMMMachine::GMMMachine(): m_gaussians(0) {
   resize(0,0);
 }
 
 mach::GMMMachine::GMMMachine(size_t n_gaussians, size_t n_inputs): 
-  m_gaussians(0), m_cache_supervector(false) 
+  m_gaussians(0)
 {
   resize(n_gaussians,n_inputs);
 }
 
 mach::GMMMachine::GMMMachine(bob::io::HDF5File& config): 
-  m_gaussians(0), m_cache_supervector(false) 
+  m_gaussians(0)
 {
   load(config);
 }
 
 mach::GMMMachine::GMMMachine(const GMMMachine& other): 
-  Machine<blitz::Array<double,1>, double>(other), m_gaussians(0), 
-  m_cache_supervector(false) 
+  Machine<blitz::Array<double,1>, double>(other), m_gaussians(0)
 {
   copy(other);
 }
@@ -55,8 +54,6 @@ mach::GMMMachine& mach::GMMMachine::operator=(const mach::GMMMachine &other) {
   if (this != &other) 
     copy(other);
   
-  // Always ignore the cache
-  m_cache_supervector = false;
   // by convention, always return *this
   return *this;
 }
@@ -92,17 +89,13 @@ void mach::GMMMachine::copy(const GMMMachine& other) {
   }
 
   // Initialise cache
-  m_cache_log_weighted_gaussian_likelihoods.resize(m_n_gaussians);
-  m_cache_P.resize(m_n_gaussians);
-  m_cache_Px.resize(m_n_gaussians,m_n_inputs);
-  m_cache_Pxx.resize(m_n_gaussians,m_n_inputs);
+  initCache();
 }
 
 mach::GMMMachine::~GMMMachine() { }
 
 void mach::GMMMachine::setNInputs(size_t n_inputs) {
   resize(m_n_gaussians,n_inputs);
-  m_cache_supervector = false;
 }
 
 void mach::GMMMachine::resize(size_t n_gaussians, size_t n_inputs) {
@@ -119,50 +112,46 @@ void mach::GMMMachine::resize(size_t n_gaussians, size_t n_inputs) {
     m_gaussians.push_back(boost::shared_ptr<mach::Gaussian>(new mach::Gaussian(n_inputs)));
 
   // Initialise cache arrays
-  m_cache_log_weighted_gaussian_likelihoods.resize(m_n_gaussians);
-  m_cache_P.resize(m_n_gaussians);
-  m_cache_Px.resize(m_n_gaussians,m_n_inputs);
-  m_cache_Pxx.resize(m_n_gaussians,m_n_inputs);
-  m_cache_supervector = false;
+  initCache();
 }
 
 
 void mach::GMMMachine::setWeights(const blitz::Array<double,1> &weights) {
-  bca::assertSameShape(weights, m_weights);
+  ca::assertSameShape(weights, m_weights);
   m_weights = weights;
 }
 
 void mach::GMMMachine::setMeans(const blitz::Array<double,2> &means) {
-  bca::assertSameDimensionLength(means.extent(0), m_n_gaussians);
-  bca::assertSameDimensionLength(means.extent(1), m_n_inputs);
+  ca::assertSameDimensionLength(means.extent(0), m_n_gaussians);
+  ca::assertSameDimensionLength(means.extent(1), m_n_inputs);
   for(size_t i=0; i<m_n_gaussians; ++i)
     m_gaussians[i]->updateMean() = means(i,blitz::Range::all());
   m_cache_supervector = false;
 }
 
 void mach::GMMMachine::getMeans(blitz::Array<double,2> &means) const {
-  bca::assertSameDimensionLength(means.extent(0), m_n_gaussians);
-  bca::assertSameDimensionLength(means.extent(1), m_n_inputs);
+  ca::assertSameDimensionLength(means.extent(0), m_n_gaussians);
+  ca::assertSameDimensionLength(means.extent(1), m_n_inputs);
   for(size_t i=0; i<m_n_gaussians; ++i) 
     means(i,blitz::Range::all()) = m_gaussians[i]->getMean(); 
 }
 
 void mach::GMMMachine::setMeanSupervector(const blitz::Array<double,1> &mean_supervector) {
-  bca::assertSameDimensionLength(mean_supervector.extent(0), m_n_gaussians*m_n_inputs);
+  ca::assertSameDimensionLength(mean_supervector.extent(0), m_n_gaussians*m_n_inputs);
   for(size_t i=0; i<m_n_gaussians; ++i) 
     m_gaussians[i]->updateMean() = mean_supervector(blitz::Range(i*m_n_inputs, (i+1)*m_n_inputs-1));
   m_cache_supervector = false;
 }
 
 void mach::GMMMachine::getMeanSupervector(blitz::Array<double,1> &mean_supervector) const {
-  bca::assertSameDimensionLength(mean_supervector.extent(0), m_n_gaussians*m_n_inputs);
+  ca::assertSameDimensionLength(mean_supervector.extent(0), m_n_gaussians*m_n_inputs);
   for(size_t i=0; i<m_n_gaussians; ++i)
     mean_supervector(blitz::Range(i*m_n_inputs, (i+1)*m_n_inputs-1)) = m_gaussians[i]->getMean(); 
 }
 
 void mach::GMMMachine::setVariances(const blitz::Array<double, 2 >& variances) {
-  bca::assertSameDimensionLength(variances.extent(0), m_n_gaussians);
-  bca::assertSameDimensionLength(variances.extent(1), m_n_inputs);
+  ca::assertSameDimensionLength(variances.extent(0), m_n_gaussians);
+  ca::assertSameDimensionLength(variances.extent(1), m_n_inputs);
   for(size_t i=0; i<m_n_gaussians; ++i) {
     m_gaussians[i]->updateVariance() = variances(i,blitz::Range::all());
     m_gaussians[i]->applyVarianceThresholds();
@@ -171,14 +160,14 @@ void mach::GMMMachine::setVariances(const blitz::Array<double, 2 >& variances) {
 }
 
 void mach::GMMMachine::getVariances(blitz::Array<double, 2 >& variances) const {
-  bca::assertSameDimensionLength(variances.extent(0), m_n_gaussians);
-  bca::assertSameDimensionLength(variances.extent(1), m_n_inputs);
+  ca::assertSameDimensionLength(variances.extent(0), m_n_gaussians);
+  ca::assertSameDimensionLength(variances.extent(1), m_n_inputs);
   for(size_t i=0; i<m_n_gaussians; ++i) 
     variances(i,blitz::Range::all()) = m_gaussians[i]->getVariance();
 }
 
 void mach::GMMMachine::setVarianceSupervector(const blitz::Array<double,1> &variance_supervector) {
-  bca::assertSameDimensionLength(variance_supervector.extent(0), m_n_gaussians*m_n_inputs);
+  ca::assertSameDimensionLength(variance_supervector.extent(0), m_n_gaussians*m_n_inputs);
   for(size_t i=0; i<m_n_gaussians; ++i) {
     m_gaussians[i]->updateVariance() = variance_supervector(blitz::Range(i*m_n_inputs, (i+1)*m_n_inputs-1));
     m_gaussians[i]->applyVarianceThresholds();
@@ -187,7 +176,7 @@ void mach::GMMMachine::setVarianceSupervector(const blitz::Array<double,1> &vari
 }
 
 void mach::GMMMachine::getVarianceSupervector(blitz::Array<double,1> &variance_supervector) const {
-  bca::assertSameDimensionLength(variance_supervector.extent(0), m_n_gaussians*m_n_inputs);
+  ca::assertSameDimensionLength(variance_supervector.extent(0), m_n_gaussians*m_n_inputs);
   for(size_t i=0; i<m_n_gaussians; ++i) {
     variance_supervector(blitz::Range(i*m_n_inputs, (i+1)*m_n_inputs-1)) = m_gaussians[i]->getVariance(); 
   }
@@ -196,26 +185,27 @@ void mach::GMMMachine::getVarianceSupervector(blitz::Array<double,1> &variance_s
 void mach::GMMMachine::setVarianceThresholds(double factor) {
   for(size_t i=0; i<m_n_gaussians; ++i) 
     m_gaussians[i]->setVarianceThresholds(factor);
+  m_cache_supervector = false;
 }
 
 void mach::GMMMachine::setVarianceThresholds(blitz::Array<double, 1> variance_thresholds) {
-  bca::assertSameDimensionLength(variance_thresholds.extent(0), m_n_inputs);
+  ca::assertSameDimensionLength(variance_thresholds.extent(0), m_n_inputs);
   for(size_t i=0; i<m_n_gaussians; ++i) 
     m_gaussians[i]->setVarianceThresholds(variance_thresholds);
   m_cache_supervector = false;
 }
 
 void mach::GMMMachine::setVarianceThresholds(const blitz::Array<double, 2>& variance_thresholds) {
-  bca::assertSameDimensionLength(variance_thresholds.extent(0), m_n_gaussians);
-  bca::assertSameDimensionLength(variance_thresholds.extent(1), m_n_inputs);
+  ca::assertSameDimensionLength(variance_thresholds.extent(0), m_n_gaussians);
+  ca::assertSameDimensionLength(variance_thresholds.extent(1), m_n_inputs);
   for(size_t i=0; i<m_n_gaussians; ++i)
     m_gaussians[i]->setVarianceThresholds(variance_thresholds(i,blitz::Range::all())); 
   m_cache_supervector = false;
 }
 
 void mach::GMMMachine::getVarianceThresholds(blitz::Array<double, 2>& variance_thresholds) const {
-  bca::assertSameDimensionLength(variance_thresholds.extent(0), m_n_gaussians);
-  bca::assertSameDimensionLength(variance_thresholds.extent(1), m_n_inputs);
+  ca::assertSameDimensionLength(variance_thresholds.extent(0), m_n_gaussians);
+  ca::assertSameDimensionLength(variance_thresholds.extent(1), m_n_inputs);
   for(size_t i=0; i<m_n_gaussians; ++i) 
     variance_thresholds(i,blitz::Range::all()) = m_gaussians[i]->getVarianceThresholds();
 }
@@ -224,8 +214,8 @@ double mach::GMMMachine::logLikelihood(const blitz::Array<double, 1> &x,
   blitz::Array<double,1> &log_weighted_gaussian_likelihoods) const 
 {
   // Initialise variables
-  bca::assertSameDimensionLength(log_weighted_gaussian_likelihoods.extent(0), m_n_gaussians);
-  bca::assertSameDimensionLength(x.extent(0), m_n_inputs);
+  ca::assertSameDimensionLength(log_weighted_gaussian_likelihoods.extent(0), m_n_gaussians);
+  ca::assertSameDimensionLength(x.extent(0), m_n_inputs);
   double log_likelihood = TLog::LogZero;
 
   // Accumulate the weighted log likelihoods from each Gaussian
@@ -260,7 +250,6 @@ void mach::GMMMachine::forward_(const blitz::Array<double,1>& input, double& out
 void mach::GMMMachine::accStatistics(const bob::io::Arrayset& ar, mach::GMMStats& stats) const {
   // iterate over data
   for(size_t i=0; i<ar.size(); ++i) {
-
     // Get example
     blitz::Array<double,1> x(ar.get<double,1>(i));
 
@@ -358,11 +347,7 @@ void mach::GMMMachine::load(bob::io::HDF5File& config) {
   config.readArray("m_weights", m_weights);
 
   // Initialise cache
-  m_cache_log_weighted_gaussian_likelihoods.resize(m_n_gaussians);
-  m_cache_P.resize(m_n_gaussians);
-  m_cache_Px.resize(m_n_gaussians,m_n_inputs);
-  m_cache_Pxx.resize(m_n_gaussians,m_n_inputs);
-  m_cache_supervector = false;
+  initCache();
 }
 
 void mach::GMMMachine::updateCacheSupervectors() const
@@ -376,6 +361,15 @@ void mach::GMMMachine::updateCacheSupervectors() const
     m_cache_variance_supervector(range) = m_gaussians[i]->getVariance();
   }
   m_cache_supervector = true;
+}
+
+void mach::GMMMachine::initCache() const {
+  // Initialise cache arrays
+  m_cache_log_weighted_gaussian_likelihoods.resize(m_n_gaussians);
+  m_cache_P.resize(m_n_gaussians);
+  m_cache_Px.resize(m_n_gaussians,m_n_inputs);
+  m_cache_Pxx.resize(m_n_gaussians,m_n_inputs);
+  m_cache_supervector = false;
 }
 
 void mach::GMMMachine::reloadCacheSupervectors() const {

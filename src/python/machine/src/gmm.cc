@@ -279,94 +279,94 @@ void bind_machine_gmm() {
                                                             "This class implements a multivariate diagonal Gaussian distribution.\n"
                                                             "See Section 2.3.9 of Bishop, \"Pattern recognition and machine learning\", 2006",
                                                             init<size_t, size_t>(args("n_gaussians", "n_inputs")))
-  .def(init<mach::GMMMachine&>())
-  .def(init<bob::io::HDF5File&>(args("config")))
-  .def(self == self)
-  .add_property("nInputs",
-                &mach::GMMMachine::getNInputs,
-                &mach::GMMMachine::setNInputs,
-                "The feature dimensionality")
-  .add_property("nGaussians",
-                &mach::GMMMachine::getNGaussians,
-                "The number of Gaussian components")
-  .add_property("weights",
-                &mach_GMMMachine_getWeights,
-                &mach::GMMMachine::setWeights,
-                "The weights (also known as \"mixing coefficients\")")
-  .add_property("means",
-                &mach_GMMMachine_getMeans,
-                &mach::GMMMachine::setMeans,
-                "The means of the gaussians")
-  .add_property("meanSupervector",
-                &mach_GMMMachine_getMeanSupervector,
-                &mach::GMMMachine::setMeanSupervector,
-                "The mean supervector of the GMMMachine "
-                "(concatenation of the mean vectors of each Gaussian of the GMMMachine")
-  .add_property("variances",
-                &mach_GMMMachine_getVariances,
-                &mach::GMMMachine::setVariances,
-                "The variances")
-  .add_property("varianceSupervector",
-                &mach_GMMMachine_getVarianceSupervector,
-                &mach::GMMMachine::setVarianceSupervector,
-                "The variance supervector of the GMMMachine "
-                "(concatenation of the variance vectors of each Gaussian of the GMMMachine")
-  .add_property("varianceThresholds",
-                &mach_GMMMachine_getVarianceThresholds,
-                (void (mach::GMMMachine::*)(const blitz::Array<double,2>&))&mach::GMMMachine::setVarianceThresholds,
-                "The variance flooring thresholds for each Gaussian in each dimension")
-  .def("resize",
-       &mach::GMMMachine::resize,
-       args("n_gaussians", "n_inputs"),
-       "Reset the input dimensionality, and the number of Gaussian components.\n"
-       "Initialises the weights to uniform distribution.")
-  .def("setVarianceThresholds",
-       (void (mach::GMMMachine::*)(double))&mach::GMMMachine::setVarianceThresholds,
-       args("factor"),
-       "Set the variance flooring thresholds in each dimension "
-       "to a proportion of the current variance, for each Gaussian")
-  .def("setVarianceThresholds",
-       (void (mach::GMMMachine::*)(blitz::Array<double,1>))&mach::GMMMachine::setVarianceThresholds,
-       args("variance_thresholds"),
-       "Set the variance flooring thresholds in each dimension "
-       "(equal for all Gaussian components)")
-  .def("logLikelihood",
-       (double (mach::GMMMachine::*)(const blitz::Array<double,1>&, blitz::Array<double,1>&) const)&mach::GMMMachine::logLikelihood,
-       args("x", "log_weighted_gaussian_likelihoods"),
-       "Output the log likelihood of the sample, x, i.e. log(p(x|mach::GMMMachine))")
-  .def("logLikelihood",
-       (double (mach::GMMMachine::*)(const blitz::Array<double,1>&) const)&mach::GMMMachine::logLikelihood,
-       args("x"),
-       " Output the log likelihood of the sample, x, i.e. log(p(x|GMM))")
-  .def("accStatistics",
-       (void (mach::GMMMachine::*)(const blitz::Array<double,1>&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics,
-       args("x", "stats"),
-       "Accumulate the GMM statistics for this sample.")
-  .def("accStatistics",
-       (void (mach::GMMMachine::*)(const io::Arrayset&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics,
-       args("sampler", "stats"),
-       "Accumulates the GMM statistics over a set of samples.")
-  .def("getGaussian",
-       &mach::GMMMachine::getGaussian,
-       args("i"),
-       "Get a pointer to a particular Gaussian component")
-  .def("getMeanSupervector",
-       (void (mach::GMMMachine::*)(blitz::Array<double,1>&) const)&mach::GMMMachine::getMeanSupervector,
-       args("mean_supervector"),
-       "Get the mean supervector of the GMMMachine "
-       "(concatenation of the mean vectors of each Gaussian of the GMMMachine)")
-  .def("getVarianceSupervector",
-       (void (mach::GMMMachine::*)(blitz::Array<double,1>&) const)&mach::GMMMachine::getVarianceSupervector,
-       args("variance_supervector"),
-       "Get the variance supervector of the GMMMachine "
-       "(concatenation of the variance vectors of each Gaussian of the GMMMachine)")
-  .def("load",
-       &mach::GMMMachine::load,
-       "Load from a Configuration")
-  .def("save",
-       &mach::GMMMachine::save,
-       "Save to a Configuration")
-  .def(self_ns::str(self_ns::self))
+    .def(init<mach::GMMMachine&>())
+    .def(init<bob::io::HDF5File&>(args("config")))
+    .def(self == self)
+    .add_property("nInputs",
+                  &mach::GMMMachine::getNInputs,
+                  &mach::GMMMachine::setNInputs,
+                  "The feature dimensionality")
+    .add_property("nGaussians",
+                  &mach::GMMMachine::getNGaussians,
+                  "The number of Gaussian components")
+    .add_property("weights",
+                  &mach_GMMMachine_getWeights,
+                  &mach::GMMMachine::setWeights,
+                  "The weights (also known as \"mixing coefficients\")")
+    .add_property("means",
+                  &mach_GMMMachine_getMeans,
+                  &mach::GMMMachine::setMeans,
+                  "The means of the gaussians")
+    .add_property("meanSupervector",
+                  &mach_GMMMachine_getMeanSupervector,
+                  &mach::GMMMachine::setMeanSupervector,
+                  "The mean supervector of the GMMMachine "
+                  "(concatenation of the mean vectors of each Gaussian of the GMMMachine")
+    .add_property("variances",
+                  &mach_GMMMachine_getVariances,
+                  &mach::GMMMachine::setVariances,
+                  "The variances")
+    .add_property("varianceSupervector",
+                  &mach_GMMMachine_getVarianceSupervector,
+                  &mach::GMMMachine::setVarianceSupervector,
+                  "The variance supervector of the GMMMachine "
+                  "(concatenation of the variance vectors of each Gaussian of the GMMMachine")
+    .add_property("varianceThresholds",
+                  &mach_GMMMachine_getVarianceThresholds,
+                  (void (mach::GMMMachine::*)(const blitz::Array<double,2>&))&mach::GMMMachine::setVarianceThresholds,
+                  "The variance flooring thresholds for each Gaussian in each dimension")
+    .def("resize",
+         &mach::GMMMachine::resize,
+         args("n_gaussians", "n_inputs"),
+         "Reset the input dimensionality, and the number of Gaussian components.\n"
+         "Initialises the weights to uniform distribution.")
+    .def("setVarianceThresholds",
+         (void (mach::GMMMachine::*)(double))&mach::GMMMachine::setVarianceThresholds,
+         args("factor"),
+         "Set the variance flooring thresholds in each dimension "
+         "to a proportion of the current variance, for each Gaussian")
+    .def("setVarianceThresholds",
+         (void (mach::GMMMachine::*)(blitz::Array<double,1>))&mach::GMMMachine::setVarianceThresholds,
+         args("variance_thresholds"),
+         "Set the variance flooring thresholds in each dimension "
+         "(equal for all Gaussian components)")
+    .def("logLikelihood",
+         (double (mach::GMMMachine::*)(const blitz::Array<double,1>&, blitz::Array<double,1>&) const)&mach::GMMMachine::logLikelihood,
+         args("x", "log_weighted_gaussian_likelihoods"),
+         "Output the log likelihood of the sample, x, i.e. log(p(x|mach::GMMMachine))")
+    .def("logLikelihood",
+         (double (mach::GMMMachine::*)(const blitz::Array<double,1>&) const)&mach::GMMMachine::logLikelihood,
+         args("x"),
+         " Output the log likelihood of the sample, x, i.e. log(p(x|GMM))")
+    .def("accStatistics",
+         (void (mach::GMMMachine::*)(const blitz::Array<double,1>&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics,
+         args("x", "stats"),
+         "Accumulate the GMM statistics for this sample.")
+    .def("accStatistics",
+         (void (mach::GMMMachine::*)(const io::Arrayset&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics,
+         args("sampler", "stats"),
+         "Accumulates the GMM statistics over a set of samples.")
+    .def("getGaussian",
+         &mach::GMMMachine::getGaussian,
+         args("i"),
+         "Get the specified Gaussian component. An exception is thrown if i is out of range.")
+    .def("getMeanSupervector",
+         (void (mach::GMMMachine::*)(blitz::Array<double,1>&) const)&mach::GMMMachine::getMeanSupervector,
+         args("mean_supervector"),
+         "Get the mean supervector of the GMMMachine "
+         "(concatenation of the mean vectors of each Gaussian of the GMMMachine)")
+    .def("getVarianceSupervector",
+         (void (mach::GMMMachine::*)(blitz::Array<double,1>&) const)&mach::GMMMachine::getVarianceSupervector,
+         args("variance_supervector"),
+         "Get the variance supervector of the GMMMachine "
+         "(concatenation of the variance vectors of each Gaussian of the GMMMachine)")
+    .def("load",
+         &mach::GMMMachine::load,
+         "Load from a Configuration")
+    .def("save",
+         &mach::GMMMachine::save,
+         "Save to a Configuration")
+    .def(self_ns::str(self_ns::self))
   ;
 
   class_<mach::GMMLLRMachine, bases<mach::Machine<blitz::Array<double,1>, double> > >("GMMLLRMachine",

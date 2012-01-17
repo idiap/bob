@@ -291,6 +291,11 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double> {
      */
     void updateCacheSupervectors() const;
 
+    /**
+     * Initialise the cache members (allocate arrays)
+     */
+    void initCache() const;
+
     /// Some cache arrays to avoid re-allocation when computing log-likelihoods
     mutable blitz::Array<double,1> m_cache_log_weighted_gaussian_likelihoods;
     mutable blitz::Array<double,1> m_cache_P;
