@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/machine/Gaussian.h
+ * @file src/cxx/machine/machine/Gaussian.h
  * @author <a href="mailto:Roy.Wallace@idiap.ch">Roy Wallace</a> 
  * @author <a href="mailto:Francois.Moulin@idiap.ch">Francois Moulin</a>
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
@@ -237,6 +237,7 @@ class Gaussian {
     blitz::Array<double,1> m_variance_thresholds;
 
     /**
+     * A constant that depends only on the feature dimensionality
      * m_n_log2pi = n_inputs * log(2*pi) (used to compute m_gnorm)
      */
     double m_n_log2pi;

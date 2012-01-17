@@ -1,5 +1,5 @@
 /**
- * @file python/machine/src/gmm.cc
+ * @file src/python/machine/src/gmm.cc
  * @date Tue Jul 26 15:11:33 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -207,37 +207,38 @@ void bind_machine_gmm() {
   ;
   
   class_<mach::Gaussian, boost::shared_ptr<mach::Gaussian> >("Gaussian",
-                   "This class implements a multivariate diagonal mach::Gaussian distribution",
+                   "This class implements a multivariate diagonal Gaussian distribution",
                    init<>())
-  .def(init<size_t>(args("n_inputs")))
-  .def(init<mach::Gaussian&>(args("other")))
-  .def(init<bob::io::HDF5File&>(args("config")))
-  .def(self == self)
-  .add_property("nInputs",
-                &mach::Gaussian::getNInputs,
-                &mach::Gaussian::setNInputs,
-                "Input dimensionality")
-  .add_property("mean",
-                &mach_Gaussian_getMean,
-                &mach::Gaussian::setMean,
-                "Mean of the mach::Gaussian")
-  .add_property("variance",
-                &mach_Gaussian_getVariance,
-                &mach::Gaussian::setVariance,
-                "The diagonal of the covariance matrix")
-  .add_property("varianceThresholds",
-                &mach_Gaussian_getVarianceThresholds,
-                (void (mach::Gaussian::*)(const blitz::Array<double,1>&)) &mach::Gaussian::setVarianceThresholds,
-                "The variance flooring thresholds, i.e. the minimum allowed value of variance in each dimension. "
-                "The variance will be set to this value if an attempt is made to set it to a smaller value.")
-  .def("setVarianceThresholds",
-       (void (mach::Gaussian::*)(double))&mach::Gaussian::setVarianceThresholds,
-       "Set the variance flooring thresholds")
-    .def("resize", &mach::Gaussian::resize, "Set the input dimensionality, reset the mean to zero and the variance to one.")
-    .def("logLikelihood", &mach::Gaussian::logLikelihood, "Output the log likelihood of the sample, x")
-    .def("save", &mach::Gaussian::save, "Save to a Configuration")
-    .def("load", &mach::Gaussian::load, "Load from a Configuration")
-    .def(self_ns::str(self_ns::self))
+    .def(init<size_t>(args("n_inputs")))
+    .def(init<mach::Gaussian&>(args("other")))
+    .def(init<bob::io::HDF5File&>(args("config")))
+    .def(self == self)
+    .add_property("nInputs",
+                  &mach::Gaussian::getNInputs,
+                  &mach::Gaussian::setNInputs,
+                  "Input dimensionality")
+    .add_property("mean",
+                  &mach_Gaussian_getMean,
+                  &mach::Gaussian::setMean,
+                  "Mean of the mach::Gaussian")
+    .add_property("variance",
+                  &mach_Gaussian_getVariance,
+                  &mach::Gaussian::setVariance,
+                  "The diagonal of the covariance matrix")
+    .add_property("varianceThresholds",
+                  &mach_Gaussian_getVarianceThresholds,
+                  (void (mach::Gaussian::*)(const blitz::Array<double,1>&)) &mach::Gaussian::setVarianceThresholds,
+                  "The variance flooring thresholds, i.e. the minimum allowed value of variance in each dimension. "
+                  "The variance will be set to this value if an attempt is made to set it to a smaller value.")
+    .def("setVarianceThresholds",
+         (void (mach::Gaussian::*)(double))&mach::Gaussian::setVarianceThresholds,
+         "Set the variance flooring thresholds")
+      .def("resize", &mach::Gaussian::resize, "Set the input dimensionality, reset the mean to zero and the variance to one.")
+      .def("logLikelihood", &mach::Gaussian::logLikelihood, "Output the log likelihood of the sample, x. The input size is checked.")
+      .def("logLikelihood_", &mach::Gaussian::logLikelihood_, "Output the log likelihood of the sample, x. The input size is NOT checked.")
+      .def("save", &mach::Gaussian::save, "Save to a Configuration")
+      .def("load", &mach::Gaussian::load, "Load from a Configuration")
+      .def(self_ns::str(self_ns::self))
   ;
 
   class_<mach::GMMStats, boost::shared_ptr<mach::GMMStats> >("GMMStats",
