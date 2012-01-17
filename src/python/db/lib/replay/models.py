@@ -6,7 +6,7 @@
 """Table models and functionality for the Replay Attack DB.
 """
 
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Table, Column, Integer, String, ForeignKey
 from ..sqlalchemy_migration import Enum, relationship
 from sqlalchemy.orm import backref
 from sqlalchemy.ext.declarative import declarative_base
@@ -26,6 +26,14 @@ class Client(Base):
   def __repr__(self):
     return "<Client('%s', '%s')>" % (self.id, self.set)
 
+protocol_to_realaccess = Table('protocol_to_realaccess', Base.metadata,
+    Column('protocol_id', Integer, ForeignKey('protocol.id')),
+    Column('realaccess_id', Integer, ForeignKey('realaccess.id')))
+
+protocol_to_attack = Table('protocol_to_attack', Base.metadata,
+    Column('protocol_id', Integer, ForeignKey('protocol.id')),
+    Column('attack_id', Integer, ForeignKey('attack.id')))
+
 class File(Base):
   __tablename__ = 'file'
 
@@ -44,6 +52,16 @@ class File(Base):
 
   def __repr__(self):
     print "<File('%s')>" % self.path
+
+class Protocol(Base):
+  __tablename__ = 'protocol'
+
+  id = Column(Integer, primary_key=True)
+  name = Column(String(20), unique=True)
+  real_accesses = relationship("RealAccess",
+      secondary=protocol_to_realaccess, backref="protocols")
+  attacks = relationship("Attack",
+      secondary=protocol_to_attack, backref="protocols")
 
 class RealAccess(Base):
   __tablename__ = 'realaccess'
