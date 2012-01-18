@@ -307,7 +307,7 @@ void mach::JFAMachine::estimateX(boost::shared_ptr<const mach::GMMStats> gmm_sta
   blitz::Array<double,1> F(ubm->getNGaussians()*ubm->getNInputs());
   // TODO: check type/dimensions?
   N = gmm_stats->n;
-  for(int g=0; g<ubm->getNGaussians(); ++g) {
+  for(size_t g=0; g<ubm->getNGaussians(); ++g) {
     blitz::Array<double,1> F_g = F(blitz::Range(g*ubm->getNInputs(),(g+1)*ubm->getNInputs()-1));
     F_g = gmm_stats->sumPx(g,blitz::Range::all());
   }

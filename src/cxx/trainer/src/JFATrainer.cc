@@ -1113,7 +1113,7 @@ void train::JFABaseTrainer::train(const std::vector<std::vector<const bob::machi
       blitz::Array<double,1> Fid_s = Fid(blitz::Range::all(),s);
       const bob::machine::GMMStats* stats = vec[id][s];
       Nid_s = stats->n;
-      for(int g=0; g<ubm->getNGaussians(); ++g)
+      for(size_t g=0; g<ubm->getNGaussians(); ++g)
       {
         blitz::Array<double,1> Fid_s_g = Fid_s(blitz::Range(g*ubm->getNInputs(),(g+1)*ubm->getNInputs()-1));
         Fid_s_g = stats->sumPx(g,blitz::Range::all());
@@ -1142,7 +1142,7 @@ void train::JFABaseTrainer::trainNoInit(const std::vector<std::vector<const bob:
       blitz::Array<double,1> Fid_s = Fid(blitz::Range::all(),s);
       const bob::machine::GMMStats* stats = vec[id][s];
       Nid_s = stats->n;
-      for(int g=0; g<ubm->getNGaussians(); ++g)
+      for(size_t g=0; g<ubm->getNGaussians(); ++g)
       {
         blitz::Array<double,1> Fid_s_g = Fid_s(blitz::Range(g*ubm->getNInputs(),(g+1)*ubm->getNInputs()-1));
         Fid_s_g = stats->sumPx(g,blitz::Range::all());
@@ -1204,7 +1204,7 @@ void train::JFABaseTrainer::trainISV(const std::vector<std::vector<const bob::ma
       blitz::Array<double,1> Fid_s = Fid(blitz::Range::all(),s);
       const bob::machine::GMMStats* stats = vec[id][s];
       Nid_s = stats->n;
-      for(int g=0; g<ubm->getNGaussians(); ++g)
+      for(size_t g=0; g<ubm->getNGaussians(); ++g)
       {
         blitz::Array<double,1> Fid_s_g = Fid_s(blitz::Range(g*ubm->getNInputs(),(g+1)*ubm->getNInputs()-1));
         Fid_s_g = stats->sumPx(g,blitz::Range::all());
@@ -1252,7 +1252,7 @@ void train::JFABaseTrainer::trainISVNoInit(const std::vector<std::vector<const b
       blitz::Array<double,1> Fid_s = Fid(blitz::Range::all(),s);
       const bob::machine::GMMStats* stats = vec[id][s];
       Nid_s = stats->n;
-      for(int g=0; g<ubm->getNGaussians(); ++g)
+      for(size_t g=0; g<ubm->getNGaussians(); ++g)
       {
         blitz::Array<double,1> Fid_s_g = Fid_s(blitz::Range(g*ubm->getNInputs(),(g+1)*ubm->getNInputs()-1));
         Fid_s_g = stats->sumPx(g,blitz::Range::all());
@@ -1311,7 +1311,7 @@ void train::JFATrainer::enrol(const std::vector<const bob::machine::GMMStats*>& 
     blitz::Array<double,1> F_s = F(blitz::Range::all(),s);
     const bob::machine::GMMStats* stats = vec[s];
     N_s = stats->n;
-    for(int g=0; g<ubm->getNGaussians(); ++g)
+    for(size_t g=0; g<ubm->getNGaussians(); ++g)
     {
       blitz::Array<double,1> F_s_g = F_s(blitz::Range(g*ubm->getNInputs(),(g+1)*ubm->getNInputs()-1));
       F_s_g = stats->sumPx(g,blitz::Range::all());
