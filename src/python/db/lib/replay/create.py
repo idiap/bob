@@ -125,8 +125,8 @@ def define_protocols(session, protodir, verbose):
       counter = 0
       for fname in open(flist, 'rt'):
         s = os.path.splitext(fname.strip())[0]
-        q = session.query(RealAccess).join(File).filter(File.path == s)
-        obj.real_accesses.append(q[0])
+        q = session.query(RealAccess).join(File).filter(File.path == s).one()
+        q.protocols.append(obj)
         counter += 1
       if verbose: print "  -> %5s/%-6s: %d files" % (grp, "real", counter)
       
@@ -134,8 +134,8 @@ def define_protocols(session, protodir, verbose):
       flist = os.path.join(protodir, 'attack.%s.%s.list' % (protocol, grp))
       for fname in open(flist, 'rt'):
         s = os.path.splitext(fname.strip())[0]
-        q = session.query(Attack).join(File).filter(File.path == s)
-        obj.attacks.append(q[0])
+        q = session.query(Attack).join(File).filter(File.path == s).one()
+        q.protocols.append(obj)
         counter += 1
       if verbose: print "  -> %5s/%-6s: %d files" % (grp, "attack", counter)
    
