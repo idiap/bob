@@ -23,9 +23,12 @@ class Database(object):
     # opens a session to the database - keep it open until the end
     self.session = utils.session(dbname())
 
-  def files(self, directory=None, extension=None, support=('fixed', 'hand'),
-      protocol='grandtest', groups=('train', 'devel', 'test'), 
-      cls=('attack', 'real'), light=('controlled', 'adverse')):
+  def files(self, directory=None, extension=None,
+      support=Attack.attack_support_choices,
+      protocol='grandtest', 
+      groups=Client.set_choices, 
+      cls=('attack', 'real'), 
+      light=File.light_choices):
     """Returns a set of filenames for the specific query by the user.
 
     Keyword Parameters:
@@ -37,21 +40,19 @@ class Database(object):
       A filename extension that will be appended to the final filepath returned
 
     support
-      One of the valid support types ("fixed" or "hand") or both, as a tuple.
-      If you set this parameter to an empty string or the value None, we use 
-      reset it to the default.
+      One of the valid support types as returned by attack_supports() or all,
+      as a tuple.  If you set this parameter to an empty string or the value
+      None, we use reset it to the default, which is to get all.
 
     protocol
-      The protocol for the attack ("mobile", "highdef", "print", "photo",
-      "video", "grandtest" or "smalltest"). If you set this parameter to an
-      empty string or the value None, we use reset it to the default,
-      "grandtest".
+      The protocol for the attack. One of the ones returned by protocols(). If
+      you set this parameter to an empty string or the value None, we use reset
+      it to the default, "grandtest".
 
     groups
-      One of the protocolar subgroups of data ("train", "devel", "test") or a
+      One of the protocolar subgroups of data as returned by groups() or a
       tuple with several of them.  If you set this parameter to an empty string
-      or the value None, we use reset it to the default, ("train", "devel",
-      "test").
+      or the value None, we use reset it to the default which is to get all.
 
     cls
       Either "attack", "real", "enroll" or any combination of those (in a
@@ -60,8 +61,8 @@ class Database(object):
       default, ("real", "attack").
 
     light
-      Either "controlled" or "adverse" or a combination of the two (in a
-      tuple), which is also the default.
+      One of the lighting conditions as returned by lights() or a combination
+      of the two (in a tuple), which is also the default.
 
     Returns: A dictionary containing the resolved filenames considering all
     the filtering criteria. The keys of the dictionary are unique identities 
@@ -88,7 +89,7 @@ class Database(object):
     groups = check_validity(groups, "group", VALID_GROUPS, VALID_GROUPS)
 
     # check if supports set are valid
-    VALID_SUPPORTS = ('fixed', 'hand')
+    VALID_SUPPORTS = self.attack_supports()
     support = check_validity(support, "support", VALID_SUPPORTS, VALID_SUPPORTS)
 
     # by default, do NOT grab enrollment data from the database
@@ -106,7 +107,7 @@ class Database(object):
     protocol = self.protocol(protocol)
 
     # checks if the light is valid
-    VALID_LIGHTS = ('controlled', 'adverse')
+    VALID_LIGHTS = self.lights()
     light = check_validity(light, "light", VALID_LIGHTS, VALID_LIGHTS)
 
     # now query the database
