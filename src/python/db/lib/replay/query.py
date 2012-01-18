@@ -8,6 +8,7 @@ replay attack database in the most obvious ways.
 """
 
 import os
+import logging
 from .. import utils
 from .models import *
 from . import dbname
@@ -21,7 +22,22 @@ class Database(object):
 
   def __init__(self):
     # opens a session to the database - keep it open until the end
-    self.session = utils.session(dbname())
+    self.connect()
+  
+  def connect(self):
+    """Tries connecting or re-connecting to the database"""
+    
+    if not os.path.exists(utils.location(dbname()).replace('sqlite:///', '')):
+      logging.warn("Database '%s' cannot be found at expected location '%s'. Create it and then try re-connecting using Database.connect()" % (dbname(), utils.location(dbname())))
+      self.session = None
+
+    else:
+      self.session = utils.session(dbname())
+
+  def is_valid(self):
+    """Returns if a valid session has been opened for reading the database"""
+
+    return self.session is not None
 
   def files(self, directory=None, extension=None,
       support=Attack.attack_support_choices,
@@ -69,6 +85,9 @@ class Database(object):
     for each file in the replay attack database. Conserve these numbers if you 
     wish to save processing results later on.
     """
+
+    if not self.is_valid():
+      raise RuntimeError, "Database '%s' cannot be found at expected location '%s'. Create it and then try re-connecting using Database.connect()" % (dbname(), utils.location(dbname()))
 
     def check_validity(l, obj, valid, default):
       """Checks validity of user input data against a set of valid values"""
@@ -136,15 +155,27 @@ class Database(object):
 
   def protocols(self):
     """Returns the names of all registered protocols"""
+
+    if not self.is_valid():
+      raise RuntimeError, "Database '%s' cannot be found at expected location '%s'. Create it and then try re-connecting using Database.connect()" % (dbname(), utils.location(dbname()))
+
     return tuple([k.name for k in self.session.query(Protocol)])
 
   def has_protocol(self, name):
     """Tells if a certain protocol is available"""
+
+    if not self.is_valid():
+      raise RuntimeError, "Database '%s' cannot be found at expected location '%s'. Create it and then try re-connecting using Database.connect()" % (dbname(), utils.location(dbname()))
+
     return self.session.query(Protocol).filter(Protocol.name==name).count() != 0
 
   def protocol(self, name):
     """Returns the protocol object in the database given a certain name. Raises
     an error if that does not exist."""
+    
+    if not self.is_valid():
+      raise RuntimeError, "Database '%s' cannot be found at expected location '%s'. Create it and then try re-connecting using Database.connect()" % (dbname(), utils.location(dbname()))
+
     return self.session.query(Protocol).filter(Protocol.name==name).one()
 
   def groups(self):
@@ -191,6 +222,10 @@ class Database(object):
     Returns a list (that may be empty) of the fully constructed paths given the
     file ids.
     """
+
+    if not self.is_valid():
+      raise RuntimeError, "Database '%s' cannot be found at expected location '%s'. Create it and then try re-connecting using Database.connect()" % (dbname(), utils.location(dbname()))
+
     fobj = self.session.query(File).filter(File.id.in_(ids))
     retval = []
     for p in ids:
@@ -209,6 +244,9 @@ class Database(object):
 
     Returns a list (that may be empty).
     """
+
+    if not self.is_valid():
+      raise RuntimeError, "Database '%s' cannot be found at expected location '%s'. Create it and then try re-connecting using Database.connect()" % (dbname(), utils.location(dbname()))
 
     fobj = self.session.query(File).filter(File.path.in_(paths))
     retval = []
@@ -238,6 +276,9 @@ class Database(object):
     extension
       The extension determines the way each of the arrays will be saved.
     """
+
+    if not self.is_valid():
+      raise RuntimeError, "Database '%s' cannot be found at expected location '%s'. Create it and then try re-connecting using Database.connect()" % (dbname(), utils.location(dbname()))
 
     from ...io import save
 
