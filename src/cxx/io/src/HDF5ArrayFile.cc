@@ -65,10 +65,13 @@ class HDF5ArrayFile: public io::File {
           m_size_arrayset = desc_arrayset.size;
 
           //array reading
-          m_file.describe(m_path)[1].type.copy_to(m_type_array);
+          const io::HDF5Descriptor& desc_array = m_file.describe(m_path)[1];
+          desc_array.type.copy_to(m_type_array);
 
-          //if m_type_all has extent == 1 on the first dimension, collapse that
-          if (m_type_array.shape[0] == 1) m_type_array = m_type_arrayset;
+          //if m_type_all has extent == 1 on the first dimension and dimension
+          //0 is expandable, collapse that
+          if (m_type_array.shape[0] == 1 && desc_array.expandable)
+            m_type_array = m_type_arrayset;
         }
 
         else {
