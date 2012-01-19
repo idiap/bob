@@ -15,9 +15,11 @@ Base = declarative_base()
 
 class Client(Base):
   __tablename__ = 'client'
+
+  set_choices = ('train', 'devel', 'test')
   
   id = Column(Integer, primary_key=True)
-  set = Column(Enum('train', 'devel', 'test'))
+  set = Column(Enum(*set_choices))
 
   def __init__(self, id, set):
     self.id = id
@@ -26,24 +28,18 @@ class Client(Base):
   def __repr__(self):
     return "<Client('%s', '%s')>" % (self.id, self.set)
 
-protocol_to_realaccess = Table('protocol_to_realaccess', Base.metadata,
-    Column('protocol_id', Integer, ForeignKey('protocol.id')),
-    Column('realaccess_id', Integer, ForeignKey('realaccess.id')))
-
-protocol_to_attack = Table('protocol_to_attack', Base.metadata,
-    Column('protocol_id', Integer, ForeignKey('protocol.id')),
-    Column('attack_id', Integer, ForeignKey('attack.id')))
-
 class File(Base):
   __tablename__ = 'file'
+
+  light_choices = ('controlled', 'adverse')
 
   id = Column(Integer, primary_key=True)
   client_id = Column(Integer, ForeignKey('client.id')) # for SQL
   path = Column(String(100), unique=True)
-  light = Column(Enum('controlled', 'adverse'))
+  light = Column(Enum(*light_choices))
 
   # for Python
-  client = relationship(Client, backref=backref('realaccesses', order_by=id))
+  client = relationship(Client, backref=backref('files', order_by=id))
 
   def __init__(self, client, path, light):
     self.client = client
@@ -53,26 +49,44 @@ class File(Base):
   def __repr__(self):
     print "<File('%s')>" % self.path
 
+# Intermediate mapping from RealAccess's to Protocol's
+realaccesses_protocols = Table('realaccesses_protocols', Base.metadata,
+    Column('realaccess_id', Integer, ForeignKey('realaccess.id')),
+    Column('protocol_id', Integer, ForeignKey('protocol.id')),
+    )
+
+# Intermediate mapping from Attack's to Protocol's
+attacks_protocols = Table('attacks_protocols', Base.metadata,
+    Column('attack_id', Integer, ForeignKey('attack.id')),
+    Column('protocol_id', Integer, ForeignKey('protocol.id')),
+    )
+
 class Protocol(Base):
   __tablename__ = 'protocol'
 
   id = Column(Integer, primary_key=True)
   name = Column(String(20), unique=True)
-  real_accesses = relationship("RealAccess",
-      secondary=protocol_to_realaccess, backref="protocols")
-  attacks = relationship("Attack",
-      secondary=protocol_to_attack, backref="protocols")
+
+  def __init__(self, name):
+    self.name = name
+
+  def __repr__(self):
+    return "<Protocol('%s')>" % (self.name,)
 
 class RealAccess(Base):
   __tablename__ = 'realaccess'
 
+  purpose_choices = ('authenticate', 'enroll')
+
   id = Column(Integer, primary_key=True)
   file_id = Column(Integer, ForeignKey('file.id')) # for SQL
-  purpose = Column(Enum('authenticate', 'enroll'))
+  purpose = Column(Enum(*purpose_choices))
   take = Column(Integer)
 
   # for Python
   file = relationship(File, backref=backref('realaccess', order_by=id))
+  protocols = relationship("Protocol", secondary=realaccesses_protocols,
+      backref='realaccesses')
 
   def __init__(self, file, purpose, take):
     self.file = file
@@ -85,15 +99,22 @@ class RealAccess(Base):
 class Attack(Base):
   __tablename__ = 'attack'
 
+  attack_support_choices = ('fixed', 'hand')
+  attack_device_choices = ('print', 'mobile', 'highdef', 'mask')
+  sample_type_choices = ('video', 'photo')
+  sample_device_choices = ('mobile', 'highdef')
+
   id = Column(Integer, primary_key=True)
   file_id = Column(Integer, ForeignKey('file.id')) # for SQL
-  attack_support = Column(Enum('fixed', 'hand'))
-  attack_device = Column(Enum('print', 'mobile', 'highdef', 'mask'))
-  sample_type = Column(Enum('video', 'photo'))
-  sample_device = Column(Enum('mobile', 'highdef'))
+  attack_support = Column(Enum(*attack_support_choices))
+  attack_device = Column(Enum(*attack_device_choices))
+  sample_type = Column(Enum(*sample_type_choices))
+  sample_device = Column(Enum(*sample_device_choices))
 
   # for Python
   file = relationship(File, backref=backref('attack', order_by=id))
+  protocols = relationship("Protocol", secondary=attacks_protocols,
+      backref='attacks')
 
   def __init__(self, file, attack_support, attack_device, sample_type, sample_device):
     self.file = file
