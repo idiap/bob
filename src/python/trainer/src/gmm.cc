@@ -44,7 +44,7 @@ void bind_trainer_gmm() {
        "Return the average output of the Machine across the dataset. "
        "The EM algorithm will terminate once the change in average_output "
        "is less than the convergence_threshold.")
-    .def("eStep", &EMTrainerGMMBase::computeLikelihood, (arg("machine")), "Returns the likelihood.")
+    .def("computeLikelihood", &EMTrainerGMMBase::computeLikelihood, (arg("machine")), "Returns the likelihood.")
     .def("mStep", &EMTrainerGMMBase::mStep, (arg("machine"), arg("data")), "Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
   ;
 

@@ -333,19 +333,35 @@ void bind_machine_gmm() {
     .def("logLikelihood",
          (double (mach::GMMMachine::*)(const blitz::Array<double,1>&, blitz::Array<double,1>&) const)&mach::GMMMachine::logLikelihood,
          args("x", "log_weighted_gaussian_likelihoods"),
-         "Output the log likelihood of the sample, x, i.e. log(p(x|mach::GMMMachine))")
+         "Output the log likelihood of the sample, x, i.e. log(p(x|mach::GMMMachine)). Inputs are checked.")
+    .def("logLikelihood_",
+         (double (mach::GMMMachine::*)(const blitz::Array<double,1>&, blitz::Array<double,1>&) const)&mach::GMMMachine::logLikelihood_,
+         args("x", "log_weighted_gaussian_likelihoods"),
+         "Output the log likelihood of the sample, x, i.e. log(p(x|mach::GMMMachine)). Inputs are NOT checked.")
     .def("logLikelihood",
          (double (mach::GMMMachine::*)(const blitz::Array<double,1>&) const)&mach::GMMMachine::logLikelihood,
          args("x"),
-         " Output the log likelihood of the sample, x, i.e. log(p(x|GMM))")
+         " Output the log likelihood of the sample, x, i.e. log(p(x|GMM)). Inputs are checked.")
+    .def("logLikelihood_",
+         (double (mach::GMMMachine::*)(const blitz::Array<double,1>&) const)&mach::GMMMachine::logLikelihood_,
+         args("x"),
+         " Output the log likelihood of the sample, x, i.e. log(p(x|GMM)). Inputs are NOT checked.")
     .def("accStatistics",
          (void (mach::GMMMachine::*)(const blitz::Array<double,1>&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics,
          args("x", "stats"),
-         "Accumulate the GMM statistics for this sample.")
+         "Accumulate the GMM statistics for this sample. Inputs are checked.")
+    .def("accStatistics_",
+         (void (mach::GMMMachine::*)(const blitz::Array<double,1>&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics_,
+         args("x", "stats"),
+         "Accumulate the GMM statistics for this sample. Inputs are NOT checked.")
     .def("accStatistics",
          (void (mach::GMMMachine::*)(const io::Arrayset&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics,
          args("sampler", "stats"),
-         "Accumulates the GMM statistics over a set of samples.")
+         "Accumulates the GMM statistics over a set of samples. Inputs are checked.")
+    .def("accStatistics_",
+         (void (mach::GMMMachine::*)(const io::Arrayset&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics_,
+         args("sampler", "stats"),
+         "Accumulates the GMM statistics over a set of samples. Inputs are NOT checked.")
     .def("getGaussian",
          &mach::GMMMachine::getGaussian,
          args("i"),
