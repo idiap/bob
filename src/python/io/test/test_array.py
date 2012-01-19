@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
 # Andre Anjos <andre.dos.anjos@gmail.com>
+# Laurent El-Shafey <laurent.el-shafey@idiap.ch>
 # Fri 11 Nov 10:38:52 2011 
 
 """Tests the io::Array interface from python.
@@ -137,6 +138,31 @@ class ArrayTest(unittest.TestCase):
     self.assertTrue (A1.filename, tname)
 
     os.unlink(tname)
+
+  def test05_save_and_load_2Darrays(self):
+    """Test introduced after ticket #105"""
+
+    # Save and load a 2D arrays
+    a=np.ndarray((3,1), 'float64')
+    a[:,0]=[1,2,3]
+    # Saving, off loads the contents on a file. Any new operation will read the
+    # contents directly from the file.
+    tname = tempname('.hdf5')
+    bob.io.save(a, tname)
+    b = bob.io.load(tname)
+    self.assertTrue( numpy.array_equal(a, b) )
+    os.unlink(tname)
+
+    a=np.ndarray((1,3), 'float64')
+    a[0,:]=[1,2,3]
+    # Saving, off loads the contents on a file. Any new operation will read the
+    # contents directly from the file.
+    tname = tempname('.hdf5')
+    bob.io.save(a, tname)
+    b = bob.io.load(tname)
+    self.assertTrue( numpy.array_equal(a, b) )
+    os.unlink(tname)
+
 
 if __name__ == '__main__':
   import gc
