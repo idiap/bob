@@ -16,7 +16,7 @@ object ppca_train(train::EMPCATrainer& t, const io::Arrayset& data) {
 
 void bind_trainer_empca() {
 
-  typedef train::EMTrainerNew<mach::LinearMachine, io::Arrayset> EMTrainerLinearBase; 
+  typedef train::EMTrainer<mach::LinearMachine, io::Arrayset> EMTrainerLinearBase; 
 
   class_<EMTrainerLinearBase, boost::noncopyable>("EMTrainerLinear", "The base python class for all EM-based trainers.", no_init)
     .add_property("convergenceThreshold", &EMTrainerLinearBase::getConvergenceThreshold, &EMTrainerLinearBase::setConvergenceThreshold, "Convergence threshold")
@@ -28,7 +28,7 @@ void bind_trainer_empca() {
     .def("eStep", &EMTrainerLinearBase::eStep, (arg("machine"), arg("data")),
        "Updates the hidden variable distribution (or the sufficient statistics) given the Machine parameters. ")
     .def("mStep", &EMTrainerLinearBase::mStep, (arg("machine"), arg("data")), "Updates the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
-    .def("computeLikelihood", &EMTrainerLinearBase::computeLikelihood, (arg("machine"), arg("data")), "Computes the current log likelihood given the hidden variable distribution (or the sufficient statistics)")
+    .def("computeLikelihood", &EMTrainerLinearBase::computeLikelihood, (arg("machine")), "Computes the current log likelihood given the hidden variable distribution (or the sufficient statistics)")
   ;
 
   class_<train::EMPCATrainer, boost::noncopyable, bases<EMTrainerLinearBase> >("EMPCATrainer",

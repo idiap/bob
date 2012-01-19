@@ -126,11 +126,11 @@ class TrainerTest(unittest.TestCase):
     # the reference value obtained using matlab
     T.eStep(m, ar)
     T.mStep(m, ar)
-    llh1 = T.computeLikelihood(m, ar)
+    llh1 = T.computeLikelihood(m)
     self.assertTrue( abs(exp_llh1 - llh1) < 2e-4)
     T.eStep(m, ar)
     T.mStep(m, ar)
-    llh2 = T.computeLikelihood(m, ar)
+    llh2 = T.computeLikelihood(m)
     self.assertTrue( abs(exp_llh2 - llh2) < 2e-4)
 
 if __name__ == '__main__':

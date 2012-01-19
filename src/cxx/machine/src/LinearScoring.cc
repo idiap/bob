@@ -29,7 +29,7 @@ namespace bob { namespace machine {
     void linearScoring(const std::vector<blitz::Array<double,1> >& models,
                        const blitz::Array<double,1>& ubm_mean,
                        const blitz::Array<double,1>& ubm_variance,
-                       const std::vector<const bob::machine::GMMStats*>& test_stats,
+                       const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& test_stats,
                        const std::vector<blitz::Array<double,1> >* test_channelOffset,
                        const bool frame_length_normalisation,
                        blitz::Array<double,2>& scores) 
@@ -87,7 +87,7 @@ namespace bob { namespace machine {
 
   void linearScoring(const std::vector<blitz::Array<double,1> >& models,
                      const blitz::Array<double,1>& ubm_mean, const blitz::Array<double,1>& ubm_variance,
-                     const std::vector<const bob::machine::GMMStats*>& test_stats,
+                     const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& test_stats,
                      const std::vector<blitz::Array<double,1> >& test_channelOffset,
                      const bool frame_length_normalisation,
                      blitz::Array<double, 2>& scores)
@@ -97,16 +97,16 @@ namespace bob { namespace machine {
 
   void linearScoring(const std::vector<blitz::Array<double,1> >& models,
                      const blitz::Array<double,1>& ubm_mean, const blitz::Array<double,1>& ubm_variance,
-                     const std::vector<const bob::machine::GMMStats*>& test_stats,
+                     const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& test_stats,
                      const bool frame_length_normalisation,
                      blitz::Array<double, 2>& scores)
   {
     detail::linearScoring(models, ubm_mean, ubm_variance, test_stats, 0, frame_length_normalisation, scores);
   }
 
-  void linearScoring(const std::vector<const bob::machine::GMMMachine*>& models,
+  void linearScoring(const std::vector<boost::shared_ptr<const bob::machine::GMMMachine> >& models,
                      const bob::machine::GMMMachine& ubm,
-                     const std::vector<const bob::machine::GMMStats*>& test_stats,
+                     const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& test_stats,
                      const bool frame_length_normalisation,
                      blitz::Array<double, 2>& scores) 
   {
@@ -155,15 +155,15 @@ namespace bob { namespace machine {
     blitz::Array<double, 2> B(S, Tt);
 
     
-    blitz::Array<double, 1> ubm_meanSupervector;
+    blitz::Array<double, 1> ubm_meanSupervector(C*Dx);
     ubm.getMeanSupervector(ubm_meanSupervector);
   
-    blitz::Array<double, 1> ubm_varianceSupervector;
+    blitz::Array<double, 1> ubm_varianceSupervector(C*Dx);
     ubm.getVarianceSupervector(ubm_varianceSupervector);
 
     // 1) Compute A
     for(int t = 0; t < Tm; t++) {
-      blitz::Array<double, 1> model_meanSupervector;
+      blitz::Array<double, 1> model_meanSupervector(C*Dx);
       models[t]->getMeanSupervector(model_meanSupervector);
       
       blitz::Array<double, 1> tmp = A(t, blitz::Range::all());

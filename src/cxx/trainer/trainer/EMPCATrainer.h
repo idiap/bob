@@ -10,7 +10,7 @@
 #define BOB5SPRO_TRAINER_EMPCA_TRAINER_H
 
 #include <blitz/array.h>
-#include "trainer/EMTrainerNew.h"
+#include "trainer/EMTrainer.h"
 #include "machine/LinearMachine.h"
 #include "io/Arrayset.h"
 
@@ -32,7 +32,7 @@ namespace bob { namespace trainer {
     *  - epsilon is the noise of the data (dimension f)
     *      Gaussian with zero-mean and covariance matrix sigma^2 * Id
     */
-  class EMPCATrainer: public EMTrainerNew<bob::machine::LinearMachine, 
+  class EMPCATrainer: public EMTrainer<bob::machine::LinearMachine, 
                                           bob::io::Arrayset> 
   {
     public: //api
@@ -90,8 +90,7 @@ namespace bob { namespace trainer {
         * Computes the average log likelihood using the current estimates of 
         * the latent variables. 
         */
-      virtual double computeLikelihood(bob::machine::LinearMachine& machine,
-         const bob::io::Arrayset& ar);
+      virtual double computeLikelihood(bob::machine::LinearMachine& machine);
 
       /**
         * Sets the seed used to generate pseudo-random numbers 

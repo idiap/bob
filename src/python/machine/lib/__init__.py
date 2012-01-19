@@ -71,7 +71,8 @@ def ztnormSameValue(vect_A, vect_B):
      vect_B An (ordered) list of client_id corresponding to the Z-Norm impostor samples
   """
   from .. import core
-  sameMatrix = core.array.bool_2(len(vect_A), len(vect_B))
+  import numpy as np
+  sameMatrix = np.ndarray((len(vect_A), len(vect_B)), 'bool')
   for j in range(len(vect_A)):
     for i in range(len(vect_B)):
       sameMatrix[j, i] = (vect_A[j] == vect_B[i])

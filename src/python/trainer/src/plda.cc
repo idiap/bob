@@ -99,7 +99,7 @@ static object get_z_first_order(train::PLDABaseTrainer& m) {
 }
 
 void bind_trainer_plda() {
-  typedef train::EMTrainerNew<mach::PLDABaseMachine, std::vector<io::Arrayset> > EMTrainerPLDABase; 
+  typedef train::EMTrainer<mach::PLDABaseMachine, std::vector<io::Arrayset> > EMTrainerPLDABase; 
 
   class_<EMTrainerPLDABase, boost::noncopyable>("EMTrainerPLDA", "The base python class for all EM/PLDA-based trainers.", no_init)
     .add_property("convergenceThreshold", &EMTrainerPLDABase::getConvergenceThreshold, &EMTrainerPLDABase::setConvergenceThreshold, "Convergence threshold")

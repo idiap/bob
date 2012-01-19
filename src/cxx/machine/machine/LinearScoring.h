@@ -17,10 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef BOB5SPRO_MACHINE_LINEARSCORING_H
-#define BOB5SPRO_MACHINE_LINEARSCORING_H
+#ifndef BOB_MACHINE_LINEARSCORING_H
+#define BOB_MACHINE_LINEARSCORING_H
 
 #include <blitz/array.h>
+#include <boost/shared_ptr.hpp>
 #include <vector>
 #include "machine/GMMMachine.h"
 
@@ -28,18 +29,18 @@ namespace bob { namespace machine {
 
   void linearScoring(const std::vector<blitz::Array<double,1> >& models,
                      const blitz::Array<double,1>& ubm_mean, const blitz::Array<double,1>& ubm_variance,
-                     const std::vector<const bob::machine::GMMStats*>& test_stats,
+                     const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& test_stats,
                      const std::vector<blitz::Array<double, 1> >& test_channelOffset,
                      const bool frame_length_normalisation,
                      blitz::Array<double, 2>& scores);
   void linearScoring(const std::vector<blitz::Array<double,1> >& models,
                      const blitz::Array<double,1>& ubm_mean, const blitz::Array<double,1>& ubm_variance,
-                     const std::vector<const bob::machine::GMMStats*>& test_stats,
+                     const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& test_stats,
                      const bool frame_length_normalisation,
                      blitz::Array<double, 2>& scores);
-  void linearScoring(const std::vector<const bob::machine::GMMMachine*>& models,
+  void linearScoring(const std::vector<boost::shared_ptr<const bob::machine::GMMMachine> >& models,
                      const bob::machine::GMMMachine& ubm,
-                     const std::vector<const bob::machine::GMMStats*>& test_stats,
+                     const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& test_stats,
                      const bool frame_length_normalisation,
                      blitz::Array<double, 2>& scores);
 
@@ -64,4 +65,4 @@ namespace bob { namespace machine {
 }
 }
 
-#endif // BOB5SPRO_MACHINE_LINEARSCORING_H
+#endif // BOB_MACHINE_LINEARSCORING_H

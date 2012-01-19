@@ -7,11 +7,12 @@
 """
 
 import os
+import fnmatch
 
 from .models import *
 from ..utils import session
 
-def add_clients(session, protodir):
+def add_clients(session, protodir, verbose):
   """Add clients to the replay attack database."""
   
   def add_client_set(session, filename, set):
@@ -21,13 +22,14 @@ def add_clients(session, protodir):
       s = client.strip()
       if not s: continue #empty line
       id = int(s)
+      if verbose: print "Adding client %d on '%s' set..." % (id, set)
       session.add(Client(id, set))
 
   add_client_set(session, os.path.join(protodir, 'client.train'), 'train')
   add_client_set(session, os.path.join(protodir, 'client.devel'), 'devel')
   add_client_set(session, os.path.join(protodir, 'client.test'),  'test')
 
-def add_real_lists(session, protodir):
+def add_real_lists(session, protodir, verbose):
   """Adds all RCD filelists"""
 
   def add_real_list(session, filename):
@@ -60,7 +62,7 @@ def add_real_lists(session, protodir):
   add_real_list(session, os.path.join(protodir, 'real.test.list'))
   add_real_list(session, os.path.join(protodir, 'enrollment.list'))
 
-def add_attack_lists(session, protodir):
+def add_attack_lists(session, protodir, verbose):
   """Adds all RAD filelists"""
 
   def add_attack_list(session, filename):
@@ -93,6 +95,52 @@ def add_attack_lists(session, protodir):
   add_attack_list(session,os.path.join(protodir, 'attack.grandtest.devel.list'))
   add_attack_list(session,os.path.join(protodir, 'attack.grandtest.test.list'))
 
+def define_protocols(session, protodir, verbose):
+  """Defines all available protocols"""
+
+  #figures out which protocols to use
+  valid = set()
+  for fname in fnmatch.filter(os.listdir(protodir), 'real.*.train.list'):
+    s = fname.split('.', 3)
+    consider = True
+    for cls in ('real', 'attack'):
+      for grp in ('train', 'devel', 'test'):
+        search_for = os.path.join(protodir, '%s.%s.%s.list' % (cls, s[1], grp))
+        if not os.path.exists(search_for):
+          if verbose:
+            print "Not considering protocol %s as '%s' was not found" % \
+              (s[1], search_for)
+          consider = False
+    if consider: valid.add(s[1])
+
+  for protocol in valid:
+    if verbose: print "Creating protocol '%s'..." % protocol
+
+    # create protocol on the protocol table
+    obj = Protocol(name=protocol)
+
+    for grp in ('train', 'devel', 'test'):
+
+      flist = os.path.join(protodir, 'real.%s.%s.list' % (protocol, grp))
+      counter = 0
+      for fname in open(flist, 'rt'):
+        s = os.path.splitext(fname.strip())[0]
+        q = session.query(RealAccess).join(File).filter(File.path == s).one()
+        q.protocols.append(obj)
+        counter += 1
+      if verbose: print "  -> %5s/%-6s: %d files" % (grp, "real", counter)
+      
+      counter = 0
+      flist = os.path.join(protodir, 'attack.%s.%s.list' % (protocol, grp))
+      for fname in open(flist, 'rt'):
+        s = os.path.splitext(fname.strip())[0]
+        q = session.query(Attack).join(File).filter(File.path == s).one()
+        q.protocols.append(obj)
+        counter += 1
+      if verbose: print "  -> %5s/%-6s: %d files" % (grp, "attack", counter)
+   
+    session.add(obj)
+
 def create_tables(args):
   """Creates all necessary tables (only to be used at the first time)"""
 
@@ -101,6 +149,7 @@ def create_tables(args):
   Client.metadata.create_all(engine)
   RealAccess.metadata.create_all(engine)
   Attack.metadata.create_all(engine)
+  Protocol.metadata.create_all(engine)
 
 # Driver API
 # ==========
@@ -109,6 +158,8 @@ def create(args):
   """Creates or re-creates this database"""
 
   dbfile = args.location.replace('sqlite:///','')
+
+  args.verbose = 0 if args.verbose is None else sum(args.verbose)
 
   if args.recreate: 
     if args.verbose and os.path.exists(dbfile):
@@ -120,10 +171,11 @@ def create(args):
 
   # the real work...
   create_tables(args)
-  s = session(args.dbname, echo=args.verbose)
-  add_clients(s, args.protodir)
-  add_real_lists(s, args.protodir)
-  add_attack_lists(s, args.protodir)
+  s = session(args.dbname, echo=(args.verbose >= 2))
+  add_clients(s, args.protodir, args.verbose)
+  add_real_lists(s, args.protodir, args.verbose)
+  add_attack_lists(s, args.protodir, args.verbose)
+  define_protocols(s, args.protodir, args.verbose)
   s.commit()
   s.close()
 
@@ -132,11 +184,11 @@ def add_command(subparsers):
 
   parser = subparsers.add_parser('create', help=create.__doc__)
 
-  parser.add_argument('--recreate', action='store_true', default=False,
+  parser.add_argument('-R', '--recreate', action='store_true', default=False,
       help="If set, I'll first erase the current database")
-  parser.add_argument('--verbose', action='store_true', default=False,
+  parser.add_argument('-v', '--verbose', action='append_const', const=1, 
       help="Do SQL operations in a verbose way")
-  parser.add_argument('--protodir', action='store', 
+  parser.add_argument('-D', '--protodir', action='store', 
       default='/idiap/group/replay/database/protocols',
       metavar='DIR',
       help="Change the relative path to the directory containing the protocol definitions for replay attacks (defaults to %(default)s)")
