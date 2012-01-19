@@ -187,14 +187,32 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double> {
      * @param[in]  x                                 The sample
      * @param[out] log_weighted_gaussian_likelihoods For each Gaussian, i: log(weight_i*p(x|Gaussian_i))
      * @return     The GMMMachine log likelihood, i.e. log(p(x|GMMMachine))
+     * Dimensions of the parameters are checked
      */
     double logLikelihood(const blitz::Array<double, 1> &x, blitz::Array<double,1> &log_weighted_gaussian_likelihoods) const;
 
     /**
+     * Output the log likelihood of the sample, x, i.e. log(p(x|GMMMachine))
+     * @param[in]  x                                 The sample
+     * @param[out] log_weighted_gaussian_likelihoods For each Gaussian, i: log(weight_i*p(x|Gaussian_i))
+     * @return     The GMMMachine log likelihood, i.e. log(p(x|GMMMachine))
+     * @warning Dimensions of the parameters are not checked
+     */
+    double logLikelihood_(const blitz::Array<double, 1> &x, blitz::Array<double,1> &log_weighted_gaussian_likelihoods) const;
+
+    /**
      * Output the log likelihood of the sample, x, i.e. log(p(x|GMM))
      * @param[in]  x The sample
+     * Dimension of the input is checked
      */
     double logLikelihood(const blitz::Array<double, 1> &x) const;
+
+    /**
+     * Output the log likelihood of the sample, x, i.e. log(p(x|GMM))
+     * @param[in]  x The sample
+     * @warning Dimension of the input is not checked
+     */
+    double logLikelihood_(const blitz::Array<double, 1> &x) const;
 
     /**
      * Output the log likelihood of the sample, x 
@@ -213,16 +231,34 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double> {
     /**
      * Accumulates the GMM statistics over a set of samples.
      * @see bool accStatistics(const blitz::Array<double,1> &x, GMMStats stats)
+     * Dimensions of the parameters are checked
      */
     void accStatistics(const bob::io::Arrayset &arrayset, GMMStats &stats) const;
+
+    /**
+     * Accumulates the GMM statistics over a set of samples.
+     * @see bool accStatistics(const blitz::Array<double,1> &x, GMMStats stats)
+     * @warning Dimensions of the parameters are not checked
+     */
+    void accStatistics_(const bob::io::Arrayset &arrayset, GMMStats &stats) const;
 
     /**
      * Accumulate the GMM statistics for this sample.
      *
      * @param[in]  x     The current sample
      * @param[out] stats The accumulated statistics
+     * Dimensions of the parameters are checked
      */
     void accStatistics(const blitz::Array<double,1> &x, GMMStats &stats) const;
+
+    /**
+     * Accumulate the GMM statistics for this sample.
+     *
+     * @param[in]  x     The current sample
+     * @param[out] stats The accumulated statistics
+     * @warning Dimensions of the parameters are not checked
+     */
+    void accStatistics_(const blitz::Array<double,1> &x, GMMStats &stats) const;
     
     /**
      * Get a pointer to a particular Gaussian component
@@ -296,11 +332,23 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double> {
      */
     void initCache() const;
 
+    /**
+     * Accumulate the GMM statistics for this sample. 
+     * Called by accStatistics() and accStatistics_()
+     *
+     * @param[in]  x     The current sample
+     * @param[out] stats The accumulated statistics
+     * @param[in]  log_likelihood  The current log_likelihood
+     * @warning Dimensions of the parameters are not checked
+     */
+    void accStatisticsInternal(const blitz::Array<double,1> &x, 
+      GMMStats &stats, const double log_likelihood) const;
+    
+
     /// Some cache arrays to avoid re-allocation when computing log-likelihoods
     mutable blitz::Array<double,1> m_cache_log_weighted_gaussian_likelihoods;
     mutable blitz::Array<double,1> m_cache_P;
     mutable blitz::Array<double,2> m_cache_Px;
-    mutable blitz::Array<double,2> m_cache_Pxx;
 
     mutable blitz::Array<double,1> m_cache_mean_supervector;
     mutable blitz::Array<double,1> m_cache_variance_supervector;

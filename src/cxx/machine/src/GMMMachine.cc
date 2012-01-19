@@ -213,9 +213,16 @@ void mach::GMMMachine::getVarianceThresholds(blitz::Array<double, 2>& variance_t
 double mach::GMMMachine::logLikelihood(const blitz::Array<double, 1> &x, 
   blitz::Array<double,1> &log_weighted_gaussian_likelihoods) const 
 {
-  // Initialise variables
+  // Check dimension
   ca::assertSameDimensionLength(log_weighted_gaussian_likelihoods.extent(0), m_n_gaussians);
   ca::assertSameDimensionLength(x.extent(0), m_n_inputs);
+  return logLikelihood_(x,log_weighted_gaussian_likelihoods);
+}
+
+double mach::GMMMachine::logLikelihood_(const blitz::Array<double, 1> &x, 
+  blitz::Array<double,1> &log_weighted_gaussian_likelihoods) const 
+{
+  // Initialise variables
   double log_likelihood = TLog::LogZero;
 
   // Accumulate the weighted log likelihoods from each Gaussian
@@ -230,9 +237,17 @@ double mach::GMMMachine::logLikelihood(const blitz::Array<double, 1> &x,
 }
 
 double mach::GMMMachine::logLikelihood(const blitz::Array<double, 1> &x) const {
+  // Check dimension
+  ca::assertSameDimensionLength(x.extent(0), m_n_inputs);
+  // Call the other logLikelihood_ (overloaded) function
+  // (log_weighted_gaussian_likelihoods will be discarded)
+  return logLikelihood_(x,m_cache_log_weighted_gaussian_likelihoods);
+}
+
+double mach::GMMMachine::logLikelihood_(const blitz::Array<double, 1> &x) const {
   // Call the other logLikelihood (overloaded) function
   // (log_weighted_gaussian_likelihoods will be discarded)
-  return logLikelihood(x,m_cache_log_weighted_gaussian_likelihoods);
+  return logLikelihood_(x,m_cache_log_weighted_gaussian_likelihoods);
 }
 
 void mach::GMMMachine::forward(const blitz::Array<double,1>& input, double& output) const {
@@ -252,21 +267,47 @@ void mach::GMMMachine::accStatistics(const bob::io::Arrayset& ar, mach::GMMStats
   for(size_t i=0; i<ar.size(); ++i) {
     // Get example
     blitz::Array<double,1> x(ar.get<double,1>(i));
-
     // Accumulate statistics
     accStatistics(x,stats);
   }
 }
 
+void mach::GMMMachine::accStatistics_(const bob::io::Arrayset& ar, mach::GMMStats& stats) const {
+  // iterate over data
+  for(size_t i=0; i<ar.size(); ++i) {
+    // Get example
+    blitz::Array<double,1> x(ar.get<double,1>(i));
+    // Accumulate statistics
+    accStatistics_(x,stats);
+  }
+}
+
 void mach::GMMMachine::accStatistics(const blitz::Array<double, 1>& x, mach::GMMStats& stats) const {
+  // check GMMStats size
+  ca::assertSameDimensionLength(stats.sumPx.extent(0), m_n_gaussians);
+  ca::assertSameDimensionLength(stats.sumPx.extent(1), m_n_inputs);
 
   // Calculate Gaussian and GMM likelihoods
   // - m_cache_log_weighted_gaussian_likelihoods(i) = log(weight_i*p(x|gaussian_i))
   // - log_likelihood = log(sum_i(weight_i*p(x|gaussian_i)))
   double log_likelihood = logLikelihood(x, m_cache_log_weighted_gaussian_likelihoods);
 
+  accStatisticsInternal(x, stats, log_likelihood);
+}
+
+void mach::GMMMachine::accStatistics_(const blitz::Array<double, 1>& x, mach::GMMStats& stats) const {
+  // Calculate Gaussian and GMM likelihoods
+  // - m_cache_log_weighted_gaussian_likelihoods(i) = log(weight_i*p(x|gaussian_i))
+  // - log_likelihood = log(sum_i(weight_i*p(x|gaussian_i)))
+  double log_likelihood = logLikelihood_(x, m_cache_log_weighted_gaussian_likelihoods);
+
+  accStatisticsInternal(x, stats, log_likelihood);
+}
+
+void mach::GMMMachine::accStatisticsInternal(const blitz::Array<double, 1>& x,
+  mach::GMMStats& stats, const double log_likelihood) const 
+{
   // Calculate responsibilities
-  m_cache_P.resize(m_n_gaussians);
   m_cache_P = blitz::exp(m_cache_log_weighted_gaussian_likelihoods - log_likelihood);
 
   // Accumulate statistics
@@ -280,26 +321,17 @@ void mach::GMMMachine::accStatistics(const blitz::Array<double, 1>& x, mach::GMM
   stats.n += m_cache_P;
 
   // - first order stats
-  m_cache_Px.resize(m_n_gaussians,m_n_inputs);
   blitz::firstIndex i;
   blitz::secondIndex j;
   
   m_cache_Px = m_cache_P(i) * x(j);
   
-  /*
-  std::cout << "P:" << m_cache_P << std::endl;
-  std::cout << "x:" << x << std::endl;
-  std::cout << "Px:" << m_cache_Px << std::endl;
-  std::cout << "sumPx:" << stats.sumPx << std::endl;
-  */
   stats.sumPx += m_cache_Px;
-  //std::cout << "sumPx:" << stats.sumPx << std::endl;
 
   // - second order stats
-  m_cache_Pxx.resize(m_n_gaussians,m_n_inputs);
-  m_cache_Pxx = m_cache_Px(i,j) * x(j);
-  stats.sumPxx += m_cache_Pxx;
+  stats.sumPxx += (m_cache_Px(i,j) * x(j));
 }
+
 
 
 boost::shared_ptr<mach::Gaussian> mach::GMMMachine::getGaussian(size_t i) {
@@ -368,7 +400,6 @@ void mach::GMMMachine::initCache() const {
   m_cache_log_weighted_gaussian_likelihoods.resize(m_n_gaussians);
   m_cache_P.resize(m_n_gaussians);
   m_cache_Px.resize(m_n_gaussians,m_n_inputs);
-  m_cache_Pxx.resize(m_n_gaussians,m_n_inputs);
   m_cache_supervector = false;
 }
 
