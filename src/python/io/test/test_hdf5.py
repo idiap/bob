@@ -300,6 +300,13 @@ class HDF5FileTest(unittest.TestCase):
     mfile = bob.io.HDF5File('matlab_1d.hdf5')
     self.assertEqual ( mfile.paths(), ['/array'] )
 
+  def test07_ioload_unlimited(self):
+
+    # This test verifies that a 3D array whose first dimension is unlimited
+    # and size equal to 1 can be read as a 2D array
+    mfile = bob.io.load('test7_unlimited.hdf5')
+    self.assertTrue ( mfile.ndim == 2 )
+
 if __name__ == '__main__':
   sys.argv.insert(1, '-v')
   if os.environ.has_key('BOB_PROFILE') and \
