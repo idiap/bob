@@ -71,7 +71,8 @@ static void convertGMMMeanList(list models, std::vector<blitz::Array<double,1> >
 static void convertGMMStatsList(list test_stats, std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& test_stats_c) {
   int size_test_stats = len(test_stats);
   for(int i=0; i<size_test_stats; ++i) {
-    test_stats_c.push_back(boost::shared_ptr<const bob::machine::GMMStats>(new bob::machine::GMMStats(extract<bob::machine::GMMStats>(test_stats[i]))));
+    boost::shared_ptr<bob::machine::GMMStats> gs = extract<boost::shared_ptr<bob::machine::GMMStats> >(test_stats[i]);
+    test_stats_c.push_back(gs);
   }
 }
 
@@ -85,7 +86,8 @@ static void convertChannelOffsetList(list test_channelOffset, std::vector<blitz:
 static void convertGMMMachineList(list models, std::vector<boost::shared_ptr<const bob::machine::GMMMachine> >& models_c) {
   int size_models = len(models);
   for(int i=0; i<size_models; ++i) {
-    models_c.push_back(boost::shared_ptr<const bob::machine::GMMMachine>(new bob::machine::GMMMachine(extract<bob::machine::GMMMachine>(models[i]))));
+    boost::shared_ptr<bob::machine::GMMMachine> gm = extract<boost::shared_ptr<bob::machine::GMMMachine> >(models[i]);
+    models_c.push_back(gm);
   }
 }
 

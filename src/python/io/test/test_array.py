@@ -143,7 +143,7 @@ class ArrayTest(unittest.TestCase):
     """Test introduced after ticket #105"""
 
     # Save and load a 2D arrays
-    a=np.ndarray((3,1), 'float64')
+    a=numpy.ndarray((3,1), 'float64')
     a[:,0]=[1,2,3]
     # Saving, off loads the contents on a file. Any new operation will read the
     # contents directly from the file.
@@ -153,7 +153,7 @@ class ArrayTest(unittest.TestCase):
     self.assertTrue( numpy.array_equal(a, b) )
     os.unlink(tname)
 
-    a=np.ndarray((1,3), 'float64')
+    a=numpy.ndarray((1,3), 'float64')
     a[0,:]=[1,2,3]
     # Saving, off loads the contents on a file. Any new operation will read the
     # contents directly from the file.
