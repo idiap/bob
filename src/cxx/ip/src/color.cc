@@ -72,7 +72,7 @@ const char* ip::UnsupportedRowExtent::what() const throw() {
  */
 template <typename T>
 static inline T scale (double value) {
-  return static_cast<T>(rintf(std::numeric_limits<T>::max()*value));
+  return static_cast<T>(rint(std::numeric_limits<T>::max()*value));
 }
 
 /**
@@ -114,7 +114,7 @@ static T tmin (T c1, T c2, T c3) {
  * This method clamps the double value between 0 and 1
  */
 static double clamp (double f) {
-  return (f<0)? 0.f : (f>1)? 1.f: f;
+  return (f<0.)? 0. : (f>1.)? 1.: f;
 }
 
 template <> void ip::rgb_to_hsv_one (uint8_t r, uint8_t g, uint8_t b,
@@ -309,7 +309,7 @@ template <> void ip::hsl_to_rgb_one (double h, double s, double l,
   double C = s*(1-fabsf(2*l - 1)); //Chroma [0,1]
   const double v = (2*l + C)/2; //Value [0,1]
   
-  if(v == 0.f) { // achromatic (gray)
+  if(v == 0.) { // achromatic (gray)
 		r = g = b = v; //Value
 		return;
 	}

@@ -182,6 +182,17 @@ class ColorTest(unittest.TestCase):
           self.assertTrue(abs(b2 - b) <= mx)
     #print "16-bit unsigned integer RGB/YCbCr/RGB error: %d (%.4f%%)" % (mx, 100*mx/65535.) 
 
+  def test05_gray_halves(self):
+
+    # tests some border-line cases for gray-scale conversion and makes sure
+    # we don't have precision problems.
+
+    correct = bob.io.load('data/gray-u8-mids.hdf5')
+    for k in range(correct.shape[0]):
+      self.assertEqual(correct[k,3], 
+          bob.ip.rgb_to_gray_u8(*[int(z) for z in correct[k,:3]]) 
+          )
+
 if __name__ == '__main__':
   sys.argv.append('-v')
   if os.environ.has_key('BOB_PROFILE') and \
