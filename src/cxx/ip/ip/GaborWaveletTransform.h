@@ -49,6 +49,8 @@ namespace bob {
           bool dc_free = true
         );
 
+        blitz::Array<double,2> kernelImage() const;
+
         void transform(
           const blitz::Array<std::complex<double>,2>& _frequency_domain_image,
           blitz::Array<std::complex<double>,2>& transformed_frequency_domain_image
@@ -63,10 +65,18 @@ namespace bob {
     }; // class GaborKernel
 
 
+    //! \brief The GaborWaveletTransform class computes a Gabor wavelet transform of the given image.
+    //! It computes either the complete Gabor wavelet transformed image (short: trafo image) with
+    //! number_of_scales * number_of_orientations layers, or a Gabor jet image that includes
+    //! one Gabor jet (with one vector of absolute values and one vector of phases) for each pixel
     class GaborWaveletTransform {
 
       public:
 
+        //! \brief Constructs a Gabor wavelet transform object.
+        //! This class will generate number_of_scales * number_of_orientations Gabor wavelets
+        //! using the given sigma, k_max and k_fac values
+        //! All parameters have reasonable defaults, as used by default algorithms
         GaborWaveletTransform(
           int number_of_scales = 5,
           int number_of_orientations = 8,
@@ -75,61 +85,32 @@ namespace bob {
           double k_fac = 1./sqrt(2.)
         );
 
+        //! generate the kernels for the new resolution
+        //! this function is called internally, no need to call it explicitly
         void generateKernels(std::pair<int, int> resolution);
 
-        //! performs Gabor wavelet transform and returns vector of complex images
-        void gwt(
-          blitz::Array<std::complex<double>,3>& trafo_image,
-          const blitz::Array<std::complex<double>,2>& gray_image);
-        //! shortcut for gray images of any type
-        template <typename T>
-          void gwt(
-            blitz::Array<std::complex<double>,3>& trafo_image,
-            const blitz::Array<T,2>& gray_image
-          ){
-            return gwt(trafo_image, bob::core::cast<std::complex<double> >(gray_image));
-          }
-        //! shortcut for color images
-        template <typename T>
-          void gwt(
-            blitz::Array<std::complex<double>,3>& trafo_image,
-            const blitz::Array<T,3>& color_image
-          ){
-            // create gray image
-            blitz::Array<T,2> gray_image(color_image.extend(1), color_image.extend(2));
-            bob::ip::rgb_to_gray(color_image, gray_image);
-            // call gray image function
-            return gwt(trafo_image, bob::core::cast<std::complex<double> >(gray_image));
-          }
+        //! generates the frequency kernels as images
+        blitz::Array<double,3> kernelImages() const;
 
-        //! performs Gabor wavelet transform and returns pair of jet images
-        // (absolute part and phase part)
-        void jetImage(
-          blitz::Array<double,4>& jet_image,
+        //! get the number of kernels (usually, 40) used by this GWT class
+        int numberOfKernels() const{return m_kernel_frequencies.size();}
+
+        //! performs Gabor wavelet transform and returns vector of complex images
+        void performGWT(
           const blitz::Array<std::complex<double>,2>& gray_image,
-          bool do_normalize);
-        //! shortcut for any type of gray image
-        template <typename T>
-          void jetImage(
-            blitz::Array<double,4>& jet_image,
-            const blitz::Array<T,2>& gray_image,
-            bool do_normalize = true
-          ){
-            return jetImage(jet_image, bob::core::cast<std::complex<double> >(gray_image), do_normalize);
-          }
-        //! shortcut for color images
-        template <typename T>
-          void jetImage(
-            blitz::Array<double,4>& jet_image,
-            const blitz::Array<T,3>& color_image,
-            bool do_normalize = true
-          ){
-            // create gray image
-            blitz::Array<T,2> gray_image(color_image.extend(1), color_image.extend(2));
-            bob::ip::rgb_to_gray(color_image, gray_image);
-            // call gray image function
-            return jetImage(jet_image, bob::core::cast<std::complex<double> >(gray_image), do_normalize);
-          }
+          blitz::Array<std::complex<double>,3>& trafo_image
+        );
+
+        //! performs Gabor wavelet transform and creates 4D image
+        //! (absolute part and phase part)
+        //! If do_normalize is enabled, the Gabor jets are normalized to length 1
+        //! (which is a good choice for most applications,
+        //! but e.g. not required to compute LGBP).
+        void computeJetImage(
+          const blitz::Array<std::complex<double>,2>& gray_image,
+          blitz::Array<double,4>& jet_image,
+          bool do_normalize = true
+        );
 
       private:
 
