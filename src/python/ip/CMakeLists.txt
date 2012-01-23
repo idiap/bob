@@ -38,7 +38,7 @@ include(../../cmake/macros.cmake)
 # If we have VLFeat installed, enable the compilation of relevant modules
 if(VLFEAT_FOUND)
   include_directories(${VLFEAT_INCLUDE_DIR})
-  set(pysrc "src/vlsift.cc;${pysrc}")
+  set(pysrc "src/vlsift.cc;src/vldsift.cc;${pysrc}")
 endif()
 
 bob_python_package_bindings(ip "${pysrc}")
@@ -67,6 +67,8 @@ bob_python_add_test(python-ip-histo-tests
 if(VLFEAT_FOUND)
 bob_python_add_test(python-ip-vlsift-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_vlsift.py)
+bob_python_add_test(python-ip-vldsift-tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_vldsift.py)
 endif()
 
 bob_python_add_test(python-ip-facenorm
