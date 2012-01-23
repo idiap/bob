@@ -47,6 +47,13 @@ static tuple call_shuffler2(train::DataShuffler& s, boost::mt19937& rng,
   return make_tuple(data, target);
 }
 
+static void call_shuffler3(train::DataShuffler& s, tp::ndarray d, tp::ndarray t)
+{
+  blitz::Array<double,2> data_ = d.bz<double,2>();
+  blitz::Array<double,2> target_ = t.bz<double,2>();
+  s(data_, target_);
+}
+
 static tuple stdnorm(train::DataShuffler& s) {
   blitz::Array<double,1> mean(s.getDataWidth());
   blitz::Array<double,1> stddev(s.getDataWidth());
@@ -88,10 +95,38 @@ static boost::shared_ptr<train::DataShuffler> shuffler_from_arraysets
   return boost::make_shared<train::DataShuffler>(vdata_ref, vtarget_ref);
 }
 
+#ifdef __LP64__
+#  define SSIZE_T_FMT "%ld"
+#else
+#  define SSIZE_T_FMT "%d"
+#endif
+
+static boost::shared_ptr<train::DataShuffler> shuffler_from_arrays_or_arraysets
+(object data, object target) {
+
+  //checks what can be extracted from the first element of the iterable
+  if (len(data) == 0) {
+    PYTHON_ERROR(RuntimeError, "Input data parameter should be an iterable with, at least, length 1");
+  }
+
+  if (len(data) != len(target)) {
+    PYTHON_ERROR(RuntimeError, "Data and target lengths differ: len(data) = " SSIZE_T_FMT " and len(target) = " SSIZE_T_FMT, len(data), len(target));
+  }
+
+  //Let's test the first element.
+  extract<io::Arrayset> check_set(data[0]);
+
+  if (check_set.check()) { //good, those are arraysets
+    return shuffler_from_arraysets(data, target); 
+  }
+
+  //we try arrays
+  return shuffler_from_arrays(data, target);
+}
+
 void bind_trainer_rprop() {
   class_<train::DataShuffler, boost::shared_ptr<train::DataShuffler> >("DataShuffler", "A data shuffler is capable of being populated with data from one or multiple classes and matching target values. Once setup, the shuffer can randomly select a number of vectors and accompaning targets for the different classes, filling up user containers.\n\nData shufflers are particular useful for training neural networks.", no_init)
-    .def("__init__", make_constructor(&shuffler_from_arrays, default_call_policies(), (arg("data"), arg("target"))), "Initializes the shuffler with some data classes and corresponding targets. The data is read by considering examples are lying on different rows of the input data.")
-    .def("__init__", make_constructor(&shuffler_from_arraysets, default_call_policies(), (arg("data"), arg("target"))), "Initializes the shuffler with some data classes and corresponding targets. The Arrayset data is copied internally for efficiency reasons.")
+    .def("__init__", make_constructor(&shuffler_from_arrays_or_arraysets, default_call_policies(), (arg("data"), arg("target"))), "Initializes the shuffler with some data classes and corresponding targets. The data is read by considering examples are lying on different rows of the input data if it is composed of a list of NumPy ndarrays or copied internally if it is composed of a list of io.Arraysets.")
     .def("stdnorm", &train::DataShuffler::getStdNorm, (arg("self"), arg("mean"), arg("stddev")), "Calculates and returns mean and standard deviation from the input data.")
     .def("stdnorm", &stdnorm, (arg("self")), "Calculates and returns mean and standard deviation from the input data.")
     .add_property("auto_stdnorm", &train::DataShuffler::getAutoStdNorm, &train::DataShuffler::setAutoStdNorm)
@@ -100,7 +135,7 @@ void bind_trainer_rprop() {
     .def("__call__", &call_shuffler1, (arg("self"), arg("N")), "Populates the output matrices (data, target) by randomly selecting N arrays from the input arraysets and matching targets in the most possible fair way. The 'data' and 'target' matrices will contain N rows and the number of columns that are dependent on input arraysets and target array widths.")
     .def("__call__", &call_shuffler2, (arg("self"), arg("rng"), arg("N")), "Populates the output matrices (data, target) by randomly selecting N arrays from the input arraysets and matching targets in the most possible fair way. The 'data' and 'target' matrices will contain N rows and the number of columns that are dependent on input arraysets and target array widths. In this version you should provide your own random number generator, already initialized.")
     .def("__call__", (void (train::DataShuffler::*)(boost::mt19937&, blitz::Array<double,2>&, blitz::Array<double,2>&))&train::DataShuffler::operator(), (arg("self"), arg("data"), arg("target")), "Populates the output matrices by randomly selecting N arrays from the input arraysets and matching targets in the most possible fair way. The 'data' and 'target' matrices will contain N rows and the number of columns that are dependent on input arraysets and target arrays.\n\nWe check don't 'data' and 'target' for size compatibility and is your responsibility to do so.")
-    .def("__call__", (void (train::DataShuffler::*)(blitz::Array<double,2>&, blitz::Array<double,2>&))&train::DataShuffler::operator(), (arg("self"), arg("data"), arg("target")), "This version is a shortcut to the previous declaration of operator() that actually instantiates its own random number generator and seed it a time-based variable. We guarantee two calls will lead to different results if they are at least 1 microsecond appart (procedure uses the machine clock).")
+    .def("__call__", call_shuffler3, (arg("self"), arg("data"), arg("target")), "This version is a shortcut to the previous declaration of operator() that actually instantiates its own random number generator and seed it a time-based variable. We guarantee two calls will lead to different results if they are at least 1 microsecond appart (procedure uses the machine clock).")
     ;
 
   class_<train::MLPRPropTrainer>("MLPRPropTrainer", "Sets an MLP to perform discrimination based on RProp: A Direct Adaptive Method for Faster Backpropagation Learning: The RPROP Algorithm, by Martin Riedmiller and Heinrich Braun on IEEE International Conference on Neural Networks, pp. 586--591, 1993.", init<const mach::MLP&, size_t>((arg("machine"), arg("batch_size")), "Initializes a new MLPRPropTrainer trainer according to a given machine settings and a training batch size. Good values for batch sizes are tens of samples. RProp is a 'batch' training algorithm. Do not try to set batch_size to a too-low value."))

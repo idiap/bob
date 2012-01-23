@@ -48,6 +48,23 @@ class DataShufferTest(unittest.TestCase):
     self.assertEqual(shuffle.dataWidth, 3)
     self.assertEqual(shuffle.targetWidth, 1)
 
+  def test01a_InitializationWithArrays(self):
+
+    # Test if we can initialize the shuffler with simple arrays
+    data = [
+        numpy.zeros((10,2), 'float64'),
+        numpy.ones ((10,2), 'float64'),
+        ]
+
+    target = [
+      numpy.array([+1,+1], 'float64'),
+      numpy.array([-1,-1], 'float64'),
+      ]
+
+    shuffle = bob.trainer.DataShuffler(data, target)
+    self.assertEqual(shuffle.dataWidth, 2)
+    self.assertEqual(shuffle.targetWidth, 2)
+
   def test02_Drawing(self):
 
     # Tests that drawing works in a particular way

@@ -16,8 +16,8 @@ def load_gray(relative_filename):
   # Please note our PNG loader will always load in RGB, but since that is a
   # grayscaled version of the image, I just select one of the planes. 
   filename = os.path.join('data', 'histo', relative_filename)
-  array = bob.io.Array(filename)
-  return array.get()[0,:,:] 
+  array = bob.io.load(filename)
+  return array[0,:,:] 
 
 def random_int(array, min_value, max_value):
   for i in range(0,array.shape()[0]):
@@ -54,9 +54,9 @@ class HistogramTest(unittest.TestCase):
     bob.ip.histogram_(input_image, histo8, 0, 255, 256)
     
     # Save the computed data
-    #bob.io.Array(histo1).save(os.path.join('data', 'histo','image_histo.hdf5'))
+    #bob.io.save(histo1, os.path.join('data', 'histo','image_histo.hdf5'))
     
-    histo_ref = bob.io.Array(os.path.join('data', 'histo','image_histo.hdf5')).get()
+    histo_ref = bob.io.load(os.path.join('data', 'histo','image_histo.hdf5'))
 
     self.assertTrue(input_image.size == histo1.sum())
     self.assertTrue(input_image.size == histo2.sum())
@@ -81,9 +81,9 @@ class HistogramTest(unittest.TestCase):
     # Generate random uint16 array
     #input_array = numpy.ndarray((50, 70), 'uint16')
     #random_int(input_array, 0, 65535)
-    #bob.io.Array(input_array).save(os.path.join('data', 'histo','input_uint16.hdf5'))
+    #bob.io.save(input_array, os.path.join('data', 'histo','input_uint16.hdf5'))
     
-    input_array = bob.io.Array(os.path.join('data', 'histo','input_uint16.hdf5')).get()
+    input_array = bob.io.load(os.path.join('data', 'histo','input_uint16.hdf5'))
     
     histo1 = bob.ip.histogram(input_array)
     histo2 = bob.ip.histogram(input_array, 65535)
@@ -101,9 +101,9 @@ class HistogramTest(unittest.TestCase):
     bob.ip.histogram_(input_array, histo8, 0, 65535, 65536)
     
     # Save computed data
-    #bob.io.Array(histo1).save(os.path.join('data', 'histo','input_uint16.histo.hdf5'))
+    #bob.io.save(histo1, os.path.join('data', 'histo','input_uint16.histo.hdf5'))
     
-    histo_ref = bob.io.Array(os.path.join('data', 'histo','input_uint16.histo.hdf5')).get()
+    histo_ref = bob.io.load(os.path.join('data', 'histo','input_uint16.histo.hdf5'))
     
     self.assertTrue(input_array.size == histo1.sum())
     self.assertTrue(input_array.size == histo2.sum())
@@ -128,9 +128,9 @@ class HistogramTest(unittest.TestCase):
     # Generate random float32 array
     #input_array = numpy.ndarray((50, 70), 'float32')
     #random_float(input_array, 0, 1)
-    #bob.io.Array(input_array).save(os.path.join('data', 'histo','input_float.hdf5'))
+    #bob.io.save(input_array, os.path.join('data', 'histo','input_float.hdf5'))
     
-    input_array = bob.io.Array(os.path.join('data', 'histo','input_float.hdf5')).get()
+    input_array = bob.io.load(os.path.join('data', 'histo','input_float.hdf5'))
     
     histo2 = numpy.ndarray((10,), 'uint64')
     
@@ -138,9 +138,9 @@ class HistogramTest(unittest.TestCase):
     bob.ip.histogram_(input_array, histo2, 0, 1, 10)
     
     # Save computed data
-    #bob.io.Array(histo1).save(os.path.join('data', 'histo','input_float.histo.hdf5'))
+    #bob.io.save(histo1,os.path.join('data', 'histo','input_float.histo.hdf5'))
     
-    histo_ref = bob.io.Array(os.path.join('data', 'histo','input_float.histo.hdf5')).get()
+    histo_ref = bob.io.load(os.path.join('data', 'histo','input_float.histo.hdf5'))
     
     self.assertTrue(input_array.size == histo1.sum())
     self.assertTrue(input_array.size == histo2.sum())
@@ -153,9 +153,9 @@ class HistogramTest(unittest.TestCase):
     # Generate random int32 array
     #input_array = numpy.ndarray((50, 70), 'int32')
     #random_int(input_array, -20,20)
-    #bob.io.Array(input_array).save(os.path.join('data', 'histo','input_int32.hdf5'))
+    #bob.io.save(input_array,os.path.join('data', 'histo','input_int32.hdf5'))
     
-    input_array = bob.io.Array(os.path.join('data', 'histo','input_int32.hdf5')).get()
+    input_array = bob.io.load(os.path.join('data', 'histo','input_int32.hdf5'))
     
     histo2 = numpy.ndarray((41,), 'uint64')
 
@@ -163,9 +163,9 @@ class HistogramTest(unittest.TestCase):
     bob.ip.histogram_(input_array, histo2, -20, 20, 41)
     
     # Save computed data
-    #bob.io.Array(histo).save(os.path.join('data', 'histo','input_int32.histo.hdf5'))
+    #bob.io.save(histo, os.path.join('data', 'histo','input_int32.histo.hdf5'))
     
-    histo_ref = bob.io.Array(os.path.join('data', 'histo','input_int32.histo.hdf5')).get()
+    histo_ref = bob.io.load(os.path.join('data', 'histo','input_int32.histo.hdf5'))
     
     self.assertTrue(input_array.size == histo1.sum())
     self.assertTrue(input_array.size == histo2.sum())
@@ -175,13 +175,13 @@ class HistogramTest(unittest.TestCase):
   def test05_uint32_accumulate_histoPython(self):
     """Accumulate the histogram of a int32 random array"""
     
-    input_array = bob.io.Array(os.path.join('data', 'histo','input_int32.hdf5')).get()
+    input_array = bob.io.load(os.path.join('data', 'histo','input_int32.hdf5'))
     
     histo = bob.ip.histogram(input_array, -20, 20, 41)
     
     bob.ip.histogram_(input_array, histo, -20, 20, 41, True)
 
-    histo_ref = bob.io.Array(os.path.join('data', 'histo','input_int32.histo.hdf5')).get()
+    histo_ref = bob.io.load(os.path.join('data', 'histo','input_int32.histo.hdf5'))
 
     self.assertTrue(input_array.size * 2 == histo.sum())
     self.assertTrue((histo_ref * 2 == histo).all())

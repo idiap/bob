@@ -1,5 +1,5 @@
 /**
- * @file python/machine/src/jfa.cc
+ * @file src/python/machine/src/jfa.cc
  * @date Sat Jul 23 21:41:15 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -33,11 +33,14 @@ namespace tp = bob::python;
 
 static void jfa_forward_list(mach::JFAMachine& m, list stats, tp::ndarray score)
 {
-  // Extracts the vector of pointers from the python list
+  // Extracts the vector of GMMStats from the python list
   int n_samples = len(stats);
   std::vector<boost::shared_ptr<const bob::machine::GMMStats> > gmm_stats;
   for(int s=0; s<n_samples; ++s)
-    gmm_stats.push_back(extract<boost::shared_ptr<const bob::machine::GMMStats> >(stats[s]));
+  {
+    boost::shared_ptr<mach::GMMStats> gs = extract<boost::shared_ptr<mach::GMMStats> >(stats[s]);
+    gmm_stats.push_back(gs);
+  }
 
   // Calls the forward function
   blitz::Array<double,1> score_ = score.bz<double,1>();

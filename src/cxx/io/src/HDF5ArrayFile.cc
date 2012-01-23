@@ -29,6 +29,8 @@
 #include "io/HDF5File.h"
 #include "io/HDF5Exception.h"
 
+#include "core/logging.h"
+
 namespace fs = boost::filesystem;
 namespace io = bob::io;
 namespace ca = bob::core::array;
@@ -70,8 +72,10 @@ class HDF5ArrayFile: public io::File {
 
           //if m_type_all has extent == 1 on the first dimension and dimension
           //0 is expandable, collapse that
-          if (m_type_array.shape[0] == 1 && desc_array.expandable)
+          if (m_type_array.shape[0] == 1 && desc_arrayset.expandable)
+          {
             m_type_array = m_type_arrayset;
+          }
         }
 
         else {

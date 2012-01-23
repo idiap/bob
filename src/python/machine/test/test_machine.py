@@ -51,11 +51,11 @@ class MachineTest(unittest.TestCase):
   def test03_GMMMachine(self):
     """Test a GMMMachine (log-likelihood computation)"""
     
-    data = bob.io.Array('data/data.hdf5').get()
+    data = bob.io.load('data/data.hdf5')
     gmm = bob.machine.GMMMachine(2, 50)
-    gmm.weights   = bob.io.Array('data/weights.hdf5').get()
-    gmm.means     = bob.io.Array('data/means.hdf5').get()
-    gmm.variances = bob.io.Array('data/variances.hdf5').get()
+    gmm.weights   = bob.io.load('data/weights.hdf5')
+    gmm.means     = bob.io.load('data/means.hdf5')
+    gmm.variances = bob.io.load('data/variances.hdf5')
 
     # Compare the log-likelihood with the one obtained using Chris Matlab 
     # implementation

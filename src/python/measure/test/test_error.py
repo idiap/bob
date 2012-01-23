@@ -13,7 +13,7 @@ import bob
 
 def load(fname):
   """Loads a single array from the 'data' directory."""
-  return bob.io.Array(os.path.join('data', fname)).get()
+  return bob.io.load(os.path.join('data', fname))
 
 def count(array, value=True):
   """Counts occurrences of a certain value in an array"""

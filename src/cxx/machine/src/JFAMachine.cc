@@ -32,6 +32,8 @@
 #include "machine/LinearScoring.h"
 
 
+#include "core/logging.h"
+
 namespace mach = bob::machine;
 namespace math = bob::math;
 
@@ -361,10 +363,10 @@ void mach::JFAMachine::forward(const std::vector<boost::shared_ptr<const mach::G
   models.push_back(m_cache_mVyDz);
 
   // Linear scoring
-  blitz::Array<double,2> scores(samples.size(),1);
+  // TODO: try to avoid this 2D array allocation or put in cache
+  blitz::Array<double,2> scores(1,samples.size());
   mach::linearScoring(models, 
     m_jfa_base->getUbm()->getMeanSupervector(), m_jfa_base->getUbm()->getVarianceSupervector(),
     samples, channelOffset, true, scores);
-  blitz::Array<double,1> scores_sl = scores(blitz::Range::all(), 0);
-  score = scores_sl;  
+  score = scores(0,blitz::Range::all());
 }
