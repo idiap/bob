@@ -7,6 +7,7 @@
 """
 
 import os, sys
+import platform
 import numpy
 import unittest
 import bob
@@ -187,11 +188,22 @@ class ColorTest(unittest.TestCase):
     # tests some border-line cases for gray-scale conversion and makes sure
     # we don't have precision problems.
 
-    correct = bob.io.load('data/gray-u8-mids.hdf5')
-    for k in range(correct.shape[0]):
-      self.assertEqual(correct[k,3], 
-          bob.ip.rgb_to_gray_u8(*[int(z) for z in correct[k,:3]]) 
-          )
+    if platform.architecture()[0] == '64bit': 
+      # do a full test, require all values to be the same
+      correct = bob.io.load('data/gray-u8-mids.hdf5')
+      for k in range(correct.shape[0]):
+        self.assertEqual(correct[k,3], 
+            bob.ip.rgb_to_gray_u8(*[int(z) for z in correct[k,:3]]) 
+            )
+    else:
+      # do a full test, require all values to be the same
+      # use a special 32-bit file. About 1600 cases do not match the 64-bit
+      # ones.
+      correct = bob.io.load('data/gray-u8-mids-32bits.hdf5')
+      for k in range(correct.shape[0]):
+        self.assertEqual(correct[k,3], 
+            bob.ip.rgb_to_gray_u8(*[int(z) for z in correct[k,:3]]) 
+            )
 
 if __name__ == '__main__':
   sys.argv.append('-v')
