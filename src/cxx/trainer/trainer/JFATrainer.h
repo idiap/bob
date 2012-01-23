@@ -1,5 +1,5 @@
 /**
- * @file cxx/trainer/trainer/JFATrainer.h
+ * @file src/cxx/trainer/trainer/JFATrainer.h
  * @date Tue Jul 19 12:16:17 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_TRAINER_JFATRAINER_H
-#define BOB5SPRO_TRAINER_JFATRAINER_H
+#ifndef BOB_TRAINER_JFATRAINER_H
+#define BOB_TRAINER_JFATRAINER_H
 
 #include <blitz/array.h>
 #include <map>
@@ -532,4 +532,4 @@ class JFATrainer {
 
 }}
 
-#endif /* BOB5SPRO_TRAINER_JFATRAINER_H */
+#endif /* BOB_TRAINER_JFATRAINER_H */
