@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 2.6)
 set(pysrc
    "src/error.cc"
    "src/main.cc"
+   "src/gabor_jet_similarities.cc"
    )
 
 include(../../cmake/macros.cmake)

@@ -40,6 +40,7 @@ void bind_ip_rotate();
 void bind_ip_flow();
 void bind_ip_dctfeatures();
 void bind_ip_gabor();
+void bind_ip_gabor_wavelet_transform();
 void bind_ip_geomnorm();
 void bind_ip_faceeyesnorm();
 void bind_ip_tantriggs();
@@ -76,6 +77,7 @@ BOOST_PYTHON_MODULE(libpybob_ip) {
   bind_ip_flow();
   bind_ip_dctfeatures();
   bind_ip_gabor();
+  bind_ip_gabor_wavelet_transform();
   bind_ip_geomnorm();
   bind_ip_faceeyesnorm();
   bind_ip_tantriggs();

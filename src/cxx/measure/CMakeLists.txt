@@ -8,6 +8,7 @@ set(shared "") #external libraries
 # This defines the list of source files inside this package.
 set(src
     "src/error.cc"
+    "src/GaborJetSimilarities.cc"
     )
 
 include(../../cmake/macros.cmake)

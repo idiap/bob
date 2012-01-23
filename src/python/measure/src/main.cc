@@ -23,10 +23,12 @@
 #include "core/python/ndarray.h"
 
 void bind_measure_error();
+void bind_measure_gabor_jet_similarities();
 
 BOOST_PYTHON_MODULE(libpybob_measure) {
 
   bob::python::setup_python("bob error measure classes and sub-classes");
 
   bind_measure_error();
+  bind_measure_gabor_jet_similarities();
 }
