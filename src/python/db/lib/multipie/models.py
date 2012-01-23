@@ -20,16 +20,22 @@ class Client(Base):
   birthyear = Column(Integer)
   gender = Column(Enum('m','f'))
   first_session = Column(Integer)
+  second_session = Column(Integer)
+  third_session = Column(Integer)
+  fourth_session = Column(Integer)
 
-  def __init__(self, id, group, birthyear, gender, first_session):
+  def __init__(self, id, group, birthyear, gender, first_session, second_session, third_session, fourth_session):
     self.id = id
     self.sgroup = group
     self.birthyear = birthyear
     self.gender = gender
     self.first_session = first_session
+    self.second_session = second_session
+    self.third_session = third_session
+    self.fourth_session = fourth_session
 
   def __repr__(self):
-    return "<Client('%d', '%s', '%d', '%s', '%d')>" % (self.id, self.sgroup, self.birthyear, self.gender, self.first_session)
+    return "<Client('%d', '%s', '%d', '%s', '%d', '%d', '%d', '%d')>" % (self.id, self.sgroup, self.birthyear, self.gender, self.first_session, self.second_session, self.third_session, self.fourth_session)
 
 class File(Base):
   __tablename__ = 'file'

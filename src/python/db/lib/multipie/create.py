@@ -36,11 +36,41 @@ def add_clients(session, filelist):
       v[2] = 'm'
     elif (v[2] == 'Female'):
       v[2] = 'f'
+    v[6] = v[6].rstrip() # chomp new line
     first_session = 0
-    if(v[3] == '1'): first_session = 1
-    elif(v[4] == '1'): first_session = 2
-    elif(v[5] == '1'): first_session = 3
-    elif(v[6] == '1'): first_session = 4
+    second_session = 0
+    third_session = 0
+    fourth_session = 0
+    if(v[3] == '1'): 
+      first_session = 1
+      if(v[4] == '1'):
+        second_session = 2
+        if(v[5] == '1'):
+          third_session = 3
+          if(v[6] == '1'):
+            fourth_session = 4
+        elif(v[6] == '1'):
+          third_session = 4
+      elif(v[5] == '1'):
+        second_session = 3
+        if(v[6] == '1'):
+          third_session = 4
+      elif(v[6] == '1'):
+        second_session = 4
+    elif(v[4] == '1'): 
+      first_session = 2
+      if(v[5] == '1'):
+        second_session = 3
+        if(v[6] == '1'):
+          third_session = 4
+      elif(v[6] == '1'):
+        second_session = 4
+    elif(v[5] == '1'): 
+      first_session = 3
+      if(v[6] == '1'):
+        second_session = 4
+    elif(v[6] == '1'): 
+      first_session = 4
     #TODO: if first_session == 0: raises an error
 
     if not (v[0] in client_dict):
@@ -48,7 +78,7 @@ def add_clients(session, filelist):
       if int(v[0]) in dev_ids: group = 'dev'
       elif int(v[0]) in eval_ids: group = 'eval'
         
-      session.add(Client(int(v[0]), group, int(v[1]), v[2], first_session))
+      session.add(Client(int(v[0]), group, int(v[1]), v[2], first_session, second_session, third_session, fourth_session))
       client_dict[v[0]] = True
   
   client_dict = {} 
