@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/machine/JFAMachine.h
+ * @file src/cxx/machine/machine/JFAMachine.h
  * @date Sat Jul 23 21:41:15 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -360,7 +360,6 @@ namespace bob { namespace machine {
       /**
         * data cached used to improve performance
         */
-      mutable boost::shared_ptr<bob::machine::GMMStats> m_cache_gmmstats;
       mutable blitz::Array<double,1> m_cache_Ux;
       mutable blitz::Array<double,1> m_cache_mVyDz;
 
