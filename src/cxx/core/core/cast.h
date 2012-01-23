@@ -90,32 +90,8 @@ namespace bob {
 
 
 /**
- * @brief Casts a blitz array allowing std::complex types.
+ * @brief Different parts of complex numbers
  */
-/*
-template<typename T, typename U, int D>
-Array<T,D> complex_cast(const Array<U,D>& in) {
-  return cast<T>(in);
-}
-*/
-
-template <typename T, typename U, int d>
-blitz::Array<T,d> fastCast(const blitz::Array<U,d>& in){
-  // check that the given array has contiguous memory
-  // so that the cast can be performed fast without any problems
-  bob::core::array::assertCContiguous(in);
-  // create new array of desired type
-  blitz::Array<T,d> out(in.shape());
-  // get iterators for both arrays
-  typename blitz::Array<U,d>::const_iterator in_it = in.begin(), in_end = in.end();
-  typename blitz::Array<T,d>::iterator out_it = out.begin();
-  // perform conversion
-  for (; in_it != in_end; ++in_it, ++ out_it){
-    *out_it = cast<T>(*in_it);
-  }
-  return out;
-}
-
 typedef enum{
 	REAL_PART,
 	IMAG_PART,
@@ -123,7 +99,9 @@ typedef enum{
 	PHASE_PART
 } ComplexPart;
 
-// template specializations for one dimension
+/**
+ * @brief Get a specific part of the 1D complex array
+ */
 template <typename T>
 void getPart(blitz::Array<T,1>& out, const blitz::Array<std::complex<T>,1>& in, ComplexPart part){
 
@@ -154,7 +132,9 @@ void getPart(blitz::Array<T,1>& out, const blitz::Array<std::complex<T>,1>& in, 
 
 static blitz::Range all = blitz::Range::all();
 
-// template specializations for different dimensionalities
+/**
+ * @brief Get a specific part of the 2D complex array
+ */
 template <typename T>
 void getPart(blitz::Array<T,2>& out, const blitz::Array<std::complex<T>,2>& in, ComplexPart part){
   // iterate the first dimension ...
@@ -167,6 +147,9 @@ void getPart(blitz::Array<T,2>& out, const blitz::Array<std::complex<T>,2>& in, 
   }
 }
 
+/**
+ * @brief Get a specific part of the 3D complex array
+ */
 template <typename T>
 void getPart(blitz::Array<T,3>& out, const blitz::Array<std::complex<T>,3>& in, ComplexPart part){
   // iterate the first dimension ...
@@ -179,6 +162,9 @@ void getPart(blitz::Array<T,3>& out, const blitz::Array<std::complex<T>,3>& in, 
   }
 }
 
+/**
+ * @brief Get a specific part of the 4D complex array
+ */
 template <typename T>
 void getPart(blitz::Array<T,4>& out, const blitz::Array<std::complex<T>,4>& in, ComplexPart part){
   // iterate the first dimension ...
