@@ -26,6 +26,7 @@
 #include <core/array_assert.h>
 #include <blitz/array.h>
 #include <numeric>
+#include <ip/GaborWaveletTransform.h>
 
 namespace bob { namespace measure {
 
@@ -37,7 +38,7 @@ namespace bob { namespace measure {
 
     public:
       //! The similarity between two Gabor jets
-      virtual double similarity(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) = 0;
+      virtual double similarity(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const = 0;
 
   };
 
@@ -48,7 +49,7 @@ namespace bob { namespace measure {
       ScalarProductSimilarity() : GaborJetSimilarity(){}
       virtual ~ScalarProductSimilarity(){}
 
-      virtual double similarity(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2);
+      virtual double similarity(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const;
   };
 
   //! The default Gabor jet similarity function, which is the normalized scalar product,
@@ -58,8 +59,31 @@ namespace bob { namespace measure {
       CanberraSimilarity() : GaborJetSimilarity(){}
       virtual ~CanberraSimilarity(){}
 
-      virtual double similarity(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2);
+      virtual double similarity(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const;
   };
+
+  //! This function computes the disparity similarity function by estimating a disparity vector from two jets
+  //! and using the disparity for phase difference correction
+  class DisparitySimilarity : GaborJetSimilarity{
+    public:
+      DisparitySimilarity(const bob::ip::GaborWaveletTransform& gwt = bob::ip::GaborWaveletTransform());
+      virtual ~DisparitySimilarity(){}
+
+      //! computes the similarity (including the estimation of the disparity vector)
+      virtual double similarity(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const;
+      //! returns the disparity vector estimated during the last call of similarity(...)
+      const std::pair<double,double>& disparity() const {return m_disparity;}
+
+    private:
+      const std::vector<std::pair<double,double> > m_kernel_frequencies;
+      const int m_number_of_scales;
+      const int m_number_of_directions;
+      std::vector<double> m_wavelet_extends;
+
+      mutable std::pair<double,double> m_disparity;
+      mutable std::vector<double> m_confidences;
+      mutable std::vector<double> m_phase_differences;
+};
 } }
 
 #endif // BOB_MEASURE_GABOR_JET_SIMILARITY_H

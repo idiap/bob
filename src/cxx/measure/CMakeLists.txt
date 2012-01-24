@@ -2,7 +2,7 @@ project(measure-cxx)
 cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
-set(deps "core") #other bob subprojects
+set(deps "core" "ip") #other bob subprojects
 set(shared "") #external libraries
 
 # This defines the list of source files inside this package.

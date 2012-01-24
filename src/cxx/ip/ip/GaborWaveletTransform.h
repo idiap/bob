@@ -79,7 +79,7 @@ namespace bob {
         //! All parameters have reasonable defaults, as used by default algorithms
         GaborWaveletTransform(
           int number_of_scales = 5,
-          int number_of_orientations = 8,
+          int number_of_directions = 8,
           double sigma = 2. * M_PI,
           double k_max = M_PI / 2.,
           double k_fac = 1./sqrt(2.)
@@ -94,6 +94,8 @@ namespace bob {
 
         //! get the number of kernels (usually, 40) used by this GWT class
         int numberOfKernels() const{return m_kernel_frequencies.size();}
+
+        const std::vector<std::pair<double, double> >& kernelFrequencies() const {return m_kernel_frequencies;}
 
         //! performs Gabor wavelet transform and returns vector of complex images
         void performGWT(
@@ -124,6 +126,9 @@ namespace bob {
 
         blitz::Array<std::complex<double>,2> m_temp_array, m_frequency_image;
 
+      public:
+        const int m_number_of_scales;
+        const int m_number_of_directions;
     }; // class GaborWaveletTransform
 
   } // namespace ip

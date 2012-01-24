@@ -114,26 +114,28 @@ blitz::Array<double,2> bob::ip::GaborKernel::kernelImage() const{
 ***********************************************************************************/
 bob::ip::GaborWaveletTransform::GaborWaveletTransform(
   int number_of_scales,
-  int number_of_orientations,
+  int number_of_directions,
   double sigma,
   double k_max,
   double k_fac
 )
 : m_sigma(sigma),
   m_fft(0,0),
-  m_ifft(0,0)
+  m_ifft(0,0),
+  m_number_of_scales(number_of_scales),
+  m_number_of_directions(number_of_directions)
 {
   // reserve enough space
-  m_kernel_frequencies.reserve(number_of_scales * number_of_orientations);
+  m_kernel_frequencies.reserve(number_of_scales * number_of_directions);
   // initialize highest frequency
   double k_abs = k_max;
   // iterate over the scales
   for (int s = 0; s < number_of_scales; ++s){
 
     // iterate over the directions
-    for (int d = 0; d < number_of_orientations; ++d )
+    for (int d = 0; d < number_of_directions; ++d )
     {
-      double angle = M_PI * d / number_of_orientations;
+      double angle = M_PI * d / number_of_directions;
       // compute center of kernel in frequency domain in Cartesian coordinates
       m_kernel_frequencies.push_back(
         std::make_pair(k_abs * cos(angle), k_abs * sin(angle)));

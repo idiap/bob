@@ -92,10 +92,11 @@ if __name__ == '__main__':
   parser.add_argument('--otherimage', '-I', help='the image to compare with')
   parser.add_argument('--othereyepositions', '-E', type=int, nargs=4, help='eye positions of the other input image')
   parser.add_argument('--grid', '-g', type=int, nargs=4, default=[3,2,4,6], help='number of nodes between, aside, above, and below the eyes')
+  parser.add_argument('--scales', '-S', type=int, default=5, help='number of scales of the GWT')
   
   # perform command line parsing
   args = parser.parse_args("-i /idiap/home/mguenther/10-Guenther-6x9-150.jpg -e 223 172 129 177 -I /idiap/home/mguenther/08-Guenther-6x9-150.jpg -E 243 190 150 171".split() + sys.argv[1:])
-#  args = parser.parse_args()
+#  args = parser.parse_args("-i /idiap/home/mguenther/10-Guenther-6x9-150.jpg -e 223 172 129 177".split() + sys.argv[1:])
 
   # read input image
   input_image = bob.io.Array(args.inputimage).get()
@@ -108,7 +109,7 @@ if __name__ == '__main__':
   (gray_image,eye_pos) = normalize(gray_image, args.eyepositions, args.neweyepositions, args.newimagesize, args.normalizeface)
 
   # perform gwt
-  gwt = bob.ip.GaborWaveletTransform()
+  gwt = bob.ip.GaborWaveletTransform(args.scales)
   jet_image = gwt.jet_image(gray_image)
   gwt.compute_jets(gray_image,jet_image)
   
@@ -122,7 +123,7 @@ if __name__ == '__main__':
   im = pylab.imshow(gray_image)
   fg.plot()
   
-  if 'otherimage' in args:
+  if args.otherimage:
     input_image = bob.io.Array(args.otherimage).get()
     if input_image.ndim == 3:
       other_image = numpy.ndarray([input_image.shape[1], input_image.shape[2]], dtype=numpy.uint8)
@@ -145,10 +146,11 @@ if __name__ == '__main__':
     print "the similarities of the two graphs are:"
     print "Cosine Measure:" , fg.similarity_to(fg2, bob.measure.ScalarProductSimilarity())
     print "Canberra Measure:", fg.similarity_to(fg2, bob.measure.CanberraSimilarity()) 
+    print "Disparity Measure:", fg.similarity_to(fg2, bob.measure.DisparitySimilarity(gwt)) 
   else:
   
     # compute the similarity of the graph to itself
-    print "similarity of the face graph to itself is:", fg.similarity_to(fg, bob.measure.ScalarProductSimilarity()), fg.similarity_to(fg, bob.measure.CanberraSimilarity())
+    print "similarity of the face graph to itself is:", fg.similarity_to(fg, bob.measure.ScalarProductSimilarity()), fg.similarity_to(fg, bob.measure.CanberraSimilarity()), fg.similarity_to(fg, bob.measure.DisparitySimilarity(gwt)) 
     
   
   pylab.show()
