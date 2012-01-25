@@ -103,8 +103,7 @@ static object inner_get_shape (O& op, tp::const_ndarray input) {
 }
 
 template <typename O>
-static object get_shape (O& op, tp::const_ndarray input,
-    tp::ndarray output) {
+static object get_shape (O& op, tp::const_ndarray input) {
   switch(input.type().dtype) {
     case ca::t_uint8: return inner_get_shape<O,uint8_t>(op, input);
     case ca::t_uint16: return inner_get_shape<O,uint16_t>(op, input);
