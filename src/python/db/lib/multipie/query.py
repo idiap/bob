@@ -229,7 +229,9 @@ class Database(object):
 
   def objects(self, directory=None, extension=None, protocol=None,
       purposes=None, model_ids=None, groups=None, classes=None, subworld=None,
-      expressions=None, world_sampling=1, world_noflash=False, world_first=False):
+      expressions=None, world_sampling=1, world_noflash=False, 
+      world_first=False, world_second=False, world_third=False, world_fourth=False,
+      world_nshots=None, world_shots=None):
     """Returns a set of filenames for the specific query by the user.
 
     Keyword Parameters:
@@ -255,9 +257,9 @@ class Database(object):
       the model_ids is performed.
 
     groups
-      One of the groups ('dev', 'eval', 'world') or a tuple with several of
-      them.  If 'None' is given (this is the default), it is considered the
-      same as a tuple with all possible values.
+      One of the groups ('dev', 'eval', 'world') or a tuple with several of them. 
+      If 'None' is given (this is the default), it is considered the same as a 
+      tuple with all possible values.
 
     classes
       The classes (types of accesses) to be retrieved ('client', 'impostor') 
@@ -275,15 +277,33 @@ class Database(object):
 
     world_sampling
       Samples the files from the world data set. Keeps only files such as:
-      File.client_id + File.shot_id % world_sampling == 0. This argument should
-      be an integer between 1 (keep everything) and 19.  It is not used if
-      world_noflash is also set.
+        File.client_id + File.shot_id % world_sampling == 0
+      This argument should be an integer between 1 (keep everything) and 19.
+      It is not used if world_noflash is also set.
+
+    world_nshots
+      Only considers the n first shots from the world data set.
+
+    world_shots
+      Only considers the shots with the given ids.
 
     world_noflash
-      Keeps the files from the world dataset recorded without flash (shot 1)
+      Keeps the files from the world dataset recorded without flash (shot 0)
       
     world_first
       Only uses data from the first recorded session of each user of the world
+      dataset.
+
+    world_second
+      Only uses data from the second recorded session of each user of the world
+      dataset.
+
+    world_third
+      Only uses data from the third recorded session of each user of the world
+      dataset.
+
+    world_fourth
+      Only uses data from the fourth recorded session of each user of the world
       dataset.
 
     Returns: A dictionary containing the resolved filenames considering all
@@ -324,12 +344,54 @@ class Database(object):
                         File.recording_id == Expression.recording_id, FileMultiview.shot_id != 19))
       if model_ids:
         q = q.filter(File.client_id.in_(model_ids))
+      if(world_nshots):
+        max1 = 19
+        max2 = 19
+        max3 = 19
+        max4 = 19
+        if world_nshots < 19:
+          max1 = world_nshots
+          max2 = 0
+          max3 = 0
+          max4 = 0
+        elif world_nshots < 38:
+          max2 = world_nshots - 19
+          max3 = 0
+          max4 = 0
+        elif world_nshots < 57:
+          max3 = world_nshots - 38
+          max4 = 0
+        else:
+          max4 = world_nshots - 57
+        q = q.filter(or_( and_( File.session_id == Client.first_session, or_(and_(File.recording_id == 1, FileMultiview.shot_id < max1),
+                                                                             and_(File.recording_id == 2, FileMultiview.shot_id < max2))),
+                          and_( File.session_id == Client.second_session, or_(and_(File.recording_id == 1, FileMultiview.shot_id < max2),
+                                                                              and_(File.recording_id == 2, FileMultiview.shot_id < max3))),
+                          and_( File.session_id == Client.third_session, or_(and_(File.recording_id == 1, FileMultiview.shot_id < max3),
+                                                                             and_(File.recording_id == 2, FileMultiview.shot_id < max4))),
+                          and_( File.session_id == Client.fourth_session, FileMultiview.shot_id < max4)))
+        #q = q.filter(FileMultiview.shot_id <= world_nshots )
+      if(world_shots):
+        q = q.filter(FileMultiview.shot_id.in_(world_shots))
       if( world_sampling != 1 and world_noflash == False):
         q = q.filter(((File.client_id + FileMultiview.shot_id) % world_sampling) == 0)
       if( world_noflash == True):
         q = q.filter(FileMultiview.shot_id == 0)
       if( world_first == True):
-        q = q.filter(File.session_id == Client.first_session)
+        q = q.filter(and_(File.session_id == Client.first_session, or_(Client.first_session != 4, 
+                  and_(Client.first_session == 4, File.recording_id == 1))))
+      if( world_second == True):
+        q = q.filter(or_( and_(Client.second_session != 4, File.session_id == Client.second_session),
+                          or_( and_(Client.first_session == 4, and_(File.session_id == 4, File.recording_id == 2)),
+                               and_(Client.second_session == 4, and_(File.session_id == 4, File.recording_id == 1)))))
+      if( world_third == True):
+        q = q.filter(or_( and_(Client.third_session != 4, File.session_id == Client.third_session),
+                          or_( and_(Client.second_session == 4, and_(File.session_id == 4, File.recording_id == 2)),
+                               and_(Client.third_session == 4, and_(File.session_id == 4, File.recording_id == 1)))))
+      if( world_fourth == True):
+        q = q.filter(or_( and_(Client.fourth_session != 4, File.session_id == Client.fourth_session),
+                          or_( and_(Client.third_session == 4, and_(File.session_id == 4, File.recording_id == 2)),
+                               and_(Client.fourth_session == 4, and_(File.session_id == 4, File.recording_id == 1)))))
       q = q.order_by(File.client_id, File.session_id, FileMultiview.shot_id)
       for k in q:
         retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
@@ -391,7 +453,9 @@ class Database(object):
 
   def files(self, directory=None, extension=None, protocol=None,
       purposes=None, model_ids=None, groups=None, classes=None, subworld=None,
-      expressions=None, world_sampling=1, world_noflash=False, world_first=False):
+      expressions=None, world_sampling=1, world_noflash=False, 
+      world_first=False, world_second=False, world_third=False, world_fourth=False,
+      world_nshots=None, world_shots=None):
     """Returns a set of filenames for the specific query by the user.
 
     Keyword Parameters:
@@ -417,9 +481,9 @@ class Database(object):
       the model_ids is performed.
 
     groups
-      One of the groups ('dev', 'eval', 'world') or a tuple with several of
-      them.  If 'None' is given (this is the default), it is considered the
-      same as a tuple with all possible values.
+      One of the groups ('dev', 'eval', 'world') or a tuple with several of them. 
+      If 'None' is given (this is the default), it is considered the same as a 
+      tuple with all possible values.
 
     classes
       The classes (types of accesses) to be retrieved ('client', 'impostor') 
@@ -434,16 +498,35 @@ class Database(object):
 
     world_sampling
       Samples the files from the world data set. Keeps only files such as:
-      File.client_id + File.shot_id % world_sampling == 0. This argument should
-      be an integer between 1 (keep everything) and 20.  It is not used if
-      world_noflash is also set.
+        File.client_id + File.shot_id % world_sampling == 0
+      This argument should be an integer between 1 (keep everything) and 20.
+      It is not used if world_noflash is also set.
+
+    world_nshots
+      Only considers the n first shots from the world data set.
+
+    world_shots
+      Only considers the shots with the given ids.
 
     world_noflash
-      Keeps the files from the world dataset recorded without flash (shots 1
-      and 19)
- 
-    world_first Only uses data from the first recorded session of each user of
-    the world dataset.
+      Keeps the files from the world dataset recorded without flash (shot 0)
+      
+    world_first
+      Only uses data from the first recorded session of each user of the world
+      dataset.
+
+    world_second
+      Only uses data from the second recorded session of each user of the world
+      dataset.
+
+    world_third
+      Only uses data from the third recorded session of each user of the world
+      dataset.
+
+    world_fourth
+      Only uses data from the fourth recorded session of each user of the world
+      dataset.
+
 
     Returns: A dictionary containing the resolved filenames considering all
     the filtering criteria. The keys of the dictionary are unique identities 
@@ -452,7 +535,7 @@ class Database(object):
     """
 
     retval = {}
-    d = self.objects(directory, extension, protocol, purposes, model_ids, groups, classes, subworld, expressions, world_sampling, world_noflash, world_first)
+    d = self.objects(directory, extension, protocol, purposes, model_ids, groups, classes, subworld, expressions, world_sampling, world_noflash, world_first, world_second, world_third, world_fourth, world_nshots, world_shots)
     for k in d: retval[k] = d[k][0]
 
     return retval
@@ -494,7 +577,6 @@ class Database(object):
       - 2: the claimed id attached to the model
       - 3: the real id
       - 4: the "stem" path (basename of the file)
-
     considering allthe filtering criteria. The keys of the dictionary are 
     unique identities for each file in the Multi-PIE database. Conserve these 
     numbers if you wish to save processing results later on.
@@ -545,7 +627,6 @@ class Database(object):
       - 2: the claimed id attached to the model
       - 3: the real id
       - 4: the "stem" path (basename of the file)
-
     considering allthe filtering criteria. The keys of the dictionary are 
     unique identities for each file in the Multi-PIE database. Conserve these 
     numbers if you wish to save processing results later on.
@@ -590,7 +671,6 @@ class Database(object):
       - 0: the resolved filenames 
       - 1: the client id
       - 2: the "stem" path (basename of the file)
-
     considering allthe filtering criteria. The keys of the dictionary are 
     unique identities for each file in the Multi-PIE database. Conserve these
     numbers if you wish to save processing results later on.
@@ -645,7 +725,6 @@ class Database(object):
       - 0: the resolved filenames 
       - 1: the client id
       - 2: the "stem" path (basename of the file)
-
     considering allthe filtering criteria. The keys of the dictionary are 
     unique identities for each file in the Multi-PIE database. Conserve these 
     numbers if you wish to save processing results later on.

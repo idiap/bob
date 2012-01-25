@@ -721,30 +721,10 @@ void train::JFABaseTrainer::updateY_i(const int id)
   // m_tmp_rv = m_cache_VtSigmaInv * m_cache_Fn_y_i = Vt*diag(sigma)^-1 * sum_{sessions h}(N_{i,h}*(o_{i,h} - m - D*z_{i} - U*x_{i,h})
   bob::math::prod(m_cache_VtSigmaInv, m_cache_Fn_y_i, m_tmp_rv); 
   bob::math::prod(m_cache_IdPlusVProd_i, m_tmp_rv, y);
-
-  // Needs to return values to be accumulated for estimating V
-  blitz::firstIndex i;
-  blitz::secondIndex j;
-  m_tmp_rvrv.resize(m_jfa_machine.getDimRv(),m_jfa_machine.getDimRv());
-  m_tmp_rvrv = m_cache_IdPlusVProd_i;
-  m_tmp_rvrv += y(i) * y(j); 
-  for(int c=0; c<m_jfa_machine.getDimC(); ++c)
-  {
-    blitz::Array<double,2> A1_y_c = m_cache_A1_y(c,blitz::Range::all(),blitz::Range::all());
-    A1_y_c += m_tmp_rvrv * m_Nacc[id](c);
-  }
-  m_cache_A2_y += m_cache_Fn_y_i(i) * y(j);
-  //m_cache_A1_y += y(i) * y(j) + m_cache_IdPlusVProd_i(i,j);
-  //m_cache_A2_y += m_cache_Fn_y_i(i) * y(j);
 }
 
 void train::JFABaseTrainer::updateY()
 {
-  // Initialize the cache accumulator
-  m_cache_A1_y.resize(m_jfa_machine.getDimC(),m_jfa_machine.getDimRv(),m_jfa_machine.getDimRv());
-  m_cache_A2_y.resize(m_jfa_machine.getDimCD(),m_jfa_machine.getDimRv());
-  m_cache_A1_y = 0.;
-  m_cache_A2_y = 0.;
   // Precompute Vt*diag(sigma)^-1
   computeVtSigmaInv();
   computeVProd();
@@ -758,6 +738,33 @@ void train::JFABaseTrainer::updateY()
 
 void train::JFABaseTrainer::updateV()
 {  
+  // Initialize the cache accumulator
+  m_cache_A1_y.resize(m_jfa_machine.getDimC(),m_jfa_machine.getDimRv(),m_jfa_machine.getDimRv());
+  m_cache_A2_y.resize(m_jfa_machine.getDimCD(),m_jfa_machine.getDimRv());
+  m_cache_A1_y = 0.;
+  m_cache_A2_y = 0.;
+  // Loop over all people
+  blitz::firstIndex i;
+  blitz::secondIndex j;
+  m_tmp_rvrv.resize(m_jfa_machine.getDimRv(),m_jfa_machine.getDimRv());
+  for(size_t id=0; id<m_Nacc.size(); ++id) {
+    computeIdPlusVProd_i(id);
+    computeFn_y_i(id);
+
+    // Needs to return values to be accumulated for estimating V
+    blitz::Array<double,1> y = m_y[id];
+    m_tmp_rvrv = m_cache_IdPlusVProd_i;
+    m_tmp_rvrv += y(i) * y(j); 
+    for(int c=0; c<m_jfa_machine.getDimC(); ++c)
+    {
+      blitz::Array<double,2> A1_y_c = m_cache_A1_y(c,blitz::Range::all(),blitz::Range::all());
+      A1_y_c += m_tmp_rvrv * m_Nacc[id](c);
+    }
+    m_cache_A2_y += m_cache_Fn_y_i(i) * y(j);
+    //m_cache_A1_y += y(i) * y(j) + m_cache_IdPlusVProd_i(i,j);
+    //m_cache_A2_y += m_cache_Fn_y_i(i) * y(j);
+  }
+ 
   int dim = m_jfa_machine.getDimD();
   m_tmp_rvrv.resize(m_jfa_machine.getDimRv(), m_jfa_machine.getDimRv());
   for(int c=0; c<m_jfa_machine.getDimC(); ++c)
@@ -849,29 +856,10 @@ void train::JFABaseTrainer::updateX_ih(const int id, const int h)
   // m_tmp_ru = m_cache_UtSigmaInv * m_cache_Fn_x_ih = Ut*diag(sigma)^-1 * N_{i,h}*(o_{i,h} - m - D*z_{i} - V*y_{i})
   bob::math::prod(m_cache_UtSigmaInv, m_cache_Fn_x_ih, m_tmp_ru); 
   bob::math::prod(m_cache_IdPlusUProd_ih, m_tmp_ru, x);
-
-  // Needs to return values to be accumulated for estimating U
-  blitz::firstIndex i;
-  blitz::secondIndex j; 
-  m_tmp_ruru = m_cache_IdPlusUProd_ih;
-  m_tmp_ruru += x(i) * x(j); 
-  for(int c=0; c<m_jfa_machine.getDimC(); ++c)
-  {
-    blitz::Array<double,2> A1_x_c = m_cache_A1_x(c,blitz::Range::all(),blitz::Range::all());
-    A1_x_c += m_tmp_ruru * m_N[id](c,h);
-  }
-  m_cache_A2_x += m_cache_Fn_x_ih(i) * x(j);
-  //m_cache_A1_x += x(i) * x(j) + m_cache_IdPlusUProd_ih(i,j);
-  //m_cache_A2_x += m_cache_Fn_x_ih(i) * x(j);
 }
 
 void train::JFABaseTrainer::updateX()
 {
-  // Initialize the cache accumulator
-  m_cache_A1_x.resize(m_jfa_machine.getDimC(),m_jfa_machine.getDimRu(),m_jfa_machine.getDimRu());
-  m_cache_A2_x.resize(m_jfa_machine.getDimCD(),m_jfa_machine.getDimRu());
-  m_cache_A1_x = 0.;
-  m_cache_A2_x = 0.;
   // Precompute Ut*diag(sigma)^-1
   computeUtSigmaInv();
   computeUProd();
@@ -888,6 +876,35 @@ void train::JFABaseTrainer::updateX()
 
 void train::JFABaseTrainer::updateU()
 {
+  // Initialize the cache accumulator
+  m_cache_A1_x.resize(m_jfa_machine.getDimC(),m_jfa_machine.getDimRu(),m_jfa_machine.getDimRu());
+  m_cache_A2_x.resize(m_jfa_machine.getDimCD(),m_jfa_machine.getDimRu());
+  m_cache_A1_x = 0.;
+  m_cache_A2_x = 0.;
+  // Loop over all people
+  blitz::firstIndex i;
+  blitz::secondIndex j; 
+  for(size_t id=0; id<m_N.size(); ++id) {
+    int n_session_i = m_x[id].extent(1);
+    for(int h=0; h<n_session_i; ++h) {
+      computeIdPlusUProd_ih(id, h);
+      computeFn_x_ih(id, h);
+
+      // Needs to return values to be accumulated for estimating U
+      blitz::Array<double,1> x = m_x[id](blitz::Range::all(), h);
+      m_tmp_ruru = m_cache_IdPlusUProd_ih;
+      m_tmp_ruru += x(i) * x(j); 
+      for(int c=0; c<m_jfa_machine.getDimC(); ++c)
+      {
+        blitz::Array<double,2> A1_x_c = m_cache_A1_x(c,blitz::Range::all(),blitz::Range::all());
+        A1_x_c += m_tmp_ruru * m_N[id](c,h);
+      }
+      m_cache_A2_x += m_cache_Fn_x_ih(i) * x(j);
+      //m_cache_A1_x += x(i) * x(j) + m_cache_IdPlusUProd_ih(i,j);
+      //m_cache_A2_x += m_cache_Fn_x_ih(i) * x(j);
+    }
+  }
+
   //bob::math::inv(m_cache_A1_x, m_tmp_ruru);
   //blitz::Array<double,2>& U = m_jfa_machine.updateU();
   //bob::math::prod(m_cache_A2_x, m_tmp_ruru, U);
@@ -969,25 +986,10 @@ void train::JFABaseTrainer::updateZ_i(const int id)
   m_tmp_CD.resize(m_jfa_machine.getDimCD());
   // m_tmp_CD = m_cache_DtSigmaInv * m_cache_Fn_z_i = Dt*diag(sigma)^-1 * sum_{sessions h}(N_{i,h}*(o_{i,h} - m - V*y_{i} - U*x_{i,h})
   z = m_cache_IdPlusDProd_i * m_cache_DtSigmaInv * m_cache_Fn_z_i; 
-
-  // Needs to return values to be accumulated for estimating D
-  blitz::firstIndex i;
-  blitz::secondIndex j; 
-  m_tmp_CD.resize(m_jfa_machine.getDimCD());
-  bob::core::repelem(m_Nacc[id], m_tmp_CD);
-  m_cache_A1_z += (m_cache_IdPlusDProd_i + z * z) * m_tmp_CD;
-  m_cache_A2_z += m_cache_Fn_z_i * z;
-  //m_cache_A1_z += z(i) * z(j) + m_tmp_CD(i,j);
-  //m_cache_A2_z += m_cache_Fn_z_i(i) * z(j);
 }
 
 void train::JFABaseTrainer::updateZ()
 {
-  // Initialize the cache accumulator
-  m_cache_A1_z.resize(m_jfa_machine.getDimCD());
-  m_cache_A2_z.resize(m_jfa_machine.getDimCD());
-  m_cache_A1_z = 0.;
-  m_cache_A2_z = 0.;
   // Precompute Dt*diag(sigma)^-1
   computeDtSigmaInv();
   computeDProd();
@@ -1001,6 +1003,28 @@ void train::JFABaseTrainer::updateZ()
 
 void train::JFABaseTrainer::updateD()
 {
+  // Initialize the cache accumulator
+  m_cache_A1_z.resize(m_jfa_machine.getDimCD());
+  m_cache_A2_z.resize(m_jfa_machine.getDimCD());
+  m_cache_A1_z = 0.;
+  m_cache_A2_z = 0.;
+  // Loop over all people
+  blitz::firstIndex i;
+  blitz::secondIndex j; 
+  m_tmp_CD.resize(m_jfa_machine.getDimCD());
+  for(size_t id=0; id<m_Nacc.size(); ++id) {
+    computeIdPlusDProd_i(id);
+    computeFn_z_i(id);
+
+    // Needs to return values to be accumulated for estimating D
+    blitz::Array<double,1> z = m_z[id];
+    bob::core::repelem(m_Nacc[id], m_tmp_CD);
+    m_cache_A1_z += (m_cache_IdPlusDProd_i + z * z) * m_tmp_CD;
+    m_cache_A2_z += m_cache_Fn_z_i * z;
+    //m_cache_A1_z += z(i) * z(j) + m_tmp_CD(i,j);
+    //m_cache_A2_z += m_cache_Fn_z_i(i) * z(j);
+  } 
+
   blitz::Array<double,1>& d = m_jfa_machine.updateD();
   d = m_cache_A2_z / m_cache_A1_z;
 /*
@@ -1177,10 +1201,11 @@ void train::JFABaseTrainer::trainISV(const std::vector<blitz::Array<double,2> >&
 
   initializeRandomU();
   initializeVD_ISV(relevance_factor);
-  initializeXYZ();
 
   for(size_t i=0; i<n_iter; ++i) {
+    initializeXYZ();
     updateX();
+    updateZ();
     updateU();
   }
 }
@@ -1225,10 +1250,11 @@ void train::JFABaseTrainer::trainISVNoInit(const std::vector<blitz::Array<double
   precomputeSumStatisticsF();
 
   initializeVD_ISV(relevance_factor);
-  initializeXYZ();
 
   for(size_t i=0; i<n_iter; ++i) {
+    initializeXYZ();
     updateX();
+    updateZ();
     updateU();
   }
 }

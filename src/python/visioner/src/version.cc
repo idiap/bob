@@ -35,7 +35,7 @@ static tuple qt4_version() {
 #ifdef HAVE_QT4
   return make_tuple(str(QT_VERSION_STR), str(QT_PACKAGEDATE_STR));
 #else
-  return str("unavailable");
+  return make_tuple(str("unavailable"), str("unknown"));
 #endif
 }
 

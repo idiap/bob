@@ -53,6 +53,7 @@ void bind_ip_spatiotempgrad();
 
 #if defined(HAVE_VLFEAT)
 void bind_ip_vlsift();
+void bind_ip_vldsift();
 #endif
 
 BOOST_PYTHON_MODULE(libpybob_ip) {
@@ -89,5 +90,6 @@ BOOST_PYTHON_MODULE(libpybob_ip) {
   bind_ip_spatiotempgrad();
 #if defined(HAVE_VLFEAT)
   bind_ip_vlsift();
+  bind_ip_vldsift();
 #endif
 }
