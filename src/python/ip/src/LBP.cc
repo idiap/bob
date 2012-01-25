@@ -167,7 +167,7 @@ void bind_ip_lbp_new() {
     .def("__call__", &call_inout<ip::LBP4R>, (arg("self"), arg("input"), arg("output")), "Call an object of this type to extract LBP4R features.")
     .def("__call__", &call_pos<ip::LBP4R>, (arg("self"), arg("input"), arg("y"), arg("x")), "Call an object of this type to extract LBP4R features.")
     .def("__call__", &call_alloc<ip::LBP4R>, (arg("self"), arg("input")), "Call an object of this type to extract LBP4R features.")
-    .def("getLBPShape", &get_shape<ip::LBP4R>, (arg("self"), arg("input")), "Get the expected size of the output when extracting LBP4R features.")
+    .def("getLBPShape", &get_shape<ip::LBP4R>, (arg("self"), arg("input")), "Get a tuple containing the expected size of the output when extracting LBP4R features.")
     ;
 
   class_<ip::LBP8R, boost::shared_ptr<ip::LBP8R>, bases<ip::LBP> >("LBP8R", lbp8r_doc, init<optional<const double, const bool, const bool, const bool, const bool, const bool> >((arg("R")=1.0,arg("circular")=false,arg("to_average")=false,arg("add_average_bit")=false,arg("uniform")=false, arg("rotation_invariant")=false), "Construct a new LBP8R object"))
@@ -175,7 +175,7 @@ void bind_ip_lbp_new() {
     .def("__call__", &call_inout<ip::LBP8R>, (arg("self"), arg("input"), arg("output")), "Call an object of this type to extract LBP8R features.")
     .def("__call__", &call_pos<ip::LBP8R>, (arg("self"), arg("input"), arg("y"), arg("x")), "Call an object of this type to extract LBP8R features.")
     .def("__call__", &call_alloc<ip::LBP8R>, (arg("self"), arg("input")), "Call an object of this type to extract LBP8R features.")
-    .def("getLBPShape", &get_shape<ip::LBP8R>, (arg("self"), arg("input")), "Get the expected size of the output when extracting LBP8R features.")
+    .def("getLBPShape", &get_shape<ip::LBP8R>, (arg("self"), arg("input")), "Get a tuple containing the expected size of the output when extracting LBP8R features.")
     ;
 
   class_<ip::LBPTopOperator, boost::shared_ptr<ip::LBPTopOperator> >("LBPTopOperator",
