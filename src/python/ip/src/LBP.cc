@@ -86,8 +86,7 @@ static object inner_call_alloc (O& op, tp::const_ndarray input) {
 }
 
 template <typename O>
-static object call_alloc (O& op, tp::const_ndarray input,
-    tp::ndarray output) {
+static object call_alloc (O& op, tp::const_ndarray input) {
   switch(input.type().dtype) {
     case ca::t_uint8: return inner_call_alloc<O,uint8_t>(op, input);
     case ca::t_uint16: return inner_call_alloc<O,uint16_t>(op, input);
