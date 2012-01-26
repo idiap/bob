@@ -4,6 +4,10 @@ cmake_minimum_required(VERSION 2.6)
 # This defines the dependencies of this package
 set(deps "") #other bob subprojects
 set(shared "${Boost_SYSTEM_LIBRARY_RELEASE};${Boost_THREAD_LIBRARY_RELEASE};${Boost_FILESYSTEM_LIBRARY_RELEASE};${Boost_IOSTREAMS_LIBRARY_RELEASE};${Boost_DATE_TIME_LIBRARY_RELEASE};${cblas_LIBRARIES};${Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE}")
+# also add a dependency to Blitz in debug mode (needed to enable the -BZ_BLITZ debugging mode)
+if("${CMAKE_BUILD_TYPE}" STREQUAL "debug")
+  set(shared ${shared} ${Blitz_LIBRARIES})
+ endif("${CMAKE_BUILD_TYPE}" STREQUAL "debug")
 
 # If we have google-perftools installed, enable the HAS_GOOGLE_PERFTOOLS flag,
 # so profiling extensions can be compiled in.
