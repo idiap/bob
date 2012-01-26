@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "math/svd.h"
+#include "math/Exception.h"
 #include "core/array_assert.h"
 #include "core/array_check.h"
 
@@ -92,6 +93,10 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   dgesvd_( &jobu, &jobvt, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
     VT_lapack, &ldvt, work, &lwork, &info );
  
+  // Check info variable
+  if( info != 0)
+    throw bob::math::LapackError("The LAPACK dgsevd function returned a non-zero value.");
+
   // Copy singular vectors back to U and V (column-major order)
   for(int j=0; j<M; ++j)
     for(int i=0; i<M; ++i)
@@ -176,6 +181,10 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   dgesvd_( &jobu, &jobvt, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
     VT_lapack, &ldvt, work, &lwork, &info );
  
+  // Check info variable
+  if( info != 0)
+    throw bob::math::LapackError("The LAPACK dgsevd function returned a non-zero value.");
+
   // Copy singular vectors back to U and V (column-major order)
   for(int j=0; j<M; ++j)
     for(int i=0; i<nb_singular; ++i)
