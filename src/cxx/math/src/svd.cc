@@ -19,7 +19,7 @@
  */
 #include "math/svd.h"
 #include "core/array_assert.h"
-#include "core/array_old.h"
+#include "core/array_check.h"
 
 namespace math = bob::math;
 
@@ -81,7 +81,7 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
     for(int i=0; i<N; ++i)
       A_lapack[j+i*M] = A(j,i);
   double *S_lapack;
-  bool sigma_direct_use = checkSafedata(sigma);
+  bool sigma_direct_use = bob::core::array::isCZeroBaseContiguous(sigma);
   if( !sigma_direct_use )
     S_lapack = new double[nb_singular];
   else
@@ -165,7 +165,7 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
     for(int i=0; i<N; ++i)
       A_lapack[j+i*M] = A(j,i);
   double *S_lapack;
-  bool sigma_direct_use = checkSafedata(sigma);
+  bool sigma_direct_use = bob::core::array::isCZeroBaseContiguous(sigma);
   if( !sigma_direct_use )
     S_lapack = new double[nb_singular];
   else

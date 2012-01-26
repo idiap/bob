@@ -20,7 +20,7 @@
 #include "math/eig.h"
 #include "math/Exception.h"
 #include "core/array_assert.h"
-#include "core/array_old.h"
+#include "core/array_check.h"
 #if !defined (HAVE_BLITZ_TINYVEC2_H)
 #include <blitz/tinyvec-et.h>
 #endif
@@ -86,7 +86,7 @@ void math::eigSymReal_(const blitz::Array<double,2>& A,
     for(int i=0; i<N; ++i)
       A_lapack[j+i*N] = A(j,i);
   double *D_lapack;
-  bool D_direct_use = checkSafedata(D);
+  bool D_direct_use = bob::core::array::isCZeroBaseContiguous(D);
   if( !D_direct_use )
     D_lapack = new double[N];
   else
@@ -167,7 +167,7 @@ void math::eigSym_(const blitz::Array<double,2>& A, const blitz::Array<double,2>
       B_lapack[j+i*N] = B(j,i);
     }
   double *D_lapack;
-  bool D_direct_use = checkSafedata(D);
+  bool D_direct_use = bob::core::array::isCZeroBaseContiguous(D);
   if( !D_direct_use )
     D_lapack = new double[N];
   else

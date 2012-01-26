@@ -21,7 +21,6 @@
 #include "math/lu_det.h"
 #include "math/Exception.h"
 #include "core/array_assert.h"
-#include "core/array_old.h"
 #if !defined (HAVE_BLITZ_TINYVEC2_H)
 #include <blitz/tinyvec-et.h>
 #endif
