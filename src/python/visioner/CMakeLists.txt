@@ -12,27 +12,13 @@ include(../../cmake/macros.cmake)
 bob_python_bindings(visioner "${pysrc}" "core" "bob_visioner")
 
 # The visioner expects a flat directory structure
-get_target_property(save pybob_visioner COMPILE_FLAGS)
-if(NOT save)
-  set(save "")
-endif(NOT save)
-set(baseinc ${CMAKE_INSTALL_PREFIX}/include/bob/visioner)
-set_target_properties(pybob_visioner PROPERTIES COMPILE_FLAGS "${save} -I${baseinc}/vision -I${baseinc}/ml -I${baseinc}/proc -I${baseinc}/util")
-
-# Specially for these bindings, we will have to find libbob_visioner which
-# comes from an external build.
-get_target_property(save pybob_visioner LINK_FLAGS)
-if(NOT save)
-  set(save "")
-endif(NOT save)
-set(baselib ${CMAKE_INSTALL_PREFIX}/lib)
-set_target_properties(pybob_visioner PROPERTIES LINK_FLAGS "${save} -L${baselib}")
+include_directories(${VISIONER_INCLUDE_DIRS})
 
 # Visioner depends on Qt4
 include (${QT_USE_FILE})
 include_directories(SYSTEM ${QT_INCLUDES})
 
-add_dependencies(pybob_visioner python-core_header_install)
+add_dependencies(pybob_visioner visioner python-core_header_install)
 target_link_libraries(pybob_visioner pybob_core_ndarray)
 
 bob_python_install(visioner)

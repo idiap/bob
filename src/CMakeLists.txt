@@ -84,6 +84,10 @@ include_directories(${CMAKE_INSTALL_PREFIX}/include/bob)
 add_definitions("-DHAVE_LBFGS=1")
 
 if (BOB_CXX)
+  if (QT4_FOUND)
+    add_library(bob_visioner SHARED IMPORTED)
+  endif ()
+
   add_subdirectory(cxx)
 endif (BOB_CXX)
 if (BOB_PYTHON)
