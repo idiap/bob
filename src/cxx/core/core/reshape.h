@@ -50,8 +50,8 @@ namespace bob {
      * only in scenarios where you have previously checked conformity and is
      * focused only on speed.
      */
-    template<typename T> 
-    void reshape_(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst) 
+    template<typename T>
+    void reshape_(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
     {
       int is=0;
       int js=0;
@@ -60,7 +60,7 @@ namespace bob {
         {
           dst(i,j) = src(is,js);
           ++is;
-          if(is>=src.extent(0)) 
+          if(is>=src.extent(0))
           {
             ++js;
             is=0;
@@ -76,8 +76,8 @@ namespace bob {
      * raise an appropriate exception if that is not cased. If you know that the
      * input and output matrices conform, use the reshape_() variant.
      */
-    template<typename T> 
-    void reshape(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst) 
+    template<typename T>
+    void reshape(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
     {
       bob::core::array::assertZeroBase(src);
       bob::core::array::assertZeroBase(dst);
@@ -94,8 +94,8 @@ namespace bob {
      * only in scenarios where you have previously checked conformity and is
      * focused only on speed.
      */
-    template<typename T> 
-    void reshape_(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst) 
+    template<typename T>
+    void reshape_(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst)
     {
       int n_blocks = src.extent(1);
       int size_block = src.extent(0);
@@ -115,8 +115,8 @@ namespace bob {
      * raise an appropriate exception if that is not cased. If you know that the
      * input and output matrices conform, use the reshape_() variant.
      */
-    template<typename T> 
-    void reshape(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst) 
+    template<typename T>
+    void reshape(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst)
     {
       bob::core::array::assertZeroBase(src);
       bob::core::array::assertZeroBase(dst);
@@ -133,7 +133,7 @@ namespace bob {
      * only in scenarios where you have previously checked conformity and is
      * focused only on speed.
      */
-    template<typename T> 
+    template<typename T>
     void reshape_(const blitz::Array<T,1>& src, blitz::Array<T,2>& dst)
     {
       int n_blocks = dst.extent(1);
@@ -154,13 +154,13 @@ namespace bob {
      * raise an appropriate exception if that is not cased. If you know that the
      * input and output matrices conform, use the reshape_() variant.
      */
-    template<typename T> 
-    void reshape(const blitz::Array<T,1>& src, blitz::Array<T,2>& dst) 
+    template<typename T>
+    void reshape(const blitz::Array<T,1>& src, blitz::Array<T,2>& dst)
     {
       bob::core::array::assertZeroBase(src);
       bob::core::array::assertZeroBase(dst);
       bob::core::ReshapeDifferentNumberOfElements(
-        src.extent(0)*src.extent(1), dst.extent(0));
+        src.extent(0), dst.extent(0)*dst.extent(1));
       reshape_(src, dst);
     }
 
