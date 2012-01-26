@@ -22,8 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_MATH_NORMINV_H
-#define BOB5SPRO_MATH_NORMINV_H
+#ifndef BOB_MATH_NORMINV_H
+#define BOB_MATH_NORMINV_H
 
 namespace bob {
 /**
@@ -67,4 +67,4 @@ namespace bob {
  */
 }
 
-#endif /* BOB5SPRO_MATH_NORMINV_H */
+#endif /* BOB_MATH_NORMINV_H */

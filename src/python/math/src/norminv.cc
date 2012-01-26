@@ -31,7 +31,6 @@ static const char* NORMINV_DOC = "Compute the inverse normal cumulative distribu
 
 void bind_math_norminv()
 {
-  // Linear system solver
   def("normsinv", (double (*)(const double))&bob::math::normsinv, (arg("p")), NORMSINV_DOC);
   def("norminv", (double (*)(const double, const double, const double))&bob::math::norminv, (arg("p"), arg("mu"), arg("sigma")), NORMINV_DOC);
 }
