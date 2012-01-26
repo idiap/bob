@@ -29,6 +29,7 @@
 #include <algorithm>
 
 namespace math = bob::math;
+namespace ca = bob::core::array;
 
 // Declaration of the external LAPACK functions
 // Eigenvalue decomposition of real symmetric matrix (dsyev)
@@ -51,13 +52,13 @@ void math::eigSymReal(const blitz::Array<double,2>& A,
   int N = A.extent(0);
   const blitz::TinyVector<int,1> shape1(N);
   const blitz::TinyVector<int,2> shape2(N,N);
-  bob::core::array::assertZeroBase(A);
-  bob::core::array::assertZeroBase(V);
-  bob::core::array::assertZeroBase(D);
+  ca::assertZeroBase(A);
+  ca::assertZeroBase(V);
+  ca::assertZeroBase(D);
 
-  bob::core::array::assertSameShape(A,shape2);
-  bob::core::array::assertSameShape(A,V);
-  bob::core::array::assertSameShape(D,shape1);
+  ca::assertSameShape(A,shape2);
+  ca::assertSameShape(V,shape2);
+  ca::assertSameShape(D,shape1);
 
   math::eigSymReal_(A, V, D);
 }
@@ -86,7 +87,7 @@ void math::eigSymReal_(const blitz::Array<double,2>& A,
     for(int i=0; i<N; ++i)
       A_lapack[j+i*N] = A(j,i);
   double *D_lapack;
-  bool D_direct_use = bob::core::array::isCZeroBaseContiguous(D);
+  bool D_direct_use = ca::isCZeroBaseContiguous(D);
   if( !D_direct_use )
     D_lapack = new double[N];
   else
@@ -124,15 +125,15 @@ void math::eigSym(const blitz::Array<double,2>& A, const blitz::Array<double,2>&
   int N = A.extent(0);
   const blitz::TinyVector<int,1> shape1(N);
   const blitz::TinyVector<int,2> shape2(N,N);
-  bob::core::array::assertZeroBase(A);
-  bob::core::array::assertZeroBase(B);
-  bob::core::array::assertZeroBase(V);
-  bob::core::array::assertZeroBase(D);
+  ca::assertZeroBase(A);
+  ca::assertZeroBase(B);
+  ca::assertZeroBase(V);
+  ca::assertZeroBase(D);
 
-  bob::core::array::assertSameShape(A,shape2);
-  bob::core::array::assertSameShape(B,shape2);
-  bob::core::array::assertSameShape(A,V);
-  bob::core::array::assertSameShape(D,shape1);
+  ca::assertSameShape(A,shape2);
+  ca::assertSameShape(B,shape2);
+  ca::assertSameShape(V,shape2);
+  ca::assertSameShape(D,shape1);
 
   math::eigSym_(A, B, V, D);
 }
@@ -167,7 +168,7 @@ void math::eigSym_(const blitz::Array<double,2>& A, const blitz::Array<double,2>
       B_lapack[j+i*N] = B(j,i);
     }
   double *D_lapack;
-  bool D_direct_use = bob::core::array::isCZeroBaseContiguous(D);
+  bool D_direct_use = ca::isCZeroBaseContiguous(D);
   if( !D_direct_use )
     D_lapack = new double[N];
   else
@@ -220,15 +221,15 @@ void math::eig(const blitz::Array<double,2>& A, const blitz::Array<double,2>& B,
   int N = A.extent(0);
   const blitz::TinyVector<int,1> shape1(N);
   const blitz::TinyVector<int,2> shape2(N,N);
-  bob::core::array::assertZeroBase(A);
-  bob::core::array::assertZeroBase(B);
-  bob::core::array::assertZeroBase(V);
-  bob::core::array::assertZeroBase(D);
+  ca::assertZeroBase(A);
+  ca::assertZeroBase(B);
+  ca::assertZeroBase(V);
+  ca::assertZeroBase(D);
 
-  bob::core::array::assertSameShape(A,shape2);
-  bob::core::array::assertSameShape(B,shape2);
-  bob::core::array::assertSameShape(A,V);
-  bob::core::array::assertSameShape(D,shape1);
+  ca::assertSameShape(A,shape2);
+  ca::assertSameShape(B,shape2);
+  ca::assertSameShape(V,shape2);
+  ca::assertSameShape(D,shape1);
 
   math::eig_(A, B, V, D);
 }
@@ -281,8 +282,8 @@ void math::eig_(const blitz::Array<double,2>& A, const blitz::Array<double,2>& B
   // AA: Re-ordering using std::vector<std::pair<value, index> >
   std::vector<std::pair<double, int> > eigv_index(N);
   for(int i=0; i<N; ++i) {
-    // TODO: Check that alphai is zero (otherwise complex eigenvalue)
-    if( alphai[i]>1e-12 )
+    // Check if alphai is zero (otherwise complex eigenvalue)
+    if( fabs(alphai[i])>1e-12 )
       throw bob::math::LapackError("The LAPACK dggev function returned a \
         non-real (i.e. complex) eigenvalue.");
     eigv_index[i].first = alphar[i] / beta[i];
