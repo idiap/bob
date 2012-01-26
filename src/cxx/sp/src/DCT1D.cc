@@ -25,7 +25,6 @@
 #include "core/array_assert.h"
 #include <fftw3.h>
 
-
 namespace tca = bob::core::array;
 namespace sp = bob::sp;
 
@@ -99,8 +98,11 @@ void sp::DCT1D::operator()(const blitz::Array<double,1>& src,
 
   // Normalize
   dst(0) *= m_sqrt_1byl/2.;
-  blitz::Range r_dst(1, dst.ubound(0) );
-  dst(r_dst) *= m_sqrt_2byl/2.;
+  if(dst.extent(0)>1)
+  {
+    blitz::Range r_dst(1, dst.ubound(0) );
+    dst(r_dst) *= m_sqrt_2byl/2.;
+  }
 }
 
 
@@ -124,8 +126,11 @@ void sp::IDCT1D::operator()(const blitz::Array<double,1>& src,
 
   // Normalize
   dst(0) /= m_sqrt_1l;
-  blitz::Range r_dst(1, dst.ubound(0) );
-  dst(r_dst) /= m_sqrt_2l;
+  if(dst.extent(0)>1)
+  {
+    blitz::Range r_dst(1, dst.ubound(0) );
+    dst(r_dst) /= m_sqrt_2l;
+  }
 
   // Reinterpret cast to fftw format
   double* dst_ = dst.data();

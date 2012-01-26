@@ -86,8 +86,7 @@ static object inner_call_alloc (O& op, tp::const_ndarray input) {
 }
 
 template <typename O>
-static object call_alloc (O& op, tp::const_ndarray input,
-    tp::ndarray output) {
+static object call_alloc (O& op, tp::const_ndarray input) {
   switch(input.type().dtype) {
     case ca::t_uint8: return inner_call_alloc<O,uint8_t>(op, input);
     case ca::t_uint16: return inner_call_alloc<O,uint16_t>(op, input);
@@ -103,8 +102,7 @@ static object inner_get_shape (O& op, tp::const_ndarray input) {
 }
 
 template <typename O>
-static object get_shape (O& op, tp::const_ndarray input,
-    tp::ndarray output) {
+static object get_shape (O& op, tp::const_ndarray input) {
   switch(input.type().dtype) {
     case ca::t_uint8: return inner_get_shape<O,uint8_t>(op, input);
     case ca::t_uint16: return inner_get_shape<O,uint16_t>(op, input);
@@ -169,7 +167,7 @@ void bind_ip_lbp_new() {
     .def("__call__", &call_inout<ip::LBP4R>, (arg("self"), arg("input"), arg("output")), "Call an object of this type to extract LBP4R features.")
     .def("__call__", &call_pos<ip::LBP4R>, (arg("self"), arg("input"), arg("y"), arg("x")), "Call an object of this type to extract LBP4R features.")
     .def("__call__", &call_alloc<ip::LBP4R>, (arg("self"), arg("input")), "Call an object of this type to extract LBP4R features.")
-    .def("getLBPShape", &get_shape<ip::LBP4R>, (arg("self"), arg("input")), "Get the expected size of the output when extracting LBP4R features.")
+    .def("getLBPShape", &get_shape<ip::LBP4R>, (arg("self"), arg("input")), "Get a tuple containing the expected size of the output when extracting LBP4R features.")
     ;
 
   class_<ip::LBP8R, boost::shared_ptr<ip::LBP8R>, bases<ip::LBP> >("LBP8R", lbp8r_doc, init<optional<const double, const bool, const bool, const bool, const bool, const bool> >((arg("R")=1.0,arg("circular")=false,arg("to_average")=false,arg("add_average_bit")=false,arg("uniform")=false, arg("rotation_invariant")=false), "Construct a new LBP8R object"))
@@ -177,7 +175,7 @@ void bind_ip_lbp_new() {
     .def("__call__", &call_inout<ip::LBP8R>, (arg("self"), arg("input"), arg("output")), "Call an object of this type to extract LBP8R features.")
     .def("__call__", &call_pos<ip::LBP8R>, (arg("self"), arg("input"), arg("y"), arg("x")), "Call an object of this type to extract LBP8R features.")
     .def("__call__", &call_alloc<ip::LBP8R>, (arg("self"), arg("input")), "Call an object of this type to extract LBP8R features.")
-    .def("getLBPShape", &get_shape<ip::LBP8R>, (arg("self"), arg("input")), "Get the expected size of the output when extracting LBP8R features.")
+    .def("getLBPShape", &get_shape<ip::LBP8R>, (arg("self"), arg("input")), "Get a tuple containing the expected size of the output when extracting LBP8R features.")
     ;
 
   class_<ip::LBPTopOperator, boost::shared_ptr<ip::LBPTopOperator> >("LBPTopOperator",

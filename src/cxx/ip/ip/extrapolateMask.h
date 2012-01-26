@@ -20,13 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_IP_EXTRAPOLATE_MASK_H
-#define BOB5SPRO_IP_EXTRAPOLATE_MASK_H
+#ifndef BOB_IP_EXTRAPOLATE_MASK_H
+#define BOB_IP_EXTRAPOLATE_MASK_H
 
 #include <blitz/array.h>
 #include "core/array_assert.h"
-
-#include <iostream>
 
 namespace bob {
 /**
@@ -92,13 +90,16 @@ namespace bob {
       }
 
       // Extrapolate the rows
-      blitz::Range r_left(0,true_min_index-1);
-      blitz::Range r_right(true_max_index+1,src_mask.extent(1)-1);
-      for(int i=0; i<src_mask.extent(0); ++i)
+      if(true_min_index>0) 
       {
-        if(true_min_index>0)
+        blitz::Range r_left(0,true_min_index-1);
+        for(int i=0; i<src_mask.extent(0); ++i)
           img(i,r_left) = img(i,true_min_index);
-        if(true_max_index+1<src_mask.extent(1))
+      }   
+      if(true_max_index+1<src_mask.extent(1)) 
+      {
+        blitz::Range r_right(true_max_index+1,src_mask.extent(1)-1);
+        for(int i=0; i<src_mask.extent(0); ++i)
           img(i,r_right) = img(i,true_max_index);
       }
     }
@@ -109,4 +110,4 @@ namespace bob {
  */
 }
 
-#endif /* BOB5SPRO_IP_EXTRAPOLATE_MASK_H */
+#endif /* BOB_IP_EXTRAPOLATE_MASK_H */
