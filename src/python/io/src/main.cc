@@ -30,7 +30,10 @@ void bind_io_arrayset();
 void bind_io_hdf5();
 void bind_io_hdf5_extras();
 void bind_io_datetime();
+
+#ifdef HAVE_FFMPEG
 void bind_io_video();
+#endif
 
 BOOST_PYTHON_MODULE(libpybob_io) {
 
@@ -44,5 +47,8 @@ BOOST_PYTHON_MODULE(libpybob_io) {
   bind_io_hdf5();
   bind_io_hdf5_extras();
   bind_io_datetime();
+
+#ifdef HAVE_FFMPEG
   bind_io_video();
+#endif
 }

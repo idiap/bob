@@ -278,6 +278,13 @@ class LBPTest(unittest.TestCase):
         self.assertEqual(bool(table[i]), True)
     self.assertEqual(len(set(values)), len(set(table))+1)
 
+  def test10_shape(self):
+    lbp = bob.ip.LBP8R()
+    image = numpy.ndarray((3,3), dtype='uint8')
+    sh = lbp.getLBPShape(image)
+    self.assertEqual(sh, (1,1))
+    
+    
 if __name__ == '__main__':
   sys.argv.append('-v')
   if os.environ.has_key('BOB_PROFILE') and \
