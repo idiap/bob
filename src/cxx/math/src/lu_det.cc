@@ -27,6 +27,7 @@
 #include <algorithm>
 
 namespace math = bob::math;
+namespace ca = bob::core::array;
 
 // Declaration of the external LAPACK functions
 // LU decomposition of a general matrix (dgetrf)
@@ -47,14 +48,14 @@ void math::lu(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
   const blitz::TinyVector<int,2> shapeL(M,minMN);
   const blitz::TinyVector<int,2> shapeU(minMN,N);
   const blitz::TinyVector<int,2> shapeP(minMN,minMN);
-  bob::core::array::assertZeroBase(A);
-  bob::core::array::assertZeroBase(L);
-  bob::core::array::assertZeroBase(U);
-  bob::core::array::assertZeroBase(P);
+  ca::assertZeroBase(A);
+  ca::assertZeroBase(L);
+  ca::assertZeroBase(U);
+  ca::assertZeroBase(P);
 
-  bob::core::array::assertSameShape(L,shapeL);
-  bob::core::array::assertSameShape(U,shapeU);
-  bob::core::array::assertSameShape(P,shapeP);
+  ca::assertSameShape(L,shapeL);
+  ca::assertSameShape(U,shapeU);
+  ca::assertSameShape(P,shapeP);
 
   math::lu_(A, L, U, P);
 }
@@ -127,7 +128,7 @@ void math::lu_(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
 
 double math::det(const blitz::Array<double,2>& A)
 {
-  bob::core::array::assertSameDimensionLength(A.extent(0),A.extent(1));
+  ca::assertSameDimensionLength(A.extent(0),A.extent(1));
   return math::det_(A);
 }
 
@@ -169,11 +170,11 @@ void math::inv(const blitz::Array<double,2>& A, blitz::Array<double,2>& B)
   // Size variable
   int N = A.extent(0);
   const blitz::TinyVector<int,2> shapeA(N,N);
-  bob::core::array::assertZeroBase(A);
-  bob::core::array::assertZeroBase(B);
+  ca::assertZeroBase(A);
+  ca::assertZeroBase(B);
 
-  bob::core::array::assertSameShape(A,shapeA);
-  bob::core::array::assertSameShape(B,shapeA);
+  ca::assertSameShape(A,shapeA);
+  ca::assertSameShape(B,shapeA);
 
   math::inv_(A, B);
 }

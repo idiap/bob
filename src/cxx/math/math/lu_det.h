@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_MATH_LU_DET_H
-#define BOB5SPRO_MATH_LU_DET_H
+#ifndef BOB_MATH_LU_DET_H
+#define BOB_MATH_LU_DET_H
 
 #include <blitz/array.h>
 
@@ -70,4 +70,4 @@ namespace bob {
  */
 }
 
-#endif /* BOB5SPRO_MATH_LU_DET_H */
+#endif /* BOB_MATH_LU_DET_H */

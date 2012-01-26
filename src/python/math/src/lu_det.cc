@@ -3,7 +3,8 @@
  * @date Tue Jun 7 01:00:21 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * @brief Binds the LU Decomposition based on LAPACK into python.
+ * @brief Binds the LU Decomposition, determinant and matrix inversion
+ *   based on LAPACK into python.
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -54,19 +55,28 @@ static void lu_(tp::const_ndarray A, tp::ndarray L,
   math::lu_(A.bz<double,2>(), L_, U_, P_);
 }
 
-static tuple py_lu(const blitz::Array<double,2>& A) {
-  int M = A.extent(0);
-  int N = A.extent(1);
+static tuple py_lu(tp::const_ndarray A) {
+  const blitz::Array<double,2> A_ = A.bz<double,2>();
+  int M = A_.extent(0);
+  int N = A_.extent(1);
   int minMN = std::min(M,N);
-  const blitz::TinyVector<int,2> shapeL(M,minMN);
-  const blitz::TinyVector<int,2> shapeU(minMN,N);
-  const blitz::TinyVector<int,2> shapeP(minMN,minMN);
 
-  blitz::Array<double,2> L(shapeL);
-  blitz::Array<double,2> U(shapeU);
-  blitz::Array<double,2> P(shapeP);
-  math::lu(A, L, U, P);
+  tp::ndarray L(ca::t_float64, M, minMN);
+  tp::ndarray U(ca::t_float64, minMN, N);
+  tp::ndarray P(ca::t_float64, minMN, minMN);
+  blitz::Array<double,2> L_ = L.bz<double,2>();
+  blitz::Array<double,2> U_ = U.bz<double,2>();
+  blitz::Array<double,2> P_ = P.bz<double,2>();
+  math::lu(A_, L_, U_, P_);
   return make_tuple(L, U, P);
+}
+
+static double det(tp::const_ndarray A) {
+  return math::det(A.bz<double,2>());
+}
+
+static double det_(tp::const_ndarray A) {
+  return math::det_(A.bz<double,2>());
 }
 
 static void inv(tp::const_ndarray A, tp::ndarray B) {
@@ -79,10 +89,12 @@ static void inv_(tp::const_ndarray A, tp::ndarray B) {
   math::inv_(A.bz<double,2>(), B_);
 }
 
-static object py_inv(const blitz::Array<double,2>& A) {
-  blitz::Array<double,2> B(A.shape());
-  math::inv(A, B);
-  return object(B);
+static object py_inv(tp::const_ndarray A) {
+  const  blitz::Array<double,2> A_ = A.bz<double,2>();
+  tp::ndarray B(ca::t_float64, A_.extent(0), A_.extent(1));
+  blitz::Array<double,2> B_ = B.bz<double,2>();
+  math::inv(A_, B_);
+  return B.self();
 }
 
 void bind_math_lu_det() {
@@ -91,8 +103,8 @@ void bind_math_lu_det() {
   def("lu_", &lu_, (arg("A"), arg("L"), arg("U"), arg("P")), LU_DOC);
   def("lu", &py_lu, (arg("A")), LU_P_DOC);
   // Compute the determinant of a square matrix, based on an LU decomposition
-  def("det_", (double (*)(const blitz::Array<double,2>& A))&bob::math::det_, (arg("A")), DET_DOC);
-  def("det", (double (*)(const blitz::Array<double,2>& A))&bob::math::det, (arg("A")), DET_DOC);
+  def("det_", &det_, (arg("A")), DET_DOC);
+  def("det", &det, (arg("A")), DET_DOC);
   // Compute the inverse of a square matrix, based on an LU decomposition
   def("inv", &inv, (arg("A"), arg("B")), INV_DOC);
   def("inv_", &inv_, (arg("A"), arg("B")), INV_DOC);
