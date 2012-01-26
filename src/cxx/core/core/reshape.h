@@ -22,8 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_CORE_RESHAPE_H
-#define BOB5SPRO_CORE_RESHAPE_H
+#ifndef BOB_CORE_RESHAPE_H
+#define BOB_CORE_RESHAPE_H
 
 #include <limits>
 #include <blitz/array.h>
@@ -160,7 +160,7 @@ namespace bob {
       bob::core::array::assertZeroBase(src);
       bob::core::array::assertZeroBase(dst);
       bob::core::ReshapeDifferentNumberOfElements(
-        src.extent(0)*src.extent(1), dst.extent(0));
+        src.extent(0), dst.extent(0)*dst.extent(1));
       reshape_(src, dst);
     }
 
@@ -170,4 +170,4 @@ namespace bob {
  */
 }
 
-#endif /* BOB5SPRO_CORE_RESHAPE_H */
+#endif /* BOB_CORE_RESHAPE_H */
