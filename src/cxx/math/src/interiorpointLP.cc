@@ -364,7 +364,7 @@ void mathdetail::initializeLargeSystem(const blitz::Array<double,2>& A,
   // block 0x0: A
   A_large( r_m, r_n) = A(r_m+A.lbound(0), r_n+A.lbound(1));
   // block 1x1: transpose(A)
-  A_large( r_n+m, r_m+n) = A_t(r_n+A_t.lbound(0), r_n+A_t.lbound(1));
+  A_large( r_n+m, r_m+n) = A_t(r_n+A_t.lbound(0), r_m+A_t.lbound(1));
   // block 1x2: I
   for( int i=0; i<n; ++i)
     A_large(m+i, m+n+i) = 1.;
