@@ -71,12 +71,10 @@ namespace detail {
     blitz::secondIndex j;
 
     
-    blitz::Array<double, 2> zA(size_eval, size_enrol);
-    blitz::Array<double, 1> mean_B(size_eval);
-
     // Znorm  -->      zA  = (A - mean(B) ) / std(B)    [znorm on oringinal scores]
-    mean_B = blitz::mean(B, j);
-    zA = (A(i, j) - mean_B(i)) / sqrt(blitz::sum(pow(B(i, j) - mean_B(i), 2) , j) / (size_znorm - 1));
+    blitz::Array<double, 1> mean_B(blitz::mean(B, j));
+    blitz::Array<double, 1> std_B(blitz::sqrt(blitz::sum(blitz::pow(B(i, j) - mean_B(i), 2), j) / (size_znorm - 1)));
+    blitz::Array<double, 2> zA( (A(i, j) - mean_B(i)) / std_B(i) ); 
 
     blitz::Array<double, 1> mean_Dimp(size_tnorm);
     blitz::Array<double, 1> std_Dimp(size_tnorm);
