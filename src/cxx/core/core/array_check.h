@@ -88,8 +88,6 @@ namespace bob {
     {
       if( !a.isStorageContiguous() )
         return false;
-      // TODO: Check that there is no need to look at the stride in the blitz
-      // implementation
       for( int i=0; i<a.rank(); ++i) 
         if( !(a.isRankStoredAscending(i) && a.ordering(i)==a.rank()-1-i) )
           return false;
@@ -108,8 +106,6 @@ namespace bob {
     {
       if( !a.isStorageContiguous() )
         return false;
-      // TODO: Check that there is no need to look at the stride in the blitz
-      // implementation
       for( int i=0; i<a.rank(); ++i) 
         if( !(a.isRankStoredAscending(i) && a.ordering(i)==i) )
           return false;
@@ -284,4 +280,4 @@ namespace bob {
  */
 }
 
-#endif /* BOB5SPRO_CORE_ARRAY_CHECK_H */
+#endif /* BOB_CORE_ARRAY_CHECK_H */
