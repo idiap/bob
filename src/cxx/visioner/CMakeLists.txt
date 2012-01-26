@@ -23,4 +23,22 @@ ExternalProject_Add(visioner
   PATCH_COMMAND ""
   CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} -DLBFGS_INCLUDE_DIR=${CMAKE_INSTALL_PREFIX}/include/bob -DLBFGS_LIBRARY_DIR=${CMAKE_BINARY_DIR}/cxx/lbfgs
   )
+
 add_dependencies(visioner bob_lbfgs)
+
+ExternalProject_Get_Property(visioner BINARY_DIR)
+ExternalProject_Get_Property(visioner SOURCE_DIR)
+
+if(APPLE)
+  set_target_properties(bob_visioner PROPERTIES IMPORTED_LOCATION ${BINARY_DIR}/src/libbob_visioner.dylib)
+else()
+  set_target_properties(bob_visioner PROPERTIES IMPORTED_LOCATION ${BINARY_DIR}/src/libbob_visioner.so)
+endif()
+
+set(VISIONER_INCLUDE_DIRS
+  "${SOURCE_DIR}/src/ml"
+  "${SOURCE_DIR}/src/proc"
+  "${SOURCE_DIR}/src/util"
+  "${SOURCE_DIR}/src/vision"
+  CACHE INTERNAL "Visioner include directories"
+  )
