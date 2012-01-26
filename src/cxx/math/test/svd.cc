@@ -27,6 +27,7 @@
 #include <blitz/array.h>
 #include <stdint.h>
 #include "core/cast.h"
+#include "math/linear.h"
 #include "math/svd.h"
 
 
@@ -125,11 +126,18 @@ BOOST_AUTO_TEST_CASE( test_svd_3x3 )
 
   // Full SVD function
   bob::math::svd(A33_1, U, S, V);
-//  checkBlitzClose(U33_1, U, eps); 
   checkBlitzClose(S3_1, S, eps);
-//  checkBlitzClose(V33_1, V, eps); 
-  // TODO: Check that A33_1 == U*S*V'
+
+  // Check that A33_1 == U*S*V'
   // Note that the singular vectors are not unique
+  blitz::Array<double,2> US(3,3);
+  blitz::Array<double,2> USVt(3,3);
+  blitz::firstIndex i;
+  blitz::secondIndex j;
+  US = U(i,j) * S(j);
+  blitz::Array<double,2> Vt = V.transpose(1,0);
+  bob::math::prod(US, Vt, USVt);
+  checkBlitzClose(A33_1, USVt, eps);
 
   // Economic SVD function 
   bob::math::svd(A33_1, U, S);
@@ -144,11 +152,18 @@ BOOST_AUTO_TEST_CASE( test_svd_2x4 )
 
   // Full SVD function
   bob::math::svd(A24_1, U, S, V);
-//  checkBlitzClose(U22_1, U, eps); 
   checkBlitzClose(S2_1, S, eps);
-//  checkBlitzClose(V44_1, V, eps); 
-  // TODO: Check that A24_1 == U*S*V'
+  // Check that A24_1 == U*S*V'
   // Note that the singular vectors are not unique
+  blitz::Array<double,2> US(2,4);
+  blitz::Array<double,2> USVt(2,4);
+  blitz::firstIndex i;
+  blitz::secondIndex j;
+  US = 0.;
+  US(blitz::Range::all(), blitz::Range(0,1)) = U(i,j) * S(j);
+  blitz::Array<double,2> Vt = V.transpose(1,0);
+  bob::math::prod(US, Vt, USVt);
+  checkBlitzClose(A24_1, USVt, eps);
 
   // Economic SVD function 
   bob::math::svd(A24_1, U, S);

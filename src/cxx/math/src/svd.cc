@@ -22,6 +22,7 @@
 #include "core/array_check.h"
 
 namespace math = bob::math;
+namespace ca = bob::core::array;
 
 // Declaration of the external LAPACK function (Generic linear system solver)
 extern "C" void dgesvd_( char *jobu, char *jobvt, int *M, int *N, double *A, 
@@ -38,16 +39,16 @@ void math::svd(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   int nb_singular = std::min(M,N);
 
   // Checks zero base
-  bob::core::array::assertZeroBase(A);
-  bob::core::array::assertZeroBase(U);
-  bob::core::array::assertZeroBase(sigma);
-  bob::core::array::assertZeroBase(V);
+  ca::assertZeroBase(A);
+  ca::assertZeroBase(U);
+  ca::assertZeroBase(sigma);
+  ca::assertZeroBase(V);
   // Checks and resizes if required
-  bob::core::array::assertSameDimensionLength(U.extent(0), M);
-  bob::core::array::assertSameDimensionLength(U.extent(1), M);
-  bob::core::array::assertSameDimensionLength(sigma.extent(0), nb_singular);
-  bob::core::array::assertSameDimensionLength(V.extent(0), N);
-  bob::core::array::assertSameDimensionLength(V.extent(1), N);
+  ca::assertSameDimensionLength(U.extent(0), M);
+  ca::assertSameDimensionLength(U.extent(1), M);
+  ca::assertSameDimensionLength(sigma.extent(0), nb_singular);
+  ca::assertSameDimensionLength(V.extent(0), N);
+  ca::assertSameDimensionLength(V.extent(1), N);
 
   math::svd_(A, U, sigma, V);
 }
@@ -81,7 +82,7 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
     for(int i=0; i<N; ++i)
       A_lapack[j+i*M] = A(j,i);
   double *S_lapack;
-  bool sigma_direct_use = bob::core::array::isCZeroBaseContiguous(sigma);
+  bool sigma_direct_use = ca::isCZeroBaseContiguous(sigma);
   if( !sigma_direct_use )
     S_lapack = new double[nb_singular];
   else
@@ -124,13 +125,13 @@ void math::svd(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   int nb_singular = std::min(M,N);
 
   // Checks zero base
-  bob::core::array::assertZeroBase(A);
-  bob::core::array::assertZeroBase(U);
-  bob::core::array::assertZeroBase(sigma);
+  ca::assertZeroBase(A);
+  ca::assertZeroBase(U);
+  ca::assertZeroBase(sigma);
   // Checks and resizes if required
-  bob::core::array::assertSameDimensionLength(U.extent(0), M);
-  bob::core::array::assertSameDimensionLength(U.extent(1), nb_singular);
-  bob::core::array::assertSameDimensionLength(sigma.extent(0), nb_singular);
+  ca::assertSameDimensionLength(U.extent(0), M);
+  ca::assertSameDimensionLength(U.extent(1), nb_singular);
+  ca::assertSameDimensionLength(sigma.extent(0), nb_singular);
  
   math::svd_(A, U, sigma);
 }
@@ -165,7 +166,7 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
     for(int i=0; i<N; ++i)
       A_lapack[j+i*M] = A(j,i);
   double *S_lapack;
-  bool sigma_direct_use = bob::core::array::isCZeroBaseContiguous(sigma);
+  bool sigma_direct_use = ca::isCZeroBaseContiguous(sigma);
   if( !sigma_direct_use )
     S_lapack = new double[nb_singular];
   else

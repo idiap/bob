@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_MATH_SVD_H
-#define BOB5SPRO_MATH_SVD_H
+#ifndef BOB_MATH_SVD_H
+#define BOB_MATH_SVD_H
 
 #include <blitz/array.h>
 
@@ -36,7 +36,7 @@ namespace bob {
 
     /**
       * @brief Function which performs a 'full' Singular Value Decomposition
-      *   using the 'generic' dgesvd LAPACK function.
+      *   using the 'simple' driver routine dgesvd of LAPACK.
       * @warning The output blitz::array U, sigma and V should have the correct 
       *   size, with zero base index. Checks are performed.
       * @param A The A matrix to decompose (size MxN)
@@ -49,7 +49,7 @@ namespace bob {
       blitz::Array<double,1>& sigma, blitz::Array<double,2>& V);
     /**
       * @brief Function which performs a 'full' Singular Value Decomposition
-      *   using the 'generic' dgesvd LAPACK function.
+      *   using the 'simple' driver routine dgesvd of LAPACK.
       * @warning The output blitz::array U, sigma and V should have the correct 
       *   size, with zero base index. Checks are NOT performed.
       * @param A The A matrix to decompose (size MxN)
@@ -64,9 +64,9 @@ namespace bob {
 
     /**
       * @brief Function which performs a 'partial' Singular Value Decomposition
-      *   using the 'generic' dgesvd LAPACK function. It only returns the first
-      *   min(M,N) columns of U, and is somehow similar to the 'economical' SVD
-      *   variant of matlab (except that it does not return V).
+      *   using the 'simple' driver routine dgesvd of LAPACK. It only returns 
+      *   the first min(M,N) columns of U, and is somehow similar to the 
+      *   'economical' SVD variant of matlab (except that it does not return V).
       * @warning The output blitz::array U and sigma should have the correct 
       *   size, with zero base index. Checks are performed.
       * @param A The A matrix to decompose (size MxN)
@@ -78,9 +78,9 @@ namespace bob {
       blitz::Array<double,1>& sigma);
     /**
       * @brief Function which performs a 'partial' Singular Value Decomposition
-      *   using the 'generic' dgesvd LAPACK function. It only returns the first
-      *   min(M,N) columns of U, and is somehow similar to the 'economical' SVD
-      *   variant of matlab (except that it does not return V).
+      *   using the 'simple' driver routine dgesvd of LAPACK. It only returns 
+      *   the first min(M,N) columns of U, and is somehow similar to the 
+      *   'economical' SVD variant of matlab (except that it does not return V).
       * @warning The output blitz::array U and sigma should have the correct 
       *   size, with zero base index. Checks are NOT performed.
       * @param A The A matrix to decompose (size MxN)
@@ -96,5 +96,5 @@ namespace bob {
  */
 }
 
-#endif /* BOB5SPRO_MATH_SVD_H */
+#endif /* BOB_MATH_SVD_H */
 
