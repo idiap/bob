@@ -5,8 +5,8 @@
  * @brief This file provides a class to filter an image with a median filter
  */
 
-#ifndef BOB5SPRO_IP_MEDIAN_H
-#define BOB5SPRO_IP_MEDIAN_H
+#ifndef BOB_IP_MEDIAN_H
+#define BOB_IP_MEDIAN_H
 
 #include <boost/shared_ptr.hpp>
 #include <list>
@@ -231,8 +231,11 @@ namespace bob {
           }
         }
         // Updates current ordered list
-        listRemoveAddRow(j, 0, src, m_list_first_col);
-        m_list_current = m_list_first_col;
+        if(j<dst.extent(0)-1)
+        {
+          listRemoveAddRow(j, 0, src, m_list_first_col);
+          m_list_current = m_list_first_col;
+        }
       }
     }
 
