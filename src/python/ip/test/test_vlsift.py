@@ -8,6 +8,7 @@
 
 import os, sys
 import unittest
+import platform
 import bob
 import numpy
 
@@ -22,7 +23,10 @@ class VLSiftTest(unittest.TestCase):
 
   def test01_VLSiftPython(self):
     img = bob.io.load(os.path.join("data", "sift", "vlimg_ref.pgm"))
-    ref = bob.io.Arrayset(os.path.join("data", "sift", "vlsift_ref.hdf5"))
+    if platform.architecture()[0] == '64bit':
+      ref = bob.io.Arrayset(os.path.join("data", "sift", "vlsift_ref.hdf5"))
+    else:
+      ref = bob.io.Arrayset(os.path.join("data", "sift", "vlsift_ref_32bits.hdf5"))
     mysift1 = bob.ip.VLSIFT(478,640, 3, 6, -1)
     out = mysift1(img)
     self.assertTrue(len(out) == len(ref))
