@@ -34,12 +34,13 @@ class EigTest(unittest.TestCase):
     self.assertEqual( (abs(D2-ref) < 1e-3).all(), True )
 
     # check that V*D*V^-1=A
-    iV1 = bob.math.inv(V1)
+    import scipy.linalg
+    iV1 = scipy.linalg.inv(V1)
     VD1 = numpy.dot(V1, numpy.diag(D1))
     VDiV1 = numpy.dot(VD1, iV1)
     self.assertEqual( (abs(A-VDiV1) < 1e-10).all(), True )
     # check that V*D*V^-1=A
-    iV2 = bob.math.inv(V2)
+    iV2 = scipy.linalg.inv(V2)
     VD2 = numpy.dot(V2, numpy.diag(D2))
     VDiV2 = numpy.dot(VD2, iV2)
     self.assertEqual( (abs(A-VDiV2) < 1e-10).all(), True )
