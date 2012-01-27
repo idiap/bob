@@ -46,7 +46,7 @@ static object py_shortstep(tp::const_ndarray A, tp::const_ndarray b, tp::const_n
     c.bz<double,1>(), theta, x_, epsilon);
   tp::ndarray xf(info.dtype, info.shape[0]/2);
   blitz::Array<double,1> xf_ = xf.bz<double,1>();
-  xf_ = x_(blitz::Range(0,xf_.extent(0)));
+  xf_ = x_(blitz::Range(0,xf_.extent(0)-1));
   return xf.self();
 }
 
@@ -62,7 +62,7 @@ static object py_predictorcorrector(tp::const_ndarray A, tp::const_ndarray b, tp
     c.bz<double,1>(), theta_pred, theta_corr, x_, epsilon);
   tp::ndarray xf(info.dtype, info.shape[0]/2);
   blitz::Array<double,1> xf_ = xf.bz<double,1>();
-  xf_ = x_(blitz::Range(0,xf_.extent(0)));
+  xf_ = x_(blitz::Range(0,xf_.extent(0)-1));
   return xf.self();
 }
 
@@ -78,7 +78,7 @@ static object py_longstep(tp::const_ndarray A, tp::const_ndarray b, tp::const_nd
     c.bz<double,1>(), gamma, sigma, x_, epsilon);
   tp::ndarray xf(info.dtype, info.shape[0]/2);
   blitz::Array<double,1> xf_ = xf.bz<double,1>();
-  xf_ = x_(blitz::Range(0,xf_.extent(0)));
+  xf_ = x_(blitz::Range(0,xf_.extent(0)-1));
   return xf.self();
 }
 
