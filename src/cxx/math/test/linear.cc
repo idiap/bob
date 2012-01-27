@@ -24,18 +24,18 @@
 #define BOOST_TEST_MODULE math-linear Tests
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
-#include "core/cast.h"
 #include "math/linear.h"
 
 
 struct T {
-  blitz::Array<double,2> A_24, A_43, A_23, Asol_44;
+  blitz::Array<double,2> A_24, A_43, A_23, Asol_44, Asol_eye_44, Asol_diag_44;
   blitz::Array<double,1> b_4, b_2, b_5a, b_5b, n_b_4;
   double b5_dot, tr_Asol_44, ned_b_4;
   double eps;
 
-  T(): A_24(2,4), A_43(4,3), A_23(2,3), Asol_44(4,4), b_4(4), b_2(2), b_5a(5), 
-       b_5b(5), n_b_4(4), b5_dot(99.), ned_b_4(5.4772), eps(1e-3)
+  T(): A_24(2,4), A_43(4,3), A_23(2,3), Asol_44(4,4), Asol_eye_44(4,4), Asol_diag_44(4,4),
+       b_4(4), b_2(2), b_5a(5), b_5b(5), n_b_4(4), 
+       b5_dot(99.), ned_b_4(5.4772), eps(1e-3)
   {
     A_24 = 1., 2., 3., 4., 5., 6., 7., 8.;
     A_43 = 12., 11., 10., 9., 8., 7., 6., 5., 4., 3., 2., 1.;
@@ -54,6 +54,16 @@ struct T {
                4.,  3., 2., 1.;
 
     tr_Asol_44 = 30.;
+
+    Asol_eye_44 = 1., 0., 0., 0.,
+                  0., 1., 0., 0.,
+                  0., 0., 1., 0.,
+                  0., 0., 0., 1.; 
+
+    Asol_diag_44 = 4., 0., 0., 0.,
+                   0., 3., 0., 0.,
+                   0., 0., 2., 0.,
+                   0., 0., 0., 1.; 
   }
 
   ~T() {}
@@ -65,33 +75,6 @@ void check_dimensions( blitz::Array<T,d>& t1, blitz::Array<U,d>& t2)
   BOOST_REQUIRE_EQUAL(t1.dimensions(), t2.dimensions());
   for( int i=0; i<t1.dimensions(); ++i)
     BOOST_CHECK_EQUAL(t1.extent(i), t2.extent(i));
-}
-
-template<typename T, typename U>  
-void checkBlitzEqual( blitz::Array<T,1>& t1, blitz::Array<U,1>& t2)
-{
-  check_dimensions( t1, t2);
-  for( int i=0; i<t1.extent(0); ++i)
-    BOOST_CHECK_EQUAL(t1(i), bob::core::cast<T>(t2(i)));
-}
-
-template<typename T, typename U>  
-void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
-{
-  check_dimensions( t1, t2);
-  for( int i=0; i<t1.extent(0); ++i)
-    for( int j=0; j<t1.extent(1); ++j)
-      BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
-}
-
-template<typename T, typename U>  
-void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2) 
-{
-  check_dimensions( t1, t2);
-  for( int i=0; i<t1.extent(0); ++i)
-    for( int j=0; j<t1.extent(1); ++j)
-      for( int k=0; k<t1.extent(2); ++k)
-        BOOST_CHECK_EQUAL(t1(i,j,k), bob::core::cast<T>(t2(i,j,k)));
 }
 
 template<typename T>  
@@ -170,6 +153,20 @@ BOOST_AUTO_TEST_CASE( test_vector_normalized )
   blitz::Array<double,1> sol(4);
   bob::math::normalize(b_4, sol);
   checkBlitzClose( n_b_4, sol, eps);
+}
+
+BOOST_AUTO_TEST_CASE( test_eye )
+{
+  blitz::Array<double,2> sol(4,4);
+  bob::math::eye(sol);
+  checkBlitzClose( Asol_eye_44, sol, eps);
+}
+
+BOOST_AUTO_TEST_CASE( test_diag )
+{
+  blitz::Array<double,2> sol(4,4);
+  bob::math::diag(b_4, sol);
+  checkBlitzClose( Asol_diag_44, sol, eps);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
