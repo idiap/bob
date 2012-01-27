@@ -71,7 +71,7 @@ double math::normsinv(const double p)
 	// Error p should be between 0 and 1
 	if (p < 0 || p > 1)
   {
-    throw bob::math::NorminvPNotInRangeError(p);
+    throw math::NorminvPNotInRangeError(p);
   }
 	// Rational approximation for lower region.
 	else if (0 < p && p < p_low)
