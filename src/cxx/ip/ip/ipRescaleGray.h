@@ -47,13 +47,13 @@ namespace bob
 
 		//////////////////////////////////////////////////////////
 
-		/// Check if the input tensor has the right dimensions and type - overridden
+		/// Check if the input tensor has the right dimensions and type - overriden
 		virtual bool		checkInput(const Tensor& input) const;
 
-		/// Allocate (if needed) the output tensors given the input tensor dimensions - overridden
+		/// Allocate (if needed) the output tensors given the input tensor dimensions - overriden
 		virtual bool		allocateOutput(const Tensor& input);
 
-		/// Process some input tensor (the input is checked, the outputs are allocated) - overridden
+		/// Process some input tensor (the input is checked, the outputs are allocated) - overriden
 		virtual bool		processInput(const Tensor& input);
 
 		//////////////////////////////////////////////////////////

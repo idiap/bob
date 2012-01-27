@@ -11,9 +11,9 @@ sys.setdlopenflags(default_flags|ctypes.RTLD_GLOBAL)
 import core
 import io
 import math
+import measure
 import sp
 import ip
-import measure
 import db
 import machine
 import trainer

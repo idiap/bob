@@ -25,7 +25,7 @@ if (CMAKE_COMPILER_IS_GNUCC)
 
   set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -O2 -mtune=generic")
 
-  set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -DBOB_DEBUG -DBZ_DEBUG")
+  set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -DBOB_DEBUG")
 
   set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
   set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
@@ -35,7 +35,7 @@ else (CMAKE_COMPILER_IS_GNUCC)
   # Then, it must be clang/clang++
   set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -O2 -mtune=generic")
 
-  set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -DBOB_DEBUG -DBZ_DEBUG")
+  set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -DBOB_DEBUG")
 
   set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
   set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")

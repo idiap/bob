@@ -60,11 +60,6 @@ namespace bob {
           blitz::Array<std::complex<double>,2>& dst) = 0;
 
         /**
-          * @brief process an array by applying the FFT inplace
-          */
-        virtual void operator()(blitz::Array<std::complex<double>,2>& src_dst) = 0;
-
-        /**
           * @brief Reset the FFT2D object for the given 2D shape
           */
         void reset(const int height, const int width);
@@ -116,11 +111,6 @@ namespace bob {
           */
         virtual void operator()(const blitz::Array<std::complex<double>,2>& src, 
           blitz::Array<std::complex<double>,2>& dst);
-
-        /**
-          * @brief process an array by applying the FFT inplace
-          */
-        virtual void operator()(blitz::Array<std::complex<double>,2>& src_dst);
     };
 
 
@@ -141,11 +131,6 @@ namespace bob {
           */
         virtual void operator()(const blitz::Array<std::complex<double>,2>& src, 
           blitz::Array<std::complex<double>,2>& dst);
-
-        /**
-          * @brief process an array by applying the FFT inplace
-          */
-        virtual void operator()(blitz::Array<std::complex<double>,2>& src_dst);
     };
 
   }

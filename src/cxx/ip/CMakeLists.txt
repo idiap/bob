@@ -51,7 +51,6 @@ set(src_ip
    "src/GaborSpatial.cc"
    "src/GaborBankFrequency.cc"
    "src/GaborBankSpatial.cc"
-   "src/GaborWaveletTransform.cc"
    "src/histo.cc"
    "src/LBP.cc"
    "src/LBP4R.cc"
@@ -107,7 +106,6 @@ bob_test(ip dctfeatures test/dctfeatures.cc)
 bob_test(ip extrapolateMask test/extrapolateMask.cc)
 bob_test(ip flipflop test/flipflop.cc)
 bob_test(ip gabor test/Gabor.cc)
-bob_test(ip gwt test/GaborWaveletTransform.cc)
 bob_test(ip gaussian test/Gaussian.cc)
 bob_test(ip median test/Median.cc)
 bob_test(ip gammaCorrection test/gammaCorrection.cc)

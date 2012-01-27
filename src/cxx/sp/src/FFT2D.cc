@@ -91,23 +91,6 @@ void sp::FFT2D::operator()(const blitz::Array<std::complex<double>,2>& src,
 }
 
 
-void sp::FFT2D::operator()(blitz::Array<std::complex<double>,2>& src_dst)
-{
-  // check data
-  tca::assertCZeroBaseContiguous(src_dst);
-
-  // Reinterpret cast to fftw format
-  fftw_complex* src_dst_ = reinterpret_cast<fftw_complex*>(src_dst.data());
-
-  fftw_plan p;
-  // FFTW_ESTIMATE -> The planner is computed quickly but may not be optimized
-  // for large arrays
-  p = fftw_plan_dft_2d(src_dst.extent(0), src_dst.extent(1), src_dst_, src_dst_, FFTW_FORWARD, FFTW_ESTIMATE);
-  fftw_execute(p);
-  fftw_destroy_plan(p);
-}
-
-
 sp::IFFT2D::IFFT2D( const int height, const int width):
   sp::FFT2DAbstract::FFT2DAbstract(height, width)
 {
@@ -139,18 +122,3 @@ void sp::IFFT2D::operator()(const blitz::Array<std::complex<double>,2>& src,
   dst /= static_cast<double>(m_width*m_height);
 }
 
-void sp::IFFT2D::operator()(blitz::Array<std::complex<double>,2>& src_dst)
-{
-  // check data
-  tca::assertCZeroBaseContiguous(src_dst);
-
-  // Reinterpret cast to fftw format
-  fftw_complex* src_dst_ = reinterpret_cast<fftw_complex*>(src_dst.data());
-
-  fftw_plan p;
-  // FFTW_ESTIMATE -> The planner is computed quickly but may not be optimized
-  // for large arrays
-  p = fftw_plan_dft_2d(src_dst.extent(0), src_dst.extent(1), src_dst_, src_dst_, FFTW_BACKWARD, FFTW_ESTIMATE);
-  fftw_execute(p);
-  fftw_destroy_plan(p);
-}
