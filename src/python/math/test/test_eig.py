@@ -33,8 +33,12 @@ class EigTest(unittest.TestCase):
     self.assertEqual( (abs(D1-ref) < 1e-3).all(), True )
     self.assertEqual( (abs(D2-ref) < 1e-3).all(), True )
 
-    # check that V*D*V^-1=A
+    # Compare eigenvalues to scipy
     import scipy.linalg
+    Ds, Vs = scipy.linalg.eigh(A)
+    self.assertEqual( (abs(D1-Ds) < 1e-3).all(), True )
+
+    # check that V*D*V^-1=A
     iV1 = scipy.linalg.inv(V1)
     VD1 = numpy.dot(V1, numpy.diag(D1))
     VDiV1 = numpy.dot(VD1, iV1)
@@ -63,9 +67,13 @@ class EigTest(unittest.TestCase):
 
     # Compare eigenvalues to matlab reference
     ref=numpy.array([-0.2728,0.0510,17.9718], 'float64')
-
     self.assertEqual( (abs(numpy.sort(D1)-ref) < 1e-3).all(), True )
     self.assertEqual( (abs(numpy.sort(D2)-ref) < 1e-3).all(), True )
+
+    # Compare eigenvalues to scipy
+    import scipy.linalg
+    Ds, Vs = scipy.linalg.eig(A, B)
+    self.assertEqual( (abs(numpy.sort(D1)-numpy.sort(Ds)) < 1e-3).all(), True )
 
     # TODO: check eigenvectors 
 
@@ -77,7 +85,6 @@ class EigTest(unittest.TestCase):
     # Input matrices to decompose
     A = [[1.,2.,3.],[2.,4.,5.],[3.,5.,6.]]
     B = [[2.,-1.,0.],[-1.,2.,-1.],[0.,-1.,2.]]
-
 
     # Do the decomposition (1)
     V1, D1 = bob.math.eig(A, B)
@@ -92,6 +99,11 @@ class EigTest(unittest.TestCase):
     # needs to reorder the eigenvalues
     self.assertEqual( (abs(numpy.sort(D1)-ref) < 1e-3).all(), True )
     self.assertEqual( (abs(numpy.sort(D2)-ref) < 1e-3).all(), True )
+
+    # Compare eigenvalues to scipy
+    import scipy.linalg
+    Ds, Vs = scipy.linalg.eig(A, B)
+    self.assertEqual( (abs(numpy.sort(D1)-numpy.sort(Ds)) < 1e-3).all(), True )
 
     # TODO: check eigenvectors 
 

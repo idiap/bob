@@ -29,6 +29,9 @@ class SqrtmTest(unittest.TestCase):
     bob.math.sqrtSymReal(A,C)
     B=bob.math.sqrtSymReal(A)
 
+    import scipy.linalg
+    ref_Sci = scipy.linalg.sqrtm(A)
+
     # Compare square root to matlab reference
     ref=numpy.array(
       [ 0.81549316, -0.54489511, -0.16221167, -0.10838638,
@@ -37,6 +40,8 @@ class SqrtmTest(unittest.TestCase):
        -0.10838638, -0.16221167, -0.54489511,  0.81549316]).reshape(4,4)
     self.assertEqual( (abs(B-ref) < 1e-4).all(), True )
     self.assertEqual( (abs(C-ref) < 1e-4).all(), True )
+    self.assertEqual( (abs(B-ref_Sci) < 1e-4).all(), True )
+    self.assertEqual( (abs(C-ref_Sci) < 1e-4).all(), True )
    
 if __name__ == '__main__':
   sys.argv.append('-v')
