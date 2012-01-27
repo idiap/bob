@@ -19,10 +19,12 @@
  */
 #include "math/linsolve.h"
 #include "math/Exception.h"
+#include "math/linear.h"
 #include "core/array_assert.h"
 #include "core/array_check.h"
 
 namespace math = bob::math;
+namespace ca = bob::core::array;
 
 // Declaration of the external LAPACK function (Linear system solvers)
 extern "C" void dgesv_( int *N, int *NRHS, double *A, int *lda, int *ipiv, 
@@ -34,14 +36,14 @@ void math::linsolve(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
   const blitz::Array<double,1>& b)
 {
   // Check x and b
-  bob::core::array::assertZeroBase(x);
-  bob::core::array::assertZeroBase(b);
-  bob::core::array::assertSameDimensionLength(x.extent(0), b.extent(0));
+  ca::assertZeroBase(x);
+  ca::assertZeroBase(b);
+  ca::assertSameDimensionLength(x.extent(0), b.extent(0));
   
   // Check A
-  bob::core::array::assertZeroBase(A);
-  bob::core::array::assertSameDimensionLength(A.extent(0), A.extent(1));
-  bob::core::array::assertSameDimensionLength(A.extent(1), b.extent(0));
+  ca::assertZeroBase(A);
+  ca::assertSameDimensionLength(A.extent(0), A.extent(1));
+  ca::assertSameDimensionLength(A.extent(1), b.extent(0));
 
   math::linsolve_(A, x, b);
 }
@@ -59,7 +61,7 @@ void math::linsolve_(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
     A_lapack[i] = 
       A( (i%A.extent(1)), (i/A.extent(1)) );
   double* x_lapack;
-  bool x_direct_use = bob::core::array::isCZeroBaseContiguous(x);
+  bool x_direct_use = ca::isCZeroBaseContiguous(x);
   if( !x_direct_use )
     x_lapack = new double[b.extent(0)];
   else
@@ -79,7 +81,7 @@ void math::linsolve_(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
  
   // Check info variable
   if( info != 0)
-    throw bob::math::LapackError("The LAPACK dgesv function returned a non-zero value.");
+    throw math::LapackError("The LAPACK dgesv function returned a non-zero value.");
 
   // Copy result back to x if required
   if( !x_direct_use )
@@ -98,14 +100,14 @@ void math::linsolveSympos(const blitz::Array<double,2>& A,
   blitz::Array<double,1>& x, const blitz::Array<double,1>& b)
 {
   // Check x and b
-  bob::core::array::assertZeroBase(x);
-  bob::core::array::assertZeroBase(b);
-  bob::core::array::assertSameDimensionLength(x.extent(0), b.extent(0));
+  ca::assertZeroBase(x);
+  ca::assertZeroBase(b);
+  ca::assertSameDimensionLength(x.extent(0), b.extent(0));
   
   // Check A
-  bob::core::array::assertZeroBase(A);
-  bob::core::array::assertSameDimensionLength(A.extent(0), A.extent(1));
-  bob::core::array::assertSameDimensionLength(A.extent(1), b.extent(0));
+  ca::assertZeroBase(A);
+  ca::assertSameDimensionLength(A.extent(0), A.extent(1));
+  ca::assertSameDimensionLength(A.extent(1), b.extent(0));
 
   math::linsolveSympos_(A, x, b);
 }
@@ -122,7 +124,7 @@ void math::linsolveSympos_(const blitz::Array<double,2>& A,
     A_lapack[i] = 
       A( (i%A.extent(1)), (i/A.extent(1)));
   double* x_lapack;
-  bool x_direct_use = bob::core::array::isCZeroBaseContiguous(x);
+  bool x_direct_use = ca::isCZeroBaseContiguous(x);
   if( !x_direct_use )
     x_lapack = new double[b.extent(0)];
   else
@@ -143,7 +145,7 @@ void math::linsolveSympos_(const blitz::Array<double,2>& A,
  
   // Check info variable
   if( info != 0)
-    throw bob::math::LapackError("The LAPACK dposv function returned a \
+    throw math::LapackError("The LAPACK dposv function returned a \
       non-zero value. This might be caused by a non-symmetric definite \
       positive matrix.");
 
@@ -157,3 +159,77 @@ void math::linsolveSympos_(const blitz::Array<double,2>& A,
     delete [] x_lapack;
   delete [] A_lapack;
 }
+
+void math::linsolveCGSympos(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
+  const blitz::Array<double,1>& b, const double acc, const int max_iter)
+{
+  // Dimensionality of the problem
+  int N = b.extent(0);
+
+  // Check x and b
+  ca::assertZeroBase(x);
+  ca::assertZeroBase(b);
+  ca::assertSameDimensionLength(x.extent(0), N);
+  
+  // Check A
+  ca::assertZeroBase(A);
+  ca::assertSameDimensionLength(A.extent(0), N);
+  ca::assertSameDimensionLength(A.extent(1), N);
+
+  math::linsolveCGSympos_(A, x, b, acc, max_iter);
+}
+
+void math::linsolveCGSympos_(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
+  const blitz::Array<double,1>& b, const double acc, const int max_iter)
+{
+  // Dimensionality of the problem
+  int N = b.extent(0);
+
+  blitz::Array<double,1> r(N), d(N), best_x(N), q(N), tmp(N);
+  x = 0.;
+  r = b;
+  d = b;
+
+  double delta = math::dot(r,r);
+  double delta0 = math::dot(b,b);
+
+  int n_iter = 0;
+  best_x = x;
+  double best_res = sqrt(delta / delta0);
+
+  while( n_iter < max_iter && delta > acc*acc*delta0)
+  {
+    // q = A*d
+    math::prod_(A, d, q);
+
+    // alpha = delta/(d'*q);
+    double alpha = delta / math::dot(d,q);
+    x = x + alpha * d;
+
+    if( n_iter+1 % 50 == 0)
+    {
+      math::prod(A,x,tmp);
+      r = b - tmp;
+    }
+    else
+      r = r - alpha * q;
+      
+    double delta_old = delta;
+    delta = math::dot(r,r);
+    double beta = delta / delta_old;
+    d = r + beta * d;
+    ++n_iter;
+
+    if( sqrt(delta/delta0) < best_res)
+    {
+      best_x = x;
+      best_res = sqrt(delta/delta0);
+    }
+  }
+
+  x = best_x;
+
+  // TODO return best_res and number of iterations?
+  //double res = best_res;
+}
+

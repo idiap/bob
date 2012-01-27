@@ -3,7 +3,7 @@
  * @date Sat Mar 19 19:49:51 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * @brief Test the solver A*x=b
+ * @brief Test the linear solvers A*x=b
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -28,7 +28,6 @@
 #include <stdint.h>
 #include "core/cast.h"
 #include "math/linsolve.h"
-#include "math/cgsolve.h"
 
 
 struct T {
@@ -124,14 +123,14 @@ BOOST_AUTO_TEST_CASE( test_solveSympos_3x3 )
   checkBlitzClose(s3_3, x, eps); 
 }
 
-BOOST_AUTO_TEST_CASE( test_cgsolve_3x3 )
+BOOST_AUTO_TEST_CASE( test_solveCGSympos_3x3 )
 {
   blitz::Array<double,1> x(3);
 
-  bob::math::cgsolveSympos(A33_1, x, b3_1, 1e-6, 1000);
+  bob::math::linsolveCGSympos(A33_1, x, b3_1, 1e-6, 1000);
   checkBlitzClose(s3_1, x, eps);
 
-  bob::math::cgsolveSympos(A33_3, x, b3_1, 1e-6, 1000);
+  bob::math::linsolveCGSympos(A33_3, x, b3_1, 1e-6, 1000);
   checkBlitzClose(s3_3, x, eps);
 }
 
