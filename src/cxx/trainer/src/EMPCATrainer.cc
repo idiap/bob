@@ -16,7 +16,8 @@
 #include "core/array_copy.h"
 #include "core/array_type.h"
 #include "math/linear.h"
-#include "math/lu_det.h"
+#include "math/det.h"
+#include "math/inv.h"
 #include "math/stats.h"
 
 namespace io = bob::io;

@@ -1,5 +1,5 @@
 /**
- * @file cxx/math/test/lu_det.cc
+ * @file cxx/math/test/lu_det_inv.cc
  * @date Tue Jun 7 01:00:21 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -21,13 +21,15 @@
  */
 
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE math-lu_det Tests
+#define BOOST_TEST_MODULE math-lu_det_inv Tests
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
 #include <stdint.h>
 #include "core/cast.h"
-#include "math/lu_det.h"
+#include "math/lu.h"
+#include "math/det.h"
+#include "math/inv.h"
 #include "math/linear.h"
 
 

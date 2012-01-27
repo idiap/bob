@@ -21,7 +21,7 @@
  */
 
 #include "trainer/JFATrainer.h"
-#include "math/lu_det.h"
+#include "math/inv.h"
 #include "math/linear.h"
 #include "core/array_check.h"
 #include "core/Exception.h"

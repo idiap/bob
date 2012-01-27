@@ -1,5 +1,5 @@
 /**
- * @file python/math/src/lu_det.cc
+ * @file python/math/src/lu_det_inv.cc
  * @date Tue Jun 7 01:00:21 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -23,7 +23,9 @@
 
 #include <boost/python.hpp>
 
-#include "math/lu_det.h"
+#include "math/lu.h"
+#include "math/det.h"
+#include "math/inv.h"
 #include "core/python/ndarray.h"
 
 using namespace boost::python;

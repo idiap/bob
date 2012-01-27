@@ -1,5 +1,5 @@
 /**
- * @file cxx/math/src/lu_det.cc
+ * @file cxx/math/src/lu.cc
  * @date Tue Jun 7 01:00:21 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -17,8 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "math/linear.h"
-#include "math/lu_det.h"
+#include "math/lu.h"
 #include "math/Exception.h"
 #include "core/array_assert.h"
 #if !defined (HAVE_BLITZ_TINYVEC2_H)
@@ -33,9 +32,6 @@ namespace ca = bob::core::array;
 // LU decomposition of a general matrix (dgetrf)
 extern "C" void dgetrf_( int *M, int *N, double *A, int *lda, int *ipiv, 
   int *info);
-// Inverse of a general matrix (dgetri)
-extern "C" void dgetri_( int *N, double *A, int *lda, int *ipiv, double *work,
-  int *lwork, int *info);
 
 
 void math::lu(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
@@ -124,108 +120,5 @@ void math::lu_(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
   // Free memory
   delete [] A_lapack;
   delete [] ipiv;
-}
-
-double math::det(const blitz::Array<double,2>& A)
-{
-  ca::assertSameDimensionLength(A.extent(0),A.extent(1));
-  return math::det_(A);
-}
-
-double math::det_(const blitz::Array<double,2>& A)
-{
-  // Size variable
-  int N = A.extent(0);
-
-  // Perform an LU decomposition
-  blitz::Array<double,2> L(N,N);
-  blitz::Array<double,2> U(N,N);
-  blitz::Array<double,2> P(N,N);
-  math::lu(A, L, U, P);
-
-  // Compute the determinant of A = det(P*L)*PI(diag(U))
-  //  where det(P*L) = +- 1 (Number of permutation in P)
-  //  and PI(diag(U)) is the product of the diagonal elements of U
-  blitz::Array<double,2> Lperm(N,N);
-  math::prod(P,L,Lperm);
-  int s = 1;
-  double Udiag=1.;
-  for( int i=0; i<N; ++i) 
-  {
-    for(int j=i+1; j<N; ++j)
-      if( P(i,j) > 0)
-      {
-        s = -s; 
-        break;
-      }
-    Udiag *= U(i,i);
-  }
-
-  return s*Udiag;
-}
-
-
-void math::inv(const blitz::Array<double,2>& A, blitz::Array<double,2>& B)
-{
-  // Size variable
-  int N = A.extent(0);
-  const blitz::TinyVector<int,2> shapeA(N,N);
-  ca::assertZeroBase(A);
-  ca::assertZeroBase(B);
-
-  ca::assertSameShape(A,shapeA);
-  ca::assertSameShape(B,shapeA);
-
-  math::inv_(A, B);
-}
-
-void math::inv_(const blitz::Array<double,2>& A, blitz::Array<double,2>& B)
-{
-  // Size variable
-  int N = A.extent(0);
-
-
-  ///////////////////////////////////
-  // Prepare to call LAPACK function
-
-  // Initialize LAPACK variables
-  int info = 0;  
-  int lda = N;
-  int lwork = N;
-
-  // Initialize LAPACK arrays
-  double *A_lapack = new double[N*N];
-  int *ipiv = new int[N];
-  double *work = new double[N];
-  for(int j=0; j<N; ++j)
-    for(int i=0; i<N; ++i)
-      A_lapack[j+i*N] = A(j,i);
- 
-  // Call the LAPACK functions
-  // 1/ Compute LU decomposition
-  dgetrf_( &N, &N, A_lapack, &lda, ipiv, &info);
- 
-  // Check info variable
-  if( info != 0)
-    throw bob::math::LapackError("The LAPACK dgetrf function returned a \
-      non-zero value.");
-
-  // 2/ Compute the inverse
-  dgetri_( &N, A_lapack, &lda, ipiv, work, &lwork, &info);
- 
-  // Check info variable
-  if( info != 0)
-    throw bob::math::LapackError("The LAPACK dgetri function returned a \
-      non-zero value. The matrix might not be invertible.");
-
-  // Copy result back to B
-  for(int j=0; j<N; ++j)
-    for(int i=0; i<N; ++i)
-      B(j,i) = A_lapack[j+i*N];
-
-  // Free memory
-  delete [] A_lapack;
-  delete [] ipiv;
-  delete [] work;
 }
 

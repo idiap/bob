@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.6)
 set(pysrc
    "src/eig.cc"
    "src/linsolve.cc"
-   "src/lu_det.cc"
+   "src/lu_det_inv.cc"
    "src/norminv.cc"
    "src/sqrtm.cc"
    "src/stats.cc"

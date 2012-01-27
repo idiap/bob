@@ -26,7 +26,7 @@
 #include "core/repmat.h"
 #include "io/Arrayset.h"
 #include "math/linear.h"
-#include "math/lu_det.h"
+#include "math/inv.h"
 #include "machine/Exception.h"
 #include "machine/JFAMachine.h"
 #include "machine/LinearScoring.h"

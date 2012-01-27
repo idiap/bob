@@ -10,7 +10,8 @@
 #include "machine/Exception.h"
 #include "machine/PLDAMachine.h"
 #include "math/linear.h"
-#include "math/lu_det.h"
+#include "math/det.h"
+#include "math/inv.h"
 
 #include <cmath>
 #include <boost/lexical_cast.hpp>

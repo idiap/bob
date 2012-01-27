@@ -13,7 +13,7 @@
 #include "trainer/PLDATrainer.h"
 #include "core/array_copy.h"
 #include "math/linear.h"
-#include "math/lu_det.h"
+#include "math/inv.h"
 #include "math/svd.h"
 #include "trainer/Exception.h"
 

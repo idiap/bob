@@ -1,10 +1,9 @@
 /**
- * @file cxx/math/math/lu_det.h
+ * @file cxx/math/math/lu.h
  * @date Tue Jun 7 01:00:21 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * @brief This file defines function to perform LU decomposition as well
- *  as computing the determinant of a 2D blitz array matrix.
+ * @brief This file defines function to perform LU decomposition 
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -21,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB_MATH_LU_DET_H
-#define BOB_MATH_LU_DET_H
+#ifndef BOB_MATH_LU_H
+#define BOB_MATH_LU_H
 
 #include <blitz/array.h>
 
@@ -46,28 +45,10 @@ namespace bob {
       blitz::Array<double,2>& U, blitz::Array<double,2>& P);
     void lu_(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
       blitz::Array<double,2>& U, blitz::Array<double,2>& P);
-
-
-    /**
-      * @brief Function which computes the determinant of a square matrix
-      * @param A The A matrix to consider (size NxN)
-      */
-    double det(const blitz::Array<double,2>& A);
-    double det_(const blitz::Array<double,2>& A);
-
-    /**
-      * @brief Function which computes the inverse of a matrix,
-      *   using the dgetrf and dgetri LAPACK functions.
-      * @param A The A matrix to decompose (size NxN)
-      * @param B The B=inverse(A) matrix (size NxN)
-      */
-    void inv(const blitz::Array<double,2>& A, blitz::Array<double,2>& B);
-    void inv_(const blitz::Array<double,2>& A, blitz::Array<double,2>& B);
-
   }
 /**
  * @}
  */
 }
 
-#endif /* BOB_MATH_LU_DET_H */
+#endif /* BOB_MATH_LU_H */

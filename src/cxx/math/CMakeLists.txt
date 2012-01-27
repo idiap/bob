@@ -18,7 +18,9 @@ set(src_blas
 set(src_lapack
   "src/eig.cc"
   "src/linsolve.cc"
-  "src/lu_det.cc"
+  "src/lu.cc"
+  "src/det.cc"
+  "src/inv.cc"
   "src/sqrtm.cc"
   "src/svd.cc"
 )
@@ -41,7 +43,7 @@ add_dependencies(bob_math math-cxx_header_install)
 # Defines tests for this package
 bob_test(math linear test/linear.cc)
 bob_test(math linsolve test/linsolve.cc)
-bob_test(math lu_det test/lu_det.cc)
+bob_test(math lu_det_inv test/lu_det_inv.cc)
 bob_test(math norminv test/norminv.cc)
 bob_test(math svd test/svd.cc)
 bob_test(math interiorpointLP test/interiorpointLP.cc)
