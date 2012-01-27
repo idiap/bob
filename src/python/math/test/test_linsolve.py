@@ -33,8 +33,8 @@ class LinsolveTest(unittest.TestCase):
     x2 = bob.math.linsolve(A,b)
 
     # Compare to reference
-    self.assertEqual( ((x1-x_ref) < 1e-10).all(), True )
-    self.assertEqual( ((x2-x_ref) < 1e-10).all(), True )
+    self.assertEqual( (abs(x1-x_ref) < 1e-10).all(), True )
+    self.assertEqual( (abs(x2-x_ref) < 1e-10).all(), True )
 
   def test02_linsolveSympos(self):
     # This test demonstrates how to solve a linear system A*x=b
@@ -56,8 +56,8 @@ class LinsolveTest(unittest.TestCase):
     x2 = bob.math.linsolveSympos(A,b)
 
     # Compare to reference
-    self.assertEqual( ((x1-x_ref) < 1e-10).all(), True )
-    self.assertEqual( ((x2-x_ref) < 1e-10).all(), True )
+    self.assertEqual( (abs(x1-x_ref) < 1e-10).all(), True )
+    self.assertEqual( (abs(x2-x_ref) < 1e-10).all(), True )
 
   def test03_linsolveCGSympos(self):
     # This test demonstrates how to solve a linear system A*x=b
@@ -82,8 +82,8 @@ class LinsolveTest(unittest.TestCase):
     x2 = bob.math.linsolveCGSympos(A,b,eps,max_iter)
 
     # Compare to reference
-    self.assertEqual( ((x1-x_ref) < 2e-6).all(), True )
-    self.assertEqual( ((x2-x_ref) < 2e-6).all(), True )
+    self.assertEqual( (abs(x1-x_ref) < 2e-6).all(), True )
+    self.assertEqual( (abs(x2-x_ref) < 2e-6).all(), True )
 
    
 if __name__ == '__main__':

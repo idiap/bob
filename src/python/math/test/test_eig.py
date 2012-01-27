@@ -30,19 +30,19 @@ class EigTest(unittest.TestCase):
 
     # Compare eigenvalues to matlab reference
     ref=numpy.array([-0.5157, 0.1709, 11.3448], 'float64')
-    self.assertEqual( ((D1-ref) < 1e-3).all(), True )
-    self.assertEqual( ((D2-ref) < 1e-3).all(), True )
+    self.assertEqual( (abs(D1-ref) < 1e-3).all(), True )
+    self.assertEqual( (abs(D2-ref) < 1e-3).all(), True )
 
     # check that V*D*V^-1=A
     iV1 = bob.math.inv(V1)
     VD1 = numpy.dot(V1, numpy.diag(D1))
     VDiV1 = numpy.dot(VD1, iV1)
-    self.assertEqual( ((A-VDiV1) < 1e-10).all(), True )
+    self.assertEqual( (abs(A-VDiV1) < 1e-10).all(), True )
     # check that V*D*V^-1=A
     iV2 = bob.math.inv(V2)
     VD2 = numpy.dot(V2, numpy.diag(D2))
     VDiV2 = numpy.dot(VD2, iV2)
-    self.assertEqual( ((A-VDiV2) < 1e-10).all(), True )
+    self.assertEqual( (abs(A-VDiV2) < 1e-10).all(), True )
    
  
   def test02_eigSymGen(self):
@@ -61,10 +61,10 @@ class EigTest(unittest.TestCase):
     bob.math.eigSym(A, B, V2, D2)
 
     # Compare eigenvalues to matlab reference
-    ref=numpy.array([17.9718,0.510,-0.2728], 'float64')
+    ref=numpy.array([-0.2728,0.0510,17.9718], 'float64')
 
-    self.assertEqual( ((D1-ref) < 1e-3).all(), True )
-    self.assertEqual( ((D2-ref) < 1e-3).all(), True )
+    self.assertEqual( (abs(numpy.sort(D1)-ref) < 1e-3).all(), True )
+    self.assertEqual( (abs(numpy.sort(D2)-ref) < 1e-3).all(), True )
 
     # TODO: check eigenvectors 
 
@@ -89,8 +89,8 @@ class EigTest(unittest.TestCase):
     ref=numpy.array([-0.2728,0.0510,17.9718], 'float64')
 
     # needs to reorder the eigenvalues
-    self.assertEqual( ((numpy.sort(D1)-ref) < 1e-3).all(), True )
-    self.assertEqual( ((numpy.sort(D2)-ref) < 1e-3).all(), True )
+    self.assertEqual( (abs(numpy.sort(D1)-ref) < 1e-3).all(), True )
+    self.assertEqual( (abs(numpy.sort(D2)-ref) < 1e-3).all(), True )
 
     # TODO: check eigenvectors 
 

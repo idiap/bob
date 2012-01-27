@@ -35,8 +35,8 @@ class SqrtmTest(unittest.TestCase):
        -0.54489510,  1.19817659, -0.49106981, -0.16221167,
        -0.16221167, -0.49106981,  1.19817659, -0.54489511,
        -0.10838638, -0.16221167, -0.54489511,  0.81549316]).reshape(4,4)
-    self.assertEqual( ((B-ref) < 1e-4).all(), True )
-    self.assertEqual( ((C-ref) < 1e-4).all(), True )
+    self.assertEqual( (abs(B-ref) < 1e-4).all(), True )
+    self.assertEqual( (abs(C-ref) < 1e-4).all(), True )
    
 if __name__ == '__main__':
   sys.argv.append('-v')
