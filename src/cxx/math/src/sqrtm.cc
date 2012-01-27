@@ -1,3 +1,26 @@
+/**
+ * @file cxx/math/math/sqrt.h
+ * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
+ *
+ * @brief This file defines a function to compute the (unique) square root of
+ * a real symmetric definite-positive matrix.
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+ */
+
+
 #include "math/sqrtm.h"
 
 #include "core/array_assert.h"
@@ -5,7 +28,7 @@
 #include "math/linear.h"
 
 
-namespace tca = bob::core::array;
+namespace ca = bob::core::array;
 namespace math = bob::math;
 
 
@@ -15,11 +38,11 @@ void math::sqrtSymReal(const blitz::Array<double,2>& A,
   // Size variable
   int N = A.extent(0);
   const blitz::TinyVector<int,2> shape(N,N);
-  bob::core::array::assertZeroBase(A);
-  bob::core::array::assertZeroBase(B);
+  ca::assertZeroBase(A);
+  ca::assertZeroBase(B);
 
-  bob::core::array::assertSameShape(A,shape);
-  bob::core::array::assertSameShape(B,shape);
+  ca::assertSameShape(A,shape);
+  ca::assertSameShape(B,shape);
 
   math::sqrtSymReal_(A, B);
 }

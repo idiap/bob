@@ -19,8 +19,8 @@
  */
 #include "math/linsolve.h"
 #include "math/Exception.h"
-#include "core/array_old.h"
 #include "core/array_assert.h"
+#include "core/array_check.h"
 
 namespace math = bob::math;
 
@@ -59,7 +59,7 @@ void math::linsolve_(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
     A_lapack[i] = 
       A( (i%A.extent(1)), (i/A.extent(1)) );
   double* x_lapack;
-  bool x_direct_use = checkSafedata(x);
+  bool x_direct_use = bob::core::array::isCZeroBaseContiguous(x);
   if( !x_direct_use )
     x_lapack = new double[b.extent(0)];
   else
@@ -122,7 +122,7 @@ void math::linsolveSympos_(const blitz::Array<double,2>& A,
     A_lapack[i] = 
       A( (i%A.extent(1)), (i/A.extent(1)));
   double* x_lapack;
-  bool x_direct_use = checkSafedata(x);
+  bool x_direct_use = bob::core::array::isCZeroBaseContiguous(x);
   if( !x_direct_use )
     x_lapack = new double[b.extent(0)];
   else

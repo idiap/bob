@@ -27,3 +27,5 @@ bob_python_add_test(python-math-sqrtm-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_sqrtm.py)
 bob_python_add_test(python-math-stats-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_stats.py)
+bob_python_add_test(python-math-svd-tests 
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_svd.py)

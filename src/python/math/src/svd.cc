@@ -3,7 +3,8 @@
  * @date Sat Mar 19 22:14:10 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * @brief Binds the Singular Value Decomposition based on LAPACK to python.
+ * @brief Binds the Singular Value Decomposition based on the LAPACK 
+ *   dgsevd routine to python.
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -77,15 +78,17 @@ static tuple svd3(tp::const_ndarray A) {
   return make_tuple(U.self(), S.self(), V.self());
 }
 
-void bind_math_svd() {
-
-  static const char* SVD1_DOC = "Decomposes a matrix A into singular values/vectors A=U*S*V'. The decomposition is performed by the LAPACK library. The singular values are returned as a 1D array rather than a 2D diagonal matrix!";
-  static const char* SVD2_DOC = "Decomposes a matrix A into singular values/vectors. It only returns the first min(M,N) columns of U (left eigenvectors with associated to non-zero singular values) as well as the singular values in a vector S. The decomposition is performed by the LAPACK library. The singular values are returned as a 1D array rather than a 2D diagonal matrix!";
-  static const char* SVD3_DOC = "Decomposes a matrix A into singular values/vectors A=U*S*V'. The decomposition is performed by the LAPACK library. The singular values are returned as a 1D array rather than a 2D diagonal matrix! This version will allocate the resulting arrays 'U', 'S' and 'V' internally every time it is called.";
+void bind_math_svd() 
+{
+  static const char* SVD1_DOC = "Decomposes a matrix A (2D numpy array) into singular values/vectors A=U*S*V'. The decomposition is performed by the LAPACK library, using the simple driver routine dgesvd(). The singular values are returned as a 1D (numpy) array rather than a 2D diagonal matrix!";
+  static const char* SVD1__DOC = "Decomposes a matrix A (2D numpy array) into singular values/vectors A=U*S*V'. The decomposition is performed by the LAPACK library, using the simple driver routine dgesvd(). The singular values are returned as a 1D (numpy) array rather than a 2D diagonal matrix! NO CHECK are performed wrt. to the dimensions of the input parameters.";
+  static const char* SVD2_DOC = "Decomposes a matrix A (2D numpy array) of size MxN into singular values/vectors. It only returns the first min(M,N) columns of U (left eigenvectors with associated to non-zero singular values) as well as the singular values in a vector S (1D numpy array). The decomposition is performed by the LAPACK library, using the simple driver routine dgesvd(). The singular values are returned as a 1D (numpy) array rather than a 2D diagonal matrix!";
+  static const char* SVD2__DOC = "Decomposes a matrix A (2D numpy array) of size MxN into singular values/vectors. It only returns the first min(M,N) columns of U (left eigenvectors with associated to non-zero singular values) as well as the singular values in a vector S (1D numpy array). The decomposition is performed by the LAPACK library, using the simple driver routine dgesvd(). The singular values are returned as a 1D (numpy) array rather than a 2D diagonal matrix! NO CHECK are performed wrt. to the dimensions of the input parameters.";
+  static const char* SVD3_DOC = "Decomposes a matrix A (2D numpy array) into singular values/vectors A=U*S*V'. The decomposition is performed by the LAPACK library, using the simple driver routine dgesvd(). The singular values are returned as a 1D (numpy) array rather than a 2D diagonal matrix! This version will allocate the resulting numpy arrays 'U', 'S' and 'V' internally every time it is called.";
 
   def("svd", &svd1, (arg("A"),arg("U"),arg("S"),arg("V")), SVD1_DOC);
-  def("svd_", &svd1_, (arg("A"),arg("U"),arg("S"),arg("V")), SVD1_DOC);
+  def("svd_", &svd1_, (arg("A"),arg("U"),arg("S"),arg("V")), SVD1__DOC);
   def("svd", &svd2, (arg("A"),arg("U"),arg("S")), SVD2_DOC);
-  def("svd_", &svd2_, (arg("A"),arg("U"),arg("S")), SVD2_DOC);
+  def("svd_", &svd2_, (arg("A"),arg("U"),arg("S")), SVD2__DOC);
   def("svd", &svd3, (arg("A")), SVD3_DOC);
 }
