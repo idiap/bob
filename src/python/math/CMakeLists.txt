@@ -23,6 +23,8 @@ bob_python_add_test(python-math-eigenvalue-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_eig.py)
 bob_python_add_test(python-math-linsolve-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_linsolve.py)
+bob_python_add_test(python-math-norminv-tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_norminv.py)
 bob_python_add_test(python-math-sqrtm-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_sqrtm.py)
 bob_python_add_test(python-math-stats-tests 
