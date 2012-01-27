@@ -21,12 +21,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_MATH_INTERIOR_POINT_LP_H
-#define BOB5SPRO_MATH_INTERIOR_POINT_LP_H 1
+#ifndef BOB_MATH_INTERIOR_POINT_LP_H
+#define BOB_MATH_INTERIOR_POINT_LP_H
 
-#include "core/logging.h"
-#include "core/Exception.h"
-//#include "math/Exception.h"
+#include <blitz/array.h>
 
 namespace bob {
 /**
@@ -334,4 +332,4 @@ namespace bob {
  */
 }
 
-#endif /* BOB5SPRO_MATH_INTERIOR_POINT_LP_H */
+#endif /* BOB_MATH_INTERIOR_POINT_LP_H */

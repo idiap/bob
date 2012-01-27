@@ -2,6 +2,7 @@ project(math-python)
 cmake_minimum_required(VERSION 2.6)
 
 set(pysrc
+   "src/interiorpointLP.cc"
    "src/linsolve.cc"
    "src/norminv.cc"
    "src/stats.cc"
@@ -17,6 +18,8 @@ target_link_libraries(pybob_math pybob_core_ndarray)
 bob_python_install(math)
 
 # Our test units
+bob_python_add_test(python-math-interiorpointLP-tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_interiorpointLP.py)
 bob_python_add_test(python-math-linsolve-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_linsolve.py)
 bob_python_add_test(python-math-norminv-tests

@@ -24,9 +24,12 @@
 #include "math/linear.h"
 #include "math/interiorpointLP.h"
 #include "math/linsolve.h"
+#include "math/Exception.h"
+
 
 namespace math = bob::math;
 namespace mathdetail = bob::math::detail;
+namespace ca = bob::core::array;
 
 bool mathdetail::isPositive(const blitz::Array<double,1>& x)
 {
@@ -268,7 +271,7 @@ void mathdetail::centeringV2(const blitz::Array<double,2>& A,
       mu_alpha(r_n) = mu(r_n+mu.lbound(0)) + alpha * x_large(r_n+m+n);
       alpha /= 2.;
       if( alpha<2*std::numeric_limits<double>::epsilon())
-        throw bob::core::Exception();
+        throw math::Exception();
     } while( !(mathdetail::isPositive(x_alpha) && mathdetail::isPositive(mu_alpha)) );
     // Move content back
     lambda( r_m+lambda.lbound(0)) = lambda_alpha(r_m);
@@ -325,7 +328,7 @@ void mathdetail::centeringVinf(const blitz::Array<double,2>& A,
       mu_alpha(r_n) = mu(r_n+mu.lbound(0)) + alpha * x_large(r_n+m+n);
       alpha /= 2.;
       if( alpha<2*std::numeric_limits<double>::epsilon())
-        throw bob::core::Exception();
+        throw math::Exception();
     } while( !(mathdetail::isPositive(x_alpha) && mathdetail::isPositive(mu_alpha)) );
     // Move content back
     lambda( r_m+lambda.lbound(0)) = lambda_alpha(r_m);
@@ -347,7 +350,6 @@ void mathdetail::initializeLargeSystem(const blitz::Array<double,2>& A,
 
   // Reindex and resize A_large, b_large and x_large
   bob::core::array::reindexAndResize( A_large, 0, 0, m+2*n, m+2*n);
-  bob::core::array::reindexAndResize( b_large, 0, m+2*n);
   bob::core::array::reindexAndResize( b_large, 0, m+2*n);
   bob::core::array::reindexAndResize( x_large, 0, m+2*n);
 
@@ -492,7 +494,7 @@ void math::interiorpointPredictorCorrectorNoInitLP(const blitz::Array<double,2>&
       mu_alpha(r_n) = mu(r_n+mu.lbound(0)) + alpha * x_large(r_n+m+n);
       alpha /= 2.;
       if( alpha<2*std::numeric_limits<double>::epsilon())
-        throw bob::core::Exception();
+        throw math::Exception();
     } while( !mathdetail::isInV2S(A,b,c,x_alpha,lambda_alpha,mu_alpha,epsilon,theta_pred));
     // Move content back
     lambda( r_m+lambda.lbound(0)) = lambda_alpha(r_m);
@@ -575,7 +577,7 @@ void math::interiorpointLongstepNoInitLP(const blitz::Array<double,2>& A,
       mu_alpha(r_n) = mu(r_n+mu.lbound(0)) + alpha * x_large(r_n+m+n);
       alpha /= 2.;
       if( alpha<2*std::numeric_limits<double>::epsilon())
-        throw bob::core::Exception();
+        throw math::Exception();
     } while( !mathdetail::isInVinfS(A,b,c,x_alpha,lambda_alpha,mu_alpha,epsilon,gamma));
     // Move content back
     lambda( r_m+lambda.lbound(0)) = lambda_alpha(r_m);
