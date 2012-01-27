@@ -22,19 +22,15 @@
 
 #include "core/python/ndarray.h"
 
-void bind_math_eig();
 void bind_math_linsolve();
 void bind_math_norminv();
-void bind_math_sqrtm();
 void bind_math_stats();
 
 BOOST_PYTHON_MODULE(libpybob_math) {
 
   bob::python::setup_python("bob mathematical classes and sub-classes");
 
-  bind_math_eig();
   bind_math_linsolve();
   bind_math_norminv();
-  bind_math_sqrtm();
   bind_math_stats();
 }
