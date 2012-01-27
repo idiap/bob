@@ -4,7 +4,6 @@ cmake_minimum_required(VERSION 2.6)
 set(pysrc
    "src/eig.cc"
    "src/linsolve.cc"
-   "src/lu_det_inv.cc"
    "src/norminv.cc"
    "src/sqrtm.cc"
    "src/stats.cc"
@@ -24,8 +23,6 @@ bob_python_add_test(python-math-eigenvalue-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_eig.py)
 bob_python_add_test(python-math-linsolve-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_linsolve.py)
-bob_python_add_test(python-math-lu_det_inv-tests
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_lu_det_inv.py)
 bob_python_add_test(python-math-sqrtm-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_sqrtm.py)
 bob_python_add_test(python-math-stats-tests 
