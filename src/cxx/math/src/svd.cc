@@ -95,7 +95,7 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
  
   // Check info variable
   if( info != 0)
-    throw bob::math::LapackError("The LAPACK dgsevd function returned a non-zero value.");
+    throw math::LapackError("The LAPACK dgsevd function returned a non-zero value.");
 
   // Copy singular vectors back to U and V (column-major order)
   for(int j=0; j<M; ++j)
@@ -183,7 +183,7 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
  
   // Check info variable
   if( info != 0)
-    throw bob::math::LapackError("The LAPACK dgsevd function returned a non-zero value.");
+    throw math::LapackError("The LAPACK dgsevd function returned a non-zero value.");
 
   // Copy singular vectors back to U and V (column-major order)
   for(int j=0; j<M; ++j)

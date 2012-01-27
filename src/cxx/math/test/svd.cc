@@ -26,7 +26,6 @@
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
 #include <stdint.h>
-#include "core/cast.h"
 #include "math/linear.h"
 #include "math/svd.h"
 
@@ -68,33 +67,6 @@ void check_dimensions( blitz::Array<T,d>& t1, blitz::Array<U,d>& t2)
   BOOST_REQUIRE_EQUAL(t1.dimensions(), t2.dimensions());
   for( int i=0; i<t1.dimensions(); ++i)
     BOOST_CHECK_EQUAL(t1.extent(i), t2.extent(i));
-}
-
-template<typename T, typename U>  
-void checkBlitzEqual( blitz::Array<T,1>& t1, blitz::Array<U,1>& t2)
-{
-  check_dimensions( t1, t2);
-  for( int i=0; i<t1.extent(0); ++i)
-    BOOST_CHECK_EQUAL(t1(i), bob::core::cast<T>(t2(i)));
-}
-
-template<typename T, typename U>  
-void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
-{
-  check_dimensions( t1, t2);
-  for( int i=0; i<t1.extent(0); ++i)
-    for( int j=0; j<t1.extent(1); ++j)
-      BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
-}
-
-template<typename T, typename U>  
-void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2) 
-{
-  check_dimensions( t1, t2);
-  for( int i=0; i<t1.extent(0); ++i)
-    for( int j=0; j<t1.extent(1); ++j)
-      for( int k=0; k<t1.extent(2); ++k)
-        BOOST_CHECK_EQUAL(t1(i,j,k), bob::core::cast<T>(t2(i,j,k)));
 }
 
 template<typename T>  
