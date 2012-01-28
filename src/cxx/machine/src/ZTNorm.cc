@@ -72,9 +72,16 @@ namespace detail {
 
     
     // Znorm  -->      zA  = (A - mean(B) ) / std(B)    [znorm on oringinal scores]
+    // mean(B)
     blitz::Array<double, 1> mean_B(blitz::mean(B, j));
-    blitz::Array<double, 1> std_B(blitz::sqrt(blitz::sum(blitz::pow(B(i, j) - mean_B(i), 2), j) / (size_znorm - 1)));
-    blitz::Array<double, 2> zA( (A(i, j) - mean_B(i)) / std_B(i) ); 
+    // std(B)
+    blitz::Array<double, 2> B2n(B.shape());
+    B2n = blitz::pow2(B(i, j) - mean_B(i));
+    blitz::Array<double, 1> std_B(B.extent(0));
+    std_B = blitz::sqrt(blitz::sum(B2n, j) / (size_znorm - 1));
+    // zA
+    blitz::Array<double, 2> zA(A.shape());
+    zA = (A(i, j) - mean_B(i)) / std_B(i);
 
     blitz::Array<double, 1> mean_Dimp(size_tnorm);
     blitz::Array<double, 1> std_Dimp(size_tnorm);
