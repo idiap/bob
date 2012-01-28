@@ -50,7 +50,6 @@ endif(MATIO_FOUND)
 
 if(ImageMagick_FOUND)
   set(shared "${shared};${ImageMagick_LIBRARIES}")
-  set(src "${src};src/MatUtils.cc")
 endif(ImageMagick_FOUND)
 
 if(FFMPEG_FOUND)
