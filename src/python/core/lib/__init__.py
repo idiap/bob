@@ -36,6 +36,3 @@ def variable_dict(self):
     v = self.variable(k)
     retval[v.name] = v
   return retval
-
-Object.variables = variables
-Object.variable_dict = variable_dict

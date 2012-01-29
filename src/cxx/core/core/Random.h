@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_CORE_RANDOM_H
-#define BOB5SPRO_CORE_RANDOM_H 1
+#ifndef BOB_CORE_RANDOM_H
+#define BOB_CORE_RANDOM_H
 
 #include <boost/random.hpp>
 #include <boost/scoped_ptr.hpp>

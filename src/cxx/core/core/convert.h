@@ -24,8 +24,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_CORE_CONVERT_H
-#define BOB5SPRO_CORE_CONVERT_H
+#ifndef BOB_CORE_CONVERT_H
+#define BOB_CORE_CONVERT_H
 
 #include <limits>
 #include <blitz/array.h>
@@ -202,5 +202,5 @@ namespace bob {
  */
 }
 
-#endif /* BOB5SPRO_CORE_CAST_H */
+#endif /* BOB_CORE_CAST_H */
 

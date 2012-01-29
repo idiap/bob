@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_CORE_EXCEPTION_H 
-#define BOB5SPRO_CORE_EXCEPTION_H
+#ifndef BOB_CORE_EXCEPTION_H 
+#define BOB_CORE_EXCEPTION_H
 
 #include <stdexcept>
 
@@ -93,4 +93,4 @@ namespace bob {
 
 }
 
-#endif /* BOB5SPRO_CORE_EXCEPTION_H */
+#endif /* BOB_CORE_EXCEPTION_H */

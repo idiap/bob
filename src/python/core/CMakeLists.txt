@@ -6,8 +6,6 @@ set(pysrc
    "src/version.cc"
    "src/exception.cc"
    "src/logging.cc"
-   "src/object.cc"
-   "src/tensor.cc"
    "src/profile.cc"
    "src/main.cc"
    )

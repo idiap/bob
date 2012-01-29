@@ -17,14 +17,8 @@ endif(GOOGLE_PERFTOOLS_FOUND)
 
 # This defines the list of source files inside this package.
 set(src
-    "src/general.cc"
     "src/blitz_io_overload.cc"
-    "src/VariableCollector.cc"
-    "src/Object.cc"
-    "src/Parameters.cc"
-    "src/Tensor.cc"
     "src/Random.cc"
-    "src/File.cc"
     "src/Exception.cc"
     "src/convert_exception.cc"
     "src/logging.cc"
@@ -43,8 +37,6 @@ bob_library(core "${src}" "${deps}" "${shared}")
 add_dependencies(bob_core core-cxx_header_install)
 
 # Defines tests for this package
-bob_test(core tensor test/tensor.cc)
-bob_test(core adapter test/blitzAdapter.cc)
 bob_test(core logging test/logging.cc)
 bob_test(core blitzarray test/blitzArray.cc)
 bob_test(core convertarray test/convert.cc)

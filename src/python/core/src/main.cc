@@ -27,8 +27,6 @@ using namespace boost::python;
 void bind_core_version();
 void bind_core_exception();
 void bind_core_logging();
-void bind_core_object();
-void bind_core_tensor();
 void bind_core_profiler();
 
 BOOST_PYTHON_MODULE(libpybob_core) {
@@ -41,7 +39,5 @@ BOOST_PYTHON_MODULE(libpybob_core) {
   bind_core_version();
   bind_core_exception();
   bind_core_logging();
-  bind_core_object();
-  bind_core_tensor();
   bind_core_profiler();
 }

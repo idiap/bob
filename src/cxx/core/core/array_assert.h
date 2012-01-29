@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_CORE_ARRAY_ASSERT_H
-#define BOB5SPRO_CORE_ARRAY_ASSERT_H
+#ifndef BOB_CORE_ARRAY_ASSERT_H
+#define BOB_CORE_ARRAY_ASSERT_H
 
 #include "core/array_check.h"
 #include "core/array_exception.h"
@@ -161,4 +161,4 @@ namespace bob {
  */
 }
 
-#endif /* BOB5SPRO_ARRAY_ASSERT_H */
+#endif /* BOB_ARRAY_ASSERT_H */
