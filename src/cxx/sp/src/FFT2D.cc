@@ -26,7 +26,7 @@
 #include <fftw3.h>
 
 
-namespace tca = bob::core::array;
+namespace ca = bob::core::array;
 namespace sp = bob::sp;
 
 sp::FFT2DAbstract::FFT2DAbstract( const int height, const int width):
@@ -72,11 +72,11 @@ void sp::FFT2D::operator()(const blitz::Array<std::complex<double>,2>& src,
   blitz::Array<std::complex<double>,2>& dst)
 {
   // check input
-  tca::assertCZeroBaseContiguous(src);
+  ca::assertCZeroBaseContiguous(src);
 
   // Check output
-  tca::assertCZeroBaseContiguous(dst);
-  tca::assertSameShape( dst, src);
+  ca::assertCZeroBaseContiguous(dst);
+  ca::assertSameShape( dst, src);
 
   // Reinterpret cast to fftw format
   fftw_complex* src_ = reinterpret_cast<fftw_complex*>(const_cast<std::complex<double>* >(src.data()));
@@ -100,11 +100,11 @@ void sp::IFFT2D::operator()(const blitz::Array<std::complex<double>,2>& src,
   blitz::Array<std::complex<double>,2>& dst)
 {
   // check input
-  tca::assertCZeroBaseContiguous(src);
+  ca::assertCZeroBaseContiguous(src);
 
   // Check output
-  tca::assertCZeroBaseContiguous(dst);
-  tca::assertSameShape( dst, src);
+  ca::assertCZeroBaseContiguous(dst);
+  ca::assertSameShape( dst, src);
 
   // Reinterpret cast to fftw format
   fftw_complex* src_ = reinterpret_cast<fftw_complex*>(const_cast<std::complex<double>* >(src.data()));

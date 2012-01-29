@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_SP_CONVOLVE_H
-#define BOB5SPRO_SP_CONVOLVE_H
+#ifndef BOB_SP_CONVOLVE_H
+#define BOB_SP_CONVOLVE_H
 
 #include "core/Exception.h"
 #include "core/array_assert.h"
@@ -29,8 +29,6 @@
 #include "core/array_index.h"
 #include <algorithm>
 #include <blitz/array.h>
-
-namespace tca = bob::core::array;
 
 namespace bob {
   /**
@@ -199,11 +197,11 @@ namespace bob {
       const blitz::TinyVector<int,1> Asize = getConvolveOutputSize(B, C, size_opt);
 
       // Checks that A has the correct size and is zero base
-      tca::assertSameShape(A, Asize);
-      tca::assertZeroBase(A);
+      bob::core::array::assertSameShape(A, Asize);
+      bob::core::array::assertZeroBase(A);
       // Checks that B and C are zero base
-      tca::assertZeroBase(B);
-      tca::assertZeroBase(C);
+      bob::core::array::assertZeroBase(B);
+      bob::core::array::assertZeroBase(C);
     
       A = 0;
       for(int i=0; i < Asize(0); ++i)
@@ -226,8 +224,8 @@ namespace bob {
           else if( border_opt == Convolution::NearestNeighbour )
           {
             for(int j=i_shifted-(Csize-1); j <= i_shifted; ++j)
-              A(i) += B( tca::keepInRange(j,0,Bsize-1)) * 
-                C( tca::keepInRange(i_shifted-j,0,Csize-1));
+              A(i) += B( bob::core::array::keepInRange(j,0,Bsize-1)) * 
+                C( bob::core::array::keepInRange(i_shifted-j,0,Csize-1));
           }
           else if( border_opt == Convolution::Circular )
           {
@@ -238,8 +236,8 @@ namespace bob {
           else if( border_opt == Convolution::Mirror )
           {
             for(int j=i_shifted-(Csize-1); j <= i_shifted; ++j)
-              A(i) += B( tca::mirrorInRange(j,0,Bsize-1) ) * 
-                C( tca::mirrorInRange(i_shifted-j,0,Csize-1) );
+              A(i) += B( bob::core::array::mirrorInRange(j,0,Bsize-1) ) * 
+                C( bob::core::array::mirrorInRange(i_shifted-j,0,Csize-1) );
           }
         }
         else if( size_opt == Convolution::Valid )
@@ -285,11 +283,11 @@ namespace bob {
       const blitz::TinyVector<int,2> Asize = getConvolveOutputSize(B, C, size_opt);
 
       // Checks that A has the correct size and is zero base
-      tca::assertSameShape(A, Asize);
-      tca::assertZeroBase(A);
+      bob::core::array::assertSameShape(A, Asize);
+      bob::core::array::assertZeroBase(A);
       // Checks that B and C are zero base
-      tca::assertZeroBase(B);
-      tca::assertZeroBase(C);
+      bob::core::array::assertZeroBase(B);
+      bob::core::array::assertZeroBase(C);
 
       for(int i1=0; i1 < Asize(0); ++i1)
       {
@@ -329,10 +327,10 @@ namespace bob {
             {
               for(int j1=i1_shifted-(Csize1-1); j1 <= i1_shifted; ++j1)
                 for(int j2=i2_shifted-(Csize2-1); j2 <= i2_shifted; ++j2)
-                  A(i1,i2) += B( tca::keepInRange(j1,0,Bsize1-1), 
-                               tca::keepInRange(j2,0,Bsize2-1)) *
-                    C( tca::keepInRange(i1_shifted-j1,0,Csize1-1),
-                       tca::keepInRange(i2_shifted-j2,0,Csize2-1));
+                  A(i1,i2) += B( bob::core::array::keepInRange(j1,0,Bsize1-1), 
+                               bob::core::array::keepInRange(j2,0,Bsize2-1)) *
+                    C( bob::core::array::keepInRange(i1_shifted-j1,0,Csize1-1),
+                       bob::core::array::keepInRange(i2_shifted-j2,0,Csize2-1));
             }
             else if( border_opt == Convolution::Circular )
             {
@@ -346,10 +344,10 @@ namespace bob {
             {
               for(int j1=i1_shifted-(Csize1-1); j1 <= i1_shifted; ++j1)
                 for(int j2=i2_shifted-(Csize2-1); j2 <= i2_shifted; ++j2)
-                  A(i1,i2) += B( tca::mirrorInRange(j1,0,Bsize1-1), 
-                               tca::mirrorInRange(j2,0,Bsize2-1)) *
-                    C( tca::mirrorInRange(i1_shifted-j1,0,Csize1-1),
-                       tca::mirrorInRange(i2_shifted-j2,0,Csize2-1));
+                  A(i1,i2) += B( bob::core::array::mirrorInRange(j1,0,Bsize1-1), 
+                               bob::core::array::mirrorInRange(j2,0,Bsize2-1)) *
+                    C( bob::core::array::mirrorInRange(i1_shifted-j1,0,Csize1-1),
+                       bob::core::array::mirrorInRange(i2_shifted-j2,0,Csize2-1));
             }
           }
           else if( size_opt == Convolution::Valid )
@@ -440,11 +438,11 @@ namespace bob {
       const blitz::TinyVector<int,N> Asize = getConvolveSepOutputSize(B, C, dim, size_opt);
 
       // Checks that A has the correct size and is zero base
-      tca::assertSameShape(A, Asize);
-      tca::assertZeroBase(A);
+      bob::core::array::assertSameShape(A, Asize);
+      bob::core::array::assertZeroBase(A);
       // Checks that B and C are zero base
-      tca::assertZeroBase(B);
-      tca::assertZeroBase(C);
+      bob::core::array::assertZeroBase(B);
+      bob::core::array::assertZeroBase(C);
 
       if(dim==0)
         detail::convolveSep( B, C, A, size_opt, border_opt);
@@ -464,4 +462,4 @@ namespace bob {
  */
 }
 
-#endif /* BOB5SPRO_SP_CONVOLVE_H */
+#endif /* BOB_SP_CONVOLVE_H */

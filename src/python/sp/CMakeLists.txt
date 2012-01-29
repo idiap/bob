@@ -6,7 +6,6 @@ set(pysrc
    "src/convolution.cc"
    "src/extrapolate.cc"
    "src/fft_dct.cc"
-   "src/spcore.cc"
    "src/main.cc"
    )
  

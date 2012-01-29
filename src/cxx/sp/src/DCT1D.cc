@@ -25,7 +25,7 @@
 #include "core/array_assert.h"
 #include <fftw3.h>
 
-namespace tca = bob::core::array;
+namespace ca = bob::core::array;
 namespace sp = bob::sp;
 
 sp::DCT1DAbstract::DCT1DAbstract( const int length):
@@ -79,11 +79,11 @@ void sp::DCT1D::operator()(const blitz::Array<double,1>& src,
   blitz::Array<double,1>& dst)
 {
   // check input
-  tca::assertCZeroBaseContiguous(src);
+  ca::assertCZeroBaseContiguous(src);
 
   // Check output
-  tca::assertCZeroBaseContiguous(dst);
-  tca::assertSameShape( dst, src);
+  ca::assertCZeroBaseContiguous(dst);
+  ca::assertSameShape( dst, src);
 
   // Reinterpret cast to fftw format
   double* src_ = const_cast<double*>(src.data());
@@ -115,11 +115,11 @@ void sp::IDCT1D::operator()(const blitz::Array<double,1>& src,
   blitz::Array<double,1>& dst)
 {
   // check input
-  tca::assertCZeroBaseContiguous(src);
+  ca::assertCZeroBaseContiguous(src);
 
   // Check output
-  tca::assertCZeroBaseContiguous(dst);
-  tca::assertSameShape( dst, src);
+  ca::assertCZeroBaseContiguous(dst);
+  ca::assertSameShape( dst, src);
 
   // Copy content from src to dst
   dst = src;

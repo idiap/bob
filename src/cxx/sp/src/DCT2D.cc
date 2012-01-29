@@ -26,7 +26,7 @@
 #include <fftw3.h>
 
 
-namespace tca = bob::core::array;
+namespace ca = bob::core::array;
 namespace sp = bob::sp;
 
 sp::DCT2DAbstract::DCT2DAbstract( const int height, const int width):
@@ -83,11 +83,11 @@ void sp::DCT2D::operator()(const blitz::Array<double,2>& src,
   blitz::Array<double,2>& dst)
 {
   // check input
-  tca::assertCZeroBaseContiguous(src);
+  ca::assertCZeroBaseContiguous(src);
 
   // Check output
-  tca::assertCZeroBaseContiguous(dst);
-  tca::assertSameShape( dst, src);
+  ca::assertCZeroBaseContiguous(dst);
+  ca::assertSameShape( dst, src);
 
   // Reinterpret cast to fftw format
   double* src_ = const_cast<double*>(src.data());
@@ -116,11 +116,11 @@ void sp::IDCT2D::operator()(const blitz::Array<double,2>& src,
   blitz::Array<double,2>& dst)
 {
   // check input
-  tca::assertCZeroBaseContiguous(src);
+  ca::assertCZeroBaseContiguous(src);
 
   // Check output
-  tca::assertCZeroBaseContiguous(dst);
-  tca::assertSameShape( dst, src);
+  ca::assertCZeroBaseContiguous(dst);
+  ca::assertSameShape( dst, src);
 
   // Normalize
   for(int j=0; j<m_width; ++j)

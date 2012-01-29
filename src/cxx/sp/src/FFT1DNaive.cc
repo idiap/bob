@@ -23,7 +23,7 @@
 #include "sp/FFT1DNaive.h"
 #include "core/array_assert.h"
 
-namespace tca = bob::core::array;
+namespace ca = bob::core::array;
 namespace spd = bob::sp::detail;
 
 spd::FFT1DNaiveAbstract::FFT1DNaiveAbstract( const int length):
@@ -71,13 +71,13 @@ void spd::FFT1DNaive::operator()(const blitz::Array<std::complex<double>,1>& src
   blitz::Array<std::complex<double>,1>& dst)
 {
   // Check input, inclusive dimension
-  tca::assertZeroBase(src);
+  ca::assertZeroBase(src);
   const blitz::TinyVector<int,1> shape(m_length);
-  tca::assertSameShape(src, shape);
+  ca::assertSameShape(src, shape);
 
   // Check output
-  tca::assertCZeroBaseContiguous(dst);
-  tca::assertSameShape( dst, src);
+  ca::assertCZeroBaseContiguous(dst);
+  ca::assertSameShape( dst, src);
 
   // Process
   processNoCheck(src, dst);
@@ -107,13 +107,13 @@ void spd::IFFT1DNaive::operator()(const blitz::Array<std::complex<double>,1>& sr
   blitz::Array<std::complex<double>,1>& dst)
 {
   // Check input, inclusive dimension
-  tca::assertZeroBase(src);
+  ca::assertZeroBase(src);
   const blitz::TinyVector<int,1> shape(m_length);
-  tca::assertSameShape(src, shape);
+  ca::assertSameShape(src, shape);
 
   // Check output
-  tca::assertCZeroBaseContiguous(dst);
-  tca::assertSameShape( dst, src);
+  ca::assertCZeroBaseContiguous(dst);
+  ca::assertSameShape( dst, src);
 
   // Process
   processNoCheck(src, dst);

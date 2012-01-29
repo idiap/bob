@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_SP_FFT2D_H
-#define BOB5SPRO_SP_FFT2D_H
+#ifndef BOB_SP_FFT2D_H
+#define BOB_SP_FFT2D_H
 
 #include <complex>
 #include <blitz/array.h>
@@ -139,4 +139,4 @@ namespace bob {
  */
 }
 
-#endif /* BOB5SPRO_SP_FFT2D_H */
+#endif /* BOB_SP_FFT2D_H */

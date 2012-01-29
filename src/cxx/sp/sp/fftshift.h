@@ -20,14 +20,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_SP_FFTSHIFT_H
-#define BOB5SPRO_SP_FFTSHIFT_H
+#ifndef BOB_SP_FFTSHIFT_H
+#define BOB_SP_FFTSHIFT_H
 
 #include <complex>
 #include <blitz/array.h>
 #include "core/array_assert.h"
 
-namespace tca = bob::core::array;
 
 namespace bob {
 /**
@@ -114,10 +113,10 @@ namespace bob {
     void fftshift(const blitz::Array<T,1>& A, blitz::Array<T,1>& B)
     {
       // Check input
-      tca::assertZeroBase(A);
+      bob::core::array::assertZeroBase(A);
       // Check output
-      tca::assertZeroBase(B);
-      tca::assertSameShape(A,B);
+      bob::core::array::assertZeroBase(B);
+      bob::core::array::assertSameShape(A,B);
 
       // Center location
       int size_by_2 = A.extent(0)/2 + (A.extent(0) % 2);
@@ -134,10 +133,10 @@ namespace bob {
     void ifftshift(const blitz::Array<T,1>& A, blitz::Array<T,1>& B)
     {
       // Check input
-      tca::assertZeroBase(A);
+      bob::core::array::assertZeroBase(A);
       // Check output
-      tca::assertZeroBase(B);
-      tca::assertSameShape(A,B);
+      bob::core::array::assertZeroBase(B);
+      bob::core::array::assertSameShape(A,B);
 
       // Center location
       int size_by_2 = A.extent(0)/2;
@@ -155,10 +154,10 @@ namespace bob {
     void fftshift(const blitz::Array<T,2>& A, blitz::Array<T,2>& B)
     {
       // Check input
-      tca::assertZeroBase(A);
+      bob::core::array::assertZeroBase(A);
       // Check output
-      tca::assertZeroBase(B);
-      tca::assertSameShape(A,B);
+      bob::core::array::assertZeroBase(B);
+      bob::core::array::assertSameShape(A,B);
 
       // Center location
       int h_by_2 = A.extent(0)/2 + (A.extent(0) % 2);
@@ -176,10 +175,10 @@ namespace bob {
     void ifftshift(const blitz::Array<T,2>& A, blitz::Array<T,2>& B)
     {
       // Check input
-      tca::assertZeroBase(A);
+      bob::core::array::assertZeroBase(A);
       // Check output
-      tca::assertZeroBase(B);
-      tca::assertSameShape(A,B);
+      bob::core::array::assertZeroBase(B);
+      bob::core::array::assertSameShape(A,B);
 
       // Center location
       int h_by_2 = A.extent(0)/2;
@@ -194,4 +193,4 @@ namespace bob {
  */
 }
 
-#endif /* BOB5SPRO_SP_FFTSHIFT_H */
+#endif /* BOB_SP_FFTSHIFT_H */

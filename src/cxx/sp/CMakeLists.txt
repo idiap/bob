@@ -7,8 +7,6 @@ set(shared "${FFTW3_LIBRARY}")
 
 # This defines the list of source files inside this package.
 set(src 
-    "src/spCore.cc"
-    "src/spCoreChain.cc"
     "src/FFT1D.cc"
     "src/FFT1DNaive.cc"
     "src/FFT2D.cc"
