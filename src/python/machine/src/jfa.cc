@@ -26,10 +26,81 @@
 #include "machine/JFAMachine.h"
 #include "machine/GMMMachine.h"
 
+#include "core/logging.h"
+
 using namespace boost::python;
 namespace mach = bob::machine;
+namespace ca = bob::core::array;
 namespace io = bob::io;
 namespace tp = bob::python;
+
+static object py_getU(const mach::JFABaseMachine& machine) {
+  size_t n_CD = machine.getDimCD();
+  size_t n_Ru = machine.getDimRu();
+  tp::ndarray U(ca::t_float64, n_CD, n_Ru);
+  blitz::Array<double,2> U_ = U.bz<double,2>();
+  U_ = machine.getU();
+  return U.self();
+}
+
+static void py_setU(mach::JFABaseMachine& machine, tp::const_ndarray U) {
+  const blitz::Array<double,2> U_ = U.bz<double,2>();
+  machine.setU(U_);
+}
+
+static object py_getV(const mach::JFABaseMachine& machine) {
+  size_t n_CD = machine.getDimCD();
+  size_t n_Rv = machine.getDimRv();
+  tp::ndarray V(ca::t_float64, n_CD, n_Rv);
+  blitz::Array<double,2> V_ = V.bz<double,2>();
+  V_ = machine.getV();
+  return V.self();
+}
+
+static void py_setV(mach::JFABaseMachine& machine, tp::const_ndarray V) {
+  const blitz::Array<double,2> V_ = V.bz<double,2>();
+  machine.setV(V_);
+}
+
+static object py_getD(const mach::JFABaseMachine& machine) {
+  size_t n_CD = machine.getDimCD();
+  tp::ndarray D(ca::t_float64, n_CD);
+  blitz::Array<double,1> D_ = D.bz<double,1>();
+  D_ = machine.getD();
+  return D.self();
+}
+
+static void py_setD(mach::JFABaseMachine& machine, tp::const_ndarray D) {
+  const blitz::Array<double,1> D_ = D.bz<double,1>();
+  machine.setD(D_);
+}
+
+
+static object py_getY(const mach::JFAMachine& machine) {
+  size_t n_Rv = machine.getDimRv();
+  tp::ndarray Y(ca::t_float64, n_Rv);
+  blitz::Array<double,1> Y_ = Y.bz<double,1>();
+  Y_ = machine.getY();
+  return Y.self();
+}
+
+static void py_setY(mach::JFAMachine& machine, tp::const_ndarray Y) {
+  const blitz::Array<double,1> Y_ = Y.bz<double,1>();
+  machine.setY(Y_);
+}
+
+static object py_getZ(const mach::JFAMachine& machine) {
+  size_t n_CD = machine.getDimCD();
+  tp::ndarray Z(ca::t_float64, n_CD);
+  blitz::Array<double,1> Z_ = Z.bz<double,1>();
+  Z_ = machine.getZ();
+  return Z.self();
+}
+
+static void py_setZ(mach::JFAMachine& machine, tp::const_ndarray Z) {
+  const blitz::Array<double,1> Z_ = Z.bz<double,1>();
+  machine.setZ(Z_);
+}
 
 static void jfa_forward_list(mach::JFAMachine& m, list stats, tp::ndarray score)
 {
@@ -63,9 +134,9 @@ void bind_machine_jfa() {
     .def("load", &mach::JFABaseMachine::load, (arg("self"), arg("config")), "Loads the configuration parameters from a configuration file.")
     .def("save", &mach::JFABaseMachine::save, (arg("self"), arg("config")), "Saves the configuration parameters to a configuration file.")
     .add_property("ubm", &mach::JFABaseMachine::getUbm, &mach::JFABaseMachine::setUbm)
-    .add_property("U", make_function(&mach::JFABaseMachine::getU, return_value_policy<copy_const_reference>()), &mach::JFABaseMachine::setU)
-    .add_property("V", make_function(&mach::JFABaseMachine::getV, return_value_policy<copy_const_reference>()), &mach::JFABaseMachine::setV)
-    .add_property("D", make_function(&mach::JFABaseMachine::getD, return_value_policy<copy_const_reference>()), &mach::JFABaseMachine::setD)
+    .add_property("U", &py_getU, &py_setU)
+    .add_property("V", &py_getV, &py_setV)
+    .add_property("D", &py_getD, &py_setD)
     .add_property("DimC", &mach::JFABaseMachine::getDimC)
     .add_property("DimD", &mach::JFABaseMachine::getDimD)
     .add_property("DimCD", &mach::JFABaseMachine::getDimCD)
@@ -83,8 +154,8 @@ void bind_machine_jfa() {
     .def("__call__", &jfa_forward_list, (arg("self"), arg("gmm_stats"), arg("scores")), "Processes a list of GMM statistics and updates a score list.")
     .def("forward", &jfa_forward_list, (arg("self"), arg("gmm_stats"), arg("scores")), "Processes a list of GMM statistics and updates a score list.")
     .add_property("jfa_base", &mach::JFAMachine::getJFABase, &mach::JFAMachine::setJFABase)
-    .add_property("y", make_function(&mach::JFAMachine::getY, return_value_policy<copy_const_reference>()), &mach::JFAMachine::setY)
-    .add_property("z", make_function(&mach::JFAMachine::getZ, return_value_policy<copy_const_reference>()), &mach::JFAMachine::setZ)
+    .add_property("y", &py_getY, &py_setY)
+    .add_property("z", &py_getZ, &py_setZ)
     .add_property("DimC", &mach::JFAMachine::getDimC)
     .add_property("DimD", &mach::JFAMachine::getDimD)
     .add_property("DimCD", &mach::JFAMachine::getDimCD)
