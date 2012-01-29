@@ -23,7 +23,7 @@
 #include "ip/GaborSpatial.h"
 #include "core/array_assert.h"
 
-namespace tca = bob::core::array;
+namespace ca = bob::core::array;
 namespace ip = bob::ip;
 namespace sp = bob::sp;
 
@@ -48,12 +48,12 @@ void ip::GaborSpatial::operator()(
   blitz::Array<std::complex<double>,2>& dst)
 { 
   // Check input
-  tca::assertZeroBase(src);
+  ca::assertZeroBase(src);
 
   // Check output
-  tca::assertZeroBase(dst);
+  ca::assertZeroBase(dst);
   // TODO: size if different Convolution::SizeOption
-  tca::assertSameShape(dst,src);
+  ca::assertSameShape(dst,src);
 
   // Convolution with the Gabor Filter
   sp::convolve( src, m_kernel, dst, sp::Convolution::Same, // m_size_opt

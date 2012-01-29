@@ -24,9 +24,7 @@
 #include "core/array_assert.h"
 #include "core/array_copy.h"
 
-#include <iostream>
-
-namespace tca = bob::core::array;
+namespace ca = bob::core::array;
 namespace ip = bob::ip;
 
 ip::GaborBankFrequency::GaborBankFrequency( const int height, const int width,
@@ -69,13 +67,13 @@ void ip::GaborBankFrequency::operator()(
   blitz::Array<std::complex<double>,3>& dst)
 { 
   // Checks input
-  tca::assertZeroBase(src);
+  ca::assertZeroBase(src);
 
   // Checks output
-  tca::assertZeroBase(dst);
+  ca::assertZeroBase(dst);
   const blitz::TinyVector<int,3> shape(m_n_freq*m_n_orient, src.extent(0),
     src.extent(1));
-  tca::assertSameShape(dst, shape);
+  ca::assertSameShape(dst, shape);
 
   // Filters using the filter bank
   for( int i=0; i<m_n_freq*m_n_orient; ++i) {

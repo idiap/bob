@@ -29,7 +29,7 @@
 #include "math/norminv.h"
 
 namespace ip = bob::ip;
-namespace tca = bob::core::array;
+namespace ca = bob::core::array;
 
 ip::GaborFrequency::GaborFrequency( const int height, const int width,
   const double f, const double theta,  const double gamma, const double eta, 
@@ -72,11 +72,11 @@ void ip::GaborFrequency::operator()(
   blitz::Array<std::complex<double>,2>& dst)
 { 
   // Checks input
-  tca::assertZeroBase(src);
-  tca::assertSameShape(src,m_kernel_shifted);
+  ca::assertZeroBase(src);
+  ca::assertSameShape(src,m_kernel_shifted);
   // Checks output
-  tca::assertZeroBase(dst);
-  tca::assertSameShape(dst,m_kernel_shifted);
+  ca::assertZeroBase(dst);
+  ca::assertSameShape(dst,m_kernel_shifted);
 
   // Filters in the frequency domain
   if( !m_use_envelope)

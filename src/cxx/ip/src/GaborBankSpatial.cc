@@ -24,6 +24,7 @@
 #include "core/array_assert.h"
 
 namespace ip = bob::ip;
+namespace ca = bob::core::array;
 
 ip::GaborBankSpatial::GaborBankSpatial( const int n_orient, const int n_freq,
   const double fmax, const bool orientation_full, const double k, 
@@ -48,13 +49,13 @@ void ip::GaborBankSpatial::operator()(
   blitz::Array<std::complex<double>,3>& dst)
 { 
   // Check input
-  tca::assertZeroBase(src);
+  ca::assertZeroBase(src);
 
   // Check and resize dst if required 
-  tca::assertZeroBase(dst);
+  ca::assertZeroBase(dst);
   const blitz::TinyVector<int,3> shape(m_n_freq*m_n_orient, src.extent(0),
     src.extent(1));
-  tca::assertSameShape(dst, shape);
+  ca::assertSameShape(dst, shape);
 
   // Filter using the filter bank
   for( int i=0; i<m_n_freq*m_n_orient; ++i) {
