@@ -6,38 +6,8 @@ set(deps core io math sp) #other bob subprojects
 set(shared "")
 
 # This defines the list of source files inside this package.
-set(src_ip
-   "src/ipCore.cc"
-   "src/vision.cc"
+set(src
    "src/color.cc"
-   "src/OldColor.cc"
-   "src/Complex.cc"
-   "src/Convert.cc"
-   "src/Image.cc"
-   "src/ipIntegral.cc"
-   "src/ipScaleYX.cc"
-   "src/ipCrop.cc"
-   "src/ipHaarLienhart.cc"
-   "src/ipHLBPLienhart.cc"
-   "src/ipLBP.cc"
-   "src/ipLBP4R.cc"
-   "src/ipLBP8R.cc"
-   "src/ipLBPBitmap.cc"
-   "src/ipSmoothGaussian.cc"
-   "src/ipSobel.cc"
-   "src/ipFlip.cc"
-   "src/ipRotate.cc"
-   "src/ipShift.cc"
-   "src/ipHistoEqual.cc"
-   "src/ipMSRSQIGaussian.cc"
-   "src/ipMultiscaleRetinex.cc"
-   "src/ipSelfQuotientImage.cc"
-   "src/multigrid.cc"
-   "src/ipVcycle.cc"
-   "src/ipRelaxation.cc"
-   "src/ipTanTriggs.cc"
-   "src/ipRescaleGray.cc"
-   "src/ipLBPTopOperator.cc"
    "src/Exception.cc"
    "src/HornAndSchunckFlow.cc"
    "src/crop.cc"
@@ -62,30 +32,6 @@ set(src_ip
    "src/SpatioTemporalGradient.cc"
 )
 #   "src/ipHOG.cc"
-
-set(src_geometry
-   "src/Affine2D.cc"
-   "src/Circle2D.cc"
-   "src/Line2D.cc"
-   "src/Matrix2D.cc"
-   "src/Octon2D.cc"
-   "src/Plane.cc"
-   "src/Point2D.cc"
-   "src/Point3D.cc"
-   "src/Polygon2D.cc"
-   "src/Ray2D.cc"
-   "src/Rectangle2D.cc"
-   "src/RotationMatrix2D.cc"
-   "src/Segment2D.cc"
-   "src/Triangle2D.cc"
-   "src/Vector2D.cc"
-   "src/Vector3D.cc"
-   "src/trigonometry.cc")
-
-set(src 
-   "${src_ip}" 
-#   "${src_imagefiles}"
-   "${src_geometry}")
 
 # If we have VLFeat installed, enable the compilation of relevant modules
 if(VLFEAT_FOUND)

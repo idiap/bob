@@ -23,9 +23,7 @@
 #include "core/python/ndarray.h"
 
 void bind_ip_version();
-void bind_ip_ipcore();
 void bind_ip_color();
-void bind_ip_filters();
 void bind_ip_block();
 void bind_ip_crop_shift();
 void bind_ip_extrapolate_mask();
@@ -60,9 +58,7 @@ BOOST_PYTHON_MODULE(libpybob_ip) {
   bob::python::setup_python("bob image processing classes and sub-classes");
 
   bind_ip_version();
-  bind_ip_ipcore();
   bind_ip_color();
-  bind_ip_filters();
   bind_ip_block();
   bind_ip_crop_shift();
   bind_ip_extrapolate_mask();
