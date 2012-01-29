@@ -63,9 +63,10 @@ def add_files(session, imagedir):
     session.add(File(int(client_id), bname, session_id, speech_type, shot_id, environment, device, channel))
 
   client_dict = {} 
-  for filename in filter(nodot, os.listdir(imagedir)):
-    if filename.endswith('.jpg'):
-      add_file(session, os.path.basename(filename) )
+  for client_id in filter(nodot, os.listdir(imagedir)):
+    for filename in filter(nodot, os.listdir(os.path.join(imagedir, client_id))):
+      if filename.endswith('.jpg'):
+        add_file(session, os.path.join(client_id, os.path.basename(filename)) )
 
 def add_protocols(session):
   """Adds protocols"""
@@ -1714,7 +1715,7 @@ def add_command(subparsers):
   parser.add_argument('--verbose', action='store_true', default=False,
       help="Do SQL operations in a verbose way")
   parser.add_argument('--imagedir', action='store', metavar='DIR',
-      default='/idiap/user/njohan/__mobio/images/selected-images/',
+      default='/idiap/group/biometric/databases/mobio/still/images/selected-images/',
       help="Change the relative path to the directory containing the images of the MOBIO database (defaults to %(default)s)")
   
   parser.set_defaults(func=create) #action
