@@ -130,4 +130,4 @@ namespace bob {
 
 }
 
-#endif /* BOB_CORE_EXCEPTION_H */
+#endif /* BOB_CORE_ARRAY_EXCEPTION_H */

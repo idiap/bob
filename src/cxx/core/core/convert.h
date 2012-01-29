@@ -202,5 +202,5 @@ namespace bob {
  */
 }
 
-#endif /* BOB_CORE_CAST_H */
+#endif /* BOB_CORE_CONVERT_H */
 

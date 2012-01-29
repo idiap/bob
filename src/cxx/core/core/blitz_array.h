@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB_IO_CARRAY_H
-#define BOB_IO_CARRAY_H
+#ifndef BOB_CORE_BLITZ_ARRAY_H
+#define BOB_CORE_BLITZ_ARRAY_H
 
 #include <stdexcept>
 #include <boost/make_shared.hpp>
@@ -240,4 +240,4 @@ namespace bob { namespace core { namespace array {
 
 }}}
 
-#endif /* BOB_IO_CARRAY_H */
+#endif /* BOB_CORE_BLITZ_ARRAY_H */

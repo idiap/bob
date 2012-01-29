@@ -1,5 +1,5 @@
 /**
- * @file src/cxx/core/core/array_copy.h
+ * @file cxx/core/core/array_copy.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief This file defines deep copy functions for blitz++ arrays
@@ -71,4 +71,4 @@ namespace bob {
  */
 }
 
-#endif /* BOB5SPRO_CORE_ARRAY_COPY_H */
+#endif /* BOB_CORE_ARRAY_COPY_H */
