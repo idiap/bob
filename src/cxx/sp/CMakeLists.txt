@@ -22,8 +22,6 @@ bob_library(sp "${src}" "${deps}" "${shared}")
 add_dependencies(bob_sp sp-cxx_header_install)
 
 # Defines tests for this package
-#bob_test(sp dftdct_naive test/dftdctnaive.cc)
-#bob_test(sp fftfct_fftpack test/fftfctfftpack.cc)
 bob_test(sp convolution test/convolution.cc)
 #bob_test(sp extrapolation test/extrapolation.cc)
 bob_test(sp fft_fct test/fft_fct.cc)
