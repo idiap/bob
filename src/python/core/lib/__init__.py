@@ -20,19 +20,3 @@ debug.reset(PythonLoggingOutputDevice(cxx_logger.debug))
 info.reset(PythonLoggingOutputDevice(cxx_logger.info))
 warn.reset(PythonLoggingOutputDevice(cxx_logger.warn))
 error.reset(PythonLoggingOutputDevice(cxx_logger.error))
-
-def variables(self):
-  """Returns all available variables in a list."""
-  
-  retval = []
-  for k in range(self.nVariables()): retval.append(self.variable(k))
-  return retval
-
-def variable_dict(self):
-  """Returns all variables in a dictionary."""
-  
-  retval = {} 
-  for k in range(self.nVariables()): 
-    v = self.variable(k)
-    retval[v.name] = v
-  return retval
