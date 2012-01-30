@@ -2,6 +2,7 @@
  * @file cxx/machine/machine/LinearScoring.h
  * @date Wed Jul 13 16:00:04 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -27,42 +28,57 @@
 
 namespace bob { namespace machine {
 
-  void linearScoring(const std::vector<blitz::Array<double,1> >& models,
-                     const blitz::Array<double,1>& ubm_mean, const blitz::Array<double,1>& ubm_variance,
-                     const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& test_stats,
-                     const std::vector<blitz::Array<double, 1> >& test_channelOffset,
-                     const bool frame_length_normalisation,
-                     blitz::Array<double, 2>& scores);
-  void linearScoring(const std::vector<blitz::Array<double,1> >& models,
-                     const blitz::Array<double,1>& ubm_mean, const blitz::Array<double,1>& ubm_variance,
-                     const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& test_stats,
-                     const bool frame_length_normalisation,
-                     blitz::Array<double, 2>& scores);
-  void linearScoring(const std::vector<boost::shared_ptr<const bob::machine::GMMMachine> >& models,
-                     const bob::machine::GMMMachine& ubm,
-                     const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& test_stats,
-                     const bool frame_length_normalisation,
-                     blitz::Array<double, 2>& scores);
+/**
+ * Compute a matrix of scores using linear scoring.
+ *
+ * @warning Each GMM must have the same size.
+ * 
+ * @param models        list of mean supervector for the client models
+ * @param ubm_mean      mean supervector of the world model
+ * @param ubm_variance  variance supervector of the world model
+ * @param test_stats    list of accumulate statistics for each test trial
+ * @param test_channelOffset  list of channel offset if any (for JFA/ISA for instance)
+ * @param frame_length_normalisation   perform a normalisation by the number of feature vectors
+ * @param[out] scores 2D matrix of scores, <tt>scores[m, s]</tt> is the score for model @c m against statistics @c s
+ * @warning the output scores matrix should have the correct size (number of models x number of test_stats)
+ */
+void linearScoring(const std::vector<blitz::Array<double,1> >& models,
+                   const blitz::Array<double,1>& ubm_mean, const blitz::Array<double,1>& ubm_variance,
+                   const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& test_stats,
+                   const std::vector<blitz::Array<double, 1> >& test_channelOffset,
+                   const bool frame_length_normalisation,
+                   blitz::Array<double, 2>& scores);
+void linearScoring(const std::vector<blitz::Array<double,1> >& models,
+                   const blitz::Array<double,1>& ubm_mean, const blitz::Array<double,1>& ubm_variance,
+                   const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& test_stats,
+                   const bool frame_length_normalisation,
+                   blitz::Array<double, 2>& scores);
 
-  /**
-   * Compute a matrix of scores using linear scoring.
-   *
-   * @warning Each GMM must have the same size.
-   * 
-   * @param models      list of client models
-   * @param ubm         world model
-   * @param test_stats  list of accumulate statistics for each test trial
-   * @param test_channelOffset 
-   * @param frame_length_normlisation perform a normalization by the number of feature vectors
-   * @param[out] scores 2D matrix of scores, <tt>scores[m, s]</tt> is the score for model @c m against statistics @c s
-   */
-  void linearScoring(std::vector<bob::machine::GMMMachine*>& models,
-                     bob::machine::GMMMachine& ubm,
-                     std::vector<bob::machine::GMMStats*>& test_stats,
-                     blitz::Array<double, 2>* test_channelOffset,
-                     bool frame_length_normalisation,
-                     blitz::Array<double, 2>& scores);
-}
-}
+/**
+ * Compute a matrix of scores using linear scoring.
+ *
+ * @warning Each GMM must have the same size.
+ * 
+ * @param models      list of client models as GMMMachines
+ * @param ubm         world model as a GMMMachine
+ * @param test_stats  list of accumulate statistics for each test trial
+ * @param test_channelOffset  list of channel offset if any (for JFA/ISA for instance)
+ * @param frame_length_normalisation   perform a normalisation by the number of feature vectors
+ * @param[out] scores 2D matrix of scores, <tt>scores[m, s]</tt> is the score for model @c m against statistics @c s
+ * @warning the output scores matrix should have the correct size (number of models x number of test_stats)
+ */
+void linearScoring(const std::vector<boost::shared_ptr<const bob::machine::GMMMachine> >& models,
+                   const bob::machine::GMMMachine& ubm,
+                   const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& test_stats,
+                   const bool frame_length_normalisation,
+                   blitz::Array<double, 2>& scores);
+void linearScoring(const std::vector<boost::shared_ptr<const bob::machine::GMMMachine> >& models,
+                   const bob::machine::GMMMachine& ubm,
+                   const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& test_stats,
+                   const std::vector<blitz::Array<double, 1> >& test_channelOffset,
+                   const bool frame_length_normalisation,
+                   blitz::Array<double, 2>& scores);
+
+}}
 
 #endif // BOB_MACHINE_LINEARSCORING_H
