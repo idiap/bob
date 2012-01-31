@@ -1,7 +1,21 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
-# Andre Anjos <andre.anjos@idiap.ch>
-# Mon 08 Aug 2011 11:10:29 CEST 
+# Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
+# Tue Sep 6 12:19:18 2011 +0200
+#
+# Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """A few checks for the face verification based on file lists database.
 """

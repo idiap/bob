@@ -1,9 +1,24 @@
 /**
- * @author Laurent El-Shafey <Laurent.El-Shafey@idiap.ch>
- * @date Thu 06 Oct 2011
+ * @file cxx/trainer/trainer/EMPCATrainer.h
+ * @date Tue Oct 11 12:18:23 2011 +0200
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * @brief Probabilistic Principal Component Analysis implemented using 
+ * @brief Probabilistic Principal Component Analysis implemented using
  * Expectation Maximization.
+ *
+ * Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef BOB5SPRO_TRAINER_EMPCA_TRAINER_H

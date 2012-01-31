@@ -1,7 +1,21 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
-# Francois Moulin <francois.moulin@idiap.ch>
-# Thu 14 Apr 15:25:55 2011 
+# Francois Moulin <Francois.Moulin@idiap.ch>
+# Mon Apr 18 16:08:34 2011 +0200
+#
+# Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """Tests histogram computation 
 """

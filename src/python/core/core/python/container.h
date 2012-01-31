@@ -13,17 +13,17 @@
  * 3) to bind a container that has fixed capacity, use fixed_size_policy:
  * from_python_sequence<boost::array<double,3>, fixed_size_policy>();
  *
- * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
- *
+ * Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+ * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */

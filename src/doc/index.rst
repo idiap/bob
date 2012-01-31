@@ -1,7 +1,20 @@
-.. Laurent El-Shafey <Laurent.El-Shafey@idiap.ch>
-.. Andre Anjos <andre.anjos@idiap.ch>
 .. vim: set fileencoding=utf-8 :
-.. Sun  3 Apr 15:50:59 2011 CEST
+.. Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
+.. Sat Mar 26 12:16:11 2011 +0100
+.. 
+.. Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+.. 
+.. This program is free software: you can redistribute it and/or modify
+.. it under the terms of the GNU General Public License as published by
+.. the Free Software Foundation, version 3 of the License.
+.. 
+.. This program is distributed in the hope that it will be useful,
+.. but WITHOUT ANY WARRANTY; without even the implied warranty of
+.. MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.. GNU General Public License for more details.
+.. 
+.. You should have received a copy of the GNU General Public License
+.. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 .. Master file, created by sphinx-quickstart on Mon Mar 21 18:07:34 2011.  You
    can adapt this file completely to your liking, but it should at least contain

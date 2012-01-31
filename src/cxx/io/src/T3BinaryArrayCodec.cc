@@ -1,10 +1,10 @@
 /**
- * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
+ * @file cxx/io/src/T3BinaryArrayCodec.cc
+ * @date Wed Jun 22 17:50:08 2011 +0200
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief Implements a bob3vision bindata reader/writer
- *
  * The format, as described in the old source code goes like this.
- *
  * 1) data is always recorded in little endian format
  * 2) the first 4 bytes describe an integer that indicates the number of arrays
  * to follow
@@ -13,9 +13,22 @@
  * 5) all elements from all arrays are "normally" float (4-bytes), but could be
  * double if set in the header of T3 during compilation. The file size will
  * indicate the right type to use.
- *
  * Because of this restriction, this codec will only be able to work with
  * single-dimension input.
+ *
+ * Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "core/array_check.h"

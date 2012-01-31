@@ -1,8 +1,23 @@
 /**
+ * @file python/machine/src/wiener.cc
+ * @date Fri Sep 30 16:58:42 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
- * @date Thu 29 sep 2011
  *
  * @brief Bindings for a WienerMachine
+ *
+ * Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <boost/python.hpp>
