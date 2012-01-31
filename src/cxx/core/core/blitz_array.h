@@ -146,6 +146,17 @@ namespace bob { namespace core { namespace array {
         }
 
       /**
+       * Starts me with new arbitrary data. Please note we don't copy the given
+       * array.
+       * @warning Any resize of the given blitz::Array after this call leads to
+       * unexpected results
+       */
+      template <typename T, int N> 
+        blitz_array(blitz::Array<T,N>& data) {
+          set(data);
+        }
+
+      /**
        * This method will set my internal data to the value you specify. We
        * will do this by referring to the data you gave.
        */
@@ -173,6 +184,16 @@ namespace bob { namespace core { namespace array {
        */
       template <typename T, int N> void set(const blitz::Array<T,N>& data) {
         set(boost::make_shared<blitz::Array<T,N> >(ccopy(data)));
+      }
+
+      /**
+       * This method will set my internal data to the value you specify. We
+       * will do this by referencing the data you gave.
+       * @warning Any resize of the given blitz::Array after this call leads to
+       * unexpected results
+       */
+      template <typename T, int N> void set(blitz::Array<T,N>& data) {
+        set(boost::make_shared<blitz::Array<T,N> >(data));
       }
 
       /**
