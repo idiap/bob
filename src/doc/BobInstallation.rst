@@ -237,7 +237,7 @@ A single command line that will install all required packages under Ubuntu
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core cmake liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools0 ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-argparse python-sqlalchemy python-sphinx dvipng libqt4-dev libfftw3-dev
+   $ sudo apt-get install git-core cmake liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools0 ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc libhdf5-serial-dev python-argparse python-sqlalchemy python-sphinx dvipng libqt4-dev libfftw3-dev
 
 .. note::
 
@@ -270,7 +270,7 @@ A single command line that will install all required packages under Ubuntu
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core cmake liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-sqlalchemy python-sphinx dvipng libqt4-dev libfftw3-dev
+   $ sudo apt-get install git-core cmake liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc libhdf5-serial-dev python-sqlalchemy python-sphinx dvipng libqt4-dev libfftw3-dev
 
 .. note::
 
@@ -293,10 +293,10 @@ A single command line that will install all required packages under Ubuntu
 Mac OSX
 =======
 
-This is a recipe for compiling bob under your Mac OSX using Snow Leopard. It
-should be possible, but remains untested, to execute similar steps under OSX
-Leopard (10.5.X). We would like to hear if you have a success story or problems
-`submit a new bug report`_.
+This is a recipe for compiling bob under your Mac OSX using Snow Leopard (10.6)
+or Lion (10.7). It should be possible, but remains untested, to execute similar
+steps under OSX Leopard (10.5.X). We would like to hear if you have a success
+story or problems `submit a new bug report`_.
 
 This recipe assumes you have already gone through the standard,
 well-documented, `MacPorts installation instructions`_ and has a prompt just in
@@ -305,13 +305,31 @@ your shell prompt:
 
 .. code-block:: sh
 
-   $ sudo port install cmake blitz ffmpeg python26 python_select gcc44 gcc_select py26-numpy -atlas matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx texlive-bin hdf5-18 py26-h5py py26-tables py26-argparse qt4-mac boost +python26 python26-scipy +no_atlas fftw-3 vlfeat
+   $ sudo port install cmake blitz ffmpeg python26 python_select gcc44 gcc_select py26-numpy -atlas matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx texlive-bin hdf5-18 py26-argparse qt4-mac boost +python26 python26-scipy +no_atlas fftw-3 vlfeat
    $ # go for a long coffee 
+
+After the installation has finished, make sure you select python 2.6 (macports)
+as your default shell:
+
+.. code-block:: sh
+
+  $ sudo port select python python26
+
+This will make sure you use the correct version of python by default, but it is
+not strictly necessary, if you remember choosing it correctly when starting a
+prompt manually.
 
 .. note::
 
-  It is possible to install the base software without compiling the atlas
-  libraries. To do so, manually
+  If you are installing on a machine running OSX Lion (10.7), use qt4-mac-devel
+  (version 4.8) instead of the package "qt4-mac".
+
+.. note::
+
+  This setup will guide you to choose Python_ 2.6 as the interpreter where
+  |project| will run. You can use Python_ 2.7 as well. Make the required
+  modifications on the instructions above so to install packages for that
+  version of python instead.
 
 You can also install git if you want to submit patches to us:
 
@@ -319,8 +337,8 @@ You can also install git if you want to submit patches to us:
 
    $ sudo port install  git-core +python26
 
-For compiling bob under OSX, we recommend the use of "llvm-gcc" instead of
-plain gcc. After running the command above, do the following:
+For compiling |project| under OSX, we recommend the use of "llvm-gcc" instead
+of plain gcc. After running the command above, do the following:
 
 .. code-block:: sh
 
@@ -339,15 +357,11 @@ plain gcc. After running the command above, do the following:
      $ sudo gcc_select mp-llvm-gcc42
 
 .. warning::
-   * bob/Blitz python bindings will not compile in **release** mode with plain
-     gcc-4.2 (blitz causes a segmentation fault at the compiler). This is why
-     we recommend to use the llvm gcc bridge instead.
-
    * The current MacPorts versionf blitz does not compile with anything newer
      than gcc-4.2.
 
 After you have gone through these installation steps, you can proceed with the
-normal bobCompilation instructions. If you have followed the
+normal :ref:`section-compilation` instructions. If you have followed the
 `MacPorts`_ installation guide to the letter, your environment should be
 correctly set. You **don't** need to setup any other environment variable.
 
@@ -421,11 +435,11 @@ Troubleshooting compilation
 ===========================
 
 Most of the problems concerning compilation come from not satisfying correctly
-the :ref:`section-dependencies` (such as `FFmpeg`_, `ImageMagick`_, etc). Start
-by double-checking every dependency or base OS and check everything is as
-expected. If you cannot go through, please `submit a new bug report`_ in
-our tracking system. At this time make sure to specify your OS version and the
-versions of the external dependencies so we can try to reproduce the failure.
+the :ref:`section-dependencies`. Start by double-checking every dependency or
+base OS and check everything is as expected. If you cannot go through, please
+`submit a new bug report`_ in our tracking system. At this time make sure to
+specify your OS version and the versions of the external dependencies so we can
+try to reproduce the failure.
 
 .. Place here references to all citations in lower case
 
@@ -449,8 +463,6 @@ versions of the external dependencies so we can try to reproduce the failure.
 .. _hdf5: http://www.hdfgroup.org/HDF5
 .. _scipy: http://www.scipy.org
 .. _ipython: http://ipython.scipy.org
-.. _h5py: http://code.google.com/p/h5py/
-.. _tables: http://www.pytables.org
 .. _matplotlib: http://matplotlib.sourceforge.net
 .. _bobidiapguide: https://www.idiap.ch/software/bob/wiki/BobIdiapGuide
 .. _buildbot: http://trac.buildbot.net
@@ -464,3 +476,4 @@ versions of the external dependencies so we can try to reproduce the failure.
 .. _vlfeat launchpad webpage: https://launchpad.net/~gezakovacs/+archive/vlfeat
 .. _fftw: http://www.fftw.org/
 .. _Bob's website: https://www.idiap.ch/software/bob
+.. _OpenCV: http://opencv.willowgarage.com/
