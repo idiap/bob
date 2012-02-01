@@ -17,7 +17,7 @@ endif(GOOGLE_PERFTOOLS_FOUND)
 
 # This defines the list of source files inside this package.
 set(src
-    "src/blitz_io_overload.cc"
+#    "src/blitz_io_overload.cc"
     "src/Random.cc"
     "src/Exception.cc"
     "src/convert_exception.cc"

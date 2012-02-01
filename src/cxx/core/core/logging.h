@@ -33,8 +33,6 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 
-#include "core/blitz_io_overload.h"
-
 namespace bob {
 
   namespace core {
