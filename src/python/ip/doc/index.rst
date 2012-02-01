@@ -25,10 +25,7 @@
 .. toctree::
    :maxdepth: 2
 
-   ExampleUsage01.rst
-
-   Practical01
+   ExampleUsage01
    
 .. automodule:: bob.ip
    :members:
-   

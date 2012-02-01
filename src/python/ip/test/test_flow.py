@@ -76,7 +76,7 @@ def compute_flow_opencv(alpha, iterations, ifile1, ifile2):
   l = 1.0/(alpha**2)
   cv.CalcOpticalFlowHS(i1, i2, 0, u, v, l, (cv.CV_TERMCRIT_ITER, iterations, 0))
   # return blitz arrays
-  return bob.core.array.array(u, 'float64'), bob.core.array.array(v, 'float64')
+  return numpy.array(u, 'float64'), numpy.array(v, 'float64')
 
 class FlowTest(unittest.TestCase):
   """Performs various combined optical flow tests."""
@@ -92,7 +92,7 @@ class FlowTest(unittest.TestCase):
     alpha = 1.5 
 
     # The OpticalFlow estimator always receives a blitz::Array<uint8_t,2> as
-    # the image input. The output has the same rank and extents but is in
+    # the image input. The output has the same rank and shape but is in
     # doubles.
     i1, i2, i3 = make_image_tripplet()
     u_cxx = numpy.zeros(i1.shape, 'float64')
@@ -168,7 +168,7 @@ class FlowTest(unittest.TestCase):
     alpha = 15 
 
     # The OpticalFlow estimator always receives a blitz::Array<uint8_t,2> as
-    # the image input. The output has the same rank and extents but is in
+    # the image input. The output has the same rank and shape but is in
     # doubles.
     
     # This will load the test images: Rubber Whale sequence
@@ -203,13 +203,5 @@ class FlowTest(unittest.TestCase):
 
 if __name__ == '__main__':
   sys.argv.append('-v')
-  if os.environ.has_key('BOB_PROFILE') and \
-      os.environ['BOB_PROFILE'] and \
-      hasattr(bob.core, 'ProfilerStart'):
-    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-  if os.environ.has_key('BOB_PROFILE') and \
-      os.environ['BOB_PROFILE'] and \
-      hasattr(bob.core, 'ProfilerStop'):
-    bob.core.ProfilerStop()

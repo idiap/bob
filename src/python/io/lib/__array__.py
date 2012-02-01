@@ -9,13 +9,13 @@
 from libpybob_io import Array
 
 def array_cast(self, dtype):
-  """Returns a array object with the required element type"""
+  """Returns an array object with the required element type"""
   return self.get().astype(dtype)
 Array.cast = array_cast
 del array_cast
 
 def array_copy(self):
-  """Returns a array object which is a copy of the internal data"""
+  """Returns an array object which is a copy of the internal data"""
   return getattr(self, '__cast_%s_%d__' % (self.elementType.name, len(self.shape)))()
 Array.copy = array_copy
 del array_copy
