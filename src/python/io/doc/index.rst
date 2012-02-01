@@ -460,7 +460,7 @@ The extension chosen defines the recording format. For an overview of all
 extensions and codecs supported with your version of |project|, you can execute
 the command-line utitlity `info_table.py`:
 
-.. code-block:: shell
+.. code-block:: sh
 
   $ <bob-root>/bin/shell.py -- info_table.py
 
