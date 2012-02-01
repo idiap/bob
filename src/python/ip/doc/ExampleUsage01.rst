@@ -26,10 +26,10 @@ Our goal is to take an image, in our case a 2D uint8 array, and crop it.
 .. code-block:: python
 
    import bob
+   import numpy
 
    # create an psuedo image (instead of loading an image)
-   image = bob.core.array.uint8_2(80, 64)
-   image.ones() 
+   image = numpy.ones((80, 64), 'uint8')
    
    # Some of the ip functionality is a simple function call
    # Whereas some ip functionality are more complex and you
@@ -40,7 +40,7 @@ Our goal is to take an image, in our case a 2D uint8 array, and crop it.
    # example of destination
    crop_height = 40
    crop_width  = 32
-   my_crop = bob.core.array.uint8_2(crop_height, crop_width)
+   my_crop = numpy.ndarray((crop_height, crop_width), 'uint8')
 
    # crop the image and store in my_crop (which acts as our destination)
    top_left_height  = 0
@@ -65,13 +65,12 @@ Now let's see a more complete ip function: Face crop + normalization.
 
    # create an pseudo image (instead of loading an image)
    
-   image = bob.core.array.uint8_2(240, 320)
-   image.ones() 
+   image = numpy.ones((240, 320), 'uint8')
 
    # as with all ip functions, we need to create the destination
    # our selves
 
-   dst = bob.core.array.uint8_2(final_height, final_width)
+   dst = numpy.ndarray((final_height, final_width), 'uint8')
 
    # lets crop and normalize the image using eye locations
    # first we will start by specifying the eye locations

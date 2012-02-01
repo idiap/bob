@@ -38,7 +38,7 @@ detection system in 3-ways on your script:
    .. code-block:: python
 
       detect_max = bob.visioner.MaxDetector()
-      image = bob.core.array.load(...)
+      image = bob.io.load(...)
       bbox = detect_max(image)
 
    With this technique you can control: 
@@ -58,7 +58,7 @@ detection system in 3-ways on your script:
    .. code-block:: python
 
       detect = bob.visioner.Detector()
-      image = bob.core.array.load(...)
+      image = bob.io.load(...)
       bboxes = detect(image) #note this is a tuple of tuples
 
    With this technique you can control: 
@@ -102,7 +102,7 @@ detection system in 3-ways on your script:
      .. code-block:: python
 
         locate = bob.visioner.Localizer()
-        image = bob.core.array.load(...)
+        image = bob.io.load(...)
         bbx_points = locate(image) #note (x, y, width, height, x1, y1, x2, y2...)
 
    With this technique you can control:

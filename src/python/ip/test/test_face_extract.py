@@ -155,7 +155,7 @@ class FilterNewTest(unittest.TestCase):
 
     
     # crop face
-    E = bob.core.array.uint8_2(100, 100)
+    E = numpy.ndarray((100, 100), 'uint8')
     bob.ip.cropFace(D, E, 30)
     bob.io.Array(E).save(os.path.join('data', 'faceextract', 'test-faces.E.jpg'));
 

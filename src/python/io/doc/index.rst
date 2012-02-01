@@ -26,9 +26,8 @@ Input and output in |project| is focused around three primitives:
 
 :py:class:`bob.io.Array`
 
-  The Array represents a :cpp:type:`blitz::Array` abstraction. It can hold
-  either a real :cpp:type:`blitz::Array` representation or be just a
-  pointer to a datafile where the actual array can be loaded from.
+  The `bob.io.Array` is an I/O capable version of :py:class:`numpy.ndarray`
+  objects.
 
 :py:class:`bob.io.Arrayset`
 
@@ -186,15 +185,17 @@ as it was defined.
   ``HDF5File`` object. You can do this using the method ``HDF5File.cd``.
   Look-up its help for more information and usage instructions.
 
-Writing arrays is a little simpler as ``blitz::Array<>``'s encode all the type
-information we need to write and read them correctly. Here is an example:
+Writing arrays is a little simpler as py:class:`numpy.ndarray`'s encode all the
+type information we need to write and read them correctly. Here is an example:
 
 .. code-block:: python
 
-  a = bob.core.array.int8_2(range(4), (2,2))
+  import numpy
+  a = numpy.array(range(4), 'int8').reshape(2,2)
+  # note 'f' should be opened as defined above
   f.set('my_array', a)
 
-And the resulting ``h5dump`` would be:
+And the resulting ``h5dump`` should be:
 
 .. code-block:: none
 
@@ -308,7 +309,7 @@ To create an :py:class:`bob.io.Array` from a file, just do the following:
   >>> a.loaded
   False
 
-Arrays are containers for :cpp:class:`blitz::Array`\s **or** just pointers
+Arrays are containers for :py:class:`numpy.ndarray`\s **or** just pointers
 to a file.  When you instantiate an :py:class:`bob.io.Array` it does **not**
 load the file contents into memory. It waits until you emit another explicit
 instruction to do so. We do this with the :py:meth:`bob.io.Array.get()`
@@ -316,11 +317,8 @@ method:
 
 .. code-block:: python
 
-  >>> bzarray = a.get()
-  blitz::Array<float64,2> (3, 10) (0x1044a0488)
-  >>> bzarray[0,0]
-  >>> bzarray[0,0] = -1
-  >>> print bzarray
+  >>> array = a.get()
+  >>> print array 
   [[ -1.   1.   2.   3.   4.   5.   6.   7.   8.   9.]
    [  0.   2.   4.   6.   8.  10.  12.  14.  16.  18.]
    [  0.   3.   6.   9.  12.  15.  18.  21.  24.  27.]]
@@ -332,11 +330,11 @@ read from the file and into a new array. Try again:
 
   >>> a.loaded
   False
-  >>> bzarray = a.get()
-  >>> bzarray
-  blitz::Array<float64,2> (3, 10) (0x1459a99b0)
-  >>> print bzarray[0,0]
-  0.0
+  >>> array = a.get()
+  >>> array
+  [[ -1.   1.   2.   3.   4.   5.   6.   7.   8.   9.]
+   [  0.   2.   4.   6.   8.  10.  12.  14.  16.  18.]
+   [  0.   3.   6.   9.  12.  15.  18.  21.  24.  27.]]
 
 You can force permanently loading the contents of the file in memory an avoid
 the I/O costs every time you read issue a :py:meth:`bob.io.Array.get()`:
@@ -348,10 +346,10 @@ the I/O costs every time you read issue a :py:meth:`bob.io.Array.get()`:
   True
   >>> a.filename
   ''
-  >>> bzarray = a.get()
-  >>> bzarray[0,0] = -1
-  >>> bzarray_reference = a.get()
-  >>> print bzarray_reference[0,0]
+  >>> array = a.get()
+  # if you do 'get()' again, you will get a reference to same object!
+  >>> array_reference = a.get()
+  >>> print array_reference[0,0]
   -1.0
 
 Notice that, once the array is loaded in memory, a reference to the same array
@@ -364,29 +362,27 @@ Saving the :py:class:`bob.io.Array` is as easy, just call the
 
   >>> a.save('copy.hdf5')
 
-Blitz Array Shortcuts
-=====================
+Numpy ndrray Shortcuts
+======================
 
-To just load a :cpp:class:`blitz::Array` in memory, we have written a
-short cut that lives at :py:func:`bob.core.array.load` and saves you from
-going through the :py:class:`bob.io.Array` API:
+To just load a :py:class:`numpy.ndarray` in memory, we have written a
+short cut that lives at :py:func:`bob.io.load` and saves you from going through
+the :py:class:`bob.io.Array` API:
 
 .. code-block:: python
 
-  >>> t = bob.core.array.load('example2.hdf5')
+  >>> t = bob.io.load('example2.hdf5')
   >>> t
-  blitz::Array<float64,2> (3, 10) (0x11023b410)
-  >>> print t
   [[  0.   1.   2.   3.   4.   5.   6.   7.   8.   9.]
    [  0.   2.   4.   6.   8.  10.  12.  14.  16.  18.]
    [  0.   3.   6.   9.  12.  15.  18.  21.  24.  27.]]
 
-You can also directly save :cpp:class:`blitz::Array`\s without going
+You can also directly save :py:class:`numpy.ndarray`\s without going
 through the :py:class:`bob.io.Array` container:
 
 .. code-block:: python
 
-  >>> t.save('copy.hdf5')
+  >>> bob.io.save(t, 'copy.hdf5')
 
 .. note::
 
@@ -405,8 +401,8 @@ data. File types and specific serialization and de-serialization is switched
 automatically using filename extensions. These are the extensions and formats
 we currently support:
 
-* Images: return RGB (uint8_t or uint16_t) 3-D arrays, or Grayscale (uint8_t or
-  uint16_t) 2-D arrays as indicated [``bob.image``]. Please notice that for
+* Images: return RGB (uint8 or uint16) 3D arrays, or Grayscale (uint8 or
+  uint16) 2-D arrays as indicated [``bob.image``]. Please notice that for
   this Array codec, file extensions DO matter even if a codecname is specified,
   as they are also used by ImageMagick to select the image loader/writer. The
   following extensions are supported:
@@ -422,7 +418,7 @@ we currently support:
   * xcf: RGB, Gimp native format (**loading only**)
 
 * Videos: returns a sequence of frames (loaded in memory) for all data within a
-  video file. The following extensions are supported:
+  video file. Returns 3D uint8 arrays. The following extensions are supported:
 
   * avi
   * dv
@@ -458,15 +454,15 @@ choosing the right extension:
 
 .. code-block:: python
 
-  >>> bzarray.save('data.mat')
+  >>> bob.io.save(array, 'data.mat')
 
-You can choose an unconforming extension, but then make sure to choose the
-right codec as defined before:
+The extension chosen defines the recording format. For an overview of all
+extensions and codecs supported with your version of |project|, you can execute
+the command-line utitlity `info_table.py`:
 
-.. code-block:: python
+.. code-block:: shell
 
-  >>> bzarray.save('data.myweird.extension', 'matlab.array.binary')
-  >>> #data is saved in Matlab format
+  $ <bob-root>/bin/shell.py -- info_table.py
 
 Arrayset interfaces
 -------------------
@@ -530,13 +526,17 @@ many times you need:
   >>> s = bob.io.Arrayset()
   >>> s.elementType
   libpybob_io.ElementType.unknown
+  >>> print s.dtype #this is the numpy equivalent
+  None
   >>> len(s)
   0
-  >>> s.append(bob.core.array.array(range(5), 'float32'))
+  >>> s.append(numpy.array(range(5), 'float32'))
   >>> len(s)
   1
   >>> s.elementType
   libpybob_io.ElementType.float32
+  >>> s.dtype
+  dtype('float32')
 
 This can quickly become inefficient if you have many arrays to pull in.
 Instead, you can extend the arrayset with a list of arrays pretty much like you
@@ -544,57 +544,34 @@ do with a normal python list:
 
 .. code-block:: python
 
-  >>> t = bob.core.array.array(range(5), 'float32')
+  >>> t = numpy.array(range(5), 'float32')
   >>> s.extend([t,t,t,t,t,t,t])
   >>> len(s)
   8
 
 Optionally, you can also extend the Arrayset with a
-:cpp:class:`blitz::Array` object with N dimensions and tell it to iterate
+:py:class:`numpy.ndarray` object with N dimensions and tell it to iterate
 through dimension D and add objects with N-1 dimensions to it:
 
 .. code-block:: python
 
-  >>> t = bob.core.array.float32_2(range(50), (10,5))
+  >>> t = numpy.array(range(50), 'float32').reshape(10,5)
   >>> s.extend(t, 0)
   >>> len(s)
   18
 
-The above code will quickly all all rows from ``t`` to ``s``. It is equivalent
-to the python code:
+The above code will quickly append all rows from ``t`` to ``s``. It is
+equivalent to the python code:
 
 .. code-block:: python
 
-  >>> for k in range(t.extent(0)): 
+  >>> for k in range(t.shape[0]): 
   ...   s.append(t[k,:])
   >>> len(s)
   28
 
-The only difference being it is executed in pure C++ and is therefore, much
+The only difference being it is executed in pure C++ and is therefore much
 faster than individually appending each sub-array.
-
-Transcoding (binary) files
---------------------------
-
-Transcoding is the operation of converting files saved in one (binary) format
-to another. You can transcode from/to any of the types described above, as long
-as the underlying blitz::Array remains compatible with the chosen format. For
-example, you can save a JPEG image as a |project| (``.hdf5``) file. You cannot
-save a complex array inside a |project| (``.hdf5``) file into a bob3
-(``.bindata``) simply because it only accepts single or double precision float
-numbers.
-
-|project| provides scripts that implements the above with a few bells and
-whistles:
-
-.. code-block:: sh
-
-  $ array_transcode.py from-file to-file
-  # or
-  $ arrayset_transcode.py from-file to-file
-
-If you execute these scripts without any parameters, an usage instruction and a
-**list of built-in codecs** will be displayed.
 
 Reference
 ---------

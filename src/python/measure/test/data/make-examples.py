@@ -57,8 +57,8 @@ def example1():
   Separation threshold is about 3.
   """
   data = loaddata('iris.data', 'petal.length')
-  bob.io.Array(bob.core.array.array(data['setosa'])).save('linsep-negatives.hdf5')
-  bob.io.Array(bob.core.array.array(data['virginica'])).save('linsep-positives.hdf5')
+  bob.io.save(data['setosa'], 'linsep-negatives.hdf5')
+  bob.io.save(data['virginica'],'linsep-positives.hdf5')
 
 def example2():
   """In the second example we will get a non-linearly separable set of scores:
@@ -70,8 +70,8 @@ def example2():
   Separation threshold is about 5 (min. HTER).
   """
   data = loaddata('iris.data', 'sepal.length')
-  bob.io.Array(bob.core.array.array(data['setosa'])).save('nonsep-negatives.hdf5')
-  bob.io.Array(bob.core.array.array(data['versicolor'])).save('nonsep-positives.hdf5')
+  bob.io.save(data['setosa'], 'nonsep-negatives.hdf5')
+  bob.io.save(data['versicolor'], 'nonsep-positives.hdf5')
 
 def main():
   """Generates data for all examples."""
