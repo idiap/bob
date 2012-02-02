@@ -200,6 +200,6 @@ def check_group_writeability(filename):
   # to the given file as well.
   if (mode & stat.S_IWGRP):
     try:
-      os.chmod(dbfile, mode | stat.S_IWGRP)
+      os.chmod(filename, mode | stat.S_IWGRP)
     except OSError, ex:
-      logging.warn("Cannot make '%s' group-writeable despite the fact its parent directory is group-writeable. This maybe a problem depending on your database setup. Please check." % dbfile)
+      logging.warn("Cannot make '%s' group-writeable despite the fact its parent directory is group-writeable. This maybe a problem depending on your database setup. Please check." % filename)
