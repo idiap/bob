@@ -22,8 +22,8 @@
  Mathematics
 =============
 
-This module binds functionalities of bob into python when there is no
-numpy equivalent.
+This module binds math functions of |project| to python when there is no numpy
+equivalent.
 
 .. automodule:: bob.math
    :members:
