@@ -41,7 +41,6 @@ simplify batch job submission.
 Debug environments can be useful if you need to run a debugger session or to
 send us a core dump with embedded debugging symbols.
 
-
 Starting programs in Bob-enabled environments
 -----------------------------------------------
 
