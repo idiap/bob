@@ -16,9 +16,9 @@
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-====================================
- Tutorial 01. Basic ip functionality
-====================================
+=============
+ IP Tutorial 
+=============
 
 In this section we present a small example how to use a ip (image processing) function.
 Our goal is to take an image, in our case a 2D uint8 array, and crop it.
@@ -81,10 +81,9 @@ Now let's see a more complete ip function: Face crop + normalization.
    height_right_eye = 130
    width_right_eye  = 140
 
-   # we now crop and normalize by using the object (my_face_normer) we created above
-   # not that it is smart to use the same object for many images, if all images
-   # should be normalized and have the same final size.
+   # we now crop and normalize by using the object (my_face_normer) we created
+   # above not that it is smart to use the same object for many images, if all
+   # images should be normalized and have the same final size.
 
    my_face_normer.__call__(image, dst, height_left_eye, width_left_eye, height_right_eye, width_right_eye)   
-
 
