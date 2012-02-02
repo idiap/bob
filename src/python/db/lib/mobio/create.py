@@ -8,7 +8,7 @@
 import os
 
 from .models import *
-from ..utils import session
+from ..utils import session, check_group_writeability
 
 
 def nodot(item):
@@ -1704,6 +1704,9 @@ def create(args):
   add_zclients(s)
   s.commit()
   s.close()
+
+  # the group writeability option
+  check_group_writeability(dbfile)
 
 def add_command(subparsers):
   """Add specific subcommands that the action "create" can use"""

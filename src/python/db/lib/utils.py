@@ -6,7 +6,11 @@
 """Some utilities to talk to bob SQLite databases.
 """
 
-import os, sys, errno
+import os
+import sys
+import errno
+import stat
+import logging
 
 class null(object):
   """A look-alike stream that discards the input"""
@@ -184,3 +188,18 @@ def makedirs_safe(fulldir):
   except OSError as exc: # Python >2.5
     if exc.errno == errno.EEXIST: pass
     else: raise
+
+def check_group_writeability(filename):
+  """Applies group writeability if the directory containing the database has
+  the write bit set, or at least tries to."""
+
+  # extracts the current mode of the parent directory
+  mode = os.stat(os.path.dirname(filename)).st_mode
+
+  # if the mode of the directory sets group to be writeable, try to apply this
+  # to the given file as well.
+  if (mode & stat.S_IWGRP):
+    try:
+      os.chmod(dbfile, mode | stat.S_IWGRP)
+    except OSError, ex:
+      logging.warn("Cannot make '%s' group-writeable despite the fact its parent directory is group-writeable. This maybe a problem depending on your database setup. Please check." % dbfile)

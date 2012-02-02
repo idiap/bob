@@ -10,7 +10,7 @@ import os
 import fnmatch
 
 from .models import *
-from ..utils import session
+from ..utils import session, check_group_writeability
 
 def add_clients(session, protodir, verbose):
   """Add clients to the replay attack database."""
@@ -178,6 +178,9 @@ def create(args):
   define_protocols(s, args.protodir, args.verbose)
   s.commit()
   s.close()
+  
+  # the group writeability option
+  check_group_writeability(dbfile)
 
 def add_command(subparsers):
   """Add specific subcommands that the action "create" can use"""
