@@ -25,14 +25,14 @@
 =======================
 
 |project| is a signal-processing and machine learning toolbox for Biometrics
-developed at  `Idiap`_, in Switzerland. The toolbox is written in a mix of
-`Python`_ and `C++` and is designed to be both efficient and to reduce
-development time. To learn about this project's history, please visit
-:doc:`BobHistory`.
+developed at  the `Idiap`_ Research Institute, in Switzerland. The toolbox is
+written in a mix of `Python`_ and `C++` and is designed to be both efficient
+and to reduce development time. To learn about this project's history, please
+visit :doc:`BobHistory`.
 
-We believe in free software and development standards. |project| is a
-open-sourced and licensed under the GPL v3 terms. For more information on
-licensing, please visit our :doc:`BobLicensing`.
+We believe in free software and development standards. |project| is a freely
+available library, licensed under the terms of the GPL v3. For more information
+on licensing, please visit our :doc:`BobLicensing`.
 
 Enjoy!
 
