@@ -87,16 +87,6 @@ namespace bob {
     COMPLEX_TO_COMPLEX_FULL_DECL(std::complex<long double>)
 
 
-/**
- * @brief Casts a blitz array allowing std::complex types.
- */
-/*
-template<typename T, typename U, int D> 
-Array<T,D> complex_cast(const Array<U,D>& in) {
-  return cast<T>(in);
-}
-*/
-
 template<typename T, typename U> 
 blitz::Array<T,1> cast(const blitz::Array<U,1>& in) {
   blitz::Array<T,1> out(in.extent(0));
