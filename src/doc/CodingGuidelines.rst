@@ -28,10 +28,10 @@ there.
 Git Tips
 --------
 
-For Bob development we use the Git_ version control system. If you don't have a
-clue on how to use Git, please refer to the official `Git tutorial`_. In here,
-we assume you have already gone through all introductory material on Git and is
-ready to get your hands dirty with Bob.
+For |project| development we use the Git_ version control system. If you don't
+have a clue on how to use Git, please refer to the official `Git tutorial`_. In
+here, we assume you have already gone through all introductory material on Git
+and is ready to get your hands dirty with |project|.
 
 Before you start
 ================
@@ -47,7 +47,7 @@ email address:
 Cloning the central Torch repository
 ====================================
 
-To clone the central Bob repository, just do:
+To clone the central |project| repository, just do:
 
 .. code-block:: sh
 
@@ -89,7 +89,8 @@ double-check your changes compile without problems and all of the
 Tagging and Branching
 =====================
 
-For Bob development, we adopt the following scheme for tagging and branching:
+For |project| development, we adopt the following scheme for tagging and
+branching:
 
 * Tagging can be done on the master branch when milestones are reached,
   important steps have been accomplished or in the event of releases;
