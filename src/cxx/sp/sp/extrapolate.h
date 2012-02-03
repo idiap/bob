@@ -37,6 +37,15 @@ namespace bob {
    */
   namespace sp {
 
+    namespace Extrapolation {
+      enum BorderType {
+        Zero,
+        NearestNeighbour,
+        Circular,
+        Mirror
+      }; 
+    }
+
     /**
       * @brief Extrapolates a 1D array, padding with a constant
       */
@@ -221,7 +230,7 @@ namespace bob {
 
       // Sets left values
       for(int j=0; j<dst.extent(0); ++j)
-        for(int i=0; i<dst.extent(0); ++i)
+        for(int i=0; i<dst.extent(1); ++i)
           dst(j,i) = src( bob::core::array::mirrorInRange(j-offset_y, 0, src.extent(0)-1),
                           bob::core::array::mirrorInRange(i-offset_x, 0, src.extent(1)-1));
     }

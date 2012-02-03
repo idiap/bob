@@ -279,7 +279,13 @@ static void extrapolateMirror(tp::const_ndarray a, tp::ndarray b) {
 }
 
 void bind_sp_extrapolate() {
-
+  enum_<bob::sp::Extrapolation::BorderType>("BorderType")
+    .value("Zero", bob::sp::Extrapolation::Zero)
+    .value("NearestNeighbour", bob::sp::Extrapolation::NearestNeighbour)
+    .value("Circular", bob::sp::Extrapolation::Circular)
+    .value("Mirror", bob::sp::Extrapolation::Mirror)
+    ;
+ 
   def("extrapolateConstant", &extrapolateConstant, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array with a constant, given a 1 or 2D input array.");
 
   def("extrapolateZero", &extrapolateZero, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array with zeros, given a 1 or 2D input array.");
