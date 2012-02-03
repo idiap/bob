@@ -140,7 +140,8 @@ int V4LCamera::open() {
       return -1;
     }
 
-    /* List and set video input
+    /*
+     // List and set video input, maybe useful in the future*
     v4l2_input input;
     input.index = 0;
     while (xioctl(v4lstruct->device, VIDIOC_ENUMINPUT, &input) != -1) {
@@ -154,9 +155,21 @@ int V4LCamera::open() {
     }
     */
 
-    /* Query and set default value to controls
     v4l2_queryctrl query;
     query.id = V4L2_CID_BASE;
+    
+    // This is a trick that comes from VLC:
+    // Sometime the driver has some problems and returns an EIO.
+    // We retry to query the device until it works
+    int retry_count = 10;
+    while (--retry_count &&
+           xioctl(v4lstruct->device, VIDIOC_QUERYCTRL, &query) == -1 &&
+          (errno == EIO || errno == EPIPE || errno == ETIMEDOUT)) {
+      query.id = V4L2_CID_BASE;
+    }
+
+    /*
+    // List controls and set default value, maybe useful in the future
     while (xioctl(v4lstruct->device, VIDIOC_QUERYCTRL, &query) != -1) {
       printf("%i %s\n", query.id, query.name);
       bool set_default = false;
@@ -178,6 +191,8 @@ int V4LCamera::open() {
           break;
         case V4L2_CTRL_TYPE_INTEGER64 :
           printf("  int64");
+          break;
+        default:
           break;
       }
 
