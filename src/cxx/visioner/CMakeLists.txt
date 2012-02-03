@@ -6,7 +6,7 @@ include("ExternalProject")
 # These are the basic variables to setup the visioner checkout from the proper
 # place and with the supported tag. It also provides basis in case we cannot
 # reach the directory ${VISIONER_REPO} directly.
-set(VISIONER_REPO "http://www.idiap.ch/software/bob/git/visioner.git/")
+set(VISIONER_REPO "git@github.com:idiap/visioner.git")
 
 # Accesses the git command
 find_program(GIT_EXECUTABLE NAMES git PATH_SUFFIXES Git/cmd Git/bin
