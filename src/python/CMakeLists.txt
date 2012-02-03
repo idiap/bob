@@ -28,6 +28,7 @@ if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
     message(STATUS "Qt4 NOT FOUND, supressing visioner-python from build")
   else (NOT QT4_FOUND)
     add_subdirectory(visioner)
+    add_subdirectory(daq)
   endif (NOT QT4_FOUND)
 
 endif (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)

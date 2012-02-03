@@ -1,6 +1,6 @@
 .. vim: set fileencoding=utf-8 :
-.. Andre Anjos <andre.anjos@idiap.ch>
-.. Sun Apr 3 19:18:37 2011 +0200
+.. Francois Moulin <Francois.Moulin@idiap.ch>
+.. Fri May 27 15:47:40 2011 +0200
 .. 
 .. Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
 .. 
@@ -16,28 +16,15 @@
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-============
- Python API
-============
+.. Index file for the Python bob::trainer bindings
 
-Most of the |project| C++ functionality is bound to Python using
-`Boost Python`_. This section includes a user guide and a reference manual.
+==================
+ Data acquisition
+==================
 
 .. toctree::
    :maxdepth: 2
-
-   ../core/doc/index
-   ../math/doc/index
-   ../io/doc/index
-   ../measure/doc/index
-   ../sp/doc/index
-   ../ip/doc/index
-   ../db/doc/index
-   ../machine/doc/index
-   ../trainer/doc/index
-   ../visioner/doc/index
-   ../daq/doc/index
-
-.. References
-
-.. _boost python: http://www.boost.org/doc/libs/release/libs/python/doc/index.html
+   
+.. automodule:: bob.daq
+   :members:
+   

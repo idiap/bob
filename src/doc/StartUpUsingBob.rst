@@ -41,15 +41,14 @@ simplify batch job submission.
 Debug environments can be useful if you need to run a debugger session or to
 send us a core dump with embedded debugging symbols.
 
-
-Starting programs in Bob-enabled environments
+Starting programs in |project|-enabled environments
 -----------------------------------------------
 
-Sometimes you just want to execute one particular program in a Bob-enabled
-environment and, when you leave it, you have your previous environment back.
-You can use the setup program ``shell.py`` for that purpose as well. For
-example, if you want to start the python interpreter within a Bob-enabled
-environment just do:
+Sometimes you just want to execute one particular program in a
+|project|-enabled environment and, when you leave it, you have your previous
+environment back.  You can use the setup program ``shell.py`` for that purpose
+as well. For example, if you want to start the python interpreter within a
+|project|-enabled environment just do:
 
 .. code-block:: sh
 
@@ -65,7 +64,7 @@ You can also create scripts that can run standalone and require no
 configuration using the `Shebang`_ OS functionality. Unfortunately,
 such a functionality is not standardized and is OS dependent (see `Shebang
 variations`_). Here is an example of a python script that executes in a
-Bob-enabled environment under *Linux*:
+|project|-enabled environment under *Linux*:
 
 .. code-block:: python
 
@@ -137,11 +136,11 @@ of this file should be similar to the model bellow:
 The line that says ``find_package(bob)`` is required. It brings in all needed
 variables to compile bob-based executables, like the location of header
 files, libraries and dependencies. The following line, starting with
-``bob_add_executable`` is where your code gets cooked together with Bob
+``bob_add_executable`` is where your code gets cooked together with |project|
 code.  The first parameter defines the executable name you will find on your
 prompt after compilation. The second parameter is a `CMake list`_ that contains
 all source files of your program, separated by a semi-colon. The third
-parameter defines the internal Bob package dependencies you need to depend
+parameter defines the internal |project| package dependencies you need to depend
 on, also separated by semi-colons. It is advisable to only introduce a
 *minimal* set of dependencies you need to compile and link a program.  Bringing
 in more dependencies than you need introduce unexpected behavior.
@@ -185,7 +184,7 @@ Python development
 ------------------
 
 Writing python code is easier than C++ because you can skip the compile-debug
-loops. To be able to use Bob constructions, just call python.
+loops. To be able to use |project| constructions, just call python.
 
 .. code-block:: python
 
