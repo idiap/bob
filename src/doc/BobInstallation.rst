@@ -237,7 +237,7 @@ A single command line that will install all required packages under Ubuntu
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core cmake liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools0 ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc libhdf5-serial-dev python-argparse python-sqlalchemy python-sphinx dvipng libqt4-dev libfftw3-dev
+   $ sudo apt-get install git-core cmake liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools0 ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc libhdf5-serial-dev python-argparse python-sqlalchemy python-sphinx dvipng libqt4-dev libfftw3-dev libcv-dev
 
 .. note::
 
@@ -251,17 +251,6 @@ A single command line that will install all required packages under Ubuntu
   on Ubuntu distributions by default. You can still add the PPA by following
   instructions on the `VLfeat launchpad webpage`_.
 
-.. warning::
-
-  There are couple of API modifications that currently affect the build of
-  |project| on Ubuntu 10.04 (LTS). Please have a look at `the Ubuntu 10.04
-  ticket`_ before trying any of this by yourself.
-
-  You may overcome these limitations by installing both HDF5 (and dependencies)
-  and FFMPEG on a private directory and informing CMake of that using
-  the CMAKE_PREFIX_PATH environment variable as explained before at
-  :ref:`basic-build`.
-
 Ubuntu 11.10
 ============
 
@@ -270,25 +259,13 @@ A single command line that will install all required packages under Ubuntu
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core cmake liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc libhdf5-serial-dev python-sqlalchemy python-sphinx dvipng libqt4-dev libfftw3-dev
+   $ sudo apt-get install git-core cmake liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc libhdf5-serial-dev python-sqlalchemy python-sphinx dvipng libqt4-dev libfftw3-dev libcv-dev
 
 .. note::
 
   You will not find a pre-packaged version of VLfeat (SIFT feature extraction)
   on Ubuntu distributions by default. You can still add the PPA by following
   instructions on the `VLfeat launchpad webpage`_.
-
-.. warning::
-
-  There are couple of API modifications that currently affect the build of
-  |project| on Ubuntu 11.04. Please have a look at `the Ubuntu 10.04
-  ticket`_ before trying any of this by yourself. Some of the issues reported
-  there are still present in Ubuntu 11.04. FFMPEG issues are cured though.
-
-  You may overcome these limitations by installing HDF5 (and dependencies)
-  on a private directory and informing CMake of that using the
-  CMAKE_PREFIX_PATH environment variable as explained before at
-  :ref:`basic-build`.
 
 Mac OSX
 =======
@@ -305,7 +282,7 @@ your shell prompt:
 
 .. code-block:: sh
 
-   $ sudo port install cmake blitz ffmpeg python26 python_select gcc44 gcc_select py26-numpy -atlas matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx texlive-bin hdf5-18 py26-argparse qt4-mac boost +python26 python26-scipy +no_atlas fftw-3 vlfeat
+   $ sudo port install cmake blitz ffmpeg python26 python_select gcc44 gcc_select py26-numpy -atlas matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx texlive-bin hdf5-18 py26-argparse qt4-mac boost +python26 python26-scipy +no_atlas fftw-3 vlfeat opencv +python26 +qt4
    $ # go for a long coffee 
 
 After the installation has finished, make sure you select python 2.6 (macports)
@@ -327,9 +304,9 @@ prompt manually.
 .. note::
 
   This setup will guide you to choose Python_ 2.6 as the interpreter where
-  |project| will run. You can use Python_ 2.7 as well. Make the required
-  modifications on the instructions above so to install packages for that
-  version of python instead.
+  |project| will run. You can use either Python_ 2.5 or Python_ 2.7 as well.
+  Make the required modifications on the instructions above so to install
+  packages for that version of python instead. 
 
 You can also install git if you want to submit patches to us:
 
@@ -446,7 +423,7 @@ try to reproduce the failure.
 .. _macports: http://www.macports.org
 .. _macports installation instructions: http://www.macports.org/install.php
 .. _fink: http://www.finkproject.org
-.. _submit a new bug report: https://www.idiap.ch/software/bob/newticket
+.. _submit a new bug report: https://github.com/idiap/bob/issues
 .. _blitz++: http://www.oonumerics.org/blitz
 .. _cmake: http://www.cmake.org
 .. _ffmpeg: http://www.ffmpeg.org
@@ -466,7 +443,6 @@ try to reproduce the failure.
 .. _matplotlib: http://matplotlib.sourceforge.net
 .. _bobidiapguide: https://www.idiap.ch/software/bob/wiki/BobIdiapGuide
 .. _buildbot: http://trac.buildbot.net
-.. _the Ubuntu 10.04 ticket: http://www.idiap.ch/software/bob/ticket/89/
 .. _argparse: http://code.google.com/p/argparse/
 .. _sqlalchemy: http://www.sqlalchemy.org/
 .. _dvipng: http://savannah.nongnu.org/projects/dvipng/
