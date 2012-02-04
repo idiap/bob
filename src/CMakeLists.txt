@@ -5,7 +5,7 @@ project(bob)
 cmake_minimum_required(VERSION 2.6)
 
 # The central database version and location
-set(BOB_DATABASE_URL "http://www.idiap.ch/software/bob/chrome/site/databases/")
+set(BOB_DATABASE_URL "http://www.idiap.ch/software/bob/databases/")
 set(BOB_DATABASE_VERSION "nightlies/last")
 
 # Force __LP64__ scheme on Mac OSX
