@@ -67,53 +67,52 @@ class ExtrapolationTest(unittest.TestCase):
   """Performs extrapolation product"""
 
 ##################### Convolution Tests ##################  
-  def test_convolution_1D_zeros(self):
+  def test_extrapolation_1D_zeros(self):
     b = numpy.zeros((14,), 'float64')
     bob.sp.extrapolateZero(a5,b)
     test_extrapolate_1D(b,a14_zeros,self)
 
-  def test_convolution_1D_twos(self):
+  def test_extrapolation_1D_twos(self):
     b = numpy.zeros((14,), 'float64')
     bob.sp.extrapolateConstant(a5,b,2.)
     test_extrapolate_1D(b,a14_twos,self)
 
-  def test_convolution_1D_nearest(self):
+  def test_extrapolation_1D_nearest(self):
     b = numpy.zeros((14,), 'float64')
     bob.sp.extrapolateNearest(a5,b)
     test_extrapolate_1D(b,a14_nearest,self)
 
-  def test_convolution_1D_circular(self):
+  def test_extrapolation_1D_circular(self):
     b = numpy.zeros((14,), 'float64')
     bob.sp.extrapolateCircular(a5,b)
     test_extrapolate_1D(b,a14_circular,self)
 
-  def test_convolution_1D_mirror(self):
+  def test_extrapolation_1D_mirror(self):
     b = numpy.zeros((14,), 'float64')
     bob.sp.extrapolateMirror(a5,b)
     test_extrapolate_1D(b,a14_mirror,self)
 
-  def test_convolution_2D_zeros(self):
+  def test_extrapolation_2D_zeros(self):
     B = numpy.zeros((4,4), 'float64')
     bob.sp.extrapolateZero(A22,B)
     test_extrapolate_2D(B,A44_zeros,self)
 
-  def test_convolution_2D_twos(self):
+  def test_extrapolation_2D_twos(self):
     B = numpy.zeros((4,4), 'float64')
     bob.sp.extrapolateConstant(A22,B,2.)
     test_extrapolate_2D(B,A44_twos,self)
 
-  def test_convolution_2D_nearest(self):
+  def test_extrapolation_2D_nearest(self):
     B = numpy.zeros((4,4), 'float64')
     bob.sp.extrapolateNearest(A22,B)
     test_extrapolate_2D(B,A44_nearest,self)
   
-  def test_convolution_2D_circular(self):
+  def test_extrapolation_2D_circular(self):
     B = numpy.zeros((4,4), 'float64')
     bob.sp.extrapolateCircular(A22,B)
     test_extrapolate_2D(B,A44_circular,self)
- 
 
-  def test_convolution_2D_mirror(self):
+  def test_extrapolation_2D_mirror(self):
     B = numpy.zeros((4,4), 'float64')
     bob.sp.extrapolateMirror(A22,B)
     test_extrapolate_2D(B,A44_mirror,self)
