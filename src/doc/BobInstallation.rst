@@ -224,7 +224,6 @@ ability to plot and interact with bob:
 * `Scipy`_: A set of scientific-related python-based utilities
 * `IPython`_: A powerful replacement for your python shell that provides bells
   and whistles
-* `H5py`_ and `Tables`_: HDF5 bindings to Python
 
 Notes for specific platforms
 ----------------------------
@@ -365,22 +364,14 @@ Grab a tarball and change into the directory of your choice, let's say
 
 .. _section-checkout:
 
-Cloning/Checking out |project|
-------------------------------
+Cloning |project|
+-----------------
 
-To checkout you currently need access to Idiap's internal filesystem (to be
-publicly available soon!):
+To checkout |project|, do the following at your shell prompt:
 
 .. code-block:: sh
 
-   $ git clone username@machine.idiap.ch:/idiap/group/bob/git/bob.git
-
-You have to fill the ``username`` and ``machine`` bits with your Idiap username
-and the machine you want to use for ssh. Please note that in order to push
-changes you need that ``machine`` does have `BuildBot`_ packages installed so
-that our build server is correctly informed of changes. Please contact one of
-the |project| developers to learn about existing machines with packages
-pre-installed.
+   $ git clone git@github.com:idiap/bob.git
 
 .. _section-compilation:
 
