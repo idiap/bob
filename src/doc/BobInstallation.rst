@@ -97,6 +97,8 @@ specific platforms.
 +----------------------+--------------+------------------------------------+
 | `OpenCV`_            | 2.1?         | BSD License                        |
 +----------------------+--------------+------------------------------------+
+| `LIBSVM`_            | ?            | Modified BSD License               |
++----------------------+--------------+------------------------------------+
 
 
 Description of |project| Dependencies
@@ -224,6 +226,9 @@ ability to plot and interact with bob:
 * `Scipy`_: A set of scientific-related python-based utilities
 * `IPython`_: A powerful replacement for your python shell that provides bells
   and whistles
+* `LIBSVM`_: A software framework for support vector classification
+* `OpenCV`_: A Computer Vision library which is currently used by the 
+  Bob Data Acquisition module.
 
 Notes for specific platforms
 ----------------------------
