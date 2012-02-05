@@ -32,11 +32,11 @@ ip::GaborSpatial::GaborSpatial( const double f, const double theta,
   const bool cancel_dc, 
   const enum ip::Gabor::NormOption norm_opt,
 //  const enum sp::Convolution::SizeOption size_opt,
-  const enum sp::Convolution::BorderOption border_opt):
+  const enum sp::Extrapolation::BorderType border_type):
   m_f(f), m_theta(theta), m_gamma(gamma), m_eta(eta), 
   m_spatial_size(spatial_size), m_cancel_dc(cancel_dc),
   m_norm_opt(norm_opt), // m_size_opt(size_opt), 
-  m_border_opt(border_opt)
+  m_border_type(border_type), m_tmp(0,0)
 {
   computeFilter();
 }
@@ -52,12 +52,25 @@ void ip::GaborSpatial::operator()(
 
   // Check output
   ca::assertZeroBase(dst);
-  // TODO: size if different Convolution::SizeOption
+  // TODO: size if different Conv::SizeOption
   ca::assertSameShape(dst,src);
 
   // Convolution with the Gabor Filter
-  sp::convolve( src, m_kernel, dst, sp::Convolution::Same, // m_size_opt
-    m_border_opt);
+  if(m_border_type == sp::Extrapolation::Zero)
+    sp::conv( src, m_kernel, dst, sp::Conv::Same); // m_size_opt
+  else
+  {
+    int h_tmp = src.extent(0)+m_spatial_size-1;
+    int w_tmp = src.extent(1)+m_spatial_size-1;
+    m_tmp.resize(h_tmp,w_tmp);
+    if(m_border_type == sp::Extrapolation::NearestNeighbour)
+      sp::extrapolateNearest(src, m_tmp);
+    else if(m_border_type == sp::Extrapolation::Circular)
+      sp::extrapolateCircular(src, m_tmp);
+    else if(m_border_type == sp::Extrapolation::Mirror)
+      sp::extrapolateMirror(src, m_tmp);
+    sp::conv( m_tmp, m_kernel, dst, sp::Conv::Valid); 
+  }
 }
 
 void ip::GaborSpatial::computeFilter()

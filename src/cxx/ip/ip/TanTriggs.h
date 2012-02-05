@@ -20,13 +20,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_TAN_TRIGGS_H
-#define BOB5SPRO_TAN_TRIGGS_H 1
+#ifndef BOB_IP_TAN_TRIGGS_H
+#define BOB_IP_TAN_TRIGGS_H
 
 #include "core/logging.h"
 #include "ip/Exception.h"
 #include "ip/gammaCorrection.h"
-#include "sp/convolution.h"
+#include "sp/conv.h"
+#include "sp/extrapolate.h"
 
 namespace bob {
 /**
@@ -58,9 +59,9 @@ namespace bob {
         */
 	    TanTriggs(const double gamma=0.2, const double sigma0=1., 
         const double sigma1=2., const int size=2, const double threshold=10., 
-        const double alpha=0.1, const enum sp::Convolution::SizeOption 
-        size_opt=sp::Convolution::Same, const enum sp::Convolution::BorderOption 
-        border_opt=sp::Convolution::Mirror);
+        const double alpha=0.1, const enum sp::Conv::SizeOption 
+        size_opt=sp::Conv::Same, const enum sp::Extrapolation::BorderType 
+        border_type=sp::Extrapolation::Mirror);
 
 	  	/**
         * @brief Destructor
@@ -89,14 +90,15 @@ namespace bob {
       // Attributes
       blitz::Array<double, 2> m_kernel;
       blitz::Array<double, 2> m_img_tmp;
+      blitz::Array<double, 2> m_img_tmp2;
       double m_gamma;
       double m_sigma0;
       double m_sigma1;
       int m_size;
       double m_threshold;
       double m_alpha;
-      enum sp::Convolution::SizeOption m_size_opt;
-      enum sp::Convolution::BorderOption m_border_opt;
+      enum sp::Conv::SizeOption m_size_opt;
+      enum sp::Extrapolation::BorderType m_border_type;
 	};
 
   template <typename T> 
@@ -110,7 +112,9 @@ namespace bob {
     }
     // Check and resize dst if required
     if( dst.extent(0) != src.extent(0) || dst.extent(1) != src.extent(1) )
+    {
       dst.resize( src.extent(0), src.extent(1) );
+    }
 
     // Check and resize intermediate array if required
     if( m_img_tmp.extent(0) != src.extent(0) ||  
@@ -130,8 +134,19 @@ namespace bob {
     }
 
     // 2/ Convolution with the DoG Filter
-    bob::sp::convolve( m_img_tmp, m_kernel, dst, 
-      m_size_opt, m_border_opt);
+    if(m_border_type == sp::Extrapolation::Zero || m_size_opt==sp::Conv::Valid)
+      sp::conv( m_img_tmp, m_kernel, dst, m_size_opt);
+    else
+    {
+      m_img_tmp2.resize(sp::getConvOutputSize(m_img_tmp, m_kernel, sp::Conv::Full));
+      if(m_border_type == sp::Extrapolation::NearestNeighbour)
+        sp::extrapolateNearest(m_img_tmp, m_img_tmp2);
+      else if(m_border_type == sp::Extrapolation::Circular)
+        sp::extrapolateCircular(m_img_tmp, m_img_tmp2);
+      else
+        sp::extrapolateMirror(m_img_tmp, m_img_tmp2);
+      sp::conv( m_img_tmp2, m_kernel, dst, sp::Conv::Valid); 
+    }
 
     // 3/ Perform contrast equalization
     performContrastEqualization(dst);
@@ -139,4 +154,4 @@ namespace bob {
 
 }}
 
-#endif /* BOB5SPRO_TAN_TRIGGS_H */
+#endif /* BOB_IP_TAN_TRIGGS_H */

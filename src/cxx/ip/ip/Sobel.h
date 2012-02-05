@@ -20,13 +20,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_IP_SOBEL_H
-#define BOB5SPRO_IP_SOBEL_H
+#ifndef BOB_IP_SOBEL_H
+#define BOB_IP_SOBEL_H
 
 #include "core/array_assert.h"
 #include "core/cast.h"
 #include "ip/Exception.h"
-#include "sp/convolution.h"
+#include "sp/conv.h"
+#include "sp/extrapolate.h"
 
 namespace bob {
 /**
@@ -47,9 +48,9 @@ namespace bob {
         * @brief Constructor: generates the Sobel kernel
         */
 	    Sobel(const bool up_positive=false, const bool left_positive=false, 
-        const enum sp::Convolution::SizeOption size_opt=sp::Convolution::Same,
-        const enum sp::Convolution::BorderOption 
-          border_opt=sp::Convolution::Mirror);
+        const enum sp::Conv::SizeOption size_opt=sp::Conv::Same,
+        const enum sp::Extrapolation::BorderType 
+          border_type=sp::Extrapolation::Mirror);
 
 	  	/**
         * @brief Destructor
@@ -77,8 +78,8 @@ namespace bob {
       blitz::Array<double, 2> m_kernel_x;
       bool m_up_positive;
       bool m_left_positive;
-      enum sp::Convolution::SizeOption m_size_opt;
-      enum sp::Convolution::BorderOption m_border_opt;
+      enum sp::Conv::SizeOption m_size_opt;
+      enum sp::Extrapolation::BorderType m_border_type;
 	};
 
   template <typename T> 
@@ -94,10 +95,32 @@ namespace bob {
     blitz::Array<T,2> dst_y = dst(0, blitz::Range::all(), blitz::Range::all());
     blitz::Array<T,2> dst_x = dst(1, blitz::Range::all(), blitz::Range::all());
     // TODO: improve the way we deal with types
-    bob::sp::convolve(src, bob::core::cast<T>(m_kernel_y), dst_y, m_size_opt, m_border_opt);
-    bob::sp::convolve(src, bob::core::cast<T>(m_kernel_x), dst_x, m_size_opt, m_border_opt);
+    if(m_border_type == sp::Extrapolation::Zero || m_size_opt==sp::Conv::Valid)
+    {
+     bob::sp::conv(src, bob::core::cast<T>(m_kernel_y), dst_y, m_size_opt);
+     bob::sp::conv(src, bob::core::cast<T>(m_kernel_x), dst_x, m_size_opt);
+    }
+    else
+    {
+      blitz::Array<T,2> tmpy(sp::getConvOutputSize(src, bob::core::cast<T>(m_kernel_y), sp::Conv::Full));
+      blitz::Array<T,2> tmpx(sp::getConvOutputSize(src, bob::core::cast<T>(m_kernel_x), sp::Conv::Full));
+      if(m_border_type == sp::Extrapolation::NearestNeighbour) {
+        sp::extrapolateNearest(src, tmpy);
+        sp::extrapolateNearest(src, tmpx);
+      }
+      else if(m_border_type == sp::Extrapolation::Circular) {
+        sp::extrapolateCircular(src, tmpy);
+        sp::extrapolateCircular(src, tmpx);
+      }
+      else if(m_border_type == sp::Extrapolation::Mirror) {
+        sp::extrapolateMirror(src, tmpy);
+        sp::extrapolateMirror(src, tmpx);
+      }
+      bob::sp::conv(tmpy, bob::core::cast<T>(m_kernel_y), dst_y, sp::Conv::Valid);
+      bob::sp::conv(tmpx, bob::core::cast<T>(m_kernel_x), dst_x, sp::Conv::Valid);
+    }
   }
 
 }}
 
-#endif /* BOB5SPRO_SOBEL_H */
+#endif /* BOB_SOBEL_H */

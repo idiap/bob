@@ -21,7 +21,8 @@
  */
 
 #include "core/array_assert.h"
-#include "sp/convolution.h"
+#include "sp/conv.h"
+#include "sp/extrapolate.h"
 #include "ip/HornAndSchunckFlow.h"
 
 namespace of = bob::ip::optflow;
@@ -31,8 +32,10 @@ static const blitz::Array<double,2> LAPLACIAN_014_KERNEL(const_cast<double*>(LAP
 
 void of::laplacian_avg_hs_opencv(const blitz::Array<double,2>& input,
     blitz::Array<double,2>& output) {
-  bob::sp::convolve(input, LAPLACIAN_014_KERNEL, output,
-      sp::Convolution::Same, sp::Convolution::Mirror);
+  blitz::Array<double,2> inputExtra(bob::sp::getConvOutputSize(input, LAPLACIAN_014_KERNEL, bob::sp::Conv::Full));
+  bob::sp::extrapolateMirror(input, inputExtra);
+  bob::sp::conv(input, LAPLACIAN_014_KERNEL, output,
+      sp::Conv::Valid);
 }
 
 static const double _12 = 1./12.;
@@ -42,8 +45,10 @@ static const blitz::Array<double,2> LAPLACIAN_12_KERNEL(const_cast<double*>(LAPL
 
 void of::laplacian_avg_hs(const blitz::Array<double,2>& input,
     blitz::Array<double,2>& output) {
-  bob::sp::convolve(input, LAPLACIAN_12_KERNEL, output,
-      sp::Convolution::Same, sp::Convolution::Mirror);
+  blitz::Array<double,2> inputExtra(bob::sp::getConvOutputSize(input, LAPLACIAN_12_KERNEL, bob::sp::Conv::Full));
+  bob::sp::extrapolateMirror(input, inputExtra);
+  bob::sp::conv(input, LAPLACIAN_12_KERNEL, output,
+      sp::Conv::Valid);
 }
 of::VanillaHornAndSchunckFlow::VanillaHornAndSchunckFlow
 (const blitz::TinyVector<int,2>& shape) :

@@ -25,10 +25,10 @@
 namespace ip = bob::ip;
 
 ip::Sobel::Sobel( const bool up_positive, const bool left_positive,
-    const enum sp::Convolution::SizeOption size_opt,
-    const enum sp::Convolution::BorderOption border_opt):
+    const enum sp::Conv::SizeOption size_opt,
+    const enum sp::Extrapolation::BorderType border_type):
   m_up_positive(up_positive), m_left_positive(left_positive),
-  m_size_opt(size_opt), m_border_opt(border_opt)
+  m_size_opt(size_opt), m_border_type(border_type)
 {
   computeKernels();
 }

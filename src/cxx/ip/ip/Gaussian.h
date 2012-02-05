@@ -20,12 +20,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_GAUSSIAN_H
-#define BOB5SPRO_GAUSSIAN_H
+#ifndef BOB_IP_GAUSSIAN_H
+#define BOB_IP_GAUSSIAN_H
 
 #include "core/array_assert.h"
 #include "core/cast.h"
-#include "sp/convolution.h"
+#include "sp/conv.h"
+#include "sp/extrapolate.h"
 
 namespace bob {
 
@@ -52,22 +53,18 @@ namespace bob {
 			   */
 	  		Gaussian(const int radius_y=1, const int radius_x=1, 
             const double sigma_y=5., const double sigma_x=5.,
-            const enum bob::sp::Convolution::SizeOption size_opt =
-              bob::sp::Convolution::Same,
-            const enum bob::sp::Convolution::BorderOption border_opt =
-              bob::sp::Convolution::Mirror):
+            const enum bob::sp::Extrapolation::BorderType border_type =
+              bob::sp::Extrapolation::Mirror):
           m_radius_y(radius_y), m_radius_x(radius_x), m_sigma_y(sigma_y),
-          m_sigma_x(sigma_x), m_conv_size(size_opt), m_conv_border(border_opt)
+          m_sigma_x(sigma_x), m_conv_border(border_type)
   			{
           computeKernel();
         }
 
         void reset( const int radius_y=1, const int radius_x=1,
           const double sigma_y=5., const double sigma_x=5.,
-          const enum bob::sp::Convolution::SizeOption size_opt =
-            bob::sp::Convolution::Same,
-          const enum bob::sp::Convolution::BorderOption border_opt =
-            bob::sp::Convolution::Mirror);
+          const enum bob::sp::Extrapolation::BorderType border_type =
+            bob::sp::Extrapolation::Mirror);
 
         /**
          * @brief Process a 2D blitz Array/Image
@@ -97,13 +94,14 @@ namespace bob {
         int m_radius_x;
         double m_sigma_y;
         double m_sigma_x;
-        enum bob::sp::Convolution::SizeOption m_conv_size;
-        enum bob::sp::Convolution::BorderOption m_conv_border;
+        enum bob::sp::Extrapolation::BorderType m_conv_border;
 
         blitz::Array<double, 1> m_kernel_y;
         blitz::Array<double, 1> m_kernel_x;
 
         blitz::Array<double, 2> m_tmp_int;
+        blitz::Array<double, 2> m_tmp_int1;
+        blitz::Array<double, 2> m_tmp_int2;
     };
 
     // Declare template method full specialization
@@ -116,12 +114,34 @@ namespace bob {
       blitz::Array<double,2>& dst)
     {
       blitz::Array<double,2> src_d = bob::core::cast<double>(src);
-      m_tmp_int.resize(bob::sp::getConvolveSepOutputSize(src_d, m_kernel_y, 0, m_conv_size));
       // Checks are postponed to the convolution function.
-      bob::sp::convolveSep(src_d, m_kernel_y, m_tmp_int, 0,
-        m_conv_size, m_conv_border);
-      bob::sp::convolveSep(m_tmp_int, m_kernel_x, dst, 1,
-        m_conv_size, m_conv_border);
+      if(m_conv_border == bob::sp::Extrapolation::Zero)
+      {
+        m_tmp_int.resize(bob::sp::getConvSepOutputSize(src_d, m_kernel_y, 0, bob::sp::Conv::Same));
+        bob::sp::convSep(src_d, m_kernel_y, m_tmp_int, 0, bob::sp::Conv::Same);
+        bob::sp::convSep(m_tmp_int, m_kernel_x, dst, 1, bob::sp::Conv::Same);
+      }
+      else
+      {
+        m_tmp_int1.resize(bob::sp::getConvSepOutputSize(src_d, m_kernel_y, 0, bob::sp::Conv::Full));
+        if(m_conv_border == bob::sp::Extrapolation::NearestNeighbour)
+          bob::sp::extrapolateNearest(src_d, m_tmp_int1);
+        else if(m_conv_border == bob::sp::Extrapolation::Circular)
+          bob::sp::extrapolateCircular(src_d, m_tmp_int1);
+        else
+          bob::sp::extrapolateMirror(src_d, m_tmp_int1);
+        m_tmp_int.resize(bob::sp::getConvSepOutputSize(m_tmp_int1, m_kernel_y, 0, bob::sp::Conv::Valid));
+        bob::sp::convSep(m_tmp_int1, m_kernel_y, m_tmp_int, 0, bob::sp::Conv::Valid);
+
+        m_tmp_int2.resize(bob::sp::getConvSepOutputSize(m_tmp_int, m_kernel_x, 1, bob::sp::Conv::Full));
+        if(m_conv_border == bob::sp::Extrapolation::NearestNeighbour)
+          bob::sp::extrapolateNearest(m_tmp_int, m_tmp_int2);
+        else if(m_conv_border == bob::sp::Extrapolation::Circular)
+          bob::sp::extrapolateCircular(m_tmp_int, m_tmp_int2);
+        else
+          bob::sp::extrapolateMirror(m_tmp_int, m_tmp_int2);
+        bob::sp::convSep(m_tmp_int2, m_kernel_x, dst, 1, bob::sp::Conv::Valid);
+      }
     }
 
     template <typename T> 

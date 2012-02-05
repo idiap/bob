@@ -56,7 +56,7 @@ namespace bob {
           const int spatial_size=35, const bool cancel_dc=false, 
           const enum ip::Gabor::NormOption norm_opt=ip::Gabor::SpatialFactor,
           // const enum sp::Convolution::SizeOption size_opt=sp::Convolution::Same,
-          const enum sp::Convolution::BorderOption border_opt=sp::Convolution::Mirror);
+          const enum sp::Extrapolation::BorderType border_type=sp::Extrapolation::Mirror);
 
         /**
          * @brief Destructor
@@ -84,8 +84,8 @@ namespace bob {
         inline bool getCancelDc() const { return m_cancel_dc; }
         inline enum ip::Gabor::NormOption getNormOption() const
           { return m_norm_opt; }
-        inline enum sp::Convolution::BorderOption getBorderOption() const
-          { return m_border_opt; }
+        inline enum sp::Extrapolation::BorderType getBorderType() const
+          { return m_border_type; }
 
         /**
           * @brief Mutator functions
@@ -112,9 +112,9 @@ namespace bob {
           { m_cancel_dc = cancel_dc; computeFilters(); }
         inline void setNormOption(const enum ip::Gabor::NormOption norm_opt)
           { m_norm_opt = norm_opt; computeFilters(); }
-        inline void setBorderOption( const enum sp::Convolution::BorderOption 
-            border_opt) 
-          { m_border_opt = border_opt; }
+        inline void setBorderType( const enum sp::Extrapolation::BorderType
+            border_type) 
+          { m_border_type = border_type; }
 
       private:
         /**
@@ -145,7 +145,7 @@ namespace bob {
         bool m_cancel_dc;
         enum ip::Gabor::NormOption m_norm_opt;
         // enum sp::Convolution::SizeOption m_size_opt;
-        enum sp::Convolution::BorderOption m_border_opt;
+        enum sp::Extrapolation::BorderType m_border_type;
 
         std::vector<boost::shared_ptr<bob::ip::GaborSpatial> > m_filters;
         blitz::Array<double,1> m_freqs;

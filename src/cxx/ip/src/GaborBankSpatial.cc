@@ -32,12 +32,12 @@ ip::GaborBankSpatial::GaborBankSpatial( const int n_orient, const int n_freq,
   const int spatial_size, const bool cancel_dc, 
   const enum ip::Gabor::NormOption norm_opt,
   //  const enum sp::Convolution::SizeOption size_opt,
-  const enum sp::Convolution::BorderOption border_opt):
+  const enum sp::Extrapolation::BorderType border_type):
   m_n_orient(n_orient), m_n_freq(n_freq), m_fmax(fmax), 
   m_orientation_full(orientation_full), m_k(k), m_p(p), m_gamma(gamma), 
   m_eta(eta), m_spatial_size(spatial_size), m_cancel_dc(cancel_dc),
   m_norm_opt(norm_opt), // m_size_opt(size_opt), 
-  m_border_opt(border_opt)
+  m_border_type(border_type)
 {
   computeFilters();
 }
@@ -97,7 +97,7 @@ void ip::GaborBankSpatial::computeFilters()
     boost::shared_ptr<ip::GaborSpatial> ptr( 
       new ip::GaborSpatial( m_freqs(f), m_orients(o), m_gamma, m_eta, 
         m_spatial_size,  m_cancel_dc, m_norm_opt, /*m_size_opt,*/ 
-        m_border_opt) );
+        m_border_type) );
     m_filters.push_back( ptr);
   }
 }

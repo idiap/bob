@@ -21,11 +21,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_IP_GABOR_SPATIAL_H
-#define BOB5SPRO_IP_GABOR_SPATIAL_H
+#ifndef BOB_IP_GABOR_SPATIAL_H
+#define BOB_IP_GABOR_SPATIAL_H
 
 #include "ip/Exception.h"
-#include "sp/convolution.h"
+#include "sp/conv.h"
+#include "sp/extrapolate.h"
 
 namespace bob {
 /**
@@ -67,8 +68,7 @@ namespace bob {
           const double gamma=1., const double eta=1., const int spatial_size=35,
           const bool cancel_dc=false, 
           const enum ip::Gabor::NormOption norm_opt=ip::Gabor::SpatialFactor,
-          // const enum sp::Convolution::SizeOption size_opt=sp::Convolution::Same,
-          const enum sp::Convolution::BorderOption border_opt=sp::Convolution::Mirror);
+          const enum sp::Extrapolation::BorderType border_type=sp::Extrapolation::Mirror);
 
         /**
          * @brief Destructor
@@ -92,8 +92,8 @@ namespace bob {
         inline bool getCancelDc() const { return m_cancel_dc; }
         inline enum ip::Gabor::NormOption getNormOption() const
           { return m_norm_opt; }
-        inline enum sp::Convolution::BorderOption getBorderOption() const
-          { return m_border_opt; }
+        inline enum sp::Extrapolation::BorderType getBorderType() const
+          { return m_border_type; }
         inline const blitz::Array<std::complex<double>, 2>& getKernel() const
           { return m_kernel; }
 
@@ -114,9 +114,9 @@ namespace bob {
           { m_cancel_dc = cancel_dc; computeFilter(); }
         inline void setNormOption(const enum ip::Gabor::NormOption norm_opt)
           { m_norm_opt = norm_opt; computeFilter(); }
-        inline void setBorderOption( const enum sp::Convolution::BorderOption 
-            border_opt) 
-          { m_border_opt = border_opt; }
+        inline void setBorderType( const enum sp::Extrapolation::BorderType 
+            border_type) 
+          { m_border_type = border_type; }
 
       private:
         /**
@@ -133,9 +133,9 @@ namespace bob {
         int m_spatial_size;
         bool m_cancel_dc;
         enum ip::Gabor::NormOption m_norm_opt;
-        //enum sp::Convolution::SizeOption m_size_opt;
-        enum sp::Convolution::BorderOption m_border_opt;
+        enum sp::Extrapolation::BorderType m_border_type;
+        blitz::Array<std::complex<double>, 2> m_tmp; // for extrapolation if required
     };
 }}
 
-#endif /* BOB5SPRO_IP_GABOR_SPATIAL_H */
+#endif /* BOB_IP_GABOR_SPATIAL_H */

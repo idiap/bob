@@ -114,7 +114,7 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 BOOST_AUTO_TEST_CASE( test_sobel_2d )
 {
   blitz::Array<double,3> y(2,1,1); 
-  bob::ip::Sobel s(false,false,bob::sp::Convolution::Valid);
+  bob::ip::Sobel s(false,false,bob::sp::Conv::Valid);
   s(x,y);
   checkBlitzClose(y, x_sol, eps);
 }

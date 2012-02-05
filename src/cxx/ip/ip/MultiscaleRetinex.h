@@ -23,14 +23,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_IP_MULTISCALE_RETINEX_H
-#define BOB5SPRO_IP_MULTISCALE_RETINEX_H
+#ifndef BOB_IP_MULTISCALE_RETINEX_H
+#define BOB_IP_MULTISCALE_RETINEX_H
 
 #include "core/array_assert.h"
 #include "core/cast.h"
-#include "sp/convolution.h"
+#include "sp/conv.h"
+#include "sp/extrapolate.h"
 #include "ip/Gaussian.h"
 #include <boost/shared_array.hpp>
+
+#include "core/logging.h"
 
 namespace bob {
 
@@ -64,10 +67,10 @@ namespace bob {
 			   */
 	  		MultiscaleRetinex(const size_t n_scales=1, const int size_min=1, 
             const int size_step=1, const double sigma=5.,
-            const enum bob::sp::Convolution::BorderOption border_opt =
-              bob::sp::Convolution::Mirror):
+            const enum bob::sp::Extrapolation::BorderType border_type =
+              bob::sp::Extrapolation::Mirror):
           m_n_scales(n_scales), m_size_min(size_min), m_size_step(size_step),
-          m_sigma(sigma), m_conv_border(border_opt),
+          m_sigma(sigma), m_conv_border(border_type),
           m_gaussians(new bob::ip::Gaussian[m_n_scales])
   			{
           computeKernels();
@@ -99,7 +102,7 @@ namespace bob {
         int m_size_min;
         int m_size_step;
         double m_sigma;
-        enum bob::sp::Convolution::BorderOption m_conv_border;
+        enum bob::sp::Extrapolation::BorderType m_conv_border;
 
         boost::shared_array<bob::ip::Gaussian> m_gaussians;
         blitz::Array<double,2> m_tmp;
@@ -138,4 +141,4 @@ namespace bob {
 	}
 }
 
-#endif /* BOB5SPRO_IP_MULTISCALE_RETINEX_H */
+#endif /* BOB_IP_MULTISCALE_RETINEX_H */

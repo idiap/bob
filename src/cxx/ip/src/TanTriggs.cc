@@ -27,11 +27,11 @@ namespace ip = bob::ip;
 ip::TanTriggs::TanTriggs( const double gamma, const double sigma0, 
   const double sigma1, const int size, const double threshold, 
   const double alpha, 
-  const enum sp::Convolution::SizeOption size_opt,
-  const enum sp::Convolution::BorderOption border_opt): 
+  const enum sp::Conv::SizeOption size_opt,
+  const enum sp::Extrapolation::BorderType border_type): 
   m_gamma(gamma), m_sigma0(sigma0), m_sigma1(sigma1), m_size(size), 
   m_threshold(threshold), m_alpha(alpha), m_size_opt(size_opt),
-  m_border_opt(border_opt)
+  m_border_type(border_type)
 {
   //m_size = 2*floor( 3*m_sigma1)+1;
   computeDoG( m_sigma0, m_sigma1, 2*m_size+1);

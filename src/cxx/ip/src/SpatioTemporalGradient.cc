@@ -23,7 +23,7 @@
 
 #include <cmath>
 #include "ip/SpatioTemporalGradient.h"
-#include "sp/convolution.h"
+#include "sp/conv.h"
 #include "core/array_assert.h"
 
 namespace ip = bob::ip;
@@ -32,8 +32,7 @@ namespace sp = bob::sp;
 static inline void fastconv(const blitz::Array<double,2>& image,
     const blitz::Array<double,1>& kernel,
     blitz::Array<double,2>& result, int dimension) {
-  sp::convolveSep(image, kernel, result, dimension, sp::Convolution::Same,
-    sp::Convolution::Mirror);
+  sp::deprecated::convolveMirrorSep(image, kernel, result, dimension, sp::Conv::Same);
 }
 
 ip::ForwardGradient::ForwardGradient(const blitz::Array<double,1>& diff_kernel,

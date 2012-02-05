@@ -23,6 +23,7 @@
 #include "ip/Gaussian.h"
 
 namespace ip = bob::ip;
+namespace sp = bob::sp;
 
 void ip::Gaussian::computeKernel()
 {
@@ -46,15 +47,13 @@ void ip::Gaussian::computeKernel()
 
 void ip::Gaussian::reset(const int radius_y, const int radius_x,
   const double sigma_y, const double sigma_x, 
-  const enum bob::sp::Convolution::SizeOption size_opt,
-  const enum bob::sp::Convolution::BorderOption border_opt)
+  const enum bob::sp::Extrapolation::BorderType border_type)
 {
   m_radius_y = radius_y;
   m_radius_x = radius_x;
   m_sigma_y = sigma_y;
   m_sigma_x = sigma_x;
-  m_conv_size = size_opt;
-  m_conv_border = border_opt;
+  m_conv_border = border_type;
   computeKernel();
 }
 
@@ -63,10 +62,32 @@ template <>
 void ip::Gaussian::operator()<double>(const blitz::Array<double,2>& src,
    blitz::Array<double,2>& dst)
 {
-  m_tmp_int.resize(bob::sp::getConvolveSepOutputSize(src, m_kernel_y, 0, m_conv_size));
   // Checks are postponed to the convolution function.
-  bob::sp::convolveSep(src, m_kernel_y, m_tmp_int, 0,
-    m_conv_size, m_conv_border);
-  bob::sp::convolveSep(m_tmp_int, m_kernel_x, dst, 1,
-    m_conv_size, m_conv_border);
+  if(m_conv_border == sp::Extrapolation::Zero)
+  {
+    m_tmp_int.resize(sp::getConvSepOutputSize(src, m_kernel_y, 0, sp::Conv::Same));
+    sp::convSep(src, m_kernel_y, m_tmp_int, 0, sp::Conv::Same);
+    sp::convSep(m_tmp_int, m_kernel_x, dst, 1, sp::Conv::Same);
+  }
+  else
+  {
+    m_tmp_int1.resize(sp::getConvSepOutputSize(src, m_kernel_y, 0, sp::Conv::Full));
+    if(m_conv_border == sp::Extrapolation::NearestNeighbour)
+      sp::extrapolateNearest(src, m_tmp_int1);
+    else if(m_conv_border == sp::Extrapolation::Circular)
+      sp::extrapolateCircular(src, m_tmp_int1);
+    else
+      sp::extrapolateMirror(src, m_tmp_int1);
+    m_tmp_int.resize(sp::getConvSepOutputSize(m_tmp_int1, m_kernel_y, 0, sp::Conv::Valid));
+    sp::convSep(m_tmp_int1, m_kernel_y, m_tmp_int, 0, sp::Conv::Valid);
+
+    m_tmp_int2.resize(sp::getConvSepOutputSize(m_tmp_int, m_kernel_x, 1, sp::Conv::Full));
+    if(m_conv_border == sp::Extrapolation::NearestNeighbour)
+      sp::extrapolateNearest(m_tmp_int, m_tmp_int2);
+    else if(m_conv_border == sp::Extrapolation::Circular)
+      sp::extrapolateCircular(m_tmp_int, m_tmp_int2);
+    else
+      sp::extrapolateMirror(m_tmp_int, m_tmp_int2);
+    sp::convSep(m_tmp_int2, m_kernel_x, dst, 1, sp::Conv::Valid);
+  }
 }
