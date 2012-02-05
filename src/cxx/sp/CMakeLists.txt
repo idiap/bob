@@ -7,6 +7,7 @@ set(shared "${FFTW3_LIBRARY}")
 
 # This defines the list of source files inside this package.
 set(src 
+    "src/Exception.cc"
     "src/FFT1D.cc"
     "src/FFT1DNaive.cc"
     "src/FFT2D.cc"
@@ -23,5 +24,6 @@ add_dependencies(bob_sp sp-cxx_header_install)
 
 # Defines tests for this package
 bob_test(sp convolution test/convolution.cc)
+bob_test(sp conv test/conv.cc)
 #bob_test(sp extrapolation test/extrapolation.cc)
 bob_test(sp fft_fct test/fft_fct.cc)

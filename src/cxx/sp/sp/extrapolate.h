@@ -25,9 +25,8 @@
 #define BOB_SP_EXTRAPOLATE_H
 
 #include <blitz/array.h>
-#include "core/Exception.h"
+#include "sp/Exception.h"
 #include "core/array_assert.h"
-#include "core/array_index.h"
 
 namespace bob {
   /**
@@ -58,7 +57,7 @@ namespace bob {
       bob::core::array::assertZeroBase(dst);
 
       if(src.extent(0) > dst.extent(0))
-        throw bob::core::Exception();
+        throw bob::sp::ExtrapolationDstTooSmall();
 
       // Sets value everywhere
       dst = value;
@@ -82,7 +81,7 @@ namespace bob {
       bob::core::array::assertZeroBase(dst);
 
       if(src.extent(0) > dst.extent(0) || src.extent(1) > dst.extent(1))
-        throw bob::core::Exception();
+        throw bob::sp::ExtrapolationDstTooSmall();
 
       // Sets value everywhere
       dst = value;
@@ -134,7 +133,7 @@ namespace bob {
       bob::core::array::assertZeroBase(dst);
 
       if(src.extent(0) > dst.extent(0))
-        throw bob::core::Exception();
+        throw bob::sp::ExtrapolationDstTooSmall();
 
       // Computes offsets
       int offset = (dst.extent(0) - src.extent(0)) / 2;
@@ -163,7 +162,7 @@ namespace bob {
       bob::core::array::assertZeroBase(dst);
 
       if(src.extent(0) > dst.extent(0) || src.extent(1) > dst.extent(1))
-        throw bob::core::Exception();
+        throw bob::sp::ExtrapolationDstTooSmall();
 
       // Computes offsets
       int offset_y = (dst.extent(0) - src.extent(0)) / 2;
@@ -448,7 +447,7 @@ namespace bob {
       bob::core::array::assertZeroBase(dst);
 
       if(src.extent(0) > dst.extent(0))
-        throw bob::core::Exception();
+        throw bob::sp::ExtrapolationDstTooSmall();
 
       // Computes offset
       int offset = (dst.extent(0) - src.extent(0)) / 2;
@@ -469,7 +468,7 @@ namespace bob {
       bob::core::array::assertZeroBase(dst);
 
       if(src.extent(0) > dst.extent(0) || src.extent(1) > dst.extent(1))
-        throw bob::core::Exception();
+        throw bob::sp::ExtrapolationDstTooSmall();
 
       // Computes offset
       int offset_y = (dst.extent(0) - src.extent(0)) / 2;
@@ -492,7 +491,7 @@ namespace bob {
       bob::core::array::assertZeroBase(dst);
 
       if(src.extent(0) > dst.extent(0))
-        throw bob::core::Exception();
+        throw bob::sp::ExtrapolationDstTooSmall();
 
       // Computes offset
       int offset = (dst.extent(0) - src.extent(0)) / 2;
@@ -513,7 +512,7 @@ namespace bob {
       bob::core::array::assertZeroBase(dst);
 
       if(src.extent(0) > dst.extent(0) || src.extent(1) > dst.extent(1))
-        throw bob::core::Exception();
+        throw bob::sp::ExtrapolationDstTooSmall();
 
       // Computes offsets
       int offset_y = (dst.extent(0) - src.extent(0)) / 2;
@@ -523,13 +522,6 @@ namespace bob {
       dst(blitz::Range(offset_y,offset_y+src.extent(0)-1), blitz::Range(offset_x,offset_x+src.extent(1)-1)) = src;
       // Call the recursive function for the borders
       detail::extrapolateMirrorRec(src, dst);
-/*
-      // Sets left values
-      for(int j=0; j<dst.extent(0); ++j)
-        for(int i=0; i<dst.extent(1); ++i)
-          dst(j,i) = src( bob::core::array::mirrorInRange(j-offset_y, 0, src.extent(0)-1),
-                          bob::core::array::mirrorInRange(i-offset_x, 0, src.extent(1)-1));
-*/
     }
  
   }
