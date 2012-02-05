@@ -35,6 +35,11 @@ a14_nearest = numpy.array([1,1,1,1,1,2,3,4,5,5,5,5,5,5], 'float64')
 a14_circular = numpy.array([2,3,4,5,1,2,3,4,5,1,2,3,4,5], 'float64')
 a14_mirror = numpy.array([4,3,2,1,1,2,3,4,5,5,4,3,2,1], 'float64')
 
+a26_zeros = numpy.array([0,0,0,0,0,0,0,0,0,0,1,2,3,4,5,0,0,0,0,0,0,0,0,0,0,0], 'float64')
+a26_twos = numpy.array([2,2,2,2,2,2,2,2,2,2,1,2,3,4,5,2,2,2,2,2,2,2,2,2,2,2], 'float64')
+a26_nearest = numpy.array([1,1,1,1,1,1,1,1,1,1,1,2,3,4,5,5,5,5,5,5,5,5,5,5,5,5], 'float64')
+a26_circular = numpy.array([1,2,3,4,5,1,2,3,4,5,1,2,3,4,5,1,2,3,4,5,1,2,3,4,5,1], 'float64')
+a26_mirror = numpy.array([1,2,3,4,5,5,4,3,2,1,1,2,3,4,5,5,4,3,2,1,1,2,3,4,5,5], 'float64')
 
 A22 = numpy.array([1,2,3,4], 'float64').reshape(2,2)
 A44_zeros = numpy.array([0,0,0,0,0,1,2,0,0,3,4,0,0,0,0,0], 'float64').reshape(4,4)
@@ -42,6 +47,63 @@ A44_twos = numpy.array([2,2,2,2,2,1,2,2,2,3,4,2,2,2,2,2], 'float64').reshape(4,4
 A44_nearest = numpy.array([1,1,2,2,1,1,2,2,3,3,4,4,3,3,4,4], 'float64').reshape(4,4)
 A44_circular = numpy.array([4,3,4,3,2,1,2,1,4,3,4,3,2,1,2,1], 'float64').reshape(4,4)
 A44_mirror = numpy.array([1,1,2,2,1,1,2,2,3,3,4,4,3,3,4,4], 'float64').reshape(4,4)
+
+A1111_zeros = numpy.array([0,0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,1,2,0,0,0,0,0,
+                           0,0,0,0,3,4,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,0,0,0], 'float64').reshape(11,11)
+A1111_twos = numpy.array([2,2,2,2,2,2,2,2,2,2,2,
+                          2,2,2,2,2,2,2,2,2,2,2,
+                          2,2,2,2,2,2,2,2,2,2,2,
+                          2,2,2,2,2,2,2,2,2,2,2,
+                          2,2,2,2,1,2,2,2,2,2,2,
+                          2,2,2,2,3,4,2,2,2,2,2,
+                          2,2,2,2,2,2,2,2,2,2,2,
+                          2,2,2,2,2,2,2,2,2,2,2,
+                          2,2,2,2,2,2,2,2,2,2,2,
+                          2,2,2,2,2,2,2,2,2,2,2,
+                          2,2,2,2,2,2,2,2,2,2,2], 'float64').reshape(11,11)
+A1111_nearest = numpy.array([1,1,1,1,1,2,2,2,2,2,2,
+                             1,1,1,1,1,2,2,2,2,2,2,
+                             1,1,1,1,1,2,2,2,2,2,2,
+                             1,1,1,1,1,2,2,2,2,2,2,
+                             1,1,1,1,1,2,2,2,2,2,2,
+                             3,3,3,3,3,4,4,4,4,4,4,
+                             3,3,3,3,3,4,4,4,4,4,4,
+                             3,3,3,3,3,4,4,4,4,4,4,
+                             3,3,3,3,3,4,4,4,4,4,4,
+                             3,3,3,3,3,4,4,4,4,4,4,
+                             3,3,3,3,3,4,4,4,4,4,4], 'float64').reshape(11,11)
+A1111_circular = numpy.array([1,2,1,2,1,2,1,2,1,2,1,
+                              3,4,3,4,3,4,3,4,3,4,3,
+                              1,2,1,2,1,2,1,2,1,2,1,
+                              3,4,3,4,3,4,3,4,3,4,3,
+                              1,2,1,2,1,2,1,2,1,2,1,
+                              3,4,3,4,3,4,3,4,3,4,3,
+                              1,2,1,2,1,2,1,2,1,2,1,
+                              3,4,3,4,3,4,3,4,3,4,3,
+                              1,2,1,2,1,2,1,2,1,2,1,
+                              3,4,3,4,3,4,3,4,3,4,3,
+                              1,2,1,2,1,2,1,2,1,2,1], 'float64').reshape(11,11)
+A1111_mirror = numpy.array([1,2,2,1,1,2,2,1,1,2,2,
+                            3,4,4,3,3,4,4,3,3,4,4,
+                            3,4,4,3,3,4,4,3,3,4,4,
+                            1,2,2,1,1,2,2,1,1,2,2,
+                            1,2,2,1,1,2,2,1,1,2,2,
+                            3,4,4,3,3,4,4,3,3,4,4,
+                            3,4,4,3,3,4,4,3,3,4,4,
+                            1,2,2,1,1,2,2,1,1,2,2,
+                            1,2,2,1,1,2,2,1,1,2,2,
+                            3,4,4,3,3,4,4,3,3,4,4,
+                            3,4,4,3,3,4,4,3,3,4,4], 'float64').reshape(11,11)
+
 #############################################################################
 
 
@@ -72,51 +134,90 @@ class ExtrapolationTest(unittest.TestCase):
     bob.sp.extrapolateZero(a5,b)
     test_extrapolate_1D(b,a14_zeros,self)
 
+    b = numpy.zeros((26,), 'float64')
+    bob.sp.extrapolateZero(a5,b)
+    test_extrapolate_1D(b,a26_zeros,self)
+
   def test_extrapolation_1D_twos(self):
     b = numpy.zeros((14,), 'float64')
     bob.sp.extrapolateConstant(a5,b,2.)
     test_extrapolate_1D(b,a14_twos,self)
+
+    b = numpy.zeros((26,), 'float64')
+    bob.sp.extrapolateConstant(a5,b,2.)
+    test_extrapolate_1D(b,a26_twos,self)
 
   def test_extrapolation_1D_nearest(self):
     b = numpy.zeros((14,), 'float64')
     bob.sp.extrapolateNearest(a5,b)
     test_extrapolate_1D(b,a14_nearest,self)
 
+    b = numpy.zeros((26,), 'float64')
+    bob.sp.extrapolateNearest(a5,b)
+    test_extrapolate_1D(b,a26_nearest,self)
+
   def test_extrapolation_1D_circular(self):
     b = numpy.zeros((14,), 'float64')
     bob.sp.extrapolateCircular(a5,b)
     test_extrapolate_1D(b,a14_circular,self)
+
+    b = numpy.zeros((26,), 'float64')
+    bob.sp.extrapolateCircular(a5,b)
+    test_extrapolate_1D(b,a26_circular,self)
 
   def test_extrapolation_1D_mirror(self):
     b = numpy.zeros((14,), 'float64')
     bob.sp.extrapolateMirror(a5,b)
     test_extrapolate_1D(b,a14_mirror,self)
 
+    b = numpy.zeros((26,), 'float64')
+    bob.sp.extrapolateMirror(a5,b)
+    test_extrapolate_1D(b,a26_mirror,self)
+
   def test_extrapolation_2D_zeros(self):
     B = numpy.zeros((4,4), 'float64')
     bob.sp.extrapolateZero(A22,B)
     test_extrapolate_2D(B,A44_zeros,self)
+
+    B = numpy.zeros((11,11), 'float64')
+    bob.sp.extrapolateZero(A22,B)
+    test_extrapolate_2D(B,A1111_zeros,self)
 
   def test_extrapolation_2D_twos(self):
     B = numpy.zeros((4,4), 'float64')
     bob.sp.extrapolateConstant(A22,B,2.)
     test_extrapolate_2D(B,A44_twos,self)
 
+    B = numpy.zeros((11,11), 'float64')
+    bob.sp.extrapolateConstant(A22,B,2.)
+    test_extrapolate_2D(B,A1111_twos,self)
+
   def test_extrapolation_2D_nearest(self):
     B = numpy.zeros((4,4), 'float64')
     bob.sp.extrapolateNearest(A22,B)
     test_extrapolate_2D(B,A44_nearest,self)
+  
+    B = numpy.zeros((11,11), 'float64')
+    bob.sp.extrapolateNearest(A22,B)
+    test_extrapolate_2D(B,A1111_nearest,self)
   
   def test_extrapolation_2D_circular(self):
     B = numpy.zeros((4,4), 'float64')
     bob.sp.extrapolateCircular(A22,B)
     test_extrapolate_2D(B,A44_circular,self)
 
+    B = numpy.zeros((11,11), 'float64')
+    bob.sp.extrapolateCircular(A22,B)
+    test_extrapolate_2D(B,A1111_circular,self)
+
   def test_extrapolation_2D_mirror(self):
     B = numpy.zeros((4,4), 'float64')
     bob.sp.extrapolateMirror(A22,B)
     test_extrapolate_2D(B,A44_mirror,self)
 
+    B = numpy.zeros((11,11), 'float64')
+    bob.sp.extrapolateMirror(A22,B)
+    test_extrapolate_2D(B,A1111_mirror,self)
 
 ##################### Main ##################  
 if __name__ == '__main__':
