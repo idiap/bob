@@ -23,10 +23,8 @@
 #ifndef BOB_SP_CONV_H
 #define BOB_SP_CONV_H
 
-#include "core/Exception.h"
+#include "sp/Exception.h"
 #include "core/array_assert.h"
-#include "core/array_copy.h"
-#include "core/array_index.h"
 #include <algorithm>
 #include <blitz/array.h>
 
@@ -113,19 +111,19 @@ namespace bob {
 
 
       template<typename T> void convSep(const blitz::Array<T,2>& A, 
-        const blitz::Array<T,1>& B, blitz::Array<T,2>& C,
+        const blitz::Array<T,1>& b, blitz::Array<T,2>& C,
         const enum Conv::SizeOption size_opt = Conv::Full)
       {
         for(int i=0; i<A.extent(1); ++i)
         {
           const blitz::Array<T,1> Arow = A(blitz::Range::all(), i);
           blitz::Array<T,1> Crow = C(blitz::Range::all(), i);
-          conv(Arow, B, Crow, size_opt);
+          conv(Arow, b, Crow, size_opt);
         }
       }
 
      template<typename T> void convSep(const blitz::Array<T,3>& A, 
-        const blitz::Array<T,1>& B, blitz::Array<T,3>& C,
+        const blitz::Array<T,1>& b, blitz::Array<T,3>& C,
         const enum Conv::SizeOption size_opt = Conv::Full)
       {
         for(int i=0; i<A.extent(1); ++i)
@@ -133,12 +131,12 @@ namespace bob {
           {
             const blitz::Array<T,1> Arow = A(blitz::Range::all(), i, j);
             blitz::Array<T,1> Crow = C(blitz::Range::all(), i, j);
-            conv(Arow, B, Crow, size_opt);
+            conv(Arow, b, Crow, size_opt);
           }
       }
 
       template<typename T> void convSep(const blitz::Array<T,4>& A, 
-        const blitz::Array<T,1>& B, blitz::Array<T,4>& C,
+        const blitz::Array<T,1>& b, blitz::Array<T,4>& C,
         const enum Conv::SizeOption size_opt = Conv::Full)
       {
         for(int i=0; i<A.extent(1); ++i)
@@ -147,7 +145,7 @@ namespace bob {
             {
               const blitz::Array<T,1> Arow = A(blitz::Range::all(), i, j, k);
               blitz::Array<T,1> Crow = C(blitz::Range::all(), i, j, k);
-              conv(Arow, B, Crow, size_opt);
+              conv(Arow, b, Crow, size_opt);
             }
       }
     }
@@ -165,6 +163,9 @@ namespace bob {
     inline const int getConvOutputSize(const int a, const int b,
       const enum Conv::SizeOption size_opt = Conv::Full)
     {
+      if(a.extent(0)<b.extent(0))
+        throw sp::ConvolutionKernelTooLarge(0, a.extent(0), b.extent(0));
+
       int res=0;
       // Size of "A + B - 1"
       if( size_opt == Conv::Full )
@@ -211,6 +212,11 @@ namespace bob {
       const blitz::Array<T,2>& A, const blitz::Array<T,2>& B,
       const enum Conv::SizeOption size_opt = Conv::Full)
     {
+      if(A.extent(0)<B.extent(0))
+        throw sp::ConvolutionKernelTooLarge(0, A.extent(0), B.extent(0));
+      if(A.extent(1)<B.extent(1))
+        throw sp::ConvolutionKernelTooLarge(1, A.extent(0), B.extent(0));
+
       blitz::TinyVector<int,2> size;
       size(0) = 0;
       size(1) = 0;
@@ -238,7 +244,7 @@ namespace bob {
      * @brief Gets the required size of the output of the separable convolution product
      *        (Convolution of a X-D signal with a 1D kernel)
      * @param A The first input array A
-     * @param B The second input array B
+     * @param B The second input array b
      * @param dim The dimension along which to convolve
      * @param size_opt:  * Full: full size (default)
      *                   * Same: same size as the largest between A and B
@@ -247,21 +253,22 @@ namespace bob {
      */
     template<typename T, int N> 
     const blitz::TinyVector<int,N> getConvSepOutputSize(const blitz::Array<T,N>& A,
-      const blitz::Array<T,1>& B, const int dim,
+      const blitz::Array<T,1>& b, const int dim,
       const enum Conv::SizeOption size_opt = Conv::Full)
     {
       blitz::TinyVector<int,N> res;
       res = A.shape();
       if(dim<N)
       {
+        if(A.extent(dim)<b.extent(0))
+          throw sp::ConvolutionKernelTooLarge(dim, A.extent(dim), b.extent(0));
+
         int a_size_d = A.extent(dim);
-        int b_size = B.extent(0);
+        int b_size = b.extent(0);
         res(dim) = getConvOutputSize(a_size_d, b_size, size_opt);
       }
       else 
-      {
-        throw bob::core::Exception();
-      }
+        throw sp::SeparableConvolutionInvalidDim(dim,N-1);
       return res;
     }
 
@@ -277,13 +284,17 @@ namespace bob {
      * @param size_opt:  * Full: full size (default)
      *                   * Same: same size as the largest between A and B
      *                   * Valid: valid (part without padding)
-     * @warning The output c should have the correct size
+     * @warning a should be larger than the kernel b
+     *    The output c should have the correct size
      */
     template <typename T>
     void conv(const blitz::Array<T,1> a, const blitz::Array<T,1> b, 
       blitz::Array<T,1> c, const enum Conv::SizeOption size_opt = Conv::Full)
     {
       const int N = b.extent(0);
+
+      if(a.extent(0)<b.extent(0))
+        throw sp::ConvolutionKernelTooLarge(0, a.extent(0), b.extent(0));
 
       if(size_opt == Conv::Full)
         detail::convInternal(a, b, c, N-1, 1);
@@ -301,7 +312,8 @@ namespace bob {
      * @param size_opt:  * Full: full size (default)
      *                   * Same: same size as the largest between A and B
      *                   * Valid: valid (part without padding)
-     * @warning The output C should have the correct size
+     * @warning A should have larger dimensions than the kernel B
+     *   The output C should have the correct size
      */
     template <typename T>
     void conv(const blitz::Array<T,2> A, const blitz::Array<T,2> B, 
@@ -309,6 +321,11 @@ namespace bob {
     {
       const int N0 = B.extent(0);
       const int N1 = B.extent(1);
+
+      if(A.extent(0)<B.extent(0))
+        throw sp::ConvolutionKernelTooLarge(0, A.extent(0), B.extent(0));
+      if(A.extent(1)<B.extent(1))
+        throw sp::ConvolutionKernelTooLarge(1, A.extent(0), B.extent(0));
 
       if(size_opt == Conv::Full)
         detail::convInternal(A, B, C, N0-1, 1, N1-1, 1);
@@ -320,39 +337,49 @@ namespace bob {
 
     /**
      * @brief Convolution of a X-D signal with a 1D kernel (for separable convolution)
-     *        along the specified dimension (C=A*B)
+     *        along the specified dimension (C=A*b)
      * @param A The first input array A
-     * @param B The second input array B
-     * @param C The output array C=A*B along the dimension d (0 or 1)
+     * @param b The second input array b
+     * @param C The output array C=A*b along the dimension d (0 or 1)
      * @param dim The dimension along which to convolve
      * @param size_opt:  * Full: full size (default)
-     *                   * Same: same size as the largest between A and B
+     *                   * Same: same size as the largest between A and b
      *                   * Valid: valid (part without padding)
+     * @warning A should have larger dimensions than the kernel b
+     *   The output C should have the correct size
      */
     template<typename T, int N> void convSep(const blitz::Array<T,N>& A, 
-      const blitz::Array<T,1>& B, blitz::Array<T,N>& C, const int dim,
+      const blitz::Array<T,1>& b, blitz::Array<T,N>& C, const int dim,
       const enum Conv::SizeOption size_opt = Conv::Full)
     {
       // Gets the expected size for the results
-      const blitz::TinyVector<int,N> Csize = getConvSepOutputSize(A, B, dim, size_opt);
+      const blitz::TinyVector<int,N> Csize = getConvSepOutputSize(A, b, dim, size_opt);
 
       // Checks that C has the correct size and is zero base
       bob::core::array::assertSameShape(C, Csize);
       bob::core::array::assertZeroBase(C);
       // Checks that A and B are zero base
       bob::core::array::assertZeroBase(A);
-      bob::core::array::assertZeroBase(B);
+      bob::core::array::assertZeroBase(b);
 
       if(dim==0)
-        detail::convSep( A, B, C, size_opt);
+      {
+        if(A.extent(dim)<b.extent(0))
+          throw sp::ConvolutionKernelTooLarge(0, A.extent(dim), b.extent(0));
+        detail::convSep( A, b, C, size_opt);
+      }
       else if(dim<N)
       {
-        const blitz::Array<T,N> Ap = (bob::core::array::ccopy(A)).transpose(dim,0);
+        if(A.extent(dim)<b.extent(0))
+          throw sp::ConvolutionKernelTooLarge(dim, A.extent(dim), b.extent(0));
+
+        // Ugly fix to support old blitz versions without const transpose() method
+        const blitz::Array<T,N> Ap = (const_cast<blitz::Array<T,N> *>(&A))->transpose(dim,0);
         blitz::Array<T,N> Cp = C.transpose(dim,0);
-        detail::convSep( Ap, B, Cp, size_opt);
+        detail::convSep( Ap, b, Cp, size_opt);
       }
       else
-        throw bob::core::Exception();
+        throw sp::SeparableConvolutionInvalidDim(dim,N-1);
     }
  
   }
