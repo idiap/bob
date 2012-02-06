@@ -3,11 +3,6 @@ cmake_minimum_required(VERSION 2.6)
 
 include("ExternalProject")
 
-# These are the basic variables to setup the visioner checkout from the proper
-# place and with the supported tag. It also provides basis in case we cannot
-# reach the directory ${VISIONER_REPO} directly.
-set(VISIONER_REPO "git@github.com:idiap/visioner.git")
-
 # Accesses the git command
 find_program(GIT_EXECUTABLE NAMES git PATH_SUFFIXES Git/cmd Git/bin
   DOC "git command line client"
@@ -18,9 +13,7 @@ if(NOT GIT_EXECUTABLE)
 endif(NOT GIT_EXECUTABLE)
 
 ExternalProject_Add(visioner
-  DOWNLOAD_COMMAND rm -rf visioner && ${GIT_EXECUTABLE} clone ${VISIONER_REPO}
-  UPDATE_COMMAND git pull origin +HEAD
-  PATCH_COMMAND ""
+  DOWNLOAD_COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR}/../../.. && ${GIT_EXECUTABLE} submodule init -- src/cxx/visioner/project && ${GIT_EXECUTABLE} submodule update && cd ${CMAKE_CURRENT_BINARY_DIR} && rsync -avz ${CMAKE_CURRENT_SOURCE_DIR}/project/ ${CMAKE_CURRENT_BINARY_DIR}/visioner/
   CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} -DLBFGS_INCLUDE_DIR=${CMAKE_INSTALL_PREFIX}/include/bob -DLBFGS_LIBRARY_DIR=${CMAKE_BINARY_DIR}/cxx/lbfgs
   )
 
