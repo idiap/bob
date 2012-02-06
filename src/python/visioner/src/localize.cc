@@ -32,7 +32,7 @@
 #include "visioner/proc/localization.h"
 #include "visioner/proc/detection.h"
 
-using namespace boost::python;
+namespace bp = boost::python;
 namespace array = bob::core::array;
 
 static void load(visioner::SWScanner& s, 
@@ -43,7 +43,7 @@ static void load(visioner::SWScanner& s,
   if (!err) PYTHON_ERROR(RuntimeError, "failed to load image at subwindow scanner");
 }
 
-static tuple detect_max(visioner::Model& cmodel, size_t levels,
+static bp::tuple detect_max(visioner::Model& cmodel, size_t levels,
     visioner::SWScanner& cscanner) {
 
   // detect faces
@@ -53,10 +53,10 @@ static tuple detect_max(visioner::Model& cmodel, size_t levels,
   // Returns a tuple containing the detection bbox
   qreal x, y, width, height;
   detection.second.getRect(&x, &y, &width, &height);
-  return make_tuple(x, y, width, height, detection.first);
+  return bp::make_tuple(x, y, width, height, detection.first);
 }
 
-static tuple detect(visioner::Model& cmodel, double threshold, size_t levels,
+static bp::tuple detect(visioner::Model& cmodel, double threshold, size_t levels,
     float cluster, visioner::SWScanner& cscanner) {
   // detect faces
   visioner::detections_t detections;
@@ -69,16 +69,16 @@ static tuple detect(visioner::Model& cmodel, double threshold, size_t levels,
   visioner::sort_desc(detections);
 
   // Returns a tuple containing all detections, with descending scores
-  list tmp;
+  bp::list tmp;
   qreal x, y, width, height;
   for (size_t i=0; i<detections.size(); ++i) {
     detections[i].second.getRect(&x, &y, &width, &height);
-    tmp.append(make_tuple(x, y, width, height, detections[i].first));
+    tmp.append(bp::make_tuple(x, y, width, height, detections[i].first));
   }
-  return tuple(tmp);
+  return bp::tuple(tmp);
 }
 
-static tuple locate(visioner::Model& cmodel, visioner::Model& lmodel,
+static bp::tuple locate(visioner::Model& cmodel, visioner::Model& lmodel,
     size_t levels, visioner::SWScanner& cscanner, 
     visioner::SWScanner& lscanner) {
   // Locate keypoints
@@ -92,23 +92,23 @@ static tuple locate(visioner::Model& cmodel, visioner::Model& lmodel,
   // [1] => A tuple containing all points detected
   qreal x, y, width, height;
   dt_region.getRect(&x, &y, &width, &height);
-  tuple bbox = make_tuple(x, y, width, height);
+  bp::tuple bbox = bp::make_tuple(x, y, width, height);
   
-  list tmp;
+  bp::list tmp;
   for (size_t i=0; i<dt_points.size(); ++i) {
-    tmp.append(make_tuple(dt_points[i].x(), dt_points[i].y()));
+    tmp.append(bp::make_tuple(dt_points[i].x(), dt_points[i].y()));
   }
 
-  return make_tuple(bbox, tuple(tmp));
+  return bp::make_tuple(bbox, bp::tuple(tmp));
 }
 
-static tuple load_model(const std::string& filename) {
+static bp::tuple load_model(const std::string& filename) {
   visioner::Model model;
 	visioner::param_t param;
   if (visioner::load_model(param, model, filename) == false) {				
     PYTHON_ERROR(IOError, "failed to load the model");
 	}
-  return make_tuple(model, param);
+  return bp::make_tuple(model, param);
 }
 
 static void save_model(const visioner::Model& model,
@@ -120,28 +120,28 @@ static void save_model(const visioner::Model& model,
 
 void bind_visioner_localize() {
   //opaque, just needs to pass around.
-  class_<visioner::Model, boost::shared_ptr<visioner::Model> >("Model",
-      "Multivariate model (a set of univariate models which are, in turn a sum of look-up tables)", init<>("Default constructor (empty model)"));
+  bp::class_<visioner::Model, boost::shared_ptr<visioner::Model> >("Model",
+      "Multivariate model (a set of univariate models which are, in turn a sum of look-up tables)", bp::init<>("Default constructor (empty model)"));
   
   //this class holds the points found by the face localization
-  class_<visioner::param_t, boost::shared_ptr<visioner::param_t> >("param_t",
-      "Parameters: (1) classification and localization models; (2) sliding-windows sampling; (3) features", init<>("Default constructor"))
+  bp::class_<visioner::param_t, boost::shared_ptr<visioner::param_t> >("param_t",
+      "Parameters: (1) classification and localization models; (2) sliding-windows sampling; (3) features", bp::init<>("Default constructor"))
     .def_readwrite("ds", &visioner::param_t::m_ds)
     ;
 
-  class_<visioner::SWScanner, boost::shared_ptr<visioner::SWScanner> >("SWScanner", "Process the sub-windows of the given scaled images: (1) validated by the tagger or (2) processed by the model", init<visioner::param_t>((arg("parameters")), "Constructor"))
-    .def("load", &load, (arg("self"), arg("image")), "Loads an int16 2D array into the scanner. You must convert the image to a 16-bit integer representation first.")
+  bp::class_<visioner::SWScanner, boost::shared_ptr<visioner::SWScanner> >("SWScanner", "Process the sub-windows of the given scaled images: (1) validated by the tagger or (2) processed by the model", bp::init<visioner::param_t>((bp::arg("parameters")), "Constructor"))
+    .def("load", &load, (bp::arg("self"), bp::arg("image")), "Loads an int16 2D array into the scanner. You must convert the image to a 16-bit integer representation first.")
     ;
 
-  def("detect_max", &detect_max, (arg("class_model"), arg("levels"),
-        arg("class_scanner")), "Detects the most likely face on an image preloaded by the (classification) scanner. Returns a tuple with the detected region and associated score in the following order (x, y, width, height, score). All values are floating-point numbers.");
+  bp::def("detect_max", &detect_max, (bp::arg("class_model"), bp::arg("levels"),
+        bp::arg("class_scanner")), "Detects the most likely face on an image preloaded by the (classification) scanner. Returns a tuple with the detected region and associated score in the following order (x, y, width, height, score). All values are floating-point numbers.");
 
-  def("detect", &detect, (arg("class_model"), arg("threshold"), arg("levels"),
-        arg("cluster"), arg("class_scanner")), "Detects faces on an image preloaded by the (classification) scanner. Returns a tuple with the detected regions and associated scores in the following order (x, y, width, height, score). All values are floating-point numbers.");
+  bp::def("detect", &detect, (bp::arg("class_model"), bp::arg("threshold"), bp::arg("levels"),
+        bp::arg("cluster"), bp::arg("class_scanner")), "Detects faces on an image preloaded by the (classification) scanner. Returns a tuple with the detected regions and associated scores in the following order (x, y, width, height, score). All values are floating-point numbers.");
 
-  def("locate", &locate, (arg("class_model"), arg("loc_model"), arg("levels"),
-        arg("class_scanner"), arg("loc_scanner")), "Locates faces on an image preloaded by the (classification and localization) scanners. Returns a tuple with the detected region and all detected landmarks");
+  bp::def("locate", &locate, (bp::arg("class_model"), bp::arg("loc_model"), bp::arg("levels"),
+        bp::arg("class_scanner"), bp::arg("loc_scanner")), "Locates faces on an image preloaded by the (classification and localization) scanners. Returns a tuple with the detected region and all detected landmarks");
 
-  def("load_model", &load_model, (arg("filename")), "Loads the model and parameters from a given file.\n\n**Note**: Serialization will use a native text format by default. Files that have their names suffixed with '.gz' will be automatically decompressed. If the filename ends in '.vbin' or '.vbgz' the format used will be the native binary format.");
-  def("save_model", &save_model, (arg("model"), arg("parameters"), arg("filename")), "Saves the model and parameters to a given file.\n\n**Note**: Serialization will use a native text format by default. Files that have their name suffixed with '.gz' will be automatically decompressed. If the filename ends in '.vbin' or '.vbgz' the format used will be the native binary format.");
+  bp::def("load_model", &load_model, (bp::arg("filename")), "Loads the model and parameters from a given file.\n\n**Note**: Serialization will use a native text format by default. Files that have their names suffixed with '.gz' will be automatically decompressed. If the filename ends in '.vbin' or '.vbgz' the format used will be the native binary format.");
+  bp::def("save_model", &save_model, (bp::arg("model"), bp::arg("parameters"), bp::arg("filename")), "Saves the model and parameters to a given file.\n\n**Note**: Serialization will use a native text format by default. Files that have their name suffixed with '.gz' will be automatically decompressed. If the filename ends in '.vbin' or '.vbgz' the format used will be the native binary format.");
 }
