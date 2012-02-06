@@ -23,7 +23,7 @@
 #include "core/python/ndarray.h"
 
 void bind_sp_version();
-void bind_sp_convolution();
+void bind_sp_conv();
 void bind_sp_extrapolate();
 void bind_sp_fft_dct();
 
@@ -32,7 +32,7 @@ BOOST_PYTHON_MODULE(libpybob_sp) {
   bob::python::setup_python("bob signal processing classes and sub-classes");
 
   bind_sp_version();
-  bind_sp_convolution();
+  bind_sp_conv();
   bind_sp_extrapolate();
   bind_sp_fft_dct();
 }

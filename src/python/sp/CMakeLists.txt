@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 set(pysrc
    "src/version.cc"
-   "src/convolution.cc"
+   "src/conv.cc"
    "src/extrapolate.cc"
    "src/fft_dct.cc"
    "src/main.cc"

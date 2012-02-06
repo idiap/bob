@@ -69,8 +69,8 @@ RES_A1_10_b1_4_full = numpy.array([0.1810, 0.5514, 0.9482,
   1.4726, 1.3763, 1.0940, 1.1761, 0.8846, 0.7250, 1.0268, 1.2872, 1.0930, 
   0.3033], 'float64')
 
-RES_A1_10_b1_4_same = numpy.array([0.9482, 1.4726, 1.3763, 
-  1.0940, 1.1761, 0.8846, 0.7250, 1.0268, 1.2872, 1.0930], 'float64');
+RES_A1_10_b1_4_same = numpy.array([0.5514, 0.9482, 1.4726, 1.3763, 
+  1.0940, 1.1761, 0.8846, 0.7250, 1.0268, 1.2872], 'float64');
 
 RES_A1_10_b1_4_valid = numpy.array([1.4726, 1.3763, 1.0940, 
   1.1761, 0.8846, 0.7250, 1.0268], 'float64');
@@ -94,11 +94,11 @@ RES_A2_5_b2_2_full = numpy.array([
   0.5286, 0.2803, 0.5274, 0.3339, 0.5380, 0.0111], 'float64').reshape(6,6)
 
 RES_A2_5_b2_2_same = numpy.array([
-  0.3540, 0.4044, 0.6551, 0.4090, 0.0262,
-  0.5297, 0.6688, 0.8132, 0.4624, 0.2498,
-  0.3469, 0.6965, 0.7432, 0.5907, 0.3721,
-  0.8510, 0.6613, 0.7272, 0.8356, 0.4477,
-  0.2803, 0.5274, 0.3339, 0.5380, 0.0111], 'float64').reshape(5,5)
+  0.1092, 0.4401, 0.2100, 0.2022, 0.1440,
+  0.5113, 0.3540, 0.4044, 0.6551, 0.4090,
+  0.2504, 0.5297, 0.6688, 0.8132, 0.4624,
+  0.4948, 0.3469, 0.6965, 0.7432, 0.5907,
+  0.2592, 0.8510, 0.6613, 0.7272, 0.8356], 'float64').reshape(5,5)
 
 RES_A2_5_b2_2_valid = numpy.array([
   0.3540, 0.4044, 0.6551, 0.4090,
@@ -163,38 +163,38 @@ RES_A4_5_b1_3_0d_full = numpy.array([
 def compare(v1, v2, width):
   return abs(v1-v2) <= width
 
-def test_convolve_1D_nopt(A, b, res, reference, obj):
+def test_conv_1D_nopt(A, b, res, reference, obj):
   # Compute the convolution product
-  res = numpy.zeros( bob.sp.getConvolveOutputSize(A, b), 'float64' )
-  bob.sp.convolve(A, b, res)
+  res = numpy.zeros( bob.sp.getConvOutputSize(A, b), 'float64' )
+  bob.sp.conv(A, b, res)
   
   obj.assertEqual(res.shape, reference.shape)
   for i in range(res.shape[0]):
     obj.assertTrue(compare(res[i], reference[i], eps))
 
-def test_convolve_1D(A, b, res, reference, obj, option):
+def test_conv_1D(A, b, res, reference, obj, option):
   # Compute the convolution product
-  res = numpy.zeros( bob.sp.getConvolveOutputSize(A, b, option), 'float64' )
-  bob.sp.convolve(A, b, res, option)
+  res = numpy.zeros( bob.sp.getConvOutputSize(A, b, option), 'float64' )
+  bob.sp.conv(A, b, res, option)
 
   obj.assertEqual(res.shape, reference.shape)
   for i in range(res.shape[0]):
     obj.assertTrue(compare(res[i], reference[i], eps))
 
-def test_convolve_2D_nopt(A, b, res, reference, obj):
+def test_conv_2D_nopt(A, b, res, reference, obj):
   # Compute the convolution product
-  res = numpy.zeros( bob.sp.getConvolveOutputSize(A, b), 'float64' )
-  bob.sp.convolve(A, b, res)
+  res = numpy.zeros( bob.sp.getConvOutputSize(A, b), 'float64' )
+  bob.sp.conv(A, b, res)
   
   obj.assertEqual(res.shape, reference.shape)
   for i in range(res.shape[0]):
     for j in range(res.shape[1]):
       obj.assertTrue(compare(res[i,j], reference[i,j], eps))
 
-def test_convolve_2D(A, b, res, reference, obj, option):
+def test_conv_2D(A, b, res, reference, obj, option):
   # Compute the convolution product
-  res = numpy.zeros( bob.sp.getConvolveOutputSize(A, b, option), 'float64' )
-  bob.sp.convolve(A, b, res, option)
+  res = numpy.zeros( bob.sp.getConvOutputSize(A, b, option), 'float64' )
+  bob.sp.conv(A, b, res, option)
 
   obj.assertEqual(res.shape, reference.shape)
   for i in range(res.shape[0]):
@@ -208,83 +208,112 @@ class ConvolutionTest(unittest.TestCase):
 
 ##################### Convolution Tests ##################  
   def test_convolution_1D_10_3_n(self):
-    test_convolve_1D_nopt( A10, b1_3, RES_1, RES_A1_10_b1_3_full, self)
+    test_conv_1D_nopt( A10, b1_3, RES_1, RES_A1_10_b1_3_full, self)
 
   def test_convolution_1D_10_3_F(self):
-    test_convolve_1D( A10, b1_3, RES_1, RES_A1_10_b1_3_full, self, 
-      bob.sp.ConvolutionSize.Full)
+    test_conv_1D( A10, b1_3, RES_1, RES_A1_10_b1_3_full, self, 
+      bob.sp.ConvSize.Full)
 
   def test_convolution_1D_10_3_S(self):
-    test_convolve_1D( A10, b1_3, RES_1, RES_A1_10_b1_3_same, self, 
-      bob.sp.ConvolutionSize.Same)
+    test_conv_1D( A10, b1_3, RES_1, RES_A1_10_b1_3_same, self, 
+      bob.sp.ConvSize.Same)
 
   def test_convolution_1D_10_3_V(self):
-    test_convolve_1D( A10, b1_3, RES_1, RES_A1_10_b1_3_valid, self, 
-      bob.sp.ConvolutionSize.Valid)
+    test_conv_1D( A10, b1_3, RES_1, RES_A1_10_b1_3_valid, self, 
+      bob.sp.ConvSize.Valid)
 
   def test_convolution_1D_10_4_n(self):
-    test_convolve_1D_nopt( A10, b1_4, RES_1, RES_A1_10_b1_4_full, self)
+    test_conv_1D_nopt( A10, b1_4, RES_1, RES_A1_10_b1_4_full, self)
 
   def test_convolution_1D_10_4_F(self):
-    test_convolve_1D( A10, b1_4, RES_1, RES_A1_10_b1_4_full, self, 
-      bob.sp.ConvolutionSize.Full)
+    test_conv_1D( A10, b1_4, RES_1, RES_A1_10_b1_4_full, self, 
+      bob.sp.ConvSize.Full)
 
   def test_convolution_1D_10_4_S(self):
-    test_convolve_1D( A10, b1_4, RES_1, RES_A1_10_b1_4_same, self, 
-      bob.sp.ConvolutionSize.Same)
+    test_conv_1D( A10, b1_4, RES_1, RES_A1_10_b1_4_same, self, 
+      bob.sp.ConvSize.Same)
 
   def test_convolution_1D_10_4_V(self):
-    test_convolve_1D( A10, b1_4, RES_1, RES_A1_10_b1_4_valid, self, 
-      bob.sp.ConvolutionSize.Valid)
+    test_conv_1D( A10, b1_4, RES_1, RES_A1_10_b1_4_valid, self, 
+      bob.sp.ConvSize.Valid)
 
   def test_convolution_1D_10_5_n(self):
-    test_convolve_1D_nopt( A10, b1_5, RES_1, RES_A1_10_b1_5_full, self)
+    test_conv_1D_nopt( A10, b1_5, RES_1, RES_A1_10_b1_5_full, self)
 
   def test_convolution_1D_10_5_F(self):
-    test_convolve_1D( A10, b1_5, RES_1, RES_A1_10_b1_5_full, self, 
-      bob.sp.ConvolutionSize.Full)
+    test_conv_1D( A10, b1_5, RES_1, RES_A1_10_b1_5_full, self, 
+      bob.sp.ConvSize.Full)
 
   def test_convolution_1D_10_5_S(self):
-    test_convolve_1D( A10, b1_5, RES_1, RES_A1_10_b1_5_same, self, 
-      bob.sp.ConvolutionSize.Same)
+    test_conv_1D( A10, b1_5, RES_1, RES_A1_10_b1_5_same, self, 
+      bob.sp.ConvSize.Same)
 
   def test_convolution_1D_10_5_V(self):
-    test_convolve_1D( A10, b1_5, RES_1, RES_A1_10_b1_5_valid, self, 
-      bob.sp.ConvolutionSize.Valid)
+    test_conv_1D( A10, b1_5, RES_1, RES_A1_10_b1_5_valid, self, 
+      bob.sp.ConvSize.Valid)
+
+  def test_convolution_1D_against_numpy(self):
+    for m in [5,6]:
+      for n in [13,14]:
+        a=numpy.random.rand(n)
+        b=numpy.random.rand(m)
+        opt = bob.sp.ConvSize.Full
+        res = numpy.zeros( bob.sp.getConvOutputSize(a, b, opt), 'float64' )
+        bob.sp.conv(a, b, res, opt)
+        reference = numpy.convolve(a, b, 'full')
+        self.assertEqual(res.shape, reference.shape)
+        for i in range(res.shape[0]):
+          self.assertTrue(compare(res[i], reference[i], eps))
+
+        opt = bob.sp.ConvSize.Same
+        res = numpy.zeros( bob.sp.getConvOutputSize(a, b, opt), 'float64' )
+        bob.sp.conv(a, b, res, opt)
+        reference = numpy.convolve(a, b, 'same')
+        self.assertEqual(res.shape, reference.shape)
+        for i in range(res.shape[0]):
+          self.assertTrue(compare(res[i], reference[i], eps))
+
+        opt = bob.sp.ConvSize.Valid
+        res = numpy.zeros( bob.sp.getConvOutputSize(a, b, opt), 'float64' )
+        bob.sp.conv(a, b, res, opt)
+        reference = numpy.convolve(a, b, 'valid')
+        self.assertEqual(res.shape, reference.shape)
+        for i in range(res.shape[0]):
+          self.assertTrue(compare(res[i], reference[i], eps))
 
   def test_convolution_2D_5_2_n(self):
-    test_convolve_2D_nopt( A2_5, b2_2, RES_2, RES_A2_5_b2_2_full, self)
+    test_conv_2D_nopt( A2_5, b2_2, RES_2, RES_A2_5_b2_2_full, self)
 
   def test_convolution_2D_5_2_F(self):
-    test_convolve_2D( A2_5, b2_2, RES_2, RES_A2_5_b2_2_full, self, 
-      bob.sp.ConvolutionSize.Full)
+    test_conv_2D( A2_5, b2_2, RES_2, RES_A2_5_b2_2_full, self, 
+      bob.sp.ConvSize.Full)
 
   def test_convolution_2D_5_2_S(self):
-    test_convolve_2D( A2_5, b2_2, RES_2, RES_A2_5_b2_2_same, self, 
-      bob.sp.ConvolutionSize.Same)
+    test_conv_2D( A2_5, b2_2, RES_2, RES_A2_5_b2_2_same, self, 
+      bob.sp.ConvSize.Same)
 
   def test_convolution_2D_5_2_V(self):
-    test_convolve_2D( A2_5, b2_2, RES_2, RES_A2_5_b2_2_valid, self, 
-      bob.sp.ConvolutionSize.Valid)
+    test_conv_2D( A2_5, b2_2, RES_2, RES_A2_5_b2_2_valid, self, 
+      bob.sp.ConvSize.Valid)
 
   def test_convolution_2D_5_3_n(self):
-    test_convolve_2D_nopt( A2_5, b2_3, RES_2, RES_A2_5_b2_3_full, self)
+    test_conv_2D_nopt( A2_5, b2_3, RES_2, RES_A2_5_b2_3_full, self)
 
   def test_convolution_2D_5_3_F(self):
-    test_convolve_2D( A2_5, b2_3, RES_2, RES_A2_5_b2_3_full, self, 
-      bob.sp.ConvolutionSize.Full)
+    test_conv_2D( A2_5, b2_3, RES_2, RES_A2_5_b2_3_full, self, 
+      bob.sp.ConvSize.Full)
 
   def test_convolution_2D_5_3_S(self):
-    test_convolve_2D( A2_5, b2_3, RES_2, RES_A2_5_b2_3_same, self, 
-      bob.sp.ConvolutionSize.Same)
+    test_conv_2D( A2_5, b2_3, RES_2, RES_A2_5_b2_3_same, self, 
+      bob.sp.ConvSize.Same)
 
   def test_convolution_2D_5_3_V(self):
-    test_convolve_2D( A2_5, b2_3, RES_2, RES_A2_5_b2_3_valid, self, 
-      bob.sp.ConvolutionSize.Valid)
+    test_conv_2D( A2_5, b2_3, RES_2, RES_A2_5_b2_3_valid, self, 
+      bob.sp.ConvSize.Valid)
 
   def test_convolution_2D_sep_0d(self):
     res0 = numpy.zeros((7,5), 'float64')
-    bob.sp.convolveSep(A2_5, b1_3, res0, 0, bob.sp.ConvolutionSize.Full)
+    bob.sp.convSep(A2_5, b1_3, res0, 0, bob.sp.ConvSize.Full)
     self.assertEqual(res0.shape, RES_A2_5_b1_3_0d_full.shape)
     for i in range(res0.shape[0]):
       for j in range(res0.shape[1]):
@@ -292,7 +321,7 @@ class ConvolutionTest(unittest.TestCase):
 
   def test_convolution_2D_sep_1d(self):
     res1 = numpy.zeros((5,7), 'float64')
-    bob.sp.convolveSep(A2_5, b1_3, res1, 1, bob.sp.ConvolutionSize.Full)
+    bob.sp.convSep(A2_5, b1_3, res1, 1, bob.sp.ConvSize.Full)
     self.assertEqual(res1.shape, RES_A2_5_b1_3_1d_full.shape)
     for i in range(res1.shape[0]):
       for j in range(res1.shape[1]):
@@ -300,13 +329,85 @@ class ConvolutionTest(unittest.TestCase):
 
   def test_convolution_4D_sep_0d(self):
     res0 = numpy.zeros((7,5,1,1), 'float64')
-    bob.sp.convolveSep(A4_5, b1_3, res0, 0, bob.sp.ConvolutionSize.Full)
+    bob.sp.convSep(A4_5, b1_3, res0, 0, bob.sp.ConvSize.Full)
     self.assertEqual(res0.shape, RES_A4_5_b1_3_0d_full.shape)
     for i in range(res0.shape[0]):
       for j in range(res0.shape[1]):
         for k in range(res0.shape[2]):
           for l in range(res0.shape[3]):
             self.assertTrue(compare(res0[i,j,k,l], RES_A4_5_b1_3_0d_full[i,j,k,l], eps))
+
+  def test_convolution_2D_against_numpy(self):
+    import scipy.signal
+    for m1 in [5,6]:
+      for m2 in [7,8]:
+        for n1 in [13,14]:
+          for n2 in [17,18]:
+            a=numpy.random.rand(n1,n2)
+            b=numpy.random.rand(m1,m2)
+            opt = bob.sp.ConvSize.Full
+            res = numpy.zeros( bob.sp.getConvOutputSize(a, b, opt), 'float64' )
+            bob.sp.conv(a, b, res, opt)
+            reference = scipy.signal.convolve2d(a, b, 'full')
+            self.assertEqual(res.shape, reference.shape)
+            for i in range(res.shape[0]):
+              for j in range(res.shape[1]):
+                self.assertTrue(compare(res[i,j], reference[i,j], eps))
+
+            opt = bob.sp.ConvSize.Same
+            res = numpy.zeros( bob.sp.getConvOutputSize(a, b, opt), 'float64' )
+            bob.sp.conv(a, b, res, opt)
+            reference = scipy.signal.convolve2d(a, b, 'same')
+            self.assertEqual(res.shape, reference.shape)
+            for i in range(res.shape[0]):
+              for j in range(res.shape[1]):
+                self.assertTrue(compare(res[i,j], reference[i,j], eps))
+
+            opt = bob.sp.ConvSize.Valid
+            res = numpy.zeros( bob.sp.getConvOutputSize(a, b, opt), 'float64' )
+            bob.sp.conv(a, b, res, opt)
+            reference = scipy.signal.convolve2d(a, b, 'valid')
+            self.assertEqual(res.shape, reference.shape)
+            for i in range(res.shape[0]):
+              for j in range(res.shape[1]):
+                self.assertTrue(compare(res[i,j], reference[i,j], eps))
+
+  def test_convolution_2D_speed(self):
+    import scipy.signal
+    import sys
+    sys.stdout.flush()
+    m1=1000
+    m2=1000
+    n1=100
+    n2=100
+    sys.stdout.flush()
+    a=numpy.random.rand(m1,m2)
+    b=numpy.random.rand(n1,n2)
+    print "BOB"
+    import time
+    de=time.clock()
+    sys.stdout.flush()
+    print "  Extrapolate"
+    sys.stdout.flush()
+    a_ = numpy.zeros((a.shape[0]+2*(b.shape[0]-1), a.shape[1]+2*(b.shape[1]-1)), 'float64' )
+    res = numpy.zeros( bob.sp.getConvOutputSize(a_, b, bob.sp.ConvSize.Valid), 'float64' )
+    bob.sp.extrapolateCircular( a, a_)
+    print "  Convolve"
+    sys.stdout.flush()
+    bob.sp.conv(a_, b, res, bob.sp.ConvSize.Valid)
+    df=time.clock()
+    print df-de
+    print "SCIPY"
+    de=time.clock()
+    sys.stdout.flush()
+    reference = scipy.signal.convolve2d(a, b, 'full', 'wrap')
+    df=time.clock()
+    print df-de
+    sys.stdout.flush()
+    self.assertEqual(res.shape, reference.shape)
+    for i in range(res.shape[0]):
+      for j in range(res.shape[1]):
+        self.assertTrue(compare(res[i,j], reference[i,j], eps))
 
 
 ##################### Main ##################  
