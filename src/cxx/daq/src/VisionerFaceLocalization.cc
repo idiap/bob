@@ -99,7 +99,7 @@ void VisionerFaceLocalization::localize() {
 
       // Convert to short
       gray.resize(grayResized.shape());
-      gray = blitz::cast<short>(grayResized);
+      gray = bob::core::cast<short>(grayResized);
     }
     pthread_mutex_unlock(&img_mutex);
 
