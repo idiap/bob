@@ -448,4 +448,5 @@ try to reproduce the failure.
 .. _vlfeat launchpad webpage: https://launchpad.net/~gezakovacs/+archive/vlfeat
 .. _fftw: http://www.fftw.org/
 .. _Bob's website: https://www.idiap.ch/software/bob
+.. _LIBSVM: http://www.csie.ntu.edu.tw/~cjlin/libsvm/
 .. _OpenCV: http://opencv.willowgarage.com/
