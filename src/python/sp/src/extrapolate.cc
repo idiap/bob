@@ -286,7 +286,7 @@ void bind_sp_extrapolate() {
     .value("Mirror", bob::sp::Extrapolation::Mirror)
     ;
  
-  def("extrapolateConstant", &extrapolateConstant, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array with a constant, given a 1 or 2D input array.");
+  def("extrapolateConstant", &extrapolateConstant, (arg("src"), arg("dst"), arg("constant")), "Extrapolates the values of a 1D array with a constant, given a 1 or 2D input array.");
 
   def("extrapolateZero", &extrapolateZero, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array with zeros, given a 1 or 2D input array.");
 
