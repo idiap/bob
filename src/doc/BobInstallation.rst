@@ -437,7 +437,7 @@ try to reproduce the failure.
 .. _scipy: http://www.scipy.org
 .. _ipython: http://ipython.scipy.org
 .. _matplotlib: http://matplotlib.sourceforge.net
-.. _bobidiapguide: https://www.idiap.ch/software/bob/wiki/BobIdiapGuide
+.. _bobidiapguide: http://github.com/idiap/bob/wiki/Using-Bob-at-Idiap
 .. _buildbot: http://trac.buildbot.net
 .. _argparse: http://code.google.com/p/argparse/
 .. _sqlalchemy: http://www.sqlalchemy.org/
