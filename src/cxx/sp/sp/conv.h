@@ -163,8 +163,8 @@ namespace bob {
     inline const int getConvOutputSize(const int a, const int b,
       const enum Conv::SizeOption size_opt = Conv::Full)
     {
-      if(a.extent(0)<b.extent(0))
-        throw sp::ConvolutionKernelTooLarge(0, a.extent(0), b.extent(0));
+      if(a<b)
+        throw sp::ConvolutionKernelTooLarge(0, a, b);
 
       int res=0;
       // Size of "A + B - 1"
