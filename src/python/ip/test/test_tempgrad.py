@@ -26,6 +26,7 @@ import unittest
 import bob
 import math
 import numpy
+import scipy.signal
 
 def load_gray(relative_filename):
   # Please note our PNG loader will always load in RGB, but since that is a
@@ -172,12 +173,9 @@ def Central_Ex(im1, im2, im3):
   c2 = numpy.ndarray(im2.shape, 'float64')
   c3 = numpy.ndarray(im3.shape, 'float64')
 
-  bob.sp.convolve(im1.astype('float64'), Kx, c1, 
-      bob.sp.ConvolutionSize.Same, bob.sp.ConvolutionBorder.Mirror)
-  bob.sp.convolve(im2.astype('float64'), Kx, c2,
-      bob.sp.ConvolutionSize.Same, bob.sp.ConvolutionBorder.Mirror)
-  bob.sp.convolve(im3.astype('float64'), Kx, c3,
-      bob.sp.ConvolutionSize.Same, bob.sp.ConvolutionBorder.Mirror)
+  c1 = scipy.signal.convolve2d(im1.astype('float64'), Kx, 'same', 'symm')
+  c2 = scipy.signal.convolve2d(im2.astype('float64'), Kx, 'same', 'symm')
+  c3 = scipy.signal.convolve2d(im3.astype('float64'), Kx, 'same', 'symm')
 
   return c1 + 2*c2 + c3
 
@@ -190,12 +188,9 @@ def Central_Ey(im1, im2, im3):
   c2 = numpy.ndarray(im2.shape, 'float64')
   c3 = numpy.ndarray(im3.shape, 'float64')
 
-  bob.sp.convolve(im1.astype('float64'), Ky, c1,
-      bob.sp.ConvolutionSize.Same, bob.sp.ConvolutionBorder.Mirror)
-  bob.sp.convolve(im2.astype('float64'), Ky, c2,
-      bob.sp.ConvolutionSize.Same, bob.sp.ConvolutionBorder.Mirror)
-  bob.sp.convolve(im3.astype('float64'), Ky, c3,
-      bob.sp.ConvolutionSize.Same, bob.sp.ConvolutionBorder.Mirror)
+  c1 = scipy.signal.convolve2d(im1.astype('float64'), Ky, 'same', 'symm')
+  c2 = scipy.signal.convolve2d(im2.astype('float64'), Ky, 'same', 'symm')
+  c3 = scipy.signal.convolve2d(im3.astype('float64'), Ky, 'same', 'symm')
 
   return c1 + 2*c2 + c3
 
@@ -207,10 +202,8 @@ def Central_Et(im1, im2, im3):
   c1 = numpy.zeros(im1.shape, 'float64')
   c3 = numpy.zeros(im3.shape, 'float64')
 
-  bob.sp.convolve(im1.astype('float64'), Kt, c1,
-      bob.sp.ConvolutionSize.Same, bob.sp.ConvolutionBorder.Mirror)
-  bob.sp.convolve(im3.astype('float64'), Kt, c3,
-      bob.sp.ConvolutionSize.Same, bob.sp.ConvolutionBorder.Mirror)
+  c1 = scipy.signal.convolve2d(im1.astype('float64'), Kt, 'same', 'symm')
+  c3 = scipy.signal.convolve2d(im3.astype('float64'), Kt, 'same', 'symm')
 
   return c3 - c1
 
