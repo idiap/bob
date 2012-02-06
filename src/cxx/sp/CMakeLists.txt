@@ -23,5 +23,5 @@ bob_library(sp "${src}" "${deps}" "${shared}")
 add_dependencies(bob_sp sp-cxx_header_install)
 
 # Defines tests for this package
-bob_test(sp conv test/conv.cc)
+bob_test(sp convolution test/conv.cc)
 bob_test(sp fft_fct test/fft_fct.cc)
