@@ -2,6 +2,8 @@ project(daq-python)
 cmake_minimum_required(VERSION 2.6)
 
 set(pysrc
+   "src/version.cc"
+   "src/all.cc"
    "src/main.cc"
    )
 

@@ -1,9 +1,10 @@
 /**
- * @file python/daq/src/main.cc
- * @date Mon 06 Feb 2012 15:19:05 CET
+ * @file python/daq/src/version.cc
+ * @date Mon 06 Feb 2012 15:21:59 CET
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
- * @brief Combines all modules to make up the complete bindings
+ * @brief Describes ways to retrieve version information about all dependent
+ * packages.
  *
  * Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
  * 
@@ -20,15 +21,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/python/ndarray.h"
+#include <boost/python.hpp>
+#include <boost/format.hpp>
 
-void bind_daq_version();
-void bind_daq_all();
+#if defined(HAVE_OPENCV)
+#include <cvver.h>
+#endif
 
-BOOST_PYTHON_MODULE(libpybob_daq) {
+using namespace boost::python;
 
-  bob::python::setup_python("bob classes and sub-classes for data acquisition");
+/**
+ * OpenCV version
+ */
+static str opencv_version() {
+#if defined(HAVE_OPENCV)
+  return str(CV_VERSION);
+#else
+  return str("unavailable");
+#endif
+}
 
-  bind_daq_version();
-  bind_daq_all();
+void bind_daq_version() {
+  dict vdict;
+  vdict["OpenCV"] = opencv_version();
+  scope().attr("version") = vdict;
 }
