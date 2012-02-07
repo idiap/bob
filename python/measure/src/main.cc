@@ -24,7 +24,7 @@
 
 void bind_measure_error();
 
-BOOST_PYTHON_MODULE(libpybob_measure) {
+BOOST_PYTHON_MODULE(_cxx) {
 
   bob::python::setup_python("bob error measure classes and sub-classes");
 

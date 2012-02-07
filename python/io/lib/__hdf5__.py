@@ -6,7 +6,7 @@
 """HDF5 additions
 """
 
-from libpybob_io import HDF5Type, HDF5File
+from ._cxx import HDF5Type, HDF5File
 import numpy
 
 # Some HDF5 addons

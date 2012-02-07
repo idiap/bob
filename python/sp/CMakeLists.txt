@@ -8,8 +8,7 @@ set(pysrc
    "src/main.cc"
    )
 
-bob_python_package_bindings(sp "${pysrc}" "core_ndarray")
-#target_link_libraries(pybob_sp pybob_core_ndarray)
+bob_python_package_bindings(sp "${pysrc}" "core_array")
 
 # Our test units
 bob_python_add_test(python-sp-fft_dct-tests 

@@ -4,31 +4,38 @@
 project(bob)
 cmake_minimum_required(VERSION 2.6)
 
-# All options for building bob
-string(TOLOWER 
-  "${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_BUILD_TYPE}" 
-  BOB_PLATFORM_TMP)
-option(BOB_PLATFORM 
-  "The name of the platform Bob is being built to" ${BOB_PLATFORM_TMP})
+# -----------------
+# START of options.
+# -----------------
 
-option(BOB_VERSION 
-  "The version of Bob that is currently being built" "unknown")
+if (NOT CMAKE_BUILD_TYPE)
+  message(FATAL_ERROR "error: choose either RELEASE or DEBUG as build type by specifying -DCMAKE_BUILD_TYPE=RELEASE or -DCMAKE_BUILD_TYPE=DEBUG on your cmake command line.")
+endif ()
 
-option(BUILD_CXX "Builds the C++ infrastructure." ON)
+string(TOLOWER "${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_BUILD_TYPE}" BOB_PLATFORM_STR)
+set(BOB_PLATFORM "${BOB_PLATFORM_STR}" CACHE ON "The name of the platform Bob is being built to")
+
+set(BOB_VERSION "unknown" CACHE ON "The version of Bob that is currently being built")
+
+# TODO: This needs to be correctly set to the version supported by this build!
+set(BOB_DATABASE_VERSION "nightlies/last" CACHE ON "Version of the databases to download")
+
+option(BOB_BUILD_CXX "Builds the C++ infrastructure." ON)
 
 # Note you cannot build the Python stuff without the C++. This will work
 # though, if you build the whole project and then just wants to rebuild the C++
 # bit.
-option(BUILD_PYTHON "Builds the python bindings." ON)
+option(BOB_BUILD_PYTHON "Builds the python bindings." ON)
 
-option(CREATE_DATABASES "Builds databases from scratch. If not set, the default, will download the databases from Bob servers instead." OFF)
+option(BOB_CREATE_DATABASES "Builds databases from scratch. If not set, the default, will download the databases from Bob servers instead." OFF)
 
-option(DB_INSTALL_PREFIX "Installation directory for the databases, if they are to be copied somewhere during the install target." OFF)
+set(BOB_DB_INSTALL_PREFIX "" CACHE ON "Installation directory for the databases, if they are to be copied somewhere during the install target.")
 
-option(DATABASE_URL "Where to download databases from." "http://www.idiap.ch/software/bob/databases/")
+set(BOB_DATABASE_URL "http://www.idiap.ch/software/bob/databases/" CACHE ON "Where to download databases from.")
 
-# TODO: This needs to be correctly set to the version supported by this build!
-option(DATABASE_VERSION "Version of the databases to download" "nightlies/last")
+# ---------------
+# END of options.
+# ---------------
 
 # Force __LP64__ scheme on Mac OSX
 if(APPLE)
@@ -82,15 +89,18 @@ set(cmakedir share/cmake)
 
 # Sets up externals and install the central dependency file
 include(cmake/bob-external.cmake)
-foreach(ext ${bob_DEPENDENCIES})
+
+foreach (ext ${bob_DEPENDENCIES})
   find_package(${ext} REQUIRED PATHS external)
   install(FILES external/${ext}Config.cmake DESTINATION ${cmakedir})
-endforeach(ext ${bob_DEPENDENCIES})
-foreach(ext ${bob_OPTIONALS})
+endforeach ()
+
+foreach (ext ${bob_OPTIONALS})
   find_package(${ext} PATHS external)
   install(FILES external/${ext}Config.cmake DESTINATION ${cmakedir})
-endforeach(ext ${bob_OPTIONALS})
-install(FILES cmake/bob-external.cmake DESTINATION ${cmakedir})
+endforeach ()
+
+install (FILES cmake/bob-external.cmake DESTINATION ${cmakedir})
 
 # Enables the testing framework
 enable_testing()
@@ -102,7 +112,7 @@ include(cmake/macros.cmake)
 
 set(BUILD_SHARED_LIBS "ON" CACHE BOOL "Build shared libs")
 
-if (BUILD_CXX)
+if (BOB_BUILD_CXX)
   if (QT4_FOUND)
     add_library(bob_visioner SHARED IMPORTED)
   endif ()
@@ -110,7 +120,7 @@ if (BUILD_CXX)
   add_subdirectory(cxx)
 endif ()
 
-if (BUILD_PYTON)
+if (BOB_BUILD_PYTHON)
   add_subdirectory(python)
 endif ()
 

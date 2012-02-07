@@ -20,9 +20,7 @@ if(LIBSVM_FOUND)
   set(pysrc "src/svm.cc;${pysrc}")
 endif()
 
-bob_python_package_bindings(machine "${pysrc}" "core")
-
-target_link_libraries(pybob_machine pybob_core_ndarray)  
+bob_python_package_bindings(machine "${pysrc}" "core_array")
 
 # Our test units
 bob_python_add_test(python-machine-kmeans-tests 

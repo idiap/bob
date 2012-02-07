@@ -1,4 +1,4 @@
-from libpybob_core import *
+from ._cxx import *
 from . import array
 from . import random
 __all__ = dir()

@@ -19,8 +19,7 @@ endif()
 include(${QT_USE_FILE})
 include_directories(${QT_INCLUDE_DIR})
 
-
-bob_python_package_bindings(daq "${pysrc}" "io;visioner")
+bob_python_package_bindings(daq "${pysrc}" "core_array")
 
 target_link_libraries(pybob_daq ${QT_LIBRARIES})
 

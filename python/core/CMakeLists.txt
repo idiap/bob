@@ -27,7 +27,7 @@ set(pysrc_random
    )
 
 bob_python_package_bindings(core "${pysrc}" "")
-bob_python_submodule_bindings(core ndarray "${pysrc_ndarray}" "")
+bob_python_submodule_bindings(core array "${pysrc_ndarray}" "")
 bob_python_submodule_bindings(core random "${pysrc_random}" "")
 
 # Our test units

@@ -6,8 +6,7 @@ set(pysrc
    "src/main.cc"
    )
 
-bob_python_package_bindings(measure "${pysrc}" "core_ndarray")
-#target_link_libraries(pybob_measure pybob_core_ndarray)
+bob_python_package_bindings(measure "${pysrc}" "core_array")
 
 # Our test units
 bob_python_add_test(python-measure-error ${CMAKE_CURRENT_SOURCE_DIR}/test/test_error.py)

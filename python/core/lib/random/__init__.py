@@ -1,4 +1,4 @@
-from libpybob_core_random import *
+from ._cxx import *
 
 class variate_generator:
   """A pure-python version of the boost::variate_generator<> class"""

@@ -20,10 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "core/python/ndarray.h"
 #include <boost/shared_ptr.hpp>
 #include "core/python/exception.h"
 #include "machine/PLDAMachine.h"
-#include "core/python/ndarray.h"
 
 using namespace boost::python;
 namespace mach = bob::machine;

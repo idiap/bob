@@ -29,7 +29,7 @@ void bind_core_exception();
 void bind_core_logging();
 void bind_core_profiler();
 
-BOOST_PYTHON_MODULE(libpybob_core) {
+BOOST_PYTHON_MODULE(_cxx) {
   docstring_options docopt; 
 # if !defined(BOB_DEBUG)
   docopt.disable_cpp_signatures();

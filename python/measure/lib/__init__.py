@@ -1,4 +1,4 @@
-from libpybob_measure import *
+from ._cxx import *
 from . import plot
 from . import load
 import numpy

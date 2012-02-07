@@ -20,10 +20,8 @@ set(pysrc_overload
    "src/main_overload.cc"
    )
 
-bob_python_submodule_bindings(trainer overload "${pysrc_overload}" "machine")
-bob_python_package_bindings(trainer "${pysrc}" "core")
-target_link_libraries(pybob_trainer_overload pybob_core_ndarray)
-target_link_libraries(pybob_trainer pybob_core_ndarray)
+bob_python_submodule_bindings(trainer overload "${pysrc_overload}" "core_array")
+bob_python_package_bindings(trainer "${pysrc}" "core_array")
 
 # Our test units
 bob_python_add_test(python-trainer-kmeans-tests 

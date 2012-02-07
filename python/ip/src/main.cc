@@ -53,7 +53,7 @@ void bind_ip_vlsift();
 void bind_ip_vldsift();
 #endif
 
-BOOST_PYTHON_MODULE(libpybob_ip) {
+BOOST_PYTHON_MODULE(_cxx) {
 
   bob::python::setup_python("bob image processing classes and sub-classes");
 

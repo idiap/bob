@@ -37,8 +37,7 @@ if(VLFEAT_FOUND)
   set(pysrc "src/vlsift.cc;src/vldsift.cc;${pysrc}")
 endif()
 
-bob_python_package_bindings(ip "${pysrc}" "core")
-target_link_libraries(pybob_ip pybob_core_ndarray)  
+bob_python_package_bindings(ip "${pysrc}" "core_array")
 
 # Our test units
 bob_python_add_test(python-ip-lbp-tests 

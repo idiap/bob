@@ -1,1 +1,1 @@
-from libpybob_core_ndarray import *
+from ._cxx import *

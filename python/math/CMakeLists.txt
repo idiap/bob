@@ -9,8 +9,7 @@ set(pysrc
    "src/main.cc"
    )
  
-bob_python_package_bindings(math "${pysrc}" "core")
-target_link_libraries(pybob_math pybob_core_ndarray)
+bob_python_package_bindings(math "${pysrc}" "core_array")
 
 # Our test units
 bob_python_add_test(python-math-interiorpointLP-tests

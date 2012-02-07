@@ -91,6 +91,8 @@ macro(bob_python_bindings cxx_package package src pydependencies)
 
     target_link_libraries(pybob_${package} bob_${cxx_package} ${pydeps_list} ${Boost_PYTHON_LIBRARY_RELEASE} ${PYTHON_LIBRARIES})
     set(pycxx_flags "-Wno-long-long -Wno-unused-function -Winvalid-pch")
+    set_target_properties(pybob_${package} PROPERTIES OUTPUT_NAME "cxx")
+    set_target_properties(pybob_${package} PROPERTIES PREFIX "_")
     set_target_properties(pybob_${package} PROPERTIES SUFFIX ".so")
     set_target_properties(pybob_${package} PROPERTIES COMPILE_FLAGS ${pycxx_flags})
     set_target_properties(pybob_${package} PROPERTIES LIBRARY_OUTPUT_DIRECTORY  ${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob/${cxx_package})
@@ -113,19 +115,31 @@ macro(bob_python_bindings cxx_package package src pydependencies)
   endif()
 endmacro(bob_python_bindings)
 
-macro(bob_python_submodule_bindings package subpackage src pydependencies)
-  bob_python_bindings("${package}" "${package}_${subpackage}" "${src}" "${pydependencies}")
-endmacro(bob_python_submodule_bindings)
-
 macro(bob_python_package_bindings package src pydependencies)
   bob_python_bindings("${package}" "${package}" "${src}" "${pydependencies}")
 endmacro(bob_python_package_bindings)
 
+macro(bob_python_submodule_bindings package subpackage src pydependencies)
+  bob_python_bindings("${package}" "${package}_${subpackage}" "${src}" "${pydependencies}")
+  set_target_properties(pybob_${package}_${subpackage} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob/${package}/${subpackage})
+endmacro(bob_python_submodule_bindings)
+
 # This macro helps users to add python tests to cmake
 function(bob_python_add_test)
   add_test(${ARGV})
+
+  if (APPLE)
+    # In OSX dlopen @ python requires the dyld path to be correctly set
+    # for any C/C++ bindings you may have. It does not use the rpath for
+    # some obscure reason - AA
+    set_property(TEST ${ARGV0} APPEND PROPERTY ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}:$ENV{PYTHONPATH}")
+    set_property(TEST ${ARGV0} APPEND PROPERTY ENVIRONMENT "DYLD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/lib:$ENV{DYLD_LIBRARY_PATH}")
+  else ()
+    # This must be Linux...
+    set_property(TEST ${ARGV0} APPEND PROPERTY ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}:$ENV{PYTHONPATH}")
+  endif ()
+
   set_property(TEST ${ARGV0} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
-  set_property(TEST ${ARGV0} APPEND PROPERTY ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/lib:${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}:$ENV{PYTHONPATH}")
   set_property(TEST ${ARGV0} APPEND PROPERTY ENVIRONMENT "BOB_VERSION=${BOB_VERSION}")
   set_property(TEST ${ARGV0} APPEND PROPERTY ENVIRONMENT "BOB_PLATFORM=${BOB_PLATFORM}")
 endfunction(bob_python_add_test)

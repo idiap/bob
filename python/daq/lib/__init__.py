@@ -1,4 +1,4 @@
-from libpybob_daq import *
+from ._cxx import *
 from os import path
 import types
 

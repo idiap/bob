@@ -12,6 +12,36 @@ set(Python_ADDITIONAL_VERSIONS ${PYTHON_VERSION})
 
 include(FindPythonInterp)
 
+# This function checks for python packages that should be installed before you
+# try to compile this project
+function(find_python_module module)
+	string(TOUPPER ${module} module_upper)
+	if(NOT PY_${module_upper})
+		if(ARGC GREATER 1 AND ARGV1 STREQUAL "REQUIRED")
+			set(PY_${module}_FIND_REQUIRED TRUE)
+		endif()
+		# A module's location is usually a directory, but for binary modules
+		# it's a .so file.
+    execute_process(COMMAND "${PYTHON_EXECUTABLE}" "-c" 
+			"import re, ${module}; print re.compile('/__init__.py.*').sub('',${module}.__file__)"
+			RESULT_VARIABLE _${module}_status 
+			OUTPUT_VARIABLE _${module}_location
+			ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+		if(NOT _${module}_status)
+			set(PY_${module_upper} ${_${module}_location} CACHE STRING 
+				"Location of Python module ${module}")
+		endif(NOT _${module}_status)
+	endif(NOT PY_${module_upper})
+	find_package_handle_standard_args(PY_${module} DEFAULT_MSG PY_${module_upper})
+endfunction(find_python_module)
+
+# Now double-check for all required python modules
+find_python_module(argparse REQUIRED)
+find_python_module(numpy REQUIRED)
+find_python_module(matplotlib REQUIRED)
+find_python_module(sqlalchemy REQUIRED)
+find_python_module(scipy REQUIRED)
+
 # A trick, to make FindPythonLibs work in the expected way in the presence of
 # externally compiled python versions.
 get_filename_component(BOB_PYTHON_PREFIX1 ${PYTHON_EXECUTABLE} PATH)

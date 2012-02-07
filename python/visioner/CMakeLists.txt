@@ -7,14 +7,12 @@ set(pysrc
    "src/main.cc"
    )
 
-bob_python_package_bindings(visioner "${pysrc}" "core")
+bob_python_package_bindings(visioner "${pysrc}" "core_array")
 
 # Visioner depends on Qt4
 include (${QT_USE_FILE})
 include_directories(SYSTEM ${QT_INCLUDES})
 
-target_link_libraries(pybob_visioner pybob_core_ndarray)
-  
 # Our test units
 bob_python_add_test(python-visioner-detection-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_detection.py)

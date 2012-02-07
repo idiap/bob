@@ -1,2 +1,2 @@
-from libpybob_trainer_overload import *
+from ._cxx import *
 __all__ = dir()

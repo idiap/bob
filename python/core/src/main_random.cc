@@ -26,7 +26,7 @@ using namespace boost::python;
 
 void bind_core_random();
 
-BOOST_PYTHON_MODULE(libpybob_core_random) {
+BOOST_PYTHON_MODULE(_cxx) {
   docstring_options docopt; 
 # if !defined(BOB_DEBUG)
   docopt.disable_cpp_signatures();

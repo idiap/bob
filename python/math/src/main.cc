@@ -27,7 +27,7 @@ void bind_math_linsolve();
 void bind_math_norminv();
 void bind_math_stats();
 
-BOOST_PYTHON_MODULE(libpybob_math) {
+BOOST_PYTHON_MODULE(_cxx) {
 
   bob::python::setup_python("bob mathematical classes and sub-classes");
 

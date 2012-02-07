@@ -79,9 +79,9 @@ specific platforms.
 +----------------------+--------------+------------------------------------+
 | `Dvipng`_            | 1.12?        | LGPLv3+                            |
 +----------------------+--------------+------------------------------------+
-| **Extra Recommended Software** (not distributed with or required to run) | 
-+----------------------+--------------+------------------------------------+
 | `Scipy`_             | -            | BSD License                        |
++----------------------+--------------+------------------------------------+
+| **Extra Recommended Software** (not distributed with or required to run) | 
 +----------------------+--------------+------------------------------------+
 | `IPython`_           | -            | New BSD License                    |
 +----------------------+--------------+------------------------------------+
@@ -109,7 +109,7 @@ installed. Here is a brief description of what you need.
 
 .. note::
    If you are at Idiap you **don't** need to install any of the packages
-   mentioned on this wiki. Instead, follow the `bobIdiapGuide`_ (special
+   mentioned on this wiki. Instead, follow `Bob's Idiap Guide`_ (special
    instructions for Idiap users).
 
 Platforms
@@ -437,7 +437,7 @@ try to reproduce the failure.
 .. _scipy: http://www.scipy.org
 .. _ipython: http://ipython.scipy.org
 .. _matplotlib: http://matplotlib.sourceforge.net
-.. _bobidiapguide: http://github.com/idiap/bob/wiki/Using-Bob-at-Idiap
+.. _Bob's Idiap Guide: http://github.com/idiap/bob/wiki/Using-Bob-at-Idiap
 .. _buildbot: http://trac.buildbot.net
 .. _argparse: http://code.google.com/p/argparse/
 .. _sqlalchemy: http://www.sqlalchemy.org/

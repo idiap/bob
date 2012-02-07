@@ -1,4 +1,4 @@
-from libpybob_machine import *
+from ._cxx import *
 
 def linearmachine_repr(self):
   """A funky way to display a bob Linear Machine"""

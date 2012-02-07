@@ -6,7 +6,7 @@
 """Addons to files.
 """
 
-from libpybob_io import File, typeinfo
+from ._cxx import File, typeinfo
 
 def typeinfo_str(self):
   return "%s@%s" % (self.dtype, self.shape)

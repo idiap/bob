@@ -6,7 +6,7 @@
 """Array additions
 """
 
-from libpybob_io import Array
+from ._cxx import Array
 
 def array_cast(self, dtype):
   """Returns an array object with the required element type"""
