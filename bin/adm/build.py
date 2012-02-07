@@ -484,6 +484,49 @@ def status_log(option, timing, problems):
   logging.debug('Finished writing status file.')
   return cfname
 
+def group_write(option):
+  """Changes the file ownership of all files in the build tree so they are group writeable."""
+
+  if (option.dryrun):
+    logging.info("Dry run: action 'group_write' will not be executed")
+    return
+
+  logging.debug('Running "chown g+w" to source tree...')
+
+  cmdline = ['chmod', '-R', 'g+w', '.']
+
+  if hasattr(option, "log_prefix"):
+    status = run(cmdline, option.save_output, option.log_prefix, cmdline[0])
+  else:
+    status = run(cmdline)
+
+  if status != 0:
+    raise RuntimeError('** ERROR: "group_write" did not work as expected.')
+
+  logging.debug('Finished running group_write.')
+
+def group_unwrite(option):
+  """Changes the file ownership of all files in the build tree so they are 
+  *not* group writeable."""
+
+  if (option.dryrun):
+    logging.info("Dry run: action 'group_unwrite' will not be executed")
+    return
+
+  logging.debug('Running "chown g-w" to source tree...')
+
+  cmdline = ['chmod', '-R', 'g-w', '.']
+
+  if hasattr(option, "log_prefix"):
+    status = run(cmdline, option.save_output, option.log_prefix, cmdline[0])
+  else:
+    status = run(cmdline)
+
+  if status != 0:
+    raise RuntimeError('** ERROR: "group_unwrite" did not work as expected.')
+
+  logging.debug('Finished running group_unwrite.')
+
 def dot(option):
   """Runs dot on the output of cmake/graphviz. Raises a RuntimeError if there
   is any problem."""
