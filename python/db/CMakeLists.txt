@@ -12,28 +12,28 @@ macro(bob_build_db dbname)
   # If we are supposed to create the database, create it on the install
   # directory at an indicated global position where the databases can be used
   # for downloading through our web server.
-  if (BOB_CREATE_DATABASES)
+  if (CREATE_DATABASES)
     bob_python_add_test(python-db-${dbname}-create
       ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py ${dbname} create 
       --recreate)
     set(python-db-${dbname}-instantiation python-db-${dbname}-create)
 
-  else (BOB_CREATE_DATABASES)
+  else (CREATE_DATABASES)
     bob_python_add_test(python-db-${dbname}-download
       ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py ${dbname} download
-      --url=${BOB_DATABASE_URL} --version=${BOB_DATABASE_VERSION})
+      --url=${DATABASE_URL} --version=${DATABASE_VERSION})
     set(python-db-${dbname}-instantiation python-db-${dbname}-download)
-  endif (BOB_CREATE_DATABASES)
+  endif (CREATE_DATABASES)
 
   # If the copying has been set through the commandline, after creation or
   # downloading, copies the database to a given location.
-  if (BOB_DB_INSTALL_PREFIX)
+  if (DB_INSTALL_PREFIX)
     bob_python_add_test(python-db-${dbname}-copy
       ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py ${dbname} copy
-      ${BOB_DB_INSTALL_PREFIX})
+      ${DB_INSTALL_PREFIX})
     set_property(TEST python-db-${dbname}-copy APPEND PROPERTY DEPENDS
       ${python-db-${dbname}-instantiation})
-  endif (BOB_DB_INSTALL_PREFIX)
+  endif (DB_INSTALL_PREFIX)
 
 endmacro(bob_build_db dbname)
 

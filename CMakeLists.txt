@@ -4,9 +4,22 @@
 project(bob)
 cmake_minimum_required(VERSION 2.6)
 
-# The central database version and location
-set(BOB_DATABASE_URL "http://www.idiap.ch/software/bob/databases/")
-set(BOB_DATABASE_VERSION "nightlies/last")
+# All options for building bob
+option(BUILD_CXX "Builds the C++ infrastructure." ON)
+
+# Note you cannot build the Python stuff without the C++. This will work
+# though, if you build the whole project and then just wants to rebuild the C++
+# bit.
+option(BUILD_PYTHON "Builds the python bindings." ON)
+
+option(CREATE_DATABASES "Builds databases from scratch. If not set, the default, will download the databases from Bob servers instead." OFF)
+
+option(DB_INSTALL_PREFIX "Installation directory for the databases, if they are to be copied somewhere during the install target." OFF)
+
+option(DATABASE_URL "Where to download databases from." "http://www.idiap.ch/software/bob/databases/")
+
+# TODO: This needs to be correctly set to the version supported by this build!
+option(DATABASE_VERSION "Version of the databases to download" "nightlies/last")
 
 # Force __LP64__ scheme on Mac OSX
 if(APPLE)
@@ -58,11 +71,6 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # This is where we install cmake files for external projects
 set(cmakedir share/cmake)
 
-# Setup BOOST pre-conditions
-if ("${BOB_LINKAGE}" STREQUAL static)
-  set(Boost_USE_STATIC_LIBS ON)
-endif ("${BOB_LINKAGE}" STREQUAL static)
-
 # Sets up externals and install the central dependency file
 include(cmake/bob-external.cmake)
 foreach(ext ${bob_DEPENDENCIES})
@@ -83,22 +91,27 @@ add_definitions("-DHAVE_LBFGS=1")
 
 include(cmake/macros.cmake)
 
-set(BOB_CXX "ON" CACHE BOOL "Compile C++ code")
-set(BOB_PYTHON "ON" CACHE BOOL "Compile python bindings")
 set(BUILD_SHARED_LIBS "ON" CACHE BOOL "Build shared libs")
 
-string(TOLOWER "${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_BUILD_TYPE}" BOB_PLATFORM)
+# A minor tweak: if the system is darwin, just say "macosx" instead
+string(TOLOWER "${CMAKE_SYSTEM_NAME}" BOB_SYSTEM_NAME)
+if (${BOB_SYSTEM_NAME} STREQUAL "darwin")
+  set(BOB_SYSTEM_NAME "macosx")
+endif ()
 
-if (BOB_CXX)
+string(TOLOWER "${BOB_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_BUILD_TYPE}" BOB_PLATFORM)
+
+if (BUILD_CXX)
   if (QT4_FOUND)
     add_library(bob_visioner SHARED IMPORTED)
   endif ()
 
   add_subdirectory(cxx)
-endif (BOB_CXX)
-if (BOB_PYTHON)
+endif ()
+
+if (BUILD_PYTON)
   add_subdirectory(python)
-endif (BOB_PYTHON)
+endif ()
 
 install(EXPORT bob DESTINATION ${cmakedir})
 install(FILES cmake/bobConfig.cmake DESTINATION ${cmakedir})
