@@ -5,6 +5,15 @@ project(bob)
 cmake_minimum_required(VERSION 2.6)
 
 # All options for building bob
+string(TOLOWER 
+  "${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_BUILD_TYPE}" 
+  BOB_PLATFORM_TMP)
+option(BOB_PLATFORM 
+  "The name of the platform Bob is being built to" ${BOB_PLATFORM_TMP})
+
+option(BOB_VERSION 
+  "The version of Bob that is currently being built" "unknown")
+
 option(BUILD_CXX "Builds the C++ infrastructure." ON)
 
 # Note you cannot build the Python stuff without the C++. This will work
@@ -92,14 +101,6 @@ add_definitions("-DHAVE_LBFGS=1")
 include(cmake/macros.cmake)
 
 set(BUILD_SHARED_LIBS "ON" CACHE BOOL "Build shared libs")
-
-# A minor tweak: if the system is darwin, just say "macosx" instead
-string(TOLOWER "${CMAKE_SYSTEM_NAME}" BOB_SYSTEM_NAME)
-if (${BOB_SYSTEM_NAME} STREQUAL "darwin")
-  set(BOB_SYSTEM_NAME "macosx")
-endif ()
-
-string(TOLOWER "${BOB_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_BUILD_TYPE}" BOB_PLATFORM)
 
 if (BUILD_CXX)
   if (QT4_FOUND)
