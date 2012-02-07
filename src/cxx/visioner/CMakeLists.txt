@@ -13,7 +13,7 @@ if(NOT GIT_EXECUTABLE)
 endif(NOT GIT_EXECUTABLE)
 
 ExternalProject_Add(visioner
-  DOWNLOAD_COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR}/../../.. && ${GIT_EXECUTABLE} submodule init -- src/cxx/visioner/project && ${GIT_EXECUTABLE} submodule update && cd ${CMAKE_CURRENT_BINARY_DIR} && rsync -avz ${CMAKE_CURRENT_SOURCE_DIR}/project/ ${CMAKE_CURRENT_BINARY_DIR}/visioner/
+  DOWNLOAD_COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR}/../../.. && ${GIT_EXECUTABLE} submodule init -- src/cxx/visioner/project && ${GIT_EXECUTABLE} submodule update && cd ${CMAKE_CURRENT_BINARY_DIR} && mkdir -pv visioner-prefix/src/visioner && rsync -avz ${CMAKE_CURRENT_SOURCE_DIR}/project/ visioner-prefix/src/visioner/
   CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} -DLBFGS_INCLUDE_DIR=${CMAKE_INSTALL_PREFIX}/include/bob -DLBFGS_LIBRARY_DIR=${CMAKE_BINARY_DIR}/cxx/lbfgs
   )
 
