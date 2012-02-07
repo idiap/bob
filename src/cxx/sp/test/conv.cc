@@ -21,15 +21,12 @@
  */
 
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE sp-conv Tests
+#define BOOST_TEST_MODULE sp-convolution Tests
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
 #include "sp/conv.h"
-#include "sp/convolution.h"
-
-#include <iostream>
 
 namespace sp = bob::sp;
 
@@ -44,7 +41,6 @@ struct T {
   blitz::Array<double,1> res_A1_10_b1_3_valid;
 
   blitz::Array<double,1> res_A1_10_b1_4_full;
-  blitz::Array<double,1> res_A1_10_b1_4_same_old;
   blitz::Array<double,1> res_A1_10_b1_4_same;
   blitz::Array<double,1> res_A1_10_b1_4_valid;
 
@@ -58,7 +54,6 @@ struct T {
   blitz::Array<double,2> b2_3;
 
   blitz::Array<double,2> res_A2_5_b2_2_full;
-  blitz::Array<double,2> res_A2_5_b2_2_same_old;
   blitz::Array<double,2> res_A2_5_b2_2_same;
   blitz::Array<double,2> res_A2_5_b2_2_valid;
 
@@ -71,26 +66,14 @@ struct T {
   blitz::Array<double,1> b1b_3;
 
   blitz::Array<double,1> res_A1b_5_b1b_3_full_zero;
-  blitz::Array<double,1> res_A1b_5_b1b_3_full_near;
-  blitz::Array<double,1> res_A1b_5_b1b_3_full_circ;
-  blitz::Array<double,1> res_A1b_5_b1b_3_full_mirr;
   blitz::Array<double,1> res_A1b_5_b1b_3_same_zero;
-  blitz::Array<double,1> res_A1b_5_b1b_3_same_near;
-  blitz::Array<double,1> res_A1b_5_b1b_3_same_circ;
-  blitz::Array<double,1> res_A1b_5_b1b_3_same_mirr;
   blitz::Array<double,1> res_A1b_5_b1b_3_valid;
 
   blitz::Array<double,2> A2b_3x4;
   blitz::Array<double,2> b2b_2x2;
 
   blitz::Array<double,2> res_A2b_3x4_b2b_2x2_full_zero;
-  blitz::Array<double,2> res_A2b_3x4_b2b_2x2_full_near;
-  blitz::Array<double,2> res_A2b_3x4_b2b_2x2_full_circ;
-  blitz::Array<double,2> res_A2b_3x4_b2b_2x2_full_mirr;
   blitz::Array<double,2> res_A2b_3x4_b2b_2x2_same_zero;
-  blitz::Array<double,2> res_A2b_3x4_b2b_2x2_same_near;
-  blitz::Array<double,2> res_A2b_3x4_b2b_2x2_same_circ;
-  blitz::Array<double,2> res_A2b_3x4_b2b_2x2_same_mirr;
   blitz::Array<double,2> res_A2b_3x4_b2b_2x2_valid;
 
   double eps_d;
@@ -141,10 +124,6 @@ struct T {
     res_A1_10_b1_4_full = 0.1810, 0.5514, 0.9482, 1.4726, 1.3763, 1.0940,
       1.1761, 0.8846, 0.7250, 1.0268, 1.2872, 1.0930, 0.3033;
 
-    res_A1_10_b1_4_same_old.resize(10);
-    res_A1_10_b1_4_same_old = 0.9482, 1.4726, 1.3763, 1.0940, 1.1761, 
-      0.8846, 0.7250, 1.0268, 1.2872, 1.0930;
-
     res_A1_10_b1_4_same.resize(10);
     res_A1_10_b1_4_same = 0.5514, 0.9482, 1.4726, 1.3763, 1.0940, 1.1761, 
       0.8846, 0.7250, 1.0268, 1.2872;
@@ -171,13 +150,6 @@ struct T {
       0.4948, 0.3469, 0.6965, 0.7432, 0.5907, 0.3721,
       0.2592, 0.8510, 0.6613, 0.7272, 0.8356, 0.4477,
       0.5286, 0.2803, 0.5274, 0.3339, 0.5380, 0.0111;
-
-    res_A2_5_b2_2_same_old.resize(5,5);
-    res_A2_5_b2_2_same_old = 0.3540, 0.4044, 0.6551, 0.4090, 0.0262,
-      0.5297, 0.6688, 0.8132, 0.4624, 0.2498,
-      0.3469, 0.6965, 0.7432, 0.5907, 0.3721,
-      0.8510, 0.6613, 0.7272, 0.8356, 0.4477,
-      0.2803, 0.5274, 0.3339, 0.5380, 0.0111;
 
     res_A2_5_b2_2_same.resize(5,5);
     res_A2_5_b2_2_same = 0.1092, 0.4401, 0.2100, 0.2022, 0.1440,
@@ -221,20 +193,8 @@ struct T {
 
     res_A1b_5_b1b_3_full_zero.resize(7);
     res_A1b_5_b1b_3_full_zero = 0, 3, 7, 13, 19, 10, 8;
-    res_A1b_5_b1b_3_full_near.resize(7);
-    res_A1b_5_b1b_3_full_near = 0, 3, 7, 13, 19, 22, 24;
-    res_A1b_5_b1b_3_full_circ.resize(7);
-    res_A1b_5_b1b_3_full_circ = 10, 11, 7, 13, 19, 10, 11;
-    res_A1b_5_b1b_3_full_mirr.resize(7);
-    res_A1b_5_b1b_3_full_mirr = 2, 3, 7, 13, 19, 22, 21;
     res_A1b_5_b1b_3_same_zero.resize(5);
     res_A1b_5_b1b_3_same_zero = 3, 7, 13, 19, 10;
-    res_A1b_5_b1b_3_same_near.resize(5);
-    res_A1b_5_b1b_3_same_near = 3, 7, 13, 19, 22;
-    res_A1b_5_b1b_3_same_circ.resize(5);
-    res_A1b_5_b1b_3_same_circ = 11, 7, 13, 19, 10;
-    res_A1b_5_b1b_3_same_mirr.resize(5);
-    res_A1b_5_b1b_3_same_mirr = 3, 7, 13, 19, 22;
     res_A1b_5_b1b_3_valid.resize(3);
     res_A1b_5_b1b_3_valid = 7, 13, 19;
     
@@ -250,37 +210,10 @@ struct T {
       16, 27, 37, 47, 13,
       44, 67, 77, 87, 25,
       24, 43, 48, 53, 22;
-    res_A2b_3x4_b2b_2x2_full_near.resize(4,5);
-    res_A2b_3x4_b2b_2x2_full_near = 0, 7, 17, 27, 30,
-      20, 27, 37, 47, 50,
-      60, 67, 77, 87, 90,
-      80, 87, 97, 107, 110;
-    res_A2b_3x4_b2b_2x2_full_circ.resize(4,5);
-    res_A2b_3x4_b2b_2x2_full_circ = 49, 47, 57, 67, 49,
-      29, 27, 37, 47, 29,
-      69, 67, 77, 87, 69,
-      49, 47, 57, 67, 49;
-    res_A2b_3x4_b2b_2x2_full_mirr.resize(4,5);
-    res_A2b_3x4_b2b_2x2_full_mirr = 0, 7, 17, 27, 30,
-      20, 27, 37, 47, 50,
-      60, 67, 77, 87, 90,
-      80, 87, 97, 107, 110;
     res_A2b_3x4_b2b_2x2_same_zero.resize(3,4);
     res_A2b_3x4_b2b_2x2_same_zero = 0, 4, 9, 14,
       16, 27, 37, 47,
       44, 67, 77, 87;
-    res_A2b_3x4_b2b_2x2_same_near.resize(3,4);
-    res_A2b_3x4_b2b_2x2_same_near = 0, 7, 17, 27,
-      20, 27, 37, 47,
-      60, 67, 77, 87;
-    res_A2b_3x4_b2b_2x2_same_circ.resize(3,4);
-    res_A2b_3x4_b2b_2x2_same_circ =  49, 47, 57, 67,
-      29, 27, 37, 47,
-      69, 67, 77, 87;
-    res_A2b_3x4_b2b_2x2_same_mirr.resize(3,4);
-    res_A2b_3x4_b2b_2x2_same_mirr =  0, 7, 17, 27,
-      20, 27, 37, 47,
-      60, 67, 77, 87;
     res_A2b_3x4_b2b_2x2_valid.resize(2,3);
     res_A2b_3x4_b2b_2x2_valid = 27, 37, 47,
       67, 77, 87;
@@ -291,36 +224,24 @@ struct T {
 
 
 template <typename T> 
-void test_convolve_1D_nopt( T eps, const blitz::Array<T,1>& a1, 
+void test_conv_1D_nopt( T eps, const blitz::Array<T,1>& a1, 
   const blitz::Array<T,1>& a2, const blitz::Array<T,1>& mat)
 {
-  blitz::Array<T,1> res( bob::sp::getConvolveOutputSize(a1, a2) );
-  bob::sp::convolve( a1, a2, res);
+  blitz::Array<T,1> res( bob::sp::getConvOutputSize(a1, a2) );
+  bob::sp::conv( a1, a2, res);
   for(int i=0; i<res.extent(0); ++i)
     BOOST_CHECK_SMALL(res(i) - mat(i), eps);
 }
 
 template <typename T> 
-void test_convolve_2D_nopt( T eps, const blitz::Array<T,2>& a1, 
+void test_conv_2D_nopt( T eps, const blitz::Array<T,2>& a1, 
   const blitz::Array<T,2>& a2, const blitz::Array<T,2>& mat)
 {
-  blitz::Array<T,2> res( bob::sp::getConvolveOutputSize(a1, a2) );
-  bob::sp::convolve( a1, a2, res);
+  blitz::Array<T,2> res( bob::sp::getConvOutputSize(a1, a2) );
+  bob::sp::conv( a1, a2, res);
   for(int i=0; i<res.extent(0); ++i)
     for(int j=0; j<res.extent(1); ++j)
       BOOST_CHECK_SMALL(res(i,j) - mat(i,j), eps);
-}
-
-template <typename T> 
-void test_convolve_1D( T eps, const blitz::Array<T,1>& a1, 
-  const blitz::Array<T,1>& a2, const blitz::Array<T,1>& mat, 
-  const enum bob::sp::Convolution::SizeOption opt1 = bob::sp::Convolution::Full,
-  const enum bob::sp::Convolution::BorderOption opt2 = bob::sp::Convolution::Zero)
-{
-  blitz::Array<T,1> res( bob::sp::getConvolveOutputSize(a1, a2, opt1) );
-  bob::sp::convolve( a1, a2, res, opt1, opt2);
-  for(int i=0; i<res.extent(0); ++i)
-    BOOST_CHECK_SMALL(res(i) - mat(i), eps);
 }
 
 template <typename T> 
@@ -332,19 +253,6 @@ void test_conv_1D( T eps, const blitz::Array<T,1>& a1,
   bob::sp::conv( a1, a2, res, opt1);
   for(int i=0; i<res.extent(0); ++i)
     BOOST_CHECK_SMALL(res(i) - mat(i), eps);
-}
-
-template <typename T> 
-void test_convolve_2D( T eps, const blitz::Array<T,2>& a1, 
-  const blitz::Array<T,2>& a2, const blitz::Array<T,2>& mat,
-  const enum bob::sp::Convolution::SizeOption opt1 = bob::sp::Convolution::Full,
-  const enum bob::sp::Convolution::BorderOption opt2 = bob::sp::Convolution::Zero)
-{
-  blitz::Array<T,2> res( bob::sp::getConvolveOutputSize(a1, a2, opt1) );
-  bob::sp::convolve( a1, a2, res, opt1, opt2);
-  for(int i=0; i<res.extent(0); ++i)
-    for(int j=0; j<res.extent(1); ++j)
-      BOOST_CHECK_SMALL(res(i,j) - mat(i,j), eps);
 }
 
 template <typename T> 
@@ -363,212 +271,158 @@ void test_conv_2D( T eps, const blitz::Array<T,2>& a1,
 
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
-// The following tests compare results from bob and Matlab.
+// The following tests compare results from bob and Numpy/Scipy.
 
 // 1D convolution between a 1D vector of length 10 and 3 (no option)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_3_nopt )
 {
-  test_convolve_1D( eps_d, A1_10, b1_3, res_A1_10_b1_3_full);
-  test_conv_1D( eps_d, A1_10, b1_3, res_A1_10_b1_3_full);
+  test_conv_1D_nopt( eps_d, A1_10, b1_3, res_A1_10_b1_3_full);
 }
 
 // 1D convolution between a 1D vector of length 10 and 3 (full)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_3_full )
 {
-  test_convolve_1D( eps_d, A1_10, b1_3, res_A1_10_b1_3_full, bob::sp::Convolution::Full);
   test_conv_1D( eps_d, A1_10, b1_3, res_A1_10_b1_3_full, bob::sp::Conv::Full);
 }
 
 // 1D convolution between a 1D vector of length 10 and 3 (same)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_3_same )
 {
-  test_convolve_1D( eps_d, A1_10, b1_3, res_A1_10_b1_3_same, bob::sp::Convolution::Same);
   test_conv_1D( eps_d, A1_10, b1_3, res_A1_10_b1_3_same, bob::sp::Conv::Same);
 }
 
 // 1D convolution between a 1D vector of length 10 and 3 (valid)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_3_valid )
 {
-  test_convolve_1D( eps_d, A1_10, b1_3, res_A1_10_b1_3_valid, bob::sp::Convolution::Valid);
   test_conv_1D( eps_d, A1_10, b1_3, res_A1_10_b1_3_valid, bob::sp::Conv::Valid);
 }
 
 // 1D convolution between a 1D vector of length 10 and 4 (no option)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_4_nopt )
 {
-  test_convolve_1D( eps_d, A1_10, b1_4, res_A1_10_b1_4_full);
-  test_conv_1D( eps_d, A1_10, b1_4, res_A1_10_b1_4_full);
+  test_conv_1D_nopt( eps_d, A1_10, b1_4, res_A1_10_b1_4_full);
 }
 
 // 1D convolution between a 1D vector of length 10 and 4 (full)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_4_full )
 {
-  test_convolve_1D( eps_d, A1_10, b1_4, res_A1_10_b1_4_full, bob::sp::Convolution::Full);
   test_conv_1D( eps_d, A1_10, b1_4, res_A1_10_b1_4_full, bob::sp::Conv::Full);
 }
 
 // 1D convolution between a 1D vector of length 10 and 4 (same)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_4_same )
 {
-  test_convolve_1D( eps_d, A1_10, b1_4, res_A1_10_b1_4_same_old, bob::sp::Convolution::Same);
   test_conv_1D( eps_d, A1_10, b1_4, res_A1_10_b1_4_same, bob::sp::Conv::Same);
 }
 
 // 1D convolution between a 1D vector of length 10 and 4 (valid)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_4_valid )
 {
-  test_convolve_1D( eps_d, A1_10, b1_4, res_A1_10_b1_4_valid, bob::sp::Convolution::Valid);
   test_conv_1D( eps_d, A1_10, b1_4, res_A1_10_b1_4_valid, bob::sp::Conv::Valid);
 }
 
 // 1D convolution between a 1D vector of length 10 and 5 (no option)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_5_nopt )
 {
-  test_convolve_1D( eps_d, A1_10, b1_5, res_A1_10_b1_5_full);
-  test_conv_1D( eps_d, A1_10, b1_5, res_A1_10_b1_5_full);
+  test_conv_1D_nopt( eps_d, A1_10, b1_5, res_A1_10_b1_5_full);
 }
 
 // 1D convolution between a 1D vector of length 10 and 5 (full)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_5_full )
 {
-  test_convolve_1D( eps_d, A1_10, b1_5, res_A1_10_b1_5_full, bob::sp::Convolution::Full);
   test_conv_1D( eps_d, A1_10, b1_5, res_A1_10_b1_5_full, bob::sp::Conv::Full);
 }
 
 // 1D convolution between a 1D vector of length 10 and 5 (same)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_5_same )
 {
-  test_convolve_1D( eps_d, A1_10, b1_5, res_A1_10_b1_5_same, bob::sp::Convolution::Same);
   test_conv_1D( eps_d, A1_10, b1_5, res_A1_10_b1_5_same, bob::sp::Conv::Same);
 }
 
 // 1D convolution between a 1D vector of length 10 and 5 (valid)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_5_valid )
 {
-  test_convolve_1D( eps_d, A1_10, b1_5, res_A1_10_b1_5_valid, bob::sp::Convolution::Valid);
   test_conv_1D( eps_d, A1_10, b1_5, res_A1_10_b1_5_valid, bob::sp::Conv::Valid);
 }
 
 // 2D convolution between a 2D vector of length 5x5 and 2x2 (no option)
 BOOST_AUTO_TEST_CASE( test_convolve_2D_5_2_nopt )
 {
-  test_convolve_2D( eps_d, A2_5, b2_2, res_A2_5_b2_2_full);
-  test_conv_2D( eps_d, A2_5, b2_2, res_A2_5_b2_2_full);
+  test_conv_2D_nopt( eps_d, A2_5, b2_2, res_A2_5_b2_2_full);
 }
 
 // 2D convolution between a 2D vector of length 5x5 and 2x2 (full)
 BOOST_AUTO_TEST_CASE( test_convolve_2D_5_2_full )
 {
-  test_convolve_2D( eps_d, A2_5, b2_2, res_A2_5_b2_2_full, bob::sp::Convolution::Full);
   test_conv_2D( eps_d, A2_5, b2_2, res_A2_5_b2_2_full, bob::sp::Conv::Full);
 }
 
 // 2D convolution between a 2D vector of length 5x5 and 2x2 (same)
 BOOST_AUTO_TEST_CASE( test_convolve_2D_5_2_same )
 {
-  test_convolve_2D( eps_d, A2_5, b2_2, res_A2_5_b2_2_same_old, bob::sp::Convolution::Same);
   test_conv_2D( eps_d, A2_5, b2_2, res_A2_5_b2_2_same, bob::sp::Conv::Same);
 }
 
 // 2D convolution between a 2D vector of length 5x5 and 2x2 (valid)
 BOOST_AUTO_TEST_CASE( test_convolve_2D_5_2_valid )
 {
-  test_convolve_2D( eps_d, A2_5, b2_2, res_A2_5_b2_2_valid, bob::sp::Convolution::Valid);
   test_conv_2D( eps_d, A2_5, b2_2, res_A2_5_b2_2_valid, bob::sp::Conv::Valid);
 }
 
 // 2D convolution between a 2D vector of length 5x5 and 3x3 (no option)
 BOOST_AUTO_TEST_CASE( test_convolve_2D_5_3_nopt )
 {
-  test_convolve_2D( eps_d, A2_5, b2_3, res_A2_5_b2_3_full);
-  test_conv_2D( eps_d, A2_5, b2_3, res_A2_5_b2_3_full);
+  test_conv_2D_nopt( eps_d, A2_5, b2_3, res_A2_5_b2_3_full);
 }
 
 // 2D convolution between a 2D vector of length 5x5 and 3x3 (full)
 BOOST_AUTO_TEST_CASE( test_convolve_2D_5_3_full )
 {
-  test_convolve_2D( eps_d, A2_5, b2_3, res_A2_5_b2_3_full, bob::sp::Convolution::Full);
   test_conv_2D( eps_d, A2_5, b2_3, res_A2_5_b2_3_full, bob::sp::Conv::Full);
 }
 
 // 2D convolution between a 2D vector of length 5x5 and 3x3 (same)
 BOOST_AUTO_TEST_CASE( test_convolve_2D_5_3_same )
 {
-  test_convolve_2D( eps_d, A2_5, b2_3, res_A2_5_b2_3_same, bob::sp::Convolution::Same);
   test_conv_2D( eps_d, A2_5, b2_3, res_A2_5_b2_3_same, bob::sp::Conv::Same);
 }
 
 // 2D convolution between a 2D vector of length 5x5 and 3x3 (valid)
 BOOST_AUTO_TEST_CASE( test_convolve_2D_5_3_valid )
 {
-  test_convolve_2D( eps_d, A2_5, b2_3, res_A2_5_b2_3_valid, bob::sp::Convolution::Valid);
   test_conv_2D( eps_d, A2_5, b2_3, res_A2_5_b2_3_valid, bob::sp::Conv::Valid);
 }
-/*
+
 // 1D convolution between a 1D vector of length 5 and 3
 BOOST_AUTO_TEST_CASE( test_convolve_1D_5_3 )
 {
   // Full size
-  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_full_zero, 
-    bob::sp::Convolution::Full, bob::sp::Convolution::Zero);
-  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_full_near, 
-    bob::sp::Convolution::Full, bob::sp::Convolution::NearestNeighbour);
-  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_full_circ, 
-    bob::sp::Convolution::Full, bob::sp::Convolution::Circular);
-  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_full_mirr, 
-    bob::sp::Convolution::Full, bob::sp::Convolution::Mirror);
+  test_conv_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_full_zero, 
+    bob::sp::Conv::Full);
 
   // Same size
-  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_same_zero, 
-    bob::sp::Convolution::Same, bob::sp::Convolution::Zero);
-  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_same_near, 
-    bob::sp::Convolution::Same, bob::sp::Convolution::NearestNeighbour);
-  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_same_circ, 
-    bob::sp::Convolution::Same, bob::sp::Convolution::Circular);
-  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_same_mirr, 
-    bob::sp::Convolution::Same, bob::sp::Convolution::Mirror);
+  test_conv_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_same_zero, 
+    bob::sp::Conv::Same);
 
   // Valid size
-  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_valid, 
-    bob::sp::Convolution::Valid, bob::sp::Convolution::Zero);
-  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_valid, 
-    bob::sp::Convolution::Valid, bob::sp::Convolution::NearestNeighbour);
-  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_valid, 
-    bob::sp::Convolution::Valid, bob::sp::Convolution::Circular);
-  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_valid, 
-    bob::sp::Convolution::Valid, bob::sp::Convolution::Mirror);
+  test_conv_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_valid, 
+    bob::sp::Conv::Valid);
 }
 
 // 2D convolution between a 2D vector of length 3x4 and 2x2
 BOOST_AUTO_TEST_CASE( test_convolve_2D_3x4_2x2 )
 {
   // Full size
-  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_full_zero, 
-    bob::sp::Convolution::Full, bob::sp::Convolution::Zero);
-  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_full_near, 
-    bob::sp::Convolution::Full, bob::sp::Convolution::NearestNeighbour);
-  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_full_circ, 
-    bob::sp::Convolution::Full, bob::sp::Convolution::Circular);
-  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_full_mirr, 
-    bob::sp::Convolution::Full, bob::sp::Convolution::Mirror);
+  test_conv_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_full_zero, 
+    bob::sp::Conv::Full);
 
   // Same size
-  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_same_zero, 
-    bob::sp::Convolution::Same, bob::sp::Convolution::Zero);
-  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_same_near, 
-    bob::sp::Convolution::Same, bob::sp::Convolution::NearestNeighbour);
-  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_same_mirr, 
-    bob::sp::Convolution::Same, bob::sp::Convolution::Mirror);
+  test_conv_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_same_zero, 
+    bob::sp::Conv::Same);
 
   // Valid size
-  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_valid, 
-    bob::sp::Convolution::Valid, bob::sp::Convolution::Zero);
-  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_valid, 
-    bob::sp::Convolution::Valid, bob::sp::Convolution::NearestNeighbour);
-  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_valid, 
-    bob::sp::Convolution::Valid, bob::sp::Convolution::Circular);
-  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_valid, 
-    bob::sp::Convolution::Valid, bob::sp::Convolution::Mirror);
+  test_conv_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_valid, 
+    bob::sp::Conv::Valid);
 }
-*/
+
 BOOST_AUTO_TEST_SUITE_END()
