@@ -117,7 +117,7 @@ train::MLPRPropTrainer::MLPRPropTrainer(const MLPRPropTrainer& other):
 }
 
 train::MLPRPropTrainer& train::MLPRPropTrainer::operator=
-(const train::MLPRPropTrainer::MLPRPropTrainer& other) {
+(const train::MLPRPropTrainer& other) {
   m_train_bias = other.m_train_bias;
   m_H = other.m_H;
   m_weight_ref.resize(m_H + 1);

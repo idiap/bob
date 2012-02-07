@@ -33,10 +33,13 @@
 
 #include "core/array.h"
 
-extern "C" {
-#include <libavformat/avformat.h>
-#include <libswscale/swscale.h>
-}
+
+struct VideoReader;
+struct AVFormatContext;
+struct AVCodecContext;
+struct AVCodec;
+struct AVFrame;
+struct SwsContext;
 
 namespace bob { namespace io {
 

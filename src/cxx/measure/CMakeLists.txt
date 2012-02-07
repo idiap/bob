@@ -10,7 +10,4 @@ set(src
     "src/error.cc"
     )
 
-include(../../cmake/macros.cmake)
-bob_header_install(measure-cxx measure "bob::measure")
 bob_library(measure "${src}" "${deps}" "${shared}")
-add_dependencies(bob_measure measure-cxx_header_install)

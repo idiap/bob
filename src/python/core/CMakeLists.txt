@@ -26,19 +26,9 @@ set(pysrc_random
    "src/main_random.cc"
    )
 
-include(../../cmake/macros.cmake)
-
-bob_python_package_bindings(core "${pysrc}")
-
-bob_header_install(python-core core "bob::python::core")
-
-bob_python_submodule_bindings(core ndarray "${pysrc_ndarray}")
-add_dependencies(pybob_core_ndarray python-core_header_install)
-
-bob_python_submodule_bindings(core random "${pysrc_random}")
-add_dependencies(pybob_core_random python-core_header_install)
-
-bob_python_install(core)
+bob_python_package_bindings(core "${pysrc}" "")
+bob_python_submodule_bindings(core ndarray "${pysrc_ndarray}" "")
+bob_python_submodule_bindings(core random "${pysrc_random}" "")
 
 # Our test units
 bob_python_add_test(python-core-exception-tests 
@@ -48,5 +38,3 @@ bob_python_add_test(python-core-conversion-tests
 bob_python_add_test(python-core-info-table-test 
   ${CMAKE_CURRENT_SOURCE_DIR}/script/info_table.py)
 
-# Installs all python scripts
-file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")

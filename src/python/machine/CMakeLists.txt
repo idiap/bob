@@ -14,22 +14,16 @@ set(pysrc
    "src/version.cc"
    "src/main.cc"
    )
-
-include(../../cmake/macros.cmake)
-
 # If we have libsvm installed, enable the compilation of relevant modules
 if(LIBSVM_FOUND)
   include_directories(${LIBSVM_INCLUDE_DIR})
   set(pysrc "src/svm.cc;${pysrc}")
 endif()
 
-bob_python_package_bindings(machine "${pysrc}")
+bob_python_package_bindings(machine "${pysrc}" "core")
 
-add_dependencies(pybob_machine python-core_header_install)
-target_link_libraries(pybob_machine pybob_core_ndarray)
+target_link_libraries(pybob_machine pybob_core_ndarray)  
 
-bob_python_install(machine)
-  
 # Our test units
 bob_python_add_test(python-machine-kmeans-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_machine.py)

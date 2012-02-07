@@ -14,21 +14,14 @@ set(pysrc
    "src/main.cc"
    )
  
-include(../../cmake/macros.cmake)
-
 if(FFMPEG_FOUND)
   set(pysrc "${pysrc};src/video.cc")
 endif(FFMPEG_FOUND)
 
-bob_python_package_bindings(io "${pysrc}")
+add_definitions("-D__STDC_CONSTANT_MACROS")
 
-add_dependencies(pybob_io python-core_header_install)
+bob_python_package_bindings(io "${pysrc}" "core")
 target_link_libraries(pybob_io pybob_core_ndarray)
-
-bob_python_install(io)
-
-# Installs all python scripts
-file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")
 
 # Our test units
 bob_python_add_test(python-io-array-tests

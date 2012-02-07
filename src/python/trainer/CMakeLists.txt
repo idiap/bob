@@ -20,20 +20,11 @@ set(pysrc_overload
    "src/main_overload.cc"
    )
 
-include(../../cmake/macros.cmake)
-
-bob_python_package_bindings(trainer "${pysrc}") 
-
-add_dependencies(pybob_trainer python-core_header_install)
+bob_python_submodule_bindings(trainer overload "${pysrc_overload}" "machine")
+bob_python_package_bindings(trainer "${pysrc}" "core")
+target_link_libraries(pybob_trainer_overload pybob_core_ndarray)
 target_link_libraries(pybob_trainer pybob_core_ndarray)
 
-bob_python_submodule_bindings(trainer overload "${pysrc_overload}")
-
-target_link_libraries(pybob_trainer_overload pybob_core_ndarray)
-add_dependencies(pybob_trainer_overload python-core_header_install trainer-cxx_header_install)
-
-bob_python_install(trainer)
-  
 # Our test units
 bob_python_add_test(python-trainer-kmeans-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_trainer.py)
@@ -58,9 +49,3 @@ bob_python_add_test(python-trainer-plda-tests
 
 bob_python_add_test(python-trainer-gmm_train
   ${CMAKE_CURRENT_SOURCE_DIR}/script/gmm_train.py --self-test)
-
-# Installs all python scripts
-file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")
-
-# Our examples (run and install)
-#bob_example_install("python" "trainer" example/banca_dct_gmm.py)

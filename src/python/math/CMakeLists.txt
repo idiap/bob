@@ -9,13 +9,8 @@ set(pysrc
    "src/main.cc"
    )
  
-include(../../cmake/macros.cmake)
-
-bob_python_package_bindings(math "${pysrc}")
-add_dependencies(pybob_math python-core_header_install)
+bob_python_package_bindings(math "${pysrc}" "core")
 target_link_libraries(pybob_math pybob_core_ndarray)
-
-bob_python_install(math)
 
 # Our test units
 bob_python_add_test(python-math-interiorpointLP-tests

@@ -17,8 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "core/cast.h"
 #include "daq/VisionerFaceLocalization.h"
-#include <visioner/proc/detection.h>
+#include <detection.h>
 #include <ip/color.h>
 #include <ip/scale.h>
 #include <io/Array.h>

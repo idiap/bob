@@ -3,16 +3,21 @@ cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
 set(deps "") #other bob subprojects
-set(shared "${Boost_SYSTEM_LIBRARY_RELEASE};${Boost_THREAD_LIBRARY_RELEASE};${Boost_FILESYSTEM_LIBRARY_RELEASE};${Boost_IOSTREAMS_LIBRARY_RELEASE};${Boost_DATE_TIME_LIBRARY_RELEASE};${cblas_LIBRARIES};${Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE}")
+set(shared ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE}
+           ${Boost_FILESYSTEM_LIBRARY_RELEASE}
+           ${Boost_IOSTREAMS_LIBRARY_RELEASE} ${Boost_DATE_TIME_LIBRARY_RELEASE}
+           ${cblas_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE})
+
+string(TOLOWER "${CMAKE_BUILD_TYPE}" LOWER_BUILD_TYPE)
 # also add a dependency to Blitz in debug mode (needed to enable the -BZ_BLITZ debugging mode)
-if("${CMAKE_BUILD_TYPE}" STREQUAL "debug")
+if("${LOWER_BUILD_TYPE}" STREQUAL "debug")
   set(shared ${shared} ${Blitz_LIBRARIES})
-endif("${CMAKE_BUILD_TYPE}" STREQUAL "debug")
+endif()
 
 # If we have google-perftools installed, enable the HAS_GOOGLE_PERFTOOLS flag,
 # so profiling extensions can be compiled in.
 if(GOOGLE_PERFTOOLS_FOUND)
-  set(shared "${shared};${GOOGLE_PERFTOOLS_LIBRARIES}")
+  set(shared ${shared} ${GOOGLE_PERFTOOLS_LIBRARIES})
 endif(GOOGLE_PERFTOOLS_FOUND)
 
 # This defines the list of source files inside this package.
@@ -31,10 +36,7 @@ set(src
     "src/repmat_exception.cc"
     )
 
-include(../../cmake/macros.cmake)
-bob_header_install(core-cxx core "bob::core")
 bob_library(core "${src}" "${deps}" "${shared}")
-add_dependencies(bob_core core-cxx_header_install)
 
 # Defines tests for this package
 bob_test(core logging test/logging.cc)

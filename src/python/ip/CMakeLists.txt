@@ -31,21 +31,15 @@ set(pysrc
    "src/main.cc"
    )
 
-include(../../cmake/macros.cmake)
-
 # If we have VLFeat installed, enable the compilation of relevant modules
 if(VLFEAT_FOUND)
   include_directories(${VLFEAT_INCLUDE_DIR})
   set(pysrc "src/vlsift.cc;src/vldsift.cc;${pysrc}")
 endif()
 
-bob_python_package_bindings(ip "${pysrc}")
+bob_python_package_bindings(ip "${pysrc}" "core")
+target_link_libraries(pybob_ip pybob_core_ndarray)  
 
-add_dependencies(pybob_ip python-core_header_install)
-target_link_libraries(pybob_ip pybob_core_ndarray)
-
-bob_python_install(ip)
-  
 # Our test units
 bob_python_add_test(python-ip-lbp-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_lbp_new.py)
@@ -75,9 +69,6 @@ bob_python_add_test(python-ip-tantriggs
   ${CMAKE_CURRENT_SOURCE_DIR}/script/tantriggs.py --self-test)
 bob_python_add_test(python-ip-blockDCT
   ${CMAKE_CURRENT_SOURCE_DIR}/script/blockDCT.py --self-test)
-
-# Installs all python scripts
-file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")
 
 # Our examples (run and install)
 bob_python_add_test(python-ip-optflowHS-example

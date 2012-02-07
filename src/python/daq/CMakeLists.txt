@@ -7,8 +7,6 @@ set(pysrc
    "src/main.cc"
    )
 
-include(../../cmake/macros.cmake)
-
 if (V4L2_FOUND)
   add_definitions(-DV4L2)
 endif ()
@@ -22,13 +20,9 @@ include(${QT_USE_FILE})
 include_directories(${QT_INCLUDE_DIR})
 
 
-bob_python_package_bindings(daq "${pysrc}")
+bob_python_package_bindings(daq "${pysrc}" "io;visioner")
 
-add_dependencies(pybob_daq python-core_header_install)
-
-target_link_libraries(pybob_daq pybob_core_ndarray ${QT_LIBRARIES})
-
-bob_python_install(daq)
+target_link_libraries(pybob_daq ${QT_LIBRARIES})
 
 if (V4L2_FOUND)
   bob_example_install("python" "daq" example/capture.py)

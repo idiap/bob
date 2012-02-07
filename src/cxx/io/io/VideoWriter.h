@@ -30,10 +30,16 @@
 
 #include "core/array.h"
 
+
 extern "C" {
-#include <libavformat/avformat.h>
-#include <libswscale/swscale.h>
+#include <libavutil/pixfmt.h>
 }
+
+struct AVOutputFormat;
+struct AVFormatContext;
+struct AVStream;
+struct AVFrame;
+struct SwsContext;
 
 namespace bob { namespace io {
 

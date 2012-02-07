@@ -34,11 +34,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "io/VideoWriter.h"
+
 #include <boost/format.hpp>
 #include <boost/preprocessor.hpp>
 
-#include "io/VideoWriter.h"
 #include "io/VideoException.h"
+
+extern "C" {
+#include <libavformat/avformat.h>
+#include <libswscale/swscale.h>
+}
 
 namespace io = bob::io;
 namespace ca = bob::core::array;

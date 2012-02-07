@@ -6,14 +6,9 @@ set(pysrc
    "src/main.cc"
    )
 
-include(../../cmake/macros.cmake)
+bob_python_package_bindings(measure "${pysrc}" "core_ndarray")
+#target_link_libraries(pybob_measure pybob_core_ndarray)
 
-bob_python_package_bindings(measure "${pysrc}")
-add_dependencies(pybob_measure python-core_header_install)
-target_link_libraries(pybob_measure pybob_core_ndarray)
-
-bob_python_install(measure)
-  
 # Our test units
 bob_python_add_test(python-measure-error ${CMAKE_CURRENT_SOURCE_DIR}/test/test_error.py)
 
@@ -25,4 +20,3 @@ bob_python_add_test(python-measure-eval-threshold
 bob_python_add_test(python-measure-apply-threshold
   ${CMAKE_CURRENT_SOURCE_DIR}/script/apply_threshold.py --self-test)
 
-file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")

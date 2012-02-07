@@ -40,10 +40,7 @@ if(VLFEAT_FOUND)
   set(src "${src};src/VLSIFT.cc;src/VLDSIFT.cc")
 endif(VLFEAT_FOUND)
 
-include(../../cmake/macros.cmake)
-bob_header_install(ip-cxx ip "bob::ip")
 bob_library(ip "${src}" "${deps}" "${shared}")
-add_dependencies(bob_ip ip-cxx_header_install)
 
 # Defines tests for this package
 bob_test(ip block test/block.cc)

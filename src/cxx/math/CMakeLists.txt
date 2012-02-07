@@ -35,10 +35,7 @@ set(src
    "${src_lapack}"
    "${src_optimization}")
 
-include(../../cmake/macros.cmake)
-bob_header_install(math-cxx math "bob::math")
 bob_library(math "${src}" "${deps}" "${shared}")
-add_dependencies(bob_math math-cxx_header_install)
 
 # Defines tests for this package
 bob_test(math eig test/eig.cc)

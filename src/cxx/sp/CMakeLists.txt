@@ -17,10 +17,7 @@ set(src
     "src/DCT2D.cc"
     "src/DCT2DNaive.cc")
 
-include(../../cmake/macros.cmake)
-bob_header_install(sp-cxx sp "bob::sp")
 bob_library(sp "${src}" "${deps}" "${shared}")
-add_dependencies(bob_sp sp-cxx_header_install)
 
 # Defines tests for this package
 bob_test(sp convolution test/conv.cc)

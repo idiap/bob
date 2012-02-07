@@ -24,10 +24,7 @@ set(src
     "src/PLDATrainer.cc"
 )
 
-include(../../cmake/macros.cmake)
-bob_header_install(trainer-cxx trainer "bob::trainer")
 bob_library(trainer "${src}" "${deps}" "${shared}")
-add_dependencies(bob_trainer trainer-cxx_header_install)
 
 # Defines tests for this package
 bob_test(trainer jfa test/jfa.cc)

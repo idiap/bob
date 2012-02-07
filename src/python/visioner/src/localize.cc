@@ -29,8 +29,8 @@
 
 #include "core/array_assert.h"
 
-#include "visioner/proc/localization.h"
-#include "visioner/proc/detection.h"
+#include "localization.h"
+#include "detection.h"
 
 namespace bp = boost::python;
 namespace array = bob::core::array;

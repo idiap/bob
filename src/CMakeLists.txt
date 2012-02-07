@@ -16,31 +16,32 @@ if(APPLE)
   set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
 endif(APPLE)
 
-set(COMMON_FLAGS "${COMMON_FLAGS} -D__STDC_CONSTANT_MACROS -g -Wall -pedantic")
+set(COMMON_FLAGS "${COMMON_FLAGS} -pedantic -Wno-variadic-macros -Wno-long-long -Wall")
 
 if (CMAKE_COMPILER_IS_GNUCC)
 
   # Set the compiler flags and build type(release or debug)
   set(COMMON_FLAGS "${COMMON_FLAGS} -pthread")
 
-  set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -O2 -mtune=generic")
+  set(CMAKE_CXX_FLAGS_RELEASE "-O2 -mtune=generic -DNDEBUG")
 
-  set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -DBOB_DEBUG -DBZ_DEBUG")
-
-  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+  set(CMAKE_CXX_FLAGS_DEBUG "-g -DBOB_DEBUG -DBZ_DEBUG")
 
 else (CMAKE_COMPILER_IS_GNUCC)
 
   # Then, it must be clang/clang++
-  set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -O2 -mtune=generic")
+  set(CMAKE_CXX_FLAGS_RELEASE "-O2 -mtune=generic -DNDEBUG")
 
-  set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -DBOB_DEBUG -DBZ_DEBUG")
-
-  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+  set(CMAKE_CXX_FLAGS_DEBUG "-g -DBOB_DEBUG -DBZ_DEBUG")
 
 endif (CMAKE_COMPILER_IS_GNUCC)
+
+set(CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE} CACHE STRING "Flags used by the compiler during release builds" FORCE)
+set(CMAKE_C_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE} CACHE STRING "Flags used by the compiler during release builds" FORCE)
+set(CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG} CACHE STRING "Flags used by the compiler during debug builds." FORCE)
+set(CMAKE_C_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG} CACHE STRING "Flags used by the compiler during debug builds." FORCE)
+set(CMAKE_CXX_FLAGS ${COMMON_FLAGS} CACHE STRING "Flags used by the compiler during all build types." FORCE)
+set(CMAKE_C_FLAGS ${COMMON_FLAGS} CACHE STRING "Flags used by the compiler during all build types." FORCE)
 
 # This is our RPATH policy
 # use, i.e. don't skip the full RPATH for the build tree
@@ -77,11 +78,16 @@ install(FILES cmake/bob-external.cmake DESTINATION ${cmakedir})
 # Enables the testing framework
 enable_testing()
 
-# This makes sure we have all headers within reach before starting to compile
-include_directories(${CMAKE_INSTALL_PREFIX}/include/bob)
-
 # Some common definitions
 add_definitions("-DHAVE_LBFGS=1")
+
+include(cmake/macros.cmake)
+
+set(BOB_CXX "ON" CACHE BOOL "Compile C++ code")
+set(BOB_PYTHON "ON" CACHE BOOL "Compile python bindings")
+set(BUILD_SHARED_LIBS "ON" CACHE BOOL "Build shared libs")
+
+string(TOLOWER "${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_BUILD_TYPE}" BOB_PLATFORM)
 
 if (BOB_CXX)
   if (QT4_FOUND)

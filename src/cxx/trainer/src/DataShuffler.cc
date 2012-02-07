@@ -131,8 +131,7 @@ train::DataShuffler::DataShuffler(const train::DataShuffler& other):
 
 train::DataShuffler::~DataShuffler() { }
 
-train::DataShuffler& train::DataShuffler::operator= 
-(const train::DataShuffler::DataShuffler& other) {
+train::DataShuffler& train::DataShuffler::operator=(const train::DataShuffler& other) {
 
   m_data.resize(other.m_data.size());
   m_target.resize(other.m_target.size());

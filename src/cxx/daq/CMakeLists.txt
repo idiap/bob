@@ -2,7 +2,7 @@ project(daq-cxx)
 cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
-set(deps "visioner;core;ip;io") #other bob subprojects
+set(deps "visioner;ip;io") #other bob subprojects
 set(shared "")
 
 # If we have google-perftools installed, enable the HAS_GOOGLE_PERFTOOLS flag,
@@ -46,18 +46,13 @@ if (OPENCV_FOUND)
   list(APPEND shared ${OpenCV_LIBS})
 endif()
 
-
 include (${QT_USE_FILE})
-include_directories(${VISIONER_INCLUDE_DIRS} ${QT_INCLUDE_DIR})
+include_directories(${QT_INCLUDE_DIR})
 list(APPEND shared ${QT_LIBRARIES})
 
 qt4_wrap_cpp(MOC_SRC "daq/QtDisplay.h")
 list(INSERT src 0 "${MOC_SRC}")
 
-
-include(../../cmake/macros.cmake)
-bob_header_install(daq-cxx daq "bob::daq")
-bob_library(daq "${src}" "${deps}" "")
-target_link_libraries(bob_daq  ${shared})
+bob_library(daq "${src}" "${deps}" "${shared}")
 add_dependencies(bob_daq visioner)
 

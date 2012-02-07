@@ -112,7 +112,7 @@ train::MLPBackPropTrainer::MLPBackPropTrainer(const MLPBackPropTrainer& other):
 }
 
 train::MLPBackPropTrainer& train::MLPBackPropTrainer::operator=
-(const train::MLPBackPropTrainer::MLPBackPropTrainer& other) {
+(const train::MLPBackPropTrainer& other) {
   m_learning_rate = other.m_learning_rate;
   m_momentum = other.m_momentum;
   m_train_bias = other.m_train_bias;

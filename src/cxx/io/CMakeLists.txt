@@ -8,7 +8,7 @@ set(shared "${HDF5_hdf5_LIBRARY_RELEASE}")
 # If we have google-perftools installed, enable the HAS_GOOGLE_PERFTOOLS flag,
 # so profiling extensions can be compiled in.
 if(GOOGLE_PERFTOOLS_FOUND)
-  set(shared "${shared};${GOOGLE_PERFTOOLS_LIBRARIES}")
+  set(shared ${shared} ${GOOGLE_PERFTOOLS_LIBRARIES})
 endif(GOOGLE_PERFTOOLS_FOUND)
 
 # This defines the list of source files inside this package.
@@ -60,10 +60,9 @@ if(FFMPEG_FOUND)
   set(src "${src};src/VideoFile.cc")
 endif(FFMPEG_FOUND)
 
-include(../../cmake/macros.cmake)
-bob_header_install(io-cxx io "bob::io")
+add_definitions("-D__STDC_CONSTANT_MACROS")
+
 bob_library(io "${src}" "${deps}" "${shared}")
-add_dependencies(bob_io io-cxx_header_install)
 
 # Defines tests for this package
 bob_test(io array test/array.cc)

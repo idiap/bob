@@ -1,12 +1,8 @@
 project(db-python)
 cmake_minimum_required(VERSION 2.6)
 
-include(../../cmake/macros.cmake)
-
-bob_python_install(db)
-
-# Installs all python scripts
-file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")
+#bob_python_package_bindings(db "src/main.cc" "core")
+bob_python_package_bindings(db "" "core")
 
 # A macro for controlling creation, downloading and dependencies automatically
 # All tests should be dependent on the "${python-db-<dbname>-instantiation}" 

@@ -32,10 +32,7 @@ if(LIBSVM_FOUND)
   set(src "${src};src/SVM.cc")
 endif(LIBSVM_FOUND)
 
-include(../../cmake/macros.cmake)
-bob_header_install(machine-cxx machine "bob::machine")
 bob_library(machine "${src}" "${deps}" "${shared}")
-add_dependencies(bob_machine machine-cxx_header_install trainer-cxx_header_install)
 
 # Defines tests for this package
 bob_test(machine linear test/linear.cc)

@@ -35,6 +35,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "io/VideoReader.h"
+
 #include <stdexcept>
 #include <boost/format.hpp>
 #include <boost/preprocessor.hpp>
@@ -43,10 +45,11 @@
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavutil/avutil.h>
+#include <libavformat/avformat.h>
+#include <libswscale/swscale.h>
 }
 
 #include "core/array_check.h"
-#include "io/VideoReader.h"
 #include "io/Exception.h"
 #include "io/VideoException.h"
 #include "core/blitz_array.h"
