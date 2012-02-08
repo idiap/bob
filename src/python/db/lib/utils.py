@@ -158,38 +158,6 @@ def location_command(subparsers):
       help="prints the filepath or directory leading to the database with the specific database protocol prepended")
   parser.set_defaults(func=print_location)
 
-def copy(options):
-  """Copies the database to a given directory."""
-
-  import shutil
-  d = options.directory[0]
-  if not os.path.exists(d): os.makedirs(d)
-  dest = os.path.join(d, options.dbname + '.sql3')
-  if os.path.exists(dest): os.unlink(dest)
-  shutil.copy2(options.location.replace('sqlite:///',''), dest)
-
-def copy_command(subparsers):
-  
-  parser = subparsers.add_parser('copy', help=copy.__doc__)
-  parser.add_argument('directory', help="sets the directory to which the database will be copied to", nargs=1)
-  parser.set_defaults(func=copy)
-
-def standard_commands(subparsers):
-  """Adds all standard commands to databases that can respond to them."""
-
-  dbshell_command(subparsers)
-  download_command(subparsers)
-  location_command(subparsers)
-  copy_command(subparsers)
-
-def makedirs_safe(fulldir):
-  """Creates a directory if it does not exists, with concurrent access support"""
-  try:
-    if not os.path.exists(fulldir): os.makedirs(fulldir)
-  except OSError as exc: # Python >2.5
-    if exc.errno == errno.EEXIST: pass
-    else: raise
-
 def check_group_writeability(filename):
   """Applies group writeability if the directory containing the database has
   the write bit set, or at least tries to."""
@@ -204,3 +172,38 @@ def check_group_writeability(filename):
       os.chmod(filename, mode | stat.S_IWGRP)
     except OSError, ex:
       logging.warn("Cannot make '%s' group-writeable despite the fact its parent directory is group-writeable. This maybe a problem depending on your database setup. Please check." % filename)
+
+def makedirs_safe(fulldir):
+  """Creates a directory if it does not exists, with concurrent access support"""
+  try:
+    if not os.path.exists(fulldir): os.makedirs(fulldir)
+  except OSError as exc: # Python >2.5
+    if exc.errno == errno.EEXIST: pass
+    else: raise
+
+  check_group_writeability(fulldir)
+
+def copy(options):
+  """Copies the database to a given directory."""
+
+  import shutil
+  d = options.directory[0]
+  makedirs_safe(fulldir)
+  dest = os.path.join(d, options.dbname + '.sql3')
+  if os.path.exists(dest): os.unlink(dest)
+  shutil.copy2(options.location.replace('sqlite:///',''), dest)
+  check_group_writeability(dest)
+
+def copy_command(subparsers):
+  
+  parser = subparsers.add_parser('copy', help=copy.__doc__)
+  parser.add_argument('directory', help="sets the directory to which the database will be copied to", nargs=1)
+  parser.set_defaults(func=copy)
+
+def standard_commands(subparsers):
+  """Adds all standard commands to databases that can respond to them."""
+
+  dbshell_command(subparsers)
+  download_command(subparsers)
+  location_command(subparsers)
+  copy_command(subparsers)
