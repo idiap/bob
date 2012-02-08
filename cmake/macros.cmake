@@ -135,7 +135,7 @@ macro(bob_python_bindings cxx_package package src pydependencies)
   # Install scripts only if not a subpackage
   if (NOT "${package}" MATCHES "_")
     # Copy python files from lib folder
-    copy_files("${CMAKE_CURRENT_SOURCE_DIR}" "lib/*.py" "${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob/${cxx_package}"
+    copy_files("${CMAKE_CURRENT_SOURCE_DIR}/lib" "*.py" "${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob/${cxx_package}"
                "lib/python${PYTHON_VERSION}/bob/${cxx_package}" output_lib_files "pybob_${package}" FALSE)
 
     # Copy python files from script folder
