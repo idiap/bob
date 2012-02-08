@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/make_shared.hpp>
 #include "core/python/ndarray.h"
+#include <boost/make_shared.hpp>
 #include <boost/python/stl_iterator.hpp>
 #include "machine/MLP.h"
 #include "machine/MLPException.h"
