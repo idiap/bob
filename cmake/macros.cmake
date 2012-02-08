@@ -61,6 +61,37 @@ macro(copy_if_different target files destination)
   endforeach(file)
 endmacro()
 
+macro(copy_files input_dir regex output_dir install_dir output_files target program)
+  set(input_files "")
+  foreach(exp ${regex})
+    file(GLOB_RECURSE files RELATIVE "${input_dir}" "${input_dir}/${exp}")
+    list(APPEND input_files ${files})
+  endforeach()
+
+  set(${output_files} "")
+  foreach(input_file_rel ${input_files})
+    set(input_file "${input_dir}/${input_file_rel}")
+    set(output_file "${output_dir}/${input_file_rel}")
+
+    add_custom_command(OUTPUT "${output_file}"
+                       DEPENDS "${input_file}"
+                       COMMAND ${CMAKE_COMMAND} -E copy "${input_file}" "${output_file}"
+                       COMMENT "Copying ${input_file_rel} for ${target}")
+                       #COMMENT "") ## Use this one to remove output text
+
+    if (NOT install_dir STREQUAL "")
+      get_filename_component(rel_path ${input_file_rel} PATH)
+      if (program)
+        install(PROGRAM ${input_file} DESTINATION "${install_dir}/${rel_path}")
+      else()
+        install(FILES ${input_file} DESTINATION "${install_dir}/${rel_path}")
+      endif()
+    endif()
+
+    list(APPEND ${output_files} "${output_file}")
+  endforeach()
+endmacro()
+
 macro(bob_python_bindings cxx_package package src pydependencies)
   string(TOUPPER "${package}" PACKAGE)
   string(TOUPPER "${cxx_package}" CXX_PACKAGE)
@@ -101,17 +132,17 @@ macro(bob_python_bindings cxx_package package src pydependencies)
     install(TARGETS pybob_${package} LIBRARY DESTINATION lib)#lib/python${PYTHON_VERSION}/bob/${package_path})
   endif()
   
-  #file(GLOB lib_files "${CMAKE_CURRENT_SOURCE_DIR}/lib/*.py")
-  #copy_if_different(pybob_${package} "${lib_files}" "${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob/${cxx_package}")
-  add_custom_command(TARGET pybob_${package} POST_BUILD
-                     COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/lib" "${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob/${cxx_package}")
-  install(DIRECTORY lib/ DESTINATION lib/python${PYTHON_VERSION}/bob/${cxx_package} PATTERN *.py)
-  
-  # Installs all python scripts
-  file(GLOB scripts "${CMAKE_CURRENT_SOURCE_DIR}/script/*.py")
-  if (NOT "${scripts}" STREQUAL "")
-    install(PROGRAMS ${scripts} DESTINATION bin)
-    copy_if_different(pybob_${package} "${scripts}" "${CMAKE_BINARY_DIR}/bin")
+  # Install scripts only if not a subpackage
+  if (NOT "${package}" MATCHES "_")
+    # Copy python files from lib folder
+    copy_files("${CMAKE_CURRENT_SOURCE_DIR}" "lib/*.py" "${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob/${cxx_package}"
+               "lib/python${PYTHON_VERSION}/bob/${cxx_package}" output_lib_files "pybob_${package}" FALSE)
+
+    # Copy python files from script folder
+    copy_files("${CMAKE_CURRENT_SOURCE_DIR}/script" "*.py" "${CMAKE_BINARY_DIR}/bin" "bin" output_script_files "pybob_${package}" TRUE)
+    
+    add_custom_target(pybob_${package}_files DEPENDS ${output_lib_files} ${output_script_files})
+    add_dependencies(pybob_${package} pybob_${package}_files)
   endif()
 endmacro(bob_python_bindings)
 
