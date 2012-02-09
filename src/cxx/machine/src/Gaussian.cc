@@ -171,9 +171,7 @@ void mach::Gaussian::setVarianceThresholds(double factor) {
 
 void mach::Gaussian::applyVarianceThresholds() {
    // Apply variance flooring threshold
-  blitz::Array<bool,1> isTooSmall(m_n_inputs);
-  isTooSmall = m_variance < m_variance_thresholds;
-  m_variance += (m_variance_thresholds - m_variance) * isTooSmall;
+  m_variance = blitz::where( m_variance < m_variance_thresholds, m_variance_thresholds, m_variance);
 
   // Re-compute g_norm, because m_variance has changed
   preComputeConstants(); 
