@@ -20,6 +20,7 @@
 
 #include "machine/ZTNorm.h"
 #include "core/array_assert.h"
+#include <limits>
 
 namespace bob { 
 namespace machine {
@@ -30,7 +31,7 @@ namespace detail {
               const blitz::Array<double, 2>& rawscores_probes_vs_tmodels,
               const blitz::Array<double, 2>& rawscores_zprobes_vs_tmodels,
               const blitz::Array<bool, 2>*  mask_zprobes_vs_tmodels_istruetrial,
-              blitz::Array<double, 2>& scores) 
+              blitz::Array<double, 2>& scores)
   {
     // Rename variables
     const blitz::Array<double, 2>& A = rawscores_probes_vs_models;
@@ -69,6 +70,8 @@ namespace detail {
     blitz::firstIndex i;
     blitz::secondIndex j;
 
+    // Constant to check if the std is close to 0. 
+    const double eps = std::numeric_limits<double>::min();
     
     // Znorm  -->      zA  = (A - mean(B) ) / std(B)    [znorm on oringinal scores]
     // mean(B)
@@ -77,7 +80,12 @@ namespace detail {
     blitz::Array<double, 2> B2n(B.shape());
     B2n = blitz::pow2(B(i, j) - mean_B(i));
     blitz::Array<double, 1> std_B(B.extent(0));
-    std_B = blitz::sqrt(blitz::sum(B2n, j) / (size_znorm - 1));
+    if(size_znorm>1)
+      std_B = blitz::sqrt(blitz::sum(B2n, j) / (size_znorm - 1));
+    else // 1 single value -> std = 0
+      std_B = 0; 
+    std_B = blitz::where( std_B <= eps, 1., std_B);
+
     // zA
     blitz::Array<double, 2> zA(A.shape());
     zA = (A(i, j) - mean_B(i)) / std_B(i);
@@ -101,11 +109,14 @@ namespace detail {
         count += keep;
       }
 
-      // TODO We assume that count is > 0
       double mean = sum / count;
       mean_Dimp(i) = mean;
-      std_Dimp(i) = sqrt((sumsq - count * mean * mean) / (count -1));
+      if(count > 1)
+        std_Dimp(i) = sqrt((sumsq - count * mean * mean) / (count -1));
+      else // 1 single value -> std = 0
+        std_Dimp(i) = 0;
     }
+    std_Dimp = blitz::where( std_Dimp <= eps, 1., std_Dimp);
 
     // zC  = (C - mean(D)) / std(D)     [znorm the tnorm scores]
     blitz::Array<double, 2> zC(size_tnorm, size_enrol);
@@ -116,7 +127,13 @@ namespace detail {
     
     // ztA = (zA - mean(zC)) / std(zC)  [ztnorm on eval scores]
     mean_zC = blitz::mean(zC(j, i), j);
-    std_zC = sqrt(blitz::sum(pow(zC(j, i) - mean_zC(i), 2) , j) / (size_tnorm - 1));
+    if(size_tnorm > 1)
+      std_zC = sqrt(blitz::sum(pow(zC(j, i) - mean_zC(i), 2) , j) / (size_tnorm - 1));
+    else // 1 single value -> std = 0
+      std_zC = 0;
+    std_zC = blitz::where( std_zC <= eps, 1., std_zC);
+
+    // Normalised scores
     scores = (zA(i, j) - mean_zC(j)) /  std_zC(j);
   }
 }
@@ -127,7 +144,7 @@ void ztNorm(const blitz::Array<double, 2>& rawscores_probes_vs_models,
             const blitz::Array<double, 2>& rawscores_probes_vs_tmodels,
             const blitz::Array<double, 2>& rawscores_zprobes_vs_tmodels,
             const blitz::Array<bool,   2>& mask_zprobes_vs_tmodels_istruetrial,
-            blitz::Array<double, 2>& scores) 
+            blitz::Array<double, 2>& scores)
 {
   detail::ztNorm(rawscores_probes_vs_models, rawscores_zprobes_vs_models, rawscores_probes_vs_tmodels,
                  rawscores_zprobes_vs_tmodels, &mask_zprobes_vs_tmodels_istruetrial, scores);
@@ -137,7 +154,7 @@ void ztNorm(const blitz::Array<double, 2>& rawscores_probes_vs_models,
             const blitz::Array<double, 2>& rawscores_zprobes_vs_models,
             const blitz::Array<double, 2>& rawscores_probes_vs_tmodels,
             const blitz::Array<double, 2>& rawscores_zprobes_vs_tmodels,
-            blitz::Array<double, 2>& scores) 
+            blitz::Array<double, 2>& scores)
 {
   detail::ztNorm(rawscores_probes_vs_models, rawscores_zprobes_vs_models, rawscores_probes_vs_tmodels,
                  rawscores_zprobes_vs_tmodels, NULL, scores);
