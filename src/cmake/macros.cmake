@@ -107,7 +107,7 @@ macro(bob_python_bindings cxx_package package src pydependencies)
   #copy_if_different(pybob_${package} "${lib_files}" "${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob/${cxx_package}")
   add_custom_command(TARGET pybob_${package} POST_BUILD
                      COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/lib" "${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob/${cxx_package}")
-  install(DIRECTORY lib/ DESTINATION lib/python${PYTHON_VERSION}/bob/${cxx_package} PATTERN *.py)
+  install(DIRECTORY "${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob/${cxx_package}" DESTINATION lib/python${PYTHON_VERSION}/bob)
   
   # Installs all python scripts
   file(GLOB scripts "${CMAKE_CURRENT_SOURCE_DIR}/script/*.py")
