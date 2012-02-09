@@ -188,7 +188,7 @@ def copy(options):
 
   import shutil
   d = options.directory[0]
-  makedirs_safe(fulldir)
+  makedirs_safe(d)
   dest = os.path.join(d, options.dbname + '.sql3')
   if os.path.exists(dest): os.unlink(dest)
   shutil.copy2(options.location.replace('sqlite:///',''), dest)
