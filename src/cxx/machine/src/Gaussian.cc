@@ -163,9 +163,9 @@ void mach::Gaussian::setVarianceThresholds(const blitz::Array<double,1> &varianc
   applyVarianceThresholds();
 }
 
-void mach::Gaussian::setVarianceThresholds(double factor) {
+void mach::Gaussian::setVarianceThresholds(double value) {
   blitz::Array<double,1> variance_thresholds(m_n_inputs);
-  variance_thresholds = m_variance * factor;
+  variance_thresholds = value;
   setVarianceThresholds(variance_thresholds);
 }
 

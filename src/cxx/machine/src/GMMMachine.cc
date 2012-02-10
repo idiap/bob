@@ -181,9 +181,9 @@ void mach::GMMMachine::getVarianceSupervector(blitz::Array<double,1> &variance_s
   }
 }
 
-void mach::GMMMachine::setVarianceThresholds(double factor) {
+void mach::GMMMachine::setVarianceThresholds(double value) {
   for(size_t i=0; i<m_n_gaussians; ++i) 
-    m_gaussians[i]->setVarianceThresholds(factor);
+    m_gaussians[i]->setVarianceThresholds(value);
   m_cache_supervector = false;
 }
 

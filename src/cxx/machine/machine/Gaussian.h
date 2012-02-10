@@ -161,7 +161,7 @@ class Gaussian {
     /**
      * Set the variance flooring thresholds
      */
-    void setVarianceThresholds(double factor);
+    void setVarianceThresholds(double value);
 
     /**
      * Apply the variance flooring thresholds

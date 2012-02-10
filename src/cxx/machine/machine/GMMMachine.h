@@ -164,9 +164,8 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double> {
     
     /**
      * Set the variance flooring thresholds in each dimension 
-     * to a proportion of the current variance, for each Gaussian
      */
-    void setVarianceThresholds(double factor);
+    void setVarianceThresholds(double value);
     /**
      * Set the variance flooring thresholds in each dimension
      * (equal for all Gaussian components)
