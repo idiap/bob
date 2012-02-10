@@ -21,53 +21,12 @@
 #include "machine/Gaussian.h"
 
 #include "core/array_assert.h"
-#include "machine/Exception.h"
+#include "math/log.h"
 
 namespace ca = bob::core::array;
+namespace mathL = bob::math::Log;
 namespace mach = bob::machine;
 namespace io = bob::io;
-
-double mach::Log::LogAdd(double log_a, double log_b) {
-  double minusdif;
-
-  if (log_a < log_b)
-  {
-    double tmp = log_a;
-    log_a = log_b;
-    log_b = tmp;
-  }
-
-  minusdif = log_b - log_a;
-  //#ifdef DEBUG
-  if (std::isnan(minusdif)) {
-    printf("LogAdd: minusdif (%f) log_b (%f) or log_a (%f) is nan\n", minusdif, log_b, log_a);
-    throw mach::Exception();
-  }
-  //#endif
-  if (minusdif < MINUS_LOG_THRESHOLD) return log_a;
-  else return log_a + log1p(exp(minusdif));
-}
-
-double mach::Log::LogSub(double log_a, double log_b) {
-  double minusdif;
-
-  if (log_a < log_b) {
-    printf("LogSub: log_a (%f) should be greater than log_b (%f)", log_a, log_b);
-    throw mach::Exception();
-  }
-
-  minusdif = log_b - log_a;
-  //#ifdef DEBUG
-  if (std::isnan(minusdif)) {
-    printf("LogSub: minusdif (%f) log_b (%f) or log_a (%f) is nan", minusdif, log_b, log_a);
-    throw mach::Exception();
-  }
-  //#endif
-  if (log_a == log_b) return LogZero;
-  else if (minusdif < MINUS_LOG_THRESHOLD) return log_a;
-  else return log_a + log1p(-exp(minusdif));
-}
-
 
 mach::Gaussian::Gaussian() {
   resize(0);
@@ -190,7 +149,7 @@ double mach::Gaussian::logLikelihood_(const blitz::Array<double,1> &x) const {
 }
 
 void mach::Gaussian::preComputeNLog2Pi() {
-  m_n_log2pi = m_n_inputs * mach::Log::Log2Pi;
+  m_n_log2pi = m_n_inputs * mathL::Log2Pi;
 }
 
 void mach::Gaussian::preComputeConstants() {

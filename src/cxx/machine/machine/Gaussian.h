@@ -28,18 +28,6 @@
 namespace bob {
 namespace machine {
 
-namespace Log
-{
-  #define MINUS_LOG_THRESHOLD -39.14
-  
-  const double Log2Pi = 1.83787706640934548355;
-  const double LogZero = -std::numeric_limits<double>::max();
-  const double LogOne = 0;
-  
-  double LogAdd(double log_a, double log_b);
-  double LogSub(double log_a, double log_b);
-}
-
 /**
  * @brief This class implements a multivariate diagonal Gaussian distribution. 
  */

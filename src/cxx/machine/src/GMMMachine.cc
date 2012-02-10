@@ -21,10 +21,11 @@
 #include "core/array_assert.h"
 #include "core/logging.h"
 #include "machine/Exception.h"
+#include "math/log.h"
 
 namespace ca = bob::core::array;
-namespace TLog = bob::machine::Log;
 namespace mach = bob::machine;
+namespace mathL = bob::math::Log;
 
 mach::GMMMachine::GMMMachine(): m_gaussians(0) {
   resize(0,0);
@@ -222,13 +223,13 @@ double mach::GMMMachine::logLikelihood_(const blitz::Array<double, 1> &x,
   blitz::Array<double,1> &log_weighted_gaussian_likelihoods) const 
 {
   // Initialise variables
-  double log_likelihood = TLog::LogZero;
+  double log_likelihood = mathL::LogZero;
 
   // Accumulate the weighted log likelihoods from each Gaussian
   for(size_t i=0; i<m_n_gaussians; ++i) {
     double l = log(m_weights(i)) + m_gaussians[i]->logLikelihood_(x);
     log_weighted_gaussian_likelihoods(i) = l;
-    log_likelihood = TLog::LogAdd(log_likelihood, l);
+    log_likelihood = mathL::logAdd(log_likelihood, l);
   }
 
   // Return log(p(x|GMMMachine))
