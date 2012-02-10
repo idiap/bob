@@ -37,8 +37,10 @@ bob_python_add_test(python-machine-plda-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_plda.py)
 bob_python_add_test(python-machine-ztnorm-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_ztnorm.py)
-bob_python_add_test(python-machine-svm-tests
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_svm.py)
+if(LIBSVM_FOUND)
+  bob_python_add_test(python-machine-svm-tests
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_svm.py)
+endif()
 
 # Installs all python scripts
 #file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")
