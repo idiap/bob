@@ -8,20 +8,20 @@ import sys, ctypes
 default_flags = sys.getdlopenflags()
 sys.setdlopenflags(default_flags|ctypes.RTLD_GLOBAL)
 
-import core
-import io
-import math
-import measure
-import sp
-import ip
-import db
-import machine
-import trainer
-import daq
+from . import core
+from . import io
+from . import math
+from . import measure
+from . import sp
+from . import ip
+from . import db
+from . import machine
+from . import trainer
+from . import daq
 
 try:
   # the visioner may not be built if Qt4 is not installed
-  import visioner
+  from . import visioner
   has_visioner = True
 except ImportError:
   has_visioner = False
