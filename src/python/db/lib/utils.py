@@ -162,8 +162,12 @@ def check_group_writeability(filename):
   """Applies group writeability if the directory containing the database has
   the write bit set, or at least tries to."""
 
+  # only checks if this is not a relative path with no parents
+  dirname = os.path.dirname(filename)
+  if not dirname: return
+
   # extracts the current mode of the parent directory
-  mode = os.stat(os.path.dirname(filename)).st_mode
+  mode = os.stat(dirname).st_mode
 
   # if the mode of the directory sets group to be writeable, try to apply this
   # to the given file as well.
