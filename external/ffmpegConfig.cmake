@@ -27,7 +27,7 @@ if(FFMPEG_FOUND)
   add_definitions("-DHAVE_FFMPEG=1")
 
   # Setup the FFMPEG "official version"
-  execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/bin/ffmpeg-version.sh OUTPUT_VARIABLE FFMPEG_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+  execute_process(COMMAND ${bob_SOURCE_DIR}/bin/ffmpeg-version.sh OUTPUT_VARIABLE FFMPEG_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
   add_definitions("-DFFMPEG_VERSION=\"${FFMPEG_VERSION}\"")
 
   find_package_message(FFMPEG "Found FFmpeg ${FFMPEG_VERSION}" "[${FFMPEG_LIBRARY_DIRS}][${FFMPEG_VERSION}]")
