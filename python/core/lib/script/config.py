@@ -95,6 +95,7 @@ def print_codecs():
     print fmt % (k.ljust(packsize), v.ljust(descsize))
   print sep
 
-version_table()
-print_codecs()
-sys.exit(0)
+def main():
+  version_table()
+  print_codecs()
+  sys.exit(0)

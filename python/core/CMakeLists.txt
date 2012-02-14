@@ -30,11 +30,15 @@ bob_python_package_bindings(core "${pysrc}" "")
 bob_python_submodule_bindings(core array "${pysrc_ndarray}" "")
 bob_python_submodule_bindings(core random "${pysrc_random}" "")
 
+# Installs our scripts
+bob_python_script(core "bob_config.py" "lib/script/config.py" "main")
+
 # Our test units
 bob_python_add_test(python-core-exception-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_exception.py)
 bob_python_add_test(python-core-conversion-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_convert.py)
-bob_python_add_test(python-core-info-table-test 
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/info_table.py)
 
+# TODO: Re-generate the test...
+#bob_python_add_test(python-core-info-table-test 
+#  ${CMAKE_CURRENT_SOURCE_DIR}/script/info_table.py)

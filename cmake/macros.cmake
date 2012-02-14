@@ -29,7 +29,6 @@ macro(bob_library package src dependencies shared)
   install(DIRECTORY ${package} DESTINATION include/bob FILES_MATCHING PATTERN "*.h")
 endmacro(bob_library)
 
-
 # Creates a standard Bob test.
 macro(bob_test package name src)
   set(testname bobtest_${package}_${name})
@@ -41,7 +40,6 @@ macro(bob_test package name src)
   set_property(TEST cxx-${package}-${name} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 endmacro(bob_test package src)
 
-
 # Creates a standard Bob benchmark.
 macro(bob_benchmark package name src)
   set(bindir bin)
@@ -52,7 +50,7 @@ macro(bob_benchmark package name src)
   install(TARGETS ${progname} RUNTIME DESTINATION ${bindir})
 endmacro(bob_benchmark package name src)
 
-
+# Copies files from one location to another iff they are different.
 macro(copy_if_different target files destination)
   foreach(file ${files})
     get_filename_component(file_name ${file} NAME)
@@ -61,7 +59,12 @@ macro(copy_if_different target files destination)
   endforeach(file)
 endmacro()
 
+# Creates rules to install a (list of) regular expression filenames to both the
+# build and installation directories. The files are taken recursively using the
+# "input_dir" variable as the root of the source directory that is going to be
+# scanned.
 macro(copy_files input_dir regex output_dir install_dir output_files target program)
+
   set(input_files "")
   foreach(exp ${regex})
     file(GLOB_RECURSE files RELATIVE "${input_dir}" "${input_dir}/${exp}")
@@ -69,28 +72,62 @@ macro(copy_files input_dir regex output_dir install_dir output_files target prog
   endforeach()
 
   set(${output_files} "")
+
   foreach(input_file_rel ${input_files})
+
     set(input_file "${input_dir}/${input_file_rel}")
     set(output_file "${output_dir}/${input_file_rel}")
 
-    add_custom_command(OUTPUT "${output_file}"
-                       DEPENDS "${input_file}"
-                       COMMAND ${CMAKE_COMMAND} -E copy "${input_file}" "${output_file}"
-                       COMMENT "Copying ${input_file_rel} for ${target}")
-                       #COMMENT "") ## Use this one to remove output text
+    add_custom_command(
+      OUTPUT "${output_file}"
+      DEPENDS "${input_file}"
+      COMMAND ${CMAKE_COMMAND} -E copy "${input_file}" "${output_file}"
+      COMMENT "Copying ${input_file_rel} for ${target}")
+      #COMMENT "") ## Use this one to remove output text
 
+    # If an installation directory was specified
     if (NOT install_dir STREQUAL "")
+
       get_filename_component(rel_path ${input_file_rel} PATH)
       if (program)
         install(PROGRAM ${input_file} DESTINATION "${install_dir}/${rel_path}")
-      else()
+      else(program)
         install(FILES ${input_file} DESTINATION "${install_dir}/${rel_path}")
-      endif()
-    endif()
+      endif(program)
+
+    endif (NOT install_dir STREQUAL "")
 
     list(APPEND ${output_files} "${output_file}")
-  endforeach()
+  
+    endforeach(input_file_rel ${input_files})
+
 endmacro()
+
+# Builds and installs a new script similar to what setuptools do for the
+# command section of a setup.py build recipe.
+macro(bob_python_script package_name script_name python_module python_method)
+
+  # figures out the module name from the input file dependence name
+  string(REPLACE ".py" "" module_name "${python_module}")
+  string(REPLACE "/" "." module_name "${module_name}")
+  string(REPLACE "lib." "bob.${package_name}." module_name "${module_name}")
+
+  # the output will always go to the bin directory
+  set(output_file "bin/${script_name}")
+
+  message( STATUS "Will execute: ${PYTHON_EXECUTABLE} ${bob_SOURCE_DIR}/bin/make_wrapper.py ${PYTHON_EXECUTABLE} ${BOB_VERSION} ${module_name} ${python_method} ${output_file}")
+
+  add_custom_command(
+    OUTPUT "${output_file}"
+    #TARGET pybob_${package_name} POST_BUILD
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${python_module}"
+    COMMAND ${PYTHON_EXECUTABLE} ${bob_SOURCE_DIR}/bin/make_wrapper.py "${BOB_VERSION}" "${module_name}" "${python_method}" "${output_file}"
+    COMMENT "Generating script ${output_file}")
+
+  # adds the dependence from the package to the installation of this script
+  add_dependencies(pybob_${package_name} ${output_file})
+
+endmacro(bob_python_script python_module python_method)
 
 macro(bob_python_bindings cxx_package package src pydependencies)
   string(TOUPPER "${package}" PACKAGE)
@@ -132,16 +169,31 @@ macro(bob_python_bindings cxx_package package src pydependencies)
   
   # Install scripts only if not a subpackage
   if (NOT "${package}" MATCHES "_")
-    # Copy python files from lib folder
-    copy_files("${CMAKE_CURRENT_SOURCE_DIR}/lib" "*.py" "${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob/${cxx_package}"
-               "lib/python${PYTHON_VERSION}/bob/${cxx_package}" output_lib_files "pybob_${package}" FALSE)
 
-    # Copy python files from script folder
-    copy_files("${CMAKE_CURRENT_SOURCE_DIR}/script" "*.py" "${CMAKE_BINARY_DIR}/bin" "bin" output_script_files "pybob_${package}" TRUE)
-    
+    # Setups rules to copy python files from lib folder to the build and
+    # installation directories
+    copy_files("${CMAKE_CURRENT_SOURCE_DIR}/lib" "*.py"
+      "${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob/${cxx_package}"
+      "lib/python${PYTHON_VERSION}/bob/${cxx_package}"
+      output_lib_files
+      "pybob_${package}"
+      FALSE)
+
+    # Setups rules to copy python files from script folder to the build and
+    # installation directories
+    copy_files("${CMAKE_CURRENT_SOURCE_DIR}/script" "*.py"
+      "${CMAKE_BINARY_DIR}/bin"
+      "bin"
+      output_script_files
+      "pybob_${package}"
+      TRUE)
+
+    # Adds the installation of all output files as a dependence to the package
     add_custom_target(pybob_${package}_files DEPENDS ${output_lib_files} ${output_script_files})
     add_dependencies(pybob_${package} pybob_${package}_files)
+
   endif()
+
 endmacro(bob_python_bindings)
 
 macro(bob_python_package_bindings package src pydependencies)
@@ -155,22 +207,29 @@ endmacro(bob_python_submodule_bindings)
 
 # This macro helps users to add python tests to cmake
 function(bob_python_add_test)
+
   add_test(${ARGV})
 
   if (APPLE)
+
     # In OSX dlopen @ python requires the dyld path to be correctly set
     # for any C/C++ bindings you may have. It does not use the rpath for
     # some obscure reason - AA
     set_property(TEST ${ARGV0} APPEND PROPERTY ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}:$ENV{PYTHONPATH}")
     set_property(TEST ${ARGV0} APPEND PROPERTY ENVIRONMENT "DYLD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/lib:$ENV{DYLD_LIBRARY_PATH}")
-  else ()
+
+  else (APPLE)
+
     # This must be Linux...
     set_property(TEST ${ARGV0} APPEND PROPERTY ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}:$ENV{PYTHONPATH}")
-  endif ()
 
+  endif (APPLE)
+
+  # Common properties to all tests
   set_property(TEST ${ARGV0} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
   set_property(TEST ${ARGV0} APPEND PROPERTY ENVIRONMENT "BOB_VERSION=${BOB_VERSION}")
   set_property(TEST ${ARGV0} APPEND PROPERTY ENVIRONMENT "BOB_PLATFORM=${BOB_PLATFORM}")
+
 endfunction(bob_python_add_test)
 
 # This macro installs an example in a standard location
