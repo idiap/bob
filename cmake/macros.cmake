@@ -78,6 +78,7 @@ macro(copy_files input_dir regex output_dir install_dir output_files target prog
     set(input_file "${input_dir}/${input_file_rel}")
     set(output_file "${output_dir}/${input_file_rel}")
 
+    # This will copy the file so it can be used during testing
     add_custom_command(
       OUTPUT "${output_file}"
       DEPENDS "${input_file}"
@@ -89,6 +90,8 @@ macro(copy_files input_dir regex output_dir install_dir output_files target prog
     if (NOT install_dir STREQUAL "")
 
       get_filename_component(rel_path ${input_file_rel} PATH)
+
+      # This will actually have the file installed
       if (program)
         install(PROGRAM ${input_file} DESTINATION "${install_dir}/${rel_path}")
       else(program)
@@ -112,20 +115,19 @@ macro(bob_python_script package_name script_name python_module python_method)
   string(REPLACE "/" "." module_name "${module_name}")
   string(REPLACE "lib." "bob.${package_name}." module_name "${module_name}")
 
-  # the output will always go to the bin directory
-  set(output_file "bin/${script_name}")
-
-  message( STATUS "Will execute: ${PYTHON_EXECUTABLE} ${bob_SOURCE_DIR}/bin/make_wrapper.py ${PYTHON_EXECUTABLE} ${BOB_VERSION} ${module_name} ${python_method} ${output_file}")
-
   add_custom_command(
-    OUTPUT "${output_file}"
-    #TARGET pybob_${package_name} POST_BUILD
-    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${python_module}"
-    COMMAND ${PYTHON_EXECUTABLE} ${bob_SOURCE_DIR}/bin/make_wrapper.py "${BOB_VERSION}" "${module_name}" "${python_method}" "${output_file}"
-    COMMENT "Generating script ${output_file}")
+    OUTPUT "${script_name}" 
+    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bin/make_wrapper.py "${BOB_VERSION}" "${module_name}" "${python_method}" "${script_name}"
+    DEPENDS "${CMAKE_SOURCE_DIR}/bin/make_wrapper.py" "${python_module}"
+    COMMENT "Generating script ${script_name}")
 
-  # adds the dependence from the package to the installation of this script
-  add_dependencies(pybob_${package_name} ${output_file})
+  get_filename_component(script_basename ${script_name} NAME_WE)
+
+  add_custom_target(script_${script_basename} DEPENDS "${script_name}")
+  add_dependencies(pybob_${package_name} script_${script_basename})
+
+  # this will make the script available to the installation tree
+  install(PROGRAMS ${script_name} DESTINATION bin)
 
 endmacro(bob_python_script python_module python_method)
 
@@ -151,9 +153,11 @@ macro(bob_python_bindings cxx_package package src pydependencies)
 
   if ("${src}" STREQUAL "")
     add_custom_target(pybob_${package} ALL)
+    message("-- adding target pybob_${package}...")
     ## TODO Add correct dependencies
   else()
     add_library(pybob_${package} SHARED ${src})
+    message("-- adding target pybob_${package}...")
 
     target_link_libraries(pybob_${package} bob_${cxx_package} ${Boost_PYTHON_LIBRARY_RELEASE} ${PYTHON_LIBRARIES})
     set(pycxx_flags "-Wno-long-long -Wno-unused-function -Winvalid-pch")
