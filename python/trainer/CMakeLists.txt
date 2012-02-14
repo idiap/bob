@@ -1,7 +1,7 @@
 project(trainer-python)
 cmake_minimum_required(VERSION 2.6)
 
-set(pysrc
+set(ccsrc
    "src/linear.cc"
    "src/kmeans.cc"
    "src/gmm.cc"
@@ -14,14 +14,19 @@ set(pysrc
    "src/main.cc"
    )
 
-set(pysrc_overload
+set(ccsrc_overload
    "src/kmeans_wrappers.cc"
    "src/gmm_wrappers.cc"
    "src/main_overload.cc"
    )
 
-bob_python_submodule_bindings(trainer overload "${pysrc_overload}" "core_array")
-bob_python_package_bindings(trainer "${pysrc}" "core_array")
+set(pysrc
+   "lib/__init__.py"
+   "lib/overload/__init__.py"
+   )
+
+bob_python_package_bindings(trainer "${ccsrc}" "${pysrc}" "core_array")
+bob_python_submodule_bindings(trainer overload "${ccsrc_overload}" "core_array")
 
 # Our test units
 bob_python_add_test(python-trainer-kmeans-tests 

@@ -1,7 +1,7 @@
 project(machine-python)
 cmake_minimum_required(VERSION 2.6)
 
-set(pysrc
+set(ccsrc
    "src/gmm.cc"
    "src/activation.cc"
    "src/linear.cc"
@@ -17,10 +17,14 @@ set(pysrc
 # If we have libsvm installed, enable the compilation of relevant modules
 if(LIBSVM_FOUND)
   include_directories(${LIBSVM_INCLUDE_DIR})
-  set(pysrc "src/svm.cc;${pysrc}")
+  set(ccsrc "src/svm.cc;${ccsrc}")
 endif()
 
-bob_python_package_bindings(machine "${pysrc}" "core_array")
+set(pysrc
+   "lib/__init__.py"
+   )
+
+bob_python_package_bindings(machine "${ccsrc}" "${pysrc}" "core_array")
 
 # Our test units
 bob_python_add_test(python-machine-kmeans-tests 

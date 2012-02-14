@@ -1,10 +1,14 @@
 project(daq-python)
 cmake_minimum_required(VERSION 2.6)
 
-set(pysrc
+set(ccsrc
    "src/version.cc"
    "src/all.cc"
    "src/main.cc"
+   )
+
+set(pysrc
+   "lib/__init__.py"
    )
 
 if (V4L2_FOUND)
@@ -19,7 +23,7 @@ endif()
 include(${QT_USE_FILE})
 include_directories(${QT_INCLUDE_DIR})
 
-bob_python_package_bindings(daq "${pysrc}" "core_array")
+bob_python_package_bindings(daq "${ccsrc}" "${pysrc}" "core_array")
 
 target_link_libraries(pybob_daq ${QT_LIBRARIES})
 

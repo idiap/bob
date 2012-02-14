@@ -1,14 +1,18 @@
 project(sp-python)
 cmake_minimum_required(VERSION 2.6)
 
-set(pysrc
+set(ccsrc
    "src/version.cc"
    "src/extrapolate.cc"
    "src/fft_dct.cc"
    "src/main.cc"
    )
 
-bob_python_package_bindings(sp "${pysrc}" "core_array")
+set(pysrc
+   "lib/__init__.py"
+   )
+
+bob_python_package_bindings(sp "${ccsrc}" "${pysrc}" "core_array")
 
 # Our test units
 bob_python_add_test(python-sp-fft_dct-tests 

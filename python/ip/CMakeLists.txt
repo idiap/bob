@@ -1,7 +1,7 @@
 project(ip-python)
 cmake_minimum_required(VERSION 2.6)
 
-set(pysrc
+set(ccsrc
    "src/version.cc"
    "src/color.cc"
    "src/block.cc"
@@ -34,10 +34,15 @@ set(pysrc
 # If we have VLFeat installed, enable the compilation of relevant modules
 if(VLFEAT_FOUND)
   include_directories(${VLFEAT_INCLUDE_DIR})
-  set(pysrc "src/vlsift.cc;src/vldsift.cc;${pysrc}")
+  set(ccsrc "src/vlsift.cc;src/vldsift.cc;${ccsrc}")
 endif()
 
-bob_python_package_bindings(ip "${pysrc}" "core_array")
+set(pysrc
+   "lib/__init__.py"
+   "lib/flowutils.py"
+   )
+
+bob_python_package_bindings(ip "${ccsrc}" "${pysrc}" "core_array")
 
 # Our test units
 bob_python_add_test(python-ip-lbp-tests 

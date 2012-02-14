@@ -90,10 +90,6 @@ def main():
   f.close()
   del f
 
-  # Print current environment
-  for key, value in os.environ.iteritems():
-    print "%s: %s" % (key, value)
-
   # Set execution bit, depending on the read mode for user, group and others
   mode = os.stat(args.output).st_mode
   if mode & stat.S_IRUSR: 

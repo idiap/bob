@@ -1,13 +1,17 @@
 project(visioner-python)
 cmake_minimum_required(VERSION 2.6)
 
-set(pysrc
+set(ccsrc
    "src/version.cc"
    "src/localize.cc"
    "src/main.cc"
    )
 
-bob_python_package_bindings(visioner "${pysrc}" "core_array")
+set(pysrc
+   "lib/__init__.py"
+   )
+
+bob_python_package_bindings(visioner "${ccsrc}" "${pysrc}" "core_array")
 
 # Visioner depends on Qt4
 include (${QT_USE_FILE})

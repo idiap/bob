@@ -2,7 +2,7 @@ project(io-python)
 cmake_minimum_required(VERSION 2.6)
 
 # Python bindings
-set(pysrc
+set(ccsrc
    "src/version.cc"
    "src/exception.cc"
    "src/file.cc"
@@ -15,12 +15,20 @@ set(pysrc
    )
  
 if(FFMPEG_FOUND)
-  set(pysrc "${pysrc};src/video.cc")
+  set(ccsrc "${ccsrc};src/video.cc")
 endif(FFMPEG_FOUND)
 
 add_definitions("-D__STDC_CONSTANT_MACROS")
 
-bob_python_package_bindings(io "${pysrc}" "core_array")
+set(pysrc
+   "lib/__array__.py"
+   "lib/__arrayset__.py"
+   "lib/__file__.py"
+   "lib/__hdf5__.py"
+   "lib/__init__.py"
+   )
+
+bob_python_package_bindings(io "${ccsrc}" "${pysrc}" "core_array")
 
 # Our test units
 bob_python_add_test(python-io-array-tests

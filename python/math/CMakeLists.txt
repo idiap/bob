@@ -1,15 +1,19 @@
 project(math-python)
 cmake_minimum_required(VERSION 2.6)
 
-set(pysrc
+set(ccsrc
    "src/interiorpointLP.cc"
    "src/linsolve.cc"
    "src/norminv.cc"
    "src/stats.cc"
    "src/main.cc"
    )
+
+set(pysrc
+   "lib/__init__.py"
+   )
  
-bob_python_package_bindings(math "${pysrc}" "core_array")
+bob_python_package_bindings(math "${ccsrc}" "${pysrc}" "core_array")
 
 # Our test units
 bob_python_add_test(python-math-interiorpointLP-tests

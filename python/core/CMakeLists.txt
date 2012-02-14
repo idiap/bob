@@ -2,7 +2,7 @@ project(core-python)
 cmake_minimum_required(VERSION 2.6)
 
 # Python bindings
-set(pysrc
+set(ccsrc
    "src/version.cc"
    "src/exception.cc"
    "src/logging.cc"
@@ -10,7 +10,7 @@ set(pysrc
    "src/main.cc"
    )
 
-set(pysrc_ndarray
+set(ccsrc_ndarray
    "src/ndarray.cc"
    "src/blitz_numpy.cc"
    "src/ndarray_numpy.cc"
@@ -21,14 +21,22 @@ set(pysrc_ndarray
    "src/main_ndarray.cc"
    )
 
-set(pysrc_random
+set(ccsrc_random
    "src/random.cc"
    "src/main_random.cc"
    )
 
-bob_python_package_bindings(core "${pysrc}" "")
-bob_python_submodule_bindings(core array "${pysrc_ndarray}" "")
-bob_python_submodule_bindings(core random "${pysrc_random}" "")
+set(pysrc
+  "lib/__init__.py"
+  "lib/array/__init__.py"
+  "lib/script/config.py"
+  "lib/script/__init__.py"
+  "lib/random/__init__.py"
+  )
+
+bob_python_package_bindings(core "${ccsrc}" "${pysrc}" "")
+bob_python_submodule_bindings(core array "${ccsrc_ndarray}" "")
+bob_python_submodule_bindings(core random "${ccsrc_random}" "")
 
 # Installs our scripts
 bob_python_script(core "bob_config.py" "lib/script/config.py" "main")

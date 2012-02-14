@@ -50,15 +50,6 @@ macro(bob_benchmark package name src)
   install(TARGETS ${progname} RUNTIME DESTINATION ${bindir})
 endmacro(bob_benchmark package name src)
 
-# Copies files from one location to another iff they are different.
-macro(copy_if_different target files destination)
-  foreach(file ${files})
-    get_filename_component(file_name ${file} NAME)
-    add_custom_command(TARGET ${target} POST_BUILD
-                       COMMAND ${CMAKE_COMMAND} -E copy_if_different ${file} ${destination}/${file_name})
-  endforeach(file)
-endmacro()
-
 # Creates rules to install a (list of) regular expression filenames to both the
 # build and installation directories. The files are taken recursively using the
 # "input_dir" variable as the root of the source directory that is going to be
@@ -117,8 +108,9 @@ macro(bob_python_script package_name script_name python_module python_method)
 
   add_custom_command(
     OUTPUT "${script_name}" 
-    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bin/make_wrapper.py "${BOB_VERSION}" "${module_name}" "${python_method}" "${script_name}"
-    DEPENDS "${CMAKE_SOURCE_DIR}/bin/make_wrapper.py" "${python_module}"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${python_module}" "${CMAKE_SOURCE_DIR}/bin/make_wrapper.py"
+    COMMAND ${PYTHON_EXECUTABLE}
+    ARGS ${CMAKE_SOURCE_DIR}/bin/make_wrapper.py "${BOB_VERSION}" "${module_name}" "${python_method}" "${CMAKE_BINARY_DIR}/bin/${script_name}"
     COMMENT "Generating script ${script_name}")
 
   get_filename_component(script_basename ${script_name} NAME_WE)
@@ -127,9 +119,50 @@ macro(bob_python_script package_name script_name python_module python_method)
   add_dependencies(pybob_${package_name} script_${script_basename})
 
   # this will make the script available to the installation tree
-  install(PROGRAMS ${script_name} DESTINATION bin)
+  install(PROGRAMS ${CMAKE_BINARY_DIR}/bin/${script_name} DESTINATION bin)
 
-endmacro(bob_python_script python_module python_method)
+endmacro()
+
+# Installs and compiles all files given in the input directory
+macro(bob_python_module package_name sources)
+
+  foreach(source ${sources})
+
+    # figures out the module name from the input file dependence name
+    string(REPLACE "lib/" "" dest_name "${source}")
+
+    set(module_name "${package_name}.${dest_name}")
+    string(REPLACE ".py" "" module_name "${module_name}")
+    string(REPLACE "/" "." module_name "${module_name}")
+    
+    # this is the temporary location for build tests
+    if(${package_name} STREQUAL "root")
+      set(output_stem lib/python${PYTHON_VERSION}/bob/${dest_name})
+    else()
+      set(output_stem lib/python${PYTHON_VERSION}/bob/${package_name}/${dest_name})
+    endif()
+    set(output_file ${CMAKE_BINARY_DIR}/${output_stem})
+
+    # this will copy the file so it can be used during testing
+    add_custom_command(
+      OUTPUT "${output_file}c"
+      DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${source}"
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/${source}" "${output_file}"
+      COMMAND ${PYTHON_EXECUTABLE} -m compileall -q "${output_file}"
+      COMMENT "Copying and compiling ${module_name}")
+
+    # this will hook-up the dependencies so all works after the package is built
+    add_custom_target(module_${module_name} DEPENDS "${output_file}c")
+    add_dependencies(pybob_${package_name} module_${module_name})
+
+    # this will actually install the files
+    get_filename_component(output_dir ${output_stem} PATH)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${source} DESTINATION ${output_dir})
+    install(FILES ${output_file}c DESTINATION ${output_dir})
+
+  endforeach(source ${sources})
+
+endmacro()
 
 macro(bob_python_bindings cxx_package package src pydependencies)
   string(TOUPPER "${package}" PACKAGE)
@@ -153,11 +186,10 @@ macro(bob_python_bindings cxx_package package src pydependencies)
 
   if ("${src}" STREQUAL "")
     add_custom_target(pybob_${package} ALL)
-    message("-- adding target pybob_${package}...")
     ## TODO Add correct dependencies
+
   else()
     add_library(pybob_${package} SHARED ${src})
-    message("-- adding target pybob_${package}...")
 
     target_link_libraries(pybob_${package} bob_${cxx_package} ${Boost_PYTHON_LIBRARY_RELEASE} ${PYTHON_LIBRARIES})
     set(pycxx_flags "-Wno-long-long -Wno-unused-function -Winvalid-pch")
@@ -172,36 +204,37 @@ macro(bob_python_bindings cxx_package package src pydependencies)
   endif()
   
   # Install scripts only if not a subpackage
-  if (NOT "${package}" MATCHES "_")
+  #if (NOT "${package}" MATCHES "_")
 
     # Setups rules to copy python files from lib folder to the build and
     # installation directories
-    copy_files("${CMAKE_CURRENT_SOURCE_DIR}/lib" "*.py"
-      "${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob/${cxx_package}"
-      "lib/python${PYTHON_VERSION}/bob/${cxx_package}"
-      output_lib_files
-      "pybob_${package}"
-      FALSE)
+    #copy_files("${CMAKE_CURRENT_SOURCE_DIR}/lib" "*.py"
+    #  "${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob/${cxx_package}"
+    #  "lib/python${PYTHON_VERSION}/bob/${cxx_package}"
+    #  output_lib_files
+    #  "pybob_${package}"
+    #  FALSE)
 
     # Setups rules to copy python files from script folder to the build and
     # installation directories
-    copy_files("${CMAKE_CURRENT_SOURCE_DIR}/script" "*.py"
-      "${CMAKE_BINARY_DIR}/bin"
-      "bin"
-      output_script_files
-      "pybob_${package}"
-      TRUE)
+    #copy_files("${CMAKE_CURRENT_SOURCE_DIR}/script" "*.py"
+    #  "${CMAKE_BINARY_DIR}/bin"
+    #  "bin"
+    #  output_script_files
+    #  "pybob_${package}"
+    #  TRUE)
 
     # Adds the installation of all output files as a dependence to the package
-    add_custom_target(pybob_${package}_files DEPENDS ${output_lib_files} ${output_script_files})
-    add_dependencies(pybob_${package} pybob_${package}_files)
+    #add_custom_target(pybob_${package}_files DEPENDS ${output_lib_files} ${output_script_files})
+    #add_dependencies(pybob_${package} pybob_${package}_files)
 
-  endif()
+    #endif()
 
 endmacro(bob_python_bindings)
 
-macro(bob_python_package_bindings package src pydependencies)
+macro(bob_python_package_bindings package src pysrc pydependencies)
   bob_python_bindings("${package}" "${package}" "${src}" "${pydependencies}")
+  bob_python_module("${package}" "${pysrc}")
 endmacro(bob_python_package_bindings)
 
 macro(bob_python_submodule_bindings package subpackage src pydependencies)
