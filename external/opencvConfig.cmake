@@ -1,8 +1,6 @@
 find_package(OpenCV)
   
 if(OpenCV_FOUND)
-  message( STATUS "OpenCV ${OpenCV_VERSION} FOUND, compiling add-ons...")
+  find_package_message(OpenCV "Found OpenCV ${OpenCV_VERSION}: ${OpenCV_LIBS}" "[${OpenCV_LIBS}][${OpenCV_INCLUDE_DIR}]")
   add_definitions("-D HAVE_OPENCV=1")
-else()
-  message( STATUS "OpenCV NOT FOUND: Disabling...")
 endif()
