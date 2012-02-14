@@ -1,4 +1,4 @@
-from ._cxx import *
+from ._daq import *
 from os import path
 import types
 

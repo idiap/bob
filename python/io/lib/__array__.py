@@ -6,7 +6,7 @@
 """Array additions
 """
 
-from ._cxx import Array
+from ._io import Array
 
 def array_cast(self, dtype):
   """Returns an array object with the required element type"""

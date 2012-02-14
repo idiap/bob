@@ -1,2 +1,2 @@
-from ._cxx import *
+from ._trainer_overload import *
 __all__ = dir()

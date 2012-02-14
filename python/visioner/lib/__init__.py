@@ -3,7 +3,7 @@
 # Andre Anjos <andre.anjos@idiap.ch> 
 # Sun 24 Jul 17:50:01 2011 CEST
 
-from ._cxx import *
+from ._visioner import *
 from os import path
 
 DEFAULT_CMODEL = path.join(path.dirname(__file__), 'Face.MCT9.gz')

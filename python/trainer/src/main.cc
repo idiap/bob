@@ -32,7 +32,7 @@ void bind_trainer_plda();
 void bind_trainer_wiener();
 void bind_trainer_empca();
 
-BOOST_PYTHON_MODULE(_cxx) {
+BOOST_PYTHON_MODULE(_trainer) {
 
   bob::python::setup_python("bob classes and sub-classes for trainers");
   

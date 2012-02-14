@@ -37,7 +37,7 @@ void bind_machine_plda();
 void bind_machine_wiener();
 void bind_machine_version();
 
-BOOST_PYTHON_MODULE(_cxx)
+BOOST_PYTHON_MODULE(_machine)
 {
   bob::python::setup_python("bob classes and sub-classes for machine access");
 

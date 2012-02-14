@@ -29,7 +29,7 @@ void bind_core_array_typeinfo();
 //void bind_core_array_examples(); ///< examples
 void bind_core_array_convert();
 
-BOOST_PYTHON_MODULE(_cxx) {
+BOOST_PYTHON_MODULE(_core_array) {
   bob::python::setup_python("bob core classes and sub-classes for array manipulation");
 
   bind_core_bz_numpy();

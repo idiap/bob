@@ -1,1 +1,1 @@
-from ._cxx import *
+from ._core_array import *
