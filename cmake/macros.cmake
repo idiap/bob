@@ -103,7 +103,7 @@ macro(bob_python_module package_name sources)
       OUTPUT "${output_file}c"
       DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${source}"
       COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/${source}" "${output_file}"
-      COMMAND ${PYTHON_EXECUTABLE} -m compileall -q "${output_file}"
+      COMMAND ${PYTHON_EXECUTABLE} -m py_compile "${output_file}"
       COMMENT "Copying and compiling ${module_name}")
 
     # this will hook-up the dependencies so all works after the package is built
