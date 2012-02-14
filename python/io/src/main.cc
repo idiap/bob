@@ -35,7 +35,7 @@ void bind_io_datetime();
 void bind_io_video();
 #endif
 
-BOOST_PYTHON_MODULE(_cxx) {
+BOOST_PYTHON_MODULE(_io) {
 
   bob::python::setup_python("bob classes and sub-classes for io access");
 

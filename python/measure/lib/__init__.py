@@ -1,4 +1,4 @@
-from ._cxx import *
+from ._measure import *
 from . import plot
 from . import load
 import numpy

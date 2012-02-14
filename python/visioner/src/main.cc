@@ -25,7 +25,7 @@
 void bind_visioner_version();
 void bind_visioner_localize();
 
-BOOST_PYTHON_MODULE(_cxx) {
+BOOST_PYTHON_MODULE(_visioner) {
   
   bob::python::setup_python("bob face localization bridge for visioner");
 
