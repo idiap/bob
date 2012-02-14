@@ -7,10 +7,13 @@ if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
   add_custom_target(pybob_root ALL
                     COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/lib" "${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob/")
 
+  # Tags version and platform and add this to the core of the distribution
+  bob_python_tag_build("lib/build.py")
+
   # Adds specific python sources
   set(pysrc "lib/__init__.py")
   bob_python_module(root ${pysrc})
-
+  
   add_subdirectory(core)
   add_subdirectory(io)
   add_subdirectory(math)

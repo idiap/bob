@@ -24,6 +24,7 @@ import os
 import sys
 import bob
 import numpy
+from ... import build
 
 def version_table():
   """Returns a summarized version table of all software compiled in, with their
@@ -47,7 +48,7 @@ def version_table():
   except AttributeError:
     pass
 
-  bob_version = "%(BOB_VERSION)s (%(BOB_PLATFORM)s)" % os.environ
+  bob_version = "%s (%s)" % (build.version, build.platform)
   print 75*'='
   print (" bob version %s" % bob_version).center(75)
   print 75*'='

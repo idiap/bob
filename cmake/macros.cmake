@@ -27,7 +27,7 @@ macro(bob_library package src dependencies shared)
           LIBRARY DESTINATION lib
           ARCHIVE DESTINATION lib)
   install(DIRECTORY ${package} DESTINATION include/bob FILES_MATCHING PATTERN "*.h")
-endmacro(bob_library)
+endmacro()
 
 # Creates a standard Bob test.
 macro(bob_test package name src)
@@ -38,7 +38,7 @@ macro(bob_test package name src)
   target_link_libraries(${testname} bob_${package} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_RELEASE})
   add_test(cxx-${package}-${name} ${testname} --log_level=test_suite)
   set_property(TEST cxx-${package}-${name} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
-endmacro(bob_test package src)
+endmacro()
 
 # Creates a standard Bob benchmark.
 macro(bob_benchmark package name src)
@@ -48,7 +48,7 @@ macro(bob_benchmark package name src)
   add_executable(${progname} ${src})
   target_link_libraries(${progname} bob_${package})
   install(TARGETS ${progname} RUNTIME DESTINATION ${bindir})
-endmacro(bob_benchmark package name src)
+endmacro()
 
 # Builds and installs a new script similar to what setuptools do for the
 # command section of a setup.py build recipe.
@@ -65,7 +65,7 @@ macro(bob_python_script package_name script_name python_module python_method)
     OUTPUT "${output_file}"
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${python_module}" "${CMAKE_SOURCE_DIR}/bin/make_wrapper.py"
     COMMAND ${PYTHON_EXECUTABLE}
-    ARGS ${CMAKE_SOURCE_DIR}/bin/make_wrapper.py "${BOB_VERSION}" "${module_name}" "${python_method}" "${output_file}"
+    ARGS ${CMAKE_SOURCE_DIR}/bin/make_wrapper.py "${module_name}" "${python_method}" "${output_file}"
     COMMENT "Generating script ${script_name}")
 
   get_filename_component(script_basename ${script_name} NAME_WE)
@@ -76,6 +76,35 @@ macro(bob_python_script package_name script_name python_module python_method)
   # this will make the script available to the installation tree
   install(PROGRAMS ${CMAKE_BINARY_DIR}/bin/${script_name} DESTINATION bin)
 
+endmacro()
+
+# Tags version and platform, and set this to core of the python package
+macro(bob_python_tag_build source)
+
+  get_filename_component(version_file ${source} NAME)
+  
+  set(output_stem lib/python${PYTHON_VERSION}/bob/${version_file})
+  set(output_file ${CMAKE_BINARY_DIR}/${output_stem})
+
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${source} ${output_file})
+
+  set(module_name "root.${version_file}")
+  string(REPLACE ".py" "" module_name "${module_name}")
+    
+  # this will compile the version file
+  add_custom_command(
+    OUTPUT "${output_file}c"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${source}"
+    COMMAND ${PYTHON_EXECUTABLE} -m py_compile "${output_file}"
+    COMMENT "Compiling ${module_name}")
+
+  # this will hook-up the dependencies so all works after the package is built
+  add_custom_target(pybob_root.build DEPENDS "${output_file}c")
+  add_dependencies(pybob_root pybob_root.build)
+
+  # this will actually install the file
+  get_filename_component(output_dir ${output_stem} PATH)
+  install(FILES "${output_file}" "${output_file}c" DESTINATION ${output_dir})
 endmacro()
 
 # Installs and compiles all files given 
@@ -175,27 +204,23 @@ endmacro(bob_python_submodule_bindings)
 # This macro helps users to add python tests to cmake
 function(bob_python_add_test)
 
-  add_test(${ARGV})
+  list(GET ARGV 0 test_name)
+  list(GET ARGV 1 prog)
+  list(REMOVE_AT ARGV 0) #pop from front
+  list(REMOVE_AT ARGV 0) #pop from front
 
-  if (APPLE)
+  get_filename_component(prog_filename ${prog} NAME)
 
-    # In OSX dlopen @ python requires the dyld path to be correctly set
-    # for any C/C++ bindings you may have. It does not use the rpath for
-    # some obscure reason - AA
-    set_property(TEST ${ARGV0} APPEND PROPERTY ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}:$ENV{PYTHONPATH}")
-    set_property(TEST ${ARGV0} APPEND PROPERTY ENVIRONMENT "DYLD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/lib:$ENV{DYLD_LIBRARY_PATH}")
-
-  else (APPLE)
-
-    # This must be Linux...
-    set_property(TEST ${ARGV0} APPEND PROPERTY ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}:$ENV{PYTHONPATH}")
-
-  endif (APPLE)
+  # temporary hack to get the other tests working
+  if ("${prog}" STREQUAL "${prog_filename}")
+    # new style testing
+    add_test(${test_name};${CMAKE_BINARY_DIR}/bin/${prog_filename};${ARGV})
+  else()
+    add_test(${test_name};${prog};${ARGV})
+  endif()
 
   # Common properties to all tests
-  set_property(TEST ${ARGV0} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
-  set_property(TEST ${ARGV0} APPEND PROPERTY ENVIRONMENT "BOB_VERSION=${BOB_VERSION}")
-  set_property(TEST ${ARGV0} APPEND PROPERTY ENVIRONMENT "BOB_PLATFORM=${BOB_PLATFORM}")
+  set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 
 endfunction(bob_python_add_test)
 

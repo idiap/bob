@@ -7,36 +7,24 @@
 """
 
 TEMPLATE = """#!%(python)s
-
 import os
 import sys
-import platform
-
-prefix = os.path.realpath(os.path.dirname(__file__))
+prefix = os.path.realpath(os.path.dirname(os.path.dirname(__file__)))
 pyver = 'python%%d.%%d' %% sys.version_info[0:2]
 library_path = os.path.realpath(os.path.join(prefix, 'lib'))
 python_path = os.path.realpath(os.path.join(library_path, pyver))
 
-if not os.environ.has_key("BOB_VERSION"):
+def prepend_path(var, value):
+  if os.environ.has_key(var): 
+    os.environ[var] = '%%s:%%s' %% (value, os.environ[var])
+  else: os.environ[var] = value
 
-  # replace the interpreter in this case, with the proper environment
-  os.environ['BOB_VERSION'] = '%(version)s'
-
-  # dlopen() (used by python) on OSX does not look-up the rpath
-  if platform.system() == 'Darwin':
-    if os.environ.has_key('DYLD_LIBRARY_PATH'):
-      os.environ['DYLD_LIBRARY_PATH'] = '%%s:%%s' %% (library_path, os.environ['DYLD_LIBRARY_PATH'])
-    else:
-      os.environ['DYLD_LIBRARY_PATH'] = library_path
-
-  if os.environ.has_key('PYTHONPATH'):
-    os.environ['PYTHONPATH'] = '%%s:%%s' %% (python_path, os.environ['PYTHONPATH'])
-  else:
-    os.environ['PYTHONPATH'] = python_path
-
-  # replace interpreter with a new instance embedded in the new environment
-  # Note: execle() will never return
-  os.execle(sys.executable, sys.executable, os.path.realpath(__file__), os.environ)
+if not os.environ.has_key("__BOB_WRAPPER__"):
+  os.environ['__BOB_WRAPPER__'] = "1"
+  %(osx_dyld)s
+  prepend_path('PYTHONPATH', python_path)
+  sys.argv.insert(0, sys.executable)
+  os.execve(sys.executable, sys.argv, os.environ)
 
 # Call the announced callable
 from %(module)s import %(method)s as main
@@ -45,6 +33,7 @@ main()
 
 import os
 import sys
+import platform
 import stat
 import argparse
 
@@ -54,9 +43,6 @@ def main():
   parser = argparse.ArgumentParser(description=__doc__)
       #epilog=__epilog__, formatter_class=argparse.RawDescriptionHelpFormatter
 
-  parser.add_argument("version", metavar="VERSION",
-      help="The version of BOB to be set for this script")
-  
   parser.add_argument("module", help="The python module name (with dots)",
       metavar="MODULE")
   
@@ -81,10 +67,12 @@ def main():
   
   dictionary = {
       'python': sys.executable,
-      'version': args.version,
       'module': args.module,
       'method': args.method,
       }
+
+  if platform.system() == 'Darwin':
+    dictionary['osx_dyld'] = "prepend_path('DYLD_LIBRARY_PATH', library_path)"
 
   f.write(TEMPLATE % dictionary)
   f.close()

@@ -12,7 +12,14 @@ if (NOT CMAKE_BUILD_TYPE)
   message(FATAL_ERROR "error: choose either RELEASE or DEBUG as build type by specifying -DCMAKE_BUILD_TYPE=RELEASE or -DCMAKE_BUILD_TYPE=DEBUG on your cmake command line.")
 endif ()
 
-string(TOLOWER "${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_BUILD_TYPE}" BOB_PLATFORM_STR)
+set(BOB_SYSTEM_PROCESSOR ${CMAKE_SYSTEM_PROCESSOR})
+set(BOB_SYSTEM_NAME ${CMAKE_SYSTEM_NAME})
+if(APPLE)
+  set(BOB_SYSTEM_PROCESSOR "x86_64") #forced, see __LP64__ comment bellow
+  set(BOB_SYSTEM_NAME "macosx")
+endif()
+
+string(TOLOWER "${BOB_SYSTEM_NAME}-${BOB_SYSTEM_PROCESSOR}-${CMAKE_BUILD_TYPE}" BOB_PLATFORM_STR)
 set(BOB_PLATFORM "${BOB_PLATFORM_STR}" CACHE ON "The name of the platform Bob is being built to")
 
 set(BOB_VERSION "unknown" CACHE ON "The version of Bob that is currently being built")
