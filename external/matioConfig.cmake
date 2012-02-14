@@ -19,9 +19,6 @@ find_package_handle_standard_args(matio DEFAULT_MSG matio_LIBRARY matio_INCLUDE_
 if(MATIO_FOUND)
   set(matio_LIBRARIES ${matio_LIBRARY})
   add_definitions("-D HAVE_MATIO=1")
-  message( STATUS "Matio FOUND: Compiling add-on modules...")
-else(MATIO_FOUND)
-  message( STATUS "Matio NOT FOUND: Disabling...")
 endif(MATIO_FOUND)
 
 mark_as_advanced(matio_INCLUDE_DIR matio_LIBRARY)

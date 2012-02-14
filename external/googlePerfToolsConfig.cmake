@@ -15,7 +15,6 @@ find_library(GOOGLE_PERFTOOLS_LIBRARY NAMES profiler)
 set(GOOGLE_PERFTOOLS_LIBRARIES ${GOOGLE_PERFTOOLS_LIBRARY} CACHE INTERNAL "libraries")
 
 if(GOOGLE_PERFTOOLS_INCLUDE_1 AND GOOGLE_PERFTOOLS_INCLUDE_2 AND GOOGLE_PERFTOOLS_LIBRARY)
-  message( STATUS "Google Perftools FOUND: Compiling add-on modules...")
   set(GOOGLE_PERFTOOLS_FOUND "YES" CACHE INTERNAL "package")
   include_directories(SYSTEM ${GOOGLE_PERFTOOLS_INCLUDE_DIRS})
   add_definitions(-DHAVE_GOOGLE_PERFTOOLS=1)
@@ -33,3 +32,5 @@ else()
     message( STATUS "Google Perftools libprofiler.so not found!")
   endif (NOT GOOGLE_PERFTOOLS_LIBRARY)
 endif()
+  
+find_package_message(GOOGLE_PERFTOOLS "Found Google PerfTools: ${GOOGLE_PERFTOOLS_INCLUDE_DIRS}" "[${GOOGLE_PERFTOOLS_INCLUDE_DIRS}][${GOOGLE_PERFTOOLS_LIBRARIES}]")

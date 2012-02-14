@@ -30,7 +30,6 @@ if(FFMPEG_FOUND)
   execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/bin/ffmpeg-version.sh OUTPUT_VARIABLE FFMPEG_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
   add_definitions("-DFFMPEG_VERSION=\"${FFMPEG_VERSION}\"")
 
-  message( STATUS "FFmpeg ${FFMPEG_VERSION} FOUND: Compiling add-on modules...")
-else(FFMPEG_FOUND)
-  message( STATUS "FFmpeg NOT FOUND: Disabling...")
+  find_package_message(FFMPEG "Found FFmpeg ${FFMPEG_VERSION}" "[${FFMPEG_LIBRARY_DIRS}][${FFMPEG_VERSION}]")
+
 endif(FFMPEG_FOUND)

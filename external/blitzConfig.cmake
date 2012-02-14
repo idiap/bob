@@ -31,17 +31,13 @@ if(BLITZ_FOUND)
     add_definitions(-DHAVE_BLITZ_SPECIAL_TYPES=1)
   endif(HAVE_BLITZ_SPECIAL_TYPES)
 
-  if(HAVE_BLITZ_SPECIAL_TYPES)
-    message(STATUS "Blitz: you can allocate arrays with more than 2G-pointees")
-  else(HAVE_BLITZ_SPECIAL_TYPES)
-    message(STATUS "Blitz: older version detected -- please note the 2G-pointee limit for arrays!")
-  endif(HAVE_BLITZ_SPECIAL_TYPES)
-
   # and has blitz/tinyvec2.h and not blitz/tinyvec-et.h
   find_file(TINYVEC2_FOUND "blitz/tinyvec2.h" ${Blitz_INCLUDE_DIR})
   if(TINYVEC2_FOUND)
     add_definitions(-DHAVE_BLITZ_TINYVEC2_H=1)
   endif(TINYVEC2_FOUND)
+
+  find_package_message(BLITZ "Found Blitz++: ${Blitz_LIBRARIES} (>2G-pointees: ${HAVE_BLITZ_SPECIAL_TYPES}; New: ${TINYVEC2_FOUND})" "[${Blitz_LIBRARIES}][${Blitz_INCLUDE_DIR}]")
 
 endif(BLITZ_FOUND)
 

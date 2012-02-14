@@ -163,10 +163,3 @@ mark_as_advanced (
   LIBSVM_ROOT_DIR
   LIBSVM_VERSION
   )
-
-if (LIBSVM_FOUND)
-  message(STATUS "libsvm ${LIBSVM_VERSION} FOUND: Compiling add-on modules...")
-  add_definitions("-DHAVE_LIBSVM=1")
-else()
-  message(STATUS "libsvm NOT FOUND: Disabling...")
-endif()

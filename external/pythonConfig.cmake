@@ -16,9 +16,9 @@ include(FindPythonInterp)
 # try to compile this project
 function(find_python_module module)
 	string(TOUPPER ${module} module_upper)
-	if(NOT PY_${module_upper})
+  if(NOT PYTHON_${module_upper})
 		if(ARGC GREATER 1 AND ARGV1 STREQUAL "REQUIRED")
-			set(PY_${module}_FIND_REQUIRED TRUE)
+      set(PYTHON_${module}_FIND_REQUIRED TRUE)
 		endif()
 		# A module's location is usually a directory, but for binary modules
 		# it's a .so file.
@@ -28,11 +28,11 @@ function(find_python_module module)
 			OUTPUT_VARIABLE _${module}_location
 			ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
 		if(NOT _${module}_status)
-			set(PY_${module_upper} ${_${module}_location} CACHE STRING 
+      set(PYTHON_${module_upper} ${_${module}_location} CACHE STRING 
 				"Location of Python module ${module}")
 		endif(NOT _${module}_status)
-	endif(NOT PY_${module_upper})
-	find_package_handle_standard_args(PY_${module} DEFAULT_MSG PY_${module_upper})
+  endif(NOT PYTHON_${module_upper})
+  find_package_handle_standard_args(PYTHON_${module} DEFAULT_MSG PYTHON_${module_upper})
 endfunction(find_python_module)
 
 # Now double-check for all required python modules
@@ -73,9 +73,6 @@ execute_process(COMMAND python -c "import sys; print '%d.%d.%d' % (sys.version_i
 
 execute_process(COMMAND python -c "import numpy; print numpy.version.version" OUTPUT_VARIABLE NUMPY_VERSION_COMPLETE OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-message( STATUS "Python ${PYTHON_VERSION_COMPLETE} and NumPy ${NUMPY_VERSION_COMPLETE} FOUND. Details for this build are:")
-message( STATUS "  executable: ${PYTHON_EXECUTABLE}")
-#message( STATUS "  prefix    : ${PYTHON_PREFIX}")
-message( STATUS "  library   : ${PYTHON_LIBRARY}")
-#message( STATUS "  libdirs   : ${python_LIBRARY_DIRS}")
-message( STATUS "  includes  : ${python_INCLUDE_DIRS}")
+if(PYTHON_VERSION_COMPLETE AND NUMPY_VERSION_COMPLETE)
+  find_package_message(PYTHON "Found Python ${PYTHON_VERSION_COMPLETE} and NumPy ${NUMPY_VERSION_COMPLETE}: interpreter@${PYTHON_EXECUTABLE}; library@${PYTHON_LIBRARY}; includes@${python_INCLUDE_DIRS}" "[${PYTHON_LIBRARY}][${python_INCLUDE_DIRS}]")
+endif()
