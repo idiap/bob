@@ -6,12 +6,12 @@
 """Self-contained script to generate python executables.
 """
 
-TEMPLATE_LOCAL = """#!%(python)s
+TEMPLATE_ROOT = """#!%(python)s
 from %(module)s import %(method)s as main
 main()
 """
 
-TEMPLATE_NON_LOCAL = """#!%(python)s
+TEMPLATE_NON_ROOT = """#!%(python)s
 import os
 import sys
 prefix = os.path.realpath(os.path.dirname(os.path.dirname(__file__)))
@@ -48,7 +48,7 @@ def main():
   parser = argparse.ArgumentParser(description=__doc__)
       #epilog=__epilog__, formatter_class=argparse.RawDescriptionHelpFormatter
 
-  parser.add_argument("--non-local", dest="non_local", default=False, 
+  parser.add_argument("--non-root", dest="non_root", default=False, 
       action="store_true", help="If set, make the installation of python scripts such that it can execute from non-default directories. By default we assume that python scripts are installed in places where extensions can be located automatically")
   
   parser.add_argument("module", help="The python module name (with dots)",
@@ -84,10 +84,10 @@ def main():
   else:
     dictionary['osx_dyld'] = ""
   
-  if args.non_local:
-    f.write(TEMPLATE_NON_LOCAL % dictionary)
+  if args.non_root:
+    f.write(TEMPLATE_NON_ROOT % dictionary)
   else:
-    f.write(TEMPLATE_LOCAL % dictionary)
+    f.write(TEMPLATE_ROOT % dictionary)
   f.close()
   del f
 

@@ -40,41 +40,60 @@ endif()
 set(pysrc
    "lib/__init__.py"
    "lib/flowutils.py"
+   "lib/test/__init__.py"
+   "lib/test/tempgrad.py"
+   "lib/test/vldsift.py"
+   "lib/test/histo.py"
+   "lib/test/vlsift.py"
+   "lib/test/color.py"
+   "lib/test/drawing.py"
+   "lib/test/optflow.py"
+   "lib/test/face_extract.py"
+   "lib/test/filters_new.py"
+   "lib/test/lbp_new.py"
+   "lib/script/__init__.py"
+   "lib/script/facenorm.py"
+   "lib/script/blockDCT.py"
+   "lib/script/tantriggs.py"
+   "lib/example/__init__.py"
+   "lib/example/optflowHS.py"
    )
 
 bob_python_package_bindings(ip "${ccsrc}" "${pysrc}" "core_array")
 
 # Our test units
-bob_python_add_test(python-ip-lbp-tests 
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_lbp_new.py)
-bob_python_add_test(python-ip-filter_new-tests 
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_filters_new.py)
-bob_python_add_test(python-ip-optflow-tests
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_flow.py)
-bob_python_add_test(python-ip-spatio-temporal-gradient-tests
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_tempgrad.py)
-bob_python_add_test(python-ip-color-tests
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_color.py)
-bob_python_add_test(python-ip-drawing-tests
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_drawing.py)
-bob_python_add_test(python-ip-histo-tests
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_histo.py)
+bob_python_add_unittest(ip lib/test/lbp_new.py main 
+  "${CMAKE_CURRENT_SOURCE_DIR}/data")
+bob_python_add_unittest(ip lib/test/filters_new.py main 
+  "${CMAKE_CURRENT_SOURCE_DIR}/data")
+bob_python_add_unittest(ip lib/test/optflow.py main 
+  "${CMAKE_CURRENT_SOURCE_DIR}/data")
+bob_python_add_unittest(ip lib/test/tempgrad.py main 
+  "${CMAKE_CURRENT_SOURCE_DIR}/data")
+bob_python_add_unittest(ip lib/test/color.py main 
+  "${CMAKE_CURRENT_SOURCE_DIR}/data")
+bob_python_add_unittest(ip lib/test/drawing.py main 
+  "${CMAKE_CURRENT_SOURCE_DIR}/data")
+bob_python_add_unittest(ip lib/test/histo.py main 
+  "${CMAKE_CURRENT_SOURCE_DIR}/data")
+
 # If we have VLFeat installed, enable the test of relevant modules
 if(VLFEAT_FOUND)
-bob_python_add_test(python-ip-vlsift-tests
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_vlsift.py)
-bob_python_add_test(python-ip-vldsift-tests
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_vldsift.py)
+  bob_python_add_unittest(ip lib/test/vlsift.py main
+    "${CMAKE_CURRENT_SOURCE_DIR}/data")
+  bob_python_add_unittest(ip lib/test/vldsift.py main
+    "${CMAKE_CURRENT_SOURCE_DIR}/data")
 endif()
 
-bob_python_add_test(python-ip-facenorm
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/facenorm.py --self-test)
-bob_python_add_test(python-ip-tantriggs
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/tantriggs.py --self-test)
-bob_python_add_test(python-ip-blockDCT
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/blockDCT.py --self-test)
+bob_python_script(ip "facenorm.py" "lib/script/facenorm.py" "main")
+bob_python_add_test(ip facenorm.py --self-test)
 
-# Our examples (run and install)
-bob_python_add_test(python-ip-optflowHS-example
-  ${CMAKE_CURRENT_SOURCE_DIR}/example/optflowHS.py --test)
-bob_example_install("python" "ip" example/optflowHS.py)
+bob_python_script(ip "tantriggs.py" "lib/script/tantriggs.py" "main")
+bob_python_add_test(ip tantriggs.py --self-test)
+
+bob_python_script(ip "blockDCT.py" "lib/script/blockDCT.py" "main")
+bob_python_add_test(ip blockDCT.py --self-test)
+
+# TODO: Our examples (run and install)
+#bob_python_example(ip "optflowHS.py" "lib/example/optflowHS.py" "main")
+#bob_python_add_test(ip optflowHS.py --test)

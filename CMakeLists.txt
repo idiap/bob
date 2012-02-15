@@ -27,6 +27,8 @@ set(BOB_VERSION "unknown" CACHE ON "The version of Bob that is currently being b
 # TODO: This needs to be correctly set to the version supported by this build!
 set(BOB_DATABASE_VERSION "nightlies/last" CACHE ON "Version of the databases to download")
 
+option(BOB_NON_ROOT_INSTALL "Generates python scripts keeping in mind the installation tree will not be sitting on a place automatically searched by python." OFF)
+
 option(BOB_BUILD_CXX "Builds the C++ infrastructure." ON)
 
 # Note you cannot build the Python stuff without the C++. This will work

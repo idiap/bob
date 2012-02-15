@@ -1,0 +1,302 @@
+#!/usr/bin/env python
+# vim: set fileencoding=utf-8 :
+# Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
+# Tue Apr 26 17:25:41 2011 +0200
+#
+# Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+"""Tests the LBP framework. Find attached to this test a table with expected
+LBP codes.
+"""
+
+import os, sys
+import unittest
+import bob
+import math
+import numpy
+
+def generate_3x3_image(image, values):
+  """Generates a 3x3 image from a 9-position value vector using the following
+  technique:
+  
+           +-+-+-+
+           |1|2|3|
+           +-+-+-+
+           |8|0|4|
+           +-+-+-+
+           |7|6|5|
+           +-+-+-+
+
+  """
+  image[1, 1] = int(values[0])
+  image[0, 0] = int(values[1])
+  image[0, 1] = int(values[2])
+  image[0, 2] = int(values[3])
+  image[1, 2] = int(values[4])
+  image[2, 2] = int(values[5])
+  image[2, 1] = int(values[6])
+  image[2, 0] = int(values[7])
+  image[1, 0] = int(values[8])
+
+def rotate(v, size=8):
+  """Rotates the LSB bit in v, making it a HSB"""
+  lsb = v & 1
+  v >>= 1
+  return (lsb << (size-1)) | v
+
+def calculate_lbp8r_rotinvariant_value(v):
+  """Calculates the rotation invariant LBP code for a certain 8-bit value"""
+  smallest = 0xff
+  tmp = v
+  for k in range(8):
+    tmp = rotate(tmp)
+    if tmp < smallest: smallest = tmp
+  return smallest
+
+def calculate_lbp8r_rotinvariant_table():
+  retval = []
+  map = {} #map into bob values
+  last = 0
+  for k in range(256):
+    v = calculate_lbp8r_rotinvariant_value(k)
+    if not v in map.keys():
+      map[v] = last
+      last += 1
+    retval.append(map[v])
+  return retval
+
+def uniformity(v):
+  "Says the degree of uniformity of a certain pattern"
+  retval = 0
+  notation = ('%8s' % bin(v)).replace(' ', '0')
+  tmp = list(notation)
+  current = None
+  for k in tmp:
+    if current is None: #initialize
+      if tmp[0] != tmp[-1]: retval += 1
+    else:
+      if current != k: retval += 1
+    current = k
+  return retval
+
+def calculate_lbp8r_u2_table():
+  retval = []
+  map = {} #map into bob values
+  last = 1
+  for k in range(256):
+    if uniformity(k) <= 2: 
+      retval.append(k)
+    else: retval.append(0)
+  return retval
+
+def calculate_lbp8r_riu2_table():
+  retval = []
+  for k in calculate_lbp8r_u2_table():
+    retval.append(calculate_lbp8r_rotinvariant_value(k))
+  return retval
+
+def bilinear_interpolation(image, x, y):
+  """Calculates the bilinear interpolation value for a certain point in the
+  given image."""
+  xl = int(math.floor(x))
+  xh = int(math.ceil(x))
+  yl = int(math.floor(y))
+  yh = int(math.floor(y))
+  y1 = (xh - x) * image[yl, xl] + (x - xl) * image[yl, xh]
+  y2 = (xh - x) * image[yh, xl] + (x - xl) * image[yh, xh]
+  retval = ((yh - y) * y1) + ((y - yl) * y2)
+
+class Processor:
+
+  def __init__(self, operator, generator, center):
+    self.operator = operator
+    self.generator = generator
+    self.x = center[0]
+    self.y = center[1]
+    self.image = numpy.ndarray((3, 3), 'uint8')
+
+  def __call__(self, value):
+    image = self.generator(self.image, value)
+    return self.operator(self.image, self.y, self.x) 
+
+def bin(s, m=1):
+  """Converts the number s into its binary representation (as a string)"""
+  return str(m*s) if s<=1 else bin(s>>1, m) + str(m*(s&1))
+
+class LBPTest(unittest.TestCase):
+  """Performs various tests for the bob::ipLBP and friends types."""
+ 
+  def test01_vanilla_4p1r(self):
+    op = bob.ip.LBP4R(1)
+    proc = Processor(op, generate_3x3_image, (1,1))
+    self.assertEqual(proc('011111111'), 0xf)
+    #please note that the bob implementation of LBPs is slightly different
+    #then that of the original LBP paper:
+    # s(x) >= 0 => LBP digit = 1
+    # s(x) <  0 => LBO digit = 0
+    self.assertEqual(proc('100000000'), 0x0)
+    self.assertEqual(proc('102000000'), 0x8)
+    self.assertEqual(proc('100020000'), 0x4)
+    self.assertEqual(proc('100000200'), 0x2)
+    self.assertEqual(proc('100000002'), 0x1)
+    self.assertEqual(proc('102020000'), 0xc)
+    self.assertEqual(proc('100020200'), 0x6)
+    self.assertEqual(proc('100000202'), 0x3)
+    self.assertEqual(proc('102000002'), 0x9)
+    self.assertEqual(proc('102020200'), 0xe)
+    self.assertEqual(proc('100020202'), 0x7)
+    self.assertEqual(proc('102000202'), 0xb)
+    self.assertEqual(proc('102020002'), 0xd)
+    self.assertEqual(proc('100020002'), 0x5)
+    self.assertEqual(proc('102000200'), 0xa)
+    self.assertEqual(proc('102020202'), 0xf)
+    self.assertEqual(op.max_label, 0x10) # this is set to 16!
+
+  def test02_rotinvariant_4p1r(self):
+    op = bob.ip.LBP4R(1,False,False,False,False,True)
+    proc = Processor(op, generate_3x3_image, (1,1))
+    #bob's implementation start labelling the patterns from 0
+    self.assertEqual(proc('100000000'), 0x0) #0x0
+    self.assertEqual(proc('102000000'), 0x1) #0x1
+    self.assertEqual(proc('100020000'), 0x1) #0x1
+    self.assertEqual(proc('100000200'), 0x1) #0x1
+    self.assertEqual(proc('100000002'), 0x1) #0x1
+    self.assertEqual(proc('102020000'), 0x2) #0x3
+    self.assertEqual(proc('100020200'), 0x2) #0x3
+    self.assertEqual(proc('100000202'), 0x2) #0x3
+    self.assertEqual(proc('102000002'), 0x2) #0x3
+    self.assertEqual(proc('100020002'), 0x3) #0x5
+    self.assertEqual(proc('102000200'), 0x3) #0x5
+    self.assertEqual(proc('102020200'), 0x4) #0x7
+    self.assertEqual(proc('100020202'), 0x4) #0x7
+    self.assertEqual(proc('102000202'), 0x4) #0x7
+    self.assertEqual(proc('102020002'), 0x4) #0x7
+    self.assertEqual(proc('102020202'), 0x5) #0xf
+    self.assertEqual(op.max_label, 0x6) # this is set to 6!
+
+  def test03_u2_4p1r(self):
+    op = bob.ip.LBP4R(1,False,False,False,True)
+    proc = Processor(op, generate_3x3_image, (1,1))
+    self.assertEqual(proc('100000000'), 0x1) #0x0
+    self.assertEqual(proc('102000000'), 0x2) #0x8
+    self.assertEqual(proc('100020000'), 0x3) #0x4
+    self.assertEqual(proc('100000200'), 0x4) #0x2
+    self.assertEqual(proc('100000002'), 0x5) #0x1
+    self.assertEqual(proc('102020000'), 0x6) #0xc
+    self.assertEqual(proc('100020200'), 0x7) #0x6
+    self.assertEqual(proc('100000202'), 0x8) #0x3
+    self.assertEqual(proc('102000002'), 0x9) #0x9 (by chance!)
+    self.assertEqual(proc('102020200'), 0xa) #0xe
+    self.assertEqual(proc('100020202'), 0xb) #0x7
+    self.assertEqual(proc('102000202'), 0xc) #0xb
+    self.assertEqual(proc('102020002'), 0xd) #0xd (by chance!)
+    self.assertEqual(proc('100020002'), 0x0) #non-uniform(2) => 0x0
+    self.assertEqual(proc('102000200'), 0x0) #non-uniform(2) => 0x0
+    self.assertEqual(proc('102020202'), 0xe) #0xf
+    self.assertEqual(op.max_label, 0xf) # this is set to 15!
+
+  def test04_rotinvariant_u2_4p1r(self):
+    op = bob.ip.LBP4R(1,False,False,False,True,True)
+    proc = Processor(op, generate_3x3_image, (1,1))
+    self.assertEqual(proc('100000000'), 0x1) #0x0
+    self.assertEqual(proc('102000000'), 0x2) #0x8
+    self.assertEqual(proc('100020000'), 0x2) #0x4
+    self.assertEqual(proc('100000200'), 0x2) #0x2
+    self.assertEqual(proc('100000002'), 0x2) #0x1
+    self.assertEqual(proc('102020000'), 0x3) #0xc
+    self.assertEqual(proc('100020200'), 0x3) #0x6
+    self.assertEqual(proc('100000202'), 0x3) #0x3
+    self.assertEqual(proc('102000002'), 0x3) #0x9 #missing from bob
+    self.assertEqual(proc('102020200'), 0x4) #0xe
+    self.assertEqual(proc('100020202'), 0x4) #0x7
+    self.assertEqual(proc('102000202'), 0x4) #0xb #missing from bob
+    self.assertEqual(proc('102020002'), 0x4) #0xd #missing from bob
+    self.assertEqual(proc('100020002'), 0x0) #non-uniform(2) => 0x0
+    self.assertEqual(proc('102000200'), 0x0) #non-uniform(2) => 0x0
+    self.assertEqual(proc('102020202'), 0x5) #0xf
+    self.assertEqual(op.max_label, 0x6) # this is set to 6!
+
+  def test05_vanilla_4p1r_toaverage(self):
+    op = bob.ip.LBP4R(1,False,True)
+    proc = Processor(op, generate_3x3_image, (1,1))
+    self.assertEqual(proc('100000000'), 0x0) #average is 0.2
+    self.assertEqual(proc('102000000'), 0x8) #average is 0.6
+    self.assertEqual(proc('100020000'), 0x4) #average is 0.6
+    self.assertEqual(proc('100000200'), 0x2) #average is 0.6
+    self.assertEqual(proc('100000002'), 0x1) #average is 0.6
+    self.assertEqual(proc('102020000'), 0xc) #average is 1.0
+    self.assertEqual(proc('100020200'), 0x6) #average is 1.0
+    self.assertEqual(proc('100000202'), 0x3) #average is 1.0
+    self.assertEqual(proc('102000002'), 0x9) #average is 1.0
+    self.assertEqual(proc('102020200'), 0xe) #average is 1.4
+    self.assertEqual(proc('100020202'), 0x7) #average is 1.4
+    self.assertEqual(proc('102000202'), 0xb) #average is 1.4
+    self.assertEqual(proc('102020002'), 0xd) #average is 1.4
+    self.assertEqual(proc('100020002'), 0x5) #average is 1.0
+    self.assertEqual(proc('102000200'), 0xa) #average is 1.0
+    self.assertEqual(proc('102020202'), 0xf) #average is 1.8
+    self.assertEqual(op.max_label, 0x10) # this is set to 16!
+
+  def test06_vanilla_8p1r(self):
+    op = bob.ip.LBP8R(1)
+    proc = Processor(op, generate_3x3_image, (1,1))
+    for i in range(256):
+      v = ('1%8s' % bin(i, 2)).replace(' ', '0')
+      self.assertEqual(proc(v), i)
+
+  def test07_rotinvariant_8p1r(self):
+    op = bob.ip.LBP8R(1,False,False,False,False,True)
+    proc = Processor(op, generate_3x3_image, (1,1))
+    table = calculate_lbp8r_rotinvariant_table()
+    for i in range(256):
+      v = ('1%8s' % bin(i, 2)).replace(' ', '0')
+      self.assertEqual(proc(v), table[i])
+
+  def test08_u2_8p1r(self):
+    op = bob.ip.LBP8R(1,False,False,False,True,False)
+    proc = Processor(op, generate_3x3_image, (1,1))
+    table = calculate_lbp8r_u2_table()
+    values = []
+    for i in range(256):
+      v = ('1%8s' % bin(i, 2)).replace(' ', '0')
+      values.append(proc(v))
+      # just check that the zeros are good
+      if not table[i] and i: self.assertEqual(values[-1], 0)
+      if values[-1] and i: 
+        self.assertEqual(bool(table[i]), True)
+    self.assertEqual(len(set(values)), len(set(table))+1)
+
+  def test09_riu2_8p1r(self):
+    op = bob.ip.LBP8R(1,False,False,False,True,True)
+    proc = Processor(op, generate_3x3_image, (1,1))
+    table = calculate_lbp8r_riu2_table()
+    values = []
+    for i in range(256):
+      v = ('1%8s' % bin(i, 2)).replace(' ', '0')
+      values.append(proc(v)) 
+      # just check that the zeros are good
+      if not table[i] and i: self.assertEqual(values[-1], 0)
+      if values[-1] and i: 
+        self.assertEqual(bool(table[i]), True)
+    self.assertEqual(len(set(values)), len(set(table))+1)
+
+  def test10_shape(self):
+    lbp = bob.ip.LBP8R()
+    image = numpy.ndarray((3,3), dtype='uint8')
+    sh = lbp.getLBPShape(image)
+    self.assertEqual(sh, (1,1))
+    
+# Instantiates our standard main module for unittests
+main = bob.helper.unittest_main(LBPTest)

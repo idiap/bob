@@ -1,0 +1,9 @@
+* pybob_visioner does not seem to depend correctly on bob_visioner. If the
+  build is run in parallel, it normally fails.
+* installation remains untested
+* the macro bob_python_tag_build (using configure_file) does not work as
+  expected. Sometimes it fills the right values, sometimes it does not.
+* Remove all group writing (chmod) flags from installation, leave this to the
+  build system
+* Example installation requires specific macro
+* face_verification python package not migrated to new infrastructure

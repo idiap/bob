@@ -21,33 +21,44 @@ endif(FFMPEG_FOUND)
 add_definitions("-D__STDC_CONSTANT_MACROS")
 
 set(pysrc
+   "lib/__init__.py"
    "lib/__array__.py"
    "lib/__arrayset__.py"
    "lib/__file__.py"
    "lib/__hdf5__.py"
-   "lib/__init__.py"
+   "lib/test/__init__.py"
+   "lib/test/file.py"
+   "lib/test/array.py"
+   "lib/test/video.py"
+   "lib/test/hdf5.py"
+   "lib/test/arrayset.py"
+   "lib/example/__init__.py"
+   "lib/example/video2frame.py"
+   "lib/script/__init__.py"
+   "lib/script/filelist.py"
+   "lib/script/arrayset_transcode.py"
+   "lib/script/array_transcode.py"
    )
 
 bob_python_package_bindings(io "${ccsrc}" "${pysrc}" "core_array")
 
 # Our test units
-bob_python_add_test(python-io-array-tests
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_array.py)
-bob_python_add_test(python-io-arrayset-tests
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_arrayset.py)
-bob_python_add_test(python-io-hdf5-tests
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_hdf5.py)
-bob_python_add_test(python-io-file-tests
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_file.py)
+bob_python_add_unittest(io lib/test/array.py main
+  "${CMAKE_CURRENT_SOURCE_DIR}/data")
+bob_python_add_unittest(io lib/test/arrayset.py main
+  "${CMAKE_CURRENT_SOURCE_DIR}/data")
+bob_python_add_unittest(io lib/test/hdf5.py main
+  "${CMAKE_CURRENT_SOURCE_DIR}/data")
+bob_python_add_unittest(io lib/test/file.py main
+  "${CMAKE_CURRENT_SOURCE_DIR}/data")
 
 if(FFMPEG_FOUND)
-  bob_python_add_test(python-io-video-tests
-    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_video.py)
+  bob_python_add_unittest(io lib/test/video.py main
+    "${CMAKE_CURRENT_SOURCE_DIR}/data")
 endif(FFMPEG_FOUND)
 
 if(FFMPEG_FOUND AND ImageMagick_FOUND)
-# Our examples (run and install)
-bob_python_add_test(python-io-video2frame-example
-  ${CMAKE_CURRENT_SOURCE_DIR}/example/video2frame.py --test)
-bob_example_install("python" "io" example/video2frame.py)
+  # TODO: Our examples (run and install)
+  #bob_python_example(io "video2frame.py" "lib/example/video2frame.py" "main")
+  #bob_python_add_test(io video2frame.py --test)
 endif(FFMPEG_FOUND AND ImageMagick_FOUND)

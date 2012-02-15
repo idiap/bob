@@ -20,7 +20,7 @@
 """Tests some functionality of the C++-Python exception bridge.
 """
 
-import os, sys, unittest
+import unittest
 import bob
 
 class ExceptionTest(unittest.TestCase):
@@ -33,5 +33,5 @@ class ExceptionTest(unittest.TestCase):
     self.assertRaises(RuntimeError, bob.ip.throw_exception)
   """
 
-def main():
-  unittest.main()
+# Instantiates our standard main module for unittests
+main = bob.helper.unittest_main(ExceptionTest)

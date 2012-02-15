@@ -20,8 +20,6 @@
 """Tests some functionality of the C++-Python array conversion bridge.
 """
 
-import os
-import sys
 import unittest
 import bob
 import numpy
@@ -54,5 +52,5 @@ class ConversionTest(unittest.TestCase):
         destRange=(0.,255.))
     self.assertTrue( numpy.array_equal(x.astype('float64'), c) )
 
-def main():
-  unittest.main()
+# Instantiates our standard main module for unittests
+main = bob.helper.unittest_main(ConversionTest)

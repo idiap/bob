@@ -66,6 +66,17 @@ set(pysrc
    "lib/xm2vts/dumplist.py"
    "lib/xm2vts/models.py"
    "lib/xm2vts/query.py"
+
+   "lib/example/__init__.py"
+   "lib/example/iris_backprop.py"
+   "lib/example/iris_lda.py"
+   "lib/example/iris_rprop.py"
+   "lib/example/replay_example.py"
+   "lib/script/__init__.py"
+   "lib/script/dbmanage.py"
+   "lib/test/__init__.py"
+   "lib/test/faceverif_fl.py"
+   "lib/test/replay.py"
    )
 
 bob_python_package_bindings(db "" "${pysrc}" "core_array")
@@ -79,29 +90,26 @@ macro(bob_build_db dbname)
   # directory at an indicated global position where the databases can be used
   # for downloading through our web server.
   if (BOB_CREATE_DATABASES)
-    bob_python_add_test(python-db-${dbname}-create
-      ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py ${dbname} create 
-      --recreate)
-    set(python-db-${dbname}-instantiation python-db-${dbname}-create)
+    bob_python_add_test(db-${dbname}-create dbmanage.py ${dbname} create --recreate)
+    set(python-db-${dbname}-instantiation python-db-${dbname}-create-dbmanage)
 
   else ()
-    bob_python_add_test(python-db-${dbname}-download
-      ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py ${dbname} download
-      --url=${BOB_DATABASE_URL} --version=${BOB_DATABASE_VERSION})
-    set(python-db-${dbname}-instantiation python-db-${dbname}-download)
+    bob_python_add_test(db-${dbname}-download dbmanage.py ${dbname} download --url=${BOB_DATABASE_URL} --version=${BOB_DATABASE_VERSION})
+    set(python-db-${dbname}-instantiation python-db-${dbname}-download-dbmanage)
   endif ()
 
   # If the copying has been set through the commandline, after creation or
   # downloading, copies the database to a given location.
   if (BOB_DB_INSTALL_PREFIX)
-    bob_python_add_test(python-db-${dbname}-copy
-      ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py ${dbname} copy
-      ${BOB_DB_INSTALL_PREFIX})
-    set_property(TEST python-db-${dbname}-copy APPEND PROPERTY DEPENDS
+    bob_python_add_test(db-${dbname}-copy dbmanage.py ${dbname} copy ${BOB_DB_INSTALL_PREFIX})
+    set_property(TEST python-db-${dbname}-copy-dbmanage APPEND PROPERTY DEPENDS
       ${python-db-${dbname}-instantiation})
   endif ()
 
 endmacro(bob_build_db dbname)
+
+# Installs our script driver
+bob_python_script(db "dbmanage.py" "lib/script/dbmanage.py" "main")
 
 # Run creation or downloading
 bob_build_db(replay)
@@ -131,8 +139,9 @@ bob_python_add_test(python-db-replay-dumplist2
   --group=devel --support=hand --protocol=highdef --self-test)
 set_property(TEST python-db-replay-dumplist2 APPEND PROPERTY DEPENDS 
   ${python-db-replay-instantiation})
-bob_python_add_test(python-db-replay-query ${CMAKE_CURRENT_SOURCE_DIR}/test/test_replay.py)
-set_property(TEST python-db-replay-query APPEND PROPERTY DEPENDS 
+
+bob_python_add_unittest(db lib/test/replay.py main)
+set_property(TEST python-db-test-replay APPEND PROPERTY DEPENDS 
   ${python-db-replay-instantiation})
 
 # BANCA database driver tests.
@@ -172,7 +181,8 @@ set_property(TEST python-db-biosecure-dumplist2 APPEND PROPERTY DEPENDS
   ${python-db-biosecure-instantiation})
 
 # Faceverif_fl database (uses file lists).
-bob_python_add_test(python-db-faceverif_fl-query ${CMAKE_CURRENT_SOURCE_DIR}/test/test_faceverif_fl.py)
+bob_python_add_unittest(db lib/test/faceverif_fl.py main
+  ${CMAKE_CURRENT_SOURCE_DIR}/data)
 
 # LFW database driver tests.
 # ######### Notice test dependencies!! ##################

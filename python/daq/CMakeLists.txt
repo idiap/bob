@@ -9,6 +9,8 @@ set(ccsrc
 
 set(pysrc
    "lib/__init__.py"
+   "lib/test/__init__.py"
+   "lib/test/all.py"
    )
 
 if (V4L2_FOUND)
@@ -28,8 +30,9 @@ bob_python_package_bindings(daq "${ccsrc}" "${pysrc}" "core_array")
 target_link_libraries(pybob_daq ${QT_LIBRARIES})
 
 if (V4L2_FOUND)
+  #TODO: fix this
   bob_example_install("python" "daq" example/capture.py)
 endif()
 
-bob_python_add_test(python-daq-test
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test.py)
+bob_python_add_unittest(daq lib/test/all.py main
+  "${CMAKE_CURRENT_SOURCE_DIR}/../io/data")

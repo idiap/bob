@@ -19,6 +19,7 @@ from . import machine
 from . import trainer
 from . import daq
 from . import build
+from . import helper
 
 try:
   # the visioner may not be built if Qt4 is not installed
@@ -39,9 +40,10 @@ __all__ = [
     'ip',
     'db',
     'machine',
-    'trainer'
-    'daq'
-    'build'
+    'trainer',
+    'daq',
+    'build',
+    'helper',
     ]
 
 if has_visioner: __all__.append('visioner')

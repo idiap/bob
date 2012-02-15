@@ -11,16 +11,17 @@ set(ccsrc
 
 set(pysrc
    "lib/__init__.py"
+   "lib/test/__init__.py"
+   "lib/test/interiorpointLP.py"
+   "lib/test/linsolve.py"
+   "lib/test/norminv.py"
+   "lib/test/stats.py"
    )
  
 bob_python_package_bindings(math "${ccsrc}" "${pysrc}" "core_array")
 
 # Our test units
-bob_python_add_test(python-math-interiorpointLP-tests
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_interiorpointLP.py)
-bob_python_add_test(python-math-linsolve-tests
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_linsolve.py)
-bob_python_add_test(python-math-norminv-tests
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_norminv.py)
-bob_python_add_test(python-math-stats-tests 
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_stats.py)
+bob_python_add_unittest(math lib/test/interiorpointLP.py main)
+bob_python_add_unittest(math lib/test/linsolve.py main)
+bob_python_add_unittest(math lib/test/norminv.py main)
+bob_python_add_unittest(math lib/test/stats.py main)

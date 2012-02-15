@@ -37,7 +37,7 @@ macro(bob_test package name src)
   add_executable(${testname} ${src})
   target_link_libraries(${testname} bob_${package} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_RELEASE})
   add_test(cxx-${package}-${name} ${testname} --log_level=test_suite)
-  set_property(TEST cxx-${package}-${name} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+  set_property(TEST cxx-${package}-${name} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/data")
 endmacro()
 
 # Creates a standard Bob benchmark.
@@ -48,6 +48,35 @@ macro(bob_benchmark package name src)
   add_executable(${progname} ${src})
   target_link_libraries(${progname} bob_${package})
   install(TARGETS ${progname} RUNTIME DESTINATION ${bindir})
+endmacro()
+
+# Installs data that needs copying to specific locations inside the python
+# directory structure.
+macro(bob_python_data package_name filenames relative)
+
+  foreach(filename ${filenames})
+
+    string(REPLACE "${relative}" "" stem "${filename}")
+
+    set(output_stem "lib/python${PYTHON_VERSION}/bob/${package_name}/${stem}")
+
+    set(output_file "${CMAKE_BINARY_DIR}/${output_stem}")
+    add_custom_command(
+      OUTPUT "${output_file}"
+      DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${filename}"
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/${filename}" "${output_file}"
+      COMMENT "Copying data file ${package}/${filename}")
+
+    get_filename_component(basename ${filename} NAME)
+
+    add_custom_target(pybob_${package_name}_${basename}_data DEPENDS "${output_file}")
+    add_dependencies(pybob_${package_name} pybob_${package_name}_${basename}_data)
+
+    # this will make the script available to the installation tree
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${filename} DESTINATION ${output_stem})
+
+  endforeach()
+
 endmacro()
 
 # Builds and installs a new script similar to what setuptools do for the
@@ -61,12 +90,25 @@ macro(bob_python_script package_name script_name python_module python_method)
 
   set(output_file "${CMAKE_BINARY_DIR}/bin/${script_name}")
 
-  add_custom_command(
-    OUTPUT "${output_file}"
-    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${python_module}" "${CMAKE_SOURCE_DIR}/bin/make_wrapper.py"
-    COMMAND ${PYTHON_EXECUTABLE}
-    ARGS ${CMAKE_SOURCE_DIR}/bin/make_wrapper.py "${module_name}" "${python_method}" "${output_file}"
-    COMMENT "Generating script ${script_name}")
+  if(BOB_NON_ROOT_INSTALL)
+
+    add_custom_command(
+      OUTPUT "${output_file}"
+      DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${python_module}" "${CMAKE_SOURCE_DIR}/bin/make_wrapper.py"
+      COMMAND ${PYTHON_EXECUTABLE}
+      ARGS ${CMAKE_SOURCE_DIR}/bin/make_wrapper.py --non-root "${module_name}" "${python_method}" "${output_file}"
+      COMMENT "Generating script ${script_name}")
+
+  else(BOB_NON_ROOT_INSTALL)
+
+    add_custom_command(
+      OUTPUT "${output_file}"
+      DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${python_module}" "${CMAKE_SOURCE_DIR}/bin/make_wrapper.py"
+      COMMAND ${PYTHON_EXECUTABLE}
+      ARGS ${CMAKE_SOURCE_DIR}/bin/make_wrapper.py "${module_name}" "${python_method}" "${output_file}"
+      COMMENT "Generating script ${script_name}")
+
+  endif(BOB_NON_ROOT_INSTALL)
 
   get_filename_component(script_basename ${script_name} NAME_WE)
 
@@ -86,6 +128,7 @@ macro(bob_python_tag_build source)
   set(output_stem lib/python${PYTHON_VERSION}/bob/${version_file})
   set(output_file ${CMAKE_BINARY_DIR}/${output_stem})
 
+  # TODO: This is not working as expected!
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${source} ${output_file})
 
   set(module_name "root.${version_file}")
@@ -170,7 +213,7 @@ macro(bob_python_bindings cxx_package package src pydependencies)
   #message(STATUS "${pyheader_list} !! ${pydeps_list}")
   #message(STATUS "${package}/${cxx_package} : ${BOB_PYTHON_${PACKAGE}_HEADER_DIRS} - ${BOB_${CXX_PACKAGE}_HEADER_DIRS}")
 
-  if ("${src}" STREQUAL "")
+  if("${src}" STREQUAL "")
     add_custom_target(pybob_${package} ALL)
     ## TODO Add correct dependencies
 
@@ -216,7 +259,7 @@ macro(bob_python_add_unittest package_name python_module python_method)
   
   get_filename_component(test_name_suffix ${python_module} NAME_WE)
   set(test_name_suffix "${test_name_suffix}-${python_method}")
-  string(REPLACE "." "_" test_name "python-core-${test_name_suffix}")
+  string(REPLACE "." "_" test_name "python-${package_name}-${test_name_suffix}")
 
   add_custom_command(
     OUTPUT "${output_file}"
@@ -228,10 +271,15 @@ macro(bob_python_add_unittest package_name python_module python_method)
   add_custom_target(${test_name} DEPENDS "${output_file}")
   add_dependencies(pybob_${package_name} ${test_name})
 
-  add_test(${test_name} ${output_file} -v)
+  # The 4th parameter is optional, it indicates the cwd for the test
+  if(${ARGC} EQUAL 4)
+    add_test(${test_name} ${output_file} --cwd=${ARGV3} --verbose --verbose)
+  else()
+    add_test(${test_name} ${output_file} --verbose --verbose)
+  endif()
 
   # Common properties to all tests
-  set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+  set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/data")
   set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}")
 
   if(APPLE)
@@ -262,14 +310,14 @@ function(bob_python_add_test)
   endif()
 
   # Common properties to all python tests
-  set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+  set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/data")
   set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}")
 
   if(APPLE)
     set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "DYLD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/lib")
   endif()
 
-endfunction(bob_python_add_test)
+endfunction()
 
 # This macro installs an example in a standard location
 macro(bob_example_install subsys package file)
