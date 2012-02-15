@@ -6,5 +6,5 @@
 """Version information collected during Bob's build
 """
 
-version = "@BOB_VERSION@"
-platform = "@BOB_PLATFORM@"
+version = "${BOB_VERSION}"
+platform = "${BOB_PLATFORM}"
