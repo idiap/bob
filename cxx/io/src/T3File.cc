@@ -3,7 +3,7 @@
  * @date Wed Oct 26 17:11:16 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
- * @brief Implements a bob3vision bindata reader/writer
+ * @brief Implements a torch3vision bindata reader/writer
  * The format, as described in the old source code goes like this.
  * 1) data is always recorded in little endian format
  * 2) the first 4 bytes describe an integer that indicates the number of arrays
@@ -170,7 +170,7 @@ class T3File: public io::File {
       const ca::typeinfo& info = buffer.type();
 
       if (!m_newfile && !info.is_compatible(m_type_arrayset)) {
-        boost::format f("input buffer of type %s cannot be appended to already initialized bob3vision binary file of type %s");
+        boost::format f("input buffer of type %s cannot be appended to already initialized torch3vision binary file of type %s");
         f % info.str() % m_type_arrayset.str();
         throw std::invalid_argument(f.str().c_str());
       }
@@ -259,7 +259,7 @@ class T3File: public io::File {
       }
 
       else {
-        boost::format f("cannot do single write of bob3vision .bindata file with array with type '%s' - only supports 1D or 2D arrays of types float32 or float64");
+        boost::format f("cannot do single write of torch3vision .bindata file with array with type '%s' - only supports 1D or 2D arrays of types float32 or float64");
         f % info.str();
         throw std::invalid_argument(f.str().c_str());
       }
@@ -278,7 +278,7 @@ class T3File: public io::File {
 
 };
 
-std::string T3File::s_codecname = "bob3.binary";
+std::string T3File::s_codecname = "torch3.binary";
 
 /**
  * From this point onwards we have the registration procedure. If you are
@@ -321,7 +321,7 @@ static bool register_codec() {
   boost::shared_ptr<io::CodecRegistry> instance =
     io::CodecRegistry::instance();
   
-  instance->registerExtension(".bindata", "bob3 binary data format", &make_file);
+  instance->registerExtension(".bindata", "torch3 binary data format", &make_file);
 
   return true;
 

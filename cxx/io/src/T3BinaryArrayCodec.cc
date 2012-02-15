@@ -3,7 +3,7 @@
  * @date Wed Jun 22 17:50:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
- * @brief Implements a bob3vision bindata reader/writer
+ * @brief Implements a torch3vision bindata reader/writer
  * The format, as described in the old source code goes like this.
  * 1) data is always recorded in little endian format
  * 2) the first 4 bytes describe an integer that indicates the number of arrays
@@ -60,7 +60,7 @@ static bool register_codec() {
 static bool codec_registered = register_codec();
 
 io::T3BinaryArrayCodec::T3BinaryArrayCodec()
-  : m_name("bob3.array.binary"),
+  : m_name("torch3.array.binary"),
     m_extensions()
 { 
   m_extensions.push_back(".bindata");

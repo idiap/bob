@@ -152,7 +152,7 @@ static bool register_codec() {
   boost::shared_ptr<io::CodecRegistry> instance =
     io::CodecRegistry::instance();
   
-  instance->registerExtension(".tensor", "bob3vision v2.1 tensor files", &make_file);
+  instance->registerExtension(".tensor", "torch3vision v2.1 tensor files", &make_file);
 
   return true;
 
