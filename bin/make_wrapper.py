@@ -73,6 +73,8 @@ def main():
 
   if platform.system() == 'Darwin':
     dictionary['osx_dyld'] = "prepend_path('DYLD_LIBRARY_PATH', library_path)"
+  else:
+    dictionary['osx_dyld'] = ""
 
   f.write(TEMPLATE % dictionary)
   f.close()
