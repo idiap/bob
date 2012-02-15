@@ -94,9 +94,9 @@ BOOST_AUTO_TEST_CASE( test_initialization )
   M.setActivation(bob::machine::TANH);
   
   //now load the same machine from the file and compare
-  char *testdata_cpath = getenv("BOB_MACHINE_TESTDATA_DIR");
+  char *testdata_cpath = getenv("BOB_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    bob::core::error << "Environment variable $BOB_MACHINE_TESTDATA_DIR " <<
+    bob::core::error << "Environment variable $BOB_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
     throw bob::core::Exception();
@@ -116,9 +116,9 @@ BOOST_AUTO_TEST_CASE( test_initialization )
 BOOST_AUTO_TEST_CASE( test_error_check )
 {
   //loads a known machine from the file
-  char *testdata_cpath = getenv("BOB_MACHINE_TESTDATA_DIR");
+  char *testdata_cpath = getenv("BOB_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    bob::core::error << "Environment variable $BOB_MACHINE_TESTDATA_DIR " <<
+    bob::core::error << "Environment variable $BOB_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
     throw bob::core::Exception();
@@ -143,9 +143,9 @@ BOOST_AUTO_TEST_CASE( test_error_check )
 BOOST_AUTO_TEST_CASE( test_correctness )
 {
   //loads a known machine from the file
-  char *testdata_cpath = getenv("BOB_MACHINE_TESTDATA_DIR");
+  char *testdata_cpath = getenv("BOB_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    bob::core::error << "Environment variable $BOB_MACHINE_TESTDATA_DIR " <<
+    bob::core::error << "Environment variable $BOB_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
     throw bob::core::Exception();

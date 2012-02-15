@@ -37,4 +37,4 @@ bob_library(machine "${src}" "${deps}" "${shared}")
 # Defines tests for this package
 bob_test(machine linear test/linear.cc)
 set_property(TEST cxx-machine-linear APPEND PROPERTY ENVIRONMENT
-  "BOB_MACHINE_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/../../python/machine/test/data")
+  "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/../../python/machine/data")
