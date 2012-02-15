@@ -28,6 +28,7 @@
 #include "io/Arrayset.h"
 #include "io/HDF5File.h"
 #include "machine/GMMMachine.h"
+#include "machine/JFAMachineException.h"
 #include "machine/LinearScoring.h"
 
 namespace bob { namespace machine {
@@ -116,19 +117,22 @@ namespace bob { namespace machine {
         * Get the number of Gaussian components
         */
       const int getDimC() const 
-      { return m_ubm->getNGaussians(); }
+      { if(!m_ubm) throw bob::machine::JFAMachineNoUBM(); 
+        return m_ubm->getNGaussians(); }
 
       /**
         * Get the feature dimensionality
         */
       const int getDimD() const 
-      { return m_ubm->getNInputs(); }
+      { if(!m_ubm) throw bob::machine::JFAMachineNoUBM();
+        return m_ubm->getNInputs(); }
 
       /**
         * Get the supervector length
         */
       const int getDimCD() const 
-      { return m_ubm->getNInputs()*m_ubm->getNGaussians(); }
+      { if(!m_ubm) throw bob::machine::JFAMachineNoUBM(); 
+        return m_ubm->getNInputs()*m_ubm->getNGaussians(); }
 
       /**
         * Get the size/rank ru of the U matrix
