@@ -32,6 +32,9 @@ set(pysrc
   "lib/script/config.py"
   "lib/script/__init__.py"
   "lib/random/__init__.py"
+  "lib/test/__init__.py"
+  "lib/test/convert.py"
+  "lib/test/exception.py"
   )
 
 bob_python_package_bindings(core "${ccsrc}" "${pysrc}" "")
@@ -40,10 +43,8 @@ bob_python_submodule_bindings(core random "${ccsrc_random}" "")
 
 # Installs and test our scripts
 bob_python_script(core "bob_config.py" "lib/script/config.py" "main")
-bob_python_add_test(python-core-config-test bob_config.py)
+bob_python_add_test(core bob_config.py)
 
 # Our test units
-bob_python_add_test(python-core-exception-tests 
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_exception.py)
-bob_python_add_test(python-core-conversion-tests 
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_convert.py)
+bob_python_add_unittest(core lib/test/exception.py main)
+bob_python_add_unittest(core lib/test/convert.py main)

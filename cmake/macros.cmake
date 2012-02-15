@@ -189,17 +189,56 @@ macro(bob_python_bindings cxx_package package src pydependencies)
     install(TARGETS pybob_${package} LIBRARY DESTINATION lib)#lib/python${PYTHON_VERSION}/bob/${package_path})
   endif()
   
-endmacro(bob_python_bindings)
+endmacro(bob_python_bindings cxx_package package src pydependencies)
 
 macro(bob_python_package_bindings package src pysrc pydependencies)
   bob_python_bindings("${package}" "${package}" "${src}" "${pydependencies}")
   bob_python_module("${package}" "${pysrc}")
-endmacro(bob_python_package_bindings)
+endmacro()
 
 macro(bob_python_submodule_bindings package subpackage src pydependencies)
   bob_python_bindings("${package}" "${package}_${subpackage}" "${src}" "${pydependencies}")
   set_target_properties(pybob_${package}_${subpackage} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob/${package}/${subpackage})
-endmacro(bob_python_submodule_bindings)
+endmacro()
+
+# This macro helps users to add python tests coded with the unittest module
+macro(bob_python_add_unittest package_name python_module python_method)
+
+  # figures out the module name from the input file dependence name
+  string(REPLACE ".py" "" module_name "${python_module}")
+  string(REPLACE "/" "." module_name "${module_name}")
+  string(REPLACE "lib." "bob.${package_name}." module_name "${module_name}")
+  string(REPLACE "." "_" test_filename "${module_name}")
+
+  set(output_file "${CMAKE_BINARY_DIR}/bin/test_python_${test_filename}.py")
+  
+  get_filename_component(script_name ${output_file} NAME)
+  
+  get_filename_component(test_name_suffix ${python_module} NAME_WE)
+  set(test_name_suffix "${test_name_suffix}-${python_method}")
+  string(REPLACE "." "_" test_name "python-core-${test_name_suffix}")
+
+  add_custom_command(
+    OUTPUT "${output_file}"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${python_module}" "${CMAKE_SOURCE_DIR}/bin/make_wrapper.py"
+    COMMAND ${PYTHON_EXECUTABLE}
+    ARGS ${CMAKE_SOURCE_DIR}/bin/make_wrapper.py "${module_name}" "${python_method}" "${output_file}"
+    COMMENT "Generating unittest script ${script_name}")
+
+  add_custom_target(${test_name} DEPENDS "${output_file}")
+  add_dependencies(pybob_${package_name} ${test_name})
+
+  add_test(${test_name} ${output_file} -v)
+
+  # Common properties to all tests
+  set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+  set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}")
+
+  if(APPLE)
+    set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "DYLD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/lib")
+  endif()
+
+endmacro()
 
 # This macro helps users to add python tests to cmake
 function(bob_python_add_test)
@@ -214,13 +253,21 @@ function(bob_python_add_test)
   # temporary hack to get the other tests working
   if ("${prog}" STREQUAL "${prog_filename}")
     # new style testing
+    get_filename_component(prog_filename_we ${prog} NAME_WE)
+    set(test_name "python-${test_name}-${prog_filename_we}")
     add_test(${test_name};${CMAKE_BINARY_DIR}/bin/${prog_filename};${ARGV})
   else()
+    # TODO: get rid of this once all tests have been migrated
     add_test(${test_name};${prog};${ARGV})
   endif()
 
-  # Common properties to all tests
+  # Common properties to all python tests
   set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+  set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}")
+
+  if(APPLE)
+    set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "DYLD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/lib")
+  endif()
 
 endfunction(bob_python_add_test)
 

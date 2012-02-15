@@ -33,15 +33,5 @@ class ExceptionTest(unittest.TestCase):
     self.assertRaises(RuntimeError, bob.ip.throw_exception)
   """
 
-if __name__ == '__main__':
-  sys.argv.append('-v')
-  if os.environ.has_key('BOB_PROFILE') and \
-      os.environ['BOB_PROFILE'] and \
-      hasattr(bob.core, 'ProfilerStart'):
-    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
-  os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
+def main():
   unittest.main()
-  if os.environ.has_key('BOB_PROFILE') and \
-      os.environ['BOB_PROFILE'] and \
-      hasattr(bob.core, 'ProfilerStop'):
-    bob.core.ProfilerStop()

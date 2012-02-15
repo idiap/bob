@@ -6,7 +6,12 @@
 """Self-contained script to generate python executables.
 """
 
-TEMPLATE = """#!%(python)s
+TEMPLATE_LOCAL = """#!%(python)s
+from %(module)s import %(method)s as main
+main()
+"""
+
+TEMPLATE_NON_LOCAL = """#!%(python)s
 import os
 import sys
 prefix = os.path.realpath(os.path.dirname(os.path.dirname(__file__)))
@@ -43,6 +48,9 @@ def main():
   parser = argparse.ArgumentParser(description=__doc__)
       #epilog=__epilog__, formatter_class=argparse.RawDescriptionHelpFormatter
 
+  parser.add_argument("--non-local", dest="non_local", default=False, 
+      action="store_true", help="If set, make the installation of python scripts such that it can execute from non-default directories. By default we assume that python scripts are installed in places where extensions can be located automatically")
+  
   parser.add_argument("module", help="The python module name (with dots)",
       metavar="MODULE")
   
@@ -75,14 +83,17 @@ def main():
     dictionary['osx_dyld'] = "prepend_path('DYLD_LIBRARY_PATH', library_path)"
   else:
     dictionary['osx_dyld'] = ""
-
-  f.write(TEMPLATE % dictionary)
+  
+  if args.non_local:
+    f.write(TEMPLATE_NON_LOCAL % dictionary)
+  else:
+    f.write(TEMPLATE_LOCAL % dictionary)
   f.close()
   del f
 
   # Set execution bit, depending on the read mode for user, group and others
   mode = os.stat(args.output).st_mode
-  if mode & stat.S_IRUSR: 
+  if mode & stat.S_IRUSR:
     os.chmod(args.output, mode | stat.S_IXUSR)
     mode = os.stat(args.output).st_mode
   if mode & stat.S_IRGRP: 
