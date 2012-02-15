@@ -319,6 +319,26 @@ function(bob_python_add_test)
 
 endfunction()
 
+# This macro helps users to add python tests to cmake that depends on other
+# tests
+function(bob_python_add_dependent_test)
+
+  list(GET ARGV 0 test_name)
+  list(GET ARGV 1 dependencies)
+  list(GET ARGV 2 prog)
+  list(REMOVE_AT ARGV 0) #pop from front
+  list(REMOVE_AT ARGV 0) #pop from front
+  list(REMOVE_AT ARGV 0) #pop from front
+
+  bob_python_add_test(${test_name};${prog};${ARGV})
+
+  get_filename_component(prog_filename_we ${prog} NAME_WE)
+  set(test_name "python-${test_name}-${prog_filename_we}") 
+
+  set_property(TEST ${test_name} APPEND PROPERTY DEPENDS "${dependencies}")
+
+endfunction()
+
 # This macro installs an example in a standard location
 macro(bob_example_install subsys package file)
   set(exdir share/doc/examples/${subsys}/${package})

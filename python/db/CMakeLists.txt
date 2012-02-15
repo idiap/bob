@@ -111,6 +111,13 @@ endmacro(bob_build_db dbname)
 # Installs our script driver
 bob_python_script(db "dbmanage.py" "lib/script/dbmanage.py" "main")
 
+# Installs all text/extra data for the databases
+set(data
+  "lib/iris/iris.names"
+  "lib/iris/iris.data"
+  )
+bob_python_data(db "${data}" "lib/")
+
 # Run creation or downloading
 bob_build_db(replay)
 bob_build_db(banca)
@@ -123,133 +130,105 @@ bob_build_db(scface)
 bob_build_db(xm2vts)
 
 # Iris database driver and example tests
-bob_python_add_test(python-db-iris-dump
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py iris dump --self-test)
-bob_python_add_test(python-db-iris-dumplist2
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py iris dump --class=versicolor --self-test)
+bob_python_add_test(db-iris-dump dbmanage.py iris dump --self-test)
+bob_python_add_test(db-iris-dump-2 dbmanage.py iris dump --class=versicolor --self-test)
 
 # Replay attack database driver tests.
-# ######### Notice test dependencies!! ##################
-bob_python_add_test(python-db-replay-dumplist
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py replay dumplist --self-test)
-set_property(TEST python-db-replay-dumplist APPEND PROPERTY DEPENDS
-  ${python-db-replay-instantiation})
-bob_python_add_test(python-db-replay-dumplist2
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py replay dumplist --class=attack
-  --group=devel --support=hand --protocol=highdef --self-test)
-set_property(TEST python-db-replay-dumplist2 APPEND PROPERTY DEPENDS 
-  ${python-db-replay-instantiation})
+bob_python_add_dependent_test(db-replay-dumplist 
+  "${python-db-replay-instantiation}" 
+  dbmanage.py replay dumplist --self-test)
+
+bob_python_add_dependent_test(db-replay-dumplist2 
+  "${python-db-replay-instantiation}" 
+  dbmanage.py replay dumplist --class=attack --group=devel --support=hand --protocol=highdef --self-test)
 
 bob_python_add_unittest(db lib/test/replay.py main)
-set_property(TEST python-db-test-replay APPEND PROPERTY DEPENDS 
+set_property(TEST python-db-replay-main APPEND PROPERTY DEPENDS 
   ${python-db-replay-instantiation})
 
 # BANCA database driver tests.
-# ######### Notice test dependencies!! ##################
-bob_python_add_test(python-db-banca-dumplist
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py banca dumplist --self-test)
-set_property(TEST python-db-banca-dumplist APPEND PROPERTY DEPENDS
-  ${python-db-banca-instantiation})
-bob_python_add_test(python-db-banca-dumplist2
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py banca dumplist --protocol=P --classes=client
-  --groups=g1 --purposes=enrol --self-test)
-set_property(TEST python-db-banca-dumplist2 APPEND PROPERTY DEPENDS 
-  ${python-db-banca-instantiation})
+bob_python_add_dependent_test(db-banca-dumplist 
+  "${python-db-banca-instantiation}"
+  dbmanage.py banca dumplist --self-test)
+
+bob_python_add_dependent_test(db-banca-dumplist2
+  "${python-db-banca-instantiation}"
+  dbmanage.py banca dumplist --protocol=P --classes=client --groups=g1 --purposes=enrol --self-test)
 
 # BANCA_SMALL database driver tests.
-# ######### Notice test dependencies!! ##################
-bob_python_add_test(python-db-banca_small-dumplist
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py banca_small dumplist --self-test)
-set_property(TEST python-db-banca_small-dumplist APPEND PROPERTY DEPENDS
-  ${python-db-banca_small-instantiation})
-bob_python_add_test(python-db-banca_small-dumplist2
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py banca_small dumplist --protocol=P --classes=client
-  --groups=g1 --purposes=enrol --self-test)
-set_property(TEST python-db-banca_small-dumplist2 APPEND PROPERTY DEPENDS 
-  ${python-db-banca_small-instantiation})
+bob_python_add_dependent_test(db-banca_small-dumplist
+  "${python-db-banca_small-instantiation}" 
+  dbmanage.py banca_small dumplist --self-test)
+
+bob_python_add_dependent_test(db-banca_small-dumplist2 
+  "${python-db-banca_small-instantiation}"
+  dbmanage.py banca_small dumplist --protocol=P --classes=client --groups=g1 --purposes=enrol --self-test)
 
 # Biosecure database driver tests.
-# ######### Notice test dependencies!! ##################
-bob_python_add_test(python-db-biosecure-dumplist
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py biosecure dumplist --self-test)
-set_property(TEST python-db-biosecure-dumplist APPEND PROPERTY DEPENDS
-  ${python-db-biosecure-instantiation})
-bob_python_add_test(python-db-biosecure-dumplist2
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py biosecure dumplist --protocol=ca0 --classes=client 
-  --groups=dev --purposes=enrol --self-test)
-set_property(TEST python-db-biosecure-dumplist2 APPEND PROPERTY DEPENDS 
-  ${python-db-biosecure-instantiation})
+bob_python_add_dependent_test(db-biosecure-dumplist 
+  "${python-db-banca_small-instantiation}" 
+  dbmanage.py biosecure dumplist --self-test)
+
+bob_python_add_dependent_test(db-biosecure-dumplist2
+  "${python-db-banca_small-instantiation}" 
+  dbmanage.py biosecure dumplist --protocol=ca0 --classes=client --groups=dev --purposes=enrol --self-test)
 
 # Faceverif_fl database (uses file lists).
 bob_python_add_unittest(db lib/test/faceverif_fl.py main
   ${CMAKE_CURRENT_SOURCE_DIR}/data)
 
 # LFW database driver tests.
-# ######### Notice test dependencies!! ##################
-bob_python_add_test(python-db-lfw-dumplist
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py lfw dumplist --self-test)
-set_property(TEST python-db-lfw-dumplist APPEND PROPERTY DEPENDS
-  ${python-db-lfw-instantiation})
-bob_python_add_test(python-db-lfw-dumplist2
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py lfw dumplist --view=view1 --subset=fold1 --classes=matched --self-test)
-set_property(TEST python-db-lfw-dumplist2 APPEND PROPERTY DEPENDS
-  ${python-db-lfw-instantiation})
+bob_python_add_dependent_test(db-lfw-dumplist
+  "${python-db-banca_small-instantiation}" 
+  dbmanage.py lfw dumplist --self-test)
+
+bob_python_add_dependent_test(db-lfw-dumplist2
+  "${python-db-banca_small-instantiation}" 
+  dbmanage.py lfw dumplist --view=view1 --subset=fold1 --classes=matched --self-test)
 
 # MOBIO database driver tests.
-# ######### Notice test dependencies!! ##################
-bob_python_add_test(python-db-mobio-dumplist
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py mobio dumplist --self-test)
-set_property(TEST python-db-mobio-dumplist APPEND PROPERTY DEPENDS
-  ${python-db-mobio-instantiation})
-bob_python_add_test(python-db-mobio-dumplist2
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py mobio dumplist --protocol=male --classes=client 
-  --groups=dev --purposes=enrol --self-test)
-set_property(TEST python-db-mobio-dumplist2 APPEND PROPERTY DEPENDS 
-  ${python-db-mobio-instantiation})
+bob_python_add_dependent_test(db-mobio-dumplist 
+  "${python-db-banca_small-instantiation}" 
+  dbmanage.py mobio dumplist --self-test)
+
+bob_python_add_dependent_test(db-mobio-dumplist2 
+  "${python-db-banca_small-instantiation}" 
+  dbmanage.py mobio dumplist --protocol=male --classes=client --groups=dev --purposes=enrol --self-test)
 
 # Multi-PIE database driver tests.
-# ######### Notice test dependencies!! ##################
-bob_python_add_test(python-db-multipie-dumplist
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py multipie dumplist --self-test)
-set_property(TEST python-db-multipie-dumplist APPEND PROPERTY DEPENDS
-  ${python-db-multipie-instantiation})
-bob_python_add_test(python-db-multipie-dumplist2
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py multipie dumplist --protocol=M --classes=client 
-  --groups=dev --purposes=enrol --self-test)
-set_property(TEST python-db-multipie-dumplist2 APPEND PROPERTY DEPENDS 
-  ${python-db-multipie-instantiation})
+bob_python_add_dependent_test(db-multipie-dumplist 
+  "${python-db-banca_small-instantiation}" 
+  dbmanage.py multipie dumplist --self-test)
+
+bob_python_add_dependent_test(db-multipie-dumplist2 
+  "${python-db-banca_small-instantiation}" 
+  dbmanage.py multipie dumplist --protocol=M --classes=client --groups=dev --purposes=enrol --self-test)
 
 # SCface database driver tests.
-# ######### Notice test dependencies!! ##################
-bob_python_add_test(python-db-scface-dumplist
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py scface dumplist --self-test)
-set_property(TEST python-db-scface-dumplist APPEND PROPERTY DEPENDS
-  ${python-db-scface-instantiation})
-bob_python_add_test(python-db-scface-dumplist2
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py scface dumplist --protocol=combined --classes=client 
-  --groups=dev --purposes=enrol --self-test)
-set_property(TEST python-db-scface-dumplist2 APPEND PROPERTY DEPENDS 
-  ${python-db-scface-instantiation})
+bob_python_add_dependent_test(db-scface-dumplist 
+  "${python-db-banca_small-instantiation}" 
+  dbmanage.py scface dumplist --self-test)
+
+bob_python_add_dependent_test(db-scface-dumplist2 
+  "${python-db-banca_small-instantiation}" 
+  dbmanage.py scface dumplist --protocol=combined --classes=client --groups=dev --purposes=enrol --self-test)
 
 # XM2VTS database driver tests.
-# ######### Notice test dependencies!! ##################
-bob_python_add_test(python-db-xm2vts-dumplist
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py xm2vts dumplist --self-test)
-set_property(TEST python-db-xm2vts-dumplist APPEND PROPERTY DEPENDS
-  ${python-db-xm2vts-instantiation})
-bob_python_add_test(python-db-xm2vts-dumplist2
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py xm2vts dumplist --protocol=lp1 --classes=client 
-  --groups=dev --purposes=enrol --self-test)
-set_property(TEST python-db-xm2vts-dumplist2 APPEND PROPERTY DEPENDS 
-  ${python-db-xm2vts-instantiation})
+bob_python_add_dependent_test(db-xm2vts-dumplist 
+  "${python-db-banca_small-instantiation}" 
+  dbmanage.py xm2vts dumplist --self-test)
 
-# Our examples (run and install)
-bob_python_add_test(python-db-iris-lda-example
-  ${CMAKE_CURRENT_SOURCE_DIR}/example/iris_lda.py --self-test)
-bob_example_install("python" "db" example/iris_lda.py)
-bob_python_add_test(python-db-iris-rprop-example
-  ${CMAKE_CURRENT_SOURCE_DIR}/example/iris_rprop.py --self-test)
-bob_example_install("python" "db" example/iris_rprop.py)
-bob_python_add_test(python-db-iris-backprop-example
-  ${CMAKE_CURRENT_SOURCE_DIR}/example/iris_backprop.py --self-test)
-bob_example_install("python" "db" example/iris_backprop.py)
+bob_python_add_dependent_test(db-xm2vts-dumplist2 
+  "${python-db-banca_small-instantiation}" 
+  dbmanage.py xm2vts dumplist --protocol=lp1 --classes=client --groups=dev --purposes=enrol --self-test)
+
+# TODO: Our examples (run and install)
+#bob_python_add_test(python-db-iris-lda-example
+#  ${CMAKE_CURRENT_SOURCE_DIR}/example/iris_lda.py --self-test)
+#bob_example_install("python" "db" example/iris_lda.py)
+#bob_python_add_test(python-db-iris-rprop-example
+#  ${CMAKE_CURRENT_SOURCE_DIR}/example/iris_rprop.py --self-test)
+#bob_example_install("python" "db" example/iris_rprop.py)
+#bob_python_add_test(python-db-iris-backprop-example
+#  ${CMAKE_CURRENT_SOURCE_DIR}/example/iris_backprop.py --self-test)
+#bob_example_install("python" "db" example/iris_backprop.py)

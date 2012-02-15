@@ -7,3 +7,9 @@
   build system
 * Example installation requires specific macro
 * face_verification python package not migrated to new infrastructure
+* Up to now, now way to make MacOSX builds load the python libraries and
+  compiled python modules w/o placing a DYLD_PATH on the environment - may be
+  have to understand how OSX frameworks work?
+* database creation, installation and copying still executed as test - a good
+  thing would be to have independent targets for this. Problems to solve:
+  testing db functionality will not work?

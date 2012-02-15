@@ -29,7 +29,7 @@ class Faceverif_flDatabaseTest(unittest.TestCase):
 
   def test01_query(self):
 
-    db = bob.db.faceverif_fl.Database('data/fl')
+    db = bob.db.faceverif_fl.Database('fl')
     self.assertEqual(len(db.models()), 6) # 6 model ids for world, dev and eval
     self.assertEqual(len(db.models(groups='world')), 2) # 2 model ids for world
     self.assertEqual(len(db.models(groups='dev')), 2) # 2 model ids for dev
