@@ -18,11 +18,20 @@ macro(bob_library package src dependencies shared)
   list(REMOVE_DUPLICATES header_list)
 
   set(BOB_${PACKAGE}_HEADER_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${header_list} CACHE INTERNAL "${package} header dirs")
+  
   #message(STATUS "${package} : ${BOB_${PACKAGE}_HEADER_DIRS}")
+  
   include_directories(${BOB_${PACKAGE}_HEADER_DIRS})
   add_library(bob_${package} ${src})
+  
   target_link_libraries(bob_${package} ${deps_list} ${shared})
+  
   set_target_properties(bob_${package} PROPERTIES LIBRARY_OUTPUT_DIRECTORY  ${CMAKE_BINARY_DIR}/lib)
+
+  # equivalent rpath rule for OSX
+  #set_target_properties(bob_${package} PROPERTIES INSTALL_NAME_DIR
+  #  "@executable_path/../lib")
+
   install(TARGETS bob_${package} EXPORT bob
           LIBRARY DESTINATION lib
           ARCHIVE DESTINATION lib)
@@ -230,6 +239,10 @@ macro(bob_python_bindings cxx_package package src pydependencies)
     set_target_properties(pybob_${package} PROPERTIES LIBRARY_OUTPUT_DIRECTORY  ${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob/${cxx_package})
 
     string(REPLACE "_" "/" package_path ${package})
+
+    # rpath override rule for OSX
+    #set_target_properties(pybob_${package} PROPERTIES INSTALL_NAME_DIR
+    #  "@executable_path/../lib/python${PYTHON_VERSION}/bob/${package_path}")
 
     # makes sure bindings to the right places
     install(TARGETS pybob_${package} LIBRARY DESTINATION lib/python${PYTHON_VERSION}/bob/${package_path})
