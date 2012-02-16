@@ -61,32 +61,6 @@ static object mach_KMeansMachine_getMeans(const mach::KMeansMachine& kMeansMachi
   return means.self();
 }
 
-
-static object mach_Gaussian_getMean(const mach::Gaussian& machine) {
-  size_t n_inputs = machine.getNInputs();
-  tp::ndarray mean(ca::t_float64, n_inputs);
-  blitz::Array<double,1> mean_ = mean.bz<double,1>();
-  mean_ = machine.getMean();
-  return mean.self();
-}
-
-static object mach_Gaussian_getVariance(const mach::Gaussian& machine) {
-  size_t n_inputs = machine.getNInputs();
-  tp::ndarray variance(ca::t_float64, n_inputs);
-  blitz::Array<double,1> variance_ = variance.bz<double,1>();
-  variance_ = machine.getVariance();
-  return variance.self();
-}
-
-static object mach_Gaussian_getVarianceThresholds(const mach::Gaussian& machine) {
-  size_t n_inputs = machine.getNInputs();
-  tp::ndarray varianceThresholds(ca::t_float64, n_inputs);
-  blitz::Array<double,1> varianceThresholds_ = varianceThresholds.bz<double,1>();
-  varianceThresholds_ = machine.getVarianceThresholds();
-  return varianceThresholds.self();
-}
-
-
 static blitz::Array<double,1> gmmstats_get_n(mach::GMMStats& s) {
   return s.n;
 }
@@ -165,25 +139,7 @@ static object mach_GMMMachine_getVarianceSupervector(const mach::GMMMachine& mac
   return vec.self();
 }
 
-
-static double forward(const mach::Machine<blitz::Array<double,1>, double>& m,
-    tp::const_ndarray input) {
-  double output;
-  m.forward(input.bz<double,1>(), output);
-  return output;
-}
-
-
 void bind_machine_gmm() {
-
-  class_<mach::Machine<blitz::Array<double,1>, double>, boost::noncopyable>("MachineDoubleBase", 
-      "Root class for all Machine<blitz::Array<double,1>, double>", no_init)
-    .def("__call__", &mach::Machine<blitz::Array<double,1>, double>::forward, (arg("input"), arg("output")), "Execute the machine")
-    .def("forward", &mach::Machine<blitz::Array<double,1>, double>::forward, (arg("input"), arg("output")), "Execute the machine")
-    .def("forward_", &mach::Machine<blitz::Array<double,1>, double>::forward_, (arg("input"), arg("output")), "Execute the machine. NO check is performed.")
-    .def("__call__", &forward, (arg("self"), arg("input")), "Execute the machine, and returns the output")
-    .def("forward", &forward, (arg("self"), arg("input")), "Execute the machine, and returns the output")
-  ;
 
   class_<mach::KMeansMachine, bases<mach::Machine<blitz::Array<double,1>, double> > >("KMeansMachine",
       "This class implements a k-means classifier.\n"
@@ -205,42 +161,7 @@ void bind_machine_gmm() {
         "1) the variance of that subset (the cluster variance)\n"
         "2) the proportion of the samples represented by that subset (the cluster weight)")
   ;
-  
-  class_<mach::Gaussian, boost::shared_ptr<mach::Gaussian> >("Gaussian",
-                   "This class implements a multivariate diagonal Gaussian distribution",
-                   init<>())
-    .def(init<size_t>(args("n_inputs")))
-    .def(init<mach::Gaussian&>(args("other")))
-    .def(init<bob::io::HDF5File&>(args("config")))
-    .def(self == self)
-    .add_property("nInputs",
-                  &mach::Gaussian::getNInputs,
-                  &mach::Gaussian::setNInputs,
-                  "Input dimensionality")
-    .add_property("mean",
-                  &mach_Gaussian_getMean,
-                  &mach::Gaussian::setMean,
-                  "Mean of the mach::Gaussian")
-    .add_property("variance",
-                  &mach_Gaussian_getVariance,
-                  &mach::Gaussian::setVariance,
-                  "The diagonal of the covariance matrix")
-    .add_property("varianceThresholds",
-                  &mach_Gaussian_getVarianceThresholds,
-                  (void (mach::Gaussian::*)(const blitz::Array<double,1>&)) &mach::Gaussian::setVarianceThresholds,
-                  "The variance flooring thresholds, i.e. the minimum allowed value of variance in each dimension. "
-                  "The variance will be set to this value if an attempt is made to set it to a smaller value.")
-    .def("setVarianceThresholds",
-         (void (mach::Gaussian::*)(double))&mach::Gaussian::setVarianceThresholds,
-         "Set the variance flooring thresholds")
-      .def("resize", &mach::Gaussian::resize, "Set the input dimensionality, reset the mean to zero and the variance to one.")
-      .def("logLikelihood", &mach::Gaussian::logLikelihood, "Output the log likelihood of the sample, x. The input size is checked.")
-      .def("logLikelihood_", &mach::Gaussian::logLikelihood_, "Output the log likelihood of the sample, x. The input size is NOT checked.")
-      .def("save", &mach::Gaussian::save, "Save to a Configuration")
-      .def("load", &mach::Gaussian::load, "Load from a Configuration")
-      .def(self_ns::str(self_ns::self))
-  ;
-
+ 
   class_<mach::GMMStats, boost::shared_ptr<mach::GMMStats> >("GMMStats",
                    "A container for GMM statistics.\n"
                    "With respect to Reynolds, \"Speaker Verification Using Adapted "

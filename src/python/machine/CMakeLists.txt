@@ -2,6 +2,8 @@ project(machine-python)
 cmake_minimum_required(VERSION 2.6)
 
 set(pysrc
+   "src/machine.cc"
+   "src/gaussian.cc"
    "src/gmm.cc"
    "src/activation.cc"
    "src/linear.cc"
@@ -25,6 +27,8 @@ bob_python_package_bindings(machine "${pysrc}" "core")
 target_link_libraries(pybob_machine pybob_core_ndarray)  
 
 # Our test units
+bob_python_add_test(python-machine-gaussian-tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_gaussian.py)
 bob_python_add_test(python-machine-kmeans-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_machine.py)
 bob_python_add_test(python-machine-linear-tests

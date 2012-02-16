@@ -2,8 +2,9 @@
  * @file cxx/machine/machine/Gaussian.h
  * @date Tue May 10 11:35:58 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+ * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,19 +22,19 @@
 #ifndef BOB_MACHINE_GAUSSIAN_H
 #define BOB_MACHINE_GAUSSIAN_H
 
+#include "machine/Machine.h"
+#include "io/HDF5File.h"
 #include <blitz/array.h>
 #include <limits>
-#include "io/HDF5File.h"
 
-namespace bob {
-namespace machine {
+namespace bob { namespace machine {
 
 /**
  * @brief This class implements a multivariate diagonal Gaussian distribution. 
  */
-class Gaussian {
+class Gaussian: public Machine<blitz::Array<double,1>, double> 
+{
   public:
-
     /**
      * Default constructor
      */
@@ -43,7 +44,7 @@ class Gaussian {
      * Constructor
      * @param[in] n_inputs The feature dimensionality
      */
-    Gaussian(size_t n_inputs);
+    Gaussian(const size_t n_inputs);
 
     /**
      * Destructor
@@ -75,8 +76,9 @@ class Gaussian {
      * and the variance to one.
      * @see resize()
      * @param n_inputs The feature dimensionality
+     * @warning The mean and variance are not initialized
      */
-    void setNInputs(size_t n_inputs);
+    void setNInputs(const size_t n_inputs);
 
     /**
      * Get the input dimensionality
@@ -90,7 +92,7 @@ class Gaussian {
      * @see setNInputs()
      * @param n_inputs The feature dimensionality
      */
-    void resize(size_t n_inputs);
+    void resize(const size_t n_inputs);
 
     /**
      * Get the mean
@@ -149,7 +151,7 @@ class Gaussian {
     /**
      * Set the variance flooring thresholds
      */
-    void setVarianceThresholds(double value);
+    void setVarianceThresholds(const double value);
 
     /**
      * Apply the variance flooring thresholds
@@ -163,41 +165,61 @@ class Gaussian {
      * Output the log likelihood of the sample, x 
      * @param x The data sample (feature vector)
      */
-    double logLikelihood(const blitz::Array<double, 1> &x) const;
+    double logLikelihood(const blitz::Array<double,1>& x) const;
 
     /**
      * Output the log likelihood of the sample, x 
      * @param x The data sample (feature vector)
      * @warning The input is NOT checked
      */
-    double logLikelihood_(const blitz::Array<double, 1> &x) const;
+    double logLikelihood_(const blitz::Array<double,1>& x) const;
 
     /**
-     * Save to a Configuration
+     * Computes the log likelihood of the sample, x 
+     * @param x The data sample (feature vector)
+     * @param output The computed log likelihood
+     */
+    void forward(const blitz::Array<double,1>& x, double& output) const
+    { output = logLikelihood(x); }
+
+    /**
+     * Computes the log likelihood of the sample, x 
+     * @param x The data sample (feature vector)
+     * @param output The computed log likelihood
+     * @warning The input is NOT checked
+     */
+    void forward_(const blitz::Array<double,1>& x, double& output) const
+    { output = logLikelihood_(x); }
+
+    /**
+     * Saves to a Configuration
      */
     void save(bob::io::HDF5File& config) const;
     
     /**
-     * Load from a Configuration
+     * Loads from a Configuration
      */
     void load(bob::io::HDF5File& config);
 
-    friend std::ostream& operator<<(std::ostream& os, const Gaussian& g);
-    
-  protected:
-
     /**
-     * Copy another Gaussian
+     * Prints a Gaussian in the output stream
+     */
+    friend std::ostream& operator<<(std::ostream& os, const Gaussian& g);
+
+
+  private:
+    /**
+     * Copies another Gaussian
      */
     void copy(const Gaussian& other);
 
     /**
-     * Compute n_inputs * log(2*pi)
+     * Computes n_inputs * log(2*pi)
      */
     void preComputeNLog2Pi();
      
     /**
-     * Compute and store the value of g_norm, 
+     * Computes and stores the value of g_norm, 
      * to later speed up evaluation of logLikelihood()
      * Note: g_norm is defined as follows:
      * log(Gaussian pdf) = log(1/((2pi)^(k/2)(det)^(1/2)) * exp(...))
@@ -206,12 +228,12 @@ class Gaussian {
     void preComputeConstants();
 
     /**
-     * The mean
+     * The mean of the Gaussian
      */
     blitz::Array<double,1> m_mean;
 
     /**
-     * The diagonal of the covariance matrix
+     * The diagonal of the covariance matrix (assumed to be diagonal)
      */
     blitz::Array<double,1> m_variance;
 
@@ -237,12 +259,10 @@ class Gaussian {
     double m_g_norm;
 
     /**
-     * The number of inputs
+     * The number of inputs (feature dimensionality)
      */
     size_t m_n_inputs;
 };
 
-
-}
-}
+}}
 #endif

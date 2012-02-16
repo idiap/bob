@@ -17,13 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef BOB5SPRO_MACHINE_MACHINE_H
-#define BOB5SPRO_MACHINE_MACHINE_H
+
+#ifndef BOB_MACHINE_MACHINE_H
+#define BOB_MACHINE_MACHINE_H
+
 #include <cstring>
 
-namespace bob {
-namespace machine {
-
+namespace bob { namespace machine {
 
 /**
  * Root class for all machines
@@ -53,7 +53,5 @@ public:
     virtual void forward_(const T_input& input, T_output& output) const = 0;
 };
 
-
-}
-}
-#endif // BOB5SPRO_MACHINE_MACHINE_H
+}}
+#endif 

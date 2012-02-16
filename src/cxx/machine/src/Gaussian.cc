@@ -2,8 +2,9 @@
  * @file cxx/machine/src/Gaussian.cc
  * @date Tue May 10 11:35:58 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+ * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +33,7 @@ mach::Gaussian::Gaussian() {
   resize(0);
 }
 
-mach::Gaussian::Gaussian(size_t n_inputs) {
+mach::Gaussian::Gaussian(const size_t n_inputs) {
   resize(n_inputs);
 }
 
@@ -79,11 +80,11 @@ void mach::Gaussian::copy(const mach::Gaussian& other) {
 }
 
 
-void mach::Gaussian::setNInputs(size_t n_inputs) {
+void mach::Gaussian::setNInputs(const size_t n_inputs) {
   resize(n_inputs);
 }
 
-void mach::Gaussian::resize(size_t n_inputs) {
+void mach::Gaussian::resize(const size_t n_inputs) {
   m_n_inputs = n_inputs;
   m_mean.resize(m_n_inputs);
   m_mean = 0;
@@ -122,7 +123,7 @@ void mach::Gaussian::setVarianceThresholds(const blitz::Array<double,1> &varianc
   applyVarianceThresholds();
 }
 
-void mach::Gaussian::setVarianceThresholds(double value) {
+void mach::Gaussian::setVarianceThresholds(const double value) {
   blitz::Array<double,1> variance_thresholds(m_n_inputs);
   variance_thresholds = value;
   setVarianceThresholds(variance_thresholds);
