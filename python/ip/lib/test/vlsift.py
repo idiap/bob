@@ -3,7 +3,7 @@
 # Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
 # Mon Dec 19 19:12:19 2011 +0100
 #
-# Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+# Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

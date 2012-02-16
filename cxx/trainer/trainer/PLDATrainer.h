@@ -6,7 +6,7 @@
  * @brief Probabilistic PLDA Discriminant Analysis implemented using
  * Expectation Maximization.
  *
- * Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+ * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

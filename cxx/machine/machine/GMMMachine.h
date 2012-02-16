@@ -6,7 +6,7 @@
  * @brief This class implements a multivariate diagonal Gaussian distribution.
  * @details See Section 2.3.9 of Bishop, "Pattern recognition and machine learning", 2006
  *
- * Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+ * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

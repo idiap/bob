@@ -6,7 +6,7 @@
  * @brief Implements an image format reader/writer using ffmpeg.
  * This codec will only be able to work with 4D input and output (color videos)
  *
- * Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+ * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

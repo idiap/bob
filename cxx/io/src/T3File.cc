@@ -16,7 +16,7 @@
  * Because of this restriction, this codec will only be able to work with
  * single-dimension input.
  *
- * Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+ * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

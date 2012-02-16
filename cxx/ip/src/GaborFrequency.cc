@@ -6,7 +6,7 @@
  * @brief This file provides a class to perform a Gabor filtering in the
  * frequency domain.
  *
- * Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+ * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

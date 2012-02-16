@@ -19,7 +19,7 @@
  * 0.7.1  | 52.110.0 | 52.122.0 | 50.43.0 | 0.14.1  | no        | no
  * 0.8    | 53.4.0   | 53.7.0   | 51.9.1  | 2.0.0   | no        | no
  *
- * Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+ * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

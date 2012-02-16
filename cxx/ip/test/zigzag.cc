@@ -6,7 +6,7 @@
  * @brief Test the zigzag decomposition function for 2D arrays/images,
  *   which is used by the DCT features
  *
- * Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+ * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

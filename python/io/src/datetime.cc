@@ -7,7 +7,7 @@
  * objects. This recipe was taken from:
  * http://code.activestate.com/recipes/576395-convert-datetimedatetime-objects-tofrom-boostpytho/
  *
- * Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+ * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
