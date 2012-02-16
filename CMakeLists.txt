@@ -36,11 +36,7 @@ option(BOB_BUILD_CXX "Builds the C++ infrastructure." ON)
 # bit.
 option(BOB_BUILD_PYTHON "Builds the python bindings." ON)
 
-option(BOB_CREATE_DATABASES "Builds databases from scratch. If not set, the default, will download the databases from Bob servers instead." OFF)
-
-set(BOB_DB_INSTALL_PREFIX "" CACHE ON "Installation directory for the databases, if they are to be copied somewhere during the install target.")
-
-set(BOB_DATABASE_URL "http://www.idiap.ch/software/bob/databases/" CACHE ON "Where to download databases from.")
+set(BOB_DATABASE_URL "http://www.idiap.ch/software/bob/databases/" CACHE ON "Where to download databases from. If this variable is set empty, then we try to create the databases instead.")
 
 # ---------------
 # END of options.

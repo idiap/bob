@@ -141,6 +141,8 @@ def download_command(subparsers):
       action='store_true', help="produces more output while downloading")
   parser.set_defaults(func=download)
 
+  return parser
+
 def print_location(options):
   """Prints the current location of the database SQL file."""
   
@@ -158,6 +160,8 @@ def location_command(subparsers):
       help="prints the filepath or directory leading to the database with the specific database protocol prepended")
   parser.set_defaults(func=print_location)
 
+  return parser
+
 def copy(options):
   """Copies the database to a given directory."""
 
@@ -173,6 +177,8 @@ def copy_command(subparsers):
   parser = subparsers.add_parser('copy', help=copy.__doc__)
   parser.add_argument('directory', help="sets the directory to which the database will be copied to", nargs=1)
   parser.set_defaults(func=copy)
+
+  return parser
 
 def standard_commands(subparsers):
   """Adds all standard commands to databases that can respond to them."""
