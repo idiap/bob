@@ -568,12 +568,9 @@ class TestBancaSmall(unittest.TestCase):
     db = bob.db.banca_small.Database()
     extension='.hdf5'
 
-    # Get the directory where the images and the UBM are stored
-    data_dir = os.path.join('data', 'bancasmall')
-
     # Computes the features
-    img_input = db.files(directory=data_dir, extension=".jpg")
-    pos_input = db.files(directory=data_dir, extension=".pos")
+    img_input = db.files(directory='bancasmall', extension=".jpg")
+    pos_input = db.files(directory='bancasmall', extension=".pos")
     features_dir = os.path.join(output_dir, 'features')
     if not os.path.exists(features_dir):
       os.mkdir(features_dir)
@@ -590,16 +587,13 @@ class TestBancaSmall(unittest.TestCase):
     output_dir = os.environ['BOB_FACE_VERIF_TEMP_DIRECTORY']
     features_dir = os.path.join(output_dir, 'features')
 
-    # Get the directory where the images and the UBM are stored
-    data_dir = os.path.join('data', 'bancasmall')
-    
     # create a subdirectory for the models
     models_dir = os.path.join(output_dir, "models")
     if not os.path.exists(models_dir):
       os.mkdir(models_dir)
 
     # loads the UBM model
-    wm_path = os.path.join(data_dir, "ubmT5_new.hdf5")
+    wm_path = os.path.join('bancasmall', "ubmT5_new.hdf5")
     wm = bob.machine.GMMMachine(bob.io.HDF5File(wm_path))
 
     # creates a GMM experiments using Linear Scoring and ZT-norm
@@ -638,11 +632,8 @@ class TestBancaSmall(unittest.TestCase):
     if not os.path.exists(gmmstats_dir):
       os.makedirs(gmmstats_dir)
 
-    # Get the directory where the images and the UBM are stored
-    data_dir = os.path.join('data', 'bancasmall')
-    
     # loads the UBM model
-    wm_path = os.path.join(data_dir, "ubmT5_new.hdf5")
+    wm_path = os.path.join('bancasmall', "ubmT5_new.hdf5")
     ubm_model = bob.machine.GMMMachine(bob.io.HDF5File(wm_path))
 
     img_input = db.files(directory=features_dir, extension=extension)
@@ -656,9 +647,9 @@ class TestBancaSmall(unittest.TestCase):
     jfa_train_relevance_factor = 4
     base_machine = bob.machine.JFABaseMachine(ubm_model, jfa_ru, jfa_rv) 
     T = bob.trainer.JFABaseTrainer(base_machine)
-    Vinit = bob.io.load(os.path.join(data_dir, 'jfa_Vinit.hdf5'))
-    Uinit = bob.io.load(os.path.join(data_dir, 'jfa_Uinit.hdf5'))
-    Dinit = bob.io.load(os.path.join(data_dir, 'jfa_Dinit.hdf5'))
+    Vinit = bob.io.load(os.path.join('bancasmall', 'jfa_Vinit.hdf5'))
+    Uinit = bob.io.load(os.path.join('bancasmall', 'jfa_Uinit.hdf5'))
+    Dinit = bob.io.load(os.path.join('bancasmall', 'jfa_Dinit.hdf5'))
     base_machine.V = Vinit
     base_machine.U = Uinit
     base_machine.D = Dinit
@@ -701,17 +692,6 @@ class TestBancaSmall(unittest.TestCase):
     if os.path.exists(output_dir):
       shutil.rmtree(output_dir)
     self.assertTrue( not os.path.exists(output_dir) )
-    
 
-if __name__ == '__main__':
-  sys.argv.append('-v')
-  if os.environ.has_key('BOB_PROFILE') and \
-      os.environ['BOB_PROFILE'] and \
-      hasattr(bob.core, 'ProfilerStart'):
-    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
-  os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
-  unittest.main()
-  if os.environ.has_key('BOB_PROFILE') and \
-      os.environ['BOB_PROFILE'] and \
-      hasattr(bob.core, 'ProfilerStop'):
-    bob.core.ProfilerStop()
+# Instantiates our standard main module for unittests
+main = bob.helper.unittest_main(TestBancaSmall)
