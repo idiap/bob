@@ -24,10 +24,6 @@
 #include <boost/python.hpp>
 #include <boost/format.hpp>
 
-#if defined(HAVE_OPENCV)
-#include <cvver.h>
-#endif
-
 using namespace boost::python;
 
 /**
@@ -35,7 +31,7 @@ using namespace boost::python;
  */
 static str opencv_version() {
 #if defined(HAVE_OPENCV)
-  return str(CV_VERSION);
+  return str(OPENCV_VERSION);
 #else
   return str("unavailable");
 #endif
