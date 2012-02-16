@@ -128,7 +128,7 @@ def download(options):
 def download_command(subparsers):
   """Adds a new download subcommand to your subparser"""
   
-  DOWNLOAD_URL = 'http://www.idiap.ch/software/bob/chrome/site/databases/'
+  DOWNLOAD_URL = 'http://www.idiap.ch/software/bob/databases/'
   """Location from where to download bob databases"""
 
   DOWNLOAD_VERSION = 'nightlies/last'
