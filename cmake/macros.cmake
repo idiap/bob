@@ -28,9 +28,9 @@ macro(bob_library package src dependencies shared)
   
   set_target_properties(bob_${package} PROPERTIES LIBRARY_OUTPUT_DIRECTORY  ${CMAKE_BINARY_DIR}/lib)
 
-  # equivalent rpath rule for OSX
-  #set_target_properties(bob_${package} PROPERTIES INSTALL_NAME_DIR
-  #  "@executable_path/../lib")
+  # rpath override rule for OSX
+  set_target_properties(bob_${package} PROPERTIES INSTALL_NAME_DIR
+    "${CMAKE_INSTALL_PREFIX}/lib")
 
   install(TARGETS bob_${package} EXPORT bob
           LIBRARY DESTINATION lib
@@ -100,25 +100,12 @@ macro(bob_python_script package_name script_name python_module python_method)
 
   set(output_file "${CMAKE_BINARY_DIR}/bin/${script_name}")
 
-  if(BOB_NON_ROOT_INSTALL)
-
-    add_custom_command(
-      OUTPUT "${output_file}"
-      DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${python_module}" "${CMAKE_SOURCE_DIR}/bin/make_wrapper.py"
-      COMMAND ${PYTHON_EXECUTABLE}
-      ARGS ${CMAKE_SOURCE_DIR}/bin/make_wrapper.py --non-root "${module_name}" "${python_method}" "${output_file}"
-      COMMENT "Generating script ${script_name}")
-
-  else(BOB_NON_ROOT_INSTALL)
-
-    add_custom_command(
-      OUTPUT "${output_file}"
-      DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${python_module}" "${CMAKE_SOURCE_DIR}/bin/make_wrapper.py"
-      COMMAND ${PYTHON_EXECUTABLE}
-      ARGS ${CMAKE_SOURCE_DIR}/bin/make_wrapper.py "${module_name}" "${python_method}" "${output_file}"
-      COMMENT "Generating script ${script_name}")
-
-  endif(BOB_NON_ROOT_INSTALL)
+  add_custom_command(
+    OUTPUT "${output_file}"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${python_module}" "${CMAKE_SOURCE_DIR}/bin/make_wrapper.py"
+    COMMAND ${PYTHON_EXECUTABLE}
+    ARGS ${CMAKE_SOURCE_DIR}/bin/make_wrapper.py --non-root "${module_name}" "${python_method}" "${output_file}"
+    COMMENT "Generating script ${script_name}")
 
   get_filename_component(script_basename ${script_name} NAME_WE)
 
@@ -241,8 +228,8 @@ macro(bob_python_bindings cxx_package package src pydependencies)
     string(REPLACE "_" "/" package_path ${package})
 
     # rpath override rule for OSX
-    #set_target_properties(pybob_${package} PROPERTIES INSTALL_NAME_DIR
-    #  "@executable_path/../lib/python${PYTHON_VERSION}/bob/${package_path}")
+    set_target_properties(pybob_${package} PROPERTIES INSTALL_NAME_DIR
+      "${CMAKE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION}/bob/${package_path}")
 
     # makes sure bindings to the right places
     install(TARGETS pybob_${package} LIBRARY DESTINATION lib/python${PYTHON_VERSION}/bob/${package_path})
@@ -285,7 +272,7 @@ macro(bob_python_add_unittest package_name python_module python_method)
     OUTPUT "${output_file}"
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${python_module}" "${CMAKE_SOURCE_DIR}/bin/make_wrapper.py"
     COMMAND ${PYTHON_EXECUTABLE}
-    ARGS ${CMAKE_SOURCE_DIR}/bin/make_wrapper.py "${module_name}" "${python_method}" "${output_file}"
+    ARGS ${CMAKE_SOURCE_DIR}/bin/make_wrapper.py --non-root "${module_name}" "${python_method}" "${output_file}"
     COMMENT "Generating unittest script ${script_name}")
 
   add_custom_target(${test_name} DEPENDS "${output_file}")
@@ -300,11 +287,6 @@ macro(bob_python_add_unittest package_name python_module python_method)
 
   # Common properties to all tests
   set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/data")
-  set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}")
-
-  if(APPLE)
-    set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "DYLD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/lib")
-  endif()
 
 endmacro()
 
@@ -331,11 +313,6 @@ function(bob_python_add_test)
 
   # Common properties to all python tests
   set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/data")
-  set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}")
-
-  if(APPLE)
-    set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "DYLD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/lib")
-  endif()
 
 endfunction()
 

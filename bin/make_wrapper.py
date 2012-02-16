@@ -12,26 +12,14 @@ main()
 """
 
 TEMPLATE_NON_ROOT = """#!%(python)s
-import os
-import sys
-prefix = os.path.realpath(os.path.dirname(os.path.dirname(__file__)))
-pyver = 'python%%d.%%d' %% sys.version_info[0:2]
-library_path = os.path.realpath(os.path.join(prefix, 'lib'))
-python_path = os.path.realpath(os.path.join(library_path, pyver))
-
-def prepend_path(var, value):
-  if os.environ.has_key(var): 
-    os.environ[var] = '%%s:%%s' %% (value, os.environ[var])
-  else: os.environ[var] = value
-
-if not os.environ.has_key("__BOB_WRAPPER__"):
-  os.environ['__BOB_WRAPPER__'] = "1"
-  %(osx_dyld)s
-  prepend_path('PYTHONPATH', python_path)
-  sys.argv.insert(0, sys.executable)
-  os.execve(sys.executable, sys.argv, os.environ)
-
-# Call the announced callable
+import os, sys
+sys.path.append(
+    os.path.join(
+      os.path.dirname(os.path.dirname(__file__)), #prefix
+      'lib', 
+      'python%%d.%%d' %% sys.version_info[0:2],
+      )
+  )
 from %(module)s import %(method)s as main
 main()
 """
@@ -79,11 +67,6 @@ def main():
       'method': args.method,
       }
 
-  if platform.system() == 'Darwin':
-    dictionary['osx_dyld'] = "prepend_path('DYLD_LIBRARY_PATH', library_path)"
-  else:
-    dictionary['osx_dyld'] = ""
-  
   if args.non_root:
     f.write(TEMPLATE_NON_ROOT % dictionary)
   else:

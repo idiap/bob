@@ -1,20 +1,16 @@
 * pybob_visioner does not seem to depend correctly on bob_visioner. If the
   build is run in parallel, it normally fails.
-* installation remains untested
 * the macro bob_python_tag_build (using configure_file) does not work as
   expected. Sometimes it fills the right values, sometimes it does not.
 * Remove all group writing (chmod) flags from installation, leave this to the
   build system
 * Example installation requires specific macro
 * face_verification python package not migrated to new infrastructure
-* Up to now, now way to make MacOSX builds load the python libraries and
-  compiled python modules w/o placing a DYLD_PATH on the environment - may be
-  have to understand how OSX frameworks work?
 * database creation, installation and copying still executed as test - a good
   thing would be to have independent targets for this. Problems to solve:
   testing db functionality will not work?
 * Installation:
-  * after installation, bindings dependant on _core_array.so cannot find it if
-    the DYLD_PATH is not set to include the python2.6/bob/core/array path.
   * have not verified if we can still compile C++ external code against Bob. A
     recipe is required somewhere.
+  * installation remains untested
+* OpenCV installation not found on MacOSX
