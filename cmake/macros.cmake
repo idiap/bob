@@ -73,7 +73,8 @@ macro(bob_python_data package_name filenames relative)
     add_dependencies(pybob_${package_name} pybob_${package_name}_${basename}_data)
 
     # this will make the script available to the installation tree
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${filename} DESTINATION ${output_stem})
+    get_filename_component(destination_directory ${output_stem} PATH)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${filename} DESTINATION ${destination_directory})
 
   endforeach()
 
@@ -229,7 +230,13 @@ macro(bob_python_bindings cxx_package package src pydependencies)
     set_target_properties(pybob_${package} PROPERTIES LIBRARY_OUTPUT_DIRECTORY  ${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob/${cxx_package})
 
     string(REPLACE "_" "/" package_path ${package})
-    install(TARGETS pybob_${package} LIBRARY DESTINATION lib)#lib/python${PYTHON_VERSION}/bob/${package_path})
+
+    # makes sure bindings to the right places
+    install(TARGETS pybob_${package} LIBRARY DESTINATION lib/python${PYTHON_VERSION}/bob/${package_path})
+
+    # makes sure headers are installed
+    install(DIRECTORY ${package} DESTINATION include/bob FILES_MATCHING PATTERN "*.h")
+
   endif()
   
 endmacro(bob_python_bindings cxx_package package src pydependencies)
