@@ -2,6 +2,8 @@ project(machine-python)
 cmake_minimum_required(VERSION 2.6)
 
 set(ccsrc
+   "src/machine.cc"
+   "src/gaussian.cc"
    "src/gmm.cc"
    "src/activation.cc"
    "src/linear.cc"
@@ -26,7 +28,7 @@ set(pysrc
    "lib/example/__init__.py"
    "lib/example/xml2hdf5.py"
    "lib/test/__init__.py"
-   #"lib/test/gmm_test_benchmark.py"
+   "lib/test/gaussian.py"
    "lib/test/linear.py"
    "lib/test/linearscoring.py"
    "lib/test/machine.py"
@@ -39,6 +41,8 @@ set(pysrc
 bob_python_package_bindings(machine "${ccsrc}" "${pysrc}" "core_array")
 
 # Our test units
+bob_python_add_unittest(machine lib/test/gaussian.py main
+  ${CMAKE_CURRENT_SOURCE_DIR}/data)
 bob_python_add_unittest(machine lib/test/machine.py main
   ${CMAKE_CURRENT_SOURCE_DIR}/data)
 bob_python_add_unittest(machine lib/test/linear.py main
@@ -51,10 +55,11 @@ bob_python_add_unittest(machine lib/test/plda.py main
   ${CMAKE_CURRENT_SOURCE_DIR}/data)
 bob_python_add_unittest(machine lib/test/ztnorm.py main
   ${CMAKE_CURRENT_SOURCE_DIR}/data)
-bob_python_add_unittest(machine lib/test/svm.py main
-  ${CMAKE_CURRENT_SOURCE_DIR}/data)
-#bob_python_add_unittest(machine lib/test/gmm_test_benchmark.py main
-#  ${CMAKE_CURRENT_SOURCE_DIR}/data)
+
+if(LIBSVM_FOUND)
+  bob_python_add_unittest(machine lib/test/svm.py main
+    ${CMAKE_CURRENT_SOURCE_DIR}/data)
+endif()
 
 # Our examples (run and install)
 bob_python_example(machine "xml2hdf5.py" "lib/example/xml2hdf5.py" "main")

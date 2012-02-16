@@ -21,6 +21,7 @@ set(src
     "src/LinearScoring.cc"
     "src/ZTNorm.cc"
     "src/JFAMachine.cc"
+    "src/JFAMachineException.cc"
     "src/WienerMachine.cc"
     "src/PLDAMachine.cc"
 )

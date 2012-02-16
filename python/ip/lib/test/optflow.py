@@ -121,8 +121,8 @@ class FlowTest(unittest.TestCase):
            py_avg_err**0.5
           )
       '''
-    self.assertTrue( numpy.array_equal(u_cxx, u_py) )
-    self.assertTrue( numpy.array_equal(v_cxx, v_py) )
+    self.assertTrue( numpy.allclose(u_cxx, u_py, atol=1e-15) )
+    self.assertTrue( numpy.allclose(v_cxx, v_py, atol=1e-15) )
 
   def notest02_VanillaHornAndSchunckDemo(self):
     

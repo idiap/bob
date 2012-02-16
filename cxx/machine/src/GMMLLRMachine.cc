@@ -20,8 +20,6 @@
 #include "machine/GMMLLRMachine.h"
 #include "machine/Exception.h"
 
-using namespace bob::machine::Log;
-
 bob::machine::GMMLLRMachine::GMMLLRMachine(bob::io::HDF5File& config) {
   load(config);
 }

@@ -2,8 +2,9 @@
  * @file cxx/machine/src/Gaussian.cc
  * @date Tue May 10 11:35:58 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+ * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,59 +22,18 @@
 #include "machine/Gaussian.h"
 
 #include "core/array_assert.h"
-#include "machine/Exception.h"
+#include "math/log.h"
 
 namespace ca = bob::core::array;
+namespace mathL = bob::math::Log;
 namespace mach = bob::machine;
 namespace io = bob::io;
-
-double mach::Log::LogAdd(double log_a, double log_b) {
-  double minusdif;
-
-  if (log_a < log_b)
-  {
-    double tmp = log_a;
-    log_a = log_b;
-    log_b = tmp;
-  }
-
-  minusdif = log_b - log_a;
-  //#ifdef DEBUG
-  if (std::isnan(minusdif)) {
-    printf("LogAdd: minusdif (%f) log_b (%f) or log_a (%f) is nan\n", minusdif, log_b, log_a);
-    throw mach::Exception();
-  }
-  //#endif
-  if (minusdif < MINUS_LOG_THRESHOLD) return log_a;
-  else return log_a + log1p(exp(minusdif));
-}
-
-double mach::Log::LogSub(double log_a, double log_b) {
-  double minusdif;
-
-  if (log_a < log_b) {
-    printf("LogSub: log_a (%f) should be greater than log_b (%f)", log_a, log_b);
-    throw mach::Exception();
-  }
-
-  minusdif = log_b - log_a;
-  //#ifdef DEBUG
-  if (std::isnan(minusdif)) {
-    printf("LogSub: minusdif (%f) log_b (%f) or log_a (%f) is nan", minusdif, log_b, log_a);
-    throw mach::Exception();
-  }
-  //#endif
-  if (log_a == log_b) return LogZero;
-  else if (minusdif < MINUS_LOG_THRESHOLD) return log_a;
-  else return log_a + log1p(-exp(minusdif));
-}
-
 
 mach::Gaussian::Gaussian() {
   resize(0);
 }
 
-mach::Gaussian::Gaussian(size_t n_inputs) {
+mach::Gaussian::Gaussian(const size_t n_inputs) {
   resize(n_inputs);
 }
 
@@ -120,11 +80,11 @@ void mach::Gaussian::copy(const mach::Gaussian& other) {
 }
 
 
-void mach::Gaussian::setNInputs(size_t n_inputs) {
+void mach::Gaussian::setNInputs(const size_t n_inputs) {
   resize(n_inputs);
 }
 
-void mach::Gaussian::resize(size_t n_inputs) {
+void mach::Gaussian::resize(const size_t n_inputs) {
   m_n_inputs = n_inputs;
   m_mean.resize(m_n_inputs);
   m_mean = 0;
@@ -163,17 +123,15 @@ void mach::Gaussian::setVarianceThresholds(const blitz::Array<double,1> &varianc
   applyVarianceThresholds();
 }
 
-void mach::Gaussian::setVarianceThresholds(double factor) {
+void mach::Gaussian::setVarianceThresholds(const double value) {
   blitz::Array<double,1> variance_thresholds(m_n_inputs);
-  variance_thresholds = m_variance * factor;
+  variance_thresholds = value;
   setVarianceThresholds(variance_thresholds);
 }
 
 void mach::Gaussian::applyVarianceThresholds() {
    // Apply variance flooring threshold
-  blitz::Array<bool,1> isTooSmall(m_n_inputs);
-  isTooSmall = m_variance < m_variance_thresholds;
-  m_variance += (m_variance_thresholds - m_variance) * isTooSmall;
+  m_variance = blitz::where( m_variance < m_variance_thresholds, m_variance_thresholds, m_variance);
 
   // Re-compute g_norm, because m_variance has changed
   preComputeConstants(); 
@@ -192,7 +150,7 @@ double mach::Gaussian::logLikelihood_(const blitz::Array<double,1> &x) const {
 }
 
 void mach::Gaussian::preComputeNLog2Pi() {
-  m_n_log2pi = m_n_inputs * mach::Log::Log2Pi;
+  m_n_log2pi = m_n_inputs * mathL::Log2Pi;
 }
 
 void mach::Gaussian::preComputeConstants() {

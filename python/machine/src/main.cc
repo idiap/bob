@@ -2,10 +2,11 @@
  * @file python/machine/src/main.cc
  * @date Tue Jan 18 17:07:26 2011 +0100
  * @author André Anjos <andre.anjos@idiap.ch>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Combines all modules to make up the complete bindings
  *
- * Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+ * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,10 +23,8 @@
 
 #include "core/python/ndarray.h"
 
-#if defined(HAVE_LIBSVM)
-void bind_machine_svm();
-#endif
-
+void bind_machine_base();
+void bind_machine_gaussian();
 void bind_machine_gmm();
 void bind_machine_activation();
 void bind_machine_linear();
@@ -37,14 +36,16 @@ void bind_machine_plda();
 void bind_machine_wiener();
 void bind_machine_version();
 
+#if defined(HAVE_LIBSVM)
+void bind_machine_svm();
+#endif
+
 BOOST_PYTHON_MODULE(_machine)
 {
   bob::python::setup_python("bob classes and sub-classes for machine access");
 
-#if defined(HAVE_LIBSVM)
-  bind_machine_svm();
-#endif
-
+  bind_machine_base();
+  bind_machine_gaussian();
   bind_machine_gmm();
   bind_machine_activation();
   bind_machine_linear();
@@ -55,4 +56,8 @@ BOOST_PYTHON_MODULE(_machine)
   bind_machine_plda();
   bind_machine_wiener();
   bind_machine_version();
+
+#if defined(HAVE_LIBSVM)
+  bind_machine_svm();
+#endif
 }

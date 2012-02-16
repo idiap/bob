@@ -45,6 +45,7 @@ set(pysrc
    "lib/multipie/dumplist.py"
    "lib/multipie/models.py"
    "lib/multipie/query.py"
+   "lib/nuaa/__init__.py"
    "lib/openanything.py"
    "lib/replay/__init__.py"
    "lib/replay/commands.py"
@@ -104,6 +105,18 @@ bob_python_script(db "dbmanage.py" "lib/script/dbmanage.py" "main")
 set(data
   "lib/iris/iris.names"
   "lib/iris/iris.data"
+  "lib/nuaa/Detectedface/client_test_face.txt"
+  "lib/nuaa/Detectedface/client_train_face.txt"
+  "lib/nuaa/Detectedface/imposter_test_face.txt"
+  "lib/nuaa/Detectedface/imposter_train_face.txt"
+  "lib/nuaa/NormalizedFace/client_test_normalized.txt"
+  "lib/nuaa/NormalizedFace/client_train_normalized.txt"
+  "lib/nuaa/NormalizedFace/imposter_test_normalized.txt"
+  "lib/nuaa/NormalizedFace/imposter_train_normalized.txt"
+  "lib/nuaa/raw/client_test_raw.txt"
+  "lib/nuaa/raw/client_train_raw.txt"
+  "lib/nuaa/raw/imposter_test_raw.txt"
+  "lib/nuaa/raw/imposter_train_raw.txt"
   )
 bob_python_data(db "${data}" "lib/")
 
@@ -135,8 +148,8 @@ bob_python_add_unittest(db lib/test/replay.py main)
 set_property(TEST python-db-replay-main APPEND PROPERTY DEPENDS 
   python-db-replay-instantiation)
 
-bob_python_example(db "replay_example.py" lib/example/replay_example.py main)
-bob_python_add_test(db replay_example.py)
+#bob_python_example(db "replay_example.py" lib/example/replay_example.py main)
+#bob_python_add_test(db replay_example.py)
 
 # BANCA database driver tests.
 bob_python_add_dependent_test(db-banca-dumplist 

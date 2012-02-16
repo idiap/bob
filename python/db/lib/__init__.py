@@ -17,5 +17,6 @@ import mobio
 import multipie
 import scface
 import xm2vts
+import nuaa
 
 __all__ = dir()

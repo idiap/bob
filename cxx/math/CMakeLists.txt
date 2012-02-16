@@ -9,6 +9,7 @@ set(shared "")
 set(src
    "src/Exception.cc"
    "src/norminv.cc"
+   "src/log.cc"
 )
 
 set(src_blas
