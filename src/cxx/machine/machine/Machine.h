@@ -31,7 +31,7 @@ namespace bob { namespace machine {
 template<class T_input, class T_output>
 class Machine
 {
-public:
+  public:
     virtual ~Machine() {}
 
     /**

@@ -105,7 +105,7 @@ void bind_machine_gaussian()
     .add_property("varianceThresholds", &py_getVarianceThresholds, &py_setVarianceThresholds,
       "The variance flooring thresholds, i.e. the minimum allowed value of variance in each dimension. "
       "The variance will be set to this value if an attempt is made to set it to a smaller value.")
-    .def("setVarianceThresholds",  (void (mach::Gaussian::*)(double))&mach::Gaussian::setVarianceThresholds,
+    .def("setVarianceThresholds",  (void (mach::Gaussian::*)(const double))&mach::Gaussian::setVarianceThresholds,
          "Set the variance flooring thresholds equal to the given threshold for all the dimensions.")
     .def("resize", &mach::Gaussian::resize, "Set the input dimensionality, reset the mean to zero and the variance to one.")
     .def("logLikelihood", &py_logLikelihood, "Output the log likelihood of the sample, x. The input size is checked.")

@@ -228,7 +228,7 @@ class Gaussian: public Machine<blitz::Array<double,1>, double>
     void preComputeConstants();
 
     /**
-     * The mean of the Gaussian
+     * The mean vector of the Gaussian
      */
     blitz::Array<double,1> m_mean;
 
