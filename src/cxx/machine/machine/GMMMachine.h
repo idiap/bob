@@ -2,11 +2,12 @@
  * @file cxx/machine/machine/GMMMachine.h
  * @date Tue May 10 11:35:58 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This class implements a multivariate diagonal Gaussian distribution.
  * @details See Section 2.3.9 of Bishop, "Pattern recognition and machine learning", 2006
  *
- * Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+ * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,23 +25,23 @@
 #ifndef BOB_MACHINE_GMMMACHINE_H
 #define BOB_MACHINE_GMMMACHINE_H
 
-#include "io/Arrayset.h"
 #include "machine/Machine.h"
-#include "machine/GMMStats.h"
+#include "io/Arrayset.h"
 #include "machine/Gaussian.h"
+#include "machine/GMMStats.h"
 #include "io/HDF5File.h"
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 #include <vector>
 
-namespace bob {
-namespace machine {
+namespace bob { namespace machine {
   
 /** 
  * @brief This class implements a multivariate diagonal Gaussian distribution.
  * @details See Section 2.3.9 of Bishop, "Pattern recognition and machine learning", 2006
  */
-class GMMMachine: public Machine<blitz::Array<double,1>, double> {
+class GMMMachine: public Machine<blitz::Array<double,1>, double> 
+{
   public:
     /**
      * Default constructor
@@ -52,7 +53,7 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double> {
      * @param[in] n_gaussians  The number of Gaussian components
      * @param[in] n_inputs     The feature dimensionality
      */
-    GMMMachine(size_t n_gaussians, size_t n_inputs);
+    GMMMachine(const size_t n_gaussians, const size_t n_inputs);
 
     /**
      * Copy constructor
@@ -82,9 +83,8 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double> {
 
     /**
      * Set the feature dimensionality
-     * Overrides Machine::setNInputs
      */
-    void setNInputs(size_t n_inputs);
+    void setNInputs(const size_t n_inputs);
 
     /**
      * Get number of inputs
@@ -98,7 +98,7 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double> {
      * @param n_gaussians The number of Gaussian components
      * @param n_inputs    The feature dimensionality
      */ 
-    void resize(size_t n_gaussians, size_t n_inputs);
+    void resize(const size_t n_gaussians, const size_t n_inputs);
 
     /**
      * Set the weights
@@ -165,7 +165,7 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double> {
     /**
      * Set the variance flooring thresholds in each dimension 
      */
-    void setVarianceThresholds(double value);
+    void setVarianceThresholds(const double value);
     /**
      * Set the variance flooring thresholds in each dimension
      * (equal for all Gaussian components)
@@ -264,7 +264,7 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double> {
      * @return A smart pointer to the i'th Gaussian component
      *         if it exists, otherwise throws an exception
      */
-    boost::shared_ptr<bob::machine::Gaussian> getGaussian(size_t i);
+    boost::shared_ptr<bob::machine::Gaussian> getGaussian(const size_t i);
 
     /**
      * Return the number of Gaussian components
@@ -290,7 +290,7 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double> {
     friend std::ostream& operator<<(std::ostream& os, const GMMMachine& machine);
 
     
-  protected:
+  private:
     /**
      * Copy another GMMMachine
      */
@@ -315,9 +315,6 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double> {
      * The weights (also known as "mixing coefficients")
      */
     blitz::Array<double,1> m_weights;
-
-
-  private:
 
     /**
      * Update the mean and variance supervectors 

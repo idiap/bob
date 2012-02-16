@@ -163,7 +163,7 @@ def stats_computation(img_input, img_output, ubm):
   """Computes GMMStats against a world model"""
   
   ubm = bob.machine.GMMMachine(bob.io.HDF5File(ubm))
-  gmmstats = bob.machine.GMMStats(ubm.nGaussians, ubm.nInputs)
+  gmmstats = bob.machine.GMMStats(ubm.DimC, ubm.DimD)
 
   # process the 'dictionary of files'
   for k in img_input:
@@ -338,7 +338,7 @@ class GMMExperiment:
           stats = bob.machine.GMMStats(bob.io.HDF5File(str(stat_path)))
         else:
           data = loadData([f])
-          stats = bob.machine.GMMStats(self.wm.nGaussians, self.wm.nInputs)
+          stats = bob.machine.GMMStats(self.wm.DimC, self.wm.DimD)
           stats.init()
           self.wm.accStatistics(data, stats)
           stats.save(bob.io.HDF5File(str(stat_path)))
@@ -407,7 +407,7 @@ class GMMExperiment:
       list_stats=[]
       for f in files :
         data = loadData([f])
-        stats = bob.machine.GMMStats(self.wm.nGaussians, self.wm.nInputs)
+        stats = bob.machine.GMMStats(self.wm.DimC, self.wm.DimD)
         self.wm.accStatistics(data, stats)
         list_stats.append(stats)
       

@@ -3,7 +3,7 @@
  * @date Tue May 10 11:35:58 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
  *
- * Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+ * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,14 +27,13 @@
 #include "io/HDF5File.h"
 #include "machine/Machine.h"
 
-namespace bob {
-namespace machine {
+namespace bob { namespace machine {
 
 /**
  * @brief This class implements a k-means classifier.
  * @details See Section 9.1 of Bishop, "Pattern recognition and machine learning", 2006
  */
-class KMeansMachine : public Machine<blitz::Array<double,1>, double> {
+class KMeansMachine: public Machine<blitz::Array<double,1>, double> {
   public: 
     /**
      * Default constructor. Builds an otherwise invalid 0 x 0 k-means 
@@ -185,7 +184,8 @@ class KMeansMachine : public Machine<blitz::Array<double,1>, double> {
      */
     size_t getNInputs() const { return m_n_inputs; }
     
-  protected:
+
+  private:
      /**
      * The number of means
      */
@@ -201,13 +201,11 @@ class KMeansMachine : public Machine<blitz::Array<double,1>, double> {
      */
     blitz::Array<double,2> m_means;
 
-  private:
     /**
      * cache to avoid re-allocation
      */
     mutable blitz::Array<double,2> m_cache_means;
 };
 
-}
-}
-#endif // KMEANSMACHINE_H
+}}
+#endif

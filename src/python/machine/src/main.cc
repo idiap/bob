@@ -26,6 +26,7 @@
 void bind_machine_base();
 void bind_machine_gaussian();
 void bind_machine_gmm();
+void bind_machine_kmeans();
 void bind_machine_activation();
 void bind_machine_linear();
 void bind_machine_mlp();
@@ -47,6 +48,7 @@ BOOST_PYTHON_MODULE(libpybob_machine)
   bind_machine_base();
   bind_machine_gaussian();
   bind_machine_gmm();
+  bind_machine_kmeans();
   bind_machine_activation();
   bind_machine_linear();
   bind_machine_mlp();

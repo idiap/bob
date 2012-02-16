@@ -26,12 +26,21 @@ import bob
 import numpy
 import tempfile
 
-
+def equals(x, y, epsilon):
+  return (abs(x - y) < epsilon)
+  
 class GaussianMachineTest(unittest.TestCase):
   """Performs various Gaussian machine tests."""
 
-  def test01_GaussianMachine(self):
-    """Test a GaussianMachine"""
+  def test01_GaussianNormal(self):
+    """Test the likelihood computation of a simple normal Gaussian"""
+    gaussian = bob.machine.Gaussian(2)
+    # By default, initialized with zero mean and unit variance
+    logLH = gaussian.logLikelihood(numpy.array([0.4, 0.2], 'float64'))
+    self.assertTrue( equals(logLH, -1.93787706641, 1e-10))
+ 
+  def test02_GaussianMachine(self):
+    """Test a GaussianMachine more thoroughly"""
 
     # Initializes a Gaussian with zero mean and unit variance
     g = bob.machine.Gaussian(3)
@@ -66,12 +75,12 @@ class GaussianMachineTest(unittest.TestCase):
     ref2 = -4.569362000894712
     ref3 = -7.319362000894712
     eps = 1e-10
-    self.assertTrue( abs(g.logLikelihood(sample1) - ref1) < eps)
-    self.assertTrue( abs(g.forward(sample1) - ref1) < eps)
-    self.assertTrue( abs(g.logLikelihood(sample2) - ref2) < eps)
-    self.assertTrue( abs(g.forward(sample2) - ref2) < eps)
-    self.assertTrue( abs(g.logLikelihood(sample3) - ref3) < eps)
-    self.assertTrue( abs(g.forward(sample3) - ref3) < eps)
+    self.assertTrue( equals(g.logLikelihood(sample1), ref1, eps) )
+    self.assertTrue( equals(g.forward(sample1), ref1, eps) )
+    self.assertTrue( equals(g.logLikelihood(sample2), ref2, eps) )
+    self.assertTrue( equals(g.forward(sample2), ref2, eps) )
+    self.assertTrue( equals(g.logLikelihood(sample3), ref3, eps) )
+    self.assertTrue( equals(g.forward(sample3), ref3, eps) )
 
     # Check resize and assignment
     g.resize(5)

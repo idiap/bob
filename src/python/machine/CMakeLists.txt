@@ -5,6 +5,7 @@ set(pysrc
    "src/machine.cc"
    "src/gaussian.cc"
    "src/gmm.cc"
+   "src/kmeans.cc"
    "src/activation.cc"
    "src/linear.cc"
    "src/mlp.cc"
@@ -29,8 +30,10 @@ target_link_libraries(pybob_machine pybob_core_ndarray)
 # Our test units
 bob_python_add_test(python-machine-gaussian-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_gaussian.py)
-bob_python_add_test(python-machine-kmeans-tests 
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_machine.py)
+bob_python_add_test(python-machine-gmm-tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_gmm.py)
+#bob_python_add_test(python-machine-kmeans-tests 
+#  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_machine.py)
 bob_python_add_test(python-machine-linear-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_linear.py)
 bob_python_add_test(python-machine-mlp-tests

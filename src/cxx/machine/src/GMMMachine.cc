@@ -2,8 +2,9 @@
  * @file cxx/machine/src/GMMMachine.cc
  * @date Tue May 10 11:35:58 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+ * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,25 +20,25 @@
  */
 #include "machine/GMMMachine.h"
 #include "core/array_assert.h"
-#include "core/logging.h"
 #include "machine/Exception.h"
 #include "math/log.h"
 
-namespace ca = bob::core::array;
 namespace mach = bob::machine;
+namespace ca = bob::core::array;
+namespace io = bob::io;
 namespace mathL = bob::math::Log;
 
 mach::GMMMachine::GMMMachine(): m_gaussians(0) {
   resize(0,0);
 }
 
-mach::GMMMachine::GMMMachine(size_t n_gaussians, size_t n_inputs): 
+mach::GMMMachine::GMMMachine(const size_t n_gaussians, const size_t n_inputs): 
   m_gaussians(0)
 {
   resize(n_gaussians,n_inputs);
 }
 
-mach::GMMMachine::GMMMachine(bob::io::HDF5File& config): 
+mach::GMMMachine::GMMMachine(io::HDF5File& config): 
   m_gaussians(0)
 {
   load(config);
@@ -94,11 +95,11 @@ void mach::GMMMachine::copy(const GMMMachine& other) {
 
 mach::GMMMachine::~GMMMachine() { }
 
-void mach::GMMMachine::setNInputs(size_t n_inputs) {
+void mach::GMMMachine::setNInputs(const size_t n_inputs) {
   resize(m_n_gaussians,n_inputs);
 }
 
-void mach::GMMMachine::resize(size_t n_gaussians, size_t n_inputs) {
+void mach::GMMMachine::resize(const size_t n_gaussians, const size_t n_inputs) {
   m_n_gaussians = n_gaussians;
   m_n_inputs = n_inputs;
 
@@ -182,7 +183,7 @@ void mach::GMMMachine::getVarianceSupervector(blitz::Array<double,1> &variance_s
   }
 }
 
-void mach::GMMMachine::setVarianceThresholds(double value) {
+void mach::GMMMachine::setVarianceThresholds(const double value) {
   for(size_t i=0; i<m_n_gaussians; ++i) 
     m_gaussians[i]->setVarianceThresholds(value);
   m_cache_supervector = false;
@@ -262,7 +263,7 @@ void mach::GMMMachine::forward_(const blitz::Array<double,1>& input, double& out
   output = logLikelihood(input);
 }
 
-void mach::GMMMachine::accStatistics(const bob::io::Arrayset& ar, mach::GMMStats& stats) const {
+void mach::GMMMachine::accStatistics(const io::Arrayset& ar, mach::GMMStats& stats) const {
   // iterate over data
   for(size_t i=0; i<ar.size(); ++i) {
     // Get example
@@ -272,7 +273,7 @@ void mach::GMMMachine::accStatistics(const bob::io::Arrayset& ar, mach::GMMStats
   }
 }
 
-void mach::GMMMachine::accStatistics_(const bob::io::Arrayset& ar, mach::GMMStats& stats) const {
+void mach::GMMMachine::accStatistics_(const io::Arrayset& ar, mach::GMMStats& stats) const {
   // iterate over data
   for(size_t i=0; i<ar.size(); ++i) {
     // Get example
@@ -333,14 +334,13 @@ void mach::GMMMachine::accStatisticsInternal(const blitz::Array<double, 1>& x,
 }
 
 
-
-boost::shared_ptr<mach::Gaussian> mach::GMMMachine::getGaussian(size_t i) {
+boost::shared_ptr<mach::Gaussian> mach::GMMMachine::getGaussian(const size_t i) {
   if(i<0 || i>=m_n_gaussians) 
-    throw bob::machine::Exception();
+    throw mach::Exception();
   return m_gaussians[i];
 }
 
-void mach::GMMMachine::save(bob::io::HDF5File& config) const {
+void mach::GMMMachine::save(io::HDF5File& config) const {
   int64_t v = static_cast<int64_t>(m_n_gaussians);
   config.set("m_n_gaussians", v);
   v = static_cast<int64_t>(m_n_inputs);
@@ -358,7 +358,7 @@ void mach::GMMMachine::save(bob::io::HDF5File& config) const {
   config.setArray("m_weights", m_weights);
 }
 
-void mach::GMMMachine::load(bob::io::HDF5File& config) {
+void mach::GMMMachine::load(io::HDF5File& config) {
   int64_t v;
   v = config.read<int64_t>("m_n_gaussians");
   m_n_gaussians = static_cast<size_t>(v);
