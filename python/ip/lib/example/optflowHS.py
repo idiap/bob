@@ -121,11 +121,9 @@ def main():
 
   if options.test:
     # then we go into test mode, all input is preset
-    packdir = os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[0])))
     outputdir = tempfile.mkdtemp()
-    movie = os.path.join(packdir, '..', 'io', 'test', 'data', 'test.mov')
     output = os.path.join(outputdir, "%(stem)s.avi")
-    optflowHS(movie, 1, options.alpha, output, 10) #1 iter. per cycle is faster
+    optflowHS(args[0], 1, options.alpha, output, 10) #1 iter. per cycle is faster
     shutil.rmtree(outputdir)
 
   else:
@@ -136,3 +134,6 @@ def main():
     optflowHS(args[0], options.iterations, options.alpha, args[1])
 
   sys.exit(0)
+
+if __name__ == '__main__':
+  main()

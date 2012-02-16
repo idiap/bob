@@ -14,3 +14,4 @@
     recipe is required somewhere.
   * installation remains untested
 * OpenCV installation not found on MacOSX
+* Documentation generation still not tackled after build modifications

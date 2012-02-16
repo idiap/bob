@@ -95,5 +95,6 @@ bob_python_script(ip "blockDCT.py" "lib/script/blockDCT.py" "main")
 bob_python_add_test(ip blockDCT.py --self-test)
 
 # TODO: Our examples (run and install)
-#bob_python_example(ip "optflowHS.py" "lib/example/optflowHS.py" "main")
-#bob_python_add_test(ip optflowHS.py --test)
+bob_python_example(ip "optflowHS.py" "lib/example/optflowHS.py" "main")
+bob_python_add_test(ip optflowHS.py --test
+  ${CMAKE_CURRENT_SOURCE_DIR}/../io/data/test.mov)

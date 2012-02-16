@@ -117,6 +117,35 @@ macro(bob_python_script package_name script_name python_module python_method)
 
 endmacro()
 
+# Builds and installs a new "example" script similar to what setuptools do for
+# the command section of a setup.py build recipe.
+macro(bob_python_example package_name script_name python_module python_method)
+
+  # figures out the module name from the input file dependence name
+  string(REPLACE ".py" "" module_name "${python_module}")
+  string(REPLACE "/" "." module_name "${module_name}")
+  string(REPLACE "lib." "bob.${package_name}." module_name "${module_name}")
+
+  set(output_file "${CMAKE_BINARY_DIR}/bin/${script_name}")
+
+  add_custom_command(
+    OUTPUT "${output_file}"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${python_module}" "${CMAKE_SOURCE_DIR}/bin/make_wrapper.py"
+    COMMAND ${PYTHON_EXECUTABLE}
+    ARGS ${CMAKE_SOURCE_DIR}/bin/make_wrapper.py --non-root "${module_name}" "${python_method}" "${output_file}"
+    COMMENT "Generating script ${script_name}")
+
+  get_filename_component(script_basename ${script_name} NAME_WE)
+
+  add_custom_target(script_${script_basename} DEPENDS "${output_file}")
+  add_dependencies(pybob_${package_name} script_${script_basename})
+
+  # this will make the script available to the installation tree
+  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${python_module} DESTINATION
+    share/doc/examples/python/${package_name})
+
+endmacro()
+
 # Tags version and platform, and set this to core of the python package
 macro(bob_python_tag_build source)
 
