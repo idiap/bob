@@ -24,6 +24,9 @@ endif(DOXYGEN_FOUND)
 
 # add a target to generate user documentation with Sphinx
 find_program(SPHINX_EXECUTABLE "sphinx-build")
+if(NOT SPHINX_EXECUTABLE)
+  find_program(SPHINX_EXECUTABLE "sphinx-build-${PYTHON_VERSION}")
+endif()
 
 if(SPHINX_EXECUTABLE)
 
