@@ -9,6 +9,8 @@
     installing, the user must download the databases using the command
     "dbmanage.py all download ..." This is only a partial solution to the
     problem.
+  * You can now use the target "install-database-download" or 
+  "install-database-create to force downloading of databases.
   * Still unsolved: how to pin the database versions to be downloaded?
 * Installation:
   * have not verified if we can still compile C++ external code against Bob. A

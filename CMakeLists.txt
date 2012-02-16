@@ -134,3 +134,6 @@ install(FILES cmake/bobConfig.cmake DESTINATION ${cmakedir})
 
 # Adds Doxygen and Sphinx generation
 include(cmake/documentation.cmake)
+
+# Adds targets for database management
+include(cmake/database.cmake)
