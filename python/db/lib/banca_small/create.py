@@ -9,7 +9,7 @@
 import os
 
 from .models import *
-from ..utils import session, check_group_writeability
+from ..utils import session
 
 def add_files(session):
   """Add files (and clients) to the BANCA_SMALL database."""
@@ -147,9 +147,6 @@ def create(args):
   add_protocols(s)
   s.commit()
   s.close()
-
-  # the group writeability option
-  check_group_writeability(dbfile)
 
 def add_command(subparsers):
   """Add specific subcommands that the action "create" can use"""
