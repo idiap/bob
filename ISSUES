@@ -1,8 +1,6 @@
 * pybob_visioner does not seem to depend correctly on bob_visioner. If the
   build is run in parallel, it normally fails.
   * This has been working a little bit better after the cmake revamp...
-* Remove all group writing (chmod) flags from installation, leave this to the
-  build system
 * database creation, installation and copying still executed as test - a good
   thing would be to have independent targets for this. Problems to solve:
   testing db functionality will not work?
