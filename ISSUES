@@ -14,4 +14,3 @@
   * have not verified if we can still compile C++ external code against Bob. A
     recipe is required somewhere.
 * OpenCV installation not found on MacOSX
-* Documentation generation still not tackled after build modifications

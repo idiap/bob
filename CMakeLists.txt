@@ -131,3 +131,6 @@ endif ()
 
 install(EXPORT bob DESTINATION ${cmakedir})
 install(FILES cmake/bobConfig.cmake DESTINATION ${cmakedir})
+
+# Adds Doxygen and Sphinx generation
+include(cmake/documentation.cmake)
