@@ -142,7 +142,9 @@ macro(bob_python_example package_name script_name python_module python_method)
 
   # this will make the script available to the installation tree
   install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${python_module} DESTINATION
-    share/doc/examples/python/${package_name})
+    share/doc/examples/python/${package_name} 
+    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE 
+                GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
 endmacro()
 

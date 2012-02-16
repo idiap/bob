@@ -246,13 +246,13 @@ def main():
     (fd, name) = tempfile.mkstemp(prefix="bob_example", suffix='.hdf5')
     os.close(fd)
     os.unlink(name)
-    mydir = os.path.dirname(os.path.realpath(sys.argv[0]))
-    convert(os.path.join(mydir, 'network.xml'), name, args.verbose)
-    os.unlink(name)
-    convert(os.path.join(mydir, 'network-without-bias.xml'), name, args.verbose)
+    convert(args.input, name, args.verbose)
     os.unlink(name)
     sys.exit(0)
 
   output = args.output
   if not output: output = os.path.splitext(args.input)[0] + '.hdf5'
   convert(args.input, output, args.verbose)
+
+if __name__ == '__main__':
+  main()

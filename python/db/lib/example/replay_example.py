@@ -17,29 +17,44 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Examplifies how to use the replay attack database.
+"""Examplifies how to use the replay attack database. Note that, for this
+example, we create and destroy the output. You will probably not want to do
+this in real-life (tm) ;-)
 """
 
 import bob
+import tempfile
+import shutil
 
 def main():
 
   db = bob.db.replay.Database()
   rawdata = "/idiap/group/replay/database/protocols"
-  processed = "gray27"
+    
+  processed = tempfile.mkdtemp(prefix='bobtest_')
   extension = ".jpg"
 
   # Accesses the real-accesses and attacks for the PRINT-ATTACK protocol
-  data = db.files(directory=rawdata, extension='.mov', device='print',
+  data = db.files(directory=rawdata, extension='.mov', protocol='print',
       cls='real')
-  data.update(db.files(directory=rawdata, extension='.mov', device='print', 
+  data.update(db.files(directory=rawdata, extension='.mov', protocol='print', 
       cls='attack'))
 
   # Example: extracts frame 27 from each of the data, save it as a gray-scale
+  # stop after 5 examples...
 
-  for key, value in data:
+  counter = 5
+  for key, value in data.iteritems():
     print "Processing %s" % value
-    snapshot = bob.database.VideoReader(value)[27]
-    gray = snapshot.grayAs()
-    bob.ip.rgb_to_gray(snapshot, gray)
+    snapshot = bob.io.VideoReader(value)[27]
+    gray = bob.ip.rgb_to_gray(snapshot)
     db.save_one(key, gray, processed, extension)
+    print "Saved gray-scale equivalent of %s at %s" % (value, processed)
+    counter -= 1
+    if counter <= 0: break
+
+  shutil.rmtree(processed)
+  print "Removed temporary directory %s" % processed
+
+if __name__ == '__main__':
+  main()

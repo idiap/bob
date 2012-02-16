@@ -11,6 +11,8 @@ set(pysrc
    "lib/__init__.py"
    "lib/test/__init__.py"
    "lib/test/all.py"
+   "lib/example/__init__.py"
+   "lib/example/capture.py"
    )
 
 if (V4L2_FOUND)
@@ -30,8 +32,8 @@ bob_python_package_bindings(daq "${ccsrc}" "${pysrc}" "core_array")
 target_link_libraries(pybob_daq ${QT_LIBRARIES})
 
 if (V4L2_FOUND)
-  #TODO: fix this
-  bob_example_install("python" "daq" example/capture.py)
+  bob_python_example(daq "capture.py" lib/example/capture.py main)
+  # note: cannot test live capture
 endif()
 
 bob_python_add_unittest(daq lib/test/all.py main

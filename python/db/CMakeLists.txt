@@ -146,6 +146,9 @@ bob_python_add_unittest(db lib/test/replay.py main)
 set_property(TEST python-db-replay-main APPEND PROPERTY DEPENDS 
   ${python-db-replay-instantiation})
 
+bob_python_example(db "replay_example.py" lib/example/replay_example.py main)
+bob_python_add_test(db replay_example.py)
+
 # BANCA database driver tests.
 bob_python_add_dependent_test(db-banca-dumplist 
   "${python-db-banca-instantiation}"
@@ -222,13 +225,12 @@ bob_python_add_dependent_test(db-xm2vts-dumplist2
   "${python-db-xm2vts-instantiation}" 
   dbmanage.py xm2vts dumplist --protocol=lp1 --classes=client --groups=dev --purposes=enrol --self-test)
 
-# TODO: Our examples (run and install)
-#bob_python_add_test(python-db-iris-lda-example
-#  ${CMAKE_CURRENT_SOURCE_DIR}/example/iris_lda.py --self-test)
-#bob_example_install("python" "db" example/iris_lda.py)
-#bob_python_add_test(python-db-iris-rprop-example
-#  ${CMAKE_CURRENT_SOURCE_DIR}/example/iris_rprop.py --self-test)
-#bob_example_install("python" "db" example/iris_rprop.py)
-#bob_python_add_test(python-db-iris-backprop-example
-#  ${CMAKE_CURRENT_SOURCE_DIR}/example/iris_backprop.py --self-test)
-#bob_example_install("python" "db" example/iris_backprop.py)
+# Our examples (run and install)
+bob_python_example(db "iris_lda.py" lib/example/iris_lda.py main)
+bob_python_add_test(db iris_lda.py --self-test)
+
+bob_python_example(db "iris_rprop.py" lib/example/iris_rprop.py main)
+bob_python_add_test(db iris_rprop.py --self-test)
+
+bob_python_example(db "iris_backprop.py" lib/example/iris_backprop.py main)
+bob_python_add_test(db iris_backprop.py --self-test)

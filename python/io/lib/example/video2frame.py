@@ -63,10 +63,8 @@ def main():
 
   if options.test:
     # then we go into test mode, all input is preset
-    packdir = os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[0])))
     outputdir = tempfile.mkdtemp()
-    movie = os.path.join(packdir, 'test', 'data', 'test.mov')
-    video2frame(movie, outputdir)
+    video2frame(args[0], outputdir)
     shutil.rmtree(outputdir)
 
   else:
@@ -77,3 +75,6 @@ def main():
     video2frame(args[0], os.path.realpath(options.outdir))
 
   sys.exit(0)
+
+if __name__ == '__main__':
+  main()

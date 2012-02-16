@@ -56,6 +56,7 @@ bob_python_add_unittest(machine lib/test/svm.py main
 #bob_python_add_unittest(machine lib/test/gmm_test_benchmark.py main
 #  ${CMAKE_CURRENT_SOURCE_DIR}/data)
 
-# TODO: Our examples (run and install)
-#bob_python_example(machine "video2frame.py" "lib/example/video2frame.py" "main")
-#bob_python_add_test(io video2frame.py --self-test)
+# Our examples (run and install)
+bob_python_example(machine "xml2hdf5.py" "lib/example/xml2hdf5.py" "main")
+bob_python_add_test(machine-1 xml2hdf5.py --self-test ${CMAKE_CURRENT_SOURCE_DIR}/data/network.xml)
+bob_python_add_test(machine-2 xml2hdf5.py --self-test ${CMAKE_CURRENT_SOURCE_DIR}/data/network-without-bias.xml)
