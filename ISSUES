@@ -1,12 +1,15 @@
 * pybob_visioner does not seem to depend correctly on bob_visioner. If the
   build is run in parallel, it normally fails.
-* the macro bob_python_tag_build (using configure_file) does not work as
-  expected. Sometimes it fills the right values, sometimes it does not.
 * Remove all group writing (chmod) flags from installation, leave this to the
   build system
 * database creation, installation and copying still executed as test - a good
   thing would be to have independent targets for this. Problems to solve:
   testing db functionality will not work?
+  * Database can now be operated with a single command. After building and
+    installing, the user must download the databases using the command
+    "dbmanage.py all download ..." This is only a partial solution to the
+    problem.
+  * Still unsolved: how to pin the database versions to be downloaded?
 * Installation:
   * have not verified if we can still compile C++ external code against Bob. A
     recipe is required somewhere.
