@@ -1,0 +1,138 @@
+/**
+ * @file cxx/math/test/linsolve.cc
+ * @date Sat Mar 19 19:49:51 2011 +0100
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
+ *
+ * @brief Test the linear solvers A*x=b
+ *
+ * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#define BOOST_TEST_DYN_LINK
+#define BOOST_TEST_MODULE math-linsolve Tests
+#define BOOST_TEST_MAIN
+#include <boost/test/unit_test.hpp>
+#include <blitz/array.h>
+#include <stdint.h>
+#include "core/cast.h"
+#include "math/linsolve.h"
+
+
+struct T {
+  blitz::Array<double,2> A33_1, A33_2, A33_3;
+  blitz::Array<double,1> b3_1, b3_2, s3_1, s3_2, s3_3;
+  double eps;
+
+  T(): A33_1(3,3), A33_2(3,3), A33_3(3,3), b3_1(3), b3_2(3), s3_1(3), 
+        s3_2(3), s3_3(3), eps(1e-6)
+  {
+    A33_1 = 1., 0., 0., 0., 1., 0., 0., 0., 1.;
+    b3_1 = 7., 5., 3.;
+    s3_1 = b3_1;
+    A33_2 = 1., 3., 5., 7., 9., 1., 3., 5., 7.;
+    b3_2 = 2., 4., 6.;
+    s3_2 = 3., -2., 1.;
+    A33_3 = 2., -1., 0., -1, 2., -1., 0., -1., 2.;
+    s3_3 = 8.5, 10., 6.5;
+  }
+
+  ~T() {}
+};
+
+template<typename T, typename U, int d>  
+void check_dimensions( blitz::Array<T,d>& t1, blitz::Array<U,d>& t2) 
+{
+  BOOST_REQUIRE_EQUAL(t1.dimensions(), t2.dimensions());
+  for( int i=0; i<t1.dimensions(); ++i)
+    BOOST_CHECK_EQUAL(t1.extent(i), t2.extent(i));
+}
+
+template<typename T, typename U>  
+void checkBlitzEqual( blitz::Array<T,1>& t1, blitz::Array<U,1>& t2)
+{
+  check_dimensions( t1, t2);
+  for( int i=0; i<t1.extent(0); ++i)
+    BOOST_CHECK_EQUAL(t1(i), bob::core::cast<T>(t2(i)));
+}
+
+template<typename T, typename U>  
+void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
+{
+  check_dimensions( t1, t2);
+  for( int i=0; i<t1.extent(0); ++i)
+    for( int j=0; j<t1.extent(1); ++j)
+      BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
+}
+
+template<typename T, typename U>  
+void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2) 
+{
+  check_dimensions( t1, t2);
+  for( int i=0; i<t1.extent(0); ++i)
+    for( int j=0; j<t1.extent(1); ++j)
+      for( int k=0; k<t1.extent(2); ++k)
+        BOOST_CHECK_EQUAL(t1(i,j,k), bob::core::cast<T>(t2(i,j,k)));
+}
+
+template<typename T>  
+void checkBlitzClose( blitz::Array<T,1>& t1, blitz::Array<T,1>& t2, 
+  const double eps )
+{
+  check_dimensions( t1, t2);
+  for( int i=0; i<t1.extent(0); ++i)
+    BOOST_CHECK_SMALL( fabs( t2(i)-t1(i) ), eps);
+}
+
+
+BOOST_FIXTURE_TEST_SUITE( test_setup, T )
+
+BOOST_AUTO_TEST_CASE( test_solve_3x3 )
+{
+  blitz::Array<double,1> x(3);
+
+  bob::math::linsolve(A33_1, x, b3_1);
+  checkBlitzClose(s3_1, x, eps); 
+
+  bob::math::linsolve(A33_2, x, b3_2);
+  checkBlitzClose(s3_2, x, eps); 
+
+  bob::math::linsolve(A33_3, x, b3_1);
+  checkBlitzClose(s3_3, x, eps); 
+}
+
+BOOST_AUTO_TEST_CASE( test_solveSympos_3x3 )
+{
+  blitz::Array<double,1> x(3);
+
+  bob::math::linsolveSympos(A33_1, x, b3_1);
+  checkBlitzClose(s3_1, x, eps); 
+
+  bob::math::linsolveSympos(A33_3, x, b3_1);
+  checkBlitzClose(s3_3, x, eps); 
+}
+
+BOOST_AUTO_TEST_CASE( test_solveCGSympos_3x3 )
+{
+  blitz::Array<double,1> x(3);
+
+  bob::math::linsolveCGSympos(A33_1, x, b3_1, 1e-6, 1000);
+  checkBlitzClose(s3_1, x, eps);
+
+  bob::math::linsolveCGSympos(A33_3, x, b3_1, 1e-6, 1000);
+  checkBlitzClose(s3_3, x, eps);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
