@@ -112,7 +112,7 @@ void bind_machine_kmeans()
     .add_property("means", &py_getMeans, &py_setMeans, "Means")
     .add_property("DimD", &mach::KMeansMachine::getNInputs, "Number of inputs")
     .add_property("DimC", &mach::KMeansMachine::getNMeans, "Number of means (k)")
-    .def("resize", &mach::KMeansMachine::resize, (arg("n_gaussians"), arg("n_inputs")), "Resize the number of gaussians and inputs")
+    .def("resize", &mach::KMeansMachine::resize, (arg("n_means"), arg("n_inputs")), "Resize the number of means and inputs")
     .def("getMean", &py_getMean, (arg("i"), arg("mean")), "Get the i'th mean")
     .def("setMean", &py_setMean, (arg("i"), arg("mean")), "Set the i'th mean")
     .def("getDistanceFromMean", &py_getDistanceFromMean, (arg("x"), arg("i")),
