@@ -26,8 +26,15 @@ if(FFMPEG_FOUND)
   link_directories(${FFMPEG_LIBRARY_DIRS})
   add_definitions("-DHAVE_FFMPEG=1")
 
-  # Setup the FFMPEG "official version"
-  execute_process(COMMAND ${CMAKE_SOURCE_DIR}/bin/ffmpeg-version.sh OUTPUT_VARIABLE FFMPEG_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+  find_program(FFMPEG_BINARY ffmpeg)
+
+  if(FFMPEG_BINARY)
+    # Setup the FFMPEG "official version"
+    execute_process(COMMAND ${CMAKE_SOURCE_DIR}/bin/ffmpeg-version.sh ${FFMPEG_BINARY} ${FFMPEG_LIBRARY_DIRS} OUTPUT_VARIABLE FFMPEG_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+  else()
+    set(FFMPEG_VERSION "unknown-version")
+  endif()
+
   add_definitions("-DFFMPEG_VERSION=\"${FFMPEG_VERSION}\"")
 
   find_package_message(FFMPEG "Found FFmpeg ${FFMPEG_VERSION}" "[${FFMPEG_LIBRARY_DIRS}][${FFMPEG_VERSION}]")
