@@ -109,14 +109,15 @@ void bind_machine_kmeans()
     .def(init<const size_t, const size_t>(args("n_means", "n_inputs")))
     .def(init<mach::KMeansMachine&>())
     .def(init<io::HDF5File&>(args("config")))
-    .add_property("means", &py_getMeans, &py_setMeans, "Means")
+    .def(self == self)
+    .add_property("means", &py_getMeans, &py_setMeans, "The mean vectors")
     .add_property("DimD", &mach::KMeansMachine::getNInputs, "Number of inputs")
     .add_property("DimC", &mach::KMeansMachine::getNMeans, "Number of means (k)")
     .def("resize", &mach::KMeansMachine::resize, (arg("n_means"), arg("n_inputs")), "Resize the number of means and inputs")
     .def("getMean", &py_getMean, (arg("i"), arg("mean")), "Get the i'th mean")
     .def("setMean", &py_setMean, (arg("i"), arg("mean")), "Set the i'th mean")
     .def("getDistanceFromMean", &py_getDistanceFromMean, (arg("x"), arg("i")),
-        "Return the Euclidean distance of the sample, x, to the i'th mean")
+        "Return the power of two of the Euclidean distance of the sample, x, to the i'th mean")
     .def("getClosestMean", &py_getClosestMean, (arg("x")),
         "Calculate the index of the mean that is closest (in terms of Euclidean distance) to the data sample, x")
     .def("getMinDistance", &py_getMinDistance, (arg("input")),
@@ -127,5 +128,6 @@ void bind_machine_kmeans()
         "2) the proportion of the samples represented by that subset (the cluster weight)")
     .def("load", &mach::KMeansMachine::load, "Load from a Configuration")
     .def("save", &mach::KMeansMachine::save, "Save to a Configuration")
+    .def(self_ns::str(self_ns::self))
   ;
 }

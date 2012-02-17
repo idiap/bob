@@ -2,6 +2,7 @@
  * @file cxx/machine/src/KMeansMachine.cc
  * @date Tue May 10 11:35:58 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
@@ -48,7 +49,6 @@ mach::KMeansMachine::KMeansMachine(const blitz::Array<double,2>& means):
   m_means(ca::ccopy(means)),
   m_cache_means(means.shape()) 
 {
-  m_means = 0;
 }
 
 mach::KMeansMachine::KMeansMachine(const mach::KMeansMachine& other): 
@@ -73,6 +73,11 @@ mach::KMeansMachine& mach::KMeansMachine::operator=
   m_means.reference(ca::ccopy(other.m_means));
   m_cache_means.resize(other.m_means.shape());
   return *this;
+}
+
+bool mach::KMeansMachine::operator==(const mach::KMeansMachine& b) const {
+  return m_n_inputs == b.m_n_inputs && m_n_means == b.m_n_means &&
+         blitz::all(m_means == b.m_means);
 }
 
 void mach::KMeansMachine::load(io::HDF5File& config) 
@@ -199,4 +204,13 @@ void mach::KMeansMachine::resize(const size_t n_means, const size_t n_inputs)
   m_n_inputs = n_inputs;
   m_means.resizeAndPreserve(n_means, n_inputs);
   m_cache_means.resizeAndPreserve(n_means, n_inputs);
+}
+
+namespace bob{
+  namespace machine{
+    std::ostream& operator<<(std::ostream& os, const KMeansMachine& km) {
+      os << "Means = " << km.m_means << std::endl;
+      return os;
+    }
+  }
 }

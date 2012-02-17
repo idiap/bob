@@ -32,8 +32,8 @@ bob_python_add_test(python-machine-gaussian-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_gaussian.py)
 bob_python_add_test(python-machine-gmm-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_gmm.py)
-#bob_python_add_test(python-machine-kmeans-tests 
-#  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_machine.py)
+bob_python_add_test(python-machine-kmeans-tests 
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_kmeans.py)
 bob_python_add_test(python-machine-linear-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_linear.py)
 bob_python_add_test(python-machine-mlp-tests

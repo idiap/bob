@@ -2,6 +2,7 @@
  * @file cxx/machine/machine/KMeansMachine.h
  * @date Tue May 10 11:35:58 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
@@ -76,6 +77,11 @@ class KMeansMachine: public Machine<blitz::Array<double,1>, double> {
     KMeansMachine& operator=(const KMeansMachine& other);
 
     /**
+     * Equal to
+     */
+    bool operator==(const KMeansMachine& b) const;
+
+    /**
      * Loads data from an existing configuration object. Resets the current
      * state.
      */
@@ -133,7 +139,7 @@ class KMeansMachine: public Machine<blitz::Array<double,1>, double> {
     { return m_means; }
    
     /**
-     * Return the Euclidean distance of the sample, x, 
+     * Return the power of two of the Euclidean distance of the sample, x, 
      * to the i'th mean
      * @param x The data sample (feature vector)
      * @param i The index of the mean
@@ -184,6 +190,11 @@ class KMeansMachine: public Machine<blitz::Array<double,1>, double> {
      */
     size_t getNInputs() const { return m_n_inputs; }
     
+    /**
+     * Prints a KMeansMachine in the output stream
+     */
+    friend std::ostream& operator<<(std::ostream& os, const KMeansMachine& km);
+
 
   private:
      /**
