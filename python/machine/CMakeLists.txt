@@ -5,6 +5,7 @@ set(ccsrc
    "src/machine.cc"
    "src/gaussian.cc"
    "src/gmm.cc"
+   "src/kmeans.cc"
    "src/activation.cc"
    "src/linear.cc"
    "src/mlp.cc"
@@ -29,9 +30,9 @@ set(pysrc
    "lib/example/xml2hdf5.py"
    "lib/test/__init__.py"
    "lib/test/gaussian.py"
+   "lib/test/gmm.py"
    "lib/test/linear.py"
    "lib/test/linearscoring.py"
-   "lib/test/machine.py"
    "lib/test/mlp.py"
    "lib/test/plda.py"
    "lib/test/svm.py"
@@ -43,7 +44,7 @@ bob_python_package_bindings(machine "${ccsrc}" "${pysrc}" "core_array")
 # Our test units
 bob_python_add_unittest(machine lib/test/gaussian.py main
   ${CMAKE_CURRENT_SOURCE_DIR}/data)
-bob_python_add_unittest(machine lib/test/machine.py main
+bob_python_add_unittest(machine lib/test/gmm.py main
   ${CMAKE_CURRENT_SOURCE_DIR}/data)
 bob_python_add_unittest(machine lib/test/linear.py main
   ${CMAKE_CURRENT_SOURCE_DIR}/data)

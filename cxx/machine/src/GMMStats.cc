@@ -2,6 +2,7 @@
  * @file cxx/machine/src/GMMStats.cc
  * @date Tue May 10 11:35:58 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
@@ -21,16 +22,17 @@
 #include "core/logging.h"
 
 namespace mach = bob::machine;
+namespace io = bob::io;
 
 mach::GMMStats::GMMStats() {
   resize(0,0);
 }
 
-mach::GMMStats::GMMStats(size_t n_gaussians, size_t n_inputs) {
+mach::GMMStats::GMMStats(const size_t n_gaussians, const size_t n_inputs) {
   resize(n_gaussians,n_inputs);
 }
 
-mach::GMMStats::GMMStats(bob::io::HDF5File& config) {
+mach::GMMStats::GMMStats(io::HDF5File& config) {
   load(config);
 }
 
@@ -76,7 +78,7 @@ void mach::GMMStats::copy(const GMMStats& other) {
   sumPxx = other.sumPxx;
 }
 
-void mach::GMMStats::resize(size_t n_gaussians, size_t n_inputs) {
+void mach::GMMStats::resize(const size_t n_gaussians, const size_t n_inputs) {
   n.resize(n_gaussians);
   sumPx.resize(n_gaussians, n_inputs);
   sumPxx.resize(n_gaussians, n_inputs);
@@ -91,9 +93,10 @@ void mach::GMMStats::init() {
   sumPxx = 0.0;
 }
 
-void mach::GMMStats::save(bob::io::HDF5File& config) const {
+void mach::GMMStats::save(io::HDF5File& config) const {
   //please note we fix the output values to be of a precise type so they can be
   //retrieved at any platform with the exact same precision.
+  // TODO: add versioning, replace int64_t by uint64_t and log_liklihood by log_likelihood
   int64_t sumpx_shape_0 = sumPx.shape()[0];
   int64_t sumpx_shape_1 = sumPx.shape()[1];
   config.set("n_gaussians", sumpx_shape_0);
@@ -105,7 +108,7 @@ void mach::GMMStats::save(bob::io::HDF5File& config) const {
   config.setArray("sumPxx", sumPxx); //Array2d
 }
 
-void mach::GMMStats::load(bob::io::HDF5File& config) {
+void mach::GMMStats::load(io::HDF5File& config) {
   log_likelihood = config.read<double>("log_liklihood");
   int64_t n_gaussians = config.read<int64_t>("n_gaussians");
   int64_t n_inputs = config.read<int64_t>("n_inputs");

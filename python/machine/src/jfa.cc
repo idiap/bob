@@ -26,8 +26,6 @@
 #include "machine/JFAMachine.h"
 #include "machine/GMMMachine.h"
 
-#include "core/logging.h"
-
 using namespace boost::python;
 namespace mach = bob::machine;
 namespace ca = bob::core::array;
@@ -44,6 +42,9 @@ static object py_getU(const mach::JFABaseMachine& machine) {
 }
 
 static void py_setU(mach::JFABaseMachine& machine, tp::const_ndarray U) {
+  const ca::typeinfo& info = U.type();
+  if(info.dtype != ca::t_float64 || info.nd != 2)
+    PYTHON_ERROR(TypeError, "cannot set array of type '%s'", info.str().c_str());
   const blitz::Array<double,2> U_ = U.bz<double,2>();
   machine.setU(U_);
 }
@@ -58,6 +59,9 @@ static object py_getV(const mach::JFABaseMachine& machine) {
 }
 
 static void py_setV(mach::JFABaseMachine& machine, tp::const_ndarray V) {
+  const ca::typeinfo& info = V.type();
+  if(info.dtype != ca::t_float64 || info.nd != 2)
+    PYTHON_ERROR(TypeError, "cannot set array of type '%s'", info.str().c_str());
   const blitz::Array<double,2> V_ = V.bz<double,2>();
   machine.setV(V_);
 }
@@ -71,6 +75,9 @@ static object py_getD(const mach::JFABaseMachine& machine) {
 }
 
 static void py_setD(mach::JFABaseMachine& machine, tp::const_ndarray D) {
+  const ca::typeinfo& info = D.type();
+  if(info.dtype != ca::t_float64 || info.nd != 1)
+    PYTHON_ERROR(TypeError, "cannot set array of type '%s'", info.str().c_str());
   const blitz::Array<double,1> D_ = D.bz<double,1>();
   machine.setD(D_);
 }
@@ -85,6 +92,9 @@ static object py_getY(const mach::JFAMachine& machine) {
 }
 
 static void py_setY(mach::JFAMachine& machine, tp::const_ndarray Y) {
+  const ca::typeinfo& info = Y.type();
+  if(info.dtype != ca::t_float64 || info.nd != 1)
+    PYTHON_ERROR(TypeError, "cannot set array of type '%s'", info.str().c_str());
   const blitz::Array<double,1> Y_ = Y.bz<double,1>();
   machine.setY(Y_);
 }
@@ -98,6 +108,9 @@ static object py_getZ(const mach::JFAMachine& machine) {
 }
 
 static void py_setZ(mach::JFAMachine& machine, tp::const_ndarray Z) {
+  const ca::typeinfo& info = Z.type();
+  if(info.dtype != ca::t_float64 || info.nd != 1)
+    PYTHON_ERROR(TypeError, "cannot set array of type '%s'", info.str().c_str());
   const blitz::Array<double,1> Z_ = Z.bz<double,1>();
   machine.setZ(Z_);
 }
@@ -119,11 +132,10 @@ static void jfa_forward_list(mach::JFAMachine& m, list stats, tp::ndarray score)
 }
 
 static double jfa_forward_sample(mach::JFAMachine& m, 
-    const bob::machine::GMMStats& stats) {
+    const boost::shared_ptr<bob::machine::GMMStats> stats) {
   double score;
-  boost::shared_ptr<const bob::machine::GMMStats> stats_(new bob::machine::GMMStats(stats));
   // Calls the forward function
-  m.forward(stats_, score);
+  m.forward(stats, score);
   return score;
 }
 
@@ -144,7 +156,7 @@ void bind_machine_jfa() {
     .add_property("DimRv", &mach::JFABaseMachine::getDimRv)
   ;
 
-  class_<mach::JFAMachine, boost::shared_ptr<mach::JFAMachine> >("JFAMachine", "A JFAMachine", init<boost::shared_ptr<mach::JFABaseMachine> >((arg("jfa_base")), "Builds a new JFAMachine. An attached JFABaseMachine should be provided for Joint Factor Analysis. The JFAMachine carries information about y and z, whereas a JFABaseMachine carries information about U, V and D."))
+  class_<mach::JFAMachine, boost::shared_ptr<mach::JFAMachine> >("JFAMachine", "A JFAMachine", init<boost::shared_ptr<mach::JFABaseMachine> >((arg("jfa_base")), "Builds a new JFAMachine. An attached JFABaseMachine should be provided for Joint Factor Analysis. The JFAMachine carries information about the speaker factors y and z, whereas a JFABaseMachine carries information about the matrices U, V and D."))
     .def(init<io::HDF5File&>((arg("config")), "Constructs a new JFAMachine from a configuration file."))
     .def(init<const mach::JFAMachine&>((arg("machine")), "Copy constructs a JFAMachine"))
     .def("load", &mach::JFAMachine::load, (arg("self"), arg("config")), "Loads the configuration parameters from a configuration file.")

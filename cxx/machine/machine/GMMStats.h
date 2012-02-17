@@ -2,6 +2,7 @@
  * @file cxx/machine/machine/GMMStats.h
  * @date Tue May 10 11:35:58 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
@@ -24,8 +25,7 @@
 #include <blitz/array.h>
 #include "io/HDF5File.h"
 
-namespace bob {
-namespace machine {
+namespace bob { namespace machine {
 
 /**
  * @brief A container for GMM statistics.
@@ -50,7 +50,7 @@ class GMMStats {
      * @param n_gaussians Number of Gaussians in the mixture model.
      * @param n_inputs    Feature dimensionality.
      */
-    GMMStats(size_t n_gaussians, size_t n_inputs);
+    GMMStats(const size_t n_gaussians, const size_t n_inputs);
 
     /**
      * Copy constructor
@@ -82,7 +82,7 @@ class GMMStats {
      * @param n_gaussians Number of Gaussians in the mixture model.
      * @param n_inputs    Feature dimensionality.
      */
-    void resize(size_t n_gaussians, size_t n_inputs);
+    void resize(const size_t n_gaussians, const size_t n_inputs);
 
     /**
      * Resets statistics to zero.
@@ -126,14 +126,13 @@ class GMMStats {
     
     friend std::ostream& operator<<(std::ostream& os, const GMMStats& g);
 
-  protected:
+  private:
     /**
      * Copy another GMMStats
      */
     void copy(const GMMStats&);
 };
 
-}
-}
+}}
 
-#endif // BOB_MACHINE_GMMSTATS_H
+#endif 
