@@ -146,8 +146,8 @@ void ip::GaborFrequency::computeFilter()
     m_kernel_shifted.resize( m_height, m_width );
 
     // Defines the offset values
-    h_offset = -( m_height / 2 - (m_height % 2 == 1 ? 0 : 1) );
-    w_offset = -( m_width / 2 - (m_width % 2 == 1 ? 0 : 1) );
+    h_offset = -( m_height / 2 - m_height % 2 );
+    w_offset = -( m_width / 2 - m_width % 2 );
     kernel_shifted_slice.reference( m_kernel_shifted );
   }
   else
@@ -303,8 +303,8 @@ void ip::GaborFrequency::computeEnvelope()
   m_env_height = m_env_y_max - m_env_y_min + 1;
   m_env_width = m_env_x_max - m_env_x_min + 1;
   // Computes envelope offset wrt. the full filter in the frequency domain
-  m_env_y_offset = m_height / 2 - (m_height % 2 == 1 ? 0 : 1) + m_env_y_min;
-  m_env_x_offset = m_width / 2 - (m_width % 2 == 1 ? 0 : 1) + m_env_x_min;
+  m_env_y_offset = m_height / 2 - m_height % 2 + m_env_y_min;
+  m_env_x_offset = m_width / 2 - m_width % 2 + m_env_x_min;
 
   // Checks that the envelope is not outside the input image/window
   if(m_env_y_offset < 0) m_env_y_offset = 0;
