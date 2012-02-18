@@ -29,8 +29,6 @@ set(ccsrc_random
 set(pysrc
   "lib/__init__.py"
   "lib/array/__init__.py"
-  "lib/script/config.py"
-  "lib/script/__init__.py"
   "lib/random/__init__.py"
   "lib/test/__init__.py"
   "lib/test/convert.py"
@@ -40,10 +38,6 @@ set(pysrc
 bob_python_package_bindings(core "${ccsrc}" "${pysrc}" "")
 bob_python_submodule_bindings(core array "${ccsrc_ndarray}" "")
 bob_python_submodule_bindings(core random "${ccsrc_random}" "")
-
-# Installs and test our scripts
-bob_python_script(core "bob_config.py" "lib/script/config.py" "main")
-bob_python_add_test(core bob_config.py)
 
 # Our test units
 bob_python_add_unittest(core lib/test/exception.py main)

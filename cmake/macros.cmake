@@ -96,7 +96,12 @@ macro(bob_python_script package_name script_name python_module python_method)
   # figures out the module name from the input file dependence name
   string(REPLACE ".py" "" module_name "${python_module}")
   string(REPLACE "/" "." module_name "${module_name}")
-  string(REPLACE "lib." "bob.${package_name}." module_name "${module_name}")
+
+  if(${package_name} STREQUAL "root")
+    string(REPLACE "lib." "bob." module_name "${module_name}")
+  else()
+    string(REPLACE "lib." "bob.${package_name}." module_name "${module_name}")
+  endif()
 
   set(output_file "${CMAKE_BINARY_DIR}/bin/${script_name}")
 
@@ -124,7 +129,12 @@ macro(bob_python_example package_name script_name python_module python_method)
   # figures out the module name from the input file dependence name
   string(REPLACE ".py" "" module_name "${python_module}")
   string(REPLACE "/" "." module_name "${module_name}")
-  string(REPLACE "lib." "bob.${package_name}." module_name "${module_name}")
+  
+  if(${package_name} STREQUAL "root")
+    string(REPLACE "lib." "bob." module_name "${module_name}")
+  else()
+    string(REPLACE "lib." "bob.${package_name}." module_name "${module_name}")
+  endif()
 
   set(output_file "${CMAKE_BINARY_DIR}/bin/${script_name}")
 
@@ -148,17 +158,17 @@ macro(bob_python_example package_name script_name python_module python_method)
 
 endmacro()
 
-# Tags version and platform, and set this to core of the python package
-macro(bob_python_tag_build source version_file)
+# Tags file and places it inside the python tree
+macro(bob_python_configure source dest)
 
-  set(output_stem lib/python${PYTHON_VERSION}/bob/${version_file})
+  set(output_stem lib/python${PYTHON_VERSION}/bob/${dest})
   set(output_file ${CMAKE_BINARY_DIR}/${output_stem})
 
-  # TODO: This is not working as expected!
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${source} ${output_file})
 
-  set(module_name "root.${version_file}")
+  set(module_name "root.${dest}")
   string(REPLACE ".py" "" module_name "${module_name}")
+  string(REPLACE "/" "." module_name "${module_name}")
     
   # this will compile the version file
   add_custom_command(
@@ -168,12 +178,28 @@ macro(bob_python_tag_build source version_file)
     COMMENT "Compiling ${module_name}")
 
   # this will hook-up the dependencies so all works after the package is built
-  add_custom_target(pybob_root.build DEPENDS "${output_file}c")
-  add_dependencies(pybob_root pybob_root.build)
+  add_custom_target(pybob_root.${module_name} DEPENDS "${output_file}c")
+  add_dependencies(pybob_root pybob_root.${module_name})
 
   # this will actually install the file
   get_filename_component(output_dir ${output_stem} PATH)
   install(FILES "${output_file}" "${output_file}c" DESTINATION ${output_dir})
+endmacro()
+
+# Tags file and places it inside the python tree
+macro(bob_python_configure_program source)
+
+  get_filename_component(prog_name ${source} NAME)
+  string(REPLACE ".in" "" prog_name "${prog_name}")
+  set(output_stem bin/${prog_name})
+  set(output_file ${CMAKE_BINARY_DIR}/${output_stem})
+
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${source} ${output_file})
+
+  # this will actually install the file
+  get_filename_component(output_dir ${output_stem} PATH)
+  install(FILES "${output_file}" DESTINATION ${output_dir})
+
 endmacro()
 
 # Installs and compiles all files given 
@@ -184,7 +210,12 @@ macro(bob_python_module package_name sources)
     # figures out the module name from the input file dependence name
     string(REPLACE "lib/" "" dest_name "${source}")
 
-    set(module_name "${package_name}.${dest_name}")
+    if(${package_name} STREQUAL "root")
+      set(module_name "${dest_name}")
+    else()
+      set(module_name "${package_name}.${dest_name}")
+    endif()
+
     string(REPLACE ".py" "" module_name "${module_name}")
     string(REPLACE "/" "." module_name "${module_name}")
     
