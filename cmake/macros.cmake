@@ -198,7 +198,7 @@ macro(bob_python_configure_program source)
 
   # this will actually install the file
   get_filename_component(output_dir ${output_stem} PATH)
-  install(FILES "${output_file}" DESTINATION ${output_dir})
+  install(PROGRAMS "${output_file}" DESTINATION ${output_dir})
 
 endmacro()
 
