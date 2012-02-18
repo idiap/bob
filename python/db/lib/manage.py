@@ -32,6 +32,7 @@ def copy_all(args):
   
   for name, module in args.modules:
     parsed = args.parser.parse_args([name, 'copy', args.directory[0]])
+    parsed.verbose = args.verbose
     parsed.func(parsed)
 
 def create_all(args):

@@ -169,12 +169,18 @@ def copy(options):
   d = options.directory[0]
   makedirs_safe(d)
   dest = os.path.join(d, options.dbname + '.sql3')
-  if os.path.exists(dest): os.unlink(dest)
-  shutil.copy2(options.location.replace('sqlite:///',''), dest)
+  if os.path.exists(dest): 
+    if options.verbose: print "Removing existing file '%s'..." % dest
+    os.unlink(dest)
+  src = options.location.replace('sqlite:///','')
+  if options.verbose: print "Copying %s -> %s" % (src, dest)
+  shutil.copy2(src, dest)
 
 def copy_command(subparsers):
   
   parser = subparsers.add_parser('copy', help=copy.__doc__)
+  parser.add_argument('--verbose', dest="verbose", default=False,
+      action='store_true', help="produces more output while downloading")
   parser.add_argument('directory', help="sets the directory to which the database will be copied to", nargs=1)
   parser.set_defaults(func=copy)
 
