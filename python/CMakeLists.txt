@@ -9,7 +9,7 @@ if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
   add_custom_target(pybob_root ALL)
 
   # Tags version and platform and add this to the core of the distribution
-  bob_python_tag_build("lib/build.py")
+  bob_python_tag_build("lib/build.py.in" "build.py")
 
   # Adds specific python sources
   set(pysrc 

@@ -149,10 +149,8 @@ macro(bob_python_example package_name script_name python_module python_method)
 endmacro()
 
 # Tags version and platform, and set this to core of the python package
-macro(bob_python_tag_build source)
+macro(bob_python_tag_build source version_file)
 
-  get_filename_component(version_file ${source} NAME)
-  
   set(output_stem lib/python${PYTHON_VERSION}/bob/${version_file})
   set(output_file ${CMAKE_BINARY_DIR}/${output_stem})
 
