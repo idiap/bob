@@ -69,9 +69,9 @@ set(PYTHON_INSTALL_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION}
 
 include_directories(SYSTEM ${python_INCLUDE_DIRS})
   
-execute_process(COMMAND python -c "import sys; print '%d.%d.%d' % (sys.version_info[0], sys.version_info[1], sys.version_info[2])" OUTPUT_VARIABLE PYTHON_VERSION_COMPLETE OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; print '%d.%d.%d' % (sys.version_info[0], sys.version_info[1], sys.version_info[2])" OUTPUT_VARIABLE PYTHON_VERSION_COMPLETE OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-execute_process(COMMAND python -c "import numpy; print numpy.version.version" OUTPUT_VARIABLE NUMPY_VERSION_COMPLETE OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import numpy; print numpy.version.version" OUTPUT_VARIABLE NUMPY_VERSION_COMPLETE OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 if(PYTHON_VERSION_COMPLETE AND NUMPY_VERSION_COMPLETE)
   find_package_message(PYTHON "Found Python ${PYTHON_VERSION_COMPLETE} and NumPy ${NUMPY_VERSION_COMPLETE}: interpreter@${PYTHON_EXECUTABLE}; library@${PYTHON_LIBRARY}; includes@${python_INCLUDE_DIRS}" "[${PYTHON_LIBRARY}][${python_INCLUDE_DIRS}]")
