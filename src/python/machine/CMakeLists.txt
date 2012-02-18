@@ -36,6 +36,8 @@ bob_python_add_test(python-machine-kmeans-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_kmeans.py)
 bob_python_add_test(python-machine-linear-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_linear.py)
+bob_python_add_test(python-machine-jfa-tests 
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_jfa.py)
 bob_python_add_test(python-machine-mlp-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_mlp.py)
 bob_python_add_test(python-machine-linearscoring-tests

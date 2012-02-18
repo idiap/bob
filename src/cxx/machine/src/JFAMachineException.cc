@@ -25,15 +25,15 @@
 
 namespace machine = bob::machine;
 
-machine::JFAMachineNoUBM::JFAMachineNoUBM() throw()
+machine::JFABaseNoUBMSet::JFABaseNoUBMSet() throw()
 {
 }
 
-machine::JFAMachineNoUBM::~JFAMachineNoUBM() throw() 
+machine::JFABaseNoUBMSet::~JFABaseNoUBMSet() throw() 
 {
 }
 
-const char* machine::JFAMachineNoUBM::what() const throw() 
+const char* machine::JFABaseNoUBMSet::what() const throw() 
 {
   try 
   {
@@ -42,7 +42,29 @@ const char* machine::JFAMachineNoUBM::what() const throw()
     return m_message.c_str();
   } catch (...) 
   {
-    static const char* emergency = "machine::JFAMachineNoUBM: cannot format, exception raised";
+    static const char* emergency = "machine::JFABaseNoUBMSet: cannot format, exception raised";
+    return emergency;
+  }
+}
+
+machine::JFAMachineNoJFABaseSet::JFAMachineNoJFABaseSet() throw()
+{
+}
+
+machine::JFAMachineNoJFABaseSet::~JFAMachineNoJFABaseSet() throw() 
+{
+}
+
+const char* machine::JFAMachineNoJFABaseSet::what() const throw() 
+{
+  try 
+  {
+    boost::format message("No UBM was set in the JFA machine.");
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) 
+  {
+    static const char* emergency = "machine::JFAMachineNoJFABaseSet: cannot format, exception raised";
     return emergency;
   }
 }

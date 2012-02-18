@@ -38,10 +38,9 @@ namespace bob { namespace machine {
  * A JFA Base machine which contains U, V and D matrices
  * TODO: add a reference to the journal article
  */
-class JFABaseMachine {
-
+class JFABaseMachine 
+{
   public:
-
     /**
      * Default constructor. Builds an otherwise invalid 0 x 0 JFA machine.
      * The Universal Background Model and the matrices U, V and diag(d) are
@@ -58,7 +57,7 @@ class JFABaseMachine {
      * @param ru size of U (CD x ru)
      * @param rv size of U (CD x rv)
      */ 
-    JFABaseMachine(const boost::shared_ptr<bob::machine::GMMMachine> ubm, int ru, int rv);
+    JFABaseMachine(const boost::shared_ptr<bob::machine::GMMMachine> ubm, const size_t ru=0, const size_t rv=0);
 
     /**
      * Copies another machine
@@ -79,6 +78,11 @@ class JFABaseMachine {
      * Assigns from a different JFA machine
      */
     JFABaseMachine& operator=(const JFABaseMachine &other);
+
+    /**
+     * Equal to
+     */
+    bool operator==(const JFABaseMachine& b) const;    
 
     /**
      * Loads data from an existing configuration object. Resets the current
@@ -120,8 +124,8 @@ class JFABaseMachine {
       * @warning An exception is thrown if no Universal Background Model has 
       *   been set yet.
       */
-    const int getDimC() const 
-    { if(!m_ubm) throw bob::machine::JFAMachineNoUBM(); 
+    const size_t getDimC() const 
+    { if(!m_ubm) throw bob::machine::JFABaseNoUBMSet(); 
       return m_ubm->getNGaussians(); }
 
     /**
@@ -129,8 +133,8 @@ class JFABaseMachine {
       * @warning An exception is thrown if no Universal Background Model has 
       *   been set yet.
       */
-    const int getDimD() const 
-    { if(!m_ubm) throw bob::machine::JFAMachineNoUBM();
+    const size_t getDimD() const 
+    { if(!m_ubm) throw bob::machine::JFABaseNoUBMSet();
       return m_ubm->getNInputs(); }
 
     /**
@@ -139,22 +143,27 @@ class JFABaseMachine {
       * @warning An exception is thrown if no Universal Background Model has 
       *   been set yet.
       */
-    const int getDimCD() const 
-    { if(!m_ubm) throw bob::machine::JFAMachineNoUBM(); 
+    const size_t getDimCD() const 
+    { if(!m_ubm) throw bob::machine::JFABaseNoUBMSet(); 
       return m_ubm->getNInputs()*m_ubm->getNGaussians(); }
 
     /**
       * Returns the size/rank ru of the U matrix
       */
-    const int getDimRu() const 
+    const size_t getDimRu() const 
     { return m_ru; }
 
     /**
       * Returns the size/rank rv of the V matrix
       */
-    const int getDimRv() const 
+    const size_t getDimRv() const 
     { return m_rv; }
 
+    /**
+     * Resets the dimensionality of the subspace U and V
+     * U and V are hence uninitialized.
+     */ 
+    void resize(const size_t ru, const size_t rv);
 
     /**
       * Returns the U matrix in order to update it
@@ -184,6 +193,7 @@ class JFABaseMachine {
 
     /**
       * Sets (the mean supervector of) the Universal Background Model
+      * U, V and d are uninitialized in case of dimensions update (C or D)
       */
     void setUbm(const boost::shared_ptr<bob::machine::GMMMachine> ubm);
 
@@ -209,8 +219,8 @@ class JFABaseMachine {
     boost::shared_ptr<bob::machine::GMMMachine> m_ubm;
 
     // dimensionality
-    int m_ru; // size of U (CD x ru)
-    int m_rv; // size of V (CD x rv)
+    size_t m_ru; // size of U (CD x ru)
+    size_t m_rv; // size of V (CD x rv)
 
     // U, V, D matrices
     // D is assumed to be diagonal, and only the diagonal is stored
@@ -227,10 +237,9 @@ class JFABaseMachine {
  * Background Model (UBM). Please note that several JFAMachines might share 
  * the same JFABaseMachine and UBM.
  */
-class JFAMachine {
-
+class JFAMachine 
+{
   public:
-
     /**
      * Default constructor. Builds an otherwise invalid 0 x 0 jfa machine.
      */
@@ -260,7 +269,13 @@ class JFAMachine {
     /**
      * Assigns from a different machine
      */
-    JFAMachine& operator= (const JFAMachine &other);
+    JFAMachine& operator=(const JFAMachine &other);
+
+    /**
+     * Equal to
+     * @warning Also checks that the UBM are equal if any
+     */
+    bool operator==(const JFAMachine &m) const;    
 
     /**
      * Loads data from an existing configuration object. Resets the current
@@ -282,41 +297,53 @@ class JFAMachine {
     /**
       * Returns the number of Gaussian components C
       */
-    const int getDimC() const 
-    { return m_jfa_base->getUbm()->getNGaussians(); }
+    const size_t getDimC() const 
+    { if(!m_jfa_base) throw bob::machine::JFAMachineNoJFABaseSet(); 
+      return m_jfa_base->getUbm()->getNGaussians(); }
 
     /**
       * Returns the feature dimensionality D
       */
-    const int getDimD() const 
-    { return m_jfa_base->getUbm()->getNInputs(); }
+    const size_t getDimD() const 
+    { if(!m_jfa_base) throw bob::machine::JFAMachineNoJFABaseSet(); 
+      return m_jfa_base->getUbm()->getNInputs(); }
 
     /**
       * Returns the supervector length CxD
       */
-    const int getDimCD() const 
-    { return m_jfa_base->getUbm()->getNInputs()*m_jfa_base->getUbm()->getNGaussians(); }
+    const size_t getDimCD() const 
+    { if(!m_jfa_base) throw bob::machine::JFAMachineNoJFABaseSet(); 
+      return m_jfa_base->getUbm()->getNInputs()*m_jfa_base->getUbm()->getNGaussians(); }
 
     /**
       * Returns the size/rank ru of the U matrix
       */
-    const int getDimRu() const 
-    { return m_jfa_base->getDimRu(); }
+    const size_t getDimRu() const 
+    { if(!m_jfa_base) throw bob::machine::JFAMachineNoJFABaseSet(); 
+      return m_jfa_base->getDimRu(); }
 
     /**
       * Returns the size/rank rv of the V matrix
       */
-    const int getDimRv() const 
-    { return m_jfa_base->getDimRv(); }
+    const size_t getDimRv() const 
+    { if(!m_jfa_base) throw bob::machine::JFAMachineNoJFABaseSet(); 
+      return m_jfa_base->getDimRv(); }
 
     /**
-      * Returns the y speaker factors
+      * Returns the last estimated x speaker factor
+      * @warning For test purpose only
+      */
+    const blitz::Array<double,1>& getX() const 
+    { return m_x; }
+
+    /**
+      * Returns the y speaker factor
       */
     const blitz::Array<double,1>& getY() const 
     { return m_y; }
 
     /**
-      * Returns the z speaker factors
+      * Returns the z speaker factor
       */
     const blitz::Array<double,1>& getZ() const 
     { return m_z; }
@@ -349,22 +376,49 @@ class JFAMachine {
       */
     void setJFABase(const boost::shared_ptr<bob::machine::JFABaseMachine> jfa_base);
 
-
     /**
       * Estimates from a 2D blitz::Array
       */
+    void estimateX(boost::shared_ptr<const bob::machine::GMMStats> gmm_stats);
+
+    /**
+     * Estimates x and computes a score for the given UBM statistics
+     */
     void forward(boost::shared_ptr<const bob::machine::GMMStats> gmm_stats, double& score);
     void forward(const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& samples, blitz::Array<double,1>& scores);
-    void estimateX(boost::shared_ptr<const bob::machine::GMMStats> gmm_stats);
-    void updateX(const blitz::Array<double,1>& N, const blitz::Array<double,1>& F);
-    void computeUtSigmaInv();
-    void computeUProd();
-    void computeIdPlusUProd(const blitz::Array<double,1>& N, const blitz::Array<double,1>& F);
-    void computeFn_x(const blitz::Array<double,1>& N, const blitz::Array<double,1>& F);
-    void updateX_fromCache();
 
 
   private:
+    /**
+     * Resizes the arrays (both members and cache)
+     */ 
+    void resize();
+    /**
+     * Resizes the arrays in cache
+     */ 
+    void resizeCache();
+    /**
+     * Put the mean and variance supervectors of the UBM in cache
+     */
+    void cacheSupervectors();
+    /**
+     * Computes U^T.Sigma^-1
+     */
+    void computeUtSigmaInv();
+    /**
+     * Computes (Id + U^T.Sigma^-1.U.N_{i,h}.U)^-1 = (Id + sum_{c=1..C} N_{i,h}.U_{c}^T.Sigma_{c}^-1.U_{c})^-1
+     */
+    void computeIdPlusUSProdInv(boost::shared_ptr<const bob::machine::GMMStats> gmm_stats);
+    /**
+     * Computes Fn_x = sum_{sessions h}(N*(o - m) (Normalised first order statistics)
+     */
+    void computeFn_x(boost::shared_ptr<const bob::machine::GMMStats> gmm_stats);
+    /**
+     * Estimates the value of x from the cache (Fn_x, U^T.Sigma^-1, etc.)
+     */
+    void updateX_fromCache();
+
+
     /**
      * the JFABaseMachine which contains the matrices U, V and D
      */
@@ -391,17 +445,23 @@ class JFAMachine {
     mutable blitz::Array<double,1> m_cache_mVyDz;
 
     mutable blitz::Array<double,2> m_cache_UtSigmaInv;
-    mutable blitz::Array<double,1> m_cache_sigma;
-    mutable blitz::Array<double,1> m_cache_mean;
     mutable blitz::Array<double,3> m_cache_UProd;
     mutable blitz::Array<double,2> m_cache_IdPlusUProd;
-    mutable blitz::Array<double,1> m_cache_Fn_x;
 
-    mutable blitz::Array<double,2> m_tmp_ruD;
-    mutable blitz::Array<double,2> m_tmp_ruru;
-    mutable blitz::Array<double,1> m_tmp_ru;
     mutable blitz::Array<double,1> m_tmp_CD;
     mutable blitz::Array<double,1> m_tmp_CD_b;
+
+
+
+
+    mutable blitz::Array<double,1> m_cache_mean;
+    mutable blitz::Array<double,1> m_cache_sigma;
+    mutable blitz::Array<double,2> m_cache_IdPlusUSProdInv;
+    mutable blitz::Array<double,1> m_cache_Fn_x;
+    mutable blitz::Array<double,1> m_tmp_ru;
+    mutable blitz::Array<double,2> m_tmp_ruru;
+    mutable blitz::Array<double,2> m_tmp_ruD;
+    mutable blitz::Array<double,2> m_tmp_ruCD;
 };
 
 
