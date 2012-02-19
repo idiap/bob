@@ -444,20 +444,12 @@ class JFAMachine
     mutable blitz::Array<double,1> m_cache_Ux;
     mutable blitz::Array<double,1> m_cache_mVyDz;
 
-    mutable blitz::Array<double,2> m_cache_UtSigmaInv;
-    mutable blitz::Array<double,3> m_cache_UProd;
-    mutable blitz::Array<double,2> m_cache_IdPlusUProd;
-
-    mutable blitz::Array<double,1> m_tmp_CD;
-    mutable blitz::Array<double,1> m_tmp_CD_b;
-
-
-
-
     mutable blitz::Array<double,1> m_cache_mean;
     mutable blitz::Array<double,1> m_cache_sigma;
+    mutable blitz::Array<double,2> m_cache_UtSigmaInv;
     mutable blitz::Array<double,2> m_cache_IdPlusUSProdInv;
     mutable blitz::Array<double,1> m_cache_Fn_x;
+
     mutable blitz::Array<double,1> m_tmp_ru;
     mutable blitz::Array<double,2> m_tmp_ruru;
     mutable blitz::Array<double,2> m_tmp_ruD;

@@ -368,6 +368,21 @@ class JFATrainerTest(unittest.TestCase):
     jfat = bob.trainer.JFABaseTrainer(jfam)
     jfat.train(N,F,5)
 
+    # TODO: get reference from the JFA cookbook
+    eps = 1e-5 
+    Uf = numpy.array([[ 0.03459834, -0.08532213], [-0.5574811,  -2.03432579],
+      [ 0.1338825,  -2.70547282], [ 5.44291379, -1.03196329], 
+      [-0.02818025,  0.09379709], [ 3.04093117, -0.5273978 ]], 'float64')
+    Vf = numpy.array([[-0.30160965, -1.10825324], [-0.80778511, -1.29315817],
+      [-0.39614772, -1.62676813], [-0.32474508, -2.3858443 ],
+      [-0.68708926, -0.39075493], [-0.14213897, -1.14195287]], 'float64')
+    Df = numpy.array([1.29666701e-07, 2.11760949e-08, -2.10831414e-05, -1.64017852e-07,
+      -5.09231006e-05, 5.25347453e-09], 'float64')
+    self.assertTrue( numpy.allclose(jfam.U, Uf, eps) )
+    self.assertTrue( numpy.allclose(jfam.V, Vf, eps) )
+    self.assertTrue( numpy.allclose(jfam.D, Df, eps) )
+
+
 if __name__ == '__main__':
   sys.argv.append('-v')
   if os.environ.has_key('BOB_PROFILE') and \
