@@ -20,6 +20,7 @@
 import os
 import sys
 import shlex
+import platform
 
 class PathJoiner(object):
   "Builds a os.path.join alias with a predefined prefix."
@@ -128,7 +129,7 @@ if __name__ == '__main__':
 
   root = os.sep + os.path.join(*os.path.realpath(__file__).split(os.sep)[:-2])
   pyver = "%d.%d" % sys.version_info[0:2]
-  system = sys.platform.lower()
+  system = platform.system().lower()
   prefixes = "$ENV{CMAKE_PREFIX_PATH}"
 
   # Note this will never return, just replace the current process...
