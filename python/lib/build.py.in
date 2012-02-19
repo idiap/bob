@@ -9,5 +9,5 @@
 version = "@BOB_VERSION@"
 system = "@BOB_SYSTEM_NAME@"
 platform = "@BOB_PLATFORM@"
-prefixes = "@CMAKE_PREFIX_PATH@"
-pyver = "@PYTHON_VERSION@" 
+prefixes = "$ENV{CMAKE_PREFIX_PATH}"
+pyver = "@PYTHON_VERSION@"
