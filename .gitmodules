@@ -1,3 +1,3 @@
-[submodule "src/cxx/visioner/project"]
-	path = src/cxx/visioner/project
+[submodule "cxx/visioner/project"]
+	path = cxx/visioner/project
 	url = git@github.com:idiap/visioner.git

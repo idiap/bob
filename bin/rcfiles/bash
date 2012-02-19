@@ -1,5 +1,0 @@
-#/bin/bash
-# This file complements the bob setup and has to used like this:
-# *bob*: --rcfile %(thisfile)s
-[ -e ~/.bashrc ] && source ~/.bashrc
-PS1="(bob@${BOB_VERSION} / ${BOB_PLATFORM})\n${PS1}"
