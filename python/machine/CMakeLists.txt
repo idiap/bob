@@ -32,6 +32,7 @@ set(pysrc
    "lib/test/gaussian.py"
    "lib/test/gmm.py"
    "lib/test/jfa.py"
+   "lib/test/kmeans.py"
    "lib/test/linear.py"
    "lib/test/linearscoring.py"
    "lib/test/mlp.py"
