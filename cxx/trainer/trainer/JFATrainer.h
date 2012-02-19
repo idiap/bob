@@ -30,6 +30,7 @@
 #include "core/array_copy.h"
 #include "io/Arrayset.h"
 #include "machine/JFAMachine.h"
+#include <boost/shared_ptr.hpp>
 
 #include "core/logging.h"
 
@@ -141,26 +142,36 @@ void estimateZandD(const blitz::Array<double,2> &F, const blitz::Array<double,2>
 
 
 
-class JFABaseTrainer {
+class JFABaseTrainerBase
+{
 
   public:
     /**
-     * Initializes a new JFABaseTrainer. This implementation is consistent with the 
+     * Initializes a new JFABaseTrainerBase. This implementation is consistent with the 
      * JFA cookbook implementation. 
      */
-    JFABaseTrainer(bob::machine::JFABaseMachine& jfa_machine);
+    JFABaseTrainerBase(bob::machine::JFABaseMachine& jfa_machine);
 
     /**
      * Destructor virtualisation
      */
-    ~JFABaseTrainer() {}
+    ~JFABaseTrainerBase() {}
 
     /**
-     * Set the zeroth and first order statistics to train
-     * @warning the JFABaseMachine should be set before
+     * Initializes the number of identities
      */
-    void setStatistics(const std::vector<blitz::Array<double,2> >& N, 
-      const std::vector<blitz::Array<double,2> >& F);
+    void initNid(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats);
+    void initNid(const size_t Nid);
+    /**
+     * Precomputes the sums of the zeroth order statistics over the sessions 
+     * for each client
+     */
+    void precomputeSumStatisticsN(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats);
+    /**
+     * Precomputes the sums of the first order statistics over the sessions 
+     * for each client
+     */
+    void precomputeSumStatisticsF(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats);
 
     /**
      * Set the x, y, z speaker factors
@@ -173,9 +184,102 @@ class JFABaseTrainer {
     /**
      * Initializes randomly the U, V and D=diag(d) matrices of the JFA machine
      */
-    void initializeRandomU();
-    void initializeRandomV();
-    void initializeRandomD();
+    virtual void initializeRandomU();
+    virtual void initializeRandomV();
+    virtual void initializeRandomD();
+    /**
+      * Initializes U, V and D
+      */
+    virtual void initializeUVD();
+    /**
+      * Initializes X, Y and Z
+      */
+    virtual void initializeXYZ(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats);
+
+    /**
+     * Get the zeroth order statistics
+     */
+    const std::vector<blitz::Array<double,1> >& getNacc() const
+    { return m_Nacc; }
+    /**
+     * Get the first order statistics
+     */
+    const std::vector<blitz::Array<double,1> >& getFacc() const
+    { return m_Facc; }
+    /**
+     * Get the x speaker factors
+     */
+    const std::vector<blitz::Array<double,2> >& getX() const
+    { return m_x; }
+    /**
+     * Get the y speaker factors
+     */
+    const std::vector<blitz::Array<double,1> >& getY() const
+    { return m_y; }
+    /**
+     * Get the z speaker factors
+     */
+    const std::vector<blitz::Array<double,1> >& getZ() const
+    { return m_z; }
+    /**
+      * Set the x speaker factors
+      */
+    void setX(const std::vector<blitz::Array<double,2> >& X)
+    { m_x = X; }
+    /**
+      * Set the y speaker factors
+      */
+    void setY(const std::vector<blitz::Array<double,1> >& y)
+    { m_y = y; }
+    /**
+      * Set the z speaker factors
+      */
+    void setZ(const std::vector<blitz::Array<double,1> >& z)
+    { m_z = z; }
+
+
+
+  protected:
+    bob::machine::JFABaseMachine& m_jfa_machine; // JFABaseMachine
+    size_t m_Nid; // Number of identities 
+
+    std::vector<blitz::Array<double,2> > m_x; // matrix x of speaker factors for eigenchannels U, for each client
+    std::vector<blitz::Array<double,1> > m_y; // vector y of spealer factors for eigenvoices V, for each client
+    std::vector<blitz::Array<double,1> > m_z; // vector z of spealer factors for eigenvoices Z, for each client
+
+    // Cache/Precomputation
+    std::vector<blitz::Array<double,1> > m_Nacc; // Sum of the zeroth order statistics over the sessions for each client
+    std::vector<blitz::Array<double,1> > m_Facc; // Sum of the first order statistics over the sessions for each client
+
+    blitz::Array<double,1> m_cache_ubm_mean;
+    blitz::Array<double,1> m_cache_ubm_var;
+
+
+  private:
+    /**
+     * Initializes randomly a 1D vector
+     */
+    static void initializeRandom(blitz::Array<double,1>& vector);
+    /**
+     * Initializes randomly a 2D matrix
+     */
+    static void initializeRandom(blitz::Array<double,2>& matrix);
+};
+
+
+class JFABaseTrainer: public JFABaseTrainerBase
+{
+  public:
+    /**
+     * Initializes a new JFABaseTrainer. This implementation is consistent with the 
+     * JFA cookbook implementation. 
+     */
+    JFABaseTrainer(bob::machine::JFABaseMachine& jfa_machine);
+
+    /**
+     * Destructor virtualisation
+     */
+    ~JFABaseTrainer() {}
 
 
     /**** Y and V functions ****/
@@ -196,7 +300,7 @@ class JFABaseTrainer {
      * Computes sum_{sessions h}(N_{i,h}*(o_{i,h} - m - D*z_{i} - U*x_{i,h}) 
      * which occurs in the y estimation of the given person
      */
-    void computeFn_y_i(const int id);
+    void computeFn_y_i(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats, const int id);
     /**
      * Updates y_i (of the current person) and the accumulators to compute V 
      * with the cache values m_cache_IdPlusVprod_i, m_VtSigmaInv and 
@@ -206,12 +310,12 @@ class JFABaseTrainer {
     /**
      * Updates y and the accumulators to compute V 
      */
-    void updateY();
+    void updateY(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats);
     /**
      * Updates V by using the accumulators m_cache_A1_x and m_cache_A2_x
      * V = A2 * A1^-1
      */
-    void updateV();
+    void updateV(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats);
 
 
     /**** X and U functions ****/
@@ -227,12 +331,12 @@ class JFABaseTrainer {
      * Computes (I+Vt*diag(sigma)^-1*Ni*V)^-1 which occurs in the y estimation
      * for the given person
      */
-    void computeIdPlusUProd_ih(const int id, const int h);
+    void computeIdPlusUProd_ih(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats, const int id, const int h);
     /**
      * Computes sum_{sessions h}(N_{i,h}*(o_{i,h} - m - D*z_{i} - U*x_{i,h}) 
      * which occurs in the y estimation of the given person
      */
-    void computeFn_x_ih(const int id, const int h);
+    void computeFn_x_ih(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats, const int id, const int h);
     /**
      * Updates x_ih (of the current person/session) and the accumulators to compute V 
      * with the cache values m_cache_IdPlusVprod_i, m_VtSigmaInv and 
@@ -242,12 +346,12 @@ class JFABaseTrainer {
     /**
      * Updates x and the accumulators to compute U
      */
-    void updateX();
+    void updateX(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats);
     /**
      * Updates U by using the accumulators m_cache_A1_y and m_cache_A2_y
      * U = A2 * A1^-1
      */
-    void updateU();
+    void updateU(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats);
 
 
     /**** z and D functions ****/
@@ -268,7 +372,7 @@ class JFABaseTrainer {
      * Computes sum_{sessions h}(N_{i,h}*(o_{i,h} - m - V*y_{i} - U*x_{i,h}) 
      * which occurs in the y estimation of the given person
      */
-    void computeFn_z_i(const int id);
+    void computeFn_z_i(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats, const int id);
     /**
      * Updates z_i (of the current person) and the accumulators to compute D
      * with the cache values m_cache_IdPlusDProd_i, m_VtSigmaInv and 
@@ -278,130 +382,42 @@ class JFABaseTrainer {
     /**
      * Updates z and the accumulators to compute D
      */
-    void updateZ();
+    void updateZ(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats);
     /**
      * Updates D by using the accumulators m_cache_A1_z and m_cache_A2_z
      * V = A2 * A1^-1
      */
-    void updateD();
+    void updateD(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats);
 
-
-
-    /**
-     * Precomputes the sums of the zeroth order statistics over the sessions 
-     * for each client
-     */
-    void precomputeSumStatisticsN();
-    /**
-     * Precomputes the sums of the first order statistics over the sessions 
-     * for each client
-     */
-    void precomputeSumStatisticsF();
 
 
 
     /**
       * Trains the Joint Factor Analysis by initializing U, V, and D randomly
       */
-    void train(const std::vector<blitz::Array<double,2> >& N,
-      const std::vector<blitz::Array<double,2> >& F, 
-      const size_t n_iter); 
-    void train(const std::vector<std::vector<const bob::machine::GMMStats*> >& features,
+    void train(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats,
       const size_t n_iter); 
     /**
-      * Trains the oint Factor Analysis without initializing U, V and D
+      * Trains the Joint Factor Analysis without initializing U, V and D
       */
-    void trainNoInit(const std::vector<blitz::Array<double,2> >& N,
-      const std::vector<blitz::Array<double,2> >& F, 
-      const size_t n_iter); 
-    void trainNoInit(const std::vector<std::vector<const bob::machine::GMMStats*> >& features,
+    void trainNoInit(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats,
       const size_t n_iter); 
 
     /**
       * Trains the Inter Session Variability model by initializing U randomly
       */
-    void trainISV(const std::vector<blitz::Array<double,2> >& N,
-      const std::vector<blitz::Array<double,2> >& F, 
-      const size_t n_iter, const double relevance_factor); 
-    void trainISV(const std::vector<std::vector<const bob::machine::GMMStats*> >& features,
+    void trainISV(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats,
       const size_t n_iter, const double relevance_factor); 
     /**
       * Trains the Inter Session Variability model without initializing U
       */
-    void trainISVNoInit(const std::vector<blitz::Array<double,2> >& N,
-      const std::vector<blitz::Array<double,2> >& F, 
-      const size_t n_iter, const double relevance_factor); 
-    void trainISVNoInit(const std::vector<std::vector<const bob::machine::GMMStats*> >& features,
+    void trainISVNoInit(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats,
       const size_t n_iter, const double relevance_factor); 
 
     /**
       * Initializes V=zero and D=srqt(var_UBM / rel_factor) for ISV
       */
     void initializeVD_ISV(const double relevance_factor);
-    /**
-      * Initializes U, V and D
-      */
-    void initializeUVD();
-    /**
-      * Initializes X, Y and Z
-      */
-    void initializeXYZ();
-
-    /**
-     * Get the zeroth order statistics
-     */
-    const std::vector<blitz::Array<double,2> >& getN() const
-    { return m_N; }
-    const std::vector<blitz::Array<double,1> >& getNacc() const
-    { return m_Nacc; }
-    /**
-     * Get the first order statistics
-     */
-    const std::vector<blitz::Array<double,2> >& getF() const
-    { return m_F; }
-    const std::vector<blitz::Array<double,1> >& getFacc() const
-    { return m_Facc; }
-    /**
-     * Get the x speaker factors
-     */
-    const std::vector<blitz::Array<double,2> >& getX() const
-    { return m_x; }
-    /**
-     * Get the y speaker factors
-     */
-    const std::vector<blitz::Array<double,1> >& getY() const
-    { return m_y; }
-    /**
-     * Get the z speaker factors
-     */
-    const std::vector<blitz::Array<double,1> >& getZ() const
-    { return m_z; }
-
-    /**
-      * Set the zeroth order statistics
-      */
-    void setN(const std::vector<blitz::Array<double,2> >& N)
-    { m_N = N; }
-    /**
-      * Set the first order statistics
-      */
-    void setF(const std::vector<blitz::Array<double,2> >& F)
-    { m_F = F; }
-    /**
-      * Set the x speaker factors
-      */
-    void setX(const std::vector<blitz::Array<double,2> >& X)
-    { m_x = X; }
-    /**
-      * Set the y speaker factors
-      */
-    void setY(const std::vector<blitz::Array<double,1> >& y)
-    { m_y = y; }
-    /**
-      * Set the z speaker factors
-      */
-    void setZ(const std::vector<blitz::Array<double,1> >& z)
-    { m_z = z; }
 
 
     /**
@@ -440,32 +456,7 @@ class JFABaseTrainer {
 
 
   private:
-    /**
-     * Initializes randomly a 1D vector
-     */
-    void initializeRandom(blitz::Array<double,1>& vector);
-    /**
-     * Initializes randomly a 2D matrix
-     */
-    void initializeRandom(blitz::Array<double,2>& matrix);
-
-
-    bob::machine::JFABaseMachine& m_jfa_machine; // JFABaseMachine
-    size_t m_Nid; // Number of identities
-    std::vector<blitz::Array<double,2> > m_N; // Zeroth order statistics
-    std::vector<blitz::Array<double,2> > m_F; // First order statistics
-
-    std::vector<blitz::Array<double,2> > m_x; // matrix x of speaker factors for eigenchannels U, for each client
-    std::vector<blitz::Array<double,1> > m_y; // vector y of spealer factors for eigenvoices V, for each client
-    std::vector<blitz::Array<double,1> > m_z; // vector z of spealer factors for eigenvoices Z, for each client
-
     // Cache/Precomputation
-    std::vector<blitz::Array<double,1> > m_Nacc; // Sum of the zeroth order statistics over the sessions for each client
-    std::vector<blitz::Array<double,1> > m_Facc; // Sum of the first order statistics over the sessions for each client
-
-    blitz::Array<double,1> m_cache_ubm_mean;
-    blitz::Array<double,1> m_cache_ubm_var;
-
     blitz::Array<double,2> m_cache_VtSigmaInv; // Vt * diag(sigma)^-1
     blitz::Array<double,3> m_cache_VProd; // first dimension is the Gaussian id
     blitz::Array<double,2> m_cache_IdPlusVProd_i;
@@ -518,9 +509,7 @@ class JFATrainer {
     /**
       * Main procedures for enroling with Joint Factor Analysis
       */
-    void enrol(const blitz::Array<double,2>& N, const blitz::Array<double,2>& F,
-      const size_t n_iter);
-    void enrol(const std::vector<const bob::machine::GMMStats*>& features,
+    void enrol(const std::vector<boost::shared_ptr<bob::machine::GMMStats> >& features,
       const size_t n_iter);
 
   private:
