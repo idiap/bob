@@ -281,6 +281,14 @@ class JFABaseTrainer: public JFABaseTrainerBase
      */
     ~JFABaseTrainer() {}
 
+    /**
+     * Initializes the cache to process the given statistics
+     */
+    void initCache();
+    void initCacheU();
+    void initCacheV();
+    void initCacheD();
+
 
     /**** Y and V functions ****/
     /**
