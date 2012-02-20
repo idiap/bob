@@ -153,4 +153,8 @@ void sp::IFFT2D::operator()(blitz::Array<std::complex<double>,2>& src_dst)
   p = fftw_plan_dft_2d(src_dst.extent(0), src_dst.extent(1), src_dst_, src_dst_, FFTW_BACKWARD, FFTW_ESTIMATE);
   fftw_execute(p);
   fftw_destroy_plan(p);
+
+  // Rescale the result by the size of the input
+  // (as this is not performed by FFTW)
+  src_dst /= static_cast<double>(m_width*m_height);
 }

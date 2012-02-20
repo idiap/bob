@@ -184,6 +184,33 @@ void test_fft2D( const blitz::Array<std::complex<double>,2> t, double eps)
       BOOST_CHECK_SMALL( abs(t_fft_ifft(i,j)-t(i,j)), eps);
 }
 
+void test_fft2Dinplace( const blitz::Array<std::complex<double>,2> t, double eps)
+{
+  // process using FFT
+  blitz::Array<std::complex<double>,2> t_fft(t.extent(0), t.extent(1)),
+    t_dft(t.extent(0), t.extent(1));
+  t_fft = t;
+  bob::sp::FFT2D fft(t.extent(0), t.extent(1));
+  fft(t_fft);
+
+  // get DFT answer and compare with FFT
+  bob::sp::detail::FFT2DNaive dft_new_naive(t.extent(0), t.extent(1));
+  dft_new_naive(t, t_dft);
+  // Compare
+  for(int i=0; i < t_fft.extent(0); ++i)
+    for(int j=0; j < t_fft.extent(1); ++j)
+      BOOST_CHECK_SMALL( abs(t_fft(i,j)-t_dft(i,j)), eps);
+
+  // process using inverse FFT
+  bob::sp::IFFT2D ifft(t.extent(0), t.extent(1));
+  ifft(t_fft);
+
+  // Compare to original
+  for(int i=0; i < t.extent(0); ++i)
+    for(int j=0; j < t.extent(1); ++j)
+      BOOST_CHECK_SMALL( abs(t_fft(i,j)-t(i,j)), eps);
+}
+
 void test_fftshift( const blitz::Array<std::complex<double>,1> t, double eps) 
 {
   // process using fftshift
@@ -340,6 +367,7 @@ BOOST_AUTO_TEST_CASE( test_fft2D_1x1to8x8_set )
 
       // call the test function
       test_fft2D( t, eps);
+      test_fft2Dinplace( t, eps);
     }
 }
 
@@ -360,6 +388,7 @@ BOOST_AUTO_TEST_CASE( test_fft2D_range1x1to64x64_random )
 
     // call the test function
     test_fft2D( t, eps);
+    test_fft2Dinplace( t, eps);
   }
 }
 
