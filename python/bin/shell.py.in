@@ -1,0 +1,137 @@
+#!/usr/bin/env python
+# vim: set fileencoding=utf-8 :
+# André Anjos <andre.anjos@idiap.ch>
+# Thu Jan 20 15:28:59 2011 +0100
+#
+# Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import os
+import sys
+import shlex
+import platform
+
+class PathJoiner(object):
+  "Builds a os.path.join alias with a predefined prefix."
+
+  def __init__(self, d): 
+    self.directory = d
+
+  def __call__(self, *args):
+    return os.path.join(self.directory, *args)
+
+class PathManipulator(object):
+  "Builds a dict[key].insert(0, arg) aliases and the such."
+
+  def __init__(self, d):
+    self.dictionary = d
+
+  def set(self, key, value):
+    self.dictionary[key] = value
+
+  def prepend_one(self, key, value):
+    if value in self.dictionary[key]:
+      del self.dictionary[key][self.dictionary[key].index(value)]
+    self.dictionary[key].insert(0, value)
+
+  def append_one(self, key, value):
+    if value in self.dictionary[key]:
+      del self.dictionary[key][self.dictionary[key].index(value)]
+    self.dictionary[key].append(value)
+
+  def before(self, key, *args):
+    if key not in self.dictionary: self.dictionary[key] = []
+    elif not isinstance(self.dictionary[key], list): 
+      #break-up and remove empty
+      self.dictionary[key] = [v for v in self.dictionary[key].split(os.pathsep) if v]
+    for value in args: self.prepend_one(key, value)
+
+  def after(self, key, *args):
+    if key not in self.dictionary: self.dictionary[key] = []
+    for value in args: self.append_one(key, value)
+
+  def consolidate(self):
+    """Returns a copy of the environment dict where all entries are strings."""
+    retval = dict(self.dictionary)
+    for key, value in retval.items():
+      if isinstance(value, list): retval[key] = os.pathsep.join(value)
+    return retval
+
+def setup_external_dir(environment, directory):
+  """Sets up the environment for libraries and utilities installed under
+  "directory"."""
+
+  if not os.path.exists(directory):
+    if verbose >= 3: print("External '%s' ignored -- not accessible!")
+    return
+
+  J = PathJoiner(directory)
+  P = PathManipulator(environment)
+
+  P.before('PATH', J('bin'))
+  P.before('MANPATH', J('man'), J('share', 'man'))
+  P.before('PKG_CONFIG_PATH', J('lib', 'pkgconfig'))
+
+  if system == 'darwin':
+    P.before('DYLD_LIBRARY_PATH', J('lib'))
+  else:
+    P.before('LD_LIBRARY_PATH', J('lib'))
+
+  P.before('CMAKE_PREFIX_PATH', directory)
+
+  #We don't setup PYTHONPATH because you are supposed to have that
+  #done when I use the python interpreter from that environment!
+
+def generate_environment(root, prefixes, pyver, system):
+  """Returns a list of environment variables that should make part a to-be 
+  generated shell."""
+
+  envdict = dict(os.environ) #copies
+
+  #loads all external environment
+  for k in prefixes.split(':'):
+    if k: setup_external_dir(envdict, k)
+
+  J = PathJoiner(root) #root_dir
+  P = PathManipulator(envdict)
+
+  P.before('PATH', J('bin'))
+  P.before('PYTHONPATH', J('lib', 'python%s' % pyver))
+
+  if system == 'darwin':
+    P.before('DYLD_LIBRARY_PATH', J('lib'))
+  else:
+    P.before('LD_LIBRARY_PATH', J('lib'))
+
+  P.before('CMAKE_PREFIX_PATH', J('share', 'cmake'))
+
+  return P.consolidate()
+
+if __name__ == '__main__':
+
+  # A little help if we are called in shebang mode
+  arguments = sys.argv[1:]
+  if len(sys.argv) > 1 and sys.argv[1].find(' ') != -1:
+    # Assuming this is a shebang call, only use 1st argument
+    arguments = shlex.split(sys.argv[1]) + sys.argv[2:]
+  if not arguments: arguments = [os.environ['SHELL']]
+
+  root = os.sep + os.path.join(*os.path.realpath(__file__).split(os.sep)[:-2])
+  pyver = "%d.%d" % sys.version_info[0:2]
+  system = platform.system().lower()
+  prefixes = "$ENV{CMAKE_PREFIX_PATH}"
+
+  # Note this will never return, just replace the current process...
+  os.execvpe(arguments[0], arguments,
+      generate_environment(root, prefixes, pyver, system))

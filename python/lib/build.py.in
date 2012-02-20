@@ -6,5 +6,8 @@
 """Version information collected during Bob's build
 """
 
-version = "${BOB_VERSION}"
-platform = "${BOB_PLATFORM}"
+version = "@BOB_VERSION@"
+system = "@BOB_SYSTEM_NAME@"
+platform = "@BOB_PLATFORM@"
+prefixes = "$ENV{CMAKE_PREFIX_PATH}"
+pyver = "@PYTHON_VERSION@"

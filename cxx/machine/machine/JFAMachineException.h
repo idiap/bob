@@ -28,10 +28,20 @@
 
 namespace bob { namespace machine {
 
-  class JFAMachineNoUBM: public Exception {
+  class JFABaseNoUBMSet: public Exception {
     public:
-      JFAMachineNoUBM() throw();
-      virtual ~JFAMachineNoUBM() throw();
+      JFABaseNoUBMSet() throw();
+      virtual ~JFABaseNoUBMSet() throw();
+      virtual const char* what() const throw();
+
+    private:
+      mutable std::string m_message;
+  };
+
+  class JFAMachineNoJFABaseSet: public Exception {
+    public:
+      JFAMachineNoJFABaseSet() throw();
+      virtual ~JFAMachineNoJFABaseSet() throw();
       virtual const char* what() const throw();
 
     private:

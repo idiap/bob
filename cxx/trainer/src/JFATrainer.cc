@@ -5,7 +5,7 @@
  *
  * @brief Joint Factor Analysis Trainer
  *
- * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -536,9 +536,9 @@ void train::JFABaseTrainer::setStatistics(const std::vector<blitz::Array<double,
 
   // Check dimensionality
   for(size_t i=0; i<m_Nid; ++i) {
-    if(N[i].extent(0) != m_jfa_machine.getDimC())
+    if(N[i].extent(0) != static_cast<int>(m_jfa_machine.getDimC()))
       throw bob::core::Exception();
-    if(F[i].extent(0) != m_jfa_machine.getDimCD())
+    if(F[i].extent(0) != static_cast<int>(m_jfa_machine.getDimCD()))
       throw bob::core::Exception();
   }
 
@@ -562,13 +562,13 @@ void train::JFABaseTrainer::setSpeakerFactors(const std::vector<blitz::Array<dou
 
 
   for(size_t i=0; i<m_x.size(); ++i) 
-    if(x[i].extent(0) != m_jfa_machine.getDimRu())
+    if(x[i].extent(0) != static_cast<int>(m_jfa_machine.getDimRu()))
       throw bob::core::Exception();
     
   for(size_t i=0; i<m_Nid; ++i) {
-    if(y[i].extent(0) != m_jfa_machine.getDimRv())
+    if(y[i].extent(0) != static_cast<int>(m_jfa_machine.getDimRv()))
       throw bob::core::Exception();
-    if(z[i].extent(0) != m_jfa_machine.getDimCD())
+    if(z[i].extent(0) != static_cast<int>(m_jfa_machine.getDimCD()))
       throw bob::core::Exception();
   }
 
@@ -658,7 +658,7 @@ void train::JFABaseTrainer::computeVProd()
   m_tmp_rvD.resize(m_jfa_machine.getDimRv(),m_jfa_machine.getDimD());
   blitz::firstIndex i;
   blitz::secondIndex j;
-  for(int c=0; c<m_jfa_machine.getDimC(); ++c)
+  for(size_t c=0; c<m_jfa_machine.getDimC(); ++c)
   {
     blitz::Array<double,2> VProd_c = m_cache_VProd(c, blitz::Range::all(), blitz::Range::all());
     const blitz::Array<double,2>& V = m_jfa_machine.getV();
@@ -679,7 +679,7 @@ void train::JFABaseTrainer::computeIdPlusVProd_i(const int id)
   blitz::Array<double,1> Ni = m_Nacc[id];
   m_tmp_rvrv.resize(m_jfa_machine.getDimRv(), m_jfa_machine.getDimRv());
   bob::math::eye(m_tmp_rvrv); // m_tmp_rvrv = I
-  for(int c=0; c<m_jfa_machine.getDimC(); ++c) {
+  for(size_t c=0; c<m_jfa_machine.getDimC(); ++c) {
     blitz::Array<double,2> VProd_c = m_cache_VProd(c,blitz::Range::all(),blitz::Range::all());
     m_tmp_rvrv += VProd_c * Ni(c);
   }
@@ -755,7 +755,7 @@ void train::JFABaseTrainer::updateV()
     blitz::Array<double,1> y = m_y[id];
     m_tmp_rvrv = m_cache_IdPlusVProd_i;
     m_tmp_rvrv += y(i) * y(j); 
-    for(int c=0; c<m_jfa_machine.getDimC(); ++c)
+    for(size_t c=0; c<m_jfa_machine.getDimC(); ++c)
     {
       blitz::Array<double,2> A1_y_c = m_cache_A1_y(c,blitz::Range::all(),blitz::Range::all());
       A1_y_c += m_tmp_rvrv * m_Nacc[id](c);
@@ -767,7 +767,7 @@ void train::JFABaseTrainer::updateV()
  
   int dim = m_jfa_machine.getDimD();
   m_tmp_rvrv.resize(m_jfa_machine.getDimRv(), m_jfa_machine.getDimRv());
-  for(int c=0; c<m_jfa_machine.getDimC(); ++c)
+  for(size_t c=0; c<m_jfa_machine.getDimC(); ++c)
   {
     const blitz::Array<double,2> A1 = m_cache_A1_y(c,blitz::Range::all(),blitz::Range::all());
     bob::math::inv(A1, m_tmp_rvrv);
@@ -797,7 +797,7 @@ void train::JFABaseTrainer::computeUProd()
   m_tmp_ruD.resize(m_jfa_machine.getDimRu(),m_jfa_machine.getDimD());
   blitz::firstIndex i;
   blitz::secondIndex j;
-  for(int c=0; c<m_jfa_machine.getDimC(); ++c)
+  for(size_t c=0; c<m_jfa_machine.getDimC(); ++c)
   {
     blitz::Array<double,2> UProd_c = m_cache_UProd(c, blitz::Range::all(), blitz::Range::all());
     const blitz::Array<double,2>& U = m_jfa_machine.getU();
@@ -818,7 +818,7 @@ void train::JFABaseTrainer::computeIdPlusUProd_ih(const int id, const int h)
   blitz::Array<double,1> Nih = m_N[id](blitz::Range::all(), h);
   m_tmp_ruru.resize(m_jfa_machine.getDimRu(), m_jfa_machine.getDimRu());
   bob::math::eye(m_tmp_ruru); // m_tmp_ruru = I
-  for(int c=0; c<m_jfa_machine.getDimC(); ++c) {
+  for(size_t c=0; c<m_jfa_machine.getDimC(); ++c) {
     blitz::Array<double,2> UProd_c = m_cache_UProd(c,blitz::Range::all(),blitz::Range::all());
     m_tmp_ruru += UProd_c * Nih(c);
   }
@@ -894,7 +894,7 @@ void train::JFABaseTrainer::updateU()
       blitz::Array<double,1> x = m_x[id](blitz::Range::all(), h);
       m_tmp_ruru = m_cache_IdPlusUProd_ih;
       m_tmp_ruru += x(i) * x(j); 
-      for(int c=0; c<m_jfa_machine.getDimC(); ++c)
+      for(int c=0; c<static_cast<int>(m_jfa_machine.getDimC()); ++c)
       {
         blitz::Array<double,2> A1_x_c = m_cache_A1_x(c,blitz::Range::all(),blitz::Range::all());
         A1_x_c += m_tmp_ruru * m_N[id](c,h);
@@ -910,7 +910,7 @@ void train::JFABaseTrainer::updateU()
   //bob::math::prod(m_cache_A2_x, m_tmp_ruru, U);
   int dim = m_jfa_machine.getDimD();
   m_tmp_ruru.resize(m_jfa_machine.getDimRu(),m_jfa_machine.getDimRu());
-  for(int c=0; c<m_jfa_machine.getDimC(); ++c)
+  for(size_t c=0; c<m_jfa_machine.getDimC(); ++c)
   {
     const blitz::Array<double,2> A1 = m_cache_A1_x(c,blitz::Range::all(),blitz::Range::all());
     bob::math::inv(A1, m_tmp_ruru);

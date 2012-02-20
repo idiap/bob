@@ -24,7 +24,7 @@ import os
 import sys
 import bob
 import numpy
-from ... import build
+from .. import build
 
 def version_table():
   """Returns a summarized version table of all software compiled in, with their

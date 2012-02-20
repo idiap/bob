@@ -31,6 +31,8 @@ set(pysrc
    "lib/test/__init__.py"
    "lib/test/gaussian.py"
    "lib/test/gmm.py"
+   "lib/test/jfa.py"
+   "lib/test/kmeans.py"
    "lib/test/linear.py"
    "lib/test/linearscoring.py"
    "lib/test/mlp.py"
@@ -45,6 +47,10 @@ bob_python_package_bindings(machine "${ccsrc}" "${pysrc}" "core_array")
 bob_python_add_unittest(machine lib/test/gaussian.py main
   ${CMAKE_CURRENT_SOURCE_DIR}/data)
 bob_python_add_unittest(machine lib/test/gmm.py main
+  ${CMAKE_CURRENT_SOURCE_DIR}/data)
+bob_python_add_unittest(machine lib/test/kmeans.py main
+  ${CMAKE_CURRENT_SOURCE_DIR}/data)
+bob_python_add_unittest(machine lib/test/jfa.py main
   ${CMAKE_CURRENT_SOURCE_DIR}/data)
 bob_python_add_unittest(machine lib/test/linear.py main
   ${CMAKE_CURRENT_SOURCE_DIR}/data)

@@ -83,6 +83,14 @@ static void py_setD(mach::JFABaseMachine& machine, tp::const_ndarray D) {
 }
 
 
+static object py_getX(const mach::JFAMachine& machine) {
+  size_t n_Ru = machine.getDimRu();
+  tp::ndarray X(ca::t_float64, n_Ru);
+  blitz::Array<double,1> X_ = X.bz<double,1>();
+  X_ = machine.getX();
+  return X.self();
+}
+
 static object py_getY(const mach::JFAMachine& machine) {
   size_t n_Rv = machine.getDimRv();
   tp::ndarray Y(ca::t_float64, n_Rv);
@@ -139,12 +147,15 @@ static double jfa_forward_sample(mach::JFAMachine& m,
   return score;
 }
 
-void bind_machine_jfa() {
-  class_<mach::JFABaseMachine, boost::shared_ptr<mach::JFABaseMachine> >("JFABaseMachine", "A JFABaseMachine", init<boost::shared_ptr<mach::GMMMachine>, int, int>((arg("ubm"), arg("ru"), arg("rv")), "Builds a new JFABaseMachine. A JFABaseMachine can be seen as a container for U, V and D when performing Joint Factor Analysis (JFA)."))
+void bind_machine_jfa() 
+{
+  class_<mach::JFABaseMachine, boost::shared_ptr<mach::JFABaseMachine> >("JFABaseMachine", "A JFABaseMachine", init<boost::shared_ptr<mach::GMMMachine>, optional<const size_t, const size_t> >((arg("ubm"), arg("ru")=0, arg("rv")=0), "Builds a new JFABaseMachine. A JFABaseMachine can be seen as a container for U, V and D when performing Joint Factor Analysis (JFA)."))
     .def(init<io::HDF5File&>((arg("config")), "Constructs a new JFABaseMachine from a configuration file."))
     .def(init<const mach::JFABaseMachine&>((arg("machine")), "Copy constructs a JFABaseMachine"))
+    .def(self == self)
     .def("load", &mach::JFABaseMachine::load, (arg("self"), arg("config")), "Loads the configuration parameters from a configuration file.")
     .def("save", &mach::JFABaseMachine::save, (arg("self"), arg("config")), "Saves the configuration parameters to a configuration file.")
+    .def("resize", &mach::JFABaseMachine::resize, "Reset the dimensionality of the subspaces U and V.")
     .add_property("ubm", &mach::JFABaseMachine::getUbm, &mach::JFABaseMachine::setUbm)
     .add_property("U", &py_getU, &py_setU)
     .add_property("V", &py_getV, &py_setV)
@@ -156,9 +167,10 @@ void bind_machine_jfa() {
     .add_property("DimRv", &mach::JFABaseMachine::getDimRv)
   ;
 
-  class_<mach::JFAMachine, boost::shared_ptr<mach::JFAMachine> >("JFAMachine", "A JFAMachine", init<boost::shared_ptr<mach::JFABaseMachine> >((arg("jfa_base")), "Builds a new JFAMachine. An attached JFABaseMachine should be provided for Joint Factor Analysis. The JFAMachine carries information about the speaker factors y and z, whereas a JFABaseMachine carries information about the matrices U, V and D."))
+  class_<mach::JFAMachine, boost::shared_ptr<mach::JFAMachine> >("JFAMachine", "A JFAMachine", init<const boost::shared_ptr<mach::JFABaseMachine> >((arg("jfa_base")), "Builds a new JFAMachine. An attached JFABaseMachine should be provided for Joint Factor Analysis. The JFAMachine carries information about the speaker factors y and z, whereas a JFABaseMachine carries information about the matrices U, V and D."))
     .def(init<io::HDF5File&>((arg("config")), "Constructs a new JFAMachine from a configuration file."))
     .def(init<const mach::JFAMachine&>((arg("machine")), "Copy constructs a JFAMachine"))
+    .def(self == self)
     .def("load", &mach::JFAMachine::load, (arg("self"), arg("config")), "Loads the configuration parameters from a configuration file.")
     .def("save", &mach::JFAMachine::save, (arg("self"), arg("config")), "Saves the configuration parameters to a configuration file.")
     .def("__call__", &jfa_forward_sample, (arg("self"), arg("gmm_stats")), "Processes GMM statistics and returns a score.")
@@ -166,6 +178,7 @@ void bind_machine_jfa() {
     .def("__call__", &jfa_forward_list, (arg("self"), arg("gmm_stats"), arg("scores")), "Processes a list of GMM statistics and updates a score list.")
     .def("forward", &jfa_forward_list, (arg("self"), arg("gmm_stats"), arg("scores")), "Processes a list of GMM statistics and updates a score list.")
     .add_property("jfa_base", &mach::JFAMachine::getJFABase, &mach::JFAMachine::setJFABase)
+    .add_property("x", &py_getX)
     .add_property("y", &py_getY, &py_setY)
     .add_property("z", &py_getZ, &py_setZ)
     .add_property("DimC", &mach::JFAMachine::getDimC)
