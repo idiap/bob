@@ -33,53 +33,33 @@ namespace tp = bob::python;
 namespace ca = bob::core::array;
 
 static void extractGMMStatsVectors(list list_stats, 
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& gmm_stats)
+  std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > >& gmm_stats)
 {
   const size_t n_ids = len(list_stats);
   // Extracts the vector of vector of pointers from the python list of lists
   for(size_t id=0; id<n_ids; ++id) {
     list list_stats_id = extract<list>(list_stats[id]);
     size_t n_samples = len(list_stats_id);
-    std::vector<boost::shared_ptr<const bob::machine::GMMStats> > gmm_stats_id;
+    std::vector<boost::shared_ptr<const mach::GMMStats> > gmm_stats_id;
     for(size_t s=0; s<n_samples; ++s) {
-      boost::shared_ptr<mach::GMMStats> gs = extract<boost::shared_ptr<bob::machine::GMMStats> >(list_stats_id[s]);
+      boost::shared_ptr<mach::GMMStats> gs = extract<boost::shared_ptr<mach::GMMStats> >(list_stats_id[s]);
       gmm_stats_id.push_back(gs);
     }
     gmm_stats.push_back(gmm_stats_id);
   }
 }
 
-
 static void jfa_train(train::JFABaseTrainer& t, list list_stats, const size_t n_iter)
 {
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
+  std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > > gmm_stats;
   extractGMMStatsVectors(list_stats, gmm_stats);
   // Calls the train function
   t.train(gmm_stats, n_iter);
 }
 
-/*
-static void jfa_train_vector(train::JFABaseTrainer& t, 
-    object N, object F, size_t n_iter) {
-  //N
-  stl_input_iterator<tp::const_ndarray> it(N), end;
-  std::vector<blitz::Array<double,2> > Nref;
-  Nref.reserve(len(N));
-  for (; it != end; ++it) Nref.push_back((*it).bz<double,2>());
-
-  //F
-  stl_input_iterator<tp::const_ndarray> it2(F);
-  std::vector<blitz::Array<double,2> > Fref;
-  Fref.reserve(len(F));
-  for (; it2 != end; ++it2) Fref.push_back((*it2).bz<double,2>());
-
-  t.train(Nref, Fref, n_iter);
-}
-*/
-
 static void jfa_train_noinit(train::JFABaseTrainer& t, list list_stats, const size_t n_iter)
 {
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
+  std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > > gmm_stats;
   extractGMMStatsVectors(list_stats, gmm_stats);
   // Calls the train function
   t.trainNoInit(gmm_stats, n_iter);
@@ -89,7 +69,7 @@ static void jfa_train_noinit(train::JFABaseTrainer& t, list list_stats, const si
 static void jfa_train_ISV(train::JFABaseTrainer& t, list list_stats, 
   const size_t n_iter, const double relevance_factor)
 {
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
+  std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > > gmm_stats;
   extractGMMStatsVectors(list_stats, gmm_stats);
   // Calls the train function
   t.trainISV(gmm_stats, n_iter, relevance_factor);
@@ -98,7 +78,7 @@ static void jfa_train_ISV(train::JFABaseTrainer& t, list list_stats,
 static void jfa_train_ISV_noinit(train::JFABaseTrainer& t, list list_stats, 
   const size_t n_iter, const double relevance_factor)
 {
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
+  std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > > gmm_stats;
   extractGMMStatsVectors(list_stats, gmm_stats);
   // Calls the train function
   t.trainISVNoInit(gmm_stats, n_iter, relevance_factor);
@@ -107,7 +87,7 @@ static void jfa_train_ISV_noinit(train::JFABaseTrainer& t, list list_stats,
 static void jfa_enrol(train::JFATrainer& t, list stats, const size_t n_iter)
 {
   int n_samples = len(stats);
-  std::vector<boost::shared_ptr<const bob::machine::GMMStats> > gmm_stats;
+  std::vector<boost::shared_ptr<const mach::GMMStats> > gmm_stats;
   for(int s=0; s<n_samples; ++s)
   {
     boost::shared_ptr<mach::GMMStats> gs = extract<boost::shared_ptr<bob::machine::GMMStats> >(stats[s]);  
@@ -181,24 +161,6 @@ static tuple get_z (const train::JFABaseTrainerBase& obj) {
   return as_tuple(obj.getZ());
 }
 
-/*
-static void jfa_set_stats(train::JFABaseTrainer& t, object N,
-    object F) {
-  //N
-  stl_input_iterator<tp::const_ndarray> it(N), end;
-  std::vector<blitz::Array<double,2> > Nref;
-  Nref.reserve(len(N));
-  for (; it != end; ++it) Nref.push_back((*it).bz<double,2>());
-
-  //F
-  stl_input_iterator<tp::const_ndarray> it2(F);
-  std::vector<blitz::Array<double,2> > Fref;
-  Fref.reserve(len(F));
-  for (; it2 != end; ++it2) Fref.push_back((*it2).bz<double,2>());
-
-  t.setStatistics(Nref, Fref);
-}
-*/
 static void jfa_set_speaker_factors(train::JFABaseTrainerBase& t, 
     object x, object y, object z) {
   //x
@@ -242,7 +204,7 @@ static void jfa_initNid(train::JFABaseTrainerBase& t, object o)
 
 static void jfa_precomputeN(train::JFABaseTrainerBase& t, list list_stats)
 {
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
+  std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > > gmm_stats;
   extractGMMStatsVectors(list_stats, gmm_stats);
   // Calls the train function
   t.precomputeSumStatisticsN(gmm_stats);
@@ -250,7 +212,7 @@ static void jfa_precomputeN(train::JFABaseTrainerBase& t, list list_stats)
 
 static void jfa_precomputeF(train::JFABaseTrainerBase& t, list list_stats)
 {
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
+  std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > > gmm_stats;
   extractGMMStatsVectors(list_stats, gmm_stats);
   // Calls the train function
   t.precomputeSumStatisticsF(gmm_stats);
@@ -258,7 +220,7 @@ static void jfa_precomputeF(train::JFABaseTrainerBase& t, list list_stats)
 
 static void jfa_updateX(train::JFABaseTrainer& t, list list_stats)
 {
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
+  std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > > gmm_stats;
   extractGMMStatsVectors(list_stats, gmm_stats);
   // Calls the train function
   t.updateX(gmm_stats);
@@ -266,7 +228,7 @@ static void jfa_updateX(train::JFABaseTrainer& t, list list_stats)
 
 static void jfa_updateY(train::JFABaseTrainer& t, list list_stats)
 {
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
+  std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > > gmm_stats;
   extractGMMStatsVectors(list_stats, gmm_stats);
   // Calls the train function
   t.updateY(gmm_stats);
@@ -274,7 +236,7 @@ static void jfa_updateY(train::JFABaseTrainer& t, list list_stats)
 
 static void jfa_updateZ(train::JFABaseTrainer& t, list list_stats)
 {
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
+  std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > > gmm_stats;
   extractGMMStatsVectors(list_stats, gmm_stats);
   // Calls the train function
   t.updateZ(gmm_stats);
@@ -282,7 +244,7 @@ static void jfa_updateZ(train::JFABaseTrainer& t, list list_stats)
 
 static void jfa_updateU(train::JFABaseTrainer& t, list list_stats)
 {
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
+  std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > > gmm_stats;
   extractGMMStatsVectors(list_stats, gmm_stats);
   // Calls the train function
   t.updateU(gmm_stats);
@@ -290,7 +252,7 @@ static void jfa_updateU(train::JFABaseTrainer& t, list list_stats)
 
 static void jfa_updateV(train::JFABaseTrainer& t, list list_stats)
 {
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
+  std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > > gmm_stats;
   extractGMMStatsVectors(list_stats, gmm_stats);
   // Calls the train function
   t.updateV(gmm_stats);
@@ -298,7 +260,7 @@ static void jfa_updateV(train::JFABaseTrainer& t, list list_stats)
 
 static void jfa_updateD(train::JFABaseTrainer& t, list list_stats)
 {
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
+  std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > > gmm_stats;
   extractGMMStatsVectors(list_stats, gmm_stats);
   // Calls the train function
   t.updateD(gmm_stats);
@@ -331,8 +293,6 @@ void bind_trainer_jfa() {
     .add_property("Fn_y_i", make_function(&train::JFABaseTrainer::getFn_y_i, return_value_policy<copy_const_reference>()), &train::JFABaseTrainer::setFn_y_i)
     .add_property("A1_y", make_function(&train::JFABaseTrainer::getA1_y, return_value_policy<copy_const_reference>()), &train::JFABaseTrainer::setA1_y)
     .add_property("A2_y", make_function(&train::JFABaseTrainer::getA2_y, return_value_policy<copy_const_reference>()), &train::JFABaseTrainer::setA2_y)
-//    .def("setStatistics", &jfa_set_stats, (arg("self"), arg("N"), arg("F")), "Set the zeroth and first order statistics.")
-//    .def("train", &jfa_train_vector, (arg("self"), arg("N"), arg("F"), arg("n_iter")), "Call the training procedure.")
     .def("train", &jfa_train, (arg("self"), arg("gmm_stats"), arg("n_iter")), "Call the training procedure.")
     .def("trainNoInit", &jfa_train_noinit, (arg("self"), arg("gmm_stats"), arg("n_iter")), "Call the training procedure.")
     .def("trainISV", &jfa_train_ISV, (arg("self"), arg("gmm_stats"), arg("n_iter"), arg("relevance")), "Call the ISV training procedure.")
@@ -360,7 +320,6 @@ void bind_trainer_jfa() {
     ;
 
   class_<train::JFATrainer, boost::noncopyable>("JFATrainer", "Create a trainer for the JFA.", init<mach::JFAMachine&, train::JFABaseTrainer&>((arg("jfa"), arg("base_trainer")),"Initializes a new JFATrainer."))
-  //  .def("enrol", (void (train::JFATrainer::*)(const blitz::Array<double,2>&, const blitz::Array<double,2>&, const size_t))&train::JFATrainer::enrol, (arg("self"), arg("N"), arg("F"), arg("n_iter")), "Call the training procedure.")
     .def("enrol", &jfa_enrol, (arg("self"), arg("gmm_stats"), arg("n_iter")), "Call the training procedure.")
     ;
 
