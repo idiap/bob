@@ -160,18 +160,18 @@ class JFABaseTrainerBase
     /**
      * Initializes the number of identities
      */
-    void initNid(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats);
+    void initNid(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats);
     void initNid(const size_t Nid);
     /**
      * Precomputes the sums of the zeroth order statistics over the sessions 
      * for each client
      */
-    void precomputeSumStatisticsN(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats);
+    void precomputeSumStatisticsN(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats);
     /**
      * Precomputes the sums of the first order statistics over the sessions 
      * for each client
      */
-    void precomputeSumStatisticsF(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats);
+    void precomputeSumStatisticsF(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats);
 
     /**
      * Set the x, y, z speaker factors
@@ -194,7 +194,7 @@ class JFABaseTrainerBase
     /**
       * Initializes X, Y and Z
       */
-    virtual void initializeXYZ(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats);
+    virtual void initializeXYZ(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats);
 
     /**
      * Get the zeroth order statistics
@@ -285,9 +285,6 @@ class JFABaseTrainer: public JFABaseTrainerBase
      * Initializes the cache to process the given statistics
      */
     void initCache();
-    void initCacheU();
-    void initCacheV();
-    void initCacheD();
 
 
     /**** Y and V functions ****/
@@ -303,27 +300,27 @@ class JFABaseTrainer: public JFABaseTrainerBase
      * Computes (I+Vt*diag(sigma)^-1*Ni*V)^-1 which occurs in the y estimation
      * for the given person
      */
-    void computeIdPlusVProd_i(const int id);
+    void computeIdPlusVProd_i(const size_t id);
     /**
      * Computes sum_{sessions h}(N_{i,h}*(o_{i,h} - m - D*z_{i} - U*x_{i,h}) 
      * which occurs in the y estimation of the given person
      */
-    void computeFn_y_i(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats, const int id);
+    void computeFn_y_i(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats, const size_t id);
     /**
      * Updates y_i (of the current person) and the accumulators to compute V 
      * with the cache values m_cache_IdPlusVprod_i, m_VtSigmaInv and 
      * m_cache_Fn_y_i
      */
-    void updateY_i(const int id);
+    void updateY_i(const size_t id);
     /**
      * Updates y and the accumulators to compute V 
      */
-    void updateY(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats);
+    void updateY(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats);
     /**
      * Updates V by using the accumulators m_cache_A1_x and m_cache_A2_x
      * V = A2 * A1^-1
      */
-    void updateV(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats);
+    void updateV(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats);
 
 
     /**** X and U functions ****/
@@ -339,27 +336,27 @@ class JFABaseTrainer: public JFABaseTrainerBase
      * Computes (I+Vt*diag(sigma)^-1*Ni*V)^-1 which occurs in the y estimation
      * for the given person
      */
-    void computeIdPlusUProd_ih(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats, const int id, const int h);
+    void computeIdPlusUProd_ih(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats, const size_t id, const size_t h);
     /**
      * Computes sum_{sessions h}(N_{i,h}*(o_{i,h} - m - D*z_{i} - U*x_{i,h}) 
      * which occurs in the y estimation of the given person
      */
-    void computeFn_x_ih(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats, const int id, const int h);
+    void computeFn_x_ih(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats, const size_t id, const size_t h);
     /**
      * Updates x_ih (of the current person/session) and the accumulators to compute V 
      * with the cache values m_cache_IdPlusVprod_i, m_VtSigmaInv and 
      * m_cache_Fn_y_i
      */
-    void updateX_ih(const int id, const int h);
+    void updateX_ih(const size_t id, const size_t h);
     /**
      * Updates x and the accumulators to compute U
      */
-    void updateX(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats);
+    void updateX(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats);
     /**
      * Updates U by using the accumulators m_cache_A1_y and m_cache_A2_y
      * U = A2 * A1^-1
      */
-    void updateU(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats);
+    void updateU(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats);
 
 
     /**** z and D functions ****/
@@ -375,27 +372,27 @@ class JFABaseTrainer: public JFABaseTrainerBase
      * Computes (I+diag(d)t*diag(sigma)^-1*Ni*diag(d))^-1 which occurs in the z estimation
      * for the given person
      */
-    void computeIdPlusDProd_i(const int id);
+    void computeIdPlusDProd_i(const size_t id);
     /**
      * Computes sum_{sessions h}(N_{i,h}*(o_{i,h} - m - V*y_{i} - U*x_{i,h}) 
      * which occurs in the y estimation of the given person
      */
-    void computeFn_z_i(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats, const int id);
+    void computeFn_z_i(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats, const size_t id);
     /**
      * Updates z_i (of the current person) and the accumulators to compute D
      * with the cache values m_cache_IdPlusDProd_i, m_VtSigmaInv and 
      * m_cache_Fn_z_i
      */
-    void updateZ_i(const int id);
+    void updateZ_i(const size_t id);
     /**
      * Updates z and the accumulators to compute D
      */
-    void updateZ(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats);
+    void updateZ(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats);
     /**
      * Updates D by using the accumulators m_cache_A1_z and m_cache_A2_z
      * V = A2 * A1^-1
      */
-    void updateD(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats);
+    void updateD(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats);
 
 
 
@@ -403,23 +400,23 @@ class JFABaseTrainer: public JFABaseTrainerBase
     /**
       * Trains the Joint Factor Analysis by initializing U, V, and D randomly
       */
-    void train(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats,
+    void train(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats,
       const size_t n_iter); 
     /**
       * Trains the Joint Factor Analysis without initializing U, V and D
       */
-    void trainNoInit(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats,
+    void trainNoInit(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats,
       const size_t n_iter); 
 
     /**
       * Trains the Inter Session Variability model by initializing U randomly
       */
-    void trainISV(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats,
+    void trainISV(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats,
       const size_t n_iter, const double relevance_factor); 
     /**
       * Trains the Inter Session Variability model without initializing U
       */
-    void trainISVNoInit(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats,
+    void trainISVNoInit(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats,
       const size_t n_iter, const double relevance_factor); 
 
     /**
@@ -517,7 +514,7 @@ class JFATrainer {
     /**
       * Main procedures for enroling with Joint Factor Analysis
       */
-    void enrol(const std::vector<boost::shared_ptr<bob::machine::GMMStats> >& features,
+    void enrol(const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& features,
       const size_t n_iter);
 
   private:

@@ -513,7 +513,7 @@ train::JFABaseTrainerBase::JFABaseTrainerBase(bob::machine::JFABaseMachine& m):
   m_jfa_machine.getUbm()->getVarianceSupervector(m_cache_ubm_var);
 }
 
-void train::JFABaseTrainerBase::initNid(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats)
+void train::JFABaseTrainerBase::initNid(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats)
 {
   // Number of people
   m_Nid = stats.size();
@@ -525,7 +525,7 @@ void train::JFABaseTrainerBase::initNid(const size_t Nid)
   m_Nid = Nid;
 }
 
-void train::JFABaseTrainerBase::precomputeSumStatisticsN(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats)
+void train::JFABaseTrainerBase::precomputeSumStatisticsN(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats)
 {
   m_Nacc.clear();
   blitz::Array<double,1> Nsum(m_jfa_machine.getDimC());
@@ -538,7 +538,7 @@ void train::JFABaseTrainerBase::precomputeSumStatisticsN(const std::vector<std::
   }
 }
 
-void train::JFABaseTrainerBase::precomputeSumStatisticsF(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats)
+void train::JFABaseTrainerBase::precomputeSumStatisticsF(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats)
 {
   m_Facc.clear();
   boost::shared_ptr<bob::machine::GMMMachine> ubm(m_jfa_machine.getUbm());
@@ -628,7 +628,7 @@ void train::JFABaseTrainerBase::initializeUVD()
   initializeRandomD();
 }
 
-void train::JFABaseTrainerBase::initializeXYZ(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& vec)
+void train::JFABaseTrainerBase::initializeXYZ(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& vec)
 {
   std::vector<blitz::Array<double,1> > z;
   std::vector<blitz::Array<double,1> > y;
@@ -670,50 +670,38 @@ train::JFABaseTrainer::JFABaseTrainer(bob::machine::JFABaseMachine& m):
 
 void train::JFABaseTrainer::initCache()
 {
-  initCacheU();
-  initCacheV();
-  initCacheD();
-}
-
-void train::JFABaseTrainer::initCacheU()
-{
+  // U
   m_cache_UtSigmaInv.resize(m_jfa_machine.getDimRu(), m_jfa_machine.getDimCD());
   m_cache_UProd.resize(m_jfa_machine.getDimC(),m_jfa_machine.getDimRu(),m_jfa_machine.getDimRu());
   m_cache_IdPlusUProd_ih.resize(m_jfa_machine.getDimRu(),m_jfa_machine.getDimRu());
   m_cache_Fn_x_ih.resize(m_jfa_machine.getDimCD());
   m_cache_A1_x.resize(m_jfa_machine.getDimC(),m_jfa_machine.getDimRu(),m_jfa_machine.getDimRu());
   m_cache_A2_x.resize(m_jfa_machine.getDimCD(),m_jfa_machine.getDimRu());
-  m_tmp_CD.resize(m_jfa_machine.getDimCD());
-  m_tmp_CD_b.resize(m_jfa_machine.getDimCD());
-  m_tmp_ru.resize(m_jfa_machine.getDimRu());
-  m_tmp_ruD.resize(m_jfa_machine.getDimRu(),m_jfa_machine.getDimD());
-  m_tmp_ruru.resize(m_jfa_machine.getDimRu(),m_jfa_machine.getDimRu());
-}
-
-void train::JFABaseTrainer::initCacheV()
-{
+  // V
   m_cache_VtSigmaInv.resize(m_jfa_machine.getDimRv(), m_jfa_machine.getDimCD());
   m_cache_VProd.resize(m_jfa_machine.getDimC(),m_jfa_machine.getDimRv(),m_jfa_machine.getDimRv());
   m_cache_IdPlusVProd_i.resize(m_jfa_machine.getDimRv(),m_jfa_machine.getDimRv());
   m_cache_Fn_y_i.resize(m_jfa_machine.getDimCD());
   m_cache_A1_y.resize(m_jfa_machine.getDimC(),m_jfa_machine.getDimRv(),m_jfa_machine.getDimRv());
   m_cache_A2_y.resize(m_jfa_machine.getDimCD(),m_jfa_machine.getDimRv());
-  m_tmp_CD.resize(m_jfa_machine.getDimCD());
-  m_tmp_CD_b.resize(m_jfa_machine.getDimCD());
-  m_tmp_rv.resize(m_jfa_machine.getDimRv());
-  m_tmp_rvD.resize(m_jfa_machine.getDimRv(),m_jfa_machine.getDimD());
-  m_tmp_rvrv.resize(m_jfa_machine.getDimRv(), m_jfa_machine.getDimRv());
-}
-
-void train::JFABaseTrainer::initCacheD()
-{
+  // D
   m_cache_DtSigmaInv.resize(m_jfa_machine.getDimCD());
   m_cache_DProd.resize(m_jfa_machine.getDimCD());
   m_cache_Fn_z_i.resize(m_jfa_machine.getDimCD());
   m_cache_A1_z.resize(m_jfa_machine.getDimCD());
   m_cache_A2_z.resize(m_jfa_machine.getDimCD());
+
+  // tmp
   m_tmp_CD.resize(m_jfa_machine.getDimCD());
   m_tmp_CD_b.resize(m_jfa_machine.getDimCD());
+
+  m_tmp_ru.resize(m_jfa_machine.getDimRu());
+  m_tmp_ruD.resize(m_jfa_machine.getDimRu(),m_jfa_machine.getDimD());
+  m_tmp_ruru.resize(m_jfa_machine.getDimRu(),m_jfa_machine.getDimRu());
+
+  m_tmp_rv.resize(m_jfa_machine.getDimRv());
+  m_tmp_rvD.resize(m_jfa_machine.getDimRv(),m_jfa_machine.getDimD());
+  m_tmp_rvrv.resize(m_jfa_machine.getDimRv(), m_jfa_machine.getDimRv());
 }
 
 void train::JFABaseTrainer::computeVtSigmaInv()
@@ -745,10 +733,8 @@ void train::JFABaseTrainer::computeVProd()
   }
 }
 
-void train::JFABaseTrainer::computeIdPlusVProd_i(const int id) 
+void train::JFABaseTrainer::computeIdPlusVProd_i(const size_t id) 
 {
-  blitz::firstIndex i;
-  blitz::secondIndex j;
   blitz::Array<double,1> Ni = m_Nacc[id];
   bob::math::eye(m_tmp_rvrv); // m_tmp_rvrv = I
   for(size_t c=0; c<m_jfa_machine.getDimC(); ++c) {
@@ -758,7 +744,7 @@ void train::JFABaseTrainer::computeIdPlusVProd_i(const int id)
   bob::math::inv(m_tmp_rvrv, m_cache_IdPlusVProd_i); // m_cache_IdPlusVProd_i = ( I+Vt*diag(sigma)^-1*Ni*V)^-1
 }
 
-void train::JFABaseTrainer::computeFn_y_i(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats, const int id)
+void train::JFABaseTrainer::computeFn_y_i(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats, const size_t id)
 {
   // Compute Fn_yi = sum_{sessions h}(N_{i,h}*(o_{i,h} - m - D*z_{i} - U*x_{i,h}) (Normalised first order statistics)
   blitz::Array<double,1> Fi = m_Facc[id];
@@ -782,7 +768,7 @@ void train::JFABaseTrainer::computeFn_y_i(const std::vector<std::vector<boost::s
   // Fn_yi = sum_{sessions h}(N_{i,h}*(o_{i,h} - m - D*z_{i} - U*x_{i,h})
 }
 
-void train::JFABaseTrainer::updateY_i(const int id)
+void train::JFABaseTrainer::updateY_i(const size_t id)
 {
   // Compute yi = Ayi * Cvs * Fn_yi
   blitz::Array<double,1> y = m_y[id];
@@ -791,7 +777,7 @@ void train::JFABaseTrainer::updateY_i(const int id)
   bob::math::prod(m_cache_IdPlusVProd_i, m_tmp_rv, y);
 }
 
-void train::JFABaseTrainer::updateY(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats)
+void train::JFABaseTrainer::updateY(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats)
 {
   // Precompute Vt*diag(sigma)^-1
   computeVtSigmaInv();
@@ -804,7 +790,7 @@ void train::JFABaseTrainer::updateY(const std::vector<std::vector<boost::shared_
   }
 }
 
-void train::JFABaseTrainer::updateV(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats)
+void train::JFABaseTrainer::updateV(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats)
 {  
   // Initialize the cache accumulator
   m_cache_A1_y = 0.;
@@ -871,7 +857,7 @@ void train::JFABaseTrainer::computeUProd()
   }
 }
 
-void train::JFABaseTrainer::computeIdPlusUProd_ih(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats, const int id, const int h) 
+void train::JFABaseTrainer::computeIdPlusUProd_ih(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats, const size_t id, const size_t h) 
 {
   blitz::firstIndex i;
   blitz::secondIndex j;
@@ -884,7 +870,7 @@ void train::JFABaseTrainer::computeIdPlusUProd_ih(const std::vector<std::vector<
   bob::math::inv(m_tmp_ruru, m_cache_IdPlusUProd_ih); // m_cache_IdPlusUProd_ih = ( I+Ut*diag(sigma)^-1*Ni*U)^-1
 }
 
-void train::JFABaseTrainer::computeFn_x_ih(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats, const int id, const int h)
+void train::JFABaseTrainer::computeFn_x_ih(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats, const size_t id, const size_t h)
 {
   // Compute Fn_x_ih = sum_{sessions h}(N_{i,h}*(o_{i,h} - m - D*z_{i} - V*y_{i}) (Normalised first order statistics)
   const blitz::Array<double,2>& Fih = stats[id][h]->sumPx;
@@ -908,7 +894,7 @@ void train::JFABaseTrainer::computeFn_x_ih(const std::vector<std::vector<boost::
   // Fn_x_ih = N_{i,h}*(o_{i,h} - m - D*z_{i} - V*y_{i})
 }
 
-void train::JFABaseTrainer::updateX_ih(const int id, const int h)
+void train::JFABaseTrainer::updateX_ih(const size_t id, const size_t h)
 {
   // Compute xih = Axih * Cus * Fn_x_ih
   blitz::Array<double,1> x = m_x[id](blitz::Range::all(), h);
@@ -917,7 +903,7 @@ void train::JFABaseTrainer::updateX_ih(const int id, const int h)
   bob::math::prod(m_cache_IdPlusUProd_ih, m_tmp_ru, x);
 }
 
-void train::JFABaseTrainer::updateX(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats)
+void train::JFABaseTrainer::updateX(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats)
 {
   // Precompute Ut*diag(sigma)^-1
   computeUtSigmaInv();
@@ -933,7 +919,7 @@ void train::JFABaseTrainer::updateX(const std::vector<std::vector<boost::shared_
   }
 }
 
-void train::JFABaseTrainer::updateU(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats)
+void train::JFABaseTrainer::updateU(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats)
 {
   // Initialize the cache accumulator
   m_cache_A1_x = 0.;
@@ -991,7 +977,7 @@ void train::JFABaseTrainer::computeDProd()
   m_cache_DProd = d / sigma * d; // Dt * diag(sigma)^-1 * D
 }
 
-void train::JFABaseTrainer::computeIdPlusDProd_i(const int id)
+void train::JFABaseTrainer::computeIdPlusDProd_i(const size_t id)
 {
   m_cache_IdPlusDProd_i.resizeAndPreserve(m_jfa_machine.getDimCD());
   blitz::Array<double,1> Ni = m_Nacc[id];
@@ -1001,7 +987,7 @@ void train::JFABaseTrainer::computeIdPlusDProd_i(const int id)
   m_cache_IdPlusDProd_i = 1 / m_cache_IdPlusDProd_i; // m_cache_IdPlusVProd_i = (I+Dt*diag(sigma)^-1*Ni*D)^-1
 }
 
-void train::JFABaseTrainer::computeFn_z_i(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats, const int id)
+void train::JFABaseTrainer::computeFn_z_i(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats, const size_t id)
 {
   // Compute Fn_z_i = sum_{sessions h}(N_{i,h}*(o_{i,h} - m - V*y_{i} - U*x_{i,h}) (Normalised first order statistics)
   blitz::Array<double,1> Fi = m_Facc[id];
@@ -1029,7 +1015,7 @@ void train::JFABaseTrainer::computeFn_z_i(const std::vector<std::vector<boost::s
   // Fn_z_i = sum_{sessions h}(N_{i,h}*(o_{i,h} - m - V*y_{i} - U*x_{i,h})
 }
 
-void train::JFABaseTrainer::updateZ_i(const int id)
+void train::JFABaseTrainer::updateZ_i(const size_t id)
 {
   // Compute zi = Azi * Cvs * Fn_zi
   blitz::Array<double,1> z = m_z[id];
@@ -1037,7 +1023,7 @@ void train::JFABaseTrainer::updateZ_i(const int id)
   z = m_cache_IdPlusDProd_i * m_cache_DtSigmaInv * m_cache_Fn_z_i; 
 }
 
-void train::JFABaseTrainer::updateZ(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats)
+void train::JFABaseTrainer::updateZ(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats)
 {
   // Precompute Dt*diag(sigma)^-1
   computeDtSigmaInv();
@@ -1050,7 +1036,7 @@ void train::JFABaseTrainer::updateZ(const std::vector<std::vector<boost::shared_
   }
 }
 
-void train::JFABaseTrainer::updateD(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& stats)
+void train::JFABaseTrainer::updateD(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats)
 {
   // Initialize the cache accumulator
   m_cache_A1_z = 0.;
@@ -1085,7 +1071,7 @@ void train::JFABaseTrainer::updateD(const std::vector<std::vector<boost::shared_
 }
 
 
-void train::JFABaseTrainer::train(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& vec,
+void train::JFABaseTrainer::train(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& vec,
   const size_t n_iter)
 {
   initNid(vec);
@@ -1111,7 +1097,7 @@ void train::JFABaseTrainer::train(const std::vector<std::vector<boost::shared_pt
   }
 }
 
-void train::JFABaseTrainer::trainNoInit(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& vec,
+void train::JFABaseTrainer::trainNoInit(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& vec,
   const size_t n_iter)
 {
   initNid(vec);
@@ -1148,7 +1134,7 @@ void train::JFABaseTrainer::initializeVD_ISV(const double relevance_factor)
   d = sqrt(m_cache_ubm_var / relevance_factor);
 }
 
-void train::JFABaseTrainer::trainISV(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& vec,
+void train::JFABaseTrainer::trainISV(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& vec,
   const size_t n_iter, const double relevance_factor)
 {
   initNid(vec);
@@ -1166,7 +1152,7 @@ void train::JFABaseTrainer::trainISV(const std::vector<std::vector<boost::shared
   }
 }
 
-void train::JFABaseTrainer::trainISVNoInit(const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& vec,
+void train::JFABaseTrainer::trainISVNoInit(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& vec,
   const size_t n_iter, const double relevance_factor)
 {
   initNid(vec);
@@ -1191,11 +1177,12 @@ train::JFATrainer::JFATrainer(bob::machine::JFAMachine& jfa_machine, bob::traine
 {
 }
 
-void train::JFATrainer::enrol(const std::vector<boost::shared_ptr<bob::machine::GMMStats> >& vec,
+void train::JFATrainer::enrol(const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& vec,
   const size_t n_iter)
 {
-  std::vector< std::vector<boost::shared_ptr<bob::machine::GMMStats> > > vvec;
+  std::vector< std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > vvec;
   vvec.push_back(vec);
+  m_base_trainer.initNid(1);
   m_base_trainer.precomputeSumStatisticsN(vvec);
   m_base_trainer.precomputeSumStatisticsF(vvec);
 

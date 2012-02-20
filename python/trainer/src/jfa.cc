@@ -32,21 +32,28 @@ namespace mach = bob::machine;
 namespace tp = bob::python;
 namespace ca = bob::core::array;
 
-static void jfa_train(train::JFABaseTrainer& t, list list_stats, const size_t n_iter)
+static void extractGMMStatsVectors(list list_stats, 
+  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& gmm_stats)
 {
-  int n_ids = len(list_stats);
-  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > gmm_stats;
-
+  const size_t n_ids = len(list_stats);
   // Extracts the vector of vector of pointers from the python list of lists
-  for(int id=0; id<n_ids; ++id) {
+  for(size_t id=0; id<n_ids; ++id) {
     list list_stats_id = extract<list>(list_stats[id]);
-    int n_samples = len(list_stats_id);
-    std::vector<boost::shared_ptr<bob::machine::GMMStats> > gmm_stats_id;
-    for(int s=0; s<n_samples; ++s)
-      gmm_stats_id.push_back(extract<boost::shared_ptr<bob::machine::GMMStats> >(list_stats_id[s]));
+    size_t n_samples = len(list_stats_id);
+    std::vector<boost::shared_ptr<const bob::machine::GMMStats> > gmm_stats_id;
+    for(size_t s=0; s<n_samples; ++s) {
+      boost::shared_ptr<mach::GMMStats> gs = extract<boost::shared_ptr<bob::machine::GMMStats> >(list_stats_id[s]);
+      gmm_stats_id.push_back(gs);
+    }
     gmm_stats.push_back(gmm_stats_id);
   }
+}
 
+
+static void jfa_train(train::JFABaseTrainer& t, list list_stats, const size_t n_iter)
+{
+  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
+  extractGMMStatsVectors(list_stats, gmm_stats);
   // Calls the train function
   t.train(gmm_stats, n_iter);
 }
@@ -72,19 +79,8 @@ static void jfa_train_vector(train::JFABaseTrainer& t,
 
 static void jfa_train_noinit(train::JFABaseTrainer& t, list list_stats, const size_t n_iter)
 {
-  int n_ids = len(list_stats);
-  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > gmm_stats;
-
-  // Extracts the vector of vector of pointers from the python list of lists
-  for(int id=0; id<n_ids; ++id) {
-    list list_stats_id = extract<list>(list_stats[id]);
-    int n_samples = len(list_stats_id);
-    std::vector<boost::shared_ptr<bob::machine::GMMStats> > gmm_stats_id;
-    for(int s=0; s<n_samples; ++s)
-      gmm_stats_id.push_back(extract<boost::shared_ptr<bob::machine::GMMStats> >(list_stats_id[s]));
-    gmm_stats.push_back(gmm_stats_id);
-  }
-
+  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
+  extractGMMStatsVectors(list_stats, gmm_stats);
   // Calls the train function
   t.trainNoInit(gmm_stats, n_iter);
 }
@@ -93,19 +89,8 @@ static void jfa_train_noinit(train::JFABaseTrainer& t, list list_stats, const si
 static void jfa_train_ISV(train::JFABaseTrainer& t, list list_stats, 
   const size_t n_iter, const double relevance_factor)
 {
-  int n_ids = len(list_stats);
-  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > gmm_stats;
-
-  // Extracts the vector of vector of pointers from the python list of lists
-  for(int id=0; id<n_ids; ++id) {
-    list list_stats_id = extract<list>(list_stats[id]);
-    int n_samples = len(list_stats_id);
-    std::vector<boost::shared_ptr<bob::machine::GMMStats> > gmm_stats_id;
-    for(int s=0; s<n_samples; ++s)
-      gmm_stats_id.push_back(extract<boost::shared_ptr<bob::machine::GMMStats> >(list_stats_id[s]));
-    gmm_stats.push_back(gmm_stats_id);
-  }
-
+  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
+  extractGMMStatsVectors(list_stats, gmm_stats);
   // Calls the train function
   t.trainISV(gmm_stats, n_iter, relevance_factor);
 }
@@ -113,19 +98,8 @@ static void jfa_train_ISV(train::JFABaseTrainer& t, list list_stats,
 static void jfa_train_ISV_noinit(train::JFABaseTrainer& t, list list_stats, 
   const size_t n_iter, const double relevance_factor)
 {
-  int n_ids = len(list_stats);
-  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > gmm_stats;
-
-  // Extracts the vector of vector of pointers from the python list of lists
-  for(int id=0; id<n_ids; ++id) {
-    list list_stats_id = extract<list>(list_stats[id]);
-    int n_samples = len(list_stats_id);
-    std::vector<boost::shared_ptr<bob::machine::GMMStats> > gmm_stats_id;
-    for(int s=0; s<n_samples; ++s)
-      gmm_stats_id.push_back(extract<boost::shared_ptr<bob::machine::GMMStats> >(list_stats_id[s]));
-    gmm_stats.push_back(gmm_stats_id);
-  }
-
+  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
+  extractGMMStatsVectors(list_stats, gmm_stats);
   // Calls the train function
   t.trainISVNoInit(gmm_stats, n_iter, relevance_factor);
 }
@@ -133,9 +107,12 @@ static void jfa_train_ISV_noinit(train::JFABaseTrainer& t, list list_stats,
 static void jfa_enrol(train::JFATrainer& t, list stats, const size_t n_iter)
 {
   int n_samples = len(stats);
-  std::vector<boost::shared_ptr<bob::machine::GMMStats> > gmm_stats;
+  std::vector<boost::shared_ptr<const bob::machine::GMMStats> > gmm_stats;
   for(int s=0; s<n_samples; ++s)
-    gmm_stats.push_back(extract<boost::shared_ptr<bob::machine::GMMStats> >(stats[s]));
+  {
+    boost::shared_ptr<mach::GMMStats> gs = extract<boost::shared_ptr<bob::machine::GMMStats> >(stats[s]);  
+    gmm_stats.push_back(gs);
+  }
 
   // Calls the enrol function
   t.enrol(gmm_stats, n_iter);
@@ -265,152 +242,64 @@ static void jfa_initNid(train::JFABaseTrainerBase& t, object o)
 
 static void jfa_precomputeN(train::JFABaseTrainerBase& t, list list_stats)
 {
-  int n_ids = len(list_stats);
-  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > gmm_stats;
-
-  // Extracts the vector of vector of pointers from the python list of lists
-  for(int id=0; id<n_ids; ++id) {
-    list list_stats_id = extract<list>(list_stats[id]);
-    int n_samples = len(list_stats_id);
-    std::vector<boost::shared_ptr<bob::machine::GMMStats> > gmm_stats_id;
-    for(int s=0; s<n_samples; ++s)
-      gmm_stats_id.push_back(extract<boost::shared_ptr<bob::machine::GMMStats> >(list_stats_id[s]));
-    gmm_stats.push_back(gmm_stats_id);
-  }
-
+  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
+  extractGMMStatsVectors(list_stats, gmm_stats);
   // Calls the train function
   t.precomputeSumStatisticsN(gmm_stats);
 }
 
 static void jfa_precomputeF(train::JFABaseTrainerBase& t, list list_stats)
 {
-  int n_ids = len(list_stats);
-  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > gmm_stats;
-
-  // Extracts the vector of vector of pointers from the python list of lists
-  for(int id=0; id<n_ids; ++id) {
-    list list_stats_id = extract<list>(list_stats[id]);
-    int n_samples = len(list_stats_id);
-    std::vector<boost::shared_ptr<bob::machine::GMMStats> > gmm_stats_id;
-    for(int s=0; s<n_samples; ++s)
-      gmm_stats_id.push_back(extract<boost::shared_ptr<bob::machine::GMMStats> >(list_stats_id[s]));
-    gmm_stats.push_back(gmm_stats_id);
-  }
-
+  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
+  extractGMMStatsVectors(list_stats, gmm_stats);
   // Calls the train function
   t.precomputeSumStatisticsF(gmm_stats);
 }
 
 static void jfa_updateX(train::JFABaseTrainer& t, list list_stats)
 {
-  int n_ids = len(list_stats);
-  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > gmm_stats;
-
-  // Extracts the vector of vector of pointers from the python list of lists
-  for(int id=0; id<n_ids; ++id) {
-    list list_stats_id = extract<list>(list_stats[id]);
-    int n_samples = len(list_stats_id);
-    std::vector<boost::shared_ptr<bob::machine::GMMStats> > gmm_stats_id;
-    for(int s=0; s<n_samples; ++s)
-      gmm_stats_id.push_back(extract<boost::shared_ptr<bob::machine::GMMStats> >(list_stats_id[s]));
-    gmm_stats.push_back(gmm_stats_id);
-  }
-
+  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
+  extractGMMStatsVectors(list_stats, gmm_stats);
   // Calls the train function
   t.updateX(gmm_stats);
 }
 
 static void jfa_updateY(train::JFABaseTrainer& t, list list_stats)
 {
-  int n_ids = len(list_stats);
-  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > gmm_stats;
-
-  // Extracts the vector of vector of pointers from the python list of lists
-  for(int id=0; id<n_ids; ++id) {
-    list list_stats_id = extract<list>(list_stats[id]);
-    int n_samples = len(list_stats_id);
-    std::vector<boost::shared_ptr<bob::machine::GMMStats> > gmm_stats_id;
-    for(int s=0; s<n_samples; ++s)
-      gmm_stats_id.push_back(extract<boost::shared_ptr<bob::machine::GMMStats> >(list_stats_id[s]));
-    gmm_stats.push_back(gmm_stats_id);
-  }
-
+  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
+  extractGMMStatsVectors(list_stats, gmm_stats);
   // Calls the train function
   t.updateY(gmm_stats);
 }
 
 static void jfa_updateZ(train::JFABaseTrainer& t, list list_stats)
 {
-  int n_ids = len(list_stats);
-  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > gmm_stats;
-
-  // Extracts the vector of vector of pointers from the python list of lists
-  for(int id=0; id<n_ids; ++id) {
-    list list_stats_id = extract<list>(list_stats[id]);
-    int n_samples = len(list_stats_id);
-    std::vector<boost::shared_ptr<bob::machine::GMMStats> > gmm_stats_id;
-    for(int s=0; s<n_samples; ++s)
-      gmm_stats_id.push_back(extract<boost::shared_ptr<bob::machine::GMMStats> >(list_stats_id[s]));
-    gmm_stats.push_back(gmm_stats_id);
-  }
-
+  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
+  extractGMMStatsVectors(list_stats, gmm_stats);
   // Calls the train function
   t.updateZ(gmm_stats);
 }
 
 static void jfa_updateU(train::JFABaseTrainer& t, list list_stats)
 {
-  int n_ids = len(list_stats);
-  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > gmm_stats;
-
-  // Extracts the vector of vector of pointers from the python list of lists
-  for(int id=0; id<n_ids; ++id) {
-    list list_stats_id = extract<list>(list_stats[id]);
-    int n_samples = len(list_stats_id);
-    std::vector<boost::shared_ptr<bob::machine::GMMStats> > gmm_stats_id;
-    for(int s=0; s<n_samples; ++s)
-      gmm_stats_id.push_back(extract<boost::shared_ptr<bob::machine::GMMStats> >(list_stats_id[s]));
-    gmm_stats.push_back(gmm_stats_id);
-  }
-
+  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
+  extractGMMStatsVectors(list_stats, gmm_stats);
   // Calls the train function
   t.updateU(gmm_stats);
 }
 
 static void jfa_updateV(train::JFABaseTrainer& t, list list_stats)
 {
-  int n_ids = len(list_stats);
-  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > gmm_stats;
-
-  // Extracts the vector of vector of pointers from the python list of lists
-  for(int id=0; id<n_ids; ++id) {
-    list list_stats_id = extract<list>(list_stats[id]);
-    int n_samples = len(list_stats_id);
-    std::vector<boost::shared_ptr<bob::machine::GMMStats> > gmm_stats_id;
-    for(int s=0; s<n_samples; ++s)
-      gmm_stats_id.push_back(extract<boost::shared_ptr<bob::machine::GMMStats> >(list_stats_id[s]));
-    gmm_stats.push_back(gmm_stats_id);
-  }
-
+  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
+  extractGMMStatsVectors(list_stats, gmm_stats);
   // Calls the train function
   t.updateV(gmm_stats);
 }
 
 static void jfa_updateD(train::JFABaseTrainer& t, list list_stats)
 {
-  int n_ids = len(list_stats);
-  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > gmm_stats;
-
-  // Extracts the vector of vector of pointers from the python list of lists
-  for(int id=0; id<n_ids; ++id) {
-    list list_stats_id = extract<list>(list_stats[id]);
-    int n_samples = len(list_stats_id);
-    std::vector<boost::shared_ptr<bob::machine::GMMStats> > gmm_stats_id;
-    for(int s=0; s<n_samples; ++s)
-      gmm_stats_id.push_back(extract<boost::shared_ptr<bob::machine::GMMStats> >(list_stats_id[s]));
-    gmm_stats.push_back(gmm_stats_id);
-  }
-
+  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
+  extractGMMStatsVectors(list_stats, gmm_stats);
   // Calls the train function
   t.updateD(gmm_stats);
 }
