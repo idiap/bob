@@ -157,7 +157,7 @@ BOOST_AUTO_TEST_CASE( test_estimateZandD )
 
   checkBlitzClose(z, z_ref, eps);
 }
-
+/*
 BOOST_AUTO_TEST_CASE( test_JFATrainer_updateYandV )
 {
   std::vector<blitz::Array<double,2> > Ft;
@@ -489,5 +489,5 @@ BOOST_AUTO_TEST_CASE( test_JFATrainer_enrol )
 //  std::cout << sample.n << sample.sumPx;
   jfa_m.forward(sample_, score);
 }
-
+*/
 BOOST_AUTO_TEST_SUITE_END()

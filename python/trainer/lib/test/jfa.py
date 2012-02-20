@@ -169,6 +169,23 @@ class JFATrainerTest(unittest.TestCase):
     N2 = numpy.array([0.1069, 0.9397, 0.6164, 0.3545]).reshape((2,2))
     N=[N1, N2]
 
+    gs11 = bob.machine.GMMStats(2,3)
+    gs11.n = N1[:,0]
+    gs11.sumPx = F1[:,0].reshape(2,3)
+    gs12 = bob.machine.GMMStats(2,3)
+    gs12.n = N1[:,1]
+    gs12.sumPx = F1[:,1].reshape(2,3)
+
+    gs21 = bob.machine.GMMStats(2,3)
+    gs21.n = N2[:,0]
+    gs21.sumPx = F2[:,0].reshape(2,3)
+    gs22 = bob.machine.GMMStats(2,3)
+    gs22.n = N2[:,1]
+    gs22.sumPx = F2[:,1].reshape(2,3)
+
+    vec = [[gs11, gs12], [gs21, gs22]]
+
+
     m = numpy.array([0.1806, 0.0451, 0.7232, 0.3474, 0.6606, 0.3839])
     E = numpy.array([0.6273, 0.0216, 0.9106, 0.8006, 0.7458, 0.8131])
     d = numpy.array([0.4106, 0.9843, 0.9456, 0.6766, 0.9883, 0.7668])
@@ -201,14 +218,13 @@ class JFATrainerTest(unittest.TestCase):
     jfam.D = d
     jfat = bob.trainer.JFABaseTrainer(jfam)
 
-    jfat.setStatistics(N, F)
+    jfat.initNid(vec)
+    jfat.precomputeSumStatisticsN(vec)
+    jfat.precomputeSumStatisticsF(vec)
     jfat.setSpeakerFactors(x,y,z)
 
-    jfat.precomputeSumStatisticsN()
-    jfat.precomputeSumStatisticsF()
-
-    jfat.updateY()
-    jfat.updateV()
+    jfat.updateY(vec)
+    jfat.updateV(vec)
 
     # Expected results(JFA cookbook, matlab)
     self.assertTrue(equals(jfat.Y[0], y3, 2e-4))
@@ -228,6 +244,23 @@ class JFATrainerTest(unittest.TestCase):
     N1 = numpy.array([0.1379, 0.1821, 0.2178, 0.0418]).reshape((2,2))
     N2 = numpy.array([0.1069, 0.9397, 0.6164, 0.3545]).reshape((2,2))
     N=[N1, N2]
+
+    gs11 = bob.machine.GMMStats(2,3)
+    gs11.n = N1[:,0]
+    gs11.sumPx = F1[:,0].reshape(2,3)
+    gs12 = bob.machine.GMMStats(2,3)
+    gs12.n = N1[:,1]
+    gs12.sumPx = F1[:,1].reshape(2,3)
+
+    gs21 = bob.machine.GMMStats(2,3)
+    gs21.n = N2[:,0]
+    gs21.sumPx = F2[:,0].reshape(2,3)
+    gs22 = bob.machine.GMMStats(2,3)
+    gs22.n = N2[:,1]
+    gs22.sumPx = F2[:,1].reshape(2,3)
+
+    vec = [[gs11, gs12], [gs21, gs22]]
+
 
     m = numpy.array([0.1806, 0.0451, 0.7232, 0.3474, 0.6606, 0.3839])
     E = numpy.array([0.6273, 0.0216, 0.9106, 0.8006, 0.7458, 0.8131])
@@ -262,14 +295,13 @@ class JFATrainerTest(unittest.TestCase):
     jfam.D = d
     jfat = bob.trainer.JFABaseTrainer(jfam)
 
-    jfat.setStatistics(N, F)
+    jfat.initNid(vec)
+    jfat.precomputeSumStatisticsN(vec)
+    jfat.precomputeSumStatisticsF(vec)
     jfat.setSpeakerFactors(x,y,z)
 
-    jfat.precomputeSumStatisticsN()
-    jfat.precomputeSumStatisticsF()
-
-    jfat.updateX()
-    jfat.updateU()
+    jfat.updateX(vec)
+    jfat.updateU(vec)
 
     # Expected results(JFA cookbook, matlab)
     self.assertTrue(equals(jfat.X[0], x3, 2e-4))
@@ -289,6 +321,23 @@ class JFATrainerTest(unittest.TestCase):
     N1 = numpy.array([0.1379, 0.1821, 0.2178, 0.0418]).reshape((2,2))
     N2 = numpy.array([0.1069, 0.9397, 0.6164, 0.3545]).reshape((2,2))
     N=[N1, N2]
+
+    gs11 = bob.machine.GMMStats(2,3)
+    gs11.n = N1[:,0]
+    gs11.sumPx = F1[:,0].reshape(2,3)
+    gs12 = bob.machine.GMMStats(2,3)
+    gs12.n = N1[:,1]
+    gs12.sumPx = F1[:,1].reshape(2,3)
+
+    gs21 = bob.machine.GMMStats(2,3)
+    gs21.n = N2[:,0]
+    gs21.sumPx = F2[:,0].reshape(2,3)
+    gs22 = bob.machine.GMMStats(2,3)
+    gs22.n = N2[:,1]
+    gs22.sumPx = F2[:,1].reshape(2,3)
+
+    vec = [[gs11, gs12], [gs21, gs22]]
+
 
     m = numpy.array([0.1806, 0.0451, 0.7232, 0.3474, 0.6606, 0.3839])
     E = numpy.array([0.6273, 0.0216, 0.9106, 0.8006, 0.7458, 0.8131])
@@ -321,14 +370,13 @@ class JFATrainerTest(unittest.TestCase):
     jfam.D = d
     jfat = bob.trainer.JFABaseTrainer(jfam)
 
-    jfat.setStatistics(N, F)
+    jfat.initNid(vec)
+    jfat.precomputeSumStatisticsN(vec)
+    jfat.precomputeSumStatisticsF(vec)
     jfat.setSpeakerFactors(x,y,z)
 
-    jfat.precomputeSumStatisticsN()
-    jfat.precomputeSumStatisticsF()
-
-    jfat.updateZ()
-    jfat.updateD()
+    jfat.updateZ(vec)
+    jfat.updateD(vec)
 
     # Expected results(JFA cookbook, matlab)
     self.assertTrue(equals(jfat.Z[0], z3_ref, 2e-4))
@@ -349,6 +397,23 @@ class JFATrainerTest(unittest.TestCase):
     N2 = numpy.array([0.1069, 0.9397, 0.6164, 0.3545]).reshape((2,2))
     N=[N1, N2]
 
+    gs11 = bob.machine.GMMStats(2,3)
+    gs11.n = N1[:,0]
+    gs11.sumPx = F1[:,0].reshape(2,3)
+    gs12 = bob.machine.GMMStats(2,3)
+    gs12.n = N1[:,1]
+    gs12.sumPx = F1[:,1].reshape(2,3)
+
+    gs21 = bob.machine.GMMStats(2,3)
+    gs21.n = N2[:,0]
+    gs21.sumPx = F2[:,0].reshape(2,3)
+    gs22 = bob.machine.GMMStats(2,3)
+    gs22.n = N2[:,1]
+    gs22.sumPx = F2[:,1].reshape(2,3)
+
+    vec = [[gs11, gs12], [gs21, gs22]]
+
+
     m = numpy.array([0.1806, 0.0451, 0.7232, 0.3474, 0.6606, 0.3839])
     E = numpy.array([0.6273, 0.0216, 0.9106, 0.8006, 0.7458, 0.8131])
     d = numpy.array([0.4106, 0.9843, 0.9456, 0.6766, 0.9883, 0.7668])
@@ -366,7 +431,7 @@ class JFATrainerTest(unittest.TestCase):
     jfam.V = v
     jfam.D = d
     jfat = bob.trainer.JFABaseTrainer(jfam)
-    jfat.train(N,F,5)
+    jfat.train(vec,5)
 
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(JFATrainerTest)
