@@ -77,6 +77,7 @@ set(pysrc
    "lib/script/dbmanage.py"
    "lib/test/__init__.py"
    "lib/test/faceverif_fl.py"
+   "lib/test/nuaa.py"
    "lib/test/replay.py"
    )
 
@@ -208,6 +209,9 @@ bob_python_add_dependent_test(db-multipie-dumplist
 bob_python_add_dependent_test(db-multipie-dumplist2 
   python-db-multipie-instantiation 
   dbmanage.py multipie dumplist --protocol=M --classes=client --groups=dev --purposes=enrol --self-test)
+
+# Nuaa database driver tests.
+bob_python_add_unittest(db lib/test/nuaa.py main)
 
 # SCface database driver tests.
 bob_python_add_dependent_test(db-scface-dumplist 
