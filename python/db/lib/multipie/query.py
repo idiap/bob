@@ -276,8 +276,10 @@ class Database(object):
       a tuple with all possible values.
 
     world_sampling
-      Samples the files from the world data set. Keeps only files such as:
+      Samples the files from the world data set. Keeps only files such as::
+      
         File.client_id + File.shot_id % world_sampling == 0
+
       This argument should be an integer between 1 (keep everything) and 19.
       It is not used if world_noflash is also set.
 
@@ -497,8 +499,10 @@ class Database(object):
       a tuple with all possible values.
 
     world_sampling
-      Samples the files from the world data set. Keeps only files such as:
+      Samples the files from the world data set. Keeps only files such as::
+
         File.client_id + File.shot_id % world_sampling == 0
+
       This argument should be an integer between 1 (keep everything) and 20.
       It is not used if world_noflash is also set.
 
@@ -526,7 +530,6 @@ class Database(object):
     world_fourth
       Only uses data from the fourth recorded session of each user of the world
       dataset.
-
 
     Returns: A dictionary containing the resolved filenames considering all
     the filtering criteria. The keys of the dictionary are unique identities 
@@ -577,7 +580,8 @@ class Database(object):
       - 2: the claimed id attached to the model
       - 3: the real id
       - 4: the "stem" path (basename of the file)
-    considering allthe filtering criteria. The keys of the dictionary are 
+
+    considering all the filtering criteria. The keys of the dictionary are 
     unique identities for each file in the Multi-PIE database. Conserve these 
     numbers if you wish to save processing results later on.
     """
@@ -627,6 +631,7 @@ class Database(object):
       - 2: the claimed id attached to the model
       - 3: the real id
       - 4: the "stem" path (basename of the file)
+
     considering allthe filtering criteria. The keys of the dictionary are 
     unique identities for each file in the Multi-PIE database. Conserve these 
     numbers if you wish to save processing results later on.
@@ -671,6 +676,7 @@ class Database(object):
       - 0: the resolved filenames 
       - 1: the client id
       - 2: the "stem" path (basename of the file)
+
     considering allthe filtering criteria. The keys of the dictionary are 
     unique identities for each file in the Multi-PIE database. Conserve these
     numbers if you wish to save processing results later on.
@@ -725,6 +731,7 @@ class Database(object):
       - 0: the resolved filenames 
       - 1: the client id
       - 2: the "stem" path (basename of the file)
+
     considering allthe filtering criteria. The keys of the dictionary are 
     unique identities for each file in the Multi-PIE database. Conserve these 
     numbers if you wish to save processing results later on.
