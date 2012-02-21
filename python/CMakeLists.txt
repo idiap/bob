@@ -39,11 +39,9 @@ if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
   add_subdirectory(trainer)
   add_subdirectory(face_verification)
 
-  if (NOT QT4_FOUND)
-    message(STATUS "Qt4 NOT FOUND, supressing visioner-python from build")
-  else (NOT QT4_FOUND)
+  if (VISIONER_FOUND)
     add_subdirectory(visioner)
     add_subdirectory(daq)
-  endif (NOT QT4_FOUND)
+  endif()
 
 endif (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
