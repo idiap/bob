@@ -34,7 +34,7 @@ class Database(object):
       A filename extension that will be appended to the final filepath returned
 
     groups
-      One of the protocolar subgroups of data as returned by groups() or a
+      One of the protocolar subgroups of data as specified in the tuple groups, or a
       tuple with several of them.  If you set this parameter to an empty string
       or the value None, we use reset it to the default which is to get all.
 
@@ -84,7 +84,7 @@ class Database(object):
     retval = {}
     key = 0
     
-    # because of couple of non-uniformities in the naming sysstem in the database, we need to introduce these dictionaries to convert between names
+    # because of couple of non-uniformities in the naming system in the database, we need to introduce these dictionaries to convert between names
     version_dict = {'raw':'raw', 'detected_face':'Detectedface', 'normalized_face':'NormalizedFace'}
     version_dict_1 = {'raw':'Raw', 'detected_face':'Face', 'normalized_face':'Normalized'}
     cls_dict = {'attack':'Imposter', 'real':'Client'}
@@ -104,6 +104,50 @@ class Database(object):
             retval[key] = make_path(os.path.join(filesdir, name), directory, extension)
             key = key + 1
     return retval
+
+  def filter_files(self, filenames, client_no=None, glasses=None, conditions=None, session=None):
+    """ Filters the filenaames in a dictionary and returns a filtered dictionary which contains only the images with the specified criteria.
+
+    Keyword Parameters:
+
+    filenames
+      A dictionary with filenames (most probably obtained using the files() method).
+
+    client_no 
+      The number of the client. A string (or tuple of strings) with values from '0001'-'0016'
+
+    glasses
+      A string (or tuple of strings) with value '00' for clients with glasses and '01' for cleints without glasses
+
+    conditions
+      A string (or tuple of strings) with values '00'-'08' for various combinations of lighting conditions and spoofing images poses
+
+    session
+      A string (or tuple of strings) with values '01'-'03' for three different sessions
+    """
+    retval = {}
+    newkey = 0
+    for key, filename in filenames.items():
+      short_filename = filename.rpartition('/')[2] # just the filename (without the full path)
+      stems = short_filename.split('_')
+      if client_no != None:
+        if stems[0] not in client_no:
+          continue
+      if glasses != None:
+        if stems[1] not in glasses:
+          continue
+      if conditions != None:
+        if stems[2] not in conditions:
+          continue
+      if session != None:
+        if stems[3] not in session:
+          continue
+      newkey = newkey + 1
+      retval[newkey] = filename
+        
+    return retval  
+
+
 
   def save_one(self, filename, obj, directory, extension):
     """Saves a single object supporting the bob save() protocol.
