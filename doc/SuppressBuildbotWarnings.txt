@@ -1,2 +1,2 @@
 # Warnings that should be suppressed at Buildbot - no solution for those...
-.*:\s*arg is not a Python function\s*$
+.* : .*arg is not a Python function.*
