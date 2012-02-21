@@ -580,7 +580,6 @@ class Database(object):
       - 2: the claimed id attached to the model
       - 3: the real id
       - 4: the "stem" path (basename of the file)
-
     considering all the filtering criteria. The keys of the dictionary are 
     unique identities for each file in the Multi-PIE database. Conserve these 
     numbers if you wish to save processing results later on.
