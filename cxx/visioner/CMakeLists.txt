@@ -5,9 +5,9 @@ include("ExternalProject")
 
 if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/project/CMakeLists.txt)
 
-  message(WARNING "warning: you should do 'git submodule init; git submodule update' on the root of bob before attempting to run a build, if you want the visioner bridge to be included. I'm disabling it for the time being. Re-run cmake to add it back after a proper initialization.")
+  message(WARNING "warning: you should do 'git submodule init; git submodule update' on the root of bob before attempting to run a build that includes the visioner. I'm disabling it for the time being. Re-run cmake to add it back after a proper initialization if you require that functionality.")
 
-  set(VISIONER_FOUND OFF)
+  set(BOB_VISIONER_ENABLED OFF PARENT_SCOPE)
 
 else(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/project/CMakeLists.txt)
 
@@ -18,7 +18,7 @@ else(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/project/CMakeLists.txt)
     INSTALL_DIR ${CMAKE_BINARY_DIR}
     )
 
-  set(VISIONER_FOUND ON)
+  set(BOB_VISIONER_ENABLED ON PARENT_SCOPE)
 
   add_dependencies(visioner bob_lbfgs)
 

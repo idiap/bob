@@ -15,13 +15,12 @@ add_subdirectory(machine)
 add_subdirectory(trainer)
 
 if (NOT QT4_FOUND)
-  set(VISIONER_FOUND OFF)
-  message(STATUS "Qt4 NOT FOUND, supressing Visioner from build")
+  set(BOB_VISIONER_ENABLED OFF)
 else (NOT QT4_FOUND)
-  set(VISIONER_FOUND ON)
   add_subdirectory(visioner) #visioner package may override VISIONER_FOUND
+  set(BOB_VISIONER_ENABLED ${BOB_VISIONER_ENABLED} PARENT_SCOPE) #escalate
 endif (NOT QT4_FOUND)
 
-if (VISIONER_FOUND)
+if (BOB_VISIONER_ENABLED)
   add_subdirectory(daq)
-endif (VISIONER_FOUND)
+endif ()
