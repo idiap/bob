@@ -20,14 +20,14 @@ if(APPLE)
 endif()
 
 string(TOLOWER "${BOB_SYSTEM_NAME}-${BOB_SYSTEM_PROCESSOR}-${CMAKE_BUILD_TYPE}" BOB_PLATFORM_STR)
-set(BOB_PLATFORM "${BOB_PLATFORM_STR}" CACHE ON "The name of the platform Bob is being built to")
+set(BOB_PLATFORM "${BOB_PLATFORM_STR}" CACHE STRING "The name of the platform Bob is being built to")
 
 execute_process(COMMAND ${CMAKE_SOURCE_DIR}/bin/bob-version.sh OUTPUT_VARIABLE BOB_DISCOVERED_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-set(BOB_VERSION "${BOB_DISCOVERED_VERSION}" CACHE ON "The version of Bob that is currently being built")
+set(BOB_VERSION_INTERNAL "${BOB_DISCOVERED_VERSION}" CACHE STRING "The version of Bob that is currently being built")
 message(STATUS "Bob version '${BOB_VERSION}' (${BOB_PLATFORM_STR})")
 
 # TODO: This needs to be correctly set to the version supported by this build!
-set(BOB_DATABASE_VERSION "nightlies/last" CACHE ON "Version of the databases to download")
+set(BOB_DATABASE_VERSION "nightlies/last" CACHE STRING "Version of the databases to download")
 
 option(BOB_BUILD_CXX "Builds the C++ infrastructure." ON)
 
@@ -36,7 +36,7 @@ option(BOB_BUILD_CXX "Builds the C++ infrastructure." ON)
 # bit.
 option(BOB_BUILD_PYTHON "Builds the python bindings." ON)
 
-set(BOB_DATABASE_URL "http://www.idiap.ch/software/bob/databases/" CACHE ON "Where to download databases from. If this variable is set empty, then we try to create the databases instead.")
+set(BOB_DATABASE_URL "http://www.idiap.ch/software/bob/databases/" CACHE STRING "Where to download databases from. If this variable is set empty, then we try to create the databases instead.")
 
 # ---------------
 # END of options.

@@ -424,42 +424,6 @@ class JFABaseTrainer: public JFABaseTrainerBase
       */
     void initializeVD_ISV(const double relevance_factor);
 
-
-    /**
-      * For debugging only
-      */
-    const blitz::Array<double,2>& getVtSigmaInv() const
-    { return m_cache_VtSigmaInv; }
-    const blitz::Array<double,2>& getIdPlusVProd_i() const
-    { return m_cache_IdPlusVProd_i; }
-    const blitz::Array<double,1>& getFn_y_i() const
-    { return m_cache_Fn_y_i; }
-    const blitz::Array<double,3>& getA1_y() const
-    { return m_cache_A1_y; }
-    const blitz::Array<double,2>& getA2_y() const
-    { return m_cache_A2_y; }
-    blitz::Array<double,2>& updateVtSigmaInv()
-    { return m_cache_VtSigmaInv; }
-    blitz::Array<double,2>& updateIdPlusVProd_i()
-    { return m_cache_IdPlusVProd_i; }
-    blitz::Array<double,1>& updateFn_y_i()
-    { return m_cache_Fn_y_i; }
-    blitz::Array<double,3>& updateA1_y()
-    { return m_cache_A1_y; }
-    blitz::Array<double,2>& updateA2_y()
-    { return m_cache_A2_y; }
-    void setVtSigmaInv(const blitz::Array<double,2>& VtSigmaInv)
-    { m_cache_VtSigmaInv.reference(bob::core::array::ccopy(VtSigmaInv)); }
-    void setIdPlusVProd_i(const blitz::Array<double,2>& IdPlusVProd_i)
-    { m_cache_IdPlusVProd_i.reference(bob::core::array::ccopy(IdPlusVProd_i)); }
-    void setFn_y_i(const blitz::Array<double,1>& Fn_y_i)
-    { m_cache_Fn_y_i.reference(bob::core::array::ccopy(Fn_y_i)); }
-    void setA1_y(const blitz::Array<double,3>& A1_y)
-    { m_cache_A1_y.reference(bob::core::array::ccopy(A1_y)); }
-    void setA2_y(const blitz::Array<double,2>& A2_y)
-    { m_cache_A2_y.reference(bob::core::array::ccopy(A2_y)); }
-
-
   private:
     // Cache/Precomputation
     blitz::Array<double,2> m_cache_VtSigmaInv; // Vt * diag(sigma)^-1

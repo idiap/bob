@@ -2,7 +2,7 @@
 .. Andre Anjos <andre.anjos@idiap.ch>
 .. Wed Jan 11 14:43:35 2012 +0100
 .. 
-.. Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+.. Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
 .. 
 .. This program is free software: you can redistribute it and/or modify
 .. it under the terms of the GNU General Public License as published by
@@ -388,21 +388,91 @@ in the destination machine before using it. Just execute:
 
 .. code-block:: sh
    
-   $ cd bob-x.y
-   $ bin/debug.sh
-   # or
-   $ bin/release.sh
+   $ cd bob
+   $ mkdir build
+   $ cd build
+   $ cmake CMAKE_BUILD_TYPE=release ..
+   $ make
 
-This will compile and install (under the directory `install` in the current
-working directory) all libraries, executables and headers available in
-|project|. You can fine tune the behavior of these shell scripts by looking up
-its help message:
+The documentation can be generated with other specific make targets:
 
 .. code-block:: sh
 
-   $ bin/debug.sh --help
-   # or
-   $ bin/release.sh --help
+   $ make doxygen #generates the C++ API documentation
+   $ make sphinx #generates the user guide
+
+You don't need to to install |project| to use it. If you wish to do it though,
+you need to do it by calling ``make`` again:
+
+.. code-block:: sh
+
+  $ make install
+  $ make doxygen-install
+  $ make sphinx-install
+
+The installation base directory is set to cmake's default, which is usually on
+an administrator restricted area, such as ``/usr/local``. If you wish to install
+the build in a different directory, you need to tell ``cmake`` the installation
+prefix:
+
+.. code-block:: sh
+
+  # installs on ../install
+  $ cmake CMAKE_BUILD_TYPE=release CMAKE_INSTALL_PREFIX=../install 
+  $ make
+  $ make install
+
+Using |project|
+---------------
+
+Using shipped scripts or binaries is one step away after building. For example:
+
+.. code-block:: sh
+
+  $ bin/bob_config.py
+
+The scripts and binaries that are shipped with |project| will be configured
+during the build to search for |project| at the build or installation
+directories. 
+
+If you installed |project| with administrator priviledges, then using bob is as
+simple as importing it in your scripts. Here is an example:
+
+.. code-block:: sh
+
+  $ python
+  ...
+  >>> import bob
+  >>> print bob.build.version
+
+If you decided to either use |project| from the build location (without
+properly installing it) or in case you don't have administrative priviledges on
+the machine you have |project| installed, you must check a few things:
+
+  1. You must use the **same** version of python that was used to compile
+     |project|. If you use the wrong version, crazy things may happen.
+  2. Append the location of the built or installed libraries to your
+     PYTHONPATH, so the interpreter can find |project|.
+
+Example:
+
+.. code-block:: sh
+
+  $ cd build
+  $ PYTHONPATH=lib/python2.6 python2.6
+  ...
+  >>> import bob
+
+We do provide an automated wrapper called `bin/shell.py` that does the above
+for your automatically. The wrapper contains hard-coded paths to the build or
+installation directories, so you don't need to worry about anything:
+
+.. code-block:: sh
+
+  $ cd build
+  $ bin/shell.py python
+  ...
+  >>> import bob
 
 Troubleshooting compilation
 ===========================

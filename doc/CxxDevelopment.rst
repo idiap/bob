@@ -2,7 +2,7 @@
 .. Andre Anjos <andre.anjos@idiap.ch>
 .. Wed Jan 11 14:43:35 2012 +0100
 .. 
-.. Copyright (C) 2011-2012 Idiap Reasearch Institute, Martigny, Switzerland
+.. Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
 .. 
 .. This program is free software: you can redistribute it and/or modify
 .. it under the terms of the GNU General Public License as published by
@@ -17,81 +17,8 @@
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =================
- Using |project|
+ C++ development
 =================
-
-To setup a working environment at your present shell, do:
-
-.. code-block:: sh
-
-  $ bob-x.y/bin/shell.py
-
-These instructions will create a clone of your current shell with the bob
-environment **appended** so your applications can find our libraries and
-executables. Would you need to use the debug version of the code, add a ``-d``
-(or ``--debug``) to the source command line:
-
-.. code-block:: sh
-
-  $ bob-x.y/bin/shell.py -d
-
-You can use scripts like these to keep programs and setup together. Or else, to
-simplify batch job submission.
-
-Debug environments can be useful if you need to run a debugger session or to
-send us a core dump with embedded debugging symbols.
-
-Starting programs in |project|-enabled environments
----------------------------------------------------
-
-Sometimes you just want to execute one particular program in a
-|project|-enabled environment and, when you leave it, you have your previous
-environment back.  You can use the setup program ``shell.py`` for that purpose
-as well. For example, if you want to start the python interpreter within a
-|project|-enabled environment just do:
-
-.. code-block:: sh
-
-  $ bob-x.y/bin/shell.py -- python
-
-When you leave the python prompt, your environment will be back to the previous
-state.
-
-Creating complete self-contained scripts
-----------------------------------------
-
-You can also create scripts that can run standalone and require no
-configuration using the `Shebang`_ OS functionality. Unfortunately,
-such a functionality is not standardized and is OS dependent (see `Shebang
-variations`_). Here is an example of a python script that executes in a
-|project|-enabled environment under *Linux*:
-
-.. code-block:: python
-
-  #!/WORKDIR/bob-x.y/bin/shell.py -- python
-  import bob
-  print bob.io.Array([1,2,3])
-
-Here is another one that is just a shell script using ``bash``:
-
-.. code-block:: sh
-
-  #!/WORKDIR/bob-x.y/bin/shell.py --debug -- bash
-  echo $BOB_PLATFORM
-
-.. note::
-
-  Under BSD/MacOSX the ``/usr/bin/env`` works (as expected) breaking up the
-  arguments, so should be used instead of the single shebang line showed above.
-  Here is an example:
-
-  .. code-block:: sh
-
-    #!/usr/bin/env /WORKDIR/bob-x.y/bin/shell.py --debug -- python
-    echo $BOB_PLATFORM
-
-C++ development
----------------
 
 .. note::
 
@@ -105,7 +32,7 @@ If you need to make an include, do it in this way:
 
 .. code-block:: c++
 
-   #include <ip/Image.h>
+   #include <io/Video.h>
 
 Using |project| code
 ====================
@@ -179,23 +106,6 @@ you need external dependencies) using CMake standard commands like
    add_definitions("-DHAS_EXTERNAL_LIB1=1" "-DHAS_EXTERNAL_LIB2")
    bob_add_executable(my_example "source1.cc;source2.cc" "ip;scanning")
    target_link_libraries(my_example "MyExternal1;MyExternal2")
-
-Python development
-------------------
-
-Writing python code is easier than C++ because you can skip the compile-debug
-loops. To be able to use |project| constructions, just call python.
-
-.. code-block:: python
-
-   >>> import bob
-
-We have taken care to document all imported types using the native python help
-system, so ``help()`` is your friend. Use it.
-
-.. code-block:: python
-
-   >>> help(bob.io.Video)
 
 .. Place here references to all citations in lower case
 
