@@ -32,6 +32,51 @@ namespace mach = bob::machine;
 namespace tp = bob::python;
 namespace ca = bob::core::array;
 
+
+static void update_eigen(tp::const_ndarray A, tp::const_ndarray C, 
+    tp::ndarray uv) {
+  blitz::Array<double,2> uv_ = uv.bz<double,2>();
+  train::jfa::updateEigen(A.bz<double,3>(), C.bz<double,2>(), uv_);
+}
+
+static void estimate_xandu(tp::const_ndarray F, tp::const_ndarray N,
+    tp::const_ndarray m, tp::const_ndarray E,
+    tp::const_ndarray d, tp::const_ndarray v,
+    tp::const_ndarray u, tp::const_ndarray z,
+    tp::const_ndarray y, tp::ndarray x,
+    tp::const_ndarray spk_ids) {
+  blitz::Array<double,2> x_ = x.bz<double,2>();
+  train::jfa::estimateXandU(F.bz<double,2>(), N.bz<double,2>(),
+      m.bz<double,1>(), E.bz<double,1>(), d.bz<double,1>(), v.bz<double,2>(),
+      u.bz<double,2>(), z.bz<double,2>(), y.bz<double,2>(), x_,
+      spk_ids.bz<uint32_t,1>());
+}
+
+static void estimate_yandv(tp::const_ndarray F, tp::const_ndarray N,
+  tp::const_ndarray m, tp::const_ndarray E, 
+  tp::const_ndarray d, tp::const_ndarray v, 
+  tp::const_ndarray u, tp::const_ndarray z, 
+  tp::ndarray y, tp::const_ndarray x, tp::const_ndarray spk_ids) {
+  blitz::Array<double,2> y_ = y.bz<double,2>();
+  train::jfa::estimateYandV(F.bz<double,2>(), N.bz<double,2>(),
+      m.bz<double,1>(), E.bz<double,1>(), d.bz<double,1>(), v.bz<double,2>(),
+      u.bz<double,2>(), z.bz<double,2>(), y_, x.bz<double,2>(), 
+      spk_ids.bz<uint32_t,1>());
+}
+
+static void estimate_zandd(tp::const_ndarray F, tp::const_ndarray N,
+  tp::const_ndarray m, tp::const_ndarray E,
+  tp::const_ndarray d, tp::const_ndarray v,
+  tp::const_ndarray u, tp::ndarray z,
+  tp::const_ndarray y, tp::const_ndarray x,
+  tp::const_ndarray spk_ids) {
+  blitz::Array<double,2> z_ = z.bz<double,2>();
+  train::jfa::estimateZandD(F.bz<double,2>(), N.bz<double,2>(),
+      m.bz<double,1>(), E.bz<double,1>(), d.bz<double,1>(), v.bz<double,2>(),
+      u.bz<double,2>(), z_, y.bz<double,2>(), x.bz<double,2>(),
+      spk_ids.bz<uint32_t,1>());
+}
+
 static void extractGMMStatsVectors(list list_stats, 
   std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > >& gmm_stats)
 {
@@ -98,49 +143,6 @@ static void jfa_enrol(train::JFATrainer& t, list stats, const size_t n_iter)
   t.enrol(gmm_stats, n_iter);
 }
 
-static void update_eigen(tp::const_ndarray A, tp::const_ndarray C, 
-    tp::ndarray uv) {
-  blitz::Array<double,2> uv_ = uv.bz<double,2>();
-  train::jfa::updateEigen(A.bz<double,3>(), C.bz<double,2>(), uv_);
-}
-
-static void estimate_xandu(tp::const_ndarray F, tp::const_ndarray N,
-    tp::const_ndarray m, tp::const_ndarray E,
-    tp::const_ndarray d, tp::const_ndarray v,
-    tp::const_ndarray u, tp::const_ndarray z,
-    tp::const_ndarray y, tp::ndarray x,
-    tp::const_ndarray spk_ids) {
-  blitz::Array<double,2> x_ = x.bz<double,2>();
-  train::jfa::estimateXandU(F.bz<double,2>(), N.bz<double,2>(),
-      m.bz<double,1>(), E.bz<double,1>(), d.bz<double,1>(), v.bz<double,2>(),
-      u.bz<double,2>(), z.bz<double,2>(), y.bz<double,2>(), x_,
-      spk_ids.bz<uint32_t,1>());
-}
-
-static void estimate_yandv(tp::const_ndarray F, tp::const_ndarray N,
-  tp::const_ndarray m, tp::const_ndarray E, 
-  tp::const_ndarray d, tp::const_ndarray v, 
-  tp::const_ndarray u, tp::const_ndarray z, 
-  tp::ndarray y, tp::const_ndarray x, tp::const_ndarray spk_ids) {
-  blitz::Array<double,2> y_ = y.bz<double,2>();
-  train::jfa::estimateYandV(F.bz<double,2>(), N.bz<double,2>(),
-      m.bz<double,1>(), E.bz<double,1>(), d.bz<double,1>(), v.bz<double,2>(),
-      u.bz<double,2>(), z.bz<double,2>(), y_, x.bz<double,2>(), 
-      spk_ids.bz<uint32_t,1>());
-}
-
-static void estimate_zandd(tp::const_ndarray F, tp::const_ndarray N,
-  tp::const_ndarray m, tp::const_ndarray E,
-  tp::const_ndarray d, tp::const_ndarray v,
-  tp::const_ndarray u, tp::ndarray z,
-  tp::const_ndarray y, tp::const_ndarray x,
-  tp::const_ndarray spk_ids) {
-  blitz::Array<double,2> z_ = z.bz<double,2>();
-  train::jfa::estimateZandD(F.bz<double,2>(), N.bz<double,2>(),
-      m.bz<double,1>(), E.bz<double,1>(), d.bz<double,1>(), v.bz<double,2>(),
-      u.bz<double,2>(), z_, y.bz<double,2>(), x.bz<double,2>(),
-      spk_ids.bz<uint32_t,1>());
-}
 
 template <typename T, int N>
 tuple as_tuple (const std::vector<blitz::Array<T,N> >& obj) {
@@ -273,50 +275,32 @@ void bind_trainer_jfa() {
   def("jfa_estimateZandD", &estimate_zandd, (arg("F"), arg("N"), arg("m"), arg("E"), arg("d"), arg("v"), arg("u"), arg("z"), arg("y"), arg("x"), arg("spk_ids")), "Estimates the speaker factors z.");
 
   class_<train::JFABaseTrainerBase, boost::noncopyable>("JFABaseTrainerBase", "Create a trainer for the JFA.", init<mach::JFABaseMachine&>((arg("jfa_base")),"Initializes a new JFABaseTrainerBase."))
-    .add_property("X", &get_x, &train::JFABaseTrainerBase::setX)
-    .add_property("Y", &get_y, &train::JFABaseTrainerBase::setY)
-    .add_property("Z", &get_z, &train::JFABaseTrainerBase::setZ)
-    .def("setSpeakerFactors", &jfa_set_speaker_factors, (arg("self"), arg("x"), arg("y"), arg("z")), "Set the speaker factors.")
-    .def("initializeRandomU", &train::JFABaseTrainerBase::initializeRandomU, (arg("self")), "Initializes randomly U.")
-    .def("initializeRandomV", &train::JFABaseTrainerBase::initializeRandomV, (arg("self")), "Initializes randomly V.")
-    .def("initializeRandomD", &train::JFABaseTrainerBase::initializeRandomD, (arg("self")), "Initializes randomly D.")
-    .def("initializeUVD", &train::JFABaseTrainerBase::initializeUVD, (arg("self")), "Initializes randomly U, V and D.")
-    .def("initNid", &jfa_initNid, (arg("self"), arg("stats")), "Initializes the number of identities.")
-    .def("precomputeSumStatisticsN", &jfa_precomputeN, (arg("self"), arg("stats")), "Precomputes zeroth order statistics over sessions.")
-    .def("precomputeSumStatisticsF", &jfa_precomputeF, (arg("self"), arg("stats")), "Precomputes first order statistics over sessions.")
+    .add_property("__X__", &get_x, &train::JFABaseTrainerBase::setX)
+    .add_property("__Y__", &get_y, &train::JFABaseTrainerBase::setY)
+    .add_property("__Z__", &get_z, &train::JFABaseTrainerBase::setZ)
+    .def("__setSpeakerFactors__", &jfa_set_speaker_factors, (arg("self"), arg("x"), arg("y"), arg("z")), "Set the speaker factors.")
+    .def("__initializeRandomU__", &train::JFABaseTrainerBase::initializeRandomU, (arg("self")), "Initializes randomly U.")
+    .def("__initializeRandomV__", &train::JFABaseTrainerBase::initializeRandomV, (arg("self")), "Initializes randomly V.")
+    .def("__initializeRandomD__", &train::JFABaseTrainerBase::initializeRandomD, (arg("self")), "Initializes randomly D.")
+    .def("__initializeUVD__", &train::JFABaseTrainerBase::initializeUVD, (arg("self")), "Initializes randomly U, V and D.")
+    .def("__initNid__", &jfa_initNid, (arg("self"), arg("stats")), "Initializes the number of identities.")
+    .def("__precomputeSumStatisticsN__", &jfa_precomputeN, (arg("self"), arg("stats")), "Precomputes zeroth order statistics over sessions.")
+    .def("__precomputeSumStatisticsF__", &jfa_precomputeF, (arg("self"), arg("stats")), "Precomputes first order statistics over sessions.")
   ;
 
 
   class_<train::JFABaseTrainer, boost::noncopyable, bases<train::JFABaseTrainerBase> >("JFABaseTrainer", "Create a trainer for the JFA.", init<mach::JFABaseMachine&>((arg("jfa_base")),"Initializes a new JFABaseTrainer."))
-    .add_property("VtSigmaInv", make_function(&train::JFABaseTrainer::getVtSigmaInv, return_value_policy<copy_const_reference>()), &train::JFABaseTrainer::setVtSigmaInv)
-    .add_property("IdPlusVProd_i", make_function(&train::JFABaseTrainer::getIdPlusVProd_i, return_value_policy<copy_const_reference>()), &train::JFABaseTrainer::setIdPlusVProd_i)
-    .add_property("Fn_y_i", make_function(&train::JFABaseTrainer::getFn_y_i, return_value_policy<copy_const_reference>()), &train::JFABaseTrainer::setFn_y_i)
-    .add_property("A1_y", make_function(&train::JFABaseTrainer::getA1_y, return_value_policy<copy_const_reference>()), &train::JFABaseTrainer::setA1_y)
-    .add_property("A2_y", make_function(&train::JFABaseTrainer::getA2_y, return_value_policy<copy_const_reference>()), &train::JFABaseTrainer::setA2_y)
     .def("train", &jfa_train, (arg("self"), arg("gmm_stats"), arg("n_iter")), "Call the training procedure.")
     .def("trainNoInit", &jfa_train_noinit, (arg("self"), arg("gmm_stats"), arg("n_iter")), "Call the training procedure.")
     .def("trainISV", &jfa_train_ISV, (arg("self"), arg("gmm_stats"), arg("n_iter"), arg("relevance")), "Call the ISV training procedure.")
     .def("trainISVNoInit", &jfa_train_ISV_noinit, (arg("self"), arg("gmm_stats"), arg("n_iter"), arg("relevance")), "Call the ISV training procedure.")
-    .def("initializeVD_ISV", &train::JFABaseTrainer::initializeVD_ISV, (arg("self"), arg("relevance factor")), "Initializes V=0 and D=sqrt(var(UBM)/r) (for ISV).")
-    .def("computeVtSigmaInv", &train::JFABaseTrainer::computeVtSigmaInv, (arg("self")), "Computes Vt*SigmaInv.")
-    .def("computeVProd", &train::JFABaseTrainer::computeVProd, (arg("self")), "Computes VProd.")
-    .def("computeIdPlusVProd_i", &train::JFABaseTrainer::computeIdPlusVProd_i, (arg("self"), arg("id")), "Computes IdPlusVProd_i.")
-    .def("computeFn_y_i", &train::JFABaseTrainer::computeFn_y_i, (arg("self"), arg("id")), "Computes Fn_y_i.")
-    .def("updateY_i", &train::JFABaseTrainer::updateY_i, (arg("self"), arg("id")), "Updates Y_i.")
-    .def("updateY", &jfa_updateY, (arg("self"), arg("stats")), "Updates Y.")
-    .def("updateV", &jfa_updateV, (arg("self"), arg("stats")), "Updates V.")
-    .def("computeUtSigmaInv", &train::JFABaseTrainer::computeUtSigmaInv, (arg("self")), "Computes Ut*SigmaInv.")
-    .def("computeIdPlusUProd_ih", &train::JFABaseTrainer::computeIdPlusUProd_ih, (arg("self"), arg("id"), arg("h")), "Computes IdPlusUProd_ih.")
-    .def("computeFn_x_ih", &train::JFABaseTrainer::computeFn_x_ih, (arg("self"), arg("id"), arg("h")), "Computes Fn_x_ih.")
-    .def("updateX_ih", &train::JFABaseTrainer::updateX_ih, (arg("self"), arg("id"), arg("h")), "Updates X_ih.")
-    .def("updateX", &jfa_updateX, (arg("self"), arg("stats")), "Updates X.")
-    .def("updateU", &jfa_updateU, (arg("self"), arg("stats")), "Updates U.")
-    .def("computeDtSigmaInv", &train::JFABaseTrainer::computeDtSigmaInv, (arg("self")), "Computes Dt*SigmaInv.")
-    .def("computeIdPlusDProd_i", &train::JFABaseTrainer::computeIdPlusDProd_i, (arg("self"), arg("id")), "Computes IdPlusDProd_i.")
-    .def("computeFn_z_i", &train::JFABaseTrainer::computeFn_z_i, (arg("self"), arg("id")), "Computes Fn_z_i.")
-    .def("updateZ_i", &train::JFABaseTrainer::updateZ_i, (arg("self"), arg("id")), "Updates Z_i.")
-    .def("updateZ", &jfa_updateZ, (arg("self"), arg("stats")), "Updates Z.")
-    .def("updateD", &jfa_updateD, (arg("self"), arg("stats")), "Updates D.")
+    .def("__initializeVD_ISV__", &train::JFABaseTrainer::initializeVD_ISV, (arg("self"), arg("relevance factor")), "Initializes V=0 and D=sqrt(var(UBM)/r) (for ISV).")
+    .def("__updateY__", &jfa_updateY, (arg("self"), arg("stats")), "Updates Y.")
+    .def("__updateV__", &jfa_updateV, (arg("self"), arg("stats")), "Updates V.")
+    .def("__updateX__", &jfa_updateX, (arg("self"), arg("stats")), "Updates X.")
+    .def("__updateU__", &jfa_updateU, (arg("self"), arg("stats")), "Updates U.")
+    .def("__updateZ__", &jfa_updateZ, (arg("self"), arg("stats")), "Updates Z.")
+    .def("__updateD__", &jfa_updateD, (arg("self"), arg("stats")), "Updates D.")
     ;
 
   class_<train::JFATrainer, boost::noncopyable>("JFATrainer", "Create a trainer for the JFA.", init<mach::JFAMachine&, train::JFABaseTrainer&>((arg("jfa"), arg("base_trainer")),"Initializes a new JFATrainer."))

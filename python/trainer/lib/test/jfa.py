@@ -218,17 +218,17 @@ class JFATrainerTest(unittest.TestCase):
     jfam.D = d
     jfat = bob.trainer.JFABaseTrainer(jfam)
 
-    jfat.initNid(vec)
-    jfat.precomputeSumStatisticsN(vec)
-    jfat.precomputeSumStatisticsF(vec)
-    jfat.setSpeakerFactors(x,y,z)
+    jfat.__initNid__(vec)
+    jfat.__precomputeSumStatisticsN__(vec)
+    jfat.__precomputeSumStatisticsF__(vec)
+    jfat.__setSpeakerFactors__(x,y,z)
 
-    jfat.updateY(vec)
-    jfat.updateV(vec)
+    jfat.__updateY__(vec)
+    jfat.__updateV__(vec)
 
     # Expected results(JFA cookbook, matlab)
-    self.assertTrue(equals(jfat.Y[0], y3, 2e-4))
-    self.assertTrue(equals(jfat.Y[1], y4, 2e-4))
+    self.assertTrue(equals(jfat.__Y__[0], y3, 2e-4))
+    self.assertTrue(equals(jfat.__Y__[1], y4, 2e-4))
     self.assertTrue(equals(jfam.V, v_ref, 2e-4))
 
 
@@ -295,17 +295,17 @@ class JFATrainerTest(unittest.TestCase):
     jfam.D = d
     jfat = bob.trainer.JFABaseTrainer(jfam)
 
-    jfat.initNid(vec)
-    jfat.precomputeSumStatisticsN(vec)
-    jfat.precomputeSumStatisticsF(vec)
-    jfat.setSpeakerFactors(x,y,z)
+    jfat.__initNid__(vec)
+    jfat.__precomputeSumStatisticsN__(vec)
+    jfat.__precomputeSumStatisticsF__(vec)
+    jfat.__setSpeakerFactors__(x,y,z)
 
-    jfat.updateX(vec)
-    jfat.updateU(vec)
+    jfat.__updateX__(vec)
+    jfat.__updateU__(vec)
 
     # Expected results(JFA cookbook, matlab)
-    self.assertTrue(equals(jfat.X[0], x3, 2e-4))
-    self.assertTrue(equals(jfat.X[1], x4, 2e-4))
+    self.assertTrue(equals(jfat.__X__[0], x3, 2e-4))
+    self.assertTrue(equals(jfat.__X__[1], x4, 2e-4))
     self.assertTrue(equals(jfam.U, u_ref, 2e-4))
 
 
@@ -370,22 +370,22 @@ class JFATrainerTest(unittest.TestCase):
     jfam.D = d
     jfat = bob.trainer.JFABaseTrainer(jfam)
 
-    jfat.initNid(vec)
-    jfat.precomputeSumStatisticsN(vec)
-    jfat.precomputeSumStatisticsF(vec)
-    jfat.setSpeakerFactors(x,y,z)
+    jfat.__initNid__(vec)
+    jfat.__precomputeSumStatisticsN__(vec)
+    jfat.__precomputeSumStatisticsF__(vec)
+    jfat.__setSpeakerFactors__(x,y,z)
 
-    jfat.updateZ(vec)
-    jfat.updateD(vec)
+    jfat.__updateZ__(vec)
+    jfat.__updateD__(vec)
 
     # Expected results(JFA cookbook, matlab)
-    self.assertTrue(equals(jfat.Z[0], z3_ref, 2e-4))
-    self.assertTrue(equals(jfat.Z[1], z4_ref, 2e-4))
+    self.assertTrue(equals(jfat.__Z__[0], z3_ref, 2e-4))
+    self.assertTrue(equals(jfat.__Z__[1], z4_ref, 2e-4))
     self.assertTrue(equals(jfam.D, d_ref, 2e-4))
 
 
-  def test08_JFABaseTrainer_train(self):
-    # train a JFABaseTrainer
+  def test08_JFATrainAndEnrol(self):
+    # Train and enrol a JFAMachine
 
     F1 = numpy.array( [0.3833, 0.4516, 0.6173, 0.2277, 0.5755, 0.8044, 0.5301,
       0.9861, 0.2751, 0.0300, 0.2486, 0.5357]).reshape((6,2))
@@ -422,7 +422,7 @@ class JFATrainerTest(unittest.TestCase):
     u = numpy.array( [0.5118, 0.3464, 0.0826, 0.8865, 0.7196, 0.4547, 0.9962,
       0.4134, 0.3545, 0.2177, 0.9713, 0.1257]).reshape((6,2))
 
-    # call the train function
+    # Calls the train function
     ubm = bob.machine.GMMMachine(2,3)
     ubm.meanSupervector = m
     ubm.varianceSupervector = E
@@ -431,7 +431,110 @@ class JFATrainerTest(unittest.TestCase):
     jfam.V = v
     jfam.D = d
     jfat = bob.trainer.JFABaseTrainer(jfam)
-    jfat.train(vec,5)
+    jfat.trainNoInit(vec,10)
+
+    v_ref = numpy.array([[0.245364911936476, 0.978133261775424], [0.769646805052223, 0.940070736856596], [0.310779202800089, 1.456332053893072],
+          [0.184760934399551, 2.265139705602147], [0.701987784039800, 0.081632150899400], [0.074344030229297, 1.090248340917255]], 'float64')
+    u_ref = numpy.array([[0.049424652628448, 0.060480486336896], [0.178104127464007, 1.884873813495153], [1.204011484266777, 2.281351307871720],
+          [7.278512126426286, -0.390966087173334], [-0.084424326581145, -0.081725474934414], [4.042143689831097, -0.262576386580701]], 'float64')
+    d_ref = numpy.array([9.648467e-18, 2.63720683155e-12, 2.11822157653706e-10, 9.1047243e-17, 1.41163442535567e-10, 3.30581e-19], 'float64')
+
+    eps = 1e-10
+    self.assertTrue( numpy.allclose(jfam.V, v_ref, eps) )
+    self.assertTrue( numpy.allclose(jfam.U, u_ref, eps) )
+    self.assertTrue( numpy.allclose(jfam.D, d_ref, eps) )
+
+    # Calls the enrol function
+    jfamachine = bob.machine.JFAMachine(jfam)
+    jfatrainer = bob.trainer.JFATrainer(jfamachine,jfat)
+  
+    Ne = numpy.array([0.1579, 0.9245, 0.1323, 0.2458]).reshape((2,2))
+    Fe = numpy.array([0.1579, 0.1925, 0.3242, 0.1234, 0.2354, 0.2734, 0.2514, 0.5874, 0.3345, 0.2463, 0.4789, 0.5236]).reshape((6,2))
+    gse1 = bob.machine.GMMStats(2,3)
+    gse1.n = Ne[:,0]
+    gse1.sumPx = Fe[:,0].reshape(2,3)
+    gse2 = bob.machine.GMMStats(2,3)
+    gse2.n = Ne[:,1]
+    gse2.sumPx = Fe[:,1].reshape(2,3)
+
+    gse = [gse1, gse2]
+    jfatrainer.enrol(gse, 5)
+
+    y_ref = numpy.array([0.555991469319657, 0.002773650670010], 'float64')
+    z_ref = numpy.array([8.2228e-20, 3.15216909492e-13, -1.48616735364395e-10, 1.0625905e-17, 3.7150503117895e-11, 1.71104e-19], 'float64')
+    self.assertTrue( numpy.allclose(jfamachine.y, y_ref, eps) )
+    self.assertTrue( numpy.allclose(jfamachine.z, z_ref, eps) )
+
+
+  def test09_ISVTrainAndEnrol(self):
+    # Train and enrol an 'ISVMachine'
+
+    F1 = numpy.array( [0.3833, 0.4516, 0.6173, 0.2277, 0.5755, 0.8044, 0.5301,
+      0.9861, 0.2751, 0.0300, 0.2486, 0.5357]).reshape((6,2))
+    F2 = numpy.array( [0.0871, 0.6838, 0.8021, 0.7837, 0.9891, 0.5341, 0.0669,
+      0.8854, 0.9394, 0.8990, 0.0182, 0.6259]).reshape((6,2))
+    F=[F1, F2]
+
+    N1 = numpy.array([0.1379, 0.1821, 0.2178, 0.0418]).reshape((2,2))
+    N2 = numpy.array([0.1069, 0.9397, 0.6164, 0.3545]).reshape((2,2))
+    N=[N1, N2]
+
+    gs11 = bob.machine.GMMStats(2,3)
+    gs11.n = N1[:,0]
+    gs11.sumPx = F1[:,0].reshape(2,3)
+    gs12 = bob.machine.GMMStats(2,3)
+    gs12.n = N1[:,1]
+    gs12.sumPx = F1[:,1].reshape(2,3)
+
+    gs21 = bob.machine.GMMStats(2,3)
+    gs21.n = N2[:,0]
+    gs21.sumPx = F2[:,0].reshape(2,3)
+    gs22 = bob.machine.GMMStats(2,3)
+    gs22.n = N2[:,1]
+    gs22.sumPx = F2[:,1].reshape(2,3)
+
+    vec = [[gs11, gs12], [gs21, gs22]]
+
+
+    m = numpy.array([0.1806, 0.0451, 0.7232, 0.3474, 0.6606, 0.3839])
+    E = numpy.array([0.6273, 0.0216, 0.9106, 0.8006, 0.7458, 0.8131])
+    u = numpy.array([0.5118, 0.3464, 0.0826, 0.8865, 0.7196, 0.4547, 0.9962,
+      0.4134, 0.3545, 0.2177, 0.9713, 0.1257]).reshape((6,2))
+
+    eps = 1e-10
+    d_ref = numpy.array([0.39601136, 0.07348469, 0.47712682, 0.44738127, 0.43179856, 0.45086029], 'float64')
+    u_ref = numpy.array([[0.855125642430777, 0.563104284748032], [-0.325497865404680, 1.923598985291687], [0.511575659503837, 1.964288663083095], [9.330165761678115, 1.073623827995043], [0.511099245664012, 0.278551249248978], [5.065578541930268, 0.509565618051587]], 'float64')
+    z_ref = numpy.array([-0.079315777443826, 0.092702428248543, -0.342488761656616, -0.059922635809136 , 0.133539981073604, 0.213118695516570], 'float64')
+
+    # Calls the train function
+    ubm = bob.machine.GMMMachine(2,3)
+    ubm.meanSupervector = m
+    ubm.varianceSupervector = E
+    jfam = bob.machine.JFABaseMachine(ubm,2)
+    jfat = bob.trainer.JFABaseTrainer(jfam)
+    jfam.U = u
+    jfat.trainISVNoInit(vec, 10, 4)
+
+    self.assertTrue( numpy.allclose(jfam.D, d_ref, eps) )
+    self.assertTrue( numpy.allclose(jfam.U, u_ref, eps) )
+
+
+    # Calls the enrol function
+    jfamachine = bob.machine.JFAMachine(jfam)
+    jfatrainer = bob.trainer.JFATrainer(jfamachine,jfat)
+  
+    Ne = numpy.array([0.1579, 0.9245, 0.1323, 0.2458]).reshape((2,2))
+    Fe = numpy.array([0.1579, 0.1925, 0.3242, 0.1234, 0.2354, 0.2734, 0.2514, 0.5874, 0.3345, 0.2463, 0.4789, 0.5236]).reshape((6,2))
+    gse1 = bob.machine.GMMStats(2,3)
+    gse1.n = Ne[:,0]
+    gse1.sumPx = Fe[:,0].reshape(2,3)
+    gse2 = bob.machine.GMMStats(2,3)
+    gse2.n = Ne[:,1]
+    gse2.sumPx = Fe[:,1].reshape(2,3)
+
+    gse = [gse1, gse2]
+    jfatrainer.enrol(gse, 5)
+    self.assertTrue( numpy.allclose(jfamachine.z, z_ref, eps) )
 
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(JFATrainerTest)
