@@ -1164,8 +1164,7 @@ void train::JFATrainer::enrol(const std::vector<boost::shared_ptr<const mach::GM
   m_base_trainer.initializeXYZ(vvec);
   
   for(size_t i=0; i<n_iter; ++i) {
-    if(m_jfa_machine.getDimRv()>0)
-      m_base_trainer.updateY(vvec);
+    m_base_trainer.updateY(vvec);
     m_base_trainer.updateX(vvec);
     m_base_trainer.updateZ(vvec);
   }

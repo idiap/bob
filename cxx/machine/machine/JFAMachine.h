@@ -56,8 +56,10 @@ class JFABaseMachine
      * @param UBM The Universal Backgroud Model
      * @param ru size of U (CD x ru)
      * @param rv size of U (CD x rv)
+     * @warning ru and rv SHOULD BE  >= 1. Just set U/V to zero if you want
+     *   to ignore one subspace. This is the case for ISV.
      */ 
-    JFABaseMachine(const boost::shared_ptr<bob::machine::GMMMachine> ubm, const size_t ru=0, const size_t rv=0);
+    JFABaseMachine(const boost::shared_ptr<bob::machine::GMMMachine> ubm, const size_t ru=1, const size_t rv=1);
 
     /**
      * Copies another machine

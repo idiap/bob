@@ -20,7 +20,6 @@
 
 
 #include "machine/JFAMachine.h"
-
 #include "core/array_copy.h"
 #include "core/repmat.h"
 #include "io/Arrayset.h"
@@ -28,10 +27,7 @@
 #include "math/inv.h"
 #include "machine/Exception.h"
 #include "machine/LinearScoring.h"
-
 #include <cmath>
-
-#include "core/logging.h"
 
 namespace mach = bob::machine;
 namespace core = bob::core;
