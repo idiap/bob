@@ -18,8 +18,9 @@ if (NOT QT4_FOUND)
   set(BOB_VISIONER_ENABLED OFF)
 else (NOT QT4_FOUND)
   add_subdirectory(visioner) #visioner package may override VISIONER_FOUND
-  set(BOB_VISIONER_ENABLED ${BOB_VISIONER_ENABLED} PARENT_SCOPE) #escalate
 endif (NOT QT4_FOUND)
+
+set(BOB_VISIONER_ENABLED ${BOB_VISIONER_ENABLED} PARENT_SCOPE) #escalate
 
 if (BOB_VISIONER_ENABLED)
   add_subdirectory(daq)
