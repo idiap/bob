@@ -81,6 +81,12 @@ Iris Database
 .. automodule:: bob.db.iris
   :members:
 
+NUAA Database
+=============
+
+.. automodule:: bob.db.nuaa
+  :members:
+
 XM2VTS Database
 ===============
 
