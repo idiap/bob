@@ -24,51 +24,24 @@ if(LIBSVM_FOUND)
   set(ccsrc "src/svm.cc;${ccsrc}")
 endif()
 
-set(pysrc
-   "lib/__init__.py"
-   "lib/example/__init__.py"
-   "lib/example/xml2hdf5.py"
-   "lib/test/__init__.py"
-   "lib/test/gaussian.py"
-   "lib/test/gmm.py"
-   "lib/test/jfa.py"
-   "lib/test/kmeans.py"
-   "lib/test/linear.py"
-   "lib/test/linearscoring.py"
-   "lib/test/mlp.py"
-   "lib/test/plda.py"
-   "lib/test/svm.py"
-   "lib/test/ztnorm.py"
-   )
-
-bob_python_package_bindings(machine "${ccsrc}" "${pysrc}" "core_array")
+bob_python_package_bindings(machine "${ccsrc}" "core_array")
 
 # Our test units
-bob_python_add_unittest(machine lib/test/gaussian.py main
-  ${CMAKE_CURRENT_SOURCE_DIR}/data)
-bob_python_add_unittest(machine lib/test/gmm.py main
-  ${CMAKE_CURRENT_SOURCE_DIR}/data)
-bob_python_add_unittest(machine lib/test/kmeans.py main
-  ${CMAKE_CURRENT_SOURCE_DIR}/data)
-bob_python_add_unittest(machine lib/test/jfa.py main
-  ${CMAKE_CURRENT_SOURCE_DIR}/data)
-bob_python_add_unittest(machine lib/test/linear.py main
-  ${CMAKE_CURRENT_SOURCE_DIR}/data)
-bob_python_add_unittest(machine lib/test/mlp.py main
-  ${CMAKE_CURRENT_SOURCE_DIR}/data)
-bob_python_add_unittest(machine lib/test/linearscoring.py main
-  ${CMAKE_CURRENT_SOURCE_DIR}/data)
-bob_python_add_unittest(machine lib/test/plda.py main
-  ${CMAKE_CURRENT_SOURCE_DIR}/data)
-bob_python_add_unittest(machine lib/test/ztnorm.py main
-  ${CMAKE_CURRENT_SOURCE_DIR}/data)
+bob_python_add_unittest(machine lib/test/gaussian.py)
+bob_python_add_unittest(machine lib/test/gmm.py)
+bob_python_add_unittest(machine lib/test/kmeans.py)
+bob_python_add_unittest(machine lib/test/jfa.py)
+bob_python_add_unittest(machine lib/test/linear.py)
+bob_python_add_unittest(machine lib/test/mlp.py)
+bob_python_add_unittest(machine lib/test/linearscoring.py)
+bob_python_add_unittest(machine lib/test/plda.py)
+bob_python_add_unittest(machine lib/test/ztnorm.py)
 
 if(LIBSVM_FOUND)
-  bob_python_add_unittest(machine lib/test/svm.py main
-    ${CMAKE_CURRENT_SOURCE_DIR}/data)
+  bob_python_add_unittest(machine lib/test/svm.py)
 endif()
 
 # Our examples (run and install)
-bob_python_example(machine "xml2hdf5.py" "lib/example/xml2hdf5.py" "main")
+bob_python_example(machine xml2hdf5.py lib/example/xml2hdf5.py main)
 bob_python_add_test(machine-1 xml2hdf5.py --self-test ${CMAKE_CURRENT_SOURCE_DIR}/data/network.xml)
 bob_python_add_test(machine-2 xml2hdf5.py --self-test ${CMAKE_CURRENT_SOURCE_DIR}/data/network-without-bias.xml)

@@ -26,19 +26,10 @@ set(ccsrc_random
    "src/main_random.cc"
    )
 
-set(pysrc
-  "lib/__init__.py"
-  "lib/array/__init__.py"
-  "lib/random/__init__.py"
-  "lib/test/__init__.py"
-  "lib/test/convert.py"
-  "lib/test/exception.py"
-  )
-
-bob_python_package_bindings(core "${ccsrc}" "${pysrc}" "")
-bob_python_submodule_bindings(core array "${ccsrc_ndarray}" "")
-bob_python_submodule_bindings(core random "${ccsrc_random}" "")
+bob_python_package_bindings(core "${ccsrc}" "")
+bob_python_subpackage_bindings(core array "${ccsrc_ndarray}" "")
+bob_python_subpackage_bindings(core random "${ccsrc_random}" "")
 
 # Our test units
-bob_python_add_unittest(core lib/test/exception.py main)
-bob_python_add_unittest(core lib/test/convert.py main)
+bob_python_add_unittest(core lib/test/exception.py)
+bob_python_add_unittest(core lib/test/convert.py)

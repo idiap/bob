@@ -9,19 +9,10 @@ set(ccsrc
    "src/main.cc"
    )
 
-set(pysrc
-   "lib/__init__.py"
-   "lib/test/__init__.py"
-   "lib/test/interiorpointLP.py"
-   "lib/test/linsolve.py"
-   "lib/test/norminv.py"
-   "lib/test/stats.py"
-   )
- 
-bob_python_package_bindings(math "${ccsrc}" "${pysrc}" "core_array")
+bob_python_package_bindings(math "${ccsrc}" "core_array")
 
 # Our test units
-bob_python_add_unittest(math lib/test/interiorpointLP.py main)
-bob_python_add_unittest(math lib/test/linsolve.py main)
-bob_python_add_unittest(math lib/test/norminv.py main)
-bob_python_add_unittest(math lib/test/stats.py main)
+bob_python_add_unittest(math lib/test/interiorpointLP.py)
+bob_python_add_unittest(math lib/test/linsolve.py)
+bob_python_add_unittest(math lib/test/norminv.py)
+bob_python_add_unittest(math lib/test/stats.py)

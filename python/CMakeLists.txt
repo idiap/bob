@@ -4,29 +4,13 @@ cmake_minimum_required(VERSION 2.6)
 
 # Installs python top-level wrapper
 if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
+  bob_configure_bobpython(bin/bobpython.in bin/bobpython bin)
 
-  # Dummy target for the python root package
-  add_custom_target(pybob_root ALL)
-
-  # Tags version and platform and add this to the core of the distribution
-  bob_python_configure("lib/build.py.in" "build.py")
-  bob_python_configure_program("bin/shell.py.in" "shell.py")
-
-  # Adds specific python sources
-  set(pysrc 
-    "lib/__init__.py"
-    "lib/helper.py"
-    "lib/script/__init__.py"
-    "lib/script/config.py"
-    )
-  bob_python_module(root "${pysrc}")
+  bob_python_bindings(root root "" "")
   
-  # Installs and test our scripts
-  bob_python_script(root "bob_config.py" "lib/script/config.py" "main")
+  # Installs and tests our scripts
+  bob_python_script(root bob_config.py lib/script/config.py)
   bob_python_add_test(root bob_config.py)
-
-  # Shell.py for user support
-  #bob_python_add_test(root shell.py)
 
   add_subdirectory(core)
   add_subdirectory(io)
@@ -44,4 +28,5 @@ if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
     add_subdirectory(daq)
   endif()
 
+  add_subdirectory(post_install)
 endif (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)

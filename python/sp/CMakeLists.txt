@@ -8,15 +8,8 @@ set(ccsrc
    "src/main.cc"
    )
 
-set(pysrc
-   "lib/__init__.py"
-   "lib/test/__init__.py"
-   "lib/test/fft_dct.py"
-   "lib/test/extrapolate.py"
-   )
-
-bob_python_package_bindings(sp "${ccsrc}" "${pysrc}" "core_array")
+bob_python_package_bindings(sp "${ccsrc}" "core_array")
 
 # Our test units
-bob_python_add_unittest(sp lib/test/fft_dct.py main)
-bob_python_add_unittest(sp lib/test/extrapolate.py main)
+bob_python_add_unittest(sp lib/test/fft_dct.py)
+bob_python_add_unittest(sp lib/test/extrapolate.py)

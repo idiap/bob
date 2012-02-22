@@ -1,0 +1,4 @@
+#!/usr/bin/env @BOB_BOBPYTHON@
+
+from @BOB_MODULE@ import @BOB_METHOD@ as main
+main()

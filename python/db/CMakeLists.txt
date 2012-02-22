@@ -1,87 +1,7 @@
 project(db-python)
 cmake_minimum_required(VERSION 2.6)
 
-set(pysrc
-   "lib/__init__.py"
-   "lib/banca/__init__.py"
-   "lib/banca/commands.py"
-   "lib/banca/create.py"
-   "lib/banca/dumplist.py"
-   "lib/banca/models.py"
-   "lib/banca/query.py"
-   "lib/banca_small/__init__.py"
-   "lib/banca_small/commands.py"
-   "lib/banca_small/create.py"
-   "lib/banca_small/dumplist.py"
-   "lib/banca_small/models.py"
-   "lib/banca_small/query.py"
-   "lib/biosecure/__init__.py"
-   "lib/biosecure/commands.py"
-   "lib/biosecure/create.py"
-   "lib/biosecure/dumplist.py"
-   "lib/biosecure/models.py"
-   "lib/biosecure/query.py"
-   "lib/faceverif_fl/__init__.py"
-   "lib/faceverif_fl/commands.py"
-   "lib/faceverif_fl/dumplist.py"
-   "lib/faceverif_fl/query.py"
-   "lib/iris/__init__.py"
-   "lib/lfw/__init__.py"
-   "lib/lfw/commands.py"
-   "lib/lfw/create.py"
-   "lib/lfw/dumplist.py"
-   "lib/lfw/models.py"
-   "lib/lfw/query.py"
-   "lib/manage.py"
-   "lib/mobio/__init__.py"
-   "lib/mobio/commands.py"
-   "lib/mobio/create.py"
-   "lib/mobio/dumplist.py"
-   "lib/mobio/models.py"
-   "lib/mobio/query.py"
-   "lib/multipie/__init__.py"
-   "lib/multipie/commands.py"
-   "lib/multipie/create.py"
-   "lib/multipie/dumplist.py"
-   "lib/multipie/models.py"
-   "lib/multipie/query.py"
-   "lib/nuaa/__init__.py"
-   "lib/openanything.py"
-   "lib/replay/__init__.py"
-   "lib/replay/commands.py"
-   "lib/replay/create.py"
-   "lib/replay/dumplist.py"
-   "lib/replay/models.py"
-   "lib/replay/query.py"
-   "lib/scface/__init__.py"
-   "lib/scface/commands.py"
-   "lib/scface/create.py"
-   "lib/scface/dumplist.py"
-   "lib/scface/models.py"
-   "lib/scface/query.py"
-   "lib/sqlalchemy_migration.py"
-   "lib/utils.py"
-   "lib/xm2vts/__init__.py"
-   "lib/xm2vts/commands.py"
-   "lib/xm2vts/create.py"
-   "lib/xm2vts/dumplist.py"
-   "lib/xm2vts/models.py"
-   "lib/xm2vts/query.py"
-
-   "lib/example/__init__.py"
-   "lib/example/iris_backprop.py"
-   "lib/example/iris_lda.py"
-   "lib/example/iris_rprop.py"
-   "lib/example/replay_example.py"
-   "lib/script/__init__.py"
-   "lib/script/dbmanage.py"
-   "lib/test/__init__.py"
-   "lib/test/faceverif_fl.py"
-   "lib/test/nuaa.py"
-   "lib/test/replay.py"
-   )
-
-bob_python_package_bindings(db "" "${pysrc}" "")
+bob_python_package_bindings(db "" "")
 
 # A macro for controlling creation, downloading and dependencies automatically
 # All tests should be dependent on the python-db-<dbname>-instantiation 
@@ -101,25 +21,6 @@ endmacro(bob_build_db dbname)
 
 # Installs our script driver
 bob_python_script(db "dbmanage.py" "lib/script/dbmanage.py" "main")
-
-# Installs all text/extra data for the databases
-set(data
-  "lib/iris/iris.names"
-  "lib/iris/iris.data"
-  "lib/nuaa/Detectedface/client_test_face.txt"
-  "lib/nuaa/Detectedface/client_train_face.txt"
-  "lib/nuaa/Detectedface/imposter_test_face.txt"
-  "lib/nuaa/Detectedface/imposter_train_face.txt"
-  "lib/nuaa/NormalizedFace/client_test_normalized.txt"
-  "lib/nuaa/NormalizedFace/client_train_normalized.txt"
-  "lib/nuaa/NormalizedFace/imposter_test_normalized.txt"
-  "lib/nuaa/NormalizedFace/imposter_train_normalized.txt"
-  "lib/nuaa/raw/client_test_raw.txt"
-  "lib/nuaa/raw/client_train_raw.txt"
-  "lib/nuaa/raw/imposter_test_raw.txt"
-  "lib/nuaa/raw/imposter_train_raw.txt"
-  )
-bob_python_data(db "${data}" "lib/")
 
 # Run creation or downloading
 bob_build_db(replay)
@@ -145,7 +46,7 @@ bob_python_add_dependent_test(db-replay-dumplist2
   python-db-replay-instantiation 
   dbmanage.py replay dumplist --class=attack --group=devel --support=hand --protocol=highdef --self-test)
 
-bob_python_add_unittest(db lib/test/replay.py main)
+bob_python_add_unittest(db lib/test/replay.py)
 set_property(TEST python-db-replay-main APPEND PROPERTY DEPENDS 
   python-db-replay-instantiation)
 
@@ -180,8 +81,7 @@ bob_python_add_dependent_test(db-biosecure-dumplist2
   dbmanage.py biosecure dumplist --protocol=ca0 --classes=client --groups=dev --purposes=enrol --self-test)
 
 # Faceverif_fl database (uses file lists).
-bob_python_add_unittest(db lib/test/faceverif_fl.py main
-  ${CMAKE_CURRENT_SOURCE_DIR}/data)
+bob_python_add_unittest(db lib/test/faceverif_fl.py)
 
 # LFW database driver tests.
 bob_python_add_dependent_test(db-lfw-dumplist
@@ -232,11 +132,11 @@ bob_python_add_dependent_test(db-xm2vts-dumplist2
   dbmanage.py xm2vts dumplist --protocol=lp1 --classes=client --groups=dev --purposes=enrol --self-test)
 
 # Our examples (run and install)
-bob_python_example(db "iris_lda.py" lib/example/iris_lda.py main)
+bob_python_example(db iris_lda.py lib/example/iris_lda.py)
 bob_python_add_test(db iris_lda.py --self-test)
 
-bob_python_example(db "iris_rprop.py" lib/example/iris_rprop.py main)
+bob_python_example(db iris_rprop.py lib/example/iris_rprop.py)
 bob_python_add_test(db iris_rprop.py --self-test)
 
-bob_python_example(db "iris_backprop.py" lib/example/iris_backprop.py main)
+bob_python_example(db iris_backprop.py lib/example/iris_backprop.py)
 bob_python_add_test(db iris_backprop.py --self-test)

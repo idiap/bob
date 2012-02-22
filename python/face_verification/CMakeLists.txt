@@ -1,17 +1,10 @@
 project(face_verification-python)
 cmake_minimum_required(VERSION 2.6)
  
-set(pysrc
-   "lib/__init__.py"
-   "lib/test/__init__.py"
-   "lib/test/bancasmall.py"
-   )
-
-bob_python_package_bindings(face_verification "" "${pysrc}" "")
+bob_python_package_bindings(face_verification "" "")
 
 # Our test units
-bob_python_add_unittest(face_verification lib/test/bancasmall.py main
-  ${CMAKE_CURRENT_SOURCE_DIR}/data)
+bob_python_add_unittest(face_verification lib/test/bancasmall.py)
 
 # Installs all python scripts
 if((${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
