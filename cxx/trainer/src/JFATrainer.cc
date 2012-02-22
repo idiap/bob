@@ -663,9 +663,8 @@ train::JFABaseTrainer::JFABaseTrainer(mach::JFABaseMachine& m):
   m_cache_Fn_x_ih(0), m_cache_A1_x(0), m_cache_A2_x(0),
   m_cache_DtSigmaInv(0), m_cache_DProd(0), m_cache_IdPlusDProd_i(0),
   m_cache_Fn_z_i(0), m_cache_A1_z(0), m_cache_A2_z(0),
-  m_tmp_rvrv(0), m_tmp_rvCD(0), m_tmp_rvD(0), m_tmp_ruD(0),
-  m_tmp_ruru(0), m_tmp_rv(0), m_tmp_ru(0), m_tmp_CD(0), m_tmp_CD_b(0),
-  m_tmp_D(0), m_tmp_CDCD(0)
+  m_tmp_rvrv(0), m_tmp_rvD(0), m_tmp_ruru(0), m_tmp_ruD(0),
+  m_tmp_rv(0), m_tmp_ru(0), m_tmp_CD(0), m_tmp_CD_b(0)
 {
   initCache();
 }

@@ -448,16 +448,13 @@ class JFABaseTrainer: public JFABaseTrainerBase
     blitz::Array<double,1> m_cache_A2_z;
 
     mutable blitz::Array<double,2> m_tmp_rvrv;
-    mutable blitz::Array<double,2> m_tmp_rvCD;
     mutable blitz::Array<double,2> m_tmp_rvD;
-    mutable blitz::Array<double,2> m_tmp_ruD;
     mutable blitz::Array<double,2> m_tmp_ruru;
+    mutable blitz::Array<double,2> m_tmp_ruD;
     mutable blitz::Array<double,1> m_tmp_rv;
     mutable blitz::Array<double,1> m_tmp_ru;
     mutable blitz::Array<double,1> m_tmp_CD;
     mutable blitz::Array<double,1> m_tmp_CD_b;
-    mutable blitz::Array<double,1> m_tmp_D;
-    mutable blitz::Array<double,2> m_tmp_CDCD;
 };
 
 
