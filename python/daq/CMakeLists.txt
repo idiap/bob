@@ -7,6 +7,10 @@ set(ccsrc
    "src/main.cc"
    )
 
+if(BOB_VISIONER_ENABLED)
+  add_definitions(-DVISIONER)
+endif()
+
 if (V4L2_FOUND)
   add_definitions(-DV4L2)
 endif ()

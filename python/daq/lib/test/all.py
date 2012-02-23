@@ -33,7 +33,11 @@ class DaqTest(unittest.TestCase):
     self.assertTrue(camera.getSupportedFrameSizes(pf)[0] == fs)
     self.assertTrue(camera.getSupportedFrameIntervals(pf, fs)[0] == fi)
 
-    fl = VisionerFaceLocalization()
+    if hasVisioner:
+      fl = VisionerFaceLocalization()
+    else:
+      fl = NullFaceLocalization()
+    
     controller = SimpleController()
     display = ConsoleDisplay()
 

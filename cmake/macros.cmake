@@ -58,7 +58,7 @@ endmacro()
 # name: test name
 # src: test source files
 #
-# Exmaple: bob_test(io array test/array.cc)
+# Example: bob_test(io array test/array.cc)
 macro(bob_test package name src)
   set(testname bobtest_${package}_${name})
 

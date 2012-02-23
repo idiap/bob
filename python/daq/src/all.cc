@@ -24,7 +24,6 @@
 
 #include <boost/format.hpp>
 
-#include <daq/CaptureSystem.h>
 #include <daq/Camera.h>
 #include <daq/VideoReaderCamera.h>
 #include <daq/OutputWriter.h>
@@ -34,8 +33,13 @@
 #include <daq/Display.h>
 #include <daq/QtDisplay.h>
 #include <daq/FaceLocalization.h>
-#include <daq/VisionerFaceLocalization.h>
+#include <daq/NullFaceLocalization.h>
 #include <daq/ConsoleDisplay.h>
+
+#ifdef VISIONER
+  #include <daq/CaptureSystem.h>
+  #include <daq/VisionerFaceLocalization.h>
+#endif
 
 #ifdef V4L2
   #include <daq/V4LCamera.h>
@@ -93,6 +97,7 @@ static std::string FrameInterval__str__(Camera::FrameInterval const &self) {
 void bind_daq_all() {
   using namespace boost::python;
 
+#ifdef VISIONER
   /// CaptureSystem
   class_<CaptureSystem, boost::noncopyable>("CaptureSystem",
       "CaptureSystem is the main class used to capture images from a Camera "
@@ -115,7 +120,8 @@ void bind_daq_all() {
     .def("setExecuteOnStartRecording", &CaptureSystem::setExecuteOnStartRecording, (arg("self"), arg("command")), "Shell command executed when the recording starts\n. Warning: The command blocks the GUI thread. You should execute time * consuming commands in a sub-shell (e.g. command params &)")
     .def("setExecuteOnStopRecording", &CaptureSystem::setExecuteOnStopRecording, (arg("self"), arg("command")), "Shell command executed when the recording stops.\n Warning: See setExecuteOnStartRecording()")
     .def("setText", &CaptureSystem::setText, (arg("self"), arg("text")), "Custom text displayed in the GUI");
-
+#endif
+  
   /// Callbacks
   class_<ControllerCallback, boost::noncopyable>("ControllerCallback", "Callback provided by a Controller", no_init)
     .def("imageReceived", &ControllerCallback::imageReceived, (arg("self"), arg("image"), arg("status")), "Image received by the Controller.\n 'image': pixel array in RGB 24 format.\n 'status': information about the frame");
@@ -233,7 +239,11 @@ void bind_daq_all() {
     .def("addFaceLocalizationCallback", &FaceLocalization::addFaceLocalizationCallback, (arg("self"), arg("callback")))
     .def("removeFaceLocalizationCallback", &FaceLocalization::removeFaceLocalizationCallback, (arg("self"), arg("callback")));
 
+#ifdef VISIONER
   class_<VisionerFaceLocalization, bases<FaceLocalization>, boost::noncopyable>("VisionerFaceLocalization", "Provide face localization using Visioner",
                                                                                 init<const char*>((arg("model_path")), "'model_path': path to a model file (e.g. Face.MCT9.gz)"));
+#endif
+  
+  class_<NullFaceLocalization, bases<FaceLocalization>, boost::noncopyable>("NullFaceLocalization", "NullFaceLocalization is an FaceLocalization which does nothing");
 
 }
