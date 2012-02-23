@@ -376,7 +376,7 @@ To checkout |project|, do the following at your shell prompt:
 
 .. code-block:: sh
 
-   $ git clone git@github.com:idiap/bob.git
+   $ git clone https://github.com/idiap/bob
 
 .. _section-compilation:
 
@@ -389,9 +389,14 @@ in the destination machine before using it. Just execute:
 .. code-block:: sh
    
    $ cd bob
+   $ # optional steps, include the visioner module
+   $ git submodule init
+   $ git config submodule.cxx/visioner/project.url https://github.com/idiap/visioner.git
+   $ git submodule update
+   $ # end of optional steps
    $ mkdir build
    $ cd build
-   $ cmake CMAKE_BUILD_TYPE=release ..
+   $ cmake -DCMAKE_BUILD_TYPE=Release ..
    $ make
 
 The documentation can be generated with other specific make targets:
@@ -407,8 +412,8 @@ you need to do it by calling ``make`` again:
 .. code-block:: sh
 
   $ make install
-  $ make doxygen-install
-  $ make sphinx-install
+  $ make install-doxygen
+  $ make install-sphinx
 
 The installation base directory is set to cmake's default, which is usually on
 an administrator restricted area, such as ``/usr/local``. If you wish to install
@@ -418,7 +423,7 @@ prefix:
 .. code-block:: sh
 
   # installs on ../install
-  $ cmake CMAKE_BUILD_TYPE=release CMAKE_INSTALL_PREFIX=../install 
+  $ cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ..
   $ make
   $ make install
 
