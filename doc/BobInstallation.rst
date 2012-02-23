@@ -502,7 +502,7 @@ try to reproduce the failure.
 .. _boost: http://www.boost.org
 .. _python: http://www.python.org
 .. _google perftools: http://code.google.com/p/google-perftools
-.. _numpy: http://http://numpy.scipy.org
+.. _numpy: http://numpy.scipy.org
 .. _libxml2: http://xmlsoft.org
 .. _doxygen: http://www.doxygen.org
 .. _sphinx: http://sphinx.pocoo.org
