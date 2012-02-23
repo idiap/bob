@@ -236,7 +236,7 @@ latex_logo = '${CMAKE_SOURCE_DIR}/doc/img/bob+reflection-sphinx.png'
 rst_epilog = """
 .. Some variables
 .. |project| replace:: Bob
-.. |homepage| replace:: https://www.idiap.ch/software/bob
+.. |bobweb| replace:: https://www.idiap.ch/software/bob
 .. |current-year| date:: %Y
 """
 
