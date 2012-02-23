@@ -22,6 +22,6 @@ endif (NOT QT4_FOUND)
 
 set(BOB_VISIONER_ENABLED ${BOB_VISIONER_ENABLED} PARENT_SCOPE) #escalate
 
-if (BOB_VISIONER_ENABLED)
+if(QT4_FOUND)
   add_subdirectory(daq)
-endif ()
+endif()

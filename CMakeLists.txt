@@ -98,12 +98,14 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # This will make sure we consider pkg-config directories that may have been
 # added when the user set CMAKE_PREFIX_PATH.
-string(REPLACE ":" ";" PKG_CONFIG_CHECK_PATH ${CMAKE_PREFIX_PATH})
-foreach (ext ${PKG_CONFIG_CHECK_PATH})
-  if(EXISTS ${ext}/lib/pkgconfig)
-    set(ENV{PKG_CONFIG_PATH} "${ext}/lib/pkgconfig:$ENV{PKG_CONFIG_PATH}")
-  endif()
-endforeach()
+if(CMAKE_PREFIX_PATH)
+  string(REPLACE ":" ";" PKG_CONFIG_CHECK_PATH ${CMAKE_PREFIX_PATH})
+  foreach (ext ${PKG_CONFIG_CHECK_PATH})
+    if(EXISTS ${ext}/lib/pkgconfig)
+      set(ENV{PKG_CONFIG_PATH} "${ext}/lib/pkgconfig:$ENV{PKG_CONFIG_PATH}")
+    endif()
+  endforeach()
+endif()
 
 # This is where we install cmake files for external projects
 set(cmakedir share/cmake)

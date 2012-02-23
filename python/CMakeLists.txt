@@ -23,8 +23,11 @@ if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
   add_subdirectory(trainer)
   add_subdirectory(face_verification)
 
-  if (BOB_VISIONER_ENABLED)
-    add_subdirectory(visioner)
+  if(QT4_FOUND)
+    if (BOB_VISIONER_ENABLED)
+      add_subdirectory(visioner)
+    endif()
+
     add_subdirectory(daq)
   endif()
 
