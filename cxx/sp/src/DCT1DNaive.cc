@@ -98,12 +98,14 @@ void spd::DCT1DNaive::processNoCheck(const blitz::Array<double,1>& src,
   // Compute the DCT
   dst = 0.;
   int ind; // index in the working array using the periodicity of cos()
+  double val;
   for( int k=0; k<m_length; ++k) {
+    val = 0.;
     for( int n=0; n<m_length; ++n) {
       ind = ((2*n+1)*k) % (4*m_length);
-      dst(k) += src(n) * m_wsave(ind);
+      val += src(n) * m_wsave(ind);
     }
-    dst(k) *= (k==0?m_sqrt_1l:m_sqrt_2l);
+    dst(k) = val * (k==0?m_sqrt_1l:m_sqrt_2l);
   }
 }
 
