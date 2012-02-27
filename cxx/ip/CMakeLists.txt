@@ -17,10 +17,7 @@ set(src
    "src/GeomNorm.cc"
    "src/maxRectInMask.cc"
    "src/FaceEyesNorm.cc"
-   "src/GaborFrequency.cc"
-   "src/GaborSpatial.cc"
-   "src/GaborBankFrequency.cc"
-   "src/GaborBankSpatial.cc"
+   "src/GaborWaveletTransform.cc"
    "src/histo.cc"
    "src/LBP.cc"
    "src/LBP4R.cc"
@@ -31,7 +28,6 @@ set(src
    "src/MultiscaleRetinex.cc"
    "src/SpatioTemporalGradient.cc"
 )
-#   "src/ipHOG.cc"
 
 # If we have VLFeat installed, enable the compilation of relevant modules
 if(VLFEAT_FOUND)
@@ -48,7 +44,7 @@ bob_test(ip crop test/crop.cc)
 bob_test(ip dctfeatures test/dctfeatures.cc)
 bob_test(ip extrapolateMask test/extrapolateMask.cc)
 bob_test(ip flipflop test/flipflop.cc)
-bob_test(ip gabor test/Gabor.cc)
+bob_test(ip gwt test/GaborWaveletTransform.cc)
 bob_test(ip gaussian test/Gaussian.cc)
 bob_test(ip median test/Median.cc)
 bob_test(ip gammaCorrection test/gammaCorrection.cc)
@@ -69,7 +65,7 @@ bob_test(ip sobel test/Sobel.cc)
 bob_test(ip zigzag test/zigzag.cc)
 
 # Defines environment variable used to localize data for the tests
-set_property(TEST cxx-ip-gabor APPEND PROPERTY ENVIRONMENT
+set_property(TEST cxx-ip-gwt APPEND PROPERTY ENVIRONMENT
   "BOB_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 #set_property(TEST cxx-ip-geomnorm APPEND PROPERTY ENVIRONMENT
 #  "BOB_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
