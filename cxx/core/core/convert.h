@@ -30,6 +30,8 @@
 #include <limits>
 #include <blitz/array.h>
 #include "core/convert_exception.h"
+#include <core/array_exception.h>
+#include <core/array_assert.h>
 
 namespace bob {
 /**
@@ -194,6 +196,95 @@ namespace bob {
         -std::numeric_limits<T>::max() : std::numeric_limits<T>::min());
       return convert<T,U>( src, tmin, 
         std::numeric_limits<T>::max(), src_min, src_max );
+    }
+
+
+    /**
+     * @brief Different parts of complex numbers that should be retrieved
+     */
+    typedef enum{
+	    REAL_PART,
+	    IMAG_PART,
+	    ABS_PART,
+	    PHASE_PART
+    } ComplexPart;
+
+    /**
+     * @brief Get a specific part of the 1D complex array
+     */
+    template <typename T>
+    void getPart(blitz::Array<T,1>& out, const blitz::Array<std::complex<T>,1>& in, ComplexPart part){
+
+      // check that both arrays have the same size
+      bob::core::array::assertSameShape(in, out);
+
+      // ... and convert the value
+      switch (part){
+        case REAL_PART: // real part
+          // iterate the only dimension ...
+          for (int x = in.extent(0); x--;)
+            out(x) = in(x).real();
+          break;
+        case IMAG_PART: // imaginary part
+          for (int x = in.extent(0); x--;)
+            out(x) = in(x).imag();
+          break;
+        case ABS_PART: // absolute part
+          for (int x = in.extent(0); x--;)
+            out(x) = std::abs(in(x));
+          break;
+        case PHASE_PART: // phase part
+          for (int x = in.extent(0); x--;)
+            out(x) = std::arg(in(x));
+          break;
+      } // switch part
+    }
+
+    static blitz::Range all = blitz::Range::all();
+
+    /**
+     * @brief Get a specific part of the 2D complex array
+     */
+    template <typename T>
+    void getPart(blitz::Array<T,2>& out, const blitz::Array<std::complex<T>,2>& in, ComplexPart part){
+      // iterate the first dimension ...
+      for (int x = in.extent(0); x--;){
+        // create 1D slices of both arrays
+        blitz::Array<T,1> out_(out(x, all));
+        const blitz::Array<std::complex<T>,1> in_(in(x, all));
+        // call the getPart function that takes 1 dimension
+        getPart(out_, in_, part);
+      }
+    }
+
+    /**
+     * @brief Get a specific part of the 3D complex array
+     */
+    template <typename T>
+    void getPart(blitz::Array<T,3>& out, const blitz::Array<std::complex<T>,3>& in, ComplexPart part){
+      // iterate the first dimension ...
+      for (int x = in.extent(0); x--;){
+        // create 2D slices of both arrays
+        blitz::Array<T,2> out_(out(x, all, all));
+        const blitz::Array<std::complex<T>,2> in_(in(x, all, all));
+        // call the getPart function that takes 2 dimensions
+        getPart(out_, in_, part);
+      }
+    }
+
+    /**
+     * @brief Get a specific part of the 4D complex array
+     */
+    template <typename T>
+    void getPart(blitz::Array<T,4>& out, const blitz::Array<std::complex<T>,4>& in, ComplexPart part){
+      // iterate the first dimension ...
+      for (int x = in.extent(0); x--;){
+        // create 3D slices of both arrays
+        blitz::Array<T,3> out_(out(x, all, all, all));
+        const blitz::Array<std::complex<T>,3> in_(in(x, all, all, all));
+        // call the getPart function that takes 3 dimensions
+        getPart(out_, in_, part);
+      }
     }
 
   }
