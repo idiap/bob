@@ -1,12 +1,11 @@
 /**
- * @file cxx/ip/src/GaborFrequency.cc
- * @date Wed Apr 13 20:12:03 2011 +0200
- * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
+ * @file cxx/ip/src/GaborWaveletTransform.cc
+ * @date 2012-02-27
+ * @author Manuel Guenther <Manuel.Guenther@idiap.ch>
  *
- * @brief This file provides a class to perform a Gabor filtering in the
- * frequency domain.
+ * @brief This file provides a class to perform a Gabor wavelet transform.
  *
- * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

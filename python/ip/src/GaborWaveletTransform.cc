@@ -1,7 +1,7 @@
 /**
  * @file python/ip/src/GaborWaveletTransform.cc
- * @date Wed Apr 13 20:16:21 2011 +0200
- * @author Manuel Guenther
+ * @date 2012-02-27
+ * @author Manuel Guenther <Manuel.Guenther@idiap.ch>
  *
  * @brief Binds the Gabor wavelet transform
  *

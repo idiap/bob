@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
-# Manuel Guenther <manuel.guenther@idiap.ch>
-# \today 
+# Manuel Guenther <Manuel.Guenther@idiap.ch>
+# 12-02-27
 
 """Extensions of the GWT class
 """
