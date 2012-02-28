@@ -53,8 +53,8 @@ User Guide
 .. toctree::
    :maxdepth: 2
 
-   ../cxx/doc/index
    ../python/doc/index
+   ../cxx/doc/index
 
 Developer's Guide
 -----------------

@@ -17,7 +17,16 @@ def normalized_scalar_product(x1, x2):
 def chi_square(h1, h2):
   """Computes the chi-square distance between two histograms"""
   d = 0
-  for i in range(h1.shape()[0]):
+  for i in range(h1.shape[0]):
     if h1[i] != h2[i]: d += (h1[i] - h2[i])**2 / (h1[i] + h2[i])
   return d
+
+
+def histogram_intersection(h1, h2):
+  """Computes the intersection measure of the given histograms"""
+  dist = 0
+  for i in range(h1.shape[0]):
+    dist += min(h1[i], h2[i])
+  return dist
+
 

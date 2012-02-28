@@ -18,14 +18,15 @@
 
 .. Index file for the Python bob::core bindings
 
-====================
- Core Functionality
-====================
+======
+ Core
+======
+
+The core module of |project| provides three different types of features:
 
 .. toctree::
    :maxdepth: 2
 
    UsingBlitzArrays
    ErrorReportingAndLogging
-
    random

@@ -18,7 +18,7 @@ set(ccsrc
    "src/DCTFeatures.cc"
    "src/gaussian.cc"
    "src/Median.cc"
-   "src/Gabor.cc"
+   "src/GaborWaveletTransform.cc"
    "src/GeomNorm.cc"
    "src/FaceEyesNorm.cc"
    "src/Rotate.cc"
