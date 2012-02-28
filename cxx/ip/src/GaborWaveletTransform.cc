@@ -22,7 +22,6 @@
 
 #include "core/array_assert.h"
 #include "core/array_copy.h"
-#include <core/convert.h>
 #include "ip/GaborWaveletTransform.h"
 #include <numeric>
 #include <sstream>
@@ -227,9 +226,9 @@ void bob::ip::GaborWaveletTransform::computeJetImage(
     m_ifft(m_temp_array);
     // convert into absolute and phase part
     blitz::Array<double,2> abs_part(jet_image(blitz::Range::all(), blitz::Range::all(), 0, j));
-    bob::core::getPart(abs_part, m_temp_array, bob::core::ABS_PART);
+    abs_part = blitz::abs(m_temp_array);
     blitz::Array<double,2> phase_part(jet_image(blitz::Range::all(), blitz::Range::all(), 1, j));
-    bob::core::getPart(phase_part, m_temp_array, bob::core::PHASE_PART);
+    phase_part = blitz::arg(m_temp_array);
   } // for j
 
   if (do_normalize){
@@ -267,7 +266,7 @@ void bob::ip::GaborWaveletTransform::computeJetImage(
     m_ifft(m_temp_array);
     // convert into absolute part
     blitz::Array<double,2> abs_part(jet_image(blitz::Range::all(), blitz::Range::all(), j));
-    bob::core::getPart(abs_part, m_temp_array, bob::core::ABS_PART);
+    abs_part = blitz::abs(m_temp_array);
   } // for j
 
   if (do_normalize){

@@ -153,49 +153,8 @@ static object convert (tp::const_ndarray src, object dtype_like,
   }
 }
 
-static void get_part(tp::const_ndarray input, tp::ndarray output, const std::string& part){
-  bob::core::ComplexPart cpart = bob::core::ABS_PART;
-  if (part == "PHASE")
-    cpart = bob::core::PHASE_PART;
-  else if (part == "REAL")
-    cpart = bob::core::REAL_PART;
-  else if (part == "IMAG")
-    cpart = bob::core::IMAG_PART;
-  else if (part != "ABS")
-    throw bob::core::Exception();
-
-  switch (input.type().nd){
-    case 1:{
-      const blitz::Array<std::complex<double>, 1> in(input.bz<std::complex<double>,1>());
-      blitz::Array<double,1> out(output.bz<double,1>());
-      bob::core::getPart(out, in, cpart);
-    } break;
-
-    case 2:{
-      const blitz::Array<std::complex<double>, 2> in(input.bz<std::complex<double>,2>());
-      blitz::Array<double,2> out(output.bz<double,2>());
-      bob::core::getPart(out, in, cpart);
-    } break;
-
-    case 3:{
-      const blitz::Array<std::complex<double>, 3> in(input.bz<std::complex<double>,3>());
-      blitz::Array<double,3> out(output.bz<double,3>());
-      bob::core::getPart(out, in, cpart);
-    } break;
-
-    case 4:{
-      const blitz::Array<std::complex<double>, 4> in(input.bz<std::complex<double>,4>());
-      blitz::Array<double,4> out(output.bz<double,4>());
-      bob::core::getPart(out, in, cpart);
-    } break;
-
-  }
-}
-
 BOOST_PYTHON_FUNCTION_OVERLOADS(convert_overloads, convert, 2, 4)
 
 void bind_core_array_convert() {
-  def("convert", &convert, convert_overloads((arg("array"), arg("dtype"), arg("destRange")=object(), arg("sourceRange")=object()), "Convert/rescale an array of a given type into another array of a possibly different type with re-scaling. Typically, this can be used to rescale a 16 bit precision grayscale image (2D array) into an 8 bit precision grayscale image.\n\n  Parameters:\n\n    array -- (array) Input array\n\n    dtype -- (string) Controls the output element type for the returned array\n\n    destRange -- (tuple) Determines the range to be deployed at the returned array\n\n    sourceRange -- (tuple) Determines the input range that will be used for the scaling\n\n  Returns: A new array with the same shape as this one, but re-scaled and with its element type as indicated by the user."));
-
-  def("get_part", &get_part, (arg("input"), arg("output"), arg("part")="ABS"), "Fills the output array with the given complex part of the complex input array");
+  def("convert", &convert, convert_overloads((arg("array"), arg("dtype"), arg("destRange")=object(), arg("sourceRange")=object()), "Function which allows to convert/rescale a array of a given type into another array of a possibly different type with re-scaling. Typically, this can be used to rescale a 16 bit precision grayscale image (2D array) into an 8 bit precision grayscale image.\n\n  Parameters:\n\n    array -- (array) Input array\n\n    dtype -- (string) Controls the output element type for the returned array\n\n    destRrange -- (tuple) Determines the range to be deployed at the returned array\n\n    sourceRange -- (tuple) Determines the input range that will be used for the scaling\n\n  Returns: A new array with the same shape as this one, but re-scaled and with its element type as indicated by the user."));
 }
