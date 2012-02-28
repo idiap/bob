@@ -18,8 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "math/inv.h"
+#include "math/linear.h"
 #include "math/Exception.h"
 #include "core/array_assert.h"
+#include "core/array_check.h"
+#include "core/array_copy.h"
 #if !defined (HAVE_BLITZ_TINYVEC2_H)
 #include <blitz/tinyvec-et.h>
 #endif
@@ -27,7 +30,7 @@
 namespace math = bob::math;
 namespace ca = bob::core::array;
 
-// Declaration of the external LAPACK functions
+// Declaration of the external LAPACK function
 // LU decomposition of a general matrix (dgetrf)
 extern "C" void dgetrf_( int *M, int *N, double *A, int *lda, int *ipiv, 
   int *info);
@@ -54,48 +57,63 @@ void math::inv_(const blitz::Array<double,2>& A, blitz::Array<double,2>& B)
   // Size variable
   int N = A.extent(0);
 
-
-  ///////////////////////////////////
-  // Prepare to call LAPACK function
-
-  // Initialize LAPACK variables
+  //////////////////////////////////////
+  // Prepares to call LAPACK functions
+  // Initializes LAPACK variables
   int info = 0;  
   int lda = N;
-  int lwork = N;
 
-  // Initialize LAPACK arrays
-  double *A_lapack = new double[N*N];
+  // Initializes LAPACK arrays
   int *ipiv = new int[N];
-  double *work = new double[N];
-  for(int j=0; j<N; ++j)
-    for(int i=0; i<N; ++i)
-      A_lapack[j+i*N] = A(j,i);
- 
-  // Call the LAPACK functions
-  // 1/ Compute LU decomposition
-  dgetrf_( &N, &N, A_lapack, &lda, ipiv, &info);
- 
-  // Check info variable
+
+  // Tries to use B directly if possible 
+  //   Input and output arrays are both column-major order.
+  //   Hence, we can ignore the problem of column- and row-major order
+  //   conversions.
+  bool B_direct_use = ca::isCZeroBaseContiguous(B);
+  blitz::Array<double,2> A_blitz_lapack;
+  if(B_direct_use) 
+  {
+    A_blitz_lapack.reference(B);
+    A_blitz_lapack = A;
+  }
+  else
+    A_blitz_lapack.reference(ca::ccopy(A));
+  double *A_lapack = A_blitz_lapack.data();
+
+
+  // Calls the LAPACK functions
+  // 1/ Computes the LU decomposition
+  dgetrf_( &N, &N, A_lapack, &lda, ipiv, &info); 
+  // Checks the info variable
   if( info != 0)
     throw bob::math::LapackError("The LAPACK dgetrf function returned a \
       non-zero value.");
 
-  // 2/ Compute the inverse
+  // TODO: We might consider adding a real invertibility test as described in
+  // this thread (Btw, this is what matlab does): 
+  // http://icl.cs.utk.edu/lapack-forum/archives/lapack/msg00778.html
+
+  // 2/ Computes the inverse matrix
+  // 2/A/ Queries the optimal size of the working array
+  int lwork_query = -1;
+  double work_query;
+  dgetri_( &N, A_lapack, &lda, ipiv, &work_query, &lwork_query, &info);
+  // 2/B/ Computes the inverse
+  int lwork = static_cast<int>(work_query);
+  double *work = new double[lwork];
   dgetri_( &N, A_lapack, &lda, ipiv, work, &lwork, &info);
- 
-  // Check info variable
+  // Checks info variable
   if( info != 0)
     throw bob::math::LapackError("The LAPACK dgetri function returned a \
       non-zero value. The matrix might not be invertible.");
 
-  // Copy result back to B
-  for(int j=0; j<N; ++j)
-    for(int i=0; i<N; ++i)
-      B(j,i) = A_lapack[j+i*N];
+  // Copy back content to B if required
+  if(!B_direct_use)
+    B = A_blitz_lapack;
 
   // Free memory
-  delete [] A_lapack;
-  delete [] ipiv;
   delete [] work;
+  delete [] ipiv;
 }
 
