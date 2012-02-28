@@ -90,8 +90,6 @@ BOOST_AUTO_TEST_CASE( test_gwt_kernel_sanity )
   blitz::TinyVector<int,6> horizontal_pairs(1,7,2,6,3,5);
   blitz::TinyVector<int,4> diagonal_pairs(0,4,1,3);
   for (int test_new_resolution = 2; test_new_resolution--;){
-    std::cout << "Testing resolution " << v_res << " x " << h_res << std::endl;
-    // create a bank of Gabor filters with one even and one odd resolution
     bob::ip::GaborWaveletTransform gwt;
     gwt.generateKernels(blitz::TinyVector<int,2>(v_res, h_res));
 
@@ -103,11 +101,9 @@ BOOST_AUTO_TEST_CASE( test_gwt_kernel_sanity )
 
     // check that the
     for (int scale = 0; scale < gwt.m_number_of_scales; ++scale){
-      std::cout << "scale: " << scale << std::flush;
       int scale_offset = gwt.m_number_of_directions * scale;
       // test the horizontal pairs
       for (int pair = 0; pair < 6; pair += 2){
-        std::cout << ", pair: " << horizontal_pairs[pair] << ", " << horizontal_pairs[pair+1] << std::flush;
         // get the two kernels to be checked
         blitz::Array<double,2>
             kernel_1 = kernels(scale_offset + horizontal_pairs[pair], blitz::Range::all(), blitz::Range::all()),
@@ -126,7 +122,6 @@ BOOST_AUTO_TEST_CASE( test_gwt_kernel_sanity )
       // these tests will work only with square kernels
       BOOST_CHECK_EQUAL(v_res, h_res);
       for (int pair = 0; pair < 4; pair += 2){
-        std::cout << ", pair: " << diagonal_pairs[pair] << ", " << diagonal_pairs[pair+1] << std::flush;
         // get the two kernels to be checked
         blitz::Array<double,2>
             kernel_1 = kernels(scale_offset + diagonal_pairs[pair], blitz::Range::all(), blitz::Range::all()),
@@ -139,7 +134,6 @@ BOOST_AUTO_TEST_CASE( test_gwt_kernel_sanity )
           }
         }
       }
-      std::cout << std::endl;
     }
     // do the tests again, this time with another resolution
     v_res = 183; h_res = 183;
