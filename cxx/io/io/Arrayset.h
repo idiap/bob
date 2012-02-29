@@ -61,12 +61,18 @@ namespace bob { namespace io {
        * Please note this does not read the file itself, just create pointers
        * to the several arrays within such a file.
        *
+       * The opening modes can be:
+       *
+       * 'r' -- Opens the file in read-only mode
+       * 'w' -- Opens the file in read-write mode, truncates if exists
+       * 'a' -- Opens the file in read-write mode, appending to the end
+       *
        * @warning: This is a compatibility short cut to create a set object
        * internally to the Array. Don't use this on fresh new code! The
        * correct way to load an array is to use the (file, *) constructors
        * above, for which you have more flexibility.
        */
-      Arrayset(const std::string& path);
+      Arrayset(const std::string& path, char mode='r');
 
       /**
        * Copy construct an Arrayset
