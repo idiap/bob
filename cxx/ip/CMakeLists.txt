@@ -22,6 +22,7 @@ set(src
    "src/LBP.cc"
    "src/LBP4R.cc"
    "src/LBP8R.cc"
+   "src/LBP16R.cc"
    "src/LBPTopOperator.cc"
    "src/Sobel.cc"
    "src/Gaussian.cc"

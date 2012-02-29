@@ -27,6 +27,7 @@
 #include "ip/LBP.h"
 #include "ip/LBP4R.h"
 #include "ip/LBP8R.h"
+#include "ip/LBP16R.h"
 #include "ip/LBPTopOperator.h"
 #include "ip/LBPHSFeatures.h"
 
@@ -37,6 +38,8 @@ namespace ca = bob::core::array;
 
 static const char* lbp4r_doc = "Objects of this class, after configuration, can compute Local Binary Features using 4 neighbour pixels.";
 static const char* lbp8r_doc = "Objects of this class, after configuration, can compute Local Binary Features using 8 neighbour pixels.";
+static const char* lbp16r_doc = "Objects of this class, after configuration, can compute Local Binary Features using 16 neighbour pixels.";
+
 
 template <typename O, typename T> 
 static void inner_call_inout (O& op, tp::const_ndarray input,
@@ -176,6 +179,14 @@ void bind_ip_lbp_new() {
     .def("__call__", &call_pos<ip::LBP8R>, (arg("self"), arg("input"), arg("y"), arg("x")), "Call an object of this type to extract LBP8R features.")
     .def("__call__", &call_alloc<ip::LBP8R>, (arg("self"), arg("input")), "Call an object of this type to extract LBP8R features.")
     .def("getLBPShape", &get_shape<ip::LBP8R>, (arg("self"), arg("input")), "Get a tuple containing the expected size of the output when extracting LBP8R features.")
+    ;
+
+  class_<ip::LBP16R, boost::shared_ptr<ip::LBP16R>, bases<ip::LBP> >("LBP16R", lbp16r_doc, init<optional<const double, const bool, const bool, const bool, const bool, const bool> >((arg("R")=1.0,arg("circular")=true,arg("to_average")=false,arg("add_average_bit")=false,arg("uniform")=false, arg("rotation_invariant")=false), "Construct a new LBP16R object"))
+    .add_property("max_label", &ip::LBP16R::getMaxLabel)
+    .def("__call__", &call_inout<ip::LBP16R>, (arg("self"), arg("input"), arg("output")), "Call an object of this type to extract LBP16R features.")
+    .def("__call__", &call_pos<ip::LBP16R>, (arg("self"), arg("input"), arg("y"), arg("x")), "Call an object of this type to extract LBP16R features.")
+    .def("__call__", &call_alloc<ip::LBP16R>, (arg("self"), arg("input")), "Call an object of this type to extract LBP16R features.")
+    .def("getLBPShape", &get_shape<ip::LBP16R>, (arg("self"), arg("input")), "Get a tuple containing the expected size of the output when extracting LBP16R features.")
     ;
 
   class_<ip::LBPTopOperator, boost::shared_ptr<ip::LBPTopOperator> >("LBPTopOperator",

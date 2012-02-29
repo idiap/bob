@@ -50,6 +50,13 @@ def generate_3x3_image(image, values):
   image[2, 0] = int(values[7])
   image[1, 0] = int(values[8])
 
+def generate_5x5_image(image, values):
+  """Generates a 5x5 image from a 25-position value vector row-wise
+  """
+  for i in range(0,5):
+    for j in range(0,5):
+      image[i,j] = int(values[i*5+j])
+
 def rotate(v, size=8):
   """Rotates the LSB bit in v, making it a HSB"""
   lsb = v & 1
@@ -120,12 +127,12 @@ def bilinear_interpolation(image, x, y):
 
 class Processor:
 
-  def __init__(self, operator, generator, center):
+  def __init__(self, operator, generator, center, img_size):
     self.operator = operator
     self.generator = generator
     self.x = center[0]
     self.y = center[1]
-    self.image = numpy.ndarray((3, 3), 'uint8')
+    self.image = numpy.ndarray((img_size, img_size), 'uint8')
 
   def __call__(self, value):
     image = self.generator(self.image, value)
@@ -140,7 +147,7 @@ class LBPTest(unittest.TestCase):
  
   def test01_vanilla_4p1r(self):
     op = bob.ip.LBP4R(1)
-    proc = Processor(op, generate_3x3_image, (1,1))
+    proc = Processor(op, generate_3x3_image, (1,1), 3)
     self.assertEqual(proc('011111111'), 0xf)
     #please note that the bob implementation of LBPs is slightly different
     #then that of the original LBP paper:
@@ -166,7 +173,7 @@ class LBPTest(unittest.TestCase):
 
   def test02_rotinvariant_4p1r(self):
     op = bob.ip.LBP4R(1,False,False,False,False,True)
-    proc = Processor(op, generate_3x3_image, (1,1))
+    proc = Processor(op, generate_3x3_image, (1,1), 3)
     #bob's implementation start labelling the patterns from 0
     self.assertEqual(proc('100000000'), 0x0) #0x0
     self.assertEqual(proc('102000000'), 0x1) #0x1
@@ -188,7 +195,7 @@ class LBPTest(unittest.TestCase):
 
   def test03_u2_4p1r(self):
     op = bob.ip.LBP4R(1,False,False,False,True)
-    proc = Processor(op, generate_3x3_image, (1,1))
+    proc = Processor(op, generate_3x3_image, (1,1), 3)
     self.assertEqual(proc('100000000'), 0x1) #0x0
     self.assertEqual(proc('102000000'), 0x2) #0x8
     self.assertEqual(proc('100020000'), 0x3) #0x4
@@ -209,7 +216,7 @@ class LBPTest(unittest.TestCase):
 
   def test04_rotinvariant_u2_4p1r(self):
     op = bob.ip.LBP4R(1,False,False,False,True,True)
-    proc = Processor(op, generate_3x3_image, (1,1))
+    proc = Processor(op, generate_3x3_image, (1,1), 3)
     self.assertEqual(proc('100000000'), 0x1) #0x0
     self.assertEqual(proc('102000000'), 0x2) #0x8
     self.assertEqual(proc('100020000'), 0x2) #0x4
@@ -230,7 +237,7 @@ class LBPTest(unittest.TestCase):
 
   def test05_vanilla_4p1r_toaverage(self):
     op = bob.ip.LBP4R(1,False,True)
-    proc = Processor(op, generate_3x3_image, (1,1))
+    proc = Processor(op, generate_3x3_image, (1,1), 3)
     self.assertEqual(proc('100000000'), 0x0) #average is 0.2
     self.assertEqual(proc('102000000'), 0x8) #average is 0.6
     self.assertEqual(proc('100020000'), 0x4) #average is 0.6
@@ -251,14 +258,14 @@ class LBPTest(unittest.TestCase):
 
   def test06_vanilla_8p1r(self):
     op = bob.ip.LBP8R(1)
-    proc = Processor(op, generate_3x3_image, (1,1))
+    proc = Processor(op, generate_3x3_image, (1,1), 3)
     for i in range(256):
       v = ('1%8s' % bin(i, 2)).replace(' ', '0')
       self.assertEqual(proc(v), i)
 
   def test07_rotinvariant_8p1r(self):
     op = bob.ip.LBP8R(1,False,False,False,False,True)
-    proc = Processor(op, generate_3x3_image, (1,1))
+    proc = Processor(op, generate_3x3_image, (1,1), 3)
     table = calculate_lbp8r_rotinvariant_table()
     for i in range(256):
       v = ('1%8s' % bin(i, 2)).replace(' ', '0')
@@ -266,7 +273,7 @@ class LBPTest(unittest.TestCase):
 
   def test08_u2_8p1r(self):
     op = bob.ip.LBP8R(1,False,False,False,True,False)
-    proc = Processor(op, generate_3x3_image, (1,1))
+    proc = Processor(op, generate_3x3_image, (1,1), 3)
     table = calculate_lbp8r_u2_table()
     values = []
     for i in range(256):
@@ -280,7 +287,7 @@ class LBPTest(unittest.TestCase):
 
   def test09_riu2_8p1r(self):
     op = bob.ip.LBP8R(1,False,False,False,True,True)
-    proc = Processor(op, generate_3x3_image, (1,1))
+    proc = Processor(op, generate_3x3_image, (1,1), 3)
     table = calculate_lbp8r_riu2_table()
     values = []
     for i in range(256):
@@ -297,6 +304,66 @@ class LBPTest(unittest.TestCase):
     image = numpy.ndarray((3,3), dtype='uint8')
     sh = lbp.getLBPShape(image)
     self.assertEqual(sh, (1,1))
-    
+
+  def test11_u2_16p1r(self):
+    op = bob.ip.LBP16R(1, True, False, False, True, False)
+    values = [207, 24, 40, 36, 167, 230, 71, 247, 107, 9, 32, 139, 244, 233, 216, 232, 244, 123, 202, 238, 161, 246, 204, 244, 173]
+    res = numpy.ndarray((3,3), dtype=int)
+    res[0,0]=210; res[0,1]=1; res[0,2]=128;
+    res[1,0]=0; res[1,1]=3; res[1,2]=32;
+    res[2,0]=11; res[2,1]=242; res[2,2]=188; 
+    proc1 = Processor(op, generate_5x5_image, (1,1), 5); self.assertEqual(proc1(values), res[0,0])
+    proc2 = Processor(op, generate_5x5_image, (2,1), 5); self.assertEqual(proc2(values), res[0,1])
+    proc3 = Processor(op, generate_5x5_image, (3,1), 5); self.assertEqual(proc3(values), res[0,2])
+    proc4 = Processor(op, generate_5x5_image, (1,2), 5); self.assertEqual(proc4(values), res[1,0])
+    proc5 = Processor(op, generate_5x5_image, (2,2), 5); self.assertEqual(proc5(values), res[1,1])
+    proc6 = Processor(op, generate_5x5_image, (3,2), 5); self.assertEqual(proc6(values), res[1,2])
+    proc7 = Processor(op, generate_5x5_image, (1,3), 5); self.assertEqual(proc7(values), res[2,0])
+    proc8 = Processor(op, generate_5x5_image, (2,3), 5); self.assertEqual(proc8(values), res[2,1])
+    proc9 = Processor(op, generate_5x5_image, (3,3), 5); self.assertEqual(proc9(values), res[2,2])
+
+  def test12_u2_16p2r(self):
+    op = bob.ip.LBP16R(2, True, False, False, True, False)
+    values = [207, 24, 40, 36, 167, 230, 71, 247, 107, 9, 32, 139, 244, 233, 216, 232, 244, 123, 202, 238, 161, 246, 204, 244, 173]
+    res = numpy.ndarray((1,1), dtype=int)
+    res[0,0]=1;
+    proc1 = Processor(op, generate_5x5_image, (2,2), 5); self.assertEqual(proc1(values), res[0,0])
+
+  def test13_riu2_16p1r(self):
+    op = bob.ip.LBP16R(1, True, False, False, True, True)
+    values = [207, 24, 40, 36, 167, 230, 71, 247, 107, 9, 32, 139, 244, 233, 216, 232, 244, 123, 202, 238, 161, 246, 204, 244, 173]
+    res = numpy.ndarray((3,3), dtype=int)
+    res[0,0]=15; res[0,1]=1; res[0,2]=9;
+    res[1,0]=0; res[1,1]=2; res[1,2]=3;
+    res[2,0]=2; res[2,1]=17; res[2,2]=13; 
+    proc1 = Processor(op, generate_5x5_image, (1,1), 5); self.assertEqual(proc1(values), res[0,0])
+    proc2 = Processor(op, generate_5x5_image, (2,1), 5); self.assertEqual(proc2(values), res[0,1])
+    proc3 = Processor(op, generate_5x5_image, (3,1), 5); self.assertEqual(proc3(values), res[0,2])
+    proc4 = Processor(op, generate_5x5_image, (1,2), 5); self.assertEqual(proc4(values), res[1,0])
+    proc5 = Processor(op, generate_5x5_image, (2,2), 5); self.assertEqual(proc5(values), res[1,1])
+    proc6 = Processor(op, generate_5x5_image, (3,2), 5); self.assertEqual(proc6(values), res[1,2])
+    proc7 = Processor(op, generate_5x5_image, (1,3), 5); self.assertEqual(proc7(values), res[2,0])
+    proc8 = Processor(op, generate_5x5_image, (2,3), 5); self.assertEqual(proc8(values), res[2,1])
+    proc9 = Processor(op, generate_5x5_image, (3,3), 5); self.assertEqual(proc9(values), res[2,2])
+
+  '''
+  def test14_ri_16p1r(self):
+    op = bob.ip.LBP16R(1, True, False, False, False, True)
+    values = [207, 24, 40, 36, 167, 230, 71, 247, 107, 9, 32, 139, 244, 233, 216, 232, 244, 123, 202, 238, 161, 246, 204, 244, 173]
+    res = numpy.ndarray((3,3), dtype=int)
+    res[0,0]=224; res[0,1]=1; res[0,2]=124;
+    res[1,0]=0; res[1,1]=2; res[1,2]=22;
+    res[2,0]=10; res[2,1]=242; res[2,2]=180; 
+    proc1 = Processor(op, generate_5x5_image, (1,1), 5); self.assertEqual(proc1(values), res[0,0])
+    proc2 = Processor(op, generate_5x5_image, (2,1), 5); self.assertEqual(proc2(values), res[0,1])
+    proc3 = Processor(op, generate_5x5_image, (3,1), 5); self.assertEqual(proc3(values), res[0,2])
+    proc4 = Processor(op, generate_5x5_image, (1,2), 5); self.assertEqual(proc4(values), res[1,0])
+    proc5 = Processor(op, generate_5x5_image, (2,2), 5); self.assertEqual(proc5(values), res[1,1])
+    proc6 = Processor(op, generate_5x5_image, (3,2), 5); self.assertEqual(proc6(values), res[1,2])
+    proc7 = Processor(op, generate_5x5_image, (1,3), 5); self.assertEqual(proc7(values), res[2,0])
+    proc8 = Processor(op, generate_5x5_image, (2,3), 5); self.assertEqual(proc8(values), res[2,1])
+    proc9 = Processor(op, generate_5x5_image, (3,3), 5); self.assertEqual(proc9(values), res[2,2])
+  ''' 
+
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(LBPTest)
