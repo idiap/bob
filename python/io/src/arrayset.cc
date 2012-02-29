@@ -168,7 +168,7 @@ void bind_io_arrayset() {
     .def("__init__", make_constructor(make_from_array_iterable1, default_call_policies(), (arg("iterable"))), "Creates a new Arrayset from a python iterable containing array-like objects. In this mode the first object will be coerced into a numpy ndarray if that is not already the case and all following objects in the iterable will be coerced to the same type as the first object.")
     .def("__init__", make_constructor(make_from_array_iterable2, default_call_policies(), (arg("iterable"),arg("dtype"))), "Creates a new Arrayset from a python iterable containing array-like objects, with an optional coertion dtype that will be applied to all arrays. If the coertion type 'dtype' is None, than this falls back to the case described in the constructor with iterables w/o dtype specification.")
     .def(init<boost::shared_ptr<io::File>, optional<size_t,size_t> >((arg("file"), arg("begin"), arg("end")), "Start with all or some arrays in a given file. You can select the start and/or the end. Numbers past the end of the given file are ignored. For example, if a file contains 5 arrays, this constructor will work ok if you leave 'end' on its default (maximum possible unsigned integer)."))
-    .def(init<const std::string&>((arg("filename")), "Initializes a new arrayset from an external file."))
+    .def(init<const std::string&, optional<char> >((arg("filename"), arg("mode")='r'), "Initializes a new arrayset from an external file."))
     .def(init<>("Creates a new empty arraset with an inlined representation."))
     
     .add_property("type", make_function(&io::Arrayset::type, return_value_policy<copy_const_reference>()), "Typing information for this arrayset")

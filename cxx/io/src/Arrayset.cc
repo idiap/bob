@@ -40,8 +40,8 @@ io::Arrayset::Arrayset (boost::shared_ptr<File> file, size_t begin, size_t end)
   m_info = file->arrayset_type();
 }
 
-io::Arrayset::Arrayset(const std::string& path) {
-  boost::shared_ptr<io::File> file = io::open(path, "", 'a');
+io::Arrayset::Arrayset(const std::string& path, char mode) {
+  boost::shared_ptr<io::File> file = io::open(path, "", mode);
   m_data.reserve(file->arrayset_size());
   for (size_t i=0; i<file->arrayset_size(); ++i) m_data.push_back(io::Array(file, i));
   m_info = file->arrayset_type();

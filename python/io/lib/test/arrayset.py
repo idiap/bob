@@ -60,19 +60,19 @@ class ArraysetTest(unittest.TestCase):
     # There are 2 ways to initialize an Arrayset with a file. Giving a range or
     # just letting it consume the whole file in one shot.
 
-    A = bob.io.Arrayset(bob.io.open('test1.hdf5', 'a')) # use whole file.
+    A = bob.io.Arrayset('test1.hdf5', 'r') # use whole file.
 
     self.assertEqual ( len(A), 3 )
     self.assertEqual ( A.dtype, 'uint16' )
 
     # You can also limit the range: start at #1 instead of #0
 
-    B = bob.io.Arrayset(bob.io.open('test1.hdf5', 'a'), 1) 
+    B = bob.io.Arrayset(bob.io.open('test1.hdf5', 'r'), 1) 
 
     self.assertEqual ( len(B), 2 )
 
     # Or limit start and end
-    C = bob.io.Arrayset(bob.io.open('test1.hdf5', 'a'), 1, 2) #load only #1
+    C = bob.io.Arrayset(bob.io.open('test1.hdf5', 'r'), 1, 2) #load only #1
 
     self.assertEqual ( len(C), 1 )
 
@@ -112,7 +112,7 @@ class ArraysetTest(unittest.TestCase):
     # Loading and saving works pretty much like for arrays. .load() loads all
     # in-file contents (if any) into memory while .save() does the inverse.
     
-    A = bob.io.Arrayset(bob.io.open('test1.hdf5', 'a')) # use whole file.
+    A = bob.io.Arrayset('test1.hdf5', 'r') # use whole file.
 
     # Nothing should be loaded as of this time
     for k in range(len(A)):
@@ -144,7 +144,7 @@ class ArraysetTest(unittest.TestCase):
     # Manipulations on Arraysets can either get you back io.Arrays or NumPy
     # ndarray's directly. Here is a demo and a test:
 
-    A = bob.io.Arrayset(bob.io.open('test1.hdf5', 'a')) # use whole file.
+    A = bob.io.Arrayset('test1.hdf5', 'r') # use whole file.
 
     # .get(<id>) will return you always an io.Array.
     self.assertTrue ( isinstance(A.get(0), bob.io.Array) )
@@ -250,6 +250,29 @@ class ArraysetTest(unittest.TestCase):
 
     for i, k in enumerate(t):
       self.assertTrue ( numpy.array_equal(vdata[i], k) )
+
+  def test13_openreadonly(self):
+
+    # tests if the array can be opened in a read-only file system
+    t = bob.io.Arrayset()
+    data = numpy.array(range(540), 'complex128').reshape(3,4,15,3)
+    t.extend(data, 2)
+    name = tempname('.hdf5')
+    t.save(name)
+
+    # make this file read-only
+    os.chmod(name, 0444)
+
+    # now try to open it with read-write, see it fails
+    self.assertRaises(RuntimeError, bob.io.Arrayset, name, 'a')
+
+    # and we make sure it opens the file in read-only mode
+    t2 = bob.io.Arrayset(name, 'r')
+    self.assertEqual( len(t2), 15 )
+    self.assertEqual( t2.elementType, bob.io.ElementType.complex128 )
+    self.assertEqual( t2.shape, (3,4,3) )
+    del t, t2
+    os.unlink(name)
 
 def main():
   import gc
