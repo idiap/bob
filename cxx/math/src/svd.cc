@@ -21,6 +21,7 @@
 #include "math/Exception.h"
 #include "core/array_assert.h"
 #include "core/array_check.h"
+#include "core/array_copy.h"
 
 namespace math = bob::math;
 namespace ca = bob::core::array;
@@ -30,9 +31,12 @@ extern "C" void dgesvd_( char *jobu, char *jobvt, int *M, int *N, double *A,
   int *lda, double *S, double *U, int* ldu, double *VT, int *ldvt, 
   double *work, int *lwork, int *info);
 
+extern "C" void dgesdd_( char *jobz, int *M, int *N, double *A, 
+  int *lda, double *S, double *U, int* ldu, double *VT, int *ldvt, 
+  double *work, int *lwork, int *iwork, int *info);
 
 void math::svd(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
-  blitz::Array<double,1>& sigma, blitz::Array<double,2>& V)
+  blitz::Array<double,1>& sigma, blitz::Array<double,2>& Vt)
 {
   // Size variables
   int M = A.extent(0);
@@ -43,80 +47,92 @@ void math::svd(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   ca::assertZeroBase(A);
   ca::assertZeroBase(U);
   ca::assertZeroBase(sigma);
-  ca::assertZeroBase(V);
+  ca::assertZeroBase(Vt);
   // Checks and resizes if required
   ca::assertSameDimensionLength(U.extent(0), M);
   ca::assertSameDimensionLength(U.extent(1), M);
   ca::assertSameDimensionLength(sigma.extent(0), nb_singular);
-  ca::assertSameDimensionLength(V.extent(0), N);
-  ca::assertSameDimensionLength(V.extent(1), N);
+  ca::assertSameDimensionLength(Vt.extent(0), N);
+  ca::assertSameDimensionLength(Vt.extent(1), N);
 
-  math::svd_(A, U, sigma, V);
+  math::svd_(A, U, sigma, Vt);
 }
 
 void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
-  blitz::Array<double,1>& sigma, blitz::Array<double,2>& V)
+  blitz::Array<double,1>& sigma, blitz::Array<double,2>& Vt)
 {
   // Size variables
   int M = A.extent(0);
   int N = A.extent(1);
   int nb_singular = std::min(M,N);
 
-  ///////////////////////////////////
-  // Prepare to call LAPACK function
+  // Prepares to call LAPACK function:
+  // We will decompose A^T rather than A to reduce the required number of copy
+  // We recall that FORTRAN/LAPACK is column-major order whereas blitz arrays 
+  // are row-major order by default.
+  // If A = U.S.V^T, then A^T = V.S.U^T
 
-  // Initialize LAPACK variables
-  char jobu = 'A'; // Get All left singular vectors
-  char jobvt = 'A'; // Get All right singular vectors
+  // Initialises LAPACK variables
+  char jobz = 'A'; // Get All left singular vectors
   int info = 0;  
-  int lda = M;
-  int ldu = M;
-  int ldvt = N;
-  int lwork = std::max(3*std::min(M,N)+std::max(M,N),5*std::min(M,N));
-
-  // Initialize LAPACK arrays
-  double *work = new double[lwork];
-  double *U_lapack = new double[M*M];
-  double *VT_lapack = new double[N*N];
-  double* A_lapack = new double[M*N];
-  for(int j=0; j<M; ++j)
-    for(int i=0; i<N; ++i)
-      A_lapack[j+i*M] = A(j,i);
-  double *S_lapack;
+  int lda = N;
+  int ldu = N;
+  int ldvt = M;
+  // Integer (workspace) array, dimension (8*min(M,N))
+  int l_iwork = 8*std::min(M,N);
+  int *iwork = new int[l_iwork];
+  // Initialises LAPACK arrays
+  blitz::Array<double,2> A_blitz_lapack(ca::ccopy(A));
+  double* A_lapack = A_blitz_lapack.data();
+  // Tries to use U, Vt and S directly to limit the number of copy()
+  // S_lapack = S
+  blitz::Array<double,1> S_blitz_lapack;
   bool sigma_direct_use = ca::isCZeroBaseContiguous(sigma);
-  if( !sigma_direct_use )
-    S_lapack = new double[nb_singular];
-  else
-    S_lapack = sigma.data();
- 
-  // Call the LAPACK function 
-  dgesvd_( &jobu, &jobvt, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
-    VT_lapack, &ldvt, work, &lwork, &info );
+  if( !sigma_direct_use ) S_blitz_lapack.resize(nb_singular);
+  else                    S_blitz_lapack.reference(sigma);
+  double *S_lapack = S_blitz_lapack.data();
+  // U_lapack = V^T
+  blitz::Array<double,2> U_blitz_lapack;
+  bool U_direct_use = ca::isCZeroBaseContiguous(Vt);
+  if( !U_direct_use )   U_blitz_lapack.resize(N,N);
+  else                  U_blitz_lapack.reference(Vt);
+  double *U_lapack = U_blitz_lapack.data();
+  // V^T_lapack = U
+  blitz::Array<double,2> VT_blitz_lapack;
+  bool VT_direct_use = ca::isCZeroBaseContiguous(U);
+  if( !VT_direct_use )  VT_blitz_lapack.resize(M,M);
+  else                  VT_blitz_lapack.reference(U);
+  double *VT_lapack = VT_blitz_lapack.data();
+
+  // Calls the LAPACK function:
+  // We use dgesdd which is faster than its predecessor dgesvd, when
+  // computing the singular vectors.
+  //   (cf. http://www.netlib.org/lapack/lug/node71.html)
+  // Please note that matlab is relying on dgesvd.
+
+  // A/ Queries the optimal size of the working array
+  int lwork_query = -1;
+  double work_query;
+  dgesdd_( &jobz, &N, &M, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
+    VT_lapack, &ldvt, &work_query, &lwork_query, iwork, &info );
+  // B/ Computes
+  int lwork = static_cast<int>(work_query);
+  double *work = new double[lwork];
+  dgesdd_( &jobz, &N, &M, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
+    VT_lapack, &ldvt, work, &lwork, iwork, &info );
  
   // Check info variable
   if( info != 0)
-    throw math::LapackError("The LAPACK dgsevd function returned a non-zero value.");
+    throw math::LapackError("The LAPACK dgsevd function returned a non-zero\
+       value.");
 
-  // Copy singular vectors back to U and V (column-major order)
-  for(int j=0; j<M; ++j)
-    for(int i=0; i<M; ++i)
-      U(j,i) = U_lapack[j+i*M];
-  // Please not that LAPACK returns transpose(V). We return V!
-  for(int j=0; j<N; ++j)
-    for(int i=0; i<N; ++i)
-      V(j,i) = VT_lapack[j*N+i];
-
-  // Copy result back to sigma if required
-  if( !sigma_direct_use )
-    for(int i=0; i<nb_singular; ++i)
-      sigma(i) = S_lapack[i];
+  // Copy singular vectors back to U, V and sigma if required
+  if( !U_direct_use )  Vt = U_blitz_lapack;
+  if( !VT_direct_use ) U = VT_blitz_lapack;
+  if( !sigma_direct_use ) sigma = S_blitz_lapack;
 
   // Free memory
-  if( !sigma_direct_use )
-    delete [] S_lapack;
-  delete [] A_lapack;
-  delete [] U_lapack;
-  delete [] VT_lapack;
+  delete [] iwork;
   delete [] work;
 }
 
@@ -149,56 +165,145 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   int N = A.extent(1);
   int nb_singular = std::min(M,N);
 
+  // Prepares to call LAPACK function
 
-  ///////////////////////////////////
-  // Prepare to call LAPACK function
-
-  // Initialize LAPACK variables
-  char jobu = 'S'; // Get All left singular vectors
-  char jobvt = 'N'; // Get All right singular vectors
+  // Initialises LAPACK variables
+  char jobz = 'S'; // Get first min(M,N) columns of U
   int info = 0;  
   int lda = M;
   int ldu = M;
-  int ldvt = N;
-  int lwork = std::max(3*std::min(M,N)+std::max(M,N),5*std::min(M,N));
+  int ldvt = std::min(M,N);
 
-  // Initialize LAPACK arrays
-  double *work = new double[lwork];
-  double *U_lapack = new double[M*nb_singular];
-  double *VT_lapack = 0;
-  double* A_lapack = new double[M*N];
-  for(int j=0; j<M; ++j)
-    for(int i=0; i<N; ++i)
-      A_lapack[j+i*M] = A(j,i);
-  double *S_lapack;
+  // Integer (workspace) array, dimension (8*min(M,N))
+  int l_iwork = 8*std::min(M,N);
+  int *iwork = new int[l_iwork];
+  // Initialises LAPACK arrays
+  blitz::Array<double,2> A_blitz_lapack(ca::ccopy(A.transpose(1,0)));
+  double* A_lapack = A_blitz_lapack.data();
+  // Tries to use U and S directly to limit the number of copy()
+  // S_lapack = S
+  blitz::Array<double,1> S_blitz_lapack;
   bool sigma_direct_use = ca::isCZeroBaseContiguous(sigma);
-  if( !sigma_direct_use )
-    S_lapack = new double[nb_singular];
-  else
-    S_lapack = sigma.data();
- 
-  // Call the LAPACK function 
-  dgesvd_( &jobu, &jobvt, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
-    VT_lapack, &ldvt, work, &lwork, &info );
+  if( !sigma_direct_use ) S_blitz_lapack.resize(nb_singular);
+  else                    S_blitz_lapack.reference(sigma);
+  double *S_lapack = S_blitz_lapack.data();
+  // U_lapack = U^T
+  blitz::Array<double,2> U_blitz_lapack;
+  blitz::Array<double,2> Ut = U.transpose(1,0);
+  bool U_direct_use = ca::isCZeroBaseContiguous(Ut);
+  if( !U_direct_use )   U_blitz_lapack.resize(nb_singular,M);
+  else                  U_blitz_lapack.reference(Ut);
+  double *U_lapack = U_blitz_lapack.data();
+  double *VT_lapack = new double[nb_singular*N];
+
+  // Calls the LAPACK function:
+  // We use dgesdd which is faster than its predecessor dgesvd, when
+  // computing the singular vectors.
+  //   (cf. http://www.netlib.org/lapack/lug/node71.html)
+  // Please note that matlab is relying on dgesvd.
+
+  // A/ Queries the optimal size of the working array
+  int lwork_query = -1;
+  double work_query;
+  dgesdd_( &jobz, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
+    VT_lapack, &ldvt, &work_query, &lwork_query, iwork, &info );
+  // B/ Computes
+  int lwork = static_cast<int>(work_query);
+  double *work = new double[lwork];
+  dgesdd_( &jobz, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
+    VT_lapack, &ldvt, work, &lwork, iwork, &info );
  
   // Check info variable
   if( info != 0)
-    throw math::LapackError("The LAPACK dgsevd function returned a non-zero value.");
-
-  // Copy singular vectors back to U and V (column-major order)
-  for(int j=0; j<M; ++j)
-    for(int i=0; i<nb_singular; ++i)
-      U(j,i) = U_lapack[j+i*M];
-
-  // Copy result back to sigma if required
-  if( !sigma_direct_use )
-    for(int i=0; i<nb_singular; ++i)
-      sigma(i) = S_lapack[i];
+    throw math::LapackError("The LAPACK dgsevd function returned a non-zero\
+       value.");
+  
+  // Copy singular vectors back to U, V and sigma if required
+  if( !U_direct_use )  Ut = U_blitz_lapack;
+  if( !sigma_direct_use ) sigma = S_blitz_lapack;
 
   // Free memory
-  if( !sigma_direct_use )
-    delete [] S_lapack;
-  delete [] A_lapack;
-  delete [] U_lapack;
+  delete [] VT_lapack;
+  delete [] iwork;
   delete [] work;
 }
+
+
+void math::svd(const blitz::Array<double,2>& A, blitz::Array<double,1>& sigma)
+{
+  // Size variables
+  int M = A.extent(0);
+  int N = A.extent(1);
+  int nb_singular = std::min(M,N);
+
+  // Checks zero base
+  ca::assertZeroBase(A);
+  ca::assertZeroBase(sigma);
+  // Checks and resizes if required
+  ca::assertSameDimensionLength(sigma.extent(0), nb_singular);
+ 
+  math::svd_(A, sigma);
+}
+
+void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,1>& sigma)
+{
+  // Size variables
+  int M = A.extent(0);
+  int N = A.extent(1);
+  int nb_singular = std::min(M,N);
+
+  // Prepares to call LAPACK function
+
+  // Initialises LAPACK variables
+  char jobz = 'N'; // Get first min(M,N) columns of U
+  int info = 0;  
+  int lda = M;
+  int ldu = M;
+  int ldvt = std::min(M,N);
+
+  // Integer (workspace) array, dimension (8*min(M,N))
+  int l_iwork = 8*std::min(M,N);
+  int *iwork = new int[l_iwork];
+  // Initialises LAPACK arrays
+  blitz::Array<double,2> A_blitz_lapack(ca::ccopy(A.transpose(1,0)));
+  double* A_lapack = A_blitz_lapack.data();
+  // Tries to use S directly to limit the number of copy()
+  // S_lapack = S
+  blitz::Array<double,1> S_blitz_lapack;
+  bool sigma_direct_use = ca::isCZeroBaseContiguous(sigma);
+  if( !sigma_direct_use ) S_blitz_lapack.resize(nb_singular);
+  else                    S_blitz_lapack.reference(sigma);
+  double *S_lapack = S_blitz_lapack.data();
+  double *U_lapack = 0;
+  double *VT_lapack = 0;
+
+  // Calls the LAPACK function:
+  // We use dgesdd which is faster than its predecessor dgesvd, when
+  // computing the singular vectors.
+  //   (cf. http://www.netlib.org/lapack/lug/node71.html)
+  // Please note that matlab is relying on dgesvd.
+
+  // A/ Queries the optimal size of the working array
+  int lwork_query = -1;
+  double work_query;
+  dgesdd_( &jobz, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
+    VT_lapack, &ldvt, &work_query, &lwork_query, iwork, &info );
+  // B/ Computes
+  int lwork = static_cast<int>(work_query);
+  double *work = new double[lwork];
+  dgesdd_( &jobz, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
+    VT_lapack, &ldvt, work, &lwork, iwork, &info );
+ 
+  // Check info variable
+  if( info != 0)
+    throw math::LapackError("The LAPACK dgsevd function returned a non-zero\
+       value.");
+
+  // Copy singular vectors back to U, V and sigma if required
+  if( !sigma_direct_use ) sigma = S_blitz_lapack;
+
+  // Free memory
+  delete [] iwork;
+  delete [] work;
+}
+

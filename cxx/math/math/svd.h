@@ -36,30 +36,30 @@ namespace bob {
 
     /**
       * @brief Function which performs a 'full' Singular Value Decomposition
-      *   using the 'simple' driver routine dgesvd of LAPACK.
-      * @warning The output blitz::array U, sigma and V should have the correct 
+      *   using the divide and conquer routine dgesdd of LAPACK.
+      * @warning The output blitz::array U, sigma and Vt should have the correct 
       *   size, with zero base index. Checks are performed.
       * @param A The A matrix to decompose (size MxN)
       * @param U The U matrix of left singular vectors (size MxM)
       * @param sigma The vector of singular values (size min(M,N))
       *    Please note that this is a 1D array rather than a 2D diagonal matrix!
-      * @param V The V matrix of right singular vectors (size NxN)
+      * @param Vt The V^T matrix of right singular vectors (size NxN)
       */
     void svd(const blitz::Array<double,2>& A, blitz::Array<double,2>& U, 
-      blitz::Array<double,1>& sigma, blitz::Array<double,2>& V);
+      blitz::Array<double,1>& sigma, blitz::Array<double,2>& Vt);
     /**
       * @brief Function which performs a 'full' Singular Value Decomposition
-      *   using the 'simple' driver routine dgesvd of LAPACK.
-      * @warning The output blitz::array U, sigma and V should have the correct 
+      *   using the divide and conquer routine dgesdd of LAPACK.
+      * @warning The output blitz::array U, sigma and Vt should have the correct 
       *   size, with zero base index. Checks are NOT performed.
       * @param A The A matrix to decompose (size MxN)
       * @param U The U matrix of left singular vectors (size MxM)
       * @param sigma The vector of singular values (size min(M,N))
       *    Please note that this is a 1D array rather than a 2D diagonal matrix!
-      * @param V The V matrix of right singular vectors (size NxN)
+      * @param Vt The V^T matrix of right singular vectors (size NxN)
       */
     void svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U, 
-      blitz::Array<double,1>& sigma, blitz::Array<double,2>& V);
+      blitz::Array<double,1>& sigma, blitz::Array<double,2>& Vt);
 
 
     /**
@@ -90,6 +90,31 @@ namespace bob {
       */
     void svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U, 
       blitz::Array<double,1>& sigma);
+
+
+    /**
+      * @brief Function which performs a 'partial' Singular Value Decomposition
+      *   using the 'simple' driver routine dgesvd of LAPACK. It only returns 
+      *   the singular values.
+      * @warning The output blitz::array sigma should have the correct 
+      *   size, with zero base index. Checks are performed.
+      * @param A The A matrix to decompose (size MxN)
+      * @param sigma The vector of singular values (size min(M,N))
+      *    Please note that this is a 1D array rather than a 2D diagonal matrix!
+      */
+    void svd(const blitz::Array<double,2>& A, blitz::Array<double,1>& sigma);
+    /**
+      * @brief Function which performs a 'partial' Singular Value Decomposition
+      *   using the 'simple' driver routine dgesvd of LAPACK. It only returns 
+      *   the singular values.
+      * @warning The output blitz::array sigma should have the correct 
+      *   size, with zero base index. Checks are NOT performed.
+      * @param A The A matrix to decompose (size MxN)
+      * @param sigma The vector of singular values (size min(M,N))
+      *    Please note that this is a 1D array rather than a 2D diagonal matrix!
+      */
+    void svd_(const blitz::Array<double,2>& A, blitz::Array<double,1>& sigma);
+
   }
 /**
  * @}
