@@ -25,6 +25,8 @@ set(src
     "src/HDF5Exception.cc"
     "src/HDF5Types.cc"
     "src/HDF5Utils.cc"
+    "src/HDF5Group.cc"
+    "src/HDF5Dataset.cc"
     "src/HDF5File.cc"
     "src/HDF5ArrayFile.cc"
 

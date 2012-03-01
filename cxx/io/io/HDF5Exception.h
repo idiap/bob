@@ -100,23 +100,6 @@ namespace bob { namespace io {
   };
 
   /**
-   * This exception is raised when the user asks for a particular path (i.e.
-   * "group" in HDF5 jargon) that does not exist in the file.
-   */
-  class HDF5InvalidPath: public HDF5Exception {
-    public:
-      HDF5InvalidPath(const std::string& filename, 
-          const std::string& path) throw();
-      virtual ~HDF5InvalidPath() throw();
-      virtual const char* what() const throw();
-
-    private:
-      std::string m_filename;
-      std::string m_path;
-      mutable std::string m_message;
-  };
-
-  /**
    * This exception is raised when we call the HDF5 C-API and that returns less
    * than zero as a status output.
    */

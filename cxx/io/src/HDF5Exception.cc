@@ -99,28 +99,6 @@ const char* io::HDF5UnsupportedDimensionError::what() const throw() {
   }
 }
 
-io::HDF5InvalidPath::HDF5InvalidPath(const std::string& filename,
-    const std::string& path) throw():
-  io::HDF5Exception(),
-  m_filename(filename),
-  m_path(path)
-{
-}
-
-io::HDF5InvalidPath::~HDF5InvalidPath() throw() { }
-
-const char* io::HDF5InvalidPath::what() const throw() {
-  try {
-    boost::format message("Cannot find path '%s' in the HDF5 file '%s'");
-    message % m_path % m_filename;
-    m_message = message.str();
-    return m_message.c_str();
-  } catch (...) {
-    static const char* emergency = "io::HDF5InvalidPath: cannot format, exception raised";
-    return emergency;
-  }
-}
-
 io::HDF5InvalidFileAccessModeError::HDF5InvalidFileAccessModeError
 (const unsigned int mode) throw():
   io::HDF5Exception(),
