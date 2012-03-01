@@ -44,11 +44,10 @@ class Database(object):
       parameter to an empty string or the value None, we use reset it to the
       default, ("real", "attack").
 
-    verions
+    versions
       Either "raw", "detected_face", "normalized_face" or any combination of those (in a
       tuple). Defines the version of the database that is going to be used. If you set this
-      parameter to an empty string or the value None, we use reset it to the
-      default, ("raw", "detected_face", "normalized_face").
+      parameter to the value None, the images from all the versions are returned ("raw", "detected_face", "normalized_face").
 
     Returns: A dictionary containing the resolved filenames considering all
     the filtering criteria. The keys of the dictionary are just pro-forma (for uniformity with the other databases).
@@ -106,7 +105,7 @@ class Database(object):
     return retval
 
   def filter_files(self, filenames, client_no=None, glasses=None, conditions=None, session=None):
-    """ Filters the filenaames in a dictionary and returns a filtered dictionary which contains only the images with the specified criteria.
+    """ Filters the filenames in a dictionary and returns a filtered dictionary which contains only the images with the specified criteria.
 
     Keyword Parameters:
 
@@ -123,7 +122,7 @@ class Database(object):
       A string (or tuple of strings) with values '00'-'08' for various combinations of lighting conditions and spoofing images poses
 
     session
-      A string (or tuple of strings) with values '01'-'03' for three different sessions
+      A string (or tuple of strings) with values '01'-'03' for three different client enrollment sessions
     """
     retval = {}
     newkey = 0
