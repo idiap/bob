@@ -153,6 +153,11 @@ namespace bob {
         inline void updateR() { m_R_rect = static_cast<int>(floor(m_R+0.5)); }
 
         /**
+          * @brief Circular shift to the right of the input integer for L positions, if N is the total number of bits
+          */ 
+        static unsigned right_shift_circular(unsigned x, int L, int N);
+
+        /**
           * @brief Attributes
           */
         int m_P;

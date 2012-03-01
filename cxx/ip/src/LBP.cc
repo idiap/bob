@@ -36,6 +36,12 @@ ip::LBP::LBP(const int P, const double R, const bool circular,
   updateR(); 
 }
 
+unsigned ip::LBP::right_shift_circular(unsigned x, int L, int N) 
+{
+  unsigned lsbs = x & ((1 << L) - 1);
+  return (x >> L) | (lsbs << (N-L));
+}
+
 void ip::LBP::init_lut_current()
 {
   // Reference to the current lookup table
