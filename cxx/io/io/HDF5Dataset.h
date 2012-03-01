@@ -135,6 +135,9 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
       /**
        * Accesses the current location id of this dataset
        */
+      const boost::shared_ptr<hid_t> location() const {
+        return m_id;
+      }
       boost::shared_ptr<hid_t> location() {
         return m_id;
       }

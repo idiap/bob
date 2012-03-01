@@ -115,6 +115,10 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
       /**
        * Accesses the current location id of this group
        */
+      const boost::shared_ptr<hid_t> location() const {
+        return m_id;
+      }
+
       boost::shared_ptr<hid_t> location() {
         return m_id;
       }
@@ -212,7 +216,8 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
       /**
        * Rename an existing dataset under me.
        */
-      virtual void rename_dataset(const std::string& from, const std::string& to);
+      virtual void rename_dataset(const std::string& from,
+          const std::string& to);
 
       /**
        * Copies the contents of the given dataset into this. By default, use
@@ -242,69 +247,6 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
       }
 
       /**
-       * Get all attributes attached to this group
-       */
-      /** TODO
-      virtual const std::map<std::string, boost::shared_ptr<Attribute> >&
-        attributes() const {
-          return m_attributes;
-        }
-        **/
-
-      /**
-       * Creates a new attribute in this group.
-       */
-      /** TODO
-      virtual boost::shared_ptr<Attribute> create_attribute
-        (const std::string& name, const bob::io::HDF5Type& type);
-        **/
-
-      /**
-       * Deletes an attribute in this group.
-       *
-       * Note that removing data already written in a file will only be
-       * effective in terms of space saving when you actually re-write that
-       * file. This instruction just unlinks all data from this group and makes
-       * them inaccessible to any further read operation.
-       */
-      /** TODO
-      virtual void remove_attribute(const std::string& name);
-      **/
-
-      /**
-       * Rename an existing attribute under me.
-       */
-      /** TODO
-      virtual void rename_attribute(const std::string& from, const std::string& to);
-      **/
-
-      /**
-       * Copies all data from an attribute into this group. By default, use the
-       * same name.
-       */
-      /** TODO
-      virtual void copy_attribute(const boost::shared_ptr<Attribute> other,
-          const std::string& name="");
-       **/
-
-      /**
-       * Says if an attribute with a certain name exists in this group
-       */
-      /** TODO
-      virtual bool has_attribute(const std::string& name) const;
-      **/
-      
-      /**
-       * Accesses a certain attribute from this group
-       */
-      /**
-      template <typename T>
-      boost::shared_ptr<Attribute> set_attribute (const std::string& path, const T value); //??
-      boost::shared_ptr<Attribute> get_attribute (const std::string& path);
-      const boost::shared_ptr<Attribute> get_attribute (const std::string& path) const;
-      **/
-
-      /**
        * Callback function for group iteration. Two cases are blessed here:
        *
        * 1. Object is another group. In this case just instantiate the group and
@@ -315,6 +257,56 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
        */
       herr_t iterate_callback(hid_t group, const char *name,
           const H5L_info_t *info);
+
+    public: //attribute hack
+
+      /**
+       * Sets a scalar attribute on the current group. Setting an existing
+       * attribute overwrites its value.
+       *
+       * @note Only simple scalars are supported for the time being
+       */
+      template <typename T> void set_attribute(const std::string& name, 
+          const T& v) {
+        bob::io::HDF5Type dest_type(v);
+        write_attribute(name, dest_type, reinterpret_cast<const void*>(&v));
+      }
+
+      /**
+       * Reads an attribute from the current group. Raises an error if such
+       * attribute does not exist on the group. To check for existence, use
+       * has_attribute().
+       */
+      template <typename T> T get_attribute(const std::string& name) const {
+        T v;
+        bob::io::HDF5Type dest_type(v);
+        read_attribute(name, dest_type, reinterpret_cast<void*>(&v));
+        return v;
+      }
+
+      /**
+       * Checks if a certain attribute exists in this group.
+       */
+      bool has_attribute(const std::string& name) const;
+
+      /**
+       * Deletes an attribute
+       */
+      void delete_attribute(const std::string& name);
+
+    private: //attribute setting/getting private methods
+
+      /**
+       * reads the attribute value, place it in "buffer"
+       */
+      void read_attribute (const std::string& name,
+          const bob::io::HDF5Type& dest, void* buffer) const;
+
+      /**
+       * writes an attribute value from "buffer"
+       */
+      void write_attribute (const std::string& name,
+          const bob::io::HDF5Type& dest, const void* buffer);
 
     private: //not implemented
 

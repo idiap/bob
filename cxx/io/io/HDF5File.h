@@ -92,6 +92,27 @@ namespace bob { namespace io {
       void createGroup(const std::string& path);
 
       /**
+       * Tells if there is a version number on the current directory
+       */
+      bool hasVersion() const;
+
+      /**
+       * Reads the version number - works if there is one, otherwise, raises an
+       * exception.
+       */
+      uint64_t getVersion() const;
+
+      /**
+       * Sets the version number, overwrites if it already exists
+       */
+      void setVersion(uint64_t version);
+
+      /**
+       * Removes the version number, if one exists
+       */
+      void removeVersion();
+
+      /**
        * Returns the current working path, fully resolved. This is
        * re-calculated every time you call this method.
        */

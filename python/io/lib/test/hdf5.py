@@ -277,5 +277,17 @@ class HDF5FileTest(unittest.TestCase):
     mfile = bob.io.load('test7_unlimited.hdf5')
     self.assertTrue ( mfile.ndim == 2 )
 
+  def test08_version(self):
+
+    tmpname = get_tempfilename()
+    outfile = bob.io.HDF5File(tmpname)
+    self.assertEqual(outfile.version, None)
+    outfile.version = 32
+    self.assertEqual(outfile.version, 32)
+    outfile.version = None
+    self.assertEqual(outfile.version, None)
+
+    os.unlink(tmpname)
+
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(HDF5FileTest)

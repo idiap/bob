@@ -567,6 +567,13 @@ io::HDF5Type::HDF5Type(const boost::shared_ptr<hid_t>& type,
 {
 }
 
+io::HDF5Type::HDF5Type(const boost::shared_ptr<hid_t>& type):
+  m_type(get_datatype(type)),
+  m_shape(1) 
+{
+  m_shape[0] = 1; 
+}
+
 io::HDF5Type::HDF5Type(const HDF5Type& other):
   m_type(other.m_type),
   m_shape(other.m_shape)

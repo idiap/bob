@@ -58,6 +58,22 @@ void io::HDF5File::createGroup(const std::string& path) {
   m_cwd->create_group(path);
 }
 
+bool io::HDF5File::hasVersion() const {
+  return m_cwd->has_attribute("version");
+}
+
+uint64_t io::HDF5File::getVersion() const {
+  return m_cwd->get_attribute<uint64_t>("version");
+}
+
+void io::HDF5File::setVersion(uint64_t version) {
+  m_cwd->set_attribute("version", version);
+}
+
+void io::HDF5File::removeVersion() {
+  m_cwd->delete_attribute("version");
+}
+
 std::string io::HDF5File::cwd() const {
   return m_cwd->path();
 }

@@ -122,7 +122,6 @@ h5::Group::Group(boost::shared_ptr<h5::Group> parent,
 }
 
 void h5::Group::open_recursively() {
-  //TODO: Digs out attributes...
   //iterates over this group only and instantiates what needs to be instantiated
   herr_t status = H5Literate(*m_id, H5_INDEX_NAME,
       H5_ITER_NATIVE, 0, group_iterate_callback, static_cast<void*>(this));
@@ -236,8 +235,6 @@ const boost::shared_ptr<h5::Dataset> h5::Group::operator[] (const std::string& d
 }
 
 void h5::Group::reset() {
-  //TODO: missing attributes
-  
   typedef std::map<std::string, boost::shared_ptr<h5::Group> > group_map_type;
   for (group_map_type::const_iterator it = m_groups.begin();
       it != m_groups.end(); ++it) {
@@ -464,31 +461,115 @@ bool h5::Group::has_dataset(const std::string& dir) const {
   return g->has_dataset(dir.substr(pos+1));
 }
 
-/** TODO
-  boost::shared_ptr<Attribute> h5::Group::create_attribute
-  (const std::string& name, const bob::io::HDF5Type& type);
- **/
+bool h5::Group::has_attribute(const std::string& name) const {
+  return H5Aexists(*m_id, name.c_str());
+}
 
-/** TODO
-  void h5::Group::remove_attribute(const std::string& name);
- **/
+/**
+ * Opens an "auto-destructible" HDF5 dataspace
+ */
+static void delete_h5dataspace (hid_t* p) {
+  if (*p >= 0) H5Sclose(*p);
+  delete p;
+  p=0;
+}
 
-/** TODO
-  void h5::Group::rename_attribute(const std::string& from, const std::string& to);
- **/
+static boost::shared_ptr<hid_t> open_memspace(const io::HDF5Type& t) {
+  boost::shared_ptr<hid_t> retval(new hid_t(-1), std::ptr_fun(delete_h5dataspace));
+  *retval = H5Screate_simple(t.shape().n(), t.shape().get(), 0);
+  if (*retval < 0) throw io::HDF5StatusError("H5Screate_simple", *retval);
+  return retval;
+}
 
-/** TODO
-  void h5::Group::copy_attribute(const boost::shared_ptr<Attribute> other,
-  const std::string& name="");
- **/
+/**
+ * Opens an "auto-destructible" HDF5 attribute
+ */
+static void delete_h5attribute (hid_t* p) {
+  if (*p >= 0) H5Aclose(*p);
+  delete p;
+  p=0;
+}
 
-/** TODO
-  bool h5::Group::has_attribute(const std::string& name) const {
-  typedef std::map<std::string, boost::shared_ptr<h5::Attribute> > map_type;
-  map_type::const_iterator it = m_attributes.find(name);
-  return (it != m_attributes.end());
+/**
+ * Auto-destructing HDF5 type
+ */
+static void delete_h5type (hid_t* p) {
+  if (*p >= 0) H5Tclose(*p);
+  delete p;
+  p=0;
+}
+
+static boost::shared_ptr<hid_t> open_attribute(boost::shared_ptr<const h5::Group> loc, const std::string& name, const io::HDF5Type& t) {
+
+  boost::shared_ptr<hid_t> retval(new hid_t(-1), 
+      std::ptr_fun(delete_h5attribute));
+
+  *retval = H5Aopen(*loc->location(), name.c_str(), H5P_DEFAULT);
+
+  if (*retval < 0) throw io::HDF5StatusError("H5Aopen", *retval);
+
+  //checks if the opened attribute is compatible w/ the expected type
+  boost::shared_ptr<hid_t> atype(new hid_t(-1), std::ptr_fun(delete_h5type));
+  *atype = H5Aget_type(*retval);
+  if (*atype < 0) throw io::HDF5StatusError("H5Aget_type", *atype);
+
+  io::HDF5Type expected(atype);
+
+  if (expected != t) {
+    boost::format m("Trying to access attribute '%s' at `%s:%s' with incompatible buffer - expected `%s', but you gave me `%s'");
+    m % name % loc->file()->filename() % loc->path() % expected.type_str() % t.type_str();
+    throw std::runtime_error(m.str().c_str());
   }
- **/
+
+  return retval;
+}
+
+static void del_attribute (boost::shared_ptr<hid_t> loc,
+    const std::string& name) {
+  herr_t err = H5Adelete(*loc, name.c_str());
+  if (err < 0) throw io::HDF5StatusError("H5Adelete", err);
+}
+
+void h5::Group::delete_attribute (const std::string& name) {
+  del_attribute(m_id, name);
+}
+
+void h5::Group::read_attribute (const std::string& name,
+    const bob::io::HDF5Type& dest, void* buffer) const {
+  boost::shared_ptr<hid_t> attribute = open_attribute(shared_from_this(), 
+      name, dest);
+  herr_t err = H5Aread(*attribute, *dest.htype(), buffer);
+  if (err < 0) throw io::HDF5StatusError("H5Aread", err);
+}
+
+static boost::shared_ptr<hid_t> create_attribute(boost::shared_ptr<hid_t> loc,
+    const std::string& name, const io::HDF5Type& t, 
+    boost::shared_ptr<hid_t> space) {
+
+  boost::shared_ptr<hid_t> retval(new hid_t(-1), 
+      std::ptr_fun(delete_h5attribute));
+
+  *retval = H5Acreate(*loc, name.c_str(), *t.htype(), *space, H5P_DEFAULT,
+      H5P_DEFAULT);
+
+  if (*retval < 0) throw io::HDF5StatusError("H5Acreate", *retval);
+  return retval;
+}
+
+void h5::Group::write_attribute (const std::string& name,
+    const bob::io::HDF5Type& dest,
+    const void* buffer) {
+
+  boost::shared_ptr<hid_t> dataspace = open_memspace(dest);
+
+  if (has_attribute(name)) delete_attribute(name);
+  boost::shared_ptr<hid_t> attribute =
+    create_attribute(m_id, name, dest, dataspace);
+  
+  /* Write the attribute data. */
+  herr_t err = H5Awrite(*attribute, *dest.htype(), buffer);
+  if (err < 0) throw io::HDF5StatusError("H5Awrite", err);
+}
 
 h5::RootGroup::RootGroup(boost::shared_ptr<h5::File> parent):
   h5::Group(parent),
