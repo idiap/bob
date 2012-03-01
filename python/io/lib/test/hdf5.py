@@ -223,51 +223,7 @@ class HDF5FileTest(unittest.TestCase):
 
     os.unlink(tmpname)
 
-  def test04_directory_support(self):
-
-    """
-    conf::Configuration c;
-    int value = 10;
-
-    c.set("value", value);
-    check_equal(c, "value", value);
-    
-    c.set("a/value", value);
-    check_equal(c, "a/value", value);
-    
-    c.cd("b");
-    c.set("value", value);
-    check_equal(c, "/b/value", value);
-
-    c.set("c/value", value);
-    check_equal(c, "/b/c/value", value);
-
-    c.cd("d");
-    c.set("value", value);
-    check_equal(c, "/b/d/value", value);
-
-    c.cd("../e");
-    c.set("value", value);
-    check_equal(c, "/b/e/value", value);
-
-    c.set("/f/value", value);
-    check_equal(c, "/f/value", value);
-    c.cd("../..");
-    check_equal(c, "f/value", value);
-
-    c.cd("..");
-    c.set("/g/value", value);
-    check_equal(c, "/g/value", value);
-
-    c.cd("b/d");
-    c.cd("/h");
-    c.set("value", value);
-    check_equal(c, "/h/value", value);
-    """
-
-    pass
-
-  def test05_resizeAndPreserve(self):
+  def test04_resizeAndPreserve(self):
     
     # This test checks that non-contiguous C-style array can be saved
     # into an HDF5 file.
@@ -282,7 +238,7 @@ class HDF5FileTest(unittest.TestCase):
     tmpname = get_tempfilename()
     bob.io.save(array[:,0], tmpname)
 
-  def test06_canLoadMatlab(self):
+  def test05_canLoadMatlab(self):
 
     # shows we can load a 2D matlab array and interpret it as a bunch of 1D
     # arrays, correctly

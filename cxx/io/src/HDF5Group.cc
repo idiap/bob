@@ -123,7 +123,6 @@ h5::Group::Group(boost::shared_ptr<h5::Group> parent,
 
 void h5::Group::open_recursively() {
   //TODO: Digs out attributes...
- 
   //iterates over this group only and instantiates what needs to be instantiated
   herr_t status = H5Literate(*m_id, H5_INDEX_NAME,
       H5_ITER_NATIVE, 0, group_iterate_callback, static_cast<void*>(this));
@@ -152,7 +151,7 @@ const std::string& h5::Group::filename() const {
 }
 
 std::string h5::Group::path() const {
-  return parent()->path() + "/" + m_name;
+  return (m_name.size()?parent()->path():"") + "/" + m_name;
 }
 
 const boost::shared_ptr<h5::File> h5::Group::file() const {
@@ -384,8 +383,13 @@ boost::shared_ptr<h5::Dataset> h5::Group::create_dataset
   //the same as we do here. This will recurse through the directory structure
   //until we find the place defined by the user or return false.
   std::string dest = dir.substr(0, pos);
-  if (!dest.size()) dest = "/";
-  boost::shared_ptr<h5::Group> g = cd(dest);
+  boost::shared_ptr<h5::Group> g;
+  if (!dest.size()) g = cd("/");
+  else {
+    //let's make sure the directory exists, or let's create it recursively
+    if (!has_group(dest)) g = create_group(dest);
+    else g = cd(dest);
+  }
   return g->create_dataset(dir.substr(pos+1), type, list, compression);
 }
 

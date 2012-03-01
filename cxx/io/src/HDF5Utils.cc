@@ -99,10 +99,15 @@ h5::File::~File() {
 }
 
 boost::shared_ptr<h5::RootGroup> h5::File::root() {
-  boost::shared_ptr<h5::RootGroup> retval =
-    boost::make_shared<h5::RootGroup>(shared_from_this());
-  retval->open_recursively();
-  return retval;
+  if (!m_root) {
+    m_root = boost::make_shared<h5::RootGroup>(shared_from_this());
+    m_root->open_recursively();
+  }
+  return m_root;
+}
+
+void h5::File::reset() {
+  m_root.reset();
 }
 
 size_t h5::File::userblock_size() const {

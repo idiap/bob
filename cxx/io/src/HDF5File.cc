@@ -50,6 +50,14 @@ void io::HDF5File::cd(const std::string& path) {
   m_cwd = m_cwd->cd(path);
 }
 
+bool io::HDF5File::hasGroup(const std::string& path) {
+  return m_cwd->has_group(path);
+}
+
+void io::HDF5File::createGroup(const std::string& path) {
+  m_cwd->create_group(path);
+}
+
 std::string io::HDF5File::cwd() const {
   return m_cwd->path();
 }
@@ -70,7 +78,8 @@ void io::HDF5File::unlink (const std::string& path) {
 void io::HDF5File::rename (const std::string& from, const std::string& to) {
   m_cwd->rename_dataset(from, to);
   std::string current_path = m_cwd->path();
-  m_cwd = m_file->root(); //re-read the whole structure
+  m_file->reset(); //re-read the whole structure
+  m_cwd = m_file->root();
   m_cwd = m_cwd->cd(current_path); //go back to the path we were before
 }
 

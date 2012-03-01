@@ -81,6 +81,17 @@ namespace bob { namespace io {
       void cd(const std::string& path);
 
       /**
+       * Tells if a certain directory exists in a file.
+       */
+      bool hasGroup(const std::string& path);
+
+      /**
+       * Creates a directory within the file. It is an error to recreate a path
+       * that already exists. You can check this with hasGroup()
+       */
+      void createGroup(const std::string& path);
+
+      /**
        * Returns the current working path, fully resolved. This is
        * re-calculated every time you call this method.
        */
@@ -120,7 +131,7 @@ namespace bob { namespace io {
        * container with T = std::string and accepting push_back()
        */
       template <typename T> void paths (T& container) const {
-        m_file->root()->dataset_paths(container);
+        m_cwd->dataset_paths(container);
       }
 
       /**

@@ -115,12 +115,18 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
        */
       boost::shared_ptr<RootGroup> root();
 
+      /**
+       * Resets this file, sets to read again all groups and datasets
+       */
+      void reset();
+
     private: //representation
 
       const boost::filesystem::path m_path; ///< path to the file
       unsigned int m_flags; ///< flags used to open it
       boost::shared_ptr<hid_t> m_fcpl; ///< file creation property lists
       boost::shared_ptr<hid_t> m_id; ///< the HDF5 id attributed to this file.
+      boost::shared_ptr<RootGroup> m_root;
   };
 
 }}}}
