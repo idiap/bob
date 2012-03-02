@@ -99,28 +99,6 @@ const char* io::HDF5UnsupportedDimensionError::what() const throw() {
   }
 }
 
-io::HDF5InvalidPath::HDF5InvalidPath(const std::string& filename,
-    const std::string& path) throw():
-  io::HDF5Exception(),
-  m_filename(filename),
-  m_path(path)
-{
-}
-
-io::HDF5InvalidPath::~HDF5InvalidPath() throw() { }
-
-const char* io::HDF5InvalidPath::what() const throw() {
-  try {
-    boost::format message("Cannot find path '%s' in the HDF5 file '%s'");
-    message % m_path % m_filename;
-    m_message = message.str();
-    return m_message.c_str();
-  } catch (...) {
-    static const char* emergency = "io::HDF5InvalidPath: cannot format, exception raised";
-    return emergency;
-  }
-}
-
 io::HDF5InvalidFileAccessModeError::HDF5InvalidFileAccessModeError
 (const unsigned int mode) throw():
   io::HDF5Exception(),
@@ -175,11 +153,10 @@ const char* io::HDF5StatusError::what() const throw() {
   }
 }
 
-io::HDF5IndexError::HDF5IndexError(const std::string& filename, 
-    const std::string& dataset, size_t size, size_t asked_for) throw():
+io::HDF5IndexError::HDF5IndexError(const std::string& location,
+    size_t size, size_t asked_for) throw():
   io::HDF5Exception(),
-  m_filename(filename),
-  m_dataset(dataset),
+  m_location(location),
   m_size(size),
   m_asked_for(asked_for)
 {
@@ -189,8 +166,8 @@ io::HDF5IndexError::~HDF5IndexError() throw() { }
 
 const char* io::HDF5IndexError::what() const throw() {
   try {
-    boost::format message("Trying to access element %d in Dataset '%s' at HDF5 file '%s' that only contains %d elements");
-    message % m_asked_for % m_dataset % m_filename % m_size;
+    boost::format message("Trying to access element %d in Dataset '%s' that only contains %d elements");
+    message % m_asked_for % m_location % m_size;
     m_message = message.str();
     return m_message.c_str();
   } catch (...) {
@@ -199,13 +176,11 @@ const char* io::HDF5IndexError::what() const throw() {
   }
 }
 
-io::HDF5IncompatibleIO::HDF5IncompatibleIO(const std::string& filename, 
-    const std::string& dataset, 
+io::HDF5IncompatibleIO::HDF5IncompatibleIO(const std::string& location, 
     const std::string& supported,
     const std::string& user_input) throw():
   io::HDF5Exception(),
-  m_filename(filename),
-  m_dataset(dataset),
+  m_location(location),
   m_supported(supported),
   m_user_input(user_input)
 {
@@ -215,8 +190,8 @@ io::HDF5IncompatibleIO::~HDF5IncompatibleIO() throw() { }
 
 const char* io::HDF5IncompatibleIO::what() const throw() {
   try {
-    boost::format message("Trying to read or write '%s' at dataset '%s' on HDF5 file '%s' that only accepts '%s'");
-    message % m_user_input % m_dataset % m_filename % m_supported;
+    boost::format message("Trying to read or write '%s' at '%s' that only accepts '%s'");
+    message % m_user_input % m_location % m_supported;
     m_message = message.str();
     return m_message.c_str();
   } catch (...) {
@@ -225,11 +200,9 @@ const char* io::HDF5IncompatibleIO::what() const throw() {
   }
 }
 
-io::HDF5NotExpandible::HDF5NotExpandible(const std::string& filename, 
-    const std::string& dataset) throw():
+io::HDF5NotExpandible::HDF5NotExpandible(const std::string& location) throw():
   io::HDF5Exception(),
-  m_filename(filename),
-  m_dataset(dataset)
+  m_location(location)
 {
 }
 
@@ -237,8 +210,8 @@ io::HDF5NotExpandible::~HDF5NotExpandible() throw() { }
 
 const char* io::HDF5NotExpandible::what() const throw() {
   try {
-    boost::format message("Trying to append to dataset '%s' on HDF5 file '%s' that is not expandible");
-    message % m_dataset % m_filename;
+    boost::format message("Trying to append to '%s' that is not expandible");
+    message % m_location;
     m_message = message.str();
     return m_message.c_str();
   } catch (...) {

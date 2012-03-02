@@ -120,6 +120,8 @@ void bob::machine::GMMLLRMachine::save(bob::io::HDF5File& config) const {
 
   std::ostringstream oss_client;
   oss_client << "m_gmm_client";
+
+  if (!config.hasGroup(oss_client.str())) config.createGroup(oss_client.str());
   config.cd(oss_client.str());
   m_gmm_client->save(config);
   config.cd("..");

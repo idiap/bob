@@ -100,23 +100,6 @@ namespace bob { namespace io {
   };
 
   /**
-   * This exception is raised when the user asks for a particular path (i.e.
-   * "group" in HDF5 jargon) that does not exist in the file.
-   */
-  class HDF5InvalidPath: public HDF5Exception {
-    public:
-      HDF5InvalidPath(const std::string& filename, 
-          const std::string& path) throw();
-      virtual ~HDF5InvalidPath() throw();
-      virtual const char* what() const throw();
-
-    private:
-      std::string m_filename;
-      std::string m_path;
-      mutable std::string m_message;
-  };
-
-  /**
    * This exception is raised when we call the HDF5 C-API and that returns less
    * than zero as a status output.
    */
@@ -138,14 +121,13 @@ namespace bob { namespace io {
    */
   class HDF5IndexError: public HDF5Exception {
     public:
-      HDF5IndexError(const std::string& filename, const std::string& dataset,
+      HDF5IndexError(const std::string& location,
           size_t size, size_t asked_for) throw();
       virtual ~HDF5IndexError() throw();
       virtual const char* what() const throw();
 
     private:
-      std::string m_filename; ///< the path to the file that has problems
-      std::string m_dataset; ///< the dataset path
+      std::string m_location; ///< the path to the dataset that has problems
       size_t m_size; ///< the current dataset size
       size_t m_asked_for; ///< which index the user asked for
       mutable std::string m_message;
@@ -158,16 +140,14 @@ namespace bob { namespace io {
    */
   class HDF5IncompatibleIO: public HDF5Exception {
     public:
-      HDF5IncompatibleIO(const std::string& filename, 
-          const std::string& dataset, 
+      HDF5IncompatibleIO(const std::string& location, 
           const std::string& supported,
           const std::string& user_input) throw();
       virtual ~HDF5IncompatibleIO() throw();
       virtual const char* what() const throw();
 
     private:
-      std::string m_filename; ///< the path to the file that has problems
-      std::string m_dataset; ///< the dataset path
+      std::string m_location; ///< the path to the location that has problems
       std::string m_supported; ///< string representation of supported type
       std::string m_user_input; ///< string representation of user input
       mutable std::string m_message;
@@ -179,14 +159,12 @@ namespace bob { namespace io {
    */
   class HDF5NotExpandible: public HDF5Exception {
     public:
-      HDF5NotExpandible(const std::string& filename, 
-          const std::string& dataset) throw();
+      HDF5NotExpandible(const std::string& location) throw();
       virtual ~HDF5NotExpandible() throw();
       virtual const char* what() const throw();
 
     private:
-      std::string m_filename; ///< the path to the file that has problems
-      std::string m_dataset; ///< the dataset path
+      std::string m_location; ///< the path to the location that has problems
       mutable std::string m_message;
   };
 

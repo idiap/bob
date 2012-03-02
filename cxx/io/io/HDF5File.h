@@ -25,13 +25,6 @@
 #ifndef BOB_IO_HDF5FILE_H 
 #define BOB_IO_HDF5FILE_H
 
-#include <vector>
-
-#include <boost/ref.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/filesystem.hpp>
-
 #include "core/array.h"
 #include "io/HDF5Utils.h"
 
@@ -73,16 +66,14 @@ namespace bob { namespace io {
       virtual ~HDF5File();
 
       /**
-       * Changes the current prefix path. When this object is started, the
-       * prefix path is empty, which means all following paths to data objects
-       * should be given using the full path. If you set this to a different
-       * value, it will be used as a prefix to any subsequent operation until
-       * you reset it.
+       * Changes the current prefix path. When this object is started, it 
+       * points to the root of the file. If you set this to a different
+       * value, it will be used as a prefix to any subsequent operation on
+       * relative paths until you reset it.
        * 
        * @param path If path starts with '/', it is treated as an absolute
        * path. '..' and '.' are supported. This object should be a std::string.
-       * If the value is relative, it is added to the current path. If it is
-       * absolute, it causes the prefix to be reset.
+       * If the value is relative, it is added to the current path. 
        *
        * @note All operations taking a relative path, following a cd(), will be
        * considered relative to the value returned by cwd().
@@ -90,9 +81,42 @@ namespace bob { namespace io {
       void cd(const std::string& path);
 
       /**
-       * Returns the current working path, fully resolved
+       * Tells if a certain directory exists in a file.
        */
-      const std::string& cwd() const;
+      bool hasGroup(const std::string& path);
+
+      /**
+       * Creates a directory within the file. It is an error to recreate a path
+       * that already exists. You can check this with hasGroup()
+       */
+      void createGroup(const std::string& path);
+
+      /**
+       * Tells if there is a version number on the current directory
+       */
+      bool hasVersion() const;
+
+      /**
+       * Reads the version number - works if there is one, otherwise, raises an
+       * exception.
+       */
+      uint64_t getVersion() const;
+
+      /**
+       * Sets the version number, overwrites if it already exists
+       */
+      void setVersion(uint64_t version);
+
+      /**
+       * Removes the version number, if one exists
+       */
+      void removeVersion();
+
+      /**
+       * Returns the current working path, fully resolved. This is
+       * re-calculated every time you call this method.
+       */
+      std::string cwd() const;
 
       /**
        * Tells if we have a variable with the given name inside the HDF5 file.
@@ -128,9 +152,7 @@ namespace bob { namespace io {
        * container with T = std::string and accepting push_back()
        */
       template <typename T> void paths (T& container) const {
-        for (std::map<std::string, boost::shared_ptr<detail::hdf5::Dataset> >::const_iterator it = m_index.begin(); it != m_index.end(); ++it) {
-          container.push_back(it->first);
-        }
+        m_cwd->dataset_paths(container);
       }
 
       /**
@@ -151,21 +173,15 @@ namespace bob { namespace io {
        */
       template <typename T>
         void read(const std::string& path, size_t pos, T& value) {
-        std::string absolute = resolve(path);
-        if (!contains(absolute)) 
-          throw bob::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
-        m_index[absolute]->read(pos, value);
-      }
+          (*m_cwd)[path]->read(pos, value);
+        }
 
       /**
        * Reads data from the file into a scalar. Returns by copy. Raises if the
        * type T is incompatible. Relative paths are accepted.
        */
       template <typename T> T read(const std::string& path, size_t pos) {
-        std::string absolute = resolve(path);
-        if (!contains(absolute)) 
-          throw bob::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
-        return m_index[absolute]->read<T>(pos);
+        return (*m_cwd)[path]->read<T>(pos);
       }
 
       /**
@@ -183,10 +199,7 @@ namespace bob { namespace io {
        */
       template <typename T, int N> void readArray(const std::string& path,
           size_t pos, blitz::Array<T,N>& value) {
-        std::string absolute = resolve(path);
-        if (!contains(absolute)) 
-          throw bob::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
-        m_index[absolute]->readArray(pos, value);
+        (*m_cwd)[path]->readArray(pos, value);
       }
 
       /**
@@ -196,10 +209,7 @@ namespace bob { namespace io {
        */
       template <typename T, int N> blitz::Array<T,N> readArray
         (const std::string& path, size_t pos) {
-        std::string absolute = resolve(path);
-        if (!contains(absolute)) 
-          throw bob::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
-        return m_index[absolute]->readArray<T,N>(pos);
+        return (*m_cwd)[path]->readArray<T,N>(pos);
       }
 
       /**
@@ -229,10 +239,7 @@ namespace bob { namespace io {
        */
       template <typename T> void replace(const std::string& path, size_t pos, 
           const T& value) {
-        std::string absolute = resolve(path);
-        if (!contains(absolute)) 
-          throw bob::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
-        m_index[absolute]->replace(pos, value);
+        (*m_cwd)[path]->replace(pos, value);
       }
 
       /**
@@ -251,10 +258,7 @@ namespace bob { namespace io {
        */
       template <typename T> void replaceArray(const std::string& path,
           size_t pos, const T& value) {
-        std::string absolute = resolve(path);
-        if (!contains(absolute)) 
-          throw bob::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
-        m_index[absolute]->replaceArray(pos, value);
+        (*m_cwd)[path]->replaceArray(pos, value);
       }
 
       /**
@@ -273,13 +277,8 @@ namespace bob { namespace io {
        */
       template <typename T> void append(const std::string& path,
           const T& value) {
-        std::string absolute = resolve(path);
-        if (!contains(absolute)) { //create dataset
-          m_index[absolute] =
-            boost::make_shared<detail::hdf5::Dataset>(boost::ref(m_file),
-              absolute, bob::io::HDF5Type(value), true, 0);
-        }
-        m_index[absolute]->add(value);
+        if (!contains(path)) m_cwd->create_dataset(path, bob::io::HDF5Type(value), true, 0);
+        (*m_cwd)[path]->add(value);
       }
 
       /**
@@ -294,13 +293,8 @@ namespace bob { namespace io {
        */
       template <typename T> void appendArray(const std::string& path,
           const T& value, size_t compression=0) {
-        std::string absolute = resolve(path);
-        if (!contains(absolute)) { //create dataset
-          m_index[absolute] =
-            boost::make_shared<detail::hdf5::Dataset>(boost::ref(m_file),
-              absolute, bob::io::HDF5Type(value), true, compression);
-        }
-        m_index[absolute]->addArray(value);
+        if (!contains(path)) m_cwd->create_dataset(path, bob::io::HDF5Type(value), true, compression);
+        (*m_cwd)[path]->addArray(value);
       }
 
       /**
@@ -309,13 +303,8 @@ namespace bob { namespace io {
        * replacing it. If the path does not exist, we append the new scalar.
        */
       template <typename T> void set(const std::string& path, const T& value) {
-        std::string absolute = resolve(path);
-        if (!contains(absolute)) { //create dataset
-          m_index[absolute] =
-            boost::make_shared<detail::hdf5::Dataset>(boost::ref(m_file),
-              absolute, bob::io::HDF5Type(value), false, 0);
-        }
-        m_index[absolute]->replace(0, value);
+        if (!contains(path)) m_cwd->create_dataset(path, bob::io::HDF5Type(value), false, 0);
+        (*m_cwd)[path]->replace(0, value);
       }
 
       /**
@@ -331,13 +320,8 @@ namespace bob { namespace io {
        */
       template <typename T> void setArray(const std::string& path,
           const T& value, size_t compression=0) {
-        std::string absolute = resolve(path);
-        if (!contains(absolute)) { //create dataset
-          m_index[absolute] =
-            boost::make_shared<detail::hdf5::Dataset>(boost::ref(m_file),
-              absolute, bob::io::HDF5Type(value), false, compression);
-        }
-        m_index[absolute]->replaceArray(0, value);
+        if (!contains(path)) m_cwd->create_dataset(path, bob::io::HDF5Type(value), false, compression);
+        (*m_cwd)[path]->replaceArray(0, value);
       }
 
     public: //api shortcuts to deal with buffers -- avoid these at all costs!
@@ -384,19 +368,10 @@ namespace bob { namespace io {
        */
       HDF5File& operator= (const HDF5File& other);
 
-    private: //helpers
-
-      /**
-       * Resolves the given path in light of the current prefix set
-       * (potentially set with cd()).
-       */
-      std::string resolve(const std::string& path) const;
-
     private: //representation
 
-      boost::shared_ptr<detail::hdf5::File> m_file; ///< the opened HDF5 file
-      std::map<std::string, boost::shared_ptr<detail::hdf5::Dataset> > m_index; ///< index of datasets currently available on that file
-      boost::filesystem::path m_cwd; ///< my current working directory
+      boost::shared_ptr<detail::hdf5::File> m_file; ///< the file itself
+      boost::shared_ptr<detail::hdf5::Group> m_cwd; ///< current working dir
 
   };
 

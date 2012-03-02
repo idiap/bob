@@ -432,6 +432,11 @@ namespace bob { namespace io {
           const HDF5Shape& extents);
 
       /**
+       * Scalar of a certain type
+       */
+      HDF5Type(const boost::shared_ptr<hid_t>& type);
+
+      /**
        * Copy construction
        */
       HDF5Type(const HDF5Type& other);

@@ -177,12 +177,33 @@ static void hdf5file_set_array(io::HDF5File& f,
   f.write_buffer(path, 0, tmp);
 }
 
+static object get_version(const io::HDF5File& f) {
+  if (!f.hasVersion()) return object();
+  return object(f.getVersion());
+}
+
+static object set_version(io::HDF5File& f, object o) {
+  if (o.ptr() == Py_None) {
+    f.removeVersion();
+    return o;
+  }
+  extract<uint64_t> int_check(o);
+  if (int_check.check()) {
+    f.setVersion(int_check());
+    return o;
+  }
+  PYTHON_ERROR(TypeError, "Setting the version requires either an integer object or None (to remove it)");
+}
+
 void bind_io_hdf5() {
   class_<io::HDF5File, boost::shared_ptr<io::HDF5File>, boost::noncopyable>("HDF5File", "A HDF5File allows users to read and write data from and to files containing standard bob binary coded data in HDF5 format. For an introduction to HDF5, please visit http://www.hdfgroup.org/HDF5.", no_init)
     .def("__init__", make_constructor(hdf5file_make_fromstr, default_call_policies(), (arg("filename"), arg("openmode_string"))), "Opens a new file in one of these supported modes: 'r' (read-only), 'w' (read/write/append), 't' (read/write/truncate) or 'x' (read/write/exclusive)")
     .def("__init__", make_constructor(hdf5file_make_readwrite, default_call_policies(), (arg("filename"))), "Opens a new HDF5File for reading and writing.")
     .def("cd", &io::HDF5File::cd, (arg("self"), arg("path")), "Changes the current prefix path. When this object is started, the prefix path is empty, which means all following paths to data objects should be given using the full path. If you set this to a different value, it will be used as a prefix to any subsequent operation until you reset it. If path starts with '/', it is treated as an absolute path. '..' and '.' are supported. This object should be a std::string. If the value is relative, it is added to the current path. If it is absolute, it causes the prefix to be reset. Note all operations taking a relative path, following a cd(), will be considered relative to the value defined by the 'cwd' property of this object.")
-    .add_property("cwd", make_function(&io::HDF5File::cwd, return_value_policy<copy_const_reference>()), &io::HDF5File::cd)
+    .def("hasGroup", &io::HDF5File::hasGroup, (arg("self"), arg("path")), "Checks if a path exists inside a file - does not work for datasets, only for directories. If the given path is relative, it is take w.r.t. to the current working directory")
+    .def("createGroup", &io::HDF5File::createGroup, (arg("self"), arg("path")), "Creates a new directory inside the file. A relative path is taken w.r.t. to the current directory. If the directory already exists (check it with hasGroup()), an exception will be raised.")
+    .add_property("version", &get_version, &set_version)
+    .add_property("cwd", &io::HDF5File::cwd)
     .def("__contains__", &io::HDF5File::contains, (arg("self"), arg("key")), "Returns True if the file contains an HDF5 dataset with a given path")
     .def("has_key", &io::HDF5File::contains, (arg("self"), arg("key")), "Returns True if the file contains an HDF5 dataset with a given path")
     .def("describe", &hdf5file_describe, (arg("self"), arg("key")), "If a given path to an HDF5 dataset exists inside the file, return a type description of objects recorded in such a dataset, otherwise, raises an exception. The returned value type is a tuple of tuples (HDF5Type, number-of-objects, expandible) describing the capabilities if the file is read using theses formats.")

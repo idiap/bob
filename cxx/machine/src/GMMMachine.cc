@@ -349,7 +349,8 @@ void mach::GMMMachine::save(io::HDF5File& config) const {
   for(size_t i=0; i<m_n_gaussians; ++i) {
     std::ostringstream oss;
     oss << "m_gaussians" << i;
-    
+   
+    if (!config.hasGroup(oss.str())) config.createGroup(oss.str());
     config.cd(oss.str());
     m_gaussians[i]->save(config);
     config.cd("..");
