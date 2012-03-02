@@ -180,7 +180,7 @@ io::VideoWriter::VideoWriter(const std::string& filename, size_t height,
 }
 
 io::VideoWriter::~VideoWriter() {
-  close();
+  if (m_isopen) close();
 }
 
 void io::VideoWriter::close() {

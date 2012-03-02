@@ -107,7 +107,8 @@ class VideoTest(unittest.TestCase):
     self.assertEqual(len(iv), len(ov))
     self.assertEqual(iv.width, ov.width)
     self.assertEqual(iv.height, ov.height)
-    
+   
+    ov.close() # forces close; see github issue #6
     del ov # trigger closing of the output video stream
 
     iv2 = bob.io.VideoReader(OUTPUT_VIDEO)
@@ -118,6 +119,8 @@ class VideoTest(unittest.TestCase):
       m = numpy.mean(diff)
       self.assertTrue(m < 3.0) # average difference is less than 3 gray levels
     os.unlink(OUTPUT_VIDEO)
+
+    del iv2 # triggers closing of the input video stream
 
   def test05_CanUseArrayInterface(self):
 
