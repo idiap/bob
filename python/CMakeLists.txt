@@ -4,7 +4,14 @@ cmake_minimum_required(VERSION 2.6)
 
 # Installs python top-level wrapper
 if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
-  bob_configure_bobpython(bin/bobpython.in bin/bobpython bin)
+
+  # Sets up a local version of the interpreter
+  set(BOB_PYTHONPATH ${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION})
+  configure_file(bin/python.in ${CMAKE_BINARY_DIR}/bin/python @ONLY)
+
+  # An easy handler to debug python stuff
+  set(BOB_PYTHONPATH ${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION})
+  configure_file(bin/gdbpy.in ${CMAKE_BINARY_DIR}/bin/gdbpy @ONLY)
 
   bob_python_bindings(root root "" "")
   

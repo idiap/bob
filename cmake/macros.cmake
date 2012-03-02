@@ -32,14 +32,14 @@ macro(bob_library package src dependencies shared)
   list(REMOVE_DUPLICATES header_list)
 
   set(BOB_${PACKAGE}_HEADER_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${header_list} CACHE INTERNAL "${package} header dirs")
-  
+
   #message(STATUS "${package} : ${BOB_${PACKAGE}_HEADER_DIRS}")
-  
+
   include_directories(${BOB_${PACKAGE}_HEADER_DIRS})
   add_library(bob_${package} ${src})
-  
+
   target_link_libraries(bob_${package} ${deps_list} ${shared})
-  
+
   set_target_properties(bob_${package} PROPERTIES LIBRARY_OUTPUT_DIRECTORY  ${CMAKE_BINARY_DIR}/lib)
 
   # rpath override rule for OSX
@@ -141,18 +141,11 @@ endmacro()
 macro(bob_wrap_python_file package_name file_path output_path python_method file_to_install)
    bob_convert_file_path_to_module_name(${package_name} ${file_path} module_name)
 
-  set(BOB_MODULE ${module_name})
-  if(python_method STREQUAL "")
-    set(BOB_METHOD "main")
-  else()
-    set(BOB_METHOD "${python_method}")
-  endif()
-
-  set(BOB_BOBPYTHON ${BOB_BOBPYTHON_BUILD})
+  set(BOB_PYTHONPATH ${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION})
   configure_file(${CMAKE_SOURCE_DIR}/python/bin/wrapper.py.in ${output_path})
 
   if(NOT ${file_to_install} STREQUAL "")
-    # Compute the temporary filename 
+    # Compute the temporary filename
     get_filename_component(filename ${output_path} NAME)
 
     # We add md5 of the full path to prevent name collision
@@ -163,9 +156,36 @@ macro(bob_wrap_python_file package_name file_path output_path python_method file
       string(MD5 md5 ${output_path})
     endif()
 
+    set(BOB_MODULE ${module_name})
+    if(python_method STREQUAL "")
+      set(BOB_METHOD "main")
+    else()
+      set(BOB_METHOD "${python_method}")
+    endif()
+
+    if(IS_ABSOLUTE ${CMAKE_INSTALL_PREFIX})
+      set(ABSOLUTE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+    else()
+      set(ABSOLUTE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX})
+    endif()
+
+    if(IS_ABSOLUTE ${build_path})
+      set(ABSOLUTE_build_path ${build_path})
+    else()
+      set(ABSOLUTE_build_path ${CMAKE_BINARY_DIR}/${build_path})
+    endif()
+
+    if(IS_ABSOLUTE ${install_dir})
+      set(ABSOLUTE_install_dir ${install_dir})
+    else()
+      set(ABSOLUTE_install_dir ${ABSOLUTE_INSTALL_PREFIX}/${install_dir})
+    endif()
+
+    set(BOB_PYTHONPATH ${ABSOLUTE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION})
+
     set(${file_to_install} ${CMAKE_BINARY_DIR}/tmp/${filename}${md5})
-    set(BOB_BOBPYTHON ${BOB_BOBPYTHON_INSTALL})
     configure_file(${CMAKE_SOURCE_DIR}/python/bin/wrapper.py.in ${${file_to_install}})
+
   endif()
 endmacro()
 
@@ -509,58 +529,8 @@ function(bob_python_add_dependent_test)
   bob_python_add_test(${test_name};${prog};${ARGV})
 
   get_filename_component(prog_filename_we ${prog} NAME_WE)
-  set(test_name "python-${test_name}-${prog_filename_we}") 
+  set(test_name "python-${test_name}-${prog_filename_we}")
 
   set_property(TEST ${test_name} APPEND PROPERTY DEPENDS "${dependencies}")
 
 endfunction()
-
-
-# Configure the wrapper to the python binary that automatically sets the correct
-# environment.
-#
-# Warning: this macro must be call only once per project.
-#
-#  bob_configure_bobpython(script_path build_path install_dir)
-#
-# script_path: path to the script to configure
-# build_path: script output path in build tree
-# install_dir: script output dir in install tree
-#
-# Example: bob_configure_bobpython(bin/bobpython.in bin/bobpython bin)
-macro(bob_configure_bobpython script_path build_path install_dir)
-  if(IS_ABSOLUTE ${CMAKE_INSTALL_PREFIX})
-    set(ABSOLUTE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
-  else()
-    set(ABSOLUTE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX})
-  endif()
-
-  if(IS_ABSOLUTE ${build_path})
-    set(ABSOLUTE_build_path ${build_path})
-  else()
-    set(ABSOLUTE_build_path ${CMAKE_BINARY_DIR}/${build_path})
-  endif()
-
-  if(IS_ABSOLUTE ${install_dir})
-    set(ABSOLUTE_install_dir ${install_dir})
-  else()
-    set(ABSOLUTE_install_dir ${ABSOLUTE_INSTALL_PREFIX}/${install_dir})
-  endif()
-  
-
-  set(BOB_PYTHONPATH ${ABSOLUTE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION})
-  configure_file(${script_path} ${CMAKE_BINARY_DIR}/tmp/bobpython.toinstall @ONLY)
-  install(PROGRAMS ${CMAKE_BINARY_DIR}/tmp/bobpython.toinstall
-          DESTINATION ${install_dir}
-          RENAME bobpython)
-
-  set(BOB_PYTHONPATH ${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION})
-  configure_file(${script_path} ${ABSOLUTE_build_path} @ONLY)
-
-  set(BOB_BOBPYTHON_BUILD ${ABSOLUTE_build_path} CACHE INTERNAL "Path to built bobpython")
-  set(BOB_BOBPYTHON_INSTALL ${ABSOLUTE_install_dir}/bobpython CACHE INTERNAL "Path to installed bobpython")
-endmacro()
-
-##################
-# END python macro
-##################
