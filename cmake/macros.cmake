@@ -139,7 +139,14 @@ endmacro()
 # file_to_install: [output] path to the file to install. If empty no install file
 #                  is generated.
 macro(bob_wrap_python_file package_name file_path output_path python_method file_to_install)
-   bob_convert_file_path_to_module_name(${package_name} ${file_path} module_name)
+  bob_convert_file_path_to_module_name(${package_name} ${file_path} module_name)
+
+  set(BOB_MODULE ${module_name})
+  if(python_method STREQUAL "")
+    set(BOB_METHOD "main")
+  else()
+    set(BOB_METHOD "${python_method}")
+  endif()
 
   set(BOB_PYTHONPATH ${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION})
   configure_file(${CMAKE_SOURCE_DIR}/python/bin/wrapper.py.in ${output_path})
