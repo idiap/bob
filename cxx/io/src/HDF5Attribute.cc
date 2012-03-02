@@ -70,7 +70,7 @@ static boost::shared_ptr<hid_t> open_attribute
 (const boost::shared_ptr<hid_t> location, const std::string& name,
  const io::HDF5Type& t) {
 
-  boost::shared_ptr<hid_t> retval(new hid_t(-1), 
+  boost::shared_ptr<hid_t> retval(new hid_t(-1),
       std::ptr_fun(delete_h5attribute));
 
   *retval = H5Aopen(*location, name.c_str(), H5P_DEFAULT);
@@ -108,13 +108,13 @@ void h5::read_attribute (const boost::shared_ptr<hid_t> location,
 }
 
 static boost::shared_ptr<hid_t> create_attribute(boost::shared_ptr<hid_t> loc,
-    const std::string& name, const io::HDF5Type& t, 
+    const std::string& name, const io::HDF5Type& t,
     boost::shared_ptr<hid_t> space) {
 
-  boost::shared_ptr<hid_t> retval(new hid_t(-1), 
+  boost::shared_ptr<hid_t> retval(new hid_t(-1),
       std::ptr_fun(delete_h5attribute));
 
-  *retval = H5Acreate(*loc, name.c_str(), *t.htype(), *space, H5P_DEFAULT,
+  *retval = H5Acreate2(*loc, name.c_str(), *t.htype(), *space, H5P_DEFAULT,
       H5P_DEFAULT);
 
   if (*retval < 0) throw io::HDF5StatusError("H5Acreate", *retval);
@@ -130,7 +130,7 @@ void h5::write_attribute (boost::shared_ptr<hid_t> location,
   if (h5::has_attribute(location, name)) h5::delete_attribute(location, name);
   boost::shared_ptr<hid_t> attribute =
     create_attribute(location, name, dest, dataspace);
-  
+
   /* Write the attribute data. */
   herr_t err = H5Awrite(*attribute, *dest.htype(), buffer);
   if (err < 0) throw io::HDF5StatusError("H5Awrite", err);
