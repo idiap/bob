@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/make_shared.hpp>
 #include <boost/format.hpp>
+#include <boost/make_shared.hpp>
 #include "io/HDF5Utils.h"
 #include "io/HDF5Group.h"
 #include "io/HDF5Dataset.h"
@@ -235,7 +235,7 @@ static void create_dataset (boost::shared_ptr<h5::Group> par,
   if (*space < 0) throw io::HDF5StatusError("H5Screate_simple", *space);
 
   //creates the property list saying we need the data to be chunked if this is
-  //supposed to be a list -- HDF5 only support expandability like this.
+  //supposed to be a list -- HDF5 only supports expandability like this.
   boost::shared_ptr<hid_t> dcpl = open_plist(H5P_DATASET_CREATE);
 
   //according to the HDF5 manual, chunks have to have the same rank as the
@@ -270,6 +270,7 @@ static void create_dataset (boost::shared_ptr<h5::Group> par,
       std::ptr_fun(delete_h5dataset));
   *dataset = H5Dcreate2(*par->location(), name.c_str(),
       *cls, *space, *lcpl, *dcpl, H5P_DEFAULT);
+
   if (*dataset < 0) throw io::HDF5StatusError("H5Dcreate2", *dataset);
 }
 
@@ -310,8 +311,7 @@ size_t h5::Dataset::size (const io::HDF5Type& type) const {
   for (size_t k=0; k<m_descr.size(); ++k) {
     if (m_descr[k].type == type) return m_descr[k].size;
   }
-  throw bob::io::HDF5IncompatibleIO(parent()->name(),
-      m_name, m_descr[0].type.str(), type.str());
+  throw bob::io::HDF5IncompatibleIO(url(), m_descr[0].type.str(), type.str());
 }
 
 const boost::shared_ptr<h5::Group> h5::Dataset::parent() const {
@@ -324,6 +324,10 @@ boost::shared_ptr<h5::Group> h5::Dataset::parent() {
 
 const std::string& h5::Dataset::filename() const {
   return parent()->filename();
+}
+
+std::string h5::Dataset::url() const {
+  return filename() + ":" + path();
 }
 
 std::string h5::Dataset::path() const {
@@ -358,14 +362,12 @@ h5::Dataset::select (size_t index, const io::HDF5Type& dest) {
   std::vector<io::HDF5Descriptor>::iterator it = find_type_index(m_descr, dest);
 
   //if we cannot find a compatible type, we throw
-  if (it == m_descr.end())
-    throw bob::io::HDF5IncompatibleIO(parent()->name(),
-        m_name, m_descr[0].type.str(), dest.str());
+  if (it == m_descr.end()) 
+    throw bob::io::HDF5IncompatibleIO(url(), m_descr[0].type.str(), dest.str());
 
   //checks indexing
   if (index >= it->size)
-    throw bob::io::HDF5IndexError(parent()->name(), m_name,
-        it->size, index);
+    throw bob::io::HDF5IndexError(url(), it->size, index);
 
   set_memspace(m_memspace, it->type);
 
@@ -405,12 +407,11 @@ void h5::Dataset::extend_buffer (const bob::io::HDF5Type& dest, const void* buff
   std::vector<io::HDF5Descriptor>::iterator it = find_type_index(m_descr, dest);
 
   //if we cannot find a compatible type, we throw
-  if (it == m_descr.end())
-    throw bob::io::HDF5IncompatibleIO(parent()->name(),
-        m_name, m_descr[0].type.str(), dest.str());
+  if (it == m_descr.end()) 
+    throw bob::io::HDF5IncompatibleIO(url(), m_descr[0].type.str(), dest.str());
 
   if (!it->expandable)
-    throw io::HDF5NotExpandible(parent()->name(), m_name);
+    throw io::HDF5NotExpandible(url());
 
   //if it is expandible, try expansion
   io::HDF5Shape tmp(it->type.shape());
@@ -433,4 +434,12 @@ void h5::Dataset::extend_buffer (const bob::io::HDF5Type& dest, const void* buff
   m_filespace = open_filespace(m_id); //update filespace
 
   write_buffer(tmp[0]-1, dest, buffer);
+}
+
+bool h5::Dataset::has_attribute(const std::string& name) const {
+  return h5::has_attribute(m_id, name);
+}
+
+void h5::Dataset::delete_attribute (const std::string& name) {
+  h5::delete_attribute(m_id, name);
 }

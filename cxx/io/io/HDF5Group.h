@@ -28,6 +28,7 @@
 #include <hdf5.h>
 #include "io/HDF5Types.h"
 #include "io/HDF5Dataset.h"
+#include "io/HDF5Attribute.h"
 
 namespace bob { namespace io { namespace detail { namespace hdf5 {
 
@@ -60,9 +61,9 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
       Group(boost::shared_ptr<File> parent);
 
       /**
-       * Recursively open sub-groups, attributes and datasets. This cannot be
-       * done at the constructor because of a enable_shared_from_this<>
-       * restriction that results in a bad weak pointer exception being raised.
+       * Recursively open sub-groups and datasets. This cannot be done at the
+       * constructor because of a enable_shared_from_this<> restriction that
+       * results in a bad weak pointer exception being raised.
        */
       void open_recursively();
 
@@ -122,6 +123,11 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
       boost::shared_ptr<hid_t> location() {
         return m_id;
       }
+      
+      /**
+       * Path with filename. Constructed each time it is called.
+       */
+      virtual std::string url() const;
 
       /**
        * move up-down on the group hierarchy
@@ -258,7 +264,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
       herr_t iterate_callback(hid_t group, const char *name,
           const H5L_info_t *info);
 
-    public: //attribute hack
+    public: //attribute support
 
       /**
        * Sets a scalar attribute on the current group. Setting an existing
@@ -269,7 +275,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
       template <typename T> void set_attribute(const std::string& name, 
           const T& v) {
         bob::io::HDF5Type dest_type(v);
-        write_attribute(name, dest_type, reinterpret_cast<const void*>(&v));
+        write_attribute(m_id,name,dest_type,reinterpret_cast<const void*>(&v));
       }
 
       /**
@@ -280,7 +286,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
       template <typename T> T get_attribute(const std::string& name) const {
         T v;
         bob::io::HDF5Type dest_type(v);
-        read_attribute(name, dest_type, reinterpret_cast<void*>(&v));
+        read_attribute(m_id, name, dest_type, reinterpret_cast<void*>(&v));
         return v;
       }
 
@@ -293,20 +299,6 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
        * Deletes an attribute
        */
       void delete_attribute(const std::string& name);
-
-    private: //attribute setting/getting private methods
-
-      /**
-       * reads the attribute value, place it in "buffer"
-       */
-      void read_attribute (const std::string& name,
-          const bob::io::HDF5Type& dest, void* buffer) const;
-
-      /**
-       * writes an attribute value from "buffer"
-       */
-      void write_attribute (const std::string& name,
-          const bob::io::HDF5Type& dest, const void* buffer);
 
     private: //not implemented
 

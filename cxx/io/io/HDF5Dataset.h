@@ -36,6 +36,7 @@
 #include "core/array_assert.h"
 #include "core/array_copy.h"
 
+#include "io/HDF5Attribute.h"
 #include "io/HDF5Exception.h"
 #include "io/HDF5Types.h"
 
@@ -118,6 +119,11 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
        * Full path to myself. Constructed each time it is called.
        */
       virtual std::string path() const;
+
+      /**
+       * Path with filename. Constructed each time it is called.
+       */
+      virtual std::string url() const;
 
       /**
        * Access file
@@ -229,8 +235,8 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
               return retval;
             }
           }
-          throw bob::io::HDF5IncompatibleIO(filename(), 
-              path(), m_descr[0].type.str(), "dynamic shape unknown");
+          throw bob::io::HDF5IncompatibleIO(url(), 
+              m_descr[0].type.str(), "dynamic shape unknown");
         }
 
       /**
@@ -407,6 +413,42 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
        * Extend the dataset with one extra variable.
        */
       void extend_buffer (const bob::io::HDF5Type& dest, const void* buffer);
+
+    public: //attribute support
+
+      /**
+       * Sets a scalar attribute on the current group. Setting an existing
+       * attribute overwrites its value.
+       *
+       * @note Only simple scalars are supported for the time being
+       */
+      template <typename T> void set_attribute(const std::string& name, 
+          const T& v) {
+        bob::io::HDF5Type dest_type(v);
+        write_attribute(m_id,name,dest_type,reinterpret_cast<const void*>(&v));
+      }
+
+      /**
+       * Reads an attribute from the current group. Raises an error if such
+       * attribute does not exist on the group. To check for existence, use
+       * has_attribute().
+       */
+      template <typename T> T get_attribute(const std::string& name) const {
+        T v;
+        bob::io::HDF5Type dest_type(v);
+        read_attribute(m_id, name, dest_type, reinterpret_cast<void*>(&v));
+        return v;
+      }
+
+      /**
+       * Checks if a certain attribute exists in this group.
+       */
+      bool has_attribute(const std::string& name) const;
+
+      /**
+       * Deletes an attribute
+       */
+      void delete_attribute(const std::string& name);
 
     private: //not implemented
 
