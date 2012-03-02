@@ -54,7 +54,7 @@ static boost::shared_ptr<hid_t> create_new_group(boost::shared_ptr<hid_t> p,
 static boost::shared_ptr<hid_t> open_group(boost::shared_ptr<hid_t> g,
     const char* name) {
   boost::shared_ptr<hid_t> retval(new hid_t(-1), std::ptr_fun(delete_h5g));
-  *retval = H5Gopen(*g, name, H5P_DEFAULT);
+  *retval = H5Gopen2(*g, name, H5P_DEFAULT);
   if (*retval < 0) throw io::HDF5StatusError("H5Gopen", *retval);
   return retval;
 }
