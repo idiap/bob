@@ -178,7 +178,7 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   int l_iwork = 8*std::min(M,N);
   int *iwork = new int[l_iwork];
   // Initialises LAPACK arrays
-  blitz::Array<double,2> A_blitz_lapack(ca::ccopy(A.transpose(1,0)));
+  blitz::Array<double,2> A_blitz_lapack(ca::ccopy(const_cast<blitz::Array<double,2>&>(A).transpose(1,0)));
   double* A_lapack = A_blitz_lapack.data();
   // Tries to use U and S directly to limit the number of copy()
   // S_lapack = S
@@ -265,7 +265,8 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,1>& sigma)
   int l_iwork = 8*std::min(M,N);
   int *iwork = new int[l_iwork];
   // Initialises LAPACK arrays
-  blitz::Array<double,2> A_blitz_lapack(ca::ccopy(A.transpose(1,0)));
+  blitz::Array<double,2> A_blitz_lapack(
+    ca::ccopy(const_cast<blitz::Array<double,2>&>(A).transpose(1,0)));
   double* A_lapack = A_blitz_lapack.data();
   // Tries to use S directly to limit the number of copy()
   // S_lapack = S
