@@ -113,6 +113,29 @@ class SvmTest(unittest.TestCase):
     self.assertTrue( +1 in machine.labels )
     self.assertTrue( abs(machine.gamma - 0.0769231) < 1e-6 )
 
+    os.unlink(tmp)
+
+  def test02a_can_save_hdf5(self):
+
+    machine = bob.machine.SupportVector(HEART_MACHINE)
+    tmp = tempname('.hdf5')
+    machine.save(bob.io.HDF5File(tmp, 'w'))
+    del machine
+
+    # make sure that the save machine is the same as before
+    machine = bob.machine.SupportVector(bob.io.HDF5File(tmp, 'r'))
+    self.assertEqual(machine.shape, (13,1))
+    self.assertEqual(machine.kernel_type, bob.machine.svm_kernel_type.RBF)
+    self.assertEqual(machine.machine_type, bob.machine.svm_type.C_SVC)
+    self.assertEqual(len(machine.labels), 2)
+    self.assertTrue( -1 in machine.labels )
+    self.assertTrue( +1 in machine.labels )
+    self.assertTrue( abs(machine.gamma - 0.0769231) < 1e-6 )
+    self.assertTrue( numpy.all(abs(machine.input_subtract - 0) < 1e-10) )
+    self.assertTrue( numpy.all(abs(machine.input_divide - 1) < 1e-10) )
+
+    os.unlink(tmp)
+
   def test03_data_loading(self):
 
     #tests if I can load data in libsvm format using SVMFile

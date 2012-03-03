@@ -113,6 +113,11 @@ namespace bob { namespace io {
       void removeVersion();
 
       /**
+       * Returns the name of the file currently opened
+       */
+      const std::string& filename() const { return m_file->filename(); }
+
+      /**
        * Returns the current working path, fully resolved. This is
        * re-calculated every time you call this method.
        */

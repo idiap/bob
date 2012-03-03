@@ -1,7 +1,7 @@
 /**
  * @file cxx/machine/src/SVM.cc
  * @date Sat Dec 17 14:41:56 2011 +0100
- * @author André Anjos <andre.dos.anjos@gmail.com>
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief Implementation of the SVM machine using libsvm
  *
@@ -24,8 +24,16 @@
 #include <cmath>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
 #include "machine/SVM.h"
+#include "machine/MLPException.h"
 #include "core/array_check.h"
+#include "core/logging.h"
+#include <cstdio>
+#include <cstdlib>
+#include <fstream>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 // We need to declare the svm_model type for libsvm < 3.0.0. The next bit of
 // code was cut and pasted from version 2.9.1 of libsvm, file svm.cpp.
@@ -115,6 +123,11 @@ bool mach::SVMFile::read_(int& label, blitz::Array<double,1>& values) {
   return true;
 }
 
+void mach::SVMFile::scaling_parameters(blitz::Array<double,1>& subtract, 
+          blitz::Array<double,1>& divide, double min, double max) {
+  //TODO: Write this method
+}
+
 /**
  * A wrapper, to standardize this function.
  */
@@ -126,15 +139,103 @@ static void my_model_free(svm_model*& m) {
 #endif
 }
 
-mach::SupportVector::SupportVector(const char* model_file):
-  m_model(svm_load_model(model_file), std::ptr_fun(my_model_free))
-{
-  if (!m_model) {
-    boost::format s("cannot open model file %s");
-    s % model_file;
+/**
+ * Creates a new SVM model by copying the given model parameters. Note that
+ * libsvm does not provide a method for copying an svm_model. We overcome this
+ * limitation by writing the model down on to a temporary file and reading it
+ * back. This guarantees that new parameters introduced in new versions of
+ * libsvm will be taken into account by the model copying procedure
+ * automatically.
+ */
+static boost::shared_ptr<svm_model> copy(const svm_model& src) {
+  //use a re-entrant version of tmpnam...
+  char tmp_filename[L_tmpnam];
+  std::tmpnam(tmp_filename);
+
+  //save it to a temporary file
+  if (svm_save_model(tmp_filename, &src)) {
+    boost::format s("cannot save SVM to file `%s' while copying model");
+    s % tmp_filename;
+    throw std::runtime_error(s.str().c_str());
+  }
+ 
+  //reload the model
+  boost::shared_ptr<svm_model> retval(svm_load_model(tmp_filename), 
+      std::ptr_fun(my_model_free));
+
+  if (!retval) {
+    boost::format s("cannot open file `%s' while copying model");
+    s % tmp_filename;
     throw std::runtime_error(s.str().c_str());
   }
 
+  //unlink the temporary file
+  boost::filesystem::remove(tmp_filename); 
+
+  return retval;
+}
+
+/**
+ * Here is the problem: libsvm does not provide a simple way to extract the
+ * information from the SVM structure. There are lots of cases and
+ * allocation and re-allocation is not exactly trivial. To overcome these
+ * problems and still be able to save data in HDF5 format, we let libsvm pickle
+ * the data into a text file and then re-read it in binary. We save the outcome
+ * of this readout in a binary blob inside the HDF5 file.
+ */
+static blitz::Array<uint8_t,1> pickle(const boost::shared_ptr<svm_model> model)
+{
+  //use a re-entrant version of tmpnam...
+  char tmp_filename[L_tmpnam]; 
+  std::tmpnam(tmp_filename);
+
+  //save it to a temporary file
+  if (svm_save_model(tmp_filename, model.get())) {
+    boost::format s("cannot save SVM to file `%s' while copying model");
+    s % tmp_filename;
+    throw std::runtime_error(s.str().c_str());
+  }
+
+  //gets total size of file
+  struct stat filestatus;
+  stat(tmp_filename, &filestatus);
+ 
+  //reload the data from the file in binary format
+  std::ifstream binfile(tmp_filename, std::ios::binary);
+  blitz::Array<uint8_t,1> buffer(filestatus.st_size);
+  binfile.read(reinterpret_cast<char*>(buffer.data()), filestatus.st_size);
+
+  //unlink the temporary file
+  boost::filesystem::remove(tmp_filename); 
+
+  //finally, return the pickled data
+  return buffer;
+}
+
+/**
+ * Reverts the pickling process, returns the model
+ */
+static boost::shared_ptr<svm_model> unpickle(const blitz::Array<uint8_t,1>& buffer) {
+  //use a re-entrant version of tmpnam...
+  char tmp_filename[L_tmpnam];
+  std::tmpnam(tmp_filename);
+
+  std::ofstream binfile(tmp_filename, std::ios::binary);
+  binfile.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
+  binfile.close();
+
+  //reload the file using the appropriate libsvm loading method
+  boost::shared_ptr<svm_model> retval(svm_load_model(tmp_filename), 
+      std::ptr_fun(my_model_free));
+
+  //unlinks the temporary file
+  boost::filesystem::remove(tmp_filename); 
+
+  //finally, return the pickled data
+  return retval;
+}
+
+void mach::SupportVector::reset() {
   //gets the expected size for the input from the first SVM
   svm_node* end = m_model->SV[0];
   while (end->index != -1) end += 1;
@@ -147,6 +248,46 @@ mach::SupportVector::SupportVector(const char* model_file):
     m_input_cache[k].value = 0.;
   }
   m_input_cache[m_model->l].index = -1; //libsvm detects end of input if idx=-1
+
+  m_input_sub.resize(inputSize());
+  m_input_sub = 0.0;
+  m_input_div.resize(inputSize());
+  m_input_div = 1.0;
+}
+
+mach::SupportVector::SupportVector(const std::string& model_file):
+  m_model(svm_load_model(model_file.c_str()), std::ptr_fun(my_model_free))
+{
+  if (!m_model) {
+    boost::format s("cannot open model file '%s'");
+    s % model_file;
+    throw std::runtime_error(s.str().c_str());
+  }
+  reset();
+}
+
+mach::SupportVector::SupportVector(bob::io::HDF5File& config):
+  m_model()
+{
+  if ( (LIBSVM_VERSION/100) > (config.getVersion()/100) ) {
+    //if the major version changes... be aware!
+    boost::format m("SVM being loaded from `%s:%s' (created with libsvm-%d) with libsvm-%d. You may want to read the libsvm FAQ at http://www.csie.ntu.edu.tw/~cjlin/libsvm/log to check if there were format changes between these versions. If not, you can safely ignore this warning and even tell us to remove it via our bug tracker: https://github.com/idiap/bob/issues");
+    m % config.filename() % config.cwd() % config.getVersion() % LIBSVM_VERSION;
+    bob::core::warn << m.str() << std::endl;
+  }
+  m_model = unpickle(config.readArray<uint8_t,1>("svm_model"));
+  reset(); ///< note: has to be done before reading scaling parameters
+  config.readArray("input_subtract", m_input_sub);
+  config.readArray("input_divide", m_input_div);
+}
+
+mach::SupportVector::SupportVector(const svm_model& model)
+  : m_model(copy(model))
+{
+  if (!m_model) {
+    throw std::runtime_error("null SVM model cannot be processed");
+  }
+  reset();
 }
 
 mach::SupportVector::~SupportVector() { }
@@ -199,17 +340,34 @@ double mach::SupportVector::coefficient0() const {
   return m_model->param.coef0;
 }
 
+void mach::SupportVector::setInputSubtraction(const blitz::Array<double,1>& v) {
+  if (inputSize() != (size_t)v.extent(0)) {
+    throw mach::NInputsMismatch(inputSize(), v.extent(0));
+  }
+  m_input_sub.reference(bob::core::array::ccopy(v));
+}
+
+void mach::SupportVector::setInputDivision(const blitz::Array<double,1>& v) {
+  if (inputSize() != (size_t)v.extent(0)) {
+    throw mach::NInputsMismatch(inputSize(), v.extent(0));
+  }
+  m_input_div.reference(bob::core::array::ccopy(v));
+}
+
 /**
- * Copies the user input to a locally pre-allocated cache.
+ * Copies the user input to a locally pre-allocated cache. Apply normalization
+ * at the same occasion.
  */
 static inline void copy(const blitz::Array<double,1>& input,
-    boost::shared_array<svm_node>& cache) {
-  for (size_t k=0; k<(size_t)input.extent(0); ++k) cache[k].value = input(k);
+    boost::shared_array<svm_node>& cache, const blitz::Array<double,1>& sub,
+    const blitz::Array<double,1>& div) {
+  for (size_t k=0; k<(size_t)input.extent(0); ++k) 
+    cache[k].value = (input(k) - sub(k))/div(k);
 }
 
 int mach::SupportVector::predictClass_
 (const blitz::Array<double,1>& input) const {
-  copy(input, m_input_cache);
+  copy(input, m_input_cache, m_input_sub, m_input_div);
   int retval = round(svm_predict(m_model.get(), m_input_cache.get()));
   return retval;
 }
@@ -229,7 +387,7 @@ int mach::SupportVector::predictClass
 int mach::SupportVector::predictClassAndScores_
 (const blitz::Array<double,1>& input,
  blitz::Array<double,1>& scores) const {
-  copy(input, m_input_cache);
+  copy(input, m_input_cache, m_input_sub, m_input_div);
 #if LIBSVM_VERSION > 290
   int retval = round(svm_predict_values(m_model.get(), m_input_cache.get(), scores.data()));
 #else
@@ -265,7 +423,7 @@ int mach::SupportVector::predictClassAndScores
 int mach::SupportVector::predictClassAndProbabilities_
 (const blitz::Array<double,1>& input,
  blitz::Array<double,1>& probabilities) const {
-  copy(input, m_input_cache);
+  copy(input, m_input_cache, m_input_sub, m_input_div);
   int retval = round(svm_predict_probability(m_model.get(), m_input_cache.get(), probabilities.data()));
   return retval;
 }
@@ -297,10 +455,17 @@ int mach::SupportVector::predictClassAndProbabilities
   return predictClassAndProbabilities_(input, probabilities);
 }
 
-void mach::SupportVector::save(const char* filename) const {
-  if (svm_save_model(filename, m_model.get())) {
+void mach::SupportVector::save(const std::string& filename) const {
+  if (svm_save_model(filename.c_str(), m_model.get())) {
     boost::format s("cannot save SVM model to file '%s'");
     s % filename;
     throw std::runtime_error(s.str().c_str());
   }
+}
+
+void mach::SupportVector::save(bob::io::HDF5File& config) const {
+  config.setArray("svm_model", pickle(m_model));
+  config.setArray("input_subtract", m_input_sub);
+  config.setArray("input_divide", m_input_div);
+  config.setVersion(LIBSVM_VERSION);
 }

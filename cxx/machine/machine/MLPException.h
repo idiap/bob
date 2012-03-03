@@ -109,4 +109,3 @@ namespace bob { namespace machine {
 }}
 
 #endif /* BOB_MACHINE_MLPEXCEPTION_H */
-

@@ -1,7 +1,7 @@
 /**
  * @file cxx/machine/machine/SVM.h
  * @date Sat Dec 17 14:41:56 2011 +0100
- * @author André Anjos <andre.dos.anjos@gmail.com>
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief C++ bindings to libsvm
  *
@@ -28,6 +28,7 @@
 #include <boost/shared_array.hpp>
 #include <blitz/array.h>
 #include <fstream>
+#include "io/HDF5File.h"
 
 namespace bob { namespace machine {
 
@@ -95,6 +96,19 @@ namespace bob { namespace machine {
       inline bool eof() const { return m_file.eof(); }
       inline bool fail() const { return m_file.fail(); }
 
+      /**
+       * Calculates the scaling parameters for each column (feature) of this
+       * file. Returns average subtraction and division parameters so that the
+       * features range between the given limits.
+       *
+       * The input arrays in which the division and subtraction parameters will
+       * be copied to need to be allocated previously and have a size that
+       * conforms to the number of features described in this file.
+       */
+      void scaling_parameters(blitz::Array<double,1>& subtract, 
+          blitz::Array<double,1>& divide, double min=-1.0,
+          double max=+1.0);
+
     private: //representation
 
       std::string m_filename; ///< The path to the file being read
@@ -111,11 +125,11 @@ namespace bob { namespace machine {
     public: //api
 
       enum svm_t { 
-        C_SVC, 
-        NU_SVC, 
-        ONE_CLASS, 
-        EPSILON_SVR, 
-        NU_SVR 
+        C_SVC,
+        NU_SVC,
+        ONE_CLASS,
+        EPSILON_SVR,
+        NU_SVR
       }; /* svm_type */
 
       enum kernel_t { 
@@ -127,10 +141,33 @@ namespace bob { namespace machine {
       }; /* kernel_type */
 
       /**
-       * Builds a new SVM model from a libsvm model file. Throws if a problem
-       * is found.
+       * Builds a new Support Vector Machine from a libsvm model file
+       *
+       * When you load using the libsvm model loader, note that the scaling
+       * parameters will be set to defaults (subtraction of 0.0 and division by
+       * 1.0). If you need scaling to be applied, set it individually using the
+       * appropriate methods bellow.
        */
-      SupportVector(const char* model_file);
+      SupportVector(const std::string& model_file);
+
+      /**
+       * Builds a new Support Vector Machine from an HDF5 file containing the
+       * configuration for this machine. Scaling parameters are also loaded
+       * from the file. Using this constructor assures a 100% state recovery
+       * from previous sessions.
+       */
+      SupportVector(bob::io::HDF5File& config);
+
+      /**
+       * Builds a new SVM model from a trained model. Scaling parameters will
+       * be neutral (subtraction := 0.0, division := 1.0).
+       *
+       * @note: This method is typically only used by the respective
+       * bob::trainer::SupportVectorTrainer as it requires the creation of the
+       * object "svm_model". You can still make use of it if you decide to
+       * implement the model instantiation yourself. 
+       */
+      SupportVector(const svm_model& model);
 
       /**
        * Virtual d'tor
@@ -193,6 +230,43 @@ namespace bob { namespace machine {
       bool supportsProbability() const;
 
       /**
+       * Returns the input subtraction factor
+       */
+      inline const blitz::Array<double, 1>& getInputSubraction() const
+      { return m_input_sub; }
+
+      /**
+       * Sets the current input subtraction factor. We will check that the
+       * number of inputs (first dimension of weights) matches the number of
+       * values currently set and will raise an exception if that is not the
+       * case.
+       */
+      void setInputSubtraction(const blitz::Array<double,1>& v);
+
+      /**
+       * Sets all input subtraction values to a specific value.
+       */
+      inline void setInputSubtraction(double v) { m_input_sub = v; }
+
+      /**
+       * Returns the input division factor
+       */
+      inline const blitz::Array<double, 1>& getInputDivision() const
+      { return m_input_div; }
+
+      /**
+       * Sets the current input division factor. We will check that the number
+       * of inputs (first dimension of weights) matches the number of values
+       * currently set and will raise an exception if that is not the case.
+       */
+      void setInputDivision(const blitz::Array<double,1>& v);
+
+      /**
+       * Sets all input division values to a specific value.
+       */
+      inline void setInputDivision(double v) { m_input_div = v; }
+
+      /**
        * Predict, output classes only. Note that the number of labels in the
        * output "labels" array should be the same as the number of input.
        */
@@ -244,15 +318,33 @@ namespace bob { namespace machine {
          blitz::Array<double,1>& probabilities) const;
 
       /**
-       * Saves the current model state to a libsvm file.
+       * Saves the current model state to a file. With this variant, the model
+       * is saved on simpler libsvm model file that does not include the
+       * scaling parameters set on this machine.
        */
-      void save(const char* filename) const;
+      void save(const std::string& filename) const;
+
+      /**
+       * Saves the whole machine into a configuration file. This allows for a
+       * single instruction parameter loading, which includes both the model
+       * and the scaling parameters.
+       */
+      void save(bob::io::HDF5File& config) const;
+
+    private: //methods
+
+      /**
+       * Resets the internal state of this machine. Normally called
+       */
+      void reset();
 
     private: //representation
 
       boost::shared_ptr<svm_model> m_model; ///< libsvm model pointer
       size_t m_input_size; ///< vector size expected as input for the SVM's
       mutable boost::shared_array<svm_node> m_input_cache; ///< cache
+      blitz::Array<double,1> m_input_sub; ///< scaling: subtraction
+      blitz::Array<double,1> m_input_div; ///< scaling: division
 
   };
 
