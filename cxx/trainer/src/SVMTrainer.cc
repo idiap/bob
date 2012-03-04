@@ -221,12 +221,19 @@ boost::shared_ptr<bob::machine::SupportVector> trainer::SVMTrainer::train
   }
 
   //do the training, returns the new machine
-  boost::shared_ptr<svm_model> retval(svm_train(problem.get(), &m_param),
+  boost::shared_ptr<svm_model> model(svm_train(problem.get(), &m_param),
       std::ptr_fun(svm_model_free));
 
   const_cast<double&>(m_param.gamma) = save_gamma;
 
-  return boost::make_shared<bob::machine::SupportVector>(retval);
+  boost::shared_ptr<bob::machine::SupportVector> retval =
+    boost::make_shared<bob::machine::SupportVector>(model);
+
+  //sets up the scaling parameters given as input
+  retval->setInputSubtraction(input_subtraction);
+  retval->setInputDivision(input_division);
+
+  return retval;
 }
 
 boost::shared_ptr<bob::machine::SupportVector> trainer::SVMTrainer::train
