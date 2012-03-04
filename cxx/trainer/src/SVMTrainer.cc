@@ -114,7 +114,7 @@ static boost::shared_ptr<svm_problem> data2problem
       std::ptr_fun(delete_problem));
 
   //choose labels.
-  if (data.size() <= 1 | data.size() > 16) {
+  if ((data.size() <= 1) | (data.size() > 16)) {
     boost::format m("Only supports SVMs for binary or multi-class classification problems (up to 16 classes). You passed me a list of %d arraysets.");
     m % data.size();
     throw std::runtime_error(m.str().c_str());
