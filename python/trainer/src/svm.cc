@@ -32,21 +32,21 @@ namespace train = bob::trainer;
 
 static boost::shared_ptr<mach::SupportVector> train1 
 (const train::SVMTrainer& trainer, object data) {
-  stl_input_iterator<bob::io::Arrayset> dbegin(data), dend;
-  std::vector<bob::io::Arrayset> vdata(dbegin, dend);
+  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
+  std::vector<blitz::Array<double,2> > vdata(dbegin, dend);
   return trainer.train(vdata);
 }
 
 static boost::shared_ptr<mach::SupportVector> train2
 (const train::SVMTrainer& trainer, object data, tp::const_ndarray sub,
  tp::const_ndarray div) {
-  stl_input_iterator<bob::io::Arrayset> dbegin(data), dend;
-  std::vector<bob::io::Arrayset> vdata(dbegin, dend);
+  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
+  std::vector<blitz::Array<double,2> > vdata(dbegin, dend);
   return trainer.train(vdata, sub.bz<double,1>(), div.bz<double,1>());
 }
 
 void bind_trainer_svm() {
-  class_<train::SVMTrainer>("SVMTrainer", "This class emulates the behavior of the command line utility called svm-train, from libsvm. These bindings do not support:\n\n * Precomputed Kernels\n * Regression Problems\n * Different weights for every label (-wi option in svm-train)\n\nFell free to implement those and remove these remarks.")
+  class_<train::SVMTrainer>("SVMTrainer", "This class emulates the behavior of the command line utility called svm-train, from libsvm. These bindings do not support:\n\n * Precomputed Kernels\n * Regression Problems\n * Different weights for every label (-wi option in svm-train)\n\nFell free to implement those and remove these remarks.", no_init)
     .def(init<optional<bob::machine::SupportVector::svm_t, bob::machine::SupportVector::kernel_t, int, double, double, double, double, double, double, double, bool, bool> >(
           (arg("svm_type")=bob::machine::SupportVector::C_SVC,
            arg("kernel_type")=bob::machine::SupportVector::RBF,

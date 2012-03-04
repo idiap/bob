@@ -25,7 +25,6 @@
 
 #include <vector>
 #include "machine/SVM.h"
-#include "io/Arrayset.h"
 
 namespace bob { namespace trainer {
 
@@ -76,14 +75,14 @@ namespace bob { namespace trainer {
        * size of the input data array should be 1.
        */
       boost::shared_ptr<bob::machine::SupportVector> train
-        (const std::vector<bob::io::Arrayset>& data) const;
+        (const std::vector<blitz::Array<double,2> >& data) const;
 
       /**
        * This version accepts scaling parameters that will be applied
        * column-wise to the input data.
        */
       boost::shared_ptr<bob::machine::SupportVector> train
-        (const std::vector<bob::io::Arrayset>& data, 
+        (const std::vector<blitz::Array<double,2> >& data, 
          const blitz::Array<double,1>& input_subtract,
          const blitz::Array<double,1>& input_division) const;
 

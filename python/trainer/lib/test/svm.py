@@ -48,7 +48,29 @@ class SvmTrainingTest(unittest.TestCase):
   """Performs various SVM training tests."""
 
   def test01_initialization(self):
-    pass
+
+    # tests and examplifies some initialization parameters
+
+    # all defaults
+    trainer = bob.trainer.SVMTrainer()
+
+  def test02_training(self):
+   
+    # For this example I'm using an SVM file because of convinience. You only
+    # need to make sure you can gather the input into 2D double arrays in which
+    # each array represents data from one class and each line on such array
+    # contains a sample.
+    f = bob.machine.SVMFile(HEART_DATA, 13)
+    labels, data = f.read_all()
+    neg = numpy.vstack([k for i,k in enumerate(data) if labels[i] < 0])
+    pos = numpy.vstack([k for i,k in enumerate(data) if labels[i] > 0])
+
+    # Data is also pre-scaled so features remain in the range between -1 and
+    # +1. libsvm, apparently, suggests you do that for all features.
+
+    trainer = bob.trainer.SVMTrainer()
+    #machine = trainer.train((neg,pos))
+
 
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(SvmTrainingTest)

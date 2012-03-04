@@ -42,4 +42,5 @@ bob_python_add_unittest(trainer lib/test/rprop.py)
 bob_python_add_unittest(trainer lib/test/backprop.py)
 bob_python_add_unittest(trainer lib/test/jfa.py)
 bob_python_add_unittest(trainer lib/test/plda.py)
-bob_python_add_unittest(trainer lib/test/svm.py)
+bob_python_add_unittest(trainer lib/test/svm.py main 
+  "${CMAKE_CURRENT_SOURCE_DIR}/../machine/data")

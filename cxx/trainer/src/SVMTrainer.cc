@@ -21,6 +21,7 @@
  */
 
 #include <boost/format.hpp>
+#include <boost/make_shared.hpp>
 #include "trainer/Exception.h"
 #include "trainer/SVMTrainer.h"
 
@@ -101,7 +102,7 @@ svm_problem* new_problem(size_t entries) {
  * training routines. Updates "gamma" at the svm_parameter's.
  */
 static boost::shared_ptr<svm_problem> data2problem
-(const std::vector<bob::io::Arrayset>& data,
+(const std::vector<blitz::Array<double, 2> >& data,
  const blitz::Array<double,1>& sub, const blitz::Array<double,1>& div,
  svm_parameter& param) {
   size_t entries = 0;
@@ -134,10 +135,13 @@ static boost::shared_ptr<svm_problem> data2problem
   int max_index = 0; //data width
 
   size_t sample = 0;
+  int n_features = data[0].extent(blitz::secondDim);
+  blitz::Range all=blitz::Range::all();
+  blitz::Array<double,1> d(n_features); //for temporary feature manipulation
+
   for (size_t k=0; k<data.size(); ++k) {
-    for (size_t i=0; i<data[k].size(); ++k) {
-      blitz::Array<double,1> d = data[k].get<double,1>(i);
-      d = (d-sub)/div;
+    for (int i=0; i<data[k].extent(blitz::firstDim); ++k) {
+      d = (data[k](i,all)-sub)/div; //eval and copy in 1 instruction
       size_t node = 1; //at least the "-1"-index terminator
       for (size_t p=0; p<d.size(); ++p) if (d(p)) ++node;
       retval->x[i] = new svm_node[node];
@@ -184,22 +188,16 @@ static void svm_model_free(svm_model*& m) {
 }
 
 boost::shared_ptr<bob::machine::SupportVector> trainer::SVMTrainer::train
-(const std::vector<bob::io::Arrayset>& data,
+(const std::vector<blitz::Array<double, 2> >& data,
  const blitz::Array<double,1>& input_subtraction,
  const blitz::Array<double,1>& input_division) const {
+
   //sanity check of input arraysets
-  int n_features = data[0].getShape()[0];
+  int n_features = data[0].extent(blitz::secondDim);
+
   for (size_t cl=0; cl<data.size(); ++cl) {
-    if (data[cl].getElementType() != bob::core::array::t_float64) {
-      throw io::TypeError(data[cl].getElementType(),
-          bob::core::array::t_float64);
-    }
-    if (data[cl].getNDim() != 1) {
-      throw bob::io::DimensionError(data[cl].getNDim(), 1);
-    }
-    if (data[cl].getShape()[0] != (size_t)n_features) {
-      throw bob::trainer::WrongNumberOfFeatures(data[cl].getShape()[0],
-          n_features, cl);
+    if (data[cl].extent(blitz::secondDim) != n_features) {
+      throw bob::trainer::WrongNumberOfFeatures(data[cl].extent(blitz::secondDim), n_features, cl);
     }
   }
 
@@ -237,8 +235,8 @@ boost::shared_ptr<bob::machine::SupportVector> trainer::SVMTrainer::train
 }
 
 boost::shared_ptr<bob::machine::SupportVector> trainer::SVMTrainer::train
-(const std::vector<bob::io::Arrayset>& data) const {
-  int n_features = data[0].getShape()[0];
+(const std::vector<blitz::Array<double,2> >& data) const {
+  int n_features = data[0].extent(blitz::secondDim);
   blitz::Array<double,1> sub(n_features);
   sub = 0.;
   blitz::Array<double,1> div(n_features);
