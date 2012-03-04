@@ -96,19 +96,6 @@ namespace bob { namespace machine {
       inline bool eof() const { return m_file.eof(); }
       inline bool fail() const { return m_file.fail(); }
 
-      /**
-       * Calculates the scaling parameters for each column (feature) of this
-       * file. Returns average subtraction and division parameters so that the
-       * features range between the given limits.
-       *
-       * The input arrays in which the division and subtraction parameters will
-       * be copied to need to be allocated previously and have a size that
-       * conforms to the number of features described in this file.
-       */
-      void scaling_parameters(blitz::Array<double,1>& subtract, 
-          blitz::Array<double,1>& divide, double min=-1.0,
-          double max=+1.0);
-
     private: //representation
 
       std::string m_filename; ///< The path to the file being read
@@ -167,7 +154,7 @@ namespace bob { namespace machine {
        * object "svm_model". You can still make use of it if you decide to
        * implement the model instantiation yourself. 
        */
-      SupportVector(const svm_model& model);
+      SupportVector(boost::shared_ptr<svm_model> model);
 
       /**
        * Virtual d'tor

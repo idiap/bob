@@ -22,6 +22,7 @@ set(src
     "src/WienerTrainer.cc"
     "src/EMPCATrainer.cc"
     "src/PLDATrainer.cc"
+    "src/SVMTrainer.cc"
 )
 
 bob_library(trainer "${src}" "${deps}" "${shared}")

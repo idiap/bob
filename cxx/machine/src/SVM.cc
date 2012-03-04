@@ -123,56 +123,15 @@ bool mach::SVMFile::read_(int& label, blitz::Array<double,1>& values) {
   return true;
 }
 
-void mach::SVMFile::scaling_parameters(blitz::Array<double,1>& subtract, 
-          blitz::Array<double,1>& divide, double min, double max) {
-  //TODO: Write this method
-}
-
 /**
  * A wrapper, to standardize this function.
  */
-static void my_model_free(svm_model*& m) {
+static void svm_model_free(svm_model*& m) {
 #if LIBSVM_VERSION >= 300
   svm_free_and_destroy_model(&m);
 #else
   svm_destroy_model(m);
 #endif
-}
-
-/**
- * Creates a new SVM model by copying the given model parameters. Note that
- * libsvm does not provide a method for copying an svm_model. We overcome this
- * limitation by writing the model down on to a temporary file and reading it
- * back. This guarantees that new parameters introduced in new versions of
- * libsvm will be taken into account by the model copying procedure
- * automatically.
- */
-static boost::shared_ptr<svm_model> copy(const svm_model& src) {
-  //use a re-entrant version of tmpnam...
-  char tmp_filename[L_tmpnam];
-  std::tmpnam(tmp_filename);
-
-  //save it to a temporary file
-  if (svm_save_model(tmp_filename, &src)) {
-    boost::format s("cannot save SVM to file `%s' while copying model");
-    s % tmp_filename;
-    throw std::runtime_error(s.str().c_str());
-  }
- 
-  //reload the model
-  boost::shared_ptr<svm_model> retval(svm_load_model(tmp_filename), 
-      std::ptr_fun(my_model_free));
-
-  if (!retval) {
-    boost::format s("cannot open file `%s' while copying model");
-    s % tmp_filename;
-    throw std::runtime_error(s.str().c_str());
-  }
-
-  //unlink the temporary file
-  boost::filesystem::remove(tmp_filename); 
-
-  return retval;
 }
 
 /**
@@ -226,7 +185,7 @@ static boost::shared_ptr<svm_model> unpickle(const blitz::Array<uint8_t,1>& buff
 
   //reload the file using the appropriate libsvm loading method
   boost::shared_ptr<svm_model> retval(svm_load_model(tmp_filename), 
-      std::ptr_fun(my_model_free));
+      std::ptr_fun(svm_model_free));
 
   //unlinks the temporary file
   boost::filesystem::remove(tmp_filename); 
@@ -256,7 +215,7 @@ void mach::SupportVector::reset() {
 }
 
 mach::SupportVector::SupportVector(const std::string& model_file):
-  m_model(svm_load_model(model_file.c_str()), std::ptr_fun(my_model_free))
+  m_model(svm_load_model(model_file.c_str()), std::ptr_fun(svm_model_free))
 {
   if (!m_model) {
     boost::format s("cannot open model file '%s'");
@@ -281,8 +240,8 @@ mach::SupportVector::SupportVector(bob::io::HDF5File& config):
   config.readArray("input_divide", m_input_div);
 }
 
-mach::SupportVector::SupportVector(const svm_model& model)
-  : m_model(copy(model))
+mach::SupportVector::SupportVector(boost::shared_ptr<svm_model> model)
+  : m_model(model)
 {
   if (!m_model) {
     throw std::runtime_error("null SVM model cannot be processed");
