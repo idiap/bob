@@ -94,7 +94,7 @@ namespace bob { namespace trainer {
       void setSvmType(bob::machine::SupportVector::svm_t v) { m_param.svm_type = v; }
 
       bob::machine::SupportVector::kernel_t getKernelType() const { return (bob::machine::SupportVector::kernel_t)m_param.kernel_type; }
-      void setSvmType(bob::machine::SupportVector::kernel_t v) { m_param.kernel_type = v; }
+      void setKernelType(bob::machine::SupportVector::kernel_t v) { m_param.kernel_type = v; }
 
       int getDegree() const { return m_param.degree; }
       void setDegree(int v) { m_param.degree = v; }
