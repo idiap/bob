@@ -26,23 +26,6 @@
 #include <vector>
 #include "machine/SVM.h"
 
-// We need to declare the svm_problem type for libsvm < 3.0.0. The next bit of
-// code was cut and pasted from version 2.9.1 of libsvm, file svm.cpp.
-#if LIBSVM_VERSION < 300
-struct svm_node
-{
-	int index;
-	double value;
-};
-
-struct svm_problem
-{
-	int l;
-	double *y;
-	struct svm_node **x;
-};
-#endif
-
 namespace bob { namespace trainer {
 
   /**

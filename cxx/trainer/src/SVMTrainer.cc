@@ -143,10 +143,10 @@ static boost::shared_ptr<svm_problem> data2problem
     for (int i=0; i<data[k].extent(blitz::firstDim); ++k) {
       d = (data[k](i,all)-sub)/div; //eval and copy in 1 instruction
       size_t node = 1; //at least the "-1"-index terminator
-      for (size_t p=0; p<d.size(); ++p) if (d(p)) ++node;
+      for (int p=0; p<d.size(); ++p) if (d(p)) ++node;
       retval->x[sample] = new svm_node[node];
       node = 0;
-      for (size_t p=0; p<d.size(); ++p) {
+      for (int p=0; p<d.size(); ++p) {
         if (d(p)) {
           int index = p+1; //starts indexing at 1
           retval->y[sample] = labels[k];

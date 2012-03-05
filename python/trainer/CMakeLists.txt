@@ -15,6 +15,12 @@ set(ccsrc
    "src/main.cc"
    )
 
+# If we have libsvm installed, enable the compilation of relevant modules
+if(LIBSVM_FOUND)
+  include_directories(${LIBSVM_INCLUDE_DIR})
+  set(ccsrc "src/svm.cc;${ccsrc}")
+endif()
+
 set(ccsrc_overload
    "src/kmeans_wrappers.cc"
    "src/gmm_wrappers.cc"
@@ -42,5 +48,8 @@ bob_python_add_unittest(trainer lib/test/rprop.py)
 bob_python_add_unittest(trainer lib/test/backprop.py)
 bob_python_add_unittest(trainer lib/test/jfa.py)
 bob_python_add_unittest(trainer lib/test/plda.py)
-bob_python_add_unittest(trainer lib/test/svm.py main 
-  "${CMAKE_CURRENT_SOURCE_DIR}/../machine/data")
+
+if(LIBSVM_FOUND)
+  bob_python_add_unittest(trainer lib/test/svm.py main 
+    "${CMAKE_CURRENT_SOURCE_DIR}/../machine/data")
+endif()
