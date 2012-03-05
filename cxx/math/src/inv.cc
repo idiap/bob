@@ -32,16 +32,16 @@ namespace ca = bob::core::array;
 
 // Declaration of the external LAPACK function
 // LU decomposition of a general matrix (dgetrf)
-extern "C" void dgetrf_( int *M, int *N, double *A, int *lda, int *ipiv, 
-  int *info);
+extern "C" void dgetrf_( const int *M, const int *N, double *A, const int *lda, 
+  int *ipiv, int *info);
 // Inverse of a general matrix (dgetri)
-extern "C" void dgetri_( int *N, double *A, int *lda, int *ipiv, double *work,
-  int *lwork, int *info);
+extern "C" void dgetri_( const int *N, double *A, const int *lda, 
+  const int *ipiv, double *work, const int *lwork, int *info);
 
 void math::inv(const blitz::Array<double,2>& A, blitz::Array<double,2>& B)
 {
   // Size variable
-  int N = A.extent(0);
+  const int N = A.extent(0);
   const blitz::TinyVector<int,2> shapeA(N,N);
   ca::assertZeroBase(A);
   ca::assertZeroBase(B);
@@ -55,13 +55,13 @@ void math::inv(const blitz::Array<double,2>& A, blitz::Array<double,2>& B)
 void math::inv_(const blitz::Array<double,2>& A, blitz::Array<double,2>& B)
 {
   // Size variable
-  int N = A.extent(0);
+  const int N = A.extent(0);
 
   //////////////////////////////////////
   // Prepares to call LAPACK functions
   // Initializes LAPACK variables
   int info = 0;  
-  int lda = N;
+  const int lda = N;
 
   // Initializes LAPACK arrays
   int *ipiv = new int[N];
@@ -96,11 +96,11 @@ void math::inv_(const blitz::Array<double,2>& A, blitz::Array<double,2>& B)
 
   // 2/ Computes the inverse matrix
   // 2/A/ Queries the optimal size of the working array
-  int lwork_query = -1;
+  const int lwork_query = -1;
   double work_query;
   dgetri_( &N, A_lapack, &lda, ipiv, &work_query, &lwork_query, &info);
   // 2/B/ Computes the inverse
-  int lwork = static_cast<int>(work_query);
+  const int lwork = static_cast<int>(work_query);
   double *work = new double[lwork];
   dgetri_( &N, A_lapack, &lda, ipiv, work, &lwork, &info);
   // Checks info variable
