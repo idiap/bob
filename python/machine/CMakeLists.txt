@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 set(ccsrc
    "src/machine.cc"
+   "src/gabor.cc"
    "src/gaussian.cc"
    "src/gmm.cc"
    "src/kmeans.cc"
