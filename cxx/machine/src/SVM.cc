@@ -115,7 +115,8 @@ blitz::Array<uint8_t,1> mach::svm_pickle
 {
   //use a re-entrant version of tmpnam...
   char tmp_filename[L_tmpnam]; 
-  std::tmpnam(tmp_filename);
+  char* v = std::tmpnam(tmp_filename);
+  if (!v) throw std::runtime_error("std::tmpnam() call failed - unique name cannot be generated");
 
   //save it to a temporary file
   if (svm_save_model(tmp_filename, model.get())) {
@@ -147,7 +148,8 @@ boost::shared_ptr<svm_model> mach::svm_unpickle
 (const blitz::Array<uint8_t,1>& buffer) {
   //use a re-entrant version of tmpnam...
   char tmp_filename[L_tmpnam];
-  std::tmpnam(tmp_filename);
+  char* v = std::tmpnam(tmp_filename);
+  if (!v) throw std::runtime_error("std::tmpnam() call failed - unique name cannot be generated");
 
   std::ofstream binfile(tmp_filename, std::ios::binary);
   binfile.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
