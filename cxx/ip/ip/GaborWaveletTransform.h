@@ -34,20 +34,25 @@ namespace bob {
 
   namespace ip {
 
+    //! \brief This class represents a single Gabor wavelet in frequency domain.
     class GaborKernel {
 
       public:
 
+        //! Generate a Gbaor kernel in frequency domain
         GaborKernel(
           blitz::TinyVector<int,2> resolution,
           blitz::TinyVector<double,2> wavelet_frequency,
           double sigma = 2. * M_PI,
-          double epsilon = 1e-10,
-          bool dc_free = true
+          double pow_of_k = 0.,
+          bool dc_free = true,
+          double epsilon = 1e-10
         );
 
+        //! Get the image represenation of the Gabor wavelet in frequency domain
         blitz::Array<double,2> kernelImage() const;
 
+        //! Gabor transforms the given image
         void transform(
           const blitz::Array<std::complex<double>,2>& _frequency_domain_image,
           blitz::Array<std::complex<double>,2>& transformed_frequency_domain_image
@@ -79,11 +84,12 @@ namespace bob {
           int number_of_directions = 8,
           double sigma = 2. * M_PI,
           double k_max = M_PI / 2.,
-          double k_fac = 1./sqrt(2.)
+          double k_fac = 1./sqrt(2.),
+          double pow_of_k = 0.,
+          bool dc_free = true
         );
 
         //! generate the kernels for the new resolution
-        //! this function is called internally, no need to call it explicitly
         void generateKernels(blitz::TinyVector<int,2> resolution);
 
         //! Returns the Gabor kernel for the given index
@@ -95,6 +101,7 @@ namespace bob {
         //! get the number of kernels (usually, 40) used by this GWT class
         int numberOfKernels() const{return m_kernel_frequencies.size();}
 
+        //! Returns the vector of central frequencies used by this Gabor wavelet family
         const std::vector<blitz::TinyVector<double,2> >& kernelFrequencies() const {return m_kernel_frequencies;}
 
         //! performs Gabor wavelet transform and returns vector of complex images
@@ -103,22 +110,16 @@ namespace bob {
           blitz::Array<std::complex<double>,3>& trafo_image
         );
 
-        //! performs Gabor wavelet transform and creates 4D image
+        //! \brief performs Gabor wavelet transform and creates 4D image
         //! (absolute part and phase part)
-        //! If do_normalize is enabled, the Gabor jets are normalized to length 1
-        //! (which is a good choice for most applications,
-        //! but e.g. not required to compute LGBP).
         void computeJetImage(
           const blitz::Array<std::complex<double>,2>& gray_image,
           blitz::Array<double,4>& jet_image,
           bool do_normalize = true
         );
 
-        //! performs Gabor wavelet transform and creates 3D image
-        //! (absolute parts of teh responses only)
-        //! If do_normalize is enabled, the Gabor jets are normalized to length 1
-        //! (which is a good choice for most applications,
-        //! but e.g. not required to compute LGBP).
+        //! \brief performs Gabor wavelet transform and creates 3D image
+        //! (absolute parts of the responses only)
         void computeJetImage(
           const blitz::Array<std::complex<double>,2>& gray_image,
           blitz::Array<double,3>& jet_image,
@@ -129,6 +130,8 @@ namespace bob {
       private:
 
         double m_sigma;
+        double m_pow_of_k;
+        bool m_dc_free;
         std::vector<GaborKernel> m_gabor_kernels;
 
         std::vector<blitz::TinyVector<double,2> > m_kernel_frequencies;
@@ -139,14 +142,16 @@ namespace bob {
         blitz::Array<std::complex<double>,2> m_temp_array, m_frequency_image;
 
       public:
+        //! The number of scales (levels, frequencies) of this family
         const int m_number_of_scales;
+        //! The number of directions (orientations) of this family
         const int m_number_of_directions;
     }; // class GaborWaveletTransform
 
-    //! Normalizes a Gabor jet (vector of absolute values) to unit lenght
+    //! Normalizes a Gabor jet (vector of absolute values) to unit length
     void normalizeGaborJet(blitz::Array<double,1>& gabor_jet);
 
-    //! Normalizes a Gabor jet (vector of absolute and phase values) to unit lenght
+    //! Normalizes a Gabor jet (vector of absolute and phase values) to unit length
     void normalizeGaborJet(blitz::Array<double,2>& gabor_jet);
 
   } // namespace ip

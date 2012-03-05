@@ -29,12 +29,22 @@
 
 static inline double sqr(double x){return x*x;}
 
+/**
+ * Generates a Gabor kernel.
+ * @param resolution The resolution of the image to generate
+ * @param k  The frequency vector (i.e. the center of the Gaussian in frequency domain)
+ * @param sigma  The standard deviation (i.e. the width of the Gabor wavelet)
+ * @param pow_of_k  The power of \f$ k^x \f$ used as a prefactor of the Gabor wavelet
+ * @param dc_free   Make the Gabor wavelet DC-free?
+ * @param epsilon   The epsilon value below which the wavelet value is considered as zero
+ */
 bob::ip::GaborKernel::GaborKernel(
   blitz::TinyVector<int,2> resolution,
   blitz::TinyVector<double,2> k,
   double sigma,
-  double epsilon,
-  bool dc_free
+  double pow_of_k,
+  bool dc_free,
+  double epsilon
 )
 : m_x_resolution(resolution[1]),
   m_y_resolution(resolution[0])
@@ -65,6 +75,9 @@ bob::ip::GaborKernel::GaborKernel(
       // assign kernel value
       double wavelet_value = exp(- sigma_square * omega_minus_k_squared / (2. * k_square));
 
+      // prefactor the wavelet value with k^(pow_of_k); the default prefactor 1 might not be the best.
+      wavelet_value *= std::pow(k_square, pow_of_k / 2.);
+
       if (dc_free){
         double omega_square = sqr(omega_x) + sqr(omega_y);
 
@@ -81,7 +94,12 @@ bob::ip::GaborKernel::GaborKernel(
   } // for y
 }
 
-
+/**
+ * Performs the convolution of the given image with this Gabor kernel.
+ * Please note that both the inpus as well as the output image are in frequency domain.
+ * @param frequency_domain_image
+ * @param transformed_frequency_domain_image
+ */
 void bob::ip::GaborKernel::transform(
   const blitz::Array<std::complex<double>,2>& frequency_domain_image,
   blitz::Array<std::complex<double>,2>& transformed_frequency_domain_image
@@ -98,6 +116,10 @@ void bob::ip::GaborKernel::transform(
   }
 }
 
+/**
+ * Generates and returns the image for the current kernel.
+ * @return The kernel image in frequency domain.
+ */
 blitz::Array<double,2> bob::ip::GaborKernel::kernelImage() const{
   blitz::Array<double,2> image(m_y_resolution, m_x_resolution);
   image = 0;
@@ -112,14 +134,28 @@ blitz::Array<double,2> bob::ip::GaborKernel::kernelImage() const{
 /***********************************************************************************
 ******************     GaborWaveletTransform      **********************************
 ***********************************************************************************/
+/**
+ * Initializes a discrete family of Gabor wavelets
+ * @param number_of_scales     The number of scales (frequencies) to generate
+ * @param number_of_directions The number of directions (orientations) to generate
+ * @param sigma                The width (standard deviation) of the Gabor wavelet
+ * @param k_max                The highest frequency to generate (maximum: PI)
+ * @param k_fac                The logarithmical factor between two scales of Gabor wavelets; should be below one
+ * @param pow_of_k             The power of k for the prefactor
+ * @param dc_free              Make the Gabor wavelet DC-free?
+ */
 bob::ip::GaborWaveletTransform::GaborWaveletTransform(
   int number_of_scales,
   int number_of_directions,
   double sigma,
   double k_max,
-  double k_fac
+  double k_fac,
+  double pow_of_k,
+  bool dc_free
 )
 : m_sigma(sigma),
+  m_pow_of_k(pow_of_k),
+  m_dc_free(dc_free),
   m_fft(0,0),
   m_ifft(0,0),
   m_number_of_scales(number_of_scales),
@@ -147,6 +183,11 @@ bob::ip::GaborWaveletTransform::GaborWaveletTransform(
 }
 
 
+/**
+ * Generates the kernels for the given image resolution.
+ * This function dose not need to be called explicitly to be able to perform the GWT.
+ * @param resolution  The resolution of the image to generate the kernels for
+ */
 void bob::ip::GaborWaveletTransform::generateKernels(
   blitz::TinyVector<int,2> resolution
 )
@@ -157,7 +198,7 @@ void bob::ip::GaborWaveletTransform::generateKernels(
     m_gabor_kernels.reserve(m_kernel_frequencies.size());
 
     for (int j = 0; j < (int)m_kernel_frequencies.size(); ++j){
-      m_gabor_kernels.push_back(bob::ip::GaborKernel(resolution, m_kernel_frequencies[j], m_sigma));
+      m_gabor_kernels.push_back(bob::ip::GaborKernel(resolution, m_kernel_frequencies[j], m_sigma, m_pow_of_k, m_dc_free));
     }
 
     // reset fft sizes
@@ -168,6 +209,10 @@ void bob::ip::GaborWaveletTransform::generateKernels(
   }
 }
 
+/**
+ * Generates and returns the images of the Gabor wavelet family in frequency domain.
+ * @return  The Gabor wavelets (one per layer)
+ */
 blitz::Array<double,3> bob::ip::GaborWaveletTransform::kernelImages() const{
   // generate array of desired size
   blitz::Array<double,3> res(m_gabor_kernels.size(), m_temp_array.shape()[0], m_temp_array.shape()[1]);
@@ -178,7 +223,11 @@ blitz::Array<double,3> bob::ip::GaborWaveletTransform::kernelImages() const{
   return res;
 }
 
-
+/**
+ * Computes the Gabor wavelet transformation for the given image (in spatial domain)
+ * @param gray_image  The source image in spatial domain
+ * @param trafo_image The convolution result, in spatial domain
+ */
 void bob::ip::GaborWaveletTransform::performGWT(
   const blitz::Array<std::complex<double>,2>& gray_image,
   blitz::Array<std::complex<double>,3>& trafo_image
@@ -203,6 +252,12 @@ void bob::ip::GaborWaveletTransform::performGWT(
   } // for j
 }
 
+/**
+ * Computes the Gabor jets including absolute values and phases for the given image (in spatial domain).
+ * @param gray_image  The source image in spatial domain
+ * @param jet_image   The resulting Gabor jet image, including absolute values and phases for each pixel
+ * @param do_normalize Shall the Gabor jets be normalized?
+ */
 void bob::ip::GaborWaveletTransform::computeJetImage(
   const blitz::Array<std::complex<double>,2>& gray_image,
   blitz::Array<double,4>& jet_image,
@@ -243,6 +298,12 @@ void bob::ip::GaborWaveletTransform::computeJetImage(
   }
 }
 
+/**
+ * Computes the Gabor jets including absolute values only for the given image (in spatial domain).
+ * @param gray_image  The source image in spatial domain
+ * @param jet_image   The resulting Gabor jet image, including only absolute values for each pixel
+ * @param do_normalize Shall the Gabor jets be normalized?
+ */
 void bob::ip::GaborWaveletTransform::computeJetImage(
   const blitz::Array<std::complex<double>,2>& gray_image,
   blitz::Array<double,3>& jet_image,
@@ -282,6 +343,10 @@ void bob::ip::GaborWaveletTransform::computeJetImage(
 }
 
 
+/**
+ * Normalizes the given Gabor jet (absolute values only) to unit length.
+ * @param gabor_jet The Gabor jet to be normalized.
+ */
 void bob::ip::normalizeGaborJet(blitz::Array<double,1>& gabor_jet){
   double norm = sqrt(std::inner_product(gabor_jet.begin(), gabor_jet.end(), gabor_jet.begin(), 0.));
   // normalize the absolute parts of the jets
@@ -289,6 +354,10 @@ void bob::ip::normalizeGaborJet(blitz::Array<double,1>& gabor_jet){
 }
 
 
+/**
+ * Normalizes the given Gabor jet to unit length.
+ * @param gabor_jet The Gabor jet to be normalized, including the phase values (which will not be altered).
+ */
 void bob::ip::normalizeGaborJet(blitz::Array<double,2>& gabor_jet){
   blitz::Array<double,1> abs_jet = gabor_jet(0, blitz::Range::all());
   double norm = sqrt(std::inner_product(abs_jet.begin(), abs_jet.end(), abs_jet.begin(), 0.));

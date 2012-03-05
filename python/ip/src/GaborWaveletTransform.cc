@@ -65,13 +65,15 @@ void bind_ip_gabor_wavelet_transform() {
   )
 
   .def(
-    boost::python::init<int,int,double,double,double>(
+    boost::python::init<int,int,double,double,double,double,bool>(
       (
         boost::python::arg("number_of_scales") = 5,
         boost::python::arg("number_of_angles") = 8,
         boost::python::arg("sigma") = 2. * M_PI,
         boost::python::arg("k_max") = M_PI / 2.,
-        boost::python::arg("k_fac") = 1./sqrt(2.)
+        boost::python::arg("k_fac") = 1./sqrt(2.),
+        boost::python::arg("pow_of_k") = 0.,
+        boost::python::arg("dc_free") = true
       ),
       "Initializes the Gabor wavelet transform"
     )
@@ -81,6 +83,18 @@ void bind_ip_gabor_wavelet_transform() {
     "number_of_kernels",
     &bob::ip::GaborWaveletTransform::numberOfKernels,
     "The number of Gabor wavelets (i.e. number of directions times number of scales, i.e. the size of the trafo image) used in this Gabor wavelet transform"
+  )
+
+  .add_property(
+    "number_of_scales",
+    &bob::ip::GaborWaveletTransform::m_number_of_scales,
+    "The number of scales that this Gabor wavelet family holds"
+  )
+
+  .add_property(
+    "number_of_directions",
+    &bob::ip::GaborWaveletTransform::m_number_of_directions,
+    "The number of directions that this Gabor wavelet family holds"
   )
 
   .def(
