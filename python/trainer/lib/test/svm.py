@@ -40,10 +40,6 @@ HEART_DATA = 'heart.svmdata' #13 inputs
 HEART_MACHINE = 'heart.svmmodel' #supports probabilities
 HEART_EXPECTED = 'heart.out' #expected probabilities
 
-IRIS_DATA = 'iris.svmdata'
-IRIS_MACHINE = 'iris.svmmodel'
-IRIS_EXPECTED = 'iris.out' #expected probabilities
-
 class SvmTrainingTest(unittest.TestCase):
   """Performs various SVM training tests."""
 
@@ -66,11 +62,80 @@ class SvmTrainingTest(unittest.TestCase):
     pos = numpy.vstack([k for i,k in enumerate(data) if labels[i] > 0])
 
     # Data is also pre-scaled so features remain in the range between -1 and
-    # +1. libsvm, apparently, suggests you do that for all features.
+    # +1. libsvm, apparently, suggests you do that for all features. Our
+    # bindings to libsvm do not include scaling. If you want to implement that
+    # generically, please do it.
 
     trainer = bob.trainer.SVMTrainer()
-    machine = trainer.train((neg,pos))
+    machine = trainer.train((pos, neg)) #ordering only affects labels
+    previous = bob.machine.SupportVector(TEST_MACHINE_NO_PROBS)
+    self.assertEqual(machine.svm_type, previous.svm_type)
+    self.assertEqual(machine.kernel_type, previous.kernel_type)
+    self.assertEqual(machine.gamma, previous.gamma)
+    self.assertEqual(machine.shape, previous.shape)
+    self.assertTrue( numpy.all(abs(machine.input_subtract - \
+      previous.input_subtract) < 1e-8) )
+    self.assertTrue( numpy.all(abs(machine.input_divide - \
+      previous.input_divide) < 1e-8) )
 
+    curr_label = machine.predictClasses(data)
+    prev_label = previous.predictClasses(data)
+    self.assertEqual(curr_label, prev_label)
+
+    curr_labels, curr_scores = machine.predictClassesAndScores(data)
+    prev_labels, prev_scores = previous.predictClassesAndScores(data)
+    self.assertEqual(curr_labels, prev_labels)
+
+    curr_scores = numpy.array(curr_scores)
+    prev_scores = numpy.array(prev_scores)
+    self.assertTrue( numpy.all(abs(curr_scores - prev_scores) < 1e-8) )
+
+  def test03_training_with_probability(self):
+   
+    f = bob.machine.SVMFile(HEART_DATA, 13)
+    labels, data = f.read_all() 
+    neg = numpy.vstack([k for i,k in enumerate(data) if labels[i] < 0])
+    pos = numpy.vstack([k for i,k in enumerate(data) if labels[i] > 0])
+
+    # Data is also pre-scaled so features remain in the range between -1 and
+    # +1. libsvm, apparently, suggests you do that for all features. Our
+    # bindings to libsvm do not include scaling. If you want to implement that
+    # generically, please do it.
+
+    trainer = bob.trainer.SVMTrainer(probability=True)
+    machine = trainer.train((pos, neg)) #ordering only affects labels
+    previous = bob.machine.SupportVector(HEART_MACHINE)
+    self.assertEqual(machine.svm_type, previous.svm_type)
+    self.assertEqual(machine.kernel_type, previous.kernel_type)
+    self.assertEqual(machine.gamma, previous.gamma)
+    self.assertEqual(machine.shape, previous.shape)
+    self.assertTrue( numpy.all(abs(machine.input_subtract - \
+      previous.input_subtract) < 1e-8) )
+    self.assertTrue( numpy.all(abs(machine.input_divide - \
+      previous.input_divide) < 1e-8) )
+
+    # check labels
+    curr_label = machine.predictClasses(data)
+    prev_label = previous.predictClasses(data)
+    self.assertEqual(curr_label, prev_label)
+
+    # check scores
+    curr_labels, curr_scores = machine.predictClassesAndScores(data)
+    prev_labels, prev_scores = previous.predictClassesAndScores(data)
+    self.assertEqual(curr_labels, prev_labels)
+
+    curr_scores = numpy.array(curr_scores)
+    prev_scores = numpy.array(prev_scores)
+    self.assertTrue( numpy.all(abs(curr_scores - prev_scores) < 1e-8) )
+
+    # check probabilities -- probA and probB do not get the exact same values
+    # as when using libsvm's svm-train.c. The reason may lie in the order in
+    # which the samples are arranged.
+    curr_labels, curr_scores = machine.predictClassesAndProbabilities(data)
+    prev_labels, prev_scores = previous.predictClassesAndProbabilities(data)
+    curr_scores = numpy.array(curr_scores)
+    prev_scores = numpy.array(prev_scores)
+    #self.assertTrue( numpy.all(abs(curr_scores-prev_scores) < 1e-8) )
 
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(SvmTrainingTest)

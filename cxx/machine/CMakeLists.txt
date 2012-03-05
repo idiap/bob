@@ -2,7 +2,7 @@ PROJECT(machine-cxx)
 cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
-set(deps core io math sp) #other bob subprojects
+set(deps core io math sp ip) #other bob subprojects
 set(shared "")
 
 # This defines the list of source files inside this package.
@@ -24,6 +24,8 @@ set(src
     "src/JFAMachineException.cc"
     "src/WienerMachine.cc"
     "src/PLDAMachine.cc"
+    "src/GaborGraphMachine.cc"
+    "src/GaborJetSimilarities.cc"
 )
 
 # If we have libsvm installed, enable the compilation of relevant modules
@@ -39,3 +41,7 @@ bob_library(machine "${src}" "${deps}" "${shared}")
 bob_test(machine linear test/linear.cc)
 set_property(TEST cxx-machine-linear APPEND PROPERTY ENVIRONMENT
   "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/../../python/machine/data")
+
+bob_test(machine gabor test/gabor.cc)
+set_property(TEST cxx-machine-gabor APPEND PROPERTY ENVIRONMENT
+  "BOB_MACHINE_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")

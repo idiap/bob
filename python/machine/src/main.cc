@@ -24,6 +24,7 @@
 #include "core/python/ndarray.h"
 
 void bind_machine_base();
+void bind_machine_gabor();
 void bind_machine_gaussian();
 void bind_machine_gmm();
 void bind_machine_kmeans();
@@ -46,6 +47,7 @@ BOOST_PYTHON_MODULE(_machine)
   bob::python::setup_python("bob classes and sub-classes for machine access");
 
   bind_machine_base();
+  bind_machine_gabor();
   bind_machine_gaussian();
   bind_machine_gmm();
   bind_machine_kmeans();
