@@ -144,7 +144,7 @@ static boost::shared_ptr<svm_problem> data2problem
       d = (data[k](i,all)-sub)/div; //eval and copy in 1 instruction
       size_t node = 1; //at least the "-1"-index terminator
       for (size_t p=0; p<d.size(); ++p) if (d(p)) ++node;
-      retval->x[i] = new svm_node[node];
+      retval->x[sample] = new svm_node[node];
       node = 0;
       for (size_t p=0; p<d.size(); ++p) {
         if (d(p)) {
@@ -157,7 +157,7 @@ static boost::shared_ptr<svm_problem> data2problem
         }
       }
       //marks end of sequence
-      retval->x[sample][node].index = -1.;
+      retval->x[sample][node].index = -1;
       retval->x[sample][node].value = 0;
       ++sample;
     }
@@ -223,6 +223,10 @@ boost::shared_ptr<bob::machine::SupportVector> trainer::SVMTrainer::train
       std::ptr_fun(svm_model_free));
 
   const_cast<double&>(m_param.gamma) = save_gamma;
+
+  //save newly created machine to file, reload from there to get rid of memory
+  //dependencies due to the poorly implemented memory model in libsvm
+  //TODO
 
   boost::shared_ptr<bob::machine::SupportVector> retval =
     boost::make_shared<bob::machine::SupportVector>(model);
