@@ -141,8 +141,9 @@ static boost::shared_ptr<svm_problem> data2problem
   std::vector<double> labels;
   labels.reserve(data.size());
   if (data.size() == 2) {
-    labels.push_back(-1.);
+    //keep libsvm ordering
     labels.push_back(+1.);
+    labels.push_back(-1.);
   }
   else { //data.size() == 3, 4, ..., 16
     for (size_t k=0; k<data.size(); ++k) labels.push_back(k+1);
