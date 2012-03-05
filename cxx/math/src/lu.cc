@@ -91,9 +91,11 @@ void math::lu_(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
   // Copy result back to L and U
   blitz::firstIndex bi;
   blitz::secondIndex bj;
-  L = blitz::where(bi>bj, A_blitz_lapack.transpose(1,0), 0.);
+  blitz::Array<double,2> A_blitz_lapack_t = A_blitz_lapack.transpose(1,0);
+  blitz::Range rall = blitz::Range::all();
+  L = blitz::where(bi>bj, A_blitz_lapack_t(rall,blitz::Range(0,minMN-1)), 0.);
   L = blitz::where(bi==bj, 1., L);
-  U = blitz::where(bi<=bj, A_blitz_lapack.transpose(1,0), 0.);
+  U = blitz::where(bi<=bj, A_blitz_lapack_t(blitz::Range(0,minMN-1),rall), 0.);
 
   // Converts weird permutation format returned by LAPACK into a permutation 
   // function
