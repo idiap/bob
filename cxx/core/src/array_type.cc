@@ -22,6 +22,7 @@
 
 #include "core/array_type.h"
 #include "core/Exception.h"
+#include <boost/format.hpp>
 
 namespace ca = bob::core::array;
 
@@ -75,7 +76,11 @@ size_t ca::getElementSize(ElementType t) {
     case ca::t_complex256:
       return sizeof(std::complex<long double>);
     default:
-      throw Exception();
+      {
+        boost::format m("unsupported element type (%d)");
+        m % (int)t;
+        throw std::runtime_error(m.str().c_str());
+      }
   }
 }
 
