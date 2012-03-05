@@ -110,15 +110,8 @@ static void svm_model_free(svm_model*& m) {
 #endif
 }
 
-/**
- * Here is the problem: libsvm does not provide a simple way to extract the
- * information from the SVM structure. There are lots of cases and
- * allocation and re-allocation is not exactly trivial. To overcome these
- * problems and still be able to save data in HDF5 format, we let libsvm pickle
- * the data into a text file and then re-read it in binary. We save the outcome
- * of this readout in a binary blob inside the HDF5 file.
- */
-static blitz::Array<uint8_t,1> pickle(const boost::shared_ptr<svm_model> model)
+blitz::Array<uint8_t,1> mach::svm_pickle
+(const boost::shared_ptr<svm_model> model)
 {
   //use a re-entrant version of tmpnam...
   char tmp_filename[L_tmpnam]; 
@@ -150,7 +143,8 @@ static blitz::Array<uint8_t,1> pickle(const boost::shared_ptr<svm_model> model)
 /**
  * Reverts the pickling process, returns the model
  */
-static boost::shared_ptr<svm_model> unpickle(const blitz::Array<uint8_t,1>& buffer) {
+boost::shared_ptr<svm_model> mach::svm_unpickle
+(const blitz::Array<uint8_t,1>& buffer) {
   //use a re-entrant version of tmpnam...
   char tmp_filename[L_tmpnam];
   std::tmpnam(tmp_filename);
@@ -171,10 +165,15 @@ static boost::shared_ptr<svm_model> unpickle(const blitz::Array<uint8_t,1>& buff
 }
 
 void mach::SupportVector::reset() {
-  //gets the expected size for the input from the first SVM
-  svm_node* end = m_model->SV[0];
-  while (end->index != -1) end += 1;
-  m_input_size = (size_t)(end - m_model->SV[0]);
+  //gets the expected size for the input from the SVM
+  m_input_size = 0;
+  for (int k=0; k<m_model->l; ++k) {
+    svm_node* end = m_model->SV[k];
+    while (end->index != -1) {
+      if (end->index > (int)m_input_size) m_input_size = end->index;
+      ++end;
+    }
+  }
 
   //create and reset cache
   m_input_cache.reset(new svm_node[1 + m_model->l]);
@@ -210,7 +209,7 @@ mach::SupportVector::SupportVector(bob::io::HDF5File& config):
     m % config.filename() % config.cwd() % config.getVersion() % LIBSVM_VERSION;
     bob::core::warn << m.str() << std::endl;
   }
-  m_model = unpickle(config.readArray<uint8_t,1>("svm_model"));
+  m_model = mach::svm_unpickle(config.readArray<uint8_t,1>("svm_model"));
   reset(); ///< note: has to be done before reading scaling parameters
   config.readArray("input_subtract", m_input_sub);
   config.readArray("input_divide", m_input_div);
@@ -399,7 +398,7 @@ void mach::SupportVector::save(const std::string& filename) const {
 }
 
 void mach::SupportVector::save(bob::io::HDF5File& config) const {
-  config.setArray("svm_model", pickle(m_model));
+  config.setArray("svm_model", mach::svm_pickle(m_model));
   config.setArray("input_subtract", m_input_sub);
   config.setArray("input_divide", m_input_div);
   config.setVersion(LIBSVM_VERSION);

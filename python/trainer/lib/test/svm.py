@@ -69,7 +69,7 @@ class SvmTrainingTest(unittest.TestCase):
     # +1. libsvm, apparently, suggests you do that for all features.
 
     trainer = bob.trainer.SVMTrainer()
-    #machine = trainer.train((neg,pos))
+    machine = trainer.train((neg,pos))
 
 
 # Instantiates our standard main module for unittests

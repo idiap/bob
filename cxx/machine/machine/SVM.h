@@ -129,6 +129,21 @@ namespace bob { namespace machine {
   };
 
   /**
+   * Here is the problem: libsvm does not provide a simple way to extract the
+   * information from the SVM structure. There are lots of cases and allocation
+   * and re-allocation is not exactly trivial. To overcome these problems and
+   * still be able to save data in HDF5 format, we let libsvm pickle the data
+   * into a text file and then re-read it in binary. We save the outcome of
+   * this readout in a binary blob inside the HDF5 file.
+   */
+  blitz::Array<uint8_t,1> svm_pickle(const boost::shared_ptr<svm_model> model);
+
+  /**
+   * Reverts the pickling process, returns the model
+   */
+  boost::shared_ptr<svm_model> svm_unpickle(const blitz::Array<uint8_t,1>& buffer);
+
+  /**
    * Interface to svm_model, from libsvm. Incorporates prediction.
    */
   class SupportVector {
@@ -341,6 +356,12 @@ namespace bob { namespace machine {
        * and the scaling parameters.
        */
       void save(bob::io::HDF5File& config) const;
+
+    private: //not implemented
+
+      SupportVector(const SupportVector& other);
+
+      SupportVector& operator= (const SupportVector& other);
 
     private: //methods
 

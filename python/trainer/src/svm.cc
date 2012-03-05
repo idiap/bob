@@ -46,7 +46,7 @@ static boost::shared_ptr<mach::SupportVector> train2
 }
 
 void bind_trainer_svm() {
-  class_<train::SVMTrainer>("SVMTrainer", "This class emulates the behavior of the command line utility called svm-train, from libsvm. These bindings do not support:\n\n * Precomputed Kernels\n * Regression Problems\n * Different weights for every label (-wi option in svm-train)\n\nFell free to implement those and remove these remarks.", no_init)
+  class_<train::SVMTrainer, boost::shared_ptr<train::SVMTrainer> >("SVMTrainer", "This class emulates the behavior of the command line utility called svm-train, from libsvm. These bindings do not support:\n\n * Precomputed Kernels\n * Regression Problems\n * Different weights for every label (-wi option in svm-train)\n\nFell free to implement those and remove these remarks.", no_init)
     .def(init<optional<bob::machine::SupportVector::svm_t, bob::machine::SupportVector::kernel_t, int, double, double, double, double, double, double, double, bool, bool> >(
           (arg("svm_type")=bob::machine::SupportVector::C_SVC,
            arg("kernel_type")=bob::machine::SupportVector::RBF,
