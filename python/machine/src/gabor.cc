@@ -129,7 +129,7 @@ void bind_machine_gabor(){
 
   boost::python::class_<bob::machine::CanberraSimilarity, boost::shared_ptr<bob::machine::CanberraSimilarity>, boost::python::bases<bob::machine::GaborJetSimilarity> >(
       "CanberraSimilarity",
-      "This class computes the similarity of two Gabor jets as the Canberra similarity measure: \\sum_j |a_j - a_j'| / (a_j + a_j'))"
+      "This class computes the similarity of two Gabor jets as the Canberra similarity measure: :math:`\\sum_j \\frac{|a_j - a_j'|} {(a_j + a_j')}`"
     )
 
     .def(
