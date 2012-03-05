@@ -26,22 +26,18 @@
 namespace math = bob::math;
 namespace ca = bob::core::array;
 
-// Declaration of the external LAPACK function (Generic linear system solver)
-extern "C" void dgesvd_( char *jobu, char *jobvt, int *M, int *N, double *A, 
-  int *lda, double *S, double *U, int* ldu, double *VT, int *ldvt, 
-  double *work, int *lwork, int *info);
-
-extern "C" void dgesdd_( char *jobz, int *M, int *N, double *A, 
-  int *lda, double *S, double *U, int* ldu, double *VT, int *ldvt, 
-  double *work, int *lwork, int *iwork, int *info);
+// Declaration of the external LAPACK function (Divide and conquer SVD)
+extern "C" void dgesdd_( const char *jobz, const int *M, const int *N, 
+  double *A, const int *lda, double *S, double *U, const int* ldu, double *VT,
+  const int *ldvt, double *work, const int *lwork, int *iwork, int *info);
 
 void math::svd(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   blitz::Array<double,1>& sigma, blitz::Array<double,2>& Vt)
 {
   // Size variables
-  int M = A.extent(0);
-  int N = A.extent(1);
-  int nb_singular = std::min(M,N);
+  const int M = A.extent(0);
+  const int N = A.extent(1);
+  const int nb_singular = std::min(M,N);
 
   // Checks zero base
   ca::assertZeroBase(A);
@@ -62,9 +58,9 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   blitz::Array<double,1>& sigma, blitz::Array<double,2>& Vt)
 {
   // Size variables
-  int M = A.extent(0);
-  int N = A.extent(1);
-  int nb_singular = std::min(M,N);
+  const int M = A.extent(0);
+  const int N = A.extent(1);
+  const int nb_singular = std::min(M,N);
 
   // Prepares to call LAPACK function:
   // We will decompose A^T rather than A to reduce the required number of copy
@@ -73,13 +69,13 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   // If A = U.S.V^T, then A^T = V.S.U^T
 
   // Initialises LAPACK variables
-  char jobz = 'A'; // Get All left singular vectors
+  const char jobz = 'A'; // Get All left singular vectors
   int info = 0;  
-  int lda = N;
-  int ldu = N;
-  int ldvt = M;
+  const int lda = N;
+  const int ldu = N;
+  const int ldvt = M;
   // Integer (workspace) array, dimension (8*min(M,N))
-  int l_iwork = 8*std::min(M,N);
+  const int l_iwork = 8*std::min(M,N);
   int *iwork = new int[l_iwork];
   // Initialises LAPACK arrays
   blitz::Array<double,2> A_blitz_lapack(ca::ccopy(A));
@@ -87,19 +83,19 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   // Tries to use U, Vt and S directly to limit the number of copy()
   // S_lapack = S
   blitz::Array<double,1> S_blitz_lapack;
-  bool sigma_direct_use = ca::isCZeroBaseContiguous(sigma);
+  const bool sigma_direct_use = ca::isCZeroBaseContiguous(sigma);
   if( !sigma_direct_use ) S_blitz_lapack.resize(nb_singular);
   else                    S_blitz_lapack.reference(sigma);
   double *S_lapack = S_blitz_lapack.data();
   // U_lapack = V^T
   blitz::Array<double,2> U_blitz_lapack;
-  bool U_direct_use = ca::isCZeroBaseContiguous(Vt);
+  const bool U_direct_use = ca::isCZeroBaseContiguous(Vt);
   if( !U_direct_use )   U_blitz_lapack.resize(N,N);
   else                  U_blitz_lapack.reference(Vt);
   double *U_lapack = U_blitz_lapack.data();
   // V^T_lapack = U
   blitz::Array<double,2> VT_blitz_lapack;
-  bool VT_direct_use = ca::isCZeroBaseContiguous(U);
+  const bool VT_direct_use = ca::isCZeroBaseContiguous(U);
   if( !VT_direct_use )  VT_blitz_lapack.resize(M,M);
   else                  VT_blitz_lapack.reference(U);
   double *VT_lapack = VT_blitz_lapack.data();
@@ -111,12 +107,12 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   // Please note that matlab is relying on dgesvd.
 
   // A/ Queries the optimal size of the working array
-  int lwork_query = -1;
+  const int lwork_query = -1;
   double work_query;
   dgesdd_( &jobz, &N, &M, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
     VT_lapack, &ldvt, &work_query, &lwork_query, iwork, &info );
   // B/ Computes
-  int lwork = static_cast<int>(work_query);
+  const int lwork = static_cast<int>(work_query);
   double *work = new double[lwork];
   dgesdd_( &jobz, &N, &M, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
     VT_lapack, &ldvt, work, &lwork, iwork, &info );
@@ -141,9 +137,9 @@ void math::svd(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   blitz::Array<double,1>& sigma)
 {
   // Size variables
-  int M = A.extent(0);
-  int N = A.extent(1);
-  int nb_singular = std::min(M,N);
+  const int M = A.extent(0);
+  const int N = A.extent(1);
+  const int nb_singular = std::min(M,N);
 
   // Checks zero base
   ca::assertZeroBase(A);
@@ -161,21 +157,21 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   blitz::Array<double,1>& sigma)
 {
   // Size variables
-  int M = A.extent(0);
-  int N = A.extent(1);
-  int nb_singular = std::min(M,N);
+  const int M = A.extent(0);
+  const int N = A.extent(1);
+  const int nb_singular = std::min(M,N);
 
   // Prepares to call LAPACK function
 
   // Initialises LAPACK variables
-  char jobz = 'S'; // Get first min(M,N) columns of U
+  const char jobz = 'S'; // Get first min(M,N) columns of U
   int info = 0;  
-  int lda = M;
-  int ldu = M;
-  int ldvt = std::min(M,N);
+  const int lda = M;
+  const int ldu = M;
+  const int ldvt = std::min(M,N);
 
   // Integer (workspace) array, dimension (8*min(M,N))
-  int l_iwork = 8*std::min(M,N);
+  const int l_iwork = 8*std::min(M,N);
   int *iwork = new int[l_iwork];
   // Initialises LAPACK arrays
   blitz::Array<double,2> A_blitz_lapack(ca::ccopy(const_cast<blitz::Array<double,2>&>(A).transpose(1,0)));
@@ -183,14 +179,14 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   // Tries to use U and S directly to limit the number of copy()
   // S_lapack = S
   blitz::Array<double,1> S_blitz_lapack;
-  bool sigma_direct_use = ca::isCZeroBaseContiguous(sigma);
+  const bool sigma_direct_use = ca::isCZeroBaseContiguous(sigma);
   if( !sigma_direct_use ) S_blitz_lapack.resize(nb_singular);
   else                    S_blitz_lapack.reference(sigma);
   double *S_lapack = S_blitz_lapack.data();
   // U_lapack = U^T
   blitz::Array<double,2> U_blitz_lapack;
   blitz::Array<double,2> Ut = U.transpose(1,0);
-  bool U_direct_use = ca::isCZeroBaseContiguous(Ut);
+  const bool U_direct_use = ca::isCZeroBaseContiguous(Ut);
   if( !U_direct_use )   U_blitz_lapack.resize(nb_singular,M);
   else                  U_blitz_lapack.reference(Ut);
   double *U_lapack = U_blitz_lapack.data();
@@ -203,12 +199,12 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   // Please note that matlab is relying on dgesvd.
 
   // A/ Queries the optimal size of the working array
-  int lwork_query = -1;
+  const int lwork_query = -1;
   double work_query;
   dgesdd_( &jobz, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
     VT_lapack, &ldvt, &work_query, &lwork_query, iwork, &info );
   // B/ Computes
-  int lwork = static_cast<int>(work_query);
+  const int lwork = static_cast<int>(work_query);
   double *work = new double[lwork];
   dgesdd_( &jobz, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
     VT_lapack, &ldvt, work, &lwork, iwork, &info );
@@ -232,9 +228,9 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
 void math::svd(const blitz::Array<double,2>& A, blitz::Array<double,1>& sigma)
 {
   // Size variables
-  int M = A.extent(0);
-  int N = A.extent(1);
-  int nb_singular = std::min(M,N);
+  const int M = A.extent(0);
+  const int N = A.extent(1);
+  const int nb_singular = std::min(M,N);
 
   // Checks zero base
   ca::assertZeroBase(A);
@@ -248,21 +244,21 @@ void math::svd(const blitz::Array<double,2>& A, blitz::Array<double,1>& sigma)
 void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,1>& sigma)
 {
   // Size variables
-  int M = A.extent(0);
-  int N = A.extent(1);
-  int nb_singular = std::min(M,N);
+  const int M = A.extent(0);
+  const int N = A.extent(1);
+  const int nb_singular = std::min(M,N);
 
   // Prepares to call LAPACK function
 
   // Initialises LAPACK variables
-  char jobz = 'N'; // Get first min(M,N) columns of U
+  const char jobz = 'N'; // Get first min(M,N) columns of U
   int info = 0;  
-  int lda = M;
-  int ldu = M;
-  int ldvt = std::min(M,N);
+  const int lda = M;
+  const int ldu = M;
+  const int ldvt = std::min(M,N);
 
   // Integer (workspace) array, dimension (8*min(M,N))
-  int l_iwork = 8*std::min(M,N);
+  const int l_iwork = 8*std::min(M,N);
   int *iwork = new int[l_iwork];
   // Initialises LAPACK arrays
   blitz::Array<double,2> A_blitz_lapack(
@@ -271,7 +267,7 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,1>& sigma)
   // Tries to use S directly to limit the number of copy()
   // S_lapack = S
   blitz::Array<double,1> S_blitz_lapack;
-  bool sigma_direct_use = ca::isCZeroBaseContiguous(sigma);
+  const bool sigma_direct_use = ca::isCZeroBaseContiguous(sigma);
   if( !sigma_direct_use ) S_blitz_lapack.resize(nb_singular);
   else                    S_blitz_lapack.reference(sigma);
   double *S_lapack = S_blitz_lapack.data();
@@ -285,12 +281,12 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,1>& sigma)
   // Please note that matlab is relying on dgesvd.
 
   // A/ Queries the optimal size of the working array
-  int lwork_query = -1;
+  const int lwork_query = -1;
   double work_query;
   dgesdd_( &jobz, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
     VT_lapack, &ldvt, &work_query, &lwork_query, iwork, &info );
   // B/ Computes
-  int lwork = static_cast<int>(work_query);
+  const int lwork = static_cast<int>(work_query);
   double *work = new double[lwork];
   dgesdd_( &jobz, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
     VT_lapack, &ldvt, work, &lwork, iwork, &info );
