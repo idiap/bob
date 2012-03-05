@@ -25,7 +25,6 @@
 
 #include <core/array_assert.h>
 #include <blitz/array.h>
-#include <blitz/tinyvec.h>
 #include <numeric>
 #include <ip/GaborWaveletTransform.h>
 

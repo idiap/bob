@@ -30,12 +30,14 @@
 
 namespace trainer = bob::trainer;
 
+#ifdef BOB_DEBUG
 //remove newline
 static std::string strip(const char* s) {
   std::string t(s);
   boost::algorithm::trim(t);
   return t;
 }
+#endif
 
 static void debug_libsvm(const char* s) {
   TDEBUG1("[libsvm-" << LIBSVM_VERSION << "] " << strip(s));
