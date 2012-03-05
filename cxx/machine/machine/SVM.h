@@ -30,6 +30,30 @@
 #include <fstream>
 #include "io/HDF5File.h"
 
+// We need to declare the svm_model type for libsvm < 3.0.0. The next bit of
+// code was cut and pasted from version 2.9.1 of libsvm, file svm.cpp.
+#if LIBSVM_VERSION < 300
+struct svm_model {
+	struct svm_parameter param;	/* parameter */
+	int nr_class;		      /* number of classes, = 2 in regression/one class svm */
+	int l;			          /* total #SV */
+	struct svm_node **SV;	/* SVs (SV[l]) */
+	double **sv_coef;	    /* coefficients for SVs in decision functions (sv_coef[k-1][l]) */
+	double *rho;		      /* constants in decision functions (rho[k*(k-1)/2]) */
+	double *probA;		    /* pariwise probability information */
+	double *probB;
+
+	/* for classification only */
+
+	int *label;  /* label of each class (label[k]) */
+	int *nSV;		 /* number of SVs for each class (nSV[k]) */
+				       /* nSV[0] + nSV[1] + ... + nSV[k-1] = l */
+	/* XXX */
+	int free_sv; /* 1 if svm_model is created by svm_load_model*/
+				       /* 0 if svm_model is created by svm_train */
+};
+#endif
+
 namespace bob { namespace machine {
 
   /**
@@ -96,19 +120,6 @@ namespace bob { namespace machine {
       inline bool eof() const { return m_file.eof(); }
       inline bool fail() const { return m_file.fail(); }
 
-      /**
-       * Calculates the scaling parameters for each column (feature) of this
-       * file. Returns average subtraction and division parameters so that the
-       * features range between the given limits.
-       *
-       * The input arrays in which the division and subtraction parameters will
-       * be copied to need to be allocated previously and have a size that
-       * conforms to the number of features described in this file.
-       */
-      void scaling_parameters(blitz::Array<double,1>& subtract, 
-          blitz::Array<double,1>& divide, double min=-1.0,
-          double max=+1.0);
-
     private: //representation
 
       std::string m_filename; ///< The path to the file being read
@@ -116,6 +127,21 @@ namespace bob { namespace machine {
       size_t m_shape; ///< Number of floats in samples
 
   };
+
+  /**
+   * Here is the problem: libsvm does not provide a simple way to extract the
+   * information from the SVM structure. There are lots of cases and allocation
+   * and re-allocation is not exactly trivial. To overcome these problems and
+   * still be able to save data in HDF5 format, we let libsvm pickle the data
+   * into a text file and then re-read it in binary. We save the outcome of
+   * this readout in a binary blob inside the HDF5 file.
+   */
+  blitz::Array<uint8_t,1> svm_pickle(const boost::shared_ptr<svm_model> model);
+
+  /**
+   * Reverts the pickling process, returns the model
+   */
+  boost::shared_ptr<svm_model> svm_unpickle(const blitz::Array<uint8_t,1>& buffer);
 
   /**
    * Interface to svm_model, from libsvm. Incorporates prediction.
@@ -167,7 +193,7 @@ namespace bob { namespace machine {
        * object "svm_model". You can still make use of it if you decide to
        * implement the model instantiation yourself. 
        */
-      SupportVector(const svm_model& model);
+      SupportVector(boost::shared_ptr<svm_model> model);
 
       /**
        * Virtual d'tor
@@ -330,6 +356,12 @@ namespace bob { namespace machine {
        * and the scaling parameters.
        */
       void save(bob::io::HDF5File& config) const;
+
+    private: //not implemented
+
+      SupportVector(const SupportVector& other);
+
+      SupportVector& operator= (const SupportVector& other);
 
     private: //methods
 

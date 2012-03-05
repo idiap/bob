@@ -108,7 +108,14 @@ bool ca::typeinfo::is_compatible(const ca::typeinfo& other) const {
 
 std::string ca::typeinfo::str() const {
   boost::format s("%dD, %s (%d bytes), %d bytes");
-  s % nd % item_str() % item_size() % buffer_size();
+  size_t sz = 0;
+  size_t buf_sz = 0;
+  if (dtype != ca::t_unknown) {
+    //otherwise it throws
+    sz = item_size();
+    buf_sz = buffer_size();
+  }
+  s % nd % item_str() % sz % buf_sz;
   return s.str();
 }
 

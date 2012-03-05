@@ -24,6 +24,12 @@ set(src
     "src/PLDATrainer.cc"
 )
 
+if(LIBSVM_FOUND)
+  include_directories(${LIBSVM_INCLUDE_DIR})
+  set(shared "${shared};${LIBSVM_LIBRARY}")
+  set(src "${src};src/SVMTrainer.cc")
+endif()
+
 bob_library(trainer "${src}" "${deps}" "${shared}")
 
 # Defines tests for this package
@@ -32,4 +38,3 @@ bob_test(trainer jfa test/jfa.cc)
 # Defines environment variable used to localize data for the tests
 #set_property(TEST cxx-trainer-gabor APPEND PROPERTY ENVIRONMENT
 #  "BOB_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
-
