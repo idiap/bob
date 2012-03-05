@@ -22,15 +22,16 @@
 #include "math/linear.h"
 #include "core/array_assert.h"
 #include "core/array_check.h"
+#include "core/array_copy.h"
 
 namespace math = bob::math;
 namespace ca = bob::core::array;
 
 // Declaration of the external LAPACK function (Linear system solvers)
-extern "C" void dgesv_( int *N, int *NRHS, double *A, int *lda, int *ipiv, 
-  double *B, int *ldb, int *info);
-extern "C" void dposv_( char* uplo, int *N, int *NRHS, double *A, int *lda,
-  double *B, int *ldb, int *info);
+extern "C" void dgesv_( const int *N, const int *NRHS, double *A, 
+  const int *lda, int *ipiv, double *B, const int *ldb, int *info);
+extern "C" void dposv_( const char* uplo, const int *N, const int *NRHS, 
+  double *A, const int *lda, double *B, const int *ldb, int *info);
 
 void math::linsolve(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
   const blitz::Array<double,1>& b)
@@ -51,32 +52,35 @@ void math::linsolve(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
 void math::linsolve_(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
   const blitz::Array<double,1>& b)
 {
-  ///////////////////////////////////
-  // Prepare to call LAPACK function
+  // Defines dimensionality variables
+  const int N = A.extent(0);
 
-  // Initialize LAPACK arrays
-  int* ipiv = new int[b.extent(0)];
-  double* A_lapack = new double[A.extent(0)*A.extent(1)];
-  for(int i=0; i<A.extent(0)*A.extent(1); ++i)
-    A_lapack[i] = 
-      A( (i%A.extent(1)), (i/A.extent(1)) );
-  double* x_lapack;
+  // Prepares to call LAPACK function
+  // Initialises LAPACK arrays
+  int* ipiv = new int[N];
+  // Transpose (C: row major order, Fortran: column major)
+  // Ugly fix for old blitz version support
+  blitz::Array<double,2> A_blitz_lapack( 
+    ca::ccopy(const_cast<blitz::Array<double,2>&>(A).transpose(1,0)));
+  double* A_lapack = A_blitz_lapack.data();
+  // Tries to use X directly
   bool x_direct_use = ca::isCZeroBaseContiguous(x);
-  if( !x_direct_use )
-    x_lapack = new double[b.extent(0)];
+  blitz::Array<double,1> x_blitz_lapack;
+  if(x_direct_use) 
+  {
+    x_blitz_lapack.reference(x);
+    x_blitz_lapack = b;
+  }
   else
-    x_lapack = x.data();
-  for(int i=0; i<b.extent(0); ++i)
-    x_lapack[i] = b(i); 
-
+    x_blitz_lapack.reference(ca::ccopy(b));
+  double *x_lapack = x_blitz_lapack.data();
   // Remaining variables
   int info = 0;  
-  int N =  A.extent(0);
-  int lda = N;
-  int ldb = N;
-  int NRHS = 1;
+  const int lda = N;
+  const int ldb = N;
+  const int NRHS = 1;
  
-  // Call the LAPACK function 
+  // Calls the LAPACK function (dgesv(
   dgesv_( &N, &NRHS, A_lapack, &lda, ipiv, x_lapack, &ldb, &info );
  
   // Check info variable
@@ -85,15 +89,79 @@ void math::linsolve_(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
 
   // Copy result back to x if required
   if( !x_direct_use )
-    for(int i=0; i<x.extent(0); ++i)
-      x(i) = x_lapack[i];
+    x = x_blitz_lapack;
 
   // Free memory
-  if( !x_direct_use )
-    delete [] x_lapack;
-  delete [] A_lapack;
   delete [] ipiv;
 }
+
+
+void math::linsolve(const blitz::Array<double,2>& A, blitz::Array<double,2>& X,
+  const blitz::Array<double,2>& B)
+{
+  // Checks dimensionality and zero base
+  ca::assertZeroBase(A);
+  ca::assertZeroBase(X);
+  ca::assertZeroBase(B);
+  ca::assertSameDimensionLength(A.extent(0), A.extent(1));
+  ca::assertSameDimensionLength(A.extent(1), X.extent(0));
+  ca::assertSameDimensionLength(A.extent(0), B.extent(0));
+  ca::assertSameDimensionLength(X.extent(1), B.extent(1));
+
+  math::linsolve_(A, X, B);
+}
+
+void math::linsolve_(const blitz::Array<double,2>& A, blitz::Array<double,2>& X,
+  const blitz::Array<double,2>& B)
+{
+  // Defines dimensionality variables
+  const int N = A.extent(0); 
+  const int P = X.extent(1);
+
+  // Prepares to call LAPACK function (dgesv)
+  // Initialises LAPACK arrays
+  int* ipiv = new int[N];
+  // Transpose (C: row major order, Fortran: column major)
+  // Ugly fix for old blitz version support
+  blitz::Array<double,2> A_blitz_lapack( 
+    ca::ccopy(const_cast<blitz::Array<double,2>&>(A).transpose(1,0)));
+  double* A_lapack = A_blitz_lapack.data();
+  // Tries to use X directly
+  blitz::Array<double,2> Xt = X.transpose(1,0);
+  bool X_direct_use = ca::isCZeroBaseContiguous(Xt);
+  blitz::Array<double,2> X_blitz_lapack;
+  if(X_direct_use) 
+  {
+    X_blitz_lapack.reference(Xt);
+    // Ugly fix for old blitz version support
+    X_blitz_lapack = const_cast<blitz::Array<double,2>&>(B).transpose(1,0);
+  }
+  else
+    X_blitz_lapack.reference(
+      ca::ccopy(const_cast<blitz::Array<double,2>&>(B).transpose(1,0)));
+  double *X_lapack = X_blitz_lapack.data();
+  // Remaining variables
+  int info = 0;  
+  const int lda = N;
+  const int ldb = N;
+  const int NRHS = P;
+ 
+  // Calls the LAPACK function (dgesv)
+  dgesv_( &N, &NRHS, A_lapack, &lda, ipiv, X_lapack, &ldb, &info );
+ 
+  // Checks info variable
+  if( info != 0)
+    throw math::LapackError("The LAPACK dgesv function returned a non-zero value.");
+
+  // Copy result back to X if required
+  if( !X_direct_use )
+    X = X_blitz_lapack.transpose(1,0);
+
+  // Free memory
+  delete [] ipiv;
+}
+
+
 
 
 void math::linsolveSympos(const blitz::Array<double,2>& A, 
@@ -115,32 +183,35 @@ void math::linsolveSympos(const blitz::Array<double,2>& A,
 void math::linsolveSympos_(const blitz::Array<double,2>& A, 
   blitz::Array<double,1>& x, const blitz::Array<double,1>& b)
 {
-  ///////////////////////////////////
-  // Prepare to call LAPACK function
+  // Defines dimensionality variables
+  const int N = A.extent(0);
 
-  // Initialize LAPACK arrays
-  double* A_lapack = new double[A.extent(0)*A.extent(1)];
-  for(int i=0; i<A.extent(0)*A.extent(1); ++i)
-    A_lapack[i] = 
-      A( (i%A.extent(1)), (i/A.extent(1)));
-  double* x_lapack;
+  // Prepares to call LAPACK function
+  // Initialises LAPACK arrays
+  // Transpose (C: row major order, Fortran: column major)
+  // Ugly fix for old blitz version support
+  blitz::Array<double,2> A_blitz_lapack( 
+    ca::ccopy(const_cast<blitz::Array<double,2>&>(A).transpose(1,0)));
+  double* A_lapack = A_blitz_lapack.data();
+  // Tries to use X directly
   bool x_direct_use = ca::isCZeroBaseContiguous(x);
-  if( !x_direct_use )
-    x_lapack = new double[b.extent(0)];
+  blitz::Array<double,1> x_blitz_lapack;
+  if(x_direct_use) 
+  {
+    x_blitz_lapack.reference(x);
+    x_blitz_lapack = b;
+  }
   else
-    x_lapack = x.data();
-  for(int i=0; i<b.extent(0); ++i)
-    x_lapack[i] = b(i); 
-
+    x_blitz_lapack.reference(ca::ccopy(b));
+  double *x_lapack = x_blitz_lapack.data();
   // Remaining variables
-  char uplo = 'U';
   int info = 0;  
-  int N =  A.extent(0);
-  int lda = N;
-  int ldb = N;
-  int NRHS = 1;
+  const char uplo = 'U';
+  const int lda = N;
+  const int ldb = N;
+  const int NRHS = 1;
  
-  // Call the LAPACK function 
+  // Calls the LAPACK function (dposv)
   dposv_( &uplo, &N, &NRHS, A_lapack, &lda, x_lapack, &ldb, &info );
  
   // Check info variable
@@ -151,20 +222,81 @@ void math::linsolveSympos_(const blitz::Array<double,2>& A,
 
   // Copy result back to x if required
   if( !x_direct_use )
-    for(int i=0; i<x.extent(0); ++i)
-      x(i) = x_lapack[i];
-
-  // Free memory
-  if( !x_direct_use )
-    delete [] x_lapack;
-  delete [] A_lapack;
+    x = x_blitz_lapack;
 }
+
+void math::linsolveSympos(const blitz::Array<double,2>& A, blitz::Array<double,2>& X,
+  const blitz::Array<double,2>& B)
+{
+  // Checks dimensionality and zero base
+  ca::assertZeroBase(A);
+  ca::assertZeroBase(X);
+  ca::assertZeroBase(B);
+  ca::assertSameDimensionLength(A.extent(0), A.extent(1));
+  ca::assertSameDimensionLength(A.extent(1), X.extent(0));
+  ca::assertSameDimensionLength(A.extent(0), B.extent(0));
+  ca::assertSameDimensionLength(X.extent(1), B.extent(1));
+
+  math::linsolveSympos_(A, X, B);
+}
+
+void math::linsolveSympos_(const blitz::Array<double,2>& A, blitz::Array<double,2>& X,
+  const blitz::Array<double,2>& B)
+{
+  // Defines dimensionality variables
+  const int N = A.extent(0); 
+  const int P = X.extent(1);
+
+  // Prepares to call LAPACK function (dposv)
+  // Initialises LAPACK arrays
+  // Transpose (C: row major order, Fortran: column major)
+  // Ugly fix for old blitz version support
+  blitz::Array<double,2> A_blitz_lapack( 
+    ca::ccopy(const_cast<blitz::Array<double,2>&>(A).transpose(1,0)));
+  double* A_lapack = A_blitz_lapack.data();
+  // Tries to use X directly
+  blitz::Array<double,2> Xt = X.transpose(1,0);
+  bool X_direct_use = ca::isCZeroBaseContiguous(Xt);
+  blitz::Array<double,2> X_blitz_lapack;
+  if(X_direct_use) 
+  {
+    X_blitz_lapack.reference(Xt);
+    // Ugly fix for old blitz version support
+    X_blitz_lapack = const_cast<blitz::Array<double,2>&>(B).transpose(1,0);
+  }
+  else
+    X_blitz_lapack.reference(
+      ca::ccopy(const_cast<blitz::Array<double,2>&>(B).transpose(1,0)));
+  double *X_lapack = X_blitz_lapack.data();
+  // Remaining variables
+  int info = 0;  
+  const char uplo = 'U';
+  const int lda = N;
+  const int ldb = N;
+  const int NRHS = P;
+ 
+  // Calls the LAPACK function (dposv)
+  dposv_( &uplo, &N, &NRHS, A_lapack, &lda, X_lapack, &ldb, &info );
+ 
+  // Check info variable
+  if( info != 0)
+    throw math::LapackError("The LAPACK dposv function returned a \
+      non-zero value. This might be caused by a non-symmetric definite \
+      positive matrix.");
+
+  // Copy result back to X if required
+  if( !X_direct_use )
+    X = X_blitz_lapack.transpose(1,0);
+}
+
+
+
 
 void math::linsolveCGSympos(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
   const blitz::Array<double,1>& b, const double acc, const int max_iter)
 {
   // Dimensionality of the problem
-  int N = b.extent(0);
+  const int N = b.extent(0);
 
   // Check x and b
   ca::assertZeroBase(x);
@@ -183,7 +315,7 @@ void math::linsolveCGSympos_(const blitz::Array<double,2>& A, blitz::Array<doubl
   const blitz::Array<double,1>& b, const double acc, const int max_iter)
 {
   // Dimensionality of the problem
-  int N = b.extent(0);
+  const int N = b.extent(0);
 
   blitz::Array<double,1> r(N), d(N), best_x(N), q(N), tmp(N);
   x = 0.;
