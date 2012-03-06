@@ -88,7 +88,6 @@ static void evalTotalScatter (const std::vector<io::Arrayset>& data,
 
   blitz::firstIndex i;
   blitz::secondIndex j;
-  blitz::Range a = blitz::Range::all();
 
   // within class scatter Sw
   St = 0;
