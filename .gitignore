@@ -3,6 +3,7 @@
 *.pyc
 *.gch
 build
+*build
 install
 examples/*/build_*
 .DS_Store

@@ -87,6 +87,12 @@ NUAA Database
 .. automodule:: bob.db.nuaa
   :members:
 
+CASIA_FASD Database
+=============
+
+.. automodule:: bob.db.casia_fasd
+  :members:
+
 XM2VTS Database
 ===============
 
