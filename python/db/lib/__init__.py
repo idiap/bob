@@ -18,5 +18,7 @@ import multipie
 import scface
 import xm2vts
 import nuaa
+import casia_fasd
+
 
 __all__ = dir()

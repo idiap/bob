@@ -72,7 +72,7 @@ class Database(object):
     VALID_GROUPS = self.groups
     groups = check_validity(groups, "group", VALID_GROUPS, VALID_GROUPS)
 
-    # check if supports set are valid
+    # check if versions are valid
     VALID_VERSIONS = self.versions
     versions = check_validity(versions, "version", VALID_VERSIONS, VALID_VERSIONS)
 
@@ -124,6 +124,7 @@ class Database(object):
     session
       A string (or tuple of strings) with values '01'-'03' for three different client enrollment sessions
     """
+    if isinstance(client_no, str): client_no = (client_no,) # transform it intoa  tuple
     retval = {}
     newkey = 0
     for key, filename in filenames.items():

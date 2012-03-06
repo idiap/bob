@@ -113,6 +113,9 @@ bob_python_add_dependent_test(db-multipie-dumplist2
 # Nuaa database driver tests.
 bob_python_add_unittest(db lib/test/nuaa.py main)
 
+# CASIA-FASD database driver tests.
+bob_python_add_unittest(db lib/test/casia_fasd.py main)
+
 # SCface database driver tests.
 bob_python_add_dependent_test(db-scface-dumplist 
   python-db-scface-instantiation 
