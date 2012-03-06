@@ -98,7 +98,7 @@ endmacro()
 #
 # Example: bob_example_install(cxx core benchmark/bigtensor2d.cc)
 macro(bob_example_install subsys package file)
-  set(exdir share/doc/examples/${subsys}/${package})
+  set(exdir share/doc/bob/examples/${subsys}/${package})
   install(PROGRAMS ${file} DESTINATION ${exdir})
 endmacro(bob_example_install subsys package file)
 
