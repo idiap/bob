@@ -117,7 +117,7 @@ Platforms
 
 We maintain nightly builds and unit tests that cover the following platforms:
 
-* **Linux**: tested on Ubuntu 11.04 and it should work without problems on
+* **Linux**: tested on Ubuntu 11.10 and it should work without problems on
   other distributions as long as you satisfy the dependencies listed bellow.
 * **Mac OSX**: tested on Snow Leopard (10.6), with `MacPorts`_, but it should
   work fine on other OSX versions as well or using `Fink`_ instead as long as
@@ -241,7 +241,7 @@ A single command line that will install all required packages under Ubuntu
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core cmake liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools0 ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc libhdf5-serial-dev python-argparse python-sqlalchemy python-sphinx dvipng libqt4-dev libfftw3-dev libcv-dev libhighgui-dev libsvm-dev
+   $ sudo apt-get install git-core cmake liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools0 ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc libhdf5-serial-dev python-argparse python-sqlalchemy python-sphinx dvipng libqt4-dev libfftw3-dev libcv-dev libhighgui-dev libsvm-dev doxygen
 
 .. note::
 
@@ -263,7 +263,23 @@ A single command line that will install all required packages under Ubuntu
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core cmake liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc libhdf5-serial-dev python-sqlalchemy python-sphinx dvipng libqt4-dev libfftw3-dev libcv-dev libhighgui-dev libsvm-dev
+   $ sudo apt-get install git-core cmake liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc libhdf5-serial-dev python-sqlalchemy python-sphinx dvipng libqt4-dev libfftw3-dev libcv-dev libhighgui-dev libsvm-dev doxygen
+
+.. note::
+
+  You will not find a pre-packaged version of VLfeat (SIFT feature extraction)
+  on Ubuntu distributions by default. You can still add the PPA by following
+  instructions on the `VLfeat launchpad webpage`_.
+
+Ubuntu 12.04 (LTS)
+==================
+
+A single command line that will install all required packages under Ubuntu
+(tested on Ubuntu 12.04):
+
+.. code-block:: sh
+
+   $ sudo apt-get install git-core cmake liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libmatio-dev libmagick++-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc libhdf5-serial-dev python-sqlalchemy python-sphinx dvipng libqt4-dev libfftw3-dev libcv-dev libhighgui-dev libsvm-dev doxygen
 
 .. note::
 
@@ -276,8 +292,8 @@ Mac OSX
 
 This is a recipe for compiling bob under your Mac OSX using Snow Leopard (10.6)
 or Lion (10.7). It should be possible, but remains untested, to execute similar
-steps under OSX Leopard (10.5.X). We would like to hear if you have a success
-story or problems `submit a new bug report`_.
+steps under OSX Leopard (10.5.X). We would like to hear from you! If you have a
+success story or problems `submit a new bug report`_.
 
 This recipe assumes you have already gone through the standard,
 well-documented, `MacPorts installation instructions`_ and has a prompt just in
@@ -503,7 +519,6 @@ try to reproduce the failure.
 .. _python: http://www.python.org
 .. _google perftools: http://code.google.com/p/google-perftools
 .. _numpy: http://numpy.scipy.org
-.. _libxml2: http://xmlsoft.org
 .. _doxygen: http://www.doxygen.org
 .. _sphinx: http://sphinx.pocoo.org
 .. _matio: http://matio.sourceforge.net
