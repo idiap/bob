@@ -133,7 +133,7 @@ void bob::machine::DisparitySimilarity::compute_disparity() const{
   m_disparity = 0.;
 
   // iterate backwards through the vector to start with the lowest frequency wavelets
-  for (int j = m_confidences.size(), level = m_number_of_scales-1; level >= 0; --level){
+  for (int j = m_confidences.size()-1, level = m_number_of_scales-1; level >= 0; --level){
     for (int direction = m_number_of_directions-1; direction >= 0; --direction, --j){
       double
           kjx = m_kernel_frequencies[j][1],
