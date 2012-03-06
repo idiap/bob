@@ -19,5 +19,5 @@ sandbox_snowowl
 my-sphinx.html
 debian/bob*
 debian/files
-debian/stamp-makefile-install
+debian/stamp-*
 obj-*
