@@ -53,7 +53,7 @@ void bob::trainer::TwoDPCATrainer::train(bob::machine::TwoDPCAMachine& machine, 
   // 3/ Compute the eigenvalue decomposition of G_mat
   blitz::Array<double,1> sigma(n);
   blitz::Array<double,2> V(n,n);
-  bob::math::eigSymReal(G_mat, V, sigma);
+  bob::math::eigSym(G_mat, V, sigma);
 
   // 4/ Sort the eigenvalues/eigenvectors (no blitz++ way unfortunately)
   std::vector< std::pair<double,int> > eigenvalues_sort;

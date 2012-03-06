@@ -77,13 +77,13 @@ void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<T,2>& t2,
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
-BOOST_AUTO_TEST_CASE( test_eigSymReal_3x3 )
+BOOST_AUTO_TEST_CASE( test_eigSym_3x3 )
 {
   blitz::Array<double,2> V(3,3);
   blitz::Array<double,1> S(3);
 
-  // Full SVD function
-  bob::math::eigSymReal(A33_1, V, S);
+  // Calls eigenvalue decomposition function
+  bob::math::eigSym(A33_1, V, S);
 
   // Check eigenvalues
   checkBlitzClose(S3_1, S, eps);
@@ -102,27 +102,12 @@ BOOST_AUTO_TEST_CASE( test_eigSymGen_3x3 )
   blitz::Array<double,2> V(3,3);
   blitz::Array<double,1> S(3);
 
-  // Full SVD function
+  // Calls eigenvalue decomposition function
   bob::math::eigSym(A33_1, B33_1, V, S);
 
-  // Sort and check eigenvalues
-  std::sort( S.data(), S.data()+S.extent(0)); 
+  // Check eigenvalues
   checkBlitzClose(S3_2, S, eps);
 }
-
-BOOST_AUTO_TEST_CASE( test_eigGen_3x3 )
-{
-  blitz::Array<double,2> V(3,3);
-  blitz::Array<double,1> S(3);
-
-  // Full SVD function
-  bob::math::eig(A33_1, B33_1, V, S);
-
-  // Sort and check eigenvalues
-  std::sort( S.data(), S.data()+S.extent(0)); 
-  checkBlitzClose(S3_2, S, eps);
-}
-
 
 BOOST_AUTO_TEST_SUITE_END()
 

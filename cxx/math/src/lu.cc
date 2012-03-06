@@ -20,6 +20,7 @@
 #include "math/lu.h"
 #include "math/Exception.h"
 #include "core/array_assert.h"
+#include "core/array_copy.h"
 #if !defined (HAVE_BLITZ_TINYVEC2_H)
 #include <blitz/tinyvec-et.h>
 #endif
@@ -30,20 +31,23 @@ namespace ca = bob::core::array;
 
 // Declaration of the external LAPACK functions
 // LU decomposition of a general matrix (dgetrf)
-extern "C" void dgetrf_( int *M, int *N, double *A, int *lda, int *ipiv, 
-  int *info);
+extern "C" void dgetrf_( const int *M, const int *N, double *A, 
+  const int *lda, int *ipiv, int *info);
 
 
 void math::lu(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
   blitz::Array<double,2>& U, blitz::Array<double,2>& P)
 {
   // Size variable
-  int M = A.extent(0);
-  int N = A.extent(1);
-  int minMN = std::min(M,N);
+  const int M = A.extent(0);
+  const int N = A.extent(1);
+  const int minMN = std::min(M,N);
+
+  // Check
   const blitz::TinyVector<int,2> shapeL(M,minMN);
   const blitz::TinyVector<int,2> shapeU(minMN,N);
   const blitz::TinyVector<int,2> shapeP(minMN,minMN);
+
   ca::assertZeroBase(A);
   ca::assertZeroBase(L);
   ca::assertZeroBase(U);
@@ -60,50 +64,43 @@ void math::lu_(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
   blitz::Array<double,2>& U, blitz::Array<double,2>& P)
 {
   // Size variable
-  int M = A.extent(0);
-  int N = A.extent(1);
-  int minMN = std::min(M,N);
+  const int M = A.extent(0);
+  const int N = A.extent(1);
+  const int minMN = std::min(M,N);
 
+  // Prepares to call LAPACK function
 
-  ///////////////////////////////////
-  // Prepare to call LAPACK function
-
-  // Initialize LAPACK variables
+  // Initialises LAPACK variables
   int info = 0;  
-  int lda = M;
+  const int lda = M;
 
-  // Initialize LAPACK arrays
-  double *A_lapack = new double[M*N];
+  // Initialises LAPACK arrays
+  blitz::Array<double,2> A_blitz_lapack(
+    ca::ccopy(const_cast<blitz::Array<double,2>&>(A).transpose(1,0)));
+  double *A_lapack = A_blitz_lapack.data();
   int *ipiv = new int[minMN];
-  for(int j=0; j<M; ++j)
-    for(int i=0; i<N; ++i)
-      A_lapack[j+i*M] = A(j,i);
- 
-  // Call the LAPACK function 
+
+  // Calls the LAPACK function 
   dgetrf_( &M, &N, A_lapack, &lda, ipiv, &info);
  
-  // Check info variable
+  // Checks info variable
   if( info != 0)
-    throw bob::math::LapackError("The LAPACK dgetrf function returned a non-zero value.");
+    throw bob::math::LapackError("The LAPACK dgetrf function returned a \
+      non-zero value.");
 
-  // Copy result back to L
-  L = 0.;
-  for(int j=0; j<minMN; ++j)
-    L(j,j) = 1.;;
-  for(int j=0; j<M; ++j)
-    for(int i=0; i<std::min(j,minMN); ++i)
-      L(j,i) = A_lapack[j+i*M];
+  // Copy result back to L and U
+  blitz::firstIndex bi;
+  blitz::secondIndex bj;
+  blitz::Array<double,2> A_blitz_lapack_t = A_blitz_lapack.transpose(1,0);
+  blitz::Range rall = blitz::Range::all();
+  L = blitz::where(bi>bj, A_blitz_lapack_t(rall,blitz::Range(0,minMN-1)), 0.);
+  L = blitz::where(bi==bj, 1., L);
+  U = blitz::where(bi<=bj, A_blitz_lapack_t(blitz::Range(0,minMN-1),rall), 0.);
 
-  // Copy result back to U
-  U = 0.;
-  for(int j=0; j<minMN; ++j)
-    for(int i=j; i<N; ++i)
-      U(j,i) = A_lapack[j+i*M];
-
-  // Convert weird permutation format returned by LAPACK into a permutation function
+  // Converts weird permutation format returned by LAPACK into a permutation 
+  // function
   blitz::Array<int,1> Pp(minMN);
-  blitz::firstIndex ind;
-  Pp = ind;
+  Pp = bi;
   int temp;
   for( int i=0; i<minMN-1; ++i)
   {
@@ -111,14 +108,12 @@ void math::lu_(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
     Pp(ipiv[i]-1) = Pp(i);
     Pp(i) = temp;
   }
-  // Update P
+  // Updates P
   P = 0.;
-  //std::cout << ipiv << std::endl;
   for(int j = 0; j<minMN; ++j)
     P(j,Pp(j)) = 1.;
   
   // Free memory
-  delete [] A_lapack;
   delete [] ipiv;
 }
 
