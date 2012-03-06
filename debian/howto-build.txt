@@ -1,0 +1,14 @@
+To build the debian packages do the following:
+
+$ fakeroot debian/rules clean 
+$ dpkg-checkbuilddeps
+$ fakeroot dpkg-buildpackage -b
+
+This will only build the binary package as a test. To build all packages,
+including the source package, do the following:
+
+$ fakeroot dpkg-buildpackage
+
+--
+Andre Anjos
+06/march/2012
