@@ -40,7 +40,7 @@ static std::string strip(const char* s) {
 #endif
 
 static void debug_libsvm(const char* s) {
-  TDEBUG1("[libsvm-" << LIBSVM_VERSION << "] " << strip(s));
+  TDEBUG1("[libsvm-" << libsvm_version << "] " << strip(s));
 }
 
 trainer::SVMTrainer::SVMTrainer(
@@ -253,12 +253,18 @@ boost::shared_ptr<bob::machine::SupportVector> trainer::SVMTrainer::train
   if (error_msg) {
     const_cast<double&>(m_param.gamma) = save_gamma;
     boost::format m("libsvm-%d reports: %s");
-    m % LIBSVM_VERSION % error_msg;
+    m % libsvm_version % error_msg;
     std::runtime_error(m.str().c_str());
   }
 
   //do the training, returns the new machine
+#if LIBSVM_VERSION >= 291
   svm_set_print_string_function(debug_libsvm);
+#else
+  boost::format m("libsvm-%d does not support debugging stream setting");
+  m % libsvm_version;
+  debug_libsvm(m.str().c_str());
+#endif
   boost::shared_ptr<svm_model> model(svm_train(problem.get(), &m_param),
       std::ptr_fun(svm_model_free));
 
