@@ -87,7 +87,7 @@ void math::eigSym_(const blitz::Array<double,2>& A,
   if(V_direct_use) 
   {
     A_blitz_lapack.reference(Vt);
-    A_blitz_lapack = A.transpose(1,0);
+    A_blitz_lapack = const_cast<blitz::Array<double,2>&>(A).transpose(1,0);
   }
   else
     // Ugly fix for non-const transpose
@@ -180,7 +180,7 @@ void math::eigSym_(const blitz::Array<double,2>& A, const blitz::Array<double,2>
   if(V_direct_use) 
   {
     A_blitz_lapack.reference(Vt);
-    A_blitz_lapack = A.transpose(1,0);
+    A_blitz_lapack = const_cast<blitz::Array<double,2>&>(A).transpose(1,0);
   }
   else
     // Ugly fix for non-const transpose
