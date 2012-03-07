@@ -15,7 +15,7 @@ if(DOXYGEN_FOUND)
 
   add_custom_target(install-doxygen
       COMMAND ${CMAKE_COMMAND} -E copy_directory
-      "${CMAKE_BINARY_DIR}/doxygen" "${CMAKE_INSTALL_PREFIX}/share/doc/doxygen"
+      "${CMAKE_BINARY_DIR}/doxygen" "${CMAKE_INSTALL_PREFIX}/share/doc/bob/doxygen"
       DEPENDS doxygen
     COMMENT "Installing C++ API documentation" VERBATIM
   )
@@ -49,7 +49,7 @@ if(SPHINX_EXECUTABLE)
 
   add_custom_target(install-sphinx
       COMMAND ${CMAKE_COMMAND} -E copy_directory
-      "${CMAKE_BINARY_DIR}/sphinx" "${CMAKE_INSTALL_PREFIX}/share/doc/sphinx"
+      "${CMAKE_BINARY_DIR}/sphinx" "${CMAKE_INSTALL_PREFIX}/share/doc/bob/sphinx"
       DEPENDS sphinx
     COMMENT "Installing (Sphinx) User Guide" VERBATIM
   )

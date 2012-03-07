@@ -70,5 +70,26 @@ class NUAADatabaseTest(unittest.TestCase):
       self.assertTrue( (v.find('.bmp') != -1) )
       self.assertTrue( (v.find('NormalizedFace') != -1) )
 
+  def test07_cross_valid(self): # testing the cross-validation subsets
+    db = bob.db.nuaa.Database()
+    files_train_real = db.files(versions='raw', cls='real', groups='train')
+    files_train_attack = db.files(versions='raw', cls='attack', groups='train')
+    '''
+    db.cross_valid_gen(len(files_train_real.items()), len(files_train_attack.items()), 10)
+    '''
+    subsets_real, subsets_attack = db.cross_valid_read()
+    self.assertEqual(len(subsets_real), 10)
+    self.assertEqual(len(subsets_attack), 10)
+    for i in range(0,10):
+      self.assertTrue(len(subsets_real[i]) in (174, 175))
+      self.assertTrue(len(subsets_attack[i]) in (174, 175))
+
+    files_real, files_attack = db.cross_valid_fold(files_train_real, files_train_attack, fold_no=0)
+    self.assertTrue(len(files_real[0]) in (174, 175)) # number of samples in validation subset
+    self.assertTrue(len(files_real[1]) in (1568, 1569)) # number of samples in training subset
+    self.assertTrue(len(files_attack[0]) in (174, 175)) # number of samples in validation subset
+    self.assertTrue(len(files_attack[1]) in (1573, 1574)) # number of samples in training subset
+    
+    
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(NUAADatabaseTest)

@@ -1,0 +1,16 @@
+Source: bob
+Section: science
+Priority: optional
+Maintainer: Andre Anjos <andre.anjos@idiap.ch>
+Build-Depends: @cdbs@, cmake, python, python-numpy, liblapack-dev, libatlas-base-dev, libblitz0-dev, libgoogle-perftools-dev, ffmpeg, libavcodec-dev, libswscale-dev, libboost-all-dev, libavformat-dev, graphviz, libmatio-dev, libmagick++-dev, libhdf5-serial-dev, libqt4-dev, libfftw3-dev, libcv-dev, libhighgui-dev, libsvm-dev, doxygen, python-sphinx, dvipng
+# for Ubuntu up to 11.10, replace libmagick++-dev by libmagick++9-dev
+
+Package: bob
+Architecture: any
+Depends: python-scipy, python-matplotlib, python-sqlalchemy
+Recommends: ipython, hdf5-tools, h5utils
+Suggests: libhdf5-doc
+Description: A toolbox for Biometrics, Machine Learning and Signal Processing
+ Bob is a signal-processing and machine learning toolbox for Biometrics developed at the Idiap Research Institute, in Switzerland. The toolbox is written in a mix of Python and C++ and is designed to be both efficient and to reduce development time.
+ .
+ Homepage: http://idiap.github.com/bob
