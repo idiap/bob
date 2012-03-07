@@ -108,7 +108,7 @@ if(CMAKE_PREFIX_PATH)
 endif()
 
 # This is where we install cmake files for external projects
-set(cmakedir share/cmake)
+set(cmakedir share/cmake/bob)
 
 # Sets up externals and install the central dependency file
 include(cmake/bob-external.cmake)
