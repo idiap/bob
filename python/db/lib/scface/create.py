@@ -47,6 +47,56 @@ def add_clients(session, filename):
 
     # Add the client
     session.add(Client(int(tok[0]), group, int(birthyear), gender, int(tok[3]), int(tok[4]), int(tok[5])))
+
+def add_subworlds(session):
+  """Adds splits in the world set, based on the client ids"""
+  # one third
+  session.add(Subworld("onethird", 1))
+  session.add(Subworld("onethird", 4))
+  session.add(Subworld("onethird", 5))
+  session.add(Subworld("onethird", 6))
+  session.add(Subworld("onethird", 8))
+  session.add(Subworld("onethird", 11))
+  session.add(Subworld("onethird", 12))
+  session.add(Subworld("onethird", 18))
+  session.add(Subworld("onethird", 20))
+  session.add(Subworld("onethird", 30))
+  session.add(Subworld("onethird", 33))
+  session.add(Subworld("onethird", 36))
+  session.add(Subworld("onethird", 39))
+  session.add(Subworld("onethird", 40))
+  
+  # two thirds
+  session.add(Subworld("twothirds", 2))
+  session.add(Subworld("twothirds", 3))
+  session.add(Subworld("twothirds", 7))
+  session.add(Subworld("twothirds", 9))
+  session.add(Subworld("twothirds", 10))
+  session.add(Subworld("twothirds", 13))
+  session.add(Subworld("twothirds", 14))
+  session.add(Subworld("twothirds", 15))
+  session.add(Subworld("twothirds", 16))
+  session.add(Subworld("twothirds", 17))
+  session.add(Subworld("twothirds", 19))
+  session.add(Subworld("twothirds", 21))
+  session.add(Subworld("twothirds", 22))
+  session.add(Subworld("twothirds", 23))
+  session.add(Subworld("twothirds", 24))
+  session.add(Subworld("twothirds", 25))
+  session.add(Subworld("twothirds", 26))
+  session.add(Subworld("twothirds", 27))
+  session.add(Subworld("twothirds", 28))
+  session.add(Subworld("twothirds", 29))
+  session.add(Subworld("twothirds", 31))
+  session.add(Subworld("twothirds", 32))
+  session.add(Subworld("twothirds", 34))
+  session.add(Subworld("twothirds", 35))
+  session.add(Subworld("twothirds", 37))
+  session.add(Subworld("twothirds", 38))
+  session.add(Subworld("twothirds", 41))
+  session.add(Subworld("twothirds", 42))
+  session.add(Subworld("twothirds", 43))
+
  
 def add_files(session, imagedir):
   """Add files to the SCFace database."""
@@ -120,6 +170,7 @@ def create_tables(args):
   from sqlalchemy import create_engine
   engine = create_engine(args.location, echo=args.verbose)
   Client.metadata.create_all(engine)
+  Subworld.metadata.create_all(engine)
   File.metadata.create_all(engine)
   Protocol.metadata.create_all(engine)
 
@@ -143,6 +194,7 @@ def create(args):
   create_tables(args)
   s = session(args.dbname, echo=args.verbose)
   add_clients(s, args.featuresfile)
+  add_subworlds(s)
   add_files(s, args.imagedir)
   add_protocols(s)
   s.commit()

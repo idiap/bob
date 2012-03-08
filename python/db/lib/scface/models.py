@@ -35,6 +35,23 @@ class Client(Base):
   def __repr__(self):
     return "<Client('%d', '%s', '%d', '%s', '%d', '%d', '%d')>" % (self.id, self.sgroup, self.birthyear, self.gender, self.beard, self.moustache, self.glasses)
 
+class Subworld(Base):
+  __tablename__ = 'subworld'
+  
+  id = Column(Integer, primary_key=True)
+  name = Column(Enum('onethird','twothirds'))
+  client_id = Column(Integer, ForeignKey('client.id')) # for SQL
+  
+  # for Python
+  real_client = relationship("Client", backref=backref("client_subworld"))
+
+  def __init__(self, name, client_id):
+    self.name = name
+    self.client_id = client_id
+
+  def __repr__(self):
+    print "<Subworld('%s', '%d')>" % (self.name, self.client_id)
+
 class File(Base):
   __tablename__ = 'file'
 

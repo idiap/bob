@@ -30,7 +30,7 @@ class Database(object):
         raise RuntimeError, 'Invalid %s "%s". Valid values are %s, or lists/tuples of those' % (obj, k, valid)
     return l
 
-  def clients(self, protocol=None, groups=None):
+  def clients(self, protocol=None, groups=None, subworld=None):
     """Returns a set of clients for the specific query by the user.
 
     Keyword Parameters:
@@ -41,21 +41,73 @@ class Database(object):
     groups
       The groups to which the clients belong ('dev', 'eval', 'world')
 
+    subworld
+      Specify a split of the world data ("onethird", "twothirds", "")
+      In order to be considered, "world" should be in groups and only one 
+      split should be specified. 
+
     Returns: A list containing all the client ids which have the given
     properties.
     """
 
     VALID_PROTOCOLS = ('combined', 'close', 'medium', 'far')
     VALID_GROUPS = ('dev', 'eval', 'world')
+    VALID_SUBWORLDS = ('onethird', 'twothirds')
     protocol = self.__check_validity__(protocol, 'protocol', VALID_PROTOCOLS)
     groups = self.__check_validity__(groups, 'group', VALID_GROUPS)
-    # List of the clients
-    q = self.session.query(Client).filter(Client.sgroup.in_(groups)).\
-          order_by(Client.id)
+    subworld = self.__check_validity__(subworld, "subworld", VALID_SUBWORLDS)
+
     retval = []
-    for id in [k.id for k in q]: 
-      retval.append(id)
+    # List of the clients
+    if "world" in groups:
+      if len(subworld)==1:
+        q = self.session.query(Client).join(Subworld).filter(Subworld.name.in_(subworld))
+      else:
+        q = self.session.query(Client).filter(Client.sgroup == 'world')
+      q = q.order_by(Client.id)
+      for id in [k.id for k in q]: 
+        retval.append(id)
+    if 'dev' in groups or 'eval' in groups:
+      q = self.session.query(Client).filter(Client.sgroup != 'world').\
+            order_by(Client.id)
+      for id in [k.id for k in q]: 
+        retval.append(id)
+
     return retval
+
+  def Tclients(self, protocol=None, groups=None):
+    """Returns a set of T-Norm clients for the specific query by the user.
+
+    Keyword Parameters:
+
+    protocol
+      The protocol to consider ('combined', 'close', 'medium', 'far')
+
+    groups
+      The groups to which the clients belong ('dev', 'eval', 'world')
+
+    Returns: A list containing all the client ids belonging to the given group.
+    """
+
+    # T-Norm clients are the ones from the onethird world subset
+    return self.clients(protocol, 'world', 'onethird')
+
+  def Zclients(self, protocol=None, groups=None):
+    """Returns a set of Z-Norm clients for the specific query by the user.
+
+    Keyword Parameters:
+
+    protocol
+      The protocol to consider ('combined', 'close', 'medium', 'far')
+
+    groups
+      The groups to which the clients belong ('dev', 'eval', 'world')
+
+    Returns: A list containing all the model ids belonging to the given group.
+    """
+
+    # Z-Norm clients are the ones from the onethird world subset
+    return self.clients(protocol, 'world', 'onethird')
 
   def models(self, protocol=None, groups=None):
     """Returns a set of models for the specific query by the user.
@@ -73,6 +125,38 @@ class Database(object):
 
     return self.clients(protocol, groups)
 
+  def Tmodels(self, protocol=None, groups=None):
+    """Returns a set of T-Norm models for the specific query by the user.
+
+    Keyword Parameters:
+
+    protocol
+      The protocol to consider ('combined', 'close', 'medium', 'far')
+
+    groups
+      The groups to which the subjects attached to the models belong ('dev', 'eval', 'world')
+
+    Returns: A list containing all the model ids belonging to the given group.
+    """
+
+    return self.Tclients(protocol, groups)
+
+  def Zmodels(self, protocol=None, groups=None):
+    """Returns a set of Z-Norm models for the specific query by the user.
+
+    Keyword Parameters:
+
+    protocol
+      The protocol to consider ('combined', 'close', 'medium', 'far')
+
+    groups
+      The groups to which the subjects attached to the models belong ('dev', 'eval', 'world')
+
+    Returns: A list containing all the model ids belonging to the given group.
+    """
+
+    return self.Zclients(protocol, groups)
+
   def getClientIdFromModelId(self, model_id):
     """Returns the client_id attached to the given model_id
     
@@ -84,6 +168,19 @@ class Database(object):
     Returns: The client_id attached to the given model_id
     """
     return model_id
+
+  def getClientIdFromTmodelId(self, model_id):
+    """Returns the client_id attached to the given T-Norm model_id
+    
+    Keyword Parameters:
+
+    model_id
+      The model_id to consider
+
+    Returns: The client_id attached to the given T-Norm model_id
+    """
+    return model_id
+
 
   def getClientIdFromFileId(self, file_id):
     """Returns the client_id (real client id) attached to the given file_id
@@ -123,7 +220,8 @@ class Database(object):
 
 
   def objects(self, directory=None, extension=None, protocol=None,
-      purposes=None, model_ids=None, groups=None, classes=None):
+      purposes=None, model_ids=None, groups=None, classes=None,
+      subworld=None):
     """Returns a set of filenames for the specific query by the user.
     WARNING: Files used as impostor access for several different models are
     only listed one and refer to only a single model
@@ -160,6 +258,11 @@ class Database(object):
       or a tuple with several of them. If 'None' is given (this is the 
       default), it is considered the same as a tuple with all possible values.
 
+    subworld
+      Specify a split of the world data ("onethird", "twothirds", "")
+      In order to be considered, "world" should be in groups and only one 
+      split should be specified. 
+
     Returns: A dictionary containing:
       - 0: the resolved filenames 
       - 1: the model id
@@ -182,11 +285,14 @@ class Database(object):
     VALID_PURPOSES = ('enrol', 'probe')
     VALID_GROUPS = ('dev', 'eval', 'world')
     VALID_CLASSES = ('client', 'impostor')
+    VALID_SUBWORLDS = ('onethird', 'twothirds')
 
     protocol = self.__check_validity__(protocol, "protocol", VALID_PROTOCOLS)
     purposes = self.__check_validity__(purposes, "purpose", VALID_PURPOSES)
     groups = self.__check_validity__(groups, "group", VALID_GROUPS)
     classes = self.__check_validity__(classes, "class", VALID_CLASSES)
+    subworld = self.__check_validity__(subworld, "subworld", VALID_SUBWORLDS)
+
     retval = {}
     
     if(isinstance(model_ids,str)):
@@ -197,6 +303,8 @@ class Database(object):
       validcam = ('frontal', 'cam1', 'cam2', 'cam3', 'cam4', 'cam5')
       q = self.session.query(File, Protocol).join(Client).\
             filter(and_(Client.sgroup == 'world', File.camera.in_(validcam)))
+      if len(subworld) == 1:
+        q = q.join(Subworld).filter(Subworld.name.in_(subworld))
       if model_ids:
         q = q.filter(Client.id.in_(model_ids))
       q = q.order_by(File.client_id, File.camera, File.distance)
@@ -243,7 +351,8 @@ class Database(object):
     return retval
 
   def files(self, directory=None, extension=None, protocol=None,
-      purposes=None, model_ids=None, groups=None, classes=None):
+      purposes=None, model_ids=None, groups=None, classes=None,
+      subworld=None):
     """Returns a set of filenames for the specific query by the user.
 
     Keyword Parameters:
@@ -278,6 +387,11 @@ class Database(object):
       or a tuple with several of them. If 'None' is given (this is the 
       default), it is considered the same as a tuple with all possible values.
 
+    subworld
+      Specify a split of the world data ("onethird", "twothirds", "")
+      In order to be considered, "world" should be in groups and only one 
+      split should be specified. 
+
     Returns: A dictionary containing the resolved filenames considering all
     the filtering criteria. The keys of the dictionary are unique identities 
     for each file in the SCFace database. Conserve these numbers if you 
@@ -285,7 +399,237 @@ class Database(object):
     """
 
     retval = {}
-    d = self.objects(directory, extension, protocol, purposes, model_ids, groups, classes)
+    d = self.objects(directory, extension, protocol, purposes, model_ids, groups, classes, subworld)
+    for k in d: retval[k] = d[k][0]
+
+    return retval
+
+  def Tobjects(self, directory=None, extension=None, protocol=None,
+      model_ids=None, groups=None):
+    """Returns a set of filenames for enrolling T-norm models for score 
+       normalization.
+
+    Keyword Parameters:
+
+    directory
+      A directory name that will be prepended to the final filepath returned
+
+    extension
+      A filename extension that will be appended to the final filepath returned
+
+    protocol
+      One of the SCFace protocols ('combined', 'close', 'medium', 'far')
+
+    model_ids
+      Only retrieves the files for the provided list of model ids (claimed 
+      client id).  If 'None' is given (this is the default), no filter over 
+      the model_ids is performed.
+
+    groups
+      One of the groups ('dev', 'eval', 'world') or a tuple with several of them. 
+      If 'None' is given (this is the default), it is considered the same as a 
+      tuple with all possible values.
+
+    Returns: A dictionary containing:
+
+      * 0: the resolved filenames 
+      * 1: the model id
+      * 2: the claimed id attached to the model
+      * 3: the real id
+      * 4: the "stem" path (basename of the file)
+
+    considering all the filtering criteria. The keys of the dictionary are 
+    unique identities for each file in the SCface database. Conserve these 
+    numbers if you wish to save processing results later on.
+    """
+
+    def make_path(stem, directory, extension):
+      import os
+      if not extension: extension = ''
+      if directory: return os.path.join(directory, stem + extension)
+      return stem + extension
+
+    VALID_PROTOCOLS = ('combined', 'close', 'medium', 'far')
+    VALID_GROUPS = ('dev', 'eval', 'world')
+
+    protocol = self.__check_validity__(protocol, "protocol", VALID_PROTOCOLS)
+    groups = self.__check_validity__(groups, "group", VALID_GROUPS)
+
+    retval = {}
+    
+    if(isinstance(model_ids,str)):
+      model_ids = (model_ids,)
+   
+    # ZT-Norm cohort is 'onethird' 
+    subworld = ('onethird',)
+    # WARNING: Restrict to frontal camera (enrol T-Norm models)
+    validcam = ('frontal',)
+    q = self.session.query(File, Protocol).join(Client).\
+            join(Subworld).filter(Subworld.name.in_(subworld)).\
+            filter(and_(Client.sgroup == 'world', File.camera.in_(validcam)))
+    if model_ids:
+      q = q.filter(Client.id.in_(model_ids))
+    q = q.order_by(File.client_id)
+    for k in q:
+      retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
+    
+    return retval
+
+  def Tfiles(self, directory=None, extension=None, protocol=None,
+      model_ids=None, groups=None):
+    """Returns a set of filenames for enrolling T-norm models for score 
+       normalization.
+
+    Keyword Parameters:
+
+    directory
+      A directory name that will be prepended to the final filepath returned
+
+    extension
+      A filename extension that will be appended to the final filepath returned
+
+    protocol
+      One of the SCFace protocols ('combined', 'close', 'medium', 'far')
+
+    model_ids
+      Only retrieves the files for the provided list of model ids (claimed 
+      client id).  If 'None' is given (this is the default), no filter over 
+      the model_ids is performed.
+
+    groups
+      One of the groups ('dev', 'eval', 'world') or a tuple with several of them. 
+      If 'None' is given (this is the default), it is considered the same as a 
+      tuple with all possible values.
+
+    Returns: A dictionary containing:
+
+      * 0: the resolved filenames 
+      * 1: the model id
+      * 2: the claimed id attached to the model
+      * 3: the real id
+      * 4: the "stem" path (basename of the file)
+
+    considering allthe filtering criteria. The keys of the dictionary are 
+    unique identities for each file in the SCface database. Conserve these 
+    numbers if you wish to save processing results later on.
+    """
+
+    retval = {}
+    d = self.Tobjects(directory, extension, protocol, model_ids, groups)
+    for k in d: retval[k] = d[k][0]
+
+    return retval
+
+  def Zobjects(self, directory=None, extension=None, protocol=None,
+      model_ids=None, groups=None):
+    """Returns a set of filenames to perform Z-norm score normalization.
+
+    Keyword Parameters:
+
+    directory
+      A directory name that will be prepended to the final filepath returned
+
+    extension
+      A filename extension that will be appended to the final filepath returned
+
+    protocol
+      One of the SCFace protocols ('combined', 'close', 'medium', 'far')
+
+    model_ids
+      Only retrieves the files for the provided list of model ids (claimed 
+      client id).  If 'None' is given (this is the default), no filter over 
+      the model_ids is performed.
+
+    groups
+      One of the groups ('dev', 'eval', 'world') or a tuple with several of them. 
+      If 'None' is given (this is the default), it is considered the same as a 
+      tuple with all possible values.
+
+    Returns: A dictionary containing:
+
+      * 0: the resolved filenames 
+      * 1: the model id
+      * 2: the claimed id attached to the model
+      * 3: the real id
+      * 4: the "stem" path (basename of the file)
+
+    considering all the filtering criteria. The keys of the dictionary are 
+    unique identities for each file in the SCface database. Conserve these 
+    numbers if you wish to save processing results later on.
+    """
+
+    def make_path(stem, directory, extension):
+      import os
+      if not extension: extension = ''
+      if directory: return os.path.join(directory, stem + extension)
+      return stem + extension
+
+    VALID_PROTOCOLS = ('combined', 'close', 'medium', 'far')
+    VALID_GROUPS = ('dev', 'eval', 'world')
+
+    protocol = self.__check_validity__(protocol, "protocol", VALID_PROTOCOLS)
+    groups = self.__check_validity__(groups, "group", VALID_GROUPS)
+
+    retval = {}
+    
+    if(isinstance(model_ids,str)):
+      model_ids = (model_ids,)
+   
+    # ZT-Norm cohort is 'onethird' 
+    subworld = ('onethird',)
+    # WARNING: Restrict to frontal camera (enrol T-Norm models)
+    validcam = ('cam1','cam2','cam3','cam4','cam5')
+    q = self.session.query(File, Protocol).join(Client).\
+            join(Subworld).filter(Subworld.name.in_(subworld)).\
+            filter(and_(Client.sgroup == 'world', File.camera.in_(validcam)))
+    if model_ids:
+      q = q.filter(Client.id.in_(model_ids))
+    q = q.order_by(File.client_id)
+    for k in q:
+      retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
+    
+    return retval
+
+  def Zfiles(self, directory=None, extension=None, protocol=None,
+      model_ids=None, groups=None):
+    """Returns a set of filenames to perform Z-norm score normalization.
+
+    Keyword Parameters:
+
+    directory
+      A directory name that will be prepended to the final filepath returned
+
+    extension
+      A filename extension that will be appended to the final filepath returned
+
+    protocol
+      One of the SCFace protocols ('combined', 'close', 'medium', 'far')
+
+    model_ids
+      Only retrieves the files for the provided list of model ids (claimed 
+      client id).  If 'None' is given (this is the default), no filter over 
+      the model_ids is performed.
+
+    groups
+      One of the groups ('dev', 'eval', 'world') or a tuple with several of them. 
+      If 'None' is given (this is the default), it is considered the same as a 
+      tuple with all possible values.
+
+    Returns: A dictionary containing:
+
+      * 0: the resolved filenames 
+      * 1: the model id
+      * 2: the claimed id attached to the model
+      * 3: the real id
+      * 4: the "stem" path (basename of the file)
+
+    considering all the filtering criteria. The keys of the dictionary are 
+    unique identities for each file in the SCface database. Conserve these 
+    numbers if you wish to save processing results later on.
+    """
+
+    retval = {}
+    d = self.Zobjects(directory, extension, protocol, model_ids, groups)
     for k in d: retval[k] = d[k][0]
 
     return retval
