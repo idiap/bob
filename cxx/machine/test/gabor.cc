@@ -37,7 +37,7 @@
 #include <io/Array.h>
 
 
-static const double epsilon = 1e-10;
+static const double epsilon = 1e-8;
 
 template <int D>
 void test_identical(const blitz::TinyVector<int,D>& shape, const blitz::TinyVector<int,D>& reference){

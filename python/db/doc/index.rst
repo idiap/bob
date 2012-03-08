@@ -88,7 +88,7 @@ NUAA Database
   :members:
 
 CASIA_FASD Database
-=============
+===================
 
 .. automodule:: bob.db.casia_fasd
   :members:
