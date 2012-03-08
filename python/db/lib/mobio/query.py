@@ -42,7 +42,7 @@ class Database(object):
     return tuple(l2)
 
 
-  def clients(self, protocol=None, groups=None, subworld=None):
+  def clients(self, protocol=None, groups=None, subworld=None, gender=None):
     """Returns a set of clients for the specific query by the user.
 
     Keyword Parameters:
@@ -59,6 +59,9 @@ class Database(object):
       In order to be considered, "world" should be in groups and only one 
       split should be specified. 
 
+    gender
+      The gender to consider ('male', 'female')
+
     Returns: A list containing all the client ids which have the given
     properties.
     """
@@ -67,10 +70,11 @@ class Database(object):
     VALID_GROUPS = ('dev', 'eval', 'world')
     VALID_SUBWORLDS = ('onethird','twothirds',)
     protocol = self.__check_validity__(protocol, "protocol", VALID_PROTOCOLS)
+    protocol = self.__gender_replace__(protocol)
     groups = self.__check_validity__(groups, "group", VALID_GROUPS)
     subworld = self.__check_validity__(subworld, "subworld", VALID_SUBWORLDS)
-
-    gender = self.__gender_replace__(protocol)
+    gender = self.__check_validity__(gender, "gender", VALID_PROTOCOLS)
+    gender = self.__gender_replace__(gender)
 
     retval = []
     # World data (gender independent)
@@ -79,6 +83,8 @@ class Database(object):
         q = self.session.query(Client).join(SubworldClient).filter(SubworldClient.name.in_(subworld))
       else:
         q = self.session.query(Client).filter(Client.sgroup == 'world')
+      if gender:
+        q = q.filter(Client.gender.in_(gender))
       q = q.order_by(Client.id)
       for id in [k.id for k in q]: 
         retval.append(id)
@@ -86,6 +92,8 @@ class Database(object):
     # dev / eval data
     if 'dev' in groups or 'eval' in groups:
       q = self.session.query(Client).filter(and_(Client.sgroup != 'world', Client.sgroup.in_(groups)))
+      if protocol:
+        q = q.filter(Client.gender.in_(protocol))
       if gender:
         q = q.filter(Client.gender.in_(gender))
       q = q.order_by(Client.id)
@@ -94,23 +102,32 @@ class Database(object):
 
     return retval
 
-  def Tclients(self, protocol=None, groups=None):
+  def Tclients(self, protocol=None, groups=None, gender=None):
     """Returns a set of T-Norm clients for the specific query by the user.
 
     Keyword Parameters:
 
     protocol
-      One of the MOBIO protocols ("male", "female").
+      One of the MOBIO protocols ("male", "female"). T-Norm clients are gender
+      independent by default for MOBIO.
     
     groups
       The groups to which the clients belong ("dev", "eval").
       Useless as they are independent from 'dev' and 'eval' for this database
 
+    gender
+      The gender to consider ('male', 'female')
+
     Returns: A list containing all the client ids belonging to the given group.
     """
 
+    VALID_PROTOCOLS = ('female', 'male')
+    protocol = self.__check_validity__(protocol, "protocol", VALID_PROTOCOLS)
+    protocol = self.__gender_replace__(protocol)
+    gender = self.__check_validity__(gender, "gender", VALID_PROTOCOLS)
+    gender = self.__gender_replace__(gender)
+
     q = self.session.query(TModel).join(Client)
-    gender = self.__gender_replace__(protocol)
     if gender:
       q = q.filter(Client.gender.in_(gender))
     q = q.order_by(TModel.client_id)
@@ -120,7 +137,7 @@ class Database(object):
       if not cid in tclient: tclient.append(cid)
     return tclient
 
-  def Zclients(self, protocol=None, groups=None):
+  def Zclients(self, protocol=None, groups=None, gender=None):
     """Returns a set of Z-Norm clients for the specific query by the user.
 
     Keyword Parameters:
@@ -132,22 +149,30 @@ class Database(object):
       The groups to which the clients belong ("dev", "eval").
       Useless as they are independent from 'dev' and 'eval' for this database
 
+    gender
+      The gender to consider ('male', 'female')
+
     Returns: A list containing all the client ids belonging to the given group.
     """
 
-    gender = self.__gender_replace__(protocol)
+    VALID_PROTOCOLS = ('female', 'male')
+    protocol = self.__check_validity__(protocol, "protocol", VALID_PROTOCOLS)
+    protocol = self.__gender_replace__(protocol)
+    gender = self.__check_validity__(gender, "gender", VALID_PROTOCOLS)
+    gender = self.__gender_replace__(gender)
 
-    zclient = []
     q = self.session.query(ZClient).join(Client)
     if gender:
       q = q.filter(Client.gender.in_(gender))
     q = q.order_by(ZClient.client_id)     
+
+    zclient = []
     for cid in [k.client_id for k in q]:
       if not cid in zclient: zclient.append(cid)
     return zclient
 
 
-  def models(self, protocol=None, groups=None, subworld=None):
+  def models(self, protocol=None, groups=None, subworld=None, gender=None):
     """Returns a set of models for the specific query by the user.
 
     Keyword Parameters:
@@ -159,13 +184,16 @@ class Database(object):
       The groups to which the subjects attached to the models belong ("dev", "eval", "world")
       Please note that world data are protocol/gender independent
 
+    gender
+      The gender to consider ('male', 'female')
+
     Returns: A list containing all the model ids belonging to the given group.
     """
 
-    return self.clients(protocol, groups, subworld)
+    return self.clients(protocol, groups, subworld, gender)
 
 
-  def Tmodels(self, protocol=None, groups=None):
+  def Tmodels(self, protocol=None, groups=None, gender=None):
     """Returns a set of T-Norm models for the specific query by the user.
 
     Keyword Parameters:
@@ -177,10 +205,17 @@ class Database(object):
       The groups to which the clients belong ("dev", "eval").
       Useless as they are independent from 'dev' and 'eval' for this database
 
+    gender
+      The gender to consider ('male', 'female')
+
     Returns: A list containing all the model ids belonging to the given group.
     """
 
-    gender = self.__gender_replace__(protocol)
+    VALID_PROTOCOLS = ('female', 'male')
+    protocol = self.__check_validity__(protocol, "protocol", VALID_PROTOCOLS)
+    protocol = self.__gender_replace__(protocol)
+    gender = self.__check_validity__(gender, "gender", VALID_PROTOCOLS)
+    gender = self.__gender_replace__(gender)
 
     tmodel = []
     q = self.session.query(TModel).join(Client)
@@ -191,7 +226,7 @@ class Database(object):
       if not tid in tmodel: tmodel.append(tid)
     return tmodel
 
-  def Zmodels(self, protocol=None, groups=None):
+  def Zmodels(self, protocol=None, groups=None, gender=None):
     """Returns a set of Z-Norm models for the specific query by the user.
 
     Keyword Parameters:
@@ -203,10 +238,13 @@ class Database(object):
       The groups to which the clients belong ("dev", "eval").
       Useless as they are independent from 'dev' and 'eval' for this database
 
+    gender
+      The gender to consider ('male', 'female')
+
     Returns: A list containing all the model ids belonging to the given group.
     """
 
-    return self.Zclients(protocol, groups)
+    return self.Zclients(protocol, groups, gender)
 
   def getClientIdFromModelId(self, model_id):
     """Returns the client_id attached to the given model_id
@@ -278,7 +316,7 @@ class Database(object):
 
   def objects(self, directory=None, extension=None, protocol=None,
       purposes=None, model_ids=None, groups=None, classes=None,
-      subworld=None):
+      subworld=None, gender=None):
     """Returns a set of filenames for the specific query by the user.
 
     Keyword Parameters:
@@ -317,6 +355,9 @@ class Database(object):
       Specify a split of the world data ("twothirds", "")
       In order to be considered, "world" should be in groups and only one 
       split should be specified. 
+
+    gender
+      The gender to consider ('male', 'female')
 
     Returns: A dictionary containing:
       - 0: the resolved filenames 
@@ -347,6 +388,8 @@ class Database(object):
     groups = self.__check_validity__(groups, "group", VALID_GROUPS)
     classes = self.__check_validity__(classes, "class", VALID_CLASSES)
     subworld = self.__check_validity__(subworld, "subworld", VALID_SUBWORLDS)
+    gender = self.__check_validity__(gender, "gender", VALID_PROTOCOLS)
+    gender = self.__gender_replace__(gender)
 
     retval = {}    
     if(isinstance(model_ids,str)):
@@ -362,6 +405,8 @@ class Database(object):
               filter(SubworldFile.name.in_(subworld)).\
               filter(and_(File.client_id == SubworldFile.client_id, File.session_id == SubworldFile.session_id,
                           File.speech_type == SubworldFile.speech_type, File.shot_id == SubworldFile.shot_id))
+      if gender:
+        q = q.filter(Client.gender.in_(gender))
       q = q.order_by(File.client_id, File.session_id, File.speech_type, File.shot_id, File.device)
       for k in q:
         retval[k.id] = (make_path(k.path, directory, extension), k.client_id, k.client_id, k.client_id, k.path)
@@ -375,6 +420,8 @@ class Database(object):
               filter(and_(Protocol.name.in_(protocol), Protocol.purpose == 'enrol', File.speech_type == Protocol.speech_type))
         if model_ids:
           q = q.filter(Client.id.in_(model_ids))
+        if gender:
+          q = q.filter(Client.gender.in_(gender))
         q = q.order_by(File.client_id, File.session_id, File.speech_type, File.shot_id, File.device)
         for k in q:
           retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
@@ -387,6 +434,8 @@ class Database(object):
                 filter(and_(Protocol.name.in_(protocol), Protocol.purpose == 'probe', File.speech_type == Protocol.speech_type))
           if model_ids:
             q = q.filter(Client.id.in_(model_ids))
+          if gender:
+            q = q.filter(Client.gender.in_(gender))
           q = q.order_by(File.client_id, File.session_id, File.speech_type, File.shot_id, File.device)
           for k in q:
             retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
@@ -398,6 +447,8 @@ class Database(object):
                 filter(and_(Protocol.name.in_(protocol), Protocol.purpose == 'probe', File.speech_type == Protocol.speech_type))
           if(model_ids and len(model_ids)==1):
             q = q.filter(not_(Client.id.in_(model_ids)))
+          if gender:
+            q = q.filter(Client.gender.in_(gender))
           q = q.order_by(File.client_id, File.session_id, File.speech_type, File.shot_id, File.device)
           for k in q:
             if(model_ids and len(model_ids) == 1):
@@ -409,7 +460,7 @@ class Database(object):
 
   def files(self, directory=None, extension=None, protocol=None,
       purposes=None, model_ids=None, groups=None, classes=None,
-      subworld=None):
+      subworld=None, gender=None):
     """Returns a set of filenames for the specific query by the user.
 
     Keyword Parameters:
@@ -449,6 +500,9 @@ class Database(object):
       In order to be considered, "world" should be in groups and only one 
       split should be specified. 
 
+    gender
+      The gender to consider ('male', 'female')
+
     Returns: A dictionary containing the resolved filenames considering all
     the filtering criteria. The keys of the dictionary are unique identities 
     for each file in the Biosecure database. Conserve these numbers if you 
@@ -456,14 +510,15 @@ class Database(object):
     """
 
     retval = {}
-    d = self.objects(directory, extension, protocol, purposes, model_ids, groups, classes, subworld)
+    d = self.objects(directory, extension, protocol, purposes, model_ids, 
+      groups, classes, subworld, gender)
     for k in d: retval[k] = d[k][0]
 
     return retval
 
 
   def Tobjects(self, directory=None, extension=None, protocol=None,
-      model_ids=None, groups=None):
+      model_ids=None, groups=None, gender=None):
     """Returns a set of filenames for enroling T-norm models for score 
        normalization.
 
@@ -488,6 +543,9 @@ class Database(object):
       If 'None' is given (this is the default), it is considered the same as a 
       tuple with all possible values.
 
+    gender
+      The gender to consider ('male', 'female')
+
     Returns: A dictionary containing:
       - 0: the resolved filenames 
       - 1: the model id
@@ -508,6 +566,8 @@ class Database(object):
 
     VALID_PROTOCOLS = ('female', 'male')
     protocol = self.__check_validity__(protocol, "protocol", VALID_PROTOCOLS)
+    gender = self.__check_validity__(gender, "gender", VALID_PROTOCOLS)
+    gender = self.__gender_replace__(gender)
 
     retval = {}    
     if(isinstance(model_ids,str)):
@@ -518,13 +578,15 @@ class Database(object):
                       File.speech_type == TModel.speech_type))
     if model_ids:
       q = q.filter(TModel.id.in_(model_ids))
+    if gender:
+      q = q.filter(Client.gender.in_(gender))
     q = q.order_by(File.client_id, File.session_id, File.speech_type, File.shot_id, File.device)
     for k in q:
       retval[k.id] = (make_path(k.path, directory, extension), k.client_id, k.client_id, k.client_id, k.path) 
     return retval
 
   def Tfiles(self, directory=None, extension=None, protocol=None,
-      model_ids=None, groups=None):
+      model_ids=None, groups=None, gender=None):
     """Returns a set of filenames for enrolling T-norm models for score 
        normalization.
 
@@ -549,6 +611,9 @@ class Database(object):
       If 'None' is given (this is the default), it is considered the same as a 
       tuple with all possible values.
 
+    gender
+      The gender to consider ('male', 'female')
+
     Returns: A list of filenames
     considering all the filtering criteria. The keys of the dictionary are 
     unique identities for each file in the BANCA database. Conserve these 
@@ -556,14 +621,15 @@ class Database(object):
     """
 
     retval = {}
-    d = self.Tobjects(directory, extension, protocol, model_ids, groups)
+    d = self.Tobjects(directory, extension, protocol, model_ids, groups, 
+      gender)
     for k in d: retval[k] = d[k][0]
 
     return retval
 
 
   def Zobjects(self, directory=None, extension=None, protocol=None,
-      model_ids=None, groups=None):
+      model_ids=None, groups=None, gender=None):
     """Returns a set of filenames to perform Z-norm score normalization.
 
     Keyword Parameters:
@@ -586,6 +652,9 @@ class Database(object):
       One of the groups ('dev', 'eval', 'world') or a tuple with several of them. 
       If 'None' is given (this is the default), it is considered the same as a 
       tuple with all possible values.
+
+    gender
+      The gender to consider ('male', 'female')
 
     Returns: A dictionary containing:
       - 0: the resolved filenames 
@@ -609,6 +678,8 @@ class Database(object):
     VALID_GROUPS = ('dev', 'eval', 'world')
     protocol = self.__check_validity__(protocol, "protocol", VALID_PROTOCOLS)
     groups = self.__check_validity__(groups, "group", VALID_GROUPS)
+    gender = self.__check_validity__(gender, "gender", VALID_PROTOCOLS)
+    gender = self.__gender_replace__(gender)
 
     retval = {}
 
@@ -620,6 +691,8 @@ class Database(object):
             filter(File.client_id == ZClient.client_id)
     if model_ids:
       q = q.filter(File.client_id.in_(model_ids))
+    if gender:
+      q = q.filter(Client.gender.in_(gender))
     q = q.order_by(File.client_id, File.session_id, File.speech_type, File.shot_id)
     for k in q:
       retval[k.id] = (make_path(k.path, directory, extension), k.client_id, k.client_id, k.client_id, k.path)
@@ -627,7 +700,7 @@ class Database(object):
     return retval
 
   def Zfiles(self, directory=None, extension=None, protocol=None,
-      model_ids=None, groups=None):
+      model_ids=None, groups=None, gender=None):
     """Returns a set of filenames to perform Z-norm score normalization.
 
     Keyword Parameters:
@@ -651,6 +724,9 @@ class Database(object):
       If 'None' is given (this is the default), it is considered the same as a 
       tuple with all possible values.
 
+    gender
+      The gender to consider ('male', 'female')
+
     Returns: A list of filenames
     considering all the filtering criteria. The keys of the dictionary are 
     unique identities for each file in the MOBIO database. Conserve these 
@@ -658,7 +734,8 @@ class Database(object):
     """
 
     retval = {}
-    d = self.Zobjects(directory, extension, protocol, model_ids, groups)
+    d = self.Zobjects(directory, extension, protocol, model_ids, groups, 
+      gender)
     for k in d: retval[k] = d[k][0]
 
     return retval
