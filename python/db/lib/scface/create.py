@@ -213,7 +213,7 @@ def add_command(subparsers):
       default='/idiap/resource/database/scface/SCface_database/features.txt',
       help="Change the path to the file containing information about the clients of the SCFace database (defaults to %(default)s)") 
   parser.add_argument('--imagedir', action='store', metavar='DIR',
-      default='/idiap/resource/database/scface/SCface_database',
+      default='/idiap/group/biometric/databases/scface/images',
       help="Change the relative path to the directory containing the images of the SCFace database (defaults to %(default)s)")
   
   parser.set_defaults(func=create) #action
