@@ -109,11 +109,11 @@ def add_files(session, imagedir):
     else:
       session.add(File(int(v[0]), os.path.join(maindir, basename), v[1], int(v[2])))
 
-  for maindir in ['mugshot_frontal_original_all', 'surveillance_cameras_distance_1',\
+  for maindir in ['mugshot_frontal_cropped_all', 'surveillance_cameras_distance_1',\
                   'surveillance_cameras_distance_2', 'surveillance_cameras_distance_3']:
     if not os.path.isdir( os.path.join( imagedir, maindir) ):
       continue
-    elif maindir == 'mugshot_frontal_original_all':
+    elif maindir == 'mugshot_frontal_cropped_all':
       for f in filter(nodot, os.listdir( os.path.join( imagedir, maindir) )):
         basename, extension = os.path.splitext(f)
         add_file(session, basename, maindir, True)
