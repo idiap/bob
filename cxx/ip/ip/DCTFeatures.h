@@ -23,8 +23,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_IP_DCT_FEATURES_H
-#define BOB5SPRO_IP_DCT_FEATURES_H
+#ifndef BOB_IP_DCT_FEATURES_H
+#define BOB_IP_DCT_FEATURES_H
 
 #include "core/cast.h"
 #include "core/array_copy.h"
@@ -183,4 +183,4 @@ namespace bob {
 
 }}
 
-#endif /* BOB5SPRO_IP_DCT_FEATURES_H */
+#endif /* BOB_IP_DCT_FEATURES_H */

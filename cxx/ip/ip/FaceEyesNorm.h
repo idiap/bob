@@ -18,8 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_IP_FACE_EYES_NORM_H
-#define BOB5SPRO_IP_FACE_EYES_NORM_H
+#ifndef BOB_IP_FACE_EYES_NORM_H
+#define BOB_IP_FACE_EYES_NORM_H
 
 #include <boost/shared_ptr.hpp>
 #include "core/array_assert.h"
@@ -184,4 +184,4 @@ namespace bob {
  */
 }
 
-#endif /* BOB5SPRO_IP_FACE_EYES_NORM_H */
+#endif /* BOB_IP_FACE_EYES_NORM_H */

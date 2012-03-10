@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_IP_COMMON_H
-#define BOB5SPRO_IP_COMMON_H
+#ifndef BOB_IP_COMMON_H
+#define BOB_IP_COMMON_H
 
 #include <blitz/array.h>
 
@@ -77,5 +77,5 @@ namespace bob {
  */
 }
 
-#endif /* BOB5SPRO_IP_COMMON_H */
+#endif /* BOB_IP_COMMON_H */
 
