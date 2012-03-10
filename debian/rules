@@ -6,3 +6,14 @@ include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/cmake.mk
 
 DEB_CMAKE_EXTRA_FLAGS := -DCMAKE_BUILD_TYPE=Release
+
+# To enable testing after the build, just uncomment
+#DEB_MAKE_CHECK_TARGET := test
+
+# This target will install databases and documentation
+pyver := $(shell python -c 'import sys; print "%d.%d" % sys.version_info[:2]')
+binary-post-install/bob::
+	LD_LIBRARY_PATH=$(DEB_DESTDIR)$(DEB_CMAKE_INSTALL_PREFIX)/lib PYTHONPATH=$(DEB_DESTDIR)$(DEB_CMAKE_INSTALL_PREFIX)/lib/python$(pyver) python $(DEB_DESTDIR)$(DEB_CMAKE_INSTALL_PREFIX)/bin/dbmanage.py all download --verbose
+	cd $(DEB_BUILDDIR) && $(MAKE) DESTDIR=$(DEB_DESTDIR) install-sphinx
+	cd $(DEB_BUILDDIR) && $(MAKE) DESTDIR=$(DEB_DESTDIR) install-doxygen
+	mv debian/

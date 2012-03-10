@@ -9,6 +9,25 @@ including the source package, do the following:
 
 $ fakeroot dpkg-buildpackage
 
+The work of building a package with dpkg-buildpackage can take some iterations.
+Here are some tips to alleviate common problems:
+
+1. To enable multiple processes when building:
+
+	$ fakeroot dpkg-buildpackage -j4
+
+2. To avoid cleaning before re-building:
+
+	$ fakeroot dpkg-buildpackage -nc
+
+	Note that, otherwise, dpkg-buildpackage will first call clean.
+
+3. To avoid signing the package (if you have a gpg key)
+
+	$ fakeroot dpkg-buildpackage -us -uc
+
+4. 
+
 --
 Andre Anjos
 06/march/2012
