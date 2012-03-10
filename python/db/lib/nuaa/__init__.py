@@ -218,12 +218,6 @@ class Database(object):
 
     Keyword parameters:
 
-    directory
-      This parameter will be prepended to all the filenames which are going to be returned by this procedure
-
-    extension
-      This parameter will be appended to all the filenames which are going to be returned by this procedure
-
     version
       The version of the database that is needed: 'raw', 'detected_face' or 'normalized_face'.
 
@@ -235,6 +229,12 @@ class Database(object):
 
     fold_no
       Number of the fold 
+
+    directory
+      This parameter will be prepended to all the filenames which are going to be returned by this procedure
+
+    extension
+      This parameter will be appended to all the filenames which are going to be returned by this procedure
   """
 
     if infilename == None:

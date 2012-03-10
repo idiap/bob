@@ -67,23 +67,27 @@ class FASDDatabaseTest(unittest.TestCase):
 
   def test02_cross_valid(self): # testing the cross-validation subsets
     db = bob.db.casia_fasd.Database()
-    import pdb; pdb.set_trace()
+    '''
     db.cross_valid_gen(60, 60, 5) # 60 is the number of real samples as well as in each attack type of the database
     '''
     subsets_real, subsets_attack = db.cross_valid_read()
-    self.assertEqual(len(subsets_real), 10)
-    self.assertEqual(len(subsets_attack), 10)
-    for i in range(0,10):
-      self.assertTrue(len(subsets_real[i]) in (174, 175))
-      self.assertTrue(len(subsets_attack[i]) in (174, 175))
-
-    import pdb; pdb.set_trace()
-    files_real_val, files_real_train = db.cross_valid_foldfiles(version='raw', cls='real', fold_no=1)
-    self.assertTrue(len(files_real_val) in (174, 175)) # number of samples in validation subset of real accesses
-    self.assertTrue(len(files_real_train) in (1568, 1569)) # number of samples in training subset of real accesses
-    files_attack_val, files_attack_train = db.cross_valid_foldfiles(version='detected_face', cls='attack', fold_no=3, directory='aaa', extension='.jpg')
-    self.assertTrue(len(files_attack_val) in (174, 175)) # number of samples in validation subset of attacks
-    self.assertTrue(len(files_attack_train) in (1573, 1574)) # number of samples in training subset of attacks
-    '''
+    self.assertEqual(len(subsets_real), 5)
+    self.assertEqual(len(subsets_attack), 5)
+    for i in range(0,5):
+      self.assertEqual(len(subsets_real[i]), 12)
+      self.assertEqual(len(subsets_attack[i]), 12)
+    files_real_val, files_real_train = db.cross_valid_foldfiles(cls='real', fold_no=1)
+    self.assertEqual(len(files_real_val), 12) # number of samples in validation subset of real accesses
+    self.assertEqual(len(files_real_train), 48) # number of samples in training subset of real accesses
+    files_real_val, files_real_train = db.cross_valid_foldfiles(types='warped', cls='attack', fold_no=2, directory='xxx', extension='.avi')
+    self.assertEqual(len(files_real_val), 12) # number of samples in validation subset of warped attacks
+    self.assertEqual(len(files_real_train), 48) # number of samples in training subset of warped attacks
+    files_real_val, files_real_train = db.cross_valid_foldfiles(types=('warped', 'cut'), cls='attack', fold_no=3)
+    self.assertEqual(len(files_real_val), 24) # number of samples in validation subset of warped and cut attacks
+    self.assertEqual(len(files_real_train), 96) # number of samples in training subset of of warped and cut attacks
+    files_real_val, files_real_train = db.cross_valid_foldfiles(types=('warped', 'cut', 'video'), cls='attack', fold_no=4)
+    self.assertEqual(len(files_real_val), 36) # number of samples in validation subset of all attacks
+    self.assertEqual(len(files_real_train), 144) # number of samples in training subset of all attacks
+    
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(FASDDatabaseTest)

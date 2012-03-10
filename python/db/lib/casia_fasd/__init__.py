@@ -194,16 +194,10 @@ class Database(object):
       linenum += 1 
     return subsets_pos, subsets_neg
 
-  def cross_valid_foldfiles(self, version, cls, infilename=None, fold_no=0, directory=None, extension=None):
+  def cross_valid_foldfiles(self, cls, types=None, infilename=None, fold_no=0, directory=None, extension=None):
     """ Returns two dictionaries: one with the names of the files of the validation subset in one fold, and one with the names of the files in the training subset of that fold. The number of the cross_validation fold is given as a parameter.
 
     Keyword parameters:
-
-    directory
-      This parameter will be prepended to all the filenames which are going to be returned by this procedure
-
-    extension
-      This parameter will be appended to all the filenames which are going to be returned by this procedure
 
     version
       The version of the database that is needed: 'raw', 'detected_face' or 'normalized_face'.
@@ -216,10 +210,25 @@ class Database(object):
 
     fold_no
       Number of the fold 
+
+    directory
+      This parameter will be prepended to all the filenames which are going to be returned by this procedure
+
+    extension
+      This parameter will be appended to all the filenames which are going to be returned by this procedure
   """
 
     if infilename == None:
-      infilename = os.path.join(os.path.dirname(__file__), version + '_' + cls + '.txt')
+      if cls == 'real':
+        infilename = os.path.join(os.path.dirname(__file__), 'real.txt')
+      else:
+        if 'warped' in types and 'cut' in types and 'video' in types: 
+          infilename = os.path.join(os.path.dirname(__file__), 'cut_warped_video_attack.txt')
+        elif 'warped' in types and 'cut' in types:
+          infilename = os.path.join(os.path.dirname(__file__), 'cut_warped_attack.txt')
+        else:
+          infilename = os.path.join(os.path.dirname(__file__), types+'_attack.txt')
+
     lines = open(infilename, 'r').readlines()
     files_val = {} # the keys in the both dictionaries are just pro-forma, for compatibility with other databases
     files_train = {}
