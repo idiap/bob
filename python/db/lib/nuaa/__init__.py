@@ -148,7 +148,7 @@ class Database(object):
     return retval  
 
   def cross_valid_gen(self, numpos, numneg, numfolds=10, outfilename=None):
-    """ Performs N-fold cross-validation on a given number of samples. Generates the indices of the validation subset for N folds, and writes them into a text file. The indices of the training samples should be known if the indices of the validation subset are known. This method is intended for 2-class classification problems, therefore the number of positive and negative samples whould be given at the beginning. The method generates validation indices for both positive and negative samples separately. Each row of the output file are the validation indices of one fold; validation indices for the positive class are in the odd lines, and validation indices for the negative class are in the even lines.
+    """ Performs N-fold cross-validation on a given number of samples. Generates the indices of the validation subset for N folds, and writes them into a text file (the indices of the training samples are easy to compute once the indices of the validation subset are known). This method is intended for 2-class classification problems, therefore the number of both positive and negative samples should be given at the beginning. The method generates validation indices for both positive and negative samples separately. Each row of the output file are the validation indices of one fold; validation indices for the positive class are in the odd lines, and validation indices for the negative class are in the even lines.
 
     Keyword parameters:
    
@@ -193,7 +193,7 @@ class Database(object):
     return 0
 
   def cross_valid_read(self, infilename=None):
-    """ Reads the cross-validation indices from a file and returns two lists of validation indices: for the positive and for the negative class. Each list actually consists of sublists; one sublist for each fold.
+    """ Reads the cross-validation indices from a file and returns two lists of validation indices: for the positive and for the negative class. Each list actually consists of sublists; one sublist with validation indices for each fold.
 
     Keyword parameters:
 
@@ -213,6 +213,83 @@ class Database(object):
       linenum += 1 
     return subsets_pos, subsets_neg
 
+  def cross_valid_foldfiles(self, version, cls, infilename=None, fold_no=0, directory=None, extension=None):
+    """ Returns two dictionaries: one with the names of the files of the validation subset in one fold, and one with the names of the files in the training subset of that fold. The number of the cross_validation fold is given as a parameter.
+
+    Keyword parameters:
+
+    directory
+      This parameter will be prepended to all the filenames which are going to be returned by this procedure
+
+    extension
+      This parameter will be appended to all the filenames which are going to be returned by this procedure
+
+    version
+      The version of the database that is needed: 'raw', 'detected_face' or 'normalized_face'.
+
+    cls
+      The class of the samples: 'real' or 'attack'
+  
+    infilename
+      The name of the file where the cross-validation files are stored. If it is None, then the name of the filename with the cross-validation files is formed using the parameters version and cls. If this parameter is specified, then the parameters version and cls are ignored
+
+    fold_no
+      Number of the fold 
+  """
+
+    if infilename == None:
+      infilename = os.path.join(os.path.dirname(__file__), version + '_' + cls + '.txt')
+    lines = open(infilename, 'r').readlines()
+    files_val = {} # the keys in the both dictionaries are just pro-forma, for compatibility with other databases
+    files_train = {}
+    k_val = 0; k_train = 0 # simple counters
+    
+    def make_path(stem, directory, extension):
+      if not extension: extension = ''
+      if directory: return os.path.join(directory, stem + extension)
+      return stem + extension
+   
+    for line in lines:
+      words = line.rstrip('\n\t').split('\t')
+      if int(words[1]) == fold_no:
+        files_val[k_val] = make_path(words[0], directory, extension); k_val += 1
+      else:
+        files_train[k_train] = make_path(words[0], directory, extension); k_train += 1
+
+    return files_val, files_train
+  
+
+  def save_one(self, filename, obj, directory, extension):
+    """Saves a single object supporting the bob save() protocol.
+
+    This method will call save() on the the given object using the correct
+    database filename stem for the given id.
+    
+    Keyword parameters:
+
+    filename
+      The unique filename under which the object will be saved. Before calling this method, the method files() should be called (with no directory and extension arguments passed) in order to obtain the unique filenames for each of the files to be saved.
+
+    obj
+      The object that needs to be saved, respecting the bob save() protocol.
+
+    directory
+      This is the base directory to which you want to save the data. The
+      directory is tested for existence and created if it is not there with
+      os.makedirs()
+
+    extension
+      The extension determines the way each of the arrays will be saved.
+    """
+
+    from ...io import save
+
+    fullpath = os.path.join(directory, filename + extension)
+    fulldir = os.path.dirname(fullpath)
+    utils.makedirs_safe(fulldir)
+    save(obj, fullpath)
+
+  '''
   def cross_valid_fold(self, filenames_pos, filenames_neg, infilename=None, fold_no=0):
     """ Separates files with given filenames into the training and validation subsets, using the validation indices of a fold given as an argument. Returns two tuples: one for the positive and one for the negative class. Each tuple consists of two elements (dictionaries): the first element is a dictionary of the validation subset files, and the second is a dictionary of the training subset files.
 
@@ -238,7 +315,7 @@ class Database(object):
     linenum = 0
 
     def split_files(filenames, ind_list): 
-      ''' Splits the files into the dicionary filenames into validation and training subset, given the list of validation indices, ind_list '''
+      # Splits the files into the dicionary filenames into validation and training subset, given the list of validation indices, ind_list
       valid = {}; train = {}
       for i in range(0, len(filenames.items())):
         key, filename = filenames.items()[i]
@@ -257,33 +334,4 @@ class Database(object):
           files_neg = split_files(filenames_neg, ind_list) 
       linenum += 1 
     return files_pos, files_neg
-
-  def save_one(self, filename, obj, directory, extension):
-    """Saves a single object supporting the bob save() protocol.
-
-    This method will call save() on the the given object using the correct
-    database filename stem for the given id.
-    
-    Keyword Parameters:
-
-    filename
-      The unique filename under which the object will be saved. Before calling this method, the method files() should be called (with no directory and extension arguments passed) in order to obtain the unique filenames for each of the files to be saved.
-
-    obj
-      The object that needs to be saved, respecting the bob save() protocol.
-
-    directory
-      This is the base directory to which you want to save the data. The
-      directory is tested for existence and created if it is not there with
-      os.makedirs()
-
-    extension
-      The extension determines the way each of the arrays will be saved.
-    """
-
-    from ...io import save
-
-    fullpath = os.path.join(directory, filename + extension)
-    fulldir = os.path.dirname(fullpath)
-    utils.makedirs_safe(fulldir)
-    save(obj, fullpath)
+  '''

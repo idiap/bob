@@ -84,12 +84,13 @@ class NUAADatabaseTest(unittest.TestCase):
       self.assertTrue(len(subsets_real[i]) in (174, 175))
       self.assertTrue(len(subsets_attack[i]) in (174, 175))
 
-    files_real, files_attack = db.cross_valid_fold(files_train_real, files_train_attack, fold_no=0)
-    self.assertTrue(len(files_real[0]) in (174, 175)) # number of samples in validation subset
-    self.assertTrue(len(files_real[1]) in (1568, 1569)) # number of samples in training subset
-    self.assertTrue(len(files_attack[0]) in (174, 175)) # number of samples in validation subset
-    self.assertTrue(len(files_attack[1]) in (1573, 1574)) # number of samples in training subset
-    
+    import pdb; pdb.set_trace()
+    files_real_val, files_real_train = db.cross_valid_foldfiles(version='raw', cls='real', fold_no=1)
+    self.assertTrue(len(files_real_val) in (174, 175)) # number of samples in validation subset of real accesses
+    self.assertTrue(len(files_real_train) in (1568, 1569)) # number of samples in training subset of real accesses
+    files_attack_val, files_attack_train = db.cross_valid_foldfiles(version='detected_face', cls='attack', fold_no=3, directory='aaa', extension='.jpg')
+    self.assertTrue(len(files_attack_val) in (174, 175)) # number of samples in validation subset of attacks
+    self.assertTrue(len(files_attack_train) in (1573, 1574)) # number of samples in training subset of attacks
     
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(NUAADatabaseTest)
