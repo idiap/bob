@@ -126,7 +126,119 @@ class Database(object):
                 key = key + 1  
               
     return retval
-              
+         
+
+  def cross_valid_gen(self, numpos, numneg, numfolds=10, outfilename=None):
+    """ Performs N-fold cross-validation on a given number of samples. Generates the indices of the validation subset for N folds, and writes them into a text file (the indices of the training samples are easy to compute once the indices of the validation subset are known). This method is intended for 2-class classification problems, therefore the number of both positive and negative samples should be given at the beginning. The method generates validation indices for both positive and negative samples separately. Each row of the output file are the validation indices of one fold; validation indices for the positive class are in the odd lines, and validation indices for the negative class are in the even lines.
+
+    Keyword parameters:
+   
+    numpos
+      Number of positive samples
+
+    numneg
+      Number of negative samples
+
+    numfold
+      Number of folds
+
+    outfilename
+      The filename of the output file
+	  """
+    if outfilename == None:
+      outfilename = os.path.join(os.path.dirname(__file__), 'cross_valid.txt')
+    f = open(outfilename, 'w')
+
+    def cross_valid(numsamples, numfolds): 
+      ''' The actual cross-validation function, returns the validation indices in a tab-delimited null-terminated string'''
+      from random import shuffle 
+      X = range(0, numsamples)
+      shuffle(X)
+      retval = []
+      for k in xrange(numfolds):
+        tr = [X[i] for i in range(0, numsamples) if i % numfolds != k]
+        vl = [X[i] for i in range(0, numsamples) if i % numfolds == k]
+        valid = ""
+        for ind in vl:
+          valid += "%d\t" % ind
+        retval.append(valid)
+      return retval
+
+    valid_pos = cross_valid(numpos, numfolds) # the validation indices of the positive set
+    valid_neg = cross_valid(numneg, numfolds) # the validation indices of the negative set
+    # it is enough to save just the validation indices, training indices are all the rest
+    for i in range(0, numfolds):
+      f.write(valid_pos[i] + '\n') # write the validation indices for the real samples (every odd line in the file)
+      f.write(valid_neg[i] + '\n') # write the validation indices for the attack samples (every even line in the file)
+    f.close()
+    return 0
+
+  def cross_valid_read(self, infilename=None):
+    """ Reads the cross-validation indices from a file and returns two lists of validation indices: for the positive and for the negative class. Each list actually consists of sublists; one sublist with validation indices for each fold.
+
+    Keyword parameters:
+
+    infilename:
+      The input filename where the validation indices are stored
+  """
+    if infilename == None:
+      infilename = os.path.join(os.path.dirname(__file__), 'cross_valid.txt')
+    lines = open(infilename, 'r').readlines()
+    subsets_pos = [] 
+    subsets_neg = []
+    linenum = 1
+    for line in lines:
+      ind_list = [int(i) for i in line.rstrip('\n\t').split('\t')]
+      if linenum % 2 == 1: subsets_pos.append(ind_list) # odd lines: validation indices for the positive class
+      else: subsets_neg.append(ind_list) # even lines: validation indices for the negative class
+      linenum += 1 
+    return subsets_pos, subsets_neg
+
+  def cross_valid_foldfiles(self, version, cls, infilename=None, fold_no=0, directory=None, extension=None):
+    """ Returns two dictionaries: one with the names of the files of the validation subset in one fold, and one with the names of the files in the training subset of that fold. The number of the cross_validation fold is given as a parameter.
+
+    Keyword parameters:
+
+    directory
+      This parameter will be prepended to all the filenames which are going to be returned by this procedure
+
+    extension
+      This parameter will be appended to all the filenames which are going to be returned by this procedure
+
+    version
+      The version of the database that is needed: 'raw', 'detected_face' or 'normalized_face'.
+
+    cls
+      The class of the samples: 'real' or 'attack'
+  
+    infilename
+      The name of the file where the cross-validation files are stored. If it is None, then the name of the filename with the cross-validation files is formed using the parameters version and cls. If this parameter is specified, then the parameters version and cls are ignored
+
+    fold_no
+      Number of the fold 
+  """
+
+    if infilename == None:
+      infilename = os.path.join(os.path.dirname(__file__), version + '_' + cls + '.txt')
+    lines = open(infilename, 'r').readlines()
+    files_val = {} # the keys in the both dictionaries are just pro-forma, for compatibility with other databases
+    files_train = {}
+    k_val = 0; k_train = 0 # simple counters
+    
+    def make_path(stem, directory, extension):
+      if not extension: extension = ''
+      if directory: return os.path.join(directory, stem + extension)
+      return stem + extension
+   
+    for line in lines:
+      words = line.rstrip('\n\t').split('\t')
+      if int(words[1]) == fold_no:
+        files_val[k_val] = make_path(words[0], directory, extension); k_val += 1
+      else:
+        files_train[k_train] = make_path(words[0], directory, extension); k_train += 1
+
+    return files_val, files_train
+     
 
   def save_one(self, filename, obj, directory, extension):
     """Saves a single object supporting the bob save() protocol.

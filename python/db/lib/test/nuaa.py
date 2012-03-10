@@ -84,7 +84,6 @@ class NUAADatabaseTest(unittest.TestCase):
       self.assertTrue(len(subsets_real[i]) in (174, 175))
       self.assertTrue(len(subsets_attack[i]) in (174, 175))
 
-    import pdb; pdb.set_trace()
     files_real_val, files_real_train = db.cross_valid_foldfiles(version='raw', cls='real', fold_no=1)
     self.assertTrue(len(files_real_val) in (174, 175)) # number of samples in validation subset of real accesses
     self.assertTrue(len(files_real_train) in (1568, 1569)) # number of samples in training subset of real accesses
