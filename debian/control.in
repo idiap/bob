@@ -4,6 +4,8 @@ Priority: optional
 Maintainer: Andre Anjos <andre.anjos@idiap.ch>
 Build-Depends: @cdbs@, cmake, python, python-numpy, liblapack-dev, libatlas-base-dev, libblitz0-dev, ffmpeg, libavcodec-dev, libswscale-dev, libboost-all-dev, libavformat-dev, graphviz, libmatio-dev, libmagick++-dev, libhdf5-serial-dev, libqt4-dev, libfftw3-dev, libcv-dev, libhighgui-dev, libsvm-dev, doxygen, python-sphinx, dvipng
 # Build-Recommends: libgoogle-perftools-dev
+Vcs-Browser: https://github.com/idiap/bob
+Homepage: http://idiap.github.com/bob
 
 Package: bob
 Architecture: any
@@ -12,5 +14,17 @@ Recommends: ipython, hdf5-tools, h5utils
 Suggests: libhdf5-doc
 Description: A toolbox for Biometrics, Machine Learning and Signal Processing
  Bob is a signal-processing and machine learning toolbox for Biometrics developed at the Idiap Research Institute, in Switzerland. The toolbox is written in a mix of Python and C++ and is designed to be both efficient and to reduce development time.
+
+Package: bob-devel
+Architecture: any
+Description: A toolbox for Biometrics, Machine Learning and Signal Processing
+ Bob is a signal-processing and machine learning toolbox for Biometrics developed at the Idiap Research Institute, in Switzerland. The toolbox is written in a mix of Python and C++ and is designed to be both efficient and to reduce development time.
  .
- Homepage: http://idiap.github.com/bob
+ These are development files needed to compile code that depends on bob.
+
+Package: bob-doc
+Architecture: any
+Description: A toolbox for Biometrics, Machine Learning and Signal Processing
+ Bob is a signal-processing and machine learning toolbox for Biometrics developed at the Idiap Research Institute, in Switzerland. The toolbox is written in a mix of Python and C++ and is designed to be both efficient and to reduce development time.
+ .
+ These are documentation files for bob.

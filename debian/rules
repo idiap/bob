@@ -16,4 +16,3 @@ binary-post-install/bob::
 	LD_LIBRARY_PATH=$(DEB_DESTDIR)$(DEB_CMAKE_INSTALL_PREFIX)/lib PYTHONPATH=$(DEB_DESTDIR)$(DEB_CMAKE_INSTALL_PREFIX)/lib/python$(pyver) python $(DEB_DESTDIR)$(DEB_CMAKE_INSTALL_PREFIX)/bin/dbmanage.py all download --verbose
 	cd $(DEB_BUILDDIR) && $(MAKE) DESTDIR=$(DEB_DESTDIR) install-sphinx
 	cd $(DEB_BUILDDIR) && $(MAKE) DESTDIR=$(DEB_DESTDIR) install-doxygen
-	mv debian/
