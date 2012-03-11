@@ -1,18 +1,33 @@
 #!/usr/bin/make -f
 
-DEB_AUTO_UPDATE_DEBIAN_CONTROL := yes
+# Do not set this! See http://ftp-master.debian.org/REJECT-FAQ.html
+#DEB_AUTO_UPDATE_DEBIAN_CONTROL := yes
+
+# Python support (compile modules after installation)
+DEB_PYTHON_SYSTEM=pysupport
+
+# Do not include the .git directory on the source package
+export DH_ALWAYS_EXCLUDE=.git
 
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/cmake.mk
 
-DEB_CMAKE_EXTRA_FLAGS := -DCMAKE_BUILD_TYPE=Release
+DEB_CMAKE_EXTRA_FLAGS := -DCMAKE_BUILD_TYPE=Release -DBOB_RELEASE=1.0alpha1
 
 # To enable testing after the build, just uncomment
 #DEB_MAKE_CHECK_TARGET := test
 
-# This target will install databases and documentation
-pyver := $(shell python -c 'import sys; print "%d.%d" % sys.version_info[:2]')
-binary-post-install/bob::
-	LD_LIBRARY_PATH=$(DEB_DESTDIR)$(DEB_CMAKE_INSTALL_PREFIX)/lib PYTHONPATH=$(DEB_DESTDIR)$(DEB_CMAKE_INSTALL_PREFIX)/lib/python$(pyver) python $(DEB_DESTDIR)$(DEB_CMAKE_INSTALL_PREFIX)/bin/dbmanage.py all download --verbose
-	cd $(DEB_BUILDDIR) && $(MAKE) DESTDIR=$(DEB_DESTDIR) install-sphinx
-	cd $(DEB_BUILDDIR) && $(MAKE) DESTDIR=$(DEB_DESTDIR) install-doxygen
+# Takes control over the installation process, which is kind of special for bob
+override_dh_install::
+	dh_testdir
+	dh_testroot
+	dh_prep
+	dh_installdirs
+
+	# Add here commands to install the package into debian/tmp.
+	$(MAKE) prefix=`pwd`/debian/tmp/usr install
+	$(MAKE) prefix=`pwd`/debian/tmp/usr install-doxygen
+	$(MAKE) prefix=`pwd`/debian/tmp/usr install-sphinx
+	$(MAKE) prefix=`pwd`/debian/tmp/usr install-database-download
+
+	dh_install

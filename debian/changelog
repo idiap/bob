@@ -1,5 +1,5 @@
-bob (1.0-0ubuntu1) precise; urgency=low
+bob (1.0alpha1-0ubuntu1) unstable; urgency=low
 
   * First release
 
- -- Andre Anjos <andre.anjos@idiap.ch>  Tue, 06 Mar 2012 17:41:32 +0100
+ -- Biometrics Group <biometric@idiap.ch>  Tue, 06 Mar 2012 17:41:32 +0100

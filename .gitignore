@@ -18,6 +18,7 @@ python/ip/test/data/faceextract/test_001.blue.norm.answer.png
 sandbox_snowowl
 my-sphinx.html
 debian/bob*
+debian/tmp
 debian/files
 debian/stamp-*
 obj-*

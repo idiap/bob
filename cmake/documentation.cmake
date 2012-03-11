@@ -17,7 +17,7 @@ if(DOXYGEN_FOUND)
       COMMAND ${CMAKE_COMMAND} -E copy_directory
       "${CMAKE_BINARY_DIR}/doxygen" "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/share/doc/bob/doxygen"
       DEPENDS doxygen
-    COMMENT "Installing C++ API documentation" VERBATIM
+    COMMENT "Installing C++ API documentation, DESTDIR = '$ENV{DESTDIR}'" VERBATIM
   )
 
 endif(DOXYGEN_FOUND)

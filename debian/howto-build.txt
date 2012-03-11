@@ -2,31 +2,34 @@ To build the debian packages do the following:
 
 $ fakeroot debian/rules clean 
 $ dpkg-checkbuilddeps
-$ fakeroot dpkg-buildpackage -b
+$ debuild -b -j5 -us -uc
 
-This will only build the binary package as a test. To build all packages,
-including the source package, do the following:
+This will only quickly build the binary package as a test. To build all
+packages, including the source package, do the following:
 
-$ fakeroot dpkg-buildpackage
+$ debuid -j5 -m"Your Name <your.address@example.com>" -e"Your Name <your.address@example.com>"
 
-The work of building a package with dpkg-buildpackage can take some iterations.
+The work of building a package with debuild can take some iterations.
 Here are some tips to alleviate common problems:
 
 1. To enable multiple processes when building:
 
-	$ fakeroot dpkg-buildpackage -j4
+	$ debuild -j4
 
-2. To avoid cleaning before re-building:
+2. To avoid cleaning before re-building (this will only rebuild the binary
+   packages and not the source one):
 
-	$ fakeroot dpkg-buildpackage -nc
+	$ debuild -nc
 
-	Note that, otherwise, dpkg-buildpackage will first call clean.
+	Note that, otherwise, debuild will first call clean.
 
 3. To avoid signing the package (if you have a gpg key)
 
-	$ fakeroot dpkg-buildpackage -us -uc
+	$ debuild -us -uc
 
-4. 
+Once you are happy with the state of the package, just upload it to the PPA:
+
+$ dput ppa:biometrics/bob <source.changes>
 
 --
 Andre Anjos
