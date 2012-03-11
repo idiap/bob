@@ -2,7 +2,7 @@ Source: bob
 Section: science
 Priority: optional
 Maintainer: Biometrics Group <biometric@idiap.ch>
-Build-Depends: debhelper (>= 7.0.1), cmake, python-dev, python-support, python-numpy, liblapack-dev, libatlas-base-dev, libblitz0-dev, ffmpeg, libavcodec-dev, libswscale-dev, libboost-all-dev, libavformat-dev, graphviz, libmatio-dev, libmagick++-dev, libhdf5-serial-dev, libqt4-dev, libfftw3-dev, libcv-dev, libhighgui-dev, libsvm-dev, doxygen, python-sphinx, dvipng
+Build-Depends: debhelper (>= 7.0.1), cmake, python-dev, python-support, python-numpy, python-argparse, python-scipy, python-matplotlib, python-sqlalchemy, liblapack-dev, libatlas-base-dev, libblitz0-dev, ffmpeg, libavcodec-dev, libswscale-dev, libboost-all-dev, libavformat-dev, graphviz, libmatio-dev, libmagick++-dev, libhdf5-serial-dev, libqt4-dev, libfftw3-dev, libcv-dev, libhighgui-dev, libsvm-dev, doxygen, python-sphinx, dvipng
 Standards-Version: 3.9.2
 #Build-Recommends: libgoogle-perftools-dev
 Homepage: http://idiap.github.com/bob
