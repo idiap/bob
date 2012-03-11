@@ -1,13 +1,13 @@
 To build the debian packages do the following:
 
-$ fakeroot debian/rules clean 
+$ debuild clean
 $ dpkg-checkbuilddeps
-$ debuild -b -j5 -us -uc
+$ debuild -us -uc -j5 -b 
 
 This will only quickly build the binary package as a test. To build all
 packages, including the source package, do the following:
 
-$ debuid -j5 -m"Your Name <your.address@example.com>" -e"Your Name <your.address@example.com>"
+$ mail="Your Name <your.address@example.com>" debuid -j5 --no-tgz-check -m"${mail}" -e"${mail}"
 
 The work of building a package with debuild can take some iterations.
 Here are some tips to alleviate common problems:

@@ -11,7 +11,7 @@ Vcs-Browser: https://github.com/idiap/bob
 
 Package: bob
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}, python, python-argparse, python-scipy, python-matplotlib, python-sqlalchemy
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}, python-argparse, python-scipy, python-matplotlib, python-sqlalchemy
 Recommends: ipython, hdf5-tools, h5utils
 Suggests: libhdf5-doc
 Description: A toolbox for Biometrics, Machine Learning and Signal Processing
@@ -19,6 +19,7 @@ Description: A toolbox for Biometrics, Machine Learning and Signal Processing
 
 Package: bob-doc
 Architecture: all
+Depends: bob
 Description: A toolbox for Biometrics, Machine Learning and Signal Processing
  Bob is a signal-processing and machine learning toolbox for Biometrics developed at the Idiap Research Institute, in Switzerland. The toolbox is written in a mix of Python and C++ and is designed to be both efficient and to reduce development time.
  .

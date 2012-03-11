@@ -11,16 +11,28 @@
 # build-arch and build-indep targets  by Bill Allombert 2001
 
 # Uncomment this to turn on verbose mode.
-#export DH_VERBOSE=1
+export DH_VERBOSE=1
 
-# Excludes the ".git" and ".gitmodules" from the packaging
-export DH_ALWAYS_EXCLUDE=".git:.gitmodules:.gitignore"
+# Turns off testing after the build
+export DEB_BUILD_OPTIONS="nocheck"
 
 # This has to be exported to make some magic below work.
 export DH_OPTIONS
 
 %:
-	dh $@ 
+	dh $@ --parallel
 
 override_dh_auto_configure:
 	dh_auto_configure -- -DCMAKE_BUILD_TYPE=Release -DBOB_VERSION=1.0alpha1
+
+override_dh_auto_build:
+	dh_auto_build -- -j5 VERBOSE=$(DH_VERBOSE) all
+	dh_auto_build -- VERBOSE=$(DH_VERBOSE) sphinx
+	dh_auto_build -- VERBOSE=$(DH_VERBOSE) doxygen
+
+override_dh_auto_install:
+	dh_auto_install
+	cmake -E copy_directory obj-$(DEB_BUILD_GNU_TYPE)/sphinx `pwd`/debian/tmp/usr/share/doc/bob/sphinx
+	cmake -E copy_directory obj-$(DEB_BUILD_GNU_TYPE)/doxygen `pwd`/debian/tmp/usr/share/doc/bob/doxygen
+	# Download databases
+	PYTHONPATH=`pwd`/debian/tmp/usr/lib/`pyversions -d` LD_LIBRARY_PATH=`pwd`/debian/tmp/usr/lib `pwd`/debian/tmp/usr/bin/dbmanage.py all download --verbose
