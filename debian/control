@@ -25,7 +25,7 @@ Description: A toolbox for Biometrics, Machine Learning and Signal Processing
  .
  These are documentation files for bob.
 
-Package: bob-devel
+Package: bob-dev
 Architecture: all
 Depends: bob
 Description: A toolbox for Biometrics, Machine Learning and Signal Processing
