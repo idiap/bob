@@ -35,6 +35,12 @@ function(find_python_module module)
   find_package_handle_standard_args(PYTHON_${module} DEFAULT_MSG PYTHON_${module_upper})
 endfunction(find_python_module)
 
+# *************************** READ THIS ***********************************
+# IMPORTANT: When you update this file, think about updating both the 
+# ubuntu/debian control file and our Portfile (OSX installation) so the
+# package installations for those systems continue to work properly. 
+# *************************** READ THIS ***********************************
+
 # Now double-check for all required python modules
 find_python_module(argparse REQUIRED)
 find_python_module(numpy REQUIRED)
