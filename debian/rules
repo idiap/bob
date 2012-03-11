@@ -14,7 +14,7 @@
 export DH_VERBOSE=1
 
 # Turns off testing after the build
-export DEB_BUILD_OPTIONS="nocheck"
+# export DEB_BUILD_OPTIONS="nocheck"
 
 # This has to be exported to make some magic below work.
 export DH_OPTIONS
@@ -26,7 +26,7 @@ override_dh_auto_configure:
 	dh_auto_configure -- -DCMAKE_BUILD_TYPE=Release -DBOB_VERSION=1.0alpha1
 
 override_dh_auto_build:
-	dh_auto_build -- -j5 VERBOSE=$(DH_VERBOSE) all
+	dh_auto_build -- VERBOSE=$(DH_VERBOSE) all
 	dh_auto_build -- VERBOSE=$(DH_VERBOSE) sphinx
 	dh_auto_build -- VERBOSE=$(DH_VERBOSE) doxygen
 
