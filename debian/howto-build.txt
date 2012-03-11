@@ -37,6 +37,11 @@ Once you are happy with the state of the package, just upload it to the PPA:
 
 $ dput ppa:biometrics/bob ../bob_XYZ-0ubuntu1_source.changes
 
+There are other ways to upload the package to the PPA, if you don't have dput
+installed. Check here:
+
+https://help.launchpad.net/Packaging/PPA/Uploading
+
 Users can download and install PPAs as indicated at:
 
 https://launchpad.net/~biometrics/+archive/bob
