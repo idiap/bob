@@ -35,7 +35,11 @@ Here are some tips to alleviate common problems:
 
 Once you are happy with the state of the package, just upload it to the PPA:
 
-$ dput ppa:biometrics/bob <source.changes>
+$ dput ppa:biometrics/bob ../bob_XYZ-0ubuntu1_source.changes
+
+Users can download and install PPAs as indicated at:
+
+https://launchpad.net/~biometrics/+archive/bob
 
 --
 Andre Anjos
