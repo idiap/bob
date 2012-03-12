@@ -226,7 +226,11 @@ AVStream* io::VideoWriter::add_video_stream() {
   AVCodecContext *c;
   AVStream *st;
 
+# if LIBAVFORMAT_VERSION_INT < 0x350400
   st = av_new_stream(m_format_ctxt, 0);
+#else
+  st = avformat_new_stream(m_format_ctxt, 0);
+#endif
   if (!st) 
     throw io::FFmpegException(m_filename.c_str(), "cannot allocate stream");
 
@@ -297,7 +301,11 @@ void io::VideoWriter::open_video() {
   if (!codec) throw io::FFmpegException(m_filename.c_str(), "codec not found");
 
   // opens the codec
+# if LIBAVCODEC_VERSION_INT < 0x350700
   if (avcodec_open(c, codec) < 0) {
+# else
+  if (avcodec_open2(c, codec, 0) < 0) {
+# endif
     throw io::FFmpegException(m_filename.c_str(), "cannot open codec");
   }
 

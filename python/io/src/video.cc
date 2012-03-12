@@ -52,6 +52,7 @@ struct iterator_wrapper {
       PYTHON_ERROR(StopIteration, "no more data");
     }
 
+    //load the next frame: if an error is detected internally, throw
     tp::py_array retval(reader->frame_type());
     o.read(retval); //note that this will advance the iterator
     return retval.pyobject();
@@ -84,7 +85,7 @@ static object videoreader_getitem (io::VideoReader& v, Py_ssize_t sframe) {
   tp::py_array retval(v.frame_type());
   io::VideoReader::const_iterator it = v.begin();
   it += frame;
-  it.read(retval);
+  it.read(retval); //read and throw if a problem occurs
   return retval.pyobject();
 }
 
@@ -129,18 +130,31 @@ static tuple videoreader_getslice (io::VideoReader& v, slice sobj) {
   it += start;
   for (size_t i=start, j=0; i<stop; i+=step, ++j, it+=(step-1)) {
     tp::py_array tmp(v.frame_type());
-    it.read(tmp);
+    it.read(tmp); //throw if a problem occurs while reading the video
     retval.append(tmp.pyobject());
   }
  
   return tuple(retval);
 }
 
-static object videoreader_load(io::VideoReader& reader) {
+static object videoreader_load(io::VideoReader& reader, 
+  bool ignore_on_error=false) {
   tp::py_array tmp(reader.video_type());
-  reader.load(tmp);
+  size_t frames_read = reader.load(tmp, ignore_on_error);
+  
+  //handles the case in which the user wants me to read all frames, ignoring 
+  //possible problems found while reading the video. In this case, just resize
+  //the output array so to match the number of frames read
+  if (ignore_on_error && (frames_read != reader.numberOfFrames())) {
+    numeric::array retval = extract<numeric::array>(tmp.pyobject());
+    const size_t* shape = tmp.type().shape;
+    retval.resize(frames_read, shape[1], shape[2], shape[3]);
+    return object(retval);
+  }
+
   return tmp.pyobject();
 }
+BOOST_PYTHON_FUNCTION_OVERLOADS(videoreader_load_overloads, videoreader_load, 1, 2)
 
 static void videowriter_append(io::VideoWriter& writer, object a) {
   tp::convert_t result = tp::convertible_to(a, writer.frame_type(),
@@ -177,7 +191,7 @@ void bind_io_video() {
     .add_property("info", make_function(&io::VideoReader::info, return_value_policy<copy_const_reference>()))
     .add_property("video_type", make_function(&io::VideoReader::video_type, return_value_policy<copy_const_reference>()), "Typing information to load all of the file at once")
     .add_property("frame_type", make_function(&io::VideoReader::frame_type, return_value_policy<copy_const_reference>()), "Typing information to load the file frame by frame.")
-    .def("load", &videoreader_load, (arg("self")), "Loads all of the video stream in a numpy ndarray organized in this way: (frames, color-bands, height, width). I'll dynamically allocate the output array and return it to you.")
+    .def("load", &videoreader_load, videoreader_load_overloads((arg("self"), arg("ignore_on_error")=false), "Loads all of the video stream in a numpy ndarray organized in this way: (frames, color-bands, height, width). I'll dynamically allocate the output array and return it to you."))
     .def("__iter__", &io::VideoReader::begin)
     .def("__getitem__", &videoreader_getitem)
     .def("__getitem__", &videoreader_getslice)

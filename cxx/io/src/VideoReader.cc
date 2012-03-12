@@ -125,8 +125,13 @@ void io::VideoReader::open() {
   }
 
   // Retrieve stream information
+# if LIBAVFORMAT_VERSION_INT < 0x350400
   if (av_find_stream_info(format_ctxt)<0) {
     av_close_input_file(format_ctxt);
+# else
+  if (avformat_find_stream_info(format_ctxt, 0)<0) {
+    avformat_close_input(&format_ctxt);
+# endif
     throw io::FFmpegException(m_filepath.c_str(), "cannot find stream info");
   }
 
@@ -144,7 +149,11 @@ void io::VideoReader::open() {
     }
   }
   if(stream_index == -1) {
+# if LIBAVFORMAT_VERSION_INT < 0x350400
     av_close_input_file(format_ctxt);
+# else
+    avformat_close_input(&format_ctxt);
+# endif
     throw io::FFmpegException(m_filepath.c_str(), "cannot find any video stream");
   }
 
@@ -160,13 +169,25 @@ void io::VideoReader::open() {
   AVCodec* codec = avcodec_find_decoder(codec_ctxt->codec_id);
 
   if (!codec) {
+# if LIBAVFORMAT_VERSION_INT < 0x350400
     av_close_input_file(format_ctxt);
+# else
+    avformat_close_input(&format_ctxt);
+# endif
     throw io::FFmpegException(m_filepath.c_str(), "unsupported codec required");
   }
 
   // Open codec
+# if LIBAVCODEC_VERSION_INT < 0x350700
   if (avcodec_open(codec_ctxt, codec) < 0) {
+# else
+  if (avcodec_open2(codec_ctxt, codec, 0) < 0) {
+# endif
+# if LIBAVFORMAT_VERSION_INT < 0x350400
     av_close_input_file(format_ctxt);
+# else
+    avformat_close_input(&format_ctxt);
+# endif
     throw io::FFmpegException(m_filepath.c_str(), "cannot open supported codec");
   }
 
@@ -225,18 +246,24 @@ void io::VideoReader::open() {
   avcodec_close(codec_ctxt);
 
   //and we close the input file
+# if LIBAVFORMAT_VERSION_INT < 0x350400
   av_close_input_file(format_ctxt);
+# else
+  avformat_close_input(&format_ctxt);
+# endif
 }
 
 io::VideoReader::~VideoReader() {
 }
 
-void io::VideoReader::load(blitz::Array<uint8_t,4>& data) const {
+size_t io::VideoReader::load(blitz::Array<uint8_t,4>& data, 
+  bool ignore_on_error) const {
   ca::blitz_array tmp(data);
-  load(tmp);
+  return load(tmp, ignore_on_error);
 }
 
-void io::VideoReader::load(ca::interface& b) const {
+size_t io::VideoReader::load(ca::interface& b, 
+  bool ignore_on_error) const {
 
   //checks if the output array shape conforms to the video specifications,
   //otherwise, throw.
@@ -248,13 +275,18 @@ void io::VideoReader::load(ca::interface& b) const {
 
   unsigned long int frame_size = m_typeinfo_frame.buffer_size();
   uint8_t* ptr = static_cast<uint8_t*>(b.ptr());
+  size_t frames_read = 0;
 
   for (const_iterator it=begin(); it!=end();) {
     ca::blitz_array ref(static_cast<void*>(ptr), m_typeinfo_frame);
-    it.read(ref);
-    ptr += frame_size;
+    if (it.read(ref, ignore_on_error)) {
+      ptr += frame_size;
+      ++frames_read;
+    }
+    //otherwise we don't count!
   }
 
+  return frames_read;
 }
 
 io::VideoReader::const_iterator io::VideoReader::begin() const {
@@ -343,7 +375,11 @@ void io::VideoReader::const_iterator::init() {
   }
 
   // Retrieve stream information
+# if LIBAVFORMAT_VERSION_INT < 0x350400
   if (av_find_stream_info(m_format_ctxt)<0) {
+# else
+  if (avformat_find_stream_info(m_format_ctxt, 0)<0) {
+# endif
     throw io::FFmpegException(filename, "cannot find stream info");
   }
 
@@ -374,7 +410,11 @@ void io::VideoReader::const_iterator::init() {
   }
 
   // Open codec
+# if LIBAVCODEC_VERSION_INT < 0x350700
   if (avcodec_open(m_codec_ctxt, m_codec) < 0) {
+# else
+  if (avcodec_open2(m_codec_ctxt, m_codec, 0) < 0) {
+# endif
     throw io::FFmpegException(filename, "cannot open supported codec");
   }
 
@@ -460,9 +500,12 @@ void io::VideoReader::const_iterator::reset() {
   
   //closes the video file we opened
   if (m_format_ctxt) {
+# if LIBAVFORMAT_VERSION_INT < 0x350400
     av_close_input_file(m_format_ctxt);
+# else
+    avformat_close_input(&m_format_ctxt);
+# endif
     m_codec_ctxt = 0;
-    m_format_ctxt = 0;
   }
 
   m_current_frame = std::numeric_limits<size_t>::max(); //that means "end" 
@@ -470,12 +513,14 @@ void io::VideoReader::const_iterator::reset() {
   m_parent = 0;
 }
 
-void io::VideoReader::const_iterator::read(blitz::Array<uint8_t,3>& data) {
+bool io::VideoReader::const_iterator::read(blitz::Array<uint8_t,3>& data,
+  bool ignore_on_error) {
   ca::blitz_array tmp(data);
-  read(tmp);
+  return read(tmp, ignore_on_error);
 }
 
-void io::VideoReader::const_iterator::read(ca::interface& data) {
+bool io::VideoReader::const_iterator::read(ca::interface& data,
+  bool ignore_on_error) {
 
   //checks if we have not passed the end of the video sequence already
   if(m_current_frame > m_parent->numberOfFrames()) {
@@ -495,8 +540,9 @@ void io::VideoReader::const_iterator::read(ca::interface& data) {
   int gotPicture = 0;
   AVPacket packet;
   av_init_packet(&packet);
+  int av_error = 0;
 
-  while (av_read_frame(m_format_ctxt, &packet) >= 0) {
+  while ((av_error=av_read_frame(m_format_ctxt, &packet)) >= 0) {
     // Is this a packet from the video stream?
     if (packet.stream_index == m_stream_index) {
   
@@ -527,33 +573,51 @@ void io::VideoReader::const_iterator::read(ca::interface& data) {
     av_free_packet(&packet);
   }
 
-  // Copies the data into the destination array. Here is some background: bob
-  // arranges the data for a colored image like: (color-bands, height, width).
-  // That makes it easy to extract a given band from the image as its memory is
-  // contiguous. FFmpeg prefers the following encoding (height, width,
-  // color-bands).
-  //
-  // Note: The FFmpeg way to read and write image data is hard-coded and
-  // impossible to circumvent by passing a different stride setup.
+  if (av_error >= 0) { //all good, can set the frame at destination array
 
-  // transpose the data.
-  blitz::TinyVector<int,3> shape;
-  blitz::TinyVector<int,3> stride;
-  
-  shape = info.shape[0], info.shape[1], info.shape[2];
-  stride = info.stride[0], info.stride[1], info.stride[2];
-  blitz::Array<uint8_t,3> dst(static_cast<uint8_t*>(data.ptr()), shape, stride,
-      blitz::neverDeleteData);
-  
-  shape = info.shape[1], info.shape[2], info.shape[0];
-  blitz::Array<uint8_t,3> src(m_rgb_frame_buffer->data[0], shape, 
-      blitz::neverDeleteData);
-  dst = src.transpose(2,0,1);
+    // Copies the data into the destination array. Here is some background: bob
+    // arranges the data for a colored image like: (color-bands, height,
+    // width).  That makes it easy to extract a given band from the image as
+    // its memory is contiguous. FFmpeg prefers the following encoding (height,
+    // width, color-bands).
+    //
+    // Note: The FFmpeg way to read and write image data is hard-coded and
+    // impossible to circumvent by passing a different stride setup.
+
+    // transpose the data.
+    blitz::TinyVector<int,3> shape;
+    blitz::TinyVector<int,3> stride;
+    
+    shape = info.shape[0], info.shape[1], info.shape[2];
+    stride = info.stride[0], info.stride[1], info.stride[2];
+    blitz::Array<uint8_t,3> dst(static_cast<uint8_t*>(data.ptr()), shape, stride,
+        blitz::neverDeleteData);
+    
+    shape = info.shape[1], info.shape[2], info.shape[0];
+    blitz::Array<uint8_t,3> src(m_rgb_frame_buffer->data[0], shape, 
+        blitz::neverDeleteData);
+    dst = src.transpose(2,0,1);
+  }
+
+  size_t last_read = m_current_frame; //see below: needed for error reporting
 
   if (m_current_frame >= m_parent->numberOfFrames()) {
     //transform the current iterator in "end"
     reset();
   }
+
+  if (av_error < 0) {
+    if (ignore_on_error) {
+      return false; //ignore it, let the user handle this problem
+    }
+    else { //report it to the user with an exception
+      boost::format m("ffmpeg/av_read_frame() returned an error (%d) reading frame %d of file '%s' which contains %d frames; you did not set the ignore_on_error flag calling the video reader, so I'm reporting it.");
+      m % av_error % last_read % m_parent->m_filepath % m_parent->m_nframes;
+      throw std::runtime_error(m.str().c_str());
+    }
+  }
+
+  return true;
 }
 
 /**

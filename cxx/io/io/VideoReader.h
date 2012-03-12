@@ -144,14 +144,26 @@ namespace bob { namespace io {
        * Loads all of the video stream in a blitz array organized in this way:
        * (frames, color-bands, height, width). The 'data' parameter will be
        * resized if required.
+       *
+       * The flag 'ignore_on_error' controls the behavior when reading. By
+       * default it is 'false', which means we throw exceptions in case of
+       * problems. If you set it to 'true', we just ignore errors. It is your
+       * task then to verify the return value of this method to make sure of 
+       * the number of returned frames which are still valid.
        */
-      void load(blitz::Array<uint8_t,4>& data) const;
+      size_t load(blitz::Array<uint8_t,4>& data, bool ignore_on_error=false) const;
 
       /**
        * Loads all of the video stream in a buffer. Resizes the buffer if
        * the space and type are not good.
+       *
+       * The flag 'ignore_on_error' controls the behavior when reading. By
+       * default it is 'false', which means we throw exceptions in case of
+       * problems. If you set it to 'true', we just ignore errors. It is your
+       * task then to verify the return value of this method to make sure of 
+       * the number of returned frames which are still valid.
        */
-      void load(bob::core::array::interface& b) const;
+      size_t load(bob::core::array::interface& b, bool ignore_on_error=false) const;
 
     private: //methods
 
@@ -238,8 +250,14 @@ namespace bob { namespace io {
            * re-load of that infrastructure. If we have reached the end
            * position, an exception is raised if you try to read() the
            * iterator.
+	   *
+	   * The flag 'ignore_on_error' controls the behavior when reading. By
+	   * default it is 'false', which means we throw exceptions in case of
+	   * problems. If you set it to 'true', we just ignore errors. It is
+	   * your task then to verify the return value of this method to make
+	   * sure of the frame was correctly read.
            */
-          void read (bob::core::array::interface& b);
+          bool read (bob::core::array::interface& b, bool ignore_on_error=false);
 
           /**
            * Reads the currently pointed frame and advances one position.
@@ -254,8 +272,14 @@ namespace bob { namespace io {
            * re-load of that infrastructure. If we have reached the end
            * position, an exception is raised if you try to read() the
            * iterator.
+	   *
+	   * The flag 'ignore_on_error' controls the behavior when reading. By
+	   * default it is 'false', which means we throw exceptions in case of
+	   * problems. If you set it to 'true', we just ignore errors. It is
+	   * your task then to verify the return value of this method to make
+	   * sure of the frame was correctly read.
            */
-          void read (blitz::Array<uint8_t,3>& data);
+          bool read (blitz::Array<uint8_t,3>& data, bool ignore_on_error=false);
 
           /**
            * Resets the current iterator state by closing and re-opening the
