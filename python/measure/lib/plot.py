@@ -129,7 +129,7 @@ def epc(dev_negatives, dev_positives, test_negatives, test_positives,
       npoints)
   return mpl.plot(out[0,:], 100.0*out[1,:], **kwargs)
 
-def det(negatives, positives, npoints=100, **kwargs):
+def det(negatives, positives, npoints=100, axisfontsize='x-small', **kwargs):
   """Plots Detection Error Trade-off (DET) curve as defined in the paper:
 
   Martin, A., Doddington, G., Kamm, T., Ordowski, M., & Przybocki, M. (1997).
@@ -168,6 +168,9 @@ def det(negatives, positives, npoints=100, **kwargs):
     
   npoints
     number of points to use when drawing the EPC curve
+
+  axisfontsize
+    the size to be used by x/ytickables to set the font size on the axis
 
   kwargs
     a dictionary of extra plotting parameters, that is passed directly to
@@ -251,9 +254,9 @@ def det(negatives, positives, npoints=100, **kwargs):
   pticks = [ppndf(float(v)) for v in desiredTicks]
   ax = mpl.gca() #and finally we set our own tick marks
   ax.set_xticks(pticks)
-  ax.set_xticklabels(desiredLabels, size='x-small')
+  ax.set_xticklabels(desiredLabels, size=axisfontsize)
   ax.set_yticks(pticks)
-  ax.set_yticklabels(desiredLabels, size='x-small')
+  ax.set_yticklabels(desiredLabels, size=axisfontsize)
 
   return retval
 
@@ -313,4 +316,8 @@ def det_axis(v, **kwargs):
   except:
     tv = v
 
-  return mpl.axis(tv, **kwargs)
+  ax = mpl.axis(tv, **kwargs)
+
+  ax.set_xticklabels(desiredLabels, size='x-small')
+  ax.set_yticklabels(desiredLabels, size='x-small')
+  return ax
