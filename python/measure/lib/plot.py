@@ -316,8 +316,4 @@ def det_axis(v, **kwargs):
   except:
     tv = v
 
-  ax = mpl.axis(tv, **kwargs)
-
-  ax.set_xticklabels(desiredLabels, size='x-small')
-  ax.set_yticklabels(desiredLabels, size='x-small')
-  return ax
+  return mpl.axis(tv, **kwargs)
