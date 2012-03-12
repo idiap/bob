@@ -602,18 +602,20 @@ bool io::VideoReader::const_iterator::read(ca::interface& data,
   size_t last_read = m_current_frame; //see below: needed for error reporting
 
   if (m_current_frame >= m_parent->numberOfFrames()) {
-    //transform the current iterator in "end"
+    //reached end-of-file: transform the current iterator in "end"
     reset();
   }
-
-  if (av_error < 0) {
-    if (ignore_on_error) {
-      return false; //ignore it, let the user handle this problem
-    }
-    else { //report it to the user with an exception
-      boost::format m("ffmpeg/av_read_frame() returned an error (%d) reading frame %d of file '%s' which contains %d frames; you did not set the ignore_on_error flag calling the video reader, so I'm reporting it.");
-      m % av_error % last_read % m_parent->m_filepath % m_parent->m_nframes;
-      throw std::runtime_error(m.str().c_str());
+  else {
+    //check error state and report, if the user has asked so
+    if (av_error < 0) {
+      if (ignore_on_error) {
+        return false; //ignore it, let the user handle this problem
+      }
+      else { //report it to the user with an exception
+        boost::format m("ffmpeg/av_read_frame() returned an error (%d) reading frame %d of file '%s' which contains %d frames");
+        m % av_error % last_read % m_parent->m_filepath % m_parent->m_nframes;
+        throw std::runtime_error(m.str().c_str());
+      }
     }
   }
 
