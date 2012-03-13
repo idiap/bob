@@ -10,4 +10,7 @@ while [ "$(echo $1 | sed 's%^-%%')" != "$1" ]; do
   shift 1;
 done
 
+# allows user created scripts to run
+export PYTHONPATH="@BOB_PYTHONPATH@:${PYTHONPATH}"
+
 exec gdb ${gdbopt} --args @PYTHON_EXECUTABLE@ "$@"
