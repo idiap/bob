@@ -145,25 +145,32 @@ namespace bob { namespace io {
        * (frames, color-bands, height, width). The 'data' parameter will be
        * resized if required.
        *
-       * The flag 'ignore_on_error' controls the behavior when reading. By
-       * default it is 'false', which means we throw exceptions in case of
-       * problems. If you set it to 'true', we just ignore errors. It is your
-       * task then to verify the return value of this method to make sure of 
-       * the number of returned frames which are still valid.
+       * The flag 'throw_on_error' controls the error reporting behavior when
+       * reading. By default it is 'false', which means we **won't** report
+       * problems reading this stream. We just silently truncate the file. If
+       * you set it to 'true', we will report any errors through exceptions. No
+       * matter what you chose here, it is your task to verify the return value
+       * of this method matches the number of frames indicated by
+       * numberOfFrames().
        */
-      size_t load(blitz::Array<uint8_t,4>& data, bool ignore_on_error=false) const;
+      size_t load(blitz::Array<uint8_t,4>& data, 
+          bool throw_on_error=false) const;
 
       /**
        * Loads all of the video stream in a buffer. Resizes the buffer if
        * the space and type are not good.
        *
-       * The flag 'ignore_on_error' controls the behavior when reading. By
-       * default it is 'false', which means we throw exceptions in case of
-       * problems. If you set it to 'true', we just ignore errors. It is your
-       * task then to verify the return value of this method to make sure of 
-       * the number of returned frames which are still valid.
+       *
+       * The flag 'throw_on_error' controls the error reporting behavior when
+       * reading. By default it is 'false', which means we **won't** report
+       * problems reading this stream. We just silently truncate the file. If
+       * you set it to 'true', we will report any errors through exceptions. No
+       * matter what you chose here, it is your task to verify the return value
+       * of this method matches the number of frames indicated by
+       * numberOfFrames().
        */
-      size_t load(bob::core::array::interface& b, bool ignore_on_error=false) const;
+      size_t load(bob::core::array::interface& b, 
+          bool throw_on_error=false) const;
 
     private: //methods
 
@@ -250,14 +257,16 @@ namespace bob { namespace io {
            * re-load of that infrastructure. If we have reached the end
            * position, an exception is raised if you try to read() the
            * iterator.
-	   *
-	   * The flag 'ignore_on_error' controls the behavior when reading. By
-	   * default it is 'false', which means we throw exceptions in case of
-	   * problems. If you set it to 'true', we just ignore errors. It is
-	   * your task then to verify the return value of this method to make
-	   * sure of the frame was correctly read.
+           *
+           * The flag 'throw_on_error' controls the error reporting behavior
+           * when reading. By default it is 'false', which means we **won't**
+           * report problems reading this stream. We just silently truncate the
+           * file. If you set it to 'true', we will report any errors through
+           * exceptions. No matter what you chose here, it is your task to
+           * verify the return value of this method matches the number of
+           * frames indicated by numberOfFrames().
            */
-          bool read (bob::core::array::interface& b, bool ignore_on_error=false);
+          bool read (bob::core::array::interface& b, bool throw_on_error=false);
 
           /**
            * Reads the currently pointed frame and advances one position.
@@ -272,14 +281,16 @@ namespace bob { namespace io {
            * re-load of that infrastructure. If we have reached the end
            * position, an exception is raised if you try to read() the
            * iterator.
-	   *
-	   * The flag 'ignore_on_error' controls the behavior when reading. By
-	   * default it is 'false', which means we throw exceptions in case of
-	   * problems. If you set it to 'true', we just ignore errors. It is
-	   * your task then to verify the return value of this method to make
-	   * sure of the frame was correctly read.
+           *
+           * The flag 'throw_on_error' controls the error reporting behavior
+           * when reading. By default it is 'false', which means we **won't**
+           * report problems reading this stream. We just silently truncate the
+           * file. If you set it to 'true', we will report any errors through
+           * exceptions. No matter what you chose here, it is your task to
+           * verify the return value of this method matches the number of
+           * frames indicated by numberOfFrames().
            */
-          bool read (blitz::Array<uint8_t,3>& data, bool ignore_on_error=false);
+          bool read (blitz::Array<uint8_t,3>& data, bool throw_on_error=false);
 
           /**
            * Resets the current iterator state by closing and re-opening the

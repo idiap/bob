@@ -54,7 +54,8 @@ struct iterator_wrapper {
 
     //load the next frame: if an error is detected internally, throw
     tp::py_array retval(reader->frame_type());
-    o.read(retval); //note that this will advance the iterator
+    bool ok = o.read(retval); //note that this will advance the iterator
+    if (!ok) PYTHON_ERROR(StopIteration, "iteration finished");
     return retval.pyobject();
   }
 
@@ -138,22 +139,12 @@ static tuple videoreader_getslice (io::VideoReader& v, slice sobj) {
 }
 
 static object videoreader_load(io::VideoReader& reader, 
-  bool ignore_on_error=false) {
+  bool raise_on_error=false) {
   tp::py_array tmp(reader.video_type());
-  size_t frames_read = reader.load(tmp, ignore_on_error);
-  
-  //handles the case in which the user wants me to read all frames, ignoring 
-  //possible problems found while reading the video. In this case, just resize
-  //the output array so to match the number of frames read
-  if (ignore_on_error && (frames_read != reader.numberOfFrames())) {
-    numeric::array retval = extract<numeric::array>(tmp.pyobject());
-    const size_t* shape = tmp.type().shape;
-    retval.resize(frames_read, shape[1], shape[2], shape[3]);
-    return object(retval);
-  }
-
-  return tmp.pyobject();
+  size_t frames_read = reader.load(tmp, raise_on_error);
+  return make_tuple(frames_read, tmp.pyobject());
 }
+
 BOOST_PYTHON_FUNCTION_OVERLOADS(videoreader_load_overloads, videoreader_load, 1, 2)
 
 static void videowriter_append(io::VideoWriter& writer, object a) {
@@ -191,7 +182,7 @@ void bind_io_video() {
     .add_property("info", make_function(&io::VideoReader::info, return_value_policy<copy_const_reference>()))
     .add_property("video_type", make_function(&io::VideoReader::video_type, return_value_policy<copy_const_reference>()), "Typing information to load all of the file at once")
     .add_property("frame_type", make_function(&io::VideoReader::frame_type, return_value_policy<copy_const_reference>()), "Typing information to load the file frame by frame.")
-    .def("load", &videoreader_load, videoreader_load_overloads((arg("self"), arg("ignore_on_error")=false), "Loads all of the video stream in a numpy ndarray organized in this way: (frames, color-bands, height, width). I'll dynamically allocate the output array and return it to you."))
+    .def("__load__", &videoreader_load, videoreader_load_overloads((arg("self"), arg("raise_on_error")=false), "Loads all of the video stream in a numpy ndarray organized in this way: (frames, color-bands, height, width). I'll dynamically allocate the output array and return it to you. The flag 'raise_on_error', which is set to 'False' by default influences the error reporting in case problems are found with the video file. If you set it to 'True', we will report problems raising exceptions. If you either don't set it or set it to 'False', we will truncate the file at the frame with problems and will not report anything. It is your task to verify if the number of frames returned matches the expected number of frames as reported by the property 'numberOfFrames' in this object."))
     .def("__iter__", &io::VideoReader::begin)
     .def("__getitem__", &videoreader_getitem)
     .def("__getitem__", &videoreader_getslice)

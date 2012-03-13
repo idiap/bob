@@ -53,6 +53,7 @@ extern "C" {
 #include "io/Exception.h"
 #include "io/VideoException.h"
 #include "core/blitz_array.h"
+#include "core/logging.h"
 
 namespace io = bob::io;
 namespace ca = bob::core::array;
@@ -257,13 +258,13 @@ io::VideoReader::~VideoReader() {
 }
 
 size_t io::VideoReader::load(blitz::Array<uint8_t,4>& data, 
-  bool ignore_on_error) const {
+  bool throw_on_error) const {
   ca::blitz_array tmp(data);
-  return load(tmp, ignore_on_error);
+  return load(tmp, throw_on_error);
 }
 
 size_t io::VideoReader::load(ca::interface& b, 
-  bool ignore_on_error) const {
+  bool throw_on_error) const {
 
   //checks if the output array shape conforms to the video specifications,
   //otherwise, throw.
@@ -279,7 +280,7 @@ size_t io::VideoReader::load(ca::interface& b,
 
   for (const_iterator it=begin(); it!=end();) {
     ca::blitz_array ref(static_cast<void*>(ptr), m_typeinfo_frame);
-    if (it.read(ref, ignore_on_error)) {
+    if (it.read(ref, throw_on_error)) {
       ptr += frame_size;
       ++frames_read;
     }
@@ -495,6 +496,7 @@ void io::VideoReader::const_iterator::reset() {
   //closes the codec we used
   if (m_codec_ctxt) {
     avcodec_close(m_codec_ctxt);
+    m_codec_ctxt = 0;
     m_codec = 0;
   }
   
@@ -502,10 +504,10 @@ void io::VideoReader::const_iterator::reset() {
   if (m_format_ctxt) {
 # if LIBAVFORMAT_VERSION_INT < 0x350400
     av_close_input_file(m_format_ctxt);
+    m_format_ctxt = 0;
 # else
     avformat_close_input(&m_format_ctxt);
 # endif
-    m_codec_ctxt = 0;
   }
 
   m_current_frame = std::numeric_limits<size_t>::max(); //that means "end" 
@@ -514,13 +516,13 @@ void io::VideoReader::const_iterator::reset() {
 }
 
 bool io::VideoReader::const_iterator::read(blitz::Array<uint8_t,3>& data,
-  bool ignore_on_error) {
+  bool throw_on_error) {
   ca::blitz_array tmp(data);
-  return read(tmp, ignore_on_error);
+  return read(tmp, throw_on_error);
 }
 
 bool io::VideoReader::const_iterator::read(ca::interface& data,
-  bool ignore_on_error) {
+  bool throw_on_error) {
 
   //checks if we have not passed the end of the video sequence already
   if(m_current_frame > m_parent->numberOfFrames()) {
@@ -541,6 +543,7 @@ bool io::VideoReader::const_iterator::read(ca::interface& data,
   AVPacket packet;
   av_init_packet(&packet);
   int av_error = 0;
+  int sws_height = 0;
 
   while ((av_error=av_read_frame(m_format_ctxt, &packet)) >= 0) {
     // Is this a packet from the video stream?
@@ -556,9 +559,9 @@ bool io::VideoReader::const_iterator::read(ca::interface& data,
 
       // Did we get a video frame?
       if (gotPicture) {
-        sws_scale(m_sws_context, m_frame_buffer->data, m_frame_buffer->linesize,
-            0, m_parent->height(), m_rgb_frame_buffer->data, 
-            m_rgb_frame_buffer->linesize);
+        sws_height = sws_scale(m_sws_context, m_frame_buffer->data, 
+            m_frame_buffer->linesize, 0, m_parent->height(),
+            m_rgb_frame_buffer->data, m_rgb_frame_buffer->linesize);
 
         // Got the image - exit
         ++m_current_frame;
@@ -573,8 +576,10 @@ bool io::VideoReader::const_iterator::read(ca::interface& data,
     av_free_packet(&packet);
   }
 
-  if (av_error >= 0) { //all good, can set the frame at destination array
-
+  // if the converted height of the frame matches my expected value, proceed
+  // transferring the data to the destination array
+  if (sws_height == (int)m_parent->height()) {
+    
     // Copies the data into the destination array. Here is some background: bob
     // arranges the data for a colored image like: (color-bands, height,
     // width).  That makes it easy to extract a given band from the image as
@@ -590,33 +595,59 @@ bool io::VideoReader::const_iterator::read(ca::interface& data,
     
     shape = info.shape[0], info.shape[1], info.shape[2];
     stride = info.stride[0], info.stride[1], info.stride[2];
-    blitz::Array<uint8_t,3> dst(static_cast<uint8_t*>(data.ptr()), shape, stride,
-        blitz::neverDeleteData);
+    blitz::Array<uint8_t,3> dst(static_cast<uint8_t*>(data.ptr()), 
+        shape, stride, blitz::neverDeleteData);
     
     shape = info.shape[1], info.shape[2], info.shape[0];
     blitz::Array<uint8_t,3> src(m_rgb_frame_buffer->data[0], shape, 
         blitz::neverDeleteData);
     dst = src.transpose(2,0,1);
-  }
 
-  size_t last_read = m_current_frame; //see below: needed for error reporting
-
-  if (m_current_frame >= m_parent->numberOfFrames()) {
-    //reached end-of-file: transform the current iterator in "end"
-    reset();
   }
   else {
-    //check error state and report, if the user has asked so
-    if (av_error < 0) {
-      if (ignore_on_error) {
-        return false; //ignore it, let the user handle this problem
+    
+    //error analysis
+
+    if (sws_height == 0) {
+
+      //We left the reading loop without converting any data. Two things might
+      //have occurred:
+      // (1) the file is over
+      // (2) there is a problem reading the current frame
+
+      //no matter our decision, this file cannot be read anymore
+      //let's reset the iterator so to mark this is the end of it.
+      //this also addresses (1).
+
+      // addresses (2) above
+      if (m_current_frame < m_parent->numberOfFrames()) {
+
+        if (throw_on_error) {
+          boost::format m("ffmpeg/av_read_frame() returned an error (%d) reading frame %d of file '%s' which contains %d frames - truncating file at this point.");
+          m % av_error % m_current_frame % m_parent->m_filepath % m_parent->m_nframes;
+          throw std::runtime_error(m.str().c_str());
+        }
       }
-      else { //report it to the user with an exception
-        boost::format m("ffmpeg/av_read_frame() returned an error (%d) reading frame %d of file '%s' which contains %d frames");
-        m % av_error % last_read % m_parent->m_filepath % m_parent->m_nframes;
+
+      //this is the normal way out, addressing (1) above
+      reset();
+      return false; 
+    }
+
+    else {
+
+      //in this case there was a scaling operation taking place, but the output
+      //is not consistent with what I expect.
+      //anyways, the m_current_frame was correctly incremented.
+      if (throw_on_error) {
+        boost::format m("ffmpeg/sws_scale() returned a number of lines read (%d) for frame %d that does not match the expected height (%d) of file '%s' which contains %d frames (you can continue to read the file, I'm not truncating it)");
+        m % sws_height % m_current_frame % m_parent->height() % m_parent->m_nframes;
         throw std::runtime_error(m.str().c_str());
       }
+      return false;
+
     }
+
   }
 
   return true;
@@ -683,8 +714,9 @@ io::VideoReader::const_iterator& io::VideoReader::const_iterator::operator++ () 
   int gotPicture = 0;
   AVPacket packet;
   av_init_packet(&packet);
+  int av_error = 0;
 
-  while (av_read_frame(m_format_ctxt, &packet) >= 0) {
+  while ((av_error=av_read_frame(m_format_ctxt, &packet)) >= 0) {
     // Is this a packet from the video stream?
     if (packet.stream_index == m_stream_index) {
       // Decodes video frame, store it on my buffer
@@ -709,10 +741,17 @@ io::VideoReader::const_iterator& io::VideoReader::const_iterator::operator++ () 
     av_free_packet(&packet);
   }
 
-  if (m_current_frame >= m_parent->numberOfFrames()) {
+  if (av_error < 0) {
+    if (m_current_frame < m_parent->numberOfFrames()) {
+      boost::format m("ffmpeg/av_read_frame() returned an error (%d) reading frame %d of file '%s' which contains %d frames - truncating file at this point.");
+      m % av_error % m_current_frame % m_parent->m_filepath % m_parent->m_nframes;
+      bob::core::info << m.str(); //goes to stdout
+    }
+
     //transform the current iterator in "end"
     reset();
   }
+
   return *this;
 }
 
