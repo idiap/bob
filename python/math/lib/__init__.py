@@ -3,8 +3,8 @@ from ._math import *
 # add some default distance functions
 import math
 
-def euklidean_distance(x1, x2):
-  """Returns the euklidean distance between the given vectors"""
+def euclidean_distance(x1, x2):
+  """Returns the Euclidean distance between the given vectors"""
   return math.sqrt(((x1-x2)*(x1-x2)).sum())
 
 
