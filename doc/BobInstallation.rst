@@ -43,7 +43,7 @@ specific platforms.
 +----------------------+--------------+----------------------------------------------+
 | `Blitz++`_           | 0.9          | `Artistic-2.0`_ or LGPLv3+ or GPLv3+         |
 +----------------------+--------------+----------------------------------------------+
-| CBlas, Lapack, Atlas | -            | BSD-style                                    |
+| `Lapack`_            | -            | BSD-style                                    |
 +----------------------+--------------+----------------------------------------------+
 | `Python`_            | 2.5          | `Python-2.0`_                                |
 +----------------------+--------------+----------------------------------------------+
@@ -138,7 +138,7 @@ Core dependencies
   indexing, so the maximum amount of positions in a single dimension is limited
   to 2^31^  (that is what fits in an signed integer), even if you decide to use
   the CVS version. This is true to the date (18/January/2011);
-* `Cblas/Lapack/Atlas`_: We use these libraries for mathematical operations
+* `Lapack`_: We use this library for mathematical operations
   on vectors and matrices. Any modern version of this library will do;
 * `FFTW`_: Provides fast computation of Fourier, Sine and Cosine transforms
 * `Boost`_: is used for our unit test framework and python bindings. Any
@@ -514,7 +514,7 @@ try to reproduce the failure.
 .. _blitz++: http://www.oonumerics.org/blitz
 .. _cmake: http://www.cmake.org
 .. _ffmpeg: http://www.ffmpeg.org
-.. _cblas/lapack/atlas: http://www.netlib.org Cblas/Lapack/Atlas
+.. _lapack: http://www.netlib.org/lapack
 .. _boost: http://www.boost.org
 .. _python: http://www.python.org
 .. _google perftools: http://code.google.com/p/google-perftools

@@ -6,7 +6,7 @@ set(deps "") #other bob subprojects
 set(shared ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE}
            ${Boost_FILESYSTEM_LIBRARY_RELEASE}
            ${Boost_IOSTREAMS_LIBRARY_RELEASE} ${Boost_DATE_TIME_LIBRARY_RELEASE}
-           ${cblas_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE})
+           ${Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE})
 
 string(TOLOWER "${CMAKE_BUILD_TYPE}" LOWER_BUILD_TYPE)
 # also add a dependency to Blitz in debug mode (needed to enable the -BZ_BLITZ debugging mode)
