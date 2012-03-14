@@ -9,16 +9,6 @@
 import os
 import sys
 
-def download_all(args):
-  """Executes all the download commands from individual databases"""
-  
-  for name, module in args.modules:
-    parsed = args.parser.parse_args([name, 'download'])
-    parsed.url = args.url
-    parsed.version = args.version
-    parsed.verbose = args.verbose
-    parsed.func(parsed)
-
 def location_all(args):
   """Executes all the location commands from individual databases"""
   
@@ -65,7 +55,7 @@ def add_all_commands(parser, top_subparser, modules):
   attach the options from those.
   """
 
-  from .utils import download_command, location_command, copy_command, copyfrom_command
+  from .utils import location_command, copy_command, copyfrom_command
 
   # creates a top-level parser for this database
   top_level = top_subparser.add_parser('all',
@@ -74,11 +64,6 @@ def add_all_commands(parser, top_subparser, modules):
 
   # declare it has subparsers for each of the supported commands
   subparsers = top_level.add_subparsers(title="subcommands")
-
-  download_parser = download_command(subparsers)
-  download_parser.set_defaults(func=download_all)
-  download_parser.set_defaults(parser=parser)
-  download_parser.set_defaults(modules=modules)
 
   location_parser = location_command(subparsers)
   location_parser.set_defaults(func=location_all)

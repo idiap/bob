@@ -79,70 +79,6 @@ def dbshell_command(subparsers):
   parser = subparsers.add_parser('dbshell', help=dbshell.__doc__)
   parser.set_defaults(func=dbshell)
 
-def download(options):
-  """Downloads the database from a remote server."""
-
-  from .openanything import fetch
-
-  url = '/'.join((options.url.strip('/'), options.version.strip('/'), 
-      options.dbname + '.sql3'))
-  location = options.location.replace('sqlite:///','')
-
-  # If location exists and it has a .etag file with it, read it and
-  # give it to the fetch method
-  etag = None
-  if os.path.exists(location) and os.path.exists(location + '.etag'):
-    etag = open(location + '.etag', 'rt').read().strip()
-
-  if options.verbose: 
-    print "Requesting %s" % (url,)
- 
-  data = fetch(url, etag=etag)
-
-  if data['status'] == 200:
-    output = open(location, 'wb')
-    output.write(data['data'])
-    output.close()
-
-    if options.verbose:
-      print "Gzip Compression: %s" % data['gzip']
-      print "Database Size: %d bytes" % len(data['data'])
-      print "Last Modification: %s" % data['lastmodified']
-      print "Saved at: %s" % location
-
-    if data['etag']:
-      if options.verbose: 
-        print "E-Tag: %s" % data['etag']
-      etag_file = open(location + '.etag', 'wt')
-      etag_file.write(data['etag'])
-      etag_file.close()
-      print "E-Tag cached: %s" % (location + '.etag',)
-
-  elif data['status'] == 304: #etag matches
-    if options.verbose:
-      print "Currently installed version is up-to-date (did not re-download)"
-
-  else:
-    raise IOError, "Failed download of %s (status: %d)" % (url, data['status'])
-
-def download_command(subparsers):
-  """Adds a new download subcommand to your subparser"""
-  
-  DOWNLOAD_URL = 'http://www.idiap.ch/software/bob/databases/'
-  """Location from where to download bob databases"""
-
-  DOWNLOAD_VERSION = 'nightlies/last'
-  """The default version to use for the databases"""
-
-  parser = subparsers.add_parser('download', help=download.__doc__)
-  parser.add_argument('-u', '--url', dest="url", default=DOWNLOAD_URL, help="changes the url from where to download the database files (defaults to '%(default)s')")
-  parser.add_argument('-v', '--version', dest="version", default=DOWNLOAD_VERSION, help="changes the base version of the databases to download (defaults to '%(default)s')")
-  parser.add_argument('--verbose', dest="verbose", default=False,
-      action='store_true', help="produces more output while downloading")
-  parser.set_defaults(func=download)
-
-  return parser
-
 def print_location(options):
   """Prints the current location of the database SQL file."""
   
@@ -216,7 +152,6 @@ def standard_commands(subparsers):
   """Adds all standard commands to databases that can respond to them."""
 
   dbshell_command(subparsers)
-  download_command(subparsers)
   location_command(subparsers)
   copy_command(subparsers)
   copyfrom_command(subparsers)

@@ -24,7 +24,7 @@ endmacro(bob_setup_db dbname)
 # Installs our script driver
 bob_python_script(db "dbmanage.py" "lib/script/dbmanage.py" "main")
 
-# Run creation or downloading
+# Run creation or copying
 bob_setup_db(replay)
 bob_setup_db(banca)
 bob_setup_db(banca_small)
