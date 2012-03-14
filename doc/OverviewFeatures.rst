@@ -17,51 +17,14 @@
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 **********
- Overview
+ Features
 **********
-
-
-.. _section-intro:
-
-Introduction
-------------
-
-|project| is a signal-processing and machine learning toolbox for Biometrics
-developed at the `Idiap`_ Research Institute, in Switzerland. 
-
-
-.. _section-motivations:
-
-Motivations
------------
-
-We designed and released |project| for the following main reasons:
-
-* Need of a software platform where stable algorithms and common tools used for research purposes can be put at.
-
-* Thoroughly tested at every minor change: correctness above speed
-
-* Easy way to reproduce published results
-
-* Environment that allows fast pace development, with throw-away prototypes
-
-* Ability to implement fast versions (in `C++`_) of identified bottlenecks
-
-* Re-use existing open-source packages and standards
-
-* Open source (`GPL-3.0`_) with hopes it is useful to others. (For more information on licensing, please visit our :doc:`BobLicensing`)
-
-
-.. _section-features:
-
-Features
---------
 
 |project| currently supports **Linux** and **Mac OS X** operating systems and provides the following features:
 
 
 Python and C++ APIs
-~~~~~~~~~~~~~~~~~~~
+===================
 
 The toolbox is written in a mix of `Python`_ and `C++`_ and is designed to 
 be both efficient and to reduce development time. `C++`_ has been chosen to 
@@ -72,7 +35,7 @@ a default lab-like environment when using |project|, and that any other
 existing `Python`_ tool could be easily glued to it.
 
 Data representation
-~~~~~~~~~~~~~~~~~~~
+===================
 
 The fundamental data structure of the library consists in multi-dimensional
 arrays. In signal-processing and machine learning, arrays are indeed a suitable
@@ -82,7 +45,7 @@ achieved with `Blitz++`_, whereas at the python level, `Numpy`_ arrays are
 used.
 
 Mathematical and signal processing
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+==================================
 
 Machine learning algorithms and signal processing usually rely on a 
 sequence of low level mathematical operations. For efficiency purpose,
@@ -91,7 +54,7 @@ are performed using `LAPACK`_ routines at the `C++`_ level. In addition,
 Fast Fourier Transform is made possible via a bridge to the `FFTW`_ library.
 
 Image processing
-~~~~~~~~~~~~~~~~
+================
 
 |project| has been developed by researchers tackling many machine vision
 problems. Furthermore, numerous image processing tools are provided such as
@@ -99,7 +62,7 @@ filtering (Gaussian, Median, Gabor), visual feature extraction
 (LBP, SIFT bridge to `VLFeat`_), face normalization and optical flow.
 
 Machine learning
-~~~~~~~~~~~~~~~~
+================
 
 Several machine learning algorithms have been integrated into the library.
 Dimensionality reduction is supported using Principal Component Analysis,
@@ -116,7 +79,7 @@ of **trainer**. For instance, the **LinearMachine** could be trained using
 Principal Component Analysis or Linear Discriminant Analysis.
 
 Storing and managing data
-~~~~~~~~~~~~~~~~~~~~~~~~~
+=========================
 
 The library has been designed to run on various platforms and to be easily 
 interfaced with any other software. Furthermore, we have chosen the open and 
@@ -129,14 +92,14 @@ thanks to `ImageMagick`_, videos through `FFmpeg`_ as well as
 standard `Matlab`_ file using `MatIO`_.
 
 Database support
-~~~~~~~~~~~~~~~~
+================
 
 The library currently provides an API to easily query and interface with 
 well know biometric database. In particular, several protocols are integrated 
 with the aim at improving reproducibility of scientific publications.
 
 Performance Evaluation
-~~~~~~~~~~~~~~~~~~~~~~
+======================
 
 A module of the library is dedicated to performance evaluation. Computation
 of false alarm and false rejection rate, equal error rate are supported as 
@@ -145,7 +108,6 @@ well as the generation of ROC, DET or EPC curves.
 
 .. Place here your external references
 
-.. _idiap: http://www.idiap.ch
 .. _python: http://www.python.org
 .. _c++: http://www2.research.att.com/~bs/C++.html
 .. _GPL-3.0: http://www.opensource.org/licenses/GPL-3.0
