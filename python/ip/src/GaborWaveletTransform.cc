@@ -60,7 +60,7 @@ void bind_ip_gabor_wavelet_transform() {
   // declare GWT class
   boost::python::class_<bob::ip::GaborWaveletTransform, boost::shared_ptr<bob::ip::GaborWaveletTransform> >(
     "GaborWaveletTransform",
-    "This class can be used to perform a Gabor wavelet transform from one image to an image of (normalized) Gabor jets",
+    "This class can be used to perform a Gabor wavelet transform from one image to an image of (normalized) Gabor jets or to a complex-valued multi-layer trafo image.",
     boost::python::no_init
   )
 
@@ -75,46 +75,46 @@ void bind_ip_gabor_wavelet_transform() {
         boost::python::arg("pow_of_k") = 0.,
         boost::python::arg("dc_free") = true
       ),
-      "Initializes the Gabor wavelet transform"
+      "Initializes the Gabor wavelet transform by generating Gabor wavelets in number_of_scales different frequencies and number_of_angles different directions. The remaining parameters are parameters of the Gabro wavelets to be generated. "
     )
   )
 
   .add_property(
     "number_of_kernels",
     &bob::ip::GaborWaveletTransform::numberOfKernels,
-    "The number of Gabor wavelets (i.e. number of directions times number of scales, i.e. the size of the trafo image) used in this Gabor wavelet transform"
+    "The number of Gabor wavelets (i.e. number of directions times number of scales, i.e. the length of a Gabor jet, i.e. the number of layers of the trafo image) used in this Gabor wavelet transform."
   )
 
   .add_property(
     "number_of_scales",
     &bob::ip::GaborWaveletTransform::m_number_of_scales,
-    "The number of scales that this Gabor wavelet family holds"
+    "The number of scales that this Gabor wavelet family holds."
   )
 
   .add_property(
     "number_of_directions",
     &bob::ip::GaborWaveletTransform::m_number_of_directions,
-    "The number of directions that this Gabor wavelet family holds"
+    "The number of directions that this Gabor wavelet family holds."
   )
 
   .def(
     "perform_gwt",
     &perform_gwt,
     (boost::python::arg("self"), boost::python::arg("input_image"), boost::python::arg("output_trafo_image")),
-    "Performs a Gabor wavelet transform and returns the complete Gabor wavelet transformed image"
+    "Performs a Gabor wavelet transform and fills the given Gabor wavelet transformed image (output_trafo_image)"
   )
 
   .def(
     "compute_jet_image",
     &compute_jet_image,
     (boost::python::arg("self"), boost::python::arg("input_image"), boost::python::arg("output_jet_image"), boost::python::arg("normalized")=true),
-    "Performs a Gabor wavelet transform and returns the complete set of Gabor jets"
+    "Performs a Gabor wavelet transform and fills given image of Gabor jets. If the normalized parameter is set to True (the default), the absolute parts of the Gabor jets are normalized to unit Euclidean lenght."
   );
 
   boost::python::def(
     "normalize_gabor_jet",
     &normalize_gabor_jet,
     (boost::python::arg("gabor_jet")),
-    "Normalizes the Gabor jet (with or without phase) to unit length"
+    "Normalizes the Gabor jet (with or without phase) to unit Euclidean length."
   );
 }

@@ -28,7 +28,7 @@ Our goal is to take an image, in our case a 2D uint8 array, and crop it.
    import bob
    import numpy
 
-   # create an psuedo image (instead of loading an image)
+   # create an pseudo image (instead of loading an image)
    image = numpy.ones((80, 64), 'uint8')
    
    # Some of the ip functionality is a simple function call
@@ -56,12 +56,12 @@ Now let's see a more complete ip function: Face crop + normalization.
    # Because this operation is a bit more complicated than just cropping, we
    # need to create an object (instance of the FaceEyesNorm class).
    
-   eye_distance = 33
    final_height = 80
    final_width  = 64
-   overlap_h    = 0 # used if we need a bigger crop (height)
-   overlap_w    = 0 # used if we need a bigger crop (width)
-   my_face_normer = bob.ip.FaceEyesNorm(eye_distance, final_height, final_width, overlap_h, overlap_w) 
+   eye_distance = 33   # distance of eyes in the cropped image
+   eye_center_y = 16   # vertical position of the eye center to be produced
+   eye_center_x = 32   # horizontal position of the eye center to be produced
+   my_face_normer = bob.ip.FaceEyesNorm(eye_distance, final_height, final_width, eye_center_y, eye_center_x) 
 
    # create an pseudo image (instead of loading an image)
    
@@ -73,17 +73,22 @@ Now let's see a more complete ip function: Face crop + normalization.
    dst = numpy.ndarray((final_height, final_width), 'uint8')
 
    # lets crop and normalize the image using eye locations
-   # first we will start by specifying the eye locations
+   # first we will start by specifying the eye locations.
+   # Please note that usually the left eye (in image coordinates)
+   # is to the RIGHT of the right eye position.
    
-   height_left_eye = 120
-   width_left_eye  = 100
-   
-   height_right_eye = 130
-   width_right_eye  = 140
+   left_eye_y = 120
+   left_eye_x = 140
+
+   right_eye_y = 130
+   right_eye_x  = 100
 
    # we now crop and normalize by using the object (my_face_normer) we created
    # above not that it is smart to use the same object for many images, if all
    # images should be normalized and have the same final size.
 
-   my_face_normer.__call__(image, dst, height_left_eye, width_left_eye, height_right_eye, width_right_eye)   
+   my_face_normer.__call__(image, dst, left_eye_y, left_eye_x, right_eye_y, right_eye_x)
+   
+   # Note: the above call could also been done just using the () operator:
+   # my_face_normer(image, dst, left_eye_y, left_eye_x, right_eye_y, right_eye_x)
 

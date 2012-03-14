@@ -3,7 +3,7 @@
 # Manuel Guenther <Manuel.Guenther@idiap.ch>
 # 12-02-27
 
-"""Extensions of the GWT class
+"""Extensions of the bob.ip.GaborWaveletTransform class
 """
 
 from ._ip import GaborWaveletTransform
@@ -11,7 +11,7 @@ from ._ip import rgb_to_gray
 import numpy
 
 def gwt_trafo_image(self,input_image):
-  """ This function creates an empty trafo image for the given input image
+  """ This function creates an empty trafo image for the given input image.
   Use this function to generate the trafo image in the correct size and with the correct data type.
   In case you have to transform multiple images of the same size, this trafo image can be reused.
   """
@@ -22,8 +22,8 @@ del gwt_trafo_image
 
 
 def gwt_transform(self,input_image,output_trafo_image):
-  """ This function performs a Gabor wavelet transform to any kind of images 
-  gray/color and int8/double/...  
+  """ This function performs a Gabor wavelet transform of any kind of images 
+  gray/color and int8/double/... and saves the result in the given trafo image
   """
   # cast image into complex type
   if input_image.ndim == 2:
@@ -44,7 +44,7 @@ del gwt_transform
 
 
 def gwt_jet_image(self, input_image, include_phases = True):
-  """ This function creates an empty jet image for the given input image.
+  """ This function creates an empty jet image (with or without phases) for the given input image.
   Use this function to generate the jet image in the correct size and with the correct data type.
   In case you have to transform multiple images of the same size, this jet image can be reused.
   """
@@ -59,8 +59,8 @@ del gwt_jet_image
 
 
 def gwt_compute_jets(self,input_image, output_jet_image, normalize=True):
-  """ This function performs a Gabor wavelet transform to any kind of images 
-  gray/color and int8/double/... and fills the Gabor jets
+  """ This function performs a Gabor wavelet transform of any kind of images 
+  gray/color and int8/double/... and fills the Gabor jets of the given jet image.
   """
   # cast image into complex type
   if input_image.ndim == 2:
