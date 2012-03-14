@@ -23,3 +23,4 @@ debian/stamp-*
 obj-*
 debian/*.log
 debian/*.substvars
+databases/
