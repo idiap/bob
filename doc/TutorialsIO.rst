@@ -16,34 +16,9 @@
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-***********
- Tutorials
-***********
-
-.. _section-intro:
-
-Introduction
-------------
-
-This list of tutorials is the starting point to get to know how to use the 
-|project| library and to learn the fundamental concepts. They all rely on
-the |project| lab-like environment which is `Python`_.
-
-.. _section-arrays:
-
-
-Multi-Dimensional arrays
-------------------------
-
-* Fundamentals about Numpy (ndrray creation, astype() function, etc.)
-
-* Images/Videos/Audio sequences as numpy array
-
-.. _section-io:
-
-
-Input/Output
-------------
+**************
+ Input/Output
+**************
 
 * Loading and saving a Numpy array
 
@@ -51,47 +26,4 @@ Input/Output
 
 * Loading and saving matlab data
 
-
-.. _section-ipsp:
-
-Image and signal processing
----------------------------
-
-* Image rescaling, rotating, etc.
-
-* Image filter (LBP, Gabor, etc.)
-
-
-.. _section-machine:
-
-Machine
--------
-
-* LinearMachine
-
-* GaussianMachine
-
-* GMMMachine
-
-* MLP
-
-* SVM
-
-
-.. _section-trainer:
-
-Trainer
--------
-
-* PCA/LDA
-
-* Expectation-Maximization for GMMs
-
-* MLPTrainer
-
-* SVMTrainer
-
-
 .. Place here your external references
-
-.. _python: http://www.python.org

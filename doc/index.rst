@@ -65,7 +65,12 @@ Tutorials
 .. toctree::
    :maxdepth: 2
 
-   Tutorials
+   TutorialsIntro
+   TutorialsArrays
+   TutorialsIO
+   TutorialsIP
+   TutorialsMachine
+   TutorialsTrainer
 
 Reference Guide
 ---------------
