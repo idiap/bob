@@ -28,7 +28,6 @@ class Database(object):
     """Tries connecting or re-connecting to the database"""
     
     if not os.path.exists(utils.location(dbname()).replace('sqlite:///', '')):
-      logging.warn("Database '%s' cannot be found at expected location '%s'. Create it and then try re-connecting using Database.connect()" % (dbname(), utils.location(dbname())))
       self.session = None
 
     else:
