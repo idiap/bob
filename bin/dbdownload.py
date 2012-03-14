@@ -60,6 +60,8 @@ import os
 import sys
 import argparse
 import urllib2, urlparse, gzip
+import urllib
+import re
 from StringIO import StringIO
 
 class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
@@ -153,17 +155,15 @@ def fetch(source, etag=None, lastmodified=None, agent=USER_AGENT):
   f.close()
   return result
 
-def download(dbname, server, version, destdir, verbose):
-
-  url = '/'.join((server.strip('/'), version.strip('/'), dbname + '.sql3'))
+def download(url, destdir, verbose):
 
   # If the destdir does not exist, create it
-  if not os.path.exists(destdir): 
+  if not os.path.exists(destdir):
     if verbose: print "Creating directory '%s'..." % destdir
     os.makedirs(destdir)
 
-	# Destination is the name of the directory plus the name of the database
-  destination = os.path.join(destdir, dbname + '.sql3')
+  # Destination is the name of the directory plus the name of the database
+  destination = os.path.join(destdir, os.path.basename(url))
 
   # If destination exists and it has a .etag file with it, read it and
   # give it to the fetch method - this will avoid re-downloading databases
@@ -184,25 +184,41 @@ def download(dbname, server, version, destdir, verbose):
     output.close()
 
     if verbose:
-      print "    Gzip Compression: %s" % data['gzip']
-      print "    Database Size: %d bytes" % len(data['data'])
-      print "    Last Modification: %s" % data['lastmodified']
-      print "    Saved at: %s" % destination
+      print "    > Gzip Compression: %s" % data['gzip']
+      print "    > Database Size: %d bytes" % len(data['data'])
+      print "    > Last Modification: %s" % data['lastmodified']
+      print "    > Saved at: %s" % destination
 
     if data['etag']:
       if verbose:
-        print "    E-Tag: %s" % data['etag']
+        print "    > E-Tag: %s" % data['etag']
       etag_file = open(destination + '.etag', 'wt')
       etag_file.write(data['etag'])
       etag_file.close()
-      print "    E-Tag cached: %s" % (destination + '.etag',)
+      if verbose:
+        print "    > E-Tag cached: %s" % (destination + '.etag',)
 
   elif data['status'] == 304: #etag matches
     if verbose:
-      print "    Currently installed version is up-to-date (did not re-download)"
+      print "[!] Currently installed version is up-to-date (did not re-download)"
 
   else:
     raise IOError, "Failed download of %s (status: %d)" % (url, data['status'])
+
+def list_apache_dir(url, verbose):
+  """List the contents of a directory in Apache, looking for sql3 files."""
+
+  parse_re = re.compile('href="([^"]*)".*(..-...-.... ..:..).*?(\d+[^\s<]*|-)')
+
+  if verbose: print "[?] Listing contents of '%s'" % url
+  html = urllib.urlopen(url).read()
+  files = parse_re.findall(html)
+  retval = []
+  for name, date, size in files:
+    if size.strip() == '-': continue
+    if name.endswith('/'): continue
+    retval.append((name,size,date))
+  return retval
 
 def main():
   """Main function: parses options and download all databases available on
@@ -220,20 +236,38 @@ def main():
       help="where to download the databases (defaults to %(default)s)")
   parser.add_argument("-v", "--verbose", dest="verbose", default=False,
       action='store_true', help="enable verbose output")
-  parser.add_argument("database", metavar='DATABASE', type=str, nargs='+',
-      help="names of databases to download")
-  parser.add_argument("-t", "--try-update", dest="tryupdate", default=False,
+  parser.add_argument("-t", "--try", dest="only_try", default=False,
       action='store_true', 
       help="if set, does not raise errors in case the update fails")
 
   args = parser.parse_args()
 
-  for db in args.database: 
-    try:
-      download(db, args.server, args.version, args.destination, args.verbose)
-    except Exception, e:
-      if args.tryupdate: 
-        if args.verbose: print "[!] Ignoring failure downloading database '%s' from URL '%s': %s" % (db, os.path.join(args.server, args.version), e)
+  if not args.destination: args.destination=os.curdir
+  args.destination = os.path.realpath(args.destination)
+  
+  baseurl = '/'.join((args.server.strip('/'), args.version.strip('/')))
+
+  try:
+
+    databases = list_apache_dir(baseurl, args.verbose)
+
+    if not databases:
+      raise IOError, "Could not retrieve directory listing for %s" % baseurl
+
+    if args.verbose:
+      maxname = max([len(k[0]) for k in databases])
+      maxsize = max([len(k[1]) for k in databases])
+      x = "[!] - %%%ds %%%ds (%%s)" % (maxname, maxsize)
+      print "[!] Found databases:"
+      for k in databases: print x % k
+
+    for db in databases:
+      url = '/'.join((baseurl, db[0]))
+      download(url, args.destination, args.verbose)
+
+  except Exception, e:
+      if args.only_try: 
+        if args.verbose: print "[!] Ignoring failure downloading database '%s' from server %s (version %s): %s" % (db, args.server, args.version, e)
       else: raise #re-raise
 
   sys.exit(0)

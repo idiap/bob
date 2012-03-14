@@ -26,11 +26,11 @@ execute_process(COMMAND ${CMAKE_SOURCE_DIR}/bin/bob-version.sh OUTPUT_VARIABLE B
 set(BOB_VERSION_INTERNAL "${BOB_DISCOVERED_VERSION}" CACHE INTERNAL "The version of Bob that is currently being built")
 if(NOT BOB_VERSION)
   set(BOB_VERSION ${BOB_VERSION_INTERNAL})
+  set(BOB_DATABASE_VERSION "nightlies/last")
+else()
+  set(BOB_DATABASE_VERSION "releases/${BOB_VERSION}")
 endif()
 message(STATUS "Bob version '${BOB_VERSION}' (${BOB_PLATFORM_STR})")
-
-# TODO: This needs to be correctly set to the version supported by this build!
-set(BOB_DATABASE_VERSION "nightlies/last" CACHE STRING "Version of the databases to download")
 
 option(BOB_BUILD_CXX "Builds the C++ infrastructure." ON)
 
@@ -39,7 +39,7 @@ option(BOB_BUILD_CXX "Builds the C++ infrastructure." ON)
 # bit.
 option(BOB_BUILD_PYTHON "Builds the python bindings." ON)
 
-set(BOB_DATABASE_URL "http://www.idiap.ch/software/bob/databases/" CACHE STRING "Where to download databases from. If this variable is set empty, then we try to create the databases instead.")
+set(BOB_DATABASE_URL "http://www.idiap.ch/software/bob/databases" CACHE STRING "Where to download databases from. If this variable is set empty, then we try to create the databases instead.")
 
 # This variable can enable or disable visioner's (and dependent targets)
 # compilation

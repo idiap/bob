@@ -3,111 +3,101 @@ cmake_minimum_required(VERSION 2.6)
 
 bob_python_package_bindings(db "" "")
 
-# A macro for controlling creation, downloading and dependencies automatically
-# All tests should be dependent on the python-db-<dbname>-instantiation 
-# test (pointer) target after this macro is called for a certain database.
-macro(bob_build_db dbname)
+# Manages database copying or instantiation
+macro(bob_setup_db dbname)
 
-  # If we are supposed to create the database, create it on the install
-  # directory at an indicated global position where the databases can be used
-  # for downloading through our web server.
-  if (NOT BOB_DATABASE_URL)
-    bob_python_add_test(db-${dbname}-instantiation dbmanage.py ${dbname} create --recreate)
-  else ()
-    bob_python_add_test(db-${dbname}-instantiation dbmanage.py ${dbname} download --url=${BOB_DATABASE_URL} --version=${BOB_DATABASE_VERSION})
-  endif ()
+  if (BOB_DATABASE_URL)
+    set(sqlite_input "${CMAKE_SOURCE_DIR}/databases/${dbname}.sql3")
+    set(sqlite_output "${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob/db/${dbname}/db.sql3")
+    add_custom_target(pybob_db_${dbname}_sqlite DEPENDS ${sqlite_input} COMMAND ${CMAKE_COMMAND} -E copy_if_different ${sqlite_input} ${sqlite_output})
+    add_dependencies(pybob_db pybob_db_${dbname}_sqlite)
 
-endmacro(bob_build_db dbname)
+  else (BOB_DATABASE_URL)
+
+    # setup the database creation tests, to be executed before the other ones
+    bob_python_add_test(db-${dbname}-create dbmanage.py ${dbname} create --recreate)
+
+  endif (BOB_DATABASE_URL)
+
+endmacro(bob_setup_db dbname)
 
 # Installs our script driver
 bob_python_script(db "dbmanage.py" "lib/script/dbmanage.py" "main")
 
 # Run creation or downloading
-bob_build_db(replay)
-bob_build_db(banca)
-bob_build_db(banca_small)
-bob_build_db(biosecure)
-bob_build_db(lfw)
-bob_build_db(mobio)
-bob_build_db(multipie)
-bob_build_db(scface)
-bob_build_db(xm2vts)
+bob_setup_db(replay)
+bob_setup_db(banca)
+bob_setup_db(banca_small)
+bob_setup_db(biosecure)
+bob_setup_db(lfw)
+bob_setup_db(mobio)
+bob_setup_db(multipie)
+bob_setup_db(scface)
+bob_setup_db(xm2vts)
 
 # Iris database driver and example tests
 bob_python_add_test(db-iris-dump dbmanage.py iris dump --self-test)
 bob_python_add_test(db-iris-dump-2 dbmanage.py iris dump --class=versicolor --self-test)
 
 # Replay attack database driver tests.
-bob_python_add_dependent_test(db-replay-dumplist 
-  python-db-replay-instantiation 
+bob_python_add_dependent_test(db-replay-dumplist python-db-replay-create
   dbmanage.py replay dumplist --self-test)
 
-bob_python_add_dependent_test(db-replay-dumplist2 
-  python-db-replay-instantiation 
+bob_python_add_dependent_test(db-replay-dumplist2 python-db-replay-create
   dbmanage.py replay dumplist --class=attack --group=devel --support=hand --protocol=highdef --self-test)
 
 bob_python_add_unittest(db lib/test/replay.py)
-set_property(TEST python-db-replay-main APPEND PROPERTY DEPENDS 
-  python-db-replay-instantiation)
+set_property(TEST python-db-replay-main APPEND PROPERTY DEPENDS
+  python-db-replay-create)
 
 #bob_python_example(db "replay_example.py" lib/example/replay_example.py main)
 #bob_python_add_test(db replay_example.py)
 
 # BANCA database driver tests.
-bob_python_add_dependent_test(db-banca-dumplist 
-  python-db-banca-instantiation
+bob_python_add_dependent_test(db-banca-dumplist python-db-banca-create
   dbmanage.py banca dumplist --self-test)
 
-bob_python_add_dependent_test(db-banca-dumplist2
-  python-db-banca-instantiation
+bob_python_add_dependent_test(db-banca-dumplist2 python-db-banca-create
   dbmanage.py banca dumplist --protocol=P --classes=client --groups=g1 --purposes=enrol --self-test)
 
 # BANCA_SMALL database driver tests.
 bob_python_add_dependent_test(db-banca_small-dumplist
-  python-db-banca_small-instantiation 
+  python-db-banca_small-create
   dbmanage.py banca_small dumplist --self-test)
 
-bob_python_add_dependent_test(db-banca_small-dumplist2 
-  python-db-banca_small-instantiation
+bob_python_add_dependent_test(db-banca_small-dumplist2
+  python-db-banca_small-create
   dbmanage.py banca_small dumplist --protocol=P --classes=client --groups=g1 --purposes=enrol --self-test)
 
 # Biosecure database driver tests.
-bob_python_add_dependent_test(db-biosecure-dumplist 
-  python-db-biosecure-instantiation 
+bob_python_add_dependent_test(db-biosecure-dumplist python-db-biosecure-create
   dbmanage.py biosecure dumplist --self-test)
 
-bob_python_add_dependent_test(db-biosecure-dumplist2
-  python-db-biosecure-instantiation 
+bob_python_add_dependent_test(db-biosecure-dumplist2 python-db-biosecure-create
   dbmanage.py biosecure dumplist --protocol=ca0 --classes=client --groups=dev --purposes=enrol --self-test)
 
 # Faceverif_fl database (uses file lists).
 bob_python_add_unittest(db lib/test/faceverif_fl.py)
 
 # LFW database driver tests.
-bob_python_add_dependent_test(db-lfw-dumplist
-  python-db-lfw-instantiation 
+bob_python_add_dependent_test(db-lfw-dumplist python-db-lfw-create
   dbmanage.py lfw dumplist --self-test)
 
-bob_python_add_dependent_test(db-lfw-dumplist2
-  python-db-lfw-instantiation 
+bob_python_add_dependent_test(db-lfw-dumplist2 python-db-lfw-create
   dbmanage.py lfw dumplist --view=view1 --subset=fold1 --classes=matched --self-test)
 
 # MOBIO database driver tests.
-bob_python_add_dependent_test(db-mobio-dumplist 
-  python-db-mobio-instantiation 
+bob_python_add_dependent_test(db-mobio-dumplist python-db-mobio-create
   dbmanage.py mobio dumplist --self-test)
 
-bob_python_add_dependent_test(db-mobio-dumplist2 
-  python-db-mobio-instantiation 
+bob_python_add_dependent_test(db-mobio-dumplist2 python-db-mobio-create
   dbmanage.py mobio dumplist --protocol=male --classes=client --groups=dev --purposes=enrol --self-test)
 
 # Multi-PIE database driver tests.
-bob_python_add_dependent_test(db-multipie-dumplist 
-  python-db-multipie-instantiation 
+bob_python_add_dependent_test(db-multipie-dumplist python-db-multipie-create
   dbmanage.py multipie dumplist --self-test)
 
-bob_python_add_dependent_test(db-multipie-dumplist2 
-  python-db-multipie-instantiation 
+bob_python_add_dependent_test(db-multipie-dumplist2 python-db-multipie-create
   dbmanage.py multipie dumplist --protocol=M --classes=client --groups=dev --purposes=enrol --self-test)
 
 # Nuaa database driver tests.
@@ -117,21 +107,17 @@ bob_python_add_unittest(db lib/test/nuaa.py main)
 bob_python_add_unittest(db lib/test/casia_fasd.py main)
 
 # SCface database driver tests.
-bob_python_add_dependent_test(db-scface-dumplist 
-  python-db-scface-instantiation 
+bob_python_add_dependent_test(db-scface-dumplist python-db-scface-create
   dbmanage.py scface dumplist --self-test)
 
-bob_python_add_dependent_test(db-scface-dumplist2 
-  python-db-scface-instantiation 
+bob_python_add_dependent_test(db-scface-dumplist2 python-db-scface-create
   dbmanage.py scface dumplist --protocol=combined --classes=client --groups=dev --purposes=enrol --self-test)
 
 # XM2VTS database driver tests.
-bob_python_add_dependent_test(db-xm2vts-dumplist 
-  python-db-xm2vts-instantiation 
+bob_python_add_dependent_test(db-xm2vts-dumplist python-db-xm2vts-create
   dbmanage.py xm2vts dumplist --self-test)
 
-bob_python_add_dependent_test(db-xm2vts-dumplist2 
-  python-db-xm2vts-instantiation 
+bob_python_add_dependent_test(db-xm2vts-dumplist2 python-db-xm2vts-create
   dbmanage.py xm2vts dumplist --protocol=lp1 --classes=client --groups=dev --purposes=enrol --self-test)
 
 # Our examples (run and install)

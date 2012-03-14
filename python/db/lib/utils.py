@@ -180,11 +180,11 @@ def copyfrom(options):
 
 def copyfrom_command(subparsers):
   
-  parser = subparsers.add_parser('copyfrom', help=copy.__doc__)
+  parser = subparsers.add_parser('copyfrom', help=copyfrom.__doc__)
   parser.add_argument('--verbose', dest="verbose", default=False,
       action='store_true', help="produces more output while copying")
   parser.add_argument('directory', help="sets the directory to which the database will be copied from", nargs=1)
-  parser.set_defaults(func=copy)
+  parser.set_defaults(func=copyfrom)
 
   return parser
 

@@ -455,8 +455,7 @@ macro(bob_python_bindings cxx_package package cxx_src pydependencies)
   endif()
 
   if(NOT TARGET pybob_compile_python_files)
-    add_custom_target(pybob_compile_python_files ALL
-                      COMMAND ${PYTHON_EXECUTABLE} -m compileall -q "${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob")
+    add_custom_target(pybob_compile_python_files ALL COMMAND ${PYTHON_EXECUTABLE} -m compileall -q "${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob")
   endif()
 
   add_dependencies(pybob_compile_python_files pybob_${package})
