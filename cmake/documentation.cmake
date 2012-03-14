@@ -33,17 +33,17 @@ if(SPHINX_EXECUTABLE)
   configure_file(${CMAKE_SOURCE_DIR}/conf.py.in ${CMAKE_CURRENT_BINARY_DIR}/conf.py)
 
   add_custom_target(sphinx
-    COMMAND ${SPHINX_EXECUTABLE} -c ${CMAKE_BINARY_DIR} -b html ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/html
+    COMMAND ${SPHINX_EXECUTABLE} -c ${CMAKE_BINARY_DIR} -b html -E ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/html
     COMMENT "Generating (html) User Guide with Sphinx" VERBATIM
   )
 
   add_custom_target(sphinx-latex 
-    COMMAND ${SPHINX_EXECUTABLE} -c ${CMAKE_BINARY_DIR} -b latex ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/latex 
+    COMMAND ${SPHINX_EXECUTABLE} -c ${CMAKE_BINARY_DIR} -b latex -E ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/latex 
     COMMENT "Generating (LaTeX2e) User Guide with Sphinx" VERBATIM
   )
 
   add_custom_target(sphinx-coverage 
-    COMMAND ${SPHINX_EXECUTABLE} -c ${CMAKE_BINARY_DIR} -b coverage ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/coverage 
+    COMMAND ${SPHINX_EXECUTABLE} -c ${CMAKE_BINARY_DIR} -b coverage -E ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/coverage 
     COMMENT "Generating (coverage) report with Sphinx" VERBATIM
   )
 
