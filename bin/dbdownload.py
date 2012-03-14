@@ -173,7 +173,7 @@ def download(dbname, server, version, destdir, verbose):
     etag = open(destination + '.etag', 'rt').read().strip()
 
   if verbose:
-    print "Requesting %s" % (url,)
+    print "[?] Requesting %s" % (url,)
 
   # Fetch the data, if not already up-to-date
   data = fetch(url, etag=etag)
@@ -184,22 +184,22 @@ def download(dbname, server, version, destdir, verbose):
     output.close()
 
     if verbose:
-      print "Gzip Compression: %s" % data['gzip']
-      print "Database Size: %d bytes" % len(data['data'])
-      print "Last Modification: %s" % data['lastmodified']
-      print "Saved at: %s" % destination
+      print "    Gzip Compression: %s" % data['gzip']
+      print "    Database Size: %d bytes" % len(data['data'])
+      print "    Last Modification: %s" % data['lastmodified']
+      print "    Saved at: %s" % destination
 
     if data['etag']:
       if verbose:
-        print "E-Tag: %s" % data['etag']
+        print "    E-Tag: %s" % data['etag']
       etag_file = open(destination + '.etag', 'wt')
       etag_file.write(data['etag'])
       etag_file.close()
-      print "E-Tag cached: %s" % (destination + '.etag',)
+      print "    E-Tag cached: %s" % (destination + '.etag',)
 
   elif data['status'] == 304: #etag matches
     if verbose:
-      print "Currently installed version is up-to-date (did not re-download)"
+      print "    Currently installed version is up-to-date (did not re-download)"
 
   else:
     raise IOError, "Failed download of %s (status: %d)" % (url, data['status'])
@@ -222,11 +222,21 @@ def main():
       action='store_true', help="enable verbose output")
   parser.add_argument("database", metavar='DATABASE', type=str, nargs='+',
       help="names of databases to download")
+  parser.add_argument("-t", "--try-update", dest="tryupdate", default=False,
+      action='store_true', 
+      help="if set, does not raise errors in case the update fails")
 
   args = parser.parse_args()
 
   for db in args.database: 
-    download(db, args.server, args.version, args.destination, args.verbose)
+    try:
+      download(db, args.server, args.version, args.destination, args.verbose)
+    except Exception, e:
+      if args.tryupdate: 
+        if args.verbose: print "[!] Ignoring failure downloading database '%s' from URL '%s': %s" % (db, os.path.join(args.server, args.version), e)
+      else: raise #re-raise
+
+  sys.exit(0)
 
 if __name__ == '__main__':
   main()

@@ -162,6 +162,32 @@ def location_command(subparsers):
 
   return parser
 
+def copyfrom(options):
+  """Copies the database from a given directory."""
+
+  import shutil
+  src = os.path.join(options.directory[0], options.dbname + '.sql3')
+  dest = options.location.replace('sqlite:///','')
+  if not os.path.exists(os.path.dirname(dest)):
+    if options.verbose: 
+      print "Creating directory '%s'..." % os.path.dirname(dest)
+    makedirs_safe(os.path.dirname(dest))
+  if os.path.exists(dest):
+    if options.verbose: print "Removing existing copy '%s'..." % dest
+    os.unlink(dest)
+  if options.verbose: print "Copying %s -> %s" % (src, dest)
+  shutil.copy2(src, dest)
+
+def copyfrom_command(subparsers):
+  
+  parser = subparsers.add_parser('copyfrom', help=copy.__doc__)
+  parser.add_argument('--verbose', dest="verbose", default=False,
+      action='store_true', help="produces more output while copying")
+  parser.add_argument('directory', help="sets the directory to which the database will be copied from", nargs=1)
+  parser.set_defaults(func=copy)
+
+  return parser
+
 def copy(options):
   """Copies the database to a given directory."""
 
@@ -180,7 +206,7 @@ def copy_command(subparsers):
   
   parser = subparsers.add_parser('copy', help=copy.__doc__)
   parser.add_argument('--verbose', dest="verbose", default=False,
-      action='store_true', help="produces more output while downloading")
+      action='store_true', help="produces more output while copying")
   parser.add_argument('directory', help="sets the directory to which the database will be copied to", nargs=1)
   parser.set_defaults(func=copy)
 
@@ -193,6 +219,7 @@ def standard_commands(subparsers):
   download_command(subparsers)
   location_command(subparsers)
   copy_command(subparsers)
+  copyfrom_command(subparsers)
 
 def makedirs_safe(fulldir):
   """Creates a directory if it does not exists, with concurrent access support"""

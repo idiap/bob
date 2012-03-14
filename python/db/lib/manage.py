@@ -27,6 +27,14 @@ def location_all(args):
     parsed.with_protocol = args.with_protocol
     parsed.func(parsed)
 
+def copyfrom_all(args):
+  """Executes all the copyfrom commands from individual databases"""
+  
+  for name, module in args.modules:
+    parsed = args.parser.parse_args([name, 'copyfrom', args.directory[0]])
+    parsed.verbose = args.verbose
+    parsed.func(parsed)
+
 def copy_all(args):
   """Executes all the copy commands from individual databases"""
   
@@ -57,11 +65,11 @@ def add_all_commands(parser, top_subparser, modules):
   attach the options from those.
   """
 
-  from .utils import download_command, location_command, copy_command
+  from .utils import download_command, location_command, copy_command, copyfrom_command
 
   # creates a top-level parser for this database
   top_level = top_subparser.add_parser('all',
-      help="Drive commands to all (above) databases in one shot", 
+      help="Drive commands to all (above) databases in one shot",
       description="Using this special database you can command the execution of available commands to all other databases at the same time.")
 
   # declare it has subparsers for each of the supported commands
@@ -81,6 +89,11 @@ def add_all_commands(parser, top_subparser, modules):
   copy_parser.set_defaults(func=copy_all)
   copy_parser.set_defaults(parser=parser)
   copy_parser.set_defaults(modules=modules)
+
+  copyfrom_parser = copyfrom_command(subparsers)
+  copyfrom_parser.set_defaults(func=copyfrom_all)
+  copyfrom_parser.set_defaults(parser=parser)
+  copyfrom_parser.set_defaults(modules=modules)
 
   create_parser = subparsers.add_parser('create',
       help="create all databases with default settings")

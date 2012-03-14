@@ -7,7 +7,7 @@ bob_python_package_bindings(db "" "")
 # All tests should be dependent on the python-db-<dbname>-instantiation 
 # test (pointer) target after this macro is called for a certain database.
 macro(bob_build_db dbname)
-  
+
   # If we are supposed to create the database, create it on the install
   # directory at an indicated global position where the databases can be used
   # for downloading through our web server.
