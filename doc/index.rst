@@ -47,14 +47,31 @@ Practicalities
    BobTicketReporting
    BobHistory
 
-User Guide
-----------
+
+Overview
+--------
+
+.. toctree::
+   :maxdepth: 2
+
+   Overview
+
+
+Tutorials
+---------
+
+.. toctree::
+   :maxdepth: 2
+
+   Tutorials
+
+Reference Guide
+---------------
 
 .. toctree::
    :maxdepth: 2
 
    ../python/doc/index
-   ../cxx/doc/index
 
 Developer's Guide
 -----------------
@@ -62,6 +79,7 @@ Developer's Guide
 .. toctree::
    :maxdepth: 2
 
+   ../cxx/doc/index
    CxxDevelopment
    GoldenRules
    CodingGuidelines
