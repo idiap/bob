@@ -44,7 +44,7 @@ machines: a ``LinearMachine``.
 LinearMachine
 -------------
 
-This machine executes the simple operation :math:`y = W \cdot x`, where `y` is
+This machine executes the simple operation :math:`y = \mathbf{W} x`, where `y` is
 the output vector, `x`, the input vector and `W` a matrix (2D array), stored
 inside the machine. The input vector `x` should be composed of double-precision
 floating-point elements. The output will also be in double-precision. Here is
@@ -59,7 +59,7 @@ how to use a `LinearMachine`:
   >>> machine = bob.machine.LinearMachine(W)
   >>> machine.shape
   (2, 2)
-  >>> x = [0.3, 0.4]
+  >>> x = numpy.array([0.3, 0.4], 'float64')
   >>> y = machine(x)
   >>> y
   array([ 0.55,  0.55])
