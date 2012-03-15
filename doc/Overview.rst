@@ -52,6 +52,7 @@ We designed and released |project| for the following main reasons:
 |project| currently supports **Linux** and **Mac OS X** operating systems and provides the following features:
 
 .. image:: img/overview_features.png
+   :scale: 70 %
 
 Python and C++ APIs
 ===================
