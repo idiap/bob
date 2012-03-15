@@ -71,6 +71,7 @@ Tutorials
    TutorialsIP
    TutorialsMachine
    TutorialsTrainer
+   TutorialsDatabase
 
 Reference Guide
 ---------------
