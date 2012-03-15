@@ -305,8 +305,7 @@ that it matches the matrix convention as well.
 number of color planes, the second dimension the height and the third the 
 width. As an image is an array, this is the responsibility of the user to know
 in which color space the content is stored. |project| provides functions to 
-perform colorspace conversion (cf. this `tutorial`_ about the image processing
-submodule of |project|).
+perform colorspace conversion (cf. the :doc:`TutorialsIP` tutorial).
 
 Videos
 ~~~~~~
@@ -331,4 +330,3 @@ and the second one to the wave magnitude.
 .. _user guide: http://docs.scipy.org/doc/numpy/user/
 .. _matlab: http://www.mathworks.ch/products/matlab/
 .. _page: http://www.scipy.org/NumPy_for_Matlab_Users page
-.. _tutorial: TutorialsIP.rst
