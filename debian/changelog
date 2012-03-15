@@ -1,6 +1,7 @@
 bob (1.0alpha1-0ubuntu7) precise; urgency=low
 
   * Documentation fixes
+  * CMake md5 fixes
 
  -- Biometrics Group <biometric@idiap.ch>  Tue, 06 Mar 2012 17:41:32 +0100
 
