@@ -139,15 +139,23 @@ drawned, for debugging purposes.
 Reference Manual
 ----------------
 
-.. autodata:: bob.visioner.DEFAULT_CMODEL
-.. autodata:: bob.visioner.DEFAULT_LMODEL_EC
-.. autodata:: bob.visioner.DEFAULT_LMODEL_MP
-.. autoclass:: bob.visioner.MaxDetector
-  :members:
-  :undoc-members:
-.. autoclass:: bob.visioner.Detector
-  :members:
-  :undoc-members:
-.. autoclass:: bob.visioner.Localizer
-  :members:
-  :undoc-members:
+.. ifconfig:: 'visioner' in bob_modules
+
+  .. autodata:: bob.visioner.DEFAULT_CMODEL
+  .. autodata:: bob.visioner.DEFAULT_LMODEL_EC
+  .. autodata:: bob.visioner.DEFAULT_LMODEL_MP
+  .. autoclass:: bob.visioner.MaxDetector
+    :members:
+    :undoc-members:
+  .. autoclass:: bob.visioner.Detector
+    :members:
+    :undoc-members:
+  .. autoclass:: bob.visioner.Localizer
+    :members:
+    :undoc-members:
+
+.. ifconfig:: 'visioner' not in bob_modules
+
+  The ``visioner`` extension was not compiled with this version of |project|.
+  We are currently working to incorporate its functionality into the core of
+  |project|, including its boosting framework. Stay tunned!

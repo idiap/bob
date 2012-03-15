@@ -264,5 +264,9 @@ def skip_member(app, what, name, obj, skip, options):
 
   return False
 
+# Used to filter some documentation in/out
+bob_modules = dir(__import__('bob'))
+
 def setup(app):
   app.connect('autodoc-skip-member', skip_member)
+  app.add_config_value('bob_modules', bob_modules, True)
