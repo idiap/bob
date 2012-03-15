@@ -16,6 +16,35 @@
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+**************
+ Introduction
+**************
+
+|project| is a signal-processing and machine learning toolbox for Biometrics
+developed at the `Idiap`_ Research Institute, in Switzerland. 
+
+
+*************
+ Motivations
+*************
+
+We designed and released |project| for the following main reasons:
+
+* Need of a software platform where stable algorithms and common tools used for research purposes can be put at.
+
+* Thoroughly tested at every minor change: correctness above speed
+
+* Easy way to reproduce published results
+
+* Environment that allows fast pace development, with throw-away prototypes
+
+* Ability to implement fast versions (in `C++`_) of identified bottlenecks
+
+* Re-use existing open-source packages and standards
+
+* Open source (`GPL-3.0`_) with hopes it is useful to others. (For more information on licensing, please visit our :doc:`BobLicensing`)
+
+
 **********
  Features
 **********
@@ -108,6 +137,7 @@ well as the generation of ROC, DET or EPC curves.
 
 .. Place here your external references
 
+.. _idiap: http://www.idiap.ch
 .. _python: http://www.python.org
 .. _c++: http://www2.research.att.com/~bs/C++.html
 .. _GPL-3.0: http://www.opensource.org/licenses/GPL-3.0

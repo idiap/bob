@@ -55,9 +55,7 @@ Overview
 .. toctree::
    :maxdepth: 2
 
-   OverviewIntro
-   OverviewMotivations
-   OverviewFeatures
+   Overview
 
 
 Tutorials
