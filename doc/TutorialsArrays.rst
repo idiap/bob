@@ -35,9 +35,9 @@ selected for this library. Furtherore, we have decided to rely on existing
 Numpy basics
 ============
 
-A `NumPy`_ array is a table of elements, all of the same type, indexed by a tuple 
-of positive integers. Before using any of the functionalities described below, 
-`NumPy`_ should be imported in the `Python`_ environment.
+A `NumPy`_ array is a table of elements, all of the same type, indexed by a 
+tuple of positive integers. Before using any of the functionalities described
+below, `NumPy`_ should be imported in the `Python`_ environment.
 
 .. doctest::
 
@@ -47,8 +47,8 @@ of positive integers. Before using any of the functionalities described below,
 Array creation
 ~~~~~~~~~~~~~~
 
-There are different ways to create `NumPy`_ arrays. For instance,
-to create an array with initialized content:
+There are different ways to create `NumPy`_ arrays. For instance, to create an
+array with initialized content:
 
 .. testsetup:: *
 
@@ -72,9 +72,9 @@ It is also possible just to allocate the array in memory.
    [[ 7. 7. 7. 7.]
     [ 7. 7. 7. 7.]]
 
-In both previous cases, `NumPy`_ creates an instance of the class **ndarray**, which
-is also known by the alias **array**. The most important attributes of an **ndarray**
-object are:
+In both previous cases, `NumPy`_ creates an instance of the class **ndarray**,
+which is also known by the alias **array**. The most important attributes of 
+an **ndarray** object are:
 
 * ndarray.ndim: the number of dimensions of the array.
 
@@ -83,16 +83,17 @@ object are:
 * ndarray.dtype: an object describing the type of the elements in the array.
 
 
-Array indexing
-~~~~~~~~~~~~~~
+Accessing array elements
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-The operator [] allows to index the elements of the array. Please
-note that the first index is 0.
+The operator [] allows to index the elements of an array. Please note that 
+the indices start at 0.
 
 .. doctest::
 
-   >>> print B[0,1]
-   7.0
+   >>> A = numpy.array([[1,2,3,4],[5,6,7,8]]) # Creates a 2D array with initialized values
+   >>> print A[0,1]
+   2
 
 It is also possible to iterate over an array. In the case of a 
 multi-dimensional array, this is done with respect to the first dimension.
@@ -100,9 +101,9 @@ multi-dimensional array, this is done with respect to the first dimension.
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
 
-   >>> for row in B: print row
-   [ 7. 7. 7. 7.]
-   [ 7. 7. 7. 7.]
+   >>> for row in A: print row
+   [1 2 3 4]
+   [5 6 7 8]
 
 
 Array type
@@ -117,8 +118,8 @@ The type of the elements of an array can be specified at the creation time.
    float64
 
 
-If we would like to cast the elements of an array to another type, 
-`NumPy`_ provides the **astype()** function.
+If we would like to cast the elements of an array to another type, `NumPy`_ 
+provides the **astype()** function.
 
 .. doctest::
 
@@ -127,11 +128,33 @@ If we would like to cast the elements of an array to another type,
    uint8
 
 
+Array shape
+~~~~~~~~~~~
+
+`NumPy`_ provides several features to reshape or stack arrays, such as the
+**reshape()**, **hstack()** and **vstack()** functions.
+
+.. doctest::
+
+   >>> E = D.reshape((1,4))
+   >>> print E.shape
+   (1, 4)
+   >>> a = numpy.array( [1,2], dtype='uint8' )
+   >>> b = numpy.array( [3,4], dtype='uint8' )
+   >>> F = numpy.vstack((a,b))
+   >>> print F
+   [[1 2]
+    [3 4]]
+   >>> G = numpy.hstack((a,b))
+   >>> print G
+   [1 2 3 4]
+
+
 Mathematical operations
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-`NumPy`_ provides numerous mathematical operations. Most of them are performed
-**elementwise**. For instance,
+`NumPy`_ also provides numerous mathematical operations. Most of them are 
+performed **elementwise**. For instance,
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -148,14 +171,28 @@ Mathematical operations
    >>> print e
    [ 2.71828183 7.3890561 20.08553692 54.59815003]
 
+
 `NumPy`_ also provides reduction operations.
+
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
    
    >>> print a.sum()
-   12
+   10
    >>> print a.max()
    4
+
+Partial reductions along a specific dimension are also possible.
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+   
+   >>> A = numpy.array([[1,2,3,4],[5,6,7,8]]) # Creates a 2D array with initialized values
+   >>> print A.sum(axis=0)
+   [ 6 8 10 12]
+   >>> print A.max(axis=1)
+   [4 8]
+
 
 
 Assignment, shallow and deep copy
@@ -172,8 +209,10 @@ at the assignment operator =.
    >>> print b is a # a and b are two names for the same ndarray object
    True
 
-In contrast, the **view()** method creates a new `NumPy`_ array object that 
-points to the same memory block. This is known as a shallow copy.
+Furthermore, the assignment operator only creates an alias to the same 
+**ndarray** object. In contrast, the **view()** method creates a new 
+`NumPy`_ array object that points to the same memory block. This is known as a
+shallow copy.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -186,8 +225,7 @@ points to the same memory block. This is known as a shallow copy.
    [1 2 7 4]
 
 In a similar way, an ndarray might be slice, and in this case, the data are 
-still shared
-
+still shared between the two **ndarray** instances.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -201,7 +239,21 @@ still shared
    >>> print a
    [0 2 7 4]
 
-For a more exhaustive introduction, please consider the ...
+If we would like to do a deep copy(), we could use the `NumPy`_ **copy()**
+function.
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+
+   >>> e = a.copy() # e is a complete copy of a
+   >>> e[0] = 7
+   >>> print a
+   [0 2 7 4]
+
+For a more exhaustive introduction about `NumPy`_, please have a look at its 
+`user guide`_. For `matlab`_ users, this `page`_ might also be of 
+interest.
+
 
 Signals as multi-dimensional arrays
 ===================================
@@ -212,3 +264,6 @@ Signals as multi-dimensional arrays
 
 .. _python: http://www.python.org
 .. _numpy: http://numpy.scipy.org
+.. _user guide: http://docs.scipy.org/doc/numpy/user/
+.. _matlab: http://www.mathworks.ch/products/matlab/
+.. _page: http://www.scipy.org/NumPy_for_Matlab_Users page
