@@ -44,7 +44,7 @@ machines: a ``LinearMachine``.
 LinearMachine
 -------------
 
-This machine executes the simple operation :math:`y = x \cdot W`, where `y` is
+This machine executes the simple operation :math:`y = \mathbf{W} x`, where `y` is
 the output vector, `x`, the input vector and `W` a matrix (2D array), stored
 inside the machine. The input vector `x` should be composed of double-precision
 floating-point elements. The output will also be in double-precision. Here is
@@ -59,10 +59,13 @@ how to use a `LinearMachine`:
   >>> machine = bob.machine.LinearMachine(W)
   >>> machine.shape
   (2, 2)
-  >>> x = [0.3, 0.4]
+  >>> x = numpy.array([0.3, 0.4], 'float64')
   >>> y = machine(x)
   >>> y
   array([ 0.55,  0.55])
+
+As it was shown, the way to pass data through a machine is to call its ``()``
+operator.
 
 The first thing to notice about machines is that they can be stored and
 retrieved in HDF5 files (for more details in manipulating HDF5 files, please
@@ -86,6 +89,49 @@ You can load the machine again in a similar way:
   >>> reloaded = bob.machine.LinearMachine(myh5_file)
   >>> numpy.array_equal(machine.weights, reloaded.weights)
   True
+
+.. note::
+
+  In the event you save a machine that has the subtraction and/or a division
+  factor set, the vectors are saved and restored automatically w/o user
+  intervention.
+
+The shape of a ``LinearMachine`` indicates the size of the input vector that is
+expected by this machine and the size of the output vector it produces, in a
+tuple formatted like ``(input-size, output-size)``:
+
+.. doctest::
+
+  >>> machine.shape
+  (2, 2)
+
+The ``LinearMachine`` also supports pre-setting normalization vectors that are
+applied to every input `x`. You can set a subtraction factor and a division
+factor, so that the actual input `x'` that is fed to the matrix `W` is 
+:math:`x' = (x .- S) ./ D`. `S` and `D` are vectors that have to have the same
+size as the input vector `x`. The operations `.-` and `./` indicate
+element-wise subtraction and division respectively. By default, 
+:math:`S := 0.0` and :math:`D := 1.0`.
+
+.. doctest::
+
+  >>> machine.input_subtract
+  array([ 0.,  0.])
+  >>> machine.input_divide
+  array([ 1.,  1.])
+
+To set a new value, just assign to the machine property:
+
+.. doctest::
+
+  >>> machine.input_subtract = numpy.array([0.5, 0.8])
+  >>> machine.input_divide = numpy.array([2.0, 4.0])
+  >>> y = machine(x)
+  >>> y
+  array([-0.15, -0.15])
+
+You will find interesting ways to train ``LinearMachines`` so they can do
+something useful to you at :doc:`TutorialsTrainer`.
 
 MLP
 ---
