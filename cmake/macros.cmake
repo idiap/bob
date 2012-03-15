@@ -161,6 +161,7 @@ macro(bob_wrap_python_file package_name file_path output_path python_method file
       set(md5 "")
     else()
       string(MD5 md5 ${output_path})
+      set(md5 "${md5}/")
     endif()
 
     set(BOB_MODULE ${module_name})
@@ -190,7 +191,7 @@ macro(bob_wrap_python_file package_name file_path output_path python_method file
 
     set(BOB_PYTHONPATH ${ABSOLUTE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION})
 
-    set(${file_to_install} ${CMAKE_BINARY_DIR}/tmp/${filename}${md5})
+    set(${file_to_install} ${CMAKE_BINARY_DIR}/tmp/${md5}${filename})
     configure_file(${CMAKE_SOURCE_DIR}/python/bin/wrapper.py.in ${${file_to_install}})
 
   endif()
