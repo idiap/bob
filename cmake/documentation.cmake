@@ -39,7 +39,7 @@ if(SPHINX_EXECUTABLE)
 
   add_custom_target(sphinx-doctest
     COMMAND ${SPHINX_EXECUTABLE} -c ${CMAKE_BINARY_DIR} -b doctest -E ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/html
-    COMMENT "Running (doctest) with Sphinx" VERBATIM
+    COMMENT "Running doctests with Sphinx" VERBATIM
   )
 
   add_custom_target(sphinx-latex 
