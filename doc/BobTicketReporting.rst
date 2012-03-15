@@ -112,5 +112,5 @@ A few things to note:
 
 .. _Eric Raymond's How To Ask Questions The Smart Way: http://www.catb.org/~esr/faqs/smart-questions.html
 .. _Simon Tatham's How to Report Bugs Effectively: http://www.chiark.greenend.org.uk/~sgtatham/bugs.html
-.. _search: https://www.idiap.ch/software/bob/search
-.. _new ticket: https://www.idiap.ch/software/bob/newticket
+.. _search: https://github.com/idiap/bob/issues
+.. _new ticket: https://github.com/idiap/bob/issues
