@@ -59,8 +59,8 @@ should also install the development files:
 Mac OSX
 -------
 
-We provide a Portfile repository that contains the description of |bob|. To use
-it, you first have to install `MacPorts`_ as explained on their home page. 
+We provide a Portfile repository that contains the description of |project|. To
+use it, you first have to install `MacPorts`_ as explained on their home page.
 Then, edit your ``/opt/local/etc/macports/sources.conf`` file to contain our
 ports repository ``rsync://www.idiap.ch/software/bob/ports`` by inserting an
 entry **before** the last entry in that file like this:

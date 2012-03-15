@@ -398,8 +398,6 @@ To checkout |project|, do the following at your shell prompt:
 
    $ git clone https://github.com/idiap/bob
 
-.. _section-compilation:
-
 Compiling the code
 ------------------
 
