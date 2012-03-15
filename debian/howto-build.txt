@@ -7,7 +7,7 @@ $ debuild -us -uc -b
 This will only quickly build the binary package as a test. To build all
 packages, including the source package, do the following:
 
-$ debuild --no-tgz-check -kA2170D5D -I.git -I.gitignore -I.gitmodules 
+$ debuild --no-tgz-check -kA2170D5D -I.git -I.gitignore -I.gitmodules -Icxx/visioner/* -S
 
 To only build the source package (for a PPA upload for instance). Replace the
 "-kValue" by your own PPA key identifier (can be obtained with the command
