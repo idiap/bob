@@ -255,10 +255,74 @@ For a more exhaustive introduction about `NumPy`_, please have a look at its
 interest.
 
 
-Signals as multi-dimensional arrays
-===================================
+Digital signals as multi-dimensional arrays
+===========================================
 
-* Images/Videos/Audio sequences as numpy array
+For |project|, we have decided to represent digital signals directly as 
+`NumPy`_ arrays, rather than having dedicated classes for each type of 
+signals. This implies that some convention has been defined.
+
+
+Vectors and matrices
+~~~~~~~~~~~~~~~~~~~~
+
+A vector is represented as a 1D `NumPy`_ array, whereas a matrix is 
+represented by a 2D arrays whose first dimension corresponds to the rows, and
+second dimension to the columns.
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+
+   >>> A = numpy.array([[1, 2, 3], [4, 5, 6]], dtype='uint8') # A is a matrix 2x3
+   >>> print A
+   [[1 2 3]
+    [4 5 6]]
+   >>> b = numpy.array([1, 2, 3], dtype='uint8') # b is a vector of length 3
+   >>> print b
+   [1 2 3]
+
+Images
+~~~~~~
+
+**Grayscale** images are represented as 2D arrays, the first dimension being the
+height (number of rows) and the second dimension being the witdh (number of 
+columns).
+
+For instance,
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+
+   >>> img = numpy.ndarray((480,640), dtype='uint8')
+
+**img** which is a 2D array can be seen as a grayscale image of dimension
+640 (width) by 480 (height). In addition, **img** can be seen as a matrix
+with 480 rows and 640 columns. This is the reason why we have decided that for
+images, the first dimension is the height and the second one the width, such
+that it matches the matrix convention as well.
+
+**Color** images are represented as 3D arrays, the first dimension being the 
+number of color planes, the second dimension the height and the third the 
+width. As an image is an array, this is the responsibility of the user to know
+in which color space the content is stored. |project| provides functions to 
+perform colorspace conversion (cf. this `tutorial`_ about the image processing
+submodule of |project|).
+
+Videos
+~~~~~~
+
+A video can be seen as a sequence of images over time. By convention, the 
+first dimension is for the frame indices (time index), whereas the remaining 
+ones are related to the corresponding image frame.
+
+Audio signal
+~~~~~~~~~~~~
+
+|project| does not yet support audio files (No wav or mp3 codec). However, it 
+is still possible to convert such a signal into e.g. HDF5, and then to read 
+and process it with |project|. In this case, a mono audio signal would be 
+represented as a 2D array, the first dimension corresponding to the time index 
+and the second one to the wave magnitude.
 
 .. Place here your external references
 
@@ -267,3 +331,4 @@ Signals as multi-dimensional arrays
 .. _user guide: http://docs.scipy.org/doc/numpy/user/
 .. _matlab: http://www.mathworks.ch/products/matlab/
 .. _page: http://www.scipy.org/NumPy_for_Matlab_Users page
+.. _tutorial: TutorialsIP.rst
