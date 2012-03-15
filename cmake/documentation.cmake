@@ -37,6 +37,11 @@ if(SPHINX_EXECUTABLE)
     COMMENT "Generating (html) User Guide with Sphinx" VERBATIM
   )
 
+  add_custom_target(sphinx-doctest
+    COMMAND ${SPHINX_EXECUTABLE} -c ${CMAKE_BINARY_DIR} -b doctest -E ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/html
+    COMMENT "Running (doctest) with Sphinx" VERBATIM
+  )
+
   add_custom_target(sphinx-latex 
     COMMAND ${SPHINX_EXECUTABLE} -c ${CMAKE_BINARY_DIR} -b latex -E ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/latex 
     COMMENT "Generating (LaTeX2e) User Guide with Sphinx" VERBATIM
