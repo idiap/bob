@@ -34,6 +34,12 @@ machines: a ``LinearMachine``.
 
    import numpy
    import bob
+   import tempfile
+   import os
+
+   current_directory = os.path.realpath(os.curdir)
+   temp_dir = tempfile.mkdtemp(prefix='bob_doctest_')
+   os.chdir(temp_dir)
 
 LinearMachine
 -------------
@@ -60,8 +66,26 @@ how to use a `LinearMachine`:
 
 The first thing to notice about machines is that they can be stored and
 retrieved in HDF5 files (for more details in manipulating HDF5 files, please
-consult :doc:`TutorialsIO`). To load a machine from an HDF5 file, you have to
-open it first:
+consult :doc:`TutorialsIO`). To save the beforemetioned machine to a file, just
+use the machine's ``save()`` command. Because several machines can be stored on
+the same HDF5File, we let the user open the file and set it up before the
+machine can write on it:
+
+.. doctest::
+
+  >>> myh5_file = bob.io.HDF5File('linear.hdf5')
+  >>> #do other operations on myh5_file to set it up, optionally
+  >>> machine.save(myh5_file)
+  >>> del myh5_file #close
+
+You can load the machine again in a similar way:
+
+.. doctest::
+
+  >>> myh5_file = bob.io.HDF5File('linear.hdf5')
+  >>> reloaded = bob.machine.LinearMachine(myh5_file)
+  >>> numpy.array_equal(machine.weights, reloaded.weights)
+  True
 
 MLP
 ---
@@ -74,6 +98,12 @@ GaussianMachine
 
 GMMMachine
 ----------
+
+.. testcleanup:: *
+
+  import shutil
+  os.chdir(current_directory)
+  shutil.rmtree(temp_dir)
 
 .. Place here your external references
 
