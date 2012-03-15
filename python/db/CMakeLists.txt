@@ -3,26 +3,19 @@ cmake_minimum_required(VERSION 2.6)
 
 bob_python_package_bindings(db "" "")
 
-# Manages database copying or instantiation
+# Manages database copying
 macro(bob_setup_db dbname)
 
   if (BOB_DATABASE_URL)
+
     set(sqlite_input "${CMAKE_SOURCE_DIR}/databases/${dbname}.sql3")
     set(sqlite_output "${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob/db/${dbname}/db.sql3")
     add_custom_target(pybob_db_${dbname}_sqlite DEPENDS ${sqlite_input} COMMAND ${CMAKE_COMMAND} -E copy_if_different ${sqlite_input} ${sqlite_output})
     add_dependencies(pybob_db pybob_db_${dbname}_sqlite)
 
-  else (BOB_DATABASE_URL)
-
-    # setup the database creation tests, to be executed before the other ones
-    bob_python_add_test(db-${dbname}-create dbmanage.py ${dbname} create --recreate)
-
   endif (BOB_DATABASE_URL)
 
 endmacro(bob_setup_db dbname)
-
-# Installs our script driver
-bob_python_script(db "dbmanage.py" "lib/script/dbmanage.py" "main")
 
 # Run creation or copying
 bob_setup_db(replay)
@@ -34,6 +27,9 @@ bob_setup_db(mobio)
 bob_setup_db(multipie)
 bob_setup_db(scface)
 bob_setup_db(xm2vts)
+
+# Installs our script driver
+bob_python_script(db "dbmanage.py" "lib/script/dbmanage.py" "main")
 
 # Iris database driver and example tests
 bob_python_add_test(db-iris-dump dbmanage.py iris dump --self-test)
