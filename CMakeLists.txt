@@ -34,7 +34,6 @@ else()
     set(BOB_DATABASE_VERSION "releases/${BOB_VERSION}")
   endif()
 endif()
-message(STATUS "Bob version '${BOB_VERSION}' (${BOB_PLATFORM_STR})")
 
 option(BOB_BUILD_CXX "Builds the C++ infrastructure." ON)
 
@@ -52,6 +51,9 @@ set(BOB_VISIONER_ENABLED ON "Enables visioner C++/Python compilation")
 # ---------------
 # END of options.
 # ---------------
+
+message(STATUS "Bob version '${BOB_VERSION}' (${BOB_PLATFORM_STR})")
+message(STATUS "Bob database version: '${BOB_DATABASE_VERSION}'")
 
 # Force __LP64__ scheme on Mac OSX
 if(APPLE)
