@@ -267,7 +267,7 @@ def main():
 
   except Exception, e:
       if args.only_try: 
-        if args.verbose: print "[!] Ignoring failure downloading database '%s' from server %s (version %s): %s" % (db, args.server, args.version, e)
+        if args.verbose: print "[!] Ignoring failure downloading databases from server %s (version %s): %s" % (args.server, args.version, e)
       else: raise #re-raise
 
   sys.exit(0)
