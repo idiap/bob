@@ -44,6 +44,7 @@ Practicalities
 
    BobLicensing
    BobInstallation
+   BobUsage
    BobTicketReporting
    BobHistory
 
@@ -87,11 +88,12 @@ Developer's Guide
 .. toctree::
    :maxdepth: 2
 
-   ../cxx/doc/index
+   BobCompilation
    CxxDevelopment
    GoldenRules
    CodingGuidelines
    OptimizingBob
+   ../cxx/doc/index
 
 Indices and tables
 ------------------

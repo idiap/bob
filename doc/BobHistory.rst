@@ -27,7 +27,7 @@ to become a completely independent project, focused primarily on tools for
 Biometrics and Forensics, Machine Learning and Signal Processing.
 
 Links to Older Versions of Torch
---------------------------------
+================================
 
 * `Torch 3`_
 * `Torch 3 Vision`_
