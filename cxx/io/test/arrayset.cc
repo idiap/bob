@@ -270,6 +270,9 @@ BOOST_AUTO_TEST_CASE( dbArrayset_loadsave_inline )
   BOOST_CHECK_THROW( db_Ar_read.add(g), std::invalid_argument );
 
   db_Ar_read.load();
+
+  // Clean-up
+  boost::filesystem::remove(tmp_file);
 }
 
 BOOST_AUTO_TEST_CASE( dbArrayset_cast_remove_inline )
@@ -413,6 +416,9 @@ BOOST_AUTO_TEST_CASE( dbArrayset_remove_external )
   check_equal(a, db_Ar[0].get<double,1>());
   check_equal(c, db_Ar[1].get<double,1>());
   check_equal(b, db_Ar[2].get<double,1>());
+
+  // Clean-up
+  boost::filesystem::remove(tmp_file);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

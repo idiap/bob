@@ -239,6 +239,9 @@ BOOST_AUTO_TEST_CASE( dbArray_creation_binaryfile )
   blitz::Array<double,1> bl_read = db_a_read.get<double,1>();
   BOOST_CHECK_EQUAL(db_a_read.isLoaded(), false);
   check_equal( a, bl_read);
+
+  // Clean-up
+  boost::filesystem::remove(tmp_file);
 }
 
 BOOST_AUTO_TEST_CASE( dbArray_transform_getload )
@@ -290,6 +293,9 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_getload )
   // Check that the 'get' array is unchanged
   blitz::Array<double,1> a_load = db_a.get<double,1>();
   check_equal( a, a_load);
+
+  // Clean-up
+  boost::filesystem::remove(tmp_file);
 }
 
 BOOST_AUTO_TEST_CASE( dbArray_transform_move )
@@ -330,6 +336,10 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_move )
   for(size_t i=0; i<db_a.getNDim(); ++i)
     BOOST_CHECK_EQUAL(db_a.getShape()[i], a.extent(i));
   check_equal( a, db_a.get<double,1>());
+
+  // Clean-up
+  boost::filesystem::remove(tmp_file);
+  boost::filesystem::remove(tmp_file2);
 }
 
 BOOST_AUTO_TEST_CASE( dbArray_cast_inline )
@@ -377,6 +387,10 @@ BOOST_AUTO_TEST_CASE( dbArray_cast_external )
   blitz::Array<uint8_t,4> g_get_uint8 = db_g.cast<uint8_t,4>();
   blitz::Array<float,4> g_get_float = db_g.cast<float,4>();
   check_equal( g_get_uint8, g_get_float);
+
+  // Clean-up
+  boost::filesystem::remove(tmp_file_a);
+  boost::filesystem::remove(tmp_file_g);
 }
 
 BOOST_AUTO_TEST_CASE( dbArray_set )
@@ -504,6 +518,9 @@ BOOST_AUTO_TEST_CASE( dbArray_copy_constructor_external )
   for(size_t i=0; i<db_a.getNDim(); ++i)
     BOOST_CHECK_EQUAL(db_a.getShape()[i], db_a_copy2.getShape()[i]);
   check_equal( db_a.get<double,1>(), db_a_copy2.get<double,1>() );
+
+  // Clean-up
+  boost::filesystem::remove(tmp_file);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

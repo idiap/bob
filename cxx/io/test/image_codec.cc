@@ -122,6 +122,9 @@ BOOST_AUTO_TEST_CASE( image_gif )
   bob::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
+
+  // Clean-up
+  boost::filesystem::remove(filename);
 }
 
 BOOST_AUTO_TEST_CASE( image_bmp )
@@ -145,6 +148,9 @@ BOOST_AUTO_TEST_CASE( image_bmp )
   bob::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
+
+  // Clean-up
+  boost::filesystem::remove(filename);
 }
 
 /*
@@ -169,6 +175,9 @@ BOOST_AUTO_TEST_CASE( image_jpg )
   bob::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
+
+  // Clean-up
+  boost::filesystem::remove(filename);
 }
 */
 
@@ -192,6 +201,9 @@ BOOST_AUTO_TEST_CASE( image_pbm )
   // Load from pbm image
   bob::io::Array db_a_read( filename);
 //  check_equal( db_a_read.get<uint8_t,2>(), a );
+
+  // Clean-up
+  boost::filesystem::remove(filename);
 }
 
 BOOST_AUTO_TEST_CASE( image_pgm )
@@ -214,6 +226,9 @@ BOOST_AUTO_TEST_CASE( image_pgm )
   // Load from pgm image
   bob::io::Array db_a_read( filename);
   check_equal( db_a_read.get<uint8_t,2>(), a );
+
+  // Clean-up
+  boost::filesystem::remove(filename);
 }
 
 BOOST_AUTO_TEST_CASE( image_png )
@@ -237,6 +252,9 @@ BOOST_AUTO_TEST_CASE( image_png )
   bob::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
+
+  // Clean-up
+  boost::filesystem::remove(filename);
 }
 
 BOOST_AUTO_TEST_CASE( image_ppm )
@@ -260,6 +278,9 @@ BOOST_AUTO_TEST_CASE( image_ppm )
   bob::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
+
+  // Clean-up
+  boost::filesystem::remove(filename);
 }
 
 BOOST_AUTO_TEST_CASE( image_tiff ) 
@@ -283,6 +304,9 @@ BOOST_AUTO_TEST_CASE( image_tiff )
   bob::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
+
+  // Clean-up
+  boost::filesystem::remove(filename);
 }
 
 /*
@@ -307,6 +331,9 @@ BOOST_AUTO_TEST_CASE( image_xcf )
   bob::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
+
+  // Clean-up
+  boost::filesystem::remove(filename);
 }
 */
 

@@ -103,6 +103,9 @@ BOOST_AUTO_TEST_CASE( tensor_2d )
   // Readd .tensor
   bob::io::Array db_a_read(filename);
   check_equal( db_a_read.get<int8_t,2>(), a);
+
+  // Clean-up
+  boost::filesystem::remove(filename);
 }
 
 BOOST_AUTO_TEST_CASE( tensor_2d_read_T5alpha )

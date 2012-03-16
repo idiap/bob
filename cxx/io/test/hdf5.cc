@@ -120,6 +120,9 @@ BOOST_AUTO_TEST_CASE( hdf5_1d_save_read )
   blitz::Array<double,1> c_read;
   c_read.reference(config.readArray<double,1>("c"));
   check_equal(c, c_read);
+
+  // Clean-up
+  boost::filesystem::remove(filename);
 }
 
 BOOST_AUTO_TEST_CASE( hdf5_2d_save_read )
@@ -135,6 +138,9 @@ BOOST_AUTO_TEST_CASE( hdf5_2d_save_read )
   blitz::Array<double,2> at_read;
   at_read.reference(config.readArray<double,2>("at"));
   check_equal(at, at_read);
+
+  // Clean-up
+  boost::filesystem::remove(filename);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

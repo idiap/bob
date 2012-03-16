@@ -136,6 +136,9 @@ BOOST_AUTO_TEST_CASE( blitz1d )
 
   check_equal_1d( a, a_read);
   in.close();
+
+  // Clean-up
+  boost::filesystem::remove(tmp_file);
 }
 
 BOOST_AUTO_TEST_CASE( blitz1d_withcast )
@@ -151,6 +154,9 @@ BOOST_AUTO_TEST_CASE( blitz1d_withcast )
   blitz::Array<double,1> c_read = in.read<double,1>();
   check_equal_1d( c, c_read);
   in.close();
+
+  // Clean-up
+  boost::filesystem::remove(tmp_file);
 }
 
 BOOST_AUTO_TEST_CASE( blitz2d )
@@ -166,6 +172,9 @@ BOOST_AUTO_TEST_CASE( blitz2d )
 
   check_equal_2d( d, d_read);
   in.close();
+
+  // Clean-up
+  boost::filesystem::remove(tmp_file);
 }
 
 BOOST_AUTO_TEST_CASE( blitz1d_inout )
@@ -186,6 +195,9 @@ BOOST_AUTO_TEST_CASE( blitz1d_inout )
   blitz::Array<double,1> a_read = inoutap.read<double,1>(0);
   check_equal_1d( a, a_read);
   inoutap.close();
+
+  // Clean-up
+  boost::filesystem::remove(tmp_file);
 }
 
 BOOST_AUTO_TEST_CASE( blitz1d_append )
@@ -208,6 +220,9 @@ BOOST_AUTO_TEST_CASE( blitz1d_append )
   blitz::Array<double,1> a_read2 = in.read<double,1>(1);
   check_equal_1d( a, a_read2);
   in.close();
+
+  // Clean-up
+  boost::filesystem::remove(tmp_file);
 }
 
 BOOST_AUTO_TEST_CASE( blitz2d_withcast )
@@ -223,6 +238,9 @@ BOOST_AUTO_TEST_CASE( blitz2d_withcast )
 
   check_equal_2d( d, d_read);
   in.close();
+
+  // Clean-up
+  boost::filesystem::remove(tmp_file);
 }
 
 BOOST_AUTO_TEST_CASE( blitz2d_directaccess )
@@ -240,6 +258,9 @@ BOOST_AUTO_TEST_CASE( blitz2d_directaccess )
   
   check_equal_2d( e, e_read);
   in.close();
+
+  // Clean-up
+  boost::filesystem::remove(tmp_file);
 }
 
 BOOST_AUTO_TEST_CASE( blitz4d_slice )
@@ -278,6 +299,10 @@ BOOST_AUTO_TEST_CASE( blitz4d_slice )
   blitz::Array<double,4> g_sliced2_read = in2.read<double,4>();
   check_equal_4d( g_sliced2, g_sliced2_read);
   in1.close();
+
+  // Clean-up
+  boost::filesystem::remove(tmp_file1);
+  boost::filesystem::remove(tmp_file2);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
