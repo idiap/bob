@@ -11,7 +11,7 @@
 # build-arch and build-indep targets  by Bill Allombert 2001
 
 # Uncomment this to turn on verbose mode.
-export DH_VERBOSE=1
+#export DH_VERBOSE=1
 
 # Turns off testing after the build
 # export DEB_BUILD_OPTIONS="nocheck"
@@ -33,7 +33,5 @@ override_dh_auto_build:
 
 override_dh_auto_install:
 	dh_auto_install
-	cmake -E copy_directory obj-$(DEB_BUILD_GNU_TYPE)/sphinx `pwd`/debian/tmp/usr/share/doc/bob/sphinx
-	cmake -E copy_directory obj-$(DEB_BUILD_GNU_TYPE)/doxygen `pwd`/debian/tmp/usr/share/doc/bob/doxygen
-	# Download databases
-	PYTHONPATH=`pwd`/debian/tmp/usr/lib/`pyversions -d` LD_LIBRARY_PATH=`pwd`/debian/tmp/usr/lib `pwd`/debian/tmp/usr/bin/dbmanage.py all download --verbose
+	DESTDIR=debian/tmp make -C obj-$(DEB_BUILD_GNU_TYPE) install-sphinx
+	DESTDIR=debian/tmp make -C obj-$(DEB_BUILD_GNU_TYPE) install-doxygen
