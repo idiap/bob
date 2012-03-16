@@ -139,7 +139,7 @@ MLP
 A multi-layer perceptron is a neural network architecture that has some
 well-defined characteristics such as a feed-forward structure [mlp-wikipedia]_.
 You can create a new MLP using one of the trainers described at
-:doc:`Trainers`. In this tutorial, we show only how to use an MLP. To
+:doc:`TutorialsTrainer`. In this tutorial, we show only how to use an MLP. To
 instantiate a new (uninitialized) ``MLP``, use the ``bob.machine.MLP`` class
 and pass a shape descriptor as a python ``tuple``. The shape parameter should
 contain the input size as the first parameter and the output size as the last
@@ -178,4 +178,4 @@ GMMMachine
 .. Place here your external references
 
 .. _numpy: http://numpy.scipy.org
-.. _[mlp-wikipedia]: http://en.wikipedia.org/wiki/Multilayer_perceptron
+.. [mlp-wikipedia] http://en.wikipedia.org/wiki/Multilayer_perceptron
