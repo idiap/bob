@@ -115,7 +115,7 @@ below.
    >>> print data
    [<Arrayset[3] float64@(3,)>, <Arrayset[3] float64@(3,)>]
    >>> [machine,eig_vals] = trainer.train(data)  # Trains the machine with the given data
-   >>> print eig_vals
+   >>> print eig_vals  # doctest: +SKIP
    [ 1.93632491 0. ]
    >>> machine.resize(3,1)  # Make the output space of dimension 1
    >>> print machine.weights  # The new weights after the training procedure
