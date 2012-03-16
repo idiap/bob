@@ -25,8 +25,16 @@ import unittest
 import math
 import numpy
 import bob
+import tempfile
 
-MACHINE = 'mlp-test.hdf5'
+
+def tempname(suffix, prefix='bobtest_'):
+  (fd, name) = tempfile.mkstemp(suffix, prefix)
+  os.close(fd)
+  os.unlink(name)
+  return name
+
+MACHINE = tempname(".hdf5")
 COMPLICATED = 'mlp-big.hdf5'
 COMPLICATED_OUTPUT = 'network.hdf5'
 COMPLICATED_NOBIAS = 'mlp-big-nobias.hdf5'
@@ -144,6 +152,7 @@ class MLPTest(unittest.TestCase):
     m.weights = weights
     m.biases = biases
 
+    # creates a file that will be used in the next test!
     m.save(bob.io.HDF5File(MACHINE))
     m2 = bob.machine.MLP(bob.io.HDF5File(MACHINE))
     
@@ -175,6 +184,7 @@ class MLPTest(unittest.TestCase):
     mlp.biases = [numpy.array([-.7])]
 
     self.assertTrue( (mlinear(i) == mlp(i)).all() )
+    os.unlink(MACHINE)
 
   def test05_ComplicatedCorrectness(self):
 
