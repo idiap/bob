@@ -26,8 +26,8 @@ import bob
 import random
 import numpy
 
-class TrainerTest(unittest.TestCase):
-  """Performs various trainer tests."""
+class LinearTest(unittest.TestCase):
+  """Performs various trainer tests for the LinearMachine."""
   
   def test01a_pca_via_svd(self):
 
@@ -52,8 +52,8 @@ class TrainerTest(unittest.TestCase):
     machine, eig_vals = T.train(data)
 
     # Makes sure results are good
-    self.assertTrue( ((machine.weights - eig_vec_correct) < 1e-6).all() )
-    self.assertTrue( ((eig_vals - eig_val_correct) < 1e-6).all() )
+    self.assertTrue( (abs(machine.weights - eig_vec_correct) < 1e-6).all() )
+    self.assertTrue( (abs(eig_vals - eig_val_correct) < 1e-6).all() )
 
   def test01b_pca_via_svd(self):
 
@@ -72,7 +72,7 @@ class TrainerTest(unittest.TestCase):
     machine, eig_vals = T.train(data)
 
     # Makes sure results are good
-    self.assertTrue( ((eig_vals - eig_val_correct) < 1e-6).all() )
+    self.assertTrue( (abs(eig_vals - eig_val_correct) < 1e-6).all() )
     self.assertTrue( machine.weights.shape[0] == 5 and machine.weights.shape[1] == 4 )
 
   def test02a_fisher_lda(self):
@@ -104,9 +104,9 @@ class TrainerTest(unittest.TestCase):
     machine, eig_vals = T.train(data)
 
     # Makes sure results are good
-    self.assertTrue( ((machine.input_subtract - exp_mean) < 1e-6).all() )
-    self.assertTrue( ((machine.weights - exp_mach) < 1e-6).all() )
-    self.assertTrue( ((eig_vals - exp_val) < 1e-6).all() )
+    self.assertTrue( (abs(machine.input_subtract - exp_mean) < 1e-6).all() )
+    self.assertTrue( (abs(machine.weights - exp_mach) < 1e-6).all() )
+    self.assertTrue( (abs(eig_vals - exp_val) < 1e-6).all() )
 
   def test02b_fisher_lda_bis(self):
 
@@ -126,16 +126,16 @@ class TrainerTest(unittest.TestCase):
 
     # Expected results
     exp_mean = numpy.array([0.59, 0.73, 0.64])
-    exp_val = numpy.array([-3.11555115e-14, 1.91783967e-13])
-    exp_mach = numpy.array([[-0.83407951, 0.03851495], [0.38694144, 0.69764105], [0.39317641, -0.71541147]])
+    exp_val = numpy.array([1.52746000e+02, 1.91783967e-13])
+    exp_mach = numpy.array([[0.14322439, 0.03851495], [-0.98379062, 0.69764105], [0.10790173, -0.71541147]])
 
     T = bob.trainer.FisherLDATrainer()
     machine, eig_vals = T.train(data)
 
     # Makes sure results are good
-    self.assertTrue( ((machine.input_subtract - exp_mean) < 1e-6).all() )
-    self.assertTrue( ((machine.weights - exp_mach) < 1e-6).all() )
-    self.assertTrue( ((eig_vals - exp_val) < 1e-6).all() )
+    self.assertTrue( (abs(machine.input_subtract - exp_mean) < 1e-6).all() )
+    self.assertTrue( (abs(machine.weights - exp_mach) < 1e-6).all() )
+    self.assertTrue( (abs(eig_vals - exp_val) < 1e-6).all() )
 
   def test03_ppca(self):
 
@@ -177,4 +177,4 @@ class TrainerTest(unittest.TestCase):
     self.assertTrue( abs(exp_llh2 - llh2) < 2e-4)
 
 # Instantiates our standard main module for unittests
-main = bob.helper.unittest_main(TrainerTest)
+main = bob.helper.unittest_main(LinearTest)

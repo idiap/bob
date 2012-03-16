@@ -210,13 +210,13 @@ void train::FisherLDATrainer::train(mach::LinearMachine& machine,
   eigen_values.resize(n_features);
   // eigSym returned the eigen_values in chronological order
   // reverts the vector and matrix before and after calling eig
-  eigen_values.reverse(0);
-  V.reverse(1);
+  eigen_values.reverseSelf(0);
+  V.reverseSelf(1);
   eigen_values = 0;
   bob::math::eigSym(Sb, Sw, V, eigen_values);
   // Convert ascending order to descending order
-  eigen_values.reverse(0);
-  V.reverse(1);
+  eigen_values.reverseSelf(0);
+  V.reverseSelf(1);
   eigen_values.resizeAndPreserve(n_features-1);
 
   // updates the machine
