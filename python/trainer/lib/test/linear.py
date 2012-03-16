@@ -75,7 +75,7 @@ class TrainerTest(unittest.TestCase):
     self.assertTrue( ((eig_vals - eig_val_correct) < 1e-6).all() )
     self.assertTrue( machine.weights.shape[0] == 5 and machine.weights.shape[1] == 4 )
 
-  def test02_fisher_lda(self):
+  def test02a_fisher_lda(self):
 
     # Tests our Fisher/LDA trainer for linear machines for a simple 2-class
     # "fake" problem:
@@ -99,6 +99,35 @@ class TrainerTest(unittest.TestCase):
     exp_mean = numpy.array([1.8100, 1.9100])
     exp_val = numpy.array([24.27536526])
     exp_mach = numpy.array([[-0.291529], [0.956562]])
+
+    T = bob.trainer.FisherLDATrainer()
+    machine, eig_vals = T.train(data)
+
+    # Makes sure results are good
+    self.assertTrue( ((machine.input_subtract - exp_mean) < 1e-6).all() )
+    self.assertTrue( ((machine.weights - exp_mach) < 1e-6).all() )
+    self.assertTrue( ((eig_vals - exp_val) < 1e-6).all() )
+
+  def test02b_fisher_lda_bis(self):
+
+    # Tests our Fisher/LDA trainer for linear machines for a simple 2-class
+    # "fake" problem:
+    data = [bob.io.Arrayset(), bob.io.Arrayset()]
+    data[0].append(numpy.array([2.5, 2.4, 2.5]))
+    data[0].append(numpy.array([2.2, 2.9, 3.]))
+    data[0].append(numpy.array([1.9, 2.2, 2.]))
+    data[0].append(numpy.array([3.1, 3.0, 3.1]))
+    data[0].append(numpy.array([2.3, 2.7, 2.4]))
+    data[1].append(numpy.array([-0.5, -0.7, -1.]))
+    data[1].append(numpy.array([-2., -1.6, -2.]))
+    data[1].append(numpy.array([-1., -1.1, -1.]))
+    data[1].append(numpy.array([-1.5, -1.6, -1.6]))
+    data[1].append(numpy.array([-1.1, -0.9, -1.]))
+
+    # Expected results
+    exp_mean = numpy.array([0.59, 0.73, 0.64])
+    exp_val = numpy.array([-3.11555115e-14, 1.91783967e-13])
+    exp_mach = numpy.array([[-0.83407951, 0.03851495], [0.38694144, 0.69764105], [0.39317641, -0.71541147]])
 
     T = bob.trainer.FisherLDATrainer()
     machine, eig_vals = T.train(data)
