@@ -73,6 +73,11 @@ class GMMStats {
     bool operator==(const GMMStats& b) const;
 
     /**
+     * Updates a GMMStats with another GMMStats
+     */
+    void operator+=(const GMMStats& b);
+
+    /**
      * Destructor
      */
     ~GMMStats();

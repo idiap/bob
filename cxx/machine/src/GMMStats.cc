@@ -19,6 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "machine/GMMStats.h"
+#include "machine/Exception.h"
 #include "core/logging.h"
 
 namespace mach = bob::machine;
@@ -66,6 +67,22 @@ bool mach::GMMStats::operator==(const mach::GMMStats& b) const {
   
   return true;
 } 
+
+void mach::GMMStats::operator+=(const mach::GMMStats& b) {
+  // Check dimensions
+  if(n.extent(0) != b.n.extent(0) || 
+      sumPx.extent(0) != b.sumPx.extent(0) || sumPx.extent(1) != b.sumPx.extent(1) ||
+      sumPxx.extent(0) != b.sumPxx.extent(0) || sumPxx.extent(1) != b.sumPxx.extent(1))
+    // TODO: add a specialized exception
+    throw mach::Exception();
+
+  // Update GMMStats object with the content of the other one
+  T += b.T;
+  log_likelihood += b.log_likelihood;
+  n += b.n;
+  sumPx += b.sumPx;
+  sumPxx += b.sumPxx;
+}
 
 void mach::GMMStats::copy(const GMMStats& other) {
   // Resize arrays

@@ -58,6 +58,19 @@ class GMMMachineTest(unittest.TestCase):
     # Makes them different
     gs_loaded.T = 58
     self.assertFalse( gs == gs_loaded )
+    # Accumulates from another GMMStats
+    gs2 = bob.machine.GMMStats(2,3)
+    gs2.log_likelihood = log_likelihood
+    gs2.T = T
+    gs2.n = n
+    gs2.sumPx = sumpx
+    gs2.sumPxx = sumpxx
+    gs2 += gs
+    self.assertTrue( gs2.log_likelihood == 2*log_likelihood )
+    self.assertTrue( gs2.T == 2*T )
+    self.assertTrue( numpy.allclose(gs2.n, 2*n, eps) )
+    self.assertTrue( numpy.allclose(gs2.sumPx, 2*sumpx, eps) )
+    self.assertTrue( numpy.allclose(gs2.sumPxx, 2*sumpxx, eps) )
 
     # Reinit and checks for zeros
     gs_loaded.init()

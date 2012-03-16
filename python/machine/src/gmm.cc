@@ -238,6 +238,7 @@ void bind_machine_gmm()
     .def("save", &mach::GMMStats::save, "Save to a Configuration")
     .def("load", &mach::GMMStats::load, "Load from a Configuration")
     .def(self_ns::str(self_ns::self))
+    .def(self_ns::self += self_ns::self)
   ;
   
   class_<mach::GMMMachine, boost::shared_ptr<mach::GMMMachine>, bases<mach::Machine<blitz::Array<double,1>, double> > >("GMMMachine",
