@@ -71,5 +71,8 @@ class KMeansMachineTest(unittest.TestCase):
     self.assertTrue( km.DimC == 4 )
     self.assertTrue( km.DimD == 5 )
 
+    # Clean-up
+    os.unlink(filename)
+
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(KMeansMachineTest)

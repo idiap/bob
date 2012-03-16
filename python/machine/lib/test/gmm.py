@@ -71,6 +71,9 @@ class GMMMachineTest(unittest.TestCase):
     self.assertTrue( gs_loaded.sumPx.shape[0] == 4) 
     self.assertTrue( gs_loaded.sumPx.shape[1] == 5) 
 
+    # Clean-up
+    os.unlink(filename)
+
   def test02_GMMMachine(self):
     """Test a GMMMachine basic features"""
 

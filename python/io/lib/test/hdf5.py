@@ -238,6 +238,8 @@ class HDF5FileTest(unittest.TestCase):
     tmpname = get_tempfilename()
     bob.io.save(array[:,0], tmpname)
 
+    os.unlink(tmpname)
+
   def test05_canLoadMatlab(self):
 
     # shows we can load a 2D matlab array and interpret it as a bunch of 1D

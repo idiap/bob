@@ -89,5 +89,8 @@ class GaussianMachineTest(unittest.TestCase):
     g2 = g
     self.assertTrue( g == g2 )
 
+    # Clean-up
+    os.unlink(filename)
+
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(GaussianMachineTest)

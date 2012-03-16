@@ -132,6 +132,8 @@ class PLDAMachineTest(unittest.TestCase):
     self.assertTrue(m_loaded.hasLogLikeConstTerm(3))
     self.assertTrue(abs(m_loaded.getAddLogLikeConstTerm(3) - constTerm3) < 1e-10)
 
+    # Clean-up
+    os.unlink(filename)
 
   def test02_plda_machine(self):
     # Data used for performing the tests
@@ -199,6 +201,9 @@ class PLDAMachineTest(unittest.TestCase):
     self.assertTrue(equals(m_loaded.getAddGamma(3), gamma3, 1e-10))
     self.assertTrue(m_loaded.hasLogLikeConstTerm(3))
     self.assertTrue(abs(m_loaded.getAddLogLikeConstTerm(3) - constTerm3) < 1e-10)
+
+    # Clean-up
+    os.unlink(filename)
 
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(PLDAMachineTest)

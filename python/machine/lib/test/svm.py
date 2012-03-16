@@ -27,7 +27,7 @@ import bob
 import numpy
 import tempfile
 
-def tempname(suffix, prefix='bobtest_'):
+def tempname(suffix, prefix='bobtest_machine_'):
   (fd, name) = tempfile.mkstemp(suffix, prefix)
   os.close(fd)
   os.unlink(name)

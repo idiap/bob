@@ -70,6 +70,8 @@ class JFAMachineTest(unittest.TestCase):
     m_loaded.ubm = ubm
     self.assertTrue( m == m_loaded )
 
+    # Clean-up
+    os.unlink(filename)
 
   def test02_JFAMachine(self):
 
@@ -132,6 +134,9 @@ class JFAMachineTest(unittest.TestCase):
     score = m.forward(gs)
     self.assertTrue( numpy.allclose(m.x, x_ref, eps) )
     self.assertTrue( abs(score_ref-score) < eps )
+
+    # Clean-up
+    os.unlink(filename)
   
   def test03_ISVMachine(self):
 
@@ -195,6 +200,8 @@ class JFAMachineTest(unittest.TestCase):
     self.assertTrue( numpy.allclose(m.x, x_ref, eps) )
     self.assertTrue( abs(score_ref-score) < eps )
 
+    # Clean-up
+    os.unlink(filename)
 
 
 # Instantiates our standard main module for unittests
