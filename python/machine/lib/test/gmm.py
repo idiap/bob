@@ -66,6 +66,7 @@ class GMMMachineTest(unittest.TestCase):
     gs2.sumPx = sumpx
     gs2.sumPxx = sumpxx
     gs2 += gs
+    eps = 1e-8
     self.assertTrue( gs2.log_likelihood == 2*log_likelihood )
     self.assertTrue( gs2.T == 2*T )
     self.assertTrue( numpy.allclose(gs2.n, 2*n, eps) )
