@@ -115,15 +115,17 @@ below.
    >>> print data
    [<Arrayset[3] float64@(3,)>, <Arrayset[3] float64@(3,)>]
    >>> [machine,eig_vals] = trainer.train(data)  # Trains the machine with the given data
+   >>> print eig_vals
+   [ 1.93632491 0. ]
    >>> print machine.weights  # The new weights after the training procedure
-   [[-0.53636948 1. ]
-    [-0.83806124 0. ]
-    [-0.09980548 0. ]]
+   [[ 0.83885757 1. ]
+    [ 0.53244291 0. ]
+    [ 0.11323656 0. ]]
    >>> machine.resize(3,1)  # Make the output space of dimension 1
    >>> print machine.weights  # The new weights after the training procedure
-   [[-0.53636948] 
-    [-0.83806124]
-    [-0.09980548]]
+   [[ 0.83885757]
+    [ 0.53244291]
+    [ 0.11323656]]
 
 
 Expectation-Maximization for k-Means
