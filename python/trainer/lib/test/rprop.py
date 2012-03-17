@@ -25,6 +25,8 @@ import unittest
 import bob
 import numpy
 
+epsilon=1e-10 # Epsilon value tolerance when checking correctness
+
 class PythonRProp:
   """A simplified (and slower) version of RProp training written in python.
   
@@ -218,21 +220,21 @@ class RPropTest(unittest.TestCase):
 
     # trains with our C++ implementation
     trainer.train_(machine, d0, t0)
-    self.assertTrue( numpy.array_equal(pymachine.weights[0], machine.weights[0]) )
+    self.assertTrue( numpy.allclose(pymachine.weights[0], machine.weights[0], epsilon) )
 
     # a second passage
     d0 = numpy.array([[4., 0., -3., 1.]])
     t0 = numpy.array([[2.]])
     pytrainer.train(pymachine, d0, t0)
     trainer.train_(machine, d0, t0)
-    self.assertTrue( numpy.array_equal(pymachine.weights[0], machine.weights[0]) )
+    self.assertTrue( numpy.allclose(pymachine.weights[0], machine.weights[0], epsilon) )
 
     # a third passage
     d0 = numpy.array([[-0.5, -9.0, 2.0, 1.1]])
     t0 = numpy.array([[3.]])
     pytrainer.train(pymachine, d0, t0)
     trainer.train_(machine, d0, t0)
-    self.assertTrue( numpy.array_equal(pymachine.weights[0], machine.weights[0]) )
+    self.assertTrue( numpy.allclose(pymachine.weights[0], machine.weights[0], epsilon) )
 
   def test03_FisherNoBias(self):
     
@@ -272,7 +274,7 @@ class RPropTest(unittest.TestCase):
       trainer.train_(machine, input, target)
       #print "[Python] MSE:", bob.measure.mse(pymachine(input), target).sqrt()
       #print "[C++] MSE:", bob.measure.mse(machine(input), target).sqrt()
-      self.assertTrue( numpy.array_equal(pymachine.weights[0], machine.weights[0]) )
+      self.assertTrue( numpy.allclose(pymachine.weights[0], machine.weights[0], epsilon) )
 
   def test04_Fisher(self):
     
@@ -311,8 +313,8 @@ class RPropTest(unittest.TestCase):
       trainer.train_(machine, input, target)
       #print "[Python] MSE:", bob.measure.mse(pymachine(input), target).sqrt()
       #print "[C++] MSE:", bob.measure.mse(machine(input), target).sqrt()
-      self.assertTrue( numpy.array_equal(pymachine.weights[0], machine.weights[0]) )
-      self.assertTrue( numpy.array_equal(pymachine.biases[0], machine.biases[0]) )
+      self.assertTrue( numpy.allclose(pymachine.weights[0], machine.weights[0], epsilon) )
+      self.assertTrue( numpy.allclose(pymachine.biases[0], machine.biases[0], epsilon) )
 
   def test05_FisherWithOneHiddenLayer(self):
 
@@ -351,9 +353,9 @@ class RPropTest(unittest.TestCase):
       #print "[Python] |RMSE|:", numpy.linalg.norm(bob.measure.rmse(pymachine(input), target))
       #print "[C++] |RMSE|:", numpy.linalg.norm(bob.measure.rmse(machine(input), target))
       for i, w in enumerate(pymachine.weights):
-        self.assertTrue( numpy.array_equal(w, machine.weights[i]) )
+        self.assertTrue( numpy.allclose(w, machine.weights[i], epsilon) )
       for i, b in enumerate(pymachine.biases):
-        self.assertTrue( numpy.array_equal(b, machine.biases[i]) )
+        self.assertTrue( numpy.allclose(b, machine.biases[i], epsilon) )
 
   def test06_FisherMultiLayer(self):
 
@@ -392,9 +394,9 @@ class RPropTest(unittest.TestCase):
       #print "[Python] MSE:", bob.measure.mse(pymachine(input), target).sqrt()
       #print "[C++] MSE:", bob.measure.mse(machine(input), target).sqrt()
       for i, w in enumerate(pymachine.weights):
-        self.assertTrue( numpy.array_equal(w, machine.weights[i]) )
+        self.assertTrue( numpy.allclose(w, machine.weights[i], epsilon) )
       for i, b in enumerate(pymachine.biases):
-        self.assertTrue( numpy.array_equal(b, machine.biases[i]) )
+        self.assertTrue( numpy.allclose(b, machine.biases[i], epsilon) )
 
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(RPropTest)
