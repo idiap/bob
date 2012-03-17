@@ -41,6 +41,7 @@ extensions = [
   'sphinx.ext.autodoc',
   'sphinx.ext.autosummary',
   'sphinx.ext.doctest',
+  'sphinx.ext.intersphinx',
   ]
 
 # The viewcode extension appeared only on Sphinx >= 1.0.0
@@ -266,6 +267,15 @@ def skip_member(app, what, name, obj, skip, options):
 
 # Used to filter some documentation in/out
 bob_modules = dir(__import__('bob'))
+
+# For inter-documentation mapping:
+intersphinx_mapping = {
+  'http://docs.python.org/@PYTHON_VERSION@/': None,
+  'http://docs.scipy.org/doc/numpy/': None,
+  'http://docs.scipy.org/doc/scipy/reference/': None,
+  'http://docs.sqlalchemy.org/en/latest/': None,
+  'http://matplotlib.sourceforge.net/': None,
+  }
 
 def setup(app):
   app.connect('autodoc-skip-member', skip_member)
