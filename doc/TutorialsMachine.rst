@@ -28,7 +28,7 @@ response or output for that input vector. It works, in many ways, similarly to
 signal processing blocks. Different types of machines will get you a different
 types of output. In this tutorial we examine a few of the machines available in
 |project| and how to make use of them. Let's start by the simplest of the
-machines: a ``LinearMachine``.
+machines: a :py:class:`bob.machine.LinearMachine`.
 
 .. testsetup:: *
 
@@ -48,7 +48,7 @@ This machine executes the simple operation :math:`y = \mathbf{W} x`, where `y`
 is the output vector, `x`, the input vector and `W` a matrix (2D array), stored
 inside the machine. The input vector `x` should be composed of double-precision
 floating-point elements. The output will also be in double-precision. Here is
-how to use a `LinearMachine`:
+how to use a :py:class:`bob.machine.LinearMachine`:
 
 .. doctest::
 
@@ -70,9 +70,9 @@ operator.
 The first thing to notice about machines is that they can be stored and
 retrieved in HDF5 files (for more details in manipulating HDF5 files, please
 consult :doc:`TutorialsIO`). To save the beforemetioned machine to a file, just
-use the machine's ``save()`` command. Because several machines can be stored on
-the same HDF5File, we let the user open the file and set it up before the
-machine can write on it:
+use the machine's ``save`` command. Because several machines can be stored on
+the same :py:class:`bob.io.HDF5File`, we let the user open the file and set it
+up before the machine can write on it:
 
 .. doctest::
 
@@ -90,22 +90,23 @@ You can load the machine again in a similar way:
   >>> numpy.array_equal(machine.weights, reloaded.weights)
   True
 
-The shape of a ``LinearMachine`` indicates the size of the input vector that is
-expected by this machine and the size of the output vector it produces, in a
-tuple formatted like ``(input-size, output-size)``:
+The shape of a ``LinearMachine`` (see
+:py:attr:`bob.machine.LinearMachine.shape`) indicates the size of the input
+vector that is expected by this machine and the size of the output vector it
+produces, in a tuple formatted like ``(input_size, output_size)``:
 
 .. doctest::
 
   >>> machine.shape
   (2, 2)
 
-The ``LinearMachine`` also supports pre-setting normalization vectors that are
-applied to every input `x`. You can set a subtraction factor and a division
-factor, so that the actual input `x'` that is fed to the matrix `W` is 
-:math:`x' = (x .- S) ./ D`. `S` and `D` are vectors that have to have the same
-size as the input vector `x`. The operations `.-` and `./` indicate
-element-wise subtraction and division respectively. By default, 
-:math:`S := 0.0` and :math:`D := 1.0`.
+A :py:class:`bob.machine.LinearMachine`` also supports pre-setting
+normalization vectors that are applied to every input `x`. You can set a
+subtraction factor and a division factor, so that the actual input `x'` that is
+fed to the matrix `W` is :math:`x' = (x .- S) ./ D`. `S` and `D` are vectors
+that have to have the same size as the input vector `x`. The operations `.-`
+and `./` indicate element-wise subtraction and division respectively. By
+default, :math:`S := 0.0` and :math:`D := 1.0`.
 
 .. doctest::
 
@@ -130,35 +131,78 @@ To set a new value, just assign to the machine property:
   factor set, the vectors are saved and restored automatically w/o user
   intervention.
 
-You will find interesting ways to train ``LinearMachines`` so they can do
-something useful to you at :doc:`TutorialsTrainer`.
+You will find interesting ways to train a :py:class:`bob.machine.LinearMachine`
+so they can do something useful to you at :doc:`TutorialsTrainer`.
 
 MLP
 ---
 
 A multi-layer perceptron is a neural network architecture that has some
-well-defined characteristics such as a feed-forward structure [mlp-wikipedia]_.
-You can create a new MLP using one of the trainers described at
+well-defined characteristics such as a feed-forward structure [1]_.  You can
+create a new MLP using one of the trainers described at
 :doc:`TutorialsTrainer`. In this tutorial, we show only how to use an MLP. To
-instantiate a new (uninitialized) ``MLP``, use the ``bob.machine.MLP`` class
-and pass a shape descriptor as a python ``tuple``. The shape parameter should
-contain the input size as the first parameter and the output size as the last
-parameter. The parameters in between define the number of neurons in the hidden
-layers of the MLP. For example ``(3, 3, 1)`` defines an MLP with 3 inputs, 1
-single hidden layer with 3 neurons and 1 output, whereas a shape like ``(10, 5,
-3, 2)`` defines an MLP with 10 inputs, 5 neurons in the first hidden layer, 3
-   neurons in the second hidden layer and 2 outputs. Here is an example:
+instantiate a new (uninitialized) :py:class:`bob.machine.MLP` pass a shape
+descriptor as a :py:class:`tuple`. The shape parameter should contain the input
+size as the first parameter and the output size as the last parameter. The
+parameters in between define the number of neurons in the hidden layers of the
+MLP. For example ``(3, 3, 1)`` defines an MLP with 3 inputs, 1 single hidden
+layer with 3 neurons and 1 output, whereas a shape like ``(10, 5, 3, 2)``
+defines an MLP with 10 inputs, 5 neurons in the first hidden layer, 3 neurons
+in the second hidden layer and 2 outputs. Here is an example:
 
 .. doctest::
 
   >>> mlp = bob.machine.MLP((3, 3, 2, 1))
 
 The network is uninitialized, for the sake of examplifying how to use MLPs,
-let's set the weight and biases to fixed values:
+let's set the weight and biases manually:
 
 .. doctest::
 
-  >>> input_to_layer0 = numpy.array([0.5, 0.3, 0.2, -1.0, 0.6, -0.1, 0.9, 0.8, 0.4], 'float64').reshape((3,3))
+  >>> input_to_hidden0 = numpy.array([0.5, 0.3, 0.2, -1.0, 0.6, -0.1, 0.9, 0.8, 0.4], 'float64').reshape((3,3))
+  >>> input_to_hidden0
+  array([[ 0.5,  0.3,  0.2],
+         [-1. ,  0.6, -0.1],
+         [ 0.9,  0.8,  0.4]])
+  >>> hidden0_to_hidden1 = numpy.array([0.4, 0.2, 0.1, 0.5, 0.6, 0.7], 'float64').reshape(3,2)
+  >>> hidden0_to_hidden1
+  array([[ 0.4,  0.2],
+         [ 0.1,  0.5],
+         [ 0.6,  0.7]])
+  >>> hidden1_to_output = numpy.array([0.3, 0.2], 'float64').reshape(2,1)
+  >>> hidden1_to_output
+  array([[ 0.3],
+         [ 0.2]])
+  >>> bias_hidden0 = numpy.array([-0.2, -0.3, -0.1], 'float64')
+  >>> bias_hidden0
+  array([-0.2, -0.3, -0.1])
+  >>> bias_hidden1 = numpy.array([-0.7, 0.2], 'float64')
+  >>> bias_hidden1
+  array([-0.7,  0.2])
+  >>> bias_output = numpy.array([0.5], 'float64')
+  >>> bias_output
+  array([ 0.5])
+  >>> mlp.weights = [input_to_hidden0, hidden0_to_hidden1, hidden1_to_output]
+  >>> mlp.biases = [bias_hidden0, bias_hidden1, bias_output]
+
+A few notes are due at this point:
+
+1. Weights should **always** be 2D arrays, even if they are connecting 1 neuron
+   to many (or many to 1). You can use the NumPy_ ``reshape()`` array method
+   for this purpose as shown above
+2. Biases should **always** be 1D arrays.
+
+Once the network weights and biases are set, we can feed forward an example
+through this machine. This is done using the ``()`` operator, like for
+a :py:class:`bob.machine.LinearMachines`:
+
+.. doctest::
+
+  >>> 
+
+You can lookup the reference manual for ``MLPs`` if you need to set, for
+example, the activation function. By default, ``MLPs`` use a hyperbolic-tangent
+as activation function.
 
 SVM
 ---
@@ -178,4 +222,4 @@ GMMMachine
 .. Place here your external references
 
 .. _numpy: http://numpy.scipy.org
-.. [mlp-wikipedia] http://en.wikipedia.org/wiki/Multilayer_perceptron
+.. [1] http://en.wikipedia.org/wiki/Multilayer_perceptron
