@@ -330,7 +330,7 @@ void mach::MLP::setWeights(const std::vector<blitz::Array<double,2> >& weight) {
     throw mach::NumberOfLayersMismatch(m_weight.size(), weight.size());
   for (size_t i=0; i<m_weight.size(); ++i) {
     if (!array::hasSameShape(m_weight[i], weight[i])) {
-      throw mach::WeightShapeMismatch(i, m_weight[i].shape(), weight[i].shape());
+      throw mach::WeightShapeMismatch(i, weight[i].shape(), m_weight[i].shape());
     }
   }
   //if you got to this point, the sizes are correct, just set
