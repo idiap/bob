@@ -159,16 +159,16 @@ let's set the weight and biases manually:
 
 .. doctest::
 
-  >>> input_to_hidden0 = numpy.array([0.5, 0.3, 0.2, -1.0, 0.6, -0.1, 0.9, 0.8, 0.4], 'float64').reshape((3,3))
+  >>> input_to_hidden0 = numpy.ones((3,3), 'float64')
   >>> input_to_hidden0
-  array([[ 0.5,  0.3,  0.2],
-         [-1. ,  0.6, -0.1],
-         [ 0.9,  0.8,  0.4]])
-  >>> hidden0_to_hidden1 = numpy.array([0.4, 0.2, 0.1, 0.5, 0.6, 0.7], 'float64').reshape(3,2)
+  array([[ 1.,  1.,  1.],
+         [ 1.,  1.,  1.],
+         [ 1.,  1.,  1.]])
+  >>> hidden0_to_hidden1 = 0.5*numpy.ones((3,2), 'float64')
   >>> hidden0_to_hidden1
-  array([[ 0.4,  0.2],
-         [ 0.1,  0.5],
-         [ 0.6,  0.7]])
+  array([[ 0.5,  0.5],
+         [ 0.5,  0.5],
+         [ 0.5,  0.5]])
   >>> hidden1_to_output = numpy.array([0.3, 0.2], 'float64').reshape(2,1)
   >>> hidden1_to_output
   array([[ 0.3],
@@ -182,8 +182,8 @@ let's set the weight and biases manually:
   >>> bias_output = numpy.array([0.5], 'float64')
   >>> bias_output
   array([ 0.5])
-  >>> mlp.weights = [input_to_hidden0, hidden0_to_hidden1, hidden1_to_output]
-  >>> mlp.biases = [bias_hidden0, bias_hidden1, bias_output]
+  >>> mlp.weights = (input_to_hidden0, hidden0_to_hidden1, hidden1_to_output)
+  >>> mlp.biases = (bias_hidden0, bias_hidden1, bias_output)
 
 A few notes are due at this point:
 
@@ -191,18 +191,23 @@ A few notes are due at this point:
    to many (or many to 1). You can use the NumPy_ ``reshape()`` array method
    for this purpose as shown above
 2. Biases should **always** be 1D arrays.
+3. By default, MLPs use hyperbolic tangent as activation functions.
 
-Once the network weights and biases are set, we can feed forward an example
-through this machine. This is done using the ``()`` operator, like for
-a :py:class:`bob.machine.LinearMachines`:
+Let's try changing all activation functions for a simpler one, just for this
+example:
 
 .. doctest::
 
-  >>> 
+  >>> mlp.activation = bob.machine.Activation.LINEAR
 
-You can lookup the reference manual for ``MLPs`` if you need to set, for
-example, the activation function. By default, ``MLPs`` use a hyperbolic-tangent
-as activation function.
+Once the network weights and biases are set, we can feed forward an example
+through this machine. This is done using the ``()`` operator, like for
+a :py:class:`bob.machine.LinearMachine`:
+
+.. doctest::
+
+  >>> mlp(numpy.array([0.1, -0.1, 0.2], 'float64'))
+  array([ 0.33])
 
 SVM
 ---
