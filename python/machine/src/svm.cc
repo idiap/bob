@@ -32,14 +32,14 @@ static tuple get_shape(const mach::SupportVector& m) {
   return make_tuple(m.inputSize(), m.outputSize());
 }
 
-static int predict_class(const mach::SupportVector& m,
+static object predict_class(const mach::SupportVector& m,
     tp::const_ndarray input) {
-  return m.predictClass(input.bz<double,1>());
+  return object(m.predictClass(input.bz<double,1>()));
 }
 
-static int predict_class_(const mach::SupportVector& m,
+static object predict_class_(const mach::SupportVector& m,
     tp::const_ndarray input) {
-  return m.predictClass_(input.bz<double,1>());
+  return object(m.predictClass_(input.bz<double,1>()));
 }
 
 static object predict_class_n(const mach::SupportVector& m,
@@ -55,6 +55,18 @@ static object predict_class_n(const mach::SupportVector& m,
     retval.append(m.predictClass_(tmp));
   }
   return tuple(retval);
+}
+
+static object svm_call(const mach::SupportVector& m,
+    tp::const_ndarray input) {
+  switch (input.type().nd) {
+    case 1:
+      return predict_class(m, input);
+    case 2:
+      return predict_class_n(m, input);
+    default:
+      PYTHON_ERROR(RuntimeError, "Input array should be 1D or 2D. You passed an array with %lu dimensions instead", input.type().nd);
+  }
 }
 
 static int predict_class_and_scores(const mach::SupportVector& m, 
@@ -218,8 +230,9 @@ static void set_input_div(mach::SupportVector& m, object o) {
 
 void bind_machine_svm() {
 
-  class_<mach::SVMFile, boost::shared_ptr<mach::SVMFile>, boost::noncopyable>("SVMFile", "Loads a given libsvm data file. The data file format, as defined on the library README is like this:\n\n  <label> <index1>:<value1> <index2>:<value2> ...\n  .\n  .\n  .\n\nThe labels are integer values, so are the indexes, starting from '1' (and not from zero as a C-programmer would expect. The values are floating point.\n\nZero values are suppressed - libsvm uses a sparse format.\n\nThis class is made available to you so you can input original libsvm files and convert them to another representation better supported. You cannot, from this object, save data or extend the current set.", init<const char*, size_t>((arg("filename"), arg("shape")), "Intializes an SVM file with the path to an existing file and the expected length of each input sample. Note that this cannot be guessed from the libsvm file because of its sparsity property."))
+  class_<mach::SVMFile, boost::shared_ptr<mach::SVMFile>, boost::noncopyable>("SVMFile", "Loads a given libsvm data file. The data file format, as defined on the library README is like this:\n\n  <label> <index1>:<value1> <index2>:<value2> ...\n  .\n  .\n  .\n\nThe labels are integer values, so are the indexes, starting from '1' (and not from zero as a C-programmer would expect. The values are floating point.\n\nZero values are suppressed - libsvm uses a sparse format.\n\nThis class is made available to you so you can input original libsvm files and convert them to another representation better supported. You cannot, from this object, save data or extend the current set.", init<const char*>((arg("filename")), "Intializes an SVM file with the path to an existing file. The file is scanned entirely so to compute the sample size."))
     .add_property("shape", &svmfile_shape, "The size of each sample in the file, as tuple with a single entry")
+    .add_property("__len__", &svmfile_, "The size of each sample in the file, as tuple with a single entry")
     .add_property("filename", make_function(&mach::SVMFile::filename, return_value_policy<copy_const_reference>()), "The name of the file being read")
     .def("reset", &mach::SVMFile::reset, (arg("self")), "Resets the current file so it starts reading from the begin once more")
     .def("read", &svmfile_read, (arg("self")), "Reads a single line from the file and returns a tuple containing the label and a numpy array of float64 elements. The numpy array has a shape as defined by the 'shape' property of this file. If the file has finished, returns None instead.")
@@ -263,6 +276,7 @@ void bind_machine_svm() {
     .def("predictClass", &predict_class, (arg("self"), arg("input")), "Returns the predicted class given a certain input. Checks the input data for size conformity. If the size is wrong, an exception is raised.")
     .def("predictClass_", &predict_class_, (arg("self"), arg("input")), "Returns the predicted class given a certain input. Does not check the input data and is, therefore, a little bit faster.")
     .def("predictClasses", &predict_class_n, (arg("self"), arg("input")), "Returns the predicted class given a certain input. Checks the input data for size conformity. If the size is wrong, an exception is raised. This variant accepts as input a 2D array with samples arranged in lines. The array can have as many lines as you want, but the number of columns should match the expected machine input size.")
+    .def("__call__", &svm_call, (arg("self"), arg("input")), "Returns the predicted class(es) given a certain input. Checks the input data for size conformity. If the size is wrong, an exception is raised. The input may be either a 1D or a 2D numpy ndarray object of double-precision floating-point numbers. If the array is 1D, a single answer is returned (the class of the input vector). If the array is 2D, then the number of columns in such array must match the input size. In this case, the SupportVector object will return 1 prediction for every row at the input array.")
     .def("predictClassAndScores", &predict_class_and_scores2, (arg("self"), arg("input")), "Returns the predicted class and output scores as a tuple, in this order. Checks the input and output arrays for size conformity. If the size is wrong, an exception is raised.")
     .def("predictClassAndScores", &predict_class_and_scores, (arg("self"), arg("input"), arg("scores")), "Returns the predicted class given a certain input. Returns the scores for each class in the second argument. Checks the input and output arrays for size conformity. If the size is wrong, an exception is raised.")
     .def("predictClassAndScores_", &predict_class_and_scores_, (arg("self"), arg("input"), arg("scores")), "Returns the predicted class given a certain input. Returns the scores for each class in the second argument. Checks the input and output arrays for size conformity. Does not check the input data and is, therefore, a little bit faster.")
