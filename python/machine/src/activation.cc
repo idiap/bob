@@ -31,5 +31,6 @@ void bind_machine_activation() {
     .value("LINEAR", mach::LINEAR)
     .value("TANH", mach::TANH)
     .value("LOG", mach::LOG)
+    .value("SIGMOID", mach::LOG)
     ;
 }
