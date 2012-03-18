@@ -78,7 +78,7 @@ namespace bob { namespace machine {
       /**
        * Constructor, initializes the file readout.
        */
-      SVMFile (const std::string& filename, size_t shape);
+      SVMFile (const std::string& filename);
 
       /**
        * Destructor virtualization

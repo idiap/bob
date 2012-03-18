@@ -34,20 +34,56 @@
 #include <fstream>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <algorithm>
 
 namespace mach = bob::machine;
 namespace array = bob::core::array;
 
-mach::SVMFile::SVMFile (const std::string& filename, size_t shape):
+static bool is_colon(char i) { return i == ':'; }
+
+mach::SVMFile::SVMFile (const std::string& filename):
   m_filename(filename),
   m_file(m_filename.c_str()),
-  m_shape(shape)
+  m_shape(0),
+  m_n_samples(0)
 {
   if (!m_file) {
     boost::format s("cannot open file '%s'");
     s % filename;
     throw std::runtime_error(s.str().c_str());
   }
+  
+  //scan the whole file, gets the shape and total size
+  while (m_file.good()) {
+    //gets the next non-empty line
+    std::string line;
+    while (!line.size()) {
+      if (!m_file.good()) break;
+      std::getline(m_file, line);
+      boost::trim(line);
+    }
+
+    if (!m_file.good()) break;
+
+    int label;
+    size_t pos;
+    char separator;
+    double value;
+    size_t n_values = std::count_if(line.begin(), line.end(), is_colon);
+  
+    std::istringstream iss(line);
+    iss >> label;
+
+    for (size_t k=0; k<n_values; ++k) {
+      iss >> pos >> separator >> value;
+      if (m_shape < pos) m_shape = pos;
+    }
+
+    ++m_n_samples;
+  }
+
+  //reset the file to the begin to read it properly
+  m_file.seekg(std::ios_base::beg);
 }
 
 mach::SVMFile::~SVMFile() {
