@@ -616,7 +616,7 @@ class TestBancaSmall(unittest.TestCase):
     # Check results (scores)
     #scores_ref = numpy.array([2.073368737400600, 1.524833680242284, 
     #  2.468051383113884, 1.705402816531652])
-    scores_ref = numpy.array([0.97241023, 0.54142182, 1.57735219, 1.25594364])
+    scores_ref = numpy.array([0.91875557, 0.53932973, 1.48734588, 1.22941611])
     self.assertTrue( (abs(scores - scores_ref) < 1e-4).all() )
 
   def test03_jfa(self):
@@ -676,8 +676,8 @@ class TestBancaSmall(unittest.TestCase):
     if not os.path.exists(clientmodel_dir):
       os.makedirs(clientmodel_dir)
     (client_scores, impostor_scores) = compute_scores(db, 'dev', gmmstats_dir, extension, protocol, clientmodel_dir, wm_path, output_machine, extension, jfa_enrol_n_iter)
-    client_scores_ref = [0.0047346262690337948, 0.0041665160545114235]
-    impostor_scores_ref = [0.01369235497039647, 0.0061709896258120263]
+    client_scores_ref = [0.0049256627092841053, 0.004753096187349203]
+    impostor_scores_ref = [0.013874685706151616, 0.0065295654116636487]
     self.assertTrue(abs(client_scores[0] - client_scores_ref[0]) < 1e-7)    
     self.assertTrue(abs(client_scores[1] - client_scores_ref[1]) < 1e-7)    
     self.assertTrue(abs(impostor_scores[0] - impostor_scores_ref[0]) < 1e-7)
