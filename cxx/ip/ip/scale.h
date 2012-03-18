@@ -64,14 +64,14 @@ namespace bob {
         for( int y=0; y<height; ++y) {
           double y_src = y_ratio * y;
           double dy1 = ceil(y_src) - y_src;
-          double dy2 = 1 - dy1;
-          int y_ind1 = tca::keepInRange( floor(y_src), 0, src.extent(0)-1);
+          double dy2 = 1. - dy1;
+          int y_ind1 = tca::keepInRange( ceil(y_src)-1, 0, src.extent(0)-1);
           int y_ind2 = tca::keepInRange( y_ind1+1, 0, src.extent(0)-1);
           for( int x=0; x<width; ++x) {
             double x_src = x_ratio * x;
             double dx1 = ceil(x_src) - x_src;
-            double dx2 = 1 - dx1;
-            int x_ind1 = tca::keepInRange( floor(x_src), 0, src.extent(1)-1);
+            double dx2 = 1. - dx1;
+            int x_ind1 = tca::keepInRange( ceil(x_src)-1, 0, src.extent(1)-1);
             int x_ind2 = tca::keepInRange( x_ind1+1, 0, src.extent(1)-1);
             double val = dx1*dy1*src(y_ind1, x_ind1)+dx1*dy2*src(y_ind2, x_ind1)
               + dx2*dy1*src(y_ind1, x_ind2 )+dx2*dy2*src(y_ind2, x_ind2 );
