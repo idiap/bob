@@ -23,4 +23,3 @@
 ==========
 
 .. automodule:: bob.machine
-   :members:
