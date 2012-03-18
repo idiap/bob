@@ -91,6 +91,11 @@ namespace bob { namespace machine {
       inline size_t shape() const { return m_shape; }
 
       /**
+       * Returns the number of samples in the file.
+       */
+      inline size_t samples() const { return m_n_samples; }
+
+      /**
        * Resets the file, going back to the beginning.
        */
       void reset();
@@ -125,6 +130,7 @@ namespace bob { namespace machine {
       std::string m_filename; ///< The path to the file being read
       std::ifstream m_file; ///< The file I'm reading.
       size_t m_shape; ///< Number of floats in samples
+      size_t m_n_samples; ///< total number of samples at input file
 
   };
 
@@ -373,8 +379,8 @@ namespace bob { namespace machine {
     private: //representation
 
       boost::shared_ptr<svm_model> m_model; ///< libsvm model pointer
-      size_t m_input_size; ///< vector size expected as input for the SVM's
       mutable boost::shared_array<svm_node> m_input_cache; ///< cache
+      size_t m_input_size; ///< vector size expected as input for the SVM's
       blitz::Array<double,1> m_input_sub; ///< scaling: subtraction
       blitz::Array<double,1> m_input_div; ///< scaling: division
 

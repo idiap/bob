@@ -41,8 +41,8 @@ machines: a :py:class:`bob.machine.LinearMachine`.
    temp_dir = tempfile.mkdtemp(prefix='bob_doctest_')
    os.chdir(temp_dir)
 
-LinearMachine
--------------
+Linear Machine
+--------------
 
 This machine executes the simple operation :math:`y = \mathbf{W} x`, where `y`
 is the output vector, `x`, the input vector and `W` a matrix (2D array), stored
@@ -134,28 +134,30 @@ To set a new value, just assign to the machine property:
 You will find interesting ways to train a :py:class:`bob.machine.LinearMachine`
 so they can do something useful to you at :doc:`TutorialsTrainer`.
 
-MLP
----
+Neural Networks: Multi-layer Perceptrons (MLP)
+----------------------------------------------
 
-A multi-layer perceptron is a neural network architecture that has some
-well-defined characteristics such as a feed-forward structure [1]_.  You can
-create a new MLP using one of the trainers described at
-:doc:`TutorialsTrainer`. In this tutorial, we show only how to use an MLP. To
-instantiate a new (uninitialized) :py:class:`bob.machine.MLP` pass a shape
-descriptor as a :py:class:`tuple`. The shape parameter should contain the input
-size as the first parameter and the output size as the last parameter. The
-parameters in between define the number of neurons in the hidden layers of the
-MLP. For example ``(3, 3, 1)`` defines an MLP with 3 inputs, 1 single hidden
-layer with 3 neurons and 1 output, whereas a shape like ``(10, 5, 3, 2)``
-defines an MLP with 10 inputs, 5 neurons in the first hidden layer, 3 neurons
-in the second hidden layer and 2 outputs. Here is an example:
+A `multi-layer perceptron <http://en.wikipedia.org/wiki/Multilayer_perceptron>`_
+is a neural network architecture that has some well-defined characteristics
+such as a feed-forward structure. You can create a new MLP using one of the
+trainers described at :doc:`TutorialsTrainer`. In this tutorial, we show only
+how to use an MLP.  To instantiate a new (uninitialized)
+:py:class:`bob.machine.MLP` pass a shape descriptor as a :py:func:`tuple`. The
+shape parameter should contain the input size as the first parameter and the
+output size as the last parameter.  The parameters in between define the number
+of neurons in the hidden layers of the MLP. For example ``(3, 3, 1)`` defines
+an MLP with 3 inputs, 1 single hidden layer with 3 neurons and 1 output,
+whereas a shape like ``(10, 5, 3, 2)`` defines an MLP with 10 inputs, 5 neurons
+in the first hidden layer, 3 neurons in the second hidden layer and 2 outputs.
+Here is an example:
 
 .. doctest::
 
   >>> mlp = bob.machine.MLP((3, 3, 2, 1))
 
-The network is uninitialized, for the sake of examplifying how to use MLPs,
-let's set the weight and biases manually:
+As it is, the network is uninitialized. For the sake of examplifying how to use
+MLPs, let's set the weight and biases manually (we would normally use a trainer
+for that):
 
 .. doctest::
 
@@ -191,7 +193,12 @@ A few notes are due at this point:
    to many (or many to 1). You can use the NumPy_ ``reshape()`` array method
    for this purpose as shown above
 2. Biases should **always** be 1D arrays.
-3. By default, MLPs use hyperbolic tangent as activation functions.
+3. By default, MLPs use the `hyperbolic tangent <http://mathworld.wolfram.com/HyperbolicTangent.html>`_ as activation functions.
+   Other 2 activation functions are possible:
+
+   * The identity function: :py:const:`bob.machine.Activation.LINEAR`
+   * The sigmoid or `logistic function <http://mathworld.wolfram.com/SigmoidFunction.html>`_: :py:const:`bob.machine.Activation.SIGMOID` or 
+     :py:const:`bob.machine.Activation.LOG`.
 
 Let's try changing all activation functions for a simpler one, just for this
 example:
@@ -209,8 +216,82 @@ a :py:class:`bob.machine.LinearMachine`:
   >>> mlp(numpy.array([0.1, -0.1, 0.2], 'float64'))
   array([ 0.33])
 
-SVM
----
+Support Vector Machines
+-----------------------
+
+The :py:class:`bob.machine.SupportVector` implements a Support Vector Machine
+with a bridge to `LIBSVM`_. The bridge functionality includes loading and
+saving SVM data files and machine models, which you can produce or download
+following the instructions found on `LIBSVM`_'s home page. |project| bindings
+to `LIBSVM`_ do not allow you to explicetly set the machine's internal values.
+You must use the associated trainer as explained on :doc:`TutorialsTrainer` to
+generate a valid :py:class:`bob.machine.SupportVector`. Once you have followed
+the instructions at :doc:`TutorialsTrainer`, you can come back to this page and
+follow the remaining instructions here.
+
+.. note:: 
+
+  Our current ``svm`` object was trained with the file called `heart_scale`,
+  distributed with `LIBSVM`_ and `available here
+  <http://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary/heart_scale>`_.
+  This dataset proposes a binary classification problem (i.e., 2 classes of
+  features to be discriminated). The number of features is 13.
+
+Our extensions to `LIBSVM`_ also allow you to feed data through a
+:py:class:`bob.machine.SupportVector` using :py:class:`numpy.ndarray` objects
+and collect results in that format. For the following lines, we assume you have
+available a :py:class:`bob.machine.SupportVector` named ``svm``.
+
+.. testsetup:: svm
+
+  import bob
+  import numpy
+  svm = bob.machine.SupportVector('../python/machine/data/heart.svmmodel')
+
+.. doctest:: svm
+
+  >>> # 'svm' is was generated from the 'heart_scale' dataset using 'svm-train' with default parameters.
+  >>> svm.shape
+  (13, 1)
+
+To run a single example through the SVM, just use the ``()`` operator like
+before:
+
+.. doctest:: svm
+
+  >> svm(numpy.ones((13,), 'float64'))
+  1
+  >> svm(numpy.ones((10,13), 'float64'))
+  (1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+
+Visit the documentation for :py:class:`bob.machine.SupportVector` to find more
+information about these bindings and methods you can call on such machine.
+Visit the documentation for :py:class:`bob.machine.SVMFile` for information on
+loading `LIBSVM`_ data files direction into python and producing
+:py:class:`numpy.ndarray` objects. Here is a quick example:
+
+.. testsetup:: svmfile
+
+  import numpy
+  import bob
+  f = bob.machine.SVMFile('../python/machine/data/heart.svmdata')
+
+.. note::
+
+  If you use this functionality in a publication, please be sure to also cite:
+
+  .. code-block:: bibtex
+
+    @article{CC01a,
+     author  = {Chang, Chih-Chung and Lin, Chih-Jen},
+     title   = {{LIBSVM}: A library for support vector machines},
+     journal = {ACM Transactions on Intelligent Systems and Technology},
+     volume  = {2},
+     issue   = {3},
+     year    = {2011},
+     pages   = {27:1--27:27},
+     note    = {Software available at \url{http://www.csie.ntu.edu.tw/~cjlin/libsvm}}
+    }
 
 GaussianMachine
 ---------------
@@ -227,4 +308,4 @@ GMMMachine
 .. Place here your external references
 
 .. _numpy: http://numpy.scipy.org
-.. [1] http://en.wikipedia.org/wiki/Multilayer_perceptron
+.. _libsvm: http://www.csie.ntu.edu.tw/~cjlin/libsvm/

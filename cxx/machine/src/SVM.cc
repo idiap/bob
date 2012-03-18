@@ -82,8 +82,9 @@ mach::SVMFile::SVMFile (const std::string& filename):
     ++m_n_samples;
   }
 
-  //reset the file to the begin to read it properly
-  m_file.seekg(std::ios_base::beg);
+  //reset the file to then begin to read it properly
+  m_file.clear();
+  m_file.seekg(0, std::ios_base::beg);
 }
 
 mach::SVMFile::~SVMFile() {

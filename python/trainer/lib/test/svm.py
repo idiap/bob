@@ -56,7 +56,7 @@ class SvmTrainingTest(unittest.TestCase):
     # need to make sure you can gather the input into 2D double arrays in which
     # each array represents data from one class and each line on such array
     # contains a sample.
-    f = bob.machine.SVMFile(HEART_DATA, 13)
+    f = bob.machine.SVMFile(HEART_DATA)
     labels, data = f.read_all()
     neg = numpy.vstack([k for i,k in enumerate(data) if labels[i] < 0])
     pos = numpy.vstack([k for i,k in enumerate(data) if labels[i] > 0])
@@ -92,7 +92,7 @@ class SvmTrainingTest(unittest.TestCase):
 
   def test03_training_with_probability(self):
    
-    f = bob.machine.SVMFile(HEART_DATA, 13)
+    f = bob.machine.SVMFile(HEART_DATA)
     labels, data = f.read_all() 
     neg = numpy.vstack([k for i,k in enumerate(data) if labels[i] < 0])
     pos = numpy.vstack([k for i,k in enumerate(data) if labels[i] > 0])

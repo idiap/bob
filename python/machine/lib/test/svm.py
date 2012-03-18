@@ -139,7 +139,7 @@ class SvmTest(unittest.TestCase):
   def test03_data_loading(self):
 
     #tests if I can load data in libsvm format using SVMFile
-    data = bob.machine.SVMFile(HEART_DATA, 13)
+    data = bob.machine.SVMFile(HEART_DATA)
     self.assertEqual(data.shape, (13,))
     self.assertEqual(data.good(), True)
     self.assertEqual(data.fail(), False)
@@ -194,8 +194,7 @@ class SvmTest(unittest.TestCase):
     #tests that the normal machine raises because probabilities are not
     #supported on that model
     machine = bob.machine.SupportVector(TEST_MACHINE_NO_PROBS)
-    labels, data = bob.machine.SVMFile(HEART_DATA,
-        machine.shape[0]).read_all()
+    labels, data = bob.machine.SVMFile(HEART_DATA).read_all()
     data = numpy.vstack(data)
     self.assertRaises(RuntimeError, machine.predictClassesAndProbabilities,
         data)
@@ -204,8 +203,7 @@ class SvmTest(unittest.TestCase):
 
     #tests the correctness of the libSVM bindings
     machine = bob.machine.SupportVector(HEART_MACHINE)
-    labels, data = bob.machine.SVMFile(HEART_DATA,
-        machine.shape[0]).read_all()
+    labels, data = bob.machine.SVMFile(HEART_DATA).read_all()
     data = numpy.vstack(data)
 
     pred_label = machine.predictClasses(data)
@@ -243,7 +241,7 @@ class SvmTest(unittest.TestCase):
 
     #same test as above, but with a 3-class problem.
     machine = bob.machine.SupportVector(IRIS_MACHINE)
-    labels, data = bob.machine.SVMFile(IRIS_DATA, machine.shape[0]).read_all()
+    labels, data = bob.machine.SVMFile(IRIS_DATA).read_all()
     data = numpy.vstack(data)
 
     pred_label = machine.predictClasses(data)
