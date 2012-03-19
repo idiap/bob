@@ -366,7 +366,38 @@ As with other machines you can save and re-load machines of this type using
 Gaussian Mixture Models
 -----------------------
 
-The :py:class:`bob.machine.GMMMachine` represents a Gaussian `Mixture Model <http://en.wikipedia.org/wiki/Mixture_model>`_ (GMM).
+The :py:class:`bob.machine.GMMMachine` represents a Gaussian 
+`Mixture Model <http://en.wikipedia.org/wiki/Mixture_model>`_ (GMM), which
+consists in a mixture of weighted :py:class:`bob.machine.Gaussian`.
+
+.. doctest::
+
+  >>> gmm = bob.machine.GMMMachine(2,3) # Mixture of two diagonal Gaussian of dimension 3
+
+By default, the diagonal gaussian distributions of the GMM are initialized 
+with zero mean and unit variance, and the weights are identical. This can be
+updated using the :py:attr:`bob.machine.GMMMachine.means`, :py:attr:`bob.machine.GMMMachine.variances`
+or :py:attr:`bob.machine.GMMMachine.weights`.
+
+.. doctest::
+  :options: +NORMALIZE_WHITESPACE
+
+  >>> gmm.means = numpy.array([[5., 5., 5.], [5., 5., -5.]], 'float64')
+  >>> gmm.means
+  array([[ 5., 5., 5.], 
+         [ 5., 5., -5.]])
+
+Once the :py:class:`bob.machine.GMMMachine` has been set, you can use it to
+estimate the logarithm likelihood of an input feature vector with a matching
+number of dimensions:
+
+.. doctest::
+
+  >>> log_likelihood = gmm(numpy.array([5.1, 4.7, -4.9], 'float64'))
+
+As with other machines you can save and re-load machines of this type using
+:py:meth:`bob.machine.GMMMachine.save` and the class constructor respectively.
+
 
 .. testcleanup:: *
 
