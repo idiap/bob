@@ -280,7 +280,7 @@ loading `LIBSVM`_ data files direction into python and producing
 
   If you use this functionality in a publication, please be sure to also cite:
 
-  .. code-block:: bibtex
+  .. code-block:: latex
 
     @article{CC01a,
      author  = {Chang, Chih-Chung and Lin, Chih-Jen},
