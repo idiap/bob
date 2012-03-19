@@ -14,22 +14,14 @@ if(OpenCV_FOUND)
   if (NOT OpenCV_CVAUX_H_FOUND)
     message(WARNING "OpenCV (version ${OpenCV_VERSION}) was found, but cvaux.h was not - Be aware!")
   endif()
-  find_library(OpenCV_CVAUX_FOUND NAMES cvaux PATHS ${OpenCV_LIB_DIRS})
-  if (NOT OpenCV_CVAUX_FOUND)
-    message(WARNING "OpenCV (version ${OpenCV_VERSION}) was found, but libcvaux was not - I'm removing it from the required library set. If you need to compile OpenCV cvaux-enabled applications, please have that installed on your system")
-    list(REMOVE_ITEM OpenCV_LIBRARIES cvaux)
-  endif()
+  #cannot search for libraries as names may vary in different installations
 
   #checks to see if libhighgui is installed - optional in some systems
   find_file(OpenCV_HIGHGUI_H_FOUND NAMES highgui.h PATHS ${OpenCV_INCLUDE_DIRS})
   if (NOT OpenCV_HIGHGUI_H_FOUND)
     message(WARNING "OpenCV (version ${OpenCV_VERSION}) was found, but highgui.h was not - Be aware!")
   endif()
-  find_library(OpenCV_HIGHGUI_FOUND NAMES highgui PATHS ${OpenCV_LIB_DIRS})
-  if (NOT OpenCV_HIGHGUI_FOUND)
-    message(WARNING "OpenCV (version ${OpenCV_VERSION}) was found, but libhighgui was not - I'm removing it from the required library set. If you need to compile OpenCV/GUI enabled applications, please have that installed on your system")
-    list(REMOVE_ITEM OpenCV_LIBRARIES highgui)
-  endif()
+  #cannot search for libraries as names may vary in different installations
 
   add_definitions("-DHAVE_OPENCV=1")
   add_definitions("-DOPENCV_VERSION=\"${OpenCV_VERSION}\"")
