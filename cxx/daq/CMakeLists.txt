@@ -40,17 +40,16 @@ if (V4L2_FOUND)
     )
 endif()
 
-if (OPENCV_FOUND)
-  list(APPEND src 
-    "src/OpenCVOutputWriter.cc"
-    "src/OpenCVFaceLocalization.cc"
-    "src/OpenCVDisplay.cc"
-    )
+if (OpenCV_FOUND)
 
+  list(APPEND src 
+    "src/OpenCVFaceLocalization.cc"
+    )
+  
   link_directories(${OpenCV_LIB_DIR})
   include_directories(${OpenCV_INCLUDE_DIRS})
 
-  list(APPEND shared ${OpenCV_LIBS})
+  list(APPEND shared ${OpenCV_LIBRARIES})
 endif()
 
 include (${QT_USE_FILE})
@@ -62,4 +61,3 @@ list(INSERT src 0 "${MOC_SRC}")
 
 bob_library(daq "${src}" "${deps}" "${shared}")
 add_dependencies(bob_daq visioner)
-

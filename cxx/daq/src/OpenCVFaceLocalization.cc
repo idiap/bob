@@ -23,21 +23,29 @@ namespace bob { namespace daq {
 
 static pthread_mutex_t pthread_mutex_initializer = PTHREAD_MUTEX_INITIALIZER;
 
-OpenCVFaceLocalization::OpenCVFaceLocalization(const char* model_path) : mustStop(false), img_mutex(pthread_mutex_initializer) {
-  // Load the HaarClassifierCascade
-  cascade = (CvHaarClassifierCascade*)cvLoad(model_path, 0, 0, 0 );
-  thread = 0;
+static void delete_cascade (CvHaarClassifierCascade* p) {
+  if (p >= 0) cvReleaseHaarClassifierCascade(&p);
+  p=0;
+}
+
+static CvHaarClassifierCascade* allocate_cascade(const char* path) {
+  return reinterpret_cast<CvHaarClassifierCascade*>(cvLoad(path, 0, 0, 0));
+}
+
+OpenCVFaceLocalization::OpenCVFaceLocalization(const char* model_path) :
+  thread(0),
+  img_mutex(pthread_mutex_initializer),
+  cascade(allocate_cascade(model_path), std::ptr_fun(delete_cascade)),
+  mustStop(false)
+{
 }
 
 OpenCVFaceLocalization::~OpenCVFaceLocalization() {
   stop();
-
   if (thread != 0) {
     // Ensure that the localization thread is over
     pthread_join(thread, NULL);
   }
-  
-  cvReleaseHaarClassifierCascade(&cascade);
 }
 
 void OpenCVFaceLocalization::stop() {
@@ -46,8 +54,8 @@ void OpenCVFaceLocalization::stop() {
 
 static void* localize_(void* param) {
   OpenCVFaceLocalization* fl = (OpenCVFaceLocalization*) param;
-
   fl->localize();
+  return 0;
 }
 
 // Detect faces
@@ -56,9 +64,6 @@ FaceLocalizationCallback::BoundingBox detect_(cv::Mat* image, CvHaarClassifierCa
 {
   // Create memory for calculations
   static CvMemStorage* storage = 0;
-  
-  // Create two points to represent the face locations
-  CvPoint pt1, pt2;
   
   // Allocate the memory storage
   storage = cvCreateMemStorage(0);
@@ -100,7 +105,7 @@ void OpenCVFaceLocalization::localize() {
     pthread_mutex_unlock(&img_mutex);
 
     if(!gray.empty()) {
-      FaceLocalizationCallback::BoundingBox bb = detect_(&gray, cascade);
+      FaceLocalizationCallback::BoundingBox bb = detect_(&gray, cascade.get());
       
       pthread_mutex_lock(&callbacks_mutex);
       for(std::vector<FaceLocalizationCallback*>::iterator it = callbacks.begin(); it != callbacks.end(); it++) {
