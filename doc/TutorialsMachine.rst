@@ -240,17 +240,24 @@ follow the remaining instructions here.
 Our extensions to `LIBSVM`_ also allow you to feed data through a
 :py:class:`bob.machine.SupportVector` using :py:class:`numpy.ndarray` objects
 and collect results in that format. For the following lines, we assume you have
-available a :py:class:`bob.machine.SupportVector` named ``svm``.
+available a :py:class:`bob.machine.SupportVector` named ``svm``. (For this
+example, the variable ``svm`` was generated from the ``heart_scale`` dataset
+using the application ``svm-train`` with default parameters.)
 
 .. testsetup:: svm
 
+  import os
   import bob
   import numpy
-  svm = bob.machine.SupportVector('../python/machine/data/heart.svmmodel')
+  
+  # the CMAKE_SOURCE_DIR is defined at conf.py.in
+  heart_model = os.path.join(os.environ['CMAKE_SOURCE_DIR'], 
+    'python/machine/data/heart.svmmodel')
+
+  svm = bob.machine.SupportVector(heart_model)
 
 .. doctest:: svm
 
-  >>> # 'svm' is was generated from the 'heart_scale' dataset using 'svm-train' with default parameters.
   >>> svm.shape
   (13, 1)
 
@@ -268,36 +275,99 @@ Visit the documentation for :py:class:`bob.machine.SupportVector` to find more
 information about these bindings and methods you can call on such machine.
 Visit the documentation for :py:class:`bob.machine.SVMFile` for information on
 loading `LIBSVM`_ data files direction into python and producing
-:py:class:`numpy.ndarray` objects. Here is a quick example:
+:py:class:`numpy.ndarray` objects.
+
+Here is quick usage example: Suppose the variable ``f`` contains an object of
+type :py:class:`bob.machine.SVMFile`. Then, you could read data (and labels)
+from the file like this:
 
 .. testsetup:: svmfile
 
+  import os
   import numpy
   import bob
-  f = bob.machine.SVMFile('../python/machine/data/heart.svmdata')
 
-.. note::
+  # the CMAKE_SOURCE_DIR is defined at conf.py.in
+  heart_data = os.path.join(os.environ['CMAKE_SOURCE_DIR'], 
+    'python/machine/data/heart.svmdata')
 
-  If you use this functionality in a publication, please be sure to also cite:
+  f = bob.machine.SVMFile(heart_data)
 
-  .. code-block:: latex
+  # the CMAKE_SOURCE_DIR is defined at conf.py.in
+  heart_model = os.path.join(os.environ['CMAKE_SOURCE_DIR'], 
+    'python/machine/data/heart.svmmodel')
 
-    @article{CC01a,
-     author  = {Chang, Chih-Chung and Lin, Chih-Jen},
-     title   = {{LIBSVM}: A library for support vector machines},
-     journal = {ACM Transactions on Intelligent Systems and Technology},
-     volume  = {2},
-     issue   = {3},
-     year    = {2011},
-     pages   = {27:1--27:27},
-     note    = {Software available at \url{http://www.csie.ntu.edu.tw/~cjlin/libsvm}}
-    }
+  svm = bob.machine.SupportVector(heart_model)
 
-GaussianMachine
----------------
+.. doctest:: svmfile
+
+  >>> labels, data = f.read_all()
+  >>> data = numpy.vstack(data) #creates a single 2D array
+
+Then you can throw the data into the ``svm`` machine you trained earlier like
+this:
+
+.. doctest:: svmfile
+
+  >>> predicted_labels = svm(data) 
+
+As a final note, if you decide to use our `LIBSVM`_ bindings for your
+publication, be sure to also cite:
+
+.. code-block:: latex
+
+  @article{CC01a,
+   author  = {Chang, Chih-Chung and Lin, Chih-Jen},
+   title   = {{LIBSVM}: A library for support vector machines},
+   journal = {ACM Transactions on Intelligent Systems and Technology},
+   volume  = {2},
+   issue   = {3},
+   year    = {2011},
+   pages   = {27:1--27:27},
+   note    = {Software available at \url{http://www.csie.ntu.edu.tw/~cjlin/libsvm}}
+  }
+
+Gaussian Machines
+-----------------
+
+The :py:class:`bob.machine.Gaussian` represents a `multivariate diagonal
+Gaussian (or normal) distribution
+<http://en.wikipedia.org/wiki/Multivariate_normal_distribution>`_. The
+*diagonality* of the gaussians in this multivariate distribution refers to the
+covariance matrix of the distribution. When the covariance matrix is diagonal,
+each variable in the distribution is independent of the others. 
+
+Objects of this class are normally used as building blocks of more complex
+:py:class:`bob.machine.GMMMachine` (Gaussian Mixture Model) objects, but can
+also be used individually. Here is how to create one multivariate diagonal
+gaussian distribution:
+
+.. doctest::
+
+  >>> g = bob.machine.Gaussian(2) #bi-variate diagonal normal distribution
+  >>> g.mean = numpy.array([0.3, 0.7], 'float64')
+  >>> g.mean
+  array([ 0.3,  0.7])
+  >>> g.variance = numpy.array([0.2, 0.1], 'float64')
+  >>> g.variance
+  array([ 0.2,  0.1])
+
+Once the :py:class:`bob.machine.Gaussian` has been set, you can use it to
+estimate the logarithm likelihood of an input feature vector with a matching
+number of dimensions:
+
+.. doctest::
+
+  >>> log_likelihood = g(numpy.array([0.4, 0.4], 'float64'))
+
+As with other machines you can save and re-load machines of this type using
+:py:meth:`bob.machine.Gaussian.save` and the class constructor respectively.
 
 GMMMachine
 ----------
+
+The :py:class:`bob.machine.GMMMachine` represents a Gaussian-Mixture Model
+(GMM).
 
 .. testcleanup:: *
 
