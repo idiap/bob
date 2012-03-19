@@ -22,7 +22,7 @@
 
 Machines are one of the core components of |project|. They represent
 statistical models that are `trainable`. Examples of machines are
-multi-layer perceptrons or gaussian-mixtures. The operation you normally expect
+multi-layer perceptrons or Gaussian-mixtures. The operation you normally expect
 from a machine is to be able to feed a feature vector and extract the machine
 response or output for that input vector. It works, in many ways, similarly to
 signal processing blocks. Different types of machines will get you a different
@@ -333,14 +333,14 @@ Gaussian Machines
 The :py:class:`bob.machine.Gaussian` represents a `multivariate diagonal
 Gaussian (or normal) distribution
 <http://en.wikipedia.org/wiki/Multivariate_normal_distribution>`_. The
-*diagonality* of the gaussians in this multivariate distribution refers to the
+*diagonality* of the Gaussians in this multivariate distribution refers to the
 covariance matrix of the distribution. When the covariance matrix is diagonal,
 each variable in the distribution is independent of the others. 
 
 Objects of this class are normally used as building blocks of more complex
 :py:class:`bob.machine.GMMMachine` (Gaussian Mixture Model) objects, but can
 also be used individually. Here is how to create one multivariate diagonal
-gaussian distribution:
+Gaussian distribution:
 
 .. doctest::
 
@@ -374,7 +374,7 @@ consists in a mixture of weighted :py:class:`bob.machine.Gaussian`.
 
   >>> gmm = bob.machine.GMMMachine(2,3) # Mixture of two diagonal Gaussian of dimension 3
 
-By default, the diagonal gaussian distributions of the GMM are initialized 
+By default, the diagonal Gaussian distributions of the GMM are initialized 
 with zero mean and unit variance, and the weights are identical. This can be
 updated using the :py:attr:`bob.machine.GMMMachine.means`, :py:attr:`bob.machine.GMMMachine.variances`
 or :py:attr:`bob.machine.GMMMachine.weights`.
