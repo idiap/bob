@@ -252,11 +252,8 @@ man_pages = [
 # Skips selected members in auto-generated documentation. Unfortunately, old
 # versions of Boost.Python will not generate a __self__ member for static
 # methods and that screws-up Sphinx processing
-def skip_member(app, what, name, obj, skip, options):
-  # We don't use this technique if the version of Sphinx is relatively new
-  if sphinx.__version__ >= "1.0": return False
-
-  # Else, we have to remove objects that do not have a __self__ attribute set
+def skip_static_member(app, what, name, obj, skip, options):
+  # We have to remove objects that do not have a __self__ attribute set
   import types
   if isinstance(obj, types.BuiltinFunctionType) and \
     not hasattr(obj, '__self__') and what == 'class':
@@ -268,8 +265,7 @@ def skip_member(app, what, name, obj, skip, options):
 # Default processing flags for sphinx
 autoclass_content = 'both'
 autodoc_member_order = 'bysource'
-autodoc_default_flags = ['members', 'inherited-members', 'show-inheritance']
-
+autodoc_default_flags = ['members', 'undoc-members', 'inherited-members', 'show-inheritance']
 
 # Used to filter some documentation in/out
 bob_modules = dir(__import__('bob'))
@@ -284,5 +280,6 @@ intersphinx_mapping = {
   }
 
 def setup(app):
-  #app.connect('autodoc-skip-member', skip_member)
+  if sphinx.__version__ < "1.0":
+    app.connect('autodoc-skip-member', skip_static_member)
   app.add_config_value('bob_modules', bob_modules, True)
