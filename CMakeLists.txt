@@ -113,22 +113,20 @@ if(CMAKE_PREFIX_PATH)
   endforeach()
 endif()
 
-# This is where we install cmake files for external projects
-set(cmakedir share/cmake/bob)
-
 # Sets up externals and install the central dependency file
 include(cmake/bob-external.cmake)
 
 foreach (ext ${bob_DEPENDENCIES})
   find_package(${ext} REQUIRED PATHS external)
-  install(FILES external/${ext}Config.cmake DESTINATION ${cmakedir})
 endforeach ()
 
 foreach (ext ${bob_OPTIONALS})
   find_package(${ext} PATHS external)
-  install(FILES external/${ext}Config.cmake DESTINATION ${cmakedir})
 endforeach ()
 
+# This is where we install cmake files for external projects
+set(cmakedir share/cmake/bob)
+install(DIRECTORY external/ DESTINATION ${cmakedir} PATTERN "*.cmake")
 install (FILES cmake/bob-external.cmake DESTINATION ${cmakedir})
 
 # Enables the testing framework
