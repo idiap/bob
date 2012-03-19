@@ -20,10 +20,12 @@
 #ifndef BOBOUTPUTWRITER_H
 #define BOBOUTPUTWRITER_H
 
-#include <daq/OutputWriter.h>
-#include <io/VideoWriter.h>
 #include <iostream>
 #include <fstream>
+#include <boost/shared_ptr.hpp>
+
+#include <daq/OutputWriter.h>
+#include <io/VideoWriter.h>
 
 namespace bob { namespace daq {
 
@@ -44,8 +46,8 @@ public:
   void writeFrame(blitz::Array<unsigned char, 2>& image, int frameNb, double timestamp);
 
 private:
-  io::VideoWriter* videoWriter;
-  std::ofstream* textFile;
+  boost::shared_ptr<io::VideoWriter> videoWriter;
+  boost::shared_ptr<std::ofstream> textFile;
 };
 
 }}

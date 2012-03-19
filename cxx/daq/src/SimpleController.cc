@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "daq/SimpleController.h"
-#include <opencv/highgui.h>
+#include <cv.h>
 #include <pthread.h>
 #include <sys/time.h>
 

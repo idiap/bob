@@ -20,6 +20,7 @@
 #ifndef OPENCVFACELOCALIZATION_H
 #define OPENCVFACELOCALIZATION_H
 
+#include <boost/shared_ptr.hpp>
 #include <daq/FaceLocalization.h>
 
 #include <cv.h>
@@ -47,7 +48,7 @@ private:
   cv::Mat img;
   pthread_mutex_t img_mutex;
 
-  CvHaarClassifierCascade* cascade;
+  boost::shared_ptr<CvHaarClassifierCascade> cascade;
 
   bool mustStop;
 };
