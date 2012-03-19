@@ -363,11 +363,10 @@ number of dimensions:
 As with other machines you can save and re-load machines of this type using
 :py:meth:`bob.machine.Gaussian.save` and the class constructor respectively.
 
-GMMMachine
-----------
+Gaussian Mixture Models
+-----------------------
 
-The :py:class:`bob.machine.GMMMachine` represents a Gaussian-Mixture Model
-(GMM).
+The :py:class:`bob.machine.GMMMachine` represents a Gaussian `Mixture Model <http://en.wikipedia.org/wiki/Mixture_model>`_ (GMM).
 
 .. testcleanup:: *
 
