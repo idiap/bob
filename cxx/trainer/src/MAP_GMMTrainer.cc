@@ -94,6 +94,9 @@ void train::MAP_GMMTrainer::mStep(mach::GMMMachine& gmm, const io::Arrayset& dat
     // Apply the scale factor, gamma, to ensure the new weights sum to unity 
     double gamma = blitz::sum(new_weights);
     new_weights /= gamma;
+
+    // Recompute the log weights in the cache of the GMMMachine
+    gmm.recomputeLogWeights();
   }
 
   // Update GMM parameters

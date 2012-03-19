@@ -121,6 +121,19 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double>
     { return m_weights; }
 
     /**
+     * Get the logarithm of the weights
+     * @param[out] logWeights The logarithm of the weights of the Gaussian components
+     */
+    inline const blitz::Array<double,1>& getLogWeights() const
+    { return m_cache_log_weights; }
+
+    /**
+     * Update the log of the weights in cache
+     * @warning Should be used by trainer only when using updateWeights()
+     */
+    void recomputeLogWeights() const;
+
+    /**
      * Set the means
      */
     void setMeans(const blitz::Array<double,2> &means);
@@ -341,6 +354,7 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double>
     
 
     /// Some cache arrays to avoid re-allocation when computing log-likelihoods
+    mutable blitz::Array<double,1> m_cache_log_weights;
     mutable blitz::Array<double,1> m_cache_log_weighted_gaussian_likelihoods;
     mutable blitz::Array<double,1> m_cache_P;
     mutable blitz::Array<double,2> m_cache_Px;

@@ -120,6 +120,12 @@ void mach::GMMMachine::resize(const size_t n_gaussians, const size_t n_inputs) {
 void mach::GMMMachine::setWeights(const blitz::Array<double,1> &weights) {
   ca::assertSameShape(weights, m_weights);
   m_weights = weights;
+  recomputeLogWeights();
+}
+
+void mach::GMMMachine::recomputeLogWeights() const
+{
+  m_cache_log_weights = blitz::log(m_weights);
 }
 
 void mach::GMMMachine::setMeans(const blitz::Array<double,2> &means) {
@@ -228,7 +234,7 @@ double mach::GMMMachine::logLikelihood_(const blitz::Array<double, 1> &x,
 
   // Accumulate the weighted log likelihoods from each Gaussian
   for(size_t i=0; i<m_n_gaussians; ++i) {
-    double l = log(m_weights(i)) + m_gaussians[i]->logLikelihood_(x);
+    double l = m_cache_log_weights(i) + m_gaussians[i]->logLikelihood_(x);
     log_weighted_gaussian_likelihoods(i) = l;
     log_likelihood = mathL::logAdd(log_likelihood, l);
   }
@@ -398,6 +404,8 @@ void mach::GMMMachine::updateCacheSupervectors() const
 
 void mach::GMMMachine::initCache() const {
   // Initialise cache arrays
+  m_cache_log_weights.resize(m_n_gaussians);
+  recomputeLogWeights();
   m_cache_log_weighted_gaussian_likelihoods.resize(m_n_gaussians);
   m_cache_P.resize(m_n_gaussians);
   m_cache_Px.resize(m_n_gaussians,m_n_inputs);

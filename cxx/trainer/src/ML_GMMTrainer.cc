@@ -56,6 +56,8 @@ void train::ML_GMMTrainer::mStep(mach::GMMMachine& gmm, const io::Arrayset& data
   if (update_weights) {
     blitz::Array<double,1>& weights = gmm.updateWeights();
     weights = m_ss.n / static_cast<double>(m_ss.T); //cast req. for linux/32-bits & osx
+    // Recompute the log weights in the cache of the GMMMachine
+    gmm.recomputeLogWeights();
   }
 
   // Generate a thresholded version of m_ss.n
