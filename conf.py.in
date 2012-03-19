@@ -241,6 +241,9 @@ rst_epilog = """
 .. |current-year| date:: %Y
 """
 
+# Some environment variables that should be set during generation
+os.environ['CMAKE_SOURCE_DIR'] = '@CMAKE_SOURCE_DIR@'
+
 # -- Options for manual page output --------------------------------------------
 
 # One entry per manual page. List of tuples
