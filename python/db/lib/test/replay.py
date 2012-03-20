@@ -34,7 +34,7 @@ class ReplayDatabaseTest(unittest.TestCase):
     self.assertEqual(len(set(f.values())), 200) #200 unique auth sessions
     for k,v in f.items():
       self.assertTrue( (v.find('authenticate') != -1) )
-      self.assertTrue( (v.find('rcd') != -1) )
+      self.assertTrue( (v.find('real') != -1) )
       self.assertTrue( (v.find('webcam') != -1) )
     
     train = db.files(cls='real', groups='train')
