@@ -263,6 +263,7 @@ class LBPTest(unittest.TestCase):
       v = ('1%8s' % bin(i, 2)).replace(' ', '0')
       self.assertEqual(proc(v), i)
 
+
   def test07_rotinvariant_8p1r(self):
     op = bob.ip.LBP8R(1,False,False,False,False,True)
     proc = Processor(op, generate_3x3_image, (1,1), 3)
@@ -346,24 +347,20 @@ class LBPTest(unittest.TestCase):
     proc8 = Processor(op, generate_5x5_image, (2,3), 5); self.assertEqual(proc8(values), res[2,1])
     proc9 = Processor(op, generate_5x5_image, (3,3), 5); self.assertEqual(proc9(values), res[2,2])
 
-  '''
-  def test14_ri_16p1r(self):
-    op = bob.ip.LBP16R(1, True, False, False, False, True)
-    values = [207, 24, 40, 36, 167, 230, 71, 247, 107, 9, 32, 139, 244, 233, 216, 232, 244, 123, 202, 238, 161, 246, 204, 244, 173]
-    res = numpy.ndarray((3,3), dtype=int)
-    res[0,0]=224; res[0,1]=1; res[0,2]=124;
-    res[1,0]=0; res[1,1]=2; res[1,2]=22;
-    res[2,0]=10; res[2,1]=242; res[2,2]=180; 
-    proc1 = Processor(op, generate_5x5_image, (1,1), 5); self.assertEqual(proc1(values), res[0,0])
-    proc2 = Processor(op, generate_5x5_image, (2,1), 5); self.assertEqual(proc2(values), res[0,1])
-    proc3 = Processor(op, generate_5x5_image, (3,1), 5); self.assertEqual(proc3(values), res[0,2])
-    proc4 = Processor(op, generate_5x5_image, (1,2), 5); self.assertEqual(proc4(values), res[1,0])
-    proc5 = Processor(op, generate_5x5_image, (2,2), 5); self.assertEqual(proc5(values), res[1,1])
-    proc6 = Processor(op, generate_5x5_image, (3,2), 5); self.assertEqual(proc6(values), res[1,2])
-    proc7 = Processor(op, generate_5x5_image, (1,3), 5); self.assertEqual(proc7(values), res[2,0])
-    proc8 = Processor(op, generate_5x5_image, (2,3), 5); self.assertEqual(proc8(values), res[2,1])
-    proc9 = Processor(op, generate_5x5_image, (3,3), 5); self.assertEqual(proc9(values), res[2,2])
-  ''' 
+  def test14_eLBP_8p1r(self):
+    op = bob.ip.LBP8R(1, False, False, False, False, False, 0) # eLBP_type = 0, 
+    proc1 = Processor(op, generate_3x3_image, (1,1), 3)
+    self.assertEqual(proc1('012345678'), 0xff) #0x0
+    op = bob.ip.LBP8R(1, False, True, False, False, False, 0) # eLBP_type = 0, to_average=True for modified LBP (MCT)
+    proc2 = Processor(op, generate_3x3_image, (1,1), 3)
+    self.assertEqual(proc2('012345678'), 0x1f) #0x0
+    op = bob.ip.LBP8R(1, False, False, False, False, False, 1) # eLBP_type=1, transitional LBP
+    proc3 = Processor(op, generate_3x3_image, (1,1), 3)
+    self.assertEqual(proc3('014725836'), 0x25) #0x0
+    op = bob.ip.LBP8R(1, False, False, False, False, False, 2) # eLBP_type=2, direction coded LBP
+    proc4 = Processor(op, generate_3x3_image, (1,1), 3)
+    self.assertEqual(proc4('014725836'), 0xae) #0x0
+    
 
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(LBPTest)

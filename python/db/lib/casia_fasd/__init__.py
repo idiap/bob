@@ -199,11 +199,11 @@ class Database(object):
 
     Keyword parameters:
 
-    version
-      The version of the database that is needed: 'raw', 'detected_face' or 'normalized_face'.
-
     cls
       The class of the samples: 'real' or 'attack'
+  
+    types
+      Type of the database that is going to be used: 'warped', 'cut' or 'video' or a tuple of these
   
     infilename
       The name of the file where the cross-validation files are stored. If it is None, then the name of the filename with the cross-validation files is formed using the parameters version and cls. If this parameter is specified, then the parameters version and cls are ignored
