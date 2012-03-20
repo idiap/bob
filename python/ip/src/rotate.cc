@@ -51,7 +51,7 @@ static boost::python::tuple get_rotated_output_shape(bob::python::const_ndarray 
 }
 
 template <class T>
-  static void inner_rotate(bob::python::const_ndarray input_image, bob::python::ndarray output_image, double angle, const bob::ip::Rotate::Algorithm& rotation_algorithm)
+  static void inner_rotate(bob::python::const_ndarray input_image, bob::python::ndarray output_image, double angle, const bob::ip::Rotate::Algorithm rotation_algorithm)
 {
   
   switch (input_image.type().nd){
@@ -72,7 +72,7 @@ template <class T>
   }
 }
 
-static void rotate(bob::python::const_ndarray input_image, bob::python::ndarray output_image, double angle, bool angle_in_degrees, const bob::ip::Rotate::Algorithm& rotation_algorithm){
+static void rotate(bob::python::const_ndarray input_image, bob::python::ndarray output_image, double angle, bool angle_in_degrees = true, const bob::ip::Rotate::Algorithm rotation_algorithm = bob::ip::Rotate::Shearing){
   // compute angle in degrees, if desired
   if (!angle_in_degrees)
     angle *= 180./M_PI;
@@ -96,7 +96,7 @@ static void rotate(bob::python::const_ndarray input_image, bob::python::ndarray 
 
 
 template <class T>
-  static void inner_rotate(bob::python::const_ndarray input_image, const blitz::Array<bool,2>& i_mask, bob::python::ndarray output_image, blitz::Array<bool,2>& o_mask, double angle, const bob::ip::Rotate::Algorithm& rotation_algorithm)
+  static void inner_rotate_with_mask(bob::python::const_ndarray input_image, const blitz::Array<bool,2>& i_mask, bob::python::ndarray output_image, blitz::Array<bool,2>& o_mask, double angle, const bob::ip::Rotate::Algorithm rotation_algorithm)
 {
   
   switch (input_image.type().nd){
@@ -118,7 +118,7 @@ template <class T>
 }
 
 
-static void rotate_mask(bob::python::const_ndarray input_image, bob::python::const_ndarray input_mask, bob::python::ndarray output_image, bob::python::ndarray output_mask, double angle, bool angle_in_degrees, const bob::ip::Rotate::Algorithm& rotation_algorithm){
+static void rotate_with_mask(bob::python::const_ndarray input_image, bob::python::const_ndarray input_mask, bob::python::ndarray output_image, bob::python::ndarray output_mask, double angle, bool angle_in_degrees = true, const bob::ip::Rotate::Algorithm rotation_algorithm = bob::ip::Rotate::Shearing){
   // compute angle in degrees, if desired
   if (!angle_in_degrees)
     angle *= 180./M_PI;
@@ -128,20 +128,24 @@ static void rotate_mask(bob::python::const_ndarray input_image, bob::python::con
   
   switch (input_image.type().dtype) {
     case bob::core::array::t_uint8:{
-      inner_rotate<uint8_t>(input_image, i_mask, output_image, o_mask, angle, rotation_algorithm);
+      inner_rotate_with_mask<uint8_t>(input_image, i_mask, output_image, o_mask, angle, rotation_algorithm);
       break;
     }
     case bob::core::array::t_uint16:{
-      inner_rotate<uint16_t>(input_image, i_mask, output_image, o_mask, angle, rotation_algorithm);
+      inner_rotate_with_mask<uint16_t>(input_image, i_mask, output_image, o_mask, angle, rotation_algorithm);
       break;
     }
     case bob::core::array::t_float64:{
-      inner_rotate<double>(input_image, i_mask, output_image, o_mask, angle, rotation_algorithm);
+      inner_rotate_with_mask<double>(input_image, i_mask, output_image, o_mask, angle, rotation_algorithm);
       break;
     }
     default: PYTHON_ERROR(TypeError, "cannot get shape from unsupporter array of type '%s'", input_image.type().str().c_str());
   }
 }
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(rotate_overloads, rotate, 3, 5)
+
+
 
 void bind_ip_rotate() {
   boost::python::enum_<bob::ip::Rotate::Algorithm>("RotateAlgorithm")
@@ -158,13 +162,13 @@ void bind_ip_rotate() {
   boost::python::def(
     "rotate",
     &rotate,
-    (boost::python::arg("input"), boost::python::arg("output"), boost::python::arg("angle"), boost::python::arg("angle_in_degrees") = true, boost::python::arg("rotation_algorithm")="Shearing"),
-    "Rotates the given input image into the given output image. The size of the output image can be computed using the get_rotated_output_shape function. The angle might be given in degree or in radians (please set angle_in_degrees to False in the latter case)."
+    rotate_overloads((boost::python::arg("input"), boost::python::arg("output"), boost::python::arg("angle"), boost::python::arg("angle_in_degrees") = true, boost::python::arg("rotation_algorithm")="Shearing"),
+    "Rotates the given input image into the given output image. The size of the output image can be computed using the get_rotated_output_shape function. The angle might be given in degree or in radians (please set angle_in_degrees to False in the latter case).")
   );
 
   boost::python::def(
     "rotate",
-    &rotate_mask,
+    &rotate_with_mask,
     (boost::python::arg("input"), boost::python::arg("input_mask"), boost::python::arg("output"), boost::python::arg("output_mask"), boost::python::arg("angle"), boost::python::arg("angle_in_degrees") = true, boost::python::arg("rotation_algorithm")="Shearing"),
     "Rotates the given input image into the given output image using the given mask images. The size of the output image and the output mask can be computed using the get_rotated_output_shape function. The angle might be given in degree or in radians (please set angle_in_degrees to False in the latter case)."
   );

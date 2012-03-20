@@ -21,7 +21,7 @@ set(ccsrc
    "src/GaborWaveletTransform.cc"
    "src/GeomNorm.cc"
    "src/FaceEyesNorm.cc"
-   "src/Rotate.cc"
+   "src/rotate.cc"
    "src/TanTriggs.cc"
    "src/histo.cc"
    "src/LBP.cc"
