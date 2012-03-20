@@ -25,6 +25,7 @@
 
 #include <blitz/array.h>
 #include <algorithm>
+#include <cmath>
 #include "core/array_assert.h"
 #include "core/cast.h"
 #include "ip/Exception.h"
@@ -56,7 +57,7 @@ namespace bob {
           */
         LBP8R(const double R=1., const bool circular=false, 
             const bool to_average=false, const bool add_average_bit=false, 
-            const bool uniform=false, const bool rotation_invariant=false);
+            const bool uniform=false, const bool rotation_invariant=false, const int eLBP_type=0);
 
         /**
           * @brief Destructor
@@ -233,21 +234,53 @@ namespace bob {
 
       uint16_t lbp = 0;
       // lbp = lbp << 1; // useless
-      if(tab[0] >= cmp_point) ++lbp;
-      lbp = lbp << 1;
-      if(tab[1] >= cmp_point) ++lbp;
-      lbp = lbp << 1;
-      if(tab[2] >= cmp_point) ++lbp;
-      lbp = lbp << 1;
-      if(tab[3] >= cmp_point) ++lbp;
-      lbp = lbp << 1;
-      if(tab[4] >= cmp_point) ++lbp;
-      lbp = lbp << 1;
-      if(tab[5] >= cmp_point) ++lbp;
-      lbp = lbp << 1;
-      if(tab[6] >= cmp_point) ++lbp;
-      lbp = lbp << 1;
-      if(tab[7] >= cmp_point) ++lbp;
+      if(m_eLBP_type == 0) // regular LBP
+      {
+        if(tab[0] >= cmp_point) ++lbp;
+        lbp = lbp << 1;
+        if(tab[1] >= cmp_point) ++lbp;
+        lbp = lbp << 1;
+        if(tab[2] >= cmp_point) ++lbp;
+        lbp = lbp << 1;
+        if(tab[3] >= cmp_point) ++lbp;
+        lbp = lbp << 1;
+        if(tab[4] >= cmp_point) ++lbp;
+        lbp = lbp << 1;
+        if(tab[5] >= cmp_point) ++lbp;
+        lbp = lbp << 1;
+        if(tab[6] >= cmp_point) ++lbp;
+        lbp = lbp << 1;
+        if(tab[7] >= cmp_point) ++lbp;
+      } 
+
+      if (m_eLBP_type == 1) // transitional LBP
+      {
+        for(int i=0; i<=7; i++)
+        {
+          lbp = lbp << 1;
+          if(i==7)
+          {
+            if(tab[i] >= tab[0]) ++lbp;
+          }
+          else    
+            if(tab[i] >= tab[i+1]) ++lbp;
+        }
+      }
+
+      if (m_eLBP_type == 2) //directional coded LBP
+      {
+        for(int i=0; i<=3; i++)
+        {
+          lbp = lbp << 2;
+          if((tab[i] >= cmp_point && tab[i+4] >= cmp_point) || (tab[i] < cmp_point && tab[i+4] < cmp_point))
+            if (fabs(tab[i]-cmp_point) > fabs(tab[i+4]-cmp_point)) lbp+=3;
+            else lbp+=2;
+          else
+            if (fabs(tab[i]-cmp_point) > fabs(tab[i+4]-cmp_point)) lbp+=0;
+            else lbp+=1;
+        }
+      }
+
       if(m_add_average_bit && !m_rotation_invariant && !m_uniform)
       {
         lbp = lbp << 1;
