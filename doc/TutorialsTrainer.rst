@@ -20,9 +20,6 @@
  Trainers
 **********
 
-Introduction
-============
-
 In the previous section, the concept of `machine` has been introduced. A
 `machine` is fed by some input data, processes it and returns an output.
 For instance, if we consider a :py:class:`bob.machine.LinearMachine`, the 
@@ -237,33 +234,63 @@ used to determine if the convergence has occurred.
    >>> trainer.maxIterations = 200
    >>> trainer.train(gmm, data)
    >>> print gmm # doctest: +SKIP
-   Weights = (0,1)
-  [ 0.4 0.6 ]
-  <BLANKLINE>
-  Gaussian 0: 
-  Mean = (0,2)
-  [ -6 6 -100.5 ]
-  <BLANKLINE>
-  Variance = (0,2)
-  [ 1 1 0.25 ]
-  <BLANKLINE>
-  Gaussian 1: 
-  Mean = (0,2)
-  [ 3.5 -3.5 99 ]
-  <BLANKLINE>
-  Variance = (0,2)
-  [ 0.166667 0.166667 0.666667 ]
 
 
 MAP-adaptation for Gaussian Mixture Model
 =========================================
 
+|project| also supports the computation of a **maximum a posteriori 
+probability** (MAP) [7]_ estimate of a Gaussian **Mixture Model** (GMM) [5]_
+distribution. MAP [7]_ is closely related to the maximum likelihood (ML) [6]_
+technique, but incorporates a prior distribution over the quantity one wants 
+to estimate. In our case, this prior is modeled by a  Gaussian **Mixture 
+Model** (GMM) [5]_. Based on this prior model and some training data, a new
+model, the MAP estimate, will be `adapted`.
 
+Let's considered that the previously trained GMM [5]_ is our prior model.
 
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
 
+   >>> print gmm # doctest: +SKIP
 
-Joint Factor Analysis Trainer
-=============================
+The training data used to compute the MAP estimate [7]_ is again stored in a
+:py:class:`bob.io.Arrayset` container.
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+
+   >>> dataMAP = bob.io.Arrayset()  # Creates a container for the training data
+   >>> a = numpy.array([7,-7,102], 'float64')
+   >>> b = numpy.array([6,-6,103], 'float64')
+   >>> c = numpy.array([-3.5,3.5,-97], 'float64')
+   >>> dataMAP.append(a)
+   >>> dataMAP.append(b)
+   >>> dataMAP.append(c)
+   >>> print dataMAP
+   <Arrayset[3] float64@(3,)>
+
+The |project| class used to perform the MAP adaptation [7]_ is 
+:py:class:`bob.trainer.MAP_GMMTrainer`. As for the ML estimate [6]_, it uses 
+an **EM**-based [4]_ algorithm and requires to specify which parts of the GMM
+are adapted at each iteration (means, variances and/or weights). In addition, 
+it also has parameters such as the maximum number of iterations and the 
+criterium used to determine if the convergence has occurred, as well as a 
+relevance factor which indicates the importance we give to the prior.
+Once the trainer has been created, a prior GMM [5]_ needs to be set.
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+  
+   >>> relevance_factor = 4.
+   >>> trainer = bob.trainer.MAP_GMMTrainer(relevance_factor, True, False, False) # mean adaptation only
+   >>> trainer.convergenceThreshold = 1e-5
+   >>> trainer.maxIterations = 200
+   >>> trainer.setPriorGMM(gmm)
+   True
+   >>> gmmAdapted = bob.machine.GMMMachine(2,3) # Create a new machine for the MAP estimate
+   >>> trainer.train(gmmAdapted, dataMAP)
+   >>> print gmmAdapted # doctest: +SKIP
 
 
 .. Place here your external references
@@ -274,3 +301,4 @@ Joint Factor Analysis Trainer
 .. [4] http://en.wikipedia.org/wiki/Expectation-maximization_algorithm
 .. [5] http://en.wikipedia.org/wiki/Mixture_model
 .. [6] http://en.wikipedia.org/wiki/Maximum_likelihood
+.. [7] http://en.wikipedia.org/wiki/Maximum_a_posteriori_estimation
