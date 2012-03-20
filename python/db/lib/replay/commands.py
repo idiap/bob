@@ -107,6 +107,10 @@ def add_commands(parser):
   from .dumplist import add_command as dumplist_command
   dumplist_command(subparsers)
 
+  # get the "checkfiles" action from a submodule
+  from .checkfiles import add_command as checkfiles_command
+  checkfiles_command(subparsers)
+
   # adds the "reverse" command
   reverse_command(subparsers)
 

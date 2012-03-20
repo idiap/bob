@@ -42,6 +42,10 @@ bob_python_add_dependent_test(db-replay-dumplist python-db-replay-create
 bob_python_add_dependent_test(db-replay-dumplist2 python-db-replay-create
   dbmanage.py replay dumplist --class=attack --group=devel --support=hand --protocol=highdef --self-test)
 
+# Just check functionality
+bob_python_add_dependent_test(db-replay-checkfiles python-db-replay-create
+  dbmanage.py replay checkfiles --self-test)
+
 bob_python_add_unittest(db lib/test/replay.py)
 set_property(TEST python-db-replay-main APPEND PROPERTY DEPENDS
   python-db-replay-create)

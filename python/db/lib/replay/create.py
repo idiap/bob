@@ -35,7 +35,7 @@ def add_real_lists(session, protodir, verbose):
   def add_real_list(session, filename):
     """Adds an RCD filelist and materializes RealAccess'es."""
 
-    def parse_rcd_filename(f):
+    def parse_real_filename(f):
       """Parses the RCD filename and break it in the relevant chunks."""
 
       v = os.path.splitext(os.path.basename(f))[0].split('_')
@@ -50,7 +50,7 @@ def add_real_lists(session, protodir, verbose):
     for fname in open(filename, 'rt'):
       s = fname.strip()
       if not s: continue #emtpy line
-      filefields, realfields = parse_rcd_filename(s)
+      filefields, realfields = parse_real_filename(s)
       filefields[0] = session.query(Client).filter(Client.id == filefields[0]).one()
       file = File(*filefields)
       session.add(file)
@@ -68,7 +68,7 @@ def add_attack_lists(session, protodir, verbose):
   def add_attack_list(session, filename):
     """Adds an RAD filelist and materializes Attacks."""
 
-    def parse_rad_filename(f):
+    def parse_attack_filename(f):
       """Parses the RAD filename and break it in the relevant chunks."""
 
       v = os.path.splitext(os.path.basename(f))[0].split('_')
@@ -84,7 +84,7 @@ def add_attack_lists(session, protodir, verbose):
     for fname in open(filename, 'rt'):
       s = fname.strip()
       if not s: continue #emtpy line
-      filefields, attackfields = parse_rad_filename(s)
+      filefields, attackfields = parse_attack_filename(s)
       filefields[0] = session.query(Client).filter(Client.id == filefields[0]).one()
       file = File(*filefields)
       session.add(file)
