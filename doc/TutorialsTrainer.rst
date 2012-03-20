@@ -236,9 +236,23 @@ used to determine if the convergence has occurred.
    >>> trainer.convergenceThreshold = 1e-5
    >>> trainer.maxIterations = 200
    >>> trainer.train(gmm, data)
-   >>> print gmm
-
-
+   >>> print gmm # doctest: +SKIP
+   Weights = (0,1)
+  [ 0.4 0.6 ]
+  <BLANKLINE>
+  Gaussian 0: 
+  Mean = (0,2)
+  [ -6 6 -100.5 ]
+  <BLANKLINE>
+  Variance = (0,2)
+  [ 1 1 0.25 ]
+  <BLANKLINE>
+  Gaussian 1: 
+  Mean = (0,2)
+  [ 3.5 -3.5 99 ]
+  <BLANKLINE>
+  Variance = (0,2)
+  [ 0.166667 0.166667 0.666667 ]
 
 
 MAP-adaptation for Gaussian Mixture Model
