@@ -43,6 +43,9 @@ below, `NumPy`_ should be imported in the `Python`_ environment.
 
    >>> import numpy
 
+.. note::
+
+   For `matlab`_ users, this `page`_ highlights the differences and the commonalities between `NumPy`_ and `matlab`_.
 
 Array creation
 ~~~~~~~~~~~~~~
@@ -251,9 +254,7 @@ function.
    [0 2 7 4]
 
 For a more exhaustive introduction about `NumPy`_, please have a look at its 
-`user guide`_. For `matlab`_ users, this `page`_ might also be of 
-interest.
-
+`user guide`_. 
 
 Digital signals as multi-dimensional arrays
 ===========================================
@@ -325,8 +326,6 @@ and the second one to the wave magnitude.
 
 .. Place here your external references
 
-.. _python: http://www.python.org
-.. _numpy: http://numpy.scipy.org
+.. include:: links.rst
 .. _user guide: http://docs.scipy.org/doc/numpy/user/
-.. _matlab: http://www.mathworks.ch/products/matlab/
 .. _page: http://www.scipy.org/NumPy_for_Matlab_Users page
