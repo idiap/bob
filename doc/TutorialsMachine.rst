@@ -223,7 +223,7 @@ The :py:class:`bob.machine.SupportVector` implements a Support Vector Machine
 with a bridge to `LIBSVM`_. The bridge functionality includes loading and
 saving SVM data files and machine models, which you can produce or download
 following the instructions found on `LIBSVM`_'s home page. |project| bindings
-to `LIBSVM`_ do not allow you to explicetly set the machine's internal values.
+to `LIBSVM`_ do not allow you to explicitly set the machine's internal values.
 You must use the associated trainer as explained on :doc:`TutorialsTrainer` to
 generate a valid :py:class:`bob.machine.SupportVector`. Once you have followed
 the instructions at :doc:`TutorialsTrainer`, you can come back to this page and
