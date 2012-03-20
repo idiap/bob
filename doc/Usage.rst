@@ -59,4 +59,4 @@ Example:
 .. note::
 
   You can find detailed information on how to build |project| locally at
-  :doc:`BobCompilation`.
+  :doc:`Compilation`.

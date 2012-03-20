@@ -31,7 +31,6 @@ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
-this program.  If not, see the `Free Software Foundation Website`_.
+this program.  If not, make sure to check the `GPL-3.0`_ licensing terms.
 
-.. Place your references here:
-.. _Free Software Foundation Website: http://www.gnu.org/licenses/
+.. include:: links.rst

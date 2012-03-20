@@ -25,7 +25,7 @@
 If you are just willing to use |project| existing resources in your scripts,
 the easiest way to pick one of the available installation methods bellow.
 Otherwise, if they fail or don't match your development requirements, you must
-compile |project| yourself as explained at :doc:`BobInstallation`.
+compile |project| yourself as explained at :doc:`Installation`.
 
 This section only describes how to automatically install pre-packaged version
 of |project|.

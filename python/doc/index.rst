@@ -17,45 +17,10 @@
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-============
- Python API
-============
-
-|project| is written in a mix of Python and C++ and is designed to be both 
-efficient and to reduce development time. Most of the |project| C++ 
-functionality is bound to Python using `Boost Python`_. This provides the
-users several advantages:
-
-* Possibility to call efficient C++ functions from the Python interpreter
-* Easy to glue all the components of an experiment within a single Python
-  script (which does not require to be compiled)
-* Scripts may easily rely on any other Python tool
-
-This section describes the features of |project| following its organization
-in packages. It includes both a user guide and a reference manual.
-
-We recall that to use |project| from Python, you just need to add the path to
-the built library to the PYTHONPATH environment variable before launching a 
-Python interpreter and importing bob. This has already been described in the
-installation section.
-
-.. code-block:: sh
-
-  $ PYTHONPATH=YOUR_PATH_TO_BOB python
-  ...
-  >>> import bob
-
-Finally, you can always get information about a specific function by using the
-Python help() function:
-
-.. code-block:: sh
-
-  >>> help(bob.machine.MLP)
-
-
 .. toctree::
    :maxdepth: 2
 
+   introduction
    ../core/doc/index
    ../io/doc/index
    ../math/doc/index
@@ -67,7 +32,3 @@ Python help() function:
    ../trainer/doc/index
    ../visioner/doc/index
    ../daq/doc/index
-
-.. References
-
-.. _boost python: http://www.boost.org/doc/libs/release/libs/python/doc/index.html

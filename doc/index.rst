@@ -27,12 +27,12 @@
 |project| is a signal-processing and machine learning toolbox for Biometrics
 developed at  the `Idiap`_ Research Institute, in Switzerland. The toolbox is
 written in a mix of `Python`_ and `C++` and is designed to be both efficient
-and to reduce development time. To learn about this project's history, please
-visit :doc:`BobHistory`.
+and to reduce development time. To learn about this project's motivations and
+history, visit :doc:`Motivation`.
 
 We believe in free software and development standards. |project| is a freely
 available library, licensed under the terms of the GPL v3. For more information
-on licensing, please visit our :doc:`BobLicensing`.
+on licensing, please visit our :doc:`Licensing`.
 
 Enjoy!
 
@@ -42,11 +42,11 @@ Practicalities
 .. toctree::
    :maxdepth: 2
 
-   BobLicensing
-   BobInstallation
-   BobUsage
-   BobTicketReporting
-   BobHistory
+   Motivation
+   Licensing
+   Installation
+   Usage
+   TicketReporting
 
 
 Overview
@@ -86,11 +86,11 @@ Developer's Guide
 .. toctree::
    :maxdepth: 2
 
-   BobCompilation
+   Compilation
    CxxDevelopment
    GoldenRules
    CodingGuidelines
-   OptimizingBob
+   Optimizing
    ../cxx/doc/index
 
 Indices and tables
@@ -100,8 +100,4 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-.. Place here your external references
-
-.. _idiap: http://www.idiap.ch
-.. _python: http://www.python.org
-.. _c++: http://www2.research.att.com/~bs/C++.html
+.. include:: links.rst

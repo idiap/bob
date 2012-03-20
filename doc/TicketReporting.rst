@@ -42,7 +42,7 @@ qualities:
    in the bug report if possible. The quicker the developer can isolate the
    issue to a specific problem, the more likely it will be fixed in a timely
    manner.
-3. **Not a Duplicate**: Please `search`_ before filing bug reports. Try a
+3. **Not a Duplicate**: Please search before filing bug reports. Try a
    variety of words in case the one(s) you're using isn't the usual one to
    describe what you're talking about. If you're running a nigthly release look
    at the associated milestone on the  Roadmap to see if your bug is already
@@ -71,7 +71,7 @@ bug report:
   suck. Oh, that is also the opinion of other folks down here. Thx 4 fixing
   theze bugz."
 * **Useful report**: "|project| crashes immediately each time I try to use the
-  bob::LBP4R type, using version 2.1.4 on a Mac OS X 10.5.4 system.  It
+  ``bob::LBP4R`` type, using version 1.0.1 on a Mac OS X 10.6.5 system.  It
   crashes upon the initialization of the class. I am attaching the crash
   reports here, together with a small program that I wrote that can reproduce
   the issue."
@@ -79,18 +79,14 @@ bug report:
 Composing a new ticket
 ----------------------
 
-Once you have logged into your Trac account you can click `New Ticket`_ at the
-top of the page to start creating a new ticket.
-
-A few things to note:
+Follow the link to `submit a new bug report`_ at GitHub. A few things to note:
 
 * Please only put one issue in each ticket. File multiple tickets if you can
-  confirm multiple bugs or want multiple features implemented.
+  confirm multiple bugs or want multiple features implemented;
 * Please make sure to file your ticket in English, as that is the only language
-  that most of our developers understand.
+  that most of our developers understand;
 * Please keep the comments related to fixing the bug or relevant to the feature
-  request. Comments like "Me too" or "I really want this fixed" are not usually
-  helpful.
+  request;
 * Please include the following information in every bug report you file:
 
   - A list of steps to reproduce the problem. If you need to compile a program
@@ -104,13 +100,15 @@ A few things to note:
     version numbers by executing the following script that is provided with
     |project|:
 
-.. code-block:: sh
-   
-   $ info_table.py
+    .. code-block:: sh
+       
+       $ bob_config.py
 
-.. Place here all external references
+.. Place here all external references for this document only
 
 .. _Eric Raymond's How To Ask Questions The Smart Way: http://www.catb.org/~esr/faqs/smart-questions.html
 .. _Simon Tatham's How to Report Bugs Effectively: http://www.chiark.greenend.org.uk/~sgtatham/bugs.html
-.. _search: https://github.com/idiap/bob/issues
-.. _new ticket: https://github.com/idiap/bob/issues
+
+.. All other references (that can be shared) should go to the central file:
+
+.. include:: links.rst

@@ -230,7 +230,7 @@ ability to plot and interact with bob:
   and whistles
 * `LIBSVM`_: A software framework for support vector classification
 * `OpenCV`_: A Computer Vision library which is currently used by the 
-  Bob Data Acquisition module.
+  |project| Data Acquisition module.
 
 Notes for specific platforms
 ----------------------------
@@ -461,52 +461,4 @@ base OS and check everything is as expected. If you cannot go through, please
 specify your OS version and the versions of the external dependencies so we can
 try to reproduce the failure.
 
-.. Place here references to all citations in lower case
-
-.. _macports: http://www.macports.org
-.. _macports installation instructions: http://www.macports.org/install.php
-.. _fink: http://www.finkproject.org
-.. _submit a new bug report: https://github.com/idiap/bob/issues
-.. _blitz++: http://www.oonumerics.org/blitz
-.. _cmake: http://www.cmake.org
-.. _ffmpeg: http://www.ffmpeg.org
-.. _lapack: http://www.netlib.org/lapack
-.. _boost: http://www.boost.org
-.. _python: http://www.python.org
-.. _google perftools: http://code.google.com/p/google-perftools
-.. _numpy: http://numpy.scipy.org
-.. _doxygen: http://www.doxygen.org
-.. _sphinx: http://sphinx.pocoo.org
-.. _matio: http://matio.sourceforge.net
-.. _imagemagick: http://www.imagemagick.org
-.. _hdf5: http://www.hdfgroup.org/HDF5
-.. _scipy: http://www.scipy.org
-.. _ipython: http://ipython.scipy.org
-.. _matplotlib: http://matplotlib.sourceforge.net
-.. _Bob's Idiap Guide: http://github.com/idiap/bob/wiki/Using-Bob-at-Idiap
-.. _buildbot: http://trac.buildbot.net
-.. _argparse: http://code.google.com/p/argparse/
-.. _sqlalchemy: http://www.sqlalchemy.org/
-.. _dvipng: http://savannah.nongnu.org/projects/dvipng/
-.. _qt4: http://qt.nokia.com/ 
-.. _git: http://git-scm.com/
-.. _vlfeat: http://www.vlfeat.org/
-.. _vlfeat launchpad webpage: https://launchpad.net/~gezakovacs/+archive/vlfeat
-.. _fftw: http://www.fftw.org/
-.. _Bob's website: https://www.idiap.ch/software/bob
-.. _LIBSVM: http://www.csie.ntu.edu.tw/~cjlin/libsvm/
-.. _OpenCV: http://opencv.willowgarage.com/
-
-.. Place here references to licenses
-
-.. _Apache-2.0: http://www.opensource.org/licenses/Apache-2.0
-.. _Artistic-2.0: http://www.opensource.org/licenses/Artistic-2.0
-.. _BSD-2-Clause: http://www.opensource.org/licenses/BSD-2-Clause
-.. _BSD-3-Clause: http://www.opensource.org/licenses/BSD-3-Clause
-.. _BSL-1.0: http://www.opensource.org/licenses/BSL-1.0
-.. _GPL-2.0: http://www.opensource.org/licenses/GPL-2.0
-.. _GPL-3.0: http://www.opensource.org/licenses/GPL-3.0
-.. _HDF5 License: ftp://ftp.hdfgroup.org/HDF5/current/src/unpacked/COPYING
-.. _LGPL-2.1: http://www.opensource.org/licenses/LGPL-2.1
-.. _MIT: http://www.opensource.org/licenses/MIT
-.. _Python-2.0: http://www.opensource.org/licenses/Python-2.0
+.. include:: links.rst

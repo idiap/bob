@@ -110,7 +110,7 @@ C++ Coding Guidelines
 Here are some C++ tips we have found useful:
 
 * Optimization: **Don't**. If you still want to do it, please make sure you
-  fully read :doc:`OptimizingBob`.
+  fully read :doc:`Optimizing`.
 * DRY: means `Don't repeat yourself`_. You should apply this principle at
   **all** moments while you are coding to avoid repeating bugs or only
   partially fixing them
@@ -143,7 +143,11 @@ Python Coding Guidelines
 
 * `The Google Python Style Guide`_
 
-.. Place your references here:
+.. Most links should go here:
+
+.. include:: links.rst
+
+.. Place your references that are exclusive to this document here:
 
 .. _`c++ faq`: http://www.parashift.com/c++-faq-lite/
 .. _`c++ coding standard`: http://www.possibility.com/Cpp/CppCodingStandard.html
