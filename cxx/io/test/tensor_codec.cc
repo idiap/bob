@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE( tensor_2d_read_T5alpha )
   boost::filesystem::path testdata_path( testdata_cpath);
   testdata_path /= "tensor_char.tensor";
 
-  // Prepare io Array from Tensor file saved with bob5 alpha
+  // Prepare io Array from Tensor file saved with torch5spro alpha
   bob::io::Array db_b(testdata_path.string());
   BOOST_CHECK_EQUAL(db_b.getNDim(), b.dimensions());
   BOOST_CHECK_EQUAL(db_b.getElementType(), bob::core::array::t_int8);
