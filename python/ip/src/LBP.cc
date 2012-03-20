@@ -163,6 +163,7 @@ void bind_ip_lbp_new() {
     .add_property("add_average_bit", &ip::LBP::getAddAverageBit, &ip::LBP::setAddAverageBit)
     .add_property("uniform", &ip::LBP::getUniform, &ip::LBP::setUniform)
     .add_property("rotation_invariant", &ip::LBP::getRotationInvariant, &ip::LBP::setRotationInvariant)
+    .add_property("eLBP_type", &ip::LBP::get_eLBP, &ip::LBP::set_eLBP, "The type of extended LBP: 0 - regular LBP, 1 - transitional LBP, 2 - direction coded LBP")
     ;
 
   class_<ip::LBP4R, boost::shared_ptr<ip::LBP4R>, bases<ip::LBP> >("LBP4R", lbp4r_doc, init<optional<const double, const bool, const bool, const bool, const bool, const bool> >((arg("R")=1.0,arg("circular")=false,arg("to_average")=false,arg("add_average_bit")=false,arg("uniform")=false, arg("rotation_invariant")=false), "Construct a new LBP4R object"))
@@ -173,7 +174,7 @@ void bind_ip_lbp_new() {
     .def("getLBPShape", &get_shape<ip::LBP4R>, (arg("self"), arg("input")), "Get a tuple containing the expected size of the output when extracting LBP4R features.")
     ;
 
-  class_<ip::LBP8R, boost::shared_ptr<ip::LBP8R>, bases<ip::LBP> >("LBP8R", lbp8r_doc, init<optional<const double, const bool, const bool, const bool, const bool, const bool> >((arg("R")=1.0,arg("circular")=false,arg("to_average")=false,arg("add_average_bit")=false,arg("uniform")=false, arg("rotation_invariant")=false), "Construct a new LBP8R object"))
+  class_<ip::LBP8R, boost::shared_ptr<ip::LBP8R>, bases<ip::LBP> >("LBP8R", lbp8r_doc, init<optional<const double, const bool, const bool, const bool, const bool, const bool, const int> >((arg("R")=1.0,arg("circular")=false,arg("to_average")=false,arg("add_average_bit")=false,arg("uniform")=false, arg("rotation_invariant")=false, arg("eLBP_type")=0), "Construct a new LBP8R object"))
     .add_property("max_label", &ip::LBP8R::getMaxLabel)
     .def("__call__", &call_inout<ip::LBP8R>, (arg("self"), arg("input"), arg("output")), "Call an object of this type to extract LBP8R features.")
     .def("__call__", &call_pos<ip::LBP8R>, (arg("self"), arg("input"), arg("y"), arg("x")), "Call an object of this type to extract LBP8R features.")

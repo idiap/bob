@@ -51,7 +51,7 @@ namespace bob {
           */
         LBP(const int P, const double R=1., const bool circular=false,
           const bool to_average=false, const bool add_average_bit=false, 
-          const bool uniform=false, const bool rotation_invariant=false);
+          const bool uniform=false, const bool rotation_invariant=false, const int eLBP_type=0);
 
         /**
           * @brief Destructor
@@ -74,6 +74,7 @@ namespace bob {
         bool getAddAverageBit() const { return m_add_average_bit; }
         bool getUniform() const { return m_uniform; }
         bool getRotationInvariant() const { return m_rotation_invariant; }
+        int get_eLBP() const { return m_eLBP_type; }
 
         /**
           * @brief Mutators
@@ -90,6 +91,8 @@ namespace bob {
           { m_uniform = unif; init_lut_current(); }
         void setRotationInvariant(const bool rot_i) 
           { m_rotation_invariant = rot_i; init_lut_current(); }
+        void set_eLBP(const int e_LBP_type)
+          { m_eLBP_type = e_LBP_type; }
 
         /**
           * @brief Extract LBP features from a 2D blitz::Array, and save 
@@ -168,6 +171,7 @@ namespace bob {
         bool m_uniform;
         bool m_rotation_invariant;
         int m_R_rect;
+        int m_eLBP_type; // the type of extended LBP (0 - regular LBP, 1 - transitional LBP, 2 - direction coded LBP)
 
         blitz::Array<uint16_t,1> m_lut_RI;
         blitz::Array<uint16_t,1> m_lut_U2;
