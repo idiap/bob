@@ -145,7 +145,7 @@ static void rotate_with_mask(bob::python::const_ndarray input_image, bob::python
 
 BOOST_PYTHON_FUNCTION_OVERLOADS(rotate_overloads, rotate, 3, 5)
 
-
+BOOST_PYTHON_FUNCTION_OVERLOADS(rotate_with_mask_overloads, rotate_with_mask, 5, 7)
 
 void bind_ip_rotate() {
   boost::python::enum_<bob::ip::Rotate::Algorithm>("RotateAlgorithm")
@@ -162,15 +162,19 @@ void bind_ip_rotate() {
   boost::python::def(
     "rotate",
     &rotate,
-    rotate_overloads((boost::python::arg("input"), boost::python::arg("output"), boost::python::arg("angle"), boost::python::arg("angle_in_degrees") = true, boost::python::arg("rotation_algorithm")="Shearing"),
-    "Rotates the given input image into the given output image. The size of the output image can be computed using the get_rotated_output_shape function. The angle might be given in degree or in radians (please set angle_in_degrees to False in the latter case).")
+    rotate_overloads(
+      (boost::python::arg("input"), boost::python::arg("output"), boost::python::arg("angle"), boost::python::arg("angle_in_degrees") = true, boost::python::arg("rotation_algorithm")="Shearing"),
+      "Rotates the given input image into the given output image. The size of the output image can be computed using the get_rotated_output_shape function. The angle might be given in degree or in radians (please set angle_in_degrees to False in the latter case)."
+    )
   );
 
   boost::python::def(
     "rotate",
     &rotate_with_mask,
-    (boost::python::arg("input"), boost::python::arg("input_mask"), boost::python::arg("output"), boost::python::arg("output_mask"), boost::python::arg("angle"), boost::python::arg("angle_in_degrees") = true, boost::python::arg("rotation_algorithm")="Shearing"),
-    "Rotates the given input image into the given output image using the given mask images. The size of the output image and the output mask can be computed using the get_rotated_output_shape function. The angle might be given in degree or in radians (please set angle_in_degrees to False in the latter case)."
+    rotate_with_mask_overloads(
+      (boost::python::arg("input"), boost::python::arg("input_mask"), boost::python::arg("output"), boost::python::arg("output_mask"), boost::python::arg("angle"), boost::python::arg("angle_in_degrees") = true, boost::python::arg("rotation_algorithm")="Shearing"),
+      "Rotates the given input image into the given output image using the given mask images. The size of the output image and the output mask can be computed using the get_rotated_output_shape function. The angle might be given in degree or in radians (please set angle_in_degrees to False in the latter case)."
+    )
   );
 
 
