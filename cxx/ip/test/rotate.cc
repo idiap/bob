@@ -28,7 +28,7 @@
 #include <stdint.h>
 #include "core/logging.h"
 #include "core/convert.h"
-#include "ip/Rotate.h"
+#include "ip/rotate.h"
 #include "ip/shear.h"
 
 #include "io/Array.h"

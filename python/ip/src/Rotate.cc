@@ -21,7 +21,7 @@
  */
 
 
-#include "ip/Rotate.h"
+#include "ip/rotate.h"
 #include "core/python/ndarray.h"
 #include <core/array_exception.h>
 

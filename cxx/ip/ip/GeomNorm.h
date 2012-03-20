@@ -34,7 +34,7 @@
 #include "core/cast.h"
 #include "ip/Exception.h"
 #include "ip/generateWithCenter.h"
-#include "ip/Rotate.h"
+#include "ip/rotate.h"
 #include "ip/scale.h"
 #include "ip/crop.h"
 
