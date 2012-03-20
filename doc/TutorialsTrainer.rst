@@ -25,15 +25,16 @@ Introduction
 
 In the previous section, the concept of `machine` has been introduced. A
 `machine` is fed by some input data, processes it and returns an output.
-For instance, if we consider a **LinearMachine**, the input data :math:`x` 
-is projected using an internal projection matrix :math:`\mathbf{W}` which is a 
-member of the **LinearMachine** class, and the projected data 
-:math:`y = \mathbf{W} x` are returned. Very often, we would like to `learn`
-the parameters of a `machine` from the data. This is the role of what 
-is referred to as a `trainer` in |project|. Some `machines` might be 
-trained using different techniques. For instance, the projection matrix
-:math:`\mathbf{W}` of a **LinearMachine** could be learned using 
-Principal Component Analysis (PCA) or Linear Discriminant Analysis (LDA).
+For instance, if we consider a :py:class:`bob.machine.LinearMachine`, the 
+input data :math:`x` is projected using an internal projection matrix 
+:math:`\mathbf{W}`, and the projected data :math:`y = \mathbf{W} x` are 
+returned. Very often, we would like to `learn` the parameters of a `machine`
+from the data. This is the role of what is referred to as a `trainer` in 
+|project|. Some `machines` might be trained using different techniques. 
+For instance, the projection matrix :math:`\mathbf{W}` of a 
+:py:class:`bob.machine.LinearMachine` could be learned using 
+Principal Component Analysis (**PCA** [1]_) or Linear Discriminant Analysis 
+(**LDA** [2]_).
 
 .. testsetup:: *
 
@@ -44,18 +45,18 @@ Principal Component Analysis (PCA) or Linear Discriminant Analysis (LDA).
 Principal Component Analysis
 ============================
 
-`PCA` is one way to train a **LinearMachine**. The associated |project| class
-is **SVDPCATrainer** as the training procedure mainly relies on a singular
-value decomposition.
+**PCA** [1]_ is one way to train a :py:class:`bob.machine.LinearMachine`. The
+associated |project| class is :py:class:`bob.trainer.SVDPCATrainer` as the 
+training procedure mainly relies on a singular value decomposition.
 
-The procedure to train a **LinearMachine** with a **SVDPCATrainer** is shown 
-below. Please note that the concepts remains really similar for most of the 
-other `trainer`/`machines`.
+**PCA** belongs to the category of `unsupervised` learning algorithms, which
+means that the training data is not labelled. Therefore, the training set can
+be represented by a set of features stored in a container. Using |project|, 
+this container is a :py:class:`bob.io.Arrayset`. 
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
 
-   >>> trainer = bob.trainer.SVDPCATrainer()
    >>> data = bob.io.Arrayset()  # Creates a container for the training data
    >>> a = numpy.array([3,-3,100], 'float64')
    >>> b = numpy.array([4,-4,50], 'float64')
@@ -67,13 +68,24 @@ other `trainer`/`machines`.
    >>> data.append(d)
    >>> print data
    <Arrayset[4] float64@(3,)>
+
+Once the training set has been defined, the overall procedure to train a 
+:py:class:`bob.machine.LinearMachine` with a 
+:py:class:`bob.trainer.SVDPCATrainer` is simple and shown below. Please 
+note that the concepts remains really similar for most of the other 
+`trainer`/`machines`.
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+
+   >>> trainer = bob.trainer.SVDPCATrainer() # Creates a PCA trainer
    >>> [machine, eig_vals] = trainer.train(data)  # Trains the machine with the given data
-   >>> print machine.weights  # The new weights after the training procedure
+   >>> print machine.weights  # The weights of the returned LinearMachine after the training procedure
    [[  2.20006252e-03 -7.06111790e-01 -7.08096957e-01]
     [ -1.80006431e-03  7.08094727e-01 -7.06115159e-01]
     [ -9.99995960e-01 -2.82811755e-03 -2.86806039e-04]]
 
-Next, input data can be projected using the learned projection matrix 
+Next, input data can be projected using this learned projection matrix 
 :math:`W`.
 
 .. doctest::
@@ -87,16 +99,16 @@ Next, input data can be projected using the learned projection matrix
 Linear Discrimant Analysis
 ==========================
 
-`LDA` is another way to train a **LinearMachine**. The associated |project| 
-class is **FisherLDATrainer**.
+**LDA** [2]_ is another way to train a :py:class:`bob.machine.LinearMachine`. 
+The associated |project| class is :py:class:`bob.trainer.FisherLDATrainer`.
 
-The procedure to train a **LinearMachine** with a **FisherLDATrainer** is shown 
-below.
+In contrast to **PCA** [1]_, **LDA** [2]_ is a `supervised` technique.
+Furthermore, the training data should be organized differently. It is indeed 
+required to be a list of :py:class:`bob.io.Arrayset`, one for each class.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
    
-   >>> trainer = bob.trainer.FisherLDATrainer()
    >>> data1 = bob.io.Arrayset()  # Creates a container for the training data of class 1
    >>> a1 = numpy.array([3,-3,100], 'float64')
    >>> b1 = numpy.array([4,-4,50], 'float64')
@@ -114,6 +126,15 @@ below.
    >>> data = [data1,data2]
    >>> print data
    [<Arrayset[3] float64@(3,)>, <Arrayset[3] float64@(3,)>]
+
+Once the training set has been defined, the procedure to train the 
+:py:class:`bob.machine.LinearMachine` with **LDA** is very similar to the one
+for **PCA**. This is shown below.
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+   
+   >>> trainer = bob.trainer.FisherLDATrainer()
    >>> [machine,eig_vals] = trainer.train(data)  # Trains the machine with the given data
    >>> print eig_vals  # doctest: +SKIP
    [ 1.93632491 0. ]
@@ -124,27 +145,118 @@ below.
     [ 0.11323656]]
 
 
-Expectation-Maximization for k-Means
-====================================
+Neural Networks: Multi-layer Perceptrons (MLP)
+==============================================
+
+Support Vector Machines
+=======================
+
+k-Means
+=======
+
+**k-Means** [3]_ is a clustering method, which aims to partition a 
+set of observations into :math:`k` clusters. This is an `unsupervised` 
+technique. Furthermore, and as for **PCA** [1]_, the training data is passed
+in a :py:class:`bob.io.Arrayset` container.
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+
+   >>> data = bob.io.Arrayset()  # Creates a container for the training data
+   >>> a = numpy.array([3,-3,100], 'float64')
+   >>> b = numpy.array([4,-4,98], 'float64')
+   >>> c = numpy.array([3.5,-3.5,99], 'float64')
+   >>> d = numpy.array([-7,7,-100], 'float64')
+   >>> e = numpy.array([-5,5,-101], 'float64')
+   >>> data.append(a)
+   >>> data.append(b)
+   >>> data.append(c)
+   >>> data.append(d)
+   >>> data.append(e)
+   >>> print data
+   <Arrayset[5] float64@(3,)>
+
+The training procedure is going to learn the `means` of a 
+:py:class:`bob.machine.KMeansMachine`. The number :math:`k` of `means` is
+directly given when creating the `machine`, as well as the feature 
+dimensionality.
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+
+   >>> kmeans = bob.machine.KMeansMachine(2, 3) # Create a machine with k=2 clusters with a dimensionality equal to 3
+
+Then, the parameters of the **Expectation-Maximization**-based [4]_ `trainer`
+is set such as the maximum number of iterations and the criterium used to 
+determine if the convergence has occurred. Next, the training procedure can be
+called.
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+
+   >>> kmeansTrainer = bob.trainer.KMeansTrainer()
+   >>> kmeansTrainer.maxIterations = 200
+   >>> kmeansTrainer.convergenceThreshold = 1e-5
+
+   >>> kmeansTrainer.train(kmeans, data) # Train the KMeansMachine
+   >>> print kmeans.means
+   [[ -6.   6.  -100.5]
+    [  3.5 -3.5   99. ]]  
 
 
-Expectation-Maximization for Gaussian Mixture Model
-===================================================
+Maximum Likelihood for Gaussian Mixture Model
+=============================================
+
+Gaussian **Mixture Model** (GMM) [5]_ is a common probabilistic model. In this
+context, there is often a need to tune the parameters of such a model given 
+some training data. For this purpose, the **maximum-likelihood** technique 
+(ML) [6]_ can be applied.
+Let's first start by creating a :py:class:`bob.machine.GMMMachine`. By default,
+its Gaussian have zero-mean and unit variance, and all the weights are equal.
+As a starting point, we could set the mean to the one obtained with 
+**k-means** [3]_.
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+
+   >>> gmm = bob.machine.GMMMachine(2,3) # Create a machine with 2 Gaussian and feature dimensionality 3
+   >>> gmm.means = kmeans.means # Set the means to the one obtained with k-means 
+
+The |project| class to perform **maximum-likelihood** [6]_ for a GMM [5]_ is
+:py:class:`bob.trainer.ML_GMMTrainer`. It uses an **EM**-based [4]_ algorithm
+and requires to specify which parts of the GMM are updated at each iteration 
+(means, variances and/or weights). In addition, and as for **k-means** [3]_,
+it has parameters such as the maximum number of iterations and the criterium 
+used to determine if the convergence has occurred.
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+
+   >>> trainer = bob.trainer.ML_GMMTrainer(True, True, True) # update means/variances/weights at each iteration
+   >>> trainer.convergenceThreshold = 1e-5
+   >>> trainer.maxIterations = 200
+   >>> trainer.train(gmm, data)
+   >>> print gmm
+
+
 
 
 MAP-adaptation for Gaussian Mixture Model
-===================================================
+=========================================
+
+
+
 
 
 Joint Factor Analysis Trainer
 =============================
 
 
-Multi-Layer Perceptron Trainer
-==============================
-
-
-Support Vector Machine Trainer
-==============================
-
 .. Place here your external references
+
+.. [1] http://en.wikipedia.org/wiki/Principal_component_analysis
+.. [2] http://en.wikipedia.org/wiki/Linear_discriminant_analysis
+.. [3] http://en.wikipedia.org/wiki/K-means_clustering
+.. [4] http://en.wikipedia.org/wiki/Expectation-maximization_algorithm
+.. [5] http://en.wikipedia.org/wiki/Mixture_model
+.. [6] http://en.wikipedia.org/wiki/Maximum_likelihood
