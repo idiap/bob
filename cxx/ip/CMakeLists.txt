@@ -12,7 +12,6 @@ set(src
    "src/HornAndSchunckFlow.cc"
    "src/crop.cc"
    "src/shift.cc"
-   "src/Rotate.cc"
    "src/TanTriggs.cc"
    "src/GeomNorm.cc"
    "src/maxRectInMask.cc"

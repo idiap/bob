@@ -162,24 +162,23 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_mod90_uint32 )
   blitz::Array<double,2> b2;
 
   // Rotation of 0
-  bob::ip::Rotate rotate(0.);
-  b2.resize( rotate.getOutputShape(a2,0.) );
-  rotate(a2, b2, 0.);
+  b2.resize( bob::ip::getRotatedShape(a2,0.) );
+  bob::ip::rotate(a2, b2, 0.);
   checkBlitzEqual(a2, b2); 
 
   // Rotation of 90
-  b2.resize( rotate.getOutputShape(a2,90.) );
-  rotate(a2, b2, 90.);
+  b2.resize( bob::ip::getRotatedShape(a2,90.) );
+  bob::ip::rotate(a2, b2, 90.);
   checkBlitzEqual(a2r_90, b2); 
 
   // Rotation of 180
-  b2.resize( rotate.getOutputShape(a2,180.) );
-  rotate(a2, b2, 180.);
+  b2.resize( bob::ip::getRotatedShape(a2,180.) );
+  bob::ip::rotate(a2, b2, 180.);
   checkBlitzEqual(a2r_180, b2); 
 
   // Rotation of 270
-  b2.resize( rotate.getOutputShape(a2,270.) );
-  rotate(a2, b2, 270.);
+  b2.resize( bob::ip::getRotatedShape(a2,270.) );
+  bob::ip::rotate(a2, b2, 270.);
   checkBlitzEqual(a2r_270, b2); 
 }
 
@@ -201,13 +200,9 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   blitz::Array<uint8_t,2> img = ar_img.get<uint8_t,2>();
   blitz::Array<double,2> img_processed;
 
-  // Rotate original image and compare with ImageMagick reference image
-  // Warning: ImageMagick considers opposite angles wrt. to us
-  bob::ip::Rotate rotate(5., bob::ip::Rotate::Shearing);
-
   // 5 degrees
-  img_processed.resize(rotate.getOutputShape(img,5.) ); 
-  rotate( img, img_processed, 5.);
+  img_processed.resize(bob::ip::getRotatedShape(img,5.) ); 
+  bob::ip::rotate( img, img_processed, 5., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r5.pgm";
   bob::io::Array ar_img_r5(testdata_path_img.string());
@@ -215,8 +210,8 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   checkBlitzClose( img_ref_r5, img_processed, eps);
 
   // 10 degrees 
-  img_processed.resize(rotate.getOutputShape(img,10.) ); 
-  rotate( img, img_processed, 10.);
+  img_processed.resize(bob::ip::getRotatedShape(img,10.) ); 
+  bob::ip::rotate( img, img_processed, 10., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r10.pgm";
   bob::io::Array ar_img_r10(testdata_path_img.string());
@@ -224,8 +219,8 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   checkBlitzClose( img_ref_r10, img_processed, eps);
 
   // 15 degrees 
-  img_processed.resize(rotate.getOutputShape(img,15.) ); 
-  rotate( img, img_processed, 15.);
+  img_processed.resize(bob::ip::getRotatedShape(img,15.) ); 
+  bob::ip::rotate( img, img_processed, 15., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r15.pgm";
   bob::io::Array ar_img_r15(testdata_path_img.string());
@@ -233,8 +228,8 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   checkBlitzClose( img_ref_r15, img_processed, eps);
 
   // 30 degrees 
-  img_processed.resize(rotate.getOutputShape(img,30.) ); 
-  rotate( img, img_processed, 30.);
+  img_processed.resize(bob::ip::getRotatedShape(img,30.) ); 
+  bob::ip::rotate( img, img_processed, 30., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r30.pgm";
   bob::io::Array ar_img_r30(testdata_path_img.string());
@@ -242,8 +237,8 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   checkBlitzClose( img_ref_r30, img_processed, eps);
 
   // 45 degrees 
-  img_processed.resize(rotate.getOutputShape(img,45.) ); 
-  rotate( img, img_processed, 45.);
+  img_processed.resize(bob::ip::getRotatedShape(img,45.) ); 
+  bob::ip::rotate( img, img_processed, 45., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r45.pgm";
   bob::io::Array ar_img_r45(testdata_path_img.string());
@@ -251,8 +246,8 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   checkBlitzClose( img_ref_r45, img_processed, eps);
 
   // 70 degrees 
-  img_processed.resize(rotate.getOutputShape(img,70.) ); 
-  rotate( img, img_processed, 70.);
+  img_processed.resize(bob::ip::getRotatedShape(img,70.) ); 
+  bob::ip::rotate( img, img_processed, 70., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r70.pgm";
   bob::io::Array ar_img_r70(testdata_path_img.string());
@@ -260,8 +255,8 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   checkBlitzClose( img_ref_r70, img_processed, eps);
 
   // 237 degrees 
-  img_processed.resize(rotate.getOutputShape(img,237.) ); 
-  rotate( img, img_processed, 237.);
+  img_processed.resize(bob::ip::getRotatedShape(img,237.) ); 
+  bob::ip::rotate( img, img_processed, 237., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r237.pgm";
   bob::io::Array ar_img_r237(testdata_path_img.string());
@@ -269,8 +264,8 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   checkBlitzClose( img_ref_r237, img_processed, eps);
 
   // -25 degrees 
-  img_processed.resize(rotate.getOutputShape(img,-25.) ); 
-  rotate( img, img_processed, -25.);
+  img_processed.resize(bob::ip::getRotatedShape(img,-25.) ); 
+  bob::ip::rotate( img, img_processed, -25., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_rn25.pgm";
   bob::io::Array ar_img_rn25(testdata_path_img.string());
@@ -296,9 +291,8 @@ BOOST_AUTO_TEST_CASE( test_rotate_3d_generic_uint32 )
   blitz::Array<double,3> img_processed;
 
   // 5 degrees 
-  bob::ip::Rotate rotate(5., bob::ip::Rotate::Shearing);
-  img_processed.resize(rotate.getOutputShape(img,5.) ); 
-  rotate( img, img_processed, 5.);
+  img_processed.resize(bob::ip::getRotatedShape(img,5.) ); 
+  bob::ip::rotate( img, img_processed, 5., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "imageColor_r5.ppm";
   bob::io::Array ar_img_r5(testdata_path_img.string());
@@ -312,10 +306,9 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_mask )
   blitz::Array<bool,2> b8_mask;
 
   // Rotation of 45
-  bob::ip::Rotate rotate(45.);
-  b8.resize( rotate.getOutputShape(a8, 45.) );
+  b8.resize( bob::ip::getRotatedShape(a8, 45.) );
   b8_mask.resize( b8.shape() );
-  rotate(a8, a8m, b8, b8_mask, 45.);
+  bob::ip::rotate(a8, a8m, b8, b8_mask, 45.);
   checkBlitzEqual(a8m_45, b8_mask); 
 }
 
