@@ -34,7 +34,7 @@
 #include "core/cast.h"
 #include "ip/Exception.h"
 #include "ip/generateWithCenter.h"
-#include "ip/Rotate.h"
+#include "ip/rotate.h"
 #include "ip/scale.h"
 #include "ip/crop.h"
 
@@ -75,7 +75,7 @@ namespace bob {
         /**
           * @brief Accessors
           */
-        inline const double getRotationAngle() { return m_rotate->getAngle(); }
+        inline const double getRotationAngle() { return m_rotation_angle; }
         inline const double getScalingFactor() { return m_scaling_factor; }
         inline const int getCropHeight() { return m_crop_height; }
         inline const int getCropWidth() { return m_crop_width; }
@@ -86,7 +86,7 @@ namespace bob {
           * @brief Mutators
           */
         inline void setRotationAngle(const double angle) 
-          { m_rotate->setAngle(angle); }
+          { m_rotation_angle = angle; }
         inline void setScalingFactor(const double scaling_factor) 
           { m_scaling_factor = scaling_factor; }
         inline void setCropHeight(const int crop_h) 
@@ -125,8 +125,7 @@ namespace bob {
         /**
           * Attributes
           */
-        //double m_rotation_angle;
-        boost::shared_ptr<Rotate> m_rotate;
+        double m_rotation_angle;
         double m_scaling_factor;
         int m_crop_height;
         int m_crop_width;
@@ -215,22 +214,22 @@ namespace bob {
       double crop_ref_x1 = offset(1) + crop_ref_x;
 
       // 2/ Rotate to align the image with the x-axis
-      shape = m_rotate->getOutputShape(m_centered, m_rotate->getAngle());
+      shape = bob::ip::getRotatedShape(m_centered, m_rotation_angle);
       if( !tca::hasSameShape(m_rotated, shape) ) {
         m_rotated.resize( shape );
         if(mask)
           m_mask_int2.resize(shape);
       }
       if(mask)
-        m_rotate->operator()(m_centered, m_mask_int1, m_rotated, m_mask_int2);
+        bob::ip::rotate(m_centered, m_mask_int1, m_rotated, m_mask_int2, m_rotation_angle);
       else
-        m_rotate->operator()(m_centered, m_rotated);
+        bob::ip::rotate(m_centered, m_rotated, m_rotation_angle);
 
       // new coordinate of the cropping reference point
       crop_ref_y1 = crop_ref_y1 - (m_centered.extent(0)-1)/2.;
       crop_ref_x1 = crop_ref_x1 - (m_centered.extent(1)-1)/2.;
-      double crop_ref_y2 = crop_ref_y1 * cos(m_rotate->getAngle()) - crop_ref_x1 * sin(m_rotate->getAngle()) + (m_rotated.extent(0)-1)/2.;
-      double crop_ref_x2 = crop_ref_x1 * cos(m_rotate->getAngle()) + crop_ref_y1 * sin(m_rotate->getAngle()) + (m_rotated.extent(1)-1)/2.;
+      double crop_ref_y2 = crop_ref_y1 * cos(m_rotation_angle) - crop_ref_x1 * sin(m_rotation_angle) + (m_rotated.extent(0)-1)/2.;
+      double crop_ref_x2 = crop_ref_x1 * cos(m_rotation_angle) + crop_ref_y1 * sin(m_rotation_angle) + (m_rotated.extent(1)-1)/2.;
 
       // 3/ Scale with the given scaling factor
       shape(0) = static_cast<int>(floor(m_rotated.extent(0) * m_scaling_factor + 0.5));
