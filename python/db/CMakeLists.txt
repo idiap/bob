@@ -105,6 +105,9 @@ bob_python_add_dependent_test(db-mobio-dumplist python-db-mobio-create
 bob_python_add_dependent_test(db-mobio-dumplist2 python-db-mobio-create
   dbmanage.py mobio dumplist --protocol=male --classes=client --groups=dev --purposes=enrol --self-test)
 
+bob_python_add_dependent_test(db-mobio-checkfiles python-db-mobio-create
+  dbmanage.py mobio checkfiles --self-test)
+
 # Multi-PIE database driver tests.
 bob_python_add_dependent_test(db-multipie-dumplist python-db-multipie-create
   dbmanage.py multipie dumplist --self-test)
