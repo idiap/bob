@@ -138,6 +138,9 @@ bob_python_add_dependent_test(db-xm2vts-dumplist python-db-xm2vts-create
 bob_python_add_dependent_test(db-xm2vts-dumplist2 python-db-xm2vts-create
   dbmanage.py xm2vts dumplist --protocol=lp1 --classes=client --groups=dev --purposes=enrol --self-test)
 
+bob_python_add_dependent_test(db-xm2vts-checkfiles python-db-xm2vts-create
+  dbmanage.py xm2vts checkfiles --self-test)
+
 # Our examples (run and install)
 bob_python_example(db iris_lda.py lib/example/iris_lda.py)
 bob_python_add_test(db iris_lda.py --self-test)
