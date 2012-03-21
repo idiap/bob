@@ -362,8 +362,8 @@ To convert a `NumPy`_ array into `OpenCV`_ (cvMat), the `fromarray()` of
    >>> a = numpy.ones((5, 10))
    >>> mat = cv.fromarray(a)
 
-Similarly, to convert an `OpenCV`_ cvMat, into a `NumPy`_ array, the 
-`asarray()` method is suitable.
+Similarly, to perform the inverse conversion from an `OpenCV`_ cvMat into a 
+`NumPy`_ array, the `asarray()` method of `OpenCV`_ is suitable.
 
 .. code-block:: python
 
@@ -372,12 +372,15 @@ Similarly, to convert an `OpenCV`_ cvMat, into a `NumPy`_ array, the
    >>> cv.Set(mat, 37)
    >>> a = numpy.asarray(mat)
 
+Both `NumPy`_ array and `OpenCV`_ cvMat use similar type (`uint8`, `uint32`, 
+`float64`, etc.), and hence, it is interesting to notice that the type is 
+preserved by the previous operations.
 
 PIL
 ~~~
 
-To convert 2D `NumPy`_ array of type uint8 into a grayscale `PIL`_ image, the
-`fromstring()` method of `PIL`_ will do the job.
+To convert a 2D `NumPy`_ array of type uint8 into a grayscale `PIL`_ image, 
+the `fromstring()` method of `PIL`_ will do the job.
 
 .. code-block:: python
 
