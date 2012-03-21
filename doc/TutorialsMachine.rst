@@ -16,9 +16,9 @@
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-==========
+**********
  Machines
-==========
+**********
 
 Machines are one of the core components of |project|. They represent
 statistical models that are `trainable`. Examples of machines are
@@ -42,7 +42,7 @@ machines: a :py:class:`bob.machine.LinearMachine`.
    os.chdir(temp_dir)
 
 Linear Machine
---------------
+==============
 
 This machine executes the simple operation :math:`y = \mathbf{W} x`, where `y`
 is the output vector, `x`, the input vector and `W` a matrix (2D array), stored
@@ -135,7 +135,7 @@ You will find interesting ways to train a :py:class:`bob.machine.LinearMachine`
 so they can do something useful to you at :doc:`TutorialsTrainer`.
 
 Neural Networks: Multi-layer Perceptrons (MLP)
-----------------------------------------------
+==============================================
 
 A `multi-layer perceptron <http://en.wikipedia.org/wiki/Multilayer_perceptron>`_
 is a neural network architecture that has some well-defined characteristics
@@ -217,7 +217,7 @@ a :py:class:`bob.machine.LinearMachine`:
   array([ 0.33])
 
 Support Vector Machines
------------------------
+=======================
 
 .. ifconfig:: not has_libsvm
 
@@ -386,7 +386,7 @@ publication, be sure to also cite:
 
 
 K-means Machines
-----------------
+================
 
 `k-Means <http://en.wikipedia.org/wiki/K-means_clustering>`_ is a clustering 
 method, which aims to partition a set of observations into :math:`k` 
@@ -412,7 +412,7 @@ data is the closest as well as the min distance.
 
 
 Gaussian Machines
------------------
+=================
 
 The :py:class:`bob.machine.Gaussian` represents a `multivariate diagonal
 Gaussian (or normal) distribution
@@ -448,7 +448,7 @@ As with other machines you can save and re-load machines of this type using
 :py:meth:`bob.machine.Gaussian.save` and the class constructor respectively.
 
 Gaussian Mixture Models
------------------------
+=======================
 
 The :py:class:`bob.machine.GMMMachine` represents a Gaussian 
 `Mixture Model <http://en.wikipedia.org/wiki/Mixture_model>`_ (GMM), which
