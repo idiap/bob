@@ -219,6 +219,13 @@ a :py:class:`bob.machine.LinearMachine`:
 Support Vector Machines
 -----------------------
 
+.. ifconfig:: not has_libsvm
+
+  .. warning:: 
+
+    LIBSVM was not found when this documentation has been generated.
+
+
 The :py:class:`bob.machine.SupportVector` implements a Support Vector Machine
 with a bridge to `LIBSVM`_. The bridge functionality includes loading and
 saving SVM data files and machine models, which you can produce or download
@@ -244,32 +251,60 @@ available a :py:class:`bob.machine.SupportVector` named ``svm``. (For this
 example, the variable ``svm`` was generated from the ``heart_scale`` dataset
 using the application ``svm-train`` with default parameters.)
 
-.. testsetup:: svm
 
-  import os
-  import bob
-  import numpy
-  
-  # the CMAKE_SOURCE_DIR is defined at conf.py.in
-  heart_model = os.path.join(os.environ['CMAKE_SOURCE_DIR'], 
-    'python/machine/data/heart.svmmodel')
+.. ifconfig:: has_libsvm
 
-  svm = bob.machine.SupportVector(heart_model)
+  .. testsetup:: svm
 
-.. doctest:: svm
+    import os
+    import bob
+    import numpy
+    
+    # the CMAKE_SOURCE_DIR is defined at conf.py.in
+    heart_model = os.path.join(os.environ['CMAKE_SOURCE_DIR'], 
+      'python/machine/data/heart.svmmodel')
 
-  >>> svm.shape
-  (13, 1)
+    svm = bob.machine.SupportVector(heart_model)
+
+
+.. ifconfig:: has_libsvm
+
+  .. doctest:: svm
+
+    >>> svm.shape
+    (13, 1)
+
+
+.. ifconfig:: not has_libsvm
+
+  .. code-block:: python
+
+    >>> svm.shape
+    (13, 1)
+
 
 To run a single example through the SVM, just use the ``()`` operator like
 before:
 
-.. doctest:: svm
 
-  >> svm(numpy.ones((13,), 'float64'))
-  1
-  >> svm(numpy.ones((10,13), 'float64'))
-  (1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+.. ifconfig:: has_libsvm
+
+  .. doctest:: svm
+
+    >> svm(numpy.ones((13,), 'float64'))
+    1
+    >> svm(numpy.ones((10,13), 'float64'))
+    (1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+
+.. ifconfig:: not has_libsvm
+
+  .. code-block:: python
+
+    >> svm(numpy.ones((13,), 'float64'))
+    1
+    >> svm(numpy.ones((10,13), 'float64'))
+    (1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+
 
 Visit the documentation for :py:class:`bob.machine.SupportVector` to find more
 information about these bindings and methods you can call on such machine.
@@ -281,35 +316,57 @@ Here is quick usage example: Suppose the variable ``f`` contains an object of
 type :py:class:`bob.machine.SVMFile`. Then, you could read data (and labels)
 from the file like this:
 
-.. testsetup:: svmfile
+.. ifconfig:: has_libsvm
 
-  import os
-  import numpy
-  import bob
+  .. testsetup:: svmfile
 
-  # the CMAKE_SOURCE_DIR is defined at conf.py.in
-  heart_data = os.path.join(os.environ['CMAKE_SOURCE_DIR'], 
-    'python/machine/data/heart.svmdata')
+    import os
+    import numpy
+    import bob
 
-  f = bob.machine.SVMFile(heart_data)
+    # the CMAKE_SOURCE_DIR is defined at conf.py.in
+    heart_data = os.path.join(os.environ['CMAKE_SOURCE_DIR'], 
+      'python/machine/data/heart.svmdata')
 
-  # the CMAKE_SOURCE_DIR is defined at conf.py.in
-  heart_model = os.path.join(os.environ['CMAKE_SOURCE_DIR'], 
-    'python/machine/data/heart.svmmodel')
+    f = bob.machine.SVMFile(heart_data)
 
-  svm = bob.machine.SupportVector(heart_model)
+    # the CMAKE_SOURCE_DIR is defined at conf.py.in
+    heart_model = os.path.join(os.environ['CMAKE_SOURCE_DIR'], 
+      'python/machine/data/heart.svmmodel')
 
-.. doctest:: svmfile
+    svm = bob.machine.SupportVector(heart_model)
 
-  >>> labels, data = f.read_all()
-  >>> data = numpy.vstack(data) #creates a single 2D array
+
+.. ifconfig:: has_libsvm
+
+  .. doctest:: svmfile
+
+    >>> labels, data = f.read_all()
+    >>> data = numpy.vstack(data) #creates a single 2D array
+
+.. ifconfig:: not has_libsvm
+
+  .. code-block:: python
+
+    >>> labels, data = f.read_all()
+    >>> data = numpy.vstack(data) #creates a single 2D array
+
 
 Then you can throw the data into the ``svm`` machine you trained earlier like
 this:
 
-.. doctest:: svmfile
+.. ifconfig:: has_libsvm
 
-  >>> predicted_labels = svm(data) 
+  .. doctest:: svmfile
+
+    >>> predicted_labels = svm(data) 
+
+.. ifconfig:: not has_libsvm
+
+  .. code-block:: python
+
+    >>> predicted_labels = svm(data) 
+
 
 As a final note, if you decide to use our `LIBSVM`_ bindings for your
 publication, be sure to also cite:
