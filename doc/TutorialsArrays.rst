@@ -196,7 +196,25 @@ Partial reductions along a specific dimension are also possible.
    >>> print A.max(axis=1)
    [4 8]
 
+Linear algebra is also supported through the bridges to the optimized **ATLAS** 
+`LAPACK`_ (and **BLAS**) libraries which are mostly integrated in the `linalg` 
+submodule of `SciPy`_. In the following, this is highlighted via two different
+examples: matrix multiplication and matrix inversion.
 
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+   
+   >>> A = numpy.array([[1,2],[3,4]]) # Creates a 2D array / matrix
+   >>> B = numpy.array([[5,6],[7,8]]) # Creates a 2D array / matrix
+   >>> C = numpy.dot(A,B) # Computes the matrix multiplication A*B
+   >>> print C
+   [[19 22]
+    [43 50]]
+   >>> import scipy.linalg
+   >>> D = scipy.linalg.inv(C) # Computes the inverse of C
+   >>> print D # doctest: +SKIP
+   [[ 12.5   -5.5 ]
+    [-10.75   4.75]]
 
 Assignment, shallow and deep copy
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
