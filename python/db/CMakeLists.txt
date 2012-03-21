@@ -72,6 +72,9 @@ bob_python_add_dependent_test(db-banca_small-dumplist2
   python-db-banca_small-create
   dbmanage.py banca_small dumplist --protocol=P --classes=client --groups=g1 --purposes=enrol --self-test)
 
+bob_python_add_dependent_test(db-banca_small-checkfiles python-db-banca_small-create
+  dbmanage.py banca_small checkfiles --self-test)
+
 # Biosecure database driver tests.
 bob_python_add_dependent_test(db-biosecure-dumplist python-db-biosecure-create
   dbmanage.py biosecure dumplist --self-test)
