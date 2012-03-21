@@ -184,7 +184,7 @@ The class used to train a MLP [3]_ with backpropagation [4]_ is
 
 Backpropagation [4]_ requires a learning rate to be set. In the previous 
 example, the default value 0.1 has been used. This might be updated using the
-:py:meth:`bob.trainer.MLPBackPropagation.learningRate` attribute.
+:py:attr:`bob.trainer.MLPBackPropTrainer.learningRate` attribute.
 
 An other alternative exists referred to as **resilient propagation** (Rprop)
 [5]_, which dynamically compute an optimal learning rate. The corresponding 
