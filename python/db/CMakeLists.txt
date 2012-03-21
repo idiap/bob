@@ -60,6 +60,9 @@ bob_python_add_dependent_test(db-banca-dumplist python-db-banca-create
 bob_python_add_dependent_test(db-banca-dumplist2 python-db-banca-create
   dbmanage.py banca dumplist --protocol=P --classes=client --groups=g1 --purposes=enrol --self-test)
 
+bob_python_add_dependent_test(db-banca-checkfiles python-db-banca-create
+  dbmanage.py banca checkfiles --self-test)
+
 # BANCA_SMALL database driver tests.
 bob_python_add_dependent_test(db-banca_small-dumplist
   python-db-banca_small-create
