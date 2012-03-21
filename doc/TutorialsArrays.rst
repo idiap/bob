@@ -379,22 +379,51 @@ preserved by the previous operations.
 PIL
 ~~~
 
-To convert a 2D `NumPy`_ array of type uint8 into a grayscale `PIL`_ image, 
-the `fromstring()` method of `PIL`_ will do the job.
+`PIL`_ does not provide a generic multi-dimensional array structure. However, 
+its Image structures can be seen as 2D or 3D arrays. To convert a 2D `NumPy`_ 
+array of type uint8 into a grayscale (integer) `PIL`_ image, the `fromarray()`
+method of `PIL`_ will do the job.
 
 .. code-block:: python
 
    >>> import numpy, Image
    >>> img = numpy.array([[1,2,3,4],[2,3,4,5],[3,4,5,6]], 'uint8')
-   >>> imgPIL = Image.fromstring('L', (img.shape[1], img.shape[0]), img.tostring())
+   >>> imgPIL = Image.fromarray(img)
 
 To convert a grayscale `PIL`_ image into a 2D `NumPy`_ array of uint8, 
-the `fromstring()` method of `NumPy`_ is suitable.
+the `asarray()` method of `NumPy`_ is suitable.
 
 .. code-block:: python
 
-   >>> img2 = numpy.fromstring(imgPIL.tostring(), numpy.uint8()).reshape(imgPIL.size[1], imgPIL.size[0])
+   >>> img2 = numpy.asarray(imgPIL)
    >>> numpy.array_equal(img, img2)
+   True
+
+In contrast to `OpenCV`_, please be aware that PIL does not support all the
+types that we have in |project|. Therefore, please restrict yourself to 
+`uint8` (and `float32` for grayscale images) when you proceed with back and
+forth conversions or take the time to check that your operations are really 
+valid and expected.
+
+Converting color images is more tricky as |project| uses plane color images
+whereas `PIL`_ relies by default on interleaved color images. Therefore, there
+is an additional conversion required.
+
+.. code-block:: python
+
+   >>> import numpy, Image
+   >>> a = numpy.array([[[1,2,3],[4,5,6]],[[11,12,13],[14,15,16]],[[21,22,23],[24,25,26]]], 'uint8')
+   >>> c = numpy.dstack((a[0,:],a[1,:],a[2,:])).reshape(a.shape[1],a.shape[2],a.shape[0]) # Convert to plane color to interleaved color
+   >>> cPIL = Image.fromarray(c)
+
+The reverse operation is similar, but again requires an extra conversion from
+interleaved color image to plane color image.
+
+.. code-block:: python
+
+   >>> c_read = numpy.asarray(cPIL)
+   >>> c_plane_read = numpy.vstack((c_read[:,:,0],c_read[:,:,1],c_read[:,:,2])).reshape(c_read.shape[2],c_read.shape[0],c_read.shape[1]) # Convert interleaved color to plane color
+   >>> numpy.array_equal(a, c_plane_read)
    True
 
 .. Place here your external references
