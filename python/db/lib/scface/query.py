@@ -68,7 +68,7 @@ class Database(object):
       for id in [k.id for k in q]: 
         retval.append(id)
     if 'dev' in groups or 'eval' in groups:
-      q = self.session.query(Client).filter(Client.sgroup != 'world').\
+      q = self.session.query(Client).filter(and_(Client.sgroup != 'world', Client.sgroup.in_(groups))).\
             order_by(Client.id)
       for id in [k.id for k in q]: 
         retval.append(id)

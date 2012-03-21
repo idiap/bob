@@ -105,7 +105,7 @@ Database support
 ----------------
 
 The library currently provides an API to easily query and interface with 
-well know biometric database. In particular, several protocols are integrated 
+well know biometric databases. In particular, several protocols are integrated
 with the aim at improving reproducibility of scientific publications.
 
 Performance Evaluation

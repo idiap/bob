@@ -16,9 +16,9 @@
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-==========
+**********
  Machines
-==========
+**********
 
 Machines are one of the core components of |project|. They represent
 statistical models that are `trainable`. Examples of machines are
@@ -42,7 +42,7 @@ machines: a :py:class:`bob.machine.LinearMachine`.
    os.chdir(temp_dir)
 
 Linear Machine
---------------
+==============
 
 This machine executes the simple operation :math:`y = \mathbf{W} x`, where `y`
 is the output vector, `x`, the input vector and `W` a matrix (2D array), stored
@@ -135,7 +135,7 @@ You will find interesting ways to train a :py:class:`bob.machine.LinearMachine`
 so they can do something useful to you at :doc:`TutorialsTrainer`.
 
 Neural Networks: Multi-layer Perceptrons (MLP)
-----------------------------------------------
+==============================================
 
 A `multi-layer perceptron <http://en.wikipedia.org/wiki/Multilayer_perceptron>`_
 is a neural network architecture that has some well-defined characteristics
@@ -217,7 +217,14 @@ a :py:class:`bob.machine.LinearMachine`:
   array([ 0.33])
 
 Support Vector Machines
------------------------
+=======================
+
+.. ifconfig:: not has_libsvm
+
+  .. warning:: 
+
+    LIBSVM was not found when this documentation has been generated.
+
 
 The :py:class:`bob.machine.SupportVector` implements a Support Vector Machine
 with a bridge to `LIBSVM`_. The bridge functionality includes loading and
@@ -244,32 +251,60 @@ available a :py:class:`bob.machine.SupportVector` named ``svm``. (For this
 example, the variable ``svm`` was generated from the ``heart_scale`` dataset
 using the application ``svm-train`` with default parameters.)
 
-.. testsetup:: svm
 
-  import os
-  import bob
-  import numpy
-  
-  # the CMAKE_SOURCE_DIR is defined at conf.py.in
-  heart_model = os.path.join(os.environ['CMAKE_SOURCE_DIR'], 
-    'python/machine/data/heart.svmmodel')
+.. ifconfig:: has_libsvm
 
-  svm = bob.machine.SupportVector(heart_model)
+  .. testsetup:: svm
 
-.. doctest:: svm
+    import os
+    import bob
+    import numpy
+    
+    # the CMAKE_SOURCE_DIR is defined at conf.py.in
+    heart_model = os.path.join(os.environ['CMAKE_SOURCE_DIR'], 
+      'python/machine/data/heart.svmmodel')
 
-  >>> svm.shape
-  (13, 1)
+    svm = bob.machine.SupportVector(heart_model)
+
+
+.. ifconfig:: has_libsvm
+
+  .. doctest:: svm
+
+    >>> svm.shape
+    (13, 1)
+
+
+.. ifconfig:: not has_libsvm
+
+  .. code-block:: python
+
+    >>> svm.shape
+    (13, 1)
+
 
 To run a single example through the SVM, just use the ``()`` operator like
 before:
 
-.. doctest:: svm
 
-  >> svm(numpy.ones((13,), 'float64'))
-  1
-  >> svm(numpy.ones((10,13), 'float64'))
-  (1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+.. ifconfig:: has_libsvm
+
+  .. doctest:: svm
+
+    >> svm(numpy.ones((13,), 'float64'))
+    1
+    >> svm(numpy.ones((10,13), 'float64'))
+    (1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+
+.. ifconfig:: not has_libsvm
+
+  .. code-block:: python
+
+    >> svm(numpy.ones((13,), 'float64'))
+    1
+    >> svm(numpy.ones((10,13), 'float64'))
+    (1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+
 
 Visit the documentation for :py:class:`bob.machine.SupportVector` to find more
 information about these bindings and methods you can call on such machine.
@@ -281,35 +316,57 @@ Here is quick usage example: Suppose the variable ``f`` contains an object of
 type :py:class:`bob.machine.SVMFile`. Then, you could read data (and labels)
 from the file like this:
 
-.. testsetup:: svmfile
+.. ifconfig:: has_libsvm
 
-  import os
-  import numpy
-  import bob
+  .. testsetup:: svmfile
 
-  # the CMAKE_SOURCE_DIR is defined at conf.py.in
-  heart_data = os.path.join(os.environ['CMAKE_SOURCE_DIR'], 
-    'python/machine/data/heart.svmdata')
+    import os
+    import numpy
+    import bob
 
-  f = bob.machine.SVMFile(heart_data)
+    # the CMAKE_SOURCE_DIR is defined at conf.py.in
+    heart_data = os.path.join(os.environ['CMAKE_SOURCE_DIR'], 
+      'python/machine/data/heart.svmdata')
 
-  # the CMAKE_SOURCE_DIR is defined at conf.py.in
-  heart_model = os.path.join(os.environ['CMAKE_SOURCE_DIR'], 
-    'python/machine/data/heart.svmmodel')
+    f = bob.machine.SVMFile(heart_data)
 
-  svm = bob.machine.SupportVector(heart_model)
+    # the CMAKE_SOURCE_DIR is defined at conf.py.in
+    heart_model = os.path.join(os.environ['CMAKE_SOURCE_DIR'], 
+      'python/machine/data/heart.svmmodel')
 
-.. doctest:: svmfile
+    svm = bob.machine.SupportVector(heart_model)
 
-  >>> labels, data = f.read_all()
-  >>> data = numpy.vstack(data) #creates a single 2D array
+
+.. ifconfig:: has_libsvm
+
+  .. doctest:: svmfile
+
+    >>> labels, data = f.read_all()
+    >>> data = numpy.vstack(data) #creates a single 2D array
+
+.. ifconfig:: not has_libsvm
+
+  .. code-block:: python
+
+    >>> labels, data = f.read_all()
+    >>> data = numpy.vstack(data) #creates a single 2D array
+
 
 Then you can throw the data into the ``svm`` machine you trained earlier like
 this:
 
-.. doctest:: svmfile
+.. ifconfig:: has_libsvm
 
-  >>> predicted_labels = svm(data) 
+  .. doctest:: svmfile
+
+    >>> predicted_labels = svm(data) 
+
+.. ifconfig:: not has_libsvm
+
+  .. code-block:: python
+
+    >>> predicted_labels = svm(data) 
+
 
 As a final note, if you decide to use our `LIBSVM`_ bindings for your
 publication, be sure to also cite:
@@ -327,8 +384,35 @@ publication, be sure to also cite:
    note    = {Software available at \url{http://www.csie.ntu.edu.tw/~cjlin/libsvm}}
   }
 
+
+K-means Machines
+================
+
+`k-Means <http://en.wikipedia.org/wiki/K-means_clustering>`_ is a clustering 
+method, which aims to partition a set of observations into :math:`k` 
+clusters. The `training` procedure is described in :doc:`TutorialsTrainer`. 
+Otherwise, it is possible to define a :py:class:`bob.io.KMeansMachine` as
+follows.
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+
+   >>> machine = bob.machine.KMeansMachine(2,3) # Two clusters with a feature dimensionality of 3
+   >>> machine.means = numpy.array([[1,0,0],[0,0,1]], 'float64') # Defines the two clusters
+
+Then, given some input data, it is possible to determine to which cluster the
+data is the closest as well as the min distance.
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+
+   >>> sample = numpy.array([2,1,-2], 'float64')
+   >>> print machine.getClosestMean(sample) # Returns the index of the closest mean and the distance to it at the power of 2
+   (0, 6.0)
+
+
 Gaussian Machines
------------------
+=================
 
 The :py:class:`bob.machine.Gaussian` represents a `multivariate diagonal
 Gaussian (or normal) distribution
@@ -364,7 +448,7 @@ As with other machines you can save and re-load machines of this type using
 :py:meth:`bob.machine.Gaussian.save` and the class constructor respectively.
 
 Gaussian Mixture Models
------------------------
+=======================
 
 The :py:class:`bob.machine.GMMMachine` represents a Gaussian 
 `Mixture Model <http://en.wikipedia.org/wiki/Mixture_model>`_ (GMM), which
