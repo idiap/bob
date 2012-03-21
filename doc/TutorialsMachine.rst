@@ -331,7 +331,7 @@ publication, be sure to also cite:
 K-means Machines
 ----------------
 
-`k-Means <http://en.wikipedia.org/wiki/K-means_clustering>` is a clustering 
+`k-Means <http://en.wikipedia.org/wiki/K-means_clustering>`_ is a clustering 
 method, which aims to partition a set of observations into :math:`k` 
 clusters. The `training` procedure is described in :doc:`TutorialsTrainer`. 
 Otherwise, it is possible to define a :py:class:`bob.io.KMeansMachine` as
