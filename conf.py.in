@@ -272,6 +272,13 @@ autodoc_default_flags = ['members', 'undoc-members', 'inherited-members', 'show-
 
 # Used to filter some documentation in/out
 bob_modules = dir(__import__('bob'))
+has_libsvm = True
+try:
+  import bob 
+  bob.machine.__getattribute__('SupportVector')
+except AttributeError:
+  has_libsvm = False
+
 
 # For inter-documentation mapping:
 intersphinx_mapping = {
@@ -286,3 +293,4 @@ def setup(app):
   if sphinx.__version__ < "1.0":
     app.connect('autodoc-skip-member', skip_static_member)
   app.add_config_value('bob_modules', bob_modules, True)
+  app.add_config_value('has_libsvm', has_libsvm, True)
