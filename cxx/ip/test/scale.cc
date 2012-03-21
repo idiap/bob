@@ -77,7 +77,6 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
       BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
-
 template<typename T, typename U>  
 void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2, 
   const double eps )
@@ -88,7 +87,7 @@ void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2,
   BOOST_CHECK_LE( abs(t1.extent(1)-t2.extent(1)), 1);
   for( int i=0; i<y_min; ++i)
     for( int j=0; j<x_min; ++j)
-      BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
+      BOOST_CHECK_SMALL(std::abs(bob::core::cast<U>(t1(i,j)) - t2(i,j)), 1. + eps);
 }
 
 
