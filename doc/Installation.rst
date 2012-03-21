@@ -23,7 +23,7 @@
 ======================
 
 If you are just willing to use |project| existing resources in your scripts,
-the easiest way to pick one of the available installation methods bellow.
+the easiest way to pick one of the available installation methods below.
 Otherwise, if they fail or don't match your development requirements, you must
 compile |project| yourself as explained at :doc:`Compilation`.
 
