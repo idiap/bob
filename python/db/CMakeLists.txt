@@ -82,6 +82,9 @@ bob_python_add_dependent_test(db-biosecure-dumplist python-db-biosecure-create
 bob_python_add_dependent_test(db-biosecure-dumplist2 python-db-biosecure-create
   dbmanage.py biosecure dumplist --protocol=ca0 --classes=client --groups=dev --purposes=enrol --self-test)
 
+bob_python_add_dependent_test(db-biosecure-checkfiles python-db-biosecure-create
+  dbmanage.py biosecure checkfiles --self-test)
+
 # Faceverif_fl database (uses file lists).
 bob_python_add_unittest(db lib/test/faceverif_fl.py)
 
