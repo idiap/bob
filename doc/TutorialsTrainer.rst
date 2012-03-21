@@ -202,6 +202,13 @@ procedure remains identical.
 Support Vector Machines
 =======================
 
+.. ifconfig:: not has_libsvm
+
+  .. warning:: 
+
+    LIBSVM was not found when this documentation has been generated.
+
+
 **Support Vector Machine** (SVM) [6]_ is a very popular `supervised` learning 
 technique. |project| provides a bridge to `LIBSVM`_ which allows to `train`
 such a `machine` and use it for classification. 
@@ -212,13 +219,24 @@ of training samples for the given class whereas the second dimension
 corresponds to the feature dimensionality. For instance, let's consider the
 following training set for a two class problem.
 
-.. doctest::
-   :options: +NORMALIZE_WHITESPACE
+.. ifconfig:: has_libsvm
 
-   >>> pos = numpy.array([[1,-1,1], [0.5,-0.5,0.5], [0.75,-0.75,0.8]], 'float64')
-   >>> neg = numpy.array([[-1,1,-0.75], [-0.25,0.5,-0.8]], 'float64')
-   >>> data = [pos,neg]
-   >>> print data # doctest: +SKIP
+  .. doctest::
+     :options: +NORMALIZE_WHITESPACE
+
+     >>> pos = numpy.array([[1,-1,1], [0.5,-0.5,0.5], [0.75,-0.75,0.8]], 'float64')
+     >>> neg = numpy.array([[-1,1,-0.75], [-0.25,0.5,-0.8]], 'float64')
+     >>> data = [pos,neg]
+     >>> print data # doctest: +SKIP
+
+.. ifconfig:: not has_libsvm
+
+  .. code-block:: python
+
+     >>> pos = numpy.array([[1,-1,1], [0.5,-0.5,0.5], [0.75,-0.75,0.8]], 'float64')
+     >>> neg = numpy.array([[-1,1,-0.75], [-0.25,0.5,-0.8]], 'float64')
+     >>> data = [pos,neg]
+     >>> print data # doctest: +SKIP
 
 .. note:: 
 
@@ -230,32 +248,57 @@ following training set for a two class problem.
 Then, a `Support Vector Machine` (SVM) [6]_ can be trained easily using the
 :py:class:`bob.trainer.SVMTrainer` class.
 
-.. doctest::
-   :options: +NORMALIZE_WHITESPACE
+.. ifconfig:: has_libsvm
 
-   >>> trainer = bob.trainer.SVMTrainer()
-   >>> machine = trainer.train(data) #ordering only affects labels
+  .. doctest::
+     :options: +NORMALIZE_WHITESPACE
+
+     >>> trainer = bob.trainer.SVMTrainer()
+     >>> machine = trainer.train(data) #ordering only affects labels
+
+.. ifconfig:: not has_libsvm
+
+  .. code-block:: python
+
+     >>> trainer = bob.trainer.SVMTrainer()
+     >>> machine = trainer.train(data) #ordering only affects labels
 
 This returns a :py:class:`bob.machine.SupportVector` which can later be used 
 for classification, as explained in :doc:`TutorialsTrainer`.
 
-.. doctest::
+.. ifconfig:: has_libsvm
 
-   >>> predicted_label = machine(numpy.array([1.,-1.,1.]))
-   >>> print predicted_label
-   1
+  .. doctest::
 
+     >>> predicted_label = machine(numpy.array([1.,-1.,1.]))
+     >>> print predicted_label
+     1
+
+.. ifconfig:: not has_libsvm
+
+  .. code-block:: python
+
+     >>> predicted_label = machine(numpy.array([1.,-1.,1.]))
+     >>> print predicted_label
+     1
 
 The `training` procedure allows several different type of options. For 
 instance, the default `kernel` is an `RBF`. If we would like a `linear SVM` 
 instead, this can be set before calling the 
 :py:meth:`bob.trainer.SVMTrainer.train()` method.
 
-.. doctest::
-   :options: +NORMALIZE_WHITESPACE
+.. ifconfig:: has_libsvm
 
-   >>> trainer.kernel_type = bob.machine.svm_kernel_type.LINEAR
+  .. doctest::
+     :options: +NORMALIZE_WHITESPACE
 
+     >>> trainer.kernel_type = bob.machine.svm_kernel_type.LINEAR
+
+.. ifconfig:: not has_libsvm
+
+  .. code-block:: python
+
+     >>> trainer.kernel_type = bob.machine.svm_kernel_type.LINEAR
 
 
 k-Means
