@@ -429,7 +429,7 @@ interleaved color image to plane color image.
 Matlab
 ~~~~~~
 
-|project| currently does not provide `Matlab`_ mex interface. Nevertheless, it is possible to load and save simple `.mat` files, thank to the `MatIO`_ library. However, complex data such as `Matlab`_ structure are not supported. Be aware that `Matlab`_ also support the `HDF5`_ file format. For more details, please have a look at :doc:`doc/TutorialsIO`.
+|project| currently does not provide `Matlab`_ mex interface. Nevertheless, it is possible to load and save simple `.mat` files, thank to the `MatIO`_ library. However, complex data such as `Matlab`_ structure are not supported. Be aware that `Matlab`_ also support the `HDF5`_ file format. For more details, please have a look at :doc:`TutorialsIO`.
 
 .. Place here your external references
 
