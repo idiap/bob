@@ -128,6 +128,9 @@ bob_python_add_dependent_test(db-scface-dumplist python-db-scface-create
 bob_python_add_dependent_test(db-scface-dumplist2 python-db-scface-create
   dbmanage.py scface dumplist --protocol=combined --classes=client --groups=dev --purposes=enrol --self-test)
 
+bob_python_add_dependent_test(db-scface-checkfiles python-db-scface-create
+  dbmanage.py scface checkfiles --self-test)
+
 # XM2VTS database driver tests.
 bob_python_add_dependent_test(db-xm2vts-dumplist python-db-xm2vts-create
   dbmanage.py xm2vts dumplist --self-test)
