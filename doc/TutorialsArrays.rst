@@ -196,8 +196,8 @@ Partial reductions along a specific dimension are also possible.
    >>> print A.max(axis=1)
    [4 8]
 
-Linear algebra is also supported through the bridges to the optimized **ATLAS** 
-`LAPACK`_ (and **BLAS**) libraries which are mostly integrated in the `linalg` 
+Linear algebra is also supported through the bridges to the optimized `ATLAS`_
+`LAPACK`_ (and `BLAS`_) libraries which are mostly integrated in the `linalg` 
 submodule of `SciPy`_. In the following, this is highlighted via two different
 examples: matrix multiplication and matrix inversion.
 
@@ -399,4 +399,6 @@ the `fromstring()` method of `NumPy`_ is suitable.
 .. include:: links.rst
 .. _user guide: http://docs.scipy.org/doc/numpy/user/
 .. _pil: http://www.pythonware.com/products/pil/
+.. _atlas: http://math-atlas.sourceforge.net/
+.. _blas: http://www.netlib.org/blas/
 .. _page: http://www.scipy.org/NumPy_for_Matlab_Users page
