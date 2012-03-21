@@ -324,8 +324,61 @@ and process it with |project|. In this case, a mono audio signal would be
 represented as a 2D array, the first dimension corresponding to the time index 
 and the second one to the wave magnitude.
 
+
+Interfacing with OpenCV and PIL
+===============================
+
+As |project| relies on `NumPy`_ arrays, it is very easy to make use of other 
+popular libraries such as `OpenCV`_ and `PIL`_.
+
+
+OpenCV
+~~~~~~
+
+To convert a `NumPy`_ array into `OpenCV`_ (cvMat), the `fromarray()` of
+`OpenCV`_ will do the job.
+
+.. code-block:: python
+
+   >>> import cv, numpy
+   >>> a = numpy.ones((5, 10))
+   >>> mat = cv.fromarray(a)
+
+Similarly, to convert an `OpenCV`_ cvMat, into a `NumPy`_ array, the 
+`asarray()` method is suitable.
+
+.. code-block:: python
+
+   >>> import cv, numpy
+   >>> mat = cv.CreateMat(3, 5, cv.CV_32FC1)
+   >>> cv.Set(mat, 37)
+   >>> a = numpy.asarray(mat)
+
+
+PIL
+~~~
+
+To convert 2D `NumPy`_ array of type uint8 into a grayscale `PIL`_ image, the
+`fromstring()` method of `PIL`_ will do the job.
+
+.. code-block:: python
+
+   >>> import numpy, Image
+   >>> img = numpy.array([[1,2,3,4],[2,3,4,5],[3,4,5,6]], 'uint8')
+   >>> imgPIL = Image.fromstring('L', (img.shape[1], img.shape[0]), img.tostring())
+
+To convert a grayscale `PIL`_ image into a 2D `NumPy`_ array of uint8, 
+the `fromstring()` method of `NumPy`_ is suitable.
+
+.. code-block:: python
+
+   >>> img2 = numpy.fromstring(imgPIL.tostring(), numpy.uint8()).reshape(imgPIL.size[1], imgPIL.size[0])
+   >>> numpy.array_equal(img, img2)
+   True
+
 .. Place here your external references
 
 .. include:: links.rst
 .. _user guide: http://docs.scipy.org/doc/numpy/user/
+.. _pil: http://www.pythonware.com/products/pil/
 .. _page: http://www.scipy.org/NumPy_for_Matlab_Users page
