@@ -95,6 +95,9 @@ bob_python_add_dependent_test(db-lfw-dumplist python-db-lfw-create
 bob_python_add_dependent_test(db-lfw-dumplist2 python-db-lfw-create
   dbmanage.py lfw dumplist --view=view1 --subset=fold1 --classes=matched --self-test)
 
+bob_python_add_dependent_test(db-lfw-checkfiles python-db-lfw-create
+  dbmanage.py lfw checkfiles --self-test)
+
 # MOBIO database driver tests.
 bob_python_add_dependent_test(db-mobio-dumplist python-db-mobio-create
   dbmanage.py mobio dumplist --self-test)
