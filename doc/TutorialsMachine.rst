@@ -327,6 +327,33 @@ publication, be sure to also cite:
    note    = {Software available at \url{http://www.csie.ntu.edu.tw/~cjlin/libsvm}}
   }
 
+
+K-means Machines
+----------------
+
+`k-Means <http://en.wikipedia.org/wiki/K-means_clustering>` is a clustering 
+method, which aims to partition a set of observations into :math:`k` 
+clusters. The `training` procedure is described in :doc:`TutorialsTrainer`. 
+Otherwise, it is possible to define a :py:class:`bob.io.KMeansMachine` as
+follows.
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+
+   >>> machine = bob.machine.KMeansMachine(2,3) # Two clusters with a feature dimensionality of 3
+   >>> machine.means = numpy.array([[1,0,0],[0,0,1]], 'float64') # Defines the two clusters
+
+Then, given some input data, it is possible to determine to which cluster the
+data is the closest as well as the min distance.
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+
+   >>> sample = numpy.array([2,1,-2], 'float64')
+   >>> print machine.getClosestMean(sample) # Returns the index of the closest mean and the distance to it at the power of 2
+   (0, 6.0)
+
+
 Gaussian Machines
 -----------------
 
