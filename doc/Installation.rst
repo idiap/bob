@@ -27,7 +27,7 @@ the easiest way to pick one of the available installation methods below.
 Otherwise, if they fail or don't match your development requirements, you must
 compile |project| yourself as explained at :doc:`Compilation`.
 
-This section only describes how to automatically install pre-packaged version
+This section only describes how to automatically install pre-packaged versions
 of |project|.
 
 Ubuntu
