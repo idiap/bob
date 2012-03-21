@@ -16,6 +16,24 @@
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+Introduction
+-------------
+
+|project| code base is subdivided in packages. Each package may depend on other
+packages to work properly or on external software. There is no notion of
+layering in the software structure. |project| is actually composed of a number
+of re-usable components that can be deployed either separately or jointly
+depending on user requirements. The following diagram may help you understand
+what is the (loose) inter-dependency of |project|'s internal packages and
+external software. Optional packages and external dependencies are marked with
+dashed lines. Functionality shipped with the build you are currently using will
+depend on software availability during compilation.
+
+.. figure:: img/overview.png
+  :alt: Overview of |project| packages and organization
+
+  Organization of |project| packages and main dependencies.
+
 Python and C++ APIs
 -------------------
 
