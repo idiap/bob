@@ -115,6 +115,9 @@ bob_python_add_dependent_test(db-multipie-dumplist python-db-multipie-create
 bob_python_add_dependent_test(db-multipie-dumplist2 python-db-multipie-create
   dbmanage.py multipie dumplist --protocol=M --classes=client --groups=dev --purposes=enrol --self-test)
 
+bob_python_add_dependent_test(db-multipie-checkfiles python-db-multipie-create
+  dbmanage.py multipie checkfiles --self-test)
+
 # Nuaa database driver tests.
 bob_python_add_unittest(db lib/test/nuaa.py main)
 
