@@ -304,6 +304,7 @@ intersphinx_mapping = {
   'http://docs.scipy.org/doc/scipy/reference/': None,
   'http://docs.sqlalchemy.org/en/latest/': None,
   'http://matplotlib.sourceforge.net/': None,
+  'http://opencv.itseez.com/': None,
   }
 
 def setup(app):
