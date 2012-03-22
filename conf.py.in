@@ -49,6 +49,9 @@ import sphinx
 if sphinx.__version__ >= "1.0":
   extensions.append('sphinx.ext.viewcode')
 
+# Always includes todos
+todo_include_todos = True
+
 # If we are on OSX, the 'dvipng' path maybe different
 dvipng_osx = '/opt/local/libexec/texlive/binaries/dvipng'
 if os.path.exists(dvipng_osx): pngmath_dvipng = dvipng_osx
@@ -289,13 +292,8 @@ autodoc_default_flags = ['members', 'undoc-members', 'special-members', 'inherit
 
 # Used to filter some documentation in/out
 bob_modules = dir(__import__('bob'))
-has_libsvm = True
-try:
-  import bob 
-  bob.machine.__getattribute__('SupportVector')
-except AttributeError:
-  has_libsvm = False
-
+has_libsvm = hasattr(__import__('bob.machine'), 'SupportVector')
+has_visioner = hasattr(__import__('bob'), 'visioner')
 
 # For inter-documentation mapping:
 intersphinx_mapping = {
@@ -311,3 +309,4 @@ def setup(app):
   app.connect('autodoc-skip-member', member_function_test)
   app.add_config_value('bob_modules', bob_modules, True)
   app.add_config_value('has_libsvm', has_libsvm, True)
+  app.add_config_value('has_visioner', has_visioner, True)

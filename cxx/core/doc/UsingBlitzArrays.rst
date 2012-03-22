@@ -26,7 +26,7 @@ guide we just give a brief introduction to some of Blitz array properties for a
 quick start.
 
 .. note::
-  Please refer to :doc:`../../../python/core/doc/UsingBlitzArrays` for a
+  Please refer to :doc:`../../../python/core/doc/ArrayNote` for a
   detailed list and element type names we support.
 
 Construction

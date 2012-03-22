@@ -29,4 +29,4 @@ def histogram_intersection(h1, h2):
     dist += min(h1[i], h2[i])
   return dist
 
-
+__all__ = dir()

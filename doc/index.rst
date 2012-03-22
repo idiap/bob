@@ -36,6 +36,13 @@ on licensing, please visit our :doc:`Licensing`.
 
 Enjoy!
 
+.. ifconfig:: todo_include_todos
+
+  List of Things To-Do
+  --------------------
+
+  .. todolist::
+
 Practicalities
 --------------
 
@@ -58,8 +65,8 @@ Overview
    Overview
 
 
-Tutorials
----------
+Dive Into |project|
+-------------------
 
 .. toctree::
    :maxdepth: 2
@@ -71,6 +78,7 @@ Tutorials
    TutorialsMachine
    TutorialsTrainer
    TutorialsDatabase
+   TutorialsPerformance
 
 Reference Guide
 ---------------
@@ -78,7 +86,18 @@ Reference Guide
 .. toctree::
    :maxdepth: 2
 
-   ../python/doc/index
+   ../python/doc/introduction
+   ../python/core/doc/index
+   ../python/math/doc/index
+   ../python/io/doc/index
+   ../python/sp/doc/index
+   ../python/ip/doc/index
+   ../python/machine/doc/index
+   ../python/trainer/doc/index
+   ../python/db/doc/index
+   ../python/measure/doc/index
+   ../python/visioner/doc/index
+   ../python/daq/doc/index
 
 Developer's Guide
 -----------------

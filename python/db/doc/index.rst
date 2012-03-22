@@ -22,8 +22,9 @@
  Databases
 ===========
 
-Reference
----------
+.. todo::
+
+  Verify all databases are here!
 
 .. automodule:: bob.db
 
@@ -33,7 +34,6 @@ BANCA Database
 .. automodule:: bob.db.banca
 
 .. autoclass:: bob.db.banca.Database
-  :members:
 
 Biosecure Database
 ==================
@@ -41,7 +41,6 @@ Biosecure Database
 .. automodule:: bob.db.biosecure
 
 .. autoclass:: bob.db.biosecure.Database
-  :members:
 
 MOBIO Database
 ==============
@@ -49,7 +48,6 @@ MOBIO Database
 .. automodule:: bob.db.mobio
 
 .. autoclass:: bob.db.mobio.Database
-  :members:
 
 Multipie Database
 =================
@@ -57,7 +55,6 @@ Multipie Database
 .. automodule:: bob.db.multipie
 
 .. autoclass:: bob.db.multipie.Database
-  :members:
 
 Replay Attack Database
 ======================
@@ -65,7 +62,6 @@ Replay Attack Database
 .. automodule:: bob.db.replay
 
 .. autoclass:: bob.db.replay.Database
-  :members:
 
 SCface Database
 ===============
@@ -73,25 +69,21 @@ SCface Database
 .. automodule:: bob.db.scface
 
 .. autoclass:: bob.db.scface.Database
-  :members:
 
 Iris Database
 =============
 
 .. automodule:: bob.db.iris
-  :members:
 
 NUAA Database
 =============
 
 .. automodule:: bob.db.nuaa
-  :members:
 
 CASIA_FASD Database
 ===================
 
 .. automodule:: bob.db.casia_fasd
-  :members:
 
 XM2VTS Database
 ===============
@@ -99,4 +91,3 @@ XM2VTS Database
 .. automodule:: bob.db.xm2vts
 
 .. autoclass:: bob.db.xm2vts.Database
-  :members:

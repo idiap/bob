@@ -22,9 +22,4 @@
  Data acquisition
 ==================
 
-.. toctree::
-   :maxdepth: 2
-   
 .. automodule:: bob.daq
-   :members:
-   

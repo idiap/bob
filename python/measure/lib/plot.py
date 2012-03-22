@@ -20,10 +20,6 @@ def roc(negatives, positives, npoints=100, **kwargs):
   The plot will represent the false-alarm on the vertical axis and the
   false-rejection on the horizontal axis.
 
-  .. warning::  
-    This method requires that matplotlib is installed and operational on the
-    system executing the plot.
-
   Input arguments:
 
   negatives
@@ -79,10 +75,6 @@ def epc(dev_negatives, dev_positives, test_negatives, test_positives,
 
   The plot will represent the minimum HTER on the vertical axis and the
   cost on the horizontal axis.
-
-  .. warning::  
-    This method requires that matplotlib is installed and operational on the
-    system executing the plot.
 
   Input arguments:
 
@@ -153,10 +145,6 @@ def det(negatives, positives, npoints=100, axisfontsize='x-small', **kwargs):
   called DETware, version 2.1 and available for download at the NIST website:
 
   http://www.itl.nist.gov/iad/mig/tools/
-
-  .. warning::
-    This method requires that matplotlib is installed and operational on the
-    system executing the plot.
 
   Keyword parameters:
 

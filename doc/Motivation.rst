@@ -16,9 +16,9 @@
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-========================================
- Motivations: Be a driver to |project|!
-========================================
+=======================================
+ Motivations: Be a driver to |project|
+=======================================
 
 We started developing |project| because of a common need in many research
 laboratories like ours: need of a software platform where stable algorithms,

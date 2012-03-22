@@ -1,4 +1,4 @@
-.. vim: set fileencoding=utf-8 :
+.. vim: set fileencoding-utf-8 :
 .. Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
 .. Wed Mar 14 12:31:35 2012 +0100
 .. 
@@ -20,16 +20,33 @@
  Multi-dimensional Arrays
 **************************
 
+Introduction
+------------
+
 The fundamental data structure of |project| consists in multi-dimensional
 arrays. In signal-processing and machine learning, arrays are indeed a suitable
 representation for many different types of digital signals such as images, 
 audio data, extracted features, etc. `Python`_ is the working environment
 selected for this library. Furtherore, we have decided to rely on existing
-`NumPy`_ multi-dimensional arrays.
+`NumPy`_ multi-dimensional arrays (:py:class:`numpy.ndarray`).
 
+At the C++ level, the `Blitz++`_ library is used to handle arrays. Although we
+initially binds `Blitz++`_ Arrays into Python, we quickly realized that it
+might be more clever to use existing NumPy_ ndarrays from Python, as they can
+directly be processed by numerous existing Python libraries such as NumPy_ and
+SciPy_. 
+
+This means that |project| multi-dimensional arrays are represented in Python by
+NumPy_ ndarrays. This also implies that there are internal conversion routines
+to convert NumPy_ ndarrays from/to `Blitz++`_. As they are done implicitly, the
+user has no need to care about this aspect and should just use NumPy_ ndarrays
+everywhere.
+
+For an introduction and tutorials about NumPy_ ndarrays, just 
+visit the Numpy_ website.
 
 Numpy basics
-============
+------------
 
 A `NumPy`_ array is a table of elements, all of the same type, indexed by a 
 tuple of positive integers. Before using any of the functionalities described
@@ -44,7 +61,7 @@ below, `NumPy`_ should be imported in the `Python`_ environment.
    For `MATLAB`_ users, this `page`_ highlights the differences and the commonalities between `NumPy`_ and `MATLAB`_.
 
 Array creation
-~~~~~~~~~~~~~~
+==============
 
 There are different ways to create `NumPy`_ arrays. For instance, to create an
 array with initialized content:
@@ -83,7 +100,7 @@ an :py:class:`numpy.ndarray` object are:
 
 
 Accessing array elements
-~~~~~~~~~~~~~~~~~~~~~~~~
+========================
 
 The `Python`_ `operator[] <http://docs.scipy.org/doc/numpy/reference/arrays.indexing.html>`_ 
 allows to index the elements of an array. Please note that the indices start 
@@ -107,7 +124,7 @@ multi-dimensional array, this is done with respect to the first dimension.
 
 
 Array type
-~~~~~~~~~~
+==========
 
 The type of the elements of an array can be specified at the creation time.
 
@@ -127,9 +144,31 @@ provides the :py:attr:`numpy.ndarray.astype` function.
    >>> print D.dtype
    uint8
 
+.. note::
+
+  .. todo::
+
+    Double-check that the following code still works and doctest it.
+
+  The :py:func:`bob.core.convert` function allows to convert/rescale an array of
+  a given type into another array of a possibly different type with re-scaling.
+  Typically, this is useful if we want to convert a uint8 2D array (e.g. a
+  grayscale image) into a float64 2D array with a ``[0,1]`` range.
+
+  .. code-block:: python
+
+    >>> img = numpy.array([[0,1,2,3,4],[255,254,253,252,251]], dtype='uint8')
+    >>> bob.core.array.convert(img, dtype='float64', destRange=(0.,1.))
+    >>> img_d = bob.core.array.convert(img, dtype='float64', destRange=(0.,1.))
+    >>> print img_d
+    [[ 0.          0.00392157  0.00784314  0.01176471  0.01568627]
+    [ 1.          0.99607843  0.99215686  0.98823529  0.98431373]]
+    >>> print img_d.dtype
+    float64
+
 
 Array shape
-~~~~~~~~~~~
+===========
 
 `NumPy`_ provides several features to reshape or stack arrays, such as the
 :py:attr:`numpy.ndarray.reshape`, :py:func:`numpy.hstack`, and
@@ -152,7 +191,7 @@ Array shape
 
 
 Mathematical operations
-~~~~~~~~~~~~~~~~~~~~~~~
+=======================
 
 `NumPy`_ also provides numerous mathematical operations. Most of them are 
 performed **elementwise**. For instance,
@@ -215,7 +254,7 @@ examples: matrix multiplication and matrix inversion.
     [-10.75   4.75]]
 
 Assignment, shallow and deep copy
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=================================
 
 Different arrays might share the same data in memory. Let's first have a look
 at the assignment operator =.
@@ -274,7 +313,7 @@ For a more exhaustive introduction about `NumPy`_, please have a look at its
 `user guide`_. 
 
 Digital signals as multi-dimensional arrays
-===========================================
+-------------------------------------------
 
 For |project|, we have decided to represent digital signals directly as 
 `NumPy`_ arrays, rather than having dedicated classes for each type of 
@@ -282,7 +321,7 @@ signals. This implies that some convention has been defined.
 
 
 Vectors and matrices
-~~~~~~~~~~~~~~~~~~~~
+====================
 
 A vector is represented as a 1D `NumPy`_ array, whereas a matrix is 
 represented by a 2D arrays whose first dimension corresponds to the rows, and
@@ -300,7 +339,7 @@ second dimension to the columns.
    [1 2 3]
 
 Images
-~~~~~~
+======
 
 **Grayscale** images are represented as 2D arrays, the first dimension being the
 height (number of rows) and the second dimension being the witdh (number of 
@@ -326,14 +365,14 @@ in which color space the content is stored. |project| provides functions to
 perform colorspace conversion (cf. the :doc:`TutorialsIP` tutorial).
 
 Videos
-~~~~~~
+======
 
 A video can be seen as a sequence of images over time. By convention, the 
 first dimension is for the frame indices (time index), whereas the remaining 
 ones are related to the corresponding image frame.
 
 Audio signal
-~~~~~~~~~~~~
+============
 
 |project| does not yet support audio files (No wav or mp3 codec). However, it 
 is still possible to convert such a signal into e.g. HDF5, and then to read 
@@ -343,14 +382,14 @@ and the second one to the wave magnitude.
 
 
 Interfacing with OpenCV and PIL
-===============================
+-------------------------------
 
 As |project| relies on `NumPy`_ arrays, it is very easy to make use of other 
 popular libraries such as `OpenCV`_ and `PIL`_.
 
 
 OpenCV
-~~~~~~
+======
 
 .. note::
 
@@ -380,7 +419,7 @@ Both `NumPy`_ array and `OpenCV`_ cvMat use similar datatypes (`uint8`,
 datatype is preserved by the previous operations.
 
 PIL
-~~~
+===
 
 `PIL`_ does not provide a generic multi-dimensional array structure. However, 
 its Image structure can be seen as 2D or 3D arrays. To convert a 2D `NumPy`_ 
@@ -429,8 +468,8 @@ interleaved color image to plane color image.
    >>> numpy.array_equal(a, c_plane_read)
    True
 
-MATLAB
-~~~~~~
+Matlab
+======
 
 |project| currently does not provide `MATLAB`_ mex interface. Nevertheless, it
 is possible to load and save simple `.mat` files, thanks to the `MatIO`_ 
@@ -438,9 +477,32 @@ library. However, complex data such as `MATLAB`_ structures are not supported.
 Be aware that `MATLAB`_ also support the `HDF5`_ file format. For more 
 details, please have a look at :doc:`TutorialsIO`.
 
-.. Place here your external references
+Random Number Generation
+------------------------
+
+We have developed a set of bridges to the `Boost Random Number Generation`_
+facilities. This allows you to generate random numbers in a variety of ways.
+
+.. todo::
+
+  Make sure that the code below works and doctest it.
+
+.. code-block:: python
+
+  >>> mt = bob.core.random.mt19937()
+  >>> binom = bob.core.random.binomial_float64()
+  >>> binom(mt)
+  0 
+
+.. note::
+
+  Numpy_ also provides random sampling functionalities.
 
 .. include:: links.rst
+
+.. Place here your external references
+
+.. _boost random number generation: http://www.boost.org/doc/libs/release/libs/random/index.html 
 .. _user guide: http://docs.scipy.org/doc/numpy/user/
 .. _pil: http://www.pythonware.com/products/pil/
 .. _atlas: http://math-atlas.sourceforge.net/

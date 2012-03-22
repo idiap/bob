@@ -23,10 +23,7 @@
 =========
 
 .. toctree::
-   :maxdepth: 2
 
-   GMMToolChain.rst
-   
+  GMMToolChain
+
 .. automodule:: bob.trainer
-   :members:
-   
