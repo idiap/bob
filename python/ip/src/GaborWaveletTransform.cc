@@ -47,22 +47,6 @@ static void gabor_wavelet_transform(bob::ip::GaborKernel& kernel, bob::python::c
   ifft(output);
 }
 
-static boost::shared_ptr<bob::ip::GaborKernel> gabor_wavelet_init(const boost::python::tuple& resolution, const boost::python::tuple& wavelet_frequency, const double sigma, const double pow_of_k, const bool dc_free, const double epsilon){
-  blitz::TinyVector<int,2> i = boost::python::extract<blitz::TinyVector<int,2> >(resolution);
-  blitz::TinyVector<double,2> wf = boost::python::extract<blitz::TinyVector<double,2> >(wavelet_frequency);
-
-  boost::shared_ptr<bob::ip::GaborKernel> res(new bob::ip::GaborKernel(
-      boost::python::extract<blitz::TinyVector<int,2> >(resolution),
-      boost::python::extract<blitz::TinyVector<double,2> >(wavelet_frequency),
-      sigma, 
-      pow_of_k, 
-      dc_free, 
-      epsilon
-  ));
-  return res;
-}
-
-
 static void perform_gwt (bob::ip::GaborWaveletTransform& gwt, bob::python::const_ndarray input_image, bob::python::ndarray output_trafo_image){
   const blitz::Array<std::complex<double>,2> image = input_image.bz<std::complex<double>,2>();
   blitz::Array<std::complex<double>,3> trafo_image = output_trafo_image.bz<std::complex<double>,3>();
@@ -117,7 +101,7 @@ void bind_ip_gabor_wavelet_transform() {
   .def(
     "__call__",
     &gabor_wavelet_transform,
-    (boost::python::arg("self"), boost::python::arg("input_image"), boost::python::arg("output_trafo")),
+    (boost::python::arg("self"), boost::python::arg("input_image"), boost::python::arg("output_image")),
     """This function Gabor-filters the given input_image to the output image. Both the input and the output images must be of complex type. The output image needs to have the same resolution as the input image."""
   );
 

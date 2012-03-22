@@ -147,14 +147,21 @@ Now, let's see what happens to a small test image:
 See, we ended up with a nicely smoothed cross.
 
 
-Another filter you might want to us are Gabor filters.
+Another filter you might want to use is a Gabor filter. 
 
-..   >>> complex_image = image.astype(complex)
-..   >>> filtered_image = numpy.ndarray(complex_image.shape, dtype = 'complex')
-..   >>> kernel = bob.ip.GaborKernel(complex_image.shape, (0,1))
-..   >>> kernel(complex_image, filtered_image)
-..   >>> abs_image = numpy.abs(filtered_image)
-..   >>> bob.io.Array(abs_image).save("/scratch/mguenther/test.hdf5")
+  >>> complex_image = image.astype(complex)
+  >>> filtered_image = numpy.ndarray(complex_image.shape, dtype = 'complex')
+  >>> kernel = bob.ip.GaborKernel(complex_image.shape, (1,0))
+  >>> kernel(complex_image, filtered_image)
+  
+or simply:
+
+  >>> filtered_image = kernel(image)
+  
+To compute the absolute and phase parts of the responses (e.g. as needed by the extended local Gabor binary pattern (ELGBP)), just use the `NumPy`_ functions on the resulting image:
+
+  >>> abs_image = numpy.abs(filtered_image)
+  >>> phase_image = numpy.angle(filtered_image)
 
 
 Normalizing images according to eye positions
@@ -171,6 +178,8 @@ Now, we have set up our object to generate images of size (128, 128) that will p
   >>> face_eyes_norm( face_image, cropped_image, le_y = 67, le_x = 47, re_y = 62, re_x = 71)
 
 
+Simple feature extraction
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 
