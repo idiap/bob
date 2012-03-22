@@ -22,10 +22,6 @@
  Databases
 ===========
 
-.. todo::
-
-  Verify all databases are here!
-
 .. automodule:: bob.db
 
 BANCA Database
@@ -35,12 +31,43 @@ BANCA Database
 
 .. autoclass:: bob.db.banca.Database
 
+BANCA small Database
+====================
+
+.. automodule:: bob.db.banca_small
+
+.. autoclass:: bob.db.banca_small.Database
+
 Biosecure Database
 ==================
 
 .. automodule:: bob.db.biosecure
 
 .. autoclass:: bob.db.biosecure.Database
+
+CASIA_FASD Database
+===================
+
+.. automodule:: bob.db.casia_fasd
+
+FaceVerif_FL Database
+=====================
+
+.. automodule:: bob.db.faceverif_fl
+
+.. autoclass:: bob.db.faceverif_fl.Database
+
+Iris Database
+=============
+
+.. automodule:: bob.db.iris
+
+Labeled Faces in the Wild Database
+==================================
+
+.. automodule:: bob.db.lfw
+
+.. autoclass:: bob.db.lfw.Database
 
 MOBIO Database
 ==============
@@ -49,12 +76,17 @@ MOBIO Database
 
 .. autoclass:: bob.db.mobio.Database
 
-Multipie Database
-=================
+Multi-PIE Database
+==================
 
 .. automodule:: bob.db.multipie
 
 .. autoclass:: bob.db.multipie.Database
+
+NUAA Database
+=============
+
+.. automodule:: bob.db.nuaa
 
 Replay Attack Database
 ======================
@@ -69,21 +101,6 @@ SCface Database
 .. automodule:: bob.db.scface
 
 .. autoclass:: bob.db.scface.Database
-
-Iris Database
-=============
-
-.. automodule:: bob.db.iris
-
-NUAA Database
-=============
-
-.. automodule:: bob.db.nuaa
-
-CASIA_FASD Database
-===================
-
-.. automodule:: bob.db.casia_fasd
 
 XM2VTS Database
 ===============
