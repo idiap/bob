@@ -29,10 +29,21 @@ external software. Optional packages and external dependencies are marked with
 dashed lines. Functionality shipped with the build you are currently using will
 depend on software availability during compilation.
 
-.. figure:: img/overview.png
-  :alt: Overview of |project| packages and organization
+.. only:: not latex
 
-  Organization of |project| packages and main dependencies.
+  .. figure:: img/overview.png
+    :alt: Overview of |project| packages and organization
+    :scale: 50%
+
+    Organization of |project| packages and main dependencies.
+
+.. only:: latex
+
+  .. figure:: img/overview.pdf
+    :alt: Overview of |project| packages and organization
+    :scale: 80%
+
+    Organization of |project| packages and main dependencies.
 
 Python and C++ APIs
 -------------------
