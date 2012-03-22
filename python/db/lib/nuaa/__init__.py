@@ -259,11 +259,11 @@ class Database(object):
     return files_val, files_train
   
 
-  def save_one(self, filename, obj, directory, extension):
+  def save_by_filename(self, filename, obj, directory, extension):
     """Saves a single object supporting the bob save() protocol.
 
     This method will call save() on the the given object using the correct
-    database filename stem for the given id.
+    database filename stem for the given filename.
     
     Keyword parameters:
 
