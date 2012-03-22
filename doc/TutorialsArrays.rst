@@ -425,13 +425,13 @@ interleaved color image to plane color image.
    >>> numpy.array_equal(a, c_plane_read)
    True
 
-Matlab
+MATLAB
 ~~~~~~
 
-|project| currently does not provide `Matlab`_ mex interface. Nevertheless, it
+|project| currently does not provide `MATLAB`_ mex interface. Nevertheless, it
 is possible to load and save simple `.mat` files, thanks to the `MatIO`_ 
-library. However, complex data such as `Matlab`_ structures are not supported.
-Be aware that `Matlab`_ also support the `HDF5`_ file format. For more 
+library. However, complex data such as `MATLAB`_ structures are not supported.
+Be aware that `MATLAB`_ also support the `HDF5`_ file format. For more 
 details, please have a look at :doc:`TutorialsIO`.
 
 .. Place here your external references

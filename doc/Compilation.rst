@@ -148,7 +148,7 @@ Core dependencies
 * `Python`_: if you want to compile our python bindings we recommend using
   Python 2.5 or up;
 * `NumPy`_: this dependence is used to bridge blitz::Arrays to python.
-* `Matplotlib`_: A matlab-like python plotting environment
+* `Matplotlib`_: A `MATLAB`_-like python plotting environment
 * `Qt4`_: This library is used as the basis for the face detection and
   localization framework (Visioner). This dependence is *optional*. Face
   localization and detection will only be compiled if you have that installed.
@@ -171,7 +171,7 @@ Data access
 * `HDF5`_: HDF5 is the format of choice for binary representation of data
   or configuration items in bob. We currently compile against version 1.8.6,
   Version 1.8.4 (and before) might not work.
-* `MatIO`_: is used for reading and writing Matlab compatible (.mat) files.
+* `MatIO`_: is used for reading and writing `MATLAB`_ compatible (.mat) files.
   Our nightly builds compile against version 1.34, but version 1.33 is known to
   work. Other versions should also work. Please note this dependence is
   *optional*.

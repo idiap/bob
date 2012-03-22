@@ -110,7 +110,7 @@ multi-dimensional arrays as well as complex machine learning models. Many
 tools for viewing, and analyzing the data are already available.
 In addition, we also support the loading and storing of most image formats
 thanks to `ImageMagick`_, videos through `FFmpeg`_ as well as 
-standard `Matlab`_ file using `MatIO`_.
+standard `MATLAB`_ file using `MatIO`_.
 
 Database support
 ----------------
