@@ -292,7 +292,7 @@ autodoc_default_flags = ['members', 'undoc-members', 'special-members', 'inherit
 
 # Used to filter some documentation in/out
 bob_modules = dir(__import__('bob'))
-has_libsvm = hasattr(__import__('bob.machine'), 'SupportVector')
+has_libsvm = hasattr(__import__('bob').machine, 'SupportVector')
 has_visioner = hasattr(__import__('bob'), 'visioner')
 
 # For inter-documentation mapping:
