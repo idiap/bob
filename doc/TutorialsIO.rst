@@ -24,9 +24,9 @@
 Introduction
 ============
 
-This section gives an overview of the operations for storing and retrieving the basic data structures in |project|, i.e. `NumPy`_ arrays. |project| uses HDF5 format for storing binary coded data. For introduction of the HDF5 file format, please refer to `hdf5`_ . Using the |project| support for `hdf5`_, it is very simple to import and export data from the program.
+This section gives an overview of the operations for storing and retrieving the basic data structures in |project|, i.e. `NumPy`_ arrays. |project| uses `HDF5`_  format for storing binary coded data. Using the |project| support for `HDF5`_, it is very simple to import and export data from the program.
 
-`hdf5`_ uses a neat descriptive language for representing the data in the HDF5 files, called Data Description Language (`ddl`_).
+`HDF5`_  uses a neat descriptive language for representing the data in the HDF5 files, called Data Description Language (`DDL`_).
 
 To perform the functionalities given in this section, we should have `NumPy`_ and |project| loaded into the `Python`_ environment.
 
@@ -43,7 +43,7 @@ To perform the functionalities given in this section, we should have `NumPy`_ an
   
 HDF5 standard utilities
 =======================
-Before explaining the basics of reading and writing to HDF5 files, it is important to list some HDF5 standard utilities for checking the content of an HDF5 file. They are supplied by the `hdf5`_ project.
+Before explaining the basics of reading and writing to `HDF5`_ files, it is important to list some `HDF5`_ standard utilities for checking the content of an `HDF5`_ file. They are supplied by the `HDF5`_ project.
 
 ``h5dump``
   Dumps the whole contents of the file using the DDL
@@ -55,8 +55,8 @@ Before explaining the basics of reading and writing to HDF5 files, it is importa
   Finds the differences in HDF5 files.
 
 
-I/O operations using **bob.io.HDF5File** 
-========================================
+I/O operations using the class `bob.io.HDF5File`
+===============================================
 
 Writing operations
 ------------------
@@ -64,18 +64,19 @@ Writing operations
 Let's take a look how to record a simple scalar data such as integers or floats.
 
 .. doctest::
+
    >>> an_integer = 5
    >>> a_float = 3.1416
-   >>> f = bob.io.HDF5File('testfile2.hdf5')
+   >>> f = bob.io.HDF5File('testfile1.hdf5')
    >>> f.set('my_integer', an_integer)
    >>> f.set('my_float', a_float)
    >>> del f
 
-If after this you use the **h5dump** utility on the file ``testfile2.hdf5``, you will verify that the file now contains:
+If after this you use the **h5dump** utility on the file ``testfile1.hdf5``, you will verify that the file now contains:
 
 .. code-block:: none
 
-  HDF5 "testfile2.hdf5" {
+  HDF5 "testfile1.hdf5" {
   GROUP "/" {
     DATASET "my_float" {
        DATATYPE  H5T_IEEE_F64LE
@@ -115,13 +116,15 @@ directory like this:
 
 .. doctest::
 
-  >>> f = bob.io.HDF5File('testfile2.hdf5', 'w')
+  >>> f = bob.io.HDF5File('testfile1.hdf5')
+  >>> f.createGroup('/test')
   >>> f.set('/test/my_float', 6.28, dtype='float32')
   >>> del f
 
+
 Line 1 shows we open the file again for reading and writing, but without
-truncating it. This will allow us to access the file contents. Next, we write a
-new variable inside the ``/test`` subdirectory. As you can verify, **for simple
+truncating it. This will allow us to access the file contents. Next, we create the directory ``/test`` and we write a
+new variable inside the  subdirectory. As you can verify, **for simple
 scalars**, we can also force the storage type. Where normally one would have a
 64-bit real value, we impose that this variable is saved as a 32-bit real
 value. You can verify the dump correctness with ``h5dump``:
@@ -149,19 +152,19 @@ as it was defined.
 
   If you need to place lots of variables in a subfolder, it may be better to
   setup the prefix folder before starting the writing operations on the
-  ``HDF5File`` object. You can do this using the method ``HDF5File.cd``.
+  :py:class:`bob.io.HDF5File` object. You can do this using the method :py:meth:`HDF5File.cd()` .
   Look-up its help for more information and usage instructions.
 
-Writing arrays is a little simpler as py:class:`numpy.ndarray`'s encode all the
+Writing arrays is a little simpler as :py:class:`numpy.ndarray`'s encode all the
 type information we need to write and read them correctly. Here is an example:
 
 .. doctest::
 
-  A = numpy.array(range(4), 'int8').reshape(2,2)
-  f = bob.io.HDF5File('testfile2.hdf5', 'w')
-  f.set('my_array', A)
+  >>> A = numpy.array(range(4), 'int8').reshape(2,2)
+  >>> f = bob.io.HDF5File('testfile1.hdf5')
+  >>> f.set('my_array', A)
 
-And the result of running ``h5dump`` on the file ``testfile2.hdf5`` should be:
+And the result of running ``h5dump`` on the file ``testfile3.hdf5`` should be:
 
 .. code-block:: none
 
@@ -191,11 +194,11 @@ be using :py:meth:`bob.io.HDF5File.lread()` instead. Here is an example:
 
 .. doctest::
 
-  >>> f = bob.io.HDF5File('testfile12.hdf5', 'r') #read only
+  >>> f = bob.io.HDF5File('testfile1.hdf5', 'r') #read only
   >>> f.read('my_integer') #reads integer
   5
   >>> f.read('my_float') # reads float
-  3.141599999999999
+  3.1415999999999999
   >>> print f.read('my_array') # reads the array
   [[0 1]
    [2 3]]
@@ -206,10 +209,11 @@ Now let's look at an example where we have used
 the case when you write lists of variables to a dataset.
 
 .. doctest::
-  >>> f = bob.io.HDF5File('testfile3.hdf5')
-  >>> f.append('arrayset', bob.core.array.float64_1(range(10),(10,)))
-  >>> f.append('arrayset', 2*bob.core.array.float64_1(range(10),(10,)))
-  >>> f.append('arrayset', 3*bob.core.array.float64_1(range(10),(10,)))
+
+  >>> f = bob.io.HDF5File('testfile2.hdf5')
+  >>> f.append('arrayset', numpy.array(range(10), 'float64'))
+  >>> f.append('arrayset', 2*numpy.array(range(10), 'float64'))
+  >>> f.append('arrayset', 3*numpy.array(range(10), 'float64'))
   >>> print f.lread('arrayset', 0)
   [ 0.  1.  2.  3.  4.  5.  6.  7.  8.  9.]
   >>> print f.lread('arrayset', 2)
@@ -219,7 +223,7 @@ This is how a ``h5dump`` of the file looks like:
 
 .. code-block:: none
 
-  HDF5 "example2.hdf5" {
+  HDF5 "testfile4.hdf5" {
   GROUP "/" {
      DATASET "arrayset" {
         DATATYPE  H5T_IEEE_F64LE
@@ -268,11 +272,9 @@ To create an :py:class:`bob.io.Array` from a file, just do the following:
 
 .. doctest::
 
-  >>> a = bob.io.Array('testfile3.hdf5')
+  >>> a = bob.io.Array('testfile2.hdf5')
   >>> a.filename
-  'array.hdf5'
-  >>> a.loaded
-  False
+  'testfile2.hdf5'
 
 Arrays are containers for :py:class:`numpy.ndarray`\s **or** just pointers
 to a file.  When you instantiate an :py:class:`bob.io.Array` it does **not**
@@ -283,23 +285,23 @@ method:
 .. doctest::
 
   >>> array = a.get()
-  >>> print array 
-  [[ -1.   1.   2.   3.   4.   5.   6.   7.   8.   9.]
-   [  0.   2.   4.   6.   8.  10.  12.  14.  16.  18.]
-   [  0.   3.   6.   9.  12.  15.  18.  21.  24.  27.]]
+  >>> array
+  array([[  0.,   1.,   2.,   3.,   4.,   5.,   6.,   7.,   8.,   9.],
+         [  0.,   2.,   4.,   6.,   8.,  10.,  12.,  14.,  16.,  18.],
+         [  0.,   3.,   6.,   9.,  12.,  15.,  18.,  21.,  24.,  27.]])
 
 Every time you say :py:meth:`bob.io.Array.get()`, the file contents will be
 read from the file and into a new array. Try again:
 
 .. doctest::
 
-  >>> a.loaded
-  False
   >>> array = a.get()
   >>> array
-  [[ -1.   1.   2.   3.   4.   5.   6.   7.   8.   9.]
-   [  0.   2.   4.   6.   8.  10.  12.  14.  16.  18.]
-   [  0.   3.   6.   9.  12.  15.  18.  21.  24.  27.]]
+  array([[  0.,   1.,   2.,   3.,   4.,   5.,   6.,   7.,   8.,   9.],
+         [  0.,   2.,   4.,   6.,   8.,  10.,  12.,  14.,  16.,  18.],
+         [  0.,   3.,   6.,   9.,  12.,  15.,  18.,  21.,  24.,  27.]])
+
+
 
 You can force permanently loading the contents of the file in memory an avoid
 the I/O costs every time you read issue a :py:meth:`bob.io.Array.get()`:
@@ -307,15 +309,12 @@ the I/O costs every time you read issue a :py:meth:`bob.io.Array.get()`:
 .. doctest::
 
   >>> a.load() #move contents to memory
-  >>> a.loaded
-  True
   >>> a.filename
   ''
-  >>> array = a.get()
-  # if you do 'get()' again, you will get a reference to same object!
+  >>> array = a.get() # if you do 'get()' again, you will get a reference to same object!
   >>> array_reference = a.get()
   >>> print array_reference[0,0]
-  -1.0
+  0.0
 
 Notice that, once the array is loaded in memory, a reference to the same array
 is shared every time you call :py:meth:`bob.io.Array.get()`.
@@ -325,7 +324,7 @@ Saving the :py:class:`bob.io.Array` is as easy, just call the
 
 .. doctest::
 
-  >>> a.save('copy.hdf5')
+  >>> a.save('copy1.hdf5')
 
 Numpy ndrray Shortcuts
 ======================
@@ -336,18 +335,18 @@ the :py:class:`bob.io.Array` API:
 
 .. doctest::
 
-  >>> t = bob.io.load('example2.hdf5')
+  >>> t = bob.io.load('testfile2.hdf5')
   >>> t
-  [[  0.   1.   2.   3.   4.   5.   6.   7.   8.   9.]
-   [  0.   2.   4.   6.   8.  10.  12.  14.  16.  18.]
-   [  0.   3.   6.   9.  12.  15.  18.  21.  24.  27.]]
+  array([[  0.,   1.,   2.,   3.,   4.,   5.,   6.,   7.,   8.,   9.],
+         [  0.,   2.,   4.,   6.,   8.,  10.,  12.,  14.,  16.,  18.],
+         [  0.,   3.,   6.,   9.,  12.,  15.,  18.,  21.,  24.,  27.]])
 
 You can also directly save :py:class:`numpy.ndarray`\s without going
 through the :py:class:`bob.io.Array` container:
 
 .. doctest::
 
-  >>> bob.io.save(t, 'copy.hdf5')
+  >>> bob.io.save(t, 'copy2.hdf5')
 
 .. note::
 
