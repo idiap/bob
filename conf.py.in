@@ -212,7 +212,7 @@ latex_documents = [
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-latex_logo = '@CMAKE_SOURCE_DIR@/doc/img/bob.png'
+latex_logo = '@CMAKE_SOURCE_DIR@/doc/img/bob-logo.pdf'
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
@@ -249,7 +249,7 @@ os.environ['CMAKE_SOURCE_DIR'] = '@CMAKE_SOURCE_DIR@'
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'bob', u'Bob Documentation', [u'Idiap Research Institute'], 1)
+    ('index', 'bob-doc', u'Bob Documentation', [u'Idiap Research Institute'], 1)
 ]
 
 
