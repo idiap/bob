@@ -68,7 +68,7 @@ array with initialized content:
 
 .. testsetup:: *
 
-   import numpy
+   import numpy, bob
 
 .. doctest::
 
@@ -144,25 +144,20 @@ provides the :py:attr:`numpy.ndarray.astype` function.
    >>> print D.dtype
    uint8
 
-.. note::
+In addition, |project| provides the :py:func:`bob.core.convert` function 
+which allows to convert/rescale a `NumPy`_ :py:class:`numpy.ndarray` of a 
+given type into another array of a possibly different type with re-scaling.
+Typically, this is useful if we want to convert a uint8 2D array (e.g. a
+grayscale image) into a float64 2D array with a ``[0,1]`` range.
 
-  .. todo::
-
-    Double-check that the following code still works and doctest it.
-
-  The :py:func:`bob.core.convert` function allows to convert/rescale an array of
-  a given type into another array of a possibly different type with re-scaling.
-  Typically, this is useful if we want to convert a uint8 2D array (e.g. a
-  grayscale image) into a float64 2D array with a ``[0,1]`` range.
-
-  .. code-block:: python
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
 
     >>> img = numpy.array([[0,1,2,3,4],[255,254,253,252,251]], dtype='uint8')
-    >>> bob.core.array.convert(img, dtype='float64', destRange=(0.,1.))
     >>> img_d = bob.core.array.convert(img, dtype='float64', destRange=(0.,1.))
     >>> print img_d
-    [[ 0.          0.00392157  0.00784314  0.01176471  0.01568627]
-    [ 1.          0.99607843  0.99215686  0.98823529  0.98431373]]
+    [[ 0. 0.00392157 0.00784314 0.01176471 0.01568627]
+     [ 1. 0.99607843 0.99215686 0.98823529 0.98431373]]
     >>> print img_d.dtype
     float64
 
@@ -468,7 +463,7 @@ interleaved color image to plane color image.
    >>> numpy.array_equal(a, c_plane_read)
    True
 
-Matlab
+MATLAB
 ======
 
 |project| currently does not provide `MATLAB`_ mex interface. Nevertheless, it
@@ -483,10 +478,6 @@ Random Number Generation
 We have developed a set of bridges to the `Boost Random Number Generation`_
 facilities. This allows you to generate random numbers in a variety of ways.
 
-.. todo::
-
-  Make sure that the code below works and doctest it.
-
 .. code-block:: python
 
   >>> mt = bob.core.random.mt19937()
@@ -496,7 +487,7 @@ facilities. This allows you to generate random numbers in a variety of ways.
 
 .. note::
 
-  Numpy_ also provides random sampling functionalities.
+  `NumPy`_ also provides random sampling functionalities.
 
 .. include:: links.rst
 
