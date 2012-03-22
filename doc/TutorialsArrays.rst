@@ -20,10 +20,6 @@
  Multi-dimensional Arrays
 **************************
 
-
-Introduction
-============
-
 The fundamental data structure of |project| consists in multi-dimensional
 arrays. In signal-processing and machine learning, arrays are indeed a suitable
 representation for many different types of digital signals such as images, 
@@ -45,7 +41,7 @@ below, `NumPy`_ should be imported in the `Python`_ environment.
 
 .. note::
 
-   For `matlab`_ users, this `page`_ highlights the differences and the commonalities between `NumPy`_ and `matlab`_.
+   For `MATLAB`_ users, this `page`_ highlights the differences and the commonalities between `NumPy`_ and `MATLAB`_.
 
 Array creation
 ~~~~~~~~~~~~~~
@@ -75,22 +71,23 @@ It is also possible just to allocate the array in memory.
    [[ 7. 7. 7. 7.]
     [ 7. 7. 7. 7.]]
 
-In both previous cases, `NumPy`_ creates an instance of the class **ndarray**,
-which is also known by the alias **array**. The most important attributes of 
-an **ndarray** object are:
+In both previous cases, `NumPy`_ creates an instance of the class :py:class:`numpy.ndarray`,
+which is also known by the alias :py:func:`numpy.array`. The most important attributes of 
+an :py:class:`numpy.ndarray` object are:
 
-* ndarray.ndim: the number of dimensions of the array.
+* :py:attr:`numpy.ndarray.ndim`: the number of dimensions of the array.
 
-* ndarray.shape: the dimensions of the array (a tuple of integers indicating the size of the array in each dimension)
+* :py:attr:`numpy.ndarray.shape`: the dimensions of the array (a tuple of integers indicating the size of the array in each dimension)
 
-* ndarray.dtype: an object describing the type of the elements in the array.
+* :py:attr:`numpy.ndarray.dtype`: an object describing the type of the elements in the array.
 
 
 Accessing array elements
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-The operator [] allows to index the elements of an array. Please note that 
-the indices start at 0.
+The `Python`_ `operator[] <http://docs.scipy.org/doc/numpy/reference/arrays.indexing.html>`_ 
+allows to index the elements of an array. Please note that the indices start 
+at 0.
 
 .. doctest::
 
@@ -122,7 +119,7 @@ The type of the elements of an array can be specified at the creation time.
 
 
 If we would like to cast the elements of an array to another type, `NumPy`_ 
-provides the **astype()** function.
+provides the :py:meth:`numpy.ndarray.astype` function.
 
 .. doctest::
 
@@ -135,7 +132,8 @@ Array shape
 ~~~~~~~~~~~
 
 `NumPy`_ provides several features to reshape or stack arrays, such as the
-**reshape()**, **hstack()** and **vstack()** functions.
+:py:meth:`numpy.ndarray.reshape`, :py:func:`numpy.hstack`, and
+:py:func:`numpy.vstack` methods.
 
 .. doctest::
 
@@ -230,10 +228,10 @@ at the assignment operator =.
    >>> print b is a # a and b are two names for the same ndarray object
    True
 
-Furthermore, the assignment operator only creates an alias to the same 
-**ndarray** object. In contrast, the **view()** method creates a new 
-`NumPy`_ array object that points to the same memory block. This is known as a
-shallow copy.
+Furthermore, the assignment operator only creates an **alias** to the same 
+:py:class:`numpy.ndarray` object. In contrast, the 
+:py:meth:`numpy.ndarray.view` method creates a new `NumPy`_ array object that
+points to the same memory block. This is known as a **shallow copy**.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -245,8 +243,9 @@ shallow copy.
    >>> print a
    [1 2 7 4]
 
-In a similar way, an `ndarray` might be sliced, and in this case, the data are
-still shared between the two **ndarray** instances.
+In a similar way, an :py:class:`numpy.ndarray` might be sliced, and in this 
+case, the data are still shared between the two :py:class:`numpy.ndarray` 
+instances.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -260,8 +259,8 @@ still shared between the two **ndarray** instances.
    >>> print a
    [0 2 7 4]
 
-If we would like to do a deep `copy()`, we could use the `NumPy`_ **copy()**
-function.
+If we would like to do a **deep copy**, we could use the 
+:py:meth:`numpy.ndarray.copy` method.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -353,8 +352,8 @@ popular libraries such as `OpenCV`_ and `PIL`_.
 OpenCV
 ~~~~~~
 
-To convert a `NumPy`_ array into an `OpenCV`_ cvMat, the `fromarray()` method 
-of `OpenCV`_ will do the job.
+To convert a `NumPy`_ array into an `OpenCV`_ cvMat, the 
+:py:func:`cv.fromarray` method of `OpenCV`_ will do the job.
 
 .. code-block:: python
 
@@ -363,7 +362,7 @@ of `OpenCV`_ will do the job.
    >>> mat = cv.fromarray(a)
 
 Similarly, to perform the inverse conversion from an `OpenCV`_ cvMat into a 
-`NumPy`_ array, the `asarray()` method of `OpenCV`_ is suitable.
+`NumPy`_ array, the :py:func:`numpy.asarray` method is suitable.
 
 .. code-block:: python
 
@@ -382,7 +381,7 @@ PIL
 `PIL`_ does not provide a generic multi-dimensional array structure. However, 
 its Image structure can be seen as 2D or 3D arrays. To convert a 2D `NumPy`_ 
 array of type `uint8` into a grayscale (integer) `PIL`_ image, the 
-`fromarray()` method of `PIL`_ will do the job.
+:py:func:`Image.fromarray` method of `PIL`_ will do the job.
 
 .. code-block:: python
 
@@ -391,7 +390,7 @@ array of type `uint8` into a grayscale (integer) `PIL`_ image, the
    >>> imgPIL = Image.fromarray(img)
 
 To convert a grayscale `PIL`_ image into a 2D `NumPy`_ array of `uint8`, 
-the `asarray()` method of `NumPy`_ is suitable.
+the :py:func:`numpy.asarray` method of `NumPy`_ is suitable.
 
 .. code-block:: python
 
