@@ -245,7 +245,7 @@ shallow copy.
    >>> print a
    [1 2 7 4]
 
-In a similar way, an ndarray might be slice, and in this case, the data are 
+In a similar way, an `ndarray` might be sliced, and in this case, the data are
 still shared between the two **ndarray** instances.
 
 .. doctest::
@@ -260,7 +260,7 @@ still shared between the two **ndarray** instances.
    >>> print a
    [0 2 7 4]
 
-If we would like to do a deep copy(), we could use the `NumPy`_ **copy()**
+If we would like to do a deep `copy()`, we could use the `NumPy`_ **copy()**
 function.
 
 .. doctest::
@@ -353,8 +353,8 @@ popular libraries such as `OpenCV`_ and `PIL`_.
 OpenCV
 ~~~~~~
 
-To convert a `NumPy`_ array into `OpenCV`_ (cvMat), the `fromarray()` of
-`OpenCV`_ will do the job.
+To convert a `NumPy`_ array into an `OpenCV`_ cvMat, the `fromarray()` method 
+of `OpenCV`_ will do the job.
 
 .. code-block:: python
 
@@ -372,17 +372,17 @@ Similarly, to perform the inverse conversion from an `OpenCV`_ cvMat into a
    >>> cv.Set(mat, 37)
    >>> a = numpy.asarray(mat)
 
-Both `NumPy`_ array and `OpenCV`_ cvMat use similar type (`uint8`, `uint32`, 
-`float64`, etc.), and hence, it is interesting to notice that the type is 
-preserved by the previous operations.
+Both `NumPy`_ array and `OpenCV`_ cvMat use similar datatypes (`uint8`, 
+`uint32`, `float64`, etc.), and hence, it is interesting to notice that the 
+datatype is preserved by the previous operations.
 
 PIL
 ~~~
 
 `PIL`_ does not provide a generic multi-dimensional array structure. However, 
-its Image structures can be seen as 2D or 3D arrays. To convert a 2D `NumPy`_ 
-array of type uint8 into a grayscale (integer) `PIL`_ image, the `fromarray()`
-method of `PIL`_ will do the job.
+its Image structure can be seen as 2D or 3D arrays. To convert a 2D `NumPy`_ 
+array of type `uint8` into a grayscale (integer) `PIL`_ image, the 
+`fromarray()` method of `PIL`_ will do the job.
 
 .. code-block:: python
 
@@ -390,7 +390,7 @@ method of `PIL`_ will do the job.
    >>> img = numpy.array([[1,2,3,4],[2,3,4,5],[3,4,5,6]], 'uint8')
    >>> imgPIL = Image.fromarray(img)
 
-To convert a grayscale `PIL`_ image into a 2D `NumPy`_ array of uint8, 
+To convert a grayscale `PIL`_ image into a 2D `NumPy`_ array of `uint8`, 
 the `asarray()` method of `NumPy`_ is suitable.
 
 .. code-block:: python
@@ -399,8 +399,8 @@ the `asarray()` method of `NumPy`_ is suitable.
    >>> numpy.array_equal(img, img2)
    True
 
-In contrast to `OpenCV`_, please be aware that PIL does not support all the
-types that we have in |project|. Therefore, please restrict yourself to 
+In contrast to `OpenCV`_, please be aware that `PIL`_ does not support all the
+datatypes that we have in |project|. Therefore, please restrict yourself to 
 `uint8` (and `float32` for grayscale images) when you proceed with back and
 forth conversions or take the time to check that your operations are really 
 valid and expected.
@@ -430,8 +430,8 @@ Matlab
 ~~~~~~
 
 |project| currently does not provide `Matlab`_ mex interface. Nevertheless, it
-is possible to load and save simple `.mat` files, thank to the `MatIO`_ 
-library. However, complex data such as `Matlab`_ structure are not supported. 
+is possible to load and save simple `.mat` files, thanks to the `MatIO`_ 
+library. However, complex data such as `Matlab`_ structures are not supported.
 Be aware that `Matlab`_ also support the `HDF5`_ file format. For more 
 details, please have a look at :doc:`TutorialsIO`.
 
