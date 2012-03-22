@@ -20,10 +20,6 @@
  Input/Output
 **************
 
-
-Introduction
-============
-
 This section gives an overview of the operations for storing and retrieving the basic data structures in |project|, i.e. `NumPy`_ arrays. |project| uses `HDF5`_  format for storing binary coded data. Using the |project| support for `HDF5`_, it is very simple to import and export data from the program.
 
 `HDF5`_  uses a neat descriptive language for representing the data in the HDF5 files, called Data Description Language (`DDL`_).
@@ -56,7 +52,7 @@ Before explaining the basics of reading and writing to `HDF5`_ files, it is impo
 
 
 I/O operations using the class `bob.io.HDF5File`
-===============================================
+================================================
 
 Writing operations
 ------------------
