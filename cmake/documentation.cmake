@@ -42,10 +42,18 @@ if(SPHINX_EXECUTABLE)
     COMMENT "Running doctests with Sphinx" VERBATIM
   )
 
-  add_custom_target(sphinx-latex 
-    COMMAND ${SPHINX_EXECUTABLE} -c ${CMAKE_BINARY_DIR} -b latex -E ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/latex 
-    COMMENT "Generating (LaTeX2e) User Guide with Sphinx" VERBATIM
-  )
+  if(PDFLATEX_COMPILER)
+    add_custom_target(sphinx-latex 
+      COMMAND ${SPHINX_EXECUTABLE} -c ${CMAKE_BINARY_DIR} -b latex -E ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/latex 
+      COMMAND make -C ${CMAKE_BINARY_DIR}/sphinx/latex
+      COMMENT "Generating (LaTeX2e) User Guide with Sphinx + PDF" VERBATIM
+    )
+  else()
+    add_custom_target(sphinx-latex 
+      COMMAND ${SPHINX_EXECUTABLE} -c ${CMAKE_BINARY_DIR} -b latex -E ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/latex 
+      COMMENT "Generating (LaTeX2e) User Guide with Sphinx" VERBATIM
+    )
+  endif()
 
   add_custom_target(sphinx-coverage 
     COMMAND ${SPHINX_EXECUTABLE} -c ${CMAKE_BINARY_DIR} -b coverage -E ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/coverage 
