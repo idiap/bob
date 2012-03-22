@@ -127,9 +127,34 @@ Complex image operations are usually wrapped by classes. The usual workflow is t
 Image filtering
 ~~~~~~~~~~~~~~~
 
-One simple example of image filtering is to apply the Sobel filter to an image. This can be easily done by:
+One simple example of image filtering is to apply a Gaussian blur filter to an image. This can be easily done by first creating an object of the bob.ip.Gaussian class:
 
-  >>> 
+  >>> filter = bob.ip.Gaussian( radius_y = 1, radius_x = 1, sigma_y = 0.3, sigma_x = 0.3)
+  
+Now, let's see what happens to a small test image:
+
+  >>> test_image = numpy.array([[1, 0, 0, 0, 1], [0, 1, 0, 1, 0], [0, 0, 1, 0, 0], [0, 1, 0, 1, 0], [1, 0, 0, 0, 1]], dtype='float64')
+  >>> filtered_image = numpy.ndarray(test_image.shape, dtype='float64')
+  >>> filter(test_image, filtered_image)
+  >>> print filtered_image
+  [[ 0.93562108  0.06327015  0.00221754  0.06327015  0.93562108]
+   [ 0.06327015  0.87345971  0.09324206  0.87345971  0.06327015]
+   [ 0.00221754  0.09324206  0.87567725  0.09324206  0.00221754]
+   [ 0.06327015  0.87345971  0.09324206  0.87345971  0.06327015]
+   [ 0.93562108  0.06327015  0.00221754  0.06327015  0.93562108]]
+
+
+See, we ended up with a nicely smoothed cross.
+
+
+Another filter you might want to us are Gabor filters.
+
+..   >>> complex_image = image.astype(complex)
+..   >>> filtered_image = numpy.ndarray(complex_image.shape, dtype = 'complex')
+..   >>> kernel = bob.ip.GaborKernel(complex_image.shape, (0,1))
+..   >>> kernel(complex_image, filtered_image)
+..   >>> abs_image = numpy.abs(filtered_image)
+..   >>> bob.io.Array(abs_image).save("/scratch/mguenther/test.hdf5")
 
 
 Normalizing images according to eye positions

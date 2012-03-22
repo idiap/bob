@@ -31,7 +31,9 @@ def gwt_transform(self,input_image,output_trafo_image):
     input_ = input_image.astype(complex)
   elif input_image.ndim == 3:
     # color image; color convert first
-    input_ = rgb_to_gray(input_image).astype(complex)
+    gray_image = numpy.ndarray(input_image.shape[1:], input_image.dtype)
+    rgb_to_gray(input_image, gray_image)
+    input_ = gray_image.astype(complex)
   else:
     bob.core.throw_exception()
   
@@ -68,7 +70,9 @@ def gwt_compute_jets(self,input_image, output_jet_image, normalize=True):
     input_ = input_image.astype(complex)
   elif input_image.ndim == 3:
     # color image; color convert first
-    input_ = rgb_to_gray(input_image).astype(complex)
+    gray_image = numpy.ndarray(input_image.shape[1:], input_image.dtype)
+    rgb_to_gray(input_image, gray_image)
+    input_ = gray_image.astype(complex)
   else:
     bob.core.throw_exception()
   
