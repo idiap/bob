@@ -358,7 +358,7 @@ OpenCV
    directly, which makes the following conversions unnecessary.
 
 To convert a `NumPy`_ array into an `OpenCV`_ cvMat, the 
-:ocv:pyoldfunction:`cv.fromarray` :py:func:`cv.fromarray` method of `OpenCV`_ will do the job.
+:py:func:`cv.fromarray` method of `OpenCV`_ will do the job.
 
 .. code-block:: python
 
