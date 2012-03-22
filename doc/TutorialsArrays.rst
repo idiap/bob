@@ -119,7 +119,7 @@ The type of the elements of an array can be specified at the creation time.
 
 
 If we would like to cast the elements of an array to another type, `NumPy`_ 
-provides the :py:meth:`numpy.ndarray.astype` function.
+provides the :py:attr:`numpy.ndarray.astype` function.
 
 .. doctest::
 
@@ -132,7 +132,7 @@ Array shape
 ~~~~~~~~~~~
 
 `NumPy`_ provides several features to reshape or stack arrays, such as the
-:py:meth:`numpy.ndarray.reshape`, :py:func:`numpy.hstack`, and
+:py:attr:`numpy.ndarray.reshape`, :py:func:`numpy.hstack`, and
 :py:func:`numpy.vstack` methods.
 
 .. doctest::
@@ -230,7 +230,7 @@ at the assignment operator =.
 
 Furthermore, the assignment operator only creates an **alias** to the same 
 :py:class:`numpy.ndarray` object. In contrast, the 
-:py:meth:`numpy.ndarray.view` method creates a new `NumPy`_ array object that
+:py:attr:`numpy.ndarray.view` method creates a new `NumPy`_ array object that
 points to the same memory block. This is known as a **shallow copy**.
 
 .. doctest::
@@ -260,7 +260,7 @@ instances.
    [0 2 7 4]
 
 If we would like to do a **deep copy**, we could use the 
-:py:meth:`numpy.ndarray.copy` method.
+:py:attr:`numpy.ndarray.copy` method.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -352,8 +352,13 @@ popular libraries such as `OpenCV`_ and `PIL`_.
 OpenCV
 ~~~~~~
 
+.. note::
+
+   The new `cv2` module of `OpenCV`_ 2.x is able to process `NumPy`_ arrays 
+   directly, which makes the following conversions unnecessary.
+
 To convert a `NumPy`_ array into an `OpenCV`_ cvMat, the 
-:py:func:`cv.fromarray` method of `OpenCV`_ will do the job.
+:ocv:pyoldfunction:`cv.fromarray` :py:func:`cv.fromarray` method of `OpenCV`_ will do the job.
 
 .. code-block:: python
 
@@ -366,7 +371,6 @@ Similarly, to perform the inverse conversion from an `OpenCV`_ cvMat into a
 
 .. code-block:: python
 
-   >>> import cv, numpy
    >>> mat = cv.CreateMat(3, 5, cv.CV_32FC1)
    >>> cv.Set(mat, 37)
    >>> a = numpy.asarray(mat)
