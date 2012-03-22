@@ -239,7 +239,7 @@ shallow copy.
    :options: +NORMALIZE_WHITESPACE
 
    >>> c = a.view()
-   >>> print c is a  # a and b are two different ndarray objects
+   >>> print c is a  # a and c are two different ndarray objects
    False
    >>> c[2] = 7  # but they share the same data in memory
    >>> print a
