@@ -23,11 +23,11 @@
 ======================
 
 If you are just willing to use |project| existing resources in your scripts,
-the easiest way to pick one of the available installation methods bellow.
+the easiest way to pick one of the available installation methods below.
 Otherwise, if they fail or don't match your development requirements, you must
-compile |project| yourself as explained at :doc:`Installation`.
+compile |project| yourself as explained at :doc:`Compilation`.
 
-This section only describes how to automatically install pre-packaged version
+This section only describes how to automatically install pre-packaged versions
 of |project|.
 
 Ubuntu
@@ -73,6 +73,7 @@ Once that is done, installing |project| should be straight forward:
 
 .. code-block:: sh
 
+  $ sudo port selfupdate
   $ sudo port install bob +python26 +docs
 
 .. Place here references to all citations in lower case

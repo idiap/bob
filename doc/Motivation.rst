@@ -74,4 +74,23 @@ inspiration:
 * `Torch 3 Vision`_
 * `Torch 5`_
 
+Authors
+-------
+
+|project| is developed and maintained by:
+
+.. place your name here if you participate - keep alphabetical order
+
+* André Anjos
+* Christopher McCool
+* Cosmin Atanasoanei
+* François Moulin
+* Ivana Chingovska
+* Laurent El-Shafey
+* Manuel Guenther
+* Murali Chakka
+* Roy Wallace
+* Sébastien Marcel
+* Venkatesh Bala
+
 .. include:: links.rst

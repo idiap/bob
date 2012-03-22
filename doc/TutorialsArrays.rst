@@ -196,7 +196,25 @@ Partial reductions along a specific dimension are also possible.
    >>> print A.max(axis=1)
    [4 8]
 
+Linear algebra is also supported through the bridges to the optimized `ATLAS`_
+`LAPACK`_ (and `BLAS`_) libraries which are mostly integrated in the `linalg` 
+submodule of `SciPy`_. In the following, this is highlighted via two different
+examples: matrix multiplication and matrix inversion.
 
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+   
+   >>> A = numpy.array([[1,2],[3,4]]) # Creates a 2D array / matrix
+   >>> B = numpy.array([[5,6],[7,8]]) # Creates a 2D array / matrix
+   >>> C = numpy.dot(A,B) # Computes the matrix multiplication A*B
+   >>> print C
+   [[19 22]
+    [43 50]]
+   >>> import scipy.linalg
+   >>> D = scipy.linalg.inv(C) # Computes the inverse of C
+   >>> print D # doctest: +SKIP
+   [[ 12.5   -5.5 ]
+    [-10.75   4.75]]
 
 Assignment, shallow and deep copy
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -324,8 +342,104 @@ and process it with |project|. In this case, a mono audio signal would be
 represented as a 2D array, the first dimension corresponding to the time index 
 and the second one to the wave magnitude.
 
+
+Interfacing with OpenCV and PIL
+===============================
+
+As |project| relies on `NumPy`_ arrays, it is very easy to make use of other 
+popular libraries such as `OpenCV`_ and `PIL`_.
+
+
+OpenCV
+~~~~~~
+
+To convert a `NumPy`_ array into `OpenCV`_ (cvMat), the `fromarray()` of
+`OpenCV`_ will do the job.
+
+.. code-block:: python
+
+   >>> import cv, numpy
+   >>> a = numpy.ones((5, 10))
+   >>> mat = cv.fromarray(a)
+
+Similarly, to perform the inverse conversion from an `OpenCV`_ cvMat into a 
+`NumPy`_ array, the `asarray()` method of `OpenCV`_ is suitable.
+
+.. code-block:: python
+
+   >>> import cv, numpy
+   >>> mat = cv.CreateMat(3, 5, cv.CV_32FC1)
+   >>> cv.Set(mat, 37)
+   >>> a = numpy.asarray(mat)
+
+Both `NumPy`_ array and `OpenCV`_ cvMat use similar type (`uint8`, `uint32`, 
+`float64`, etc.), and hence, it is interesting to notice that the type is 
+preserved by the previous operations.
+
+PIL
+~~~
+
+`PIL`_ does not provide a generic multi-dimensional array structure. However, 
+its Image structures can be seen as 2D or 3D arrays. To convert a 2D `NumPy`_ 
+array of type uint8 into a grayscale (integer) `PIL`_ image, the `fromarray()`
+method of `PIL`_ will do the job.
+
+.. code-block:: python
+
+   >>> import numpy, Image
+   >>> img = numpy.array([[1,2,3,4],[2,3,4,5],[3,4,5,6]], 'uint8')
+   >>> imgPIL = Image.fromarray(img)
+
+To convert a grayscale `PIL`_ image into a 2D `NumPy`_ array of uint8, 
+the `asarray()` method of `NumPy`_ is suitable.
+
+.. code-block:: python
+
+   >>> img2 = numpy.asarray(imgPIL)
+   >>> numpy.array_equal(img, img2)
+   True
+
+In contrast to `OpenCV`_, please be aware that PIL does not support all the
+types that we have in |project|. Therefore, please restrict yourself to 
+`uint8` (and `float32` for grayscale images) when you proceed with back and
+forth conversions or take the time to check that your operations are really 
+valid and expected.
+
+Converting color images is more tricky as |project| uses plane color images
+whereas `PIL`_ relies by default on interleaved color images. Therefore, there
+is an additional conversion required.
+
+.. code-block:: python
+
+   >>> import numpy, Image
+   >>> a = numpy.array([[[1,2,3],[4,5,6]],[[11,12,13],[14,15,16]],[[21,22,23],[24,25,26]]], 'uint8')
+   >>> c = numpy.dstack((a[0,:],a[1,:],a[2,:])).reshape(a.shape[1],a.shape[2],a.shape[0]) # Convert to plane color to interleaved color
+   >>> cPIL = Image.fromarray(c)
+
+The reverse operation is similar, but again requires an extra conversion from
+interleaved color image to plane color image.
+
+.. code-block:: python
+
+   >>> c_read = numpy.asarray(cPIL)
+   >>> c_plane_read = numpy.vstack((c_read[:,:,0],c_read[:,:,1],c_read[:,:,2])).reshape(c_read.shape[2],c_read.shape[0],c_read.shape[1]) # Convert interleaved color to plane color
+   >>> numpy.array_equal(a, c_plane_read)
+   True
+
+Matlab
+~~~~~~
+
+|project| currently does not provide `Matlab`_ mex interface. Nevertheless, it
+is possible to load and save simple `.mat` files, thank to the `MatIO`_ 
+library. However, complex data such as `Matlab`_ structure are not supported. 
+Be aware that `Matlab`_ also support the `HDF5`_ file format. For more 
+details, please have a look at :doc:`TutorialsIO`.
+
 .. Place here your external references
 
 .. include:: links.rst
 .. _user guide: http://docs.scipy.org/doc/numpy/user/
+.. _pil: http://www.pythonware.com/products/pil/
+.. _atlas: http://math-atlas.sourceforge.net/
+.. _blas: http://www.netlib.org/blas/
 .. _page: http://www.scipy.org/NumPy_for_Matlab_Users page
