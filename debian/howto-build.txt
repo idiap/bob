@@ -13,7 +13,7 @@ To only build the source package (for a PPA upload for instance). Replace the
 "-kValue" by your own PPA key identifier (can be obtained with the command
 `gpg --list-keys`):
 
-$ debuild --no-tgz-check -kA2170D5D -I.git -I.gitignore -I.gitmodules -Icxx/visioner/project/* -Icxx/visioner/project/
+$ debuild --no-tgz-check -kA2170D5D -I.git -I.gitignore -I.gitmodules -Icxx/visioner/project/* -Icxx/visioner/project/ -S
 
 Note: The above command will not pack the visioner
 
