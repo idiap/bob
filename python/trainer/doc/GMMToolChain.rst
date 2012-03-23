@@ -20,6 +20,10 @@
  GMM Toolchain
 ===============
 
+.. todo::
+
+  Is this still valid?
+
 In this section we present a small example how to train GMM with |project|.
 
 Generate features

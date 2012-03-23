@@ -22,9 +22,6 @@
  Databases
 ===========
 
-Reference
----------
-
 .. automodule:: bob.db
 
 BANCA Database
@@ -33,7 +30,13 @@ BANCA Database
 .. automodule:: bob.db.banca
 
 .. autoclass:: bob.db.banca.Database
-  :members:
+
+BANCA small Database
+====================
+
+.. automodule:: bob.db.banca_small
+
+.. autoclass:: bob.db.banca_small.Database
 
 Biosecure Database
 ==================
@@ -41,7 +44,30 @@ Biosecure Database
 .. automodule:: bob.db.biosecure
 
 .. autoclass:: bob.db.biosecure.Database
-  :members:
+
+CASIA_FASD Database
+===================
+
+.. automodule:: bob.db.casia_fasd
+
+FaceVerif_FL Database
+=====================
+
+.. automodule:: bob.db.faceverif_fl
+
+.. autoclass:: bob.db.faceverif_fl.Database
+
+Iris Database
+=============
+
+.. automodule:: bob.db.iris
+
+Labeled Faces in the Wild Database
+==================================
+
+.. automodule:: bob.db.lfw
+
+.. autoclass:: bob.db.lfw.Database
 
 MOBIO Database
 ==============
@@ -49,15 +75,18 @@ MOBIO Database
 .. automodule:: bob.db.mobio
 
 .. autoclass:: bob.db.mobio.Database
-  :members:
 
-Multipie Database
-=================
+Multi-PIE Database
+==================
 
 .. automodule:: bob.db.multipie
 
 .. autoclass:: bob.db.multipie.Database
-  :members:
+
+NUAA Database
+=============
+
+.. automodule:: bob.db.nuaa
 
 Replay Attack Database
 ======================
@@ -65,7 +94,6 @@ Replay Attack Database
 .. automodule:: bob.db.replay
 
 .. autoclass:: bob.db.replay.Database
-  :members:
 
 SCface Database
 ===============
@@ -73,25 +101,6 @@ SCface Database
 .. automodule:: bob.db.scface
 
 .. autoclass:: bob.db.scface.Database
-  :members:
-
-Iris Database
-=============
-
-.. automodule:: bob.db.iris
-  :members:
-
-NUAA Database
-=============
-
-.. automodule:: bob.db.nuaa
-  :members:
-
-CASIA_FASD Database
-===================
-
-.. automodule:: bob.db.casia_fasd
-  :members:
 
 XM2VTS Database
 ===============
@@ -99,4 +108,3 @@ XM2VTS Database
 .. automodule:: bob.db.xm2vts
 
 .. autoclass:: bob.db.xm2vts.Database
-  :members:

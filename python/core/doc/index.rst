@@ -22,11 +22,14 @@
  Core
 ======
 
-The core module of |project| provides three different types of features:
-
 .. toctree::
    :maxdepth: 2
 
-   UsingBlitzArrays
+   ArrayNote
    ErrorReportingAndLogging
-   random
+
+Reference Manual
+----------------
+
+.. automodule:: bob.core.array
+.. automodule:: bob.core.random

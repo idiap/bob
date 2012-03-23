@@ -49,6 +49,9 @@ import sphinx
 if sphinx.__version__ >= "1.0":
   extensions.append('sphinx.ext.viewcode')
 
+# Always includes todos
+todo_include_todos = True
+
 # If we are on OSX, the 'dvipng' path maybe different
 dvipng_osx = '/opt/local/libexec/texlive/binaries/dvipng'
 if os.path.exists(dvipng_osx): pngmath_dvipng = dvipng_osx
@@ -206,13 +209,13 @@ latex_font_size = '10pt'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('doc/index', 'bob.tex', u'Bob',
+  ('doc/index', 'bobman.tex', u'Bob',
    u'Biometrics Groups, Idiap Research Institute', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-latex_logo = '@CMAKE_SOURCE_DIR@/doc/img/bob.png'
+latex_logo = '@CMAKE_SOURCE_DIR@/doc/img/bob.pdf'
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
@@ -289,13 +292,8 @@ autodoc_default_flags = ['members', 'undoc-members', 'special-members', 'inherit
 
 # Used to filter some documentation in/out
 bob_modules = dir(__import__('bob'))
-has_libsvm = True
-try:
-  import bob 
-  bob.machine.__getattribute__('SupportVector')
-except AttributeError:
-  has_libsvm = False
-
+has_libsvm = hasattr(__import__('bob').machine, 'SupportVector')
+has_visioner = hasattr(__import__('bob'), 'visioner')
 
 # For inter-documentation mapping:
 intersphinx_mapping = {
@@ -304,9 +302,11 @@ intersphinx_mapping = {
   'http://docs.scipy.org/doc/scipy/reference/': None,
   'http://docs.sqlalchemy.org/en/latest/': None,
   'http://matplotlib.sourceforge.net/': None,
+  'http://opencv.itseez.com/': None,
   }
 
 def setup(app):
   app.connect('autodoc-skip-member', member_function_test)
   app.add_config_value('bob_modules', bob_modules, True)
   app.add_config_value('has_libsvm', has_libsvm, True)
+  app.add_config_value('has_visioner', has_visioner, True)

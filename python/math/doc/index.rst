@@ -26,4 +26,3 @@ This module binds math functions of |project| to python when there is no numpy
 equivalent.
 
 .. automodule:: bob.math
-   :members:

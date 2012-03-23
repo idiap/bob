@@ -22,10 +22,4 @@
  Signal Processing
 ===================
 
-.. toctree::
-   :maxdepth: 2
-
-   ExampleUsage01
-
 .. automodule:: bob.sp
-   :members:

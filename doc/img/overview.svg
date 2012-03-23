@@ -15,7 +15,10 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="block3.svg">
+   sodipodi:docname="overview.svg"
+   inkscape:export-filename="/local/scratch/aanjos/bob/doc/img/overview.png"
+   inkscape:export-xdpi="233.76707"
+   inkscape:export-ydpi="233.76707">
   <defs
      id="defs4">
     <inkscape:perspective
@@ -590,7 +593,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -880,7 +883,7 @@
        transform="matrix(0,1,-1,0,196.73775,74.932244)"><textPath
          xlink:href="#path7114-18"
          startOffset="50%"
-         id="textPath8258-8" /></text>
+         id="textPath8258-8"></textPath></text>
     <path
        sodipodi:type="arc"
        style="fill:#ff8787;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.70700002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
@@ -1009,7 +1012,7 @@
                x="178.797"
                y="210.40004"
                style="text-align:center;text-anchor:middle" /></flowRegion><flowPara
-             id="flowPara3612-0-0-2-2-6">OpenCV</flowPara></flowRoot>      </g>
+             id="flowPara3612-0-0-2-2-6">v4l2</flowPara></flowRoot>      </g>
       <text
          x="56.692078"
          y="257.48465"

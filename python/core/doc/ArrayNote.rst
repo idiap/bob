@@ -17,41 +17,19 @@
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-==========================
- Multi-Dimensional Arrays
-==========================
+=================================
+ Note on Supported Element Types
+=================================
 
-The basic data structure of |project| are multi-dimensional arrays. They
-are indeed suitable representations for various types of signals: A color
-image can be represented by a 3D array, MFCCs extracted on a speech sequence
-can be represented by a 2D array, etc.
-
-At the C++ level, the Blitz_ library is used to handle arrays. Although we 
-initially binds Blitz_ Arrays into Python, we quickly realized that it might 
-be more clever to use existing NumPy_ ndarrays from Python, as they can
-directly be processed by numerous existing Python libraries such as NumPy_ 
-and SciPy_. 
-
-This means that |project| multi-dimensional arrays are represented in Python 
-by NumPy_ ndarrays. This also implies that there are internal conversion 
-routines to convert NumPy_ ndarrays from/to Blitz_. As they are done 
-implicitly, the user has no need to care about this aspect and should just 
-use NumPy_ ndarrays everywhere.
-
-For an introduction and tutorials about NumPy_ ndarrays, just 
-visit the Numpy_ website.
-
-Supported Types
----------------
-
-Because Blitz_ arrays are template types, we must fix the set of supported
-combinations of element type and number of dimensions that are supported by
-|project| and subsequently at the python bridge. Indeed, Blitz_ arrays a
-flexible containers that support a different range of base element types and 
-up to 11 dimensions. At |project|, we limit the support of provided code to
-manipulate arrays *up to 4 dimensions* and using the following element types.
-These element types and ranks should cover all of the functionality needed by
-machine learning algorithms and signal processing utilities.
+Because `Blitz++`_ arrays (and :py:class:`numpy.ndarray`) are template types,
+we must fix the set of supported combinations of element type and number of
+dimensions that are supported by |project| and subsequently at the python
+bridge. `Blitz++`_ arrays a flexible containers that support a different range
+of base element types and up to 11 dimensions. At |project|, we limit the
+support of provided code to manipulate arrays **up to 4 dimensions** and using
+the following element types. These element types and ranks should cover most of
+the functionality needed by machine learning algorithms and signal processing
+utilities.
 
 +--------------+-----------------------------+--------------+--------------------------------------------------------------+
 | Common name  |   C++                       | `NumPy`_     | Meaning                                                      |
@@ -149,30 +127,4 @@ machine learning algorithms and signal processing utilities.
   This made it hard to write code that can I/O data properly. Moreover, long
   doubles are not widely popular, making this choice an easy one.
 
-Convert function
------------------
-
-The convert() function allows to convert/rescale an array of a given type 
-into another array of a possibly different type with re-scaling. Typically,
-this is useful if we want to convert a uint8 2D array (e.g. a grayscale image)
-into a float64 2D array with a [0,1] range.
-
-.. code-block:: python
-
-  >>> import numpy
-  >>> img = numpy.array([[0,1,2,3,4],[255,254,253,252,251]], dtype='uint8')
-  >>> bob.core.array.convert(img, dtype='float64', destRange=(0.,1.))
-  >>> img_d = bob.core.array.convert(img, dtype='float64', destRange=(0.,1.))
-  >>> print img_d
-      [[ 0.          0.00392157  0.00784314  0.01176471  0.01568627]
-      [ 1.          0.99607843  0.99215686  0.98823529  0.98431373]]
-  >>> print img_d.dtype
-      float64
-
-
-
-.. Place here your references
-.. _blitz: http://www.oonumerics.org/blitz
-.. _numpy: http://numpy.scipy.org
-.. _scipy: http://www.scipy.org
-.. _here: http://www.idiap.ch/software/bob/wiki/bobDatabaseBindata#Binaryfileformatheader
+.. include:: ../../../doc/links.rst

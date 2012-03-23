@@ -139,7 +139,7 @@ drawned, for debugging purposes.
 Reference Manual
 ----------------
 
-.. ifconfig:: 'visioner' in bob_modules
+.. ifconfig:: has_visioner
 
   .. autodata:: bob.visioner.DEFAULT_CMODEL
   .. autodata:: bob.visioner.DEFAULT_LMODEL_EC
@@ -154,7 +154,7 @@ Reference Manual
     :members:
     :undoc-members:
 
-.. ifconfig:: 'visioner' not in bob_modules
+.. ifconfig:: not has_visioner
 
   The ``visioner`` extension was not compiled with this version of |project|.
   We are currently working to incorporate its functionality into the core of
