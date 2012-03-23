@@ -53,7 +53,7 @@ class Database(object):
       retval.append((k.id, k.name))
     return retval
 
-  def clientsIds(self, protocol=None, groups=None):
+  def clients_ids(self, protocol=None, groups=None):
     """Returns a set of client ids for the specific query by the user.
 
     Keyword Parameters:
@@ -77,7 +77,7 @@ class Database(object):
       retval.append(k.id)
     return retval
 
-  def clientsNames(self, protocol=None, groups=None):
+  def clients_names(self, protocol=None, groups=None):
     """Returns a set of client names for the specific query by the user.
 
     Keyword Parameters:
@@ -101,7 +101,7 @@ class Database(object):
       retval.append(k.name)
     return retval
 
-  def getClientNameFromClientId(self, client_id):
+  def get_client_name_from_client_id(self, client_id):
     """Returns the client name attached to the given client_id
 
     Keyword Parameters:
@@ -119,7 +119,7 @@ class Database(object):
     else:
       return q.first().name
 
-  def getClientIdFromClientName(self, client_name):
+  def get_client_id_from_client_name(self, client_name):
     """Returns the client_id attached to the given client_name
 
     Keyword Parameters:
@@ -137,7 +137,7 @@ class Database(object):
     else:
       return q.first().id
 
-  def getClientIdFromFileId(self, file_id):
+  def get_client_id_from_file_id(self, file_id):
     """Returns the client_id (real client id) attached to the given file_id
     
     Keyword Parameters:
@@ -155,7 +155,7 @@ class Database(object):
     else:
       return q.first().client_id
 
-  def getInternalPathFromFileId(self, file_id):
+  def get_internal_path_from_file_id(self, file_id):
     """Returns the unique "internal path" attached to the given file_id
     
     Keyword Parameters:

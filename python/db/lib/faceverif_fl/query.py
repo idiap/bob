@@ -31,12 +31,12 @@ class Database(object):
     self.tnorm_filename = 'for_tnorm.lst' # filename model_id real_id
     self.znorm_filename = 'for_znorm.lst' # filename real_id
       
-  def getBaseDirectory(self):
+  def get_base_directory(self):
     """Returns the base directory where the filelists defining the database
        are located."""
     return self.base_dir
 
-  def setBaseDirectory(self, base_dir):
+  def set_base_directory(self, base_dir):
     """Resets the base directory where the filelists defining the database
        are located."""
     self.base_dir = base_dir
@@ -156,7 +156,7 @@ class Database(object):
     # not found
     return (False, '0')
    
-  def getClientIdFromModelId(self, model_id_arg):
+  def get_client_id_from_model_id(self, model_id_arg):
     """Returns a client id from a model id"""
     world_filename = os.path.join(self.base_dir, self.world_subdir, self.world_filename0)
     (found, value) = self.__getClientIdFromFile__(model_id_arg, world_filename)
@@ -173,7 +173,7 @@ class Database(object):
     # not found
     raise RuntimeError, 'Could not find client id from the given model id %s.' % (model_id_arg,)
    
-  def getClientIdFromTmodelId(self, model_id_arg):
+  def get_client_id_from_tmodel_id(self, model_id_arg):
     """Returns a client id from a T-Norm model id"""
     devtnorm_filename = os.path.join(self.base_dir, self.dev_subdir, self.tnorm_filename)
     (found, value) = self.__getClientIdFromFile__(model_id_arg, devtnorm_filename)
@@ -223,7 +223,7 @@ class Database(object):
 
     return retval
 
-  def Tmodels(self, protocol=None, groups=None):
+  def tmodels(self, protocol=None, groups=None):
     """Returns a set of T-Norm models for the specific query by the user.
 
     Keyword Parameters:
@@ -248,7 +248,7 @@ class Database(object):
 
     return retval
 
-  def Zmodels(self, protocol=None, groups=None):
+  def zmodels(self, protocol=None, groups=None):
     """Returns a set of Z-Norm models for the specific query by the user.
 
     Keyword Parameters:
@@ -416,7 +416,7 @@ class Database(object):
     return retval
 
 
-  def Tobjects(self, directory=None, extension=None, protocol=None, model_ids=None, groups=None):
+  def tobjects(self, directory=None, extension=None, protocol=None, model_ids=None, groups=None):
     """Returns a set of filenames for enrolling T-norm models for score 
        normalization.
 
@@ -466,7 +466,7 @@ class Database(object):
     return retval
 
 
-  def Tfiles(self, directory=None, extension=None, protocol=None, model_ids=None, groups=None):
+  def tfiles(self, directory=None, extension=None, protocol=None, model_ids=None, groups=None):
     """Returns a set of filenames for enrolling T-norm models for score 
        normalization.
 
@@ -496,13 +496,13 @@ class Database(object):
     """
 
     retval = []
-    d = self.Tobjects(directory, extension, protocol, model_ids, groups)
+    d = self.tobjects(directory, extension, protocol, model_ids, groups)
     for t in d: retval.append(t[0])
 
     return retval
 
 
-  def Zobjects(self, directory=None, extension=None, protocol=None, model_ids=None, groups=None):
+  def zobjects(self, directory=None, extension=None, protocol=None, model_ids=None, groups=None):
     """Returns a set of filenames to perform Z-norm score normalization.
 
     Keyword Parameters:
@@ -548,7 +548,7 @@ class Database(object):
 
     return retval
 
-  def Zfiles(self, directory=None, extension=None, protocol=None,
+  def zfiles(self, directory=None, extension=None, protocol=None,
       model_ids=None, groups=None):
     """Returns a set of filenames to perform Z-norm score normalization.
 
@@ -576,7 +576,7 @@ class Database(object):
     """
 
     retval = []
-    d = self.Zobjects(directory, extension, protocol, model_ids, groups)
+    d = self.zobjects(directory, extension, protocol, model_ids, groups)
     for t in d: retval.append(t[0])
 
     return retval

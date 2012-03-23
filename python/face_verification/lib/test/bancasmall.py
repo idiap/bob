@@ -345,7 +345,7 @@ class GMMExperiment:
 
         self.znorm_tests.append(stats)
         #tnorm_clients_ext.append(c)
-        r_id = self.db.getRealIdFromTNormId(c)
+        r_id = self.db.get_real_id_from_tnorm_id(c)
         tnorm_clients_ext.append(r_id)
 
       i += 1
@@ -354,7 +354,7 @@ class GMMExperiment:
     self.D = bob.machine.linearScoring(self.tnorm_models, self.wm, self.znorm_tests)
     tnorm_real_ids = []
     for c in tnorm_clients:
-      r_id = self.db.getRealIdFromTNormId(c)
+      r_id = self.db.get_real_id_from_tnorm_id(c)
       tnorm_real_ids.append(r_id)
     self.D_sameValue = self.sameValue(tnorm_real_ids, tnorm_clients_ext)
 
