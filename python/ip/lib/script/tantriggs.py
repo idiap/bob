@@ -42,7 +42,7 @@ def tantriggs(line, A_OUTPUT_DIR, A_OUT_H, A_OUT_W,
   output_file = os.path.join(A_OUTPUT_DIR, os.path.splitext(os.path.basename(line))[0] + ".hdf5")
 
   # Save output file
-  bob.io.Array(bob.core.array.convert(preprocessed_img, 'uint8', sourceRange=(preprocessed_img.min(), preprocessed_img.max()))).save(output_file)
+  bob.io.Array(bob.core.array.convert(preprocessed_img, 'uint8', source_range=(preprocessed_img.min(), preprocessed_img.max()))).save(output_file)
   print output_file
 
 
