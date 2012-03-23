@@ -80,7 +80,7 @@ Rotating images
 
 The rotation of an image is slightly more difficult since the resulting image size has to be computed in advance. For that purpose, the **bob.ip.get_rotated_image_size** function can be used:
 
-  >>> A = numpy.array( [ [1, 2, 3], [4, 5, 6] ], dtype = 'uint8' ) # A small image of size 3x3
+  >>> A = numpy.array( [ [1, 2, 3], [4, 5, 6] ], dtype = numpy.uint8 ) # A small image of size 3x3
   >>> print A
   [[1 2 3]
    [4 5 6]]
@@ -90,7 +90,7 @@ The rotation of an image is slightly more difficult since the resulting image si
    
 After the creation of the rotated version of the image, the **bob.ip.scale** function can be used:
   
-  >>> A_rotated = numpy.ndarray( rotated_shape, dtype = 'float64' ) # A small image of rotated size
+  >>> A_rotated = numpy.ndarray( rotated_shape, dtype = numpy.float64 ) # A small image of rotated size
   >>> bob.ip.rotate(A, A_rotated, 90)      # execute the rotation
   >>> print A_rotated
   [[ 3.  6.]
@@ -133,8 +133,8 @@ One simple example of image filtering is to apply a Gaussian blur filter to an i
   
 Now, let's see what happens to a small test image:
 
-  >>> test_image = numpy.array([[1, 0, 0, 0, 1], [0, 1, 0, 1, 0], [0, 0, 1, 0, 0], [0, 1, 0, 1, 0], [1, 0, 0, 0, 1]], dtype='float64')
-  >>> filtered_image = numpy.ndarray(test_image.shape, dtype='float64')
+  >>> test_image = numpy.array([[1, 0, 0, 0, 1], [0, 1, 0, 1, 0], [0, 0, 1, 0, 0], [0, 1, 0, 1, 0], [1, 0, 0, 0, 1]], dtype = numpy.float64)
+  >>> filtered_image = numpy.ndarray(test_image.shape, dtype = numpy.float64)
   >>> filter(test_image, filtered_image)
   >>> print filtered_image
   [[ 0.93562108  0.06327015  0.00221754  0.06327015  0.93562108]
@@ -147,14 +147,20 @@ Now, let's see what happens to a small test image:
 See, we ended up with a nicely smoothed cross.
 
 
-Another filter you might want to us are Gabor filters.
+Another filter you might want to use is a Gabor filter. Gabor filters can be applied to any kind of images, including colored images (in which case the image is converted to gray scale first). A nice trick to get the trailing two dimensions of the image (i.e., the resolution of gray or colored image) is to extract shape[-2:] of the image. Since the output of a Gabor filter is always complex valued, the filtered image image need to have complex type:
 
-..   >>> complex_image = image.astype(complex)
-..   >>> filtered_image = numpy.ndarray(complex_image.shape, dtype = 'complex')
-..   >>> kernel = bob.ip.GaborKernel(complex_image.shape, (0,1))
-..   >>> kernel(complex_image, filtered_image)
-..   >>> abs_image = numpy.abs(filtered_image)
-..   >>> bob.io.Array(abs_image).save("/scratch/mguenther/test.hdf5")
+  >>> kernel = bob.ip.GaborKernel(image.shape[-2:], (1,0))
+  >>> filtered_image = numpy.ndarray(image.shape[-2:], dtype = numpy.complex128)
+  >>> kernel(image, filtered_image)
+
+or simply:
+
+  >>> filtered_image = kernel(image)
+  
+To compute the absolute and phase parts of the responses (e.g. as needed by the extended local Gabor binary pattern (ELGBP)), just use the `NumPy`_ functions on the resulting image:
+
+  >>> abs_image = numpy.abs(filtered_image)
+  >>> phase_image = numpy.angle(filtered_image)
 
 
 Normalizing images according to eye positions
@@ -167,9 +173,12 @@ For many biometric applications to faces, the images are geometrically normalize
 Now, we have set up our object to generate images of size (128, 128) that will put the left eye to pixel position (32, 32) and the right eye to position (32, 96). Afterwards, this object is used to geometrically normalize the face, given the eye positions in the original face image:
 
   >>> face_image = bob.io.load( image_path )
-  >>> cropped_image = numpy.ndarray( (128, 128), dtype = 'float64' )
+  >>> cropped_image = numpy.ndarray( (128, 128), dtype = numpy.float64 )
   >>> face_eyes_norm( face_image, cropped_image, le_y = 67, le_x = 47, re_y = 62, re_x = 71)
 
+
+Simple feature extraction
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 

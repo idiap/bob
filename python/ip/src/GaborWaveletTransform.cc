@@ -24,8 +24,78 @@
 #include <boost/python.hpp>
 #include <core/python/ndarray.h>
 #include <core/array_exception.h>
+#include <core/array_type.h>
 
 #include <ip/GaborWaveletTransform.h>
+#include <sp/FFT2D.h>
+#include <blitz/array.h>
+
+#include <core/cast.h>
+#include <ip/color.h>
+
+
+template <class T> 
+static inline blitz::Array<std::complex<double>,2> complex_cast(bob::python::const_ndarray input){
+  blitz::Array<T,2> gray(input.type().shape[1],input.type().shape[2]);
+  bob::ip::rgb_to_gray(input.bz<T,3>(), gray);
+  return bob::core::cast<std::complex<double> >(gray);
+}
+
+static inline const blitz::Array<std::complex<double>, 2> convert_image(bob::python::const_ndarray input){
+  if (input.type().nd == 3){
+    // perform color type conversion
+    switch (input.type().dtype){
+      case bob::core::array::t_uint8: return complex_cast<uint8_t>(input);
+      case bob::core::array::t_uint16: return complex_cast<uint16_t>(input);
+      case bob::core::array::t_float64: return complex_cast<double>(input);
+      default: throw bob::core::Exception();
+    }
+  } else {
+    switch (input.type().dtype){
+      case bob::core::array::t_uint8: return bob::core::cast<std::complex<double> >(input.bz<uint8_t,2>());
+      case bob::core::array::t_uint16: return bob::core::cast<std::complex<double> >(input.bz<uint16_t,2>());
+      case bob::core::array::t_float64: return bob::core::cast<std::complex<double> >(input.bz<double,2>());
+      case bob::core::array::t_complex128: return input.bz<std::complex<double>,2>();
+      default: throw bob::core::Exception();
+    }
+  }
+}
+
+static inline void transform(bob::ip::GaborKernel& kernel, blitz::Array<std::complex<double>,2>& input, blitz::Array<std::complex<double>,2>& output){
+ // perform fft on input image
+  bob::sp::FFT2D fft(input.extent(0), input.extent(1));
+  fft(input);
+
+  // apply the kernel in frequency domain
+  kernel.transform(input, output);
+  
+  // perform ifft on the result
+  bob::sp::IFFT2D ifft(output.extent(0), output.extent(1));
+  ifft(output);
+}
+
+static boost::python::object gabor_wavelet_transform_1(bob::ip::GaborKernel& kernel, bob::python::const_ndarray input_image){
+  // convert input ndarray to complex blitz array
+  blitz::Array<std::complex<double>,2> input = convert_image(input_image);
+  // allocate output array
+  bob::python::ndarray result(bob::core::array::t_complex128, input.extent(0), input.extent(1));
+  blitz::Array<std::complex<double>,2> output = result.bz<std::complex<double>,2>();
+  
+  // transform input to output
+  transform(kernel, input, output);
+  
+  // return the py_object
+  return result.self();
+}
+
+static void gabor_wavelet_transform_2(bob::ip::GaborKernel& kernel, bob::python::const_ndarray input_image, bob::python::ndarray output_image){
+  // convert input image into complex type
+  blitz::Array<std::complex<double>,2> input = convert_image(input_image);
+  // cast output image to complex type
+  blitz::Array<std::complex<double>,2> output = output_image.bz<std::complex<double>,2>();
+  // transform input to output
+  transform(kernel, input, output);
+}
 
 static void perform_gwt (bob::ip::GaborWaveletTransform& gwt, bob::python::const_ndarray input_image, bob::python::ndarray output_trafo_image){
   const blitz::Array<std::complex<double>,2> image = input_image.bz<std::complex<double>,2>();
@@ -57,6 +127,43 @@ static void normalize_gabor_jet(bob::python::ndarray gabor_jet){
 }
 
 void bind_ip_gabor_wavelet_transform() {
+  // bind Gabor Kernel class
+  boost::python::class_<bob::ip::GaborKernel, boost::shared_ptr<bob::ip::GaborKernel> >(
+    "GaborKernel",
+    "This class can be used to filter an image with a single Gabor wavelet.",
+    boost::python::no_init
+  )
+  
+  .def(
+    boost::python::init< const blitz::TinyVector<int,2>&, const blitz::TinyVector<double,2>&, boost::python::optional <const double, const double, const bool, const double> >(
+      (
+        boost::python::arg("resolution"),
+        boost::python::arg("wavelet_frequency"),
+        boost::python::arg("sigma") = 2. * M_PI,
+        boost::python::arg("pow_of_k") = 0.,
+        boost::python::arg("dc_free") = true,
+        boost::python::arg("epsilon") = 1e-10
+      ),
+      "Initializes the Gabor wavelet of the given wavelet frequency to be used as a filter for the given image resolution. The optional parameters can be changed, but have useful default values."
+    )
+  )
+  
+  .def(
+    "__call__",
+    &gabor_wavelet_transform_1,
+    (boost::python::arg("self"), boost::python::arg("input_image")),
+    """This function Gabor-filters the given input_image, which can be of any type. The output image is of complex type. It will be automatically generated and returned."""
+  )
+
+  .def(
+    "__call__",
+    &gabor_wavelet_transform_2,
+    (boost::python::arg("self"), boost::python::arg("input_image"), boost::python::arg("output_image")),
+    """This function Gabor-filters the given input_image, which can be of any type, to the output image. The output image needs to have the same resolution as the input image and must be of complex type."""
+  );
+
+    
+
   // declare GWT class
   boost::python::class_<bob::ip::GaborWaveletTransform, boost::shared_ptr<bob::ip::GaborWaveletTransform> >(
     "GaborWaveletTransform",
@@ -65,7 +172,7 @@ void bind_ip_gabor_wavelet_transform() {
   )
 
   .def(
-    boost::python::init<int,int,double,double,double,double,bool>(
+    boost::python::init<boost::python::optional<int,int,double,double,double,double,bool> >(
       (
         boost::python::arg("number_of_scales") = 5,
         boost::python::arg("number_of_angles") = 8,
@@ -75,7 +182,7 @@ void bind_ip_gabor_wavelet_transform() {
         boost::python::arg("pow_of_k") = 0.,
         boost::python::arg("dc_free") = true
       ),
-      "Initializes the Gabor wavelet transform by generating Gabor wavelets in number_of_scales different frequencies and number_of_angles different directions. The remaining parameters are parameters of the Gabro wavelets to be generated. "
+      "Initializes the Gabor wavelet transform by generating Gabor wavelets in number_of_scales different frequencies and number_of_angles different directions. The remaining parameters are parameters of the Gabor wavelets to be generated. "
     )
   )
 

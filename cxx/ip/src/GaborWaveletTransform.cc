@@ -39,12 +39,12 @@ static inline double sqr(double x){return x*x;}
  * @param epsilon   The epsilon value below which the wavelet value is considered as zero
  */
 bob::ip::GaborKernel::GaborKernel(
-  blitz::TinyVector<int,2> resolution,
-  blitz::TinyVector<double,2> k,
-  double sigma,
-  double pow_of_k,
-  bool dc_free,
-  double epsilon
+  const blitz::TinyVector<int,2>& resolution,
+  const blitz::TinyVector<double,2>& k,
+  const double sigma,
+  const double pow_of_k,
+  const bool dc_free,
+  const double epsilon
 )
 : m_x_resolution(resolution[1]),
   m_y_resolution(resolution[0])

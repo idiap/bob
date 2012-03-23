@@ -38,8 +38,7 @@ Enjoy!
 
 .. ifconfig:: todo_include_todos
 
-  List of Things To-Do
-  --------------------
+  Here is a todo list, auto-generated from our sources:
 
   .. todolist::
 

@@ -39,14 +39,14 @@ namespace bob {
 
       public:
 
-        //! Generate a Gbaor kernel in frequency domain
+        //! Generate a Gabor kernel in frequency domain
         GaborKernel(
-          blitz::TinyVector<int,2> resolution,
-          blitz::TinyVector<double,2> wavelet_frequency,
-          double sigma = 2. * M_PI,
-          double pow_of_k = 0.,
-          bool dc_free = true,
-          double epsilon = 1e-10
+          const blitz::TinyVector<int,2>& resolution,
+          const blitz::TinyVector<double,2>& wavelet_frequency,
+          const double sigma = 2. * M_PI,
+          const double pow_of_k = 0.,
+          const bool dc_free = true,
+          const double epsilon = 1e-10
         );
 
         //! Get the image represenation of the Gabor wavelet in frequency domain
@@ -54,7 +54,7 @@ namespace bob {
 
         //! Gabor transforms the given image
         void transform(
-          const blitz::Array<std::complex<double>,2>& _frequency_domain_image,
+          const blitz::Array<std::complex<double>,2>& frequency_domain_image,
           blitz::Array<std::complex<double>,2>& transformed_frequency_domain_image
         ) const;
 
