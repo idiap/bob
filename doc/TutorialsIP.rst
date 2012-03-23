@@ -147,13 +147,12 @@ Now, let's see what happens to a small test image:
 See, we ended up with a nicely smoothed cross.
 
 
-Another filter you might want to use is a Gabor filter. 
+Another filter you might want to use is a Gabor filter. Gabor filters can be applied to any kind of images, including colored images (in which case the image is converted to gray scale first). A nice trick to get the trailing two dimensions of the image (i.e., the resolution of gray or colored image) is to extract shape[-2:] of the image. Since the output of a Gabor filter is always complex valued, the filtered image image need to have complex type:
 
-  >>> complex_image = image.astype(complex)
-  >>> filtered_image = numpy.ndarray(complex_image.shape, dtype = 'complex')
-  >>> kernel = bob.ip.GaborKernel(complex_image.shape, (1,0))
-  >>> kernel(complex_image, filtered_image)
-  
+  >>> kernel = bob.ip.GaborKernel(image.shape[-2:], (1,0))
+  >>> filtered_image = numpy.ndarray(image.shape[-2:], dtype = 'complex')
+  >>> kernel(image, filtered_image)
+
 or simply:
 
   >>> filtered_image = kernel(image)

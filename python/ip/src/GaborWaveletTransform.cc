@@ -24,18 +24,45 @@
 #include <boost/python.hpp>
 #include <core/python/ndarray.h>
 #include <core/array_exception.h>
+#include <core/array_type.h>
 
 #include <ip/GaborWaveletTransform.h>
 #include <sp/FFT2D.h>
 #include <blitz/array.h>
 
-static void gabor_wavelet_transform(bob::ip::GaborKernel& kernel, bob::python::const_ndarray input_image, bob::python::ndarray output_image){
-  // cast input image into complex type
-  blitz::Array<std::complex<double>,2> input = input_image.bz<std::complex<double>,2>();
-  
-  blitz::Array<std::complex<double>,2> output = output_image.bz<std::complex<double>,2>();
-  
-  // perform fft on input image
+#include <core/cast.h>
+#include <ip/color.h>
+
+
+template <class T> 
+static inline blitz::Array<std::complex<double>,2> complex_cast(bob::python::const_ndarray input){
+  blitz::Array<T,2> gray(input.type().shape[1],input.type().shape[2]);
+  bob::ip::rgb_to_gray(input.bz<T,3>(), gray);
+  return bob::core::cast<std::complex<double> >(gray);
+}
+
+static inline const blitz::Array<std::complex<double>, 2> convert_image(bob::python::const_ndarray input){
+  if (input.type().nd == 3){
+    // perform color type conversion
+    switch (input.type().dtype){
+      case bob::core::array::t_uint8: return complex_cast<uint8_t>(input);
+      case bob::core::array::t_uint16: return complex_cast<uint16_t>(input);
+      case bob::core::array::t_float64: return complex_cast<double>(input);
+      default: throw bob::core::Exception();
+    }
+  } else {
+    switch (input.type().dtype){
+      case bob::core::array::t_uint8: return bob::core::cast<std::complex<double> >(input.bz<uint8_t,2>());
+      case bob::core::array::t_uint16: return bob::core::cast<std::complex<double> >(input.bz<uint16_t,2>());
+      case bob::core::array::t_float64: return bob::core::cast<std::complex<double> >(input.bz<double,2>());
+      case bob::core::array::t_complex128: return input.bz<std::complex<double>,2>();
+      default: throw bob::core::Exception();
+    }
+  }
+}
+
+static inline void transform(bob::ip::GaborKernel& kernel, blitz::Array<std::complex<double>,2>& input, blitz::Array<std::complex<double>,2>& output){
+ // perform fft on input image
   bob::sp::FFT2D fft(input.extent(0), input.extent(1));
   fft(input);
 
@@ -43,8 +70,31 @@ static void gabor_wavelet_transform(bob::ip::GaborKernel& kernel, bob::python::c
   kernel.transform(input, output);
   
   // perform ifft on the result
-  bob::sp::IFFT2D ifft(input.extent(0), input.extent(1));
+  bob::sp::IFFT2D ifft(output.extent(0), output.extent(1));
   ifft(output);
+}
+
+static boost::python::object gabor_wavelet_transform_1(bob::ip::GaborKernel& kernel, bob::python::const_ndarray input_image){
+  // convert input ndarray to complex blitz array
+  blitz::Array<std::complex<double>,2> input = convert_image(input_image);
+  // allocate output array
+  bob::python::ndarray result(bob::core::array::t_complex128, input.extent(0), input.extent(1));
+  blitz::Array<std::complex<double>,2> output = result.bz<std::complex<double>,2>();
+  
+  // transform input to output
+  transform(kernel, input, output);
+  
+  // return the py_object
+  return result.self();
+}
+
+static void gabor_wavelet_transform_2(bob::ip::GaborKernel& kernel, bob::python::const_ndarray input_image, bob::python::ndarray output_image){
+  // convert input image into complex type
+  blitz::Array<std::complex<double>,2> input = convert_image(input_image);
+  // cast output image to complex type
+  blitz::Array<std::complex<double>,2> output = output_image.bz<std::complex<double>,2>();
+  // transform input to output
+  transform(kernel, input, output);
 }
 
 static void perform_gwt (bob::ip::GaborWaveletTransform& gwt, bob::python::const_ndarray input_image, bob::python::ndarray output_trafo_image){
@@ -100,9 +150,16 @@ void bind_ip_gabor_wavelet_transform() {
   
   .def(
     "__call__",
-    &gabor_wavelet_transform,
+    &gabor_wavelet_transform_1,
+    (boost::python::arg("self"), boost::python::arg("input_image")),
+    """This function Gabor-filters the given input_image, which can be of any type. The output image is of complex type. It will be automatically generated and returned."""
+  )
+
+  .def(
+    "__call__",
+    &gabor_wavelet_transform_2,
     (boost::python::arg("self"), boost::python::arg("input_image"), boost::python::arg("output_image")),
-    """This function Gabor-filters the given input_image to the output image. Both the input and the output images must be of complex type. The output image needs to have the same resolution as the input image."""
+    """This function Gabor-filters the given input_image, which can be of any type, to the output image. The output image needs to have the same resolution as the input image and must be of complex type."""
   );
 
     

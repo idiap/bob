@@ -7,41 +7,8 @@
 """
 
 from ._ip import GaborWaveletTransform
-from ._ip import GaborKernel
 from ._ip import rgb_to_gray
 import numpy
-
-def gabor_kernel_transform(self,input_image, output_image=None):
-  """This function performs a Gabor wavelet transform on the given input image. When the output_image is not given, it will be automatically allocated in the desired size, and the resulting image is returned. When the output image is given, it will fill the given image and this function returns None. In any case, the following C++ API is used:"""
-  # cast image into complex type
-  if input_image.ndim == 2:
-    # gray image; convert to complex
-    input_ = input_image.astype(complex)
-  elif input_image.ndim == 3:
-    # color image; color convert first
-    gray_image = numpy.ndarray(input_image.shape[1:], input_image.dtype)
-    rgb_to_gray(input_image, gray_image)
-    input_ = gray_image.astype(complex)
-  else:
-    bob.core.throw_exception()
- 
-  return_value = None
-  if output_image == None:
-    output_image = numpy.ndarray(input_.shape, input_.dtype)
-    return_value = output_image
-    
-  
-  # use the C++ function that was already bound
-  self.__call_old__(input_, output_image)
-  
-  # return the output image
-  return return_value
-
-GaborKernel.__call_old__ = GaborKernel.__call__
-gabor_kernel_transform.__doc__ += "\n" + GaborKernel.__call__.__doc__
-GaborKernel.__call__ = gabor_kernel_transform
-del gabor_kernel_transform
-
 
 def gwt_trafo_image(self,input_image):
   """ This function creates an empty trafo image for the given input image.
