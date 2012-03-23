@@ -3,6 +3,8 @@ bob (1.0alpha1-0ubuntu9) precise; urgency=low
   * Do not include the visioner
   * Fix documentation installation
 
+ -- Biometrics Group <biometric@idiap.ch>  Fri, 23 Mar 2012 09:02:44 +0100
+
 bob (1.0alpha1-0ubuntu8) precise; urgency=low
 
   * More documentation fixes
