@@ -1,3 +1,8 @@
+bob (1.0alpha1-0ubuntu9) precise; urgency=low
+
+  * Do not include the visioner
+  * Fix documentation installation
+
 bob (1.0alpha1-0ubuntu8) precise; urgency=low
 
   * More documentation fixes
