@@ -21,7 +21,7 @@
 **************************
 
 Introduction
-------------
+============
 
 The fundamental data structure of |project| consists in multi-dimensional
 arrays. In signal-processing and machine learning, arrays are indeed a suitable
@@ -45,8 +45,8 @@ everywhere.
 For an introduction and tutorials about NumPy_ ndarrays, just 
 visit the Numpy_ website.
 
-Numpy basics
-------------
+`NumPy`_ basics
+===============
 
 A `NumPy`_ array is a table of elements, all of the same type, indexed by a 
 tuple of positive integers. Before using any of the functionalities described
@@ -61,7 +61,7 @@ below, `NumPy`_ should be imported in the `Python`_ environment.
    For `MATLAB`_ users, this `page`_ highlights the differences and the commonalities between `NumPy`_ and `MATLAB`_.
 
 Array creation
-==============
+--------------
 
 There are different ways to create `NumPy`_ arrays. For instance, to create an
 array with initialized content:
@@ -100,7 +100,7 @@ an :py:class:`numpy.ndarray` object are:
 
 
 Accessing array elements
-========================
+------------------------
 
 The `Python`_ `operator[] <http://docs.scipy.org/doc/numpy/reference/arrays.indexing.html>`_ 
 allows to index the elements of an array. Please note that the indices start 
@@ -124,7 +124,7 @@ multi-dimensional array, this is done with respect to the first dimension.
 
 
 Array type
-==========
+----------
 
 The type of the elements of an array can be specified at the creation time.
 
@@ -163,7 +163,7 @@ grayscale image) into a float64 2D array with a ``[0,1]`` range.
 
 
 Array shape
-===========
+-----------
 
 `NumPy`_ provides several features to reshape or stack arrays, such as the
 :py:attr:`numpy.ndarray.reshape`, :py:func:`numpy.hstack`, and
@@ -186,7 +186,7 @@ Array shape
 
 
 Mathematical operations
-=======================
+-----------------------
 
 `NumPy`_ also provides numerous mathematical operations. Most of them are 
 performed **elementwise**. For instance,
@@ -249,7 +249,7 @@ examples: matrix multiplication and matrix inversion.
     [-10.75   4.75]]
 
 Assignment, shallow and deep copy
-=================================
+---------------------------------
 
 Different arrays might share the same data in memory. Let's first have a look
 at the assignment operator =.
@@ -308,7 +308,7 @@ For a more exhaustive introduction about `NumPy`_, please have a look at its
 `user guide`_. 
 
 Digital signals as multi-dimensional arrays
--------------------------------------------
+===========================================
 
 For |project|, we have decided to represent digital signals directly as 
 `NumPy`_ arrays, rather than having dedicated classes for each type of 
@@ -316,7 +316,7 @@ signals. This implies that some convention has been defined.
 
 
 Vectors and matrices
-====================
+--------------------
 
 A vector is represented as a 1D `NumPy`_ array, whereas a matrix is 
 represented by a 2D arrays whose first dimension corresponds to the rows, and
@@ -334,7 +334,7 @@ second dimension to the columns.
    [1 2 3]
 
 Images
-======
+------
 
 **Grayscale** images are represented as 2D arrays, the first dimension being the
 height (number of rows) and the second dimension being the witdh (number of 
@@ -360,31 +360,35 @@ in which color space the content is stored. |project| provides functions to
 perform colorspace conversion (cf. the :doc:`TutorialsIP` tutorial).
 
 Videos
-======
+------
 
 A video can be seen as a sequence of images over time. By convention, the 
 first dimension is for the frame indices (time index), whereas the remaining 
 ones are related to the corresponding image frame.
 
 Audio signal
-============
+------------
 
-|project| does not yet support audio files (No wav or mp3 codec). However, it 
-is still possible to convert such a signal into e.g. HDF5, and then to read 
-and process it with |project|. In this case, a mono audio signal would be 
-represented as a 2D array, the first dimension corresponding to the time index 
-and the second one to the wave magnitude.
+|project| does not yet support audio files (No wav or mp3 codec). However, 
+there are several alternatives: 
 
+* The signal in the audio file could be converted into e.g. HDF5, and then could be read and process with |project|.
+
+* A `Python`_ module could be used to load the audio file as a `NumPy`_ :py:class:`numpy.ndarray`, such as :py:mod:`scipy.io.wavfile`. Please look at :ref:`audiosignal` for an example of how to do it.
+
+Then, a stereo audio signal would be represented as a 2D array, the first 
+dimension corresponding to the time index and the second one to the audio 
+channel, values in the array corresponding to wave magnitudes.
 
 Interfacing with OpenCV and PIL
--------------------------------
+===============================
 
 As |project| relies on `NumPy`_ arrays, it is very easy to make use of other 
 popular libraries such as `OpenCV`_ and `PIL`_.
 
 
 OpenCV
-======
+------
 
 .. note::
 
@@ -414,7 +418,7 @@ Both `NumPy`_ array and `OpenCV`_ cvMat use similar datatypes (`uint8`,
 datatype is preserved by the previous operations.
 
 PIL
-===
+---
 
 `PIL`_ does not provide a generic multi-dimensional array structure. However, 
 its Image structure can be seen as 2D or 3D arrays. To convert a 2D `NumPy`_ 
@@ -464,7 +468,7 @@ interleaved color image to plane color image.
    True
 
 MATLAB
-======
+------
 
 |project| currently does not provide `MATLAB`_ mex interface. Nevertheless, it
 is possible to load and save simple `.mat` files, thanks to the `MatIO`_ 
@@ -473,7 +477,7 @@ Be aware that `MATLAB`_ also support the `HDF5`_ file format. For more
 details, please have a look at :doc:`TutorialsIO`.
 
 Random Number Generation
-------------------------
+========================
 
 We have developed a set of bridges to the `Boost Random Number Generation`_
 facilities. This allows you to generate random numbers in a variety of ways.

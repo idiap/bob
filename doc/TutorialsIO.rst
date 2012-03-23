@@ -350,16 +350,7 @@ through the :py:class:`bob.io.Array` container:
   the read and write operations. This avoids code duplication and hooks data
   loading and saving to the powerful |project| transcoding framework that is
   explained next. 
-   
 
-
-
-
-
-
-* Loading and saving an image/video (conversion routines)
-
-* Loading and saving matlab data
 
 .. testcleanup:: *
 
@@ -367,9 +358,47 @@ through the :py:class:`bob.io.Array` container:
   os.chdir(current_directory)
   shutil.rmtree(temp_dir)
 
+
+Loading and saving images and videos
+====================================
+
+
+Loading and saving matlab data
+==============================
+
+
+.. _audiosignal:
+
+Loading and saving audio files
+==============================
+
+|project| does not yet support audio files (No wav codec). However, it is 
+possible to use the `Python`_ module :py:mod:`scipy.io.wavfile` to do
+the job. For instance, to read a wave file, just use the
+:py:func:`scipy.io.wavfile.read` function.
+
+.. code-block:: python
+
+   >>> import scipy.io.wavfile
+   >>> filename = '/home/user/sample.wav'
+   >>> samplerate, data = scipy.io.wavfile.read(filename)
+   >>> print type(data)
+   <type 'numpy.ndarray'>
+   >>> print data.shape
+   (132474, 2)
+
+In the previous example, the stereo audio signal is represented as a 2D 
+`NumPy` :py:class:`numpy.ndarray`, the first dimension corresponding to the
+time index (132474 frames) and the second one to the audio channel (2 channels,
+stereo), values in the array being wave magnitudes.
+
+To save a `NumPy` :py:class:`numpy.ndarray` into a wave file, the 
+:py:func:`scipy.io.wavfile.write` could be used, which also requires the
+framerate to be specified.
+
+
+.. include:: links.rst
+
 .. Place here your external references
 
-.. _hdf5: http://www.hdfgroup.org/HDF5/
-.. _numpy: http://numpy.scipy.org
-.. _python: http://www.python.org
 .. _ddl: http://www.hdfgroup.org/HDF5/doc/ddl.html
