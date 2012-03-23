@@ -147,14 +147,20 @@ Now, let's see what happens to a small test image:
 See, we ended up with a nicely smoothed cross.
 
 
-Another filter you might want to us are Gabor filters.
+Another filter you might want to use is a Gabor filter. Gabor filters can be applied to any kind of images, including colored images (in which case the image is converted to gray scale first). A nice trick to get the trailing two dimensions of the image (i.e., the resolution of gray or colored image) is to extract shape[-2:] of the image. Since the output of a Gabor filter is always complex valued, the filtered image image need to have complex type:
 
-..   >>> complex_image = image.astype(complex)
-..   >>> filtered_image = numpy.ndarray(complex_image.shape, dtype = 'complex')
-..   >>> kernel = bob.ip.GaborKernel(complex_image.shape, (0,1))
-..   >>> kernel(complex_image, filtered_image)
-..   >>> abs_image = numpy.abs(filtered_image)
-..   >>> bob.io.Array(abs_image).save("/scratch/mguenther/test.hdf5")
+  >>> kernel = bob.ip.GaborKernel(image.shape[-2:], (1,0))
+  >>> filtered_image = numpy.ndarray(image.shape[-2:], dtype = 'complex')
+  >>> kernel(image, filtered_image)
+
+or simply:
+
+  >>> filtered_image = kernel(image)
+  
+To compute the absolute and phase parts of the responses (e.g. as needed by the extended local Gabor binary pattern (ELGBP)), just use the `NumPy`_ functions on the resulting image:
+
+  >>> abs_image = numpy.abs(filtered_image)
+  >>> phase_image = numpy.angle(filtered_image)
 
 
 Normalizing images according to eye positions
@@ -171,6 +177,8 @@ Now, we have set up our object to generate images of size (128, 128) that will p
   >>> face_eyes_norm( face_image, cropped_image, le_y = 67, le_x = 47, re_y = 62, re_x = 71)
 
 
+Simple feature extraction
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 

@@ -228,6 +228,17 @@ void bind_core_array_tinyvector () {
   tinyvec_from_sequence<uint64_t,9>();
   tinyvec_from_sequence<uint64_t,10>();
   tinyvec_from_sequence<uint64_t,11>();
+  tinyvec_from_sequence<double,1>();
+  tinyvec_from_sequence<double,2>();
+  tinyvec_from_sequence<double,3>();
+  tinyvec_from_sequence<double,4>();
+  tinyvec_from_sequence<double,5>();
+  tinyvec_from_sequence<double,6>();
+  tinyvec_from_sequence<double,7>();
+  tinyvec_from_sequence<double,8>();
+  tinyvec_from_sequence<double,9>();
+  tinyvec_from_sequence<double,10>();
+  tinyvec_from_sequence<double,11>();
 # if defined(HAVE_BLITZ_SPECIAL_TYPES)
   if (typeid(int) != typeid(blitz::diffType)) {
     tinyvec_from_sequence<blitz::diffType,1>();
@@ -270,6 +281,17 @@ void bind_core_array_tinyvector () {
   register_tinyvec_to_tuple<uint64_t,9>();
   register_tinyvec_to_tuple<uint64_t,10>();
   register_tinyvec_to_tuple<uint64_t,11>();
+  register_tinyvec_to_tuple<double,1>();
+  register_tinyvec_to_tuple<double,2>();
+  register_tinyvec_to_tuple<double,3>();
+  register_tinyvec_to_tuple<double,4>();
+  register_tinyvec_to_tuple<double,5>();
+  register_tinyvec_to_tuple<double,6>();
+  register_tinyvec_to_tuple<double,7>();
+  register_tinyvec_to_tuple<double,8>();
+  register_tinyvec_to_tuple<double,9>();
+  register_tinyvec_to_tuple<double,10>();
+  register_tinyvec_to_tuple<double,11>();
 # if defined(HAVE_BLITZ_SPECIAL_TYPES)
   if (typeid(int) != typeid(blitz::diffType)) {
     register_tinyvec_to_tuple<blitz::diffType,1>();
