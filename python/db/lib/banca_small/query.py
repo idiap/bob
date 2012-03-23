@@ -242,7 +242,8 @@ class Database(object):
       - 2: the claimed id attached to the model
       - 3: the real id
       - 4: the "stem" path (basename of the file)
-    considering allthe filtering criteria. The keys of the dictionary are 
+
+    considering all the filtering criteria. The keys of the dictionary are 
     unique identities for each file in the BANCA_SMALL database. Conserve these 
     numbers if you wish to save processing results later on.
     """

@@ -318,7 +318,8 @@ class Database(object):
       - 2: the claimed id attached to the model
       - 3: the real id
       - 4: the "stem" path (basename of the file)
-    considering allthe filtering criteria. 
+
+    considering all the filtering criteria. 
     """
 
     VALID_PURPOSES = ('enrol', 'probe')
@@ -442,6 +443,7 @@ class Database(object):
       - 2: the claimed id attached to the model
       - 3: the real id (same as claimed id)
       - 4: the "stem" path (basename of the file)
+
     considering all the filtering criteria. 
     """
 
@@ -492,6 +494,7 @@ class Database(object):
       - 2: the claimed id attached to the model
       - 3: the real id (same as claimed id)
       - 4: the "stem" path (basename of the file)
+
     considering all the filtering criteria. 
     """
 
@@ -525,6 +528,7 @@ class Database(object):
       - 0: the resolved filenames 
       - 1: the real id
       - 2: the "stem" path (basename of the file)
+
     considering all the filtering criteria. 
     """
 
@@ -572,6 +576,7 @@ class Database(object):
       - 0: the resolved filenames 
       - 1: the real id
       - 2: the "stem" path (basename of the file)
+
     considering all the filtering criteria.
     """
 

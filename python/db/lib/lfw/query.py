@@ -201,7 +201,8 @@ class Database(object):
       - 0: the resolved filenames 
       - 1: the client id
       - 2: the "stem" path (basename of the file)
-    considering allthe filtering criteria. The keys of the dictionary are 
+
+    considering all the filtering criteria. The keys of the dictionary are 
     unique identities for each file in the LFW database. Conserve these 
     numbers if you wish to save processing results later on.
     """
@@ -258,7 +259,8 @@ class Database(object):
       - 0: the resolved filenames 
       - 1: the client id
       - 2: the "stem" path (basename of the file)
-    considering allthe filtering criteria. The keys of the dictionary are 
+
+    considering all the filtering criteria. The keys of the dictionary are 
     unique identities for each file in the LFW database. Conserve these 
     numbers if you wish to save processing results later on.
     """
@@ -300,6 +302,7 @@ class Database(object):
       - 3: client_id associated with filename 2
       - 4: file_id associated with filename 1
       - 5: file_id associated with filename 2
+
     considering all the filtering criteria. The keys of the dictionary are 
     unique identities for each file in the LFW database. Conserve these 
     numbers if you wish to save processing results later on.
