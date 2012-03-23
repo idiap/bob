@@ -59,6 +59,8 @@ The Iris Dataset
 
   import bob
   import numpy
+  import matplotlib
+  matplotlib.use('pdf') #non-interactive avoids exception on display
 
 The Iris Dataset is built into the guts of |project|. It is likely the only
 dataset completely available with the source code (you will need to download
