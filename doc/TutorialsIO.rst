@@ -178,7 +178,7 @@ And the result of running ``h5dump`` on the file ``testfile3.hdf5`` should be:
 You don't need to limit yourself to single variables, you can also save lists
 of scalars and arrays using the function :py:meth:`bob.io.HDF5.append()` instead of :py:meth:`bob.io.HDF5.set()`.
 
-Reading opeartions
+Reading operations
 ------------------
 
 Reading up data you just wrote is as easy. For this task you should use
@@ -322,7 +322,7 @@ Saving the :py:class:`bob.io.Array` is as easy, just call the
 
   >>> a.save('copy1.hdf5')
 
-Numpy ndrray Shortcuts
+Numpy ndarray shortcuts
 ======================
 
 To just load a :py:class:`numpy.ndarray` in memory, we have written a
@@ -350,6 +350,80 @@ through the :py:class:`bob.io.Array` container:
   the read and write operations. This avoids code duplication and hooks data
   loading and saving to the powerful |project| transcoding framework that is
   explained next. 
+
+Reading and writing image and video data
+========================================
+
+Array transcoding
+=================
+
+|project| provides support to load and save data from many different
+file types including Matlab ``.mat`` files, various image file types and video
+data. File types and specific serialization and de-serialization is switched
+automatically using filename extensions. Knowing this, saving an array in a different format is just a matter of
+choosing the right extension: 
+
+.. doctest::
+
+  >>> my_image = numpy.uint8(numpy.random.random_integers(0,255,(3,256,256))) # creating an image with random pixel values
+  >>> bob.io.save(my_image, 'testimage.jpg') # saving the image in jpeg format
+  >>> my_copy_image = bob.io.load('testimage.jpg')
+
+These are the extensions and formats which are currently supported in |project|:
+
+* Images: when reading and image, the returned values for RGB is (uint8 or uint16) 3D arrays, and for grayscale (uint8 or
+  uint16) 2-D arrays as indicated [``bob.image``]. Please notice that for
+  this Array codec, file extensions DO matter even if a codecname is specified,
+  as they are also used by ImageMagick to select the image loader/writer. The
+  following extensions are supported:
+
+  * bmp: RGB, bitmap format
+  * gif: RGB, GIF
+  * jpeg: RGB, Joint-Photograph Experts Group
+  * pbm: Grayscale, Portable binary map (images)
+  * pgm: Grayscale, Portable grayscale map
+  * png: RGB, Portable network graphics, indexed
+  * ppm: RGB, Portable pixel map
+  * tiff: RGB
+  * xcf: RGB, Gimp native format (**loading only**)
+
+* Videos: returns a sequence of frames (loaded in memory) for all data within a
+  video file. Returns 3D uint8 arrays. The following extensions are supported:
+
+  * avi
+  * dv
+  * filmstrip
+  * flv
+  * h261
+  * h263
+  * h264
+  * mov
+  * image2
+  * image2pipe
+  * m4v
+  * mjpeg
+  * mpeg
+  * mpegts
+  * ogg
+  * rawvideo
+  * rm
+  * rtsp
+  * yuv4mpegpipe
+
+* Other binary formats: 
+  
+  * Matlab (``.mat``), Matlab arrays, supports all integer, float and complex varieties [``matlab.array.binary``];
+  * bob3 (``.bindata``), supports single or double precision float numbers, only 1-D [``bob3.array.binary``];
+  * bob beta (``.bin``), supports all element types in |project| and any dimensionality [``bob.array.binary``] (*deprecated*);
+  * bob alpha (``.tensor``) [``tensor.array.binary``] (*deprecated*);
+  * **HDF5** (``.hdf5`` or ``.h5``) [``hdf5.array.binary``], is the **prefered
+    format for enconding |project| data** as discussed before.
+
+
+The extension chosen defines the recording format. For an overview of all
+extensions and codecs supported with your version of |project|, you can execute
+the command-line utitlity `info_table.py`:
+
 
 
 .. testcleanup:: *
