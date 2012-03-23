@@ -295,12 +295,51 @@ bob_modules = dir(__import__('bob'))
 has_libsvm = hasattr(__import__('bob').machine, 'SupportVector')
 has_visioner = hasattr(__import__('bob'), 'visioner')
 
+def smaller_than(v1, v2):
+  """Compares scipy/numpy version numbers"""
+
+  c1 = v1.split('.')
+  c2 = v2.split('.')[:len(c1)] #clip to the compared version
+  for i, k in enumerate(c2):
+    n1 = c1[i]
+    n2 = c2[i]
+    try:
+      n1 = int(n1)
+      n2 = int(n2)
+    except ValueError:
+      n1 = str(n1)
+      n2 = str(n2)
+    if n1 > n2: return False
+  return True
+
+# Some name mangling to find the correct sphinx manuals for some packages
+numpy_version = __import__('numpy').version.version
+if smaller_than(numpy_version, '1.5.z'):
+  numpy_version = '.'.join(numpy_version.split('.')[:-1]) + '.x'
+else:
+  numpy_version = '.'.join(numpy_version.split('.')[:-1]) + '.0'
+numpy_manual = 'http://docs.scipy.org/doc/numpy-%s/' % numpy_version
+
+scipy_version = __import__('scipy').version.version
+if smaller_than(scipy_version, '0.8.z'):
+  scipy_version = '.'.join(scipy_version.split('.')[:-1]) + '.x'
+else:
+  scipy_version = '.'.join(scipy_version.split('.')[:-1]) + '.0'
+scipy_manual = 'http://docs.scipy.org/doc/scipy-%s/reference/' % scipy_version
+
+sqlalc_version = __import__('sqlalchemy').__version__
+sqlalc_major = sqlalc_version.split('.')[1] in ('5', '6')
+if sqlalc_major in ('5', '6'):
+ sqlalc_manual = 'http://docs.sqlalchemy.org/en/rel_0_%s' % sqlalc_major
+else:
+ sqlalc_manual = 'http://docs.sqlalchemy.org/en/latest'
+
 # For inter-documentation mapping:
 intersphinx_mapping = {
   'http://docs.python.org/@PYTHON_VERSION@/': None,
-  'http://docs.scipy.org/doc/numpy/': None,
-  'http://docs.scipy.org/doc/scipy/reference/': None,
-  'http://docs.sqlalchemy.org/en/latest/': None,
+  numpy_manual: None,
+  scipy_manual: None,
+  sqlalc_manual: None,
   'http://matplotlib.sourceforge.net/': None,
   'http://opencv.itseez.com/': None,
   }
