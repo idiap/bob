@@ -216,6 +216,7 @@ the case when you write lists of variables to a dataset.
   [ 0.  1.  2.  3.  4.  5.  6.  7.  8.  9.]
   >>> print f.lread('arrayset', 2)
   [  0.   3.   6.   9.  12.  15.  18.  21.  24.  27.]
+  >>> del f
 
 This is how a ``h5dump`` of the file looks like:
 
@@ -241,7 +242,8 @@ Of course, you can also read the whole contents of the arrayset in a single
 shot:
 
 .. doctest::
-
+  
+  >>> f = bob.io.HDF5File('testfile2.hdf5', 'r')
   >>> print f.read('arrayset')
   [[  0.   1.   2.   3.   4.   5.   6.   7.   8.   9.]
    [  0.   2.   4.   6.   8.  10.  12.  14.  16.  18.]
@@ -356,9 +358,6 @@ through the :py:class:`bob.io.Array` container:
 Reading and writing image and video data
 ========================================
 
-Array transcoding
-=================
-
 |project| provides support to load and save data from many different
 file types including Matlab ``.mat`` files, various image file types and video
 data. File types and specific serialization and de-serialization is switched
@@ -371,14 +370,27 @@ choosing the right extension:
   >>> bob.io.save(my_image, 'testimage.jpg') # saving the image in jpeg format
   >>> my_copy_image = bob.io.load('testimage.jpg')
 
-These are the extensions and formats which are currently supported in |project|:
+As for reading the video files, although it is possible to read a video using the :py:meth:`bob.io.load()`, you should use the methods of the class :py:class:`bob.io.VideoReader` to read frame by frame and avoid overloading your machine's memory. In the following code you can see how to create a video and save it using the class :py:class:`bob.io.VideoWriter` and load it again using the class :py:class:`bob.io.VideoReader`.
 
-* Images: when reading and image, the returned values for RGB is (uint8 or uint16) 3D arrays, and for grayscale (uint8 or
-  uint16) 2-D arrays as indicated [``bob.image``]. Please notice that for
-  this Array codec, file extensions DO matter even if a codecname is specified,
-  as they are also used by ImageMagick to select the image loader/writer. The
-  following extensions are supported:
+.. doctest::
 
+  >>> width = 256; height = 256; # width and height of the new video
+  >>> framerate = 24
+  >>> outv = bob.io.VideoWriter('testvideo.avi', height, width, framerate) # output video
+  >>> for i in range(0, 100): newframe = numpy.uint8(numpy.random.random_integers(0,255,(3,256,256))); outv.append(newframe)  # adding a total of 100 random generated frames to the video 
+  >>> outv.close()
+  >>> input = bob.io.VideoReader('testvideo.avi')
+  >>> input.numberOfFrames
+  100
+  >>> inv = input.load()
+  >>> inv.shape
+  (100, 3, 256, 256)
+  >>> type(inv)
+  <type 'numpy.ndarray'>
+
+The loaded image files are 3D arrays (for RGB format) or 2D arrays (for greyscale) of type uint8 or uint16, while the loaded videos are sequences of frames i.e. 4D arrays of type uint8. All the extensions and formats for images and videos supported in |project| are given below:
+
+* Images:
   * bmp: RGB, bitmap format
   * gif: RGB, GIF
   * jpeg: RGB, Joint-Photograph Experts Group
@@ -389,9 +401,7 @@ These are the extensions and formats which are currently supported in |project|:
   * tiff: RGB
   * xcf: RGB, Gimp native format (**loading only**)
 
-* Videos: returns a sequence of frames (loaded in memory) for all data within a
-  video file. Returns 3D uint8 arrays. The following extensions are supported:
-
+* Videos:
   * avi
   * dv
   * filmstrip
@@ -412,32 +422,18 @@ These are the extensions and formats which are currently supported in |project|:
   * rtsp
   * yuv4mpegpipe
 
-* Other binary formats: 
+|project| supports a number of other binary formats, writing to which is performed using the :py:class:`bob.io.save()` with the right file extension passed as an argument, just as shown in the example above. These additional formats are:
   
   * Matlab (``.mat``), Matlab arrays, supports all integer, float and complex varieties [``matlab.array.binary``];
   * bob3 (``.bindata``), supports single or double precision float numbers, only 1-D [``bob3.array.binary``];
   * bob beta (``.bin``), supports all element types in |project| and any dimensionality [``bob.array.binary``] (*deprecated*);
   * bob alpha (``.tensor``) [``tensor.array.binary``] (*deprecated*);
-  * **HDF5** (``.hdf5`` or ``.h5``) [``hdf5.array.binary``], is the **prefered
-    format for enconding |project| data** as discussed before.
-
-
-The extension chosen defines the recording format. For an overview of all
-extensions and codecs supported with your version of |project|, you can execute
-the command-line utitlity `info_table.py`:
-
-
 
 .. testcleanup:: *
 
   import shutil
   os.chdir(current_directory)
   shutil.rmtree(temp_dir)
-
-
-Loading and saving images and videos
-====================================
-
 
 Loading and saving matlab data
 ==============================
