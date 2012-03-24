@@ -42,8 +42,8 @@ extensions = [
   'sphinx.ext.autosummary',
   'sphinx.ext.doctest',
   'sphinx.ext.intersphinx',
-  'matplotlib.sphinxext.only_directives',
-  'matplotlib.sphinxext.plot_directive',
+  #'matplotlib.sphinxext.plot_directive',
+  'bob.sphinxext.plot', # ours add source copying to install directory
   ]
 
 # The viewcode extension appeared only on Sphinx >= 1.0.0
