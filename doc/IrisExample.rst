@@ -167,24 +167,10 @@ Finally, to display the plot, do:
 
 You should see an image like this:
 
-.. only:: not latex
-
-  .. figure:: img/fisher-1st-comp.png
-    :alt: Reproduction of Fisher LDA on the Iris Dataset using |project|.
-    
-    Reproduction of Fisher LDA on the Iris Dataset using |project|.
-
-.. only:: latex
-
-  .. figure:: img/fisher-1st-comp.pdf
-    :alt: Reproduction of Fisher LDA on the Iris Dataset using |project|.
-    :scale: 80%
-    
-    Reproduction of Fisher LDA on the Iris Dataset using |project|.
+.. plot:: doc/plot/iris_lda.py
+  :include-source:
 
 .. include:: links.rst
-
-
 
 .. some references
 
