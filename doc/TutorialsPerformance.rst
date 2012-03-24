@@ -194,18 +194,8 @@ town. To plot a ROC curve, in possession of your **negatives** and
 
 You should see an image like the following one:
 
-.. plot::
-
-  >>> import numpy, bob, matplotlib
-  >>> from matplotlib import pyplot
-  >>> positives = numpy.random.normal(1,1,100)
-  >>> negatives = numpy.random.normal(-1,1,100)
-  >>> npoints = 100
-  >>> bob.measure.plot.roc(negatives, positives, npoints, color=(0,0,0), linestyle='-', label='test')
-  >>> pyplot.xlabel('FRR (%)')
-  >>> pyplot.ylabel('FAR (%)')
-  >>> pyplot.grid(True)
-  >>> pyplot.show()
+.. plot:: doc/plot/perf_roc.py
+  :include-source: True
 
 As can be observed, plotting methods live in the namespace
 :py:mod:`bob.measure.plot`. They work like `Matplotlib`_'s `plot()`_ method
@@ -240,20 +230,8 @@ A DET curve can be drawn using commands such as the ones for the ROC curve:
 
 This will produce an image like the following one:
 
-.. plot::
-
-  >>> import numpy, bob, matplotlib
-  >>> from matplotlib import pyplot
-  >>> positives = numpy.random.normal(1,1,100)
-  >>> negatives = numpy.random.normal(-1,1,100)
-  >>> npoints = 100
-  >>> bob.measure.plot.det(negatives, positives, npoints, color=(0,0,0), linestyle='-', label='test') # doctest: +SKIP
-  >>> bob.measure.plot.det_axis([0.1, 80, 0.1, 80])
-  >>> pyplot.xlabel('FRR (%)')
-  >>> pyplot.ylabel('FAR (%)')
-  >>> pyplot.grid(True)
-  >>> pyplot.show()
-
+.. plot:: doc/plot/perf_det.py
+  :include-source: True
 
 .. note::
 
@@ -289,18 +267,8 @@ slightly modified:
 
 This will produce an image like the following one:
 
-.. plot::
-
-  >>> import numpy, bob, matplotlib
-  >>> from matplotlib import pyplot
-  >>> dev_pos = numpy.random.normal(1,1,100)
-  >>> dev_neg = numpy.random.normal(-1,1,100)
-  >>> test_pos = numpy.random.normal(0.9,1,100)
-  >>> test_neg = numpy.random.normal(-1.1,1,100)
-  >>> npoints = 100
-  >>> bob.measure.plot.epc(dev_neg, dev_pos, test_neg, test_pos, npoints, color=(0,0,0), linestyle='-')
-  >>> pyplot.grid(True)
-  >>> pyplot.show()
+.. plot:: doc/plot/perf_epc.py
+  :include-source: True
 
 Fine-tunning
 ============
