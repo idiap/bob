@@ -325,7 +325,7 @@ Saving the :py:class:`bob.io.Array` is as easy, just call the
   >>> a.save('copy1.hdf5')
 
 Numpy ndarray shortcuts
-======================
+=======================
 
 To just load a :py:class:`numpy.ndarray` in memory, we have written a
 short cut that lives at :py:func:`bob.io.load` and saves you from going through
