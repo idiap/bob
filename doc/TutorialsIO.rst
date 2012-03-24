@@ -159,6 +159,7 @@ type information we need to write and read them correctly. Here is an example:
   >>> A = numpy.array(range(4), 'int8').reshape(2,2)
   >>> f = bob.io.HDF5File('testfile1.hdf5')
   >>> f.set('my_array', A)
+  >>> del f
 
 And the result of running ``h5dump`` on the file ``testfile3.hdf5`` should be:
 
@@ -198,6 +199,7 @@ be using :py:meth:`bob.io.HDF5File.lread()` instead. Here is an example:
   >>> print f.read('my_array') # reads the array
   [[0 1]
    [2 3]]
+  >>> del f
 
 Now let's look at an example where we have used
 :py:meth:`bob.io.HDF5File.append()` instead of
