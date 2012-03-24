@@ -238,7 +238,7 @@ A DET curve can be drawn using commands such as the ones for the ROC curve:
   >>> pyplot.grid(True)
   >>> pyplot.show() # doctest: +SKIP
 
-This will produce an mage like the following one:
+This will produce an image like the following one:
 
 .. plot::
 
@@ -287,7 +287,7 @@ slightly modified:
   >>> bob.measure.plot.epc(dev_neg, dev_pos, test_neg, test_pos, npoints, color=(0,0,0), linestyle='-') # doctest: +SKIP
   >>> pyplot.show() # doctest: +SKIP
 
-This will produce an mage like the following one:
+This will produce an image like the following one:
 
 .. plot::
 
