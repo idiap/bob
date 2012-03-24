@@ -42,6 +42,7 @@ extensions = [
   'sphinx.ext.autosummary',
   'sphinx.ext.doctest',
   'sphinx.ext.intersphinx',
+  'matplotlib.sphinxext.only_directives',
   'matplotlib.sphinxext.plot_directive',
   ]
 
