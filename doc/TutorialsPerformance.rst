@@ -107,10 +107,12 @@ defined in the first equation.
 
 .. testsetup:: *
 
-   import numpy
-   positives = numpy.random.normal(1,1,100)
-   negatives = numpy.random.normal(-1,1,100)
-   import bob
+  import numpy
+  positives = numpy.random.normal(1,1,100)
+  negatives = numpy.random.normal(-1,1,100)
+  import bob
+  import matplotlib
+  matplotlib.use('pdf') #non-interactive avoids exception on display
 
 Evaluation
 ----------
@@ -181,14 +183,14 @@ town. To plot a ROC curve, in possession of your **negatives** and
 
 .. doctest::
 
-  >>> import matplotlib.pyplot as mpl
+  >>> from matplotlib import pyplot
   >>> # we assume you have your negatives and positives already split
   >>> npoints = 100
   >>> bob.measure.plot.roc(negatives, positives, npoints, color=(0,0,0), linestyle='-', label='test') # doctest: +SKIP
-  >>> mpl.xlabel('FRR (%)') # doctest: +SKIP
-  >>> mpl.ylabel('FAR (%)') # doctest: +SKIP
-  >>> mpl.grid(True)
-  >>> mpl.show() # doctest: +SKIP
+  >>> pyplot.xlabel('FRR (%)') # doctest: +SKIP
+  >>> pyplot.ylabel('FAR (%)') # doctest: +SKIP
+  >>> pyplot.grid(True)
+  >>> pyplot.show() # doctest: +SKIP
 
 As can be observed, plotting methods live in the namespace
 :py:mod:`bob.measure.plot`. They work like `Matplotlib`_'s `plot()`_ method
@@ -211,14 +213,14 @@ A DET curve can be drawn using commands such as the ones for the ROC curve:
 
 .. doctest::
 
-  >>> import matplotlib.pyplot as mpl
+  >>> from matplotlib import pyplot
   >>> # we assume you have your negatives and positives already split
   >>> npoints = 100
   >>> bob.measure.plot.det(negatives, positives, npoints, color=(0,0,0), linestyle='-', label='test') # doctest: +SKIP
-  >>> mpl.xlabel('FRR (%)') # doctest: +SKIP
-  >>> mpl.ylabel('FAR (%)') # doctest: +SKIP
-  >>> mpl.grid(True)
-  >>> mpl.show() # doctest: +SKIP
+  >>> pyplot.xlabel('FRR (%)') # doctest: +SKIP
+  >>> pyplot.ylabel('FAR (%)') # doctest: +SKIP
+  >>> pyplot.grid(True)
+  >>> pyplot.show() # doctest: +SKIP
 
 .. note::
 
@@ -231,7 +233,7 @@ A DET curve can be drawn using commands such as the ones for the ROC curve:
   .. doctest::
 
     >>> #AFTER you plot the DET curve, just set the axis in this way:
-    >>> mpl.axis([bob.measure.ppndf(k/100.0) for k in (1, 40, 1, 40)]) # doctest: +SKIP
+    >>> pyplot.axis([bob.measure.ppndf(k/100.0) for k in (1, 40, 1, 40)]) # doctest: +SKIP
 
   We provide a convenient way for you to do the above in this module. So,
   optionally, you may use the ``bob.measure.plot.det_axis`` method like this:
@@ -250,7 +252,7 @@ slightly modified:
 .. doctest::
 
   >>> bob.measure.plot.epc(dev_neg, dev_pos, test_neg, test_pos, npoints, color=(0,0,0), linestyle='-') # doctest: +SKIP
-  >>> mpl.show() # doctest: +SKIP
+  >>> pyplot.show() # doctest: +SKIP
 
 Fine-tunning
 ============
