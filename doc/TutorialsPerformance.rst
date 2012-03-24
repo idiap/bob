@@ -192,6 +192,21 @@ town. To plot a ROC curve, in possession of your **negatives** and
   >>> pyplot.grid(True)
   >>> pyplot.show() # doctest: +SKIP
 
+You should see an image like the following one:
+
+.. plot::
+
+  >>> import numpy, bob, matplotlib
+  >>> from matplotlib import pyplot
+  >>> positives = numpy.random.normal(1,1,100)
+  >>> negatives = numpy.random.normal(-1,1,100)
+  >>> npoints = 100
+  >>> bob.measure.plot.roc(negatives, positives, npoints, color=(0,0,0), linestyle='-', label='test')
+  >>> pyplot.xlabel('FRR (%)')
+  >>> pyplot.ylabel('FAR (%)')
+  >>> pyplot.grid(True)
+  >>> pyplot.show()
+
 As can be observed, plotting methods live in the namespace
 :py:mod:`bob.measure.plot`. They work like `Matplotlib`_'s `plot()`_ method
 itself, except that instead of receiving the x and y point coordinates as
@@ -217,10 +232,28 @@ A DET curve can be drawn using commands such as the ones for the ROC curve:
   >>> # we assume you have your negatives and positives already split
   >>> npoints = 100
   >>> bob.measure.plot.det(negatives, positives, npoints, color=(0,0,0), linestyle='-', label='test') # doctest: +SKIP
+  >>> bob.measure.plot.det_axis([0.01, 40, 0.01, 40])
   >>> pyplot.xlabel('FRR (%)') # doctest: +SKIP
   >>> pyplot.ylabel('FAR (%)') # doctest: +SKIP
   >>> pyplot.grid(True)
   >>> pyplot.show() # doctest: +SKIP
+
+This will produce an mage like the following one:
+
+.. plot::
+
+  >>> import numpy, bob, matplotlib
+  >>> from matplotlib import pyplot
+  >>> positives = numpy.random.normal(1,1,100)
+  >>> negatives = numpy.random.normal(-1,1,100)
+  >>> npoints = 100
+  >>> bob.measure.plot.det(negatives, positives, npoints, color=(0,0,0), linestyle='-', label='test') # doctest: +SKIP
+  >>> bob.measure.plot.det_axis([0.1, 80, 0.1, 80])
+  >>> pyplot.xlabel('FRR (%)')
+  >>> pyplot.ylabel('FAR (%)')
+  >>> pyplot.grid(True)
+  >>> pyplot.show()
+
 
 .. note::
 
@@ -253,6 +286,21 @@ slightly modified:
 
   >>> bob.measure.plot.epc(dev_neg, dev_pos, test_neg, test_pos, npoints, color=(0,0,0), linestyle='-') # doctest: +SKIP
   >>> pyplot.show() # doctest: +SKIP
+
+This will produce an mage like the following one:
+
+.. plot::
+
+  >>> import numpy, bob, matplotlib
+  >>> from matplotlib import pyplot
+  >>> dev_pos = numpy.random.normal(1,1,100)
+  >>> dev_neg = numpy.random.normal(-1,1,100)
+  >>> test_pos = numpy.random.normal(0.9,1,100)
+  >>> test_neg = numpy.random.normal(-1.1,1,100)
+  >>> npoints = 100
+  >>> bob.measure.plot.epc(dev_neg, dev_pos, test_neg, test_pos, npoints, color=(0,0,0), linestyle='-')
+  >>> pyplot.grid(True)
+  >>> pyplot.show()
 
 Fine-tunning
 ============
