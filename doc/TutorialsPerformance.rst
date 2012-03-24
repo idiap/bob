@@ -222,7 +222,7 @@ A DET curve can be drawn using commands such as the ones for the ROC curve:
   >>> # we assume you have your negatives and positives already split
   >>> npoints = 100
   >>> bob.measure.plot.det(negatives, positives, npoints, color=(0,0,0), linestyle='-', label='test') # doctest: +SKIP
-  >>> bob.measure.plot.det_axis([0.01, 40, 0.01, 40])
+  >>> bob.measure.plot.det_axis([0.01, 40, 0.01, 40]) # doctest: +SKIP
   >>> pyplot.xlabel('FRR (%)') # doctest: +SKIP
   >>> pyplot.ylabel('FAR (%)') # doctest: +SKIP
   >>> pyplot.grid(True)
