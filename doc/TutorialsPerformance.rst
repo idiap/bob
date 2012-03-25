@@ -194,8 +194,8 @@ town. To plot a ROC curve, in possession of your **negatives** and
 
 You should see an image like the following one:
 
-.. plot:: doc/plot/perf_roc.py
-  :include-source: True
+.. plot:: plot/perf_roc.py
+  :include-source: False
 
 As can be observed, plotting methods live in the namespace
 :py:mod:`bob.measure.plot`. They work like `Matplotlib`_'s `plot()`_ method
@@ -230,8 +230,8 @@ A DET curve can be drawn using commands such as the ones for the ROC curve:
 
 This will produce an image like the following one:
 
-.. plot:: doc/plot/perf_det.py
-  :include-source: True
+.. plot:: plot/perf_det.py
+  :include-source: False
 
 .. note::
 
@@ -267,8 +267,8 @@ slightly modified:
 
 This will produce an image like the following one:
 
-.. plot:: doc/plot/perf_epc.py
-  :include-source: True
+.. plot:: plot/perf_epc.py
+  :include-source: False
 
 Fine-tunning
 ============

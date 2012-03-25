@@ -208,10 +208,10 @@ except ImportError:
 # Registration hook
 #------------------------------------------------------------------------------
 
-def plot_directive(name, arguments, options, content, lineno,
-                   content_offset, block_text, state, state_machine):
+def plot(name, arguments, options, content, lineno,
+    content_offset, block_text, state, state_machine):
     return run(arguments, content, options, state_machine, state, lineno)
-plot_directive.__doc__ = __doc__
+plot.__doc__ = __doc__
 
 def _option_boolean(arg):
     if not arg or not arg.strip():
@@ -279,7 +279,7 @@ def setup(app):
                'encoding': directives.encoding
                }
 
-    app.add_directive('plot', plot_directive, True, (0, 2, False), **options)
+    app.add_directive('plot', plot, True, (0, 2, False), **options)
     app.add_config_value('plot_pre_code', None, True)
     app.add_config_value('plot_include_source', False, True)
     app.add_config_value('plot_formats', ['png', 'hires.png', 'pdf'], True)
@@ -614,7 +614,7 @@ def run(arguments, content, options, state_machine, state, lineno):
 
     if len(arguments):
         if not config.plot_basedir:
-            source_file_name = os.path.join(setup.app.builder.srcdir,
+            source_file_name = os.path.join(rst_dir,
                                             directives.uri(arguments[0]))
         else:
             source_file_name = os.path.join(setup.confdir, config.plot_basedir,
@@ -661,15 +661,14 @@ def run(arguments, content, options, state_machine, state, lineno):
             is_doctest = True
 
     # determine output directory name fragment
-    source_rel_name = relpath(source_file_name, setup.confdir)
+    source_rel_name = relpath(source_file_name, setup.app.builder.srcdir)
     source_rel_dir = os.path.dirname(source_rel_name)
     while source_rel_dir.startswith(os.path.sep):
         source_rel_dir = source_rel_dir[1:]
 
     # build_dir: where to place output files (temporarily)
     build_dir = os.path.join(os.path.dirname(setup.app.doctreedir),
-                             'plot_directive',
-                             source_rel_dir)
+                             'plot', source_rel_dir)
     # get rid of .. in paths, also changes pathsep
     # see note in Python docs for warning about symbolic links on Windows.
     # need to compare source and dest paths at end
@@ -685,7 +684,7 @@ def run(arguments, content, options, state_machine, state, lineno):
         os.makedirs(dest_dir) # no problem here for me, but just use built-ins
 
     # how to link to files from the RST file
-    dest_dir_link = os.path.join(relpath(setup.confdir, rst_dir),
+    dest_dir_link = os.path.join(relpath(setup.app.builder.srcdir, rst_dir),
                                  source_rel_dir).replace(os.path.sep, '/')
     build_dir_link = relpath(build_dir, rst_dir).replace(os.path.sep, '/')
     source_link = dest_dir_link + '/' + output_base + source_ext
@@ -767,6 +766,10 @@ def run(arguments, content, options, state_machine, state, lineno):
                 destimg = os.path.join(dest_dir, os.path.basename(fn))
                 if fn != destimg:
                     shutil.copyfile(fn, destimg)
+        target_name = os.path.join(dest_dir, output_base + source_ext)
+        f = open(target_name, 'w')
+        f.write(unescape_doctest(code_piece))
+        f.close()
 
     # copy script (if necessary)
     if source_file_name == rst_file:

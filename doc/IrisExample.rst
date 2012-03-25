@@ -167,7 +167,7 @@ Finally, to display the plot, do:
 
 You should see an image like this:
 
-.. plot:: doc/plot/iris_lda.py
+.. plot:: plot/iris_lda.py
 
 .. include:: links.rst
 
