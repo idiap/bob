@@ -194,8 +194,6 @@ be using :py:meth:`bob.io.HDF5File.lread()` instead. Here is an example:
   >>> f = bob.io.HDF5File('testfile1.hdf5', 'r') #read only
   >>> f.read('my_integer') #reads integer
   5
-  >>> f.read('my_float') # reads float
-  3.1415999999999999
   >>> print f.read('my_array') # reads the array
   [[0 1]
    [2 3]]
