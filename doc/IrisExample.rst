@@ -169,6 +169,51 @@ You should see an image like this:
 
 .. plot:: plot/iris_lda.py
 
+Measuring Performance
+---------------------
+
+You can measure the performance of the system on classifying, say, *Iris
+Virginica* as compared to the other two variants. We can use the functions in
+:py:mod:`bob.measure` for that purpose. Let's first find a threshold that
+separates this variant from the others. We choose to find the threshold in the
+point where the relative error rate considering both *Versicolor* and *Setosa*
+variants is the same as for the *Virginica* one.
+
+.. doctest:: iris
+
+  >>> negatives = numpy.vstack([output['setosa'], output['versicolor']])[:,0]
+  >>> positives = output['virginica'][:,0]
+  >>> t = bob.measure.eerThreshold(negatives, positives)
+
+With the threshold at hand, we can estimate the number of correctly classified
+*negatives* (or true-rejections) and *positives* (or true-accepts). Let's
+translate that: plants from the *Versicolor* and *Setosa* variants that have
+the first LDA component smaller than the threshold (so called *negatives* at
+this point) and plants from the *Virginica* variant that have the first LDA
+component greater than the threshold defined (the *positives*). To calculate
+the rates, we just use :py:mod:`bob.measure` again:
+
+.. doctest:: iris
+
+  >>> true_rejects = bob.measure.correctlyClassifiedNegatives(negatives, t)
+  >>> true_accepts = bob.measure.correctlyClassifiedPositives(positives, t)
+
+From that you can calculate, for example, the number of misses on the Equal
+Error Rate:
+
+.. doctest:: iris
+
+  >>> numpy.count_nonzero(true_rejects)
+  98 
+  >>> numpy.count_nonzero(true_accepts)
+  49
+
+You can also plot an R.O.C. curve as explained at :doc:`TutorialsPerformance`.
+Here is the full code that will lead you to the following plot:
+
+.. plot:: plot/iris_lda_roc.py
+  :include-source: True
+
 .. include:: links.rst
 
 .. some references
