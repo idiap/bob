@@ -1,3 +1,10 @@
+bob (1.0alpha1-0ubuntu10) precise; urgency=low
+
+  * Documentation near to completion
+  * Remove check on precision
+
+ -- Biometrics Group <biometric@idiap.ch>  Fri, 25 Mar 2012 21:42:00 +0200
+
 bob (1.0alpha1-0ubuntu9) precise; urgency=low
 
   * Do not include the visioner
