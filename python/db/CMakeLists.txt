@@ -120,9 +120,13 @@ bob_python_add_dependent_test(db-multipie-checkfiles python-db-multipie-create
 
 # Nuaa database driver tests.
 bob_python_add_unittest(db lib/test/nuaa.py main)
+bob_python_add_test(db-nuaa-dumplist dbmanage.py nuaa dumplist --self-test)
+bob_python_add_test(db-nuaa-checkfiles dbmanage.py nuaa checkfiles --self-test)
 
 # CASIA-FASD database driver tests.
 bob_python_add_unittest(db lib/test/casia_fasd.py main)
+bob_python_add_test(db-casia_fasd-dumplist dbmanage.py casia_fasd dumplist --self-test)
+bob_python_add_test(db-casia_fasd-checkfiles dbmanage.py casia_fasd checkfiles --self-test)
 
 # SCface database driver tests.
 bob_python_add_dependent_test(db-scface-dumplist python-db-scface-create
