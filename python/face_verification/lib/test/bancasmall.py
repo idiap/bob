@@ -163,7 +163,7 @@ def stats_computation(img_input, img_output, ubm):
   """Computes GMMStats against a world model"""
   
   ubm = bob.machine.GMMMachine(bob.io.HDF5File(ubm))
-  gmmstats = bob.machine.GMMStats(ubm.DimC, ubm.DimD)
+  gmmstats = bob.machine.GMMStats(ubm.dim_c, ubm.dim_d)
 
   # process the 'dictionary of files'
   for k in img_input:
@@ -171,7 +171,7 @@ def stats_computation(img_input, img_output, ubm):
     img = bob.io.Arrayset( str(img_input[k]) )
     # accumulates statistics
     gmmstats.init()
-    ubm.accStatistics(img, gmmstats)
+    ubm.acc_statistics(img, gmmstats)
     # save statistics
     gmmstats.save(bob.io.HDF5File( str(img_output[k]) ) ) 
   
@@ -244,7 +244,7 @@ def trainGMM(data, n_gaussians=32, iterk=25, iterg=25, convergence_threshold=1e-
   # Train the KMeansTrainer
   kmeansTrainer.train(kmeans, normalizedAr)
 
-  [variances, weights] = kmeans.getVariancesAndWeightsForEachCluster(normalizedAr)
+  [variances, weights] = kmeans.get_variances_and_weights_for_each_cluster(normalizedAr)
   means = kmeans.means
 
   # Undo normalization
@@ -254,7 +254,7 @@ def trainGMM(data, n_gaussians=32, iterk=25, iterg=25, convergence_threshold=1e-
 
   # Initialize gmm
   gmm.means = means
-  gmm.setVarianceThresholds(variance_threshold)
+  gmm.set_variance_thresholds(variance_threshold)
   gmm.variances = variances
   gmm.weights = weights
 
@@ -273,7 +273,7 @@ def adaptGMM(data, prior_gmm, iterg=25, convergence_threshold=1e-5, variance_thr
   ar=data
 
   # Load prior gmm
-  prior_gmm.setVarianceThresholds(variance_threshold)
+  prior_gmm.set_variance_thresholds(variance_threshold)
 
   # Create trainer
   if responsibilities_threshold == 0.:
@@ -289,7 +289,7 @@ def adaptGMM(data, prior_gmm, iterg=25, convergence_threshold=1e-5, variance_thr
 
   # Load gmm
   gmm = bob.machine.GMMMachine(prior_gmm)
-  gmm.setVarianceThresholds(variance_threshold)
+  gmm.set_variance_thresholds(variance_threshold)
 
   # Train gmm
   trainer.train(gmm, ar)
@@ -338,9 +338,9 @@ class GMMExperiment:
           stats = bob.machine.GMMStats(bob.io.HDF5File(str(stat_path)))
         else:
           data = loadData([f])
-          stats = bob.machine.GMMStats(self.wm.DimC, self.wm.DimD)
+          stats = bob.machine.GMMStats(self.wm.dim_c, self.wm.dim_d)
           stats.init()
-          self.wm.accStatistics(data, stats)
+          self.wm.acc_statistics(data, stats)
           stats.save(bob.io.HDF5File(str(stat_path)))
 
         self.znorm_tests.append(stats)
@@ -351,7 +351,7 @@ class GMMExperiment:
       i += 1
 
 
-    self.D = bob.machine.linearScoring(self.tnorm_models, self.wm, self.znorm_tests)
+    self.D = bob.machine.linear_scoring(self.tnorm_models, self.wm, self.znorm_tests)
     tnorm_real_ids = []
     for c in tnorm_clients:
       r_id = self.db.get_real_id_from_tnorm_id(c)
@@ -407,11 +407,11 @@ class GMMExperiment:
       list_stats=[]
       for f in files :
         data = loadData([f])
-        stats = bob.machine.GMMStats(self.wm.DimC, self.wm.DimD)
-        self.wm.accStatistics(data, stats)
+        stats = bob.machine.GMMStats(self.wm.dim_c, self.wm.dim_d)
+        self.wm.acc_statistics(data, stats)
         list_stats.append(stats)
       
-      scores = bob.machine.linearScoring(models, self.wm, list_stats)
+      scores = bob.machine.linear_scoring(models, self.wm, list_stats)
     else:
       scores = numpy.ndarray((len(models), len(files)), 'float64')
       
@@ -436,9 +436,9 @@ class GMMExperiment:
       n_blocks = 4161
       A = scores / n_blocks
       #print "A: " + str(A)
-      B = bob.machine.linearScoring(models, self.wm, self.znorm_tests) / n_blocks
+      B = bob.machine.linear_scoring(models, self.wm, self.znorm_tests) / n_blocks
       #print "B: " + str(B)
-      C = bob.machine.linearScoring(self.tnorm_models, self.wm, list_stats) / n_blocks 
+      C = bob.machine.linear_scoring(self.tnorm_models, self.wm, list_stats) / n_blocks 
       #print "C: " + str(C)
       scores = bob.machine.ztnorm(A, B, C, self.D/n_blocks, self.D_sameValue)
     return scores
@@ -650,9 +650,9 @@ class TestBancaSmall(unittest.TestCase):
     Vinit = bob.io.load(os.path.join('bancasmall', 'jfa_Vinit.hdf5'))
     Uinit = bob.io.load(os.path.join('bancasmall', 'jfa_Uinit.hdf5'))
     Dinit = bob.io.load(os.path.join('bancasmall', 'jfa_Dinit.hdf5'))
-    base_machine.V = Vinit
-    base_machine.U = Uinit
-    base_machine.D = Dinit
+    base_machine.v = Vinit
+    base_machine.u = Uinit
+    base_machine.d = Dinit
     # Load Training Data
     world_clients = db.clients(protocol=protocol, groups="world")
     gmmstats = []

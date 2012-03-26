@@ -111,18 +111,18 @@ void bind_machine_kmeans()
     .def(init<io::HDF5File&>(args("config")))
     .def(self == self)
     .add_property("means", &py_getMeans, &py_setMeans, "The mean vectors")
-    .add_property("DimD", &mach::KMeansMachine::getNInputs, "Number of inputs")
-    .add_property("DimC", &mach::KMeansMachine::getNMeans, "Number of means (k)")
+    .add_property("dim_d", &mach::KMeansMachine::getNInputs, "Number of inputs")
+    .add_property("dim_c", &mach::KMeansMachine::getNMeans, "Number of means (k)")
     .def("resize", &mach::KMeansMachine::resize, (arg("n_means"), arg("n_inputs")), "Resize the number of means and inputs")
-    .def("getMean", &py_getMean, (arg("i"), arg("mean")), "Get the i'th mean")
-    .def("setMean", &py_setMean, (arg("i"), arg("mean")), "Set the i'th mean")
-    .def("getDistanceFromMean", &py_getDistanceFromMean, (arg("x"), arg("i")),
+    .def("get_mean", &py_getMean, (arg("i"), arg("mean")), "Get the i'th mean")
+    .def("set_mean", &py_setMean, (arg("i"), arg("mean")), "Set the i'th mean")
+    .def("get_distance_from_mean", &py_getDistanceFromMean, (arg("x"), arg("i")),
         "Return the power of two of the Euclidean distance of the sample, x, to the i'th mean")
-    .def("getClosestMean", &py_getClosestMean, (arg("x")),
+    .def("get_closest_mean", &py_getClosestMean, (arg("x")),
         "Calculate the index of the mean that is closest (in terms of Euclidean distance) to the data sample, x")
-    .def("getMinDistance", &py_getMinDistance, (arg("input")),
+    .def("get_min_distance", &py_getMinDistance, (arg("input")),
         "Output the minimum distance between the input and one of the means")
-    .def("getVariancesAndWeightsForEachCluster", &py_getVariancesAndWeightsForEachCluster, (arg("machine"), arg("data")),
+    .def("get_variances_and_weights_for_each_cluster", &py_getVariancesAndWeightsForEachCluster, (arg("machine"), arg("data")),
         "For each mean, find the subset of the samples that is closest to that mean, and calculate\n"
         "1) the variance of that subset (the cluster variance)\n"
         "2) the proportion of the samples represented by that subset (the cluster weight)")

@@ -46,22 +46,22 @@ class JFAMachineTest(unittest.TestCase):
     V = numpy.array([[6, 5], [4, 3], [2, 1], [1, 2], [3, 4], [5, 6]], 'float64')
     d = numpy.array([0, 1, 0, 1, 0, 1], 'float64')
     m = bob.machine.JFABaseMachine(ubm)
-    self.assertTrue( m.DimRu == 1)
-    self.assertTrue( m.DimRv == 1)
+    self.assertTrue( m.dim_ru == 1)
+    self.assertTrue( m.dim_rv == 1)
 
     # Checks for correctness
     m.resize(2,2) 
-    m.U = U
-    m.V = V
-    m.D = d 
-    self.assertTrue( (m.U == U).all() )
-    self.assertTrue( (m.V == V).all() )
-    self.assertTrue( (m.D == d).all() )
-    self.assertTrue( m.DimC == 2)
-    self.assertTrue( m.DimD == 3)
-    self.assertTrue( m.DimCD == 6)
-    self.assertTrue( m.DimRu == 2)
-    self.assertTrue( m.DimRv == 2)
+    m.u = U
+    m.v = V
+    m.d = d 
+    self.assertTrue( (m.u == U).all() )
+    self.assertTrue( (m.v == V).all() )
+    self.assertTrue( (m.d == d).all() )
+    self.assertTrue( m.dim_c == 2)
+    self.assertTrue( m.dim_d == 3)
+    self.assertTrue( m.dim_cd == 6)
+    self.assertTrue( m.dim_ru == 2)
+    self.assertTrue( m.dim_rv == 2)
    
     # Saves and loads
     filename = str(tempfile.mkstemp(".hdf5")[1])
@@ -89,9 +89,9 @@ class JFAMachineTest(unittest.TestCase):
     V = numpy.array([[6, 5], [4, 3], [2, 1], [1, 2], [3, 4], [5, 6]], 'float64')
     d = numpy.array([0, 1, 0, 1, 0, 1], 'float64')
     base = bob.machine.JFABaseMachine(ubm,2,2)
-    base.U = U
-    base.V = V
-    base.D = d 
+    base.u = U
+    base.v = V
+    base.d = d 
 
     # Creates a JFAMachine
     y = numpy.array([1,2], 'float64')
@@ -99,11 +99,11 @@ class JFAMachineTest(unittest.TestCase):
     m = bob.machine.JFAMachine(base)
     m.y = y
     m.z = z
-    self.assertTrue( m.DimC == 2)
-    self.assertTrue( m.DimD == 3)
-    self.assertTrue( m.DimCD == 6)
-    self.assertTrue( m.DimRu == 2)
-    self.assertTrue( m.DimRv == 2)
+    self.assertTrue( m.dim_c == 2)
+    self.assertTrue( m.dim_d == 3)
+    self.assertTrue( m.dim_cd == 6)
+    self.assertTrue( m.dim_ru == 2)
+    self.assertTrue( m.dim_rv == 2)
     self.assertTrue( (m.y == y).all() )
     self.assertTrue( (m.z == z).all() )
 
@@ -122,10 +122,10 @@ class JFAMachineTest(unittest.TestCase):
     sumpx = numpy.array([[1., 2., 3.], [4., 5., 6.]], 'float64')
     sumpxx = numpy.array([[10., 20., 30.], [40., 50., 60.]], 'float64')
     gs.log_likelihood = log_likelihood
-    gs.T = T
+    gs.t = T
     gs.n = n
-    gs.sumPx = sumpx
-    gs.sumPxx = sumpxx
+    gs.sum_px = sumpx
+    gs.sum_pxx = sumpxx
 
     # Forward GMMStats and check estimated value of the x speaker factor
     eps = 1e-10
@@ -154,9 +154,9 @@ class JFAMachineTest(unittest.TestCase):
     V = numpy.array([[0], [0], [0], [0], [0], [0]], 'float64')
     d = numpy.array([0, 1, 0, 1, 0, 1], 'float64')
     base = bob.machine.JFABaseMachine(ubm,2)
-    base.U = U
-    base.V = V
-    base.D = d
+    base.u = U
+    base.v = V
+    base.d = d
 
     # Creates a JFAMachine
     z = numpy.array([3,4,1,2,0,1], 'float64')
@@ -164,11 +164,11 @@ class JFAMachineTest(unittest.TestCase):
     m = bob.machine.JFAMachine(base)
     m.y = y
     m.z = z
-    self.assertTrue( m.DimC == 2)
-    self.assertTrue( m.DimD == 3)
-    self.assertTrue( m.DimCD == 6)
-    self.assertTrue( m.DimRu == 2)
-    self.assertTrue( m.DimRv == 1)
+    self.assertTrue( m.dim_c == 2)
+    self.assertTrue( m.dim_d == 3)
+    self.assertTrue( m.dim_cd == 6)
+    self.assertTrue( m.dim_ru == 2)
+    self.assertTrue( m.dim_rv == 1)
     self.assertTrue( (m.z == z).all() )
 
     # Saves and loads
@@ -186,10 +186,10 @@ class JFAMachineTest(unittest.TestCase):
     sumpx = numpy.array([[1., 2., 3.], [4., 5., 6.]], 'float64')
     sumpxx = numpy.array([[10., 20., 30.], [40., 50., 60.]], 'float64')
     gs.log_likelihood = log_likelihood
-    gs.T = T
+    gs.t = T
     gs.n = n
-    gs.sumPx = sumpx
-    gs.sumPxx = sumpxx
+    gs.sum_px = sumpx
+    gs.sum_pxx = sumpxx
 
     # Forward GMMStats and check estimated value of the x speaker factor
     eps = 1e-10

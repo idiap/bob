@@ -41,24 +41,24 @@ class KMeansMachineTest(unittest.TestCase):
     # Initializes a KMeansMachine
     km = bob.machine.KMeansMachine(2,3)
     km.means = means
-    self.assertTrue( km.DimC == 2 )
-    self.assertTrue( km.DimD == 3 )
+    self.assertTrue( km.dim_c == 2 )
+    self.assertTrue( km.dim_d == 3 )
 
     # Sets and gets
     self.assertTrue( (km.means == means).all() )
-    self.assertTrue( (km.getMean(0) == means[0,:]).all() )
-    self.assertTrue( (km.getMean(1) == means[1,:]).all() )
-    km.setMean(0, mean)
-    self.assertTrue( (km.getMean(0) == mean).all() )
+    self.assertTrue( (km.get_mean(0) == means[0,:]).all() )
+    self.assertTrue( (km.get_mean(1) == means[1,:]).all() )
+    km.set_mean(0, mean)
+    self.assertTrue( (km.get_mean(0) == mean).all() )
 
     # Distance and closest mean
     eps = 1e-10
-    self.assertTrue( equals( km.getDistanceFromMean(mean, 0), 0, eps) )
-    self.assertTrue( equals( km.getDistanceFromMean(mean, 1), 6, eps) )
-    (index, dist) = km.getClosestMean(mean)
+    self.assertTrue( equals( km.get_distance_from_mean(mean, 0), 0, eps) )
+    self.assertTrue( equals( km.get_distance_from_mean(mean, 1), 6, eps) )
+    (index, dist) = km.get_closest_mean(mean)
     self.assertTrue( index == 0)
     self.assertTrue( equals( dist, 0, eps) )
-    self.assertTrue( equals( km.getMinDistance(mean), 0, eps) )
+    self.assertTrue( equals( km.get_min_distance(mean), 0, eps) )
 
     # Loads and saves
     filename = str(tempfile.mkstemp(".hdf5")[1])
@@ -68,8 +68,8 @@ class KMeansMachineTest(unittest.TestCase):
 
     # Resize 
     km.resize(4,5)
-    self.assertTrue( km.DimC == 4 )
-    self.assertTrue( km.DimD == 5 )
+    self.assertTrue( km.dim_c == 4 )
+    self.assertTrue( km.dim_d == 5 )
 
     # Clean-up
     os.unlink(filename)

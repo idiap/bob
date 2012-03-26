@@ -228,10 +228,10 @@ void bind_machine_gmm()
     .def(init<io::HDF5File&>(args("config")))
     .def(self == self)
     .def_readwrite("log_likelihood", &mach::GMMStats::log_likelihood, "The accumulated log likelihood of all samples")
-    .def_readwrite("T", &mach::GMMStats::T, "The accumulated number of samples")
+    .def_readwrite("t", &mach::GMMStats::T, "The accumulated number of samples")
     .add_property("n", &py_gmmstats_getN, &py_gmmstats_setN, "For each Gaussian, the accumulated sum of responsibilities, i.e. the sum of P(gaussian_i|x)")
-    .add_property("sumPx", &py_gmmstats_getSumpx, &py_gmmstats_setSumpx, "For each Gaussian, the accumulated sum of responsibility times the sample ")
-    .add_property("sumPxx", &py_gmmstats_getSumpxx, &py_gmmstats_setSumpxx, "For each Gaussian, the accumulated sum of responsibility times the sample squared")
+    .add_property("sum_px", &py_gmmstats_getSumpx, &py_gmmstats_setSumpx, "For each Gaussian, the accumulated sum of responsibility times the sample ")
+    .add_property("sum_pxx", &py_gmmstats_getSumpxx, &py_gmmstats_setSumpxx, "For each Gaussian, the accumulated sum of responsibility times the sample squared")
     .def("resize", &mach::GMMStats::resize, args("n_gaussians", "n_inputs"),
          " Allocates space for the statistics and resets to zero.")
     .def("init", &mach::GMMStats::init, "Resets statistics to zero.")
@@ -249,43 +249,43 @@ void bind_machine_gmm()
     .def(init<mach::GMMMachine&>())
     .def(init<io::HDF5File&>(args("config")))
     .def(self == self)
-    .add_property("DimD", &mach::GMMMachine::getNInputs, &mach::GMMMachine::setNInputs, "The feature dimensionality D")
-    .add_property("DimC", &mach::GMMMachine::getNGaussians, "The number of Gaussian components C")
+    .add_property("dim_d", &mach::GMMMachine::getNInputs, &mach::GMMMachine::setNInputs, "The feature dimensionality D")
+    .add_property("dim_c", &mach::GMMMachine::getNGaussians, "The number of Gaussian components C")
     .add_property("weights", &py_gmmmachine_getWeights, &py_gmmmachine_setWeights, "The weights (also known as \"mixing coefficients\")")
     .add_property("means", &py_gmmmachine_getMeans, &py_gmmmachine_setMeans, "The means of the gaussians")
-    .add_property("meanSupervector", &py_gmmmachine_getMeanSupervector, &py_gmmmachine_setMeanSupervector,
+    .add_property("mean_supervector", &py_gmmmachine_getMeanSupervector, &py_gmmmachine_setMeanSupervector,
                   "The mean supervector of the GMMMachine "
                   "(concatenation of the mean vectors of each Gaussian of the GMMMachine")
     .add_property("variances", &py_gmmmachine_getVariances, &py_gmmmachine_setVariances, "The (diagonal) variances of the Gaussians")
-    .add_property("varianceSupervector", &py_gmmmachine_getVarianceSupervector, &py_gmmmachine_setVarianceSupervector,
+    .add_property("variance_supervector", &py_gmmmachine_getVarianceSupervector, &py_gmmmachine_setVarianceSupervector,
                   "The variance supervector of the GMMMachine "
                   "(concatenation of the variance vectors of each Gaussian of the GMMMachine")
-    .add_property("varianceThresholds", &py_gmmmachine_getVarianceThresholds, &py_gmmmachine_setVarianceThresholds,
+    .add_property("variance_thresholds", &py_gmmmachine_getVarianceThresholds, &py_gmmmachine_setVarianceThresholds,
                   "The variance flooring thresholds for each Gaussian in each dimension")
     .def("resize", &mach::GMMMachine::resize, args("n_gaussians", "n_inputs"),
          "Reset the input dimensionality, and the number of Gaussian components.\n"
          "Initialises the weights to uniform distribution.")
-    .def("setVarianceThresholds", &py_gmmmachine_setVarianceThresholdsOther, args("variance_threshold"),
+    .def("set_variance_thresholds", &py_gmmmachine_setVarianceThresholdsOther, args("variance_threshold"),
          "Set the variance flooring thresholds in each dimension to the same vector for all Gaussian components if the argument is a 1D numpy arrray, and equal for all Gaussian components and dimensions if the parameter is a scalar.")
-    .def("getGaussian", &mach::GMMMachine::getGaussian, args("i"),
+    .def("get_gaussian", &mach::GMMMachine::getGaussian, args("i"),
          "Get the specified Gaussian component. An exception is thrown if i is out of range.")
 
-    .def("logLikelihood", &py_gmmmachine_loglikelihoodA, args("self", "x", "log_weighted_gaussian_likelihoods"),
+    .def("log_likelihood", &py_gmmmachine_loglikelihoodA, args("self", "x", "log_weighted_gaussian_likelihoods"),
          "Output the log likelihood of the sample, x, i.e. log(p(x|mach::GMMMachine)). Inputs are checked.")
-    .def("logLikelihood_", &py_gmmmachine_loglikelihoodA_, args("self", "x", "log_weighted_gaussian_likelihoods"),
+    .def("log_likelihood_", &py_gmmmachine_loglikelihoodA_, args("self", "x", "log_weighted_gaussian_likelihoods"),
          "Output the log likelihood of the sample, x, i.e. log(p(x|mach::GMMMachine)). Inputs are NOT checked.")
-    .def("logLikelihood", &py_gmmmachine_loglikelihoodB, args("self", "x"),
+    .def("log_likelihood", &py_gmmmachine_loglikelihoodB, args("self", "x"),
          " Output the log likelihood of the sample, x, i.e. log(p(x|GMM)). Inputs are checked.")
-    .def("logLikelihood_", &py_gmmmachine_loglikelihoodB_, args("self", "x"),
+    .def("log_likelihood_", &py_gmmmachine_loglikelihoodB_, args("self", "x"),
          " Output the log likelihood of the sample, x, i.e. log(p(x|GMM)). Inputs are checked.")
-    .def("accStatistics", &py_gmmmachine_accStatistics, args("self", "x", "stats"),
+    .def("acc_statistics", &py_gmmmachine_accStatistics, args("self", "x", "stats"),
          "Accumulate the GMM statistics for this sample. Inputs are checked.")
-    .def("accStatistics_", &py_gmmmachine_accStatistics_, args("self", "x", "stats"),
+    .def("acc_statistics_", &py_gmmmachine_accStatistics_, args("self", "x", "stats"),
          "Accumulate the GMM statistics for this sample. Inputs are NOT checked.")
-    .def("accStatistics",
+    .def("acc_statistics",
          (void (mach::GMMMachine::*)(const io::Arrayset&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics,
          args("sampler", "stats"), "Accumulates the GMM statistics over a set of samples. Inputs are checked.")
-    .def("accStatistics_",
+    .def("acc_statistics_",
          (void (mach::GMMMachine::*)(const io::Arrayset&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics_,
          args("sampler", "stats"), "Accumulates the GMM statistics over a set of samples. Inputs are NOT checked.")
     .def("load", &mach::GMMMachine::load, "Load from a Configuration")
@@ -301,13 +301,13 @@ void bind_machine_gmm()
     .def(init<io::HDF5File&,io::HDF5File&>(args("client", "ubm")))
     .def(init<mach::GMMMachine&,mach::GMMMachine&>(args("client", "ubm")))
     .def(self == self)
-    .def("getGMMClient",
+    .def("get_gmm_client",
          &mach::GMMLLRMachine::getGMMClient, return_value_policy<reference_existing_object>(),
          "Get a pointer to the client GMM")
-    .def("getGMMUBM",
+    .def("get_gmm_ubm",
          &mach::GMMLLRMachine::getGMMUBM, return_value_policy<reference_existing_object>(),
          "Get a pointer to the UBM GMM")
-    .add_property("nInputs", &mach::GMMMachine::getNInputs, "The feature dimensionality")
+    .add_property("n_inputs", &mach::GMMMachine::getNInputs, "The feature dimensionality")
     .def("load", &mach::GMMLLRMachine::load, "Load from a Configuration")
     .def("save", &mach::GMMLLRMachine::save, "Save to a Configuration")
     .def(self_ns::str(self_ns::self))
