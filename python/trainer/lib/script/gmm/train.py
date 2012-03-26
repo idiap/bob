@@ -23,7 +23,7 @@ import optparse
 import math
 import numpy
 
-def NormalizeStdArrayset(arrayset):
+def normalize_std_arrayset(arrayset):
   arrayset.load()
 
   length = arrayset.shape[0]
@@ -51,7 +51,7 @@ def NormalizeStdArrayset(arrayset):
   return (arStd,std)
 
 
-def multiplyVectorsByFactors(matrix, vector):
+def multiply_vectors_by_factors(matrix, vector):
   for i in range(0, matrix.shape[0]):
     for j in range(0, matrix.shape[1]):
       matrix[i, j] *= vector[j]
@@ -174,7 +174,7 @@ def main():
   if options.no_norm:
     normalizedAr = ar
   else:
-    (normalizedAr,stdAr) = NormalizeStdArrayset(ar)
+    (normalizedAr,stdAr) = normalize_std_arrayset(ar)
     
   # Create the machines
   kmeans = bob.machine.KMeansMachine(options.n_gaussians, input_size)
@@ -193,8 +193,8 @@ def main():
 
   # Undo normalization
   if not options.no_norm:
-    multiplyVectorsByFactors(means, stdAr)
-    multiplyVectorsByFactors(variances, stdAr ** 2)
+    multiply_vectors_by_factors(means, stdAr)
+    multiply_vectors_by_factors(variances, stdAr ** 2)
 
   # Initialize gmm
   gmm.means = means

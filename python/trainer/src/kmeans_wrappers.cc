@@ -41,15 +41,15 @@ public:
   }
   
   virtual void eStep(mach::KMeansMachine& machine, const io::Arrayset& data) {
-    this->get_override("eStep")(machine, data);
+    this->get_override("e_step")(machine, data);
   }
   
   virtual void mStep(mach::KMeansMachine& machine, const io::Arrayset& data) {
-    this->get_override("mStep")(machine, data);
+    this->get_override("m_step")(machine, data);
   }
 
   virtual double computeLikelihood(mach::KMeansMachine& machine) {
-    return this->get_override("computeLikelihood")(machine);
+    return this->get_override("compute_likelihood")(machine);
   }
 
   virtual void finalization(mach::KMeansMachine& machine, const io::Arrayset& data) {
@@ -90,7 +90,7 @@ public:
   }
   
   void eStep(mach::KMeansMachine& machine, const io::Arrayset& data) {
-    if (override python_eStep = this->get_override("eStep")) python_eStep(machine, data);
+    if (override python_eStep = this->get_override("e_step")) python_eStep(machine, data);
     train::KMeansTrainer::eStep(machine, data);
   }
   
@@ -99,7 +99,7 @@ public:
   }
   
   void mStep(mach::KMeansMachine& machine, const io::Arrayset& data) {
-    if (override python_mStep = this->get_override("mStep")) 
+    if (override python_mStep = this->get_override("m_step")) 
       python_mStep(machine, data);
     else
       train::KMeansTrainer::mStep(machine, data);
@@ -110,7 +110,7 @@ public:
   }
 
   double computeLikelihood(mach::KMeansMachine& machine) {
-    if (override python_computeLikelihood = this->get_override("computeLikelihood")) return python_computeLikelihood(machine);
+    if (override python_computeLikelihood = this->get_override("compute_likelihood")) return python_computeLikelihood(machine);
     return train::KMeansTrainer::computeLikelihood(machine);
   }
   
@@ -149,19 +149,19 @@ void bind_trainer_kmeans_wrappers() {
 
   class_<EMTrainerKMeansWrapper, boost::noncopyable>("EMTrainerKMeans", no_init)
     .def(init<optional<double, int, bool> >((arg("convergence_threshold")=0.001, arg("max_iterations")=10, arg("compute_likelihood")=true)))
-    .add_property("convergenceThreshold", &EMTrainerKMeansBase::getConvergenceThreshold, &EMTrainerKMeansBase::setConvergenceThreshold, "Convergence threshold")
-    .add_property("maxIterations", &EMTrainerKMeansBase::getMaxIterations, &EMTrainerKMeansBase::setMaxIterations, "Max iterations")
-    .add_property("computeLikelihood", &EMTrainerKMeansBase::getComputeLikelihood, &EMTrainerKMeansBase::setComputeLikelihood, "Tells whether we compute the likelihood or not")
+    .add_property("convergence_threshold", &EMTrainerKMeansBase::getConvergenceThreshold, &EMTrainerKMeansBase::setConvergenceThreshold, "Convergence threshold")
+    .add_property("max_iterations", &EMTrainerKMeansBase::getMaxIterations, &EMTrainerKMeansBase::setMaxIterations, "Max iterations")
+    .add_property("compute_likelihood", &EMTrainerKMeansBase::getComputeLikelihood, &EMTrainerKMeansBase::setComputeLikelihood, "Tells whether we compute the likelihood or not")
     .def("train", &EMTrainerKMeansBase::train, &EMTrainerKMeansWrapper::d_train, (arg("machine"), arg("data")), "Train a machine using data")
     .def("initialization", pure_virtual(&EMTrainerKMeansBase::initialization), (arg("machine"), arg("data")), "This method is called before the EM algorithm")
-    .def("eStep", pure_virtual(&EMTrainerKMeansBase::eStep), (arg("machine"), arg("data")),
+    .def("e_step", pure_virtual(&EMTrainerKMeansBase::eStep), (arg("machine"), arg("data")),
        "Update the hidden variable distribution (or the sufficient statistics) given the Machine parameters. "
        "Also, calculate the average output of the Machine given these parameters.\n"
        "Return the average output of the Machine across the dataset. "
        "The EM algorithm will terminate once the change in average_output "
        "is less than the convergence_threshold.")
-    .def("mStep", pure_virtual(&EMTrainerKMeansBase::mStep), (arg("machine"), arg("data")), "Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
-    .def("computeLikelihood", pure_virtual(&EMTrainerKMeansBase::computeLikelihood), (arg("machine")), "Returns the average min distance.")
+    .def("m_step", pure_virtual(&EMTrainerKMeansBase::mStep), (arg("machine"), arg("data")), "Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
+    .def("compute_likelihood", pure_virtual(&EMTrainerKMeansBase::computeLikelihood), (arg("machine")), "Returns the average min distance.")
     .def("finalization", pure_virtual(&EMTrainerKMeansBase::finalization), (arg("machine"), arg("data")), "This method is called after the EM algorithm")
   ;
 
@@ -172,14 +172,14 @@ void bind_trainer_kmeans_wrappers() {
       "It uses a random initialisation of the means followed by the expectation-maximization algorithm"
       )
     .def(init<optional<double,int,bool> >((arg("convergence_threshold")=0.001, arg("max_iterations")=10, arg("compute_likelihood")=true)))
-    .add_property("convergenceThreshold", &KMeansTrainerWrapper::getConvergenceThreshold, &KMeansTrainerWrapper::setConvergenceThreshold, "Convergence threshold")
-    .add_property("maxIterations", &KMeansTrainerWrapper::getMaxIterations, &KMeansTrainerWrapper::setMaxIterations, "Max iterations")
+    .add_property("convergence_threshold", &KMeansTrainerWrapper::getConvergenceThreshold, &KMeansTrainerWrapper::setConvergenceThreshold, "Convergence threshold")
+    .add_property("max_iterations", &KMeansTrainerWrapper::getMaxIterations, &KMeansTrainerWrapper::setMaxIterations, "Max iterations")
     .add_property("seed", &KMeansTrainerWrapper::getSeed, &KMeansTrainerWrapper::setSeed, "Seed used to genrated pseudo-random numbers")
     .def("train", &train::KMeansTrainer::train, &KMeansTrainerWrapper::d_train, (arg("machine"), arg("data")), "Train a machine using some data")
     .def("initialization", &train::KMeansTrainer::initialization, &KMeansTrainerWrapper::d_initialization, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
-    .def("eStep", &train::KMeansTrainer::eStep, &KMeansTrainerWrapper::d_eStep, (arg("machine"), arg("data")), "Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
-    .def("mStep", &train::KMeansTrainer::mStep, &KMeansTrainerWrapper::d_mStep, (arg("machine"), arg("data")), "M-step of the EM-algorithm.")
-    .def("computeLikelihood", &train::KMeansTrainer::computeLikelihood, &KMeansTrainerWrapper::d_computeLikelihood, (arg("machine")), "Returns the average min distance.")
+    .def("e_step", &train::KMeansTrainer::eStep, &KMeansTrainerWrapper::d_eStep, (arg("machine"), arg("data")), "Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
+    .def("m_step", &train::KMeansTrainer::mStep, &KMeansTrainerWrapper::d_mStep, (arg("machine"), arg("data")), "M-step of the EM-algorithm.")
+    .def("compute_likelihood", &train::KMeansTrainer::computeLikelihood, &KMeansTrainerWrapper::d_computeLikelihood, (arg("machine")), "Returns the average min distance.")
     .def("finalization", &train::KMeansTrainer::finalization, &KMeansTrainerWrapper::d_finalization, (arg("machine"), arg("data")), "This method is called after the EM algorithm")
   ;
 

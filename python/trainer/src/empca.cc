@@ -38,16 +38,16 @@ void bind_trainer_empca() {
   typedef train::EMTrainer<mach::LinearMachine, io::Arrayset> EMTrainerLinearBase; 
 
   class_<EMTrainerLinearBase, boost::noncopyable>("EMTrainerLinear", "The base python class for all EM-based trainers.", no_init)
-    .add_property("convergenceThreshold", &EMTrainerLinearBase::getConvergenceThreshold, &EMTrainerLinearBase::setConvergenceThreshold, "Convergence threshold")
-    .add_property("maxIterations", &EMTrainerLinearBase::getMaxIterations, &EMTrainerLinearBase::setMaxIterations, "Max iterations")
-    .add_property("computeLikelihoodVariable", &EMTrainerLinearBase::getComputeLikelihood, &EMTrainerLinearBase::setComputeLikelihood, "Indicates whether the log likelihood should be computed during EM or not")
+    .add_property("convergence_threshold", &EMTrainerLinearBase::getConvergenceThreshold, &EMTrainerLinearBase::setConvergenceThreshold, "Convergence threshold")
+    .add_property("max_iterations", &EMTrainerLinearBase::getMaxIterations, &EMTrainerLinearBase::setMaxIterations, "Max iterations")
+    .add_property("compute_likelihood_variable", &EMTrainerLinearBase::getComputeLikelihood, &EMTrainerLinearBase::setComputeLikelihood, "Indicates whether the log likelihood should be computed during EM or not")
     .def("train", &EMTrainerLinearBase::train, (arg("machine"), arg("data")), "Trains a machine using data")
     .def("initialization", &EMTrainerLinearBase::initialization, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
     .def("finalization", &EMTrainerLinearBase::finalization, (arg("machine"), arg("data")), "This method is called at the end of the EM algorithm")
-    .def("eStep", &EMTrainerLinearBase::eStep, (arg("machine"), arg("data")),
+    .def("e_step", &EMTrainerLinearBase::eStep, (arg("machine"), arg("data")),
        "Updates the hidden variable distribution (or the sufficient statistics) given the Machine parameters. ")
-    .def("mStep", &EMTrainerLinearBase::mStep, (arg("machine"), arg("data")), "Updates the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
-    .def("computeLikelihood", &EMTrainerLinearBase::computeLikelihood, (arg("machine")), "Computes the current log likelihood given the hidden variable distribution (or the sufficient statistics)")
+    .def("m_step", &EMTrainerLinearBase::mStep, (arg("machine"), arg("data")), "Updates the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
+    .def("compute_likelihood", &EMTrainerLinearBase::computeLikelihood, (arg("machine")), "Computes the current log likelihood given the hidden variable distribution (or the sufficient statistics)")
   ;
 
   class_<train::EMPCATrainer, boost::noncopyable, bases<EMTrainerLinearBase> >("EMPCATrainer",

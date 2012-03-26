@@ -33,7 +33,7 @@ class JFATrainerTest(unittest.TestCase):
   """Performs various JFA trainer tests."""
   
   def test01_updateEigen(self):
-    # Tests our updateEigen function
+    # Tests our update_eigen function
     A = numpy.array([0.9293, 0.2511, 0.3517, 0.3500, 0.6160, 0.8308, 0.1966,
       0.4733, 0.5853, 0.5497, 0.7572, 0.5678, 0.9172, 0.7537, 0.0759, 0.2858,
       0.3804, 0.0540]).reshape(2,3,3)
@@ -46,7 +46,7 @@ class JFATrainerTest(unittest.TestCase):
     uv = numpy.ndarray((3,8), 'float64')
 
     # call the update_u function
-    bob.trainer.jfa_updateEigen(A,C,uv)
+    bob.trainer.jfa_update_eigen(A,C,uv)
     # Expected results (JFA cookbook, matlab)
     uv_ref = numpy.array([-0.3120, 0.8754, 0.7009, 0.5404, -0.9020, -5.2395,
       -1.3741, 0.4054, -1.2266, 20.2066, 7.6548, 5.4262, 1.4229, 6.7651,
@@ -57,7 +57,7 @@ class JFATrainerTest(unittest.TestCase):
     self.assertTrue(equals(uv, uv_ref, 5e-3))
 
   def test02_estimateXandU(self):
-    # test the estimateXandU function
+    # test the estimate_x_and_u function
     F = numpy.array([0.3833, 0.6173, 0.5755, 0.5301, 0.2751, 0.2486, 0.4516,
       0.2277, 0.8044, 0.9861, 0.0300, 0.5357, 0.0871, 0.8021, 0.9891, 0.0669,
       0.9394, 0.0182, 0.6838, 0.7837, 0.5341, 0.8854, 0.8990,
@@ -78,8 +78,8 @@ class JFATrainerTest(unittest.TestCase):
     x = numpy.ndarray((4,2), 'float64')
     spk_ids = numpy.array([0,0,1,1], 'uint32')
 
-    # call the estimateXandU function
-    bob.trainer.jfa_estimateXandU(F,N,m,E,d,v,u,z,y,x,spk_ids)
+    # call the estimate_x_and_u function
+    bob.trainer.jfa_estimate_x_and_u(F,N,m,E,d,v,u,z,y,x,spk_ids)
     # Expected results(JFA cookbook, matlab)
     x_ref = numpy.array([0.2143, 3.1979, 1.8275, 0.1227, -1.3861, 5.3326,
       0.2359,  -0.7914]).reshape(4,2)
@@ -116,8 +116,8 @@ class JFATrainerTest(unittest.TestCase):
       0.9175]).reshape((4,2))
     spk_ids= numpy.array([0,0,1,1], 'uint32')
 
-    # call the estimateXandU function
-    bob.trainer.jfa_estimateYandV(F,N,m,E,d,v,u,z,y,x,spk_ids)
+    # call the estimate_y_and_v function
+    bob.trainer.jfa_estimate_y_and_v(F,N,m,E,d,v,u,z,y,x,spk_ids)
 
     # Expected results(JFA cookbook, matlab)
     y_ref = numpy.array( [0.9630, 1.3868, 0.04255, -0.3721]).reshape((2,2))
@@ -126,7 +126,7 @@ class JFATrainerTest(unittest.TestCase):
     self.assertTrue(equals(y, y_ref, 2e-4))
 
   def test04_estimateZandD(self):
-    # test the estimateYandV function
+    # test the estimate_z_and_d function
     F = numpy.array( [0.3833, 0.6173, 0.5755, 0.5301, 0.2751, 0.2486, 0.4516,
       0.2277, 0.8044, 0.9861, 0.0300, 0.5357, 0.0871, 0.8021, 0.9891, 0.0669,
       0.9394, 0.0182, 0.6838, 0.7837, 0.5341, 0.8854, 0.8990, 0.6259]).reshape((4,6))
@@ -145,8 +145,8 @@ class JFATrainerTest(unittest.TestCase):
       0.9175]).reshape((4,2))
     spk_ids = numpy.array([0,0,1,1], 'uint32')
 
-    # call the estimateXandU function
-    bob.trainer.jfa_estimateZandD(F,N,m,E,d,v,u,z,y,x,spk_ids)
+    # call the estimate_z_and_d function
+    bob.trainer.jfa_estimate_z_and_d(F,N,m,E,d,v,u,z,y,x,spk_ids)
 
     # Expected results(JFA cookbook, matlab)
     z_ref = numpy.array( [0.3256, 1.8633, 0.6480, 0.8085, -0.0432, 0.2885,
@@ -431,7 +431,7 @@ class JFATrainerTest(unittest.TestCase):
     jfam.v = v
     jfam.d = d
     jfat = bob.trainer.JFABaseTrainer(jfam)
-    jfat.trainNoInit(vec,10)
+    jfat.train_no_init(vec,10)
 
     v_ref = numpy.array([[0.245364911936476, 0.978133261775424], [0.769646805052223, 0.940070736856596], [0.310779202800089, 1.456332053893072],
           [0.184760934399551, 2.265139705602147], [0.701987784039800, 0.081632150899400], [0.074344030229297, 1.090248340917255]], 'float64')
@@ -513,7 +513,7 @@ class JFATrainerTest(unittest.TestCase):
     jfam = bob.machine.JFABaseMachine(ubm,2)
     jfat = bob.trainer.JFABaseTrainer(jfam)
     jfam.u = u
-    jfat.trainISVNoInit(vec, 10, 4)
+    jfat.train_isv_no_init(vec, 10, 4)
 
     self.assertTrue( numpy.allclose(jfam.d, d_ref, eps) )
     self.assertTrue( numpy.allclose(jfam.u, u_ref, eps) )

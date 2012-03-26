@@ -31,7 +31,7 @@ def loadGMM():
   gmm.weights = bob.io.load('gmm.init_weights.hdf5')
   gmm.means = bob.io.load('gmm.init_means.hdf5')
   gmm.variances = bob.io.load('gmm.init_variances.hdf5')
-  gmm.varianceThreshold = numpy.array([0.001, 0.001], 'float64')
+  gmm.variance_threshold = numpy.array([0.001, 0.001], 'float64')
 
   return gmm
 
@@ -201,8 +201,8 @@ class TrainerTest(unittest.TestCase):
     max_iter_gmm = 25
     accuracy = 0.00001
     ml_gmmtrainer = bob.trainer.ML_GMMTrainer(True, True, True, prior)
-    ml_gmmtrainer.maxIterations = max_iter_gmm
-    ml_gmmtrainer.convergenceThreshold = accuracy
+    ml_gmmtrainer.max_iterations = max_iter_gmm
+    ml_gmmtrainer.convergence_threshold = accuracy
 
     # Run ML
     ml_gmmtrainer.train(gmm, ar)
@@ -227,7 +227,7 @@ class TrainerTest(unittest.TestCase):
     gmmprior = bob.machine.GMMMachine(bob.io.HDF5File("gmm_ML.hdf5"))
     
     map_gmmtrainer = bob.trainer.MAP_GMMTrainer(16)
-    map_gmmtrainer.setPriorGMM(gmmprior)
+    map_gmmtrainer.set_prior_gmm(gmmprior)
     map_gmmtrainer.train(gmm, ar)
 
     #config = bob.io.HDF5File("gmm_MAP.hdf5")
@@ -255,14 +255,14 @@ class TrainerTest(unittest.TestCase):
     arrayset = bob.io.Arrayset()
     arrayset.append(data)
 
-    map_adapt.setPriorGMM(gmm)
+    map_adapt.set_prior_gmm(gmm)
 
     gmm_adapted = bob.machine.GMMMachine(2,50)
     gmm_adapted.means = means
     gmm_adapted.variances = variances
     gmm_adapted.weights = weights
 
-    map_adapt.maxIterations = 1
+    map_adapt.max_iterations = 1
     map_adapt.train(gmm_adapted,arrayset)
 
     new_means = bob.io.load('new_adapted_mean.hdf5')
@@ -294,10 +294,10 @@ class TrainerTest(unittest.TestCase):
     accuracy = 0.00001
     map_factor = 0.5
     map_gmmtrainer = bob.trainer.MAP_GMMTrainer(relevance_factor, True, False, False, prior)
-    map_gmmtrainer.maxIterations = max_iter_gmm
-    map_gmmtrainer.convergenceThreshold = accuracy
-    map_gmmtrainer.setPriorGMM(prior_gmm) 
-    map_gmmtrainer.setT3MAP(map_factor); 
+    map_gmmtrainer.max_iterations = max_iter_gmm
+    map_gmmtrainer.convergence_threshold = accuracy
+    map_gmmtrainer.set_prior_gmm(prior_gmm) 
+    map_gmmtrainer.set_t3_map(map_factor); 
 
     gmm = bob.machine.GMMMachine(n_gaussians, n_inputs)
     gmm.set_variance_thresholds(threshold)

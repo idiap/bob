@@ -55,7 +55,7 @@ void bind_trainer_svm() {
            arg("coef0")=0., //for poly/sigmoid
            arg("cache_size")=100, //in MB
            arg("eps")=1.e-3, //stopping criteria epsilon
-           arg("C")=1., //for C_SVC, EPSILON_SVR and NU_SVR
+           arg("cost")=1., //for C_SVC, EPSILON_SVR and NU_SVR
            arg("nu")=0.5, //for NU_SVC, ONE_CLASS and NU_SVR
            arg("p")=0.1, //for EPSILON_SVR, this is the "epsilon" value there
            arg("shrinking")=true, //use the shrinking heuristics
@@ -70,7 +70,7 @@ void bind_trainer_svm() {
     .add_property("coef0", &train::SVMTrainer::getCoef0, &train::SVMTrainer::setCoef0, "Coefficient 0 for poly/sigmoid")
     .add_property("cache_size", &train::SVMTrainer::getCacheSizeInMB, &train::SVMTrainer::setCacheSizeInMb, "libsvm cache size in Mb")
     .add_property("eps", &train::SVMTrainer::getStopEpsilon, &train::SVMTrainer::setStopEpsilon, "The epsilon used for stop training")
-    .add_property("C", &train::SVMTrainer::getCost, &train::SVMTrainer::setCost, "The cost for C_SVC, EPSILON_SVR and NU_SVR")
+    .add_property("cost", &train::SVMTrainer::getCost, &train::SVMTrainer::setCost, "The cost for C_SVC, EPSILON_SVR and NU_SVR")
     .add_property("nu", &train::SVMTrainer::getNu, &train::SVMTrainer::setNu, "for NU_SVC, ONE_CLASS and NU_SVR")
     .add_property("p", &train::SVMTrainer::getLossEpsilonSVR, &train::SVMTrainer::setLossEpsilonSVR, "for EPSILON_SVR, this is the 'epsilon' value on the equation")
     .add_property("shrinking", &train::SVMTrainer::getUseShrinking, &train::SVMTrainer::setUseShrinking, "use the shrinking heuristics")

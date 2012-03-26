@@ -269,10 +269,10 @@ static void jfa_updateD(train::JFABaseTrainer& t, list list_stats)
 }
 
 void bind_trainer_jfa() {
-  def("jfa_updateEigen", &update_eigen, (arg("A"), arg("C"), arg("uv")), "Updates eigenchannels (or eigenvoices) from accumulators A and C.");
-  def("jfa_estimateXandU", &estimate_xandu, (arg("F"), arg("N"), arg("m"), arg("E"), arg("d"), arg("v"), arg("u"), arg("z"), arg("y"), arg("x"), arg("spk_ids")), "Estimates the channel factors.");
-  def("jfa_estimateYandV", &estimate_yandv, (arg("F"), arg("N"), arg("m"), arg("E"), arg("d"), arg("v"), arg("u"), arg("z"), arg("y"), arg("x"), arg("spk_ids")), "Estimates the speaker factors y.");
-  def("jfa_estimateZandD", &estimate_zandd, (arg("F"), arg("N"), arg("m"), arg("E"), arg("d"), arg("v"), arg("u"), arg("z"), arg("y"), arg("x"), arg("spk_ids")), "Estimates the speaker factors z.");
+  def("jfa_update_eigen", &update_eigen, (arg("a"), arg("c"), arg("uv")), "Updates eigenchannels (or eigenvoices) from accumulators a and c.");
+  def("jfa_estimate_x_and_u", &estimate_xandu, (arg("f"), arg("n"), arg("m"), arg("e"), arg("d"), arg("v"), arg("u"), arg("z"), arg("y"), arg("x"), arg("spk_ids")), "Estimates the channel factors.");
+  def("jfa_estimate_y_and_v", &estimate_yandv, (arg("f"), arg("n"), arg("m"), arg("e"), arg("d"), arg("v"), arg("u"), arg("z"), arg("y"), arg("x"), arg("spk_ids")), "Estimates the speaker factors y.");
+  def("jfa_estimate_z_and_d", &estimate_zandd, (arg("f"), arg("n"), arg("m"), arg("e"), arg("d"), arg("v"), arg("u"), arg("z"), arg("y"), arg("x"), arg("spk_ids")), "Estimates the speaker factors z.");
 
   class_<train::JFABaseTrainerBase, boost::noncopyable>("JFABaseTrainerBase", "Create a trainer for the JFA.", init<mach::JFABaseMachine&>((arg("jfa_base")),"Initializes a new JFABaseTrainerBase."))
     .add_property("__X__", &get_x, &train::JFABaseTrainerBase::setX)
@@ -291,9 +291,9 @@ void bind_trainer_jfa() {
 
   class_<train::JFABaseTrainer, boost::noncopyable, bases<train::JFABaseTrainerBase> >("JFABaseTrainer", "Create a trainer for the JFA.", init<mach::JFABaseMachine&>((arg("jfa_base")),"Initializes a new JFABaseTrainer."))
     .def("train", &jfa_train, (arg("self"), arg("gmm_stats"), arg("n_iter")), "Call the training procedure.")
-    .def("trainNoInit", &jfa_train_noinit, (arg("self"), arg("gmm_stats"), arg("n_iter")), "Call the training procedure.")
-    .def("trainISV", &jfa_train_ISV, (arg("self"), arg("gmm_stats"), arg("n_iter"), arg("relevance")), "Call the ISV training procedure.")
-    .def("trainISVNoInit", &jfa_train_ISV_noinit, (arg("self"), arg("gmm_stats"), arg("n_iter"), arg("relevance")), "Call the ISV training procedure.")
+    .def("train_no_init", &jfa_train_noinit, (arg("self"), arg("gmm_stats"), arg("n_iter")), "Call the training procedure.")
+    .def("train_isv", &jfa_train_ISV, (arg("self"), arg("gmm_stats"), arg("n_iter"), arg("relevance")), "Call the ISV training procedure.")
+    .def("train_isv_no_init", &jfa_train_ISV_noinit, (arg("self"), arg("gmm_stats"), arg("n_iter"), arg("relevance")), "Call the ISV training procedure.")
     .def("__initializeVD_ISV__", &train::JFABaseTrainer::initializeVD_ISV, (arg("self"), arg("relevance factor")), "Initializes V=0 and D=sqrt(var(UBM)/r) (for ISV).")
     .def("__updateY__", &jfa_updateY, (arg("self"), arg("stats")), "Updates Y.")
     .def("__updateV__", &jfa_updateV, (arg("self"), arg("stats")), "Updates V.")

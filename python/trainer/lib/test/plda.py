@@ -172,28 +172,28 @@ class PLDATrainerTest(unittest.TestCase):
     m.f = F_init
 
     # E-step 1
-    t.eStep(m,l)
+    t.e_step(m,l)
     # Compares statistics to Prince matlab reference
     self.assertTrue(equals(t.z_first_order[0], z_first_order_a_1, 1e-10))
     self.assertTrue(equals(t.z_first_order[1], z_first_order_b_1, 1e-10))
     self.assertTrue(equals(t.z_second_order_sum, z_second_order_sum_1, 1e-10))
 
     # M-step 1
-    t.mStep(m,l)
+    t.m_step(m,l)
     # Compares F, G and sigma to Prince matlab reference
     self.assertTrue(equals(m.f, F_1, 1e-10))
     self.assertTrue(equals(m.g, G_1, 1e-10))
     self.assertTrue(equals(m.sigma, sigma_1, 1e-10))
 
     # E-step 2
-    t.eStep(m,l)
+    t.e_step(m,l)
     # Compares statistics to Prince matlab reference
     self.assertTrue(equals(t.z_first_order[0], z_first_order_a_2, 1e-10))
     self.assertTrue(equals(t.z_first_order[1], z_first_order_b_2, 1e-10))
     self.assertTrue(equals(t.z_second_order_sum, z_second_order_sum_2, 1e-10))
 
     # M-step 2
-    t.mStep(m,l)
+    t.m_step(m,l)
     # Compares F, G and sigma to Prince matlab reference
     self.assertTrue(equals(m.f, F_2, 1e-10))
     self.assertTrue(equals(m.g, G_2, 1e-10))
