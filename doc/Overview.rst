@@ -41,12 +41,12 @@ Numerous image processing tools are provided such as filtering (Gaussian, Median
 Machine learning
 ----------------
 
-|project| has been developed by researchers tackling many machine vision problems. Several machine learning algorithms have been integrated into the library. Dimensionality reduction is supported using Principal Component Analysis, Linear Discriminant Analysis and its probabilistic variant. k-Means is provided for data clustering, and classification is possible using both generative modeling techniques (Gaussian Mixture Models, Join Factor Analysis) and discriminative approaches such as Multi-Layer Perceptrons or Support Vector Machine (via a `LIBSVM`_ bridge). 
+|project| has been developed by researchers tackling many machine vision problems. Several machine learning algorithms have been integrated into the library. Dimensionality reduction is supported using Principal Component Analysis, Linear Discriminant Analysis and its probabilistic variant. K-means is provided for data clustering, and classification is possible using both generative modeling techniques (Gaussian mixture models, Join Factor Analysis) and discriminative approaches such as Multi-Layer Perceptrons or Support Vector Machine (via a `LIBSVM`_ bridge). 
 
 Storing and managing data
 -------------------------
 
-The library has been designed to run on various platforms and be easily interfaced with other software. We have chosen the open and portable `HDF5`_ library and file format as our core feature for storing and managing data. `HDF5`_ is very flexible and hence allows us to store simple multi-dimensional arrays as well as complex machine learning models. Many tools for viewing, and analyzing the data are already available.  In addition, we also support the loading and storing of most image formats thanks to `ImageMagick`_, videos through `FFmpeg`_ as well as standard `MATLAB`_ file using `MatIO`_.
+The library has been designed to run on various platforms and to be easily interfaced with other software. We have chosen the open and portable `HDF5`_ library and file format as our core feature for storing and managing data. `HDF5`_ is very flexible and hence allows us to store simple multi-dimensional arrays as well as complex machine learning models. Many tools for viewing, and analyzing the data are already available. In addition, we also support the loading and storing of most image formats thanks to `ImageMagick`_, videos through `FFmpeg`_ as well as standard `MATLAB`_ file using `MatIO`_.
 
 Database support
 ----------------
@@ -56,6 +56,6 @@ The library currently provides an API to easily query and interface with well kn
 Performance evaluation
 ----------------------
 
-A module of the library is dedicated to performance evaluation. Computation of false alarm and false rejection rate, equal error rate are supported as well as the generation of ROC, DET or EPC curves.
+A module of the library is dedicated to performance evaluation. This includes the computation of false alarm and false rejection rates, equal error rates as well as the generation of plots such as ROCs, DETs or EPC curves.
 
 .. include:: links.rst
