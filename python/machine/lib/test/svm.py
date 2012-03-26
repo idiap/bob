@@ -196,7 +196,7 @@ class SvmTest(unittest.TestCase):
     machine = bob.machine.SupportVector(TEST_MACHINE_NO_PROBS)
     labels, data = bob.machine.SVMFile(HEART_DATA).read_all()
     data = numpy.vstack(data)
-    self.assertRaises(RuntimeError, machine.predictClassesAndProbabilities,
+    self.assertRaises(RuntimeError, machine.predict_classes_and_probabilities,
         data)
 
   def test05_correctness_heart(self):
@@ -206,15 +206,15 @@ class SvmTest(unittest.TestCase):
     labels, data = bob.machine.SVMFile(HEART_DATA).read_all()
     data = numpy.vstack(data)
 
-    pred_label = machine.predictClasses(data)
+    pred_label = machine.predict_classes(data)
 
     self.assertEqual(pred_label, expected_heart_predictions)
 
     #finally, we test if the values also work fine.
-    pred_lab_values = [machine.predictClassAndScores(k) for k in data]
+    pred_lab_values = [machine.predict_class_and_scores(k) for k in data]
 
     #tries the variant with multiple inputs
-    pred_labels2, pred_scores2 = machine.predictClassesAndScores(data)
+    pred_labels2, pred_scores2 = machine.predict_classes_and_scores(data)
     self.assertEqual( expected_heart_predictions,  pred_labels2 )
     self.assertEqual( tuple([k[1] for k in pred_lab_values]), pred_scores2 )
 
@@ -232,7 +232,7 @@ class SvmTest(unittest.TestCase):
     # parameter set as more differences will be observed.
     all_labels, real_labels, real_probs = load_expected(HEART_EXPECTED)
     
-    pred_labels, pred_probs = machine.predictClassesAndProbabilities(data)
+    pred_labels, pred_probs = machine.predict_classes_and_probabilities(data)
     self.assertEqual(pred_labels, real_labels)
     self.assertTrue( numpy.all(abs(numpy.vstack(pred_probs) -
       numpy.vstack(real_probs)) < 1e-6) )
@@ -244,15 +244,15 @@ class SvmTest(unittest.TestCase):
     labels, data = bob.machine.SVMFile(IRIS_DATA).read_all()
     data = numpy.vstack(data)
 
-    pred_label = machine.predictClasses(data)
+    pred_label = machine.predict_classes(data)
 
     self.assertEqual(pred_label, expected_iris_predictions)
 
     #finally, we test if the values also work fine.
-    pred_lab_values = [machine.predictClassAndScores(k) for k in data]
+    pred_lab_values = [machine.predict_class_and_scores(k) for k in data]
 
     #tries the variant with multiple inputs
-    pred_labels2, pred_scores2 = machine.predictClassesAndScores(data)
+    pred_labels2, pred_scores2 = machine.predict_classes_and_scores(data)
     self.assertEqual( expected_iris_predictions,  pred_labels2 )
     self.assertTrue( numpy.all(abs(numpy.vstack([k[1] for k in
       pred_lab_values]) - numpy.vstack(pred_scores2)) < 1e-20 ) )
@@ -262,7 +262,7 @@ class SvmTest(unittest.TestCase):
 
     all_labels, real_labels, real_probs = load_expected(IRIS_EXPECTED)
     
-    pred_labels, pred_probs = machine.predictClassesAndProbabilities(data)
+    pred_labels, pred_probs = machine.predict_classes_and_probabilities(data)
     self.assertEqual(pred_labels, real_labels)
     self.assertTrue( numpy.all(abs(numpy.vstack(pred_probs) -
       numpy.vstack(real_probs)) < 1e-6) )

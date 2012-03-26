@@ -112,7 +112,7 @@ def main():
 
   # Load prior gmm
   prior_gmm = bob.machine.GMMMachine(bob.io.HDF5File(options.prior_model))
-  prior_gmm.setVarianceThresholds(options.variance_threshold)
+  prior_gmm.set_variance_thresholds(options.variance_threshold)
 
   # Create trainer
   if options.responsibilities_threshold == 0.:
@@ -128,7 +128,7 @@ def main():
 
   # Load gmm
   gmm = bob.machine.GMMMachine(bob.io.HDF5File(options.prior_model))
-  gmm.setVarianceThresholds(options.variance_threshold)
+  gmm.set_variance_thresholds(options.variance_threshold)
 
   # Train gmm
   trainer.train(gmm, ar)

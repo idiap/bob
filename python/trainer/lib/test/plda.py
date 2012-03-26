@@ -168,8 +168,8 @@ class PLDATrainerTest(unittest.TestCase):
     # to new reference ones (to make the tests deterministic)
     t.initialization(m,l)
     m.sigma = sigma_init
-    m.G = G_init
-    m.F = F_init
+    m.g = G_init
+    m.f = F_init
 
     # E-step 1
     t.eStep(m,l)
@@ -181,8 +181,8 @@ class PLDATrainerTest(unittest.TestCase):
     # M-step 1
     t.mStep(m,l)
     # Compares F, G and sigma to Prince matlab reference
-    self.assertTrue(equals(m.F, F_1, 1e-10))
-    self.assertTrue(equals(m.G, G_1, 1e-10))
+    self.assertTrue(equals(m.f, F_1, 1e-10))
+    self.assertTrue(equals(m.g, G_1, 1e-10))
     self.assertTrue(equals(m.sigma, sigma_1, 1e-10))
 
     # E-step 2
@@ -195,8 +195,8 @@ class PLDATrainerTest(unittest.TestCase):
     # M-step 2
     t.mStep(m,l)
     # Compares F, G and sigma to Prince matlab reference
-    self.assertTrue(equals(m.F, F_2, 1e-10))
-    self.assertTrue(equals(m.G, G_2, 1e-10))
+    self.assertTrue(equals(m.f, F_2, 1e-10))
+    self.assertTrue(equals(m.g, G_2, 1e-10))
     self.assertTrue(equals(m.sigma, sigma_2, 1e-10))
 
 
@@ -229,8 +229,8 @@ class PLDATrainerTest(unittest.TestCase):
     # base machine
     mb = bob.machine.PLDABaseMachine(D,nf,ng)
     mb.sigma = sigma_init
-    mb.G = G_init
-    mb.F = F_init
+    mb.g = G_init
+    mb.f = F_init
     mb.mu = mean_zero
 
     # Data for likelihood computation
@@ -251,7 +251,7 @@ class PLDATrainerTest(unittest.TestCase):
 
     # machine
     m = bob.machine.PLDAMachine(mb)
-    ll = m.computeLikelihood(X)
+    ll = m.compute_likelihood(X)
     self.assertTrue(abs(ll - ll_ref) < 1e-10)
 
     # log likelihood ratio
@@ -260,9 +260,9 @@ class PLDATrainerTest(unittest.TestCase):
     Y[1,:] = x2
     Z = numpy.ndarray((1,D), 'float64')
     Z[0,:] = x3
-    llX = m.computeLikelihood(X)
-    llY = m.computeLikelihood(Y)
-    llZ = m.computeLikelihood(Z)
+    llX = m.compute_likelihood(X)
+    llY = m.compute_likelihood(Y)
+    llZ = m.compute_likelihood(Z)
     # reference obtained by computing the likelihood of [x1,x2,x3], [x1,x2] 
     # and [x3] separately
     llr_ref = -4.43695386675
@@ -298,8 +298,8 @@ class PLDATrainerTest(unittest.TestCase):
     # base machine
     mb = bob.machine.PLDABaseMachine(D,nf,ng)
     mb.sigma = sigma_init
-    mb.G = G_init
-    mb.F = F_init
+    mb.g = G_init
+    mb.f = F_init
     mb.mu = mean_zero
 
     # Data for likelihood computation
@@ -318,7 +318,7 @@ class PLDATrainerTest(unittest.TestCase):
     m = bob.machine.PLDAMachine(mb)
     t = bob.trainer.PLDATrainer(m)
     t.enrol(a_enrol)
-    ll = m.computeLikelihood(x3)
+    ll = m.compute_likelihood(x3)
     self.assertTrue(abs(ll - ll_ref) < 1e-10)
 
     # reference obtained by computing the likelihood of [x1,x2,x3], [x1,x2] 

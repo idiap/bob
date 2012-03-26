@@ -36,7 +36,7 @@ class GaussianMachineTest(unittest.TestCase):
     """Test the likelihood computation of a simple normal Gaussian"""
     gaussian = bob.machine.Gaussian(2)
     # By default, initialized with zero mean and unit variance
-    logLH = gaussian.logLikelihood(numpy.array([0.4, 0.2], 'float64'))
+    logLH = gaussian.log_likelihood(numpy.array([0.4, 0.2], 'float64'))
     self.assertTrue( equals(logLH, -1.93787706641, 1e-10))
  
   def test02_GaussianMachine(self):
@@ -46,17 +46,17 @@ class GaussianMachineTest(unittest.TestCase):
     g = bob.machine.Gaussian(3)
     self.assertTrue( (g.mean == 0.0).all() )
     self.assertTrue( (g.variance == 1.0).all() )
-    self.assertTrue( g.DimD == 3 )
+    self.assertTrue( g.dim_d == 3 )
 
     # Set and check mean, variance, variance thresholds 
     mean     = numpy.array([0, 1, 2], 'float64')
     variance = numpy.array([3, 2, 1], 'float64')
     g.mean     = mean
     g.variance = variance
-    g.setVarianceThresholds(0.0005)
+    g.set_variance_thresholds(0.0005)
     self.assertTrue( (g.mean == mean).all() )
     self.assertTrue( (g.variance == variance).all() )
-    self.assertTrue( (g.varianceThresholds == 0.0005).all() )
+    self.assertTrue( (g.variance_thresholds == 0.0005).all() )
     
     # Save and read from file
     filename = str(tempfile.mkstemp(".hdf5")[1])
@@ -64,7 +64,7 @@ class GaussianMachineTest(unittest.TestCase):
     g_loaded = bob.machine.Gaussian(bob.io.HDF5File(filename))
     self.assertTrue( g == g_loaded )
     # Make them different
-    g_loaded.setVarianceThresholds(0.001)
+    g_loaded.set_variance_thresholds(0.001)
     self.assertFalse( g == g_loaded )
 
     # Check likelihood computation
@@ -75,16 +75,16 @@ class GaussianMachineTest(unittest.TestCase):
     ref2 = -4.569362000894712
     ref3 = -7.319362000894712
     eps = 1e-10
-    self.assertTrue( equals(g.logLikelihood(sample1), ref1, eps) )
+    self.assertTrue( equals(g.log_likelihood(sample1), ref1, eps) )
     self.assertTrue( equals(g.forward(sample1), ref1, eps) )
-    self.assertTrue( equals(g.logLikelihood(sample2), ref2, eps) )
+    self.assertTrue( equals(g.log_likelihood(sample2), ref2, eps) )
     self.assertTrue( equals(g.forward(sample2), ref2, eps) )
-    self.assertTrue( equals(g.logLikelihood(sample3), ref3, eps) )
+    self.assertTrue( equals(g.log_likelihood(sample3), ref3, eps) )
     self.assertTrue( equals(g.forward(sample3), ref3, eps) )
 
     # Check resize and assignment
     g.resize(5)
-    self.assertTrue( g.DimD == 5 )
+    self.assertTrue( g.dim_d == 5 )
     g2 = bob.machine.Gaussian()
     g2 = g
     self.assertTrue( g == g2 )

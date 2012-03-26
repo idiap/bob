@@ -171,17 +171,17 @@ class JFATrainerTest(unittest.TestCase):
 
     gs11 = bob.machine.GMMStats(2,3)
     gs11.n = N1[:,0]
-    gs11.sumPx = F1[:,0].reshape(2,3)
+    gs11.sum_px = F1[:,0].reshape(2,3)
     gs12 = bob.machine.GMMStats(2,3)
     gs12.n = N1[:,1]
-    gs12.sumPx = F1[:,1].reshape(2,3)
+    gs12.sum_px = F1[:,1].reshape(2,3)
 
     gs21 = bob.machine.GMMStats(2,3)
     gs21.n = N2[:,0]
-    gs21.sumPx = F2[:,0].reshape(2,3)
+    gs21.sum_px = F2[:,0].reshape(2,3)
     gs22 = bob.machine.GMMStats(2,3)
     gs22.n = N2[:,1]
-    gs22.sumPx = F2[:,1].reshape(2,3)
+    gs22.sum_px = F2[:,1].reshape(2,3)
 
     vec = [[gs11, gs12], [gs21, gs22]]
 
@@ -210,12 +210,12 @@ class JFATrainerTest(unittest.TestCase):
 
     # call the updateY function
     ubm = bob.machine.GMMMachine(2,3)
-    ubm.meanSupervector = m
-    ubm.varianceSupervector = E
+    ubm.mean_supervector = m
+    ubm.variance_supervector = E
     jfam = bob.machine.JFABaseMachine(ubm,2,2)
-    jfam.U = u
-    jfam.V = v
-    jfam.D = d
+    jfam.u = u
+    jfam.v = v
+    jfam.d = d
     jfat = bob.trainer.JFABaseTrainer(jfam)
 
     jfat.__initNid__(vec)
@@ -229,7 +229,7 @@ class JFATrainerTest(unittest.TestCase):
     # Expected results(JFA cookbook, matlab)
     self.assertTrue(equals(jfat.__Y__[0], y3, 2e-4))
     self.assertTrue(equals(jfat.__Y__[1], y4, 2e-4))
-    self.assertTrue(equals(jfam.V, v_ref, 2e-4))
+    self.assertTrue(equals(jfam.v, v_ref, 2e-4))
 
 
   def test06_JFABaseTrainer_updateXandU(self):
@@ -247,17 +247,17 @@ class JFATrainerTest(unittest.TestCase):
 
     gs11 = bob.machine.GMMStats(2,3)
     gs11.n = N1[:,0]
-    gs11.sumPx = F1[:,0].reshape(2,3)
+    gs11.sum_px = F1[:,0].reshape(2,3)
     gs12 = bob.machine.GMMStats(2,3)
     gs12.n = N1[:,1]
-    gs12.sumPx = F1[:,1].reshape(2,3)
+    gs12.sum_px = F1[:,1].reshape(2,3)
 
     gs21 = bob.machine.GMMStats(2,3)
     gs21.n = N2[:,0]
-    gs21.sumPx = F2[:,0].reshape(2,3)
+    gs21.sum_px = F2[:,0].reshape(2,3)
     gs22 = bob.machine.GMMStats(2,3)
     gs22.n = N2[:,1]
-    gs22.sumPx = F2[:,1].reshape(2,3)
+    gs22.sum_px = F2[:,1].reshape(2,3)
 
     vec = [[gs11, gs12], [gs21, gs22]]
 
@@ -287,12 +287,12 @@ class JFATrainerTest(unittest.TestCase):
 
     # call the updateX function
     ubm = bob.machine.GMMMachine(2,3)
-    ubm.meanSupervector = m
-    ubm.varianceSupervector = E
+    ubm.mean_supervector = m
+    ubm.variance_supervector = E
     jfam = bob.machine.JFABaseMachine(ubm,2,2)
-    jfam.U = u
-    jfam.V = v
-    jfam.D = d
+    jfam.u = u
+    jfam.v = v
+    jfam.d = d
     jfat = bob.trainer.JFABaseTrainer(jfam)
 
     jfat.__initNid__(vec)
@@ -306,7 +306,7 @@ class JFATrainerTest(unittest.TestCase):
     # Expected results(JFA cookbook, matlab)
     self.assertTrue(equals(jfat.__X__[0], x3, 2e-4))
     self.assertTrue(equals(jfat.__X__[1], x4, 2e-4))
-    self.assertTrue(equals(jfam.U, u_ref, 2e-4))
+    self.assertTrue(equals(jfam.u, u_ref, 2e-4))
 
 
   def test07_JFABaseTrainer_updateZandD(self):
@@ -324,17 +324,17 @@ class JFATrainerTest(unittest.TestCase):
 
     gs11 = bob.machine.GMMStats(2,3)
     gs11.n = N1[:,0]
-    gs11.sumPx = F1[:,0].reshape(2,3)
+    gs11.sum_px = F1[:,0].reshape(2,3)
     gs12 = bob.machine.GMMStats(2,3)
     gs12.n = N1[:,1]
-    gs12.sumPx = F1[:,1].reshape(2,3)
+    gs12.sum_px = F1[:,1].reshape(2,3)
 
     gs21 = bob.machine.GMMStats(2,3)
     gs21.n = N2[:,0]
-    gs21.sumPx = F2[:,0].reshape(2,3)
+    gs21.sum_px = F2[:,0].reshape(2,3)
     gs22 = bob.machine.GMMStats(2,3)
     gs22.n = N2[:,1]
-    gs22.sumPx = F2[:,1].reshape(2,3)
+    gs22.sum_px = F2[:,1].reshape(2,3)
 
     vec = [[gs11, gs12], [gs21, gs22]]
 
@@ -362,12 +362,12 @@ class JFATrainerTest(unittest.TestCase):
 
     # call the updateZ function
     ubm = bob.machine.GMMMachine(2,3)
-    ubm.meanSupervector = m
-    ubm.varianceSupervector = E
+    ubm.mean_supervector = m
+    ubm.variance_supervector = E
     jfam = bob.machine.JFABaseMachine(ubm,2,2)
-    jfam.U = u
-    jfam.V = v
-    jfam.D = d
+    jfam.u = u
+    jfam.v = v
+    jfam.d = d
     jfat = bob.trainer.JFABaseTrainer(jfam)
 
     jfat.__initNid__(vec)
@@ -381,7 +381,7 @@ class JFATrainerTest(unittest.TestCase):
     # Expected results(JFA cookbook, matlab)
     self.assertTrue(equals(jfat.__Z__[0], z3_ref, 2e-4))
     self.assertTrue(equals(jfat.__Z__[1], z4_ref, 2e-4))
-    self.assertTrue(equals(jfam.D, d_ref, 2e-4))
+    self.assertTrue(equals(jfam.d, d_ref, 2e-4))
 
 
   def test08_JFATrainAndEnrol(self):
@@ -399,17 +399,17 @@ class JFATrainerTest(unittest.TestCase):
 
     gs11 = bob.machine.GMMStats(2,3)
     gs11.n = N1[:,0]
-    gs11.sumPx = F1[:,0].reshape(2,3)
+    gs11.sum_px = F1[:,0].reshape(2,3)
     gs12 = bob.machine.GMMStats(2,3)
     gs12.n = N1[:,1]
-    gs12.sumPx = F1[:,1].reshape(2,3)
+    gs12.sum_px = F1[:,1].reshape(2,3)
 
     gs21 = bob.machine.GMMStats(2,3)
     gs21.n = N2[:,0]
-    gs21.sumPx = F2[:,0].reshape(2,3)
+    gs21.sum_px = F2[:,0].reshape(2,3)
     gs22 = bob.machine.GMMStats(2,3)
     gs22.n = N2[:,1]
-    gs22.sumPx = F2[:,1].reshape(2,3)
+    gs22.sum_px = F2[:,1].reshape(2,3)
 
     vec = [[gs11, gs12], [gs21, gs22]]
 
@@ -424,12 +424,12 @@ class JFATrainerTest(unittest.TestCase):
 
     # Calls the train function
     ubm = bob.machine.GMMMachine(2,3)
-    ubm.meanSupervector = m
-    ubm.varianceSupervector = E
+    ubm.mean_supervector = m
+    ubm.variance_supervector = E
     jfam = bob.machine.JFABaseMachine(ubm,2,2)
-    jfam.U = u
-    jfam.V = v
-    jfam.D = d
+    jfam.u = u
+    jfam.v = v
+    jfam.d = d
     jfat = bob.trainer.JFABaseTrainer(jfam)
     jfat.trainNoInit(vec,10)
 
@@ -440,9 +440,9 @@ class JFATrainerTest(unittest.TestCase):
     d_ref = numpy.array([9.648467e-18, 2.63720683155e-12, 2.11822157653706e-10, 9.1047243e-17, 1.41163442535567e-10, 3.30581e-19], 'float64')
 
     eps = 1e-10
-    self.assertTrue( numpy.allclose(jfam.V, v_ref, eps) )
-    self.assertTrue( numpy.allclose(jfam.U, u_ref, eps) )
-    self.assertTrue( numpy.allclose(jfam.D, d_ref, eps) )
+    self.assertTrue( numpy.allclose(jfam.v, v_ref, eps) )
+    self.assertTrue( numpy.allclose(jfam.u, u_ref, eps) )
+    self.assertTrue( numpy.allclose(jfam.d, d_ref, eps) )
 
     # Calls the enrol function
     jfamachine = bob.machine.JFAMachine(jfam)
@@ -452,10 +452,10 @@ class JFATrainerTest(unittest.TestCase):
     Fe = numpy.array([0.1579, 0.1925, 0.3242, 0.1234, 0.2354, 0.2734, 0.2514, 0.5874, 0.3345, 0.2463, 0.4789, 0.5236]).reshape((6,2))
     gse1 = bob.machine.GMMStats(2,3)
     gse1.n = Ne[:,0]
-    gse1.sumPx = Fe[:,0].reshape(2,3)
+    gse1.sum_px = Fe[:,0].reshape(2,3)
     gse2 = bob.machine.GMMStats(2,3)
     gse2.n = Ne[:,1]
-    gse2.sumPx = Fe[:,1].reshape(2,3)
+    gse2.sum_px = Fe[:,1].reshape(2,3)
 
     gse = [gse1, gse2]
     jfatrainer.enrol(gse, 5)
@@ -481,17 +481,17 @@ class JFATrainerTest(unittest.TestCase):
 
     gs11 = bob.machine.GMMStats(2,3)
     gs11.n = N1[:,0]
-    gs11.sumPx = F1[:,0].reshape(2,3)
+    gs11.sum_px = F1[:,0].reshape(2,3)
     gs12 = bob.machine.GMMStats(2,3)
     gs12.n = N1[:,1]
-    gs12.sumPx = F1[:,1].reshape(2,3)
+    gs12.sum_px = F1[:,1].reshape(2,3)
 
     gs21 = bob.machine.GMMStats(2,3)
     gs21.n = N2[:,0]
-    gs21.sumPx = F2[:,0].reshape(2,3)
+    gs21.sum_px = F2[:,0].reshape(2,3)
     gs22 = bob.machine.GMMStats(2,3)
     gs22.n = N2[:,1]
-    gs22.sumPx = F2[:,1].reshape(2,3)
+    gs22.sum_px = F2[:,1].reshape(2,3)
 
     vec = [[gs11, gs12], [gs21, gs22]]
 
@@ -508,15 +508,15 @@ class JFATrainerTest(unittest.TestCase):
 
     # Calls the train function
     ubm = bob.machine.GMMMachine(2,3)
-    ubm.meanSupervector = m
-    ubm.varianceSupervector = E
+    ubm.mean_supervector = m
+    ubm.variance_supervector = E
     jfam = bob.machine.JFABaseMachine(ubm,2)
     jfat = bob.trainer.JFABaseTrainer(jfam)
-    jfam.U = u
+    jfam.u = u
     jfat.trainISVNoInit(vec, 10, 4)
 
-    self.assertTrue( numpy.allclose(jfam.D, d_ref, eps) )
-    self.assertTrue( numpy.allclose(jfam.U, u_ref, eps) )
+    self.assertTrue( numpy.allclose(jfam.d, d_ref, eps) )
+    self.assertTrue( numpy.allclose(jfam.u, u_ref, eps) )
 
 
     # Calls the enrol function
@@ -527,10 +527,10 @@ class JFATrainerTest(unittest.TestCase):
     Fe = numpy.array([0.1579, 0.1925, 0.3242, 0.1234, 0.2354, 0.2734, 0.2514, 0.5874, 0.3345, 0.2463, 0.4789, 0.5236]).reshape((6,2))
     gse1 = bob.machine.GMMStats(2,3)
     gse1.n = Ne[:,0]
-    gse1.sumPx = Fe[:,0].reshape(2,3)
+    gse1.sum_px = Fe[:,0].reshape(2,3)
     gse2 = bob.machine.GMMStats(2,3)
     gse2.n = Ne[:,1]
-    gse2.sumPx = Fe[:,1].reshape(2,3)
+    gse2.sum_px = Fe[:,1].reshape(2,3)
 
     gse = [gse1, gse2]
     jfatrainer.enrol(gse, 5)

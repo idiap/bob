@@ -113,7 +113,7 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(linearScoring1_overloads, linearScoring1, 4, 6)
 BOOST_PYTHON_FUNCTION_OVERLOADS(linearScoring2_overloads, linearScoring2, 3, 5)
 
 void bind_machine_linear_scoring() {
-  def("linearScoring", linearScoring1, linearScoring1_overloads(args("models", "ubm_mean", "ubm_variance", "test_stats", "test_channelOffset", "frame_length_normalisation"),
+  def("linear_scoring", linearScoring1, linearScoring1_overloads(args("models", "ubm_mean", "ubm_variance", "test_stats", "test_channelOffset", "frame_length_normalisation"),
     "Compute a matrix of scores using linear scoring.\n"
     "Return a 2D matrix of scores, scores[m, s] is the score for model m against statistics s\n"
     "\n"
@@ -126,7 +126,7 @@ void bind_machine_linear_scoring() {
     "test_channelOffset -- \n"
     "frame_length_normlisation -- perform a normalisation by the number of feature vectors\n"
     ));
-  def("linearScoring", linearScoring2, linearScoring2_overloads(args("models", "ubm", "test_stats", "test_channelOffset", "frame_length_normalisation"),
+  def("linear_scoring", linearScoring2, linearScoring2_overloads(args("models", "ubm", "test_stats", "test_channel_offset", "frame_length_normalisation"),
     "Compute a matrix of scores using linear scoring.\n"
     "Return a 2D matrix of scores, scores[m, s] is the score for model m against statistics s\n"
     "\n"
@@ -135,7 +135,7 @@ void bind_machine_linear_scoring() {
     "models      -- list of client models\n"
     "ubm         -- world model\n"
     "test_stats  -- list of accumulate statistics for each test trial\n"
-    "test_channelOffset -- \n"
+    "test_channel_offset -- \n"
     "frame_length_normlisation -- perform a normalisation by the number of feature vectors\n"
   ));
 }
