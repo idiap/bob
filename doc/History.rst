@@ -23,13 +23,12 @@
 History
 -------
 
-|project| has distant roots on `Torch 3 vision`_, a variant of `Torch`_, a
-framework for machine learning, initially developed at the Idiap Research
-Institute in Martigny, Wallis, Switzerland. It diverged from `Torch`_ in its
-early infancy to become a completely independent project, focused primarily on
-tools for Biometrics and Forensics, Machine Learning and Signal Processing.
-Here are some links to older versions of ``Torch`` that certain served as an
-inspiration:
+|project| has distant roots from `Torch 3 vision`_, a variant of `Torch`_, which
+was/is a framework for machine learning, initially developed at the Idiap Research
+Institute in Switzerland. It diverged from `Torch`_ in its infancy to become a 
+completely independent project focused primarily on tools for biometrics, forensics, 
+machine learning and signal processing. Here are some links to older versions of 
+``Torch`` that served as an inspiration:
 
 * `Torch 3`_
 * `Torch 3 Vision`_
@@ -38,7 +37,7 @@ inspiration:
 Authors
 -------
 
-|project| is developed and maintained by:
+Many people have contributed to the development and maintenance of |project|, these include:
 
 .. place your name here if you participate - keep alphabetical order
 
