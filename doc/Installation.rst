@@ -23,9 +23,10 @@
 ======================
 
 This section describes how to automatically install pre-packaged versions of |project|.
-This is the easiest way to start using |project| in your scripts, by following one of the available installation methods below.
-On the other hand, if they are not appropriate or you would like to become a developer of |project|, you should
-compile |project| yourself as explained at :doc:`Compilation`.
+This is the easiest way to start using |project| in your scripts, all you need to do is follow
+one of the available installation methods below. On the other hand, if they are not appropriate 
+or you would like to become a developer of |project|, you should compile |project| yourself as 
+explained at :doc:`Compilation`. 
 
 
 Ubuntu
