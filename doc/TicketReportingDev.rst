@@ -21,13 +21,14 @@ Bug Reporting and Feature Requesting
 ====================================
 
 
-Reporting bugs that will be taken into account and treated quickly is not an
-easy task. Please read this entire document before submitting tickets. *It
-will help us fix your bug faster!* Bug submissions that do not meet the
-following guidelines tend to be investigated last or, more likely, closed as
-invalid. (For great insights on bug reporting, also read through the very good
+Reporting bugs and then resolving them quickly is not an easy task. For this
+reason we ask that you follow the guidelines outlined below when logging a
+bug or asked for new features. Please read this entire document before submitting 
+tickets. *It will help us fix your bug faster!* Bug submissions or feature requests
+that do not meet these guidelines tend to be investigated last or, more likely, closed as
+invalid. For great insights on bug reporting, also read through the very good
 suggestions offered by `Eric Raymond's How To Ask Questions The Smart Way`_ and
-`Simon Tatham's How to Report Bugs Effectively`_.)
+`Simon Tatham's How to Report Bugs Effectively`_.
 
 Guidelines
 ----------
@@ -56,9 +57,8 @@ been reported. This is a good thing. If you wish, you can vote on the ticket by
 clicking the "up" arrow at the top of the page.
 
 Once you have filled a bug or a feature request, try following it up (mails are
-sent when they get changed) and answering any questions that have been asked,
-following all steps that may have been suggested. If possible, include
-additional useful information.
+sent when they get changed) and please answer any follow up questions that have 
+been asked of you. If possible, include additional useful information.
 
 Examples of good and bad reports
 --------------------------------
