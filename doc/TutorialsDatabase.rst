@@ -24,7 +24,7 @@
 biometric databases. A database contains information about the organization
 of the files, functions to query information such as the data which might be
 used for training a model, but it does **not** contain the data itself.
-Most of the databases are stored in a `sqlite`_ file, whereas the smallest 
+Most of the databases are stored in a sqlite_ file, whereas the smallest 
 ones are stored as filelists.
 
 .. testsetup:: *
@@ -35,33 +35,24 @@ ones are stored as filelists.
 MOBIO database
 ==============
 
-Let's consider an example with the freely available `MOBIO`_ database, which
-consists in bi-modal (audio and video) data from 152 people. For this example,
-we will use the still images of the database. The database is created as any 
-other `Python` object.
+Let's consider an example with the freely available MOBIO_ database, which
+consists in bi-modal (audio and video) data from 150 people. For this example,
+we will use the still images of the database. The database query is 
+instantiated as any other Python_ object.
 
 .. doctest::
 
    >>> mobioDb = bob.db.mobio.Database()
 
-If the `sqlite`_ file containing the `MOBIO`_ database has not been created 
-during the |project| build, the previous command will return a runtime error.
-Fortunately, |project| provides a binary utility called `dbmanage.py` which 
-allows to perform basic operations on a database, such as creating it, dumping
-the files, etc. In case of problem, running the following command will 
-generate the database.
-
-.. code-block:: sh
-
-   $ dbmanage.py mobio create
-
-Once the database has been created, it is possible to query information about
-it. For instance, to retrieve the list of clients, the 
+Once the database has been instantiated, it is possible to query information 
+about it. For instance, to retrieve the list of client ids, the 
 :py:meth:`bob.db.mobio.Database.clients()` could be called.
 
 .. doctest::
 
    >>> clientsList = mobioDb.clients()
+   >>> print len(clientsList)
+   150
 
 The |project| database also contains information about the protocols. In 
 particular, the :py:meth:`bob.db.mobio.Database.clients()` can be 
@@ -72,7 +63,7 @@ a model (`world` subset) for a specified protocol.
 
    >>> clientsSublist = mobioDb.clients(protocol = 'male', groups = 'world')
    >>> clientsSublistSorted = sorted(clientsSublist)
-   >>> print clientsSublistSorted[0]
+   >>> print clientsSublistSorted[0] # print the id of the first client
    202
    
 Then, if we would like to retrieve the list of files associated with this 
@@ -85,7 +76,7 @@ help.
    >>> print len(fileList0)
    192
 
-In the previous case, the returned list of filenames contains relative path 
+In the previous case, the returned list of filenames contains relative paths
 without extension. However, it is posssible to provides a base directory and
 an extension argument to the function, that will respectively prepend and 
 append them to the list of filenames.
@@ -104,6 +95,8 @@ files of a database using the `checkfiles` command of the `dbmanage.py` script.
 
 If a file can not be found, its filename will be printed in the standard 
 output stream.
+
+.. include:: links.rst
 
 .. Place here your external references
 
