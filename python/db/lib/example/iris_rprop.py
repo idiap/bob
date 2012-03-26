@@ -129,7 +129,7 @@ def plot(output):
     positives = histo[i][O].copy() #make it C-style contiguous
     negatives = numpy.hstack([histo[i][k] for k in order if k != O])
     # note: threshold a posteriori! (don't do this at home, kids ;-)
-    thres = bob.measure.eerThreshold(negatives, positives)
+    thres = bob.measure.eer_threshold(negatives, positives)
     far, frr = bob.measure.farfrr(negatives, positives, thres)
     FAR.append(far)
     FRR.append(frr)

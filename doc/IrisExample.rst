@@ -183,7 +183,7 @@ variants is the same as for the *Virginica* one.
 
   >>> negatives = numpy.vstack([output['setosa'], output['versicolor']])[:,0]
   >>> positives = output['virginica'][:,0]
-  >>> t = bob.measure.eerThreshold(negatives, positives)
+  >>> t = bob.measure.eer_threshold(negatives, positives)
 
 With the threshold at hand, we can estimate the number of correctly classified
 *negatives* (or true-rejections) and *positives* (or true-accepts). Let's
@@ -195,8 +195,8 @@ the rates, we just use :py:mod:`bob.measure` again:
 
 .. doctest:: iris
 
-  >>> true_rejects = bob.measure.correctlyClassifiedNegatives(negatives, t)
-  >>> true_accepts = bob.measure.correctlyClassifiedPositives(positives, t)
+  >>> true_rejects = bob.measure.correctly_classified_negatives(negatives, t)
+  >>> true_accepts = bob.measure.correctly_classified_positives(positives, t)
 
 From that you can calculate, for example, the number of misses on the Equal
 Error Rate:
@@ -208,7 +208,7 @@ Error Rate:
   >>> sum(true_accepts)
   49
 
-You can also plot an R.O.C. curve as explained at :doc:`TutorialsPerformance`.
+You can also plot an ROC curve as explained at :doc:`TutorialsPerformance`.
 Here is the full code that will lead you to the following plot:
 
 .. plot:: plot/iris_lda_roc.py

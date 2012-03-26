@@ -67,8 +67,8 @@ class ErrorTest(unittest.TestCase):
 
   def test02_indexing(self):
 
-    # This test verifies that the output of correctlyClassifiedPositives() and
-    # correctlyClassifiedPositives() makes sense.
+    # This test verifies that the output of correctly_classified_positives() and
+    # correctly_classified_negatives() makes sense.
     positives = bob.io.load('linsep-positives.hdf5')
     negatives = bob.io.load('linsep-negatives.hdf5')
 
@@ -78,35 +78,35 @@ class ErrorTest(unittest.TestCase):
     # If the threshold is minimum, we should have all positive samples
     # correctly classified and none of the negative samples correctly
     # classified.
-    self.assertTrue(bob.measure.correctlyClassifiedPositives(positives,
+    self.assertTrue(bob.measure.correctly_classified_positives(positives,
       minimum-0.1).all())
-    self.assertFalse(bob.measure.correctlyClassifiedNegatives(negatives,
+    self.assertFalse(bob.measure.correctly_classified_negatives(negatives,
       minimum-0.1).any())
 
     # The inverse is true if the threshold is a bit above the maximum.
-    self.assertFalse(bob.measure.correctlyClassifiedPositives(positives,
+    self.assertFalse(bob.measure.correctly_classified_positives(positives,
       maximum+0.1).any())
-    self.assertTrue(bob.measure.correctlyClassifiedNegatives(negatives,
+    self.assertTrue(bob.measure.correctly_classified_negatives(negatives,
       maximum+0.1).all())
 
     # If the threshold separates the sets, than all should be correctly
     # classified.
-    self.assertTrue(bob.measure.correctlyClassifiedPositives(positives, 3).all())
-    self.assertTrue(bob.measure.correctlyClassifiedNegatives(negatives, 3).all())
+    self.assertTrue(bob.measure.correctly_classified_positives(positives, 3).all())
+    self.assertTrue(bob.measure.correctly_classified_negatives(negatives, 3).all())
 
   def test03_thresholding(self):
 
-    # This example will demonstrate and check the use of eerThreshold() to
+    # This example will demonstrate and check the use of eer_threshold() to
     # calculate the threshold that minimizes the EER.
    
     # This test set is not separable.
     positives = bob.io.load('nonsep-positives.hdf5')
     negatives = bob.io.load('nonsep-negatives.hdf5')
-    threshold = bob.measure.eerThreshold(negatives, positives)
+    threshold = bob.measure.eer_threshold(negatives, positives)
 
     # Of course we have to make sure that will set the EER correctly:
-    ccp = count(bob.measure.correctlyClassifiedPositives(positives,threshold))
-    ccn = count(bob.measure.correctlyClassifiedNegatives(negatives,threshold))
+    ccp = count(bob.measure.correctly_classified_positives(positives,threshold))
+    ccn = count(bob.measure.correctly_classified_negatives(negatives,threshold))
     self.assertTrue( (ccp - ccn) <= 1 )
 
     # If the set is separable, the calculation of the threshold is a little bit
@@ -115,23 +115,23 @@ class ErrorTest(unittest.TestCase):
     # do better. Let's verify
     positives = bob.io.load('linsep-positives.hdf5')
     negatives = bob.io.load('linsep-negatives.hdf5')
-    threshold = bob.measure.eerThreshold(negatives, positives)
+    threshold = bob.measure.eer_threshold(negatives, positives)
     # the result here is 3.242 (which is what is expect ;-)
 
     # Of course we have to make sure that will set the EER correctly:
-    ccp = count(bob.measure.correctlyClassifiedPositives(positives,threshold))
-    ccn = count(bob.measure.correctlyClassifiedNegatives(negatives,threshold))
+    ccp = count(bob.measure.correctly_classified_positives(positives,threshold))
+    ccn = count(bob.measure.correctly_classified_negatives(negatives,threshold))
     self.assertEqual(ccp, ccn)
 
     # The second option for the calculation of the threshold is to use the
     # minimum HTER.
-    threshold2 = bob.measure.minHterThreshold(negatives, positives)
+    threshold2 = bob.measure.min_hter_threshold(negatives, positives)
     # the result here is 3.242 (which is what is expect ;-)
     self.assertEqual(threshold, threshold2) #in this particular case
 
     # Of course we have to make sure that will set the EER correctly:
-    ccp = count(bob.measure.correctlyClassifiedPositives(positives,threshold2))
-    ccn = count(bob.measure.correctlyClassifiedNegatives(negatives,threshold2))
+    ccp = count(bob.measure.correctly_classified_positives(positives,threshold2))
+    ccn = count(bob.measure.correctly_classified_negatives(negatives,threshold2))
     self.assertEqual(ccp, ccn)
 
   def test04_plots(self):
@@ -139,7 +139,7 @@ class ErrorTest(unittest.TestCase):
     # This test set is not separable.
     positives = bob.io.load('nonsep-positives.hdf5')
     negatives = bob.io.load('nonsep-negatives.hdf5')
-    threshold = bob.measure.eerThreshold(negatives, positives)
+    threshold = bob.measure.eer_threshold(negatives, positives)
 
     # This example will test the ROC plot calculation functionality.
     xy = bob.measure.roc(negatives, positives, 100)

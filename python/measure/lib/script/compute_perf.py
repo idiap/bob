@@ -58,9 +58,9 @@ def print_crit(dev_neg, dev_pos, test_neg, test_pos, crit):
   """Prints a single output line that contains all info for a given criterium"""
 
   if crit == 'EER':
-    thres = bob.measure.eerThreshold(dev_neg, dev_pos)
+    thres = bob.measure.eer_threshold(dev_neg, dev_pos)
   else:
-    thres = bob.measure.minHterThreshold(dev_neg, dev_pos)
+    thres = bob.measure.min_hter_threshold(dev_neg, dev_pos)
 
   dev_far, dev_frr = bob.measure.farfrr(dev_neg, dev_pos, thres)
   dev_hter = (dev_far + dev_frr)/2.0
