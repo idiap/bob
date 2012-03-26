@@ -203,9 +203,9 @@ Error Rate:
 
 .. doctest:: iris
 
-  >>> numpy.count_nonzero(true_rejects)
+  >>> sum(true_rejects)
   98 
-  >>> numpy.count_nonzero(true_accepts)
+  >>> sum(true_accepts)
   49
 
 You can also plot an R.O.C. curve as explained at :doc:`TutorialsPerformance`.
