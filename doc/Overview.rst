@@ -24,7 +24,7 @@ Overview
 |project| is a free signal-processing and machine learning toolbox 
 developed by the Biometrics group at `Idiap`_ Research Institute, Switzerland. The toolbox is
 written in a mix of `Python`_ and `C++` and is designed to be both efficient
-and to reduce development time. 
+and reduce development time. 
 
 Below is a brief summary of what you can do right now with |project|. To get started using |project|, please continue to the instructions for :doc:`Installation`.
 
@@ -41,7 +41,7 @@ Numerous image processing tools are provided such as filtering (Gaussian, Median
 Machine learning
 ----------------
 
-|project| has been developed by researchers tackling many machine vision problems. Several machine learning algorithms have been integrated into the library. Dimensionality reduction is supported using Principal Component Analysis, Linear Discriminant Analysis and its probabilistic variant. K-means is provided for data clustering, and classification is possible using both generative modeling techniques (Gaussian mixture models, Join Factor Analysis) and discriminative approaches such as Multi-Layer Perceptrons or Support Vector Machine (via a `LIBSVM`_ bridge). 
+|project| has been developed by researchers tackling many machine vision problems. Several machine learning algorithms have been integrated into the library. Dimensionality reduction is supported using Principal Component Analysis, Linear Discriminant Analysis and its probabilistic variant. There are data clustering algorithms such as k-means and classification is possible using both generative modeling techniques (Gaussian mixture models, Join Factor Analysis) and discriminative approaches such as Multi-Layer Perceptrons or Support Vector Machine (via a `LIBSVM`_ bridge). 
 
 Storing and managing data
 -------------------------
