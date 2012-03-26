@@ -21,23 +21,25 @@
 =======================================
 
 We started developing |project| because of a common need in many research
-laboratories like ours: need of a software platform where stable algorithms,
-common tools, practice and start-up documentation could be put at and
-maintained. It did not take long for us to understand the importance of those
-tasks when involving new parties in our research: better documentation and
-reliable infrastructure can boost your working efficiency many times! Since
-then, we try to maintain and improve the functionality for the project with the
-following ideas in mind:
+laboratories like ours: the need to have a software platform where stable 
+algorithms and common tools could be stored, easily shared and maintained. 
+We quickly realised the importance of such a platform, the ability to have
+common algorithms and tools in one central repository with good documentation 
+greatly improved our efficiency by allowing us to not only more easily share 
+our code but also to allow new people (and external parties) to get up to speed
+and collaborate easily! With this in mind we have tried to maintain and improve
+the functionality of |project| with the following ideas in mind.
 
 * All modifications and improvements are thoroughly tested at every minor
   change: correctness comes first, whereas speed is a bonus. This is not to
-  say |project| is not fast enough - it is! Our code is very much readable and
-  maintanable though. We are constantly inspecting it and making sure other
+  say |project| is not fast enough - it is! But we do not sacrifice the 
+  readability and maintainability of our code for a few microseconds of
+  efficiency. We are constantly inspecting the code and making sure other
   people (mainly beginners and new students) can understand what it is that our
-  programs do; 
-* Reproducing publications should be dead-simple. If that is not the case, your
+  programs do.
+* Reproducing publications should be dead-simple. If that is not the case, the
   potential impact becomes severely compromised. We try to develop |project| so
-  that our own research results are easy to reproduce and understand; 
+  that our own research results are easy to reproduce and understand.
 * There should always be a laboratory-like environment in which experiments can
   be conducted without the compile-link-test cycles which tend to be lengthy
   and counter-productive. We have chosen the `Python`_ language because it
@@ -47,17 +49,17 @@ following ideas in mind:
   operation vectorization or `Matplotlib`_ for plotting.
 * We still keep the ability to implement fast versions (in `C++`_) of
   identified bottlenecks. We do this by avoiding the `NumPy`_ C-API which can
-  be overwhelming and bridging those types to `Blitz++`_ arrays. With that
-  approach, our `C++`_ becomes clean and easy to understand. It is very easy to
-  speed-up code if you need to in |project|;
-* As much as is possible with a project in this scale, we try to re-use
+  be overwhelming, instead for the `C++`_ code we use simple and efficient `Blitz++`_ 
+  arrays. With such an approach, our `C++`_ becomes clean and easy to understand. 
+  It also means that it is very easy to speed-up code if you need to in |project|.
+* As much as is possible, with a project in this scale, we try to re-use
   existing open-source packages and standards. This simplifies our testing to
-  the bare minimum and keep the overall quality of |project| pretty high;
-* We do this effort so |project| is useful to us (and maybe to you) as a
-  continously development framework for new experiments in signal processing,
-  machine learning and biometrics. We open source it (`GPL-3.0`_) with hopes it
-  is useful to others. (For more information on licensing, please visit our
-  :doc:`Licensing`)
+  the bare minimum and keeps the overall quality of |project| high.
+* We make this effort so |project| is useful to us (and maybe to you) as a
+  continuously development framework for new experiments in signal processing,
+  machine learning and biometrics. For this reason we open source it (`GPL-3.0`_) with 
+  the hope that it is useful to others. For more information on licensing, please 
+  visit our :doc:`Licensing`.
 
 For more details about the history and authors of |project|, you can see :doc:`History`.
 
