@@ -32,19 +32,19 @@ void bind_trainer_kmeans() {
   typedef train::EMTrainer<mach::KMeansMachine, io::Arrayset> EMTrainerKMeansBase; 
 
   class_<EMTrainerKMeansBase, boost::noncopyable>("EMTrainerKMeans", "The base python class for all EM-based trainers.", no_init)
-    .add_property("convergenceThreshold", &EMTrainerKMeansBase::getConvergenceThreshold, &EMTrainerKMeansBase::setConvergenceThreshold, "Convergence threshold")
-    .add_property("maxIterations", &EMTrainerKMeansBase::getMaxIterations, &EMTrainerKMeansBase::setMaxIterations, "Max iterations")
-    .add_property("computeLikelihood", &EMTrainerKMeansBase::getComputeLikelihood, &EMTrainerKMeansBase::setComputeLikelihood, "Tells whether we compute the average min distance or not.")
+    .add_property("convergence_threshold", &EMTrainerKMeansBase::getConvergenceThreshold, &EMTrainerKMeansBase::setConvergenceThreshold, "Convergence threshold")
+    .add_property("max_iterations", &EMTrainerKMeansBase::getMaxIterations, &EMTrainerKMeansBase::setMaxIterations, "Max iterations")
+    .add_property("compute_likelihood", &EMTrainerKMeansBase::getComputeLikelihood, &EMTrainerKMeansBase::setComputeLikelihood, "Tells whether we compute the average min distance or not.")
     .def("train", &EMTrainerKMeansBase::train, (arg("machine"), arg("data")), "Train a machine using data")
     .def("initialization", &EMTrainerKMeansBase::initialization, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
-    .def("eStep", &EMTrainerKMeansBase::eStep, (arg("machine"), arg("data")),
+    .def("e_step", &EMTrainerKMeansBase::eStep, (arg("machine"), arg("data")),
        "Update the hidden variable distribution (or the sufficient statistics) given the Machine parameters. "
        "Also, calculate the average output of the Machine given these parameters.\n"
        "Return the average output of the Machine across the dataset. "
        "The EM algorithm will terminate once the change in average_output "
        "is less than the convergence_threshold.")
-    .def("mStep", &EMTrainerKMeansBase::mStep, (arg("machine"), arg("data")), "Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
-     .def("computeLikelihood", &EMTrainerKMeansBase::computeLikelihood, (arg("machine")), "Returns the average min distance")
+    .def("m_step", &EMTrainerKMeansBase::mStep, (arg("machine"), arg("data")), "Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
+     .def("compute_likelihood", &EMTrainerKMeansBase::computeLikelihood, (arg("machine")), "Returns the average min distance")
      .def("finalization", &EMTrainerKMeansBase::finalization, (arg("machine"), arg("data")), "This method is called after the EM algorithm")
   ;
 

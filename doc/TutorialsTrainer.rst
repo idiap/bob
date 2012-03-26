@@ -179,7 +179,7 @@ The class used to train a MLP [3]_ with backpropagation [4]_ is
    :options: +NORMALIZE_WHITESPACE
    
    >>> trainer = bob.trainer.MLPBackPropTrainer(machine, 1) #  Creates a BackProp trainer with a batch size of 1
-   >>> trainer.trainBiases = False # Do not train the bias
+   >>> trainer.train_biases = False # Do not train the bias
    >>> trainer.train(machine, d0, t0) # Performs the Back Propagation
 
 Backpropagation [4]_ requires a learning rate to be set. In the previous 
@@ -195,7 +195,7 @@ procedure remains identical.
    :options: +NORMALIZE_WHITESPACE
  
    >>> trainer = bob.trainer.MLPRPropTrainer(machine, 1)
-   >>> trainer.trainBiases = False
+   >>> trainer.train_biases = False
    >>> trainer.train(machine, d0, t0) 
 
 
@@ -345,8 +345,8 @@ called.
    :options: +NORMALIZE_WHITESPACE
 
    >>> kmeansTrainer = bob.trainer.KMeansTrainer()
-   >>> kmeansTrainer.maxIterations = 200
-   >>> kmeansTrainer.convergenceThreshold = 1e-5
+   >>> kmeansTrainer.max_iterations = 200
+   >>> kmeansTrainer.convergence_threshold = 1e-5
 
    >>> kmeansTrainer.train(kmeans, data) # Train the KMeansMachine
    >>> print kmeans.means
@@ -383,8 +383,8 @@ used to determine if the convergence has occurred.
    :options: +NORMALIZE_WHITESPACE
 
    >>> trainer = bob.trainer.ML_GMMTrainer(True, True, True) # update means/variances/weights at each iteration
-   >>> trainer.convergenceThreshold = 1e-5
-   >>> trainer.maxIterations = 200
+   >>> trainer.convergence_threshold = 1e-5
+   >>> trainer.max_iterations = 200
    >>> trainer.train(gmm, data)
    >>> print gmm # doctest: +SKIP
 
@@ -437,9 +437,9 @@ Once the trainer has been created, a prior GMM [9]_ needs to be set.
   
    >>> relevance_factor = 4.
    >>> trainer = bob.trainer.MAP_GMMTrainer(relevance_factor, True, False, False) # mean adaptation only
-   >>> trainer.convergenceThreshold = 1e-5
-   >>> trainer.maxIterations = 200
-   >>> trainer.setPriorGMM(gmm)
+   >>> trainer.convergence_threshold = 1e-5
+   >>> trainer.max_iterations = 200
+   >>> trainer.set_prior_gmm(gmm)
    True
    >>> gmmAdapted = bob.machine.GMMMachine(2,3) # Create a new machine for the MAP estimate
    >>> trainer.train(gmmAdapted, dataMAP)

@@ -59,8 +59,8 @@ class DataShufflerTest(unittest.TestCase):
     shuffle = bob.trainer.DataShuffler([self.set1, self.set2, self.set3],
         [self.target1, self.target2, self.target3])
 
-    self.assertEqual(shuffle.dataWidth, 3)
-    self.assertEqual(shuffle.targetWidth, 1)
+    self.assertEqual(shuffle.data_width, 3)
+    self.assertEqual(shuffle.target_width, 1)
 
   def test01a_InitializationWithArrays(self):
 
@@ -76,8 +76,8 @@ class DataShufflerTest(unittest.TestCase):
       ]
 
     shuffle = bob.trainer.DataShuffler(data, target)
-    self.assertEqual(shuffle.dataWidth, 2)
-    self.assertEqual(shuffle.targetWidth, 2)
+    self.assertEqual(shuffle.data_width, 2)
+    self.assertEqual(shuffle.target_width, 2)
 
   def test02_Drawing(self):
 
@@ -90,8 +90,8 @@ class DataShufflerTest(unittest.TestCase):
 
     [data, target] = shuffle(N)
 
-    self.assertEqual(data.shape, (N, shuffle.dataWidth))
-    self.assertEqual(target.shape, (N, shuffle.targetWidth))
+    self.assertEqual(data.shape, (N, shuffle.data_width))
+    self.assertEqual(target.shape, (N, shuffle.target_width))
 
     # Finally, we also test if the data is well separated. We have to have 2 
     # of each class since N is multiple of 9
@@ -109,8 +109,8 @@ class DataShufflerTest(unittest.TestCase):
 
     [data, target] = shuffle(N)
 
-    self.assertEqual(data.shape, (N, shuffle.dataWidth))
-    self.assertEqual(target.shape, (N, shuffle.targetWidth))
+    self.assertEqual(data.shape, (N, shuffle.data_width))
+    self.assertEqual(target.shape, (N, shuffle.target_width))
 
     # Finally, we also test if the data is well separated. We have to have 2 
     # of each class since N is multiple of 9

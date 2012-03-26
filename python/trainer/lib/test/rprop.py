@@ -188,15 +188,15 @@ class RPropTest(unittest.TestCase):
     machine.activation = bob.machine.Activation.LINEAR
     B = 10
     trainer = bob.trainer.MLPRPropTrainer(machine, B)
-    self.assertEqual( trainer.batchSize, B )
-    self.assertTrue ( trainer.isCompatible(machine) )
-    self.assertTrue ( trainer.trainBiases )
+    self.assertEqual( trainer.batch_size, B )
+    self.assertTrue ( trainer.is_compatible(machine) )
+    self.assertTrue ( trainer.train_biases )
 
     machine = bob.machine.MLP((7, 2))
-    self.assertFalse ( trainer.isCompatible(machine) )
+    self.assertFalse ( trainer.is_compatible(machine) )
 
-    trainer.trainBiases = False
-    self.assertFalse ( trainer.trainBiases )
+    trainer.train_biases = False
+    self.assertFalse ( trainer.train_biases )
 
   def test02_SingleLayerNoBiasControlled(self):
 
@@ -209,12 +209,12 @@ class RPropTest(unittest.TestCase):
     w0 = numpy.array([[.1],[.2],[-.1],[-.05]])
     machine.weights = [w0]
     trainer = bob.trainer.MLPRPropTrainer(machine, 1)
-    trainer.trainBiases = False
+    trainer.train_biases = False
     d0 = numpy.array([[1., 2., 0., 2.]])
     t0 = numpy.array([[1.]])
 
     # trains in python first
-    pytrainer = PythonRProp(train_biases=trainer.trainBiases)
+    pytrainer = PythonRProp(train_biases=trainer.train_biases)
     pymachine = bob.machine.MLP(machine) #a copy
     pytrainer.train(pymachine, d0, t0)
 
@@ -249,7 +249,7 @@ class RPropTest(unittest.TestCase):
     machine.randomize()
     machine.biases = 0
     trainer = bob.trainer.MLPRPropTrainer(machine, N)
-    trainer.trainBiases = False
+    trainer.train_biases = False
 
     # A helper to select and shuffle the data
     targets = [ #we choose the approximate Fisher response!
@@ -264,7 +264,7 @@ class RPropTest(unittest.TestCase):
     S = bob.trainer.DataShuffler(datalist, targets)
 
     # trains in python first
-    pytrainer = PythonRProp(train_biases=trainer.trainBiases)
+    pytrainer = PythonRProp(train_biases=trainer.train_biases)
     pymachine = bob.machine.MLP(machine) #a copy
 
     # We now iterate for several steps, look for the convergence
@@ -288,7 +288,7 @@ class RPropTest(unittest.TestCase):
     machine.activation = bob.machine.Activation.LINEAR
     machine.randomize()
     trainer = bob.trainer.MLPRPropTrainer(machine, N)
-    trainer.trainBiases = True
+    trainer.train_biases = True
 
     # A helper to select and shuffle the data
     targets = [ #we choose the approximate Fisher response!
@@ -303,7 +303,7 @@ class RPropTest(unittest.TestCase):
     S = bob.trainer.DataShuffler(datalist, targets)
 
     # trains in python first
-    pytrainer = PythonRProp(train_biases=trainer.trainBiases)
+    pytrainer = PythonRProp(train_biases=trainer.train_biases)
     pymachine = bob.machine.MLP(machine) #a copy
 
     # We now iterate for several steps, look for the convergence
@@ -327,7 +327,7 @@ class RPropTest(unittest.TestCase):
     machine.activation = bob.machine.Activation.TANH
     machine.randomize()
     trainer = bob.trainer.MLPRPropTrainer(machine, N)
-    trainer.trainBiases = True
+    trainer.train_biases = True
 
     # A helper to select and shuffle the data
     targets = [ #we choose the approximate Fisher response!
@@ -342,7 +342,7 @@ class RPropTest(unittest.TestCase):
     S = bob.trainer.DataShuffler(datalist, targets)
 
     # trains in python first
-    pytrainer = PythonRProp(train_biases=trainer.trainBiases)
+    pytrainer = PythonRProp(train_biases=trainer.train_biases)
     pymachine = bob.machine.MLP(machine) #a copy
 
     # We now iterate for several steps, look for the convergence
@@ -368,7 +368,7 @@ class RPropTest(unittest.TestCase):
     machine.activation = bob.machine.Activation.TANH
     machine.randomize()
     trainer = bob.trainer.MLPRPropTrainer(machine, N)
-    trainer.trainBiases = True
+    trainer.train_biases = True
 
     # A helper to select and shuffle the data
     targets = [ #we choose the approximate Fisher response!
@@ -383,7 +383,7 @@ class RPropTest(unittest.TestCase):
     S = bob.trainer.DataShuffler(datalist, targets)
 
     # trains in python first
-    pytrainer = PythonRProp(train_biases=trainer.trainBiases)
+    pytrainer = PythonRProp(train_biases=trainer.train_biases)
     pymachine = bob.machine.MLP(machine) #a copy
 
     # We now iterate for several steps, look for the convergence

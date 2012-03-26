@@ -238,8 +238,8 @@ def trainGMM(data, n_gaussians=32, iterk=25, iterg=25, convergence_threshold=1e-
 
   # Create the KMeansTrainer
   kmeansTrainer = bob.trainer.KMeansTrainer()
-  kmeansTrainer.convergenceThreshold = convergence_threshold
-  kmeansTrainer.maxIterations = iterk
+  kmeansTrainer.convergence_threshold = convergence_threshold
+  kmeansTrainer.max_iterations = iterk
 
   # Train the KMeansTrainer
   kmeansTrainer.train(kmeans, normalizedAr)
@@ -260,8 +260,8 @@ def trainGMM(data, n_gaussians=32, iterk=25, iterg=25, convergence_threshold=1e-
 
   # Train gmm
   trainer = bob.trainer.ML_GMMTrainer(update_means, update_variances, update_weights)
-  trainer.convergenceThreshold = convergence_threshold
-  trainer.maxIterations = iterg
+  trainer.convergence_threshold = convergence_threshold
+  trainer.max_iterations = iterg
   trainer.train(gmm, ar)
 
   return gmm
@@ -280,9 +280,9 @@ def adaptGMM(data, prior_gmm, iterg=25, convergence_threshold=1e-5, variance_thr
     trainer = bob.trainer.MAP_GMMTrainer(relevance_factor, True, adapt_variance, adapt_weight)
   else:
     trainer = bob.trainer.MAP_GMMTrainer(relevance_factor, True, adapt_variance, adapt_weight, responsibilities_threshold)
-  trainer.convergenceThreshold = convergence_threshold
-  trainer.maxIterations = iterg
-  trainer.setPriorGMM(prior_gmm)
+  trainer.convergence_threshold = convergence_threshold
+  trainer.max_iterations = iterg
+  trainer.set_prior_gmm(prior_gmm)
 
   if bob3_map:
     trainer.setT3MAP(alpha_bob3)
@@ -666,7 +666,7 @@ class TestBancaSmall(unittest.TestCase):
         # append in the list
         gmmstats_c.append(stats)
       gmmstats.append(gmmstats_c)
-    T.trainNoInit(gmmstats, jfa_train_n_iter)
+    T.train_no_init(gmmstats, jfa_train_n_iter)
     output_machine = os.path.join(output_dir, 'jfa_model_UVD.hdf5')
     base_machine.save(bob.io.HDF5File(output_machine))
     # TODO: compare trained and enrolled values?

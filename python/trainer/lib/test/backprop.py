@@ -143,15 +143,15 @@ class BackPropTest(unittest.TestCase):
     machine.activation = bob.machine.Activation.LINEAR
     B = 10
     trainer = bob.trainer.MLPBackPropTrainer(machine, B)
-    self.assertEqual( trainer.batchSize, B )
-    self.assertTrue ( trainer.isCompatible(machine) )
-    self.assertTrue ( trainer.trainBiases )
+    self.assertEqual( trainer.batch_size, B )
+    self.assertTrue ( trainer.is_compatible(machine) )
+    self.assertTrue ( trainer.train_biases )
 
     machine = bob.machine.MLP((7, 2))
-    self.assertFalse ( trainer.isCompatible(machine) )
+    self.assertFalse ( trainer.is_compatible(machine) )
 
-    trainer.trainBiases = False
-    self.assertFalse ( trainer.trainBiases )
+    trainer.train_biases = False
+    self.assertFalse ( trainer.train_biases )
 
   def test02_TwoLayersNoBiasControlled(self):
 
@@ -165,12 +165,12 @@ class BackPropTest(unittest.TestCase):
     w1 = numpy.array([[-.12], [-0.88]])
     machine.weights = [w0, w1]
     trainer = bob.trainer.MLPBackPropTrainer(machine, 1)
-    trainer.trainBiases = False
+    trainer.train_biases = False
     d0 = numpy.array([[.3, .7]])
     t0 = numpy.array([[.0]])
 
     # trains in python first
-    pytrainer = PythonBackProp(train_biases=trainer.trainBiases)
+    pytrainer = PythonBackProp(train_biases=trainer.train_biases)
     pymachine = bob.machine.MLP(machine) #a copy
     pytrainer.train(pymachine, d0, t0)
 
@@ -189,7 +189,7 @@ class BackPropTest(unittest.TestCase):
     machine.activation = bob.machine.Activation.TANH
     machine.randomize()
     trainer = bob.trainer.MLPBackPropTrainer(machine, N)
-    trainer.trainBiases = True
+    trainer.train_biases = True
 
     # A helper to select and shuffle the data
     targets = [ #we choose the approximate Fisher response!
@@ -204,7 +204,7 @@ class BackPropTest(unittest.TestCase):
     S = bob.trainer.DataShuffler(datalist, targets)
 
     # trains in python first
-    pytrainer = PythonBackProp(train_biases=trainer.trainBiases)
+    pytrainer = PythonBackProp(train_biases=trainer.train_biases)
     pymachine = bob.machine.MLP(machine) #a copy
 
     # We now iterate for several steps, look for the convergence
@@ -233,7 +233,7 @@ class BackPropTest(unittest.TestCase):
     machine.activation = bob.machine.Activation.TANH
     machine.randomize()
     trainer = bob.trainer.MLPBackPropTrainer(machine, N)
-    trainer.trainBiases = True
+    trainer.train_biases = True
 
     # A helper to select and shuffle the data
     targets = [ #we choose the approximate Fisher response!
@@ -248,7 +248,7 @@ class BackPropTest(unittest.TestCase):
     S = bob.trainer.DataShuffler(datalist, targets)
 
     # trains in python first
-    pytrainer = PythonBackProp(train_biases=trainer.trainBiases)
+    pytrainer = PythonBackProp(train_biases=trainer.train_biases)
     pymachine = bob.machine.MLP(machine) #a copy
 
     # We now iterate for several steps, look for the convergence
@@ -277,7 +277,7 @@ class BackPropTest(unittest.TestCase):
     machine.activation = bob.machine.Activation.TANH
     machine.randomize()
     trainer = bob.trainer.MLPBackPropTrainer(machine, N)
-    trainer.trainBiases = True
+    trainer.train_biases = True
     trainer.momentum = 0.99
 
     # A helper to select and shuffle the data
@@ -293,7 +293,7 @@ class BackPropTest(unittest.TestCase):
     S = bob.trainer.DataShuffler(datalist, targets)
 
     # trains in python first
-    pytrainer = PythonBackProp(train_biases=trainer.trainBiases)
+    pytrainer = PythonBackProp(train_biases=trainer.train_biases)
     pymachine = bob.machine.MLP(machine) #a copy
     pytrainer.momentum = 0.99
 

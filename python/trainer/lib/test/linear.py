@@ -168,13 +168,13 @@ class LinearTest(unittest.TestCase):
     # the new value of W and sigma2 
     # This does an E-Step, M-Step, computes the likelihood, and compares it to
     # the reference value obtained using matlab
-    T.eStep(m, ar)
-    T.mStep(m, ar)
-    llh1 = T.computeLikelihood(m)
+    T.e_step(m, ar)
+    T.m_step(m, ar)
+    llh1 = T.compute_likelihood(m)
     self.assertTrue( abs(exp_llh1 - llh1) < 2e-4)
-    T.eStep(m, ar)
-    T.mStep(m, ar)
-    llh2 = T.computeLikelihood(m)
+    T.e_step(m, ar)
+    T.m_step(m, ar)
+    llh2 = T.compute_likelihood(m)
     self.assertTrue( abs(exp_llh2 - llh2) < 2e-4)
 
 # Instantiates our standard main module for unittests
