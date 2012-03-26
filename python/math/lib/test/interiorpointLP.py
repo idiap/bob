@@ -63,17 +63,17 @@ class InteriorpointLPTest(unittest.TestCase):
       A, b, c, x0, sol = generateProblem(N)
 
       # short step
-      x = bob.math.interiorpointShortstepLP(A, b, c, 0.4, x0, acc)
+      x = bob.math.interiorpoint_shortstep_lp(A, b, c, 0.4, x0, acc)
       # Compare to reference solution
       self.assertEqual( (abs(x-sol) < eps).all(), True )
 
       # predictor corrector
-      x = bob.math.interiorpointPredictorCorrectorLP(A, b, c, 0.5, 0.25, x0, acc)
+      x = bob.math.interiorpoint_predictor_corrector_lp(A, b, c, 0.5, 0.25, x0, acc)
       # Compare to reference solution
       self.assertEqual( (abs(x-sol) < eps).all(), True )
 
       # long step
-      x = bob.math.interiorpointLongstepLP(A, b, c, 1e-3, 0.1, x0, acc)
+      x = bob.math.interiorpoint_longstep_lp(A, b, c, 1e-3, 0.1, x0, acc)
       # Compare to reference solution
       self.assertEqual( (abs(x-sol) < eps).all(), True )
  

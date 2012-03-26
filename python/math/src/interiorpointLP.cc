@@ -86,8 +86,8 @@ static object py_longstep(tp::const_ndarray A, tp::const_ndarray b, tp::const_nd
 void bind_math_interiorpointLP()
 {
   // Interior point methods for Linear Programming
-  def("interiorpointShortstepLP", &py_shortstep, (arg("A"), arg("b"), arg("c"), arg("theta"), arg("x0"), arg("epsilon")), SHORTSTEP_DOC);
-  def("interiorpointPredictorCorrectorLP", &py_predictorcorrector, (arg("A"), arg("b"), arg("c"), arg("theta_pred"), arg("theta_corr"), arg("x0"), arg("epsilon")), PREDICTORCORRECTOR_DOC);
-  def("interiorpointLongstepLP", &py_longstep, (arg("A"), arg("b"), arg("c"), arg("gamma"), arg("sigma"), arg("x0"), arg("epsilon")), LONGSTEP_DOC);
+  def("interiorpoint_shortstep_lp", &py_shortstep, (arg("a"), arg("b"), arg("c"), arg("theta"), arg("x0"), arg("epsilon")), SHORTSTEP_DOC);
+  def("interiorpoint_predictor_corrector_lp", &py_predictorcorrector, (arg("a"), arg("b"), arg("c"), arg("theta_pred"), arg("theta_corr"), arg("x0"), arg("epsilon")), PREDICTORCORRECTOR_DOC);
+  def("interiorpoint_longstep_lp", &py_longstep, (arg("a"), arg("b"), arg("c"), arg("gamma"), arg("sigma"), arg("x0"), arg("epsilon")), LONGSTEP_DOC);
 }
 

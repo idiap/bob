@@ -67,8 +67,8 @@ class LinsolveTest(unittest.TestCase):
     x1 = numpy.ndarray((3,), 'float64')
 
     # Computes the solution
-    bob.math.linsolveSympos(A,x1,b)
-    x2 = bob.math.linsolveSympos(A,b)
+    bob.math.linsolve_sympos(A,x1,b)
+    x2 = bob.math.linsolve_sympos(A,b)
 
     # Compare to reference
     self.assertEqual( (abs(x1-x_ref) < 1e-10).all(), True )
@@ -93,8 +93,8 @@ class LinsolveTest(unittest.TestCase):
     # Computes the solution
     eps = 1e-6
     max_iter = 1000
-    bob.math.linsolveCGSympos(A,x1,b,eps,max_iter)
-    x2 = bob.math.linsolveCGSympos(A,b,eps,max_iter)
+    bob.math.linsolve_cg_sympos(A,x1,b,eps,max_iter)
+    x2 = bob.math.linsolve_cg_sympos(A,b,eps,max_iter)
 
     # Compare to reference
     self.assertEqual( (abs(x1-x_ref) < 2e-6).all(), True )

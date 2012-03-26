@@ -124,9 +124,9 @@ the following techniques:
 
   >>> # negatives, positives = parse_my_scores(...) # write parser if not provided!
   >>> T = 0.0 #Threshold: later we explain how one can calculate these
-  >>> correct_negatives = bob.measure.correctlyClassifiedNegatives(negatives, T)
+  >>> correct_negatives = bob.measure.correctly_classified_negatives(negatives, T)
   >>> FAR = 1 - (float(correct_negatives.sum())/negatives.size)
-  >>> correct_positives = bob.measure.correctlyClassifiedPositives(positives, T)
+  >>> correct_positives = bob.measure.correctly_classified_positives(positives, T)
   >>> FRR = 1 - (float(correct_positives.sum())/positives.size)
 
 We do provide a method to calculate the FAR and FRR in a single shot:
@@ -146,13 +146,13 @@ threshold:
 
   .. doctest::
 
-    >>> T = bob.measure.eerThreshold(negatives, positives)
+    >>> T = bob.measure.eer_threshold(negatives, positives)
 
 * Threshold for the minimum HTER
   
   .. doctest::
 
-    >>> T = bob.measure.minHterThreshold(negatives, positives)
+    >>> T = bob.measure.min_hter_threshold(negatives, positives)
 
 * Threshold for the minimum weighted error rate (MWER) given a certain cost
   :math:`\beta`.
@@ -160,12 +160,12 @@ threshold:
   .. code-block:: python
 
      >>> cost = 0.3 #or "beta"
-     >>> T = bob.measure.minWeightedErrorRateThreshold(negatives, positives, cost)
+     >>> T = bob.measure.min_weighted_error_rate_threshold(negatives, positives, cost)
 
   .. note::
 
     By setting cost to 0.5 is equivalent to use
-    :py:meth:`bob.measure.minHterThreshold`.
+    :py:meth:`bob.measure.min_hter_threshold`.
 
 Plotting
 --------

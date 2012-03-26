@@ -66,12 +66,12 @@ def calculate(neg, pos, crit, cost):
   """Returns the threshold given a certain criteria"""
 
   if crit == 'eer':
-    return bob.measure.eerThreshold(neg, pos)
+    return bob.measure.eer_threshold(neg, pos)
   elif crit == 'mhter':
-    return bob.measure.minHterThreshold(neg, pos)
+    return bob.measure.min_hter_threshold(neg, pos)
 
   # defaults to the minimum of the weighter error rate
-  return bob.measure.minWeightedErrorRateThreshold(neg, pos, cost)
+  return bob.measure.min_weighted_error_rate_threshold(neg, pos, cost)
 
 def get_options():
   """Parse the program options"""

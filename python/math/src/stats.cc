@@ -30,11 +30,11 @@ namespace tp = bob::python;
 namespace math = bob::math;
 namespace ca = bob::core::array;
 
-static const char* SCATTER_DOC1 = "Computes the scatter matrix of a 2D array considering data is organized column-wise (each sample is a column, each feature is a row). The resulting matrix 'S' has to be square with extents equal to the number of rows in A.";
+static const char* SCATTER_DOC1 = "Computes the scatter matrix of a 2D array considering data is organized column-wise (each sample is a column, each feature is a row). The resulting matrix 's' has to be square with extents equal to the number of rows in a.";
 
-static const char* SCATTER_DOC2 = "Computes the scatter matrix of a 2D array considering data is organized column-wise (each sample is a column, each feature is a row). This variant also returns the sample means in 'M'. The resulting arrays 'M' and 'S' have to have the correct sizes (S should be square with extents equal to the number of rows in A and M should be a 1D vector with extents equal to the number of rows in A).";
+static const char* SCATTER_DOC2 = "Computes the scatter matrix of a 2D array considering data is organized column-wise (each sample is a column, each feature is a row). This variant also returns the sample means in 'm'. The resulting arrays 'm' and 's' have to have the correct sizes (s should be square with extents equal to the number of rows in a and m should be a 1D vector with extents equal to the number of rows in a).";
 
-static const char* SCATTER_DOC3 = "Computes the scatter matrix of a 2D array considering data is organized column-wise (each sample is a column, each feature is a row). This variant returns the sample means and the scatter matrix in a tuple. If you are looking for efficiency, prefer the variants that receive the output variable as one of the input parameters. This version will allocate the resulting arrays 'M' and 'S' internally every time it is called.";
+static const char* SCATTER_DOC3 = "Computes the scatter matrix of a 2D array considering data is organized column-wise (each sample is a column, each feature is a row). This variant returns the sample means and the scatter matrix in a tuple. If you are looking for efficiency, prefer the variants that receive the output variable as one of the input parameters. This version will allocate the resulting arrays 'm' and 's' internally every time it is called.";
 
 template <typename T> static tuple scatter_inner(tp::const_ndarray A) {
   const ca::typeinfo& info = A.type();
@@ -137,12 +137,12 @@ static void scatter_M_check(tp::const_ndarray A, tp::ndarray S,
 }
 
 void bind_math_stats() {
-  def("scatter_", &scatter_nocheck, (arg("A"), arg("S")), SCATTER_DOC1);
-  def("scatter", &scatter_check, (arg("A"), arg("S")), SCATTER_DOC1);
+  def("scatter_", &scatter_nocheck, (arg("a"), arg("s")), SCATTER_DOC1);
+  def("scatter", &scatter_check, (arg("a"), arg("s")), SCATTER_DOC1);
   
-  def("scatter_", &scatter_M_nocheck, (arg("A"), arg("S"), arg("M")), SCATTER_DOC2);
-  def("scatter", &scatter_M_check, (arg("A"), arg("S"), arg("M")), SCATTER_DOC2);
+  def("scatter_", &scatter_M_nocheck, (arg("a"), arg("s"), arg("m")), SCATTER_DOC2);
+  def("scatter", &scatter_M_check, (arg("a"), arg("s"), arg("m")), SCATTER_DOC2);
 
-  def("scatter", &scatter, (arg("A")), SCATTER_DOC3);
+  def("scatter", &scatter, (arg("a")), SCATTER_DOC3);
 
 }

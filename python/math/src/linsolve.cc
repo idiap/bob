@@ -28,9 +28,9 @@ using namespace boost::python;
 namespace tp = bob::python;
 namespace ca = bob::core::array;
 
-static const char* LINSOLVE_DOC = "Solve the linear system A*x=b and return the result as a blitz array. The solver is from the LAPACK library (use of dgesv).";
-static const char* LINSOLVE_SYMPOS_DOC = "Solve the linear system A*x=b, where A is symmetric definite positive, and return the result as a blitz array. The solver is from the LAPACK library (use of dposv).";
-static const char* LINSOLVE_CG_SYMPOS_DOC = "Solve the linear system A*x=b via conjugate gradients, where A is symmetric definite positive, and return the result as a blitz array.";
+static const char* LINSOLVE_DOC = "Solve the linear system a*x=b and return the result as a blitz array. The solver is from the LAPACK library (use of dgesv).";
+static const char* LINSOLVE_SYMPOS_DOC = "Solve the linear system a*x=b, where a is symmetric definite positive, and return the result as a blitz array. The solver is from the LAPACK library (use of dposv).";
+static const char* LINSOLVE_CG_SYMPOS_DOC = "Solve the linear system a*x=b via conjugate gradients, where a is symmetric definite positive, and return the result as a blitz array.";
 
 static void script_linsolve(tp::const_ndarray A, tp::ndarray x, tp::const_ndarray b) {
   const ca::typeinfo& info_x = x.type();
@@ -229,15 +229,15 @@ static object py_script_linsolveCGSympos(tp::const_ndarray A, tp::const_ndarray 
 void bind_math_linsolve()
 {
   // Linear system solver -- internal allocation of result
-  def("linsolve", &py_script_linsolve, (arg("A"), arg("b")), LINSOLVE_DOC);
-  def("linsolveSympos", &py_script_linsolveSympos, (arg("A"), arg("b")), LINSOLVE_SYMPOS_DOC);
-  def("linsolveCGSympos", &py_script_linsolveCGSympos, (arg("A"), arg("b"), arg("acc"), arg("max_iter")), LINSOLVE_CG_SYMPOS_DOC);
+  def("linsolve", &py_script_linsolve, (arg("a"), arg("b")), LINSOLVE_DOC);
+  def("linsolve_sympos", &py_script_linsolveSympos, (arg("a"), arg("b")), LINSOLVE_SYMPOS_DOC);
+  def("linsolve_cg_sympos", &py_script_linsolveCGSympos, (arg("a"), arg("b"), arg("acc"), arg("max_iter")), LINSOLVE_CG_SYMPOS_DOC);
   
-  def("linsolve", &script_linsolve, (arg("A"),arg("output"),arg("b")), LINSOLVE_DOC);
-  def("linsolve_", &script_linsolve_, (arg("A"),arg("output"),arg("b")), LINSOLVE_DOC);
-  def("linsolveSympos", &script_linsolveSympos, (arg("A"),arg("output"),arg("b")), LINSOLVE_SYMPOS_DOC);
-  def("linsolveSympos_", &script_linsolveSympos_, (arg("A"),arg("output"),arg("b")), LINSOLVE_SYMPOS_DOC);
-  def("linsolveCGSympos", &script_linsolveCGSympos, (arg("A"), arg("output"), arg("b"), arg("acc"), arg("max_iter")), LINSOLVE_CG_SYMPOS_DOC);
-  def("linsolveCGSympos_", &script_linsolveCGSympos_, (arg("A"), arg("output"), arg("b"), arg("acc"), arg("max_iter")), LINSOLVE_CG_SYMPOS_DOC);
+  def("linsolve", &script_linsolve, (arg("a"),arg("output"),arg("b")), LINSOLVE_DOC);
+  def("linsolve_", &script_linsolve_, (arg("a"),arg("output"),arg("b")), LINSOLVE_DOC);
+  def("linsolve_sympos", &script_linsolveSympos, (arg("a"),arg("output"),arg("b")), LINSOLVE_SYMPOS_DOC);
+  def("linsolve_sympos_", &script_linsolveSympos_, (arg("a"),arg("output"),arg("b")), LINSOLVE_SYMPOS_DOC);
+  def("linsolve_cg_sympos", &script_linsolveCGSympos, (arg("a"), arg("output"), arg("b"), arg("acc"), arg("max_iter")), LINSOLVE_CG_SYMPOS_DOC);
+  def("linsolve_cg_sympos_", &script_linsolveCGSympos_, (arg("a"), arg("output"), arg("b"), arg("acc"), arg("max_iter")), LINSOLVE_CG_SYMPOS_DOC);
 }
 
