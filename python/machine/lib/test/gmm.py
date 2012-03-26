@@ -40,15 +40,15 @@ class GMMMachineTest(unittest.TestCase):
     sumpx = numpy.array([[1., 2., 3.], [4., 5., 6.]], 'float64')
     sumpxx = numpy.array([[10., 20., 30.], [40., 50., 60.]], 'float64')
     gs.log_likelihood = log_likelihood
-    gs.T = T
+    gs.t = T
     gs.n = n
-    gs.sumPx = sumpx
-    gs.sumPxx = sumpxx
+    gs.sum_px = sumpx
+    gs.sum_pxx = sumpxx
     self.assertTrue( gs.log_likelihood == log_likelihood )
-    self.assertTrue( gs.T == T )
+    self.assertTrue( gs.t == T )
     self.assertTrue( (gs.n == n).all() )
-    self.assertTrue( (gs.sumPx == sumpx).all() )
-    self.assertTrue( (gs.sumPxx == sumpxx).all() )
+    self.assertTrue( (gs.sum_px == sumpx).all() )
+    self.assertTrue( (gs.sum_pxx == sumpxx).all() )
 
     # Saves and reads from file
     filename = str(tempfile.mkstemp(".hdf5")[1])
@@ -56,34 +56,34 @@ class GMMMachineTest(unittest.TestCase):
     gs_loaded = bob.machine.GMMStats(bob.io.HDF5File(filename))
     self.assertTrue( gs == gs_loaded )
     # Makes them different
-    gs_loaded.T = 58
+    gs_loaded.t = 58
     self.assertFalse( gs == gs_loaded )
     # Accumulates from another GMMStats
     gs2 = bob.machine.GMMStats(2,3)
     gs2.log_likelihood = log_likelihood
-    gs2.T = T
+    gs2.t = T
     gs2.n = n
-    gs2.sumPx = sumpx
-    gs2.sumPxx = sumpxx
+    gs2.sum_px = sumpx
+    gs2.sum_pxx = sumpxx
     gs2 += gs
     eps = 1e-8
     self.assertTrue( gs2.log_likelihood == 2*log_likelihood )
-    self.assertTrue( gs2.T == 2*T )
+    self.assertTrue( gs2.t == 2*T )
     self.assertTrue( numpy.allclose(gs2.n, 2*n, eps) )
-    self.assertTrue( numpy.allclose(gs2.sumPx, 2*sumpx, eps) )
-    self.assertTrue( numpy.allclose(gs2.sumPxx, 2*sumpxx, eps) )
+    self.assertTrue( numpy.allclose(gs2.sum_px, 2*sumpx, eps) )
+    self.assertTrue( numpy.allclose(gs2.sum_pxx, 2*sumpxx, eps) )
 
     # Reinit and checks for zeros
     gs_loaded.init()
     self.assertTrue( gs_loaded.log_likelihood == 0 )
-    self.assertTrue( gs_loaded.T == 0 )
+    self.assertTrue( gs_loaded.t == 0 )
     self.assertTrue( (gs_loaded.n == 0).all() )
-    self.assertTrue( (gs_loaded.sumPx == 0).all() )
-    self.assertTrue( (gs_loaded.sumPxx == 0).all() )
+    self.assertTrue( (gs_loaded.sum_px == 0).all() )
+    self.assertTrue( (gs_loaded.sum_pxx == 0).all() )
     # Resize and checks size
     gs_loaded.resize(4,5)
-    self.assertTrue( gs_loaded.sumPx.shape[0] == 4) 
-    self.assertTrue( gs_loaded.sumPx.shape[1] == 5) 
+    self.assertTrue( gs_loaded.sum_px.shape[0] == 4) 
+    self.assertTrue( gs_loaded.sum_px.shape[1] == 5) 
 
     # Clean-up
     os.unlink(filename)
@@ -104,41 +104,41 @@ class GMMMachineTest(unittest.TestCase):
     gmm.means = means
     gmm.variances = variances
     gmm.varianceThresholds = varianceThresholds
-    self.assertTrue( gmm.DimC == 2 )
-    self.assertTrue( gmm.DimD == 3 )
+    self.assertTrue( gmm.dim_c == 2 )
+    self.assertTrue( gmm.dim_d == 3 )
     self.assertTrue( (gmm.weights == weights).all() )
     self.assertTrue( (gmm.means == means).all() )
     self.assertTrue( (gmm.variances == variances).all() )
-    self.assertTrue( (gmm.varianceThresholds == varianceThresholds).all() )
+    self.assertTrue( (gmm.variance_thresholds == varianceThresholds).all() )
    
     # Checks supervector-like accesses
-    self.assertTrue( (gmm.meanSupervector == means.reshape(means.size)).all() )
-    self.assertTrue( (gmm.varianceSupervector == variances.reshape(variances.size)).all() )
+    self.assertTrue( (gmm.mean_supervector == means.reshape(means.size)).all() )
+    self.assertTrue( (gmm.variance_supervector == variances.reshape(variances.size)).all() )
     newMeans = numpy.array([[3, 70, 2], [4, 72, 2]], 'float64')
     newVariances = numpy.array([[1, 1, 1], [2, 2, 2]], 'float64')
-    gmm.meanSupervector = newMeans.reshape(newMeans.size)
-    gmm.varianceSupervector = newVariances.reshape(newVariances.size)
-    self.assertTrue( (gmm.meanSupervector == newMeans.reshape(newMeans.size)).all() )
-    self.assertTrue( (gmm.varianceSupervector == newVariances.reshape(newVariances.size)).all() )
+    gmm.mean_supervector = newMeans.reshape(newMeans.size)
+    gmm.variance_supervector = newVariances.reshape(newVariances.size)
+    self.assertTrue( (gmm.mean_supervector == newMeans.reshape(newMeans.size)).all() )
+    self.assertTrue( (gmm.variance_supervector == newVariances.reshape(newVariances.size)).all() )
 
     # Checks particular varianceThresholds-related methods
     varianceThresholds1D = numpy.array([0.3, 1, 0.5], 'float64')
-    gmm.setVarianceThresholds(varianceThresholds1D)
-    self.assertTrue( (gmm.varianceThresholds[0,:] == varianceThresholds1D).all() )
-    self.assertTrue( (gmm.varianceThresholds[1,:] == varianceThresholds1D).all() )
-    gmm.setVarianceThresholds(0.005)
-    self.assertTrue( (gmm.varianceThresholds == 0.005).all() )
+    gmm.set_variance_thresholds(varianceThresholds1D)
+    self.assertTrue( (gmm.variance_thresholds[0,:] == varianceThresholds1D).all() )
+    self.assertTrue( (gmm.variance_thresholds[1,:] == varianceThresholds1D).all() )
+    gmm.set_variance_thresholds(0.005)
+    self.assertTrue( (gmm.variance_thresholds == 0.005).all() )
 
     # Checks Gaussians access
-    self.assertTrue( (gmm.getGaussian(0).mean == newMeans[0,:]).all() )
-    self.assertTrue( (gmm.getGaussian(1).mean == newMeans[1,:]).all() )
-    self.assertTrue( (gmm.getGaussian(0).variance == newVariances[0,:]).all() )
-    self.assertTrue( (gmm.getGaussian(1).variance == newVariances[1,:]).all() )
+    self.assertTrue( (gmm.get_gaussian(0).mean == newMeans[0,:]).all() )
+    self.assertTrue( (gmm.get_gaussian(1).mean == newMeans[1,:]).all() )
+    self.assertTrue( (gmm.get_gaussian(0).variance == newVariances[0,:]).all() )
+    self.assertTrue( (gmm.get_gaussian(1).variance == newVariances[1,:]).all() )
 
     # Checks resize
     gmm.resize(4,5)
-    self.assertTrue( gmm.DimC == 4 )
-    self.assertTrue( gmm.DimD == 5 )
+    self.assertTrue( gmm.dim_c == 4 )
+    self.assertTrue( gmm.dim_d == 5 )
 
   def test03_GMMMachine(self):
     """Test a GMMMachine (statistics)"""
@@ -148,19 +148,19 @@ class GMMMachineTest(unittest.TestCase):
     gmm.weights   = numpy.array([0.5, 0.5], 'float64')
     gmm.means     = numpy.array([[3, 70], [4, 72]], 'float64')
     gmm.variances = numpy.array([[1, 10], [2, 5]], 'float64')
-    gmm.varianceThresholds = numpy.array([[0, 0], [0, 0]], 'float64')
+    gmm.variance_thresholds = numpy.array([[0, 0], [0, 0]], 'float64')
 
     stats = bob.machine.GMMStats(2, 2)
-    gmm.accStatistics(arrayset, stats)
+    gmm.acc_statistics(arrayset, stats)
     
     stats_ref = bob.machine.GMMStats(bob.io.HDF5File("stats.hdf5"))
 
-    self.assertTrue(stats.T == stats_ref.T)
+    self.assertTrue(stats.t == stats_ref.t)
     self.assertTrue( numpy.allclose(stats.n, stats_ref.n, atol=1e-10) )
     #self.assertTrue( numpy.array_equal(stats.sumPx, stats_ref.sumPx) )
     #Note AA: precision error above
-    self.assertTrue ( numpy.allclose(stats.sumPx, stats_ref.sumPx, atol=1e-10) )
-    self.assertTrue( numpy.allclose(stats.sumPxx, stats_ref.sumPxx, atol=1e-10) )
+    self.assertTrue ( numpy.allclose(stats.sum_px, stats_ref.sum_px, atol=1e-10) )
+    self.assertTrue( numpy.allclose(stats.sum_pxx, stats_ref.sum_pxx, atol=1e-10) )
 
   def test04_GMMMachine(self):
     """Test a GMMMachine (log-likelihood computation)"""

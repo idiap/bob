@@ -188,7 +188,7 @@ def main():
   # Train the KMeansTrainer
   kmeansTrainer.train(kmeans, normalizedAr)
 
-  [variances, weights] = kmeans.getVariancesAndWeightsForEachCluster(normalizedAr)
+  [variances, weights] = kmeans.get_variances_and_weights_for_each_cluster(normalizedAr)
   means = kmeans.means
 
   # Undo normalization
@@ -200,7 +200,7 @@ def main():
   gmm.means = means
   gmm.variances = variances
   gmm.weights = weights
-  gmm.setVarianceThresholds(options.variance_threshold)
+  gmm.set_variance_thresholds(options.variance_threshold)
 
   # Train gmm
   trainer = bob.trainer.ML_GMMTrainer(not options.no_update_means, not options.no_update_variances, not options.no_update_weights)

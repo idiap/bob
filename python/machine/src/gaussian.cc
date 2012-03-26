@@ -98,18 +98,18 @@ void bind_machine_gaussian()
     .def(init<mach::Gaussian&>(args("other")))
     .def(init<io::HDF5File&>(args("config")))
     .def(self == self)
-    .add_property("DimD", &mach::Gaussian::getNInputs, &mach::Gaussian::setNInputs,
+    .add_property("dim_d", &mach::Gaussian::getNInputs, &mach::Gaussian::setNInputs,
       "Dimensionality of the input feature space")
     .add_property("mean", &py_getMean, &py_setMean, "Mean of the Gaussian")
     .add_property("variance", &py_getVariance, &py_setVariance, "The diagonal of the (diagonal) covariance matrix")
-    .add_property("varianceThresholds", &py_getVarianceThresholds, &py_setVarianceThresholds,
+    .add_property("variance_thresholds", &py_getVarianceThresholds, &py_setVarianceThresholds,
       "The variance flooring thresholds, i.e. the minimum allowed value of variance in each dimension. "
       "The variance will be set to this value if an attempt is made to set it to a smaller value.")
-    .def("setVarianceThresholds",  (void (mach::Gaussian::*)(const double))&mach::Gaussian::setVarianceThresholds,
+    .def("set_variance_thresholds",  (void (mach::Gaussian::*)(const double))&mach::Gaussian::setVarianceThresholds,
          "Set the variance flooring thresholds equal to the given threshold for all the dimensions.")
     .def("resize", &mach::Gaussian::resize, "Set the input dimensionality, reset the mean to zero and the variance to one.")
-    .def("logLikelihood", &py_logLikelihood, "Output the log likelihood of the sample, x. The input size is checked.")
-    .def("logLikelihood_", &py_logLikelihood_, "Output the log likelihood of the sample, x. The input size is NOT checked.")
+    .def("log_likelihood", &py_logLikelihood, "Output the log likelihood of the sample, x. The input size is checked.")
+    .def("log_likelihood_", &py_logLikelihood_, "Output the log likelihood of the sample, x. The input size is NOT checked.")
     .def("save", &mach::Gaussian::save, "Save to a Configuration")
     .def("load", &mach::Gaussian::load, "Load from a Configuration")
     .def(self_ns::str(self_ns::self))

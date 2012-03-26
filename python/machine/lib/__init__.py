@@ -63,12 +63,12 @@ def mlp_str(self):
 MLP.__str__ = mlp_str
 del mlp_str
 
-def ztnormSameValue(vect_A, vect_B):
+def ztnorm_same_value(vect_a, vect_b):
   """Computes the matrix of boolean D for the ZT-norm, which indicates where 
      the client ids of the T-Norm models and Z-Norm samples match.
 
-     vect_A An (ordered) list of client_id corresponding to the T-Norm models
-     vect_B An (ordered) list of client_id corresponding to the Z-Norm impostor samples
+     vect_a An (ordered) list of client_id corresponding to the T-Norm models
+     vect_b An (ordered) list of client_id corresponding to the Z-Norm impostor samples
   """
   from .. import core
   import numpy as np

@@ -89,11 +89,11 @@ class PLDAMachineTest(unittest.TestCase):
     # Sets the current F, G and sigma 
     # WARNING: order does matter, as this implies some precomputations
     m.sigma = sigma
-    m.G = G
-    m.F = F
+    m.g = G
+    m.f = F
     m.mu = mu
-    gamma3 = m.getAddGamma(3).copy()
-    constTerm3 = m.getAddLogLikeConstTerm(3)
+    gamma3 = m.get_add_gamma(3).copy()
+    constTerm3 = m.get_add_log_like_const_term(3)
     
     # Compares precomputed values to matlab reference
     self.assertTrue(equals(m.__alpha__, alpha_ref, 1e-10))
@@ -117,8 +117,8 @@ class PLDAMachineTest(unittest.TestCase):
 
     # Compares the values loaded with the former ones
     self.assertTrue(equals(m_loaded.sigma, sigma, 1e-10))
-    self.assertTrue(equals(m_loaded.G, G, 1e-10))
-    self.assertTrue(equals(m_loaded.F, F, 1e-10))
+    self.assertTrue(equals(m_loaded.g, G, 1e-10))
+    self.assertTrue(equals(m_loaded.f, F, 1e-10))
     self.assertTrue(equals(m_loaded.mu, mu, 1e-10))
     self.assertTrue(equals(m_loaded.__isigma__, isigma, 1e-10))
     self.assertTrue(equals(m_loaded.__alpha__, alpha, 1e-10))
@@ -127,10 +127,10 @@ class PLDAMachineTest(unittest.TestCase):
     self.assertTrue(equals(m_loaded.__GtISigma__, GtISigma, 1e-10))
     self.assertTrue(abs(m_loaded.__logdetAlpha__ - logdetAlpha) < 1e-10)
     self.assertTrue(abs(m_loaded.__logdetSigma__ - logdetSigma) < 1e-10)
-    self.assertTrue(m_loaded.hasGamma(3))
-    self.assertTrue(equals(m_loaded.getAddGamma(3), gamma3_ref, 1e-10))
-    self.assertTrue(m_loaded.hasLogLikeConstTerm(3))
-    self.assertTrue(abs(m_loaded.getAddLogLikeConstTerm(3) - constTerm3) < 1e-10)
+    self.assertTrue(m_loaded.has_gamma(3))
+    self.assertTrue(equals(m_loaded.get_add_gamma(3), gamma3_ref, 1e-10))
+    self.assertTrue(m_loaded.has_log_like_const_term(3))
+    self.assertTrue(abs(m_loaded.get_add_log_like_const_term(3) - constTerm3) < 1e-10)
 
     # Clean-up
     os.unlink(filename)
@@ -167,8 +167,8 @@ class PLDAMachineTest(unittest.TestCase):
     # Sets the current F, G and sigma 
     # WARNING: order does matter, as this implies some precomputations
     mb.sigma = sigma
-    mb.G = G
-    mb.F = F
+    mb.g = G
+    mb.f = F
     mb.mu = mu
 
     # Defines machine
@@ -179,12 +179,12 @@ class PLDAMachineTest(unittest.TestCase):
     log_likelihood = -0.22
 
     m.n_samples = n_samples
-    m.WSumXitBetaXi = WSumXitBetaXi
-    m.weightedSum = weightedSum
+    m.w_sum_xit_beta_xi = WSumXitBetaXi
+    m.weighted_sum = weightedSum
     m.log_likelihood = log_likelihood
 
-    gamma3 = m.getAddGamma(3).copy()
-    constTerm3 = m.getAddLogLikeConstTerm(3)
+    gamma3 = m.get_add_gamma(3).copy()
+    constTerm3 = m.get_add_log_like_const_term(3)
 
     # Saves to file, loads and compares to original
     filename = str(tempfile.mkstemp(".hdf5")[1])
@@ -194,13 +194,13 @@ class PLDAMachineTest(unittest.TestCase):
 
     # Compares the values loaded with the former ones
     self.assertTrue(abs(m_loaded.n_samples - n_samples) < 1e-10)
-    self.assertTrue(abs(m_loaded.WSumXitBetaXi - WSumXitBetaXi) < 1e-10)
-    self.assertTrue(equals(m_loaded.weightedSum, weightedSum, 1e-10))
+    self.assertTrue(abs(m_loaded.w_sum_xit_beta_xi - WSumXitBetaXi) < 1e-10)
+    self.assertTrue(equals(m_loaded.weighted_sum, weightedSum, 1e-10))
     self.assertTrue(abs(m_loaded.log_likelihood - log_likelihood) < 1e-10) 
-    self.assertTrue(m_loaded.hasGamma(3))
-    self.assertTrue(equals(m_loaded.getAddGamma(3), gamma3, 1e-10))
-    self.assertTrue(m_loaded.hasLogLikeConstTerm(3))
-    self.assertTrue(abs(m_loaded.getAddLogLikeConstTerm(3) - constTerm3) < 1e-10)
+    self.assertTrue(m_loaded.has_gamma(3))
+    self.assertTrue(equals(m_loaded.get_add_gamma(3), gamma3, 1e-10))
+    self.assertTrue(m_loaded.has_log_like_const_term(3))
+    self.assertTrue(abs(m_loaded.get_add_log_like_const_term(3) - constTerm3) < 1e-10)
 
     # Clean-up
     os.unlink(filename)

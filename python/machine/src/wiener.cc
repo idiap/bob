@@ -52,16 +52,16 @@ static void set_Ps(mach::WienerMachine& m, object o) {
 
 
 void bind_machine_wiener() {
-  class_<mach::WienerMachine, boost::shared_ptr<mach::WienerMachine> >("WienerMachine", "A Wiener filter.", init<size_t,size_t, const double, optional<const double> >((arg("height"), arg("width"), arg("Pn"), arg("variance_threshold")=1e-8), "Constructs a new Wiener filter dedicated to images of the given dimensions. The filter is initialized with zero values."))
-    .def(init<const blitz::Array<double,2>&, const double, optional<const double> >((arg("Ps"), arg("Pn"), arg("variance_threshold")=1e-8), "Constructs a new WienerMachine from a set of variance estimates Ps, a noise level Pn, and optionally a variance threshold level."))
+  class_<mach::WienerMachine, boost::shared_ptr<mach::WienerMachine> >("WienerMachine", "A Wiener filter.", init<size_t,size_t, const double, optional<const double> >((arg("height"), arg("width"), arg("pn"), arg("variance_threshold")=1e-8), "Constructs a new Wiener filter dedicated to images of the given dimensions. The filter is initialized with zero values."))
+    .def(init<const blitz::Array<double,2>&, const double, optional<const double> >((arg("ps"), arg("pn"), arg("variance_threshold")=1e-8), "Constructs a new WienerMachine from a set of variance estimates ps, a noise level pn, and optionally a variance threshold level."))
     .def(init<io::HDF5File&>((arg("config")), "Constructs a new WienerMachine from a configuration file."))
     .def(init<>("Default constructor, builds a machine as with 'WienerMachine(0,0)'."))
     .def("load", &mach::WienerMachine::load, (arg("self"), arg("config")), "Loads the filter from a configuration file.")
     .def("save", &mach::WienerMachine::save, (arg("self"), arg("config")), "Saves the filter to a configuration file.")
-    .add_property("Pn", &mach::WienerMachine::getPn, &mach::WienerMachine::setPn)
+    .add_property("pn", &mach::WienerMachine::getPn, &mach::WienerMachine::setPn)
     .add_property("variance_threshold", &mach::WienerMachine::getVarianceThreshold, &mach::WienerMachine::setVarianceThreshold)
-    .add_property("Ps", make_function(&mach::WienerMachine::getPs, return_internal_reference<>()), &set_Ps)
-    .add_property("W", make_function(&mach::WienerMachine::getW, return_internal_reference<>()))
+    .add_property("ps", make_function(&mach::WienerMachine::getPs, return_internal_reference<>()), &set_Ps)
+    .add_property("w", make_function(&mach::WienerMachine::getW, return_internal_reference<>()))
     .def("resize", &mach::WienerMachine::resize, (arg("self"), arg("height"), arg("width")), "Resizes the filter.")
     .def("__call__", &mach::WienerMachine::forward, (arg("self"), arg("input"), arg("output")), "Filters the input and saves results on the output.")
     .def("forward", &mach::WienerMachine::forward, (arg("self"), arg("input"), arg("output")), "Filters the input and saves results on the output.")

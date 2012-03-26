@@ -121,9 +121,9 @@ class TrainerTest(unittest.TestCase):
     trainer = bob.trainer.KMeansTrainer()
     trainer.train(machine, data)
 
-    [variances, weights] = machine.getVariancesAndWeightsForEachCluster(data)
-    m1 = machine.getMean(0)
-    m2 = machine.getMean(1)
+    [variances, weights] = machine.get_variances_and_weights_for_each_cluster(data)
+    m1 = machine.get_mean(0)
+    m2 = machine.get_mean(1)
 
     # Check means [-10,10] / variances [1,1] / weights [0.5,0.5]
     if(m1<m2): means=numpy.array(([m1[0],m2[0]]), 'float64')
@@ -144,7 +144,7 @@ class TrainerTest(unittest.TestCase):
     trainer.train(machine, arStd)
 
 
-    [variances, weights] = machine.getVariancesAndWeightsForEachCluster(arStd)
+    [variances, weights] = machine.get_variances_and_weights_for_each_cluster(arStd)
     means = machine.means
 
     multiplyVectorsByFactors(means, std)
@@ -194,7 +194,7 @@ class TrainerTest(unittest.TestCase):
     gmm.weights = numpy.exp(bob.io.load("weightsAfterKMeans.hdf5").astype('float64'))
    
     threshold = 0.001
-    gmm.setVarianceThresholds(threshold)
+    gmm.set_variance_thresholds(threshold)
     
     # Initialize ML Trainer
     prior = 0.001
@@ -285,7 +285,7 @@ class TrainerTest(unittest.TestCase):
     prior_gmm.weights = bob.io.load("weightsAfterML.hdf5")
   
     threshold = 0.001
-    prior_gmm.setVarianceThresholds(threshold)
+    prior_gmm.set_variance_thresholds(threshold)
     
     # Initialize MAP Trainer
     relevance_factor = 0.1
@@ -300,7 +300,7 @@ class TrainerTest(unittest.TestCase):
     map_gmmtrainer.setT3MAP(map_factor); 
 
     gmm = bob.machine.GMMMachine(n_gaussians, n_inputs)
-    gmm.setVarianceThresholds(threshold)
+    gmm.set_variance_thresholds(threshold)
 
     # Train
     map_gmmtrainer.train(gmm, ar)
@@ -334,7 +334,7 @@ class TrainerTest(unittest.TestCase):
     gmm.weights = bob.io.load("weightsAfterML.hdf5")
   
     threshold = 0.001
-    gmm.setVarianceThresholds(threshold)
+    gmm.set_variance_thresholds(threshold)
     
     # Test against the model
     score_mean_ref = -1.50379e+06

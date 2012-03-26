@@ -78,12 +78,12 @@ class SvmTrainingTest(unittest.TestCase):
     self.assertTrue( numpy.all(abs(machine.input_divide - \
       previous.input_divide) < 1e-8) )
 
-    curr_label = machine.predictClasses(data)
-    prev_label = previous.predictClasses(data)
+    curr_label = machine.predict_classes(data)
+    prev_label = previous.predict_classes(data)
     self.assertEqual(curr_label, prev_label)
 
-    curr_labels, curr_scores = machine.predictClassesAndScores(data)
-    prev_labels, prev_scores = previous.predictClassesAndScores(data)
+    curr_labels, curr_scores = machine.predict_classes_and_scores(data)
+    prev_labels, prev_scores = previous.predict_classes_and_scores(data)
     self.assertEqual(curr_labels, prev_labels)
 
     curr_scores = numpy.array(curr_scores)
@@ -115,13 +115,13 @@ class SvmTrainingTest(unittest.TestCase):
       previous.input_divide) < 1e-8) )
 
     # check labels
-    curr_label = machine.predictClasses(data)
-    prev_label = previous.predictClasses(data)
+    curr_label = machine.predict_classes(data)
+    prev_label = previous.predict_classes(data)
     self.assertEqual(curr_label, prev_label)
 
     # check scores
-    curr_labels, curr_scores = machine.predictClassesAndScores(data)
-    prev_labels, prev_scores = previous.predictClassesAndScores(data)
+    curr_labels, curr_scores = machine.predict_classes_and_scores(data)
+    prev_labels, prev_scores = previous.predict_classes_and_scores(data)
     self.assertEqual(curr_labels, prev_labels)
 
     curr_scores = numpy.array(curr_scores)
@@ -131,8 +131,8 @@ class SvmTrainingTest(unittest.TestCase):
     # check probabilities -- probA and probB do not get the exact same values
     # as when using libsvm's svm-train.c. The reason may lie in the order in
     # which the samples are arranged.
-    curr_labels, curr_scores = machine.predictClassesAndProbabilities(data)
-    prev_labels, prev_scores = previous.predictClassesAndProbabilities(data)
+    curr_labels, curr_scores = machine.predict_classes_and_probabilities(data)
+    prev_labels, prev_scores = previous.predict_classes_and_probabilities(data)
     curr_scores = numpy.array(curr_scores)
     prev_scores = numpy.array(prev_scores)
     #self.assertTrue( numpy.all(abs(curr_scores-prev_scores) < 1e-8) )

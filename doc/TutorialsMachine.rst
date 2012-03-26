@@ -409,7 +409,7 @@ data is the closest as well as the min distance.
    :options: +NORMALIZE_WHITESPACE
 
    >>> sample = numpy.array([2,1,-2], 'float64')
-   >>> print machine.getClosestMean(sample) # Returns the index of the closest mean and the distance to it at the power of 2
+   >>> print machine.get_closest_mean(sample) # Returns the index of the closest mean and the distance to it at the power of 2
    (0, 6.0)
 
 
