@@ -180,16 +180,16 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(shear_y2_overloads, shear_x2, 5, 6)
 
 void bind_ip_shear() {
 
-  def("getShearXShape", &shear_x_shape, (arg("src"), arg("shear")), "Return the shape of the output 2D array/image, when calling shearX.");
+  def("get_shear_x_shape", &shear_x_shape, (arg("src"), arg("shear")), "Return the shape of the output 2D array/image, when calling shear_x.");
 
-  def("getShearYShape", &shear_y_shape, (arg("src"), arg("shear")), "Return the shape of the output 2D array/image, when calling shearY.");
+  def("get_shear_y_shape", &shear_y_shape, (arg("src"), arg("shear")), "Return the shape of the output 2D array/image, when calling shear_y.");
 
-  def("shearX", &shear_x, shear_x_overloads((arg("src"), arg("dst"), arg("angle"), arg("antialias")=true), "Shear a 2D array/image with the given shear parameter along the X-dimension."));
+  def("shear_x", &shear_x, shear_x_overloads((arg("src"), arg("dst"), arg("angle"), arg("antialias")=true), "Shear a 2D array/image with the given shear parameter along the X-dimension."));
   
-  def("shearY", &shear_y, shear_y_overloads((arg("src"), arg("dst"), arg("angle"), arg("antialias")=true), "Shear a 2D array/image with the given shear parameter along the Y-dimension."));
+  def("shear_y", &shear_y, shear_y_overloads((arg("src"), arg("dst"), arg("angle"), arg("antialias")=true), "Shear a 2D array/image with the given shear parameter along the Y-dimension."));
 
-  def("shearX", &shear_x2, shear_x2_overloads((arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("angle"), arg("antialias")=true), "Shear a 2D array/image with the given shear parameter along the X-dimension, taking mask into account."));
+  def("shear_x", &shear_x2, shear_x2_overloads((arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("angle"), arg("antialias")=true), "Shear a 2D array/image with the given shear parameter along the X-dimension, taking mask into account."));
   
-  def("shearX", &shear_y2, shear_y2_overloads((arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("angle"), arg("antialias")=true), "Shear a 2D array/image with the given shear parameter along the Y-dimension, taking mask into account."));
+  def("shear_y", &shear_y2, shear_y2_overloads((arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("angle"), arg("antialias")=true), "Shear a 2D array/image with the given shear parameter along the Y-dimension, taking mask into account."));
 
 }

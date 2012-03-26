@@ -32,7 +32,7 @@ import tempfile
 import shutil
 import bob
 
-def optflowHS(movie, iterations, alpha, template, stop=0):
+def optflow_hs(movie, iterations, alpha, template, stop=0):
   """This method is the one you are interested, it shows how bob reads a
   video file and computes the optical flow using the Horn & Schunck method,
   saving the output as a new video in the output directory (using a template
@@ -123,7 +123,7 @@ def main():
     # then we go into test mode, all input is preset
     outputdir = tempfile.mkdtemp()
     output = os.path.join(outputdir, "%(stem)s.avi")
-    optflowHS(args[0], 1, options.alpha, output, 10) #1 iter. per cycle is faster
+    optflow_hs(args[0], 1, options.alpha, output, 10) #1 iter. per cycle is faster
     shutil.rmtree(outputdir)
 
   else:
@@ -131,7 +131,7 @@ def main():
     if len(args) != 2:
       parser.error("requires 2 arguments (the movie path and the output template file name) -- read the help message!")
 
-    optflowHS(args[0], options.iterations, options.alpha, args[1])
+    optflow_hs(args[0], options.iterations, options.alpha, args[1])
 
   sys.exit(0)
 

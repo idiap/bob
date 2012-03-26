@@ -200,7 +200,7 @@ void bind_ip_spatiotempgrad() {
     .add_property("avg_kernel", make_function(&ip::ForwardGradient::getAvgKernel, return_value_policy<copy_const_reference>()), &ip::ForwardGradient::setAvgKernel, "The averaging kernel")
     .def("__call__", &forward_gradient_1, (arg("s")))
     .def("__call__", &forward_gradient_3, (arg("i1"), arg("i2")))
-    .def("__call__", &forward_gradient_2, (arg("i1"), arg("i2"), arg("Ex"), arg("Ey"), arg("Et")))
+    .def("__call__", &forward_gradient_2, (arg("i1"), arg("i2"), arg("ex"), arg("ey"), arg("et")))
     ;
 
   class_<ip::HornAndSchunckGradient, bases<ip::ForwardGradient> >("HornAndSchunckGradient", "This class computes the spatio-temporal gradient using the same approximation as the one described by Horn & Schunck in the paper titled 'Determining Optical Flow', published in 1981, Artificial Intelligence, * Vol. 17, No. 1-3, pp. 185-203.\n\nThis is equivalent to convolving the image sequence with the following (separate) kernels:\n\nEx = 1/4 * ([-1 +1]^T * ([+1 +1]*(i1)) + [-1 +1]^T * ([+1 +1]*(i2)))\n\nEy = 1/4 * ([+1 +1]^T * ([-1 +1]*(i1)) + [+1 +1]^T * ([-1 +1]*(i2)))\n\nEt = 1/4 * ([+1 +1]^T * ([+1 +1]*(i1)) - [+1 +1]^T * ([+1 +1]*(i2)))", init<const blitz::TinyVector<int,2>&>((arg("shape")), "We initialize with the shape of the images we need to treat. The shape is used by the internal buffers.\n\nThe difference kernel for this operator is [+1/4; -1/4]\n\nThe averaging kernel for this oeprator is [+1; +1]."))
@@ -212,7 +212,7 @@ void bind_ip_spatiotempgrad() {
     .add_property("avg_kernel", make_function(&ip::CentralGradient::getAvgKernel, return_value_policy<copy_const_reference>()), &ip::CentralGradient::setAvgKernel, "The averaging kernel")
     .def("__call__", &central_gradient_1, (arg("s")))
     .def("__call__", &central_gradient_3, (arg("i1"), arg("i2"), arg("i3")))
-    .def("__call__", &central_gradient_2, (arg("i1"), arg("i2"), arg("i3"), arg("Ex"), arg("Ey"), arg("Et")))
+    .def("__call__", &central_gradient_2, (arg("i1"), arg("i2"), arg("i3"), arg("ex"), arg("ey"), arg("et")))
     ;
   
   class_<ip::SobelGradient, bases<ip::CentralGradient> >("SobelGradient", "This class computes the spatio-temporal gradient using a 3-D sobel filter. The gradients are calculated along the x, y and t directions. The Sobel operator can be decomposed into 2 1D kernels that are applied in sequence. Considering h'(.) = [+1 0 -1] and h(.) = [1 2 1] one can represent the operations like this:\n\nEx = h'(x)h(y)h(t)\n\nEy = h(x)h'(y)h(t)\n\nEt = h(x)h(y)h'(t)", init<const blitz::TinyVector<int,2>&>((arg("shape")), "We initialize with the shape of the images we need to treat. The shape is used by the internal buffers.\n\nThe difference kernel for this operator is [+1; 0; -1]\n\nThe averaging kernel for this oeprator is [+1; +2; +1]."))

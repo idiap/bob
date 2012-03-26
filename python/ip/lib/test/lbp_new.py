@@ -303,7 +303,7 @@ class LBPTest(unittest.TestCase):
   def test10_shape(self):
     lbp = bob.ip.LBP8R()
     image = numpy.ndarray((3,3), dtype='uint8')
-    sh = lbp.getLBPShape(image)
+    sh = lbp.get_lbp_shape(image)
     self.assertEqual(sh, (1,1))
 
   def test11_u2_16p1r(self):

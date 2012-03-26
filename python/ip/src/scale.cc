@@ -130,5 +130,5 @@ void bind_ip_scale() {
 
   def("scale", &scale2, scale2_overloads((arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("algorithm")="BilinearInterp"), "Rescale a 2D array/image with the given dimensions, taking mask into account."));
 
-	def("scaleAs", &scale_as, (arg("original"), arg("scale_factor")), "Gives back a scaled version of the original 2 or 3D array (image)");
+	def("scale_as", &scale_as, (arg("original"), arg("scale_factor")), "Gives back a scaled version of the original 2 or 3D array (image)");
 }
