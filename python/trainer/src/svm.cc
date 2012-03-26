@@ -75,7 +75,7 @@ void bind_trainer_svm() {
     .add_property("p", &train::SVMTrainer::getLossEpsilonSVR, &train::SVMTrainer::setLossEpsilonSVR, "for EPSILON_SVR, this is the 'epsilon' value on the equation")
     .add_property("shrinking", &train::SVMTrainer::getUseShrinking, &train::SVMTrainer::setUseShrinking, "use the shrinking heuristics")
     .add_property("probability", &train::SVMTrainer::getProbabilityEstimates, &train::SVMTrainer::setProbabilityEstimates, "do probability estimates")
-    .def("train", &train1, "Trains a new machine for multi-class classification. If the number of classes in data is 2, then the assigned labels will be -1 and +1. If the number of classes is greater than 2, labels are picked starting from 1 (i.e., 1, 2, 3, 4, etc.). If what you want is regression, the size of the input data array should be 1.")
-    .def("train", &train2, "This version accepts scaling parameters that will be applied column-wise to the input data.")
+    .def("train", &train1, (arg("self"), arg("data")), "Trains a new machine for multi-class classification. If the number of classes in data is 2, then the assigned labels will be -1 and +1. If the number of classes is greater than 2, labels are picked starting from 1 (i.e., 1, 2, 3, 4, etc.). If what you want is regression, the size of the input data array should be 1.")
+    .def("train", &train2, (arg("self"), arg("data"), arg("subtract"), arg("divide")), "This version accepts scaling parameters that will be applied column-wise to the input data.")
     ;
 }

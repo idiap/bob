@@ -25,13 +25,13 @@ class DaqTest(unittest.TestCase):
 
     pf = PixelFormat.RGB24
     fs = FrameSize(video.width, video.height)
-    fi = FrameInterval(1, int(video.frameRate))
+    fi = FrameInterval(1, int(video.frame_rate))
 
     camera = VideoReaderCamera(video)
 
-    self.assertTrue(camera.getSupportedPixelFormats()[0] == pf)
-    self.assertTrue(camera.getSupportedFrameSizes(pf)[0] == fs)
-    self.assertTrue(camera.getSupportedFrameIntervals(pf, fs)[0] == fi)
+    self.assertTrue(camera.get_supported_pixel_formats()[0] == pf)
+    self.assertTrue(camera.get_supported_frame_sizes(pf)[0] == fs)
+    self.assertTrue(camera.get_supported_frame_intervals(pf, fs)[0] == fi)
 
     if hasVisioner:
       fl = VisionerFaceLocalization()
@@ -42,21 +42,21 @@ class DaqTest(unittest.TestCase):
     display = ConsoleDisplay()
 
     outputWriter = BobOutputWriter()
-    outputWriter.setOutputDir(os.path.dirname(OUTPUT_VIDEO))
-    outputWriter.setOutputName(os.path.basename(OUTPUT_VIDEO))
-    outputWriter.open(video.width, video.height, int(video.frameRate))
+    outputWriter.set_output_dir(os.path.dirname(OUTPUT_VIDEO))
+    outputWriter.set_output_name(os.path.basename(OUTPUT_VIDEO))
+    outputWriter.open(video.width, video.height, int(video.frame_rate))
 
-    controller.addControllerCallback(fl)
-    controller.addControllerCallback(display)
-    controller.addStoppable(camera)
+    controller.add_controller_callback(fl)
+    controller.add_controller_callback(display)
+    controller.add_stoppable(camera)
 
-    controller.setOutputWriter(outputWriter)
-    controller.recordingDelay = 1
+    controller.set_output_writer(outputWriter)
+    controller.recording_delay = 1
     controller.length = 3
 
-    fl.addFaceLocalizationCallback(display)
+    fl.add_face_localization_callback(display)
  
-    camera.addCameraCallback(controller)
+    camera.add_camera_callback(controller)
 
     self.assertTrue(camera.start() == 0)
     self.assertTrue(fl.start() == True)

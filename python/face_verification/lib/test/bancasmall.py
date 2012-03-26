@@ -24,7 +24,7 @@ import unittest
 import bob
 import numpy
 
-def normalizeBlocks(src):
+def normalize_blocks(src):
   for i in range(src.shape[0]):
     block = src[i, :, :]
     mean = block.mean()
@@ -36,7 +36,7 @@ def normalizeBlocks(src):
 
     src[i, :, :] = (block - mean) / std
     
-def normalizeDCT(src):
+def normalize_dct(src):
   for i in range(src.shape[1]):
     col = src[:, i]
     mean = col.mean()
@@ -52,12 +52,12 @@ def normalizeDCT(src):
 def dctfeatures(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W, 
     A_N_DCT_COEF, norm_before, norm_after, add_xy):
   
-  blockShape = bob.ip.getBlockShape(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
+  blockShape = bob.ip.get_block_shape(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
   blocks = numpy.ndarray(blockShape, 'float64')
   bob.ip.block(prep, blocks, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
 
   if norm_before:
-    normalizeBlocks(blocks)
+    normalize_blocks(blocks)
 
   if add_xy:
     real_DCT_coef = A_N_DCT_COEF - 2
@@ -88,7 +88,7 @@ def dctfeatures(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W,
   
   TMP_tensor = numpy.ndarray((n_blocks, TMP_tensor_max), 'float64')
   
-  nBlocks = bob.ip.getNBlocks(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
+  nBlocks = bob.ip.get_n_blocks(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
   for by in range(nBlocks[0]):
     for bx in range(nBlocks[1]):
       bi = bx + by * nBlocks[1]
@@ -99,7 +99,7 @@ def dctfeatures(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W,
       TMP_tensor[bi, TMP_tensor_min:TMP_tensor_max] = dct_blocks[bi, dct_blocks_min:dct_blocks_max]
 
   if norm_after:
-    normalizeDCT(TMP_tensor)
+    normalize_dct(TMP_tensor)
 
   return TMP_tensor
 
@@ -345,7 +345,7 @@ class GMMExperiment:
 
         self.znorm_tests.append(stats)
         #tnorm_clients_ext.append(c)
-        r_id = self.db.getRealIdFromTNormId(c)
+        r_id = self.db.get_real_id_from_tnorm_id(c)
         tnorm_clients_ext.append(r_id)
 
       i += 1
@@ -354,7 +354,7 @@ class GMMExperiment:
     self.D = bob.machine.linearScoring(self.tnorm_models, self.wm, self.znorm_tests)
     tnorm_real_ids = []
     for c in tnorm_clients:
-      r_id = self.db.getRealIdFromTNormId(c)
+      r_id = self.db.get_real_id_from_tnorm_id(c)
       tnorm_real_ids.append(r_id)
     self.D_sameValue = self.sameValue(tnorm_real_ids, tnorm_clients_ext)
 

@@ -20,15 +20,12 @@
  Multi-dimensional Arrays
 **************************
 
-Introduction
-------------
-
 The fundamental data structure of |project| consists in multi-dimensional
 arrays. In signal-processing and machine learning, arrays are indeed a suitable
 representation for many different types of digital signals such as images, 
-audio data, extracted features, etc. `Python`_ is the working environment
+audio data, extracted features, etc. Python_ is the working environment
 selected for this library. Furtherore, we have decided to rely on existing
-`NumPy`_ multi-dimensional arrays (:py:class:`numpy.ndarray`).
+NumPy_ multi-dimensional arrays (:py:class:`numpy.ndarray`).
 
 At the C++ level, the `Blitz++`_ library is used to handle arrays. Although we
 initially binds `Blitz++`_ Arrays into Python, we quickly realized that it
@@ -45,12 +42,12 @@ everywhere.
 For an introduction and tutorials about NumPy_ ndarrays, just 
 visit the Numpy_ website.
 
-Numpy basics
-------------
+NumPy_ basics
+=============
 
-A `NumPy`_ array is a table of elements, all of the same type, indexed by a 
+A NumPy_ array is a table of elements, all of the same type, indexed by a 
 tuple of positive integers. Before using any of the functionalities described
-below, `NumPy`_ should be imported in the `Python`_ environment.
+below, NumPy_ should be imported in the Python_ environment.
 
 .. doctest::
 
@@ -61,9 +58,9 @@ below, `NumPy`_ should be imported in the `Python`_ environment.
    For `MATLAB`_ users, this `page`_ highlights the differences and the commonalities between `NumPy`_ and `MATLAB`_.
 
 Array creation
-==============
+--------------
 
-There are different ways to create `NumPy`_ arrays. For instance, to create an
+There are different ways to create NumPy_ arrays. For instance, to create an
 array with initialized content:
 
 .. testsetup:: *
@@ -88,7 +85,7 @@ It is also possible just to allocate the array in memory.
    [[ 7. 7. 7. 7.]
     [ 7. 7. 7. 7.]]
 
-In both previous cases, `NumPy`_ creates an instance of the class :py:class:`numpy.ndarray`,
+In both previous cases, NumPy_ creates an instance of the class :py:class:`numpy.ndarray`,
 which is also known by the alias :py:func:`numpy.array`. The most important attributes of 
 an :py:class:`numpy.ndarray` object are:
 
@@ -100,9 +97,9 @@ an :py:class:`numpy.ndarray` object are:
 
 
 Accessing array elements
-========================
+------------------------
 
-The `Python`_ `operator[] <http://docs.scipy.org/doc/numpy/reference/arrays.indexing.html>`_ 
+The Python_ `operator[] <http://docs.scipy.org/doc/numpy/reference/arrays.indexing.html>`_ 
 allows to index the elements of an array. Please note that the indices start 
 at 0.
 
@@ -124,7 +121,7 @@ multi-dimensional array, this is done with respect to the first dimension.
 
 
 Array type
-==========
+----------
 
 The type of the elements of an array can be specified at the creation time.
 
@@ -135,7 +132,7 @@ The type of the elements of an array can be specified at the creation time.
    float64
 
 
-If we would like to cast the elements of an array to another type, `NumPy`_ 
+If we would like to cast the elements of an array to another type, NumPy_ 
 provides the :py:attr:`numpy.ndarray.astype` function.
 
 .. doctest::
@@ -145,7 +142,7 @@ provides the :py:attr:`numpy.ndarray.astype` function.
    uint8
 
 In addition, |project| provides the :py:func:`bob.core.convert` function 
-which allows to convert/rescale a `NumPy`_ :py:class:`numpy.ndarray` of a 
+which allows to convert/rescale a NumPy_ :py:class:`numpy.ndarray` of a 
 given type into another array of a possibly different type with re-scaling.
 Typically, this is useful if we want to convert a uint8 2D array (e.g. a
 grayscale image) into a float64 2D array with a ``[0,1]`` range.
@@ -154,7 +151,7 @@ grayscale image) into a float64 2D array with a ``[0,1]`` range.
    :options: +NORMALIZE_WHITESPACE
 
     >>> img = numpy.array([[0,1,2,3,4],[255,254,253,252,251]], dtype='uint8')
-    >>> img_d = bob.core.array.convert(img, dtype='float64', destRange=(0.,1.))
+    >>> img_d = bob.core.array.convert(img, dtype='float64', dest_range=(0.,1.))
     >>> print img_d
     [[ 0. 0.00392157 0.00784314 0.01176471 0.01568627]
      [ 1. 0.99607843 0.99215686 0.98823529 0.98431373]]
@@ -163,9 +160,9 @@ grayscale image) into a float64 2D array with a ``[0,1]`` range.
 
 
 Array shape
-===========
+-----------
 
-`NumPy`_ provides several features to reshape or stack arrays, such as the
+NumPy_ provides several features to reshape or stack arrays, such as the
 :py:attr:`numpy.ndarray.reshape`, :py:func:`numpy.hstack`, and
 :py:func:`numpy.vstack` methods.
 
@@ -186,10 +183,10 @@ Array shape
 
 
 Mathematical operations
-=======================
+-----------------------
 
-`NumPy`_ also provides numerous mathematical operations. Most of them are 
-performed **elementwise**. For instance,
+NumPy_ provides numerous mathematical operations. Most of them are performed
+**elementwise**. For instance,
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -207,7 +204,7 @@ performed **elementwise**. For instance,
    [ 2.71828183 7.3890561 20.08553692 54.59815003]
 
 
-`NumPy`_ also provides reduction operations.
+NumPy_ also provides reduction operations.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -228,9 +225,9 @@ Partial reductions along a specific dimension are also possible.
    >>> print A.max(axis=1)
    [4 8]
 
-Linear algebra is also supported through the bridges to the optimized `ATLAS`_
-`LAPACK`_ (and `BLAS`_) libraries which are mostly integrated in the `linalg` 
-submodule of `SciPy`_. In the following, this is highlighted via two different
+Linear algebra is also supported through the bridges to the optimized ATLAS_
+LAPACK_ (and BLAS_) libraries which are mostly integrated in the `linalg` 
+submodule of SciPy_. In the following, this is highlighted via two different
 examples: matrix multiplication and matrix inversion.
 
 .. doctest::
@@ -249,7 +246,7 @@ examples: matrix multiplication and matrix inversion.
     [-10.75   4.75]]
 
 Assignment, shallow and deep copy
-=================================
+---------------------------------
 
 Different arrays might share the same data in memory. Let's first have a look
 at the assignment operator =.
@@ -264,7 +261,7 @@ at the assignment operator =.
 
 Furthermore, the assignment operator only creates an **alias** to the same 
 :py:class:`numpy.ndarray` object. In contrast, the 
-:py:attr:`numpy.ndarray.view` method creates a new `NumPy`_ array object that
+:py:attr:`numpy.ndarray.view` method creates a new NumPy_ array object that
 points to the same memory block. This is known as a **shallow copy**.
 
 .. doctest::
@@ -304,21 +301,21 @@ If we would like to do a **deep copy**, we could use the
    >>> print a
    [0 2 7 4]
 
-For a more exhaustive introduction about `NumPy`_, please have a look at its 
+For a more exhaustive introduction about NumPy_, please have a look at its 
 `user guide`_. 
 
 Digital signals as multi-dimensional arrays
--------------------------------------------
+===========================================
 
 For |project|, we have decided to represent digital signals directly as 
-`NumPy`_ arrays, rather than having dedicated classes for each type of 
+NumPy_ arrays, rather than having dedicated classes for each type of 
 signals. This implies that some convention has been defined.
 
 
 Vectors and matrices
-====================
+--------------------
 
-A vector is represented as a 1D `NumPy`_ array, whereas a matrix is 
+A vector is represented as a 1D NumPy_ array, whereas a matrix is 
 represented by a 2D arrays whose first dimension corresponds to the rows, and
 second dimension to the columns.
 
@@ -334,7 +331,7 @@ second dimension to the columns.
    [1 2 3]
 
 Images
-======
+------
 
 **Grayscale** images are represented as 2D arrays, the first dimension being the
 height (number of rows) and the second dimension being the witdh (number of 
@@ -360,39 +357,43 @@ in which color space the content is stored. |project| provides functions to
 perform colorspace conversion (cf. the :doc:`TutorialsIP` tutorial).
 
 Videos
-======
+------
 
 A video can be seen as a sequence of images over time. By convention, the 
 first dimension is for the frame indices (time index), whereas the remaining 
 ones are related to the corresponding image frame.
 
 Audio signal
-============
+------------
 
-|project| does not yet support audio files (No wav or mp3 codec). However, it 
-is still possible to convert such a signal into e.g. HDF5, and then to read 
-and process it with |project|. In this case, a mono audio signal would be 
-represented as a 2D array, the first dimension corresponding to the time index 
-and the second one to the wave magnitude.
+|project| does not yet support audio files (No wav or mp3 codec). However, 
+there are several alternatives: 
+
+* The signal in the audio file could be converted into e.g. HDF5, and then could be read and process with |project|.
+
+* A Python_ module could be used to load the audio file as a NumPy_ :py:class:`numpy.ndarray`, such as :py:mod:`scipy.io.wavfile`. Please look at :ref:`audiosignal` for an example of how to do it.
+
+Then, a stereo audio signal would be represented as a 2D array, the first 
+dimension corresponding to the time index and the second one to the audio 
+channel, values in the array corresponding to wave magnitudes.
+
+Interfacing with OpenCV_ and PIL_
+=================================
+
+As |project| relies on NumPy_ arrays, it is very easy to make use of other 
+popular libraries such as OpenCV_ and PIL_.
 
 
-Interfacing with OpenCV and PIL
--------------------------------
-
-As |project| relies on `NumPy`_ arrays, it is very easy to make use of other 
-popular libraries such as `OpenCV`_ and `PIL`_.
-
-
-OpenCV
-======
+OpenCV_
+-------
 
 .. note::
 
-   The new `cv2` module of `OpenCV`_ 2.x is able to process `NumPy`_ arrays 
+   The new `cv2` module of OpenCV_ 2.x is able to process NumPy_ arrays 
    directly, which makes the following conversions unnecessary.
 
-To convert a `NumPy`_ array into an `OpenCV`_ cvMat, the 
-:py:func:`cv.fromarray` method of `OpenCV`_ will do the job.
+To convert a NumPy_ array into an OpenCV_ cvMat, the 
+:py:func:`cv.fromarray` method of OpenCV_ will do the job.
 
 .. code-block:: python
 
@@ -400,8 +401,8 @@ To convert a `NumPy`_ array into an `OpenCV`_ cvMat, the
    >>> a = numpy.ones((5, 10))
    >>> mat = cv.fromarray(a)
 
-Similarly, to perform the inverse conversion from an `OpenCV`_ cvMat into a 
-`NumPy`_ array, the :py:func:`numpy.asarray` method is suitable.
+Similarly, to perform the inverse conversion from an OpenCV_ cvMat into a 
+NumPy_ array, the :py:func:`numpy.asarray` method is suitable.
 
 .. code-block:: python
 
@@ -409,17 +410,17 @@ Similarly, to perform the inverse conversion from an `OpenCV`_ cvMat into a
    >>> cv.Set(mat, 37)
    >>> a = numpy.asarray(mat)
 
-Both `NumPy`_ array and `OpenCV`_ cvMat use similar datatypes (`uint8`, 
+Both NumPy_ array and OpenCV_ cvMat use similar datatypes (`uint8`, 
 `uint32`, `float64`, etc.), and hence, it is interesting to notice that the 
 datatype is preserved by the previous operations.
 
-PIL
-===
+PIL_
+----
 
-`PIL`_ does not provide a generic multi-dimensional array structure. However, 
-its Image structure can be seen as 2D or 3D arrays. To convert a 2D `NumPy`_ 
-array of type `uint8` into a grayscale (integer) `PIL`_ image, the 
-:py:func:`Image.fromarray` method of `PIL`_ will do the job.
+PIL_ does not provide a generic multi-dimensional array structure. However, 
+its Image structure can be seen as 2D or 3D arrays. To convert a 2D NumPy_ 
+array of type `uint8` into a grayscale (integer) PIL_ image, the 
+:py:func:`Image.fromarray` method of PIL_ will do the job.
 
 .. code-block:: python
 
@@ -427,8 +428,8 @@ array of type `uint8` into a grayscale (integer) `PIL`_ image, the
    >>> img = numpy.array([[1,2,3,4],[2,3,4,5],[3,4,5,6]], 'uint8')
    >>> imgPIL = Image.fromarray(img)
 
-To convert a grayscale `PIL`_ image into a 2D `NumPy`_ array of `uint8`, 
-the :py:func:`numpy.asarray` method of `NumPy`_ is suitable.
+To convert a grayscale PIL_ image into a 2D NumPy_ array of `uint8`, 
+the :py:func:`numpy.asarray` method of NumPy_ is suitable.
 
 .. code-block:: python
 
@@ -436,14 +437,14 @@ the :py:func:`numpy.asarray` method of `NumPy`_ is suitable.
    >>> numpy.array_equal(img, img2)
    True
 
-In contrast to `OpenCV`_, please be aware that `PIL`_ does not support all the
+In contrast to OpenCV_, please be aware that PIL_ does not support all the
 datatypes that we have in |project|. Therefore, please restrict yourself to 
 `uint8` (and `float32` for grayscale images) when you proceed with back and
 forth conversions or take the time to check that your operations are really 
 valid and expected.
 
 Converting color images is more tricky as |project| uses plane color images
-whereas `PIL`_ relies by default on interleaved color images. Therefore, there
+whereas PIL_ relies by default on interleaved color images. Therefore, there
 is an additional conversion required.
 
 .. code-block:: python
@@ -463,17 +464,17 @@ interleaved color image to plane color image.
    >>> numpy.array_equal(a, c_plane_read)
    True
 
-MATLAB
-======
+MATLAB_
+-------
 
-|project| currently does not provide `MATLAB`_ mex interface. Nevertheless, it
-is possible to load and save simple `.mat` files, thanks to the `MatIO`_ 
-library. However, complex data such as `MATLAB`_ structures are not supported.
-Be aware that `MATLAB`_ also support the `HDF5`_ file format. For more 
+|project| currently does not provide MATLAB_ mex interface. Nevertheless, it
+is possible to load and save simple `.mat` files, thanks to the MatIO_ 
+library. However, complex data such as MATLAB_ structures are not supported.
+Be aware that MATLAB_ also support the HDF5_ file format. For more 
 details, please have a look at :doc:`TutorialsIO`.
 
 Random Number Generation
-------------------------
+========================
 
 We have developed a set of bridges to the `Boost Random Number Generation`_
 facilities. This allows you to generate random numbers in a variety of ways.

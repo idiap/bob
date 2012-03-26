@@ -70,7 +70,7 @@ class Database(object):
 
     return self.clients(protocol, groups)
 
-  def getClientIdFromModelId(self, model_id):
+  def get_client_id_from_model_id(self, model_id):
     """Returns the client_id attached to the given model_id
     
     Keyword Parameters:
@@ -82,7 +82,7 @@ class Database(object):
     """
     return model_id
 
-  def getClientIdFromFileId(self, file_id):
+  def get_client_id_from_file_id(self, file_id):
     """Returns the client_id (real client id) attached to the given file_id
     
     Keyword Parameters:
@@ -100,7 +100,7 @@ class Database(object):
     else:
       return q.first().client_id
 
-  def getInternalPathFromFileId(self, file_id):
+  def get_internal_path_from_file_id(self, file_id):
     """Returns the unique "internal path" attached to the given file_id
     
     Keyword Parameters:

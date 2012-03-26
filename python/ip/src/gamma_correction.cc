@@ -36,7 +36,7 @@ static void inner_gammaCorrection (tp::const_ndarray src, tp::ndarray dst,
   ip::gammaCorrection<T>(src.bz<T,N>(), dst_, g);
 }
 
-static void gammaCorrection (tp::const_ndarray src, tp::ndarray dst, double g) {
+static void gamma_correction (tp::const_ndarray src, tp::ndarray dst, double g) {
   const ca::typeinfo& info = src.type();
 
   if (info.nd != 2) PYTHON_ERROR(TypeError, "gamma correction does not support input of type '%s'", info.str().c_str());
@@ -54,5 +54,5 @@ static void gammaCorrection (tp::const_ndarray src, tp::ndarray dst, double g) {
 }
 
 void bind_ip_gamma_correction() {
-  def("gammaCorrection", &gammaCorrection, (arg("src"), arg("dst"), arg("gamma")), "Perform a power-law gamma correction on a 2D blitz array/image.");
+  def("gamma_correction", &gamma_correction, (arg("src"), arg("dst"), arg("gamma")), "Perform a power-law gamma correction on a 2D blitz array/image.");
 }

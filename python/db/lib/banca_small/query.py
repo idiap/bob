@@ -106,7 +106,7 @@ class Database(object):
 
     return retval
 
-  def getRealIdFromTNormId(self, tnorm_id, protocol=None):
+  def get_real_id_from_tnorm_id(self, tnorm_id, protocol=None):
     """Returns the real id of a client from a TNorm client id.
 
     Keyword Parameters:
@@ -146,7 +146,7 @@ class Database(object):
 
     return self.clients(protocol, groups, ids_real)
 
-  def getClientIdFromModelId(self, model_id):
+  def get_client_id_from_model_id(self, model_id):
     """Returns the client_id attached to the given model_id
     
     Keyword Parameters:
@@ -158,7 +158,7 @@ class Database(object):
     """
     return model_id
 
-  def getClientIdFromFileId(self, file_id):
+  def get_client_id_from_file_id(self, file_id):
     """Returns the client_id (real client id) attached to the given file_id
     
     Keyword Parameters:
@@ -176,7 +176,7 @@ class Database(object):
     else:
       return q.first().real_id
 
-  def getInternalPathFromFileId(self, file_id):
+  def get_internal_path_from_file_id(self, file_id):
     """Returns the unique "internal path" attached to the given file_id
     
     Keyword Parameters:
@@ -242,7 +242,8 @@ class Database(object):
       - 2: the claimed id attached to the model
       - 3: the real id
       - 4: the "stem" path (basename of the file)
-    considering allthe filtering criteria. The keys of the dictionary are 
+
+    considering all the filtering criteria. The keys of the dictionary are 
     unique identities for each file in the BANCA_SMALL database. Conserve these 
     numbers if you wish to save processing results later on.
     """

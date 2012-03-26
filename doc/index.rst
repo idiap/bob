@@ -77,6 +77,7 @@ User's Guide
    TutorialsTrainer
    TutorialsDatabase
    TutorialsPerformance
+   IrisExample
    TicketReporting
 
 Developer's Guide
