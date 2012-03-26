@@ -360,67 +360,37 @@ Reading and writing image and video data
 file types including Matlab ``.mat`` files, various image file types and video
 data. File types and specific serialization and de-serialization is switched
 automatically using filename extensions. Knowing this, saving an array in a different format is just a matter of
-choosing the right extension: 
+choosing the right extension. This is illustrated in the following example, where an image generated randomly using the method `NumPy` :py:meth:`numpy.random.random_integers()`, is saved in JPEG format. The image must be of type uint8 or uint16.
 
 .. doctest::
 
-  >>> my_image = numpy.uint8(numpy.random.random_integers(0,255,(3,256,256))) # creating an image with random pixel values
-  >>> bob.io.save(my_image, 'testimage.jpg') # saving the image in jpeg format
+  >>> my_image = numpy.random.random_integers(0,255,(3,256,256))
+  >>> bob.io.save(my_image.astype('uint8'), 'testimage.jpg') # saving the image in jpeg format
   >>> my_copy_image = bob.io.load('testimage.jpg')
 
-As for reading the video files, although it is possible to read a video using the :py:meth:`bob.io.load()`, you should use the methods of the class :py:class:`bob.io.VideoReader` to read frame by frame and avoid overloading your machine's memory. In the following code you can see how to create a video and save it using the class :py:class:`bob.io.VideoWriter` and load it again using the class :py:class:`bob.io.VideoReader`.
+As for reading the video files, although it is possible to read a video using the :py:meth:`bob.io.load()`, you should use the methods of the class :py:class:`bob.io.VideoReader` to read frame by frame and avoid overloading your machine's memory. In the following example you can see how to create a video and save it using the class :py:class:`bob.io.VideoWriter` and load it again using the class :py:class:`bob.io.VideoReader`. The created video will have 30 frames, generated randomly like in the previous example. Due to *FFMPEG* constrains, the width and height of the video need to be multiples of two.
 
 .. doctest::
 
-  >>> width = 256; height = 256; # width and height of the new video
+  >>> width = 50; height = 50;
   >>> framerate = 24
   >>> outv = bob.io.VideoWriter('testvideo.avi', height, width, framerate) # output video
-  >>> for i in range(0, 100): newframe = numpy.uint8(numpy.random.random_integers(0,255,(3,256,256))); outv.append(newframe)  # adding a total of 100 random generated frames to the video 
+  >>> for i in range(0, 30):
+  ...  newframe = (numpy.random.random_integers(0,255,(3,50,50)))
+  ...  outv.append(newframe.astype('uint8'))
   >>> outv.close()
   >>> input = bob.io.VideoReader('testvideo.avi')
   >>> input.number_of_frames
-  100
+  30
   >>> inv = input.load()
   >>> inv.shape
-  (100, 3, 256, 256)
+  (30, 3, 50, 50)
   >>> type(inv)
   <type 'numpy.ndarray'>
 
-The loaded image files are 3D arrays (for RGB format) or 2D arrays (for greyscale) of type uint8 or uint16, while the loaded videos are sequences of frames i.e. 4D arrays of type uint8. All the extensions and formats for images and videos supported in |project| are given below:
+The loaded image files are 3D arrays (for RGB format) or 2D arrays (for greyscale) of type uint8 or uint16, while the loaded videos are sequences of frames i.e. 4D arrays of type uint8. All the extensions and formats for images and videos supported in your version of |project| can be listed using the |project|'s utility `bob-config.py`.
 
-* Images:
-  * bmp: RGB, bitmap format
-  * gif: RGB, GIF
-  * jpeg: RGB, Joint-Photograph Experts Group
-  * pbm: Grayscale, Portable binary map (images)
-  * pgm: Grayscale, Portable grayscale map
-  * png: RGB, Portable network graphics, indexed
-  * ppm: RGB, Portable pixel map
-  * tiff: RGB
-  * xcf: RGB, Gimp native format (**loading only**)
-
-* Videos:
-  * avi
-  * dv
-  * filmstrip
-  * flv
-  * h261
-  * h263
-  * h264
-  * mov
-  * image2
-  * image2pipe
-  * m4v
-  * mjpeg
-  * mpeg
-  * mpegts
-  * ogg
-  * rawvideo
-  * rm
-  * rtsp
-  * yuv4mpegpipe
-
-|project| supports a number of other binary formats, writing to which is performed using the :py:class:`bob.io.save()` with the right file extension passed as an argument, just as shown in the example above. These additional formats are:
+|project| supports a number of binary formats, writing to which is performed using the :py:class:`bob.io.save()` with the right file extension passed as an argument, just as shown in the example above. These additional formats are:
   
   * Matlab (``.mat``), Matlab arrays, supports all integer, float and complex varieties [``matlab.array.binary``];
   * bob3 (``.bindata``), supports single or double precision float numbers, only 1-D [``bob3.array.binary``];
@@ -433,9 +403,10 @@ The loaded image files are 3D arrays (for RGB format) or 2D arrays (for greyscal
   os.chdir(current_directory)
   shutil.rmtree(temp_dir)
 
-Loading and saving matlab data
+Loading and saving Matlab data
 ==============================
 
+An alternative for saving data in ``.mat`` files using :py:meth:`bob.io.save()`, would be saving them simply in `HDF5`_ file, which then can be easily read in Matlab. Similarly, instead of having to read ``.mat`` files using :py:meth:`bob.io.load()`, you can save your Matlab data in `HDF5`_ format, which then can be easily read from |project|. Detailed instructions about how to save and load data from Matlab to and from `HDF5`_ files can be found `here`__.
 
 .. _audiosignal:
 
@@ -472,3 +443,5 @@ framerate to be specified.
 .. Place here your external references
 
 .. _ddl: http://www.hdfgroup.org/HDF5/doc/ddl.html
+.. _matlab-hdf5: http://www.mathworks.ch/help/techdoc/ref/hdf5write.html
+__ matlab-hdf5_
