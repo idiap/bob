@@ -68,7 +68,7 @@ def process_video_data(args):
   total = 0
   if args.verbose:
     sys.stdout.write("Detecting (single) faces in %d frames from file %s" % \
-        (input.numberOfFrames, args.input))
+        (input.number_of_frames, args.input))
   for k in input:
     bob.ip.rgb_to_gray(k, gray_buffer)
     int16_buffer = gray_buffer.astype('int16')
@@ -84,7 +84,7 @@ def process_video_data(args):
 
   if args.verbose:
     print "Total localization time was %.2f seconds" % total
-    print " -> Per image/frame %.3f seconds" % (total/input.numberOfFrames)
+    print " -> Per image/frame %.3f seconds" % (total/input.number_of_frames)
 
   if not args.output:
 
@@ -108,7 +108,7 @@ def process_video_data(args):
     yellow = (255, 255, 0)
     orows = 2*(input.height/2)
     ocolumns = 2*(input.width/2)
-    ov = bob.io.VideoWriter(args.output, orows, ocolumns, input.frameRate)
+    ov = bob.io.VideoWriter(args.output, orows, ocolumns, input.frame_rate)
 
     for frame,(bbox,points) in zip(input,data):
 

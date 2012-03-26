@@ -103,7 +103,7 @@ void bind_io_array() {
     .add_property("type", make_function(&io::Array::type, return_value_policy<copy_const_reference>()), "Typing information for this array")
     .def("load", &io::Array::load, "Loads this array into memory, if that is not already the case")
     .add_property("index", &io::Array::getIndex, &io::Array::setIndex)
-    .add_property("loadsAll", &io::Array::loadsAll)
+    .add_property("loads_all", &io::Array::loadsAll)
     .add_property("filename", make_function(&io::Array::getFilename, return_value_policy<copy_const_reference>()), "Filename -- empty if loaded in memory")
     .add_property("codec", &io::Array::getCodec, "File object being read, if any")
     .def("save", &io::Array::save, (arg("self"), arg("filename")), "Save the array contents to a file, truncating it before")
