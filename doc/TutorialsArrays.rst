@@ -250,7 +250,7 @@ Assignment, shallow and deep copy
 ---------------------------------
 
 Different arrays might share the same data in memory. Let's first have a look
-at the assignment operator =.
+at the assignment operator "=".
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -260,7 +260,7 @@ at the assignment operator =.
    >>> print b is a # a and b are two names for the same ndarray object
    True
 
-Furthermore, the assignment operator only creates an **alias** to the same 
+The assignment operator only creates an **alias** to the same 
 :py:class:`numpy.ndarray` object. In contrast, the 
 :py:attr:`numpy.ndarray.view` method creates a new NumPy_ array object that
 points to the same memory block. This is known as a **shallow copy**.
@@ -317,7 +317,7 @@ Vectors and matrices
 --------------------
 
 A vector is represented as a 1D NumPy_ array, whereas a matrix is 
-represented by a 2D arrays whose first dimension corresponds to the rows, and
+represented by a 2D array whose first dimension corresponds to the rows, and
 second dimension to the columns.
 
 .. doctest::
@@ -335,7 +335,7 @@ Images
 ------
 
 **Grayscale** images are represented as 2D arrays, the first dimension being the
-height (number of rows) and the second dimension being the witdh (number of 
+height (number of rows) and the second dimension being the width (number of 
 columns).
 
 For instance,
@@ -370,13 +370,14 @@ Audio signal
 |project| does not yet support audio files (No wav or mp3 codec). However, 
 there are several alternatives: 
 
-* The signal in the audio file could be converted into e.g. HDF5, and then could be read and process with |project|.
+* The signal in the audio file could be converted into HDF5. After this it can then
+  be read and processed with |project|.
 
 * A Python_ module could be used to load the audio file as a NumPy_ :py:class:`numpy.ndarray`, such as :py:mod:`scipy.io.wavfile`. Please look at :ref:`audiosignal` for an example of how to do it.
 
-Then, a stereo audio signal would be represented as a 2D array, the first 
+Once loaded, a stereo audio signal would be represented as a 2D array, the first 
 dimension corresponding to the time index and the second one to the audio 
-channel, values in the array corresponding to wave magnitudes.
+channel, values in the array would then correspond to wave magnitudes.
 
 Interfacing with OpenCV_ and PIL_
 =================================
