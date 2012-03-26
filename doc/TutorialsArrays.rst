@@ -52,7 +52,7 @@ below, NumPy_ should be imported in the Python_ environment.
 
 .. doctest::
 
-   >>> import numpy
+  >>> import numpy
 
 .. note::
 
@@ -66,25 +66,25 @@ array with initialized content:
 
 .. testsetup:: *
 
-   import numpy, bob
+  import numpy, bob
 
 .. doctest::
 
-   >>> A = numpy.array([[1,2,3,4],[5,6,7,8]]) # Creates a 2D array with initialized values
-   >>> print A
-   [[1 2 3 4]
-    [5 6 7 8]]
+  >>> A = numpy.array([[1,2,3,4],[5,6,7,8]]) # Creates a 2D array with initialized values
+  >>> print A
+  [[1 2 3 4]
+   [5 6 7 8]]
 
 It is also possible just to allocate the array in memory.
 
 .. doctest::
-   :options: +NORMALIZE_WHITESPACE
+  :options: +NORMALIZE_WHITESPACE
 
-   >>> B = numpy.ndarray((2,4)) # Creates a 2D array with uninitialized values
-   >>> B.fill(7) # Fill it in with a constant value 7
-   >>> print B
-   [[ 7. 7. 7. 7.]
-    [ 7. 7. 7. 7.]]
+  >>> B = numpy.ndarray((2,4)) # Creates a 2D array with uninitialized values
+  >>> B.fill(7) # Fill it in with a constant value 7
+  >>> print B
+  [[ 7. 7. 7. 7.]
+   [ 7. 7. 7. 7.]]
 
 In both previous cases, NumPy_ creates an instance of the class :py:class:`numpy.ndarray`,
 which is also known by the alias :py:func:`numpy.array`. The most important attributes of 
@@ -96,6 +96,15 @@ an :py:class:`numpy.ndarray` object are:
 
 * :py:attr:`numpy.ndarray.dtype`: an object describing the type of the elements in the array.
 
+.. doctest::
+  :options: +NORMALIZE_WHITESPACE
+
+  >>> print A.ndim
+  2
+  >>> print A.shape
+  (2, 4)
+  >>> print A.dtype # doctest: +SKIP
+  int64
 
 Accessing array elements
 ------------------------
@@ -106,19 +115,19 @@ at 0.
 
 .. doctest::
 
-   >>> A = numpy.array([[1,2,3,4],[5,6,7,8]]) # Creates a 2D array with initialized values
-   >>> print A[0,1]
-   2
+  >>> A = numpy.array([[1,2,3,4],[5,6,7,8]]) # Creates a 2D array with initialized values
+  >>> print A[0,1]
+  2
 
 It is also possible to iterate over an array. In the case of a 
 multi-dimensional array, this is done with respect to the first dimension.
 
 .. doctest::
-   :options: +NORMALIZE_WHITESPACE
+  :options: +NORMALIZE_WHITESPACE
 
-   >>> for row in A: print row
-   [1 2 3 4]
-   [5 6 7 8]
+  >>> for row in A: print row
+  [1 2 3 4]
+  [5 6 7 8]
 
 
 Array type
@@ -128,9 +137,9 @@ The type of the elements of an array can be specified at the creation time.
 
 .. doctest::
 
-   >>> C = numpy.array( [[1,2], [3,4]], dtype='float64' )
-   >>> print C.dtype
-   float64
+  >>> C = numpy.array( [[1,2], [3,4]], dtype='float64' )
+  >>> print C.dtype
+  float64
 
 
 If you would like to cast the elements of an array to another type you can
@@ -138,9 +147,9 @@ do this by using the NumPy_ function :py:attr:`numpy.ndarray.astype`.
 
 .. doctest::
 
-   >>> D = C.astype('uint8')
-   >>> print D.dtype
-   uint8
+  >>> D = C.astype('uint8')
+  >>> print D.dtype
+  uint8
 
 In addition, |project| provides the :py:func:`bob.core.convert` function 
 which allows you to convert/rescale a NumPy_ :py:class:`numpy.ndarray` of a 
@@ -149,15 +158,15 @@ Typically, this is useful if you want to convert a uint8 2D array (such as a
 grayscale image) into a float64 2D array with a ``[0,1]`` range.
 
 .. doctest::
-   :options: +NORMALIZE_WHITESPACE
+  :options: +NORMALIZE_WHITESPACE
 
-    >>> img = numpy.array([[0,1,2,3,4],[255,254,253,252,251]], dtype='uint8')
-    >>> img_d = bob.core.array.convert(img, dtype='float64', dest_range=(0.,1.))
-    >>> print img_d
-    [[ 0. 0.00392157 0.00784314 0.01176471 0.01568627]
-     [ 1. 0.99607843 0.99215686 0.98823529 0.98431373]]
-    >>> print img_d.dtype
-    float64
+  >>> img = numpy.array([[0,1,2,3,4],[255,254,253,252,251]], dtype='uint8')
+  >>> img_d = bob.core.array.convert(img, dtype='float64', dest_range=(0.,1.))
+  >>> print img_d
+  [[ 0. 0.00392157 0.00784314 0.01176471 0.01568627]
+   [ 1. 0.99607843 0.99215686 0.98823529 0.98431373]]
+  >>> print img_d.dtype
+  float64
 
 
 Array shape
@@ -169,18 +178,18 @@ NumPy_ provides several features to reshape or stack arrays, such as the
 
 .. doctest::
 
-   >>> E = D.reshape((1,4))
-   >>> print E.shape
-   (1, 4)
-   >>> a = numpy.array( [1,2], dtype='uint8' )
-   >>> b = numpy.array( [3,4], dtype='uint8' )
-   >>> F = numpy.vstack((a,b))
-   >>> print F
-   [[1 2]
-    [3 4]]
-   >>> G = numpy.hstack((a,b))
-   >>> print G
-   [1 2 3 4]
+  >>> E = D.reshape((1,4))
+  >>> print E.shape
+  (1, 4)
+  >>> a = numpy.array( [1,2], dtype='uint8' )
+  >>> b = numpy.array( [3,4], dtype='uint8' )
+  >>> F = numpy.vstack((a,b))
+  >>> print F
+  [[1 2]
+   [3 4]]
+  >>> G = numpy.hstack((a,b))
+  >>> print G
+  [1 2 3 4]
 
 
 Mathematical operations
@@ -190,41 +199,41 @@ NumPy_ provides numerous mathematical operations. Most of them are performed
 **elementwise**. For instance,
 
 .. doctest::
-   :options: +NORMALIZE_WHITESPACE
+  :options: +NORMALIZE_WHITESPACE
 
-   >>> a = numpy.array([1,2,3,4])
-   >>> b = numpy.array([4,3,2,1])
-   >>> c = a+b
-   >>> print c
-   [5 5 5 5]
-   >>> d = a*b
-   >>> print d
-   [4 6 6 4]
-   >>> e = numpy.exp(a)
-   >>> print e
-   [ 2.71828183 7.3890561 20.08553692 54.59815003]
+  >>> a = numpy.array([1,2,3,4])
+  >>> b = numpy.array([4,3,2,1])
+  >>> c = a+b
+  >>> print c
+  [5 5 5 5]
+  >>> d = a*b
+  >>> print d
+  [4 6 6 4]
+  >>> e = numpy.exp(a)
+  >>> print e
+  [ 2.71828183 7.3890561 20.08553692 54.59815003]
 
 
 NumPy_ also provides reduction operations.
 
 .. doctest::
-   :options: +NORMALIZE_WHITESPACE
+  :options: +NORMALIZE_WHITESPACE
    
-   >>> print a.sum()
-   10
-   >>> print a.max()
-   4
+  >>> print a.sum()
+  10
+  >>> print a.max()
+  4
 
 Partial reductions along a specific dimension are also possible.
 
 .. doctest::
-   :options: +NORMALIZE_WHITESPACE
+  :options: +NORMALIZE_WHITESPACE
    
-   >>> A = numpy.array([[1,2,3,4],[5,6,7,8]]) # Creates a 2D array with initialized values
-   >>> print A.sum(axis=0)
-   [ 6 8 10 12]
-   >>> print A.max(axis=1)
-   [4 8]
+  >>> A = numpy.array([[1,2,3,4],[5,6,7,8]]) # Creates a 2D array with initialized values
+  >>> print A.sum(axis=0)
+  [ 6 8 10 12]
+  >>> print A.max(axis=1)
+  [4 8]
 
 Linear algebra is also supported through the bridges to the optimized ATLAS_
 LAPACK_ (and BLAS_) libraries which are mostly integrated in the `linalg` 
@@ -232,19 +241,19 @@ submodule of SciPy_. In the following, this is highlighted via two different
 examples: matrix multiplication and matrix inversion.
 
 .. doctest::
-   :options: +NORMALIZE_WHITESPACE
+  :options: +NORMALIZE_WHITESPACE
    
-   >>> A = numpy.array([[1,2],[3,4]]) # Creates a 2D array / matrix
-   >>> B = numpy.array([[5,6],[7,8]]) # Creates a 2D array / matrix
-   >>> C = numpy.dot(A,B) # Computes the matrix multiplication A*B
-   >>> print C
-   [[19 22]
-    [43 50]]
-   >>> import scipy.linalg
-   >>> D = scipy.linalg.inv(C) # Computes the inverse of C
-   >>> print D # doctest: +SKIP
-   [[ 12.5   -5.5 ]
-    [-10.75   4.75]]
+  >>> A = numpy.array([[1,2],[3,4]]) # Creates a 2D array / matrix
+  >>> B = numpy.array([[5,6],[7,8]]) # Creates a 2D array / matrix
+  >>> C = numpy.dot(A,B) # Computes the matrix multiplication A*B
+  >>> print C
+  [[19 22]
+   [43 50]]
+  >>> import scipy.linalg
+  >>> D = scipy.linalg.inv(C) # Computes the inverse of C
+  >>> print D # doctest: +SKIP
+  [[ 12.5   -5.5 ]
+   [-10.75   4.75]]
 
 Assignment, shallow and deep copy
 ---------------------------------
@@ -253,12 +262,12 @@ Different arrays might share the same data in memory. Let's first have a look
 at the assignment operator =.
 
 .. doctest::
-   :options: +NORMALIZE_WHITESPACE
+  :options: +NORMALIZE_WHITESPACE
 
-   >>> a = numpy.array([1,2,3,4], dtype='uint8')
-   >>> b = a # Asignment -> No copy at all
-   >>> print b is a # a and b are two names for the same ndarray object
-   True
+  >>> a = numpy.array([1,2,3,4], dtype='uint8')
+  >>> b = a # Asignment -> No copy at all
+  >>> print b is a # a and b are two names for the same ndarray object
+  True
 
 Furthermore, the assignment operator only creates an **alias** to the same 
 :py:class:`numpy.ndarray` object. In contrast, the 
@@ -266,41 +275,41 @@ Furthermore, the assignment operator only creates an **alias** to the same
 points to the same memory block. This is known as a **shallow copy**.
 
 .. doctest::
-   :options: +NORMALIZE_WHITESPACE
+  :options: +NORMALIZE_WHITESPACE
 
-   >>> c = a.view()
-   >>> print c is a  # a and c are two different ndarray objects
-   False
-   >>> c[2] = 7  # but they share the same data in memory
-   >>> print a
-   [1 2 7 4]
+  >>> c = a.view()
+  >>> print c is a  # a and c are two different ndarray objects
+  False
+  >>> c[2] = 7  # but they share the same data in memory
+  >>> print a
+  [1 2 7 4]
 
 In a similar way, an :py:class:`numpy.ndarray` might be sliced, and in this 
 case, the data are still shared between the two :py:class:`numpy.ndarray` 
 instances.
 
 .. doctest::
-   :options: +NORMALIZE_WHITESPACE
+  :options: +NORMALIZE_WHITESPACE
 
-   >>> d = a[0:3] # d is a slice of a (elements 0 to 3 excluded)
-   >>> print d is a  # a and d are two different ndarray objects
-   False
-   >>> print len(d)
-   3
-   >>> d[0] = 0 # but they share the same data in memory
-   >>> print a
-   [0 2 7 4]
+  >>> d = a[0:3] # d is a slice of a (elements 0 to 3 excluded)
+  >>> print d is a  # a and d are two different ndarray objects
+  False
+  >>> print len(d)
+  3
+  >>> d[0] = 0 # but they share the same data in memory
+  >>> print a
+  [0 2 7 4]
 
 If we would like to do a **deep copy**, we could use the 
 :py:attr:`numpy.ndarray.copy` method.
 
 .. doctest::
-   :options: +NORMALIZE_WHITESPACE
+  :options: +NORMALIZE_WHITESPACE
 
-   >>> e = a.copy() # e is a complete copy of a
-   >>> e[0] = 7
-   >>> print a
-   [0 2 7 4]
+  >>> e = a.copy() # e is a complete copy of a
+  >>> e[0] = 7
+  >>> print a
+  [0 2 7 4]
 
 For a more exhaustive introduction about NumPy_, please have a look at its 
 `user guide`_. 
@@ -321,15 +330,15 @@ represented by a 2D arrays whose first dimension corresponds to the rows, and
 second dimension to the columns.
 
 .. doctest::
-   :options: +NORMALIZE_WHITESPACE
+  :options: +NORMALIZE_WHITESPACE
 
-   >>> A = numpy.array([[1, 2, 3], [4, 5, 6]], dtype='uint8') # A is a matrix 2x3
-   >>> print A
-   [[1 2 3]
-    [4 5 6]]
-   >>> b = numpy.array([1, 2, 3], dtype='uint8') # b is a vector of length 3
-   >>> print b
-   [1 2 3]
+  >>> A = numpy.array([[1, 2, 3], [4, 5, 6]], dtype='uint8') # A is a matrix 2x3
+  >>> print A
+  [[1 2 3]
+   [4 5 6]]
+  >>> b = numpy.array([1, 2, 3], dtype='uint8') # b is a vector of length 3
+  >>> print b
+  [1 2 3]
 
 Images
 ------
@@ -341,9 +350,9 @@ columns).
 For instance,
 
 .. doctest::
-   :options: +NORMALIZE_WHITESPACE
+  :options: +NORMALIZE_WHITESPACE
 
-   >>> img = numpy.ndarray((480,640), dtype='uint8')
+  >>> img = numpy.ndarray((480,640), dtype='uint8')
 
 **img** which is a 2D array can be seen as a grayscale image of dimension
 640 (width) by 480 (height). In addition, **img** can be seen as a matrix
@@ -398,18 +407,18 @@ To convert a NumPy_ array into an OpenCV_ cvMat, the
 
 .. code-block:: python
 
-   >>> import cv, numpy
-   >>> a = numpy.ones((5, 10))
-   >>> mat = cv.fromarray(a)
+  >>> import cv, numpy
+  >>> a = numpy.ones((5, 10))
+  >>> mat = cv.fromarray(a)
 
 Similarly, to perform the inverse conversion from an OpenCV_ cvMat into a 
 NumPy_ array, the :py:func:`numpy.asarray` method is suitable.
 
 .. code-block:: python
 
-   >>> mat = cv.CreateMat(3, 5, cv.CV_32FC1)
-   >>> cv.Set(mat, 37)
-   >>> a = numpy.asarray(mat)
+  >>> mat = cv.CreateMat(3, 5, cv.CV_32FC1)
+  >>> cv.Set(mat, 37)
+  >>> a = numpy.asarray(mat)
 
 Both NumPy_ array and OpenCV_ cvMat use similar datatypes (`uint8`, 
 `uint32`, `float64`, etc.), and hence, it is interesting to notice that the 
@@ -425,18 +434,18 @@ array of type `uint8` into a grayscale (integer) PIL_ image, the
 
 .. code-block:: python
 
-   >>> import numpy, Image
-   >>> img = numpy.array([[1,2,3,4],[2,3,4,5],[3,4,5,6]], 'uint8')
-   >>> imgPIL = Image.fromarray(img)
+  >>> import numpy, Image
+  >>> img = numpy.array([[1,2,3,4],[2,3,4,5],[3,4,5,6]], 'uint8')
+  >>> imgPIL = Image.fromarray(img)
 
 To convert a grayscale PIL_ image into a 2D NumPy_ array of `uint8`, 
 the :py:func:`numpy.asarray` method of NumPy_ is suitable.
 
 .. code-block:: python
 
-   >>> img2 = numpy.asarray(imgPIL)
-   >>> numpy.array_equal(img, img2)
-   True
+  >>> img2 = numpy.asarray(imgPIL)
+  >>> numpy.array_equal(img, img2)
+  True
 
 In contrast to OpenCV_, please be aware that PIL_ does not support all the
 datatypes that we have in |project|. Therefore, please restrict yourself to 
@@ -450,20 +459,20 @@ is an additional conversion required.
 
 .. code-block:: python
 
-   >>> import numpy, Image
-   >>> a = numpy.array([[[1,2,3],[4,5,6]],[[11,12,13],[14,15,16]],[[21,22,23],[24,25,26]]], 'uint8')
-   >>> c = numpy.dstack((a[0,:],a[1,:],a[2,:])).reshape(a.shape[1],a.shape[2],a.shape[0]) # Convert to plane color to interleaved color
-   >>> cPIL = Image.fromarray(c)
+  >>> import numpy, Image
+  >>> a = numpy.array([[[1,2,3],[4,5,6]],[[11,12,13],[14,15,16]],[[21,22,23],[24,25,26]]], 'uint8')
+  >>> c = numpy.dstack((a[0,:],a[1,:],a[2,:])).reshape(a.shape[1],a.shape[2],a.shape[0]) # Convert to plane color to interleaved color
+  >>> cPIL = Image.fromarray(c)
 
 The reverse operation is similar, but again requires an extra conversion from
 interleaved color image to plane color image.
 
 .. code-block:: python
 
-   >>> c_read = numpy.asarray(cPIL)
-   >>> c_plane_read = numpy.vstack((c_read[:,:,0],c_read[:,:,1],c_read[:,:,2])).reshape(c_read.shape[2],c_read.shape[0],c_read.shape[1]) # Convert interleaved color to plane color
-   >>> numpy.array_equal(a, c_plane_read)
-   True
+  >>> c_read = numpy.asarray(cPIL)
+  >>> c_plane_read = numpy.vstack((c_read[:,:,0],c_read[:,:,1],c_read[:,:,2])).reshape(c_read.shape[2],c_read.shape[0],c_read.shape[1]) # Convert interleaved color to plane color
+  >>> numpy.array_equal(a, c_plane_read)
+  True
 
 MATLAB_
 -------
