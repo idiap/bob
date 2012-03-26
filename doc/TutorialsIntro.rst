@@ -23,12 +23,12 @@
 The following tutorials constitute a suitable starting point to get to know 
 how to use the |project| library and to learn its fundamental concepts. 
 
-They all rely on the |project| lab-like environment which is `Python`_. 
-Using |project| within a `Python`_ environment is convenient because:
+They all rely on the |project| lab-like environment which is `Python`_. Using 
+|project| within a `Python`_ environment is convenient because:
 
-* You can easily glue together all of the components of an experiment within a single Python script (which does not require to be compiled)
+* you can easily glue together all of the components of an experiment within a single Python script (which does not require to be compiled),
 
-* Scripts may easily rely on other `Python`_ tools as well as |project|
+* scripts may easily rely on other `Python`_ tools as well as |project|, and 
 
 * `Python`_ bindings are used to transparently run the underlying efficient C++ compiled code for the key features of the library.
 
@@ -52,7 +52,7 @@ Here is an example:
 
 If you installed without administrator priviledges, you should first check two things:
 
-1. Use the **same** version of `Python`_ that was used to compile |project|.
+1. Use the **same** version of `Python`_ that was used to compile |project|. 
 2. Append the location of the built/installed libraries to your `PYTHONPATH`, so `Python`_ can find |project|.
 
 Example:

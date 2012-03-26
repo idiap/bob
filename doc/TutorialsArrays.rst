@@ -1,4 +1,4 @@
-.. vim: set fileencoding-utf-8 :
+.. vim: set fileencoding=utf-8 :
 .. Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
 .. Wed Mar 14 12:31:35 2012 +0100
 .. 
@@ -20,16 +20,17 @@
  Multi-dimensional Arrays
 **************************
 
-The fundamental data structure of |project| consists in multi-dimensional
-arrays. In signal-processing and machine learning, arrays are indeed a suitable
+The fundamental data structure of |project| is a multi-dimensional
+array. In signal-processing and machine learning, arrays are a suitable
 representation for many different types of digital signals such as images, 
-audio data, extracted features, etc. Python_ is the working environment
-selected for this library. Furtherore, we have decided to rely on existing
-NumPy_ multi-dimensional arrays (:py:class:`numpy.ndarray`).
+audio data and extracted features. Python_ is the working environment
+selected for this library and so when using Python_ we have relied on the 
+existing NumPy_ multi-dimensional arrays (:py:class:`numpy.ndarray`). This
+provides with greater flexibility within the Python environment.
 
 At the C++ level, the `Blitz++`_ library is used to handle arrays. Although we
-initially binds `Blitz++`_ Arrays into Python, we quickly realized that it
-might be more clever to use existing NumPy_ ndarrays from Python, as they can
+initially bound `Blitz++`_ Arrays in Python, we quickly realized that it
+might be more clever to use the existing NumPy_ ndarrays from Python, as they can
 directly be processed by numerous existing Python libraries such as NumPy_ and
 SciPy_. 
 
@@ -132,8 +133,8 @@ The type of the elements of an array can be specified at the creation time.
    float64
 
 
-If we would like to cast the elements of an array to another type, NumPy_ 
-provides the :py:attr:`numpy.ndarray.astype` function.
+If you would like to cast the elements of an array to another type you can
+do this by using the NumPy_ function :py:attr:`numpy.ndarray.astype`.
 
 .. doctest::
 
@@ -142,9 +143,9 @@ provides the :py:attr:`numpy.ndarray.astype` function.
    uint8
 
 In addition, |project| provides the :py:func:`bob.core.convert` function 
-which allows to convert/rescale a NumPy_ :py:class:`numpy.ndarray` of a 
-given type into another array of a possibly different type with re-scaling.
-Typically, this is useful if we want to convert a uint8 2D array (e.g. a
+which allows you to convert/rescale a NumPy_ :py:class:`numpy.ndarray` of a 
+given type into another array, of possibly different type, with re-scaling.
+Typically, this is useful if you want to convert a uint8 2D array (such as a
 grayscale image) into a float64 2D array with a ``[0,1]`` range.
 
 .. doctest::
