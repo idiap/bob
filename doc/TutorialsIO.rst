@@ -113,7 +113,7 @@ directory like this:
 .. doctest::
 
   >>> f = bob.io.HDF5File('testfile1.hdf5')
-  >>> f.createGroup('/test')
+  >>> f.create_group('/test')
   >>> f.set('/test/my_float', 6.28, dtype='float32')
   >>> del f
 
@@ -378,7 +378,7 @@ As for reading the video files, although it is possible to read a video using th
   >>> for i in range(0, 100): newframe = numpy.uint8(numpy.random.random_integers(0,255,(3,256,256))); outv.append(newframe)  # adding a total of 100 random generated frames to the video 
   >>> outv.close()
   >>> input = bob.io.VideoReader('testvideo.avi')
-  >>> input.numberOfFrames
+  >>> input.number_of_frames
   100
   >>> inv = input.load()
   >>> inv.shape

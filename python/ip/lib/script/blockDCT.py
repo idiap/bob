@@ -23,7 +23,7 @@ import optparse
 import math
 import numpy
 
-def normalizeBlocks(src):
+def normalize_blocks(src):
   for i in range(src.shape[0]):
     block = src[i, :, :]
     mean = block.mean()
@@ -35,7 +35,7 @@ def normalizeBlocks(src):
 
     src[i, :, :] = (block - mean) / std
     
-def normalizeDCT(src):
+def normalize_dct(src):
   for i in range(src.shape[1]):
     col = src[:, i]
     mean = col.mean()
@@ -58,12 +58,12 @@ def dctfeatures(line, A_OUTPUT_DIR, A_OUTPUT_EXTENSION,
   # Process one file
   prep = bob.io.Array(line).get().astype('float64')
 
-  blockShape = bob.ip.getBlockShape(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
+  blockShape = bob.ip.get_block_shape(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
   blocks = numpy.ndarray(blockShape, 'float64')
   bob.ip.block(prep, blocks, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
 
   if norm_before:
-    normalizeBlocks(blocks)
+    normalize_blocks(blocks)
 
   if add_xy:
     real_DCT_coef = A_N_DCT_COEF - 2
@@ -94,7 +94,7 @@ def dctfeatures(line, A_OUTPUT_DIR, A_OUTPUT_EXTENSION,
   
   TMP_tensor = numpy.ndarray((n_blocks, TMP_tensor_max), 'float64')
   
-  nBlocks = bob.ip.getNBlocks(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
+  nBlocks = bob.ip.get_n_blocks(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
   for by in range(nBlocks[0]):
     for bx in range(nBlocks[1]):
       bi = bx + by * nBlocks[1]
@@ -105,7 +105,7 @@ def dctfeatures(line, A_OUTPUT_DIR, A_OUTPUT_EXTENSION,
       TMP_tensor[bi, TMP_tensor_min:TMP_tensor_max] = dct_blocks[bi, dct_blocks_min:dct_blocks_max]
 
   if norm_after:
-    normalizeDCT(TMP_tensor)
+    normalize_dct(TMP_tensor)
 
   output_file = os.path.join(A_OUTPUT_DIR, os.path.splitext(os.path.basename(line))[0] + ".hdf5")
   bob.io.Array(TMP_tensor).save(output_file)
@@ -193,16 +193,16 @@ def main():
     array = numpy.array([[[ 8,  2], [ 2,  8] ]], 'float64')
 
     array_ref = numpy.array([[[ 1, -1], [-1,  1] ]], 'float64')
-    normalizeBlocks(array)
+    normalize_blocks(array)
     if not (array == array_ref).all():
-      print "Problem with normalizeBlocks"
+      print "Problem with normalize_blocks"
       sys.exit(1)
     
     array = numpy.array([[ 2,  8], [ 8,  2], [ 2,  8], [ 8,  2] ], 'float64')
     array_ref = numpy.array([[-1,  1], [ 1, -1], [-1,  1], [ 1, -1] ], 'float64')
-    normalizeDCT(array)
+    normalize_dct(array)
     if not (array == array_ref).all():
-      print "Problem with normalizeDCT"
+      print "Problem with normalize_dct"
       sys.exit(1)
 
     if os.path.exists("/tmp/input.hdf5"):

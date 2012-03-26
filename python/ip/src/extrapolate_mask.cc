@@ -35,7 +35,7 @@ static void inner_extrapolateMask(tp::const_ndarray src, tp::ndarray img) {
   ip::extrapolateMask<T>(src.bz<bool,2>(), img_);
 }
 
-static void extrapolateMask (tp::const_ndarray src, tp::const_ndarray img) {
+static void extrapolate_mask (tp::const_ndarray src, tp::const_ndarray img) {
   
   const ca::typeinfo& info = img.type();
   
@@ -51,5 +51,5 @@ static void extrapolateMask (tp::const_ndarray src, tp::const_ndarray img) {
 }
 
 void bind_ip_extrapolate_mask() {
-  def("extrapolateMask", &extrapolateMask, (arg("src_mask"), arg("img")), "Extrapolate a 2D array/image, taking mask into account.");
+  def("extrapolate_mask", &extrapolate_mask, (arg("src_mask"), arg("img")), "Extrapolate a 2D array/image, taking mask into account.");
 }

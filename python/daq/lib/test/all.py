@@ -25,7 +25,7 @@ class DaqTest(unittest.TestCase):
 
     pf = PixelFormat.RGB24
     fs = FrameSize(video.width, video.height)
-    fi = FrameInterval(1, int(video.frameRate))
+    fi = FrameInterval(1, int(video.frame_rate))
 
     camera = VideoReaderCamera(video)
 
@@ -44,7 +44,7 @@ class DaqTest(unittest.TestCase):
     outputWriter = BobOutputWriter()
     outputWriter.set_output_dir(os.path.dirname(OUTPUT_VIDEO))
     outputWriter.set_output_name(os.path.basename(OUTPUT_VIDEO))
-    outputWriter.open(video.width, video.height, int(video.frameRate))
+    outputWriter.open(video.width, video.height, int(video.frame_rate))
 
     controller.add_controller_callback(fl)
     controller.add_controller_callback(display)

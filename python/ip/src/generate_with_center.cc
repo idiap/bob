@@ -130,12 +130,12 @@ static object gwc_offset (tp::const_ndarray src, int y, int x) {
 
 void bind_ip_generate_with_center() {
 
-  def("generateWithCenter", &gwc, (arg("src"), arg("dst"), arg("center_y"), arg("center_x")), "Extend a 2D blitz array/image, putting a given point in the center.");
+  def("generate_with_center", &gwc, (arg("src"), arg("dst"), arg("center_y"), arg("center_x")), "Extend a 2D blitz array/image, putting a given point in the center.");
 
-  def("generateWithCenter", &gwc2, (arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("center_y"), arg("center_x")), "Extend a 2D blitz array/image, putting a given point in the center, taking mask into account.");
+  def("generate_with_center", &gwc2, (arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("center_y"), arg("center_x")), "Extend a 2D blitz array/image, putting a given point in the center, taking mask into account.");
 
-  def("getGenerateWithCenterShape", &gwc_shape, (arg("src"), arg("center_y"), arg("center_x")), "Return the shape of the output 2D blitz array/image, when calling generateWithCenter which puts a given point of an image in the center.");
+  def("get_generate_with_center_shape", &gwc_shape, (arg("src"), arg("center_y"), arg("center_x")), "Return the shape of the output 2D blitz array/image, when calling generate_with_center which puts a given point of an image in the center.");
   
-  def("getGenerateWithCenterOffset", &gwc_offset, (arg("src"), arg("center_y"), arg("center_x")), "Return the offset of the output 2D blitz array/image, when calling generateWithCenter which puts a given point of an image in the center.");
+  def("get_generate_with_center_offset", &gwc_offset, (arg("src"), arg("center_y"), arg("center_x")), "Return the offset of the output 2D blitz array/image, when calling generate_with_center which puts a given point of an image in the center.");
 
 }

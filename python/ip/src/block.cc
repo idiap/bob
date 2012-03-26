@@ -95,6 +95,6 @@ static object get_n_blocks (tp::const_ndarray input, int a, int b, int c, int d)
 void bind_ip_block()
 {
   def("block", &block, (arg("src"), arg("dst"), arg("block_h"), arg("block_w"), arg("overlap_h"), arg("overlap_w")), BLOCK2D_DOC);
-  def("getBlockShape", &get_block_shape, (arg("src"), arg("block_h"), arg("block_w"), arg("overlap_h"), arg("overlap_w")), GETBLOCKSHAPE2D_DOC);
-  def("getNBlocks", &get_n_blocks, (arg("src"), arg("block_h"), arg("block_w"), arg("overlap_h"), arg("overlap_w")), GETNBLOCKS2D_DOC);
+  def("get_block_shape", &get_block_shape, (arg("src"), arg("block_h"), arg("block_w"), arg("overlap_h"), arg("overlap_w")), GETBLOCKSHAPE2D_DOC);
+  def("get_n_blocks", &get_n_blocks, (arg("src"), arg("block_h"), arg("block_w"), arg("overlap_h"), arg("overlap_w")), GETNBLOCKS2D_DOC);
 }

@@ -124,7 +124,7 @@ class ArrayTest(unittest.TestCase):
 
     A1 = bob.io.Array('test1.hdf5')
 
-    self.assertTrue  (A1.loadsAll)
+    self.assertTrue  (A1.loads_all)
     self.assertEqual (A1.filename, 'test1.hdf5')
     
     a_before = A1.get()
@@ -143,7 +143,7 @@ class ArrayTest(unittest.TestCase):
 
     A1.save(tname)
 
-    self.assertTrue (A1.loadsAll)
+    self.assertTrue (A1.loads_all)
     self.assertEqual (A1.filename, tname)
 
     self.assertTrue ( numpy.array_equal(A1.get(), a_before) )

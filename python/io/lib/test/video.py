@@ -48,9 +48,9 @@ class VideoTest(unittest.TestCase):
     self.assertEqual(v.height, 240)
     self.assertEqual(v.width, 320)
     self.assertEqual(v.duration, 15000000) #microseconds
-    self.assertEqual(v.numberOfFrames, 375)
+    self.assertEqual(v.number_of_frames, 375)
     self.assertEqual(len(v), 375)
-    self.assertEqual(v.codecName, 'mjpeg')
+    self.assertEqual(v.codec_name, 'mjpeg')
 
   def test02_CanReadImages(self):
 

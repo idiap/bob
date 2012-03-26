@@ -103,10 +103,10 @@ class FlowTest(unittest.TestCase):
     for i in range(N):
       flow(alpha, 1, i1, i2, u_cxx, v_cxx)
       u_py, v_py = HornAndSchunckFlowPython(alpha, i1, i2, i3, u_py, v_py)
-      cxx_se2 = flow.evalEc2(u_cxx, v_cxx)
-      cxx_be = flow.evalEb(i1, i2, u_cxx, v_cxx)
-      py_se2 = flow.evalEc2(u_py, v_py)
-      py_be = flow.evalEb(i1, i2, u_py, v_py)
+      cxx_se2 = flow.eval_ec2(u_cxx, v_cxx)
+      cxx_be = flow.eval_eb(i1, i2, u_cxx, v_cxx)
+      py_se2 = flow.eval_ec2(u_py, v_py)
+      py_be = flow.eval_eb(i1, i2, u_py, v_py)
       cxx_avg_err = (cxx_se2 * (alpha**2) + cxx_be**2).sum()
       py_avg_err = (py_se2 * (alpha**2) + py_be**2).sum()
       '''
@@ -141,8 +141,8 @@ class FlowTest(unittest.TestCase):
       flow(alpha, 1, i1, i2, u, v)
       #array = (255.0*bob.ip.flowutils.flow2hsv(u,v)).astype('uint8')
       #array.save("hs_rubberwhale-%d.png" % i)
-      se2 = flow.evalEc2(u, v)
-      be = flow.evalEb(i1, i2, u, v)
+      se2 = flow.eval_ec2(u, v)
+      be = flow.eval_eb(i1, i2, u, v)
       avg_err = (se2 * (alpha**2) + be**2).sum()
       print "Error %2d| Ec2: %.3e Eb: %.3e E2 (avg.): %.3e" % \
           (
@@ -181,16 +181,16 @@ class FlowTest(unittest.TestCase):
     v_cxx = numpy.zeros(i1.shape, 'float64')
     flow = bob.ip.VanillaHornAndSchunckFlow(i1.shape)
     flow(alpha, N, i1, i2, u_cxx, v_cxx)
-    se2 = flow.evalEc2(u_cxx, v_cxx)
-    be = flow.evalEb(i1, i2, u_cxx, v_cxx)
+    se2 = flow.eval_ec2(u_cxx, v_cxx)
+    be = flow.eval_eb(i1, i2, u_cxx, v_cxx)
     avg_err = (se2 * (alpha**2) + be**2).sum()
     print "bob H&S Error (%2d iterations) : %.3e %.3e %.3e" % (N, se2.sum()**0.5, be.sum(), avg_err**0.5)
 
     u_ocv1, v_ocv1 = compute_flow_opencv(alpha, N/4, if1, if2)
     u_ocv2, v_ocv2 = compute_flow_opencv(alpha, N/2, if1, if2)
     u_ocv, v_ocv = compute_flow_opencv(alpha, N, if1, if2)
-    se2 = flow.evalEc2(u_ocv, v_ocv)
-    be = flow.evalEb(i1, i2, u_ocv, v_ocv)
+    se2 = flow.eval_ec2(u_ocv, v_ocv)
+    be = flow.eval_eb(i1, i2, u_ocv, v_ocv)
     avg_err = (se2 * (alpha**2) + be**2).sum()
     print "OpenCV H&S Error (%2d iterations): %.3e %.3e %.3e" % (N, se2.sum()**0.5, be.sum(), avg_err**0.5)
 

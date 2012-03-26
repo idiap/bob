@@ -179,7 +179,7 @@ void bind_ip_rotate() {
 
 
   boost::python::def(
-    "getAngleToHorizontal", 
+    "get_angle_to_horizontal", 
     &bob::ip::getAngleToHorizontal, 
     (boost::python::arg("left_h"), boost::python::arg("left_w"), boost::python::arg("right_h"), boost::python::arg("right_w")), 
     "Get the angle needed to level out (horizontally) two points.");

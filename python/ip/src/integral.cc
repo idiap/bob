@@ -77,5 +77,5 @@ static void integral (tp::const_ndarray src, tp::ndarray dst, bool b=false) {
 BOOST_PYTHON_FUNCTION_OVERLOADS(integral_overloads, integral, 2, 3)
 
 void bind_ip_integral() {
-  def(BOOST_PP_STRINGIZE(integral), &integral, integral_overloads((arg("src"), arg("dst"), arg("addZeroBorder")=false), "Compute the integral image of a 2D blitz array (image).")); 
+  def(BOOST_PP_STRINGIZE(integral), &integral, integral_overloads((arg("src"), arg("dst"), arg("add_zero_border")=false), "Compute the integral image of a 2D blitz array (image).")); 
 }

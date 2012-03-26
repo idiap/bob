@@ -64,7 +64,7 @@ void bind_ip_vldsift() {
   		.def("__call__", &call_vldsift_, (arg("self"), arg("src"), arg("dst")), "Computes the dense SIFT features from an input image, using the VLFeat library. Both input and output arrays should have the expected size.")
   		.def("forward", &call_vldsift, (arg("self"), arg("src")), "Computes the dense SIFT features from an input image, using the VLFeat library. Returns the descriptors.")
   		.def("__call__", &call_vldsift, (arg("self"), arg("src")), "Computes the dense SIFT features from an input image, using the VLFeat library. Returns the descriptors.")
-      .def("getNKeypoints", &ip::VLDSIFT::getNKeypoints, "Returns the number of keypoints for the current parameters/image size.")
-      .def("getDescriptorSize", &ip::VLDSIFT::getDescriptorSize, "Returns the descriptor size for the current parameters.")
+      .def("get_n_keypoints", &ip::VLDSIFT::getNKeypoints, "Returns the number of keypoints for the current parameters/image size.")
+      .def("get_descriptor_size", &ip::VLDSIFT::getDescriptorSize, "Returns the descriptor size for the current parameters.")
 		;
 }
