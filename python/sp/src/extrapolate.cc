@@ -286,14 +286,14 @@ void bind_sp_extrapolate() {
     .value("Mirror", bob::sp::Extrapolation::Mirror)
     ;
  
-  def("extrapolateConstant", &extrapolateConstant, (arg("src"), arg("dst"), arg("constant")), "Extrapolates the values of a 1D array with a constant, given a 1 or 2D input array.");
+  def("extrapolate_constant", &extrapolateConstant, (arg("src"), arg("dst"), arg("constant")), "Extrapolates the values of a 1D array with a constant, given a 1 or 2D input array.");
 
-  def("extrapolateZero", &extrapolateZero, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array with zeros, given a 1 or 2D input array.");
+  def("extrapolate_zero", &extrapolateZero, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array with zeros, given a 1 or 2D input array.");
 
-  def("extrapolateNearest", &extrapolateNearest, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array with nearest values, given a 1 or 2D input array.");
+  def("extrapolate_nearest", &extrapolateNearest, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array with nearest values, given a 1 or 2D input array.");
 
-  def("extrapolateCircular", &extrapolateCircular, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array using circular extrapolation, given a 1 or 2D input array.");
+  def("extrapolate_circular", &extrapolateCircular, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array using circular extrapolation, given a 1 or 2D input array.");
 
-  def("extrapolateMirror", &extrapolateMirror, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array using mirroring, given a 1 or 2D input array.");
+  def("extrapolate_mirror", &extrapolateMirror, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array using mirroring, given a 1 or 2D input array.");
 
 }
