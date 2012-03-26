@@ -20,8 +20,10 @@
  Machines
 **********
 
-Machines are one of the core components of |project|. They represent
-statistical models that are `trainable`. Examples of machines are
+Machines are one of the core components of |project|. 
+They represent statistical models or other functions defined by parameters that
+can be set using :doc:`TutorialsTrainer`.
+Examples of machines are
 multi-layer perceptrons or Gaussian-mixtures. The operation you normally expect
 from a machine is to be able to feed a feature vector and extract the machine
 response or output for that input vector. It works, in many ways, similarly to

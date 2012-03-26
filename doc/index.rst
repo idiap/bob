@@ -24,11 +24,16 @@
  The |project| Project
 =======================
 
-|project| is a signal-processing and machine learning toolbox for Biometrics
-developed at  the `Idiap`_ Research Institute, in Switzerland. The toolbox is
+|project| is a free signal-processing and machine learning toolbox 
+developed by the Biometrics group at `Idiap`_ Research Institute, Switzerland. The toolbox is
 written in a mix of `Python`_ and `C++` and is designed to be both efficient
-and to reduce development time. To learn about this project's motivations and
-history, visit :doc:`Motivation`.
+and to reduce development time. 
+
+* To learn about this project's motivations and history, visit :doc:`Motivation`. 
+
+* For a brief summary of what you can do with |project|, have a look at :doc:`Overview`. 
+
+* To just get started using |project|, skip ahead to :doc:`Installation`.
 
 We believe in free software and development standards. |project| is a freely
 available library, licensed under the terms of the GPL v3. For more information
@@ -42,19 +47,6 @@ Enjoy!
 
   .. todolist::
 
-Practicalities
---------------
-
-.. toctree::
-   :maxdepth: 2
-
-   Motivation
-   Licensing
-   Installation
-   Usage
-   TicketReporting
-
-
 Overview
 --------
 
@@ -63,9 +55,16 @@ Overview
 
    Overview
 
+Installation
+------------
 
-Dive Into |project|
--------------------
+.. toctree::
+   :maxdepth: 2
+
+   Installation
+
+User's Guide
+------------
 
 .. toctree::
    :maxdepth: 2
@@ -78,9 +77,26 @@ Dive Into |project|
    TutorialsTrainer
    TutorialsDatabase
    TutorialsPerformance
+   TicketReporting
 
-Reference Guide
----------------
+Developer's Guide
+-----------------
+
+.. toctree::
+   :maxdepth: 2
+
+   Motivation
+   CodeBaseOverview
+   Compilation
+   CxxDevelopment
+   GoldenRules
+   CodingGuidelines
+   Optimizing
+   ../cxx/doc/index
+   TicketReportingDev
+
+Reference
+---------
 
 .. toctree::
    :maxdepth: 2
@@ -98,18 +114,22 @@ Reference Guide
    ../python/visioner/doc/index
    ../python/daq/doc/index
 
-Developer's Guide
------------------
+History
+-------
 
 .. toctree::
    :maxdepth: 2
 
-   Compilation
-   CxxDevelopment
-   GoldenRules
-   CodingGuidelines
-   Optimizing
-   ../cxx/doc/index
+   History
+
+Licensing
+---------
+
+.. toctree::
+   :maxdepth: 2
+
+   Licensing
+ 
 
 Indices and tables
 ------------------

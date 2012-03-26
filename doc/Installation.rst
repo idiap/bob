@@ -22,13 +22,11 @@
  Installing |project|
 ======================
 
-If you are just willing to use |project| existing resources in your scripts,
-the easiest way to pick one of the available installation methods below.
-Otherwise, if they fail or don't match your development requirements, you must
+This section describes how to automatically install pre-packaged versions of |project|.
+This is the easiest way to start using |project| in your scripts, by following one of the available installation methods below.
+On the other hand, if they are not appropriate or you would like to become a developer of |project|, you should
 compile |project| yourself as explained at :doc:`Compilation`.
 
-This section only describes how to automatically install pre-packaged versions
-of |project|.
 
 Ubuntu
 ------
@@ -81,3 +79,4 @@ Once that is done, installing |project| should be straight forward:
 .. _ubuntu packages: https://launchpad.net/~biometrics/+archive/bob
 .. _macports: http://www.macports.org/install.php
 .. _our website: http://idiap.github.com/bob/
+
