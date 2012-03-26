@@ -212,7 +212,7 @@ latex_font_size = '10pt'
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('doc/index', 'bobman.tex', u'Bob',
-   u'Biometrics Groups, Idiap Research Institute', 'manual'),
+   u'Biometrics Group, Idiap Research Institute', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
