@@ -105,35 +105,35 @@ defined in the first equation.
   loaded your scores in two 1D float64 vectors and are ready to evaluate the
   performance of the classifier.
 
+.. testsetup:: *
+
+  import numpy
+  positives = numpy.random.normal(1,1,100)
+  negatives = numpy.random.normal(-1,1,100)
+  import bob
+  import matplotlib
+  matplotlib.use('pdf') #non-interactive avoids exception on display
+
 Evaluation
 ----------
 
 To count the number of correctly classified positives and negatives you can use
 the following techniques:
 
-.. todo::
+.. doctest::
 
-  Make sure the code below is correct and doctest it.
-
-.. code-block:: python
-
-  import bob
-  negatives, positives = parse_my_scores(...) #write parser if not provided!
-  T = 0.0 #Threshold: later we explain how one can calculate these
-  correct_negatives = bob.measure.correctlyClassifiedNegatives(negatives, T)
-  FAR = 1 - (float(correct_negatives.size)/negatives.size)
-  correct_positives = bob.measure.correctlyClassifiedPositives(positives, T)
-  FRR = 1 - (float(correct_positives.size)/positives.size)
+  >>> # negatives, positives = parse_my_scores(...) # write parser if not provided!
+  >>> T = 0.0 #Threshold: later we explain how one can calculate these
+  >>> correct_negatives = bob.measure.correctlyClassifiedNegatives(negatives, T)
+  >>> FAR = 1 - (float(correct_negatives.sum())/negatives.size)
+  >>> correct_positives = bob.measure.correctlyClassifiedPositives(positives, T)
+  >>> FRR = 1 - (float(correct_positives.sum())/positives.size)
 
 We do provide a method to calculate the FAR and FRR in a single shot:
 
-.. todo::
+.. doctest::
 
-  Make sure the code below is correct and doctest it.
-
-.. code-block:: python
-
-  FAR, FRR = bob.measure.farfrr(negatives, positives, T)
+  >>> FAR, FRR = bob.measure.farfrr(negatives, positives, T)
 
 The threshold ``T`` is normally calculated by looking at the distribution of
 negatives and positives in a development (or validation) set, selecting a
@@ -144,35 +144,23 @@ threshold:
 
 * Threshold for the EER
 
-  .. todo::
+  .. doctest::
 
-    Make sure the code below is correct and doctest it.
-
-  .. code-block:: python
-
-    T = bob.measure.eerThreshold(negatives, positives)
+    >>> T = bob.measure.eerThreshold(negatives, positives)
 
 * Threshold for the minimum HTER
   
-  .. todo::
+  .. doctest::
 
-    Make sure the code below is correct and doctest it.
-
-  .. code-block:: python
-
-    T = bob.measure.minHterThreshold(negatives, positives)
+    >>> T = bob.measure.minHterThreshold(negatives, positives)
 
 * Threshold for the minimum weighted error rate (MWER) given a certain cost
   :math:`\beta`.
 
-  .. todo::
-
-    Make sure the code below is correct and doctest it.
-
   .. code-block:: python
 
-    cost = 0.3 #or "beta"
-    T = bob.measure.minWeightedErrorRateThreshold(negatives, positives, cost)
+     >>> cost = 0.3 #or "beta"
+     >>> T = bob.measure.minWeightedErrorRateThreshold(negatives, positives, cost)
 
   .. note::
 
@@ -193,20 +181,21 @@ The Receiver Operating Characteristic (ROC) curve is one of the oldest plots in
 town. To plot a ROC curve, in possession of your **negatives** and
 **positives**, just do something along these lines:
 
-.. todo::
+.. doctest::
 
-  Make sure the code below is correct and doctest it.
+  >>> from matplotlib import pyplot
+  >>> # we assume you have your negatives and positives already split
+  >>> npoints = 100
+  >>> bob.measure.plot.roc(negatives, positives, npoints, color=(0,0,0), linestyle='-', label='test') # doctest: +SKIP
+  >>> pyplot.xlabel('FRR (%)') # doctest: +SKIP
+  >>> pyplot.ylabel('FAR (%)') # doctest: +SKIP
+  >>> pyplot.grid(True)
+  >>> pyplot.show() # doctest: +SKIP
 
-.. code-block:: python
+You should see an image like the following one:
 
-  import matplotlib.pyplot as mpl
-  # we assume you have your negatives and positives already split
-  npoints = 100
-  bob.measure.plot.roc(negatives, positives, npoints, color=(0,0,0),
-      linestyle='-', label='test')
-  mpl.xlabel('FRR (%)')
-  mpl.ylabel('FAR (%)')
-  mpl.grid(True)
+.. plot:: plot/perf_roc.py
+  :include-source: False
 
 As can be observed, plotting methods live in the namespace
 :py:mod:`bob.measure.plot`. They work like `Matplotlib`_'s `plot()`_ method
@@ -227,20 +216,22 @@ DET
 
 A DET curve can be drawn using commands such as the ones for the ROC curve:
 
-.. todo::
+.. doctest::
 
-  Make sure the code below is correct and doctest it.
+  >>> from matplotlib import pyplot
+  >>> # we assume you have your negatives and positives already split
+  >>> npoints = 100
+  >>> bob.measure.plot.det(negatives, positives, npoints, color=(0,0,0), linestyle='-', label='test') # doctest: +SKIP
+  >>> bob.measure.plot.det_axis([0.01, 40, 0.01, 40]) # doctest: +SKIP
+  >>> pyplot.xlabel('FRR (%)') # doctest: +SKIP
+  >>> pyplot.ylabel('FAR (%)') # doctest: +SKIP
+  >>> pyplot.grid(True)
+  >>> pyplot.show() # doctest: +SKIP
 
-.. code-block:: python
+This will produce an image like the following one:
 
-  import matplotlib.pyplot as mpl
-  # we assume you have your negatives and positives already split
-  npoints = 100
-  bob.measure.plot.det(negatives, positives, npoints, color=(0,0,0),
-      linestyle='-', label='test')
-  mpl.xlabel('FRR (%)')
-  mpl.ylabel('FAR (%)')
-  mpl.grid(True)
+.. plot:: plot/perf_det.py
+  :include-source: False
 
 .. note::
 
@@ -250,17 +241,17 @@ A DET curve can be drawn using commands such as the ones for the ROC curve:
   ``bob.measure.ppndf()`` method. For example, if you wish to set the x and y
   axis to display data between 1% and 40% here is the recipe:
 
-  .. code-block:: python
+  .. doctest::
 
-    #AFTER you plot the DET curve, just set the axis in this way:
-    mpl.axis([bob.measure.ppndf(k/100.0) for k in (1, 40, 1, 40)])
+    >>> #AFTER you plot the DET curve, just set the axis in this way:
+    >>> pyplot.axis([bob.measure.ppndf(k/100.0) for k in (1, 40, 1, 40)]) # doctest: +SKIP
 
   We provide a convenient way for you to do the above in this module. So,
   optionally, you may use the ``bob.measure.plot.det_axis`` method like this:
 
-  .. code-block:: python
+  .. doctest:: 
 
-    bob.measure.plot.det_axis([1, 40, 1, 40])
+    >>> bob.measure.plot.det_axis([1, 40, 1, 40]) # doctest: +SKIP
 
 EPC
 ===
@@ -269,14 +260,15 @@ A EPC curve to be drawn, requires that both the development set negatives and
 positives to be provided alongside with the test set ones. So, the API is
 slightly modified:
 
-.. todo::
+.. doctest::
 
-  Make sure the code below is correct and doctest it.
+  >>> bob.measure.plot.epc(dev_neg, dev_pos, test_neg, test_pos, npoints, color=(0,0,0), linestyle='-') # doctest: +SKIP
+  >>> pyplot.show() # doctest: +SKIP
 
-.. code-block:: python
+This will produce an image like the following one:
 
-  bob.measure.plot.epc(dev_neg, dev_pos, test_neg, test_pos, npoints, 
-      color=(0,0,0), linestyle='-')
+.. plot:: plot/perf_epc.py
+  :include-source: False
 
 Fine-tunning
 ============
@@ -300,10 +292,6 @@ either a 4-column or 5-column data format as specified in the documentation of
 
 To calculate the threshold using a certain criteria (EER, min.HTER or weighted
 Error Rate) on a set, after setting up |project|, just do:
-
-.. todo::
-
-  Make sure the code below is correct and doctest it.
 
 .. code-block:: sh
 

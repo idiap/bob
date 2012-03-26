@@ -13,6 +13,11 @@ import os
 import sys
 import numpy
 from .. import utils
+from .commands import add_commands
+
+# Use this variable to tell dbmanage.py all driver that there is nothing to
+# download for this database.
+__builtin__ = True
 
 class Database(object):
 
@@ -22,6 +27,11 @@ class Database(object):
     self.qualities = ('low','normal','high')
     self.types = ('warped', 'cut', 'video')
     self.ids = range(1, 51)
+
+  def dbname(self):
+    """Calculates my own name automatically."""
+    return os.path.basename(os.path.dirname(__file__))
+
 
   def files(self, directory=None, extension=None, ids=[], groups=None, cls=None, qualities=None, types=None):
     """Returns a set of filenames for the specific query by the user.
@@ -278,3 +288,6 @@ class Database(object):
     fulldir = os.path.dirname(fullpath)
     utils.makedirs_safe(fulldir)
     save(obj, fullpath)
+
+ 
+

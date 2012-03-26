@@ -159,6 +159,7 @@ type information we need to write and read them correctly. Here is an example:
   >>> A = numpy.array(range(4), 'int8').reshape(2,2)
   >>> f = bob.io.HDF5File('testfile1.hdf5')
   >>> f.set('my_array', A)
+  >>> del f
 
 And the result of running ``h5dump`` on the file ``testfile3.hdf5`` should be:
 
@@ -178,7 +179,7 @@ And the result of running ``h5dump`` on the file ``testfile3.hdf5`` should be:
 You don't need to limit yourself to single variables, you can also save lists
 of scalars and arrays using the function :py:meth:`bob.io.HDF5.append()` instead of :py:meth:`bob.io.HDF5.set()`.
 
-Reading opeartions
+Reading operations
 ------------------
 
 Reading up data you just wrote is as easy. For this task you should use
@@ -193,11 +194,10 @@ be using :py:meth:`bob.io.HDF5File.lread()` instead. Here is an example:
   >>> f = bob.io.HDF5File('testfile1.hdf5', 'r') #read only
   >>> f.read('my_integer') #reads integer
   5
-  >>> f.read('my_float') # reads float
-  3.1415999999999999
   >>> print f.read('my_array') # reads the array
   [[0 1]
    [2 3]]
+  >>> del f
 
 Now let's look at an example where we have used
 :py:meth:`bob.io.HDF5File.append()` instead of
@@ -214,6 +214,7 @@ the case when you write lists of variables to a dataset.
   [ 0.  1.  2.  3.  4.  5.  6.  7.  8.  9.]
   >>> print f.lread('arrayset', 2)
   [  0.   3.   6.   9.  12.  15.  18.  21.  24.  27.]
+  >>> del f
 
 This is how a ``h5dump`` of the file looks like:
 
@@ -239,7 +240,8 @@ Of course, you can also read the whole contents of the arrayset in a single
 shot:
 
 .. doctest::
-
+  
+  >>> f = bob.io.HDF5File('testfile2.hdf5', 'r')
   >>> print f.read('arrayset')
   [[  0.   1.   2.   3.   4.   5.   6.   7.   8.   9.]
    [  0.   2.   4.   6.   8.  10.  12.  14.  16.  18.]
@@ -322,8 +324,8 @@ Saving the :py:class:`bob.io.Array` is as easy, just call the
 
   >>> a.save('copy1.hdf5')
 
-Numpy ndrray Shortcuts
-======================
+Numpy ndarray shortcuts
+=======================
 
 To just load a :py:class:`numpy.ndarray` in memory, we have written a
 short cut that lives at :py:func:`bob.io.load` and saves you from going through
@@ -350,16 +352,80 @@ through the :py:class:`bob.io.Array` container:
   the read and write operations. This avoids code duplication and hooks data
   loading and saving to the powerful |project| transcoding framework that is
   explained next. 
-   
 
+Reading and writing image and video data
+========================================
 
+|project| provides support to load and save data from many different
+file types including Matlab ``.mat`` files, various image file types and video
+data. File types and specific serialization and de-serialization is switched
+automatically using filename extensions. Knowing this, saving an array in a different format is just a matter of
+choosing the right extension: 
 
+.. doctest::
 
+  >>> my_image = numpy.uint8(numpy.random.random_integers(0,255,(3,256,256))) # creating an image with random pixel values
+  >>> bob.io.save(my_image, 'testimage.jpg') # saving the image in jpeg format
+  >>> my_copy_image = bob.io.load('testimage.jpg')
 
+As for reading the video files, although it is possible to read a video using the :py:meth:`bob.io.load()`, you should use the methods of the class :py:class:`bob.io.VideoReader` to read frame by frame and avoid overloading your machine's memory. In the following code you can see how to create a video and save it using the class :py:class:`bob.io.VideoWriter` and load it again using the class :py:class:`bob.io.VideoReader`.
 
-* Loading and saving an image/video (conversion routines)
+.. doctest::
 
-* Loading and saving matlab data
+  >>> width = 256; height = 256; # width and height of the new video
+  >>> framerate = 24
+  >>> outv = bob.io.VideoWriter('testvideo.avi', height, width, framerate) # output video
+  >>> for i in range(0, 100): newframe = numpy.uint8(numpy.random.random_integers(0,255,(3,256,256))); outv.append(newframe)  # adding a total of 100 random generated frames to the video 
+  >>> outv.close()
+  >>> input = bob.io.VideoReader('testvideo.avi')
+  >>> input.numberOfFrames
+  100
+  >>> inv = input.load()
+  >>> inv.shape
+  (100, 3, 256, 256)
+  >>> type(inv)
+  <type 'numpy.ndarray'>
+
+The loaded image files are 3D arrays (for RGB format) or 2D arrays (for greyscale) of type uint8 or uint16, while the loaded videos are sequences of frames i.e. 4D arrays of type uint8. All the extensions and formats for images and videos supported in |project| are given below:
+
+* Images:
+  * bmp: RGB, bitmap format
+  * gif: RGB, GIF
+  * jpeg: RGB, Joint-Photograph Experts Group
+  * pbm: Grayscale, Portable binary map (images)
+  * pgm: Grayscale, Portable grayscale map
+  * png: RGB, Portable network graphics, indexed
+  * ppm: RGB, Portable pixel map
+  * tiff: RGB
+  * xcf: RGB, Gimp native format (**loading only**)
+
+* Videos:
+  * avi
+  * dv
+  * filmstrip
+  * flv
+  * h261
+  * h263
+  * h264
+  * mov
+  * image2
+  * image2pipe
+  * m4v
+  * mjpeg
+  * mpeg
+  * mpegts
+  * ogg
+  * rawvideo
+  * rm
+  * rtsp
+  * yuv4mpegpipe
+
+|project| supports a number of other binary formats, writing to which is performed using the :py:class:`bob.io.save()` with the right file extension passed as an argument, just as shown in the example above. These additional formats are:
+  
+  * Matlab (``.mat``), Matlab arrays, supports all integer, float and complex varieties [``matlab.array.binary``];
+  * bob3 (``.bindata``), supports single or double precision float numbers, only 1-D [``bob3.array.binary``];
+  * bob beta (``.bin``), supports all element types in |project| and any dimensionality [``bob.array.binary``] (*deprecated*);
+  * bob alpha (``.tensor``) [``tensor.array.binary``] (*deprecated*);
 
 .. testcleanup:: *
 
@@ -367,9 +433,42 @@ through the :py:class:`bob.io.Array` container:
   os.chdir(current_directory)
   shutil.rmtree(temp_dir)
 
+Loading and saving matlab data
+==============================
+
+
+.. _audiosignal:
+
+Loading and saving audio files
+==============================
+
+|project| does not yet support audio files (No wav codec). However, it is 
+possible to use the `Python`_ module :py:mod:`scipy.io.wavfile` to do
+the job. For instance, to read a wave file, just use the
+:py:func:`scipy.io.wavfile.read` function.
+
+.. code-block:: python
+
+   >>> import scipy.io.wavfile
+   >>> filename = '/home/user/sample.wav'
+   >>> samplerate, data = scipy.io.wavfile.read(filename)
+   >>> print type(data)
+   <type 'numpy.ndarray'>
+   >>> print data.shape
+   (132474, 2)
+
+In the previous example, the stereo audio signal is represented as a 2D 
+`NumPy` :py:class:`numpy.ndarray`, the first dimension corresponding to the
+time index (132474 frames) and the second one to the audio channel (2 channels,
+stereo), values in the array being wave magnitudes.
+
+To save a `NumPy` :py:class:`numpy.ndarray` into a wave file, the 
+:py:func:`scipy.io.wavfile.write` could be used, which also requires the
+framerate to be specified.
+
+
+.. include:: links.rst
+
 .. Place here your external references
 
-.. _hdf5: http://www.hdfgroup.org/HDF5/
-.. _numpy: http://numpy.scipy.org
-.. _python: http://www.python.org
 .. _ddl: http://www.hdfgroup.org/HDF5/doc/ddl.html

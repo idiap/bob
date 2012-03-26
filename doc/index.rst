@@ -78,6 +78,7 @@ Dive Into |project|
    TutorialsTrainer
    TutorialsDatabase
    TutorialsPerformance
+   IrisExample
 
 Reference Guide
 ---------------

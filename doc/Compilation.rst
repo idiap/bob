@@ -34,61 +34,45 @@ covered by multiple licenses, we show which we are presently using (using
 dependence is required for the project and installation instructions for
 specific platforms.
 
+Required at Runtime
+===================
+
++----------------------+--------------+---------------------------------------+
+| Package Name         | Min. Version | License                               |
++======================+==============+=======================================+
+| Std. C/C++ Libraries | any          | Depends on the compiler               |
++----------------------+--------------+---------------------------------------+
+| `Blitz++`_           | 0.9          | `Artistic-2.0`_ or LGPLv3+ or GPLv3+  |
++----------------------+--------------+---------------------------------------+
+| `Lapack`_            | any          | BSD-style                             |
++----------------------+--------------+---------------------------------------+
+| `Python`_            | 2.5          | `Python-2.0`_                         |
++----------------------+--------------+---------------------------------------+
+| `Boost`_             | 1.34         | `BSL-1.0`_                            |
++----------------------+--------------+---------------------------------------+
+| `NumPy`_             | 1.3          | `BSD-3-Clause`_                       |
++----------------------+--------------+---------------------------------------+
+| `Scipy`_             | 0.7?         | `BSD-3-Clause`_                       |
++----------------------+--------------+---------------------------------------+
+| `Matplotlib`_        | 0.99         | Based on `Python-2.0`_                |
++----------------------+--------------+---------------------------------------+
+| `fftw`_              | 3.0?         | `GPL-2.0`_ or later (also commercial) |
++----------------------+--------------+---------------------------------------+
+| `SQLAlchemy`_        | 0.5          | `MIT`_                                |
++----------------------+--------------+---------------------------------------+
+| `ImageMagick`_       | 6.5          | `Apache-2.0`_                         |
++----------------------+--------------+---------------------------------------+
+| `HDF5`_              | 1.8.4        | `HDF5 License`_ (BSD-like, 5 clauses) |
++----------------------+--------------+---------------------------------------+
+| `argparse`_          | 1.2          | `Python-2.0`_                         |
++----------------------+--------------+---------------------------------------+
+
+Strongly Recommended Add-Ons
+============================
+
 +----------------------+--------------+----------------------------------------------+
 | Package Name         | Min. Version | License                                      |
 +======================+==============+==============================================+
-| |project|            | -            | `GPL-3.0`_                                   |
-+----------------------+--------------+----------------------------------------------+
-| **Required Compilation and Runtime Dependencies**                                  |
-+----------------------+--------------+----------------------------------------------+
-| Std. C/C++ Libraries | -            | Depends on the compiler                      |
-+----------------------+--------------+----------------------------------------------+
-| `Blitz++`_           | 0.9          | `Artistic-2.0`_ or LGPLv3+ or GPLv3+         |
-+----------------------+--------------+----------------------------------------------+
-| `Lapack`_            | -            | BSD-style                                    |
-+----------------------+--------------+----------------------------------------------+
-| `Python`_            | 2.5          | `Python-2.0`_                                |
-+----------------------+--------------+----------------------------------------------+
-| `Boost`_             | 1.34         | `BSL-1.0`_                                   |
-+----------------------+--------------+----------------------------------------------+
-| `NumPy`_             | 1.3          | `BSD-3-Clause`_                              |
-+----------------------+--------------+----------------------------------------------+
-| `Matplotlib`_        | 0.99         | Based on `Python-2.0`_                       |
-+----------------------+--------------+----------------------------------------------+
-| `fftw`_              | 3.0?         | `GPL-2.0`_ or later (also commercial)        |
-+----------------------+--------------+----------------------------------------------+
-| **Data Access (runtime)**                                                          |
-+----------------------+--------------+----------------------------------------------+
-| `SQLAlchemy`_        | 0.5          | `MIT`_                                       |
-+----------------------+--------------+----------------------------------------------+
-| `ImageMagick`_       | 6.5          | `Apache-2.0`_                                |
-+----------------------+--------------+----------------------------------------------+
-| `HDF5`_              | 1.8.4        | `HDF5 License`_ (BSD-like, 5 clauses)        |
-+----------------------+--------------+----------------------------------------------+
-| `argparse`_          | 1.2          | `Python-2.0`_                                |
-+----------------------+--------------+----------------------------------------------+
-| **Building and Debugging Dependencies** (not required for runtime)                 |
-+----------------------+--------------+----------------------------------------------+
-| `Git`_               | 1.6?         | `GPL-2.0`_                                   |
-+----------------------+--------------+----------------------------------------------+
-| `CMake`_             | 2.8          | `BSD-3-Clause`_                              |
-+----------------------+--------------+----------------------------------------------+
-| `Google Perftools`_  | 0.8?         | `BSD-3-Clause`_                              |
-+----------------------+--------------+----------------------------------------------+
-| `Sphinx`_            | 0.6          | `BSD-2-Clause`_                              |
-+----------------------+--------------+----------------------------------------------+
-| `Doxygen`_           | 1.6?         | `GPL-2.0`_                                   |
-+----------------------+--------------+----------------------------------------------+
-| `Dvipng`_            | 1.12?        | `GPL-3.0`_                                   |
-+----------------------+--------------+----------------------------------------------+
-| `Scipy`_             | -            | `BSD-3-Clause`_                              |
-+----------------------+--------------+----------------------------------------------+
-| **Extra Recommended Software** (not distributed with or required to run)           |
-+----------------------+--------------+----------------------------------------------+
-| `IPython`_           | -            | `BSD-3-Clause`_                              |
-+----------------------+--------------+----------------------------------------------+
-| **Optional Software** (if present, compiles more extensions)                       |
-+----------------------+--------------+----------------------------------------------+
 | `FFMpeg`_            | 0.5          | `LGPL-2.1`_ or later, or `GPL-2.0`_ or later |
 +----------------------+--------------+----------------------------------------------+
 | `MatIO`_             | 1.3.3?       | `BSD-2-Clause`_                              |
@@ -102,6 +86,33 @@ specific platforms.
 | `LIBSVM`_            | 2.89+        | `BSD-3-Clause`_                              |
 +----------------------+--------------+----------------------------------------------+
 
+Build Dependencies
+==================
+
++----------------------+--------------+------------------+
+| Package Name         | Min. Version | License          |
++======================+==============+==================+
+| `Git`_               | 1.6?         | `GPL-2.0`_       |
++----------------------+--------------+------------------+
+| `CMake`_             | 2.8          | `BSD-3-Clause`_  |
++----------------------+--------------+------------------+
+| `Google Perftools`_  | 0.8?         | `BSD-3-Clause`_  |
++----------------------+--------------+------------------+
+| `Sphinx`_            | 0.6          | `BSD-2-Clause`_  |
++----------------------+--------------+------------------+
+| `Doxygen`_           | 1.6?         | `GPL-2.0`_       |
++----------------------+--------------+------------------+
+| `Dvipng`_            | 1.12?        | `GPL-3.0`_       |
++----------------------+--------------+------------------+
+
+Recommended Software
+====================
+
++----------------------+--------------+------------------+
+| Package Name         | Min. Version | License          |
++======================+==============+==================+
+| `IPython`_           | any          | `BSD-3-Clause`_  |
++----------------------+--------------+------------------+
 
 Description of |project| Dependencies
 -------------------------------------
@@ -148,10 +159,14 @@ Core dependencies
 * `Python`_: if you want to compile our python bindings we recommend using
   Python 2.5 or up;
 * `NumPy`_: this dependence is used to bridge blitz::Arrays to python.
+* `Scipy`_: A set of scientific-related python-based utilities
 * `Matplotlib`_: A `MATLAB`_-like python plotting environment
 * `Qt4`_: This library is used as the basis for the face detection and
   localization framework (Visioner). This dependence is *optional*. Face
   localization and detection will only be compiled if you have that installed.
+* `argparse`_: is used for argument parsing in some of our python utilities. If
+  you are not compiling against Python 2.7 or superior, you need to install it
+  separately.
 
 Data access
 ===========
@@ -178,9 +193,6 @@ Data access
 * `VLFeat`_: is used for calculating SIFT features. This is an *optional*
   dependencies. If you have VLFeat installed, additional C++ and Python
   bindings will be compiled and integrated to |project|.
-* `argparse`_: is used for argument parsing in some of our python utilities. If
-  you are not compiling against Python 2.7 or superior, you need to install it
-  separately.
 
 .. _basic-build:
 
@@ -225,7 +237,6 @@ These are packages that are *not* required to compile or run bob examples,
 but make a nice complement to the installation and provides you with the
 ability to plot and interact with bob:
 
-* `Scipy`_: A set of scientific-related python-based utilities
 * `IPython`_: A powerful replacement for your python shell that provides bells
   and whistles
 * `LIBSVM`_: A software framework for support vector classification

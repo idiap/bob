@@ -22,8 +22,4 @@
  Trainer
 =========
 
-.. toctree::
-
-  GMMToolChain
-
 .. automodule:: bob.trainer
