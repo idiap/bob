@@ -31,8 +31,8 @@ or checkout and build yourself as explained below.
 
 .. warning::
 
-  *Make sure to read  and install all requirements defined in*
-  :doc:`Dependencies`, *prior to running bob applications.*
+  Make sure you read and install all requirements defined in
+  :doc:`Dependencies`, prior to compiling and using |project|.
 
 Grab a tarball and change into the directory of your choice, let's say
 ``mybob``:

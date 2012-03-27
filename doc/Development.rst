@@ -1,6 +1,4 @@
 .. vim: set fileencoding=utf-8 :
-.. Andre Anjos <andre.anjos@idiap.ch>
-.. Wed Jan 11 14:43:35 2012 +0100
 .. Roy Wallace
 .. 27 Mar 2012
 .. 
@@ -18,27 +16,23 @@
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-=================
- C++ development
-=================
+=======================
+ |project| development
+=======================
 
-.. todo::
+For |project| development we use the Git_ version control system. If you aren't
+familiar with Git, please refer to the official `Git tutorial`_. Within
+this guide, we assume you have already gone through all introductory material on Git
+and are ready to get your hands dirty with |project|.
 
-  Include a new C++ Reference section (rename current section to Python Reference), and link to it from here?
-
-The core components of |project| are implemented in C++ for speed. 
-Python bindings are provided to the underlying C++ code for the convenience of the user.
-In the following sections you will find more information on how to use and develop the components of |project| that are written in C++.
-
+ 
 .. toctree::
    :maxdepth: 2
 
-   IntroCxxDevelopment
-   CxxCoreUsingBlitzArrays
-   CxxCoreErrorReporting
-   GuidelinesCxxDevelopment
+   CxxDevelopment
+   PythonDevelopment
+   PythonBindingsDevelopment
 
 .. include:: links.rst
-
-.. Place here references to all citations in lower case
-
+.. _`Git`: http://git-scm.com/
+.. _`Git Tutorial`: http://schacon.github.com/git/gittutorial.html
