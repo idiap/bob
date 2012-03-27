@@ -141,7 +141,24 @@ Here are some C++ tips we have found useful:
 Python Coding Guidelines
 ------------------------
 
-* `The Google Python Style Guide`_
+* Try to follow `The Google Python Style Guide`_
+* Class names usually start with an upper-case character and use CamelCase to 
+  combine words. Function names (global functions or public class methods) start 
+  with a lower-case character and words are combined\_with\_underscores. If you
+  write use private functions, please assure that they start with an underscore.
+
+C++ Python Code Bindings
+------------------------
+
+* When you bind C++ methods to python, use `Boost.Python`_. Try to follow the 
+  examples in already existing bindings.
+* Avoid allocating memory in C++ and exporting it to python. Instead, allocate 
+  the memory in python and give it as reference parameters to your functions.
+  Allocating blitz::Arrays in C++ and export them to python is possible, but 
+  error prone. 
+* If you want your bound classes to allocate memory, please write python 
+  functions and add it to your bound classes. Try to follow the examples in the
+  code.
 
 .. Most links should go here:
 
@@ -157,3 +174,4 @@ Python Coding Guidelines
 .. _`don't repeat yourself`: http://en.wikipedia.org/wiki/Don't_repeat_yourself
 .. _`Git`: http://git-scm.com/
 .. _`Git Tutorial`: http://schacon.github.com/git/gittutorial.html
+.. _`Boost.Python`: http://www.boost.org/libs/python/doc
