@@ -84,6 +84,7 @@ Developer's Guide
 
    Motivation
    CodeBaseOverview
+   Dependencies
    Compilation
    CxxDevelopment
    GoldenRules

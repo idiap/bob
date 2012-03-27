@@ -33,6 +33,7 @@ They all rely on the |project| lab-like environment which is `Python`_. Using
 * `Python`_ bindings are used to transparently run the underlying efficient C++ compiled code for the key features of the library.
 
 .. _section-usage:
+
 First use
 ---------
 
