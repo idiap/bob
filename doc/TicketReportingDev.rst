@@ -56,9 +56,9 @@ one! If you do find an existing ticket about your problem, then it has already
 been reported. This is a good thing. If you wish, you can vote on the ticket by
 clicking the "up" arrow at the top of the page.
 
-Once you have filled a bug or a feature request, try following it up (mails are
-sent when they get changed) and please answer any follow up questions that have 
-been asked of you. If possible, include additional useful information.
+Once you have filed a bug or a feature request, please make sure you keep an eye
+on the bug and answer any follow up questions that have been asked of you. If 
+possible, include additional useful information.
 
 Examples of good and bad reports
 --------------------------------
@@ -92,10 +92,10 @@ Follow the link to `submit a new bug report`_ at GitHub. A few things to note:
 
   - A list of steps to reproduce the problem. If you need to compile a program
     to cause the bug, please create a small version of the program that still
-    causes the crash and upload it with the bug report. Do not upload files
-    that only make sense together with other files you are not uploading -
-    nobody will look at these. Focus in finding an easy way to explain your
-    problem and make it reproducible;
+    causes the crash and upload it with the bug report. Please keep the examples
+    to an absolute minimum but also ensure that you have uploaded all of the
+    files needed to reproduce the bug. When uploading these files focus on
+    finding an easy way to explain your problem and make it reproducible;
   - The specific versions of |project| and the operating system that you are
     using (*not* "I'm using the latest/previous version"). You can obtain
     version numbers by executing the following script that is provided with
