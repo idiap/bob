@@ -455,7 +455,7 @@ forth conversions or take the time to check that your operations are really
 valid and expected.
 
 Converting color images is more tricky as |project| uses plane color images
-whereas PIL_ relies by default on interleaved color images. Therefore, there
+whereas PIL_ relies, by default, on interleaved color images. Therefore, there
 is an additional conversion required.
 
 .. code-block:: python
@@ -478,10 +478,10 @@ interleaved color image to plane color image.
 MATLAB_
 -------
 
-|project| currently does not provide MATLAB_ mex interface. Nevertheless, it
-is possible to load and save simple `.mat` files, thanks to the MatIO_ 
+|project| currently does not provide a MATLAB_ mex interface. Nevertheless, it
+is possible to load and save simple `.mat` files thanks to the MatIO_ 
 library. However, complex data such as MATLAB_ structures are not supported.
-Be aware that MATLAB_ also support the HDF5_ file format. For more 
+Be aware that MATLAB_ also supports the HDF5_ file format. For more 
 details, please have a look at :doc:`TutorialsIO`.
 
 Random Number Generation
