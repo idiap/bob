@@ -20,11 +20,11 @@
  Trainers
 **********
 
-In the previous section, the concept of `machine` has been introduced. A
+In the previous section, the concept of a `machine` was introduced. A
 `machine` is fed by some input data, processes it and returns an output.
 For instance, if we consider a :py:class:`bob.machine.LinearMachine`, the 
 input data :math:`x` is projected using an internal projection matrix 
-:math:`\mathbf{W}`, and the projected data :math:`y = \mathbf{W} x` are 
+:math:`\mathbf{W}`, and the projected data :math:`y = \mathbf{W} x` is
 returned. Very often, we would like to `learn` the parameters of a `machine`
 from the data. This is the role of what is referred to as a `trainer` in 
 |project|. Some `machines` might be trained using different techniques. 
@@ -69,8 +69,8 @@ this container is a :py:class:`bob.io.Arrayset`.
 Once the training set has been defined, the overall procedure to train a 
 :py:class:`bob.machine.LinearMachine` with a 
 :py:class:`bob.trainer.SVDPCATrainer` is simple and shown below. Please 
-note that the concepts remains really similar for most of the other 
-`trainer`/`machines`.
+note that the concepts remains very similar for most of the other 
+`trainers` and `machines`.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -147,7 +147,7 @@ Neural Networks: Multi-layer Perceptrons (MLP)
 
 A **multilayer perceptron** (MLP) [3]_ is a neural network architecture that 
 has some well-defined characteristics such as a feed-forward structure. 
-As described in :doc:`TutorialsMachine`, an MLP might be created as follows:
+As described in :doc:`TutorialsMachine`, an MLP can be created as follows:
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -159,7 +159,7 @@ As described in :doc:`TutorialsMachine`, an MLP might be created as follows:
    >>> w1 = numpy.array([[-.12], [-0.88]])
    >>> machine.weights = [w0, w1] # Sets the initial weights of the machine
 
-Such a network might be `trained` through backpropagation [4]_, which is 
+Such a network can be `trained` through backpropagation [4]_, which is 
 a supervised learning technique. Therefore, the training procedure requires a
 set of features with labels (or targets). Using |project|, this is passed to
 the `train()` method in two different 2D `NumPy`_ arrays, one for the input 
@@ -184,12 +184,10 @@ The class used to train a MLP [3]_ with backpropagation [4]_ is
 
 Backpropagation [4]_ requires a learning rate to be set. In the previous 
 example, the default value 0.1 has been used. This might be updated using the
-:py:attr:`bob.trainer.MLPBackPropTrainer.learningRate` attribute.
-
-An other alternative exists referred to as **resilient propagation** (Rprop)
-[5]_, which dynamically compute an optimal learning rate. The corresponding 
-class is :py:class:`bob.trainer.MLPRPropTrainer`, and the overall training
-procedure remains identical.
+:py:attr:`bob.trainer.MLPBackPropTrainer.learningRate` attribute. Another alternative exists 
+referred to as **resilient propagation** (Rprop) [5]_, which dynamically computes an optimal 
+learning rate. The corresponding class is :py:class:`bob.trainer.MLPRPropTrainer`, and the 
+overall training procedure remains identical.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -209,15 +207,15 @@ Support Vector Machines
     LIBSVM was not found when this documentation has been generated.
 
 
-**Support Vector Machine** (SVM) [6]_ is a very popular `supervised` learning 
-technique. |project| provides a bridge to `LIBSVM`_ which allows to `train`
+A **Support Vector Machine** (SVM) [6]_ is a very popular `supervised` learning 
+technique. |project| provides a bridge to `LIBSVM`_ which allows you to `train`
 such a `machine` and use it for classification. 
 
 The training set for such a machine consists of a list of 2D `NumPy` arrays,
 one for each class. The first dimension of each 2D `NumPy` array is the number
-of training samples for the given class whereas the second dimension 
-corresponds to the feature dimensionality. For instance, let's consider the
-following training set for a two class problem.
+of training samples for the given class and the second dimension is the dimensionality
+of the feature. For instance, let's consider the following training set for a two 
+class problem.
 
 .. ifconfig:: has_libsvm
 
@@ -245,8 +243,7 @@ following training set for a two class problem.
   you do that for all features. Our bindings to libsvm do not include scaling. 
   If you want to implement that generically, please do it.
 
-Then, a `Support Vector Machine` (SVM) [6]_ can be trained easily using the
-:py:class:`bob.trainer.SVMTrainer` class.
+Then, an SVM [6]_ can be trained easily using the :py:class:`bob.trainer.SVMTrainer` class.
 
 .. ifconfig:: has_libsvm
 
@@ -264,7 +261,7 @@ Then, a `Support Vector Machine` (SVM) [6]_ can be trained easily using the
      >>> machine = trainer.train(data) #ordering only affects labels
 
 This returns a :py:class:`bob.machine.SupportVector` which can later be used 
-for classification, as explained in :doc:`TutorialsTrainer`.
+for classification, as explained in :doc:`TutorialsMachine`.
 
 .. ifconfig:: has_libsvm
 
@@ -282,7 +279,7 @@ for classification, as explained in :doc:`TutorialsTrainer`.
      >>> print predicted_label
      1
 
-The `training` procedure allows several different type of options. For 
+The `training` procedure allows several different options. For 
 instance, the default `kernel` is an `RBF`. If we would like a `linear SVM` 
 instead, this can be set before calling the 
 :py:meth:`bob.trainer.SVMTrainer.train()` method.
@@ -301,12 +298,12 @@ instead, this can be set before calling the
      >>> trainer.kernel_type = bob.machine.svm_kernel_type.LINEAR
 
 
-k-Means
+k-means
 =======
 
-**k-Means** [7]_ is a clustering method, which aims to partition a 
+**k-means** [7]_ is a clustering method, which aims to partition a 
 set of observations into :math:`k` clusters. This is an `unsupervised` 
-technique. Furthermore, and as for **PCA** [1]_, the training data is passed
+technique. As for **PCA** [1]_, the training data is passed
 in a :py:class:`bob.io.Arrayset` container.
 
 .. doctest::
@@ -326,20 +323,19 @@ in a :py:class:`bob.io.Arrayset` container.
    >>> print data
    <Arrayset[5] float64@(3,)>
 
-The training procedure is going to learn the `means` of a 
-:py:class:`bob.machine.KMeansMachine`. The number :math:`k` of `means` is
-directly given when creating the `machine`, as well as the feature 
-dimensionality.
+The training procedure will learn the `means` for the :py:class:`bob.machine.KMeansMachine`. The 
+number :math:`k` of `means` is given when creating the `machine`, as well as the dimensionality of
+the features.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
 
    >>> kmeans = bob.machine.KMeansMachine(2, 3) # Create a machine with k=2 clusters with a dimensionality equal to 3
 
-Then, the parameters of the **Expectation-Maximization**-based [8]_ `trainer`
-is set such as the maximum number of iterations and the criterium used to 
-determine if the convergence has occurred. Next, the training procedure can be
-called.
+Then training procedure for `k-means` is an **Expectation-Maximization**-based [8]_ algorithm. There
+are several options that can be set such as the maximum number of iterations and the criterion used to 
+determine if the convergence has occurred. After setting all of these options, the training procedure can 
+then be called.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -357,14 +353,13 @@ called.
 Maximum Likelihood for Gaussian Mixture Model
 =============================================
 
-Gaussian **Mixture Model** (GMM) [9]_ is a common probabilistic model. In this
-context, there is often a need to tune the parameters of such a model given 
-some training data. For this purpose, the **maximum-likelihood** technique 
-(ML) [10]_ can be applied.
-Let's first start by creating a :py:class:`bob.machine.GMMMachine`. By default,
-its Gaussian have zero-mean and unit variance, and all the weights are equal.
-As a starting point, we could set the mean to the one obtained with 
-**k-means** [7]_.
+A Gaussian **mixture model** (GMM) [9]_ is a common probabilistic model. In 
+order to train the parameters of such a model it is common to use a 
+**maximum-likelihood** (ML) approach [10]_. To do this we use an 
+**Expectation-Maximization** (EM) algorithm [8]_. Let's first start by creating 
+a :py:class:`bob.machine.GMMMachine`. By default, all of the Gaussian's 
+have zero-mean and unit variance, and all the weights are equal. As a starting 
+point, we could set the mean to the one obtained with **k-means** [7]_.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -372,12 +367,12 @@ As a starting point, we could set the mean to the one obtained with
    >>> gmm = bob.machine.GMMMachine(2,3) # Create a machine with 2 Gaussian and feature dimensionality 3
    >>> gmm.means = kmeans.means # Set the means to the one obtained with k-means 
 
-The |project| class to perform **maximum-likelihood** [10]_ for a GMM [9]_ is
+The |project| class to learn the parameters of a GMM [9]_ using ML [10]_ is
 :py:class:`bob.trainer.ML_GMMTrainer`. It uses an **EM**-based [8]_ algorithm
-and requires to specify which parts of the GMM are updated at each iteration 
+and requires the user to specify which parameters of the GMM are updated at each iteration 
 (means, variances and/or weights). In addition, and as for **k-means** [7]_,
-it has parameters such as the maximum number of iterations and the criterium 
-used to determine if the convergence has occurred.
+it has parameters such as the maximum number of iterations and the criterion 
+used to determine if the parameters have converged.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -392,15 +387,12 @@ used to determine if the convergence has occurred.
 MAP-adaptation for Gaussian Mixture Model
 =========================================
 
-|project| also supports the computation of a **maximum a posteriori 
-probability** (MAP) [11]_ estimate of a Gaussian **Mixture Model** (GMM) [9]_
-distribution. MAP [11]_ is closely related to the **maximum-likelihood** (ML) 
-[10]_ technique, but incorporates a prior distribution over the quantity one 
-wants to estimate. In our case, this prior is modeled by a  Gaussian **Mixture
-Model** (GMM) [9]_. Based on this prior model and some training data, a new
-model, the MAP estimate, will be `adapted`.
+|project| also supports the training of GMMs [9]_ using a **maximum a posteriori** (MAP) 
+approach [11]_. MAP is closely related to the ML [10]_ technique but it incorporates a prior 
+on the quantity that we want to estimate. In our case, this prior is a GMM [9]_. Based on 
+this prior model and some training data, a new model, the MAP estimate, will be `adapted`.
 
-Let's considered that the previously trained GMM [9]_ is our prior model.
+Let's consider that the previously trained GMM [9]_ is our prior model.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -423,13 +415,13 @@ The training data used to compute the MAP estimate [11]_ is again stored in a
    >>> print dataMAP
    <Arrayset[3] float64@(3,)>
 
-The |project| class used to perform the MAP adaptation [11]_ is 
-:py:class:`bob.trainer.MAP_GMMTrainer`. As for the ML estimate [10]_, it uses 
-an **EM**-based [8]_ algorithm and requires to specify which parts of the GMM
+The |project| class used to perform MAP adaptation training [11]_ is 
+:py:class:`bob.trainer.MAP_GMMTrainer`. As with the ML estimate [10]_, it uses 
+an **EM**-based [8]_ algorithm and requires the user to specify which parts of the GMM
 are adapted at each iteration (means, variances and/or weights). In addition, 
 it also has parameters such as the maximum number of iterations and the 
-criterium used to determine if the convergence has occurred, as well as a 
-relevance factor which indicates the importance we give to the prior.
+criterion used to determine if the parameters have converged, in addition to this there
+is also a relevance factor which indicates the importance we give to the prior.
 Once the trainer has been created, a prior GMM [9]_ needs to be set.
 
 .. doctest::
