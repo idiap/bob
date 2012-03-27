@@ -28,7 +28,6 @@ if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
   add_subdirectory(ip)
   add_subdirectory(machine)
   add_subdirectory(trainer)
-  add_subdirectory(face_verification)
 
   if(QT4_FOUND)
     if (BOB_VISIONER_ENABLED)
