@@ -215,12 +215,7 @@ void mach::SupportVector::reset() {
   }
 
   //create and reset cache
-  m_input_cache.reset(new svm_node[1 + m_model->l]);
-  for (int k=0; k<m_model->l; ++k) {
-    m_input_cache[k].index = k+1;
-    m_input_cache[k].value = 0.;
-  }
-  m_input_cache[m_model->l].index = -1; //libsvm detects end of input if idx=-1
+  m_input_cache.reset(new svm_node[1 + m_input_size]);
 
   m_input_sub.resize(inputSize());
   m_input_sub = 0.0;
@@ -334,8 +329,18 @@ void mach::SupportVector::setInputDivision(const blitz::Array<double,1>& v) {
 static inline void copy(const blitz::Array<double,1>& input,
     boost::shared_array<svm_node>& cache, const blitz::Array<double,1>& sub,
     const blitz::Array<double,1>& div) {
-  for (size_t k=0; k<(size_t)input.extent(0); ++k) 
-    cache[k].value = (input(k) - sub(k))/div(k);
+
+  size_t cur = 0; ///< currently used index
+
+  for (size_t k=0; k<(size_t)input.extent(0); ++k) {
+    double tmp = (input(k) - sub(k))/div(k);
+    if (!tmp) continue;
+    cache[cur].index = k+1;
+    cache[cur].value = tmp;
+    ++cur;
+  }
+
+  cache[cur].index = -1; //libsvm detects end of input if index==-1
 }
 
 int mach::SupportVector::predictClass_
