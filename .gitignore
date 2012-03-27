@@ -16,7 +16,7 @@ sandbox_snowowl
 my-sphinx.html
 debian/bob/
 debian/bob-doc/
-debian/bob-devel/
+debian/bob-dev/
 debian/tmp
 debian/files
 debian/stamp-*

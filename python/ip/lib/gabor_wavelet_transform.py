@@ -17,7 +17,7 @@ def gwt_trafo_image(self,input_image):
   """
   return numpy.ndarray([self.number_of_kernels, input_image.shape[-2], input_image.shape[-1]], dtype=complex)
 #register function
-GaborWaveletTransform.trafo_image = gwt_trafo_image
+GaborWaveletTransform.empty_trafo_image = gwt_trafo_image
 del gwt_trafo_image
 
 
@@ -56,7 +56,7 @@ def gwt_jet_image(self, input_image, include_phases = True):
     return numpy.ndarray([input_image.shape[-2], input_image.shape[-1], self.number_of_kernels], dtype=numpy.float64)
     
 #register function
-GaborWaveletTransform.jet_image = gwt_jet_image
+GaborWaveletTransform.empty_jet_image = gwt_jet_image
 del gwt_jet_image
 
 
