@@ -32,8 +32,6 @@
  Image and signal processing
 *****************************
 
-.. todo::
-  Finish off the sections "Simple feature extraction" and "Signal Processing"
 
 Introduction
 ============
