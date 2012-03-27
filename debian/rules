@@ -7,7 +7,7 @@
 #export DH_VERBOSE=1
 
 # Turns off testing after the build
-# export DEB_BUILD_OPTIONS="nocheck"
+export DEB_BUILD_OPTIONS="nocheck"
 
 # This has to be exported to make some magic below work.
 export DH_OPTIONS
@@ -20,11 +20,13 @@ override_dh_auto_configure:
 
 override_dh_auto_build:
 	dh_auto_build -- VERBOSE=$(DH_VERBOSE) all
-	cd obj-$(DEB_BUILD_GNU_TYPE); ctest --verbose; cd -
 	dh_auto_build -- VERBOSE=$(DH_VERBOSE) sphinx
-	dh_auto_build -- VERBOSE=$(DH_VERBOSE) sphinx-doctest
 	dh_auto_build -- VERBOSE=$(DH_VERBOSE) sphinx-latex
 	dh_auto_build -- VERBOSE=$(DH_VERBOSE) doxygen
+
+override_dh_auto_test:
+	dh_auto_build -- VERBOSE=$(DH_VERBOSE) ARGS="-V" test
+	dh_auto_build -- VERBOSE=$(DH_VERBOSE) sphinx-doctest
 
 override_dh_auto_install:
 	dh_auto_install

@@ -22,14 +22,14 @@
 
 Machines are one of the core components of |project|. 
 They represent statistical models or other functions defined by parameters that
-can be set using :doc:`TutorialsTrainer`.
-Examples of machines are
-multi-layer perceptrons or Gaussian-mixtures. The operation you normally expect
+can be learnt or set by using :doc:`TutorialsTrainer`.
+Two examples of machines are multi-layer perceptrons (MLPs) and Gaussian mixture
+models (GMMs). The operation you normally expect
 from a machine is to be able to feed a feature vector and extract the machine
 response or output for that input vector. It works, in many ways, similarly to
-signal processing blocks. Different types of machines will get you a different
-types of output. In this tutorial we examine a few of the machines available in
-|project| and how to make use of them. Let's start by the simplest of the
+signal processing blocks. Different types of machines will give you a different
+type of output. In this tutorial we examine a few of the machines available in
+|project| and how to make use of them. Let's start with the simplest of the
 machines: a :py:class:`bob.machine.LinearMachine`.
 
 .. testsetup:: *
@@ -47,8 +47,8 @@ Linear Machine
 ==============
 
 This machine executes the simple operation :math:`y = \mathbf{W} x`, where `y`
-is the output vector, `x`, the input vector and `W` a matrix (2D array), stored
-inside the machine. The input vector `x` should be composed of double-precision
+is the output vector, `x` is the input vector and `W` is a matrix (2D array) stored
+in the machine. The input vector `x` should be composed of double-precision
 floating-point elements. The output will also be in double-precision. Here is
 how to use a :py:class:`bob.machine.LinearMachine`:
 
@@ -66,15 +66,15 @@ how to use a :py:class:`bob.machine.LinearMachine`:
   >>> y
   array([ 0.55,  0.55])
 
-As it was shown, the way to pass data through a machine is to call its ``()``
+As was shown in the above example, the way to pass data through a machine is to call its ``()``
 operator.
 
 The first thing to notice about machines is that they can be stored and
 retrieved in HDF5 files (for more details in manipulating HDF5 files, please
-consult :doc:`TutorialsIO`). To save the beforemetioned machine to a file, just
+consult :doc:`TutorialsIO`). To save the before metioned machine to a file, just
 use the machine's ``save`` command. Because several machines can be stored on
 the same :py:class:`bob.io.HDF5File`, we let the user open the file and set it
-up before the machine can write on it:
+up before the machine can write to it:
 
 .. doctest::
 
@@ -95,7 +95,7 @@ You can load the machine again in a similar way:
 The shape of a ``LinearMachine`` (see
 :py:attr:`bob.machine.LinearMachine.shape`) indicates the size of the input
 vector that is expected by this machine and the size of the output vector it
-produces, in a tuple formatted like ``(input_size, output_size)``:
+produces, in a tuple format like ``(input_size, output_size)``:
 
 .. doctest::
 
@@ -105,10 +105,9 @@ produces, in a tuple formatted like ``(input_size, output_size)``:
 A :py:class:`bob.machine.LinearMachine`` also supports pre-setting
 normalization vectors that are applied to every input `x`. You can set a
 subtraction factor and a division factor, so that the actual input `x'` that is
-fed to the matrix `W` is :math:`x' = (x .- S) ./ D`. `S` and `D` are vectors
-that have to have the same size as the input vector `x`. The operations `.-`
-and `./` indicate element-wise subtraction and division respectively. By
-default, :math:`S := 0.0` and :math:`D := 1.0`.
+fed to the matrix `W` is :math:`x' = (x - s) ./ d`. The variables `s` and `d` are vectors
+that have to have the same size as the input vector `x`. The operator `./` indicates
+an element-wise division. By default, :math:`s := 0.0` and :math:`d := 1.0`.
 
 .. doctest::
 
@@ -117,7 +116,7 @@ default, :math:`S := 0.0` and :math:`D := 1.0`.
   >>> machine.input_divide
   array([ 1.,  1.])
 
-To set a new value, just assign to the machine property:
+To set a new value for `s` or `d` just assign the desired machine property:
 
 .. doctest::
 
@@ -134,12 +133,12 @@ To set a new value, just assign to the machine property:
   intervention.
 
 You will find interesting ways to train a :py:class:`bob.machine.LinearMachine`
-so they can do something useful to you at :doc:`TutorialsTrainer`.
+so they can do something useful for you at :doc:`TutorialsTrainer`.
 
 Neural Networks: Multi-layer Perceptrons (MLP)
 ==============================================
 
-A `multi-layer perceptron <http://en.wikipedia.org/wiki/Multilayer_perceptron>`_
+A `multi-layer perceptron <http://en.wikipedia.org/wiki/Multilayer_perceptron>`_ (MLP)
 is a neural network architecture that has some well-defined characteristics
 such as a feed-forward structure. You can create a new MLP using one of the
 trainers described at :doc:`TutorialsTrainer`. In this tutorial, we show only
@@ -157,9 +156,9 @@ Here is an example:
 
   >>> mlp = bob.machine.MLP((3, 3, 2, 1))
 
-As it is, the network is uninitialized. For the sake of examplifying how to use
+As it is, the network is uninitialized. For the sake of demonstrating how to use
 MLPs, let's set the weight and biases manually (we would normally use a trainer
-for that):
+for this):
 
 .. doctest::
 
@@ -189,20 +188,20 @@ for that):
   >>> mlp.weights = (input_to_hidden0, hidden0_to_hidden1, hidden1_to_output)
   >>> mlp.biases = (bias_hidden0, bias_hidden1, bias_output)
 
-A few notes are due at this point:
+At this point, a few things should be noted:
 
 1. Weights should **always** be 2D arrays, even if they are connecting 1 neuron
    to many (or many to 1). You can use the NumPy_ ``reshape()`` array method
    for this purpose as shown above
 2. Biases should **always** be 1D arrays.
-3. By default, MLPs use the `hyperbolic tangent <http://mathworld.wolfram.com/HyperbolicTangent.html>`_ as activation functions.
-   Other 2 activation functions are possible:
+3. By default, MLPs use the `hyperbolic tangent <http://mathworld.wolfram.com/HyperbolicTangent.html>`_ as the activation function.
+   There are currently 2 other activation functions avialble in |project|:
 
    * The identity function: :py:const:`bob.machine.Activation.LINEAR`
-   * The sigmoid or `logistic function <http://mathworld.wolfram.com/SigmoidFunction.html>`_: :py:const:`bob.machine.Activation.SIGMOID` or 
+   * The sigmoid function (also known as the `logistic function <http://mathworld.wolfram.com/SigmoidFunction.html>`_ function): :py:const:`bob.machine.Activation.SIGMOID` or 
      :py:const:`bob.machine.Activation.LOG`.
 
-Let's try changing all activation functions for a simpler one, just for this
+Let's try changing all of the activation functions to a simpler one, just for this
 example:
 
 .. doctest::
@@ -228,12 +227,13 @@ Support Vector Machines
     LIBSVM was not found when this documentation has been generated.
 
 
-The :py:class:`bob.machine.SupportVector` implements a Support Vector Machine
-with a bridge to `LIBSVM`_. The bridge functionality includes loading and
+Support for Suuport Vecotor Machines (SVMs) is provided through the 
+:py:class:`bob.machine.SupportVector` machine in |project|. This is in fact a 
+bridge to `LIBSVM`_. The functionality of this bridge includes loading and
 saving SVM data files and machine models, which you can produce or download
 following the instructions found on `LIBSVM`_'s home page. |project| bindings
 to `LIBSVM`_ do not allow you to explicitly set the machine's internal values.
-You must use the associated trainer as explained on :doc:`TutorialsTrainer` to
+You must use the associated trainer as explained in :doc:`TutorialsTrainer` to
 generate a valid :py:class:`bob.machine.SupportVector`. Once you have followed
 the instructions at :doc:`TutorialsTrainer`, you can come back to this page and
 follow the remaining instructions here.
@@ -246,12 +246,12 @@ follow the remaining instructions here.
   This dataset proposes a binary classification problem (i.e., 2 classes of
   features to be discriminated). The number of features is 13.
 
-Our extensions to `LIBSVM`_ also allow you to feed data through a
+Our extensions to `LIBSVM`_ also allows you to feed data through a
 :py:class:`bob.machine.SupportVector` using :py:class:`numpy.ndarray` objects
 and collect results in that format. For the following lines, we assume you have
 available a :py:class:`bob.machine.SupportVector` named ``svm``. (For this
 example, the variable ``svm`` was generated from the ``heart_scale`` dataset
-using the application ``svm-train`` with default parameters.)
+using the application ``svm-train`` with default parameters).
 
 
 .. ifconfig:: has_libsvm
@@ -309,12 +309,12 @@ before:
 
 
 Visit the documentation for :py:class:`bob.machine.SupportVector` to find more
-information about these bindings and methods you can call on such machine.
+information about these bindings and methods you can call on such a machine.
 Visit the documentation for :py:class:`bob.machine.SVMFile` for information on
 loading `LIBSVM`_ data files direction into python and producing
 :py:class:`numpy.ndarray` objects.
 
-Here is quick usage example: Suppose the variable ``f`` contains an object of
+Below is a quick example: Suppose the variable ``f`` contains an object of
 type :py:class:`bob.machine.SVMFile`. Then, you could read data (and labels)
 from the file like this:
 
@@ -387,11 +387,11 @@ publication, be sure to also cite:
   }
 
 
-K-means Machines
+k-means Machines
 ================
 
-`k-Means <http://en.wikipedia.org/wiki/K-means_clustering>`_ is a clustering 
-method, which aims to partition a set of observations into :math:`k` 
+`k-means <http://en.wikipedia.org/wiki/K-means_clustering>`_ is a clustering 
+method which aims to partition a set of observations into :math:`k` 
 clusters. The `training` procedure is described in :doc:`TutorialsTrainer`. 
 Otherwise, it is possible to define a :py:class:`bob.io.KMeansMachine` as
 follows.
@@ -418,13 +418,13 @@ Gaussian Machines
 
 The :py:class:`bob.machine.Gaussian` represents a `multivariate diagonal
 Gaussian (or normal) distribution
-<http://en.wikipedia.org/wiki/Multivariate_normal_distribution>`_. The
-*diagonality* of the Gaussians in this multivariate distribution refers to the
-covariance matrix of the distribution. When the covariance matrix is diagonal,
-each variable in the distribution is independent of the others. 
+<http://en.wikipedia.org/wiki/Multivariate_normal_distribution>`_. In this
+context, a *diagonal* Gaussian refers to the covariance matrix of the distribution
+being diagonal. When the covariance matrix is diagonal, each variable in the distribution 
+is independent of the others. 
 
-Objects of this class are normally used as building blocks of more complex
-:py:class:`bob.machine.GMMMachine` (Gaussian Mixture Model) objects, but can
+Objects of this class are normally used as building blocks for more complex
+:py:class:`bob.machine.GMMMachine` or GMM objects, but can
 also be used individually. Here is how to create one multivariate diagonal
 Gaussian distribution:
 
@@ -439,7 +439,7 @@ Gaussian distribution:
   array([ 0.2,  0.1])
 
 Once the :py:class:`bob.machine.Gaussian` has been set, you can use it to
-estimate the logarithm likelihood of an input feature vector with a matching
+estimate the log-likelihood of an input feature vector with a matching
 number of dimensions:
 
 .. doctest::
@@ -449,12 +449,12 @@ number of dimensions:
 As with other machines you can save and re-load machines of this type using
 :py:meth:`bob.machine.Gaussian.save` and the class constructor respectively.
 
-Gaussian Mixture Models
+Gaussian mixture models
 =======================
 
 The :py:class:`bob.machine.GMMMachine` represents a Gaussian 
-`Mixture Model <http://en.wikipedia.org/wiki/Mixture_model>`_ (GMM), which
-consists in a mixture of weighted :py:class:`bob.machine.Gaussian`.
+`mixture model <http://en.wikipedia.org/wiki/Mixture_model>`_ (GMM), which
+consists of a mixture of weighted :py:class:`bob.machine.Gaussian`\s.
 
 .. doctest::
 
@@ -474,7 +474,7 @@ or :py:attr:`bob.machine.GMMMachine.weights`.
          [ 5., 5., -5.]])
 
 Once the :py:class:`bob.machine.GMMMachine` has been set, you can use it to
-estimate the logarithm likelihood of an input feature vector with a matching
+estimate the log-likelihood of an input feature vector with a matching
 number of dimensions:
 
 .. doctest::

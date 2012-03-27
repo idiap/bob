@@ -1,3 +1,11 @@
+bob (1.0beta3-anjos~precise3) precise; urgency=low
+
+  * Fix problems with previous testing
+  * Switch off testing for now
+  * Updates to the documentation merged from upstream
+
+ -- Biometrics Group <biometric@idiap.ch>  Tue, 27 Mar 2012 14:56:00 +0200
+
 bob (1.0beta2-anjos~precise2) precise; urgency=low
 
   * Run test targets in verbose mode
