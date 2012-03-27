@@ -1,3 +1,11 @@
+bob (1.0beta2-anjos~precise2) precise; urgency=low
+
+  * Run test targets in verbose mode
+  * More documentation updates
+  * Add build dependency to libvl-dev (in our PPA)
+
+ -- Biometrics Group <biometric@idiap.ch>  Tue, 27 Mar 2012 10:27:20 +0200
+
 bob (1.0beta1-anjos~precise1) precise; urgency=low
 
   * Also run test targets

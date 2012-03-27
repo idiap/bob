@@ -16,10 +16,11 @@ export DH_OPTIONS
 	dh $@ --parallel
 
 override_dh_auto_configure:
-	dh_auto_configure -- -DCMAKE_BUILD_TYPE=Release -DBOB_VERSION=1.0alpha1
+	dh_auto_configure -- -DCMAKE_BUILD_TYPE=Release
 
 override_dh_auto_build:
 	dh_auto_build -- VERBOSE=$(DH_VERBOSE) all
+	cd obj-$(DEB_BUILD_GNU_TYPE); ctest --verbose; cd -
 	dh_auto_build -- VERBOSE=$(DH_VERBOSE) test
 	dh_auto_build -- VERBOSE=$(DH_VERBOSE) sphinx
 	dh_auto_build -- VERBOSE=$(DH_VERBOSE) sphinx-doctest
