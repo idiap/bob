@@ -86,11 +86,9 @@ Developer's Guide
    CodeBaseOverview
    Dependencies
    Compilation
-   CxxDevelopment
-   GoldenRules
-   CodingGuidelines
+   Development
+   Contributing
    Optimizing
-   ../cxx/doc/index
    TicketReportingDev
 
 Reference

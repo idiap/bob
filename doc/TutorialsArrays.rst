@@ -492,7 +492,7 @@ facilities. This allows you to generate random numbers in a variety of ways.
 
 .. code-block:: python
 
-  >>> mt = bob.core.random.mt19937()
+  >>> mt = bob.core.random.mt19937()  # initialise the random number generator
   >>> binom = bob.core.random.binomial_float64()
   >>> binom(mt)
   0 

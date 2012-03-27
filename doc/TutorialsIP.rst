@@ -65,7 +65,8 @@ The basic operations on images are the affine image conversions like image scali
 Scaling images
 ~~~~~~~~~~~~~~
 
-To compute a scaled version of the image, simply create the image in the desired scale:
+To compute a scaled version of the image, simply create the image at the desired scale. For instance, in the example
+below an image is up-scaled by first creating the image and then initialising the larger image:
 
  
   >>> A = numpy.array( [ [1, 2, 3], [4, 5, 6] ], dtype = numpy.uint8 ) # A small image of size 2x3
@@ -74,7 +75,7 @@ To compute a scaled version of the image, simply create the image in the desired
    [4 5 6]]
   >>> B = numpy.ndarray( (3, 5), dtype = numpy.float64 )               # A larger image of size 3x5
 
-and call the scale function of |project|: 
+the scale function of |project| is then called to up-scale the image:
 
   >>> bob.ip.scale( A, B )
   >>> print B
@@ -94,7 +95,7 @@ which bi-linearly interpolates image A to image B. Of course, scaling factors ca
 Rotating images
 ~~~~~~~~~~~~~~~
 
-The rotation of an image is slightly more difficult since the resulting image size has to be computed in advance. For that purpose, the :py:func:`bob.ip.get_rotated_output_shape` function can be used:
+The rotation of an image is slightly more difficult since the resulting image size has to be computed in advance. To facilitate this there is a function :py:func:`bob.ip.get_rotated_output_shape` which can be used:
 
   >>> A = numpy.array( [ [1, 2, 3], [4, 5, 6] ], dtype = numpy.uint8 ) # A small image of size 3x3
   >>> print A
@@ -117,7 +118,9 @@ After the creation of the image in the desired size, the :py:func:`bob.ip.rotate
 Color type conversion
 ~~~~~~~~~~~~~~~~~~~~~
 
-When dealing with color images, sometimes different parts of the color image are required. Most common face verification algorithms require the images to be gray scale. To assure that the image that is loaded is actually a gray level image, the conversion from color to gray scale images can be applied:
+When dealing with color images, sometimes different parts of the color image are required. Many image processing 
+algorithms require the images to be gray scale. To assure that the image that is loaded is actually a gray level 
+image, the conversion from color to gray scale images can be applied:
 
   >>> # set up 'color_image_path' to point to any kind of image
   >>> image = bob.io.load( color_image_path )
@@ -126,7 +129,7 @@ When dealing with color images, sometimes different parts of the color image are
   ...   bob.ip.rgb_to_gray( image, gray_image )                              # Convert it to gray scale
   ...   image = gray_image
 
-Converting a colored RGB image to YUV is as straightforward:
+Converting a colored RGB image to YUV is just as straightforward:
 
   >>> rgb_image = bob.io.load( color_image_path )
   >>> yuv_image = numpy.ndarray( rgb_image.shape, dtype = rgb_image.dtype )
@@ -137,7 +140,7 @@ Converting a colored RGB image to YUV is as straightforward:
 Complex image operations
 ========================
 
-Complex image operations are usually wrapped by classes. The usual work flow is to first generate an object of the desired class, specifying parameters that are independent on the images to operate, and to second use the class on images. Usually, objects that perform image operations have the **__call__** function overloaded, so that one simply can use it as if it were functions.
+Complex image operations are usually wrapped up by classes. The usual work flow is to first generate an object of the desired class, specifying parameters that are independent on the images to operate, and to second use the class on images. Usually, objects that perform image operations have the **__call__** function overloaded, so that one simply can use it as if it were functions. Below we provide some examples.
 
 
 Image filtering
@@ -159,9 +162,9 @@ Now, let's see what happens to a small test image:
    [ 0.063  0.873  0.093  0.873  0.063]
    [ 0.936  0.063  0.002  0.063  0.936]] 
 
-See, we ended up with a nicely smoothed cross.
+The image of the cross has now been nicely smoothed.
 
-Another filter you might want to use is a Gabor filter. Gabor filters can be applied to any kind of images, including colored images (in which case the image is converted to gray scale first). A nice trick to get the trailing two dimensions of the image (i.e., the resolution of gray or colored image) is to extract shape[-2:] of the image. Since the output of a Gabor filter is always complex valued, the filtered image image need to have complex type:
+Another filter you might want to use is a Gabor filter. Gabor filters can be applied to any kind of images, including colored images (in which case the image is converted to gray scale first). A nice trick to get the trailing two dimensions of the image (i.e., the resolution of gray or colored image) is to extract shape[-2:] of the image. Since the output of a Gabor filter is always complex valued, the filtered image needs to be a complex type:
 
   >>> kernel = bob.ip.GaborKernel(image.shape[-2:], (1,0))
   >>> filtered_image = numpy.ndarray(image.shape[-2:], dtype = numpy.complex128)
@@ -171,7 +174,7 @@ or simply:
 
   >>> filtered_image = kernel(image)
   
-To compute the absolute and phase parts of the responses (e.g. as needed by the extended local Gabor binary pattern (ELGBP)), just use the `NumPy`_ functions on the resulting image:
+To compute the absolute and phase parts of the responses (as is the case for the extended local Gabor binary pattern (ELGBP)) you can simply use the `NumPy`_ functions on the resulting image:
 
   >>> abs_image = numpy.abs(filtered_image)
   >>> phase_image = numpy.angle(filtered_image)
@@ -180,11 +183,14 @@ To compute the absolute and phase parts of the responses (e.g. as needed by the 
 Normalizing images according to eye positions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For many biometric applications to faces, the images are geometrically normalized according to the eye positions, which are either hand-labeled or detected by an algorithm. The first thing to do is to create an object of the class, defining the image properties of the geometrically normalized image (that will be generated when applying the object):
+For many biometric applications, for instance face recognition, the images are geometrically normalized according to the eye positions.
+In such a case, the first thing to do is to create an object of the class defining the image properties of the geometrically normalized 
+image (that will be generated when applying the object):
 
   >>> face_eyes_norm = bob.ip.FaceEyesNorm(eyes_distance = 64, crop_height = 128, crop_width = 128, crop_eyecenter_offset_h = 32, crop_eyecenter_offset_w = 64)
 
-Now, we have set up our object to generate images of size (128, 128) that will put the left eye to pixel position (32, 32) and the right eye to position (32, 96). Afterwards, this object is used to geometrically normalize the face, given the eye positions in the original face image:
+Now, we have set up our object to generate images of size (128, 128) that will put the left eye at the pixel position (32, 32) and the right eye at the 
+position (32, 96). Afterwards, this object is used to geometrically normalize the face, given the eye positions in the original face image:
 
   >>> face_image = bob.io.load( image_path )
   >>> cropped_image = numpy.ndarray( (128, 128), dtype = numpy.float64 )

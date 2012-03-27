@@ -1,6 +1,4 @@
 .. vim: set fileencoding=utf-8 :
-.. Andre Anjos <andre.anjos@idiap.ch>
-.. Wed Jan 11 14:43:35 2012 +0100
 .. Roy Wallace
 .. 27 Mar 2012
 .. 
@@ -18,27 +16,24 @@
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-=================
- C++ development
-=================
+====================
+ Python development
+====================
 
-.. todo::
+.. todo:: 
 
-  Include a new C++ Reference section (rename current section to Python Reference), and link to it from here?
+  Describe when a developer should write in Python rather than C++. Briefly describe what a python binding is, and link to that section (:doc:`PythonBindingsDevelopment`)
 
-The core components of |project| are implemented in C++ for speed. 
-Python bindings are provided to the underlying C++ code for the convenience of the user.
-In the following sections you will find more information on how to use and develop the components of |project| that are written in C++.
+Python Coding Guidelines
+------------------------
 
-.. toctree::
-   :maxdepth: 2
+* Try to follow `The Google Python Style Guide`_
+* Class names usually start with an upper-case character and use CamelCase to 
+  combine words. Function names (global functions or public class methods) start 
+  with a lower-case character and words are combined\_with\_underscores. If you
+  write use private functions, please assure that they start with an underscore.
 
-   IntroCxxDevelopment
-   CxxCoreUsingBlitzArrays
-   CxxCoreErrorReporting
-   GuidelinesCxxDevelopment
 
 .. include:: links.rst
-
-.. Place here references to all citations in lower case
+.. _`the google python style guide`: http://google-styleguide.googlecode.com/svn/trunk/pyguide.html
 

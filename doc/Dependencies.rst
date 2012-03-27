@@ -22,6 +22,13 @@
  Dependencies
 ==============
 
+.. warning::
+   If you are at Idiap you **don't** need to install these dependencies.
+   Instead, follow `Bob's Idiap Guide`_ (special instructions for Idiap users).
+
+List of dependencies
+====================
+
 This is a listing of current |project| dependencies showing minimum required
 versions where relevant and the respective project licenses. When a project is
 covered by multiple licenses, we show which we are presently using (using
@@ -30,7 +37,7 @@ dependence is required for the project and installation instructions for
 specific platforms.
 
 Required at Runtime
-===================
+-------------------
 
 +----------------------+--------------+---------------------------------------+
 | Package Name         | Min. Version | License                               |
@@ -63,7 +70,7 @@ Required at Runtime
 +----------------------+--------------+---------------------------------------+
 
 Strongly Recommended Add-Ons
-============================
+----------------------------
 
 +----------------------+--------------+----------------------------------------------+
 | Package Name         | Min. Version | License                                      |
@@ -82,7 +89,7 @@ Strongly Recommended Add-Ons
 +----------------------+--------------+----------------------------------------------+
 
 Build Dependencies
-==================
+------------------
 
 +----------------------+--------------+------------------+
 | Package Name         | Min. Version | License          |
@@ -101,7 +108,7 @@ Build Dependencies
 +----------------------+--------------+------------------+
 
 Recommended Software
-====================
+--------------------
 
 +----------------------+--------------+------------------+
 | Package Name         | Min. Version | License          |
@@ -109,19 +116,14 @@ Recommended Software
 | `IPython`_           | any          | `BSD-3-Clause`_  |
 +----------------------+--------------+------------------+
 
-Description of |project| Dependencies
--------------------------------------
 
-In order to compile and develop against bob, you must have a few tools
-installed. Here is a brief description of what you need.
+Description of dependencies
+===========================
 
-.. note::
-   If you are at Idiap you **don't** need to install any of the packages
-   mentioned on this wiki. Instead, follow `Bob's Idiap Guide`_ (special
-   instructions for Idiap users).
+In order to compile and develop against bob, you must have a few tools installed. Here is a brief description of what you need.
 
 Platforms
-=========
+---------
 
 We maintain nightly builds and unit tests that cover the following platforms:
 
@@ -135,8 +137,9 @@ We maintain nightly builds and unit tests that cover the following platforms:
 If you find problems with a particular OS version, please `submit a new bug
 report`_ so we can try to help you.
 
+
 Core dependencies
-=================
+-----------------
 
 * `Blitz++`_: replaces the old bob Tensor system with C++ templated
   versions that offer equivalent speed, more documentation and stability. You
@@ -165,7 +168,7 @@ Core dependencies
   separately.
 
 Data access
-===========
+-----------
 
 * `SqlAlchemy`_: A Python SQL toolkit and Object Relational Mapper. This is
   used for storing and querying more complex databases. You need at least
@@ -193,7 +196,7 @@ Data access
 .. _basic-build:
 
 Building and debugging
-======================
+----------------------
 
 These are packages you need for compiling |project|, but do not depend at
 during runtime.
@@ -227,7 +230,7 @@ during runtime.
       $ export CMAKE_PREFIX_PATH=/path/to/the/root/of/your/packages
 
 Extra packages we recommend
-===========================
+---------------------------
 
 These are packages that are *not* required to compile or run bob examples,
 but make a nice complement to the installation and provides you with the
@@ -240,10 +243,10 @@ ability to plot and interact with bob:
   |project| Data Acquisition module.
 
 Notes for specific platforms
-----------------------------
+============================
 
 Ubuntu 10.04 (LTS)
-==================
+------------------
 
 A single command line that will install all required packages under Ubuntu
 (tested on Ubuntu 10.04 LTS):
@@ -265,7 +268,7 @@ A single command line that will install all required packages under Ubuntu
   instructions on the `VLfeat launchpad webpage`_.
 
 Ubuntu 11.10
-============
+------------
 
 A single command line that will install all required packages under Ubuntu
 (tested on Ubuntu 11.10):
@@ -281,7 +284,7 @@ A single command line that will install all required packages under Ubuntu
   instructions on the `VLfeat launchpad webpage`_.
 
 Ubuntu 12.04 (LTS)
-==================
+------------------
 
 A single command line that will install all required packages under Ubuntu
 (tested on Ubuntu 12.04):
@@ -297,7 +300,7 @@ A single command line that will install all required packages under Ubuntu
   instructions on the `VLfeat launchpad webpage`_.
 
 Mac OSX
-=======
+-------
 
 This is a recipe for installing |project| dependencies under your Mac OSX using
 Snow Leopard (10.6) or Lion (10.7). It should be possible, but remains

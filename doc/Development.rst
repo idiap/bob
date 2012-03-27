@@ -1,6 +1,6 @@
 .. vim: set fileencoding=utf-8 :
-.. Andre Anjos <andre.anjos@idiap.ch>
-.. Sun Apr 3 19:18:37 2011 +0200
+.. Roy Wallace
+.. 27 Mar 2012
 .. 
 .. Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
 .. 
@@ -16,13 +16,23 @@
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-=========
- C++ API 
-=========
+=======================
+ |project| development
+=======================
 
-This section includes information required to write C++ code using |project|.
+For |project| development we use the Git_ version control system. If you aren't
+familiar with Git, please refer to the official `Git tutorial`_. Within
+this guide, we assume you have already gone through all introductory material on Git
+and are ready to get your hands dirty with |project|.
 
+ 
 .. toctree::
    :maxdepth: 2
 
-   ../core/doc/index
+   CxxDevelopment
+   PythonDevelopment
+   PythonBindingsDevelopment
+
+.. include:: links.rst
+.. _`Git`: http://git-scm.com/
+.. _`Git Tutorial`: http://schacon.github.com/git/gittutorial.html
