@@ -20,11 +20,16 @@
  Input/Output
 **************
 
-This section gives an overview of the operations for storing and retrieving the basic data structures in |project|, i.e. `NumPy`_ arrays. |project| uses `HDF5`_  format for storing binary coded data. Using the |project| support for `HDF5`_, it is very simple to import and export data from the program.
+This section gives an overview of the operations for storing and retrieving the basic data 
+structures in |project|, such as `NumPy`_ arrays. |project| uses `HDF5`_  format for storing 
+binary coded data. Using the |project| support for `HDF5`_, it is very simple to import and 
+export data.
 
-`HDF5`_  uses a neat descriptive language for representing the data in the HDF5 files, called Data Description Language (`DDL`_).
+`HDF5`_  uses a neat descriptive language for representing the data in the HDF5 files, called 
+Data Description Language (`DDL`_).
 
-To perform the functionalities given in this section, we should have `NumPy`_ and |project| loaded into the `Python`_ environment.
+To perform the functionalities given in this section, you should 
+have `NumPy`_ and |project| loaded into the `Python`_ environment.
 
 .. testsetup:: *
 
@@ -39,16 +44,18 @@ To perform the functionalities given in this section, we should have `NumPy`_ an
   
 HDF5 standard utilities
 =======================
-Before explaining the basics of reading and writing to `HDF5`_ files, it is important to list some `HDF5`_ standard utilities for checking the content of an `HDF5`_ file. They are supplied by the `HDF5`_ project.
+Before explaining the basics of reading and writing to `HDF5`_ files, it is important to list 
+some `HDF5`_ standard utilities for checking the content of an `HDF5`_ file. These are 
+supplied by the `HDF5`_ project.
 
 ``h5dump``
-  Dumps the whole contents of the file using the DDL
+  Dumps the content of the file using the DDL.
 
 ``h5ls``
-  Lists the contents of the file using DDL, but does not show the data
+  Lists the content of the file using DDL, but does not show the data.
 
 ``h5diff``
-  Finds the differences in HDF5 files.
+  Finds the differences between HDF5 files.
 
 
 I/O operations using the class `bob.io.HDF5File`
@@ -57,7 +64,7 @@ I/O operations using the class `bob.io.HDF5File`
 Writing operations
 ------------------
 
-Let's take a look how to record a simple scalar data such as integers or floats.
+Let's take a look at how to write simple scalar data such as integers or floats.
 
 .. doctest::
 
@@ -93,21 +100,21 @@ If after this you use the **h5dump** utility on the file ``testfile1.hdf5``, you
 
 .. note::
 
-   In |project|, when you open an HDF5 file, you can choose one of the following options:
+   In |project|, when you open a HDF5 file, you can choose one of the following options:
   
-   **'r'** Open the file in reading mode; writing opeartions will fail.
+   **'r'** Open the file in reading mode; writing operations will fail.
 
-   **'w'** Open the file in reading and writing mode with appending (this is the default)
+   **'w'** Open the file in reading and writing mode with appending (this is the default).
  
-   **'t'** Open the file in reading and writing mode, but truncate it
+   **'t'** Open the file in reading and writing mode, but truncate it.
 
-   **'x'** Read/write/append with exclusive access
+   **'x'** Read/write/append with exclusive access.
 
 The dump shows that there are two datasets inside a group named ``/`` in the file.
-HDF5 groups are like filesystem directories. They create namespaces for the
-data. In the root group (or directory), we find our two variables, named as we
-set them to be.  The variable names are the complete path to the location where
-they live. We could write a new variable in the same file, but in a different
+HDF5 groups are like file system directories. They create namespaces for the
+data. In the root group (or directory), you will find the two variables, named as 
+you set them to be.  The variable names are the complete path to the location where
+they live. You could write a new variable in the same file but in a different
 directory like this:
 
 .. doctest::
@@ -118,11 +125,11 @@ directory like this:
   >>> del f
 
 
-Line 1 shows we open the file again for reading and writing, but without
-truncating it. This will allow us to access the file contents. Next, we create the directory ``/test`` and we write a
-new variable inside the  subdirectory. As you can verify, **for simple
-scalars**, we can also force the storage type. Where normally one would have a
-64-bit real value, we impose that this variable is saved as a 32-bit real
+Line 1 opens the file for reading and writing, but without truncating it. This will 
+allow you to access the file contents. Next, the directory ``/test`` is created 
+and a new variable is written inside the subdirectory. As you can verify, **for simple
+scalars**, you can also force the storage type. Where normally one would have a
+64-bit real value, you can impose that this variable is saved as a 32-bit real
 value. You can verify the dump correctness with ``h5dump``:
 
 .. code-block:: none
@@ -148,11 +155,11 @@ as it was defined.
 
   If you need to place lots of variables in a subfolder, it may be better to
   setup the prefix folder before starting the writing operations on the
-  :py:class:`bob.io.HDF5File` object. You can do this using the method :py:meth:`HDF5File.cd()` .
-  Look-up its help for more information and usage instructions.
+  :py:class:`bob.io.HDF5File` object. You can do this using the method :py:meth:`HDF5File.cd()`.
+  Look up its help for more information and usage instructions.
 
-Writing arrays is a little simpler as :py:class:`numpy.ndarray`'s encode all the
-type information we need to write and read them correctly. Here is an example:
+Writing arrays is a little simpler as the :py:class:`numpy.ndarray` objects encode 
+all the type information we need to write and read them correctly. Here is an example:
 
 .. doctest::
 
@@ -161,7 +168,7 @@ type information we need to write and read them correctly. Here is an example:
   >>> f.set('my_array', A)
   >>> del f
 
-And the result of running ``h5dump`` on the file ``testfile3.hdf5`` should be:
+The result of running ``h5dump`` on the file ``testfile3.hdf5`` should be:
 
 .. code-block:: none
 
@@ -177,14 +184,15 @@ And the result of running ``h5dump`` on the file ``testfile3.hdf5`` should be:
   ...
 
 You don't need to limit yourself to single variables, you can also save lists
-of scalars and arrays using the function :py:meth:`bob.io.HDF5.append()` instead of :py:meth:`bob.io.HDF5.set()`.
+of scalars and arrays using the function :py:meth:`bob.io.HDF5.append()` instead 
+of :py:meth:`bob.io.HDF5.set()`.
 
 Reading operations
 ------------------
 
-Reading up data you just wrote is as easy. For this task you should use
+Reading data from a file that you just wrote to is just as easy. For this task you should use
 :py:meth:`bob.io.HDF5File.read`. The read method will read all the
-contents of the variable pointed by the given path. This is the normal way to
+contents of the variable pointed to by the given path. This is the normal way to
 read a variable you have written with :py:meth:`bob.io.HDF5File.set()`. If
 you decided to create a list of scalar or arrays, the way to read that up would
 be using :py:meth:`bob.io.HDF5File.lread()` instead. Here is an example:
@@ -216,7 +224,7 @@ the case when you write lists of variables to a dataset.
   [  0.   3.   6.   9.  12.  15.  18.  21.  24.  27.]
   >>> del f
 
-This is how a ``h5dump`` of the file looks like:
+This is what the ``h5dump`` of the file would look like:
 
 .. code-block:: none
 
@@ -249,7 +257,7 @@ shot:
   
 As you can see, the only difference between :py:meth:`bob.io.HDF5File.read()`
 and :py:meth:`bob.io.HDF5File.lread()` is on how |project| considers the
-available data (as a single array with N dimensions or set of arrays with N-1
+available data (as a single array with N dimensions or as a set of arrays with N-1
 dimensions). In the first example, you would have also been able to read the
 variable `my_array` as an arrayset using :py:meth:`bob.io.HDF5File.lread()`
 instead of :py:meth:`bob.io.HDF5File.read()`. In this case, each position
@@ -300,9 +308,9 @@ read from the file and into a new array. Try again:
          [  0.,   3.,   6.,   9.,  12.,  15.,  18.,  21.,  24.,  27.]])
 
 
-
-You can force permanently loading the contents of the file in memory an avoid
-the I/O costs every time you read issue a :py:meth:`bob.io.Array.get()`:
+Calling :py:meth:`bob.io.Array.get()` will, by default, load the contents of the
+file into memory. Doing this means that subsequent calls to :py:meth:`bob.io.Array.get()`
+avoid having to read the file again and so do not incur an additional I/O cost.
 
 .. doctest::
 
@@ -327,9 +335,9 @@ Saving the :py:class:`bob.io.Array` is as easy, just call the
 Numpy ndarray shortcuts
 =======================
 
-To just load a :py:class:`numpy.ndarray` in memory, we have written a
-short cut that lives at :py:func:`bob.io.load` and saves you from going through
-the :py:class:`bob.io.Array` API:
+To just load an :py:class:`numpy.ndarray` in memory, you can use a short cut that
+lives at :py:func:`bob.io.load`. This short cut means that you don't have to go 
+through the :py:class:`bob.io.Array` container:
 
 .. doctest::
 
@@ -360,7 +368,8 @@ Reading and writing image and video data
 file types including Matlab ``.mat`` files, various image file types and video
 data. File types and specific serialization and de-serialization is switched
 automatically using filename extensions. Knowing this, saving an array in a different format is just a matter of
-choosing the right extension. This is illustrated in the following example, where an image generated randomly using the method `NumPy` :py:meth:`numpy.random.random_integers()`, is saved in JPEG format. The image must be of type uint8 or uint16.
+choosing the right extension. This is illustrated in the following example, where an image generated randomly using the 
+method `NumPy` :py:meth:`numpy.random.random_integers()`, is saved in JPEG format. The image must be of type uint8 or uint16.
 
 .. doctest::
 
@@ -368,7 +377,11 @@ choosing the right extension. This is illustrated in the following example, wher
   >>> bob.io.save(my_image.astype('uint8'), 'testimage.jpg') # saving the image in jpeg format
   >>> my_copy_image = bob.io.load('testimage.jpg')
 
-As for reading the video files, although it is possible to read a video using the :py:meth:`bob.io.load()`, you should use the methods of the class :py:class:`bob.io.VideoReader` to read frame by frame and avoid overloading your machine's memory. In the following example you can see how to create a video and save it using the class :py:class:`bob.io.VideoWriter` and load it again using the class :py:class:`bob.io.VideoReader`. The created video will have 30 frames, generated randomly like in the previous example. Due to *FFMPEG* constrains, the width and height of the video need to be multiples of two.
+As for reading the video files, although it is possible to read a video using the :py:meth:`bob.io.load()`, you should use the 
+methods of the class :py:class:`bob.io.VideoReader` to read frame by frame and avoid overloading your machine's memory. In the following 
+example you can see how to create a video and save it using the class :py:class:`bob.io.VideoWriter` and load it again using the 
+class :py:class:`bob.io.VideoReader`. The created video will have 30 frames generated randomly. Due 
+to *FFMPEG* constrains, the width and height of the video need to be multiples of two.
 
 .. doctest::
 
@@ -388,9 +401,13 @@ As for reading the video files, although it is possible to read a video using th
   >>> type(inv)
   <type 'numpy.ndarray'>
 
-The loaded image files are 3D arrays (for RGB format) or 2D arrays (for greyscale) of type uint8 or uint16, while the loaded videos are sequences of frames i.e. 4D arrays of type uint8. All the extensions and formats for images and videos supported in your version of |project| can be listed using the |project|'s utility `bob-config.py`.
+The loaded image files are 3D arrays (for RGB format) or 2D arrays (for greyscale) of type uint8 or uint16, while the loaded videos are 
+sequences of frames, usually 4D arrays of type uint8. All the extensions and formats for images and videos supported in your version 
+of |project| can be listed using the |project|'s utility `bob-config.py`.
 
-|project| supports a number of binary formats, writing to which is performed using the :py:class:`bob.io.save()` with the right file extension passed as an argument, just as shown in the example above. These additional formats are:
+|project| supports a number of binary formats in a manner similar to the cases shown above. Writing binary files is achieved using 
+the :py:class:`bob.io.save()` with the right file extension passed as an argument, just as was shown in the example above. These additional 
+formats are:
   
   * Matlab (``.mat``), Matlab arrays, supports all integer, float and complex varieties [``matlab.array.binary``];
   * bob3 (``.bindata``), supports single or double precision float numbers, only 1-D [``bob3.array.binary``];
@@ -406,15 +423,18 @@ The loaded image files are 3D arrays (for RGB format) or 2D arrays (for greyscal
 Loading and saving Matlab data
 ==============================
 
-An alternative for saving data in ``.mat`` files using :py:meth:`bob.io.save()`, would be saving them simply in `HDF5`_ file, which then can be easily read in Matlab. Similarly, instead of having to read ``.mat`` files using :py:meth:`bob.io.load()`, you can save your Matlab data in `HDF5`_ format, which then can be easily read from |project|. Detailed instructions about how to save and load data from Matlab to and from `HDF5`_ files can be found `here`__.
+An alternative for saving data in ``.mat`` files using :py:meth:`bob.io.save()`, would be to save them as a `HDF5`_ file which then can 
+be easily read in Matlab. Similarly, instead of having to read ``.mat`` files using :py:meth:`bob.io.load()`, you can save your Matlab data 
+in `HDF5`_ format, which then can be easily read from |project|. Detailed instructions about how to save and load data from Matlab to and 
+from `HDF5`_ files can be found `here`__.
 
 .. _audiosignal:
 
 Loading and saving audio files
 ==============================
 
-|project| does not yet support audio files (No wav codec). However, it is 
-possible to use the `Python`_ module :py:mod:`scipy.io.wavfile` to do
+|project| does not yet support audio files (no wav codec). However, it is 
+possible to use the `SciPy`_ module :py:mod:`scipy.io.wavfile` to do
 the job. For instance, to read a wave file, just use the
 :py:func:`scipy.io.wavfile.read` function.
 
@@ -428,10 +448,11 @@ the job. For instance, to read a wave file, just use the
    >>> print data.shape
    (132474, 2)
 
-In the previous example, the stereo audio signal is represented as a 2D 
-`NumPy` :py:class:`numpy.ndarray`, the first dimension corresponding to the
-time index (132474 frames) and the second one to the audio channel (2 channels,
-stereo), values in the array being wave magnitudes.
+In the above example, the stereo audio signal is represented as a 2D 
+`NumPy` :py:class:`numpy.ndarray`. The first dimension corresponds to the
+time index (132474 frames) and the second dimesnion correpsonds to one of
+the audio channel (2 channels, stereo). The values in the array correpsond
+to the wave magnitudes.
 
 To save a `NumPy` :py:class:`numpy.ndarray` into a wave file, the 
 :py:func:`scipy.io.wavfile.write` could be used, which also requires the
