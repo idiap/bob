@@ -20,7 +20,7 @@
  Database
 **********
 
-|project| provides an API to easily query and interface with well know 
+|project| provides an API to easily query and interface with well known
 biometric databases. A database contains information about the organization
 of the files, functions to query information such as the data which might be
 used for training a model, but it does **not** contain the data itself.
@@ -36,7 +36,7 @@ MOBIO database
 ==============
 
 Let's consider an example with the freely available MOBIO_ database, which
-consists in bi-modal (audio and video) data from 150 people. For this example,
+consists of bi-modal (audio and video) data from 150 people. For this example,
 we will use the still images of the database. The database query is 
 instantiated as any other Python_ object.
 
@@ -66,7 +66,7 @@ a model (`world` subset) for a specified protocol.
    >>> print clientsSublistSorted[0] # print the id of the first client
    202
    
-Then, if we would like to retrieve the list of files associated with this 
+Then, if you would like to retrieve the list of files associated with this 
 identity, the :py:meth:`bob.db.mobio.Database.files()` method will be of 
 help.
 
