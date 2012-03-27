@@ -22,9 +22,9 @@
  Performance Evaluation
 ========================
 
-Methods in the :py:mod:`bob.measure` module help you evaluating error in
-multi-class or binary classification problems. If you are not yet familiarized
-with aspects of performance evaluation, we recommend the following papers
+Methods in the :py:mod:`bob.measure` module can help you to quickly and easily 
+evaluate error for multi-class or binary classification problems. If you are not yet 
+familiarized with aspects of performance evaluation, we recommend the following papers
 for an overview of some of the methods implemented.
 
 * Bengio, S., Keller, M., Mariéthoz, J. (2004). `The Expected Performance
@@ -38,7 +38,7 @@ Overview
 --------
 
 A classifier is subject to two types of errors, either the real access/signal
-is rejected (false rejection) or an impostor attack/noise is accepted (false
+is rejected (false rejection) or an impostor attack/a false access is accepted (false
 acceptance). A possible way to measure the detection performance is to use the
 Half Total Error Rate (HTER), which combines the False Rejection Rate (FRR) and
 the False Acceptance Rate (FAR) and is defined in the following formula:
@@ -47,34 +47,36 @@ the False Acceptance Rate (FAR) and is defined in the following formula:
 
   HTER(\tau, \mathcal{D}) = \frac{FAR(\tau, \mathcal{D}) + FRR(\tau, \mathcal{D})}{2} \quad \textrm{[\%]} 
 
-where :math:`\mathcal{D}` denotes the used dataset. Since both the FAR and the
+where :math:`\mathcal{D}` denotes the dataset used. Since both the FAR and the
 FRR depends on the threshold :math:`\tau`, they are strongly related to each
 other: increasing the FAR will reduce the FRR and vice-versa. For this reason,
-results are often presented using either Receiver Operating Characteristic
-(ROC) or Detection-Error Tradeoff (DET) curves, which basically plots the FAR
-versus the FRR for different values of the threshold. Another widely used
-measure to summarise the performance of a system is the Equal Error Rate (EER),
-defined as the point along the ROC or DET curve where the FAR equals the FRR.
+results are often presented using either a Receiver Operating Characteristic
+(ROC) or a Detection-Error Tradeoff (DET) plot, these two plots basically 
+present the FAR versus the FRR for different values of the threshold. Another 
+widely used measure to summarise the performance of a system is the Equal Error 
+Rate (EER), defined as the point along the ROC or DET curve where the FAR equals 
+the FRR.
 
-However, it was noted in by Bengio (2004) that ROC and DET curves may be
+However, it was noted in by Bengio et al. (2004) that ROC and DET curves may be
 misleading when comparing systems. Hence, the so-called Expected Performance
-Curve (EPC) was proposed, and consists in an unbiased estimate of the reachable
+Curve (EPC) was proposed and consists of an unbiased estimate of the reachable
 performance of a system at various operating points.  Indeed, in real-world
-scenario, the threshold :math:`\tau` has to be set a priori: this is typically
+scenarios, the threshold :math:`\tau` has to be set a priori: this is typically
 done using a development set (also called cross-validation set). Nevertheless,
 the optimal threshold can be different depending on the relative importance
 given to the FAR and the FRR. Hence, in the EPC framework, the cost
-:math:`\beta \in [0;1]` is defined as the tradeoff between FAR and FRR. The
+:math:`\beta \in [0;1]` is defined as the tradeoff between the FAR and FRR. The
 optimal threshold :math:`\tau^*` is then computed using different values of
 :math:`\beta`, corresponding to different operating points:
 
 .. math::
   \tau^{*} = \arg\!\min_{\tau} \quad \beta \cdot \textrm{FAR}(\tau, \mathcal{D}_{d}) + (1-\beta) \cdot \textrm{FRR}(\tau, \mathcal{D}_{d})
 
-where :math:`\mathcal{D}_{d}` denotes the development set.
+where :math:`\mathcal{D}_{d}` denotes the development set and should be completely
+separate to the evaluation set `\mathcal{D}`.
 
 Performance for different values of :math:`\beta` is then computed on the test
-set :math:`\mathcal{D}_{t}` using the previously found threshold. Note that
+set :math:`\mathcal{D}_{t}` using the previously derived threshold. Note that
 setting :math:`\beta` to 0.5 yields to the Half Total Error Rate (HTER) as
 defined in the first equation.
 
@@ -82,26 +84,29 @@ defined in the first equation.
 
   Most of the methods availabe in this module require as input a set of 2
   :py:class:`numpy.ndarray` objects that contain the scores obtained by the
-  classification system to be evaluated, without specific order. The first set,
-  refered in this manual as the **negatives** represents the impostor attacks
-  or noise response of the classifier. The second set, refered as the
-  **positives** represents the client or signal response of the classifier. The
-  vectors are called this way because the procedures implemented in this module
-  expects that the scores of **negatives** to be statistically distributed to
-  the left of signal scores, i.e., the **positives**. If that is not the case,
-  one should either invert the input to the methods or multiply all scores
-  available by -1, in order to have then inverted.
+  classification system to be evaluated, without specific order. Most of the
+  classes that are defined to deal with two-class problems. Therefore, in this
+  setting, and throughout this manual, we have defined that the **negatives** 
+  represents the impostor attacks or false class accesses (that is when a sample
+  of class A is given to the classifier of another class, such as class B) for 
+  of the classifier. The second set, refered as the **positives** represents the 
+  true class accesses or signal response of the classifier. The vectors are called 
+  this way because the procedures implemented in this module expects that the 
+  scores of **negatives** to be statistically distributed to the left of the signal 
+  scores (the **positives**). If that is not the case, one should either invert 
+  the input to the methods or multiply all scores available by -1, in order to have 
+  them inverted.
 
   The input to create these two vectors is generated by experiments conducted
   by the user and normally sits in files that may need some parsing before
   these vectors can be extracted.
 
   While it is not possible to provide a parser for every individual file that
-  may be generated in different experiment frameworks, we do provide a few
+  may be generated in different experimental frameworks, we do provide a few
   parsers for formats we use the most. Please refer to the documentation of
   :py:mod:`bob.measure.load` for a list of formats and details.
 
-  In the reminder of this section we assume you have successfuly parsed and
+  In the remainder of this section we assume you have successfuly parsed and
   loaded your scores in two 1D float64 vectors and are ready to evaluate the
   performance of the classifier.
 
@@ -137,10 +142,10 @@ We do provide a method to calculate the FAR and FRR in a single shot:
 
 The threshold ``T`` is normally calculated by looking at the distribution of
 negatives and positives in a development (or validation) set, selecting a
-threshold that matches a certain criteria, and applying this found threshold to
-the test set. This technique gives a better overview of the method
-generalization. We implement different techniques for the calculation of the
-threshold:
+threshold that matches a certain criterion and applying this derived threshold to
+the test (or evaluation) set. This technique gives a better overview of the 
+generalization of a method. We implement different techniques for the calculation 
+of the threshold:
 
 * Threshold for the EER
 
@@ -171,15 +176,15 @@ Plotting
 --------
 
 An image is worth 1000 words, they say. You can combine the capabilities of
-`Matplotlib`_ with |project|'s to plot a number of curves. You must have that
-package installed though, be aware. In this section we describe a few recipes.
+`Matplotlib`_ with |project| to plot a number of curves. However, you must have that
+package installed though. In this section we describe a few recipes.
 
 ROC
 ===
 
 The Receiver Operating Characteristic (ROC) curve is one of the oldest plots in
-town. To plot a ROC curve, in possession of your **negatives** and
-**positives**, just do something along these lines:
+town. To plot an ROC curve, in possession of your **negatives** and
+**positives**, just do something along the lines of:
 
 .. doctest::
 
@@ -214,7 +219,7 @@ controls.
 DET
 ===
 
-A DET curve can be drawn using commands such as the ones for the ROC curve:
+A DET curve can be drawn using similar commands such as the ones for the ROC curve:
 
 .. doctest::
 
@@ -235,7 +240,7 @@ This will produce an image like the following one:
 
 .. note::
 
-  If you wish to reset axis zooming, you must use the gaussian scale rather
+  If you wish to reset axis zooming, you must use the Gaussian scale rather
   than the visual marks showed at the plot, which are just there for
   displaying purposes. The real axis scale is based on the
   ``bob.measure.ppndf()`` method. For example, if you wish to set the x and y
@@ -256,9 +261,8 @@ This will produce an image like the following one:
 EPC
 ===
 
-A EPC curve to be drawn, requires that both the development set negatives and
-positives to be provided alongside with the test set ones. So, the API is
-slightly modified:
+Drawing an EPC requires that both the development set negatives and positives are provided alognside 
+the test (or evaluation) set ones. Because of this the API is slightly modified:
 
 .. doctest::
 
@@ -279,7 +283,7 @@ only calculate the points without doing any plotting. You may prefer to tweak
 the plotting or even use a different plotting system such as gnuplot. Have a
 look at the implementations at :py:mod:`bob.measure.plot` to understand how
 to use the |project| methods to compute the curves and interlace that in the
-way that best suites you.
+way that best suits you.
 
 Full Applications
 -----------------
@@ -290,7 +294,7 @@ either a 4-column or 5-column data format as specified in the documentation of
 :py:mod:`bob.measure.load.four_column` or
 :py:mod:`bob.measure.load.five_column`.
 
-To calculate the threshold using a certain criteria (EER, min.HTER or weighted
+To calculate the threshold using a certain criterion (EER, min.HTER or weighted
 Error Rate) on a set, after setting up |project|, just do:
 
 .. code-block:: sh
@@ -302,8 +306,8 @@ Error Rate) on a set, after setting up |project|, just do:
   HTER: 6.699%
 
 The output will present the threshold together with the FAR, FRR and HTER on
-the given set, calculated using such a threshold. The relative counts of FA's
-and FR's are also displayed between parenthesis.
+the given set, calculated using such a threshold. The relative counts of FAs
+and FRs are also displayed between parenthesis.
 
 To evaluate the performance of a new score file with a given threshold, use the
 application ``apply_threshold.py``:
@@ -339,7 +343,7 @@ evaluation and plotting of development and test set data using our combined
 Inside that script we evaluate 2 different thresholds based on the EER and the
 minimum HTER on the development set and apply the output to the test set. As
 can be seen from the toy-example above, the system generalizes reasonably well.
-A single PDF file is generated containing ROC, DET and EPC curves of such a
+A single PDF file is generated containing an EPC as well as ROC and DET plots of such a
 system.
 
 Use the ``--help`` option on the above-cited scripts to find-out about more
