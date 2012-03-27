@@ -151,7 +151,7 @@ do this by using the NumPy_ function :py:attr:`numpy.ndarray.astype`.
   >>> print D.dtype
   uint8
 
-In addition, |project| provides the :py:func:`bob.core.convert` function 
+In addition, |project| provides the :py:func:`bob.core.array.convert` function 
 which allows you to convert/rescale a NumPy_ :py:class:`numpy.ndarray` of a 
 given type into another array, of possibly different type, with re-scaling.
 Typically, this is useful if you want to convert a uint8 2D array (such as a

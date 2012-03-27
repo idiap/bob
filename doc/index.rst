@@ -41,11 +41,7 @@ on licensing, please visit our :doc:`Licensing`.
 
 Enjoy!
 
-.. ifconfig:: todo_include_todos
-
-  Here is a todo list, auto-generated from our sources:
-
-  .. todolist::
+.. todolist::
 
 Overview
 --------

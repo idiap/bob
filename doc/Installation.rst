@@ -73,7 +73,7 @@ Once that is done, installing |project| should be straight forward:
 .. code-block:: sh
 
   $ sudo port selfupdate
-  $ sudo port install bob +python26 +docs
+  $ sudo port install bob +docs
 
 .. Place here references to all citations in lower case
 
