@@ -21,19 +21,19 @@
 =================================
 
 You can use `Blitz`_ arrays as tensor primitives. For a complete description on
-how to use `Blitz`_ arrays, please refer to the `Blitz Manual`_. In this
+how to use `Blitz`_ arrays please refer to the `Blitz Manual`_. In this
 guide we just give a brief introduction to some of Blitz array properties for a
 quick start.
 
 .. note::
   Please refer to :doc:`../../../python/core/doc/ArrayNote` for a
-  detailed list and element type names we support.
+  detailed list and element type names that we support.
 
 Construction
 ------------
 
-Blitz arrays are templates, so you must the element types and the number of
-dimensions are part of the type. Here is how to declare arrays:
+Blitz arrays are templates, so the element types and the number of
+dimensions are all part of the type. Here is how to declare arrays:
 
 .. code-block:: c++
     
