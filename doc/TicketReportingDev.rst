@@ -53,6 +53,7 @@ qualities:
    there. Time spent by the team sorting through different tickets on duplicate
    issues may be time not spent fixing a bug.
 
+The list of known bugs are listed `here <https://github.com/idiap/bob/issues>`_.
 If you don't find an existing ticket about your issue, then you get to file
 one! If you do find an existing ticket about your problem, then it has already
 been reported. This is a good thing. If you wish, you can vote on the ticket by
