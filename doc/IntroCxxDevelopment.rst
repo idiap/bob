@@ -22,6 +22,8 @@
  Introduction to |project| C++ development
 ===========================================
 
+This is an introduction to doing C++ development for |project|.
+
 .. note::
 
    Be sure to familiarize yourself with `CMake`_. We use this tool for
@@ -52,7 +54,7 @@ Compiling the code
 ==================
 
 After you have created your program, open your preferred editor creating a new
-file named ``CMakeLists.txt``, that will drive your compilation. The contents
+file named ``CMakeLists.txt``. This file will drive your compilation. The contents
 of this file should be similar to the model bellow:
 
 .. code-block:: cmake
@@ -62,19 +64,19 @@ of this file should be similar to the model bellow:
    find_package(bob)
    bob_add_executable(my_example "source1.cc;source2.cc" "ip;scanning")
 
-The line that says ``find_package(bob)`` is required. It brings in all needed
-variables to compile bob-based executables, like the location of header
+The line that says ``find_package(bob)`` is required. It brings in all the variables
+needed to compile |project|-based executables, like the location of header
 files, libraries and dependencies. The following line, starting with
 ``bob_add_executable`` is where your code gets cooked together with |project|
-code.  The first parameter defines the executable name you will find on your
+code. The first parameter defines the executable name you will find on your
 prompt after compilation. The second parameter is a `CMake list`_ that contains
 all source files of your program, separated by a semi-colon. The third
 parameter defines the internal |project| package dependencies you need to depend
 on, also separated by semi-colons. It is advisable to only introduce a
-*minimal* set of dependencies you need to compile and link a program.  Bringing
-in more dependencies than you need introduce unexpected behavior.
+*minimal* set of dependencies that you need to compile and link a program.  Bringing
+in more dependencies than you need may introduce unexpected behavior.
 
-After generating the adequate ``CMakeLists.txt`` file for your project, all it
+After generating the adequate ``CMakeLists.txt`` file for your project, all that
 remains is to compile the code. You can do this with these simple steps on your
 prompt:
 
@@ -97,7 +99,7 @@ creates a local target for CMake. The target is named after the first macro
 argument. In the example above, it would be called ``my_example``. You can
 extend the compilation environment and the number of linked libraries (in case
 you need external dependencies) using CMake standard commands like
-`include_directories`_ or `target_link_libraries`_. Example:
+`include_directories`_ or `target_link_libraries`_. For example:
 
 .. code-block:: cmake
 
