@@ -299,7 +299,7 @@ Error Rate) on a set, after setting up |project|, just do:
 
 .. code-block:: sh
 
-  $ eval_threshold.py --scores=development-scores-4col.txt
+  $ bob_eval_threshold.py --scores=development-scores-4col.txt
   Threshold: -0.004787956164
   FAR : 6.731% (35/520)
   FRR : 6.667% (26/390)
@@ -310,22 +310,22 @@ the given set, calculated using such a threshold. The relative counts of FAs
 and FRs are also displayed between parenthesis.
 
 To evaluate the performance of a new score file with a given threshold, use the
-application ``apply_threshold.py``:
+application ``bob_apply_threshold.py``:
 
 .. code-block:: sh
 
-  $ apply_threshold.py --scores=test-scores-4col.txt --threshold=-0.0047879
+  $ bob_apply_threshold.py --scores=test-scores-4col.txt --threshold=-0.0047879
   FAR : 2.115% (11/520)
   FRR : 7.179% (28/390)
   HTER: 4.647%
 
 In this case, only the error figures are presented. You can conduct the
 evaluation and plotting of development and test set data using our combined
-``compute_perf.py`` script. You pass both sets and it does the rest:
+``bob_compute_perf.py`` script. You pass both sets and it does the rest:
 
 .. code-block:: sh
 
-  $ compute_perf.py --devel=development-scores-4col.txt --test=test-scores-4col.txt 
+  $ bob_compute_perf.py --devel=development-scores-4col.txt --test=test-scores-4col.txt 
   [Min. criterium: EER] Threshold on Development set: -4.787956e-03
          | Development     | Test           
   -------+-----------------+------------------

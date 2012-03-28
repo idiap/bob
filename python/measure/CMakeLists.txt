@@ -12,11 +12,11 @@ bob_python_package_bindings(measure "${ccsrc}" "core_array")
 bob_python_add_unittest(measure lib/test/error.py)
 
 # Installs and test our scripts
-bob_python_script(measure compute_perf.py lib/script/compute_perf.py)
-bob_python_add_test(measure compute_perf.py --devel=${CMAKE_CURRENT_SOURCE_DIR}/data/dev-4col.txt --test=${CMAKE_CURRENT_SOURCE_DIR}/data/test-4col.txt  --self-test)
+bob_python_script(measure bob_compute_perf.py lib/script/compute_perf.py)
+bob_python_add_test(measure bob_compute_perf.py --devel=${CMAKE_CURRENT_SOURCE_DIR}/data/dev-4col.txt --test=${CMAKE_CURRENT_SOURCE_DIR}/data/test-4col.txt  --self-test)
 
-bob_python_script(measure eval_threshold.py lib/script/eval_threshold.py)
-bob_python_add_test(measure eval_threshold.py --scores=${CMAKE_CURRENT_SOURCE_DIR}/data/dev-4col.txt --self-test)
+bob_python_script(measure bob_eval_threshold.py lib/script/eval_threshold.py)
+bob_python_add_test(measure bob_eval_threshold.py --scores=${CMAKE_CURRENT_SOURCE_DIR}/data/dev-4col.txt --self-test)
 
-bob_python_script(measure apply_threshold.py lib/script/apply_threshold.py)
-bob_python_add_test(measure apply_threshold.py --scores=${CMAKE_CURRENT_SOURCE_DIR}/data/test-4col.txt --self-test)
+bob_python_script(measure bob_apply_threshold.py lib/script/apply_threshold.py)
+bob_python_add_test(measure bob_apply_threshold.py --scores=${CMAKE_CURRENT_SOURCE_DIR}/data/test-4col.txt --self-test)
