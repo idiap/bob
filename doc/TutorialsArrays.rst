@@ -40,6 +40,13 @@ to convert NumPy_ ndarrays from/to `Blitz++`_. As they are done implicitly, the
 user has no need to care about this aspect and should just use NumPy_ ndarrays
 everywhere.
 
+.. warning::
+
+  On Ubuntu 10.04 LTS, the `Blitz++`_ package shipped with the distribution does 
+  not support more than 2G memory allocation. If you need to be able to use more 
+  memory, you should install a more recent version of `Blitz++`_ on your own.
+  
+
 For an introduction and tutorials about NumPy_ ndarrays, just 
 visit the Numpy_ website.
 
@@ -67,6 +74,7 @@ array with initialized content:
 .. testsetup:: *
 
   import numpy, bob
+  numpy.set_printoptions(precision=3, suppress=True)
 
 .. doctest::
 
@@ -162,9 +170,9 @@ grayscale image) into a float64 2D array with a ``[0,1]`` range.
 
   >>> img = numpy.array([[0,1,2,3,4],[255,254,253,252,251]], dtype='uint8')
   >>> img_d = bob.core.array.convert(img, dtype='float64', dest_range=(0.,1.))
-  >>> print img_d # doctest: +SKIP
-  [[ 0. 0.00392157 0.00784314 0.01176471 0.01568627]
-   [ 1. 0.99607843 0.99215686 0.98823529 0.98431373]]
+  >>> print img_d 
+  [[ 0. 0.004 0.008 0.012 0.016]
+   [ 1. 0.996 0.992 0.988 0.984]]
   >>> print img_d.dtype
   float64
 
@@ -210,8 +218,8 @@ NumPy_ provides numerous mathematical operations. Most of them are performed
   >>> print d
   [4 6 6 4]
   >>> e = numpy.exp(a)
-  >>> print e # doctest: +SKIP
-  [ 2.71828183 7.3890561 20.08553692 54.59815003]
+  >>> print e
+  [ 2.718 7.389 20.086 54.598]
 
 
 NumPy_ also provides reduction operations.
@@ -251,9 +259,9 @@ examples: matrix multiplication and matrix inversion.
    [43 50]]
   >>> import scipy.linalg
   >>> D = scipy.linalg.inv(C) # Computes the inverse of C
-  >>> print D # doctest: +SKIP
-  [[ 12.5   -5.5 ]
-   [-10.75   4.75]]
+  >>> print D
+  [[ 12.5 -5.5 ]
+   [-10.75 4.75]]
 
 Assignment, shallow and deep copy
 ---------------------------------
