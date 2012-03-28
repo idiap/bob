@@ -37,20 +37,20 @@ a complete example that discriminates Iris species based on |project|.
 .. note::
   
   This example will consider all 3 classes for the LDA training. This is *not*
-  what Fisher did on his paper entitled "The Use of Multiple Measurements in
+  what Fisher did in his paper entitled "The Use of Multiple Measurements in
   Taxonomic Problems", Annals of Eugenics, pp. 179-188, 1936. In that work
-  Fisher does the "right" thing only for the first 2-class problem (setosa
+  Fisher did the "right" thing only for the first 2-class problem (setosa
   *versus* versicolor). You can reproduce the 2-class LDA using bob's LDA
-  training system w/o problems. When inserting the virginica class, Fisher
-  decides for a different metric (:math:`4vi + ve - 5se`) and solves  for the
+  training system without problems. When inserting the virginica class, Fisher
+  decides for a different metric (:math:`4vi + ve - 5se`) and solves for the
   matrices in the last row of Table VIII.
 
-  This is OK, but does not generalize the method proposed on the begining of
+  This is OK, but does not generalize the method proposed in the beginning of
   his paper. Results achieved by the generalized LDA method [1]_ will not match
   Fisher's result on that last table, be aware. That being said, the final
   histogram presented on that paper looks quite similar to the one produced by
   this script, showing that Fisher's solution was a good approximation for the
-  generalized LDA implementation available at |project|.
+  generalized LDA implementation available in |project|.
 
 The Iris Dataset
 ----------------
@@ -62,7 +62,7 @@ The Iris Dataset
   import matplotlib
   matplotlib.use('pdf') #non-interactive avoids exception on display
 
-The Iris Dataset is built into the guts of |project|. It is likely the only
+The Iris Dataset is built into |project|. Currently, it is the only
 dataset completely available with the source code (you will need to download
 the other ones yourself as explained at :doc:`TutorialsDatabase`). The
 reference manual for this dataset is available at :py:mod:`bob.db.iris`. The
@@ -138,7 +138,7 @@ At this point the variable ``output`` contains the LDA-projected information as
   ...
 
 Now, the only step missing is the visualization of the results. Fisher proposed
-an histogram showing the separation achieved by looking at the first only.
+the use of a histogram showing the separation achieved by looking at the first only.
 Let's reproduce it.
 
 .. doctest:: iris
@@ -175,7 +175,7 @@ Measuring Performance
 You can measure the performance of the system on classifying, say, *Iris
 Virginica* as compared to the other two variants. We can use the functions in
 :py:mod:`bob.measure` for that purpose. Let's first find a threshold that
-separates this variant from the others. We choose to find the threshold in the
+separates this variant from the others. We choose to find the threshold at the
 point where the relative error rate considering both *Versicolor* and *Setosa*
 variants is the same as for the *Virginica* one.
 
@@ -198,8 +198,8 @@ the rates, we just use :py:mod:`bob.measure` again:
   >>> true_rejects = bob.measure.correctly_classified_negatives(negatives, t)
   >>> true_accepts = bob.measure.correctly_classified_positives(positives, t)
 
-From that you can calculate, for example, the number of misses on the Equal
-Error Rate:
+From that you can calculate, for example, the number of misses at the defined
+threshold "t":
 
 .. doctest:: iris
 

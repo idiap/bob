@@ -25,8 +25,8 @@
 Obtaining the code
 ------------------
 
-To compile |project| locally you need first to set your mind on what to
-work on. You can choose between a released stable version from `Bob's website`
+To compile |project| locally you need to first set your mind on what to
+work with. You can choose between a released stable version from `Bob's website`
 or checkout and build yourself as explained below.
 
 .. warning::
@@ -115,9 +115,9 @@ Troubleshooting compilation
 
 Most of the problems concerning compilation come from not satisfying correctly
 the :ref:`section-dependencies`. Start by double-checking every dependency or
-base OS and check everything is as expected. If you cannot go through, please
-`submit a new bug report`_ in our tracking system. At this time make sure to
-specify your OS version and the versions of the external dependencies so we can
-try to reproduce the failure.
+base OS and check everything is as expected. If after exhausting all of these 
+possibilities you are still unable to compile |project|, please `submit a new bug report`_ 
+in our tracking system. At this time make sure to specify your OS version and the versions 
+of the external dependencies so we can try to reproduce the failure.
 
 .. include:: links.rst
