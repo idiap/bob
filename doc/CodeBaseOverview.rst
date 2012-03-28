@@ -20,7 +20,7 @@
 Code Base Overview
 ------------------
 
-|project| code base is subdivided in packages. Each package may depend on other
+|project| code base is subdivided into packages. Each package may depend on other
 packages to work properly or on external software. There is no notion of
 layering in the software structure. |project| is actually composed of a number
 of re-usable components that can be deployed either separately or jointly
