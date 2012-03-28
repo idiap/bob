@@ -53,16 +53,16 @@ if(VLFEAT_FOUND)
   bob_python_add_unittest(ip lib/test/vldsift.py)
 endif()
 
-bob_python_script(ip facenorm.py lib/script/facenorm.py)
-bob_python_add_test(ip facenorm.py --self-test)
+bob_python_script(ip bob_facenorm.py lib/script/facenorm.py)
+bob_python_add_test(ip bob_facenorm.py --self-test)
 
-bob_python_script(ip tantriggs.py lib/script/tantriggs.py)
-bob_python_add_test(ip tantriggs.py --self-test)
+bob_python_script(ip bob_tantriggs.py lib/script/tantriggs.py)
+bob_python_add_test(ip bob_tantriggs.py --self-test)
 
-bob_python_script(ip blockDCT.py lib/script/blockDCT.py)
-bob_python_add_test(ip blockDCT.py --self-test)
+bob_python_script(ip bob_block_dct.py lib/script/block_dct.py)
+bob_python_add_test(ip bob_block_dct.py --self-test)
 
 # Our examples (run and install)
-bob_python_example(ip optflowHS.py lib/example/optflowHS.py)
-bob_python_add_test(ip optflowHS.py --test
+bob_python_example(ip optflow_hs.py lib/example/optflow_hs.py)
+bob_python_add_test(ip optflow_hs.py --test
   ${CMAKE_CURRENT_SOURCE_DIR}/../io/data/test.mov)
