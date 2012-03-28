@@ -112,7 +112,7 @@ class PLDAMachineTest(unittest.TestCase):
 
     # Saves to file, loads and compares to original
     filename = str(tempfile.mkstemp(".hdf5")[1])
-    m.save(bob.io.HDF5File(filename))
+    m.save(bob.io.HDF5File(filename, 'w'))
     m_loaded = bob.machine.PLDABaseMachine(bob.io.HDF5File(filename))
 
     # Compares the values loaded with the former ones
@@ -188,7 +188,7 @@ class PLDAMachineTest(unittest.TestCase):
 
     # Saves to file, loads and compares to original
     filename = str(tempfile.mkstemp(".hdf5")[1])
-    m.save(bob.io.HDF5File(filename))
+    m.save(bob.io.HDF5File(filename, 'w'))
     m_loaded = bob.machine.PLDAMachine(bob.io.HDF5File(filename))
     m_loaded.plda_base = mb
 

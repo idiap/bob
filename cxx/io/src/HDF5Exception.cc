@@ -131,13 +131,13 @@ io::HDF5StatusError::HDF5StatusError(const std::string& call, herr_t status)
 io::HDF5StatusError::~HDF5StatusError() throw() { }
 
 static std::string format_hdf5_error() {
-  const std::vector<std::string>& stack = io::HDF5Error::get(); 
+  const std::vector<std::string>& stack = io::DefaultHDF5ErrorStack->get();
   std::ostringstream retval;
   std::string prefix(" ");
   if (stack.size()) retval << prefix << stack[0];
   for (size_t i=1; i<stack.size(); ++i) 
     retval << std::endl << prefix << stack[i];
-  io::HDF5Error::clear();
+  io::DefaultHDF5ErrorStack->clear();
   return retval.str();
 }
 

@@ -84,7 +84,7 @@ class HDF5FileTest(unittest.TestCase):
     # Now we create a new binary output file in a temporary location and save
     # the data there.
     tmpname = get_tempfilename()
-    outfile = bob.io.HDF5File(tmpname)
+    outfile = bob.io.HDF5File(tmpname, 'w')
     outfile.append('testdata', arrays)
 
     # Data that is thrown in the file is immediately accessible, so you can
@@ -133,7 +133,7 @@ class HDF5FileTest(unittest.TestCase):
     N = 100 
 
     tmpname = get_tempfilename()
-    outfile = bob.io.HDF5File(tmpname)
+    outfile = bob.io.HDF5File(tmpname, 'w')
 
     data = [bool(int(random.uniform(0,2))) for z in range(N)]
     self.readWriteTest(outfile, 'bool_data', data)
@@ -195,7 +195,7 @@ class HDF5FileTest(unittest.TestCase):
     N = 100 
 
     tmpname = get_tempfilename()
-    outfile = bob.io.HDF5File(tmpname)
+    outfile = bob.io.HDF5File(tmpname, 'w')
 
     data = [int(random.uniform(0,N)) for z in range(N)]
     outfile.append('int_data', data)
@@ -282,7 +282,7 @@ class HDF5FileTest(unittest.TestCase):
   def test08_version(self):
 
     tmpname = get_tempfilename()
-    outfile = bob.io.HDF5File(tmpname)
+    outfile = bob.io.HDF5File(tmpname, 'w')
     self.assertEqual(outfile.version, None)
     outfile.version = 32
     self.assertEqual(outfile.version, 32)

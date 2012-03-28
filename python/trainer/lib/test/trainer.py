@@ -173,7 +173,7 @@ class TrainerTest(unittest.TestCase):
     ml_gmmtrainer = bob.trainer.ML_GMMTrainer(True, True, True)
     ml_gmmtrainer.train(gmm, ar)
 
-    #config = bob.io.HDF5File("gmm_ML.hdf5")
+    #config = bob.io.HDF5File("gmm_ML.hdf5", 'w')
     #gmm.save(config)
 
     gmm_ref = bob.machine.GMMMachine(bob.io.HDF5File("gmm_ML.hdf5"))
@@ -230,7 +230,7 @@ class TrainerTest(unittest.TestCase):
     map_gmmtrainer.set_prior_gmm(gmmprior)
     map_gmmtrainer.train(gmm, ar)
 
-    #config = bob.io.HDF5File("gmm_MAP.hdf5")
+    #config = bob.io.HDF5File("gmm_MAP.hdf5", 'w')
     #gmm.save(config)
     
     gmm_ref = bob.machine.GMMMachine(bob.io.HDF5File("gmm_MAP.hdf5"))

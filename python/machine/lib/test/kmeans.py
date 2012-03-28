@@ -62,7 +62,7 @@ class KMeansMachineTest(unittest.TestCase):
 
     # Loads and saves
     filename = str(tempfile.mkstemp(".hdf5")[1])
-    km.save(bob.io.HDF5File(filename))
+    km.save(bob.io.HDF5File(filename, 'w'))
     km_loaded = bob.machine.KMeansMachine(bob.io.HDF5File(filename))
     self.assertTrue( km == km_loaded )
 

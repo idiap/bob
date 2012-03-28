@@ -123,7 +123,7 @@ class SvmTest(unittest.TestCase):
     del machine
 
     # make sure that the save machine is the same as before
-    machine = bob.machine.SupportVector(bob.io.HDF5File(tmp, 'r'))
+    machine = bob.machine.SupportVector(bob.io.HDF5File(tmp))
     self.assertEqual(machine.shape, (13,1))
     self.assertEqual(machine.kernel_type, bob.machine.svm_kernel_type.RBF)
     self.assertEqual(machine.svm_type, bob.machine.svm_type.C_SVC)

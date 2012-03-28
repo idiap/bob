@@ -209,7 +209,7 @@ def main():
   trainer.train(gmm, ar)
 
   # Save gmm
-  config = bob.io.HDF5File(options.output_file)
+  config = bob.io.HDF5File(options.output_file, 'w')
   gmm.save(config)
 
   if options.test:

@@ -286,9 +286,9 @@ h5::Dataset::Dataset(boost::shared_ptr<h5::Group> parent,
   m_memspace()
 {
   //First, we test to see if we can find the named dataset.
-  io::HDF5Error::mute();
+  io::DefaultHDF5ErrorStack->mute();
   hid_t set_id = H5Dopen2(*parent->location(),m_name.c_str(),H5P_DEFAULT);
-  io::HDF5Error::unmute();
+  io::DefaultHDF5ErrorStack->unmute();
 
   if (set_id < 0) create_dataset(parent, m_name, type, list, compression);
   else H5Dclose(set_id); //close it, will re-open it properly

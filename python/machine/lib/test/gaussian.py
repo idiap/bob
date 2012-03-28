@@ -60,7 +60,7 @@ class GaussianMachineTest(unittest.TestCase):
     
     # Save and read from file
     filename = str(tempfile.mkstemp(".hdf5")[1])
-    g.save(bob.io.HDF5File(filename))
+    g.save(bob.io.HDF5File(filename, 'w'))
     g_loaded = bob.machine.Gaussian(bob.io.HDF5File(filename))
     self.assertTrue( g == g_loaded )
     # Make them different

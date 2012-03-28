@@ -216,7 +216,7 @@ def convert(ifile, ofile, verbose):
   """Runs the full conversion from XML to HDF5"""
 
   machine = load_xml(ifile, verbose)
-  machine.save(bob.io.HDF5File(ofile))
+  machine.save(bob.io.HDF5File(ofile, 'w'))
   if verbose: 
     print "MLP/HDF5 machine saved at %s" % ofile
     print machine

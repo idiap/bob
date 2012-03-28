@@ -128,69 +128,8 @@ namespace bob { namespace io {
 
   };
 
-  /**
-   * Automatic controller for the HDF5 C-API error logger
-   */
-  class HDF5Error {
-
-    public: //api
-      
-      /**
-       * Retrieves the current instance of the error handler
-       */
-      static boost::shared_ptr<HDF5Error> instance();
-
-      /**
-       * Accesses the strings method of the error stack
-       */
-      static inline const std::vector<std::string>& get () {
-        return instance()->stack().get();
-      }
-
-      /**
-       * Accesses the clear method of the error stack
-       */
-      static inline void clear () { instance()->stack().clear(); }
-
-      /**
-       * Mutes the current stack
-       */
-      static inline void mute () { instance()->stack().mute(); }
-
-      /**
-       * Unmutes the current stack
-       */
-      static inline void unmute () { instance()->stack().unmute(); }
-
-      /**
-       * Unmutes the error stack
-       */
-      virtual ~HDF5Error();
-
-      /**
-       * Gets the current stack
-       */
-      inline HDF5ErrorStack& stack() { return m_error; }
-
-    private: //singleton
-
-      static boost::shared_ptr<HDF5Error> s_instance;
-
-      /**
-       * Mutes the default error stack for the current thread
-       */
-      HDF5Error();
-
-      /**
-       * Mutes a specific error stack
-       */
-      HDF5Error(hid_t stack);
-
-    private: //representation
-
-      HDF5ErrorStack m_error; ///< the muted error stack 
-
-  };
+  // Global default HDF5 error stack
+  extern const boost::shared_ptr<HDF5ErrorStack> DefaultHDF5ErrorStack;
 
   /**
    * This class defines the shape type: a counter and a variable-size hsize_t

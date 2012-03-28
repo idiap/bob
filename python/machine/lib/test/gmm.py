@@ -52,7 +52,7 @@ class GMMMachineTest(unittest.TestCase):
 
     # Saves and reads from file
     filename = str(tempfile.mkstemp(".hdf5")[1])
-    gs.save(bob.io.HDF5File(filename))
+    gs.save(bob.io.HDF5File(filename, 'w'))
     gs_loaded = bob.machine.GMMStats(bob.io.HDF5File(filename))
     self.assertTrue( gs == gs_loaded )
     # Makes them different

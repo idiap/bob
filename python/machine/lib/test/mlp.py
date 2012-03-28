@@ -153,7 +153,7 @@ class MLPTest(unittest.TestCase):
     m.biases = biases
 
     # creates a file that will be used in the next test!
-    m.save(bob.io.HDF5File(MACHINE))
+    m.save(bob.io.HDF5File(MACHINE, 'w'))
     m2 = bob.machine.MLP(bob.io.HDF5File(MACHINE))
     
     self.assertEqual(m.shape, m2.shape)

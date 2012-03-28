@@ -36,11 +36,6 @@ namespace io = bob::io;
 namespace ca = bob::core::array;
 
 /**
- * Required initialization by the HDF5 sub-system
- */
-static boost::shared_ptr<io::HDF5Error> init = io::HDF5Error::instance();
-
-/**
  * Read and write arrays in HDF5 format
  */
 class HDF5ArrayFile: public io::File {

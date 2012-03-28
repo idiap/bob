@@ -57,7 +57,7 @@ class MachineTest(unittest.TestCase):
     self.assertTrue( (m.biases == b). all() )
     self.assertEqual(m.activation, bob.machine.Activation.TANH)
     # Save to file
-    # c = bob.io.HDF5File("bla.hdf5")
+    # c = bob.io.HDF5File("bla.hdf5", 'w')
     # m.save(c)
 
     # Start by reading data from a file

@@ -24,6 +24,19 @@
 #include <sstream>
 #include <boost/make_shared.hpp>
 
+/**
+ * MT "lock" support was only introduced in Boost 1.35. Before copying this
+ * very ugly hack, make sure we are still using Boost 1.34. This will no longer
+ * be the case starting January 2011.
+ */
+#include <boost/version.hpp>
+#include <boost/thread/mutex.hpp>
+#if ((BOOST_VERSION / 100) % 1000) > 34
+#include <boost/thread/locks.hpp>
+#else
+#warning Disabling MT locks because Boost < 1.35!
+#endif
+
 #include "io/HDF5Types.h"
 #include "io/HDF5Exception.h"
 
@@ -109,21 +122,10 @@ io::HDF5ErrorStack::~HDF5ErrorStack () {
   H5Eset_auto2(m_stack, m_func, m_client_data);
 }
 
-boost::shared_ptr<io::HDF5Error> io::HDF5Error::s_instance;
-
-boost::shared_ptr<io::HDF5Error> io::HDF5Error::instance() {
-  if (!s_instance) io::HDF5Error::s_instance.reset(new HDF5Error());
-  return s_instance;
-}
-
-io::HDF5Error::HDF5Error (): m_error() {
-}
-
-io::HDF5Error::HDF5Error (hid_t stack): m_error(stack) {
-}
-
-io::HDF5Error::~HDF5Error() {
-}
+//creates a pointer to the default HDF5 error stack that is global to the
+//application level.
+const boost::shared_ptr<io::HDF5ErrorStack>
+  io::DefaultHDF5ErrorStack(new HDF5ErrorStack());
 
 io::HDF5Shape::HDF5Shape (size_t n):
   m_n(n),

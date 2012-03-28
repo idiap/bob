@@ -65,7 +65,7 @@ class JFAMachineTest(unittest.TestCase):
    
     # Saves and loads
     filename = str(tempfile.mkstemp(".hdf5")[1])
-    m.save(bob.io.HDF5File(filename))
+    m.save(bob.io.HDF5File(filename, 'w'))
     m_loaded = bob.machine.JFABaseMachine(bob.io.HDF5File(filename))
     m_loaded.ubm = ubm
     self.assertTrue( m == m_loaded )
@@ -109,7 +109,7 @@ class JFAMachineTest(unittest.TestCase):
 
     # Saves and loads
     filename = str(tempfile.mkstemp(".hdf5")[1])
-    m.save(bob.io.HDF5File(filename))
+    m.save(bob.io.HDF5File(filename, 'w'))
     m_loaded = bob.machine.JFAMachine(bob.io.HDF5File(filename))
     m_loaded.jfa_base = base
     self.assertTrue( m == m_loaded )
@@ -173,7 +173,7 @@ class JFAMachineTest(unittest.TestCase):
 
     # Saves and loads
     filename = str(tempfile.mkstemp(".hdf5")[1])
-    m.save(bob.io.HDF5File(filename))
+    m.save(bob.io.HDF5File(filename, 'w'))
     m_loaded = bob.machine.JFAMachine(bob.io.HDF5File(filename))
     m_loaded.jfa_base = base
     self.assertTrue( m == m_loaded )

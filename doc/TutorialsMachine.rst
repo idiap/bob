@@ -78,7 +78,7 @@ up before the machine can write to it:
 
 .. doctest::
 
-  >>> myh5_file = bob.io.HDF5File('linear.hdf5')
+  >>> myh5_file = bob.io.HDF5File('linear.hdf5', 't')
   >>> #do other operations on myh5_file to set it up, optionally
   >>> machine.save(myh5_file)
   >>> del myh5_file #close

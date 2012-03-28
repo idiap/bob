@@ -70,7 +70,7 @@ Let's take a look at how to write simple scalar data such as integers or floats.
 
    >>> an_integer = 5
    >>> a_float = 3.1416
-   >>> f = bob.io.HDF5File('testfile1.hdf5')
+   >>> f = bob.io.HDF5File('testfile1.hdf5', 'w')
    >>> f.set('my_integer', an_integer)
    >>> f.set('my_float', a_float)
    >>> del f
@@ -119,7 +119,7 @@ directory like this:
 
 .. doctest::
 
-  >>> f = bob.io.HDF5File('testfile1.hdf5')
+  >>> f = bob.io.HDF5File('testfile1.hdf5', 'w')
   >>> f.create_group('/test')
   >>> f.set('/test/my_float', 6.28, dtype='float32')
   >>> del f
@@ -164,7 +164,7 @@ all the type information we need to write and read them correctly. Here is an ex
 .. doctest::
 
   >>> A = numpy.array(range(4), 'int8').reshape(2,2)
-  >>> f = bob.io.HDF5File('testfile1.hdf5')
+  >>> f = bob.io.HDF5File('testfile1.hdf5', 'w')
   >>> f.set('my_array', A)
   >>> del f
 
@@ -199,7 +199,7 @@ be using :py:meth:`bob.io.HDF5File.lread()` instead. Here is an example:
 
 .. doctest::
 
-  >>> f = bob.io.HDF5File('testfile1.hdf5', 'r') #read only
+  >>> f = bob.io.HDF5File('testfile1.hdf5') #read only
   >>> f.read('my_integer') #reads integer
   5
   >>> print f.read('my_array') # reads the array
@@ -214,7 +214,7 @@ the case when you write lists of variables to a dataset.
 
 .. doctest::
 
-  >>> f = bob.io.HDF5File('testfile2.hdf5')
+  >>> f = bob.io.HDF5File('testfile2.hdf5', 'w')
   >>> f.append('arrayset', numpy.array(range(10), 'float64'))
   >>> f.append('arrayset', 2*numpy.array(range(10), 'float64'))
   >>> f.append('arrayset', 3*numpy.array(range(10), 'float64'))
@@ -249,7 +249,7 @@ shot:
 
 .. doctest::
   
-  >>> f = bob.io.HDF5File('testfile2.hdf5', 'r')
+  >>> f = bob.io.HDF5File('testfile2.hdf5')
   >>> print f.read('arrayset')
   [[  0.   1.   2.   3.   4.   5.   6.   7.   8.   9.]
    [  0.   2.   4.   6.   8.  10.  12.  14.  16.  18.]
