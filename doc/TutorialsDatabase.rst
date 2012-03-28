@@ -21,7 +21,9 @@
 **********
 
 |project| provides an API to easily query and interface with well known
-biometric databases. A database contains information about the organization
+databases. Most of the examples we provide are for biometric databases though 
+|project| is not at all limited to these kinds of databases. 
+A database contains information about the organization
 of the files, functions to query information such as the data which might be
 used for training a model, but it does **not** contain the data itself.
 Most of the databases are stored in a sqlite_ file, whereas the smallest 

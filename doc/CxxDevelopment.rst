@@ -24,10 +24,8 @@
 
 .. todo::
 
-  Include a new C++ Reference section (rename current section to Python Reference), and link to it from here?
+  Include a new C++ Reference section (rename current section to Python Reference), and link to it from here? --> link to doxygen at ../../doxygen/
 
-The core components of |project| are implemented in C++ for speed. 
-Python bindings are provided to the underlying C++ code for the convenience of the user.
 In the following sections you will find more information on how to use and develop the components of |project| that are written in C++.
 
 .. toctree::

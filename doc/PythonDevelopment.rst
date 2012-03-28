@@ -20,9 +20,7 @@
  Python development
 ====================
 
-.. todo:: 
-
-  Describe when a developer should write in Python rather than C++. Briefly describe what a python binding is, and link to that section (:doc:`PythonBindingsDevelopment`)
+.. _section-python-coding-guidelines:
 
 Python Coding Guidelines
 ------------------------

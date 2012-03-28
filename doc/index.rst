@@ -26,7 +26,7 @@
 
 |project| is a free signal-processing and machine learning toolbox 
 developed by the Biometrics group at `Idiap`_ Research Institute, Switzerland. The toolbox is
-written in a mix of `Python`_ and `C++` and is designed to be both efficient
+written in a mix of `Python`_ and `C++`_ and is designed to be both efficient
 and to reduce development time. 
 
 * To learn about this project's motivations and history, visit :doc:`Motivation`. 
@@ -82,6 +82,7 @@ Developer's Guide
 .. toctree::
    :maxdepth: 2
 
+   Community
    Motivation
    CodeBaseOverview
    Dependencies
