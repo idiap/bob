@@ -22,6 +22,8 @@
  Dependencies
 ==============
 
+Below we provide a list of dependencies for |project|.
+
 .. warning::
    If you are at Idiap you **don't** need to install these dependencies.
    Instead, follow `Bob's Idiap Guide`_ (special instructions for Idiap users).
@@ -31,7 +33,7 @@ List of dependencies
 
 This is a listing of current |project| dependencies showing minimum required
 versions where relevant and the respective project licenses. When a project is
-covered by multiple licenses, we show which we are presently using (using
+covered by multiple licenses, we show which one we are presently using (using
 **bold** face). The following sections have detailed information on why the
 dependence is required for the project and installation instructions for
 specific platforms.
@@ -149,18 +151,18 @@ Core dependencies
   64-bit fixes'''. Also note that Blitz++ does not support 64-bit array
   indexing, so the maximum amount of positions in a single dimension is limited
   to 2^31^  (that is what fits in an signed integer), even if you decide to use
-  the CVS version. This is true to the date (18/January/2011);
-* `Lapack`_: We use this library for mathematical operations
-  on vectors and matrices. Any modern version of this library will do;
-* `FFTW`_: Provides fast computation of Fourier, Sine and Cosine transforms
+  the CVS version. This is true to the date (18/January/2011).
+* `Lapack`_: we use this library for mathematical operations
+  on vectors and matrices. Any modern version of this library will do.
+* `FFTW`_: provides fast computation of Fourier, Sine and Cosine transforms
 * `Boost`_: is used for our unit test framework and python bindings. Any
-  version superior to 1.34 will work;
+  version superior to 1.34 will work.
 * `Python`_: if you want to compile our python bindings we recommend using
-  Python 2.5 or up;
+  Python 2.5 or up.
 * `NumPy`_: this dependence is used to bridge blitz::Arrays to python.
-* `Scipy`_: A set of scientific-related python-based utilities
-* `Matplotlib`_: A `MATLAB`_-like python plotting environment
-* `Qt4`_: This library is used as the basis for the face detection and
+* `Scipy`_: a set of scientific-related python-based utilities.
+* `Matplotlib`_: a `MATLAB`_-like python plotting environment.
+* `Qt4`_: this library is used as the basis for the face detection and
   localization framework (Visioner). This dependence is *optional*. Face
   localization and detection will only be compiled if you have that installed.
 * `argparse`_: is used for argument parsing in some of our python utilities. If
@@ -170,7 +172,7 @@ Core dependencies
 Data access
 -----------
 
-* `SqlAlchemy`_: A Python SQL toolkit and Object Relational Mapper. This is
+* `SqlAlchemy`_: a Python SQL toolkit and Object Relational Mapper. This is
   used for storing and querying more complex databases. You need at least
   version 0.5.
 * `FFMpeg`_: is used to give bob support for input and output videos.
@@ -178,7 +180,7 @@ Data access
   superior because of licensing incompatibilities. That being said, for
   '''private development''', you can use version 0.5.1 and above. bob will
   work seemlessly. Please note that if you decide to distribute bob compiled
-  with a version of ffmpeg prior to 0.6, then the whole package becomes GPL'ed;
+  with a version of ffmpeg prior to 0.6, then the whole package becomes GPL'ed.
 * `ImageMagick`_: is used for reading and writing image output. We
   currently compile against version 6.6.7, but other versions should work.
   Please note we make use of the C++ API (a.k.a. ImageMagick++).
@@ -202,9 +204,9 @@ These are packages you need for compiling |project|, but do not depend at
 during runtime.
 
 * `Git`_: is used as our version control system. You need it if you want to
-  perform a fresh checkout of sources beforem compiling;
+  perform a fresh checkout of sources beforem compiling.
 * `CMake`_: is used to build bob and to compile examples. You need at
-  least version 2.8;
+  least version 2.8.
 * `Google Perftools`_: if you want to compile profiling extensions. We have
   used version 1.6, but version 1.5 will do the work as well. Please note that
   the use of this package is optional.
@@ -234,12 +236,12 @@ Extra packages we recommend
 
 These are packages that are *not* required to compile or run bob examples,
 but make a nice complement to the installation and provides you with the
-ability to plot and interact with bob:
+ability to plot and interact with bob.
 
-* `IPython`_: A powerful replacement for your python shell that provides bells
-  and whistles
-* `LIBSVM`_: A software framework for support vector classification
-* `OpenCV`_: A Computer Vision library which is currently used by the 
+* `IPython`_: a powerful replacement for your python shell that provides bells
+  and whistles.
+* `LIBSVM`_: a software framework for support vector classification.
+* `OpenCV`_: a Computer Vision library which is currently used by the 
   |project| Data Acquisition module.
 
 Notes for specific platforms
@@ -309,7 +311,7 @@ hear from you! If you have a success story or problems `submit a new bug
 report`_.
 
 This recipe assumes you have already gone through the standard,
-well-documented, `MacPorts installation instructions`_ and has a prompt just in
+well-documented, `MacPorts installation instructions`_ and have a prompt just in
 front of you and a checkout of bob you want to try out. Then, just do, at your
 shell prompt:
 
