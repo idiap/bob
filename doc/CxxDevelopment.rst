@@ -22,10 +22,6 @@
  C++ development
 =================
 
-.. todo::
-
-  Include a new C++ Reference section (rename current section to Python Reference), and link to it from here? --> link to doxygen at ../../doxygen/
-
 In the following sections you will find more information on how to use and develop the components of |project| that are written in C++.
 
 .. toctree::
@@ -35,6 +31,7 @@ In the following sections you will find more information on how to use and devel
    CxxCoreUsingBlitzArrays
    CxxCoreErrorReporting
    GuidelinesCxxDevelopment
+   CxxReference
 
 .. include:: links.rst
 

@@ -17,7 +17,7 @@
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =================================
- Using Blitz Arrays in |project|
+ Using Blitz arrays in |project|
 =================================
 
 You can use `Blitz`_ arrays as tensor primitives. For a complete description on

@@ -30,7 +30,7 @@ from the data. This is the role of what is referred to as a `trainer` in
 |project|. Some `machines` might be trained using different techniques. 
 For instance, the projection matrix :math:`\mathbf{W}` of a 
 :py:class:`bob.machine.LinearMachine` could be learned using 
-Principal Component Analysis (**PCA** [1]_) or Linear Discriminant Analysis 
+Principal component analysis (**PCA** [1]_) or Linear discriminant analysis 
 (**LDA** [2]_).
 
 .. testsetup:: *
@@ -39,7 +39,7 @@ Principal Component Analysis (**PCA** [1]_) or Linear Discriminant Analysis
    import numpy
 
 
-Principal Component Analysis
+Principal component analysis
 ============================
 
 **PCA** [1]_ is one way to train a :py:class:`bob.machine.LinearMachine`. The
@@ -93,7 +93,7 @@ Next, input data can be projected using this learned projection matrix
    [ 9.99868456 0.47009678 0.09187563]
 
 
-Linear Discrimant Analysis
+Linear discrimant analysis
 ==========================
 
 **LDA** [2]_ is another way to train a :py:class:`bob.machine.LinearMachine`. 
@@ -142,7 +142,7 @@ for **PCA**. This is shown below.
     [ 0.11323656]]
 
 
-Neural Networks: Multi-layer Perceptrons (MLP)
+Neural networks: multi-layer perceptrons (MLP)
 ==============================================
 
 A **multilayer perceptron** (MLP) [3]_ is a neural network architecture that 
@@ -197,7 +197,7 @@ overall training procedure remains identical.
    >>> trainer.train(machine, d0, t0) 
 
 
-Support Vector Machines
+Support vector machines
 =======================
 
 .. ifconfig:: not has_libsvm
@@ -207,7 +207,7 @@ Support Vector Machines
     LIBSVM was not found when this documentation has been generated.
 
 
-A **Support Vector Machine** (SVM) [6]_ is a very popular `supervised` learning 
+A **support vector machine** (SVM) [6]_ is a very popular `supervised` learning 
 technique. |project| provides a bridge to `LIBSVM`_ which allows you to `train`
 such a `machine` and use it for classification. 
 
@@ -298,7 +298,7 @@ instead, this can be set before calling the
      >>> trainer.kernel_type = bob.machine.svm_kernel_type.LINEAR
 
 
-k-means
+K-means
 =======
 
 **k-means** [7]_ is a clustering method, which aims to partition a 
@@ -350,7 +350,7 @@ then be called.
     [  3.5 -3.5   99. ]]  
 
 
-Maximum Likelihood for Gaussian Mixture Model
+Maximum likelihood for Gaussian mixture model
 =============================================
 
 A Gaussian **mixture model** (GMM) [9]_ is a common probabilistic model. In 
@@ -384,7 +384,7 @@ used to determine if the parameters have converged.
    >>> print gmm # doctest: +SKIP
 
 
-MAP-adaptation for Gaussian Mixture Model
+MAP-adaptation for Gaussian mixture model
 =========================================
 
 |project| also supports the training of GMMs [9]_ using a **maximum a posteriori** (MAP) 
