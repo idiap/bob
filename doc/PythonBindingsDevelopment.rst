@@ -20,17 +20,16 @@
  Python bindings to C++ code
 =============================
 
-Since there are two programming languages (with major differences in their concepts)
-there need to be functionality to access classes and functions from on language in
-the other one. To access the C++ functions and classes in python code, they need to 
-be **bound**.
+`Python`_ was chosen to be the lab-like environment. With this in mind we needed to
+expose the functionality of the C++ functions to `Python`_. To do this we use a set
+of bindings, we provide an overview of these bindings below.
 
 
 Binding functions
 ~~~~~~~~~~~~~~~~~
 
 For many practical reasons we decided to use `Boost.Python`_ to do the bindings. 
-`Boost.Python`_ allows to selectively expose C++ functionality to python. Imagine,
+`Boost.Python`_ allows to selectively expose C++ functionality to `Python`_. Imagine,
 you have a C++ function:
 
 .. code-block:: c++
@@ -72,16 +71,16 @@ and make sure that it is compiled by adding the according file into the
 
   <bob_src_root>/python/<module>/CMakeLists.txt
 
-There are two more things to note:
+There are two more things to note.
 
 * The parameter list of the bound function is given in parentheses. This is 
-  especially required, when there is more than one parameter (see example below). 
+  very important when there is more than one parameter (see example below). 
   Defining default parameters is possible, but this is not shown in this example.
 
-* The above definition of the function does neither specify the type of the 
+* The above definition of the function does not specify the type of the 
   parameter nor the return type of the function. The types will be determined during
   runtime, and a python exception will be risen if the conversion does not work.
-  For the simple types, `Boost.Python`_ provides automatic python/C++ type conversion.
+  For the simple types, `Boost.Python`_ provides automatic Python/C++ type conversion.
   For some more complicated types like `NumPy`_ ndarray's, |project| provides functions
   to bind them to `blitz`_ Array's:
 
@@ -97,7 +96,7 @@ There are two more things to note:
     "Description of the bar function."
   );
   
-Using this function in python is straightforward. Simply create an ndarray and call it.
+Using this function in `Python`_ is straightforward. Simply create an ndarray and call it.
 
 .. code-block:: py
 
@@ -105,11 +104,12 @@ Using this function in python is straightforward. Simply create an ndarray and c
   >>> result = bar ( input )
   
 Note that both the data type and the dimensionality of the ndarray must fit to the ones
-specified by the C++ foo() function, otherwise python will throw an exception.
+specified by the C++ foo() function, otherwise Python will throw an exception.
 
 Usually, C++ functions operate on given input data and return output data. One important
-issue is the memory allocation. To avoid memory leaks, it is most save to allocate the 
-memory in the python side and give input and output data as parameters to the function:
+issue is the memory allocation. To avoid memory leaks, it is usually better to allocate the 
+memory explicitly in Python and to give both the input and output data as parameters to the 
+bound C++ function:
 
 .. code-block:: c++
 
@@ -121,7 +121,7 @@ memory in the python side and give input and output data as parameters to the fu
   >>> foobar ( input, output )
 
 
-Hence, when you write C++ functions that should be bound to python, design the functions
+Hence, when you write C++ functions that should be bound to Python, design the functions
 not to allocate and return objects (other than simple types), but rather to operate on
 given data.
 
@@ -168,7 +168,7 @@ Suppose you have the following C++ class:
     int bar_;
   };
   
-So, you start writing the class definition:
+You would start writing the class definition:
 
 .. code-block:: c++
 
@@ -186,9 +186,9 @@ So, you start writing the class definition:
     )
   ) // no semicolon here since we want to extend this class
 
-Now, you add the bound_function. Since this will become a python method, the first argument is
+Now, you add the bound_function. Since this will become a Python method, the first argument is
 always **self** (i.e., **this** in C++). Often, C++ functions are bound to the special __call__
-python function, which mimics the **operator ()** behaviour in C++:
+Python function, which mimics the **operator ()** behaviour in C++:
 
 .. code-block:: c++
 
@@ -199,8 +199,8 @@ python function, which mimics the **operator ()** behaviour in C++:
     "Executes the Foo class on the given input and writes the given output"
   ) // No semicolon here either
 
-Also, data members can be bound to the python class. One way to do this is to use the 
-getter and setter functions that are provided by the class:
+Also, data members can be bound to the Python class. One way to do this is to use the 
+get and set functions that are provided by the class:
 
 .. code-block:: c++
 
@@ -215,7 +215,7 @@ getter and setter functions that are provided by the class:
     "The bar member defines, how the __call__ function is executed"
   ); // This semicolon ends the class definition
 
-On the python side, this class can now be easily be used:
+On the Python side, this class can now be easily be used:
 
 .. code-block:: py
 
@@ -226,14 +226,14 @@ On the python side, this class can now be easily be used:
   >>> # execute the __call__ function
   >>> foo ( input, output )
 
-Finally, to get information about the class, you can use python's help function:
+Finally, to get information about the class, you can use Python's help function:
 
 .. code-block:: py
 
   >>> help ( foo )
   
 which will include (amongst some documentation added by `Boost.Python`_) the 
-descriptions that you were adding in the bindings.
+descriptions that were added in the bindings.
 
 
 .. include:: links.rst
