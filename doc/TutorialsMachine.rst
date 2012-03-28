@@ -43,7 +43,7 @@ machines: a :py:class:`bob.machine.LinearMachine`.
    temp_dir = tempfile.mkdtemp(prefix='bob_doctest_')
    os.chdir(temp_dir)
 
-Linear Machine
+Linear machine
 ==============
 
 This machine executes the simple operation :math:`y = \mathbf{W} x`, where `y`
@@ -135,7 +135,7 @@ To set a new value for `s` or `d` just assign the desired machine property:
 You will find interesting ways to train a :py:class:`bob.machine.LinearMachine`
 so they can do something useful for you at :doc:`TutorialsTrainer`.
 
-Neural Networks: Multi-layer Perceptrons (MLP)
+Neural networks: multi-layer perceptrons (MLP)
 ==============================================
 
 A `multi-layer perceptron <http://en.wikipedia.org/wiki/Multilayer_perceptron>`_ (MLP)
@@ -217,7 +217,7 @@ a :py:class:`bob.machine.LinearMachine`:
   >>> mlp(numpy.array([0.1, -0.1, 0.2], 'float64'))
   array([ 0.33])
 
-Support Vector Machines
+Support vector machines
 =======================
 
 .. ifconfig:: not has_libsvm
@@ -387,7 +387,7 @@ publication, be sure to also cite:
   }
 
 
-k-means Machines
+K-means machines
 ================
 
 `k-means <http://en.wikipedia.org/wiki/K-means_clustering>`_ is a clustering 
@@ -413,7 +413,7 @@ data is the closest as well as the min distance.
    (0, 6.0)
 
 
-Gaussian Machines
+Gaussian machines
 =================
 
 The :py:class:`bob.machine.Gaussian` represents a `multivariate diagonal

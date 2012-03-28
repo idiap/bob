@@ -52,7 +52,7 @@ a complete example that discriminates Iris species based on |project|.
   this script, showing that Fisher's solution was a good approximation for the
   generalized LDA implementation available in |project|.
 
-The Iris Dataset
+The Iris dataset
 ----------------
 
 .. testsetup:: iris
@@ -62,7 +62,7 @@ The Iris Dataset
   import matplotlib
   matplotlib.use('pdf') #non-interactive avoids exception on display
 
-The Iris Dataset is built into |project|. Currently, it is the only
+The Iris dataset is built into |project|. Currently, it is the only
 dataset completely available with the source code (you will need to download
 the other ones yourself as explained at :doc:`TutorialsDatabase`). The
 reference manual for this dataset is available at :py:mod:`bob.db.iris`. The
@@ -85,7 +85,7 @@ Training a :py:class:`bob.machine.LinearMachine` with LDA
 ---------------------------------------------------------
 
 Creating a :py:class:`bob.machine.LinearMachine` to perform Linear Discriminant
-Analysis on the Iris Dataset involves using the
+Analysis on the Iris dataset involves using the
 :py:class:`bob.trainer.FisherLDATrainer`, as introduced at
 :doc:`TutorialsTrainer`.
 
@@ -112,7 +112,7 @@ perform LDA on the Iris dataset. A few things should be noted:
    for our LDA implementation, in case you would like to use them. For this
    example, we just discard this information.
 
-Looking at the First LDA Component
+Looking at the first LDA component
 ----------------------------------
 
 To reproduce Fisher's results, we must pass the data through the created
@@ -169,7 +169,7 @@ You should see an image like this:
 
 .. plot:: plot/iris_lda.py
 
-Measuring Performance
+Measuring performance
 ---------------------
 
 You can measure the performance of the system on classifying, say, *Iris

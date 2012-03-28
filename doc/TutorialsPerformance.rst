@@ -285,7 +285,7 @@ look at the implementations at :py:mod:`bob.measure.plot` to understand how
 to use the |project| methods to compute the curves and interlace that in the
 way that best suits you.
 
-Full Applications
+Full applications
 -----------------
 
 We do provide a few scripts that can be used to quickly evaluate a set of

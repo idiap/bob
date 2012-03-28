@@ -21,7 +21,7 @@
 .. _section-cxx-coding-guidelines:
 
 =====================
-C++ Coding Guidelines
+C++ coding guidelines
 =====================
 
 * `C++ FAQ`_: A must if you want to write reliable code

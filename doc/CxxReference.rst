@@ -1,6 +1,6 @@
 .. vim: set fileencoding=utf-8 :
 .. Roy Wallace
-.. 27 Mar 2012
+.. 28 Mar 2012
 .. 
 .. Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
 .. 
@@ -16,22 +16,13 @@
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-====================
- Python development
-====================
+===============
+ C++ reference
+===============
 
-.. _section-python-coding-guidelines:
-
-Python coding guidelines
-------------------------
-
-* Try to follow `The Google Python Style Guide`_
-* Class names usually start with an upper-case character and use CamelCase to 
-  combine words. Function names (global functions or public class methods) start 
-  with a lower-case character and words are combined\_with\_underscores. If you
-  write use private functions, please assure that they start with an underscore.
-
+For a reference of `C++`_ classes, methods, etc., implemented in |project|, please see the `Doxygen`_ reference `here <../../../doxygen/html/index.html>`_.
 
 .. include:: links.rst
-.. _`the google python style guide`: http://google-styleguide.googlecode.com/svn/trunk/pyguide.html
+
+.. Place here references to all citations in lower case
 

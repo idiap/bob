@@ -492,7 +492,7 @@ library. However, complex data such as MATLAB_ structures are not supported.
 Be aware that MATLAB_ also supports the HDF5_ file format. For more 
 details, please have a look at :doc:`TutorialsIO`.
 
-Random Number Generation
+Random number generation
 ========================
 
 We have developed a set of bridges to the `Boost Random Number Generation`_
