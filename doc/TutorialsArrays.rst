@@ -210,7 +210,7 @@ NumPy_ provides numerous mathematical operations. Most of them are performed
   >>> print d
   [4 6 6 4]
   >>> e = numpy.exp(a)
-  >>> print e
+  >>> print e # doctest: +SKIP
   [ 2.71828183 7.3890561 20.08553692 54.59815003]
 
 
