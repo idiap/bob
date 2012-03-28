@@ -29,7 +29,7 @@ Python coding guidelines
 * Class names usually start with an upper-case character and use CamelCase to 
   combine words. Function names (global functions or public class methods) start 
   with a lower-case character and words are combined\_with\_underscores. If you
-  write use private functions, please assure that they start with an underscore.
+  have private functions, please assure that they start with an underscore.
 
 
 .. include:: links.rst
