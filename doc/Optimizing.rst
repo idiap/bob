@@ -17,7 +17,7 @@
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ============================================
- How to profile and optimize |project| code
+ How to Profile and Optimize |project| Code
 ============================================
 
 Consider profiling your code **before** optimizing it. Optimization based on

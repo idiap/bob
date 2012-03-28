@@ -38,7 +38,7 @@ covered by multiple licenses, we show which one we are presently using (using
 dependence is required for the project and installation instructions for
 specific platforms.
 
-Required at Runtime
+Required at runtime
 -------------------
 
 +----------------------+--------------+---------------------------------------+
@@ -71,7 +71,7 @@ Required at Runtime
 | `argparse`_          | 1.2          | `Python-2.0`_                         |
 +----------------------+--------------+---------------------------------------+
 
-Strongly Recommended Add-Ons
+Strongly recommended add-ons
 ----------------------------
 
 +----------------------+--------------+----------------------------------------------+
@@ -90,7 +90,7 @@ Strongly Recommended Add-Ons
 | `LIBSVM`_            | 2.89+        | `BSD-3-Clause`_                              |
 +----------------------+--------------+----------------------------------------------+
 
-Build Dependencies
+Build dependencies
 ------------------
 
 +----------------------+--------------+------------------+
@@ -109,7 +109,7 @@ Build Dependencies
 | `Dvipng`_            | 1.12?        | `GPL-3.0`_       |
 +----------------------+--------------+------------------+
 
-Recommended Software
+Recommended software
 --------------------
 
 +----------------------+--------------+------------------+

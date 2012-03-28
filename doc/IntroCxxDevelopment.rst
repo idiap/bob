@@ -91,7 +91,7 @@ prompt:
    experience any problems with running cmake, it is recommended to first
    remove this cache file and try again.
 
-Special case: Introducing external header files and libraries
+Special case: introducing external header files and libraries
 =============================================================
 
 The line that starts with ``bob_add_executable`` is just a CMake macro that
