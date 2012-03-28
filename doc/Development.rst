@@ -19,7 +19,7 @@
 .. _section-development:
 
 =======================
- |project| development
+ |project| Development
 =======================
 
 The core components of |project| are implemented in C++ for speed. 

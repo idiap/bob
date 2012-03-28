@@ -213,7 +213,7 @@ It is possible, for instance, that somebody decides to throw away "info"-style
 messages within their application. **Do not rely on messages to have problems
 fixed!** If you think something is wrong and should never happen, it may be
 more appropriate to throw an exception. Please read the section named "Case
-Study" bellow to understand when to make use of exceptions as an error
+study" bellow to understand when to make use of exceptions as an error
 reporting mechanism for your code.
 
 How to configure streams
@@ -245,7 +245,7 @@ ultimatately responsible for deciding how to display the messages.
 
 .. _case-study:
 
-Case Study
+Case study
 ----------
 
 Library developer

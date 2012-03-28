@@ -19,7 +19,7 @@
 .. _section-contributing:
 
 ========================================
- Contributing to the |project| project
+ Contributing to the |project| Project
 ========================================
 
 We're really glad you'd like to join the |project| team!
