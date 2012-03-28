@@ -23,20 +23,19 @@
 We started developing |project| because of a common need in many research
 laboratories like ours: the need to have a software platform where stable 
 algorithms and common tools could be stored, easily shared and maintained. 
-We quickly realised the importance of such a platform, the ability to have
+We quickly realised the importance of such a platform, having a set of
 common algorithms and tools in one central repository with good documentation 
 greatly improved our efficiency by allowing us to not only more easily share 
 our code but also to allow new people (and external parties) to get up to speed
-and collaborate easily! With this in mind we have tried to maintain and improve
+and collaborate much more easily! With this in mind we have tried to maintain and improve
 the functionality of |project| with the following ideas in mind.
 
 * All modifications and improvements are thoroughly tested at every minor
   change: correctness comes first, whereas speed is a bonus. This is not to
   say |project| is not fast enough - it is! But we do not sacrifice the 
-  readability and maintainability of our code for a few microseconds of
-  efficiency. We are constantly inspecting the code and making sure other
-  people (mainly beginners and new students) can understand what it is that our
-  programs do.
+  readability and maintainability of our code for efficiency. We are constantly inspecting 
+  the code and making sure that other people (mainly beginners and new students) can understand 
+  what it is that our programs do.
 * Reproducing publications should be dead-simple. If that is not the case, the
   potential impact becomes severely compromised. We try to develop |project| so
   that our own research results are easy to reproduce and understand.
