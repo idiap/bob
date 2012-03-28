@@ -30,14 +30,14 @@ bob_python_package_bindings(trainer "${ccsrc}" "core_array")
 bob_python_subpackage_bindings(trainer overload "${ccsrc_overload}" "core_array")
 
 # Installs and test our scripts
-bob_python_script(trainer gmm_train.py lib/script/gmm/train.py)
-bob_python_add_test(trainer gmm_train.py --self-test)
+bob_python_script(trainer bob_gmm_train.py lib/script/gmm/train.py)
+bob_python_add_test(trainer bob_gmm_train.py --self-test)
 
-bob_python_script(trainer gmm_adapt.py lib/script/gmm/adapt.py)
-#bob_python_add_test(trainer gmm_adapt.py) ##??
+bob_python_script(trainer bob_gmm_adapt.py lib/script/gmm/adapt.py)
+#bob_python_add_test(trainer bob_gmm_adapt.py) ##??
 
-bob_python_script(trainer gmm_test.py lib/script/gmm/test.py)
-#bob_python_add_test(trainer gmm_test.py) ##??
+bob_python_script(trainer bob_gmm_test.py lib/script/gmm/test.py)
+#bob_python_add_test(trainer bob_gmm_test.py) ##??
 
 # Our test units
 bob_python_add_unittest(trainer lib/test/trainer.py)
