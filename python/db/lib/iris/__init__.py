@@ -48,7 +48,7 @@ stats = {
 stat_names = ['Minimum', 'Maximum', 'Mean', 'Std.Dev.', 'Correlation']
 """These are the statistics available in each column of the stats variable."""
 
-# Use this variable to tell dbmanage.py all driver that there is nothing to
+# Use this variable to tell bob_dbmanage.py all driver that there is nothing to
 # download for this database.
 __builtin__ = True
 

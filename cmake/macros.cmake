@@ -82,7 +82,6 @@ macro(bob_benchmark package name src)
 
   add_executable(${progname} ${src})
   target_link_libraries(${progname} bob_${package})
-  install(TARGETS ${progname} RUNTIME DESTINATION ${bindir})
 endmacro()
 
 #################

@@ -29,22 +29,22 @@ bob_setup_db(scface)
 bob_setup_db(xm2vts)
 
 # Installs our script driver
-bob_python_script(db "dbmanage.py" "lib/script/dbmanage.py" "main")
+bob_python_script(db "bob_dbmanage.py" "lib/script/dbmanage.py" "main")
 
 # Iris database driver and example tests
-bob_python_add_test(db-iris-dump dbmanage.py iris dump --self-test)
-bob_python_add_test(db-iris-dump-2 dbmanage.py iris dump --class=versicolor --self-test)
+bob_python_add_test(db-iris-dump bob_dbmanage.py iris dump --self-test)
+bob_python_add_test(db-iris-dump-2 bob_dbmanage.py iris dump --class=versicolor --self-test)
 
 # Replay attack database driver tests.
 bob_python_add_dependent_test(db-replay-dumplist python-db-replay-create
-  dbmanage.py replay dumplist --self-test)
+  bob_dbmanage.py replay dumplist --self-test)
 
 bob_python_add_dependent_test(db-replay-dumplist2 python-db-replay-create
-  dbmanage.py replay dumplist --class=attack --group=devel --support=hand --protocol=highdef --self-test)
+  bob_dbmanage.py replay dumplist --class=attack --group=devel --support=hand --protocol=highdef --self-test)
 
 # Just check functionality
 bob_python_add_dependent_test(db-replay-checkfiles python-db-replay-create
-  dbmanage.py replay checkfiles --self-test)
+  bob_dbmanage.py replay checkfiles --self-test)
 
 bob_python_add_unittest(db lib/test/replay.py)
 set_property(TEST python-db-replay-main APPEND PROPERTY DEPENDS
@@ -55,98 +55,98 @@ set_property(TEST python-db-replay-main APPEND PROPERTY DEPENDS
 
 # BANCA database driver tests.
 bob_python_add_dependent_test(db-banca-dumplist python-db-banca-create
-  dbmanage.py banca dumplist --self-test)
+  bob_dbmanage.py banca dumplist --self-test)
 
 bob_python_add_dependent_test(db-banca-dumplist2 python-db-banca-create
-  dbmanage.py banca dumplist --protocol=P --classes=client --groups=g1 --purposes=enrol --self-test)
+  bob_dbmanage.py banca dumplist --protocol=P --classes=client --groups=g1 --purposes=enrol --self-test)
 
 bob_python_add_dependent_test(db-banca-checkfiles python-db-banca-create
-  dbmanage.py banca checkfiles --self-test)
+  bob_dbmanage.py banca checkfiles --self-test)
 
 # BANCA_SMALL database driver tests.
 bob_python_add_dependent_test(db-banca_small-dumplist
   python-db-banca_small-create
-  dbmanage.py banca_small dumplist --self-test)
+  bob_dbmanage.py banca_small dumplist --self-test)
 
 bob_python_add_dependent_test(db-banca_small-dumplist2
   python-db-banca_small-create
-  dbmanage.py banca_small dumplist --protocol=P --classes=client --groups=g1 --purposes=enrol --self-test)
+  bob_dbmanage.py banca_small dumplist --protocol=P --classes=client --groups=g1 --purposes=enrol --self-test)
 
 bob_python_add_dependent_test(db-banca_small-checkfiles python-db-banca_small-create
-  dbmanage.py banca_small checkfiles --self-test)
+  bob_dbmanage.py banca_small checkfiles --self-test)
 
 # Biosecure database driver tests.
 bob_python_add_dependent_test(db-biosecure-dumplist python-db-biosecure-create
-  dbmanage.py biosecure dumplist --self-test)
+  bob_dbmanage.py biosecure dumplist --self-test)
 
 bob_python_add_dependent_test(db-biosecure-dumplist2 python-db-biosecure-create
-  dbmanage.py biosecure dumplist --protocol=ca0 --classes=client --groups=dev --purposes=enrol --self-test)
+  bob_dbmanage.py biosecure dumplist --protocol=ca0 --classes=client --groups=dev --purposes=enrol --self-test)
 
 bob_python_add_dependent_test(db-biosecure-checkfiles python-db-biosecure-create
-  dbmanage.py biosecure checkfiles --self-test)
+  bob_dbmanage.py biosecure checkfiles --self-test)
 
 # Faceverif_fl database (uses file lists).
 bob_python_add_unittest(db lib/test/faceverif_fl.py)
 
 # LFW database driver tests.
 bob_python_add_dependent_test(db-lfw-dumplist python-db-lfw-create
-  dbmanage.py lfw dumplist --self-test)
+  bob_dbmanage.py lfw dumplist --self-test)
 
 bob_python_add_dependent_test(db-lfw-dumplist2 python-db-lfw-create
-  dbmanage.py lfw dumplist --view=view1 --subset=fold1 --classes=matched --self-test)
+  bob_dbmanage.py lfw dumplist --view=view1 --subset=fold1 --classes=matched --self-test)
 
 bob_python_add_dependent_test(db-lfw-checkfiles python-db-lfw-create
-  dbmanage.py lfw checkfiles --self-test)
+  bob_dbmanage.py lfw checkfiles --self-test)
 
 # MOBIO database driver tests.
 bob_python_add_dependent_test(db-mobio-dumplist python-db-mobio-create
-  dbmanage.py mobio dumplist --self-test)
+  bob_dbmanage.py mobio dumplist --self-test)
 
 bob_python_add_dependent_test(db-mobio-dumplist2 python-db-mobio-create
-  dbmanage.py mobio dumplist --protocol=male --classes=client --groups=dev --purposes=enrol --self-test)
+  bob_dbmanage.py mobio dumplist --protocol=male --classes=client --groups=dev --purposes=enrol --self-test)
 
 bob_python_add_dependent_test(db-mobio-checkfiles python-db-mobio-create
-  dbmanage.py mobio checkfiles --self-test)
+  bob_dbmanage.py mobio checkfiles --self-test)
 
 # Multi-PIE database driver tests.
 bob_python_add_dependent_test(db-multipie-dumplist python-db-multipie-create
-  dbmanage.py multipie dumplist --self-test)
+  bob_dbmanage.py multipie dumplist --self-test)
 
 bob_python_add_dependent_test(db-multipie-dumplist2 python-db-multipie-create
-  dbmanage.py multipie dumplist --protocol=M --classes=client --groups=dev --purposes=enrol --self-test)
+  bob_dbmanage.py multipie dumplist --protocol=M --classes=client --groups=dev --purposes=enrol --self-test)
 
 bob_python_add_dependent_test(db-multipie-checkfiles python-db-multipie-create
-  dbmanage.py multipie checkfiles --self-test)
+  bob_dbmanage.py multipie checkfiles --self-test)
 
 # Nuaa database driver tests.
 bob_python_add_unittest(db lib/test/nuaa.py main)
-bob_python_add_test(db-nuaa-dumplist dbmanage.py nuaa dumplist --self-test)
-bob_python_add_test(db-nuaa-checkfiles dbmanage.py nuaa checkfiles --self-test)
+bob_python_add_test(db-nuaa-dumplist bob_dbmanage.py nuaa dumplist --self-test)
+bob_python_add_test(db-nuaa-checkfiles bob_dbmanage.py nuaa checkfiles --self-test)
 
 # CASIA-FASD database driver tests.
 bob_python_add_unittest(db lib/test/casia_fasd.py main)
-bob_python_add_test(db-casia_fasd-dumplist dbmanage.py casia_fasd dumplist --self-test)
-bob_python_add_test(db-casia_fasd-checkfiles dbmanage.py casia_fasd checkfiles --self-test)
+bob_python_add_test(db-casia_fasd-dumplist bob_dbmanage.py casia_fasd dumplist --self-test)
+bob_python_add_test(db-casia_fasd-checkfiles bob_dbmanage.py casia_fasd checkfiles --self-test)
 
 # SCface database driver tests.
 bob_python_add_dependent_test(db-scface-dumplist python-db-scface-create
-  dbmanage.py scface dumplist --self-test)
+  bob_dbmanage.py scface dumplist --self-test)
 
 bob_python_add_dependent_test(db-scface-dumplist2 python-db-scface-create
-  dbmanage.py scface dumplist --protocol=combined --classes=client --groups=dev --purposes=enrol --self-test)
+  bob_dbmanage.py scface dumplist --protocol=combined --classes=client --groups=dev --purposes=enrol --self-test)
 
 bob_python_add_dependent_test(db-scface-checkfiles python-db-scface-create
-  dbmanage.py scface checkfiles --self-test)
+  bob_dbmanage.py scface checkfiles --self-test)
 
 # XM2VTS database driver tests.
 bob_python_add_dependent_test(db-xm2vts-dumplist python-db-xm2vts-create
-  dbmanage.py xm2vts dumplist --self-test)
+  bob_dbmanage.py xm2vts dumplist --self-test)
 
 bob_python_add_dependent_test(db-xm2vts-dumplist2 python-db-xm2vts-create
-  dbmanage.py xm2vts dumplist --protocol=lp1 --classes=client --groups=dev --purposes=enrol --self-test)
+  bob_dbmanage.py xm2vts dumplist --protocol=lp1 --classes=client --groups=dev --purposes=enrol --self-test)
 
 bob_python_add_dependent_test(db-xm2vts-checkfiles python-db-xm2vts-create
-  dbmanage.py xm2vts checkfiles --self-test)
+  bob_dbmanage.py xm2vts checkfiles --self-test)
 
 # Our examples (run and install)
 bob_python_example(db iris_lda.py lib/example/iris_lda.py)

@@ -89,11 +89,11 @@ append them to the list of filenames.
    >>> print fileList1 # doctest: +SKIP
 
 Finally, it is possible to check that a given base directory contains all the
-files of a database using the `checkfiles` command of the `dbmanage.py` script.
+files of a database using the `checkfiles` command of the `bob_dbmanage.py` script.
 
 .. code-block:: sh
 
-   $ dbmanage.py mobio checkfiles -d /MYDIR -e '.pgm'
+   $ bob_dbmanage.py mobio checkfiles -d /MYDIR -e '.pgm'
 
 If a file can not be found, its filename will be printed in the standard 
 output stream.

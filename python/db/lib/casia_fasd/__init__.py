@@ -15,7 +15,7 @@ import numpy
 from .. import utils
 from .commands import add_commands
 
-# Use this variable to tell dbmanage.py all driver that there is nothing to
+# Use this variable to tell bob_dbmanage.py all driver that there is nothing to
 # download for this database.
 __builtin__ = True
 

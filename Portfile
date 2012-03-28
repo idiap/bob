@@ -3,7 +3,7 @@
 
 PortSystem          1.0
 name                bob
-version             1.0alpha1
+version             1.0beta1
 categories          science
 platforms           darwin
 maintainers         anjos \
@@ -20,7 +20,8 @@ master_sites        http://www.idiap.ch/software/bob/releases/
 checksums           rmd160  7bbfce4fecc2a8e1ca081169e70c1a298ab1b75a \
                     sha256  2829fcb7393bac85925090b286b1f9c3cd3fbbf8e7f35796ef4131322509aa53
 
-depends_build       port:cmake
+depends_build       port:cmake \
+                    port:llvm-gcc42
 
 depends_lib         port:blitz \
                     port:ffmpeg \
@@ -31,21 +32,20 @@ depends_lib         port:blitz \
                     port:boost \
                     port:fftw-3 \
                     port:vlfeat \
-                    port:libsvm \
-                    port:dvipng
+                    port:libsvm
 
 configure.args      -DCMAKE_BUILD_TYPE=Release -DBOB_VERSION=${version}
 
 # Can only compile blitz/bob with llvm-gcc-4.2
 if {${configure.compiler} == "clang"} {
     configure.compiler llvm-gcc-4.2
+    ui_warn "Overriding default 'clang' compiler with llvm-gcc-4.2"
 }
 
 variant python25 conflicts python26 python27 description {Builds for python 2.5.} {
   depends_lib-append    port:python25 \
                         port:py25-numpy \
                         port:py25-matplotlib \
-                        port:py25-sphinx \
                         port:py25-argparse \
                         port:py25-scipy
   configure.python      ${prefix}/bin/python2.5
@@ -80,9 +80,22 @@ variant opencv description {Compile OpenCV extensions.} {
 }
 
 variant doc {Builds documentation.} {
-  depends_lib-append    port:dvipng \
-                        port:doxygen \
-                        port:texlive-bin
+  depends_build-append    port:dvipng \
+                          port:doxygen \
+                          port:texlive-latex
+
+  if {${configure.python} == ${prefix}/bin/python2.5} {
+    depends_build-apend   port:py25-sphinx
+  }
+  if {${configure.python} == ${prefix}/bin/python2.6} {
+    depends_build-apend   port:py26-sphinx
+  }
+  if {${configure.python} == ${prefix}/bin/python2.7} {
+    depends_build-apend   port:py27-sphinx
+  }
 }
 
-universal_variant   no
+universal_variant  no
+default_variants   +qt4 +opencv +doc
+
+# defines the python variant depending on the current default python version
