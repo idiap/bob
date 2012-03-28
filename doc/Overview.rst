@@ -51,7 +51,7 @@ The library has been designed to run on various platforms and to be easily inter
 Database support
 ----------------
 
-The library currently provides an API to easily query and interface with. In particular, several protocols for well known biometric databases are integrated with the aim at improving reproducibility of scientific publications.
+The library currently provides an API to easily query and interface with database protocols. In particular, several protocols for well-known biometric databases are integrated with the aim at improving reproducibility of scientific publications.
 
 Performance evaluation
 ----------------------
