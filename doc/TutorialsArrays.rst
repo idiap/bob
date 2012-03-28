@@ -162,7 +162,7 @@ grayscale image) into a float64 2D array with a ``[0,1]`` range.
 
   >>> img = numpy.array([[0,1,2,3,4],[255,254,253,252,251]], dtype='uint8')
   >>> img_d = bob.core.array.convert(img, dtype='float64', dest_range=(0.,1.))
-  >>> print img_d
+  >>> print img_d # doctest: +SKIP
   [[ 0. 0.00392157 0.00784314 0.01176471 0.01568627]
    [ 1. 0.99607843 0.99215686 0.98823529 0.98431373]]
   >>> print img_d.dtype
