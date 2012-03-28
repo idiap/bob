@@ -22,19 +22,19 @@
 
 Consider profiling your code **before** optimizing it. Optimization based on
 guessing is pointless - **don't do this!** Here are rules you should respect
-when optimizing:
+when optimizing.
 
 1. Avoid it at all costs, optimization usually makes code unreadable and
-   difficult to maintain;
-2. Re-think about rule 1 for at least a day;
+   difficult to maintain.
+2. Re-think about rule 1 for at least a day.
 3. If you still need some optimization, run a full profiling session as
    explained on this guide and **understand** your bottlenecks. Optimizing
    functions that are only rarely executed and do not account for the bulk of
    the total processing time are not worth the effort. Always prefer
-   readability and maintainability in these cases;
-4. After completely understanding your bottlenecks, think about rule 1 again;
+   readability and maintainability in these cases.
+4. After completely understanding your bottlenecks, think about rule 1 again.
 5. If you still decide for optimizing, then focus on the smallest set of
-   routines that will get your job done. Do **no** over-optimize at the cost
+   routines that will get your job done. Do **not** over-optimize at the cost
    of poorer readability or maintainability.
 
 .. note::
@@ -44,24 +44,24 @@ when optimizing:
 Profiling C/C++ code directly
 -----------------------------
 
-Profiling your code is a 3-step procedure: 
+Profiling your code is a 3-step procedure.
 
-1. bracketing the target code with ``ProfilerStart()`` and ``ProfilerStop()``; 
-2. linking against ``libprofiler.so``;
-3. Analyzing the output. 
+1. Bracket the target code with ``ProfilerStart()`` and ``ProfilerStop()``.
+2. Link against ``libprofiler.so``.
+3. Analyse the output. 
 
-In |project|, we provide a few constructions that allow one to easy adapt any
+In |project|, we provide a few constructions that allow you to easily adapt any
 code to support profiling. In this guide we only cover specific topics to be
-addressed at |project| builds. We consider item 1 before, which is your
+addressed for |project| builds. We consider that item 1, which is your
 responsibility, has already been done and will focus this guide on getting the
-code to compile/link properly. Analysis (item 3) should be conducted in the
+code to compile/link properly (item 2). Analysis (item 3) should be conducted in the
 same way as explained on `PerfTool introduction to profiling`_.
 
 Guidelines on building against Google perftools
 -----------------------------------------------
 
-1. At your ``CMakeLists.txt``, always test to check for google-perftools
-   availability:
+1. At your ``CMakeLists.txt``, always test to check for the availability of
+   google-perftools:
 
 .. code-block:: cmake
 
@@ -70,7 +70,7 @@ Guidelines on building against Google perftools
     add_definitions(-DHAVE_GOOGLE_PERFTOOLS)
   endif(googlePerfTools_FOUND)
 
-2. At your code, include **optional** usage of perftools in the following
+2. Within your code, include **optional** usage of perftools in the following
    (suggested) way:
 
 .. code-block:: c++
@@ -100,7 +100,7 @@ Guidelines on building against Google perftools
 
 With this, you tie the execution of the profiling to the setting of an
 environment variable called ``BOB_PROFILE``. If you don't set the variable,
-code will execute in full speed. After compilation, to run your code in profile
+the code will execute in full speed. After compilation, to run your code in profile
 mode, just call your program in the following way:
 
 .. code-block:: sh
