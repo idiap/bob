@@ -119,7 +119,7 @@ directory like this:
 
 .. doctest::
 
-  >>> f = bob.io.HDF5File('testfile1.hdf5', 'w')
+  >>> f = bob.io.HDF5File('testfile1.hdf5', 'a')
   >>> f.create_group('/test')
   >>> f.set('/test/my_float', 6.28, dtype='float32')
   >>> del f
@@ -164,7 +164,7 @@ all the type information we need to write and read them correctly. Here is an ex
 .. doctest::
 
   >>> A = numpy.array(range(4), 'int8').reshape(2,2)
-  >>> f = bob.io.HDF5File('testfile1.hdf5', 'w')
+  >>> f = bob.io.HDF5File('testfile1.hdf5', 'a')
   >>> f.set('my_array', A)
   >>> del f
 
