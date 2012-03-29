@@ -123,6 +123,11 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
        */
       void reset();
 
+      /**
+       * Tells if this file is writeable
+       */
+      bool writeable() const;
+
     private: //representation
 
       const boost::filesystem::path m_path; ///< path to the file

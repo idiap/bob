@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE( hdf5_write_on_readonly )
   config = boost::make_shared<bob::io::HDF5File>(filename, bob::io::HDF5File::in);
 
   // This should raise an exception and that is it.
-  config->set("float", 3.14);
+  BOOST_REQUIRE_THROW(config->set("float", 3.14), std::runtime_error);
 
   // Clean-up
   boost::filesystem::remove(filename);
