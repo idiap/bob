@@ -23,6 +23,7 @@
 #include <boost/format.hpp>
 #include "io/HDF5Attribute.h"
 #include "io/HDF5Exception.h"
+#include "core/logging.h"
 
 namespace h5 = bob::io::detail::hdf5;
 namespace io = bob::io;
@@ -36,9 +37,14 @@ bool h5::has_attribute(const boost::shared_ptr<hid_t> location,
  * Opens an "auto-destructible" HDF5 dataspace
  */
 static void delete_h5dataspace (hid_t* p) {
-  if (*p >= 0) H5Sclose(*p);
+  if (*p >= 0) {
+    herr_t err = H5Sclose(*p);
+    if (err < 0) {
+      bob::core::error << "H5Sclose() exited with an error (" << err << "). The stack trace follows:" << std::endl;
+      bob::core::error << bob::io::format_hdf5_error() << std::endl;
+    }
+  }
   delete p;
-  p=0;
 }
 
 static boost::shared_ptr<hid_t> open_memspace(const io::HDF5Type& t) {
@@ -52,18 +58,28 @@ static boost::shared_ptr<hid_t> open_memspace(const io::HDF5Type& t) {
  * Opens an "auto-destructible" HDF5 attribute
  */
 static void delete_h5attribute (hid_t* p) {
-  if (*p >= 0) H5Aclose(*p);
+  if (*p >= 0) {
+    herr_t err = H5Aclose(*p);
+    if (err < 0) {
+      bob::core::error << "H5Aclose() exited with an error (" << err << "). The stack trace follows:" << std::endl;
+      bob::core::error << bob::io::format_hdf5_error() << std::endl;
+    }
+  }
   delete p;
-  p=0;
 }
 
 /**
  * Auto-destructing HDF5 type
  */
 static void delete_h5type (hid_t* p) {
-  if (*p >= 0) H5Tclose(*p);
+  if (*p >= 0) {
+    herr_t err = H5Tclose(*p);
+    if (err < 0) {
+      bob::core::error << "H5Tclose() exited with an error (" << err << "). The stack trace follows:" << std::endl;
+      bob::core::error << bob::io::format_hdf5_error() << std::endl;
+    }
+  }
   delete p;
-  p=0;
 }
 
 static boost::shared_ptr<hid_t> open_attribute

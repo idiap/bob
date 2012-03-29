@@ -22,6 +22,7 @@
 
 #include <boost/make_shared.hpp>
 #include "io/HDF5Utils.h"
+#include "core/logging.h"
 
 namespace h5 = bob::io::detail::hdf5;
 namespace io = bob::io;
@@ -30,22 +31,36 @@ namespace io = bob::io;
  * Opens/Creates an "auto-destructible" HDF5 file
  */
 static void delete_h5file (hid_t* p) {
+  TDEBUG1("Closing HDF5 file (hid=" << *p << ")");
   if (*p >= 0) {
-    H5Fclose(*p);
+    herr_t err = H5Fclose(*p);
+    if (err < 0) {
+      bob::core::error << "H5Fclose(hid=" << *p << ") exited with an error (" << err << "). The stack trace follows:" << std::endl;
+      bob::core::error << bob::io::format_hdf5_error() << std::endl;
+      bob::core::error << "Returning w/o deleting HDF5 hid pointer (this is a bug - report it as soon as possible)"
+        << std::endl;
+      return;
+    }
   }
   delete p;
-  p=0;
 }
 
 /**
  * Opens/Creates and "auto-destructible" HDF5 file creation property list
  */
 static void delete_h5p (hid_t* p) {
+  TDEBUG1("Closing HDF5 property (hid=" << *p << ")");
   if (*p >= 0) {
-    H5Pclose(*p);
+    herr_t err = H5Pclose(*p);
+    if (err < 0) {
+      bob::core::error << "H5Pclose(hid=" << *p << ") exited with an error (" << err << "). The stack trace follows:" << std::endl;
+      bob::core::error << bob::io::format_hdf5_error() << std::endl;
+      bob::core::error << "Returning w/o deleting HDF5 hid pointer (this is a bug - report it as soon as possible)"
+        << std::endl;
+      return;
+    }
   }
   delete p;
-  p=0;
 }
 
 static boost::shared_ptr<hid_t> open_file(const boost::filesystem::path& path,
@@ -71,7 +86,7 @@ static boost::shared_ptr<hid_t> open_file(const boost::filesystem::path& path,
         *fcpl, H5P_DEFAULT);
     if (*retval < 0) throw io::HDF5StatusError("H5Fcreate", *retval);
   }
-
+  TDEBUG1("Opening HDF5 file '" << path << "' (hid=" << *retval << ")");
   return retval;
 }
 

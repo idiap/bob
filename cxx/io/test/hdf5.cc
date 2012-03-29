@@ -26,6 +26,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/shared_array.hpp>
+#include <boost/make_shared.hpp>
 
 #include <blitz/array.h>
 #include <complex>
@@ -138,6 +139,24 @@ BOOST_AUTO_TEST_CASE( hdf5_2d_save_read )
   blitz::Array<double,2> at_read;
   at_read.reference(config.readArray<double,2>("at"));
   check_equal(at, at_read);
+
+  // Clean-up
+  boost::filesystem::remove(filename);
+}
+
+BOOST_AUTO_TEST_CASE( hdf5_write_on_readonly )
+{
+  const std::string filename = temp_file();
+  boost::shared_ptr<bob::io::HDF5File> config = 
+    boost::make_shared<bob::io::HDF5File>(filename, bob::io::HDF5File::trunc);
+  config->set("integer", 3);
+  config.reset();
+
+  // Try to write on a read-only version opened
+  config = boost::make_shared<bob::io::HDF5File>(filename, bob::io::HDF5File::in);
+
+  // This should raise an exception and that is it.
+  config->set("float", 3.14);
 
   // Clean-up
   boost::filesystem::remove(filename);

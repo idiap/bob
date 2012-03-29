@@ -25,6 +25,7 @@
 #include "io/HDF5Utils.h"
 #include "io/HDF5Group.h"
 #include "io/HDF5Dataset.h"
+#include "core/logging.h"
 
 namespace h5 = bob::io::detail::hdf5;
 namespace io = bob::io;
@@ -33,9 +34,14 @@ namespace io = bob::io;
  * Opens an "auto-destructible" HDF5 dataset
  */
 static void delete_h5dataset (hid_t* p) {
-  if (*p >= 0) H5Dclose(*p);
+  if (*p >= 0) {
+    herr_t err = H5Dclose(*p);
+    if (err < 0) {
+      bob::core::error << "H5Dclose() exited with an error (" << err << "). The stack trace follows:" << std::endl;
+      bob::core::error << bob::io::format_hdf5_error() << std::endl;
+    }
+  }
   delete p;
-  p=0;
 }
 
 static boost::shared_ptr<hid_t> open_dataset
@@ -59,9 +65,14 @@ static boost::shared_ptr<hid_t> open_dataset
  * Opens an "auto-destructible" HDF5 datatype
  */
 static void delete_h5datatype (hid_t* p) {
-  if (*p >= 0) H5Tclose(*p);
+  if (*p >= 0) {
+    herr_t err = H5Tclose(*p);
+    if (err < 0) {
+      bob::core::error << "H5Tclose() exited with an error (" << err << "). The stack trace follows:" << std::endl;
+      bob::core::error << bob::io::format_hdf5_error() << std::endl;
+    }
+  }
   delete p;
-  p=0;
 }
 
 static boost::shared_ptr<hid_t> open_datatype
@@ -79,9 +90,14 @@ static boost::shared_ptr<hid_t> open_datatype
  * Opens an "auto-destructible" HDF5 property list
  */
 static void delete_h5plist (hid_t* p) {
-  if (*p >= 0) H5Pclose(*p);
+  if (*p >= 0) {
+    herr_t err = H5Pclose(*p);
+    if (err < 0) {
+      bob::core::error << "H5Pclose() exited with an error (" << err << "). The stack trace follows:" << std::endl;
+      bob::core::error << bob::io::format_hdf5_error() << std::endl;
+    }
+  }
   delete p;
-  p=0;
 }
 
 static boost::shared_ptr<hid_t> open_plist(hid_t classid) {
@@ -97,9 +113,14 @@ static boost::shared_ptr<hid_t> open_plist(hid_t classid) {
  * Opens an "auto-destructible" HDF5 dataspace
  */
 static void delete_h5dataspace (hid_t* p) {
-  if (*p >= 0) H5Sclose(*p);
+  if (*p >= 0) {
+    herr_t err = H5Sclose(*p);
+    if (err < 0) {
+      bob::core::error << "H5Sclose() exited with an error (" << err << "). The stack trace follows:" << std::endl;
+      bob::core::error << bob::io::format_hdf5_error() << std::endl;
+    }
+  }
   delete p;
-  p=0;
 }
 
 static boost::shared_ptr<hid_t> open_filespace

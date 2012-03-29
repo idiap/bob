@@ -37,6 +37,7 @@
 #warning Disabling MT locks because Boost < 1.35!
 #endif
 
+#include "core/logging.h"
 #include "io/HDF5Types.h"
 #include "io/HDF5Exception.h"
 
@@ -216,9 +217,14 @@ std::string io::HDF5Shape::str () const {
  * Deleter method for auto-destroyable HDF5 datatypes.
  */
 static void delete_h5datatype (hid_t* p) {
-  if (*p >= 0) H5Tclose(*p); 
+  if (*p >= 0) {
+    herr_t err = H5Tclose(*p); 
+    if (err < 0) {
+      bob::core::error << "H5Tclose() exited with an error (" << err << "). The stack trace follows:" << std::endl;
+      bob::core::error << bob::io::format_hdf5_error() << std::endl;
+    }
+  }
   delete p; 
-  p=0; 
 }
 
 /**

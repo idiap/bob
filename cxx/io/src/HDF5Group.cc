@@ -36,10 +36,13 @@ namespace io = bob::io;
  */
 static void delete_h5g (hid_t* p) {
   if (*p >= 0) {
-    H5Gclose(*p);
+    herr_t err = H5Gclose(*p);
+    if (err < 0) {
+      bob::core::error << "H5Gclose() exited with an error (" << err << "). The stack trace follows:" << std::endl;
+      bob::core::error << bob::io::format_hdf5_error() << std::endl;
+    }
   }
   delete p;
-  p=0;
 }
 
 static boost::shared_ptr<hid_t> create_new_group(boost::shared_ptr<hid_t> p,
@@ -298,9 +301,14 @@ void h5::Group::remove_group(const std::string& dir) {
  * Opens an "auto-destructible" HDF5 property list
  */
 static void delete_h5plist (hid_t* p) {
-  if (*p >= 0) H5Pclose(*p);
+  if (*p >= 0) {
+    herr_t err = H5Pclose(*p);
+    if (err < 0) {
+      bob::core::error << "H5Pclose() exited with an error (" << err << "). The stack trace follows:" << std::endl;
+      bob::core::error << bob::io::format_hdf5_error() << std::endl;
+    }
+  }
   delete p;
-  p=0;
 }
 
 static boost::shared_ptr<hid_t> open_plist(hid_t classid) {

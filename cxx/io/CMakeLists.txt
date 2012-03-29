@@ -71,6 +71,7 @@ bob_library(io "${src}" "${deps}" "${shared}")
 bob_test(io array test/array.cc)
 bob_test(io arrayset test/arrayset.cc)
 bob_test(io hdf5 test/hdf5.cc)
+bob_test(io hdf5_bug test/hdf5_2.cc)
 bob_test(io tensor_codec test/tensor_codec.cc)
 
 if(ImageMagick_FOUND)

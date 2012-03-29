@@ -29,6 +29,12 @@
 namespace bob { namespace io {
 
   /**
+   * Format and returns the current HDF5 error stack. It also clears the stack
+   * before returning.
+   */
+  std::string format_hdf5_error();
+
+  /**
    * This is a generic exception for HDF5 errors. You should not throw it, but
    * since all others inherit from this one, you can catch by reference and
    * treat HDF5 problems in a generic way.

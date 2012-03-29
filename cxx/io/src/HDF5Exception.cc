@@ -130,7 +130,7 @@ io::HDF5StatusError::HDF5StatusError(const std::string& call, herr_t status)
 
 io::HDF5StatusError::~HDF5StatusError() throw() { }
 
-static std::string format_hdf5_error() {
+std::string io::format_hdf5_error() {
   const std::vector<std::string>& stack = io::DefaultHDF5ErrorStack->get();
   std::ostringstream retval;
   std::string prefix(" ");
