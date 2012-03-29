@@ -72,10 +72,10 @@ def ztnorm_same_value(vect_a, vect_b):
   """
   from .. import core
   import numpy as np
-  sameMatrix = np.ndarray((len(vect_A), len(vect_B)), 'bool')
-  for j in range(len(vect_A)):
-    for i in range(len(vect_B)):
-      sameMatrix[j, i] = (vect_A[j] == vect_B[i])
+  sameMatrix = np.ndarray((len(vect_a), len(vect_b)), 'bool')
+  for j in range(len(vect_a)):
+    for i in range(len(vect_b)):
+      sameMatrix[j, i] = (vect_a[j] == vect_b[i])
   return sameMatrix
 
 __all__ = dir()
