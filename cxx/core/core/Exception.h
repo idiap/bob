@@ -33,18 +33,18 @@ namespace bob {
      * The stock bob exception class should be used as a base of any other
      * exception type in bob. There are no input parameters you can specify
      * and that is on purpose. If you need to be specific about a problem,
-     * derive from this one, virtually.
+     * derive from this one.
      *
      * Example: My filter only accepts gray-scaled images.
      *
-     * class NotGrayScaleImage: virtual bob::core::Exception {
+     * class NotGrayScaleImage: public bob::core::Exception {
      * ...
      * }
      *
      * Make sure to specify that your exception does not throw anything by
      * providing formal exception specification on their methods.
      */
-    class Exception: virtual std::exception {
+    class Exception: public std::exception {
 
       public:
 
