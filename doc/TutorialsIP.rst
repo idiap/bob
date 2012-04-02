@@ -229,14 +229,15 @@ image (that will be generated when applying the object):
   >>> face_eyes_norm = bob.ip.FaceEyesNorm(eyes_distance = 64, crop_height = 128, crop_width = 128, crop_eyecenter_offset_h = 32, crop_eyecenter_offset_w = 64)
 
 Now, we have set up our object to generate images of size (128, 128) that will put the left eye at the pixel position (32, 32) and the right eye at the 
-position (32, 96). Afterwards, this object is used to geometrically normalize the face, given the eye positions in the original face image:
+position (32, 96). Afterwards, this object is used to geometrically normalize the face, given the eye positions in the original face image. 
+Note that the left eye usually has a higher x-coordinate than the right eye:
 
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
   
   >>> face_image = bob.io.load( image_path )
   >>> cropped_image = numpy.ndarray( (128, 128), dtype = numpy.float64 )
-  >>> face_eyes_norm( face_image, cropped_image, le_y = 67, le_x = 47, re_y = 62, re_x = 71)
+  >>> face_eyes_norm( face_image, cropped_image, re_y = 67, re_x = 47, le_y = 62, le_x = 71)
 
 
 Simple feature extraction
