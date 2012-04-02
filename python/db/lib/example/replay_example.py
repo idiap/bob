@@ -29,7 +29,7 @@ import shutil
 def main():
 
   db = bob.db.replay.Database()
-  rawdata = "/idiap/group/replay/database/protocols"
+  rawdata = "/idiap/group/replay/database/protocols/replayattack-database/protocols"
     
   processed = tempfile.mkdtemp(prefix='bobtest_')
   extension = ".jpg"

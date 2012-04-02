@@ -15,19 +15,13 @@ from ..utils import session
 def add_clients(session, protodir, verbose):
   """Add clients to the replay attack database."""
   
-  def add_client_set(session, filename, set):
-    """Loads a single client list."""
-
-    for client in open(filename, 'rt'):
-      s = client.strip()
-      if not s: continue #empty line
-      id = int(s)
-      if verbose: print "Adding client %d on '%s' set..." % (id, set)
-      session.add(Client(id, set))
-
-  add_client_set(session, os.path.join(protodir, 'client.train'), 'train')
-  add_client_set(session, os.path.join(protodir, 'client.devel'), 'devel')
-  add_client_set(session, os.path.join(protodir, 'client.test'),  'test')
+  for client in open(os.path.join(protodir, 'clients.txt'), 'rt'):
+    s = client.strip().split(' ', 2)
+    if not s: continue #empty line
+    id = int(s[0])
+    set = s[1]
+    if verbose: print "Adding client %d on '%s' set..." % (id, set)
+    session.add(Client(id, set))
 
 def add_real_lists(session, protodir, verbose):
   """Adds all RCD filelists"""
@@ -57,10 +51,12 @@ def add_real_lists(session, protodir, verbose):
       realfields.insert(0, file)
       session.add(RealAccess(*realfields))
 
-  add_real_list(session, os.path.join(protodir, 'real.train.list'))
-  add_real_list(session, os.path.join(protodir, 'real.devel.list'))
-  add_real_list(session, os.path.join(protodir, 'real.test.list'))
-  add_real_list(session, os.path.join(protodir, 'enrollment.list'))
+  add_real_list(session, os.path.join(protodir, 'real-train.txt'))
+  add_real_list(session, os.path.join(protodir, 'real-devel.txt'))
+  add_real_list(session, os.path.join(protodir, 'real-test.txt'))
+  add_real_list(session, os.path.join(protodir, 'recognition-train.txt'))
+  add_real_list(session, os.path.join(protodir, 'recognition-devel.txt'))
+  add_real_list(session, os.path.join(protodir, 'recognition-test.txt'))
 
 def add_attack_lists(session, protodir, verbose):
   """Adds all RAD filelists"""
@@ -91,54 +87,70 @@ def add_attack_lists(session, protodir, verbose):
       attackfields.insert(0, file)
       session.add(Attack(*attackfields))
 
-  add_attack_list(session,os.path.join(protodir, 'attack.grandtest.train.list'))
-  add_attack_list(session,os.path.join(protodir, 'attack.grandtest.devel.list'))
-  add_attack_list(session,os.path.join(protodir, 'attack.grandtest.test.list'))
+  add_attack_list(session,os.path.join(protodir, 'attack-grandtest-allsupports-train.txt'))
+  add_attack_list(session,os.path.join(protodir, 'attack-grandtest-allsupports-devel.txt'))
+  add_attack_list(session,os.path.join(protodir, 'attack-grandtest-allsupports-test.txt'))
 
 def define_protocols(session, protodir, verbose):
   """Defines all available protocols"""
 
   #figures out which protocols to use
-  valid = set()
-  for fname in fnmatch.filter(os.listdir(protodir), 'real.*.train.list'):
-    s = fname.split('.', 3)
-    consider = True
-    for cls in ('real', 'attack'):
-      for grp in ('train', 'devel', 'test'):
-        search_for = os.path.join(protodir, '%s.%s.%s.list' % (cls, s[1], grp))
-        if not os.path.exists(search_for):
-          if verbose:
-            print "Not considering protocol %s as '%s' was not found" % \
-              (s[1], search_for)
-          consider = False
-    if consider: valid.add(s[1])
+  valid = {}
 
-  for protocol in valid:
+  for fname in fnmatch.filter(os.listdir(protodir), 'attack-*-allsupports-train.txt'):
+    s = fname.split('-', 4)
+
+    consider = True
+    files = {}
+
+    for grp in ('train', 'devel', 'test'):
+
+      # check attack file
+      attack = os.path.join(protodir, 'attack-%s-allsupports-%s.txt' % (s[1], grp))
+      if not os.path.exists(attack):
+        if verbose:
+          print "Not considering protocol %s as attack list '%s' was not found" % (s[1], attack)
+        consider = False
+      
+      # check real file
+      real = os.path.join(protodir, 'real-%s-allsupports-%s.txt' % (s[1], grp))
+      if not os.path.exists(real):
+        alt_real = os.path.join(protodir, 'real-%s.txt' % (grp,))
+        if not os.path.exists(alt_real):
+          if verbose:
+            print "Not considering protocol %s as real list '%s' or '%s' were not found" % (s[1], real, alt_real)
+          consider = False 
+        else:
+          real = alt_real
+
+      if consider: files[grp] = (attack, real)
+
+    if consider: valid[s[1]] = files
+
+  for protocol, groups in valid.iteritems():
     if verbose: print "Creating protocol '%s'..." % protocol
 
     # create protocol on the protocol table
     obj = Protocol(name=protocol)
 
-    for grp in ('train', 'devel', 'test'):
+    for grp, flist in groups.iteritems():
 
-      flist = os.path.join(protodir, 'real.%s.%s.list' % (protocol, grp))
       counter = 0
-      for fname in open(flist, 'rt'):
-        s = os.path.splitext(fname.strip())[0]
-        q = session.query(RealAccess).join(File).filter(File.path == s).one()
-        q.protocols.append(obj)
-        counter += 1
-      if verbose: print "  -> %5s/%-6s: %d files" % (grp, "real", counter)
-      
-      counter = 0
-      flist = os.path.join(protodir, 'attack.%s.%s.list' % (protocol, grp))
-      for fname in open(flist, 'rt'):
+      for fname in open(flist[0], 'rt'):
         s = os.path.splitext(fname.strip())[0]
         q = session.query(Attack).join(File).filter(File.path == s).one()
         q.protocols.append(obj)
         counter += 1
       if verbose: print "  -> %5s/%-6s: %d files" % (grp, "attack", counter)
    
+      counter = 0
+      for fname in open(flist[1], 'rt'):
+        s = os.path.splitext(fname.strip())[0]
+        q = session.query(RealAccess).join(File).filter(File.path == s).one()
+        q.protocols.append(obj)
+        counter += 1
+      if verbose: print "  -> %5s/%-6s: %d files" % (grp, "real", counter)
+      
     session.add(obj)
 
 def create_tables(args):
@@ -189,7 +201,7 @@ def add_command(subparsers):
   parser.add_argument('-v', '--verbose', action='append_const', const=1, 
       help="Do SQL operations in a verbose way")
   parser.add_argument('-D', '--protodir', action='store', 
-      default='/idiap/group/replay/database/protocols',
+      default='/idiap/group/replay/database/protocols/replayattack-database/protocols',
       metavar='DIR',
       help="Change the relative path to the directory containing the protocol definitions for replay attacks (defaults to %(default)s)")
   
