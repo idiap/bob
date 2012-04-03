@@ -9,7 +9,7 @@ cmake_minimum_required(VERSION 2.6)
 # -----------------
 
 if (NOT CMAKE_BUILD_TYPE)
-  message(FATAL_ERROR "error: choose either RELEASE or DEBUG as build type by specifying -DCMAKE_BUILD_TYPE=RELEASE or -DCMAKE_BUILD_TYPE=DEBUG on your cmake command line.")
+  message(FATAL_ERROR "error: choose either Release or Debug as build type by specifying -DCMAKE_BUILD_TYPE=Release or -DCMAKE_BUILD_TYPE=Debug on your cmake command line.")
 endif ()
 
 set(BOB_SYSTEM_PROCESSOR ${CMAKE_SYSTEM_PROCESSOR})
