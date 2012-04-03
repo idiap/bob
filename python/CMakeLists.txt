@@ -3,7 +3,7 @@ project(python)
 cmake_minimum_required(VERSION 2.6)
 
 # Installs python top-level wrapper
-if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
+if (PYTHON_EXECUTABLE AND PYTHONLIBS_FOUND AND Boost_FOUND)
 
   # Sets up a local version of the interpreter
   set(BOB_PYTHONPATH ${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION})
