@@ -10,7 +10,7 @@ else()
   find_program(PYTHON_EXECUTABLE python DOC "Default python interpreter")
 endif()
 
-execute_process(COMMAND python -c "import sys; print '%d.%d' % (sys.version_info[0], sys.version_info[1])" OUTPUT_VARIABLE PYTHON_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; print '%d.%d' % (sys.version_info[0], sys.version_info[1])" OUTPUT_VARIABLE PYTHON_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 set(PYTHON_VERSION "${PYTHON_VERSION}" CACHE STRING "Python version")
 
 include(FindPackageHandleStandardArgs)
