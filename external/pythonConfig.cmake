@@ -1,16 +1,18 @@
 # Tries to find a local version of Python installed
 # Andre Anjos - 09.july.2010
 
-# We pre-calculate the default python version
-execute_process(COMMAND python -c "import sys; print '%d.%d' % (sys.version_info[0], sys.version_info[1])" OUTPUT_VARIABLE PYTHON_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+# Forces a certain version of Python in a certain location
+if(WITH_PYTHON)
+  execute_process(COMMAND ${WITH_PYTHON} -c "import sys; print sys.executable" OUTPUT_VARIABLE PYTHON_EXECUTABLE OUTPUT_STRIP_TRAILING_WHITESPACE)
+else()
+  execute_process(COMMAND python -c "import sys; print sys.executable" OUTPUT_VARIABLE PYTHON_EXECUTABLE OUTPUT_STRIP_TRAILING_WHITESPACE)
+endif()
+set(PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}" CACHE PATH "Python interpreter")
 
-# Cache this variable so it stays
-set(PYTHON_VERSION ${PYTHON_VERSION} CACHE INTERNAL "python")
+execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; print '%d.%d' % (sys.version_info[0], sys.version_info[1])" OUTPUT_VARIABLE PYTHON_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+set(PYTHON_VERSION "${PYTHON_VERSION}" CACHE STRING "Python version")
 
-# We then set the preference to use that
-set(Python_ADDITIONAL_VERSIONS ${PYTHON_VERSION})
-
-include(FindPythonInterp)
+include(FindPackageHandleStandardArgs)
 
 # This function checks for python packages that should be installed before you
 # try to compile this project
@@ -54,6 +56,7 @@ get_filename_component(BOB_PYTHON_PREFIX1 ${PYTHON_EXECUTABLE} PATH)
 get_filename_component(BOB_PYTHON_PREFIX ${BOB_PYTHON_PREFIX1} PATH)
 set(CMAKE_SYSTEM_PREFIX_OLD ${CMAKE_SYSTEM_PREFIX_PATH}) #memorize old path
 set(CMAKE_SYSTEM_PREFIX_PATH "${BOB_PYTHON_PREFIX};${CMAKE_SYSTEM_PREFIX_PATH}")
+set(Python_ADDITIONAL_VERSIONS ${PYTHON_VERSION})
 include(FindPythonLibs)
 set(CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_SYSTEM_PREFIX_OLD}) #reset to old path
 
