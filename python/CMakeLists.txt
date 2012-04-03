@@ -38,4 +38,5 @@ if (PYTHON_EXECUTABLE AND PYTHONLIBS_FOUND AND Boost_FOUND)
   endif()
 
   add_subdirectory(post_install)
-endif (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
+
+endif ()
