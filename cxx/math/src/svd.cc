@@ -17,6 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include <boost/shared_array.hpp>
+
 #include "math/svd.h"
 #include "math/Exception.h"
 #include "core/array_assert.h"
@@ -76,7 +79,7 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   const int ldvt = M;
   // Integer (workspace) array, dimension (8*min(M,N))
   const int l_iwork = 8*std::min(M,N);
-  int *iwork = new int[l_iwork];
+  boost::shared_array<int> iwork(new int[l_iwork]);
   // Initialises LAPACK arrays
   blitz::Array<double,2> A_blitz_lapack(ca::ccopy(A));
   double* A_lapack = A_blitz_lapack.data();
@@ -110,26 +113,22 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   const int lwork_query = -1;
   double work_query;
   dgesdd_( &jobz, &N, &M, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
-    VT_lapack, &ldvt, &work_query, &lwork_query, iwork, &info );
+    VT_lapack, &ldvt, &work_query, &lwork_query, iwork.get(), &info );
   // B/ Computes
   const int lwork = static_cast<int>(work_query);
-  double *work = new double[lwork];
+  boost::shared_array<double> work(new double[lwork]);
   dgesdd_( &jobz, &N, &M, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
-    VT_lapack, &ldvt, work, &lwork, iwork, &info );
+    VT_lapack, &ldvt, work.get(), &lwork, iwork.get(), &info );
  
   // Check info variable
   if( info != 0)
-    throw math::LapackError("The LAPACK dgsevd function returned a non-zero\
+    throw math::LapackError("The LAPACK dgesdd function returned a non-zero\
        value.");
 
   // Copy singular vectors back to U, V and sigma if required
   if( !U_direct_use )  Vt = U_blitz_lapack;
   if( !VT_direct_use ) U = VT_blitz_lapack;
   if( !sigma_direct_use ) sigma = S_blitz_lapack;
-
-  // Free memory
-  delete [] iwork;
-  delete [] work;
 }
 
 
@@ -172,7 +171,7 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
 
   // Integer (workspace) array, dimension (8*min(M,N))
   const int l_iwork = 8*std::min(M,N);
-  int *iwork = new int[l_iwork];
+  boost::shared_array<int> iwork(new int[l_iwork]);
   // Initialises LAPACK arrays
   blitz::Array<double,2> A_blitz_lapack(ca::ccopy(const_cast<blitz::Array<double,2>&>(A).transpose(1,0)));
   double* A_lapack = A_blitz_lapack.data();
@@ -190,7 +189,7 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   if( !U_direct_use )   U_blitz_lapack.resize(nb_singular,M);
   else                  U_blitz_lapack.reference(Ut);
   double *U_lapack = U_blitz_lapack.data();
-  double *VT_lapack = new double[nb_singular*N];
+  boost::shared_array<double> VT_lapack(new double[nb_singular*N]);
 
   // Calls the LAPACK function:
   // We use dgesdd which is faster than its predecessor dgesvd, when
@@ -202,26 +201,21 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   const int lwork_query = -1;
   double work_query;
   dgesdd_( &jobz, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
-    VT_lapack, &ldvt, &work_query, &lwork_query, iwork, &info );
+    VT_lapack.get(), &ldvt, &work_query, &lwork_query, iwork.get(), &info );
   // B/ Computes
   const int lwork = static_cast<int>(work_query);
-  double *work = new double[lwork];
+  boost::shared_array<double> work(new double[lwork]);
   dgesdd_( &jobz, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
-    VT_lapack, &ldvt, work, &lwork, iwork, &info );
+    VT_lapack.get(), &ldvt, work.get(), &lwork, iwork.get(), &info );
  
   // Check info variable
   if( info != 0)
-    throw math::LapackError("The LAPACK dgsevd function returned a non-zero\
+    throw math::LapackError("The LAPACK dgesdd function returned a non-zero\
        value.");
   
   // Copy singular vectors back to U, V and sigma if required
   if( !U_direct_use )  Ut = U_blitz_lapack;
   if( !sigma_direct_use ) sigma = S_blitz_lapack;
-
-  // Free memory
-  delete [] VT_lapack;
-  delete [] iwork;
-  delete [] work;
 }
 
 
@@ -259,7 +253,7 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,1>& sigma)
 
   // Integer (workspace) array, dimension (8*min(M,N))
   const int l_iwork = 8*std::min(M,N);
-  int *iwork = new int[l_iwork];
+  boost::shared_array<int> iwork(new int[l_iwork]);
   // Initialises LAPACK arrays
   blitz::Array<double,2> A_blitz_lapack(
     ca::ccopy(const_cast<blitz::Array<double,2>&>(A).transpose(1,0)));
@@ -284,23 +278,18 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,1>& sigma)
   const int lwork_query = -1;
   double work_query;
   dgesdd_( &jobz, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
-    VT_lapack, &ldvt, &work_query, &lwork_query, iwork, &info );
+    VT_lapack, &ldvt, &work_query, &lwork_query, iwork.get(), &info );
   // B/ Computes
   const int lwork = static_cast<int>(work_query);
-  double *work = new double[lwork];
+  boost::shared_array<double> work(new double[lwork]);
   dgesdd_( &jobz, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
-    VT_lapack, &ldvt, work, &lwork, iwork, &info );
+    VT_lapack, &ldvt, work.get(), &lwork, iwork.get(), &info );
  
   // Check info variable
   if( info != 0)
-    throw math::LapackError("The LAPACK dgsevd function returned a non-zero\
+    throw math::LapackError("The LAPACK dgesdd function returned a non-zero\
        value.");
 
   // Copy singular vectors back to U, V and sigma if required
   if( !sigma_direct_use ) sigma = S_blitz_lapack;
-
-  // Free memory
-  delete [] iwork;
-  delete [] work;
 }
-
