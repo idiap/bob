@@ -1,0 +1,81 @@
+Installing Bob
+--------------
+
+This document briefly describes how to install Bob on a generic platform. For
+platform-specific details and pre-compiled binaries, please consult our website
+at http://idiap.github.com/bob/.
+
+1. Dependencies
+---------------
+
+Bob depends on:
+
+ * Blitz++
+ * Lapack
+ * Python
+ * Boost
+ * NumPy
+ * Scipy
+ * Matplotlib
+ * fftw
+ * SQLAlchemy
+ * ImageMagick
+ * HDF5
+ * argparse
+
+There are also optional dependencies we strongly recommend:
+
+ * FFMpeg
+ * MatIO
+ * Qt4
+ * VLFeat
+ * OpenCV
+ * LIBSVM
+
+Building and documentation generation depends on the following packages:
+
+ * CMake
+ * Sphinx
+ * Doxygen
+ * Dvipng
+
+2. Building
+-----------
+
+Once you have built and installed all dependencies locally, you should use
+CMake to build Bob itself. From your shell, do:
+
+$ mkdir build
+$ cd build
+$ cmake -DCMAKE_BUILD_TYPE=Release ..
+$ make
+
+3. Testing
+----------
+
+Tests can be executed with:
+
+$ make test
+$ make sphinx-doctest
+
+4. Installing
+-------------
+
+Just execute:
+
+$ make install
+
+5. Influential CMake variables
+------------------------------
+
+Some variables that may be handy:
+
+ * CMAKE_BUILD_TYPE: options "Release" or "Debug" are supported
+ * CMAKE_PREFIX_PATH: places to look-up for externals such as the dependencies
+   listed above
+ * WITH_PYTHON: if you would like to force a specific version of python, you
+   can define it with this variable
+
+--
+Andre Anjos
+04.April.2012

@@ -2,7 +2,6 @@
 *.swp
 *.pyc
 *.gch
-install
 .DS_Store
 python/tests/out.mov
 .gdb_history
