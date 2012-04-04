@@ -23,7 +23,7 @@
 ==============================
 
 .. ****************************** BIG WARNING ********************************
-.. If you update this document, please make sure to also update the INSTALL
+.. If you update this document, please make sure to also update the INSTALL.md
 .. file at the root of bob. It contains a simplified version of these
 .. instructions. Thanks.
 .. ****************************** BIG WARNING ********************************
