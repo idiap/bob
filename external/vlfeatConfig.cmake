@@ -1,4 +1,4 @@
-find_path(VLFEAT_INCLUDE_DIR vl/sift2.h)
+find_path(VLFEAT_INCLUDE_DIR vl/sift.h)
 find_library(VLFEAT_LIBRARY NAMES vl)
 
 set(VLFEAT_FOUND FALSE)
