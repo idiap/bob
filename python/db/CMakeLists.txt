@@ -8,16 +8,36 @@ macro(bob_setup_db dbname)
 
   if (BOB_DATABASE_URL)
 
+    # The normal way to build: user has download package with databases or the
+    # databases have been previously downloaded @ ${CMAKE_SOURCE_DIR}/databases
     set(sqlite_input "${CMAKE_SOURCE_DIR}/databases/${dbname}.sql3")
-    set(sqlite_output "${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob/db/${dbname}/db.sql3")
-    add_custom_target(pybob_db_${dbname}_sqlite DEPENDS ${sqlite_input} COMMAND ${CMAKE_COMMAND} -E copy_if_different ${sqlite_input} ${sqlite_output})
+    set(sqlite_output "lib/python${PYTHON_VERSION}/bob/db/${dbname}")
+    add_custom_target(pybob_db_${dbname}_sqlite DEPENDS ${sqlite_input} COMMAND ${CMAKE_COMMAND} -E copy_if_different ${sqlite_input} ${CMAKE_BINARY_DIR}/${sqlite_output}/db.sql3)
     add_dependencies(pybob_db pybob_db_${dbname}_sqlite)
+    install(FILES ${sqlite_input} DESTINATION ${sqlite_output} RENAME db.sql3)
 
-  endif (BOB_DATABASE_URL)
+  else()
+
+    # If the current build creates the databases, you have to call:
+    #  * make
+    #  * make install
+    #  * make db-install
+    add_custom_target(pybob_db_create_${dbname}_sqlite COMMAND ${CMAKE_BINARY_DIR}/bin/bob_dbmanage.py ${dbname} create --recreate COMMENT "Generating ${dbname} sqlite database")
+    add_dependencies(db-create pybob_db_create_${dbname}_sqlite)
+    set(sqlite_base "lib/python${PYTHON_VERSION}/bob/db/${dbname}/db.sql3")
+    set(sqlite_input "${CMAKE_BINARY_DIR}/${sqlite_base}")
+    set(sqlite_output "${CMAKE_INSTALL_PREFIX}/${sqlite_base}")
+    add_custom_target(pybob_db_install_${dbname}_sqlite ${CMAKE_COMMAND} -E copy_if_different ${sqlite_input} ${sqlite_output} COMMENT "Installing ${dbname} sqlite database")
+    add_dependencies(pybob_db_install_${dbname}_sqlite pybob_db_create_${dbname}_sqlite)
+    add_dependencies(db-install pybob_db_install_${dbname}_sqlite)
+
+  endif()
 
 endmacro(bob_setup_db dbname)
 
 # Run creation or copying
+add_custom_target(db-create)
+add_custom_target(db-install)
 bob_setup_db(replay)
 bob_setup_db(banca)
 bob_setup_db(banca_small)
