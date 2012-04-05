@@ -1,4 +1,4 @@
 #!/usr/bin/env @PYTHON_EXECUTABLE@
-import sys; sys.path.append("@BOB_PYTHONPATH@")
+import sys; sys.path.insert(0, "@BOB_PYTHONPATH@")
 from @BOB_MODULE@ import @BOB_METHOD@ as main
 main()
