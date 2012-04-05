@@ -296,6 +296,54 @@ macro(bob_python_add_unittest package_name file_path)
   set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/data")
 endmacro()
 
+# Configure the wrapper to the python binary that automatically sets the
+# correct environment.
+#
+# Warning: this macro must be call only once per project.
+#
+#  bob_configure_bobpython(script_path build_path install_dir)
+#
+# script_path: path to the script to configure
+# build_path: script output path in build tree
+# install_dir: script output dir in install tree
+#
+# Example: bob_configure_bobpython(bin/python.in bin/python bin)
+macro(bob_configure_bobpython script_path build_path install_dir)
+  if(IS_ABSOLUTE ${CMAKE_INSTALL_PREFIX})
+    set(ABSOLUTE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+  else()
+    set(ABSOLUTE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX})
+  endif()
+
+  if(IS_ABSOLUTE ${build_path})
+    set(ABSOLUTE_build_path ${build_path})
+  else()
+    set(ABSOLUTE_build_path ${CMAKE_BINARY_DIR}/${build_path})
+  endif()
+
+  if(IS_ABSOLUTE ${install_dir})
+    set(ABSOLUTE_install_dir ${install_dir})
+  else()
+    set(ABSOLUTE_install_dir ${ABSOLUTE_INSTALL_PREFIX}/${install_dir})
+  endif()
+
+  set(BOB_PYTHONPATH ${ABSOLUTE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION})
+  configure_file(${script_path} ${CMAKE_BINARY_DIR}/tmp/python.toinstall @ONLY)
+  install(PROGRAMS ${CMAKE_BINARY_DIR}/tmp/python.toinstall
+    DESTINATION ${install_dir}
+    RENAME python)
+
+  set(BOB_PYTHONPATH ${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION})
+  configure_file(${script_path} ${ABSOLUTE_build_path} @ONLY)
+
+  set(BOB_BOBPYTHON_BUILD ${ABSOLUTE_build_path} CACHE INTERNAL "Path to built python")
+  set(BOB_BOBPYTHON_INSTALL ${ABSOLUTE_install_dir}/python CACHE INTERNAL "Path to installed python")
+endmacro()
+
+##################
+# END python macro
+##################
+
 # Internal macro.
 # Recursively copy files from a folder to the build tree and install them. The
 # macro respects the relative path of the file.

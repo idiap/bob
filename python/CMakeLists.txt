@@ -7,7 +7,12 @@ if (PYTHON_EXECUTABLE AND PYTHONLIBS_FOUND AND Boost_FOUND)
 
   # Sets up a local version of the interpreter
   set(BOB_PYTHONPATH ${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION})
-  configure_file(bin/python.in ${CMAKE_BINARY_DIR}/bin/python @ONLY)
+  if(BOB_INSTALL_PYTHON_INTERPRETER)
+    bob_configure_bobpython(bin/python.in bin/python bin)
+  else()
+    # just configure it locally for build-time usage
+    configure_file(bin/python.in ${CMAKE_BINARY_DIR}/bin/python @ONLY)
+  endif()
 
   # An easy handler to debug python stuff
   set(BOB_PYTHONPATH ${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION})

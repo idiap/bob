@@ -37,6 +37,8 @@ endif()
 
 option(BOB_BUILD_CXX "Builds the C++ infrastructure." ON)
 
+option(BOB_INSTALL_PYTHON_INTERPRETER "When enabled, installs a version of the python interpreter preset to prepend Bob's environment." OFF)
+
 # Note you cannot build the Python stuff without the C++. This will work
 # though, if you build the whole project and then just wants to rebuild the C++
 # bit.
