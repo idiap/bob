@@ -75,3 +75,7 @@ Some variables that may be handy:
    listed above
  * WITH_PYTHON: if you would like to force a specific version of python, you
    can define it with this variable
+ * BOB_INSTALL_PYTHON_INTERPRETER: installs a version of Python in the
+   `<CMAKE_PREFIX_PATH>/bin` directory. This variable is useful **only** for
+   local installations of Bob in with a non-default Python interpreter in
+   which you want to facilitate the end-user setup. It is OFF by default.
