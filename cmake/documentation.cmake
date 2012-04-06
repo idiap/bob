@@ -1,8 +1,5 @@
 # New targets for building documentation
 
-# add a target to generate API documentation with Doxygen
-find_package(Doxygen)
-
 if(DOXYGEN_FOUND)
 
   configure_file(${CMAKE_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
@@ -22,13 +19,7 @@ if(DOXYGEN_FOUND)
 
 endif(DOXYGEN_FOUND)
 
-# add a target to generate user documentation with Sphinx
-find_program(SPHINX_EXECUTABLE "sphinx-build")
-if(NOT SPHINX_EXECUTABLE)
-  find_program(SPHINX_EXECUTABLE "sphinx-build-${PYTHON_VERSION}")
-endif()
-
-if(SPHINX_EXECUTABLE)
+if(SPHINX_FOUND)
 
   configure_file(${CMAKE_SOURCE_DIR}/conf.py.in ${CMAKE_CURRENT_BINARY_DIR}/conf.py)
 
@@ -67,4 +58,4 @@ if(SPHINX_EXECUTABLE)
     COMMENT "Installing (Sphinx) User Guide" VERBATIM
   )
 
-endif(SPHINX_EXECUTABLE)
+endif()
