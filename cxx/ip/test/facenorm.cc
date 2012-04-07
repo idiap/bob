@@ -39,7 +39,8 @@
 struct T {
   double eps;
 
-	T(): eps(1e-5) {}
+  //note we are comparing uint8_t values, so a difference of 1 is OK.
+	T(): eps(1.5) {}
 
 	~T() {}
 };
@@ -53,13 +54,23 @@ void check_dimensions( blitz::Array<T,d>& t1, blitz::Array<U,d>& t2)
 }
 
 template<typename T>  
-void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<T,2>& t2, 
+void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<T,2>& t2,
   const double eps )
 {
 	check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
-    for( int j=0; j<t2.extent(1); ++j)
-      BOOST_CHECK_SMALL( fabs(t1(i,j)-t2(i,j)), eps );
+    for( int j=0; j<t2.extent(1); ++j) {
+      BOOST_CHECK_SMALL( fabs(t1(i,j)-t2(i,j)), eps);
+    }
+
+  //also checks if the global sum of differences is much smaller than 1
+  double average = 0.;
+  for( int i=0; i<t1.extent(0); ++i)
+    for( int j=0; j<t2.extent(1); ++j) {
+      average += fabs(t1(i,j)-t2(i,j));
+    }
+  average /= t1.size();
+  BOOST_CHECK(average < 1e-2);
 }
 
 
