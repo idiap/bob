@@ -64,6 +64,14 @@ To checkout |project|, do the following at your shell prompt:
 
    $ git clone https://github.com/idiap/bob
 
+After cloning, you will need a copy of the databases supported by the project.
+Just do the followin commands before attempting to compile |project|:
+
+.. code-block:: sh
+
+  $ cd bob
+  $ bin/dbdownload.py --verbose
+
 Compiling the code
 ------------------
 

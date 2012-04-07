@@ -247,15 +247,14 @@ ability to plot and interact with bob.
 Notes for specific platforms
 ============================
 
-Ubuntu 10.04 (LTS)
-------------------
+Ubuntu
+------
 
-A single command line that will install all required packages under Ubuntu
-(tested on Ubuntu 10.04 LTS):
+A single command line that will install all required packages under Ubuntu:
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core cmake liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools0 ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc libhdf5-serial-dev python-argparse python-sqlalchemy python-sphinx dvipng libqt4-dev libfftw3-dev libcv-dev libhighgui-dev libcvaux-dev libsvm-dev doxygen python-sphinx texlive-fonts-recommended
+   $ sudo apt-get install git-core, cmake, rsync, python-dev, python-support, python-numpy, python-argparse, python-scipy, python-matplotlib, python-sqlalchemy, liblapack-dev, libatlas-base-dev, libblitz1-dev, ffmpeg, libavcodec-dev, libswscale-dev, libboost-all-dev, libavformat-dev, graphviz, libmatio-dev, libmagick++-dev, libhdf5-serial-dev, libqt4-dev, libfftw3-dev, libcv-dev, libhighgui-dev, libcvaux-dev, texlive-latex-recommended, texlive-latex-extra, texlive-fonts-recommended, libsvm-dev, libvl-dev, doxygen, python-sphinx, dvipng
 
 .. note::
 
@@ -265,41 +264,18 @@ A single command line that will install all required packages under Ubuntu
 
 .. note::
 
-  You will not find a pre-packaged version of VLfeat (SIFT feature extraction)
-  on Ubuntu distributions by default. You can still add the PPA by following
-  instructions on the `VLfeat launchpad webpage`_.
+  The version of Blitz++ that ships with Ubuntu currently does not support
+  arrays with more than 2G elements. Further, VLFeat is not available on this
+  distribution.  To overcome these difficulties, we have made available an
+  Ubuntu PPA that contains VLFeat and a newer version of Blitz++. To install
+  them:
 
-Ubuntu 11.10
-------------
+  .. code-block:: sh
 
-A single command line that will install all required packages under Ubuntu
-(tested on Ubuntu 11.10):
-
-.. code-block:: sh
-
-   $ sudo apt-get install git-core cmake liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc libhdf5-serial-dev python-sqlalchemy python-sphinx dvipng libqt4-dev libfftw3-dev libcv-dev libhighgui-dev libcvaux-dev libsvm-dev doxygen python-sphinx texlive-fonts-recommended
-
-.. note::
-
-  You will not find a pre-packaged version of VLfeat (SIFT feature extraction)
-  on Ubuntu distributions by default. You can still add the PPA by following
-  instructions on the `VLfeat launchpad webpage`_.
-
-Ubuntu 12.04 (LTS)
-------------------
-
-A single command line that will install all required packages under Ubuntu
-(tested on Ubuntu 12.04):
-
-.. code-block:: sh
-
-   $ sudo apt-get install git-core cmake liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libmatio-dev libmagick++-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc libhdf5-serial-dev python-sqlalchemy python-sphinx dvipng libqt4-dev libfftw3-dev libcv-dev libhighgui-dev libcvaux-dev libsvm-dev doxygen python-sphinx texlive-fonts-recommended
-
-.. note::
-
-  You will not find a pre-packaged version of VLfeat (SIFT feature extraction)
-  on Ubuntu distributions by default. You can still add the PPA by following
-  instructions on the `VLfeat launchpad webpage`_.
+    $ sudo apt-add-repository ppa:biometrics/blitz
+    $ sudo apt-add-repository ppa:biometrics/vlfeat
+    $ sudo apt-get update
+    $ sudo apt-get install libblitz1-dev libvl-dev
 
 Mac OSX
 -------
@@ -317,7 +293,7 @@ shell prompt:
 
 .. code-block:: sh
 
-   $ sudo port install cmake blitz ffmpeg python26 python_select gcc44 gcc_select py26-numpy -atlas matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx texlive-bin hdf5-18 py26-argparse qt4-mac boost +python26 python26-scipy +no_atlas fftw-3 vlfeat opencv +python26 +qt4 libsvm +python26 +tools dvipng
+   $ sudo port install cmake blitz ffmpeg python26 python_select gcc44 gcc_select py26-numpy -atlas matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx texlive-latex-extra hdf5-18 py26-argparse qt4-mac boost +python26 python26-scipy +no_atlas fftw-3 vlfeat opencv +python26 +qt4 libsvm +python26 +tools dvipng
    $ # go for a long coffee 
 
 After the installation has finished, make sure you select python 2.6 (macports)
@@ -333,21 +309,30 @@ prompt manually.
 
 .. note::
 
-  If you are installing on a machine running OSX Lion (10.7), use qt4-mac-devel
-  (version 4.8) instead of the package "qt4-mac".
-
-.. note::
-
   This setup will guide you to choose Python_ 2.6 as the interpreter where
   |project| will run. You can use either Python_ 2.5 or Python_ 2.7 as well.
   Make the required modifications on the instructions above so to install
-  packages for that version of python instead. 
+  packages for that version of python instead. It is very important that the
+  version of Python chosen matches that with which Boost.Python has been
+  compiled with. You can check how Boost (and therefore Boost.Python) has been
+  installed with the following command:
 
-You can also install git if you want to submit patches to us:
+  .. code-block:: sh
+
+    $ port installed boost
+    The following ports are currently installed:
+      boost @1.49.0_0+python26 (active)
+
+  That defines that boost is effectively installed. It was compiled with
+  version 2.6 of Python_. This is the version you **should** use when compiling
+  |project|. If you start getting crashes on the python bindings, verify this
+  first.
+
+You can also install git if you want to develop |project|.
 
 .. code-block:: sh
 
-   $ sudo port install  git-core +python26
+   $ sudo port install git-core +python26
 
 For compiling |project| under OSX, we recommend the use of "llvm-gcc" instead
 of plain gcc. After running the command above, do the following:
