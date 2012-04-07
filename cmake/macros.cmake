@@ -147,7 +147,7 @@ macro(bob_wrap_python_file package_name file_path output_path python_method file
     set(BOB_METHOD "${python_method}")
   endif()
 
-  set(BOB_PYTHONPATH ${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION})
+  set(BOB_PYTHONPATH ${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES})
   configure_file(${CMAKE_SOURCE_DIR}/python/bin/wrapper.py.in ${output_path})
 
   if(NOT ${file_to_install} STREQUAL "")
@@ -188,7 +188,7 @@ macro(bob_wrap_python_file package_name file_path output_path python_method file
       set(ABSOLUTE_install_dir ${ABSOLUTE_INSTALL_PREFIX}/${install_dir})
     endif()
 
-    set(BOB_PYTHONPATH ${ABSOLUTE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION})
+    set(BOB_PYTHONPATH ${ABSOLUTE_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES})
 
     set(${file_to_install} ${CMAKE_BINARY_DIR}/tmp/${md5}${filename})
     configure_file(${CMAKE_SOURCE_DIR}/python/bin/wrapper.py.in ${${file_to_install}})
@@ -327,13 +327,13 @@ macro(bob_configure_bobpython script_path build_path install_dir)
     set(ABSOLUTE_install_dir ${ABSOLUTE_INSTALL_PREFIX}/${install_dir})
   endif()
 
-  set(BOB_PYTHONPATH ${ABSOLUTE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION})
+  set(BOB_PYTHONPATH ${ABSOLUTE_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES})
   configure_file(${script_path} ${CMAKE_BINARY_DIR}/tmp/python.toinstall @ONLY)
   install(PROGRAMS ${CMAKE_BINARY_DIR}/tmp/python.toinstall
     DESTINATION ${install_dir}
     RENAME python)
 
-  set(BOB_PYTHONPATH ${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION})
+  set(BOB_PYTHONPATH ${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES})
   configure_file(${script_path} ${ABSOLUTE_build_path} @ONLY)
 
   set(BOB_BOBPYTHON_BUILD ${ABSOLUTE_build_path} CACHE INTERNAL "Path to built python")
@@ -458,16 +458,16 @@ macro(bob_python_bindings cxx_package package cxx_src pydependencies)
     set_target_properties(pybob_${package} PROPERTIES PREFIX "_")
     set_target_properties(pybob_${package} PROPERTIES SUFFIX ".so")
     set_target_properties(pybob_${package} PROPERTIES COMPILE_FLAGS ${pycxx_flags})
-    set_target_properties(pybob_${package} PROPERTIES LIBRARY_OUTPUT_DIRECTORY  ${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob/${cxx_package})
+    set_target_properties(pybob_${package} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES}/bob/${cxx_package})
 
     string(REPLACE "_" "/" package_path ${package})
 
     # rpath override rule for OSX
     set_target_properties(pybob_${package} PROPERTIES INSTALL_NAME_DIR
-      "${CMAKE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION}/bob/${package_path}")
+      "${CMAKE_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES}/bob/${package_path}")
 
     # makes sure bindings to the right places
-    install(TARGETS pybob_${package} LIBRARY DESTINATION lib/python${PYTHON_VERSION}/bob/${package_path})
+    install(TARGETS pybob_${package} LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES}/bob/${package_path})
 
     # makes sure headers are installed
     install(DIRECTORY ${package} DESTINATION include/bob FILES_MATCHING PATTERN "*.h")
@@ -477,11 +477,11 @@ macro(bob_python_bindings cxx_package package cxx_src pydependencies)
   # Install scripts only if not a subpackage
   if (NOT subpackage)
     if(CXX_PACKAGE STREQUAL "ROOT")
-      set(bin_path "${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob")
-      set(install_path "lib/python${PYTHON_VERSION}/bob")
+      set(bin_path "${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES}/bob")
+      set(install_path "${PYTHON_SITE_PACKAGES}/bob")
     else()
-      set(bin_path "${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob/${cxx_package}")
-      set(install_path "lib/python${PYTHON_VERSION}/bob/${cxx_package}")
+      set(bin_path "${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES}/bob/${cxx_package}")
+      set(install_path "${PYTHON_SITE_PACKAGES}/bob/${cxx_package}")
     endif()
 
     set(input_dir "${CMAKE_CURRENT_SOURCE_DIR}/lib")
@@ -503,7 +503,7 @@ macro(bob_python_bindings cxx_package package cxx_src pydependencies)
   endif()
 
   if(NOT TARGET pybob_compile_python_files)
-    add_custom_target(pybob_compile_python_files ALL COMMAND ${PYTHON_EXECUTABLE} -m compileall -q "${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob")
+    add_custom_target(pybob_compile_python_files ALL COMMAND ${PYTHON_EXECUTABLE} -m compileall -q "${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES}/bob")
   endif()
 
   add_dependencies(pybob_compile_python_files pybob_${package})
@@ -539,7 +539,7 @@ endmacro()
 # Example: bob_python_subpackage_bindings(core array "src/foo.cc" "")
 macro(bob_python_subpackage_bindings package subpackage cxx_src pydependencies)
   bob_python_bindings("${package}" "${package}_${subpackage}" "${cxx_src}" "${pydependencies}" TRUE)
-  set_target_properties(pybob_${package}_${subpackage} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION}/bob/${package}/${subpackage})
+  set_target_properties(pybob_${package}_${subpackage} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES}/bob/${package}/${subpackage})
 endmacro()
 
 
