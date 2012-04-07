@@ -36,13 +36,11 @@ namespace fs = boost::filesystem;
 namespace io = bob::io;
 namespace ca = bob::core::array;
 
-static int im_peek(const std::string& path, ca::typeinfo& info) {
+static void im_peek(const std::string& path, ca::typeinfo& info) {
 
   Magick::Image image;
   image.ping(path.c_str());
-  int retval = 0;
 
-  // Assume Grayscale image
   if( !image.magick().compare("PBM") || 
       !image.magick().compare("PGM") ||
       (
@@ -54,30 +52,29 @@ static int im_peek(const std::string& path, ca::typeinfo& info) {
       )
     )
   {
-    image.colorSpace(Magick::GRAYColorspace);
+    // Assume Grayscale image
     info.nd = 2;
     info.shape[0] = image.rows();
     info.shape[1] = image.columns();
     info.update_strides();
-    retval = 1;
   } 
   else {
     // Assume RGB image
-    image.colorSpace(Magick::RGBColorspace);
     info.nd = 3;
     info.shape[0] = 3;
     info.shape[1] = image.rows();
     info.shape[2] = image.columns();
     info.update_strides();
-    retval = 3;
   }
 
   // Set depth
   if (image.depth() <= 8) info.dtype = bob::core::array::t_uint8;
   else if (image.depth() <= 16) info.dtype = bob::core::array::t_uint16;
-  else throw std::runtime_error("unsupported image depth when reading file");
-
-  return retval;
+  else {
+    boost::format m("unsupported image depth (%d) when reading file");
+    m % image.depth();
+    throw std::runtime_error(m.str().c_str());
+  }
 }
 
 template <typename T>
