@@ -24,6 +24,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/shared_array.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/format.hpp>
 
 #include <ImageMagick/Magick++.h> 
 #include <ImageMagick/magick/MagickCore.h>
@@ -35,43 +36,46 @@ namespace fs = boost::filesystem;
 namespace io = bob::io;
 namespace ca = bob::core::array;
 
-static int im_peek(Magick::Image& image, ca::typeinfo& info) {
+static int im_peek(const std::string& path, ca::typeinfo& info) {
+
+  Magick::Image image;
+  image.ping(path.c_str());
   int retval = 0;
 
-    // Assume Grayscale image
-    if( !image.magick().compare("PBM") || 
-        !image.magick().compare("PGM") ||
-        (
-         !image.magick().compare("PNM") && 
-         (
-          image.type() == Magick::BilevelType ||
-          image.type() == Magick::GrayscaleMatteType || 
-          image.type() == Magick::GrayscaleType) 
-         )
-        )
-    {
-      image.colorSpace(Magick::GRAYColorspace);
-      info.nd = 2;
-      info.shape[0] = image.rows();
-      info.shape[1] = image.columns();
-      info.update_strides();
-      retval = 1;
-    } 
-    else {
+  // Assume Grayscale image
+  if( !image.magick().compare("PBM") || 
+      !image.magick().compare("PGM") ||
+      (
+       !image.magick().compare("PNM") && 
+       (
+        image.type() == Magick::BilevelType ||
+        image.type() == Magick::GrayscaleMatteType || 
+        image.type() == Magick::GrayscaleType) 
+      )
+    )
+  {
+    image.colorSpace(Magick::GRAYColorspace);
+    info.nd = 2;
+    info.shape[0] = image.rows();
+    info.shape[1] = image.columns();
+    info.update_strides();
+    retval = 1;
+  } 
+  else {
     // Assume RGB image
-      image.colorSpace(Magick::RGBColorspace);
-      info.nd = 3;
-      info.shape[0] = 3;
-      info.shape[1] = image.rows();
-      info.shape[2] = image.columns();
-      info.update_strides();
-      retval = 3;
-    }
+    image.colorSpace(Magick::RGBColorspace);
+    info.nd = 3;
+    info.shape[0] = 3;
+    info.shape[1] = image.rows();
+    info.shape[2] = image.columns();
+    info.update_strides();
+    retval = 3;
+  }
 
-    // Set depth
-    if (image.depth() <= 8) info.dtype = bob::core::array::t_uint8;
-    else if (image.depth() <= 16) info.dtype = bob::core::array::t_uint16;
-    else throw std::runtime_error("unsupported image depth when reading file");
+  // Set depth
+  if (image.depth() <= 8) info.dtype = bob::core::array::t_uint8;
+  else if (image.depth() <= 16) info.dtype = bob::core::array::t_uint16;
+  else throw std::runtime_error("unsupported image depth when reading file");
 
   return retval;
 }
@@ -222,14 +226,14 @@ class ImageFile: public io::File {
 
         if (mode == 'r' || (mode == 'a' && fs::exists(path))) { //try peeking
           try {
-            Magick::Image image;
-            image.ping(path.c_str());
-            im_peek(image, m_type);
+            im_peek(path, m_type);
             m_length = 1;
             m_newfile = false;
           }
           catch (Magick::Exception &error_) {
-            throw io::FileNotReadable(path);
+            boost::format m("file '%s' is not readable; ImageMagick-%s reports: %s");
+            m % path % MagickLibVersionText % error_.what();
+            throw std::runtime_error(m.str().c_str());
           }
         }
         else {
@@ -281,7 +285,9 @@ class ImageFile: public io::File {
         im_load(image, buffer);
       }
       catch( Magick::Exception &error_ ) {
-        throw io::FileNotReadable(m_filename);
+        boost::format m("file '%s' is not readable; ImageMagick-%s reports: %s");
+        m % m_filename % MagickLibVersionText % error_.what();
+        throw std::runtime_error(m.str().c_str());
       }
 
     }
