@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 2.6)
 if (PYTHON_EXECUTABLE AND PYTHONLIBS_FOUND AND Boost_FOUND)
 
   # Sets up a local version of the interpreter
-  set(BOB_PYTHONPATH ${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION})
+  set(BOB_PYTHONPATH "${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES}")
   if(BOB_INSTALL_PYTHON_INTERPRETER)
     bob_configure_bobpython(bin/python.in bin/python bin)
   else()
@@ -15,7 +15,6 @@ if (PYTHON_EXECUTABLE AND PYTHONLIBS_FOUND AND Boost_FOUND)
   endif()
 
   # An easy handler to debug python stuff
-  set(BOB_PYTHONPATH ${CMAKE_BINARY_DIR}/lib/python${PYTHON_VERSION})
   configure_file(bin/gdbpy.in ${CMAKE_BINARY_DIR}/bin/gdbpy @ONLY)
 
   bob_python_bindings(root root "" "")

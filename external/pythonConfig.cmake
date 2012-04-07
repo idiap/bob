@@ -68,9 +68,6 @@ execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import numpy; print numpy.get_i
 set(python_INCLUDE_DIRS "${PYTHON_PREFIX}/include/python${PYTHON_VERSION};${PYTHON_NUMPY_INCLUDE_DIR}" CACHE INTERNAL "incdirs")
 get_filename_component(python_LIBRARY_DIRS ${PYTHON_LIBRARY} PATH CACHE)
   
-set(PYTHON_INSTALL_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION}
-  CACHE INTERNAL "python")
-
 include_directories(SYSTEM ${python_INCLUDE_DIRS})
   
 execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; print '%d.%d.%d' % (sys.version_info[0], sys.version_info[1], sys.version_info[2])" OUTPUT_VARIABLE PYTHON_VERSION_COMPLETE OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -80,3 +77,8 @@ execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import numpy; print numpy.versi
 if(PYTHON_VERSION_COMPLETE AND NUMPY_VERSION_COMPLETE)
   find_package_message(PYTHON "Found Python ${PYTHON_VERSION_COMPLETE} and NumPy ${NUMPY_VERSION_COMPLETE}: interpreter@${PYTHON_EXECUTABLE}; library@${PYTHON_LIBRARY}; includes@${python_INCLUDE_DIRS}" "[${PYTHON_LIBRARY}][${python_INCLUDE_DIRS}]")
 endif()
+
+# Finally, we setup the python installation prefix centrally. This value is
+# standardized by Python as defined in http://docs.python.org/install/index.html
+set(PYTHON_SITE_PACKAGES "lib/python${PYTHON_VERSION}/site-packages" CACHE
+  PATH "Default package installation prefix for Python packages")
