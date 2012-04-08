@@ -57,7 +57,7 @@ namespace bob {
           */
         LBP16R(const double R=1., const bool circular=true, 
             const bool to_average=false, const bool add_average_bit=false, 
-            const bool uniform=false, const bool rotation_invariant=false);
+            const bool uniform=false, const bool rotation_invariant=false, const int eLBP_type=0);
 
         /**
           * @brief Destructor
@@ -237,16 +237,48 @@ namespace bob {
 
       // calculating the lbp
       uint16_t lbp = 0;
-      for (int i=0; i < 16; i++)
+  
+      if(m_eLBP_type == 0) 
       {
-        lbp = lbp << 1;
-        if(tab[i] >= cmp_point) ++lbp;
-      }
+        for (int i=0; i < 16; i++)
+        {
+          lbp = lbp << 1;
+          if(tab[i] >= cmp_point) ++lbp;
+        }
       
-      if(m_add_average_bit && !m_rotation_invariant && !m_uniform)
+        if(m_add_average_bit && !m_rotation_invariant && !m_uniform)
+        {
+          lbp = lbp << 1;
+          if(center > cmp_point) ++lbp;
+        }
+      }
+
+      if (m_eLBP_type == 1) // transitional LBP
       {
-        lbp = lbp << 1;
-        if(center > cmp_point) ++lbp;
+        for(int i=0; i<=15; i++)
+        {
+          lbp = lbp << 1;
+          if(i==15)
+          {
+            if(tab[i] >= tab[0]) ++lbp;
+          }
+          else    
+            if(tab[i] >= tab[i+1]) ++lbp;
+        }
+      }
+
+      if (m_eLBP_type == 2) //directional coded LBP
+      {
+        for(int i=0; i<=7; i++)
+        {
+          lbp = lbp << 2;
+          if((tab[i] >= cmp_point && tab[i+8] >= cmp_point) || (tab[i] < cmp_point && tab[i+8] < cmp_point))
+            if (fabs(tab[i]-cmp_point) > fabs(tab[i+8]-cmp_point)) lbp+=3;
+            else lbp+=2;
+          else
+            if (fabs(tab[i]-cmp_point) > fabs(tab[i+8]-cmp_point)) lbp+=0;
+            else lbp+=1;
+        }
       }
 
       return m_lut_current(lbp);

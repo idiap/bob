@@ -56,7 +56,7 @@ namespace bob {
           */
         LBP4R(const double R=1., const bool circular=false, 
             const bool to_average=false, const bool add_average_bit=false,
-            const bool uniform=false, const bool rotation_invariant=false);
+            const bool uniform=false, const bool rotation_invariant=false,  const int eLBP_type=0);
 
         /**
           * @brief Destructor
@@ -224,17 +224,49 @@ namespace bob {
 
       uint16_t lbp = 0;
       // lbp = lbp << 1; // useless
-      if(tab[0] >= cmp_point) ++lbp;
-      lbp = lbp << 1;
-      if(tab[1] >= cmp_point) ++lbp;
-      lbp = lbp << 1;
-      if(tab[2] >= cmp_point) ++lbp;
-      lbp = lbp << 1;
-      if(tab[3] >= cmp_point) ++lbp;
-      if(m_add_average_bit && !m_rotation_invariant && !m_uniform)
+
+      if(m_eLBP_type == 0) // regular LBP
       {
+        if(tab[0] >= cmp_point) ++lbp;
         lbp = lbp << 1;
-        if(center > cmp_point) ++lbp;
+        if(tab[1] >= cmp_point) ++lbp;
+        lbp = lbp << 1;
+        if(tab[2] >= cmp_point) ++lbp;
+        lbp = lbp << 1;
+        if(tab[3] >= cmp_point) ++lbp;
+        if(m_add_average_bit && !m_rotation_invariant && !m_uniform)
+        {
+          lbp = lbp << 1;
+          if(center > cmp_point) ++lbp;
+        }
+      }
+
+      if (m_eLBP_type == 1) // transitional LBP
+      {
+        for(int i=0; i<=3; i++)
+        {
+          lbp = lbp << 1;
+          if(i==3)
+          {
+            if(tab[i] >= tab[0]) ++lbp;
+          }
+          else    
+            if(tab[i] >= tab[i+1]) ++lbp;
+        }
+      }
+
+      if (m_eLBP_type == 2) //directional coded LBP
+      {
+        for(int i=0; i<=1; i++)
+        {
+          lbp = lbp << 2;
+          if((tab[i] >= cmp_point && tab[i+2] >= cmp_point) || (tab[i] < cmp_point && tab[i+2] < cmp_point))
+            if (fabs(tab[i]-cmp_point) > fabs(tab[i+2]-cmp_point)) lbp+=3;
+            else lbp+=2;
+          else
+            if (fabs(tab[i]-cmp_point) > fabs(tab[i+2]-cmp_point)) lbp+=0;
+            else lbp+=1;
+        }
       }
 
       return m_lut_current(lbp);

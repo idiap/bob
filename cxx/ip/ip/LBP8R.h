@@ -251,6 +251,12 @@ namespace bob {
         if(tab[6] >= cmp_point) ++lbp;
         lbp = lbp << 1;
         if(tab[7] >= cmp_point) ++lbp;
+
+        if(m_add_average_bit && !m_rotation_invariant && !m_uniform)
+        {
+          lbp = lbp << 1;
+          if(center > cmp_point) ++lbp;
+        }
       } 
 
       if (m_eLBP_type == 1) // transitional LBP
@@ -279,12 +285,6 @@ namespace bob {
             if (fabs(tab[i]-cmp_point) > fabs(tab[i+4]-cmp_point)) lbp+=0;
             else lbp+=1;
         }
-      }
-
-      if(m_add_average_bit && !m_rotation_invariant && !m_uniform)
-      {
-        lbp = lbp << 1;
-        if(center > cmp_point) ++lbp;
       }
 
       return m_lut_current(lbp);
