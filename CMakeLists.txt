@@ -35,6 +35,12 @@ else()
   endif()
 endif()
 
+set(BOB_SOVERSION_INTERNAL "OFF" CACHE INTERNAL "If we need to use a SOVERSION
+on libraries, this should set it")
+if(NOT BOB_SOVERSION)
+  set(BOB_SOVERSION ${BOB_SOVERSION_INTERNAL})
+endif()
+
 option(BOB_BUILD_CXX "Builds the C++ infrastructure." ON)
 
 option(BOB_INSTALL_PYTHON_INTERPRETER "When enabled, installs a version of the python interpreter preset to prepend Bob's environment." OFF)

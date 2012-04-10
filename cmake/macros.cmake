@@ -46,6 +46,12 @@ macro(bob_library package src dependencies shared)
   set_target_properties(bob_${package} PROPERTIES INSTALL_NAME_DIR
     "${CMAKE_INSTALL_PREFIX}/lib")
 
+  if (BOB_SOVERSION)
+    # adds versioning information
+    set_target_properties(bob_${package} PROPERTIES VERSION ${BOB_VERSION})
+    set_target_properties(bob_${package} PROPERTIES SOVERSION ${BOB_SOVERSION})
+  endif()
+
   install(TARGETS bob_${package} EXPORT bob
           LIBRARY DESTINATION lib
           ARCHIVE DESTINATION lib)
