@@ -27,6 +27,7 @@
 #include <blitz/array.h>
 #include <stdint.h>
 #include <stdexcept>
+#include <boost/format.hpp>
 
 #include "core/array.h"
 #include "core/cast.h"
@@ -59,10 +60,18 @@ namespace bob { namespace core { namespace array {
 
     if (!buf.ptr()) throw std::runtime_error("empty buffer");
 
-    if (type.dtype != bob::core::array::getElementType<T>()) throw std::runtime_error("cannot efficiently retrieve blitz::Array<> from buffer containing a different dtype");
+    if (type.dtype != bob::core::array::getElementType<T>()) {
+      boost::format m("cannot efficiently retrieve blitz::Array<%s,%d> from buffer of type '%s'");
+      m % stringize<T>() % N % type.str();
+      throw std::runtime_error(m.str().c_str());
+    }
 
-    if (type.nd != N) throw std::runtime_error("cannot retrieve blitz::Array<> from buffer containing different dimensionality");
-
+    if (type.nd != N) {
+      boost::format m("cannot retrieve blitz::Array<%s,%d> from buffer of type '%s'");
+      m % stringize<T>() % N % type.str();
+      throw std::runtime_error(m.str().c_str());
+    }
+          
     blitz::TinyVector<int,N> shape;
     blitz::TinyVector<int,N> stride;
     set_shape_and_stride(type, shape, stride);
@@ -86,7 +95,11 @@ namespace bob { namespace core { namespace array {
 
     const typeinfo& type = buf.type();
 
-    if (type.nd != N) throw std::runtime_error("cannot cast blitz::Array<> from buffer containing different dimensionality");
+    if (type.nd != N) {
+      boost::format m("cannot cast blitz::Array<%s,%d> from buffer of type '%s'");
+      m % stringize<T>() % N % type.str();
+      throw std::runtime_error(m.str().c_str());
+    }
 
     switch (type.dtype) {
       case bob::core::array::t_bool: 

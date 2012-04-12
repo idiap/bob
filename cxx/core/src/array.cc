@@ -107,7 +107,7 @@ bool ca::typeinfo::is_compatible(const ca::typeinfo& other) const {
 }
 
 std::string ca::typeinfo::str() const {
-  boost::format s("%dD, %s (%d bytes), %d bytes");
+  boost::format s("dtype: %s (%d); shape: [%s]; size: %d bytes");
   size_t sz = 0;
   size_t buf_sz = 0;
   if (dtype != ca::t_unknown) {
@@ -115,7 +115,28 @@ std::string ca::typeinfo::str() const {
     sz = item_size();
     buf_sz = buffer_size();
   }
-  s % nd % item_str() % sz % buf_sz;
+  s % item_str() % sz; 
+  switch (nd) {
+    case 0:
+      s % "";
+      break;
+    case 1:
+      s % (boost::format("%d") % shape[0]).str();
+      break;
+    case 2:
+      s % (boost::format("%d,%d") % shape[0] % shape[1]).str();
+      break;
+    case 3:
+      s % (boost::format("%d,%d,%d") % shape[0] % shape[1] % shape[2]).str();
+      break;
+    case 4:
+      s % (boost::format("%d,%d,%d,%d") % shape[0] % shape[1] % shape[2] % shape[3]).str();
+      break;
+    default:
+      s % ">4 dimensions?";
+      break;
+  }
+  s % buf_sz;
   return s.str();
 }
 
