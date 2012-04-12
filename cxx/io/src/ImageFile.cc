@@ -25,9 +25,10 @@
 #include <boost/shared_array.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/format.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <ImageMagick/Magick++.h> 
-#include <ImageMagick/magick/MagickCore.h>
 
 #include "io/CodecRegistry.h"
 #include "io/Exception.h"
@@ -40,16 +41,19 @@ static void im_peek(const std::string& path, ca::typeinfo& info) {
 
   Magick::Image image;
   image.ping(path.c_str());
+  std::string ext = boost::filesystem::extension(path);
+  boost::algorithm::to_lower(ext);
 
-  if( !image.magick().compare("PBM") || 
-      !image.magick().compare("PGM") ||
-      (
-       !image.magick().compare("PNM") && 
-       (
-        image.type() == Magick::BilevelType ||
-        image.type() == Magick::GrayscaleMatteType || 
-        image.type() == Magick::GrayscaleType) 
-      )
+  if( (!image.magick().compare("PBM") || 
+        !image.magick().compare("PGM") ||
+        (
+         !image.magick().compare("PNM") && 
+         (
+          image.type() == Magick::BilevelType ||
+          image.type() == Magick::GrayscaleMatteType || 
+          image.type() == Magick::GrayscaleType) 
+        )
+      ) && ext != ".ppm" //hack to get around ImageMagic-6.6.x
     )
   {
     // Assume Grayscale image
