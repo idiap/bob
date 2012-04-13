@@ -8,7 +8,7 @@ set(ccsrc
    "src/main.cc"
    )
 
-bob_python_package_bindings(sp "${ccsrc}" "core_array")
+bob_python_package_bindings(sp "${ccsrc}" "python_integration")
 
 # Our test units
 bob_python_add_unittest(sp lib/test/fft_dct.py)

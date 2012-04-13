@@ -7,7 +7,18 @@ include(FindBoost)
 set(Boost_USE_MULTITHREADED ON)
 
 # Determine here the components you need so the system can verify
-find_package(Boost COMPONENTS python unit_test_framework iostreams thread filesystem date_time program_options system regex)
+find_package(Boost 1.40.0 REQUIRED 
+  COMPONENTS 
+    python 
+    unit_test_framework
+    iostreams 
+    thread
+    filesystem
+    date_time
+    program_options
+    system
+    regex
+  )
 
 # Renaming so all works automagically
 set(boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} CACHE INTERNAL "incdirs")

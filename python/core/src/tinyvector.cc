@@ -185,7 +185,7 @@ void register_tinyvec_to_tuple() {
               >();
 }
 
-void bind_core_array_tinyvector () {
+void bind_core_tinyvector () {
 
   /**
    * The following struct constructors will make sure we can input

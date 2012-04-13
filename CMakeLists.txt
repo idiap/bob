@@ -41,6 +41,8 @@ if(NOT BOB_SOVERSION)
   set(BOB_SOVERSION ${BOB_SOVERSION_INTERNAL})
 endif()
 
+option(SET_PUBLIC_LIBRARY_PATH "Use `ld -rpath' (Linux) or `install_name_tool' (Apple) when linking public libraries, executables. This option does not cover python bindings to C++ installed at the Python directories." ON)
+
 option(BOB_BUILD_CXX "Builds the C++ infrastructure." ON)
 
 option(BOB_INSTALL_PYTHON_INTERPRETER "When enabled, installs a version of the python interpreter preset to prepend Bob's environment." OFF)
@@ -98,17 +100,17 @@ set(CMAKE_C_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG} CACHE STRING "Flags used by the
 set(CMAKE_CXX_FLAGS ${COMMON_FLAGS} CACHE STRING "Flags used by the compiler during all build types." FORCE)
 set(CMAKE_C_FLAGS ${COMMON_FLAGS} CACHE STRING "Flags used by the compiler during all build types." FORCE)
 
-# This is our RPATH policy
-# use, i.e. don't skip the full RPATH for the build tree
-set(CMAKE_SKIP_BUILD_RPATH  FALSE)
-# when building, don't use the install RPATH already
-# (but later on when installing)
-set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-# the RPATH to be used when installing
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-# add the automatically determined parts of the RPATH
-# which point to directories outside the build tree to the install RPATH
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+if(SET_PUBLIC_LIBRARY_PATH)
+  if (APPLE)
+    set(CMAKE_INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+  else()
+    # This is our RPATH policy under Linux
+    set(CMAKE_SKIP_BUILD_RPATH  FALSE)
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+  endif()
+endif()
 
 # This will make sure we consider pkg-config directories that may have been
 # added when the user set CMAKE_PREFIX_PATH.

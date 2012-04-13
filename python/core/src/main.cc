@@ -28,6 +28,11 @@ void bind_core_version();
 void bind_core_exception();
 void bind_core_logging();
 void bind_core_profiler();
+void bind_core_bz_numpy();
+void bind_core_ndarray_numpy();
+void bind_core_typeinfo();
+void bind_core_convert();
+void bind_core_tinyvector();
 
 BOOST_PYTHON_MODULE(_core) {
   docstring_options docopt; 
@@ -40,4 +45,9 @@ BOOST_PYTHON_MODULE(_core) {
   bind_core_exception();
   bind_core_logging();
   bind_core_profiler();
+  bind_core_bz_numpy();
+  bind_core_ndarray_numpy();
+  bind_core_typeinfo();
+  bind_core_convert();
+  bind_core_tinyvector();
 }

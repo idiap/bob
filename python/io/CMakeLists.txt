@@ -20,7 +20,7 @@ endif(FFMPEG_FOUND)
 
 add_definitions("-D__STDC_CONSTANT_MACROS")
 
-bob_python_package_bindings(io "${ccsrc}" "core_array")
+bob_python_package_bindings(io "${ccsrc}" "python_integration")
 
 # Our test units
 bob_python_add_unittest(io lib/test/array.py)

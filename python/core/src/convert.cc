@@ -155,6 +155,6 @@ static object convert (tp::const_ndarray src, object dtype_like,
 
 BOOST_PYTHON_FUNCTION_OVERLOADS(convert_overloads, convert, 2, 4)
 
-void bind_core_array_convert() {
+void bind_core_convert() {
   def("convert", &convert, convert_overloads((arg("array"), arg("dtype"), arg("dest_range")=object(), arg("source_range")=object()), "Function which allows to convert/rescale a array of a given type into another array of a possibly different type with re-scaling. Typically, this can be used to rescale a 16 bit precision grayscale image (2D array) into an 8 bit precision grayscale image.\n\n  Parameters:\n\n    array -- (array) Input array\n\n    dtype -- (string) Controls the output element type for the returned array\n\n    dest_range -- (tuple) Determines the range to be deployed at the returned array\n\n    source_range -- (tuple) Determines the input range that will be used for the scaling\n\n  Returns: A new array with the same shape as this one, but re-scaled and with its element type as indicated by the user."));
 }
