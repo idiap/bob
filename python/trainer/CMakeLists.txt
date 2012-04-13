@@ -26,8 +26,8 @@ set(ccsrc_overload
    "src/main_overload.cc"
    )
 
-bob_python_package_bindings(trainer "${ccsrc}" "core_array")
-bob_python_subpackage_bindings(trainer overload "${ccsrc_overload}" "core_array")
+bob_python_package_bindings(trainer "${ccsrc}" "python_integration")
+bob_python_subpackage_bindings(trainer overload "${ccsrc_overload}" "python_integration")
 
 # Our test units
 bob_python_add_unittest(trainer lib/test/trainer.py)

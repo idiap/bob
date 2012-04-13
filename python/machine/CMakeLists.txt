@@ -25,7 +25,7 @@ if(LIBSVM_FOUND)
   set(ccsrc "src/svm.cc;${ccsrc}")
 endif()
 
-bob_python_package_bindings(machine "${ccsrc}" "core_array")
+bob_python_package_bindings(machine "${ccsrc}" "python_integration")
 
 # Our test units
 bob_python_add_unittest(machine lib/test/gaussian.py)

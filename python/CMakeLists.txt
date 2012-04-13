@@ -23,6 +23,7 @@ if (PYTHON_EXECUTABLE AND PYTHONLIBS_FOUND AND Boost_FOUND)
   bob_python_script(root bob_config.py lib/script/config.py)
   bob_python_add_test(root bob_config.py)
 
+  add_subdirectory(integration)
   add_subdirectory(core)
   add_subdirectory(io)
   add_subdirectory(math)

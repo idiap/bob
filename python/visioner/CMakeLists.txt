@@ -7,7 +7,7 @@ set(ccsrc
    "src/main.cc"
    )
 
-bob_python_package_bindings(visioner "${ccsrc}" "core_array")
+bob_python_package_bindings(visioner "${ccsrc}" "python_integration")
 
 # Visioner depends on Qt4
 include (${QT_USE_FILE})

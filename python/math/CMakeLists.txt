@@ -9,7 +9,7 @@ set(ccsrc
    "src/main.cc"
    )
 
-bob_python_package_bindings(math "${ccsrc}" "core_array")
+bob_python_package_bindings(math "${ccsrc}" "python_integration")
 
 # Our test units
 bob_python_add_unittest(math lib/test/interiorpointLP.py)

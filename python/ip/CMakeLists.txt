@@ -37,7 +37,7 @@ if(VLFEAT_FOUND)
   set(ccsrc "src/vlsift.cc;src/vldsift.cc;${ccsrc}")
 endif()
 
-bob_python_package_bindings(ip "${ccsrc}" "core_array")
+bob_python_package_bindings(ip "${ccsrc}" "python_integration")
 
 # Our test units
 bob_python_add_unittest(ip lib/test/lbp_new.py)

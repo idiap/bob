@@ -43,7 +43,7 @@ static tuple ti_stride(const ca::typeinfo& ti) {
 }
 
 
-void bind_core_array_typeinfo() {
+void bind_core_typeinfo() {
   
   class_<ca::typeinfo>("typeinfo", "Type information for bob C++ data", 
       no_init)

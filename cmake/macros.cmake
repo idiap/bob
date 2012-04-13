@@ -13,9 +13,22 @@
 #               are automatically available for the current target. Transitivity
 #               is correctly handled
 # shared: additional libraries to link with.
+# headers: [OPTIONAL] where to get the headers for this package from
 #
 # Example: bob_library(io "foo.cc;bar.cc" "core" "foo.so")
 macro(bob_library package src dependencies shared)
+
+  if(${ARGC} LESS 5)
+    set(headers "${package}")
+  else()
+    set(headers "${ARGV4}")
+  endif()
+  #message(STATUS "package      '${package}'")
+  #message(STATUS "src          '${src}'")
+  #message(STATUS "dependencies '${dependencies}'")
+  #message(STATUS "shared       '${shared}'")
+  #message(STATUS "headers      '${headers}'")
+
   string(TOUPPER "${package}" PACKAGE)
 
   set(deps_list "")
@@ -42,10 +55,6 @@ macro(bob_library package src dependencies shared)
 
   set_target_properties(bob_${package} PROPERTIES LIBRARY_OUTPUT_DIRECTORY  ${CMAKE_BINARY_DIR}/lib)
 
-  # rpath override rule for OSX
-  set_target_properties(bob_${package} PROPERTIES INSTALL_NAME_DIR
-    "${CMAKE_INSTALL_PREFIX}/lib")
-
   if (BOB_SOVERSION)
     # adds versioning information
     set_target_properties(bob_${package} PROPERTIES VERSION ${BOB_VERSION})
@@ -55,7 +64,7 @@ macro(bob_library package src dependencies shared)
   install(TARGETS bob_${package} EXPORT bob
           LIBRARY DESTINATION lib
           ARCHIVE DESTINATION lib)
-  install(DIRECTORY ${package} DESTINATION include/bob FILES_MATCHING PATTERN "*.h")
+  install(DIRECTORY ${headers} DESTINATION include/bob FILES_MATCHING PATTERN "*.h")
 endmacro()
 
 # Creates a standard Bob test.
@@ -433,13 +442,13 @@ macro(bob_python_bindings cxx_package package cxx_src pydependencies)
   string(TOUPPER "${package}" PACKAGE)
   string(TOUPPER "${cxx_package}" CXX_PACKAGE)
 
-  set(pydeps_list "")
+  set(pydeps_list "bob_${cxx_package}")
   set(pyheader_list "")
   if(NOT ("${pydependencies}" STREQUAL ""))
     foreach(dep ${pydependencies})
       string(TOUPPER "${dep}" DEP)
-      list(APPEND pydeps_list pybob_${dep})
-      list(APPEND pyheader_list "${BOB_PYTHON_${DEP}_HEADER_DIRS}")
+      list(APPEND pydeps_list bob_${dep})
+      list(APPEND pyheader_list "${BOB_${DEP}_HEADER_DIRS}")
     endforeach(dep)
   endif(NOT ("${pydependencies}" STREQUAL ""))
 
@@ -447,6 +456,7 @@ macro(bob_python_bindings cxx_package package cxx_src pydependencies)
 
   set(BOB_PYTHON_${PACKAGE}_HEADER_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${BOB_${CXX_PACKAGE}_HEADER_DIRS} ${pyheader_list} CACHE INTERNAL "${package} header dirs")
   include_directories(${BOB_PYTHON_${PACKAGE}_HEADER_DIRS} ${python_INCLUDE_DIRS})
+  #message(STATUS "Python ${package}:")
   #message(STATUS "${pydependencies}")
   #message(STATUS "${pyheader_list} !! ${pydeps_list}")
   #message(STATUS "${package}/${cxx_package} : ${BOB_PYTHON_${PACKAGE}_HEADER_DIRS} - ${BOB_${CXX_PACKAGE}_HEADER_DIRS}")
@@ -457,26 +467,18 @@ macro(bob_python_bindings cxx_package package cxx_src pydependencies)
 
   else()
     add_library(pybob_${package} SHARED ${cxx_src})
-
-    target_link_libraries(pybob_${package} bob_${cxx_package} ${pydeps_list} ${Boost_PYTHON_LIBRARY_RELEASE} ${PYTHON_LIBRARIES})
-    set(pycxx_flags "-Wno-long-long -Wno-unused-function -Winvalid-pch")
+    target_link_libraries(pybob_${package} ${pydeps_list})
     set_target_properties(pybob_${package} PROPERTIES OUTPUT_NAME "${package}")
     set_target_properties(pybob_${package} PROPERTIES PREFIX "_")
     set_target_properties(pybob_${package} PROPERTIES SUFFIX ".so")
+    set(pycxx_flags "-Wno-long-long -Wno-unused-function")
     set_target_properties(pybob_${package} PROPERTIES COMPILE_FLAGS ${pycxx_flags})
     set_target_properties(pybob_${package} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES}/bob/${cxx_package})
 
     string(REPLACE "_" "/" package_path ${package})
 
-    # rpath override rule for OSX
-    set_target_properties(pybob_${package} PROPERTIES INSTALL_NAME_DIR
-      "${CMAKE_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES}/bob/${package_path}")
-
-    # makes sure bindings to the right places
+    # makes sure bindings are installed at the right places
     install(TARGETS pybob_${package} LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES}/bob/${package_path})
-
-    # makes sure headers are installed
-    install(DIRECTORY ${package} DESTINATION include/bob FILES_MATCHING PATTERN "*.h")
 
   endif()
 
