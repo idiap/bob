@@ -1,6 +1,9 @@
-from .. import convert as __convert__
-def convert(*args, **kwargs):
-  __convert__(*args, **kwargs)
-convert.__doc__ = __convert__.__doc__
+from .. import convert as __private_convert__
+import warnings
 
-__all__ = dir()
+def convert(*args, **kwargs):
+  warnings.warn("bob.core.array.convert() has moved to bob.core.convert()", DeprecationWarning)
+  return __private_convert__(*args, **kwargs)
+convert.__doc__ = __private_convert__.__doc__
+
+__all__ = ['convert']
