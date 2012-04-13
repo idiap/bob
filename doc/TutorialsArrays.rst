@@ -159,7 +159,7 @@ do this by using the NumPy_ function :py:attr:`numpy.ndarray.astype`.
   >>> print D.dtype
   uint8
 
-In addition, |project| provides the :py:func:`bob.core.array.convert` function 
+In addition, |project| provides the :py:func:`bob.core.convert` function 
 which allows you to convert/rescale a NumPy_ :py:class:`numpy.ndarray` of a 
 given type into another array, of possibly different type, with re-scaling.
 Typically, this is useful if you want to convert a uint8 2D array (such as a
@@ -169,7 +169,7 @@ grayscale image) into a float64 2D array with a ``[0,1]`` range.
   :options: +NORMALIZE_WHITESPACE
 
   >>> img = numpy.array([[0,1,2,3,4],[255,254,253,252,251]], dtype='uint8')
-  >>> img_d = bob.core.array.convert(img, dtype='float64', dest_range=(0.,1.))
+  >>> img_d = bob.core.convert(img, dtype='float64', dest_range=(0.,1.))
   >>> print img_d 
   [[ 0. 0.004 0.008 0.012 0.016]
    [ 1. 0.996 0.992 0.988 0.984]]
