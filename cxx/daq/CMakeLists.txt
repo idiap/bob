@@ -47,13 +47,13 @@ if (OpenCV_FOUND)
     )
   
   link_directories(${OpenCV_LIB_DIR})
-  include_directories(${OpenCV_INCLUDE_DIRS})
+  include_directories(SYSTEM ${OpenCV_INCLUDE_DIRS})
 
   list(APPEND shared ${OpenCV_LIBRARIES})
 endif()
 
 include (${QT_USE_FILE})
-include_directories(${QT_INCLUDE_DIR})
+include_directories(SYSTEM ${QT_INCLUDE_DIR})
 list(APPEND shared ${QT_LIBRARIES})
 
 qt4_wrap_cpp(MOC_SRC "daq/QtDisplay.h")

@@ -30,7 +30,7 @@ set(src
 
 # If we have libsvm installed, enable the compilation of relevant modules
 if(LIBSVM_FOUND)
-  include_directories(${LIBSVM_INCLUDE_DIR})
+  include_directories(SYSTEM ${LIBSVM_INCLUDE_DIR})
   set(shared "${shared};${LIBSVM_LIBRARY}")
   set(src "${src};src/SVM.cc")
 endif(LIBSVM_FOUND)

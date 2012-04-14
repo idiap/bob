@@ -31,7 +31,7 @@ set(src
 
 # If we have VLFeat installed, enable the compilation of relevant modules
 if(VLFEAT_FOUND)
-  include_directories(${VLFEAT_INCLUDE_DIR})
+  include_directories(SYSTEM ${VLFEAT_INCLUDE_DIR})
   set(shared "${shared};${VLFEAT_LIBRARY}")
   set(src "${src};src/VLSIFT.cc;src/VLDSIFT.cc")
 endif(VLFEAT_FOUND)
