@@ -39,4 +39,5 @@ public:
 };
 
 }}
+
 #endif // NULLFACERECOGNTION_H

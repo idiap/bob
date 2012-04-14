@@ -17,11 +17,11 @@ endif ()
 
 if (OPENCV_FOUND)
   link_directories(${OpenCV_LIB_DIR})
-  include_directories(${OpenCV_INCLUDE_DIRS})
+  include_directories(SYSTEM ${OpenCV_INCLUDE_DIRS})
 endif()
 
 include(${QT_USE_FILE})
-include_directories(${QT_INCLUDE_DIR})
+include_directories(SYSTEM ${QT_INCLUDE_DIR})
 
 bob_python_package_bindings(daq "${ccsrc}" "python_integration")
 

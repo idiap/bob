@@ -25,7 +25,7 @@ set(src
 )
 
 if(LIBSVM_FOUND)
-  include_directories(${LIBSVM_INCLUDE_DIR})
+  include_directories(SYSTEM ${LIBSVM_INCLUDE_DIR})
   set(shared "${shared};${LIBSVM_LIBRARY}")
   set(src "${src};src/SVMTrainer.cc")
 endif()

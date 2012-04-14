@@ -109,45 +109,6 @@ namespace bob {
         }
       }
 
-
-      template<typename T> void convSep(const blitz::Array<T,2>& A, 
-        const blitz::Array<T,1>& b, blitz::Array<T,2>& C,
-        const enum Conv::SizeOption size_opt = Conv::Full)
-      {
-        for(int i=0; i<A.extent(1); ++i)
-        {
-          const blitz::Array<T,1> Arow = A(blitz::Range::all(), i);
-          blitz::Array<T,1> Crow = C(blitz::Range::all(), i);
-          conv(Arow, b, Crow, size_opt);
-        }
-      }
-
-     template<typename T> void convSep(const blitz::Array<T,3>& A, 
-        const blitz::Array<T,1>& b, blitz::Array<T,3>& C,
-        const enum Conv::SizeOption size_opt = Conv::Full)
-      {
-        for(int i=0; i<A.extent(1); ++i)
-          for(int j=0; j<A.extent(2); ++j)
-          {
-            const blitz::Array<T,1> Arow = A(blitz::Range::all(), i, j);
-            blitz::Array<T,1> Crow = C(blitz::Range::all(), i, j);
-            conv(Arow, b, Crow, size_opt);
-          }
-      }
-
-      template<typename T> void convSep(const blitz::Array<T,4>& A, 
-        const blitz::Array<T,1>& b, blitz::Array<T,4>& C,
-        const enum Conv::SizeOption size_opt = Conv::Full)
-      {
-        for(int i=0; i<A.extent(1); ++i)
-          for(int j=0; j<A.extent(2); ++j)
-            for(int k=0; k<A.extent(3); ++k)
-            {
-              const blitz::Array<T,1> Arow = A(blitz::Range::all(), i, j, k);
-              blitz::Array<T,1> Crow = C(blitz::Range::all(), i, j, k);
-              conv(Arow, b, Crow, size_opt);
-            }
-      }
     }
  
 
@@ -333,6 +294,48 @@ namespace bob {
         detail::convInternal(A, B, C, N0/2, (N0+1)/2, N1/2, (N1+1)/2);
       else
         detail::convInternal(A, B, C, 0, N0, 0, N1);
+    }
+
+    namespace detail {
+
+      template<typename T> void convSep(const blitz::Array<T,2>& A, 
+        const blitz::Array<T,1>& b, blitz::Array<T,2>& C,
+        const enum Conv::SizeOption size_opt = Conv::Full)
+      {
+        for(int i=0; i<A.extent(1); ++i)
+        {
+          const blitz::Array<T,1> Arow = A(blitz::Range::all(), i);
+          blitz::Array<T,1> Crow = C(blitz::Range::all(), i);
+          conv(Arow, b, Crow, size_opt);
+        }
+      }
+
+     template<typename T> void convSep(const blitz::Array<T,3>& A, 
+        const blitz::Array<T,1>& b, blitz::Array<T,3>& C,
+        const enum Conv::SizeOption size_opt = Conv::Full)
+      {
+        for(int i=0; i<A.extent(1); ++i)
+          for(int j=0; j<A.extent(2); ++j)
+          {
+            const blitz::Array<T,1> Arow = A(blitz::Range::all(), i, j);
+            blitz::Array<T,1> Crow = C(blitz::Range::all(), i, j);
+            conv(Arow, b, Crow, size_opt);
+          }
+      }
+
+      template<typename T> void convSep(const blitz::Array<T,4>& A, 
+        const blitz::Array<T,1>& b, blitz::Array<T,4>& C,
+        const enum Conv::SizeOption size_opt = Conv::Full)
+      {
+        for(int i=0; i<A.extent(1); ++i)
+          for(int j=0; j<A.extent(2); ++j)
+            for(int k=0; k<A.extent(3); ++k)
+            {
+              const blitz::Array<T,1> Arow = A(blitz::Range::all(), i, j, k);
+              blitz::Array<T,1> Crow = C(blitz::Range::all(), i, j, k);
+              conv(Arow, b, Crow, size_opt);
+            }
+      }
     }
 
     /**

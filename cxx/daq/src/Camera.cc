@@ -51,3 +51,4 @@ void Camera::removeCameraCallback(CameraCallback& callback) {
 }
 
 }}
+

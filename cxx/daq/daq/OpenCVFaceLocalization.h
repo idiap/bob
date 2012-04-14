@@ -23,7 +23,8 @@
 #include <boost/shared_ptr.hpp>
 #include <daq/FaceLocalization.h>
 
-#include <cv.h>
+#include <cxcore.h>
+#include <cvaux.h>
 
 namespace bob { namespace daq {
 

@@ -73,20 +73,19 @@ if(APPLE)
   set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
 endif(APPLE)
 
-set(COMMON_FLAGS "${COMMON_FLAGS} -pedantic -Wno-variadic-macros -Wno-long-long -Wall")
+set(COMMON_FLAGS "${COMMON_FLAGS} -pthread -pedantic -Wno-variadic-macros -Wno-long-long -Wall")
 
 if (CMAKE_COMPILER_IS_GNUCC)
-
-  # Set the compiler flags and build type(release or debug)
-  set(COMMON_FLAGS "${COMMON_FLAGS} -pthread")
 
   set(CMAKE_CXX_FLAGS_RELEASE "-O2 -mtune=generic -DNDEBUG")
 
   set(CMAKE_CXX_FLAGS_DEBUG "-g -DBOB_DEBUG -DBZ_DEBUG")
 
 else (CMAKE_COMPILER_IS_GNUCC)
-
   # Then, it must be clang/clang++
+
+  set(COMMON_FLAGS "${COMMON_FLAGS} -Qunused-arguments")
+
   set(CMAKE_CXX_FLAGS_RELEASE "-O2 -mtune=generic -DNDEBUG")
 
   set(CMAKE_CXX_FLAGS_DEBUG "-g -DBOB_DEBUG -DBZ_DEBUG")
