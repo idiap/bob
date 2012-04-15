@@ -316,43 +316,43 @@ endmacro()
 #
 # Warning: this macro must be call only once per project.
 #
-#  bob_configure_bobpython(script_path build_path install_dir)
+#  bob_configure_bobpython(file_input build_path install_dir)
 #
-# script_path: path to the script to configure
-# build_path: script output path in build tree
-# install_dir: script output dir in install tree
+# file_input: path to the script to configure
+# script_name: the destination name for the script
 #
-# Example: bob_configure_bobpython(bin/python.in bin/python bin)
-macro(bob_configure_bobpython script_path build_path install_dir)
+# Example: bob_configure_bobpython(bin/python.in bin/python)
+macro(bob_configure_bobpython file_input script_name executable)
+
+  get_filename_component(install_dir ${script_name} PATH)
+  get_filename_component(install_name ${script_name} NAME)
+
+  if ("${install_name}" STREQUAL "") 
+    set(install_name ".") 
+  endif()
+
+  # configures and installs the build directory version of the script
+  set(ABSOLUTE_build_path ${CMAKE_BINARY_DIR})
+  set(BOB_PYTHONPATH ${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES})
+  configure_file(${file_input} ${ABSOLUTE_build_path}/${script_name} @ONLY)
+
+  # gets the absolute installation prefix
   if(IS_ABSOLUTE ${CMAKE_INSTALL_PREFIX})
     set(ABSOLUTE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
   else()
     set(ABSOLUTE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX})
   endif()
 
-  if(IS_ABSOLUTE ${build_path})
-    set(ABSOLUTE_build_path ${build_path})
-  else()
-    set(ABSOLUTE_build_path ${CMAKE_BINARY_DIR}/${build_path})
-  endif()
-
-  if(IS_ABSOLUTE ${install_dir})
-    set(ABSOLUTE_install_dir ${install_dir})
-  else()
-    set(ABSOLUTE_install_dir ${ABSOLUTE_INSTALL_PREFIX}/${install_dir})
-  endif()
-
+  # configures and installs the installation directory version of the script
+  set(ABSOLUTE_install_dir ${ABSOLUTE_INSTALL_PREFIX}/${install_dir})
   set(BOB_PYTHONPATH ${ABSOLUTE_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES})
-  configure_file(${script_path} ${CMAKE_BINARY_DIR}/tmp/python.toinstall @ONLY)
-  install(PROGRAMS ${CMAKE_BINARY_DIR}/tmp/python.toinstall
-    DESTINATION ${install_dir}
-    RENAME python)
+  configure_file(${file_input} ${CMAKE_BINARY_DIR}/tmp/${install_name}.toinstall @ONLY)
+  if(executable)
+    install(PROGRAMS ${CMAKE_BINARY_DIR}/tmp/${install_name}.toinstall DESTINATION ${install_dir} RENAME ${install_name})
+  else()
+    install(FILES ${CMAKE_BINARY_DIR}/tmp/${install_name}.toinstall DESTINATION ${install_dir} RENAME ${install_name})
+  endif()
 
-  set(BOB_PYTHONPATH ${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES})
-  configure_file(${script_path} ${ABSOLUTE_build_path} @ONLY)
-
-  set(BOB_BOBPYTHON_BUILD ${ABSOLUTE_build_path} CACHE INTERNAL "Path to built python")
-  set(BOB_BOBPYTHON_INSTALL ${ABSOLUTE_install_dir}/python CACHE INTERNAL "Path to installed python")
 endmacro()
 
 ##################
