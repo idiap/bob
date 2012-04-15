@@ -17,6 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include <boost/format.hpp>
+#include "core/logging.h"
 #include "daq/QtDisplay.h"
 
 namespace bob { namespace daq {
@@ -85,7 +88,12 @@ void QtDisplay::start() {
 
   isRecording = false;
   if (!onStopRecording.empty()) {
-    system(onStopRecording.c_str());
+    int status = system(onStopRecording.c_str());
+    if (status) {
+      boost::format m("stop of recording command '%s' exited with status %d (!=0)");
+      m % onStartRecording.c_str() % status;
+      bob::core::warn << m.str() << std::endl; 
+    }
   }
 }
 
@@ -137,7 +145,12 @@ void QtDisplay::paintEvent(QPaintEvent* event) {
 
     if (status.isRecording) {
       if (!onStartRecording.empty()) {
-        system(onStartRecording.c_str());
+        int status = system(onStartRecording.c_str());
+        if (status) {
+          boost::format m("start of recording command '%s' exited with status %d (!=0)");
+          m % onStartRecording.c_str() % status;
+          bob::core::warn << m.str() << std::endl;
+        }
       }
     }
   }
