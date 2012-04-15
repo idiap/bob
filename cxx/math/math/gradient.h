@@ -134,7 +134,7 @@ namespace bob {
       bob::core::array::assertZeroBase(gy);
       bob::core::array::assertZeroBase(gx); 
 
-      // Defines 'full' ranges
+      // Defines 'full' range
       blitz::Range rall = blitz::Range::all();
 
       // Uncentered gradient at the boundaries
@@ -208,7 +208,7 @@ namespace bob {
       // Check input
       if(M<2) throw bob::math::GradientDimTooSmall(0, M);
       if(N<2) throw bob::math::GradientDimTooSmall(1, N);
-      if(P<2) throw bob::math::GradientDimTooSmall(1, P);
+      if(P<2) throw bob::math::GradientDimTooSmall(2, P);
       if(!dz>0.) throw bob::math::GradientNonPositiveSampleDistance(0,dz);
       if(!dy>0.) throw bob::math::GradientNonPositiveSampleDistance(1,dy);
       if(!dx>0.) throw bob::math::GradientNonPositiveSampleDistance(2,dx);
@@ -217,7 +217,7 @@ namespace bob {
       bob::core::array::assertZeroBase(gy);
       bob::core::array::assertZeroBase(gx); 
 
-      // Defines 'full' ranges
+      // Defines 'full' range
       blitz::Range rall = blitz::Range::all();
 
       // Uncentered gradient at the boundaries
