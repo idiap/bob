@@ -14,8 +14,3 @@ Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
 Classifier: Programming Language :: C++
 Classifier: Programming Language :: Python
 Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
-Requires-Python: @PYTHON_VERSION@
-Requires-Dist: numpy
-Requires-Dist: scipy
-Requires-Dist: sqlalchemy
-Requires-Dist: matplotlib 
