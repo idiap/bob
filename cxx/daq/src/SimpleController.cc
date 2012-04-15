@@ -22,8 +22,8 @@
 #include <sys/time.h>
 
 #include <cstdio>
+#include <cstring>
 
-#include <cstdio>
 #include <Magick++/Blob.h>
 #include <Magick++/Image.h>
 
@@ -108,6 +108,10 @@ static void yuyvToRgb24(unsigned char* dst , const unsigned char* src , const in
   }
 }
 
+/**
+ * This method is currently unused, so it was commented out of the code
+ */
+/**
 static void yuyvToBgr24(unsigned char* dst , const unsigned char* src , const int width, const int height) {
   unsigned char *s;
   unsigned char *d;
@@ -151,6 +155,7 @@ static void yuyvToBgr24(unsigned char* dst , const unsigned char* src , const in
     }
   }
 }
+**/
 
 // JPEG Header to convert MJPEG to JPEG
 // See http://alexmogurenko.com/blog/programming/mjpeg-to-jpeg-cpp-csharp-delphi/

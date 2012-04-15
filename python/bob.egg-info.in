@@ -1,0 +1,16 @@
+Metadata-Version: 1.2
+Name: bob
+Version: @BOB_VERSION@
+Summary: Bob is a free signal-processing and machine learning toolbox
+Home-page: http://idiap.github.com/bob
+Url: http://idiap.github.com/bob
+Download-URL: http://www.idiap.ch/software/bob/packages/bob-@BOB_VERSION@.tar.gz
+Author-email: "Bob Developers" <bob-devel@googlegroups.com>
+License: GPL version 3
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console (Text Based)
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Programming Language :: C++
+Classifier: Programming Language :: Python
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
