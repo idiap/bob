@@ -73,3 +73,47 @@ const char* math::NorminvPNotInRangeError::what() const throw() {
   }
 }
 
+math::GradientDimTooSmall::GradientDimTooSmall(const size_t ind, const size_t size) throw(): 
+  m_ind(ind), m_size(size)
+{
+}
+
+math::GradientDimTooSmall::~GradientDimTooSmall() throw() {
+}
+
+const char* math::GradientDimTooSmall::what() const throw() {
+  try {
+    boost::format message("The dimension '%d' is of length '%d', strictly smaller than 2. \
+      No Gradient could be computed.");
+    message % m_ind;
+    message % m_size;
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "math::GradientDimTooSmall: cannot format, exception raised";
+    return emergency;
+  }
+}
+
+math::GradientNonPositiveSampleDistance::GradientNonPositiveSampleDistance(
+  const size_t ind, const double val) throw(): 
+  m_ind(ind), m_val(val)
+{
+}
+
+math::GradientNonPositiveSampleDistance::~GradientNonPositiveSampleDistance() throw() {
+}
+
+const char* math::GradientNonPositiveSampleDistance::what() const throw() {
+  try {
+    boost::format message("The sample distance '%f' for dimension '%d' is NOT strictly positive.\
+      No Gradient could be computed.");
+    message % m_val;
+    message % m_ind;
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "math::GradientNonPositiveSampleDistance: cannot format, exception raised";
+    return emergency;
+  }
+}

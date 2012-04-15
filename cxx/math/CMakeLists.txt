@@ -40,6 +40,7 @@ bob_library(math "${src}" "${deps}" "${shared}")
 
 # Defines tests for this package
 bob_test(math eig test/eig.cc)
+bob_test(math gradient test/gradient.cc)
 bob_test(math linear test/linear.cc)
 bob_test(math linsolve test/linsolve.cc)
 bob_test(math lu_det_inv test/lu_det_inv.cc)

@@ -65,6 +65,38 @@ namespace bob { namespace math {
       mutable std::string m_message;
   };
 
+  /**
+   * Raised when a gradient is computed along a dimension whose length is 
+   * strictly smaller than 2.
+   */
+  class GradientDimTooSmall: public Exception {
+    public:
+      GradientDimTooSmall(const size_t index, const size_t size) throw();
+      virtual ~GradientDimTooSmall() throw();
+      virtual const char* what() const throw();
+
+    private:
+      size_t m_ind;
+      size_t m_size;
+      mutable std::string m_message;
+  };
+
+  /**
+   * Raised when a sample distance parameter of the gradient computation is
+   * not strictly positive.
+   */
+  class GradientNonPositiveSampleDistance: public Exception {
+    public:
+      GradientNonPositiveSampleDistance(const size_t index, const double val) throw();
+      virtual ~GradientNonPositiveSampleDistance() throw();
+      virtual const char* what() const throw();
+
+    private:
+      size_t m_ind;
+      double m_val;
+      mutable std::string m_message;
+  };
+
 }}
 
 #endif /* BOB_MATH_EXCEPTION_H */
