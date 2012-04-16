@@ -77,10 +77,13 @@ namespace bob {
       g(M-1) = input(M-1) - input(M-2);
 
       // Centered gradient otherwise
-      blitz::Range r(1,M-2);
-      blitz::Range rp(2,M-1);
-      blitz::Range rm(0,M-3);
-      g(r) = (input(rp) - input(rm)) / 2.;
+      if(M>2)
+      {
+        blitz::Range r(1,M-2);
+        blitz::Range rp(2,M-1);
+        blitz::Range rm(0,M-3);
+        g(r) = (input(rp) - input(rm)) / 2.;
+      }
 
       // Update scaling if required
       if(dx!=1.) g *= (1./dx);
@@ -144,14 +147,20 @@ namespace bob {
       gx(rall,N-1) = input(rall,N-1) - input(rall,N-2);
 
       // Centered gradient otherwise
-      blitz::Range ry(1,M-2);
-      blitz::Range ryp(2,M-1);
-      blitz::Range rym(0,M-3);
-      blitz::Range rx(1,N-2);
-      blitz::Range rxp(2,N-1);
-      blitz::Range rxm(0,N-3);
-      gy(ry,rall) = (input(ryp,rall) - input(rym,rall)) / 2.;
-      gx(rall,rx) = (input(rall,rxp) - input(rall,rxm)) / 2.;
+      if(M>2)
+      {
+        blitz::Range ry(1,M-2);
+        blitz::Range ryp(2,M-1);
+        blitz::Range rym(0,M-3);
+        gy(ry,rall) = (input(ryp,rall) - input(rym,rall)) / 2.;
+      }
+      if(N>2)
+      {
+        blitz::Range rx(1,N-2);
+        blitz::Range rxp(2,N-1);
+        blitz::Range rxm(0,N-3);
+        gx(rall,rx) = (input(rall,rxp) - input(rall,rxm)) / 2.;
+      }
 
       // Update scaling if required
       if(dy!=1.) gy *= (1./dy);
@@ -229,18 +238,27 @@ namespace bob {
       gx(rall,rall,P-1) = input(rall,rall,P-1) - input(rall,rall,P-2);
 
       // Centered gradient otherwise
-      blitz::Range rz(1,M-2);
-      blitz::Range rzp(2,M-1);
-      blitz::Range rzm(0,M-3);
-      blitz::Range ry(1,N-2);
-      blitz::Range ryp(2,N-1);
-      blitz::Range rym(0,N-3);
-      blitz::Range rx(1,P-2);
-      blitz::Range rxp(2,P-1);
-      blitz::Range rxm(0,P-3);
-      gz(rz,rall,rall) = (input(rzp,rall,rall) - input(rzm,rall,rall)) / 2.;
-      gy(rall,ry,rall) = (input(rall,ryp,rall) - input(rall,rym,rall)) / 2.;
-      gx(rall,rall,rx) = (input(rall,rall,rxp) - input(rall,rall,rxm)) / 2.;
+      if(M>2)
+      {
+        blitz::Range rz(1,M-2);
+        blitz::Range rzp(2,M-1);
+        blitz::Range rzm(0,M-3);
+        gz(rz,rall,rall) = (input(rzp,rall,rall) - input(rzm,rall,rall)) / 2.;
+      }
+      if(N>2)
+      {
+        blitz::Range ry(1,N-2);
+        blitz::Range ryp(2,N-1);
+        blitz::Range rym(0,N-3);
+        gy(rall,ry,rall) = (input(rall,ryp,rall) - input(rall,rym,rall)) / 2.;
+      }
+      if(P>2)
+      {
+        blitz::Range rx(1,P-2);
+        blitz::Range rxp(2,P-1);
+        blitz::Range rxm(0,P-3);
+        gx(rall,rall,rx) = (input(rall,rall,rxp) - input(rall,rall,rxm)) / 2.;
+      }
       
       // Update scaling if required
       if(dz!=1.) gz *= (1./dz);
