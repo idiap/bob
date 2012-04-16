@@ -7,6 +7,7 @@ set(shared "")
 
 # This defines the list of source files inside this package.
 set(src
+   "src/block.cc"
    "src/color.cc"
    "src/Exception.cc"
    "src/HornAndSchunckFlow.cc"
