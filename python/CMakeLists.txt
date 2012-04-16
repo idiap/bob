@@ -8,7 +8,7 @@ if (PYTHON_EXECUTABLE AND PYTHONLIBS_FOUND AND Boost_FOUND)
   # Sets up a local version of the interpreter
   set(BOB_PYTHONPATH "${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES}")
   if(BOB_INSTALL_PYTHON_INTERPRETER)
-    bob_configure_bobpython(bin/python.in bin/python ON)
+    bob_configure_bobpython(bin/python.in bin/python "ON")
   else()
     # just configure it locally for build-time usage
     configure_file(bin/python.in ${CMAKE_BINARY_DIR}/bin/python @ONLY)
@@ -24,7 +24,7 @@ if (PYTHON_EXECUTABLE AND PYTHONLIBS_FOUND AND Boost_FOUND)
   bob_python_add_test(root bob_config.py)
 
   # Installs the egg-info plugin so setuptools can find bob
-  bob_configure_bobpython(bob.egg-info.in ${PYTHON_SITE_PACKAGES}/bob-${BOB_VERSION}-py${PYTHON_VERSION}.egg-info OFF)
+  bob_configure_bobpython(bob.egg-info.in ${PYTHON_SITE_PACKAGES}/bob-${BOB_VERSION}-py${PYTHON_VERSION}.egg-info "OFF")
 
   add_subdirectory(integration)
   add_subdirectory(core)
