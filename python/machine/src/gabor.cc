@@ -68,7 +68,6 @@ static double bob_similarity(bob::machine::GaborGraphMachine& self, bob::python:
         default:
           throw bob::core::UnexpectedShapeError();
       }
-      break;
     }
 
     case 3:{ // Gabor graph including jets with phases
@@ -85,7 +84,6 @@ static double bob_similarity(bob::machine::GaborGraphMachine& self, bob::python:
         default:
           throw bob::core::UnexpectedShapeError();
       }
-      break;
     }
 
     default: // unknown graph shape
