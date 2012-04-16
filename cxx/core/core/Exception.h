@@ -89,6 +89,21 @@ namespace bob {
         mutable std::string m_message;
     };
 
+
+    /**
+     * A NotImplementedError is raised when a specific function of a class
+     * is only implementable in certain subclasses, but not in the current one.
+     */
+    class NotImplementedError: public Exception {
+
+      public:
+        NotImplementedError(const std::string& reason = "This function cannot be implemented in this class") throw();
+        virtual ~NotImplementedError() throw();
+        virtual const char* what() const throw();
+
+      private:
+        std::string m_reason;
+    };
   }
 
 }

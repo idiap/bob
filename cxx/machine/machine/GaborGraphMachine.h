@@ -46,7 +46,7 @@ namespace bob{ namespace machine {
         int below
       );
       
-      //! creates a regular grid graph with sepcified first and last position, and the step size between two nodes
+      //! creates a regular grid graph with specified first and last position, and the step size between two nodes
       GaborGraphMachine(
         blitz::TinyVector<int,2> first,
         blitz::TinyVector<int,2> last,
@@ -79,8 +79,22 @@ namespace bob{ namespace machine {
 
       //! computes the similarity of two Gabor graphs
       double similarity(
+        const blitz::Array<double,2>& model_graph_jets,
+        const blitz::Array<double,2>& probe_graph_jets,
+        const bob::machine::GaborJetSimilarity& jet_similarity_function
+      ) const;
+
+      //! computes the similarity of two Gabor graphs
+      double similarity(
         const blitz::Array<double,3>& model_graph_jets,
         const blitz::Array<double,3>& probe_graph_jets,
+        const bob::machine::GaborJetSimilarity& jet_similarity_function
+      ) const;
+
+      //! computes the similarity of a set of graphs to another graph
+      double similarity(
+        const blitz::Array<double,3>& many_model_graph_jets,
+        const blitz::Array<double,2>& probe_graph_jets,
         const bob::machine::GaborJetSimilarity& jet_similarity_function
       ) const;
 
