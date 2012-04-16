@@ -54,6 +54,7 @@ void bind_core_exception() {
   register_exception_translator<std::underflow_error>(PyExc_ArithmeticError);
 
   register_exception_translator<bob::core::Exception>(PyExc_RuntimeError);
+  register_exception_translator<bob::core::NotImplementedError>(PyExc_NotImplementedError);
 
   // note: only register exceptions to which you need specific behavior not
   // covered by catching RuntimeError
