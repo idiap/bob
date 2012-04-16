@@ -100,7 +100,7 @@ static double adjustPhase(double phase){
 /**
  * Constructor for the DisparitySimilarity function that requires the information about the
  * GaborWaveletTransform that was used to generate the Gabor jets that will be compared later on
- * @param gwt The GaborWaveletTransform class with which the Gbaor jets were generated
+ * @param gwt The GaborWaveletTransform class with which the Gabor jets were generated
  */
 bob::machine::DisparitySimilarity::DisparitySimilarity(const bob::ip::GaborWaveletTransform& gwt)
   : GaborJetSimilarity(),

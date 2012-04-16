@@ -53,15 +53,54 @@ static void bob_average(bob::machine::GaborGraphMachine& self, bob::python::cons
 }
 
 static double bob_similarity(bob::machine::GaborGraphMachine& self, bob::python::const_ndarray model_graph, bob::python::ndarray probe_graph, const bob::machine::GaborJetSimilarity& similarity_function){
-  blitz::Array<double,3> probe = probe_graph.bz<double,3>();
-  switch (model_graph.type().nd){
-    case 3:{
-      const blitz::Array<double,3> model = model_graph.bz<double,3>();
-      return self.similarity(model, probe, similarity_function);
+  switch (probe_graph.type().nd){
+    case 2:{ // Gabor graph including jets without phases
+      blitz::Array<double,2> probe = probe_graph.bz<double,2>();
+      switch (model_graph.type().nd){
+        case 2:{
+          const blitz::Array<double,2> model = model_graph.bz<double,2>();
+          return self.similarity(model, probe, similarity_function);
+        }
+        case 3:{
+          const blitz::Array<double,3> model = model_graph.bz<double,3>();
+          return self.similarity(model, probe, similarity_function);
+        }
+        default:
+          throw bob::core::UnexpectedShapeError();
+      }
+      break;
     }
-    case 4:{
-      const blitz::Array<double,4> model = model_graph.bz<double,4>();
-      return self.similarity(model, probe, similarity_function);
+    case 3:{ // Gabor graph including jets with phases
+      blitz::Array<double,3> probe = probe_graph.bz<double,3>();
+      switch (model_graph.type().nd){
+        case 3:{
+          const blitz::Array<double,3> model = model_graph.bz<double,3>();
+          return self.similarity(model, probe, similarity_function);
+        }
+        case 4:{
+          const blitz::Array<double,4> model = model_graph.bz<double,4>();
+          return self.similarity(model, probe, similarity_function);
+        }
+        default:
+          throw bob::core::UnexpectedShapeError();
+      }
+      break;
+    }
+    break;
+    default: // unknown graph shape
+      throw bob::core::UnexpectedShapeError();
+  }
+}
+
+static double base_class_sim(const bob::machine::GaborJetSimilarity& self, bob::python::const_ndarray jet1, bob::python::const_ndarray jet2){
+  switch (jet1.type().nd){
+    case 1:{
+      const blitz::Array<double,1> j1 = jet1.bz<double,1>(), j2 = jet2.bz<double,1>();
+      return self.similarity(j1, j2);
+    }
+    case 2:{
+      const blitz::Array<double,2> j1 = jet1.bz<double,2>(), j2 = jet2.bz<double,2>();
+      return self.similarity(j1, j2);
     }
     default:
       throw bob::core::UnexpectedShapeError();
@@ -98,6 +137,22 @@ static double canberra_sim(const bob::machine::CanberraSimilarity& self, bob::py
   }
 }
 
+static double disparity_sim(const bob::machine::DisparitySimilarity& self, bob::python::const_ndarray jet1, bob::python::const_ndarray jet2){
+  switch (jet1.type().nd){
+    case 1:{
+      const blitz::Array<double,1> j1 = jet1.bz<double,1>(), j2 = jet2.bz<double,1>();
+      // call the similarity function (which will throw an exception)
+      return self.similarity(j1, j2);
+    }
+    case 2:{
+      const blitz::Array<double,2> j1 = jet1.bz<double,2>(), j2 = jet2.bz<double,2>();
+      return self.similarity(j1, j2);
+    }
+    default:
+      throw bob::core::UnexpectedShapeError();
+  }
+}
+
 
 void bind_machine_gabor(){
   /////////////////////////////////////////////////////////////////////////////////////////
@@ -110,7 +165,7 @@ void bind_machine_gabor(){
 
     .def(
       "__call__",
-      &bob::machine::GaborJetSimilarity::similarity,
+      &base_class_sim,
       (boost::python::arg("self"), boost::python::arg("jet1"), boost::python::arg("jet2")),
       "Computes the similarity."
     );
@@ -154,7 +209,7 @@ void bind_machine_gabor(){
 
     .def(
       "__call__",
-      &bob::machine::DisparitySimilarity::similarity,
+      &disparity_sim,
       (boost::python::arg("self"), boost::python::arg("jet1"), boost::python::arg("jet2")),
       "Computes the similarity."
     )
@@ -237,8 +292,7 @@ void bind_machine_gabor(){
         "Generates a Grid graph extractor with nodes put between the given first and last position in the desired step size."
       )
     )
-    
-    
+
     .add_property(
       "number_of_nodes",
       &bob::machine::GaborGraphMachine::numberOfNodes,

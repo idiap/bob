@@ -38,6 +38,9 @@ namespace bob { namespace machine {
       //! The similarity between two Gabor jets, including absolute values and phases
       virtual double similarity(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const = 0;
 
+      //! The similarity between two Gabor jets, including absolute values only
+      virtual double similarity(const blitz::Array<double,1>& jet1, const blitz::Array<double,1>& jet2) const = 0;
+
   };
 
   //! \brief The default Gabor jet similarity function, which is the normalized scalar product,
@@ -50,7 +53,7 @@ namespace bob { namespace machine {
       virtual double similarity(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const;
 
       //! computes similarity between Gabor jets with absolute values only
-      double similarity(const blitz::Array<double,1>& jet1, const blitz::Array<double,1>& jet2) const;
+      virtual double similarity(const blitz::Array<double,1>& jet1, const blitz::Array<double,1>& jet2) const;
 };
 
   //! The Canberra similarity measure which most often performs better than the cosine
@@ -62,7 +65,7 @@ namespace bob { namespace machine {
       virtual double similarity(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const;
 
       //! computes similarity between Gabor jets with absolute values only
-      double similarity(const blitz::Array<double,1>& jet1, const blitz::Array<double,1>& jet2) const;
+      virtual double similarity(const blitz::Array<double,1>& jet1, const blitz::Array<double,1>& jet2) const;
   };
 
   //! \brief This function computes the disparity similarity function by estimating a disparity vector from two jets
@@ -73,6 +76,12 @@ namespace bob { namespace machine {
 
       //! computes the similarity (including the estimation of the disparity vector)
       virtual double similarity(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const;
+
+      //! the similarity between Gabor jets without phases is not supported by this class (and its derivations)
+      virtual double similarity(const blitz::Array<double,1>& jet1, const blitz::Array<double,1>& jet2) const{
+        throw bob::core::NotImplementedError("Disparity similarity (and its derivatives) need Gabor jets including phases");
+      }
+
       //! returns the disparity vector estimated during the last call of similarity(...)
       const blitz::TinyVector<double,2>& disparity() const {return m_disparity;}
 

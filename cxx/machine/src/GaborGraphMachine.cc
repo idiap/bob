@@ -169,6 +169,28 @@ void bob::machine::GaborGraphMachine::average(
  * @return the similarity of the two graphs
  */
 double bob::machine::GaborGraphMachine::similarity(
+  const blitz::Array<double,2>& model_graph_jets,
+  const blitz::Array<double,2>& probe_graph_jets,
+  const bob::machine::GaborJetSimilarity& jet_similarity_function
+) const
+{
+  // iterate over the nodes and average Gabor jet similarities
+  double similarity = 0.;
+  blitz::Range all = blitz::Range::all();
+  for (int i = 0; i < model_graph_jets.extent(0); ++i){
+    similarity += jet_similarity_function.similarity(model_graph_jets(i,all), probe_graph_jets(i,all));
+  }
+  return similarity / model_graph_jets.extent(0);
+}
+
+/**
+ * Computes the similarity of two Gabor graphs with the given similarity function
+ * @param model_graph_jets  One of the two graphs to compare
+ * @param probe_graph_jets  One of the two graphs to compare
+ * @param jet_similarity_function  The similarity function to be used for comparison of two corresponding Gabor jets
+ * @return the similarity of the two graphs
+ */
+double bob::machine::GaborGraphMachine::similarity(
   const blitz::Array<double,3>& model_graph_jets,
   const blitz::Array<double,3>& probe_graph_jets,
   const bob::machine::GaborJetSimilarity& jet_similarity_function
@@ -182,6 +204,35 @@ double bob::machine::GaborGraphMachine::similarity(
   }
   return similarity / model_graph_jets.extent(0);
 }
+
+
+/**
+ * Computes the similarity of the given set of graphs and the given probe graph
+ * @param many_model_graph_jets  The set of Gabor graphs to compare
+ * @param probe_graph_jets  The probe graph to compare
+ * @param jet_similarity_function  The similarity function to be used for comparison of two corresponding Gabor jets
+ * @return the similarity of the two graphs
+ */
+double bob::machine::GaborGraphMachine::similarity(
+  const blitz::Array<double,3>& many_model_graph_jets,
+  const blitz::Array<double,2>& probe_graph_jets,
+  const bob::machine::GaborJetSimilarity& jet_similarity_function
+) const
+{
+  // iterate over the nodes and average Gabor jet similarities
+  double similarity = 0.;
+  blitz::Range all = blitz::Range::all();
+  for (int i = 0; i < many_model_graph_jets.extent(1); ++i){
+    // maximize jet similarity over all models in the gallery
+    double max_similarity = 0.;
+    for (int p = 0; p < many_model_graph_jets.extent(0); ++p){
+      max_similarity = std::max(max_similarity, jet_similarity_function.similarity(many_model_graph_jets(p,i,all), probe_graph_jets(i,all)));
+    }
+    similarity += max_similarity;
+  }
+  return similarity / many_model_graph_jets.extent(1);
+}
+
 
 /**
  * Computes the similarity of the given set of graphs and the given probe graph
