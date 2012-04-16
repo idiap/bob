@@ -26,6 +26,7 @@ void bind_math_interiorpointLP();
 void bind_math_linsolve();
 void bind_math_norminv();
 void bind_math_stats();
+void bind_math_histogram();
 
 BOOST_PYTHON_MODULE(_math) {
 
@@ -35,4 +36,5 @@ BOOST_PYTHON_MODULE(_math) {
   bind_math_linsolve();
   bind_math_norminv();
   bind_math_stats();
+  bind_math_histogram();
 }
