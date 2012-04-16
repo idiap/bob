@@ -70,6 +70,7 @@ static double bob_similarity(bob::machine::GaborGraphMachine& self, bob::python:
       }
       break;
     }
+
     case 3:{ // Gabor graph including jets with phases
       blitz::Array<double,3> probe = probe_graph.bz<double,3>();
       switch (model_graph.type().nd){
@@ -86,7 +87,7 @@ static double bob_similarity(bob::machine::GaborGraphMachine& self, bob::python:
       }
       break;
     }
-    break;
+
     default: // unknown graph shape
       throw bob::core::UnexpectedShapeError();
   }
