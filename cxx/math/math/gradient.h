@@ -32,25 +32,7 @@ namespace bob {
  * @{
  */
   namespace math {
-
-    /**
-      * @brief Function which computes the gradient of a 1D signal
-      *   The gradient is computed using central differences in the interior
-      *   and first differences at the boundaries.
-      *   Similar to NumPy and MATLAB gradient function
-      * @param input The input blitz array
-      * @param dx The sample distance along the x-axis 
-      * @param g The output blitz array for the gradient
-      */
-    template <typename T, typename U>
-    void gradient(const blitz::Array<T,1>& input, blitz::Array<U,1>& g,
-      const double dx=1.)
-    {
-      // Check input size
-      bob::core::array::assertSameShape(input, g);
-      gradient_(input, g, dx);
-    }
-    
+   
     /**
       * @brief Function which computes the gradient of a 1D signal
       *   The gradient is computed using central differences in the interior
@@ -88,26 +70,22 @@ namespace bob {
       // Update scaling if required
       if(dx!=1.) g *= (1./dx);
     } 
-
     /**
-      * @brief Function which computes the gradient of a 2D signal
+      * @brief Function which computes the gradient of a 1D signal
       *   The gradient is computed using central differences in the interior
       *   and first differences at the boundaries.
       *   Similar to NumPy and MATLAB gradient function
       * @param input The input blitz array
-      * @param gy The output blitz array for the gradient along the y-axis
-      * @param gx The output blitz array for the gradient along the x-axis
-      * @param dy The sample distance along the y-axis 
       * @param dx The sample distance along the x-axis 
+      * @param g The output blitz array for the gradient
       */
     template <typename T, typename U>
-    void gradient(const blitz::Array<T,2>& input, blitz::Array<U,2>& gy,
-      blitz::Array<U,2>& gx, const double dy=1., const double dx=1.)
+    void gradient(const blitz::Array<T,1>& input, blitz::Array<U,1>& g,
+      const double dx=1.)
     {
       // Check input size
-      bob::core::array::assertSameShape(input, gy);
-      bob::core::array::assertSameShape(input, gx);
-      gradient_(input, gy, gx, dy, dx);
+      bob::core::array::assertSameShape(input, g);
+      gradient_<T,U>(input, g, dx);
     }
  
     /**
@@ -166,30 +144,25 @@ namespace bob {
       if(dy!=1.) gy *= (1./dy);
       if(dx!=1.) gx *= (1./dx);
     }
-
     /**
-      * @brief Function which computes the gradient of a 3D signal
+      * @brief Function which computes the gradient of a 2D signal
       *   The gradient is computed using central differences in the interior
       *   and first differences at the boundaries.
       *   Similar to NumPy and MATLAB gradient function
       * @param input The input blitz array
-      * @param gz The output blitz array for the gradient along the z-axis
       * @param gy The output blitz array for the gradient along the y-axis
       * @param gx The output blitz array for the gradient along the x-axis
-      * @param dz The sample distance along the z-axis 
       * @param dy The sample distance along the y-axis 
       * @param dx The sample distance along the x-axis 
       */
     template <typename T, typename U>
-    void gradient(const blitz::Array<T,2>& input, blitz::Array<U,2>& gz,
-      blitz::Array<U,2>& gy, blitz::Array<U,2>& gx, const double dz=1.,
-      const double dy=1., const double dx=1.)
+    void gradient(const blitz::Array<T,2>& input, blitz::Array<U,2>& gy,
+      blitz::Array<U,2>& gx, const double dy=1., const double dx=1.)
     {
       // Check input size
-      bob::core::array::assertSameShape(input, gz);
       bob::core::array::assertSameShape(input, gy);
       bob::core::array::assertSameShape(input, gx);
-      gradient_(input, gz, gy, gx, dz, dy, dx);
+      gradient_<T,U>(input, gy, gx, dy, dx);
     }
  
     /**
@@ -265,7 +238,31 @@ namespace bob {
       if(dy!=1.) gy *= (1./dy);
       if(dx!=1.) gx *= (1./dx);
     }
-
+    /**
+      * @brief Function which computes the gradient of a 3D signal
+      *   The gradient is computed using central differences in the interior
+      *   and first differences at the boundaries.
+      *   Similar to NumPy and MATLAB gradient function
+      * @param input The input blitz array
+      * @param gz The output blitz array for the gradient along the z-axis
+      * @param gy The output blitz array for the gradient along the y-axis
+      * @param gx The output blitz array for the gradient along the x-axis
+      * @param dz The sample distance along the z-axis 
+      * @param dy The sample distance along the y-axis 
+      * @param dx The sample distance along the x-axis 
+      */
+    template <typename T, typename U>
+    void gradient(const blitz::Array<T,2>& input, blitz::Array<U,2>& gz,
+      blitz::Array<U,2>& gy, blitz::Array<U,2>& gx, const double dz=1.,
+      const double dy=1., const double dx=1.)
+    {
+      // Check input size
+      bob::core::array::assertSameShape(input, gz);
+      bob::core::array::assertSameShape(input, gy);
+      bob::core::array::assertSameShape(input, gx);
+      gradient_<T,U>(input, gz, gy, gx, dz, dy, dx);
+    }
+ 
   }
 
 /**
