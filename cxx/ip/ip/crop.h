@@ -20,13 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_IP_CROP_H
-#define BOB5SPRO_IP_CROP_H
+#ifndef BOB_IP_CROP_H
+#define BOB_IP_CROP_H
 
 #include "core/array_assert.h"
 #include "core/array_index.h"
-
-namespace tca = bob::core::array;
 
 namespace bob {
 /**
@@ -108,10 +106,10 @@ namespace bob {
         int y_src, x_src;
         for( int y=0; y<crop_h; ++y) {
           is_y_out = y+crop_y<0 || y+crop_y>=src.extent(0);
-          y_src = tca::keepInRange( y+crop_y, 0, src.extent(0)-1);
+          y_src = bob::core::array::keepInRange( y+crop_y, 0, src.extent(0)-1);
           for( int x=0; x<crop_w; ++x) {
             if( is_y_out || x+crop_x<0 || x+crop_x>=src.extent(1) ) {
-              x_src = tca::keepInRange( x+crop_x, 0, src.extent(1)-1);
+              x_src = bob::core::array::keepInRange( x+crop_x, 0, src.extent(1)-1);
               dst(y,x) = (zero_out ? 0 : 
                 src( y_src, x_src) );
               if( mask )
@@ -151,7 +149,7 @@ namespace bob {
       detail::cropParameterCheck( crop_y, crop_x, crop_h, crop_w, 
         src.extent(0), src.extent(1) );
       // Checks that the src array has zero base indices
-      tca::assertZeroBase( src);
+      bob::core::array::assertZeroBase( src);
 
       // Crop the 2D array
       detail::cropNoCheckReference(src, dst, crop_y, crop_x, crop_h, crop_w);
@@ -185,11 +183,11 @@ namespace bob {
         detail::cropParameterCheck( crop_y, crop_x, crop_h, crop_w, 
           src.extent(0), src.extent(1) );
       // Check input 
-      tca::assertZeroBase(src);
+      bob::core::array::assertZeroBase(src);
       // Check output
       const blitz::TinyVector<int,2> shape(crop_h,crop_w);
-      tca::assertZeroBase(dst);
-      tca::assertSameShape(dst, shape);
+      bob::core::array::assertZeroBase(dst);
+      bob::core::array::assertSameShape(dst, shape);
     
       // Crop the 2D array
       blitz::Array<bool,2> src_mask, dst_mask; 
@@ -226,11 +224,11 @@ namespace bob {
         detail::cropParameterCheck( crop_y, crop_x, crop_h, crop_w, 
           src.extent(1), src.extent(2) );
       // Check input
-      tca::assertZeroBase( src);
+      bob::core::array::assertZeroBase( src);
       // Check output
       const blitz::TinyVector<int,3> shape(src.extent(0), crop_h, crop_w);
-      tca::assertZeroBase(dst);
-      tca::assertSameShape(dst, shape);
+      bob::core::array::assertZeroBase(dst);
+      bob::core::array::assertSameShape(dst, shape);
  
       blitz::Array<bool,2> src_mask, dst_mask; 
       for( int p=0; p<dst.extent(0); ++p) {
@@ -280,15 +278,15 @@ namespace bob {
         detail::cropParameterCheck( crop_y, crop_x, crop_h, crop_w, 
           src.extent(0), src.extent(1) );
       // Check input 
-      tca::assertZeroBase(src);
-      tca::assertZeroBase(src_mask);
-      tca::assertSameShape(src, src_mask);
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(src_mask);
+      bob::core::array::assertSameShape(src, src_mask);
       // Check output
       const blitz::TinyVector<int,2> shape(crop_h,crop_w);
-      tca::assertZeroBase(dst);
-      tca::assertZeroBase(dst_mask);
-      tca::assertSameShape(dst, dst_mask);
-      tca::assertSameShape(dst, shape);
+      bob::core::array::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(dst_mask);
+      bob::core::array::assertSameShape(dst, dst_mask);
+      bob::core::array::assertSameShape(dst, shape);
     
       // Crop the 2D array
       detail::cropNoCheck<T,true>(src, src_mask, dst, dst_mask, crop_y, 
@@ -329,15 +327,15 @@ namespace bob {
         detail::cropParameterCheck( crop_y, crop_x, crop_h, crop_w, 
           src.extent(1), src.extent(2) );
       // Check input
-      tca::assertZeroBase(src);
-      tca::assertZeroBase(src_mask);
-      tca::assertSameShape(src, src_mask);
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(src_mask);
+      bob::core::array::assertSameShape(src, src_mask);
       // Check output
       const blitz::TinyVector<int,3> shape(src.extent(0), crop_h, crop_w);
-      tca::assertZeroBase(dst);
-      tca::assertZeroBase(dst_mask);
-      tca::assertSameShape(dst, dst_mask);
-      tca::assertSameShape(dst, shape);
+      bob::core::array::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(dst_mask);
+      bob::core::array::assertSameShape(dst, dst_mask);
+      bob::core::array::assertSameShape(dst, shape);
  
       for( int p=0; p<dst.extent(0); ++p) {
         // Prepare reference array to 2D slices
@@ -360,4 +358,4 @@ namespace bob {
  */
 }
 
-#endif /* BOB5SPRO_IP_CROP_H */
+#endif /* BOB_IP_CROP_H */
