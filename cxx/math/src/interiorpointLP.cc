@@ -236,9 +236,6 @@ void mathdetail::centeringV2(const blitz::Array<double,2>& A,
   blitz::Range r_m(0,m-1);
   blitz::Range r_n(0,n-1);
 
-  // Declare and initialize variables
-  double nu;
-
   // Declare and initialize arrays for the large linear system
   blitz::Array<double,2> A_large;
   blitz::Array<double,1> x_large; // i.e. (d_x,d_lambda,d_mu)
@@ -253,9 +250,7 @@ void mathdetail::centeringV2(const blitz::Array<double,2>& A,
   int k=0;  
   while(true)
   {
-    // 1) nu = 1/n <x,mu>
-    nu = math::dot(x, mu) / n;
-    // Stopping criterion
+    // 1) Stopping criterion
     if( mathdetail::isInV2(x, mu, theta) )
       break;
 
@@ -293,9 +288,6 @@ void mathdetail::centeringVinf(const blitz::Array<double,2>& A,
   blitz::Range r_m(0,m-1);
   blitz::Range r_n(0,n-1);
 
-  // Declare and initialize variables
-  double nu;
-
   // Declare and initialize arrays for the large linear system
   blitz::Array<double,2> A_large;
   blitz::Array<double,1> x_large; // i.e. (d_x,d_lambda,d_mu)
@@ -310,9 +302,7 @@ void mathdetail::centeringVinf(const blitz::Array<double,2>& A,
   int k=0;  
   while(true)
   {
-    // 1) nu = 1/n <x,mu>
-    nu = math::dot(x, mu) / n;
-    // Stopping criterion
+    // 1) Stopping criterion
     if( mathdetail::isInVinf(x, mu, gamma) )
       break;
 
