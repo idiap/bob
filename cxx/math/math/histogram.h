@@ -34,10 +34,17 @@ namespace bob{
   namespace math{
 
     template <class T>
+      // wrapper for the std::min function (required to be compilable under OsX)
+      static inline T minimum(const T& v1, const T& v2){
+        return std::min<T>(v1,v2);
+      }
+
+    template <class T>
       // helper function to compute the chi_square distance between the given values
       static inline T chi_square_distance(const T& v1, const T& v2){
         return v1 != v2 ? (v1 - v2) * (v1 - v2) / (v1 + v2) : T(0);
       }
+
 
     template <class T>
       //! Fast implementation of the histogram intersection measure
@@ -54,7 +61,7 @@ namespace bob{
           h2.begin(),
           T(0),
           std::plus<T>(),
-          std::min<T>
+          bob::math::minimum<T>
         );
       }
 
