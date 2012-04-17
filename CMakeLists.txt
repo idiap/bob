@@ -77,7 +77,7 @@ set(COMMON_FLAGS "${COMMON_FLAGS} -pthread -pedantic -Wno-variadic-macros -Wno-l
 
 if (CMAKE_COMPILER_IS_GNUCC)
 
-  set(CMAKE_CXX_FLAGS_RELEASE "-O2 -mtune=generic -DNDEBUG")
+  set(CMAKE_CXX_FLAGS_RELEASE "-O2 -mtune=generic -DNDEBUG -finline-limit=1133")
 
   set(CMAKE_CXX_FLAGS_DEBUG "-g -DBOB_DEBUG -DBZ_DEBUG")
 
