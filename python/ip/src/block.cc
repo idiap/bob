@@ -30,63 +30,90 @@ namespace ca = bob::core::array;
 
 using namespace boost::python;
 
-static const char* BLOCK2D_DOC = "Perform a block decomposition of a 2D blitz array/image.";
-static const char* GETBLOCKSHAPE2D_DOC = "Return the shape of the output 2D blitz array/image, when calling block which performs a block decomposition of a 2D blitz array/image.";
-static const char* GETNBLOCKS2D_DOC = "Return the number of blocks of the output 2D blitz array/image, when calling block which performs a block decomposition of a 2D blitz array/image.";
+static const char* BLOCK2D_DOC = "Performs a block decomposition of a 2D array/image.";
+static const char* GETBLOCK3DOUTPUTSHAPE_DOC = "Returns the shape of the output 2D blitz\
+  array/image, when calling block which performs a block decomposition of a 2D array/image,\
+  and saving the results in a 3D array.";
+static const char* GETBLOCK4DOUTPUTSHAPE_DOC = "Returns the shape of the output 2D blitz\
+  array/image, when calling block which performs a block decomposition of a 2D array/image,\
+  and saving the results in a 4D array.";
 
-template <typename T> static void inner_block (tp::const_ndarray input,
+template <typename T> static void inner_block_3d(tp::const_ndarray input,
     tp::ndarray output, int a, int b, int c, int d) {
   blitz::Array<T,3> output_ = output.bz<T,3>();
   ip::block<T>(input.bz<T,2>(), output_, a, b, c, d);
 }
 
+template <typename T> static void inner_block_4d(tp::const_ndarray input,
+    tp::ndarray output, int a, int b, int c, int d) {
+  blitz::Array<T,4> output_ = output.bz<T,4>();
+  ip::block<T>(input.bz<T,2>(), output_, a, b, c, d);
+}
+
 static void block (tp::const_ndarray input, tp::ndarray output,
     int a, int b, int c, int d) {
+  const ca::typeinfo& infoOut = output.type();
   const ca::typeinfo& info = input.type();
-  switch (info.dtype) {
-    case ca::t_uint8: 
-      return inner_block<uint8_t>(input, output, a,b,c,d);
-    case ca::t_uint16:
-      return inner_block<uint16_t>(input, output, a,b,c,d);
-    case ca::t_float64: 
-      return inner_block<double>(input, output, a,b,c,d);
-    default: PYTHON_ERROR(TypeError, "block operator does not support array with type '%s'", info.str().c_str());
+  switch(infoOut.nd) {
+    case 3:
+      switch (info.dtype) {
+        case ca::t_uint8: 
+          return inner_block_3d<uint8_t>(input, output, a,b,c,d);
+        case ca::t_uint16:
+          return inner_block_3d<uint16_t>(input, output, a,b,c,d);
+        case ca::t_float64: 
+          return inner_block_3d<double>(input, output, a,b,c,d);
+        default: PYTHON_ERROR(TypeError, "block operator does not support array with type '%s'", info.str().c_str());
+      }
+    case 4:
+      switch (info.dtype) {
+        case ca::t_uint8: 
+          return inner_block_4d<uint8_t>(input, output, a,b,c,d);
+        case ca::t_uint16:
+          return inner_block_4d<uint16_t>(input, output, a,b,c,d);
+        case ca::t_float64: 
+          return inner_block_4d<double>(input, output, a,b,c,d);
+        default: PYTHON_ERROR(TypeError, "block operator does not support array with type '%s'", info.str().c_str());
+      }     
+    default: PYTHON_ERROR(TypeError, "block operator does not support output array with number of dimensions '%d'", info.nd);
   }
 }
 
-template <typename T> static object inner_get_block_shape 
+
+template <typename T> static object inner_get_block_3d_output_shape 
 (tp::const_ndarray input, int a, int b, int c, int d) {
-  return object(ip::getBlockShape<T>(input.bz<T,2>(), a, b, c, d));
+  return object(ip::getBlock3DOutputShape<T>(input.bz<T,2>(), a, b, c, d));
 }
 
-static object get_block_shape (tp::const_ndarray input,
+template <typename T> static object inner_get_block_4d_output_shape 
+(tp::const_ndarray input, int a, int b, int c, int d) {
+  return object(ip::getBlock4DOutputShape<T>(input.bz<T,2>(), a, b, c, d));
+}
+
+static object get_block_3d_output_shape (tp::const_ndarray input,
     int a, int b, int c, int d) {
   const ca::typeinfo& info = input.type();
   switch (info.dtype) {
     case ca::t_uint8: 
-      return inner_get_block_shape<uint8_t>(input, a,b,c,d);
+      return inner_get_block_3d_output_shape<uint8_t>(input, a,b,c,d);
     case ca::t_uint16:
-      return inner_get_block_shape<uint16_t>(input, a,b,c,d);
+      return inner_get_block_3d_output_shape<uint16_t>(input, a,b,c,d);
     case ca::t_float64: 
-      return inner_get_block_shape<double>(input, a,b,c,d);
+      return inner_get_block_3d_output_shape<double>(input, a,b,c,d);
     default: PYTHON_ERROR(TypeError, "operation does not support array with type '%s'", info.str().c_str());
   }
 }
 
-template <typename T> static object inner_get_n_blocks
-(tp::const_ndarray input, int a, int b, int c, int d) {
-  return object(ip::getNBlocks<T>(input.bz<T,2>(), a, b, c, d));
-}
-
-static object get_n_blocks (tp::const_ndarray input, int a, int b, int c, int d) {
+static object get_block_4d_output_shape (tp::const_ndarray input,
+    int a, int b, int c, int d) {
   const ca::typeinfo& info = input.type();
   switch (info.dtype) {
     case ca::t_uint8: 
-      return inner_get_n_blocks<uint8_t>(input, a,b,c,d);
+      return inner_get_block_4d_output_shape<uint8_t>(input, a,b,c,d);
     case ca::t_uint16:
-      return inner_get_n_blocks<uint16_t>(input, a,b,c,d);
+      return inner_get_block_4d_output_shape<uint16_t>(input, a,b,c,d);
     case ca::t_float64: 
-      return inner_get_n_blocks<double>(input, a,b,c,d);
+      return inner_get_block_4d_output_shape<double>(input, a,b,c,d);
     default: PYTHON_ERROR(TypeError, "operation does not support array with type '%s'", info.str().c_str());
   }
 }
@@ -95,6 +122,6 @@ static object get_n_blocks (tp::const_ndarray input, int a, int b, int c, int d)
 void bind_ip_block()
 {
   def("block", &block, (arg("src"), arg("dst"), arg("block_h"), arg("block_w"), arg("overlap_h"), arg("overlap_w")), BLOCK2D_DOC);
-  def("get_block_shape", &get_block_shape, (arg("src"), arg("block_h"), arg("block_w"), arg("overlap_h"), arg("overlap_w")), GETBLOCKSHAPE2D_DOC);
-  def("get_n_blocks", &get_n_blocks, (arg("src"), arg("block_h"), arg("block_w"), arg("overlap_h"), arg("overlap_w")), GETNBLOCKS2D_DOC);
+  def("get_block_3d_output_shape", &get_block_3d_output_shape, (arg("src"), arg("block_h"), arg("block_w"), arg("overlap_h"), arg("overlap_w")), GETBLOCK3DOUTPUTSHAPE_DOC);
+  def("get_block_4d_output_shape", &get_block_4d_output_shape, (arg("src"), arg("block_h"), arg("block_w"), arg("overlap_h"), arg("overlap_w")), GETBLOCK4DOUTPUTSHAPE_DOC);
 }

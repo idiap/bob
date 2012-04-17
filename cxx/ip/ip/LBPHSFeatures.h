@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_IP_LBPHS_FEATURES_H
-#define BOB5SPRO_IP_LBPHS_FEATURES_H
+#ifndef BOB_IP_LBPHS_FEATURES_H
+#define BOB_IP_LBPHS_FEATURES_H
 
 #include "core/cast.h"
 #include "ip/Exception.h"
@@ -150,7 +150,7 @@ namespace bob {
   template<typename T>
   const int LBPHSFeatures::getNBlocks(const blitz::Array<T,2>& src)
   {
-    const blitz::TinyVector<int,3> res = getBlockShape(src, m_block_h, 
+    const blitz::TinyVector<int,3> res = getBlock3DOutputShape(src, m_block_h, 
       m_block_w, m_overlap_h, m_overlap_w); 
     return res(0);
   }
@@ -158,4 +158,4 @@ namespace bob {
 
 }}
 
-#endif /* BOB5SPRO_IP_LBPHS_FEATURES_H */
+#endif /* BOB_IP_LBPHS_FEATURES_H */

@@ -54,18 +54,17 @@ void ipd::blockCheckInput(const int height, const int width, const int block_h,
       block_w); 
 }
 
-
 /**
   * @brief Function which returns the number of blocks when applying 
   *   a decomposition by block of an input array of the given size.
   * @param height  The height of the input array
   * @param width   The width of the input array
-  * @param block_w The desired width of the blocks.
   * @param block_h The desired height of the blocks.
-  * @param overlap_w The overlap between each block along the x axis.
+  * @param block_w The desired width of the blocks.
   * @param overlap_h The overlap between each block along the y axis.
+  * @param overlap_w The overlap between each block along the x axis.
   */
-const blitz::TinyVector<int,3> ip::getBlockShape(const int height, 
+const blitz::TinyVector<int,3> ip::getBlock3DOutputShape(const int height, 
   const int width, const int block_h, const int block_w, const int overlap_h,
   const int overlap_w)
 {
@@ -80,18 +79,18 @@ const blitz::TinyVector<int,3> ip::getBlockShape(const int height,
   return res;
 }
 
+
 /**
-  * @brief Function which returns the number of blocks along y and x when
-  *   applying a decomposition by block of an input array of the given size.
+  * @brief Function which returns the number of blocks when applying 
+  *   a decomposition by block of an input array of the given size.
   * @param height  The height of the input array
   * @param width   The width of the input array
-  * @param block_w The desired width of the blocks.
   * @param block_h The desired height of the blocks.
-  * @param overlap_w The overlap between each block along the x axis.
+  * @param block_w The desired width of the blocks.
   * @param overlap_h The overlap between each block along the y axis.
-  * @return Number of blocks along y and x-axis
+  * @param overlap_w The overlap between each block along the x axis.
   */
-const blitz::TinyVector<int,2> ip::getNBlocks(const int height, 
+const blitz::TinyVector<int,4> ip::getBlock4DOutputShape(const int height, 
   const int width, const int block_h, const int block_w, const int overlap_h,
   const int overlap_w)
 {
@@ -101,8 +100,8 @@ const blitz::TinyVector<int,2> ip::getNBlocks(const int height,
   const int n_blocks_h = (height-overlap_h)/ size_ov_h;
   const int n_blocks_w = (width-overlap_w)/ size_ov_w;
 
-  // Return the number of blocks
-  blitz::TinyVector<int, 2> res(n_blocks_h, n_blocks_w);
+  // Return the shape of the output
+  blitz::TinyVector<int,4> res( n_blocks_h, n_blocks_w, block_h, block_w);
   return res;
 }
 

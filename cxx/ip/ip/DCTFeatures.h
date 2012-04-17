@@ -176,7 +176,7 @@ namespace bob {
   template<typename T>
   const int DCTFeatures::getNBlocks(const blitz::Array<T,2>& src)
   {
-    const blitz::TinyVector<int,3> res = getBlockShape(src, m_block_h, 
+    const blitz::TinyVector<int,3> res = getBlock3DOutputShape(src, m_block_h, 
       m_block_w, m_overlap_h, m_overlap_w); 
     return res(0);
   }

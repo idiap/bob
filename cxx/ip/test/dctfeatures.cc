@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE( test_dct_feature_extract )
 BOOST_AUTO_TEST_CASE( test_dct_feature_extract_norm )
 {
   // Get the block shape
-  blitz::TinyVector<int, 3> shape = bob::ip::getBlockShape(src, 3, 4, 0, 0);
+  blitz::TinyVector<int, 3> shape = bob::ip::getBlock3DOutputShape(src, 3, 4, 0, 0);
 
   // Get the blocks
   blitz::Array<double, 3> block_dst(shape);
