@@ -75,7 +75,7 @@ static void block (tp::const_ndarray input, tp::ndarray output,
           return inner_block_4d<double>(input, output, a,b,c,d);
         default: PYTHON_ERROR(TypeError, "block operator does not support array with type '%s'", info.str().c_str());
       }     
-    default: PYTHON_ERROR(TypeError, "block operator does not support output array with number of dimensions '%d'", info.nd);
+    default: PYTHON_ERROR(TypeError, "block operator does not support output array with number of dimensions '%lu'", info.nd);
   }
 }
 
