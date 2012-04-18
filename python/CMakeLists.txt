@@ -24,7 +24,12 @@ if (PYTHON_EXECUTABLE AND PYTHONLIBS_FOUND AND Boost_FOUND)
   bob_python_add_test(root bob_config.py)
 
   # Installs the egg-info plugin so setuptools can find bob
-  bob_configure_bobpython(bob.egg-info.in ${PYTHON_SITE_PACKAGES}/bob-${BOB_VERSION}-py${PYTHON_VERSION}.egg-info "OFF")
+  if (BOB_SOVERSION)
+    # installs with a specific version number
+    bob_configure_bobpython(bob.egg-info.in ${PYTHON_SITE_PACKAGES}/bob-${BOB_VERSION}-py${PYTHON_VERSION}.egg-info "OFF")
+  else()
+    bob_configure_bobpython(bob.egg-info.in ${PYTHON_SITE_PACKAGES}/bob.egg-info "OFF")
+  endif()
 
   add_subdirectory(integration)
   add_subdirectory(core)
