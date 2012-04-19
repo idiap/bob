@@ -19,6 +19,7 @@ set(src
    "src/FaceEyesNorm.cc"
    "src/GaborWaveletTransform.cc"
    "src/histo.cc"
+   "src/HOG.cc"
    "src/LBP.cc"
    "src/LBP4R.cc"
    "src/LBP8R.cc"
