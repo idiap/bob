@@ -62,6 +62,10 @@ ORI_B = numpy.array([[0, 0, 0, 0, 0],  [0, 0, 0, 0, 0],  [0, 0, 0, 0, 0],
 HIST_B = numpy.array([20, 0, 0, 0, 0, 0, 0, 0], dtype='float64')
 EPSILON = 1e-10
 
+HIST_3D = numpy.array([[[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]], 
+                       [[11, 12, 13, 14, 15], [16, 17, 18, 19, 20]]], dtype='float64')
+HIST_NORM_L1 = numpy.zeros(dtype='float64', shape=(20,))
+
 class HOGTest(unittest.TestCase):
   """Performs various tests"""
 
@@ -94,17 +98,56 @@ class HOGTest(unittest.TestCase):
     numpy.allclose(ori, ORI_B, EPSILON) 
 
   def test02_hogComputeCellHistogram(self):
-    # Declare reference arrays
+    # Check with first input array
     hist = numpy.ndarray(shape=(8,), dtype='float64')
     bob.ip.hog_compute_cell_histogram(MAG1_A, ORI_A, hist)
     numpy.allclose(hist, HIST_A, EPSILON)
+    bob.ip.hog_compute_cell_histogram_(MAG1_A, ORI_A, hist)
+    numpy.allclose(hist, HIST_A, EPSILON)
     
+    # Check with second input array
     bob.ip.hog_compute_cell_histogram(MAG_B, ORI_B, hist)
+    numpy.allclose(hist, HIST_B, EPSILON)
+    bob.ip.hog_compute_cell_histogram_(MAG_B, ORI_B, hist)
     numpy.allclose(hist, HIST_B, EPSILON)
   
   def test03_hogNormalizeBlock(self):
-    # TODO
-    pass
+    # Vectorizes the 3D histogram into a 1D one
+    HIST_1D = numpy.reshape(HIST_3D, (20,))
+    # Declares 1D output histogram of size 20
+    hist = numpy.ndarray(shape=(20,), dtype='float64')
+    # No norm
+    bob.ip.hog_normalize_block(HIST_3D, hist, bob.ip.BlockNorm.None)
+    numpy.allclose(hist, HIST_1D, EPSILON)
+    bob.ip.hog_normalize_block_(HIST_3D, hist, bob.ip.BlockNorm.None)
+    numpy.allclose(hist, HIST_1D, EPSILON)
+    # L2 Norm
+    py_L2ref = HIST_1D / numpy.linalg.norm(HIST_1D)
+    bob.ip.hog_normalize_block(HIST_3D, hist)
+    numpy.allclose(hist, py_L2ref, EPSILON)
+    bob.ip.hog_normalize_block_(HIST_3D, hist)
+    numpy.allclose(hist, py_L2ref, EPSILON)
+    # L2Hys Norm
+    py_L2Hysref = HIST_1D / numpy.linalg.norm(HIST_1D)
+    numpy.clip(py_L2Hysref, a_min=0, a_max=0.2) 
+    py_L2Hysref = py_L2Hysref / numpy.linalg.norm(py_L2Hysref)
+    bob.ip.hog_normalize_block(HIST_3D, hist, bob.ip.BlockNorm.L2Hys)
+    numpy.allclose(hist, py_L2Hysref, EPSILON)
+    bob.ip.hog_normalize_block_(HIST_3D, hist, bob.ip.BlockNorm.L2Hys)
+    numpy.allclose(hist, py_L2Hysref, EPSILON)
+    # L1 Norm
+    py_L1ref = HIST_1D / numpy.linalg.norm(HIST_1D, 1)
+    bob.ip.hog_normalize_block(HIST_3D, hist, bob.ip.BlockNorm.L1) 
+    numpy.allclose(hist, py_L1ref, EPSILON)
+    bob.ip.hog_normalize_block_(HIST_3D, hist, bob.ip.BlockNorm.L1) 
+    numpy.allclose(hist, py_L1ref, EPSILON)
+    # L1 Norm sqrt
+    import math
+    py_L1sqrtref = HIST_1D / math.sqrt(numpy.linalg.norm(HIST_1D, 1))
+    bob.ip.hog_normalize_block(HIST_3D, hist, bob.ip.BlockNorm.L1sqrt)
+    numpy.allclose(hist, py_L1sqrtref, EPSILON)
+    bob.ip.hog_normalize_block_(HIST_3D, hist, bob.ip.BlockNorm.L1sqrt)
+    numpy.allclose(hist, py_L1sqrtref, EPSILON)
 
   def test04_HOG(self):
     # HOG features extractor 
