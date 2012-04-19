@@ -39,12 +39,20 @@ namespace bob {
     namespace hog {
       /**
         * Gradient 'magnitude' used
+        * - Magnitude: L2 magnitude over X and Y
+        * - MagnitudeSquare: Square of the L2 magnitude
+        * - SqrtMagnitude: Square root of the L2 magnitude
         */
       typedef enum GradientMagnitudeType_ 
       { Magnitude, MagnitudeSquare, SqrtMagnitude } GradientMagnitudeType;
       
       /**
         * Norm used for normalizing the HOG blocks
+        * - L2: Euclidean norm
+        * - L2Hys: L2 norm with clipping of high values
+        * - L1: L1 norm (Manhattan distance)
+        * - L1sqrt: Square root of the L1 norm
+        * - None: no norm used
         */
       typedef enum BlockNorm_ { L2, L2Hys, L1, L1sqrt, None } BlockNorm;
     }
@@ -93,8 +101,6 @@ namespace bob {
       {
         out = in * factor;
       }
-
-
     }
 
     /**
@@ -140,7 +146,10 @@ namespace bob {
       * @param norm_hist The output 1D normalized block descriptor
       * @param block_norm The norm used by the procedure 
       * @param eps The epsilon used for the block normalization 
+      *   (to avoid zero norm, as in the article of Dalal and Triggs) 
       * @param threshold The threshold used for the block normalization
+      *   This is only used with the L2Hys norm, for the clipping of large 
+      *   values.
       * @warning Does not check that input and output arrays have the same
       *   number of elements.
       */ 
@@ -193,7 +202,10 @@ namespace bob {
       * @param norm_hist The output 1D normalized block descriptor
       * @param block_norm The norm used by the procedure 
       * @param eps The epsilon used for the block normalization 
+      *   (to avoid zero norm, as in the article of Dalal and Triggs) 
       * @param threshold The threshold used for the block normalization
+      *   This is only used with the L2Hys norm, for the clipping of large 
+      *   values.
       */ 
     template <int D>
     void hogNormalizeBlock(const blitz::Array<double,D>& hist,
@@ -285,9 +297,14 @@ namespace bob {
       *     computation. However, this can easily be done (using this library)
       *     before extracting the descriptors.
       *  3) Gradients are computed using standard 1D centered gradient (except
-      *     at the borders where the gradient is uncerentered [-1 1]). This
+      *     at the borders where the gradient is uncentered [-1 1]). This
       *     is the method which achieved best performance reported in the 
       *     article.
+      *     To avoid too many uncentered gradients to be used, the gradients
+      *     are computed on the full image prior to the cell decomposition.
+      *     This implies that extra-pixels at each boundary of the cell are 
+      *     contributing to the gradients, although these pixels are not 
+      *     located inside the cell.
       *  4) R-HOG blocks (rectangular) normalisation is supported, but
       *     not C-HOG blocks (circular).
       *  5) Due to the similarity with the SIFT descriptors, this can also be
@@ -388,7 +405,10 @@ namespace bob {
           */
         const blitz::TinyVector<int,3> getOutputShape() const;
         /**
-          * Processes an input array
+          * Processes an input array. This extracts HOG descriptors from the
+          * input image. The output is 3D, the first two dimensions being the 
+          * y- and x- indices of the block, and the last one the index of the
+          * bin (among the concatenated cell histograms for this block).
           */
         template <typename T>
         void forward_(const blitz::Array<T,2>& input, 
