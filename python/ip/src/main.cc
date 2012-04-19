@@ -47,6 +47,7 @@ void bind_ip_gaussian();
 void bind_ip_median();
 void bind_ip_drawing();
 void bind_ip_spatiotempgrad();
+void bind_ip_hog();
 
 #if defined(HAVE_VLFEAT)
 void bind_ip_vlsift();
@@ -82,6 +83,7 @@ BOOST_PYTHON_MODULE(_ip) {
   bind_ip_median();
   bind_ip_drawing();
   bind_ip_spatiotempgrad();
+  bind_ip_hog();
 #if defined(HAVE_VLFEAT)
   bind_ip_vlsift();
   bind_ip_vldsift();

@@ -28,6 +28,7 @@ set(ccsrc
    "src/MultiscaleRetinex.cc"
    "src/drawing.cc"
    "src/SpatioTemporalGradient.cc"
+   "src/HOG.cc"
    "src/main.cc"
    )
 
