@@ -24,20 +24,8 @@ import os, sys
 import unittest
 import bob
 import numpy
-
-def load_image(relative_filename):
-  # Please note our PNG loader will always load in RGB, but since that is a
-  # grayscaled version of the image, I just select one of the planes. 
-  filename = os.path.join("sift", relative_filename)
-  array = bob.io.load(filename)
-  return array.astype('float32')
-
-def equal(x, y, epsilon):
-  return (abs(x - y) < epsilon)
-
-def equals(x, y, epsilon):
-  return (abs(x - y) < epsilon).all()
 import math
+
 SRC_A = numpy.array([[0, 0, 4, 0, 0],  [0, 0, 4, 0, 0],  [0, 0, 4, 0, 0],
                      [0, 0, 4, 0, 0],  [0, 0, 4, 0, 0]],  dtype='float64')
 MAG1_A = numpy.array([[0, 2, 0, 2, 0], [0, 2, 0, 2, 0], [0, 2, 0, 2, 0],
@@ -66,10 +54,25 @@ HIST_3D = numpy.array([[[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]],
                        [[11, 12, 13, 14, 15], [16, 17, 18, 19, 20]]], dtype='float64')
 HIST_NORM_L1 = numpy.zeros(dtype='float64', shape=(20,))
 
+IMG_8x8_A = numpy.array([ [0, 2, 0, 0, 0, 0, 2, 0],
+                          [0, 2, 0, 0, 0, 0, 2, 0], 
+                          [0, 2, 0, 0, 0, 0, 2, 0], 
+                          [0, 2, 0, 0, 0, 0, 2, 0], 
+                          [0, 2, 0, 0, 0, 0, 2, 0], 
+                          [0, 2, 0, 0, 0, 0, 2, 0], 
+                          [0, 2, 0, 0, 0, 0, 2, 0], 
+                          [0, 2, 0, 0, 0, 0, 2, 0]], dtype='float64')
+HIST_IMG_A = numpy.array([0, 0, 0, 0, 0.5, 0, 0, 0,
+                          0, 0, 0, 0, 0.5, 0, 0, 0,
+                          0, 0, 0, 0, 0.5, 0, 0, 0,
+                          0, 0, 0, 0, 0.5, 0, 0, 0], dtype='float64')
+
 class HOGTest(unittest.TestCase):
   """Performs various tests"""
 
   def test01_HOGGradientMaps(self):
+    """Test the Gradient maps computation"""
+
     # Declare reference arrays
     hgm = bob.ip.HOGGradientMaps(5,5)
     mag = numpy.zeros(shape=(5,5), dtype='float64')
@@ -98,6 +101,8 @@ class HOGTest(unittest.TestCase):
     numpy.allclose(ori, ORI_B, EPSILON) 
 
   def test02_hogComputeCellHistogram(self):
+    """Test the HOG computation for a given cell using hog_compute_cell()"""
+
     # Check with first input array
     hist = numpy.ndarray(shape=(8,), dtype='float64')
     bob.ip.hog_compute_cell_histogram(MAG1_A, ORI_A, hist)
@@ -112,6 +117,8 @@ class HOGTest(unittest.TestCase):
     numpy.allclose(hist, HIST_B, EPSILON)
   
   def test03_hogNormalizeBlock(self):
+    """Test the block normalization using hog_normalize_block()"""
+
     # Vectorizes the 3D histogram into a 1D one
     HIST_1D = numpy.reshape(HIST_3D, (20,))
     # Declares 1D output histogram of size 20
@@ -142,7 +149,6 @@ class HOGTest(unittest.TestCase):
     bob.ip.hog_normalize_block_(HIST_3D, hist, bob.ip.BlockNorm.L1) 
     numpy.allclose(hist, py_L1ref, EPSILON)
     # L1 Norm sqrt
-    import math
     py_L1sqrtref = HIST_1D / math.sqrt(numpy.linalg.norm(HIST_1D, 1))
     bob.ip.hog_normalize_block(HIST_3D, hist, bob.ip.BlockNorm.L1sqrt)
     numpy.allclose(hist, py_L1sqrtref, EPSILON)
@@ -150,6 +156,9 @@ class HOGTest(unittest.TestCase):
     numpy.allclose(hist, py_L1sqrtref, EPSILON)
 
   def test04_HOG(self):
+    """Test the HOG class which is used to perform the full feature 
+      extraction"""
+    
     # HOG features extractor 
     hog = bob.ip.HOG(8,12)
     # Check members
@@ -199,7 +208,21 @@ class HOGTest(unittest.TestCase):
     hog.block_ov_x = 1
     self.assertTrue( numpy.array_equal( hog.get_output_shape(), numpy.array([3,3,48]) ))
 
-    #TODO: check descriptor computation
+    # Check descriptor computation
+    hog.resize(8, 8)
+    hog.n_bins = 8
+    hog.cell_y = 4
+    hog.cell_x = 4
+    hog.cell_ov_y = 0
+    hog.cell_ov_x = 0
+    hog.block_y = 2
+    hog.block_x = 2
+    hog.block_ov_y = 0
+    hog.block_ov_x = 0
+    hog.block_norm = bob.ip.BlockNorm.L2
+    hist_3D = numpy.ndarray(dtype='float64', shape=(1,1,32))
+    hog.forward(IMG_8x8_A, hist_3D)
+    self.assertTrue( numpy.allclose( hist_3D, HIST_IMG_A, EPSILON))
 
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(HOGTest)
