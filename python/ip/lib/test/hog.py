@@ -69,12 +69,12 @@ HIST_IMG_A = numpy.array([0, 0, 0, 0, 0.5, 0, 0, 0,
 
 class HOGTest(unittest.TestCase):
   """Performs various tests"""
-
-  def test01_HOGGradientMaps(self):
+  
+  def test01_GradientMaps(self):
     """Test the Gradient maps computation"""
 
     # Declare reference arrays
-    hgm = bob.ip.HOGGradientMaps(5,5)
+    hgm = bob.ip.GradientMaps(5,5)
     mag = numpy.zeros(shape=(5,5), dtype='float64')
     ori = numpy.zeros(shape=(5,5), dtype='float64')
 
@@ -105,15 +105,15 @@ class HOGTest(unittest.TestCase):
 
     # Check with first input array
     hist = numpy.ndarray(shape=(8,), dtype='float64')
-    bob.ip.hog_compute_cell_histogram(MAG1_A, ORI_A, hist)
+    bob.ip.hog_compute_histogram(MAG1_A, ORI_A, hist)
     numpy.allclose(hist, HIST_A, EPSILON)
-    bob.ip.hog_compute_cell_histogram_(MAG1_A, ORI_A, hist)
+    bob.ip.hog_compute_histogram_(MAG1_A, ORI_A, hist)
     numpy.allclose(hist, HIST_A, EPSILON)
     
     # Check with second input array
-    bob.ip.hog_compute_cell_histogram(MAG_B, ORI_B, hist)
+    bob.ip.hog_compute_histogram(MAG_B, ORI_B, hist)
     numpy.allclose(hist, HIST_B, EPSILON)
-    bob.ip.hog_compute_cell_histogram_(MAG_B, ORI_B, hist)
+    bob.ip.hog_compute_histogram_(MAG_B, ORI_B, hist)
     numpy.allclose(hist, HIST_B, EPSILON)
   
   def test03_hogNormalizeBlock(self):
@@ -124,35 +124,35 @@ class HOGTest(unittest.TestCase):
     # Declares 1D output histogram of size 20
     hist = numpy.ndarray(shape=(20,), dtype='float64')
     # No norm
-    bob.ip.hog_normalize_block(HIST_3D, hist, bob.ip.BlockNorm.None)
+    bob.ip.normalize_block(HIST_3D, hist, bob.ip.BlockNorm.None)
     numpy.allclose(hist, HIST_1D, EPSILON)
-    bob.ip.hog_normalize_block_(HIST_3D, hist, bob.ip.BlockNorm.None)
+    bob.ip.normalize_block_(HIST_3D, hist, bob.ip.BlockNorm.None)
     numpy.allclose(hist, HIST_1D, EPSILON)
     # L2 Norm
     py_L2ref = HIST_1D / numpy.linalg.norm(HIST_1D)
-    bob.ip.hog_normalize_block(HIST_3D, hist)
+    bob.ip.normalize_block(HIST_3D, hist)
     numpy.allclose(hist, py_L2ref, EPSILON)
-    bob.ip.hog_normalize_block_(HIST_3D, hist)
+    bob.ip.normalize_block_(HIST_3D, hist)
     numpy.allclose(hist, py_L2ref, EPSILON)
     # L2Hys Norm
     py_L2Hysref = HIST_1D / numpy.linalg.norm(HIST_1D)
     numpy.clip(py_L2Hysref, a_min=0, a_max=0.2) 
     py_L2Hysref = py_L2Hysref / numpy.linalg.norm(py_L2Hysref)
-    bob.ip.hog_normalize_block(HIST_3D, hist, bob.ip.BlockNorm.L2Hys)
+    bob.ip.normalize_block(HIST_3D, hist, bob.ip.BlockNorm.L2Hys)
     numpy.allclose(hist, py_L2Hysref, EPSILON)
-    bob.ip.hog_normalize_block_(HIST_3D, hist, bob.ip.BlockNorm.L2Hys)
+    bob.ip.normalize_block_(HIST_3D, hist, bob.ip.BlockNorm.L2Hys)
     numpy.allclose(hist, py_L2Hysref, EPSILON)
     # L1 Norm
     py_L1ref = HIST_1D / numpy.linalg.norm(HIST_1D, 1)
-    bob.ip.hog_normalize_block(HIST_3D, hist, bob.ip.BlockNorm.L1) 
+    bob.ip.normalize_block(HIST_3D, hist, bob.ip.BlockNorm.L1) 
     numpy.allclose(hist, py_L1ref, EPSILON)
-    bob.ip.hog_normalize_block_(HIST_3D, hist, bob.ip.BlockNorm.L1) 
+    bob.ip.normalize_block_(HIST_3D, hist, bob.ip.BlockNorm.L1) 
     numpy.allclose(hist, py_L1ref, EPSILON)
     # L1 Norm sqrt
     py_L1sqrtref = HIST_1D / math.sqrt(numpy.linalg.norm(HIST_1D, 1))
-    bob.ip.hog_normalize_block(HIST_3D, hist, bob.ip.BlockNorm.L1sqrt)
+    bob.ip.normalize_block(HIST_3D, hist, bob.ip.BlockNorm.L1sqrt)
     numpy.allclose(hist, py_L1sqrtref, EPSILON)
-    bob.ip.hog_normalize_block_(HIST_3D, hist, bob.ip.BlockNorm.L1sqrt)
+    bob.ip.normalize_block_(HIST_3D, hist, bob.ip.BlockNorm.L1sqrt)
     numpy.allclose(hist, py_L1sqrtref, EPSILON)
 
   def test04_HOG(self):
@@ -165,7 +165,7 @@ class HOGTest(unittest.TestCase):
     self.assertTrue( hog.height == 8) 
     self.assertTrue( hog.width == 12)
     self.assertTrue( hog.magnitude_type == bob.ip.GradientMagnitudeType.Magnitude)
-    self.assertTrue( hog.n_bins == 8)
+    self.assertTrue( hog.cell_dim == 8)
     self.assertTrue( hog.full_orientation == False)
     self.assertTrue( hog.cell_y == 4)
     self.assertTrue( hog.cell_x == 4)
@@ -201,7 +201,7 @@ class HOGTest(unittest.TestCase):
     hog.block_ov_y = 0
     hog.block_ov_x = 0
     self.assertTrue( numpy.array_equal( hog.get_output_shape(), numpy.array([1,1,128]) ))
-    hog.n_bins = 12
+    hog.cell_dim = 12
     hog.block_y = 2
     hog.block_x = 2
     hog.block_ov_y = 1
@@ -210,7 +210,7 @@ class HOGTest(unittest.TestCase):
 
     # Check descriptor computation
     hog.resize(8, 8)
-    hog.n_bins = 8
+    hog.cell_dim = 8
     hog.cell_y = 4
     hog.cell_x = 4
     hog.cell_ov_y = 0
@@ -223,6 +223,7 @@ class HOGTest(unittest.TestCase):
     hist_3D = numpy.ndarray(dtype='float64', shape=(1,1,32))
     hog.forward(IMG_8x8_A, hist_3D)
     self.assertTrue( numpy.allclose( hist_3D, HIST_IMG_A, EPSILON))
+
 
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(HOGTest)

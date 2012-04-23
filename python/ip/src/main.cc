@@ -84,6 +84,7 @@ BOOST_PYTHON_MODULE(_ip) {
   bind_ip_drawing();
   bind_ip_spatiotempgrad();
   bind_ip_hog();
+
 #if defined(HAVE_VLFEAT)
   bind_ip_vlsift();
   bind_ip_vldsift();
