@@ -168,6 +168,11 @@ bob_python_add_dependent_test(db-xm2vts-dumplist2 python-db-xm2vts-create
 bob_python_add_dependent_test(db-xm2vts-checkfiles python-db-xm2vts-create
   bob_dbmanage.py xm2vts checkfiles --self-test)
 
+# AT&T database driver tests.
+bob_python_add_unittest(db lib/test/atnt.py main)
+bob_python_add_test(db-atnt-dumplist bob_dbmanage.py atnt dumplist --self-test)
+bob_python_add_test(db-atnt-checkfiles bob_dbmanage.py atnt checkfiles -d "." --self-test)
+
 # Our examples (run and install)
 bob_python_example(db iris_lda.py lib/example/iris_lda.py)
 bob_python_add_test(db iris_lda.py --self-test)
