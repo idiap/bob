@@ -204,7 +204,6 @@ namespace bob {
         // Methods to resize arrays in cache
         virtual void resizeCache();
         virtual void resizeCellCache();
-        virtual void resizeBlockCache();
         
         // Gradient related
         boost::shared_ptr<GradientMaps> m_gradient_maps;
@@ -233,32 +232,29 @@ namespace bob {
     template <typename T, typename U>
     void BlockCellGradientDescriptors<T,U>::resizeCache()
     {
+      // Resizes BlockCellDescriptors first
+      BlockCellDescriptors<T,U>::resizeCache();
+      // Resizes everything else
       m_gradient_maps->resize(BlockCellDescriptors<T,U>::m_height, 
         BlockCellDescriptors<T,U>::m_width);
       m_magnitude.resize(BlockCellDescriptors<T,U>::m_height, 
         BlockCellDescriptors<T,U>::m_width);
       m_orientation.resize(BlockCellDescriptors<T,U>::m_height, 
         BlockCellDescriptors<T,U>::m_width);
-      // Resizes everything else
-      BlockCellDescriptors<T,U>::resizeCache();
     }
 
     template <typename T, typename U>
     void BlockCellGradientDescriptors<T,U>::resizeCellCache()
     {
+      // Resizes BlockCellDescriptors first
+      BlockCellDescriptors<T,U>::resizeCellCache();
+      // Resizes everything else
       m_cell_magnitude.resize(BlockCellDescriptors<T,U>::m_nb_cells_y, 
         BlockCellDescriptors<T,U>::m_nb_cells_x, BlockCellDescriptors<T,U>::m_cell_y, 
         BlockCellDescriptors<T,U>::m_cell_x);
       m_cell_orientation.resize(BlockCellDescriptors<T,U>::m_nb_cells_y, 
         BlockCellDescriptors<T,U>::m_nb_cells_x, BlockCellDescriptors<T,U>::m_cell_y, 
         BlockCellDescriptors<T,U>::m_cell_x);
-      BlockCellDescriptors<T,U>::resizeCellCache();
-    }
-
-    template <typename T, typename U>
-    void BlockCellGradientDescriptors<T,U>::resizeBlockCache()
-    {
-      BlockCellDescriptors<T,U>::resizeBlockCache();
     }
 
     template <typename T, typename U>
