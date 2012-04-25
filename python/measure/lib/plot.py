@@ -5,7 +5,7 @@
 
 """Methods to plot error analysis figures such as ROC, EPC and DET"""
 
-def roc(negatives, positives, npoints=100, **kwargs):
+def roc(negatives, positives, npoints=100, CAR=False, **kwargs):
   """Plots Receiver Operating Charactaristic (ROC) curve.
 
   This method will call matplotlib to plot the ROC curve for a system which
@@ -31,6 +31,9 @@ def roc(negatives, positives, npoints=100, **kwargs):
   npoints
     number of points to use when drawing the ROC curve
 
+  CAR
+    plot CAR over FAR in semilogx (CAR=True) or FAR over FRR linearly (CAR=False, the default)
+
   kwargs
     a dictionary of extra plotting parameters, that is passed directly to
     matplotlib.pyplot.plot().
@@ -53,7 +56,10 @@ def roc(negatives, positives, npoints=100, **kwargs):
   
   from . import roc as calc
   out = calc(negatives, positives, npoints)
-  return mpl.plot(100.0*out[0,:], 100.0*out[1,:], **kwargs)
+  if not CAR:
+    return mpl.plot(100.0*out[0,:], 100.0*out[1,:], **kwargs)
+  else:
+    return mpl.semilogx(100.0*out[1,:], 100.0*(1-out[0,:]), **kwargs)
 
 def epc(dev_negatives, dev_positives, test_negatives, test_positives, 
     npoints=100, **kwargs):
