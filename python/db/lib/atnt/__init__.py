@@ -33,10 +33,9 @@ __builtin__ = True
 
 class Database(object):
   """Wrapper class for the AT&T database (http://www.cl.cam.ac.uk/research/dtg/attarchive/facedatabase.html).
-  This class defines a simple protocol for training, enrolment and probe by splitting the few images of the database in a reasonable manner.""" 
+  This class defines a simple protocol for training, enrollment and probe by splitting the few images of the database in a reasonable manner.""" 
 
   def __init__(self):
-    """Initializes the AT&T database and defines a simple protocol for the AT&T database."""
     self.m_groups = ('train', 'test')
     self.m_purposes = ('enrol', 'probe')
     self.m_client_ids = set(range(1, 41))
