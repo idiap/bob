@@ -24,6 +24,12 @@
 
 .. automodule:: bob.db
 
+AT&T database
+=============
+
+.. automodule:: bob.db.atnt
+
+
 BANCA Database
 ==============
 
