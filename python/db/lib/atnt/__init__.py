@@ -18,7 +18,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-The AT&T database is a small database to test algorithms on. It is freely downloadable from:
+The AT&T "Database of Faces" is a small free facial image database to test face 
+recognition and verification algorithms on. It is also known by its former name
+"The ORL Database of Faces". You can download the AT&T database from:
 http://www.cl.cam.ac.uk/research/dtg/attarchive/facedatabase.html
 """
 import os
@@ -32,7 +34,7 @@ from .commands import add_commands
 __builtin__ = True
 
 class Database(object):
-  """Wrapper class for the AT&T database (http://www.cl.cam.ac.uk/research/dtg/attarchive/facedatabase.html).
+  """Wrapper class for the AT&T (aka ORL) database of faces (http://www.cl.cam.ac.uk/research/dtg/attarchive/facedatabase.html).
   This class defines a simple protocol for training, enrollment and probe by splitting the few images of the database in a reasonable manner.""" 
 
   def __init__(self):
