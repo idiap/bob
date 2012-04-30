@@ -150,8 +150,13 @@ Core dependencies
   recommended that you download the latest CVS version as it includes important
   64-bit fixes'''. Also note that Blitz++ does not support 64-bit array
   indexing, so the maximum amount of positions in a single dimension is limited
-  to 2^31^  (that is what fits in an signed integer), even if you decide to use
-  the CVS version. This is true to the date (18/January/2011).
+  to 2^31^  (that is what fits in a signed integer), even if you decide to use
+  the CVS version. This is true to the date (18/January/2011). If you plan to 
+  use your own built version of blitz++ from the mercurial repository on a 
+  Linux 32bits platform, '''you must enable the configuration flag 
+  ''--enable-simd-width=8'' (multiples of 8 should also be fine).''' This is 
+  required as BLAS/LAPACK need 8-byte aligned double arrays (cf. ticket #46 on
+  the github bug tracker).
 * `Lapack`_: we use this library for mathematical operations
   on vectors and matrices. Any modern version of this library will do.
 * `FFTW`_: provides fast computation of Fourier, Sine and Cosine transforms
