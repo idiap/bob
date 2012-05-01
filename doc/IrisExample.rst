@@ -92,7 +92,7 @@ Analysis on the Iris dataset involves using the
 .. doctest:: iris
 
   >>> trainer = bob.trainer.FisherLDATrainer()
-  >>> machine, eigen_values = trainer.train(data.values())
+  >>> machine, unused_eigen_values = trainer.train(data.values())
   >>> machine
   <LinearMachine float64@(4, 3)>
 
@@ -121,25 +121,14 @@ machine:
 .. doctest:: iris
 
   >>> output = {}
-  >>> for key in data.keys():
-  ...   output[key] = data[key].foreach(machine.forward)
+  >>> for key in data:
+  ...   output[key] = machine.forward(data[key])
   ...
-  >>> output
-  {'setosa': <Arrayset[50] float64@(3,)>, 'versicolor': <Arrayset[50] float64@(3,)>, 'virginica': <Arrayset[50] float64@(3,)>}
 
 At this point the variable ``output`` contains the LDA-projected information as
-:py:class:`bob.io.Arrayset` objects. Let's convert them to a 2D
-:py:class:`numpy.ndarray` so it is easy to feed information into `Matplotlib`_.
-
-.. doctest:: iris
-
-  >>> for key, value in output.iteritems():
-  ...   output[key] = numpy.vstack(value)
-  ...
-
-Now, the only step missing is the visualization of the results. Fisher proposed
-the use of a histogram showing the separation achieved by looking at the first only.
-Let's reproduce it.
+2D :py:class:`numpy.ndarray` objects.  The only step missing is the
+visualization of the results. Fisher proposed the use of a histogram showing
+the separation achieved by looking at the first only.  Let's reproduce it.
 
 .. doctest:: iris
 
