@@ -1,5 +1,5 @@
 /**
- * @file cxx/math/src/histogram.h
+ * @file cxx/math/math/histogram.h
  * @date Mon Apr 16
  * @author Manuel Guenther <Manuel.Guenther@idiap.ch>
  *
