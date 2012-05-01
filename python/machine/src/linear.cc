@@ -30,16 +30,64 @@ namespace mach = bob::machine;
 namespace io = bob::io;
 
 static object forward(const mach::LinearMachine& m, tp::const_ndarray input) {
-  tp::ndarray output(ca::t_float64, m.outputSize());
-  blitz::Array<double,1> output_ = output.bz<double,1>();
-  m.forward(input.bz<double,1>(), output_);
-  return output.self();
+  const ca::typeinfo& info = input.type();
+
+  if (info.dtype != ca::t_float64)
+    PYTHON_ERROR(TypeError, "cannot forward arrays of type '%s'", info.str().c_str());
+
+  switch(info.nd) {
+    case 1:
+      {
+        tp::ndarray output(ca::t_float64, m.outputSize());
+        blitz::Array<double,1> output_ = output.bz<double,1>();
+        m.forward(input.bz<double,1>(), output_);
+        return output.self();
+      }
+    case 2:
+      {
+        tp::ndarray output(ca::t_float64, info.shape[0], m.outputSize());
+        blitz::Array<double,2> input_ = input.bz<double,2>();
+        blitz::Array<double,2> output_ = output.bz<double,2>();
+        blitz::Range all = blitz::Range::all();
+        for (size_t k=0; k<info.shape[0]; ++k) {
+          blitz::Array<double,1> i_ = input_(k,all);
+          blitz::Array<double,1> o_ = output_(k,all);
+          m.forward(i_, o_);
+        }
+        return output.self();
+      }
+    default:
+      PYTHON_ERROR(TypeError, "cannot forward arrays of type '%s'", info.str().c_str());
+  }
 }
 
 static void forward2(const mach::LinearMachine& m, tp::const_ndarray input,
     tp::ndarray output) {
-  blitz::Array<double,1> output_ = output.bz<double,1>();
-  m.forward(input.bz<double,1>(), output_);
+  const ca::typeinfo& info = input.type();
+
+  if (info.dtype != ca::t_float64)
+    PYTHON_ERROR(TypeError, "cannot forward arrays of type '%s'", info.str().c_str());
+
+  switch(info.nd) {
+    case 1:
+      {
+        blitz::Array<double,1> output_ = output.bz<double,1>();
+        m.forward(input.bz<double,1>(), output_);
+      }
+    case 2:
+      {
+        blitz::Array<double,2> input_ = input.bz<double,2>();
+        blitz::Array<double,2> output_ = output.bz<double,2>();
+        blitz::Range all = blitz::Range::all();
+        for (size_t k=0; k<info.shape[0]; ++k) {
+          blitz::Array<double,1> i_ = input_(k,all);
+          blitz::Array<double,1> o_ = output_(k,all);
+          m.forward(i_, o_);
+        }
+      }
+    default:
+      PYTHON_ERROR(TypeError, "cannot forward arrays of type '%s'", info.str().c_str());
+  }
 }
 
 static tuple get_shape(const mach::LinearMachine& m) {
