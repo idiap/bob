@@ -102,11 +102,11 @@ If after this you use the **h5dump** utility on the file ``testfile1.hdf5``, you
 
    In |project|, when you open a HDF5 file, you can choose one of the following options:
   
-   **'r'** Open the file in reading mode; writing operations will fail.
+   **'r'** Open the file in reading mode; writing operations will fail (this is the default).
 
-   **'w'** Open the file in reading and writing mode with appending (this is the default).
+   **'a'** Open the file in reading and writing mode with appending.
  
-   **'t'** Open the file in reading and writing mode, but truncate it.
+   **'w'** Open the file in reading and writing mode, but truncate it.
 
    **'x'** Read/write/append with exclusive access.
 
