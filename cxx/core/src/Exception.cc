@@ -58,3 +58,14 @@ const char* bob::core::DeprecationError::what() const throw() {
   }
 }
 
+bob::core::NotImplementedError::NotImplementedError(const std::string& reason) throw()
+: m_reason(reason)
+  {}
+
+bob::core::NotImplementedError::~NotImplementedError() throw() {
+}
+
+const char* bob::core::NotImplementedError::what() const throw() {
+  return m_reason.c_str();
+}
+

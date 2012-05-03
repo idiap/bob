@@ -6,6 +6,7 @@ set(ccsrc
    "src/linsolve.cc"
    "src/norminv.cc"
    "src/stats.cc"
+   "src/histogram.cc"
    "src/main.cc"
    )
 
@@ -16,3 +17,4 @@ bob_python_add_unittest(math lib/test/interiorpointLP.py)
 bob_python_add_unittest(math lib/test/linsolve.py)
 bob_python_add_unittest(math lib/test/norminv.py)
 bob_python_add_unittest(math lib/test/stats.py)
+bob_python_add_unittest(math lib/test/histogram.py)

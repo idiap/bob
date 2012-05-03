@@ -3,14 +3,9 @@
 *.pyc
 *.gch
 .DS_Store
-python/tests/out.mov
 .gdb_history
 ctags
 etags
-python/ip/test/data/faceextract/test_001.blue.answer.png
-python/ip/test/data/faceextract/test_001.shift.png
-python/ip/test/data/faceextract/test_001.blue.level.answer.png
-python/ip/test/data/faceextract/test_001.blue.norm.answer.png
 sandbox_snowowl
 my-sphinx.html
 debian/bob/
