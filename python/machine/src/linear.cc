@@ -74,6 +74,7 @@ static void forward2(const mach::LinearMachine& m, tp::const_ndarray input,
         blitz::Array<double,1> output_ = output.bz<double,1>();
         m.forward(input.bz<double,1>(), output_);
       }
+      break;
     case 2:
       {
         blitz::Array<double,2> input_ = input.bz<double,2>();
@@ -85,6 +86,7 @@ static void forward2(const mach::LinearMachine& m, tp::const_ndarray input,
           m.forward(i_, o_);
         }
       }
+      break;
     default:
       PYTHON_ERROR(TypeError, "cannot forward arrays of type '%s'", info.str().c_str());
   }
