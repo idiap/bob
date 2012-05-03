@@ -99,11 +99,59 @@ class MachineTest(unittest.TestCase):
         [12,0,0],
         ]
 
+    # 1D case
     maxerr = numpy.ndarray((2,), 'float64')
     maxerr.fill(1e-10)
     for k in testing:
       input = numpy.array(k, 'float64')
       self.assertTrue ( (abs(presumed(input) - m(input)) < maxerr).all() )
+
+    # 2D case
+    output = m(testing)
+    for i, k in enumerate(testing):
+      input = numpy.array(k, 'float64')
+      self.assertTrue ( (abs(presumed(input) - output[i,:]) < maxerr).all() )
+
+  def test03_UserAllocation(self):
+
+    # Tests the correctness of a linear machine
+    c = bob.io.HDF5File(MACHINE)
+    m = bob.machine.LinearMachine(c)
+
+    def presumed(ivalue):
+      """Calculates, by hand, the presumed output given the input"""
+
+      # These are the supposed preloaded values from the file "MACHINE"
+      isub = numpy.array([0., 0.5, 0.5], 'float64')
+      idiv = numpy.array([0.5, 1.0, 1.0], 'float64')
+      w = numpy.array([[0.4, 0.4, 0.2], [0.1, 0.2, 0.7]], 'float64')
+      b = numpy.array([0.3, -3.0], 'float64')
+      act = math.tanh
+  
+      return numpy.array([ act((w[i,:]*((ivalue-isub)/idiv)).sum() + b[i]) for i in range(w.shape[0]) ], 'float64')
+
+    testing = [
+        [1,1,1],
+        [0.5,0.2,200],
+        [-27,35.77,0],
+        [12,0,0],
+        ]
+
+    # 1D case
+    maxerr = numpy.ndarray((2,), 'float64')
+    maxerr.fill(1e-10)
+    output = numpy.ndarray((2,), 'float64')
+    for k in testing:
+      input = numpy.array(k, 'float64')
+      m(input, output)
+      self.assertTrue ( (abs(presumed(input) - output) < maxerr).all() )
+
+    # 2D case
+    output = numpy.ndarray((len(testing), 2), 'float64')
+    m(testing, output)
+    for i, k in enumerate(testing):
+      input = numpy.array(k, 'float64')
+      self.assertTrue ( (abs(presumed(input) - output[i,:]) < maxerr).all() )
 
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(MachineTest)
