@@ -34,28 +34,28 @@ class ATNTDatabaseTest(unittest.TestCase):
     f = db.files()
     self.assertEqual(len(f.values()), 400) # number of all files in the database
 
-    f = db.files(groups='train')
+    f = db.files(groups='world')
     self.assertEqual(len(f.values()), 200) # number of all training files
    
-    f = db.files(groups='test')
+    f = db.files(groups='dev')
     self.assertEqual(len(f.values()), 200) # number of all test files
     
-    f = db.files(groups='test', purposes = 'enrol')
+    f = db.files(groups='dev', purposes = 'enrol')
     self.assertEqual(len(f.values()), 100) # number of enrol files
 
-    f = db.files(groups='test', purposes = 'probe')
+    f = db.files(groups='dev', purposes = 'probe')
     self.assertEqual(len(f.values()), 100) # number of probe files
 
-    f = db.client_ids()
+    f = db.clients()
     self.assertEqual(len(f), 40) # number of clients
     
-    f = db.client_ids(groups = 'train')
+    f = db.clients(groups = 'world')
     self.assertEqual(len(f), 20) # number of training clients
 
-    f = db.client_ids(groups = 'test')
+    f = db.clients(groups = 'dev')
     self.assertEqual(len(f), 20) # number of test clients
 
-    f = db.files(groups = 'test', purposes = 'enrol', client_ids = [3])
+    f = db.files(groups = 'dev', purposes = 'enrol', client_ids = [3])
     self.assertEqual(len(f), 5)
     keys = sorted(f.keys())
     values = sorted(list(db.m_enrol_files))
