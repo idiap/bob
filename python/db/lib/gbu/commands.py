@@ -22,6 +22,7 @@
 
 import os
 import sys
+import tempfile, shutil
 
 
 def dumplist(args):
@@ -81,6 +82,45 @@ def checkfiles(args):
         (len(bad), len(r), args.directory))
 
 
+def create_eye_files(args):
+  """Creates the eye position files for the GBU database 
+  (using the eye positions stored in the database), 
+  so that GBU shares the same structure as other databases."""  
+
+  # report
+  output = sys.stdout
+  if args.selftest:
+    from ..utils import null
+    output = null()
+    args.directory = tempfile.mkdtemp(prefix='bob_db_gbu_')
+  
+  from .query import Database
+  db = Database()
+  
+  # retrieve all files
+  objects = db.objects(directory=args.directory, extension=args.extension)
+  for object in objects.itervalues():
+    filename = object[0]
+    if not os.path.exists(os.path.dirname(filename)):
+      os.makedirs(os.path.dirname(filename))
+    eyes = object[2]
+    f = open(filename, 'w')
+    # write eyes in the common order: left eye, right eye
+    f.writelines(str(eyes[2]) + ' ' + str(eyes[3]) + ' ' + str(eyes[0]) + ' ' + str(eyes[1]) + '\n')
+    f.close()
+    
+  
+  if args.selftest:
+    # check that all files really exist
+    args.selftest = False
+    args.groups = None
+    args.subworld = None
+    args.protocol = None
+    args.purposes = None
+    checkfiles(args)
+    shutil.rmtree(args.directory)
+
+
 def add_commands(parser):
   """Adds my subset of options and arguments to the top-level parser. For
   details on syntax, please consult:
@@ -124,8 +164,7 @@ def add_commands(parser):
   dump_list_parser.add_argument('-s', '--subworld', help="if given, limits the dump to a particular subset of the data that corresponds to the given protocol (defaults to '%(default)s')", choices=('x1', 'x2', 'x4', 'x8', ''))
   dump_list_parser.add_argument('-p', '--protocol', help="if given, limits the dump to a particular subset of the data that corresponds to the given protocol (defaults to '%(default)s')", choices=('Good', 'Bad', 'Ugly'''))
   dump_list_parser.add_argument('-u', '--purposes', help="if given, this value will limit the output files to those designed for the given purposes. (defaults to '%(default)s')", choices=('enrol', 'probe', ''))
-  dump_list_parser.add_argument('--self-test', dest="selftest", default=False,
-      action='store_true', help=SUPPRESS)
+  dump_list_parser.add_argument('--self-test', dest="selftest", action='store_true', help=SUPPRESS)
 
   dump_list_parser.set_defaults(func=dumplist) #action
 
@@ -138,7 +177,15 @@ def add_commands(parser):
   check_files_parser.add_argument('-s', '--subworld', help="if given, limits the dump to a particular subset of the data that corresponds to the given protocol (defaults to '%(default)s')", choices=('x1', 'x2', 'x4', 'x8', ''))
   check_files_parser.add_argument('-p', '--protocol', help="if given, limits the dump to a particular subset of the data that corresponds to the given protocol (defaults to '%(default)s')", choices=('Good', 'Bad', 'Ugly'''))
   check_files_parser.add_argument('-u', '--purposes', help="if given, this value will limit the output files to those designed for the given purposes. (defaults to '%(default)s')", choices=('enrol', 'probe', ''))
-  check_files_parser.add_argument('--self-test', dest="selftest", default=False,
-      action='store_true', help=SUPPRESS)
+  check_files_parser.add_argument('--self-test', dest="selftest", action='store_true', help=SUPPRESS)
 
   check_files_parser.set_defaults(func=checkfiles) #action
+
+  # get the "create-eye-files" action from a submodule
+  create_eye_files_parser = subparsers.add_parser('create-eye-files', help=create_eye_files.__doc__)
+
+  create_eye_files_parser.add_argument('-d', '--directory', required=True, help="The eye position files will be stored in this directory")
+  create_eye_files_parser.add_argument('-e', '--extension', default = '.pos', help="if given, this extension will be appended to every entry returned (defaults to '%(default)s')")
+  create_eye_files_parser.add_argument('--self-test', dest="selftest", action='store_true', help=SUPPRESS)
+
+  create_eye_files_parser.set_defaults(func=create_eye_files) #action

@@ -178,6 +178,7 @@ bob_python_add_test(db-atnt-checkfiles bob_dbmanage.py atnt checkfiles -d "." --
 bob_python_add_unittest(db lib/test/gbu.py main)
 bob_python_add_test(db-gbu-dumplist bob_dbmanage.py gbu dumplist --self-test)
 bob_python_add_test(db-gbu-checkfiles bob_dbmanage.py gbu checkfiles -d "." --self-test)
+bob_python_add_test(db-gbu-create-eye-files bob_dbmanage.py gbu create-eye-files -d "." --self-test)
 
 # Our examples (run and install)
 bob_python_example(db iris_lda.py lib/example/iris_lda.py)
