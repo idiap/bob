@@ -63,6 +63,15 @@ FaceVerif_FL Database
 
 .. autoclass:: bob.db.faceverif_fl.Database
 
+
+GBU Database
+============
+
+.. automodule:: bob.db.gbu
+
+.. autoclass:: bob.db.gbu.Database
+
+
 Iris Database
 =============
 
