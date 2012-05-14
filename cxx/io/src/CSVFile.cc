@@ -94,7 +94,7 @@ class CSVFile: public io::File {
 
     CSVFile(const std::string& path, char mode):
       m_filename(path),
-      m_newfile(true) {
+      m_newfile(false) {
 
         if (mode == 'r' || (mode == 'a' && fs::exists(path))) { //try peeking
           
@@ -102,7 +102,6 @@ class CSVFile: public io::File {
             m_file.open(m_filename.c_str(), std::ios::in);
           else if (mode == 'a')
             m_file.open(m_filename.c_str(), std::ios::app|std::ios::in|std::ios::out);
-
           if (!m_file.is_open()) {
             boost::format m("cannot open file '%s' for reading or appending");
             m % path;
@@ -122,6 +121,10 @@ class CSVFile: public io::File {
 
           m_newfile = true;
         }
+
+        //general precision settings, in case output is needed...
+        m_file.precision(10);
+        m_file.setf(std::ios_base::scientific, std::ios_base::floatfield);
 
       }
 
@@ -155,6 +158,7 @@ class CSVFile: public io::File {
 
       //read contents
       std::string line;
+      if (m_file.eof()) m_file.clear(); ///< clear current "end" state.
       m_file.seekg(0);
       double* p = static_cast<double*>(buffer.ptr());
       while (std::getline(m_file, line)) {
@@ -162,17 +166,6 @@ class CSVFile: public io::File {
         for(Tokenizer::iterator k=tok.begin(); k!=tok.end(); ++k) {
           std::istringstream(*k) >> *(p++);
         }
-      }
-    }
-
-    void arrayset_read_(ca::interface& buffer, size_t index) {
-      //reads a specific line from the file.
-      std::string line;
-      m_file.seekg(m_pos[index]);
-      Tokenizer tok(line);
-      double* p = static_cast<double*>(buffer.ptr());
-      for(Tokenizer::iterator k=tok.begin(); k!=tok.end(); ++k) {
-        std::istringstream(*k) >> *(p++);
       }
     }
 
@@ -190,7 +183,20 @@ class CSVFile: public io::File {
         throw std::runtime_error(m.str().c_str());
       }
 
-      arrayset_read_(buffer, index);
+      //reads a specific line from the file.
+      std::string line;
+      if (m_file.eof()) m_file.clear(); ///< clear current "end" state.
+      m_file.seekg(m_pos[index]);
+      if (!std::getline(m_file, line)) {
+        boost::format m("could not seek to line %u (offset %u) while reading file '%s'");
+        m % index % m_pos[index] % m_filename;
+        throw std::runtime_error(m.str().c_str());
+      }
+      Tokenizer tok(line);
+      double* p = static_cast<double*>(buffer.ptr());
+      for(Tokenizer::iterator k=tok.begin(); k!=tok.end(); ++k) {
+        std::istringstream(*k) >> *(p++);
+      }
 
     }
 
@@ -256,6 +262,7 @@ class CSVFile: public io::File {
         m_arrayset_type.update_strides();
         m_array_type = type;
         m_newfile = false;
+        return;
       }
 
       //TODO
