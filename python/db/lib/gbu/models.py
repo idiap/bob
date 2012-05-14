@@ -46,8 +46,7 @@ class File(Base):
   m_presentation = Column(String(9), primary_key=True) # The id of the file; should start with nd2
   m_signature = Column(String(9), ForeignKey('client.m_signature')) # The client id; should start with nd1
   m_directory = Column(String(100)) # The relative directory where to find the file
-#  m_filename = Column(String(9), unique=True) # The name of the file; usually starts with 0
-  m_filename = Column(String(9)) # The name of the file; usually starts with 0
+  m_filename = Column(String(9), unique=True) # The name of the file; usually starts with 0
   m_le_x = Column(Integer) # left eye 
   m_le_y = Column(Integer)
   m_re_x = Column(Integer) # right eye 
