@@ -63,7 +63,7 @@ class GBUDatabaseTest(unittest.TestCase):
       for model in db.models(type='gbu', protocol=protocol):
         base = os.path.basename(model)
         self.assertTrue(base[:2] == 'nd' and base[3] == 'R')
-      # assert that all models of the 'gbu' protocol type 
+      # assert that all models of the 'multi' protocol type 
       #  start with "nd1S", i.e., the client id
       for model in db.models(protocol=protocol):
         self.assertTrue('nd1S' in model)

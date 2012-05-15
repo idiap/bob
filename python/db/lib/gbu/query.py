@@ -278,7 +278,7 @@ class Database(object):
 #    model_ids = self.__check_validity__(model_ids, 'model id', self.models(type,groups,subworld,protocol),[])
     # so we do not check that the given model id's are valid... 
     if isinstance(model_ids, str):
-      model_ids = (model_ids)
+      model_ids = (model_ids,)
     
     type = self.__check_single__(type, 'protocol type', self.m_types)
 
