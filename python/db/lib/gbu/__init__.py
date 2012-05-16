@@ -20,11 +20,31 @@
 """
 The GBU (Good, Bad and Ugly) database consists of parts of the MBGC-v1 image set. 
 It defines three protocols, i.e., Good, Bad and Ugly for which different model and probe images are used.
+
+Installation
+------------
 To be able to use this database, please have a look at the NIST webpage: http://www.nist.gov/itl/iad/ig/focs.cfm
-Two things are required to create the database:
+and download:
 
 * The Multiple Biometric Grand Challenge (MBGC)-V1 image database.
-* The GBU image lists that define the Good, Bad and the Ugly sets, as well as the training sets.
+
+Unfortunately, the directory structure in this image database changed. If you have an older version of it,
+and the ``bob_dbmanage.py gbu checkfiles --directory <YOUR_PATH_TO_MBGC-V1>`` fails (i.e. reports missing files), you have two possible options:
+
+* Download the XML lists that define the GBU sets from http://www.nist.gov/itl/iad/ig/focs.cfm and call
+  ``bob_dbmanage.py gbu create --recreate --list-directory <YOUR_PATH_TO_THE_XML_LISTS> --rescan-image-directory <YOUR_PATH_TO_MBGC-V1>`` 
+  (you might need root access to recreate the database)
+  
+* Copy (or link) the images of the MBGC-V1 database into a directory that has the required directory structure by calling:
+  ``bob_dbmanage.py gbu copy-image-files --soft-link --original-image-directory <YOUR_PATH_TO_MBGC-V1> --new-image-directory <NEW_IMAGE_PATH_TO_BE_CREATED>``
+
+To be sure that the procedure succeeded, please call ``bob_dbmanage.py gbu checkfiles --directory <YOUR_PATH_TO_MBGC-V1>`` 
+or ``bob_dbmanage.py gbu checkfiles --directory <NEW_IMAGE_PATH_TO_BE_CREATED>`` afterwards. 
+If this fails again, your copy of the MBGC-V1 database is corrupted, and you might consider to get a new copy of it.
+
+
+Usage
+-----
 
 This implementation of the GBU database wrapper provides two different types of protocols:
 
