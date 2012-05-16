@@ -26,6 +26,22 @@ from .models import *
 from ..utils import session
 
 
+def collect_files(directory, extension = '.jpg', subdirectory = None):
+  """Reads add images (in all sub-directories) of the given directory and 
+  corrects the directories stored in all entries"""
+  # recursively walk through the directory and collect files
+  walk = [(x[0], x[1], x[2]) for x in os.walk(directory)]
+
+  # split off the images and align the directory
+  filelist = []
+  dirlist = []
+  for dir,subdirs,files in walk:
+    filelist.extend([f for f in files if os.path.splitext(f)[1]==extension and ((not subdirectory) or subdirectory in dir)])
+    dirlist.extend([dir.lstrip(directory) for f in files if os.path.splitext(f)[1]==extension and ((not subdirectory) or subdirectory in dir)])
+    
+  return (filelist, dirlist)
+
+
 
 
 def add_files_and_protocols(session, list_dir, image_dir = None):
@@ -126,21 +142,6 @@ def add_files_and_protocols(session, list_dir, image_dir = None):
     return missing_files
 
 
-  def collect_files(directory, extension = '.jpg', subdirectory = None):
-    """Reads add images (in all sub-directories) of the given directory and 
-    corrects the directories stored in all entries"""
-    # recursively walk through the directory and collect files
-    walk = [(x[0], x[1], x[2]) for x in os.walk(directory)]
-
-    # split off the images and align the directory
-    filelist = []
-    dirlist = []
-    for dir,subdirs,files in walk:
-      filelist.extend([f for f in files if os.path.splitext(f)[1]==extension and ((not subdirectory) or subdirectory in dir)])
-      dirlist.extend([dir.lstrip(directory) for f in files if os.path.splitext(f)[1]==extension and ((not subdirectory) or subdirectory in dir)])
-      
-    return (filelist, dirlist)
-  
   
 ###########################################################################
 #### Here the function really starts ######################################
@@ -171,8 +172,10 @@ def add_files_and_protocols(session, list_dir, image_dir = None):
 
   # now, correct the directories according to the real image directory structure
   if image_dir:
+    print "Collecting images from directory", image_dir
     # collect all the files in the given directory
     file_list, dir_list = collect_files(image_dir)
+    print "Done. Collected", len(file_list), "images."
     # correct the directories in all file lists
     for l in all_lists:
       correct_dir(l, file_list, dir_list)
@@ -236,7 +239,7 @@ def create(args):
   # the real work...
   create_tables(args)
   s = session(args.dbname, echo=args.verbose)
-  add_files_and_protocols(s, args.list_directory, args.image_directory)
+  add_files_and_protocols(s, args.list_directory, args.rescan_image_directory)
   s.commit()
   s.close()
 
@@ -252,8 +255,8 @@ def add_command(subparsers):
   parser.add_argument('--list-directory', metavar='DIR',
       default = "/idiap/user/mguenther/GBU_FILE_LISTS",
       help="Change the relative path to the directory containing the list of the GBU database (defaults to %(default)s)")
-  parser.add_argument('--image-directory', metavar='DIR',
+  parser.add_argument('--rescan-image-directory', metavar='DIR',
 #      default='/idiap/resource/database/MBGC-V1',
-      help="Change the relative path to the directory containing the images of the MBGC-V1 database (defaults to %(default)s)")
+      help="If required, select the path to the directory containing the images of the MBGC-V1 database to be re-scanned")
   
   parser.set_defaults(func=create) #action
