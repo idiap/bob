@@ -47,6 +47,7 @@ bob_setup_db(mobio)
 bob_setup_db(multipie)
 bob_setup_db(scface)
 bob_setup_db(xm2vts)
+bob_setup_db(gbu)
 
 # Installs our script driver
 bob_python_script(db "bob_dbmanage.py" "lib/script/dbmanage.py" "main")
@@ -172,6 +173,12 @@ bob_python_add_dependent_test(db-xm2vts-checkfiles python-db-xm2vts-create
 bob_python_add_unittest(db lib/test/atnt.py main)
 bob_python_add_test(db-atnt-dumplist bob_dbmanage.py atnt dumplist --self-test)
 bob_python_add_test(db-atnt-checkfiles bob_dbmanage.py atnt checkfiles -d "." --self-test)
+
+# GBU database driver tests.
+bob_python_add_unittest(db lib/test/gbu.py main)
+bob_python_add_test(db-gbu-dumplist bob_dbmanage.py gbu dumplist --self-test)
+bob_python_add_test(db-gbu-checkfiles bob_dbmanage.py gbu checkfiles -d "." --self-test)
+bob_python_add_test(db-gbu-create-eye-files bob_dbmanage.py gbu create-eye-files -d "." --self-test)
 
 # Our examples (run and install)
 bob_python_example(db iris_lda.py lib/example/iris_lda.py)
