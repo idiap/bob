@@ -4,6 +4,7 @@
 *.gch
 .DS_Store
 .gdb_history
+.pydevproject
 ctags
 etags
 sandbox_snowowl

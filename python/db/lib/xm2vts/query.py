@@ -184,7 +184,7 @@ class Database(object):
       - 4: the "stem" path (basename of the file)
 
     considering all the filtering criteria. The keys of the dictionary are 
-    unique identities for each file in the Biosecure database. Conserve these 
+    unique identities for each file in the XM2VTS database. Conserve these 
     numbers if you wish to save processing results later on.
     """
 
@@ -311,7 +311,7 @@ class Database(object):
 
     Returns: A dictionary containing the resolved filenames considering all
     the filtering criteria. The keys of the dictionary are unique identities 
-    for each file in the Biosecure database. Conserve these numbers if you 
+    for each file in the XM2VTS database. Conserve these numbers if you 
     wish to save processing results later on.
     """
 
