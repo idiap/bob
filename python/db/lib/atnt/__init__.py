@@ -38,7 +38,7 @@ class Database(object):
   This class defines a simple protocol for training, enrollment and probe by splitting the few images of the database in a reasonable manner.""" 
 
   def __init__(self):
-    self.m_groups = ('train', 'test')
+    self.m_groups = ('world', 'dev')
     self.m_purposes = ('enrol', 'probe')
     self.m_client_ids = set(range(1, 41))
     self.m_files = set(range(1, 11))
@@ -67,33 +67,54 @@ class Database(object):
     return stem + extension
 
 
-  def client_ids(self, groups = None):
+  def clients(self, groups = None):
     """Returns the vector of ids of the clients used in a given purpose
     
     Keyword Parameters:
 
     groups
-      One of the groups 'train', 'test' or a tuple with both of them (which is the default).
+      One of the groups 'world', 'dev' or a tuple with both of them (which is the default).
     """
 
     VALID_GROUPS = self.m_groups
     groups = self.__check_validity__(groups, "group", VALID_GROUPS, VALID_GROUPS)
     
     ids = set()
-    if 'train' in groups:
+    if 'world' in groups:
       ids |= self.m_training_clients
-    if 'test' in groups:
+    if 'dev' in groups:
       ids |= self.m_client_ids - self.m_training_clients
       
     return list(sorted(ids))
   
+
+  def models(self, groups = None):
+    """Returns the vector of ids of the models used in a given purpose
+    
+    Keyword Parameters:
+
+    groups
+      One of the groups 'world', 'dev' or a tuple with both of them (which is the default).
+    """
+
+    VALID_GROUPS = self.m_groups
+    groups = self.__check_validity__(groups, "group", VALID_GROUPS, VALID_GROUPS)
+    
+    ids = set()
+    if 'world' in groups:
+      ids |= self.m_training_clients
+    if 'dev' in groups:
+      ids |= self.m_client_ids - self.m_training_clients
+      
+    return list(sorted(ids))
+
   
   def get_client_id_from_file_id(self, file_id):
     """Returns the client id from the given image id"""
     return (file_id-1) / len(self.m_files) + 1
     
 
-  def files(self, directory=None, extension=None, client_ids=[], groups=None, purposes=None):
+  def files(self, directory=None, extension=None, client_ids=None, groups=None, purposes=None):
     """Returns a set of filenames for the specific query by the user.
 
     Keyword Parameters:
@@ -108,7 +129,7 @@ class Database(object):
       The ids of the clients whose files need to be retrieved. Should be a list of integral numbers from [1,40]
 
     groups
-      One of the groups 'train' or 'test' or a list with both of them (which is the default).
+      One of the groups 'world' or 'dev' or a list with both of them (which is the default).
 
     purposes
       One of the purposes 'enrol' or 'probe' or a list with both of them (which is the default).
@@ -121,18 +142,18 @@ class Database(object):
     groups = self.__check_validity__(groups, "group", VALID_GROUPS, VALID_GROUPS)
 
     # collect the ids to retrieve
-    ids = set(self.client_ids(groups))
+    ids = set(self.clients(groups))
 
     # check the desired client ids for sanity
     VALID_IDS = self.m_client_ids
-    client_ids = set(self.__check_validity__(client_ids, "client_id", VALID_IDS, VALID_IDS))
+    client_ids = set(self.__check_validity__(client_ids, "client id", VALID_IDS, VALID_IDS))
 
     # calculate the intersection between the ids and the desired client ids
     ids = ids & client_ids
 
     # check that the groups are valid
     VALID_PURPOSES = self.m_purposes
-    if 'test' in groups:
+    if 'dev' in groups:
       purposes = self.__check_validity__(purposes, "purpose", VALID_PURPOSES, VALID_PURPOSES)
     else:
       purposes = VALID_PURPOSES
