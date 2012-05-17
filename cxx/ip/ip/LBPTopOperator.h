@@ -23,8 +23,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_IP_LBPTOPOPERATOR_H 
-#define BOB5SPRO_IP_LBPTOPOPERATOR_H
+#ifndef BOB_IP_LBPTOPOPERATOR_H 
+#define BOB_IP_LBPTOPOPERATOR_H
 
 #include <blitz/array.h>
 #include <algorithm>
@@ -32,6 +32,7 @@
 #include "ip/LBP4R.h"
 #include "ip/LBP8R.h"
 #include "ip/Exception.h"
+#include <boost/shared_ptr.hpp>
 
 namespace bob {
 /**
@@ -45,6 +46,7 @@ namespace bob {
      * coefficients given a set of images. 
      *
      * The workflow is as follows:
+     * TODO: UPDATE as this is not true
      * 1. You initialize the class, defining the radius and number of points
      * in each of the three directions: XY, XT, YT for the LBP calculations
      * 2. For each image you have in the frame sequence, you push into the 
@@ -90,17 +92,19 @@ namespace bob {
         /**
          * Destructor
          */
-        virtual ~LBPTopOperator();
+        virtual ~LBPTopOperator() {}
 
         /**
          * Processes a 3D tensor representing a set of <b>grayscale</b> images 
          * and returns (by argument) the three LBP planes calculated. The 3D 
          * tensor has to be arranged in this way:
          *
-         * 1st dimension => frame height
-         * 2nd dimension => frame width
-         * 3rd dimension => time
+         * 1st dimension => time
+         * 2nd dimension => frame height
+         * 3rd dimension => frame width
          *
+         * TODO: The following is not true anymore! 
+         *       The three planes now intersect at the central pixel
          * The number of frames in the tensor has to be always an odd number.
          * The central frame is taken as the frame where the LBP planes have
          * to be calculated from. The radius in dimension T (3rd dimension) is
@@ -151,9 +155,9 @@ namespace bob {
         int m_points_xt; ///< The number of points in the XT LBPu2,i
         int m_radius_yt; ///< The LBPu2,i radius in YT
         int m_points_yt; ///< The number of points in the YT LBPu2,i
-        bob::ip::LBP* m_lbp_xy; ///< The operator for the XY calculation
-        bob::ip::LBP* m_lbp_xt; ///< The operator for the XT calculation
-        bob::ip::LBP* m_lbp_yt; ///< The operator for the YT calculation
+        boost::shared_ptr<bob::ip::LBP> m_lbp_xy; ///< The operator for the XY calculation
+        boost::shared_ptr<bob::ip::LBP> m_lbp_xt; ///< The operator for the XT calculation
+        boost::shared_ptr<bob::ip::LBP> m_lbp_yt; ///< The operator for the YT calculation
     };
 
     template <typename T>
@@ -164,32 +168,38 @@ namespace bob {
     {
       // TODO
       // Assert on input and output dimensions
-
+      /*
       // we need an odd number, at (2N+1), where N = std::max(radius_xt, radius_yt)
       if(src.extent(2)%2 == 0) {
         // bob::warning("Cannot process a even-numbered set of frames");
         // TODO
         throw bob::ip::Exception();
       }
+      
       const int N = std::max(m_radius_xt, m_radius_yt);
       if(src.extent(2) != (2*N+1) ) {
         // bob::warning("The number of input frames should be %d", 2*N+1);
         // TODO
         throw bob::ip::Exception();
       }
+      */
+      int Tlength = src.extent(0);
+      int height = src.extent(1);
+      int width = src.extent(2);
+      int tc = Tlength/2;
+      int yc = height/2;
+      int xc = width/2;
 
       // XY plane calculation
-      blitz::Array<T,2> k = 
-        src( blitz::Range::all(), blitz::Range::all(), 2*N);
+      const blitz::Array<T,2> kxy = 
+        src( tc, blitz::Range::all(), blitz::Range::all());
       //k.select(&tensor, 3, 2*N);
-      int width = k.extent(1);
-      int height = k.extent(0);
-      const int max_lbp_xy = m_lbp_xy->getMaxLabel();
-      const float inv_max_lbp_xy = 255.0f / (max_lbp_xy + 0.0f);
-      for (int x=m_radius_xy; x < (width-m_radius_xy); ++x) {
-        for (int y=m_radius_xy; y < (height-m_radius_xy); ++y) {
+      //const int max_lbp_xy = m_lbp_xy->getMaxLabel();
+      //const float inv_max_lbp_xy = 255.0f / (max_lbp_xy + 0.0f);
+      for (int y=m_radius_xy; y < (height-m_radius_xy); ++y) {
+        for (int x=m_radius_xy; x < (width-m_radius_xy); ++x) {
           //m_lbp_xy->setXY(x, y);
-          xy(y,x) = static_cast<uint16_t>(  floor( m_lbp_xy->operator()(k, y, x) * inv_max_lbp_xy + 0.5));
+          xy(y-m_radius_xy,x-m_radius_xy) = m_lbp_xy->operator()(kxy, y, x);
           //xy(y,x) = static_cast<uint16_t>(  
           //  floor(m_lbp_xy->operator()(k, y, x) * inv_max_lbp_xy + 0.5));
           //xy.set(y, x, 0, (short)(inv_max_lbp_xy * m_lbp_xy->getLBP() + 0.5f));
@@ -197,33 +207,31 @@ namespace bob {
       }
 
       // XT plane calculation
-      const int max_lbp_xt = m_lbp_xt->getMaxLabel();
-      const float inv_max_lbp_xt = 255.0f / (max_lbp_xt + 0.0f);
-      for (int y=m_radius_xt; y < (src.extent(0)-m_radius_xt); ++y) {
-        blitz::Array<T,2> k = 
-          src( y, blitz::Range::all(), blitz::Range::all());
-        k.transposeSelf(1,0);
+      //const int max_lbp_xt = m_lbp_xt->getMaxLabel();
+      //const float inv_max_lbp_xt = 255.0f / (max_lbp_xt + 0.0f);
+      const blitz::Array<T,2> kxt = 
+        src( blitz::Range::all(), yc, blitz::Range::all());
+      for (int t = m_radius_xt; t < (Tlength-m_radius_xt); ++t) {
         //bob::ShortTensor k;
         //k.select(&tensor, 0, y);
         //bob::ShortTensor kt;
         //kt.transpose(&k, 1, 2); //get the gray levels on the last dimension
-        for (int x = m_radius_xt; x < (width-m_radius_xt); ++x) {
+        for (int x=m_radius_xt; x < (width-m_radius_xt); ++x) {
           //m_lbp_xt->setXY(x, 2*N);
           //m_lbp_xt->process(kt);
           //xt.set(y, x, 0, (short)(inv_max_lbp_xt * m_lbp_xt->getLBP() + 0.5f));
-          xt(y,x) = static_cast<uint16_t>(  floor( m_lbp_xt->operator()(k, 2*N, x) * inv_max_lbp_xt + 0.5));
+          xt(t-m_radius_xt,x-m_radius_xt) = m_lbp_xt->operator()(kxt, t, x);
           //xt(y,x) = static_cast<uint16_t>(
           //   floor(m_lbp_xt->operator()(k, 2*N, x) * inv_max_lbp_xt + 0.5));
         }
       }
 
       // YT plane calculation
-      const int max_lbp_yt = m_lbp_yt->getMaxLabel();
-      const float inv_max_lbp_yt = 255.0f / (max_lbp_yt + 0.0f);
-      for (int x=m_radius_yt; x < (src.extent(1)-m_radius_yt); ++x) {
-        blitz::Array<T,2> k = 
-          src( blitz::Range::all(), x, blitz::Range::all());
-        k.transposeSelf(1,0);
+      //const int max_lbp_yt = m_lbp_yt->getMaxLabel();
+      //const float inv_max_lbp_yt = 255.0f / (max_lbp_yt + 0.0f);
+      const blitz::Array<T,2> kyt = 
+        src( blitz::Range::all(), blitz::Range::all(), xc);
+      for (int t = m_radius_yt; t < (Tlength-m_radius_yt); ++t) {
         //bob::ShortTensor k;
         //k.select(&tensor, 1, x);
         //bob::ShortTensor kt;
@@ -232,14 +240,14 @@ namespace bob {
           //m_lbp_yt->setXY(y, 2*N);
           //m_lbp_yt->process(kt);
           //yt.set(y, x, 0, (short)(inv_max_lbp_yt * m_lbp_yt->getLBP() + 0.5f));
-          yt(y,x) = static_cast<uint16_t>(  floor( m_lbp_yt->operator()(k, 2*N, y) * inv_max_lbp_yt + 0.5));
+          yt(t-m_radius_yt,y-m_radius_yt) = m_lbp_yt->operator()(kyt, t, y);
           //yt(y,x) = static_cast<uint16_t>(
           //   floor(m_lbp_yt->operator()(k, 2*N, y) * inv_max_lbp_yt + 0.5));
         }
-      } 
+      }
     }
 
   }
 }
 
-#endif /* BOB5SPRO_IP_LBPTOPOPERATOR_H */
+#endif /* BOB_IP_LBPTOPOPERATOR_H */
