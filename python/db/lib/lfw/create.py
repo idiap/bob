@@ -1,8 +1,23 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
-# Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
+# @author: Manuel Guenther <Manuel.Guenther@idiap.ch> 
+# @date: Thu May 24 10:41:42 CEST 2012
+#
+# Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""This script creates the LFW database in a single pass.
+"""This script creates the Labeled Faces in the Wild (LFW) database in a single pass.
 """
 
 import os
@@ -20,84 +35,106 @@ def add_files(session, basedir):
      Returns dictionaries with ids of the clients and ids of the files 
      in the generated SQL tables"""
 
-  def add_client(session, client_dir):
+  def add_client(session, client_id):
     """Adds a client to the LFW database."""
     c = Client(client_dir)
     session.add(c)
-    # We want to make use of the new assigned client id
-    # We need to do the following:
-    session.flush()
-    session.refresh(c)
-    return c.id
  
-  def add_file(session, c_id, client_dir, basename):
+  def add_file(session, file_name):
     """Parses a single filename and add it to the list."""
-    bname = os.path.splitext(basename)[0]
-    shot = bname.split('_')[-1]
-    f = File(int(c_id), os.path.join(client_dir, bname), int(shot))
+    base_name = os.path.splitext(os.path.basename(file_name))[0]
+    shot_id = base_name.split('_')[-1]
+    client_id = base_name[0:-len(shot_id)-1]
+    f = File(client_id, shot_id)
     session.add(f)
-    # We want to make use of the new assigned file id
-    # We need to do the following:
-    session.flush()
-    session.refresh(f)
-    return (f.id, int(shot))
 
   # Loops over the directory structure
-  client_dict = {} # dict[client_name_string] = client_id_sql
-  file_dict = {} # dict[(client_id_sql,file_shot_id)] = file_id_sql
   imagedir = os.path.join(basedir, 'all_images')
   for client_dir in filter(nodot, sorted([d for d in os.listdir(imagedir)])):
     # adds a client to the database
-    c_id = add_client(session, client_dir)
-    client_dict[client_dir] = c_id
+    client_name = add_client(session, client_dir)
     for filename in filter(nodot, sorted([d for d in os.listdir(os.path.join(imagedir, client_dir))])):
       if filename.endswith('.jpg'):
         # adds a file to the database
-        (f_id, f_shot_id) = add_file(session, c_id, client_dir, os.path.basename(filename) )
-        file_dict[(c_id, f_shot_id)] = f_id
+        file_id = add_file(session, filename )
   
-  return (client_dict, file_dict)
 
-def add_pairs(session, basedir, client_dict, file_dict):
-  """Adds pairs"""
+def add_people(session, basedir):
+  """Adds the people to the LFW database"""
 
-  def add_mpair(session, view, subset, client_id1, shot_id1, shot_id2):
+  def add_client(session, protocol, client_id, count):
+    """Adds all images of a client"""
+    for i in range(1,count+1):
+      session.add(People(protocol, File(client_id, i).m_id))
+
+  def parse_view1(session, filename, protocol):
+    """Parses a file containing the people of view 1 of the LFW database"""
+    pfile = open(filename)
+    for line in pfile:
+      llist = line.split()
+      if len(llist) == 2: # one person and the number of images 
+        add_client(session, protocol, llist[0], int(llist[1]))
+
+  def parse_view2(session, filename):
+    """Parses the file containing the people of view 2 of the LFW database"""
+    fold_id = 0
+    pfile = open(filename)
+    for line in pfile:
+      llist = line.split()
+      if len(llist) == 1: # the number of persons in the list
+        protocol = "fold"+str(fold_id)
+        fold_id += 1
+      elif len(llist) == 2: # one person and the number of images 
+        add_client(session, protocol, llist[0], int(llist[1]))
+    
+
+  # Adds view1 people
+  parse_view1(session, os.path.join(basedir, 'view1', 'peopleDevTrain.txt'), 'train')
+  parse_view1(session, os.path.join(basedir, 'view1', 'peopleDevTest.txt'), 'test')
+
+  # Adds view2 people
+  parse_view2(session, os.path.join(basedir, 'view2', 'people.txt'))
+
+def add_pairs(session, basedir):
+  """Adds the pairs for all protocols of the LFW database"""
+
+  def add_mpair(session, protocol, file_id1, file_id2):
     """Add a matched pair to the LFW database."""
-    session.add(Pair(view, subset, client_id1, shot_id1, client_id1, shot_id2))
+    session.add(Pair(protocol, file_id1, file_id2, True))
 
-  def add_upair(session, view, subset, client_id1, shot_id1, client_id2, shot_id2):
+  def add_upair(session, protocol, file_id1, file_id2):
     """Add an unmatched pair to the LFW database."""
-    session.add(Pair(view, subset, client_id1, shot_id1, client_id2, shot_id2))
+    session.add(Pair(protocol, file_id1, file_id2, False))
 
-  def parse_file(session, filename, view, subset, file_dict):
+  def parse_file(session, filename, protocol):
     """Parses a file containing pairs and adds them to the LFW database"""
     pfile = open(filename)
     for line in pfile:
       llist = line.split()
       if len(llist) == 3: # Matched pair 
-        f_id1 = file_dict[(client_dict[llist[0]], int(llist[1]))]
-        f_id2 = file_dict[(client_dict[llist[0]], int(llist[2]))]
-        add_mpair(session, view, subset, client_dict[llist[0]], f_id1, f_id2)
+        file_id1 = File(llist[0], int(llist[1])).m_id
+        file_id2 = File(llist[0], int(llist[2])).m_id
+        add_mpair(session, protocol, file_id1, file_id2)
       elif len(llist) == 4: # Unmatched pair
-        f_id1 = file_dict[(client_dict[llist[0]], int(llist[1]))]
-        f_id2 = file_dict[(client_dict[llist[2]], int(llist[3]))]
-        add_upair(session, view, subset, client_dict[llist[0]], f_id1, client_dict[llist[2]], f_id2)
+        file_id1 = File(llist[0], int(llist[1])).m_id
+        file_id2 = File(llist[2], int(llist[3])).m_id
+        add_upair(session, protocol, file_id1, file_id2)
 
   # Adds view1 pairs
-  parse_file(session, os.path.join(basedir, 'view1', 'pairsDevTrain.txt'), 'view1', 'train', file_dict)
-  parse_file(session, os.path.join(basedir, 'view1', 'pairsDevTest.txt'), 'view1', 'test', file_dict)
+  parse_file(session, os.path.join(basedir, 'view1', 'pairsDevTrain.txt'), 'train')
+  parse_file(session, os.path.join(basedir, 'view1', 'pairsDevTest.txt'), 'test')
 
   # Adds view2 pairs
-  parse_file(session, os.path.join(basedir, 'view2', 'pairs_fold1.txt'), 'view2', 'fold1', file_dict)
-  parse_file(session, os.path.join(basedir, 'view2', 'pairs_fold2.txt'), 'view2', 'fold2', file_dict)
-  parse_file(session, os.path.join(basedir, 'view2', 'pairs_fold3.txt'), 'view2', 'fold3', file_dict)
-  parse_file(session, os.path.join(basedir, 'view2', 'pairs_fold4.txt'), 'view2', 'fold4', file_dict)
-  parse_file(session, os.path.join(basedir, 'view2', 'pairs_fold5.txt'), 'view2', 'fold5', file_dict)
-  parse_file(session, os.path.join(basedir, 'view2', 'pairs_fold6.txt'), 'view2', 'fold6', file_dict)
-  parse_file(session, os.path.join(basedir, 'view2', 'pairs_fold7.txt'), 'view2', 'fold7', file_dict)
-  parse_file(session, os.path.join(basedir, 'view2', 'pairs_fold8.txt'), 'view2', 'fold8', file_dict)
-  parse_file(session, os.path.join(basedir, 'view2', 'pairs_fold9.txt'), 'view2', 'fold9', file_dict)
-  parse_file(session, os.path.join(basedir, 'view2', 'pairs_fold10.txt'), 'view2', 'fold10', file_dict)
+  parse_file(session, os.path.join(basedir, 'view2', 'pairs_fold1.txt'), 'fold1')
+  parse_file(session, os.path.join(basedir, 'view2', 'pairs_fold2.txt'), 'fold2')
+  parse_file(session, os.path.join(basedir, 'view2', 'pairs_fold3.txt'), 'fold3')
+  parse_file(session, os.path.join(basedir, 'view2', 'pairs_fold4.txt'), 'fold4')
+  parse_file(session, os.path.join(basedir, 'view2', 'pairs_fold5.txt'), 'fold5')
+  parse_file(session, os.path.join(basedir, 'view2', 'pairs_fold6.txt'), 'fold6')
+  parse_file(session, os.path.join(basedir, 'view2', 'pairs_fold7.txt'), 'fold7')
+  parse_file(session, os.path.join(basedir, 'view2', 'pairs_fold8.txt'), 'fold8')
+  parse_file(session, os.path.join(basedir, 'view2', 'pairs_fold9.txt'), 'fold9')
+  parse_file(session, os.path.join(basedir, 'view2', 'pairs_fold10.txt'), 'fold10')
 
 
 def create_tables(args):
@@ -107,6 +144,7 @@ def create_tables(args):
   engine = create_engine(args.location, echo=args.verbose)
   Client.metadata.create_all(engine)
   File.metadata.create_all(engine)
+  People.metadata.create_all(engine)
   Pair.metadata.create_all(engine)
 
 # Driver API
@@ -128,8 +166,9 @@ def create(args):
   # the real work...
   create_tables(args)
   s = session(args.dbname, echo=args.verbose)
-  (client_dict, file_dict) = add_files(s, args.basedir)
-  add_pairs(s, args.basedir, client_dict, file_dict)
+  add_files(s, args.basedir)
+  add_people(s, args.basedir)
+  add_pairs(s, args.basedir)
   s.commit()
   s.close()
 
