@@ -30,46 +30,60 @@ class LFWDatabaseTest(unittest.TestCase):
   # expected numbers of clients
   expected_clients = {
       'view1': (4038, 1711, 0), 
-      'fold1': (4539, 609, 601),
-      'fold2': (4593, 601, 555),
-      'fold3': (4642, 555, 552),
-      'fold4': (4637, 552, 560),
-      'fold5': (4622, 560, 567),
-      'fold6': (4655, 567, 527),
-      'fold7': (4625, 527, 597),
-      'fold8': (4551, 597, 601),
-      'fold9': (4568, 601, 580),
-      'fold10': (4560, 580, 609)
+      'fold1': (3959, 1189, 601),
+      'fold2': (3984, 1210, 555),
+      'fold3': (4041, 1156, 552),
+      'fold4': (4082, 1107, 560),
+      'fold5': (4070, 1112, 567),
+      'fold6': (4095, 1127, 527),
+      'fold7': (4058, 1094, 597),
+      'fold8': (4024, 1124, 601),
+      'fold9': (3971, 1198, 580),
+      'fold10': (3959, 1181, 609)
     }
 
   expected_models = {
-      'view1': (9525, 853, 0), 
-      'fold1': (10081, 458, 472),
-      'fold2': (10497, 472, 462),
-      'fold3': (10777, 462, 440),
-      'fold4': (10820, 440, 459),
-      'fold5': (10893, 459, 436),
-      'fold6': (11051, 436, 441),
-      'fold7': (10377, 441, 476),
-      'fold8': (10321, 476, 462),
-      'fold9': (10804, 462, 458),
-      'fold10': (10243, 458, 458)
-    }
-  
-  expected_restricted_training_images = { 
-      'view1': 3443, 
-      'fold1': 6109,
-      'fold2': 6118,
-      'fold3': 6188,
-      'fold4': 6210,
-      'fold5': 6210,
-      'fold6': 6221,
-      'fold7': 6145,
-      'fold8': 6103,
-      'fold9': 6152,
-      'fold10': 6152
+      'view1': (3443, 853, 0), 
+      'fold1': (5345, 916, 472),
+      'fold2': (5333, 930, 462),
+      'fold3': (5381, 934, 440),
+      'fold4': (5434, 902, 459),
+      'fold5': (5473, 899, 436),
+      'fold6': (5467, 895, 441),
+      'fold7': (5408, 877, 476),
+      'fold8': (5360, 917, 462),
+      'fold9': (5339, 938, 458),
+      'fold10': (5367, 920, 458)
     }
 
+  expected_restricted_training_images = { 
+      'view1': 3443, 
+      'fold1': 2267,
+      'fold2': 2228,
+      'fold3': 2234,
+      'fold4': 2293,
+      'fold5': 2341,
+      'fold6': 2362,
+      'fold7': 2334,
+      'fold8': 2356,
+      'fold9': 2368,
+      'fold10': 2320
+    }
+  
+  expected_unrestricted_files = {
+      'view1': (9525, 1549, 0),
+      'fold1': (8874, 2990, 1369),
+      'fold2': (8714, 3152, 1367),
+      'fold3': (9408, 2736, 1089),
+      'fold4': (9453, 2456, 1324),
+      'fold5': (9804, 2413, 1016),
+      'fold6': (9727, 2340, 1166),
+      'fold7': (9361, 2182, 1690),
+      'fold8': (9155, 2856, 1222),
+      'fold9': (9114, 2912, 1207),
+      'fold10': (9021, 2429, 1783)
+    }
+         
   def test_clients(self):
     """Tests if the clients() and models() functions work as expected"""
     db = bob.db.lfw.Database()
@@ -100,11 +114,11 @@ class LFWDatabaseTest(unittest.TestCase):
     
     # also check that the training files in the restricted configuration fit
     for e,l in self.expected_restricted_training_images.iteritems():
-      self.assertEqual(len(db.files(protocol=e, groups='world', subworld='restricted')), l)
+      self.assertEqual(len(db.files(protocol=e, groups='world', subworld='threefolds')), l)
 
     # check that the number of files for the restricted case are 7701 in each fold 
     for i in range(1,11):
-      self.assertEqual(len(db.files(protocol='fold%d'%i, subworld='restricted')), 7701)
+      self.assertEqual(len(db.files(protocol='fold%d'%i, subworld='sevenfolds')), 7701)
     
       
     # check that the probe files sum up to 1000 (view1) or 600 (view2)
@@ -122,7 +136,7 @@ class LFWDatabaseTest(unittest.TestCase):
     
     db = bob.db.lfw.Database()
     
-    numbers = ((2200, 1000, 0), (4800, 600, 600))
+    numbers = ((2200, 1000, 0), (4200, 1200, 600))
     
     # check the number of pairs
     index = 10
@@ -132,6 +146,16 @@ class LFWDatabaseTest(unittest.TestCase):
       self.assertEqual(len(db.pairs(protocol=e, groups='eval')), numbers[index > 0][2])
       index -= 1
 
+  def test_unrestricted(self):
+    """Tests the unrestricted configuration"""
+
+    db = bob.db.lfw.Database()
+    
+    # check that the training files in the unrestricted configuration fit
+    for e,l in self.expected_unrestricted_files.iteritems():
+      self.assertEqual(len(db.files(protocol=e, groups='world', type='unrestricted')), l[0])
+      self.assertEqual(len(db.files(protocol=e, groups='dev', type='unrestricted')), l[1])
+      self.assertEqual(len(db.files(protocol=e, groups='eval', type='unrestricted')), l[2])
    
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(LFWDatabaseTest)

@@ -40,6 +40,9 @@ class Database(object):
     self.m_valid_groups = ('world', 'dev', 'eval')
     self.m_valid_purposes = ('enrol', 'probe')
     self.m_valid_classes = ('matched', 'unmatched')
+    self.m_valid_subworlds = ('onefolds', 'twofolds', 'threefolds', 'fourfolds', 'fivefolds', 'sixfolds', 'sevenfolds')
+    self.m_subworld_counts = {'onefolds':1, 'twofolds':2, 'threefolds':3, 'fourfolds':4, 'fivefolds':5, 'sixfolds':6, 'sevenfolds':7}
+    self.m_valid_types = ('restricted', 'unrestricted')
 
   def __check_single__(self, value, description, valid):
     if not isinstance(value, str):
@@ -60,20 +63,22 @@ class Database(object):
     return int(fold[4:])
 
   def __dev__(self, eval):
-    return (eval + 8) % 10 + 1
+    # take the two parts of the training set (the ones before the eval set) for dev 
+    return ((eval + 7) % 10 + 1, (eval + 8) % 10 + 1)
     
   def __dev_for__(self, fold):
-    return ["fold%d"%self.__dev__(self.__eval__(fold))]
+    return ["fold%d"%f for f in self.__dev__(self.__eval__(fold))]
   
-  def __world_for__(self, fold):
+  def __world_for__(self, fold, subworld):
     # the training sets for each fold are composed of all folds
     # except the given one and the previous
     eval = self.__eval__(fold)
-    dev = self.__dev__(eval) 
-    others = range(1,11)
-    others.remove(dev)
-    others.remove(eval)
-    return ["fold%d"%f for f in others]
+    dev = self.__dev__(eval)
+    world_count = self.m_subworld_counts[subworld]
+    world = []
+    for i in range(world_count):
+      world.append((eval + i) % 10 + 1) 
+    return ["fold%d"%f for f in world]
   
   def __make_path__(self, stem, directory, extension):
     import os
@@ -82,7 +87,7 @@ class Database(object):
     return stem + extension
 
 
-  def clients(self, protocol=None, groups=None):
+  def clients(self, protocol=None, groups=None, subworld='sevenfolds'):
     """Returns a set of clients for the specific query by the user.
 
     Keyword Parameters:
@@ -94,11 +99,18 @@ class Database(object):
       The groups to which the clients belong; one or several of: ('world', 'dev', 'eval')
       The 'eval' group does not exist for protocol 'view1'.
       
+    subworld
+      The subset of the training data. Has to be specified if groups includes 'world' 
+      and protocol is one of 'fold1', ..., 'fold10'.
+      It might be exactly one of ('onefolds', 'twofolds', ..., 'sevenfolds').
+      
     Returns: A list containing all client names which have the desired properties.
     """
 
     self.__check_single__(protocol, 'protocol', self.m_valid_protocols)
     groups = self.__check_validity__(groups, 'group', self.m_valid_groups)
+    if subworld != None:
+      self.__check_single__(subworld, 'sub-world', self.m_valid_subworlds)
  
     queries = []
  
@@ -117,7 +129,7 @@ class Database(object):
     else:
       if 'world' in groups:
         # select training set for the given fold
-        trainset = self.__world_for__(protocol)
+        trainset = self.__world_for__(protocol, subworld)
         queries.append(\
             self.m_session.query(Client).join(File).join(People).\
                   filter(People.m_protocol.in_(trainset)).\
@@ -145,8 +157,11 @@ class Database(object):
     assert len(set(retval)) == len(retval)
     return retval
 
-  def models(self, protocol=None, groups=None):
+
+  def models(self, protocol=None, groups=None, subworld='sevenfolds', type='restricted'):
     """Returns a set of models (multiple models per client) for the specific query by the user.
+    Note that for 'world' sets in the 'restricted' case, both images of the pairs are returned,
+    while for the 'dev' and 'eval' groups, only the first element of the pair is extracted.  
 
     Keyword Parameters:
 
@@ -157,20 +172,37 @@ class Database(object):
       The groups to which the clients belong; one or several of: ('world', 'dev', 'eval')
       The 'eval' group does not exist for protocol 'view1'.
       
+    subworld
+      The subset of the training data. Has to be specified if groups includes 'world' 
+      and protocol is one of 'fold1', ..., 'fold10'.
+      It might be exactly one of ('onefolds', 'twofolds', ..., 'sevenfolds').
+
+    type
+      One of ('restricted', 'unrestricted'). For 'restricted' type, only the **file ids**
+      that appear in the file lists are returned, whereas the 'unrestricted' type returns
+       **client ids** of the clients from "peoples.txt".
+
     Returns: A list containing all client names which have the desired properties.
     """
 
     self.__check_single__(protocol, 'protocol', self.m_valid_protocols)
     groups = self.__check_validity__(groups, 'group', self.m_valid_groups)
- 
+    if subworld != None:
+      self.__check_single__(subworld, 'sub-world', self.m_valid_subworlds)
+    self.__check_single__(type, 'protocol type', self.m_valid_types)
+    
+    if type == 'unrestricted':
+      return self.clients(protocol, groups, subworld)
+    
+    # the restricted case...
     queries = []
  
-    # List of the clients
+    # List of the models
     if protocol == 'view1':
       if 'world' in groups:
         queries.append(\
-            self.m_session.query(File).join(People).\
-                  filter(People.m_protocol == 'train'))
+            self.m_session.query(File).join((Pair, or_(File.m_id == Pair.m_enrol_file, File.m_id == Pair.m_probe_file))).\
+                  filter(Pair.m_protocol == 'train'))
       if 'dev' in groups:
         queries.append(\
             # enroll files
@@ -179,10 +211,10 @@ class Database(object):
     else:
       if 'world' in groups:
         # select training set for the given fold
-        trainset = self.__world_for__(protocol)
+        trainset = self.__world_for__(protocol, subworld)
         queries.append(\
-            self.m_session.query(File).join(People).\
-                  filter(People.m_protocol.in_(trainset)))
+            self.m_session.query(File).join((Pair, or_(File.m_id == Pair.m_enrol_file, File.m_id == Pair.m_probe_file))).\
+                  filter(Pair.m_protocol.in_(trainset)))
       if 'dev' in groups:
         # select development set for the given fold
         devset = self.__dev_for__(protocol)
@@ -204,6 +236,7 @@ class Database(object):
     assert len(set(retval)) == len(retval)
     return retval
 
+
   def get_client_id_from_file_id(self, file_id):
     """Returns the client_id (real client id) attached to the given file_id
     
@@ -221,7 +254,7 @@ class Database(object):
     return q.first().m_client_id
 
 
-  def objects(self, directory=None, extension=None, protocol=None, model_ids=None, groups=None, purposes=None, subworld=None):
+  def objects(self, directory=None, extension=None, protocol=None, model_ids=None, groups=None, purposes=None, subworld='sevenfolds', type='restricted'):
     """Returns a set of filenames for the specific query by the user.
 
     Keyword Parameters:
@@ -242,8 +275,14 @@ class Database(object):
       The purposes of the objects ('enrol', 'probe')
 
     subworld
-      If the single option 'restricted' is specified, only the 'world' files 
-      that are given in the training pairs lists are returned  
+      The subset of the training data. Has to be specified if groups includes 'world' 
+      and protocol is one of 'fold1', ..., 'fold10'.
+      It might be exactly one of ('onefolds', 'twofolds', ..., 'sevenfolds').
+      
+    type
+      One of ('restricted', 'unrestricted'). If the type 'restricted' is given,
+      model_ids will be handled as file ids, if type is 'unrestricted', model ids
+      will be client ids.
 
     model_ids
       Only retrieves the objects for the provided list of model ids.  
@@ -265,9 +304,10 @@ class Database(object):
     self.__check_single__(protocol, "protocol", self.m_valid_protocols)
     groups = self.__check_validity__(groups, "group", self.m_valid_groups)
     purposes = self.__check_validity__(purposes, "purpose", self.m_valid_purposes)
+    self.__check_single__(type, 'protocol type', self.m_valid_types)
     
-    if subworld != None and subworld != 'restricted':
-      raise ValueError("Only subworld 'restricted' is accepted") 
+    if subworld != None:
+      self.__check_single__(subworld, 'sub-world', self.m_valid_subworlds)
     
     if(isinstance(model_ids,str)):
       model_ids = (model_ids,)
@@ -279,7 +319,7 @@ class Database(object):
     if protocol == 'view1':
       if 'world' in groups:
         # training files of view1
-        if subworld == 'restricted':
+        if type == 'restricted':
           queries.append(\
               self.m_session.query(File).join((Pair, or_(File.m_id == Pair.m_enrol_file, File.m_id == Pair.m_probe_file))).\
                   filter(Pair.m_protocol == 'train'))
@@ -304,8 +344,8 @@ class Database(object):
       # view 2
       if 'world' in groups:
         # world set of current fold of view 2
-        trainset = self.__world_for__(protocol)
-        if subworld == 'restricted':
+        trainset = self.__world_for__(protocol, subworld)
+        if type == 'restricted':
           queries.append(\
               self.m_session.query(File).join((Pair, or_(File.m_id == Pair.m_enrol_file, File.m_id == Pair.m_probe_file))).\
                   filter(Pair.m_protocol.in_(trainset)))
@@ -317,48 +357,68 @@ class Database(object):
       if 'dev' in groups:
         # development set of current fold of view 2
         devset = self.__dev_for__(protocol)
-        if 'enrol' in purposes:
+        if type == 'restricted':
+          if 'enrol' in purposes:
+            queries.append(\
+                self.m_session.query(File).join((Pair, File.m_id == Pair.m_enrol_file)).\
+                    filter(Pair.m_protocol.in_(devset)))
+          if 'probe' in purposes:
+            probe_queries.append(\
+                self.m_session.query(File, file_alias).\
+                    join((Pair, File.m_id == Pair.m_probe_file)).\
+                    join((file_alias, file_alias.m_id == Pair.m_enrol_file)).\
+                    filter(Pair.m_protocol.in_(devset)))
+        else: # unrestricted
+          # Note: This query is somewhat weird. You are allowed to use it, but it does not make much sense.
           queries.append(\
-              self.m_session.query(File).join((Pair, File.m_id == Pair.m_enrol_file)).\
-                  filter(Pair.m_protocol.in_(devset)))
-        if 'probe' in purposes:
-          probe_queries.append(\
-              self.m_session.query(File, file_alias).\
-                  join((Pair, File.m_id == Pair.m_probe_file)).\
-                  join((file_alias, file_alias.m_id == Pair.m_enrol_file)).\
-                  filter(Pair.m_protocol.in_(devset)))
+              self.m_session.query(File).join(People).\
+                  filter(People.m_protocol.in_(devset)))
 
       if 'eval' in groups:
         # evaluation set of current fold of view 2; this is the REAL fold
-        if 'enrol' in purposes:
+        if type == 'restricted':
+          if 'enrol' in purposes:
+            queries.append(\
+                self.m_session.query(File).join((Pair, File.m_id == Pair.m_enrol_file)).\
+                    filter(Pair.m_protocol == protocol))
+          if 'probe' in purposes:
+            probe_queries.append(\
+                self.m_session.query(File,file_alias).\
+                    join((Pair, File.m_id == Pair.m_probe_file)).\
+                    join((file_alias, file_alias.m_id == Pair.m_enrol_file)).\
+                    filter(Pair.m_protocol == protocol))
+        else: # unrestricted
+          # Note: THIS QUERY VIOLATES THE LFW PROTOCOL. PLEASE DO NOT USE IT FOR EXPERIMENTS!  
           queries.append(\
-              self.m_session.query(File).join((Pair, File.m_id == Pair.m_enrol_file)).\
-                  filter(Pair.m_protocol == protocol))
-        if 'probe' in purposes:
-          probe_queries.append(\
-              self.m_session.query(File,file_alias).\
-                  join((Pair, File.m_id == Pair.m_probe_file)).\
-                  join((file_alias, file_alias.m_id == Pair.m_enrol_file)).\
-                  filter(Pair.m_protocol == protocol))
+              self.m_session.query(File).join(People).\
+                  filter(People.m_protocol == protocol))
         
           
   
     retval = {}
     for query in queries:
       if model_ids and len(model_ids):
-        query = query.filter(File.m_id.in_(model_ids))
+        if type == 'restricted': # filter file ids
+          query = query.filter(File.m_id.in_(model_ids))
+        else: # unrestricted; filter client ids
+          query = query.filter(File.m_client_id.in_(model_ids))
+          
       for f in query:
         retval[f.m_id] = (self.__make_path__(f.m_path, directory, extension), f.m_id, f.m_client_id, f.m_client_id, f.m_path)
 
     for query in probe_queries:
       if model_ids and len(model_ids):
-        query = query.filter(file_alias.m_id.in_(model_ids))
+        if type == 'restricted': # filter file ids
+          query = query.filter(file_alias.m_id.in_(model_ids))
+        else: # unrestricted; filter client ids
+          query = query.filter(file_alias.m_client_id.in_(model_ids))
+          
       for probe,model in query:
         retval[probe.m_id] = (self.__make_path__(probe.m_path, directory, extension), model.m_id, model.m_client_id, probe.m_client_id, probe.m_path)
       
     return retval
 
-  def files(self, directory=None, extension=None, protocol=None, model_ids=None, groups=None, purposes=None, subworld=None):
+  def files(self, directory=None, extension=None, protocol=None, model_ids=None, groups=None, purposes=None, subworld='sevenfolds', type='restricted'):
     """Returns a dictionary of filenames for the specific query by the user.
 
     Keyword Parameters:
@@ -395,13 +455,13 @@ class Database(object):
     """
 
     retval = {}
-    d = self.objects(directory, extension, protocol, model_ids, groups, purposes, subworld)
+    d = self.objects(directory, extension, protocol, model_ids, groups, purposes, subworld, type)
     for k in d: retval[k] = d[k][0]
 
     return retval
 
 
-  def pairs(self, directory=None, extension=None, protocol=None, groups=None, classes=None):
+  def pairs(self, directory=None, extension=None, protocol=None, groups=None, classes=None, subworld='sevenfolds'):
     """Returns a dictionary of pairs of files. 
 
     Keyword Parameters:
@@ -442,6 +502,8 @@ class Database(object):
     self.__check_single__(protocol, "protocol", self.m_valid_protocols)
     groups = self.__check_validity__(groups, "group", self.m_valid_groups)
     classes = self.__check_validity__(classes, "class", self.m_valid_classes)
+    if subworld != None:
+      self.__check_single__(subworld, 'sub-world', self.m_valid_subworlds)
 
     queries = []
     File1 = aliased(File)
@@ -455,7 +517,7 @@ class Database(object):
 
     else:
       if 'world' in groups:
-        trainset = self.__world_for__(protocol)
+        trainset = self.__world_for__(protocol, subworld)
         queries.append(default_query().filter(Pair.m_protocol.in_(trainset)))
       if 'dev' in groups:
         devset = self.__dev_for__(protocol)
