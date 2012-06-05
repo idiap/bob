@@ -134,12 +134,12 @@ for **PCA**. This is shown below.
    >>> trainer = bob.trainer.FisherLDATrainer()
    >>> [machine,eig_vals] = trainer.train(data)  # Trains the machine with the given data
    >>> print eig_vals  # doctest: +SKIP
-   [ 1.93632491 0. ]
+   [ 13.10097786 0. ]
    >>> machine.resize(3,1)  # Make the output space of dimension 1
    >>> print machine.weights  # The new weights after the training procedure
-   [[ 0.83885757]
-    [ 0.53244291]
-    [ 0.11323656]]
+   [[ 0.60903619]
+    [ 0.78533635]
+    [ 0.11100332]]
 
 
 Neural networks: multi-layer perceptrons (MLP)
