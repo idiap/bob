@@ -93,7 +93,7 @@ Next, input data can be projected using this learned projection matrix
    [ 9.99868456 0.47009678 0.09187563]
 
 
-Linear discrimant analysis
+Linear discriminant analysis
 ==========================
 
 **LDA** [2]_ is another way to train a :py:class:`bob.machine.LinearMachine`. 
@@ -117,7 +117,7 @@ required to be a list of :py:class:`bob.io.Arrayset`, one for each class.
    >>> a2 = numpy.array([3,6,-50], 'float64')
    >>> b2 = numpy.array([4,8,-100], 'float64')
    >>> c2 = numpy.array([40,79,-800], 'float64')
-   >>> data2.append(a1)
+   >>> data2.append(a2)
    >>> data2.append(b2)
    >>> data2.append(c2)
    >>> data = [data1,data2]
