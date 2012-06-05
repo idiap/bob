@@ -94,7 +94,7 @@ Next, input data can be projected using this learned projection matrix
 
 
 Linear discriminant analysis
-==========================
+============================
 
 **LDA** [2]_ is another way to train a :py:class:`bob.machine.LinearMachine`. 
 The associated |project| class is :py:class:`bob.trainer.FisherLDATrainer`.
