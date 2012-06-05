@@ -27,6 +27,10 @@
 
 static boost::python::object histogram_intersection(bob::python::const_ndarray h1, bob::python::const_ndarray h2){
   switch(h1.type().dtype){
+    case bob::core::array::t_uint8:
+      return boost::python::object(bob::math::histogram_intersection<uint8_t>(h1.bz<uint8_t,1>(), h2.bz<uint8_t, 1>()));
+    case bob::core::array::t_uint16:
+      return boost::python::object(bob::math::histogram_intersection<uint16_t>(h1.bz<uint16_t,1>(), h2.bz<uint16_t, 1>()));
     case bob::core::array::t_int32:
       return boost::python::object(bob::math::histogram_intersection<int32_t>(h1.bz<int32_t,1>(), h2.bz<int32_t, 1>()));
     case bob::core::array::t_int64:
@@ -40,6 +44,10 @@ static boost::python::object histogram_intersection(bob::python::const_ndarray h
 
 static boost::python::object chi_square(bob::python::const_ndarray h1, bob::python::const_ndarray h2){
   switch(h1.type().dtype){
+    case bob::core::array::t_uint8:
+      return boost::python::object(bob::math::chi_square<uint8_t>(h1.bz<uint8_t,1>(), h2.bz<uint8_t, 1>()));
+    case bob::core::array::t_uint16:
+      return boost::python::object(bob::math::chi_square<uint16_t>(h1.bz<uint16_t,1>(), h2.bz<uint16_t, 1>()));
     case bob::core::array::t_int32:
       return boost::python::object(bob::math::chi_square<int32_t>(h1.bz<int32_t,1>(), h2.bz<int32_t, 1>()));
     case bob::core::array::t_int64:

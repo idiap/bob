@@ -110,11 +110,13 @@ bob_python_add_dependent_test(db-biosecure-checkfiles python-db-biosecure-create
 bob_python_add_unittest(db lib/test/faceverif_fl.py)
 
 # LFW database driver tests.
+bob_python_add_unittest(db lib/test/lfw.py main)
+
 bob_python_add_dependent_test(db-lfw-dumplist python-db-lfw-create
   bob_dbmanage.py lfw dumplist --self-test)
 
-bob_python_add_dependent_test(db-lfw-dumplist2 python-db-lfw-create
-  bob_dbmanage.py lfw dumplist --view=view1 --subset=fold1 --classes=matched --self-test)
+bob_python_add_dependent_test(db-lfw-dumppairs python-db-lfw-create
+  bob_dbmanage.py lfw dumppairs --self-test)
 
 bob_python_add_dependent_test(db-lfw-checkfiles python-db-lfw-create
   bob_dbmanage.py lfw checkfiles --self-test)
