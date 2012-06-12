@@ -180,7 +180,7 @@ class Database(object):
     type
       One of ('restricted', 'unrestricted'). For 'restricted' type, only the **file ids**
       that appear in the file lists are returned, whereas the 'unrestricted' type returns
-       **client ids** of the clients from "peoples.txt".
+      **client ids** of the clients from "peoples.txt".
 
     Returns: A list containing all client names which have the desired properties.
     """
