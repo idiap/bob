@@ -15,6 +15,7 @@ set(ccsrc
    "src/jfa.cc"
    "src/wiener.cc"
    "src/plda.cc"
+   "src/bic.cc"
    "src/version.cc"
    "src/main.cc"
    )

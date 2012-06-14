@@ -11,6 +11,7 @@ set(ccsrc
    "src/wiener.cc"
    "src/empca.cc"
    "src/plda.cc"
+   "src/bic.cc"
    "src/main.cc"
    )
 
@@ -37,6 +38,7 @@ bob_python_add_unittest(trainer lib/test/rprop.py)
 bob_python_add_unittest(trainer lib/test/backprop.py)
 bob_python_add_unittest(trainer lib/test/jfa.py)
 bob_python_add_unittest(trainer lib/test/plda.py)
+bob_python_add_unittest(trainer lib/test/bic.py)
 
 if(LIBSVM_FOUND)
   bob_python_add_unittest(trainer lib/test/svm.py main 
