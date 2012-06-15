@@ -78,7 +78,7 @@ namespace bob { namespace ip {
    * Converts a RGB color-pixel to HSV as defined in:
    * http://en.wikipedia.org/wiki/HSL_and_HSV
    *
-   * @warn: This method is just an API definition. Look for the type-specific
+   * \warning This method is just an API definition. Look for the type-specific
    * implementations in this file to understand supported types.
    */
   template <typename T> void rgb_to_hsv_one (T r, T g, T b, T& h, T& s, T& v) {
@@ -113,7 +113,7 @@ namespace bob { namespace ip {
    * Converts a HSV color-coded pixel to RGB as defined in:
    * http://en.wikipedia.org/wiki/HSL_and_HSV
    *
-   * @warn: This method is just an API definition. Look for the type-specific
+   * \warning This method is just an API definition. Look for the type-specific
    * implementations in this file to understand supported types.
    */
   template <typename T> void hsv_to_rgb_one (T h, T s, T v, T& r, T& g, T& b) {
@@ -149,7 +149,7 @@ namespace bob { namespace ip {
    * Converts a RGB color-pixel to HSL as defined in:
    * http://en.wikipedia.org/wiki/HSL_and_HSV
    *
-   * @warn: This method is just an API definition. Look for the type-specific
+   * \warning This method is just an API definition. Look for the type-specific
    * implementations in this file to understand supported types.
    */
   template <typename T> void rgb_to_hsl_one (T r, T g, T b, T& h, T& s, T& l) {
@@ -181,7 +181,7 @@ namespace bob { namespace ip {
    * Converts a HSL color-coded pixel to RGB as defined in:
    * http://en.wikipedia.org/wiki/HSL_and_HSV
    *
-   * @warn: This method is just an API definition. Look for the type-specific
+   * \warning This method is just an API definition. Look for the type-specific
    * implementations in this file to understand supported types.
    */
   template <typename T> void hsl_to_rgb_one (T h, T s, T l, T& r, T& g, T& b) {
@@ -218,7 +218,7 @@ namespace bob { namespace ip {
    * 0.114, Kr = 0.299) as discussed here: http://en.wikipedia.org/wiki/YCbCr
    * and here: http://www.fourcc.org/fccyvrgb.php
    *
-   * @warn: This method is just an API definition. Look for the type-specific
+   * \warning This method is just an API definition. Look for the type-specific
    * implementations in this file to understand supported types.
    */
   template <typename T> void rgb_to_yuv_one (T r, T g, T b, T& y, T& u, T& v) {
@@ -231,7 +231,7 @@ namespace bob { namespace ip {
    * here: http://en.wikipedia.org/wiki/YCbCr and here:
    * http://www.fourcc.org/fccyvrgb.php
    *
-   * @warn: This implementation returns U and V values varying from 0 to the
+   * \warning This implementation returns U and V values varying from 0 to the
    * maximum range for mapping norm ranges [-0.5, 0.5] into unsigned integer
    * values.
    */
@@ -244,7 +244,7 @@ namespace bob { namespace ip {
    * discussed here: http://en.wikipedia.org/wiki/YCbCr and here:
    * http://www.fourcc.org/fccyvrgb.php
    *
-   * @warn: This implementation returns U and V values varying from 0 to the
+   * \warning This implementation returns U and V values varying from 0 to the
    * maximum range for mapping norm ranges [-0.5, 0.5] into unsigned integer
    * values.
    */
@@ -257,7 +257,7 @@ namespace bob { namespace ip {
    * here: http://en.wikipedia.org/wiki/YCbCr and here:
    * http://www.fourcc.org/fccyvrgb.php
    *
-   * @warn: This implementation returns U and V values varying from 0 to 1
+   * \warning This implementation returns U and V values varying from 0 to 1
    * for mapping norm ranges [-0.5, 0.5] into a more standard setting.
    */
   template <> void rgb_to_yuv_one (double r, double g, double b,
@@ -268,7 +268,7 @@ namespace bob { namespace ip {
    * Kr = 0.299) to RGB as discussed here: http://en.wikipedia.org/wiki/YCbCr
    * and here: http://www.fourcc.org/fccyvrgb.php
    *
-   * @warn: This method is just an API definition. Look for the type-specific
+   * \warning This method is just an API definition. Look for the type-specific
    * implementations in this file to understand supported types.
    */
   template <typename T> void yuv_to_rgb_one (T y, T u, T v, T& r, T& g, T& b) {
@@ -310,7 +310,7 @@ namespace bob { namespace ip {
    * Converts a RGB color-coded pixel to grayscale using the CCIR 601 (Kb =
    * 0.114, Kr = 0.299) "Y'" (luma) component conversion.
    *
-   * @warn: This method is just an API definition. Look for the type-specific
+   * \warning This method is just an API definition. Look for the type-specific
    * implementations in this file to understand supported types.
    */
   template <typename T> void rgb_to_gray_one (T r, T g, T b, T& gray) {
@@ -358,7 +358,7 @@ namespace bob { namespace ip {
    * dimension.  Its shape should be something like (3, width, height) or (3,
    * height, width). The output array will be checked for shape conformity.
    *
-   * @warn As of this time only C-style storage arrays are supported
+   * \warning As of this time only C-style storage arrays are supported
    */
   template <typename T> void rgb_to_hsv (const blitz::Array<T,3>& from,
       blitz::Array<T,3>& to) {
@@ -377,7 +377,7 @@ namespace bob { namespace ip {
    * dimension.  Its shape should be something like (3, width, height) or (3,
    * height, width). The output array will be checked for shape conformity.
    *
-   * @warn As of this time only C-style storage arrays are supported
+   * \warning As of this time only C-style storage arrays are supported
    */
   template <typename T> void hsv_to_rgb (const blitz::Array<T,3>& from,
       blitz::Array<T,3>& to) {
@@ -396,7 +396,7 @@ namespace bob { namespace ip {
    * dimension.  Its shape should be something like (3, width, height) or (3,
    * height, width). The output array will be checked for shape conformity.
    *
-   * @warn As of this time only C-style storage arrays are supported
+   * \warning As of this time only C-style storage arrays are supported
    */
   template <typename T> void rgb_to_hsl (const blitz::Array<T,3>& from,
       blitz::Array<T,3>& to) {
@@ -415,7 +415,7 @@ namespace bob { namespace ip {
    * dimension.  Its shape should be something like (3, width, height) or (3,
    * height, width). The output array will be checked for shape conformity.
    *
-   * @warn As of this time only C-style storage arrays are supported
+   * \warning As of this time only C-style storage arrays are supported
    */
   template <typename T> void hsl_to_rgb (const blitz::Array<T,3>& from,
       blitz::Array<T,3>& to) {
@@ -435,7 +435,7 @@ namespace bob { namespace ip {
    * (3, height, width). The output array will be automatically resized if
    * required.
    *
-   * @warn As of this time only C-style storage arrays are supported
+   * \warning As of this time only C-style storage arrays are supported
    */
   template <typename T> void rgb_to_yuv (const blitz::Array<T,3>& from,
       blitz::Array<T,3>& to) {
@@ -455,7 +455,7 @@ namespace bob { namespace ip {
    * height) or (3, height, width). The output array will be checked for shape
    * conformity.
    *
-   * @warn As of this time only C-style storage arrays are supported
+   * \warning As of this time only C-style storage arrays are supported
    */
   template <typename T> void yuv_to_rgb (const blitz::Array<T,3>& from,
       blitz::Array<T,3>& to) {
@@ -475,7 +475,7 @@ namespace bob { namespace ip {
    * height, width). The output array is a 2D array with the same element type.
    * The output array will be checked for shape conformity.
    *
-   * @warn As of this time only C-style storage arrays are supported
+   * \warning As of this time only C-style storage arrays are supported
    */
   template <typename T> void rgb_to_gray (const blitz::Array<T,3>& from,
       blitz::Array<T,2>& to) {
@@ -492,7 +492,7 @@ namespace bob { namespace ip {
    * with RGB equivalents as determined by gray_to_rgb_one(). The output array
    * will be checked for shape conformity.
    *
-   * @warn As of this time only C-style storage arrays are supported
+   * \warning As of this time only C-style storage arrays are supported
    */
   template <typename T> void gray_to_rgb (const blitz::Array<T,2>& from,
       blitz::Array<T,3>& to) {

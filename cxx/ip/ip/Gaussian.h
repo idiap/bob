@@ -49,7 +49,7 @@ namespace bob {
 	  		 * @param radius_x The width of the kernel along the x-axis
          * @param sigma The standard deviation of the kernal
 		  	 * @param size_opt The size of the output wrt. to convolution
-		  	 * @param border_opt The interpolation type for the convolution
+		  	 * @param border_type The interpolation type for the convolution
 			   */
 	  		Gaussian(const int radius_y=1, const int radius_x=1, 
             const double sigma_y=5., const double sigma_x=5.,

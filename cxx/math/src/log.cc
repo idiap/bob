@@ -28,7 +28,7 @@ namespace math = bob::math;
  * Computes log(a+b)=log(exp(log(a))+exp(log(b))) from log(a) and log(b), 
  * while dealing with numerical issues
  */
-double math::Log::logAdd(double log_a, double log_b) 
+double bob::math::Log::logAdd(double log_a, double log_b) 
 {
   if(log_a < log_b)
   {
@@ -53,7 +53,7 @@ double math::Log::logAdd(double log_a, double log_b)
  * Computes log(a-b)=log(exp(log(a))-exp(log(b))) from log(a) and log(b), 
  * while dealing with numerical issues
  */
-double math::Log::logSub(double log_a, double log_b) 
+double bob::math::Log::logSub(double log_a, double log_b) 
 {
   double minusdif;
 

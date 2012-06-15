@@ -95,9 +95,9 @@ namespace bob {
         virtual ~LBPTopOperator() {}
 
         /**
-         * Processes a 3D tensor representing a set of <b>grayscale</b> images 
+         * Processes a 3D array representing a set of <b>grayscale</b> images 
          * and returns (by argument) the three LBP planes calculated. The 3D 
-         * tensor has to be arranged in this way:
+         * array has to be arranged in this way:
          *
          * 1st dimension => time
          * 2nd dimension => frame height
@@ -105,21 +105,21 @@ namespace bob {
          *
          * TODO: The following is not true anymore! 
          *       The three planes now intersect at the central pixel
-         * The number of frames in the tensor has to be always an odd number.
+         * The number of frames in the array has to be always an odd number.
          * The central frame is taken as the frame where the LBP planes have
          * to be calculated from. The radius in dimension T (3rd dimension) is
          * taken to be (N-1)/2 where N is the number of frames input.
          *
-         * @param tensor The input 3D tensor as described in the documentation
+         * @param src The input 3D array as described in the documentation
          * of this method.
          * @param xy The result of the LBP operator in the XY plane (frame),
-         * for the central frame of the input tensor. This is an image.
+         * for the central frame of the input array. This is an image.
          * @param xt The result of the LBP operator in the XT plane for the
          * whole image, taking into consideration the size of the width of the
-         * input tensor along the time direction. 
+         * input array along the time direction. 
          * @param yt The result of the LBP operator in the YT plane for the
          * whole image, taking into consideration the size of the width of the
-         * input tensor along the time direction. 
+         * input array along the time direction. 
          *
          */
         void operator()(const blitz::Array<uint8_t,3>& src, 
@@ -140,7 +140,7 @@ namespace bob {
 
       private:
         /**
-          * Processes a 3D tensor representing a set of <b>grayscale</b> images
+          * Processes a 3D array representing a set of <b>grayscale</b> images
           * and returns (by argument) the three LBP planes calculated.
           */
         template <typename T> 

@@ -43,17 +43,17 @@ namespace bob { namespace machine {
   /**
    * This class computes the Bayesian Intrapersonal/Extrapersonal Classifier (BIC),
    * (see "Beyond Eigenfaces: Probabilistic Matching for Face Recognition" from Moghaddam, Wahid and Pentland)
-   * which estimates the posterior probability that the given **difference vector**
+   * which estimates the posterior probability that the given <b>image difference vector</b>
    * is of the intrapersonal class, i.e., both images stem from the same person.
    *
    * There are two possible implementations of the BIC:
+   * <ul>
+   * <li> "The Bayesian Intrapersonal/Extrapersonal Classifier" from Teixeira.<br>
+   *    A full projection of the data is performed. No prior for the classes has to be selected.</li>
    *
-   * - "The Bayesian Intrapersonal/Extrapersonal Classifier" from Teixeira.
-   *    A full projection of the data is performed. No prior for the classes has to be selected.
-   *
-   * - "Face Detection and Recognition using Maximum Likelihood Classifiers on Gabor Graphs" from Günther and Würtz.
-   *    Only mean and variance of the difference vectors are calculated. There is no subspace truncation and no priors.
-   *
+   * <li> "Face Detection and Recognition using Maximum Likelihood Classifiers on Gabor Graphs" from Günther and Würtz.<br>
+   *    Only mean and variance of the difference vectors are calculated. There is no subspace truncation and no priors.</li>
+   * </ul>
    * In any of the two implementations, the resulting score (using the forward() method) is a log-likelihood estimate,
    * using Mahalanobis(-like) distance measures.
    *

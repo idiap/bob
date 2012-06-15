@@ -215,8 +215,6 @@ namespace bob {
       *   one is the width (x-axis).
       * @param src The input blitz array
       * @param dst The output blitz array
-      * @param dst_mask The output blitz array mask, specifying the valid
-      *   pixels of dst.
       * @param shear The shear parameter in the matrix [1 shear; 0 1]
       * @param antialias Whether antialiasing should be used or not 
       */

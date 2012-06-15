@@ -273,7 +273,7 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double>
     
     /**
      * Get a pointer to a particular Gaussian component
-     * @param[i] i The index of the Gaussian component
+     * @param[in] i The index of the Gaussian component
      * @return A smart pointer to the i'th Gaussian component
      *         if it exists, otherwise throws an exception
      */

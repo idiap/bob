@@ -53,7 +53,7 @@ void train::MAP_GMMTrainer::initialization(mach::GMMMachine& gmm, const io::Arra
   m_cache_ml_weights.resize(n_gaussians);
 }
 
-bool train::MAP_GMMTrainer::setPriorGMM(boost::shared_ptr<mach::GMMMachine> prior_gmm) {
+bool train::MAP_GMMTrainer::setPriorGMM(boost::shared_ptr<bob::machine::GMMMachine> prior_gmm) {
   if(!prior_gmm) return false;
   m_prior_gmm = prior_gmm;
   return true;

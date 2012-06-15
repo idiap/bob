@@ -31,7 +31,7 @@ train::Exception::Exception() throw() {
 train::Exception::~Exception() throw() {
 }
 
-const char* train::Exception::Exception::what() const throw() {
+const char* train::Exception::what() const throw() {
  static const char* what_string = "Generic trainer::Exception: user specialization has not overwritten what() or is throwing an object of this class (in which case, please fix it!)";
  return what_string;
 }
@@ -94,7 +94,7 @@ train::IncompatibleMachine::IncompatibleMachine() throw() {
 train::IncompatibleMachine::~IncompatibleMachine() throw() {
 }
 
-const char* train::IncompatibleMachine::IncompatibleMachine::what() const throw() {
+const char* train::IncompatibleMachine::what() const throw() {
  static const char* what_string = "trainer::IncompatibleMachine: you are trying to provide a machine this trained was not tailored for";
  return what_string;
 }
@@ -105,7 +105,7 @@ train::EmptyTrainingSet::EmptyTrainingSet() throw() {
 train::EmptyTrainingSet::~EmptyTrainingSet() throw() {
 }
 
-const char* train::EmptyTrainingSet::EmptyTrainingSet::what() const throw() {
+const char* train::EmptyTrainingSet::what() const throw() {
  static const char* what_string = "trainer::EmptyTrainingSet: you are trying to train a machine without any data";
  return what_string;
 }

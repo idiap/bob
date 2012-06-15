@@ -42,7 +42,7 @@ mach::JFABaseMachine::JFABaseMachine():
 {
 }
 
-mach::JFABaseMachine::JFABaseMachine(const boost::shared_ptr<mach::GMMMachine> ubm, 
+mach::JFABaseMachine::JFABaseMachine(const boost::shared_ptr<bob::machine::GMMMachine> ubm, 
     const size_t ru, const size_t rv):
   m_ubm(ubm), m_ru(ru), m_rv(rv),
   m_U(getDimCD(),ru), m_V(getDimCD(),rv), m_d(getDimCD())
@@ -105,7 +105,7 @@ void mach::JFABaseMachine::resize(const size_t ru, const size_t rv) {
   m_V.resizeAndPreserve(m_V.extent(0), rv);
 }
 
-void mach::JFABaseMachine::setUbm(const boost::shared_ptr<mach::GMMMachine> ubm) {
+void mach::JFABaseMachine::setUbm(const boost::shared_ptr<bob::machine::GMMMachine> ubm) {
   m_ubm = ubm;
   m_U.resizeAndPreserve(getDimCD(), m_ru);
   m_V.resizeAndPreserve(getDimCD(), m_rv);
@@ -149,7 +149,7 @@ mach::JFAMachine::JFAMachine():
 {
 }
 
-mach::JFAMachine::JFAMachine(const boost::shared_ptr<mach::JFABaseMachine> jfa_base): 
+mach::JFAMachine::JFAMachine(const boost::shared_ptr<bob::machine::JFABaseMachine> jfa_base): 
   m_jfa_base(jfa_base),
   m_y(jfa_base->getDimRv()), m_z(jfa_base->getDimCD()),
   m_y_for_x(jfa_base->getDimRv()), m_z_for_x(jfa_base->getDimCD()),
@@ -205,7 +205,7 @@ void mach::JFAMachine::save(io::HDF5File& config) const {
   config.setArray("z", m_z);
 }
 
-void mach::JFAMachine::setJFABase(const boost::shared_ptr<mach::JFABaseMachine> jfa_base) {
+void mach::JFAMachine::setJFABase(const boost::shared_ptr<bob::machine::JFABaseMachine> jfa_base) {
   m_jfa_base = jfa_base; 
   // Resize variables
   resize();
@@ -266,7 +266,7 @@ void mach::JFAMachine::computeUtSigmaInv()
   m_cache_UtSigmaInv = U(j,i) / m_cache_sigma(j); // Ut * diag(sigma)^-1
 }
 
-void mach::JFAMachine::computeIdPlusUSProdInv(boost::shared_ptr<const mach::GMMStats> gmm_stats)
+void mach::JFAMachine::computeIdPlusUSProdInv(boost::shared_ptr<const bob::machine::GMMStats> gmm_stats)
 {
   // Computes (Id + U^T.Sigma^-1.U.N_{i,h}.U)^-1 = (Id + sum_{c=1..C} N_{i,h}.U_{c}^T.Sigma_{c}^-1.U_{c})^-1
   const blitz::Array<double,2>& U = m_jfa_base->getU();
@@ -295,7 +295,7 @@ void mach::JFAMachine::computeIdPlusUSProdInv(boost::shared_ptr<const mach::GMMS
   math::inv(m_tmp_ruru, m_cache_IdPlusUSProdInv);
 }
 
-void mach::JFAMachine::computeFn_x(boost::shared_ptr<const mach::GMMStats> gmm_stats)
+void mach::JFAMachine::computeFn_x(boost::shared_ptr<const bob::machine::GMMStats> gmm_stats)
 {
   // Compute Fn_x = sum_{sessions h}(N*(o - m) (Normalised first order statistics)
   m_jfa_base->getUbm()->getMeanSupervector(m_cache_mean);
@@ -317,7 +317,7 @@ void mach::JFAMachine::updateX_fromCache()
   math::prod(m_cache_IdPlusUSProdInv, m_tmp_ru, m_x);
 }
 
-void mach::JFAMachine::estimateX(boost::shared_ptr<const mach::GMMStats> gmm_stats) 
+void mach::JFAMachine::estimateX(boost::shared_ptr<const bob::machine::GMMStats> gmm_stats) 
 {
   cacheSupervectors(); // Put supervector in cache
   computeUtSigmaInv(); // Computes U^T.Sigma^-1
@@ -326,7 +326,7 @@ void mach::JFAMachine::estimateX(boost::shared_ptr<const mach::GMMStats> gmm_sta
   updateX_fromCache(); // Estimates the value of x using the current cache
 }
 
-void mach::JFAMachine::forward(boost::shared_ptr<const mach::GMMStats> gmm_stats, double& score)
+void mach::JFAMachine::forward(boost::shared_ptr<const bob::machine::GMMStats> gmm_stats, double& score)
 {
   // Checks that a Base machine has been set
   if(!m_jfa_base) throw bob::machine::JFAMachineNoJFABaseSet();
@@ -356,7 +356,7 @@ void mach::JFAMachine::forward(boost::shared_ptr<const mach::GMMStats> gmm_stats
   score = scores(0,0);
 }
 
-void mach::JFAMachine::forward(const std::vector<boost::shared_ptr<const mach::GMMStats> >& samples, blitz::Array<double,1>& score)
+void mach::JFAMachine::forward(const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& samples, blitz::Array<double,1>& score)
 {
   // Checks that a Base machine has been set
   if(!m_jfa_base) throw bob::machine::JFAMachineNoJFABaseSet();

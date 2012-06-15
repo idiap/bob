@@ -121,7 +121,7 @@ void bob::machine::BICMachine::setBIC(
 /**
  * Set or unset the usage of the Distance From Feature Space
  *
- * @param  The new value of use_DFFS
+ * @param use_DFFS The new value of use_DFFS
  */
 void bob::machine::BICMachine::use_DFFS(bool use_DFFS){
   m_use_DFFS = use_DFFS;

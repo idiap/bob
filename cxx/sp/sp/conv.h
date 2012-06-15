@@ -205,7 +205,7 @@ namespace bob {
      * @brief Gets the required size of the output of the separable convolution product
      *        (Convolution of a X-D signal with a 1D kernel)
      * @param A The first input array A
-     * @param B The second input array b
+     * @param b The second input array b
      * @param dim The dimension along which to convolve
      * @param size_opt:  * Full: full size (default)
      *                   * Same: same size as the largest between A and B

@@ -29,7 +29,7 @@ namespace io = bob::io;
 namespace iod = io::detail;
 namespace ca = bob::core::array;
 
-boost::shared_ptr<mat_t> iod::make_matfile(const std::string& filename,
+boost::shared_ptr<mat_t> bob::io::detail::make_matfile(const std::string& filename,
     int flags) {
   return boost::shared_ptr<mat_t>(Mat_Open(filename.c_str(), flags), std::ptr_fun(Mat_Close));
 }
@@ -253,7 +253,7 @@ static void assign_array (boost::shared_ptr<matvar_t> matvar, ca::interface& buf
 
 }
 
-void iod::read_array (boost::shared_ptr<mat_t> file, ca::interface& buf,
+void bob::io::detail::read_array (boost::shared_ptr<mat_t> file, ca::interface& buf,
     const std::string& varname) {
 
   boost::shared_ptr<matvar_t> matvar;
@@ -264,7 +264,7 @@ void iod::read_array (boost::shared_ptr<mat_t> file, ca::interface& buf,
 
 }
 
-void iod::write_array(boost::shared_ptr<mat_t> file, 
+void bob::io::detail::write_array(boost::shared_ptr<mat_t> file, 
     const std::string& varname, const ca::interface& buf) {
 
   boost::shared_ptr<matvar_t> matvar = make_matvar(varname, buf);
@@ -281,7 +281,7 @@ static void get_var_info(boost::shared_ptr<const matvar_t> matvar,
       matvar->rank, matvar->dims);
 }
 
-void iod::mat_peek(const std::string& filename, ca::typeinfo& info) {
+void bob::io::detail::mat_peek(const std::string& filename, ca::typeinfo& info) {
 
   boost::shared_ptr<mat_t> mat = iod::make_matfile(filename, MAT_ACC_RDONLY);
   if (!mat) throw io::FileNotReadable(filename);
@@ -290,7 +290,7 @@ void iod::mat_peek(const std::string& filename, ca::typeinfo& info) {
 
 }
 
-void iod::mat_peek_set(const std::string& filename, ca::typeinfo& info) {
+void bob::io::detail::mat_peek_set(const std::string& filename, ca::typeinfo& info) {
   boost::shared_ptr<mat_t> mat = iod::make_matfile(filename, MAT_ACC_RDONLY);
   if (!mat) throw io::FileNotReadable(filename);
   boost::shared_ptr<matvar_t> matvar = make_matvar(mat); //gets the first var.
@@ -298,7 +298,7 @@ void iod::mat_peek_set(const std::string& filename, ca::typeinfo& info) {
 }
 
 boost::shared_ptr<std::map<size_t, std::pair<std::string, ca::typeinfo> > >
-  iod::list_variables(const std::string& filename) {
+bob::io::detail::list_variables(const std::string& filename) {
 
   boost::shared_ptr<std::map<size_t, std::pair<std::string, ca::typeinfo> > > retval(new std::map<size_t, std::pair<std::string, ca::typeinfo> >());
 

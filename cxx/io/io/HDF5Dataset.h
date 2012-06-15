@@ -244,8 +244,6 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
        * readArray(0, value). The same conditions as for readArray(index=0,
        * value) apply.
        *
-       * @param index Which of the arrays to read in the current dataset, by
-       * order
        * @param value The output array data will be stored inside this
        * variable. This variable has to be a zero-based C-style contiguous
        * storage array. If that is not the case, we will raise an exception.

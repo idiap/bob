@@ -63,7 +63,7 @@ namespace bob {
          * @param size_step The step size of the convolution kernels
          * @param sigma The standard deviation of the kernal for the smallest
          *  convolution kernel.
-		  	 * @param border_opt The interpolation type for the convolution
+		  	 * @param border_type The interpolation type for the convolution
 			   */
 	  		MultiscaleRetinex(const size_t n_scales=1, const int size_min=1, 
             const int size_step=1, const double sigma=5.,

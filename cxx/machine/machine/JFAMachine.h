@@ -53,7 +53,7 @@ class JFABaseMachine
      * The Universal Background Model and the matrices U, V and diag(d) are
      * not initialized.
      *
-     * @param UBM The Universal Backgroud Model
+     * @param ubm The Universal Background Model
      * @param ru size of U (CD x ru)
      * @param rv size of U (CD x rv)
      * @warning ru and rv SHOULD BE  >= 1. Just set U/V to zero if you want
