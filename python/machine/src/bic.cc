@@ -49,15 +49,18 @@ void bind_machine_bic(){
   // bind BICMachine
   boost::python::class_<bob::machine::BICMachine, boost::shared_ptr<bob::machine::BICMachine> > (
       "BICMachine",
-      "This machine is designed to classify image differences to be either intrapersonal or extrapersonal."
-      "There are two possible implementations of the BIC:"
-      ""
-      "* 'The Bayesian Intrapersonal/Extrapersonal Classifier' from Teixeira."
-      "  A full projection of the data is performed. No prior for the classes has to be selected."
-      "* 'Face Detection and Recognition using Maximum Likelihood Classifiers on Gabor Graphs' from Guenther and Wuertz."
-      "  Only mean and variance of the difference vectors are calculated. There is no subspace truncation and no priors."
-      ""
-      "What kind of machine is used is dependent on the way, this class is trained via the BICTrainer.",
+      "This machine is designed to classify image differences to be either intrapersonal or extrapersonal. "
+      "There are two possible implementations of the BIC:\n"
+      "\n"
+      "* 'The Bayesian Intrapersonal/Extrapersonal Classifier' from Teixeira [1]_. "
+      "  A full projection of the data is performed. No prior for the classes has to be selected.\n"
+      "* 'Face Detection and Recognition using Maximum Likelihood Classifiers on Gabor Graphs' from Guenther and Wuertz [2]_."
+      "  Only mean and variance of the difference vectors are calculated. There is no subspace truncation and no priors.\n"
+      "\n"
+      "What kind of machine is used is dependent on the way, this class is trained via the BICTrainer.\n"
+      "\n"
+      ".. [1] Marcio Luis Teixeira. The bayesian intrapersonal/extrapersonal classifier. Colorado State University, 2003.\n"
+      ".. [2] Manuel Guenther and Rolf P. Wuertz. Face detection and recognition using maximum likelihood classifiers on Gabor graphs. International Journal of Pattern Recognition and Artificial Intelligence, 23(3):433-461, 2009.",
       boost::python::init<bool>(
           (boost::python::arg("use_dffs") = true),
           "Initializes an empty BICMachine. The optional boolean parameter specifies whether to use the DFFS in the BIC implementation."
@@ -87,8 +90,8 @@ void bind_machine_bic(){
           boost::python::arg("input"),
           boost::python::arg("output")
       ),
-      "Computes the BIC or IEC score for the given input vector, which results of a comparison of two (facial) images."
-      "The score itself is the log-likelihood score of the given input vector belonging to the intrapersonal class."
+      "Computes the BIC or IEC score for the given input vector, which results of a comparison of two (facial) images. "
+      "The score itself is the log-likelihood score of the given input vector belonging to the intrapersonal class. "
       "No sanity checks of input and output are performed."
     )
 
@@ -99,9 +102,9 @@ void bind_machine_bic(){
           boost::python::arg("self"),
           boost::python::arg("input")
       ),
-      "Computes the BIC or IEC score for the given input vector, which results of a comparison of two (facial) images."
-      "The resulting value is returned as a single float value."
-      "The score itself is the log-likelihood score of the given input vector belonging to the intrapersonal class."
+      "Computes the BIC or IEC score for the given input vector, which results of a comparison of two (facial) images. "
+      "The resulting value is returned as a single float value. "
+      "The score itself is the log-likelihood score of the given input vector belonging to the intrapersonal class. "
       "No sanity checks of input and output are performed."
     )
 
@@ -113,8 +116,8 @@ void bind_machine_bic(){
           boost::python::arg("input"),
           boost::python::arg("output")
       ),
-      "Computes the BIC or IEC score for the given input vector, which results of a comparison of two (facial) images."
-      "The score itself is the log-likelihood score of the given input vector belonging to the intrapersonal class."
+      "Computes the BIC or IEC score for the given input vector, which results of a comparison of two (facial) images. "
+      "The score itself is the log-likelihood score of the given input vector belonging to the intrapersonal class. "
       "No sanity checks of input and output are performed."
     )
 
@@ -126,8 +129,8 @@ void bind_machine_bic(){
           boost::python::arg("input"),
           boost::python::arg("output")
       ),
-      "Computes the BIC or IEC score for the given input vector, which results of a comparison of two (facial) images."
-      "The score itself is the log-likelihood score of the given input vector belonging to the intrapersonal class."
+      "Computes the BIC or IEC score for the given input vector, which results of a comparison of two (facial) images. "
+      "The score itself is the log-likelihood score of the given input vector belonging to the intrapersonal class. "
       "Sanity checks of input and output shape are performed."
     )
 
