@@ -26,7 +26,7 @@ void bind_trainer_bic(){
   boost::python::class_<bob::trainer::BICTrainer, boost::shared_ptr<bob::trainer::BICTrainer> > (
       "BICTrainer",
       "A Trainer for a BICMachine. It trains either a BIC model (including projection matrix and eigenvalues), "
-          "or an IEC model (containing mean and variance only)",
+          "or an IEC model (containing mean and variance only). See :py:class:`bob.machine.BICMachine` for more details.",
       boost::python::init<int,int>(
           (
               boost::python::arg("intra_dim"),
@@ -50,7 +50,7 @@ void bind_trainer_bic(){
           boost::python::arg("intra_differences"),
           boost::python::arg("extra_differences")
       ),
-      "Trains the given machine (should be of type bob.machine.BICMachine) to classify intrapersonal image differences vs. extrapersonal ones."
+      "Trains the given machine (should be of type :py:class:`bob.machine.BICMachine`) to classify intrapersonal image differences vs. extrapersonal ones. "
       "The given difference vectors might be the result of any image comparison function, e.g., the pixel difference of the images."
     );
 }
