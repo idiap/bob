@@ -47,6 +47,7 @@ bob_setup_db(mobio)
 bob_setup_db(multipie)
 bob_setup_db(scface)
 bob_setup_db(xm2vts)
+bob_setup_db(fir)
 bob_setup_db(gbu)
 
 # Installs our script driver
@@ -168,6 +169,16 @@ bob_python_add_dependent_test(db-xm2vts-dumplist2 python-db-xm2vts-create
 
 bob_python_add_dependent_test(db-xm2vts-checkfiles python-db-xm2vts-create
   bob_dbmanage.py xm2vts checkfiles --self-test)
+
+# FIR database driver tests.
+bob_python_add_dependent_test(db-fir-dumplist python-db-fir-create
+  bob_dbmanage.py fir dumplist --self-test)
+
+bob_python_add_dependent_test(db-fir-dumplist2 python-db-fir-create
+  bob_dbmanage.py fir dumplist --protocol=lp1 --classes=client --groups=dev --purposes=enrol --self-test)
+
+bob_python_add_dependent_test(db-fir-checkfiles python-db-fir-create
+  bob_dbmanage.py fir checkfiles --self-test)
 
 # AT&T database driver tests.
 bob_python_add_unittest(db lib/test/atnt.py main)

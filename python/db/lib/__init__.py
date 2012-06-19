@@ -17,6 +17,7 @@ import mobio
 import multipie
 import scface
 import xm2vts
+import fir
 import nuaa
 import casia_fasd
 import atnt

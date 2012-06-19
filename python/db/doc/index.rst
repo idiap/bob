@@ -123,3 +123,10 @@ XM2VTS Database
 .. automodule:: bob.db.xm2vts
 
 .. autoclass:: bob.db.xm2vts.Database
+
+FIR Database
+===============
+
+.. automodule:: bob.db.fir
+
+.. autoclass:: bob.db.fir.Database
