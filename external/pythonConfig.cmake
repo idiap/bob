@@ -82,3 +82,12 @@ endif()
 # standardized by Python as defined in http://docs.python.org/install/index.html
 set(PYTHON_SITE_PACKAGES "lib/python${PYTHON_VERSION}/site-packages" CACHE
   PATH "Default package installation prefix for Python packages")
+
+# And we also try to find ipython, if it is installed
+find_program(IPYTHON_EXECUTABLE ${WITH_IPYTHON} ipython DOC "Default ipython interpreter")
+
+if(IPYTHON_EXECUTABLE)
+  execute_process(COMMAND ${IPYTHON_EXECUTABLE} -Version OUTPUT_VARIABLE IPYTHON_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+  set(IPYTHON_VERSION "${IPYTHON_VERSION}" CACHE STRING "IPython version")
+  find_package_message(IPYTHON "Found IPython ${IPYTHON_VERSION} at ${IPYTHON_EXECUTABLE}" "[${IPYTHON_EXECUTABLE}][${IPYTHON_VERSION}]")
+endif()
