@@ -44,49 +44,38 @@ def add_clients(session):
 def add_files(session, imagedir):
   """Add files to the FIR database."""
  
-  def add_file(session, basename, client_dir):
+  def add_file(session, basename):
     """Parse a single filename and add it to the list."""
     v = os.path.splitext(basename)[0].split('_')
-    session.add(File(int(v[0]), os.path.join(client_dir, basename), bool(v[1]), int(v[2]), int(v[3]), int(v[4])))
+    ir = True
+    if v[1] == '0':
+      ir = False
+    else:
+      ir = True
+    session.add(File(int(v[0]), basename, ir, int(v[2]), int(v[3]), int(v[4])))
   
   file_list = os.listdir(imagedir)
   for filename in filter(nodot, file_list):
     basename, extension = os.path.splitext(filename)
-    add_file(session, basename, imagedir)
+    add_file(session, basename)
 
 def add_protocols(session):
   """Adds protocols"""
-  # Protocol ir
-  for illumination in range(1,6):
-    for shot in range(0,4):
-      session.add(Protocol('ir', 'world', 'enrol', True, 1, illumination, shot))
-      session.add(Protocol('ir', 'world', 'enrol', True, 2, illumination, shot))
+  for illumination in range(1,7):
+    for shot in range(0,5):
+      session.add(Protocol('ir', 'world', 'enrol', True, illumination, shot))
+      session.add(Protocol('noir', 'world', 'enrol', False, illumination, shot))
       if illumination == 2:
-        session.add(Protocol('ir', 'dev', 'enrol', True, 1, illumination, shot))
-        session.add(Protocol('ir', 'dev', 'enrol', True, 2, illumination, shot))
-        session.add(Protocol('ir', 'eval', 'enrol', True, 1, illumination, shot))
-        session.add(Protocol('ir', 'eval', 'enrol', True, 2, illumination, shot))
+        session.add(Protocol('ir', 'dev', 'enrol', True, illumination, shot))
+        session.add(Protocol('noir', 'dev', 'enrol', False, illumination, shot))
+        session.add(Protocol('ir', 'eval', 'enrol', True, illumination, shot))
+        session.add(Protocol('noir', 'eval', 'enrol', False, illumination, shot))
       else:
-        session.add(Protocol('ir', 'dev', 'probe', True, 1, illumination, shot))
-        session.add(Protocol('ir', 'dev', 'probe', True, 2, illumination, shot))
-        session.add(Protocol('ir', 'eval', 'probe', True, 1, illumination, shot))
-        session.add(Protocol('ir', 'eval', 'probe', True, 2, illumination, shot))
+        session.add(Protocol('ir', 'dev', 'probe', True, illumination, shot))
+        session.add(Protocol('noir', 'dev', 'probe', False, illumination, shot))
+        session.add(Protocol('ir', 'eval', 'probe', True, illumination, shot))
+        session.add(Protocol('noir', 'eval', 'probe', False, illumination, shot))
   
-  # Protocol noir
-  for illumination in range(1,6):
-    for shot in range(0,4):
-      session.add(Protocol('noir', 'world', 'enrol', False, 1, illumination, shot))
-      session.add(Protocol('noir', 'world', 'enrol', False, 2, illumination, shot))
-      if illumination == 2:
-        session.add(Protocol('noir', 'dev', 'enrol', False, 1, illumination, shot))
-        session.add(Protocol('noir', 'dev', 'enrol', False, 2, illumination, shot))
-        session.add(Protocol('noir', 'eval', 'enrol', False, 1, illumination, shot))
-        session.add(Protocol('noir', 'eval', 'enrol', False, 2, illumination, shot))
-      else:
-        session.add(Protocol('noir', 'dev', 'probe', False, 1, illumination, shot))
-        session.add(Protocol('noir', 'dev', 'probe', False, 2, illumination, shot))
-        session.add(Protocol('noir', 'eval', 'probe', False, 1, illumination, shot))
-        session.add(Protocol('noir', 'eval', 'probe', False, 2, illumination, shot))
 
 def create_tables(args):
   """Creates all necessary tables (only to be used at the first time)"""
