@@ -32,7 +32,7 @@ class FIRDatabaseTest(unittest.TestCase):
     db = bob.db.fir.Database()
     
     f = db.files()
-    self.assertEqual(len(f.values()), 1463) # number of all files in the database
+    self.assertEqual(len(f.values()), 1462) # number of all files in the database
 
     f = db.files(groups='world')
     self.assertEqual(len(f.values()), 625) # number of all training files
@@ -41,24 +41,24 @@ class FIRDatabaseTest(unittest.TestCase):
     self.assertEqual(len(f.values()), 419) # number of all test files
     
     f = db.files(groups='dev', purposes = 'enrol')
-    self.assertEqual(len(f.values()), 120) # number of enrol files
+    self.assertEqual(len(f.values()), 60) # number of enrol files
 
     f = db.files(groups='dev', purposes = 'probe')
-    self.assertEqual(len(f.values()), 298) # number of probe files
+    self.assertEqual(len(f.values()), 359) # number of probe files
 
     f = db.files(groups='eval')
     self.assertEqual(len(f.values()), 418) # number of all test files
     
     f = db.files(groups='eval', purposes = 'enrol')
-    self.assertEqual(len(f.values()), 120) # number of enrol files
+    self.assertEqual(len(f.values()), 59) # number of enrol files
 
     f = db.files(groups='eval', purposes = 'probe')
-    self.assertEqual(len(f.values()), 298) # number of probe files
+    self.assertEqual(len(f.values()), 359) # number of probe files
     f = db.clients()
     self.assertEqual(len(f), 21) # number of clients
     
     f = db.clients(groups = 'world')
-    self.assertEqual(len(f), 12) # number of training clients
+    self.assertEqual(len(f), 9) # number of training clients
 
     f = db.clients(groups = 'dev')
     self.assertEqual(len(f), 6) # number of test clients
@@ -66,8 +66,11 @@ class FIRDatabaseTest(unittest.TestCase):
     f = db.clients(groups = 'eval')
     self.assertEqual(len(f), 6) # number of test clients
 
-    f = db.files(groups = 'dev', purposes = 'enrol', client_ids = [2])
-    self.assertEqual(len(f), 19)
-    
+    f = db.files(groups = 'dev', purposes = 'enrol', model_ids = [2])
+    self.assertEqual(len(f), 0)
+
+    f = db.files(groups = 'dev', purposes = 'enrol', model_ids = [3])
+    self.assertEqual(len(f), 10)
+
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(FIRDatabaseTest)

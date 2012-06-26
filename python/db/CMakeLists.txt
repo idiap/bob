@@ -173,11 +173,13 @@ bob_python_add_dependent_test(db-xm2vts-checkfiles python-db-xm2vts-create
   bob_dbmanage.py xm2vts checkfiles --self-test)
 
 # FIR database driver tests.
+bob_python_add_unittest(db lib/test/fir.py main)
+
 bob_python_add_dependent_test(db-fir-dumplist python-db-fir-create
   bob_dbmanage.py fir dumplist --self-test)
 
 bob_python_add_dependent_test(db-fir-dumplist2 python-db-fir-create
-  bob_dbmanage.py fir dumplist --protocol=lp1 --classes=client --groups=dev --purposes=enrol --self-test)
+  bob_dbmanage.py fir dumplist --protocol=noir --groups=dev --purposes=enrol --self-test)
 
 bob_python_add_dependent_test(db-fir-checkfiles python-db-fir-create
   bob_dbmanage.py fir checkfiles --self-test)

@@ -17,7 +17,7 @@ class Client(Base):
   __tablename__ = 'client'
 
   id = Column(Integer, primary_key=True)
-  sgroup = Column(Enum('world', 'dev', 'eval'))
+  sgroup = Column(Enum('world', 'dev', 'eval'), ForeignKey('protocol.sgroup'))
 
   def __init__(self, id, group):
     self.id = id
@@ -32,10 +32,10 @@ class File(Base):
   id = Column(Integer, primary_key=True)
   client_id = Column(Integer, ForeignKey('client.id')) # for SQL
   path = Column(String(100), unique=True)
-  ir = Column(Boolean)
+  ir = Column(Boolean, ForeignKey('protocol.ir'))
   location_id = Column(Integer)
-  illumination_id = Column(Integer)
-  shot_id = Column(Integer)
+  illumination_id = Column(Integer, ForeignKey('protocol.illumination_id'))
+  shot_id = Column(Integer, ForeignKey('protocol.shot_id'))
 
   # for Python
   client = relationship("Client", backref="client_file")
@@ -59,16 +59,14 @@ class Protocol(Base):
   sgroup = Column(Enum('world', 'dev', 'eval'), primary_key=True)
   purpose = Column(Enum('enrol', 'probe'))
   ir = Column(Boolean, primary_key=True)
-  location_id = Column(Integer, primary_key=True)
   illumination_id = Column(Integer, primary_key=True)
   shot_id = Column(Integer, primary_key=True)
 
-  def __init__(self, name, group, purpose, ir, location_id, illumination_id, shot_id):
+  def __init__(self, name, group, purpose, ir, illumination_id, shot_id):
     self.name = name
     self.sgroup = group
     self.purpose = purpose
     self.ir = ir
-    self.location_id = location_id
     self.illumination_id = illumination_id
     self.shot_id = shot_id
 

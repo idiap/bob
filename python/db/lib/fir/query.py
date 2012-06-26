@@ -47,12 +47,11 @@ class Database(object):
     properties.
     """
 
-    if not groups:
-      ngroups = ('world', 'dev', 'eval')
-    else:
-      ngroups = groups
+    VALID_GROUPS = ('dev', 'eval', 'world')
+    groups = self.__check_validity__(groups, "group", VALID_GROUPS)
+
     # List of the clients
-    q = self.session.query(Client).filter(Client.sgroup.in_(ngroups)).\
+    q = self.session.query(Client).filter(Client.sgroup.in_(groups)).\
           order_by(Client.id)
     retval = []
     for id in [k.id for k in q]: 
@@ -105,7 +104,7 @@ class Database(object):
       #throw exception?
       return None
     else:
-      return q.first().real_id
+      return q.first().client_id
 
   def get_internal_path_from_file_id(self, file_id):
     """Returns the unique "internal path" attached to the given file_id
@@ -184,45 +183,18 @@ class Database(object):
     purposes = self.__check_validity__(purposes, "purpose", VALID_PURPOSES)
     groups = self.__check_validity__(groups, "group", VALID_GROUPS)
     retval = {}
-#    ir = []
-#    for p in protocol:
-#      if p == 'noir':
-#        ir.append(False)
-#        print 'noir'
-#      elif p == 'ir':
-#        ir.append(True)
-#        print 'ir'
     
     if(isinstance(model_ids,str)):
       model_ids = (model_ids,)
 
 
-#    ltmp = []
-#    if( 'dev' in groups):
-#      ltmp.append('dev')
-#    if( 'eval' in groups):
-#      ltmp.append('eval')
-#    if( 'world' in groups):
-#      ltmp.append('world')
-#    dev_eval = tuple(ltmp)
-#    if('enrol' in purposes):
-#      q = self.session.query(File, Protocol).join(Client).\
-#            filter(and_(Protocol.name.in_(protocol), Protocol.purpose == 'enrol', Protocol.sgroup.in_(groups))).\
-#            filter(and_(File.location_id == Protocol.location_id, File.shot_id == Protocol.shot_id, File.ir == Protocol.ir))
-#      if model_ids:
-#        q = q.filter(Client.id.in_(model_ids))
-#      q = q.order_by(File.client_id, File.location_id, File.shot_id)
-#      for k in q:
-#        retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
-#    if('probe' in purposes):
-    q = self.session.query(File, Protocol, Client).\
-          filter(and_(Protocol.name.in_(protocol), Protocol.purpose.in_(purposes), Protocol.sgroup.in_(groups))).\
-          filter(and_(File.location_id == Protocol.location_id, File.illumination_id, File.shot_id == Protocol.shot_id, File.ir == Protocol.ir, Client.sgroup == Protocol.sgroup, Client.id == File.client_id))
+    q = self.session.query(File).join((Client, File.client_id == Client.id)).outerjoin((Protocol, and_(Client.sgroup == Protocol.sgroup, File.ir == Protocol.ir, File.illumination_id == Protocol.illumination_id, File.shot_id == Protocol.shot_id))).\
+          filter(and_(Protocol.name.in_(protocol), Protocol.purpose.in_(purposes), Protocol.sgroup.in_(groups)))
     if model_ids:
       q = q.filter(Client.id.in_(model_ids))
     q = q.order_by(File.client_id, File.ir, File.location_id, File.illumination_id, File.shot_id)
     for k in q:
-      retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
+      retval[k.id] = (make_path(k.path, directory, extension), k.client_id, k.client_id, k.client_id, k.path)
 
     return retval
 
@@ -264,7 +236,7 @@ class Database(object):
     """
 
     retval = {}
-    d = self.objects(directory, extension, protocol, purposes, model_ids, groups)
+    d = self.objects(directory = directory, extension = extension, protocol = protocol, purposes = purposes, model_ids = model_ids, groups = groups)
     for k in d: retval[k] = d[k][0]
 
     return retval
