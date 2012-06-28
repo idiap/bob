@@ -33,7 +33,7 @@ class HistogramMeasureTest(unittest.TestCase):
     """Computes the chi-square distance between two histograms (or histogram sequences)"""
     d = 0
     for i in range(h1.shape[0]):
-      if h1[i] != h2[i]: d -= (h1[i] - h2[i])**2 / (h1[i] + h2[i])
+      if h1[i] != h2[i]: d += (h1[i] - h2[i])**2 / (h1[i] + h2[i])
     return d
   
   
@@ -86,7 +86,7 @@ class HistogramMeasureTest(unittest.TestCase):
 
     # test specific (simple) case
     self.assertEqual(bob.math.chi_square(self.m_h5, self.m_h5), 0.)
-    self.assertEqual(bob.math.chi_square(self.m_h5, self.m_h6), -2.)
+    self.assertEqual(bob.math.chi_square(self.m_h5, self.m_h6), 2.)
     
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(HistogramMeasureTest)
