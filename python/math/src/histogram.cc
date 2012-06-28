@@ -73,6 +73,6 @@ void bind_math_histogram()
     "chi_square",
     &chi_square,
     (boost::python::arg("h1"), boost::python::arg("h2")),
-    "Computes the histogram intersection between the given histograms, which might be of singular dimension only."
+    "Computes the negative chi square distance between the given histograms, which might be of singular dimension only."
   );
 }
