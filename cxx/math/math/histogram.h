@@ -66,7 +66,7 @@ namespace bob{
       }
 
     template <class T>
-      //! Fast implementation of the chi square histogram distance measure
+      //! Fast implementation of the **negative** chi square histogram distance measure
       inline T chi_square(const blitz::Array<T,1>& h1, const blitz::Array<T,1>& h2){
         bob::core::array::assertCContiguous(h1);
         bob::core::array::assertCContiguous(h2);
@@ -79,7 +79,7 @@ namespace bob{
           h1.end(),
           h2.begin(),
           T(0),
-          std::plus<T>(),
+          std::minus<T>(),
           bob::math::chi_square_distance<T>
         );
       }

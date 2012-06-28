@@ -62,7 +62,7 @@ class Gaussian: public Machine<blitz::Array<double,1>, double>
     Gaussian(bob::io::HDF5File& config);
 
     /**
-     * Assigment
+     * Assignment
      */
     Gaussian& operator=(const Gaussian &other);
 
