@@ -66,13 +66,13 @@ void bind_math_histogram()
     "histogram_intersection",
     &histogram_intersection,
     (boost::python::arg("h1"), boost::python::arg("h2")),
-    "Computes the histogram intersection between the given histograms, which might be of singular dimension only."
+    "Computes the histogram intersection between the given histograms, which might be of singular dimension only. The histogram intersection defines a similarity measure, so higher values are better."
   );
 
   boost::python::def(
     "chi_square",
     &chi_square,
     (boost::python::arg("h1"), boost::python::arg("h2")),
-    "Computes the negative chi square distance between the given histograms, which might be of singular dimension only."
+    "Computes the chi square distance between the given histograms, which might be of singular dimension only. The chi square function is a distance measure, so lower values are better."
   );
 }
