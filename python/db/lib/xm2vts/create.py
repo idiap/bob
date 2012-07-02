@@ -331,7 +331,7 @@ def add_files(session, imagedir):
       client_dir = os.path.join(imagedir, cl_dir)
       for filename in filter(nodot, os.listdir(client_dir)):
         basename, extension = os.path.splitext(filename)
-        add_file(session, basename, client_dir)
+        add_file(session, basename, cl_dir)
 
 def add_protocols(session):
   """Adds protocols"""
