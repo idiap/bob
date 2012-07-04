@@ -24,6 +24,14 @@
 
 .. automodule:: bob.db
 
+AR face database
+================
+
+.. automodule:: bob.db.arface
+
+.. autoclass:: bob.db.arface.Database
+
+
 AT&T database
 =============
 
