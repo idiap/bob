@@ -22,6 +22,7 @@ import nuaa
 import casia_fasd
 import atnt
 import gbu
+import arface
 
 
 __all__ = dir()

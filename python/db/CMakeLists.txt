@@ -49,6 +49,7 @@ bob_setup_db(scface)
 bob_setup_db(xm2vts)
 bob_setup_db(fir)
 bob_setup_db(gbu)
+bob_setup_db(arface)
 
 # Installs our script driver
 bob_python_script(db "bob_dbmanage.py" "lib/script/dbmanage.py" "main")
@@ -192,6 +193,11 @@ bob_python_add_unittest(db lib/test/gbu.py main)
 bob_python_add_test(db-gbu-dumplist bob_dbmanage.py gbu dumplist --self-test)
 bob_python_add_test(db-gbu-checkfiles bob_dbmanage.py gbu checkfiles -d "." --self-test)
 bob_python_add_test(db-gbu-create-eye-files bob_dbmanage.py gbu create-eye-files -d "." --self-test)
+
+# ARface database driver tests.
+bob_python_add_unittest(db lib/test/arface.py main)
+bob_python_add_test(db-atnt-dumplist bob_dbmanage.py arface dumplist --self-test)
+bob_python_add_test(db-atnt-checkfiles bob_dbmanage.py arface checkfiles -d "." --self-test)
 
 # Our examples (run and install)
 bob_python_example(db iris_lda.py lib/example/iris_lda.py)
