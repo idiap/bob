@@ -255,7 +255,7 @@ You can either get the LBP feature for a single point by specifying the position
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
   
-  >>> lbp_local = lbp_extractor ( cropped_image, 32, 32 )
+  >>> lbp_local = lbp_extractor ( cropped_image, 31, 31 )
   >>> # print the binary representation of the LBP
   >>> print bin ( lbp_local )
   0b10001111
@@ -272,7 +272,7 @@ or you can extract the LBP features for all pixels in the image. In this case yo
   >>> lbp_extractor ( cropped_image,  lbp_output_image )
   >>> # print the binary representation of the pixel at the same location as above;
   >>> # note that the index is shifted by 1 since the lbp image is smaller than the original
-  >>> print bin ( lbp_output_image [ 31, 31 ] )
+  >>> print bin ( lbp_output_image [ 30, 30 ] )
   0b10001111
 
 
