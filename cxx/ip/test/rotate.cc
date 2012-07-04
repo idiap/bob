@@ -312,4 +312,23 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_mask )
   checkBlitzEqual(a8m_45, b8_mask); 
 }
 
+BOOST_AUTO_TEST_CASE( test_get_angle_to_horizontal )
+{
+  // check that the getAngleToHorizontal function returns reasonable results
+  const double epsilon = 1e-8;
+  
+  // along the axis
+  BOOST_CHECK_CLOSE(bob::ip::getAngleToHorizontal(0,0,0,1), 0., epsilon);
+  BOOST_CHECK_CLOSE(bob::ip::getAngleToHorizontal(0,1,0,0), 180., epsilon);
+  BOOST_CHECK_CLOSE(bob::ip::getAngleToHorizontal(0,0,1,0), 90., epsilon);
+  BOOST_CHECK_CLOSE(bob::ip::getAngleToHorizontal(1,0,0,0), -90., epsilon);
+  
+  // 45 degrees
+  BOOST_CHECK_CLOSE(bob::ip::getAngleToHorizontal(0,0,1,1), 45., epsilon);
+  BOOST_CHECK_CLOSE(bob::ip::getAngleToHorizontal(0,1,1,0), 135., epsilon);
+  BOOST_CHECK_CLOSE(bob::ip::getAngleToHorizontal(1,1,0,0), -135., epsilon);
+  BOOST_CHECK_CLOSE(bob::ip::getAngleToHorizontal(1,0,0,1), -45., epsilon);
+}
+
+
 BOOST_AUTO_TEST_SUITE_END()
