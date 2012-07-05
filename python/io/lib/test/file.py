@@ -256,11 +256,11 @@ class FileTest(unittest.TestCase):
         image = bob.io.open(filename, 'r').read()
 
         # save with the same extension
-        outfile = bob.io.open(filename, 'w')
+        outfile = bob.io.open(tmpname, 'w')
         outfile.write(image)
 
         # reload the image from the file
-        image2 = bob.io.open(filename, 'r').read()
+        image2 = bob.io.open(tmpname, 'r').read()
 
         self.assertTrue ( numpy.array_equal(image, image2) )
 
