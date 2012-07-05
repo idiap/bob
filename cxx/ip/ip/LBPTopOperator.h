@@ -61,6 +61,8 @@ namespace bob {
     {
       public:
         /**
+	 * THIS IS NOT VALID ANYMORE
+	 * 
          * Constructs a new LBPTopOperator object starting from the algorithm
          * configuration. Please note this object will always produce rotation
          * invariant 2D codes, also taking into consideration pattern
@@ -85,10 +87,21 @@ namespace bob {
          * @param radius_yt The radius to be used at the YT plane
          * @param points_yt The number of points to use for the calculation of
          * the 2D LBP on the YT plane
-         */
+
         LBPTopOperator(int radius_xy, int points_xy, int radius_xt, 
           int points_xt, int radius_yt, int points_yt);
+	******************/
 
+	/*
+	Constructs a new LBPTopOperator object starting from the algorithm configuration
+	@param m_lbp_xy The 2D LBP-XY plane configuration
+	@param m_lbp_xt The 2D LBP-XT plane configuration
+	@param m_lbp_yt The 2D LBP-YT plane configuration
+	*/
+
+	LBPTopOperator(boost::shared_ptr<bob::ip::LBP> lbp_xy, 
+		       boost::shared_ptr<bob::ip::LBP> lbp_xt, 
+		       boost::shared_ptr<bob::ip::LBP> lbp_yt);
         /**
          * Destructor
          */
@@ -149,12 +162,15 @@ namespace bob {
           blitz::Array<uint16_t,2>& xt,
           blitz::Array<uint16_t,2>& yt) const;
 
+	/*
         int m_radius_xy; ///< The LBPu2,i radius in XY
         int m_points_xy; ///< The number of points in the XY LBPu2,i
         int m_radius_xt; ///< The LBPu2,i radius in XT
         int m_points_xt; ///< The number of points in the XT LBPu2,i
         int m_radius_yt; ///< The LBPu2,i radius in YT
         int m_points_yt; ///< The number of points in the YT LBPu2,i
+	*/
+
         boost::shared_ptr<bob::ip::LBP> m_lbp_xy; ///< The operator for the XY calculation
         boost::shared_ptr<bob::ip::LBP> m_lbp_xt; ///< The operator for the XT calculation
         boost::shared_ptr<bob::ip::LBP> m_lbp_yt; ///< The operator for the YT calculation
@@ -166,6 +182,12 @@ namespace bob {
       blitz::Array<uint16_t,2>& xt,
       blitz::Array<uint16_t,2>& yt) const
     {
+
+        int m_radius_xy = m_lbp_xy->getRadius(); ///< The LBPu2,i radius in XY
+        int m_radius_xt = m_lbp_xt->getRadius(); ///< The LBPu2,i radius in XT
+        int m_radius_yt = m_lbp_yt->getRadius(); ///< The LBPu2,i radius in YT
+
+
       // TODO
       // Assert on input and output dimensions
       /*
