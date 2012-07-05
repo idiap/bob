@@ -83,7 +83,7 @@ void bind_ip_faceeyesnorm() {
     .add_property("crop_width", &ip::FaceEyesNorm::getCropWidth, &ip::FaceEyesNorm::setCropWidth)
     .add_property("crop_offset_h", &ip::FaceEyesNorm::getCropOffsetH, &ip::FaceEyesNorm::setCropOffsetH)
     .add_property("crop_offset_w", &ip::FaceEyesNorm::getCropOffsetW, &ip::FaceEyesNorm::setCropOffsetW)
-    .def("__call__", &call1, (arg("input"), arg("output"), arg("re_y"), arg("re_x"), arg("le_y"), arg("le_x")), "Call an object of this type to extract a face given the coordinates of the left (le_y, le_x) and right (re_y, re_x) eye centers. Please note that the horizontal position le_x of the left eye is usually larger than the positon re_x of the right eye.")
+    .def("__call__", &call1, (arg("input"), arg("output"), arg("re_y"), arg("re_x"), arg("le_y"), arg("le_x")), "Call an object of this type to extract a face given the coordinates of the left (le_y, le_x) and right (re_y, re_x) eye centers. Please note that the horizontal position le_x of the left eye is usually larger than the position re_x of the right eye.")
     .def("__call__", &call2, (arg("input"), arg("input_mask"), arg("output"), arg("output_mask"), arg("re_y"), arg("re_x"), arg("le_y"), arg("le_x")), "Call an object of this type to extract a face given the coordinates of the left (le_y, le_x) and right (re_y, re_x) eye centers, taking mask into account.")
     ;
 }

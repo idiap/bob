@@ -114,10 +114,10 @@ namespace bob {
 
     //! Computes the angle between the line of the two given points and the horizontal line
     double getAngleToHorizontal(
-      const int left_h, 
-      const int left_w,
-	    const int right_h, 
-	    const int right_w
+      const double left_y, 
+      const double left_x,
+      const double right_y, 
+      const double right_x
     );
     
 
@@ -447,7 +447,7 @@ template <typename T>
 
 /**
   * Rotate the given 2D input image to the given output image using the specified input mask.
-  * The size of the output image and the outpuzt mask must be identical to the size returned by bob::ip::getRotatedShape(src,angle).
+  * The size of the output image and the output mask must be identical to the size returned by bob::ip::getRotatedShape(src,angle).
   * @param src  The source image to rotate.
   * @param src_mask  The mask that should be applied
   * @param dst  The destination image that will hold the rotated image
@@ -516,7 +516,7 @@ template <typename T>
 
 /**
   * Rotate the given 3D (e.g. colored) input image to the given output image using the specified input mask.
-  * The size of the output image and the outpuzt mask must be identical to the size returned by bob::ip::getRotatedShape(src,angle).
+  * The size of the output image and the output mask must be identical to the size returned by bob::ip::getRotatedShape(src,angle).
   * @note The input and output masks are only 2D!
   * @param src  The source image to rotate.
   * @param src_mask  The mask that should be applied
@@ -628,21 +628,21 @@ template<typename T>
 
 /**
  * Function to calculate the angle we need to rotate to level out two points horizontally.
- * @param left_h The height of the left point
- * @param left_w The width of the left point
- * @param right_h The height of the right point
- * @param right_w The width of the right point
+ * @param left_y The vertical position of the left point
+ * @param left_x The horizontal of the left point
+ * @param right_y The vertical position of the right point
+ * @param right_x The horizontal position of the right point
  * @return The angle (in degrees).
  */
 inline double bob::ip::getAngleToHorizontal(
-  const int left_h, 
-  const int left_w,
-	const int right_h, 
-	const int right_w
+  const double left_y, 
+  const double left_x,
+  const double right_y, 
+  const double right_x
 )
 {
   static const double RAD_TO_DEGREES   = 180. / M_PI;
-  return std::tan(1.0 * (right_h - left_h) / (right_w - left_w)) 
+  return std::atan2(right_y - left_y, right_x - left_x)
     * 
     RAD_TO_DEGREES;
 }
