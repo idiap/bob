@@ -51,8 +51,17 @@ def generate_3x3_image(image, values):
   image[1, 0] = int(values[8])
 
 
-def generate_nx3x3_image(image, values):
-  """ Generates a 3x3x3 image from an 1x3 array with 9-position value using the following technique:
+
+def generate_5x5_image(image, values):
+  """Generates a 5x5 image from a 25-position value vector row-wise
+  """
+  for i in range(0,5):
+    for j in range(0,5):
+      image[i,j] = int(values[i*5+j])
+
+
+def generate_NxMxM_image(image, values):
+  """ Generates a NxMxM image from an 1x3 array with 9-position value using the following technique for M=3:
 
       frame (0,:,:) = 
            +-+-+-+
@@ -71,8 +80,13 @@ def generate_nx3x3_image(image, values):
            +-+-+-+
            |7|6|5|
            +-+-+-+
+     .
+     .
+     .
+     .
+     .
 
-     frame (2,:,:) = 
+     frame (N,:,:) = 
            +-+-+-+
            |1|2|3|
            +-+-+-+
@@ -83,19 +97,18 @@ def generate_nx3x3_image(image, values):
 
   """
 
-  generate_3x3_image(image[0,:,:], values[0])
-  generate_3x3_image(image[1,:,:], values[1])
-  generate_3x3_image(image[2,:,:], values[2])
+  N = image.shape[0]
+  M = image.shape[1]
 
-  
+  for i in range(N):
+    #3x3
+    if(M==3):
+      generate_3x3_image(image[i,:,:], values[i])
+    #5x5
+    else: #only two options
+      generate_5x5_image(image[i,:,:],values[i])
 
 
-def generate_5x5_image(image, values):
-  """Generates a 5x5 image from a 25-position value vector row-wise
-  """
-  for i in range(0,5):
-    for j in range(0,5):
-      image[i,j] = int(values[i*5+j])
 
 def rotate(v, size=8):
   """Rotates the LSB bit in v, making it a HSB"""
@@ -220,7 +233,7 @@ class ProcessorLBPTop:
   "  @param plane_index Index of the plane (0- XY Plane, 1- XT Plane, 2- YT Plane)
   "  @param center Coordinates of a specific operator in order to check
   """
-  def __call__(self, value,plane_index=0,operator_coordinates=(0,0)):
+  def __call__(self, value='',plane_index=0,operator_coordinates=(0,0)):
 
     image = self.generator(self.image, value)
     self.operator(self.image, self.XY,self.XT,self.YT)
@@ -462,21 +475,37 @@ class LBPTest(unittest.TestCase):
     self.assertEqual(proc4('014725836'), 0xae) #0x0
     
 
+  """
+  " All planes are p=4, r=1, non uniform pattern and non RI
+  """
   def test15_vanilla_4p1r_4p1r_4p1r(self):
-    """
-    Considering XY,XT,YT
-    """
-
-    lbp4R_XY = bob.ip.LBP4R(radius=1.0, circular=False, uniform=True, rotation_invariant=False)
-    lbp4R_XT = bob.ip.LBP4R(radius=1.0, circular=False, uniform=True, rotation_invariant=False)
-    lbp4R_YT = bob.ip.LBP4R(radius=1.0, circular=False, uniform=True, rotation_invariant=False)
+    lbp4R_XY = bob.ip.LBP4R(radius=1.0, circular=False, uniform=False, rotation_invariant=False)
+    lbp4R_XT = bob.ip.LBP4R(radius=1.0, circular=False, uniform=False, rotation_invariant=False)
+    lbp4R_YT = bob.ip.LBP4R(radius=1.0, circular=False, uniform=False, rotation_invariant=False)
 
     op = bob.ip.LBPTopOperator(lbp4R_XY,lbp4R_XT,lbp4R_YT)
 
-    proc1 = ProcessorLBPTop(op, generate_nx3x3_image,img_size=3,n_frames=3)
-    self.assertEqual(proc1(['000000000','111111111','222222222'],plane_index=0,operator_coordinates=(0,0)),0xe)
-    self.assertEqual(proc1(['000000000','111111111','222222222'],plane_index=1,operator_coordinates=(0,0)),0xb)
-    self.assertEqual(proc1(['000000000','111111111','222222222'],plane_index=2,operator_coordinates=(0,0)),0xb)
+    proc1 = ProcessorLBPTop(op, generate_NxMxM_image,img_size=3,n_frames=3)
+    self.assertEqual(proc1(['000000000','111111111','222222222'],plane_index=0,operator_coordinates=(0,0)),0xf)
+    self.assertEqual(proc1(['000000000','111111111','222222222'],plane_index=1,operator_coordinates=(0,0)),0x7)
+    self.assertEqual(proc1(['000000000','111111111','222222222'],plane_index=2,operator_coordinates=(0,0)),0x7)
+
+
+    proc2 = ProcessorLBPTop(op, generate_NxMxM_image,img_size=5,n_frames=5)
+    values_5x5 = []
+    values_5x5.append([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
+    values_5x5.append([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1])
+    values_5x5.append([2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2])
+    values_5x5.append([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1])
+    values_5x5.append([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
+
+    self.assertEqual(proc2(values_5x5,plane_index=0,operator_coordinates=(0,0)),0xf)
+    self.assertEqual(proc2(values_5x5,plane_index=1,operator_coordinates=(0,0)),0x7)
+    self.assertEqual(proc2(values_5x5,plane_index=2,operator_coordinates=(0,0)),0x7)
+
+
+
+
 
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(LBPTest)
