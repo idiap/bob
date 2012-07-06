@@ -37,6 +37,10 @@ designed to be both efficient and reduce development time.
 
 * To just get started using |project|, skip ahead to :doc:`Installation`.
 
+* If you make use of |project| or any `Satellite Packages`_, we would
+  appreciate if you referred to one of our publications as described in
+  :doc:`Overview`.
+
 * For more detailed information, scroll down to the User's Guide, Developer's Guide or Reference manual.
 
 We believe in free software and development standards. |project| is a freely

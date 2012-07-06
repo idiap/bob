@@ -50,6 +50,7 @@
 .. _opencv: http://opencv.willowgarage.com/
 .. _python: http://www.python.org
 .. _qt4: http://qt.nokia.com/ 
+.. _satellite packages: https://github.com/idiap/bob/Satellite-Packages
 .. _scipy: http://www.scipy.org
 .. _sphinx: http://sphinx.pocoo.org
 .. _sqlalchemy: http://www.sqlalchemy.org/
