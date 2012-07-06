@@ -77,7 +77,7 @@ def testcase_transcode(self, filename):
 # assertions
 unittest.TestCase.transcode = testcase_transcode
 
-def testcase_array_readwrite(self, extension, arr):
+def testcase_array_readwrite(self, extension, arr, close=False):
   """Runs a read/write verify step using the given numpy data"""
   tmpname = tempname(extension)
   try:
@@ -86,14 +86,15 @@ def testcase_array_readwrite(self, extension, arr):
     del f
     f = bob.io.open(tmpname, 'r')
     reloaded = f.read() #read the contents
-    self.assertTrue(numpy.array_equal(arr, reloaded))
+    if close: self.assertTrue(numpy.allclose(arr, reloaded))
+    else: self.assertTrue(numpy.array_equal(arr, reloaded))
   finally:
     if os.path.exists(tmpname): os.unlink(tmpname)
 
 # And we attach...
 unittest.TestCase.array_readwrite = testcase_array_readwrite
 
-def testcase_arrayset_readwrite(self, extension, arrays):
+def testcase_arrayset_readwrite(self, extension, arrays, close=False):
   """Runs a read/write verify step using the given numpy data"""
   tmpname = tempname(extension)
   try:
@@ -104,7 +105,9 @@ def testcase_arrayset_readwrite(self, extension, arrays):
     f = bob.io.open(tmpname, 'r')
     for k, array in enumerate(arrays):
       reloaded = f.read(k) #read the contents
-      self.assertTrue(numpy.array_equal(array, reloaded))
+      if close: 
+        self.assertTrue(numpy.allclose(array, reloaded))
+      else: self.assertTrue(numpy.array_equal(array, reloaded))
   finally:
     if os.path.exists(tmpname): os.unlink(tmpname)
 
@@ -272,7 +275,31 @@ class FileTest(unittest.TestCase):
     image_transcode('test.ppm') #indexed, works fine
     #image_transcode('test.jpg') #does not work because of re-compression
 
-  def xtest05_bin(self):
+  def test05_csv(self):
+
+    # array writing tests
+    a1 = numpy.random.normal(size=(5,5)).astype('float64')
+    a2 = numpy.random.normal(size=(5,10)).astype('float64')
+    a3 = numpy.random.normal(size=(5,100)).astype('float64')
+
+    self.array_readwrite('.csv', a1, close=True)
+    self.array_readwrite(".csv", a2, close=True)
+    self.array_readwrite('.csv', a3, close=True)
+
+    # arrayset writing tests
+    a1 = []
+    a2 = []
+    a3 = []
+    for k in range(10):
+      a1.append(numpy.random.normal(size=(5,)).astype('float64'))
+      a2.append(numpy.random.normal(size=(50,)).astype('float64'))
+      a3.append(numpy.random.normal(size=(500,)).astype('float64'))
+
+    self.arrayset_readwrite('.csv', a1, close=True)
+    self.arrayset_readwrite(".csv", a2, close=True)
+    self.arrayset_readwrite('.csv', a3, close=True)
+
+  def xtest06_bin(self):
 
     # DEPRECATED
 

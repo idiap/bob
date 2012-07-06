@@ -33,6 +33,8 @@ set(src
 
     "src/ImageFile.cc"
 
+    "src/CSVFile.cc"
+
     "src/BinFileHeader.cc"
     "src/BinFile.cc"
     "src/BinaryArrayFile.cc"
