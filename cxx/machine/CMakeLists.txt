@@ -26,6 +26,7 @@ set(src
     "src/PLDAMachine.cc"
     "src/GaborGraphMachine.cc"
     "src/GaborJetSimilarities.cc"
+    "src/BICMachine.cc"
 )
 
 # If we have libsvm installed, enable the compilation of relevant modules

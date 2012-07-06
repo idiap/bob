@@ -47,7 +47,7 @@ namespace po = boost::program_options;
  * 
  * Here are other options for return values:
  * std::pair<>
- * boost::tuple<> #this is a generalized std::pair w/ any number of components
+ * boost::tuple<> (this is a generalized std::pair w/ any number of components)
  */
 template<typename T> class ReduceMeanStdDev {
   

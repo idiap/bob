@@ -184,7 +184,7 @@ class Database(object):
       - 4: the "stem" path (basename of the file)
 
     considering all the filtering criteria. The keys of the dictionary are 
-    unique identities for each file in the Biosecure database. Conserve these 
+    unique identities for each file in the XM2VTS database. Conserve these 
     numbers if you wish to save processing results later on.
     """
 
@@ -260,16 +260,14 @@ class Database(object):
           if( 'eval' in groups):
             ltmp.append('impostorEval')
           impostorGroups = tuple(ltmp)
-          q = self.session.query(File, Protocol).join(Client).\
-                filter(Client.sgroup.in_(impostorGroups)).\
-                filter(and_(Protocol.name.in_(protocol), Protocol.purpose == 'probe', Protocol.sgroup.in_(dev_eval))).\
-                filter(and_(File.session_id == Protocol.session_id, File.shot_id == Protocol.shot_id))
+          q = self.session.query(File).join(Client).\
+                filter(Client.sgroup.in_(impostorGroups))
           q = q.order_by(File.client_id, File.session_id, File.shot_id)
           for k in q:
             if(model_ids and len(model_ids) > 0):
-              retval[k[0].id] = (make_path(k[0].path, directory, extension), model_ids[0], model_ids[0], k[0].client_id, k[0].path)
+              retval[k.id] = (make_path(k.path, directory, extension), model_ids[0], model_ids[0], k.client_id, k.path)
             else:
-              retval[k[0].id] = (make_path(k[0].path, directory, extension), 0, 0, k[0].client_id, k[0].path)
+              retval[k.id] = (make_path(k.path, directory, extension), 0, 0, k.client_id, k.path)
 
     return retval
 
@@ -311,7 +309,7 @@ class Database(object):
 
     Returns: A dictionary containing the resolved filenames considering all
     the filtering criteria. The keys of the dictionary are unique identities 
-    for each file in the Biosecure database. Conserve these numbers if you 
+    for each file in the XM2VTS database. Conserve these numbers if you 
     wish to save processing results later on.
     """
 

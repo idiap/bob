@@ -159,7 +159,7 @@ namespace bob { namespace io {
        * blitz::Array<> with 4 dimensions organized in this way:
        * (frame-number, RGB color-bands, height, width).
        *
-       * @warn At present time we only support arrays that have C-style
+       * \warning At present time we only support arrays that have C-style
        * storages (if you pass reversed arrays or arrays with Fortran-style
        * storage, the result is undefined).
        */
@@ -170,7 +170,7 @@ namespace bob { namespace io {
        * blitz::Array<> with 3 dimensions organized in this way (RGB
        * color-bands, height, width).
        *
-       * @warn At present time we only support arrays that have C-style
+       * \warning At present time we only support arrays that have C-style
        * storages (if you pass reversed arrays or arrays with Fortran-style
        * storage, the result is undefined). 
        */

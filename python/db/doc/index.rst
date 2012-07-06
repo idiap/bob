@@ -24,6 +24,14 @@
 
 .. automodule:: bob.db
 
+AR face database
+================
+
+.. automodule:: bob.db.arface
+
+.. autoclass:: bob.db.arface.Database
+
+
 AT&T database
 =============
 
@@ -62,6 +70,15 @@ FaceVerif_FL Database
 .. automodule:: bob.db.faceverif_fl
 
 .. autoclass:: bob.db.faceverif_fl.Database
+
+
+GBU Database
+============
+
+.. automodule:: bob.db.gbu
+
+.. autoclass:: bob.db.gbu.Database
+
 
 Iris Database
 =============
@@ -114,3 +131,10 @@ XM2VTS Database
 .. automodule:: bob.db.xm2vts
 
 .. autoclass:: bob.db.xm2vts.Database
+
+FIR Database
+===============
+
+.. automodule:: bob.db.fir
+
+.. autoclass:: bob.db.fir.Database

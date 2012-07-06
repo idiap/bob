@@ -29,8 +29,8 @@ namespace io = bob::io;
 namespace iod = io::detail;
 namespace core = bob::core;
 
-const uint32_t iod::MAGIC_ENDIAN_DW = 0x01020304;
-const uint8_t iod::FORMAT_VERSION = 0;
+const uint32_t bob::io::detail::MAGIC_ENDIAN_DW = 0x01020304;
+const uint8_t bob::io::detail::FORMAT_VERSION = 0;
 
 iod::BinFileHeader::BinFileHeader()
   : m_version(iod::FORMAT_VERSION),

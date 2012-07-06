@@ -31,9 +31,9 @@ namespace ip = bob::ip;
 /**
  * A little helper to create the LBP operators in an homogene way.
  */
-static ip::LBP* make_lbp(int radius, int points)
+static boost::shared_ptr<ip::LBP> make_lbp(int radius, int points)
 {
-  ip::LBP* retval = 0;
+  boost::shared_ptr<ip::LBP> retval;
   if (points != 4 && points != 8) {
     // TODO
     throw bob::ip::Exception();
@@ -42,9 +42,9 @@ static ip::LBP* make_lbp(int radius, int points)
   }
   else {
     if (points == 4) 
-      retval = new ip::LBP4R(radius, false, false, false, true, true);
+      retval = boost::shared_ptr<ip::LBP>(new ip::LBP4R(radius, false, false, false, true, true));
     else  
-      retval = new ip::LBP8R(radius, false, false, false, true, true);
+      retval = boost::shared_ptr<ip::LBP>(new ip::LBP8R(radius, false, false, false, true, true));
   }
   return retval;
 }
@@ -64,14 +64,5 @@ ip::LBPTopOperator::LBPTopOperator(int radius_xy,
 {
   m_lbp_xy = make_lbp(m_radius_xy, m_points_xy);
   m_lbp_xt = make_lbp(m_radius_xt, m_points_xt);
-  m_lbp_xy = make_lbp(m_radius_yt, m_points_yt);
-}
-
-ip::LBPTopOperator::~LBPTopOperator() {
-  delete m_lbp_xy;
-  m_lbp_xy = 0;
-  delete m_lbp_xt;
-  m_lbp_xt = 0;
-  delete m_lbp_yt;
-  m_lbp_yt = 0;
+  m_lbp_yt = make_lbp(m_radius_yt, m_points_yt);
 }

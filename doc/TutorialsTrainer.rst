@@ -93,8 +93,8 @@ Next, input data can be projected using this learned projection matrix
    [ 9.99868456 0.47009678 0.09187563]
 
 
-Linear discrimant analysis
-==========================
+Linear discriminant analysis
+============================
 
 **LDA** [2]_ is another way to train a :py:class:`bob.machine.LinearMachine`. 
 The associated |project| class is :py:class:`bob.trainer.FisherLDATrainer`.
@@ -117,7 +117,7 @@ required to be a list of :py:class:`bob.io.Arrayset`, one for each class.
    >>> a2 = numpy.array([3,6,-50], 'float64')
    >>> b2 = numpy.array([4,8,-100], 'float64')
    >>> c2 = numpy.array([40,79,-800], 'float64')
-   >>> data2.append(a1)
+   >>> data2.append(a2)
    >>> data2.append(b2)
    >>> data2.append(c2)
    >>> data = [data1,data2]
@@ -134,12 +134,12 @@ for **PCA**. This is shown below.
    >>> trainer = bob.trainer.FisherLDATrainer()
    >>> [machine,eig_vals] = trainer.train(data)  # Trains the machine with the given data
    >>> print eig_vals  # doctest: +SKIP
-   [ 1.93632491 0. ]
+   [ 13.10097786 0. ]
    >>> machine.resize(3,1)  # Make the output space of dimension 1
    >>> print machine.weights  # The new weights after the training procedure
-   [[ 0.83885757]
-    [ 0.53244291]
-    [ 0.11323656]]
+   [[ 0.60903619]
+    [ 0.78533635]
+    [ 0.11100332]]
 
 
 Neural networks: multi-layer perceptrons (MLP)

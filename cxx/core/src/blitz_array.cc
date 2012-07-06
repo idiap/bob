@@ -25,19 +25,19 @@
 
 namespace ca = bob::core::array;
 
-ca::blitz_array::blitz_array(boost::shared_ptr<ca::blitz_array> other) {
+ca::blitz_array::blitz_array(boost::shared_ptr<blitz_array> other) {
   set(other);
 }
 
-ca::blitz_array::blitz_array(const ca::blitz_array& other) {
+ca::blitz_array::blitz_array(const blitz_array& other) {
   set(other);
 }
 
-ca::blitz_array::blitz_array(boost::shared_ptr<ca::interface> other) {
+ca::blitz_array::blitz_array(boost::shared_ptr<interface> other) {
   set(other);
 }
 
-ca::blitz_array::blitz_array(const ca::interface& other) {
+ca::blitz_array::blitz_array(const interface& other) {
   set(other);
 }
 
@@ -54,20 +54,20 @@ ca::blitz_array::blitz_array(void* data, const typeinfo& info):
 ca::blitz_array::~blitz_array() {
 }
 
-void ca::blitz_array::set(boost::shared_ptr<ca::blitz_array> other) {
+void ca::blitz_array::set(boost::shared_ptr<blitz_array> other) {
   m_type = other->m_type;
   m_ptr = other->m_ptr;
   m_is_blitz = other->m_is_blitz;
   m_data = other->m_data;
 }
 
-void ca::blitz_array::set(const ca::interface& other) {
+void ca::blitz_array::set(const interface& other) {
   TDEBUG1("[non-optimal] buffer data copy requested: " << other.type().str());
   set(other.type());
   memcpy(m_ptr, other.ptr(), m_type.buffer_size());
 }
 
-void ca::blitz_array::set(boost::shared_ptr<ca::interface> other) {
+void ca::blitz_array::set(boost::shared_ptr<interface> other) {
   m_type = other->type();
   m_ptr = other->ptr();
   m_is_blitz = false;

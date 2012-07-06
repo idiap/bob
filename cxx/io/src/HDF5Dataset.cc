@@ -210,7 +210,7 @@ static void reset_compatibility_list(boost::shared_ptr<hid_t>& space,
   descr.push_back(io::HDF5Descriptor(file_base, 1, false));
 }
 
-h5::Dataset::Dataset(boost::shared_ptr<h5::Group> parent,
+h5::Dataset::Dataset(boost::shared_ptr<Group> parent,
     const std::string& name) :
   m_parent(parent),
   m_name(name),
@@ -295,7 +295,7 @@ static void create_dataset (boost::shared_ptr<h5::Group> par,
   if (*dataset < 0) throw io::HDF5StatusError("H5Dcreate2", *dataset);
 }
 
-h5::Dataset::Dataset(boost::shared_ptr<h5::Group> parent,
+h5::Dataset::Dataset(boost::shared_ptr<Group> parent,
     const std::string& name, const io::HDF5Type& type,
     bool list, size_t compression):
   m_parent(parent),

@@ -80,7 +80,7 @@ namespace bob{
           h2.begin(),
           T(0),
           std::plus<T>(),
-          &bob::math::chi_square_distance<T>
+          bob::math::chi_square_distance<T>
         );
       }
   } // namespace math

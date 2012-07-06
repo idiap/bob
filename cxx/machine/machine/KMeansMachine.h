@@ -118,7 +118,7 @@ class KMeansMachine: public Machine<blitz::Array<double,1>, double> {
     
     /**
      * Get a mean
-     * @param[i]   i    The index of the mean
+     * @param[in]   i    The index of the mean
      * @param[out] mean The mean, a 1D array, with a length equal to the number of feature dimensions.
      */
     void getMean(const size_t i, blitz::Array<double,1>& mean) const;
@@ -152,7 +152,7 @@ class KMeansMachine: public Machine<blitz::Array<double,1>, double> {
      * (in terms of Euclidean distance) to the data sample, x
      * @param x The data sample (feature vector)
      * @param closest_mean (output) The index of the mean closest to the sample
-     * @param distance (output) The distance of the sample from the closest mean
+     * @param min_distance (output) The distance of the sample from the closest mean
      */
     void getClosestMean(const blitz::Array<double,1>& x, 
       size_t &closest_mean, double &min_distance) const;
@@ -167,7 +167,7 @@ class KMeansMachine: public Machine<blitz::Array<double,1>, double> {
      * that is closest to that mean, and calculate
      * 1) the variance of that subset (the cluster variance)
      * 2) the proportion of the samples represented by that subset (the cluster weight)
-     * @param[in]  sampler   The sampler
+     * @param[in]  ar        The sampler
      * @param[out] variances The cluster variances (one row per cluster), 
      *                       with as many columns as feature dimensions.
      * @param[out] weights   A vector of weights, one per cluster

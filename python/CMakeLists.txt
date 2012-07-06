@@ -9,9 +9,15 @@ if (PYTHON_EXECUTABLE AND PYTHONLIBS_FOUND AND Boost_FOUND)
   set(BOB_PYTHONPATH "${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES}")
   if(BOB_INSTALL_PYTHON_INTERPRETER)
     bob_configure_bobpython(bin/python.in bin/python "ON")
+    if(IPYTHON_EXECUTABLE)
+      bob_configure_bobpython(bin/ipython.in bin/ipython "ON")
+    endif()
   else()
     # just configure it locally for build-time usage
     configure_file(bin/python.in ${CMAKE_BINARY_DIR}/bin/python @ONLY)
+    if(IPYTHON_EXECUTABLE)
+      configure_file(bin/ipython.in ${CMAKE_BINARY_DIR}/bin/ipython @ONLY)
+    endif()
   endif()
 
   # An easy handler to debug python stuff

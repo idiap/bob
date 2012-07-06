@@ -29,7 +29,6 @@
 #include "core/python/exception.h"
 
 using namespace bob::python;
-using namespace boost::python;
 
 /**
  * This method is only useful to test exception throwing in Python code.

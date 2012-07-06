@@ -35,7 +35,7 @@ namespace mach = bob::machine;
 namespace math = bob::math;
 namespace core = bob::core;
 
-void train::jfa::updateEigen(const blitz::Array<double,3> &A, 
+void bob::trainer::jfa::updateEigen(const blitz::Array<double,3> &A, 
   const blitz::Array<double,2> &C, blitz::Array<double,2> &uv)
 {
   // Check dimensions: ru
@@ -74,7 +74,7 @@ void train::jfa::updateEigen(const blitz::Array<double,3> &A,
   }
 }
 
-void train::jfa::estimateXandU(const blitz::Array<double,2> &F, const blitz::Array<double,2> &N,
+void bob::trainer::jfa::estimateXandU(const blitz::Array<double,2> &F, const blitz::Array<double,2> &N,
   const blitz::Array<double,1> &m, const blitz::Array<double,1> &E,
   const blitz::Array<double,1> &d, const blitz::Array<double,2> &v,
   const blitz::Array<double,2> &u, const blitz::Array<double,2> &z,
@@ -222,7 +222,7 @@ void train::jfa::estimateXandU(const blitz::Array<double,2> &F, const blitz::Arr
 }
 
 
-void train::jfa::estimateYandV(const blitz::Array<double,2> &F, const blitz::Array<double,2> &N, 
+void bob::trainer::jfa::estimateYandV(const blitz::Array<double,2> &F, const blitz::Array<double,2> &N, 
   const blitz::Array<double,1> &m, const blitz::Array<double,1> &E, 
   const blitz::Array<double,1> &d, const blitz::Array<double,2> &v, 
   const blitz::Array<double,2> &u, const blitz::Array<double,2> &z, 
@@ -376,7 +376,7 @@ void train::jfa::estimateYandV(const blitz::Array<double,2> &F, const blitz::Arr
 
 
 
-void train::jfa::estimateZandD(const blitz::Array<double,2> &F, const blitz::Array<double,2> &N,
+void bob::trainer::jfa::estimateZandD(const blitz::Array<double,2> &F, const blitz::Array<double,2> &N,
   const blitz::Array<double,1> &m, const blitz::Array<double,1> &E, 
   const blitz::Array<double,1> &d, const blitz::Array<double,2> &v, 
   const blitz::Array<double,2> &u, blitz::Array<double,2> &z, 
@@ -515,7 +515,7 @@ train::JFABaseTrainerBase::JFABaseTrainerBase(mach::JFABaseMachine& m):
   m_jfa_machine.getUbm()->getVarianceSupervector(m_cache_ubm_var);
 }
 
-void train::JFABaseTrainerBase::initNid(const std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > >& stats)
+void train::JFABaseTrainerBase::initNid(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats)
 {
   // Number of people
   m_Nid = stats.size();
@@ -527,7 +527,7 @@ void train::JFABaseTrainerBase::initNid(const size_t Nid)
   m_Nid = Nid;
 }
 
-void train::JFABaseTrainerBase::precomputeSumStatisticsN(const std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > >& stats)
+void train::JFABaseTrainerBase::precomputeSumStatisticsN(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats)
 {
   m_Nacc.clear();
   blitz::Array<double,1> Nsum(m_jfa_machine.getDimC());
@@ -540,7 +540,7 @@ void train::JFABaseTrainerBase::precomputeSumStatisticsN(const std::vector<std::
   }
 }
 
-void train::JFABaseTrainerBase::precomputeSumStatisticsF(const std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > >& stats)
+void train::JFABaseTrainerBase::precomputeSumStatisticsF(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats)
 {
   m_Facc.clear();
   boost::shared_ptr<mach::GMMMachine> ubm(m_jfa_machine.getUbm());
@@ -630,7 +630,7 @@ void train::JFABaseTrainerBase::initializeUVD()
   initializeRandomD();
 }
 
-void train::JFABaseTrainerBase::initializeXYZ(const std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > >& vec)
+void train::JFABaseTrainerBase::initializeXYZ(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& vec)
 {
   std::vector<blitz::Array<double,1> > z;
   std::vector<blitz::Array<double,1> > y;
@@ -746,7 +746,7 @@ void train::JFABaseTrainer::computeIdPlusVProd_i(const size_t id)
   math::inv(m_tmp_rvrv, m_cache_IdPlusVProd_i); // m_cache_IdPlusVProd_i = ( I+Vt*diag(sigma)^-1*Ni*V)^-1
 }
 
-void train::JFABaseTrainer::computeFn_y_i(const std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > >& stats, const size_t id)
+void train::JFABaseTrainer::computeFn_y_i(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats, const size_t id)
 {
   // Compute Fn_yi = sum_{sessions h}(N_{i,h}*(o_{i,h} - m - D*z_{i} - U*x_{i,h}) (Normalised first order statistics)
   const blitz::Array<double,1>& Fi = m_Facc[id];
@@ -777,7 +777,7 @@ void train::JFABaseTrainer::updateY_i(const size_t id)
   math::prod(m_cache_IdPlusVProd_i, m_tmp_rv, y);
 }
 
-void train::JFABaseTrainer::updateY(const std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > >& stats)
+void train::JFABaseTrainer::updateY(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats)
 {
   // Precomputation
   computeVtSigmaInv();
@@ -790,7 +790,7 @@ void train::JFABaseTrainer::updateY(const std::vector<std::vector<boost::shared_
   }
 }
 
-void train::JFABaseTrainer::updateV(const std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > >& stats)
+void train::JFABaseTrainer::updateV(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats)
 {  
   // Initializes the cache accumulator
   m_cache_A1_y = 0.;
@@ -856,7 +856,7 @@ void train::JFABaseTrainer::computeUProd()
   }
 }
 
-void train::JFABaseTrainer::computeIdPlusUProd_ih(const std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > >& stats, const size_t id, const size_t h) 
+void train::JFABaseTrainer::computeIdPlusUProd_ih(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats, const size_t id, const size_t h) 
 {
   const blitz::Array<double,1>& Nih = stats[id][h]->n;
   math::eye(m_tmp_ruru); // m_tmp_ruru = I
@@ -867,7 +867,7 @@ void train::JFABaseTrainer::computeIdPlusUProd_ih(const std::vector<std::vector<
   math::inv(m_tmp_ruru, m_cache_IdPlusUProd_ih); // m_cache_IdPlusUProd_ih = ( I+Ut*diag(sigma)^-1*Ni*U)^-1
 }
 
-void train::JFABaseTrainer::computeFn_x_ih(const std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > >& stats, const size_t id, const size_t h)
+void train::JFABaseTrainer::computeFn_x_ih(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats, const size_t id, const size_t h)
 {
   // Compute Fn_x_ih = sum_{sessions h}(N_{i,h}*(o_{i,h} - m - D*z_{i} - V*y_{i}) (Normalised first order statistics)
   const blitz::Array<double,2>& Fih = stats[id][h]->sumPx;
@@ -898,7 +898,7 @@ void train::JFABaseTrainer::updateX_ih(const size_t id, const size_t h)
   math::prod(m_cache_IdPlusUProd_ih, m_tmp_ru, x);
 }
 
-void train::JFABaseTrainer::updateX(const std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > >& stats)
+void train::JFABaseTrainer::updateX(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats)
 {
   // Precomputation
   computeUtSigmaInv();
@@ -914,7 +914,7 @@ void train::JFABaseTrainer::updateX(const std::vector<std::vector<boost::shared_
   }
 }
 
-void train::JFABaseTrainer::updateU(const std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > >& stats)
+void train::JFABaseTrainer::updateU(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats)
 {
   // Initializes the cache accumulator
   m_cache_A1_x = 0.;
@@ -976,7 +976,7 @@ void train::JFABaseTrainer::computeIdPlusDProd_i(const size_t id)
   m_cache_IdPlusDProd_i = 1 / m_cache_IdPlusDProd_i; // m_cache_IdPlusVProd_i = (I+Dt*diag(sigma)^-1*Ni*D)^-1
 }
 
-void train::JFABaseTrainer::computeFn_z_i(const std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > >& stats, const size_t id)
+void train::JFABaseTrainer::computeFn_z_i(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats, const size_t id)
 {
   // Compute Fn_z_i = sum_{sessions h}(N_{i,h}*(o_{i,h} - m - V*y_{i} - U*x_{i,h}) (Normalised first order statistics)
   const blitz::Array<double,1>& Fi = m_Facc[id];
@@ -1008,7 +1008,7 @@ void train::JFABaseTrainer::updateZ_i(const size_t id)
   z = m_cache_IdPlusDProd_i * m_cache_DtSigmaInv * m_cache_Fn_z_i; 
 }
 
-void train::JFABaseTrainer::updateZ(const std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > >& stats)
+void train::JFABaseTrainer::updateZ(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats)
 {
   // Precomputation
   computeDtSigmaInv();
@@ -1021,7 +1021,7 @@ void train::JFABaseTrainer::updateZ(const std::vector<std::vector<boost::shared_
   }
 }
 
-void train::JFABaseTrainer::updateD(const std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > >& stats)
+void train::JFABaseTrainer::updateD(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& stats)
 {
   // Initializes the cache accumulator
   m_cache_A1_z = 0.;
@@ -1045,7 +1045,7 @@ void train::JFABaseTrainer::updateD(const std::vector<std::vector<boost::shared_
 }
 
 
-void train::JFABaseTrainer::train(const std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > >& vec,
+void train::JFABaseTrainer::train(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& vec,
   const size_t n_iter)
 {
   initNid(vec);
@@ -1071,7 +1071,7 @@ void train::JFABaseTrainer::train(const std::vector<std::vector<boost::shared_pt
   }
 }
 
-void train::JFABaseTrainer::trainNoInit(const std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > >& vec,
+void train::JFABaseTrainer::trainNoInit(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& vec,
   const size_t n_iter)
 {
   initNid(vec);
@@ -1108,7 +1108,7 @@ void train::JFABaseTrainer::initializeVD_ISV(const double relevance_factor)
   d = sqrt(m_cache_ubm_var / relevance_factor);
 }
 
-void train::JFABaseTrainer::trainISV(const std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > >& vec,
+void train::JFABaseTrainer::trainISV(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& vec,
   const size_t n_iter, const double relevance_factor)
 {
   initNid(vec);
@@ -1126,7 +1126,7 @@ void train::JFABaseTrainer::trainISV(const std::vector<std::vector<boost::shared
   }
 }
 
-void train::JFABaseTrainer::trainISVNoInit(const std::vector<std::vector<boost::shared_ptr<const mach::GMMStats> > >& vec,
+void train::JFABaseTrainer::trainISVNoInit(const std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& vec,
   const size_t n_iter, const double relevance_factor)
 {
   initNid(vec);
@@ -1151,7 +1151,7 @@ train::JFATrainer::JFATrainer(mach::JFAMachine& jfa_machine, train::JFABaseTrain
 {
 }
 
-void train::JFATrainer::enrol(const std::vector<boost::shared_ptr<const mach::GMMStats> >& vec,
+void train::JFATrainer::enrol(const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& vec,
   const size_t n_iter)
 {
   std::vector< std::vector<boost::shared_ptr<const mach::GMMStats> > > vvec;

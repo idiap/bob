@@ -127,7 +127,7 @@ train::PLDABaseTrainer& train::PLDABaseTrainer::operator=
 }
 
 void train::PLDABaseTrainer::initialization(mach::PLDABaseMachine& machine,
-  const std::vector<io::Arrayset>& v_ar) 
+  const std::vector<bob::io::Arrayset>& v_ar) 
 {
   // Checks training data
   checkTrainingData(v_ar);
@@ -148,7 +148,7 @@ void train::PLDABaseTrainer::initialization(mach::PLDABaseMachine& machine,
 }
 
 void train::PLDABaseTrainer::finalization(mach::PLDABaseMachine& machine,
-  const std::vector<io::Arrayset>& v_ar) 
+  const std::vector<bob::io::Arrayset>& v_ar) 
 {
   // Precomputes constant parts of the log likelihood and (gamma_a)
   precomputeLogLike(machine, v_ar);
@@ -157,7 +157,7 @@ void train::PLDABaseTrainer::finalization(mach::PLDABaseMachine& machine,
   machine.getAddLogLikeConstTerm(1);
 }
 
-void train::PLDABaseTrainer::checkTrainingData(const std::vector<io::Arrayset>& v_ar)
+void train::PLDABaseTrainer::checkTrainingData(const std::vector<bob::io::Arrayset>& v_ar)
 {
   // Checks that the vector of Arraysets is not empty
   if(v_ar.size() == 0)
@@ -181,7 +181,7 @@ void train::PLDABaseTrainer::checkTrainingData(const std::vector<io::Arrayset>& 
   } 
 }
 
-void train::PLDABaseTrainer::initMembers(const std::vector<io::Arrayset>& v_ar)
+void train::PLDABaseTrainer::initMembers(const std::vector<bob::io::Arrayset>& v_ar)
 {
   // Gets dimension (first Arrayset)
   size_t n_features = v_ar[0].getShape()[0]; // dimensionality of the data
@@ -232,7 +232,7 @@ void train::PLDABaseTrainer::initMembers(const std::vector<io::Arrayset>& v_ar)
 }
 
 void train::PLDABaseTrainer::computeMeanVariance(mach::PLDABaseMachine& machine, 
-  const std::vector<io::Arrayset>& v_ar) 
+  const std::vector<bob::io::Arrayset>& v_ar) 
 {
   blitz::Array<double,1>& mu = machine.updateMu();
   // TODO: Uncomment variance computation if required
@@ -263,7 +263,7 @@ void train::PLDABaseTrainer::computeMeanVariance(mach::PLDABaseMachine& machine,
 }
 
 void train::PLDABaseTrainer::initFGSigma(mach::PLDABaseMachine& machine, 
-  const std::vector<io::Arrayset>& v_ar) 
+  const std::vector<bob::io::Arrayset>& v_ar) 
 {
   // Initializes F, G and sigma
   initF(machine, v_ar);
@@ -275,7 +275,7 @@ void train::PLDABaseTrainer::initFGSigma(mach::PLDABaseMachine& machine,
 }
 
 void train::PLDABaseTrainer::initF(mach::PLDABaseMachine& machine, 
-  const std::vector<io::Arrayset>& v_ar) 
+  const std::vector<bob::io::Arrayset>& v_ar) 
 {
   blitz::Array<double,2>& F = machine.updateF();
 
@@ -336,7 +336,7 @@ void train::PLDABaseTrainer::initF(mach::PLDABaseMachine& machine,
 }
 
 void train::PLDABaseTrainer::initG(mach::PLDABaseMachine& machine, 
-  const std::vector<io::Arrayset>& v_ar) 
+  const std::vector<bob::io::Arrayset>& v_ar) 
 {
   blitz::Array<double,2>& G = machine.updateG();
 
@@ -411,7 +411,7 @@ void train::PLDABaseTrainer::initG(mach::PLDABaseMachine& machine,
 }
 
 void train::PLDABaseTrainer::initSigma(mach::PLDABaseMachine& machine, 
-  const std::vector<io::Arrayset>& v_ar) 
+  const std::vector<bob::io::Arrayset>& v_ar) 
 {
   blitz::Array<double,1>& sigma = machine.updateSigma();
   double eps = std::numeric_limits<double>::epsilon(); // Sigma should be invertible...
@@ -499,7 +499,7 @@ void train::PLDABaseTrainer::initRandomFGSigma(mach::PLDABaseMachine& machine)
 
 
 void train::PLDABaseTrainer::eStep(mach::PLDABaseMachine& machine, 
-  const std::vector<io::Arrayset>& v_ar)
+  const std::vector<bob::io::Arrayset>& v_ar)
 {  
   // Precomputes useful variables using current estimates of F,G, and sigma
   precomputeFromFGSigma(machine);
@@ -620,7 +620,7 @@ void train::PLDABaseTrainer::precomputeFromFGSigma(mach::PLDABaseMachine& machin
 }
 
 void train::PLDABaseTrainer::precomputeLogLike(mach::PLDABaseMachine& machine, 
-  const std::vector<io::Arrayset>& v_ar) 
+  const std::vector<bob::io::Arrayset>& v_ar) 
 {
   // Precomputes the log determinant of alpha and sigma
   machine.precomputeLogLike();
@@ -638,7 +638,7 @@ void train::PLDABaseTrainer::precomputeLogLike(mach::PLDABaseMachine& machine,
 
 
 void train::PLDABaseTrainer::mStep(mach::PLDABaseMachine& machine, 
-  const std::vector<io::Arrayset>& v_ar) 
+  const std::vector<bob::io::Arrayset>& v_ar) 
 {
   // TODO: 0/ Add mean update rule as an option?
 
@@ -655,7 +655,7 @@ void train::PLDABaseTrainer::mStep(mach::PLDABaseMachine& machine,
 }
 
 void train::PLDABaseTrainer::updateFG(mach::PLDABaseMachine& machine,
-  const std::vector<io::Arrayset>& v_ar)
+  const std::vector<bob::io::Arrayset>& v_ar)
 {
   /// Computes the B matrix (B = [F G])
   /// B = (sum_ij (x_ij-mu).E{z_i}^T).(sum_ij E{z_i.z_i^T})^-1
@@ -695,7 +695,7 @@ void train::PLDABaseTrainer::updateFG(mach::PLDABaseMachine& machine,
 }
 
 void train::PLDABaseTrainer::updateSigma(mach::PLDABaseMachine& machine,
-  const std::vector<io::Arrayset>& v_ar)
+  const std::vector<bob::io::Arrayset>& v_ar)
 {
   /// Computes the Sigma matrix
   /// Sigma = 1/IJ sum_ij Diag{(x_ij-mu).(x_ij-mu)^T - B.E{z_i}.(x_ij-mu)^T}

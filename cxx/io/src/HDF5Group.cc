@@ -62,7 +62,7 @@ static boost::shared_ptr<hid_t> open_group(boost::shared_ptr<hid_t> g,
   return retval;
 }
 
-h5::Group::Group(boost::shared_ptr<h5::Group> parent, const std::string& name):
+h5::Group::Group(boost::shared_ptr<Group> parent, const std::string& name):
   m_name(name),
   m_id(create_new_group(parent->location(), name)),
   m_parent(parent)
@@ -111,7 +111,7 @@ herr_t h5::Group::iterate_callback(hid_t self, const char *name,
   return 0;
 }
 
-h5::Group::Group(boost::shared_ptr<h5::Group> parent,
+h5::Group::Group(boost::shared_ptr<Group> parent,
     const std::string& name, bool):
   m_name(name),
   m_id(open_group(parent->location(), name.c_str())),
@@ -132,7 +132,7 @@ void h5::Group::open_recursively() {
   if (status < 0) throw io::HDF5StatusError("H5Literate", status);
 }
 
-h5::Group::Group(boost::shared_ptr<h5::File> parent):
+h5::Group::Group(boost::shared_ptr<File> parent):
   m_name(""),
   m_id(open_group(parent->location(), "/")),
   m_parent()
@@ -328,7 +328,7 @@ void h5::Group::rename_group(const std::string& from, const std::string& to) {
   if (status < 0) throw io::HDF5StatusError("H5Lmove", status);
 }
 
-void h5::Group::copy_group(const boost::shared_ptr<h5::Group> other,
+void h5::Group::copy_group(const boost::shared_ptr<Group> other,
     const std::string& dir) {
   std::string::size_type pos = dir.find_last_of('/');
   if (pos == std::string::npos) { //copy on the current group
@@ -432,7 +432,7 @@ void h5::Group::rename_dataset(const std::string& from, const std::string& to) {
   if (status < 0) throw io::HDF5StatusError("H5Ldelete", status);
 }
 
-void h5::Group::copy_dataset(const boost::shared_ptr<h5::Dataset> other,
+void h5::Group::copy_dataset(const boost::shared_ptr<Dataset> other,
     const std::string& dir) {
 
   std::string::size_type pos = dir.find_last_of('/');
@@ -482,7 +482,7 @@ void h5::Group::delete_attribute (const std::string& name) {
   h5::delete_attribute(m_id, name);
 }
 
-h5::RootGroup::RootGroup(boost::shared_ptr<h5::File> parent):
+h5::RootGroup::RootGroup(boost::shared_ptr<File> parent):
   h5::Group(parent),
   m_parent(parent)
 {

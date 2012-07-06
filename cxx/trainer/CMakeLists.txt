@@ -22,6 +22,7 @@ set(src
     "src/WienerTrainer.cc"
     "src/EMPCATrainer.cc"
     "src/PLDATrainer.cc"
+    "src/BICTrainer.cc"
 )
 
 if(LIBSVM_FOUND)
@@ -34,6 +35,7 @@ bob_library(trainer "${src}" "${deps}" "${shared}")
 
 # Defines tests for this package
 bob_test(trainer jfa test/jfa.cc)
+bob_test(trainer bic test/bic.cc)
 
 # Defines environment variable used to localize data for the tests
 #set_property(TEST cxx-trainer-gabor APPEND PROPERTY ENVIRONMENT

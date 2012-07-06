@@ -48,8 +48,6 @@ namespace bob {
         * @warning No check is performed on the dst blitz::array/image.
         * @param src The input blitz array
         * @param dst The output blitz array
-        * @param height The height of the dst blitz::array.
-        * @param width The width of the dst blitz::array.
         */
       template<typename T, bool mask>
       void scaleNoCheck2D_BI(const blitz::Array<T,2>& src, 

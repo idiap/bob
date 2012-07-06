@@ -180,11 +180,11 @@ bob::core::AutoOutputDevice::AutoOutputDevice()
 : m_device(new NullOutputDevice)
 {}
 
-bob::core::AutoOutputDevice::AutoOutputDevice(const bob::core::AutoOutputDevice& other)
+bob::core::AutoOutputDevice::AutoOutputDevice(const AutoOutputDevice& other)
 : m_device(other.m_device)
 {}
 
-bob::core::AutoOutputDevice::AutoOutputDevice(const boost::shared_ptr<bob::core::OutputDevice>& device)
+bob::core::AutoOutputDevice::AutoOutputDevice(const boost::shared_ptr<OutputDevice>& device)
 : m_device(device)
 {}
 
@@ -205,7 +205,7 @@ void bob::core::AutoOutputDevice::reset(const std::string& configuration) {
   else m_device.reset(new FileOutputDevice(configuration));
 }
 
-void bob::core::AutoOutputDevice::reset(const boost::shared_ptr<bob::core::OutputDevice>& device) {
+void bob::core::AutoOutputDevice::reset(const boost::shared_ptr<OutputDevice>& device) {
   m_device = device;
 }
 
@@ -223,11 +223,11 @@ bob::core::AutoInputDevice::AutoInputDevice()
 : m_device(new StdinInputDevice)
 {}
 
-bob::core::AutoInputDevice::AutoInputDevice(const bob::core::AutoInputDevice& other)
+bob::core::AutoInputDevice::AutoInputDevice(const AutoInputDevice& other)
 : m_device(other.m_device)
 {}
 
-bob::core::AutoInputDevice::AutoInputDevice(const boost::shared_ptr<bob::core::InputDevice>& device)
+bob::core::AutoInputDevice::AutoInputDevice(const boost::shared_ptr<InputDevice>& device)
 : m_device(device)
 {}
 
@@ -246,7 +246,7 @@ void bob::core::AutoInputDevice::reset(const std::string& configuration) {
   else m_device.reset(new FileInputDevice(configuration));
 }
 
-void bob::core::AutoInputDevice::reset(const boost::shared_ptr<bob::core::InputDevice>& device) {
+void bob::core::AutoInputDevice::reset(const boost::shared_ptr<InputDevice>& device) {
   m_device = device;
 }
 

@@ -60,16 +60,13 @@ namespace bob { namespace machine {
    * Loads a given libsvm data file. The data file format, as defined on the
    * library README is like this:
    *
-   * <label> <index1>:<value1> <index2>:<value2> ...
-   * .
-   * .
-   * .
+   * [label] [index1]:[value1] [index2]:[value2] ...
    *
    * The labels are integer values, so are the indexes, starting from "1" (and
    * not from zero as a C-programmer would expect. The values are floating
    * point.
    *
-   * Zero values are suppresed - this is a sparse format.
+   * Zero values are suppressed - this is a sparse format.
    */
   class SVMFile {
 

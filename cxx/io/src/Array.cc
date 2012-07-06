@@ -32,7 +32,7 @@ io::Array::Array(const ca::interface& data):
 {
 }
 
-io::Array::Array(boost::shared_ptr<ca::interface> data):
+io::Array::Array(boost::shared_ptr<bob::core::array::interface> data):
   m_inlined(data),
   m_loadsall(false)
 {
@@ -94,7 +94,7 @@ void io::Array::set(const ca::interface& data) {
   m_inlined = boost::make_shared<ca::blitz_array>(data);
 }
         
-void io::Array::set(boost::shared_ptr<ca::interface> data) {
+void io::Array::set(boost::shared_ptr<bob::core::array::interface> data) {
   m_external.reset();
   m_inlined = data; 
 }
