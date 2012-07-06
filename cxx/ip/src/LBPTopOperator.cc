@@ -78,8 +78,7 @@ ip::LBPTopOperator::LBPTopOperator(boost::shared_ptr<bob::ip::LBP> lbp_xy,
   m_lbp_xy = lbp_xy;
   m_lbp_xt = lbp_xt;
   m_lbp_yt = lbp_yt;
-};
-
+}
 
 
 
