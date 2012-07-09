@@ -7,17 +7,18 @@
  * program:
  * http://cekirdek.pardus.org.tr/~ismail/ffmpeg-docs/output-example_8c-source.html.
  * FFMpeg versions for your reference
- * ffmpeg | avformat | avcodec  | avutil  | swscale | old style | swscale GPL?
- * =======+==========+==========+=========+=========+===========+==============
- * 0.5    | 52.31.0  | 52.20.0  | 49.15.0 | 0.7.1   | yes       | yes
- * 0.5.1  | 52.31.0  | 52.20.1  | 49.15.0 | 0.7.1   | yes       | yes
- * 0.5.2  | 52.31.0  | 52.20.1  | 49.15.0 | 0.7.1   | yes       | yes
- * 0.5.3  | 52.31.0  | 52.20.1  | 49.15.0 | 0.7.1   | yes       | yes
- * 0.6    | 52.64.2  | 52.72.2  | 50.15.1 | 0.11.0  | no        | no
- * 0.6.1  | 52.64.2  | 52.72.2  | 50.15.1 | 0.11.0  | no        | no
- * 0.7    | 52.110.0 | 52.122.0 | 50.43.0 | 0.14.1  | no        | no
- * 0.7.1  | 52.110.0 | 52.122.0 | 50.43.0 | 0.14.1  | no        | no
- * 0.8    | 53.4.0   | 53.7.0   | 51.9.1  | 2.0.0   | no        | no
+ * ffmpeg | avformat | avcodec  | avutil   | swscale | old style | swscale GPL?
+ * =======+==========+==========+==========+=========+===========+=============
+ * 0.5    | 52.31.0  | 52.20.0  | 49.15.0  | 0.7.1   | yes       | yes
+ * 0.5.1  | 52.31.0  | 52.20.1  | 49.15.0  | 0.7.1   | yes       | yes
+ * 0.5.2  | 52.31.0  | 52.20.1  | 49.15.0  | 0.7.1   | yes       | yes
+ * 0.5.3  | 52.31.0  | 52.20.1  | 49.15.0  | 0.7.1   | yes       | yes
+ * 0.6    | 52.64.2  | 52.72.2  | 50.15.1  | 0.11.0  | no        | no
+ * 0.6.1  | 52.64.2  | 52.72.2  | 50.15.1  | 0.11.0  | no        | no
+ * 0.7    | 52.110.0 | 52.122.0 | 50.43.0  | 0.14.1  | no        | no
+ * 0.7.1  | 52.110.0 | 52.122.0 | 50.43.0  | 0.14.1  | no        | no
+ * 0.8    | 53.4.0   | 53.7.0   | 51.9.1   | 2.0.0   | no        | no
+ * 0.11.1 | 54.6.100 | 54.23.100| 51.54.100| 2.1.100 | no        | no
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
@@ -385,9 +386,22 @@ void io::VideoWriter::write_video_frame(const blitz::Array<uint8_t,3>& data) {
   }
   else {
     // encodes the image
+#   if LIBAVCODEC_VERSION_INT >= 0x360000
+    AVPacket pkt;
+    av_init_packet(&pkt);
+    pkt.data = video_outbuf;
+    pkt.size = video_outbuf_size;
+    int got_packet_ptr = -1;
+    out_size = avcodec_encode_video2(c, &pkt, picture, &got_packet_ptr);
+
+    // if zero size, it means the image was buffered
+    if (out_size >= 0 && got_packet_ptr) {
+#   else
     out_size = avcodec_encode_video(c, video_outbuf, video_outbuf_size, picture);
+
     // if zero size, it means the image was buffered
     if (out_size > 0) {
+#   endif
       AVPacket pkt;
       av_init_packet(&pkt);
 
