@@ -37,10 +37,10 @@
 #include <iostream>
 
 struct T {
-  double eps;
+  double eps,eps2;
 
   //note we are comparing uint8_t values, so a difference of 1 is OK.
-	T(): eps(1.5) {}
+	T(): eps(1.5), eps2(1e-8) {}
 
 	~T() {}
 };
@@ -72,6 +72,7 @@ void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<T,2>& t2,
   average /= t1.size();
   BOOST_CHECK(average < 1e-2);
 }
+
 
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
@@ -117,25 +118,20 @@ BOOST_AUTO_TEST_CASE( test_facenorm2 )
     throw bob::core::Exception();
   }
   // Load original image
-  boost::filesystem::path testdata_path_img( testdata_cpath);
-  testdata_path_img /= "9003_m_wm_s01_9004_en_1.jpg";
-  bob::io::Array ar_img(testdata_path_img.string());
-  blitz::Array<uint8_t,3> img_rgb = ar_img.get<uint8_t,3>();
-  blitz::Array<uint8_t,2> img(img_rgb.extent(1),img_rgb.extent(2));
-  bob::ip::rgb_to_gray(img_rgb, img);
-  blitz::Array<double,2> img_processed_d(80,64);
+  boost::filesystem::path testdata_path_image(testdata_cpath);
+  testdata_path_image /= "Nicolas_Cage_0001.pgm";
+  bob::io::Array image(testdata_path_image.string());
+  blitz::Array<double,2> processed_image(80,64);
   
-
   bob::ip::FaceEyesNorm facenorm(33,80,64,16,32);
 
   // Process giving the coordinates of the eyes
-  facenorm(img,img_processed_d,276,276,276,375);
-  blitz::Array<uint8_t,2> img_processed = bob::core::convertFromRange<uint8_t>( img_processed_d, 0., 255.);
-  testdata_path_img = testdata_cpath;
-  testdata_path_img /= "9003_m_wm_s01_9004_en_1_facenorm.pgm";
-  bob::io::Array ar_img_facenorm(testdata_path_img.string());
-  blitz::Array<uint8_t,2> img_ref_facenorm = ar_img_facenorm.get<uint8_t,2>();
-  checkBlitzClose( img_ref_facenorm, img_processed, eps);
+  facenorm(image.get<uint8_t,2>(),processed_image,116,104,116,147);
+  testdata_path_image = testdata_cpath;
+  testdata_path_image /= "Nicolas_Cage_0001.hdf5";
+  bob::io::Array read_reference_image(testdata_path_image.string());
+  blitz::Array<double,2> reference_image = read_reference_image.get<double,2>();
+  checkBlitzClose(reference_image, processed_image, eps2);
 }
  
   
