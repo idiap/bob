@@ -483,7 +483,7 @@ class LBPTest(unittest.TestCase):
     lbp4R_XT = bob.ip.LBP4R(radius=1.0, circular=False, uniform=False, rotation_invariant=False)
     lbp4R_YT = bob.ip.LBP4R(radius=1.0, circular=False, uniform=False, rotation_invariant=False)
 
-    op = bob.ip.LBPTopOperator(lbp4R_XY,lbp4R_XT,lbp4R_YT)
+    op = bob.ip.LBPTop(lbp4R_XY,lbp4R_XT,lbp4R_YT)
 
     proc1 = ProcessorLBPTop(op, generate_NxMxM_image,img_size=3,n_frames=3)
     self.assertEqual(proc1(['000000000','111111111','222222222'],plane_index=0,operator_coordinates=(0,0)),0xf)

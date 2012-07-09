@@ -116,7 +116,7 @@ static object get_shape (O& op, tp::const_ndarray input) {
 }
 
 template <typename T> 
-static void inner_call_lbptop (ip::LBPTopOperator& op, tp::const_ndarray input,
+static void inner_call_lbptop (ip::LBPTop& op, tp::const_ndarray input,
     tp::ndarray xy, tp::ndarray xt, tp::ndarray yt) {
   blitz::Array<uint16_t,2> xy_ = xy.bz<uint16_t,2>();
   blitz::Array<uint16_t,2> xt_ = xt.bz<uint16_t,2>();
@@ -124,7 +124,7 @@ static void inner_call_lbptop (ip::LBPTopOperator& op, tp::const_ndarray input,
   op(input.bz<T,3>(), xy_, xt_, yt_);
 }
 
-static void call_lbptop (ip::LBPTopOperator& op, tp::const_ndarray input,
+static void call_lbptop (ip::LBPTop& op, tp::const_ndarray input,
     tp::ndarray xy, tp::ndarray xt, tp::ndarray yt) {
   switch(input.type().dtype) {
     case ca::t_uint8: return inner_call_lbptop<uint8_t>(op, input, xy, xt, yt);
@@ -190,8 +190,8 @@ void bind_ip_lbp_new() {
     .def("get_lbp_shape", &get_shape<ip::LBP16R>, (arg("self"), arg("input")), "Get a tuple containing the expected size of the output when extracting LBP16R features.")
     ;
 
-  class_<ip::LBPTopOperator, boost::shared_ptr<ip::LBPTopOperator> >("LBPTopOperator",
- "Constructs a new LBPTopOperator object starting from the algorithm configuration.", init<boost::shared_ptr<bob::ip::LBP>, boost::shared_ptr<bob::ip::LBP>, boost::shared_ptr<bob::ip::LBP> >((arg("lbp_xy"), arg("lbp_xt"), arg("lbp_yt")), "Constructs a new ipLBPTopOperator"))
+  class_<ip::LBPTop, boost::shared_ptr<ip::LBPTop> >("LBPTop",
+ "Constructs a new LBPTop object starting from the algorithm configuration.", init<boost::shared_ptr<bob::ip::LBP>, boost::shared_ptr<bob::ip::LBP>, boost::shared_ptr<bob::ip::LBP> >((arg("lbp_xy"), arg("lbp_xt"), arg("lbp_yt")), "Constructs a new ipLBPTop"))
     .def("__call__", &call_lbptop, (arg("self"),arg("input"), arg("xy"), arg("xt"), arg("yt")), "Processes a 3D array representing a set of <b>grayscale</b> images and returns (by argument) the three LBP planes calculated. The 3D array has to be arranged in this way:\n\n1st dimension => time\n2nd dimension => frame height\n3rd dimension => frame width\n\nThe central pixel is the point where the LBP planes interesect/have to be calculated from.")
     ;
 

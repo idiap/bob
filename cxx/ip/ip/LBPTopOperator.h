@@ -23,8 +23,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB_IP_LBPTOPOPERATOR_H 
-#define BOB_IP_LBPTOPOPERATOR_H
+#ifndef BOB_IP_LBPTOP_H 
+#define BOB_IP_LBPTOP_H
 
 #include <blitz/array.h>
 #include <algorithm>
@@ -42,7 +42,7 @@ namespace bob {
  */
   namespace ip {
     /**
-     * The LBPTopOperator class is designed to calculate the LBP-Top
+     * The LBPTop class is designed to calculate the LBP-Top
      * coefficients given a set of images. 
      *
      * The workflow is as follows:
@@ -57,22 +57,22 @@ namespace bob {
      * 4. After pushing an image, you read the current LBP-Top coefficients
      * and may save it somewhere.
      */
-    class LBPTopOperator
+    class LBPTop
     {
       public:
 	/*
-	Constructs a new LBPTopOperator object starting from the algorithm configuration
+	Constructs a new LBPTop object starting from the algorithm configuration
 	@param m_lbp_xy The 2D LBP-XY plane configuration
 	@param m_lbp_xt The 2D LBP-XT plane configuration
 	@param m_lbp_yt The 2D LBP-YT plane configuration
 	*/
-	LBPTopOperator(boost::shared_ptr<bob::ip::LBP> lbp_xy, 
+	LBPTop(boost::shared_ptr<bob::ip::LBP> lbp_xy, 
 		       boost::shared_ptr<bob::ip::LBP> lbp_xt, 
 		       boost::shared_ptr<bob::ip::LBP> lbp_yt);
         /**
          * Destructor
          */
-        virtual ~LBPTopOperator() {}
+        virtual ~LBPTop() {}
 
         /**
          * Processes a 3D array representing a set of <b>grayscale</b> images 
@@ -128,7 +128,7 @@ namespace bob {
     };
 
     template <typename T>
-    void bob::ip::LBPTopOperator::process(const blitz::Array<T,3>& src,
+    void bob::ip::LBPTop::process(const blitz::Array<T,3>& src,
       blitz::Array<uint16_t,2>& xy,
       blitz::Array<uint16_t,2>& xt,
       blitz::Array<uint16_t,2>& yt) const
@@ -176,4 +176,4 @@ namespace bob {
   }
 }
 
-#endif /* BOB_IP_LBPTOPOPERATOR_H */
+#endif /* BOB_IP_LBPTOP_H */

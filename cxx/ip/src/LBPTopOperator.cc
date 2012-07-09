@@ -28,7 +28,7 @@
 
 namespace ip = bob::ip;
 
-ip::LBPTopOperator::LBPTopOperator(boost::shared_ptr<bob::ip::LBP> lbp_xy, 
+ip::LBPTop::LBPTop(boost::shared_ptr<bob::ip::LBP> lbp_xy, 
 			           boost::shared_ptr<bob::ip::LBP> lbp_xt, 
 			           boost::shared_ptr<bob::ip::LBP> lbp_yt)
 {
