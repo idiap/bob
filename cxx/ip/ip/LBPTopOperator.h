@@ -156,9 +156,6 @@ namespace bob {
 
 	int x=0,y=0,t=0;
 
-        //throw ParamOutOfBoundaryError("yc", false, 10 , ceil(10));
-
-
       // XY plane calculation
       const blitz::Array<T,2> kxy = 
         src( tc, blitz::Range::all(), blitz::Range::all());
