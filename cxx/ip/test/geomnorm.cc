@@ -29,6 +29,7 @@
 #include <boost/filesystem.hpp>
 #include "core/cast.h"
 #include "core/convert.h"
+#include "core/logging.h"
 #include "ip/GeomNorm.h"
 #include "io/Array.h"
 
@@ -112,26 +113,22 @@ BOOST_AUTO_TEST_CASE( test_geomnorm )
   blitz::Array<uint8_t,2> img = ar_img.get<uint8_t,2>();
   blitz::Array<double,2> img_processed_d(40,40);
   
+  // Define a Geometric normalizer 
+  // * rotation angle: 10 degrees
+  // * scaling factor: 1.
+  // * Cropping area: 40x40
+  // * No final cropping offset (i.e. used the provided upper left corner when calling 
+  //   the operator() method)
+  bob::ip::GeomNorm geomnorm(-10., 0.65, 40, 40, 0, 0);
 
-  bob::ip::GeomNorm geomnorm(20,40,40,0,0);
-
-  // Process giving the coordinates of the eyes
-  geomnorm(img,img_processed_d,67,47,62,71);
+  // Process giving the rotation center, and the upper left corner of the cropping area
+  geomnorm(img, img_processed_d, 65, 59, 54, 27);
   blitz::Array<uint8_t,2> img_processed = bob::core::convertFromRange<uint8_t>( img_processed_d, 0., 255.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r10_geomnorm.pgm";
   bob::io::Array ar_img_geomnorm(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_geomnorm = ar_img_geomnorm.get<uint8_t,2>();
   checkBlitzClose( img_ref_geomnorm, img_processed, eps);
-
-  bob::ip::GeomNorm geomnorm2(20,40,40,0,0);
-  img_processed_d.resize(40,40);
-  geomnorm2(img,img_processed_d,67,47,62,71);
-  blitz::Array<uint8_t,2> img_processed2 = bob::core::convertFromRange<uint8_t>( img_processed_d, 0., 255.);
-  testdata_path_img = testdata_cpath;
-  testdata_path_img /= "image_r10_geomnorm_BORDER25x0.pgm";
-  bob::io::Array ar_img_geomnorm2(img_processed2);
-  ar_img_geomnorm2.save(testdata_path_img.string());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
