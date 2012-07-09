@@ -18,6 +18,7 @@ find_package_handle_standard_args(matio DEFAULT_MSG matio_LIBRARY matio_INCLUDE_
 
 if(MATIO_FOUND)
   set(matio_LIBRARIES ${matio_LIBRARY})
+  CHECK_CXX_SOURCE_COMPILES("#include <matio.h> int main() { ComplexSplit s; }" HAVE_MATIO_OLD_COMPLEXSPLIT)
   add_definitions("-D HAVE_MATIO=1")
 endif(MATIO_FOUND)
 
