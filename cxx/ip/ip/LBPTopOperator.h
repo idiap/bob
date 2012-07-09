@@ -120,6 +120,7 @@ namespace bob {
 	boost::shared_ptr<bob::ip::LBP> getYT(){return m_lbp_yt;} //Get the YT plane
 
       private:
+
         /**
           * Processes a 3D array representing a set of <b>grayscale</b> images
           * and returns (by argument) the three LBP planes calculated.
@@ -153,18 +154,33 @@ namespace bob {
         int yc = height/2;
         int xc = width/2;
 
+	int x=0,y=0,t=0;
+
+        //throw ParamOutOfBoundaryError("yc", false, 10 , ceil(10));
+
+
       // XY plane calculation
       const blitz::Array<T,2> kxy = 
         src( tc, blitz::Range::all(), blitz::Range::all());
+      
+      /*Checking XY. Just touching the method in order to stress theirs exceptions*/
+      y=m_radius_xy; x=y;
+      m_lbp_xy->operator()(kxy, y, x);
+
       for (int y=m_radius_xy; y < (height-m_radius_xy); ++y) {
         for (int x=m_radius_xy; x < (width-m_radius_xy); ++x) {
-          xy(y-m_radius_xy,x-m_radius_xy) = m_lbp_xy->operator()(kxy, y, x);
+           xy(y-m_radius_xy,x-m_radius_xy) = m_lbp_xy->operator()(kxy, y, x);
         }
       }
 
       // XT plane calculation
       const blitz::Array<T,2> kxt = 
         src( blitz::Range::all(), yc, blitz::Range::all());
+
+      /*Checking XT. Just touching the method in order to stress theirs exceptions*/
+      t=m_radius_xt; x = t;
+      m_lbp_xt->operator()(kxt, t, x);
+
       for (int t = m_radius_xt; t < (Tlength-m_radius_xt); ++t) {
         for (int x=m_radius_xt; x < (width-m_radius_xt); ++x) {
           xt(t-m_radius_xt,x-m_radius_xt) = m_lbp_xt->operator()(kxt, t, x);
@@ -174,6 +190,11 @@ namespace bob {
       // YT plane calculation
       const blitz::Array<T,2> kyt = 
         src( blitz::Range::all(), blitz::Range::all(), xc);
+
+      /*Checking YT. Just touching the method in order to stress theirs exceptions*/
+      t=m_radius_yt; y = t;
+      m_lbp_yt->operator()(kyt, t, y);
+
       for (int t = m_radius_yt; t < (Tlength-m_radius_yt); ++t) {
         for (int y = m_radius_yt; y < (height-m_radius_yt); ++y) {
           yt(t-m_radius_yt,y-m_radius_yt) = m_lbp_yt->operator()(kyt, t, y);

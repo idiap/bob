@@ -39,4 +39,3 @@ ip::LBPTop::LBPTop(boost::shared_ptr<bob::ip::LBP> lbp_xy,
 
 
 
-
