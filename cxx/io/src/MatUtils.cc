@@ -204,7 +204,11 @@ boost::shared_ptr<matvar_t> make_matvar
   void* fdata = static_cast<void*>(new char[info.buffer_size()]);
   
   //matio gets dimensions as integers
+# if HAVE_MATIO_OLD_COMPLEXSPLIT == 1
   int mio_dims[BOB_MAX_DIM];
+# else
+  size_t mio_dims[BOB_MAX_DIM];
+# endif
   for (size_t i=0; i<info.nd; ++i) mio_dims[i] = info.shape[i];
 
   switch (info.dtype) {
@@ -216,7 +220,11 @@ boost::shared_ptr<matvar_t> make_matvar
         uint8_t* real = static_cast<uint8_t*>(fdata);
         uint8_t* imag = real + (info.buffer_size()/2);
         io::row_to_col_order_complex(buf.ptr(), real, imag, info); 
+#       if HAVE_MATIO_OLD_COMPLEXSPLIT == 1
         ComplexSplit mio_complex = {real, imag};
+#       else
+        mat_complex_split_t mio_complex = {real, imag};
+#       endif
         return boost::shared_ptr<matvar_t>(Mat_VarCreate(varname.c_str(),
               mio_class_type(info.dtype), mio_data_type(info.dtype),
               info.nd, mio_dims, static_cast<void*>(&mio_complex),
@@ -241,12 +249,20 @@ boost::shared_ptr<matvar_t> make_matvar
 static void assign_array (boost::shared_ptr<matvar_t> matvar, ca::interface& buf) {
 
   ca::typeinfo info(bob_element_type(matvar->data_type, matvar->isComplex),
+#     if HAVE_MATIO_OLD_COMPLEXSPLIT == 1
       matvar->rank, matvar->dims);
+#     else
+      (size_t)matvar->rank, matvar->dims);
+#     endif
 
   if(!buf.type().is_compatible(info)) buf.set(info);
 
   if (matvar->isComplex) {
+#   if HAVE_MATIO_OLD_COMPLEXSPLIT == 1
     ComplexSplit mio_complex = *static_cast<ComplexSplit*>(matvar->data);
+#   else
+    mat_complex_split_t mio_complex = *static_cast<mat_complex_split_t*>(matvar->data);
+#   endif
     io::col_to_row_order_complex(mio_complex.Re, mio_complex.Im, buf.ptr(), info);
   }
   else io::col_to_row_order(matvar->data, buf.ptr(), info);
@@ -268,7 +284,11 @@ void bob::io::detail::write_array(boost::shared_ptr<mat_t> file,
     const std::string& varname, const ca::interface& buf) {
 
   boost::shared_ptr<matvar_t> matvar = make_matvar(varname, buf);
+# if HAVE_MATIO_OLD_COMPLEXSPLIT == 1
   Mat_VarWrite(file.get(), matvar.get(), 0);
+# else
+  Mat_VarWrite(file.get(), matvar.get(), (matio_compression)0);
+# endif
 
 }
 
@@ -278,7 +298,11 @@ void bob::io::detail::write_array(boost::shared_ptr<mat_t> file,
 static void get_var_info(boost::shared_ptr<const matvar_t> matvar,
     ca::typeinfo& info) {
   info.set(bob_element_type(matvar->data_type, matvar->isComplex),
+#     if HAVE_MATIO_OLD_COMPLEXSPLIT == 1
       matvar->rank, matvar->dims);
+#     else
+      (size_t)matvar->rank, matvar->dims);
+#     endif
 }
 
 void bob::io::detail::mat_peek(const std::string& filename, ca::typeinfo& info) {

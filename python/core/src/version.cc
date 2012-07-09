@@ -44,7 +44,7 @@ static str blitz_version() {
   std::string retval(BZ_VERSION);
 # if defined(HAVE_BLITZ_SPECIAL_TYPES)
   //this is a temporary hack to identify support for more than 2GB big arrays
-  retval += "+CVS (>2GB contents supported)";
+  retval += " (>2GB contents supported)";
 # endif
   return str(retval);
 }
