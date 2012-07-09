@@ -78,12 +78,15 @@ void io::CodecRegistry::registerExtension(const std::string& extension,
 io::file_factory_t io::CodecRegistry::findByExtension
 (const std::string& extension) {
 
+  std::string lower_extension = extension;
+  std::transform(extension.begin(), extension.end(), lower_extension.begin(), ::tolower);
+
   std::map<std::string, io::file_factory_t >::iterator it = 
-    s_extension2codec.find(extension);
+    s_extension2codec.find(lower_extension);
 
   if (it == s_extension2codec.end()) {
     boost::format m("unregistered extension: %s");
-    m % extension;
+    m % lower_extension;
     throw std::runtime_error(m.str().c_str());
   }
 
