@@ -111,6 +111,14 @@ namespace bob {
           blitz::Array<uint16_t,2>& yt) const
         { process<double>( src, xy, xt, yt); }
 
+
+        /**
+          * @brief Accessors
+          */
+	boost::shared_ptr<bob::ip::LBP> getXY(){return m_lbp_xy;} //Get the XY plane
+	boost::shared_ptr<bob::ip::LBP> getXT(){return m_lbp_xt;} //Get the XT plane
+	boost::shared_ptr<bob::ip::LBP> getYT(){return m_lbp_yt;} //Get the YT plane
+
       private:
         /**
           * Processes a 3D array representing a set of <b>grayscale</b> images

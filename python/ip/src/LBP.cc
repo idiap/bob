@@ -192,6 +192,9 @@ void bind_ip_lbp_new() {
 
   class_<ip::LBPTop, boost::shared_ptr<ip::LBPTop> >("LBPTop",
  "Constructs a new LBPTop object starting from the algorithm configuration.", init<boost::shared_ptr<bob::ip::LBP>, boost::shared_ptr<bob::ip::LBP>, boost::shared_ptr<bob::ip::LBP> >((arg("lbp_xy"), arg("lbp_xt"), arg("lbp_yt")), "Constructs a new ipLBPTop"))
+    .add_property("xy", &ip::LBPTop::getXY)
+    .add_property("xt", &ip::LBPTop::getXT)
+    .add_property("yt", &ip::LBPTop::getYT)
     .def("__call__", &call_lbptop, (arg("self"),arg("input"), arg("xy"), arg("xt"), arg("yt")), "Processes a 3D array representing a set of <b>grayscale</b> images and returns (by argument) the three LBP planes calculated. The 3D array has to be arranged in this way:\n\n1st dimension => time\n2nd dimension => frame height\n3rd dimension => frame width\n\nThe central pixel is the point where the LBP planes interesect/have to be calculated from.")
     ;
 
