@@ -28,6 +28,20 @@ designed to be both efficient and reduce development time.
 
 Below is a brief summary of what you can do right now with |project|. To get started using |project|, please continue to the instructions for :doc:`Installation`.
 
+If you make use of |project| or any `Satellite Packages`_, we would appreciate
+if you referred to our publication:
+
+.. code-block:: latex
+
+  @inproceedings{bob2012,
+    author = {A. Anjos AND L. El Shafey AND R. Wallace AND M. G\"unther AND C. McCool AND S. Marcel},
+    title = {Bob: a free signal processing and machine learning toolbox for researchers},
+    year = {2012},
+    month = {october},
+    booktitle = {20th ACM Conference on Multimedia Systems (ACMMM), Nara, Japan},
+    publisher = {ACM Press},
+  }
+
 Mathematical and signal processing
 ----------------------------------
 
