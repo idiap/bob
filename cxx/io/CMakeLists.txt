@@ -47,11 +47,11 @@ set(src
     )
 
 # If we have matio installed, enable the compilation of relevant modules
-if(MATIO_FOUND)
-  set(shared "${shared};${matio_LIBRARY}")
+if(matio_FOUND)
+  set(shared "${shared};${matio_LIBRARIES}")
   set(src "${src};src/MatUtils.cc")
   set(src "${src};src/MatFile.cc")
-endif(MATIO_FOUND)
+endif(matio_FOUND)
 
 if(ImageMagick_FOUND)
   set(shared "${shared};${ImageMagick_LIBRARIES}")

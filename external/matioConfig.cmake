@@ -1,25 +1,20 @@
-# - Find matio library
-# Find the native matio includes and library
-# This module defines
-#  matio_INCLUDE_DIR, where to find tiff.h, etc.
-#  matio_LIBRARIES, libraries to link against to use Matio.
-#  MATIO_FOUND, If false, do not try to use Matio.
-# also defined, but not for general use are
-#  matio_LIBRARY, where to find the Matio library.
+# Tries to find a local version of matio installed
+# Andre Anjos - 9.july.2012
 
-find_path(matio_INCLUDE_DIR matio.h)
+include(FindPkgConfig)
+pkg_check_modules(matio matio)
 
-find_library(matio_LIBRARY NAMES matio)
+if(matio_FOUND)
+  add_definitions("-DHAVE_MATIO=1")
 
-# handle the QUIETLY and REQUIRED arguments and set MATIO_FOUND to TRUE if 
-# all listed variables are TRUE
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(matio DEFAULT_MSG matio_LIBRARY matio_INCLUDE_DIR)
+  include(CheckCSourceCompiles)
+  set(CMAKE_REQUIRED_INCLUDES ${matio_INCLUDE_DIR})
+  set(CMAKE_REQUIRED_LIBRARIES ${matio_LIBRARIES})
+  set(CMAKE_REQUIRED_FLAGS ${matio_LDFLAGS})
+  CHECK_C_SOURCE_COMPILES("#include <matio.h> 
+    int main() { struct ComplexSplit s; }" HAVE_MATIO_OLD_COMPLEXSPLIT)
+  set(CMAKE_REQUIRED_FLAGS)
+  set(CMAKE_REQUIRED_LIBRARIES)
+  set(CMAKE_REQUIRED_INCLUDES)
 
-if(MATIO_FOUND)
-  set(matio_LIBRARIES ${matio_LIBRARY})
-  CHECK_CXX_SOURCE_COMPILES("#include <matio.h> int main() { ComplexSplit s; }" HAVE_MATIO_OLD_COMPLEXSPLIT)
-  add_definitions("-D HAVE_MATIO=1")
-endif(MATIO_FOUND)
-
-mark_as_advanced(matio_INCLUDE_DIR matio_LIBRARY)
+endif()
