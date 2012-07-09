@@ -25,8 +25,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_IP_GEOM_NORM_H
-#define BOB5SPRO_IP_GROM_NORM_H
+#ifndef BOB_IP_GEOM_NORM_H
+#define BOB_IP_GROM_NORM_H
 
 #include <boost/shared_ptr.hpp>
 #include "core/array_assert.h"
@@ -37,8 +37,6 @@
 #include "ip/rotate.h"
 #include "ip/scale.h"
 #include "ip/crop.h"
-
-namespace tca = bob::core::array;
 
 namespace bob {
 /**
@@ -54,7 +52,8 @@ namespace bob {
      *   1/ rotated with a given angle and a rotation center
      *   2/ rescaled according to a given scaling factor
      *   3/ cropped with respect to the point given and the additional
-     *        cropping parameters.
+     *        cropping parameters (will be substracted to the provided 
+     *        reference point in the final coordinate system)
      */
     class GeomNorm
     {
@@ -148,11 +147,11 @@ namespace bob {
       const int crop_ref_y, const int crop_ref_x) 
     { 
       // Check input
-      tca::assertZeroBase(src);
+      bob::core::array::assertZeroBase(src);
 
       // Check output
-      tca::assertZeroBase(dst);
-      tca::assertSameShape(dst, m_out_shape);
+      bob::core::array::assertZeroBase(dst);
+      bob::core::array::assertSameShape(dst, m_out_shape);
 
       // Process
       blitz::Array<bool,2> src_mask, dst_mask;
@@ -167,15 +166,15 @@ namespace bob {
       const int crop_ref_y, const int crop_ref_x) 
     { 
       // Check input
-      tca::assertZeroBase(src);
-      tca::assertZeroBase(src_mask);
-      tca::assertSameShape(src,src_mask);
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(src_mask);
+      bob::core::array::assertSameShape(src,src_mask);
 
       // Check output
-      tca::assertZeroBase(dst);
-      tca::assertZeroBase(dst_mask);
-      tca::assertSameShape(dst, dst_mask);
-      tca::assertSameShape(dst, m_out_shape);
+      bob::core::array::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(dst_mask);
+      bob::core::array::assertSameShape(dst, dst_mask);
+      bob::core::array::assertSameShape(dst, m_out_shape);
 
       // Process
       processNoCheck<T,true>( src, src_mask, dst, dst_mask, rot_c_y, rot_c_x,
@@ -198,7 +197,7 @@ namespace bob {
         getGenerateWithCenterShape(src_d, rot_c_y, rot_c_x);
       blitz::TinyVector<int,2> offset = 
         getGenerateWithCenterOffset(src_d, rot_c_y, rot_c_x);
-      if( !tca::hasSameShape(m_centered, shape) ) {
+      if( !bob::core::array::hasSameShape(m_centered, shape) ) {
         m_centered.resize( shape );
         if(mask)
           m_mask_int1.resize(shape);
@@ -215,7 +214,7 @@ namespace bob {
 
       // 2/ Rotate to align the image with the x-axis
       shape = bob::ip::getRotatedShape(m_centered, m_rotation_angle);
-      if( !tca::hasSameShape(m_rotated, shape) ) {
+      if( !bob::core::array::hasSameShape(m_rotated, shape) ) {
         m_rotated.resize( shape );
         if(mask)
           m_mask_int2.resize(shape);
@@ -228,13 +227,13 @@ namespace bob {
       // new coordinate of the cropping reference point
       crop_ref_y1 = crop_ref_y1 - (m_centered.extent(0)-1)/2.;
       crop_ref_x1 = crop_ref_x1 - (m_centered.extent(1)-1)/2.;
-      double crop_ref_y2 = crop_ref_y1 * cos(m_rotation_angle) - crop_ref_x1 * sin(m_rotation_angle) + (m_rotated.extent(0)-1)/2.;
-      double crop_ref_x2 = crop_ref_x1 * cos(m_rotation_angle) + crop_ref_y1 * sin(m_rotation_angle) + (m_rotated.extent(1)-1)/2.;
+      double crop_ref_y2 = crop_ref_y1 * cos(m_rotation_angle*M_PI/180.) - crop_ref_x1 * sin(m_rotation_angle*M_PI/180.) + (m_rotated.extent(0)-1)/2.;
+      double crop_ref_x2 = crop_ref_x1 * cos(m_rotation_angle*M_PI/180.) + crop_ref_y1 * sin(m_rotation_angle*M_PI/180.) + (m_rotated.extent(1)-1)/2.;
 
       // 3/ Scale with the given scaling factor
       shape(0) = static_cast<int>(floor(m_rotated.extent(0) * m_scaling_factor + 0.5));
       shape(1) = static_cast<int>(floor(m_rotated.extent(1) * m_scaling_factor + 0.5));
-      if( !tca::hasSameShape(m_scaled, shape) ) {
+      if( !bob::core::array::hasSameShape(m_scaled, shape) ) {
         m_scaled.resize( shape );
         if(mask)
           m_mask_int3.resize(shape);
@@ -263,4 +262,4 @@ namespace bob {
  */
 }
 
-#endif /* BOB5SPRO_IP_GEOM_NORM_H */
+#endif /* BOB_IP_GEOM_NORM_H */

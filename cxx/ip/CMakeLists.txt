@@ -51,7 +51,7 @@ bob_test(ip gwt test/GaborWaveletTransform.cc)
 bob_test(ip gaussian test/Gaussian.cc)
 bob_test(ip median test/Median.cc)
 bob_test(ip gammaCorrection test/gammaCorrection.cc)
-#bob_test(ip geomnorm test/geomnorm.cc)
+bob_test(ip geomnorm test/geomnorm.cc)
 bob_test(ip facenorm test/facenorm.cc)
 bob_test(ip integral test/integral.cc)
 bob_test(ip lbp test/LBP.cc)
@@ -70,8 +70,8 @@ bob_test(ip zigzag test/zigzag.cc)
 # Defines environment variable used to localize data for the tests
 set_property(TEST cxx-ip-gwt APPEND PROPERTY ENVIRONMENT
   "BOB_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
-#set_property(TEST cxx-ip-geomnorm APPEND PROPERTY ENVIRONMENT
-#  "BOB_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+set_property(TEST cxx-ip-geomnorm APPEND PROPERTY ENVIRONMENT
+  "BOB_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 set_property(TEST cxx-ip-facenorm APPEND PROPERTY ENVIRONMENT
   "BOB_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 set_property(TEST cxx-ip-gaussian APPEND PROPERTY ENVIRONMENT
