@@ -53,6 +53,8 @@ namespace bob {
           const bool to_average=false, const bool add_average_bit=false, 
           const bool uniform=false, const bool rotation_invariant=false, const int eLBP_type=0);
 
+        LBP(const LBP& other);
+
         /**
           * @brief Destructor
           */
@@ -134,6 +136,12 @@ namespace bob {
         getLBPShape(const blitz::Array<double,2>& src) const = 0;
 
     	protected:
+
+		    /**
+          * @brief Initialize all the conversion tables 
+          */
+          void init_luts();
+
 		    /**
           * @brief Initialize the conversion table for rotation invariant and 
           *   uniform LBP patterns
@@ -144,10 +152,6 @@ namespace bob {
     		virtual void init_lut_add_average_bit()= 0;
     		virtual void init_lut_normal()= 0;
     		void init_lut_current();
-		    /**
-          * @brief Initialize all the conversion tables 
-          */
-        void init_luts();
 
 		    /**
           * @brief Compute the current integer value of the radius in case 

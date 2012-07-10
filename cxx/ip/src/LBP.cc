@@ -33,7 +33,28 @@ ip::LBP::LBP(const int P, const double R, const bool circular,
   m_lut_RI(0), m_lut_U2(0), m_lut_U2RI(0), m_lut_add_average_bit(0), 
   m_lut_normal(0), m_lut_current(0)
 {
-  updateR(); 
+  updateR();
+  init_luts(); 
+}
+
+ip::LBP::LBP(const ip::LBP& other):
+  m_P(other.m_P), 
+  m_R(other.m_R), 
+  m_circular(other.m_circular), 
+  m_to_average(other.m_to_average), 
+  m_add_average_bit(other.m_add_average_bit), 
+  m_uniform(other.m_uniform), 
+  m_rotation_invariant(other.m_rotation_invariant), 
+  m_eLBP_type(other.m_eLBP_type),
+  m_lut_RI(0), 
+  m_lut_U2(0),
+  m_lut_U2RI(0),
+  m_lut_add_average_bit(0), 
+  m_lut_normal(0), 
+  m_lut_current(0)
+{
+  updateR();
+  init_luts(); 
 }
 
 unsigned ip::LBP::right_shift_circular(unsigned x, int L, int N) 

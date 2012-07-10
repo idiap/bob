@@ -29,8 +29,6 @@ ip::LBP16R::LBP16R(const double R, const bool circular, const bool to_average,
     const bool rotation_invariant, const int eLBP_type): 
   LBP(16,R,circular,to_average,add_average_bit,uniform,rotation_invariant, eLBP_type)
 {
-  // Initialize the lookup tables
-  init_luts();
 }
 
 int ip::LBP16R::getMaxLabel() const

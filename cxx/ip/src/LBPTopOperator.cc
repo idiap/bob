@@ -28,13 +28,13 @@
 
 namespace ip = bob::ip;
 
-ip::LBPTop::LBPTop(boost::shared_ptr<bob::ip::LBP> lbp_xy, 
-			           boost::shared_ptr<bob::ip::LBP> lbp_xt, 
-			           boost::shared_ptr<bob::ip::LBP> lbp_yt)
+ip::LBPTop::LBPTop(const bob::ip::LBP& lbp_xy, 
+                   const bob::ip::LBP& lbp_xt, 
+	           const bob::ip::LBP& lbp_yt)
+: m_lbp_xy(new bob::ip::LBP(lbp_xy)),
+  m_lbp_xt(new bob::ip::LBP(lbp_xt)),
+  m_lbp_yt(new bob::ip::LBP(lbp_yt)),
 {
-  m_lbp_xy = lbp_xy;
-  m_lbp_xt = lbp_xt;
-  m_lbp_yt = lbp_yt;
 }
 
 

@@ -66,9 +66,9 @@ namespace bob {
 	@param m_lbp_xt The 2D LBP-XT plane configuration
 	@param m_lbp_yt The 2D LBP-YT plane configuration
 	*/
-	LBPTop(boost::shared_ptr<bob::ip::LBP> lbp_xy, 
-		       boost::shared_ptr<bob::ip::LBP> lbp_xt, 
-		       boost::shared_ptr<bob::ip::LBP> lbp_yt);
+	LBPTop(const bob::ip::LBP& lbp_xy, 
+		       const bob::ip::LBP& lbp_xt, 
+		       const bob::ip::LBP& lbp_yt);
         /**
          * Destructor
          */
@@ -115,9 +115,9 @@ namespace bob {
         /**
           * @brief Accessors
           */
-	boost::shared_ptr<bob::ip::LBP> getXY(){return m_lbp_xy;} //Get the XY plane
-	boost::shared_ptr<bob::ip::LBP> getXT(){return m_lbp_xt;} //Get the XT plane
-	boost::shared_ptr<bob::ip::LBP> getYT(){return m_lbp_yt;} //Get the YT plane
+	boost::shared_ptr<const bob::ip::LBP> getXY() const {return m_lbp_xy;} //Get the XY plane
+	boost::shared_ptr<const bob::ip::LBP> getXT() const {return m_lbp_xt;} //Get the XT plane
+	boost::shared_ptr<const bob::ip::LBP> getYT() const {return m_lbp_yt;} //Get the YT plane
 
       private:
 
