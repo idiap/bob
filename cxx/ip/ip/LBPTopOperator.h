@@ -143,55 +143,79 @@ namespace bob {
       blitz::Array<uint16_t,2>& yt) const
     {
 
-        int m_radius_xy = m_lbp_xy->getRadius(); ///< The LBPu2,i radius in XY
-        int m_radius_xt = m_lbp_xt->getRadius(); ///< The LBPu2,i radius in XT
-        int m_radius_yt = m_lbp_yt->getRadius(); ///< The LBPu2,i radius in YT
+      int m_radius_xy = m_lbp_xy->getRadius(); ///< The LBPu2,i radius in XY
+      int m_radius_xt = m_lbp_xt->getRadius(); ///< The LBPu2,i radius in XT
+      int m_radius_yt = m_lbp_yt->getRadius(); ///< The LBPu2,i radius in YT
 
-        int Tlength = src.extent(0);
-        int height = src.extent(1);
-        int width = src.extent(2);
-        int tc = Tlength/2;
-        int yc = height/2;
-        int xc = width/2;
+      int Tlength = src.extent(0);
+      int height = src.extent(1);
+      int width = src.extent(2);
+      int tc = Tlength/2;
+      int yc = height/2;
+      int xc = width/2;
 
-	int x=0,y=0,t=0;
+      int x=0,y=0,t=0;
 
-      // XY plane calculation
+
+      /**** Get XY plane ****/
       const blitz::Array<T,2> kxy = 
         src( tc, blitz::Range::all(), blitz::Range::all());
       
-      /*Checking XY. Just touching the method in order to stress theirs exceptions*/
+      /*Checking the LBP conditions for XY. Just touching the method in order to stress theirs exceptions*/
       y=m_radius_xy; x=y;
       m_lbp_xy->operator()(kxy, y, x);
 
+
+      /**** Get XT plane ****/
+      const blitz::Array<T,2> kxt = 
+        src( blitz::Range::all(), yc, blitz::Range::all());
+
+      /*Checking the LBP conditions for XT. Just touching the method in order to stress theirs exceptions*/
+      t=m_radius_xt; x = t;
+      m_lbp_xt->operator()(kxt, t, x);
+
+
+      /**** Get YT plane ****/
+      const blitz::Array<T,2> kyt = 
+        src( blitz::Range::all(), blitz::Range::all(), xc);
+
+      /*Checking the LBP conditions for YT. Just touching the method in order to stress theirs exceptions*/
+      t=m_radius_yt; y = t;
+      m_lbp_yt->operator()(kyt, t, y);
+
+
+
+      /*Checking the size output arrays*/
+      /*Checking XY*/
+      x = width-m_radius_xy;
+      y = height-m_radius_xy;
+
+      
+
+      if(x!=xy.extent(0))
+        printf("Exception 1 ");
+      if(y!=xy.extent(1))
+        printf("Exception 2 ");
+
+//printf("%d,%d \n",xt.extent(0),xt.extent(1));
+
+
+
+      /*Calculating the XY plane*/
       for (int y=m_radius_xy; y < (height-m_radius_xy); ++y) {
         for (int x=m_radius_xy; x < (width-m_radius_xy); ++x) {
            xy(y-m_radius_xy,x-m_radius_xy) = m_lbp_xy->operator()(kxy, y, x);
         }
       }
 
-      // XT plane calculation
-      const blitz::Array<T,2> kxt = 
-        src( blitz::Range::all(), yc, blitz::Range::all());
-
-      /*Checking XT. Just touching the method in order to stress theirs exceptions*/
-      t=m_radius_xt; x = t;
-      m_lbp_xt->operator()(kxt, t, x);
-
+      /*Calculation of the XT plane*/
       for (int t = m_radius_xt; t < (Tlength-m_radius_xt); ++t) {
         for (int x=m_radius_xt; x < (width-m_radius_xt); ++x) {
           xt(t-m_radius_xt,x-m_radius_xt) = m_lbp_xt->operator()(kxt, t, x);
         }
       }
 
-      // YT plane calculation
-      const blitz::Array<T,2> kyt = 
-        src( blitz::Range::all(), blitz::Range::all(), xc);
-
-      /*Checking YT. Just touching the method in order to stress theirs exceptions*/
-      t=m_radius_yt; y = t;
-      m_lbp_yt->operator()(kyt, t, y);
-
+      /*Calculation of the YT plane*/
       for (int t = m_radius_yt; t < (Tlength-m_radius_yt); ++t) {
         for (int y = m_radius_yt; y < (height-m_radius_yt); ++y) {
           yt(t-m_radius_yt,y-m_radius_yt) = m_lbp_yt->operator()(kyt, t, y);
