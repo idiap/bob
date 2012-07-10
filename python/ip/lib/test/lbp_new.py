@@ -221,9 +221,18 @@ class ProcessorLBPTop:
     self.operator = operator
     self.generator = generator
     
-    self.XY = numpy.empty(shape=(1,1),dtype='uint16')
-    self.XT = numpy.empty(shape=(1,1),dtype='uint16')
-    self.YT = numpy.empty(shape=(1,1),dtype='uint16')
+    xy_width  = img_size-(operator.xy.radius*2) #Square image
+    xy_height = xy_width
+
+    xt_width = img_size-(operator.xt.radius*2)
+    xt_height = n_frames-(operator.xt.radius*2)
+
+    yt_width  = img_size-(operator.yt.radius*2)
+    yt_height = n_frames-(operator.yt.radius*2)
+
+    self.XY = numpy.empty(shape=(xy_width,xy_height),dtype='uint16')
+    self.XT = numpy.empty(shape=(xt_width,xt_height),dtype='uint16')
+    self.YT = numpy.empty(shape=(yt_width,yt_height),dtype='uint16')
 
     self.image = numpy.ndarray((n_frames,img_size, img_size), 'uint8')
 

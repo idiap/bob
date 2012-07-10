@@ -143,9 +143,9 @@ namespace bob {
       blitz::Array<uint16_t,2>& yt) const
     {
 
-      int m_radius_xy = m_lbp_xy->getRadius(); ///< The LBPu2,i radius in XY
-      int m_radius_xt = m_lbp_xt->getRadius(); ///< The LBPu2,i radius in XT
-      int m_radius_yt = m_lbp_yt->getRadius(); ///< The LBPu2,i radius in YT
+      int radius_xy = m_lbp_xy->getRadius(); ///< The LBPu2,i radius in XY
+      int radius_xt = m_lbp_xt->getRadius(); ///< The LBPu2,i radius in XT
+      int radius_yt = m_lbp_yt->getRadius(); ///< The LBPu2,i radius in YT
 
       int Tlength = src.extent(0);
       int height = src.extent(1);
@@ -155,6 +155,7 @@ namespace bob {
       int xc = width/2;
 
       int x=0,y=0,t=0;
+      int correctX,correctY,correctT;
 
 
       /**** Get XY plane ****/
@@ -162,7 +163,7 @@ namespace bob {
         src( tc, blitz::Range::all(), blitz::Range::all());
       
       /*Checking the LBP conditions for XY. Just touching the method in order to stress theirs exceptions*/
-      y=m_radius_xy; x=y;
+      y=radius_xy; x=y;
       m_lbp_xy->operator()(kxy, y, x);
 
 
@@ -171,7 +172,7 @@ namespace bob {
         src( blitz::Range::all(), yc, blitz::Range::all());
 
       /*Checking the LBP conditions for XT. Just touching the method in order to stress theirs exceptions*/
-      t=m_radius_xt; x = t;
+      t=radius_xt; x = t;
       m_lbp_xt->operator()(kxt, t, x);
 
 
@@ -180,49 +181,87 @@ namespace bob {
         src( blitz::Range::all(), blitz::Range::all(), xc);
 
       /*Checking the LBP conditions for YT. Just touching the method in order to stress theirs exceptions*/
-      t=m_radius_yt; y = t;
+      t=radius_yt; y = t;
       m_lbp_yt->operator()(kyt, t, y);
 
 
 
-      /*Checking the size output arrays*/
+      /**** Checking the size output arrays ****/
       /*Checking XY*/
-      x = width-m_radius_xy;
-      y = height-m_radius_xy;
+      correctX = width-(radius_xy*2);
+      correctY = height-(radius_xy*2);
+      x = xy.extent(0);
+      y = xy.extent(1);
 
-      
+      if(x > correctX)
+        throw ParamOutOfBoundaryError("XY_Plane(x,y) x dimension",true,x,correctX);
+      else if(x < correctX)
+        throw ParamOutOfBoundaryError("XY_Plane(x,y) x dimension",false,x,correctX);
 
-      if(x!=xy.extent(0))
-        printf("Exception 1 ");
-      if(y!=xy.extent(1))
-        printf("Exception 2 ");
+      if(y > correctY)
+        throw ParamOutOfBoundaryError("XY_Plane(x,y) y dimension",true,y,correctY);
+      else if(x < correctX)
+        throw ParamOutOfBoundaryError("XY_Plane(x,y) y dimension",false,y,correctY);
 
-//printf("%d,%d \n",xt.extent(0),xt.extent(1));
+
+      /*Checking XT*/
+      correctT = Tlength-(radius_xt*2);
+      correctX = width-(radius_xt*2);
+      t = xt.extent(0);
+      x = xt.extent(1);
+
+      if(t > correctT)
+        throw ParamOutOfBoundaryError("XT_Plane(t,x) t dimension",true,t,correctT);
+      else if(t < correctT)
+        throw ParamOutOfBoundaryError("XT_Plane(t,x) t dimension",false,t,correctT);
+
+      if(x > correctX)
+        throw ParamOutOfBoundaryError("XT_Plane(t,x) x dimension",true,x,correctX);
+      else if(x < correctX)
+        throw ParamOutOfBoundaryError("XT_Plane(t,x) x dimension",false,x,correctX);
+
+
+      /*Checking YT*/
+      correctY = height-(radius_yt*2);
+      correctT = Tlength-(radius_yt*2);
+      t = yt.extent(0);
+      y = yt.extent(1);
+
+      if(t > correctT)
+        throw ParamOutOfBoundaryError("YT_Plane(t,y) t dimension",true,t,correctT);
+      else if(t < correctT)
+        throw ParamOutOfBoundaryError("YT_Plane(t,y) t dimension",false,t,correctT);
+
+      if(y > correctY)
+        throw ParamOutOfBoundaryError("YT_Plane(t,y) y dimension",true,y,correctY);
+      else if(y < correctY)
+        throw ParamOutOfBoundaryError("YT_Plane(t,y) y dimension",false,y,correctY);
+
 
 
 
       /*Calculating the XY plane*/
-      for (int y=m_radius_xy; y < (height-m_radius_xy); ++y) {
-        for (int x=m_radius_xy; x < (width-m_radius_xy); ++x) {
-           xy(y-m_radius_xy,x-m_radius_xy) = m_lbp_xy->operator()(kxy, y, x);
+      for (int y=radius_xy; y < (height-radius_xy); ++y) {
+        for (int x=radius_xy; x < (width-radius_xy); ++x) {
+           xy(y-radius_xy,x-radius_xy) = m_lbp_xy->operator()(kxy, y, x);
         }
       }
 
       /*Calculation of the XT plane*/
-      for (int t = m_radius_xt; t < (Tlength-m_radius_xt); ++t) {
-        for (int x=m_radius_xt; x < (width-m_radius_xt); ++x) {
-          xt(t-m_radius_xt,x-m_radius_xt) = m_lbp_xt->operator()(kxt, t, x);
+      for (int t = radius_xt; t < (Tlength-radius_xt); ++t) {
+        for (int x=radius_xt; x < (width-radius_xt); ++x) {
+          xt(t-radius_xt,x-radius_xt) = m_lbp_xt->operator()(kxt, t, x);
         }
       }
 
       /*Calculation of the YT plane*/
-      for (int t = m_radius_yt; t < (Tlength-m_radius_yt); ++t) {
-        for (int y = m_radius_yt; y < (height-m_radius_yt); ++y) {
-          yt(t-m_radius_yt,y-m_radius_yt) = m_lbp_yt->operator()(kyt, t, y);
+      for (int t = radius_yt; t < (Tlength-radius_yt); ++t) {
+        for (int y = radius_yt; y < (height-radius_yt); ++y) {
+          yt(t-radius_yt,y-radius_yt) = m_lbp_yt->operator()(kyt, t, y);
         }
       }
-    }
 
+    }
   }
 }
 
