@@ -308,6 +308,13 @@ namespace bob {
      */
     std::string tmpdir();
 
+    /**
+     * Returns the full path of a temporary file in tmpdir().
+     *
+     * @param extension The desired extension for the file
+     */
+    std::string tmpfile(const std::string& extension=".hdf5");
+
   }
 
 }

@@ -54,24 +54,6 @@ struct T {
 };
 
 
-/**
- * @brief Generates a unique temporary filename, and returns the file
- * descriptor
- */
-std::string temp_file(const std::string& ext) {
-  boost::filesystem::path tpl = bob::core::tmpdir();
-  std::string filename("bobtest_core_binformatXXXXXX");
-  filename.append(ext);
-  tpl /= filename;
-  boost::shared_array<char> char_tpl(new char[tpl.file_string().size()+1]);
-  strcpy(char_tpl.get(), tpl.file_string().c_str());
-  int fd = mkstemps(char_tpl.get(), ext.size());
-  close(fd);
-  boost::filesystem::remove(char_tpl.get());
-  std::string res = char_tpl.get();
-  return res;
-}
-
 template<typename T, typename U> 
 void check_equal(const blitz::Array<T,2>& a, const blitz::Array<U,2>& b) 
 {
@@ -115,7 +97,7 @@ BOOST_AUTO_TEST_CASE( image_gif )
   check_equal( db_b.get<uint8_t,3>(), b );
 
   // Save to gif image
-  std::string filename = temp_file(".gif");
+  std::string filename = bob::core::tmpfile(".gif");
   db_b.save( filename);
 
   // Load from gif image
@@ -141,7 +123,7 @@ BOOST_AUTO_TEST_CASE( image_bmp )
   check_equal( db_b.get<uint8_t,3>(), b );
 
   // Save to bmp image
-  std::string filename = temp_file(".bmp");
+  std::string filename = bob::core::tmpfile(".bmp");
   db_b.save( filename);
 
   // Load from bmp image
@@ -168,7 +150,7 @@ BOOST_AUTO_TEST_CASE( image_jpg )
   check_equal( db_b.get<uint8_t,3>(), b );
 
   // Save to jpg image
-  std::string filename = temp_file(".jpg");
+  std::string filename = bob::core::tmpfile(".jpg");
   db_b.save( filename);
 
   // Load from jpg image
@@ -195,7 +177,7 @@ BOOST_AUTO_TEST_CASE( image_pbm )
   check_equal( db_a.get<uint8_t,2>(), a );
 
   // Save to pbm image
-  std::string filename = temp_file(".pbm");
+  std::string filename = bob::core::tmpfile(".pbm");
   db_a.save( filename);
 
   // Load from pbm image
@@ -220,7 +202,7 @@ BOOST_AUTO_TEST_CASE( image_pgm )
   check_equal( db_a.get<uint8_t,2>(), a );
 
   // Save to pgm image
-  std::string filename = temp_file(".pgm");
+  std::string filename = bob::core::tmpfile(".pgm");
   db_a.save( filename);
 
   // Load from pgm image
@@ -245,7 +227,7 @@ BOOST_AUTO_TEST_CASE( image_png )
   check_equal( db_b.get<uint8_t,3>(), b );
 
   // Save to png image
-  std::string filename = temp_file(".png");
+  std::string filename = bob::core::tmpfile(".png");
   db_b.save( filename);
 
   // Load from png image
@@ -271,7 +253,7 @@ BOOST_AUTO_TEST_CASE( image_ppm )
   check_equal( db_b.get<uint8_t,3>(), b );
 
   // Save to ppm image
-  std::string filename = temp_file(".ppm");
+  std::string filename = bob::core::tmpfile(".ppm");
   db_b.save( filename);
 
   // Load from ppm image
@@ -297,7 +279,7 @@ BOOST_AUTO_TEST_CASE( image_tiff )
   check_equal( db_b.get<uint8_t,3>(), b );
 
   // Save to tiff image
-  std::string filename = temp_file(".tiff");
+  std::string filename = bob::core::tmpfile(".tiff");
   db_b.save( filename);
 
   // Load from tiff image
@@ -324,7 +306,7 @@ BOOST_AUTO_TEST_CASE( image_xcf )
   check_equal( db_b.get<uint8_t,3>(), b );
 
   // Save to xcf image
-  std::string filename = temp_file(".xcf");
+  std::string filename = bob::core::tmpfile(".xcf");
   db_b.save( filename);
 
   // Load from xcf image

@@ -73,22 +73,6 @@ struct T {
 };
 
 
-/**
- * @brief Generates a unique temporary filename, and returns the file
- * descriptor
- */
-std::string temp_file() {
-  boost::filesystem::path tpl = bob::core::tmpdir();
-  tpl /= "bobtest_core_binformatXXXXXX.hdf5";
-  boost::shared_array<char> char_tpl(new char[tpl.file_string().size()+1]);
-  strcpy(char_tpl.get(), tpl.file_string().c_str());
-  int fd = mkstemps(char_tpl.get(),5);
-  close(fd);
-  boost::filesystem::remove(char_tpl.get());
-  std::string res = char_tpl.get();
-  return res;
-}
-
 const char* CODEC_NAME = "bob.hdf5";
 
 template<typename T, typename U> 
@@ -218,7 +202,7 @@ BOOST_AUTO_TEST_CASE( dbArray_creation_binaryfile )
   BOOST_REQUIRE_NO_THROW(bob::io::Array db_a(a));
   bob::io::Array db_a(a);
 
-  std::string tmp_file = temp_file();
+  std::string tmp_file = bob::core::tmpfile();
   BOOST_REQUIRE_NO_THROW(db_a.save( tmp_file));
 
   // Create a io Array from a binary file and check its properties
@@ -259,7 +243,7 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_getload )
     BOOST_CHECK_EQUAL(db_a.getShape()[i], a.extent(i));
   
   // Save it to a binary file
-  std::string tmp_file = temp_file();
+  std::string tmp_file = bob::core::tmpfile();
   BOOST_REQUIRE_NO_THROW(db_a.save( tmp_file));
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
   BOOST_CHECK_EQUAL(db_a.getElementType(), bob::core::array::t_float64);
@@ -313,7 +297,7 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_move )
     BOOST_CHECK_EQUAL(db_a.getShape()[i], a.extent(i));
   
   // Save it to a binary file
-  std::string tmp_file = temp_file();
+  std::string tmp_file = bob::core::tmpfile();
   BOOST_REQUIRE_NO_THROW(db_a.save( tmp_file));
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
   BOOST_CHECK_EQUAL(db_a.getElementType(), bob::core::array::t_float64);
@@ -326,7 +310,7 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_move )
   check_equal( a, db_a.get<double,1>());
 
   // Move it to another binary file
-  std::string tmp_file2 = temp_file();
+  std::string tmp_file2 = bob::core::tmpfile();
   BOOST_REQUIRE_NO_THROW(db_a.save( tmp_file2));
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
   BOOST_CHECK_EQUAL(db_a.getElementType(), bob::core::array::t_float64);
@@ -368,7 +352,7 @@ BOOST_AUTO_TEST_CASE( dbArray_cast_external )
   BOOST_REQUIRE_NO_THROW(bob::io::Array db_a(a));
   bob::io::Array db_a(a);
   // Save it to a binary file
-  std::string tmp_file_a = temp_file();
+  std::string tmp_file_a = bob::core::tmpfile();
   BOOST_REQUIRE_NO_THROW(db_a.save( tmp_file_a));
 
   // Call the cast function and check that properties remain unchanged
@@ -380,7 +364,7 @@ BOOST_AUTO_TEST_CASE( dbArray_cast_external )
   BOOST_REQUIRE_NO_THROW(bob::io::Array db_g(g));
   bob::io::Array db_g(g);
   // Save it to a binary file
-  std::string tmp_file_g = temp_file();
+  std::string tmp_file_g = bob::core::tmpfile();
   BOOST_REQUIRE_NO_THROW(db_a.save( tmp_file_g));
 
   // Call the get function and check that properties remain unchanged
@@ -481,7 +465,7 @@ BOOST_AUTO_TEST_CASE( dbArray_copy_constructor_external )
   // Create a io Array from a blitz::array
   BOOST_REQUIRE_NO_THROW(bob::io::Array db_a(a));
   bob::io::Array db_a(a);
-  std::string tmp_file = temp_file();
+  std::string tmp_file = bob::core::tmpfile();
   BOOST_REQUIRE_NO_THROW(db_a.save( tmp_file));
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
   BOOST_CHECK_EQUAL(db_a.getElementType(), bob::core::array::t_float64);

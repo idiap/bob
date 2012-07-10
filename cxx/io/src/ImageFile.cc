@@ -41,7 +41,7 @@ static void im_peek(const std::string& path, ca::typeinfo& info) {
 
   Magick::Image image;
   image.ping(path.c_str());
-  std::string ext = boost::filesystem::extension(path);
+  std::string ext = boost::filesystem::path(path).extension().c_str();
   boost::algorithm::to_lower(ext);
 
   if( (!image.magick().compare("PBM") || 
