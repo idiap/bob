@@ -9,10 +9,12 @@ if(matio_FOUND)
 
   include(CheckCSourceCompiles)
   set(CMAKE_REQUIRED_INCLUDES "${matio_INCLUDEDIR}")
-  set(CMAKE_REQUIRED_LIBRARIES ${matio_LIBRARIES})
+  set(CMAKE_REQUIRED_FLAGS "-L${matio_LIBDIR}")
+  set(CMAKE_REQUIRED_LIBRARIES "${matio_LIBRARIES}")
   CHECK_C_SOURCE_COMPILES("#include <matio.h> 
     int main() { struct ComplexSplit s; }" HAVE_MATIO_OLD_COMPLEXSPLIT)
   set(CMAKE_REQUIRED_LIBRARIES)
+  set(CMAKE_REQUIRED_FLAGS)
   set(CMAKE_REQUIRED_INCLUDES)
 
   if(HAVE_MATIO_OLD_COMPLEXSPLIT)
