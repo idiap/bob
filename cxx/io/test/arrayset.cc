@@ -68,23 +68,6 @@ struct T {
 
 
 /**
- * @brief Generates a unique temporary filename, and returns the file
- * descriptor
- */
-std::string temp_file() {
-  boost::filesystem::path tpl = bob::core::tmpdir();
-  tpl /= "bobtest_core_binformatXXXXXX.hdf5";
-  boost::shared_array<char> char_tpl(new char[tpl.file_string().size()+1]);
-  strcpy(char_tpl.get(), tpl.file_string().c_str());
-  int fd = mkstemps(char_tpl.get(),5);
-  close(fd);
-  boost::filesystem::remove(char_tpl.get());
-  std::string res = char_tpl.get();
-  return res;
-//  return char_tpl.get();
-}
-
-/**
  * Use this static variable to count the check_equal() calls so you can know
  * which of the tests failed. Uncomment the first line in each check_equal()
  * implementation to printout the compared arrays and an instance number.
@@ -252,7 +235,7 @@ BOOST_AUTO_TEST_CASE( dbArrayset_loadsave_inline )
   BOOST_CHECK_EQUAL(db_Ar.getShape()[0], 4);
 
   // Save the Arrayset to a file
-  std::string tmp_file = temp_file();
+  std::string tmp_file = bob::core::tmpfile();
   BOOST_REQUIRE_NO_THROW(db_Ar.save( tmp_file ));
   // Check that adding a blitz arrays with different dimensions will raise
   // an exception
@@ -393,7 +376,7 @@ BOOST_AUTO_TEST_CASE( dbArrayset_remove_external )
   check_equal( c, db_Ar[2].get<double,1>() );
 
   // Save the Arrayset to a file
-  std::string tmp_file = temp_file();
+  std::string tmp_file = bob::core::tmpfile();
   BOOST_REQUIRE_NO_THROW(db_Ar.save( tmp_file ));
   // Check data
   BOOST_CHECK_EQUAL(db_Ar.size(), 3); 

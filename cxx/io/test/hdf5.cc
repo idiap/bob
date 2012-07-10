@@ -52,22 +52,6 @@ struct T {
 };
 
 
-/**
- * @brief Generates a unique temporary filename, and returns the file
- * descriptor
- */
-std::string temp_file() {
-  boost::filesystem::path tpl = bob::core::tmpdir();
-  tpl /= "bobtest_core_hdf5XXXXXX.hdf5";
-  boost::shared_array<char> char_tpl(new char[tpl.file_string().size()+1]);
-  strcpy(char_tpl.get(), tpl.file_string().c_str());
-  int fd = mkstemps(char_tpl.get(),5);
-  close(fd);
-  boost::filesystem::remove(char_tpl.get());
-  std::string res = char_tpl.get();
-  return res;
-}
-
 template<typename T, typename U> 
 void check_equal(const blitz::Array<T,1>& a, const blitz::Array<U,1>& b) 
 {
@@ -112,7 +96,7 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 BOOST_AUTO_TEST_CASE( hdf5_1d_save_read )
 {
   // Put a 1D array in a HDF5File
-  const std::string filename = temp_file();
+  const std::string filename = bob::core::tmpfile();
   bob::io::HDF5File::mode_t flag = bob::io::HDF5File::inout;
   bob::io::HDF5File config(filename, flag);
   config.setArray("c", c);
@@ -129,7 +113,7 @@ BOOST_AUTO_TEST_CASE( hdf5_1d_save_read )
 BOOST_AUTO_TEST_CASE( hdf5_2d_save_read )
 {
   // Put a 2D array in a HDF5File
-  const std::string filename = temp_file();
+  const std::string filename = bob::core::tmpfile();
   bob::io::HDF5File::mode_t flag = bob::io::HDF5File::inout;
   bob::io::HDF5File config(filename, flag);
   blitz::Array<double,2> at = a.transpose(1,0);
@@ -146,7 +130,7 @@ BOOST_AUTO_TEST_CASE( hdf5_2d_save_read )
 
 BOOST_AUTO_TEST_CASE( hdf5_write_on_readonly )
 {
-  const std::string filename = temp_file();
+  const std::string filename = bob::core::tmpfile();
   boost::shared_ptr<bob::io::HDF5File> config = 
     boost::make_shared<bob::io::HDF5File>(filename, bob::io::HDF5File::trunc);
   config->set("integer", 3);
