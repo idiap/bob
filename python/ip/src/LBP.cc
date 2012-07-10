@@ -191,7 +191,7 @@ void bind_ip_lbp_new() {
     ;
 
   class_<ip::LBPTop, boost::shared_ptr<ip::LBPTop> >("LBPTop",
- "Constructs a new LBPTop object starting from the algorithm configuration.", init<boost::shared_ptr<bob::ip::LBP>, boost::shared_ptr<bob::ip::LBP>, boost::shared_ptr<bob::ip::LBP> >((arg("lbp_xy"), arg("lbp_xt"), arg("lbp_yt")), "Constructs a new ipLBPTop"))
+ "Constructs a new LBPTop object starting from the algorithm configuration.", init<boost::shared_ptr<bob::ip::LBP>, boost::shared_ptr<bob::ip::LBP>, boost::shared_ptr<bob::ip::LBP> >((arg("xy"), arg("xt"), arg("yt")), "Constructs a new ipLBPTop"))
     .add_property("xy", &ip::LBPTop::getXY)
     .add_property("xt", &ip::LBPTop::getXT)
     .add_property("yt", &ip::LBPTop::getYT)

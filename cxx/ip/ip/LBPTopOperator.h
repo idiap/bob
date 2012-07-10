@@ -155,7 +155,7 @@ namespace bob {
       int xc = width/2;
 
       int x=0,y=0,t=0;
-      int correctX,correctY,correctT;
+      int correctX=0,correctY=0,correctT=0;
 
 
       /**** Get XY plane ****/
