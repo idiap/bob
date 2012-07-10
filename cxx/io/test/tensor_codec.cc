@@ -49,26 +49,6 @@ struct T {
 
 };
 
-/**
- * @brief Generates a unique temporary filename, closes the file and return
- * its name. 
- *
- * Yes, I know this is not 100% secure...
- */
-std::string temp_file(const std::string& ext) {
-  boost::filesystem::path tpl = bob::core::tmpdir();
-  std::string filename("bobtest_core_tensorformatXXXXXX");
-  filename.append(ext);
-  tpl /= filename;
-  boost::shared_array<char> char_tpl(new char[tpl.file_string().size()+1]);
-  strcpy(char_tpl.get(), tpl.file_string().c_str());
-  int fd = mkstemps(char_tpl.get(), ext.size());
-  close(fd);
-  boost::filesystem::remove(char_tpl.get());
-  std::string res = char_tpl.get();
-  return res;
-}
-
 template<typename T, typename U> 
 void check_equal(const blitz::Array<T,2>& a, const blitz::Array<U,2>& b) 
 {
@@ -97,7 +77,7 @@ BOOST_AUTO_TEST_CASE( tensor_2d )
   check_equal( db_a.get<int8_t,2>(), a );
 
   // Save to .tensor
-  std::string filename = temp_file(".tensor");
+  std::string filename = bob::core::tmpfile(".tensor");
   db_a.save(filename);
 
   // Readd .tensor

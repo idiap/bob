@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE( test_basic )
  */
 std::string get_contents(const std::string& fname) {
   std::string cmd;
-  if (boost::filesystem::extension(fname) == ".gz") cmd = "zcat ";
+  if (boost::filesystem::path(fname).extension() == ".gz") cmd = "zcat ";
   else cmd = "cat ";
   cmd += fname;
   FILE* pipe = popen(cmd.c_str(), "r");

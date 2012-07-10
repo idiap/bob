@@ -97,8 +97,7 @@ io::file_factory_t io::CodecRegistry::findByExtension
 io::file_factory_t io::CodecRegistry::findByFilenameExtension
 (const std::string& filename) {
 
-  boost::filesystem::path path(filename);
-  return findByExtension(path.extension());
+  return findByExtension(boost::filesystem::path(filename).extension().c_str());
 
 }
 

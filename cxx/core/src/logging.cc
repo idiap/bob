@@ -28,6 +28,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
+#include <boost/shared_array.hpp>
 
 /**
  * MT "lock" support was only introduced in Boost 1.35. Before copying this
@@ -94,7 +95,7 @@ struct StdinInputDevice: public bob::core::InputDevice {
  * @param filename The name of the file to be analyzed.
  */
 inline static bool is_dot_gz(const std::string& filename) {
-  return boost::filesystem::extension(filename) == ".gz";
+  return boost::filesystem::path(filename).extension() == ".gz";
 }
 
 struct FileOutputDevice: public bob::core::OutputDevice {
@@ -269,4 +270,16 @@ std::string bob::core::tmpdir() {
   const char* value = getenv("TMPDIR");
   if (value) return value;
   else return "/tmp";
+}
+
+std::string bob::core::tmpfile(const std::string& extension) {
+  boost::filesystem::path tpl = bob::core::tmpdir();
+  tpl /= std::string("bobtest_core_binformatXXXXXX") + extension;
+  boost::shared_array<char> char_tpl(new char[tpl.string().size()+1]);
+  strcpy(char_tpl.get(), tpl.string().c_str());
+  int fd = mkstemps(char_tpl.get(), extension.size());
+  close(fd);
+  boost::filesystem::remove(char_tpl.get());
+  std::string res = char_tpl.get();
+  return res;
 }
