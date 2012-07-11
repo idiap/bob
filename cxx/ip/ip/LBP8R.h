@@ -3,7 +3,7 @@
  * @date Wed Apr 20 21:44:36 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * @brief This file defines a function to compute the LBP8R.
+ * This file defines a function to compute the LBP8R.
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_IP_LBP8R_H
-#define BOB5SPRO_IP_LBP8R_H
+#ifndef BOB_IP_LBP8R_H
+#define BOB_IP_LBP8R_H
 
 #include <blitz/array.h>
 #include <algorithm>
@@ -32,120 +32,131 @@
 #include "ip/LBP.h"
 #include "sp/interpolate.h"
 
-namespace bob {
-/**
- * \ingroup libip_api
- * @{
- *
- */
-  namespace ip {
+namespace bob { namespace ip {
 
-    /**
-      * @brief This class allows to extract Local Binary Pattern-like features
-      *   based on 8 neighbour pixels.
-      *   For more information, please refer to the following article:
-      *     "Face Recognition with Local Binary Patterns", from T. Ahonen,
-      *     A. Hadid and M. Pietikainen
-      *     in the proceedings of the European Conference on Computer Vision
-      *     (ECCV'2004), p. 469-481
-      */
-    class LBP8R: public LBP
-    {
-      public:
-        /**
-          * @brief Constructor
-          */
-        LBP8R(const double R=1., const bool circular=false, 
-            const bool to_average=false, const bool add_average_bit=false, 
-            const bool uniform=false, const bool rotation_invariant=false, const int eLBP_type=0);
+  /**
+   * This class allows to extract Local Binary Pattern-like features based on 8
+   * neighbour pixels.  For more information, please refer to the following
+   * article: "Face Recognition with Local Binary Patterns", from T. Ahonen, A.
+   * Hadid and M. Pietikainen in the proceedings of the European Conference on
+   * Computer Vision (ECCV'2004), p. 469-481
+   */
+  class LBP8R: public LBP {
 
-        /**
-          * @brief Destructor
-          */
-        virtual ~LBP8R() { }
+    public: //api
 
-		    /**
-          * @brief Return the maximum number of labels for the current LBP 
-          *   variant
-          */
-  		  virtual int getMaxLabel() const;
+      /**
+       * Complete constructor
+       */
+      LBP8R(const double R=1., 
+            const bool circular=false, 
+            const bool to_average=false,
+            const bool add_average_bit=false, 
+            const bool uniform=false,
+            const bool rotation_invariant=false,
+            const int eLBP_type=0);
 
-        /**
-          * @brief Extract LBP features from a 2D blitz::Array, and save 
-          *   the resulting LBP codes in the dst 2D blitz::Array.
-          */
-        template <typename T> 
+      /**
+       * Copy constructor
+       */
+      LBP8R(const LBP8R& other);
+
+      /**
+       * Destructor
+       */
+      virtual ~LBP8R();
+
+      /**
+       * Assignment operator
+       */
+      LBP8R& operator= (const LBP8R& other);
+
+      /**
+       * Clone self into a boost::shared_ptr<LBP>
+       */
+      virtual boost::shared_ptr<LBP> clone() const;
+
+      /**
+       * Return the maximum number of labels for the current LBP variant
+       */
+      virtual int getMaxLabel() const;
+
+      /**
+       * Extract LBP features from a 2D blitz::Array, and save 
+       *   the resulting LBP codes in the dst 2D blitz::Array.
+       */
+      template <typename T> 
         void operator()(const blitz::Array<T,2>& src, 
-          blitz::Array<uint16_t,2>& dst) const;
-        void 
+            blitz::Array<uint16_t,2>& dst) const;
+      void 
         operator()(const blitz::Array<uint8_t,2>& src, 
             blitz::Array<uint16_t,2>& dst) const 
-          { operator()<uint8_t>(src, dst); }
-        void 
+        { operator()<uint8_t>(src, dst); }
+      void 
         operator()(const blitz::Array<uint16_t,2>& src, 
             blitz::Array<uint16_t,2>& dst) const 
-          { operator()<uint16_t>(src, dst); }
-        void 
+        { operator()<uint16_t>(src, dst); }
+      void 
         operator()(const blitz::Array<double,2>& src, 
             blitz::Array<uint16_t,2>& dst) const 
-          { operator()<double>(src, dst); }
+        { operator()<double>(src, dst); }
 
-        /**
-          * @brief Extract the LBP code of a 2D blitz::Array at the given 
-          *   location, and return it.
-          */
-        template <typename T> 
+      /**
+       * Extract the LBP code of a 2D blitz::Array at the given 
+       *   location, and return it.
+       */
+      template <typename T> 
         uint16_t operator()(const blitz::Array<T,2>& src, int y, int x) const;
-        uint16_t 
+      uint16_t 
         operator()(const blitz::Array<uint8_t,2>& src, int y, int x) const 
-          { return operator()<uint8_t>( src, y, x); }
-        uint16_t 
+        { return operator()<uint8_t>( src, y, x); }
+      uint16_t 
         operator()(const blitz::Array<uint16_t,2>& src, int y, int x) const 
-          { return operator()<uint16_t>( src, y, x); }
-        uint16_t 
+        { return operator()<uint16_t>( src, y, x); }
+      uint16_t 
         operator()(const blitz::Array<double,2>& src, int y, int x) const 
-          { return operator()<double>( src, y, x); }
+        { return operator()<double>( src, y, x); }
 
-        /**
-          * @brief Get the required shape of the dst output blitz array, 
-          *   before calling the operator() method.
-          */
-        template <typename T>
+      /**
+       * Get the required shape of the dst output blitz array, 
+       *   before calling the operator() method.
+       */
+      template <typename T>
         const blitz::TinyVector<int,2> 
         getLBPShape(const blitz::Array<T,2>& src) const;
-        const blitz::TinyVector<int,2> 
+      const blitz::TinyVector<int,2> 
         getLBPShape(const blitz::Array<uint8_t,2>& src) const
-          { return getLBPShape<uint8_t>(src); }
-        const blitz::TinyVector<int,2> 
+        { return getLBPShape<uint8_t>(src); }
+      const blitz::TinyVector<int,2> 
         getLBPShape(const blitz::Array<uint16_t,2>& src) const
-          { return getLBPShape<uint16_t>(src); }
-        const blitz::TinyVector<int,2> 
+        { return getLBPShape<uint16_t>(src); }
+      const blitz::TinyVector<int,2> 
         getLBPShape(const blitz::Array<double,2>& src) const
-          { return getLBPShape<double>(src); }
+        { return getLBPShape<double>(src); }
 
-    	private:
-        /**
-          * @brief Extract the LBP code of a 2D blitz::Array at the given 
-          *   location, and return it, without performing any check.
-          */
-        template <typename T, bool circular>
+    private:
+      /**
+       * Extract the LBP code of a 2D blitz::Array at the given 
+       *   location, and return it, without performing any check.
+       */
+      template <typename T, bool circular>
         uint16_t processNoCheck(const blitz::Array<T,2>& src, int y, int x) 
-          const;
+        const;
 
-		    /**
-    		  * @brief Initialize the conversion table for rotation invariant and
-          * uniform LBP patterns
-          */
-		    virtual void init_lut_RI();
-    	  virtual void init_lut_U2();
-        virtual void init_lut_U2RI();
-        virtual void init_lut_add_average_bit();
-        virtual void init_lut_normal();
-    };
+      /**
+       * Initialize the conversion table for rotation invariant and
+       * uniform LBP patterns
+       */
+      virtual void init_lut_RI();
+      virtual void init_lut_U2();
+      virtual void init_lut_U2RI();
+      virtual void init_lut_add_average_bit();
+      virtual void init_lut_normal();
+  };
 
-    template <typename T>
+  template <typename T>
     void bob::ip::LBP8R::operator()(const blitz::Array<T,2>& src,  
-      blitz::Array<uint16_t,2>& dst) const
+        blitz::Array<uint16_t,2>& dst) const
     {
       bob::core::array::assertZeroBase(src);
       bob::core::array::assertZeroBase(dst);
@@ -156,7 +167,7 @@ namespace bob {
           for(int x=0; x<dst.extent(1); ++x)
             dst(y,x) = 
               bob::ip::LBP8R::processNoCheck<T,true>(src,
-                static_cast<int>(ceil(m_R))+y, static_cast<int>(ceil(m_R))+x);
+                  static_cast<int>(ceil(m_R))+y, static_cast<int>(ceil(m_R))+x);
       }
       else
       {
@@ -164,13 +175,13 @@ namespace bob {
           for(int x=0; x<dst.extent(1); ++x)
             dst(y,x) = 
               bob::ip::LBP8R::processNoCheck<T,false>(src,
-                static_cast<int>(m_R_rect)+y, static_cast<int>(m_R_rect)+x);
+                  static_cast<int>(m_R_rect)+y, static_cast<int>(m_R_rect)+x);
       }
     }
-    
-    template <typename T> 
+
+  template <typename T> 
     uint16_t bob::ip::LBP8R::operator()(const blitz::Array<T,2>& src, 
-      int yc, int xc) const
+        int yc, int xc) const
     {
       bob::core::array::assertZeroBase(src);
       if( m_circular)
@@ -198,10 +209,10 @@ namespace bob {
         return bob::ip::LBP8R::processNoCheck<T,false>( src, yc, xc);
       }
     }
-    
-    template <typename T, bool circular> 
+
+  template <typename T, bool circular> 
     uint16_t bob::ip::LBP8R::processNoCheck( const blitz::Array<T,2>& src,
-      int yc, int xc) const
+        int yc, int xc) const
     {
       double tab[8];
       if(circular)
@@ -230,7 +241,7 @@ namespace bob {
 
       const T center = src(yc,xc);
       const double cmp_point = (m_to_average ? 
-        ( 0.1111111111 * (tab[0] + tab[1] + tab[2] + tab[3] + tab[4] + tab[5] + tab[6] + tab[7] + center)) : center);
+          ( 0.1111111111 * (tab[0] + tab[1] + tab[2] + tab[3] + tab[4] + tab[5] + tab[6] + tab[7] + center)) : center);
 
       uint16_t lbp = 0;
       // lbp = lbp << 1; // useless
@@ -290,7 +301,7 @@ namespace bob {
       return m_lut_current(lbp);
     }
 
-    template <typename T>
+  template <typename T>
     const blitz::TinyVector<int,2> 
     bob::ip::LBP8R::getLBPShape(const blitz::Array<T,2>& src) const
     {
@@ -300,7 +311,7 @@ namespace bob {
       return res;
     }
 
-  }
+}
 }
 
-#endif /* BOB5SPRO_IP_LBP8R_H */
+#endif /* BOB_IP_LBP8R_H */

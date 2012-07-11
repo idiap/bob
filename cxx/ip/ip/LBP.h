@@ -3,7 +3,7 @@
  * @date Wed Apr 20 20:21:19 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * @brief This file defines classes to compute LBP and variants
+ * This file defines classes to compute LBP and variants
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
@@ -20,173 +20,187 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_IP_LBP_H
-#define BOB5SPRO_IP_LBP_H
+#ifndef BOB_IP_LBP_H
+#define BOB_IP_LBP_H
 
 #include <blitz/array.h>
-#include <stdint.h> // uint16_t declaration
+#include <stdint.h>
+#include <boost/shared_ptr.hpp>
 
-namespace bob {
-/**
- * \ingroup libip_api
- * @{
- *
- */
-  namespace ip {
+namespace bob { namespace ip {
 
-    /**
-      * @brief This class is an abstraction for all the Local Binary Patterns
-      *   variants. For more information, please refer to the following 
-      *   article:
-      *     "Face Recognition with Local Binary Patterns", from T. Ahonen,
-      *     A. Hadid and M. Pietikainen
-      *     in the proceedings of the European Conference on Computer Vision
-      *     (ECCV'2004), p. 469-481
-      */
-    class LBP
-    {
-      public:
-        /**
-          * @brief Constructor
-          */
-        LBP(const int P, const double R=1., const bool circular=false,
-          const bool to_average=false, const bool add_average_bit=false, 
-          const bool uniform=false, const bool rotation_invariant=false, const int eLBP_type=0);
+  /**
+   * This class is an abstraction for all the Local Binary Patterns
+   *   variants. For more information, please refer to the following 
+   *   article:
+   *     "Face Recognition with Local Binary Patterns", from T. Ahonen,
+   *     A. Hadid and M. Pietikainen
+   *     in the proceedings of the European Conference on Computer Vision
+   *     (ECCV'2004), p. 469-481
+   */
+  class LBP {
 
-        LBP(const LBP& other);
+    public: //api
 
-        /**
-          * @brief Destructor
-          */
-        virtual ~LBP() { }
+      /**
+       * Complete constructor
+       */
+      LBP(const int P, 
+          const double R=1., 
+          const bool circular=false,
+          const bool to_average=false, 
+          const bool add_average_bit=false, 
+          const bool uniform=false, 
+          const bool rotation_invariant=false, 
+          const int eLBP_type=0);
 
-		    /**
-          * @brief Return the maximum number of labels for the current LBP 
-          *   variant
-          */
-  		  virtual int getMaxLabel() const = 0;
+      /**
+       * Copy constructor - note this is an abstract class, so you cannot
+       * create an object of this type or copy construct directly.
+       */
+      LBP(const LBP& other);
 
-        /**
-          * @brief Accessors
-          */
-        double getRadius() const { return m_R; }
-        int getNNeighbours() const { return m_P; }
-        bool getCircular() const { return m_circular; }
-        bool getToAverage() const { return m_to_average; }
-        bool getAddAverageBit() const { return m_add_average_bit; }
-        bool getUniform() const { return m_uniform; }
-        bool getRotationInvariant() const { return m_rotation_invariant; }
-        int get_eLBP() const { return m_eLBP_type; }
+      /**
+       * Destructor
+       */
+      virtual ~LBP();
 
-        /**
-          * @brief Mutators
-          */
-        void setRadius(const double R) 
-          { m_R = R; updateR(); }
-        void setCircular(const bool circ) 
-          { m_circular = circ; init_lut_current(); }
-        void setToAverage(const bool to_a) 
-          { m_to_average = to_a; init_lut_current(); }
-        void setAddAverageBit(const bool add_a_b) 
-          { m_add_average_bit = add_a_b; init_lut_current(); }
-        void setUniform(const bool unif) 
-          { m_uniform = unif; init_lut_current(); }
-        void setRotationInvariant(const bool rot_i) 
-          { m_rotation_invariant = rot_i; init_lut_current(); }
-        void set_eLBP(const int e_LBP_type)
-          { m_eLBP_type = e_LBP_type; }
+      /**
+       * Assignment
+       */
+      LBP& operator= (const LBP& other);
 
-        /**
-          * @brief Extract LBP features from a 2D blitz::Array, and save 
-          *   the resulting LBP codes in the dst 2D blitz::Array.
-          */
-        virtual void 
+      /**
+       * Clone self into a boost::shared_ptr<LBP>
+       */
+      virtual boost::shared_ptr<LBP> clone() const =0;
+
+      /**
+       * Return the maximum number of labels for the current LBP 
+       *   variant
+       */
+      virtual int getMaxLabel() const = 0;
+
+      /**
+       * Accessors
+       */
+      double getRadius() const { return m_R; }
+      int getNNeighbours() const { return m_P; }
+      bool getCircular() const { return m_circular; }
+      bool getToAverage() const { return m_to_average; }
+      bool getAddAverageBit() const { return m_add_average_bit; }
+      bool getUniform() const { return m_uniform; }
+      bool getRotationInvariant() const { return m_rotation_invariant; }
+      int get_eLBP() const { return m_eLBP_type; }
+
+      /**
+       * Mutators
+       */
+      void setRadius(const double R) 
+      { m_R = R; updateR(); }
+      void setCircular(const bool circ) 
+      { m_circular = circ; init_lut_current(); }
+      void setToAverage(const bool to_a) 
+      { m_to_average = to_a; init_lut_current(); }
+      void setAddAverageBit(const bool add_a_b) 
+      { m_add_average_bit = add_a_b; init_lut_current(); }
+      void setUniform(const bool unif) 
+      { m_uniform = unif; init_lut_current(); }
+      void setRotationInvariant(const bool rot_i) 
+      { m_rotation_invariant = rot_i; init_lut_current(); }
+      void set_eLBP(const int e_LBP_type)
+      { m_eLBP_type = e_LBP_type; }
+
+      /**
+       * Extract LBP features from a 2D blitz::Array, and save 
+       *   the resulting LBP codes in the dst 2D blitz::Array.
+       */
+      virtual void 
         operator()(const blitz::Array<uint8_t,2>& src, 
-          blitz::Array<uint16_t,2>& dst) const = 0;
-        virtual void 
+            blitz::Array<uint16_t,2>& dst) const = 0;
+      virtual void 
         operator()(const blitz::Array<uint16_t,2>& src, 
-          blitz::Array<uint16_t,2>& dst) const = 0;
-        virtual void 
+            blitz::Array<uint16_t,2>& dst) const = 0;
+      virtual void 
         operator()(const blitz::Array<double,2>& src, 
-          blitz::Array<uint16_t,2>& dst) const = 0;
+            blitz::Array<uint16_t,2>& dst) const = 0;
 
-        /**
-          * @brief Extract the LBP code of a 2D blitz::Array at the given 
-          *   location, and return it.
-          */
-        virtual uint16_t 
+      /**
+       * Extract the LBP code of a 2D blitz::Array at the given 
+       *   location, and return it.
+       */
+      virtual uint16_t 
         operator()(const blitz::Array<uint8_t,2>& src, 
-          int y, int x) const = 0;
-        virtual uint16_t 
+            int y, int x) const = 0;
+      virtual uint16_t 
         operator()(const blitz::Array<uint16_t,2>& src, 
-          int y, int x) const = 0;
-        virtual uint16_t 
+            int y, int x) const = 0;
+      virtual uint16_t 
         operator()(const blitz::Array<double,2>& src, 
-          int y, int x) const = 0;
+            int y, int x) const = 0;
 
-        /**
-          * @brief Get the required shape of the dst output blitz array, 
-          *   before calling the operator() method.
-          */
-        virtual const blitz::TinyVector<int,2> 
+      /**
+       * Get the required shape of the dst output blitz array, 
+       *   before calling the operator() method.
+       */
+      virtual const blitz::TinyVector<int,2> 
         getLBPShape(const blitz::Array<uint8_t,2>& src) const = 0;
-        virtual const blitz::TinyVector<int,2> 
+      virtual const blitz::TinyVector<int,2> 
         getLBPShape(const blitz::Array<uint16_t,2>& src) const = 0;
-        virtual const blitz::TinyVector<int,2> 
+      virtual const blitz::TinyVector<int,2> 
         getLBPShape(const blitz::Array<double,2>& src) const = 0;
 
-    	protected:
+    protected:
 
-		    /**
-          * @brief Initialize all the conversion tables 
-          */
-          void init_luts();
+      /**
+       * Initialize all the conversion tables 
+       */
+      void init_luts();
 
-		    /**
-          * @brief Initialize the conversion table for rotation invariant and 
-          *   uniform LBP patterns
-          */
-		    virtual void init_lut_RI() = 0;
-    		virtual void init_lut_U2() = 0;
-    		virtual void init_lut_U2RI()= 0;
-    		virtual void init_lut_add_average_bit()= 0;
-    		virtual void init_lut_normal()= 0;
-    		void init_lut_current();
+      /**
+       * Initialize the conversion table for rotation invariant and 
+       *   uniform LBP patterns
+       */
+      virtual void init_lut_RI() = 0;
+      virtual void init_lut_U2() = 0;
+      virtual void init_lut_U2RI()= 0;
+      virtual void init_lut_add_average_bit()= 0;
+      virtual void init_lut_normal()= 0;
+      void init_lut_current();
 
-		    /**
-          * @brief Compute the current integer value of the radius in case 
-          *   of a non-circular LBP variant
-          */ 
-        inline void updateR() { m_R_rect = static_cast<int>(floor(m_R+0.5)); }
+      /**
+       * Compute the current integer value of the radius in case 
+       *   of a non-circular LBP variant
+       */ 
+      inline void updateR() { m_R_rect = static_cast<int>(floor(m_R+0.5)); }
 
-        /**
-          * @brief Circular shift to the right of the input integer for L positions, if N is the total number of bits
-          */ 
-        static unsigned right_shift_circular(unsigned x, int L, int N);
+      /**
+       * Circular shift to the right of the input integer for L positions, if N is the total number of bits
+       */ 
+      static unsigned right_shift_circular(unsigned x, int L, int N);
 
-        /**
-          * @brief Attributes
-          */
-        int m_P;
-        double m_R;
-        bool m_circular;
-        bool m_to_average;
-        bool m_add_average_bit;
-        bool m_uniform;
-        bool m_rotation_invariant;
-        int m_R_rect;
-        int m_eLBP_type; // the type of extended LBP (0 - regular LBP, 1 - transitional LBP, 2 - direction coded LBP)
+      /**
+       * Attributes
+       */
+      int m_P;
+      double m_R;
+      bool m_circular;
+      bool m_to_average;
+      bool m_add_average_bit;
+      bool m_uniform;
+      bool m_rotation_invariant;
+      int m_R_rect;
+      int m_eLBP_type; // the type of extended LBP (0 - regular LBP, 1 - transitional LBP, 2 - direction coded LBP)
 
-        blitz::Array<uint16_t,1> m_lut_RI;
-        blitz::Array<uint16_t,1> m_lut_U2;
-        blitz::Array<uint16_t,1> m_lut_U2RI;
-        blitz::Array<uint16_t,1> m_lut_add_average_bit;
-        blitz::Array<uint16_t,1> m_lut_normal;
+      blitz::Array<uint16_t,1> m_lut_RI;
+      blitz::Array<uint16_t,1> m_lut_U2;
+      blitz::Array<uint16_t,1> m_lut_U2RI;
+      blitz::Array<uint16_t,1> m_lut_add_average_bit;
+      blitz::Array<uint16_t,1> m_lut_normal;
 
-        blitz::Array<uint16_t,1> m_lut_current;
-    };
+      blitz::Array<uint16_t,1> m_lut_current;
+  };
 
-  }
-}
+} }
 
-#endif /* BOB5SPRO_IP_LBP_H */
+#endif /* BOB_IP_LBP_H */

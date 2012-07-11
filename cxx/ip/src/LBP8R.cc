@@ -20,15 +20,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/make_shared.hpp>
 #include "ip/LBP8R.h"
 
 namespace ip = bob::ip;
 
-ip::LBP8R::LBP8R(const double R, const bool circular, const bool to_average,
-    const bool add_average_bit, const bool uniform, 
-    const bool rotation_invariant, const int eLBP_type): 
+ip::LBP8R::LBP8R(const double R,
+    const bool circular,
+    const bool to_average,
+    const bool add_average_bit,
+    const bool uniform, 
+    const bool rotation_invariant,
+    const int eLBP_type): 
   LBP(8,R,circular,to_average,add_average_bit,uniform,rotation_invariant,eLBP_type)
 {
+  init_luts();
+}
+
+ip::LBP8R::LBP8R(const ip::LBP8R& other):
+  ip::LBP(other)
+{
+  init_luts();
+}
+
+ip::LBP8R::~LBP8R() { }
+
+ip::LBP8R& ip::LBP8R::operator= (const ip::LBP8R& other) {
+  ip::LBP::operator=(other);
+  return *this;
+}
+
+boost::shared_ptr<ip::LBP> ip::LBP8R::clone() const {
+  return boost::make_shared<ip::LBP8R>(*this);
 }
 
 int ip::LBP8R::getMaxLabel() const

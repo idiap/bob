@@ -20,15 +20,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/make_shared.hpp>
 #include "ip/LBP4R.h"
 
 namespace ip = bob::ip;
 
-ip::LBP4R::LBP4R(const double R, const bool circular, const bool to_average,
-    const bool add_average_bit, const bool uniform, 
-    const bool rotation_invariant, const int eLBP_type): 
-  LBP(4,R,circular,to_average,add_average_bit,uniform,rotation_invariant, eLBP_type)
+ip::LBP4R::LBP4R(const double R,
+    const bool circular,
+    const bool to_average,
+    const bool add_average_bit,
+    const bool uniform, 
+    const bool rotation_invariant,
+    const int eLBP_type): 
+  ip::LBP(4,R,circular,to_average,add_average_bit,uniform,rotation_invariant,
+      eLBP_type)
 {
+  init_luts();
+}
+
+ip::LBP4R::LBP4R(const ip::LBP4R& other): 
+  ip::LBP(other)
+{
+  init_luts();
+}
+
+ip::LBP4R::~LBP4R() { }
+
+ip::LBP4R& ip::LBP4R::operator= (const ip::LBP4R& other) {
+  ip::LBP::operator=(other);
+  return *this;
+}
+
+boost::shared_ptr<ip::LBP> ip::LBP4R::clone() const {
+  return boost::make_shared<ip::LBP4R>(*this);
 }
 
 int ip::LBP4R::getMaxLabel() const

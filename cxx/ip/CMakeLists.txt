@@ -25,7 +25,7 @@ set(src
    "src/LBP4R.cc"
    "src/LBP8R.cc"
    "src/LBP16R.cc"
-   "src/LBPTopOperator.cc"
+   "src/LBPTop.cc"
    "src/Sobel.cc"
    "src/Gaussian.cc"
    "src/MultiscaleRetinex.cc"
