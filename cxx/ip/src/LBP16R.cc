@@ -20,29 +20,49 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/make_shared.hpp>
 #include "ip/LBP16R.h"
 
 namespace ip = bob::ip;
 
-ip::LBP16R::LBP16R(const double R, const bool circular, const bool to_average,
-    const bool add_average_bit, const bool uniform, 
-    const bool rotation_invariant, const int eLBP_type): 
-  LBP(16,R,circular,to_average,add_average_bit,uniform,rotation_invariant, eLBP_type)
+ip::LBP16R::LBP16R(const double R, 
+    const bool circular,
+    const bool to_average,
+    const bool add_average_bit,
+    const bool uniform, 
+    const bool rotation_invariant,
+    const int eLBP_type): 
+  ip::LBP(16,R,circular,to_average,add_average_bit,uniform,rotation_invariant, eLBP_type)
 {
-  // Initialize the lookup tables
   init_luts();
 }
 
-int ip::LBP16R::getMaxLabel() const
+ip::LBP16R::LBP16R(const ip::LBP16R& other):
+  ip::LBP(other)
 {
-return  (m_rotation_invariant ?
-            (m_uniform ? 18 : // Rotation invariant + uniform
-                         4116) // Rotation invariant
-          : (m_uniform ? 243 : // Uniform
-              (m_to_average && m_add_average_bit ? 131072 : // i.e. 2^17=512 vs. 2^16=65536
-                                            65536)       // i.e. 2^8=256)
-            )
-        );
+  init_luts();
+}
+
+ip::LBP16R::~LBP16R() { }
+
+ip::LBP16R& ip::LBP16R::operator= (const ip::LBP16R& other) {
+  ip::LBP::operator=(other);
+  return *this;
+}
+
+boost::shared_ptr<ip::LBP> ip::LBP16R::clone() const {
+  return boost::make_shared<ip::LBP16R>(*this);
+}
+
+int ip::LBP16R::getMaxLabel() const {
+  return  (m_rotation_invariant ?
+      (m_uniform ? 18 : // Rotation invariant + uniform
+       4116) // Rotation invariant
+      : (m_uniform ? 243 : // Uniform
+        (m_to_average && m_add_average_bit ? 131072 : // i.e. 2^17=512 vs. 2^16=65536
+         65536)       // i.e. 2^8=256)
+      )
+    );
 }
 
 void ip::LBP16R::init_lut_RI()

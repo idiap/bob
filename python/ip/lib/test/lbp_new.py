@@ -50,12 +50,65 @@ def generate_3x3_image(image, values):
   image[2, 0] = int(values[7])
   image[1, 0] = int(values[8])
 
+
+
 def generate_5x5_image(image, values):
   """Generates a 5x5 image from a 25-position value vector row-wise
   """
   for i in range(0,5):
     for j in range(0,5):
       image[i,j] = int(values[i*5+j])
+
+
+def generate_NxMxM_image(image, values):
+  """ Generates a NxMxM image from an 1x3 array with 9-position value using the following technique for M=3:
+
+      frame (0,:,:) = 
+           +-+-+-+
+           |1|2|3|
+           +-+-+-+
+           |8|0|4|
+           +-+-+-+
+           |7|6|5|
+           +-+-+-+
+
+     frame (1,:,:) = 
+           +-+-+-+
+           |1|2|3|
+           +-+-+-+
+           |8|0|4|
+           +-+-+-+
+           |7|6|5|
+           +-+-+-+
+     .
+     .
+     .
+     .
+     .
+
+     frame (N,:,:) = 
+           +-+-+-+
+           |1|2|3|
+           +-+-+-+
+           |8|0|4|
+           +-+-+-+
+           |7|6|5|
+           +-+-+-+
+
+  """
+
+  N = image.shape[0]
+  M = image.shape[1]
+
+  for i in range(N):
+    #3x3
+    if(M==3):
+      generate_3x3_image(image[i,:,:], values[i])
+    #5x5
+    else: #only two options
+      generate_5x5_image(image[i,:,:],values[i])
+
+
 
 def rotate(v, size=8):
   """Rotates the LSB bit in v, making it a HSB"""
@@ -125,8 +178,19 @@ def bilinear_interpolation(image, x, y):
   y2 = (xh - x) * image[yh, xl] + (x - xl) * image[yh, xh]
   retval = ((yh - y) * y1) + ((y - yl) * y2)
 
+"""
+" Helper that generate LBP-bins to check in the unit test cases
+"""
 class Processor:
 
+  """
+  " Helper that generate LBP-bins to check in the unit test cases
+  "
+  " @param operator LBP-Operator
+  " @param generator Image generator function
+  " @param center Coordinates of a specific operator in order to check
+  " @param img_size Images sizes (square image)
+  """
   def __init__(self, operator, generator, center, img_size):
     self.operator = operator
     self.generator = generator
@@ -138,13 +202,71 @@ class Processor:
     image = self.generator(self.image, value)
     return self.operator(self.image, self.y, self.x) 
 
+
+
+"""
+" Helper that generate LBPTop-bins to check in the unit test cases
+"""
+class ProcessorLBPTop:
+
+  """
+  " Helper that generate LBPTop-bins to check in the unit test cases
+  "
+  " @param operator LBP-Operator with defined XY,XT,YT planes
+  " @param generator Image generator function
+  " @param img_size Images sizes (square image)
+  " @param n_frames Number of Frames
+  """
+  def __init__(self, operator, generator, img_size, n_frames):
+    self.operator = operator
+    self.generator = generator
+    
+    xy_width  = img_size-(operator.xy.radius*2) #Square image
+    xy_height = xy_width
+
+    xt_width = img_size-(operator.xt.radius*2)
+    xt_height = n_frames-(operator.xt.radius*2)
+
+    yt_width  = img_size-(operator.yt.radius*2)
+    yt_height = n_frames-(operator.yt.radius*2)
+
+    self.XY = numpy.empty(shape=(xy_width,xy_height),dtype='uint16')
+    self.XT = numpy.empty(shape=(xt_width,xt_height),dtype='uint16')
+    self.YT = numpy.empty(shape=(yt_width,yt_height),dtype='uint16')
+
+    self.image = numpy.ndarray((n_frames,img_size, img_size), 'uint8')
+
+
+  """
+  "
+  "  @param plane_index Index of the plane (0- XY Plane, 1- XT Plane, 2- YT Plane)
+  "  @param center Coordinates of a specific operator in order to check
+  """
+  def __call__(self, value='',plane_index=0,operator_coordinates=(0,0)):
+
+    image = self.generator(self.image, value)
+    self.operator(self.image, self.XY,self.XT,self.YT)
+
+    x = operator_coordinates[0]
+    y = operator_coordinates[1]
+
+    if(plane_index==0):
+      return self.XY[x,y]
+    elif(plane_index==1):
+      return self.XT[x,y]
+    else:
+      return self.YT[x,y]
+
+
+
+
 def bin(s, m=1):
   """Converts the number s into its binary representation (as a string)"""
   return str(m*s) if s<=1 else bin(s>>1, m) + str(m*(s&1))
 
 class LBPTest(unittest.TestCase):
   """Performs various tests for the bob::ipLBP and friends types."""
- 
+
   def test01_vanilla_4p1r(self):
     op = bob.ip.LBP4R(1)
     proc = Processor(op, generate_3x3_image, (1,1), 3)
@@ -361,6 +483,38 @@ class LBPTest(unittest.TestCase):
     proc4 = Processor(op, generate_3x3_image, (1,1), 3)
     self.assertEqual(proc4('014725836'), 0xae) #0x0
     
+
+  """
+  " All planes are p=4, r=1, non uniform pattern and non RI
+  """
+  def test15_vanilla_4p1r_4p1r_4p1r(self):
+    lbp4R_XY = bob.ip.LBP4R(radius=1.0, circular=False, uniform=False, rotation_invariant=False)
+    lbp4R_XT = bob.ip.LBP4R(radius=1.0, circular=False, uniform=False, rotation_invariant=False)
+    lbp4R_YT = bob.ip.LBP4R(radius=1.0, circular=False, uniform=False, rotation_invariant=False)
+
+    op = bob.ip.LBPTop(lbp4R_XY,lbp4R_XT,lbp4R_YT)
+
+    proc1 = ProcessorLBPTop(op, generate_NxMxM_image,img_size=3,n_frames=3)
+    self.assertEqual(proc1(['000000000','111111111','222222222'],plane_index=0,operator_coordinates=(0,0)),0xf)
+    self.assertEqual(proc1(['000000000','111111111','222222222'],plane_index=1,operator_coordinates=(0,0)),0x7)
+    self.assertEqual(proc1(['000000000','111111111','222222222'],plane_index=2,operator_coordinates=(0,0)),0x7)
+
+
+    proc2 = ProcessorLBPTop(op, generate_NxMxM_image,img_size=5,n_frames=5)
+    values_5x5 = []
+    values_5x5.append([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
+    values_5x5.append([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1])
+    values_5x5.append([2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2])
+    values_5x5.append([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1])
+    values_5x5.append([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
+
+    self.assertEqual(proc2(values_5x5,plane_index=0,operator_coordinates=(0,0)),0xf)
+    self.assertEqual(proc2(values_5x5,plane_index=1,operator_coordinates=(0,0)),0x7)
+    self.assertEqual(proc2(values_5x5,plane_index=2,operator_coordinates=(0,0)),0x7)
+
+
+
+
 
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(LBPTest)

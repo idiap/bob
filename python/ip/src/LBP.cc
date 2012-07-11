@@ -24,11 +24,10 @@
 
 #include <stdint.h>
 #include <vector>
-#include "ip/LBP.h"
 #include "ip/LBP4R.h"
 #include "ip/LBP8R.h"
 #include "ip/LBP16R.h"
-#include "ip/LBPTopOperator.h"
+#include "ip/LBPTop.h"
 #include "ip/LBPHSFeatures.h"
 
 using namespace boost::python;
@@ -116,7 +115,7 @@ static object get_shape (O& op, tp::const_ndarray input) {
 }
 
 template <typename T> 
-static void inner_call_lbptop (ip::LBPTopOperator& op, tp::const_ndarray input,
+static void inner_call_lbptop (const ip::LBPTop& op, tp::const_ndarray input,
     tp::ndarray xy, tp::ndarray xt, tp::ndarray yt) {
   blitz::Array<uint16_t,2> xy_ = xy.bz<uint16_t,2>();
   blitz::Array<uint16_t,2> xt_ = xt.bz<uint16_t,2>();
@@ -124,7 +123,7 @@ static void inner_call_lbptop (ip::LBPTopOperator& op, tp::const_ndarray input,
   op(input.bz<T,3>(), xy_, xt_, yt_);
 }
 
-static void call_lbptop (ip::LBPTopOperator& op, tp::const_ndarray input,
+static void call_lbptop (const ip::LBPTop& op, tp::const_ndarray input,
     tp::ndarray xy, tp::ndarray xt, tp::ndarray yt) {
   switch(input.type().dtype) {
     case ca::t_uint8: return inner_call_lbptop<uint8_t>(op, input, xy, xt, yt);
@@ -155,7 +154,7 @@ static object lbp_apply (ip::LBPHSFeatures& op, tp::const_ndarray input) {
 }
 
 void bind_ip_lbp_new() {
-  class_<ip::LBP, boost::noncopyable>("LBP", "A base class for the LBP-like operators", no_init)
+  class_<ip::LBP, boost::shared_ptr<ip::LBP>, boost::noncopyable>("LBP", "A base class for the LBP-like operators", no_init)
     .add_property("radius", &ip::LBP::getRadius, &ip::LBP::setRadius)
     .add_property("points", &ip::LBP::getNNeighbours)
     .add_property("circular", &ip::LBP::getCircular, &ip::LBP::setCircular)
@@ -190,10 +189,14 @@ void bind_ip_lbp_new() {
     .def("get_lbp_shape", &get_shape<ip::LBP16R>, (arg("self"), arg("input")), "Get a tuple containing the expected size of the output when extracting LBP16R features.")
     ;
 
-  class_<ip::LBPTopOperator, boost::shared_ptr<ip::LBPTopOperator> >("LBPTopOperator",
- "Constructs a new LBPTopOperator object starting from the algorithm configuration. Please note this object will always produce rotation invariant 2D codes, also taking into consideration pattern uniformity (u2 variant).\n\nThe current number of points supported in bob is either 8 or 4. Any values differing from that need implementation of specialized functionality.", init<int, int, int, int, int, int>((arg("radius_xy"), arg("points_xy"), arg("radius_xt"), arg("points_xt"),  arg("radius_yt"), arg("points_yt")), "Constructs a new ipLBPTopOperator"))
+  class_<ip::LBPTop, boost::shared_ptr<ip::LBPTop> >("LBPTop",
+ "Constructs a new LBPTop object starting from the algorithm configuration.", init< const bob::ip::LBP &,  const bob::ip::LBP &,  const bob::ip::LBP & >((arg("xy"), arg("xt"), arg("yt")), "Constructs a new ipLBPTop"))
+    .add_property("xy", &ip::LBPTop::getXY)
+    .add_property("xt", &ip::LBPTop::getXT)
+    .add_property("yt", &ip::LBPTop::getYT)
     .def("__call__", &call_lbptop, (arg("self"),arg("input"), arg("xy"), arg("xt"), arg("yt")), "Processes a 3D array representing a set of <b>grayscale</b> images and returns (by argument) the three LBP planes calculated. The 3D array has to be arranged in this way:\n\n1st dimension => time\n2nd dimension => frame height\n3rd dimension => frame width\n\nThe central pixel is the point where the LBP planes interesect/have to be calculated from.")
     ;
+
 
   class_<ip::LBPHSFeatures, boost::shared_ptr<ip::LBPHSFeatures> >("LBPHSFeatures", "Constructs a new LBPHSFeatures object to extract histogram of LBP over 2D blitz arrays/images.", init<const int, const int, const int, const int, optional<const double, const int, const bool, const bool, const bool, const bool, const bool> >((arg("block_h"), arg("block_w"), arg("overlap_h"), arg("overlap_w"), arg("lbp_radius")=1., arg("lbp_neighbours")=8, arg("circular")=false,arg("to_average")=false,arg("add_average_bit")=false,arg("uniform")=false, arg("rotation_invariant")=false), "Constructs a new DCT features extractor."))
     .add_property("n_bins", &ip::LBPHSFeatures::getNBins)
