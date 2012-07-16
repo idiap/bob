@@ -59,11 +59,11 @@ void bind_machine_bic(){
       "\n"
       "What kind of machine is used is dependent on the way, this class is trained via the BICTrainer.\n"
       "\n"
-      ".. [1] Marcio Luis Teixeira. The bayesian intrapersonal/extrapersonal classifier. Colorado State University, 2003.\n"
+      ".. [1] Marcio Luis Teixeira. The Bayesian intrapersonal/extrapersonal classifier. Colorado State University, 2003.\n"
       ".. [2] Manuel Guenther and Rolf P. Wuertz. Face detection and recognition using maximum likelihood classifiers on Gabor graphs. International Journal of Pattern Recognition and Artificial Intelligence, 23(3):433-461, 2009.",
       boost::python::init<bool>(
-          (boost::python::arg("use_dffs") = true),
-          "Initializes an empty BICMachine. The optional boolean parameter specifies whether to use the DFFS in the BIC implementation."
+          (boost::python::arg("use_dffs") = false),
+          "Initializes an empty BICMachine. The optional boolean parameter specifies whether to use the DFFS in the BIC implementation. \n\n.. warning :: Use this flag with care, the default value 'False' is usually the best choice!"
       )
     )
 
@@ -139,6 +139,6 @@ void bind_machine_bic(){
       // cast overloaded function with the same name to its type...
       static_cast<bool (bob::machine::BICMachine::*)() const>(&bob::machine::BICMachine::use_DFFS),
       static_cast<void (bob::machine::BICMachine::*)(bool)>(&bob::machine::BICMachine::use_DFFS),
-      "Should the Distance From Feature Space (DFFS) measure be added during scoring?"
+      "Should the Distance From Feature Space (DFFS) measure be added during scoring? \n\n.. warning :: Only set this flag to True if the number of intrapersonal and extrapersonal training pairs is approximately equal. Otherwise, weird thing may happen!"
   );
 }
