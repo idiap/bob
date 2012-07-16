@@ -25,6 +25,7 @@
 #include "core/array_assert.h"
 #include "core/array_check.h"
 #include "ip/GeomNorm.h"
+#include <ip/rotate.h>
 
 namespace tca = bob::core::array;
 
@@ -171,11 +172,9 @@ namespace bob {
 
       // Perform the normalization
       if(mask)
-        m_geom_norm->operator()(src, src_mask, dst, dst_mask, center_y, 
-          center_x, center_y, center_x);
+        m_geom_norm->operator()(src, src_mask, dst, dst_mask, center_y, center_x);
       else
-        m_geom_norm->operator()(src, dst, center_y, center_x, center_y, 
-          center_x);
+        m_geom_norm->operator()(src, dst, center_y, center_x);
     }
 
   }

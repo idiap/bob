@@ -30,6 +30,7 @@
 #include "core/cast.h"
 #include "core/convert.h"
 #include "core/logging.h"
+#include "ip/generateWithCenter.h"
 #include "ip/GeomNorm.h"
 #include "io/Array.h"
 
@@ -115,20 +116,71 @@ BOOST_AUTO_TEST_CASE( test_geomnorm )
   
   // Define a Geometric normalizer 
   // * rotation angle: 10 degrees
-  // * scaling factor: 1.
+  // * scaling factor: 0.65
   // * Cropping area: 40x40
   // * No final cropping offset (i.e. used the provided upper left corner when calling 
   //   the operator() method)
   bob::ip::GeomNorm geomnorm(-10., 0.65, 40, 40, 0, 0);
 
-  // Process giving the rotation center, and the upper left corner of the cropping area
-  geomnorm(img, img_processed_d, 65, 59, 54, 27);
+  // Process giving the upper left corner as the rotation center (and the offset of the cropping area)
+  geomnorm(img, img_processed_d, 54, 27);
   blitz::Array<uint8_t,2> img_processed = bob::core::convertFromRange<uint8_t>( img_processed_d, 0., 255.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r10_geomnorm.pgm";
+//  bob::io::Array(img_processed).save(testdata_path_img.string()); // Re-generate reference data
   bob::io::Array ar_img_geomnorm(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_geomnorm = ar_img_geomnorm.get<uint8_t,2>();
   checkBlitzClose( img_ref_geomnorm, img_processed, eps);
 }
+
+BOOST_AUTO_TEST_CASE( test_geomnorm_with_mask )
+{
+  // Get path to the XML Schema definition
+  char *testdata_cpath = getenv("BOB_IP_TESTDATA_DIR");
+  if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
+    bob::core::error << "Environment variable $BOB_IP_TESTDATA_DIR " <<
+      "is not set. " << "Have you setup your working environment " <<
+      "correctly?" << std::endl;
+    throw bob::core::Exception();
+  }
+  // Load original image
+  boost::filesystem::path testdata_path(testdata_cpath);
+  testdata_path /= "image_r70.pgm";
+  blitz::Array<uint8_t,2> input_image = bob::io::Array(testdata_path.string()).get<uint8_t,2>();
+  blitz::Array<double,2> output_image(160,160);
+  
+  blitz::Array<bool,2> input_mask(input_image.shape()[0],input_image.shape()[1]);
+  // estimate the input mask from the black pixels of the input image
+  input_mask = input_image != 0;
+  blitz::Array<bool,2> output_mask(output_image.shape()[0], output_image.shape()[1]);
+  
+  // Define a Geometric normalizer 
+  // * rotation angle: 70 degrees
+  // * scaling factor: 1.2
+  // * Cropping area: 160x160
+  // * Final cropping offset: 80x80
+  bob::ip::GeomNorm geomnorm(-70., 1.2, 160, 160, 80, 80);
+
+  // Process giving the masks and the center of the eye positions
+  geomnorm(input_image, input_mask, output_image, output_mask, 64, 69);
+  
+  // check that the image is close to the reference image
+  blitz::Array<uint8_t,2> output_image_uint8 = bob::core::convertFromRange<uint8_t>(output_image, 0., 255.);
+  testdata_path = testdata_cpath;
+  testdata_path /= "image_r70_geomnorm.pgm";
+//  bob::io::Array(output_image_uint8).save(testdata_path.string()); // Re-generate reference data
+  blitz::Array<uint8_t,2> output_reference = bob::io::Array(testdata_path.string()).get<uint8_t,2>();
+  checkBlitzClose( output_image_uint8, output_reference, eps);
+  
+  // check that the mask is identical to the reference mask
+  blitz::Array<uint8_t,2> output_mask_uint8 = bob::core::convertFromRange<uint8_t>(output_mask, false, true);
+  testdata_path = testdata_cpath;
+  testdata_path /= "image_r70_mask.pgm";
+//  bob::io::Array(output_mask_uint8).save(testdata_path.string()); // Re-generate reference data
+  output_reference = bob::io::Array(testdata_path.string()).get<uint8_t,2>();
+  checkBlitzEqual(output_mask_uint8, output_reference);
+}
+
+
 
 BOOST_AUTO_TEST_SUITE_END()

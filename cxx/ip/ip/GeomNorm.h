@@ -33,10 +33,7 @@
 #include "core/array_check.h"
 #include "core/cast.h"
 #include "ip/Exception.h"
-#include "ip/generateWithCenter.h"
-#include "ip/rotate.h"
-#include "ip/scale.h"
-#include "ip/crop.h"
+
 
 namespace bob {
 /**
@@ -103,13 +100,11 @@ namespace bob {
           */
         template <typename T> 
         void operator()(const blitz::Array<T,2>& src, 
-          blitz::Array<double,2>& dst, const int rot_c_y, const int rot_c_x, 
-          const int crop_ref_y, const int crop_ref_x);
+          blitz::Array<double,2>& dst, const int rot_c_y, const int rot_c_x);
         template <typename T> 
         void operator()(const blitz::Array<T,2>& src, 
           const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst, 
-          blitz::Array<bool,2>& dst_mask, const int rot_c_y, const int rot_c_x,
-          const int crop_ref_y, const int crop_ref_x);
+          blitz::Array<bool,2>& dst_mask, const int rot_c_y, const int rot_c_x);
 
       private:
         /**
@@ -118,8 +113,7 @@ namespace bob {
         template <typename T, bool mask>
         void processNoCheck(const blitz::Array<T,2>& src, 
           const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst, 
-          blitz::Array<bool,2>& dst_mask, const int rot_c_y, const int rot_c_x,
-          const int crop_ref_y, const int crop_ref_x);
+          blitz::Array<bool,2>& dst_mask, const int rot_c_y, const int rot_c_x);
 
         /**
           * Attributes
@@ -132,19 +126,11 @@ namespace bob {
         int m_crop_offset_w;
 
         blitz::TinyVector<int,2> m_out_shape; 
-        blitz::Array<double, 2> m_centered;
-        blitz::Array<double, 2> m_rotated;
-        blitz::Array<double, 2> m_scaled;
-
-        blitz::Array<bool,2> m_mask_int1;
-        blitz::Array<bool,2> m_mask_int2;
-        blitz::Array<bool,2> m_mask_int3;
     };
 
     template <typename T> 
     void GeomNorm::operator()(const blitz::Array<T,2>& src, 
-      blitz::Array<double,2>& dst, const int rot_c_y, const int rot_c_x,
-      const int crop_ref_y, const int crop_ref_x) 
+      blitz::Array<double,2>& dst, const int rot_c_y, const int rot_c_x) 
     { 
       // Check input
       bob::core::array::assertZeroBase(src);
@@ -155,15 +141,13 @@ namespace bob {
 
       // Process
       blitz::Array<bool,2> src_mask, dst_mask;
-      processNoCheck<T,false>( src, src_mask, dst, dst_mask, rot_c_y, rot_c_x,
-        crop_ref_y, crop_ref_x);
+      processNoCheck<T,false>(src, src_mask, dst, dst_mask, rot_c_y, rot_c_x);
     }
 
     template <typename T> 
     void GeomNorm::operator()(const blitz::Array<T,2>& src, 
       const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst, 
-      blitz::Array<bool,2>& dst_mask, const int rot_c_y, const int rot_c_x,
-      const int crop_ref_y, const int crop_ref_x) 
+      blitz::Array<bool,2>& dst_mask, const int rot_c_y, const int rot_c_x) 
     { 
       // Check input
       bob::core::array::assertZeroBase(src);
@@ -177,85 +161,113 @@ namespace bob {
       bob::core::array::assertSameShape(dst, m_out_shape);
 
       // Process
-      processNoCheck<T,true>( src, src_mask, dst, dst_mask, rot_c_y, rot_c_x,
-        crop_ref_y, crop_ref_x);
+      processNoCheck<T,true>(src, src_mask, dst, dst_mask, rot_c_y, rot_c_x);
     }
 
     // TODO: Refactor with Geometry module to keep track of the cropping
     // point coordinates after each operation
     template <typename T, bool mask> 
-    void GeomNorm::processNoCheck(const blitz::Array<T,2>& src,
-      const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst, 
-      blitz::Array<bool,2>& dst_mask, const int rot_c_y, const int rot_c_x,
-      const int crop_ref_y, const int crop_ref_x) 
+    void GeomNorm::processNoCheck(const blitz::Array<T,2>& source,
+      const blitz::Array<bool,2>& source_mask, blitz::Array<double,2>& target,
+      blitz::Array<bool,2>& target_mask, const int rot_c_y, const int rot_c_x) 
     { 
-      // 0/ Cast input to double
-      blitz::Array<double,2> src_d = bob::core::cast<double>(src);
- 
-      // 1/ Expand the image such the the point (yc,xc) is at the center
-      blitz::TinyVector<int,2> shape = 
-        getGenerateWithCenterShape(src_d, rot_c_y, rot_c_x);
-      blitz::TinyVector<int,2> offset = 
-        getGenerateWithCenterOffset(src_d, rot_c_y, rot_c_x);
-      if( !bob::core::array::hasSameShape(m_centered, shape) ) {
-        m_centered.resize( shape );
-        if(mask)
-          m_mask_int1.resize(shape);
+      // This is the fastest version of the function that I can imagine...
+      // It handles two different coordinate systems: original image and new image
+
+      // transformation center in original image
+      const double original_center_x = rot_c_x, 
+                   original_center_y = rot_c_y;
+      // transformation center in new image:
+      const double new_center_x = m_crop_offset_w, 
+                   new_center_y = m_crop_offset_h;
+
+      // With these positions, we can define a mapping from the new image to the original image
+      const double sin_angle = -sin(m_rotation_angle * M_PI / 180.), 
+                   cos_angle = cos(m_rotation_angle * M_PI / 180.);
+      // we compute the distance in the source image, when going 1 pixel in the new image
+      const double dx = cos_angle / m_scaling_factor, 
+                   dy = -sin_angle / m_scaling_factor;
+
+      // Now, we iterate through the target image, and compute pixel positions in the source.
+      // For this purpose, get the (0,0) position of the target image in source image coordinates:
+      double origin_x = original_center_x - (cos_angle * new_center_x + sin_angle * new_center_y) / m_scaling_factor;
+      double origin_y = original_center_y - (cos_angle * new_center_y - sin_angle * new_center_x) / m_scaling_factor;
+
+      // some helpers for the interpolation
+      int ox, oy;
+      double mx, my;
+      int h = source.shape()[0]-1;
+      int w = source.shape()[1]-1;
+
+      // Ok, so let's do it.
+      for (int y = 0; y < m_crop_height; ++y){
+        // set the source image point to first point in row
+        double source_x = origin_x, source_y = origin_y;
+        // iterate over the row
+        for (int x = 0; x < m_crop_width; ++x){
+
+          // We are at the desired pixel in the new image. Interpolate the old image's pixels:
+          double& res = target(y,x) = 0.;
+
+          // split each source x and y in integral and decimal digits
+          ox = std::floor(source_x);
+          oy = std::floor(source_y);
+          mx = source_x - ox;
+          my = source_y - oy;
+
+          // add the four values bi-linearly interpolated
+          if (mask){
+            bool& new_mask = target_mask(y,x) = false;
+            // upper left
+            if (ox >= 0 && oy >= 0 && ox <= w && oy <= h && source_mask(oy,ox)){
+              res += (1.-mx) * (1.-my) * source(oy,ox);
+              new_mask = true;
+            }
+            // upper right
+            if (ox >= -1 && oy >= 0 && ox < w && oy <= h && source_mask(oy,ox+1)){
+              res += mx * (1.-my) * source(oy,ox+1);
+              new_mask = true;
+            }
+            // lower left
+            if (ox >= 0 && oy >= -1 && ox <= w && oy < h && source_mask(oy+1,ox)){
+              res += (1.-mx) * my * source(oy+1,ox);
+              new_mask = true;
+            }
+            // lower right
+            if (ox >= -1 && oy >= -1 && ox < w && oy < h && source_mask(oy+1,ox+1)){
+              res += mx * my * source(oy+1,ox+1);
+              new_mask = true;
+            }
+          } else {
+            // upper left
+            if (ox >= 0 && oy >= 0 && ox <= w && oy <= h)
+              res += (1.-mx) * (1.-my) * source(oy,ox);
+
+            // upper right
+            if (ox >= -1 && oy >= 0 && ox < w && oy <= h)
+              res += mx * (1.-my) * source(oy,ox+1);
+
+            // lower left
+            if (ox >= 0 && oy >= -1 && ox <= w && oy < h)
+              res += (1.-mx) * my * source(oy+1,ox);
+
+            // lower right
+            if (ox >= -1 && oy >= -1 && ox < w && oy < h)
+              res += mx * my * source(oy+1,ox+1);
+          }
+
+          // done with this pixel...
+          // go to the next source pixel in the row
+          source_x += dx;
+          source_y += dy;
+        }
+        // at the end of the row, we shift the origin to the next line
+        origin_x -= dy;
+        origin_y += dx;
       }
-      if(mask)
-        generateWithCenter(src_d, src_mask, m_centered, m_mask_int1,
-          rot_c_y, rot_c_x);
-      else
-        generateWithCenter(src_d, m_centered, rot_c_y, rot_c_x);
 
-      // new coordinate of the cropping reference point
-      double crop_ref_y1 = offset(0) + crop_ref_y;
-      double crop_ref_x1 = offset(1) + crop_ref_x;
-
-      // 2/ Rotate to align the image with the x-axis
-      shape = bob::ip::getRotatedShape(m_centered, m_rotation_angle);
-      if( !bob::core::array::hasSameShape(m_rotated, shape) ) {
-        m_rotated.resize( shape );
-        if(mask)
-          m_mask_int2.resize(shape);
-      }
-      if(mask)
-        bob::ip::rotate(m_centered, m_mask_int1, m_rotated, m_mask_int2, m_rotation_angle);
-      else
-        bob::ip::rotate(m_centered, m_rotated, m_rotation_angle);
-
-      // new coordinate of the cropping reference point
-      crop_ref_y1 = crop_ref_y1 - (m_centered.extent(0)-1)/2.;
-      crop_ref_x1 = crop_ref_x1 - (m_centered.extent(1)-1)/2.;
-      double crop_ref_y2 = crop_ref_y1 * cos(m_rotation_angle*M_PI/180.) - crop_ref_x1 * sin(m_rotation_angle*M_PI/180.) + (m_rotated.extent(0)-1)/2.;
-      double crop_ref_x2 = crop_ref_x1 * cos(m_rotation_angle*M_PI/180.) + crop_ref_y1 * sin(m_rotation_angle*M_PI/180.) + (m_rotated.extent(1)-1)/2.;
-
-      // 3/ Scale with the given scaling factor
-      shape(0) = static_cast<int>(floor(m_rotated.extent(0) * m_scaling_factor + 0.5));
-      shape(1) = static_cast<int>(floor(m_rotated.extent(1) * m_scaling_factor + 0.5));
-      if( !bob::core::array::hasSameShape(m_scaled, shape) ) {
-        m_scaled.resize( shape );
-        if(mask)
-          m_mask_int3.resize(shape);
-      }
-      if(mask)
-        scale(m_rotated, m_mask_int2, m_scaled, m_mask_int3);
-      else
-        scale(m_rotated, m_scaled);
-
-      // new coordinate of the cropping reference point
-      int crop_ref_y3 = static_cast<int>(floor(crop_ref_y2 * m_scaling_factor + 0.5));
-      int crop_ref_x3 = static_cast<int>(floor(crop_ref_x2 * m_scaling_factor + 0.5));
-
-      // 4/ Crop the face
-      if(mask)
-        crop(m_scaled, m_mask_int3, dst, dst_mask, crop_ref_y3-m_crop_offset_h,
-          crop_ref_x3-m_crop_offset_w, m_crop_height, m_crop_width, true, true);
-      else
-        crop(m_scaled, dst, crop_ref_y3-m_crop_offset_h, 
-          crop_ref_x3-m_crop_offset_w, m_crop_height, m_crop_width, true, true);
+      // done!
     }
-
   }
 /**
  * @}

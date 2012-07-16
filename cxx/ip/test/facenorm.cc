@@ -102,6 +102,7 @@ BOOST_AUTO_TEST_CASE( test_facenorm )
   blitz::Array<uint8_t,2> img_processed = bob::core::convertFromRange<uint8_t>( img_processed_d, 0., 255.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r10_facenorm.pgm";
+//  bob::io::Array(img_processed).save(testdata_path_img.string()); // Re-generate reference data
   bob::io::Array ar_img_facenorm(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_facenorm = ar_img_facenorm.get<uint8_t,2>();
   checkBlitzClose( img_ref_facenorm, img_processed, eps);
@@ -129,6 +130,7 @@ BOOST_AUTO_TEST_CASE( test_facenorm2 )
   facenorm(image.get<uint8_t,2>(),processed_image,116,104,116,147);
   testdata_path_image = testdata_cpath;
   testdata_path_image /= "Nicolas_Cage_0001.hdf5";
+//  bob::io::Array(processed_image).save(testdata_path_image.string());  // Re-generate reference data
   bob::io::Array read_reference_image(testdata_path_image.string());
   blitz::Array<double,2> reference_image = read_reference_image.get<double,2>();
   checkBlitzClose(reference_image, processed_image, eps2);
