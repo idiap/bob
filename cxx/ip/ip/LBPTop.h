@@ -188,9 +188,10 @@ namespace bob { namespace ip {
 
       /***** Checking the inputs *****/
       /**** Get XY plane (the first is enough) ****/
-      const blitz::Array<T,2> kxy = 
+
+      const blitz::Array<T,2> checkXY = 
         src( 0, blitz::Range::all(), blitz::Range::all());
-      m_lbp_xy->operator()(kxy, radius_xy, radius_xy);
+      m_lbp_xy->operator()(checkXY, radius_xy, radius_xy);
 
 
       /**** Get XT plane (Intersect in one point is enough) ****/
@@ -204,33 +205,35 @@ namespace bob { namespace ip {
         throw ParamOutOfBoundaryError("yt_radius", false, Tlength, limitYT);
 
 
+      /***** Checking the outputs *****/
+      /*TODO: Checking the outputs*/
+
       //for each element in time domain
       for(int i=maxT_radius;i<(Tlength-maxT_radius);++i){
         for (int j=radius_xy; j < (height-radius_xy); ++j) {
           for (int k=radius_xy; k < (width-radius_xy); ++k) {
 
             /*Getting the "micro-plane" for XY calculus*/
+
             const blitz::Array<T,2> kxy = 
                src( i, blitz::Range(j-radius_xy,j+radius_xy), blitz::Range(k-radius_xy,k+radius_xy));
-            xy(i,j,k) = m_lbp_xy->operator()(kxy, 1, 1);
+            xy(i-maxT_radius,j-radius_xy,k-radius_xy) = m_lbp_xy->operator()(kxy, 1, 1);
 
 
             /*Getting the "micro-plane" for XT calculus*/
             const blitz::Array<T,2> kxt = 
                src(blitz::Range(i-radius_xt,i+radius_xt),j,blitz::Range(k-radius_xt,k+radius_xt));
-            xt(i,j,k) = m_lbp_xt->operator()(kxt, 1, 1);
+            xt(i-maxT_radius,j-radius_xy,k-radius_xy) = m_lbp_xt->operator()(kxt, 1, 1);
 
             /*Getting the "micro-plane" for YT calculus*/
+
             const blitz::Array<T,2> kyt = 
                src(blitz::Range(i-radius_yt,i+radius_yt),blitz::Range(j-radius_yt,j+radius_yt),k);
-            yt(i,j,k) = m_lbp_yt->operator()(kyt, 1, 1);
+            yt(i-maxT_radius,j-radius_xy,k-radius_xy) = m_lbp_yt->operator()(kyt, 1, 1);
 
           }
         }
       }
-
-      printf("\n\n END \n\n ");
-       
     }
 } }
 
