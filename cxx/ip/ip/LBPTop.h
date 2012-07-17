@@ -62,9 +62,9 @@ namespace bob { namespace ip {
        * Constructs a new LBPTop object starting from the algorithm
        * configuration
        *
-       * @param m_lbp_xy The 2D LBP-XY plane configuration
-       * @param m_lbp_xt The 2D LBP-XT plane configuration
-       * @param m_lbp_yt The 2D LBP-YT plane configuration
+       * @param lbp_xy The 2D LBP-XY plane configuration
+       * @param lbp_xt The 2D LBP-XT plane configuration
+       * @param lbp_yt The 2D LBP-YT plane configuration
        */
       LBPTop(const bob::ip::LBP& lbp_xy,
              const bob::ip::LBP& lbp_xt, 

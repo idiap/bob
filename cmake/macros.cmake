@@ -327,7 +327,7 @@ macro(bob_python_add_idiap_unittest package_name file_path)
   # test if the BOB_AT_IDIAP cmake variable is set
   if (BOB_AT_IDIAP)
     # add the unit test
-    bob_python_add_unittest(package_name file_path)
+    bob_python_add_unittest(${package_name} ${file_path})
   endif()
 endmacro()
 
