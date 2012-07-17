@@ -193,7 +193,6 @@ namespace bob { namespace ip {
         src( 0, blitz::Range::all(), blitz::Range::all());
       m_lbp_xy->operator()(checkXY, radius_xy, radius_xy);
 
-
       /**** Get XT plane (Intersect in one point is enough) ****/
       int limitXT = ceil(2*radius_xt + 1);
       if( Tlength < limitXT )
@@ -241,22 +240,21 @@ namespace bob { namespace ip {
           for (int k=radius_xy; k < (width-radius_xy); ++k) {
 
             /*Getting the "micro-plane" for XY calculus*/
-
             const blitz::Array<T,2> kxy = 
                src( i, blitz::Range(j-radius_xy,j+radius_xy), blitz::Range(k-radius_xy,k+radius_xy));
-            xy(i-maxT_radius,j-radius_xy,k-radius_xy) = m_lbp_xy->operator()(kxy, 1, 1);
+            xy(i-maxT_radius,j-radius_xy,k-radius_xy) = m_lbp_xy->operator()(kxy, radius_xy, radius_xy);
 
 
             /*Getting the "micro-plane" for XT calculus*/
             const blitz::Array<T,2> kxt = 
                src(blitz::Range(i-radius_xt,i+radius_xt),j,blitz::Range(k-radius_xt,k+radius_xt));
-            xt(i-maxT_radius,j-radius_xy,k-radius_xy) = m_lbp_xt->operator()(kxt, 1, 1);
+            xt(i-maxT_radius,j-radius_xy,k-radius_xy) = m_lbp_xt->operator()(kxt, radius_xt, radius_xt);
 
             /*Getting the "micro-plane" for YT calculus*/
-
             const blitz::Array<T,2> kyt = 
                src(blitz::Range(i-radius_yt,i+radius_yt),blitz::Range(j-radius_yt,j+radius_yt),k);
-            yt(i-maxT_radius,j-radius_xy,k-radius_xy) = m_lbp_yt->operator()(kyt, 1, 1);
+
+            yt(i-maxT_radius,j-radius_xy,k-radius_xy) = m_lbp_yt->operator()(kyt, radius_yt, radius_yt);
 
           }
         }
