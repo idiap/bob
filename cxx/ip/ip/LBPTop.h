@@ -106,19 +106,19 @@ namespace bob { namespace ip {
        * array along the time direction. 
        */
       void operator()(const blitz::Array<uint8_t,3>& src, 
-          blitz::Array<uint16_t,2>& xy,
-          blitz::Array<uint16_t,2>& xt,
-          blitz::Array<uint16_t,2>& yt) const;
+          blitz::Array<uint16_t,3>& xy,
+          blitz::Array<uint16_t,3>& xt,
+          blitz::Array<uint16_t,3>& yt) const;
 
       void operator()(const blitz::Array<uint16_t,3>& src, 
-          blitz::Array<uint16_t,2>& xy,
-          blitz::Array<uint16_t,2>& xt,
-          blitz::Array<uint16_t,2>& yt) const;
+          blitz::Array<uint16_t,3>& xy,
+          blitz::Array<uint16_t,3>& xt,
+          blitz::Array<uint16_t,3>& yt) const;
 
       void operator()(const blitz::Array<double,3>& src, 
-          blitz::Array<uint16_t,2>& xy,
-          blitz::Array<uint16_t,2>& xt,
-          blitz::Array<uint16_t,2>& yt) const;
+          blitz::Array<uint16_t,3>& xy,
+          blitz::Array<uint16_t,3>& xt,
+          blitz::Array<uint16_t,3>& yt) const;
 
       /**
        * Accessors
@@ -153,9 +153,9 @@ namespace bob { namespace ip {
        */
       template <typename T> 
         void process(const blitz::Array<T,3>& src, 
-            blitz::Array<uint16_t,2>& xy,
-            blitz::Array<uint16_t,2>& xt,
-            blitz::Array<uint16_t,2>& yt) const;
+            blitz::Array<uint16_t,3>& xy,
+            blitz::Array<uint16_t,3>& xt,
+            blitz::Array<uint16_t,3>& yt) const;
 
       boost::shared_ptr<bob::ip::LBP> m_lbp_xy; ///< LBP for the XY calculation
       boost::shared_ptr<bob::ip::LBP> m_lbp_xt; ///< LBP for the XT calculation
@@ -168,121 +168,100 @@ namespace bob { namespace ip {
 
   template <typename T>
     void bob::ip::LBPTop::process(const blitz::Array<T,3>& src,
-                                  blitz::Array<uint16_t,2>& xy,
-                                  blitz::Array<uint16_t,2>& xt,
-                                  blitz::Array<uint16_t,2>& yt) const
+                                  blitz::Array<uint16_t,3>& xy,
+                                  blitz::Array<uint16_t,3>& xt,
+                                  blitz::Array<uint16_t,3>& yt) const
     {
+
 
       int radius_xy = m_lbp_xy->getRadius(); ///< The LBPu2,i radius in XY
       int radius_xt = m_lbp_xt->getRadius(); ///< The LBPu2,i radius in XT
       int radius_yt = m_lbp_yt->getRadius(); ///< The LBPu2,i radius in YT
 
+      /*Getting the maximum radius in T domain. This is necessary because we need to intersect the 3 planes in one point*/
+      int maxT_radius = radius_xt>radius_yt ? radius_xt : radius_yt;
+
       int Tlength = src.extent(0);
       int height = src.extent(1);
       int width = src.extent(2);
-      int tc = Tlength/2;
-      int yc = height/2;
-      int xc = width/2;
 
-      int x=0,y=0,t=0;
-      int correctX=0,correctY=0,correctT=0;
 
-      /**** Get XY plane ****/
-      const blitz::Array<T,2> kxy = 
-        src( tc, blitz::Range::all(), blitz::Range::all());
+      /***** Checking the inputs *****/
+      /**** Get XY plane (the first is enough) ****/
 
-      /*Checking the LBP conditions for XY. Just touching the method in order to stress theirs exceptions*/
-      y=radius_xy; x=y;
-      m_lbp_xy->operator()(kxy, y, x);
+      const blitz::Array<T,2> checkXY = 
+        src( 0, blitz::Range::all(), blitz::Range::all());
+      m_lbp_xy->operator()(checkXY, radius_xy, radius_xy);
 
-      /**** Get XT plane ****/
-      const blitz::Array<T,2> kxt = 
-        src( blitz::Range::all(), yc, blitz::Range::all());
 
-      /*Checking the LBP conditions for XT. Just touching the method in order to stress theirs exceptions*/
-      t=radius_xt; x = t;
-      m_lbp_xt->operator()(kxt, t, x);
+      /**** Get XT plane (Intersect in one point is enough) ****/
+      int limitXT = ceil(2*radius_xt + 1);
+      if( Tlength < limitXT )
+        throw ParamOutOfBoundaryError("xt_radius", false, Tlength, limitXT);
 
-      /**** Get YT plane ****/
-      const blitz::Array<T,2> kyt = 
-        src( blitz::Range::all(), blitz::Range::all(), xc);
+      /**** Get YT plane (Intersect in one point is enough) ****/
+      int limitYT = ceil(2*radius_yt + 1);
+      if( Tlength < limitYT )
+        throw ParamOutOfBoundaryError("yt_radius", false, Tlength, limitYT);
 
-      /*Checking the LBP conditions for YT. Just touching the method in order to stress theirs exceptions*/
-      t=radius_yt; y = t;
-      m_lbp_yt->operator()(kyt, t, y);
 
-      /**** Checking the size output arrays ****/
-      /*Checking XY*/
-      correctX = width-(radius_xy*2);
-      correctY = height-(radius_xy*2);
-      x = xy.extent(0);
-      y = xy.extent(1);
+      /***** Checking the outputs *****/
+      int limitWidth  = width-2*radius_xy;
+      int limitHeight = height-2*radius_xy;
+      int limitTime   = Tlength-2*((radius_xt>radius_yt)?radius_xt:radius_yt);
 
-      if(x > correctX)
-        throw ParamOutOfBoundaryError("XY_Plane(x,y) x dimension",true,x,correctX);
-      else if(x < correctX)
-        throw ParamOutOfBoundaryError("XY_Plane(x,y) x dimension",false,x,correctX);
-
-      if(y > correctY)
-        throw ParamOutOfBoundaryError("XY_Plane(x,y) y dimension",true,y,correctY);
-      else if(x < correctX)
-        throw ParamOutOfBoundaryError("XY_Plane(x,y) y dimension",false,y,correctY);
+      /*Checking XY*/      
+      if( xy.extent(0) != limitTime)
+        throw ParamOutOfBoundaryError("Time parameter in  XY ", (xy.extent(0) > limitTime), xy.extent(0), limitTime);
+      if( xy.extent(1) != limitWidth)
+        throw ParamOutOfBoundaryError("Width parameter in  XY ", (xy.extent(1) > limitWidth), xy.extent(1), limitWidth);
+      if( xy.extent(2) != limitHeight)
+        throw ParamOutOfBoundaryError("Height parameter in  XY ", (xy.extent(2) > limitHeight), xy.extent(2), limitHeight);
 
       /*Checking XT*/
-      correctT = Tlength-(radius_xt*2);
-      correctX = width-(radius_xt*2);
-      t = xt.extent(0);
-      x = xt.extent(1);
-
-      if(t > correctT)
-        throw ParamOutOfBoundaryError("XT_Plane(t,x) t dimension",true,t,correctT);
-      else if(t < correctT)
-        throw ParamOutOfBoundaryError("XT_Plane(t,x) t dimension",false,t,correctT);
-
-      if(x > correctX)
-        throw ParamOutOfBoundaryError("XT_Plane(t,x) x dimension",true,x,correctX);
-      else if(x < correctX)
-        throw ParamOutOfBoundaryError("XT_Plane(t,x) x dimension",false,x,correctX);
+      if( xt.extent(0) != limitTime)
+        throw ParamOutOfBoundaryError("Time parameter in  XT ", (xt.extent(0) > limitTime), xt.extent(0), limitTime);
+      if( xt.extent(1) != limitWidth)
+        throw ParamOutOfBoundaryError("Width parameter in  XT ", (xt.extent(1) > limitWidth), xt.extent(1), limitWidth);
+      if( xt.extent(2) != limitHeight)
+        throw ParamOutOfBoundaryError("Height parameter in  XT ", (xt.extent(2) > limitHeight), xt.extent(2), limitHeight);
 
       /*Checking YT*/
-      correctY = height-(radius_yt*2);
-      correctT = Tlength-(radius_yt*2);
-      t = yt.extent(0);
-      y = yt.extent(1);
+      if( yt.extent(0) != limitTime)
+        throw ParamOutOfBoundaryError("Time parameter in  YT ", (yt.extent(0) > limitTime), yt.extent(0), limitTime);
+      if( yt.extent(1) != limitWidth)
+        throw ParamOutOfBoundaryError("Width parameter in  YT ", (yt.extent(1) > limitWidth), yt.extent(1), limitWidth);
+      if( yt.extent(2) != limitHeight)
+        throw ParamOutOfBoundaryError("Height parameter in  YT ", (yt.extent(2) > limitHeight), yt.extent(2), limitHeight);
 
-      if(t > correctT)
-        throw ParamOutOfBoundaryError("YT_Plane(t,y) t dimension",true,t,correctT);
-      else if(t < correctT)
-        throw ParamOutOfBoundaryError("YT_Plane(t,y) t dimension",false,t,correctT);
 
-      if(y > correctY)
-        throw ParamOutOfBoundaryError("YT_Plane(t,y) y dimension",true,y,correctY);
-      else if(y < correctY)
-        throw ParamOutOfBoundaryError("YT_Plane(t,y) y dimension",false,y,correctY);
+      //for each element in time domain
+      for(int i=maxT_radius;i<(Tlength-maxT_radius);++i){
+        for (int j=radius_xy; j < (height-radius_xy); ++j) {
+          for (int k=radius_xy; k < (width-radius_xy); ++k) {
 
-      /*Calculating the XY plane*/
-      for (int y=radius_xy; y < (height-radius_xy); ++y) {
-        for (int x=radius_xy; x < (width-radius_xy); ++x) {
-          xy(y-radius_xy,x-radius_xy) = m_lbp_xy->operator()(kxy, y, x);
+            /*Getting the "micro-plane" for XY calculus*/
+
+            const blitz::Array<T,2> kxy = 
+               src( i, blitz::Range(j-radius_xy,j+radius_xy), blitz::Range(k-radius_xy,k+radius_xy));
+            xy(i-maxT_radius,j-radius_xy,k-radius_xy) = m_lbp_xy->operator()(kxy, 1, 1);
+
+
+            /*Getting the "micro-plane" for XT calculus*/
+            const blitz::Array<T,2> kxt = 
+               src(blitz::Range(i-radius_xt,i+radius_xt),j,blitz::Range(k-radius_xt,k+radius_xt));
+            xt(i-maxT_radius,j-radius_xy,k-radius_xy) = m_lbp_xt->operator()(kxt, 1, 1);
+
+            /*Getting the "micro-plane" for YT calculus*/
+
+            const blitz::Array<T,2> kyt = 
+               src(blitz::Range(i-radius_yt,i+radius_yt),blitz::Range(j-radius_yt,j+radius_yt),k);
+            yt(i-maxT_radius,j-radius_xy,k-radius_xy) = m_lbp_yt->operator()(kyt, 1, 1);
+
+          }
         }
       }
-
-      /*Calculation of the XT plane*/
-      for (int t = radius_xt; t < (Tlength-radius_xt); ++t) {
-        for (int x=radius_xt; x < (width-radius_xt); ++x) {
-          xt(t-radius_xt,x-radius_xt) = m_lbp_xt->operator()(kxt, t, x);
-        }
-      }
-
-      /*Calculation of the YT plane*/
-      for (int t = radius_yt; t < (Tlength-radius_yt); ++t) {
-        for (int y = radius_yt; y < (height-radius_yt); ++y) {
-          yt(t-radius_yt,y-radius_yt) = m_lbp_yt->operator()(kyt, t, y);
-        }
-      }
-
     }
-
 } }
 
 #endif /* BOB_IP_LBPTOP_H */
