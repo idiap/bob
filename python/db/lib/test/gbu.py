@@ -93,20 +93,20 @@ class GBUDatabaseTest(unittest.TestCase):
 
     # The following tests might take a while...
     
-    for protocol in protocols:
-      # check that for 'gbu' protocol types, exactly one file per id is returned
-      for model_id in db.models(type='gbu', groups='dev', protocol=protocol):
-        # assert that there is exactly one file for each enrol purposes per model
-        self.assertEqual(len(db.files(type='gbu', groups='dev', protocol=protocol, model_ids=[model_id], purposes='enrol')), 1)
-        # model ids and probe id's should differ, hence there should be no probe file for a given model id
-        self.assertEqual(len(db.files(type='gbu', groups='dev', protocol=protocol, model_ids=[model_id], purposes='probe')), 0)
+    protocol = protocols[0]
+    # check that for 'gbu' protocol types, exactly one file per id is returned
+    for model_id in db.models(type='gbu', groups='dev', protocol=protocol):
+      # assert that there is exactly one file for each enrol purposes per model
+      self.assertEqual(len(db.files(type='gbu', groups='dev', protocol=protocol, model_ids=[model_id], purposes='enrol')), 1)
+      # model ids and probe id's should differ, hence there should be no probe file for a given model id
+      self.assertEqual(len(db.files(type='gbu', groups='dev', protocol=protocol, model_ids=[model_id], purposes='probe')), 0)
 
-      # for the 'multi' protocols, there is AT LEAST one file per model
-      for model_id in db.models(type='multi', groups='dev', protocol=protocol):
-        # assert that there is exactly one file for each enrol purposes per model
-        self.assertTrue(len(db.files(type='multi', groups='dev', protocol=protocol, model_ids=[model_id], purposes='enrol')) >= 1)
-        # model ids and probe id's are identical for 'multi'
-        self.assertTrue(len(db.files(type='multi', groups='dev', protocol=protocol, model_ids=[model_id], purposes='probe')) >= 1)
+    # for the 'multi' protocols, there is AT LEAST one file per model
+    for model_id in db.models(type='multi', groups='dev', protocol=protocol):
+      # assert that there is exactly one file for each enrol purposes per model
+      self.assertTrue(len(db.files(type='multi', groups='dev', protocol=protocol, model_ids=[model_id], purposes='enrol')) >= 1)
+      # model ids and probe id's are identical for 'multi'
+      self.assertTrue(len(db.files(type='multi', groups='dev', protocol=protocol, model_ids=[model_id], purposes='probe')) >= 1)
 
 
   def test_file_ids(self):
@@ -114,25 +114,23 @@ class GBUDatabaseTest(unittest.TestCase):
     db = bob.db.gbu.Database()
 
     # the training subworlds and the protocols
-    subworlds = bob.db.gbu.models.Trainset.m_names
-    protocols = bob.db.gbu.models.Protocol.m_names
+    protocol = bob.db.gbu.models.Protocol.m_names[0]
 
-    for protocol in protocols:
-      # for 'gbu' protocols, get_client_id_from_file_id and get_client_id_from_model_id should return the same value
-      for model_id in db.models(type='gbu', groups='dev', protocol=protocol):
-        for file_id in db.files(type='gbu', groups='dev', protocol=protocol, model_ids=[model_id], purposes='enrol'):
-          self.assertEqual(
-                db.get_client_id_from_file_id(file_id), 
-                db.get_client_id_from_model_id(model_id, type='gbu'))
+    # for 'gbu' protocols, get_client_id_from_file_id and get_client_id_from_model_id should return the same value
+    for model_id in db.models(type='gbu', groups='dev', protocol=protocol):
+      for file_id in db.files(type='gbu', groups='dev', protocol=protocol, model_ids=[model_id], purposes='enrol'):
+        self.assertEqual(
+              db.get_client_id_from_file_id(file_id), 
+              db.get_client_id_from_model_id(model_id, type='gbu'))
 
-      for model_id in db.models(type='multi', groups='dev', protocol=protocol):
-        # for 'multi' protocols, get_client_id_from_model_id should return the client id.
-        self.assertEqual(db.get_client_id_from_model_id(model_id, type='multi'), model_id)
-        # and also get_client_id_from_file_id should return the model id, both for enrol and probe sets
-        for file_id in db.files(type='multi', groups='dev', protocol=protocol, model_ids=[model_id], purposes='enrol'):
-          self.assertEqual(db.get_client_id_from_file_id(file_id), model_id)
-        for file_id in db.files(type='multi', groups='dev', protocol=protocol, model_ids=[model_id], purposes='probe'):
-          self.assertEqual(db.get_client_id_from_file_id(file_id), model_id)
+    for model_id in db.models(type='multi', groups='dev', protocol=protocol):
+      # for 'multi' protocols, get_client_id_from_model_id should return the client id.
+      self.assertEqual(db.get_client_id_from_model_id(model_id, type='multi'), model_id)
+      # and also get_client_id_from_file_id should return the model id, both for enrol and probe sets
+      for file_id in db.files(type='multi', groups='dev', protocol=protocol, model_ids=[model_id], purposes='enrol'):
+        self.assertEqual(db.get_client_id_from_file_id(file_id), model_id)
+      for file_id in db.files(type='multi', groups='dev', protocol=protocol, model_ids=[model_id], purposes='probe'):
+        self.assertEqual(db.get_client_id_from_file_id(file_id), model_id)
 
 
 # Instantiates our standard main module for unittests

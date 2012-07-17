@@ -52,17 +52,16 @@ class Database(object):
         raise RuntimeError, 'Invalid %s "%s". Valid values are %s, or lists/tuples of those' % (description, k, possibilities)
     return elements
   
-  def __check_single__(self, element, description, possibilities, default = None):
+  def __check_single__(self, element, description, possibilities):
     """Checks validity of user input data against a set of valid values"""
     if not element:
-      return default
+      raise RuntimeError, 'Please select one element from %s for %s' % (possibilities, description)
     if isinstance(element,tuple) or isinstance (element,list):
       if len(element) > 1:
         raise RuntimeError, 'For %s, only single elements from %s are allowed' % (description, possibilities)
       element = element[0]
     if element not in possibilities:
       raise RuntimeError, 'The given %s "%s" is not allowed. Please choose one of %s' % (description, element, possibilities)
-    return element
 
   def __make_path__(self, file, directory, extension):
     """Generates the file name for the given File object."""
@@ -137,7 +136,7 @@ class Database(object):
     Returns: A list containing all the model id's belonging to the given group.
     """
 
-    type = self.__check_single__(type, "types", self.m_types, 'multi')
+    self.__check_single__(type, "types", self.m_types)
    
     if type == 'multi':
       return self.clients(groups, subworld, protocol)
@@ -183,7 +182,7 @@ class Database(object):
     Returns: The client_id attached to the given model_id
     """
    
-    type = self.__check_single__(type, "types", self.m_types, 'multi')
+    self.__check_single__(type, "types", self.m_types)
     
     if type == 'multi':
       return model_id
@@ -280,7 +279,7 @@ class Database(object):
     if isinstance(model_ids, str):
       model_ids = (model_ids,)
     
-    type = self.__check_single__(type, 'protocol type', self.m_types)
+    self.__check_single__(type, 'protocol type', self.m_types)
 
     retval = {}
 
