@@ -23,6 +23,7 @@ import casia_fasd
 import atnt
 import gbu
 import arface
+import frgc
 
 
 __all__ = dir()

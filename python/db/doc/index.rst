@@ -71,6 +71,12 @@ FaceVerif_FL Database
 
 .. autoclass:: bob.db.faceverif_fl.Database
 
+FRGC Database
+=============
+
+.. automodule:: bob.db.frgc
+
+.. autoclass:: bob.db.frgc.Database
 
 GBU Database
 ============

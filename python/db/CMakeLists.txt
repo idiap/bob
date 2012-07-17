@@ -201,6 +201,12 @@ bob_python_add_unittest(db lib/test/arface.py main)
 bob_python_add_test(db-atnt-dumplist bob_dbmanage.py arface dumplist --self-test)
 bob_python_add_test(db-atnt-checkfiles bob_dbmanage.py arface checkfiles -d "." --self-test)
 
+# FRGC database driver test; only executed in an Idiap environment
+bob_python_add_idiap_unittest(db lib/test/frgc.py main)
+bob_python_add_idiap_test(db-frgc-dumplist bob_dbmanage.py frgc dumplist --self-test)
+bob_python_add_idiap_test(db-frgc-checkfiles bob_dbmanage.py frgc checkfiles -d "." --self-test)
+bob_python_add_idiap_test(db-frgc-position-files bob_dbmanage.py frgc create-position-files -d "." --self-test)
+
 # Our examples (run and install)
 bob_python_example(db iris_lda.py lib/example/iris_lda.py)
 bob_python_add_test(db iris_lda.py --self-test)
