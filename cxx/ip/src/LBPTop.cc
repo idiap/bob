@@ -56,24 +56,24 @@ ip::LBPTop& ip::LBPTop::operator= (const LBPTop& other) {
 }
 
 void ip::LBPTop::operator()(const blitz::Array<uint8_t,3>& src, 
-    blitz::Array<uint16_t,2>& xy,
-    blitz::Array<uint16_t,2>& xt,
-    blitz::Array<uint16_t,2>& yt) const
+    blitz::Array<uint16_t,3>& xy,
+    blitz::Array<uint16_t,3>& xt,
+    blitz::Array<uint16_t,3>& yt) const
 {
   process<uint8_t>(src, xy, xt, yt);
 }
 
 void ip::LBPTop::operator()(const blitz::Array<uint16_t,3>& src, 
-    blitz::Array<uint16_t,2>& xy,
-    blitz::Array<uint16_t,2>& xt,
-    blitz::Array<uint16_t,2>& yt) const
+    blitz::Array<uint16_t,3>& xy,
+    blitz::Array<uint16_t,3>& xt,
+    blitz::Array<uint16_t,3>& yt) const
 { 
   process<uint16_t>(src, xy, xt, yt); 
 }
 void ip::LBPTop::operator()(const blitz::Array<double,3>& src, 
-    blitz::Array<uint16_t,2>& xy,
-    blitz::Array<uint16_t,2>& xt,
-    blitz::Array<uint16_t,2>& yt) const
+    blitz::Array<uint16_t,3>& xy,
+    blitz::Array<uint16_t,3>& xt,
+    blitz::Array<uint16_t,3>& yt) const
 { 
   process<double>(src, xy, xt, yt); 
 }

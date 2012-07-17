@@ -224,15 +224,15 @@ class ProcessorLBPTop:
     xy_width  = img_size-(operator.xy.radius*2) #Square image
     xy_height = xy_width
 
-    xt_width = img_size-(operator.xt.radius*2)
-    xt_height = n_frames-(operator.xt.radius*2)
+    if(operator.xt.radius>operator.yt.radius):
+      maxT_radius = operator.xt.radius
+    else:
+      maxT_radius = operator.yt.radius
+    tLength   = n_frames-(maxT_radius*2)
 
-    yt_width  = img_size-(operator.yt.radius*2)
-    yt_height = n_frames-(operator.yt.radius*2)
-
-    self.XY = numpy.empty(shape=(xy_width,xy_height),dtype='uint16')
-    self.XT = numpy.empty(shape=(xt_width,xt_height),dtype='uint16')
-    self.YT = numpy.empty(shape=(yt_width,yt_height),dtype='uint16')
+    self.XY = numpy.empty(shape=(tLength,xy_width,xy_height),dtype='uint16')
+    self.XT = numpy.empty(shape=(tLength,xy_width,xy_height),dtype='uint16')
+    self.YT = numpy.empty(shape=(tLength,xy_width,xy_height),dtype='uint16')
 
     self.image = numpy.ndarray((n_frames,img_size, img_size), 'uint8')
 
@@ -242,20 +242,21 @@ class ProcessorLBPTop:
   "  @param plane_index Index of the plane (0- XY Plane, 1- XT Plane, 2- YT Plane)
   "  @param center Coordinates of a specific operator in order to check
   """
-  def __call__(self, value='',plane_index=0,operator_coordinates=(0,0)):
+  def __call__(self, value='',plane_index=0,operator_coordinates=(0,0,0)):
 
     image = self.generator(self.image, value)
     self.operator(self.image, self.XY,self.XT,self.YT)
 
     x = operator_coordinates[0]
     y = operator_coordinates[1]
+    z = operator_coordinates[2]
 
     if(plane_index==0):
-      return self.XY[x,y]
+      return self.XY[x,y,z]
     elif(plane_index==1):
-      return self.XT[x,y]
+      return self.XT[x,y,z]
     else:
-      return self.YT[x,y]
+      return self.YT[x,y,z]
 
 
 
@@ -495,9 +496,9 @@ class LBPTest(unittest.TestCase):
     op = bob.ip.LBPTop(lbp4R_XY,lbp4R_XT,lbp4R_YT)
 
     proc1 = ProcessorLBPTop(op, generate_NxMxM_image,img_size=3,n_frames=3)
-    self.assertEqual(proc1(['000000000','111111111','222222222'],plane_index=0,operator_coordinates=(0,0)),0xf)
-    self.assertEqual(proc1(['000000000','111111111','222222222'],plane_index=1,operator_coordinates=(0,0)),0x7)
-    self.assertEqual(proc1(['000000000','111111111','222222222'],plane_index=2,operator_coordinates=(0,0)),0x7)
+    self.assertEqual(proc1(['000000000','111111111','222222222'],plane_index=0,operator_coordinates=(0,0,0)),0xf)
+    self.assertEqual(proc1(['000000000','111111111','222222222'],plane_index=1,operator_coordinates=(0,0,0)),0x7)
+    self.assertEqual(proc1(['000000000','111111111','222222222'],plane_index=2,operator_coordinates=(0,0,0)),0x7)
 
 
     proc2 = ProcessorLBPTop(op, generate_NxMxM_image,img_size=5,n_frames=5)
@@ -508,9 +509,9 @@ class LBPTest(unittest.TestCase):
     values_5x5.append([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1])
     values_5x5.append([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
 
-    self.assertEqual(proc2(values_5x5,plane_index=0,operator_coordinates=(0,0)),0xf)
-    self.assertEqual(proc2(values_5x5,plane_index=1,operator_coordinates=(0,0)),0x7)
-    self.assertEqual(proc2(values_5x5,plane_index=2,operator_coordinates=(0,0)),0x7)
+    self.assertEqual(proc2(values_5x5,plane_index=0,operator_coordinates=(0,0,0)),0xf)
+    self.assertEqual(proc2(values_5x5,plane_index=1,operator_coordinates=(0,0,0)),0x7)
+    self.assertEqual(proc2(values_5x5,plane_index=2,operator_coordinates=(0,0,0)),0x7)
 
 
 

@@ -117,9 +117,9 @@ static object get_shape (O& op, tp::const_ndarray input) {
 template <typename T> 
 static void inner_call_lbptop (const ip::LBPTop& op, tp::const_ndarray input,
     tp::ndarray xy, tp::ndarray xt, tp::ndarray yt) {
-  blitz::Array<uint16_t,2> xy_ = xy.bz<uint16_t,2>();
-  blitz::Array<uint16_t,2> xt_ = xt.bz<uint16_t,2>();
-  blitz::Array<uint16_t,2> yt_ = yt.bz<uint16_t,2>();
+  blitz::Array<uint16_t,3> xy_ = xy.bz<uint16_t,3>();
+  blitz::Array<uint16_t,3> xt_ = xt.bz<uint16_t,3>();
+  blitz::Array<uint16_t,3> yt_ = yt.bz<uint16_t,3>();
   op(input.bz<T,3>(), xy_, xt_, yt_);
 }
 
