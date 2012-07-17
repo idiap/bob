@@ -311,6 +311,26 @@ macro(bob_python_add_unittest package_name file_path)
   set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/data")
 endmacro()
 
+
+# Add python tests coded with the unittest module, but only when -DBOB_AT_IDIAP=On is defined
+#
+#   bob_python_add_unittest(package_name file_path [python_method] [working_directory])
+#
+# package_name: package name
+# file_path: path to the python file containing the test method
+# python_method: python test method (default "main")
+# working_directory: working directory where the test are executed. Default to
+#                    "data" dir in current source dir.
+#
+# Example: bob_python_add_unittest(io lib/test/array.py)
+macro(bob_python_add_idiap_unittest package_name file_path)
+  # test if the BOB_AT_IDIAP cmake variable is set
+  if (BOB_AT_IDIAP)
+    # add the unit test
+    bob_python_add_unittest(package_name file_path)
+  endif()
+endmacro()
+
 # Configure the wrapper to the python binary that automatically sets the
 # correct environment.
 #
@@ -577,6 +597,16 @@ function(bob_python_add_test)
 
 endfunction()
 
+# add the python test, but only if -DBOB_AT_IDIAP=On is defined
+macro(bob_python_add_idiap_test)
+  # test if the BOB_AT_IDIAP cmake variable is set
+  if (BOB_AT_IDIAP)
+    # add the test
+    bob_python_add_test(${ARGV})
+  endif()
+endmacro()
+
+
 # This macro helps users to add python tests to cmake that depends on other
 # tests
 function(bob_python_add_dependent_test)
@@ -596,3 +626,14 @@ function(bob_python_add_dependent_test)
   set_property(TEST ${test_name} APPEND PROPERTY DEPENDS "${dependencies}")
 
 endfunction()
+
+# add the dependent python test, but only if -DBOB_AT_IDIAP=On is defined
+macro(bob_python_add_dependent_idiap_test)
+  # test if the BOB_AT_IDIAP cmake variable is set
+  if (BOB_AT_IDIAP)
+    # add the dependent test
+    bob_python_add_dependent_test(${ARGV})
+  endif()
+endmacro()
+
+
