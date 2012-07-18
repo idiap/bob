@@ -178,8 +178,10 @@ namespace bob { namespace ip {
       int radius_xt = m_lbp_xt->getRadius(); ///< The LBPu2,i radius in XT
       int radius_yt = m_lbp_yt->getRadius(); ///< The LBPu2,i radius in YT
 
-      /*Getting the maximum radius in T domain. This is necessary because we need to intersect the 3 planes in one point*/
-      int maxT_radius = radius_xt>radius_yt ? radius_xt : radius_yt;
+      /*Getting the maximum radius in XY, XT and YT. This is necessary because we need to intersect the 3 planes in one point for the entire video and 
+       for that is necessary to clip the borders using the maximum radius*/
+      int max_radius = radius_xt>radius_yt ? radius_xt : radius_yt;
+      max_radius = max_radius > radius_xy ? max_radius : radius_xy;
 
       int Tlength = src.extent(0);
       int height = src.extent(1);
@@ -192,7 +194,6 @@ namespace bob { namespace ip {
       const blitz::Array<T,2> checkXY = 
         src( 0, blitz::Range::all(), blitz::Range::all());
       m_lbp_xy->operator()(checkXY, radius_xy, radius_xy);
-
 
       /**** Get XT plane (Intersect in one point is enough) ****/
       int limitXT = ceil(2*radius_xt + 1);
@@ -235,29 +236,25 @@ namespace bob { namespace ip {
         throw ParamOutOfBoundaryError("Height parameter in  YT ", (yt.extent(2) > limitHeight), yt.extent(2), limitHeight);
 
 
-      //for each element in time domain
-      for(int i=maxT_radius;i<(Tlength-maxT_radius);++i){
-        for (int j=radius_xy; j < (height-radius_xy); ++j) {
-          for (int k=radius_xy; k < (width-radius_xy); ++k) {
+      //for each element in time domain (the simplest way to see what is happening)
+      for(int i=max_radius;i<(Tlength-max_radius);i++){
+        for (int j=max_radius; j < (height-max_radius); j++) {
+          for (int k=max_radius; k < (width-max_radius); k++) {
 
             /*Getting the "micro-plane" for XY calculus*/
-
             const blitz::Array<T,2> kxy = 
                src( i, blitz::Range(j-radius_xy,j+radius_xy), blitz::Range(k-radius_xy,k+radius_xy));
-            xy(i-maxT_radius,j-radius_xy,k-radius_xy) = m_lbp_xy->operator()(kxy, 1, 1);
-
+            xy(i-max_radius,j-max_radius,k-max_radius) = m_lbp_xy->operator()(kxy, radius_xy, radius_xy);
 
             /*Getting the "micro-plane" for XT calculus*/
             const blitz::Array<T,2> kxt = 
                src(blitz::Range(i-radius_xt,i+radius_xt),j,blitz::Range(k-radius_xt,k+radius_xt));
-            xt(i-maxT_radius,j-radius_xy,k-radius_xy) = m_lbp_xt->operator()(kxt, 1, 1);
+            xt(i-max_radius,j-max_radius,k-max_radius) = m_lbp_xt->operator()(kxt, radius_xt, radius_xt);
 
             /*Getting the "micro-plane" for YT calculus*/
-
             const blitz::Array<T,2> kyt = 
                src(blitz::Range(i-radius_yt,i+radius_yt),blitz::Range(j-radius_yt,j+radius_yt),k);
-            yt(i-maxT_radius,j-radius_xy,k-radius_xy) = m_lbp_yt->operator()(kyt, 1, 1);
-
+            yt(i-max_radius,j-max_radius,k-max_radius) = m_lbp_yt->operator()(kyt, radius_yt, radius_yt);
           }
         }
       }
