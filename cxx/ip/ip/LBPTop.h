@@ -207,9 +207,9 @@ namespace bob { namespace ip {
 
 
       /***** Checking the outputs *****/
-      int limitWidth  = width-2*radius_xy;
-      int limitHeight = height-2*radius_xy;
-      int limitTime   = Tlength-2*((radius_xt>radius_yt)?radius_xt:radius_yt);
+      int limitWidth  = width-2*max_radius;
+      int limitHeight = height-2*max_radius;
+      int limitTime   = Tlength-2*max_radius;
 
       /*Checking XY*/      
       if( xy.extent(0) != limitTime)
