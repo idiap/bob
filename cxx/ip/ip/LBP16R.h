@@ -57,6 +57,20 @@ namespace bob { namespace ip {
           const int eLBP_type=0);
 
       /**
+       * Constructor with two radius (not optional). This will permit Eliptical and Retangular navigation. 
+        This second radio will work in the X coordinate
+       */
+      LBP16R(const double R,
+          const double R2, 
+          const bool circular=true, 
+          const bool to_average=false, 
+          const bool add_average_bit=false, 
+          const bool uniform=false, 
+          const bool rotation_invariant=false, 
+          const int eLBP_type=0);
+
+
+      /**
        * Copy constructor
        */
       LBP16R(const LBP16R& other);
@@ -167,7 +181,7 @@ namespace bob { namespace ip {
           for(int x=0; x<dst.extent(1); ++x)
             dst(y,x) = 
               bob::ip::LBP16R::processNoCheck<T,true>(src,
-                  static_cast<int>(ceil(m_R))+y, static_cast<int>(ceil(m_R))+x);
+                  static_cast<int>(ceil(m_R))+y, static_cast<int>(ceil(m_R2))+x);
       }
       else //no possibility for non-circular LBP16
       {
@@ -186,10 +200,10 @@ namespace bob { namespace ip {
           throw ParamOutOfBoundaryError("yc", false, yc, ceil(m_R));
         if( yc>=src.extent(0)-ceil(m_R) )
           throw ParamOutOfBoundaryError("yc", true, yc, src.extent(0)-ceil(m_R)-1);
-        if( xc<ceil(m_R) )
-          throw ParamOutOfBoundaryError("xc", false, xc, ceil(m_R));
-        if( xc>=src.extent(1)-ceil(m_R) )
-          throw ParamOutOfBoundaryError("xc", true, xc, src.extent(1)-ceil(m_R)-1);
+        if( xc<ceil(m_R2) )
+          throw ParamOutOfBoundaryError("xc", false, xc, ceil(m_R2));
+        if( xc>=src.extent(1)-ceil(m_R2) )
+          throw ParamOutOfBoundaryError("xc", true, xc, src.extent(1)-ceil(m_R2)-1);
         return bob::ip::LBP16R::processNoCheck<T,true>( src, yc, xc);
       }
       else // there is no possibility for non-circular LBP16
@@ -208,27 +222,33 @@ namespace bob { namespace ip {
         const double PI = 4.0*atan(1.0);
         const double alpha = 2 * PI / 16; // the angle between the points ont he circle of radius m_R
         const double R_sqrt2 = m_R / sqrt(2);
-        const double long_cath = m_R * cos(alpha);
-        const double short_cath = m_R * sin(alpha); 
-        tab[0] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R,xc);
-        tab[1] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-long_cath,xc+short_cath);
-        tab[2] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-R_sqrt2,xc+R_sqrt2);
-        tab[3] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-short_cath,xc+long_cath);
+        const double R2_sqrt2 = m_R2 / sqrt(2);
 
-        tab[4] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc,xc+m_R);
-        tab[5] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+short_cath,xc+long_cath);
-        tab[6] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+R_sqrt2,xc+R_sqrt2);
-        tab[7] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+long_cath,xc+short_cath);
+        const double long_cath = m_R * cos(alpha);
+        const double long_cath2 = m_R2 * cos(alpha);
+        
+        const double short_cath = m_R * sin(alpha);
+        const double short_cath2 = m_R2 * sin(alpha);  
+
+        tab[0] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R,xc);
+        tab[1] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-long_cath,xc+short_cath2);
+        tab[2] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-R_sqrt2,xc+R2_sqrt2);
+        tab[3] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-short_cath,xc+long_cath2);
+
+        tab[4] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc,xc+m_R2);
+        tab[5] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+short_cath,xc+long_cath2);
+        tab[6] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+R_sqrt2,xc+R2_sqrt2);
+        tab[7] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+long_cath,xc+short_cath2);
 
         tab[8] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+m_R,xc);
-        tab[9] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+long_cath,xc-short_cath);
-        tab[10] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+R_sqrt2,xc-R_sqrt2);
-        tab[11] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+short_cath,xc-long_cath);
+        tab[9] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+long_cath,xc-short_cath2);
+        tab[10] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+R_sqrt2,xc-R2_sqrt2);
+        tab[11] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+short_cath,xc-long_cath2);
 
-        tab[12] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc,xc-m_R);
-        tab[13] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-short_cath,xc-long_cath);
-        tab[14] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-R_sqrt2,xc-R_sqrt2);
-        tab[15] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-long_cath,xc-short_cath);
+        tab[12] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc,xc-m_R2);
+        tab[13] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-short_cath,xc-long_cath2);
+        tab[14] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-R_sqrt2,xc-R2_sqrt2);
+        tab[15] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-long_cath,xc-short_cath2);
       }
       else // there is no possibility for non-circular LBP16
       {
@@ -301,7 +321,7 @@ namespace bob { namespace ip {
     {
       blitz::TinyVector<int,2> res;
       res(0) = std::max(0, src.extent(0)-2*static_cast<int>(ceil(m_R)));
-      res(1) = std::max(0, src.extent(1)-2*static_cast<int>(ceil(m_R)));
+      res(1) = std::max(0, src.extent(1)-2*static_cast<int>(ceil(m_R2)));
       return res;
     }
 

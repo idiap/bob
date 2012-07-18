@@ -32,11 +32,26 @@ ip::LBP4R::LBP4R(const double R,
     const bool uniform, 
     const bool rotation_invariant,
     const int eLBP_type): 
-  ip::LBP(4,R,circular,to_average,add_average_bit,uniform,rotation_invariant,
+  ip::LBP(4,R,R,circular,to_average,add_average_bit,uniform,rotation_invariant,
       eLBP_type)
 {
   init_luts();
 }
+
+ip::LBP4R::LBP4R(const double R,
+    const double R2,
+    const bool circular,
+    const bool to_average,
+    const bool add_average_bit,
+    const bool uniform, 
+    const bool rotation_invariant,
+    const int eLBP_type): 
+  ip::LBP(4,R,R2,circular,to_average,add_average_bit,uniform,rotation_invariant,
+      eLBP_type)
+{
+  init_luts();
+}
+
 
 ip::LBP4R::LBP4R(const ip::LBP4R& other): 
   ip::LBP(other)
