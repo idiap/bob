@@ -180,8 +180,10 @@ namespace bob { namespace ip {
 
       /*Getting the maximum radius in XY, XT and YT. This is necessary because we need to intersect the 3 planes in one point for the entire video and 
        for that is necessary to clip the borders using the maximum radius*/
+
       int max_radius = radius_xt>radius_yt ? radius_xt : radius_yt;
       max_radius = max_radius > radius_xy ? max_radius : radius_xy;
+
 
       int Tlength = src.extent(0);
       int height = src.extent(1);
@@ -211,7 +213,7 @@ namespace bob { namespace ip {
       int limitHeight = height-2*max_radius;
       int limitTime   = Tlength-2*max_radius;
 
-      /*Checking XY*/      
+      /*Checking XY*/
       if( xy.extent(0) != limitTime)
         throw ParamOutOfBoundaryError("Time parameter in  XY ", (xy.extent(0) > limitTime), xy.extent(0), limitTime);
       if( xy.extent(1) != limitWidth)
@@ -234,6 +236,9 @@ namespace bob { namespace ip {
         throw ParamOutOfBoundaryError("Width parameter in  YT ", (yt.extent(1) > limitWidth), yt.extent(1), limitWidth);
       if( yt.extent(2) != limitHeight)
         throw ParamOutOfBoundaryError("Height parameter in  YT ", (yt.extent(2) > limitHeight), yt.extent(2), limitHeight);
+
+      /*Checking the X radius*/
+
 
 
       //for each element in time domain (the simplest way to see what is happening)
