@@ -82,7 +82,7 @@ def checkfiles(args):
         (len(bad), len(r), args.directory))
 
 
-def create_position_files(args):
+def create_annotation_files(args):
   """Creates the position files for the FRGC database 
   (using the positions stored in the xml files), 
   so that FRGC position files share the same structure as the image files."""  
@@ -179,11 +179,11 @@ def add_commands(parser):
   check_files_parser.set_defaults(func=checkfiles) #action
 
   # get the "create-eye-files" action from a submodule
-  create_eye_files_parser = subparsers.add_parser('create-position-files', help=create_position_files.__doc__)
+  create_annotation_files_parser = subparsers.add_parser('create-annotation-files', help=create_annotation_files.__doc__)
 
-  create_eye_files_parser.add_argument('-D', '--database', default='/idiap/resource/database/frgc/FRGC-2.0-dist', help="The base directory of the FRGC database")
-  create_eye_files_parser.add_argument('-d', '--directory', required=True, help="The eye position files will be stored in this directory")
-  create_eye_files_parser.add_argument('-e', '--extension', default = '.pos', help="if given, this extension will be appended to every entry returned (defaults to '%(default)s')")
-  create_eye_files_parser.add_argument('--self-test', dest="selftest", action='store_true', help=SUPPRESS)
+  create_annotation_files_parser.add_argument('-D', '--database', default='/idiap/resource/database/frgc/FRGC-2.0-dist', help="The base directory of the FRGC database")
+  create_annotation_files_parser.add_argument('-d', '--directory', required=True, help="The eye position files will be stored in this directory")
+  create_annotation_files_parser.add_argument('-e', '--extension', default = '.pos', help="if given, this extension will be appended to every entry returned (defaults to '%(default)s')")
+  create_annotation_files_parser.add_argument('--self-test', dest="selftest", action='store_true', help=SUPPRESS)
 
-  create_eye_files_parser.set_defaults(func=create_position_files) #action
+  create_annotation_files_parser.set_defaults(func=create_annotation_files) #action
