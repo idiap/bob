@@ -221,34 +221,58 @@ namespace bob { namespace ip {
       {
         const double PI = 4.0*atan(1.0);
         const double alpha = 2 * PI / 16; // the angle between the points ont he circle of radius m_R
-        const double R_sqrt2 = m_R / sqrt(2);
-        const double R2_sqrt2 = m_R2 / sqrt(2);
 
-        const double long_cath = m_R * cos(alpha);
-        const double long_cath2 = m_R2 * cos(alpha);
-        
-        const double short_cath = m_R * sin(alpha);
-        const double short_cath2 = m_R2 * sin(alpha);  
+        /*A real circle*/
+        if(m_R==m_R2)
+	{
+          const double R_sqrt2 = m_R / sqrt(2);
+          const double long_cath = m_R * cos(alpha);
+          const double short_cath = m_R * sin(alpha);
 
-        tab[0] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R,xc);
-        tab[1] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-long_cath,xc+short_cath2);
-        tab[2] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-R_sqrt2,xc+R2_sqrt2);
-        tab[3] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-short_cath,xc+long_cath2);
+          tab[0] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R,xc);
+          tab[1] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-long_cath,xc+short_cath);
+          tab[2] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-R_sqrt2,xc+R_sqrt2);
+          tab[3] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-short_cath,xc+long_cath);
 
-        tab[4] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc,xc+m_R2);
-        tab[5] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+short_cath,xc+long_cath2);
-        tab[6] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+R_sqrt2,xc+R2_sqrt2);
-        tab[7] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+long_cath,xc+short_cath2);
+          tab[4] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc,xc+m_R);
+          tab[5] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+short_cath,xc+long_cath);
+          tab[6] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+R_sqrt2,xc+R_sqrt2);
+          tab[7] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+long_cath,xc+short_cath);
 
-        tab[8] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+m_R,xc);
-        tab[9] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+long_cath,xc-short_cath2);
-        tab[10] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+R_sqrt2,xc-R2_sqrt2);
-        tab[11] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+short_cath,xc-long_cath2);
+          tab[8] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+m_R,xc);
+          tab[9] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+long_cath,xc-short_cath);
+          tab[10] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+R_sqrt2,xc-R_sqrt2);
+          tab[11] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+short_cath,xc-long_cath);
 
-        tab[12] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc,xc-m_R2);
-        tab[13] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-short_cath,xc-long_cath2);
-        tab[14] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-R_sqrt2,xc-R2_sqrt2);
-        tab[15] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-long_cath,xc-short_cath2);
+          tab[12] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc,xc-m_R);
+          tab[13] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-short_cath,xc-long_cath);
+          tab[14] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-R_sqrt2,xc-R_sqrt2);
+          tab[15] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-long_cath,xc-short_cath);
+        }
+        else
+        {
+          /*An elipse*/
+          tab[0] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R,xc);
+          tab[1] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R*cos(2*PI*1/m_P),xc+m_R2*sin(2*PI*1/m_P));
+          tab[2] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R*cos(2*PI*2/m_P),xc+m_R2*sin(2*PI*2/m_P));
+          tab[3] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R*cos(2*PI*3/m_P),xc+m_R2*sin(2*PI*3/m_P));
+
+          tab[4] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc,xc+m_R2);
+          tab[5] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R*cos(2*PI*5/m_P),xc+m_R2*sin(2*PI*5/m_P));
+          tab[6] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R*cos(2*PI*6/m_P),xc+m_R2*sin(2*PI*6/m_P));
+          tab[7] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R*cos(2*PI*7/m_P),xc+m_R2*sin(2*PI*7/m_P));
+
+          tab[8] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+m_R,xc);
+          tab[9] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R*cos(2*PI*9/m_P),xc+m_R2*sin(2*PI*9/m_P));
+          tab[10] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R*cos(2*PI*10/m_P),xc+m_R2*sin(2*PI*10/m_P));
+          tab[11] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R*cos(2*PI*11/m_P),xc+m_R2*sin(2*PI*11/m_P));
+
+          tab[12] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc,xc-m_R2);
+          tab[13] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R*cos(2*PI*13/m_P),xc+m_R2*sin(2*PI*13/m_P));
+          tab[14] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R*cos(2*PI*14/m_P),xc+m_R2*sin(2*PI*14/m_P));
+          tab[15] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R*cos(2*PI*15/m_P),xc+m_R2*sin(2*PI*15/m_P));
+
+        }
       }
       else // there is no possibility for non-circular LBP16
       {

@@ -232,16 +232,32 @@ namespace bob { namespace ip {
       double tab[8];
       if(circular)
       {
-        const double R_sqrt2 = m_R / sqrt(2);
-        const double R2_sqrt2 = m_R2 / sqrt(2);
-        tab[0] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-R_sqrt2,xc-R2_sqrt2);
-        tab[1] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R,xc);
-        tab[2] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-R_sqrt2,xc+R2_sqrt2);
-        tab[3] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc,xc+m_R2);
-        tab[4] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+R_sqrt2,xc+R2_sqrt2);
-        tab[5] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+m_R,xc);
-        tab[6] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+R_sqrt2,xc-R2_sqrt2);
-        tab[7] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc,xc-m_R2);
+        if(m_R == m_R2){
+          const double R_sqrt2 = m_R / sqrt(2);
+          tab[0] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-R_sqrt2,xc-R_sqrt2);
+          tab[1] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R,xc);
+          tab[2] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-R_sqrt2,xc+R_sqrt2);
+          tab[3] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc,xc+m_R);
+          tab[4] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+R_sqrt2,xc+R_sqrt2);
+          tab[5] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+m_R,xc);
+          tab[6] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+R_sqrt2,xc-R_sqrt2);
+          tab[7] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc,xc-m_R);
+        }
+        else{
+        /*An ellipse*/
+          const double PI = 4.0*atan(1.0);
+          /*The elipse navigation was extracted from the book "Computer Vision using LocalBinary Patterns" page 56. In their implementation the first bin is the top-center and the bob implementation is top-left. By that reason the first bin initialized was 7*/
+
+          tab[0] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R*cos(2*PI*7/m_P),xc+m_R2*sin(2*PI*7/m_P));
+          tab[1] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R,xc);
+          tab[2] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R*cos(2*PI*1/m_P),xc+m_R2*sin(2*PI*1/m_P));
+          tab[3] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc,xc+m_R);
+          tab[4] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R*cos(2*PI*3/m_P),xc+m_R2*sin(2*PI*3/m_P));
+          tab[5] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+m_R,xc);
+          tab[6] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R*cos(2*PI*5/m_P),xc+m_R2*sin(2*PI*5/m_P));
+          tab[7] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc,xc-m_R);
+
+        }
       }
       else
       {

@@ -156,6 +156,7 @@ static object lbp_apply (ip::LBPHSFeatures& op, tp::const_ndarray input) {
 void bind_ip_lbp_new() {
   class_<ip::LBP, boost::shared_ptr<ip::LBP>, boost::noncopyable>("LBP", "A base class for the LBP-like operators", no_init)
     .add_property("radius", &ip::LBP::getRadius, &ip::LBP::setRadius)
+    .add_property("radius2", &ip::LBP::getRadius2, &ip::LBP::setRadius2)
     .add_property("points", &ip::LBP::getNNeighbours)
     .add_property("circular", &ip::LBP::getCircular, &ip::LBP::setCircular)
     .add_property("to_average", &ip::LBP::getToAverage, &ip::LBP::setToAverage)
