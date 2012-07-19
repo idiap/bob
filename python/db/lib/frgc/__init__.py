@@ -41,6 +41,10 @@ This saves some time and space, but ensures identical results.
 Enjoy!
 """
 
+# The FRGC database does not create a .sql3 file, so it is considered as "built in"
+__builtin__ = True
+
+
 def dbname():
   """Calculates my own name automatically."""
   import os
