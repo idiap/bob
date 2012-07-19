@@ -98,16 +98,17 @@ def create_position_files(args):
   db = Database(args.database)
   
   # retrieve all files
-  positions = db.positions(directory=args.directory, extension=args.extension)
-  for position in positions.itervalues():
-    filename = position[0]
+  annotations = db.annotations(directory=args.directory, extension=args.extension)
+  for annotation in annotations.itervalues():
+    filename = annotation[0]
     if not os.path.exists(os.path.dirname(filename)):
       os.makedirs(os.path.dirname(filename))
-    eyes = position[1]
+    positions = annotation[1]
     f = open(filename, 'w')
     # write eyes in the common order: left eye, right eye
     
-    f.writelines(str(eyes[0]) + ' ' + str(eyes[1]) + '\n' + str(eyes[2]) + ' ' + str(eyes[3]) + '\n' + str(eyes[4]) + ' ' + str(eyes[5]) + '\n' + str(eyes[6]) + ' ' + str(eyes[7]) + '\n')
+    for type in ('reye', 'leye', 'nose', 'mouth'):
+      f.writelines(type + ' ' + str(positions[type][1]) + ' ' + str(positions[type][0]) + '\n')
     f.close()
     
   

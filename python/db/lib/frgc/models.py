@@ -94,21 +94,17 @@ class PositionFileReader (xml.sax.handler.ContentHandler):
     if name == 'Recording':
       assert self.m_signature == None
       self.m_signature = attrs['recording_id']
-      self.m_positions = [-1]*8
+      self.m_positions = {}
       self.m_use_recording = False
     elif name == 'LeftEyeCenter':
-      self.m_positions[2] = int(attrs['x'])
-      self.m_positions[3] = int(attrs['y'])
+      self.m_positions['leye'] = (int(attrs['y']), int(attrs['x']))
       self.m_use_recording = True
     elif name == 'RightEyeCenter':
-      self.m_positions[0] = int(attrs['x'])
-      self.m_positions[1] = int(attrs['y'])
+      self.m_positions['reye'] = (int(attrs['y']), int(attrs['x']))
     elif name == 'Nose':
-      self.m_positions[4] = int(attrs['x'])
-      self.m_positions[5] = int(attrs['y'])
+      self.m_positions['nose'] = (int(attrs['y']), int(attrs['x']))
     elif name == 'Mouth':
-      self.m_positions[6] = int(attrs['x'])
-      self.m_positions[7] = int(attrs['y'])
+      self.m_positions['mouth'] = (int(attrs['y']), int(attrs['x']))
     else: # other name
       pass
 
