@@ -174,15 +174,9 @@ namespace bob { namespace ip {
     {
 
 
-      int radius_xy = m_lbp_xy->getRadius(); ///< The LBPu2,i radius in XY
-      int radius_xt = m_lbp_xt->getRadius(); ///< The LBPu2,i radius in XT
-      int radius_yt = m_lbp_yt->getRadius(); ///< The LBPu2,i radius in YT
-
-      /*Getting the maximum radius in XY, XT and YT. This is necessary because we need to intersect the 3 planes in one point for the entire video and 
-       for that is necessary to clip the borders using the maximum radius*/
-
-      int max_radius = radius_xt>radius_yt ? radius_xt : radius_yt;
-      max_radius = max_radius > radius_xy ? max_radius : radius_xy;
+      int radius_x = m_lbp_xy->getRadius();  ///< The LBPu2,i radius in X direction
+      int radius_y = m_lbp_xy->getRadius2(); ///< The LBPu2,i radius in Y direction
+      int radius_t = m_lbp_yt->getRadius2();  ///< The LBPu2,i radius in T direction
 
 
       int Tlength = src.extent(0);
@@ -195,23 +189,18 @@ namespace bob { namespace ip {
 
       const blitz::Array<T,2> checkXY = 
         src( 0, blitz::Range::all(), blitz::Range::all());
-      m_lbp_xy->operator()(checkXY, radius_xy, radius_xy);
+      m_lbp_xy->operator()(checkXY, radius_x, radius_y);
 
       /**** Get XT plane (Intersect in one point is enough) ****/
-      int limitXT = ceil(2*radius_xt + 1);
-      if( Tlength < limitXT )
-        throw ParamOutOfBoundaryError("xt_radius", false, Tlength, limitXT);
-
-      /**** Get YT plane (Intersect in one point is enough) ****/
-      int limitYT = ceil(2*radius_yt + 1);
-      if( Tlength < limitYT )
-        throw ParamOutOfBoundaryError("yt_radius", false, Tlength, limitYT);
+      int limitT = ceil(2*radius_t + 1);
+      if( Tlength < limitT )
+        throw ParamOutOfBoundaryError("t_radius", false, Tlength, limitT);
 
 
       /***** Checking the outputs *****/
-      int limitWidth  = width-2*max_radius;
-      int limitHeight = height-2*max_radius;
-      int limitTime   = Tlength-2*max_radius;
+      int limitWidth  = width-2*radius_x;
+      int limitHeight = height-2*radius_y;
+      int limitTime   = Tlength-2*radius_t;
 
       /*Checking XY*/
       if( xy.extent(0) != limitTime)
@@ -237,29 +226,26 @@ namespace bob { namespace ip {
       if( yt.extent(2) != limitHeight)
         throw ParamOutOfBoundaryError("Height parameter in  YT ", (yt.extent(2) > limitHeight), yt.extent(2), limitHeight);
 
-      /*Checking the X radius*/
-
-
 
       //for each element in time domain (the simplest way to see what is happening)
-      for(int i=max_radius;i<(Tlength-max_radius);i++){
-        for (int j=max_radius; j < (height-max_radius); j++) {
-          for (int k=max_radius; k < (width-max_radius); k++) {
+      for(int i=radius_t;i<(Tlength-radius_t);i++){
+        for (int j=radius_y; j < (height-radius_y); j++) {
+          for (int k=radius_x; k < (width-radius_x); k++) {
 
             /*Getting the "micro-plane" for XY calculus*/
             const blitz::Array<T,2> kxy = 
-               src( i, blitz::Range(j-radius_xy,j+radius_xy), blitz::Range(k-radius_xy,k+radius_xy));
-            xy(i-max_radius,j-max_radius,k-max_radius) = m_lbp_xy->operator()(kxy, radius_xy, radius_xy);
+               src( i, blitz::Range(j-radius_y,j+radius_y), blitz::Range(k-radius_x,k+radius_x));
+            xy(i-radius_t,j-radius_y,k-radius_x) = m_lbp_xy->operator()(kxy, radius_y, radius_x);
 
             /*Getting the "micro-plane" for XT calculus*/
             const blitz::Array<T,2> kxt = 
-               src(blitz::Range(i-radius_xt,i+radius_xt),j,blitz::Range(k-radius_xt,k+radius_xt));
-            xt(i-max_radius,j-max_radius,k-max_radius) = m_lbp_xt->operator()(kxt, radius_xt, radius_xt);
+               src(blitz::Range(i-radius_t,i+radius_t),j,blitz::Range(k-radius_x,k+radius_x));
+            xt(i-radius_t,j-radius_y,k-radius_x) = m_lbp_xt->operator()(kxt, radius_x, radius_t);
 
             /*Getting the "micro-plane" for YT calculus*/
             const blitz::Array<T,2> kyt = 
-               src(blitz::Range(i-radius_yt,i+radius_yt),blitz::Range(j-radius_yt,j+radius_yt),k);
-            yt(i-max_radius,j-max_radius,k-max_radius) = m_lbp_yt->operator()(kyt, radius_yt, radius_yt);
+               src(blitz::Range(i-radius_t,i+radius_t),blitz::Range(j-radius_y,j+radius_y),k);
+            yt(i-radius_t,j-radius_y,k-radius_x) = m_lbp_yt->operator()(kyt, radius_y, radius_t);
           }
         }
       }
