@@ -550,7 +550,7 @@ class LBPTest(unittest.TestCase):
     self.assertEqual(proc(values), 35);
 
 
-  def test17_vanilla_8p1r_circle(self):
+  def test17_vanilla_8p1r_elipse(self):
     #please note that the bob implementation of LBPs is slightly different
     #then that of the original LBP paper:
     # s(x) >= 0 => LBP digit = 1
@@ -583,7 +583,7 @@ class LBPTest(unittest.TestCase):
     self.assertEqual(proc(values), 2);
 
 
-  def test18_vanilla_8p1r_circle(self):
+  def test18_vanilla_16p1r_elipse(self):
     #please note that the bob implementation of LBPs is slightly different
     #then that of the original LBP paper:
     # s(x) >= 0 => LBP digit = 1
