@@ -169,7 +169,6 @@ void bind_ip_lbp_new() {
 
   class_<ip::LBP4R, boost::shared_ptr<ip::LBP4R>, bases<ip::LBP> >("LBP4R", lbp4r_doc, init<optional<const double, const bool, const bool, const bool, const bool, const bool, const int> >((arg("radius")=1.0,arg("circular")=false,arg("to_average")=false,arg("add_average_bit")=false,arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=0), "Construct a new LBP4R object"))
     .add_property("max_label", &ip::LBP4R::getMaxLabel)
-    .def(init<const double,const double,optional<const bool, const bool, const bool, const bool, const bool, const int> >((arg("radius")=1.0,arg("radius2")=1.0,arg("circular")=false,arg("to_average")=false,arg("add_average_bit")=false,arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=0), "Construct a new LBP4R object"))
     .def("__call__", &call_inout<ip::LBP4R>, (arg("self"), arg("input"), arg("output")), "Call an object of this type to extract LBP4R features.")
     .def("__call__", &call_pos<ip::LBP4R>, (arg("self"), arg("input"), arg("y"), arg("x")), "Call an object of this type to extract LBP4R features.")
     .def("__call__", &call_alloc<ip::LBP4R>, (arg("self"), arg("input")), "Call an object of this type to extract LBP4R features.")
@@ -178,8 +177,7 @@ void bind_ip_lbp_new() {
 
 
   class_<ip::LBP8R, boost::shared_ptr<ip::LBP8R>, bases<ip::LBP> >("LBP8R", lbp8r_doc, init<optional<const double, const bool, const bool, const bool, const bool, const bool, const int> >((arg("radius")=1.0,arg("circular")=false,arg("to_average")=false,arg("add_average_bit")=false,arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=0), "Construct a new LBP8R object"))
-    .add_property("max_label", &ip::LBP8R::getMaxLabel)
-    .def(init<const double,const double,optional<const bool, const bool, const bool, const bool, const bool, const int> >((arg("radius")=1.0,arg("radius2")=1.0,arg("circular")=false,arg("to_average")=false,arg("add_average_bit")=false,arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=0), "Construct a new LBP8R object"))    
+    .add_property("max_label", &ip::LBP8R::getMaxLabel)  
     .def("__call__", &call_inout<ip::LBP8R>, (arg("self"), arg("input"), arg("output")), "Call an object of this type to extract LBP8R features.")
     .def("__call__", &call_pos<ip::LBP8R>, (arg("self"), arg("input"), arg("y"), arg("x")), "Call an object of this type to extract LBP8R features.")
     .def("__call__", &call_alloc<ip::LBP8R>, (arg("self"), arg("input")), "Call an object of this type to extract LBP8R features.")
@@ -188,7 +186,6 @@ void bind_ip_lbp_new() {
 
   class_<ip::LBP16R, boost::shared_ptr<ip::LBP16R>, bases<ip::LBP> >("LBP16R", lbp16r_doc, init<optional<const double, const bool, const bool, const bool, const bool, const bool, const int> >((arg("radius")=1.0,arg("circular")=true,arg("to_average")=false,arg("add_average_bit")=false,arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=0), "Construct a new LBP16R object"))
     .add_property("max_label", &ip::LBP16R::getMaxLabel)
-    .def(init<const double,const double,optional<const bool, const bool, const bool, const bool, const bool, const int> >((arg("radius")=1.0,arg("radius2")=1.0,arg("circular")=true,arg("to_average")=false,arg("add_average_bit")=false,arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=0), "Construct a new LBP16R object"))
     .def("__call__", &call_inout<ip::LBP16R>, (arg("self"), arg("input"), arg("output")), "Call an object of this type to extract LBP16R features.")
     .def("__call__", &call_pos<ip::LBP16R>, (arg("self"), arg("input"), arg("y"), arg("x")), "Call an object of this type to extract LBP16R features.")
     .def("__call__", &call_alloc<ip::LBP16R>, (arg("self"), arg("input")), "Call an object of this type to extract LBP16R features.")
