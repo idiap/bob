@@ -57,7 +57,7 @@ namespace bob {
   	public:
 
 	  	/**
-        * @brief Constructor: generates the Difference of Gaussians filter
+        * @brief Constructor: generates a DCTFeatures extractor
         */
 	    DCTFeatures( const int block_h, const int block_w, const int overlap_h, 
         const int overlap_w, const int n_dct_coefs): m_dct2d(0),
