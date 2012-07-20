@@ -485,10 +485,142 @@ class LBPTest(unittest.TestCase):
     self.assertEqual(proc4('014725836'), 0xae) #0x0
     
 
+
+  def test15_vanilla_4p1r_rectangle(self):
+    #please note that the bob implementation of LBPs is slightly different
+    #then that of the original LBP paper:
+    # s(x) >= 0 => LBP digit = 1
+    # s(x) <  0 => LBO digit = 0
+
+    op = bob.ip.LBP4R()
+    values = [3,5,12,1,3, 4,5,2,10,13, 14,0,10,3,1, 20,12,0,1,2, 14,12,1,3,7]
+
+    op.radius  = 1
+    op.radius2 = 1
+    proc = Processor(op, generate_5x5_image, (2,2), 5)
+    self.assertEqual(proc(values), 0);
+
+    op.radius  = 2
+    op.radius2 = 2
+    proc = Processor(op, generate_5x5_image, (2,2), 5)
+    self.assertEqual(proc(values), 9);
+
+
+    op.radius  = 2
+    op.radius2 = 1
+    proc = Processor(op, generate_5x5_image, (2,2), 5)
+    self.assertEqual(proc(values), 8);
+
+
+    op.radius  = 1
+    op.radius2 = 2
+    proc = Processor(op, generate_5x5_image, (2,2), 5)
+    self.assertEqual(proc(values), 1);
+
+
+  def test16_vanilla_8p1r_rectangle(self):
+    #please note that the bob implementation of LBPs is slightly different
+    #then that of the original LBP paper:
+    # s(x) >= 0 => LBP digit = 1
+    # s(x) <  0 => LBO digit = 0
+
+    op = bob.ip.LBP8R()
+    values = [3,5,12,1,3, 4,5,2,10,13, 14,0,10,3,1, 20,12,0,1,2, 14,12,1,3,7]
+
+    op.radius  = 1
+    op.radius2 = 1
+    proc = Processor(op, generate_5x5_image, (2,2), 5)
+    self.assertEqual(proc(values), 34);
+
+    op.radius  = 2
+    op.radius2 = 2
+    proc = Processor(op, generate_5x5_image, (2,2), 5)
+    self.assertEqual(proc(values), 67);
+
+
+    op.radius  = 2
+    op.radius2 = 1
+    proc = Processor(op, generate_5x5_image, (2,2), 5)
+    self.assertEqual(proc(values), 66);
+
+
+    op.radius  = 1
+    op.radius2 = 2
+    proc = Processor(op, generate_5x5_image, (2,2), 5)
+    self.assertEqual(proc(values), 35);
+
+
+  def test17_vanilla_8p1r_elipse(self):
+    #please note that the bob implementation of LBPs is slightly different
+    #then that of the original LBP paper:
+    # s(x) >= 0 => LBP digit = 1
+    # s(x) <  0 => LBO digit = 0
+
+    op = bob.ip.LBP8R()
+    op.circular = True
+    values = [3,5,12,1,3, 4,5,2,10,13, 14,0,10,3,1, 20,12,0,1,2, 14,12,1,3,7]
+
+    op.radius  = 1
+    op.radius2 = 1
+    proc = Processor(op, generate_5x5_image, (2,2), 5)
+    self.assertEqual(proc(values), 0);
+
+    op.radius  = 2
+    op.radius2 = 2
+    proc = Processor(op, generate_5x5_image, (2,2), 5)
+    self.assertEqual(proc(values), 67);
+
+
+    op.radius  = 2
+    op.radius2 = 1
+    proc = Processor(op, generate_5x5_image, (2,2), 5)
+    self.assertEqual(proc(values), 65);
+
+
+    op.radius  = 1
+    op.radius2 = 2
+    proc = Processor(op, generate_5x5_image, (2,2), 5)
+    self.assertEqual(proc(values), 2);
+
+
+  def test18_vanilla_16p1r_elipse(self):
+    #please note that the bob implementation of LBPs is slightly different
+    #then that of the original LBP paper:
+    # s(x) >= 0 => LBP digit = 1
+    # s(x) <  0 => LBO digit = 0
+
+    op = bob.ip.LBP16R()
+    op.circular = True
+    values = [3,5,12,1,3, 4,5,2,10,13, 14,0,10,3,1, 20,12,0,1,2, 14,12,1,3,7]
+
+    op.radius  = 1
+    op.radius2 = 1
+    proc = Processor(op, generate_5x5_image, (2,2), 5)
+    self.assertEqual(proc(values), 0);
+
+    op.radius  = 2
+    op.radius2 = 2
+    proc = Processor(op, generate_5x5_image, (2,2), 5)
+    self.assertEqual(proc(values), 32824);
+
+
+    op.radius  = 2
+    op.radius2 = 1
+    proc = Processor(op, generate_5x5_image, (2,2), 5)
+    self.assertEqual(proc(values), 32768);
+
+
+    op.radius  = 1
+    op.radius2 = 2
+    proc = Processor(op, generate_5x5_image, (2,2), 5)
+    self.assertEqual(proc(values), 56);
+
+
+
   """
   " All planes are p=4, r=1, non uniform pattern and non RI
   """
-  def test15_vanilla_4p1r_4p1r_4p1r(self):
+  def test19_vanilla_4p1r_4p1r_4p1r(self):
     lbp4R_XY = bob.ip.LBP4R(radius=1.0, circular=False, uniform=False, rotation_invariant=False)
     lbp4R_XT = bob.ip.LBP4R(radius=1.0, circular=False, uniform=False, rotation_invariant=False)
     lbp4R_YT = bob.ip.LBP4R(radius=1.0, circular=False, uniform=False, rotation_invariant=False)

@@ -24,11 +24,13 @@
 
 namespace ip = bob::ip;
 
-ip::LBP::LBP(const int P, const double R, const bool circular,
+
+ip::LBP::LBP(const int P, const double R,const double R2 , const bool circular,
     const bool to_average,const bool add_average_bit, const bool uniform,
     const bool rotation_invariant, const int eLBP_type):
   m_P(P), 
-  m_R(R), 
+  m_R(R),
+  m_R2(R),  
   m_circular(circular), 
   m_to_average(to_average), 
   m_add_average_bit(add_average_bit), 
@@ -43,12 +45,15 @@ ip::LBP::LBP(const int P, const double R, const bool circular,
   m_lut_current(0)
 {
   updateR();
+  updateR2();
   //init_luts();
 }
+
 
 ip::LBP::LBP(const ip::LBP& other):
   m_P(other.m_P), 
   m_R(other.m_R), 
+  m_R2(other.m_R2), 
   m_circular(other.m_circular), 
   m_to_average(other.m_to_average), 
   m_add_average_bit(other.m_add_average_bit), 
@@ -63,6 +68,7 @@ ip::LBP::LBP(const ip::LBP& other):
   m_lut_current(0)
 {
   updateR();
+  updateR2();
   //init_luts(); 
 }
 
@@ -70,7 +76,8 @@ ip::LBP::~LBP() { }
 
 ip::LBP& ip::LBP::operator=(const ip::LBP& other) {
   m_P = other.m_P; 
-  m_R = other.m_R; 
+  m_R = other.m_R;
+  m_R2 = other.m_R2;  
   m_circular = other.m_circular; 
   m_to_average = other.m_to_average; 
   m_add_average_bit = other.m_add_average_bit; 

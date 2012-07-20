@@ -134,6 +134,7 @@ static void call_lbptop (const ip::LBPTop& op, tp::const_ndarray input,
   }
 }
 
+
 template <typename T> 
 static object inner_lbp_apply (ip::LBPHSFeatures& op, tp::const_ndarray input) {
   std::vector<blitz::Array<uint64_t,1> > dst;
@@ -156,6 +157,7 @@ static object lbp_apply (ip::LBPHSFeatures& op, tp::const_ndarray input) {
 void bind_ip_lbp_new() {
   class_<ip::LBP, boost::shared_ptr<ip::LBP>, boost::noncopyable>("LBP", "A base class for the LBP-like operators", no_init)
     .add_property("radius", &ip::LBP::getRadius, &ip::LBP::setRadius)
+    .add_property("radius2", &ip::LBP::getRadius2, &ip::LBP::setRadius2)
     .add_property("points", &ip::LBP::getNNeighbours)
     .add_property("circular", &ip::LBP::getCircular, &ip::LBP::setCircular)
     .add_property("to_average", &ip::LBP::getToAverage, &ip::LBP::setToAverage)
@@ -173,8 +175,9 @@ void bind_ip_lbp_new() {
     .def("get_lbp_shape", &get_shape<ip::LBP4R>, (arg("self"), arg("input")), "Get a tuple containing the expected size of the output when extracting LBP4R features.")
     ;
 
+
   class_<ip::LBP8R, boost::shared_ptr<ip::LBP8R>, bases<ip::LBP> >("LBP8R", lbp8r_doc, init<optional<const double, const bool, const bool, const bool, const bool, const bool, const int> >((arg("radius")=1.0,arg("circular")=false,arg("to_average")=false,arg("add_average_bit")=false,arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=0), "Construct a new LBP8R object"))
-    .add_property("max_label", &ip::LBP8R::getMaxLabel)
+    .add_property("max_label", &ip::LBP8R::getMaxLabel)  
     .def("__call__", &call_inout<ip::LBP8R>, (arg("self"), arg("input"), arg("output")), "Call an object of this type to extract LBP8R features.")
     .def("__call__", &call_pos<ip::LBP8R>, (arg("self"), arg("input"), arg("y"), arg("x")), "Call an object of this type to extract LBP8R features.")
     .def("__call__", &call_alloc<ip::LBP8R>, (arg("self"), arg("input")), "Call an object of this type to extract LBP8R features.")
