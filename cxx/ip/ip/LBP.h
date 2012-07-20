@@ -42,17 +42,21 @@ namespace bob { namespace ip {
 
     public: //api
 
+
       /**
-       * Complete constructor
+       * Complete constructor with two radius. This will permit Eliptical and Retangular navigation. 
+        This second radio will work in the X coordinate
        */
       LBP(const int P, 
           const double R=1., 
+          const double R2=1.,
           const bool circular=false,
           const bool to_average=false, 
           const bool add_average_bit=false, 
           const bool uniform=false, 
           const bool rotation_invariant=false, 
           const int eLBP_type=0);
+
 
       /**
        * Copy constructor - note this is an abstract class, so you cannot
@@ -85,6 +89,7 @@ namespace bob { namespace ip {
        * Accessors
        */
       double getRadius() const { return m_R; }
+      double getRadius2() const { return m_R2; }
       int getNNeighbours() const { return m_P; }
       bool getCircular() const { return m_circular; }
       bool getToAverage() const { return m_to_average; }
@@ -98,6 +103,8 @@ namespace bob { namespace ip {
        */
       void setRadius(const double R) 
       { m_R = R; updateR(); }
+      void setRadius2(const double R2) 
+      { m_R2 = R2; updateR2(); }
       void setCircular(const bool circ) 
       { m_circular = circ; init_lut_current(); }
       void setToAverage(const bool to_a) 
@@ -175,6 +182,13 @@ namespace bob { namespace ip {
       inline void updateR() { m_R_rect = static_cast<int>(floor(m_R+0.5)); }
 
       /**
+       * Compute the current integer value of the radius in case 
+       *   of a non-circular LBP variant
+       */ 
+      inline void updateR2() { m_R2_rect = static_cast<int>(floor(m_R2+0.5)); }
+
+
+      /**
        * Circular shift to the right of the input integer for L positions, if N is the total number of bits
        */ 
       static unsigned right_shift_circular(unsigned x, int L, int N);
@@ -184,12 +198,14 @@ namespace bob { namespace ip {
        */
       int m_P;
       double m_R;
+      double m_R2;
       bool m_circular;
       bool m_to_average;
       bool m_add_average_bit;
       bool m_uniform;
       bool m_rotation_invariant;
       int m_R_rect;
+      int m_R2_rect;
       int m_eLBP_type; // the type of extended LBP (0 - regular LBP, 1 - transitional LBP, 2 - direction coded LBP)
 
       blitz::Array<uint16_t,1> m_lut_RI;

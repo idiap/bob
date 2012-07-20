@@ -97,6 +97,27 @@ const char* ip::UnknownRotatingAlgorithm::what() const throw() {
   return what_string;
 }
 
+ip::LBPRadiusDoesNotMatch::LBPRadiusDoesNotMatch(const std::string& axis,const std::string& plane1,const std::string& plane2) throw(): 
+    m_axis(axis), m_plane1(plane1), m_plane2(plane2)
+{
+}
+
+ip::LBPRadiusDoesNotMatch::~LBPRadiusDoesNotMatch() throw(){
+}
+
+
+const char* ip::LBPRadiusDoesNotMatch::what() const throw() {
+   boost::format message(
+   "The radius in '%s' direction does not match in planes %s and %s ");
+   message % m_axis;
+   message % m_plane1;
+   message % m_plane2;
+   m_message = message.str();
+   return m_message.c_str();
+
+}
+
+
 
 ip::LBPUnsupportedNNeighbours::LBPUnsupportedNNeighbours(
   const int N) throw(): 

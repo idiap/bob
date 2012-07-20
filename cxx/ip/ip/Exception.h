@@ -71,6 +71,25 @@ namespace bob { namespace ip {
     private:
       mutable std::string m_message;
   };
+
+
+  /**
+   * This exception is thrown when the radius between LBPs does not match. For example, if the radius in X direction in XY plane is different from the radius in X direction in XT plane, the exception will raised.
+   */
+  class LBPRadiusDoesNotMatch: public Exception {
+    public:
+      LBPRadiusDoesNotMatch(const std::string& axis,const std::string& plane1,const std::string& plane2) throw();
+      virtual ~LBPRadiusDoesNotMatch() throw();
+      virtual const char* what() const throw();
+
+    private:
+      std::string m_axis;
+      std::string m_plane1;
+      std::string m_plane2;
+      mutable std::string m_message;
+
+  };
+
   
   /**
     * This exception is thrown when using a LBP with a non-common number

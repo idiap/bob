@@ -55,6 +55,22 @@ namespace bob { namespace ip {
           const bool rotation_invariant=false,
           const int eLBP_type=0);
 
+
+      /**
+       * Constructor with two radius (not optional). This will permit Eliptical and Retangular navigation. 
+        This second radio will work in the X coordinate
+       */
+      LBP4R(const double R,
+          const double R2,
+          const bool circular=false, 
+          const bool to_average=false,
+          const bool add_average_bit=false,
+          const bool uniform=false,
+          const bool rotation_invariant=false,
+          const int eLBP_type=0);
+
+
+
       /**
        * Copy constructor
        */
@@ -166,7 +182,7 @@ namespace bob { namespace ip {
           for(int x=0; x<dst.extent(1); ++x)
             dst(y,x) = 
               bob::ip::LBP4R::processNoCheck<T,true>(src, 
-                  static_cast<int>(ceil(m_R))+y, static_cast<int>(ceil(m_R))+x);
+                  static_cast<int>(ceil(m_R))+y, static_cast<int>(ceil(m_R2))+x);
       }
       else
       {
@@ -174,7 +190,7 @@ namespace bob { namespace ip {
           for(int x=0; x<dst.extent(1); ++x)
             dst(y,x) = 
               bob::ip::LBP4R::processNoCheck<T,false>(src, 
-                  static_cast<int>(m_R_rect)+y, static_cast<int>(m_R_rect)+x);
+                  static_cast<int>(m_R_rect)+y, static_cast<int>(m_R2_rect)+x);
       }
     }
 
@@ -189,10 +205,10 @@ namespace bob { namespace ip {
           throw ParamOutOfBoundaryError("yc", false, yc, ceil(m_R));
         if( yc>=src.extent(0)-ceil(m_R) )
           throw ParamOutOfBoundaryError("yc", true, yc, src.extent(0)-ceil(m_R)-1);
-        if( xc<ceil(m_R) )
-          throw ParamOutOfBoundaryError("xc", false, xc, ceil(m_R));
-        if( xc>=src.extent(1)-ceil(m_R) )
-          throw ParamOutOfBoundaryError("xc", true, xc, src.extent(1)-ceil(m_R)-1);
+        if( xc<ceil(m_R2) )
+          throw ParamOutOfBoundaryError("xc", false, xc, ceil(m_R2));
+        if( xc>=src.extent(1)-ceil(m_R2) )
+          throw ParamOutOfBoundaryError("xc", true, xc, src.extent(1)-ceil(m_R2)-1);
         return bob::ip::LBP4R::processNoCheck<T,true>( src, yc, xc);
       }
       else
@@ -201,10 +217,10 @@ namespace bob { namespace ip {
           throw ParamOutOfBoundaryError("yc", false, yc, m_R_rect);
         if( yc>=src.extent(0)-m_R_rect )
           throw ParamOutOfBoundaryError("yc", true, yc, src.extent(0)-m_R_rect-1);
-        if( xc<m_R_rect )
-          throw ParamOutOfBoundaryError("xc", false, xc, m_R_rect);
-        if( xc>=src.extent(1)-m_R_rect )
-          throw ParamOutOfBoundaryError("xc", true, xc, src.extent(1)-m_R_rect-1);
+        if( xc<m_R2_rect )
+          throw ParamOutOfBoundaryError("xc", false, xc, m_R2_rect);
+        if( xc>=src.extent(1)-m_R2_rect )
+          throw ParamOutOfBoundaryError("xc", true, xc, src.extent(1)-m_R2_rect-1);
         return bob::ip::LBP4R::processNoCheck<T,false>( src, yc, xc);
       }
     }
@@ -217,16 +233,16 @@ namespace bob { namespace ip {
       if(circular)
       {
         tab[0] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R,xc);
-        tab[1] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc,xc+m_R);
+        tab[1] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc,xc+m_R2);
         tab[2] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc+m_R,xc);
-        tab[3] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc,xc-m_R);
+        tab[3] = bob::sp::detail::bilinearInterpolationNoCheck(src,yc,xc-m_R2);
       }
       else
       {
         tab[0] = static_cast<double>(src(yc-m_R_rect,xc));
-        tab[1] = static_cast<double>(src(yc,xc+m_R_rect));
+        tab[1] = static_cast<double>(src(yc,xc+m_R2_rect));
         tab[2] = static_cast<double>(src(yc+m_R_rect,xc));
-        tab[3] = static_cast<double>(src(yc,xc-m_R_rect));
+        tab[3] = static_cast<double>(src(yc,xc-m_R2_rect));
       }
 
       const T center = src(yc,xc);
@@ -289,7 +305,7 @@ namespace bob { namespace ip {
     {
       blitz::TinyVector<int,2> res;
       res(0) = std::max(0, src.extent(0)-2*static_cast<int>(ceil(m_R)));
-      res(1) = std::max(0, src.extent(1)-2*static_cast<int>(ceil(m_R)));
+      res(1) = std::max(0, src.extent(1)-2*static_cast<int>(ceil(m_R2)));
       return res;
     }
 

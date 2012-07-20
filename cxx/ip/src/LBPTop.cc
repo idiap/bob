@@ -37,6 +37,19 @@ ip::LBPTop::LBPTop(const bob::ip::LBP& lbp_xy,
   m_lbp_xt(lbp_xt.clone()),
   m_lbp_yt(lbp_yt.clone())
 {
+ /*Checking the inputs. The radius in XY,XT and YT must be the same*/
+
+  if(lbp_xy.getRadius()!=lbp_xt.getRadius())
+    throw LBPRadiusDoesNotMatch("X","XY","XT");
+
+  if(lbp_xy.getRadius2()!=lbp_yt.getRadius())
+    throw LBPRadiusDoesNotMatch("Y","XY","YT");
+
+  if(lbp_xt.getRadius2()!=lbp_yt.getRadius2())
+    throw LBPRadiusDoesNotMatch("T","XT","YT");
+
+
+
 }
 
 ip::LBPTop::LBPTop(const LBPTop& other)
