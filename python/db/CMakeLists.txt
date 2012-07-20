@@ -194,7 +194,7 @@ bob_python_add_test(db-atnt-checkfiles bob_dbmanage.py atnt checkfiles -d "." --
 bob_python_add_unittest(db lib/test/gbu.py main)
 bob_python_add_test(db-gbu-dumplist bob_dbmanage.py gbu dumplist --self-test)
 bob_python_add_test(db-gbu-checkfiles bob_dbmanage.py gbu checkfiles -d "." --self-test)
-bob_python_add_test(db-gbu-create-eye-files bob_dbmanage.py gbu create-eye-files -d "." --self-test)
+bob_python_add_test(db-gbu-annotation-files bob_dbmanage.py gbu create-annotation-files -d "." --self-test)
 
 # ARface database driver tests.
 bob_python_add_unittest(db lib/test/arface.py main)
@@ -205,7 +205,7 @@ bob_python_add_test(db-atnt-checkfiles bob_dbmanage.py arface checkfiles -d "." 
 bob_python_add_idiap_unittest(db lib/test/frgc.py main)
 bob_python_add_idiap_test(db-frgc-dumplist bob_dbmanage.py frgc dumplist --self-test)
 bob_python_add_idiap_test(db-frgc-checkfiles bob_dbmanage.py frgc checkfiles -d "." --self-test)
-bob_python_add_idiap_test(db-frgc-position-files bob_dbmanage.py frgc create-position-files -d "." --self-test)
+bob_python_add_idiap_test(db-frgc-annotation-files bob_dbmanage.py frgc create-annotation-files -d "." --self-test)
 
 # Our examples (run and install)
 bob_python_example(db iris_lda.py lib/example/iris_lda.py)

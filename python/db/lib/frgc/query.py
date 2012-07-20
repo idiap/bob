@@ -383,15 +383,15 @@ class Database(object):
     return files
   
 
-  def positions(self, directory=None, extension=None, groups=None, protocols=None, purposes=None):
-    """Returns a list of 8 integrals (positions of right eye (re), left eye (le), mouth (m), nose (n)) for the given query.
+  def annotations(self, directory=None, extension=None, groups=None, protocols=None, purposes=None):
+    """Returns a list of dictionary of the annotations  (positions of right eye ('reye'), left eye ('leye'), mouth ('mouth'), nose ('nose')) for the given query.
     
     Returns:
     
       A dictionary with the file id as key and:
       
       * 1: The resolved file name
-      * 2: The positions in the order (re_x, re_y, le_x, le_y, m_x, m_y, n_x, n_y) 
+      * 2: The positions in a dictionary: 'reye':(y,x), 'leye':(y,x), 'mouth':(y,x), 'nose':(y,x) 
     
     Keyword Parameters:
 

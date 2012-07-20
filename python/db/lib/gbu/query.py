@@ -214,9 +214,11 @@ class Database(object):
   def objects(self, directory=None, extension=None, groups=None, subworld=None, protocol=None, purposes=None, model_ids=None, type='multi'):
     """Using the specified restrictions, this function returns a dictionary from file_ids to a tuple containing:
     
-    * The file name
-    * The client id
-    * The eye positions as a tuple of 4 elements: (re_x, re_y, le_x, le_y)
+    * 0: the resolved filename
+    * 1: the model id (if one (and only one) model_id is given, it is copied here, otherwise the model id of the file)
+    * 2: the claimed client id attached to the model (in case of the AR database: identical to 1)
+    * 3: the real client id (for a probe image, the client id of the probe, otherwise identical to 1)
+    * 4: the "stem" path (basename of the file; in case of the AR database: identical to the file id)
 
     Keyword Parameters:
 
@@ -262,10 +264,12 @@ class Database(object):
           query = query.filter(File.m_signature.in_(model_ids))
       return query
     
-    def object(file, directory, extension):
+    def object(file, claimed_client_id):
       return (self.__make_path__(file, directory, extension),
+              file.m_presentation if type == 'gbu' else file.m_signature,
+              claimed_client_id,
               file.m_signature,
-              (file.m_re_x, file.m_re_y, file.m_le_x, file.m_le_y))
+              os.path.join(file.m_directory, file.m_filename))
     
     # check that every parameter is as expected
     groups = self.__check_validity__(groups, "group", self.m_groups)
@@ -289,7 +293,7 @@ class Database(object):
       query = filter_model(query, type, model_ids)
 
       for file in query:
-        retval[file.m_presentation] = object(file, directory, extension)
+        retval[file.m_presentation] = object(file, file.m_signature)
     
     if 'dev' in groups:
       query = self.m_session.query(File).join(Protocol)\
@@ -297,8 +301,12 @@ class Database(object):
                   .filter(Protocol.m_purpose.in_(purposes))
       query = filter_model(query, type, model_ids)
 
-      for file in query:
-        retval[file.m_presentation] = object(file, directory, extension)
+      if model_ids and len(model_ids) == 1:
+        for file in query:
+          retval[file.m_presentation] = object(file, self.get_client_id_from_model_id(model_ids[0], type))
+      else:
+        for file in query:
+          retval[file.m_presentation] = object(file, file.m_signature)
 
     return retval
 
@@ -348,6 +356,69 @@ class Database(object):
       files[file_id] = object[0]
     
     return files
+
+
+  def annotations(self, directory=None, extension=None, groups=None, subworld=None, protocol=None, purposes=None):
+    """Returns a list of dictionary of the annotations  (positions of right eye ('reye') and left eye ('leye')) for the given query.
+    
+    Returns:
+    
+      A dictionary with the file id as key and:
+      
+      * 1: The resolved file name
+      * 2: The annotations in a dictionary: 'reye':(y,x), 'leye':(y,x) 
+        
+    Keyword Parameters:
+
+    directory
+      A directory name that will be prepended to all file paths
+
+    extension
+      A filename extension that will be appended to all file paths
+
+    groups
+      One or several groups to which the models belong ('world', 'dev').
+    
+    subworld
+      One or several training sets ('x1', 'x2', 'x4', 'x8'), only valid if group is 'world'.
+      
+    protocol
+      One or several of the GBU protocols ('Good', 'Bad', 'Ugly'), only valid if group is 'dev'.
+    
+    purposes
+      One or several groups for which files should be retrieved ('enrol', 'probe'),
+      only valid when the group is 'dev'·
+      
+    """
+    
+    def object(file):
+      return (self.__make_path__(file, directory, extension),
+              {'reye': (file.m_re_y, file.m_re_x), 'leye': (file.m_le_y, file.m_le_x)})
+
+    # check that every parameter is as expected
+    groups = self.__check_validity__(groups, "group", self.m_groups)
+    subworlds = self.__check_validity__(subworld, "subworld", self.m_train_sets)
+    protocols = self.__check_validity__(protocol, "protocol", self.m_protocols)
+    purposes = self.__check_validity__(purposes, "purpose", self.m_purposes)
+
+    positions = {}
+
+    if 'world' in groups:
+      query = self.m_session.query(File).join(Trainset)\
+                  .filter(Trainset.m_name.in_(subworlds))
+
+      for file in query:
+        positions[file.m_presentation] = object(file)
+    
+    if 'dev' in groups:
+      query = self.m_session.query(File).join(Protocol)\
+                  .filter(Protocol.m_name.in_(protocols))\
+                  .filter(Protocol.m_purpose.in_(purposes))
+
+      for file in query:
+        positions[file.m_presentation] = object(file)
+        
+    return positions
 
 
   def save_one(self, file_id, obj, directory, extension):

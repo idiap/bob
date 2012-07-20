@@ -124,7 +124,7 @@ def copy_image_files(args):
       command(old_file, new_file)
 
 
-def create_eye_files(args):
+def create_annotation_files(args):
   """Creates the eye position files for the GBU database 
   (using the eye positions stored in the database), 
   so that GBU shares the same structure as other databases."""  
@@ -140,15 +140,16 @@ def create_eye_files(args):
   db = Database()
   
   # retrieve all files
-  objects = db.objects(directory=args.directory, extension=args.extension)
-  for object in objects.itervalues():
-    filename = object[0]
+  annotations = db.annotations(directory=args.directory, extension=args.extension)
+  for annotation in annotations.itervalues():
+    filename = annotation[0]
     if not os.path.exists(os.path.dirname(filename)):
       os.makedirs(os.path.dirname(filename))
-    eyes = object[2]
+    eyes = annotation[1]
     f = open(filename, 'w')
-    # write eyes in the common order: left eye, right eye
-    f.writelines(str(eyes[2]) + ' ' + str(eyes[3]) + ' ' + str(eyes[0]) + ' ' + str(eyes[1]) + '\n')
+    # write eyes in with annotations: right eye, left eye
+    f.writelines('reye' + ' ' + str(eyes['reye'][1]) + ' ' + str(eyes['reye'][0]) + '\n')
+    f.writelines('leye' + ' ' + str(eyes['leye'][1]) + ' ' + str(eyes['leye'][0]) + '\n')
     f.close()
     
   
@@ -235,10 +236,10 @@ def add_commands(parser):
   copy_image_files_parser.set_defaults(func=copy_image_files) #action
 
   # get the "create-eye-files" action from a submodule
-  create_eye_files_parser = subparsers.add_parser('create-eye-files', help=create_eye_files.__doc__)
+  create_annotation_files_parser = subparsers.add_parser('create-annotation-files', help=create_annotation_files.__doc__)
 
-  create_eye_files_parser.add_argument('-d', '--directory', required=True, help="The eye position files will be stored in this directory")
-  create_eye_files_parser.add_argument('-e', '--extension', default = '.pos', help="if given, this extension will be appended to every entry returned (defaults to '%(default)s')")
-  create_eye_files_parser.add_argument('--self-test', dest="selftest", action='store_true', help=SUPPRESS)
+  create_annotation_files_parser.add_argument('-d', '--directory', required=True, help="The eye position files will be stored in this directory")
+  create_annotation_files_parser.add_argument('-e', '--extension', default = '.pos', help="if given, this extension will be appended to every entry returned (defaults to '%(default)s')")
+  create_annotation_files_parser.add_argument('--self-test', dest="selftest", action='store_true', help=SUPPRESS)
 
-  create_eye_files_parser.set_defaults(func=create_eye_files) #action
+  create_annotation_files_parser.set_defaults(func=create_annotation_files) #action

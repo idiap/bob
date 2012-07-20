@@ -82,7 +82,7 @@ def checkfiles(args):
         (len(bad), len(r), args.directory))
 
 
-def create_position_files(args):
+def create_annotation_files(args):
   """Creates the position files for the FRGC database 
   (using the positions stored in the xml files), 
   so that FRGC position files share the same structure as the image files."""  
@@ -98,16 +98,17 @@ def create_position_files(args):
   db = Database(args.database)
   
   # retrieve all files
-  positions = db.positions(directory=args.directory, extension=args.extension)
-  for position in positions.itervalues():
-    filename = position[0]
+  annotations = db.annotations(directory=args.directory, extension=args.extension)
+  for annotation in annotations.itervalues():
+    filename = annotation[0]
     if not os.path.exists(os.path.dirname(filename)):
       os.makedirs(os.path.dirname(filename))
-    eyes = position[1]
+    positions = annotation[1]
     f = open(filename, 'w')
     # write eyes in the common order: left eye, right eye
     
-    f.writelines(str(eyes[0]) + ' ' + str(eyes[1]) + '\n' + str(eyes[2]) + ' ' + str(eyes[3]) + '\n' + str(eyes[4]) + ' ' + str(eyes[5]) + '\n' + str(eyes[6]) + ' ' + str(eyes[7]) + '\n')
+    for type in ('reye', 'leye', 'nose', 'mouth'):
+      f.writelines(type + ' ' + str(positions[type][1]) + ' ' + str(positions[type][0]) + '\n')
     f.close()
     
   
@@ -178,11 +179,11 @@ def add_commands(parser):
   check_files_parser.set_defaults(func=checkfiles) #action
 
   # get the "create-eye-files" action from a submodule
-  create_eye_files_parser = subparsers.add_parser('create-position-files', help=create_position_files.__doc__)
+  create_annotation_files_parser = subparsers.add_parser('create-annotation-files', help=create_annotation_files.__doc__)
 
-  create_eye_files_parser.add_argument('-D', '--database', default='/idiap/resource/database/frgc/FRGC-2.0-dist', help="The base directory of the FRGC database")
-  create_eye_files_parser.add_argument('-d', '--directory', required=True, help="The eye position files will be stored in this directory")
-  create_eye_files_parser.add_argument('-e', '--extension', default = '.pos', help="if given, this extension will be appended to every entry returned (defaults to '%(default)s')")
-  create_eye_files_parser.add_argument('--self-test', dest="selftest", action='store_true', help=SUPPRESS)
+  create_annotation_files_parser.add_argument('-D', '--database', default='/idiap/resource/database/frgc/FRGC-2.0-dist', help="The base directory of the FRGC database")
+  create_annotation_files_parser.add_argument('-d', '--directory', required=True, help="The eye position files will be stored in this directory")
+  create_annotation_files_parser.add_argument('-e', '--extension', default = '.pos', help="if given, this extension will be appended to every entry returned (defaults to '%(default)s')")
+  create_annotation_files_parser.add_argument('--self-test', dest="selftest", action='store_true', help=SUPPRESS)
 
-  create_eye_files_parser.set_defaults(func=create_position_files) #action
+  create_annotation_files_parser.set_defaults(func=create_annotation_files) #action
