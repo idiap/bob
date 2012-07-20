@@ -57,7 +57,7 @@ namespace bob{ namespace machine {
       int numberOfNodes() const { return m_node_positions.extent(0);}
 
       //! Returns the generated node positions (in the usual order (y,x))
-      const blitz::Array<int,2>& nodes() const {return m_node_positions;}
+      blitz::Array<int,2> nodes() const {return m_node_positions;}
 
       //! extracts the Gabor jets of the graph from the jet image
       void extract(

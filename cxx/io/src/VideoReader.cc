@@ -524,9 +524,21 @@ bool io::VideoReader::const_iterator::read(blitz::Array<uint8_t,3>& data,
 bool io::VideoReader::const_iterator::read(ca::interface& data,
   bool throw_on_error) {
 
+  if (!m_parent)
+    //we are already past the end of the stream
+    throw std::runtime_error("video iterator for file has already reached its end and was reset");
+
   //checks if we have not passed the end of the video sequence already
-  if(m_current_frame > m_parent->numberOfFrames()) {
-    throw io::IndexError(m_current_frame);
+  if(m_current_frame >= m_parent->numberOfFrames()) {
+
+    if (throw_on_error) {
+      boost::format m("you are trying to read past the file end (next frame no. to be read would be %d) on file %s, which contains only %d frames");
+      m % m_current_frame % m_parent->m_filepath % m_parent->m_nframes;
+      throw std::runtime_error(m.str().c_str());
+    }
+    
+    reset();
+    return false;
   }
 
   const ca::typeinfo& info = data.type();
@@ -706,11 +718,16 @@ bool seekFrame(ffmpeg::int64_t frame)
  * operations to get a better performance.
  */
 io::VideoReader::const_iterator& io::VideoReader::const_iterator::operator++ () {
-  //checks if we have not passed the end of the video sequence already
-  if(m_current_frame > m_parent->numberOfFrames()) {
-    throw io::IndexError(m_current_frame);
+  if (!m_parent)
+    //we are already past the end of the stream
+    throw std::runtime_error("video iterator for file has already reached its end and was reset");
+
+  if(m_current_frame >= m_parent->numberOfFrames()) {
+    reset();
+    return *this;
   }
 
+  //read the frame
   int gotPicture = 0;
   AVPacket packet;
   av_init_packet(&packet);

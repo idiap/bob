@@ -297,6 +297,12 @@ void bind_machine_gabor(){
       &bob::machine::GaborGraphMachine::numberOfNodes,
       "The number of nodes of the graph."
     )
+
+    .add_property(
+      "nodes",
+      &bob::machine::GaborGraphMachine::nodes,
+      "The node positions of the graph."
+      )
       
     .def(
       "__call__",
