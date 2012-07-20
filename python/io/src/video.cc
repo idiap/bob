@@ -129,7 +129,7 @@ static tuple videoreader_getslice (io::VideoReader& v, slice sobj) {
   list retval;
   io::VideoReader::const_iterator it = v.begin();
   it += start;
-  for (size_t i=start, j=0; i<stop; i+=step, ++j, it+=(step-1)) {
+  for (size_t i=start; it.parent() && i<stop; i+=step, it+=(step-1)) {
     tp::py_array tmp(v.frame_type());
     it.read(tmp); //throw if a problem occurs while reading the video
     retval.append(tmp.pyobject());
