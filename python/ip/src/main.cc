@@ -44,6 +44,7 @@ void bind_ip_tantriggs();
 void bind_ip_histogram();
 void bind_ip_lbp_new();
 void bind_ip_gaussian();
+void bind_ip_wgaussian();
 void bind_ip_median();
 void bind_ip_drawing();
 void bind_ip_spatiotempgrad();
@@ -80,6 +81,7 @@ BOOST_PYTHON_MODULE(_ip) {
   bind_ip_histogram();
   bind_ip_lbp_new();
   bind_ip_gaussian();
+  bind_ip_wgaussian();
   bind_ip_median();
   bind_ip_drawing();
   bind_ip_spatiotempgrad();

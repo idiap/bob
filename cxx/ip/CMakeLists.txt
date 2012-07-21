@@ -28,6 +28,7 @@ set(src
    "src/LBPTop.cc"
    "src/Sobel.cc"
    "src/Gaussian.cc"
+   "src/WeightedGaussian.cc"
    "src/MultiscaleRetinex.cc"
    "src/SpatioTemporalGradient.cc"
 )
@@ -49,6 +50,7 @@ bob_test(ip extrapolateMask test/extrapolateMask.cc)
 bob_test(ip flipflop test/flipflop.cc)
 bob_test(ip gwt test/GaborWaveletTransform.cc)
 bob_test(ip gaussian test/Gaussian.cc)
+bob_test(ip weightedGaussian test/WeightedGaussian.cc)
 bob_test(ip median test/Median.cc)
 bob_test(ip gammaCorrection test/gammaCorrection.cc)
 bob_test(ip geomnorm test/geomnorm.cc)
@@ -75,6 +77,8 @@ set_property(TEST cxx-ip-geomnorm APPEND PROPERTY ENVIRONMENT
 set_property(TEST cxx-ip-facenorm APPEND PROPERTY ENVIRONMENT
   "BOB_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 set_property(TEST cxx-ip-gaussian APPEND PROPERTY ENVIRONMENT
+  "BOB_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+set_property(TEST cxx-ip-weightedGaussian APPEND PROPERTY ENVIRONMENT
   "BOB_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 set_property(TEST cxx-ip-msr APPEND PROPERTY ENVIRONMENT
   "BOB_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
