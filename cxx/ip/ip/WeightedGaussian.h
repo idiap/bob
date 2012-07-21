@@ -56,7 +56,7 @@ namespace bob {
 		  	 * @param border_type The interpolation type for the convolution
 			   */
 	  		WeightedGaussian(const int radius_y=1, const int radius_x=1, 
-            const double sigma_y=5., const double sigma_x=5.,
+            const double sigma_y=2., const double sigma_x=2.,
             const enum bob::sp::Extrapolation::BorderType border_type =
               bob::sp::Extrapolation::Mirror):
           m_radius_y(radius_y), m_radius_x(radius_x), m_sigma_y(sigma_y),

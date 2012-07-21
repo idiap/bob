@@ -139,7 +139,7 @@ static object call_wgs2(bob::ip::WeightedGaussian& op,
 void bind_ip_wgaussian() {
   static const char* wgaussiandoc = "This class performs weighted gaussian smoothing (anisotropic filtering). In particular, it is used by the Self Quotient Image (SQI) algorithm.";
 
-	class_<bob::ip::WeightedGaussian, boost::shared_ptr<bob::ip::WeightedGaussian> >("WeightedGaussian", wgaussiandoc, init<optional<const int, const int, const double, const double, const enum bob::sp::Extrapolation::BorderType> >((arg("radius_y")=1, arg("radius_x")=1, arg("sigma_y")=5., arg("sigma_x")=5., arg("conv_border")=bob::sp::Extrapolation::Mirror), "Creates a weighted gaussian smoother."))
+	class_<bob::ip::WeightedGaussian, boost::shared_ptr<bob::ip::WeightedGaussian> >("WeightedGaussian", wgaussiandoc, init<optional<const int, const int, const double, const double, const enum bob::sp::Extrapolation::BorderType> >((arg("radius_y")=1, arg("radius_x")=1, arg("sigma_y")=2., arg("sigma_x")=2., arg("conv_border")=bob::sp::Extrapolation::Mirror), "Creates a weighted gaussian smoother."))
       .def(init<bob::ip::WeightedGaussian&>(args("other")))
       .def(self == self)
       .def(self != self)
