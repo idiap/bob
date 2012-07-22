@@ -51,7 +51,7 @@ namespace bob {
          *        kernel
 	  		 * @param radius_y The height of the kernel along the y-axis
 	  		 * @param radius_x The width of the kernel along the x-axis
-         * @param sigma The standard deviation of the kernal
+         * @param sigma The variance of the kernal
 		  	 * @param size_opt The size of the output wrt. to convolution
 		  	 * @param border_type The interpolation type for the convolution
 			   */
@@ -99,12 +99,12 @@ namespace bob {
          * @brief Resets the parameters of the filter
 	  		 * @param radius_y The height of the kernel along the y-axis
 	  		 * @param radius_x The width of the kernel along the x-axis
-         * @param sigma The standard deviation of the kernal
+         * @param sigma The variance of the kernal
 		  	 * @param size_opt The size of the output wrt. to convolution
 		  	 * @param border_type The interpolation type for the convolution
 			   */
         void reset( const int radius_y=1, const int radius_x=1,
-          const double sigma_y=5., const double sigma_x=5.,
+          const double sigma_y=2., const double sigma_x=2.,
           const enum bob::sp::Extrapolation::BorderType border_type =
             bob::sp::Extrapolation::Mirror);
 
