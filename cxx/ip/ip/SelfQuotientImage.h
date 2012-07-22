@@ -59,7 +59,7 @@ namespace bob {
 	  		 * @param n_scales The number of scales
          * @param size_min The size of the smallest convolution kernel
          * @param size_step The step size of the convolution kernels
-         * @param sigma The standard deviation of the kernal for the smallest
+         * @param sigma The variance of the kernal for the smallest
          *  convolution kernel.
 		  	 * @param border_type The interpolation type for the convolution
 			   */
@@ -110,7 +110,7 @@ namespace bob {
 	  		 * @param n_scales The number of scales
          * @param size_min The size of the smallest convolution kernel
          * @param size_step The step size of the convolution kernels
-         * @param sigma The standard deviation of the kernal for the smallest
+         * @param sigma The variance of the kernal for the smallest
          *  convolution kernel.
 		  	 * @param border_type The interpolation type for the convolution
 			   */
