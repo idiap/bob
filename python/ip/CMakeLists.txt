@@ -27,6 +27,7 @@ set(ccsrc
    "src/histo.cc"
    "src/LBP.cc"
    "src/MultiscaleRetinex.cc"
+   "src/SelfQuotientImage.cc"
    "src/drawing.cc"
    "src/SpatioTemporalGradient.cc"
    "src/HOG.cc"
@@ -51,6 +52,7 @@ bob_python_add_unittest(ip lib/test/color.py)
 bob_python_add_unittest(ip lib/test/drawing.py)
 bob_python_add_unittest(ip lib/test/histo.py)
 bob_python_add_unittest(ip lib/test/weightedGaussian.py)
+bob_python_add_unittest(ip lib/test/sqi.py)
 
 # If we have VLFeat installed, enable the test of relevant modules
 if(VLFEAT_FOUND)

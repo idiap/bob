@@ -30,6 +30,7 @@ set(src
    "src/Gaussian.cc"
    "src/WeightedGaussian.cc"
    "src/MultiscaleRetinex.cc"
+   "src/SelfQuotientImage.cc"
    "src/SpatioTemporalGradient.cc"
 )
 
