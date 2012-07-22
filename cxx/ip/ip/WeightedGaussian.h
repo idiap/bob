@@ -79,7 +79,7 @@ namespace bob {
         /**
          * @brief Destructor
          */
-        ~WeightedGaussian() {}
+        virtual ~WeightedGaussian() {}
 
         /**
          * @brief Assignment operator
