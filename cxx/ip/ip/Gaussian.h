@@ -47,8 +47,7 @@ namespace bob {
   			 * @brief Creates an object to smooth images with a Gaussian kernel
 	  		 * @param radius_y The height of the kernel along the y-axis
 	  		 * @param radius_x The width of the kernel along the x-axis
-         * @param sigma The standard deviation of the kernal
-		  	 * @param size_opt The size of the output wrt. to convolution
+         * @param sigma The variance of the kernal
 		  	 * @param border_type The interpolation type for the convolution
 			   */
 	  		Gaussian(const int radius_y=1, const int radius_x=1, 
@@ -61,10 +60,74 @@ namespace bob {
           computeKernel();
         }
 
+        /**
+         * @brief Copy constructor
+         */
+        Gaussian(const Gaussian& other): 
+          m_radius_y(other.m_radius_y), m_radius_x(other.m_radius_x), 
+          m_sigma_y(other.m_sigma_y), m_sigma_x(other.m_sigma_x), 
+          m_conv_border(other.m_conv_border)
+  			{
+          computeKernel();
+        }
+
+        /**
+         * @brief Destructor
+         */
+        virtual ~Gaussian() {}
+
+        /**
+         * @brief Assignment operator
+         */
+        Gaussian& operator=(const Gaussian& other);
+
+        /**
+         * @brief Equal to
+         */
+        bool operator==(const Gaussian& b) const;
+        /**
+         * @brief Not equal to
+         */
+        bool operator!=(const Gaussian& b) const; 
+ 
+        /**
+         * @brief Resets the parameters of the filter
+	  		 * @param radius_y The height of the kernel along the y-axis
+	  		 * @param radius_x The width of the kernel along the x-axis
+         * @param sigma The variance of the kernal
+		  	 * @param size_opt The size of the output wrt. to convolution
+		  	 * @param border_type The interpolation type for the convolution
+			   */
+
         void reset( const int radius_y=1, const int radius_x=1,
           const double sigma_y=5., const double sigma_x=5.,
           const enum bob::sp::Extrapolation::BorderType border_type =
             bob::sp::Extrapolation::Mirror);
+
+        /**
+         * @brief Getters
+         */
+        int getRadiusY() const { return m_radius_y; }
+        int getRadiusX() const { return m_radius_x; }
+        double getSigmaY() const { return m_sigma_y; }
+        double getSigmaX() const { return m_sigma_x; }
+        enum bob::sp::Extrapolation::BorderType getConvBorder() const { return m_conv_border; }
+        const blitz::Array<double,1>& getKernelY() const { return m_kernel_y; }
+        const blitz::Array<double,1>& getKernelX() const { return m_kernel_x; }
+       
+        /**
+         * @brief Setters
+         */
+        void setRadiusY(const int radius_y) 
+        { m_radius_y = radius_y; computeKernel(); }
+        void setRadiusX(const int radius_x) 
+        { m_radius_x = radius_x; computeKernel(); }
+        void setSigmaY(const double sigma_y) 
+        { m_sigma_y = sigma_y; computeKernel(); }
+        void setSigmaX(const double sigma_x) 
+        { m_sigma_x = sigma_x; computeKernel(); }
+        void setConvBorder(const enum bob::sp::Extrapolation::BorderType border_type)
+        { m_conv_border = border_type; }
 
         /**
          * @brief Process a 2D blitz Array/Image
@@ -113,35 +176,10 @@ namespace bob {
     void bob::ip::Gaussian::operator()(const blitz::Array<T,2>& src, 
       blitz::Array<double,2>& dst)
     {
+      // Casts the input to double
       blitz::Array<double,2> src_d = bob::core::cast<double>(src);
-      // Checks are postponed to the convolution function.
-      if(m_conv_border == bob::sp::Extrapolation::Zero)
-      {
-        m_tmp_int.resize(bob::sp::getConvSepOutputSize(src_d, m_kernel_y, 0, bob::sp::Conv::Same));
-        bob::sp::convSep(src_d, m_kernel_y, m_tmp_int, 0, bob::sp::Conv::Same);
-        bob::sp::convSep(m_tmp_int, m_kernel_x, dst, 1, bob::sp::Conv::Same);
-      }
-      else
-      {
-        m_tmp_int1.resize(bob::sp::getConvSepOutputSize(src_d, m_kernel_y, 0, bob::sp::Conv::Full));
-        if(m_conv_border == bob::sp::Extrapolation::NearestNeighbour)
-          bob::sp::extrapolateNearest(src_d, m_tmp_int1);
-        else if(m_conv_border == bob::sp::Extrapolation::Circular)
-          bob::sp::extrapolateCircular(src_d, m_tmp_int1);
-        else
-          bob::sp::extrapolateMirror(src_d, m_tmp_int1);
-        m_tmp_int.resize(bob::sp::getConvSepOutputSize(m_tmp_int1, m_kernel_y, 0, bob::sp::Conv::Valid));
-        bob::sp::convSep(m_tmp_int1, m_kernel_y, m_tmp_int, 0, bob::sp::Conv::Valid);
-
-        m_tmp_int2.resize(bob::sp::getConvSepOutputSize(m_tmp_int, m_kernel_x, 1, bob::sp::Conv::Full));
-        if(m_conv_border == bob::sp::Extrapolation::NearestNeighbour)
-          bob::sp::extrapolateNearest(m_tmp_int, m_tmp_int2);
-        else if(m_conv_border == bob::sp::Extrapolation::Circular)
-          bob::sp::extrapolateCircular(m_tmp_int, m_tmp_int2);
-        else
-          bob::sp::extrapolateMirror(m_tmp_int, m_tmp_int2);
-        bob::sp::convSep(m_tmp_int2, m_kernel_x, dst, 1, bob::sp::Conv::Valid);
-      }
+      // Calls the specialized template function for double
+      this->operator()(src_d, dst);
     }
 
     template <typename T> 
@@ -151,11 +189,11 @@ namespace bob {
       for( int p=0; p<dst.extent(0); ++p) {
         const blitz::Array<T,2> src_slice = 
           src( p, blitz::Range::all(), blitz::Range::all() );
-        blitz::Array<T,2> dst_slice = 
+        blitz::Array<double,2> dst_slice = 
           dst( p, blitz::Range::all(), blitz::Range::all() );
         
         // Gaussian smooth plane
-        this(src_slice, dst_slice);
+        this->operator()(src_slice, dst_slice);
       }
     }
 

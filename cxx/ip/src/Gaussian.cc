@@ -22,10 +22,7 @@
 
 #include "ip/Gaussian.h"
 
-namespace ip = bob::ip;
-namespace sp = bob::sp;
-
-void ip::Gaussian::computeKernel()
+void bob::ip::Gaussian::computeKernel()
 {
   m_kernel_y.resize(2 * m_radius_y + 1);
   // Computes the kernel
@@ -45,7 +42,7 @@ void ip::Gaussian::computeKernel()
   m_kernel_x /= blitz::sum(m_kernel_x);
 }
 
-void ip::Gaussian::reset(const int radius_y, const int radius_x,
+void bob::ip::Gaussian::reset(const int radius_y, const int radius_x,
   const double sigma_y, const double sigma_x, 
   const enum bob::sp::Extrapolation::BorderType border_type)
 {
@@ -57,9 +54,37 @@ void ip::Gaussian::reset(const int radius_y, const int radius_x,
   computeKernel();
 }
 
+bob::ip::Gaussian& 
+bob::ip::Gaussian::operator=(const bob::ip::Gaussian& other)
+{
+  if (this != &other)
+  {
+    m_radius_y = other.m_radius_y;
+    m_radius_x = other.m_radius_x;
+    m_sigma_y = other.m_sigma_y;
+    m_sigma_x = other.m_sigma_x;
+    m_conv_border = other.m_conv_border;
+    computeKernel();
+  }
+  return *this;
+}
+
+bool 
+bob::ip::Gaussian::operator==(const bob::ip::Gaussian& b) const
+{
+  return (this->m_radius_y == b.m_radius_y && this->m_radius_x == b.m_radius_x && 
+          this->m_sigma_y == b.m_sigma_y && this->m_sigma_x == b.m_sigma_x && 
+          this->m_conv_border == b.m_conv_border);
+}
+
+bool 
+bob::ip::Gaussian::operator!=(const bob::ip::Gaussian& b) const
+{
+  return !(this->operator==(b));
+}
 
 template <>
-void ip::Gaussian::operator()<double>(const blitz::Array<double,2>& src,
+void bob::ip::Gaussian::operator()<double>(const blitz::Array<double,2>& src,
    blitz::Array<double,2>& dst)
 {
   // Checks are postponed to the convolution function.
