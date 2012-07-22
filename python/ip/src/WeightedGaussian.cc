@@ -1,5 +1,5 @@
 /**
- * @file python/ip/src/wgaussian.cc
+ * @file python/ip/src/WeightedGaussian.cc
  * @date Thu Jul 19 18:42:00 2012 +0200
  * @author Laurent El Shafey <laurent.el-shafey@idiap.ch>
  *
