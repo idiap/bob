@@ -57,7 +57,7 @@ static void call_wgs1(bob::ip::WeightedGaussian& op,
           case bob::core::array::t_uint16: return inner_call_wgs1<uint16_t,2>(op, src, dst);
           case bob::core::array::t_float64: return inner_call_wgs1<double,2>(op, src, dst);
           default:
-            PYTHON_ERROR(TypeError, "weighted gaussian smoothing does not support type '%s'", info.str().c_str());
+            PYTHON_ERROR(TypeError, "WeightedGaussian __call__ does not support array with type '%s'", info.str().c_str());
         }
       }
       break;
@@ -68,12 +68,12 @@ static void call_wgs1(bob::ip::WeightedGaussian& op,
           case bob::core::array::t_uint16: return inner_call_wgs1<uint16_t,3>(op, src, dst);
           case bob::core::array::t_float64: return inner_call_wgs1<double,3>(op, src, dst);
           default:
-            PYTHON_ERROR(TypeError, "weighted gaussian smoothing does not support type '%s'", info.str().c_str());
+            PYTHON_ERROR(TypeError, "WeightedGaussian __call__ does not support array with type '%s'", info.str().c_str());
         }
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "weighted gaussian smoothing does not support input of type '%s'", info.str().c_str());
+      PYTHON_ERROR(TypeError, "WeightedGaussian __call__ does not support array with '%ld' dimensions", info.nd);
   }    
 }
 
@@ -115,7 +115,7 @@ static object call_wgs2(bob::ip::WeightedGaussian& op,
           case bob::core::array::t_uint16: return inner_call_wgs2_2d<uint16_t>(op, src);
           case bob::core::array::t_float64: return inner_call_wgs2_2d<double>(op, src);
           default:
-            PYTHON_ERROR(TypeError, "weighted gaussian smoothing does not support type '%s'", info.str().c_str());
+            PYTHON_ERROR(TypeError, "WeightedGaussian __call__ does not support array with type '%s'", info.str().c_str());
         }
       }
       break;
@@ -126,12 +126,12 @@ static object call_wgs2(bob::ip::WeightedGaussian& op,
           case bob::core::array::t_uint16: return inner_call_wgs2_3d<uint16_t>(op, src);
           case bob::core::array::t_float64: return inner_call_wgs2_3d<double>(op, src);
           default:
-            PYTHON_ERROR(TypeError, "weighted gaussian smoothing does not support type '%s'", info.str().c_str());
+            PYTHON_ERROR(TypeError, "WeightedGaussian __call__ does not support array with type '%s'", info.str().c_str());
         }
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "weighted gaussian smoothing does not support input of type '%s'", info.str().c_str());
+      PYTHON_ERROR(TypeError, "WeightedGaussian __call__ does not support array with '%ld' dimensions", info.nd);
   }
 }
 
