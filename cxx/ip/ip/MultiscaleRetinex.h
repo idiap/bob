@@ -28,12 +28,9 @@
 
 #include "core/array_assert.h"
 #include "core/cast.h"
-#include "sp/conv.h"
 #include "sp/extrapolate.h"
 #include "ip/Gaussian.h"
 #include <boost/shared_array.hpp>
-
-#include "core/logging.h"
 
 namespace bob {
 
@@ -77,6 +74,76 @@ namespace bob {
         }
 
         /**
+         * @brief Copy constructor
+         */
+        MultiscaleRetinex(const MultiscaleRetinex& other): 
+          m_n_scales(other.m_n_scales), m_size_min(other.m_size_min), 
+          m_size_step(other.m_size_step), m_sigma(other.m_sigma), 
+          m_conv_border(other.m_conv_border),
+          m_gaussians(new bob::ip::Gaussian[m_n_scales])
+  			{
+          computeKernels();
+        }
+
+        /**
+         * @brief Destructor
+         */
+        virtual ~MultiscaleRetinex() {}
+
+        /**
+         * @brief Assignment operator
+         */
+        MultiscaleRetinex& operator=(const MultiscaleRetinex& other);
+
+        /**
+         * @brief Equal to
+         */
+        bool operator==(const MultiscaleRetinex& b) const;
+        /**
+         * @brief Not equal to
+         */
+        bool operator!=(const MultiscaleRetinex& b) const; 
+ 
+        /**
+         * @brief Resets the parameters of the filter
+	  		 * @param n_scales The number of scales
+         * @param size_min The size of the smallest convolution kernel
+         * @param size_step The step size of the convolution kernels
+         * @param sigma The variance of the kernal for the smallest
+         *  convolution kernel.
+		  	 * @param border_type The interpolation type for the convolution
+			   */
+        void reset( const size_t n_scales=1, const int size_min=1, 
+            const int size_step=1, const double sigma=2.,
+            const enum bob::sp::Extrapolation::BorderType border_type =
+              bob::sp::Extrapolation::Mirror);
+
+        /**
+         * @brief Getters
+         */
+        size_t getNScales() const { return m_n_scales; }
+        int getSizeMin() const { return m_size_min; }
+        int getSizeStep() const { return m_size_step; }
+        double getSigma() const { return m_sigma; }
+        enum bob::sp::Extrapolation::BorderType getConvBorder() const { return m_conv_border; }
+       
+        /**
+         * @brief Setters
+         */
+        void setNScales(const size_t n_scales) 
+        { m_n_scales = n_scales; 
+          m_gaussians.reset(new bob::ip::Gaussian[m_n_scales]); 
+          computeKernels(); }
+        void setSizeMin(const int size_min) 
+        { m_size_min = size_min; computeKernels(); }
+        void setSizeStep(const int size_step) 
+        { m_size_step = size_step; computeKernels(); }
+        void setSigma(const double sigma) 
+        { m_sigma = sigma; computeKernels(); }
+        void setConvBorder(const enum bob::sp::Extrapolation::BorderType border_type)
+        { m_conv_border = border_type; computeKernels(); }
+
+        /**
          * @brief Process a 2D blitz Array/Image
          * @param src The 2D input blitz array
          * @param src The 2D input blitz array
@@ -113,14 +180,14 @@ namespace bob {
       blitz::Array<double,2>& dst)
     {
       // Checks are postponed to the Gaussian operator() function.
-      dst = 0;
+      dst = 0.;
       if( m_tmp.extent(0) != src.extent(0) || m_tmp.extent(1) != src.extent(1))
         m_tmp.resize(src.extent(0), src.extent(1) );
       for(size_t s=0; s<m_n_scales; ++s) {
-        m_gaussians[s](src,m_tmp);
-        dst += log(src+1) - log(m_tmp+1);
+        m_gaussians[s].operator()(src,m_tmp);
+        dst += (blitz::log(src+1.) - blitz::log(m_tmp+1.));
       }
-      dst /= m_n_scales;
+      dst /= (double)m_n_scales;
     }
 
     template <typename T> 
@@ -130,11 +197,11 @@ namespace bob {
       for( int p=0; p<dst.extent(0); ++p) {
         const blitz::Array<T,2> src_slice = 
           src( p, blitz::Range::all(), blitz::Range::all() );
-        blitz::Array<T,2> dst_slice = 
+        blitz::Array<double,2> dst_slice = 
           dst( p, blitz::Range::all(), blitz::Range::all() );
         
         // Gaussian smooth plane
-        this(src_slice, dst_slice);
+        this->operator()(src_slice, dst_slice);
       }
     }
 

@@ -53,6 +53,7 @@ bob_python_add_unittest(ip lib/test/drawing.py)
 bob_python_add_unittest(ip lib/test/histo.py)
 bob_python_add_unittest(ip lib/test/weightedGaussian.py)
 bob_python_add_unittest(ip lib/test/sqi.py)
+bob_python_add_unittest(ip lib/test/msr.py)
 
 # If we have VLFeat installed, enable the test of relevant modules
 if(VLFEAT_FOUND)
