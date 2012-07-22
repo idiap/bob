@@ -24,29 +24,26 @@
 #include "ip/MultiscaleRetinex.h"
 
 using namespace boost::python;
-namespace ip = bob::ip;
-namespace tp = bob::python;
-namespace ca = bob::core::array;
 
-template <typename T> static void inner_call (ip::MultiscaleRetinex& obj, 
-    tp::const_ndarray input, tp::ndarray output) {
+template <typename T> static void inner_call (bob::ip::MultiscaleRetinex& obj, 
+    bob::python::const_ndarray input, bob::python::ndarray output) {
   blitz::Array<double,2> output_ = output.bz<double,2>();
   obj(input.bz<T,2>(), output_);
 }
 
-static void py_call (ip::MultiscaleRetinex& obj, tp::const_ndarray input,
-    tp::ndarray output) {
-  const ca::typeinfo& info = input.type();
+static void py_call (bob::ip::MultiscaleRetinex& obj, bob::python::const_ndarray input,
+    bob::python::ndarray output) {
+  const bob::core::array::typeinfo& info = input.type();
   switch (info.dtype) {
-    case ca::t_uint8: return inner_call<uint8_t>(obj, input, output);
-    case ca::t_uint16: return inner_call<uint16_t>(obj, input, output);
-    case ca::t_float64: return inner_call<double>(obj, input, output);
+    case bob::core::array::t_uint8: return inner_call<uint8_t>(obj, input, output);
+    case bob::core::array::t_uint16: return inner_call<uint16_t>(obj, input, output);
+    case bob::core::array::t_float64: return inner_call<double>(obj, input, output);
     default: PYTHON_ERROR(TypeError, "MultiscaleRetinex __call__ operator does not support array with type '%s'", info.str().c_str());
   }
 }
 
 void bind_ip_msr() {
-	class_<ip::MultiscaleRetinex, boost::shared_ptr<ip::MultiscaleRetinex> >("MultiscaleRetinex", "Applies the Multiscale Retinex algorithm", init<optional<const size_t, const int, const int, const double> >((arg("n_scales")=1,arg("size_min")=1, arg("size_step")=1, arg("sigma")=5.), "Creates a MultiscaleRetinex object."))
+	class_<bob::ip::MultiscaleRetinex, boost::shared_ptr<bob::ip::MultiscaleRetinex> >("MultiscaleRetinex", "Applies the Multiscale Retinex algorithm", init<optional<const size_t, const int, const int, const double> >((arg("n_scales")=1,arg("size_min")=1, arg("size_step")=1, arg("sigma")=5.), "Creates a MultiscaleRetinex object."))
 		.def("__call__", &py_call, (arg("self"), arg("src"), arg("dst")), "Applies the Multiscale Retinex algorithm to an image of type uint8, uint16 or double")
 		;
 }
