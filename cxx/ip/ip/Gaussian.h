@@ -47,7 +47,8 @@ namespace bob {
   			 * @brief Creates an object to smooth images with a Gaussian kernel
 	  		 * @param radius_y The height of the kernel along the y-axis
 	  		 * @param radius_x The width of the kernel along the x-axis
-         * @param sigma The variance of the kernal
+         * @param sigma_y The variance of the kernel along the y-axis
+         * @param sigma_x The variance of the kernel along the x-axis
 		  	 * @param border_type The interpolation type for the convolution
 			   */
 	  		Gaussian(const int radius_y=1, const int radius_x=1, 
