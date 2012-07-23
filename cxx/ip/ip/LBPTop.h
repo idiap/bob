@@ -207,26 +207,26 @@ namespace bob { namespace ip {
       /*Checking XY*/
       if( xy.extent(0) != limitTime)
         throw ParamOutOfBoundaryError("Time parameter in  XY ", (xy.extent(0) > limitTime), xy.extent(0), limitTime);
-      if( xy.extent(1) != limitWidth)
-        throw ParamOutOfBoundaryError("Width parameter in  XY ", (xy.extent(1) > limitWidth), xy.extent(1), limitWidth);
-      if( xy.extent(2) != limitHeight)
-        throw ParamOutOfBoundaryError("Height parameter in  XY ", (xy.extent(2) > limitHeight), xy.extent(2), limitHeight);
+      if( xy.extent(1) != limitHeight)
+        throw ParamOutOfBoundaryError("Height parameter in  XY ", (xy.extent(1) > limitWidth), xy.extent(1), limitWidth);
+      if( xy.extent(2) != limitWidth)
+        throw ParamOutOfBoundaryError("Width parameter in  XY ", (xy.extent(2) > limitHeight), xy.extent(2), limitHeight);
 
       /*Checking XT*/
       if( xt.extent(0) != limitTime)
         throw ParamOutOfBoundaryError("Time parameter in  XT ", (xt.extent(0) > limitTime), xt.extent(0), limitTime);
-      if( xt.extent(1) != limitWidth)
-        throw ParamOutOfBoundaryError("Width parameter in  XT ", (xt.extent(1) > limitWidth), xt.extent(1), limitWidth);
-      if( xt.extent(2) != limitHeight)
-        throw ParamOutOfBoundaryError("Height parameter in  XT ", (xt.extent(2) > limitHeight), xt.extent(2), limitHeight);
+      if( xt.extent(1) != limitHeight)
+        throw ParamOutOfBoundaryError("Height parameter in  XT ", (xt.extent(1) > limitWidth), xt.extent(1), limitWidth);
+      if( xt.extent(2) != limitWidth)
+        throw ParamOutOfBoundaryError("Width parameter in  XT ", (xt.extent(2) > limitHeight), xt.extent(2), limitHeight);
 
       /*Checking YT*/
       if( yt.extent(0) != limitTime)
         throw ParamOutOfBoundaryError("Time parameter in  YT ", (yt.extent(0) > limitTime), yt.extent(0), limitTime);
-      if( yt.extent(1) != limitWidth)
-        throw ParamOutOfBoundaryError("Width parameter in  YT ", (yt.extent(1) > limitWidth), yt.extent(1), limitWidth);
-      if( yt.extent(2) != limitHeight)
-        throw ParamOutOfBoundaryError("Height parameter in  YT ", (yt.extent(2) > limitHeight), yt.extent(2), limitHeight);
+      if( yt.extent(1) != limitHeight)
+        throw ParamOutOfBoundaryError("Height parameter in  YT ", (yt.extent(1) > limitWidth), yt.extent(1), limitWidth);
+      if( yt.extent(2) != limitWidth)
+        throw ParamOutOfBoundaryError("Width parameter in  YT ", (yt.extent(2) > limitHeight), yt.extent(2), limitHeight);
 
 
       //for each element in time domain (the simplest way to see what is happening)
