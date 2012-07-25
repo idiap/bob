@@ -49,18 +49,20 @@ namespace bob {
 			  /**
   			 * @brief Creates an object to smooth images with a weighted Gaussian 
          *        kernel
-	  		 * @param radius_y The height of the kernel along the y-axis
-	  		 * @param radius_x The width of the kernel along the x-axis
-         * @param sigma_y The variance of the kernel along the y-axis
-         * @param sigma_x The variance of the kernel along the x-axis
+	  		 * @param radius_y The radius-height of the kernel along the y-axis 
+         *                 (height = 2*radius_y + 1)
+	  		 * @param radius_x The radius-width of the kernel along the x-axis 
+         *                 (width = 2*radius_x + 1)
+         * @param sigma2_y The variance of the kernel along the y-axis
+         * @param sigma2_x The variance of the kernel along the x-axis
 		  	 * @param border_type The interpolation type for the convolution
 			   */
-	  		WeightedGaussian(const int radius_y=1, const int radius_x=1, 
-            const double sigma_y=2., const double sigma_x=2.,
+	  		WeightedGaussian(const size_t radius_y=1, const size_t radius_x=1, 
+            const double sigma2_y=2., const double sigma2_x=2.,
             const enum bob::sp::Extrapolation::BorderType border_type =
               bob::sp::Extrapolation::Mirror):
-          m_radius_y(radius_y), m_radius_x(radius_x), m_sigma_y(sigma_y),
-          m_sigma_x(sigma_x), m_conv_border(border_type)
+          m_radius_y(radius_y), m_radius_x(radius_x), m_sigma2_y(sigma2_y),
+          m_sigma2_x(sigma2_x), m_conv_border(border_type)
   			{
           computeKernel();
         }
@@ -70,7 +72,7 @@ namespace bob {
          */
         WeightedGaussian(const WeightedGaussian& other): 
           m_radius_y(other.m_radius_y), m_radius_x(other.m_radius_x), 
-          m_sigma_y(other.m_sigma_y), m_sigma_x(other.m_sigma_x), 
+          m_sigma2_y(other.m_sigma2_y), m_sigma2_x(other.m_sigma2_x), 
           m_conv_border(other.m_conv_border)
   			{
           computeKernel();
@@ -97,38 +99,41 @@ namespace bob {
  
         /**
          * @brief Resets the parameters of the filter
-	  		 * @param radius_y The height of the kernel along the y-axis
-	  		 * @param radius_x The width of the kernel along the x-axis
-         * @param sigma The variance of the kernal
+	  		 * @param radius_y The radius-height of the kernel along the y-axis 
+         *                 (height = 2*radius_y + 1)
+	  		 * @param radius_x The radius-width of the kernel along the x-axis 
+         *                 (width = 2*radius_x + 1)
+         * @param sigma2_y The variance of the kernel along the y-axis
+         * @param sigma2_x The variance of the kernel along the x-axis
 		  	 * @param size_opt The size of the output wrt. to convolution
 		  	 * @param border_type The interpolation type for the convolution
 			   */
-        void reset( const int radius_y=1, const int radius_x=1,
-          const double sigma_y=2., const double sigma_x=2.,
+        void reset( const size_t radius_y=1, const size_t radius_x=1,
+          const double sigma2_y=2., const double sigma2_x=2.,
           const enum bob::sp::Extrapolation::BorderType border_type =
             bob::sp::Extrapolation::Mirror);
 
         /**
          * @brief Getters
          */
-        int getRadiusY() const { return m_radius_y; }
-        int getRadiusX() const { return m_radius_x; }
-        double getSigmaY() const { return m_sigma_y; }
-        double getSigmaX() const { return m_sigma_x; }
+        size_t getRadiusY() const { return m_radius_y; }
+        size_t getRadiusX() const { return m_radius_x; }
+        double getSigma2Y() const { return m_sigma2_y; }
+        double getSigma2X() const { return m_sigma2_x; }
         enum bob::sp::Extrapolation::BorderType getConvBorder() const { return m_conv_border; }
         const blitz::Array<double,2>& getUnweightedKernel() const { return m_kernel; }
        
         /**
          * @brief Setters
          */
-        void setRadiusY(const int radius_y) 
+        void setRadiusY(const size_t radius_y) 
         { m_radius_y = radius_y; computeKernel(); }
-        void setRadiusX(const int radius_x) 
+        void setRadiusX(const size_t radius_x) 
         { m_radius_x = radius_x; computeKernel(); }
-        void setSigmaY(const double sigma_y) 
-        { m_sigma_y = sigma_y; computeKernel(); }
-        void setSigmaX(const double sigma_x) 
-        { m_sigma_x = sigma_x; computeKernel(); }
+        void setSigma2Y(const double sigma2_y) 
+        { m_sigma2_y = sigma2_y; computeKernel(); }
+        void setSigma2X(const double sigma2_x) 
+        { m_sigma2_x = sigma2_x; computeKernel(); }
         void setConvBorder(const enum bob::sp::Extrapolation::BorderType border_type)
         { m_conv_border = border_type; }
 
@@ -156,26 +161,26 @@ namespace bob {
         /**
          * @brief Attributes
          */	
-        int m_radius_y;
-        int m_radius_x;
-        double m_sigma_y;
-        double m_sigma_x;
+        size_t m_radius_y;
+        size_t m_radius_x;
+        double m_sigma2_y;
+        double m_sigma2_x;
         enum bob::sp::Extrapolation::BorderType m_conv_border;
 
-        blitz::Array<double, 2> m_kernel;
-        blitz::Array<double, 2> m_kernel_weighted;
+        blitz::Array<double,2> m_kernel;
+        blitz::Array<double,2> m_kernel_weighted;
 
-        blitz::Array<double, 2> m_src_extra;
-        blitz::Array<double, 2> m_src_integral;
+        blitz::Array<double,2> m_src_extra;
+        blitz::Array<double,2> m_src_integral;
     };
 
     // Declare template method full specialization
     template <> 
-    void bob::ip::WeightedGaussian::operator()<double>(const blitz::Array<double,2>& src,
+    void WeightedGaussian::operator()<double>(const blitz::Array<double,2>& src,
       blitz::Array<double,2>& dst);
 
     template <typename T> 
-    void bob::ip::WeightedGaussian::operator()(const blitz::Array<T,2>& src, 
+    void WeightedGaussian::operator()(const blitz::Array<T,2>& src, 
       blitz::Array<double,2>& dst)
     {
       // Casts the input to double
@@ -185,10 +190,14 @@ namespace bob {
     }
 
     template <typename T> 
-    void bob::ip::WeightedGaussian::operator()(const blitz::Array<T,3>& src, 
+    void WeightedGaussian::operator()(const blitz::Array<T,3>& src, 
       blitz::Array<double,3>& dst)
     {
-      for( int p=0; p<dst.extent(0); ++p) {
+      // Check number of planes
+      bob::core::array::assertSameDimensionLength(src.extent(0), dst.extent(0));
+
+      for( int p=0; p<dst.extent(0); ++p) 
+      {
         const blitz::Array<T,2> src_slice = 
           src( p, blitz::Range::all(), blitz::Range::all() );
         blitz::Array<double,2> dst_slice = 

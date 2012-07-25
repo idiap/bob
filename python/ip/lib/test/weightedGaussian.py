@@ -37,24 +37,24 @@ class WeightedGaussianTest(unittest.TestCase):
     op = bob.ip.WeightedGaussian(1,1,0.5,0.5)
     self.assertEqual(op.radius_y, 1)
     self.assertEqual(op.radius_x, 1)
-    self.assertEqual(op.sigma_y, 0.5)
-    self.assertEqual(op.sigma_x, 0.5)
+    self.assertEqual(op.sigma2_y, 0.5)
+    self.assertEqual(op.sigma2_x, 0.5)
     self.assertEqual(op.conv_border, bob.sp.BorderType.Mirror)
     op.radius_y = 2
     op.radius_x = 2
-    op.sigma_y = 1.
-    op.sigma_x = 1.
+    op.sigma2_y = 1.
+    op.sigma2_x = 1.
     op.conv_border = bob.sp._sp.BorderType.Circular
     self.assertEqual(op.radius_y, 2)
     self.assertEqual(op.radius_x, 2)
-    self.assertEqual(op.sigma_y, 1.)
-    self.assertEqual(op.sigma_x, 1.)
+    self.assertEqual(op.sigma2_y, 1.)
+    self.assertEqual(op.sigma2_x, 1.)
     self.assertEqual(op.conv_border, bob.sp.BorderType.Circular)
     op.reset(1,1,0.5,0.5,bob.sp.BorderType.Mirror)
     self.assertEqual(op.radius_y, 1)
     self.assertEqual(op.radius_x, 1)
-    self.assertEqual(op.sigma_y, 0.5)
-    self.assertEqual(op.sigma_x, 0.5)
+    self.assertEqual(op.sigma2_y, 0.5)
+    self.assertEqual(op.sigma2_x, 0.5)
     self.assertEqual(op.conv_border, bob.sp.BorderType.Mirror)
   
   def test02_processing(self):

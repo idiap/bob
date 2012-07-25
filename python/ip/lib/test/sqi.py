@@ -36,23 +36,23 @@ class SelfQuotientImageTest(unittest.TestCase):
     self.assertEqual(op.n_scales, 2)
     self.assertEqual(op.size_min, 1)
     self.assertEqual(op.size_step, 1)
-    self.assertEqual(op.sigma, 2.)
+    self.assertEqual(op.sigma2, 2.)
     self.assertEqual(op.conv_border, bob.sp.BorderType.Mirror)
     op.n_scales = 3
     op.size_min = 2
     op.size_step = 2
-    op.sigma = 1.
+    op.sigma2 = 1.
     op.conv_border = bob.sp.BorderType.Circular
     self.assertEqual(op.n_scales, 3)
     self.assertEqual(op.size_min, 2)
     self.assertEqual(op.size_step, 2)
-    self.assertEqual(op.sigma, 1.)
+    self.assertEqual(op.sigma2, 1.)
     self.assertEqual(op.conv_border, bob.sp.BorderType.Circular)
     op.reset(1,1,1,0.5,bob.sp.BorderType.Mirror)
     self.assertEqual(op.n_scales, 1)
     self.assertEqual(op.size_min, 1)
     self.assertEqual(op.size_step, 1)
-    self.assertEqual(op.sigma, 0.5)
+    self.assertEqual(op.sigma2, 0.5)
     self.assertEqual(op.conv_border, bob.sp.BorderType.Mirror)
 
   def test02_processing(self):

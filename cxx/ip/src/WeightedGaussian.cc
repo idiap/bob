@@ -28,23 +28,24 @@ void bob::ip::WeightedGaussian::computeKernel()
   m_kernel.resize(2 * m_radius_y + 1, 2 * m_radius_x + 1);
   m_kernel_weighted.resize(2 * m_radius_y + 1, 2 * m_radius_x + 1);
   // Computes the kernel
-  const double inv_sigma_y = 1.0 / m_sigma_y;
-  const double inv_sigma_x = 1.0 / m_sigma_x;
-  for (int i = -m_radius_y; i <= m_radius_y; ++i) 
-    for (int j = -m_radius_x; j <= m_radius_x; ++j)
-      m_kernel(i + m_radius_y, j + m_radius_x) = exp( -0.5 * (inv_sigma_y * (i * i) + inv_sigma_x * (j * j)));
+  const double inv_sigma2_y = 1.0 / m_sigma2_y;
+  const double inv_sigma2_x = 1.0 / m_sigma2_x;
+  for (int i = -(int)m_radius_y; i <= (int)m_radius_y; ++i) 
+    for (int j = -(int)m_radius_x; j <= (int)m_radius_x; ++j)
+      m_kernel(i + (int)m_radius_y, j + (int)m_radius_x) = 
+        exp( -0.5 * (inv_sigma2_y * (i * i) + inv_sigma2_x * (j * j)));
   // Normalizes the kernel
   m_kernel /= blitz::sum(m_kernel);
 }
 
-void bob::ip::WeightedGaussian::reset(const int radius_y, const int radius_x,
-  const double sigma_y, const double sigma_x, 
+void bob::ip::WeightedGaussian::reset(const size_t radius_y, const size_t radius_x,
+  const double sigma2_y, const double sigma2_x, 
   const enum bob::sp::Extrapolation::BorderType border_type)
 {
   m_radius_y = radius_y;
   m_radius_x = radius_x;
-  m_sigma_y = sigma_y;
-  m_sigma_x = sigma_x;
+  m_sigma2_y = sigma2_y;
+  m_sigma2_x = sigma2_x;
   m_conv_border = border_type;
   computeKernel();
 }
@@ -56,8 +57,8 @@ bob::ip::WeightedGaussian::operator=(const bob::ip::WeightedGaussian& other)
   {
     m_radius_y = other.m_radius_y;
     m_radius_x = other.m_radius_x;
-    m_sigma_y = other.m_sigma_y;
-    m_sigma_x = other.m_sigma_x;
+    m_sigma2_y = other.m_sigma2_y;
+    m_sigma2_x = other.m_sigma2_x;
     m_conv_border = other.m_conv_border;
     computeKernel();
   }
@@ -68,7 +69,7 @@ bool
 bob::ip::WeightedGaussian::operator==(const bob::ip::WeightedGaussian& b) const
 {
   return (this->m_radius_y == b.m_radius_y && this->m_radius_x == b.m_radius_x && 
-          this->m_sigma_y == b.m_sigma_y && this->m_sigma_x == b.m_sigma_x && 
+          this->m_sigma2_y == b.m_sigma2_y && this->m_sigma2_x == b.m_sigma2_x && 
           this->m_conv_border == b.m_conv_border);
 }
 
@@ -94,8 +95,8 @@ void bob::ip::WeightedGaussian::operator()<double>(
   // 1/ Extrapolation of src
   // Resize temporary extrapolated src array
   blitz::TinyVector<int,2> shape = src.shape();
-  shape(0) += 2 * m_radius_y;
-  shape(1) += 2 * m_radius_x;
+  shape(0) += 2 * (int)m_radius_y;
+  shape(1) += 2 * (int)m_radius_x;
   m_src_extra.resize(shape);
   
   // Extrapolate
@@ -121,11 +122,11 @@ void bob::ip::WeightedGaussian::operator()<double>(
       // Computes the threshold associated to the current location
       // Integral image is used to speed up the process
       blitz::Array<double,2> src_slice = m_src_extra(
-        blitz::Range(y,y+2*m_radius_y), blitz::Range(x,x+2*m_radius_x));
+        blitz::Range(y,y+2*(int)m_radius_y), blitz::Range(x,x+2*(int)m_radius_x));
       double threshold = (m_src_integral(y,x) + 
-          m_src_integral(y+2*m_radius_y+1,x+2*m_radius_x+1) - 
-          m_src_integral(y,x+2*m_radius_x+1) - 
-          m_src_integral(y+2*m_radius_y+1,x)
+          m_src_integral(y+2*(int)m_radius_y+1,x+2*(int)m_radius_x+1) - 
+          m_src_integral(y,x+2*(int)m_radius_x+1) - 
+          m_src_integral(y+2*(int)m_radius_y+1,x)
         ) / n_elem;
       // Computes the weighted Gaussian kernel at this location
       // a/ M1 is the set of pixels whose values are above the threshold
