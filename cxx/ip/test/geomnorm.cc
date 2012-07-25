@@ -182,5 +182,25 @@ BOOST_AUTO_TEST_CASE( test_geomnorm_with_mask )
 }
 
 
+BOOST_AUTO_TEST_CASE( test_geomnorm_with_points )
+{
+  // generate geometric normalizer that rotates by 45 degrees, scales by 2 and moves to new center (40,80)
+  // (the image resolution aka cropping area 160x160 is not required for this test...)
+  bob::ip::GeomNorm geom_norm(45., 2., 160, 160, 40, 80);
+
+  // define positions to be rotated
+  blitz::TinyVector<double,2> position(15,25);
+
+  // we take an offset of 20,20 to rotate the point
+  // the centered point is hence (-5,5)
+  blitz::TinyVector<double,2> rotated = geom_norm(position,20,20);
+
+  // check the new position
+  // new y-value should be 0 plus offset
+  BOOST_CHECK_CLOSE(rotated(0), 40., 1e-10);
+  // new x value is the length of the centered vector (i.e. 5*sqrt(2)) times the scaling factor 2 plus offset
+  BOOST_CHECK_CLOSE(rotated(1), 80. + 5. * std::sqrt(2.) * 2, 1e-10);
+
+}
 
 BOOST_AUTO_TEST_SUITE_END()

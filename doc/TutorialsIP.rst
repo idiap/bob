@@ -226,9 +226,9 @@ image (that will be generated when applying the object):
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
   
-  >>> face_eyes_norm = bob.ip.FaceEyesNorm(eyes_distance = 64, crop_height = 128, crop_width = 128, crop_eyecenter_offset_h = 32, crop_eyecenter_offset_w = 64)
+  >>> face_eyes_norm = bob.ip.FaceEyesNorm(eyes_distance = 65, crop_height = 128, crop_width = 128, crop_eyecenter_offset_h = 32, crop_eyecenter_offset_w = 63.5)
 
-Now, we have set up our object to generate images of size (128, 128) that will put the left eye at the pixel position (32, 32) and the right eye at the 
+Now, we have set up our object to generate images of size (128, 128) that will put the left eye at the pixel position (32, 31) and the right eye at the 
 position (32, 96). Afterwards, this object is used to geometrically normalize the face, given the eye positions in the original face image. 
 Note that the left eye usually has a higher x-coordinate than the right eye:
 
@@ -255,10 +255,10 @@ You can either get the LBP feature for a single point by specifying the position
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
   
-  >>> lbp_local = lbp_extractor ( cropped_image, 31, 31 )
+  >>> lbp_local = lbp_extractor ( cropped_image, 69, 62 )
   >>> # print the binary representation of the LBP
   >>> print bin ( lbp_local )
-  0b11001111
+  0b11110000
   
 or you can extract the LBP features for all pixels in the image. In this case you need to get the required shape of the output image:
 
@@ -272,8 +272,8 @@ or you can extract the LBP features for all pixels in the image. In this case yo
   >>> lbp_extractor ( cropped_image,  lbp_output_image )
   >>> # print the binary representation of the pixel at the same location as above;
   >>> # note that the index is shifted by 1 since the lbp image is smaller than the original
-  >>> print bin ( lbp_output_image [ 30, 30 ] )
-  0b11001111
+  >>> print bin ( lbp_output_image [ 68, 60 ] )
+  0b11110000
 
 
 Gabor jets can be extracted from an image. Simply use the :py:class:`bob.ip.GaborWaveletTransform` class:

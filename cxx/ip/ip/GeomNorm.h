@@ -59,8 +59,8 @@ namespace bob {
           * @brief Constructor
           */
         GeomNorm(const double rotation_angle, const double scaling_factor, 
-          const int crop_height, const int crop_width, 
-          const int crop_offset_h, const int crop_offset_w);
+          const size_t crop_height, const size_t crop_width,
+          const double crop_offset_h, const double crop_offset_w);
 
         /**
          * @brief Copy constructor
@@ -91,10 +91,10 @@ namespace bob {
           */
         double getRotationAngle() const { return m_rotation_angle; }
         double getScalingFactor() const { return m_scaling_factor; }
-        int getCropHeight() const { return m_crop_height; }
-        int getCropWidth() const { return m_crop_width; }
-        int getCropOffsetH() const { return m_crop_offset_h; }
-        int getCropOffsetW() const { return m_crop_offset_w; }
+        size_t getCropHeight() const { return m_crop_height; }
+        size_t getCropWidth() const { return m_crop_width; }
+        double getCropOffsetH() const { return m_crop_offset_h; }
+        double getCropOffsetW() const { return m_crop_offset_w; }
 
         /**
           * @brief Mutators
@@ -103,13 +103,13 @@ namespace bob {
           { m_rotation_angle = angle; }
         void setScalingFactor(const double scaling_factor) 
           { m_scaling_factor = scaling_factor; }
-        void setCropHeight(const int crop_h) 
+        void setCropHeight(const size_t crop_h)
           { m_crop_height = crop_h; }
-        void setCropWidth(const int crop_w) 
+        void setCropWidth(const size_t crop_w)
           { m_crop_width = crop_w; }
-        void setCropOffsetH(const int crop_dh) 
+        void setCropOffsetH(const double crop_dh)
           { m_crop_offset_h = crop_dh; }
-        void setCropOffsetW(const int crop_dw) 
+        void setCropOffsetW(const double crop_dw)
           { m_crop_offset_w = crop_dw; }
 
         /**
@@ -118,11 +118,11 @@ namespace bob {
           */
         template <typename T> 
         void operator()(const blitz::Array<T,2>& src, 
-          blitz::Array<double,2>& dst, const int rot_c_y, const int rot_c_x) const;
+          blitz::Array<double,2>& dst, const double rot_c_y, const double rot_c_x) const;
         template <typename T> 
         void operator()(const blitz::Array<T,2>& src, 
           const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst, 
-          blitz::Array<bool,2>& dst_mask, const int rot_c_y, const int rot_c_x) const;
+          blitz::Array<bool,2>& dst_mask, const double rot_c_y, const double rot_c_x) const;
 
         /**
          * @brief Process a 3D blitz Array/Image by applying the geometric
@@ -130,11 +130,17 @@ namespace bob {
          */
         template <typename T> 
         void operator()(const blitz::Array<T,3>& src, 
-          blitz::Array<double,3>& dst, const int rot_c_y, const int rot_c_x) const;
+          blitz::Array<double,3>& dst, const double rot_c_y, const double rot_c_x) const;
         template <typename T> 
         void operator()(const blitz::Array<T,3>& src, 
           const blitz::Array<bool,3>& src_mask, blitz::Array<double,3>& dst, 
-          blitz::Array<bool,3>& dst_mask, const int rot_c_y, const int rot_c_x) const;
+          blitz::Array<bool,3>& dst_mask, const double rot_c_y, const double rot_c_x) const;
+
+        /**
+         * @brief applies the geometric normalization to the given input position
+         */
+        blitz::TinyVector<double,2> operator()(const blitz::TinyVector<double,2>& position,
+          const double rot_c_y, const double rot_c_x) const;
 
       private:
         /**
@@ -143,22 +149,22 @@ namespace bob {
         template <typename T, bool mask>
         void processNoCheck(const blitz::Array<T,2>& src, 
           const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst, 
-          blitz::Array<bool,2>& dst_mask, const int rot_c_y, const int rot_c_x) const;
+          blitz::Array<bool,2>& dst_mask, const double rot_c_y, const double rot_c_x) const;
 
         /**
           * Attributes
           */
         double m_rotation_angle;
         double m_scaling_factor;
-        int m_crop_height;
-        int m_crop_width;
-        int m_crop_offset_h;
-        int m_crop_offset_w;
+        size_t m_crop_height;
+        size_t m_crop_width;
+        double m_crop_offset_h;
+        double m_crop_offset_w;
     };
 
     template <typename T> 
-    void bob::ip::GeomNorm::operator()(const blitz::Array<T,2>& src, 
-      blitz::Array<double,2>& dst, const int rot_c_y, const int rot_c_x) const
+    void bob::ip::GeomNorm::operator()(const blitz::Array<T,2>& src,
+      blitz::Array<double,2>& dst, const double rot_c_y, const double rot_c_x) const
     { 
       // Check input
       bob::core::array::assertZeroBase(src);
@@ -176,7 +182,7 @@ namespace bob {
     template <typename T> 
     void bob::ip::GeomNorm::operator()(const blitz::Array<T,2>& src, 
       const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst, 
-      blitz::Array<bool,2>& dst_mask, const int rot_c_y, const int rot_c_x) const
+      blitz::Array<bool,2>& dst_mask, const double rot_c_y, const double rot_c_x) const
     { 
       // Check input
       bob::core::array::assertZeroBase(src);
@@ -197,7 +203,7 @@ namespace bob {
     template <typename T, bool mask> 
     void bob::ip::GeomNorm::processNoCheck(const blitz::Array<T,2>& source,
       const blitz::Array<bool,2>& source_mask, blitz::Array<double,2>& target,
-      blitz::Array<bool,2>& target_mask, const int rot_c_y, const int rot_c_x) const
+      blitz::Array<bool,2>& target_mask, const double rot_c_y, const double rot_c_x) const
     { 
       // This is the fastest version of the function that I can imagine...
       // It handles two different coordinate systems: original image and new image
@@ -228,11 +234,11 @@ namespace bob {
       int w = source.shape()[1]-1;
 
       // Ok, so let's do it.
-      for (int y = 0; y < m_crop_height; ++y){
+      for (int y = 0; y < (int)m_crop_height; ++y){
         // set the source image point to first point in row
         double source_x = origin_x, source_y = origin_y;
         // iterate over the row
-        for (int x = 0; x < m_crop_width; ++x){
+        for (int x = 0; x < (int)m_crop_width; ++x){
 
           // We are at the desired pixel in the new image. Interpolate the old image's pixels:
           double& res = target(y,x) = 0.;
@@ -298,7 +304,7 @@ namespace bob {
 
     template <typename T> 
     void bob::ip::GeomNorm::operator()(const blitz::Array<T,3>& src, 
-      blitz::Array<double,3>& dst, const int rot_c_y, const int rot_c_x) const
+      blitz::Array<double,3>& dst, const double rot_c_y, const double rot_c_x) const
     {
       for( int p=0; p<dst.extent(0); ++p) {
         const blitz::Array<T,2> src_slice = 
@@ -314,7 +320,7 @@ namespace bob {
     template <typename T> 
     void bob::ip::GeomNorm::operator()(const blitz::Array<T,3>& src, 
       const blitz::Array<bool,3>& src_mask, blitz::Array<double,3>& dst, 
-      blitz::Array<bool,3>& dst_mask, const int rot_c_y, const int rot_c_x) const 
+      blitz::Array<bool,3>& dst_mask, const double rot_c_y, const double rot_c_x) const
     {
       for( int p=0; p<dst.extent(0); ++p) {
         const blitz::Array<T,2> src_slice = 
