@@ -130,9 +130,9 @@ namespace bob {
     };
 
     template <typename T> 
-    inline void FaceEyesNorm::operator()(const blitz::Array<T,2>& src, 
+    inline void bob::ip::FaceEyesNorm::operator()(const blitz::Array<T,2>& src, 
       blitz::Array<double,2>& dst, const int e1_y, const int e1_x,
-      const int e2_y, const int e2_x) 
+      const int e2_y, const int e2_x) const
     { 
       // Check input
       bob::core::array::assertZeroBase(src);
@@ -148,10 +148,10 @@ namespace bob {
     }
 
     template <typename T> 
-    inline void FaceEyesNorm::operator()(const blitz::Array<T,2>& src, 
+    inline void bob::ip::FaceEyesNorm::operator()(const blitz::Array<T,2>& src, 
       const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst,
       blitz::Array<bool,2>& dst_mask, const int e1_y, const int e1_x,
-      const int e2_y, const int e2_x) 
+      const int e2_y, const int e2_x) const
     { 
       // Check input
       bob::core::array::assertZeroBase(src);
@@ -170,10 +170,10 @@ namespace bob {
     }
 
     template <typename T, bool mask> 
-    inline void FaceEyesNorm::processNoCheck(const blitz::Array<T,2>& src, 
+    inline void bob::ip::FaceEyesNorm::processNoCheck(const blitz::Array<T,2>& src, 
       const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst,
       blitz::Array<bool,2>& dst_mask, const int e1_y, const int e1_x,
-      const int e2_y, const int e2_x) 
+      const int e2_y, const int e2_x) const
     { 
       // Get angle to horizontal
       const double angle = getAngleToHorizontal(e1_y, e1_x, e2_y, e2_x);
