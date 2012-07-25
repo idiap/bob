@@ -46,9 +46,9 @@ namespace bob {
         /**
           * @brief Constructor
           */
-        FaceEyesNorm( const int eyes_distance, const int crop_height, 
-          const int crop_width, const int crop_offset_h, 
-          const int crop_offset_w);
+        FaceEyesNorm( const double eyes_distance, const size_t crop_height,
+          const size_t crop_width, const double crop_offset_h,
+          const double crop_offset_w);
 
         /**
          * @brief Copy constructor
@@ -77,24 +77,24 @@ namespace bob {
         /**
           * @brief Accessors
           */
-        int getEyesDistance() const { return m_eyes_distance; }
-        int getCropHeight() const { return m_crop_height; }
-        int getCropWidth() const { return m_crop_width; }
-        int getCropOffsetH() const { return m_crop_offset_h; }
-        int getCropOffsetW() const { return m_crop_offset_w; }
+        double getEyesDistance() const { return m_eyes_distance; }
+        size_t getCropHeight() const { return m_crop_height; }
+        size_t getCropWidth() const { return m_crop_width; }
+        double getCropOffsetH() const { return m_crop_offset_h; }
+        double getCropOffsetW() const { return m_crop_offset_w; }
 
         /**
           * @brief Mutators
           */
-        void setEyesDistance(const int eyes_distance) 
+        void setEyesDistance(const double eyes_distance)
           { m_eyes_distance = eyes_distance; }
-        void setCropHeight(const int crop_h) 
+        void setCropHeight(const size_t crop_h)
           { m_crop_height = crop_h; m_geom_norm->setCropHeight(crop_h); }
-        void setCropWidth(const int crop_w) 
+        void setCropWidth(const size_t crop_w)
           { m_crop_width = crop_w; m_geom_norm->setCropWidth(crop_w); }
-        void setCropOffsetH(const int crop_dh) 
+        void setCropOffsetH(const double crop_dh)
           { m_crop_offset_h = crop_dh; m_geom_norm->setCropOffsetH(crop_dh); }
-        void setCropOffsetW(const int crop_dw) 
+        void setCropOffsetW(const double crop_dw)
           { m_crop_offset_w = crop_dw; m_geom_norm->setCropOffsetW(crop_dw); }
 
         /**
@@ -102,28 +102,37 @@ namespace bob {
           * normalization
           */
         template <typename T> void operator()(const blitz::Array<T,2>& src, 
-          blitz::Array<double,2>& dst, const int e1_y, const int e1_x, 
-          const int e2_y, const int e2_x) const;
+          blitz::Array<double,2>& dst, const double e1_y, const double e1_x,
+          const double e2_y, const double e2_x) const;
         template <typename T> void operator()(const blitz::Array<T,2>& src, 
           const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst, 
-          blitz::Array<bool,2>& dst_mask, const int e1_y, const int e1_x, 
-          const int e2_y, const int e2_x) const;
+          blitz::Array<bool,2>& dst_mask, const double e1_y, const double e1_x,
+          const double e2_y, const double e2_x) const;
+
+        /**
+         * @brief Getter function for the bob::ip::GeomNorm object that is doing the job.
+         *
+         * @warning The returned GeomNorm object is only valid *after a call to operator()*
+         *
+         * @return  The GeomNorm object that is used to perform the transformation.
+         */
+        const boost::shared_ptr<GeomNorm> getGeomNorm(){return m_geom_norm;}
 
       private:
         template <typename T, bool mask> 
         void processNoCheck(const blitz::Array<T,2>& src, 
           const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst, 
-          blitz::Array<bool,2>& dst_mask, const int e1_y, const int e1_x, 
-          const int e2_y, const int e2_x) const;
+          blitz::Array<bool,2>& dst_mask, const double e1_y, const double e1_x,
+          const double e2_y, const double e2_x) const;
 
         /**
           * Attributes
           */
         double m_eyes_distance;
-        int m_crop_height;
-        int m_crop_width;
-        int m_crop_offset_h;
-        int m_crop_offset_w;
+        size_t m_crop_height;
+        size_t m_crop_width;
+        double m_crop_offset_h;
+        double m_crop_offset_w;
 
         blitz::TinyVector<int,2> m_out_shape;
         boost::shared_ptr<GeomNorm> m_geom_norm;
@@ -131,8 +140,8 @@ namespace bob {
 
     template <typename T> 
     inline void bob::ip::FaceEyesNorm::operator()(const blitz::Array<T,2>& src, 
-      blitz::Array<double,2>& dst, const int e1_y, const int e1_x,
-      const int e2_y, const int e2_x) const
+      blitz::Array<double,2>& dst, const double e1_y, const double e1_x,
+      const double e2_y, const double e2_x) const
     { 
       // Check input
       bob::core::array::assertZeroBase(src);
@@ -150,8 +159,8 @@ namespace bob {
     template <typename T> 
     inline void bob::ip::FaceEyesNorm::operator()(const blitz::Array<T,2>& src, 
       const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst,
-      blitz::Array<bool,2>& dst_mask, const int e1_y, const int e1_x,
-      const int e2_y, const int e2_x) const
+      blitz::Array<bool,2>& dst_mask, const double e1_y, const double e1_x,
+      const double e2_y, const double e2_x) const
     { 
       // Check input
       bob::core::array::assertZeroBase(src);
@@ -172,8 +181,8 @@ namespace bob {
     template <typename T, bool mask> 
     inline void bob::ip::FaceEyesNorm::processNoCheck(const blitz::Array<T,2>& src, 
       const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst,
-      blitz::Array<bool,2>& dst_mask, const int e1_y, const int e1_x,
-      const int e2_y, const int e2_x) const
+      blitz::Array<bool,2>& dst_mask, const double e1_y, const double e1_x,
+      const double e2_y, const double e2_x) const
     { 
       // Get angle to horizontal
       const double angle = getAngleToHorizontal(e1_y, e1_x, e2_y, e2_x);
@@ -184,8 +193,8 @@ namespace bob {
       m_geom_norm->setScalingFactor( m_eyes_distance / eyes_distance);
 
       // Get the center (of the eye centers segment)
-      int center_y = (e1_y + e2_y) / 2;
-      int center_x = (e1_x + e2_x) / 2;
+      double center_y = (e1_y + e2_y) / 2.;
+      double center_x = (e1_x + e2_x) / 2.;
 
       // Perform the normalization
       if(mask)

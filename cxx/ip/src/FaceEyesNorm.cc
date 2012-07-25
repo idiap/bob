@@ -22,9 +22,9 @@
 
 #include "ip/FaceEyesNorm.h"
 
-bob::ip::FaceEyesNorm::FaceEyesNorm( const int eyes_distance, 
-    const int crop_height, const int crop_width, const int crop_offset_h,
-    const int crop_offset_w):
+bob::ip::FaceEyesNorm::FaceEyesNorm( const double eyes_distance,
+    const size_t crop_height, const size_t crop_width, const double crop_offset_h,
+    const double crop_offset_w):
   m_eyes_distance(eyes_distance), m_crop_height(crop_height),
   m_crop_width(crop_width), m_crop_offset_h(crop_offset_h),
   m_crop_offset_w(crop_offset_w), m_out_shape(crop_height, crop_width), 

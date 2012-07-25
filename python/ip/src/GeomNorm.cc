@@ -32,14 +32,14 @@ static const char* MAXRECTINMASK2D_DOC = "Given a 2D mask (a 2D blitz array of b
 template <typename T> 
 static void inner_call1(bob::ip::GeomNorm& obj, 
   bob::python::const_ndarray input, bob::python::ndarray output,
-  const int a, const int b) 
+  const double a, const double b)
 {
   blitz::Array<double,2> output_ = output.bz<double,2>();
   obj(input.bz<T,2>(), output_, a,b);
 }
 
 static void call1(bob::ip::GeomNorm& obj, bob::python::const_ndarray input,
-  bob::python::ndarray output, const int a, const int b) 
+  bob::python::ndarray output, const double a, const double b)
 {
   const bob::core::array::typeinfo& info = input.type();
   switch (info.dtype) 
@@ -61,7 +61,7 @@ template <typename T>
 static void inner_call2(bob::ip::GeomNorm& obj, 
   bob::python::const_ndarray input, bob::python::const_ndarray input_mask,
   bob::python::ndarray output, bob::python::ndarray output_mask,
-  const int a, const int b) 
+  const double a, const double b)
 {
   blitz::Array<double,2> output_ = output.bz<double,2>();
   blitz::Array<bool,2> output_mask_ = output_mask.bz<bool,2>();
@@ -71,7 +71,7 @@ static void inner_call2(bob::ip::GeomNorm& obj,
 
 static void call2(bob::ip::GeomNorm& obj, bob::python::const_ndarray input,
   bob::python::const_ndarray input_mask, bob::python::ndarray output, bob::python::ndarray output_mask,
-  const int a, const int b) 
+  const double a, const double b)
 {
   const bob::core::array::typeinfo& info = input.type();
   switch (info.dtype) 
@@ -89,6 +89,12 @@ static void call2(bob::ip::GeomNorm& obj, bob::python::const_ndarray input,
   }
 }
 
+static blitz::TinyVector<double,2> call3(bob::ip::GeomNorm& obj,
+  const blitz::TinyVector<double,2>& position, const double a, const double b)
+{
+  return obj(position,a,b);
+}
+
 void bind_ip_geomnorm() 
 {
   class_<bob::ip::GeomNorm, boost::shared_ptr<bob::ip::GeomNorm> >("GeomNorm", GEOMNORM_DOC, init<const double, const double, const int, const int, const int, const int>((arg("rotation_angle"), arg("scaling_factor"), arg("crop_height"), arg("crop_width"), arg("crop_offset_h"), arg("crop_offset_w")), "Constructs a GeomNorm object."))
@@ -100,6 +106,7 @@ void bind_ip_geomnorm()
     .add_property("crop_offset_w", &bob::ip::GeomNorm::getCropOffsetW, &bob::ip::GeomNorm::setCropOffsetW, "x-coordinate of the rotation center in the new cropped area")
     .def("__call__", &call1, (arg("input"), arg("output"), arg("rotation_center_y"), arg("rotation_center_x")), "Call an object of this type to perform a geometric normalization of an image wrt. the given rotation center")
     .def("__call__", &call2, (arg("input"), arg("input_mask"), arg("output"), arg("output_mask"), arg("rotation_center_y"), arg("rotation_center_x")), "Call an object of this type to perform a geometric normalization of an image wrt. the given rotation center, taking mask into account.")
+    .def("__call__", &call3, (arg("input"), arg("rotation_center_y"), arg("rotation_center_x")), "This function performs the geometric normalization for the given input position")
   ;
 
   def("max_rect_in_mask", (const blitz::TinyVector<int,4> (*)(const blitz::Array<bool,2>&))&bob::ip::maxRectInMask, (("src")), MAXRECTINMASK2D_DOC); 

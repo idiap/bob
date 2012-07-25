@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE( test_facenorm2 )
   bob::io::Array image(testdata_path_image.string());
   blitz::Array<double,2> processed_image(80,64);
   
-  bob::ip::FaceEyesNorm facenorm(33,80,64,16,32);
+  bob::ip::FaceEyesNorm facenorm(33,80,64,16,31.5);
 
   // Process giving the coordinates of the eyes
   facenorm(image.get<uint8_t,2>(),processed_image,116,104,116,147);
@@ -134,6 +134,19 @@ BOOST_AUTO_TEST_CASE( test_facenorm2 )
   bob::io::Array read_reference_image(testdata_path_image.string());
   blitz::Array<double,2> reference_image = read_reference_image.get<double,2>();
   checkBlitzClose(reference_image, processed_image, eps2);
+
+  // check that the eye positions are at the requested positions
+  blitz::TinyVector<double,2> right_eye(116,104), left_eye(116,147);
+
+  double center_y = 116.;
+  double center_x = (104. + 147.) / 2.;
+  blitz::TinyVector<double,2> new_right_eye = facenorm.getGeomNorm()->operator()(right_eye, center_y, center_x);
+  blitz::TinyVector<double,2> new_left_eye = facenorm.getGeomNorm()->operator()(left_eye, center_y, center_x);
+
+  BOOST_CHECK_CLOSE(new_right_eye(0), 16., 1e-8);
+  BOOST_CHECK_CLOSE(new_right_eye(1), 15., 1e-8);
+  BOOST_CHECK_CLOSE(new_left_eye(0), 16., 1e-8);
+  BOOST_CHECK_CLOSE(new_left_eye(1), 48., 1e-8);
 }
  
   

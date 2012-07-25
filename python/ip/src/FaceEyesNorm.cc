@@ -30,14 +30,14 @@ static const char* faceeyesnorm_doc = "Objects of this class, after configuratio
 template <typename T> 
 static void inner_call1(bob::ip::FaceEyesNorm& obj, 
     bob::python::const_ndarray input, bob::python::ndarray output,
-    int e1y, int e1x, int e2y, int e2x) 
+    double e1y, double e1x, double e2y, double e2x)
 {
   blitz::Array<double,2> output_ = output.bz<double,2>();
   obj(input.bz<T,2>(), output_, e1y, e1x, e2y, e2x);
 }
 
 static void call1(bob::ip::FaceEyesNorm& obj, bob::python::const_ndarray input,
-    bob::python::ndarray output, int e1y, int e1x, int e2y, int e2x) {
+    bob::python::ndarray output, double e1y, double e1x, double e2y, double e2x) {
   const bob::core::array::typeinfo& info = input.type();
   switch (info.dtype) {
     case bob::core::array::t_uint8: 
@@ -52,7 +52,7 @@ static void call1(bob::ip::FaceEyesNorm& obj, bob::python::const_ndarray input,
 
 template <typename T> 
 static object inner_call1b(bob::ip::FaceEyesNorm& op, 
-    bob::python::const_ndarray src, int e1y, int e1x, int e2y, int e2x) 
+    bob::python::const_ndarray src, double e1y, double e1x, double e2y, double e2x)
 {
   bob::python::ndarray dst(bob::core::array::t_float64, op.getCropHeight(), 
     op.getCropWidth());
@@ -62,7 +62,7 @@ static object inner_call1b(bob::ip::FaceEyesNorm& op,
 }
 
 static object call1b(bob::ip::FaceEyesNorm& op, bob::python::const_ndarray src,
-    int e1y, int e1x, int e2y, int e2x) 
+    double e1y, double e1x, double e2y, double e2x)
 {
   const bob::core::array::typeinfo& info = src.type();
   switch (info.dtype) {
@@ -79,7 +79,7 @@ static object call1b(bob::ip::FaceEyesNorm& op, bob::python::const_ndarray src,
 template <typename T> static void inner_call2 (bob::ip::FaceEyesNorm& obj, 
     bob::python::const_ndarray input, bob::python::const_ndarray input_mask,
     bob::python::ndarray output, bob::python::ndarray output_mask,
-    int e1y, int e1x, int e2y, int e2x) {
+    double e1y, double e1x, double e2y, double e2x) {
   blitz::Array<double,2> output_ = output.bz<double,2>();
   blitz::Array<bool,2> output_mask_ = output_mask.bz<bool,2>();
   obj(input.bz<T,2>(), input_mask.bz<bool,2>(), output_, output_mask_,
@@ -88,7 +88,7 @@ template <typename T> static void inner_call2 (bob::ip::FaceEyesNorm& obj,
 
 static void call2 (bob::ip::FaceEyesNorm& obj, bob::python::const_ndarray input,
     bob::python::const_ndarray input_mask, bob::python::ndarray output, bob::python::ndarray output_mask,
-    int e1y, int e1x, int e2y, int e2x) {
+    double e1y, double e1x, double e2y, double e2x) {
   const bob::core::array::typeinfo& info = input.type();
   switch (info.dtype) {
     case bob::core::array::t_uint8: 
@@ -103,7 +103,7 @@ static void call2 (bob::ip::FaceEyesNorm& obj, bob::python::const_ndarray input,
 
 template <typename T> static object inner_call2b(bob::ip::FaceEyesNorm& op, 
     bob::python::const_ndarray src, bob::python::const_ndarray src_mask,
-    int e1y, int e1x, int e2y, int e2x) 
+    double e1y, double e1x, double e2y, double e2x)
 {
   bob::python::ndarray dst(bob::core::array::t_float64, op.getCropHeight(), 
     op.getCropWidth());
@@ -116,7 +116,7 @@ template <typename T> static object inner_call2b(bob::ip::FaceEyesNorm& op,
 }
 
 static object call2b(bob::ip::FaceEyesNorm& op, bob::python::const_ndarray src,
-    bob::python::const_ndarray src_mask, int e1y, int e1x, int e2y, int e2x) 
+    bob::python::const_ndarray src_mask, double e1y, double e1x, double e2y, double e2x)
 {
   const bob::core::array::typeinfo& info = src.type();
   switch (info.dtype) {
@@ -132,7 +132,7 @@ static object call2b(bob::ip::FaceEyesNorm& op, bob::python::const_ndarray src,
 
 
 void bind_ip_faceeyesnorm() {
-  class_<bob::ip::FaceEyesNorm, boost::shared_ptr<bob::ip::FaceEyesNorm> >("FaceEyesNorm", faceeyesnorm_doc, init<const int, const int, const int, const int, const int>((arg("eyes_distance"), arg("crop_height"), arg("crop_width"), arg("crop_eyecenter_offset_h"), arg("crop_eyecenter_offset_w")), "Constructs a FaceEyeNorm object."))
+  class_<bob::ip::FaceEyesNorm, boost::shared_ptr<bob::ip::FaceEyesNorm> >("FaceEyesNorm", faceeyesnorm_doc, init<const double, const size_t, const size_t, const double, const double>((arg("eyes_distance"), arg("crop_height"), arg("crop_width"), arg("crop_eyecenter_offset_h"), arg("crop_eyecenter_offset_w")), "Constructs a FaceEyeNorm object."))
       .def(init<bob::ip::FaceEyesNorm&>(args("other")))
       .def(self == self)
       .def(self != self)
