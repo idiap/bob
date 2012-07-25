@@ -70,7 +70,7 @@ bob::ip::maxRectInMask( const blitz::Array<bool,2>& src)
       for(int y1=y0; y1<height; ++y1)
         for(int x1=x0; x1<cur_i_max; ++x1)
         {
-          if(ipd::isTrue(src,y1,x0,y1,x1))
+          if(bob::ip::detail::isTrue(src,y1,x0,y1,x1))
           {
             int area = (y1-y0+1)*(x1-x0+1);
             if( area > cur_max_area )
