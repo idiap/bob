@@ -258,30 +258,30 @@ namespace bob {
       }
     }
 
-	  template <typename T>
-	  blitz::Array<T,2> 
-    scaleAs(const blitz::Array<T,2>& original, const double scale_factor)
-	  {
-		  blitz::TinyVector<int, 2> new_shape = 
-        blitz::floor(original.shape() * scale_factor + 0.5);
-		  return blitz::Array<T,2>(new_shape);
-	  }
-	  
-	  template <typename T>
-	  blitz::Array<T,3> 
-    scaleAs(const blitz::Array<T,3>& original, const double scale_factor) 
-	  {
-		  // With 3D Blitz arrays (e.g, color image) we do not want 
-      // to scale the number of planes :)
-		  blitz::TinyVector<int, 3> new_shape = original.shape();
-		  new_shape(1) = floor(new_shape(1) * scale_factor + 0.5);
-		  new_shape(2) = floor(new_shape(2) * scale_factor + 0.5);
-		  
-		  return blitz::Array<T,3>(new_shape);
-	  }
+    template <typename T>
+      blitz::Array<T,2> 
+      scaleAs(const blitz::Array<T,2>& original, const double scale_factor)
+      {
+        blitz::TinyVector<int, 2> new_shape = 
+          blitz::floor(original.shape() * scale_factor + 0.5);
+        return blitz::Array<T,2>(new_shape);
+      }
+
+    template <typename T>
+      blitz::Array<T,3> 
+      scaleAs(const blitz::Array<T,3>& original, const double scale_factor) 
+      {
+        // With 3D Blitz arrays (e.g, color image) we do not want 
+        // to scale the number of planes :)
+        blitz::TinyVector<int, 3> new_shape = original.shape();
+        new_shape(1) = floor(new_shape(1) * scale_factor + 0.5);
+        new_shape(2) = floor(new_shape(2) * scale_factor + 0.5);
+
+        return blitz::Array<T,3>(new_shape);
+      }
   }
-/**
- * @}
+  /**
+   * @}
  */
 }
 
