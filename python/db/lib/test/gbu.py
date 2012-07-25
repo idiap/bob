@@ -65,11 +65,11 @@ class GBUDatabaseTest(unittest.TestCase):
         self.assertTrue(base[:2] == 'nd' and base[3] == 'R')
       # assert that all models of the 'multi' protocol type 
       #  start with "nd1S", i.e., the client id
-      for model in db.models(protocol=protocol):
+      for model in db.models(type='multi', protocol=protocol):
         self.assertTrue('nd1S' in model)
 
 
-  def test_files(self):
+  def XXest_files(self):
     """Tests that the 'files()' function returns reasonable output"""
     db = bob.db.gbu.Database()
 
@@ -92,21 +92,21 @@ class GBUDatabaseTest(unittest.TestCase):
 
 
     # The following tests might take a while...
-    
     protocol = protocols[0]
+    probe_file_count = len(db.files(type='gbu', groups='dev', protocol=protocol, purposes='probe'))
     # check that for 'gbu' protocol types, exactly one file per id is returned
     for model_id in db.models(type='gbu', groups='dev', protocol=protocol):
       # assert that there is exactly one file for each enrol purposes per model
       self.assertEqual(len(db.files(type='gbu', groups='dev', protocol=protocol, model_ids=[model_id], purposes='enrol')), 1)
-      # model ids and probe id's should differ, hence there should be no probe file for a given model id
-      self.assertEqual(len(db.files(type='gbu', groups='dev', protocol=protocol, model_ids=[model_id], purposes='probe')), 0)
+      # probe files should always be the same
+      self.assertEqual(len(db.files(type='gbu', groups='dev', protocol=protocol, model_ids=[model_id], purposes='probe')), probe_file_count)
 
     # for the 'multi' protocols, there is AT LEAST one file per model
     for model_id in db.models(type='multi', groups='dev', protocol=protocol):
       # assert that there is exactly one file for each enrol purposes per model
       self.assertTrue(len(db.files(type='multi', groups='dev', protocol=protocol, model_ids=[model_id], purposes='enrol')) >= 1)
-      # model ids and probe id's are identical for 'multi'
-      self.assertTrue(len(db.files(type='multi', groups='dev', protocol=protocol, model_ids=[model_id], purposes='probe')) >= 1)
+      # probe files should always be the same
+      self.assertEqual(len(db.files(type='multi', groups='dev', protocol=protocol, model_ids=[model_id], purposes='probe')), probe_file_count)
 
 
   def test_file_ids(self):
@@ -128,8 +128,6 @@ class GBUDatabaseTest(unittest.TestCase):
       self.assertEqual(db.get_client_id_from_model_id(model_id, type='multi'), model_id)
       # and also get_client_id_from_file_id should return the model id, both for enrol and probe sets
       for file_id in db.files(type='multi', groups='dev', protocol=protocol, model_ids=[model_id], purposes='enrol'):
-        self.assertEqual(db.get_client_id_from_file_id(file_id), model_id)
-      for file_id in db.files(type='multi', groups='dev', protocol=protocol, model_ids=[model_id], purposes='probe'):
         self.assertEqual(db.get_client_id_from_file_id(file_id), model_id)
 
 

@@ -112,7 +112,7 @@ class Database(object):
     return retval
 
 
-  def models(self, type='multi', groups=None, subworld=None, protocol=None):
+  def models(self, type='gbu', groups=None, subworld=None, protocol=None):
     """Returns a set of models for the specific query by the user.
     The returned list depends on the type:
     
@@ -163,7 +163,7 @@ class Database(object):
     return retval
 
 
-  def get_client_id_from_model_id(self, model_id, type='multi'):
+  def get_client_id_from_model_id(self, model_id, type='gbu'):
     """Returns the client_id attached to the given model_id.
     Dependent on the type, it is expected that
     
@@ -211,7 +211,7 @@ class Database(object):
     return q.first().m_signature
 
 
-  def objects(self, directory=None, extension=None, groups=None, subworld=None, protocol=None, purposes=None, model_ids=None, type='multi'):
+  def objects(self, directory=None, extension=None, groups=None, subworld=None, protocol=None, purposes=None, model_ids=None, type='gbu'):
     """Using the specified restrictions, this function returns a dictionary from file_ids to a tuple containing:
     
     * 0: the resolved filename
@@ -238,13 +238,14 @@ class Database(object):
       One or several of the GBU protocols ('Good', 'Bad', 'Ugly'), only valid if group is 'dev'.
     
     purposes
-      One or several groups for which files should be retrieved ('enrol', 'probe'),
+      One or several groups for which objects should be retrieved ('enrol', 'probe'),
       only valid when the group is 'dev'·
 
     model_ids
-      If given (as a list of model id's or a single one), only the files
-      belonging to the specified model id is returned. The content of the model id
-      is dependent on the type:
+      If given (as a list of model id's or a single one), only the objects
+      belonging to the specified model id is returned. If the purpose is 'probe', 
+      the probe objects belonging to the given model ids are returned, i.e., ALL probe files.
+      The content of the model id is dependent on the type:
       
       * model_id is a file_id, when type is 'gbu'
       * model_id is a client_id, when type is 'multi'
@@ -299,7 +300,9 @@ class Database(object):
       query = self.m_session.query(File).join(Protocol)\
                   .filter(Protocol.m_name.in_(protocol))\
                   .filter(Protocol.m_purpose.in_(purposes))
-      query = filter_model(query, type, model_ids)
+      # filter model ids only when only the enrol objects are requested
+      if 'probe' not in purposes:
+        query = filter_model(query, type, model_ids)
 
       if model_ids and len(model_ids) == 1:
         for file in query:
@@ -311,7 +314,7 @@ class Database(object):
     return retval
 
 
-  def files(self, directory=None, extension=None, groups=None, subworld=None, protocol=None, purposes=None, model_ids=None, type='multi'):
+  def files(self, directory=None, extension=None, groups=None, subworld=None, protocol=None, purposes=None, model_ids=None, type='gbu'):
     """Returns a dictionary from file_ids to file paths using the specified restrictions:
 
     Keyword Parameters:
