@@ -92,14 +92,14 @@ static void call2(bob::ip::GeomNorm& obj, bob::python::const_ndarray input,
 void bind_ip_geomnorm() 
 {
   class_<bob::ip::GeomNorm, boost::shared_ptr<bob::ip::GeomNorm> >("GeomNorm", GEOMNORM_DOC, init<const double, const double, const int, const int, const int, const int>((arg("rotation_angle"), arg("scaling_factor"), arg("crop_height"), arg("crop_width"), arg("crop_offset_h"), arg("crop_offset_w")), "Constructs a GeomNorm object."))
-    .add_property("rotation_angle", &ip::GeomNorm::getRotationAngle, &ip::GeomNorm::setRotationAngle, "Rotation angle for the geometric normalization (in radians)")
-    .add_property("scaling_factor", &ip::GeomNorm::getScalingFactor, &ip::GeomNorm::setScalingFactor, "Scaling factor for the geometric normalization")
-    .add_property("crop_height", &ip::GeomNorm::getCropHeight, &ip::GeomNorm::setCropHeight, "Height of the cropping area/output after the geometric normalization")
-    .add_property("crop_width", &ip::GeomNorm::getCropWidth, &ip::GeomNorm::setCropWidth, "Width of the cropping area/output after the geometric normalization")
-    .add_property("crop_offset_h", &ip::GeomNorm::getCropOffsetH, &ip::GeomNorm::setCropOffsetH, "y-coordinate of the rotation center in the new cropped area")
-    .add_property("crop_offset_w", &ip::GeomNorm::getCropOffsetW, &ip::GeomNorm::setCropOffsetW, "x-coordinate of the rotation center in the new cropped area")
-    def("__call__", &call1, (arg("input"), arg("output"), arg("rotation_center_y"), arg("rotation_center_x")), "Call an object of this type to perform a geometric normalization of an image wrt. the given rotation center")
-    def("__call__", &call2, (arg("input"), arg("input_mask"), arg("output"), arg("output_mask"), arg("rotation_center_y"), arg("rotation_center_x")), "Call an object of this type to perform a geometric normalization of an image wrt. the given rotation center, taking mask into account.")
+    .add_property("rotation_angle", &bob::ip::GeomNorm::getRotationAngle, &bob::ip::GeomNorm::setRotationAngle, "Rotation angle for the geometric normalization (in radians)")
+    .add_property("scaling_factor", &bob::ip::GeomNorm::getScalingFactor, &bob::ip::GeomNorm::setScalingFactor, "Scaling factor for the geometric normalization")
+    .add_property("crop_height", &bob::ip::GeomNorm::getCropHeight, &bob::ip::GeomNorm::setCropHeight, "Height of the cropping area/output after the geometric normalization")
+    .add_property("crop_width", &bob::ip::GeomNorm::getCropWidth, &bob::ip::GeomNorm::setCropWidth, "Width of the cropping area/output after the geometric normalization")
+    .add_property("crop_offset_h", &bob::ip::GeomNorm::getCropOffsetH, &bob::ip::GeomNorm::setCropOffsetH, "y-coordinate of the rotation center in the new cropped area")
+    .add_property("crop_offset_w", &bob::ip::GeomNorm::getCropOffsetW, &bob::ip::GeomNorm::setCropOffsetW, "x-coordinate of the rotation center in the new cropped area")
+    .def("__call__", &call1, (arg("input"), arg("output"), arg("rotation_center_y"), arg("rotation_center_x")), "Call an object of this type to perform a geometric normalization of an image wrt. the given rotation center")
+    .def("__call__", &call2, (arg("input"), arg("input_mask"), arg("output"), arg("output_mask"), arg("rotation_center_y"), arg("rotation_center_x")), "Call an object of this type to perform a geometric normalization of an image wrt. the given rotation center, taking mask into account.")
   ;
 
   def("max_rect_in_mask", (const blitz::TinyVector<int,4> (*)(const blitz::Array<bool,2>&))&bob::ip::maxRectInMask, (("src")), MAXRECTINMASK2D_DOC); 
