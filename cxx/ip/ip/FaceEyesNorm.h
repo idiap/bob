@@ -25,9 +25,7 @@
 #include "core/array_assert.h"
 #include "core/array_check.h"
 #include "ip/GeomNorm.h"
-#include <ip/rotate.h>
-
-namespace tca = bob::core::array;
+#include "ip/rotate.h"
 
 namespace bob {
 /**
@@ -38,9 +36,9 @@ namespace bob {
   namespace ip {
 
     /**
-     * @brief This file defines a class to perform a normalization of 
-     * a face based on the eye center locations.
-    */
+     * @brief A class to perform a geometric normalization of a face based 
+     * on the eye center locations.
+     */
     class FaceEyesNorm
     {
       public:
@@ -53,31 +51,50 @@ namespace bob {
           const int crop_offset_w);
 
         /**
+         * @brief Copy constructor
+         */
+        FaceEyesNorm(const FaceEyesNorm& other); 
+
+        /**
           * @brief Destructor
           */
-        virtual ~FaceEyesNorm();
+        virtual ~FaceEyesNorm() {}
 
+        /**
+         * @brief Assignment operator
+         */
+        FaceEyesNorm& operator=(const FaceEyesNorm& other);
+
+        /**
+         * @brief Equal to
+         */
+        bool operator==(const FaceEyesNorm& b) const;
+        /**
+         * @brief Not equal to
+         */
+        bool operator!=(const FaceEyesNorm& b) const; 
+ 
         /**
           * @brief Accessors
           */
-        inline const int getEyesDistance() { return m_eyes_distance; }
-        inline const int getCropHeight() { return m_crop_height; }
-        inline const int getCropWidth() { return m_crop_width; }
-        inline const int getCropOffsetH() { return m_crop_offset_h; }
-        inline const int getCropOffsetW() { return m_crop_offset_w; }
+        int getEyesDistance() const { return m_eyes_distance; }
+        int getCropHeight() const { return m_crop_height; }
+        int getCropWidth() const { return m_crop_width; }
+        int getCropOffsetH() const { return m_crop_offset_h; }
+        int getCropOffsetW() const { return m_crop_offset_w; }
 
         /**
           * @brief Mutators
           */
-        inline void setEyesDistance(const int eyes_distance) 
+        void setEyesDistance(const int eyes_distance) 
           { m_eyes_distance = eyes_distance; }
-        inline void setCropHeight(const int crop_h) 
+        void setCropHeight(const int crop_h) 
           { m_crop_height = crop_h; m_geom_norm->setCropHeight(crop_h); }
-        inline void setCropWidth(const int crop_w) 
+        void setCropWidth(const int crop_w) 
           { m_crop_width = crop_w; m_geom_norm->setCropWidth(crop_w); }
-        inline void setCropOffsetH(const int crop_dh) 
+        void setCropOffsetH(const int crop_dh) 
           { m_crop_offset_h = crop_dh; m_geom_norm->setCropOffsetH(crop_dh); }
-        inline void setCropOffsetW(const int crop_dw) 
+        void setCropOffsetW(const int crop_dw) 
           { m_crop_offset_w = crop_dw; m_geom_norm->setCropOffsetW(crop_dw); }
 
         /**
@@ -86,18 +103,18 @@ namespace bob {
           */
         template <typename T> void operator()(const blitz::Array<T,2>& src, 
           blitz::Array<double,2>& dst, const int e1_y, const int e1_x, 
-          const int e2_y, const int e2_x);
+          const int e2_y, const int e2_x) const;
         template <typename T> void operator()(const blitz::Array<T,2>& src, 
           const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst, 
           blitz::Array<bool,2>& dst_mask, const int e1_y, const int e1_x, 
-          const int e2_y, const int e2_x);
+          const int e2_y, const int e2_x) const;
 
       private:
         template <typename T, bool mask> 
         void processNoCheck(const blitz::Array<T,2>& src, 
           const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst, 
           blitz::Array<bool,2>& dst_mask, const int e1_y, const int e1_x, 
-          const int e2_y, const int e2_x);
+          const int e2_y, const int e2_x) const;
 
         /**
           * Attributes
@@ -118,11 +135,11 @@ namespace bob {
       const int e2_y, const int e2_x) 
     { 
       // Check input
-      tca::assertZeroBase(src);
+      bob::core::array::assertZeroBase(src);
 
       // Check output
-      tca::assertZeroBase(dst);
-      tca::assertSameShape(dst, m_out_shape);
+      bob::core::array::assertZeroBase(dst);
+      bob::core::array::assertSameShape(dst, m_out_shape);
 
       // Process
       blitz::Array<bool,2> src_mask, dst_mask;
@@ -137,15 +154,15 @@ namespace bob {
       const int e2_y, const int e2_x) 
     { 
       // Check input
-      tca::assertZeroBase(src);
-      tca::assertZeroBase(src_mask);
-      tca::assertSameShape(src,src_mask);
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(src_mask);
+      bob::core::array::assertSameShape(src,src_mask);
 
       // Check output
-      tca::assertZeroBase(dst);
-      tca::assertZeroBase(dst_mask);
-      tca::assertSameShape(dst,dst_mask);
-      tca::assertSameShape(dst, m_out_shape);
+      bob::core::array::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(dst_mask);
+      bob::core::array::assertSameShape(dst,dst_mask);
+      bob::core::array::assertSameShape(dst, m_out_shape);
 
       // Process
       processNoCheck<T,true>(src, src_mask, dst, dst_mask, e1_y, e1_x, e2_y, 

@@ -31,7 +31,6 @@
 #include <boost/shared_ptr.hpp>
 #include "core/array_assert.h"
 #include "core/array_check.h"
-#include "core/cast.h"
 #include "ip/Exception.h"
 
 
@@ -64,34 +63,53 @@ namespace bob {
           const int crop_offset_h, const int crop_offset_w);
 
         /**
+         * @brief Copy constructor
+         */
+        GeomNorm(const GeomNorm& other);
+
+        /**
           * @brief Destructor
           */
-        virtual ~GeomNorm();
+        virtual ~GeomNorm() { }
+
+        /**
+         * @brief Assignment operator
+         */
+        GeomNorm& operator=(const GeomNorm& other);
+
+        /**
+         * @brief Equal to
+         */
+        bool operator==(const GeomNorm& b) const;
+        /**
+         * @brief Not equal to
+         */
+        bool operator!=(const GeomNorm& b) const;  
 
         /**
           * @brief Accessors
           */
-        inline const double getRotationAngle() { return m_rotation_angle; }
-        inline const double getScalingFactor() { return m_scaling_factor; }
-        inline const int getCropHeight() { return m_crop_height; }
-        inline const int getCropWidth() { return m_crop_width; }
-        inline const int getCropOffsetH() { return m_crop_offset_h; }
-        inline const int getCropOffsetW() { return m_crop_offset_w; }
+        double getRotationAngle() const { return m_rotation_angle; }
+        double getScalingFactor() const { return m_scaling_factor; }
+        int getCropHeight() const { return m_crop_height; }
+        int getCropWidth() const { return m_crop_width; }
+        int getCropOffsetH() const { return m_crop_offset_h; }
+        int getCropOffsetW() const { return m_crop_offset_w; }
 
         /**
           * @brief Mutators
           */
-        inline void setRotationAngle(const double angle) 
+        void setRotationAngle(const double angle) 
           { m_rotation_angle = angle; }
-        inline void setScalingFactor(const double scaling_factor) 
+        void setScalingFactor(const double scaling_factor) 
           { m_scaling_factor = scaling_factor; }
-        inline void setCropHeight(const int crop_h) 
+        void setCropHeight(const int crop_h) 
           { m_crop_height = crop_h; }
-        inline void setCropWidth(const int crop_w) 
+        void setCropWidth(const int crop_w) 
           { m_crop_width = crop_w; }
-        inline void setCropOffsetH(const int crop_dh) 
+        void setCropOffsetH(const int crop_dh) 
           { m_crop_offset_h = crop_dh; }
-        inline void setCropOffsetW(const int crop_dw) 
+        void setCropOffsetW(const int crop_dw) 
           { m_crop_offset_w = crop_dw; }
 
         /**
@@ -100,11 +118,23 @@ namespace bob {
           */
         template <typename T> 
         void operator()(const blitz::Array<T,2>& src, 
-          blitz::Array<double,2>& dst, const int rot_c_y, const int rot_c_x);
+          blitz::Array<double,2>& dst, const int rot_c_y, const int rot_c_x) const;
         template <typename T> 
         void operator()(const blitz::Array<T,2>& src, 
           const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst, 
-          blitz::Array<bool,2>& dst_mask, const int rot_c_y, const int rot_c_x);
+          blitz::Array<bool,2>& dst_mask, const int rot_c_y, const int rot_c_x) const;
+
+        /**
+         * @brief Process a 3D blitz Array/Image by applying the geometric
+         * normalization to each color plane
+         */
+        template <typename T> 
+        void operator()(const blitz::Array<T,3>& src, 
+          blitz::Array<double,3>& dst, const int rot_c_y, const int rot_c_x) const;
+        template <typename T> 
+        void operator()(const blitz::Array<T,3>& src, 
+          const blitz::Array<bool,3>& src_mask, blitz::Array<double,3>& dst, 
+          blitz::Array<bool,3>& dst_mask, const int rot_c_y, const int rot_c_x) const;
 
       private:
         /**
@@ -113,7 +143,7 @@ namespace bob {
         template <typename T, bool mask>
         void processNoCheck(const blitz::Array<T,2>& src, 
           const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst, 
-          blitz::Array<bool,2>& dst_mask, const int rot_c_y, const int rot_c_x);
+          blitz::Array<bool,2>& dst_mask, const int rot_c_y, const int rot_c_x) const;
 
         /**
           * Attributes
@@ -124,20 +154,19 @@ namespace bob {
         int m_crop_width;
         int m_crop_offset_h;
         int m_crop_offset_w;
-
-        blitz::TinyVector<int,2> m_out_shape; 
     };
 
     template <typename T> 
-    void GeomNorm::operator()(const blitz::Array<T,2>& src, 
-      blitz::Array<double,2>& dst, const int rot_c_y, const int rot_c_x) 
+    void bob::ip::GeomNorm::operator()(const blitz::Array<T,2>& src, 
+      blitz::Array<double,2>& dst, const int rot_c_y, const int rot_c_x) const
     { 
       // Check input
       bob::core::array::assertZeroBase(src);
 
       // Check output
       bob::core::array::assertZeroBase(dst);
-      bob::core::array::assertSameShape(dst, m_out_shape);
+      bob::core::array::assertSameDimensionLength(dst.extent(0), m_crop_height);
+      bob::core::array::assertSameDimensionLength(dst.extent(1), m_crop_width);
 
       // Process
       blitz::Array<bool,2> src_mask, dst_mask;
@@ -145,9 +174,9 @@ namespace bob {
     }
 
     template <typename T> 
-    void GeomNorm::operator()(const blitz::Array<T,2>& src, 
+    void bob::ip::GeomNorm::operator()(const blitz::Array<T,2>& src, 
       const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst, 
-      blitz::Array<bool,2>& dst_mask, const int rot_c_y, const int rot_c_x) 
+      blitz::Array<bool,2>& dst_mask, const int rot_c_y, const int rot_c_x) const
     { 
       // Check input
       bob::core::array::assertZeroBase(src);
@@ -158,18 +187,17 @@ namespace bob {
       bob::core::array::assertZeroBase(dst);
       bob::core::array::assertZeroBase(dst_mask);
       bob::core::array::assertSameShape(dst, dst_mask);
-      bob::core::array::assertSameShape(dst, m_out_shape);
+      bob::core::array::assertSameDimensionLength(dst.extent(0), m_crop_height);
+      bob::core::array::assertSameDimensionLength(dst.extent(1), m_crop_width);
 
       // Process
       processNoCheck<T,true>(src, src_mask, dst, dst_mask, rot_c_y, rot_c_x);
     }
 
-    // TODO: Refactor with Geometry module to keep track of the cropping
-    // point coordinates after each operation
     template <typename T, bool mask> 
-    void GeomNorm::processNoCheck(const blitz::Array<T,2>& source,
+    void bob::ip::GeomNorm::processNoCheck(const blitz::Array<T,2>& source,
       const blitz::Array<bool,2>& source_mask, blitz::Array<double,2>& target,
-      blitz::Array<bool,2>& target_mask, const int rot_c_y, const int rot_c_x) 
+      blitz::Array<bool,2>& target_mask, const int rot_c_y, const int rot_c_x) const
     { 
       // This is the fastest version of the function that I can imagine...
       // It handles two different coordinate systems: original image and new image
@@ -265,9 +293,45 @@ namespace bob {
         origin_x -= dy;
         origin_y += dx;
       }
-
       // done!
     }
+
+    template <typename T> 
+    void bob::ip::GeomNorm::operator()(const blitz::Array<T,3>& src, 
+      blitz::Array<double,3>& dst, const int rot_c_y, const int rot_c_x) const
+    {
+      for( int p=0; p<dst.extent(0); ++p) {
+        const blitz::Array<T,2> src_slice = 
+          src( p, blitz::Range::all(), blitz::Range::all() );
+        blitz::Array<double,2> dst_slice = 
+          dst( p, blitz::Range::all(), blitz::Range::all() );
+        
+        // Process one plane
+        this->operator()(src_slice, dst_slice, rot_c_y, rot_c_x);
+      }
+    }
+
+    template <typename T> 
+    void bob::ip::GeomNorm::operator()(const blitz::Array<T,3>& src, 
+      const blitz::Array<bool,3>& src_mask, blitz::Array<double,3>& dst, 
+      blitz::Array<bool,3>& dst_mask, const int rot_c_y, const int rot_c_x) const 
+    {
+      for( int p=0; p<dst.extent(0); ++p) {
+        const blitz::Array<T,2> src_slice = 
+          src( p, blitz::Range::all(), blitz::Range::all() );
+        const blitz::Array<bool,2> src_mask_slice = 
+          src_mask( p, blitz::Range::all(), blitz::Range::all() );
+        blitz::Array<double,2> dst_slice = 
+          dst( p, blitz::Range::all(), blitz::Range::all() );
+        blitz::Array<bool,2> dst_mask_slice = 
+          dst_mask( p, blitz::Range::all(), blitz::Range::all() );
+        
+        // Process one plane
+        this->operator()(src_slice, src_mask_slice, dst_slice, 
+          dst_mask_slice, rot_c_y, rot_c_x);
+      }
+    }
+ 
   }
 /**
  * @}
