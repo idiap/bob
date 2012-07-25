@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_IP_GAMMA_CORRECTION_H
-#define BOB5SPRO_IP_GAMMA_CORRECTION_H
+#ifndef BOB_IP_GAMMA_CORRECTION_H
+#define BOB_IP_GAMMA_CORRECTION_H
 
 #include <blitz/array.h>
 #include <cmath>
@@ -97,4 +97,4 @@ namespace bob {
  */
 }
 
-#endif /* BOB5SPRO_IP_GAMMA_CORRECTION_H */
+#endif /* BOB_IP_GAMMA_CORRECTION_H */

@@ -20,11 +20,9 @@
 
 #include "ip/maxRectInMask.h"
 
-namespace ip = bob::ip;
-namespace ipd = bob::ip::detail;
-
 bool
-ipd::isTrue( const blitz::Array<bool,2>& src, int y0, int x0, int y1, int x1)
+bob::ip::detail::isTrue( const blitz::Array<bool,2>& src, int y0, int x0, 
+  int y1, int x1)
 {
   for(int j=y0; j<=y1; ++j)
     for(int i=x0; i<=x1; ++i)
@@ -34,7 +32,7 @@ ipd::isTrue( const blitz::Array<bool,2>& src, int y0, int x0, int y1, int x1)
 }
 
 const blitz::TinyVector<int,4> 
-ip::maxRectInMask( const blitz::Array<bool,2>& src)
+bob::ip::maxRectInMask( const blitz::Array<bool,2>& src)
 {
   const int height = src.extent(0);
   const int width = src.extent(1);

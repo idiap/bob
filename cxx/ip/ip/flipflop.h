@@ -20,14 +20,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_IP_FLIPFLOP_H
-#define BOB5SPRO_IP_FLIPFLOP_H
+#ifndef BOB_IP_FLIPFLOP_H
+#define BOB_IP_FLIPFLOP_H
 
 #include "core/array_assert.h"
 #include "ip/Exception.h"
 #include "ip/common.h"
-
-namespace tca = bob::core::array;
 
 namespace bob {
 /**
@@ -74,7 +72,7 @@ namespace bob {
     void flip(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst) 
     {
       // Check output
-      tca::assertSameShape(dst,src);
+      bob::core::array::assertSameShape(dst,src);
 
       // Flip the 2D array
       detail::flipNoCheck(src, dst);
@@ -95,7 +93,7 @@ namespace bob {
     void flip(const blitz::Array<T,3>& src, blitz::Array<T,3>& dst) 
     {
       // Check output
-      tca::assertSameShape(dst,src);
+      bob::core::array::assertSameShape(dst,src);
 
       for( int p=0; p<dst.extent(0); ++p) {
         // Prepare reference array to 2D slices
@@ -123,7 +121,7 @@ namespace bob {
     void flop(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst) 
     {
       // Check output
-      tca::assertSameShape(dst,src);
+      bob::core::array::assertSameShape(dst,src);
 
       // Flip the 2D array
       const blitz::Array<T,2> src_t = const_cast<blitz::Array<T,2>&>(src).transpose(1,0);
@@ -146,7 +144,7 @@ namespace bob {
     void flop(const blitz::Array<T,3>& src, blitz::Array<T,3>& dst) 
     {
       // Check output
-      tca::assertSameShape(dst,src);
+      bob::core::array::assertSameShape(dst,src);
 
       for( int p=0; p<dst.extent(0); ++p) {
         // Prepare reference array to 2D slices
@@ -167,4 +165,4 @@ namespace bob {
  */
 }
 
-#endif /* BOB5SPRO_IP_FLIPFLOP_H */
+#endif /* BOB_IP_FLIPFLOP_H */

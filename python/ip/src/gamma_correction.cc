@@ -25,34 +25,35 @@
 #include "ip/gammaCorrection.h"
 
 using namespace boost::python;
-namespace tp = bob::python;
-namespace ip = bob::ip;
-namespace ca = bob::core::array;
 
 template <typename T, int N>
-static void inner_gammaCorrection (tp::const_ndarray src, tp::ndarray dst,
-    double g) {
+static void inner_gammaCorrection(bob::python::const_ndarray src, 
+  bob::python::ndarray dst, const double g) 
+{
   blitz::Array<double,N> dst_ = dst.bz<double,N>();
-  ip::gammaCorrection<T>(src.bz<T,N>(), dst_, g);
+  bob::ip::gammaCorrection<T>(src.bz<T,N>(), dst_, g);
 }
 
-static void gamma_correction (tp::const_ndarray src, tp::ndarray dst, double g) {
-  const ca::typeinfo& info = src.type();
+static void gamma_correction(bob::python::const_ndarray src, 
+  bob::python::ndarray dst, const double g)
+{
+  const bob::core::array::typeinfo& info = src.type();
 
-  if (info.nd != 2) PYTHON_ERROR(TypeError, "gamma correction does not support input of type '%s'", info.str().c_str());
+  if (info.nd != 2) PYTHON_ERROR(TypeError, "gamma_correction() does not support input array with '%ld' dimensions.", info.nd);
 
   switch (info.dtype) {
-    case ca::t_uint8: 
+    case bob::core::array::t_uint8: 
       return inner_gammaCorrection<uint8_t,2>(src, dst, g);
-    case ca::t_uint16:
+    case bob::core::array::t_uint16:
       return inner_gammaCorrection<uint16_t,2>(src, dst, g);
-    case ca::t_float64:
+    case bob::core::array::t_float64:
       return inner_gammaCorrection<double,2>(src, dst, g);
     default:
-      PYTHON_ERROR(TypeError, "gamma correction does not support type '%s'", info.str().c_str());
+      PYTHON_ERROR(TypeError, "gamma_correction() does not support input array of type '%s'.", info.str().c_str());
   }
 }
 
-void bind_ip_gamma_correction() {
-  def("gamma_correction", &gamma_correction, (arg("src"), arg("dst"), arg("gamma")), "Perform a power-law gamma correction on a 2D blitz array/image.");
+void bind_ip_gamma_correction() 
+{
+  def("gamma_correction", &gamma_correction, (arg("src"), arg("dst"), arg("gamma")), "Performs a power-law gamma correction on a 2D blitz array/image.");
 }

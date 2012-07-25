@@ -24,16 +24,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_IP_SHEAR_H
-#define BOB5SPRO_IP_SHEAR_H
+#ifndef BOB_IP_SHEAR_H
+#define BOB_IP_SHEAR_H
 
 #include <blitz/array.h>
 #include "core/array_assert.h"
 #include "core/cast.h"
 #include "ip/Exception.h"
 #include "ip/common.h"
-
-namespace tca = bob::core::array;
 
 namespace bob {
 /**
@@ -119,7 +117,7 @@ namespace bob {
               // Determine x-location on dst row
               int x_dst = ceil(x - x_c_src + x_c_dst - skew_i-0.5);
               if( x_dst >= 0 && x_dst < dst.extent(1) ) {
-                dst(y,x_dst) = pixel; //TODO: check C-like cast
+                dst(y,x_dst) = pixel;
                 if(mask) 
                   dst_mask(y,x_dst) = ( x==src.extent(1)-1 ?
                       (antialias && skew_f !=0. ? false : src_mask(y,x))
@@ -148,7 +146,7 @@ namespace bob {
               pixel = (pixel - residual) + old_residual;
               int x_dst = ceil(x - x_c_src + x_c_dst + skew_i-0.5);
               if( x_dst >= 0 && x_dst < dst.extent(1) ) {
-                dst(y,x_dst) = pixel; //TODO: check C-like cast
+                dst(y,x_dst) = pixel;
                 if(mask) 
                   dst_mask(y,x_dst) = (x==0 ? 
                       (antialias && skew_f !=0. ? false : src_mask(y,x))
@@ -223,11 +221,11 @@ namespace bob {
       const double shear, const bool antialias=true)
     {
       // Check input
-      tca::assertZeroBase(src);
+      bob::core::array::assertZeroBase(src);
       // Check output
-      tca::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(dst);
       const blitz::TinyVector<int,2> shape = getShearXShape(src, shear); 
-      tca::assertSameShape(dst, shape);
+      bob::core::array::assertSameShape(dst, shape);
 
       // Call the shearXNoCheck function
       blitz::Array<bool,2> src_mask, dst_mask;
@@ -256,15 +254,15 @@ namespace bob {
       const double shear, const bool antialias=true)
     {
       // Check input
-      tca::assertZeroBase(src);
-      tca::assertZeroBase(src_mask);
-      tca::assertSameShape(src, src_mask);
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(src_mask);
+      bob::core::array::assertSameShape(src, src_mask);
       // Check output
-      tca::assertZeroBase(dst);
-      tca::assertZeroBase(dst_mask);
-      tca::assertSameShape(dst, dst_mask);
+      bob::core::array::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(dst_mask);
+      bob::core::array::assertSameShape(dst, dst_mask);
       const blitz::TinyVector<int,2> shape = getShearXShape(src, shear); 
-      tca::assertSameShape(dst, shape);
+      bob::core::array::assertSameShape(dst, shape);
 
       // Call the shearXNoCheck function
       detail::shearXNoCheck<T,true>( src, src_mask, dst, dst_mask, shear, 
@@ -286,11 +284,11 @@ namespace bob {
       const double shear, const bool antialias=true)
     {
       // Check input
-      tca::assertZeroBase(src);
+      bob::core::array::assertZeroBase(src);
       // Check output
-      tca::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(dst);
       const blitz::TinyVector<int,2> shape = getShearYShape(src, shear); 
-      tca::assertSameShape(dst, shape);
+      bob::core::array::assertSameShape(dst, shape);
 
       // Create transposed view arrays for both src and dst
       const blitz::Array<T,2> src_transpose = (src.copy()).transpose(1,0);
@@ -322,15 +320,15 @@ namespace bob {
       const double shear, const bool antialias=true)
     {
       // Check input
-      tca::assertZeroBase(src);
-      tca::assertZeroBase(src_mask);
-      tca::assertSameShape(src, src_mask);
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(src_mask);
+      bob::core::array::assertSameShape(src, src_mask);
       // Check output
-      tca::assertZeroBase(dst);
-      tca::assertZeroBase(dst_mask);
-      tca::assertSameShape(dst, dst_mask);
+      bob::core::array::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(dst_mask);
+      bob::core::array::assertSameShape(dst, dst_mask);
       const blitz::TinyVector<int,2> shape = getShearYShape(src, shear); 
-      tca::assertSameShape(dst, shape);
+      bob::core::array::assertSameShape(dst, shape);
 
       // Create transposed view arrays for both src and dst
       const blitz::Array<T,2> src_transpose = (src.copy()).transpose(1,0);
@@ -350,4 +348,4 @@ namespace bob {
  */
 }
 
-#endif /* BOB5SPRO_IP_SHEAR_H */
+#endif /* BOB_IP_SHEAR_H */

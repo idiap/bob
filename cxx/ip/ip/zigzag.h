@@ -24,13 +24,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_IP_ZIGZAG_H
-#define BOB5SPRO_IP_ZIGZAG_H
+#ifndef BOB_IP_ZIGZAG_H
+#define BOB_IP_ZIGZAG_H
 
 #include "core/array_assert.h"
 #include "ip/Exception.h"
-
-namespace tca = bob::core::array;
 
 namespace bob {
 	/**
@@ -137,7 +135,7 @@ namespace bob {
       int n_coef_kept = 0, const bool right_first = false)
     {
       // Checks that the src array has zero base indices
-      tca::assertZeroBase( src);
+      bob::core::array::assertZeroBase( src);
 
       // Define constant
       const int max_n_coef = src.extent(0)*src.extent(1);
@@ -149,9 +147,9 @@ namespace bob {
 
       // Checks that the dst array has zero base indices and is of
       // the expected size
-      tca::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(dst);
       blitz::TinyVector<int,1> shape( n_coef_kept);
-      tca::assertSameShape(dst,shape);
+      bob::core::array::assertSameShape(dst,shape);
       
       // Check that we ask to keep a valid number of coefficients
       if( n_coef_kept > max_n_coef )
@@ -171,4 +169,4 @@ namespace bob {
 	 */
 }
 
-#endif /* BOB5SPRO_IP_ZIGZAG_H */
+#endif /* BOB_IP_ZIGZAG_H */

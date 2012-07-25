@@ -20,14 +20,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_IP_SHIFT_H
-#define BOB5SPRO_IP_SHIFT_H
+#ifndef BOB_IP_SHIFT_H
+#define BOB_IP_SHIFT_H
 
 #include "core/array_index.h"
 #include "core/array_assert.h"
 #include "ip/crop.h"
-
-namespace tca = bob::core::array;
 
 namespace bob {
 /**
@@ -80,10 +78,10 @@ namespace bob {
         detail::shiftParameterCheck( shift_y, shift_x, src.extent(0), 
           src.extent(1) );
       // Check input
-      tca::assertZeroBase(src);
+      bob::core::array::assertZeroBase(src);
       // Check output
-      tca::assertZeroBase(dst);
-      tca::assertSameShape(dst, src);
+      bob::core::array::assertZeroBase(dst);
+      bob::core::array::assertSameShape(dst, src);
       
       // Shift the 2D array
       blitz::Array<bool,2> src_mask, dst_mask; 
@@ -118,10 +116,10 @@ namespace bob {
         detail::shiftParameterCheck( shift_y, shift_x, src.extent(1), 
           src.extent(2) );
       // Check input
-      tca::assertZeroBase(src);
+      bob::core::array::assertZeroBase(src);
       // Check output
-      tca::assertZeroBase(dst);
-      tca::assertSameShape(dst, src);
+      bob::core::array::assertZeroBase(dst);
+      bob::core::array::assertSameShape(dst, src);
     
       for( int p=0; p<dst.extent(0); ++p) {
         // Prepare reference array to 2D slices
@@ -169,14 +167,14 @@ namespace bob {
         detail::shiftParameterCheck( shift_y, shift_x, src.extent(0), 
           src.extent(1) );
       // Check input
-      tca::assertZeroBase(src);
-      tca::assertZeroBase(src_mask);
-      tca::assertSameShape(src, src_mask);
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(src_mask);
+      bob::core::array::assertSameShape(src, src_mask);
       // Check output
-      tca::assertZeroBase(dst);
-      tca::assertZeroBase(dst_mask);
-      tca::assertSameShape(dst, dst_mask);
-      tca::assertSameShape(dst, src);
+      bob::core::array::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(dst_mask);
+      bob::core::array::assertSameShape(dst, dst_mask);
+      bob::core::array::assertSameShape(dst, src);
       
       // Shift the 2D array
       detail::cropNoCheck<T,true>(src, src_mask, dst, dst_mask, shift_y,
@@ -216,14 +214,14 @@ namespace bob {
         detail::shiftParameterCheck( shift_y, shift_x, src.extent(1), 
           src.extent(2) );
       // Check input
-      tca::assertZeroBase(src);
-      tca::assertZeroBase(src_mask);
-      tca::assertSameShape(src, src_mask);
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(src_mask);
+      bob::core::array::assertSameShape(src, src_mask);
       // Check output
-      tca::assertZeroBase(dst);
-      tca::assertZeroBase(dst_mask);
-      tca::assertSameShape(dst, dst_mask);
-      tca::assertSameShape(dst, src);
+      bob::core::array::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(dst_mask);
+      bob::core::array::assertSameShape(dst, dst_mask);
+      bob::core::array::assertSameShape(dst, src);
       
       for( int p=0; p<dst.extent(0); ++p) {
         // Prepare reference array to 2D slices
@@ -248,4 +246,4 @@ namespace bob {
  */
 }
 
-#endif /* BOB5SPRO_IP_SHIFT_H */
+#endif /* BOB_IP_SHIFT_H */

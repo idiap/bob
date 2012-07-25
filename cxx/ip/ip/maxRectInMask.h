@@ -21,21 +21,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_IP_MAX_RECT_IN_MASK_H
-#define BOB5SPRO_IP_MAX_RECT_IN_MASK_H
+#ifndef BOB_IP_MAX_RECT_IN_MASK_H
+#define BOB_IP_MAX_RECT_IN_MASK_H
 
 #include <blitz/array.h>
 #include "core/array_assert.h"
 #include "core/array_index.h"
 
-namespace tca = bob::core::array;
-
 namespace bob {
-/**
- * \ingroup libip_api
- * @{
- *
- */
+  /**
+    * \ingroup libip_api
+    * @{
+    *
+    */
   namespace ip {
 
     namespace detail {
@@ -76,4 +74,4 @@ namespace bob {
  */
 }
 
-#endif /* BOB5SPRO_IP_MAX_RECT_IN_MASK_H */
+#endif /* BOB_IP_MAX_RECT_IN_MASK_H */
