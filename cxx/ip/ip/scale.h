@@ -20,16 +20,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_IP_SCALE_H
-#define BOB5SPRO_IP_SCALE_H
+#ifndef BOB_IP_SCALE_H
+#define BOB_IP_SCALE_H
 
 #include "core/array_assert.h"
 #include "core/array_index.h"
 #include "core/cast.h"
 #include "ip/Exception.h"
 #include "ip/common.h"
-
-namespace tca = bob::core::array;
 
 namespace bob {
 /**
@@ -47,7 +45,9 @@ namespace bob {
         *   one is the width (x-axis).
         * @warning No check is performed on the dst blitz::array/image.
         * @param src The input blitz array
+        * @param src_mask The input blitz boolean mask array
         * @param dst The output blitz array
+        * @param dst_mask The output blitz boolean mask array
         */
       template<typename T, bool mask>
       void scaleNoCheck2D_BI(const blitz::Array<T,2>& src, 
@@ -63,17 +63,17 @@ namespace bob {
           double y_src = y_ratio * y;
           double dy2 = y_src - floor(y_src);
           double dy1 = 1. - dy2;
-          int y_ind1 = tca::keepInRange( floor(y_src), 0, src.extent(0)-1);
-          int y_ind2 = tca::keepInRange( y_ind1+1, 0, src.extent(0)-1);
+          int y_ind1 = bob::core::array::keepInRange( floor(y_src), 0, src.extent(0)-1);
+          int y_ind2 = bob::core::array::keepInRange( y_ind1+1, 0, src.extent(0)-1);
           for( int x=0; x<width; ++x) {
             double x_src = x_ratio * x;
             double dx2 = x_src - floor(x_src);
             double dx1 = 1. - dx2;
-            int x_ind1 = tca::keepInRange( floor(x_src), 0, src.extent(1)-1);
-            int x_ind2 = tca::keepInRange( x_ind1+1, 0, src.extent(1)-1);
+            int x_ind1 = bob::core::array::keepInRange( floor(x_src), 0, src.extent(1)-1);
+            int x_ind2 = bob::core::array::keepInRange( x_ind1+1, 0, src.extent(1)-1);
             double val = dx1*dy1*src(y_ind1, x_ind1)+dx1*dy2*src(y_ind2, x_ind1)
               + dx2*dy1*src(y_ind1, x_ind2 )+dx2*dy2*src(y_ind2, x_ind2 );
-            dst(y,x) = val; // TODO Check C-style cast
+            dst(y,x) = val;
             if( mask) {
               bool all_in_mask = true;
               for( int ym=y_ind1; ym<=y_ind2; ++ym)
@@ -108,10 +108,10 @@ namespace bob {
       const enum Rescale::Algorithm alg=Rescale::BilinearInterp)
     {
       // Check and resize src if required
-      tca::assertZeroBase(src);
+      bob::core::array::assertZeroBase(src);
 
       // Check and resize dst if required
-      tca::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(dst);
 
       // Defines output height and width
       const int height = dst.extent(0);
@@ -155,8 +155,10 @@ namespace bob {
       *   The first dimension is the height (y-axis), whereas the second
       *   one is the width (x-axis).
       * @param src The input blitz array
+      * @param src_mask The input blitz boolean mask array
       * @param dst The output blitz array. The new array is resized according
       *   to the dimensions of this dst array.
+      * @param dst_mask The output blitz boolean mask array
       * @param alg The algorithm used for rescaling.
       */
     template<typename T>
@@ -165,14 +167,14 @@ namespace bob {
       const enum Rescale::Algorithm alg=Rescale::BilinearInterp)
     {
       // Check and resize src if required
-      tca::assertZeroBase(src);
-      tca::assertZeroBase(src_mask);
-      tca::assertSameShape(src, src_mask);
+      bob::core::array::assertZeroBase(src);
+      bob::core::array::assertZeroBase(src_mask);
+      bob::core::array::assertSameShape(src, src_mask);
 
       // Check and resize dst if required
-      tca::assertZeroBase(dst);
-      tca::assertZeroBase(dst_mask);
-      tca::assertSameShape(dst, dst_mask);
+      bob::core::array::assertZeroBase(dst);
+      bob::core::array::assertZeroBase(dst_mask);
+      bob::core::array::assertSameShape(dst, dst_mask);
 
       // Defines output height and width
       const int height = dst.extent(0);
@@ -211,18 +213,66 @@ namespace bob {
       }
     }
 
+    template <typename T> 
+    void scale(const blitz::Array<T,3>& src, blitz::Array<double,3>& dst, 
+      const enum Rescale::Algorithm alg=Rescale::BilinearInterp)
+    {
+      // Check number of planes
+      bob::core::array::assertSameDimensionLength(src.extent(0), dst.extent(0));
+
+      for( int p=0; p<dst.extent(0); ++p) 
+        {
+        const blitz::Array<T,2> src_slice = 
+          src( p, blitz::Range::all(), blitz::Range::all() );
+        blitz::Array<double,2> dst_slice = 
+          dst( p, blitz::Range::all(), blitz::Range::all() );
+        
+        // Process one plane
+        scale(src_slice, dst_slice, alg);
+      }
+    }
+ 
+    template <typename T> 
+    void scale(const blitz::Array<T,3>& src, const blitz::Array<bool,3>& src_mask,
+      blitz::Array<double,3>& dst, blitz::Array<bool,3>& dst_mask,
+      const enum Rescale::Algorithm alg=Rescale::BilinearInterp)
+    {
+      // Check number of planes
+      bob::core::array::assertSameDimensionLength(src.extent(0), dst.extent(0));
+      bob::core::array::assertSameDimensionLength(src.extent(0), src_mask.extent(0));
+      bob::core::array::assertSameDimensionLength(src_mask.extent(0), dst_mask.extent(0));
+
+      for( int p=0; p<dst.extent(0); ++p) 
+        {
+        const blitz::Array<T,2> src_slice = 
+          src( p, blitz::Range::all(), blitz::Range::all() );
+        const blitz::Array<bool,2> src_mask_slice = 
+          src_mask( p, blitz::Range::all(), blitz::Range::all() );
+        blitz::Array<double,2> dst_slice = 
+          dst( p, blitz::Range::all(), blitz::Range::all() );
+        blitz::Array<bool,2> dst_mask_slice = 
+          dst_mask( p, blitz::Range::all(), blitz::Range::all() );
+        
+        // Process one plane
+        scale(src_slice, src_mask_slice, dst_slice, dst_mask_slice, alg);
+      }
+    }
 
 	  template <typename T>
-	  blitz::Array<T,2> scaleAs(const blitz::Array<T,2>& original, const double scale_factor) 
+	  blitz::Array<T,2> 
+    scaleAs(const blitz::Array<T,2>& original, const double scale_factor)
 	  {
-		  blitz::TinyVector<int, 2> new_shape = floor(original.shape() * scale_factor + 0.5);
+		  blitz::TinyVector<int, 2> new_shape = 
+        blitz::floor(original.shape() * scale_factor + 0.5);
 		  return blitz::Array<T,2>(new_shape);
 	  }
 	  
 	  template <typename T>
-	  blitz::Array<T,3> scaleAs(const blitz::Array<T,3>& original, const double scale_factor) 
+	  blitz::Array<T,3> 
+    scaleAs(const blitz::Array<T,3>& original, const double scale_factor) 
 	  {
-		  // with 3d Blitz arrays (e.g, color image) we do not want to scale the number of planes :)
+		  // With 3D Blitz arrays (e.g, color image) we do not want 
+      // to scale the number of planes :)
 		  blitz::TinyVector<int, 3> new_shape = original.shape();
 		  new_shape(1) = floor(new_shape(1) * scale_factor + 0.5);
 		  new_shape(2) = floor(new_shape(2) * scale_factor + 0.5);
@@ -235,4 +285,4 @@ namespace bob {
  */
 }
 
-#endif /* BOB5SPRO_IP_SCALE_H */
+#endif /* BOB_IP_SCALE_H */
