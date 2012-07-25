@@ -84,14 +84,14 @@ class FRGCDatabaseTest(unittest.TestCase):
     """Tests that the client id's returned by the 'get_client_id_from_file_id()' and 'get_client_id_from_model_id()' functions are correct"""
 
     # this test might take a while...
-    for protocol in self.m_db.m_protocols:
-      # extract all models
-      for model_id in self.m_db.models(groups='dev', protocol=protocol):
-        # get the client id of the model
-        client_id = self.m_db.get_client_id_from_model_id(model_id)
-        # check that all files with the same model id share the same client id
-        for file_id in self.m_db.files(groups='dev', protocol=protocol, model_ids=(model_id,), purposes='enrol'):
-          self.assertEqual(self.m_db.get_client_id_from_file_id(file_id), client_id)
+    protocol = self.m_db.m_protocols[0]
+    # extract all models
+    for model_id in self.m_db.models(groups='dev', protocol=protocol):
+      # get the client id of the model
+      client_id = self.m_db.get_client_id_from_model_id(model_id)
+      # check that all files with the same model id share the same client id
+      for file_id in self.m_db.files(groups='dev', protocol=protocol, model_ids=(model_id,), purposes='enrol'):
+        self.assertEqual(self.m_db.get_client_id_from_file_id(file_id), client_id)
 
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(FRGCDatabaseTest)
