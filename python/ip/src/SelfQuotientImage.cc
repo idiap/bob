@@ -125,16 +125,16 @@ static object py_call2(bob::ip::SelfQuotientImage& op,
 
 
 void bind_ip_sqi() {
-  class_<bob::ip::SelfQuotientImage, boost::shared_ptr<bob::ip::SelfQuotientImage> >("SelfQuotientImage", "This class allows after configuration to apply the Self Quotient Image algorithm to images.", init<optional<const size_t, const size_t, const size_t, const double, const enum bob::sp::Extrapolation::BorderType> >((arg("n_scales")=1,arg("size_min")=1, arg("size_step")=1, arg("sigma")=2., arg("conv_border")=bob::sp::Extrapolation::Mirror), "Creates a SelfQuotientImage object."))
+  class_<bob::ip::SelfQuotientImage, boost::shared_ptr<bob::ip::SelfQuotientImage> >("SelfQuotientImage", "This class allows after configuration to apply the Self Quotient Image algorithm to images.", init<optional<const size_t, const size_t, const size_t, const double, const enum bob::sp::Extrapolation::BorderType> >((arg("n_scales")=1,arg("size_min")=1, arg("size_step")=1, arg("sigma2")=2., arg("conv_border")=bob::sp::Extrapolation::Mirror), "Creates a SelfQuotientImage object."))
       .def(init<bob::ip::SelfQuotientImage&>(args("other")))
       .def(self == self)
       .def(self != self)
       .add_property("n_scales", &bob::ip::SelfQuotientImage::getNScales, &bob::ip::SelfQuotientImage::setNScales, "The number of scales (Weighted Gaussian).")
       .add_property("size_min", &bob::ip::SelfQuotientImage::getSizeMin, &bob::ip::SelfQuotientImage::setSizeMin, "The radius (size=2*radius+1) of the kernel of the smallest weighted Gaussian.")
       .add_property("size_step", &bob::ip::SelfQuotientImage::getSizeStep, &bob::ip::SelfQuotientImage::setSizeStep, "The step used to set the kernel size of other Weighted Gaussians (size_s=2*(size_min+s*size_step)+1).")
-      .add_property("sigma", &bob::ip::SelfQuotientImage::getSigma2, &bob::ip::SelfQuotientImage::setSigma2, "The variance of the kernel of the smallest weighted Gaussian (variance_s = sigma * (size_min+s*size_step)/size_min).")
+      .add_property("sigma2", &bob::ip::SelfQuotientImage::getSigma2, &bob::ip::SelfQuotientImage::setSigma2, "The variance of the kernel of the smallest weighted Gaussian (variance_s = sigma2 * (size_min+s*size_step)/size_min).")
       .add_property("conv_border", &bob::ip::SelfQuotientImage::getConvBorder, &bob::ip::SelfQuotientImage::setConvBorder, "The extrapolation method used by the convolution at the border")
-      .def("reset", &bob::ip::SelfQuotientImage::reset, (arg("self"), arg("n_scales")=1, arg("size_min")=1, arg("size_step")=1, arg("sigma")=2., arg("conv_border")=bob::sp::Extrapolation::Mirror), "Resets the parametrization of the SelfQuotientImage object.")
+      .def("reset", &bob::ip::SelfQuotientImage::reset, (arg("self"), arg("n_scales")=1, arg("size_min")=1, arg("size_step")=1, arg("sigma2")=2., arg("conv_border")=bob::sp::Extrapolation::Mirror), "Resets the parametrization of the SelfQuotientImage object.")
       .def("__call__", &py_call1, (arg("self"), arg("src"), arg("dst")), "Applies the Self Quotient Image algorithm to an image (2D/grayscale or color 3D/color) of type uint8, uint16 or double. The dst array should have the type (numpy.float64) and the same size as the src array.")
       .def("__call__", &py_call2, (arg("self"), arg("src")), "Applies the Self Quotient Image algorithm to an image (2D/grayscale or color 3D/color) of type uint8, uint16 or double. The filtered image is returned as a numpy array.")
     ;
