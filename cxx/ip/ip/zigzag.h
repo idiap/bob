@@ -2,6 +2,7 @@
  * @file cxx/ip/ip/zigzag.h
  * @date Tue Apr 5 17:28:28 2011 +0200
  * @author Niklas Johansson <niklas.johansson@idiap.ch>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file defines a function to extract a 1D zigzag pattern from
  * 2D dimensional array as described in:
@@ -31,25 +32,25 @@
 #include "ip/Exception.h"
 
 namespace bob {
-	/**
-	 * \ingroup libip_api
-	 * @{
-	 *
-	 */
-	namespace ip {
+  /**
+    * \ingroup libip_api
+    * @{
+    *
+    */
+  namespace ip {
 
     namespace detail {
       /**
-       * @brief Extract the zigzag pattern from a 2D blitz::array, as
-       * described in:
-       *   "Polynomial Features for Robust Face Authentication", 
-       *   from C. Sanderson and K. Paliwal, in the proceedings of the 
-       *   IEEE International Conference on Image Processing 2002.
-       * @param src The input blitz array
-       * @param dst The output blitz array
-       * @param right_first Set to true to reverse the initial zigzag order. 
-       *   By default, the direction is left-to-right for the first diagonal.
-       */
+        * @brief Extract the zigzag pattern from a 2D blitz::array, as
+        * described in:
+        *   "Polynomial Features for Robust Face Authentication", 
+        *   from C. Sanderson and K. Paliwal, in the proceedings of the 
+        *   IEEE International Conference on Image Processing 2002.
+        * @param src The input blitz array
+        * @param dst The output blitz array
+        * @param right_first Set to true to reverse the initial zigzag order. 
+        *   By default, the direction is left-to-right for the first diagonal.
+        */
       template<typename T>
       void zigzagNoCheck(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst, 
         const bool right_first)
@@ -118,55 +119,46 @@ namespace bob {
       }
     }
 
-		/**
-		 * @brief Extract the zigzag pattern from a 2D blitz::array, as described 
-     * in:
-     *   "Polynomial Features for Robust Face Authentication", 
-     *   from C. Sanderson and K. Paliwal, in the proceedings of the 
-     *   IEEE International Conference on Image Processing 2002.
-		 * @param src The input blitz array
-		 * @param dst The output blitz array
-		 * @param n_coef_kept The number of coefficients to be kept
-		 * @param right_first Set to true to reverse the initial zigzag order. 
-     *   By default, the direction is left-to-right for the first diagonal.
-		 */
-		template<typename T>
+    /**
+      * @brief Extract the zigzag pattern from a 2D blitz::array, as described 
+      * in:
+      *   "Polynomial Features for Robust Face Authentication", 
+      *   from C. Sanderson and K. Paliwal, in the proceedings of the 
+      *   IEEE International Conference on Image Processing 2002.
+      * @param src The input 2D blitz array
+      * @param dst The output 1D blitz array. The number of coefficients kept is
+      *            given by the length of this array.
+      * @param right_first Set to true to reverse the initial zigzag order. 
+      *   By default, the direction is left-to-right for the first diagonal.
+      */
+    template<typename T>
     void zigzag(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst, 
-      int n_coef_kept = 0, const bool right_first = false)
+      const bool right_first = false)
     {
-      // Checks that the src array has zero base indices
+      // Checks that the src and dst arrays have zero base indices
       bob::core::array::assertZeroBase( src);
+      bob::core::array::assertZeroBase(dst);
 
       // Define constant
       const int max_n_coef = src.extent(0)*src.extent(1);
+      const int n_coef_kept = dst.extent(0);
 
-      // if the number of coefficients to be kept is not specified, 
-      // set it to the MAX 
-      if(0 == n_coef_kept) 
-        n_coef_kept = max_n_coef;
-
-      // Checks that the dst array has zero base indices and is of
-      // the expected size
-      bob::core::array::assertZeroBase(dst);
-      blitz::TinyVector<int,1> shape( n_coef_kept);
-      bob::core::array::assertSameShape(dst,shape);
-      
       // Check that we ask to keep a valid number of coefficients
       if( n_coef_kept > max_n_coef )
         throw ParamOutOfBoundaryError("n_coef_kept", true, 
-          n_coef_kept, max_n_coef);
+            n_coef_kept, max_n_coef);
       if( n_coef_kept < 0 )
         throw ParamOutOfBoundaryError("n_coef_kept", false, 
-          n_coef_kept, 0);
+            n_coef_kept, 0);
 
       // Apply the zigzag function
       detail::zigzagNoCheck( src, dst, right_first);
     }
-	}
+  }
 
-	/**
-	 * @}
-	 */
+  /**
+    * @}
+    */
 }
 
 #endif /* BOB_IP_ZIGZAG_H */

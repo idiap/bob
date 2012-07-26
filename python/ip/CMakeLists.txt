@@ -45,7 +45,6 @@ bob_python_package_bindings(ip "${ccsrc}" "python_integration")
 # Our test units
 bob_python_add_unittest(ip lib/test/hog.py)
 bob_python_add_unittest(ip lib/test/lbp_new.py)
-bob_python_add_unittest(ip lib/test/filters_new.py)
 bob_python_add_unittest(ip lib/test/optflow.py)
 bob_python_add_unittest(ip lib/test/tempgrad.py)
 bob_python_add_unittest(ip lib/test/color.py)
@@ -55,6 +54,7 @@ bob_python_add_unittest(ip lib/test/gaussian.py)
 bob_python_add_unittest(ip lib/test/weightedGaussian.py)
 bob_python_add_unittest(ip lib/test/sqi.py)
 bob_python_add_unittest(ip lib/test/msr.py)
+bob_python_add_unittest(ip lib/test/zigzag.py)
 
 # If we have VLFeat installed, enable the test of relevant modules
 if(VLFEAT_FOUND)

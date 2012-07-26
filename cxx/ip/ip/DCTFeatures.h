@@ -137,7 +137,7 @@ namespace bob {
 
       // extract the required number of coefficients using the zigzag pattern
       blitz::Array<double,1> dct_block_zigzag(m_n_dct_coefs);
-      zigzag(dct_tmp_block, dct_block_zigzag, m_n_dct_coefs);
+      zigzag(dct_tmp_block, dct_block_zigzag);
       
       // Push the resulting processed block in the container
       dst.push_back(dct_block_zigzag);
@@ -165,7 +165,7 @@ namespace bob {
 
       // Extract the required number of coefficients using the zigzag pattern
       blitz::Array<double,1> dct_block_zigzag(m_n_dct_coefs);
-      zigzag(dct_tmp_block, dct_block_zigzag, m_n_dct_coefs);
+      zigzag(dct_tmp_block, dct_block_zigzag);
       
       // Push the resulting processed block in the right dst row
       blitz::Array<double, 1> dst_row = dst(i, blitz::Range::all());
