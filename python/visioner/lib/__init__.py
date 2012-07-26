@@ -6,7 +6,7 @@
 from ._visioner import *
 from os import path
 
-DEFAULT_CMODEL = path.join(path.dirname(__file__), 'Face.MCT9.gz')
+DEFAULT_CMODEL = path.join(path.dirname(__file__), 'detection.gz')
 """Default classification model for basic face detection"""
 
 DEFAULT_LMODEL_EC = path.join(path.dirname(__file__), 'Facial.MCT9.TMaxBoost.EyeCenters.gz')
@@ -17,85 +17,85 @@ DEFAULT_LMODEL_MP = path.join(path.dirname(__file__), 'Facial.MCT9.TMaxBoost.Mul
 """Alternative keypoint localization model. This model will get you eye
 centers, eye corners, nose tip, nostrils, mouth corners."""
 
-class MaxDetector:
+class MaxDetector(CVDetector):
   """A class that bridges the Visioner to bob so as to detect the most
   face-like object in still images or video frames"""
 
-  def __init__(self, cmodel_file=None, scan_levels=0, scale_var=8):
+  def __init__(self, model_file=None, threshold=0.0, levels=0, 
+      scale_variation=2, clustering=0.05,
+      detection_method=DetectionMethod.GroundTruth):
     """Creates a new face localization object by loading object classification
     and keypoint localization models from visioner model files.
 
     Keyword Parameters:
 
-    cmodel_file
-      Path to a file containing the object classification model. If unset (or
-      set to None), I will use the default model file installed with the
-      release.
-
-    scan_levels
-      scanning levels (the more, the faster)
-
-    scale_var
-      scanning: scale variation in pixels
+    model
+      file containing the model to be loaded; **note**: Serialization will use a native text format by default. Files that have their names suffixed with '.gz' will be automatically decompressed. If the filename ends in '.vbin' or '.vbgz' the format used will be the native binary format.
+      
+    threshold
+      object classification threshold
+      
+    levels
+      levels (the more, the faster)
+      
+    scale_variation
+      scale variation in pixels
+      
+    clustering
+      overlapping threshold for clustering detections
+      
+    detection_method
+      Scanning or GroundTruth
     """
 
-    if cmodel_file is None: cmodel_file = DEFAULT_CMODEL
+    if model_file is None: model_file = DEFAULT_CMODEL
 
-    self.cmodel, self.cparam = load_model(cmodel_file)
-    self.cparam.ds = scale_var
-    self.cscanner = SWScanner(self.cparam)
-    self.scan_levels = scan_levels
+    CVDetector.__init__(self, model_file, threshold, levels,
+        scale_variation, clustering, detection_method)
 
   def __call__(self, grayimage):
-    """Runs the detection machinery, returns bounding boxes"""
+    """Runs the detection machinery, returns a single bounding boxes"""
+    return self.detect_max(grayimage)
 
-    self.cscanner.load(grayimage)
-    return detect_max(self.cmodel, self.scan_levels, self.cscanner)
-
-class Detector:
+class Detector(CVDetector):
   """A class that bridges the Visioner to bob so as to detect faces in 
   still images or video frames"""
 
-  def __init__(self, cmodel_file=None, threshold=0., 
-      scan_levels=0, scale_var=8, cluster=0.10):
+  def __init__(self, model_file=None, threshold=0.0, levels=0, 
+      scale_variation=2, clustering=0.05,
+      detection_method=DetectionMethod.GroundTruth):
     """Creates a new face localization object by loading object classification
     and keypoint localization models from visioner model files.
 
     Keyword Parameters:
 
-    cmodel_file
-      Path to a file containing the object classification model. If unset (or
-      set to None), I will use the default model file installed with the
-      release.
-
+    model
+      file containing the model to be loaded; **note**: Serialization will use a native text format by default. Files that have their names suffixed with '.gz' will be automatically decompressed. If the filename ends in '.vbin' or '.vbgz' the format used will be the native binary format.
+      
     threshold
-      Classifier threshold
-
-    scan_levels
-      scanning levels (the more, the faster)
-
-    scale_var
-      scanning: scale variation in pixels
-    
-    cluster
-      NMS clustering: overlapping threshold
+      object classification threshold
+      
+    levels
+      levels (the more, the faster)
+      
+    scale_variation
+      scale variation in pixels
+      
+    clustering
+      overlapping threshold for clustering detections
+      
+    detection_method
+      Scanning or GroundTruth
     """
 
-    if cmodel_file is None: cmodel_file = DEFAULT_CMODEL
+    if model_file is None: model_file = DEFAULT_CMODEL
 
-    self.cmodel, self.cparam = load_model(cmodel_file)
-    self.cparam.ds = scale_var
-    self.cscanner = SWScanner(self.cparam)
-    self.threshold = threshold
-    self.scan_levels = scan_levels
-    self.cluster = cluster
+    CVDetector.__init__(self, model_file, threshold, levels,
+        scale_variation, clustering, detection_method)
 
   def __call__(self, grayimage):
-    """Runs the detection machinery, returns bounding boxes"""
-
-    self.cscanner.load(grayimage)
-    return detect(self.cmodel, self.threshold, self.scan_levels, 
-        self.cluster, self.cscanner)
+    """Runs the detection machinery, returns a single bounding boxes"""
+    return self.detect(grayimage)
 
 class Localizer:
   """A class that bridges the Visioner to bob so as to localize face in 

@@ -1,0 +1,245 @@
+#include <fstream>
+
+#include "visioner/vision/object.h"
+
+namespace bob { namespace visioner {
+
+  Object::Object(const string_t& type, const string_t& pose, const string_t& id, 
+      float bbx_x, float bbx_y, float bbx_w, float bbx_h)
+    :	m_type(type), m_pose(pose), m_id(id), m_bbx(bbx_x, bbx_y, bbx_w, bbx_h)
+  {		
+  }
+
+  Object::Object(const string_t& type, const string_t& pose, const string_t& id, 
+      const rect_t& bbx)
+    :	m_type(type), m_pose(pose), m_id(id), m_bbx(bbx)
+  {
+  }
+
+  void Object::clear()
+  {
+    m_keypoints.clear();
+  }
+
+  void Object::add(const Keypoint& keypoint)
+  {
+    m_keypoints.push_back(keypoint);
+  }
+
+  void Object::move(const rect_t& bbx)
+  {
+    m_bbx = bbx;
+  }
+
+  void Object::scale(scalar_t factor)
+  {
+    // Scale the object bounding box
+    const scalar_t bbx_w = factor * m_bbx.width();
+    const scalar_t bbx_h = factor * m_bbx.height();
+    const scalar_t top = factor * m_bbx.top();
+    const scalar_t left = factor * m_bbx.left();
+
+    m_bbx = rect_t(left, top, bbx_w, bbx_h);
+
+    // Scale each keypoint
+    for (keypoints_t::iterator it = m_keypoints.begin(); it != m_keypoints.end(); ++ it)
+    {
+      it->m_point = point_t(factor * it->m_point.x(), factor * it->m_point.y());
+    }
+  }
+
+  void Object::translate(scalar_t dx, scalar_t dy)
+  {
+    m_bbx.translate(dx, dy);
+    for (keypoints_t::iterator it = m_keypoints.begin(); it != m_keypoints.end(); ++ it)
+    {
+      it->m_point.setX(it->m_point.x() + dx);
+      it->m_point.setY(it->m_point.y() + dy);
+    }
+  }
+
+  bool Object::find(const string_t& id, Keypoint& keypoint) const
+  {
+    for (keypoints_t::const_iterator it = m_keypoints.begin(); it != m_keypoints.end(); ++ it)
+      if (it->m_id == id)
+      {
+        keypoint = *it;
+        return true;
+      }
+    return false;
+  }
+
+  bool Object::load(const string_t& filename, objects_t& objects)
+  {
+    objects.clear();
+
+    // Open the file
+    std::ifstream is(filename.c_str());
+    if (is.is_open() == false)
+    {
+      return false;
+    }
+
+    // Parse the file
+    static const int buff_size = 4096;
+    char buff[buff_size];
+    int n_objects = -1;
+    while (is.getline(buff, buff_size))
+    {
+      const strings_t tokens = split(buff, " ");
+
+      // Number of objects
+      if (n_objects < 0)
+      {
+        if (tokens.size() != 1 ||
+            (n_objects = boost::lexical_cast<int>(tokens[0].c_str())) < 0 || n_objects > 1000)
+        {
+          n_objects = -1;
+          break;
+        }
+      }
+
+      // Bounding box + keypoints [id x y]
+      else
+      {
+        if (tokens.size() < 7)
+        {
+          n_objects = -1;
+          break;
+        }
+
+        Object object(
+            tokens[0], tokens[1], tokens[2],
+            boost::lexical_cast<float>(tokens[3].c_str()),
+            boost::lexical_cast<float>(tokens[4].c_str()),
+            boost::lexical_cast<float>(tokens[5].c_str()),
+            boost::lexical_cast<float>(tokens[6].c_str()));
+
+        const int n2read = tokens.size() - 7;
+        if (n2read % 3 != 0)
+        {
+          n_objects = -1;
+          break;
+        }
+
+        const int n_keypoints = n2read / 3;
+        for (int i = 0, ii = 7; i < n_keypoints; i ++, ii += 3)
+        {
+          object.add(Keypoint(  
+                tokens[ii],
+                boost::lexical_cast<float>(tokens[ii + 1]),
+                boost::lexical_cast<float>(tokens[ii + 2])));
+        }
+
+        objects.push_back(object);
+      }
+    }
+
+    // Check if the objects were read correctly
+    if (n_objects < 0 || n_objects != (int)objects.size())
+    {
+      objects.clear();
+      is.close();
+      return false;
+    }
+
+    // OK
+    is.close();
+    return true;
+  }
+
+  bool Object::save(const string_t& filename, const objects_t& objects)
+  {
+    // Open the file
+    std::ofstream os(filename.c_str());
+    if (os.is_open() == false)
+    {
+      return false;
+    }
+
+    // Save the objects
+    os << objects.size() << "\n";
+    for (objects_t::const_iterator it = objects.begin(); it != objects.end(); ++ it)
+    {
+      const Object& object = *it;
+      os << object.type() << " " << object.pose() << " " << object.id() << " "
+        << object.bbx().left() << " " << object.bbx().top() << " " 
+        << object.bbx().width() << " " << object.bbx().height() << " ";
+
+      const keypoints_t& keypoints = object.keypoints();
+      for (keypoints_t::const_iterator itf = keypoints.begin(); itf != keypoints.end(); ++ itf)
+      {
+        os << itf->m_id << " " << itf->m_point.x() << " " << itf->m_point.y() << " ";
+      }
+
+      os << "\n";
+    }
+
+    // OK
+    os.close();
+    return true;
+  }
+
+  bool Object::save(const string_t& filename) const
+  {
+    objects_t objects;
+    objects.push_back(*this);
+    return save(filename, objects);
+  }
+
+  scalar_t overlap(const rect_t& reg, const objects_t& objects, int* pwhich)
+  {
+    if (pwhich != 0)
+      *pwhich = 0;
+
+    scalar_t max_overlap = 0.0;		
+    for (objects_t::const_iterator it = objects.begin(); it != objects.end(); ++ it)
+    {
+      const scalar_t o = overlap(reg, it->bbx());
+      if (o > max_overlap)
+      {
+        max_overlap = o;
+        if (pwhich != 0)
+        {
+          *pwhich = it - objects.begin();
+        }
+      }
+    }
+    return max_overlap;
+  }
+
+  objects_t filter_by_type(const objects_t& objects, const string_t& type)
+  {
+    objects_t result;
+    for (objects_t::const_iterator it = objects.begin(); it != objects.end(); ++ it)
+      if (it->type() == type)
+      {
+        result.push_back(*it);
+      }
+    return result;
+  }
+
+  objects_t filter_by_pose(const objects_t& objects, const string_t& pose)
+  {
+    objects_t result;
+    for (objects_t::const_iterator it = objects.begin(); it != objects.end(); ++ it)
+      if (it->pose() == pose)
+      {
+        result.push_back(*it);
+      }
+    return result;
+  }
+
+  objects_t filter_by_id(const objects_t& objects, const string_t& id)
+  {
+    objects_t result;
+    for (objects_t::const_iterator it = objects.begin(); it != objects.end(); ++ it)
+      if (it->id() == id)
+      {
+        result.push_back(*it);
+      }
+    return result;
+
+  }
+
+}}

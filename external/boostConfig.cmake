@@ -12,6 +12,7 @@ find_package(Boost 1.40.0 REQUIRED
     python 
     unit_test_framework
     iostreams 
+    serialization
     thread
     filesystem
     date_time

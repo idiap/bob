@@ -295,7 +295,6 @@ autodoc_default_flags = ['members', 'undoc-members', 'special-members', 'inherit
 # Used to filter some documentation in/out
 bob_modules = dir(__import__('bob'))
 has_libsvm = hasattr(__import__('bob').machine, 'SupportVector')
-has_visioner = hasattr(__import__('bob'), 'visioner')
 
 def smaller_than(v1, v2):
   """Compares scipy/numpy version numbers"""
@@ -350,4 +349,3 @@ def setup(app):
   app.connect('autodoc-skip-member', member_function_test)
   app.add_config_value('bob_modules', bob_modules, True)
   app.add_config_value('has_libsvm', has_libsvm, True)
-  app.add_config_value('has_visioner', has_visioner, True)

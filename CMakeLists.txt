@@ -54,10 +54,6 @@ option(BOB_BUILD_PYTHON "Builds the python bindings." ON)
 
 set(BOB_DATABASE_URL "http://www.idiap.ch/software/bob/databases" CACHE STRING "Where to download databases from. If this variable is set empty, then we try to create the databases instead.")
 
-# This variable can enable or disable visioner's (and dependent targets)
-# compilation
-set(BOB_VISIONER_ENABLED ON "Enables visioner C++/Python compilation")
-
 # ---------------
 # END of options.
 # ---------------
@@ -149,10 +145,6 @@ include(cmake/macros.cmake)
 set(BUILD_SHARED_LIBS "ON" CACHE BOOL "Build shared libs")
 
 if (BOB_BUILD_CXX)
-  if (QT4_FOUND)
-    add_library(bob_visioner SHARED IMPORTED)
-  endif ()
-
   add_subdirectory(cxx)
 endif ()
 

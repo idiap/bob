@@ -38,7 +38,7 @@ class Loader:
 
     if not hasattr(self, 'video'):
       self.video = bob.io.VideoReader(TEST_VIDEO)
-      self.images = [bob.ip.rgb_to_gray(k).astype('int16') for k in self.video[:100]]
+      self.images = [bob.ip.rgb_to_gray(k) for k in self.video[:100]]
 
 data = Loader()
 

@@ -20,11 +20,12 @@
 #ifndef VISIONERFACELOCALIZATION_H
 #define VISIONERFACELOCALIZATION_H
 
-#include <daq/FaceLocalization.h>
+#include <boost/shared_ptr.hpp>
+
+#include "daq/FaceLocalization.h"
+#include "visioner/cv/cv_detector.h"
 
 namespace bob { namespace daq {
-
-struct Visioner_ptr;
 
 /**
  * Provide face localization using Visioner
@@ -48,7 +49,7 @@ public:
 private:
   pthread_t thread;
   
-  Visioner_ptr* visioner_ptr;
+  boost::shared_ptr<bob::visioner::CVDetector> detector;
   
   blitz::Array<unsigned char, 2> img;
   pthread_mutex_t img_mutex;

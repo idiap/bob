@@ -71,9 +71,8 @@ def process_video_data(args):
         (input.number_of_frames, args.input))
   for k in input:
     bob.ip.rgb_to_gray(k, gray_buffer)
-    int16_buffer = gray_buffer.astype('int16')
     start = time.clock()
-    detection = args.processor(int16_buffer)
+    detection = args.processor(gray_buffer)
     if args.verbose:
       sys.stdout.write('.')
       sys.stdout.flush()
@@ -128,9 +127,9 @@ def process_image_data(args):
   input = bob.io.load(args.input) #load the image
 
   if len(input.shape) == 3: #it is a color image
-    graydata = bob.ip.rgb_to_gray(input).astype('int16')
+    graydata = bob.ip.rgb_to_gray(input)
   elif len(input.shape) == 2: #it is a gray-scale image
-    graydata = input.astype('int16')
+    graydata = input
 
   start = time.clock()
   data = args.processor(graydata)
@@ -174,7 +173,7 @@ def main():
   parser.add_argument("output", metavar='FILE', type=str, nargs='?',
       help="the output filename; if this filename is omitted, output for the detections is dumped in text format to the screen")
   parser.add_argument("-c", "--classification-model", metavar='FILE',
-      type=str, dest="cmodel", default=None,
+      type=str, dest="model", default=None,
       help="use a classification model file different than the default")
   parser.add_argument("-d", "--dump-scores",
       default=False, action='store_true', dest='dump_scores',
@@ -211,8 +210,8 @@ def main():
     args.scan_levels = 10
 
   start = time.clock() 
-  args.processor = bob.visioner.MaxDetector(cmodel_file=args.cmodel,
-      scan_levels=args.scan_levels)
+  args.processor = bob.visioner.MaxDetector(model_file=args.model,
+      levels=args.scan_levels)
   total = time.clock() - start
 
   if args.verbose:
