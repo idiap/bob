@@ -52,14 +52,14 @@ namespace bob {
    *   from C. Sanderson and K. Paliwal, in the proceedings of the 
    *   IEEE International Conference on Image Processing 2002.
   */
-	class DCTFeatures
-	{
-  	public:
+  class DCTFeatures
+  {
+    public:
 
-	  	/**
+      /**
         * @brief Constructor: generates a DCTFeatures extractor
         */
-	    DCTFeatures( const int block_h, const int block_w, const int overlap_h, 
+      DCTFeatures( const int block_h, const int block_w, const int overlap_h, 
         const int overlap_w, const int n_dct_coefs): m_dct2d(0),
           m_block_h(block_h), m_block_w(block_w), m_overlap_h(overlap_h), 
           m_overlap_w(overlap_w), m_n_dct_coefs(n_dct_coefs)
@@ -67,21 +67,21 @@ namespace bob {
         m_dct2d = new bob::sp::DCT2D(block_h, block_w);
       }
 
-	  	/**
+      /**
         * @brief Destructor
         */
-	    virtual ~DCTFeatures() {
+      virtual ~DCTFeatures() {
         if( m_dct2d!=0)
           delete m_dct2d;
       }
 
-	  	/**
+      /**
         * @brief Process a 2D blitz Array/Image by extracting DCT features.
         * @param src The 2D input blitz array
         * @param dst A container (with a push_back method such as an STL list)
         *   of 1D double blitz arrays.
         */
-	    template <typename T, typename U> 
+      template <typename T, typename U> 
       void operator()(const blitz::Array<T,2>& src, U& dst);
 
       /**
@@ -102,7 +102,7 @@ namespace bob {
       template<typename T>
       const int getNBlocks(const blitz::Array<T,2>& src);
 
-	  private:
+    private:
       /**
         * Attributes
         */
@@ -112,7 +112,7 @@ namespace bob {
       int m_overlap_h;
       int m_overlap_w;
       int m_n_dct_coefs;
-	};
+  };
 
   template <typename T, typename U> 
   void DCTFeatures::operator()(const blitz::Array<T,2>& src, 
