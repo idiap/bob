@@ -32,100 +32,100 @@
 
 namespace bob {
 
-	/**
-	 * \ingroup libip_api
-	 * @{
-	 *
-	 */
-	namespace ip {
+  /**
+    * \ingroup libip_api
+    * @{
+    *
+    */
+  namespace ip {
 
     /**
       * @brief This class allows to smooth images with a weighted Gaussian 
       *        kernel (used by the Self Quotient Image)
       */
-		class WeightedGaussian
-		{
-  		public:
-			  /**
-  			 * @brief Creates an object to smooth images with a weighted Gaussian 
-         *        kernel
-	  		 * @param radius_y The radius-height of the kernel along the y-axis 
-         *                 (height = 2*radius_y + 1)
-	  		 * @param radius_x The radius-width of the kernel along the x-axis 
-         *                 (width = 2*radius_x + 1)
-         * @param sigma2_y The variance of the kernel along the y-axis
-         * @param sigma2_x The variance of the kernel along the x-axis
-		  	 * @param border_type The interpolation type for the convolution
-			   */
-	  		WeightedGaussian(const size_t radius_y=1, const size_t radius_x=1, 
+    class WeightedGaussian
+    {
+      public:
+        /**
+          * @brief Creates an object to smooth images with a weighted Gaussian 
+          *        kernel
+          * @param radius_y The radius-height of the kernel along the y-axis 
+          *                 (height = 2*radius_y + 1)
+          * @param radius_x The radius-width of the kernel along the x-axis 
+          *                 (width = 2*radius_x + 1)
+          * @param sigma2_y The variance of the kernel along the y-axis
+          * @param sigma2_x The variance of the kernel along the x-axis
+          * @param border_type The interpolation type for the convolution
+          */
+        WeightedGaussian(const size_t radius_y=1, const size_t radius_x=1, 
             const double sigma2_y=2., const double sigma2_x=2.,
-            const enum bob::sp::Extrapolation::BorderType border_type =
+            const bob::sp::Extrapolation::BorderType border_type =
               bob::sp::Extrapolation::Mirror):
           m_radius_y(radius_y), m_radius_x(radius_x), m_sigma2_y(sigma2_y),
           m_sigma2_x(sigma2_x), m_conv_border(border_type)
-  			{
+        {
           computeKernel();
         }
 
         /**
-         * @brief Copy constructor
-         */
+          * @brief Copy constructor
+          */
         WeightedGaussian(const WeightedGaussian& other): 
           m_radius_y(other.m_radius_y), m_radius_x(other.m_radius_x), 
           m_sigma2_y(other.m_sigma2_y), m_sigma2_x(other.m_sigma2_x), 
           m_conv_border(other.m_conv_border)
-  			{
+        {
           computeKernel();
         }
 
         /**
-         * @brief Destructor
-         */
+          * @brief Destructor
+          */
         virtual ~WeightedGaussian() {}
 
         /**
-         * @brief Assignment operator
-         */
+          * @brief Assignment operator
+          */
         WeightedGaussian& operator=(const WeightedGaussian& other);
 
         /**
-         * @brief Equal to
-         */
+          * @brief Equal to
+          */
         bool operator==(const WeightedGaussian& b) const;
         /**
-         * @brief Not equal to
-         */
+          * @brief Not equal to
+          */
         bool operator!=(const WeightedGaussian& b) const; 
  
         /**
-         * @brief Resets the parameters of the filter
-	  		 * @param radius_y The radius-height of the kernel along the y-axis 
-         *                 (height = 2*radius_y + 1)
-	  		 * @param radius_x The radius-width of the kernel along the x-axis 
-         *                 (width = 2*radius_x + 1)
-         * @param sigma2_y The variance of the kernel along the y-axis
-         * @param sigma2_x The variance of the kernel along the x-axis
-		  	 * @param size_opt The size of the output wrt. to convolution
-		  	 * @param border_type The interpolation type for the convolution
-			   */
+          * @brief Resets the parameters of the filter
+          * @param radius_y The radius-height of the kernel along the y-axis 
+          *                 (height = 2*radius_y + 1)
+          * @param radius_x The radius-width of the kernel along the x-axis 
+          *                 (width = 2*radius_x + 1)
+          * @param sigma2_y The variance of the kernel along the y-axis
+          * @param sigma2_x The variance of the kernel along the x-axis
+          * @param size_opt The size of the output wrt. to convolution
+          * @param border_type The interpolation type for the convolution
+          */
         void reset( const size_t radius_y=1, const size_t radius_x=1,
           const double sigma2_y=2., const double sigma2_x=2.,
-          const enum bob::sp::Extrapolation::BorderType border_type =
+          const bob::sp::Extrapolation::BorderType border_type =
             bob::sp::Extrapolation::Mirror);
 
         /**
-         * @brief Getters
-         */
+          * @brief Getters
+          */
         size_t getRadiusY() const { return m_radius_y; }
         size_t getRadiusX() const { return m_radius_x; }
         double getSigma2Y() const { return m_sigma2_y; }
         double getSigma2X() const { return m_sigma2_x; }
-        enum bob::sp::Extrapolation::BorderType getConvBorder() const { return m_conv_border; }
+        bob::sp::Extrapolation::BorderType getConvBorder() const { return m_conv_border; }
         const blitz::Array<double,2>& getUnweightedKernel() const { return m_kernel; }
        
         /**
-         * @brief Setters
-         */
+          * @brief Setters
+          */
         void setRadiusY(const size_t radius_y) 
         { m_radius_y = radius_y; computeKernel(); }
         void setRadiusX(const size_t radius_x) 
@@ -134,23 +134,23 @@ namespace bob {
         { m_sigma2_y = sigma2_y; computeKernel(); }
         void setSigma2X(const double sigma2_x) 
         { m_sigma2_x = sigma2_x; computeKernel(); }
-        void setConvBorder(const enum bob::sp::Extrapolation::BorderType border_type)
+        void setConvBorder(const bob::sp::Extrapolation::BorderType border_type)
         { m_conv_border = border_type; }
 
         /**
-         * @brief Process a 2D blitz Array/Image
-         * @param src The 2D input blitz array
-         * @param src The 2D input blitz array
-         */
+          * @brief Process a 2D blitz Array/Image
+          * @param src The 2D input blitz array
+          * @param src The 2D input blitz array
+          */
         template <typename T> 
         void operator()(const blitz::Array<T,2>& src, 
           blitz::Array<double,2>& dst);
 
         /**
-         * @brief Process a 3D blitz Array/Image
-         * @param src The 3D input blitz array
-         * @param src The 3D input blitz array
-         */
+          * @brief Process a 3D blitz Array/Image
+          * @param src The 3D input blitz array
+          * @param src The 3D input blitz array
+          */
         template <typename T> 
         void operator()(const blitz::Array<T,3>& src, 
           blitz::Array<double,3>& dst);
@@ -159,13 +159,13 @@ namespace bob {
         void computeKernel(); 
 
         /**
-         * @brief Attributes
-         */	
+          * @brief Attributes
+          */  
         size_t m_radius_y;
         size_t m_radius_x;
         double m_sigma2_y;
         double m_sigma2_x;
-        enum bob::sp::Extrapolation::BorderType m_conv_border;
+        bob::sp::Extrapolation::BorderType m_conv_border;
 
         blitz::Array<double,2> m_kernel;
         blitz::Array<double,2> m_kernel_weighted;
@@ -208,7 +208,7 @@ namespace bob {
       }
     }
 
-	}
+  }
 }
 
 #endif

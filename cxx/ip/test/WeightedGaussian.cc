@@ -64,7 +64,7 @@ template<typename T>
 void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<T,2>& t2, 
   const double eps )
 {
-	check_dimensions( t1, t2);
+  check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t2.extent(1); ++j) 
       BOOST_CHECK_SMALL( fabs(t1(i,j)-t2(i,j)), eps);

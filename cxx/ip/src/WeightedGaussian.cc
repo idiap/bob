@@ -40,7 +40,7 @@ void bob::ip::WeightedGaussian::computeKernel()
 
 void bob::ip::WeightedGaussian::reset(const size_t radius_y, const size_t radius_x,
   const double sigma2_y, const double sigma2_x, 
-  const enum bob::sp::Extrapolation::BorderType border_type)
+  const bob::sp::Extrapolation::BorderType border_type)
 {
   m_radius_y = radius_y;
   m_radius_x = radius_x;
