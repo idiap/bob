@@ -30,12 +30,12 @@
 namespace tca = bob::core::array;
 
 namespace bob {
-	/**
-	 * \ingroup libip_api
-	 * @{
-	 *
-	 */
-	namespace ip {
+  /**
+   * \ingroup libip_api
+   * @{
+   *
+   */
+  namespace ip {
 
     /**
       * @brief Return the shape of an image, where the point with the given 
@@ -196,10 +196,10 @@ namespace bob {
         dst_mask, target_center_h, target_center_w);
     }
 
-	}
-	/**
-	 * @}
-	 */
+  }
+  /**
+   * @}
+   */
 }
 
 #endif // BOB5SPRO_IP_GENERATE_WITH_CENTER_H

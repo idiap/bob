@@ -28,14 +28,13 @@
 #include "core/array_assert.h"
 
 namespace ip = bob::ip;
-namespace sp = bob::sp;
 
 static inline void fastconv(const blitz::Array<double,2>& image,
     const blitz::Array<double,1>& kernel,
     blitz::Array<double,2>& result, int dimension) {
   blitz::Array<double,2> imageExtra(bob::sp::getConvSepOutputSize(image, kernel, dimension, bob::sp::Conv::Full));
-  sp::extrapolateMirror(image, imageExtra);
-  sp::convSep(imageExtra, kernel, result, dimension, sp::Conv::Valid);
+  bob::sp::extrapolateMirror(image, imageExtra);
+  bob::sp::convSep(imageExtra, kernel, result, dimension, bob::sp::Conv::Valid);
 }
 
 ip::ForwardGradient::ForwardGradient(const blitz::Array<double,1>& diff_kernel,

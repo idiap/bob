@@ -50,42 +50,42 @@ namespace bob {
    *       Volume 19, p. 1635-1650.
    *       (http://ieeexplore.ieee.org/xpl/freeabs_all.jsp?arnumber=5411802)
   */
-	class TanTriggs
-	{
-  	public:
+  class TanTriggs
+  {
+    public:
 
-	  	/**
+      /**
         * @brief Constructor: generates the Difference of Gaussians filter
         */
-	    TanTriggs(const double gamma=0.2, const double sigma0=1., 
+      TanTriggs(const double gamma=0.2, const double sigma0=1., 
         const double sigma1=2., const int size=2, const double threshold=10., 
-        const double alpha=0.1, const enum sp::Conv::SizeOption 
-        size_opt=sp::Conv::Same, const enum sp::Extrapolation::BorderType 
-        border_type=sp::Extrapolation::Mirror);
+        const double alpha=0.1, const bob::sp::Conv::SizeOption 
+        size_opt=sp::Conv::Same, const bob::sp::Extrapolation::BorderType 
+        border_type=bob::sp::Extrapolation::Mirror);
 
-	  	/**
+      /**
         * @brief Destructor
         */
-	    virtual ~TanTriggs();
+      virtual ~TanTriggs();
 
-	  	/**
+      /**
         * @brief Process a 2D blitz Array/Image by applying the preprocessing
         * algorihtm
         */
-	    template <typename T> void operator()(const blitz::Array<T,2>& src, 
+      template <typename T> void operator()(const blitz::Array<T,2>& src, 
         blitz::Array<double,2>& dst);
 
-	  private:
-	  	/**
+    private:
+      /**
         * @brief Perform the contrast equalization step on a 2D blitz 
         * Array/Image.
         */
       void performContrastEqualization( blitz::Array<double,2>& img);
 
-	  	/**
+      /**
         * @brief Generate the difference of Gaussian filter
         */
-  		void computeDoG(double sigma0, double sigma1, int size);
+      void computeDoG(double sigma0, double sigma1, int size);
 
       // Attributes
       blitz::Array<double, 2> m_kernel;
@@ -97,9 +97,9 @@ namespace bob {
       int m_size;
       double m_threshold;
       double m_alpha;
-      enum sp::Conv::SizeOption m_size_opt;
-      enum sp::Extrapolation::BorderType m_border_type;
-	};
+      bob::sp::Conv::SizeOption m_size_opt;
+      bob::sp::Extrapolation::BorderType m_border_type;
+  };
 
   template <typename T> 
   void TanTriggs::operator()(const blitz::Array<T,2>& src, 
@@ -134,18 +134,18 @@ namespace bob {
     }
 
     // 2/ Convolution with the DoG Filter
-    if(m_border_type == sp::Extrapolation::Zero || m_size_opt==sp::Conv::Valid)
+    if(m_border_type == bob::sp::Extrapolation::Zero || m_size_opt == bob::sp::Conv::Valid)
       sp::conv( m_img_tmp, m_kernel, dst, m_size_opt);
     else
     {
-      m_img_tmp2.resize(sp::getConvOutputSize(m_img_tmp, m_kernel, sp::Conv::Full));
-      if(m_border_type == sp::Extrapolation::NearestNeighbour)
-        sp::extrapolateNearest(m_img_tmp, m_img_tmp2);
-      else if(m_border_type == sp::Extrapolation::Circular)
-        sp::extrapolateCircular(m_img_tmp, m_img_tmp2);
+      m_img_tmp2.resize(bob::sp::getConvOutputSize(m_img_tmp, m_kernel, bob::sp::Conv::Full));
+      if(m_border_type == bob::sp::Extrapolation::NearestNeighbour)
+        bob::sp::extrapolateNearest(m_img_tmp, m_img_tmp2);
+      else if(m_border_type == bob::sp::Extrapolation::Circular)
+        bob::sp::extrapolateCircular(m_img_tmp, m_img_tmp2);
       else
-        sp::extrapolateMirror(m_img_tmp, m_img_tmp2);
-      sp::conv( m_img_tmp2, m_kernel, dst, sp::Conv::Valid); 
+        bob::sp::extrapolateMirror(m_img_tmp, m_img_tmp2);
+      bob::sp::conv( m_img_tmp2, m_kernel, dst, bob::sp::Conv::Valid); 
     }
 
     // 3/ Perform contrast equalization

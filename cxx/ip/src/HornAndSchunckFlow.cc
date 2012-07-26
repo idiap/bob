@@ -35,7 +35,7 @@ void of::laplacian_avg_hs_opencv(const blitz::Array<double,2>& input,
   blitz::Array<double,2> inputExtra(bob::sp::getConvOutputSize(input, LAPLACIAN_014_KERNEL, bob::sp::Conv::Full));
   bob::sp::extrapolateMirror(input, inputExtra);
   bob::sp::conv(input, LAPLACIAN_014_KERNEL, output,
-      sp::Conv::Valid);
+      bob::sp::Conv::Valid);
 }
 
 static const double _12 = 1./12.;
@@ -48,7 +48,7 @@ void of::laplacian_avg_hs(const blitz::Array<double,2>& input,
   blitz::Array<double,2> inputExtra(bob::sp::getConvOutputSize(input, LAPLACIAN_12_KERNEL, bob::sp::Conv::Full));
   bob::sp::extrapolateMirror(input, inputExtra);
   bob::sp::conv(input, LAPLACIAN_12_KERNEL, output,
-      sp::Conv::Valid);
+      bob::sp::Conv::Valid);
 }
 of::VanillaHornAndSchunckFlow::VanillaHornAndSchunckFlow
 (const blitz::TinyVector<int,2>& shape) :

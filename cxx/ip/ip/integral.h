@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_IP_INTEGRAL_H
-#define BOB5SPRO_IP_INTEGRAL_H
+#ifndef BOB_IP_INTEGRAL_H
+#define BOB_IP_INTEGRAL_H
 
 #include "core/array_assert.h"
 #include "core/array_index.h"
@@ -120,4 +120,4 @@ namespace bob {
  */
 }
 
-#endif /* BOB5SPRO_IP_INTEGRAL_H */
+#endif /* BOB_IP_INTEGRAL_H */
