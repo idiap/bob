@@ -46,15 +46,15 @@ namespace bob {
    *   sequences of Local Binary Patterns, as described in the following
    *   article:
    */
-	class LBPHSFeatures
-	{
-  	public:
+  class LBPHSFeatures
+  {
+    public:
 
-	  	/**
+      /**
         * @brief Constructor: generates the LBPHSFeatures object
         * @warning Only LBP4R and LBP8R are currently supported
         */
-	    LBPHSFeatures( const int block_h, const int block_w, const int overlap_h,
+      LBPHSFeatures( const int block_h, const int block_w, const int overlap_h,
           const int overlap_w, const double lbp_r = 1, const int lbp_p = 8, 
           const bool circular = false, const bool to_average = false, 
           const bool add_average_bit = false, const bool uniform = false, 
@@ -73,21 +73,21 @@ namespace bob {
           throw bob::ip::LBPUnsupportedNNeighbours(m_lbp_p);
       }
 
-	  	/**
+      /**
         * @brief Destructor
         */
-	    virtual ~LBPHSFeatures() {
+      virtual ~LBPHSFeatures() {
         if( m_lbp!=0)
           delete m_lbp;
       }
 
-	  	/**
+      /**
         * @brief Process a 2D blitz Array/Image by extracting LBPHS features.
         * @param src The 2D input blitz array
         * @param dst A container (with a push_back method such as an STL list)
         *   of 1D uint32_t blitz arrays.
         */
-	    template <typename T, typename U> 
+      template <typename T, typename U> 
       void operator()(const blitz::Array<T,2>& src, U& dst);
 
       /**
@@ -105,7 +105,7 @@ namespace bob {
         */
       inline const uint64_t getNBins() { return m_lbp->getMaxLabel(); }
 
-	  private:
+    private:
       /**
         * Attributes
         */
@@ -116,7 +116,7 @@ namespace bob {
       int m_overlap_w;
       double m_lbp_r;
       int m_lbp_p;
-	};
+  };
 
   template <typename T, typename U> 
   void LBPHSFeatures::operator()(const blitz::Array<T,2>& src, 

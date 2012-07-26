@@ -40,47 +40,47 @@ namespace bob {
   /**
    * @brief This class can be used to process images with the Sobel operator
   */
-	class Sobel
-	{
-  	public:
+  class Sobel
+  {
+    public:
 
-	  	/**
+      /**
         * @brief Constructor: generates the Sobel kernel
         */
-	    Sobel(const bool up_positive=false, const bool left_positive=false, 
-        const enum sp::Conv::SizeOption size_opt=sp::Conv::Same,
-        const enum sp::Extrapolation::BorderType 
-          border_type=sp::Extrapolation::Mirror);
+      Sobel(const bool up_positive=false, const bool left_positive=false, 
+        const bob::sp::Conv::SizeOption size_opt=bob::sp::Conv::Same,
+        const bob::sp::Extrapolation::BorderType 
+          border_type=bob::sp::Extrapolation::Mirror);
 
-	  	/**
+      /**
         * @brief Destructor
         */
-	    virtual ~Sobel() {}
+      virtual ~Sobel() {}
 
-	  	/**
+      /**
         * @brief Process a 2D blitz Array/Image by applying the Sobel operator
         *   The resulting 3D array will contain two planes:
         *     - The first one for the convolution with the y-kernel
         *     - The second one for the convolution with the x-kernel
         * @warning The selected type should be signed (e.g. int64_t or double)
         */
-	    template <typename T> void operator()(const blitz::Array<T,2>& src, 
+      template <typename T> void operator()(const blitz::Array<T,2>& src, 
         blitz::Array<T,3>& dst);
 
-	  private:
-	  	/**
+    private:
+      /**
         * @brief Generates the Sobel kernels
         */
-  		void computeKernels();
+      void computeKernels();
 
       // Attributes
       blitz::Array<double, 2> m_kernel_y;
       blitz::Array<double, 2> m_kernel_x;
       bool m_up_positive;
       bool m_left_positive;
-      enum sp::Conv::SizeOption m_size_opt;
-      enum sp::Extrapolation::BorderType m_border_type;
-	};
+      bob::sp::Conv::SizeOption m_size_opt;
+      bob::sp::Extrapolation::BorderType m_border_type;
+  };
 
   template <typename T> 
   void Sobel::operator()(const blitz::Array<T,2>& src, blitz::Array<T,3>& dst)
@@ -95,29 +95,29 @@ namespace bob {
     blitz::Array<T,2> dst_y = dst(0, blitz::Range::all(), blitz::Range::all());
     blitz::Array<T,2> dst_x = dst(1, blitz::Range::all(), blitz::Range::all());
     // TODO: improve the way we deal with types
-    if(m_border_type == sp::Extrapolation::Zero || m_size_opt==sp::Conv::Valid)
+    if(m_border_type == bob::sp::Extrapolation::Zero || m_size_opt == bob::sp::Conv::Valid)
     {
      bob::sp::conv(src, bob::core::cast<T>(m_kernel_y), dst_y, m_size_opt);
      bob::sp::conv(src, bob::core::cast<T>(m_kernel_x), dst_x, m_size_opt);
     }
     else
     {
-      blitz::Array<T,2> tmpy(sp::getConvOutputSize(src, bob::core::cast<T>(m_kernel_y), sp::Conv::Full));
-      blitz::Array<T,2> tmpx(sp::getConvOutputSize(src, bob::core::cast<T>(m_kernel_x), sp::Conv::Full));
-      if(m_border_type == sp::Extrapolation::NearestNeighbour) {
-        sp::extrapolateNearest(src, tmpy);
-        sp::extrapolateNearest(src, tmpx);
+      blitz::Array<T,2> tmpy(bob::sp::getConvOutputSize(src, bob::core::cast<T>(m_kernel_y), bob::sp::Conv::Full));
+      blitz::Array<T,2> tmpx(bob::sp::getConvOutputSize(src, bob::core::cast<T>(m_kernel_x), bob::sp::Conv::Full));
+      if(m_border_type == bob::sp::Extrapolation::NearestNeighbour) {
+        bob::sp::extrapolateNearest(src, tmpy);
+        bob::sp::extrapolateNearest(src, tmpx);
       }
-      else if(m_border_type == sp::Extrapolation::Circular) {
-        sp::extrapolateCircular(src, tmpy);
-        sp::extrapolateCircular(src, tmpx);
+      else if(m_border_type == bob::sp::Extrapolation::Circular) {
+        bob::sp::extrapolateCircular(src, tmpy);
+        bob::sp::extrapolateCircular(src, tmpx);
       }
-      else if(m_border_type == sp::Extrapolation::Mirror) {
-        sp::extrapolateMirror(src, tmpy);
-        sp::extrapolateMirror(src, tmpx);
+      else if(m_border_type == bob::sp::Extrapolation::Mirror) {
+        bob::sp::extrapolateMirror(src, tmpy);
+        bob::sp::extrapolateMirror(src, tmpx);
       }
-      bob::sp::conv(tmpy, bob::core::cast<T>(m_kernel_y), dst_y, sp::Conv::Valid);
-      bob::sp::conv(tmpx, bob::core::cast<T>(m_kernel_x), dst_x, sp::Conv::Valid);
+      bob::sp::conv(tmpy, bob::core::cast<T>(m_kernel_y), dst_y, bob::sp::Conv::Valid);
+      bob::sp::conv(tmpx, bob::core::cast<T>(m_kernel_x), dst_x, bob::sp::Conv::Valid);
     }
   }
 

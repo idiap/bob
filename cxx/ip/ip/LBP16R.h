@@ -224,7 +224,7 @@ namespace bob { namespace ip {
 
         /*A real circle*/
         if(m_R==m_R2)
-	{
+        {
           const double R_sqrt2 = m_R / sqrt(2);
           const double long_cath = m_R * cos(alpha);
           const double short_cath = m_R * sin(alpha);

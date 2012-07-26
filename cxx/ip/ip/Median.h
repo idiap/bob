@@ -31,12 +31,12 @@
 
 namespace bob {
 
-	/**
-	 * \ingroup libip_api
-	 * @{
-	 *
-	 */
-	namespace ip {
+  /**
+   * \ingroup libip_api
+   * @{
+   *
+   */
+  namespace ip {
 
     namespace detail {
       template <typename T>
@@ -85,18 +85,18 @@ namespace bob {
       * @brief This class allows to filter an image with a median filter
       */
     template <typename T> 
-		class Median
-		{
-  		public:
-			  /**
-  			 * @brief Creates an object to filter images with a median filter
-	  		 * @param radius_y The height of the kernel along the y-axis
-	  		 * @param radius_x The width of the kernel along the x-axis
-			   */
-	  		Median(const int radius_y=1, const int radius_x=1): 
+    class Median
+    {
+      public:
+        /**
+         * @brief Creates an object to filter images with a median filter
+         * @param radius_y The height of the kernel along the y-axis
+         * @param radius_x The width of the kernel along the x-axis
+         */
+        Median(const int radius_y=1, const int radius_x=1): 
           m_radius_y(radius_y), m_radius_x(radius_x),
           m_median_pos((2*radius_y+1)*(2*radius_x+1)/2)
-  			{
+        {
         }
 
         virtual ~Median() 
@@ -147,7 +147,7 @@ namespace bob {
 
         /**
          * @brief Attributes
-         */	
+         */  
         int m_radius_y;
         int m_radius_x;
         int m_median_pos;
@@ -268,7 +268,7 @@ namespace bob {
       }
     }
 
-	}
+  }
 }
 
 #endif
