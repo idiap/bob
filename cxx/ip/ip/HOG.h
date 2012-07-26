@@ -115,14 +115,33 @@ namespace bob {
           const size_t block_ov_y=0, const size_t block_ov_x=0);
 
         /**
+          * Copy constructor
+          */
+        HOG(const HOG& other);
+
+        /**
           * Destructor
           */
         virtual ~HOG() {}
 
         /**
+          * @brief Assignment operator
+          */
+        HOG& operator=(const HOG& other);
+
+        /**
+          * @brief Equal to
+          */
+        bool operator==(const HOG& b) const;
+        /**
+          * @brief Not equal to
+          */
+        bool operator!=(const HOG& b) const; 
+ 
+        /**
           * Getters
           */
-        inline bool getFullOrientation() const { return m_full_orientation; }
+        bool getFullOrientation() const { return m_full_orientation; }
         /**
           * Setters
           */
@@ -146,7 +165,8 @@ namespace bob {
 
     template <typename T>
     HOG<T>::HOG(const size_t height, 
-        const size_t width, const size_t cell_dim, const bool full_orientation, 
+        const size_t width, const size_t cell_dim, 
+        const bool full_orientation, 
         const size_t cell_y, const size_t cell_x, 
         const size_t cell_ov_y, const size_t cell_ov_x,
         const size_t block_y, const size_t block_x, 
@@ -159,6 +179,37 @@ namespace bob {
     }
 
     template <typename T>
+    HOG<T>::HOG(const HOG& other):
+      BlockCellGradientDescriptors<T,double>(other),
+      m_full_orientation(other.m_full_orientation)
+    {      
+    }
+
+    template <typename T>
+    HOG<T>& HOG<T>::operator=(const HOG<T>& other)
+    {
+      if(this != &other)
+      {
+        BlockCellGradientDescriptors<T,double>::operator=(other);
+        m_full_orientation = other.m_full_orientation;
+      }
+      return *this;
+    }
+
+    template <typename T>
+    bool HOG<T>::operator==(const HOG<T>& b) const
+    {
+      return (BlockCellGradientDescriptors<T,double>::operator==(b) && 
+              this->m_full_orientation == b.m_full_orientation);
+    }
+
+    template <typename T>
+    bool HOG<T>::operator!=(const HOG<T>& b) const
+    {
+      return !(this->operator==(b));
+    }
+
+    template <typename T>
     void HOG<T>::forward_(const blitz::Array<T,2>& input, 
       blitz::Array<double,3>& output)
     {
@@ -167,15 +218,18 @@ namespace bob {
       BlockCellDescriptors<T,double>::m_cell_descriptor = 0.;
       blitz::Range rall = blitz::Range::all();
       for(size_t cy=0; cy<BlockCellDescriptors<T,double>::m_nb_cells_y; ++cy)
-        for(size_t cx=0; cx<BlockCellDescriptors<T,double>::m_nb_cells_x; ++cx)
+        for(size_t cx=0; cx<BlockCellDescriptors<T,double>::m_nb_cells_x; 
+          ++cx)
         {
           blitz::Array<double,1> hist = 
             BlockCellDescriptors<T,double>::m_cell_descriptor(cy,cx,rall);
           blitz::Array<double,2> mag = 
-            BlockCellGradientDescriptors<T,double>::m_cell_magnitude(cy,cx,rall,rall);
+            BlockCellGradientDescriptors<T,double>::m_cell_magnitude(cy,cx,
+                                                              rall,rall);
           blitz::Array<double,2> ori = 
-            BlockCellGradientDescriptors<T,double>::m_cell_orientation(cy,cx,rall,rall);
-          bob::ip::hogComputeHistogram_(mag, ori, hist, false, 
+            BlockCellGradientDescriptors<T,double>::m_cell_orientation(cy,cx,
+                                                              rall,rall);
+          hogComputeHistogram_(mag, ori, hist, false, 
             m_full_orientation);
         }
 

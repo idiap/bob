@@ -79,7 +79,13 @@ class HOGTest(unittest.TestCase):
     ori = numpy.zeros(shape=(5,5), dtype='float64')
 
     # Magnitude
+    hgm(SRC_A, mag, ori)
+    numpy.allclose(mag, MAG1_A, EPSILON)
+    numpy.allclose(ori, ORI_A, EPSILON)
     hgm.forward(SRC_A, mag, ori)
+    numpy.allclose(mag, MAG1_A, EPSILON)
+    numpy.allclose(ori, ORI_A, EPSILON)
+    hgm.forward_(SRC_A, mag, ori)
     numpy.allclose(mag, MAG1_A, EPSILON)
     numpy.allclose(ori, ORI_A, EPSILON)
 
@@ -89,17 +95,52 @@ class HOGTest(unittest.TestCase):
     numpy.allclose(mag, MAG2_A, EPSILON)
     numpy.allclose(ori, ORI_A, EPSILON)
 
-    # Magnitude
+    # SqrtMagnitude
     hgm.magnitude_type = bob.ip.GradientMagnitudeType.SqrtMagnitude
     hgm.forward(SRC_A, mag, ori)
     numpy.allclose(mag, MAGSQRT_A, EPSILON)
     numpy.allclose(ori, ORI_A, EPSILON)
 
-    # Magnitude
+    # SqrtMagnitude
     hgm.forward(SRC_B, mag, ori)
     numpy.allclose(mag, MAG_B, EPSILON)
     numpy.allclose(ori, ORI_B, EPSILON) 
 
+    # Equal/Not equal operator
+    hgm.magnitude_type = bob.ip.GradientMagnitudeType.Magnitude
+    hgm2 = bob.ip.GradientMaps(5,5)
+    self.assertTrue(  hgm == hgm2 )
+    self.assertFalse( hgm != hgm2 )
+    hgm2.height = 6
+    self.assertFalse( hgm == hgm2 )
+    self.assertTrue(  hgm != hgm2 )
+    hgm2.height = 5
+    self.assertTrue(  hgm == hgm2 )
+    self.assertFalse( hgm != hgm2 )
+    hgm2.width = 6
+    self.assertFalse( hgm == hgm2 )
+    self.assertTrue(  hgm != hgm2 )
+    hgm2.width = 5
+    self.assertTrue(  hgm == hgm2 )
+    self.assertFalse( hgm != hgm2 )
+    hgm2.magnitude_type = bob.ip.GradientMagnitudeType.MagnitudeSquare
+    self.assertFalse( hgm == hgm2 )
+    self.assertTrue(  hgm != hgm2 )
+    hgm2.magnitude_type = bob.ip.GradientMagnitudeType.Magnitude
+    self.assertTrue(  hgm == hgm2 )
+    self.assertFalse( hgm != hgm2 )
+
+    # Resize
+    hgm.resize(7,7)
+    self.assertTrue(  hgm.height == 7 )
+    self.assertTrue(  hgm.width == 7 )
+
+    # Copy constructor
+    hgm3 = bob.ip.GradientMaps(hgm)
+    self.assertTrue(  hgm == hgm3 )
+    self.assertFalse( hgm != hgm3 )
+    
+    
   def test02_hogComputeCellHistogram(self):
     """Test the HOG computation for a given cell using hog_compute_cell()"""
 
@@ -223,7 +264,119 @@ class HOGTest(unittest.TestCase):
     hist_3D = numpy.ndarray(dtype='float64', shape=(1,1,32))
     hog.forward(IMG_8x8_A, hist_3D)
     self.assertTrue( numpy.allclose( hist_3D, HIST_IMG_A, EPSILON))
+    hog.forward(IMG_8x8_A.astype(numpy.uint8), hist_3D)
+    self.assertTrue( numpy.allclose( hist_3D, HIST_IMG_A, EPSILON))
+    hog.forward(IMG_8x8_A.astype(numpy.uint16), hist_3D)
+    self.assertTrue( numpy.allclose( hist_3D, HIST_IMG_A, EPSILON))
 
+    # Check equal/not equal operators
+    hog1 = bob.ip.HOG(8,8)
+    hog2 = bob.ip.HOG(8,8)
+    self.assertTrue(  hog1 == hog2 )
+    self.assertFalse( hog1 != hog2 )
+    hog1.width = 9
+    self.assertFalse( hog1 == hog2 )
+    self.assertTrue(  hog1 != hog2 )
+    hog1.width = 8
+    self.assertTrue(  hog1 == hog2 )
+    self.assertFalse( hog1 != hog2 )
+    hog1.height = 9
+    self.assertFalse( hog1 == hog2 )
+    self.assertTrue(  hog1 != hog2 )
+    hog1.height = 8
+    self.assertTrue(  hog1 == hog2 )
+    self.assertFalse( hog1 != hog2 )
+    hog1.magnitude_type = bob.ip.GradientMagnitudeType.SqrtMagnitude
+    self.assertFalse( hog1 == hog2 )
+    self.assertTrue(  hog1 != hog2 )
+    hog1.magnitude_type = bob.ip.GradientMagnitudeType.Magnitude
+    self.assertTrue(  hog1 == hog2 )
+    self.assertFalse( hog1 != hog2 )
+    hog1.cell_dim = 10
+    self.assertFalse( hog1 == hog2 )
+    self.assertTrue(  hog1 != hog2 )
+    hog1.cell_dim = 8
+    self.assertTrue(  hog1 == hog2 )
+    self.assertFalse( hog1 != hog2 )
+    hog1.full_orientation = True
+    self.assertFalse( hog1 == hog2 )
+    self.assertTrue(  hog1 != hog2 )
+    hog1.full_orientation = False
+    self.assertTrue(  hog1 == hog2 )
+    self.assertFalse( hog1 != hog2 )
+    hog1.cell_y = 6
+    self.assertFalse( hog1 == hog2 )
+    self.assertTrue(  hog1 != hog2 )
+    hog1.cell_y = 4
+    self.assertTrue(  hog1 == hog2 )
+    self.assertFalse( hog1 != hog2 )
+    hog1.cell_x = 6
+    self.assertFalse( hog1 == hog2 )
+    self.assertTrue(  hog1 != hog2 )
+    hog1.cell_x = 4
+    self.assertTrue(  hog1 == hog2 )
+    self.assertFalse( hog1 != hog2 )
+    hog1.cell_ov_y = 2
+    self.assertFalse( hog1 == hog2 )
+    self.assertTrue(  hog1 != hog2 )
+    hog1.cell_ov_y = 0
+    self.assertTrue(  hog1 == hog2 )
+    self.assertFalse( hog1 != hog2 )
+    hog1.cell_ov_x = 2
+    self.assertFalse( hog1 == hog2 )
+    self.assertTrue(  hog1 != hog2 )
+    hog1.cell_ov_x = 0
+    self.assertTrue(  hog1 == hog2 )
+    self.assertFalse( hog1 != hog2 )
+    hog1.block_y = 6
+    self.assertFalse( hog1 == hog2 )
+    self.assertTrue(  hog1 != hog2 )
+    hog1.block_y = 4
+    self.assertTrue(  hog1 == hog2 )
+    self.assertFalse( hog1 != hog2 )
+    hog1.block_x = 6
+    self.assertFalse( hog1 == hog2 )
+    self.assertTrue(  hog1 != hog2 )
+    hog1.block_x = 4
+    self.assertTrue(  hog1 == hog2 )
+    self.assertFalse( hog1 != hog2 )
+    hog1.block_ov_y = 2
+    self.assertFalse( hog1 == hog2 )
+    self.assertTrue(  hog1 != hog2 )
+    hog1.block_ov_y = 0
+    self.assertTrue(  hog1 == hog2 )
+    self.assertFalse( hog1 != hog2 )
+    hog1.block_ov_x = 2
+    self.assertFalse( hog1 == hog2 )
+    self.assertTrue(  hog1 != hog2 )
+    hog1.block_ov_x = 0
+    self.assertTrue(  hog1 == hog2 )
+    self.assertFalse( hog1 != hog2 )
+    hog1.block_norm = bob.ip.BlockNorm.L1
+    self.assertFalse( hog1 == hog2 )
+    self.assertTrue(  hog1 != hog2 )
+    hog1.block_norm = bob.ip.BlockNorm.L2
+    self.assertTrue(  hog1 == hog2 )
+    self.assertFalse( hog1 != hog2 )
+    hog1.block_norm_eps = 1e-6
+    self.assertFalse( hog1 == hog2 )
+    self.assertTrue(  hog1 != hog2 )
+    hog1.block_norm_eps = 1e-10
+    self.assertTrue(  hog1 == hog2 )
+    self.assertFalse( hog1 != hog2 )
+    hog1.block_norm_threshold = 0.4
+    self.assertFalse( hog1 == hog2 )
+    self.assertTrue(  hog1 != hog2 )
+    hog1.block_norm_threshold = 0.2
+    self.assertTrue(  hog1 == hog2 )
+    self.assertFalse( hog1 != hog2 )
+
+    # Copy constructor
+    hog2.resize(16,16)
+    hog3 = bob.ip.HOG(hog2)
+    self.assertTrue(  hog3 == hog2 )
+    self.assertFalse( hog3 != hog2 )
+    
 
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(HOGTest)

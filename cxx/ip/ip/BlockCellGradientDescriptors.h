@@ -32,10 +32,10 @@
 #include <boost/shared_ptr.hpp>
 
 namespace bob {
-/**
- * \ingroup libip_api
- * @{
- */
+  /**
+    * \ingroup libip_api
+    * @{
+    */
   namespace ip {
 
     /**
@@ -59,9 +59,27 @@ namespace bob {
         GradientMaps(const size_t height, const size_t width, 
           const GradientMagnitudeType mag_type=Magnitude);
         /**
+          * Copy constructor
+          */
+        GradientMaps(const GradientMaps& other);
+        /**
           * Destructor
           */
-        ~GradientMaps() {}
+        virtual ~GradientMaps() {}
+
+        /**
+         * @brief Assignment operator
+         */
+        GradientMaps& operator=(const GradientMaps& other);
+        /**
+         * @brief Equal to
+         */
+        bool operator==(const GradientMaps& b) const;
+        /**
+         * @brief Not equal to
+         */
+        bool operator!=(const GradientMaps& b) const; 
+ 
         /**
           * Sets the height
           */
@@ -82,16 +100,15 @@ namespace bob {
         /**
           * Returns the current height
           */
-        inline const size_t getHeight() const { return m_gy.extent(0); }
+        size_t getHeight() const { return m_gy.extent(0); }
         /**
           * Returns the current width
           */
-        inline const size_t getWidth() const { return m_gy.extent(1); }
+        size_t getWidth() const { return m_gy.extent(1); }
         /**
           * Returns the magnitude type used
           */
-        inline const GradientMagnitudeType 
-        getGradientMagnitudeType() const
+        GradientMagnitudeType getGradientMagnitudeType() const
         { return m_mag_type; }
 
         /**
@@ -99,10 +116,12 @@ namespace bob {
           */
         template <typename T>
         void forward(const blitz::Array<T,2>& input, 
-          blitz::Array<double,2>& magnitude, blitz::Array<double,2>& orientation);
+          blitz::Array<double,2>& magnitude, 
+          blitz::Array<double,2>& orientation);
         template <typename T>
         void forward_(const blitz::Array<T,2>& input, 
-          blitz::Array<double,2>& magnitude, blitz::Array<double,2>& orientation);
+          blitz::Array<double,2>& magnitude, 
+          blitz::Array<double,2>& orientation);
 
       private:
         blitz::Array<double,2> m_gy;
@@ -125,7 +144,8 @@ namespace bob {
           magnitude = blitz::pow2(m_gy) + blitz::pow2(m_gx);
           break;
         case SqrtMagnitude:
-          magnitude = blitz::sqrt(blitz::sqrt(blitz::pow2(m_gy) + blitz::pow2(m_gx)));
+          magnitude = blitz::sqrt(blitz::sqrt(blitz::pow2(m_gy) + 
+                                  blitz::pow2(m_gx)));
           break;
         case Magnitude: 
         default: 
@@ -169,14 +189,33 @@ namespace bob {
           const size_t block_ov_y=0, const size_t block_ov_x=0);
 
         /**
+          * Copy constructor
+          */
+        BlockCellGradientDescriptors(const BlockCellGradientDescriptors& b);
+
+        /**
           * Destructor
           */
         virtual ~BlockCellGradientDescriptors() {}
 
         /**
+         * @brief Assignment operator
+         */
+        BlockCellGradientDescriptors& operator=(
+          const BlockCellGradientDescriptors& other);
+        /**
+         * @brief Equal to
+         */
+        bool operator==(const BlockCellGradientDescriptors& b) const;
+        /**
+         * @brief Not equal to
+         */
+        bool operator!=(const BlockCellGradientDescriptors& b) const; 
+ 
+        /**
           * Getters
           */
-        inline GradientMagnitudeType getGradientMagnitudeType() const
+        GradientMagnitudeType getGradientMagnitudeType() const
         { return m_gradient_maps->getGradientMagnitudeType(); }
         /**
           * Setters
@@ -216,8 +255,8 @@ namespace bob {
     };
 
     template <typename T, typename U>
-    BlockCellGradientDescriptors<T,U>::BlockCellGradientDescriptors(const size_t height, 
-        const size_t width, const size_t cell_dim, 
+    BlockCellGradientDescriptors<T,U>::BlockCellGradientDescriptors(
+        const size_t height, const size_t width, const size_t cell_dim, 
         const size_t cell_y, const size_t cell_x, 
         const size_t cell_ov_y, const size_t cell_ov_x,
         const size_t block_y, const size_t block_x, 
@@ -229,6 +268,46 @@ namespace bob {
       resizeCache();
     }
 
+    template <typename T, typename U>
+    BlockCellGradientDescriptors<T,U>::BlockCellGradientDescriptors(
+        const BlockCellGradientDescriptors<T,U>& b):
+      BlockCellDescriptors<T,U>(b), 
+      m_gradient_maps(new GradientMaps(b.m_height, b.m_width, 
+                            b.getGradientMagnitudeType()))
+    {
+      resizeCache();
+    }
+
+    template <typename T, typename U>
+    BlockCellGradientDescriptors<T,U>&
+    BlockCellGradientDescriptors<T,U>::operator=(
+        const BlockCellGradientDescriptors<T,U>& other)
+    {
+      if(this != &other)
+      {
+        BlockCellDescriptors<T,U>::operator=(other);
+        m_gradient_maps.reset(new GradientMaps(other.m_height, other.m_width,
+                                          other.getGradientMagnitudeType()));
+        resizeCache();
+      }
+      return *this;
+    }
+
+    template <typename T, typename U>
+    bool BlockCellGradientDescriptors<T,U>::operator==(
+        const BlockCellGradientDescriptors<T,U>& b) const
+    {
+      return (BlockCellDescriptors<T,U>::operator==(b) && 
+              *(this->m_gradient_maps) == *(b.m_gradient_maps));
+    }
+ 
+    template <typename T, typename U>
+    bool BlockCellGradientDescriptors<T,U>::operator!=(
+        const BlockCellGradientDescriptors<T,U>& b) const
+    {
+      return !(this->operator==(b));
+    }
+ 
     template <typename T, typename U>
     void BlockCellGradientDescriptors<T,U>::resizeCache()
     {
@@ -250,10 +329,12 @@ namespace bob {
       BlockCellDescriptors<T,U>::resizeCellCache();
       // Resizes everything else
       m_cell_magnitude.resize(BlockCellDescriptors<T,U>::m_nb_cells_y, 
-        BlockCellDescriptors<T,U>::m_nb_cells_x, BlockCellDescriptors<T,U>::m_cell_y, 
+        BlockCellDescriptors<T,U>::m_nb_cells_x, 
+        BlockCellDescriptors<T,U>::m_cell_y, 
         BlockCellDescriptors<T,U>::m_cell_x);
       m_cell_orientation.resize(BlockCellDescriptors<T,U>::m_nb_cells_y, 
-        BlockCellDescriptors<T,U>::m_nb_cells_x, BlockCellDescriptors<T,U>::m_cell_y, 
+        BlockCellDescriptors<T,U>::m_nb_cells_x, 
+        BlockCellDescriptors<T,U>::m_cell_y, 
         BlockCellDescriptors<T,U>::m_cell_x);
     }
 
@@ -265,12 +346,16 @@ namespace bob {
       m_gradient_maps->forward_(input, m_magnitude, m_orientation);
       
       // Performs the block decomposition on the Gradients maps
-      bob::ip::block(m_magnitude, m_cell_magnitude, 
-        BlockCellDescriptors<T,U>::m_cell_y, BlockCellDescriptors<T,U>::m_cell_x,
-        BlockCellDescriptors<T,U>::m_cell_ov_y, BlockCellDescriptors<T,U>::m_cell_ov_x);
-      bob::ip::block(m_orientation, m_cell_orientation, 
-        BlockCellDescriptors<T,U>::m_cell_y, BlockCellDescriptors<T,U>::m_cell_x,
-        BlockCellDescriptors<T,U>::m_cell_ov_y, BlockCellDescriptors<T,U>::m_cell_ov_x); 
+      block(m_magnitude, m_cell_magnitude, 
+        BlockCellDescriptors<T,U>::m_cell_y, 
+        BlockCellDescriptors<T,U>::m_cell_x,
+        BlockCellDescriptors<T,U>::m_cell_ov_y, 
+        BlockCellDescriptors<T,U>::m_cell_ov_x);
+      block(m_orientation, m_cell_orientation, 
+        BlockCellDescriptors<T,U>::m_cell_y, 
+        BlockCellDescriptors<T,U>::m_cell_x,
+        BlockCellDescriptors<T,U>::m_cell_ov_y, 
+        BlockCellDescriptors<T,U>::m_cell_ov_x); 
     }
 
   }

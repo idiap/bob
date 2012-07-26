@@ -29,13 +29,11 @@
 #include "ip/block.h"
 #include <boost/shared_ptr.hpp>
 
-#include <iostream>
-
 namespace bob {
-/**
- * \ingroup libip_api
- * @{
- */
+  /**
+    * \ingroup libip_api
+    * @{
+    */
   namespace ip {
 
     namespace detail {
@@ -123,34 +121,38 @@ namespace bob {
       switch(block_norm)
       {
         case None:
-          bob::ip::detail::vectorizeMultArray(descr, norm_descr);
+          detail::vectorizeMultArray(descr, norm_descr);
           break;
         case L2Hys:
           // Normalizes to unit length (using L2)
-          sumInv = 1. / sqrt(blitz::sum(blitz::pow2(blitz::abs(descr))) + eps*eps);
-          bob::ip::detail::vectorizeMultArray(descr, norm_descr, sumInv);
+          sumInv = 1. / sqrt(blitz::sum(blitz::pow2(blitz::abs(descr))) +
+                              eps*eps);
+          detail::vectorizeMultArray(descr, norm_descr, sumInv);
           // Clips values above threshold
-          norm_descr = blitz::where(blitz::abs(norm_descr) <= threshold, norm_descr, threshold);
+          norm_descr = blitz::where(blitz::abs(norm_descr) <= threshold, 
+                                    norm_descr, threshold);
           // Normalizes to unit length (using L2)
-          sumInv = 1. / sqrt(blitz::sum(blitz::pow2(blitz::abs(norm_descr))) + eps*eps);
+          sumInv = 1. / sqrt(blitz::sum(blitz::pow2(blitz::abs(norm_descr))) +
+                              eps*eps);
           norm_descr = norm_descr * sumInv;
           break;
         case L1:
           // Normalizes to unit length (using L1)
           sumInv = 1. / (blitz::sum(blitz::abs(descr)) + eps);
-          bob::ip::detail::vectorizeMultArray(descr, norm_descr, sumInv);
+          detail::vectorizeMultArray(descr, norm_descr, sumInv);
           break;
         case L1sqrt:
           // Normalizes to unit length (using L1)
           sumInv = 1. / (blitz::sum(blitz::abs(descr)) + eps);
-          bob::ip::detail::vectorizeMultArray(descr, norm_descr, sumInv);
+          detail::vectorizeMultArray(descr, norm_descr, sumInv);
           norm_descr = blitz::sqrt(norm_descr);
           break;
         case L2:
         default:
           // Normalizes to unit length (using L2)
-          sumInv = 1. / sqrt(blitz::sum(blitz::pow2(blitz::abs(descr))) + eps*eps);
-          bob::ip::detail::vectorizeMultArray(descr, norm_descr, sumInv);
+          sumInv = 1. / sqrt(blitz::sum(blitz::pow2(blitz::abs(descr))) +
+                              eps*eps);
+          detail::vectorizeMultArray(descr, norm_descr, sumInv);
           break;
       }
     }
@@ -168,7 +170,7 @@ namespace bob {
       * @param threshold The threshold used for the block normalization
       *   This is only used with the L2Hys norm, for the clipping of large 
       *   values.
-     */ 
+      */ 
     template <typename U, int D>
     void normalizeBlock(const blitz::Array<U,D>& descr,
       blitz::Array<U,1>& norm_descr, const BlockNorm block_norm=L2,
@@ -177,7 +179,8 @@ namespace bob {
       // Checks input/output arrays
       int ndescr=1;
       for(int d=0; d<D; ++d) ndescr *= descr.extent(d);
-      bob::core::array::assertSameDimensionLength(ndescr, norm_descr.extent(0));
+      bob::core::array::assertSameDimensionLength(ndescr, 
+        norm_descr.extent(0));
 
       // Normalizes
       normalizeBlock_(descr, norm_descr, block_norm, eps, threshold);
@@ -203,10 +206,29 @@ namespace bob {
           const size_t block_ov_y=0, const size_t block_ov_x=0);
 
         /**
+          * @brief Copy constructor
+          */
+        BlockCellDescriptors(const BlockCellDescriptors& other);
+
+        /**
           * Destructor
           */
         virtual ~BlockCellDescriptors() {}
 
+        /**
+          * @brief Assignment operator
+          */
+        BlockCellDescriptors& operator=(const BlockCellDescriptors& other);
+
+        /**
+          * @brief Equal to
+          */
+        bool operator==(const BlockCellDescriptors& b) const;
+        /**
+          * @brief Not equal to
+          */
+        bool operator!=(const BlockCellDescriptors& b) const; 
+ 
         /**
           * Resizes the cache
           */
@@ -215,20 +237,20 @@ namespace bob {
         /**
           * Getters
           */
-        inline size_t getHeight() const { return m_height; }
-        inline size_t getWidth() const { return m_width; }
-        inline size_t getCellDim() const { return m_cell_dim; }
-        inline size_t getCellHeight() const { return m_cell_y; }
-        inline size_t getCellWidth() const { return m_cell_x; }
-        inline size_t getCellOverlapHeight() const { return m_cell_ov_y; }
-        inline size_t getCellOverlapWidth() const { return m_cell_ov_x; }
-        inline size_t getBlockHeight() const { return m_block_y; }
-        inline size_t getBlockWidth() const { return m_block_x; }
-        inline size_t getBlockOverlapHeight() const { return m_block_ov_y; }
-        inline size_t getBlockOverlapWidth() const { return m_block_ov_x; }
-        inline BlockNorm getBlockNorm() const { return m_block_norm; }
-        inline double getBlockNormEps() const { return m_block_norm_eps; }
-        inline double getBlockNormThreshold() const { return m_block_norm_threshold; }
+        size_t getHeight() const { return m_height; }
+        size_t getWidth() const { return m_width; }
+        size_t getCellDim() const { return m_cell_dim; }
+        size_t getCellHeight() const { return m_cell_y; }
+        size_t getCellWidth() const { return m_cell_x; }
+        size_t getCellOverlapHeight() const { return m_cell_ov_y; }
+        size_t getCellOverlapWidth() const { return m_cell_ov_x; }
+        size_t getBlockHeight() const { return m_block_y; }
+        size_t getBlockWidth() const { return m_block_x; }
+        size_t getBlockOverlapHeight() const { return m_block_ov_y; }
+        size_t getBlockOverlapWidth() const { return m_block_ov_x; }
+        BlockNorm getBlockNorm() const { return m_block_norm; }
+        double getBlockNormEps() const { return m_block_norm_eps; }
+        double getBlockNormThreshold() const { return m_block_norm_threshold; }
         /**
           * Setters
           */
@@ -262,8 +284,8 @@ namespace bob {
         { m_block_norm_threshold = block_norm_threshold; }
 
         /**
-          * Disable block normalization. This is performed by setting parameters
-          * such that the cells are not further processed, that is
+          * Disable block normalization. This is performed by setting 
+          * parameters such that the cells are not further processed, that is
           * block_y=1, block_x=1, block_ov_y=0, block_ov_x=0, and 
           * block_norm=None.
           */
@@ -271,7 +293,8 @@ namespace bob {
 
         /**
           * Gets the descriptor output size given the current parameters and
-          * size. (number of blocks along Y x number of block along X x number of bins)
+          * size. (number of blocks along Y x number of block along X x number 
+          *       of bins)
           */
         const blitz::TinyVector<int,3> getOutputShape() const;
 
@@ -340,13 +363,84 @@ namespace bob {
       m_cell_ov_y(cell_ov_y), m_cell_ov_x(cell_ov_x), 
       m_block_y(block_y), m_block_x(block_x), 
       m_block_ov_y(block_ov_y), m_block_ov_x(block_ov_x), 
-      m_block_norm(L2), m_block_norm_eps(1e-10), m_block_norm_threshold(0.2) 
+      m_block_norm(L2), m_block_norm_eps(1e-10), m_block_norm_threshold(0.2)
     {
       resizeCache();
     }
 
     template <typename T, typename U>
-    void BlockCellDescriptors<T,U>::resize(const size_t height, const size_t width)
+    BlockCellDescriptors<T,U>::BlockCellDescriptors(
+      const BlockCellDescriptors<T,U>& other)
+    {
+      m_height = other.m_height;
+      m_width = other.m_width;
+      m_cell_dim = other.m_cell_dim;
+      m_cell_y = other.m_cell_y;
+      m_cell_x = other.m_cell_x;
+      m_cell_ov_y = other.m_cell_ov_y;
+      m_cell_ov_x = other.m_cell_ov_x;
+      m_block_y = other.m_block_y;
+      m_block_x = other.m_block_x;
+      m_block_ov_y = other.m_block_ov_y;
+      m_block_ov_x = other.m_block_ov_x;
+      m_block_norm = other.m_block_norm;
+      m_block_norm_eps = other.m_block_norm_eps;
+      m_block_norm_threshold = other.m_block_norm_threshold;
+      resizeCache();
+    }
+
+    template <typename T, typename U>
+    BlockCellDescriptors<T,U>& BlockCellDescriptors<T,U>::operator=(
+      const BlockCellDescriptors<T,U>& other)
+    {
+      if (this != &other)
+      {
+        m_height = other.m_height;
+        m_width = other.m_width;
+        m_cell_dim = other.m_cell_dim;
+        m_cell_y = other.m_cell_y;
+        m_cell_x = other.m_cell_x;
+        m_cell_ov_y = other.m_cell_ov_y;
+        m_cell_ov_x = other.m_cell_ov_x;
+        m_block_y = other.m_block_y;
+        m_block_x = other.m_block_x;
+        m_block_ov_y = other.m_block_ov_y;
+        m_block_ov_x = other.m_block_ov_x;
+        m_block_norm = other.m_block_norm;
+        m_block_norm_eps = other.m_block_norm_eps;
+        m_block_norm_threshold = other.m_block_norm_threshold;
+        resizeCache();
+      }
+      return *this;
+    }
+
+    template <typename T, typename U>
+    bool 
+    BlockCellDescriptors<T,U>::operator==(const BlockCellDescriptors& b) const
+    {
+      return (m_height == b.m_height && m_width == b.m_width &&
+              m_cell_dim == b.m_cell_dim && 
+              m_cell_y == b.m_cell_y && m_cell_x == b.m_cell_x && 
+              m_cell_ov_y == b.m_cell_ov_y && 
+              m_cell_ov_x == b.m_cell_ov_x && 
+              m_block_y == b.m_block_y && m_block_x == b.m_block_x && 
+              m_block_ov_y == b.m_block_ov_y && 
+              m_block_ov_x == b.m_block_ov_x && 
+              m_block_norm == b.m_block_norm && 
+              m_block_norm_eps == b.m_block_norm_eps && 
+              m_block_norm_threshold == b.m_block_norm_threshold);
+    }
+
+    template <typename T, typename U>
+    bool 
+    BlockCellDescriptors<T,U>::operator!=(const BlockCellDescriptors& b) const
+    {
+      return !(this->operator==(b));
+    }
+
+    template <typename T, typename U>
+    void 
+    BlockCellDescriptors<T,U>::resize(const size_t height, const size_t width)
     {
       m_height = height;
       m_width = width;
@@ -364,7 +458,7 @@ namespace bob {
     void BlockCellDescriptors<T,U>::resizeCellCache()
     {
       // Resizes the cell-related arrays
-      const blitz::TinyVector<int,4> nb_cells = bob::ip::getBlock4DOutputShape(
+      const blitz::TinyVector<int,4> nb_cells = getBlock4DOutputShape(
           m_height, m_width, m_cell_y, m_cell_x, m_cell_ov_y, m_cell_ov_x);
       m_cell_descriptor.resize(nb_cells(0), nb_cells(1), m_cell_dim);
       
@@ -380,7 +474,7 @@ namespace bob {
     void BlockCellDescriptors<T,U>::resizeBlockCache()
     {
       // Determines the number of blocks per row and column
-      blitz::TinyVector<int,4> nb_blocks = ip::getBlock4DOutputShape(
+      blitz::TinyVector<int,4> nb_blocks = getBlock4DOutputShape(
         m_nb_cells_y, m_nb_cells_x, m_block_y, m_block_x, m_block_ov_y, 
         m_block_ov_x);
 
@@ -424,16 +518,16 @@ namespace bob {
           blitz::Range rx(bx,bx+m_block_x-1);
           blitz::Array<double,3> cells_block = m_cell_descriptor(ry,rx,rall);
           blitz::Array<double,1> block = output(by,bx,rall);
-          bob::ip::normalizeBlock_(cells_block, block, m_block_norm, 
+          normalizeBlock_(cells_block, block, m_block_norm, 
             m_block_norm_eps, m_block_norm_threshold);
         }
     }
 
   }
 
-/**
- * @}
- */
+  /**
+    * @}
+    */
 }
 
 #endif /* BOB_IP_BLOCK_CELL_DESCRIPTORS_H */
