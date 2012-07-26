@@ -125,7 +125,7 @@ static object py_call2(bob::ip::SelfQuotientImage& op,
 
 
 void bind_ip_sqi() {
-  class_<bob::ip::SelfQuotientImage, boost::shared_ptr<bob::ip::SelfQuotientImage> >("SelfQuotientImage", "This class allows after configuration to apply the Self Quotient Image algorithm to images.", init<optional<const size_t, const size_t, const size_t, const double, const enum bob::sp::Extrapolation::BorderType> >((arg("n_scales")=1,arg("size_min")=1, arg("size_step")=1, arg("sigma2")=2., arg("conv_border")=bob::sp::Extrapolation::Mirror), "Creates a SelfQuotientImage object."))
+  class_<bob::ip::SelfQuotientImage, boost::shared_ptr<bob::ip::SelfQuotientImage> >("SelfQuotientImage", "This class allows after configuration to apply the Self Quotient Image algorithm to images.", init<optional<const size_t, const size_t, const size_t, const double, const bob::sp::Extrapolation::BorderType> >((arg("n_scales")=1,arg("size_min")=1, arg("size_step")=1, arg("sigma2")=2., arg("conv_border")=bob::sp::Extrapolation::Mirror), "Creates a SelfQuotientImage object."))
       .def(init<bob::ip::SelfQuotientImage&>(args("other")))
       .def(self == self)
       .def(self != self)

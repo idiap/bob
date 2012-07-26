@@ -125,7 +125,7 @@ static object py_call2(bob::ip::MultiscaleRetinex& op,
 
 
 void bind_ip_msr() {
-	class_<bob::ip::MultiscaleRetinex, boost::shared_ptr<bob::ip::MultiscaleRetinex> >("MultiscaleRetinex", "This class allows after configuration to apply the Self Quotient Image algorithm to images.", init<optional<const size_t, const int, const int, const double, const enum bob::sp::Extrapolation::BorderType> >((arg("n_scales")=1,arg("size_min")=1, arg("size_step")=1, arg("sigma")=2., arg("conv_border")=bob::sp::Extrapolation::Mirror), "Creates a MultiscaleRetinex object."))
+	class_<bob::ip::MultiscaleRetinex, boost::shared_ptr<bob::ip::MultiscaleRetinex> >("MultiscaleRetinex", "This class allows after configuration to apply the Self Quotient Image algorithm to images.", init<optional<const size_t, const int, const int, const double, const bob::sp::Extrapolation::BorderType> >((arg("n_scales")=1,arg("size_min")=1, arg("size_step")=1, arg("sigma")=2., arg("conv_border")=bob::sp::Extrapolation::Mirror), "Creates a MultiscaleRetinex object."))
       .def(init<bob::ip::MultiscaleRetinex&>(args("other")))
       .def(self == self)
       .def(self != self)

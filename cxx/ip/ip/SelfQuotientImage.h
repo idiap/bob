@@ -64,7 +64,7 @@ namespace bob {
           */
         SelfQuotientImage(const size_t n_scales=1, const size_t size_min=1,
             const size_t size_step=1, const double sigma2=2.,
-            const enum bob::sp::Extrapolation::BorderType border_type =
+            const bob::sp::Extrapolation::BorderType border_type =
             bob::sp::Extrapolation::Mirror):
           m_n_scales(n_scales), m_size_min(size_min), m_size_step(size_step),
           m_sigma2(sigma2), m_conv_border(border_type),
@@ -115,7 +115,7 @@ namespace bob {
          */
         void reset( const size_t n_scales=1, const size_t size_min=1,
           const size_t size_step=1, const double sigma2=2.,
-          const enum bob::sp::Extrapolation::BorderType border_type =
+          const bob::sp::Extrapolation::BorderType border_type =
           bob::sp::Extrapolation::Mirror);
 
         /**
@@ -125,7 +125,7 @@ namespace bob {
         size_t getSizeMin() const { return m_size_min; }
         size_t getSizeStep() const { return m_size_step; }
         double getSigma2() const { return m_sigma2; }
-        enum bob::sp::Extrapolation::BorderType getConvBorder() const { return m_conv_border; }
+        bob::sp::Extrapolation::BorderType getConvBorder() const { return m_conv_border; }
 
         /**
          * @brief Setters
@@ -140,7 +140,7 @@ namespace bob {
         { m_size_step = size_step; computeKernels(); }
         void setSigma2(const double sigma2) 
         { m_sigma2 = sigma2; computeKernels(); }
-        void setConvBorder(const enum bob::sp::Extrapolation::BorderType border_type)
+        void setConvBorder(const bob::sp::Extrapolation::BorderType border_type)
           { m_conv_border = border_type; computeKernels(); }
 
           /**
@@ -169,7 +169,7 @@ namespace bob {
           size_t m_size_min;
           size_t m_size_step;
           double m_sigma2;
-          enum bob::sp::Extrapolation::BorderType m_conv_border;
+          bob::sp::Extrapolation::BorderType m_conv_border;
 
           boost::shared_array<bob::ip::WeightedGaussian> m_wgaussians;
           blitz::Array<double,2> m_tmp;

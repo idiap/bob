@@ -153,7 +153,7 @@ static object call_gs2(bob::ip::Gaussian& op,
 void bind_ip_gaussian() {
   static const char* gaussiandoc = "This class allows after configuration to perform gaussian smoothing.";
 
-	class_<bob::ip::Gaussian, boost::shared_ptr<bob::ip::Gaussian> >("Gaussian", gaussiandoc, init<optional<const int, const int, const double, const double, const enum bob::sp::Extrapolation::BorderType> >((arg("radius_y")=1, arg("radius_x")=1, arg("sigma_y")=5., arg("sigma_x")=5., arg("conv_border")=bob::sp::Extrapolation::Mirror), "Creates a gaussian smoother."))
+	class_<bob::ip::Gaussian, boost::shared_ptr<bob::ip::Gaussian> >("Gaussian", gaussiandoc, init<optional<const int, const int, const double, const double, const bob::sp::Extrapolation::BorderType> >((arg("radius_y")=1, arg("radius_x")=1, arg("sigma_y")=5., arg("sigma_x")=5., arg("conv_border")=bob::sp::Extrapolation::Mirror), "Creates a gaussian smoother."))
       .def(init<bob::ip::Gaussian&>(args("other")))
       .def(self == self)
       .def(self != self)

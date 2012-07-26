@@ -38,7 +38,7 @@ void bob::ip::MultiscaleRetinex::computeKernels()
 
 void bob::ip::MultiscaleRetinex::reset(const size_t n_scales, 
   const int size_min, const int size_step, const double sigma,
-  const enum bob::sp::Extrapolation::BorderType border_type)
+  const bob::sp::Extrapolation::BorderType border_type)
 {
   m_n_scales = n_scales;
   m_gaussians.reset(new bob::ip::Gaussian[m_n_scales]);

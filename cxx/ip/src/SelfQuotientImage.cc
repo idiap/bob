@@ -38,7 +38,7 @@ void bob::ip::SelfQuotientImage::computeKernels()
 
 void bob::ip::SelfQuotientImage::reset(const size_t n_scales, 
   const size_t size_min, const size_t size_step, const double sigma2,
-  const enum bob::sp::Extrapolation::BorderType border_type)
+  const bob::sp::Extrapolation::BorderType border_type)
 {
   m_n_scales = n_scales;
   m_wgaussians.reset(new bob::ip::WeightedGaussian[m_n_scales]);
