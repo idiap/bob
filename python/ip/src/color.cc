@@ -24,363 +24,394 @@
 #include "core/python/ndarray.h"
 
 using namespace boost::python;
-namespace ip = bob::ip;
-namespace tp = bob::python;
-namespace ca = bob::core::array;
 
 template <typename T> static tuple rgb_to_hsv_one_python(T r, T g, T b) {
   T h, s, v;
-  ip::rgb_to_hsv_one(r, g, b, h, s, v);
+  bob::ip::rgb_to_hsv_one(r, g, b, h, s, v);
   return make_tuple(h, s, v);
 }
 
 template <> tuple rgb_to_hsv_one_python(uint8_t r, uint8_t g, uint8_t b) {
   uint8_t h, s, v;
-  ip::rgb_to_hsv_one(r, g, b, h, s, v);
+  bob::ip::rgb_to_hsv_one(r, g, b, h, s, v);
   return make_tuple((uint32_t)h, (uint32_t)s, (uint32_t)v);
 }
 
 template <typename T> static tuple hsv_to_rgb_one_python(T h, T s, T v) {
   T r, g, b;
-  ip::hsv_to_rgb_one(h, s, v, r, g, b);
+  bob::ip::hsv_to_rgb_one(h, s, v, r, g, b);
   return make_tuple(r, g, b);
 }
 
 template <> tuple hsv_to_rgb_one_python(uint8_t h, uint8_t s, uint8_t v) {
   uint8_t r, g, b;
-  ip::hsv_to_rgb_one(h, s, v, r, g, b);
+  bob::ip::hsv_to_rgb_one(h, s, v, r, g, b);
   return make_tuple((uint32_t)r, (uint32_t)g, (uint32_t)b);
 }
 
 template <typename T> static tuple rgb_to_hsl_one_python(T r, T g, T b) {
   T h, s, l;
-  ip::rgb_to_hsl_one(r, g, b, h, s, l);
+  bob::ip::rgb_to_hsl_one(r, g, b, h, s, l);
   return make_tuple(h, s, l);
 }
 
 template <> tuple rgb_to_hsl_one_python(uint8_t r, uint8_t g, uint8_t b) {
   uint8_t h, s, l;
-  ip::rgb_to_hsl_one(r, g, b, h, s, l);
+  bob::ip::rgb_to_hsl_one(r, g, b, h, s, l);
   return make_tuple((uint32_t)h, (uint32_t)s, (uint32_t)l);
 }
 
 template <typename T> static tuple hsl_to_rgb_one_python(T h, T s, T l) {
   T r, g, b;
-  ip::hsl_to_rgb_one(h, s, l, r, g, b);
+  bob::ip::hsl_to_rgb_one(h, s, l, r, g, b);
   return make_tuple(r, g, b);
 }
 
 template <> tuple hsl_to_rgb_one_python(uint8_t h, uint8_t s, uint8_t l) {
   uint8_t r, g, b;
-  ip::hsl_to_rgb_one(h, s, l, r, g, b);
+  bob::ip::hsl_to_rgb_one(h, s, l, r, g, b);
   return make_tuple((uint32_t)r, (uint32_t)g, (uint32_t)b);
 }
 
 template <typename T> static tuple rgb_to_yuv_one_python(T r, T g, T b) {
   T y, u, v;
-  ip::rgb_to_yuv_one(r, g, b, y, u, v);
+  bob::ip::rgb_to_yuv_one(r, g, b, y, u, v);
   return make_tuple(y, u, v);
 }
 
 template <> tuple rgb_to_yuv_one_python(uint8_t r, uint8_t g, uint8_t b) {
   uint8_t y, u, v;
-  ip::rgb_to_yuv_one(r, g, b, y, u, v);
+  bob::ip::rgb_to_yuv_one(r, g, b, y, u, v);
   return make_tuple((uint32_t)y, (uint32_t)u, (uint32_t)v);
 }
 
 template <typename T> static tuple yuv_to_rgb_one_python(T y, T u, T v) {
   T r, g, b;
-  ip::yuv_to_rgb_one(y, u, v, r, g, b);
+  bob::ip::yuv_to_rgb_one(y, u, v, r, g, b);
   return make_tuple(r, g, b);
 }
 
 template <> tuple yuv_to_rgb_one_python(uint8_t y, uint8_t u, uint8_t v) {
   uint8_t r, g, b;
-  ip::yuv_to_rgb_one(y, u, v, r, g, b);
+  bob::ip::yuv_to_rgb_one(y, u, v, r, g, b);
   return make_tuple((uint32_t)r, (uint32_t)g, (uint32_t)b);
 }
 
 template <typename T> static object rgb_to_gray_one_python(T r, T g, T b) {
   T y;
-  ip::rgb_to_gray_one(r, g, b, y);
+  bob::ip::rgb_to_gray_one(r, g, b, y);
   return object(y);
 }
 
 template <> object rgb_to_gray_one_python(uint8_t r, uint8_t g, uint8_t b) {
   uint8_t y;
-  ip::rgb_to_gray_one(r, g, b, y);
+  bob::ip::rgb_to_gray_one(r, g, b, y);
   return object((uint32_t)y);
 }
 
 template <typename T> static tuple gray_to_rgb_one_python(T y) {
   T r, g, b;
-  ip::gray_to_rgb_one(y, r, g, b);
+  bob::ip::gray_to_rgb_one(y, r, g, b);
   return make_tuple(r, g, b);
 }
 
 template <> tuple gray_to_rgb_one_python(uint8_t y) {
   uint8_t r, g, b;
-  ip::gray_to_rgb_one(y, r, g, b);
+  bob::ip::gray_to_rgb_one(y, r, g, b);
   return make_tuple((uint32_t)r, (uint32_t)g, (uint32_t)b);
 }
 
 //a few methods to return a dynamically allocated converted object
-static void py_rgb_to_hsv (tp::const_ndarray from, tp::ndarray to) {
+static 
+void py_rgb_to_hsv (bob::python::const_ndarray from, bob::python::ndarray to)
+{
   switch (from.type().dtype) {
-    case ca::t_uint8:
+    case bob::core::array::t_uint8:
       {
         blitz::Array<uint8_t,3> to_ = to.bz<uint8_t,3>();
-        ip::rgb_to_hsv(from.bz<uint8_t,3>(), to_);
+        bob::ip::rgb_to_hsv(from.bz<uint8_t,3>(), to_);
       }
       break;
-    case ca::t_uint16:
+    case bob::core::array::t_uint16:
       {
         blitz::Array<uint16_t,3> to_ = to.bz<uint16_t,3>();
-        ip::rgb_to_hsv(from.bz<uint16_t,3>(), to_);
+        bob::ip::rgb_to_hsv(from.bz<uint16_t,3>(), to_);
       }
       break;
-    case ca::t_float64:
+    case bob::core::array::t_float64:
       {
         blitz::Array<double,3> to_ = to.bz<double,3>();
-        ip::rgb_to_hsv(from.bz<double,3>(), to_);
+        bob::ip::rgb_to_hsv(from.bz<double,3>(), to_);
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "color conversion operator does not support array with type '%s'", from.type().str().c_str());
+      PYTHON_ERROR(TypeError, 
+        "color conversion operator does not support array with type '%s'", 
+        from.type().str().c_str());
   }
 }
 
-static object py_rgb_to_hsv2 (tp::const_ndarray from) {
-  const ca::typeinfo& info = from.type();
-  tp::ndarray to(info);
+static object py_rgb_to_hsv2 (bob::python::const_ndarray from) {
+  const bob::core::array::typeinfo& info = from.type();
+  bob::python::ndarray to(info);
   py_rgb_to_hsv(from, to);
   return to.self();
 }
 
-static void py_hsv_to_rgb (tp::const_ndarray from, tp::ndarray to) {
+static 
+void py_hsv_to_rgb (bob::python::const_ndarray from, bob::python::ndarray to)
+{
   switch (from.type().dtype) {
-    case ca::t_uint8:
+    case bob::core::array::t_uint8:
       {
         blitz::Array<uint8_t,3> to_ = to.bz<uint8_t,3>();
-        ip::hsv_to_rgb(from.bz<uint8_t,3>(), to_);
+        bob::ip::hsv_to_rgb(from.bz<uint8_t,3>(), to_);
       }
       break;
-    case ca::t_uint16:
+    case bob::core::array::t_uint16:
       {
         blitz::Array<uint16_t,3> to_ = to.bz<uint16_t,3>();
-        ip::hsv_to_rgb(from.bz<uint16_t,3>(), to_);
+        bob::ip::hsv_to_rgb(from.bz<uint16_t,3>(), to_);
       }
       break;
-    case ca::t_float64:
+    case bob::core::array::t_float64:
       {
         blitz::Array<double,3> to_ = to.bz<double,3>();
-        ip::hsv_to_rgb(from.bz<double,3>(), to_);
+        bob::ip::hsv_to_rgb(from.bz<double,3>(), to_);
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "color conversion operator does not support array with type '%s'", from.type().str().c_str());
+      PYTHON_ERROR(TypeError, 
+        "color conversion operator does not support array with type '%s'", 
+        from.type().str().c_str());
   }
 }
 
-static object py_hsv_to_rgb2 (tp::const_ndarray from) {
-  const ca::typeinfo& info = from.type();
-  tp::ndarray to(info);
+static object py_hsv_to_rgb2 (bob::python::const_ndarray from) {
+  const bob::core::array::typeinfo& info = from.type();
+  bob::python::ndarray to(info);
   py_hsv_to_rgb(from, to);
   return to.self();
 }
 
-static void py_rgb_to_hsl (tp::const_ndarray from, tp::ndarray to) {
+static 
+void py_rgb_to_hsl (bob::python::const_ndarray from, bob::python::ndarray to)
+{
   switch (from.type().dtype) {
-    case ca::t_uint8:
+    case bob::core::array::t_uint8:
       {
         blitz::Array<uint8_t,3> to_ = to.bz<uint8_t,3>();
-        ip::rgb_to_hsl(from.bz<uint8_t,3>(), to_);
+        bob::ip::rgb_to_hsl(from.bz<uint8_t,3>(), to_);
       }
       break;
-    case ca::t_uint16:
+    case bob::core::array::t_uint16:
       {
         blitz::Array<uint16_t,3> to_ = to.bz<uint16_t,3>();
-        ip::rgb_to_hsl(from.bz<uint16_t,3>(), to_);
+        bob::ip::rgb_to_hsl(from.bz<uint16_t,3>(), to_);
       }
       break;
-    case ca::t_float64:
+    case bob::core::array::t_float64:
       {
         blitz::Array<double,3> to_ = to.bz<double,3>();
-        ip::rgb_to_hsl(from.bz<double,3>(), to_);
+        bob::ip::rgb_to_hsl(from.bz<double,3>(), to_);
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "color conversion operator does not support array with type '%s'", from.type().str().c_str());
+      PYTHON_ERROR(TypeError, 
+        "color conversion operator does not support array with type '%s'", 
+        from.type().str().c_str());
   }
 }
 
-static object py_rgb_to_hsl2 (tp::const_ndarray from) {
-  const ca::typeinfo& info = from.type();
-  tp::ndarray to(info);
+static object py_rgb_to_hsl2 (bob::python::const_ndarray from) {
+  const bob::core::array::typeinfo& info = from.type();
+  bob::python::ndarray to(info);
   py_rgb_to_hsl(from, to);
   return to.self();
 }
 
-static void py_hsl_to_rgb (tp::const_ndarray from, tp::ndarray to) {
+static 
+void py_hsl_to_rgb (bob::python::const_ndarray from, bob::python::ndarray to)
+{
   switch (from.type().dtype) {
-    case ca::t_uint8:
+    case bob::core::array::t_uint8:
       {
         blitz::Array<uint8_t,3> to_ = to.bz<uint8_t,3>();
-        ip::hsl_to_rgb(from.bz<uint8_t,3>(), to_);
+        bob::ip::hsl_to_rgb(from.bz<uint8_t,3>(), to_);
       }
       break;
-    case ca::t_uint16:
+    case bob::core::array::t_uint16:
       {
         blitz::Array<uint16_t,3> to_ = to.bz<uint16_t,3>();
-        ip::hsl_to_rgb(from.bz<uint16_t,3>(), to_);
+        bob::ip::hsl_to_rgb(from.bz<uint16_t,3>(), to_);
       }
       break;
-    case ca::t_float64:
+    case bob::core::array::t_float64:
       {
         blitz::Array<double,3> to_ = to.bz<double,3>();
-        ip::hsl_to_rgb(from.bz<double,3>(), to_);
+        bob::ip::hsl_to_rgb(from.bz<double,3>(), to_);
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "color conversion operator does not support array with type '%s'", from.type().str().c_str());
+      PYTHON_ERROR(TypeError, 
+        "color conversion operator does not support array with type '%s'", 
+        from.type().str().c_str());
   }
 }
 
-static object py_hsl_to_rgb2 (tp::const_ndarray from) {
-  const ca::typeinfo& info = from.type();
-  tp::ndarray to(info);
+static object py_hsl_to_rgb2 (bob::python::const_ndarray from) {
+  const bob::core::array::typeinfo& info = from.type();
+  bob::python::ndarray to(info);
   py_hsl_to_rgb(from, to);
   return to.self();
 }
 
-static void py_rgb_to_yuv (tp::const_ndarray from, tp::ndarray to) {
+static 
+void py_rgb_to_yuv (bob::python::const_ndarray from, bob::python::ndarray to) 
+{
   switch (from.type().dtype) {
-    case ca::t_uint8:
+    case bob::core::array::t_uint8:
       {
         blitz::Array<uint8_t,3> to_ = to.bz<uint8_t,3>();
-        ip::rgb_to_yuv(from.bz<uint8_t,3>(), to_);
+        bob::ip::rgb_to_yuv(from.bz<uint8_t,3>(), to_);
       }
       break;
-    case ca::t_uint16:
+    case bob::core::array::t_uint16:
       {
         blitz::Array<uint16_t,3> to_ = to.bz<uint16_t,3>();
-        ip::rgb_to_yuv(from.bz<uint16_t,3>(), to_);
+        bob::ip::rgb_to_yuv(from.bz<uint16_t,3>(), to_);
       }
       break;
-    case ca::t_float64:
+    case bob::core::array::t_float64:
       {
         blitz::Array<double,3> to_ = to.bz<double,3>();
-        ip::rgb_to_yuv(from.bz<double,3>(), to_);
+        bob::ip::rgb_to_yuv(from.bz<double,3>(), to_);
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "color conversion operator does not support array with type '%s'", from.type().str().c_str());
+      PYTHON_ERROR(TypeError, 
+        "color conversion operator does not support array with type '%s'", 
+        from.type().str().c_str());
   }
 }
 
-static object py_rgb_to_yuv2 (tp::const_ndarray from) {
-  const ca::typeinfo& info = from.type();
-  tp::ndarray to(info);
+static object py_rgb_to_yuv2 (bob::python::const_ndarray from) {
+  const bob::core::array::typeinfo& info = from.type();
+  bob::python::ndarray to(info);
   py_rgb_to_yuv(from, to);
   return to.self();
 }
 
-static void py_yuv_to_rgb (tp::const_ndarray from, tp::ndarray to) {
+static 
+void py_yuv_to_rgb (bob::python::const_ndarray from, bob::python::ndarray to)
+{
   switch (from.type().dtype) {
-    case ca::t_uint8:
+    case bob::core::array::t_uint8:
       {
         blitz::Array<uint8_t,3> to_ = to.bz<uint8_t,3>();
-        ip::yuv_to_rgb(from.bz<uint8_t,3>(), to_);
+        bob::ip::yuv_to_rgb(from.bz<uint8_t,3>(), to_);
       }
       break;
-    case ca::t_uint16:
+    case bob::core::array::t_uint16:
       {
         blitz::Array<uint16_t,3> to_ = to.bz<uint16_t,3>();
-        ip::yuv_to_rgb(from.bz<uint16_t,3>(), to_);
+        bob::ip::yuv_to_rgb(from.bz<uint16_t,3>(), to_);
       }
       break;
-    case ca::t_float64:
+    case bob::core::array::t_float64:
       {
         blitz::Array<double,3> to_ = to.bz<double,3>();
-        ip::yuv_to_rgb(from.bz<double,3>(), to_);
+        bob::ip::yuv_to_rgb(from.bz<double,3>(), to_);
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "color conversion operator does not support array with type '%s'", from.type().str().c_str());
+      PYTHON_ERROR(TypeError, 
+        "color conversion operator does not support array with type '%s'", 
+        from.type().str().c_str());
   }
 }
 
-static object py_yuv_to_rgb2 (tp::const_ndarray from) {
-  const ca::typeinfo& info = from.type();
-  tp::ndarray to(info);
+static object py_yuv_to_rgb2 (bob::python::const_ndarray from) {
+  const bob::core::array::typeinfo& info = from.type();
+  bob::python::ndarray to(info);
   py_yuv_to_rgb(from, to);
   return to.self();
 }
 
-static void py_rgb_to_gray (tp::const_ndarray from, tp::ndarray to) {
+static 
+void py_rgb_to_gray (bob::python::const_ndarray from, bob::python::ndarray to)
+{
   switch (from.type().dtype) {
-    case ca::t_uint8:
+    case bob::core::array::t_uint8:
       {
         blitz::Array<uint8_t,2> to_ = to.bz<uint8_t,2>();
-        ip::rgb_to_gray(from.bz<uint8_t,3>(), to_);
+        bob::ip::rgb_to_gray(from.bz<uint8_t,3>(), to_);
       }
       break;
-    case ca::t_uint16:
+    case bob::core::array::t_uint16:
       {
         blitz::Array<uint16_t,2> to_ = to.bz<uint16_t,2>();
-        ip::rgb_to_gray(from.bz<uint16_t,3>(), to_);
+        bob::ip::rgb_to_gray(from.bz<uint16_t,3>(), to_);
       }
       break;
-    case ca::t_float64:
+    case bob::core::array::t_float64:
       {
         blitz::Array<double,2> to_ = to.bz<double,2>();
-        ip::rgb_to_gray(from.bz<double,3>(), to_);
+        bob::ip::rgb_to_gray(from.bz<double,3>(), to_);
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "color conversion operator does not support array with type '%s'", from.type().str().c_str());
+      PYTHON_ERROR(TypeError, 
+        "color conversion operator does not support array with type '%s'", 
+        from.type().str().c_str());
   }
 }
 
-static object py_rgb_to_gray2 (tp::const_ndarray from) {
-  const ca::typeinfo& info = from.type();
+static object py_rgb_to_gray2 (bob::python::const_ndarray from) {
+  const bob::core::array::typeinfo& info = from.type();
   if (info.nd != 3) {
-    PYTHON_ERROR(TypeError, "input type must have at least 3 dimensions, but you gave me '%s'", info.str().c_str());
+    PYTHON_ERROR(TypeError, 
+      "input type must have at least 3 dimensions, but you gave me '%s'", 
+      info.str().c_str());
   }
-  tp::ndarray to(info.dtype, info.shape[1], info.shape[2]);
+  bob::python::ndarray to(info.dtype, info.shape[1], info.shape[2]);
   py_rgb_to_gray(from, to);
   return to.self();
 }
 
 
-static void py_gray_to_rgb (tp::const_ndarray from, tp::ndarray to) {
+static 
+void py_gray_to_rgb (bob::python::const_ndarray from, bob::python::ndarray to)
+{
   switch (from.type().dtype) {
-    case ca::t_uint8:
+    case bob::core::array::t_uint8:
       {
         blitz::Array<uint8_t,3> to_ = to.bz<uint8_t,3>();
-        ip::gray_to_rgb(from.bz<uint8_t,2>(), to_);
+        bob::ip::gray_to_rgb(from.bz<uint8_t,2>(), to_);
       }
       break;
-    case ca::t_uint16:
+    case bob::core::array::t_uint16:
       {
         blitz::Array<uint16_t,3> to_ = to.bz<uint16_t,3>();
-        ip::gray_to_rgb(from.bz<uint16_t,2>(), to_);
+        bob::ip::gray_to_rgb(from.bz<uint16_t,2>(), to_);
       }
       break;
-    case ca::t_float64:
+    case bob::core::array::t_float64:
       {
         blitz::Array<double,3> to_ = to.bz<double,3>();
-        ip::gray_to_rgb(from.bz<double,2>(), to_);
+        bob::ip::gray_to_rgb(from.bz<double,2>(), to_);
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "color conversion operator does not support array with type '%s'", from.type().str().c_str());
+      PYTHON_ERROR(TypeError, 
+        "color conversion operator does not support array with type '%s'", 
+        from.type().str().c_str());
   }
 }
 
-static object py_gray_to_rgb2 (tp::const_ndarray from) {
-  const ca::typeinfo& info = from.type();
-  tp::ndarray to(info.dtype, (size_t)3, info.shape[0], info.shape[1]);
+static object py_gray_to_rgb2 (bob::python::const_ndarray from) {
+  const bob::core::array::typeinfo& info = from.type();
+  bob::python::ndarray to(info.dtype, (size_t)3, info.shape[0], info.shape[1]);
   py_gray_to_rgb(from, to);
   return to.self();
 }

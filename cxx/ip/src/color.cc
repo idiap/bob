@@ -25,43 +25,41 @@
 #include <boost/format.hpp>
 #include "ip/color.h"
 
-namespace ip = bob::ip;
-
-ip::UnsupportedTypeForColorConversion::UnsupportedTypeForColorConversion(bob::core::array::ElementType eltype) throw(): m_eltype(eltype) {
+bob::ip::UnsupportedTypeForColorConversion::UnsupportedTypeForColorConversion(bob::core::array::ElementType eltype) throw(): m_eltype(eltype) {
 }
 
-ip::UnsupportedTypeForColorConversion::~UnsupportedTypeForColorConversion() throw() {
+bob::ip::UnsupportedTypeForColorConversion::~UnsupportedTypeForColorConversion() throw() {
 }
 
-const char* ip::UnsupportedTypeForColorConversion::what() const throw() {
+const char* bob::ip::UnsupportedTypeForColorConversion::what() const throw() {
   try {
     boost::format message("Color conversion for type '%s' is not supported");
     message % bob::core::array::stringize(m_eltype);
     m_message = message.str();
     return m_message.c_str();
   } catch (...) {
-    static const char* emergency = "ip::UnsupportedTypeForColorConversion: cannot format, exception raised";
+    static const char* emergency = "bob::ip::UnsupportedTypeForColorConversion: cannot format, exception raised";
     return emergency;
   }
 }
 
-ip::UnsupportedRowExtent::UnsupportedRowExtent(int expected, int got) throw(): 
+bob::ip::UnsupportedRowExtent::UnsupportedRowExtent(int expected, int got) throw(): 
   m_expected(expected),
   m_got(got)
 {
 }
 
-ip::UnsupportedRowExtent::~UnsupportedRowExtent() throw() {
+bob::ip::UnsupportedRowExtent::~UnsupportedRowExtent() throw() {
 }
 
-const char* ip::UnsupportedRowExtent::what() const throw() {
+const char* bob::ip::UnsupportedRowExtent::what() const throw() {
   try {
     boost::format message("Color conversion requires an array with %d rows, but I got %d instead");
     message % m_expected % m_got;
     m_message = message.str();
     return m_message.c_str();
   } catch (...) {
-    static const char* emergency = "ip::UnsupportedRowExtent: cannot format, exception raised";
+    static const char* emergency = "bob::ip::UnsupportedRowExtent: cannot format, exception raised";
     return emergency;
   }
 }
@@ -117,21 +115,21 @@ static double clamp (double f) {
   return (f<0.)? 0. : (f>1.)? 1.: f;
 }
 
-template <> void ip::rgb_to_hsv_one (uint8_t r, uint8_t g, uint8_t b,
+template <> void bob::ip::rgb_to_hsv_one (uint8_t r, uint8_t g, uint8_t b,
     uint8_t& h, uint8_t& s, uint8_t& v) {
   double H, S, V;
   rgb_to_hsv_one(normalize(r), normalize(g), normalize(b), H, S, V);
   h = scale<uint8_t>(H); s = scale<uint8_t>(S); v = scale<uint8_t>(V);
 }
 
-template <> void ip::rgb_to_hsv_one (uint16_t r, uint16_t g, uint16_t b,
+template <> void bob::ip::rgb_to_hsv_one (uint16_t r, uint16_t g, uint16_t b,
     uint16_t& h, uint16_t& s, uint16_t& v) {
   double H, S, V;
   rgb_to_hsv_one(normalize(r), normalize(g), normalize(b), H, S, V);
   h = scale<uint16_t>(H); s = scale<uint16_t>(S); v = scale<uint16_t>(V);
 }
 
-template <> void ip::rgb_to_hsv_one (double r, double g, double b,
+template <> void bob::ip::rgb_to_hsv_one (double r, double g, double b,
     double& h, double& s, double& v) {
   v = tmax(r, g, b); //value
   
@@ -169,21 +167,21 @@ template <> void ip::rgb_to_hsv_one (double r, double g, double b,
   else h = clamp(2.0/3 + (r - g)/C); //sextants 4/5
 }
 
-template <> void ip::hsv_to_rgb_one (uint8_t h, uint8_t s, uint8_t v,
+template <> void bob::ip::hsv_to_rgb_one (uint8_t h, uint8_t s, uint8_t v,
     uint8_t& r, uint8_t& g, uint8_t& b) {
   double R, G, B;
   hsv_to_rgb_one(normalize(h), normalize(s), normalize(v), R, G, B);
   r = scale<uint8_t>(R); g = scale<uint8_t>(G); b = scale<uint8_t>(B);
 }
 	
-template <> void ip::hsv_to_rgb_one (uint16_t h, uint16_t s, uint16_t v,
+template <> void bob::ip::hsv_to_rgb_one (uint16_t h, uint16_t s, uint16_t v,
     uint16_t& r, uint16_t& g, uint16_t& b) {
   double R, G, B;
   hsv_to_rgb_one(normalize(h), normalize(s), normalize(v), R, G, B);
   r = scale<uint16_t>(R); g = scale<uint16_t>(G); b = scale<uint16_t>(B);
 }
 	
-template <> void ip::hsv_to_rgb_one (double h, double s, double v,
+template <> void bob::ip::hsv_to_rgb_one (double h, double s, double v,
     double& r, double& g, double& b) {
 	
   if(s == 0) { // achromatic (gray)
@@ -233,21 +231,21 @@ template <> void ip::hsv_to_rgb_one (double h, double s, double v,
 	}
 }
 
-template <> void ip::rgb_to_hsl_one (uint8_t r, uint8_t g, uint8_t b,
+template <> void bob::ip::rgb_to_hsl_one (uint8_t r, uint8_t g, uint8_t b,
     uint8_t& h, uint8_t& s, uint8_t& l) {
   double H, S, L;
   rgb_to_hsl_one(normalize(r), normalize(g), normalize(b), H, S, L);
   h = scale<uint8_t>(H); s = scale<uint8_t>(S); l = scale<uint8_t>(L);
 }
 
-template <> void ip::rgb_to_hsl_one (uint16_t r, uint16_t g, uint16_t b,
+template <> void bob::ip::rgb_to_hsl_one (uint16_t r, uint16_t g, uint16_t b,
     uint16_t& h, uint16_t& s, uint16_t& l) {
   double H, S, L;
   rgb_to_hsl_one(normalize(r), normalize(g), normalize(b), H, S, L);
   h = scale<uint16_t>(H); s = scale<uint16_t>(S); l = scale<uint16_t>(L);
 }
 
-template <> void ip::rgb_to_hsl_one (double r, double g, double b,
+template <> void bob::ip::rgb_to_hsl_one (double r, double g, double b,
     double& h, double& s, double& l) {
   //lightness calculation: L = (M + m)/2
   const double M = tmax(r, g, b);
@@ -289,21 +287,21 @@ template <> void ip::rgb_to_hsl_one (double r, double g, double b,
   else h = clamp(2.0/3 + (r - g)/C); //sextants 4/5
 }
 
-template <> void ip::hsl_to_rgb_one (uint8_t h, uint8_t s, uint8_t l,
+template <> void bob::ip::hsl_to_rgb_one (uint8_t h, uint8_t s, uint8_t l,
     uint8_t& r, uint8_t& g, uint8_t& b) {
   double R, G, B;
   hsl_to_rgb_one(normalize(h), normalize(s), normalize(l), R, G, B);
   r = scale<uint8_t>(R); g = scale<uint8_t>(G); b = scale<uint8_t>(B);
 }
 	
-template <> void ip::hsl_to_rgb_one (uint16_t h, uint16_t s, uint16_t l,
+template <> void bob::ip::hsl_to_rgb_one (uint16_t h, uint16_t s, uint16_t l,
     uint16_t& r, uint16_t& g, uint16_t& b) {
   double R, G, B;
   hsl_to_rgb_one(normalize(h), normalize(s), normalize(l), R, G, B);
   r = scale<uint16_t>(R); g = scale<uint16_t>(G); b = scale<uint16_t>(B);
 }
 	
-template <> void ip::hsl_to_rgb_one (double h, double s, double l,
+template <> void bob::ip::hsl_to_rgb_one (double h, double s, double l,
     double& r, double& g, double& b) {
   
   double C = s*(1-fabsf(2*l - 1)); //Chroma [0,1]
@@ -355,14 +353,14 @@ template <> void ip::hsl_to_rgb_one (double h, double s, double l,
 	}
 }
 
-template <> void ip::rgb_to_yuv_one (uint8_t r, uint8_t g, uint8_t b,
+template <> void bob::ip::rgb_to_yuv_one (uint8_t r, uint8_t g, uint8_t b,
     uint8_t& y, uint8_t& u, uint8_t& v) {
   double Y, U, V;
   rgb_to_yuv_one(normalize(r), normalize(g), normalize(b), Y, U, V);
   y = scale<uint8_t>(Y); u = scale<uint8_t>(U); v = scale<uint8_t>(V);
 }
 
-template <> void ip::rgb_to_yuv_one (uint16_t r, uint16_t g, uint16_t b,
+template <> void bob::ip::rgb_to_yuv_one (uint16_t r, uint16_t g, uint16_t b,
     uint16_t& y, uint16_t& u, uint16_t& v) {
   double Y, U, V;
   rgb_to_yuv_one(normalize(r), normalize(g), normalize(b), Y, U, V);
@@ -372,21 +370,21 @@ template <> void ip::rgb_to_yuv_one (uint16_t r, uint16_t g, uint16_t b,
 /**
  * Using the JPEG YUV conversion scheme
  */
-template <> void ip::rgb_to_yuv_one (double r, double g, double b,
+template <> void bob::ip::rgb_to_yuv_one (double r, double g, double b,
     double& y, double& u, double& v) {
-  ip::rgb_to_gray_one(r, g, b, y); //Y'
+  bob::ip::rgb_to_gray_one(r, g, b, y); //Y'
   u = clamp(0.5 - 0.168736*r - 0.331264*g + 0.5*b); //Cb [0, 1]
   v = clamp(0.5 + 0.5*r - 0.418688*g - 0.081312*b); //Cr [0, 1]
 }
 
-template <> void ip::yuv_to_rgb_one (uint8_t y, uint8_t u, uint8_t v,
+template <> void bob::ip::yuv_to_rgb_one (uint8_t y, uint8_t u, uint8_t v,
     uint8_t& r, uint8_t& g, uint8_t& b) {
   double R, G, B;
   yuv_to_rgb_one(normalize(y), normalize(u), normalize(v), R, G, B);
   r = scale<uint8_t>(R); g = scale<uint8_t>(G); b = scale<uint8_t>(B);
 }
 	
-template <> void ip::yuv_to_rgb_one (uint16_t y, uint16_t u, uint16_t v,
+template <> void bob::ip::yuv_to_rgb_one (uint16_t y, uint16_t u, uint16_t v,
     uint16_t& r, uint16_t& g, uint16_t& b) {
   double R, G, B;
   yuv_to_rgb_one(normalize(y), normalize(u), normalize(v), R, G, B);
@@ -396,21 +394,21 @@ template <> void ip::yuv_to_rgb_one (uint16_t y, uint16_t u, uint16_t v,
 /**
  * We are doing the inverse of the rgb_to_yuv_one() method above
  */
-template <> void ip::yuv_to_rgb_one (double y, double u, double v,
+template <> void bob::ip::yuv_to_rgb_one (double y, double u, double v,
     double& r, double& g, double& b) {
   r = clamp(y + 1.40199959*(v-0.5));
   b = clamp(y + 1.772000066*(u-0.5));
   g = clamp(y - 0.344135678*(u-0.5) - 0.714136156*(v-0.5));
 }
 
-template <> void ip::rgb_to_gray_one (uint8_t r, uint8_t g, uint8_t b,
+template <> void bob::ip::rgb_to_gray_one (uint8_t r, uint8_t g, uint8_t b,
     uint8_t& y) {
   double Y;
   rgb_to_gray_one(normalize(r), normalize(g), normalize(b), Y);
   y = scale<uint8_t>(Y);
 }
 
-template <> void ip::rgb_to_gray_one (uint16_t r, uint16_t g, uint16_t b,
+template <> void bob::ip::rgb_to_gray_one (uint16_t r, uint16_t g, uint16_t b,
     uint16_t& y) {
   double Y;
   rgb_to_gray_one(normalize(r), normalize(g), normalize(b), Y);
@@ -420,7 +418,7 @@ template <> void ip::rgb_to_gray_one (uint16_t r, uint16_t g, uint16_t b,
 /**
  * Y = 0.299R+0.587G+0.114B
  */
-template <> void ip::rgb_to_gray_one (double r, double g, double b, 
+template <> void bob::ip::rgb_to_gray_one (double r, double g, double b, 
     double& gray) {
   gray = clamp(0.299*r + 0.587*g + 0.114*b);
 }
