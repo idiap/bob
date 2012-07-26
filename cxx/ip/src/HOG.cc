@@ -22,9 +22,7 @@
 #include "ip/Exception.h"
 #include "core/array_assert.h"
 
-namespace ip = bob::ip;
-
-void ip::hogComputeHistogram(const blitz::Array<double,2>& mag, 
+void bob::ip::hogComputeHistogram(const blitz::Array<double,2>& mag, 
   const blitz::Array<double,2>& ori, blitz::Array<double,1>& hist, 
   const bool init_hist, const bool full_orientation)
 {
@@ -32,10 +30,10 @@ void ip::hogComputeHistogram(const blitz::Array<double,2>& mag,
   bob::core::array::assertSameShape(mag, ori);
 
   // Computes histogram
-  hogComputeHistogram_(mag, ori, hist, init_hist, full_orientation);
+  bob::ip::hogComputeHistogram_(mag, ori, hist, init_hist, full_orientation);
 }
 
-void ip::hogComputeHistogram_(const blitz::Array<double,2>& mag, 
+void bob::ip::hogComputeHistogram_(const blitz::Array<double,2>& mag, 
   const blitz::Array<double,2>& ori, blitz::Array<double,1>& hist, 
   const bool init_hist, const bool full_orientation)
 {
