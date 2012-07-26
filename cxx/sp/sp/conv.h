@@ -30,21 +30,21 @@
 
 namespace bob {
   /**
-   * \ingroup libsp_api
-   * @{
-   *
-   */
+    * \ingroup libsp_api
+    * @{
+    *
+    */
   namespace sp {
 
     /**
-     * @brief Enumerations of the possible output size options
-     */
+      * @brief Enumerations of the possible output size options
+      */
     namespace Conv {
-      enum SizeOption {
+      typedef enum SizeOption_ {
         Full,
         Same,
         Valid
-      };
+      } SizeOption;
     }
 
     namespace detail {
@@ -61,7 +61,8 @@ namespace bob {
         for(int i=0; i<P; ++i)
         {
           blitz::Array<T,1> b_s = b(blitz::Range(bu_offset,bl_offset,-1));
-          blitz::Array<T,1> a_s = a(blitz::Range(al_offset,al_offset+bu_offset-bl_offset));
+          blitz::Array<T,1> a_s = 
+            a(blitz::Range(al_offset,al_offset+bu_offset-bl_offset));
           c(i) = blitz::sum(a_s * b_s);
           if(i < offset_0) ++bu_offset;
           else ++al_offset;
@@ -121,22 +122,22 @@ namespace bob {
      *                   * Valid: valid (part without padding)
      * @return The size of the output array
      */
-    inline const int getConvOutputSize(const int a, const int b,
-      const enum Conv::SizeOption size_opt = Conv::Full)
+    inline size_t getConvOutputSize(const size_t a, const size_t b,
+      const Conv::SizeOption size_opt = Conv::Full)
     {
       if(a<b)
-        throw sp::ConvolutionKernelTooLarge(0, a, b);
+        throw ConvolutionKernelTooLarge(0, a, b);
 
-      int res=0;
+      size_t res=0;
       // Size of "A + B - 1"
       if( size_opt == Conv::Full )
-        res = std::max(0, a + b - 1);
+        res = std::max(0, (int)(a + b - 1));
       // Same size as A
       else if( size_opt == Conv::Same )
         res = a;
       // Size when not allowing any padding
       else 
-        res = std::max(0, a - b + 1); 
+        res = std::max(0, (int)(a - b + 1)); 
       return res;
     }
 
@@ -152,7 +153,7 @@ namespace bob {
     template<typename T> 
     const blitz::TinyVector<int,1> getConvOutputSize(
       const blitz::Array<T,1>& a, const blitz::Array<T,1>& b,
-      const enum Conv::SizeOption size_opt = Conv::Full)
+      const Conv::SizeOption size_opt = Conv::Full)
     {
       blitz::TinyVector<int,1> size;
       size(0) = getConvOutputSize(a.extent(0), b.extent(0), size_opt);
@@ -171,12 +172,12 @@ namespace bob {
     template<typename T> 
     const blitz::TinyVector<int,2> getConvOutputSize(
       const blitz::Array<T,2>& A, const blitz::Array<T,2>& B,
-      const enum Conv::SizeOption size_opt = Conv::Full)
+      const Conv::SizeOption size_opt = Conv::Full)
     {
       if(A.extent(0)<B.extent(0))
-        throw sp::ConvolutionKernelTooLarge(0, A.extent(0), B.extent(0));
+        throw ConvolutionKernelTooLarge(0, A.extent(0), B.extent(0));
       if(A.extent(1)<B.extent(1))
-        throw sp::ConvolutionKernelTooLarge(1, A.extent(0), B.extent(0));
+        throw ConvolutionKernelTooLarge(1, A.extent(0), B.extent(0));
 
       blitz::TinyVector<int,2> size;
       size(0) = 0;
@@ -214,26 +215,24 @@ namespace bob {
      */
     template<typename T, int N> 
     const blitz::TinyVector<int,N> getConvSepOutputSize(const blitz::Array<T,N>& A,
-      const blitz::Array<T,1>& b, const int dim,
-      const enum Conv::SizeOption size_opt = Conv::Full)
+      const blitz::Array<T,1>& b, const size_t dim,
+      const Conv::SizeOption size_opt = Conv::Full)
     {
       blitz::TinyVector<int,N> res;
       res = A.shape();
-      if(dim<N)
+      if((int)dim<N)
       {
         if(A.extent(dim)<b.extent(0))
-          throw sp::ConvolutionKernelTooLarge(dim, A.extent(dim), b.extent(0));
+          throw ConvolutionKernelTooLarge(dim, A.extent(dim), b.extent(0));
 
         int a_size_d = A.extent(dim);
         int b_size = b.extent(0);
-        res(dim) = getConvOutputSize(a_size_d, b_size, size_opt);
+        res((int)dim) = getConvOutputSize(a_size_d, b_size, size_opt);
       }
       else 
-        throw sp::SeparableConvolutionInvalidDim(dim,N-1);
+        throw SeparableConvolutionInvalidDim(dim,N-1);
       return res;
     }
-
-
 
 
 
@@ -250,12 +249,12 @@ namespace bob {
      */
     template <typename T>
     void conv(const blitz::Array<T,1> a, const blitz::Array<T,1> b, 
-      blitz::Array<T,1> c, const enum Conv::SizeOption size_opt = Conv::Full)
+      blitz::Array<T,1> c, const Conv::SizeOption size_opt = Conv::Full)
     {
       const int N = b.extent(0);
 
       if(a.extent(0)<b.extent(0))
-        throw sp::ConvolutionKernelTooLarge(0, a.extent(0), b.extent(0));
+        throw ConvolutionKernelTooLarge(0, a.extent(0), b.extent(0));
 
       if(size_opt == Conv::Full)
         detail::convInternal(a, b, c, N-1, 1);
@@ -278,15 +277,15 @@ namespace bob {
      */
     template <typename T>
     void conv(const blitz::Array<T,2> A, const blitz::Array<T,2> B, 
-      blitz::Array<T,2> C, const enum Conv::SizeOption size_opt = Conv::Full)
+      blitz::Array<T,2> C, const Conv::SizeOption size_opt = Conv::Full)
     {
       const int N0 = B.extent(0);
       const int N1 = B.extent(1);
 
       if(A.extent(0)<B.extent(0))
-        throw sp::ConvolutionKernelTooLarge(0, A.extent(0), B.extent(0));
+        throw ConvolutionKernelTooLarge(0, A.extent(0), B.extent(0));
       if(A.extent(1)<B.extent(1))
-        throw sp::ConvolutionKernelTooLarge(1, A.extent(0), B.extent(0));
+        throw ConvolutionKernelTooLarge(1, A.extent(0), B.extent(0));
 
       if(size_opt == Conv::Full)
         detail::convInternal(A, B, C, N0-1, 1, N1-1, 1);
@@ -300,7 +299,7 @@ namespace bob {
 
       template<typename T> void convSep(const blitz::Array<T,2>& A, 
         const blitz::Array<T,1>& b, blitz::Array<T,2>& C,
-        const enum Conv::SizeOption size_opt = Conv::Full)
+        const Conv::SizeOption size_opt = Conv::Full)
       {
         for(int i=0; i<A.extent(1); ++i)
         {
@@ -312,7 +311,7 @@ namespace bob {
 
      template<typename T> void convSep(const blitz::Array<T,3>& A, 
         const blitz::Array<T,1>& b, blitz::Array<T,3>& C,
-        const enum Conv::SizeOption size_opt = Conv::Full)
+        const Conv::SizeOption size_opt = Conv::Full)
       {
         for(int i=0; i<A.extent(1); ++i)
           for(int j=0; j<A.extent(2); ++j)
@@ -325,7 +324,7 @@ namespace bob {
 
       template<typename T> void convSep(const blitz::Array<T,4>& A, 
         const blitz::Array<T,1>& b, blitz::Array<T,4>& C,
-        const enum Conv::SizeOption size_opt = Conv::Full)
+        const Conv::SizeOption size_opt = Conv::Full)
       {
         for(int i=0; i<A.extent(1); ++i)
           for(int j=0; j<A.extent(2); ++j)
@@ -352,8 +351,8 @@ namespace bob {
      *   The output C should have the correct size
      */
     template<typename T, int N> void convSep(const blitz::Array<T,N>& A, 
-      const blitz::Array<T,1>& b, blitz::Array<T,N>& C, const int dim,
-      const enum Conv::SizeOption size_opt = Conv::Full)
+      const blitz::Array<T,1>& b, blitz::Array<T,N>& C, const size_t dim,
+      const Conv::SizeOption size_opt = Conv::Full)
     {
       // Gets the expected size for the results
       const blitz::TinyVector<int,N> Csize = getConvSepOutputSize(A, b, dim, size_opt);
@@ -368,27 +367,29 @@ namespace bob {
       if(dim==0)
       {
         if(A.extent(dim)<b.extent(0))
-          throw sp::ConvolutionKernelTooLarge(0, A.extent(dim), b.extent(0));
+          throw ConvolutionKernelTooLarge(0, A.extent(dim), b.extent(0));
         detail::convSep( A, b, C, size_opt);
       }
-      else if(dim<N)
+      else if((int)dim<N)
       {
         if(A.extent(dim)<b.extent(0))
-          throw sp::ConvolutionKernelTooLarge(dim, A.extent(dim), b.extent(0));
+          throw ConvolutionKernelTooLarge(dim, A.extent(dim), b.extent(0));
 
-        // Ugly fix to support old blitz versions without const transpose() method
-        const blitz::Array<T,N> Ap = (const_cast<blitz::Array<T,N> *>(&A))->transpose(dim,0);
+        // Ugly fix to support old blitz versions without const transpose()
+        // method
+        const blitz::Array<T,N> Ap = 
+          (const_cast<blitz::Array<T,N> *>(&A))->transpose(dim,0);
         blitz::Array<T,N> Cp = C.transpose(dim,0);
         detail::convSep( Ap, b, Cp, size_opt);
       }
       else
-        throw sp::SeparableConvolutionInvalidDim(dim,N-1);
+        throw SeparableConvolutionInvalidDim(dim,N-1);
     }
  
   }
-/**
- * @}
- */
+  /**
+    * @}
+    */
 }
 
 #endif /* BOB_SP_CONV_H */

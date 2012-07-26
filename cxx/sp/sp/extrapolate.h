@@ -37,7 +37,7 @@ namespace bob {
   namespace sp {
 
     namespace Extrapolation {
-      typedef enum BorderType {
+      typedef enum BorderType_ {
         Zero,
         NearestNeighbour,
         Circular,

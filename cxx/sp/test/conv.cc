@@ -247,7 +247,7 @@ void test_conv_2D_nopt( T eps, const blitz::Array<T,2>& a1,
 template <typename T> 
 void test_conv_1D( T eps, const blitz::Array<T,1>& a1, 
   const blitz::Array<T,1>& a2, const blitz::Array<T,1>& mat, 
-  const enum bob::sp::Conv::SizeOption opt1 = bob::sp::Conv::Full)
+  const bob::sp::Conv::SizeOption opt1 = bob::sp::Conv::Full)
 {
   blitz::Array<T,1> res( bob::sp::getConvOutputSize(a1, a2, opt1) );
   bob::sp::conv( a1, a2, res, opt1);
@@ -258,7 +258,7 @@ void test_conv_1D( T eps, const blitz::Array<T,1>& a1,
 template <typename T> 
 void test_conv_2D( T eps, const blitz::Array<T,2>& a1, 
   const blitz::Array<T,2>& a2, const blitz::Array<T,2>& mat,
-  const enum bob::sp::Conv::SizeOption opt1 = bob::sp::Conv::Full)
+  const bob::sp::Conv::SizeOption opt1 = bob::sp::Conv::Full)
 {
   blitz::Array<T,2> res( bob::sp::getConvOutputSize(a1, a2, opt1) );
   bob::sp::conv( a1, a2, res, opt1);
