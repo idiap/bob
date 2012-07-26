@@ -37,12 +37,12 @@ namespace bob {
   namespace sp {
 
     namespace Extrapolation {
-      enum BorderType {
+      typedef enum BorderType {
         Zero,
         NearestNeighbour,
         Circular,
         Mirror
-      }; 
+      } BorderType;
     }
 
     /**
