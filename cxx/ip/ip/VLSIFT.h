@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_IP_VLSIFT_H
-#define BOB5SPRO_IP_VLSIFT_H
+#ifndef BOB_IP_VLSIFT_H
+#define BOB_IP_VLSIFT_H
 
 #include <blitz/array.h>
 #include <stdint.h> // uint16_t declaration
@@ -31,11 +31,11 @@
 #include <vl/sift.h>
 
 namespace bob {
-/**
- * \ingroup libip_api
- * @{
- *
- */
+  /**
+    * \ingroup libip_api
+    * @{
+    *
+    */
   namespace ip {
 
     /**
@@ -51,14 +51,69 @@ namespace bob {
         /**
           * @brief Constructor
           */
-        VLSIFT(const int height, const int width, const int n_intervals,
-          const int n_octaves, const int octave_min,
-          const double peak_thres=0.03, const double edge_thres=10, const double magnif=3);
+        VLSIFT(const size_t height, const size_t width, 
+          const size_t n_intervals, const size_t n_octaves, 
+          const int octave_min, const double peak_thres=0.03, 
+          const double edge_thres=10., const double magnif=3.);
+
+        /**
+          * @brief Copy constructor
+          */
+        VLSIFT(const VLSIFT& other);
 
         /**
           * @brief Destructor
           */
         virtual ~VLSIFT();
+
+        /**
+          * @brief Assignment operator
+          */
+        VLSIFT& operator=(const VLSIFT& other);
+
+        /**
+          * @brief Equal to
+          */
+        bool operator==(const VLSIFT& b) const;
+        /**
+          * @brief Not equal to
+          */
+        bool operator!=(const VLSIFT& b) const; 
+
+        /**
+          * @brief Getters
+          */
+        size_t getHeight() const { return m_height; }
+        size_t getWidth() const { return m_width; }
+        size_t getNIntervals() const { return m_n_intervals; }
+        size_t getNOctaves() const { return m_n_octaves; }
+        int getOctaveMin() const { return m_octave_min; }
+        double getPeakThres() const { return m_peak_thres; }
+        double getEdgeThres() const { return m_edge_thres; }
+        double getMagnif() const { return m_magnif; }
+       
+        /**
+          * @brief Setters
+          */
+        void setHeight(const size_t height) 
+        { m_height = height; cleanup(); allocateAndSet(); }
+        void setWidth(const size_t width) 
+        { m_width = width; cleanup(); allocateAndSet(); }
+        void setNIntervals(const size_t n_intervals) 
+        { m_n_intervals = n_intervals; cleanupFilter(); 
+          allocateFilterAndSet(); }
+        void setNOctaves(const size_t n_octaves) 
+        { m_n_octaves = n_octaves; cleanupFilter(); allocateFilterAndSet(); }
+        void setOctaveMin(const int octave_min) 
+        { m_octave_min = octave_min; cleanupFilter(); allocateFilterAndSet(); }
+        void setPeakThres(const double peak_thres) 
+        { m_peak_thres = peak_thres; 
+          vl_sift_set_peak_thresh(m_filt, m_peak_thres); }
+        void setEdgeThres(const double edge_thres) 
+        { m_edge_thres = edge_thres; 
+          vl_sift_set_edge_thresh(m_filt, m_edge_thres); }
+        void setMagnif(const double magnif) 
+        { m_magnif = magnif; vl_sift_set_magnif(m_filt, m_magnif); }
 
         /**
           * @brief Extract SIFT features from a 2D blitz::Array, and save 
@@ -68,18 +123,46 @@ namespace bob {
           std::vector<blitz::Array<double,1> >& dst);
 
 
-    	protected:
+      protected:
+        /**
+          * @brief Allocation methods
+          */
+        void allocateBuffers();
+        void allocateFilter();
+        void allocate();
+        /**
+          * @brief Resets the properties of the VLfeat filter object
+          */
+        void setFilterProperties(); 
+        /**
+          * @brief Reallocate and resets the properties of the VLfeat filter 
+          * object
+          */
+        void allocateFilterAndSet();
+        /**
+          * @brief Reallocate and resets the properties of the VLfeat objects
+          */
+        void allocateAndSet();
+
+        /**
+          * @brief Deallocation methods
+          */
+        void cleanupBuffers();
+        void cleanupFilter();
+        void cleanup();
+
         /**
           * @brief Attributes
           */
-        int m_height;
-        int m_width;
-        int m_n_intervals;
-        int m_n_octaves;
-        int m_octave_min;
+        size_t m_height;
+        size_t m_width;
+        size_t m_n_intervals;
+        size_t m_n_octaves;
+        int m_octave_min; // might be negative
         double m_peak_thres;
         double m_edge_thres;
         double m_magnif;
+        
         VlSiftFilt *m_filt;
         vl_uint8 *m_data;
         vl_sift_pix *m_fdata;
@@ -88,4 +171,4 @@ namespace bob {
   }
 }
 
-#endif /* BOB5SPRO_IP_VLSIFT_H */
+#endif /* BOB_IP_VLSIFT_H */

@@ -85,7 +85,7 @@ namespace bob {
         inline size_t getDescriptorSize() const 
         { return vl_dsift_get_descriptor_size(m_filt); }
 
-    	protected:
+      protected:
         /**
           * @brief Attributes
           */

@@ -24,36 +24,64 @@
 
 #include <vl/pgm.h>
 #include "core/array_assert.h"
-#include "core/logging.h"
-#include "core/convert.h"
-#include "io/Array.h"
 
-namespace ip = bob::ip;
-namespace tca = bob::core::array;
-
-ip::VLSIFT::VLSIFT(const int height, const int width, const int n_intervals,
-    const int n_octaves, const int octave_min,
-    const double peak_thres, const double edge_thres, const double magnif): 
+bob::ip::VLSIFT::VLSIFT(const size_t height, const size_t width, 
+    const size_t n_intervals, const size_t n_octaves, const int octave_min,
+    const double peak_thres, const double edge_thres, const double magnif):
   m_height(height), m_width(width), m_n_intervals(n_intervals), 
   m_n_octaves(n_octaves), m_octave_min(octave_min),
   m_peak_thres(peak_thres), m_edge_thres(edge_thres), m_magnif(magnif)
 {
-  const int npixels = height * width;
-
-  // Allocates buffers
-  m_data  = (vl_uint8*)malloc(npixels * sizeof(vl_uint8)); 
-  m_fdata = (vl_sift_pix*)malloc(npixels * sizeof(vl_sift_pix));
-
-  // Generates the filters
-  m_filt = vl_sift_new(m_width, m_height, m_n_octaves, m_n_intervals, m_octave_min);
-  vl_sift_set_edge_thresh(m_filt, m_edge_thres);
-  vl_sift_set_peak_thresh(m_filt, m_peak_thres);
-  vl_sift_set_magnif(m_filt, m_magnif);
-
-  // TODO: deals with allocation error?
+  // Allocates buffers and filter, and set filter properties
+  allocateAndSet();
 }
 
-void ip::VLSIFT::operator()(const blitz::Array<uint8_t,2>& src, 
+bob::ip::VLSIFT::VLSIFT(const VLSIFT& other):
+  m_height(other.m_height), m_width(other.m_width), 
+  m_n_intervals(other.m_n_intervals), m_n_octaves(other.m_n_octaves), 
+  m_octave_min(other.m_octave_min), m_peak_thres(other.m_peak_thres), 
+  m_edge_thres(other.m_edge_thres), m_magnif(other.m_magnif)
+{
+  // Allocates buffers and filter, and set filter properties
+  allocateAndSet();
+}
+
+bob::ip::VLSIFT& bob::ip::VLSIFT::operator=(const bob::ip::VLSIFT& other)
+{
+  if (this != &other)
+  {
+    m_height = other.m_height;
+    m_width = other.m_width;
+    m_n_intervals = other.m_n_intervals;
+    m_n_octaves = other.m_n_octaves; 
+    m_octave_min = other.m_octave_min;
+    m_peak_thres = other.m_peak_thres;
+    m_edge_thres = other.m_edge_thres;
+    m_magnif = other.m_magnif;
+  
+    // Allocates buffers and filter, and set filter properties
+    allocateAndSet();
+  }
+  return *this;
+}
+
+bool bob::ip::VLSIFT::operator==(const bob::ip::VLSIFT& b) const
+{
+  return (this->m_height == b.m_height && this->m_width == b.m_width && 
+          this->m_n_intervals == b.m_n_intervals && 
+          this->m_n_octaves == b.m_n_octaves && 
+          this->m_octave_min == b.m_octave_min && 
+          this->m_peak_thres == b.m_peak_thres && 
+          this->m_edge_thres == b.m_edge_thres &&
+          this->m_magnif == b.m_magnif);
+}
+
+bool bob::ip::VLSIFT::operator!=(const bob::ip::VLSIFT& b) const
+{
+  return !(this->operator==(b));
+}
+
+void bob::ip::VLSIFT::operator()(const blitz::Array<uint8_t,2>& src, 
  std::vector<blitz::Array<double,1> >& dst)
 {
   // Clears the vector
@@ -61,13 +89,11 @@ void ip::VLSIFT::operator()(const blitz::Array<uint8_t,2>& src,
   vl_bool err=VL_ERR_OK;
 
   // Copies data
-  for(unsigned int q=0; q<(unsigned)(m_width * m_height); ++q) {
+  for(unsigned int q=0; q<(unsigned)(m_width * m_height); ++q) 
     m_data[q] = src((int)(q/m_width), (int)(q%m_width));
-  }
   // Converts data type
-  for(unsigned int q=0; q<(unsigned)(m_width * m_height); ++q) {
+  for(unsigned int q=0; q<(unsigned)(m_width * m_height); ++q) 
     m_fdata[q] = m_data[q];
-  }
 
   // Processes each octave
   int i=0;
@@ -132,23 +158,71 @@ void ip::VLSIFT::operator()(const blitz::Array<uint8_t,2>& src,
 
 }
 
-ip::VLSIFT::~VLSIFT()
+void bob::ip::VLSIFT::allocateBuffers()
+{
+  const size_t npixels = m_height * m_width;
+  // Allocates buffers
+  m_data  = (vl_uint8*)malloc(npixels * sizeof(vl_uint8)); 
+  m_fdata = (vl_sift_pix*)malloc(npixels * sizeof(vl_sift_pix));
+  // TODO: deals with allocation error?
+}
+
+void bob::ip::VLSIFT::allocateFilter()
+{
+  // Generates the filter
+  m_filt = vl_sift_new(m_width, m_height, m_n_octaves, m_n_intervals, m_octave_min);
+  // TODO: deals with allocation error?
+}
+
+void bob::ip::VLSIFT::allocate()
+{
+  allocateBuffers();
+  allocateFilter();
+}
+
+void bob::ip::VLSIFT::setFilterProperties()
+{
+  // Set filter properties
+  vl_sift_set_edge_thresh(m_filt, m_edge_thres);
+  vl_sift_set_peak_thresh(m_filt, m_peak_thres);
+  vl_sift_set_magnif(m_filt, m_magnif);
+}
+
+void bob::ip::VLSIFT::allocateFilterAndSet()
+{
+  allocateFilter();
+  setFilterProperties();
+}
+
+void bob::ip::VLSIFT::allocateAndSet()
+{
+  allocateBuffers();
+  allocateFilterAndSet();
+}
+
+void bob::ip::VLSIFT::cleanupBuffers()
+{
+  // Releases image data
+  free(m_fdata);
+  m_fdata = 0;
+  free(m_data);
+  m_data = 0;
+}
+
+void bob::ip::VLSIFT::cleanupFilter()
 {
   // Releases filter
-  if(m_filt) {
-    vl_sift_delete(m_filt);
-    m_filt = 0;
-  }
+  vl_sift_delete(m_filt);
+  m_filt = 0;
+}
 
-  // Releases image data
-  if(m_fdata) {
-    free(m_fdata);
-    m_fdata = 0;
-  }
+void bob::ip::VLSIFT::cleanup()
+{
+  cleanupBuffers();
+  cleanupFilter();
+}
 
-  // Releases image data
-  if(m_data) {
-    free(m_data);
-    m_data = 0;
-  }
+bob::ip::VLSIFT::~VLSIFT()
+{
+  cleanup();
 }
