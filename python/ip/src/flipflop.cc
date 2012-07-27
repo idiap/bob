@@ -24,75 +24,147 @@
 #include "ip/flipflop.h"
 
 using namespace boost::python;
-namespace tp = bob::python;
-namespace ip = bob::ip;
-namespace ca = bob::core::array;
 
 template <typename T, int N>
-static void inner_flip (tp::const_ndarray src, tp::ndarray dst) {
+static void inner_flip(bob::python::const_ndarray src, 
+  bob::python::ndarray dst) 
+{
   blitz::Array<T,N> dst_ = dst.bz<T,N>();
-  ip::flip<T>(src.bz<T,N>(), dst_);
+  bob::ip::flip<T>(src.bz<T,N>(), dst_);
 }
 
-template <typename T>
-static void inner_flip_dim (tp::const_ndarray src, tp::ndarray dst) {
-  const ca::typeinfo& info = src.type();
-  switch (info.nd) {
-    case 2: return inner_flip<T,2>(src, dst);
-    case 3: return inner_flip<T,3>(src, dst);
-    default:
-      PYTHON_ERROR(TypeError, "image flipping does not support type '%s'", info.str().c_str());
-  }
-}
-
-static void flip (tp::const_ndarray src, tp::ndarray dst) {
-  const ca::typeinfo& info = src.type();
+template <int N>
+static void inner_flip_type(bob::python::const_ndarray src, 
+  bob::python::ndarray dst) 
+{
+  const bob::core::array::typeinfo& info = src.type();
   switch (info.dtype) {
-    case ca::t_uint8: 
-      return inner_flip_dim<uint8_t>(src, dst);
-    case ca::t_uint16:
-      return inner_flip_dim<uint16_t>(src, dst);
-    case ca::t_float64:
-      return inner_flip_dim<double>(src, dst);
+    case bob::core::array::t_uint8:
+      return inner_flip<uint8_t,N>(src, dst);
+    case bob::core::array::t_uint16:
+      return inner_flip<uint16_t,N>(src, dst);
+    case bob::core::array::t_float64:
+      return inner_flip<double,N>(src, dst);
     default:
-      PYTHON_ERROR(TypeError, "image flipping does not support type '%s'", info.str().c_str());
+      PYTHON_ERROR(TypeError, 
+        "image flipping does not support array of type '%s'.", 
+        info.str().c_str());
   }
 }
+
+static void py_flip_c(bob::python::const_ndarray src, 
+  bob::python::ndarray dst)
+{
+  const bob::core::array::typeinfo& info = src.type();
+  switch (info.nd) {
+    case 2: return inner_flip_type<2>(src, dst);
+    case 3: return inner_flip_type<3>(src, dst);
+    default:
+      PYTHON_ERROR(TypeError, 
+        "image flipping does not support array of '%ld' dimensions.", 
+        info.nd);
+  }
+}
+
+static object py_flip_p(bob::python::const_ndarray src) 
+{
+  const bob::core::array::typeinfo& info = src.type();
+  switch (info.nd) {
+    case 2:
+      {
+        bob::python::ndarray dst(info.dtype, info.shape[0], info.shape[1]);
+        inner_flip_type<2>(src, dst);
+        return dst.self();
+      }
+    case 3:
+      {
+        bob::python::ndarray dst(info.dtype, info.shape[0], info.shape[1], 
+          info.shape[2]);
+        inner_flip_type<3>(src, dst);
+        return dst.self();
+      }
+    default:
+      PYTHON_ERROR(TypeError, 
+        "image flipping does not support array of '%ld' dimensions.", 
+        info.nd);
+  }
+}
+
 
 template <typename T, int N>
-static void inner_flop (tp::const_ndarray src, tp::ndarray dst) {
+static void inner_flop(bob::python::const_ndarray src, 
+  bob::python::ndarray dst) 
+{
   blitz::Array<T,N> dst_ = dst.bz<T,N>();
-  ip::flop<T>(src.bz<T,N>(), dst_);
+  bob::ip::flop<T>(src.bz<T,N>(), dst_);
 }
 
-template <typename T>
-static void inner_flop_dim (tp::const_ndarray src, tp::ndarray dst) {
-  const ca::typeinfo& info = src.type();
-  switch (info.nd) {
-    case 2: return inner_flop<T,2>(src, dst);
-    case 3: return inner_flop<T,3>(src, dst);
-    default:
-      PYTHON_ERROR(TypeError, "image flopping does not support type '%s'", info.str().c_str());
-  }
-}
-
-static void flop (tp::const_ndarray src, tp::ndarray dst) {
-  const ca::typeinfo& info = src.type();
+template <int N>
+static void inner_flop_type(bob::python::const_ndarray src, 
+  bob::python::ndarray dst) 
+{
+  const bob::core::array::typeinfo& info = src.type();
   switch (info.dtype) {
-    case ca::t_uint8: 
-      return inner_flop_dim<uint8_t>(src, dst);
-    case ca::t_uint16:
-      return inner_flop_dim<uint16_t>(src, dst);
-    case ca::t_float64:
-      return inner_flop_dim<double>(src, dst);
+    case bob::core::array::t_uint8:
+      return inner_flop<uint8_t,N>(src, dst);
+    case bob::core::array::t_uint16:
+      return inner_flop<uint16_t,N>(src, dst);
+    case bob::core::array::t_float64:
+      return inner_flop<double,N>(src, dst);
     default:
-      PYTHON_ERROR(TypeError, "image flopping does not support type '%s'", info.str().c_str());
+      PYTHON_ERROR(TypeError, 
+        "image flopping does not support array of type '%s'.", 
+        info.str().c_str());
   }
 }
 
-void bind_ip_flipflop() {
-  static const char* FLIP_DOC = "Flip a 2 or 3D array/image upside-down.";
-  static const char* FLOP_DOC = "Flop a 2 or 3D array/image left-right.";
-  def("flip", &flip, (arg("src"), arg("dst")), FLIP_DOC); 
-  def("flop", &flop, (arg("src"), arg("dst")), FLOP_DOC); 
+static void py_flop_c(bob::python::const_ndarray src, 
+  bob::python::ndarray dst)
+{
+  const bob::core::array::typeinfo& info = src.type();
+  switch (info.nd) {
+    case 2: return inner_flop_type<2>(src, dst);
+    case 3: return inner_flop_type<3>(src, dst);
+    default:
+      PYTHON_ERROR(TypeError, 
+        "image flopping does not support array of '%ld' dimensions.", 
+        info.nd);
+  }
+}
+
+static object py_flop_p(bob::python::const_ndarray src) 
+{
+  const bob::core::array::typeinfo& info = src.type();
+  switch (info.nd) {
+    case 2:
+      {
+        bob::python::ndarray dst(info.dtype, info.shape[0], info.shape[1]);
+        inner_flop_type<2>(src, dst);
+        return dst.self();
+      }
+    case 3:
+      {
+        bob::python::ndarray dst(info.dtype, info.shape[0], info.shape[1], 
+          info.shape[2]);
+        inner_flop_type<3>(src, dst);
+        return dst.self();
+      }
+    default:
+      PYTHON_ERROR(TypeError, 
+        "image flopping does not support array of '%ld' dimensions.", 
+        info.nd);
+  }
+}
+
+void bind_ip_flipflop() 
+{
+  static const char* FLIP_DOC = "Flip a 2D or 3D array/image upside-down. The destination array should have the same size and type as the source array.";
+  static const char* FLIP_P_DOC = "Flip a 2D or 3D array/image upside-down. The output array is allocated and returned.";
+  static const char* FLOP_DOC = "Flop a 2D or 3D array/image left-right. The destination array should have the same size and type as the source array.";
+  static const char* FLOP_P_DOC = "Flop a 2D or 3D array/image left-right. The output array is allocated and returned.";
+
+  def("flip", &py_flip_c, (arg("src"), arg("dst")), FLIP_DOC); 
+  def("flip", &py_flip_p, (arg("src")), FLIP_P_DOC); 
+  def("flop", &py_flop_c, (arg("src"), arg("dst")), FLOP_DOC); 
+  def("flop", &py_flop_p, (arg("src")), FLOP_P_DOC); 
 }
