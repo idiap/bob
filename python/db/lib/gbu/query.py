@@ -248,7 +248,7 @@ class Database(object):
       The content of the model id is dependent on the type:
       
       * model_id is a file_id, when type is 'gbu'
-      * model_id is a client_id, when type is 'multi'
+      * model_id is a client_id, when type is 'multi', or when group is 'world'
       
     type
       One protocol type from ('gbu', 'multi'), only required when model_ids are specified
@@ -291,7 +291,8 @@ class Database(object):
     if 'world' in groups:
       query = self.m_session.query(File).join(Trainset)\
                   .filter(Trainset.m_name.in_(subworld))
-      query = filter_model(query, type, model_ids)
+      # here, we always query client ids (which is done by taking the 'multi' protocol)
+      query = filter_model(query, 'multi', model_ids)
 
       for file in query:
         retval[file.m_presentation] = object(file, file.m_signature)
