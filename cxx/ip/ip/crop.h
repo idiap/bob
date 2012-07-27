@@ -39,18 +39,20 @@ namespace bob {
         * @brief Checks the given cropping parameters wrt. given input 
         *   dimensions, and throws an exception if one part of the cropping
         *   area is outside the boundary of the source array.
-        * @param crop_x The x-offset of the top left corner of the cropping area 
-        * wrt. to the x-index of the top left corner of the blitz::array.
-        * @param crop_y The y-offset of the top left corner of the cropping area 
-        * wrt. to the y-index of the top left corner of the blitz::array.
-        * @param crop_w The desired width of the cropped blitz::array.
+        * @param crop_y The y-offset of the top left corner of the cropping 
+        *   area wrt. to the y-index of the top left corner of the 
+        *   blitz::array.
+        * @param crop_x The x-offset of the top left corner of the cropping 
+        *   area wrt. to the x-index of the top left corner of the 
+        *   blitz::array.
         * @param crop_h The desired height of the cropped blitz::array.
+        * @param crop_w The desired width of the cropped blitz::array.
         * @param src_height The height of the input image
         * @param src_width The width of the input image
         */
       void cropParameterCheck( const int crop_y, const int crop_x,
-        const int crop_h, const int crop_w, const int src_height, 
-        const int src_width);
+        const size_t crop_h, const size_t crop_w, const size_t src_height, 
+        const size_t src_width);
 
       /**
         * @brief Function which crops a 2D blitz::array/image of a given type,
@@ -59,17 +61,19 @@ namespace bob {
         *   one is the width (x-axis).
         * @param src The input blitz array
         * @param dst The output blitz array
-        * @param crop_x The x-offset of the top left corner of the cropping area 
-        * wrt. to the x-index of the top left corner of the blitz::array.
-        * @param crop_y The y-offset of the top left corner of the cropping area 
-        * wrt. to the y-index of the top left corner of the blitz::array.
-        * @param crop_w The desired width of the cropped blitz::array.
+        * @param crop_y The y-offset of the top left corner of the cropping 
+        *   area wrt. to the y-index of the top left corner of the 
+        *   blitz::array.
+        * @param crop_x The x-offset of the top left corner of the cropping 
+        *   area wrt. to the x-index of the top left corner of the 
+        *   blitz::array.
         * @param crop_h The desired height of the cropped blitz::array.
+        * @param crop_w The desired width of the cropped blitz::array.
         */
       template<typename T>
       void cropNoCheckReference(const blitz::Array<T,2>& src, 
         blitz::Array<T,2>& dst, const int crop_y, const int crop_x, 
-        const int crop_h, const int crop_w)
+        const size_t crop_h, const size_t crop_w)
       {
         blitz::Range ry( crop_y, crop_y+crop_h-1);
         blitz::Range rx( crop_x, crop_x+crop_w-1);
@@ -86,32 +90,38 @@ namespace bob {
         * @param dst The output blitz array
         * @param dst_mask The input blitz array mask, specifying the valid
         *   pixels of dst.
-        * @param crop_x The x-offset of the top left corner of the cropping area 
-        * wrt. to the x-index of the top left corner of the blitz::array.
-        * @param crop_y The y-offset of the top left corner of the cropping area 
-        * wrt. to the y-index of the top left corner of the blitz::array.
-        * @param crop_w The desired width of the cropped blitz::array.
+        * @param crop_y The y-offset of the top left corner of the cropping 
+        *   area wrt. to the y-index of the top left corner of the 
+        *   blitz::array.
+        * @param crop_x The x-offset of the top left corner of the cropping 
+        *   area wrt. to the x-index of the top left corner of the 
+        *   blitz::array.
         * @param crop_h The desired height of the cropped blitz::array.
-        * @param zero_out Whether the cropping area which is out of the boundary
-        * of the input blitz array should be filled with zero values, or with 
-        * the intensity of the closest pixel in the neighbourhood.
+        * @param crop_w The desired width of the cropped blitz::array.
+        * @param zero_out Whether the cropping area which is out of the 
+        *   boundary of the input blitz array should be filled with zero 
+        *   values, or with the intensity of the closest pixel in the 
+        *   neighbourhood.
         */
       template<typename T, bool mask>
-      void cropNoCheck(const blitz::Array<T,2>& src, const blitz::Array<bool,2>& src_mask,
-        blitz::Array<T,2>& dst, blitz::Array<bool,2>& dst_mask,
-        const int crop_y, const int crop_x, const int crop_h, const int crop_w,
-        const bool zero_out)
+      void cropNoCheck(const blitz::Array<T,2>& src, 
+        const blitz::Array<bool,2>& src_mask, blitz::Array<T,2>& dst, 
+        blitz::Array<bool,2>& dst_mask,
+        const int crop_y, const int crop_x, const size_t crop_h, 
+        const size_t crop_w, const bool zero_out)
       {
         bool is_y_out;
         int y_src, x_src;
-        for( int y=0; y<crop_h; ++y) {
+        for( int y=0; y<(int)crop_h; ++y) {
           is_y_out = y+crop_y<0 || y+crop_y>=src.extent(0);
-          y_src = bob::core::array::keepInRange( y+crop_y, 0, src.extent(0)-1);
-          for( int x=0; x<crop_w; ++x) {
-            if( is_y_out || x+crop_x<0 || x+crop_x>=src.extent(1) ) {
-              x_src = bob::core::array::keepInRange( x+crop_x, 0, src.extent(1)-1);
-              dst(y,x) = (zero_out ? 0 : 
-                src( y_src, x_src) );
+          y_src = bob::core::array::keepInRange( y+crop_y, 0, 
+                                                 src.extent(0)-1);
+          for( int x=0; x<(int)crop_w; ++x) {
+            if( is_y_out || x+crop_x<0 || x+crop_x>=src.extent(1) )
+            {
+              x_src = bob::core::array::keepInRange( x+crop_x, 0, 
+                                                     src.extent(1)-1);
+              dst(y,x) = (zero_out ? 0 : src( y_src, x_src) );
               if( mask )
                 dst_mask(y,x) = false;
             }
@@ -134,16 +144,19 @@ namespace bob {
       *   one is the width (x-axis).
       * @param src The input blitz array
       * @param dst The output blitz array
-      * @param crop_x The x-offset of the top left corner of the cropping area 
-      * wrt. to the x-index of the top left corner of the blitz::array.
-      * @param crop_y The y-offset of the top left corner of the cropping area 
-      * wrt. to the y-index of the top left corner of the blitz::array.
-      * @param crop_w The desired width of the cropped blitz::array.
+      * @param crop_y The y-offset of the top left corner of the cropping 
+      *   area wrt. to the y-index of the top left corner of the 
+      *   blitz::array.
+      * @param crop_x The x-offset of the top left corner of the cropping 
+      *   area wrt. to the x-index of the top left corner of the 
+      *   blitz::array.
       * @param crop_h The desired height of the cropped blitz::array.
+      * @param crop_w The desired width of the cropped blitz::array.
       */
     template<typename T>
     void cropReference(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst, 
-      const int crop_y, const int crop_x, const int crop_h, const int crop_w)
+      const int crop_y, const int crop_x, const size_t crop_h, 
+      const size_t crop_w)
     {
       // Check parameters and throw exception if required
       detail::cropParameterCheck( crop_y, crop_x, crop_h, crop_w, 
@@ -161,22 +174,27 @@ namespace bob {
       *   one is the width (x-axis).
       * @param src The input blitz array
       * @param dst The output blitz array
-      * @param crop_x The x-offset of the top left corner of the cropping area 
-      * wrt. to the x-index of the top left corner of the blitz::array.
-      * @param crop_y The y-offset of the top left corner of the cropping area 
-      * wrt. to the y-index of the top left corner of the blitz::array.
-      * @param crop_w The desired width of the cropped blitz::array.
+      * @param crop_y The y-offset of the top left corner of the cropping 
+      *   area wrt. to the y-index of the top left corner of the 
+      *   blitz::array.
+      * @param crop_x The x-offset of the top left corner of the cropping 
+      *   area wrt. to the x-index of the top left corner of the 
+      *   blitz::array. 
       * @param crop_h The desired height of the cropped blitz::array.
-      * @param allow_out Whether an exception should be raised or not if a part
-      * of the cropping area is out of the boundary of the input blitz array.
-      * @param zero_out Whether the cropping area which is out of the boundary
-      * of the input blitz array should be filled with zero values, or with 
-      * the intensity of the closest pixel in the neighbourhood.
+      * @param crop_w The desired width of the cropped blitz::array.
+      * @param allow_out Whether an exception should be raised or not if a 
+      *   part of the cropping area is out of the boundary of the input 
+      *   blitz array.
+      * @param zero_out Whether the cropping area which is out of the 
+      *   boundary of the input blitz array should be filled with zero 
+      *   values, or with the intensity of the closest pixel in the 
+      *   neighbourhood.
       */
     template<typename T>
     void crop(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst, 
-      const int crop_y, const int crop_x, const int crop_h, const int crop_w,
-      const bool allow_out=false, const bool zero_out=false)
+      const int crop_y, const int crop_x, const size_t crop_h, 
+      const size_t crop_w, const bool allow_out=false, 
+      const bool zero_out=false)
     {
       // Check parameters and throw exception if required
       if(!allow_out) 
@@ -202,22 +220,27 @@ namespace bob {
       *   height (y-axis), whereas the third one is the width (x-axis).
       * @param src The input blitz array
       * @param dst The output blitz array
-      * @param crop_x The x-offset of the top left corner of the cropping area 
-      * wrt. to the x-index of the top left corner of the blitz::array.
-      * @param crop_y The y-offset of the top left corner of the cropping area 
-      * wrt. to the y-index of the top left corner of the blitz::array.
-      * @param crop_w The desired width of the cropped blitz::array.
+      * @param crop_y The y-offset of the top left corner of the cropping 
+      *   area wrt. to the y-index of the top left corner of the 
+      *   blitz::array.
+      * @param crop_x The x-offset of the top left corner of the cropping 
+      *   area wrt. to the x-index of the top left corner of the 
+      *   blitz::array. 
       * @param crop_h The desired height of the cropped blitz::array.
-      * @param allow_out Whether an exception should be raised or not if a part
-      * of the cropping area is out of the boundary of the input blitz array.
-      * @param zero_out Whether the cropping area which is out of the boundary
-      * of the input blitz array should be filled with zero values, or with 
-      * the intensity of the closest pixel in the neighbourhood.
+      * @param crop_w The desired width of the cropped blitz::array.
+      * @param allow_out Whether an exception should be raised or not if a 
+      *   part of the cropping area is out of the boundary of the input 
+      *   blitz array.
+      * @param zero_out Whether the cropping area which is out of the 
+      *   boundary of the input blitz array should be filled with zero 
+      *   values, or with the intensity of the closest pixel in the 
+      *   neighbourhood.
       */
     template<typename T>
     void crop(const blitz::Array<T,3>& src, blitz::Array<T,3>& dst, 
-      const int crop_y, const int crop_x, const int crop_h, const int crop_w,
-      const bool allow_out=false, const bool zero_out=false)
+      const int crop_y, const int crop_x, const size_t crop_h, 
+      const size_t crop_w, const bool allow_out=false, 
+      const bool zero_out=false)
     {
       // Check parameters and throw exception if required
       if(!allow_out) 
@@ -226,7 +249,8 @@ namespace bob {
       // Check input
       bob::core::array::assertZeroBase( src);
       // Check output
-      const blitz::TinyVector<int,3> shape(src.extent(0), crop_h, crop_w);
+      const blitz::TinyVector<int,3> shape(src.extent(0), (int)crop_h, 
+        (int)crop_w);
       bob::core::array::assertZeroBase(dst);
       bob::core::array::assertSameShape(dst, shape);
  
@@ -255,23 +279,28 @@ namespace bob {
       * @param dst The output blitz array
       * @param dst_mask The output blitz array mask, specifying the valid
       *   pixels of dst.
-      * @param crop_x The x-offset of the top left corner of the cropping area 
-      * wrt. to the x-index of the top left corner of the blitz::array.
-      * @param crop_y The y-offset of the top left corner of the cropping area 
-      * wrt. to the y-index of the top left corner of the blitz::array.
+      * @param crop_x The x-offset of the top left corner of the cropping 
+      *   area wrt. to the x-index of the top left corner of the 
+      *   blitz::array.
+      * @param crop_y The y-offset of the top left corner of the cropping
+      *   area wrt. to the y-index of the top left corner of the 
+      *   blitz::array.
       * @param crop_w The desired width of the cropped blitz::array.
       * @param crop_h The desired height of the cropped blitz::array.
-      * @param allow_out Whether an exception should be raised or not if a part
-      * of the cropping area is out of the boundary of the input blitz array.
-      * @param zero_out Whether the cropping area which is out of the boundary
-      * of the input blitz array should be filled with zero values, or with 
-      * the intensity of the closest pixel in the neighbourhood.
+      * @param allow_out Whether an exception should be raised or not if a
+      *   part of the cropping area is out of the boundary of the input 
+      *   blitz array.
+      * @param zero_out Whether the cropping area which is out of the 
+      *   boundary of the input blitz array should be filled with zero 
+      *   values, or with the intensity of the closest pixel in the 
+      *   neighbourhood.
       */
     template<typename T>
-    void crop(const blitz::Array<T,2>& src, const blitz::Array<bool,2>& src_mask,
-      blitz::Array<T,2>& dst, blitz::Array<bool,2>& dst_mask,
-      const int crop_y, const int crop_x, const int crop_h, const int crop_w,
-      const bool allow_out=false, const bool zero_out=false)
+    void crop(const blitz::Array<T,2>& src, 
+      const blitz::Array<bool,2>& src_mask, blitz::Array<T,2>& dst, 
+      blitz::Array<bool,2>& dst_mask, const int crop_y, const int crop_x, 
+      const size_t crop_h, const size_t crop_w, const bool allow_out=false, 
+      const bool zero_out=false)
     {
       // Check parameters and throw exception if required
       if(!allow_out) 
@@ -282,7 +311,7 @@ namespace bob {
       bob::core::array::assertZeroBase(src_mask);
       bob::core::array::assertSameShape(src, src_mask);
       // Check output
-      const blitz::TinyVector<int,2> shape(crop_h,crop_w);
+      const blitz::TinyVector<int,2> shape((int)crop_h, (int)crop_w);
       bob::core::array::assertZeroBase(dst);
       bob::core::array::assertZeroBase(dst_mask);
       bob::core::array::assertSameShape(dst, dst_mask);
@@ -304,22 +333,27 @@ namespace bob {
       * @param dst The output blitz array
       * @param dst_mask The output blitz array mask, specifying the valid
       *   pixels of dst.
-      * @param crop_x The x-offset of the top left corner of the cropping area 
-      * wrt. to the x-index of the top left corner of the blitz::array.
-      * @param crop_y The y-offset of the top left corner of the cropping area 
-      * wrt. to the y-index of the top left corner of the blitz::array.
-      * @param crop_w The desired width of the cropped blitz::array.
+      * @param crop_y The y-offset of the top left corner of the cropping 
+      *   area wrt. to the y-index of the top left corner of the 
+      *   blitz::array.
+      * @param crop_x The x-offset of the top left corner of the cropping 
+      *   area wrt. to the x-index of the top left corner of the 
+      *   blitz::array. 
       * @param crop_h The desired height of the cropped blitz::array.
-      * @param allow_out Whether an exception should be raised or not if a part
-      * of the cropping area is out of the boundary of the input blitz array.
-      * @param zero_out Whether the cropping area which is out of the boundary
-      * of the input blitz array should be filled with zero values, or with 
-      * the intensity of the closest pixel in the neighbourhood.
+      * @param crop_w The desired width of the cropped blitz::array.
+      * @param allow_out Whether an exception should be raised or not if a 
+      *   part of the cropping area is out of the boundary of the input 
+      *   blitz array.
+      * @param zero_out Whether the cropping area which is out of the 
+      *   boundary of the input blitz array should be filled with zero 
+      *   values, or with the intensity of the closest pixel in the 
+      *   neighbourhood.
       */
     template<typename T>
-    void crop(const blitz::Array<T,3>& src, const blitz::Array<bool,3>& src_mask,
-      blitz::Array<T,3>& dst, blitz::Array<bool,3>& dst_mask,
-      const int crop_y, const int crop_x, const int crop_h, const int crop_w,
+    void crop(const blitz::Array<T,3>& src, 
+      const blitz::Array<bool,3>& src_mask, blitz::Array<T,3>& dst, 
+      blitz::Array<bool,3>& dst_mask, const int crop_y, 
+      const int crop_x, const size_t crop_h, const size_t crop_w,
       const bool allow_out=false, const bool zero_out=false)
     {
       // Check parameters and throw exception if required
@@ -331,7 +365,8 @@ namespace bob {
       bob::core::array::assertZeroBase(src_mask);
       bob::core::array::assertSameShape(src, src_mask);
       // Check output
-      const blitz::TinyVector<int,3> shape(src.extent(0), crop_h, crop_w);
+      const blitz::TinyVector<int,3> shape(src.extent(0), (int)crop_h,
+        (int)crop_w);
       bob::core::array::assertZeroBase(dst);
       bob::core::array::assertZeroBase(dst_mask);
       bob::core::array::assertSameShape(dst, dst_mask);
@@ -348,7 +383,7 @@ namespace bob {
         blitz::Array<bool,2> dst_mask_slice = 
           dst_mask( p, blitz::Range::all(), blitz::Range::all() );
         // Crop the 2D array
-        detail::cropNoCheck<T,true>(src_slice, src_mask_slice, dst_slice, 
+        detail::cropNoCheck<T,true>(src_slice, src_mask_slice, dst_slice,
           dst_mask_slice, crop_y, crop_x, crop_h, crop_w, zero_out);
       }
     }

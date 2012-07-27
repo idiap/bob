@@ -21,25 +21,23 @@
 #include "ip/shift.h"
 #include "ip/Exception.h"
 
-namespace ipd = bob::ip::detail;
-
-void ipd::shiftParameterCheck( const int shift_y, const int shift_x,
-  const int src_height, const int src_width)
+void bob::ip::detail::shiftParameterCheck( const int shift_y, const int shift_x,
+  const size_t src_height, const size_t src_width)
 {
   // Check parameters and throw exception if required
-  if( shift_y <= -src_height ) {
+  if( shift_y <= -(int)src_height ) {
     throw ParamOutOfBoundaryError("shift_y", false, shift_y, 
       -src_height+1);
   }
-  if( shift_x <= -src_width ) {
+  if( shift_x <= -(int)src_width ) {
     throw ParamOutOfBoundaryError("shift_x", false, shift_x, 
       -src_width+1);
   }
-  if( shift_y >= src_height ) {
+  if( shift_y >= (int)src_height ) {
     throw ParamOutOfBoundaryError("shift_y", true, shift_y, 
       src_height-1);
   }
-  if( shift_x >= src_width ) {
+  if( shift_x >= (int)src_width ) {
     throw ParamOutOfBoundaryError("shift_x", true, shift_x, 
       src_width-1);
   }

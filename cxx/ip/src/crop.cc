@@ -21,11 +21,9 @@
 #include "ip/crop.h"
 #include "ip/Exception.h"
 
-namespace ipd = bob::ip::detail;
-
-void ipd::cropParameterCheck( const int crop_y, const int crop_x,
-  const int crop_h, const int crop_w, const int src_height, 
-  const int src_width)
+void bob::ip::detail::cropParameterCheck( const int crop_y, 
+  const int crop_x, const size_t crop_h, const size_t crop_w, 
+  const size_t src_height, const size_t src_width)
 {
   // Check parameters and throw exception if required
   if( crop_y<0) {
@@ -33,12 +31,6 @@ void ipd::cropParameterCheck( const int crop_y, const int crop_x,
   }
   if( crop_x<0 ) {
     throw ParamOutOfBoundaryError("crop_x", false, crop_x, 0);
-  }
-  if( crop_h<0) {
-    throw ParamOutOfBoundaryError("crop_h", false, crop_h, 0);
-  }
-  if( crop_w<0) {
-    throw ParamOutOfBoundaryError("crop_w", false, crop_w, 0);
   }
   if( crop_y+crop_h>src_height ) {
     throw ParamOutOfBoundaryError("crop_y+crop_h", true, crop_y+crop_h, 

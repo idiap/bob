@@ -44,6 +44,8 @@ bob_python_package_bindings(ip "${ccsrc}" "python_integration")
 
 # Our test units
 bob_python_add_unittest(ip lib/test/block.py)
+bob_python_add_unittest(ip lib/test/crop_shift.py)
+bob_python_add_unittest(ip lib/test/flipflop.py)
 bob_python_add_unittest(ip lib/test/hog.py)
 bob_python_add_unittest(ip lib/test/lbp_new.py)
 bob_python_add_unittest(ip lib/test/optflow.py)
