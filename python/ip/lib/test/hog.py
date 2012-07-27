@@ -88,6 +88,15 @@ class HOGTest(unittest.TestCase):
     hgm.forward_(SRC_A, mag, ori)
     numpy.allclose(mag, MAG1_A, EPSILON)
     numpy.allclose(ori, ORI_A, EPSILON)
+    (mag2, ori2) = hgm(SRC_A)
+    numpy.allclose(mag2, MAG1_A, EPSILON)
+    numpy.allclose(ori2, ORI_A, EPSILON)
+    (mag2, ori2) = hgm.forward(SRC_A)
+    numpy.allclose(mag2, MAG1_A, EPSILON)
+    numpy.allclose(ori2, ORI_A, EPSILON)
+    (mag2, ori2) = hgm.forward_(SRC_A)
+    numpy.allclose(mag2, MAG1_A, EPSILON)
+    numpy.allclose(ori2, ORI_A, EPSILON)
 
     # MagnitudeSquare
     hgm.magnitude_type = bob.ip.GradientMagnitudeType.MagnitudeSquare
@@ -150,6 +159,10 @@ class HOGTest(unittest.TestCase):
     numpy.allclose(hist, HIST_A, EPSILON)
     bob.ip.hog_compute_histogram_(MAG1_A, ORI_A, hist)
     numpy.allclose(hist, HIST_A, EPSILON)
+    hist2 = bob.ip.hog_compute_histogram(MAG1_A, ORI_A, 8)
+    numpy.allclose(hist2, HIST_A, EPSILON)
+    hist2 = bob.ip.hog_compute_histogram_(MAG1_A, ORI_A, 8)
+    numpy.allclose(hist, HIST_A, EPSILON)
     
     # Check with second input array
     bob.ip.hog_compute_histogram(MAG_B, ORI_B, hist)
@@ -175,6 +188,10 @@ class HOGTest(unittest.TestCase):
     numpy.allclose(hist, py_L2ref, EPSILON)
     bob.ip.normalize_block_(HIST_3D, hist)
     numpy.allclose(hist, py_L2ref, EPSILON)
+    hist2 = bob.ip.normalize_block(HIST_3D)
+    numpy.allclose(hist2, py_L2ref, EPSILON)
+    hist2 = bob.ip.normalize_block_(HIST_3D)
+    numpy.allclose(hist2, py_L2ref, EPSILON)
     # L2Hys Norm
     py_L2Hysref = HIST_1D / numpy.linalg.norm(HIST_1D)
     numpy.clip(py_L2Hysref, a_min=0, a_max=0.2) 
@@ -268,6 +285,12 @@ class HOGTest(unittest.TestCase):
     self.assertTrue( numpy.allclose( hist_3D, HIST_IMG_A, EPSILON))
     hog.forward(IMG_8x8_A.astype(numpy.uint16), hist_3D)
     self.assertTrue( numpy.allclose( hist_3D, HIST_IMG_A, EPSILON))
+    hist3 = hog.forward(IMG_8x8_A)
+    self.assertTrue( numpy.allclose( hist3, HIST_IMG_A, EPSILON))
+    hist3 = hog.forward(IMG_8x8_A.astype(numpy.uint8))
+    self.assertTrue( numpy.allclose( hist3, HIST_IMG_A, EPSILON))
+    hist3 = hog.forward(IMG_8x8_A.astype(numpy.uint16))
+    self.assertTrue( numpy.allclose( hist3, HIST_IMG_A, EPSILON))
 
     # Check equal/not equal operators
     hog1 = bob.ip.HOG(8,8)

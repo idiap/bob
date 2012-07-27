@@ -27,7 +27,7 @@
 
 using namespace boost::python;
 
-static void hog_compute_histogram_(bob::python::const_ndarray mag, 
+static void hog_compute_histogram__c(bob::python::const_ndarray mag, 
   bob::python::const_ndarray ori, bob::python::ndarray hist, 
   const bool init_hist=true, const bool full_orientation=false)
 {
@@ -46,14 +46,39 @@ static void hog_compute_histogram_(bob::python::const_ndarray mag,
       infoOri.dtype != bob::core::array::t_float64 || 
       infoHist.dtype != bob::core::array::t_float64)
     PYTHON_ERROR(TypeError, 
-      "bob.ip.hog_compute_histogram_ requires input arrays of type float64.");
+      "bob.ip.hog_compute_histogram_() requires input arrays of type \
+       float64.");
 
   blitz::Array<double,1> hist_ = hist.bz<double,1>();
   bob::ip::hogComputeHistogram_(mag.bz<double,2>(), ori.bz<double,2>(), hist_,
     init_hist, full_orientation);
 }
 
-static void hog_compute_histogram(bob::python::const_ndarray mag, 
+static object hog_compute_histogram__p(bob::python::const_ndarray mag, 
+  bob::python::const_ndarray ori, const size_t nb_bins, 
+  const bool full_orientation=false)
+{
+  const bob::core::array::typeinfo& infoMag = mag.type();
+  const bob::core::array::typeinfo& infoOri = ori.type();
+
+  if(infoMag.nd != 2 || infoOri.nd !=2)
+    PYTHON_ERROR(TypeError, 
+      "bob.ip.hog_compute_histogram_() requires 2D input arrays.");
+
+  if(infoMag.dtype != bob::core::array::t_float64 || 
+      infoOri.dtype != bob::core::array::t_float64)
+    PYTHON_ERROR(TypeError, 
+      "bob.ip.hog_compute_histogram_() requires input arrays of type \
+       float64.");
+
+  bob::python::ndarray hist(bob::core::array::t_float64, nb_bins);
+  blitz::Array<double,1> hist_ = hist.bz<double,1>();
+  bob::ip::hogComputeHistogram_(mag.bz<double,2>(), ori.bz<double,2>(), hist_,
+    true, full_orientation);
+  return hist.self();
+}
+
+static void hog_compute_histogram_c(bob::python::const_ndarray mag, 
   bob::python::const_ndarray ori, bob::python::ndarray hist, 
   const bool init_hist=true, const bool full_orientation=false)
 {
@@ -63,26 +88,57 @@ static void hog_compute_histogram(bob::python::const_ndarray mag,
 
   if(infoMag.nd != 2 || infoOri.nd !=2)
     PYTHON_ERROR(TypeError, 
-      "bob.ip.hog_compute_histogram requires 2D input arrays.");
+      "bob.ip.hog_compute_histogram() requires 2D input arrays.");
   if(infoHist.nd !=1)
     PYTHON_ERROR(TypeError, 
-      "bob.ip.hog_compute_histogram requires a 1D output array.");
+      "bob.ip.hog_compute_histogram() requires a 1D output array.");
 
   if(infoMag.dtype != bob::core::array::t_float64 || 
       infoOri.dtype != bob::core::array::t_float64 || 
       infoHist.dtype != bob::core::array::t_float64)
     PYTHON_ERROR(TypeError, 
-      "bob.ip.hog_compute_histogram requires input arrays of type float64.");
+      "bob.ip.hog_compute_histogram() requires input arrays of type \
+       float64.");
 
   blitz::Array<double,1> hist_ = hist.bz<double,1>();
-  bob::ip::hogComputeHistogram(mag.bz<double,2>(), ori.bz<double,2>(), hist_,
-    init_hist, full_orientation);
+  bob::ip::hogComputeHistogram(mag.bz<double,2>(), ori.bz<double,2>(), 
+    hist_, init_hist, full_orientation);
 }
 
-BOOST_PYTHON_FUNCTION_OVERLOADS(hog_compute_histogram__overloads, 
-  hog_compute_histogram_, 3, 5)
-BOOST_PYTHON_FUNCTION_OVERLOADS(hog_compute_histogram_overloads, 
-  hog_compute_histogram, 3, 5)
+static object hog_compute_histogram_p(bob::python::const_ndarray mag, 
+  bob::python::const_ndarray ori, const size_t nb_bins, 
+  const bool full_orientation=false)
+{
+  const bob::core::array::typeinfo& infoMag = mag.type();
+  const bob::core::array::typeinfo& infoOri = ori.type();
+
+  if(infoMag.nd != 2 || infoOri.nd !=2)
+    PYTHON_ERROR(TypeError, 
+      "bob.ip.hog_compute_histogram_() requires 2D input arrays.");
+
+  if(infoMag.dtype != bob::core::array::t_float64 || 
+      infoOri.dtype != bob::core::array::t_float64)
+    PYTHON_ERROR(TypeError, 
+      "bob.ip.hog_compute_histogram_() requires input arrays of type \
+       float64.");
+
+  bob::python::ndarray hist(bob::core::array::t_float64, nb_bins);
+  blitz::Array<double,1> hist_ = hist.bz<double,1>();
+  bob::ip::hogComputeHistogram(mag.bz<double,2>(), ori.bz<double,2>(), 
+    hist_, true, full_orientation);
+  return hist.self();
+}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(hog_compute_histogram__c_overloads, 
+  hog_compute_histogram__c, 3, 5)
+BOOST_PYTHON_FUNCTION_OVERLOADS(hog_compute_histogram__p_overloads, 
+  hog_compute_histogram__p, 3, 4)
+BOOST_PYTHON_FUNCTION_OVERLOADS(hog_compute_histogram_c_overloads, 
+  hog_compute_histogram_c, 3, 5)
+BOOST_PYTHON_FUNCTION_OVERLOADS(hog_compute_histogram_p_overloads, 
+  hog_compute_histogram_p, 3, 4)
+
+
 
 template <int D> 
 static void inner_normalize_block_(bob::python::const_ndarray hist, 
@@ -90,10 +146,11 @@ static void inner_normalize_block_(bob::python::const_ndarray hist,
   const double eps, const double threshold)
 {
   blitz::Array<double,1> norm_hist_ = norm_hist.bz<double,1>();
-  bob::ip::normalizeBlock_(hist.bz<double,D>(), norm_hist_, block_norm, eps, threshold);
+  bob::ip::normalizeBlock_(hist.bz<double,D>(), norm_hist_, block_norm, eps,
+    threshold);
 }
 
-static void normalize_block_(bob::python::const_ndarray hist, 
+static void normalize_block__c(bob::python::const_ndarray hist, 
   bob::python::ndarray norm_hist, 
   const bob::ip::BlockNorm block_norm=bob::ip::L2, const double eps=1e-10, 
   const double threshold=0.2)
@@ -123,7 +180,49 @@ static void normalize_block_(bob::python::const_ndarray hist,
       break;
     default:
       PYTHON_ERROR(TypeError, 
-        "bob.ip.normalize_block requires a 1D, 2D or 3D input array.");
+        "bob.ip.normalize_block_() requires a 1D, 2D or 3D input array.");
+  } 
+}
+
+static object normalize_block__p(bob::python::const_ndarray hist, 
+  const bob::ip::BlockNorm block_norm=bob::ip::L2, const double eps=1e-10, 
+  const double threshold=0.2)
+{
+  const bob::core::array::typeinfo& infoHist = hist.type();
+
+  if(infoHist.dtype != bob::core::array::t_float64) 
+    PYTHON_ERROR(TypeError, 
+      "bob.ip.normalize_block_() requires input arrays of type float64.");
+
+  switch(infoHist.nd)
+  {
+    case 1:
+      {
+        bob::python::ndarray norm_hist(bob::core::array::t_float64, 
+          infoHist.shape[0]);
+        inner_normalize_block_<1>(hist, norm_hist, block_norm, eps, 
+          threshold);
+        return norm_hist.self();
+      }
+    case 2:
+      {
+        bob::python::ndarray norm_hist(bob::core::array::t_float64, 
+          infoHist.shape[0]*infoHist.shape[1]);
+        inner_normalize_block_<2>(hist, norm_hist, block_norm, eps, 
+          threshold);
+        return norm_hist.self();
+      }
+    case 3:
+      {
+        bob::python::ndarray norm_hist(bob::core::array::t_float64, 
+          infoHist.shape[0]*infoHist.shape[1]*infoHist.shape[2]);
+        inner_normalize_block_<3>(hist, norm_hist, block_norm, eps, 
+          threshold);
+        return norm_hist.self();
+      }
+    default:
+      PYTHON_ERROR(TypeError, 
+        "bob.ip.normalize_block_() requires a 1D, 2D or 3D input array.");
   } 
 }
 
@@ -138,7 +237,7 @@ static void inner_normalize_block( bob::python::const_ndarray hist,
     threshold);
 }
 
-static void normalize_block(bob::python::const_ndarray hist, 
+static void normalize_block_c(bob::python::const_ndarray hist, 
   bob::python::ndarray norm_hist,
   const bob::ip::BlockNorm block_norm=bob::ip::L2, const double eps=1e-10,
   const double threshold=0.2)
@@ -148,12 +247,12 @@ static void normalize_block(bob::python::const_ndarray hist,
 
   if(infoNormHist.nd !=1)
     PYTHON_ERROR(TypeError, 
-      "bob.ip.normalize_block_() requires a 1D output array.");
+      "bob.ip.normalize_block() requires a 1D output array.");
 
   if(infoHist.dtype != bob::core::array::t_float64 || 
       infoNormHist.dtype != bob::core::array::t_float64)
     PYTHON_ERROR(TypeError, 
-      "normalize_block_ requires input arrays of type float64.");
+      "bob.ip.normalize_block() requires input arrays of type float64.");
 
   switch(infoHist.nd)
   {
@@ -168,15 +267,62 @@ static void normalize_block(bob::python::const_ndarray hist,
       break;
     default:
       PYTHON_ERROR(TypeError, 
-        "bob.ip.normalize_block requires a 1D, 2D or 3D input array.");
+        "bob.ip.normalize_block() requires a 1D, 2D or 3D input array.");
   } 
 }
 
+static object normalize_block_p(bob::python::const_ndarray hist, 
+  const bob::ip::BlockNorm block_norm=bob::ip::L2, const double eps=1e-10, 
+  const double threshold=0.2)
+{
+  const bob::core::array::typeinfo& infoHist = hist.type();
 
-BOOST_PYTHON_FUNCTION_OVERLOADS(normalize_block__overloads, 
-  normalize_block_, 2, 5) 
-BOOST_PYTHON_FUNCTION_OVERLOADS(normalize_block_overloads, 
-  normalize_block, 2, 5) 
+  if(infoHist.dtype != bob::core::array::t_float64) 
+    PYTHON_ERROR(TypeError, 
+      "bob.ip.normalize_block() requires input arrays of type float64.");
+
+  switch(infoHist.nd)
+  {
+    case 1:
+      {
+        bob::python::ndarray norm_hist(bob::core::array::t_float64, 
+          infoHist.shape[0]);
+        inner_normalize_block<1>(hist, norm_hist, block_norm, eps, 
+          threshold);
+        return norm_hist.self();
+      }
+    case 2:
+      {
+        bob::python::ndarray norm_hist(bob::core::array::t_float64, 
+          infoHist.shape[0]*infoHist.shape[1]);
+        inner_normalize_block<2>(hist, norm_hist, block_norm, eps, 
+          threshold);
+        return norm_hist.self();
+      }
+    case 3:
+      {
+        bob::python::ndarray norm_hist(bob::core::array::t_float64, 
+          infoHist.shape[0]*infoHist.shape[1]*infoHist.shape[2]);
+        inner_normalize_block<3>(hist, norm_hist, block_norm, eps, 
+          threshold);
+        return norm_hist.self();
+      }
+    default:
+      PYTHON_ERROR(TypeError, 
+        "bob.ip.normalize_block() requires a 1D, 2D or 3D input array.");
+  } 
+}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(normalize_block__c_overloads, 
+  normalize_block__c, 2, 5) 
+BOOST_PYTHON_FUNCTION_OVERLOADS(normalize_block__p_overloads, 
+  normalize_block__p, 1, 4) 
+BOOST_PYTHON_FUNCTION_OVERLOADS(normalize_block_c_overloads, 
+  normalize_block_c, 2, 5) 
+BOOST_PYTHON_FUNCTION_OVERLOADS(normalize_block_p_overloads, 
+  normalize_block_p, 1, 4) 
+
+
 
 template <typename T> 
 static void inner_gradient_maps_call1(bob::ip::GradientMaps& obj, 
@@ -208,6 +354,33 @@ static void gradient_maps_call1(bob::ip::GradientMaps& obj,
         "bob.ip.GradientMaps __call__ does not support array with type '%s'.",
         info.str().c_str());
   }
+}
+
+static tuple gradient_maps_call1_p(bob::ip::GradientMaps& obj, 
+  bob::python::const_ndarray input)
+{
+  const bob::core::array::typeinfo& info = input.type();
+  bob::python::ndarray magnitude(bob::core::array::t_float64, 
+    info.shape[0], info.shape[1]);
+  bob::python::ndarray orientation(bob::core::array::t_float64, 
+    info.shape[0], info.shape[1]);
+
+  switch (info.dtype) {
+    case bob::core::array::t_uint8: 
+      inner_gradient_maps_call1<uint8_t>(obj, input, magnitude, orientation);
+      break;
+    case bob::core::array::t_uint16:
+      inner_gradient_maps_call1<uint16_t>(obj, input, magnitude, orientation);
+      break;
+    case bob::core::array::t_float64: 
+      inner_gradient_maps_call1<double>(obj, input, magnitude, orientation);
+      break;
+    default: 
+      PYTHON_ERROR(TypeError, 
+        "bob.ip.GradientMaps __call__ does not support array with type '%s'.",
+        info.str().c_str());
+  }
+  return make_tuple(magnitude, orientation);
 }
 
 template <typename T> 
@@ -242,6 +415,35 @@ static void gradient_maps_call2(bob::ip::GradientMaps& obj,
   }
 }
 
+static tuple gradient_maps_call2_p(bob::ip::GradientMaps& obj, 
+  bob::python::const_ndarray input)
+{
+  const bob::core::array::typeinfo& info = input.type();
+  bob::python::ndarray magnitude(bob::core::array::t_float64, 
+    info.shape[0], info.shape[1]);
+  bob::python::ndarray orientation(bob::core::array::t_float64, 
+    info.shape[0], info.shape[1]);
+
+  switch (info.dtype) {
+    case bob::core::array::t_uint8: 
+      inner_gradient_maps_call2<uint8_t>(obj, input, magnitude, orientation);
+      break;
+    case bob::core::array::t_uint16:
+      inner_gradient_maps_call2<uint16_t>(obj, input, magnitude, orientation);
+      break;
+    case bob::core::array::t_float64: 
+      inner_gradient_maps_call2<double>(obj, input, magnitude, orientation);
+      break;
+    default: 
+      PYTHON_ERROR(TypeError, 
+        "bob.ip.GradientMaps __call__ does not support array with type '%s'.",
+        info.str().c_str());
+  }
+  return make_tuple(magnitude, orientation);
+}
+
+
+
 template <typename T> 
 static void inner_hog_call1(bob::ip::HOG<double>& obj, 
   bob::python::const_ndarray input, bob::python::ndarray output)
@@ -275,6 +477,33 @@ static void hog_call1(bob::ip::HOG<double>& obj,
         "bob.ip.HOG __call__ does not support array with type '%s'.", 
         info.str().c_str());
   }
+}
+
+static object hog_call1_p(bob::ip::HOG<double>& obj, 
+  bob::python::const_ndarray input) 
+{
+  const bob::core::array::typeinfo& info = input.type();
+  const blitz::TinyVector<int,3> shape = obj.getOutputShape();
+  bob::python::ndarray output(bob::core::array::t_float64, 
+    shape(0), shape(1), shape(2));
+
+  switch (info.dtype) {
+    case bob::core::array::t_uint8: 
+      inner_hog_call1_cast<uint8_t>(obj, input, output);
+      break;
+    case bob::core::array::t_uint16:
+      inner_hog_call1_cast<uint16_t>(obj, input, output);
+      break;
+    case bob::core::array::t_float64: 
+      inner_hog_call1<double>(obj, input, output);
+      break;
+    default: 
+      PYTHON_ERROR(TypeError, 
+        "bob.ip.HOG __call__ does not support array with type '%s'.", 
+        info.str().c_str());
+  }
+
+  return output.self();
 }
 
 template <typename T> 
@@ -312,8 +541,36 @@ static void hog_call2(bob::ip::HOG<double>& obj,
   }
 }
 
+static object hog_call2_p(bob::ip::HOG<double>& obj, 
+  bob::python::const_ndarray input) 
+{
+  const bob::core::array::typeinfo& info = input.type();
+  const blitz::TinyVector<int,3> shape = obj.getOutputShape();
+  bob::python::ndarray output(bob::core::array::t_float64, 
+    shape(0), shape(1), shape(2));
 
-void bind_ip_hog() {
+  switch (info.dtype) {
+    case bob::core::array::t_uint8: 
+      inner_hog_call2_cast<uint8_t>(obj, input, output);
+      break;
+    case bob::core::array::t_uint16:
+      inner_hog_call2_cast<uint16_t>(obj, input, output);
+      break;
+    case bob::core::array::t_float64: 
+      inner_hog_call2<double>(obj, input, output);
+      break;
+    default: 
+      PYTHON_ERROR(TypeError, 
+        "bob.ip.HOG __call__ does not support array with type '%s'.", 
+        info.str().c_str());
+  }
+
+  return output.self();
+}
+
+
+void bind_ip_hog() 
+{
   static const char* gradientmaps_doc = 
     "Objects of this class, after configuration, can extract gradient \
      magnitude and orientation maps.";
@@ -333,27 +590,50 @@ void bind_ip_hog() {
     .value("L1sqrt", bob::ip::L1sqrt)
     .value("None", bob::ip::None);
 
-  def("hog_compute_histogram_", &hog_compute_histogram_, 
-    hog_compute_histogram__overloads((arg("mag"), arg("ori"), 
+  def("hog_compute_histogram_", &hog_compute_histogram__c, 
+    hog_compute_histogram__c_overloads((arg("mag"), arg("ori"), arg("hist"),
     arg("init_hist")=true, arg("full_orientation")=false), 
     "Computes an Histogram of Gradients for a given 'cell'. The inputs are \
     the gradient magnitudes and the orientations for each pixel of the cell. \
     This variant does NOT check the inputs."));
-  def("hog_compute_histogram", &hog_compute_histogram, 
-    hog_compute_histogram_overloads((arg("mag"), arg("ori"), 
-    arg("init_hist")=true, arg("full_orientation")=false), 
+  def("hog_compute_histogram_", &hog_compute_histogram__p, 
+    hog_compute_histogram__p_overloads((arg("mag"), arg("ori"), 
+    arg("nb_bins"), arg("full_orientation")=false), 
+    "Computes an Histogram of Gradients for a given 'cell'. The inputs are \
+    the gradient magnitudes and the orientations for each pixel of the cell. \
+    This variant does NOT check the inputs."));
+  def("hog_compute_histogram", &hog_compute_histogram_c, 
+    hog_compute_histogram_c_overloads((arg("mag"), arg("ori"), 
+    arg("hist"), arg("init_hist")=true, arg("full_orientation")=false), 
+    "Computes an Histogram of Gradients for a given 'cell'. The inputs are \
+    the gradient magnitudes and the orientations for each pixel of the \
+    cell."));
+  def("hog_compute_histogram", &hog_compute_histogram_p, 
+    hog_compute_histogram_p_overloads((arg("mag"), arg("ori"), 
+    arg("nb_bins"), arg("full_orientation")=false), 
     "Computes an Histogram of Gradients for a given 'cell'. The inputs are \
     the gradient magnitudes and the orientations for each pixel of the \
     cell."));
 
-  def("normalize_block_", &normalize_block_, 
-    normalize_block__overloads((arg("hist"), arg("norm_hist"), 
+  def("normalize_block_", &normalize_block__c, 
+    normalize_block__c_overloads((arg("hist"), arg("norm_hist"), 
     arg("block_norm")=bob::ip::L2, arg("eps")=1e-10, arg("threshold")=0.2), 
     "normalizes a set of cells (Histogram of Gradients), and returns \
     the corresponding block descriptor. This variant does NOT check the \
     inputs."));
-  def("normalize_block", &normalize_block, 
-    normalize_block_overloads((arg("hist"), arg("norm_hist"), 
+  def("normalize_block_", &normalize_block__p, 
+    normalize_block__p_overloads((arg("hist"),
+    arg("block_norm")=bob::ip::L2, arg("eps")=1e-10, arg("threshold")=0.2), 
+    "normalizes a set of cells (Histogram of Gradients), and returns \
+    the corresponding block descriptor. This variant does NOT check the \
+    inputs."));
+  def("normalize_block", &normalize_block_c, 
+    normalize_block_c_overloads((arg("hist"), arg("norm_hist"), 
+    arg("block_norm")=bob::ip::L2, arg("eps")=1e-10, arg("threshold")=0.2), 
+    "normalizes a set of cells (Histogram of Gradients), and returns \
+    the corresponding block descriptor."));
+  def("normalize_block", &normalize_block_p, 
+    normalize_block_p_overloads((arg("hist"),
     arg("block_norm")=bob::ip::L2, arg("eps")=1e-10, arg("threshold")=0.2), 
     "normalizes a set of cells (Histogram of Gradients), and returns \
     the corresponding block descriptor."));
@@ -383,13 +663,21 @@ void bind_ip_hog() {
     .def("__call__", &gradient_maps_call1, 
       (arg("input"), arg("magnitude"), arg("orientation")),
       "Extract the gradient magnitude and orientation maps.")
+    .def("__call__", &gradient_maps_call1_p, (arg("input")),
+      "Extract the gradient magnitude and orientation maps.")
     .def("forward", &gradient_maps_call1, 
       (arg("input"), arg("magnitude"), arg("orientation")),
+      "Extract the gradient magnitude and orientation maps.")
+    .def("forward", &gradient_maps_call1_p, (arg("input")),
       "Extract the gradient magnitude and orientation maps.")
     .def("forward_", &gradient_maps_call2, 
       (arg("input"), arg("magnitude"), arg("orientation")),
       "Extract the gradient magnitude and orientation maps. This variant \
-      does not check the inputs.");
+      does not check the inputs.")
+    .def("forward_", &gradient_maps_call2_p, (arg("input")),
+      "Extract the gradient magnitude and orientation maps. This variant \
+      does not check the inputs.")
+    ;
 
   class_<bob::ip::HOG<double>, boost::shared_ptr<bob::ip::HOG<double> > >(
       "HOG", 
@@ -465,9 +753,15 @@ void bind_ip_hog() {
     .def("get_output_shape", &bob::ip::HOG<double>::getOutputShape)
     .def("__call__", &hog_call1, (arg("input"), arg("output")),
       "Extract the HOG descriptors.")
+    .def("__call__", &hog_call1_p, (arg("input")),
+      "Extract the HOG descriptors.")
     .def("forward", &hog_call1, (arg("input"), arg("output")),
       "Extract the HOG descriptors.")
+    .def("forward", &hog_call1_p, (arg("input")),
+      "Extract the HOG descriptors.")
     .def("forward_", &hog_call2, (arg("input"), arg("output")),
+      "Extract the HOG descriptors. This variant does not check the inputs.")
+    .def("forward_", &hog_call2_p, (arg("input")),
       "Extract the HOG descriptors. This variant does not check the inputs.")
   ;
 }
