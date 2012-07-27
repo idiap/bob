@@ -21,15 +21,14 @@
 #include "ip/block.h"
 #include "ip/Exception.h"
 
-namespace ip = bob::ip;
-namespace ipd = bob::ip::detail;
 
 /**
   * @brief Function which checks the given parameters for a block 
   *   decomposition of a 2D blitz::array/image.
   */
-void ipd::blockCheckInput(const int height, const int width, const int block_h, 
-    const int block_w, const int overlap_h, const int overlap_w)
+void bob::ip::detail::blockCheckInput(const size_t height, 
+  const size_t width, const size_t block_h, const size_t block_w, 
+  const size_t overlap_h, const size_t overlap_w)
 {
   // Check parameters and throw exception if required
   if( block_h<1)
@@ -64,15 +63,16 @@ void ipd::blockCheckInput(const int height, const int width, const int block_h,
   * @param overlap_h The overlap between each block along the y axis.
   * @param overlap_w The overlap between each block along the x axis.
   */
-const blitz::TinyVector<int,3> ip::getBlock3DOutputShape(const int height, 
-  const int width, const int block_h, const int block_w, const int overlap_h,
-  const int overlap_w)
+const blitz::TinyVector<int,3> 
+bob::ip::getBlock3DOutputShape(const size_t height, const size_t width, 
+  const size_t block_h, const size_t block_w, 
+  const size_t overlap_h, const size_t overlap_w)
 {
   // Determine the number of block per row and column
   const int size_ov_h = block_h - overlap_h;
   const int size_ov_w = block_w - overlap_w;
-  const int n_blocks_h = (height-overlap_h)/ size_ov_h;
-  const int n_blocks_w = (width-overlap_w)/ size_ov_w;
+  const int n_blocks_h = (int)(height-overlap_h) / size_ov_h;
+  const int n_blocks_w = (int)(width-overlap_w) / size_ov_w;
 
   // Return the shape of the output
   blitz::TinyVector<int,3> res( n_blocks_h*n_blocks_w, block_h, block_w);
@@ -90,15 +90,16 @@ const blitz::TinyVector<int,3> ip::getBlock3DOutputShape(const int height,
   * @param overlap_h The overlap between each block along the y axis.
   * @param overlap_w The overlap between each block along the x axis.
   */
-const blitz::TinyVector<int,4> ip::getBlock4DOutputShape(const int height, 
-  const int width, const int block_h, const int block_w, const int overlap_h,
-  const int overlap_w)
+const blitz::TinyVector<int,4> 
+bob::ip::getBlock4DOutputShape(const size_t height, const size_t width, 
+  const size_t block_h, const size_t block_w, 
+  const size_t overlap_h, const size_t overlap_w)
 {
   // Determine the number of block per row and column
   const int size_ov_h = block_h - overlap_h;
   const int size_ov_w = block_w - overlap_w;
-  const int n_blocks_h = (height-overlap_h)/ size_ov_h;
-  const int n_blocks_w = (width-overlap_w)/ size_ov_w;
+  const int n_blocks_h = (int)(height-overlap_h) / size_ov_h;
+  const int n_blocks_w = (int)(width-overlap_w) / size_ov_w;
 
   // Return the shape of the output
   blitz::TinyVector<int,4> res( n_blocks_h, n_blocks_w, block_h, block_w);

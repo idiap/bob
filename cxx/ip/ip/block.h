@@ -41,14 +41,14 @@ namespace bob {
         */
       template<typename T, typename U>
       void blockReferenceNoCheck(const blitz::Array<T,2>& src, U& dst, 
-          const int block_h, const int block_w, const int overlap_h, 
-          const int overlap_w)
+        const size_t block_h, const size_t block_w, const size_t overlap_h,
+        const size_t overlap_w)
       {
         // Determine the number of block per row and column
         const int size_ov_h = block_h - overlap_h;
         const int size_ov_w = block_w - overlap_w;
-        const int n_blocks_h = (src.extent(0)-overlap_h)/ size_ov_h;
-        const int n_blocks_w = (src.extent(1)-overlap_w)/ size_ov_w;
+        const int n_blocks_h = (src.extent(0) - (int)overlap_h) / size_ov_h;
+        const int n_blocks_w = (src.extent(1) - (int)overlap_w) / size_ov_w;
 
         // Perform the block decomposition
         blitz::Array<T,2> current_block;
@@ -67,14 +67,14 @@ namespace bob {
         */
       template<typename T>
       void blockNoCheck(const blitz::Array<T,2>& src, blitz::Array<T,3>& dst,
-          const int block_h, const int block_w, const int overlap_h, 
-          const int overlap_w)
+        const int block_h, const int block_w, const int overlap_h, 
+        const int overlap_w)
       {
         // Determine the number of block per row and column
         const int size_ov_h = block_h - overlap_h;
         const int size_ov_w = block_w - overlap_w;
-        const int n_blocks_h = (src.extent(0)-overlap_h)/ size_ov_h;
-        const int n_blocks_w = (src.extent(1)-overlap_w)/ size_ov_w;
+        const int n_blocks_h = (src.extent(0) - (int)overlap_h) / size_ov_h;
+        const int n_blocks_w = (src.extent(1) - (int)overlap_w) / size_ov_w;
 
         // Perform the block decomposition
         blitz::Array<bool,2> src_mask, dst_mask;
@@ -94,14 +94,14 @@ namespace bob {
         */
       template<typename T>
       void blockNoCheck(const blitz::Array<T,2>& src, blitz::Array<T,4>& dst,
-          const int block_h, const int block_w, const int overlap_h, 
-          const int overlap_w)
+        const size_t block_h, const size_t block_w, const size_t overlap_h,
+        const size_t overlap_w)
       {
         // Determine the number of block per row and column
         const int size_ov_h = block_h - overlap_h;
         const int size_ov_w = block_w - overlap_w;
-        const int n_blocks_h = (src.extent(0)-overlap_h)/ size_ov_h;
-        const int n_blocks_w = (src.extent(1)-overlap_w)/ size_ov_w;
+        const int n_blocks_h = (src.extent(0)-(int)overlap_h) / size_ov_h;
+        const int n_blocks_w = (src.extent(1)-(int)overlap_w) / size_ov_w;
 
         // Perform the block decomposition
         blitz::Array<bool,2> src_mask, dst_mask;
@@ -118,17 +118,17 @@ namespace bob {
         * @brief Function which checks the given parameters for a block 
         *   decomposition of a 2D blitz::array/image.
         */
-      void blockCheckInput(const int height, const int width, 
-          const int block_h, const int block_w, const int overlap_h, 
-          const int overlap_w);
+      void blockCheckInput(const size_t height, const size_t width, 
+        const size_t block_h, const size_t block_w, const size_t overlap_h, 
+        const size_t overlap_w);
 
       /**
         * @brief Function which checks the given parameters for a block 
         *   decomposition of a 2D blitz::array/image.
         */
       template<typename T>
-      void blockCheckInput(const blitz::Array<T,2>& src, const int block_h, 
-          const int block_w, const int overlap_h, const int overlap_w)
+      void blockCheckInput(const blitz::Array<T,2>& src, const size_t block_h, 
+        const size_t block_w, const size_t overlap_h, const size_t overlap_w)
       {
         // Checks that the src array has zero base indices
         bob::core::array::assertZeroBase( src);
@@ -158,14 +158,15 @@ namespace bob {
       */
     template<typename T, typename U>
     void blockReference(const blitz::Array<T,2>& src, U& dst, 
-      const int block_h, const int block_w, const int overlap_h, 
-      const int overlap_w)
+      const size_t block_h, const size_t block_w, const size_t overlap_h, 
+      const size_t overlap_w)
     {
       // Check input
       detail::blockCheckInput( src, block_h, block_w, overlap_h, overlap_w);
 
       // Crop the 2D array
-      detail::blockReferenceNoCheck(src, dst, block_h, block_w, overlap_h, overlap_w);
+      detail::blockReferenceNoCheck(src, dst, block_h, block_w, overlap_h, 
+        overlap_w);
     }
 
     /**
@@ -181,9 +182,10 @@ namespace bob {
       * @param overlap_h The overlap between each block along the y axis.
       * @param overlap_w The overlap between each block along the x axis.
       */ 
-    const blitz::TinyVector<int,3> getBlock3DOutputShape(const int height, 
-      const int width, const int block_h, const int block_w, 
-      const int overlap_h, const int overlap_w);
+    const blitz::TinyVector<int,3> 
+    getBlock3DOutputShape(const size_t height, const size_t width, 
+      const size_t block_h, const size_t block_w, 
+      const size_t overlap_h, const size_t overlap_w);
 
     /**
       * @brief Function which returns the expected shape of the output 
@@ -198,9 +200,9 @@ namespace bob {
       * @param overlap_w The overlap between each block along the x axis.
       */
     template<typename T>
-    const blitz::TinyVector<int,3> getBlock3DOutputShape(
-      const blitz::Array<T,2>& src, const int block_h, const int block_w,
-      const int overlap_h, const int overlap_w)
+    const blitz::TinyVector<int,3> 
+    getBlock3DOutputShape(const blitz::Array<T,2>& src, const size_t block_h,
+      const size_t block_w, const size_t overlap_h, const size_t overlap_w)
     {
       // Check input
       detail::blockCheckInput( src, block_h, block_w, overlap_h, overlap_w);
@@ -223,9 +225,10 @@ namespace bob {
       * @param overlap_h The overlap between each block along the y axis.
       * @param overlap_w The overlap between each block along the x axis.
       */ 
-    const blitz::TinyVector<int,4> getBlock4DOutputShape(const int height, 
-      const int width, const int block_h, const int block_w, 
-      const int overlap_h, const int overlap_w);
+    const blitz::TinyVector<int,4> 
+    getBlock4DOutputShape(const size_t height, const size_t width, 
+      const size_t block_h, const size_t block_w, const size_t overlap_h,
+      const size_t overlap_w);
 
     /**
       * @brief Function which returns the expected shape of the output 
@@ -242,8 +245,8 @@ namespace bob {
       */
     template<typename T>
     const blitz::TinyVector<int,4> getBlock4DOutputShape(
-      const blitz::Array<T,2>& src, const int block_h, const int block_w,
-      const int overlap_h, const int overlap_w)
+      const blitz::Array<T,2>& src, const size_t block_h, 
+      const size_t block_w, const size_t overlap_h, const size_t overlap_w)
     {
       // Check input
       detail::blockCheckInput( src, block_h, block_w, overlap_h, overlap_w);
@@ -268,8 +271,8 @@ namespace bob {
       */
     template<typename T>
     void block(const blitz::Array<T,2>& src, blitz::Array<T,3>& dst, 
-      const int block_h, const int block_w, const int overlap_h, 
-      const int overlap_w)
+      const size_t block_h, const size_t block_w, const size_t overlap_h, 
+      const size_t overlap_w)
     {
       // Check input
       detail::blockCheckInput( src, block_h, block_w, overlap_h, overlap_w);
@@ -297,8 +300,8 @@ namespace bob {
       */
     template<typename T>
     void block(const blitz::Array<T,2>& src, blitz::Array<T,4>& dst, 
-      const int block_h, const int block_w, const int overlap_h, 
-      const int overlap_w)
+      const size_t block_h, const size_t block_w, const size_t overlap_h, 
+      const size_t overlap_w)
     {
       // Check input
       detail::blockCheckInput( src, block_h, block_w, overlap_h, overlap_w);
