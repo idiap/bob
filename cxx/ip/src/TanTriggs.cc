@@ -58,7 +58,7 @@ void ip::TanTriggs::performContrastEqualization( blitz::Array<double,2>& dst)
     pow( fabs(dst(dst_y,dst_x)), m_alpha))) / wxh, inv_alpha);
   dst(dst_y,dst_x) /= norm_fact;
 
-  // Last step: I:= threshold * tanh( I / threshold )	
+  // Last step: I:= threshold * tanh( I / threshold ) 
   dst(dst_y,dst_x) = m_threshold * tanh( dst(dst_y,dst_x) / m_threshold );
 }
 

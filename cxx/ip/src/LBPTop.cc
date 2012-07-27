@@ -32,7 +32,7 @@ namespace ip = bob::ip;
 
 ip::LBPTop::LBPTop(const bob::ip::LBP& lbp_xy, 
                    const bob::ip::LBP& lbp_xt, 
-	           const bob::ip::LBP& lbp_yt)
+                   const bob::ip::LBP& lbp_yt)
 : m_lbp_xy(lbp_xy.clone()),
   m_lbp_xt(lbp_xt.clone()),
   m_lbp_yt(lbp_yt.clone())

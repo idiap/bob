@@ -46,7 +46,7 @@ static object call_vlsift(ip::VLSIFT& op, tp::const_ndarray src) {
 void bind_ip_vlsift() {
   static const char* VLSIFT_doc = "Computes SIFT features using the VLFeat library";
 
-	class_<ip::VLSIFT, boost::shared_ptr<ip::VLSIFT> >("VLSIFT", VLSIFT_doc, init<const int, const int, const int, const int, const int, optional<const double, const double, const double> >((arg("height"), arg("width"), arg("n_intervals"), arg("n_octaves"), arg("octave_min"), arg("peak_thres")=10, arg("edge_thres")=0.03, arg("magnif")=3), "Creates an object to compute SIFT features"))
-		.def("__call__", &call_vlsift, (arg("self"), arg("src")), "Computes the SIFT features from an input image. It returns a list of descriptors, one for each keypoint and orientation. The first four values are the x, y, sigma and orientation of the values. The 128 remaining values define the descriptor.")
-		;
+  class_<ip::VLSIFT, boost::shared_ptr<ip::VLSIFT> >("VLSIFT", VLSIFT_doc, init<const int, const int, const int, const int, const int, optional<const double, const double, const double> >((arg("height"), arg("width"), arg("n_intervals"), arg("n_octaves"), arg("octave_min"), arg("peak_thres")=10, arg("edge_thres")=0.03, arg("magnif")=3), "Creates an object to compute SIFT features"))
+    .def("__call__", &call_vlsift, (arg("self"), arg("src")), "Computes the SIFT features from an input image. It returns a list of descriptors, one for each keypoint and orientation. The first four values are the x, y, sigma and orientation of the values. The 128 remaining values define the descriptor.")
+    ;
 }

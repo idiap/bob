@@ -102,13 +102,13 @@ void ip::LBP16R::init_lut_U2()
   m_lut_U2.resize(65536);
   int counter = 0 ;
   int bases[] = {1, 3, 7, 15, 31, 63, 127, 255, 511, 1023, 2047, 4095, 8191, 16383, 32767, 65535};
-	// all non uniform patterns have a label of 0.
+  // all non uniform patterns have a label of 0.
   m_lut_U2 = 0; counter++;
 
-	// LBP pattern with 0 bit to 1
-	m_lut_U2(0) = 1; counter++;
+  // LBP pattern with 0 bit to 1
+  m_lut_U2(0) = 1; counter++;
 
-	// all the other LBP patterns with bases[i] next-to-each-other bits equal to 1
+  // all the other LBP patterns with bases[i] next-to-each-other bits equal to 1
   for (int i=0; i < 16; i++)
   {
     for (int j=bases[i];;)
@@ -126,11 +126,11 @@ void ip::LBP16R::init_lut_U2RI()
   m_lut_U2RI.resize(65536);
   int counter = 0;
   int bases[] = {1, 3, 7, 15, 31, 63, 127, 255, 511, 1023, 2047, 4095, 8191, 16383, 32767, 65535};
-	// all non uniform patterns have a label of 0.
+  // all non uniform patterns have a label of 0.
   m_lut_U2RI = 0; counter++;
 
   // LBP pattern with zero bits equal to 1
-	m_lut_U2RI(0) = 1; counter++;
+  m_lut_U2RI(0) = 1; counter++;
 
   // all the other LBP patterns with bases[i] next-to-each-other bits equal to 1
   for (int i=0; i < 16; i++)

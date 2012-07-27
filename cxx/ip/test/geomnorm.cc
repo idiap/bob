@@ -36,34 +36,34 @@
 
 
 struct T {
-	blitz::Array<uint32_t,2> a2, a2_centered;
+  blitz::Array<uint32_t,2> a2, a2_centered;
   double eps;
 
-	T(): a2(4,4), a2_centered(5,5), eps(1e-5)
-	{
-		a2 = 
-			0, 1, 2, 3, 
-			4, 5, 6, 7,
-			8, 9, 10, 11, 
-			12, 13, 14, 15;
+  T(): a2(4,4), a2_centered(5,5), eps(1e-5)
+  {
+    a2 = 
+      0, 1, 2, 3, 
+      4, 5, 6, 7,
+      8, 9, 10, 11, 
+      12, 13, 14, 15;
 
-		a2_centered = 
+    a2_centered = 
       0, 0, 0, 0, 0,
-			0, 0, 1, 2, 3, 
-			0, 4, 5, 6, 7,
-			0, 8, 9, 10, 11, 
-			0, 12, 13, 14, 15;
-	}
+      0, 0, 1, 2, 3, 
+      0, 4, 5, 6, 7,
+      0, 8, 9, 10, 11, 
+      0, 12, 13, 14, 15;
+  }
 
-	~T() {}
+  ~T() {}
 };
 
 template<typename T, typename U, int d>  
 void check_dimensions( blitz::Array<T,d>& t1, blitz::Array<U,d>& t2) 
 {
-	BOOST_REQUIRE_EQUAL(t1.dimensions(), t2.dimensions());
-	for( int i=0; i<t1.dimensions(); ++i)
-		BOOST_CHECK_EQUAL(t1.extent(i), t2.extent(i));
+  BOOST_REQUIRE_EQUAL(t1.dimensions(), t2.dimensions());
+  for( int i=0; i<t1.dimensions(); ++i)
+    BOOST_CHECK_EQUAL(t1.extent(i), t2.extent(i));
 }
 
 template<typename T, typename U>  
@@ -79,7 +79,7 @@ template<typename T>
 void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<T,2>& t2, 
   const double eps )
 {
-	check_dimensions( t1, t2);
+  check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t2.extent(1); ++j)
       BOOST_CHECK_SMALL( fabs(t1(i,j)-t2(i,j)), eps );
@@ -90,11 +90,11 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
 BOOST_AUTO_TEST_CASE( test_generateWithCenter )
 {
-	blitz::Array<uint32_t,2> b2(bob::ip::getGenerateWithCenterShape(a2,1,1));
+  blitz::Array<uint32_t,2> b2(bob::ip::getGenerateWithCenterShape(a2,1,1));
   BOOST_CHECK_EQUAL( b2.extent(0), a2_centered.extent(0));
   BOOST_CHECK_EQUAL( b2.extent(1), a2_centered.extent(1));
-	bob::ip::generateWithCenter(a2, b2, 1, 1);
-	checkBlitzEqual(a2_centered, b2); 
+  bob::ip::generateWithCenter(a2, b2, 1, 1);
+  checkBlitzEqual(a2_centered, b2); 
 }
 
 BOOST_AUTO_TEST_CASE( test_geomnorm )

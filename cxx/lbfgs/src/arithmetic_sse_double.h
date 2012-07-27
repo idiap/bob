@@ -42,7 +42,7 @@
 
 inline static void* vecalloc(size_t size)
 {
-#ifdef	_MSC_VER
+#ifdef  _MSC_VER
     void *memblock = _aligned_malloc(size, 16);
 #else
     void *memblock = memalign(16, size);
@@ -55,7 +55,7 @@ inline static void* vecalloc(size_t size)
 
 inline static void vecfree(void *memblock)
 {
-#ifdef	_MSC_VER
+#ifdef  _MSC_VER
     _aligned_free(memblock);
 #else
     free(memblock);

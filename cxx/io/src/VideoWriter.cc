@@ -250,8 +250,8 @@ AVStream* io::VideoWriter::add_video_stream() {
   c->height = m_height;
   // time base: this is the fundamental unit of time (in seconds) in terms
   //      of which frame timestamps are represented. for fixed-fps content,
-  //	timebase should be 1/framerate and timestamp increments should be
-  //	identically 1.
+  //  timebase should be 1/framerate and timestamp increments should be
+  //  identically 1.
   c->time_base.den = m_framerate;
   c->time_base.num = 1;
   c->gop_size = m_gop; // emit one intra frame every N frames at most
@@ -314,10 +314,10 @@ void io::VideoWriter::open_video() {
   if (!(m_format_ctxt->oformat->flags & AVFMT_RAWPICTURE)) {
     // allocate output buffer
     // XXX: API change will be done
-    //	buffers passed into lav* can be allocated any way you prefer,
-    //	as long as they're aligned enough for the architecture, and
-    //	they're freed appropriately (such as using av_free for buffers
-    //	allocated with av_malloc)
+    //  buffers passed into lav* can be allocated any way you prefer,
+    //  as long as they're aligned enough for the architecture, and
+    //  they're freed appropriately (such as using av_free for buffers
+    //  allocated with av_malloc)
     video_outbuf_size = 200000;
     video_outbuf = (uint8_t*)av_malloc(video_outbuf_size);
 
@@ -347,8 +347,8 @@ void io::VideoWriter::write_video_frame(const blitz::Array<uint8_t,3>& data) {
 
   if (false) { //m_current_frame >= STREAM_NB_FRAMES)
     // no more frame to compress. The codec has a latency of a few
-    //     	frames if using B frames, so we get the last frames by
-    //	passing the same picture again
+    //      frames if using B frames, so we get the last frames by
+    //  passing the same picture again
   }
   else {
     if (c->pix_fmt != PIX_FMT_RGB24) {

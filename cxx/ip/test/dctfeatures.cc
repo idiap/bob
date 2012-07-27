@@ -30,19 +30,19 @@
 #include "ip/DCTFeatures.h"
 
 struct T {
-	blitz::Array<uint32_t,2> src;
-	blitz::Array<double,1> dst1, dst2, dst3, dst4;
+  blitz::Array<uint32_t,2> src;
+  blitz::Array<double,1> dst1, dst2, dst3, dst4;
   std::vector<blitz::Array<double,1> > dst_mat;
   double eps;
 
-	T(): src(6,8), dst1(6), dst2(6), dst3(6), dst4(6), dst_mat(0), eps(1e-3)
-	{
-		src = 0, 1, 2, 3, 4, 5, 6, 7,
-			8, 9, 10, 11, 12, 13, 14, 15,
-			16, 17, 18, 19, 20, 21, 22, 23,
-			24, 25, 26, 27, 28, 29, 30, 31,
-			32, 33, 34, 35, 36, 37, 38, 39,
-			40, 41, 42, 43, 44, 45, 46, 47;
+  T(): src(6,8), dst1(6), dst2(6), dst3(6), dst4(6), dst_mat(0), eps(1e-3)
+  {
+    src = 0, 1, 2, 3, 4, 5, 6, 7,
+      8, 9, 10, 11, 12, 13, 14, 15,
+      16, 17, 18, 19, 20, 21, 22, 23,
+      24, 25, 26, 27, 28, 29, 30, 31,
+      32, 33, 34, 35, 36, 37, 38, 39,
+      40, 41, 42, 43, 44, 45, 46, 47;
 
     dst1 = 32.9090, -3.8632, -22.6274, 0., 0., 0.;
     dst2 = 46.7654, -3.8632, -22.6274, 0., 0., 0.;
@@ -53,9 +53,9 @@ struct T {
     dst_mat.push_back(dst2);
     dst_mat.push_back(dst3);
     dst_mat.push_back(dst4);
-	}
-	
-	~T() {}
+  }
+  
+  ~T() {}
 };
 
 template<typename T>  

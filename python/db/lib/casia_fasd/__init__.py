@@ -154,7 +154,7 @@ class Database(object):
 
     outfilename
       The filename of the output file
-	  """
+    """
     if outfilename == None:
       outfilename = os.path.join(os.path.dirname(__file__), 'cross_valid.txt')
     f = open(outfilename, 'w')

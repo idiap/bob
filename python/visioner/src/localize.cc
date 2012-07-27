@@ -104,18 +104,18 @@ static bp::tuple locate(visioner::Model& cmodel, visioner::Model& lmodel,
 
 static bp::tuple load_model(const std::string& filename) {
   visioner::Model model;
-	visioner::param_t param;
-  if (visioner::load_model(param, model, filename) == false) {				
+  visioner::param_t param;
+  if (visioner::load_model(param, model, filename) == false) {        
     PYTHON_ERROR(IOError, "failed to load the model");
-	}
+  }
   return bp::make_tuple(model, param);
 }
 
 static void save_model(const visioner::Model& model,
     const visioner::param_t& param, const std::string& filename) {
-  if (visioner::save_model(param, model, filename) == false) {				
+  if (visioner::save_model(param, model, filename) == false) {        
     PYTHON_ERROR(IOError, "failed to save the model");
-	}
+  }
 }
 
 void bind_visioner_localize() {

@@ -40,24 +40,24 @@ struct T {
   double eps,eps2;
 
   //note we are comparing uint8_t values, so a difference of 1 is OK.
-	T(): eps(1.5), eps2(1e-8) {}
+  T(): eps(1.5), eps2(1e-8) {}
 
-	~T() {}
+  ~T() {}
 };
 
 template<typename T, typename U, int d>  
 void check_dimensions( blitz::Array<T,d>& t1, blitz::Array<U,d>& t2) 
 {
-	BOOST_REQUIRE_EQUAL(t1.dimensions(), t2.dimensions());
-	for( int i=0; i<t1.dimensions(); ++i)
-		BOOST_CHECK_EQUAL(t1.extent(i), t2.extent(i));
+  BOOST_REQUIRE_EQUAL(t1.dimensions(), t2.dimensions());
+  for( int i=0; i<t1.dimensions(); ++i)
+    BOOST_CHECK_EQUAL(t1.extent(i), t2.extent(i));
 }
 
 template<typename T>  
 void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<T,2>& t2,
   const double eps )
 {
-	check_dimensions( t1, t2);
+  check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t2.extent(1); ++j) {
       BOOST_CHECK_SMALL( fabs(t1(i,j)-t2(i,j)), eps);

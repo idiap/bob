@@ -125,7 +125,7 @@ static object py_call2(bob::ip::MultiscaleRetinex& op,
 
 
 void bind_ip_msr() {
-	class_<bob::ip::MultiscaleRetinex, boost::shared_ptr<bob::ip::MultiscaleRetinex> >("MultiscaleRetinex", "This class allows after configuration to apply the Self Quotient Image algorithm to images.", init<optional<const size_t, const int, const int, const double, const bob::sp::Extrapolation::BorderType> >((arg("n_scales")=1,arg("size_min")=1, arg("size_step")=1, arg("sigma")=2., arg("conv_border")=bob::sp::Extrapolation::Mirror), "Creates a MultiscaleRetinex object."))
+  class_<bob::ip::MultiscaleRetinex, boost::shared_ptr<bob::ip::MultiscaleRetinex> >("MultiscaleRetinex", "This class allows after configuration to apply the Self Quotient Image algorithm to images.", init<optional<const size_t, const int, const int, const double, const bob::sp::Extrapolation::BorderType> >((arg("n_scales")=1,arg("size_min")=1, arg("size_step")=1, arg("sigma")=2., arg("conv_border")=bob::sp::Extrapolation::Mirror), "Creates a MultiscaleRetinex object."))
       .def(init<bob::ip::MultiscaleRetinex&>(args("other")))
       .def(self == self)
       .def(self != self)
@@ -135,7 +135,7 @@ void bind_ip_msr() {
       .add_property("sigma", &bob::ip::MultiscaleRetinex::getSigma, &bob::ip::MultiscaleRetinex::setSigma, "The variance of the kernel of the smallest Gaussian (variance_s = sigma * (size_min+s*size_step)/size_min).")
       .add_property("conv_border", &bob::ip::MultiscaleRetinex::getConvBorder, &bob::ip::MultiscaleRetinex::setConvBorder, "The extrapolation method used by the convolution at the border")
       .def("reset", &bob::ip::MultiscaleRetinex::reset, (arg("self"), arg("n_scales")=1, arg("size_min")=1, arg("size_step")=1, arg("sigma")=2., arg("conv_border")=bob::sp::Extrapolation::Mirror), "Resets the parametrization of the MultiscaleRetinex object.")
-  		.def("__call__", &py_call1, (arg("self"), arg("src"), arg("dst")), "Applies the Self Quotient Image algorithm to an image (2D/grayscale or color 3D/color) of type uint8, uint16 or double. The dst array should have the type (numpy.float64) and the same size as the src array.")
-  		.def("__call__", &py_call2, (arg("self"), arg("src")), "Applies the Self Quotient Image algorithm to an image (2D/grayscale or color 3D/color) of type uint8, uint16 or double. The filtered image is returned as a numpy array.")
-		;
+      .def("__call__", &py_call1, (arg("self"), arg("src"), arg("dst")), "Applies the Self Quotient Image algorithm to an image (2D/grayscale or color 3D/color) of type uint8, uint16 or double. The dst array should have the type (numpy.float64) and the same size as the src array.")
+      .def("__call__", &py_call2, (arg("self"), arg("src")), "Applies the Self Quotient Image algorithm to an image (2D/grayscale or color 3D/color) of type uint8, uint16 or double. The filtered image is returned as a numpy array.")
+    ;
 }

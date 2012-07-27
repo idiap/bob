@@ -30,16 +30,16 @@
 #include "ip/LBPHSFeatures.h"
 
 struct T {
-	blitz::Array<uint32_t,2> src;
-	blitz::Array<uint64_t,1> dst1, dst2, dst3, dst4;
+  blitz::Array<uint32_t,2> src;
+  blitz::Array<uint64_t,1> dst1, dst2, dst3, dst4;
   std::vector<blitz::Array<uint64_t,1> > dst_mat;
   double eps;
 
-	T(): src(10,10), dst1(16), dst2(16), dst3(16), dst4(16), dst_mat(0), eps(1e-3)
-	{
-  	src =  0, 10,  9, 10,  0,  5,  6,  7,  8,  9,
-			    10,  9, 10,  9, 10, 10, 11, 12, 13, 14,
-			     9, 10,  9, 10,  9, 15, 16, 17, 18, 19, 
+  T(): src(10,10), dst1(16), dst2(16), dst3(16), dst4(16), dst_mat(0), eps(1e-3)
+  {
+    src =  0, 10,  9, 10,  0,  5,  6,  7,  8,  9,
+          10,  9, 10,  9, 10, 10, 11, 12, 13, 14,
+           9, 10,  9, 10,  9, 15, 16, 17, 18, 19, 
           10,  9, 10,  9, 10, 20, 21, 22, 23, 24,
            0, 10,  9, 10,  0, 25, 26, 27, 28, 29,
           20, 20, 20, 20, 20,  5, 22, 23, 22, 54, 
@@ -67,9 +67,9 @@ struct T {
     dst_mat.push_back(dst2);
     dst_mat.push_back(dst3);
     dst_mat.push_back(dst4);
-	}
-	
-	~T() {}
+  }
+  
+  ~T() {}
 };
 
 template<typename T>  
@@ -85,8 +85,8 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
 BOOST_AUTO_TEST_CASE( test_lbphs_feature_extract )
 {
-	std::vector<blitz::Array<uint64_t,1> > dst;
-	bob::ip::LBPHSFeatures lbphsfeatures( 5, 5, 0, 0, 1., 4, false, false, 
+  std::vector<blitz::Array<uint64_t,1> > dst;
+  bob::ip::LBPHSFeatures lbphsfeatures( 5, 5, 0, 0, 1., 4, false, false, 
     false, false, false);
 
   lbphsfeatures( src, dst);

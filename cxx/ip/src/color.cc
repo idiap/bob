@@ -173,21 +173,21 @@ template <> void bob::ip::hsv_to_rgb_one (uint8_t h, uint8_t s, uint8_t v,
   hsv_to_rgb_one(normalize(h), normalize(s), normalize(v), R, G, B);
   r = scale<uint8_t>(R); g = scale<uint8_t>(G); b = scale<uint8_t>(B);
 }
-	
+  
 template <> void bob::ip::hsv_to_rgb_one (uint16_t h, uint16_t s, uint16_t v,
     uint16_t& r, uint16_t& g, uint16_t& b) {
   double R, G, B;
   hsv_to_rgb_one(normalize(h), normalize(s), normalize(v), R, G, B);
   r = scale<uint16_t>(R); g = scale<uint16_t>(G); b = scale<uint16_t>(B);
 }
-	
+  
 template <> void bob::ip::hsv_to_rgb_one (double h, double s, double v,
     double& r, double& g, double& b) {
-	
+  
   if(s == 0) { // achromatic (gray)
-		r = g = b = v;
-		return;
-	}
+    r = g = b = v;
+    return;
+  }
 
   const double Hp = 6*h;
   const uint8_t sextant = static_cast<uint8_t>(Hp);
@@ -197,38 +197,38 @@ template <> void bob::ip::hsv_to_rgb_one (double h, double s, double v,
   const double X = C * (1 - fabsf(Hpmod2 - 1)) + m;
   C += m;
 
-	switch(sextant) {
-		case 0: //Hue is between red and yellow (red + green)
-			r = clamp(v);
-			g = clamp(X);
-			b = clamp(m);
-			break;
-		case 1: //Hue is between yellow (red + green) and green
-			r = clamp(X);
-			g = clamp(v);
-			b = clamp(m);
-			break;
-		case 2: //Hue is between green and cyan (green + blue)
-			r = clamp(m);
-			g = clamp(v);
-			b = clamp(X);
-			break;
-		case 3: //Hue is between cyan (green + blue) and blue
-			r = clamp(m);
-			g = clamp(X);
-			b = clamp(v);
-			break;
-		case 4: //Hue is between blue and magenta (blue + red)
-			r = clamp(X);
-			g = clamp(m);
-			b = clamp(v);
-			break;
-		default: //Hue is between magenta (blue + red) and red
-			r = clamp(v);
-			g = clamp(m);
-			b = clamp(X);
-			break;
-	}
+  switch(sextant) {
+    case 0: //Hue is between red and yellow (red + green)
+      r = clamp(v);
+      g = clamp(X);
+      b = clamp(m);
+      break;
+    case 1: //Hue is between yellow (red + green) and green
+      r = clamp(X);
+      g = clamp(v);
+      b = clamp(m);
+      break;
+    case 2: //Hue is between green and cyan (green + blue)
+      r = clamp(m);
+      g = clamp(v);
+      b = clamp(X);
+      break;
+    case 3: //Hue is between cyan (green + blue) and blue
+      r = clamp(m);
+      g = clamp(X);
+      b = clamp(v);
+      break;
+    case 4: //Hue is between blue and magenta (blue + red)
+      r = clamp(X);
+      g = clamp(m);
+      b = clamp(v);
+      break;
+    default: //Hue is between magenta (blue + red) and red
+      r = clamp(v);
+      g = clamp(m);
+      b = clamp(X);
+      break;
+  }
 }
 
 template <> void bob::ip::rgb_to_hsl_one (uint8_t r, uint8_t g, uint8_t b,
@@ -293,14 +293,14 @@ template <> void bob::ip::hsl_to_rgb_one (uint8_t h, uint8_t s, uint8_t l,
   hsl_to_rgb_one(normalize(h), normalize(s), normalize(l), R, G, B);
   r = scale<uint8_t>(R); g = scale<uint8_t>(G); b = scale<uint8_t>(B);
 }
-	
+  
 template <> void bob::ip::hsl_to_rgb_one (uint16_t h, uint16_t s, uint16_t l,
     uint16_t& r, uint16_t& g, uint16_t& b) {
   double R, G, B;
   hsl_to_rgb_one(normalize(h), normalize(s), normalize(l), R, G, B);
   r = scale<uint16_t>(R); g = scale<uint16_t>(G); b = scale<uint16_t>(B);
 }
-	
+  
 template <> void bob::ip::hsl_to_rgb_one (double h, double s, double l,
     double& r, double& g, double& b) {
   
@@ -308,9 +308,9 @@ template <> void bob::ip::hsl_to_rgb_one (double h, double s, double l,
   const double v = (2*l + C)/2; //Value [0,1]
   
   if(v == 0.) { // achromatic (gray)
-		r = g = b = v; //Value
-		return;
-	}
+    r = g = b = v; //Value
+    return;
+  }
 
   const double Hp = 6*h;
   const uint8_t sextant = static_cast<uint8_t>(Hp);
@@ -319,38 +319,38 @@ template <> void bob::ip::hsl_to_rgb_one (double h, double s, double l,
   const double X = C * (1 - fabsf(Hpmod2 - 1)) + m;
   C += m;
 
-	switch(sextant) {
-		case 0: //Hue is between red and yellow (red + green)
-			r = clamp(v);
-			g = clamp(X);
-			b = clamp(m);
-			break;
-		case 1: //Hue is between yellow (red + green) and green
-			r = clamp(X);
-			g = clamp(v);
-			b = clamp(m);
-			break;
-		case 2: //Hue is between green and cyan (green + blue)
-			r = clamp(m);
-			g = clamp(v);
-			b = clamp(X);
-			break;
-		case 3: //Hue is between cyan (green + blue) and blue
-			r = clamp(m);
-			g = clamp(X);
-			b = clamp(v);
-			break;
-		case 4: //Hue is between blue and magenta (blue + red)
-			r = clamp(X);
-			g = clamp(m);
-			b = clamp(v);
-			break;
-		default: //Hue is between magenta (blue + red) and red
-			r = clamp(v);
-			g = clamp(m);
-			b = clamp(X);
-			break;
-	}
+  switch(sextant) {
+    case 0: //Hue is between red and yellow (red + green)
+      r = clamp(v);
+      g = clamp(X);
+      b = clamp(m);
+      break;
+    case 1: //Hue is between yellow (red + green) and green
+      r = clamp(X);
+      g = clamp(v);
+      b = clamp(m);
+      break;
+    case 2: //Hue is between green and cyan (green + blue)
+      r = clamp(m);
+      g = clamp(v);
+      b = clamp(X);
+      break;
+    case 3: //Hue is between cyan (green + blue) and blue
+      r = clamp(m);
+      g = clamp(X);
+      b = clamp(v);
+      break;
+    case 4: //Hue is between blue and magenta (blue + red)
+      r = clamp(X);
+      g = clamp(m);
+      b = clamp(v);
+      break;
+    default: //Hue is between magenta (blue + red) and red
+      r = clamp(v);
+      g = clamp(m);
+      b = clamp(X);
+      break;
+  }
 }
 
 template <> void bob::ip::rgb_to_yuv_one (uint8_t r, uint8_t g, uint8_t b,
@@ -383,14 +383,14 @@ template <> void bob::ip::yuv_to_rgb_one (uint8_t y, uint8_t u, uint8_t v,
   yuv_to_rgb_one(normalize(y), normalize(u), normalize(v), R, G, B);
   r = scale<uint8_t>(R); g = scale<uint8_t>(G); b = scale<uint8_t>(B);
 }
-	
+  
 template <> void bob::ip::yuv_to_rgb_one (uint16_t y, uint16_t u, uint16_t v,
     uint16_t& r, uint16_t& g, uint16_t& b) {
   double R, G, B;
   yuv_to_rgb_one(normalize(y), normalize(u), normalize(v), R, G, B);
   r = scale<uint16_t>(R); g = scale<uint16_t>(G); b = scale<uint16_t>(B);
 }
-	
+  
 /**
  * We are doing the inverse of the rgb_to_yuv_one() method above
  */

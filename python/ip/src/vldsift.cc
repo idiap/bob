@@ -59,12 +59,12 @@ static object call_vldsift(ip::VLDSIFT& op, tp::const_ndarray src) {
 void bind_ip_vldsift() {
   static const char* VLDSIFT_doc = "Computes dense SIFT features using the VLFeat library";
 
-	class_<ip::VLDSIFT, boost::shared_ptr<ip::VLDSIFT> >("VLDSIFT", VLDSIFT_doc, init<const int, const int, optional<const int, const int> >((arg("height"), arg("width"), arg("step")=5, arg("bin_size")=5), "Creates an object to compute dense SIFT features"))
-  		.def("forward", &call_vldsift_, (arg("self"), arg("src"), arg("dst")), "Computes the dense SIFT features from an input image, using the VLFeat library. Both input and output arrays should have the expected size.")
-  		.def("__call__", &call_vldsift_, (arg("self"), arg("src"), arg("dst")), "Computes the dense SIFT features from an input image, using the VLFeat library. Both input and output arrays should have the expected size.")
-  		.def("forward", &call_vldsift, (arg("self"), arg("src")), "Computes the dense SIFT features from an input image, using the VLFeat library. Returns the descriptors.")
-  		.def("__call__", &call_vldsift, (arg("self"), arg("src")), "Computes the dense SIFT features from an input image, using the VLFeat library. Returns the descriptors.")
+  class_<ip::VLDSIFT, boost::shared_ptr<ip::VLDSIFT> >("VLDSIFT", VLDSIFT_doc, init<const int, const int, optional<const int, const int> >((arg("height"), arg("width"), arg("step")=5, arg("bin_size")=5), "Creates an object to compute dense SIFT features"))
+      .def("forward", &call_vldsift_, (arg("self"), arg("src"), arg("dst")), "Computes the dense SIFT features from an input image, using the VLFeat library. Both input and output arrays should have the expected size.")
+      .def("__call__", &call_vldsift_, (arg("self"), arg("src"), arg("dst")), "Computes the dense SIFT features from an input image, using the VLFeat library. Both input and output arrays should have the expected size.")
+      .def("forward", &call_vldsift, (arg("self"), arg("src")), "Computes the dense SIFT features from an input image, using the VLFeat library. Returns the descriptors.")
+      .def("__call__", &call_vldsift, (arg("self"), arg("src")), "Computes the dense SIFT features from an input image, using the VLFeat library. Returns the descriptors.")
       .def("get_n_keypoints", &ip::VLDSIFT::getNKeypoints, "Returns the number of keypoints for the current parameters/image size.")
       .def("get_descriptor_size", &ip::VLDSIFT::getDescriptorSize, "Returns the descriptor size for the current parameters.")
-		;
+    ;
 }
