@@ -19,12 +19,12 @@ bob_python_add_unittest(visioner lib/test/detection.py main
 bob_python_add_unittest(visioner lib/test/localization.py main
   "${CMAKE_CURRENT_SOURCE_DIR}/../io/data")
 
-# No tests?
-bob_python_script(visioner visioner_transcode.py lib/script/transcode.py)
+bob_python_script(visioner bob_face_detect.py lib/script/facebox.py)
 
-bob_python_script(visioner visioner_facebox.py lib/script/facebox.py)
-bob_python_add_test(visioner-1 visioner_facebox.py "${CMAKE_CURRENT_SOURCE_DIR}/../io/data/test.mov" --self-test=1)
-bob_python_add_test(visioner-2 visioner_facebox.py "${CMAKE_CURRENT_SOURCE_DIR}/../ip/data/faceextract/test-faces.jpg" --self-test=2)
-bob_python_script(visioner visioner_facepoints.py lib/script/facepoints.py)
-bob_python_add_test(visioner-1 visioner_facepoints.py "${CMAKE_CURRENT_SOURCE_DIR}/../io/data/test.mov" --self-test=1)
-bob_python_add_test(visioner-2 visioner_facepoints.py "${CMAKE_CURRENT_SOURCE_DIR}/../ip/data/faceextract/test-faces.jpg" --self-test=2)
+bob_python_add_test(visioner-1 bob_face_detect.py "${CMAKE_CURRENT_SOURCE_DIR}/../io/data/test.mov" --self-test=1)
+bob_python_add_test(visioner-2 bob_face_detect.py "${CMAKE_CURRENT_SOURCE_DIR}/../ip/data/faceextract/test-faces.jpg" --self-test=2)
+
+bob_python_script(visioner bob_face_keypoints.py lib/script/facepoints.py)
+
+bob_python_add_test(visioner-1 bob_face_keypoints.py "${CMAKE_CURRENT_SOURCE_DIR}/../io/data/test.mov" --self-test=1)
+bob_python_add_test(visioner-2 bob_face_keypoints.py "${CMAKE_CURRENT_SOURCE_DIR}/../ip/data/faceextract/test-faces.jpg" --self-test=2)

@@ -19,7 +19,8 @@ from . import machine
 from . import trainer
 from . import build
 from . import helper
-
+from . import visioner
+  
 try:
   # the daq may not be built if Qt4 is not installed
   from . import daq
@@ -27,12 +28,6 @@ try:
 except ImportError:
   has_daq = False
 
-try:
-  # the visioner may not be built if Qt4 is not installed
-  from . import visioner
-  has_visioner = True
-except ImportError:
-  has_visioner = False
 
 sys.setdlopenflags(default_flags)
 del default_flags
@@ -49,7 +44,7 @@ __all__ = [
     'trainer',
     'build',
     'helper',
+    'visioner',
     ]
 
-if has_visioner: __all__.append('visioner')
 if has_daq: __all__.append('daq')

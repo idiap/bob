@@ -26,6 +26,7 @@
 
 #include <blitz/array.h>
 #include <core/Exception.h>
+#include <io/HDF5File.h>
 #include <sp/FFT2D.h>
 #include <vector>
 #include <utility>
@@ -100,9 +101,17 @@ namespace bob {
 
         //! get the number of kernels (usually, 40) used by this GWT class
         int numberOfKernels() const{return m_kernel_frequencies.size();}
+        int numberOfDirections() const{return m_number_of_directions;}
+        int numberOfScales() const{return m_number_of_scales;}
 
         //! Returns the vector of central frequencies used by this Gabor wavelet family
         const std::vector<blitz::TinyVector<double,2> >& kernelFrequencies() const {return m_kernel_frequencies;}
+
+        double sigma() const {return m_sigma;}
+        double k_max() const {return m_k_max;}
+        double k_fac() const {return m_k_fac;}
+        double pow_of_k() const {return m_pow_of_k;}
+        bool dc_free() const {return m_dc_free;}
 
         //! performs Gabor wavelet transform and returns vector of complex images
         void performGWT(
@@ -126,11 +135,20 @@ namespace bob {
           bool do_normalize = true
         );
 
+        //! \brief saves the parameters of this Gabor wavelet family to file
+        void save(bob::io::HDF5File& file) const;
+
+        //! \brief reads the parameters of this Gabor wavelet family from file
+        void load(bob::io::HDF5File& file);
 
       private:
 
+        void computeKernelFrequencies();
+
         double m_sigma;
         double m_pow_of_k;
+        double m_k_max;
+        double m_k_fac;
         bool m_dc_free;
         std::vector<GaborKernel> m_gabor_kernels;
 
@@ -141,11 +159,10 @@ namespace bob {
 
         blitz::Array<std::complex<double>,2> m_temp_array, m_frequency_image;
 
-      public:
         //! The number of scales (levels, frequencies) of this family
-        const int m_number_of_scales;
+        int m_number_of_scales;
         //! The number of directions (orientations) of this family
-        const int m_number_of_directions;
+        int m_number_of_directions;
     }; // class GaborWaveletTransform
 
     //! Normalizes a Gabor jet (vector of absolute values) to unit length

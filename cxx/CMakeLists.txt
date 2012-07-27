@@ -14,14 +14,7 @@ add_subdirectory(ip)
 add_subdirectory(machine)
 add_subdirectory(trainer)
 
-if (NOT QT4_FOUND)
-  set(BOB_VISIONER_ENABLED OFF)
-else (NOT QT4_FOUND)
-  add_subdirectory(visioner) #visioner package may override VISIONER_FOUND
-endif (NOT QT4_FOUND)
-
-set(BOB_VISIONER_ENABLED ${BOB_VISIONER_ENABLED} PARENT_SCOPE) #escalate
-
 if(QT4_FOUND)
+  add_subdirectory(visioner)
   add_subdirectory(daq)
 endif()

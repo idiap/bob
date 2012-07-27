@@ -49,10 +49,7 @@ if (PYTHON_EXECUTABLE AND PYTHONLIBS_FOUND AND Boost_FOUND)
   add_subdirectory(trainer)
 
   if(QT4_FOUND)
-    if (BOB_VISIONER_ENABLED)
-      add_subdirectory(visioner)
-    endif()
-
+    add_subdirectory(visioner)
     add_subdirectory(daq)
   endif()
 

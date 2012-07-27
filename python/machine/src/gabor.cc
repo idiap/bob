@@ -30,10 +30,6 @@
 #include <core/array_exception.h>
 
 
-static boost::python::tuple bob_disparity(const bob::machine::DisparitySimilarity& self){
-  return boost::python::make_tuple(self.disparity()[0], self.disparity()[1]);
-}
-
 static void bob_extract(bob::machine::GaborGraphMachine& self, bob::python::const_ndarray input_jet_image, bob::python::ndarray output_graph){
   if (output_graph.type().nd == 2){
     const blitz::Array<double,3> jet_image = input_jet_image.bz<double,3>();
@@ -43,6 +39,22 @@ static void bob_extract(bob::machine::GaborGraphMachine& self, bob::python::cons
     const blitz::Array<double,4> jet_image = input_jet_image.bz<double,4>();
     blitz::Array<double,3> graph = output_graph.bz<double,3>();
     self.extract(jet_image, graph);
+  } else throw bob::core::UnexpectedShapeError();
+}
+
+static bob::python::ndarray bob_extract2(bob::machine::GaborGraphMachine& self, bob::python::const_ndarray input_jet_image){
+  if (input_jet_image.type().nd == 3){
+    const blitz::Array<double,3> jet_image = input_jet_image.bz<double,3>();
+    bob::python::ndarray output_graph(bob::core::array::t_float64, self.numberOfNodes(), jet_image.shape()[2]);
+    blitz::Array<double,2> graph = output_graph.bz<double,2>();
+    self.extract(jet_image, graph);
+    return output_graph;
+  } else if (input_jet_image.type().nd == 4){
+    const blitz::Array<double,4> jet_image = input_jet_image.bz<double,4>();
+    bob::python::ndarray output_graph(bob::core::array::t_float64, self.numberOfNodes(), jet_image.shape()[2], jet_image.shape()[3]);
+    blitz::Array<double,3> graph = output_graph.bz<double,3>();
+    self.extract(jet_image, graph);
+    return output_graph;
   } else throw bob::core::UnexpectedShapeError();
 }
 
@@ -91,67 +103,20 @@ static double bob_similarity(bob::machine::GaborGraphMachine& self, bob::python:
   }
 }
 
-static double base_class_sim(const bob::machine::GaborJetSimilarity& self, bob::python::const_ndarray jet1, bob::python::const_ndarray jet2){
+static double bob_jet_sim(const bob::machine::GaborJetSimilarity& self, bob::python::const_ndarray jet1, bob::python::const_ndarray jet2){
   switch (jet1.type().nd){
     case 1:{
       const blitz::Array<double,1> j1 = jet1.bz<double,1>(), j2 = jet2.bz<double,1>();
-      return self.similarity(j1, j2);
+      return self(j1, j2);
     }
     case 2:{
       const blitz::Array<double,2> j1 = jet1.bz<double,2>(), j2 = jet2.bz<double,2>();
-      return self.similarity(j1, j2);
+      return self(j1, j2);
     }
     default:
       throw bob::core::UnexpectedShapeError();
   }
 }
-
-static double scalar_product_sim(const bob::machine::ScalarProductSimilarity& self, bob::python::const_ndarray jet1, bob::python::const_ndarray jet2){
-  switch (jet1.type().nd){
-    case 1:{
-      const blitz::Array<double,1> j1 = jet1.bz<double,1>(), j2 = jet2.bz<double,1>();
-      return self.similarity(j1, j2);
-    }
-    case 2:{
-      const blitz::Array<double,2> j1 = jet1.bz<double,2>(), j2 = jet2.bz<double,2>();
-      return self.similarity(j1, j2);
-    }
-    default:
-      throw bob::core::UnexpectedShapeError();
-  }
-}
-
-static double canberra_sim(const bob::machine::CanberraSimilarity& self, bob::python::const_ndarray jet1, bob::python::const_ndarray jet2){
-  switch (jet1.type().nd){
-    case 1:{
-      const blitz::Array<double,1> j1 = jet1.bz<double,1>(), j2 = jet2.bz<double,1>();
-      return self.similarity(j1, j2);
-    }
-    case 2:{
-      const blitz::Array<double,2> j1 = jet1.bz<double,2>(), j2 = jet2.bz<double,2>();
-      return self.similarity(j1, j2);
-    }
-    default:
-      throw bob::core::UnexpectedShapeError();
-  }
-}
-
-static double disparity_sim(const bob::machine::DisparitySimilarity& self, bob::python::const_ndarray jet1, bob::python::const_ndarray jet2){
-  switch (jet1.type().nd){
-    case 1:{
-      const blitz::Array<double,1> j1 = jet1.bz<double,1>(), j2 = jet2.bz<double,1>();
-      // call the similarity function (which will throw an exception)
-      return self.similarity(j1, j2);
-    }
-    case 2:{
-      const blitz::Array<double,2> j1 = jet1.bz<double,2>(), j2 = jet2.bz<double,2>();
-      return self.similarity(j1, j2);
-    }
-    default:
-      throw bob::core::UnexpectedShapeError();
-  }
-}
-
 
 void bind_machine_gabor(){
   /////////////////////////////////////////////////////////////////////////////////////////
@@ -163,105 +128,47 @@ void bind_machine_gabor(){
     )
 
     .def(
-      "__call__",
-      &base_class_sim,
-      (boost::python::arg("self"), boost::python::arg("jet1"), boost::python::arg("jet2")),
-      "Computes the similarity."
-    );
-
-  boost::python::class_<bob::machine::ScalarProductSimilarity, boost::shared_ptr<bob::machine::ScalarProductSimilarity>, boost::python::bases<bob::machine::GaborJetSimilarity> >(
-      "ScalarProductSimilarity",
-      "This class computes the similarity of two Gabor jets as the normalized scalar product (also known as the cosine measure)"
-  )
-
-    .def(
-      "__call__",
-      &scalar_product_sim,
-      (boost::python::arg("self"), boost::python::arg("jet1"), boost::python::arg("jet2")),
-      "Computes the similarity."
-    );
-
-  boost::python::class_<bob::machine::CanberraSimilarity, boost::shared_ptr<bob::machine::CanberraSimilarity>, boost::python::bases<bob::machine::GaborJetSimilarity> >(
-      "CanberraSimilarity",
-      "This class computes the similarity of two Gabor jets as the Canberra similarity measure: :math:`\\sum_j \\frac{|a_j - a_j'|} {(a_j + a_j')}`"
-    )
-
-    .def(
-      "__call__",
-      &canberra_sim,
-      (boost::python::arg("self"), boost::python::arg("jet1"), boost::python::arg("jet2")),
-      "Computes the similarity."
-    );
-
-  boost::python::class_<bob::machine::DisparitySimilarity, boost::shared_ptr<bob::machine::DisparitySimilarity>, boost::python::bases<bob::machine::GaborJetSimilarity> >(
-      "DisparitySimilarity",
-      "This class computes the similarity of two Gabor jets by computing the disparity between the two jets and use this to correct phase differences in the calculation of the similarity",
-      boost::python::no_init
-    )
-
-    .def(
-      boost::python::init<const bob::ip::GaborWaveletTransform&>(
-        (boost::python::arg("gwt") = bob::ip::GaborWaveletTransform()),
-        "Initializes the similarity measure with parameters from the given transform (or default transform, if no other is given)"
+      boost::python::init<bob::machine::GaborJetSimilarity::SimilarityType, const bob::ip::GaborWaveletTransform&>(
+        (
+          boost::python::arg("type"),
+          boost::python::arg("gwt") = bob::ip::GaborWaveletTransform()
+        ),
+        "Generates a Gabor jet similarity measure of the given type. The parameters of the given transform are used for disparity-like similarity functions only."
       )
     )
 
     .def(
-      "__call__",
-      &disparity_sim,
-      (boost::python::arg("self"), boost::python::arg("jet1"), boost::python::arg("jet2")),
-      "Computes the similarity."
+      "save",
+      &bob::machine::GaborJetSimilarity::save,
+      "Saves the parameterization of this Gabor jet similarity function to HDF5 file."
     )
 
-    .def
-    (
+    .def(
+      "load",
+      &bob::machine::GaborJetSimilarity::load,
+      "Loads the parameterization of this Gabor jet similarity function from HDF5 file."
+    )
+
+    .def(
       "disparity",
-      &bob_disparity,
-      boost::python::arg("self"),
-      "Returns the disparity estimated by the last call to similarity"
-    );
-
-
-  boost::python::class_<bob::machine::DisparityCorrectedPhaseDifference, boost::shared_ptr<bob::machine::DisparityCorrectedPhaseDifference>, boost::python::bases<bob::machine::DisparitySimilarity> >(
-      "DisparityCorrectedPhaseDifference",
-      "This class computes the similarity of two Gabor jets by computing the disparity between the two jets and use this to correct phase differences in the calculation of the similarity",
-      boost::python::no_init
-    )
-
-    .def(
-      boost::python::init<const bob::ip::GaborWaveletTransform&>(
-        (boost::python::arg("gwt") = bob::ip::GaborWaveletTransform()),
-        "Initializes the similarity measure with parameters from the given transform (or default transform, if no other is given)"
-      )
+      &bob::machine::GaborJetSimilarity::disparity,
+      "Returns the disparity computed by the latest call. Only valid for disparity-like similarity function types."
     )
 
     .def(
       "__call__",
-      &bob::machine::DisparityCorrectedPhaseDifference::similarity,
+      &bob_jet_sim,
       (boost::python::arg("self"), boost::python::arg("jet1"), boost::python::arg("jet2")),
-      "Computes the similarity."
+      "Computes the similarity between the given Gabor jets."
   );
 
-
-  boost::python::class_<bob::machine::DisparityCorrectedPhaseDifferencePlusCanberra, boost::shared_ptr<bob::machine::DisparityCorrectedPhaseDifferencePlusCanberra>, boost::python::bases<bob::machine::DisparitySimilarity> >(
-      "DisparityCorrectedPhaseDifferencePlusCanberra",
-      "This class computes the similarity of two Gabor jets by computing the disparity between the two jets and use this to correct phase differences in the calculation of the similarity. Additionally, the Canberra distance between the absolute values of the jets is added.",
-      boost::python::no_init
-    )
-
-    .def(
-      boost::python::init<const bob::ip::GaborWaveletTransform&>(
-        (boost::python::arg("gwt") = bob::ip::GaborWaveletTransform()),
-        "Initializes the similarity measure with parameters from the given transform (or default transform, if no other is given)"
-      )
-    )
-
-    .def(
-      "__call__",
-      &bob::machine::DisparityCorrectedPhaseDifferencePlusCanberra::similarity,
-      (boost::python::arg("self"), boost::python::arg("jet1"), boost::python::arg("jet2")),
-      "Computes the similarity."
-  );
+  boost::python::enum_<bob::machine::GaborJetSimilarity::SimilarityType>("gabor_jet_similarity_type")
+    .value("SCALAR_PRODUCT", bob::machine::GaborJetSimilarity::SCALAR_PRODUCT)
+    .value("CANBERRA", bob::machine::GaborJetSimilarity::CANBERRA)
+    .value("DISPARITY", bob::machine::GaborJetSimilarity::DISPARITY)
+    .value("PHASE_DIFF", bob::machine::GaborJetSimilarity::PHASE_DIFF)
+    .value("PHASE_DIFF_PLUS_CANBERRA", bob::machine::GaborJetSimilarity::PHASE_DIFF_PLUS_CANBERRA)
+    .export_values();
 
   /////////////////////////////////////////////////////////////////////////////////////////
   //////////////// Gabor graph machine
@@ -292,6 +199,18 @@ void bind_machine_gabor(){
       )
     )
 
+    .def(
+      "save",
+      &bob::machine::GaborGraphMachine::save,
+      "Saves the parameterization of this Gabor graph extractor to HDF5 file."
+    )
+
+    .def(
+      "load",
+      &bob::machine::GaborGraphMachine::load,
+      "Loads the parameterization of this Gabor graph extractor from HDF5 file."
+    )
+
     .add_property(
       "number_of_nodes",
       &bob::machine::GaborGraphMachine::numberOfNodes,
@@ -311,6 +230,13 @@ void bind_machine_gabor(){
       "Extracts the Gabor jets at the desired locations from the given Gabor jet image"
     )
     
+    .def(
+      "__call__",
+      &bob_extract2,
+      (boost::python::arg("self"), boost::python::arg("jet_image")),
+      "Extracts and returns the Gabor jets at the desired locations from the given Gabor jet image"
+    )
+
     .def(
       "average",
       &bob_average,

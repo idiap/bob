@@ -178,7 +178,7 @@ double bob::machine::GaborGraphMachine::similarity(
   double similarity = 0.;
   blitz::Range all = blitz::Range::all();
   for (int i = 0; i < model_graph_jets.extent(0); ++i){
-    similarity += jet_similarity_function.similarity(model_graph_jets(i,all), probe_graph_jets(i,all));
+    similarity += jet_similarity_function(model_graph_jets(i,all), probe_graph_jets(i,all));
   }
   return similarity / model_graph_jets.extent(0);
 }
@@ -200,7 +200,7 @@ double bob::machine::GaborGraphMachine::similarity(
   double similarity = 0.;
   blitz::Range all = blitz::Range::all();
   for (int i = 0; i < model_graph_jets.extent(0); ++i){
-    similarity += jet_similarity_function.similarity(model_graph_jets(i,all,all), probe_graph_jets(i,all,all));
+    similarity += jet_similarity_function(model_graph_jets(i,all,all), probe_graph_jets(i,all,all));
   }
   return similarity / model_graph_jets.extent(0);
 }
@@ -226,7 +226,7 @@ double bob::machine::GaborGraphMachine::similarity(
     // maximize jet similarity over all models in the gallery
     double max_similarity = 0.;
     for (int p = 0; p < many_model_graph_jets.extent(0); ++p){
-      max_similarity = std::max(max_similarity, jet_similarity_function.similarity(many_model_graph_jets(p,i,all), probe_graph_jets(i,all)));
+      max_similarity = std::max(max_similarity, jet_similarity_function(many_model_graph_jets(p,i,all), probe_graph_jets(i,all)));
     }
     similarity += max_similarity;
   }
@@ -254,7 +254,7 @@ double bob::machine::GaborGraphMachine::similarity(
     // maximize jet similarity over all models in the gallery
     double max_similarity = 0.;
     for (int p = 0; p < many_model_graph_jets.extent(0); ++p){
-      max_similarity = std::max(max_similarity, jet_similarity_function.similarity(many_model_graph_jets(p,i,all,all), probe_graph_jets(i,all,all)));
+      max_similarity = std::max(max_similarity, jet_similarity_function(many_model_graph_jets(p,i,all,all), probe_graph_jets(i,all,all)));
     }
     similarity += max_similarity;
   }
@@ -262,3 +262,10 @@ double bob::machine::GaborGraphMachine::similarity(
 }
 
 
+void bob::machine::GaborGraphMachine::save(bob::io::HDF5File& file) const{
+  file.setArray("NodePositions", m_node_positions);
+}
+
+void bob::machine::GaborGraphMachine::load(bob::io::HDF5File& file){
+  m_node_positions = file.readArray<int,2>("NodePositions");
+}

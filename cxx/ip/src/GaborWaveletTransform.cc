@@ -155,33 +155,42 @@ bob::ip::GaborWaveletTransform::GaborWaveletTransform(
 )
 : m_sigma(sigma),
   m_pow_of_k(pow_of_k),
+  m_k_max(k_max),
+  m_k_fac(k_fac),
   m_dc_free(dc_free),
   m_fft(0,0),
   m_ifft(0,0),
   m_number_of_scales(number_of_scales),
   m_number_of_directions(number_of_directions)
 {
+  computeKernelFrequencies();
+}
+
+/**
+ * Private function that computes the frequency vectors of the Gabor kernels
+ */
+void bob::ip::GaborWaveletTransform::computeKernelFrequencies(){
   // reserve enough space
-  m_kernel_frequencies.reserve(number_of_scales * number_of_directions);
+  m_kernel_frequencies.clear();
+  m_kernel_frequencies.reserve(m_number_of_scales * m_number_of_directions);
   // initialize highest frequency
-  double k_abs = k_max;
+  double k_abs = m_k_max;
   // iterate over the scales
-  for (int s = 0; s < number_of_scales; ++s){
+  for (int s = 0; s < m_number_of_scales; ++s){
 
     // iterate over the directions
-    for (int d = 0; d < number_of_directions; ++d )
+    for (int d = 0; d < m_number_of_directions; ++d )
     {
-      double angle = M_PI * d / number_of_directions;
+      double angle = M_PI * d / m_number_of_directions;
       // compute center of kernel in frequency domain in Cartesian coordinates
       m_kernel_frequencies.push_back(
         blitz::TinyVector<double,2>(k_abs * sin(angle), k_abs * cos(angle)));
     } // for d
 
     // move to the next frequency scale
-    k_abs *= k_fac;
+    k_abs *= m_k_fac;
   } // for s
 }
-
 
 /**
  * Generates the kernels for the given image resolution.
@@ -342,6 +351,27 @@ void bob::ip::GaborWaveletTransform::computeJetImage(
   }
 }
 
+void bob::ip::GaborWaveletTransform::save(bob::io::HDF5File& file) const{
+  file.set("Sigma", m_sigma);
+  file.set("PowOfK", m_pow_of_k);
+  file.set("KMax", m_k_max);
+  file.set("KFac", m_k_fac);
+  file.set("DCfree", m_dc_free);
+  file.set("NumberOfScales", m_number_of_scales);
+  file.set("NumberOfDirections", m_number_of_directions);
+}
+
+void bob::ip::GaborWaveletTransform::load(bob::io::HDF5File& file){
+  m_sigma = file.read<double>("Sigma");
+  m_pow_of_k = file.read<double>("PowOfK");
+  m_k_max = file.read<double>("KMax");
+  m_k_fac = file.read<double>("KFac");
+  m_dc_free = file.read<bool>("DCfree");
+  m_number_of_scales = file.read<int>("NumberOfScales");
+  m_number_of_directions = file.read<int>("NumberOfDirections");
+
+  computeKernelFrequencies();
+}
 
 /**
  * Normalizes the given Gabor jet (absolute values only) to unit length.

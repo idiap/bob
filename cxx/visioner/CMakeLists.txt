@@ -1,54 +1,124 @@
-project(visioner-cxx)
+PROJECT(visioner-cxx)
 cmake_minimum_required(VERSION 2.6)
 
-include("ExternalProject")
+# This defines the dependencies of this package
+set(deps "lbfgs;core") #other bob subprojects
 
-if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/project/CMakeLists.txt)
+include (${QT_USE_FILE})
+include_directories(SYSTEM ${QT_INCLUDE_DIR})
+set(shared "${QT_LIBRARIES};${Boost_IOSTREAMS_LIBRARY_RELEASE};${Boost_SERIALIZATION_LIBRARY_RELEASE}")
 
-  message(WARNING "warning: you should do 'git submodule init; git submodule update' on the root of bob before attempting to run a build that includes the visioner. I'm disabling it for the time being. Re-run cmake to add it back after a proper initialization if you require that functionality.")
+# Enables OpenMP if found
+if (OPENMP_FOUND)
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${OpenMP_CXX_FLAGS}")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${OpenMP_CXX_FLAGS}")
+endif ()
 
-  set(BOB_VISIONER_ENABLED OFF PARENT_SCOPE)
+# This defines the list of source files inside this package.
+set(src
+    "src/averager.cc"
+    "src/cv_classifier.cc"
+    "src/cv_detector.cc"
+    "src/cv_draw.cc"
+    "src/cv_localizer.cc"
+    "src/dataset.cc"
+    "src/diag_exp_loss.cc"
+    "src/diag_log_loss.cc"
+    "src/diag_loss.cc"
+    "src/diag_symexp_loss.cc"
+    "src/diag_symlog_loss.cc"
+    "src/histogram.cc"
+    "src/image.cc"
+    "src/ipyramid.cc"
+    "src/jesorsky_loss.cc"
+    "src/lut_problem.cc"
+    "src/lut_problem_ept.cc"
+    "src/lut_problem_var.cc"
+    "src/mdecoder.cc"
+    "src/ml.cc"
+    "src/model.cc"
+    "src/object.cc"
+    "src/param.cc"
+    "src/sampler.cc"
+    "src/tagger_keypoint_oxy.cc"
+    "src/tagger_object.cc"
+    "src/taylor_booster.cc"
+    "src/util.cc"
+    "src/vision.cc"
+)
 
-else(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/project/CMakeLists.txt)
+bob_library(visioner "${src}" "${deps}" "${shared}")
 
-  ExternalProject_Add(visioner
-    DOWNLOAD_COMMAND ""
-    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/project
-    CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR} -DLBFGS_INCLUDE_DIR=${BOB_LBFGS_HEADER_DIRS} -DLBFGS_LIBRARY_DIR=${CMAKE_BINARY_DIR}/lib
-    INSTALL_DIR ${CMAKE_BINARY_DIR}
+# Visioner applications
+bob_add_executable(visioner classifier programs/classifier.cc)
+bob_add_executable(visioner classifier_eval programs/classifier_eval.cc)
+bob_add_executable(visioner detector programs/detector.cc)
+bob_add_executable(visioner detector2bbx programs/detector2bbx.cc)
+bob_add_executable(visioner detector_eval programs/detector_eval.cc)
+bob_add_executable(visioner downscaler programs/downscaler.cc)
+bob_add_executable(visioner drawlbps programs/drawlbps.cc)
+bob_add_executable(visioner drawmb_ctf programs/drawmb_ctf.cc)
+bob_add_executable(visioner drawmbs programs/drawmbs.cc)
+bob_add_executable(visioner face2bbx programs/face2bbx.cc)
+bob_add_executable(visioner feature_stats programs/feature_stats.cc)
+bob_add_executable(visioner gt2pts programs/gt2pts.cc)
+bob_add_executable(visioner localizer programs/localizer.cc)
+bob_add_executable(visioner localizer_eval programs/localizer_eval.cc)
+bob_add_executable(visioner localizer_eval_ex programs/localizer_eval_ex.cc)
+bob_add_executable(visioner max_threads programs/max_threads.cc)
+bob_add_executable(visioner model_stats programs/model_stats.cc)
+bob_add_executable(visioner param2model programs/param2model.cc)
+bob_add_executable(visioner pts2gt programs/pts2gt.cc)
+bob_add_executable(visioner readcmuprofile programs/readcmuprofile.cc)
+bob_add_executable(visioner readmit+cmu programs/readmit+cmu.cc)
+bob_add_executable(visioner readmnist programs/readmnist.cc)
+bob_add_executable(visioner trainer programs/trainer.cc)
+
+# The graphical 'vgui' app
+set(vgui_src
+    "programs/vgui/fmap_item.cc"
+    "programs/vgui/fmap_scene.cc"
+    "programs/vgui/fmap_widget.cc"
+    "programs/vgui/settings.cc"
+    "programs/vgui/settings_dialog.cc"
+    "programs/vgui/image_collection.cc"
+    "programs/vgui/main.cc"
+    "programs/vgui/controls.cc"
+    "programs/vgui/extended_table.cc"
+    "programs/vgui/extended_item_delegate.cc"
     )
 
-  set(BOB_VISIONER_ENABLED ON PARENT_SCOPE)
+set(vgui_mocs
+    "programs/vgui/fmap_scene.h"
+    "programs/vgui/fmap_widget.h"
+    "programs/vgui/extended_table.h"
+    "programs/vgui/extended_item_delegate.h"
+    )
+  
+#set (vgui_uis
+#     "programs/vgui/mainwindow.ui"
+#    )
 
-  add_dependencies(visioner bob_lbfgs)
-
-  ExternalProject_Get_Property(visioner BINARY_DIR)
-  ExternalProject_Get_Property(visioner SOURCE_DIR)
-
-
-  if(APPLE)
-    set(PATH_TO_SO ${CMAKE_BINARY_DIR}/lib/libbob_visioner.dylib)
-  else()
-    set(PATH_TO_SO ${CMAKE_BINARY_DIR}/lib/libbob_visioner.so)
-  endif()
-
-  set_target_properties(bob_visioner PROPERTIES IMPORTED_LOCATION ${PATH_TO_SO})
-
-  install(FILES ${PATH_TO_SO} DESTINATION lib)
-
-  set(BOB_VISIONER_HEADER_DIRS
-    "${SOURCE_DIR}/src/ml"
-    "${SOURCE_DIR}/src/proc"
-    "${SOURCE_DIR}/src/util"
-    "${SOURCE_DIR}/src/vision"
-    CACHE INTERNAL "Visioner include directories"
+set(vgui_resrc
+    "programs/vgui/icons.qrc"
     )
 
-  foreach(HEADER_DIR in ${BOB_VISIONER_HEADER_DIRS})
-    get_filename_component(DIR_NAME ${HEADER_DIR} NAME)
-    install(DIRECTORY ${HEADER_DIR}
-            DESTINATION include/bob/visioner/${DIR_NAME}
-            FILES_MATCHING PATTERN "*.h")
-  endforeach()
 
-endif(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/project/CMakeLists.txt)
+# This command will generate rules that will run rcc on all files from
+# SAMPLE_RCS in result SAMPLE_RC_SRCS variable will contain paths to files
+# produced by rcc
+QT4_ADD_RESOURCES(vgui_resrc "${vgui_resrc}")
+
+# This will run uic on .ui files: only run when required to avoid modifying the
+# file (f.ex. the date it was generated on)
+QT4_WRAP_UI(vgui_uis "${vgui_uis}")
+
+# And finally this will run moc:
+QT4_WRAP_CPP(vgui_mocs "${vgui_mocs}")
+
+# We need this to be able to include headers produced by uic in our code
+# (CMAKE_BINARY_DIR holds a path to the build directory, while
+# INCLUDE_DIRECTORIES() works just like INCLUDEPATH from qmake)
+include_directories(${CMAKE_BINARY_DIR})
+
+bob_add_executable(visioner vgui "${vgui_src};${vgui_mocs};${vgui_uis};${vgui_resrc}")

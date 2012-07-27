@@ -27,59 +27,41 @@ import bob
 
 TEST_VIDEO = "test.mov"
 
-class Loader:
-  
-  def __init__(self):
-    pass
-
-  def setUp(self):
-    if not hasattr(self, 'processor'):
-      self.processor = bob.visioner.MaxDetector()
-
-    if not hasattr(self, 'video'):
-      self.video = bob.io.VideoReader(TEST_VIDEO)
-      self.images = [bob.ip.rgb_to_gray(k).astype('int16') for k in self.video[:100]]
-
-data = Loader()
-
 class DetectionTest(unittest.TestCase):
   """Performs various face detection tests."""
   
-  def setUp(self):
+  def test01_Faster(self):
 
-    # load models and video only once
-    if not hasattr(data, 'processor'): data.setUp()
-    self.processor = data.processor
-    self.images = data.images
-
-  def test01_Thourough(self):
+    video = bob.io.VideoReader(TEST_VIDEO)
+    self.images = [bob.ip.rgb_to_gray(k) for k in video[:20]]
+    self.processor = bob.visioner.MaxDetector(scanning_levels=10)
 
     # find faces on the video
-    # scan_levels = 0, 8 scales
-    locdata = [self.processor(k) for k in self.images]
-
-    # asserts at least 95% detections
-    self.assertTrue ( (0.95 * len(self.images)) <= len(locdata) )
+    for image in self.images:
+      locdata = self.processor(image)
+      self.assertTrue(locdata is not None)
 
   def test02_Fast(self):
 
-    # find faces on the video
-    # scan_levels = 3, 8 scales
-    self.processor.scan_levels = 3
-    locdata = [self.processor(k) for k in self.images]
-
-    # asserts at least 90% detections
-    self.assertTrue ( (0.9 * len(self.images)) <= len(locdata) )
-
-  def test03_Faster(self):
+    video = bob.io.VideoReader(TEST_VIDEO)
+    self.images = [bob.ip.rgb_to_gray(k) for k in video[:10]]
+    self.processor = bob.visioner.MaxDetector(scanning_levels=5)
 
     # find faces on the video
-    # scan_levels = 10, 8 scales
-    self.processor.scan_levels = 10
-    locdata = [self.processor(k) for k in self.images]
+    for image in self.images:
+      locdata = self.processor(image)
+      self.assertTrue(locdata is not None)
 
-    # asserts at least 80% detections
-    self.assertTrue ( (0.8 * len(self.images)) <= len(locdata) )
+  def xtest03_Thorough(self):
+    
+    video = bob.io.VideoReader(TEST_VIDEO)
+    self.images = [bob.ip.rgb_to_gray(k) for k in video[:2]]
+    self.processor = bob.visioner.MaxDetector()
+
+    # find faces on the video
+    for image in self.images:
+      locdata = self.processor(image)
+      self.assertTrue(locdata is not None)
 
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(DetectionTest)

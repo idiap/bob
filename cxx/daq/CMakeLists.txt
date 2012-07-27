@@ -2,7 +2,7 @@ project(daq-cxx)
 cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
-set(deps "ip;io") #other bob subprojects
+set(deps "ip;io;visioner") #other bob subprojects
 set(shared "")
 
 # If we have google-perftools installed, enable the HAS_GOOGLE_PERFTOOLS flag,
@@ -23,16 +23,9 @@ set(src
     "src/BobOutputWriter.cc"
     "src/VideoReaderCamera.cc"
     "src/ConsoleDisplay.cc"
-    )
-
-if(BOB_VISIONER_ENABLED)
-  list(APPEND src 
     "src/CaptureSystem.cc"
     "src/VisionerFaceLocalization.cc"
     )
-
-  list(APPEND deps "visioner")
-endif()
 
 if (V4L2_FOUND)
   list(APPEND src 
@@ -60,4 +53,3 @@ qt4_wrap_cpp(MOC_SRC "daq/QtDisplay.h")
 list(INSERT src 0 "${MOC_SRC}")
 
 bob_library(daq "${src}" "${deps}" "${shared}")
-add_dependencies(bob_daq visioner)

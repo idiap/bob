@@ -50,11 +50,6 @@ import bob
 import tempfile #for package tests
 import numpy
 
-def testfile(path):
-  """Computes the path to a test file"""
-  d = os.path.join(os.path.dirname(__file__))
-  return os.path.realpath(os.path.join(d, path))
-
 def r(v):
   """Rounds the given float value to the nearest integer"""
   return int(round(v))
@@ -63,17 +58,33 @@ def process_video_data(args):
   """A more efficienty (memory-wise) way to process video data"""
 
   input = bob.io.VideoReader(args.input)
+
+  if args.start_frame < 0 or args.start_frame >= len(input):
+    raise RuntimeError, "start frame has to set to a value between 0 and %d (inclusive)" % (len(input)-1,)
+
+  if args.end_frame <= 0: args.end_frame = len(input)
+
+  if args.end_frame < 0 or args.end_frame > len(input):
+    raise RuntimeError, "end frame has to set to a value between 1 and %d (inclusive)" % (len(input),)
+
+  if args.start_frame >= args.end_frame:
+    raise RuntimeError, "start frame (%d) has to be smaller than end frame (%d)" % (args.start_frame, args.end_frame)
+
   gray_buffer = numpy.ndarray((input.height, input.width), 'uint8')
   data = []
   total = 0
   if args.verbose:
     sys.stdout.write("Detecting (single) faces in %d frames from file %s" % \
         (input.number_of_frames, args.input))
-  for k in input:
+
+  valid_range = range(args.start_frame, args.end_frame)
+
+  for i, k in enumerate(input):
+    if i not in valid_range: continue
+
     bob.ip.rgb_to_gray(k, gray_buffer)
-    int16_buffer = gray_buffer.astype('int16')
     start = time.clock()
-    detection = args.processor(int16_buffer)
+    detection = args.processor(gray_buffer)
     if args.verbose:
       sys.stdout.write('.')
       sys.stdout.flush()
@@ -84,7 +95,7 @@ def process_video_data(args):
 
   if args.verbose:
     print "Total detection time was %.2f seconds" % total
-    print " -> Per image/frame %.3f seconds" % (total/input.number_of_frames)
+    print " -> Per image/frame %.3f seconds" % (total/len(valid_range))
 
   if not args.output:
     for k, det in enumerate(data):
@@ -128,9 +139,9 @@ def process_image_data(args):
   input = bob.io.load(args.input) #load the image
 
   if len(input.shape) == 3: #it is a color image
-    graydata = bob.ip.rgb_to_gray(input).astype('int16')
+    graydata = bob.ip.rgb_to_gray(input)
   elif len(input.shape) == 2: #it is a gray-scale image
-    graydata = input.astype('int16')
+    graydata = input
 
   start = time.clock()
   data = args.processor(graydata)
@@ -174,17 +185,23 @@ def main():
   parser.add_argument("output", metavar='FILE', type=str, nargs='?',
       help="the output filename; if this filename is omitted, output for the detections is dumped in text format to the screen")
   parser.add_argument("-c", "--classification-model", metavar='FILE',
-      type=str, dest="cmodel", default=None,
+      type=str, dest="model", default=None,
       help="use a classification model file different than the default")
   parser.add_argument("-d", "--dump-scores",
       default=False, action='store_true', dest='dump_scores',
       help="if set, also dump scores after every bounding box")
-  parser.add_argument("-s", "--scan-levels", dest="scan_levels",
-      default=0, type=int, metavar='INT>=0',
+  parser.add_argument("-s", "--scanning-levels", dest="scan_levels",
+      default=10, type=int, metavar='INT>=0',
       help="scan levels (the higher, the faster - defaults to %(default)s)")
   parser.add_argument("-v", "--verbose", dest="verbose",
       default=False, action='store_true',
       help="enable verbose output")
+  parser.add_argument("-S", "--start-frame", dest='start_frame',
+      type=int, default=0, 
+      help="starts detection on the given frame (inclusive), in case you are treating videos (defaults to %(default)s")
+  parser.add_argument("-E", "--end-frame", dest='end_frame',
+      type=int, default=0, 
+      help="ends detection on the given frame (exclusive), in case you are treating videos (give '0' to go through all frames; defaults to %(default)s")
   parser.add_argument("--self-test", metavar='INT', type=int, default=False,
       dest='selftest', help=argparse.SUPPRESS)
 
@@ -198,6 +215,8 @@ def main():
     os.close(fd)
     os.unlink(filename)
     args.output = filename
+    args.start_frame = 0
+    args.end_frame = 3 
 
   elif args.selftest == 2:
     (fd, filename) = tempfile.mkstemp('.jpg', 'bobtest_')
@@ -208,11 +227,10 @@ def main():
   if args.selftest:
     args.verbose = True
     args.dump_scores = True
-    args.scan_levels = 10
 
   start = time.clock() 
-  args.processor = bob.visioner.MaxDetector(cmodel_file=args.cmodel,
-      scan_levels=args.scan_levels)
+  args.processor = bob.visioner.MaxDetector(model_file=args.model,
+      scanning_levels=args.scan_levels)
   total = time.clock() - start
 
   if args.verbose:

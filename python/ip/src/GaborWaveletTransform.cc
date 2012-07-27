@@ -186,6 +186,18 @@ void bind_ip_gabor_wavelet_transform() {
     )
   )
 
+  .def(
+    "save",
+    &bob::ip::GaborWaveletTransform::save,
+    "Saves the parameterization of this Gabor wavelet transform to HDF5 file."
+  )
+
+  .def(
+    "load",
+    &bob::ip::GaborWaveletTransform::load,
+    "Loads the parameterization of this Gabor wavelet transform from HDF5 file."
+  )
+
   .add_property(
     "number_of_kernels",
     &bob::ip::GaborWaveletTransform::numberOfKernels,
@@ -194,13 +206,13 @@ void bind_ip_gabor_wavelet_transform() {
 
   .add_property(
     "number_of_scales",
-    &bob::ip::GaborWaveletTransform::m_number_of_scales,
+    &bob::ip::GaborWaveletTransform::numberOfScales,
     "The number of scales that this Gabor wavelet family holds."
   )
 
   .add_property(
     "number_of_directions",
-    &bob::ip::GaborWaveletTransform::m_number_of_directions,
+    &bob::ip::GaborWaveletTransform::numberOfDirections,
     "The number of directions that this Gabor wavelet family holds."
   )
 

@@ -22,103 +22,125 @@
 
 #include "machine/GaborJetSimilarities.h"
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////  Simple similarity functions  //////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * This function computes the similarity between two Gabor jets as the
- * inner product of the absolute parts of the jets \f[ \sum_j a_j\,a_j' \f]
- * @param jet1 One of the two Gabor jets to compare
- * @param jet2 One of the two Gabor jets to compare
- * @return The similarity of jet1 and jet2, a value between 0 and 1
- */
-double bob::machine::ScalarProductSimilarity::similarity(const blitz::Array<double,1>& jet1, const blitz::Array<double,1>& jet2) const{
-  bob::core::array::assertCZeroBaseContiguous(jet1);
-  bob::core::array::assertCZeroBaseContiguous(jet2);
-  bob::core::array::assertSameShape(jet1,jet2);
-  return std::inner_product(jet1.begin(), jet1.end(), jet2.begin(), 0.);
-}
-
-/**
- * This function computes the similarity between two Gabor jets as the
- * inner product of the absolute parts of the jets \f[ \sum_j a_j\,a_j' \f]
- * @param jet1 One of the two Gabor jets to compare
- * @param jet2 One of the two Gabor jets to compare
- * @return The similarity of jet1 and jet2, a value between 0 and 1
- */
-double bob::machine::ScalarProductSimilarity::similarity(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const{
-  const blitz::Array<double,1> j1 = jet1(0,blitz::Range::all()), j2 = jet2(0,blitz::Range::all());
-  return similarity(j1, j2);
-}
-
-
-
-/**
- * This function computes the similarity between two Gabor jets as the
- * inner product of the absolute parts of the jets
- * \f[ 1 - \frac1J \sum_j \frac{|a_j - a_j'|}{a_j + a_j'} \f]
- * @param jet1 One of the two Gabor jets to compare
- * @param jet2 One of the two Gabor jets to compare
- * @return The similarity of jet1 and jet2, a value between 0 and 1
- */
-double bob::machine::CanberraSimilarity::similarity(const blitz::Array<double,1>& jet1, const blitz::Array<double,1>& jet2) const{
-  bob::core::array::assertCZeroBaseContiguous(jet1);
-  bob::core::array::assertCZeroBaseContiguous(jet2);
-  bob::core::array::assertSameShape(jet1,jet2);
-  double sim = 0.;
-  unsigned size = jet1.shape()[0];
-  for (unsigned j = size; j--;){
-    sim += 1. - std::abs(jet1(j) - jet2(j)) / (jet1(j) + jet2(j));
+bob::machine::GaborJetSimilarity::GaborJetSimilarity(bob::machine::GaborJetSimilarity::SimilarityType type, const bob::ip::GaborWaveletTransform& gwt)
+:
+  m_type(type),
+  m_gwt(gwt)
+{
+  // initialize, when required
+  if (m_type >= DISPARITY){
+    init();
   }
-  return sim / size;
 }
 
-/**
- * This function computes the similarity between two Gabor jets as the
- * inner product of the absolute parts of the jets
- * \f[ 1 - \frac1J \sum_j \frac{|a_j - a_j'|}{a_j + a_j'} \f]
- * @param jet1 One of the two Gabor jets to compare
- * @param jet2 One of the two Gabor jets to compare
- * @return The similarity of jet1 and jet2, a value between 0 and 1
- */
-double bob::machine::CanberraSimilarity::similarity(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const{
-  const blitz::Array<double,1> j1 = jet1(0,blitz::Range::all()), j2 = jet2(0,blitz::Range::all());
-  return similarity(j1, j2);
+static double sqr(double x){return x*x;}
+
+void bob::machine::GaborJetSimilarity::init(){
+  m_disparity = 0.;
+  m_confidences.resize(m_gwt.numberOfKernels());
+  std::fill(m_confidences.begin(), m_confidences.end(), 0.);
+  m_phase_differences.resize(m_gwt.numberOfKernels());
+  std::fill(m_phase_differences.begin(), m_phase_differences.end(), 0.);
+
+  // used for disparity-like similarity functions only...
+  m_wavelet_extends.reserve(m_gwt.numberOfScales());
+  for (int level = 0; level < m_gwt.numberOfScales(); ++level){
+    blitz::TinyVector<double,2> k = m_gwt.kernelFrequencies()[level * m_gwt.numberOfDirections()];
+    double k_abs = sqrt(sqr(k[0]) + sqr(k[1]));
+    m_wavelet_extends.push_back(M_PI / k_abs);
+  }
+}
+
+
+double bob::machine::GaborJetSimilarity::operator()(const blitz::Array<double,1>& jet1, const blitz::Array<double,1>& jet2) const{
+  bob::core::array::assertCZeroBaseContiguous(jet1);
+  bob::core::array::assertCZeroBaseContiguous(jet2);
+  bob::core::array::assertSameShape(jet1,jet2);
+
+  switch (m_type){
+    case SCALAR_PRODUCT:
+      // normalized scalar product
+      return std::inner_product(jet1.begin(), jet1.end(), jet2.begin(), 0.);
+    case CANBERRA:{
+      // Canberra similarity
+      double sim = 0.;
+      unsigned size = jet1.shape()[0];
+      for (unsigned j = size; j--;){
+        sim += 1. - std::abs(jet1(j) - jet2(j)) / (jet1(j) + jet2(j));
+      }
+      return sim / size;
+    }
+    default:
+      throw bob::core::NotImplementedError("Disparity similarity (and its derivatives) need Gabor jets including phases");
+  }
+}
+
+
+double bob::machine::GaborJetSimilarity::operator()(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const{
+  if (m_type == SCALAR_PRODUCT || m_type == CANBERRA){
+    // call the function without phases
+    return operator()(jet1(0,blitz::Range::all()), jet2(0,blitz::Range::all()));
+  }
+
+  // Here, only the disparity based similarity functions are executed
+  bob::core::array::assertCZeroBaseContiguous(jet1);
+  bob::core::array::assertCZeroBaseContiguous(jet2);
+  bob::core::array::assertSameShape(jet1,jet2);
+
+  // compute confidence vectors
+  compute_confidences(jet1, jet2);
+
+  // now, compute the disparity
+  compute_disparity();
+
+  const std::vector<blitz::TinyVector<double,2> >& kernels = m_gwt.kernelFrequencies();
+
+  switch (m_type){
+    case DISPARITY:{
+      // compute the similarity using the estimated disparity
+      double sum = 0.;
+      for (int j = m_confidences.size(); j--;){
+        sum += m_confidences[j] * cos(m_phase_differences[j] - m_disparity[0] * kernels[j][0] - m_disparity[1] * kernels[j][1]);
+      }
+      return sum;
+    } // DISPARITY
+
+    case PHASE_DIFF:{
+      // compute the similarity using the estimated disparity
+      double sum = 0.;
+      for (int j = m_phase_differences.size(); j--;){
+        sum += cos(m_phase_differences[j] - m_disparity[0] * kernels[j][0] - m_disparity[1] * kernels[j][1]);
+      }
+      return sum / jet1.shape()[1];
+    } // PHASE_DIFF
+
+    case PHASE_DIFF_PLUS_CANBERRA:{
+      // compute the similarity using the estimated disparity
+      double sum = 0.;
+      for (int j = m_phase_differences.size(); j--;){
+        // add disparity term
+        sum += cos(m_phase_differences[j] - m_disparity[0] * kernels[j][0] - m_disparity[1] * kernels[j][1]);
+        // add Canberra term
+        sum += 1. - std::abs(jet1(0,j) - jet2(0,j)) / (jet1(0,j) + jet2(0,j));
+      }
+      return sum / (2. * jet1.shape()[1]);
+    }
+
+    default:
+      // this should never happen
+      throw bob::core::NotImplementedError("This should not have happened. Please check the implementation of the similarity() functions.");
+  }
 }
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////  Disparity estimation  /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-static double sqr(double x){return x*x;}
-
 static double adjustPhase(double phase){
   return phase - (2.*M_PI)*round(phase / (2.*M_PI));
 }
 
-/**
- * Constructor for the DisparitySimilarity function that requires the information about the
- * GaborWaveletTransform that was used to generate the Gabor jets that will be compared later on
- * @param gwt The GaborWaveletTransform class with which the Gabor jets were generated
- */
-bob::machine::DisparitySimilarity::DisparitySimilarity(const bob::ip::GaborWaveletTransform& gwt)
-  : GaborJetSimilarity(),
-    m_disparity(0.,0.),
-    m_confidences(gwt.m_number_of_scales * gwt.m_number_of_directions, 0.),
-    m_phase_differences(gwt.m_number_of_scales * gwt.m_number_of_directions, 0.),
-    m_kernel_frequencies(gwt.kernelFrequencies()),
-    m_number_of_scales(gwt.m_number_of_scales),
-    m_number_of_directions(gwt.m_number_of_directions)
-{
-  m_wavelet_extends.reserve(m_number_of_scales);
-  for (int level = 0; level < m_number_of_scales; ++level){
-    double k = sqrt(sqr(m_kernel_frequencies[level * m_number_of_directions][0]) + sqr(m_kernel_frequencies[level * m_number_of_directions][1]));
-    m_wavelet_extends.push_back(M_PI / k);
-  }
-}
-
-void bob::machine::DisparitySimilarity::compute_confidences(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const{
+void bob::machine::GaborJetSimilarity::compute_confidences(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const{
   // first, fill confidence and phase difference vectors
   for (int j = m_confidences.size(); j--;){
     m_confidences[j] = jet1(0,j) * jet2(0,j);
@@ -126,18 +148,19 @@ void bob::machine::DisparitySimilarity::compute_confidences(const blitz::Array<d
   }
 }
 
-void bob::machine::DisparitySimilarity::compute_disparity() const{
+void bob::machine::GaborJetSimilarity::compute_disparity() const{
   // approximate the disparity from the phase differences
   double gamma_x_x = 0., gamma_x_y = 0., gamma_y_y = 0., phi_x = 0., phi_y = 0.;
   // initialize the disparity with 0
   m_disparity = 0.;
 
+  const std::vector<blitz::TinyVector<double,2> >& kernels = m_gwt.kernelFrequencies();
   // iterate backwards through the vector to start with the lowest frequency wavelets
-  for (int j = m_confidences.size()-1, level = m_number_of_scales-1; level >= 0; --level){
-    for (int direction = m_number_of_directions-1; direction >= 0; --direction, --j){
+  for (int j = m_confidences.size()-1, level = m_gwt.numberOfScales()-1; level >= 0; --level){
+    for (int direction = m_gwt.numberOfDirections()-1; direction >= 0; --direction, --j){
       double
-          kjx = m_kernel_frequencies[j][1],
-          kjy = m_kernel_frequencies[j][0],
+          kjx = kernels[j][1],
+          kjy = kernels[j][0],
           conf = m_confidences[j],
           diff = m_phase_differences[j];
 
@@ -162,78 +185,29 @@ void bob::machine::DisparitySimilarity::compute_disparity() const{
   } // for level
 }
 
-/**
- * Computes the similarity of the given Gabor jets by first estimating the disparity vector \f$ \vec d \f$
- * and afterwards using this disparity to correct the Gabor phase difference:
- * \f[ \sum_j a_j\,a_j'\,\cos(\phi_j - \phi_j' - \vec d^T \vec k_j) \f]
- * @param jet1 One of the two Gabor jets to compare
- * @param jet2 One of the two Gabor jets to compare
- * @return The similarity of jet1 and jet2, a value between -1 and 1
- */
-double bob::machine::DisparitySimilarity::similarity(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const{
-  // compute confidence vectors
-  compute_confidences(jet1, jet2);
 
-  // now, compute the disparity
-  compute_disparity();
+void bob::machine::GaborJetSimilarity::save(bob::io::HDF5File& file) const{
 
-  // finally, compute the similarity using the estimated disparity
-  double sum = 0.;
-  for (int j = m_confidences.size(); j--;){
-    sum += m_confidences[j] * cos(m_phase_differences[j] - m_disparity[0] * m_kernel_frequencies[j][0] - m_disparity[1] * m_kernel_frequencies[j][1]);
+  file.set("Type", m_type);
+#undef TYPE_TO_STRING
+  if (m_type >= DISPARITY){
+    file.createGroup("GaborWaveletTransform");
+    file.cd("GaborWaveletTransform");
+    m_gwt.save(file);
+    file.cd("..");
   }
-
-  return sum;
-}
-
-/**
- * Computes the similarity of the given Gabor jets by first estimating the disparity vector \f$ \vec d \f$
- * and afterwards using this disparity to correct the Gabor phase difference:
- * \f[ \frac1J \sum_j \cos(\phi_j - \phi_j' - \vec d^T \vec k_j) \f]
- * @param jet1 One of the two Gabor jets to compare
- * @param jet2 One of the two Gabor jets to compare
- * @return The similarity of jet1 and jet2, a value between -1 and 1
- */
-double bob::machine::DisparityCorrectedPhaseDifference::similarity(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const{
-  // compute confidence vectors
-  compute_confidences(jet1, jet2);
-
-  // now, compute the disparity
-  compute_disparity();
-
-  // finally, compute the similarity using the estimated disparity
-  double sum = 0.;
-  for (int j = m_phase_differences.size(); j--;){
-    sum += cos(m_phase_differences[j] - m_disparity[0] * m_kernel_frequencies[j][0] - m_disparity[1] * m_kernel_frequencies[j][1]);
-  }
-
-  return sum / jet1.shape()[1];
 }
 
 
-/**
- * Computes the similarity of the given Gabor jets by first estimating the disparity vector \f$ \vec d \f$
- * and afterwards using this disparity to correct the Gabor phase difference:
- * \f[ \frac1{2J} \sum_j \left[ \cos(\phi_j - \phi_j' - \vec d^T \vec k_j) + \frac{|a_j - a_j'|}{a_j + a_j'} \right]\f]
- * @param jet1 One of the two Gabor jets to compare
- * @param jet2 One of the two Gabor jets to compare
- * @return The similarity of jet1 and jet2, a value between -1 and 1
- */
-double bob::machine::DisparityCorrectedPhaseDifferencePlusCanberra::similarity(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const{
-  // compute confidence vectors
-  compute_confidences(jet1, jet2);
+void bob::machine::GaborJetSimilarity::load(bob::io::HDF5File& file){
+  // read value
+  m_type = (SimilarityType)file.read<int>("Type");
 
-  // now, compute the disparity
-  compute_disparity();
+  if (m_type >= DISPARITY){
+    file.cd("GaborWaveletTransform");
+    m_gwt.load(file);
+    file.cd("..");
 
-  // finally, compute the similarity using the estimated disparity
-  double sum = 0.;
-  for (int j = m_phase_differences.size(); j--;){
-    // add disparity term
-    sum += cos(m_phase_differences[j] - m_disparity[0] * m_kernel_frequencies[j][0] - m_disparity[1] * m_kernel_frequencies[j][1]);
-    // add Canberra term
-    sum += 1. - std::abs(jet1(0,j) - jet2(0,j)) / (jet1(0,j) + jet2(0,j));
+    init();
   }
-
-  return sum / (2. * jet1.shape()[1]);
 }
