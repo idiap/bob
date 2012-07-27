@@ -73,3 +73,52 @@ bob_add_executable(visioner readcmuprofile programs/readcmuprofile.cc)
 bob_add_executable(visioner readmit+cmu programs/readmit+cmu.cc)
 bob_add_executable(visioner readmnist programs/readmnist.cc)
 bob_add_executable(visioner trainer programs/trainer.cc)
+
+# The graphical 'vgui' app
+set(vgui_src
+    "programs/vgui/fmap_item.cc"
+    "programs/vgui/fmap_scene.cc"
+    "programs/vgui/fmap_widget.cc"
+    "programs/vgui/settings.cc"
+    "programs/vgui/settings_dialog.cc"
+    "programs/vgui/image_collection.cc"
+    "programs/vgui/main.cc"
+    "programs/vgui/controls.cc"
+    "programs/vgui/extended_table.cc"
+    "programs/vgui/extended_item_delegate.cc"
+    )
+
+set(vgui_mocs
+    "programs/vgui/fmap_scene.h"
+    "programs/vgui/fmap_widget.h"
+    "programs/vgui/extended_table.h"
+    "programs/vgui/extended_item_delegate.h"
+    )
+  
+#set (vgui_uis
+#     "programs/vgui/mainwindow.ui"
+#    )
+
+set(vgui_resrc
+    "programs/vgui/icons.qrc"
+    )
+
+
+# This command will generate rules that will run rcc on all files from
+# SAMPLE_RCS in result SAMPLE_RC_SRCS variable will contain paths to files
+# produced by rcc
+QT4_ADD_RESOURCES(vgui_resrc "${vgui_resrc}")
+
+# This will run uic on .ui files: only run when required to avoid modifying the
+# file (f.ex. the date it was generated on)
+QT4_WRAP_UI(vgui_uis "${vgui_uis}")
+
+# And finally this will run moc:
+QT4_WRAP_CPP(vgui_mocs "${vgui_mocs}")
+
+# We need this to be able to include headers produced by uic in our code
+# (CMAKE_BINARY_DIR holds a path to the build directory, while
+# INCLUDE_DIRECTORIES() works just like INCLUDEPATH from qmake)
+include_directories(${CMAKE_BINARY_DIR})
+
+bob_add_executable(visioner vgui "${vgui_src};${vgui_mocs};${vgui_uis};${vgui_resrc}")
