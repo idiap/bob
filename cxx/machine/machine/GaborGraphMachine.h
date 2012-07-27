@@ -25,6 +25,7 @@
 
 #include <ip/GaborWaveletTransform.h>
 #include <machine/GaborJetSimilarities.h>
+#include <io/HDF5File.h>
 
 namespace bob{ namespace machine {
   //! \brief This machine computes graphs labeled with Gabor jets (so-called Gabor graphs) from a Gabor jet image.
@@ -104,6 +105,12 @@ namespace bob{ namespace machine {
         const blitz::Array<double,3>& probe_graph_jets,
         const bob::machine::GaborJetSimilarity& jet_similarity_function
       ) const;
+
+      //! saves this machine to file
+      void save(bob::io::HDF5File& file) const;
+
+      //! loads this machine from file
+      void load(bob::io::HDF5File& file);
 
     private:
       // The node positions of the graph

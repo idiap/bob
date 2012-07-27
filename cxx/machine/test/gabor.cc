@@ -115,11 +115,11 @@ BOOST_AUTO_TEST_CASE( test_gabor_graph_machine )
 
   // compute similarities of the graph to itself and check that they are unity
   std::vector<boost::shared_ptr<bob::machine::GaborJetSimilarity> > sim_fcts;
-  sim_fcts.push_back(boost::shared_ptr<bob::machine::GaborJetSimilarity>(new bob::machine::ScalarProductSimilarity()));
-  sim_fcts.push_back(boost::shared_ptr<bob::machine::GaborJetSimilarity>(new bob::machine::CanberraSimilarity()));
-  sim_fcts.push_back(boost::shared_ptr<bob::machine::GaborJetSimilarity>(new bob::machine::DisparitySimilarity(gwt)));
-  sim_fcts.push_back(boost::shared_ptr<bob::machine::GaborJetSimilarity>(new bob::machine::DisparityCorrectedPhaseDifference(gwt)));
-  sim_fcts.push_back(boost::shared_ptr<bob::machine::GaborJetSimilarity>(new bob::machine::DisparityCorrectedPhaseDifferencePlusCanberra(gwt)));
+  sim_fcts.push_back(boost::shared_ptr<bob::machine::GaborJetSimilarity>(new bob::machine::GaborJetSimilarity(bob::machine::GaborJetSimilarity::SCALAR_PRODUCT)));
+  sim_fcts.push_back(boost::shared_ptr<bob::machine::GaborJetSimilarity>(new bob::machine::GaborJetSimilarity(bob::machine::GaborJetSimilarity::CANBERRA)));
+  sim_fcts.push_back(boost::shared_ptr<bob::machine::GaborJetSimilarity>(new bob::machine::GaborJetSimilarity(bob::machine::GaborJetSimilarity::DISPARITY, gwt)));
+  sim_fcts.push_back(boost::shared_ptr<bob::machine::GaborJetSimilarity>(new bob::machine::GaborJetSimilarity(bob::machine::GaborJetSimilarity::PHASE_DIFF,gwt)));
+  sim_fcts.push_back(boost::shared_ptr<bob::machine::GaborJetSimilarity>(new bob::machine::GaborJetSimilarity(bob::machine::GaborJetSimilarity::PHASE_DIFF_PLUS_CANBERRA,gwt)));
 
   for (int i = sim_fcts.size(); i--;){
     double similarity = machine.similarity(graph, graph_jets, *sim_fcts[i]);

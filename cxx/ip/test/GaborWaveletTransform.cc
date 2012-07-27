@@ -53,6 +53,13 @@ void test_identical(const blitz::TinyVector<int,D>& shape, const blitz::TinyVect
 
 }
 
+template <int D>
+void test_close(const blitz::TinyVector<double,D>& shape, const blitz::TinyVector<double,D>& reference, const double epsilon){
+  for (int i = D; i--;)
+    BOOST_CHECK_SMALL(shape[i] - reference[i], epsilon);
+
+}
+
 void test_close(const blitz::Array<double, 3>& image, const blitz::Array<double, 3>& reference, const double epsilon){
   for (int x = image.extent(0); x--;)
     for (int y = image.extent(1); y--;)
@@ -75,14 +82,40 @@ void test_close(const blitz::Array<std::complex<double>, 3>& image, const blitz:
   for (int x = image.extent(0); x--;)
     for (int y = image.extent(1); y--;)
       for (int z = image.extent(2); z--;){
-        BOOST_CHECK_SMALL(std::abs(image(x,y,z).real() - reference(x,y,z).real()), epsilon);
-        BOOST_CHECK_SMALL(std::abs(image(x,y,z).imag() - reference(x,y,z).imag()), epsilon);
+        BOOST_CHECK_SMALL(image(x,y,z).real() - reference(x,y,z).real(), epsilon);
+        BOOST_CHECK_SMALL(image(x,y,z).imag() - reference(x,y,z).imag(), epsilon);
   }
 }
 
 
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
+
+BOOST_AUTO_TEST_CASE( test_gwt_io )
+{
+  bob::ip::GaborWaveletTransform gwt;
+
+  char* data = getenv("BOB_IP_TESTDATA_DIR");
+  if (!data){
+    bob::core::error << "Environment variable $BOB_IP_TESTDATA_DIR "
+        "is not set. Have you setup your working environment correctly?" << std::endl;
+    throw bob::core::Exception();
+  }
+  boost::filesystem::path file_path = boost::filesystem::path(data) / "temp_gwt.hdf5";
+  bob::io::HDF5File file(file_path.string(), bob::io::HDF5File::trunc);
+  gwt.save(file);
+
+  // create gwt class with different parameterization
+  bob::ip::GaborWaveletTransform gwt2(1,2,3.1);
+  bob::io::HDF5File file2(file_path.string(), bob::io::HDF5File::in);
+  gwt2.load(file2);
+
+  // compare the two classes
+  for (int i = 0; i < gwt.numberOfKernels(); ++i){
+    test_close<2>(gwt.kernelFrequencies()[i], gwt2.kernelFrequencies()[i], epsilon);
+  }
+  remove(file_path.string().c_str());
+}
 
 BOOST_AUTO_TEST_CASE( test_gwt_kernel_sanity )
 {
@@ -94,14 +127,14 @@ BOOST_AUTO_TEST_CASE( test_gwt_kernel_sanity )
     gwt.generateKernels(blitz::TinyVector<int,2>(v_res, h_res));
 
     // This test will only work with 8 directions
-    BOOST_CHECK_EQUAL(gwt.m_number_of_directions, 8);
+    BOOST_CHECK_EQUAL(gwt.numberOfDirections(), 8);
 
     // get the kernel images
     blitz::Array<double,3> kernels = gwt.kernelImages();
 
     // check that the
-    for (int scale = 0; scale < gwt.m_number_of_scales; ++scale){
-      int scale_offset = gwt.m_number_of_directions * scale;
+    for (int scale = 0; scale < gwt.numberOfScales(); ++scale){
+      int scale_offset = gwt.numberOfDirections() * scale;
       // test the horizontal pairs
       for (int pair = 0; pair < 6; pair += 2){
         // get the two kernels to be checked
@@ -112,7 +145,7 @@ BOOST_AUTO_TEST_CASE( test_gwt_kernel_sanity )
         for (int y = 0; y < v_res; ++y){
           // do not test the zero'th index since this is unique
           for (int x = 1; x < h_res; ++x){
-            BOOST_CHECK_SMALL(std::abs(kernel_1(y,x) - kernel_2(y,h_res-x)), epsilon);
+            BOOST_CHECK_SMALL(kernel_1(y,x) - kernel_2(y,h_res-x), epsilon);
           }
         }
 
@@ -130,7 +163,7 @@ BOOST_AUTO_TEST_CASE( test_gwt_kernel_sanity )
         // do not test the zero'th index since this is unique
         for (int y = 1; y < v_res; ++y){
           for (int x = 1; x < h_res; ++x){
-            BOOST_CHECK_SMALL(std::abs(kernel_1(y,x) - kernel_2(x,y)), epsilon);
+            BOOST_CHECK_SMALL(kernel_1(y,x) - kernel_2(x,y), epsilon);
           }
         }
       }

@@ -30,101 +30,62 @@
 
 namespace bob { namespace machine {
 
-  //! base class for Gabor jet similarity functions
+  //! Class to compute Gabor jet similarities
   class GaborJetSimilarity{
     public:
-      GaborJetSimilarity(){}
+
+      //! This enum defines different types of Gabor jet similarity functions.
+      //! The first functions are based on absolute values of Gabor jets,
+      //! while the latter also use the Gabor phases
+      typedef enum {
+        SCALAR_PRODUCT = 1,
+        CANBERRA = 3,
+        DISPARITY = 16,
+        PHASE_DIFF = 22,
+        PHASE_DIFF_PLUS_CANBERRA = 30
+      }
+      SimilarityType;
+
+      //! Constructor for the Gabor jet similarity
+      GaborJetSimilarity(SimilarityType type, const bob::ip::GaborWaveletTransform& gwt = bob::ip::GaborWaveletTransform());
 
       //! The similarity between two Gabor jets, including absolute values and phases
-      virtual double similarity(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const = 0;
+      double operator()(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const;
 
       //! The similarity between two Gabor jets, including absolute values only
-      virtual double similarity(const blitz::Array<double,1>& jet1, const blitz::Array<double,1>& jet2) const = 0;
+      double operator()(const blitz::Array<double,1>& jet1, const blitz::Array<double,1>& jet2) const;
 
-  };
+      //! returns the disparity vector estimated during the last call of similarity; only valid for disparity types
+      blitz::TinyVector<double,2> disparity() const {return m_disparity;}
 
-  //! \brief The default Gabor jet similarity function, which is the normalized scalar product,
-  //! also known as the cosine measure
-  class ScalarProductSimilarity : public GaborJetSimilarity{
-    public:
-      ScalarProductSimilarity() : GaborJetSimilarity(){}
+      //! \brief saves the parameters of this Gabor jet similarity to file
+      void save(bob::io::HDF5File& file) const;
 
-      //! computes similarity between Gabor jets with absolute and phase values
-      virtual double similarity(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const;
-
-      //! computes similarity between Gabor jets with absolute values only
-      virtual double similarity(const blitz::Array<double,1>& jet1, const blitz::Array<double,1>& jet2) const;
-};
-
-  //! The Canberra similarity measure which most often performs better than the cosine
-  class CanberraSimilarity : public GaborJetSimilarity{
-    public:
-      CanberraSimilarity() : GaborJetSimilarity(){}
-
-      //! computes similarity between Gabor jets with absolute and phase values
-      virtual double similarity(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const;
-
-      //! computes similarity between Gabor jets with absolute values only
-      virtual double similarity(const blitz::Array<double,1>& jet1, const blitz::Array<double,1>& jet2) const;
-  };
-
-  //! \brief This function computes the disparity similarity function by estimating a disparity vector from two jets
-  //! and using the disparity for phase difference correction
-  class DisparitySimilarity : public GaborJetSimilarity{
-    public:
-      DisparitySimilarity(const bob::ip::GaborWaveletTransform& gwt = bob::ip::GaborWaveletTransform());
-
-      //! computes the similarity (including the estimation of the disparity vector)
-      virtual double similarity(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const;
-
-      //! the similarity between Gabor jets without phases is not supported by this class (and its derivations)
-      virtual double similarity(const blitz::Array<double,1>& jet1, const blitz::Array<double,1>& jet2) const{
-        throw bob::core::NotImplementedError("Disparity similarity (and its derivatives) need Gabor jets including phases");
-      }
-
-      //! returns the disparity vector estimated during the last call of similarity(...)
-      const blitz::TinyVector<double,2>& disparity() const {return m_disparity;}
-
-    protected:
-      virtual void compute_confidences(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const;
-      //! computes the disparity using the m_confidences and m_phase_differences values
-      virtual void compute_disparity() const;
-
-      mutable blitz::TinyVector<double,2> m_disparity;
-      mutable std::vector<double> m_confidences;
-      mutable std::vector<double> m_phase_differences;
-      const std::vector<blitz::TinyVector<double,2> > m_kernel_frequencies;
+      //! \brief reads the parameters of this Gabor jet similarity from file
+      void load(bob::io::HDF5File& file);
 
     private:
-      const int m_number_of_scales;
-      const int m_number_of_directions;
+      // members for all similarity functions
+      SimilarityType m_type;
+
+      // members required by disparity functions
+      bob::ip::GaborWaveletTransform m_gwt;
+
+      // initializes the internal memory to be used for disparity-like Gabor jet similarities
+      void init();
+      // computes confidences from the given Gabor jets
+      void compute_confidences(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const;
+      // computes the disparity using the m_confidences and m_phase_differences values
+      void compute_disparity() const;
+
+      mutable blitz::TinyVector<double,2> m_disparity;
+
+      mutable std::vector<double> m_confidences;
+      mutable std::vector<double> m_phase_differences;
       std::vector<double> m_wavelet_extends;
 
-  };
+  }; // class GaborJetSimilarity
 
-  //! \brief This class computes the similarity using disparity corrected phase differences
-  //! (without accounting for the absolute values)
-  class DisparityCorrectedPhaseDifference : public DisparitySimilarity{
-    public:
-      DisparityCorrectedPhaseDifference(const bob::ip::GaborWaveletTransform& gwt = bob::ip::GaborWaveletTransform())
-      :DisparitySimilarity(gwt){}
-
-      //! computes the similarity using only the phases
-      virtual double similarity(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const;
-  };
-
-
-  //! \brief This class computes the similarity using disparity corrected phase differences
-  //! for the phases and Canberra similarity for the absolute values.
-  class DisparityCorrectedPhaseDifferencePlusCanberra : public DisparitySimilarity{
-    public:
-      DisparityCorrectedPhaseDifferencePlusCanberra(const bob::ip::GaborWaveletTransform& gwt = bob::ip::GaborWaveletTransform())
-      :DisparitySimilarity(gwt){}
-
-      //! computes the similarity using only the phases
-      virtual double similarity(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const;
-  };
-
-} }
+} } // namespaces
 
 #endif // BOB_MACHINE_GABOR_JET_SIMILARITY_H
