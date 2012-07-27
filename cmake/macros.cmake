@@ -84,6 +84,21 @@ macro(bob_test package name src)
   set_property(TEST cxx-${package}-${name} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/data")
 endmacro()
 
+# Creates a standard Bob binary application.
+#
+# package: package the test belongs to
+# name: application name
+# src: test source files
+#
+# Example: bob_add_executable(io array test/array.cc)
+macro(bob_add_executable package name src)
+  set(progname bob_${package}_${name})
+
+  # Please note we don't install test executables
+  add_executable(${progname} ${src})
+  target_link_libraries(${progname} bob_${package})
+endmacro()
+
 # Creates a standard Bob benchmark.
 #
 # package: package the benchmark belongs to

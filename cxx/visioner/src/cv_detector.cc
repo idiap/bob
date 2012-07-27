@@ -8,6 +8,109 @@
 
 namespace bob { namespace visioner {
 
+  // Constructor
+  CVDetector::CVDetector():	
+    m_ds(2),
+    m_cluster(0.05),
+    m_threshold(0.0),
+    m_type(GroundTruth),
+    m_levels(0)
+  {
+  }
+
+  // Command line processing
+  template <typename T>
+    void decode_var(const boost::program_options::options_description& po_desc,
+        boost::program_options::variables_map& po_vm,
+        const char* var_name, T& var)
+    {
+      if (!po_vm.count(var_name))
+      {
+        log_error("CVDetector", "decode_var") << po_desc << "\n";
+        exit(EXIT_FAILURE);
+      }
+
+      var = po_vm[var_name].as<T>();
+    }
+
+  void CVDetector::add_options(boost::program_options::options_description& po_desc) const
+  {
+    po_desc.add_options()
+
+      ("detect_model", boost::program_options::value<std::string>(),
+       "detection: object classification model")
+
+      ("detect_threshold",
+       boost::program_options::value<scalar_t>()->default_value(m_threshold),
+       "detection: object classification threshold")
+
+      ("detect_levels", 
+       boost::program_options::value<index_t>()->default_value(m_levels),
+       "detection: levels (the more, the faster)")
+
+      ("detect_ds",
+       boost::program_options::value<index_t>()->default_value(m_ds),
+       "detection: scale variation in pixels")
+      
+      ("detect_cluster",
+       boost::program_options::value<scalar_t>()->default_value(m_cluster),
+       "detection: overlapping threshold for clustering detections")
+      
+      ("detect_method",
+       boost::program_options::value<std::string>()->default_value("groundtruth"),
+       "detection: method (scanning, groundtruth)");
+
+  }
+
+  bool CVDetector::decode(const boost::program_options::options_description& po_desc, boost::program_options::variables_map& po_vm) {
+
+    // Load the model
+    const std::string cmd_model = po_vm["detect_model"].as<std::string>();
+    if (Model::load(cmd_model, m_model) == false)
+    {
+      log_error("CVDetector", "decode") 
+        << "Failed to load the model <" << cmd_model << ">!\n";
+      return false;
+    }
+    if (valid_model() == false)
+    {
+      log_error("CVDetector", "decode") << "Invalid model!\n";
+      return false;
+    }
+
+    param_t _param = param();
+    _param.m_ds = m_ds;
+    m_ipyramid.reset(_param); 
+
+    // Decode parameters
+    decode_var(po_desc, po_vm, "detect_threshold", m_threshold);
+    decode_var(po_desc, po_vm, "detect_levels", m_levels);
+    decode_var(po_desc, po_vm, "detect_ds", m_ds);
+    decode_var(po_desc, po_vm, "detect_cluster", m_cluster);     
+
+    string_t cmd_method;
+    decode_var(po_desc, po_vm, "detect_method", cmd_method);
+
+    if (cmd_method == "groundtruth")
+    {
+      m_type = GroundTruth;
+    }
+    else if (cmd_method == "scanning")
+    {
+      m_type = Scanning;                         
+    }
+    else
+    {
+      log_error("CVDetector", "decode") << "Invalid detection method!\n";
+      return false;
+    }
+
+    set_scan_levels(m_levels);
+
+    // OK
+    return true;
+  }
+
   CVDetector::CVDetector(const std::string& model, scalar_t threshold,
       index_t levels, index_t scale_variation, scalar_t clustering,
       CVDetector::Type detection_method):
@@ -36,6 +139,8 @@ namespace bob { namespace visioner {
       set_scan_levels(levels);
 
     }
+
+
 
   void CVDetector::set_scan_levels(index_t levels) {
     m_levels = levels;

@@ -314,7 +314,7 @@ int main(int argc, char *argv[]) {
   // Check arguments and options
   if (	po_vm.empty() || po_vm.count("help"))
   {
-    visioner::log_error("drawmbs") << po_desc << "\n";
+    bob::visioner::log_error("drawmbs") << po_desc << "\n";
     exit(EXIT_FAILURE);
   }
 

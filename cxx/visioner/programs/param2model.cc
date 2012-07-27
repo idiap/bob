@@ -3,7 +3,7 @@
 
 int main(int argc, char *argv[]) {
 
-  visioner::param_t param;
+  bob::visioner::param_t param;
 
   // Parse the command line
   boost::program_options::options_description po_desc("", 160);
@@ -26,21 +26,21 @@ int main(int argc, char *argv[]) {
       !param.decode(po_desc, po_vm) ||
       !po_vm.count("model"))
   {
-    visioner::log_error("param2model") << po_desc << "\n";
+    bob::visioner::log_error("param2model") << po_desc << "\n";
     exit(EXIT_FAILURE);
   }
 
-  const visioner::string_t cmd_model = po_vm["model"].as<std::string>();
+  const bob::visioner::string_t cmd_model = po_vm["model"].as<std::string>();
 
-  const visioner::rmodel_t model = visioner::make_model(param);
+  const bob::visioner::rmodel_t model = bob::visioner::make_model(param);
   if (model->save(cmd_model) == false)
   {
-    visioner::log_error("param2model")
+    bob::visioner::log_error("param2model")
       << "Failed to save the model <" << cmd_model << ">!\n";
   }
 
   // OK
-  visioner::log_finished();
+  bob::visioner::log_finished();
   exit(EXIT_SUCCESS);
 
 }

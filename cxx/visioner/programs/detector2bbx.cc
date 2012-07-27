@@ -6,7 +6,7 @@
 
 int main(int argc, char *argv[]) {	
 
-  visioner::CVDetector detector;
+  bob::visioner::CVDetector detector;
 
   // Parse the command line
   boost::program_options::options_description po_desc("", 160);
@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
       !po_vm.count("data") ||
       !detector.decode(po_desc, po_vm))
   {
-    visioner::log_error("detector2bbx") << po_desc << "\n";
+    bob::visioner::log_error("detector2bbx") << po_desc << "\n";
     exit(EXIT_FAILURE);
   }
 
@@ -39,14 +39,14 @@ int main(int argc, char *argv[]) {
   const std::string cmd_results = po_vm["results"].as<std::string>();
 
   // Load the test datasets
-  visioner::strings_t ifiles, gfiles;
-  if (visioner::load_listfiles(cmd_data, ifiles, gfiles) == false)
+  bob::visioner::strings_t ifiles, gfiles;
+  if (bob::visioner::load_listfiles(cmd_data, ifiles, gfiles) == false)
   {
-    visioner::log_error("detector2bbx") << "Failed to load the test datasets <" << cmd_data << ">!\n";
+    bob::visioner::log_error("detector2bbx") << "Failed to load the test datasets <" << cmd_data << ">!\n";
     exit(EXIT_FAILURE);
   }
 
-  visioner::Timer timer;
+  bob::visioner::Timer timer;
 
   // Process each image ...
   for (std::size_t i = 0; i < ifiles.size(); i ++)
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
     // Load the image and the ground truth
     if (detector.load(ifile, gfile) == false)
     {
-      visioner::log_error("detector2bbx")
+      bob::visioner::log_error("detector2bbx")
         << "Failed to load image <" << ifile << "> or ground truth <" << gfile << ">!\n";
       exit(EXIT_FAILURE);
     }
@@ -65,14 +65,14 @@ int main(int argc, char *argv[]) {
     timer.restart();
 
     // Detect objects
-    visioner::detections_t detections;                
-    visioner::bools_t labels;
+    bob::visioner::detections_t detections;                
+    bob::visioner::bools_t labels;
 
     detector.scan(detections);
     detector.label(detections, labels);
 
     // Save the bounding boxes of the correct detections
-    std::ofstream out((cmd_results + "/" + visioner::basename(ifiles[i]) + ".det.bbx").c_str());
+    std::ofstream out((cmd_results + "/" + bob::visioner::basename(ifiles[i]) + ".det.bbx").c_str());
     if (out.is_open() == false)
     {
       continue;
@@ -82,14 +82,14 @@ int main(int argc, char *argv[]) {
     {
       if (labels[d] == true)
       {
-        const visioner::detection_t& det = detections[d];
-        const visioner::rect_t& bbx = det.second.first;
+        const bob::visioner::detection_t& det = detections[d];
+        const bob::visioner::rect_t& bbx = det.second.first;
         out << bbx.left() << " " << bbx.top() 
           << " " << bbx.width() << " " << bbx.height() << "\n";
       }
     }
 
-    visioner::log_info("detector2bbx") 
+    bob::visioner::log_info("detector2bbx") 
       << "Image [" << (i + 1) << "/" << ifiles.size() << "]: scanned " 
       << detections.size() << "/" << detector.stats().m_sws << " SWs & "
       << detector.n_objects() << "/" << detector.stats().m_gts << " GTs in " 
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
   detector.stats().show();
 
   // OK
-  visioner::log_finished();
+  bob::visioner::log_finished();
   return EXIT_SUCCESS;
 
 }

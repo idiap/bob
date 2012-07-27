@@ -31,50 +31,50 @@ int main(int argc, char *argv[]) {
       !po_vm.count("output") ||
       !po_vm.count("output_dir"))
   {
-    visioner::log_error("downscaler") << po_desc << "\n";
+    bob::visioner::log_error("downscaler") << po_desc << "\n";
     exit(EXIT_FAILURE);
   }
 
   const std::string cmd_input = po_vm["input"].as<std::string>();
   const std::string cmd_output = po_vm["output"].as<std::string>();
   const std::string cmd_output_dir = po_vm["output_dir"].as<std::string>();
-  const double cmd_downscale = visioner::range(po_vm["downscale"].as<double>(), 0.10, 1.00);
+  const double cmd_downscale = bob::visioner::range(po_vm["downscale"].as<double>(), 0.10, 1.00);
 
   // Load the image and ground truth files	
-  visioner::strings_t ifiles, gfiles;
-  if (	visioner::load_listfiles(cmd_input, ifiles, gfiles) == false ||
+  bob::visioner::strings_t ifiles, gfiles;
+  if (	bob::visioner::load_listfiles(cmd_input, ifiles, gfiles) == false ||
       ifiles.empty() || ifiles.size() != gfiles.size())
   {
-    visioner::log_error("downscaler") << "Failed to load the input image lists!\n";
+    bob::visioner::log_error("downscaler") << "Failed to load the input image lists!\n";
     exit(EXIT_FAILURE);
   }
 
   // Downscale each image ...
-  visioner::strings_t ifiles_proc, gfiles_proc;
-  visioner::ipscale_t ipscale, ipscale_proc;
+  bob::visioner::strings_t ifiles_proc, gfiles_proc;
+  bob::visioner::ipscale_t ipscale, ipscale_proc;
   for (std::size_t i = 0; i < ifiles.size(); i ++)
   {
-    const std::string ifile_proc = visioner::basename(ifiles[i]) + ".png";
-    const std::string gfile_proc = visioner::filename(gfiles[i]);
+    const std::string ifile_proc = bob::visioner::basename(ifiles[i]) + ".png";
+    const std::string gfile_proc = bob::visioner::filename(gfiles[i]);
 
-    visioner::log_info("downscaler") << "Downscaling [" << (i + 1) << "/" << ifiles.size() << "] ...\r";
+    bob::visioner::log_info("downscaler") << "Downscaling [" << (i + 1) << "/" << ifiles.size() << "] ...\r";
 
     // Load the image and the ground truth
-    if (	visioner::load(ifiles[i], ipscale.m_image) == false ||
-        visioner::Object::load(gfiles[i], ipscale.m_objects) == false)
+    if (	bob::visioner::load(ifiles[i], ipscale.m_image) == false ||
+        bob::visioner::Object::load(gfiles[i], ipscale.m_objects) == false)
     {
-      visioner::log_error("downscaler") << "Failed to load the image <" << ifiles[i] << ">!\n";
+      bob::visioner::log_error("downscaler") << "Failed to load the image <" << ifiles[i] << ">!\n";
       exit(EXIT_FAILURE);
     }
 
     // Downscale and save them
     ipscale.scale(cmd_downscale, ipscale_proc);
 
-    const QImage qimage = visioner::convert(ipscale_proc.m_image);
+    const QImage qimage = bob::visioner::convert(ipscale_proc.m_image);
     if (	qimage.save((cmd_output_dir + "/" + ifile_proc).c_str()) == false ||
-        visioner::Object::save(cmd_output_dir + "/" + gfile_proc, ipscale_proc.m_objects) == false)
+        bob::visioner::Object::save(cmd_output_dir + "/" + gfile_proc, ipscale_proc.m_objects) == false)
     {
-      visioner::log_error("downscaler") 
+      bob::visioner::log_error("downscaler") 
         << "Failed to save the processed image <" 
         << (cmd_output_dir + "/" + ifile_proc) << ">!\n";
       exit(EXIT_FAILURE);
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
   std::ofstream os(cmd_output.c_str());
   if (os.is_open() == false)
   {
-    visioner::log_error("downscaler") << "Cannot open the output file list <" << cmd_output << ">!\n";
+    bob::visioner::log_error("downscaler") << "Cannot open the output file list <" << cmd_output << ">!\n";
     exit(EXIT_FAILURE);
   }
 
@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
   os.close();
 
   // OK
-  visioner::log_finished();
+  bob::visioner::log_finished();
   exit(EXIT_SUCCESS);
 
 }

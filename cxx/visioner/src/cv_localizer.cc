@@ -6,6 +6,81 @@
 
 namespace bob { namespace visioner {
 
+  CVLocalizer::CVLocalizer()
+    :	m_type(MultipleShots_Median)
+  {
+  }
+
+  template <typename T>
+    void decode_var(const boost::program_options::options_description& po_desc,
+        boost::program_options::variables_map& po_vm,
+        const char* var_name, T& var)
+    {
+      if (!po_vm.count(var_name))
+      {
+        log_error("CVLocalizer", "decode_var") << po_desc << "\n";
+        exit(EXIT_FAILURE);
+      }
+
+      var = po_vm[var_name].as<T>();
+    }
+
+  void CVLocalizer::add_options(boost::program_options::options_description& po_desc) const {
+
+    po_desc.add_options()
+
+      ("localize_model", boost::program_options::value<std::string>(),
+       "localization: keypoint localization model")
+      
+      ("localize_method", 
+       boost::program_options::value<std::string>()->default_value("mshots+med"),
+       "localization: method (1shot, mshots+avg, mshots+med");
+
+  }
+
+  bool CVLocalizer::decode(const boost::program_options::options_description& po_desc,
+      boost::program_options::variables_map& po_vm)
+  {
+    // Load the localization model
+    const std::string cmd_model = po_vm["localize_model"].as<std::string>();
+    if (Model::load(cmd_model, m_model) == false)
+    {
+      log_error("CVLocalizer", "decode") 
+        << "Failed to load the localization model <" << cmd_model << ">!\n";
+      return false;
+    }
+    if (valid_model() == false)
+    {
+      log_error("CVLocalizer", "decode") << "Invalid model!\n";
+      return false;
+    }
+
+    // Decode parameters
+    string_t cmd_method;
+    decode_var(po_desc, po_vm, "localize_method", cmd_method);
+
+    if (cmd_method == "1shot")
+    {
+      m_type = SingleShot;
+    }
+    else if (cmd_method == "mshots+avg")
+    {
+      m_type = MultipleShots_Average;
+    }
+    else if (cmd_method == "mshots+med")
+    {
+      m_type = MultipleShots_Median;
+    }
+    else
+    {
+      log_error("CVLocalizer", "decode") << "Invalid localization method!\n";
+      return false;
+    }
+
+    // OK
+    return true;
+  }
+
   CVLocalizer::CVLocalizer(const std::string& model, Type method):
     m_type(method) {
 

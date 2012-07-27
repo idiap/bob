@@ -193,7 +193,7 @@ int main(int argc, char *argv[]) {
   // Check arguments and options
   if (	po_vm.empty() || po_vm.count("help"))
   {
-    visioner::log_error("drawmb_ctf") << po_desc << "\n";
+    bob::visioner::log_error("drawmb_ctf") << po_desc << "\n";
     exit(EXIT_FAILURE);
   }
 
@@ -235,16 +235,16 @@ int main(int argc, char *argv[]) {
       draw_contour(proj_image, bcx, bcy, 2 * dx, 2 * dy, 2 * cx, 2 * cy, nx, ny,
           QPen(QBrush(QColor(155, 55, 55)), 4, Qt::DashLine));                        
 
-      proj_image.save((visioner::basename(result) + ".proj" + 
-            boost::lexical_cast<visioner::string_t>(cnt) +
-            visioner::extname(result)).c_str());
+      proj_image.save((bob::visioner::basename(result) + ".proj" + 
+            boost::lexical_cast<bob::visioner::string_t>(cnt) +
+            bob::visioner::extname(result)).c_str());
     }
   }
 
   //        // Assembly the original feature and the projected features
   //        QImage comb_image = draw_combine(image, proj_images);
-  //        comb_image.save((visioner::basename(result) + ".comb" +
-  //                         visioner::extname(result)).c_str());
+  //        comb_image.save((bob::visioner::basename(result) + ".comb" +
+  //                         bob::visioner::extname(result)).c_str());
 
   // OK
   return EXIT_SUCCESS;

@@ -56,7 +56,7 @@ namespace bob { namespace visioner {
       };
 
       /**
-       * Constructor
+       * Constructor from scratch
        *
        * @param model file containing the model to be loaded
        * @param threshold object classification threshold
@@ -120,6 +120,24 @@ namespace bob { namespace visioner {
 
       // Save the model back to file
       void save(const std::string& filename) const;
+
+    public: //allows command line processing
+
+      /**
+       * Default constructor
+       */
+      CVDetector();
+
+      /**
+       * Adds options to the parser
+       */
+      void add_options(boost::program_options::options_description& po_desc) const;
+
+      /**
+       * Decodes command line options
+       */
+      bool decode(const boost::program_options::options_description& po_desc,
+          boost::program_options::variables_map& po_vm);
 
     private:
 

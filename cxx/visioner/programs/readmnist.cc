@@ -12,7 +12,7 @@ bool read(const std::string& str_ifimage, const std::string& str_iflabel, int n_
 
   if (!fimage.is_open() || !flabel.is_open())
   {
-    visioner::log_error("readmnist") << "Cannot open MNIST files!" << std::endl;
+    bob::visioner::log_error("readmnist") << "Cannot open MNIST files!" << std::endl;
     return false;
   }
 
@@ -25,7 +25,7 @@ bool read(const std::string& str_ifimage, const std::string& str_iflabel, int n_
   fimage.read(buffer, 16);
   flabel.read(buffer, 8);
 
-  visioner::greyimage_t image(28, 28);
+  bob::visioner::greyimage_t image(28, 28);
 
   // Now cycle over all images in MNIST dataset
   for (int i = 0; i < n_images; i ++)
@@ -34,7 +34,7 @@ bool read(const std::string& str_ifimage, const std::string& str_iflabel, int n_
     fimage.read(buffer, image.size());
 
     std::copy(buffer, buffer + image.size(), image[0]);		
-    const QImage qimage = visioner::convert(image);
+    const QImage qimage = bob::visioner::convert(image);
     qimage.save((str_ofimage + boost::lexical_cast<std::string>((int)label[0]) + "/"
           + boost::lexical_cast<std::string>(i + 1) + ".png").c_str());		
 

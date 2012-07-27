@@ -2,7 +2,7 @@
 
 int main(int argc, char *argv[]) {
 
-  visioner::param_t param;
+  bob::visioner::param_t param;
 
   // Parse the command line
   boost::program_options::options_description po_desc("", 160);
@@ -21,18 +21,18 @@ int main(int argc, char *argv[]) {
   if (	po_vm.empty() || po_vm.count("help") || 
       !param.decode(po_desc, po_vm))
   {
-    visioner::log_error("feature_stats") << po_desc << "\n";
+    bob::visioner::log_error("feature_stats") << po_desc << "\n";
     exit(EXIT_FAILURE);
   }
 
-  const visioner::rmodel_t model = visioner::make_model(param);
+  const bob::visioner::rmodel_t model = bob::visioner::make_model(param);
 
-  visioner::log_info("feature_stats")
+  bob::visioner::log_info("feature_stats")
     << "The model <" << param.m_feature << "> has " << model->n_features()
     << " features in [0, " << model->n_fvalues() << ").\n";
 
   // OK
-  visioner::log_finished();
+  bob::visioner::log_finished();
   exit(EXIT_SUCCESS);
 
 }

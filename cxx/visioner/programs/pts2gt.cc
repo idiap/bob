@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
       !po_vm.count("points") ||
       !po_vm.count("output"))
   {
-    visioner::log_error("pts2gt") << po_desc << "\n";
+    bob::visioner::log_error("pts2gt") << po_desc << "\n";
     exit(EXIT_FAILURE);
   }
 
@@ -37,13 +37,13 @@ int main(int argc, char *argv[]) {
   const std::string cmd_points = po_vm["points"].as<std::string>();
   const std::string cmd_output = po_vm["output"].as<std::string>();
 
-  const visioner::strings_t tokens = visioner::split(cmd_points, ":");
+  const bob::visioner::strings_t tokens = bob::visioner::split(cmd_points, ":");
 
   // Save the .gt annotations ...
   std::ifstream in(cmd_input.c_str());
   if (in.is_open() == false)
   {
-    visioner::log_error("pts2gt") 
+    bob::visioner::log_error("pts2gt") 
       << "Cannot load the .pts annotations <" << cmd_input << ">!\n";
     exit(EXIT_FAILURE);
   }
@@ -54,25 +54,25 @@ int main(int argc, char *argv[]) {
     in.getline(line, 1024);
   }
 
-  visioner::Object object("unknown", "unknown", "unknown");
-  for (visioner::strings_t::const_iterator it = tokens.begin(); it != tokens.end(); ++ it)
+  bob::visioner::Object object("unknown", "unknown", "unknown");
+  for (bob::visioner::strings_t::const_iterator it = tokens.begin(); it != tokens.end(); ++ it)
   {
-    visioner::scalar_t x, y;
+    bob::visioner::scalar_t x, y;
     in >> x >> y;
 
-    visioner::Keypoint keypoint(*it, x, y);
+    bob::visioner::Keypoint keypoint(*it, x, y);
     object.add(keypoint);
   }              
 
   if (object.save(cmd_output) == false)
   {
-    visioner::log_error("pts2gt") 
+    bob::visioner::log_error("pts2gt") 
       << "Cannot save the .gt annotations <" << cmd_output << ">!\n";
     exit(EXIT_FAILURE);
   }
 
   // OK
-  visioner::log_finished();
+  bob::visioner::log_finished();
   return EXIT_SUCCESS;
 
 }

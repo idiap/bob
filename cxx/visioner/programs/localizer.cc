@@ -9,8 +9,8 @@ int main(int argc, char *argv[]) {
   QApplication app(argc, argv);
   Q_UNUSED(app);
 
-  visioner::CVDetector detector;
-  visioner::CVLocalizer localizer;
+  bob::visioner::CVDetector detector;
+  bob::visioner::CVLocalizer localizer;
 
   // Parse the command line
   boost::program_options::options_description po_desc("", 160);
@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
       !detector.decode(po_desc, po_vm) ||
       !localizer.decode(po_desc, po_vm))
   {
-    visioner::log_error("localizer") << po_desc << "\n";
+    bob::visioner::log_error("localizer") << po_desc << "\n";
     exit(EXIT_FAILURE);
   }
 
@@ -45,14 +45,14 @@ int main(int argc, char *argv[]) {
   const std::string cmd_results = po_vm["results"].as<std::string>();
 
   // Load the test datasets
-  visioner::strings_t ifiles, gfiles;
-  if (visioner::load_listfiles(cmd_data, ifiles, gfiles) == false)
+  bob::visioner::strings_t ifiles, gfiles;
+  if (bob::visioner::load_listfiles(cmd_data, ifiles, gfiles) == false)
   {
-    visioner::log_error("localizer") << "Failed to load the test datasets <" << cmd_data << ">!\n";
+    bob::visioner::log_error("localizer") << "Failed to load the test datasets <" << cmd_data << ">!\n";
     exit(EXIT_FAILURE);
   }
 
-  visioner::Timer timer;
+  bob::visioner::Timer timer;
 
   // Process each image ...
   for (std::size_t i = 0; i < ifiles.size(); i ++)
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
     // Load the image and the ground truth
     if (detector.load(ifile, gfile) == false)
     {
-      visioner::log_warning("localizer") 
+      bob::visioner::log_warning("localizer") 
         << "Failed to load image <" << ifile << "> or ground truth <" << gfile << ">!\n";
       continue;
     }
@@ -71,41 +71,41 @@ int main(int argc, char *argv[]) {
     timer.restart();
 
     // Detect objects
-    visioner::detections_t detections;                
-    visioner::bools_t labels;
+    bob::visioner::detections_t detections;                
+    bob::visioner::bools_t labels;
 
     detector.scan(detections);                
     detector.label(detections, labels);
 
-    QImage qimage = visioner::draw_gt(detector.ipscale());
-    visioner::draw_detections(qimage, detections, detector.param(), labels);
+    QImage qimage = bob::visioner::draw_gt(detector.ipscale());
+    bob::visioner::draw_detections(qimage, detections, detector.param(), labels);
 
     // Localize keypoints
-    visioner::Object object;
-    visioner::points_t dt_points;
-    for (visioner::detections_const_it it = detections.begin(); it != detections.end(); ++ it)
+    bob::visioner::Object object;
+    bob::visioner::points_t dt_points;
+    for (bob::visioner::detections_const_it it = detections.begin(); it != detections.end(); ++ it)
       if (detector.match(*it, object) == true)
       {
         if (localizer.locate(detector, it->second.first, dt_points) == false)
         {
-          visioner::log_warning("localizer") 
+          bob::visioner::log_warning("localizer") 
             << "Failed to localize the keypoints for the <" << ifile << "> image!\n";
           continue;
         }          
 
-        visioner::draw_points(qimage, dt_points);
+        bob::visioner::draw_points(qimage, dt_points);
       }
 
-    qimage.save((cmd_results + "/" + visioner::basename(ifiles[i]) + ".loc.png").c_str());
+    qimage.save((cmd_results + "/" + bob::visioner::basename(ifiles[i]) + ".loc.png").c_str());
 
-    visioner::log_info("localizer") 
+    bob::visioner::log_info("localizer") 
       << "Image [" << (i + 1) << "/" << ifiles.size() << "]: localized "
       << detector.n_objects() << "/" << detector.stats().m_gts << " GTs in " 
       << timer.elapsed() << "s.\n";                
   }
 
   // OK
-  visioner::log_finished();
+  bob::visioner::log_finished();
   return EXIT_SUCCESS;
 
 }

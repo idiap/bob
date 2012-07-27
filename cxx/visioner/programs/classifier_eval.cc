@@ -3,8 +3,8 @@
 
 int main(int argc, char *argv[]) {	
 
-  visioner::CVDetector detector;
-  visioner::CVClassifier classifier;
+  bob::visioner::CVDetector detector;
+  bob::visioner::CVClassifier classifier;
 
   // Parse the command line
   boost::program_options::options_description po_desc("", 160);
@@ -29,74 +29,74 @@ int main(int argc, char *argv[]) {
       !detector.decode(po_desc, po_vm) ||
       !classifier.decode(po_desc, po_vm))
   {
-    visioner::log_error("classifier_eval") << po_desc << "\n";
+    bob::visioner::log_error("classifier_eval") << po_desc << "\n";
     exit(EXIT_FAILURE);
   }
 
   const std::string cmd_data = po_vm["data"].as<std::string>();
 
   // Load the test datasets
-  visioner::strings_t ifiles, gfiles;
-  if (visioner::load_listfiles(cmd_data, ifiles, gfiles) == false)
+  bob::visioner::strings_t ifiles, gfiles;
+  if (bob::visioner::load_listfiles(cmd_data, ifiles, gfiles) == false)
   {
-    visioner::log_error("classifier_eval") << "Failed to load the test datasets <" << cmd_data << ">!\n";
+    bob::visioner::log_error("classifier_eval") << "Failed to load the test datasets <" << cmd_data << ">!\n";
     exit(EXIT_FAILURE);
   }
 
   // Build the confusion matrix
-  visioner::index_mat_t hits_mat;
-  visioner::indices_t hits_cnt;
+  bob::visioner::index_mat_t hits_mat;
+  bob::visioner::indices_t hits_cnt;
 
   classifier.evaluate(ifiles, gfiles, detector, hits_mat, hits_cnt);
 
   // Display the confusion matrix
-  const visioner::index_t n_classes = classifier.n_classes();
-  const visioner::strings_t& labels = classifier.param().m_labels;
+  const bob::visioner::index_t n_classes = classifier.n_classes();
+  const bob::visioner::strings_t& labels = classifier.param().m_labels;
 
-  const visioner::index_t str_size = 12;
-  const visioner::string_t empty_str = visioner::resize(visioner::string_t(), str_size);
+  const bob::visioner::index_t str_size = 12;
+  const bob::visioner::string_t empty_str = bob::visioner::resize(bob::visioner::string_t(), str_size);
 
-  const visioner::index_t sum_hits = std::accumulate(hits_cnt.begin(), hits_cnt.end(), 0);
+  const bob::visioner::index_t sum_hits = std::accumulate(hits_cnt.begin(), hits_cnt.end(), 0);
 
   // --- header
-  visioner::log_info() << empty_str;
-  for (visioner::index_t c1 = 0; c1 < n_classes; c1 ++)
+  bob::visioner::log_info() << empty_str;
+  for (bob::visioner::index_t c1 = 0; c1 < n_classes; c1 ++)
   {
-    visioner::log_info() << visioner::resize(labels[c1], str_size);
+    bob::visioner::log_info() << bob::visioner::resize(labels[c1], str_size);
   }
-  visioner::log_info() << visioner::resize("[ERR]", str_size) << "\n";
+  bob::visioner::log_info() << bob::visioner::resize("[ERR]", str_size) << "\n";
 
   // --- content
-  visioner::index_t sum_hits_c11 = 0;
-  for (visioner::index_t c1 = 0; c1 < n_classes; c1 ++)
+  bob::visioner::index_t sum_hits_c11 = 0;
+  for (bob::visioner::index_t c1 = 0; c1 < n_classes; c1 ++)
   {
-    visioner::log_info() << visioner::resize(labels[c1], str_size);
+    bob::visioner::log_info() << bob::visioner::resize(labels[c1], str_size);
 
-    for (visioner::index_t c2 = 0; c2 < n_classes; c2 ++)
+    for (bob::visioner::index_t c2 = 0; c2 < n_classes; c2 ++)
     {
-      const visioner::scalar_t c12_dr = 
-        100.0 * visioner::inverse(hits_cnt[c1]) * hits_mat(c1, c2);   
+      const bob::visioner::scalar_t c12_dr = 
+        100.0 * bob::visioner::inverse(hits_cnt[c1]) * hits_mat(c1, c2);   
 
-      visioner::log_info()
-        << visioner::resize(visioner::round(c12_dr, 2), str_size);
+      bob::visioner::log_info()
+        << bob::visioner::resize(bob::visioner::round(c12_dr, 2), str_size);
     }
 
-    const visioner::scalar_t c1_err = 
-      100.0 - 100.0 * visioner::inverse(hits_cnt[c1]) * hits_mat(c1, c1);  
-    visioner::log_info()
-      << visioner::resize(visioner::round(c1_err, 2), str_size) << "\n";
+    const bob::visioner::scalar_t c1_err = 
+      100.0 - 100.0 * bob::visioner::inverse(hits_cnt[c1]) * hits_mat(c1, c1);  
+    bob::visioner::log_info()
+      << bob::visioner::resize(bob::visioner::round(c1_err, 2), str_size) << "\n";
 
     sum_hits_c11 += hits_mat(c1, c1);
   }
 
   // --- end
-  const visioner::scalar_t err = 
-    100.0 - 100.0 * visioner::inverse(sum_hits) * sum_hits_c11;  
-  visioner::log_info()
-    << ">>> Average error: " << visioner::round(err, 2) << "%.\n";
+  const bob::visioner::scalar_t err = 
+    100.0 - 100.0 * bob::visioner::inverse(sum_hits) * sum_hits_c11;  
+  bob::visioner::log_info()
+    << ">>> Average error: " << bob::visioner::round(err, 2) << "%.\n";
 
   // OK
-  visioner::log_finished();
+  bob::visioner::log_finished();
   return EXIT_SUCCESS;
 
 }

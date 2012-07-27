@@ -60,6 +60,24 @@ namespace bob { namespace visioner {
       // Save the model back to file
       void save(const std::string& filename) const;
 
+    public: //allows command line processing
+
+      /**
+       * Default constructor
+       */
+      CVLocalizer();
+
+      /**
+       * Adds options to the parser
+       */
+      void add_options(boost::program_options::options_description& po_desc) const;
+
+      /**
+       * Decodes command line options
+       */
+      bool decode(const boost::program_options::options_description& po_desc,
+          boost::program_options::variables_map& po_vm);
+
     private:
 
       // Compute the normalized distances [0.0 - 1.0] between

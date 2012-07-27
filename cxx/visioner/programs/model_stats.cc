@@ -19,55 +19,55 @@ int main(int argc, char *argv[]) {
   if (	po_vm.empty() || po_vm.count("help") || 
       !po_vm.count("input"))
   {
-    visioner::log_error("model_stats") << po_desc << "\n";
+    bob::visioner::log_error("model_stats") << po_desc << "\n";
     exit(EXIT_FAILURE);
   }
 
   const std::string cmd_input = po_vm["input"].as<std::string>();
 
   // Load the model
-  visioner::rmodel_t model;
-  if (visioner::Model::load(cmd_input, model) == false)
+  bob::visioner::rmodel_t model;
+  if (bob::visioner::Model::load(cmd_input, model) == false)
   {
-    visioner::log_error("model_stats") 
+    bob::visioner::log_error("model_stats") 
       << "Failed to load the model <" << cmd_input << ">!\n";
     exit(EXIT_FAILURE);
   }
 
   // Display statistics
-  visioner::log_info("model_stats")
+  bob::visioner::log_info("model_stats")
     << "#outputs = " << model->n_outputs() << ", #n_features = " << model->n_features()
     << ", #n_fvalues = " << model->n_fvalues() << ".\n";
-  for (visioner::index_t o = 0; o < model->n_outputs(); o ++)
+  for (bob::visioner::index_t o = 0; o < model->n_outputs(); o ++)
   {
-    visioner::log_info("model_stats")
+    bob::visioner::log_info("model_stats")
       << "\toutput <" << (o + 1) << "/" 
       << model->n_outputs() << ">: #luts = " << model->n_luts(o) << "\n";
   }
 
-  visioner::indices_t features;
-  for (visioner::index_t o = 0; o < model->n_outputs(); o ++)
+  bob::visioner::indices_t features;
+  for (bob::visioner::index_t o = 0; o < model->n_outputs(); o ++)
   {
-    for (visioner::index_t r = 0; r < model->n_luts(o); r ++)
+    for (bob::visioner::index_t r = 0; r < model->n_luts(o); r ++)
     {
-      const visioner::LUT& lut = model->luts()[o][r];
+      const bob::visioner::LUT& lut = model->luts()[o][r];
       features.push_back(lut.feature());
     }
   }
 
-  visioner::unique(features);        
-  visioner::log_info("model_stats")
+  bob::visioner::unique(features);        
+  bob::visioner::log_info("model_stats")
     << "#selected features = " << features.size() << ".\n";
 
-  for (visioner::index_t i = 0; i < features.size(); i ++)
+  for (bob::visioner::index_t i = 0; i < features.size(); i ++)
   {
-    visioner::log_info("model_stats")
+    bob::visioner::log_info("model_stats")
       << "feature <" << (i + 1) << "/" 
       << features.size() << ">: " << model->describe(features[i]) << ".\n";
   }
 
   // OK
-  visioner::log_finished();
+  bob::visioner::log_finished();
   exit(EXIT_SUCCESS);
 
 }

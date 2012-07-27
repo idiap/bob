@@ -3,8 +3,8 @@
 
 int main(int argc, char *argv[]) {	
 
-  visioner::CVDetector detector;
-  visioner::CVLocalizer localizer;
+  bob::visioner::CVDetector detector;
+  bob::visioner::CVLocalizer localizer;
 
   // Parse the command line
   boost::program_options::options_description po_desc("", 160);
@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
       !detector.decode(po_desc, po_vm) ||
       !localizer.decode(po_desc, po_vm))
   {
-    visioner::log_error("localizer_eval") << po_desc << "\n";
+    bob::visioner::log_error("localizer_eval") << po_desc << "\n";
     exit(EXIT_FAILURE);
   }
 
@@ -40,16 +40,16 @@ int main(int argc, char *argv[]) {
   const std::string cmd_loc = po_vm["loc"].as<std::string>();
 
   // Load the test datasets
-  visioner::strings_t ifiles, gfiles;
-  if (visioner::load_listfiles(cmd_data, ifiles, gfiles) == false)
+  bob::visioner::strings_t ifiles, gfiles;
+  if (bob::visioner::load_listfiles(cmd_data, ifiles, gfiles) == false)
   {
-    visioner::log_error("localizer_eval") << "Failed to load the test datasets <" << cmd_data << ">!\n";
+    bob::visioner::log_error("localizer_eval") << "Failed to load the test datasets <" << cmd_data << ">!\n";
     exit(EXIT_FAILURE);
   }
 
   // Build the normalized localization error histograms	
-  visioner::Histogram histo;	
-  std::vector<visioner::Histogram> histos;
+  bob::visioner::Histogram histo;	
+  std::vector<bob::visioner::Histogram> histos;
 
   localizer.evaluate(ifiles, gfiles, detector, histos, histo);
 
@@ -57,13 +57,13 @@ int main(int argc, char *argv[]) {
   histo.norm();
   if (histo.save(cmd_loc + ".histo") == false)
   {
-    visioner::log_error("localizer_eval") << "Failed to save the localization histogram!\n";
+    bob::visioner::log_error("localizer_eval") << "Failed to save the localization histogram!\n";
     exit(EXIT_FAILURE);
   }
   histo.cumulate();
   if (histo.save(cmd_loc + ".cum.histo") == false)
   {
-    visioner::log_error("localizer_eval") << "Failed to save the localization histogram!\n";
+    bob::visioner::log_error("localizer_eval") << "Failed to save the localization histogram!\n";
     exit(EXIT_FAILURE);
   }
 
@@ -73,20 +73,20 @@ int main(int argc, char *argv[]) {
     if (histos[iid].save(cmd_loc + ".histo." + 
           boost::lexical_cast<std::string>(localizer.param().m_labels[iid])) == false)
     {
-      visioner::log_error("localizer_eval") << "Failed to save the localization histogram!\n";
+      bob::visioner::log_error("localizer_eval") << "Failed to save the localization histogram!\n";
       exit(EXIT_FAILURE);
     }
     histos[iid].cumulate();
     if (histos[iid].save(cmd_loc + ".cum.histo." + 
           boost::lexical_cast<std::string>(localizer.param().m_labels[iid])) == false)
     {
-      visioner::log_error("localizer_eval") << "Failed to save the localization histogram!\n";
+      bob::visioner::log_error("localizer_eval") << "Failed to save the localization histogram!\n";
       exit(EXIT_FAILURE);
     }
   }
 
   // OK
-  visioner::log_finished();
+  bob::visioner::log_finished();
   return EXIT_SUCCESS;
 
 }

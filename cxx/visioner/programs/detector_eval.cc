@@ -2,7 +2,7 @@
 
 int main(int argc, char *argv[]) {	
 
-  visioner::CVDetector detector;
+  bob::visioner::CVDetector detector;
 
   // Parse the command line
   boost::program_options::options_description po_desc("", 160);
@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
       !po_vm.count("roc") ||
       !detector.decode(po_desc, po_vm))
   {
-    visioner::log_error("detector_eval") << po_desc << "\n";
+    bob::visioner::log_error("detector_eval") << po_desc << "\n";
     exit(EXIT_FAILURE);
   }
 
@@ -36,26 +36,26 @@ int main(int argc, char *argv[]) {
   const std::string cmd_roc = po_vm.count("roc") ? po_vm["roc"].as<std::string>() : "";
 
   // Load the test datasets
-  visioner::strings_t ifiles, gfiles;
-  if (visioner::load_listfiles(cmd_data, ifiles, gfiles) == false)
+  bob::visioner::strings_t ifiles, gfiles;
+  if (bob::visioner::load_listfiles(cmd_data, ifiles, gfiles) == false)
   {
-    visioner::log_error("detector_eval") << "Failed to load the test datasets <" << cmd_data << ">!\n";
+    bob::visioner::log_error("detector_eval") << "Failed to load the test datasets <" << cmd_data << ">!\n";
     exit(EXIT_FAILURE);
   }
 
   // Build the ROC curve		
-  visioner::scalars_t fas, tars;
+  bob::visioner::scalars_t fas, tars;
   detector.evaluate(ifiles, gfiles, fas, tars);
 
   // ... and save it to file: TAR + FA
-  if (visioner::save_roc(fas, tars, cmd_roc) == false)
+  if (bob::visioner::save_roc(fas, tars, cmd_roc) == false)
   {
-    visioner::log_error("detector_eval") << "Failed to save the ROC points!\n";
+    bob::visioner::log_error("detector_eval") << "Failed to save the ROC points!\n";
     exit(EXIT_FAILURE);
   }
 
   // OK
-  visioner::log_finished();
+  bob::visioner::log_finished();
   return EXIT_SUCCESS;
 
 }
