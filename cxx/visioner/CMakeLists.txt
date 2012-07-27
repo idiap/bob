@@ -8,6 +8,12 @@ include (${QT_USE_FILE})
 include_directories(SYSTEM ${QT_INCLUDE_DIR})
 set(shared "${QT_LIBRARIES};${Boost_IOSTREAMS_LIBRARY_RELEASE};${Boost_SERIALIZATION_LIBRARY_RELEASE}")
 
+# Enables OpenMP if found
+if (OPENMP_FOUND)
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${OpenMP_CXX_FLAGS}")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${OpenMP_CXX_FLAGS}")
+endif ()
+
 # This defines the list of source files inside this package.
 set(src
     "src/averager.cc"

@@ -66,11 +66,11 @@ namespace bob { namespace visioner {
           }
 
         // Access functions
-        const T* operator[](std::size_t row) const { return &m_data[row * cols()]; }
-        T* operator[](std::size_t row) { return &m_data[row * cols()]; }
+        const T* operator[](std::size_t row) const { return &m_data[row * m_cols]; }
+        T* operator[](std::size_t row) { return &m_data[row * m_cols]; }
 
-        const T& operator()(std::size_t row, std::size_t col) const { return m_data[row * cols() + col]; }
-        T& operator()(std::size_t row, std::size_t col) { return m_data[row * cols() + col]; } 
+        const T& operator()(std::size_t row, std::size_t col) const { return m_data[row * m_cols + col]; }
+        T& operator()(std::size_t row, std::size_t col) { return m_data[row * m_cols + col]; } 
 
         const T& operator()(std::size_t index) const { return m_data[index]; }
         T& operator()(std::size_t index) { return m_data[index]; } 
@@ -97,8 +97,8 @@ namespace bob { namespace visioner {
         d2_const_it_t begin() const { return m_data.begin(); }
         d2_it_t begin() { return m_data.begin(); }
 
-        d2_const_it_t end() const { return m_data.begin() + size(); }
-        d2_it_t end() { return m_data.begin() + size(); }               
+        d2_const_it_t end() const { return m_data.begin() + m_data.size(); }
+        d2_it_t end() { return m_data.begin() + m_data.size(); }               
 
         // Fill 
         void fill(T value)
@@ -138,29 +138,29 @@ namespace bob { namespace visioner {
           }
 
         // 1D row iterators
-        const T* _rpt(std::size_t row) const { return &m_data[row * cols()]; }
-        T* _rpt(std::size_t row) { return &m_data[row * cols()]; }
+        const T* _rpt(std::size_t row) const { return &m_data[row * m_cols]; }
+        T* _rpt(std::size_t row) { return &m_data[row * m_cols]; }
 
         d1_const_it_t _row_begin(std::size_t row) const { return d1_const_it_t(_rpt(row), 1); }
         d1_it_t _row_begin(std::size_t row) { return d1_it_t(_rpt(row), 1); }
 
-        d1_const_it_t _row_end(std::size_t row) const { return d1_const_it_t(_rpt(row) + cols(), 1); }
-        d1_it_t _row_end(std::size_t row) { return d1_it_t(_rpt(row) + cols(), 1); }
+        d1_const_it_t _row_end(std::size_t row) const { return d1_const_it_t(_rpt(row) + m_cols, 1); }
+        d1_it_t _row_end(std::size_t row) { return d1_it_t(_rpt(row) + m_cols, 1); }
 
         // 1D column iterators
         const T* _cpt(std::size_t col) const { return &m_data[col]; }
         T* _cpt(std::size_t col) { return &m_data[col]; }
 
-        d1_const_it_t _col_begin(std::size_t col) const { return d1_const_it_t(_cpt(col), rows()); }
-        d1_it_t _col_begin(std::size_t col) { return d1_it_t(_cpt(col), rows()); }
+        d1_const_it_t _col_begin(std::size_t col) const { return d1_const_it_t(_cpt(col), m_rows); }
+        d1_it_t _col_begin(std::size_t col) { return d1_it_t(_cpt(col), m_rows); }
 
         d1_const_it_t _col_end(std::size_t col) const 
         { 
-          return d1_const_it_t(_cpt(col) + (size() - rows()), rows()); 
+          return d1_const_it_t(_cpt(col) + (m_data.size() - m_rows), m_rows); 
         }
         d1_it_t _col_end(std::size_t col) 
         { 
-          return d1_it_t(_cpt(col) + (size() - rows()), rows()); 
+          return d1_it_t(_cpt(col) + (m_data.size() - m_rows), m_rows); 
         }
 
       private:

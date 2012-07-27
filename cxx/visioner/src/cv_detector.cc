@@ -11,28 +11,34 @@ namespace bob { namespace visioner {
   CVDetector::CVDetector(const std::string& model, scalar_t threshold,
       index_t levels, index_t scale_variation, scalar_t clustering,
       CVDetector::Type detection_method):
-    m_levels(levels),
     m_ds(scale_variation),
     m_cluster(clustering),
     m_threshold(threshold),
     m_type(detection_method) {
 
-    // Load the model
-    if (Model::load(model, m_model) == false) {
-      boost::format m("failed to load model from file '%s'");
-      m % model;
-      throw std::runtime_error(m.str().c_str());
+      // Load the model
+      if (Model::load(model, m_model) == false) {
+        boost::format m("failed to load model from file '%s'");
+        m % model;
+        throw std::runtime_error(m.str().c_str());
+      }
+
+      if (valid_model() == false) {
+        boost::format m("the model loaded from file '%s' is not valid");
+        m % model;
+        throw std::runtime_error(m.str().c_str());
+      }
+
+      param_t _param = param();
+      _param.m_ds = m_ds;
+      m_ipyramid.reset(_param); 
+
+      set_scan_levels(levels);
+
     }
 
-    if (valid_model() == false) {
-      boost::format m("the model loaded from file '%s' is not valid");
-      m % model;
-      throw std::runtime_error(m.str().c_str());
-    }
-
-    param_t _param = param();
-    _param.m_ds = m_ds;
-    m_ipyramid.reset(_param); 
+  void CVDetector::set_scan_levels(index_t levels) {
+    m_levels = levels;
 
     // Build the level classifiers
     m_lmodel_begins.resize(n_outputs(), m_levels + 1);
@@ -92,7 +98,7 @@ namespace bob { namespace visioner {
   // NB: The detections are thresholded and clustered!
   bool CVDetector::scan(detections_t& detections) const
   {
-    detections.clear();   
+    detections.clear();
 
     // Ground truth mode ...
     if (m_type == GroundTruth)

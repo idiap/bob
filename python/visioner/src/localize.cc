@@ -33,13 +33,18 @@
 namespace bp = boost::python;
 namespace tp = bob::python;
 
-static bp::tuple detect_max(bob::visioner::CVDetector& det, 
+static bp::object detect_max(bob::visioner::CVDetector& det, 
     tp::const_ndarray image) {
 
   blitz::Array<bob::visioner::grey_t,2> bzimage = image.bz<bob::visioner::grey_t,2>();
   det.load(bzimage.data(), bzimage.rows(), bzimage.cols());
   bob::visioner::detections_t detections;
   det.scan(detections);
+
+  if (detections.size() == 0) {
+    return bp::object();
+  }
+
   det.sort_desc(detections);
 
   // Returns a tuple containing the detection bbox
@@ -48,13 +53,18 @@ static bp::tuple detect_max(bob::visioner::CVDetector& det,
   return bp::make_tuple(x, y, width, height, detections[0].first);
 }
 
-static bp::tuple detect(bob::visioner::CVDetector& det,
+static bp::object detect(bob::visioner::CVDetector& det,
     tp::const_ndarray image) {
   
   blitz::Array<bob::visioner::grey_t,2> bzimage = image.bz<bob::visioner::grey_t,2>();
   det.load(bzimage.data(), bzimage.rows(), bzimage.cols());
   bob::visioner::detections_t detections;
   det.scan(detections);
+  
+  if (detections.size() == 0) {
+    return bp::object();
+  }
+
   det.sort_desc(detections);
 
   // Returns a tuple containing all detections, with descending scores
@@ -67,13 +77,18 @@ static bp::tuple detect(bob::visioner::CVDetector& det,
   return bp::tuple(tmp);
 }
 
-static bp::tuple locate(bob::visioner::CVLocalizer& loc,
+static bp::object locate(bob::visioner::CVLocalizer& loc,
     bob::visioner::CVDetector& det, tp::const_ndarray image) {
 
   blitz::Array<bob::visioner::grey_t,2> bzimage = image.bz<bob::visioner::grey_t,2>();
   det.load(bzimage.data(), bzimage.rows(), bzimage.cols());
   bob::visioner::detections_t detections;
   det.scan(detections);
+  
+  if (detections.size() == 0) {
+    return bp::object();
+  }
+
   det.sort_desc(detections);
 
   // Locate keypoints
@@ -108,12 +123,12 @@ void bind_visioner_localize() {
 
   bp::class_<bob::visioner::CVDetector>("CVDetector", "Object detector that processes a pyramid of images", bp::init<const std::string&, bob::visioner::scalar_t, bob::visioner::index_t, bob::visioner::index_t, bob::visioner::scalar_t, bob::visioner::CVDetector::Type>((bp::arg("model"), bp::arg("threshold")=0.0, bp::arg("scanning_levels")=0, bp::arg("scale_variation")=2, bp::arg("clustering")=0.05, bp::arg("method")=bob::visioner::CVDetector::GroundTruth), "Basic constructor with the following parameters:\n\nmodel\n  file containing the model to be loaded; **note**: Serialization will use a native text format by default. Files that have their names suffixed with '.gz' will be automatically decompressed. If the filename ends in '.vbin' or '.vbgz' the format used will be the native binary format.\n\nthreshold\n  object classification threshold\n\nscanning_levels\n  scanning levels (the more, the faster)\n\nscale_variation\n  scale variation in pixels\n\nclustering\n  overlapping threshold for clustering detections\n\nmethod\n  Scanning or GroundTruth"))
     .def_readwrite("threshold", &bob::visioner::CVDetector::m_threshold, "Object classification threshold")
-    .def_readwrite("scanning_levels", &bob::visioner::CVDetector::m_levels, "Levels (the more, the faster)")
+    .add_property("scanning_levels", &bob::visioner::CVDetector::get_scan_levels, &bob::visioner::CVDetector::set_scan_levels, "Levels (the more, the faster)")
     .def_readwrite("scale_variation", &bob::visioner::CVDetector::m_ds, "Scale variation in pixels")
     .def_readwrite("clustering", &bob::visioner::CVDetector::m_cluster, "Overlapping threshold for clustering detections")
-    .def_readwrite("method", &bob::visioner::CVDetector::m_type, "Scanning or GroundTruth")
+    .def_readwrite("method", &bob::visioner::CVDetector::m_type, "Scanning or GroundTruth (default)")
     .def("detect", &detect, (bp::arg("self"), bp::arg("image")), "Detects faces in the input (gray-scaled) image according to the current settings. The input image format should be a 2D array of dtype=uint8.")
-    .def("detect_max", &detect, (bp::arg("self"), bp::arg("image")), "Detects the most probable face in the input (gray-scaled) image according to the current settings")
+    .def("detect_max", &detect_max, (bp::arg("self"), bp::arg("image")), "Detects the most probable face in the input (gray-scaled) image according to the current settings")
     .def("save", &bob::visioner::CVDetector::save, (bp::arg("self"), bp::arg("filename")), "Saves the model and parameters to a given file.\n\n**Note**: Serialization will use a native text format by default. Files that have their name suffixed with '.gz' will be automatically decompressed. If the filename ends in '.vbin' or '.vbgz' the format used will be the native binary format.")
     ;
 
@@ -124,7 +139,7 @@ void bind_visioner_localize() {
     ;
 
   bp::class_<bob::visioner::CVLocalizer>("CVLocalizer", "Keypoint localizer to be applied in tandem with ground-truth or detections from CVDetector", bp::init<const std::string&, bob::visioner::CVLocalizer::Type>((bp::arg("model"), bp::arg("method")=bob::visioner::CVLocalizer::MultipleShots_Median), "Basic constructor taking a model file and the localization method to use"))
-      .def_readwrite("method", &bob::visioner::CVLocalizer::m_type, "SingleShot, MultipleShots_Average or MultipleShots_Median")
+      .def_readwrite("method", &bob::visioner::CVLocalizer::m_type, "SingleShot, MultipleShots_Average or MultipleShots_Median (default)")
       .def("locate", &locate, (bp::arg("self"), bp::arg("detector"), bp::arg("image")), "Runs the keypoint localization on the first (highest scored) face location determined by the detector. The input image format should be a 2D array of dtype=uint8.")
     .def("save", &bob::visioner::CVLocalizer::save, (bp::arg("self"), bp::arg("filename")), "Saves the model and parameters to a given file.\n\n**Note**: Serialization will use a native text format by default. Files that have their name suffixed with '.gz' will be automatically decompressed. If the filename ends in '.vbin' or '.vbgz' the format used will be the native binary format.")
     ;

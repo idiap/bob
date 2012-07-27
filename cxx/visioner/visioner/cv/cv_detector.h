@@ -110,6 +110,10 @@ namespace bob { namespace visioner {
       const stats_t& stats() const { return m_stats; }
       static scalar_t MinOverlap() { return 0.50; }	
 
+      // Getters and setters
+      void set_scan_levels(index_t levels);
+      index_t get_scan_levels() const { return m_levels; }
+
       // Process detections
       static void sort_asc(detections_t& detections);
       static void sort_desc(detections_t& detections);
@@ -128,21 +132,22 @@ namespace bob { namespace visioner {
           scalar_t min_score, index_t n_thress, scalar_t delta_score,
           indices_t& n_tps, indices_t& n_fas);
 
-    public:
+    public: //attributes
 
-      // Attributes
-      rmodel_t                m_model;	// Object classifier(s)
-      index_mat_t             m_lmodel_begins;// Level classifiers for each output:
-      index_mat_t             m_lmodel_ends;  //      [begin, end) LUT range
-      index_t			m_levels;	// #levels (speed-up scanning)
-      index_t                 m_ds;           // Scanning resolution
-      scalar_t		m_cluster;	// NMS threshold
-      scalar_t		m_threshold;	// Detection threshold
-      ipyramid_t		m_ipyramid;	// Pyramid of images
+      index_t  m_ds;        ///< Scanning resolution
+      scalar_t m_cluster;	  ///< NMS threshold
+      scalar_t m_threshold;	///< Detection threshold
+      Type     m_type;      ///< Mode: scanning vs. GT
 
-      Type                    m_type;         // Mode: scanning vs. GT
+    private: //attributes
 
-      mutable stats_t         m_stats;        // Scanning statistics
+      rmodel_t    m_model;	       ///< Object classifier(s)
+      index_mat_t m_lmodel_begins; ///< Level classifiers for each output:
+      index_mat_t m_lmodel_ends;   ///< [begin, end) LUT range
+      index_t			m_levels;	       ///< #levels (speed-up scanning)
+      ipyramid_t  m_ipyramid;	     ///< Pyramid of images
+      mutable stats_t m_stats;     ///< Scanning statistics
+
   };
 
 }}
