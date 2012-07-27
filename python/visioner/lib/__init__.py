@@ -6,24 +6,20 @@
 from ._visioner import *
 from os import path
 
-DEFAULT_CMODEL = path.join(path.dirname(__file__), 'detection.gz')
+DEFAULT_DETECTION_MODEL = path.join(path.dirname(__file__), 'detection.gz')
 """Default classification model for basic face detection"""
 
-DEFAULT_LMODEL_EC = path.join(path.dirname(__file__), 'Facial.MCT9.TMaxBoost.EyeCenters.gz')
-"""Default keypoint localization model. This model will get you left and
-right eye centers."""
-
-DEFAULT_LMODEL_MP = path.join(path.dirname(__file__), 'Facial.MCT9.TMaxBoost.MultiPoint.gz')
-"""Alternative keypoint localization model. This model will get you eye
-centers, eye corners, nose tip, nostrils, mouth corners."""
+DEFAULT_LOCALIZATION_MODEL = path.join(path.dirname(__file__), 
+  'localization.gz')
+"""Default keypoint localization model. TODO: How many points?"""
 
 class MaxDetector(CVDetector):
   """A class that bridges the Visioner to bob so as to detect the most
   face-like object in still images or video frames"""
 
-  def __init__(self, model_file=None, threshold=0.0, levels=0, 
+  def __init__(self, model_file=None, threshold=0.0, scanning_levels=0, 
       scale_variation=2, clustering=0.05,
-      detection_method=DetectionMethod.GroundTruth):
+      method=DetectionMethod.GroundTruth):
     """Creates a new face localization object by loading object classification
     and keypoint localization models from visioner model files.
 
@@ -35,8 +31,8 @@ class MaxDetector(CVDetector):
     threshold
       object classification threshold
       
-    levels
-      levels (the more, the faster)
+    scanning_levels
+      scanning levels (the more, the faster)
       
     scale_variation
       scale variation in pixels
@@ -44,26 +40,35 @@ class MaxDetector(CVDetector):
     clustering
       overlapping threshold for clustering detections
       
-    detection_method
+    method
       Scanning or GroundTruth
     """
 
-    if model_file is None: model_file = DEFAULT_CMODEL
+    if model_file is None: model_file = DEFAULT_DETECTION_MODEL
 
-    CVDetector.__init__(self, model_file, threshold, levels,
-        scale_variation, clustering, detection_method)
+    CVDetector.__init__(self, model_file, threshold, scanning_levels,
+        scale_variation, clustering, method)
 
   def __call__(self, grayimage):
-    """Runs the detection machinery, returns a single bounding boxes"""
+    """Runs the detection machinery, returns a single bounding box
+
+    Keyword parameters:
+
+    image
+      A gray-scaled image (2D array) with dtype=uint8.
+
+    Returns a single (highest scored) detection as a bounding box.
+    """
+
     return self.detect_max(grayimage)
 
 class Detector(CVDetector):
   """A class that bridges the Visioner to bob so as to detect faces in 
   still images or video frames"""
 
-  def __init__(self, model_file=None, threshold=0.0, levels=0, 
+  def __init__(self, model_file=None, threshold=0.0, scanning_levels=0, 
       scale_variation=2, clustering=0.05,
-      detection_method=DetectionMethod.GroundTruth):
+      method=DetectionMethod.GroundTruth):
     """Creates a new face localization object by loading object classification
     and keypoint localization models from visioner model files.
 
@@ -75,8 +80,8 @@ class Detector(CVDetector):
     threshold
       object classification threshold
       
-    levels
-      levels (the more, the faster)
+    scanning_levels
+      scanning levels (the more, the faster)
       
     scale_variation
       scale variation in pixels
@@ -84,70 +89,80 @@ class Detector(CVDetector):
     clustering
       overlapping threshold for clustering detections
       
-    detection_method
+    method
       Scanning or GroundTruth
     """
 
-    if model_file is None: model_file = DEFAULT_CMODEL
+    if model_file is None: model_file = DEFAULT_DETECTION_MODEL
 
-    CVDetector.__init__(self, model_file, threshold, levels,
-        scale_variation, clustering, detection_method)
+    CVDetector.__init__(self, model_file, threshold, scanning_levels,
+        scale_variation, clustering, method)
 
   def __call__(self, grayimage):
-    """Runs the detection machinery, returns a single bounding boxes"""
+    """Runs the detection machinery, returns all bounding boxes above
+    threshold. Detections are already clustered following the clustering
+    parameter. The iterable contains detections in descending order with the
+    first being the one with the highest score.
+
+    Keyword parameters:
+
+    image
+      A gray-scaled image (2D array) with dtype=uint8.
+
+    Returns an iterable with all detected bounding boxes in descending score
+    order (first one is has the highest score).
+    """
+
     return self.detect(grayimage)
 
-class Localizer:
-  """A class that bridges the Visioner to bob so as to localize face in 
+class Localizer(CVLocalizer):
+  """A class that bridges the Visioner to bob to localize keypoints in 
   still images or video frames"""
 
-  def __init__(self, cmodel_file=None, lmodel_file=None, scan_levels=0, scale_var=8):
+  def __init__(self, model_file=None,
+      method=LocalizationMethod.MultipleShots_Median,
+      detector=None):
     """Creates a new face localization object by loading object classification
     and keypoint localization models from visioner model files.
 
     Keyword Parameters:
 
-    cmodel_file
-      Path to a file containing the object classification model. If unset (or
-      set to None), I will use the default model file installed with the
-      release.
+    model_file
+      Path to a file containing the keypoint localization model. If None is
+      given, use the default localizer.
 
-    lmodel_file
-      Path to a file containing the keypoints localization model. If unset (or
-      set to None), I will use the default model file installed with the
-      release.
+    method
+      SingleShot, MultipleShots_Average or MultipleShots_Median
 
-    scan_levels
-      scanning levels (the more, the faster)
-
-    scale_var
-      scanning: scale variation in pixels
+    detector
+      Path to a file or a CVDetector (or Max/Detector) object to be used as the
+      basis for the localization procedure. If None is given, use the default
+      detector. 
     """
 
-    if cmodel_file is None: cmodel_file = DEFAULT_CMODEL
-    if lmodel_file is None: lmodel_file = DEFAULT_LMODEL_EC
+    if model_file is None: model_file = DEFAULT_LOCALIZATION_MODEL
+    CVLocalizer.__init__(self, model_file, method)
 
-    self.cmodel, self.cparam = load_model(cmodel_file)
-    self.cparam.ds = scale_var
-    self.cscanner = SWScanner(self.cparam)
-    self.lmodel, self.lparam = load_model(lmodel_file)
-    self.lparam.ds = scale_var
-    self.lscanner = SWScanner(self.lparam)
-    self.scan_levels = scan_levels
+    if detector is None: 
+      self.detector = Detector()
+    elif isinstance(detector, (str, unicode)): 
+      self.detector = Detector(detector)
+    elif isinstance(detector, CVDetector):
+      self.detector = detector
+    else:
+      raise RuntimeError, 'input detector has to be either None, a file path or Detector object'
 
-  def __call__(self, grayimage):
-    """Runs the localization machinery, returns points"""
+  def __call__(self, image):
+    """Runs the localization machinery, returns the bounding box and points
+ 
+    Keyword parameters:
 
-    self.cscanner.load(grayimage)
-    self.lscanner.load(grayimage)
-    return locate(self.cmodel, self.lmodel, self.scan_levels, 
-        self.cscanner, self.lscanner)
+    image
+      A gray-scaled image (2D array) with dtype=uint8.
 
-def model_transcode(iname, oname):
-  """Transcodes the model in a certain input file to another format also
-  supported by the visioner"""
+    Returns a bounding box and a set of keypoints.
+    """
 
-  model, params = load_model(iname)
-  save_model(model, params, oname)
+    return self.locate(self.detector, grayimage)
 
 __all__ = dir()
