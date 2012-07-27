@@ -62,10 +62,10 @@ hdf5file_make_readonly(const std::string& filename) {
 /**
  * Returns a list of all paths inside a HDF5File
  */
-static list hdf5file_paths(const io::HDF5File& f) {
+static list hdf5file_paths(const io::HDF5File& f, const bool relative) {
   list retval;
   std::vector<std::string> values;
-  f.paths(values);
+  f.paths(values, relative);
   for (size_t i=0; i<values.size(); ++i) retval.append(str(values[i]));
   return retval;
 }
@@ -208,8 +208,8 @@ void bind_io_hdf5() {
     .def("describe", &hdf5file_describe, (arg("self"), arg("key")), "If a given path to an HDF5 dataset exists inside the file, return a type description of objects recorded in such a dataset, otherwise, raises an exception. The returned value type is a tuple of tuples (HDF5Type, number-of-objects, expandible) describing the capabilities if the file is read using theses formats.")
     .def("unlink", &io::HDF5File::unlink, (arg("self"), arg("key")), "If a given path to an HDF5 dataset exists inside the file, unlinks it. Please note this will note remove the data from the file, just make it inaccessible. If you wish to cleanup, save the reacheable objects from this file to another HDF5File object using copy(), for example.")
     .def("rename", &io::HDF5File::rename, (arg("self"), arg("from"), arg("to")), "If a given path to an HDF5 dataset exists in the file, rename it")
-    .def("keys", &hdf5file_paths, (arg("self")), "Returns all paths to datasets available inside this file")
-    .def("paths", &hdf5file_paths, (arg("self")), "Returns all paths to datasets available inside this file")
+    .def("keys", &hdf5file_paths, (arg("self"), arg("relative") = false), "Synonym for 'paths'")
+    .def("paths", &hdf5file_paths, (arg("self"), arg("relative") = false), "Returns all paths to datasets available inside this file, stored under the current working directory. If relative is set to True, the returned paths are relative to the current working directory, otherwise they are asbolute.")
     .def("copy", &io::HDF5File::copy, (arg("self"), arg("file")), "Copies all accessible content to another HDF5 file")
     .def("read", &hdf5file_read, (arg("self"), arg("key")), "Reads the whole dataset in a single shot. Returns a single object with all contents.") 
     .def("lread", (object(*)(io::HDF5File&, const std::string&, int64_t))0, hdf5file_lread_overloads((arg("self"), arg("key"), arg("pos")=-1), "Reads a given position from the dataset. Returns a single object if 'pos' >= 0, otherwise a list by reading all objects in sequence."))

@@ -157,8 +157,18 @@ namespace bob { namespace io {
        * Accesses all existing paths in one shot. Input has to be a std
        * container with T = std::string and accepting push_back()
        */
-      template <typename T> void paths (T& container) const {
+      template <typename T> void paths (T& container, const bool relative = false) const {
         m_cwd->dataset_paths(container);
+        if (relative){
+          const std::string d = cwd();
+          const int len = d.length()+1;
+          for (typename T::iterator it = container.begin(); it != container.end(); ++it){
+            // assert that the string contains the current path
+            assert(it->find(d) == 0);
+            // subtract current path
+            *it = it->substr(len);
+          }
+        }
       }
 
       /**
