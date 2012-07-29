@@ -86,7 +86,7 @@ namespace bob {
         /**
           * @brief Getters
           */
-        size_t getLength() { return m_length; }
+        size_t getLength() const { return m_length; }
         /**
           * @brief Setters
           */
