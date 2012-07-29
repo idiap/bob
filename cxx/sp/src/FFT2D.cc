@@ -26,57 +26,81 @@
 #include <fftw3.h>
 
 
-namespace ca = bob::core::array;
-namespace sp = bob::sp;
-
-sp::FFT2DAbstract::FFT2DAbstract( const int height, const int width):
+bob::sp::FFT2DAbstract::FFT2DAbstract( const size_t height, const size_t width):
   m_height(height), m_width(width)
 {
-  reset();
 }
 
-sp::FFT2DAbstract::~FFT2DAbstract()
+bob::sp::FFT2DAbstract::FFT2DAbstract( const bob::sp::FFT2DAbstract& other):
+  m_height(other.m_height), m_width(other.m_width)
 {
-  cleanup();
 }
 
-void sp::FFT2DAbstract::reset(const int height, const int width)
+const bob::sp::FFT2DAbstract& bob::sp::FFT2DAbstract::operator=(const FFT2DAbstract& other)
 {
-  // Reset if required
-  if( m_height != height || m_width != width) {
-    // Update the height and width
-    m_height = height;
-    m_width = width;
-    // Deallocate memory
-    cleanup();
-    // Reset given the new height and width
-    reset();
+  if(this != &other)
+  {
+    reset(other.m_height, other.m_width);
   }
+  return *this;
 }
- 
-void sp::FFT2DAbstract::reset()
+
+bool bob::sp::FFT2DAbstract::operator==(const bob::sp::FFT2DAbstract& b) const
+{
+  return (this->m_height == b.m_height && this->m_width == b.m_width);
+}
+
+bool bob::sp::FFT2DAbstract::operator!=(const bob::sp::FFT2DAbstract& b) const
+{
+  return !(this->operator==(b));
+}
+
+void bob::sp::FFT2DAbstract::reset(const size_t height, const size_t width)
+{
+  // Update the height and width
+  m_height = height;
+  m_width = width;
+}
+
+
+bob::sp::FFT2D::FFT2D( const size_t height, const size_t width):
+  bob::sp::FFT2DAbstract(height, width)
 {
 }
 
-void sp::FFT2DAbstract::cleanup() {
-}
-
-
-
-sp::FFT2D::FFT2D( const int height, const int width):
-  sp::FFT2DAbstract::FFT2DAbstract(height, width)
+bob::sp::FFT2D::FFT2D( const bob::sp::FFT2D& other):
+  bob::sp::FFT2DAbstract(other)
 {
 }
 
-void sp::FFT2D::operator()(const blitz::Array<std::complex<double>,2>& src, 
+const bob::sp::FFT2D& bob::sp::FFT2D::operator=(const FFT2D& other)
+{
+  if(this != &other)
+  {
+    bob::sp::FFT2DAbstract::operator=(other);
+  }
+  return *this;
+}
+
+bool bob::sp::FFT2D::operator==(const bob::sp::FFT2D& b) const
+{
+  return (bob::sp::FFT2DAbstract::operator==(b));
+}
+
+bool bob::sp::FFT2D::operator!=(const bob::sp::FFT2D& b) const
+{
+  return !(this->operator==(b));
+}
+
+void bob::sp::FFT2D::operator()(const blitz::Array<std::complex<double>,2>& src, 
   blitz::Array<std::complex<double>,2>& dst)
 {
   // check input
-  ca::assertCZeroBaseContiguous(src);
+  bob::core::array::assertCZeroBaseContiguous(src);
 
   // Check output
-  ca::assertCZeroBaseContiguous(dst);
-  ca::assertSameShape( dst, src);
+  bob::core::array::assertCZeroBaseContiguous(dst);
+  bob::core::array::assertSameShape( dst, src);
 
   // Reinterpret cast to fftw format
   fftw_complex* src_ = reinterpret_cast<fftw_complex*>(const_cast<std::complex<double>* >(src.data()));
@@ -91,10 +115,10 @@ void sp::FFT2D::operator()(const blitz::Array<std::complex<double>,2>& src,
 }
 
 
-void sp::FFT2D::operator()(blitz::Array<std::complex<double>,2>& src_dst)
+void bob::sp::FFT2D::operator()(blitz::Array<std::complex<double>,2>& src_dst)
 {
   // check data
-  ca::assertCZeroBaseContiguous(src_dst);
+  bob::core::array::assertCZeroBaseContiguous(src_dst);
 
   // Reinterpret cast to fftw format
   fftw_complex* src_dst_ = reinterpret_cast<fftw_complex*>(src_dst.data());
@@ -108,20 +132,44 @@ void sp::FFT2D::operator()(blitz::Array<std::complex<double>,2>& src_dst)
 }
 
 
-sp::IFFT2D::IFFT2D( const int height, const int width):
-  sp::FFT2DAbstract::FFT2DAbstract(height, width)
+bob::sp::IFFT2D::IFFT2D( const size_t height, const size_t width):
+  bob::sp::FFT2DAbstract(height, width)
 {
 }
 
-void sp::IFFT2D::operator()(const blitz::Array<std::complex<double>,2>& src, 
+bob::sp::IFFT2D::IFFT2D( const bob::sp::IFFT2D& other):
+  bob::sp::FFT2DAbstract(other)
+{
+}
+
+const bob::sp::IFFT2D& bob::sp::IFFT2D::operator=(const IFFT2D& other)
+{
+  if(this != &other)
+  {
+    bob::sp::FFT2DAbstract::operator=(other);
+  }
+  return *this;
+}
+
+bool bob::sp::IFFT2D::operator==(const bob::sp::IFFT2D& b) const
+{
+  return (bob::sp::FFT2DAbstract::operator==(b));
+}
+
+bool bob::sp::IFFT2D::operator!=(const bob::sp::IFFT2D& b) const
+{
+  return !(this->operator==(b));
+}
+
+void bob::sp::IFFT2D::operator()(const blitz::Array<std::complex<double>,2>& src, 
   blitz::Array<std::complex<double>,2>& dst)
 {
   // check input
-  ca::assertCZeroBaseContiguous(src);
+  bob::core::array::assertCZeroBaseContiguous(src);
 
   // Check output
-  ca::assertCZeroBaseContiguous(dst);
-  ca::assertSameShape( dst, src);
+  bob::core::array::assertCZeroBaseContiguous(dst);
+  bob::core::array::assertSameShape( dst, src);
 
   // Reinterpret cast to fftw format
   fftw_complex* src_ = reinterpret_cast<fftw_complex*>(const_cast<std::complex<double>* >(src.data()));
@@ -139,10 +187,10 @@ void sp::IFFT2D::operator()(const blitz::Array<std::complex<double>,2>& src,
   dst /= static_cast<double>(m_width*m_height);
 }
 
-void sp::IFFT2D::operator()(blitz::Array<std::complex<double>,2>& src_dst)
+void bob::sp::IFFT2D::operator()(blitz::Array<std::complex<double>,2>& src_dst)
 {
   // check data
-  ca::assertCZeroBaseContiguous(src_dst);
+  bob::core::array::assertCZeroBaseContiguous(src_dst);
 
   // Reinterpret cast to fftw format
   fftw_complex* src_dst_ = reinterpret_cast<fftw_complex*>(src_dst.data());

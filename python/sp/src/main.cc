@@ -24,7 +24,8 @@
 
 void bind_sp_version();
 void bind_sp_extrapolate();
-void bind_sp_fft_dct();
+void bind_sp_dct();
+void bind_sp_fft();
 
 BOOST_PYTHON_MODULE(_sp) {
 
@@ -32,5 +33,6 @@ BOOST_PYTHON_MODULE(_sp) {
 
   bind_sp_version();
   bind_sp_extrapolate();
-  bind_sp_fft_dct();
+  bind_sp_dct();
+  bind_sp_fft();
 }

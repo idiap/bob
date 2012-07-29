@@ -3,7 +3,7 @@
  * @date Wed Apr 13 23:08:13 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * @brief Implement a blitz-based 1D Fast Fourier Transform using FFTPACK
+ * @brief Implement a blitz-based 1D Fast Fourier Transform using FFTW
  * functions
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
@@ -37,7 +37,7 @@ namespace bob {
 
     /**
       * @brief This class implements a 1D Discrete Fourier Transform based on 
-      * the Netlib FFTPACK library. It is used as a base class for FFT1D and
+      * the FFTW library. It is used as a base class for FFT1D and
       * IFFT1D classes.
       */
     class FFT1DAbstract
@@ -46,12 +46,32 @@ namespace bob {
         /**
           * @brief Constructor: Initialize working array
           */
-        FFT1DAbstract( const int length);
+        FFT1DAbstract( const size_t length);
+
+        /**
+          * @brief Copy constructor
+          */
+        FFT1DAbstract( const FFT1DAbstract& other);
 
         /**
           * @brief Destructor
           */
-        virtual ~FFT1DAbstract();
+        virtual ~FFT1DAbstract() { }
+
+        /**
+          * @brief Assignment operator
+          */
+        const FFT1DAbstract& operator=(const FFT1DAbstract& other);
+
+        /**
+          * @brief Equal operator
+          */
+        bool operator==(const FFT1DAbstract& other) const;
+
+        /**
+          * @brief Not equal operator
+          */
+        bool operator!=(const FFT1DAbstract& other) const;
 
         /**
           * @brief process an array by applying the FFT
@@ -62,35 +82,28 @@ namespace bob {
         /**
           * @brief Reset the FFT1D object for the given 1D shape
           */
-        void reset(const int length);
+        void reset(const size_t length);
 
         /**
-          * @brief Get the current height of the FFT1D object
+          * @brief Getters
           */
-        inline const int getLength() { return m_length; }
-
-      private:
+        size_t getLength() const { return m_length; }
         /**
-          * @brief Call the initialization procedures
+          * @brief Setters
           */
-        void reset();
-
-        /**
-          * @brief Deallocate memory
-          */
-        void cleanup();
+        void setLength(const size_t length);
 
       protected:
         /**
           * Private attributes
           */
-        int m_length;
+        size_t m_length;
     };
 
 
     /**
       * @brief This class implements a direct 1D Discrete Fourier Transform 
-      * based on the FFTPACK library
+      * based on the FFTW library
       */
     class FFT1D: public FFT1DAbstract
     {
@@ -98,7 +111,32 @@ namespace bob {
         /**
           * @brief Constructor: Initialize working arrays
           */ 
-        FFT1D( const int length);
+        FFT1D( const size_t length);
+
+        /**
+          * @brief Copy constructor
+          */
+        FFT1D( const FFT1D& other);
+
+        /**
+          * @brief Destructor
+          */
+        virtual ~FFT1D() { }
+
+        /**
+          * @brief Assignment operator
+          */
+        const FFT1D& operator=(const FFT1D& other);
+
+        /**
+          * @brief Equal operator
+          */
+        bool operator==(const FFT1D& other) const;
+
+        /**
+          * @brief Not equal operator
+          */
+        bool operator!=(const FFT1D& other) const;
 
         /**
           * @brief process an array by applying the direct FFT
@@ -110,7 +148,7 @@ namespace bob {
 
     /**
       * @brief This class implements a inverse 1D Discrete Fourier Transform 
-      * based on the FFTPACK library
+      * based on the FFTW library
       */
     class IFFT1D: public FFT1DAbstract
     {
@@ -118,7 +156,32 @@ namespace bob {
         /**
           * @brief Constructor: Initialize working array
           */ 
-        IFFT1D( const int length);
+        IFFT1D( const size_t length);
+
+        /**
+          * @brief Copy constructor
+          */
+        IFFT1D( const IFFT1D& other);
+
+        /**
+          * @brief Destructor
+          */
+        virtual ~IFFT1D() { }
+
+        /**
+          * @brief Assignment operator
+          */
+        const IFFT1D& operator=(const IFFT1D& other);
+
+        /**
+          * @brief Equal operator
+          */
+        bool operator==(const IFFT1D& other) const;
+
+        /**
+          * @brief Not equal operator
+          */
+        bool operator!=(const IFFT1D& other) const;
 
         /**
           * @brief process an array by applying the inverse FFT

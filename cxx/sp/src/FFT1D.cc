@@ -26,55 +26,87 @@
 #include <fftw3.h>
 
 
-namespace ca = bob::core::array;
 namespace sp = bob::sp;
 
-sp::FFT1DAbstract::FFT1DAbstract( const int length):
+bob::sp::FFT1DAbstract::FFT1DAbstract( const size_t length):
   m_length(length)
 {
-  // Initialize working array and normalization factors
-  reset();
 }
 
-void sp::FFT1DAbstract::reset(const int length)
+bob::sp::FFT1DAbstract::FFT1DAbstract( const bob::sp::FFT1DAbstract& other):
+  m_length(other.m_length)
 {
-  // Reset if required
-  if( m_length != length) {
-    // Update the length
-    m_length = length;
-    // Deallocate memory
-    cleanup();
-    // Reset given the new height and width
-    reset();
+}
+
+const bob::sp::FFT1DAbstract& bob::sp::FFT1DAbstract::operator=(const FFT1DAbstract& other)
+{
+  if(this != &other)
+  {
+    reset(other.m_length);
   }
+  return *this;
 }
- 
-void sp::FFT1DAbstract::reset()
+
+bool bob::sp::FFT1DAbstract::operator==(const bob::sp::FFT1DAbstract& b) const
+{
+  return (this->m_length == b.m_length);
+}
+
+bool bob::sp::FFT1DAbstract::operator!=(const bob::sp::FFT1DAbstract& b) const
+{
+  return !(this->operator==(b));
+}
+
+void bob::sp::FFT1DAbstract::reset(const size_t length)
+{
+  // Update the length
+  m_length = length;
+}
+
+void bob::sp::FFT1DAbstract::setLength(const size_t length)
+{
+  reset(length);
+}
+
+
+bob::sp::FFT1D::FFT1D( const size_t length):
+  bob::sp::FFT1DAbstract(length)
 {
 }
 
-sp::FFT1DAbstract::~FFT1DAbstract()
-{
-  cleanup();
-}
-
-void sp::FFT1DAbstract::cleanup() {
-}
-
-sp::FFT1D::FFT1D( const int length):
-  sp::FFT1DAbstract::FFT1DAbstract(length)
+bob::sp::FFT1D::FFT1D( const bob::sp::FFT1D& other):
+  bob::sp::FFT1DAbstract(other)
 {
 }
 
-void sp::FFT1D::operator()(const blitz::Array<std::complex<double>,1>& src, 
+const bob::sp::FFT1D& bob::sp::FFT1D::operator=(const FFT1D& other)
+{
+  if(this != &other)
+  {
+    bob::sp::FFT1DAbstract::operator=(other);
+  }
+  return *this;
+}
+
+bool bob::sp::FFT1D::operator==(const bob::sp::FFT1D& b) const
+{
+  return (bob::sp::FFT1DAbstract::operator==(b));
+}
+
+bool bob::sp::FFT1D::operator!=(const bob::sp::FFT1D& b) const
+{
+  return !(this->operator==(b));
+}
+
+void bob::sp::FFT1D::operator()(const blitz::Array<std::complex<double>,1>& src, 
   blitz::Array<std::complex<double>,1>& dst)
 {
   // check input
-  ca::assertCZeroBaseContiguous(src);
+  bob::core::array::assertCZeroBaseContiguous(src);
 
   // Check output
-  ca::assertCZeroBaseContiguous(dst);
-  ca::assertSameShape( dst, src);
+  bob::core::array::assertCZeroBaseContiguous(dst);
+  bob::core::array::assertSameShape( dst, src);
 
   // Reinterpret cast to fftw format
   fftw_complex* src_ = reinterpret_cast<fftw_complex*>(const_cast<std::complex<double>* >(src.data()));
@@ -89,20 +121,44 @@ void sp::FFT1D::operator()(const blitz::Array<std::complex<double>,1>& src,
 }
 
 
-sp::IFFT1D::IFFT1D( const int length):
-  sp::FFT1DAbstract::FFT1DAbstract(length)
+bob::sp::IFFT1D::IFFT1D( const size_t length):
+  bob::sp::FFT1DAbstract(length)
 {
 }
 
-void sp::IFFT1D::operator()(const blitz::Array<std::complex<double>,1>& src, 
+bob::sp::IFFT1D::IFFT1D( const bob::sp::IFFT1D& other):
+  bob::sp::FFT1DAbstract(other)
+{
+}
+
+const bob::sp::IFFT1D& bob::sp::IFFT1D::operator=(const IFFT1D& other)
+{
+  if(this != &other)
+  {
+    bob::sp::FFT1DAbstract::operator=(other);
+  }
+  return *this;
+}
+
+bool bob::sp::IFFT1D::operator==(const bob::sp::IFFT1D& b) const
+{
+  return (bob::sp::FFT1DAbstract::operator==(b));
+}
+
+bool bob::sp::IFFT1D::operator!=(const bob::sp::IFFT1D& b) const
+{
+  return !(this->operator==(b));
+}
+
+void bob::sp::IFFT1D::operator()(const blitz::Array<std::complex<double>,1>& src, 
   blitz::Array<std::complex<double>,1>& dst)
 {
   // check input
-  ca::assertCZeroBaseContiguous(src);
+  bob::core::array::assertCZeroBaseContiguous(src);
 
   // Check output
-  ca::assertCZeroBaseContiguous(dst);
-  ca::assertSameShape( dst, src);
+  bob::core::array::assertCZeroBaseContiguous(dst);
+  bob::core::array::assertSameShape( dst, src);
 
   // Reinterpret cast to fftw format
   fftw_complex* src_ = reinterpret_cast<fftw_complex*>(const_cast<std::complex<double>* >(src.data()));

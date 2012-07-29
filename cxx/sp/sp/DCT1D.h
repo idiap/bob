@@ -27,11 +27,11 @@
 #include <blitz/array.h>
 
 namespace bob {
-/**
- * \ingroup libsp_api
- * @{
- *
- */
+  /**
+    * \ingroup libsp_api
+    * @{
+    *
+    */
   namespace sp {
 
     /**
@@ -45,12 +45,32 @@ namespace bob {
         /**
           * @brief Constructor: Initialize working array
           */
-        DCT1DAbstract( const int length);
+        DCT1DAbstract( const size_t length);
+
+        /**
+          * @brief Copy constructor
+          */
+        DCT1DAbstract( const DCT1DAbstract& other);
 
         /**
           * @brief Destructor
           */
-        virtual ~DCT1DAbstract();
+        virtual ~DCT1DAbstract() { }
+
+        /**
+          * @brief Assignment operator
+          */
+        const DCT1DAbstract& operator=(const DCT1DAbstract& other);
+
+        /**
+          * @brief Equal operator
+          */
+        bool operator==(const DCT1DAbstract& other) const;
+
+        /**
+          * @brief Not equal operator
+          */
+        bool operator!=(const DCT1DAbstract& other) const;
 
         /**
           * @brief process an array by applying the DCT
@@ -61,12 +81,17 @@ namespace bob {
         /**
           * @brief Reset the DCT1D object for the given 1D shape
           */
-        void reset(const int length);
+        void reset(const size_t length);
 
         /**
-          * @brief Get the current height of the DCT1D object
+          * @brief Getters
           */
-        inline const int getLength() { return m_length; }
+        size_t getLength() { return m_length; }
+        /**
+          * @brief Setters
+          */
+        void setLength(const size_t length);
+
 
       private:
         /**
@@ -79,16 +104,11 @@ namespace bob {
           */
         void reset();
 
-        /**
-          * @brief Deallocate memory
-          */
-        void cleanup();
-
       protected:
         /**
           * Private attributes
           */
-        int m_length;
+        size_t m_length;
 
         /**
           * Normalization factors
@@ -110,7 +130,32 @@ namespace bob {
         /**
           * @brief Constructor: Initialize working arrays
           */ 
-        DCT1D( const int length);
+        DCT1D( const size_t length);
+
+        /**
+          * @brief Copy constructor
+          */
+        DCT1D( const DCT1D& other);
+
+        /**
+          * @brief Destructor
+          */
+        virtual ~DCT1D() { }
+
+        /**
+          * @brief Assignment operator
+          */
+        const DCT1D& operator=(const DCT1D& other);
+
+        /**
+          * @brief Equal operator
+          */
+        bool operator==(const DCT1D& other) const;
+
+        /**
+          * @brief Not equal operator
+          */
+        bool operator!=(const DCT1D& other) const;
 
         /**
           * @brief process an array by applying the direct DCT
@@ -130,7 +175,32 @@ namespace bob {
         /**
           * @brief Constructor: Initialize working array
           */ 
-        IDCT1D( const int length);
+        IDCT1D( const size_t length);
+
+        /**
+          * @brief Copy constructor
+          */
+        IDCT1D( const IDCT1D& other);
+
+        /**
+          * @brief Destructor
+          */
+        virtual ~IDCT1D() { }
+
+        /**
+          * @brief Assignment operator
+          */
+        const IDCT1D& operator=(const IDCT1D& other);
+
+        /**
+          * @brief Equal operator
+          */
+        bool operator==(const IDCT1D& other) const;
+
+        /**
+          * @brief Not equal operator
+          */
+        bool operator!=(const IDCT1D& other) const;
 
         /**
           * @brief process an array by applying the inverse DCT
@@ -140,9 +210,9 @@ namespace bob {
     };
 
   }
-/**
- * @}
- */
+  /**
+    * @}
+    */
 }
 
 #endif /* BOB_SP_DCT1D_H */

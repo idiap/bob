@@ -3,7 +3,7 @@
  * @date Tue Apr 5 19:18:23 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * @brief Implement a blitz-based 2D Fast Cosine Transform using FFTPACK
+ * @brief Implement a blitz-based 2D Fast Cosine Transform using FFTW
  * functions
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
@@ -27,17 +27,16 @@
 #include <blitz/array.h>
 
 namespace bob {
-/**
- * \ingroup libsp_api
- * @{
- *
- */
+  /**
+    * \ingroup libsp_api
+    * @{
+    *
+    */
   namespace sp {
 
     /**
       * @brief This class implements a Discrete Cosine Transform based on the
-      * Netlib FFTPACK library. It is used as a base class for DCT2D and 
-      * IDCT2D classes.
+      * FFTW library. It is used as a base class for DCT2D and IDCT2D classes.
       */
     class DCT2DAbstract
     {
@@ -45,12 +44,32 @@ namespace bob {
         /**
           * @brief Constructor: Initialize working arrays
           */
-        DCT2DAbstract( const int height, const int width);
+        DCT2DAbstract( const size_t height, const size_t width);
+
+        /**
+          * @brief Copy constructor
+          */
+        DCT2DAbstract( const DCT2DAbstract& other);
 
         /**
           * @brief Destructor
           */
-        virtual ~DCT2DAbstract();
+        virtual ~DCT2DAbstract() { }
+
+        /**
+          * @brief Assignment operator
+          */
+        const DCT2DAbstract& operator=(const DCT2DAbstract& other);
+
+        /**
+          * @brief Equal operator
+          */
+        bool operator==(const DCT2DAbstract& other) const;
+
+        /**
+          * @brief Not equal operator
+          */
+        bool operator!=(const DCT2DAbstract& other) const;
 
         /**
           * @brief process an array by applying the DCT
@@ -61,17 +80,19 @@ namespace bob {
         /**
           * @brief Reset the DCT2D object for the given 2D shape
           */
-        void reset(const int height, const int width);
+        void reset(const size_t height, const size_t width);
 
         /**
-          * @brief Get the current height of the DCT2D object
+          * @brief Getters
           */
-        inline const int getHeight() { return m_height; }
+        size_t getHeight() const { return m_height; }
+        size_t getWidth() const { return m_width; }
 
         /**
-          * @brief Get the current width of the DCT2D object
+          * @brief Setters
           */
-        inline const int getWidth() { return m_width; }
+        void setHeight(const size_t height);
+        void setWidth(const size_t width);
 
       private:
         /**
@@ -84,17 +105,12 @@ namespace bob {
           */
         void reset();
 
-        /**
-          * @brief Deallocate memory
-          */
-        void cleanup();
-
       protected:
         /**
           * Private attributes
           */
-        int m_height;
-        int m_width;
+        size_t m_height;
+        size_t m_width;
 
         /**
           * Normalization factors
@@ -108,7 +124,7 @@ namespace bob {
 
     /**
       * @brief This class implements a direct 2D Discrete Cosine Transform 
-      * based on the FFTPACK library
+      * based on the FFTW library
       */
     class DCT2D: public DCT2DAbstract
     {
@@ -116,7 +132,32 @@ namespace bob {
         /**
           * @brief Constructor: Initialize working arrays
           */ 
-        DCT2D( const int height, const int width);
+        DCT2D( const size_t height, const size_t width);
+
+        /**
+          * @brief Copy constructor
+          */
+        DCT2D( const DCT2D& other);
+
+        /**
+          * @brief Destructor
+          */
+        virtual ~DCT2D() { }
+
+        /**
+          * @brief Assignment operator
+          */
+        const DCT2D& operator=(const DCT2D& other);
+
+        /**
+          * @brief Equal operator
+          */
+        bool operator==(const DCT2D& other) const;
+
+        /**
+          * @brief Not equal operator
+          */
+        bool operator!=(const DCT2D& other) const;
 
         /**
           * @brief process an array by applying the direct DCT
@@ -128,7 +169,7 @@ namespace bob {
 
     /**
       * @brief This class implements a inverse 2D Discrete Cosine Transform 
-      * based on the FFTPACK library
+      * based on the FFTW library
       */
     class IDCT2D: public DCT2DAbstract
     {
@@ -136,7 +177,32 @@ namespace bob {
         /**
           * @brief Constructor: Initialize working arrays
           */ 
-        IDCT2D( const int height, const int width);
+        IDCT2D( const size_t height, const size_t width);
+
+        /**
+          * @brief Copy constructor
+          */
+        IDCT2D( const IDCT2D& other);
+
+        /**
+          * @brief Destructor
+          */
+        virtual ~IDCT2D() { }
+
+        /**
+          * @brief Assignment operator
+          */
+        const IDCT2D& operator=(const IDCT2D& other);
+
+        /**
+          * @brief Equal operator
+          */
+        bool operator==(const IDCT2D& other) const;
+
+        /**
+          * @brief Not equal operator
+          */
+        bool operator!=(const IDCT2D& other) const;
 
         /**
           * @brief process an array by applying the inverse DCT
@@ -146,9 +212,9 @@ namespace bob {
     };
 
   }
-/**
- * @}
- */
+  /**
+    * @}
+    */
 }
 
 #endif /* BOB_SP_DCT2D_H */

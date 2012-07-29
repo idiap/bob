@@ -25,65 +25,108 @@
 #include "core/array_assert.h"
 #include <fftw3.h>
 
-namespace ca = bob::core::array;
-namespace sp = bob::sp;
-
-sp::DCT1DAbstract::DCT1DAbstract( const int length):
+bob::sp::DCT1DAbstract::DCT1DAbstract( const size_t length):
   m_length(length)
 {
   // Initialize working array and normalization factors
   reset();
 }
 
-void sp::DCT1DAbstract::reset(const int length)
+bob::sp::DCT1DAbstract::DCT1DAbstract( const bob::sp::DCT1DAbstract& other):
+  m_length(other.m_length)
+{
+  // Initialize working array and normalization factors
+  reset();
+}
+
+const bob::sp::DCT1DAbstract& bob::sp::DCT1DAbstract::operator=(const DCT1DAbstract& other)
+{
+  if(this != &other)
+  {
+    reset(other.m_length);
+  }
+  return *this;
+}
+
+bool bob::sp::DCT1DAbstract::operator==(const bob::sp::DCT1DAbstract& b) const
+{
+  return (this->m_length == b.m_length);
+}
+
+bool bob::sp::DCT1DAbstract::operator!=(const bob::sp::DCT1DAbstract& b) const
+{
+  return !(this->operator==(b));
+}
+
+void bob::sp::DCT1DAbstract::reset(const size_t length)
 {
   if( m_length != length) {
     // Update the length
     m_length = length;
-    // Deallocate memory
-    cleanup();
     // Reset given the new height and width
     reset();
   }
 }
+
+void bob::sp::DCT1DAbstract::setLength(const size_t length)
+{
+  reset(length);
+}
  
-void sp::DCT1DAbstract::reset()
+void bob::sp::DCT1DAbstract::reset()
 {
   // Precompute some normalization factors
   initNormFactors();
 }
 
-sp::DCT1DAbstract::~DCT1DAbstract()
-{
-  cleanup();
-}
-
-void sp::DCT1DAbstract::initNormFactors()
+void bob::sp::DCT1DAbstract::initNormFactors()
 {
   // Precompute multiplicative factors
-  m_sqrt_1byl=sqrt(1./m_length);
-  m_sqrt_2byl=sqrt(2./m_length);
-  m_sqrt_1l=sqrt(1.*m_length);
-  m_sqrt_2l=sqrt(2.*m_length);
+  m_sqrt_1byl=sqrt(1./(double)m_length);
+  m_sqrt_2byl=sqrt(2./(double)m_length);
+  m_sqrt_1l=sqrt(1.*(double)m_length);
+  m_sqrt_2l=sqrt(2.*(double)m_length);
 }
 
-void sp::DCT1DAbstract::cleanup() {
-}
 
-sp::DCT1D::DCT1D( const int length):
-  sp::DCT1DAbstract::DCT1DAbstract(length)
+bob::sp::DCT1D::DCT1D( const size_t length):
+  bob::sp::DCT1DAbstract(length)
 {
 }
 
-void sp::DCT1D::operator()(const blitz::Array<double,1>& src, 
+bob::sp::DCT1D::DCT1D( const bob::sp::DCT1D& other):
+  bob::sp::DCT1DAbstract(other)
+{
+}
+
+const bob::sp::DCT1D& bob::sp::DCT1D::operator=(const DCT1D& other)
+{
+  if(this != &other)
+  {
+    bob::sp::DCT1DAbstract::operator=(other);
+  }
+  return *this;
+}
+
+bool bob::sp::DCT1D::operator==(const bob::sp::DCT1D& b) const
+{
+  return (bob::sp::DCT1DAbstract::operator==(b));
+}
+
+bool bob::sp::DCT1D::operator!=(const bob::sp::DCT1D& b) const
+{
+  return !(this->operator==(b));
+}
+
+void bob::sp::DCT1D::operator()(const blitz::Array<double,1>& src, 
   blitz::Array<double,1>& dst)
 {
   // check input
-  ca::assertCZeroBaseContiguous(src);
+  bob::core::array::assertCZeroBaseContiguous(src);
 
   // Check output
-  ca::assertCZeroBaseContiguous(dst);
-  ca::assertSameShape( dst, src);
+  bob::core::array::assertCZeroBaseContiguous(dst);
+  bob::core::array::assertSameShape( dst, src);
 
   // Reinterpret cast to fftw format
   double* src_ = const_cast<double*>(src.data());
@@ -106,20 +149,44 @@ void sp::DCT1D::operator()(const blitz::Array<double,1>& src,
 }
 
 
-sp::IDCT1D::IDCT1D( const int length):
-  sp::DCT1DAbstract::DCT1DAbstract(length)
+bob::sp::IDCT1D::IDCT1D( const size_t length):
+  bob::sp::DCT1DAbstract(length)
 {
 }
 
-void sp::IDCT1D::operator()(const blitz::Array<double,1>& src, 
+bob::sp::IDCT1D::IDCT1D( const bob::sp::IDCT1D& other):
+  bob::sp::DCT1DAbstract(other)
+{
+}
+
+const bob::sp::IDCT1D& bob::sp::IDCT1D::operator=(const IDCT1D& other)
+{
+  if(this != &other)
+  {
+    bob::sp::DCT1DAbstract::operator=(other);
+  }
+  return *this;
+}
+
+bool bob::sp::IDCT1D::operator==(const bob::sp::IDCT1D& b) const
+{
+  return (bob::sp::DCT1DAbstract::operator==(b));
+}
+
+bool bob::sp::IDCT1D::operator!=(const bob::sp::IDCT1D& b) const
+{
+  return !(this->operator==(b));
+}
+
+void bob::sp::IDCT1D::operator()(const blitz::Array<double,1>& src, 
   blitz::Array<double,1>& dst)
 {
   // check input
-  ca::assertCZeroBaseContiguous(src);
+  bob::core::array::assertCZeroBaseContiguous(src);
 
   // Check output
-  ca::assertCZeroBaseContiguous(dst);
-  ca::assertSameShape( dst, src);
+  bob::core::array::assertCZeroBaseContiguous(dst);
+  bob::core::array::assertSameShape( dst, src);
 
   // Copy content from src to dst
   dst = src;

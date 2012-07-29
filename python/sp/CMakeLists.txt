@@ -4,7 +4,8 @@ cmake_minimum_required(VERSION 2.6)
 set(ccsrc
    "src/version.cc"
    "src/extrapolate.cc"
-   "src/fft_dct.cc"
+   "src/dct.cc"
+   "src/fft.cc"
    "src/main.cc"
    )
 
