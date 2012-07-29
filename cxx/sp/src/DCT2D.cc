@@ -67,7 +67,19 @@ void bob::sp::DCT2DAbstract::reset(const size_t height, const size_t width)
     reset();
   }
 }
- 
+
+void bob::sp::DCT2DAbstract::setHeight(const size_t height)
+{
+  m_height = height;
+  reset();
+}
+
+void bob::sp::DCT2DAbstract::setWidth(const size_t width)
+{
+  m_width = width;
+  reset();
+}
+
 void bob::sp::DCT2DAbstract::reset()
 {
   // Precompute some normalization factors
