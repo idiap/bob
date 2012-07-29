@@ -31,6 +31,7 @@
 #include "ip/Exception.h"
 
 #include <list>
+#include <boost/shared_ptr.hpp>
 
 #include "ip/block.h"
 #include "sp/DCT2D.h"
@@ -59,21 +60,18 @@ namespace bob {
       /**
         * @brief Constructor: generates a DCTFeatures extractor
         */
-      DCTFeatures( const int block_h, const int block_w, const int overlap_h, 
-        const int overlap_w, const int n_dct_coefs): m_dct2d(0),
+      DCTFeatures( const size_t block_h, const size_t block_w, const size_t overlap_h, 
+        const size_t overlap_w, const size_t n_dct_coefs): 
+          m_dct2d(new bob::sp::DCT2D(block_h, block_w)),
           m_block_h(block_h), m_block_w(block_w), m_overlap_h(overlap_h), 
           m_overlap_w(overlap_w), m_n_dct_coefs(n_dct_coefs)
       {
-        m_dct2d = new bob::sp::DCT2D(block_h, block_w);
       }
 
       /**
         * @brief Destructor
         */
-      virtual ~DCTFeatures() {
-        if( m_dct2d!=0)
-          delete m_dct2d;
-      }
+      virtual ~DCTFeatures() { }
 
       /**
         * @brief Process a 2D blitz Array/Image by extracting DCT features.
@@ -82,7 +80,7 @@ namespace bob {
         *   of 1D double blitz arrays.
         */
       template <typename T, typename U> 
-      void operator()(const blitz::Array<T,2>& src, U& dst);
+      void operator()(const blitz::Array<T,2>& src, U& dst) const;
 
       /**
        * @brief Process a list of blocks by extracting DCT features.
@@ -100,23 +98,23 @@ namespace bob {
         * @param src The input blitz array
         */
       template<typename T>
-      const int getNBlocks(const blitz::Array<T,2>& src);
+      size_t getNBlocks(const blitz::Array<T,2>& src) const;
 
     private:
       /**
         * Attributes
         */
-      bob::sp::DCT2D *m_dct2d;
-      int m_block_h;
-      int m_block_w;
-      int m_overlap_h;
-      int m_overlap_w;
-      int m_n_dct_coefs;
+      boost::shared_ptr<bob::sp::DCT2D> m_dct2d;
+      size_t m_block_h;
+      size_t m_block_w;
+      size_t m_overlap_h;
+      size_t m_overlap_w;
+      size_t m_n_dct_coefs;
   };
 
   template <typename T, typename U> 
   void DCTFeatures::operator()(const blitz::Array<T,2>& src, 
-    U& dst) 
+    U& dst) const
   { 
     // cast to double
     blitz::Array<double,2> double_version = bob::core::cast<double>(src);
@@ -174,7 +172,7 @@ namespace bob {
   }
   
   template<typename T>
-  const int DCTFeatures::getNBlocks(const blitz::Array<T,2>& src)
+  size_t DCTFeatures::getNBlocks(const blitz::Array<T,2>& src) const
   {
     const blitz::TinyVector<int,3> res = getBlock3DOutputShape(src, m_block_h, 
       m_block_w, m_overlap_h, m_overlap_w); 
