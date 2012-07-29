@@ -39,6 +39,7 @@ namespace bob {
     namespace Extrapolation {
       typedef enum BorderType_ {
         Zero,
+        Constant,
         NearestNeighbour,
         Circular,
         Mirror
@@ -548,11 +549,62 @@ namespace bob {
       // Calls the recursive function for the borders
       detail::extrapolateMirrorRec(src, dst);
     }
+
+    template<typename T>
+    void extrapolate(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst, 
+      const Extrapolation::BorderType border_type = Extrapolation::Zero, 
+      const T value=0)
+    {
+      switch(border_type)
+      {
+        case Extrapolation::NearestNeighbour:
+          extrapolateNearest(src, dst);
+          break;
+        case Extrapolation::Circular:
+          extrapolateCircular(src, dst);
+          break;
+        case Extrapolation::Mirror:
+          extrapolateMirror(src, dst);
+          break;
+        case Extrapolation::Constant:
+          extrapolateConstant(src, dst, value);
+          break;
+        case Extrapolation::Zero:
+        default:
+          extrapolateZero(src, dst);
+      }
+    }
+
+    template<typename T>
+    void extrapolate(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst, 
+      const Extrapolation::BorderType border_type = Extrapolation::Zero, 
+      const T value=0)
+    {
+      switch(border_type)
+      {
+        case Extrapolation::NearestNeighbour:
+          extrapolateNearest(src, dst); 
+          break;
+        case Extrapolation::Circular:
+          extrapolateCircular(src, dst);
+          break;
+        case Extrapolation::Mirror:
+          extrapolateMirror(src, dst);
+          break;
+        case Extrapolation::Constant:
+          extrapolateConstant(src, dst, value);
+          break;
+        case Extrapolation::Zero:
+        default:
+          extrapolateZero(src, dst);
+      }
+    }
  
+  
   }
 /**
  * @}
  */
 }
 
-#endif /* BOB_SP_INTERPOLATE_H */
+#endif /* BOB_SP_EXTRAPOLATE_H */
