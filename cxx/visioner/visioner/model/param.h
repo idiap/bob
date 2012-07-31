@@ -41,7 +41,12 @@ namespace bob { namespace visioner {
 
     public:
 
-      // Default Constructor
+      /**
+       * Default Constructor
+       *
+       * @note Other parameters are hard-coded within the constructor
+       * initialization. Have a look there to find all default parameters.
+       */
       param_t(
           index_t rows=24,
           index_t cols=20,
