@@ -324,9 +324,9 @@ def add_files(session, imagedir):
     """Parse a single filename and add it to the list."""
     v = os.path.splitext(basename)[0].split('_')
     if(subdir == 'frontal'):
-      session.add(File(int(v[0]), os.path.join(client_dir, basename), int(v[1]), 'n', int(v[2])))  
+      session.add(File(int(v[0]), os.path.join(subdir, client_dir, basename), int(v[1]), 'n', int(v[2])))  
     elif(subdir == 'darkened'):
-      session.add(File(int(v[0]), os.path.join(client_dir, basename), 4, v[2][0], int(v[2][1])))  
+      session.add(File(int(v[0]), os.path.join(subdir, client_dir, basename), 4, v[2][0], int(v[2][1])))  
  
   for subdir in ('frontal', 'darkened'): 
     imagedir_app = os.path.join(imagedir,subdir)
