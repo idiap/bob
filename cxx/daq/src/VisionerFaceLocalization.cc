@@ -34,7 +34,7 @@ VisionerFaceLocalization::VisionerFaceLocalization(const char* model_path) :
   thread = 0;
   mustStop = false;
   
-  bool ok = false;
+  bool ok = true;
   try {
     detector.reset(new bob::visioner::CVDetector(model_path));
   }
