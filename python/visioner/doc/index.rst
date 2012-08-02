@@ -22,11 +22,11 @@
  Visioner
 ==========
 
-The Visioner is a library that implements face detection and key point
-localization in still images. The Visioner is compiled as an external project
-to |project| and we only provide a limited set of interfaces allowing
-detection and localization. You can incorporate a call to the Visioner
-detection system in 3-ways on your script:
+The Visioner is a library that implements face detection, key point
+localization and pose estimation in still images using `Boosted Classifiers
+<http://en.wikipedia.org/wiki/Boosting>`_. For the time being, We only provide
+a limited set of interfaces allowing detection and localization. You can
+incorporate a call to the Visioner detection system in 3-ways on your script:
 
 1. Use simple (single) face detection with
    :py:class:`bob.visioner.MaxDetector`:
