@@ -48,7 +48,7 @@ class Database(object):
     Keyword Parameters:
 
     protocol
-      One of the XM2VTS protocols ('lp1', 'lp2').
+      One of the XM2VTS protocols ('lp1', 'lp2', 'darkened-lp1', 'darkened-lp2').
     
     groups
       The groups to which the clients belong ('dev', 'eval', 'world').
@@ -78,7 +78,7 @@ class Database(object):
     Keyword Parameters:
 
     protocol
-      One of the XM2VTS protocols ('lp1', 'lp2').
+      One of the XM2VTS protocols ('lp1', 'lp2', 'darkened-lp1', 'darkened-lp2').
     
     groups
       The groups to which the subjects attached to the models belong ('dev', 'eval', 'world')
@@ -153,7 +153,7 @@ class Database(object):
       A filename extension that will be appended to the final filepath returned
 
     protocol
-      One of the XM2VTS protocols ('lp1', 'lp2').
+      One of the XM2VTS protocols ('lp1', 'lp2', 'darkened-lp1', 'darkened-lp2').
 
     purposes
       The purposes required to be retrieved ('enrol', 'probe') or a tuple
@@ -194,7 +194,7 @@ class Database(object):
       if directory: return os.path.join(directory, stem + extension)
       return stem + extension
 
-    VALID_PROTOCOLS = ('lp1', 'lp2')
+    VALID_PROTOCOLS = ('lp1', 'lp2', 'darkened-lp1', 'darkened-lp2')
     VALID_PURPOSES = ('enrol', 'probe')
     VALID_GROUPS = ('dev', 'eval', 'world')
     VALID_CLASSES = ('client', 'impostor')
@@ -217,7 +217,7 @@ class Database(object):
       q = self.session.query(File, Protocol).join(Client).\
             filter(Client.sgroup.in_(clientGroup)).\
             filter(and_(Protocol.name.in_(protocol), Protocol.purpose == 'enrol')).\
-            filter(and_(File.session_id == Protocol.session_id, File.shot_id == Protocol.shot_id))
+            filter(and_(File.session_id == Protocol.session_id, File.darkened == Protocol.darkened, File.shot_id == Protocol.shot_id))
       if model_ids:
         q = q.filter(Client.id.in_(model_ids))
       q = q.order_by(File.client_id, File.session_id, File.shot_id)
@@ -229,7 +229,7 @@ class Database(object):
         q = self.session.query(File, Protocol).join(Client).\
               filter(Client.sgroup.in_(clientGroup)).\
               filter(and_(Protocol.name.in_(protocol), Protocol.purpose == 'enrol')).\
-              filter(and_(File.session_id == Protocol.session_id, File.shot_id == Protocol.shot_id))
+              filter(and_(File.session_id == Protocol.session_id, File.darkened == Protocol.darkened, File.shot_id == Protocol.shot_id))
         if model_ids:
           q = q.filter(Client.id.in_(model_ids))
         q = q.order_by(File.client_id, File.session_id, File.shot_id)
@@ -246,29 +246,42 @@ class Database(object):
           q = self.session.query(File, Protocol).join(Client).\
                 filter(Client.sgroup.in_(clientGroup)).\
                 filter(and_(Protocol.name.in_(protocol), Protocol.purpose == 'probe', Protocol.sgroup.in_(dev_eval))).\
-                filter(and_(File.session_id == Protocol.session_id, File.shot_id == Protocol.shot_id))
+                filter(and_(File.session_id == Protocol.session_id, File.darkened == Protocol.darkened, File.shot_id == Protocol.shot_id))
           if model_ids:
             q = q.filter(Client.id.in_(model_ids))
-          q = q.order_by(File.client_id, File.session_id, File.shot_id)
+          q = q.order_by(File.client_id, File.session_id, File.darkened, File.shot_id)
           for k in q:
             retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
 
         if('impostor' in classes):
+          # Keep all darkened image from impostors of evaluation (named test in the XM2VTS reference)
+          if(('darkened-lp1' in protocol or 'darkened-lp2' in protocol) and 'eval' in groups):
+            q = self.session.query(File).join(Client).\
+                  filter(Client.sgroup == 'impostorEval').\
+                  filter(or_(File.darkened == 'l', File.darkened == 'r'))
+            q = q.order_by(File.client_id, File.session_id, File.shot_id)
+            for k in q:
+              if(model_ids and len(model_ids) > 0):
+                retval[k.id] = (make_path(k.path, directory, extension), model_ids[0], model_ids[0], k.client_id, k.path)
+              else:
+                retval[k.id] = (make_path(k.path, directory, extension), 0, 0, k.client_id, k.path) 
           ltmp = []
           if( 'dev' in groups):
             ltmp.append('impostorDev')
           if( 'eval' in groups):
             ltmp.append('impostorEval')
           impostorGroups = tuple(ltmp)
-          q = self.session.query(File).join(Client).\
-                filter(Client.sgroup.in_(impostorGroups))
-          q = q.order_by(File.client_id, File.session_id, File.shot_id)
-          for k in q:
-            if(model_ids and len(model_ids) > 0):
-              retval[k.id] = (make_path(k.path, directory, extension), model_ids[0], model_ids[0], k.client_id, k.path)
-            else:
-              retval[k.id] = (make_path(k.path, directory, extension), 0, 0, k.client_id, k.path)
-
+          # Keeps all non-darkened image from impostors
+          if(not ('darkened-lp1' in protocol or 'darkened-lp2' in protocol) or 'dev' in groups):
+            q = self.session.query(File).join(Client).\
+                  filter(Client.sgroup.in_(impostorGroups)).\
+                  filter(File.darkened == 'n')
+            q = q.order_by(File.client_id, File.session_id, File.shot_id)
+            for k in q:
+              if(model_ids and len(model_ids) > 0):
+                retval[k.id] = (make_path(k.path, directory, extension), model_ids[0], model_ids[0], k.client_id, k.path)
+              else:
+                retval[k.id] = (make_path(k.path, directory, extension), 0, 0, k.client_id, k.path) 
     return retval
 
   def files(self, directory=None, extension=None, protocol=None,
@@ -284,7 +297,7 @@ class Database(object):
       A filename extension that will be appended to the final filepath returned
 
     protocol
-      One of the XM2VTS protocols ('lp1', 'lp2').
+      One of the XM2VTS protocols ('lp1', 'lp2', 'darkened-lp1', 'darkened-lp2').
 
     purposes
       The purposes required to be retrieved ('enrol', 'probe') or a tuple

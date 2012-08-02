@@ -33,15 +33,17 @@ class File(Base):
   client_id = Column(Integer, ForeignKey('client.id')) # for SQL
   path = Column(String(100), unique=True)
   session_id = Column(Integer)
+  darkened = Column(Enum('n','l','r')) # none, left, right
   shot_id = Column(Integer)
 
   # for Python
   client = relationship("Client", backref="client_file")
 
-  def __init__(self, client_id, path, session_id, shot_id):
+  def __init__(self, client_id, path, session_id, darkened, shot_id):
     self.client_id = client_id
     self.path = path
     self.session_id = session_id
+    self.darkened = darkened
     self.shot_id = shot_id
 
   def __repr__(self):
@@ -52,18 +54,20 @@ class Protocol(Base):
   __tablename__ = 'protocol'
   
   id = Column(Integer, primary_key=True)
-  name = Column(Enum('lp1', 'lp2'))
+  name = Column(Enum('lp1', 'lp2', 'darkened-lp1', 'darkened-lp2'))
   sgroup = Column(Enum('', 'dev', 'eval'))
   purpose = Column(Enum('enrol', 'probe'))
   session_id = Column(Integer)
+  darkened = Column(Enum('n','l','r')) # none, left, right
   shot_id = Column(Integer)
 
-  def __init__(self, name, group, purpose, session_id, shot_id):
+  def __init__(self, name, group, purpose, session_id, darkened, shot_id):
     self.name = name
     self.sgroup = group
     self.purpose = purpose
     self.session_id = session_id
+    self.darkened = darkened
     self.shot_id = shot_id
 
   def __repr__(self):
-    return "<Protocol('%d', '%s', '%s', '%s', '%d', '%d')>" % (self.session_id, self.name, self.sgroup, self.purpose, self.session_id, self.shot_id)
+    return "<Protocol('%s', '%s', '%s', '%d', '%s', '%d')>" % (self.name, self.sgroup, self.purpose, self.session_id, self.darkened, self.shot_id)

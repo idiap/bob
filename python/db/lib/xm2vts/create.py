@@ -320,40 +320,70 @@ def add_clients(session):
 def add_files(session, imagedir):
   """Add files to the XM2VTS database."""
  
-  def add_file(session, basename, client_dir):
+  def add_file(session, basename, client_dir, subdir):
     """Parse a single filename and add it to the list."""
     v = os.path.splitext(basename)[0].split('_')
-    session.add(File(int(v[0]), os.path.join(client_dir, basename), int(v[1]), int(v[2])))
-  
-  file_list = os.listdir(imagedir)
-  for cl_dir in filter(nodot, file_list):
-    if os.path.isdir(os.path.join(imagedir, cl_dir)):
-      client_dir = os.path.join(imagedir, cl_dir)
-      for filename in filter(nodot, os.listdir(client_dir)):
-        basename, extension = os.path.splitext(filename)
-        add_file(session, basename, cl_dir)
+    if(subdir == 'frontal'):
+      session.add(File(int(v[0]), os.path.join(client_dir, basename), int(v[1]), 'n', int(v[2])))  
+    elif(subdir == 'darkened'):
+      session.add(File(int(v[0]), os.path.join(client_dir, basename), 4, v[2][0], int(v[2][1])))  
+ 
+  for subdir in ('frontal', 'darkened'): 
+    imagedir_app = os.path.join(imagedir,subdir)
+    file_list = os.listdir(imagedir_app)
+    for cl_dir in filter(nodot, file_list):
+      if os.path.isdir(os.path.join(imagedir_app, cl_dir)):
+        client_dir = os.path.join(imagedir_app, cl_dir)
+        for filename in filter(nodot, os.listdir(client_dir)):
+          basename, extension = os.path.splitext(filename)
+          add_file(session, basename, cl_dir, subdir)
 
 def add_protocols(session):
   """Adds protocols"""
   # Protocol lp1
-  session.add(Protocol('lp1', '', 'enrol', 1, 1))
-  session.add(Protocol('lp1', '', 'enrol', 2, 1))
-  session.add(Protocol('lp1', '', 'enrol', 3, 1))
-  session.add(Protocol('lp1', 'dev', 'probe', 1, 2))
-  session.add(Protocol('lp1', 'dev', 'probe', 2, 2))
-  session.add(Protocol('lp1', 'dev', 'probe', 3, 2))
-  session.add(Protocol('lp1', 'eval', 'probe', 4, 1))
-  session.add(Protocol('lp1', 'eval', 'probe', 4, 2))
+  session.add(Protocol('lp1', '', 'enrol', 1, 'n', 1))
+  session.add(Protocol('lp1', '', 'enrol', 2, 'n', 1))
+  session.add(Protocol('lp1', '', 'enrol', 3, 'n', 1))
+  session.add(Protocol('lp1', 'dev', 'probe', 1, 'n', 2))
+  session.add(Protocol('lp1', 'dev', 'probe', 2, 'n', 2))
+  session.add(Protocol('lp1', 'dev', 'probe', 3, 'n', 2))
+  session.add(Protocol('lp1', 'eval', 'probe', 4, 'n', 1))
+  session.add(Protocol('lp1', 'eval', 'probe', 4, 'n', 2))
   
   # Protocol lp2
-  session.add(Protocol('lp2', '', 'enrol', 1, 1))
-  session.add(Protocol('lp2', '', 'enrol', 1, 2))
-  session.add(Protocol('lp2', '', 'enrol', 2, 1))
-  session.add(Protocol('lp2', '', 'enrol', 2, 2))
-  session.add(Protocol('lp2', 'dev', 'probe', 3, 1))
-  session.add(Protocol('lp2', 'dev', 'probe', 3, 2))
-  session.add(Protocol('lp2', 'eval', 'probe', 4, 1))
-  session.add(Protocol('lp2', 'eval', 'probe', 4, 2))
+  session.add(Protocol('lp2', '', 'enrol', 1, 'n', 1))
+  session.add(Protocol('lp2', '', 'enrol', 1, 'n', 2))
+  session.add(Protocol('lp2', '', 'enrol', 2, 'n', 1))
+  session.add(Protocol('lp2', '', 'enrol', 2, 'n', 2))
+  session.add(Protocol('lp2', 'dev', 'probe', 3, 'n', 1))
+  session.add(Protocol('lp2', 'dev', 'probe', 3, 'n', 2))
+  session.add(Protocol('lp2', 'eval', 'probe', 4, 'n', 1))
+  session.add(Protocol('lp2', 'eval', 'probe', 4, 'n', 2))
+
+  # Protocol darkened-lp1
+  session.add(Protocol('darkened-lp1', '', 'enrol', 1, 'n', 1))
+  session.add(Protocol('darkened-lp1', '', 'enrol', 2, 'n', 1))
+  session.add(Protocol('darkened-lp1', '', 'enrol', 3, 'n', 1))
+  session.add(Protocol('darkened-lp1', 'dev', 'probe', 1, 'n', 2))
+  session.add(Protocol('darkened-lp1', 'dev', 'probe', 2, 'n', 2))
+  session.add(Protocol('darkened-lp1', 'dev', 'probe', 3, 'n', 2))
+  session.add(Protocol('darkened-lp1', 'eval', 'probe', 4, 'l', 1))
+  session.add(Protocol('darkened-lp1', 'eval', 'probe', 4, 'l', 2))
+  session.add(Protocol('darkened-lp1', 'eval', 'probe', 4, 'r', 1))
+  session.add(Protocol('darkened-lp1', 'eval', 'probe', 4, 'r', 2))
+
+  # Protocol darkened-lp2
+  session.add(Protocol('darkened-lp2', '', 'enrol', 1, 'n', 1))
+  session.add(Protocol('darkened-lp2', '', 'enrol', 1, 'n', 2))
+  session.add(Protocol('darkened-lp2', '', 'enrol', 2, 'n', 1))
+  session.add(Protocol('darkened-lp2', '', 'enrol', 2, 'n', 2))
+  session.add(Protocol('darkened-lp2', 'dev', 'probe', 3, 'n', 1))
+  session.add(Protocol('darkened-lp2', 'dev', 'probe', 3, 'n', 2))
+  session.add(Protocol('darkened-lp2', 'eval', 'probe', 4, 'l', 1))
+  session.add(Protocol('darkened-lp2', 'eval', 'probe', 4, 'l', 2))
+  session.add(Protocol('darkened-lp2', 'eval', 'probe', 4, 'r', 1))
+  session.add(Protocol('darkened-lp2', 'eval', 'probe', 4, 'r', 2))
+
 
 def create_tables(args):
   """Creates all necessary tables (only to be used at the first time)"""
@@ -399,7 +429,7 @@ def add_command(subparsers):
   parser.add_argument('--verbose', action='store_true', default=False,
       help="Do SQL operations in a verbose way")
   parser.add_argument('--imagedir', action='store', metavar='DIR',
-      default='/idiap/resource/database/xm2vtsdb/images/frontal/',
+      default='/idiap/temp/lelshafey/db/xm2vts/',
       help="Change the relative path to the directory containing the images of the XM2VTS database (defaults to %(default)s)")
   
   parser.set_defaults(func=create) #action
