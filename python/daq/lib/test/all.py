@@ -3,11 +3,13 @@
 """Test data aquisition
 """
 
-import os, sys
+import os
+import sys
 import unittest
-import bob.io
-from bob.daq import *
 import tempfile
+
+from ...io import VideoReader
+from .. import *
 
 def get_tempfilename(prefix='bobtest_', suffix='.avi'):
   (fd, name) = tempfile.mkstemp(suffix, prefix)
@@ -21,7 +23,7 @@ class DaqTest(unittest.TestCase):
   """Performs various data aquisition tests."""
   
   def test_VideoReaderCamera(self):
-    video = bob.io.VideoReader(INPUT_VIDEO)
+    video = VideoReader(INPUT_VIDEO)
 
     pf = PixelFormat.RGB24
     fs = FrameSize(video.width, video.height)
@@ -33,10 +35,7 @@ class DaqTest(unittest.TestCase):
     self.assertTrue(camera.get_supported_frame_sizes(pf)[0] == fs)
     self.assertTrue(camera.get_supported_frame_intervals(pf, fs)[0] == fi)
 
-    if hasVisioner:
-      fl = VisionerFaceLocalization()
-    else:
-      fl = NullFaceLocalization()
+    fl = VisionerFaceLocalization()
     
     controller = SimpleController()
     display = ConsoleDisplay()
@@ -74,4 +73,5 @@ class DaqTest(unittest.TestCase):
     os.unlink(text_file)
 
 # Instantiates our standard main module for unittests
-main = bob.helper.unittest_main(DaqTest)
+from ...helper import unittest_main
+main = unittest_main(DaqTest)

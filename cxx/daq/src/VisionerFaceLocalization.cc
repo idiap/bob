@@ -37,6 +37,8 @@ VisionerFaceLocalization::VisionerFaceLocalization(const char* model_path) :
   bool ok = true;
   try {
     detector.reset(new bob::visioner::CVDetector(model_path));
+    detector->m_type = bob::visioner::CVDetector::Scanning;
+    detector->set_scan_levels(10);
   }
   catch(...) {
     ok = false;
@@ -117,7 +119,13 @@ void VisionerFaceLocalization::localize() {
       // Detection
       detector->scan(detections);
       detector->sort_desc(detections);
-      visioner::detection_t detect = detections.at(0);
+  
+      if (detections.size() == 0) {
+        fprintf(stderr, "Visioner cannot find faces on image\n");
+        continue;
+      }
+
+      visioner::detection_t& detect = detections[0];
 
       FaceLocalizationCallback::BoundingBox bb;
 

@@ -35,11 +35,8 @@
 #include <daq/FaceLocalization.h>
 #include <daq/NullFaceLocalization.h>
 #include <daq/ConsoleDisplay.h>
-
-#ifdef VISIONER
-  #include <daq/CaptureSystem.h>
-  #include <daq/VisionerFaceLocalization.h>
-#endif
+#include <daq/CaptureSystem.h>
+#include <daq/VisionerFaceLocalization.h>
 
 #ifdef V4L2
   #include <daq/V4LCamera.h>
@@ -97,7 +94,6 @@ static std::string FrameInterval__str__(Camera::FrameInterval const &self) {
 void bind_daq_all() {
   using namespace boost::python;
 
-#ifdef VISIONER
   /// CaptureSystem
   class_<CaptureSystem, boost::noncopyable>("CaptureSystem",
       "CaptureSystem is the main class used to capture images from a Camera "
@@ -120,7 +116,6 @@ void bind_daq_all() {
     .def("set_execute_on_start_recording", &CaptureSystem::setExecuteOnStartRecording, (arg("self"), arg("command")), "Shell command executed when the recording starts\n. Warning: The command blocks the GUI thread. You should execute time * consuming commands in a sub-shell (e.g. command params &)")
     .def("set_execute_on_stop_recording", &CaptureSystem::setExecuteOnStopRecording, (arg("self"), arg("command")), "Shell command executed when the recording stops.\n Warning: See setExecuteOnStartRecording()")
     .def("set_text", &CaptureSystem::setText, (arg("self"), arg("text")), "Custom text displayed in the GUI");
-#endif
   
   /// Callbacks
   class_<ControllerCallback, boost::noncopyable>("ControllerCallback", "Callback provided by a Controller", no_init)
@@ -239,10 +234,8 @@ void bind_daq_all() {
     .def("add_face_localization_callback", &FaceLocalization::addFaceLocalizationCallback, (arg("self"), arg("callback")))
     .def("remove_face_localization_callback", &FaceLocalization::removeFaceLocalizationCallback, (arg("self"), arg("callback")));
 
-#ifdef VISIONER
   class_<VisionerFaceLocalization, bases<FaceLocalization>, boost::noncopyable>("VisionerFaceLocalization", "Provide face localization using Visioner",
-                                                                                init<const char*>((arg("model_path")), "'model_path': path to a model file (e.g. Face.MCT9.gz)"));
-#endif
+                                                                                init<const char*>((arg("model_path")), "'model_path': path to a model file"));
   
   class_<NullFaceLocalization, bases<FaceLocalization>, boost::noncopyable>("NullFaceLocalization", "NullFaceLocalization is an FaceLocalization which does nothing");
 
