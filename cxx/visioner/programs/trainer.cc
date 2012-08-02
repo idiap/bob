@@ -22,6 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "core/logging.h"
+
 #include "visioner/util/timer.h"
 #include "visioner/model/mdecoder.h"
 #include "visioner/model/sampler.h"
@@ -36,7 +38,7 @@ static bool train(bob::visioner::Model& model) {
   timer.restart();
   const bob::visioner::Sampler t_sampler(param, bob::visioner::Sampler::TrainSampler);
   const bob::visioner::Sampler v_sampler(param, bob::visioner::Sampler::ValidSampler); 
-  bob::visioner::log_info("trainer") << "timing: loading ~ " << timer.elapsed() << ".\n";
+  bob::core::info << "timing: loading ~ " << timer.elapsed() << "." << std::endl;
 
   // Train the model using coarse-to-fine feature projection
   for (bob::visioner::index_t p = 0; p <= param.m_projections; p ++, model.project())
@@ -44,10 +46,10 @@ static bool train(bob::visioner::Model& model) {
     timer.restart();
     if (bob::visioner::make_trainer(param)->train(t_sampler, v_sampler, model) == false)
     {
-      bob::visioner::log_error("trainer") << "Failed to train the model!\n";
+      bob::core::error << "Failed to train the model!" << std::endl;
       return false;
     }
-    bob::visioner::log_info("trainer") << "timing: training ~ " << timer.elapsed() << ".\n";
+    bob::core::info << "timing: training ~ " << timer.elapsed() << "." << std::endl;
   }
 
   // OK
@@ -79,7 +81,7 @@ int main(int argc, char *argv[]) {
       !po_vm.count("model") ||
       !param.decode(po_desc, po_vm))
   {
-    bob::visioner::log_error("trainer") << po_desc << "\n";
+    bob::core::error << po_desc << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -90,20 +92,20 @@ int main(int argc, char *argv[]) {
   bob::visioner::rmodel_t model = make_model(param);
   if (train(*model) == false)
   {
-    bob::visioner::log_error("trainer") << "Failed to train the model!\n";
+    bob::core::error << "Failed to train the model!" << std::endl;
     exit(EXIT_FAILURE);
   }	
-  bob::visioner::log_info("trainer") << ">>> Training done in " << timer.elapsed() << "s.\n";	
+  bob::core::info << ">>> Training done in " << timer.elapsed() << "s." << std::endl;	
 
   // Save the model
   if (model->save(cmd_model) == false)
   {
-    bob::visioner::log_error("trainer") << "Failed to save the model!\n";
+    bob::core::error << "Failed to save the model!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
   // OK
-  bob::visioner::log_finished();
+  bob::core::info << "Program finished successfuly" << std::endl;
   return EXIT_SUCCESS;
 
 }

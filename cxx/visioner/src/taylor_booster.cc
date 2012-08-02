@@ -22,6 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "core/logging.h"
+
 #include "visioner/util/timer.h"
 #include "visioner/model/trainers/taylor_booster.h"
 #include "visioner/model/trainers/lutproblems/lut_problem_ept.h"
@@ -68,7 +70,7 @@ namespace bob { namespace visioner {
       t_sampler.map(t_samples, model, t_data);
       v_sampler.map(v_samples, model, v_data);
 
-      log_info("TaylorBooster", "train") << "timing: sampling ~ " << timer.elapsed() << ".\n";
+      bob::core::info << "timing: sampling ~ " << timer.elapsed() << "." << std::endl;
 
       // Train the model
       timer.restart();
@@ -78,11 +80,11 @@ namespace bob { namespace visioner {
       if (    train(t_data, v_data, model, gen) == false ||
           model.set(gen.model()) == false)
       {
-        log_error("TaylorBooster", "train") << "Failed to train the model!\n";
+        bob::core::error << "Failed to train the model!" << std::endl;
         return false;
       }
 
-      log_info("TaylorBooster", "train") << "timing: training ~ " << timer.elapsed() << ".\n";
+      bob::core::info << "timing: training ~ " << timer.elapsed() << "." << std::endl;
     }
 
     // OK
@@ -101,16 +103,16 @@ namespace bob { namespace visioner {
         t_data.n_features() != v_data.n_features() ||
         t_data.n_features() < 1)
     {
-      log_error("TaylorBooster", "train") << "Invalid training & validation samples!\n";
+      bob::core::error << "Invalid training & validation samples!" << std::endl;
       return false;
     }
 
-    log_info("TaylorBooster", "train")
+    bob::core::info
       << "using "
       << t_data.n_samples() << " training and "
       << v_data.n_samples() << " validation samples with "
       << t_data.n_features() << " features to train "
-      << m_param.m_rounds << " weak learners.\n"; 
+      << m_param.m_rounds << " weak learners." << std::endl; 
 
     // Regularization factors
     static const scalar_t lambdas[] = { 0.0, 0.1, 0.2, 0.5, 1.0 };
@@ -145,10 +147,10 @@ namespace bob { namespace visioner {
     }
 
     // OK
-    log_info("TaylorBooster", "train")
+    bob::core::info
       << "optimal: " << gen.description()
       << ": train = " << gen.train_error()
-      << ", valid = " << gen.valid_error() << ".\n";
+      << ", valid = " << gen.valid_error() << "." << std::endl;
 
     return true;
   }
@@ -190,19 +192,19 @@ namespace bob { namespace visioner {
       gen.process(t_lp->error(), v_lp->error(), t_lp->mluts(), description);
 
       // Debug
-      log_info("TaylorBooster", "train")
+      bob::core::info
         << description
         << ": train = " << t_lp->value() << " / " << t_lp->error()
         << ", valid = " << v_lp->error()
-        << " in " << time_select << "+" << time_optimize << "s.\n";                        
+        << " in " << time_select << "+" << time_optimize << "s." << std::endl;                        
 
       // Debug
       for (index_t o = 0; o < t_lp->n_outputs(); o ++)
       {
         const LUT& lut = t_lp->luts()[o];
-        log_info("TaylorBooster", "train")
+        bob::core::info
           << "output <" << (o + 1) << "/" << t_lp->n_outputs() 
-          << "> selected feature <" << model.describe(lut.feature()) << ">.\n";
+          << "> selected feature <" << model.describe(lut.feature()) << ">." << std::endl;
       }
     }
   }

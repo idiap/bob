@@ -22,6 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "core/logging.h"
+
 #include "visioner/model/ipyramid.h"
 #include "visioner/util/timer.h"
 
@@ -67,7 +69,7 @@ int main(int argc, char *argv[]) {
   if (	po_vm.empty() || po_vm.count("help") || 
       !po_vm.count("input"))
   {
-    bob::visioner::log_error("face2bbx") << po_desc << "\n";
+    bob::core::error << po_desc << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -78,7 +80,7 @@ int main(int argc, char *argv[]) {
   if (	bob::visioner::load_listfiles(cmd_input, ifiles, gfiles) == false ||
       ifiles.empty() || ifiles.size() != gfiles.size())
   {
-    bob::visioner::log_error("face2bbx") << "Failed to load the face datasets <" << (cmd_input) << ">!\n";
+    bob::core::error << "Failed to load the face datasets <" << (cmd_input) << ">!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -91,8 +93,7 @@ int main(int argc, char *argv[]) {
     // Load the image and the round truth		
     if (bob::visioner::Object::load(gfile, objects) == false)
     {
-      bob::visioner::log_warning("face2bbx") 
-        << "Cannot load the ground truth <" << gfile << ">!\n";
+      bob::core::warn << "Cannot load the ground truth <" << gfile << ">!" << std::endl;
       bob::visioner::objects_t objects;
       bob::visioner::Object::save(gfile, objects);
       continue;
@@ -134,13 +135,13 @@ int main(int argc, char *argv[]) {
     // Save the new bounding box
     bob::visioner::Object::save(gfile, objects);
 
-    bob::visioner::log_info("face2bbx") 
+    bob::core::info 
       << "Image [" << (i + 1) << "/" << ifiles.size() << "]: "
-      << objects.size() << " GTs.\n";
+      << objects.size() << " GTs." << std::endl;
   }
 
   // OK
-  bob::visioner::log_finished();
+  bob::core::info << "Program finished successfully" << std::endl;
   return EXIT_SUCCESS;
 
 }

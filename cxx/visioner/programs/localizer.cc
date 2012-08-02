@@ -24,6 +24,8 @@
 
 #include <QApplication>
 
+#include "core/logging.h"
+
 #include "visioner/cv/cv_localizer.h"
 #include "visioner/cv/cv_draw.h"
 #include "visioner/util/timer.h"
@@ -61,7 +63,7 @@ int main(int argc, char *argv[]) {
       !detector.decode(po_desc, po_vm) ||
       !localizer.decode(po_desc, po_vm))
   {
-    bob::visioner::log_error("localizer") << po_desc << "\n";
+    bob::core::error << po_desc << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -72,7 +74,7 @@ int main(int argc, char *argv[]) {
   bob::visioner::strings_t ifiles, gfiles;
   if (bob::visioner::load_listfiles(cmd_data, ifiles, gfiles) == false)
   {
-    bob::visioner::log_error("localizer") << "Failed to load the test datasets <" << cmd_data << ">!\n";
+    bob::core::error << "Failed to load the test datasets <" << cmd_data << ">!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -87,8 +89,7 @@ int main(int argc, char *argv[]) {
     // Load the image and the ground truth
     if (detector.load(ifile, gfile) == false)
     {
-      bob::visioner::log_warning("localizer") 
-        << "Failed to load image <" << ifile << "> or ground truth <" << gfile << ">!\n";
+      bob::core::warn << "Failed to load image <" << ifile << "> or ground truth <" << gfile << ">!" << std::endl;
       continue;
     }
 
@@ -112,8 +113,7 @@ int main(int argc, char *argv[]) {
       {
         if (localizer.locate(detector, it->second.first, dt_points) == false)
         {
-          bob::visioner::log_warning("localizer") 
-            << "Failed to localize the keypoints for the <" << ifile << "> image!\n";
+          bob::core::warn << "Failed to localize the keypoints for the <" << ifile << "> image!" << std::endl;
           continue;
         }          
 
@@ -122,14 +122,14 @@ int main(int argc, char *argv[]) {
 
     qimage.save((cmd_results + "/" + bob::visioner::basename(ifiles[i]) + ".loc.png").c_str());
 
-    bob::visioner::log_info("localizer") 
+    bob::core::info 
       << "Image [" << (i + 1) << "/" << ifiles.size() << "]: localized "
       << detector.n_objects() << "/" << detector.stats().m_gts << " GTs in " 
-      << timer.elapsed() << "s.\n";                
+      << timer.elapsed() << "s." << std::endl;                
   }
 
   // OK
-  bob::visioner::log_finished();
+  bob::core::info << "Program finished successfully" << std::endl;
   return EXIT_SUCCESS;
 
 }

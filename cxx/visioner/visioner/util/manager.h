@@ -30,6 +30,8 @@
 #include <boost/serialization/singleton.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include "core/logging.h"
+
 #include "visioner/util/util.h"
 
 namespace bob { namespace visioner {
@@ -66,8 +68,7 @@ namespace bob { namespace visioner {
         const typename std::map<ID, robject_t>::const_iterator it = m_prototypes.find(id);
         if (it == m_prototypes.end())
         {
-          log_error("Manager", "get") 
-            << "The manager cannot find the object <" << id << ">!\n";
+          bob::core::error << "The manager cannot find the object <" << id << ">!" << std::endl;
           exit(EXIT_FAILURE);
         }
         return it->second->clone();

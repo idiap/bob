@@ -22,6 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "core/logging.h"
+
 #include "visioner/vision/object.h"
 
 // Parse a MIT+CMU ground truth file
@@ -31,7 +33,7 @@ bool parse(const bob::visioner::string_t& file)
   bob::visioner::string_t text;
   if (bob::visioner::load_file(file, text) == false)
   {
-    bob::visioner::log_error("readcmuprofile") << "Failed to load <" << file << ">!\n";
+    bob::core::error << "Failed to load <" << file << ">!" << std::endl;
     return false;
   }
 
@@ -84,6 +86,6 @@ int main(int argc, char *argv[]) {
   parse(input);
 
   // OK
-  bob::visioner::log_finished();
+  bob::core::info << "Program finished successfuly" << std::endl;
   return EXIT_SUCCESS;
 }

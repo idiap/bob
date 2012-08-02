@@ -27,6 +27,8 @@
 #include <QColor>
 #include <boost/program_options.hpp>
 
+#include "core/logging.h"
+
 #include "visioner/util/util.h"
 
 QImage draw_init(int bw, int bh, int bcx, int bcy)
@@ -217,7 +219,7 @@ int main(int argc, char *argv[]) {
   // Check arguments and options
   if (	po_vm.empty() || po_vm.count("help"))
   {
-    bob::visioner::log_error("drawmb_ctf") << po_desc << "\n";
+    bob::core::error << po_desc << std::endl;
     exit(EXIT_FAILURE);
   }
 

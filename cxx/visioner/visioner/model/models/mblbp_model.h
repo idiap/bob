@@ -185,8 +185,7 @@ namespace bob { namespace visioner {
         }                        
         m_delta >>= 1;
 
-        log_info("MBxLBPModel", "project")
-          << "Projecting the selected features using the <" << m_delta << ">px resolution.\n";
+        bob::core::info << "Projecting the selected features using the <" << m_delta << ">px resolution." << std::endl;
 
         const indices_t features = IIModel::features();                         
         mbs_t old_mbs = m_mbs;

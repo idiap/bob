@@ -24,7 +24,9 @@
 
 #include <numeric>
 
+#include "core/logging.h"
 #include "lbfgs/lbfgs.h"
+
 #include "visioner/model/trainers/lutproblems/lut_problem.h"
 #include "visioner/model/mdecoder.h"
 
@@ -185,8 +187,8 @@ namespace bob { namespace visioner {
       }                 
     }
 
-    log_info("LUTProblem", "optimize")
-      << "line-search step = [" << min_x << " - " << max_x << "]\n";
+    bob::core::info << "line-search step = [" << min_x << " - " << max_x << "]"
+      << std::endl;
 
     lbfgs_free(x);
     lbfgs_free(fx);

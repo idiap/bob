@@ -22,6 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "core/logging.h"
+
 #include "visioner/cv/cv_classifier.h"
 #include "visioner/model/mdecoder.h"
 #include "visioner/util/timer.h"
@@ -42,7 +44,7 @@ namespace bob { namespace visioner {
     {
       if (!po_vm.count(var_name))
       {
-        log_error("CVClassifier", "decode_var") << po_desc << "\n";
+        bob::core::error << po_desc << std::endl;
         exit(EXIT_FAILURE);
       }
 
@@ -64,13 +66,13 @@ namespace bob { namespace visioner {
     const std::string cmd_model = po_vm["classify_model"].as<std::string>();
     if (Model::load(cmd_model, m_model) == false)
     {
-      log_error("CVClassifier", "decode") 
-        << "Failed to load the classification model <" << cmd_model << ">!\n";
+      bob::core::error 
+        << "Failed to load the classification model <" << cmd_model << ">!" << std::endl;
       return false;
     }
     if (valid_model() == false)
     {
-      log_error("CVClassifier", "decode") << "Invalid model!\n";
+      bob::core::error << "Invalid model!" << std::endl;
       return false;
     }
 
@@ -125,8 +127,7 @@ namespace bob { namespace visioner {
     const ObjectTagger* obj_tagger = dynamic_cast<const ObjectTagger*>(tagger.get());
     if (obj_tagger == 0)
     {
-      log_warning("CVClassifier", "classify") 
-        << "Invalid classification tagger!\n";
+      bob::core::warn << "Invalid classification tagger!" << std::endl;
       return false;
     }
 
@@ -152,8 +153,7 @@ namespace bob { namespace visioner {
     const ObjectTagger* obj_tagger = dynamic_cast<const ObjectTagger*>(tagger.get());
     if (obj_tagger == 0)
     {
-      log_warning("CVClassifier", "evaluate") 
-        << "Invalid classification tagger!\n";
+      bob::core::warn << "Invalid classification tagger!" << std::endl;
       return;
     }
 
@@ -166,8 +166,7 @@ namespace bob { namespace visioner {
       // Load the image and the ground truth
       if (detector.load(ifile, gfile) == false)
       {
-        log_warning("CVClassifier", "evaluate") 
-          << "Failed to load image <" << ifile << "> or ground truth <" << gfile << ">!\n";
+        bob::core::warn << "Failed to load image <" << ifile << "> or ground truth <" << gfile << ">!" << std::endl;
         continue;
       }
 
@@ -190,8 +189,7 @@ namespace bob { namespace visioner {
           index_t dt_label = 0;
           if (classify(detector, object.bbx(), dt_label) == false)
           {
-            log_warning("CVClassifier", "evaluate")
-              << "Failed to classify a sub-window for the <" << ifile << "> image!\n";
+            bob::core::warn << "Failed to classify a sub-window for the <" << ifile << "> image!" << std::endl;
             continue;
           }
 
@@ -200,9 +198,9 @@ namespace bob { namespace visioner {
         }
 
       // Debug
-      log_info("CVClassifier", "evaluate")
+      bob::core::info
         << "Image [" << (i + 1) << "/" << ifiles.size() 
-        << "]: classified in " << timer.elapsed() << "s.\n";
+        << "]: classified in " << timer.elapsed() << "s." << std::endl;
     }
   }
 

@@ -24,6 +24,8 @@
 
 #include <boost/format.hpp>
 
+#include "core/logging.h"
+
 #include "visioner/cv/cv_localizer.h"
 #include "visioner/model/mdecoder.h"
 #include "visioner/util/timer.h"
@@ -42,7 +44,7 @@ namespace bob { namespace visioner {
     {
       if (!po_vm.count(var_name))
       {
-        log_error("CVLocalizer", "decode_var") << po_desc << "\n";
+        bob::core::error << po_desc << std::endl;
         exit(EXIT_FAILURE);
       }
 
@@ -69,13 +71,13 @@ namespace bob { namespace visioner {
     const std::string cmd_model = po_vm["localize_model"].as<std::string>();
     if (Model::load(cmd_model, m_model) == false)
     {
-      log_error("CVLocalizer", "decode") 
-        << "Failed to load the localization model <" << cmd_model << ">!\n";
+      bob::core::error 
+        << "Failed to load the localization model <" << cmd_model << ">!" << std::endl;
       return false;
     }
     if (valid_model() == false)
     {
-      log_error("CVLocalizer", "decode") << "Invalid model!\n";
+      bob::core::error << "Invalid model!" << std::endl;
       return false;
     }
 
@@ -97,7 +99,7 @@ namespace bob { namespace visioner {
     }
     else
     {
-      log_error("CVLocalizer", "decode") << "Invalid localization method!\n";
+      bob::core::error << "Invalid localization method!" << std::endl;
       return false;
     }
 
@@ -280,8 +282,7 @@ namespace bob { namespace visioner {
       // Load the image and the ground truth
       if (detector.load(ifile, gfile) == false)
       {
-        log_warning("CVLocalizer", "evaluate") 
-          << "Failed to load image <" << ifile << "> or ground truth <" << gfile << ">!\n";
+        bob::core::warn << "Failed to load image <" << ifile << "> or ground truth <" << gfile << ">!" << std::endl;
         continue;
       }
 
@@ -298,17 +299,16 @@ namespace bob { namespace visioner {
           points_t dt_points;
           if (locate(detector, it->second.first, dt_points) == false)
           {
-            log_warning("CVLocalizer", "evaluate")
-              << "Failed to localize the keypoints for the <" << ifile << "> image!\n";
+            bob::core::warn << "Failed to localize the keypoints for the <" << ifile << "> image!" << std::endl;
             continue;
           }
 
           evaluate(object, dt_points, histos, histo);
         }
 
-      log_info("CVLocalizer", "evaluate")
+      bob::core::info
         << "Image [" << (i + 1) << "/" << ifiles.size() 
-        << "]: localized in " << timer.elapsed() << "s.\n";
+        << "]: localized in " << timer.elapsed() << "s." << std::endl;
     }                
   }
 
@@ -331,21 +331,18 @@ namespace bob { namespace visioner {
       objects_t gobjects, pobjects;
       if (Object::load(gfile, gobjects) == false)
       {
-        log_warning("CVLocalizer", "evaluate") 
-          << "Failed to load ground truth <" << gfile << ">!\n";
+        bob::core::warn << "Failed to load ground truth <" << gfile << ">!" << std::endl;
         continue;
       }
       if (Object::load(pfile, pobjects) == false)
       {
-        log_warning("CVLocalizer", "evaluate") 
-          << "Failed to load predictions <" << pfile << ">!\n";
+        bob::core::warn << "Failed to load predictions <" << pfile << ">!" << std::endl;
         continue;
       }
 
       if (gobjects.size() != pobjects.size())
       {
-        log_warning("CVLocalizer", "evaluate") 
-          << "Different number of predictions for ground truth <" << gfile << ">!\n";
+        bob::core::warn << "Different number of predictions for ground truth <" << gfile << ">!" << std::endl;
         continue;
       }
 
@@ -362,9 +359,7 @@ namespace bob { namespace visioner {
           Keypoint keypoint;
           if (pobjects[k].find(name, keypoint) == false)
           {
-            log_warning("CVLocalizer", "evaluate")
-              << "Failed to find point <" << name << "> "
-              << "for predictions <" << pfile << ">!\n";
+            bob::core::warn << "Failed to find point <" << name << "> " << "for predictions <" << pfile << ">!" << std::endl;
             continue;
           }
 
@@ -374,9 +369,9 @@ namespace bob { namespace visioner {
         evaluate(gobjects[k], dt_points, histos, histo);
       }
 
-      log_info("CVLocalizer", "evaluate")
+      bob::core::info
         << "Ground truth [" << (i + 1) << "/" << gfiles.size() 
-        << "]: evaluated in " << timer.elapsed() << "s.\n";
+        << "]: evaluated in " << timer.elapsed() << "s." << std::endl;
     }                
   }
 
