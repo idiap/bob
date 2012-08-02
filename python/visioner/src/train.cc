@@ -32,7 +32,6 @@
 
 #include "core/python/ndarray.h"
 
-#include "visioner/util/timer.h"
 #include "visioner/model/mdecoder.h"
 #include "visioner/model/sampler.h"
 
