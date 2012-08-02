@@ -31,19 +31,37 @@
 
 namespace bob { namespace visioner {
 
-  //////////////////////////////////////////////////////////////////////////////////////
-  // Parameters:
-  //	- loss, trainer, tagger
-  //	- sliding-windows sampling
-  //	- features
-  //////////////////////////////////////////////////////////////////////////////////////
+  /**
+   * Parameters:
+   *	- loss, trainer, tagger
+   *	- sliding-windows sampling
+   *	- features
+   */
+  struct param_t {
 
-  struct param_t
-  {
     public:
 
-      // Constructor
-      param_t();
+      /**
+       * Default Constructor
+       *
+       * @note Other parameters are hard-coded within the constructor
+       * initialization. Have a look there to find all default parameters.
+       */
+      param_t(
+          index_t rows=24,
+          index_t cols=20,
+          const string_t& loss="diag_log",
+          scalar_t loss_parameter=0.0,
+          const string_t& optimization_type="ept",
+          const string_t& training_model="gboost",
+          index_t num_of_bootstraps=3,
+          const string_t& feature_type="elbp",
+          const string_t& feature_sharing="shared",
+          index_t feature_projections=0,
+          scalar_t min_gt_overlap=0.8,
+          index_t sliding_windows=2,
+          const string_t& subwindow_labelling="object_type"
+          );
 
       // Compute the range of top-left sub-window coordinates for a given image
       int min_row(index_t image_rows, index_t image_cols) const;
@@ -89,7 +107,7 @@ namespace bob { namespace visioner {
           ar & m_tagger;
         }
 
-    public:
+    public: //representation
 
       // Attributes
       index_t		m_rows, m_cols;		// Model size

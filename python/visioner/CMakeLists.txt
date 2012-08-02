@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 2.6)
 set(ccsrc
    "src/version.cc"
    "src/localize.cc"
+   "src/train.cc"
    "src/main.cc"
    )
 

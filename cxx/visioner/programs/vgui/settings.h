@@ -34,6 +34,7 @@
 #include <QPainter>
 #include <vector>
 
+#if (defined(__LP64__) || defined(__APPLE__))
 // Serialization
 inline QDataStream& operator<<(QDataStream& stream, const std::size_t& settings)
 {
@@ -47,6 +48,7 @@ inline QDataStream& operator>>(QDataStream& stream, std::size_t& settings)
   settings = (std::size_t)value;
   return stream;
 }
+#endif
 
 // Serialization
 inline QDataStream& operator<<(QDataStream& stream, const std::string& settings)

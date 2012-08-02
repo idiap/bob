@@ -28,15 +28,40 @@
 namespace bob { namespace visioner {
 
   // Constructor
-  param_t::param_t()	:
-    m_rows(24), m_cols(20), m_seed(0),
+  param_t::param_t(
+      index_t rows,
+      index_t cols,
+      const string_t& loss,
+      scalar_t loss_parameter,
+      const string_t& optimization_type,
+      const string_t& training_model,
+      index_t num_of_bootstraps,
+      const string_t& feature_type,
+      const string_t& feature_sharing,
+      index_t feature_projections,
+      scalar_t min_gt_overlap,
+      index_t sliding_windows,
+      const string_t& subwindow_labelling):
+    m_rows(rows), 
+    m_cols(cols), 
+    m_seed(0), //hard-coded default
     m_labels(),
-    m_loss("diag_log"), m_loss_param(0.0), m_optimization("ept"),
-    m_trainer("gboost"), m_rounds(1024), m_bootstraps(3), 
-    m_train_data(), m_valid_data(),
-    m_train_samples(4096), m_valid_samples(1024),
-    m_feature("elbp"), m_sharing("shared"), m_projections(0),
-    m_min_gt_overlap(0.80), m_ds(2), m_tagger("object_type")
+    m_loss(loss),
+    m_loss_param(loss_parameter),
+    m_optimization(optimization_type),
+    m_trainer(training_model),
+    m_rounds(1024), //hard-coded default
+    m_bootstraps(num_of_bootstraps), 
+    m_train_data(),
+    m_valid_data(),
+    m_train_samples(4096), //hard-coded default
+    m_valid_samples(1024), //hard-coded default
+    m_feature(feature_type),
+    m_sharing(feature_sharing),
+    m_projections(feature_projections),
+    m_min_gt_overlap(min_gt_overlap),
+    m_ds(sliding_windows),
+    m_tagger(subwindow_labelling)
   {
   }
 

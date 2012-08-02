@@ -35,7 +35,7 @@ static bool train(bob::visioner::Model& model) {
   // Load the data files        
   timer.restart();
   const bob::visioner::Sampler t_sampler(param, bob::visioner::Sampler::TrainSampler);
-  const bob::visioner::Sampler v_sampler(param, bob::visioner::Sampler::ValidSampler);        
+  const bob::visioner::Sampler v_sampler(param, bob::visioner::Sampler::ValidSampler); 
   bob::visioner::log_info("trainer") << "timing: loading ~ " << timer.elapsed() << ".\n";
 
   // Train the model using coarse-to-fine feature projection
