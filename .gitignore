@@ -5,8 +5,7 @@
 .DS_Store
 .gdb_history
 .pydevproject
-ctags
-etags
+tags
 sandbox_snowowl
 my-sphinx.html
 debian/bob/
@@ -20,3 +19,4 @@ debian/*.log
 debian/*.substvars
 databases/
 build/
+cxx/visioner/project/
