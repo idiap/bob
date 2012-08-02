@@ -39,7 +39,7 @@ static inline double sqr(double x){return x*x;}
  * @param epsilon   The epsilon value below which the wavelet value is considered as zero
  */
 bob::ip::GaborKernel::GaborKernel(
-  const blitz::TinyVector<int,2>& resolution,
+  const blitz::TinyVector<unsigned,2>& resolution,
   const blitz::TinyVector<double,2>& k,
   const double sigma,
   const double pow_of_k,
@@ -110,7 +110,7 @@ void bob::ip::GaborKernel::transform(
   // clear resulting image first
   transformed_frequency_domain_image = std::complex<double>(0);
   // iterate through the kernel pixels and do the multiplication
-  std::vector<std::pair<blitz::TinyVector<int,2>, double> >::const_iterator it = m_kernel_pixel.begin(), it_end = m_kernel_pixel.end();
+  std::vector<std::pair<blitz::TinyVector<unsigned,2>, double> >::const_iterator it = m_kernel_pixel.begin(), it_end = m_kernel_pixel.end();
   for (; it < it_end; ++it){
     transformed_frequency_domain_image(it->first) = frequency_domain_image(it->first) * it->second;
   }
@@ -124,7 +124,7 @@ blitz::Array<double,2> bob::ip::GaborKernel::kernelImage() const{
   blitz::Array<double,2> image(m_y_resolution, m_x_resolution);
   image = 0;
   // iterate through the kernel pixels
-  std::vector<std::pair<blitz::TinyVector<int,2>, double> >::const_iterator it = m_kernel_pixel.begin(), it_end = m_kernel_pixel.end();
+  std::vector<std::pair<blitz::TinyVector<unsigned,2>, double> >::const_iterator it = m_kernel_pixel.begin(), it_end = m_kernel_pixel.end();
   for (; it < it_end; ++it){
     image(it->first) = it->second;
   }
@@ -145,8 +145,8 @@ blitz::Array<double,2> bob::ip::GaborKernel::kernelImage() const{
  * @param dc_free              Make the Gabor wavelet DC-free?
  */
 bob::ip::GaborWaveletTransform::GaborWaveletTransform(
-  int number_of_scales,
-  int number_of_directions,
+  unsigned number_of_scales,
+  unsigned number_of_directions,
   double sigma,
   double k_max,
   double k_fac,
@@ -176,10 +176,10 @@ void bob::ip::GaborWaveletTransform::computeKernelFrequencies(){
   // initialize highest frequency
   double k_abs = m_k_max;
   // iterate over the scales
-  for (int s = 0; s < m_number_of_scales; ++s){
+  for (unsigned s = 0; s < m_number_of_scales; ++s){
 
     // iterate over the directions
-    for (int d = 0; d < m_number_of_directions; ++d )
+    for (unsigned d = 0; d < m_number_of_directions; ++d )
     {
       double angle = M_PI * d / m_number_of_directions;
       // compute center of kernel in frequency domain in Cartesian coordinates
@@ -198,7 +198,7 @@ void bob::ip::GaborWaveletTransform::computeKernelFrequencies(){
  * @param resolution  The resolution of the image to generate the kernels for
  */
 void bob::ip::GaborWaveletTransform::generateKernels(
-  blitz::TinyVector<int,2> resolution
+  blitz::TinyVector<unsigned,2> resolution
 )
 {
   if (resolution[1] != m_fft.getWidth() || resolution[0] != m_fft.getHeight()){
@@ -206,7 +206,7 @@ void bob::ip::GaborWaveletTransform::generateKernels(
     m_gabor_kernels.clear();
     m_gabor_kernels.reserve(m_kernel_frequencies.size());
 
-    for (int j = 0; j < (int)m_kernel_frequencies.size(); ++j){
+    for (unsigned j = 0; j < m_kernel_frequencies.size(); ++j){
       m_gabor_kernels.push_back(bob::ip::GaborKernel(resolution, m_kernel_frequencies[j], m_sigma, m_pow_of_k, m_dc_free));
     }
 
@@ -243,7 +243,7 @@ void bob::ip::GaborWaveletTransform::performGWT(
 )
 {
   // first, check if we need to reset the kernels
-  generateKernels(blitz::TinyVector<int,2>(gray_image.extent(0),gray_image.extent(1)));
+  generateKernels(blitz::TinyVector<unsigned,2>(gray_image.extent(0),gray_image.extent(1)));
 
   // perform Fourier transformation to image
   m_fft(gray_image, m_frequency_image);
@@ -252,7 +252,7 @@ void bob::ip::GaborWaveletTransform::performGWT(
   bob::core::array::assertSameShape(trafo_image, blitz::shape(m_kernel_frequencies.size(),gray_image.extent(0),gray_image.extent(1)));
 
   // now, let each kernel compute the transformation result
-  for (int j = 0; j < (int)m_gabor_kernels.size(); ++j){
+  for (unsigned j = 0; j < m_gabor_kernels.size(); ++j){
     // get a reference to the current layer of the trafo image
     m_gabor_kernels[j].transform(m_frequency_image, m_temp_array);
     // perform ifft on the trafo image layer
@@ -274,7 +274,7 @@ void bob::ip::GaborWaveletTransform::computeJetImage(
 )
 {
   // first, check if we need to reset the kernels
-  generateKernels(blitz::TinyVector<int,2>(gray_image.extent(0),gray_image.extent(1)));
+  generateKernels(blitz::TinyVector<unsigned,2>(gray_image.extent(0),gray_image.extent(1)));
 
   // perform Fourier transformation to image
   m_fft(gray_image, m_frequency_image);
@@ -367,8 +367,8 @@ void bob::ip::GaborWaveletTransform::load(bob::io::HDF5File& file){
   m_k_max = file.read<double>("KMax");
   m_k_fac = file.read<double>("KFac");
   m_dc_free = file.read<bool>("DCfree");
-  m_number_of_scales = file.read<int>("NumberOfScales");
-  m_number_of_directions = file.read<int>("NumberOfDirections");
+  m_number_of_scales = file.read<unsigned>("NumberOfScales");
+  m_number_of_directions = file.read<unsigned>("NumberOfDirections");
 
   computeKernelFrequencies();
 }

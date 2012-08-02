@@ -44,7 +44,7 @@ void bob::machine::GaborJetSimilarity::init(){
 
   // used for disparity-like similarity functions only...
   m_wavelet_extends.reserve(m_gwt.numberOfScales());
-  for (int level = 0; level < m_gwt.numberOfScales(); ++level){
+  for (unsigned level = 0; level < m_gwt.numberOfScales(); ++level){
     blitz::TinyVector<double,2> k = m_gwt.kernelFrequencies()[level * m_gwt.numberOfDirections()];
     double k_abs = sqrt(sqr(k[0]) + sqr(k[1]));
     m_wavelet_extends.push_back(M_PI / k_abs);

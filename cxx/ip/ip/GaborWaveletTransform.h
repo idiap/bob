@@ -42,7 +42,7 @@ namespace bob {
 
         //! Generate a Gabor kernel in frequency domain
         GaborKernel(
-          const blitz::TinyVector<int,2>& resolution,
+          const blitz::TinyVector<unsigned,2>& resolution,
           const blitz::TinyVector<double,2>& wavelet_frequency,
           const double sigma = 2. * M_PI,
           const double pow_of_k = 0.,
@@ -61,9 +61,9 @@ namespace bob {
 
       private:
         // the Gabor wavelet, stored as pairs of indices and values
-        std::vector<std::pair<blitz::TinyVector<int,2>, double> > m_kernel_pixel;
+        std::vector<std::pair<blitz::TinyVector<unsigned,2>, double> > m_kernel_pixel;
 
-        int m_x_resolution, m_y_resolution;
+        unsigned m_x_resolution, m_y_resolution;
 
     }; // class GaborKernel
 
@@ -81,8 +81,8 @@ namespace bob {
         //! using the given sigma, k_max and k_fac values
         //! All parameters have reasonable defaults, as used by default algorithms
         GaborWaveletTransform(
-          int number_of_scales = 5,
-          int number_of_directions = 8,
+          unsigned number_of_scales = 5,
+          unsigned number_of_directions = 8,
           double sigma = 2. * M_PI,
           double k_max = M_PI / 2.,
           double k_fac = 1./sqrt(2.),
@@ -91,18 +91,18 @@ namespace bob {
         );
 
         //! generate the kernels for the new resolution
-        void generateKernels(blitz::TinyVector<int,2> resolution);
+        void generateKernels(blitz::TinyVector<unsigned,2> resolution);
 
         //! Returns the Gabor kernel for the given index
-        const bob::ip::GaborKernel& getKernel(int index) {if (index < (int)m_gabor_kernels.size()) return m_gabor_kernels[index]; else throw bob::core::Exception();}
+        const bob::ip::GaborKernel& getKernel(unsigned index) {if (index < m_gabor_kernels.size()) return m_gabor_kernels[index]; else throw bob::core::Exception();}
 
         //! generates the frequency kernels as images
         blitz::Array<double,3> kernelImages() const;
 
         //! get the number of kernels (usually, 40) used by this GWT class
-        int numberOfKernels() const{return m_kernel_frequencies.size();}
-        int numberOfDirections() const{return m_number_of_directions;}
-        int numberOfScales() const{return m_number_of_scales;}
+        unsigned numberOfKernels() const{return m_kernel_frequencies.size();}
+        unsigned numberOfDirections() const{return m_number_of_directions;}
+        unsigned numberOfScales() const{return m_number_of_scales;}
 
         //! Returns the vector of central frequencies used by this Gabor wavelet family
         const std::vector<blitz::TinyVector<double,2> >& kernelFrequencies() const {return m_kernel_frequencies;}
@@ -160,9 +160,9 @@ namespace bob {
         blitz::Array<std::complex<double>,2> m_temp_array, m_frequency_image;
 
         //! The number of scales (levels, frequencies) of this family
-        int m_number_of_scales;
+        unsigned m_number_of_scales;
         //! The number of directions (orientations) of this family
-        int m_number_of_directions;
+        unsigned m_number_of_directions;
     }; // class GaborWaveletTransform
 
     //! Normalizes a Gabor jet (vector of absolute values) to unit length
