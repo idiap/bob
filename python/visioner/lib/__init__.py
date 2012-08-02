@@ -167,4 +167,36 @@ class Localizer(CVLocalizer):
 
     return self.locate(self.detector, image)
 
+def param_setattr(self, key, value):
+  if not hasattr(self, key):
+    raise TypeError("parameter '%s' is not defined on '%s' and cannot be set" % (key, self.__class__.__name__))
+  object.__setattr__(self, key, value)
+param.__setattr__ = param_setattr
+del param_setattr
+
+def param_str(self):
+  return "<param rows=%d, cols=%d, seed=%d, loss='%s', loss_parameter=%f, optimization_type='%s', training_model='%s', max_rounds=%d, num_of_bootstraps=%d, training_data='%s', num_of_train_samples=%d, validation_data='%s', num_of_valid_samples=%d, feature_type='%s', feature_sharing='%s', feature_projections=%d, min_gt_overlap=%f, sliding_windows=%d, subwindow_labelling='%s'>" % (
+      self.rows,
+      self.cols,
+      self.seed,
+      self.loss,
+      self.loss_parameter,
+      self.optimization_type,
+      self.training_model,
+      self.max_rounds,
+      self.num_of_bootstraps,
+      self.training_data,
+      self.num_of_train_samples,
+      self.validation_data,
+      self.num_of_valid_samples,
+      self.feature_type,
+      self.feature_sharing,
+      self.feature_projections,
+      self.min_gt_overlap,
+      self.sliding_windows,
+      self.subwindow_labelling,
+      )
+param.__str__ = param_str
+del param_str
+
 __all__ = dir()

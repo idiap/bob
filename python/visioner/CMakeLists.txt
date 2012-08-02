@@ -29,3 +29,5 @@ bob_python_script(visioner bob_face_keypoints.py lib/script/facepoints.py)
 
 bob_python_add_test(visioner-1 bob_face_keypoints.py "${CMAKE_CURRENT_SOURCE_DIR}/../io/data/test.mov" --self-test=1)
 bob_python_add_test(visioner-2 bob_face_keypoints.py "${CMAKE_CURRENT_SOURCE_DIR}/../ip/data/faceextract/test-faces.jpg" --self-test=2)
+
+bob_python_script(visioner bob_visioner_trainer.py lib/script/trainer.py)

@@ -152,15 +152,17 @@ void bind_visioner_train() {
     .def_readwrite("cols", &bob::visioner::param_t::m_cols, "Number of columns in pixels")
     .def_readwrite("seed", &bob::visioner::param_t::m_seed, "Random seed used for sampling")
 
-    .def_readwrite("loss", &bob::visioner::param_t::m_loss, "Loss")
+    .def_readwrite("loss", &bob::visioner::param_t::m_loss, "Loss type")
     .def_readwrite("loss_parameter", &bob::visioner::param_t::m_loss_param, "Loss parameter")
-    .def_readwrite("optimization_type", &bob::visioner::param_t::m_optimization, "Optimization type (expectation vs. variational)")
+    .def_readwrite("optimization_type", &bob::visioner::param_t::m_optimization, "Optimization type")
     .def_readwrite("training_model", &bob::visioner::param_t::m_trainer, "Training model")
 
-    .def_readwrite("max_rounds", &bob::visioner::param_t::m_rounds, "Maximum boosting rounds")
+    .def_readwrite("max_rounds", &bob::visioner::param_t::m_rounds, "Maximum number of boosting rounds")
     .def_readwrite("num_of_bootstraps", &bob::visioner::param_t::m_bootstraps, "Number of bootstrapping steps")
 
+    .def_readwrite("training_data", &bob::visioner::param_t::m_train_data, "Training data")
     .def_readwrite("num_of_train_samples", &bob::visioner::param_t::m_train_samples, "Number of training samples")
+    .def_readwrite("validation_data", &bob::visioner::param_t::m_valid_data, "Validation data")
     .def_readwrite("num_of_valid_samples", &bob::visioner::param_t::m_valid_samples, "Number of validation samples")
     .def_readwrite("feature_type", &bob::visioner::param_t::m_feature, "Feature type")
     .def_readwrite("feature_sharing", &bob::visioner::param_t::m_sharing, "Feature sharing")
