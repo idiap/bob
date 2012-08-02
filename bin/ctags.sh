@@ -4,4 +4,4 @@
 
 install_dir=$(readlink -f $(dirname $(dirname $0)));
 files=$(find ${install_dir}/cxx ${install_dir}/python -name '*.h' -or -name '*.cc' -or -name '*.c' -or -name '*.cxx' -or -name '*.cpp' -or -name '*.C' -or -name '*.CC')
-ctags --output=${install_dir}/ctags ${files}
+ctags --output=${install_dir}/tags ${files}
