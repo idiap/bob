@@ -135,6 +135,37 @@ namespace bob { namespace visioner {
   }
 
   // Retrieve the lists of encoded objects
+  strings_t available_losses_list()
+  {
+    return LossManager::get_const_instance().describe_list();
+  }
+
+  strings_t available_taggers_list()
+  {
+    return TaggerManager::get_const_instance().describe_list();
+  }
+
+  strings_t available_models_list()
+  {
+    return ModelManager::get_const_instance().describe_list();
+  }
+
+  strings_t available_trainers_list()
+  {
+    return TrainerManager::get_const_instance().describe_list();
+  }
+
+  strings_t available_optimizations_list()
+  {
+    return OptimizationManager::get_const_instance().describe_list();
+  }
+
+  strings_t available_sharings_list()
+  {
+    return FeatureSharingManager::get_const_instance().describe_list();
+  }
+
+  // Retrieve the lists of encoded objects as a single string
   string_t available_losses()
   {
     return LossManager::get_const_instance().describe();

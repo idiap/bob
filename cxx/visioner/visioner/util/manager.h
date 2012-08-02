@@ -75,6 +75,14 @@ namespace bob { namespace visioner {
       }
 
       // Retrieve the registered IDs as a list
+      strings_t describe_list() const
+      {
+        strings_t retval;
+        for (typename std::map<ID, robject_t>::const_iterator it = m_prototypes.begin(); it != m_prototypes.end(); ++ it) retval.push_back(it->first);
+        return retval;
+      }
+
+      // Retrieve the registered IDs as a single string
       string_t describe() const
       {
         string_t desc;
