@@ -429,7 +429,7 @@ def add_command(subparsers):
   parser.add_argument('--verbose', action='store_true', default=False,
       help="Do SQL operations in a verbose way")
   parser.add_argument('--imagedir', action='store', metavar='DIR',
-      default='/idiap/temp/lelshafey/db/xm2vts/',
+      default='/idiap/resource/database/xm2vtsdb/images/',
       help="Change the relative path to the directory containing the images of the XM2VTS database (defaults to %(default)s)")
   
   parser.set_defaults(func=create) #action
