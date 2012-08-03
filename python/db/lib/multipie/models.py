@@ -24,6 +24,9 @@ class Client(Base):
   third_session = Column(Integer)
   fourth_session = Column(Integer)
 
+  # Relationship
+  files = relationship("File", backref="files_client")
+
   def __init__(self, id, group, birthyear, gender, first_session, second_session, third_session, fourth_session):
     self.id = id
     self.sgroup = group
@@ -61,7 +64,7 @@ class File(Base):
     print "<File('%s')>" % self.path
 
 class FileMultiview(Base):
-  __tablename__ = 'fileMultiview'
+  __tablename__ = 'file_multiview'
 
   id = Column(Integer, ForeignKey('file.id'), primary_key=True) # for SQL
   camera_id = Column(String(6))
@@ -97,21 +100,21 @@ class Expression(Base):
     return "<Expression('%s', '%s', '%d', '%d')>" % (self.name, self.img_type, self.session_id, self.recording_id)
 
 class ProtocolName(Base):
-  __tablename__ = 'protocolName'
-  
+  __tablename__ = 'protocol_name'
+
   name = Column(String(6), primary_key=True)
 
   def __init__(self, name):
     self.name = name
 
   def __repr__(self):
-    return "<ProtocolName('%s')>" % (self.name)
+    return "<Protocol('%s')>" % self.name
 
 class Protocol(Base):
   __tablename__ = 'protocol'
 
   id = Column(Integer, primary_key=True)
-  name = Column(String(6), ForeignKey('protocolName.name'))
+  name = Column(String(6), ForeignKey('protocol_name.name')) # for SQL
   sgroup = Column(Enum('dev','eval','world')) # DO NOT USE GROUP (LIKELY KEYWORD)
   purpose = Column(Enum('enrol', 'probe', 'probeImpostor', 'world'))
   session_id = Column(Integer)
@@ -119,7 +122,7 @@ class Protocol(Base):
   img_type = Column(Enum('multiview', 'highres'))
 
   # for Python
-  protocol = relationship("ProtocolName", backref=backref("protocolName_protocol"))
+  protocol_name = relationship("ProtocolName", backref=backref("protocolName_protocol"))
 
   def __init__(self, name, group, purpose, session_id, recording_id, img_type):
     self.name = name
@@ -130,12 +133,13 @@ class Protocol(Base):
     self.img_type = img_type
 
   def __repr__(self):
-    return "<ProtocolMultiview('%s', '%s', '%s', '%d', '%d', '%s')>" % (self.name, self.sgroup, self.purpose, self.session_id, self.recording_id, self.img_type)
+    return "<Protocol('%s', '%s', '%s', '%d', '%d', '%s')>" % (self.name, self.sgroup, self.purpose, self.session_id, self.recording_id, self.img_type)
 
 class ProtocolMultiview(Base):
-  __tablename__ = 'protocolMultiview'
+  __tablename__ = 'protocol_multiview'
 
-  id = Column(Integer, ForeignKey('protocol.id'), primary_key=True) # for SQL
+  id = Column(Integer, primary_key=True)
+  protocol_id = Column(Integer, ForeignKey('protocol.id')) # for SQL
   camera_id = Column(String(6))
   shot_id = Column(Integer)
 
@@ -143,10 +147,28 @@ class ProtocolMultiview(Base):
   protocol = relationship("Protocol", backref=backref("protocol_protocolMultiview"))
 
   def __init__(self, protocol_id, camera_id, shot_id):
-    self.id = protocol_id
+    self.protocol_id = protocol_id
     self.camera_id = camera_id
     self.shot_id = shot_id
 
   def __repr__(self):
-    print "<ProtocolMultiview('%d','%d')>" % (self.camera_id, self.shot_id)
+    print "<ProtocolMultiview('%d', '%s','%d')>" % (self.protocol_id, self.camera_id, self.shot_id)
 
+class FileProtocol(Base):
+  __tablename__ = 'file_protocol'
+
+  file_id = Column(Integer, ForeignKey('file.id'), primary_key=True)
+  protocol_name = Column(String(6), ForeignKey('protocol_name.name'), primary_key=True)
+  purpose = Column(Enum('enrol', 'probe', 'world'))
+ 
+  # for Python
+  file = relationship("File", backref=backref('file_fileProtocol'))
+  protocol = relationship("File", backref=backref('protocol_fileProtocol'))
+ 
+  def __init__(self, file_id, protocol_name, purpose):
+    self.file_id = file_id
+    self.protocol_name = protocol_name
+    self.purpose = purpose
+
+  def __repr__(self):
+    print "<FileProtocol('%d', '%s', '%s')>" % (self.file_id, self.protocol_name, self.purpose)
