@@ -24,7 +24,7 @@ import numpy
 import random
 
 #############################################################################
-# Test fast DCT/FFT implementation based on FFTPACK
+# Test fast DCT/FFT implementation based on FFTW
 #############################################################################
 
 def compare(v1, v2, width):
