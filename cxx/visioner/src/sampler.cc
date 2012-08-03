@@ -25,6 +25,8 @@
 #include <boost/bind.hpp>
 #include <boost/lambda/lambda.hpp>
 
+#include "core/logging.h"
+
 #include "visioner/model/sampler.h"
 #include "visioner/model/mdecoder.h"
 
@@ -55,8 +57,7 @@ namespace bob { namespace visioner {
       if (	load_listfiles(data, ifiles, gfiles) == false ||
           ifiles.empty() || ifiles.size() != gfiles.size())
       {
-        log_warning("Sampler", "Sampler") 
-          << "Failed to load the datasets <" << data << ">!\n";
+        bob::core::warn << "Failed to load the datasets <" << data << ">!" << std::endl;
         ifiles.clear();
         gfiles.clear();
       }
@@ -75,15 +76,15 @@ namespace bob { namespace visioner {
     // Process each image in the list
     for (index_t i = 0; i < ifiles.size(); i ++)
     {
-      log_info("Sampler", "load") 
-        << "mode [" << type2str()
-        << "] loading image [" << (i + 1)  << "/" << ifiles.size() << "] ...\n";
+      bob::core::info << "mode [" << type2str()
+        << "] loading image [" << (i + 1)  << "/" << ifiles.size() << "] ..."
+        << std::endl;
 
       // Load the scaled images ...
       if (ipyramid.load(ifiles[i], gfiles[i]) == false)
       {
-        log_warning("Sampler", "load") 
-          << "Failed to load the image <" << ifiles[i] << ">!\n";
+        bob::core::warn << "Failed to load the image <" << ifiles[i] << ">!"
+          << std::endl;
         continue;
       }
 
@@ -123,11 +124,10 @@ namespace bob { namespace visioner {
     // Debug
     for (index_t iti = 0; iti < n_types(); iti ++)
     {
-      log_info("Sampler", "load") 
-        << "mode [" << type2str()
+      bob::core::info << "mode [" << type2str()
         << "] target type [" << iti << "]"
         << " found in " << m_tcounts[iti] << "/" << n_samples()
-        << " samples.\n";
+        << " samples." << std::endl;
     }
   }
 
@@ -236,10 +236,9 @@ namespace bob { namespace visioner {
       const scalar_t cost = inverse(sum_inv) * inverse(count) * tcounts.size();
       tcosts[iti] = cost;
 
-      log_info("Sampler", "map") 
-        << "mode [" << type2str() << "] mapping target type ["
+      bob::core::info << "mode [" << type2str() << "] mapping target type ["
         << type << "] in " << count << "/" << samples.size() << " samples "
-        << "with cost [" << cost << "].\n";
+        << "with cost [" << cost << "]." << std::endl;
     }
 
     // Set the costs

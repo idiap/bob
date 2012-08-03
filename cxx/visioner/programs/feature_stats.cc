@@ -22,6 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "core/logging.h"
+
 #include "visioner/model/mdecoder.h"
 
 int main(int argc, char *argv[]) {
@@ -45,18 +47,18 @@ int main(int argc, char *argv[]) {
   if (	po_vm.empty() || po_vm.count("help") || 
       !param.decode(po_desc, po_vm))
   {
-    bob::visioner::log_error("feature_stats") << po_desc << "\n";
+    bob::core::error << po_desc << std::endl;
     exit(EXIT_FAILURE);
   }
 
   const bob::visioner::rmodel_t model = bob::visioner::make_model(param);
 
-  bob::visioner::log_info("feature_stats")
+  bob::core::info
     << "The model <" << param.m_feature << "> has " << model->n_features()
-    << " features in [0, " << model->n_fvalues() << ").\n";
+    << " features in [0, " << model->n_fvalues() << ")." << std::endl;
 
   // OK
-  bob::visioner::log_finished();
+  bob::core::info << "Program finished successfully" << std::endl;
   exit(EXIT_SUCCESS);
 
 }

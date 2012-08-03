@@ -27,6 +27,8 @@
 
 #include <QObject>
 
+#include "core/logging.h"
+
 #include "visioner/util/util.h"
 
 namespace bob { namespace visioner {
@@ -41,62 +43,6 @@ namespace bob { namespace visioner {
       sbegin = std::min(sbegin + n_objects_per_thread, n_objects);
       sends[ith] = sbegin;
     }
-  }
-
-  // Logging
-  static std::ostream& log(const char* base, const char* class_name, const char* func_name)
-  {
-    std::cout << base << " <" << class_name << "::" << func_name << ">: ";
-    return std::cout;
-  }
-  static std::ostream& log(const char* base, const char* func_name)
-  {
-    std::cout << base << " <" << func_name << ">: ";
-    return std::cout;
-  }
-
-  std::ostream& log_warning(const char* class_name, const char* func_name)
-  {
-    return log("Warning", class_name, func_name);
-  }
-  std::ostream& log_warning(const char* func_name)
-  {
-    return log("Warning", func_name);
-  }
-  std::ostream& log_warning()
-  {
-    return std::cout;
-  }
-
-  std::ostream& log_error(const char* class_name, const char* func_name)
-  {
-    return log("Error", class_name, func_name);
-  }
-  std::ostream& log_error(const char* func_name)
-  {
-    return log("Error", func_name);
-  }
-  std::ostream& log_error()
-  {
-    return std::cout;
-  }
-
-  std::ostream& log_info(const char* class_name, const char* func_name)
-  {
-    return log("Info", class_name, func_name);
-  }
-  std::ostream& log_info(const char* func_name)
-  {
-    return log("Info", func_name);
-  }	
-  std::ostream& log_info()
-  {
-    return std::cout;
-  }
-
-  void log_finished()
-  {
-    std::cout << "Program finished correctly!\n";
   }
 
   // Trim a string
@@ -233,7 +179,8 @@ namespace bob { namespace visioner {
       }
     }
 
-    log_error("attribute_value") << "Missing value for the attribute <" << attribute << ">!\n";
+    bob::core::error << "Missing value for the attribute <"
+      << attribute << ">!" << std::endl;
     return "";
   }
 

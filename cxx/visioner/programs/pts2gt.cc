@@ -24,6 +24,8 @@
 
 #include <fstream>
 
+#include "core/logging.h"
+
 #include "visioner/model/ipyramid.h"
 
 int main(int argc, char *argv[]) {	
@@ -53,7 +55,7 @@ int main(int argc, char *argv[]) {
       !po_vm.count("points") ||
       !po_vm.count("output"))
   {
-    bob::visioner::log_error("pts2gt") << po_desc << "\n";
+    bob::core::error << po_desc << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -67,8 +69,8 @@ int main(int argc, char *argv[]) {
   std::ifstream in(cmd_input.c_str());
   if (in.is_open() == false)
   {
-    bob::visioner::log_error("pts2gt") 
-      << "Cannot load the .pts annotations <" << cmd_input << ">!\n";
+    bob::core::error 
+      << "Cannot load the .pts annotations <" << cmd_input << ">!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -90,13 +92,13 @@ int main(int argc, char *argv[]) {
 
   if (object.save(cmd_output) == false)
   {
-    bob::visioner::log_error("pts2gt") 
-      << "Cannot save the .gt annotations <" << cmd_output << ">!\n";
+    bob::core::error 
+      << "Cannot save the .gt annotations <" << cmd_output << ">!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
   // OK
-  bob::visioner::log_finished();
+  bob::core::info << "Program finished successfuly" << std::endl;
   return EXIT_SUCCESS;
 
 }

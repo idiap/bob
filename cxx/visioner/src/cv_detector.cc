@@ -26,6 +26,8 @@
 #include <boost/lambda/bind.hpp>
 #include <boost/format.hpp>
 
+#include "core/logging.h"
+
 #include "visioner/cv/cv_detector.h"
 #include "visioner/model/mdecoder.h"
 #include "visioner/util/timer.h"
@@ -50,7 +52,7 @@ namespace bob { namespace visioner {
     {
       if (!po_vm.count(var_name))
       {
-        log_error("CVDetector", "decode_var") << po_desc << "\n";
+        bob::core::error << po_desc << std::endl;
         exit(EXIT_FAILURE);
       }
 
@@ -92,13 +94,13 @@ namespace bob { namespace visioner {
     const std::string cmd_model = po_vm["detect_model"].as<std::string>();
     if (Model::load(cmd_model, m_model) == false)
     {
-      log_error("CVDetector", "decode") 
-        << "Failed to load the model <" << cmd_model << ">!\n";
+      bob::core::error 
+        << "Failed to load the model <" << cmd_model << ">!" << std::endl;
       return false;
     }
     if (valid_model() == false)
     {
-      log_error("CVDetector", "decode") << "Invalid model!\n";
+      bob::core::error << "Invalid model!" << std::endl;
       return false;
     }
 
@@ -125,7 +127,7 @@ namespace bob { namespace visioner {
     }
     else
     {
-      log_error("CVDetector", "decode") << "Invalid detection method!\n";
+      bob::core::error << "Invalid detection method!" << std::endl;
       return false;
     }
 
@@ -502,8 +504,7 @@ namespace bob { namespace visioner {
       // Load the image and the ground truth
       if (load(ifile, gfile) == false)
       {
-        log_warning("CVDetector", "evaluate") 
-          << "Failed to load image <" << ifile << "> or ground truth <" << gfile << ">!\n";
+        bob::core::warn << "Failed to load image <" << ifile << "> or ground truth <" << gfile << ">!" << std::endl;
         continue;
       }
 
@@ -528,18 +529,18 @@ namespace bob { namespace visioner {
       ilabels.push_back(labels);                
 
       // Debug
-      log_info("CVDetector", "evaluate") 
+      bob::core::info 
         << "Image [" << (i + 1) << "/" << ifiles.size() << "]: produced "
         << detections.size() << " detections / "
-        << n_objects() << " GTs in " << timer.elapsed() << "s.\n";
+        << n_objects() << " GTs in " << timer.elapsed() << "s." << std::endl;
     }
 
     const index_t n_thress = 256;
     const scalar_t delta_score = inverse(n_thress - 1) * (max_score - min_score);
 
-    log_info("CVDetector", "evaluate") 
+    bob::core::info 
       << "min_score = " << min_score << ", max_score = " << max_score
-      << ", delta_score = " << delta_score << "\n";
+      << ", delta_score = " << delta_score << std::endl;
 
     std::vector<index_t> n_tps(n_thress, 0);	// #true positives
     std::vector<index_t> n_fas(n_thress, 0);	// #false alarms			
@@ -571,10 +572,10 @@ namespace bob { namespace visioner {
   // Display statistics
   void CVDetector::stats_t::show() const
   {
-    log_info("CVDetector::stats_t", "show")
-      << "Processed " << m_gts << " GTs by scanning " << m_sws << " SWs with " 
-      << (inverse(m_sws) * m_evals) << " LUT evaluations done in "
-      << (inverse(m_sws) * m_timing) << " seconds on average.\n";
+    bob::core::info << "Processed " << m_gts << " GTs by scanning " 
+      << m_sws << " SWs with " << (inverse(m_sws) * m_evals) 
+      << " LUT evaluations done in " << (inverse(m_sws) * m_timing) 
+      << " seconds on average." << std::endl;
   }
 
   // Save the model back to file

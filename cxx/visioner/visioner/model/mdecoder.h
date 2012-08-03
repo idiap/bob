@@ -42,13 +42,20 @@ namespace bob { namespace visioner {
   FeatureSharingType      make_sharing(const param_t& param);
 
   // Retrieve the lists of encoded objects
-  string_t        available_losses();
-  string_t        available_taggers();
-  string_t        available_models();
-  string_t        available_trainers();
+  strings_t available_losses_list();
+  strings_t available_taggers_list();
+  strings_t available_models_list();
+  strings_t available_trainers_list();
+  strings_t available_optimizations_list();
+  strings_t available_sharings_list();
 
-  string_t        available_optimizations();
-  string_t        available_sharings();
+  // Retrieve the lists of encoded objects as a single string
+  string_t available_losses();
+  string_t available_taggers();
+  string_t available_models();
+  string_t available_trainers();
+  string_t available_optimizations();
+  string_t available_sharings();
 
 }}
 

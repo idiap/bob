@@ -37,7 +37,7 @@ class File(Base):
   shot_id = Column(Integer)
 
   # for Python
-  client = relationship("Client", backref="client_file")
+  client = relationship("Client", backref=backref("client_file"))
 
   def __init__(self, client_id, path, session_id, darkened, shot_id):
     self.client_id = client_id

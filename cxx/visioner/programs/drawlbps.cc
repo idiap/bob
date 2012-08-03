@@ -22,6 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "core/logging.h"
+
 #include <QApplication>
 #include <QPainter>
 #include <QColor>
@@ -338,7 +340,7 @@ int main(int argc, char *argv[]) {
   // Check arguments and options
   if (	po_vm.empty() || po_vm.count("help"))
   {
-    bob::visioner::log_error("drawmbs") << po_desc << "\n";
+    bob::core::error << po_desc << std::endl;
     exit(EXIT_FAILURE);
   }
 

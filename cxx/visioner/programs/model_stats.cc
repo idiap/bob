@@ -22,6 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "core/logging.h"
+
 #include "visioner/model/mdecoder.h"
 
 int main(int argc, char *argv[]) {
@@ -43,7 +45,7 @@ int main(int argc, char *argv[]) {
   if (	po_vm.empty() || po_vm.count("help") || 
       !po_vm.count("input"))
   {
-    bob::visioner::log_error("model_stats") << po_desc << "\n";
+    bob::core::error << po_desc << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -53,20 +55,18 @@ int main(int argc, char *argv[]) {
   bob::visioner::rmodel_t model;
   if (bob::visioner::Model::load(cmd_input, model) == false)
   {
-    bob::visioner::log_error("model_stats") 
-      << "Failed to load the model <" << cmd_input << ">!\n";
+    bob::core::error 
+      << "Failed to load the model <" << cmd_input << ">!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
   // Display statistics
-  bob::visioner::log_info("model_stats")
+  bob::core::info
     << "#outputs = " << model->n_outputs() << ", #n_features = " << model->n_features()
-    << ", #n_fvalues = " << model->n_fvalues() << ".\n";
+    << ", #n_fvalues = " << model->n_fvalues() << "." << std::endl;
   for (bob::visioner::index_t o = 0; o < model->n_outputs(); o ++)
   {
-    bob::visioner::log_info("model_stats")
-      << "\toutput <" << (o + 1) << "/" 
-      << model->n_outputs() << ">: #luts = " << model->n_luts(o) << "\n";
+    bob::core::info << "\toutput <" << (o + 1) << "/" << model->n_outputs() << ">: #luts = " << model->n_luts(o) << std::endl;
   }
 
   bob::visioner::indices_t features;
@@ -80,18 +80,16 @@ int main(int argc, char *argv[]) {
   }
 
   bob::visioner::unique(features);        
-  bob::visioner::log_info("model_stats")
-    << "#selected features = " << features.size() << ".\n";
+  bob::core::info
+    << "#selected features = " << features.size() << "." << std::endl;
 
   for (bob::visioner::index_t i = 0; i < features.size(); i ++)
   {
-    bob::visioner::log_info("model_stats")
-      << "feature <" << (i + 1) << "/" 
-      << features.size() << ">: " << model->describe(features[i]) << ".\n";
+    bob::core::info << "feature <" << (i + 1) << "/" << features.size() << ">: " << model->describe(features[i]) << "." << std::endl;
   }
 
   // OK
-  bob::visioner::log_finished();
+  bob::core::info << "Program finished successfully" << std::endl;
   exit(EXIT_SUCCESS);
 
 }

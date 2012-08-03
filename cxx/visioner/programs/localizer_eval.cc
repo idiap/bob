@@ -22,6 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "core/logging.h"
+
 #include "visioner/cv/cv_localizer.h"
 #include "visioner/util/timer.h"
 
@@ -56,7 +58,7 @@ int main(int argc, char *argv[]) {
       !detector.decode(po_desc, po_vm) ||
       !localizer.decode(po_desc, po_vm))
   {
-    bob::visioner::log_error("localizer_eval") << po_desc << "\n";
+    bob::core::error << po_desc << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -67,7 +69,7 @@ int main(int argc, char *argv[]) {
   bob::visioner::strings_t ifiles, gfiles;
   if (bob::visioner::load_listfiles(cmd_data, ifiles, gfiles) == false)
   {
-    bob::visioner::log_error("localizer_eval") << "Failed to load the test datasets <" << cmd_data << ">!\n";
+    bob::core::error << "Failed to load the test datasets <" << cmd_data << ">!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -81,13 +83,13 @@ int main(int argc, char *argv[]) {
   histo.norm();
   if (histo.save(cmd_loc + ".histo") == false)
   {
-    bob::visioner::log_error("localizer_eval") << "Failed to save the localization histogram!\n";
+    bob::core::error << "Failed to save the localization histogram!" << std::endl;
     exit(EXIT_FAILURE);
   }
   histo.cumulate();
   if (histo.save(cmd_loc + ".cum.histo") == false)
   {
-    bob::visioner::log_error("localizer_eval") << "Failed to save the localization histogram!\n";
+    bob::core::error << "Failed to save the localization histogram!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -97,20 +99,20 @@ int main(int argc, char *argv[]) {
     if (histos[iid].save(cmd_loc + ".histo." + 
           boost::lexical_cast<std::string>(localizer.param().m_labels[iid])) == false)
     {
-      bob::visioner::log_error("localizer_eval") << "Failed to save the localization histogram!\n";
+      bob::core::error << "Failed to save the localization histogram!" << std::endl;
       exit(EXIT_FAILURE);
     }
     histos[iid].cumulate();
     if (histos[iid].save(cmd_loc + ".cum.histo." + 
           boost::lexical_cast<std::string>(localizer.param().m_labels[iid])) == false)
     {
-      bob::visioner::log_error("localizer_eval") << "Failed to save the localization histogram!\n";
+      bob::core::error << "Failed to save the localization histogram!" << std::endl;
       exit(EXIT_FAILURE);
     }
   }
 
   // OK
-  bob::visioner::log_finished();
+  bob::core::info << "Program finished successfuly" << std::endl;
   return EXIT_SUCCESS;
 
 }

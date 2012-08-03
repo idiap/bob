@@ -23,6 +23,9 @@
  */
 
 #include <fstream>
+
+#include "core/logging.h"
+
 #include "visioner/model/mdecoder.h"
 
 int main(int argc, char *argv[]) {
@@ -50,7 +53,7 @@ int main(int argc, char *argv[]) {
       !param.decode(po_desc, po_vm) ||
       !po_vm.count("model"))
   {
-    bob::visioner::log_error("param2model") << po_desc << "\n";
+    bob::core::error << po_desc << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -59,12 +62,12 @@ int main(int argc, char *argv[]) {
   const bob::visioner::rmodel_t model = bob::visioner::make_model(param);
   if (model->save(cmd_model) == false)
   {
-    bob::visioner::log_error("param2model")
-      << "Failed to save the model <" << cmd_model << ">!\n";
+    bob::core::error
+      << "Failed to save the model <" << cmd_model << ">!" << std::endl;
   }
 
   // OK
-  bob::visioner::log_finished();
+  bob::core::info << "Program finished successfuly" << std::endl;
   exit(EXIT_SUCCESS);
 
 }

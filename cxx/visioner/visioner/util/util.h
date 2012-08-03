@@ -236,21 +236,6 @@ namespace bob { namespace visioner {
       }
     }
 
-  // Logging
-  std::ostream& log_warning(const char* class_name, const char* func_name);
-  std::ostream& log_warning(const char* func_name);
-  std::ostream& log_warning();
-
-  std::ostream& log_error(const char* class_name, const char* func_name);
-  std::ostream& log_error(const char* func_name);
-  std::ostream& log_error();
-
-  std::ostream& log_info(const char* class_name, const char* func_name);
-  std::ostream& log_info(const char* func_name);
-  std::ostream& log_info();
-
-  void log_finished();
-
   /////////////////////////////////////////////////////////////////////////////////////////
   // String processing
   /////////////////////////////////////////////////////////////////////////////////////////

@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_CASE( test_gwt_io )
   gwt2.load(file2);
 
   // compare the two classes
-  for (int i = 0; i < gwt.numberOfKernels(); ++i){
+  for (unsigned i = 0; i < gwt.numberOfKernels(); ++i){
     test_close<2>(gwt.kernelFrequencies()[i], gwt2.kernelFrequencies()[i], epsilon);
   }
   remove(file_path.string().c_str());
@@ -120,8 +120,8 @@ BOOST_AUTO_TEST_CASE( test_gwt_io )
 BOOST_AUTO_TEST_CASE( test_gwt_kernel_sanity )
 {
   int v_res = 152, h_res = 152;
-  blitz::TinyVector<int,6> horizontal_pairs(1,7,2,6,3,5);
-  blitz::TinyVector<int,4> diagonal_pairs(0,4,1,3);
+  blitz::TinyVector<unsigned,6> horizontal_pairs(1,7,2,6,3,5);
+  blitz::TinyVector<unsigned,4> diagonal_pairs(0,4,1,3);
   for (int test_new_resolution = 2; test_new_resolution--;){
     bob::ip::GaborWaveletTransform gwt;
     gwt.generateKernels(blitz::TinyVector<int,2>(v_res, h_res));
@@ -133,10 +133,10 @@ BOOST_AUTO_TEST_CASE( test_gwt_kernel_sanity )
     blitz::Array<double,3> kernels = gwt.kernelImages();
 
     // check that the
-    for (int scale = 0; scale < gwt.numberOfScales(); ++scale){
-      int scale_offset = gwt.numberOfDirections() * scale;
+    for (unsigned scale = 0; scale < gwt.numberOfScales(); ++scale){
+      unsigned scale_offset = gwt.numberOfDirections() * scale;
       // test the horizontal pairs
-      for (int pair = 0; pair < 6; pair += 2){
+      for (unsigned pair = 0; pair < 6; pair += 2){
         // get the two kernels to be checked
         blitz::Array<double,2>
             kernel_1 = kernels(scale_offset + horizontal_pairs[pair], blitz::Range::all(), blitz::Range::all()),
@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE( test_gwt_kernel_sanity )
       // test the diagonal pairs
       // these tests will work only with square kernels
       BOOST_CHECK_EQUAL(v_res, h_res);
-      for (int pair = 0; pair < 4; pair += 2){
+      for (unsigned pair = 0; pair < 4; pair += 2){
         // get the two kernels to be checked
         blitz::Array<double,2>
             kernel_1 = kernels(scale_offset + diagonal_pairs[pair], blitz::Range::all(), blitz::Range::all()),

@@ -22,6 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "core/logging.h"
+
 #include "visioner/cv/cv_detector.h"
 
 int main(int argc, char *argv[]) {	
@@ -52,7 +54,7 @@ int main(int argc, char *argv[]) {
       !po_vm.count("roc") ||
       !detector.decode(po_desc, po_vm))
   {
-    bob::visioner::log_error("detector_eval") << po_desc << "\n";
+    bob::core::error << po_desc << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -63,7 +65,7 @@ int main(int argc, char *argv[]) {
   bob::visioner::strings_t ifiles, gfiles;
   if (bob::visioner::load_listfiles(cmd_data, ifiles, gfiles) == false)
   {
-    bob::visioner::log_error("detector_eval") << "Failed to load the test datasets <" << cmd_data << ">!\n";
+    bob::core::error << "Failed to load the test datasets <" << cmd_data << ">!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -74,12 +76,12 @@ int main(int argc, char *argv[]) {
   // ... and save it to file: TAR + FA
   if (bob::visioner::save_roc(fas, tars, cmd_roc) == false)
   {
-    bob::visioner::log_error("detector_eval") << "Failed to save the ROC points!\n";
+    bob::core::error << "Failed to save the ROC points!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
   // OK
-  bob::visioner::log_finished();
+  bob::core::info << "Program finished successfuly" << std::endl;
   return EXIT_SUCCESS;
 
 }

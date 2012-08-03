@@ -24,6 +24,8 @@
 
 #include <fstream>
 
+#include "core/logging.h"
+
 #include "visioner/model/ipyramid.h"
 
 int main(int argc, char *argv[]) {
@@ -55,7 +57,7 @@ int main(int argc, char *argv[]) {
       !po_vm.count("output") ||
       !po_vm.count("output_dir"))
   {
-    bob::visioner::log_error("downscaler") << po_desc << "\n";
+    bob::core::error << po_desc << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -69,7 +71,7 @@ int main(int argc, char *argv[]) {
   if (	bob::visioner::load_listfiles(cmd_input, ifiles, gfiles) == false ||
       ifiles.empty() || ifiles.size() != gfiles.size())
   {
-    bob::visioner::log_error("downscaler") << "Failed to load the input image lists!\n";
+    bob::core::error << "Failed to load the input image lists!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -81,13 +83,13 @@ int main(int argc, char *argv[]) {
     const std::string ifile_proc = bob::visioner::basename(ifiles[i]) + ".png";
     const std::string gfile_proc = bob::visioner::filename(gfiles[i]);
 
-    bob::visioner::log_info("downscaler") << "Downscaling [" << (i + 1) << "/" << ifiles.size() << "] ...\r";
+    bob::core::info << "Downscaling [" << (i + 1) << "/" << ifiles.size() << "] ...\r";
 
     // Load the image and the ground truth
     if (	bob::visioner::load(ifiles[i], ipscale.m_image) == false ||
         bob::visioner::Object::load(gfiles[i], ipscale.m_objects) == false)
     {
-      bob::visioner::log_error("downscaler") << "Failed to load the image <" << ifiles[i] << ">!\n";
+      bob::core::error << "Failed to load the image <" << ifiles[i] << ">!" << std::endl;
       exit(EXIT_FAILURE);
     }
 
@@ -98,9 +100,9 @@ int main(int argc, char *argv[]) {
     if (	qimage.save((cmd_output_dir + "/" + ifile_proc).c_str()) == false ||
         bob::visioner::Object::save(cmd_output_dir + "/" + gfile_proc, ipscale_proc.m_objects) == false)
     {
-      bob::visioner::log_error("downscaler") 
+      bob::core::error 
         << "Failed to save the processed image <" 
-        << (cmd_output_dir + "/" + ifile_proc) << ">!\n";
+        << (cmd_output_dir + "/" + ifile_proc) << ">!" << std::endl;
       exit(EXIT_FAILURE);
     }
 
@@ -113,19 +115,19 @@ int main(int argc, char *argv[]) {
   std::ofstream os(cmd_output.c_str());
   if (os.is_open() == false)
   {
-    bob::visioner::log_error("downscaler") << "Cannot open the output file list <" << cmd_output << ">!\n";
+    bob::core::error << "Cannot open the output file list <" << cmd_output << ">!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
-  os << (cmd_output_dir + "/") << "\n";
+  os << (cmd_output_dir + "/") << std::endl;
   for (std::size_t i = 0; i < ifiles.size(); i ++)
   {
-    os << ifiles_proc[i] << " # " << gfiles_proc[i] << "\n";
+    os << ifiles_proc[i] << " # " << gfiles_proc[i] << std::endl;
   }
   os.close();
 
   // OK
-  bob::visioner::log_finished();
+  bob::core::info << "Program finished successfuly" << std::endl;
   exit(EXIT_SUCCESS);
 
 }

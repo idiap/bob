@@ -22,6 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "core/logging.h"
+
 #include "visioner/model/param.h"
 #include "visioner/model/mdecoder.h"
 
@@ -98,7 +100,7 @@ namespace bob { namespace visioner {
     {
       if (!po_vm.count(var_name))
       {
-        log_error("decode_var") << po_desc << "\n";
+        bob::core::error << po_desc << std::endl;
         exit(EXIT_FAILURE);
       }
 
@@ -112,7 +114,7 @@ namespace bob { namespace visioner {
     {
       if (!po_vm.count(var_name))
       {
-        log_error("decode_vars") << po_desc << "\n";
+        bob::core::error << po_desc << std::endl;
         exit(EXIT_FAILURE);
       }
 
@@ -127,7 +129,7 @@ namespace bob { namespace visioner {
     {
       if (!po_vm.count(var_name))
       {
-        log_error("decode_values_bundle") << po_desc << "\n";
+        bob::core::error << po_desc << std::endl;
         exit(EXIT_FAILURE);
       }
 
@@ -159,7 +161,7 @@ namespace bob { namespace visioner {
         // Error
         else
         {
-          log_error("decode_values_bundle") << po_desc << "\n";
+          bob::core::error << po_desc << std::endl;
           exit(EXIT_FAILURE);
         }
       }
@@ -167,7 +169,7 @@ namespace bob { namespace visioner {
       // Error
       if (values.empty())
       {
-        log_error("decode_values_bundle") << po_desc << "\n";
+        bob::core::error << po_desc << std::endl;
         exit(EXIT_FAILURE);
       }
     }

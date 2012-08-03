@@ -22,6 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "core/logging.h"
+
 #include "visioner/cv/cv_classifier.h"
 #include "visioner/util/timer.h"
 
@@ -53,7 +55,7 @@ int main(int argc, char *argv[]) {
       !detector.decode(po_desc, po_vm) ||
       !classifier.decode(po_desc, po_vm))
   {
-    bob::visioner::log_error("classifier_eval") << po_desc << "\n";
+    bob::core::error << po_desc << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -63,7 +65,7 @@ int main(int argc, char *argv[]) {
   bob::visioner::strings_t ifiles, gfiles;
   if (bob::visioner::load_listfiles(cmd_data, ifiles, gfiles) == false)
   {
-    bob::visioner::log_error("classifier_eval") << "Failed to load the test datasets <" << cmd_data << ">!\n";
+    bob::core::error << "Failed to load the test datasets <" << cmd_data << ">!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -83,32 +85,32 @@ int main(int argc, char *argv[]) {
   const bob::visioner::index_t sum_hits = std::accumulate(hits_cnt.begin(), hits_cnt.end(), 0);
 
   // --- header
-  bob::visioner::log_info() << empty_str;
+  bob::core::info << empty_str;
   for (bob::visioner::index_t c1 = 0; c1 < n_classes; c1 ++)
   {
-    bob::visioner::log_info() << bob::visioner::resize(labels[c1], str_size);
+    bob::core::info << bob::visioner::resize(labels[c1], str_size);
   }
-  bob::visioner::log_info() << bob::visioner::resize("[ERR]", str_size) << "\n";
+  bob::core::info << bob::visioner::resize("[ERR]", str_size) << std::endl;
 
   // --- content
   bob::visioner::index_t sum_hits_c11 = 0;
   for (bob::visioner::index_t c1 = 0; c1 < n_classes; c1 ++)
   {
-    bob::visioner::log_info() << bob::visioner::resize(labels[c1], str_size);
+    bob::core::info << bob::visioner::resize(labels[c1], str_size);
 
     for (bob::visioner::index_t c2 = 0; c2 < n_classes; c2 ++)
     {
       const bob::visioner::scalar_t c12_dr = 
         100.0 * bob::visioner::inverse(hits_cnt[c1]) * hits_mat(c1, c2);   
 
-      bob::visioner::log_info()
+      bob::core::info
         << bob::visioner::resize(bob::visioner::round(c12_dr, 2), str_size);
     }
 
     const bob::visioner::scalar_t c1_err = 
       100.0 - 100.0 * bob::visioner::inverse(hits_cnt[c1]) * hits_mat(c1, c1);  
-    bob::visioner::log_info()
-      << bob::visioner::resize(bob::visioner::round(c1_err, 2), str_size) << "\n";
+    bob::core::info
+      << bob::visioner::resize(bob::visioner::round(c1_err, 2), str_size) << std::endl;
 
     sum_hits_c11 += hits_mat(c1, c1);
   }
@@ -116,11 +118,11 @@ int main(int argc, char *argv[]) {
   // --- end
   const bob::visioner::scalar_t err = 
     100.0 - 100.0 * bob::visioner::inverse(sum_hits) * sum_hits_c11;  
-  bob::visioner::log_info()
-    << ">>> Average error: " << bob::visioner::round(err, 2) << "%.\n";
+  bob::core::info
+    << ">>> Average error: " << bob::visioner::round(err, 2) << "%." << std::endl;
 
   // OK
-  bob::visioner::log_finished();
+  bob::core::info << "Program finished successfuly" << std::endl;
   return EXIT_SUCCESS;
 
 }

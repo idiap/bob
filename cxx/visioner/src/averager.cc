@@ -22,6 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "core/logging.h"
+
 #include "visioner/model/trainers/averager.h"
 #include "visioner/util/timer.h"
 
@@ -50,19 +52,18 @@ namespace bob { namespace visioner {
 
     t_sampler.map(t_samples, model, t_data);
 
-    log_info("Averager", "train") << "timing: sampling ~ " << timer.elapsed() << ".\n";
+    bob::core::info << "timing: sampling ~ " << timer.elapsed() << "." << std::endl;
 
     // Check parameters
     if (t_data.empty())
     {
-      log_error("Averager", "train") << "Invalid training samples!\n";
+      bob::core::error << "Invalid training samples!" << std::endl;
       return false;
     }
 
-    log_info("Averager", "train")
-      << "using "
+    bob::core::info << "using "
       << t_data.n_samples() << " training samples with "
-      << t_data.n_features() << " features.\n";
+      << t_data.n_features() << " features." << std::endl;
 
     // Train the model ...		
     scalars_t avg_outputs(t_data.n_outputs(), 0.0);
@@ -78,9 +79,9 @@ namespace bob { namespace visioner {
     {
       avg_outputs[o] *= inverse(t_data.n_samples());
 
-      log_info("Averager", "train")
+      bob::core::info
         << "output [" << (o + 1) << "/" << t_data.n_outputs() << "] = "
-        << avg_outputs[o] << ".\n";
+        << avg_outputs[o] << "." << std::endl;
     }
 
     MultiLUTs mluts(t_data.n_outputs(), LUTs(1, LUT(0, t_data.n_fvalues())));		

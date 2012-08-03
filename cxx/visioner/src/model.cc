@@ -29,6 +29,8 @@
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/filesystem.hpp>
 
+#include "core/logging.h"
+
 #include "visioner/model/model.h"
 #include "visioner/model/mdecoder.h"
 
@@ -38,7 +40,7 @@
  * @param filename The name of the file to be analyzed.
  */
 inline static bool is_dot_gz(const std::string& filename) {
-   return boost::filesystem::extension(filename) == ".gz" || 
+   return boost::filesystem::extension(filename) == ".gz" ||
      boost::filesystem::extension(filename) == ".vbgz";
 }
 
@@ -95,7 +97,7 @@ namespace bob { namespace visioner {
 
     if (ofs.good() == false)
     {
-      log_error("save_model") << "Failed to save the model!\n";
+      bob::core::error << "Failed to save the model!" << std::endl;
       return false;
     }
 
@@ -129,7 +131,7 @@ namespace bob { namespace visioner {
 
     if (ifs.good() == false)
     {
-      log_error("load_model") << "Failed to load the model!\n";
+      bob::core::error << "Failed to load the model!" << std::endl;
       return false;
     }
 
@@ -162,7 +164,7 @@ namespace bob { namespace visioner {
 
     if (ifs.good() == false)
     {
-      log_error("load_model") << "Failed to load the model!\n";
+      bob::core::error << "Failed to load the model!" << std::endl;
       return false;
     }
 

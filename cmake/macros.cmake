@@ -97,6 +97,8 @@ macro(bob_add_executable package name src)
   # Please note we don't install test executables
   add_executable(${progname} ${src})
   target_link_libraries(${progname} bob_${package})
+  
+  install(TARGETS ${progname} DESTINATION bin)
 endmacro()
 
 # Creates a standard Bob benchmark.

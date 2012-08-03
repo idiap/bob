@@ -24,6 +24,8 @@
 
 #include <fstream>
 
+#include "core/logging.h"
+
 #include "visioner/model/ipyramid.h"
 
 int main(int argc, char *argv[]) {	
@@ -53,7 +55,7 @@ int main(int argc, char *argv[]) {
       !po_vm.count("points") ||
       !po_vm.count("output"))
   {
-    bob::visioner::log_error("gt2pts") << po_desc << "\n";
+    bob::core::error << po_desc << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -66,7 +68,7 @@ int main(int argc, char *argv[]) {
   if (	bob::visioner::load_listfiles(cmd_input, ifiles, gfiles) == false ||
       ifiles.empty() || ifiles.size() != gfiles.size())
   {
-    bob::visioner::log_error("gt2pts") << "Failed to load the face datasets <" << (cmd_input) << ">!\n";
+    bob::core::error << "Failed to load the face datasets <" << (cmd_input) << ">!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -81,8 +83,7 @@ int main(int argc, char *argv[]) {
     // Load the ground truth		
     if (bob::visioner::Object::load(gfile, objects) == false)
     {
-      bob::visioner::log_warning("gt2pts") 
-        << "Cannot load the ground truth <" << gfile << ">!\n";
+      bob::core::warn << "Cannot load the ground truth <" << gfile << ">!" << std::endl;
       continue;
     }
 
@@ -95,32 +96,31 @@ int main(int argc, char *argv[]) {
     std::ofstream out((cmd_output + "/" + bob::visioner::basename(gfile) + ".pts").c_str());
     if (out.is_open() == false)
     {
-      bob::visioner::log_warning("gt2pts") 
-        << "Cannot save the .pts annotations for <" << gfile << ">!\n";
+      bob::core::warn << "Cannot save the .pts annotations for <" << gfile << ">!" << std::endl;
     }
 
     const bob::visioner::Object& object = objects[0];
 
-    out << "version: 1\n";
-    out << "n_points: " << tokens.size() << "\n";
-    out << "{\n";
+    out << "version: 1" << std::endl;
+    out << "n_points: " << tokens.size() << std::endl;
+    out << "{" << std::endl;
 
     for (bob::visioner::strings_t::const_iterator it = tokens.begin(); it != tokens.end(); ++ it)
     {
       bob::visioner::Keypoint keypoint;                        
       object.find(*it, keypoint);
 
-      out << keypoint.m_point.x() << " " << keypoint.m_point.y() << "\n";
+      out << keypoint.m_point.x() << " " << keypoint.m_point.y() << std::endl;
     }
 
-    out << "}\n";
+    out << "}" << std::endl;
 
-    bob::visioner::log_info("gt2pts") 
-      << "Ground truth [" << (i + 1) << "/" << ifiles.size() << "]: processed.\n";
+    bob::core::info 
+      << "Ground truth [" << (i + 1) << "/" << ifiles.size() << "]: processed." << std::endl;
   }
 
   // OK
-  bob::visioner::log_finished();
+  bob::core::info << "Program finished successfuly" << std::endl;
   return EXIT_SUCCESS;
 
 }

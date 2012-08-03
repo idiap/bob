@@ -24,6 +24,8 @@
 
 #include <QApplication>
 
+#include "core/logging.h"
+
 #include "visioner/cv/cv_detector.h"
 #include "visioner/cv/cv_draw.h"
 #include "visioner/util/timer.h"
@@ -58,7 +60,7 @@ int main(int argc, char *argv[]) {
       !po_vm.count("data") ||
       !detector.decode(po_desc, po_vm))
   {
-    bob::visioner::log_error("detector") << po_desc << "\n";
+    bob::core::error << po_desc << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -69,7 +71,7 @@ int main(int argc, char *argv[]) {
   bob::visioner::strings_t ifiles, gfiles;
   if (bob::visioner::load_listfiles(cmd_data, ifiles, gfiles) == false)
   {
-    bob::visioner::log_error("detector") << "Failed to load the test datasets <" << cmd_data << ">!\n";
+    bob::core::error << "Failed to load the test datasets <" << cmd_data << ">!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -84,8 +86,8 @@ int main(int argc, char *argv[]) {
     // Load the image and the ground truth
     if (detector.load(ifile, gfile) == false)
     {
-      bob::visioner::log_error("detector")
-        << "Failed to load image <" << ifile << "> or ground truth <" << gfile << ">!\n";
+      bob::core::error
+        << "Failed to load image <" << ifile << "> or ground truth <" << gfile << ">!" << std::endl;
       exit(EXIT_FAILURE);
     }
 
@@ -103,18 +105,18 @@ int main(int argc, char *argv[]) {
 
     qimage.save((cmd_results + "/" + bob::visioner::basename(ifiles[i]) + ".det.png").c_str());
 
-    bob::visioner::log_info("detector") 
+    bob::core::info 
       << "Image [" << (i + 1) << "/" << ifiles.size() << "]: scanned " 
       << detections.size() << "/" << detector.stats().m_sws << " SWs & "
       << detector.n_objects() << "/" << detector.stats().m_gts << " GTs in " 
-      << timer.elapsed() << "s.\n";
+      << timer.elapsed() << "s." << std::endl;
   }
 
   // Display statistics
   detector.stats().show();
 
   // OK
-  bob::visioner::log_finished();
+  bob::core::info << "Program finished successfuly" << std::endl;
   return EXIT_SUCCESS;
 
 }
