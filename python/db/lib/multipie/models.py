@@ -61,7 +61,7 @@ class File(Base):
     self.img_type = img_type
 
   def __repr__(self):
-    print "<File('%s')>" % self.path
+    return "<File('%s')>" % self.path
 
 class FileMultiview(Base):
   __tablename__ = 'file_multiview'
@@ -79,7 +79,7 @@ class FileMultiview(Base):
     self.shot_id = shot_id
 
   def __repr__(self):
-    print "<FileMultiview('%d','%d')>" % self.camera_id, self.shot_id
+    return "<FileMultiview('%d','%d')>" % self.camera_id, self.shot_id
 
 class Expression(Base):
   __tablename__ = 'expression'
@@ -108,7 +108,7 @@ class ProtocolName(Base):
     self.name = name
 
   def __repr__(self):
-    return "<Protocol('%s')>" % self.name
+    return "<ProtocolName('%s')>" % self.name
 
 class Protocol(Base):
   __tablename__ = 'protocol'
@@ -152,7 +152,7 @@ class ProtocolMultiview(Base):
     self.shot_id = shot_id
 
   def __repr__(self):
-    print "<ProtocolMultiview('%d', '%s','%d')>" % (self.protocol_id, self.camera_id, self.shot_id)
+    return "<ProtocolMultiview('%d', '%s','%d')>" % (self.protocol_id, self.camera_id, self.shot_id)
 
 class FileProtocol(Base):
   __tablename__ = 'file_protocol'
@@ -171,4 +171,4 @@ class FileProtocol(Base):
     self.purpose = purpose
 
   def __repr__(self):
-    print "<FileProtocol('%d', '%s', '%s')>" % (self.file_id, self.protocol_name, self.purpose)
+    return "<FileProtocol('%d', '%s', '%s')>" % (self.file_id, self.protocol_name, self.purpose)

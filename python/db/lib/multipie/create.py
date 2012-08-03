@@ -344,7 +344,6 @@ def add_fileprotocol(session):
   for k in q:
     for prot in protocols_I:
       session.add(FileProtocol(k[0], prot, 'world'))
-  print q.count()
   
   protocols_P = ('P051', 'P050', 'P140', 'P041', 'P130')
   cameras_P = ('05_1', '05_0', '14_0', '04_1', '13_0')
@@ -358,12 +357,8 @@ def add_fileprotocol(session):
           filter(and_(File.img_type == 'multiview', FileMultiview.camera_id.in_(cams), File.session_id == Expression.session_id,
                       File.recording_id == Expression.recording_id, Expression.img_type == 'multiview', FileMultiview.shot_id == 0)).\
           order_by(File.client_id, File.session_id, File.recording_id, FileMultiview.camera_id, FileMultiview.shot_id)
-    print cams
-    print cameras_P[prot]
-    print protocols_P[prot]
     for k in q:
       session.add(FileProtocol(k[0], protocols_P[prot], 'world'))
-    print q.count()
  
 def create_tables(args):
   """Creates all necessary tables (only to be used at the first time)"""
