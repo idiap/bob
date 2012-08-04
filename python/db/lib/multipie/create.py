@@ -403,6 +403,7 @@ def create_tables(args):
   File.metadata.create_all(engine)
   FileMultiview.metadata.create_all(engine)
   Client.metadata.create_all(engine)
+  SubworldClient.metadata.create_all(engine)
   Expression.metadata.create_all(engine)
   ProtocolName.metadata.create_all(engine)
   Protocol.metadata.create_all(engine)
