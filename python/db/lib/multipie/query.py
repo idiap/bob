@@ -30,7 +30,7 @@ class Database(object):
         raise RuntimeError, 'Invalid %s "%s". Valid values are %s, or lists/tuples of those' % (obj, k, valid)
     return l
 
-  def clients(self, protocol=None, groups=None, gender=None, birthyear=None):
+  def clients(self, protocol=None, groups=None, subworld=None, gender=None, birthyear=None):
     """Returns a set of clients for the specific query by the user.
 
     Keyword Parameters:
@@ -40,6 +40,10 @@ class Database(object):
 
     groups
       The groups to which the clients belong ('dev', 'eval', 'world')
+
+    subworld
+      Specify a split of the world data ("sub41", "sub81", "sub121, "sub161", "")
+      In order to be considered, "world" should be in groups.
 
     gender
       The genders to which the clients belong ('f', 'm')
@@ -53,22 +57,38 @@ class Database(object):
 
     VALID_PROTOCOLS = ('M', 'U', 'G', 'P051', 'P050', 'P140', 'P041', 'P130')
     VALID_GROUPS = ('dev', 'eval', 'world')
+    VALID_SUBWORLDS = ('sub41', 'sub81', 'sub121', 'sub161')
     VALID_GENDERS = ('m', 'f')
     VALID_BIRTHYEARS = range(1900, 2050)
     VALID_BIRTHYEARS.append(57) # bug in subject_list.txt (57 instead of 1957)
     protocol = self.__check_validity__(protocol, 'protocol', VALID_PROTOCOLS)
     groups = self.__check_validity__(groups, 'group', VALID_GROUPS)
+    if subworld: subworld = self.__check_validity__(subworld, 'subworld', VALID_SUBWORLDS)
     gender = self.__check_validity__(gender, 'gender', VALID_GENDERS)
     birthyear = self.__check_validity__(birthyear, 'birthyear', VALID_BIRTHYEARS)
     # List of the clients
-    q = self.session.query(Client).\
-          filter(Client.sgroup.in_(groups)).\
-          filter(Client.gender.in_(gender)).\
-          filter(Client.birthyear.in_(birthyear)).\
-          order_by(Client.id)
     retval = []
-    for id in [k.id for k in q]: 
-      retval.append(id)
+    # World data
+    if "world" in groups:
+      if subworld:
+        q = self.session.query(Client).join(SubworldClient).filter(SubworldClient.name.in_(subworld))
+      else:
+        q = self.session.query(Client)
+      q = q.filter(Client.sgroup == 'world').\
+            filter(Client.gender.in_(gender)).\
+            filter(Client.birthyear.in_(birthyear)).\
+            order_by(Client.id)
+      for id in [k.id for k in q]:
+        retval.append(id)
+    # dev / eval data
+    if 'dev' in groups or 'eval' in groups:
+      q = self.session.query(Client).\
+            filter(and_(Client.sgroup != 'world', Client.sgroup.in_(groups))).\
+            filter(Client.gender.in_(gender)).\
+            filter(Client.birthyear.in_(birthyear)).\
+            order_by(Client.id)
+      for id in [k.id for k in q]:
+        retval.append(id)
     return retval
 
   def tclients(self, protocol=None, groups=None):
@@ -267,7 +287,8 @@ class Database(object):
       default), it is considered the same as a tuple with all possible values.
   
     subworld
-      if only a subset of the world data should be used
+      Specify a split of the world data ("sub41", "sub81", "sub121, "sub161", "")
+      In order to be considered, "world" should be in groups.
 
     expressions
       The (face) expressions to be retrieved ('neutral', 'smile', 'surprise',
@@ -324,12 +345,14 @@ class Database(object):
     VALID_PURPOSES = ('enrol', 'probe')
     VALID_GROUPS = ('dev', 'eval', 'world')
     VALID_CLASSES = ('client', 'impostor')
+    VALID_SUBWORLDS = ('sub41', 'sub81', 'sub121', 'sub161')
     VALID_EXPRESSIONS = ('neutral', 'smile', 'surprise', 'squint', 'disgust', 'scream')
 
     protocol = self.__check_validity__(protocol, 'protocol', VALID_PROTOCOLS)
     purposes = self.__check_validity__(purposes, 'purpose', VALID_PURPOSES)
     groups = self.__check_validity__(groups, 'group', VALID_GROUPS)
     classes = self.__check_validity__(classes, 'class', VALID_CLASSES)
+    if subworld: subworld = self.__check_validity__(subworld, 'subworld', VALID_SUBWORLDS)
     expressions = self.__check_validity__(expressions, 'expression', VALID_EXPRESSIONS)
 
     retval = {}
@@ -348,6 +371,8 @@ class Database(object):
       """
       q = self.session.query(FileProtocol).join(File).join(Client).join(ProtocolName).join(FileMultiview).\
             filter(and_(ProtocolName.name.in_(protocol), Client.sgroup == 'world', FileProtocol.purpose == 'world'))
+      if subworld:
+        q = q.join(SubworldClient).filter(SubworldClient.name.in_(subworld))
       if model_ids:
         q = q.filter(File.client_id.in_(model_ids))
       if(world_nshots):
@@ -492,6 +517,10 @@ class Database(object):
       The classes (types of accesses) to be retrieved ('client', 'impostor') 
       or a tuple with several of them. If 'None' is given (this is the 
       default), it is considered the same as a tuple with all possible values.
+
+    subworld
+      Specify a split of the world data ("sub41", "sub81", "sub121, "sub161", "")
+      In order to be considered, "world" should be in groups.
 
     expressions
       The (face) expressions to be retrieved ('neutral', 'smile', 'surprise',

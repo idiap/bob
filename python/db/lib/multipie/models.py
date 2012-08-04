@@ -40,6 +40,23 @@ class Client(Base):
   def __repr__(self):
     return "<Client('%d', '%s', '%d', '%s', '%d', '%d', '%d', '%d')>" % (self.id, self.sgroup, self.birthyear, self.gender, self.first_session, self.second_session, self.third_session, self.fourth_session)
 
+class SubworldClient(Base):
+  __tablename__ = 'subworld_client'
+
+  id = Column(Integer, primary_key=True)
+  name = Column(String(20))
+  client_id = Column(Integer, ForeignKey('client.id')) # for SQL
+
+  # for Python
+  client = relationship("Client", backref=backref("client_subworldClient"))
+ 
+  def __init__(self, name, client_id):
+    self.name = name
+    self.client_id = client_id
+
+  def __repr__(self):
+    return "<SubworldClient('%s', '%d')>" % (self.name, self.client_id)
+
 class File(Base):
   __tablename__ = 'file'
 
