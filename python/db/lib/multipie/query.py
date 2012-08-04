@@ -30,7 +30,7 @@ class Database(object):
         raise RuntimeError, 'Invalid %s "%s". Valid values are %s, or lists/tuples of those' % (obj, k, valid)
     return l
 
-  def clients(self, protocol=None, groups=None, gender=None, birthyear=None):
+  def clients(self, protocol=None, groups=None, subworld=None, gender=None, birthyear=None):
     """Returns a set of clients for the specific query by the user.
 
     Keyword Parameters:
@@ -40,6 +40,10 @@ class Database(object):
 
     groups
       The groups to which the clients belong ('dev', 'eval', 'world')
+
+    subworld
+      Specify a split of the world data ("sub41", "sub81", "sub121, "sub161", "")
+      In order to be considered, "world" should be in groups.
 
     gender
       The genders to which the clients belong ('f', 'm')
@@ -51,24 +55,40 @@ class Database(object):
     properties.
     """
 
-    VALID_PROTOCOLS = ('M', 'U', 'G')
+    VALID_PROTOCOLS = ('M', 'U', 'G', 'P051', 'P050', 'P140', 'P041', 'P130')
     VALID_GROUPS = ('dev', 'eval', 'world')
+    VALID_SUBWORLDS = ('sub41', 'sub81', 'sub121', 'sub161')
     VALID_GENDERS = ('m', 'f')
     VALID_BIRTHYEARS = range(1900, 2050)
     VALID_BIRTHYEARS.append(57) # bug in subject_list.txt (57 instead of 1957)
     protocol = self.__check_validity__(protocol, 'protocol', VALID_PROTOCOLS)
     groups = self.__check_validity__(groups, 'group', VALID_GROUPS)
+    if subworld: subworld = self.__check_validity__(subworld, 'subworld', VALID_SUBWORLDS)
     gender = self.__check_validity__(gender, 'gender', VALID_GENDERS)
     birthyear = self.__check_validity__(birthyear, 'birthyear', VALID_BIRTHYEARS)
     # List of the clients
-    q = self.session.query(Client).\
-          filter(Client.sgroup.in_(groups)).\
-          filter(Client.gender.in_(gender)).\
-          filter(Client.birthyear.in_(birthyear)).\
-          order_by(Client.id)
     retval = []
-    for id in [k.id for k in q]: 
-      retval.append(id)
+    # World data
+    if "world" in groups:
+      if subworld:
+        q = self.session.query(Client).join(SubworldClient).filter(SubworldClient.name.in_(subworld))
+      else:
+        q = self.session.query(Client)
+      q = q.filter(Client.sgroup == 'world').\
+            filter(Client.gender.in_(gender)).\
+            filter(Client.birthyear.in_(birthyear)).\
+            order_by(Client.id)
+      for id in [k.id for k in q]:
+        retval.append(id)
+    # dev / eval data
+    if 'dev' in groups or 'eval' in groups:
+      q = self.session.query(Client).\
+            filter(and_(Client.sgroup != 'world', Client.sgroup.in_(groups))).\
+            filter(Client.gender.in_(gender)).\
+            filter(Client.birthyear.in_(birthyear)).\
+            order_by(Client.id)
+      for id in [k.id for k in q]:
+        retval.append(id)
     return retval
 
   def tclients(self, protocol=None, groups=None):
@@ -267,7 +287,8 @@ class Database(object):
       default), it is considered the same as a tuple with all possible values.
   
     subworld
-      if only a subset of the world data should be used
+      Specify a split of the world data ("sub41", "sub81", "sub121, "sub161", "")
+      In order to be considered, "world" should be in groups.
 
     expressions
       The (face) expressions to be retrieved ('neutral', 'smile', 'surprise',
@@ -320,16 +341,18 @@ class Database(object):
       if directory: return os.path.join(directory, stem + extension)
       return stem + extension
 
-    VALID_PROTOCOLS = ('M', 'U', 'G')
+    VALID_PROTOCOLS = ('M', 'U', 'G', 'P051', 'P050', 'P140', 'P041', 'P130')
     VALID_PURPOSES = ('enrol', 'probe')
     VALID_GROUPS = ('dev', 'eval', 'world')
     VALID_CLASSES = ('client', 'impostor')
+    VALID_SUBWORLDS = ('sub41', 'sub81', 'sub121', 'sub161')
     VALID_EXPRESSIONS = ('neutral', 'smile', 'surprise', 'squint', 'disgust', 'scream')
 
     protocol = self.__check_validity__(protocol, 'protocol', VALID_PROTOCOLS)
     purposes = self.__check_validity__(purposes, 'purpose', VALID_PURPOSES)
     groups = self.__check_validity__(groups, 'group', VALID_GROUPS)
     classes = self.__check_validity__(classes, 'class', VALID_CLASSES)
+    if subworld: subworld = self.__check_validity__(subworld, 'subworld', VALID_SUBWORLDS)
     expressions = self.__check_validity__(expressions, 'expression', VALID_EXPRESSIONS)
 
     retval = {}
@@ -339,11 +362,17 @@ class Database(object):
    
     if 'world' in groups:
       # Multiview
+      """
       q = self.session.query(File,Expression).join(Client).join(FileMultiview).\
             filter(Client.sgroup == 'world').\
             filter(Expression.name.in_(expressions)).\
             filter(and_(File.img_type == 'multiview', File.session_id == Expression.session_id,\
                         File.recording_id == Expression.recording_id, FileMultiview.shot_id != 19))
+      """
+      q = self.session.query(FileProtocol).join(File).join(Client).join(ProtocolName).join(FileMultiview).\
+            filter(and_(ProtocolName.name.in_(protocol), Client.sgroup == 'world', FileProtocol.purpose == 'world'))
+      if subworld:
+        q = q.join(SubworldClient).filter(SubworldClient.name.in_(subworld))
       if model_ids:
         q = q.filter(File.client_id.in_(model_ids))
       if(world_nshots):
@@ -372,7 +401,6 @@ class Database(object):
                           and_( File.session_id == Client.third_session, or_(and_(File.recording_id == 1, FileMultiview.shot_id < max3),
                                                                              and_(File.recording_id == 2, FileMultiview.shot_id < max4))),
                           and_( File.session_id == Client.fourth_session, FileMultiview.shot_id < max4)))
-        #q = q.filter(FileMultiview.shot_id <= world_nshots )
       if(world_shots):
         q = q.filter(FileMultiview.shot_id.in_(world_shots))
       if( world_sampling != 1 and world_noflash == False):
@@ -394,59 +422,57 @@ class Database(object):
         q = q.filter(or_( and_(Client.fourth_session != 4, File.session_id == Client.fourth_session),
                           or_( and_(Client.third_session == 4, and_(File.session_id == 4, File.recording_id == 2)),
                                and_(Client.fourth_session == 4, and_(File.session_id == 4, File.recording_id == 1)))))
-      q = q.order_by(File.client_id, File.session_id, FileMultiview.shot_id)
       for k in q:
-        retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
+        kk = k.file
+        retval[kk.id] = (make_path(kk.path, directory, extension), kk.client_id, kk.client_id, kk.client_id, kk.path)
     
       # Highres
       # TODO
 
-    if('dev' in groups or 'eval' in groups):
+    if('dev' in groups or 'eval' in groups): 
+      # Dev and/or eval groups from the query
+      groups_de = []
+      if 'dev' in groups: groups_de.append('dev')
+      if 'eval' in groups: groups_de.append('eval')
+
       # Multiview
+      # Enrol
       if('enrol' in purposes):
-        q = self.session.query(File, Protocol, ProtocolName, ProtocolMultiview).join(Client).join(FileMultiview).\
-              filter(and_(Client.sgroup.in_(groups), Client.sgroup != 'world')).\
-              filter(and_(ProtocolName.name.in_(protocol), Protocol.name == ProtocolName.name, Protocol.sgroup.in_(groups),\
-                          Protocol.sgroup != 'world', Protocol.img_type == 'multiview', Protocol.session_id == File.session_id,\
-                          Protocol.recording_id == File.recording_id, Protocol.purpose == 'enrol')).\
-              filter(and_(Protocol.id == ProtocolMultiview.id, ProtocolMultiview.camera_id == FileMultiview.camera_id,\
-                          ProtocolMultiview.shot_id == FileMultiview.shot_id))
+        q = self.session.query(FileProtocol).join(File).join(Client).join(ProtocolName).\
+              filter(and_(ProtocolName.name.in_(protocol), Client.sgroup.in_(groups_de), FileProtocol.purpose == 'enrol'))
         if model_ids:
           q = q.filter(and_(Client.id.in_(model_ids)))
-        q = q.order_by(File.client_id, File.session_id, FileMultiview.shot_id)
         for k in q:
-          retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
-
+          kk = k.file
+          retval[kk.id] = (make_path(kk.path, directory, extension), kk.client_id, kk.client_id, kk.client_id, kk.path)
+      # Probe
       if('probe' in purposes):
-        if('client' in classes):
-          q = self.session.query(File, Protocol, ProtocolName, ProtocolMultiview).join(Client).join(FileMultiview).\
-                filter(and_(Client.sgroup.in_(groups), Client.sgroup != 'world')).\
-                filter(and_(ProtocolName.name.in_(protocol), Protocol.name == ProtocolName.name, Protocol.sgroup.in_(groups),\
-                            Protocol.sgroup != 'world', Protocol.img_type == 'multiview', Protocol.session_id == File.session_id,\
-                            Protocol.recording_id == File.recording_id, Protocol.purpose == 'probe')).\
-                filter(and_(Protocol.id == ProtocolMultiview.id, ProtocolMultiview.camera_id == FileMultiview.camera_id,\
-                            ProtocolMultiview.shot_id == FileMultiview.shot_id))
+        # Note: defining the variable q once outside the if statement makes it less efficient!
+        if('client' in classes and 'impostor' in classes):
+          q = self.session.query(FileProtocol).join(File).join(Client).join(ProtocolName).\
+                filter(and_(ProtocolName.name.in_(protocol), Client.sgroup.in_(groups_de), FileProtocol.purpose == 'probe'))
+          for k in q: 
+            kk = k.file
+            retval[kk.id] = (make_path(kk.path, directory, extension), kk.client_id, kk.client_id, kk.client_id, kk.path)
+        elif('client' in classes):
+          q = self.session.query(FileProtocol).join(File).join(Client).join(ProtocolName).\
+                filter(and_(ProtocolName.name.in_(protocol), Client.sgroup.in_(groups_de), FileProtocol.purpose == 'probe'))
           if model_ids:
             q = q.filter(Client.id.in_(model_ids))
-          q = q.order_by(File.client_id, File.session_id, FileMultiview.shot_id)
-          for k in q:
-            retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
-        if('impostor' in classes):
-          q = self.session.query(File, Protocol, ProtocolName, ProtocolMultiview).join(Client).join(FileMultiview).\
-                filter(and_(Client.sgroup.in_(groups), Client.sgroup != 'world')).\
-                filter(and_(ProtocolName.name.in_(protocol), Protocol.name == ProtocolName.name, Protocol.sgroup.in_(groups),\
-                            Protocol.sgroup != 'world', Protocol.img_type == 'multiview', Protocol.session_id == File.session_id,\
-                            Protocol.recording_id == File.recording_id, Protocol.purpose == 'probe')).\
-                filter(and_(Protocol.id == ProtocolMultiview.id, ProtocolMultiview.camera_id == FileMultiview.camera_id,\
-                            ProtocolMultiview.shot_id == FileMultiview.shot_id))
+          for k in q: 
+            kk = k.file
+            retval[kk.id] = (make_path(kk.path, directory, extension), kk.client_id, kk.client_id, kk.client_id, kk.path) 
+        elif('impostor' in classes):
+          q = self.session.query(FileProtocol).join(File).join(Client).join(ProtocolName).\
+                filter(and_(ProtocolName.name.in_(protocol), Client.sgroup.in_(groups_de), FileProtocol.purpose == 'probe'))
           if(model_ids and len(model_ids)==1):
             q = q.filter(not_(Client.id.in_(model_ids)))
-          q = q.order_by(File.client_id, File.session_id, FileMultiview.shot_id)
           for k in q:
+            kk = k.file
             if(model_ids and len(model_ids) == 1):
-              retval[k[0].id] = (make_path(k[0].path, directory, extension), model_ids[0], model_ids[0], k[0].client_id, k[0].path)
+              retval[kk.id] = (make_path(kk.path, directory, extension), model_ids[0], model_ids[0], kk.client_id, kk.path)
             else:
-              retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
+              retval[kk.id] = (make_path(kk.path, directory, extension), kk.client_id, kk.client_id, kk.client_id, kk.path)
 
       # Highres
       # TODO
@@ -491,6 +517,10 @@ class Database(object):
       The classes (types of accesses) to be retrieved ('client', 'impostor') 
       or a tuple with several of them. If 'None' is given (this is the 
       default), it is considered the same as a tuple with all possible values.
+
+    subworld
+      Specify a split of the world data ("sub41", "sub81", "sub121, "sub161", "")
+      In order to be considered, "world" should be in groups.
 
     expressions
       The (face) expressions to be retrieved ('neutral', 'smile', 'surprise',
