@@ -24,6 +24,7 @@
 
 #include <boost/bind.hpp>
 #include <boost/lambda/lambda.hpp>
+#include <boost/format.hpp>
 
 #include "core/logging.h"
 
@@ -34,17 +35,14 @@
 namespace bob { namespace visioner {
 
   // Constructor
-  Sampler::Sampler(const param_t& param, SamplerType type)
-    :	m_param(param),
+  Sampler::Sampler(const param_t& param, SamplerType type) :	
+    m_param(param),
     m_type(type),
-
     m_tagger(make_tagger(m_param)),
     m_loss(make_loss(m_param)),
-
     m_n_outputs(m_tagger->n_outputs()),
     m_n_samples(0),
     m_n_types(m_tagger->n_types()),
-
     m_rgens(boost::thread::hardware_concurrency(), boost::mt19937(param.m_seed))
     {
       stat_init(m_tcounts);
@@ -53,45 +51,48 @@ namespace bob { namespace visioner {
       const std::string& data = 
         type == TrainSampler ? param.m_train_data : param.m_valid_data;
 
-      // Load the list files
-      std::vector<std::string> ifiles, gfiles;
-      if (	load_listfiles(data, ifiles, gfiles) == false ||
-          ifiles.empty() || ifiles.size() != gfiles.size())
-      {
-        bob::core::warn << "Failed to load the datasets <" << data << ">!" << std::endl;
-        ifiles.clear();
-        gfiles.clear();
+      if (data.size() != 0) { //loads the list files
+
+        std::vector<std::string> ifiles, gfiles;
+
+        if (load_listfiles(data, ifiles, gfiles) == false ||
+            ifiles.empty() || ifiles.size() != gfiles.size()) {
+          boost::format m("Failed to load the dataset list '%s'");
+          m % data;
+          throw std::runtime_error(m.str().c_str());
+        }
+
+        this->load(ifiles, gfiles);
       }
 
-      load(ifiles, gfiles);
     }
 
   // Reset to a set of listfiles
-  void Sampler::load(const std::vector<std::string>& ifiles, const std::vector<std::string>& gfiles)
-  {
+  void Sampler::load(const std::vector<std::string>& ifiles, 
+      const std::vector<std::string>& gfiles) {
+
     ipyramid_t ipyramid(m_param);
 
     std::vector<double> targets(n_outputs());
     uint64_t type;
 
     // Process each image in the list
-    for (uint64_t i = 0; i < ifiles.size(); i ++)
-    {
+    for (uint64_t i = 0; i < ifiles.size(); i ++) {
+
       bob::core::info << "mode [" << type2str()
         << "] loading image [" << (i + 1)  << "/" << ifiles.size() << "] ..."
         << std::endl;
 
       // Load the scaled images ...
-      if (ipyramid.load(ifiles[i], gfiles[i]) == false)
-      {
+      if (ipyramid.load(ifiles[i], gfiles[i]) == false) {
         bob::core::warn << "Failed to load the image <" << ifiles[i] << ">!"
           << std::endl;
         continue;
       }
 
       // Build the samples using sliding-windows
-      for (uint64_t is = 0; is < ipyramid.size(); is ++)
-      {
+      for (uint64_t is = 0; is < ipyramid.size(); is ++) {
+
         const ipscale_t& ip = ipyramid[is];
 
         uint64_t new_n_samples = 0, old_n_samples = n_samples();
@@ -106,8 +107,7 @@ namespace bob { namespace visioner {
           }
 
         // Make sure to store only images with at least one sample
-        if (new_n_samples > 0)
-        {
+        if (new_n_samples > 0) {
           m_ipscales.push_back(ip);
           m_ipsbegins.push_back(old_n_samples);
           m_ipsends.push_back(old_n_samples + new_n_samples);
@@ -123,8 +123,7 @@ namespace bob { namespace visioner {
     }
 
     // Debug
-    for (uint64_t iti = 0; iti < n_types(); iti ++)
-    {
+    for (uint64_t iti = 0; iti < n_types(); iti ++) {
       bob::core::info << "mode [" << type2str()
         << "] target type [" << iti << "]"
         << " found in " << m_tcounts[iti] << "/" << n_samples()

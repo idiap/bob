@@ -23,6 +23,7 @@
 #include <fstream>
 
 #include <boost/python.hpp>
+#include <boost/python/stl_iterator.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
@@ -145,6 +146,30 @@ static bp::tuple available_sharings() {
   return bp::tuple(retval);
 }
 
+static void sampler_load(bob::visioner::Sampler& s, bp::object images,
+    bp::object gts) {
+  std::vector<std::string> i;
+  {
+    bp::stl_input_iterator<std::string> begin(images), end;
+    std::copy(begin, end, i.begin());
+  }
+  std::vector<std::string> g;
+  {
+    bp::stl_input_iterator<std::string> begin(gts), end;
+    std::copy(begin, end, g.begin());
+  }
+  s.load(i, g);
+}
+
+static boost::shared_ptr<bob::visioner::Sampler> 
+sampler_from_files(const bob::visioner::param_t& param,
+    bob::visioner::Sampler::SamplerType type, bp::object images,
+    bp::object gts) {
+  boost::shared_ptr<bob::visioner::Sampler> retval(new bob::visioner::Sampler(param, type));
+  sampler_load(*retval, images, gts);
+  return retval;
+}
+
 void bind_visioner_train() {
   bp::class_<bob::visioner::param_t>("param", "Various parameters useful for training boosted classifiers in the context of the Visioner", bp::init<bp::optional<uint64_t, uint64_t, const std::string&, double, const std::string&, const std::string&, uint64_t, const std::string&, const std::string&, uint64_t, double, uint64_t, const std::string&> >((bp::arg("rows")=24, bp::arg("cols")=20, bp::arg("loss")="diag_log", bp::arg("loss_parameter")=0.0, bp::arg("optimization_type")="ept", bp::arg("training_model")="gboost", bp::arg("num_of_bootstraps")=3, bp::arg("feature_type")="elbp", bp::arg("feature_sharing")="shared", bp::arg("feature_projections")=0, bp::arg("min_gt_overlap")=0.8, bp::arg("sliding_windows")=2, bp::arg("subwindow_labelling")="object_type"), "Default constructor. Note: The seed, number of training and validation samples, as well as the maximum number of boosting rounds is hard-coded."))
     .def_readwrite("rows", &bob::visioner::param_t::m_rows, "Number of rows in pixels")
@@ -179,10 +204,13 @@ void bind_visioner_train() {
     ;
 
   bp::class_<bob::visioner::Sampler>("Sampler", "Object used for sampling uniformly, such that the same number of samples are obtained for distinct target values.", bp::init<bob::visioner::param_t, bob::visioner::Sampler::SamplerType>((bp::arg("param"), bp::arg("type")), "Default constructor with parameters and the type of sampler this sampler will be."))
+    .def("__init__", make_constructor(&sampler_from_files, bp::default_call_policies(), (bp::arg("param"), bp::arg("type"), bp::arg("images"), bp::arg("ground_thruth"))), "Constructs a new sampler with parameters, a type and a list of images and (associated) ground-thruth information. Note that if you specify the list of images and ground-thruth inside the parameters object, that list will be read, but discarded in favor of the discrete list provided with the two input parameters.")
     .add_property("num_of_images", &bob::visioner::Sampler::n_images)
     .add_property("num_of_samples", &bob::visioner::Sampler::n_samples)
     .add_property("num_of_outputs", &bob::visioner::Sampler::n_outputs)
     .add_property("num_of_types", &bob::visioner::Sampler::n_types)
+    .add_property("type", &bob::visioner::Sampler::getType, "This sampler's type")
+    .def("load", &sampler_load, (bp::arg("self"), bp::arg("images"), bp::arg("ground_thruth")), "Resets the current contents of this sampler to use the image and (matching) ground-thruth files given. This method input lists or python iterables with the absolute or relative path of images and ground-thruth files you need to load.")
     ;
 
   bp::class_<bob::visioner::Model, boost::shared_ptr<bob::visioner::Model>, boost::noncopyable>("Model", "Multivariate model as a linear combination of LUTs. NB: The ::preprocess() must be called before ::get() and ::score() functions.", bp::no_init)

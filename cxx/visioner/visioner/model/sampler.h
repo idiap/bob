@@ -70,6 +70,11 @@ namespace bob { namespace visioner {
       uint64_t n_types() const { return m_n_types; }
       const std::vector<ipscale_t>& images() const { return m_ipscales; }
 
+      // Resets to a list of images and (matching) ground truth files
+      void load(const std::vector<std::string>& ifiles, const std::vector<std::string>& gfiles);
+
+      inline SamplerType getType() const { return m_type; }
+
     private:
 
       // Cumulate a set of statistics indexed by an integer
@@ -116,7 +121,6 @@ namespace bob { namespace visioner {
 
       // Reset to a set of listfiles
       void load(const std::vector<std::string>& listfiles);
-      void load(const std::vector<std::string>& ifiles, const std::vector<std::string>& gfiles);
 
       // Uniform sampling thread
       void th_usample(uint64_t ith, std::pair<uint64_t, uint64_t> srange, std::vector<uint64_t>& samples) const;
