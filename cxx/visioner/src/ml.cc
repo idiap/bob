@@ -23,6 +23,7 @@
  */
 
 #include <fstream>
+#include <cmath>
 
 #include "visioner/model/ml.h"
 
@@ -41,7 +42,7 @@ namespace bob { namespace visioner {
 
   double regression_error(double target, double score, double epsilon)
   {
-    const double delta = my_abs(target - score);
+    const double delta = std::abs(target - score);
     return delta > epsilon ? delta - epsilon : 0.0;
   }
 
@@ -56,10 +57,10 @@ namespace bob { namespace visioner {
     for (uint64_t i = 0; i < fars.size(); i ++)
     {
       const double crt_tar = tars[i], crt_far = fars[i];
-      area += 0.5 * my_abs(crt_far - prv_far) * (crt_tar + prv_tar);
+      area += 0.5 * std::abs(crt_far - prv_far) * (crt_tar + prv_tar);
       prv_tar = crt_tar, prv_far = crt_far;
     }			
-    area += 0.5 * my_abs(0.0 - prv_far) * (0.0 + prv_tar);
+    area += 0.5 * std::abs(0.0 - prv_far) * (0.0 + prv_tar);
 
     return area;
   }

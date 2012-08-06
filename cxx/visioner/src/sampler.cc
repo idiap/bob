@@ -29,6 +29,7 @@
 
 #include "visioner/model/sampler.h"
 #include "visioner/model/mdecoder.h"
+#include "visioner/util/threads.h"
 
 namespace bob { namespace visioner {
 
@@ -44,7 +45,7 @@ namespace bob { namespace visioner {
     m_n_samples(0),
     m_n_types(m_tagger->n_types()),
 
-    m_rgens(n_threads(), boost::mt19937(param.m_seed))
+    m_rgens(boost::thread::hardware_concurrency(), boost::mt19937(param.m_seed))
     {
       stat_init(m_tcounts);
       stat_init(m_sprobs);
@@ -150,7 +151,7 @@ namespace bob { namespace visioner {
 
     // Merge results
     samples.clear();
-    for (uint64_t ith = 0; ith < n_threads(); ith ++)
+    for (uint64_t ith = 0; ith < boost::thread::hardware_concurrency(); ith ++)
     {
       samples.insert(samples.end(), th_samples[ith].begin(), th_samples[ith].end());
     }
@@ -185,7 +186,7 @@ namespace bob { namespace visioner {
 
     // Merge results
     samples.clear();
-    for (uint64_t ith = 0; ith < n_threads(); ith ++)
+    for (uint64_t ith = 0; ith < boost::thread::hardware_concurrency(); ith ++)
     {
       samples.insert(samples.end(), th_samples[ith].begin(), th_samples[ith].end());
     }

@@ -37,28 +37,28 @@ namespace bob { namespace visioner {
       double target, double score,
       double& value) const
   {
-    const double eval = my_exp(- target * score);
+    const double eval = std::exp(- target * score);
 
-    value = my_log(1.0 + eval);
+    value = std::log(1.0 + eval);
   }
   void DiagLogLoss::eval(
       double target, double score,
       double& value, double& deriv1) const
   {
-    const double eval = my_exp(- target * score);
+    const double eval = std::exp(- target * score);
     const double norm = 1.0 / (1.0 + eval);
 
-    value = my_log(1.0 + eval);
+    value = std::log(1.0 + eval);
     deriv1 = - target * eval * norm;
   }
   void DiagLogLoss::eval(
       double target, double score,
       double& value, double& deriv1, double& deriv2) const
   {
-    const double eval = my_exp(- target * score);
+    const double eval = std::exp(- target * score);
     const double norm = 1.0 / (1.0 + eval);
 
-    value = my_log(1.0 + eval);
+    value = std::log(1.0 + eval);
     deriv1 = - target * eval * norm;
     deriv2 = target * target * eval * norm * norm;
   }

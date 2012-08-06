@@ -23,6 +23,7 @@
  */
 
 #include <fstream>
+#include <boost/algorithm/string/split.hpp>
 
 #include "core/logging.h"
 
@@ -63,7 +64,8 @@ int main(int argc, char *argv[]) {
   const std::string cmd_points = po_vm["points"].as<std::string>();
   const std::string cmd_output = po_vm["output"].as<std::string>();
 
-  const std::vector<std::string> tokens = bob::visioner::split(cmd_points, ":");
+  std::vector<std::string> tokens;
+  boost::split(tokens, cmd_points, boost::is_any_of(":"));
 
   // Save the .gt annotations ...
   std::ifstream in(cmd_input.c_str());

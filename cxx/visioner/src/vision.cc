@@ -22,6 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cmath>
+
 #include "visioner/vision/vision.h"
 
 namespace bob { namespace visioner {
@@ -30,7 +32,7 @@ namespace bob { namespace visioner {
   {
     const float diffx = point1.x() - point2.x();
     const float diffy = point1.y() - point2.y();
-    return my_sqrt(diffx * diffx + diffy * diffy);
+    return std::sqrt(diffx * diffx + diffy * diffy);
   }
 
   template <typename T>
@@ -47,7 +49,7 @@ namespace bob { namespace visioner {
     const double d2 = square_euclidean(dt_reye.x() - gt_reye.x(), dt_reye.y() - gt_reye.y());
     const double EE = square_euclidean(gt_reye.x() - gt_leye.x(), gt_reye.y() - gt_reye.y());
 
-    return my_sqrt((d1 > d2 ? d1 : d2) / EE);
+    return std::sqrt((d1 > d2 ? d1 : d2) / EE);
   }
 
   double Jesorsky(const QPointF& dt_leye, const QPointF& dt_reye,

@@ -26,6 +26,7 @@
 #include <QPainter>
 #include <QColor>
 #include <boost/program_options.hpp>
+#include <boost/filesystem.hpp>
 
 #include "core/logging.h"
 
@@ -263,14 +264,9 @@ int main(int argc, char *argv[]) {
 
       proj_image.save((bob::visioner::basename(result) + ".proj" + 
             boost::lexical_cast<std::string>(cnt) +
-            bob::visioner::extname(result)).c_str());
+            boost::filesystem::path(result).extension()).c_str());
     }
   }
-
-  //        // Assembly the original feature and the projected features
-  //        QImage comb_image = draw_combine(image, proj_images);
-  //        comb_image.save((bob::visioner::basename(result) + ".comb" +
-  //                         bob::visioner::extname(result)).c_str());
 
   // OK
   return EXIT_SUCCESS;

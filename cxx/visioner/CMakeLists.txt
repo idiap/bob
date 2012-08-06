@@ -43,6 +43,7 @@ set(src
     "src/tagger_keypoint_oxy.cc"
     "src/tagger_object.cc"
     "src/taylor_booster.cc"
+    "src/threads.cc"
     "src/util.cc"
     "src/vision.cc"
 )

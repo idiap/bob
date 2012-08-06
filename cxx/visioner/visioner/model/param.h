@@ -26,6 +26,8 @@
 #define BOB_VISIONER_PARAM_H
 
 #include <boost/program_options.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
 
 #include "visioner/model/ml.h"
 

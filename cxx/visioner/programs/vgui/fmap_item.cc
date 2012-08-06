@@ -109,8 +109,7 @@ bool FeatureMapItem::update_fmap(const ItemSettings& settings)
 	return false;
 }
 
-void FeatureMapItem::update_fmap()
-{
+void FeatureMapItem::update_fmap() {
 	const bob::visioner::ipscale_t& ipscale = ImageCollection::get_const_instance().ipscale();
 	
 	m_src_image = ipscale.m_image;

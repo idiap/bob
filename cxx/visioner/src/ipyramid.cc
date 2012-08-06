@@ -263,7 +263,7 @@ namespace bob { namespace visioner {
     sw.m_s = 0;
     for (uint64_t s = 0; s < size(); s ++)
     {
-      const double dist = my_abs(scale - m_ipscales[s].m_scale);
+      const double dist = std::abs(scale - m_ipscales[s].m_scale);
       if (dist < min_dist)
       {
         min_dist = dist;

@@ -24,6 +24,7 @@
 
 #include <numeric>
 
+#include "visioner/util/threads.h"
 #include "visioner/model/trainers/lutproblems/lut_problem_ept.h"
 
 namespace bob { namespace visioner {
@@ -196,7 +197,7 @@ namespace bob { namespace visioner {
       {
         for (uint64_t o = 0; o < n_outputs(); o ++)
         {
-          m_fldeltas(f, o) -= my_abs(histo_grad(u, o));
+          m_fldeltas(f, o) -= std::abs(histo_grad(u, o));
         }
       }
     }

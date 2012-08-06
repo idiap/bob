@@ -22,6 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cmath>
+
 #include "core/logging.h"
 
 #include "visioner/model/ipyramid.h"
@@ -41,7 +43,7 @@ QRectF eyes2bbx(const QPointF& leye, const QPointF& reye)
   const double c0x = std::min(leye.x(), reye.x()) + 0.5 * EEx;
   const double c0y = std::min(leye.y(), reye.y()) + 0.5 * EEy;
 
-  const double ratio = bob::visioner::my_sqrt(EEx * EEx + EEy * EEy) / D_EYES;
+  const double ratio = std::sqrt(EEx * EEx + EEy * EEy) / D_EYES;
 
   return QRectF(c0x - ratio * 0.5 * MODEL_WIDTH, 
       c0y - ratio * Y_UPPER,
@@ -118,7 +120,7 @@ int main(int argc, char *argv[]) {
         const QPointF& eye_pt = eye.m_point;
         const QPointF& ntip_pt = ntip.m_point;
 
-        const double dx = bob::visioner::my_abs(eye_pt.x() - ntip_pt.x());
+        const double dx = std::abs(eye_pt.x() - ntip_pt.x());
         const double width = dx * 2.5;                                
 
         it->move(eyes2bbx(QPointF(eye_pt.x() - 0.25 * width, eye_pt.y()),

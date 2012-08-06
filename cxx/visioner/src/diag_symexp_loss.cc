@@ -39,7 +39,7 @@ namespace bob { namespace visioner {
   {
     static const double delta = 2.0;
 
-    const double eval = my_exp(score - target);
+    const double eval = std::exp(score - target);
     const double ieval = 1.0 / eval;
 
     value = eval + ieval - delta;
@@ -50,7 +50,7 @@ namespace bob { namespace visioner {
   {
     static const double delta = 2.0;
 
-    const double eval = my_exp(score - target);
+    const double eval = std::exp(score - target);
     const double ieval = 1.0 / eval;
 
     value = eval + ieval - delta;
@@ -62,7 +62,7 @@ namespace bob { namespace visioner {
   {
     static const double delta = 2.0;
 
-    const double eval = my_exp(score - target);
+    const double eval = std::exp(score - target);
     const double ieval = 1.0 / eval;
 
     value = eval + ieval - delta;

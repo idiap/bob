@@ -38,7 +38,7 @@ namespace bob { namespace visioner {
     {
       const double dx = scores[2 * p + 0] - targets[2 * p + 0];
       const double dy = scores[2 * p + 1] - targets[2 * p + 1];
-      sum_error += scale * my_sqrt(dx * dx + dy * dy);
+      sum_error += scale * std::sqrt(dx * dx + dy * dy);
     }
 
     return sum_error;
@@ -58,7 +58,7 @@ namespace bob { namespace visioner {
     {
       const double dx = scores[2 * p + 0] - targets[2 * p + 0];
       const double dy = scores[2 * p + 1] - targets[2 * p + 1];
-      value += scale * my_sqrt(dx * dx + dy * dy);
+      value += scale * std::sqrt(dx * dx + dy * dy);
     }
   }
   void JesorskyLoss::eval(
@@ -75,7 +75,7 @@ namespace bob { namespace visioner {
       const double dx = scores[2 * p + 0] - targets[2 * p + 0];
       const double dy = scores[2 * p + 1] - targets[2 * p + 1];
 
-      const double sq = my_sqrt(dx * dx + dy * dy);
+      const double sq = std::sqrt(dx * dx + dy * dy);
       const double isq = inverse(sq);
 
       value += scale * sq;

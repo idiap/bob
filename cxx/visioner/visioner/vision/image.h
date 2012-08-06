@@ -28,6 +28,7 @@
 #include <QImage>
 
 #include "visioner/vision/vision.h"
+#include "visioner/util/matrix.h"
 
 namespace bob { namespace visioner {
 

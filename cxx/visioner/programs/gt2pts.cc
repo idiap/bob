@@ -23,6 +23,7 @@
  */
 
 #include <fstream>
+#include <boost/algorithm/string/split.hpp>
 
 #include "core/logging.h"
 
@@ -72,7 +73,8 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  const std::vector<std::string> tokens = bob::visioner::split(cmd_points, ":");
+  std::vector<std::string> tokens;
+  boost::split(tokens, cmd_points, boost::is_any_of(":"));
 
   // Process each face ...
   std::vector<bob::visioner::Object> objects;

@@ -23,6 +23,7 @@
  */
 
 #include <fstream>
+#include <boost/algorithm/string/split.hpp>
 
 #include "visioner/vision/object.h"
 
@@ -97,10 +98,9 @@ namespace bob { namespace visioner {
   {
     objects.clear();
 
-    // Open the file
+    // Open the file, test
     std::ifstream is(filename.c_str());
-    if (is.is_open() == false)
-    {
+    if (is.is_open() == false) {
       return false;
     }
 
@@ -110,24 +110,22 @@ namespace bob { namespace visioner {
     int n_objects = -1;
     while (is.getline(buff, buff_size))
     {
-      const std::vector<std::string> tokens = split(buff, " ");
+      std::string sbuff(buff);
+      std::vector<std::string> tokens;
+      boost::split(tokens, sbuff, boost::is_any_of(" "));
 
       // Number of objects
-      if (n_objects < 0)
-      {
+      if (n_objects < 0) {
         if (tokens.size() != 1 ||
-            (n_objects = boost::lexical_cast<int>(tokens[0].c_str())) < 0 || n_objects > 1000)
-        {
+            (n_objects = boost::lexical_cast<int>(tokens[0].c_str())) < 0 || n_objects > 1000) {
           n_objects = -1;
           break;
         }
       }
 
       // Bounding box + keypoints [id x y]
-      else
-      {
-        if (tokens.size() < 7)
-        {
+      else {
+        if (tokens.size() < 7) {
           n_objects = -1;
           break;
         }

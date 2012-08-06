@@ -70,7 +70,7 @@ namespace bob { namespace visioner {
       {
         const double dx = targets[0] - targets[2];
         const double dy = targets[1] - targets[3];
-        return my_sqrt(dx * dx + dy * dy);
+        return std::sqrt(dx * dx + dy * dy);
       }
 
       // Compute the number of facial feature points

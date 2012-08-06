@@ -37,34 +37,34 @@ namespace bob { namespace visioner {
       double target, double score,
       double& value) const
   {
-    static const double delta = my_log(4.0);
+    static const double delta = std::log(4.0);
 
-    const double eval = my_exp(score - target);
+    const double eval = std::exp(score - target);
 
-    value = my_log(2.0 + eval + 1.0 / eval) - delta;
+    value = std::log(2.0 + eval + 1.0 / eval) - delta;
   }
   void DiagSymLogLoss::eval(
       double target, double score,
       double& value, double& deriv1) const
   {
-    static const double delta = my_log(4.0);
+    static const double delta = std::log(4.0);
 
-    const double eval = my_exp(score - target);
+    const double eval = std::exp(score - target);
     const double norm = 1.0 / (1.0 + eval);
 
-    value = my_log(2.0 + eval + 1.0 / eval) - delta;
+    value = std::log(2.0 + eval + 1.0 / eval) - delta;
     deriv1 = (eval - 1) * norm;
   }
   void DiagSymLogLoss::eval(
       double target, double score,
       double& value, double& deriv1, double& deriv2) const
   {
-    static const double delta = my_log(4.0);
+    static const double delta = std::log(4.0);
 
-    const double eval = my_exp(score - target);
+    const double eval = std::exp(score - target);
     const double norm = 1.0 / (1.0 + eval);
 
-    value = my_log(2.0 + eval + 1.0 / eval) - delta;
+    value = std::log(2.0 + eval + 1.0 / eval) - delta;
     deriv1 = (eval - 1) * norm;
     deriv2 = 2.0 * eval * norm * norm;
   }

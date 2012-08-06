@@ -22,6 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/algorithm/string/split.hpp>
+
 #include "core/logging.h"
 
 #include "visioner/vision/object.h"
@@ -43,10 +45,12 @@ bool parse(const std::string& file)
     "leye", "reye", "nose", "lmc", "mc", "rmc"      
   };
 
-  const std::vector<std::string> lines = bob::visioner::split(text, "\n");
+  std::vector<std::string> lines;
+  boost::split(lines, text, boost::is_any_of("\n"));
   for (uint64_t i = 0; i < lines.size(); i ++)
   {
-    const std::vector<std::string> tokens = bob::visioner::split(lines[i], "\t {}");
+    std::vector<std::string> tokens;
+    boost::split(tokens, lines[i], boost::is_any_of("\t {}"));
     if (tokens.size() != 2 * n_points + 1)
     {
       continue;
