@@ -1,4 +1,5 @@
 /**
+ * @file visioner/src/threads.cc
  * @author Andre Anjos <andre.anjos@idiap.ch>
  * @date Mon 06 Aug 2012 14:31:27 CEST
  *
