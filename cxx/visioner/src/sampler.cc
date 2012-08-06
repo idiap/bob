@@ -77,21 +77,20 @@ namespace bob { namespace visioner {
     uint64_t type;
 
     // Process each image in the list
-    for (uint64_t i = 0; i < ifiles.size(); i ++) {
+    for (uint64_t i = 0; i < ifiles.size(); ++i) {
 
-      bob::core::info << "mode [" << type2str()
-        << "] loading image [" << (i + 1)  << "/" << ifiles.size() << "] ..."
-        << std::endl;
+      TDEBUG1("mode [" << type2str() << "] loading image [" << (i + 1)  
+          << "/" << ifiles.size() << "] ...");
 
       // Load the scaled images ...
       if (ipyramid.load(ifiles[i], gfiles[i]) == false) {
-        bob::core::warn << "Failed to load the image <" << ifiles[i] << ">!"
-          << std::endl;
+        bob::core::warn << "failed to load the image in file '"
+          << ifiles[i] << "'" << std::endl;
         continue;
       }
 
       // Build the samples using sliding-windows
-      for (uint64_t is = 0; is < ipyramid.size(); is ++) {
+      for (uint64_t is = 0; is < ipyramid.size(); ++is) {
 
         const ipscale_t& ip = ipyramid[is];
 
@@ -122,13 +121,12 @@ namespace bob { namespace visioner {
       }
     }
 
-    // Debug
+#   ifdef BOB_DEBUG
     for (uint64_t iti = 0; iti < n_types(); iti ++) {
-      bob::core::info << "mode [" << type2str()
-        << "] target type [" << iti << "]"
-        << " found in " << m_tcounts[iti] << "/" << n_samples()
-        << " samples." << std::endl;
+      TDEBUG1("mode [" << type2str() << "] target type [" << iti << "]"
+        << " found in " << m_tcounts[iti] << "/" << n_samples() << " samples.");
     }
+#   endif
   }
 
   // Sample the given number of samples (uniformly)
@@ -236,9 +234,9 @@ namespace bob { namespace visioner {
       const double cost = inverse(sum_inv) * inverse(count) * tcounts.size();
       tcosts[iti] = cost;
 
-      bob::core::info << "mode [" << type2str() << "] mapping target type ["
+      TDEBUG1("mode [" << type2str() << "] mapping target type ["
         << type << "] in " << count << "/" << samples.size() << " samples "
-        << "with cost [" << cost << "]." << std::endl;
+        << "with cost [" << cost << "].");
     }
 
     // Set the costs
