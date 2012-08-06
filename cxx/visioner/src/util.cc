@@ -153,7 +153,7 @@ namespace bob { namespace visioner {
   }	
 
   std::string basename(const std::string& path) {
-    return boost::filesystem::path(path).stem();
+    return boost::filesystem::path(path).stem().c_str();
   }
 
 }}

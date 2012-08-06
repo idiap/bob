@@ -264,7 +264,7 @@ int main(int argc, char *argv[]) {
 
       proj_image.save((bob::visioner::basename(result) + ".proj" + 
             boost::lexical_cast<std::string>(cnt) +
-            boost::filesystem::path(result).extension()).c_str());
+            boost::filesystem::path(result).extension().c_str()).c_str());
     }
   }
 

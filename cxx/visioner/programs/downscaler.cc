@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
   for (std::size_t i = 0; i < ifiles.size(); i ++)
   {
     const std::string ifile_proc = bob::visioner::basename(ifiles[i]) + ".png";
-    const std::string gfile_proc = boost::filesystem::path(gfiles[i]).filename();
+    const std::string gfile_proc = boost::filesystem::path(gfiles[i]).filename().c_str();
 
     bob::core::info << "Downscaling [" << (i + 1) << "/" << ifiles.size() << "] ...\r";
 
