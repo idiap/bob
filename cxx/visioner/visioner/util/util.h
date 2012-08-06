@@ -240,9 +240,6 @@ namespace bob { namespace visioner {
   // String processing
   /////////////////////////////////////////////////////////////////////////////////////////
 
-  // Trim a string
-  string_t trim(const string_t& str, const char* trim_chars = " \n\t\r");
-
   // Split a string given some separators
   strings_t split(const string_t& str, const char* delim_chars = " \n\t\r");
 

@@ -24,6 +24,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <boost/algorithm/string/trim.hpp>
 
 #include <QObject>
 
@@ -42,23 +43,6 @@ namespace bob { namespace visioner {
       sbegins[ith] = sbegin;
       sbegin = std::min(sbegin + n_objects_per_thread, n_objects);
       sends[ith] = sbegin;
-    }
-  }
-
-  // Trim a string
-  string_t trim(const string_t& str, const char* trim_chars)
-  {
-    // Find the beginning of the trimmed string
-    const index_t pos_beg = str.find_first_not_of(trim_chars);
-    if (pos_beg == string_t::npos)
-    {
-      return "";
-    }
-    else
-    {
-      // Also the end of the trimmed string
-      const index_t pos_end = str.find_last_not_of(trim_chars);
-      return str.substr(pos_beg, pos_end - pos_beg + 1);
     }
   }
 
@@ -125,7 +109,7 @@ namespace bob { namespace visioner {
     for (strings_t::const_iterator it = lines.begin(); it != lines.end(); ++ it)
     {
       // Check line (empty or comment)
-      const string_t line = trim(*it);
+      const string_t line = boost::trim_copy(*it);
       if (line.empty() || line[0] == '#')
       {
         continue;
@@ -138,8 +122,8 @@ namespace bob { namespace visioner {
         return false;
       }
 
-      const string_t attribute = trim(split(tokens[0], "#")[0]);
-      const string_t value = trim(split(tokens[1], "#")[0]);
+      const string_t attribute = boost::trim_copy(split(tokens[0], "#")[0]);
+      const string_t value = boost::trim_copy(split(tokens[1], "#")[0]);
 
       strings_t::const_iterator it2 = std::find(attributes.begin(), attributes.end(), attribute);
       if (it2 != attributes.end())
@@ -289,12 +273,12 @@ namespace bob { namespace visioner {
       const strings_t tokens = split(buff, "#");
       if (tokens.size() == 1)
       {
-        dir = dirname(path) + trim(tokens[0]);
+        dir = dirname(path) + boost::trim_copy(tokens[0]);
       }
       else if (tokens.size() == 2)
       {
-        ifiles.push_back(dir + trim(tokens[0]));
-        gfiles.push_back(dir + trim(tokens[1]));
+        ifiles.push_back(dir + boost::trim_copy(tokens[0]));
+        gfiles.push_back(dir + boost::trim_copy(tokens[1]));
       }
       else
       {
