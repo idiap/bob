@@ -61,9 +61,9 @@ class ImageCollection : public boost::serialization::singleton<ImageCollection>
     std::size_t index() const { return m_crt_index; }
     const bob::visioner::ipscale_t& ipscale() const { return m_crt_ipscale; }
     const std::string& name() const { return m_crt_name; }	
-    const bob::visioner::strings_t& listfiles() const { return m_listfiles; }
-    const bob::visioner::strings_t& ifiles() const { return m_ifiles; }
-    const bob::visioner::strings_t& gfiles() const { return m_gfiles; }
+    const std::vector<std::string>& listfiles() const { return m_listfiles; }
+    const std::vector<std::string>& ifiles() const { return m_ifiles; }
+    const std::vector<std::string>& gfiles() const { return m_gfiles; }
 
   private:
 
@@ -71,9 +71,9 @@ class ImageCollection : public boost::serialization::singleton<ImageCollection>
     bool load();
 
     // Attributes
-    bob::visioner::strings_t	m_listfiles;		// List files
-    bob::visioner::strings_t	m_ifiles, m_gfiles;	// List of image and ground truth files to process
-    bob::visioner::ipscales_t    m_ipscales;             // Images
+    std::vector<std::string>	m_listfiles;		// List files
+    std::vector<std::string>	m_ifiles, m_gfiles;	// List of image and ground truth files to process
+    std::vector<bob::visioner::ipscale_t>    m_ipscales; // Images
 
     std::size_t		m_crt_index;		// Current index in the image list
     bob::visioner::ipscale_t	m_crt_ipscale;		// Current image && ground truth (if available)

@@ -32,98 +32,88 @@
 
 namespace bob { namespace visioner {
 
-  class Object;
-  typedef std::vector<Object>	objects_t;
-
   // Check if a label is known
-  inline bool is_known(const string_t& label)
-  {
+  inline bool is_known(const std::string& label) {
     return label != "unknown";
   }
 
-  /////////////////////////////////////////////////////////////////////////////////////////
-  // Keypoints for object detection & recognition
-  /////////////////////////////////////////////////////////////////////////////////////////
-
-  struct Keypoint
-  {
+  /**
+   * Keypoints for object detection & recognition
+   */
+  struct Keypoint {
     // Constructors
-    Keypoint(const string_t& id = string_t(), float x = 0.0, float y = 0.0)
-      :   m_id(id), m_point(x, y)
-    {
-    }
-    Keypoint(const string_t& id, const point_t& point)
-      :   m_id(id), m_point(point)
-    {
-    }
+    Keypoint(const std::string& id = std::string(), float x = 0.0,
+        float y = 0.0) 
+      : m_id(id), m_point(x, y) { }
+
+    Keypoint(const std::string& id, const QPointF& point)
+      : m_id(id), m_point(point) { }
 
     // Attributes
-    string_t	m_id;
-    point_t		m_point;
+    std::string	m_id;
+    QPointF		m_point;
   };
 
-  typedef std::vector<Keypoint>	keypoints_t;
+  /**
+   * Object:
+   * - type + pose + ID
+   * - bounding box
+   * - keypoints (if any)
+   */
+  class Object {
 
-  // Compute the maximum overlap of a rectangle with a collection of objects
-  scalar_t overlap(const rect_t& reg, const objects_t& objects, int* pwhich = 0);
-
-  // Filter objects by type, pose or ID
-  objects_t filter_by_type(const objects_t& objects, const string_t& type);
-  objects_t filter_by_pose(const objects_t& objects, const string_t& pose);
-  objects_t filter_by_id(const objects_t& objects, const string_t& id);
-
-  /////////////////////////////////////////////////////////////////////////////////////////
-  // Object:
-  //	- type + pose + ID
-  //	- bounding box
-  //	- keypoints (if any)
-  /////////////////////////////////////////////////////////////////////////////////////////
-
-  class Object
-  {
     public:	
 
       // Constructors
-      Object(const string_t& type = string_t(), 
-          const string_t& pose = string_t(),
-          const string_t& id = string_t(), 
+      Object(const std::string& type = std::string(), 
+          const std::string& pose = std::string(),
+          const std::string& id = std::string(), 
           float bbx_x = 0.0f, float bbx_y = 0.0f, float bbx_w = 0.0f, float bbx_h = 0.0f);
-      Object(const string_t& type, 
-          const string_t& pose,
-          const string_t& id, 
-          const rect_t& bbx);
+      Object(const std::string& type, 
+          const std::string& pose,
+          const std::string& id, 
+          const QRectF& bbx);
 
       // Keypoint setup
       void clear();
       void add(const Keypoint& feat);
 
       // Change geometry
-      void move(const rect_t& bbx);		
-      void scale(scalar_t factor);
-      void translate(scalar_t dx, scalar_t dy);
+      void move(const QRectF& bbx);		
+      void scale(double factor);
+      void translate(double dx, double dy);
 
       // Find some keypoint (if any)
-      bool find(const string_t& id, Keypoint& keypoint) const;
+      bool find(const std::string& id, Keypoint& keypoint) const;
 
       // Load/Save a list of ground truth object positions from/to some file
-      static bool load(const string_t& filename, objects_t& objects);
-      bool save(const string_t& filename) const;
-      static bool save(const string_t& filename, const objects_t& objects);
+      static bool load(const std::string& filename, std::vector<Object>& objects);
+      bool save(const std::string& filename) const;
+      static bool save(const std::string& filename, const std::vector<Object>& objects);
 
       // Access functions
-      const rect_t& bbx() const { return m_bbx; }
-      const keypoints_t& keypoints() const { return m_keypoints; }
-      const string_t& type() const { return m_type; }
-      const string_t& pose() const { return m_pose; }
-      const string_t& id() const { return m_id; }
+      const QRectF& bbx() const { return m_bbx; }
+      const std::vector<Keypoint>& keypoints() const { return m_keypoints; }
+      const std::string& type() const { return m_type; }
+      const std::string& pose() const { return m_pose; }
+      const std::string& id() const { return m_id; }
 
     private:
 
       // Attributes		
-      string_t	m_type, m_pose, m_id;	// Type + pose + ID
-      rect_t		m_bbx;                  // Bounding box
-      keypoints_t	m_keypoints;            // Keypoints
+      std::string	m_type, m_pose, m_id;	// Type + pose + ID
+      QRectF		m_bbx;                  // Bounding box
+      std::vector<Keypoint>	m_keypoints;            // Keypoints
   };
+
+  // Compute the maximum overlap of a rectangle with a collection of objects
+  double overlap(const QRectF& reg, 
+      const std::vector<Object>& objects, int* pwhich = 0);
+
+  // Filter objects by type, pose or ID
+  std::vector<Object> filter_by_type(const std::vector<Object>& objects, const std::string& type);
+  std::vector<Object> filter_by_pose(const std::vector<Object>& objects, const std::string& pose);
+  std::vector<Object> filter_by_id(const std::vector<Object>& objects, const std::string& id);
 
 }}
 

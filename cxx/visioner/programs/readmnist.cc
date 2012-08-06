@@ -51,7 +51,7 @@ bool read(const std::string& str_ifimage, const std::string& str_iflabel, int n_
   fimage.read(buffer, 16);
   flabel.read(buffer, 8);
 
-  bob::visioner::greyimage_t image(28, 28);
+  bob::visioner::Matrix<uint8_t> image(28, 28);
 
   // Now cycle over all images in MNIST dataset
   for (int i = 0; i < n_images; i ++)

@@ -29,83 +29,72 @@
 
 namespace bob { namespace visioner {
 
-  /////////////////////////////////////////////////////////////////////////////////////////
-  // 1D fixed increment iterator
-  /////////////////////////////////////////////////////////////////////////////////////////
+  /** 
+   * 1D fixed increment iterator
+   */
+  template <typename T> class DeltaIterator {
 
-  template <typename T>
-    class DeltaIterator
-    {
-      public:
+    public:
 
-        // Constructor
-        DeltaIterator(T* pdata, std::size_t delta)
-          :       m_pdata(pdata), m_delta(delta)
-        {
-        }
+      // Constructor
+      DeltaIterator(T* pdata, size_t delta)
+        : m_pdata(pdata), m_delta(delta) {
+      }
 
-        // Next element
-        void operator++()
-        {
-          m_pdata += m_delta;
-        }
+      // Next element
+      void operator++() {
+        m_pdata += m_delta;
+      }
 
-        // Test convergence
-        bool operator==(const DeltaIterator<T>& other) const
-        {
-          return m_pdata == other.m_pdata;
-        }
-        bool operator!=(const DeltaIterator<T>& other) const
-        {
-          return m_pdata != other.m_pdata;
-        }
+      // Test convergence
+      bool operator==(const DeltaIterator<T>& other) const {
+        return m_pdata == other.m_pdata;
+      }
 
-        // Access functions
-        T& operator*() { return *m_pdata; }                        
+      bool operator!=(const DeltaIterator<T>& other) const {
+        return m_pdata != other.m_pdata;
+      }
 
-      private:
+      // Access functions
+      T& operator*() { return *m_pdata; }                        
 
-        // Attributes
-        T*              m_pdata;
-        std::size_t         m_delta;
-    };
+    private: //representation
 
-  template <typename T>
-    class ConstDeltaIterator
-    {
-      public:
+      T* m_pdata;
+      size_t m_delta;
 
-        // Constructor
-        ConstDeltaIterator(const T* pdata, std::size_t delta)
-          :       m_pdata(pdata), m_delta(delta)
-        {
-        }
+  };
 
-        // Next element
-        void operator++()
-        {
-          m_pdata += m_delta;
-        }
+  template <typename T> class ConstDeltaIterator {
 
-        // Test convergence
-        bool operator==(const DeltaIterator<T>& other) const
-        {
-          return m_pdata == other.m_pdata;
-        }
-        bool operator!=(const DeltaIterator<T>& other) const
-        {
-          return m_pdata != other.m_pdata;
-        }
+    public:
 
-        // Access functions
-        const T& operator*() const { return *m_pdata; }          
+      // Constructor
+      ConstDeltaIterator(const T* pdata, size_t delta)
+        : m_pdata(pdata), m_delta(delta) {
+      }
 
-      private:
+      // Next element
+      void operator++() {
+        m_pdata += m_delta;
+      }
 
-        // Attributes
-        const T*        m_pdata;
-        std::size_t         m_delta;
-    };
+      // Test convergence
+      bool operator==(const DeltaIterator<T>& other) const {
+        return m_pdata == other.m_pdata;
+      }
+
+      bool operator!=(const DeltaIterator<T>& other) const {
+        return m_pdata != other.m_pdata;
+      }
+
+      // Access functions
+      const T& operator*() const { return *m_pdata; }
+
+    private: // representation
+      const T* m_pdata;
+      size_t m_delta;
+  };
 
 }}
 

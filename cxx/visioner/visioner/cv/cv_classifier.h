@@ -48,16 +48,16 @@ namespace bob { namespace visioner {
           boost::program_options::variables_map& po_vm);
 
       // Predict the object label of the keypoints in the <reg> region.
-      bool classify(	const CVDetector& detector, const rect_t& reg, index_t& dt_label) const;
+      bool classify(	const CVDetector& detector, const QRectF& reg, uint64_t& dt_label) const;
 
       // Compute the confusion matrix considering the 
       //      ground truth and the predicted labels.
-      void evaluate(  const strings_t& ifiles, const strings_t& gfiles,
+      void evaluate(  const std::vector<std::string>& ifiles, const std::vector<std::string>& gfiles,
           CVDetector& detector, 
-          index_mat_t& hits_mat, indices_t& hits_cnt) const;
+          Matrix<uint64_t>& hits_mat, std::vector<uint64_t>& hits_cnt) const;
 
       // Retrieve the ground truth label for the given object
-      bool classify(  const Object& object, index_t& gt_label) const;
+      bool classify(  const Object& object, uint64_t& gt_label) const;
 
       // Check the validity of different components
       bool valid() const;
@@ -65,35 +65,35 @@ namespace bob { namespace visioner {
 
       // Access functions
       const param_t& param() const { return m_model->param(); }
-      index_t n_classes() const { return param().m_labels.size(); }
-      const string_t& label(index_t i) const { return param().m_labels[i]; }
+      uint64_t n_classes() const { return param().m_labels.size(); }
+      const std::string& label(uint64_t i) const { return param().m_labels[i]; }
 
     private:
 
       // Collect predictions from the neighbourhood of <seed_sw>
-      void locate(const CVDetector& detector, const sw_t& seed_sw, 
+      void locate(const CVDetector& detector, const subwindow_t& seed_sw, 
           int n_ds, int n_dx, int dx, int n_dy, int dy,
-          std::vector<points_t>& preds) const;
+          std::vector<std::vector<QPointF> >& preds) const;
 
       // Average the collection of predictions
-      void avg(const std::vector<points_t>& preds, points_t& pred) const;
-      void avg(const points_t& pts, point_t& pt) const;
+      void avg(const std::vector<std::vector<QPointF> >& preds, std::vector<QPointF>& pred) const;
+      void avg(const std::vector<QPointF>& pts, QPointF& pt) const;
 
       // Median the collection of predictions
-      void med(const std::vector<points_t>& preds, points_t& pred) const;
-      void med(const points_t& pts, point_t& pt) const;
+      void med(const std::vector<std::vector<QPointF> >& preds, std::vector<QPointF>& pred) const;
+      void med(const std::vector<QPointF>& pts, QPointF& pt) const;
 
       // Return the neighbours (location only) of the given sub-window
-      sws_t neighbours(const CVDetector& detector, const sw_t& sw, 
+      std::vector<subwindow_t> neighbours(const CVDetector& detector, const subwindow_t& sw, 
           int n_dx, int dx, int n_dy, int dy) const;
 
       // Number of keypoints
-      index_t n_points() const { return param().m_labels.size(); }
+      uint64_t n_points() const { return param().m_labels.size(); }
 
     private:
 
       // Attributes
-      rmodel_t                m_model;	// Object classifiers
+      boost::shared_ptr<Model>                m_model;	// Object classifiers
   };
 
 }}

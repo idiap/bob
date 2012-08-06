@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
   const std::string cmd_roc = po_vm.count("roc") ? po_vm["roc"].as<std::string>() : "";
 
   // Load the test datasets
-  bob::visioner::strings_t ifiles, gfiles;
+  std::vector<std::string> ifiles, gfiles;
   if (bob::visioner::load_listfiles(cmd_data, ifiles, gfiles) == false)
   {
     bob::core::error << "Failed to load the test datasets <" << cmd_data << ">!" << std::endl;
@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Build the ROC curve		
-  bob::visioner::scalars_t fas, tars;
+  std::vector<double> fas, tars;
   detector.evaluate(ifiles, gfiles, fas, tars);
 
   // ... and save it to file: TAR + FA

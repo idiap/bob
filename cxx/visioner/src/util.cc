@@ -35,10 +35,10 @@
 namespace bob { namespace visioner {
 
   // Split some objects to process using multiple threads
-  void thread_split(index_t n_objects, index_t* sbegins, index_t* sends)
+  void thread_split(uint64_t n_objects, uint64_t* sbegins, uint64_t* sends)
   {
-    const index_t n_objects_per_thread = n_objects / n_threads() + 1;
-    for (index_t ith = 0, sbegin = 0; ith < n_threads(); ith ++)
+    const uint64_t n_objects_per_thread = n_objects / n_threads() + 1;
+    for (uint64_t ith = 0, sbegin = 0; ith < n_threads(); ith ++)
     {
       sbegins[ith] = sbegin;
       sbegin = std::min(sbegin + n_objects_per_thread, n_objects);
@@ -47,17 +47,17 @@ namespace bob { namespace visioner {
   }
 
   // Split a string given some separators
-  strings_t split(const string_t& str, const char* delim_chars)
+  std::vector<std::string> split(const std::string& str, const char* delim_chars)
   {
-    strings_t parse_strs;
+    std::vector<std::string> parse_strs;
 
-    // Find the beginning of the splitted strings_t ...
-    index_t pos_beg = str.find_first_not_of(delim_chars);
-    while (pos_beg != string_t::npos)
+    // Find the beginning of the splitted std::vector<std::string> ...
+    uint64_t pos_beg = str.find_first_not_of(delim_chars);
+    while (pos_beg != std::string::npos)
     {
-      // Find the end of the splitted strings_t ...
-      index_t pos_end = str.find_first_of(delim_chars, pos_beg + 1);
-      if (pos_end == string_t::npos)
+      // Find the end of the splitted std::vector<std::string> ...
+      uint64_t pos_end = str.find_first_of(delim_chars, pos_beg + 1);
+      if (pos_end == std::string::npos)
         pos_end = str.size();
       if (pos_end != pos_beg)
         parse_strs.push_back(str.substr(pos_beg, pos_end - pos_beg));
@@ -77,9 +77,9 @@ namespace bob { namespace visioner {
   // Resize the string to obtain the given size
   //  (   if larger - characters will be removed from the end, 
   //      if smaller - <app_char> will be inserted at the end)        
-  string_t resize(const string_t& str, index_t size, char app_char)
+  std::string resize(const std::string& str, uint64_t size, char app_char)
   {
-    string_t result = str;
+    std::string result = str;
     if (result.size() < size)
     {
       result.insert(result.end(), size - result.size(), app_char);
@@ -93,39 +93,39 @@ namespace bob { namespace visioner {
   }
 
   // Trim a float value to the given digits
-  string_t round(scalar_t value, index_t digits)
+  std::string round(double value, uint64_t digits)
   {
     return QObject::tr("%1").arg(value, 0, 'f', digits).toStdString();
   }        
 
   // Parse an .ini stream (lines with: "attribute = values [#xxx]", ignoring "#xxx" ones)
-  bool load_initext(const string_t& text, strings_t& attributes, strings_t& values)
+  bool load_initext(const std::string& text, std::vector<std::string>& attributes, std::vector<std::string>& values)
   {
     attributes.clear();
     values.clear();
 
     // Parse each line ...
-    const strings_t lines = split(text, "\n");
-    for (strings_t::const_iterator it = lines.begin(); it != lines.end(); ++ it)
+    const std::vector<std::string> lines = split(text, "\n");
+    for (std::vector<std::string>::const_iterator it = lines.begin(); it != lines.end(); ++ it)
     {
       // Check line (empty or comment)
-      const string_t line = boost::trim_copy(*it);
+      const std::string line = boost::trim_copy(*it);
       if (line.empty() || line[0] == '#')
       {
         continue;
       }
 
       // Parse line
-      const strings_t tokens = split(line, "=");
+      const std::vector<std::string> tokens = split(line, "=");
       if (tokens.size() != 2)
       {
         return false;
       }
 
-      const string_t attribute = boost::trim_copy(split(tokens[0], "#")[0]);
-      const string_t value = boost::trim_copy(split(tokens[1], "#")[0]);
+      const std::string attribute = boost::trim_copy(split(tokens[0], "#")[0]);
+      const std::string value = boost::trim_copy(split(tokens[1], "#")[0]);
 
-      strings_t::const_iterator it2 = std::find(attributes.begin(), attributes.end(), attribute);
+      std::vector<std::string>::const_iterator it2 = std::find(attributes.begin(), attributes.end(), attribute);
       if (it2 != attributes.end())
       {
         values[it2 - attributes.begin()] = value;
@@ -140,9 +140,9 @@ namespace bob { namespace visioner {
     return true;
   }
 
-  bool load_inifile(const string_t &path, strings_t& attributes, strings_t& values)
+  bool load_inifile(const std::string &path, std::vector<std::string>& attributes, std::vector<std::string>& values)
   {
-    string_t text;
+    std::string text;
     if (load_file(path, text) == false)
     {
       return false;
@@ -151,10 +151,10 @@ namespace bob { namespace visioner {
     return load_initext(text, attributes, values);
   }
 
-  string_t attribute_value(const strings_t& attributes, const strings_t& values,
+  std::string attribute_value(const std::vector<std::string>& attributes, const std::vector<std::string>& values,
       const char* attribute)
   {
-    for (strings_t::const_iterator it_a = attributes.begin(), it_v = values.begin(); 
+    for (std::vector<std::string>::const_iterator it_a = attributes.begin(), it_v = values.begin(); 
         it_a != attributes.end() && it_v != values.end(); ++ it_a, ++ it_v)
     {
       if (*it_a == attribute)
@@ -169,7 +169,7 @@ namespace bob { namespace visioner {
   }
 
   // Load the content of a text file into a string
-  bool load_file(const string_t& path, string_t& text)
+  bool load_file(const std::string& path, std::string& text)
   {
     std::ifstream is(path.c_str());
     if (is.is_open() == false)
@@ -192,10 +192,10 @@ namespace bob { namespace visioner {
   }
 
   // Extract the name of the file, with (filename) and without (basename) extension, from a path
-  string_t filename(const string_t& path)
+  std::string filename(const std::string& path)
   {
-    index_t pos = path.find_last_of("\\/");
-    if (pos == string_t::npos)
+    uint64_t pos = path.find_last_of("\\/");
+    if (pos == std::string::npos)
     {
       return path;
     }
@@ -206,12 +206,12 @@ namespace bob { namespace visioner {
     }
   }
 
-  string_t basename(const string_t& path)
+  std::string basename(const std::string& path)
   {
-    const string_t file = filename(path);
+    const std::string file = filename(path);
 
-    const index_t pos = file.find_last_of(".");
-    if (pos == string_t::npos)
+    const uint64_t pos = file.find_last_of(".");
+    if (pos == std::string::npos)
     {
       return file;
     }
@@ -221,12 +221,12 @@ namespace bob { namespace visioner {
     }
   }
 
-  string_t extname(const string_t& path)
+  std::string extname(const std::string& path)
   {
-    const string_t file = filename(path);
+    const std::string file = filename(path);
 
-    const index_t pos = file.find_last_of(".");
-    if (pos == string_t::npos)
+    const uint64_t pos = file.find_last_of(".");
+    if (pos == std::string::npos)
     {
       return "";
     }
@@ -237,10 +237,10 @@ namespace bob { namespace visioner {
   }
 
   // Extract the name of the directory from a path
-  string_t dirname(const string_t &path)
+  std::string dirname(const std::string &path)
   {
-    index_t pos = path.find_last_of("\\/");
-    if (pos == string_t::npos)
+    uint64_t pos = path.find_last_of("\\/");
+    if (pos == std::string::npos)
     {
       return "./";
     }
@@ -251,7 +251,7 @@ namespace bob { namespace visioner {
   }
 
   // Parse a list file
-  static bool load_listfile(const string_t& path, strings_t& ifiles, strings_t& gfiles)
+  static bool load_listfile(const std::string& path, std::vector<std::string>& ifiles, std::vector<std::string>& gfiles)
   {
     static const int buff_size = 4096;
     char buff[buff_size];
@@ -267,10 +267,10 @@ namespace bob { namespace visioner {
     }
 
     // Parse the file
-    string_t dir;
+    std::string dir;
     while (is.getline(buff, buff_size))
     {
-      const strings_t tokens = split(buff, "#");
+      const std::vector<std::string> tokens = split(buff, "#");
       if (tokens.size() == 1)
       {
         dir = dirname(path) + boost::trim_copy(tokens[0]);
@@ -296,14 +296,14 @@ namespace bob { namespace visioner {
   }	
 
   // Parse a (sef of) list file(s)
-  bool load_listfiles(const string_t& files, strings_t& ifiles, strings_t& gfiles)
+  bool load_listfiles(const std::string& files, std::vector<std::string>& ifiles, std::vector<std::string>& gfiles)
   {
     ifiles.clear(), gfiles.clear();
 
-    const strings_t tokens = split(files, ":\n\t\r");
-    for (strings_t::const_iterator it = tokens.begin(); it != tokens.end(); ++ it)
+    const std::vector<std::string> tokens = split(files, ":\n\t\r");
+    for (std::vector<std::string>::const_iterator it = tokens.begin(); it != tokens.end(); ++ it)
     {
-      strings_t ifiles_crt, gfiles_crt;
+      std::vector<std::string> ifiles_crt, gfiles_crt;
       if (	load_listfile(*it, ifiles_crt, gfiles_crt) == false ||
           ifiles_crt.empty() || ifiles_crt.size() != gfiles_crt.size())
       {

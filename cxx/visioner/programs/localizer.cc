@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
   const std::string cmd_results = po_vm["results"].as<std::string>();
 
   // Load the test datasets
-  bob::visioner::strings_t ifiles, gfiles;
+  std::vector<std::string> ifiles, gfiles;
   if (bob::visioner::load_listfiles(cmd_data, ifiles, gfiles) == false)
   {
     bob::core::error << "Failed to load the test datasets <" << cmd_data << ">!" << std::endl;
@@ -96,8 +96,8 @@ int main(int argc, char *argv[]) {
     timer.restart();
 
     // Detect objects
-    bob::visioner::detections_t detections;                
-    bob::visioner::bools_t labels;
+    std::vector<bob::visioner::detection_t> detections;                
+    std::vector<int> labels;
 
     detector.scan(detections);                
     detector.label(detections, labels);
@@ -107,8 +107,8 @@ int main(int argc, char *argv[]) {
 
     // Localize keypoints
     bob::visioner::Object object;
-    bob::visioner::points_t dt_points;
-    for (bob::visioner::detections_const_it it = detections.begin(); it != detections.end(); ++ it)
+    std::vector<QPointF> dt_points;
+    for (std::vector<bob::visioner::detection_t>::const_iterator it = detections.begin(); it != detections.end(); ++ it)
       if (detector.match(*it, object) == true)
       {
         if (localizer.locate(detector, it->second.first, dt_points) == false)

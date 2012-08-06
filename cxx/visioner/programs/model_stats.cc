@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
   const std::string cmd_input = po_vm["input"].as<std::string>();
 
   // Load the model
-  bob::visioner::rmodel_t model;
+  boost::shared_ptr<bob::visioner::Model> model;
   if (bob::visioner::Model::load(cmd_input, model) == false)
   {
     bob::core::error 
@@ -64,15 +64,15 @@ int main(int argc, char *argv[]) {
   bob::core::info
     << "#outputs = " << model->n_outputs() << ", #n_features = " << model->n_features()
     << ", #n_fvalues = " << model->n_fvalues() << "." << std::endl;
-  for (bob::visioner::index_t o = 0; o < model->n_outputs(); o ++)
+  for (uint64_t o = 0; o < model->n_outputs(); o ++)
   {
     bob::core::info << "\toutput <" << (o + 1) << "/" << model->n_outputs() << ">: #luts = " << model->n_luts(o) << std::endl;
   }
 
-  bob::visioner::indices_t features;
-  for (bob::visioner::index_t o = 0; o < model->n_outputs(); o ++)
+  std::vector<uint64_t> features;
+  for (uint64_t o = 0; o < model->n_outputs(); o ++)
   {
-    for (bob::visioner::index_t r = 0; r < model->n_luts(o); r ++)
+    for (uint64_t r = 0; r < model->n_luts(o); r ++)
     {
       const bob::visioner::LUT& lut = model->luts()[o][r];
       features.push_back(lut.feature());
@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
   bob::core::info
     << "#selected features = " << features.size() << "." << std::endl;
 
-  for (bob::visioner::index_t i = 0; i < features.size(); i ++)
+  for (uint64_t i = 0; i < features.size(); i ++)
   {
     bob::core::info << "feature <" << (i + 1) << "/" << features.size() << ">: " << model->describe(features[i]) << "." << std::endl;
   }

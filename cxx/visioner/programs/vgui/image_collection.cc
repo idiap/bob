@@ -41,7 +41,7 @@ void ImageCollection::clear()
 
 bool ImageCollection::add(const std::string& list_file)
 {
-  bob::visioner::strings_t ifiles, gfiles;
+  std::vector<std::string> ifiles, gfiles;
   if (	bob::visioner::load_listfiles(list_file, ifiles, gfiles) == false ||
       ifiles.empty() || ifiles.size() != gfiles.size())
   {
@@ -52,7 +52,7 @@ bool ImageCollection::add(const std::string& list_file)
   progress.setWindowModality(Qt::WindowModal);
 
   bob::visioner::ipscale_t ip;
-  for (bob::visioner::index_t i = 0; i < ifiles.size(); i ++)
+  for (uint64_t i = 0; i < ifiles.size(); i ++)
   {
     if (    bob::visioner::Object::load(gfiles[i], ip.m_objects) == true &&
         bob::visioner::load(ifiles[i], ip.m_image) == true)
@@ -128,7 +128,7 @@ bool ImageCollection::load()
 bool ImageCollection::pixInsideObject(int x, int y) const
 {
   bool inside = false;
-  for (bob::visioner::objects_t::const_iterator it = m_crt_ipscale.m_objects.begin();
+  for (std::vector<bob::visioner::Object>::const_iterator it = m_crt_ipscale.m_objects.begin();
       it != m_crt_ipscale.m_objects.end() && inside == false; ++ it)
   {
     inside = it->bbx().contains(x, y);

@@ -43,13 +43,13 @@ static ImageCollection& theImages = ImageCollection::get_mutable_instance();
     QDataStream data(&file);
 
     // Image collection
-    bob::visioner::strings_t listfiles;
+    std::vector<std::string> listfiles;
     std::size_t index;
     data >> listfiles;
     data >> index;
 
     theImages.clear();
-    for (bob::visioner::strings_t::const_iterator it = listfiles.begin(); it != listfiles.end(); ++ it)
+    for (std::vector<std::string>::const_iterator it = listfiles.begin(); it != listfiles.end(); ++ it)
     {
       theImages.add(*it);
     }
@@ -264,7 +264,7 @@ void FeatureMapWidget::populateImageList()
   {
     m_listImages->takeItem(0);
   }
-  for (bob::visioner::strings_t::const_iterator it_i = theImages.ifiles().begin(),
+  for (std::vector<std::string>::const_iterator it_i = theImages.ifiles().begin(),
       it_g = theImages.gfiles().begin(); it_i != theImages.ifiles().end(); ++ it_i, ++ it_g)
   {
     m_listImages->insertItem(

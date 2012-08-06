@@ -47,17 +47,17 @@ namespace bob { namespace visioner {
       virtual ~KeypointOxyTagger() {}
 
       // Clone the object
-      virtual rtagger_t clone() const { return rtagger_t(new KeypointOxyTagger(*this)); }
+      virtual boost::shared_ptr<Tagger> clone() const { return boost::shared_ptr<Tagger>(new KeypointOxyTagger(*this)); }
 
       // Number of outputs
-      virtual index_t n_outputs() const;
+      virtual uint64_t n_outputs() const;
 
       // Number of types
-      virtual index_t n_types() const { return 1; }
+      virtual uint64_t n_types() const { return 1; }
 
       // Label a sub-window
       virtual bool check(const ipscale_t& ipscale, int x, int y, 
-          scalars_t& targets, index_t& type) const;
+          std::vector<double>& targets, uint64_t& type) const;
   };
 
 }}

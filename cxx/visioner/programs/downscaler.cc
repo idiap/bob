@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
   const double cmd_downscale = bob::visioner::range(po_vm["downscale"].as<double>(), 0.10, 1.00);
 
   // Load the image and ground truth files	
-  bob::visioner::strings_t ifiles, gfiles;
+  std::vector<std::string> ifiles, gfiles;
   if (	bob::visioner::load_listfiles(cmd_input, ifiles, gfiles) == false ||
       ifiles.empty() || ifiles.size() != gfiles.size())
   {
@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Downscale each image ...
-  bob::visioner::strings_t ifiles_proc, gfiles_proc;
+  std::vector<std::string> ifiles_proc, gfiles_proc;
   bob::visioner::ipscale_t ipscale, ipscale_proc;
   for (std::size_t i = 0; i < ifiles.size(); i ++)
   {

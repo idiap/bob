@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
   const std::string cmd_loc = po_vm["loc"].as<std::string>();
 
   // Load the test datasets
-  bob::visioner::strings_t ifiles, gfiles;
+  std::vector<std::string> ifiles, gfiles;
   if (bob::visioner::load_listfiles(cmd_data, ifiles, gfiles) == false)
   {
     bob::core::error << "Failed to load the test datasets <" << cmd_data << ">!" << std::endl;
@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Load the prediction datasets
-  bob::visioner::strings_t pfiles;
+  std::vector<std::string> pfiles;
   if (bob::visioner::load_listfiles(cmd_pred, ifiles, pfiles) == false)
   {
     bob::core::error 

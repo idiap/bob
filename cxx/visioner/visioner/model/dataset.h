@@ -41,39 +41,39 @@ namespace bob { namespace visioner {
     public:
 
       // Constructor
-      DataSet(index_t n_outputs = 0, index_t n_samples = 0,
-          index_t n_features = 0, index_t n_fvalues = 0);
+      DataSet(uint64_t n_outputs = 0, uint64_t n_samples = 0,
+          uint64_t n_features = 0, uint64_t n_fvalues = 0);
 
       // Resize
-      void resize(index_t n_outputs, index_t n_samples,
-          index_t n_features, index_t n_fvalues);
+      void resize(uint64_t n_outputs, uint64_t n_samples,
+          uint64_t n_features, uint64_t n_fvalues);
 
       // Access functions
       bool empty() const { return m_targets.empty(); }
-      index_t n_outputs() const { return m_targets.cols(); }
-      index_t n_samples() const { return m_targets.rows(); }
-      index_t	n_features() const { return m_values.rows(); }
-      index_t n_fvalues() const { return m_n_fvalues; }
+      uint64_t n_outputs() const { return m_targets.cols(); }
+      uint64_t n_samples() const { return m_targets.rows(); }
+      uint64_t	n_features() const { return m_values.rows(); }
+      uint64_t n_fvalues() const { return m_n_fvalues; }
 
-      scalar_t target(index_t s, index_t o) const { return m_targets(s, o); }
-      scalar_t& target(index_t s, index_t o) { return m_targets(s, o); }
-      const scalar_mat_t& targets() const { return m_targets; }
+      double target(uint64_t s, uint64_t o) const { return m_targets(s, o); }
+      double& target(uint64_t s, uint64_t o) { return m_targets(s, o); }
+      const Matrix<double>& targets() const { return m_targets; }
 
-      discrete_t value(index_t f, index_t s) const { return m_values(f, s); }
-      discrete_t& value(index_t f, index_t s) { return m_values(f, s); }
-      const discrete_mat_t& values() const { return m_values; }
+      uint16_t value(uint64_t f, uint64_t s) const { return m_values(f, s); }
+      uint16_t& value(uint64_t f, uint64_t s) { return m_values(f, s); }
+      const Matrix<uint16_t>& values() const { return m_values; }
 
-      scalar_t cost(index_t s) const { return m_costs[s]; }
-      scalar_t& cost(index_t s) { return m_costs[s]; }
-      const scalars_t& costs() const { return m_costs; }
+      double cost(uint64_t s) const { return m_costs[s]; }
+      double& cost(uint64_t s) { return m_costs[s]; }
+      const std::vector<double>& costs() const { return m_costs; }
 
     private:
 
       // Attributes
-      index_t		m_n_fvalues;
-      scalar_mat_t	m_targets;
-      discrete_mat_t	m_values;
-      scalars_t       m_costs;
+      uint64_t		m_n_fvalues;
+      Matrix<double>	m_targets;
+      Matrix<uint16_t>	m_values;
+      std::vector<double>       m_costs;
   };
 
 }}

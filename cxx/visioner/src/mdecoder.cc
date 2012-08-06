@@ -42,53 +42,45 @@
 
 namespace bob { namespace visioner {
 
-  typedef Manager<Loss>			LossManager;
-  typedef Manager<Tagger>			TaggerManager;
-  typedef Manager<Model>                  ModelManager;
-  typedef Manager<Trainer>		TrainerManager;
-
-  typedef Manager<Manageable<OptimizationType> >          OptimizationManager;
-  typedef Manager<Manageable<FeatureSharingType> >        FeatureSharingManager;
-
   // Register the available object types
   static bool register_objects()
   {
     // Register boosted loss types
-    OptimizationManager::get_mutable_instance().add("ept", Expectation);
-    OptimizationManager::get_mutable_instance().add("var", Variational);
+    Manager<Manageable<OptimizationType> >::get_mutable_instance().add("ept", Expectation);
+    Manager<Manageable<OptimizationType> >::get_mutable_instance().add("var", Variational);
 
     // Register feature sharing types
-    FeatureSharingManager::get_mutable_instance().add("shared", Shared);
-    FeatureSharingManager::get_mutable_instance().add("indep", Independent);
+    Manager<Manageable<FeatureSharingType> >::get_mutable_instance().add("shared", Shared);
+    Manager<Manageable<FeatureSharingType> >::get_mutable_instance().add("indep", Independent);
 
     // Register the losses
-    LossManager::get_mutable_instance().add("diag_exp", DiagExpLoss());
-    LossManager::get_mutable_instance().add("diag_log", DiagLogLoss());
-    LossManager::get_mutable_instance().add("diag_symlog", DiagSymLogLoss());
-    LossManager::get_mutable_instance().add("diag_symexp", DiagSymExpLoss());
-    LossManager::get_mutable_instance().add("jesorsky", JesorskyLoss());
+    Manager<Loss>::get_mutable_instance().add("diag_exp", DiagExpLoss());
+    Manager<Loss>::get_mutable_instance().add("diag_log", DiagLogLoss());
+    Manager<Loss>::get_mutable_instance().add("diag_symlog", DiagSymLogLoss());
+    Manager<Loss>::get_mutable_instance().add("diag_symexp", DiagSymExpLoss());
+    Manager<Loss>::get_mutable_instance().add("jesorsky", JesorskyLoss());
 
     // Register the SW taggers
-    TaggerManager::get_mutable_instance().add("object_type", ObjectTagger(ObjectTagger::TypeTagger));
-    TaggerManager::get_mutable_instance().add("object_pose", ObjectTagger(ObjectTagger::PoseTagger));
-    TaggerManager::get_mutable_instance().add("object_id", ObjectTagger(ObjectTagger::IDTagger));
-    TaggerManager::get_mutable_instance().add("keypoint", KeypointOxyTagger());
+    Manager<Tagger>::get_mutable_instance().add("object_type", ObjectTagger(ObjectTagger::TypeTagger));
+    Manager<Tagger>::get_mutable_instance().add("object_pose", ObjectTagger(ObjectTagger::PoseTagger));
+    Manager<Tagger>::get_mutable_instance().add("object_id", ObjectTagger(ObjectTagger::IDTagger));
+    Manager<Tagger>::get_mutable_instance().add("keypoint", KeypointOxyTagger());
 
     // Register models
-    ModelManager::get_mutable_instance().add("lbp", 
+    Manager<Model>::get_mutable_instance().add("lbp", 
         MBLBPModel());
 
-    ModelManager::get_mutable_instance().add("elbp",
+    Manager<Model>::get_mutable_instance().add("elbp",
         ModelPool<MBLBPModel, 
         ModelPool<MBmLBPModel, 
         ModelPool<MBtLBPModel, MBdLBPModel> > >());
 
-    ModelManager::get_mutable_instance().add("mct", 
+    Manager<Model>::get_mutable_instance().add("mct", 
         MBMCTModel());
 
     // Register trainers
-    TrainerManager::get_mutable_instance().add("avg", Averager());                
-    TrainerManager::get_mutable_instance().add("gboost", TaylorBooster());
+    Manager<Trainer>::get_mutable_instance().add("avg", Averager());                
+    Manager<Trainer>::get_mutable_instance().add("gboost", TaylorBooster());
 
     return true;
   }
@@ -96,104 +88,104 @@ namespace bob { namespace visioner {
   static const bool registered = register_objects();
 
   // Decode parameters
-  rloss_t	make_loss(const param_t& param)
+  boost::shared_ptr<Loss>	make_loss(const param_t& param)
   {
-    const rloss_t loss = LossManager::get_const_instance().get(param.m_loss);
+    const boost::shared_ptr<Loss> loss = Manager<Loss>::get_const_instance().get(param.m_loss);
     loss->reset(param);
     return loss;
   }
 
-  rtagger_t make_tagger(const param_t& param)
+  boost::shared_ptr<Tagger> make_tagger(const param_t& param)
   {
-    rtagger_t tagger = TaggerManager::get_const_instance().get(param.m_tagger);
+    boost::shared_ptr<Tagger> tagger = Manager<Tagger>::get_const_instance().get(param.m_tagger);
     tagger->reset(param);
     return tagger;
   }
 
-  rmodel_t make_model(const param_t& param)
+  boost::shared_ptr<Model> make_model(const param_t& param)
   {
-    rmodel_t model = ModelManager::get_const_instance().get(param.m_feature);
+    boost::shared_ptr<Model> model = Manager<Model>::get_const_instance().get(param.m_feature);
     model->reset(param);
     return model;
   }
 
-  rtrainer_t make_trainer(const param_t& param)
+  boost::shared_ptr<Trainer> make_trainer(const param_t& param)
   {
-    rtrainer_t trainer = TrainerManager::get_const_instance().get(param.m_trainer);
+    boost::shared_ptr<Trainer> trainer = Manager<Trainer>::get_const_instance().get(param.m_trainer);
     trainer->reset(param);
     return trainer;
   }
 
   OptimizationType make_optimization(const param_t& param)
   {
-    return **OptimizationManager::get_const_instance().get(param.m_optimization);
+    return **Manager<Manageable<OptimizationType> >::get_const_instance().get(param.m_optimization);
   }
 
   FeatureSharingType make_sharing(const param_t& param)
   {
-    return **FeatureSharingManager::get_const_instance().get(param.m_sharing);
+    return **Manager<Manageable<FeatureSharingType> >::get_const_instance().get(param.m_sharing);
   }
 
   // Retrieve the lists of encoded objects
-  strings_t available_losses_list()
+  std::vector<std::string> available_losses_list()
   {
-    return LossManager::get_const_instance().describe_list();
+    return Manager<Loss>::get_const_instance().describe_list();
   }
 
-  strings_t available_taggers_list()
+  std::vector<std::string> available_taggers_list()
   {
-    return TaggerManager::get_const_instance().describe_list();
+    return Manager<Tagger>::get_const_instance().describe_list();
   }
 
-  strings_t available_models_list()
+  std::vector<std::string> available_models_list()
   {
-    return ModelManager::get_const_instance().describe_list();
+    return Manager<Model>::get_const_instance().describe_list();
   }
 
-  strings_t available_trainers_list()
+  std::vector<std::string> available_trainers_list()
   {
-    return TrainerManager::get_const_instance().describe_list();
+    return Manager<Trainer>::get_const_instance().describe_list();
   }
 
-  strings_t available_optimizations_list()
+  std::vector<std::string> available_optimizations_list()
   {
-    return OptimizationManager::get_const_instance().describe_list();
+    return Manager<Manageable<OptimizationType> >::get_const_instance().describe_list();
   }
 
-  strings_t available_sharings_list()
+  std::vector<std::string> available_sharings_list()
   {
-    return FeatureSharingManager::get_const_instance().describe_list();
+    return Manager<Manageable<FeatureSharingType> >::get_const_instance().describe_list();
   }
 
   // Retrieve the lists of encoded objects as a single string
-  string_t available_losses()
+  std::string available_losses()
   {
-    return LossManager::get_const_instance().describe();
+    return Manager<Loss>::get_const_instance().describe();
   }
 
-  string_t available_taggers()
+  std::string available_taggers()
   {
-    return TaggerManager::get_const_instance().describe();
+    return Manager<Tagger>::get_const_instance().describe();
   }
 
-  string_t available_models()
+  std::string available_models()
   {
-    return ModelManager::get_const_instance().describe();
+    return Manager<Model>::get_const_instance().describe();
   }
 
-  string_t available_trainers()
+  std::string available_trainers()
   {
-    return TrainerManager::get_const_instance().describe();
+    return Manager<Trainer>::get_const_instance().describe();
   }
 
-  string_t available_optimizations()
+  std::string available_optimizations()
   {
-    return OptimizationManager::get_const_instance().describe();
+    return Manager<Manageable<OptimizationType> >::get_const_instance().describe();
   }
 
-  string_t available_sharings()
+  std::string available_sharings()
   {
-    return FeatureSharingManager::get_const_instance().describe();
+    return Manager<Manageable<FeatureSharingType> >::get_const_instance().describe();
   }
 
 }}

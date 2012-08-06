@@ -49,32 +49,32 @@ namespace bob { namespace visioner {
       virtual void reset(const param_t& param) { m_param = param; }
 
       // Clone the object
-      virtual rloss_t clone() const { return rloss_t(new JesorskyLoss(m_param)); }
+      virtual boost::shared_ptr<Loss> clone() const { return boost::shared_ptr<Loss>(new JesorskyLoss(m_param)); }
 
       // Compute the error (associated to the loss)
-      virtual scalar_t error(
-          const scalar_t* targets, const scalar_t* scores, index_t size) const;
+      virtual double error(
+          const double* targets, const double* scores, uint64_t size) const;
 
       // Compute the loss value & derivatives
       virtual void eval(
-          const scalar_t* targets, const scalar_t* scores, index_t size,
-          scalar_t& value) const;
+          const double* targets, const double* scores, uint64_t size,
+          double& value) const;
       virtual void eval(
-          const scalar_t* targets, const scalar_t* scores, index_t size,
-          scalar_t& value, scalar_t* grad) const;
+          const double* targets, const double* scores, uint64_t size,
+          double& value, double* grad) const;
 
     protected:
 
       // Compute the distance between the eyes
-      scalar_t eye_dist(const scalar_t* targets) const
+      double eye_dist(const double* targets) const
       {
-        const scalar_t dx = targets[0] - targets[2];
-        const scalar_t dy = targets[1] - targets[3];
+        const double dx = targets[0] - targets[2];
+        const double dy = targets[1] - targets[3];
         return my_sqrt(dx * dx + dy * dy);
       }
 
       // Compute the number of facial feature points
-      index_t points(index_t size) const
+      uint64_t points(uint64_t size) const
       {
         return size >> 1;
       }

@@ -55,7 +55,7 @@ namespace bob { namespace visioner {
     protected:    
 
       // Attributes
-      igreyimage_t            m_iimage;       // Integral image
+      Matrix<uint32_t>            m_iimage;       // Integral image
   };
 
 }}

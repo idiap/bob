@@ -57,9 +57,9 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  const bob::visioner::string_t cmd_model = po_vm["model"].as<std::string>();
+  const std::string cmd_model = po_vm["model"].as<std::string>();
 
-  const bob::visioner::rmodel_t model = bob::visioner::make_model(param);
+  const boost::shared_ptr<bob::visioner::Model> model = bob::visioner::make_model(param);
   if (model->save(cmd_model) == false)
   {
     bob::core::error

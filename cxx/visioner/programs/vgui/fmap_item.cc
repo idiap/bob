@@ -124,8 +124,8 @@ void FeatureMapItem::update_fmap()
                 // MB-LBP code map
         case DrawingSource_LBP:
                 bob::visioner::mb_dense<
-                        bob::visioner::igrey_t, bob::visioner::discrete_t, 3, 3, 
-                        bob::visioner::mb_lbp<bob::visioner::igrey_t, bob::visioner::discrete_t> >(
+                        uint32_t, uint16_t, 3, 3, 
+                        bob::visioner::mb_lbp<uint32_t, uint16_t> >(
                         m_src_iimage, m_settings.m_cx, m_settings.m_cy, m_src_fmap);
                 m_src_colors = &theFMap2Rgbs.m_8bits2rgbs;
 		break;
@@ -133,8 +133,8 @@ void FeatureMapItem::update_fmap()
                 // MB-mLBP code map
         case DrawingSource_mLBP:
                 bob::visioner::mb_dense<
-                        bob::visioner::igrey_t, bob::visioner::discrete_t, 3, 3, 
-                        bob::visioner::mb_mlbp<bob::visioner::igrey_t, bob::visioner::discrete_t> >(
+                        uint32_t, uint16_t, 3, 3, 
+                        bob::visioner::mb_mlbp<uint32_t, uint16_t> >(
                         m_src_iimage, m_settings.m_cx, m_settings.m_cy, m_src_fmap);
                 m_src_colors = &theFMap2Rgbs.m_8bits2rgbs;
 		break;                
@@ -142,8 +142,8 @@ void FeatureMapItem::update_fmap()
                 // MB-tLBP code map
         case DrawingSource_tLBP:
                 bob::visioner::mb_dense<
-                        bob::visioner::igrey_t, bob::visioner::discrete_t, 3, 3, 
-                        bob::visioner::mb_tlbp<bob::visioner::igrey_t, bob::visioner::discrete_t> >(
+                        uint32_t, uint16_t, 3, 3, 
+                        bob::visioner::mb_tlbp<uint32_t, uint16_t> >(
                         m_src_iimage, m_settings.m_cx, m_settings.m_cy, m_src_fmap);
                 m_src_colors = &theFMap2Rgbs.m_8bits2rgbs;
 		break;
@@ -151,8 +151,8 @@ void FeatureMapItem::update_fmap()
                 // MB-dLBP code map
         case DrawingSource_dLBP:
                 bob::visioner::mb_dense<
-                        bob::visioner::igrey_t, bob::visioner::discrete_t, 3, 3,
-                        bob::visioner::mb_dlbp<bob::visioner::igrey_t, bob::visioner::discrete_t> >(
+                        uint32_t, uint16_t, 3, 3,
+                        bob::visioner::mb_dlbp<uint32_t, uint16_t> >(
                         m_src_iimage, m_settings.m_cx, m_settings.m_cy, m_src_fmap);
                 m_src_colors = &theFMap2Rgbs.m_8bits2rgbs;
 		break;
@@ -170,7 +170,7 @@ void FeatureMapItem::update_fmap()
 	m_src_qfmap = QImage(m_src_fmap.cols(), m_src_fmap.rows(), QImage::Format_RGB32);
 	for (int j = 0, y = 0; j < m_src_qfmap.height(); j ++, y ++)
 	{
-		const bob::visioner::discrete_t* p_src = &m_src_fmap[j][0];
+		const uint16_t* p_src = &m_src_fmap[j][0];
 		for (int i = 0, x = 0; i < m_src_qfmap.width(); i ++, x ++)
 		{
 			const QRgb color = colors[*(p_src ++)];
@@ -190,7 +190,7 @@ void FeatureMapItem::update_fmap()
 //	// DEBUG: 	
 //	{
 //		int cnt = 0;
-//		for (bob::visioner::discrete_mat_t::iterator_t it = m_src_fmap.begin(); it != m_src_fmap.end(); ++ it)
+//		for (bob::visioner::Matrix<uint16_t>::iterator_t it = m_src_fmap.begin(); it != m_src_fmap.end(); ++ it)
 //		{
 //			if ((*it) < 0 || (*it) > src_max)
 //			{
@@ -442,11 +442,11 @@ void FeatureMapItem::drawGTruth(QPainter& painter)
 	const qreal dy = imageRect().top();
 	
 	// Draw each object: bounding box + keypoints + label
-	for (bob::visioner::objects_t::const_iterator it = ipscale.m_objects.begin();
+	for (std::vector<bob::visioner::Object>::const_iterator it = ipscale.m_objects.begin();
 		it != ipscale.m_objects.end(); ++ it)
 	{
 		const bob::visioner::Object& object = *it;
-		const bob::visioner::rect_t& bbx = object.bbx();
+		const QRectF& bbx = object.bbx();
 
 		QRectF draw_bbx = bbx.translated(dx, dy);
 
@@ -484,7 +484,7 @@ void FeatureMapItem::drawGTruth(QPainter& painter)
 		}
 		
 		// Keypoints
-		for (bob::visioner::keypoints_t::const_iterator itf = object.keypoints().begin();
+		for (std::vector<bob::visioner::Keypoint>::const_iterator itf = object.keypoints().begin();
 			itf != object.keypoints().end(); ++ itf)
 		{
 			static const int delta = 6;
@@ -514,7 +514,7 @@ void FeatureMapItem::drawGTruth(QPainter& painter)
 
 void FeatureMapItem::drawHistogram(QPainter& painter)
 {
-	const bob::visioner::scalars_t& bins = m_src_histo.bins();
+	const std::vector<double>& bins = m_src_histo.bins();
 	const float max_bin = bins.empty() ? 1.0 : *std::max_element(bins.begin(), bins.end());
 	const int n_bins = bins.size();
 	

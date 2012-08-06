@@ -8,16 +8,16 @@
  * Bob coding standards and structure.
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -29,69 +29,64 @@
 
 #include <boost/serialization/singleton.hpp>
 #include <boost/shared_ptr.hpp>
-
-#include "core/logging.h"
+#include <boost/format.hpp>
 
 #include "visioner/util/util.h"
 
 namespace bob { namespace visioner {
 
   /////////////////////////////////////////////////////////////////////////////////////////
-  // Manager: used to retrieve an object type based on a given ID.
+  // Manager: used to retrieve an object type based on a given std::string.
   //	The objects need to posses a ::clone() function.
   /////////////////////////////////////////////////////////////////////////////////////////
 
   template <typename TObject>
-    class Manager : public boost::serialization::singleton<Manager<TObject> >
-  {
-    protected:	
+    class Manager : public boost::serialization::singleton<Manager<TObject> > {
 
-      typedef string_t			ID;		
-      typedef boost::shared_ptr<TObject>	robject_t;
+    protected:
 
       // Constructor
-      Manager() 
-      {
-      }
+      Manager() { }
 
     public:
 
       // Register a new classifier
-      void add(ID id, const TObject& proto)
+      void add(std::string id, const TObject& proto)
       {
         m_prototypes[id] = proto.clone();
       }
 
-      // Retrieve a classifier prototype by its ID
-      robject_t get(ID id) const
+      // Retrieve a classifier prototype by its std::string
+      boost::shared_ptr<TObject> get(const std::string& id) const
       {
-        const typename std::map<ID, robject_t>::const_iterator it = m_prototypes.find(id);
-        if (it == m_prototypes.end())
-        {
-          bob::core::error << "The manager cannot find the object <" << id << ">!" << std::endl;
-          exit(EXIT_FAILURE);
+        const typename std::map<std::string, boost::shared_ptr<TObject> >::const_iterator it = m_prototypes.find(id);
+        if (it == m_prototypes.end()) {
+          boost::format m("The manager cannot find object with id='%s'");
+          m % id;
+          throw std::runtime_error(m.str().c_str());
         }
         return it->second->clone();
       }
 
-      // Retrieve the registered IDs as a list
-      strings_t describe_list() const
-      {
-        strings_t retval;
-        for (typename std::map<ID, robject_t>::const_iterator it = m_prototypes.begin(); it != m_prototypes.end(); ++ it) retval.push_back(it->first);
+      // Retrieve the registered std::strings as a list
+      std::vector<std::string> describe_list() const {
+
+        std::vector<std::string> retval;
+        for (typename std::map<std::string, boost::shared_ptr<TObject> >::const_iterator it = m_prototypes.begin(); it != m_prototypes.end(); ++ it) retval.push_back(it->first);
         return retval;
+
       }
 
-      // Retrieve the registered IDs as a single string
-      string_t describe() const
-      {
-        string_t desc;
-        for (typename std::map<ID, robject_t>::const_iterator it = m_prototypes.begin();
+      // Retrieve the registered std::strings as a single string
+      std::string describe() const {
+
+        std::string desc;
+        for (typename std::map<std::string, boost::shared_ptr<TObject> >::const_iterator it = m_prototypes.begin();
             it != m_prototypes.end(); ++ it)
         {
           desc += it->first;
 
-          typename std::map<ID, robject_t>::const_iterator it2 = it;
+          typename std::map<std::string, boost::shared_ptr<TObject> >::const_iterator it2 = it;
           ++ it2;
           if (it2 != m_prototypes.end())
             desc += ", ";
@@ -103,33 +98,30 @@ namespace bob { namespace visioner {
     private:
 
       // Attributes
-      std::map<ID, robject_t>	m_prototypes;
+      std::map<std::string, boost::shared_ptr<TObject> >	m_prototypes;
   };
 
-  template <typename TObject>
-    class Manageable
-    {
-      public:
+  template <typename TObject> class Manageable {
 
-        typedef boost::shared_ptr<Manageable<TObject> >	robject_t;
+    public:
 
-        // Constructor
-        Manageable(const TObject& data)      
-          :       m_data(data)
-        {                        
-        }
+      // Constructor
+      Manageable(const TObject& data)
+        : m_data(data) { }
 
-        // Clone the object
-        robject_t clone() const { return robject_t(new Manageable<TObject>(m_data)); }
+      // Clone the object
+      boost::shared_ptr<Manageable<TObject> > clone() const
+      { return boost::shared_ptr<Manageable<TObject> >
+          (new Manageable<TObject>(m_data)); }
 
-        // Access function
-        TObject operator*() const { return m_data; }
+      // Access function
+      TObject operator*() const { return m_data; }
 
-      private:
+    private:
 
-        // Attributes
-        TObject         m_data;
-    };
+      // Attributes
+      TObject         m_data;
+  };
 
 }}
 

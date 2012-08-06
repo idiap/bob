@@ -36,7 +36,7 @@ namespace bob { namespace visioner {
     painter.setPen(QPen(QBrush(qRgb(0, 255, 0)), 2.0, Qt::SolidLine));
 
     // Draw each object
-    for (objects_t::const_iterator ito = ipscale.m_objects.begin();
+    for (std::vector<Object>::const_iterator ito = ipscale.m_objects.begin();
         ito != ipscale.m_objects.end(); ++ ito)
     {
       // Bounding box
@@ -44,11 +44,11 @@ namespace bob { namespace visioner {
       painter.drawRect(object.bbx());
 
       // Keypoints
-      for (keypoints_t::const_iterator itk = object.keypoints().begin();
+      for (std::vector<bob::visioner::Keypoint>::const_iterator itk = object.keypoints().begin();
           itk != object.keypoints().end(); ++ itk)
       {
         const visioner::Keypoint& keypoint = *itk;
-        const visioner::point_t& point = keypoint.m_point;
+        const QPointF& point = keypoint.m_point;
 
         painter.drawLine(point.x() - 4, point.y(), point.x() + 4, point.y());
         painter.drawLine(point.x(), point.y() - 4, point.x(), point.y() + 4);
@@ -68,8 +68,8 @@ namespace bob { namespace visioner {
     static const QPen pen_true(QBrush(qRgb(0, 0, 255)), 2.0, Qt::SolidLine);
     static const QPen pen_false(QBrush(qRgb(255, 0, 0)), 2.0, Qt::SolidLine);
 
-    const scalar_t& score = detection.first;
-    const rect_t& bbx = detection.second.first;                
+    const double& score = detection.first;
+    const QRectF& bbx = detection.second.first;                
     const int output = detection.second.second;
 
     // Detection: bounding box
@@ -102,25 +102,25 @@ namespace bob { namespace visioner {
         text_label);                
   }
 
-  void draw_detections(QImage& qimage, const detections_t& detections, const param_t& param, const bools_t& labels)
+  void draw_detections(QImage& qimage, const std::vector<detection_t>& detections, const param_t& param, const std::vector<int>& labels)
   {
     if (detections.size() == labels.size())
     {
-      for (index_t i = 0; i < detections.size(); i ++)
+      for (uint64_t i = 0; i < detections.size(); i ++)
       {
         draw_detection(qimage, detections[i], param, labels[i]);
       }
     }
   }
 
-  void draw_points(QImage& qimage, const points_t& points)
+  void draw_points(QImage& qimage, const std::vector<QPointF>& points)
   {
     QPainter painter(&qimage);
 
     painter.setPen(QPen(QBrush(qRgb(255, 0, 0)), 2.0, Qt::SolidLine));
-    for (points_t::const_iterator it = points.begin(); it != points.end(); ++ it)
+    for (std::vector<QPointF>::const_iterator it = points.begin(); it != points.end(); ++ it)
     {
-      const point_t& point = *it;
+      const QPointF& point = *it;
 
       painter.drawLine(point.x() - 4, point.y(), point.x() + 4, point.y());
       painter.drawLine(point.x(), point.y() - 4, point.x(), point.y() + 4);
@@ -128,7 +128,7 @@ namespace bob { namespace visioner {
   }
 
   void draw_label(QImage& qimage, const detection_t& detection, const param_t& param, 
-      index_t gt_label, index_t dt_label)
+      uint64_t gt_label, uint64_t dt_label)
   {
     QPainter painter(&qimage);
 
@@ -139,7 +139,7 @@ namespace bob { namespace visioner {
     static const QPen pen_true(QBrush(qRgb(0, 0, 255)), 2.0, Qt::SolidLine);
     static const QPen pen_false(QBrush(qRgb(255, 0, 0)), 2.0, Qt::SolidLine);
 
-    const rect_t& bbx = detection.second.first;                
+    const QRectF& bbx = detection.second.first;                
 
     painter.setPen(gt_label == dt_label ? pen_true : pen_false);
     const QString text_label = QObject::tr("<%1> / <%2>")

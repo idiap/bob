@@ -40,7 +40,7 @@ namespace bob { namespace visioner {
     public:
 
       // Constructor
-      LUTProblemVAR(const DataSet& data, const param_t& param, scalar_t lambda);
+      LUTProblemVAR(const DataSet& data, const param_t& param, double lambda);
 
       // Destructor
       virtual ~LUTProblemVAR() {} 
@@ -48,13 +48,13 @@ namespace bob { namespace visioner {
     protected:
 
       // Update loss values and derivatives (for some particular scores)
-      virtual void update_loss_deriv(const scalar_mat_t& scores);
-      virtual void update_loss(const scalar_mat_t& scores);
+      virtual void update_loss_deriv(const Matrix<double>& scores);
+      virtual void update_loss(const Matrix<double>& scores);
 
     protected:
 
       // Attributes
-      scalar_t                        m_lambda;       // Regularization factor
+      double                        m_lambda;       // Regularization factor
   };	
 
 }}

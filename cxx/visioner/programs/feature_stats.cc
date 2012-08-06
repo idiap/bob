@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  const bob::visioner::rmodel_t model = bob::visioner::make_model(param);
+  const boost::shared_ptr<bob::visioner::Model> model = bob::visioner::make_model(param);
 
   bob::core::info
     << "The model <" << param.m_feature << "> has " << model->n_features()

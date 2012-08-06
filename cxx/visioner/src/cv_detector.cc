@@ -67,19 +67,19 @@ namespace bob { namespace visioner {
        "detection: object classification model")
 
       ("detect_threshold",
-       boost::program_options::value<scalar_t>()->default_value(m_threshold),
+       boost::program_options::value<double>()->default_value(m_threshold),
        "detection: object classification threshold")
 
       ("detect_levels", 
-       boost::program_options::value<index_t>()->default_value(m_levels),
+       boost::program_options::value<uint64_t>()->default_value(m_levels),
        "detection: levels (the more, the faster)")
 
       ("detect_ds",
-       boost::program_options::value<index_t>()->default_value(m_ds),
+       boost::program_options::value<uint64_t>()->default_value(m_ds),
        "detection: scale variation in pixels")
       
       ("detect_cluster",
-       boost::program_options::value<scalar_t>()->default_value(m_cluster),
+       boost::program_options::value<double>()->default_value(m_cluster),
        "detection: overlapping threshold for clustering detections")
       
       ("detect_method",
@@ -114,7 +114,7 @@ namespace bob { namespace visioner {
     decode_var(po_desc, po_vm, "detect_ds", m_ds);
     decode_var(po_desc, po_vm, "detect_cluster", m_cluster);     
 
-    string_t cmd_method;
+    std::string cmd_method;
     decode_var(po_desc, po_vm, "detect_method", cmd_method);
 
     if (cmd_method == "groundtruth")
@@ -137,8 +137,8 @@ namespace bob { namespace visioner {
     return true;
   }
 
-  CVDetector::CVDetector(const std::string& model, scalar_t threshold,
-      index_t levels, index_t scale_variation, scalar_t clustering,
+  CVDetector::CVDetector(const std::string& model, double threshold,
+      uint64_t levels, uint64_t scale_variation, double clustering,
       CVDetector::Type detection_method):
     m_ds(scale_variation),
     m_cluster(clustering),
@@ -168,20 +168,20 @@ namespace bob { namespace visioner {
 
 
 
-  void CVDetector::set_scan_levels(index_t levels) {
+  void CVDetector::set_scan_levels(uint64_t levels) {
     m_levels = levels;
 
     // Build the level classifiers
     m_lmodel_begins.resize(n_outputs(), m_levels + 1);
     m_lmodel_ends.resize(n_outputs(), m_levels + 1);
-    for (index_t o = 0; o < n_outputs(); o ++)
+    for (uint64_t o = 0; o < n_outputs(); o ++)
     {
-      const index_t size = m_model->n_luts(o);
+      const uint64_t size = m_model->n_luts(o);
 
       m_lmodel_begins(o, 0) = 0;
       m_lmodel_ends(o, 0) = size >> m_levels;
 
-      for (index_t l = 1; l <= m_levels; l ++)			
+      for (uint64_t l = 1; l <= m_levels; l ++)			
       {
         m_lmodel_begins(o, l) = size >> (m_levels - l + 1); 
         m_lmodel_ends(o, l) = size >> (m_levels - l);
@@ -190,7 +190,7 @@ namespace bob { namespace visioner {
   }
 
   // Load an image (build the image pyramid)
-  bool CVDetector::load(const string_t& ifile, const string_t& gfile)
+  bool CVDetector::load(const std::string& ifile, const std::string& gfile)
   {
     return	m_ipyramid.load(ifile, gfile) &&
       m_ipyramid.empty() == false;
@@ -200,7 +200,7 @@ namespace bob { namespace visioner {
     return	m_ipyramid.load(ipscale) &&
       m_ipyramid.empty() == false;
   }
-  bool CVDetector::load(const grey_t* image, index_t rows, index_t cols)
+  bool CVDetector::load(const uint8_t* image, uint64_t rows, uint64_t cols)
   {
     return	m_ipyramid.load(image, rows, cols) &&
       m_ipyramid.empty() == false;
@@ -220,21 +220,21 @@ namespace bob { namespace visioner {
   {
     return  m_ipyramid.empty() == false;
   }
-  bool CVDetector::valid_output(index_t output) const
+  bool CVDetector::valid_output(uint64_t output) const
   {
     return	output >= 0 && output < m_model->n_outputs();
   }
 
   // Detect objects
   // NB: The detections are thresholded and clustered!
-  bool CVDetector::scan(detections_t& detections) const
+  bool CVDetector::scan(std::vector<detection_t>& detections) const
   {
     detections.clear();
 
     // Ground truth mode ...
     if (m_type == GroundTruth)
     {
-      for (objects_t::const_iterator it = objects().begin(); it != objects().end(); ++ it)
+      for (std::vector<Object>::const_iterator it = objects().begin(); it != objects().end(); ++ it)
       {
         const int ilabel = find(*it);
         if (ilabel >= 0)
@@ -258,23 +258,23 @@ namespace bob { namespace visioner {
 
     // Scan the image ... 
     Timer timer;
-    for (index_t is = 0; is < m_ipyramid.size(); is ++)
+    for (uint64_t is = 0; is < m_ipyramid.size(); is ++)
     {
       const ipscale_t& ip = m_ipyramid[is];
       m_model->preprocess(ip);
 
       // ... with every model type
-      for (index_t o = 0; o < n_outputs(); o ++)
+      for (uint64_t o = 0; o < n_outputs(); o ++)
       {
         for (int x = ip.m_scan_min_x; x < ip.m_scan_max_x; x += ip.m_scan_dx)
           for (int y = ip.m_scan_min_y; y < ip.m_scan_max_y; y += ip.m_scan_dy)
           {
             // Concentrate computation on the most promising detections
-            scalar_t score = 0.0;
-            for (index_t l = 0; l <= m_levels && score >= 0.0; l ++)
+            double score = 0.0;
+            for (uint64_t l = 0; l <= m_levels && score >= 0.0; l ++)
             {
-              const index_t lbegin = m_lmodel_begins[o][l];
-              const index_t lend = m_lmodel_ends[o][l];
+              const uint64_t lbegin = m_lmodel_begins[o][l];
+              const uint64_t lend = m_lmodel_ends[o][l];
               score += m_model->score(o, lbegin, lend, x, y);
 
               // Update statistics
@@ -286,7 +286,7 @@ namespace bob { namespace visioner {
             {
               detections.push_back(make_detection(
                     score, 
-                    m_ipyramid.map(sw_t(x, y, is)), 
+                    m_ipyramid.map(subwindow_t(x, y, is)), 
                     o));
             }
 
@@ -328,21 +328,21 @@ namespace bob { namespace visioner {
     return  overlap(detection.second.first, objects(), &which) >= MinOverlap() &&
       detection.second.second == find(objects()[which]);
   }
-  void CVDetector::label(const detections_t& detections, bools_t& labels) const
+  void CVDetector::label(const std::vector<detection_t>& detections, std::vector<int>& labels) const
   {
     labels.resize(detections.size());
-    for (index_t id = 0; id < detections.size(); id ++)
+    for (uint64_t id = 0; id < detections.size(); id ++)
     {
       labels[id] = label(detections[id]);
     }
   }
-  void CVDetector::label(const detections_t& detections, bool_mat_t& labels) const
+  void CVDetector::label(const std::vector<detection_t>& detections, Matrix<int>& labels) const
   {
     labels.resize(detections.size(), n_objects());
-    for (index_t id = 0; id < detections.size(); id ++)
+    for (uint64_t id = 0; id < detections.size(); id ++)
     {
       const detection_t& det = detections[id];
-      for (index_t ig = 0; ig < n_objects(); ig ++)
+      for (uint64_t ig = 0; ig < n_objects(); ig ++)
       {
         const Object& obj = objects()[ig];
         labels(id, ig) = 
@@ -353,10 +353,10 @@ namespace bob { namespace visioner {
   }
 
   // Prune detections (remove false alarms)
-  void CVDetector::prune(detections_t& detections) const
+  void CVDetector::prune(std::vector<detection_t>& detections) const
   {
     Object object;
-    for (index_t i = 0; i < detections.size(); i ++)
+    for (uint64_t i = 0; i < detections.size(); i ++)
     {
       if (match(detections[i], object) == false)
       {
@@ -367,17 +367,17 @@ namespace bob { namespace visioner {
   }
 
   // Process detections
-  void CVDetector::sort_asc(detections_t& detections)
+  void CVDetector::sort_asc(std::vector<detection_t>& detections)
   {
     std::sort(detections.begin(), detections.end(), std::less<detection_t>());
   }
 
-  void CVDetector::sort_desc(detections_t& detections)
+  void CVDetector::sort_desc(std::vector<detection_t>& detections)
   {
     std::sort(detections.begin(), detections.end(), std::greater<detection_t>());
   }
 
-  void CVDetector::threshold(detections_t& detections, scalar_t thres)
+  void CVDetector::threshold(std::vector<detection_t>& detections, double thres)
   {
     detections.erase(
         std::remove_if(	detections.begin(), detections.end(),
@@ -385,7 +385,7 @@ namespace bob { namespace visioner {
         detections.end());
   }
 
-  void CVDetector::cluster(detections_t& detections, scalar_t thres, index_t n_outputs)
+  void CVDetector::cluster(std::vector<detection_t>& detections, double thres, uint64_t n_outputs)
   {
     if (thres >= 1.0)
     {
@@ -396,10 +396,10 @@ namespace bob { namespace visioner {
     sort_desc(detections);
 
     // Check if the detection ...
-    detections_t result;
-    for (index_t o = 0; o < n_outputs; o ++)
+    std::vector<detection_t> result;
+    for (uint64_t o = 0; o < n_outputs; o ++)
     {
-      for (index_t iref = 0; iref < detections.size(); iref ++)
+      for (uint64_t iref = 0; iref < detections.size(); iref ++)
       {
         const detection_t& ref = detections[iref];
         if (    ref.second.first.left() > -0.5 && // ... is still valid!
@@ -408,7 +408,7 @@ namespace bob { namespace visioner {
           result.push_back(ref);
 
           // Then, remove the overlapping detections
-          for (index_t icrt = iref + 1; icrt < detections.size(); icrt ++)
+          for (uint64_t icrt = iref + 1; icrt < detections.size(); icrt ++)
           {
             detection_t& crt = detections[icrt];
             if (	crt.second.first.left() > -0.5 &&
@@ -428,9 +428,9 @@ namespace bob { namespace visioner {
   // Compute the ROC - the number of true positives and false alarms
   //	for the <min_score + t * delta_score, t < n_thress> threshold values.
   void CVDetector::roc(
-      const bool_mat_t& labels, const detections_t& detections,
-      scalar_t min_score, index_t n_thress, scalar_t delta_score,
-      indices_t& n_tps, indices_t& n_fas)
+      const Matrix<int>& labels, const std::vector<detection_t>& detections,
+      double min_score, uint64_t n_thress, double delta_score,
+      std::vector<uint64_t>& n_tps, std::vector<uint64_t>& n_fas)
   {
     if (	detections.empty() ||
         labels.rows() != detections.size())
@@ -439,8 +439,8 @@ namespace bob { namespace visioner {
     }
 
     // Compute the FAs and TPs for various threshold values
-    scalar_t thres = min_score;
-    for (index_t t = 0, id = 0; t < n_thress; t ++, thres += delta_score)
+    double thres = min_score;
+    for (uint64_t t = 0, id = 0; t < n_thress; t ++, thres += delta_score)
     {
       // Find the first detection with the score just above this threshold
       for ( ; id < detections.size() &&
@@ -450,12 +450,12 @@ namespace bob { namespace visioner {
 
       // Update the number of false alarms and true detections
       //	for the thresholded detections
-      index_t tps = 0, fas = 0;
+      uint64_t tps = 0, fas = 0;
 
-      for (index_t cid = id; cid < labels.rows(); cid ++)
+      for (uint64_t cid = id; cid < labels.rows(); cid ++)
       {
         fas ++;
-        for (index_t ig = 0; ig < labels.cols(); ig ++)
+        for (uint64_t ig = 0; ig < labels.cols(); ig ++)
         {
           if (labels(cid, ig))
           {
@@ -465,9 +465,9 @@ namespace bob { namespace visioner {
         }
       }
 
-      for (index_t ig = 0; ig < labels.cols(); ig ++)
+      for (uint64_t ig = 0; ig < labels.cols(); ig ++)
       {
-        for (index_t cid = id; cid < labels.rows(); cid ++)
+        for (uint64_t cid = id; cid < labels.rows(); cid ++)
         {
           if (labels(cid, ig))
           {
@@ -483,27 +483,26 @@ namespace bob { namespace visioner {
   }
 
   // Compute the ROC - the number of true positives and false alarms
-  void CVDetector::evaluate(
-      const strings_t& ifiles, const strings_t& gfiles,
-      scalars_t& fas, scalars_t& tars)
-  {
+  void CVDetector::evaluate(const std::vector<std::string>& ifiles, 
+      const std::vector<std::string>& gfiles, std::vector<double>& fas, 
+      std::vector<double>& tars) {
+
     // 1st pass: process each image to assess the minimum/maximum score ...
-    scalar_t min_score = std::numeric_limits<scalar_t>::max();
-    scalar_t max_score = -std::numeric_limits<scalar_t>::max();
+    double min_score = std::numeric_limits<double>::max();
+    double max_score = -std::numeric_limits<double>::max();
 
-    std::vector<detections_t>       idetections;
-    std::vector<bool_mat_t>         ilabels;
+    std::vector<std::vector<detection_t> > idetections;
+    std::vector<Matrix<int> > ilabels;
 
-    detections_t detections;
+    std::vector<detection_t> detections;
 
-    for (index_t i = 0; i < ifiles.size(); i ++)
-    {
+    for (uint64_t i = 0; i < ifiles.size(); i ++) {
+
       const std::string& ifile = ifiles[i];
       const std::string& gfile = gfiles[i];
 
       // Load the image and the ground truth
-      if (load(ifile, gfile) == false)
-      {
+      if (load(ifile, gfile) == false) {
         bob::core::warn << "Failed to load image <" << ifile << "> or ground truth <" << gfile << ">!" << std::endl;
         continue;
       }
@@ -515,53 +514,47 @@ namespace bob { namespace visioner {
 
       // Update the score extremes
       sort_asc(detections);
-      if (detections.empty() == false)
-      {
+      if (detections.empty() == false) {
         min_score = std::min(min_score, detections.begin()->first);
         max_score = std::max(max_score, detections.rbegin()->first);
       }
 
       // Save detections and labels
-      bool_mat_t labels;
+      Matrix<int> labels;
       label(detections, labels); 
 
       idetections.push_back(detections);		
       ilabels.push_back(labels);                
 
       // Debug
-      bob::core::info 
-        << "Image [" << (i + 1) << "/" << ifiles.size() << "]: produced "
-        << detections.size() << " detections / "
+      bob::core::info << "Image [" << (i + 1) << "/" << ifiles.size() 
+        << "]: produced " << detections.size() << " detections / "
         << n_objects() << " GTs in " << timer.elapsed() << "s." << std::endl;
     }
 
-    const index_t n_thress = 256;
-    const scalar_t delta_score = inverse(n_thress - 1) * (max_score - min_score);
+    const uint64_t n_thress = 256;
+    const double delta_score = inverse(n_thress - 1) * (max_score - min_score);
 
-    bob::core::info 
-      << "min_score = " << min_score << ", max_score = " << max_score
-      << ", delta_score = " << delta_score << std::endl;
+    bob::core::info << "min_score = " << min_score << ", max_score = " 
+      << max_score << ", delta_score = " << delta_score << std::endl;
 
-    std::vector<index_t> n_tps(n_thress, 0);	// #true positives
-    std::vector<index_t> n_fas(n_thress, 0);	// #false alarms			
+    std::vector<uint64_t> n_tps(n_thress, 0);	// #true positives
+    std::vector<uint64_t> n_fas(n_thress, 0);	// #false alarms			
 
-    // 2nd pass: use the detections and the ground truth locations to compute the ROC curve ...
-    for (index_t i = 0; i < ifiles.size(); i ++)
-    {
-      const detections_t& detections = idetections[i];
-      const bool_mat_t& labels = ilabels[i];
-
-      roc(	labels, detections, min_score, n_thress, delta_score,
-          n_tps, n_fas);
+    // 2nd pass: use the detections and the ground truth locations to compute
+    // the ROC curve ...
+    for (uint64_t i = 0; i < ifiles.size(); i ++) {
+      const std::vector<detection_t>& detections = idetections[i];
+      const Matrix<int>& labels = ilabels[i];
+      roc(labels, detections, min_score, n_thress, delta_score, n_tps, n_fas);
     }
 
     // Build the ROC curve		
     fas.resize(n_thress), tars.resize(n_thress);
-    for (index_t t = 0; t < n_thress; t ++)
-    {
+    for (uint64_t t = 0; t < n_thress; t ++) {
       fas[t] = n_fas[t];
       tars[t] = inverse(stats().m_gts) * n_tps[t];
-    }			
+    }
     roc_order(fas, tars);
     roc_trim(fas, tars);    
 
@@ -570,8 +563,7 @@ namespace bob { namespace visioner {
   }
 
   // Display statistics
-  void CVDetector::stats_t::show() const
-  {
+  void CVDetector::stats_t::show() const {
     bob::core::info << "Processed " << m_gts << " GTs by scanning " 
       << m_sws << " SWs with " << (inverse(m_sws) * m_evals) 
       << " LUT evaluations done in " << (inverse(m_sws) * m_timing) 

@@ -37,16 +37,16 @@ namespace bob { namespace visioner {
 	public:
 		
 		// Constructor
-		Histogram(index_t n_bins = 20, scalar_t min_value = 0.0, scalar_t max_value = 1.0);
+		Histogram(uint64_t n_bins = 20, double min_value = 0.0, double max_value = 1.0);
 				
 		// Reset to the new bins
-		void reset(index_t n_bins, scalar_t min_value, scalar_t max_value);
+		void reset(uint64_t n_bins, double min_value, double max_value);
 		
 		// Delete all stored values
 		void clear() { std::fill(m_bins.begin(), m_bins.end(), 0.0); }
                 
                 // Add a new value
-		void add(scalar_t value);
+		void add(double value);
 		
 		template <typename TIterator>
 		void add(TIterator begin, TIterator end)
@@ -56,7 +56,7 @@ namespace bob { namespace visioner {
 		}
 		
 		// Save to file
-		bool save(const string_t& path) const;
+		bool save(const std::string& path) const;
 		
 		// Compute and normalize the cumulated histogram
 		void cumulate();
@@ -65,17 +65,17 @@ namespace bob { namespace visioner {
                 void norm();
 		
 		// Access functions
-		index_t n_bins() const { return m_n_bins; }
-		scalar_t delta() const { return m_delta; }
-		scalar_t bin_value(index_t bin) const { return m_min + bin * m_delta; }
-		const scalars_t& bins() const { return m_bins; }
+		uint64_t n_bins() const { return m_n_bins; }
+		double delta() const { return m_delta; }
+		double bin_value(uint64_t bin) const { return m_min + bin * m_delta; }
+		const std::vector<double>& bins() const { return m_bins; }
 		
 	private:
 		
 		// Attributes
-		index_t		m_n_bins;
-		scalar_t	m_min, m_delta, m_max, m_inv_delta;
-		scalars_t	m_bins;
+		uint64_t		m_n_bins;
+		double	m_min, m_delta, m_max, m_inv_delta;
+		std::vector<double>	m_bins;
 	};
 
 }}

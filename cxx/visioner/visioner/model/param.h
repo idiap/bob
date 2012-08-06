@@ -48,29 +48,29 @@ namespace bob { namespace visioner {
        * initialization. Have a look there to find all default parameters.
        */
       param_t(
-          index_t rows=24,
-          index_t cols=20,
-          const string_t& loss="diag_log",
-          scalar_t loss_parameter=0.0,
-          const string_t& optimization_type="ept",
-          const string_t& training_model="gboost",
-          index_t num_of_bootstraps=3,
-          const string_t& feature_type="elbp",
-          const string_t& feature_sharing="shared",
-          index_t feature_projections=0,
-          scalar_t min_gt_overlap=0.8,
-          index_t sliding_windows=2,
-          const string_t& subwindow_labelling="object_type"
+          uint64_t rows=24,
+          uint64_t cols=20,
+          const std::string& loss="diag_log",
+          double loss_parameter=0.0,
+          const std::string& optimization_type="ept",
+          const std::string& training_model="gboost",
+          uint64_t num_of_bootstraps=3,
+          const std::string& feature_type="elbp",
+          const std::string& feature_sharing="shared",
+          uint64_t feature_projections=0,
+          double min_gt_overlap=0.8,
+          uint64_t sliding_windows=2,
+          const std::string& subwindow_labelling="object_type"
           );
 
       // Compute the range of top-left sub-window coordinates for a given image
-      int min_row(index_t image_rows, index_t image_cols) const;
-      int max_row(index_t image_rows, index_t image_cols) const;
-      int min_col(index_t image_rows, index_t image_cols) const;
-      int max_col(index_t image_rows, index_t image_cols) const;
+      int min_row(uint64_t image_rows, uint64_t image_cols) const;
+      int max_row(uint64_t image_rows, uint64_t image_cols) const;
+      int min_col(uint64_t image_rows, uint64_t image_cols) const;
+      int max_col(uint64_t image_rows, uint64_t image_cols) const;
 
       // Return the index of the given label (negative if not found)
-      int find(const string_t& label) const;
+      int find(const std::string& label) const;
 
       // Command line processing
       void add_options(boost::program_options::options_description& po_desc) const;
@@ -82,7 +82,7 @@ namespace bob { namespace visioner {
       template <typename Archive>
         void serialize(Archive& ar, const unsigned int)
         {
-          string_t dummy_to_be_removed("dense");
+          std::string dummy_to_be_removed("dense");
 
           ar & m_rows;
           ar & m_cols;
@@ -110,33 +110,33 @@ namespace bob { namespace visioner {
     public: //representation
 
       // Attributes
-      index_t		m_rows, m_cols;		// Model size
-      index_t         m_seed;                 // Random seed
+      uint64_t		m_rows, m_cols;		// Model size
+      uint64_t         m_seed;                 // Random seed
 
-      strings_t	m_labels;		// Object types/poses/IDs or Keypoint IDs of interest
+      std::vector<std::string>	m_labels;		// Object types/poses/IDs or Keypoint IDs of interest
 
-      string_t	m_loss;			// Loss
-      scalar_t        m_loss_param;           // Loss parameter
-      string_t        m_optimization;         // Optimization type (expectation vs. variational)
+      std::string	m_loss;			// Loss
+      double        m_loss_param;           // Loss parameter
+      std::string        m_optimization;         // Optimization type (expectation vs. variational)
 
-      string_t	m_trainer;		// Training model
+      std::string	m_trainer;		// Training model
 
-      index_t		m_rounds;		// Maximum boosting rounds
-      index_t         m_bootstraps;           // Number of bootstrapping steps
+      uint64_t		m_rounds;		// Maximum boosting rounds
+      uint64_t         m_bootstraps;           // Number of bootstrapping steps
 
-      string_t	m_train_data;		// Training data
-      string_t	m_valid_data;		// Validation data
-      index_t         m_train_samples;        // #training samples
-      index_t         m_valid_samples;        // #validation samples
+      std::string	m_train_data;		// Training data
+      std::string	m_valid_data;		// Validation data
+      uint64_t         m_train_samples;        // #training samples
+      uint64_t         m_valid_samples;        // #validation samples
 
-      string_t	m_feature;		// Feature type
-      string_t        m_sharing;              // Feature sharing
-      index_t         m_projections;          // Coarse-to-fine feature projection
+      std::string	m_feature;		// Feature type
+      std::string        m_sharing;              // Feature sharing
+      uint64_t         m_projections;          // Coarse-to-fine feature projection
 
-      scalar_t	m_min_gt_overlap;	// Minimum overlapping with ground truth for positive samples
+      double	m_min_gt_overlap;	// Minimum overlapping with ground truth for positive samples
 
-      index_t		m_ds;			// Sliding windows
-      string_t	m_tagger;		// Labelling sub-windows		
+      uint64_t		m_ds;			// Sliding windows
+      std::string	m_tagger;		// Labelling sub-windows		
   };
 
   //////////////////////////////////////////////////////////////////////////////////////

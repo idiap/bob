@@ -28,14 +28,14 @@
 
 namespace bob { namespace visioner {
 
-  Object::Object(const string_t& type, const string_t& pose, const string_t& id, 
+  Object::Object(const std::string& type, const std::string& pose, const std::string& id, 
       float bbx_x, float bbx_y, float bbx_w, float bbx_h)
     :	m_type(type), m_pose(pose), m_id(id), m_bbx(bbx_x, bbx_y, bbx_w, bbx_h)
   {		
   }
 
-  Object::Object(const string_t& type, const string_t& pose, const string_t& id, 
-      const rect_t& bbx)
+  Object::Object(const std::string& type, const std::string& pose, const std::string& id, 
+      const QRectF& bbx)
     :	m_type(type), m_pose(pose), m_id(id), m_bbx(bbx)
   {
   }
@@ -50,41 +50,41 @@ namespace bob { namespace visioner {
     m_keypoints.push_back(keypoint);
   }
 
-  void Object::move(const rect_t& bbx)
+  void Object::move(const QRectF& bbx)
   {
     m_bbx = bbx;
   }
 
-  void Object::scale(scalar_t factor)
+  void Object::scale(double factor)
   {
     // Scale the object bounding box
-    const scalar_t bbx_w = factor * m_bbx.width();
-    const scalar_t bbx_h = factor * m_bbx.height();
-    const scalar_t top = factor * m_bbx.top();
-    const scalar_t left = factor * m_bbx.left();
+    const double bbx_w = factor * m_bbx.width();
+    const double bbx_h = factor * m_bbx.height();
+    const double top = factor * m_bbx.top();
+    const double left = factor * m_bbx.left();
 
-    m_bbx = rect_t(left, top, bbx_w, bbx_h);
+    m_bbx = QRectF(left, top, bbx_w, bbx_h);
 
     // Scale each keypoint
-    for (keypoints_t::iterator it = m_keypoints.begin(); it != m_keypoints.end(); ++ it)
+    for (std::vector<Keypoint>::iterator it = m_keypoints.begin(); it != m_keypoints.end(); ++ it)
     {
-      it->m_point = point_t(factor * it->m_point.x(), factor * it->m_point.y());
+      it->m_point = QPointF(factor * it->m_point.x(), factor * it->m_point.y());
     }
   }
 
-  void Object::translate(scalar_t dx, scalar_t dy)
+  void Object::translate(double dx, double dy)
   {
     m_bbx.translate(dx, dy);
-    for (keypoints_t::iterator it = m_keypoints.begin(); it != m_keypoints.end(); ++ it)
+    for (std::vector<Keypoint>::iterator it = m_keypoints.begin(); it != m_keypoints.end(); ++ it)
     {
       it->m_point.setX(it->m_point.x() + dx);
       it->m_point.setY(it->m_point.y() + dy);
     }
   }
 
-  bool Object::find(const string_t& id, Keypoint& keypoint) const
+  bool Object::find(const std::string& id, Keypoint& keypoint) const
   {
-    for (keypoints_t::const_iterator it = m_keypoints.begin(); it != m_keypoints.end(); ++ it)
+    for (std::vector<Keypoint>::const_iterator it = m_keypoints.begin(); it != m_keypoints.end(); ++ it)
       if (it->m_id == id)
       {
         keypoint = *it;
@@ -93,7 +93,7 @@ namespace bob { namespace visioner {
     return false;
   }
 
-  bool Object::load(const string_t& filename, objects_t& objects)
+  bool Object::load(const std::string& filename, std::vector<Object>& objects)
   {
     objects.clear();
 
@@ -110,7 +110,7 @@ namespace bob { namespace visioner {
     int n_objects = -1;
     while (is.getline(buff, buff_size))
     {
-      const strings_t tokens = split(buff, " ");
+      const std::vector<std::string> tokens = split(buff, " ");
 
       // Number of objects
       if (n_objects < 0)
@@ -172,7 +172,7 @@ namespace bob { namespace visioner {
     return true;
   }
 
-  bool Object::save(const string_t& filename, const objects_t& objects)
+  bool Object::save(const std::string& filename, const std::vector<Object>& objects)
   {
     // Open the file
     std::ofstream os(filename.c_str());
@@ -183,15 +183,15 @@ namespace bob { namespace visioner {
 
     // Save the objects
     os << objects.size() << "\n";
-    for (objects_t::const_iterator it = objects.begin(); it != objects.end(); ++ it)
+    for (std::vector<Object>::const_iterator it = objects.begin(); it != objects.end(); ++ it)
     {
       const Object& object = *it;
       os << object.type() << " " << object.pose() << " " << object.id() << " "
         << object.bbx().left() << " " << object.bbx().top() << " " 
         << object.bbx().width() << " " << object.bbx().height() << " ";
 
-      const keypoints_t& keypoints = object.keypoints();
-      for (keypoints_t::const_iterator itf = keypoints.begin(); itf != keypoints.end(); ++ itf)
+      const std::vector<Keypoint>& keypoints = object.keypoints();
+      for (std::vector<Keypoint>::const_iterator itf = keypoints.begin(); itf != keypoints.end(); ++ itf)
       {
         os << itf->m_id << " " << itf->m_point.x() << " " << itf->m_point.y() << " ";
       }
@@ -204,22 +204,22 @@ namespace bob { namespace visioner {
     return true;
   }
 
-  bool Object::save(const string_t& filename) const
+  bool Object::save(const std::string& filename) const
   {
-    objects_t objects;
+    std::vector<Object> objects;
     objects.push_back(*this);
     return save(filename, objects);
   }
 
-  scalar_t overlap(const rect_t& reg, const objects_t& objects, int* pwhich)
+  double overlap(const QRectF& reg, const std::vector<Object>& objects, int* pwhich)
   {
     if (pwhich != 0)
       *pwhich = 0;
 
-    scalar_t max_overlap = 0.0;		
-    for (objects_t::const_iterator it = objects.begin(); it != objects.end(); ++ it)
+    double max_overlap = 0.0;		
+    for (std::vector<Object>::const_iterator it = objects.begin(); it != objects.end(); ++ it)
     {
-      const scalar_t o = overlap(reg, it->bbx());
+      const double o = overlap(reg, it->bbx());
       if (o > max_overlap)
       {
         max_overlap = o;
@@ -232,10 +232,10 @@ namespace bob { namespace visioner {
     return max_overlap;
   }
 
-  objects_t filter_by_type(const objects_t& objects, const string_t& type)
+  std::vector<Object> filter_by_type(const std::vector<Object>& objects, const std::string& type)
   {
-    objects_t result;
-    for (objects_t::const_iterator it = objects.begin(); it != objects.end(); ++ it)
+    std::vector<Object> result;
+    for (std::vector<Object>::const_iterator it = objects.begin(); it != objects.end(); ++ it)
       if (it->type() == type)
       {
         result.push_back(*it);
@@ -243,10 +243,10 @@ namespace bob { namespace visioner {
     return result;
   }
 
-  objects_t filter_by_pose(const objects_t& objects, const string_t& pose)
+  std::vector<Object> filter_by_pose(const std::vector<Object>& objects, const std::string& pose)
   {
-    objects_t result;
-    for (objects_t::const_iterator it = objects.begin(); it != objects.end(); ++ it)
+    std::vector<Object> result;
+    for (std::vector<Object>::const_iterator it = objects.begin(); it != objects.end(); ++ it)
       if (it->pose() == pose)
       {
         result.push_back(*it);
@@ -254,10 +254,10 @@ namespace bob { namespace visioner {
     return result;
   }
 
-  objects_t filter_by_id(const objects_t& objects, const string_t& id)
+  std::vector<Object> filter_by_id(const std::vector<Object>& objects, const std::string& id)
   {
-    objects_t result;
-    for (objects_t::const_iterator it = objects.begin(); it != objects.end(); ++ it)
+    std::vector<Object> result;
+    for (std::vector<Object>::const_iterator it = objects.begin(); it != objects.end(); ++ it)
       if (it->id() == id)
       {
         result.push_back(*it);

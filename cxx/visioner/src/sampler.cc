@@ -44,16 +44,16 @@ namespace bob { namespace visioner {
     m_n_samples(0),
     m_n_types(m_tagger->n_types()),
 
-    m_rgens(n_threads(), rgen_t(param.m_seed))
+    m_rgens(n_threads(), boost::mt19937(param.m_seed))
     {
       stat_init(m_tcounts);
       stat_init(m_sprobs);
 
-      const string_t& data = 
+      const std::string& data = 
         type == TrainSampler ? param.m_train_data : param.m_valid_data;
 
       // Load the list files
-      strings_t ifiles, gfiles;
+      std::vector<std::string> ifiles, gfiles;
       if (	load_listfiles(data, ifiles, gfiles) == false ||
           ifiles.empty() || ifiles.size() != gfiles.size())
       {
@@ -66,15 +66,15 @@ namespace bob { namespace visioner {
     }
 
   // Reset to a set of listfiles
-  void Sampler::load(const strings_t& ifiles, const strings_t& gfiles)
+  void Sampler::load(const std::vector<std::string>& ifiles, const std::vector<std::string>& gfiles)
   {
     ipyramid_t ipyramid(m_param);
 
-    scalars_t targets(n_outputs());
-    index_t type;
+    std::vector<double> targets(n_outputs());
+    uint64_t type;
 
     // Process each image in the list
-    for (index_t i = 0; i < ifiles.size(); i ++)
+    for (uint64_t i = 0; i < ifiles.size(); i ++)
     {
       bob::core::info << "mode [" << type2str()
         << "] loading image [" << (i + 1)  << "/" << ifiles.size() << "] ..."
@@ -89,11 +89,11 @@ namespace bob { namespace visioner {
       }
 
       // Build the samples using sliding-windows
-      for (index_t is = 0; is < ipyramid.size(); is ++)
+      for (uint64_t is = 0; is < ipyramid.size(); is ++)
       {
         const ipscale_t& ip = ipyramid[is];
 
-        index_t new_n_samples = 0, old_n_samples = n_samples();
+        uint64_t new_n_samples = 0, old_n_samples = n_samples();
         for (int y = ip.m_scan_min_y; y < ip.m_scan_max_y; y += ip.m_scan_dy)
           for (int x = ip.m_scan_min_x; x < ip.m_scan_max_x; x += ip.m_scan_dx)
           {
@@ -122,7 +122,7 @@ namespace bob { namespace visioner {
     }
 
     // Debug
-    for (index_t iti = 0; iti < n_types(); iti ++)
+    for (uint64_t iti = 0; iti < n_types(); iti ++)
     {
       bob::core::info << "mode [" << type2str()
         << "] target type [" << iti << "]"
@@ -132,17 +132,17 @@ namespace bob { namespace visioner {
   }
 
   // Sample the given number of samples (uniformly)
-  void Sampler::sample(index_t n_sel_samples, indices_t& samples) const
+  void Sampler::sample(uint64_t n_sel_samples, std::vector<uint64_t>& samples) const
   {
     // Compute the uniform sampling probabilities
-    for (index_t iti = 0; iti < n_types(); iti ++)
+    for (uint64_t iti = 0; iti < n_types(); iti ++)
     {
       m_sprobs[iti] = n_sel_samples * inverse(n_types()) * 
         inverse(m_tcounts[iti]);
     }
 
     // Split the computation (select the samples)
-    std::vector<indices_t> th_samples;                
+    std::vector<std::vector<uint64_t> > th_samples;                
     thread_iloop(
         boost::bind(&Sampler::th_usample, 
           this, boost::lambda::_1, boost::lambda::_2, boost::lambda::_3),
@@ -150,7 +150,7 @@ namespace bob { namespace visioner {
 
     // Merge results
     samples.clear();
-    for (index_t ith = 0; ith < n_threads(); ith ++)
+    for (uint64_t ith = 0; ith < n_threads(); ith ++)
     {
       samples.insert(samples.end(), th_samples[ith].begin(), th_samples[ith].end());
     }
@@ -158,26 +158,26 @@ namespace bob { namespace visioner {
   }
 
   // Sample the given number of samples (error based)
-  void Sampler::sample(index_t n_sel_samples, const Model& model, indices_t& samples) const
+  void Sampler::sample(uint64_t n_sel_samples, const Model& model, std::vector<uint64_t>& samples) const
   {
     // Split the computation (compute the error for each sample)
-    std::vector<tpowers_t> th_terrors;
+    std::vector<std::vector<double> > th_terrors;
     thread_loop(
         boost::bind(&Sampler::th_errors, 
           this, boost::lambda::_1, boost::cref(model), boost::lambda::_2),
         n_samples(), th_terrors);
 
-    const tpowers_t terrors = stat_cumulate(th_terrors);
+    const std::vector<double> terrors = stat_cumulate(th_terrors);
 
     // Compute the error-based sampling probabilities
-    for (index_t iti = 0; iti < n_types(); iti ++)
+    for (uint64_t iti = 0; iti < n_types(); iti ++)
     {
       m_sprobs[iti] = n_sel_samples * inverse(m_tcounts.size()) *
         inverse(terrors[iti]);
     }                
 
     // Split the computation (select the samples)
-    std::vector<indices_t> th_samples;                
+    std::vector<std::vector<uint64_t> > th_samples;                
     thread_iloop(
         boost::bind(&Sampler::th_esample, 
           this, boost::lambda::_1, boost::lambda::_2, boost::cref(model), boost::lambda::_3),
@@ -185,7 +185,7 @@ namespace bob { namespace visioner {
 
     // Merge results
     samples.clear();
-    for (index_t ith = 0; ith < n_threads(); ith ++)
+    for (uint64_t ith = 0; ith < n_threads(); ith ++)
     {
       samples.insert(samples.end(), th_samples[ith].begin(), th_samples[ith].end());
     }
@@ -193,16 +193,16 @@ namespace bob { namespace visioner {
   } 
 
   // Map selected samples to a dataset
-  void Sampler::map(const indices_t& _samples, const Model& model, DataSet& data) const
+  void Sampler::map(const std::vector<uint64_t>& _samples, const Model& model, DataSet& data) const
   {
-    indices_t samples = _samples;
+    std::vector<uint64_t> samples = _samples;
     unique(samples);
 
     // Allocate memory
     data.resize(n_outputs(), samples.size(), model.n_features(), model.n_fvalues());
 
     // Split the computation (buffer the feature values and the targets)
-    indices_t types(samples.size(), 0);
+    std::vector<uint64_t> types(samples.size(), 0);
     thread_loop(
         boost::bind(
           &Sampler::th_map, this, boost::lambda::_1,
@@ -210,30 +210,30 @@ namespace bob { namespace visioner {
         samples.size());
 
     // Compute the cost for each class
-    tcounts_t tcounts;
+    std::vector<uint64_t> tcounts;
     stat_init(tcounts);
 
-    for (index_t s = 0; s < samples.size(); s ++)
+    for (uint64_t s = 0; s < samples.size(); s ++)
     {
-      const index_t type = types[s];
+      const uint64_t type = types[s];
       tcounts[type] ++;
     }
 
-    scalar_t sum_inv = 0.0;
-    for (index_t iti = 0; iti < n_types(); iti ++)
+    double sum_inv = 0.0;
+    for (uint64_t iti = 0; iti < n_types(); iti ++)
     {
-      const index_t count = tcounts[iti];
+      const uint64_t count = tcounts[iti];
       sum_inv += inverse(count);
     }                
 
-    tpowers_t tcosts;
+    std::vector<double> tcosts;
     stat_init(tcosts);
 
-    for (index_t iti = 0; iti < n_types(); iti ++)
+    for (uint64_t iti = 0; iti < n_types(); iti ++)
     {
-      const index_t type = iti;
-      const index_t count = tcounts[iti];
-      const scalar_t cost = inverse(sum_inv) * inverse(count) * tcounts.size();
+      const uint64_t type = iti;
+      const uint64_t count = tcounts[iti];
+      const double cost = inverse(sum_inv) * inverse(count) * tcounts.size();
       tcosts[iti] = cost;
 
       bob::core::info << "mode [" << type2str() << "] mapping target type ["
@@ -242,17 +242,17 @@ namespace bob { namespace visioner {
     }
 
     // Set the costs
-    for (index_t s = 0; s < samples.size(); s ++)
+    for (uint64_t s = 0; s < samples.size(); s ++)
     {
-      const index_t type = types[s];
+      const uint64_t type = types[s];
       data.cost(s) = tcosts[type];
     }
   }
 
   // Map the given sample to image
-  index_t Sampler::sample2image(index_t s) const
+  uint64_t Sampler::sample2image(uint64_t s) const
   {
-    for (index_t i = 0; i < n_images(); i ++)
+    for (uint64_t i = 0; i < n_images(); i ++)
     {
       if (    m_ipsbegins[i] <= s && 
           s < m_ipsends[i])
@@ -265,11 +265,9 @@ namespace bob { namespace visioner {
   }
 
   // Compute the error of the given sample
-  scalar_t Sampler::error(
-      index_t x, index_t y, 
-      const scalars_t& targets, const Model& model, scalars_t& scores) const
+  double Sampler::error(uint64_t x, uint64_t y, const std::vector<double>& targets, const Model& model, std::vector<double>& scores) const
   {
-    for (index_t o = 0; o < n_outputs(); o ++)
+    for (uint64_t o = 0; o < n_outputs(); o ++)
     {
       scores[o] = model.score(o, x, y);
     }
@@ -277,10 +275,9 @@ namespace bob { namespace visioner {
   }
 
   // Cost-based sampling
-  void Sampler::sample(
-      index_t s, scalar_t cost, rgen_t& gen, rdie_t& die, indices_t& samples) const
+  void Sampler::sample(uint64_t s, double cost, boost::mt19937& gen, boost::uniform_01<>& die, std::vector<uint64_t>& samples) const
   {
-    index_t icost = (index_t)cost;
+    uint64_t icost = (uint64_t)cost;
     if (icost > 0)
     {
       samples.insert(samples.end(), icost, s);
@@ -294,22 +291,21 @@ namespace bob { namespace visioner {
   }
 
   // Uniform sampling thread
-  void Sampler::th_usample(
-      index_t ith, index_pair_t srange, indices_t& samples) const
+  void Sampler::th_usample(uint64_t ith, std::pair<uint64_t, uint64_t> srange, std::vector<uint64_t>& samples) const
   {
     if (srange.first >= srange.second)
     {
       return;
     }
 
-    scalars_t targets(n_outputs());
-    index_t type;
+    std::vector<double> targets(n_outputs());
+    uint64_t type;
 
-    rgen_t& gen = m_rgens[ith];
-    rdie_t die;                
+    boost::mt19937& gen = m_rgens[ith];
+    boost::uniform_01<> die;                
 
     // Process the valid samples in the range ...
-    for (index_t i = sample2image(srange.first), s = m_ipsbegins[i]; 
+    for (uint64_t i = sample2image(srange.first), s = m_ipsbegins[i]; 
         s < srange.second && i < n_images(); i ++)
     {
       const ipscale_t& ip = m_ipscales[i];
@@ -321,7 +317,7 @@ namespace bob { namespace visioner {
           {
             if (s >= srange.first && s < srange.second)
             {
-              const scalar_t cost = m_sprobs[type];
+              const double cost = m_sprobs[type];
               sample(s, cost, gen, die, samples);
             }
             s ++;                                        
@@ -331,25 +327,24 @@ namespace bob { namespace visioner {
   }
 
   // Error-based sampling thread
-  void Sampler::th_esample(
-      index_t ith, index_pair_t srange, const Model& bmodel, indices_t& samples) const
+  void Sampler::th_esample(uint64_t ith, std::pair<uint64_t, uint64_t> srange, const Model& bmodel, std::vector<uint64_t>& samples) const
   {
     if (srange.first >= srange.second)
     {
       return;
     }
 
-    const rmodel_t model = bmodel.clone();                
-    scalars_t targets(n_outputs()), scores(n_outputs());
-    index_t type;
+    const boost::shared_ptr<Model> model = bmodel.clone();                
+    std::vector<double> targets(n_outputs()), scores(n_outputs());
+    uint64_t type;
 
-    rgen_t& gen = m_rgens[ith];
-    rdie_t die;                
+    boost::mt19937& gen = m_rgens[ith];
+    boost::uniform_01<> die;                
 
     // Process the valid samples in the range ...
-    for (index_t i = sample2image(srange.first), s = m_ipsbegins[i]; 
-        s < srange.second && i < n_images(); i ++)
-    {
+    for (uint64_t i = sample2image(srange.first), s = m_ipsbegins[i]; 
+        s < srange.second && i < n_images(); i ++) {
+
       const ipscale_t& ip = m_ipscales[i];
 
       model->preprocess(ip);
@@ -361,7 +356,7 @@ namespace bob { namespace visioner {
           {
             if (s >= srange.first && s < srange.second)
             {
-              const scalar_t cost = 
+              const double cost = 
                 error(x, y, targets, *model, scores) * m_sprobs[type];
               sample(s, cost, gen, die, samples);
             }
@@ -373,8 +368,8 @@ namespace bob { namespace visioner {
 
   // Evaluation thread
   void Sampler::th_errors(
-      index_pair_t srange, const Model& bmodel,
-      tpowers_t& terrors) const
+      std::pair<uint64_t, uint64_t> srange, const Model& bmodel,
+      std::vector<double>& terrors) const
   {
     if (srange.first >= srange.second)
     {
@@ -383,12 +378,12 @@ namespace bob { namespace visioner {
 
     stat_init(terrors);
 
-    const rmodel_t model = bmodel.clone();                
-    scalars_t targets(n_outputs()), scores(n_outputs());
-    index_t type;
+    const boost::shared_ptr<Model> model = bmodel.clone();                
+    std::vector<double> targets(n_outputs()), scores(n_outputs());
+    uint64_t type;
 
     // Process the valid samples in the range ...
-    for (index_t i = sample2image(srange.first), s = m_ipsbegins[i]; 
+    for (uint64_t i = sample2image(srange.first), s = m_ipsbegins[i]; 
         s < srange.second && i < n_images(); i ++)
     {
       const ipscale_t& ip = m_ipscales[i];
@@ -412,21 +407,21 @@ namespace bob { namespace visioner {
 
   // Mapping thread (samples to dataset)
   void Sampler::th_map(
-      index_pair_t srange, 
-      const indices_t& samples, const Model& bmodel, 
-      indices_t& types, DataSet& data) const
+      std::pair<uint64_t, uint64_t> srange, 
+      const std::vector<uint64_t>& samples, const Model& bmodel, 
+      std::vector<uint64_t>& types, DataSet& data) const
   {
     if (srange.first >= srange.second)
     {
       return;
     }
 
-    const rmodel_t model = bmodel.clone();                
-    scalars_t targets(n_outputs());
-    index_t type;
+    const boost::shared_ptr<Model> model = bmodel.clone();                
+    std::vector<double> targets(n_outputs());
+    uint64_t type;
 
     // Process the valid samples in the range ...                
-    for (index_t ss = srange.first, i = sample2image(samples[ss]), s = m_ipsbegins[i]; 
+    for (uint64_t ss = srange.first, i = sample2image(samples[ss]), s = m_ipsbegins[i]; 
         ss < srange.second && i < n_images(); i ++)
     {
       const ipscale_t& ip = m_ipscales[i];
@@ -443,13 +438,13 @@ namespace bob { namespace visioner {
               types[ss] = type;
 
               // Buffer targets
-              for (index_t o = 0; o < n_outputs(); o ++)
+              for (uint64_t o = 0; o < n_outputs(); o ++)
               {
                 data.target(ss, o) = targets[o];
               }
 
               // Buffer feature values
-              for (index_t f = 0; f < model->n_features(); f ++)
+              for (uint64_t f = 0; f < model->n_features(); f ++)
               {
                 data.value(f, ss) = model->get(f, x, y);
               }
@@ -460,10 +455,10 @@ namespace bob { namespace visioner {
               //                        if (targets[0] < 0.0)
               //                                continue;
 
-              //                        greyimage_t image(m_param.m_rows, m_param.m_cols);
-              //                        for (index_t y = 0; y < m_param.m_rows; y ++)
+              //                        Matrix<uint8_t> image(m_param.m_rows, m_param.m_cols);
+              //                        for (uint64_t y = 0; y < m_param.m_rows; y ++)
               //                        {
-              //                                for (index_t x = 0; x < m_param.m_cols; x ++)
+              //                                for (uint64_t x = 0; x < m_param.m_cols; x ++)
               //                                {
               //                                        image(y, x) = ipscale.m_image(sw.m_y + y, sw.m_x + x);
               //                                }

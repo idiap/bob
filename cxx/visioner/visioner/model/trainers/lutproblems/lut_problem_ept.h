@@ -55,35 +55,35 @@ namespace bob { namespace visioner {
       bool line_search();
 
       // Compute the loss value/error
-      virtual scalar_t value() const;
-      virtual scalar_t error() const;
+      virtual double value() const;
+      virtual double error() const;
 
       // Compute the gradient <g> and the function value in the <x> point
       //      (used during linesearch)
-      virtual scalar_t linesearch(const scalar_t* x, scalar_t* g);
+      virtual double linesearch(const double* x, double* g);
 
     protected:
 
       // Update loss values and derivatives (for some particular scores)
-      virtual void update_loss_deriv(const scalar_mat_t& scores);
-      virtual void update_loss(const scalar_mat_t& scores);
+      virtual void update_loss_deriv(const Matrix<double>& scores);
+      virtual void update_loss(const Matrix<double>& scores);
 
       // Compute the local loss decrease for a range of features
-      void select(index_pair_t frange);
+      void select(std::pair<uint64_t, uint64_t> frange);
 
       // Compute the loss gradient histogram for a given feature
-      void histo(index_t f, scalar_mat_t& histo) const;
+      void histo(uint64_t f, Matrix<double>& histo) const;
 
       // Setup the given feature for the given output
-      void setup(index_t f, index_t o);
+      void setup(uint64_t f, uint64_t o);
 
     protected:
 
       // Attributes
-      scalars_t               m_values;       // Loss values
-      scalar_mat_t            m_grad;         // Loss gradients
+      std::vector<double>               m_values;       // Loss values
+      Matrix<double>            m_grad;         // Loss gradients
 
-      scalar_mat_t            m_fldeltas;     // (feature, output) -> local loss decrease
+      Matrix<double>            m_fldeltas;     // (feature, output) -> local loss decrease
   };	
 
 }}

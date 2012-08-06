@@ -86,15 +86,15 @@ void VisionerFaceLocalization::localize() {
       downscale = 2;
     }
 
-    blitz::Array<bob::visioner::grey_t, 2> gray;
+    blitz::Array<uint8_t, 2> gray;
     if (img.size() != 0) {
       // Convert 2D to 3D blitz array
-      blitz::Array<unsigned char, 3> image3D(img.data(), blitz::shape(img.rows(), img.cols() / 3, 3), blitz::neverDeleteData);
+      blitz::Array<uint8_t, 3> image3D(img.data(), blitz::shape(img.rows(), img.cols() / 3, 3), blitz::neverDeleteData);
       // Reorder dimensions to be compatible with Bob
-      blitz::Array<unsigned char, 3> imageBob(image3D.transpose(2, 0, 1));
+      blitz::Array<uint8_t, 3> imageBob(image3D.transpose(2, 0, 1));
 
       // Convert to grayscale
-      blitz::Array<unsigned char, 2> grayUchar(img.rows(), img.cols() / 3);
+      blitz::Array<uint8_t, 2> grayUchar(img.rows(), img.cols() / 3);
       bob::ip::rgb_to_gray(imageBob, grayUchar);
 
       // Resize the image
@@ -103,12 +103,12 @@ void VisionerFaceLocalization::localize() {
 
       // Convert to unsigned
       gray.resize(grayResized.shape());
-      gray = bob::core::cast<bob::visioner::grey_t>(grayResized);
+      gray = bob::core::cast<uint8_t>(grayResized);
     }
     pthread_mutex_unlock(&img_mutex);
 
     if(gray.size() != 0) {
-      visioner::detections_t detections;
+      std::vector<visioner::detection_t> detections;
       bool ok = detector->load(gray.data(), gray.rows(), gray.cols());
 
       if (!ok) {

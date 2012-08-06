@@ -27,12 +27,12 @@
 namespace bob { namespace visioner {
 
   // Compute the error (associated to the loss)
-  scalar_t DiagLoss::error(
-      const scalar_t* targets, const scalar_t* scores, index_t size) const
+  double DiagLoss::error(
+      const double* targets, const double* scores, uint64_t size) const
   {
-    scalar_t sum_error = 0;
+    double sum_error = 0;
 
-    for (index_t o = 0; o < size; o ++)
+    for (uint64_t o = 0; o < size; o ++)
     {
       sum_error += error(targets[o], scores[o]);
     }
@@ -42,27 +42,27 @@ namespace bob { namespace visioner {
 
   // Compute the loss value & derivatives
   void DiagLoss::eval(
-      const scalar_t* targets, const scalar_t* scores, index_t size,
-      scalar_t& value) const
+      const double* targets, const double* scores, uint64_t size,
+      double& value) const
   {
     value = 0.0;
 
-    for (index_t o = 0; o < size; o ++)
+    for (uint64_t o = 0; o < size; o ++)
     {
-      scalar_t ovalue;
+      double ovalue;
       eval(targets[o], scores[o], ovalue);
 
       value += ovalue;
     }
   }
   void DiagLoss::eval(
-      const scalar_t* targets, const scalar_t* scores, index_t size,
-      scalar_t& value, scalar_t* grad) const
+      const double* targets, const double* scores, uint64_t size,
+      double& value, double* grad) const
   {
     value = 0.0;                
-    for (index_t o = 0; o < size; o ++)
+    for (uint64_t o = 0; o < size; o ++)
     {
-      scalar_t ovalue, oderiv1;
+      double ovalue, oderiv1;
       eval(targets[o], scores[o], ovalue, oderiv1);
 
       value += ovalue;

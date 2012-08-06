@@ -46,32 +46,32 @@ namespace bob { namespace visioner {
   }
 
   // Update loss values and derivatives (for some particular scores)
-  void LUTProblemEPT::update_loss_deriv(const scalar_mat_t& scores)
+  void LUTProblemEPT::update_loss_deriv(const Matrix<double>& scores)
   {
     // Allocate buffers (if not already done)
     m_grad.resize(n_samples(), n_outputs());
 
     // Compute the loss value + gradient
 # pragma omp parallel for
-    for (index_t s = 0; s < n_samples(); s ++)
+    for (uint64_t s = 0; s < n_samples(); s ++)
     {
       m_loss.eval(target(s), scores[s], n_outputs(), m_values[s], m_grad[s]);
 
       // Adjust with costs
-      const scalar_t _cost = cost(s);
+      const double _cost = cost(s);
 
       m_values[s] *= _cost;
-      for (index_t o = 0; o < n_outputs(); o ++)
+      for (uint64_t o = 0; o < n_outputs(); o ++)
       {
         m_grad(s, o) *= _cost;
       }
     }                 
   }
-  void LUTProblemEPT::update_loss(const scalar_mat_t& scores)
+  void LUTProblemEPT::update_loss(const Matrix<double>& scores)
   {
     // Compute the loss value
 # pragma omp parallel for
-    for (index_t s = 0; s < n_samples(); s ++)
+    for (uint64_t s = 0; s < n_samples(); s ++)
     {
       m_loss.eval(target(s), scores[s], n_outputs(), m_values[s]);
 
@@ -81,15 +81,15 @@ namespace bob { namespace visioner {
   }
 
   // Compute the loss value/error
-  scalar_t LUTProblemEPT::value() const
+  double LUTProblemEPT::value() const
   {
     return  std::accumulate(m_values.begin(), m_values.end(), 0.0) * 
       inverse(n_samples()) * inverse(n_outputs());        
   }
-  scalar_t LUTProblemEPT::error() const
+  double LUTProblemEPT::error() const
   {
-    scalar_t sum = 0.0;
-    for (index_t s = 0; s < n_samples(); s ++)
+    double sum = 0.0;
+    for (uint64_t s = 0; s < n_samples(); s ++)
     {
       sum += m_loss.error(target(s), m_sscores[s], n_outputs()) * cost(s);
     }
@@ -100,19 +100,19 @@ namespace bob { namespace visioner {
 
   // Compute the gradient <g> and the function value in the <x> point
   //      (used during linesearch)
-  scalar_t LUTProblemEPT::linesearch(const scalar_t* x, scalar_t* g)
+  double LUTProblemEPT::linesearch(const double* x, double* g)
   {
     update_cscores(x);
     update_loss_deriv(m_cscores);
 
     // Compute the loss value
-    const scalar_t fx = std::accumulate(m_values.begin(), m_values.end(), 0.0);
+    const double fx = std::accumulate(m_values.begin(), m_values.end(), 0.0);
 
     // Compute the gradients
     std::fill(g, g + n_outputs(), 0.0);
-    for (index_t s = 0; s < n_samples(); s ++)
+    for (uint64_t s = 0; s < n_samples(); s ++)
     {
-      for (index_t o = 0; o < n_outputs(); o ++)
+      for (uint64_t o = 0; o < n_outputs(); o ++)
       {
         g[o] += m_grad(s, o) * m_wscores(s, o);
       }
@@ -139,13 +139,13 @@ namespace bob { namespace visioner {
       // Independent features
       case Independent:
         {
-          for (index_t o = 0; o < n_outputs(); o ++)
+          for (uint64_t o = 0; o < n_outputs(); o ++)
           {
-            index_t bestf = 0;
-            scalar_t besthv = 0.0;
-            for (index_t f = 0; f < n_features(); f ++)
+            uint64_t bestf = 0;
+            double besthv = 0.0;
+            for (uint64_t f = 0; f < n_features(); f ++)
             {
-              const scalar_t hv = m_fldeltas(f, o);
+              const double hv = m_fldeltas(f, o);
               if (hv < besthv)
               {
                 bestf = f, besthv = hv;
@@ -160,11 +160,11 @@ namespace bob { namespace visioner {
         // Shared feature
       case Shared:
         {
-          index_t bestf = 0;
-          scalar_t besthv = 0.0;
-          for (index_t f = 0; f < n_features(); f ++)
+          uint64_t bestf = 0;
+          double besthv = 0.0;
+          for (uint64_t f = 0; f < n_features(); f ++)
           {
-            const scalar_t hv = 
+            const double hv = 
               std::accumulate(m_fldeltas[f], m_fldeltas[f] + n_outputs(), 0.0);
             if (hv < besthv)
             {
@@ -172,7 +172,7 @@ namespace bob { namespace visioner {
             }
           }
 
-          for (index_t o = 0; o < n_outputs(); o ++)
+          for (uint64_t o = 0; o < n_outputs(); o ++)
           {
             setup(bestf, o);
           }
@@ -182,19 +182,19 @@ namespace bob { namespace visioner {
   }      
 
   // Compute the local loss decrease for a range of features
-  void LUTProblemEPT::select(index_pair_t frange)
+  void LUTProblemEPT::select(std::pair<uint64_t, uint64_t> frange)
   {
     // Evaluate each feature ...
-    scalar_mat_t histo_grad(n_entries(), n_outputs());                
-    for (index_t f = frange.first; f < frange.second; f ++)
+    Matrix<double> histo_grad(n_entries(), n_outputs());                
+    for (uint64_t f = frange.first; f < frange.second; f ++)
     {
       // - compute the loss gradient histogram
       histo(f, histo_grad);
 
       // - compute the local loss decrease
-      for (index_t u = 0; u < n_entries(); u ++)
+      for (uint64_t u = 0; u < n_entries(); u ++)
       {
-        for (index_t o = 0; o < n_outputs(); o ++)
+        for (uint64_t o = 0; o < n_outputs(); o ++)
         {
           m_fldeltas(f, o) -= my_abs(histo_grad(u, o));
         }
@@ -203,13 +203,13 @@ namespace bob { namespace visioner {
   }
 
   // Compute the loss gradient histogram for a given feature
-  void LUTProblemEPT::histo(index_t f, scalar_mat_t& histo_grad) const
+  void LUTProblemEPT::histo(uint64_t f, Matrix<double>& histo_grad) const
   {
     histo_grad.fill(0.0);
-    for (index_t s = 0; s < n_samples(); s ++)
+    for (uint64_t s = 0; s < n_samples(); s ++)
     {
-      const discrete_t u = fvalue(f, s);
-      for (index_t o = 0; o < n_outputs(); o ++)
+      const uint16_t u = fvalue(f, s);
+      for (uint64_t o = 0; o < n_outputs(); o ++)
       {
         histo_grad(u, o) += m_grad(s, o);
       }
@@ -217,9 +217,9 @@ namespace bob { namespace visioner {
   }
 
   // Setup the given feature for the given output
-  void LUTProblemEPT::setup(index_t f, index_t o)
+  void LUTProblemEPT::setup(uint64_t f, uint64_t o)
   {
-    scalar_mat_t histo_grad(n_entries(), n_outputs());                
+    Matrix<double> histo_grad(n_entries(), n_outputs());                
     histo(f, histo_grad);                
 
     // - set feature
@@ -227,7 +227,7 @@ namespace bob { namespace visioner {
     lut.feature() = f;
 
     // - set entries
-    for (index_t u = 0; u < n_entries(); u ++)
+    for (uint64_t u = 0; u < n_entries(); u ++)
     {
       lut[u] = histo_grad(u, o) > 0.0 ? -1.0 : 1.0;
       lut[u] *= m_umasks(f, u);

@@ -32,15 +32,13 @@
 
 namespace bob { namespace visioner {        
 
-  ////////////////////////////////////////////////////////////////////////////////
-  // TaylorBooster: 
-  //      greedy boosting of multivariate weak learners using 
-  //      the local Taylor expansion of the loss
-  //      in the functional space of the weak learners.
-  ////////////////////////////////////////////////////////////////////////////////
+  /**
+   * TaylorBooster: greedy boosting of multivariate weak learners using the
+   * local Taylor expansion of the loss in the functional space of the weak
+   * learners.
+   */
+  class TaylorBooster : public Trainer {
 
-  class TaylorBooster : public Trainer
-  {
     public:
 
       // Constructor
@@ -53,25 +51,22 @@ namespace bob { namespace visioner {
       virtual void reset(const param_t& param) { m_param = param; }
 
       // Clone the object
-      virtual rtrainer_t clone() const 
-      {
-        return rtrainer_t(new TaylorBooster(m_param)); 
+      virtual boost::shared_ptr<Trainer> clone() const {
+        return boost::shared_ptr<Trainer>(new TaylorBooster(m_param)); 
       }
 
       // Train a model using the given training and validation samples
-      virtual bool train(	
-          const Sampler& t_sampler, const Sampler& v_sampler, Model& model);
+      virtual bool train(const Sampler& t_sampler, 
+          const Sampler& v_sampler, Model& model);
 
     private:
 
-      // Generalizer for LUTs
-      typedef Generalizer<MultiLUTs>  GenModel;
-
       // Train a model
       bool train(const DataSet& t_data, const DataSet& v_data, 
-          const Model& model, GenModel& gen) const;
-      void train(const rlutproblem_t& t_lp, const rlutproblem_t& v_lp,
-          const string_t& base_description, const Model& model, GenModel& gen) const;
+          const Model& model, Generalizer<std::vector<std::vector<LUT> > >& gen) const;
+
+      void train(const boost::shared_ptr<LUTProblem>& t_lp, const boost::shared_ptr<LUTProblem>& v_lp, const std::string& base_description, const Model& model, Generalizer<std::vector<std::vector<LUT> > >& gen) const;
+
   };
 
 }}

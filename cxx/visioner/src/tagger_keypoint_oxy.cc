@@ -33,29 +33,29 @@ namespace bob { namespace visioner {
   }
 
   // Number of outputs
-  index_t KeypointOxyTagger::n_outputs() const
+  uint64_t KeypointOxyTagger::n_outputs() const
   {
     return 2 * m_param.m_labels.size();
   }
 
   // Label a sub-window
   bool KeypointOxyTagger::check(const ipscale_t& ipscale, int x, int y, 
-      scalars_t& targets, index_t& type) const
+      std::vector<double>& targets, uint64_t& type) const
   {
-    const rect_t reg(x, y, m_param.m_cols, m_param.m_rows);
-    const scalar_t inv_x = inverse(m_param.m_cols);
-    const scalar_t inv_y = inverse(m_param.m_rows);
+    const QRectF reg(x, y, m_param.m_cols, m_param.m_rows);
+    const double inv_x = inverse(m_param.m_cols);
+    const double inv_y = inverse(m_param.m_rows);
 
     // Valid if it overlaps a large part of the object ...
-    for (objects_t::const_iterator it = ipscale.m_objects.begin();
+    for (std::vector<Object>::const_iterator it = ipscale.m_objects.begin();
         it != ipscale.m_objects.end(); ++ it)
     {
-      const scalar_t overlap = visioner::overlap(reg, it->bbx());
+      const double overlap = visioner::overlap(reg, it->bbx());
       if (overlap >= m_param.m_min_gt_overlap)
       {
         Keypoint keypoint;
         bool valid = true;
-        for (index_t i = 0; i < m_param.m_labels.size() && valid == true; i ++)
+        for (uint64_t i = 0; i < m_param.m_labels.size() && valid == true; i ++)
         {
           valid = it->find(m_param.m_labels[i], keypoint);
         }
@@ -63,7 +63,7 @@ namespace bob { namespace visioner {
         if (valid == true)
         {
           // OK, return the normalized Ox/Oy coordinates
-          for (index_t i = 0; i < m_param.m_labels.size() && valid == true; i ++)
+          for (uint64_t i = 0; i < m_param.m_labels.size() && valid == true; i ++)
           {
             it->find(m_param.m_labels[i], keypoint);
             targets[2 * i + 0] = inv_x * (keypoint.m_point.x() - x);

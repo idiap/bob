@@ -44,7 +44,7 @@ namespace bob { namespace visioner {
     Timer timer;
 
     // Sample uniformly the training data
-    indices_t t_samples;                
+    std::vector<uint64_t> t_samples;                
     DataSet t_data;
 
     t_sampler.sample(m_param.m_train_samples, t_samples);
@@ -66,16 +66,16 @@ namespace bob { namespace visioner {
       << t_data.n_features() << " features." << std::endl;
 
     // Train the model ...		
-    scalars_t avg_outputs(t_data.n_outputs(), 0.0);
-    for (index_t s = 0; s < t_data.n_samples(); s ++)
+    std::vector<double> avg_outputs(t_data.n_outputs(), 0.0);
+    for (uint64_t s = 0; s < t_data.n_samples(); s ++)
     {
-      for (index_t o = 0; o < t_data.n_outputs(); o ++)
+      for (uint64_t o = 0; o < t_data.n_outputs(); o ++)
       {
         avg_outputs[o] += t_data.targets()(s, o);
       }
     }
 
-    for (index_t o = 0; o < t_data.n_outputs(); o ++)
+    for (uint64_t o = 0; o < t_data.n_outputs(); o ++)
     {
       avg_outputs[o] *= inverse(t_data.n_samples());
 
@@ -84,8 +84,8 @@ namespace bob { namespace visioner {
         << avg_outputs[o] << "." << std::endl;
     }
 
-    MultiLUTs mluts(t_data.n_outputs(), LUTs(1, LUT(0, t_data.n_fvalues())));		
-    for (index_t o = 0; o < t_data.n_outputs(); o ++)
+    std::vector<std::vector<LUT> > mluts(t_data.n_outputs(), std::vector<LUT>(1, LUT(0, t_data.n_fvalues())));		
+    for (uint64_t o = 0; o < t_data.n_outputs(); o ++)
     {
       LUT& lut = mluts[o][0];
       std::fill(lut.begin(), lut.end(), avg_outputs[o]);

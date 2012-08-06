@@ -53,8 +53,8 @@ namespace bob { namespace visioner {
 
         // Process a new model with the given training and validation loss values
         //	(discard <model> if it is overfitting)
-        bool process(scalar_t train_error, scalar_t valid_error,
-            const TModel& model, const string_t& description)
+        bool process(double train_error, double valid_error,
+            const TModel& model, const std::string& description)
         {
           bool better = false;
 
@@ -77,28 +77,28 @@ namespace bob { namespace visioner {
 
         // Access functions		
         const TModel& model() const { return m_model; }
-        const string_t& description() const { return m_description; }
-        scalar_t train_error() const { return m_train_error; }
-        scalar_t valid_error() const { return m_valid_error; }
-        scalar_t last_train_error() const { return last(m_train_errors); }
-        scalar_t last_valid_error() const { return last(m_valid_errors); }
+        const std::string& description() const { return m_description; }
+        double train_error() const { return m_train_error; }
+        double valid_error() const { return m_valid_error; }
+        double last_train_error() const { return last(m_train_errors); }
+        double last_valid_error() const { return last(m_valid_errors); }
 
       private:
 
         // Returns the last entry in a list of values (if any)
-        static scalar_t last(const scalars_t& values)
+        static double last(const std::vector<double>& values)
         {
           return values.empty() ? 
-            std::numeric_limits<scalar_t>::max() : 
+            std::numeric_limits<double>::max() : 
             *values.rbegin();
         }
 
         // Attributes
-        scalars_t	m_train_errors;
-        scalars_t	m_valid_errors;
-        string_t	m_description;	// Description of the optimal parameters
-        scalar_t	m_train_error;	// Optimal train loss
-        scalar_t	m_valid_error;	// Optimal validation loss
+        std::vector<double>	m_train_errors;
+        std::vector<double>	m_valid_errors;
+        std::string	m_description;	// Description of the optimal parameters
+        double	m_train_error;	// Optimal train loss
+        double	m_valid_error;	// Optimal validation loss
         TModel		m_model;	// Optimal model
     };
 

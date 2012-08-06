@@ -95,10 +95,10 @@ namespace bob { namespace visioner {
   }
 
   // Predict the object label of the keypoints in the <reg> region.
-  bool CVClassifier::classify(const CVDetector& detector, const rect_t& reg, index_t& dt_label) const
+  bool CVClassifier::classify(const CVDetector& detector, const QRectF& reg, uint64_t& dt_label) const
   {
     // Check the sub-window
-    const sw_t sw = detector.ipyramid().map(reg, param());
+    const subwindow_t sw = detector.ipyramid().map(reg, param());
     if (detector.ipyramid().check(sw, param()) == false)
     {
       return false;
@@ -108,8 +108,8 @@ namespace bob { namespace visioner {
     const ipscale_t& ip = detector.ipyramid()[sw.m_s];
     m_model->preprocess(ip);
 
-    scalars_t scores(n_classes());                
-    for (index_t o = 0; o < n_classes(); o ++)
+    std::vector<double> scores(n_classes());                
+    for (uint64_t o = 0; o < n_classes(); o ++)
     { 
       scores[o] = m_model->score(o, sw.m_x, sw.m_y);
     }
@@ -121,9 +121,9 @@ namespace bob { namespace visioner {
   }
 
   // Retrieve the ground truth label for the given object
-  bool CVClassifier::classify(  const Object& object, index_t& gt_label) const
+  bool CVClassifier::classify(  const Object& object, uint64_t& gt_label) const
   {
-    const rtagger_t tagger = make_tagger(param());
+    const boost::shared_ptr<Tagger> tagger = make_tagger(param());
     const ObjectTagger* obj_tagger = dynamic_cast<const ObjectTagger*>(tagger.get());
     if (obj_tagger == 0)
     {
@@ -139,9 +139,9 @@ namespace bob { namespace visioner {
   // Compute the confusion matrix considering the 
   //      ground truth and the predicted labels.
   void CVClassifier::evaluate(
-      const strings_t& ifiles, const strings_t& gfiles,
+      const std::vector<std::string>& ifiles, const std::vector<std::string>& gfiles,
       CVDetector& detector, 
-      index_mat_t& hits_mat, indices_t& hits_cnt) const
+      Matrix<uint64_t>& hits_mat, std::vector<uint64_t>& hits_cnt) const
   {
     hits_mat.resize(n_classes(), n_classes());
     hits_mat.fill(0);
@@ -149,7 +149,7 @@ namespace bob { namespace visioner {
     hits_cnt.resize(n_classes());
     std::fill(hits_cnt.begin(), hits_cnt.end(), 0);
 
-    const rtagger_t tagger = make_tagger(param());
+    const boost::shared_ptr<Tagger> tagger = make_tagger(param());
     const ObjectTagger* obj_tagger = dynamic_cast<const ObjectTagger*>(tagger.get());
     if (obj_tagger == 0)
     {
@@ -158,7 +158,7 @@ namespace bob { namespace visioner {
     }
 
     // Process each image ...        
-    for (index_t i = 0; i < ifiles.size(); i ++)
+    for (uint64_t i = 0; i < ifiles.size(); i ++)
     {
       const std::string& ifile = ifiles[i];
       const std::string& gfile = gfiles[i];
@@ -173,11 +173,11 @@ namespace bob { namespace visioner {
       // Classify sub-windows (on the detections that did not fail)
       Timer timer;				
 
-      detections_t detections;
+      std::vector<detection_t> detections;
       detector.scan(detections);
 
       Object object;
-      for (detections_const_it it = detections.begin(); it != detections.end(); ++ it)
+      for (std::vector<detection_t>::const_iterator it = detections.begin(); it != detections.end(); ++ it)
         if (detector.match(*it, object) == true)
         {
           const int gt_label = obj_tagger->find(object);
@@ -186,7 +186,7 @@ namespace bob { namespace visioner {
             continue;
           }
 
-          index_t dt_label = 0;
+          uint64_t dt_label = 0;
           if (classify(detector, object.bbx(), dt_label) == false)
           {
             bob::core::warn << "Failed to classify a sub-window for the <" << ifile << "> image!" << std::endl;

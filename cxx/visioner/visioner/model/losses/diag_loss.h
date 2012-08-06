@@ -48,29 +48,29 @@ namespace bob { namespace visioner {
       virtual ~DiagLoss() {}
 
       // Compute the error (associated to the loss)
-      virtual scalar_t error(
-          const scalar_t* targets, const scalar_t* scores, index_t size) const;
+      virtual double error(
+          const double* targets, const double* scores, uint64_t size) const;
 
       // Compute the loss value & derivatives
       virtual void eval(
-          const scalar_t* targets, const scalar_t* scores, index_t size,
-          scalar_t& value) const;
+          const double* targets, const double* scores, uint64_t size,
+          double& value) const;
       virtual void eval(
-          const scalar_t* targets, const scalar_t* scores, index_t size,
-          scalar_t& value, scalar_t* grad) const;
+          const double* targets, const double* scores, uint64_t size,
+          double& value, double* grad) const;
 
     protected:
 
       // Compute the error (associated to the loss)
-      virtual scalar_t error(scalar_t target, scalar_t score) const = 0;
+      virtual double error(double target, double score) const = 0;
 
       // Compute the loss value & derivatives
       virtual void eval(
-          scalar_t target, scalar_t score,
-          scalar_t& value) const = 0;
+          double target, double score,
+          double& value) const = 0;
       virtual void eval(
-          scalar_t target, scalar_t score,
-          scalar_t& value, scalar_t& deriv1) const = 0;
+          double target, double score,
+          double& value, double& deriv1) const = 0;
   };
 
 }}

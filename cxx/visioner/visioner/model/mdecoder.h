@@ -33,29 +33,29 @@
 namespace bob { namespace visioner {
 
   // Decode parameters
-  rloss_t		make_loss(const param_t& param);
-  rtagger_t	make_tagger(const param_t& param);
-  rmodel_t        make_model(const param_t& param);
-  rtrainer_t	make_trainer(const param_t& param);
+  boost::shared_ptr<Loss>		make_loss(const param_t& param);
+  boost::shared_ptr<Tagger>	make_tagger(const param_t& param);
+  boost::shared_ptr<Model>        make_model(const param_t& param);
+  boost::shared_ptr<Trainer>	make_trainer(const param_t& param);
 
   OptimizationType        make_optimization(const param_t& param);
   FeatureSharingType      make_sharing(const param_t& param);
 
   // Retrieve the lists of encoded objects
-  strings_t available_losses_list();
-  strings_t available_taggers_list();
-  strings_t available_models_list();
-  strings_t available_trainers_list();
-  strings_t available_optimizations_list();
-  strings_t available_sharings_list();
+  std::vector<std::string> available_losses_list();
+  std::vector<std::string> available_taggers_list();
+  std::vector<std::string> available_models_list();
+  std::vector<std::string> available_trainers_list();
+  std::vector<std::string> available_optimizations_list();
+  std::vector<std::string> available_sharings_list();
 
   // Retrieve the lists of encoded objects as a single string
-  string_t available_losses();
-  string_t available_taggers();
-  string_t available_models();
-  string_t available_trainers();
-  string_t available_optimizations();
-  string_t available_sharings();
+  std::string available_losses();
+  std::string available_taggers();
+  std::string available_models();
+  std::string available_trainers();
+  std::string available_optimizations();
+  std::string available_sharings();
 
 }}
 

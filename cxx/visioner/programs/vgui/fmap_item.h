@@ -110,9 +110,9 @@ class FeatureMapItem : public QGraphicsItem {
     const SceneSettings&		m_global;	// Drawing settings for the whole scene
     ItemSettings			m_settings;	// Drawing settings for the item
 
-    bob::visioner::igreyimage_t		m_src_image;	// Source data: image
-    bob::visioner::igreyimage_t		m_src_iimage;	// Source data: integral image
-    bob::visioner::discrete_mat_t	m_src_fmap;	// Source data: feature map
+    bob::visioner::Matrix<uint32_t>		m_src_image;	// Source data: image
+    bob::visioner::Matrix<uint32_t>		m_src_iimage;	// Source data: integral image
+    bob::visioner::Matrix<uint16_t>	m_src_fmap;	// Source data: feature map
     QImage				m_src_qfmap;	// Source data: feature map transformed to QImage
     bob::visioner::Histogram		m_src_histo;	// Source data: feature map histogram
     const std::vector<QRgb>*	m_src_colors;	// Value to RGB mapping

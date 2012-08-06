@@ -60,7 +60,7 @@ static bool train_model(bob::visioner::Model& model,
   const bob::visioner::param_t param = model.param();
 
   // Train the model using coarse-to-fine feature projection
-  for (bob::visioner::index_t p = 0; p <= param.m_projections;
+  for (uint64_t p = 0; p <= param.m_projections;
       ++p, model.project()) {
     if (bob::visioner::make_trainer(param)->train(training, validation, model) == false) return false;
   }
@@ -69,7 +69,7 @@ static bool train_model(bob::visioner::Model& model,
   return true;
 }
 
-static boost::shared_ptr<bob::visioner::Model> model_from_path(const bob::visioner::string_t& path) {
+static boost::shared_ptr<bob::visioner::Model> model_from_path(const std::string& path) {
 
   std::ios_base::openmode mode = std::ios_base::in;
   if (is_dot_gz(path) || is_dot_vbin(path)) mode |= std::ios_base::binary;
@@ -104,49 +104,49 @@ static boost::shared_ptr<bob::visioner::Model> model_from_path(const bob::vision
  * Listings of implemented stuff
  */
 static bp::tuple available_losses() {
-  bob::visioner::strings_t v = bob::visioner::available_losses_list();
+  std::vector<std::string> v = bob::visioner::available_losses_list();
   bp::list retval;
   for (size_t k=0; k<v.size(); ++k) retval.append(v[k]);
   return bp::tuple(retval);
 }
 
 static bp::tuple available_taggers() {
-  bob::visioner::strings_t v = bob::visioner::available_taggers_list();
+  std::vector<std::string> v = bob::visioner::available_taggers_list();
   bp::list retval;
   for (size_t k=0; k<v.size(); ++k) retval.append(v[k]);
   return bp::tuple(retval);
 }
 
 static bp::tuple available_models() {
-  bob::visioner::strings_t v = bob::visioner::available_models_list();
+  std::vector<std::string> v = bob::visioner::available_models_list();
   bp::list retval;
   for (size_t k=0; k<v.size(); ++k) retval.append(v[k]);
   return bp::tuple(retval);
 }
 
 static bp::tuple available_trainers() {
-  bob::visioner::strings_t v = bob::visioner::available_trainers_list();
+  std::vector<std::string> v = bob::visioner::available_trainers_list();
   bp::list retval;
   for (size_t k=0; k<v.size(); ++k) retval.append(v[k]);
   return bp::tuple(retval);
 }
 
 static bp::tuple available_optimizations() {
-  bob::visioner::strings_t v = bob::visioner::available_optimizations_list();
+  std::vector<std::string> v = bob::visioner::available_optimizations_list();
   bp::list retval;
   for (size_t k=0; k<v.size(); ++k) retval.append(v[k]);
   return bp::tuple(retval);
 }
 
 static bp::tuple available_sharings() {
-  bob::visioner::strings_t v = bob::visioner::available_sharings_list();
+  std::vector<std::string> v = bob::visioner::available_sharings_list();
   bp::list retval;
   for (size_t k=0; k<v.size(); ++k) retval.append(v[k]);
   return bp::tuple(retval);
 }
 
 void bind_visioner_train() {
-  bp::class_<bob::visioner::param_t>("param", "Various parameters useful for training boosted classifiers in the context of the Visioner", bp::init<bp::optional<bob::visioner::index_t, bob::visioner::index_t, const bob::visioner::string_t&, bob::visioner::scalar_t, const bob::visioner::string_t&, const bob::visioner::string_t&, bob::visioner::index_t, const bob::visioner::string_t&, const bob::visioner::string_t&, bob::visioner::index_t, bob::visioner::scalar_t, bob::visioner::index_t, const bob::visioner::string_t&> >((bp::arg("rows")=24, bp::arg("cols")=20, bp::arg("loss")="diag_log", bp::arg("loss_parameter")=0.0, bp::arg("optimization_type")="ept", bp::arg("training_model")="gboost", bp::arg("num_of_bootstraps")=3, bp::arg("feature_type")="elbp", bp::arg("feature_sharing")="shared", bp::arg("feature_projections")=0, bp::arg("min_gt_overlap")=0.8, bp::arg("sliding_windows")=2, bp::arg("subwindow_labelling")="object_type"), "Default constructor. Note: The seed, number of training and validation samples, as well as the maximum number of boosting rounds is hard-coded."))
+  bp::class_<bob::visioner::param_t>("param", "Various parameters useful for training boosted classifiers in the context of the Visioner", bp::init<bp::optional<uint64_t, uint64_t, const std::string&, double, const std::string&, const std::string&, uint64_t, const std::string&, const std::string&, uint64_t, double, uint64_t, const std::string&> >((bp::arg("rows")=24, bp::arg("cols")=20, bp::arg("loss")="diag_log", bp::arg("loss_parameter")=0.0, bp::arg("optimization_type")="ept", bp::arg("training_model")="gboost", bp::arg("num_of_bootstraps")=3, bp::arg("feature_type")="elbp", bp::arg("feature_sharing")="shared", bp::arg("feature_projections")=0, bp::arg("min_gt_overlap")=0.8, bp::arg("sliding_windows")=2, bp::arg("subwindow_labelling")="object_type"), "Default constructor. Note: The seed, number of training and validation samples, as well as the maximum number of boosting rounds is hard-coded."))
     .def_readwrite("rows", &bob::visioner::param_t::m_rows, "Number of rows in pixels")
     .def_readwrite("cols", &bob::visioner::param_t::m_cols, "Number of columns in pixels")
     .def_readwrite("seed", &bob::visioner::param_t::m_seed, "Random seed used for sampling")
@@ -191,7 +191,7 @@ void bind_visioner_train() {
     .def("clone", &bob::visioner::Model::clone, (bp::arg("self")), "Clones the current model")
     .def("reset", &bob::visioner::Model::reset, (bp::arg("self"), bp::arg("param")), "Resets to new parameters")
     .def("project", &bob::visioner::Model::project, (bp::arg("self")), "Projects the selected features to a higher resolution")
-    .def("save", (bool(bob::visioner::Model::*)(const bob::visioner::string_t&) const)&bob::visioner::Model::save, (bp::arg("self"), bp::arg("path")), "Saves the model to a file")
+    .def("save", (bool(bob::visioner::Model::*)(const std::string&) const)&bob::visioner::Model::save, (bp::arg("self"), bp::arg("path")), "Saves the model to a file")
     .def("get", &bob::visioner::Model::get, (bp::arg("self"), bp::arg("feature"), bp::arg("x"), bp::arg("y")), "Computes the value of the feature <f> at the (x, y) position")
     .add_property("num_of_features", &bob::visioner::Model::n_features)
     .add_property("num_of_fvalues", &bob::visioner::Model::n_fvalues)

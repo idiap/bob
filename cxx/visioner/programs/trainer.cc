@@ -41,7 +41,7 @@ static bool train(bob::visioner::Model& model) {
   bob::core::info << "timing: loading ~ " << timer.elapsed() << "." << std::endl;
 
   // Train the model using coarse-to-fine feature projection
-  for (bob::visioner::index_t p = 0; p <= param.m_projections; p ++, model.project())
+  for (uint64_t p = 0; p <= param.m_projections; p ++, model.project())
   {
     timer.restart();
     if (bob::visioner::make_trainer(param)->train(t_sampler, v_sampler, model) == false)
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
 
   // Train the model	
   bob::visioner::Timer timer;
-  bob::visioner::rmodel_t model = make_model(param);
+  boost::shared_ptr<bob::visioner::Model> model = make_model(param);
   if (train(*model) == false)
   {
     bob::core::error << "Failed to train the model!" << std::endl;

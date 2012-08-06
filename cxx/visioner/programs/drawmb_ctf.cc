@@ -262,7 +262,7 @@ int main(int argc, char *argv[]) {
           QPen(QBrush(QColor(155, 55, 55)), 4, Qt::DashLine));                        
 
       proj_image.save((bob::visioner::basename(result) + ".proj" + 
-            boost::lexical_cast<bob::visioner::string_t>(cnt) +
+            boost::lexical_cast<std::string>(cnt) +
             bob::visioner::extname(result)).c_str());
     }
   }

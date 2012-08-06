@@ -41,18 +41,18 @@ namespace bob { namespace visioner {
   bool TaylorBooster::train(
       const Sampler& t_sampler, const Sampler& v_sampler, Model& model)
   {
-    const index_t n_boots = m_param.m_bootstraps;
-    const index_t t_b_n_samples = m_param.m_train_samples * inverse(n_boots + 1);
-    const index_t v_n_samples = m_param.m_valid_samples;  
-    const index_t b_n_rounds = std::max((index_t)1, m_param.m_rounds >> n_boots);
+    const uint64_t n_boots = m_param.m_bootstraps;
+    const uint64_t t_b_n_samples = m_param.m_train_samples * inverse(n_boots + 1);
+    const uint64_t v_n_samples = m_param.m_valid_samples;  
+    const uint64_t b_n_rounds = std::max((uint64_t)1, m_param.m_rounds >> n_boots);
 
-    indices_t t_samples, t_b_samples, v_samples;
+    std::vector<uint64_t> t_samples, t_b_samples, v_samples;
     DataSet t_data, v_data;
 
     Timer timer;
 
     // Bootstrap the training samples
-    for (index_t b = 0; b <= n_boots; b ++)
+    for (uint64_t b = 0; b <= n_boots; b ++)
     {                
       // Sample training data (first uniformly and then bootstrapped)
       //      & validation data (always uniformly)
@@ -75,7 +75,7 @@ namespace bob { namespace visioner {
       // Train the model
       timer.restart();
 
-      GenModel gen;
+      Generalizer<std::vector<std::vector<LUT> > > gen;
       m_param.m_rounds = b_n_rounds << b;
       if (    train(t_data, v_data, model, gen) == false ||
           model.set(gen.model()) == false)
@@ -93,8 +93,8 @@ namespace bob { namespace visioner {
 
   // Train a model
   bool TaylorBooster::train(
-      const DataSet& t_data, const DataSet& v_data, 
-      const Model& model, GenModel& gen) const
+      const DataSet& t_data, const DataSet& v_data, const Model& model,
+      Generalizer<std::vector<std::vector<LUT> > >& gen) const
   {
     // Check parameters
     if (	t_data.empty() || v_data.empty() ||
@@ -115,17 +115,17 @@ namespace bob { namespace visioner {
       << m_param.m_rounds << " weak learners." << std::endl; 
 
     // Regularization factors
-    static const scalar_t lambdas[] = { 0.0, 0.1, 0.2, 0.5, 1.0 };
-    const index_t n_lambdas = 
-      (make_optimization(m_param) == Variational) ? sizeof(lambdas)/sizeof(scalar_t) : 1;
+    static const double lambdas[] = { 0.0, 0.1, 0.2, 0.5, 1.0 };
+    const uint64_t n_lambdas = 
+      (make_optimization(m_param) == Variational) ? sizeof(lambdas)/sizeof(double) : 1;
 
     // Tune the regularization factor ...
-    for (index_t ilambda = 0; ilambda < n_lambdas; ilambda ++)
+    for (uint64_t ilambda = 0; ilambda < n_lambdas; ilambda ++)
     {
-      const scalar_t lambda = lambdas[ilambda];
+      const double lambda = lambdas[ilambda];
 
       // Create the solvers 
-      rlutproblem_t t_lp, v_lp;
+      boost::shared_ptr<LUTProblem> t_lp, v_lp;
       switch (make_optimization(m_param))
       {
         case Expectation:
@@ -140,8 +140,8 @@ namespace bob { namespace visioner {
       }
 
       // And train the model                        
-      const string_t base_description =
-        "<<lambda " + boost::lexical_cast<string_t>(lambda) + ">>";
+      const std::string base_description =
+        "<<lambda " + boost::lexical_cast<std::string>(lambda) + ">>";
 
       train(t_lp, v_lp, base_description, model, gen);
     }
@@ -157,31 +157,31 @@ namespace bob { namespace visioner {
 
   // Train a model
   void TaylorBooster::train(
-      const rlutproblem_t& t_lp, const rlutproblem_t& v_lp, 
-      const string_t& base_description, const Model& model, GenModel& gen) const
+      const boost::shared_ptr<LUTProblem>& t_lp, const boost::shared_ptr<LUTProblem>& v_lp, 
+      const std::string& base_description, const Model& model, Generalizer<std::vector<std::vector<LUT> > >& gen) const
   {
     Timer timer;
 
     // Train the models in boosting rounds ...
-    for (index_t nc = 0; nc < m_param.m_rounds; nc ++)
+    for (uint64_t nc = 0; nc < m_param.m_rounds; nc ++)
     {                        
       // Train weak learners ...
       timer.restart();                        
       t_lp->update_loss_deriv();
       t_lp->select();                        
-      const scalar_t time_select = timer.elapsed();
+      const double time_select = timer.elapsed();
 
       timer.restart();                        
       if (t_lp->line_search() == false)
       {
         break;
       }                            
-      const scalar_t time_optimize = timer.elapsed();
+      const double time_optimize = timer.elapsed();
 
       // Check the generalization properties of the model
-      const string_t description = base_description +
-        "<<round " + boost::lexical_cast<string_t>(nc + 1) + "/" +
-        boost::lexical_cast<string_t>(m_param.m_rounds) + ">>";
+      const std::string description = base_description +
+        "<<round " + boost::lexical_cast<std::string>(nc + 1) + "/" +
+        boost::lexical_cast<std::string>(m_param.m_rounds) + ">>";
 
       t_lp->update_scores(t_lp->luts());
       t_lp->update_loss();                        
@@ -199,7 +199,7 @@ namespace bob { namespace visioner {
         << " in " << time_select << "+" << time_optimize << "s." << std::endl;                        
 
       // Debug
-      for (index_t o = 0; o < t_lp->n_outputs(); o ++)
+      for (uint64_t o = 0; o < t_lp->n_outputs(); o ++)
       {
         const LUT& lut = t_lp->luts()[o];
         bob::core::info

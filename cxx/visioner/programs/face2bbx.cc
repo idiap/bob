@@ -28,7 +28,7 @@
 #include "visioner/util/timer.h"
 
 // Compute the face bbx from the eye coordinates
-bob::visioner::rect_t eyes2bbx(const bob::visioner::point_t& leye, const bob::visioner::point_t& reye)
+QRectF eyes2bbx(const QPointF& leye, const QPointF& reye)
 {
   static const double D_EYES = 10.0;
   static const double Y_UPPER = 7.0;
@@ -43,7 +43,7 @@ bob::visioner::rect_t eyes2bbx(const bob::visioner::point_t& leye, const bob::vi
 
   const double ratio = bob::visioner::my_sqrt(EEx * EEx + EEy * EEy) / D_EYES;
 
-  return bob::visioner::rect_t(c0x - ratio * 0.5 * MODEL_WIDTH, 
+  return QRectF(c0x - ratio * 0.5 * MODEL_WIDTH, 
       c0y - ratio * Y_UPPER,
       ratio * MODEL_WIDTH, ratio * MODEL_HEIGHT);
 }
@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
   const std::string cmd_input = po_vm["input"].as<std::string>();
 
   // Load the face datasets
-  bob::visioner::strings_t ifiles, gfiles;
+  std::vector<std::string> ifiles, gfiles;
   if (	bob::visioner::load_listfiles(cmd_input, ifiles, gfiles) == false ||
       ifiles.empty() || ifiles.size() != gfiles.size())
   {
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Process each face ...
-  bob::visioner::objects_t objects;
+  std::vector<bob::visioner::Object> objects;
   for (std::size_t i = 0; i < ifiles.size(); i ++)
   {
     const std::string& gfile = gfiles[i];
@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
     if (bob::visioner::Object::load(gfile, objects) == false)
     {
       bob::core::warn << "Cannot load the ground truth <" << gfile << ">!" << std::endl;
-      bob::visioner::objects_t objects;
+      std::vector<bob::visioner::Object> objects;
       bob::visioner::Object::save(gfile, objects);
       continue;
     }
@@ -104,8 +104,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Compute the bounding box
-    for (bob::visioner::objects_t::iterator it = objects.begin(); it != objects.end(); ++ it)
-    {
+    for (std::vector<bob::visioner::Object>::iterator it = objects.begin(); it != objects.end(); ++ it) {
       bob::visioner::Keypoint leye, reye, eye, ntip;
 
       if (    it->find("leye", leye) == true &&
@@ -116,19 +115,18 @@ int main(int argc, char *argv[]) {
       else if (       it->find("eye", eye) == true &&
           it->find("ntip", ntip) == true)
       {                                
-        const bob::visioner::point_t& eye_pt = eye.m_point;
-        const bob::visioner::point_t& ntip_pt = ntip.m_point;
+        const QPointF& eye_pt = eye.m_point;
+        const QPointF& ntip_pt = ntip.m_point;
 
-        const bob::visioner::scalar_t dx = bob::visioner::my_abs(eye_pt.x() - ntip_pt.x());
-        const bob::visioner::scalar_t width = dx * 2.5;                                
+        const double dx = bob::visioner::my_abs(eye_pt.x() - ntip_pt.x());
+        const double width = dx * 2.5;                                
 
-        it->move(eyes2bbx(
-              bob::visioner::point_t(eye_pt.x() - 0.25 * width, eye_pt.y()),
-              bob::visioner::point_t(eye_pt.x() + 0.25 * width, eye_pt.y())));
+        it->move(eyes2bbx(QPointF(eye_pt.x() - 0.25 * width, eye_pt.y()),
+              QPointF(eye_pt.x() + 0.25 * width, eye_pt.y())));
       }
       else
       {
-        it->move(bob::visioner::rect_t(-1, -1, -1, -1));
+        it->move(QRectF(-1, -1, -1, -1));
       }
     }
 

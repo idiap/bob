@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
   const std::string cmd_data = po_vm["data"].as<std::string>();
 
   // Load the test datasets
-  bob::visioner::strings_t ifiles, gfiles;
+  std::vector<std::string> ifiles, gfiles;
   if (bob::visioner::load_listfiles(cmd_data, ifiles, gfiles) == false)
   {
     bob::core::error << "Failed to load the test datasets <" << cmd_data << ">!" << std::endl;
@@ -70,44 +70,44 @@ int main(int argc, char *argv[]) {
   }
 
   // Build the confusion matrix
-  bob::visioner::index_mat_t hits_mat;
-  bob::visioner::indices_t hits_cnt;
+  bob::visioner::Matrix<uint64_t> hits_mat;
+  std::vector<uint64_t> hits_cnt;
 
   classifier.evaluate(ifiles, gfiles, detector, hits_mat, hits_cnt);
 
   // Display the confusion matrix
-  const bob::visioner::index_t n_classes = classifier.n_classes();
-  const bob::visioner::strings_t& labels = classifier.param().m_labels;
+  const uint64_t n_classes = classifier.n_classes();
+  const std::vector<std::string>& labels = classifier.param().m_labels;
 
-  const bob::visioner::index_t str_size = 12;
-  const bob::visioner::string_t empty_str = bob::visioner::resize(bob::visioner::string_t(), str_size);
+  const uint64_t str_size = 12;
+  const std::string empty_str = bob::visioner::resize(std::string(), str_size);
 
-  const bob::visioner::index_t sum_hits = std::accumulate(hits_cnt.begin(), hits_cnt.end(), 0);
+  const uint64_t sum_hits = std::accumulate(hits_cnt.begin(), hits_cnt.end(), 0);
 
   // --- header
   bob::core::info << empty_str;
-  for (bob::visioner::index_t c1 = 0; c1 < n_classes; c1 ++)
+  for (uint64_t c1 = 0; c1 < n_classes; c1 ++)
   {
     bob::core::info << bob::visioner::resize(labels[c1], str_size);
   }
   bob::core::info << bob::visioner::resize("[ERR]", str_size) << std::endl;
 
   // --- content
-  bob::visioner::index_t sum_hits_c11 = 0;
-  for (bob::visioner::index_t c1 = 0; c1 < n_classes; c1 ++)
+  uint64_t sum_hits_c11 = 0;
+  for (uint64_t c1 = 0; c1 < n_classes; c1 ++)
   {
     bob::core::info << bob::visioner::resize(labels[c1], str_size);
 
-    for (bob::visioner::index_t c2 = 0; c2 < n_classes; c2 ++)
+    for (uint64_t c2 = 0; c2 < n_classes; c2 ++)
     {
-      const bob::visioner::scalar_t c12_dr = 
+      const double c12_dr = 
         100.0 * bob::visioner::inverse(hits_cnt[c1]) * hits_mat(c1, c2);   
 
       bob::core::info
         << bob::visioner::resize(bob::visioner::round(c12_dr, 2), str_size);
     }
 
-    const bob::visioner::scalar_t c1_err = 
+    const double c1_err = 
       100.0 - 100.0 * bob::visioner::inverse(hits_cnt[c1]) * hits_mat(c1, c1);  
     bob::core::info
       << bob::visioner::resize(bob::visioner::round(c1_err, 2), str_size) << std::endl;
@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
   }
 
   // --- end
-  const bob::visioner::scalar_t err = 
+  const double err = 
     100.0 - 100.0 * bob::visioner::inverse(sum_hits) * sum_hits_c11;  
   bob::core::info
     << ">>> Average error: " << bob::visioner::round(err, 2) << "%." << std::endl;

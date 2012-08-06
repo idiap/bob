@@ -30,32 +30,22 @@
 
 namespace bob { namespace visioner {
 
-  // Matrix used to store grayscale values
-  typedef u_int8_t			grey_t;
-  typedef Matrix<grey_t>			greyimage_t;
-  typedef std::vector<greyimage_t>	greyimages_t;
-
-  // Matrix used to store integral images
-  typedef u_int32_t			igrey_t;
-  typedef Matrix<igrey_t>			igreyimage_t;
-  typedef std::vector<igreyimage_t>	igreyimages_t;
-
   // 2D Euclidean distance
-  float distance(const point_t& point1, const point_t& point2);
+  float distance(const QPointF& point1, const QPointF& point2);
 
   // Jesorsky distance	
-  scalar_t Jesorsky(	const point_t& dt_leye, const point_t& dt_reye,		// detection
-      const point_t& gt_leye, const point_t& gt_reye);	// ground truth
-  scalar_t Jesorsky(	const point_t& dt_leye, const point_t& dt_reye,		// detection
-      const points_t& gt_leyes, const points_t& gt_reyes);	// ground truth
+  double Jesorsky(	const QPointF& dt_leye, const QPointF& dt_reye,		// detection
+      const QPointF& gt_leye, const QPointF& gt_reye);	// ground truth
+  double Jesorsky(	const QPointF& dt_leye, const QPointF& dt_reye,		// detection
+      const std::vector<QPointF>& gt_leyes, const std::vector<QPointF>& gt_reyes);	// ground truth
 
   // Overlapping [0.0 - 1.0]
-  inline scalar_t overlap(const rect_t& det, const rect_t& gt)
+  inline double overlap(const QRectF& det, const QRectF& gt)
   {
-    const rect_t inter = det.intersected(gt);
+    const QRectF inter = det.intersected(gt);
     return area(inter) / (area(det) + area(gt) - area(inter));
   }	
-  scalar_t overlap(const rect_t& det, const rects_t& gts);
+  double overlap(const QRectF& det, const std::vector<QRectF>& gts);
 
 }}
 

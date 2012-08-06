@@ -67,35 +67,35 @@ namespace bob { namespace visioner {
 
     m_umasks(n_features(), n_entries(), 0.0)
     {
-      scalars_t counts(n_entries());
-      std::vector<std::pair<scalar_t, index_t> > stats(n_entries());
+      std::vector<double> counts(n_entries());
+      std::vector<std::pair<double, uint64_t> > stats(n_entries());
 
-      const scalar_t cutoff = 0.90;
+      const double cutoff = 0.90;
 
       // Mask the entries that are not frequent enough                
       //      - the associated response is fixed to zero!
-      for (index_t f = 0; f < n_features(); f ++)
+      for (uint64_t f = 0; f < n_features(); f ++)
       {
         std::fill(counts.begin(), counts.end(), 0.0);
-        for (index_t s = 0; s < n_samples(); s ++)
+        for (uint64_t s = 0; s < n_samples(); s ++)
         {
-          const discrete_t u = fvalue(f, s);
+          const uint16_t u = fvalue(f, s);
           counts[u] += cost(s);
         }
-        const scalar_t thres = cutoff * std::accumulate(counts.begin(), counts.end(), 0.0);
+        const double thres = cutoff * std::accumulate(counts.begin(), counts.end(), 0.0);
 
-        for (index_t u = 0; u < n_entries(); u ++)
+        for (uint64_t u = 0; u < n_entries(); u ++)
         {
           stats[u].first = counts[u];
           stats[u].second = u;
         }                        
-        std::sort(stats.begin(), stats.end(), std::greater<std::pair<scalar_t, index_t> >());                        
+        std::sort(stats.begin(), stats.end(), std::greater<std::pair<double, uint64_t> >());                        
 
-        scalar_t sum = 0.0;
-        for (index_t uu = 0; uu < n_entries() && sum < thres; uu ++)
+        double sum = 0.0;
+        for (uint64_t uu = 0; uu < n_entries() && sum < thres; uu ++)
         {
-          const scalar_t cnt = stats[uu].first;
-          const index_t u = stats[uu].second;
+          const double cnt = stats[uu].first;
+          const uint64_t u = stats[uu].second;
 
           m_umasks(f, u) = 1.0;                                
           sum += cnt;
@@ -104,27 +104,27 @@ namespace bob { namespace visioner {
     }
 
   // Update predictions
-  void LUTProblem::update_scores(const LUTs& luts)
+  void LUTProblem::update_scores(const std::vector<LUT>& luts)
   {
 # pragma omp parallel for
-    for (index_t s = 0; s < n_samples(); s ++)
+    for (uint64_t s = 0; s < n_samples(); s ++)
     {
-      for (index_t o = 0; o < n_outputs(); o ++)
+      for (uint64_t o = 0; o < n_outputs(); o ++)
       {
         const LUT& lut = luts[o];                        
-        const discrete_t u = fvalue(lut.feature(), s);
+        const uint16_t u = fvalue(lut.feature(), s);
         m_sscores(s, o) += lut[u];
       }
     }
   }
 
   // Update current scores
-  void LUTProblem::update_cscores(const scalar_t* x)
+  void LUTProblem::update_cscores(const double* x)
   {
 # pragma omp parallel for
-    for (index_t s = 0; s < n_samples(); s ++)
+    for (uint64_t s = 0; s < n_samples(); s ++)
     {
-      for (index_t o = 0; o < n_outputs(); o ++)
+      for (uint64_t o = 0; o < n_outputs(); o ++)
       {
         m_cscores(s, o) = m_sscores(s, o) + x[o] * m_wscores(s, o);
       }
@@ -136,18 +136,18 @@ namespace bob { namespace visioner {
   {
     // Buffer the weak learner scores
 # pragma omp parallel for
-    for (index_t s = 0; s < n_samples(); s ++)
+    for (uint64_t s = 0; s < n_samples(); s ++)
     {
-      for (index_t o = 0; o < n_outputs(); o ++)
+      for (uint64_t o = 0; o < n_outputs(); o ++)
       {
         const LUT& lut = m_luts[o];
-        const index_t u = fvalue(lut.feature(), s);
+        const uint64_t u = fvalue(lut.feature(), s);
         m_wscores(s, o) = lut[u];
       }
     }
 
     // Line-search to scale the LUT entries (using libLBFGS)
-    static const index_t iters = 20;
+    static const uint64_t iters = 20;
     lbfgs_parameter_t param;
     lbfgs_parameter_init(&param);
     param.max_iterations = iters;
@@ -164,10 +164,10 @@ namespace bob { namespace visioner {
     const int ret = lbfgs(n_outputs(), x, fx, lbfgs_wrapper::linesearch,
         NULL, (void*)this, &param);
 
-    const scalar_t min_x = *std::min_element(x, x + n_outputs());
-    const scalar_t max_x = *std::max_element(x, x + n_outputs());
+    const double min_x = *std::min_element(x, x + n_outputs());
+    const double max_x = *std::max_element(x, x + n_outputs());
 
-    const bool ok = (max_x > std::numeric_limits<scalar_t>::epsilon()) &&
+    const bool ok = (max_x > std::numeric_limits<double>::epsilon()) &&
       (ret == LBFGS_SUCCESS ||
        ret == LBFGS_ALREADY_MINIMIZED ||
        ret == LBFGSERR_MAXIMUMLINESEARCH ||
@@ -176,10 +176,10 @@ namespace bob { namespace visioner {
        ret == LBFGSERR_MINIMUMSTEP ||
        ret == LBFGSERR_MAXIMUMSTEP);
 
-    // OK, setup LUTs
+    // OK, setup std::vector<LUT>
     if (ok == true)
     {
-      for (index_t o = 0; o < n_outputs(); o ++)
+      for (uint64_t o = 0; o < n_outputs(); o ++)
       {
         LUT& lut = m_luts[o];
         lut.scale(x[o]);

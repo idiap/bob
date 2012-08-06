@@ -32,16 +32,15 @@
 
 namespace bob { namespace visioner {	
 
-  /////////////////////////////////////////////////////////////////////////////////////////	
-  // Look-up-table with discrete feature values.
-  /////////////////////////////////////////////////////////////////////////////////////////	
+  /**
+   * Look-up-table with discrete feature values.
+   */
+  class LUT {
 
-  class LUT
-  {
     public:
 
       // Constructor
-      LUT(	index_t feature = 0, index_t n_fvalues = 512)
+      LUT(	uint64_t feature = 0, uint64_t n_fvalues = 512)
         :	m_feature(feature), m_entries(n_fvalues, 0.0)
       {		
 
@@ -57,37 +56,33 @@ namespace bob { namespace visioner {
         }
 
       // Scale its output by a given factor
-      void scale(scalar_t factor) 
+      void scale(double factor) 
       {
         std::transform(m_entries.begin(), m_entries.end(), m_entries.begin(),
-            std::bind1st(std::multiplies<scalar_t>(), factor));
+            std::bind1st(std::multiplies<double>(), factor));
       }
 
       // Access functions
       template <typename TFeatureValue>
-        const scalar_t& operator[](TFeatureValue fv) const { return m_entries[fv]; }
-      scalars_t::const_iterator begin() const { return m_entries.begin(); }
-      scalars_t::const_iterator end() const { return m_entries.end(); }
+        const double& operator[](TFeatureValue fv) const { return m_entries[fv]; }
+      std::vector<double>::const_iterator begin() const { return m_entries.begin(); }
+      std::vector<double>::const_iterator end() const { return m_entries.end(); }
 
       template <typename TFeatureValue>
-        scalar_t& operator[](TFeatureValue fv) { return m_entries[fv]; }
-      scalars_t::iterator begin() { return m_entries.begin(); }
-      scalars_t::iterator end() { return m_entries.end(); }
+        double& operator[](TFeatureValue fv) { return m_entries[fv]; }
+      std::vector<double>::iterator begin() { return m_entries.begin(); }
+      std::vector<double>::iterator end() { return m_entries.end(); }
 
-      const index_t& feature() const { return m_feature; }
-      index_t& feature() { return m_feature; }
+      const uint64_t& feature() const { return m_feature; }
+      uint64_t& feature() { return m_feature; }
 
-      index_t n_fvalues() const { return m_entries.size(); }
+      uint64_t n_fvalues() const { return m_entries.size(); }
 
-    private:
+    private: // representation
 
-      // Attributes
-      index_t                 m_feature;
-      scalars_t               m_entries;
+      uint64_t m_feature;
+      std::vector<double> m_entries;
   };
-
-  typedef std::vector<LUT>	LUTs;
-  typedef std::vector<LUTs>       MultiLUTs;
 
 }}
 

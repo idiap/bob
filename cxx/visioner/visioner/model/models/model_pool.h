@@ -50,7 +50,7 @@ namespace bob { namespace visioner {
       virtual ~ModelPool() {}
 
       // Clone the object
-      virtual rmodel_t clone() const { return rmodel_t(new ModelPool(*this)); }
+      virtual boost::shared_ptr<Model> clone() const { return boost::shared_ptr<Model>(new ModelPool(*this)); }
 
       // Reset to new parameters
       virtual void reset(const param_t& param)
@@ -60,8 +60,8 @@ namespace bob { namespace visioner {
         m_fpool2.reset(param);
       } 
 
-      // Reset to new LUTs (lut.size() == model.n_outputs()!)
-      virtual bool set(const MultiLUTs& mluts)
+      // Reset to new std::vector<LUT> (lut.size() == model.n_outputs()!)
+      virtual bool set(const std::vector<std::vector<LUT> >& mluts)
       {
         return _set(mluts);
       }
@@ -80,7 +80,7 @@ namespace bob { namespace visioner {
       }
 
       // Compute the value of the feature <f> at the (x, y) position
-      virtual index_t get(index_t f, int x, int y) const
+      virtual uint64_t get(uint64_t f, int x, int y) const
       {
         if (f < n_features1())
         {
@@ -93,13 +93,13 @@ namespace bob { namespace visioner {
       }
 
       // Access functions
-      virtual index_t n_fvalues() const { return m_fpool1.n_fvalues(); }
-      virtual index_t n_features() const { return n_features1() + n_features2(); }
-      index_t n_features1() const { return m_fpool1.n_features(); }
-      index_t n_features2() const { return m_fpool2.n_features(); }
+      virtual uint64_t n_fvalues() const { return m_fpool1.n_fvalues(); }
+      virtual uint64_t n_features() const { return n_features1() + n_features2(); }
+      uint64_t n_features1() const { return m_fpool1.n_features(); }
+      uint64_t n_features2() const { return m_fpool2.n_features(); }
 
       // Describe a feature
-      virtual string_t describe(index_t f) const
+      virtual std::string describe(uint64_t f) const
       {
         if (f < n_features1())
         {
@@ -135,22 +135,22 @@ namespace bob { namespace visioner {
 
     private:
 
-      // Reset to new LUTs (lut.size() == model.n_outputs()!)
-      bool _set(const MultiLUTs& mluts)
+      // Reset to new std::vector<LUT> (lut.size() == model.n_outputs()!)
+      bool _set(const std::vector<std::vector<LUT> >& mluts)
       {
         if (Model::set(mluts) == false)
         {
           return false;
         }
 
-        // Split the LUTs to the associated feature pool ...
-        MultiLUTs mluts1(n_outputs()), mluts2(n_outputs());
-        for (index_t o = 0; o < n_outputs(); o ++)
+        // Split the std::vector<LUT> to the associated feature pool ...
+        std::vector<std::vector<LUT> > mluts1(n_outputs()), mluts2(n_outputs());
+        for (uint64_t o = 0; o < n_outputs(); o ++)
         {
-          LUTs& luts1 = mluts1[o];
-          LUTs& luts2 = mluts2[o];
+          std::vector<LUT>& luts1 = mluts1[o];
+          std::vector<LUT>& luts2 = mluts2[o];
 
-          for (index_t r = 0; r < n_luts(o); r ++)
+          for (uint64_t r = 0; r < n_luts(o); r ++)
           {
             LUT lut = luts()[o][r];                                        
             if (lut.feature() < n_features1())

@@ -36,15 +36,15 @@ namespace bob { namespace visioner {
   /////////////////////////////////////////////////////////////////////////////////////////
 
   // Loads an image
-  bool load(const QImage& qimage, greyimage_t& grays);
-  bool load(const string_t& filename, greyimage_t& grays);
+  bool load(const QImage& qimage, Matrix<uint8_t>& grays);
+  bool load(const std::string& filename, Matrix<uint8_t>& grays);
 
   // Scale the image to a specific <scale> of the <src> source image
-  bool scale(const greyimage_t& src, scalar_t scale, greyimage_t& dst);
+  bool scale(const Matrix<uint8_t>& src, double scale, Matrix<uint8_t>& dst);
 
-  // Convert from <greyimage_t> to <QImage>
-  QImage convert(const greyimage_t& grays);
-  bool convert(const QImage& qimage, greyimage_t& grays);
+  // Convert from <Matrix<uint8_t>> to <QImage>
+  QImage convert(const Matrix<uint8_t>& grays);
+  bool convert(const QImage& qimage, Matrix<uint8_t>& grays);
 
 }}
 

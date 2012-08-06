@@ -36,9 +36,9 @@ namespace tp = bob::python;
 static bp::object detect_max(bob::visioner::CVDetector& det, 
     tp::const_ndarray image) {
 
-  blitz::Array<bob::visioner::grey_t,2> bzimage = image.bz<bob::visioner::grey_t,2>();
+  blitz::Array<uint8_t,2> bzimage = image.bz<uint8_t,2>();
   det.load(bzimage.data(), bzimage.rows(), bzimage.cols());
-  bob::visioner::detections_t detections;
+  std::vector<bob::visioner::detection_t> detections;
   det.scan(detections);
 
   if (detections.size() == 0) {
@@ -56,9 +56,9 @@ static bp::object detect_max(bob::visioner::CVDetector& det,
 static bp::object detect(bob::visioner::CVDetector& det,
     tp::const_ndarray image) {
   
-  blitz::Array<bob::visioner::grey_t,2> bzimage = image.bz<bob::visioner::grey_t,2>();
+  blitz::Array<uint8_t,2> bzimage = image.bz<uint8_t,2>();
   det.load(bzimage.data(), bzimage.rows(), bzimage.cols());
-  bob::visioner::detections_t detections;
+  std::vector<bob::visioner::detection_t> detections;
   det.scan(detections);
   
   if (detections.size() == 0) {
@@ -80,9 +80,9 @@ static bp::object detect(bob::visioner::CVDetector& det,
 static bp::object locate(bob::visioner::CVLocalizer& loc,
     bob::visioner::CVDetector& det, tp::const_ndarray image) {
 
-  blitz::Array<bob::visioner::grey_t,2> bzimage = image.bz<bob::visioner::grey_t,2>();
+  blitz::Array<uint8_t,2> bzimage = image.bz<uint8_t,2>();
   det.load(bzimage.data(), bzimage.rows(), bzimage.cols());
-  bob::visioner::detections_t detections;
+  std::vector<bob::visioner::detection_t> detections;
   det.scan(detections);
   
   if (detections.size() == 0) {
@@ -93,9 +93,9 @@ static bp::object locate(bob::visioner::CVLocalizer& loc,
 
   // Locate keypoints
   bob::visioner::Object object;
-  bob::visioner::points_t dt_points;
+  std::vector<QPointF> dt_points;
 
-  for (bob::visioner::detections_const_it it = detections.begin(); it != detections.end(); ++ it) {
+  for (std::vector<bob::visioner::detection_t>::const_iterator it = detections.begin(); it != detections.end(); ++ it) {
     if (det.match(*it, object) && loc.locate(det, it->second.first, dt_points))
       break;
   }
@@ -121,7 +121,7 @@ void bind_visioner_localize() {
     .value("GroundTruth", bob::visioner::CVDetector::GroundTruth)
     ;
 
-  bp::class_<bob::visioner::CVDetector>("CVDetector", "Object detector that processes a pyramid of images", bp::init<const std::string&, bob::visioner::scalar_t, bob::visioner::index_t, bob::visioner::index_t, bob::visioner::scalar_t, bob::visioner::CVDetector::Type>((bp::arg("model"), bp::arg("threshold")=0.0, bp::arg("scanning_levels")=0, bp::arg("scale_variation")=2, bp::arg("clustering")=0.05, bp::arg("method")=bob::visioner::CVDetector::GroundTruth), "Basic constructor with the following parameters:\n\nmodel\n  file containing the model to be loaded; **note**: Serialization will use a native text format by default. Files that have their names suffixed with '.gz' will be automatically decompressed. If the filename ends in '.vbin' or '.vbgz' the format used will be the native binary format.\n\nthreshold\n  object classification threshold\n\nscanning_levels\n  scanning levels (the more, the faster)\n\nscale_variation\n  scale variation in pixels\n\nclustering\n  overlapping threshold for clustering detections\n\nmethod\n  Scanning or GroundTruth"))
+  bp::class_<bob::visioner::CVDetector>("CVDetector", "Object detector that processes a pyramid of images", bp::init<const std::string&, double, uint64_t, uint64_t, double, bob::visioner::CVDetector::Type>((bp::arg("model"), bp::arg("threshold")=0.0, bp::arg("scanning_levels")=0, bp::arg("scale_variation")=2, bp::arg("clustering")=0.05, bp::arg("method")=bob::visioner::CVDetector::GroundTruth), "Basic constructor with the following parameters:\n\nmodel\n  file containing the model to be loaded; **note**: Serialization will use a native text format by default. Files that have their names suffixed with '.gz' will be automatically decompressed. If the filename ends in '.vbin' or '.vbgz' the format used will be the native binary format.\n\nthreshold\n  object classification threshold\n\nscanning_levels\n  scanning levels (the more, the faster)\n\nscale_variation\n  scale variation in pixels\n\nclustering\n  overlapping threshold for clustering detections\n\nmethod\n  Scanning or GroundTruth"))
     .def_readwrite("threshold", &bob::visioner::CVDetector::m_threshold, "Object classification threshold")
     .add_property("scanning_levels", &bob::visioner::CVDetector::get_scan_levels, &bob::visioner::CVDetector::set_scan_levels, "Levels (the more, the faster)")
     .def_readwrite("scale_variation", &bob::visioner::CVDetector::m_ds, "Scale variation in pixels")

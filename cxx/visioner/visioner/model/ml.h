@@ -47,32 +47,32 @@ namespace bob { namespace visioner {
   // Labelling convention for classification
   /////////////////////////////////////////////////////////////////////////////////////////
 
-  inline scalar_t pos_target() { return 1.0; }
-  inline scalar_t neg_target() { return -1.0; }
+  inline double pos_target() { return 1.0; }
+  inline double neg_target() { return -1.0; }
 
   /////////////////////////////////////////////////////////////////////////////////////////
   // Compute the classification/regression error for some
   //      targets and predicted scores
   /////////////////////////////////////////////////////////////////////////////////////////
 
-  scalar_t classification_error(scalar_t target, scalar_t score, scalar_t epsilon);
-  scalar_t regression_error(scalar_t target, scalar_t score, scalar_t epsilon);        
+  double classification_error(double target, double score, double epsilon);
+  double regression_error(double target, double score, double epsilon);        
 
   /////////////////////////////////////////////////////////////////////////////////////////
   // ROC processing
   /////////////////////////////////////////////////////////////////////////////////////////
 
   // Compute the area under the ROC curve
-  scalar_t roc_area(const scalars_t& fars, const scalars_t& tars);
+  double roc_area(const std::vector<double>& fars, const std::vector<double>& tars);
 
   // Order the FARs and TARs such that to make a real curve
-  void roc_order(scalars_t& fars, scalars_t& tars);	
+  void roc_order(std::vector<double>& fars, std::vector<double>& tars);	
 
   // Trim the ROC curve (remove points that line inside a horizontal segment)
-  void roc_trim(scalars_t& fars, scalars_t& tars);
+  void roc_trim(std::vector<double>& fars, std::vector<double>& tars);
 
   // Save the ROC points to file
-  bool save_roc(const scalars_t& fars, const scalars_t& tars, const string_t& path);
+  bool save_roc(const std::vector<double>& fars, const std::vector<double>& tars, const std::string& path);
 
 }}
 

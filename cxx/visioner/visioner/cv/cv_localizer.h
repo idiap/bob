@@ -61,17 +61,17 @@ namespace bob { namespace visioner {
 
       // Predict the location of the keypoints in the <reg> region.
       bool locate(const CVDetector& detector,
-          const rect_t& reg, points_t& points) const;
+          const QRectF& reg, std::vector<QPointF>& points) const;
 
       // Compute the normalized distances [0.0 - 1.0] between
       //	each ground truth keypoints and its predicted points.
-      void evaluate(const strings_t& ifiles, const strings_t& gfiles,
+      void evaluate(const std::vector<std::string>& ifiles, const std::vector<std::string>& gfiles,
           CVDetector& detector, std::vector<Histogram>& histos, Histogram&
           histo) const;
 
       // Compute the normalized distances [0.0 - 1.0] between
       //	each ground truth keypoints and its predicted points.
-      void evaluate(const strings_t& gfiles, const strings_t& pfiles,
+      void evaluate(const std::vector<std::string>& gfiles, const std::vector<std::string>& pfiles,
           std::vector<Histogram>& histos, Histogram& histo) const;
 
       // Check the validity of different components
@@ -107,29 +107,29 @@ namespace bob { namespace visioner {
       // Compute the normalized distances [0.0 - 1.0] between
       //	each ground truth keypoint and its predicted points <dt_points>
       bool evaluate(	
-          const Object& gt_object, const points_t& dt_points,
+          const Object& gt_object, const std::vector<QPointF>& dt_points,
           std::vector<Histogram>& histos, Histogram& histo) const;
 
       // Collect predictions from the neighbourhood of <seed_sw>
-      void locate(const CVDetector& detector, const sw_t& seed_sw, 
+      void locate(const CVDetector& detector, const subwindow_t& seed_sw, 
           int n_ds, int n_dx, int dx, int n_dy, int dy,
-          std::vector<points_t>& preds) const;
+          std::vector<std::vector<QPointF> >& preds) const;
 
       // Average the collection of predictions
-      void avg(const std::vector<points_t>& preds, points_t& pred) const;
-      void avg(const points_t& pts, point_t& pt) const;
+      void avg(const std::vector<std::vector<QPointF> >& preds, std::vector<QPointF>& pred) const;
+      void avg(const std::vector<QPointF>& pts, QPointF& pt) const;
 
       // Median the collection of predictions
-      void med(const std::vector<points_t>& preds, points_t& pred) const;
-      void med(const points_t& pts, point_t& pt) const;
+      void med(const std::vector<std::vector<QPointF> >& preds, std::vector<QPointF>& pred) const;
+      void med(const std::vector<QPointF>& pts, QPointF& pt) const;
 
       // Number of keypoints
-      index_t n_points() const { return param().m_labels.size(); }
+      uint64_t n_points() const { return param().m_labels.size(); }
 
     public:
 
       // Attributes
-      rmodel_t                m_model;	// Keypoint localizers
+      boost::shared_ptr<Model>                m_model;	// Keypoint localizers
       Type			m_type;
   };
 

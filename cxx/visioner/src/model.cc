@@ -63,21 +63,21 @@ namespace bob { namespace visioner {
   {
     m_param = param;
     m_mluts.resize(make_tagger(param)->n_outputs());
-    for (index_t o = 0; o < n_outputs(); o ++)                        
+    for (uint64_t o = 0; o < n_outputs(); o ++)                        
     {
       m_mluts[o].clear();
     }
   }
 
-  // Reset to new LUTs (lut.size() == model.n_outputs()!)
-  bool Model::set(const MultiLUTs& mluts)
+  // Reset to new std::vector<LUT> (lut.size() == model.n_outputs()!)
+  bool Model::set(const std::vector<std::vector<LUT> >& mluts)
   {
     if (mluts.size() != n_outputs())
     {
       return false;
     }
 
-    for (index_t o = 0; o < n_outputs(); o ++)                        
+    for (uint64_t o = 0; o < n_outputs(); o ++)                        
     {
       m_mluts[o] = mluts[o];
     }
@@ -85,7 +85,7 @@ namespace bob { namespace visioner {
   }
 
   // Save/load to/from file
-  bool Model::save(const string_t& path) const
+  bool Model::save(const std::string& path) const
   {
     std::ios_base::openmode mode = std::ios_base::out | std::ios_base::trunc;
     if (is_dot_gz(path) || is_dot_vbin(path)) mode |= std::ios_base::binary;
@@ -118,7 +118,7 @@ namespace bob { namespace visioner {
 
   }
 
-  bool Model::load(const string_t& path)
+  bool Model::load(const std::string& path)
   {
     //AA: adds gzip decompression if necessary (depends on path)
     std::ios_base::openmode mode = std::ios_base::in;
@@ -151,7 +151,7 @@ namespace bob { namespace visioner {
     return ifs.good();
   }
 
-  bool Model::load(const string_t& path, rmodel_t& model)
+  bool Model::load(const std::string& path, boost::shared_ptr<Model>& model)
   {
     //AA: adds gzip decompression if necessary (depends on path)
     std::ios_base::openmode mode = std::ios_base::in;
@@ -188,29 +188,29 @@ namespace bob { namespace visioner {
   }
 
   // Compute the model score at the (x, y) position for the output <o>
-  scalar_t Model::score(index_t o, int x, int y) const
+  double Model::score(uint64_t o, int x, int y) const
   {
     return score(o, 0, n_luts(o), x, y);
   }        
-  scalar_t Model::score(index_t o, index_t rbegin, index_t rend, int x, int y) const
+  double Model::score(uint64_t o, uint64_t rbegin, uint64_t rend, int x, int y) const
   {                
-    scalar_t sum = 0.0;
-    for (index_t r = rbegin; r < rend; r ++)
+    double sum = 0.0;
+    for (uint64_t r = rbegin; r < rend; r ++)
     {
       const LUT& lut = m_mluts[o][r];
-      const index_t fv = get(lut.feature(), x, y);
+      const uint64_t fv = get(lut.feature(), x, y);
       sum += lut[fv];
     }
     return sum;
   }
 
   // Return the selected features
-  indices_t Model::features() const
+  std::vector<uint64_t> Model::features() const
   {
-    indices_t result;
-    for (index_t o = 0; o < n_outputs(); o ++)
+    std::vector<uint64_t> result;
+    for (uint64_t o = 0; o < n_outputs(); o ++)
     {
-      for (index_t r = 0; r < n_luts(o); r ++)
+      for (uint64_t r = 0; r < n_luts(o); r ++)
       {
         const LUT& lut = m_mluts[o][r];
         result.push_back(lut.feature());

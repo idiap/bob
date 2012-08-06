@@ -82,7 +82,7 @@ namespace bob { namespace visioner {
     }
 
     // Decode parameters
-    string_t cmd_method;
+    std::string cmd_method;
     decode_var(po_desc, po_vm, "localize_method", cmd_method);
 
     if (cmd_method == "1shot")
@@ -135,17 +135,17 @@ namespace bob { namespace visioner {
   }
 
   // Predict the location of the keypoints in the <reg> region.
-  bool CVLocalizer::locate(const CVDetector& detector, const rect_t& reg, points_t& dt_points) const
+  bool CVLocalizer::locate(const CVDetector& detector, const QRectF& reg, std::vector<QPointF>& dt_points) const
   {
     // Check the sub-window
-    const sw_t sw = detector.ipyramid().map(reg, param());
+    const subwindow_t sw = detector.ipyramid().map(reg, param());
     if (detector.ipyramid().check(sw, param()) == false)
     {
       return false;
     }
 
     // Collect predictions (not projected)
-    std::vector<points_t> preds(n_points());
+    std::vector<std::vector<QPointF> > preds(n_points());
     switch (m_type)
     {
       case SingleShot:
@@ -162,11 +162,11 @@ namespace bob { namespace visioner {
     }
 
     // Process the predictions: average or median (if required)
-    points_t pred;                
+    std::vector<QPointF> pred;                
     switch (m_type)
     {
       case SingleShot:
-        for (index_t i = 0; i < n_points(); i ++)
+        for (uint64_t i = 0; i < n_points(); i ++)
         {
           pred.push_back(preds[i][0]);
         }
@@ -189,16 +189,16 @@ namespace bob { namespace visioner {
 
   // Collect predictions from the neighbourhood of <seed_sw>
   void CVLocalizer::locate(
-      const CVDetector& detector, const sw_t& seed_sw, 
-      int n_ds, int n_dx, int dx, int n_dy, int dy, std::vector<points_t>& preds) const
+      const CVDetector& detector, const subwindow_t& seed_sw, 
+      int n_ds, int n_dx, int dx, int n_dy, int dy, std::vector<std::vector<QPointF> >& preds) const
   {       
-    std::vector<sws_t> ssws = detector.ipyramid().neighbours(
+    std::vector<std::vector<subwindow_t> > ssws = detector.ipyramid().neighbours(
         seed_sw, n_ds, n_dx, dx, n_dy, dy, param());
 
     // Process each scale ...
-    for (index_t ss = 0; ss < ssws.size(); ss ++)
+    for (uint64_t ss = 0; ss < ssws.size(); ss ++)
     {
-      const sws_t& sws = ssws[ss];
+      const std::vector<subwindow_t>& sws = ssws[ss];
       if (sws.empty() == true)
       {
         continue;
@@ -208,17 +208,17 @@ namespace bob { namespace visioner {
       m_model->preprocess(ip);
 
       // Process each sub-window at this scale ...
-      const scalar_t inv_scale = ip.m_inv_scale;                          
-      for (index_t s = 0; s < sws.size(); s ++)
+      const double inv_scale = ip.m_inv_scale;                          
+      for (uint64_t s = 0; s < sws.size(); s ++)
       {
-        const sw_t& sw = sws[s];
+        const subwindow_t& sw = sws[s];
 
-        for (index_t i = 0; i < n_points(); i ++)
+        for (uint64_t i = 0; i < n_points(); i ++)
         {
-          const scalar_t x = m_model->score(2 * i + 0, sw.m_x, sw.m_y) * param().m_cols;
-          const scalar_t y = m_model->score(2 * i + 1, sw.m_x, sw.m_y) * param().m_rows;
+          const double x = m_model->score(2 * i + 0, sw.m_x, sw.m_y) * param().m_cols;
+          const double y = m_model->score(2 * i + 1, sw.m_x, sw.m_y) * param().m_rows;
 
-          preds[i].push_back(point_t(inv_scale * (sw.m_x + x), 
+          preds[i].push_back(QPointF(inv_scale * (sw.m_x + x), 
                 inv_scale * (sw.m_y + y)));
         }
       }
@@ -226,32 +226,32 @@ namespace bob { namespace visioner {
   }
 
   // Average the collection of predictions
-  void CVLocalizer::avg(const std::vector<points_t>& preds, points_t& pred) const
+  void CVLocalizer::avg(const std::vector<std::vector<QPointF> >& preds, std::vector<QPointF>& pred) const
   {
     pred.resize(n_points());
-    for (index_t i = 0; i < n_points(); i ++)
+    for (uint64_t i = 0; i < n_points(); i ++)
     {
       avg(preds[i], pred[i]);
     }
   }
-  void CVLocalizer::avg(const points_t& pts, point_t& pt) const
+  void CVLocalizer::avg(const std::vector<QPointF>& pts, QPointF& pt) const
   {
-    pt = std::accumulate(pts.begin(), pts.end(), point_t(0.0, 0.0)) * inverse(pts.size());
+    pt = std::accumulate(pts.begin(), pts.end(), QPointF(0.0, 0.0)) * inverse(pts.size());
   }
 
   // Median the collection of predictions
-  void CVLocalizer::med(const std::vector<points_t>& preds, points_t& pred) const
+  void CVLocalizer::med(const std::vector<std::vector<QPointF> >& preds, std::vector<QPointF>& pred) const
   {
     pred.resize(n_points());
-    for (index_t i = 0; i < n_points(); i ++)
+    for (uint64_t i = 0; i < n_points(); i ++)
     {
       med(preds[i], pred[i]);
     }
   }
-  void CVLocalizer::med(const points_t& pts, point_t& pt) const
+  void CVLocalizer::med(const std::vector<QPointF>& pts, QPointF& pt) const
   {
-    scalars_t xs(pts.size()), ys(pts.size());
-    for (index_t i = 0; i < pts.size(); i ++)
+    std::vector<double> xs(pts.size()), ys(pts.size());
+    for (uint64_t i = 0; i < pts.size(); i ++)
     {
       xs[i] = pts[i].x();
       ys[i] = pts[i].y();
@@ -260,13 +260,13 @@ namespace bob { namespace visioner {
     std::sort(xs.begin(), xs.end());
     std::sort(ys.begin(), ys.end());
 
-    pt = point_t(xs[xs.size() / 2], ys[ys.size() / 2]);
+    pt = QPointF(xs[xs.size() / 2], ys[ys.size() / 2]);
   }
 
   // Compute the normalized distances [0.0 - 1.0] between
   //	each ground truth keypoints and its predicted points.
   void CVLocalizer::evaluate(  
-      const strings_t& ifiles, const strings_t& gfiles,
+      const std::vector<std::string>& ifiles, const std::vector<std::string>& gfiles,
       CVDetector& detector,
       std::vector<Histogram>& histos, Histogram& histo) const
   {
@@ -274,7 +274,7 @@ namespace bob { namespace visioner {
     histos = std::vector<Histogram>(n_points(), histo);                
 
     // Process each image ...
-    for (index_t i = 0; i < ifiles.size(); i ++)
+    for (uint64_t i = 0; i < ifiles.size(); i ++)
     {
       const std::string& ifile = ifiles[i];
       const std::string& gfile = gfiles[i];
@@ -289,14 +289,14 @@ namespace bob { namespace visioner {
       // Locate keypoints (on the detections that did not fail)
       Timer timer;				
 
-      detections_t detections;
+      std::vector<detection_t> detections;
       detector.scan(detections);
 
       Object object;
-      for (detections_const_it it = detections.begin(); it != detections.end(); ++ it)
+      for (std::vector<detection_t>::const_iterator it = detections.begin(); it != detections.end(); ++ it)
         if (detector.match(*it, object) == true)
         {
-          points_t dt_points;
+          std::vector<QPointF> dt_points;
           if (locate(detector, it->second.first, dt_points) == false)
           {
             bob::core::warn << "Failed to localize the keypoints for the <" << ifile << "> image!" << std::endl;
@@ -315,20 +315,20 @@ namespace bob { namespace visioner {
   // Compute the normalized distances [0.0 - 1.0] between
   //	each ground truth keypoints and its predicted points.
   void CVLocalizer::evaluate(  
-      const strings_t& gfiles, const strings_t& pfiles,
+      const std::vector<std::string>& gfiles, const std::vector<std::string>& pfiles,
       std::vector<Histogram>& histos, Histogram& histo) const
   {
     histo = Histogram(100, 0.0, 1.0);
     histos = std::vector<Histogram>(n_points(), histo);                
 
     // Process each object ...
-    for (index_t i = 0; i < gfiles.size(); i ++)
+    for (uint64_t i = 0; i < gfiles.size(); i ++)
     {
       const std::string& gfile = gfiles[i];
       const std::string& pfile = pfiles[i];
 
       // Load the ground truth and the predictions
-      objects_t gobjects, pobjects;
+      std::vector<Object> gobjects, pobjects;
       if (Object::load(gfile, gobjects) == false)
       {
         bob::core::warn << "Failed to load ground truth <" << gfile << ">!" << std::endl;
@@ -349,12 +349,12 @@ namespace bob { namespace visioner {
       // Compare each ground truth with its associated prediction
       Timer timer;				
 
-      for (index_t k = 0; k < gobjects.size(); k ++)
+      for (uint64_t k = 0; k < gobjects.size(); k ++)
       {
-        points_t dt_points(n_points());
-        for (index_t p = 0; p < n_points(); p ++)
+        std::vector<QPointF> dt_points(n_points());
+        for (uint64_t p = 0; p < n_points(); p ++)
         {
-          const string_t name = param().m_labels[p];
+          const std::string name = param().m_labels[p];
 
           Keypoint keypoint;
           if (pobjects[k].find(name, keypoint) == false)
@@ -378,24 +378,24 @@ namespace bob { namespace visioner {
   // Compute the normalized distances [0.0 - 1.0] between
   //	each ground truth keypoint and its predicted points <dt_points>
   bool CVLocalizer::evaluate(	
-      const Object& gt_object, const points_t& dt_points,
+      const Object& gt_object, const std::vector<QPointF>& dt_points,
       std::vector<Histogram>& histos, Histogram& histo) const
   {
     // Compute the normalization factor
-    //                const scalar_t scale = 0.25 * (gt_object.bbx().width() + gt_object.bbx().height());
-    //                const scalar_t norm = inverse(scale);
+    //                const double scale = 0.25 * (gt_object.bbx().width() + gt_object.bbx().height());
+    //                const double norm = inverse(scale);
 
     //  --- the distance between the eyes for facial feature
     Keypoint leye, reye;
     gt_object.find("leye", leye);
     gt_object.find("reye", reye);
 
-    const scalar_t scale = distance(leye.m_point, reye.m_point);
-    const scalar_t norm = inverse(scale);
+    const double scale = distance(leye.m_point, reye.m_point);
+    const double norm = inverse(scale);
 
     // Compute and normalize the distance between predictions and ground truths
-    scalar_t sum_dist = 0.0;
-    for (index_t ipt = 0; ipt < dt_points.size(); ipt ++)
+    double sum_dist = 0.0;
+    for (uint64_t ipt = 0; ipt < dt_points.size(); ipt ++)
     {
       Keypoint keypoint;
       if (gt_object.find(param().m_labels[ipt], keypoint) == false)
@@ -403,7 +403,7 @@ namespace bob { namespace visioner {
         return false;
       }
 
-      const scalar_t dist = range(norm * distance(keypoint.m_point, dt_points[ipt]), 0.0, 1.0);
+      const double dist = range(norm * distance(keypoint.m_point, dt_points[ipt]), 0.0, 1.0);
       histos[ipt].add(dist);
       sum_dist += dist;
     }

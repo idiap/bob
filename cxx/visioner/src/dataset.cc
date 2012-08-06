@@ -27,14 +27,14 @@
 namespace bob { namespace visioner {
 
   // Constructor
-  DataSet::DataSet(index_t n_outputs, index_t n_samples, index_t n_features, index_t n_fvalues)
+  DataSet::DataSet(uint64_t n_outputs, uint64_t n_samples, uint64_t n_features, uint64_t n_fvalues)
     :	m_n_fvalues(n_fvalues)
   {
     resize(n_outputs, n_samples, n_features, n_fvalues);
   }
 
   // Resize
-  void DataSet::resize(index_t n_outputs, index_t n_samples, index_t n_features, index_t n_fvalues)
+  void DataSet::resize(uint64_t n_outputs, uint64_t n_samples, uint64_t n_features, uint64_t n_fvalues)
   {
     m_n_fvalues = n_fvalues;
     m_targets.resize(n_samples, n_outputs);

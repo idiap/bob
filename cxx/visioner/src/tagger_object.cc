@@ -33,14 +33,14 @@ namespace bob { namespace visioner {
   }
 
   // Number of outputs
-  index_t ObjectTagger::n_outputs() const
+  uint64_t ObjectTagger::n_outputs() const
   {
     return m_param.m_labels.size();
   }
 
   // Label a sub-window
   bool ObjectTagger::check(const ipscale_t& ipscale, int x, int y, 
-      scalars_t& targets, index_t& type) const
+      std::vector<double>& targets, uint64_t& type) const
   {
     // Background image: all SWs are valid negative samples
     if (ipscale.m_objects.empty() == true)
@@ -53,10 +53,10 @@ namespace bob { namespace visioner {
     // Image with objects: check the overlapping with the ground truth
     else
     {
-      const rect_t reg(x, y, m_param.m_cols, m_param.m_rows);
+      const QRectF reg(x, y, m_param.m_cols, m_param.m_rows);
 
       int oindex = 0;
-      const scalar_t overlap = visioner::overlap(reg, ipscale.m_objects, &oindex);
+      const double overlap = visioner::overlap(reg, ipscale.m_objects, &oindex);
 
       // Valid positive sample
       if (overlap >= m_param.m_min_gt_overlap)

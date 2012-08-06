@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
   const std::string cmd_points = po_vm["points"].as<std::string>();
   const std::string cmd_output = po_vm["output"].as<std::string>();
 
-  const bob::visioner::strings_t tokens = bob::visioner::split(cmd_points, ":");
+  const std::vector<std::string> tokens = bob::visioner::split(cmd_points, ":");
 
   // Save the .gt annotations ...
   std::ifstream in(cmd_input.c_str());
@@ -81,9 +81,9 @@ int main(int argc, char *argv[]) {
   }
 
   bob::visioner::Object object("unknown", "unknown", "unknown");
-  for (bob::visioner::strings_t::const_iterator it = tokens.begin(); it != tokens.end(); ++ it)
+  for (std::vector<std::string>::const_iterator it = tokens.begin(); it != tokens.end(); ++ it)
   {
-    bob::visioner::scalar_t x, y;
+    double x, y;
     in >> x >> y;
 
     bob::visioner::Keypoint keypoint(*it, x, y);

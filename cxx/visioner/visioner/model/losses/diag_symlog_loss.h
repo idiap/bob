@@ -52,23 +52,23 @@ namespace bob { namespace visioner {
       virtual void reset(const param_t& param) { m_param = param; }
 
       // Clone the object
-      virtual rloss_t clone() const { return rloss_t(new DiagSymLogLoss(m_param)); }
+      virtual boost::shared_ptr<Loss> clone() const { return boost::shared_ptr<Loss>(new DiagSymLogLoss(m_param)); }
 
     protected:
 
       // Compute the error (associated to the loss)
-      virtual scalar_t error(scalar_t target, scalar_t score) const;
+      virtual double error(double target, double score) const;
 
       // Compute the loss value & derivatives
       virtual void eval(
-          scalar_t target, scalar_t score,
-          scalar_t& value) const;
+          double target, double score,
+          double& value) const;
       virtual void eval(
-          scalar_t target, scalar_t score,
-          scalar_t& value, scalar_t& deriv1) const;
+          double target, double score,
+          double& value, double& deriv1) const;
       virtual void eval(
-          scalar_t target, scalar_t score,
-          scalar_t& value, scalar_t& deriv1, scalar_t& deriv2) const;
+          double target, double score,
+          double& value, double& deriv1, double& deriv2) const;
   };
 
 }}

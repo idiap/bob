@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
   const std::string cmd_output = po_vm["output"].as<std::string>();
 
   // Load the face datasets
-  bob::visioner::strings_t ifiles, gfiles;
+  std::vector<std::string> ifiles, gfiles;
   if (	bob::visioner::load_listfiles(cmd_input, ifiles, gfiles) == false ||
       ifiles.empty() || ifiles.size() != gfiles.size())
   {
@@ -72,10 +72,10 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  const bob::visioner::strings_t tokens = bob::visioner::split(cmd_points, ":");
+  const std::vector<std::string> tokens = bob::visioner::split(cmd_points, ":");
 
   // Process each face ...
-  bob::visioner::objects_t objects;
+  std::vector<bob::visioner::Object> objects;
   for (std::size_t i = 0; i < ifiles.size(); i ++)
   {
     const std::string& gfile = gfiles[i];
@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
     out << "n_points: " << tokens.size() << std::endl;
     out << "{" << std::endl;
 
-    for (bob::visioner::strings_t::const_iterator it = tokens.begin(); it != tokens.end(); ++ it)
+    for (std::vector<std::string>::const_iterator it = tokens.begin(); it != tokens.end(); ++ it)
     {
       bob::visioner::Keypoint keypoint;                        
       object.find(*it, keypoint);

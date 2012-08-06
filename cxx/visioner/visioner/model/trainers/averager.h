@@ -48,7 +48,7 @@ namespace bob { namespace visioner {
       virtual void reset(const param_t& param) { m_param = param; }
 
       // Clone the object
-      virtual rtrainer_t clone() const { return rtrainer_t(new Averager(m_param)); }
+      virtual boost::shared_ptr<Trainer> clone() const { return boost::shared_ptr<Trainer>(new Averager(m_param)); }
 
       // Train a model using the given training and validation samples
       virtual bool train(	

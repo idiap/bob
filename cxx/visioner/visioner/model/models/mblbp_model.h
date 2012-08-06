@@ -25,6 +25,8 @@
 #ifndef BOB_VISIONER_MB_LBP_MODEL_H
 #define BOB_VISIONER_MB_LBP_MODEL_H
 
+#include "core/logging.h"
+
 #include "visioner/model/models/ii_model.h"
 #include "visioner/vision/mb_xlbp.h"
 #include "visioner/vision/mb_xmct.h"
@@ -36,13 +38,13 @@ namespace bob { namespace visioner {
   //      All codes are used.
   /////////////////////////////////////////////////////////////////////////////////////////
 
-  static const string_t LBPNames[] = { "LBP",
+  static const std::string LBPNames[] = { "LBP",
     "mLBP", 
     "tLBP", 
     "dLBP",
     "MCT"};
 
-  template <index_t (*TLBPOp) (const igreyimage_t&, int, int, int, int), int TNameIndex, int NFeatureValues> class MBxxxLBPModel : public IIModel {
+  template <uint64_t (*TLBPOp) (const Matrix<uint32_t>&, int, int, int, int), int TNameIndex, int NFeatureValues> class MBxxxLBPModel : public IIModel {
 
     public:
 
@@ -56,7 +58,7 @@ namespace bob { namespace visioner {
       virtual ~MBxxxLBPModel() {}
 
       // Clone the object
-      virtual rmodel_t clone() const { return rmodel_t(new MBxxxLBPModel(*this)); }
+      virtual boost::shared_ptr<Model> clone() const { return boost::shared_ptr<Model>(new MBxxxLBPModel(*this)); }
 
       // Reset to new parameters
       virtual void reset(const param_t& param)
@@ -72,25 +74,25 @@ namespace bob { namespace visioner {
       }
 
       // Compute the value of the feature <f> at the (x, y) position
-      virtual index_t get(index_t f, int x, int y) const
+      virtual uint64_t get(uint64_t f, int x, int y) const
       {
         const mb_t& mb = m_mbs[f];
         return TLBPOp(m_iimage, x + mb.m_dx, y + mb.m_dy, mb.m_cx, mb.m_cy);
       }
 
       // Access functions
-      virtual index_t n_features() const { return m_mbs.size(); }
-      virtual index_t n_fvalues() const { return NFeatureValues; }
+      virtual uint64_t n_features() const { return m_mbs.size(); }
+      virtual uint64_t n_fvalues() const { return NFeatureValues; }
 
       // Describe a feature
-      virtual string_t describe(index_t f) const
+      virtual std::string describe(uint64_t f) const
       {
         const mb_t& mb = m_mbs[f];
         return  "MB-" + LBPNames[TNameIndex] +
-          " size "    +   boost::lexical_cast<string_t>((int)mb.m_cx * 3) + "x"
-          +   boost::lexical_cast<string_t>((int)mb.m_cy * 3) + " @("
-          +   boost::lexical_cast<string_t>((int)mb.m_dx) + ", "
-          +   boost::lexical_cast<string_t>((int)mb.m_dy) + ")";
+          " size "    +   boost::lexical_cast<std::string>((int)mb.m_cx * 3) + "x"
+          +   boost::lexical_cast<std::string>((int)mb.m_cy * 3) + " @("
+          +   boost::lexical_cast<std::string>((int)mb.m_dx) + ", "
+          +   boost::lexical_cast<std::string>((int)mb.m_dy) + ")";
       }
 
       // Save/load specific (feature) information
@@ -113,14 +115,13 @@ namespace bob { namespace visioner {
 
     public:
 
-      /////////////////////////////////////////////////////////////////////////////////////////
-      // Multi-block feature parametrization:
-      //	(dx, dy) displacement in the SW
-      //	(cx, cy) cell size
-      /////////////////////////////////////////////////////////////////////////////////////////
+      /**
+       * Multi-block feature parametrization:
+       *	(dx, dy) displacement in the SW
+       *	(cx, cy) cell size
+       */
+      struct mb_t {
 
-      struct mb_t
-      {
         mb_t(int dx = 0, int dy = 0, int cx = 0, int cy = 0)
           :	m_dx(dx), m_dy(dy), m_cx(cx), m_cy(cy)
         {
@@ -136,9 +137,9 @@ namespace bob { namespace visioner {
             ar & m_cy;
           }
 
-        u_int8_t	m_dx, m_dy, m_cx, m_cy;
+        uint8_t	m_dx, m_dy, m_cx, m_cy;
+
       };
-      typedef std::vector<mb_t>	mbs_t;
 
     private:
 
@@ -187,14 +188,14 @@ namespace bob { namespace visioner {
 
         bob::core::info << "Projecting the selected features using the <" << m_delta << ">px resolution." << std::endl;
 
-        const indices_t features = IIModel::features();                         
-        mbs_t old_mbs = m_mbs;
+        const std::vector<uint64_t> features = IIModel::features();                         
+        std::vector<mb_t> old_mbs = m_mbs;
 
         // Project each feature ...
         m_mbs.clear();
-        for (index_t ff = 0; ff < features.size(); ff ++)
+        for (uint64_t ff = 0; ff < features.size(); ff ++)
         {
-          const index_t f = features[ff];
+          const uint64_t f = features[ff];
           const mb_t& mb = old_mbs[f];
 
           const int min_cx = (int)mb.m_cx - m_delta, max_cx = min_cx + 2 * m_delta;
@@ -214,7 +215,7 @@ namespace bob { namespace visioner {
                   cy >= 0 && dy >= 0 && dy + 3 * cy < (int)m_param.m_rows)
               {
                 bool found = false;
-                for (index_t i = 0; i < m_mbs.size() && found == false; i ++)
+                for (uint64_t i = 0; i < m_mbs.size() && found == false; i ++)
                 {
                   found = 
                     (dx == m_mbs[i].m_dx) &&
@@ -239,18 +240,18 @@ namespace bob { namespace visioner {
     protected:
 
       // Attributes
-      mbs_t           m_mbs;		// MB-features
-      index_t         m_delta;        // Projection level
+      std::vector<mb_t>           m_mbs;		// MB-features
+      uint64_t         m_delta;        // Projection level
   };
 
   // xLBP feature pools        
-  typedef MBxxxLBPModel<mb_lbp<igrey_t, index_t>, 0, 256>                 MBLBPModel;
-  typedef MBxxxLBPModel<mb_mlbp<igrey_t, index_t>, 1, 256>                MBmLBPModel;        
-  typedef MBxxxLBPModel<mb_tlbp<igrey_t, index_t>, 2, 256>                MBtLBPModel;
-  typedef MBxxxLBPModel<mb_dlbp<igrey_t, index_t>, 3, 256>                MBdLBPModel;                
+  typedef MBxxxLBPModel<mb_lbp<uint32_t, uint64_t>, 0, 256>                 MBLBPModel;
+  typedef MBxxxLBPModel<mb_mlbp<uint32_t, uint64_t>, 1, 256>                MBmLBPModel;        
+  typedef MBxxxLBPModel<mb_tlbp<uint32_t, uint64_t>, 2, 256>                MBtLBPModel;
+  typedef MBxxxLBPModel<mb_dlbp<uint32_t, uint64_t>, 3, 256>                MBdLBPModel;                
 
   // MCT feature pool
-  typedef MBxxxLBPModel<mb_mct<igrey_t, 3, 3, index_t>, 4, 512>           MBMCTModel;                
+  typedef MBxxxLBPModel<mb_mct<uint32_t, 3, 3, uint64_t>, 4, 512>           MBMCTModel;                
 
 }}
 

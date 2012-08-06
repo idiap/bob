@@ -27,35 +27,35 @@
 #include "visioner/vision/object.h"
 
 // Parse a .dat CMUProfile ground truth fileb
-bool parse(const bob::visioner::string_t& file) {
+bool parse(const std::string& file) {
   // Load file content
-  bob::visioner::string_t text;
+  std::string text;
   if (bob::visioner::load_file(file, text) == false)
   {
     bob::core::error << "Failed to load <" << file << ">!" << std::endl;
     return false;
   }
 
-  const bob::visioner::strings_t lines = bob::visioner::split(text, "\n");
-  for (bob::visioner::index_t i = 0; i < lines.size(); i ++)
+  const std::vector<std::string> lines = bob::visioner::split(text, "\n");
+  for (uint64_t i = 0; i < lines.size(); i ++)
   {
-    const bob::visioner::strings_t tokens = bob::visioner::split(lines[i], "\t {}");
+    const std::vector<std::string> tokens = bob::visioner::split(lines[i], "\t {}");
     if (tokens.empty() == true)
     {
       continue;
     }
 
-    const bob::visioner::string_t ifile = tokens[0];
-    const bob::visioner::string_t gfile = bob::visioner::basename(ifile) + ".gt";
+    const std::string ifile = tokens[0];
+    const std::string gfile = bob::visioner::basename(ifile) + ".gt";
 
     bob::visioner::Object object("face", "unknown", "unknown");                
-    for (bob::visioner::index_t j = 0; 3 * j < tokens.size() - 3; j ++)
+    for (uint64_t j = 0; 3 * j < tokens.size() - 3; j ++)
     {
-      const bob::visioner::string_t k = tokens[3 * j + 1];
-      const bob::visioner::string_t x = tokens[3 * j + 2];
-      const bob::visioner::string_t y = tokens[3 * j + 3];
+      const std::string k = tokens[3 * j + 1];
+      const std::string x = tokens[3 * j + 2];
+      const std::string y = tokens[3 * j + 3];
 
-      bob::visioner::string_t new_k;
+      std::string new_k;
       if (k == "leye")
       {
         new_k = k;
@@ -90,7 +90,7 @@ bool parse(const bob::visioner::string_t& file) {
       }
     }
 
-    bob::visioner::objects_t objects;
+    std::vector<bob::visioner::Object> objects;
     bob::visioner::Object::load(gfile, objects);
 
     objects.push_back(object);
@@ -103,8 +103,8 @@ bool parse(const bob::visioner::string_t& file) {
 
 int main(int argc, char *argv[]) {	
 
-  const bob::visioner::string_t profile_dat = "testing_profile_ground_truth.dat";
-  const bob::visioner::string_t frontal_dat = "testing_frontal_ground_truth.dat";
+  const std::string profile_dat = "testing_profile_ground_truth.dat";
+  const std::string frontal_dat = "testing_frontal_ground_truth.dat";
 
   parse(profile_dat);
   parse(frontal_dat);
