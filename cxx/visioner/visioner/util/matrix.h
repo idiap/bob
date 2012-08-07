@@ -28,6 +28,7 @@
 #include <vector>
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/vector.hpp>
+#include <blitz/array.h>
 
 #include "visioner/util/iterators.h"
 
@@ -52,14 +53,29 @@ namespace bob { namespace visioner {
           std::copy(data, data+size, m_data.begin());
         }
 
+      // Starts from an existing pointer
+      template <typename U> Matrix(const blitz::Array<U,2>& other)
+        : m_rows(other.extent(0)), m_cols(other.extent(1)) {
+          size_t size = m_rows * m_cols;
+          m_data.resize(size);
+          std::copy(other.data(), other.data()+other.size(), m_data.begin());
+        }
+
       // Assignment operator
+      template <typename U> Matrix<T>& operator=(const Matrix<U>& other) {
+        m_rows = other.rows();
+        m_cols = other.cols();
+        m_data.resize(other.size());
+        std::copy(other.begin(), other.end(), m_data.begin());
+        return *this;
+      }
+
       template <typename U>
-        Matrix<T>& operator=(const Matrix<U>& other)
-        {
+        Matrix<T>& operator=(const blitz::Array<U,2>& other) {
           m_rows = other.rows();
           m_cols = other.cols();
           m_data.resize(other.size());
-          std::copy(other.begin(), other.end(), m_data.begin());
+          std::copy(other.data(), other.data()+other.size(), m_data.begin());
           return *this;
         }
 
