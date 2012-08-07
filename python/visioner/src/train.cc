@@ -30,6 +30,7 @@
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/foreach.hpp>
 
 #include "core/python/ndarray.h"
 
@@ -105,59 +106,47 @@ static boost::shared_ptr<bob::visioner::Model> model_from_path(const std::string
  * Listings of implemented stuff
  */
 static bp::tuple available_losses() {
-  std::vector<std::string> v = bob::visioner::available_losses_list();
   bp::list retval;
-  for (size_t k=0; k<v.size(); ++k) retval.append(v[k]);
+  BOOST_FOREACH(const std::string& s, bob::visioner::available_losses_list()) retval.append(s);
   return bp::tuple(retval);
 }
 
 static bp::tuple available_taggers() {
-  std::vector<std::string> v = bob::visioner::available_taggers_list();
   bp::list retval;
-  for (size_t k=0; k<v.size(); ++k) retval.append(v[k]);
+  BOOST_FOREACH(const std::string& s, bob::visioner::available_taggers_list()) retval.append(s);
   return bp::tuple(retval);
 }
 
 static bp::tuple available_models() {
-  std::vector<std::string> v = bob::visioner::available_models_list();
   bp::list retval;
-  for (size_t k=0; k<v.size(); ++k) retval.append(v[k]);
+  BOOST_FOREACH(const std::string& s, bob::visioner::available_models_list()) retval.append(s);
   return bp::tuple(retval);
 }
 
 static bp::tuple available_trainers() {
-  std::vector<std::string> v = bob::visioner::available_trainers_list();
   bp::list retval;
-  for (size_t k=0; k<v.size(); ++k) retval.append(v[k]);
+  BOOST_FOREACH(const std::string& s, bob::visioner::available_trainers_list()) retval.append(s);
   return bp::tuple(retval);
 }
 
 static bp::tuple available_optimizations() {
-  std::vector<std::string> v = bob::visioner::available_optimizations_list();
   bp::list retval;
-  for (size_t k=0; k<v.size(); ++k) retval.append(v[k]);
+  BOOST_FOREACH(const std::string& s, bob::visioner::available_optimizations_list()) retval.append(s);
   return bp::tuple(retval);
 }
 
 static bp::tuple available_sharings() {
-  std::vector<std::string> v = bob::visioner::available_sharings_list();
   bp::list retval;
-  for (size_t k=0; k<v.size(); ++k) retval.append(v[k]);
+  BOOST_FOREACH(const std::string& s, bob::visioner::available_sharings_list()) retval.append(s);
   return bp::tuple(retval);
 }
 
 static void sampler_load(bob::visioner::Sampler& s, bp::object images,
     bp::object gts) {
-  std::vector<std::string> i;
-  {
-    bp::stl_input_iterator<std::string> begin(images), end;
-    std::copy(begin, end, i.begin());
-  }
-  std::vector<std::string> g;
-  {
-    bp::stl_input_iterator<std::string> begin(gts), end;
-    std::copy(begin, end, g.begin());
-  }
+  bp::stl_input_iterator<const char*> ibegin(images), iend;
+  std::vector<std::string> i(ibegin, iend);
+    bp::stl_input_iterator<const char*> gbegin(gts), gend;
+  std::vector<std::string> g(gbegin, gend);
   s.load(i, g);
 }
 
