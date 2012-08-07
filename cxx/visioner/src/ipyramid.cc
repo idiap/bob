@@ -22,6 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/format.hpp>
+
 #include "visioner/model/ipyramid.h"
 #include "visioner/vision/image.h"
 #include "visioner/vision/integral.h"
@@ -123,17 +125,15 @@ namespace bob { namespace visioner {
   bool ipyramid_t::load(const std::string& ifile, const std::string& gfile)
   {
     Matrix<uint8_t> tmp_image;
-    if (visioner::load(ifile, tmp_image) == false)
-    {
-      return false;
-    }
+    visioner::load(ifile, tmp_image);
 
     // Compute the scalling factors
-    const std::vector<double> scales = scan_scales(
-        m_param.m_rows, m_param.m_cols, tmp_image.rows(), tmp_image.cols(), m_param.m_ds);
-    if (scales.empty())
-    {
-      return false;
+    const std::vector<double> scales = scan_scales(m_param.m_rows, m_param.m_cols, tmp_image.rows(), tmp_image.cols(), m_param.m_ds);
+    if (scales.empty()) {
+      boost::format m("The number of scales for image file '%s' is empty. Relevant parameters are model shape: %d x %d; image shape: %d x %d, sliding windows: %d");
+      m % ifile % m_param.m_rows % m_param.m_cols;
+      m % tmp_image.rows() % tmp_image.cols() % m_param.m_ds;
+      throw std::runtime_error(m.str().c_str());
     }
 
     m_ipscales.resize(scales.size());
@@ -141,10 +141,10 @@ namespace bob { namespace visioner {
     // Load the ground truth and the image
     m_ipscales[0].m_scale = 1.0;
     m_ipscales[0].m_inv_scale = 1.0;
-    if (	visioner::Object::load(gfile, m_ipscales[0].m_objects) == false)
-      //visioner::load(ifile, m_ipscales[0].m_image) == false)
-    {
-      return false;
+    if (visioner::Object::load(gfile, m_ipscales[0].m_objects) == false) {
+      boost::format m("The ground-thruth file '%s' could not be loaded");
+      m % gfile;
+      throw std::runtime_error(m.str().c_str());
     }
     m_ipscales[0].m_image = tmp_image;
     update_ipscale(m_ipscales[0], m_param);

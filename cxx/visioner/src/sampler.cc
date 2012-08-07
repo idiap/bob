@@ -123,10 +123,12 @@ namespace bob { namespace visioner {
 
 #   ifdef BOB_DEBUG
     for (uint64_t iti = 0; iti < n_types(); iti ++) {
-      TDEBUG1("mode [" << type2str() << "] target type [" << iti << "]"
-        << " found in " << m_tcounts[iti] << "/" << n_samples() << " samples.");
+      TDEBUG1("" << type2str() << " sampler] target type '" << iti << "'"
+        << " found in " << m_tcounts[iti] << " of " << n_samples()
+        << " samples.");
     }
 #   endif
+
   }
 
   // Sample the given number of samples (uniformly)

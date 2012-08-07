@@ -2,7 +2,7 @@ PROJECT(visioner-cxx)
 cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
-set(deps "lbfgs;core") #other bob subprojects
+set(deps "lbfgs;io;ip;core") #other bob subprojects
 
 include (${QT_USE_FILE})
 include_directories(SYSTEM ${QT_INCLUDE_DIR})

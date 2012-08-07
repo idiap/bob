@@ -22,6 +22,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/format.hpp>
+
+#include "io/Array.h"
+#include "io/CodecRegistry.h"
+#include "ip/color.h"
+
 #include "visioner/vision/image.h"
 #include "visioner/util/util.h"
 
@@ -33,11 +39,31 @@ namespace bob { namespace visioner {
     return convert(qimage, grays);
   }
 
-  bool load(const std::string& filename, Matrix<uint8_t>& grays)
-  {
-    QImage qimage;
-    return	qimage.load(filename.c_str()) &&
-      load(qimage, grays);
+  bool load(const std::string& filename, Matrix<uint8_t>& grays) {
+    bob::io::Array array(bob::io::open(filename, "", 'r'));
+  
+    if (array.type().dtype != bob::core::array::t_uint8) {
+      boost::format m("The file '%s' does not contain an image coded with unsigned 8-bit integers. The loaded array contains '%s' elements. Presently, there is no code here to handle this condition");
+      m % filename % array.type().item_str();
+      throw std::runtime_error(m.str().c_str());
+    }
+
+    if (array.type().nd == 2) { //it is grayscale
+      grays = array.get<uint8_t, 2>();
+    }
+    else if (array.type().nd == 3) { //it is RGB
+      blitz::Array<uint8_t,3> color = array.get<uint8_t, 3>();
+      blitz::Array<uint8_t,2> grayed(color.extent(1), color.extent(2));
+      bob::ip::rgb_to_gray(color, grayed);
+      grays = grayed;
+    }
+    else {
+      boost::format m("The file '%s' does not contain a grayscale or RGB image. The loaded array contains '%d' dimensions. Presently, there is no code here to handle this condition");
+      m % filename % array.type().nd;
+      throw std::runtime_error(m.str().c_str());
+    }
+
+    return true;
   }
 
   // Scale the image to a specific <scale> of the <src> source image
@@ -48,7 +74,8 @@ namespace bob { namespace visioner {
     const int new_h = (int)(0.5 + scale * src.rows());
 
     QImage qimage = convert(src);
-    return load(qimage.scaled(new_w, new_h, Qt::KeepAspectRatio, Qt::SmoothTransformation), dst);
+    return load(qimage.scaled(new_w, new_h, Qt::KeepAspectRatio, 
+          Qt::SmoothTransformation), dst);
   }
 
   // Convert from <Matrix<uint8_t>> to <QImage>

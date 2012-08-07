@@ -24,6 +24,7 @@
 
 #include <fstream>
 #include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/trim.hpp>
 
 #include "visioner/vision/object.h"
 
@@ -111,6 +112,7 @@ namespace bob { namespace visioner {
     while (is.getline(buff, buff_size))
     {
       std::string sbuff(buff);
+      boost::trim(sbuff);
       std::vector<std::string> tokens;
       boost::split(tokens, sbuff, boost::is_any_of(" "));
 
