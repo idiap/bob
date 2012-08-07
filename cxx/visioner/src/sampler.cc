@@ -79,8 +79,8 @@ namespace bob { namespace visioner {
     // Process each image in the list
     for (uint64_t i = 0; i < ifiles.size(); ++i) {
 
-      TDEBUG1("mode [" << type2str() << "] loading image [" << (i + 1)  
-          << "/" << ifiles.size() << "] ...");
+      TDEBUG1("[" << type2str() << " sampler] loading image "
+        << (i + 1) << " of " << ifiles.size() << "...");
 
       // Load the scaled images ...
       if (ipyramid.load(ifiles[i], gfiles[i]) == false) {
@@ -113,11 +113,11 @@ namespace bob { namespace visioner {
           m_n_samples += new_n_samples;
         }
 
-        //                                // Backgroung image - there is no point in keeping in memory too many scales!
-        //                                if (ip.m_objects.empty() == true)
-        //                                {
-        //                                        is += 2;//ipyramid.size() / 8;
-        //                                }
+        // Backgroung image - there is no point in keeping in memory too many scales!
+        // if (ip.m_objects.empty() == true)
+        // {
+        //         is += 2;//ipyramid.size() / 8;
+        // }
       }
     }
 
