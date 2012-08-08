@@ -36,7 +36,7 @@
 #include "math/linear.h"
 
 /**
- * Evalutes the presumed output of a linear machine through a different path.
+ * Evaluates the presumed output of a linear machine through a different path.
  */
 static blitz::Array<double,1> presumed (const blitz::Array<double,1>& input) {
   blitz::Array<double,1> buffer(bob::core::array::ccopy(input));
