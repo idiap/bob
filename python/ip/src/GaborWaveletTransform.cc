@@ -35,7 +35,7 @@
 
 
 template <class T> 
-static inline blitz::Array<std::complex<double>,2> complex_cast(bob::python::const_ndarray input){
+static inline const blitz::Array<std::complex<double>,2> complex_cast (bob::python::const_ndarray input){
   blitz::Array<T,2> gray(input.type().shape[1],input.type().shape[2]);
   bob::ip::rgb_to_gray(input.bz<T,3>(), gray);
   return bob::core::cast<std::complex<double> >(gray);
@@ -61,7 +61,7 @@ static inline const blitz::Array<std::complex<double>, 2> convert_image(bob::pyt
   }
 }
 
-static inline void transform(bob::ip::GaborKernel& kernel, blitz::Array<std::complex<double>,2>& input, blitz::Array<std::complex<double>,2>& output){
+static inline void transform (bob::ip::GaborKernel& kernel, blitz::Array<std::complex<double>,2>& input, blitz::Array<std::complex<double>,2>& output){
  // perform fft on input image
   bob::sp::FFT2D fft(input.extent(0), input.extent(1));
   fft(input);
@@ -74,21 +74,7 @@ static inline void transform(bob::ip::GaborKernel& kernel, blitz::Array<std::com
   ifft(output);
 }
 
-static boost::python::object gabor_wavelet_transform_1(bob::ip::GaborKernel& kernel, bob::python::const_ndarray input_image){
-  // convert input ndarray to complex blitz array
-  blitz::Array<std::complex<double>,2> input = convert_image(input_image);
-  // allocate output array
-  bob::python::ndarray result(bob::core::array::t_complex128, input.extent(0), input.extent(1));
-  blitz::Array<std::complex<double>,2> output = result.bz<std::complex<double>,2>();
-  
-  // transform input to output
-  transform(kernel, input, output);
-  
-  // return the py_object
-  return result.self();
-}
-
-static void gabor_wavelet_transform_2(bob::ip::GaborKernel& kernel, bob::python::const_ndarray input_image, bob::python::ndarray output_image){
+static void gabor_wavelet_transform_1 (bob::ip::GaborKernel& kernel, bob::python::const_ndarray input_image, bob::python::ndarray output_image){
   // convert input image into complex type
   blitz::Array<std::complex<double>,2> input = convert_image(input_image);
   // cast output image to complex type
@@ -97,14 +83,47 @@ static void gabor_wavelet_transform_2(bob::ip::GaborKernel& kernel, bob::python:
   transform(kernel, input, output);
 }
 
-static void perform_gwt (bob::ip::GaborWaveletTransform& gwt, bob::python::const_ndarray input_image, bob::python::ndarray output_trafo_image){
-  const blitz::Array<std::complex<double>,2> image = input_image.bz<std::complex<double>,2>();
+static blitz::Array<std::complex<double>,2> gabor_wavelet_transform_2 (bob::ip::GaborKernel& kernel, bob::python::const_ndarray input_image){
+  // convert input ndarray to complex blitz array
+  blitz::Array<std::complex<double>,2> input = convert_image(input_image);
+  // allocate output array
+  blitz::Array<std::complex<double>,2> output(input.extent(0), input.extent(1));
+  
+  // transform input to output
+  transform(kernel, input, output);
+  
+  // return the nd array
+  return output;
+}
+
+
+static blitz::Array<std::complex<double>,3> empty_trafo_image (bob::ip::GaborWaveletTransform& gwt, bob::python::const_ndarray input_image){
+  return blitz::Array<std::complex<double>,3>(gwt.numberOfKernels(), input_image.type().nd-2, input_image.type().nd-1);
+}
+
+static void perform_gwt_1 (bob::ip::GaborWaveletTransform& gwt, bob::python::const_ndarray input_image, bob::python::ndarray output_trafo_image){
+  const blitz::Array<std::complex<double>,2>& image = convert_image(input_image);
   blitz::Array<std::complex<double>,3> trafo_image = output_trafo_image.bz<std::complex<double>,3>();
   gwt.performGWT(image, trafo_image);
 }
 
-static void compute_jet_image(bob::ip::GaborWaveletTransform& gwt, bob::python::const_ndarray input_image, bob::python::ndarray output_jet_image, bool normalized){
-  const blitz::Array<std::complex<double>,2> image = input_image.bz<std::complex<double>,2>();
+static blitz::Array<std::complex<double>,3> perform_gwt_2 (bob::ip::GaborWaveletTransform& gwt, bob::python::const_ndarray input_image){
+  const blitz::Array<std::complex<double>,2>& image = convert_image(input_image);
+  blitz::Array<std::complex<double>,3> trafo_image(gwt.numberOfKernels(), image.shape()[0], image.shape()[1]);
+  gwt.performGWT(image, trafo_image);
+  return trafo_image;
+}
+
+static bob::python::ndarray empty_jet_image(bob::ip::GaborWaveletTransform& gwt, bob::python::const_ndarray input_image, bool include_phases){
+  const blitz::Array<std::complex<double>,2>& image = convert_image(input_image);
+  if (include_phases)
+    return bob::python::ndarray (bob::core::array::t_float64, image.extent(0), image.extent(1), 2, (int)gwt.numberOfKernels());
+  else
+    return bob::python::ndarray (bob::core::array::t_float64, image.extent(0), image.extent(1), (int)gwt.numberOfKernels());
+}
+
+static void compute_jets_1(bob::ip::GaborWaveletTransform& gwt, bob::python::const_ndarray input_image, bob::python::ndarray output_jet_image, bool normalized){
+  const blitz::Array<std::complex<double>,2>& image = convert_image(input_image);
 
   if (output_jet_image.type().nd == 3){
     // compute jet image with absolute values only
@@ -115,6 +134,13 @@ static void compute_jet_image(bob::ip::GaborWaveletTransform& gwt, bob::python::
     gwt.computeJetImage(image, jet_image, normalized);
   } else throw bob::core::UnexpectedShapeError();
 }
+
+static bob::python::ndarray compute_jets_2(bob::ip::GaborWaveletTransform& gwt, bob::python::const_ndarray input_image, bool include_phases, bool normalized){
+  bob::python::ndarray output_jet_image = empty_jet_image(gwt, input_image, include_phases);
+  compute_jets_1(gwt, input_image, output_jet_image, normalized);
+  return output_jet_image;
+}
+
 
 static void normalize_gabor_jet(bob::python::ndarray gabor_jet){
   if (gabor_jet.type().nd == 1){
@@ -150,14 +176,14 @@ void bind_ip_gabor_wavelet_transform() {
   
   .def(
     "__call__",
-    &gabor_wavelet_transform_1,
+    &gabor_wavelet_transform_2,
     (boost::python::arg("self"), boost::python::arg("input_image")),
     """This function Gabor-filters the given input_image, which can be of any type. The output image is of complex type. It will be automatically generated and returned."""
   )
 
   .def(
     "__call__",
-    &gabor_wavelet_transform_2,
+    &gabor_wavelet_transform_1,
     (boost::python::arg("self"), boost::python::arg("input_image"), boost::python::arg("output_image")),
     """This function Gabor-filters the given input_image, which can be of any type, to the output image. The output image needs to have the same resolution as the input image and must be of complex type."""
   );
@@ -217,17 +243,59 @@ void bind_ip_gabor_wavelet_transform() {
   )
 
   .def(
+    "empty_trafo_image",
+    &empty_trafo_image,
+    (boost::python::arg("self"), boost::python::arg("input_image")),
+    "This function creates an empty trafo image for the given input image. Use this function to generate the trafo image in the correct size and with the correct data type. In case you have to transform multiple images of the same size, this trafo image can be reused."
+  )
+
+  .def(
     "perform_gwt",
-    &perform_gwt,
+    &perform_gwt_1,
     (boost::python::arg("self"), boost::python::arg("input_image"), boost::python::arg("output_trafo_image")),
     "Performs a Gabor wavelet transform and fills the given Gabor wavelet transformed image (output_trafo_image)"
   )
 
   .def(
-    "compute_jet_image",
-    &compute_jet_image,
+    "perform_gwt",
+    &perform_gwt_2,
+    (boost::python::arg("self"), boost::python::arg("input_image")),
+    "Performs a Gabor wavelet transform and returns a Gabor wavelet transformed image"
+  )
+
+  .def(
+    "__call__",
+    &perform_gwt_1,
+    (boost::python::arg("self"), boost::python::arg("input_image"), boost::python::arg("output_trafo_image")),
+    "Performs a Gabor wavelet transform and fills the given Gabor wavelet transformed image (output_trafo_image)"
+   )
+
+  .def(
+    "__call__",
+    &perform_gwt_2,
+    (boost::python::arg("self"), boost::python::arg("input_image")),
+    "Performs a Gabor wavelet transform and returns a Gabor wavelet transformed image"
+  )
+
+  .def(
+    "empty_jet_image",
+    &empty_jet_image,
+    (boost::python::arg("self"), boost::python::arg("input_image"), boost::python::arg("include_phases")=true),
+    "This function creates an empty jet image (with or without Gabor phases) for the given input image. Use this function to generate the jet image in the correct size and with the correct data type. In case you have to transform multiple images of the same size, this jet image can be reused."
+  )
+
+  .def(
+    "compute_jets",
+    &compute_jets_1,
     (boost::python::arg("self"), boost::python::arg("input_image"), boost::python::arg("output_jet_image"), boost::python::arg("normalized")=true),
-    "Performs a Gabor wavelet transform and fills given image of Gabor jets. If the normalized parameter is set to True (the default), the absolute parts of the Gabor jets are normalized to unit Euclidean lenght."
+    "Performs a Gabor wavelet transform and fills given image of Gabor jets. If the normalized parameter is set to True (the default), the absolute parts of the Gabor jets are normalized to unit Euclidean length."
+  )
+
+  .def(
+    "compute_jets",
+    &compute_jets_2,
+    (boost::python::arg("self"), boost::python::arg("input_image"), boost::python::arg("include_phases")=true, boost::python::arg("normalized")=true),
+    "Performs a Gabor wavelet transform and returns the image of Gabor jets, with or without Gabor phases. If the normalized parameter is set to True (the default), the absolute parts of the Gabor jets are normalized to unit Euclidean length."
   );
 
   boost::python::def(
