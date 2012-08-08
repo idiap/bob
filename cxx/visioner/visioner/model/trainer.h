@@ -44,9 +44,14 @@ namespace bob { namespace visioner {
       // Clone the object
       virtual boost::shared_ptr<Trainer> clone() const = 0;
 
-      // Train a model using the given training and validation samples
+      /**
+       * Train a model using the given training and validation samples. The
+       * number of threads control if the training will be executed on the
+       * current thread (zero) or in separate threads (one or more), what can
+       * considerably speed it up.
+       */
       virtual bool train(const Sampler& t_sampler, const Sampler& v_sampler, 
-          Model& model) = 0;
+          Model& model, size_t threads) = 0;
   };
 
 }}

@@ -41,29 +41,39 @@ namespace bob { namespace visioner {
 
     public:
 
-      // Constructor
+      /**
+       * Builds a new trainer using TaylorBoost that will train a new model
+       * with the given number of threads.
+       */
       TaylorBooster(const param_t& param = param_t());
 
       // Destructor
       virtual ~TaylorBooster() {}
 
       // Reset to new parameters
-      virtual void reset(const param_t& param) { m_param = param; }
+      virtual void reset(const param_t& param) 
+      { m_param = param; }
 
       // Clone the object
       virtual boost::shared_ptr<Trainer> clone() const {
         return boost::shared_ptr<Trainer>(new TaylorBooster(m_param)); 
       }
 
-      // Train a model using the given training and validation samples
-      virtual bool train(const Sampler& t_sampler, 
-          const Sampler& v_sampler, Model& model);
+      /**
+       * Trains a model using the given training and validation samples. The
+       * number of threads control if the training will be executed on the
+       * current thread (zero) or in separate threads (one or more), what can
+       * considerably speed it up.
+       */
+      virtual bool train(const Sampler& t_sampler, const Sampler& v_sampler,
+          Model& model, size_t threads=0);
 
     private:
 
       // Train a model
       bool train(const DataSet& t_data, const DataSet& v_data, 
-          const Model& model, Generalizer<std::vector<std::vector<LUT> > >& gen) const;
+          const Model& model, Generalizer<std::vector<std::vector<LUT> > >& gen,
+          size_t threads) const;
 
       void train(const boost::shared_ptr<LUTProblem>& t_lp, const boost::shared_ptr<LUTProblem>& v_lp, const std::string& base_description, const Model& model, Generalizer<std::vector<std::vector<LUT> > >& gen) const;
 

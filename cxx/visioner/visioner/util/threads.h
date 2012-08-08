@@ -34,81 +34,91 @@
 namespace bob { namespace visioner {
 
   // Split some objects to process using multiple threads
-  void thread_split(uint64_t n_objects, uint64_t* sbegins, uint64_t* sends);
+  void thread_split(uint64_t n_objects, uint64_t* sbegins, uint64_t* sends,
+      size_t num_of_threads);
 
   // Split a loop computation of the given size using multiple threads
   // NB: Stateless threads: op(<begin, end>)
-  template <typename TOp> void thread_loop(TOp op, uint64_t size) {
-    uint64_t N_PROCESSORS = boost::thread::hardware_concurrency();
-    boost::shared_array<boost::thread> threads(new boost::thread[N_PROCESSORS]);
-    boost::shared_array<uint64_t> th_begins(new uint64_t[N_PROCESSORS]);
-    boost::shared_array<uint64_t> th_ends(new uint64_t[N_PROCESSORS]);
+  template <typename TOp> void thread_loop(TOp op, uint64_t size,
+      size_t num_of_threads=boost::thread::hardware_concurrency()) {
+    
+    boost::shared_array<boost::thread> threads(new boost::thread[num_of_threads]);
+    boost::shared_array<uint64_t> th_begins(new uint64_t[num_of_threads]);
+    boost::shared_array<uint64_t> th_ends(new uint64_t[num_of_threads]);
 
-    thread_split(size, th_begins.get(), th_ends.get());		
-    for (uint64_t ith = 0; ith < N_PROCESSORS; ith ++) {
+    thread_split(size, th_begins.get(), th_ends.get(), num_of_threads);		
+    for (uint64_t ith = 0; ith < num_of_threads; ith ++) {
       threads[ith] = boost::thread(boost::bind(op, std::pair<uint64_t, uint64_t>(th_begins[ith], th_ends[ith])));
     }
-    for (uint64_t ith = 0; ith < N_PROCESSORS; ith ++) {
+
+    for (uint64_t ith = 0; ith < num_of_threads; ith ++) {
       threads[ith].join();
     }
+
   }
 
   // Split a loop computation of the given size using multiple threads
   // NB: Stateless threads: op(thread_index, <begin, end>)
-  template <typename TOp> void thread_iloop(TOp op, uint64_t size) {
-    uint64_t N_PROCESSORS = boost::thread::hardware_concurrency();
-    boost::shared_array<boost::thread> threads(new boost::thread[N_PROCESSORS]);
-    boost::shared_array<uint64_t> th_begins(new uint64_t[N_PROCESSORS]);
-    boost::shared_array<uint64_t> th_ends(new uint64_t[N_PROCESSORS]);
+  template <typename TOp> void thread_iloop(TOp op, uint64_t size,
+      size_t num_of_threads=boost::thread::hardware_concurrency()) {
 
-    thread_split(size, th_begins.get(), th_ends.get());		
-    for (uint64_t ith = 0; ith < N_PROCESSORS; ith ++) {
+    boost::shared_array<boost::thread> threads(new boost::thread[num_of_threads]);
+    boost::shared_array<uint64_t> th_begins(new uint64_t[num_of_threads]);
+    boost::shared_array<uint64_t> th_ends(new uint64_t[num_of_threads]);
+
+    thread_split(size, th_begins.get(), th_ends.get(), num_of_threads);		
+    for (uint64_t ith = 0; ith < num_of_threads; ith ++) {
       threads[ith] = boost::thread(boost::bind(op, ith, std::pair<uint64_t, uint64_t>(th_begins[ith], th_ends[ith])));
     }
-    for (uint64_t ith = 0; ith < N_PROCESSORS; ith ++) {
+
+    for (uint64_t ith = 0; ith < num_of_threads; ith ++) {
       threads[ith].join();
     }
+
   }
 
   // Split a loop computation of the given size using multiple threads
   // NB: State threads: op(<begin, end>, result&)
-  template <typename TOp, typename TResult> void thread_loop(TOp op, uint64_t size, std::vector<TResult>& results) {
-    uint64_t N_PROCESSORS = boost::thread::hardware_concurrency();
-    boost::shared_array<boost::thread> threads(new boost::thread[N_PROCESSORS]);
-    boost::shared_array<uint64_t> th_begins(new uint64_t[N_PROCESSORS]);
-    boost::shared_array<uint64_t> th_ends(new uint64_t[N_PROCESSORS]);
+  template <typename TOp, typename TResult> void thread_loop(TOp op, uint64_t size, std::vector<TResult>& results, size_t num_of_threads=boost::thread::hardware_concurrency()) {
 
-    results.resize(N_PROCESSORS);
+    boost::shared_array<boost::thread> threads(new boost::thread[num_of_threads]);
+    boost::shared_array<uint64_t> th_begins(new uint64_t[num_of_threads]);
+    boost::shared_array<uint64_t> th_ends(new uint64_t[num_of_threads]);
 
-    thread_split(size, th_begins.get(), th_ends.get());
-    for (uint64_t ith = 0; ith < N_PROCESSORS; ith ++) {
+    results.resize(num_of_threads);
+
+    thread_split(size, th_begins.get(), th_ends.get(), num_of_threads);
+    for (uint64_t ith = 0; ith < num_of_threads; ith ++) {
       threads[ith] = boost::thread(boost::bind(op, std::pair<uint64_t, uint64_t>(th_begins[ith], th_ends[ith]), boost::ref(results[ith])));
     }
-    for (uint64_t ith = 0; ith < N_PROCESSORS; ith ++) {
+
+    for (uint64_t ith = 0; ith < num_of_threads; ith ++) {
       threads[ith].join();
     }
+
   }
 
   // Split a loop computation of the given size using multiple threads
   // NB: State threads: op(thread_index, <begin, end>, result&)
-  template <typename TOp, typename TResult> void thread_iloop(TOp op, uint64_t size, std::vector<TResult>& results) {
-    uint64_t N_PROCESSORS = boost::thread::hardware_concurrency();
-    boost::shared_array<boost::thread> threads(new boost::thread[N_PROCESSORS]);
-    boost::shared_array<uint64_t> th_begins(new uint64_t[N_PROCESSORS]);
-    boost::shared_array<uint64_t> th_ends(new uint64_t[N_PROCESSORS]);
+  template <typename TOp, typename TResult> void thread_iloop(TOp op, uint64_t size, std::vector<TResult>& results, size_t num_of_threads=boost::thread::hardware_concurrency()) {
 
-    results.resize(N_PROCESSORS);
+    boost::shared_array<boost::thread> threads(new boost::thread[num_of_threads]);
+    boost::shared_array<uint64_t> th_begins(new uint64_t[num_of_threads]);
+    boost::shared_array<uint64_t> th_ends(new uint64_t[num_of_threads]);
 
-    thread_split(size, th_begins.get(), th_ends.get());
-    for (uint64_t ith = 0; ith < N_PROCESSORS; ith ++)
-    {
+    results.resize(num_of_threads);
+
+    thread_split(size, th_begins.get(), th_ends.get(), num_of_threads);
+    for (uint64_t ith = 0; ith < num_of_threads; ith ++) {
       threads[ith] = boost::thread(
           boost::bind(op, ith, std::pair<uint64_t, uint64_t>(th_begins[ith], th_ends[ith]), 
             boost::ref(results[ith])));
     }
-    for (uint64_t ith = 0; ith < N_PROCESSORS; ith ++) {
+
+    for (uint64_t ith = 0; ith < num_of_threads; ith ++) {
       threads[ith].join();
     }
+
   }
 
 }}

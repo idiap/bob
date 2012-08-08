@@ -39,7 +39,7 @@ namespace bob { namespace visioner {
   // Train a model using the given training and validation samples
   bool Averager::train(	
       const Sampler& t_sampler, const Sampler&,
-      Model& model)
+      Model& model, size_t threads)
   {
     Timer timer;
 
@@ -47,10 +47,10 @@ namespace bob { namespace visioner {
     std::vector<uint64_t> t_samples;                
     DataSet t_data;
 
-    t_sampler.sample(m_param.m_train_samples, t_samples);
+    t_sampler.sample(m_param.m_train_samples, t_samples, threads);
     std::sort(t_samples.begin(), t_samples.end());
 
-    t_sampler.map(t_samples, model, t_data);
+    t_sampler.map(t_samples, model, t_data, threads);
 
     bob::core::info << "timing: sampling ~ " << timer.elapsed() << "." << std::endl;
 

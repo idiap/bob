@@ -39,7 +39,7 @@ namespace bob { namespace visioner {
     public:
 
       // Constructor
-      LUTProblemEPT(const DataSet& data, const param_t& param);
+      LUTProblemEPT(const DataSet& data, const param_t& param, size_t threads);
 
       // Destructor
       virtual ~LUTProblemEPT() {}
@@ -84,6 +84,7 @@ namespace bob { namespace visioner {
       Matrix<double>            m_grad;         // Loss gradients
 
       Matrix<double>            m_fldeltas;     // (feature, output) -> local loss decrease
+
   };	
 
 }}

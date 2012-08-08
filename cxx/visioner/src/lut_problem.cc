@@ -23,6 +23,7 @@
  */
 
 #include <numeric>
+#include <omp.h>
 
 #include "core/logging.h"
 #include "lbfgs/lbfgs.h"
@@ -49,8 +50,8 @@ namespace bob { namespace visioner {
 
   // Constructor
   LUTProblem::LUTProblem(
-      const DataSet& data, const param_t& param)
-    :       m_data(data), 
+      const DataSet& data, const param_t& param, size_t threads)
+    : m_data(data), 
     m_param(param),
 
     m_rloss(make_loss(param)),
@@ -65,7 +66,9 @@ namespace bob { namespace visioner {
     m_wscores(n_samples(), n_outputs()),
     m_cscores(n_samples(), n_outputs()),
 
-    m_umasks(n_features(), n_entries(), 0.0)
+    m_umasks(n_features(), n_entries(), 0.0),
+
+    m_threads(threads)
     {
       std::vector<double> counts(n_entries());
       std::vector<std::pair<double, uint64_t> > stats(n_entries());
@@ -106,6 +109,7 @@ namespace bob { namespace visioner {
   // Update predictions
   void LUTProblem::update_scores(const std::vector<LUT>& luts)
   {
+    omp_set_num_threads(this->m_threads);
 # pragma omp parallel for
     for (uint64_t s = 0; s < n_samples(); s ++)
     {
@@ -121,6 +125,7 @@ namespace bob { namespace visioner {
   // Update current scores
   void LUTProblem::update_cscores(const double* x)
   {
+    omp_set_num_threads(this->m_threads);
 # pragma omp parallel for
     for (uint64_t s = 0; s < n_samples(); s ++)
     {
@@ -135,6 +140,7 @@ namespace bob { namespace visioner {
   bool LUTProblem::line_search()
   {
     // Buffer the weak learner scores
+    omp_set_num_threads(this->m_threads);
 # pragma omp parallel for
     for (uint64_t s = 0; s < n_samples(); s ++)
     {
@@ -164,7 +170,9 @@ namespace bob { namespace visioner {
     const int ret = lbfgs(n_outputs(), x, fx, lbfgs_wrapper::linesearch,
         NULL, (void*)this, &param);
 
+#   ifdef BOB_DEBUG
     const double min_x = *std::min_element(x, x + n_outputs());
+#   endif
     const double max_x = *std::max_element(x, x + n_outputs());
 
     const bool ok = (max_x > std::numeric_limits<double>::epsilon()) &&
@@ -187,8 +195,7 @@ namespace bob { namespace visioner {
       }                 
     }
 
-    bob::core::info << "line-search step = [" << min_x << " - " << max_x << "]"
-      << std::endl;
+    TDEBUG1("line-search step = [" << min_x << " - " << max_x << "]");
 
     lbfgs_free(x);
     lbfgs_free(fx);

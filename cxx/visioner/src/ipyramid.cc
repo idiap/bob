@@ -138,7 +138,7 @@ namespace bob { namespace visioner {
 
     m_ipscales.resize(scales.size());
 
-    // Load the ground truth and the image
+    // Load the ground truth and the image to the top of the pyramid
     m_ipscales[0].m_scale = 1.0;
     m_ipscales[0].m_inv_scale = 1.0;
     if (visioner::Object::load(gfile, m_ipscales[0].m_objects) == false) {
@@ -175,12 +175,9 @@ namespace bob { namespace visioner {
     m_ipscales.clear();
 
     // Compute the scalling factors
-    const std::vector<double> scales = scan_scales(
-        m_param.m_rows, m_param.m_cols, ipscale.rows(), ipscale.cols(), m_param.m_ds);
-    if (scales.empty())
-    {
-      return false;                        
-    }
+    const std::vector<double> scales = scan_scales(m_param.m_rows, m_param.m_cols, ipscale.rows(), ipscale.cols(), m_param.m_ds);
+
+    if (scales.empty()) return false;
 
     m_ipscales.resize(scales.size());
 
@@ -192,15 +189,13 @@ namespace bob { namespace visioner {
 
     // Build the scaled versions of the original image
     const ipscale_t& src = m_ipscales[0];
-    for (uint64_t i = 1; i < scales.size(); i ++)
-    {
+    for (uint64_t i = 1; i < scales.size(); i ++) {
       ipscale_t& dst = m_ipscales[i];
       src.scale(scales[i], dst);
       update_ipscale(dst, m_param);
 
-      if (	dst.m_scan_min_x >= dst.m_scan_max_x ||
-          dst.m_scan_min_y >= dst.m_scan_max_y)
-      {
+      if (dst.m_scan_min_x >= dst.m_scan_max_x ||
+          dst.m_scan_min_y >= dst.m_scan_max_y) {
         m_ipscales.erase(m_ipscales.begin() + i, m_ipscales.end());
         break;
       }
@@ -210,19 +205,15 @@ namespace bob { namespace visioner {
     return true;
   }
 
-  // Loads scaled versions of an image and its ground truth
+  // Loads scaled versions of an image without its ground-thruth
   bool ipyramid_t::load(const uint8_t* image, uint64_t rows, uint64_t cols)
   {
     //AA: no simple way not to have a copy here...
     Matrix<uint8_t> tmp_image(rows, cols, image);
 
     // Compute the scalling factors
-    const std::vector<double> scales = scan_scales(
-        m_param.m_rows, m_param.m_cols, tmp_image.rows(), tmp_image.cols(), m_param.m_ds);
-    if (scales.empty())
-    {
-      return false;
-    }
+    const std::vector<double> scales = scan_scales(m_param.m_rows, m_param.m_cols, tmp_image.rows(), tmp_image.cols(), m_param.m_ds);
+    if (scales.empty()) return false;
 
     m_ipscales.resize(scales.size());
 

@@ -32,17 +32,28 @@
 namespace bob { namespace visioner {
 
   /**
-   * Pyramid of scaled images.
+   * A single scaled-image inside a pyramid of scaled images, @see
+   * bob::visioner::ipyramid_t
    */
   struct ipscale_t {
 
     public: //api
 
       // Constructor
-      ipscale_t() :	m_scale(1.0), m_inv_scale(1.0),
-        m_scan_dx(1), m_scan_dy(1), m_scan_min_x(0), m_scan_max_x(0),
-        m_scan_min_y(0), m_scan_max_y(0), m_scan_w(0), m_scan_h(0),
-        m_scan_o_w(0), m_scan_o_h(0) {			}
+      ipscale_t():
+        m_scale(1.0), 
+        m_inv_scale(1.0),
+        m_scan_dx(1), 
+        m_scan_dy(1), 
+        m_scan_min_x(0), 
+        m_scan_max_x(0),
+        m_scan_min_y(0), 
+        m_scan_max_y(0), 
+        m_scan_w(0), 
+        m_scan_h(0),
+        m_scan_o_w(0), 
+        m_scan_o_h(0) {
+        }
 
       // Access functions
       uint64_t rows() const { return m_image.rows(); }
@@ -67,6 +78,9 @@ namespace bob { namespace visioner {
       uint64_t		m_scan_o_w, m_scan_o_h;		//	and at the original scale
   };
 
+  /**
+   * A pyramid of scaled images.
+   */
   struct ipyramid_t : public Parametrizable {
 
     public:

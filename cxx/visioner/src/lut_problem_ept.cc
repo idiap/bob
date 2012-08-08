@@ -23,6 +23,7 @@
  */
 
 #include <numeric>
+#include <omp.h>
 
 #include "visioner/util/threads.h"
 #include "visioner/model/trainers/lutproblems/lut_problem_ept.h"
@@ -30,9 +31,9 @@
 namespace bob { namespace visioner {
 
   // Constructor
-  LUTProblemEPT::LUTProblemEPT(const DataSet& data, const param_t& param)
-    :       LUTProblem(data, param),
-    m_values(n_samples())
+  LUTProblemEPT::LUTProblemEPT(const DataSet& data, const param_t& param,
+      size_t threads)
+    : LUTProblem(data, param, threads), m_values(n_samples())
   {                
   }
 
@@ -53,6 +54,7 @@ namespace bob { namespace visioner {
     m_grad.resize(n_samples(), n_outputs());
 
     // Compute the loss value + gradient
+    omp_set_num_threads(this->m_threads);
 # pragma omp parallel for
     for (uint64_t s = 0; s < n_samples(); s ++)
     {
@@ -71,6 +73,7 @@ namespace bob { namespace visioner {
   void LUTProblemEPT::update_loss(const Matrix<double>& scores)
   {
     // Compute the loss value
+    omp_set_num_threads(this->m_threads);
 # pragma omp parallel for
     for (uint64_t s = 0; s < n_samples(); s ++)
     {
@@ -130,9 +133,13 @@ namespace bob { namespace visioner {
     m_fldeltas.fill(0.0);
 
     // Split the computation
-    thread_loop(
-        boost::bind(&LUTProblemEPT::select, this, boost::lambda::_1),
-        n_features());
+    if (!m_threads) {
+      select(std::make_pair<uint64_t,uint64_t>(0, n_features()));
+    }
+    else {
+      thread_loop(boost::bind(&LUTProblemEPT::select, this, boost::lambda::_1),
+          n_features(), m_threads);
+    }
 
     // Decision: select the feature(s)
     switch (m_sharing)

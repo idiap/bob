@@ -8,19 +8,22 @@
  * Bob coding standards and structure.
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include <boost/format.hpp>
+#include <boost/thread.hpp>
 
 #include "core/logging.h"
 
@@ -39,11 +42,12 @@ namespace bob { namespace visioner {
 
   // Train a model using the given training and validation samples
   bool TaylorBooster::train(
-      const Sampler& t_sampler, const Sampler& v_sampler, Model& model)
+      const Sampler& t_sampler, const Sampler& v_sampler, Model& model,
+      size_t threads)
   {
     const uint64_t n_boots = m_param.m_bootstraps;
     const uint64_t t_b_n_samples = m_param.m_train_samples * inverse(n_boots + 1);
-    const uint64_t v_n_samples = m_param.m_valid_samples;  
+    const uint64_t v_n_samples = m_param.m_valid_samples;
     const uint64_t b_n_rounds = std::max((uint64_t)1, m_param.m_rounds >> n_boots);
 
     std::vector<uint64_t> t_samples, t_b_samples, v_samples;
@@ -53,38 +57,38 @@ namespace bob { namespace visioner {
 
     // Bootstrap the training samples
     for (uint64_t b = 0; b <= n_boots; b ++)
-    {                
+    {
       // Sample training data (first uniformly and then bootstrapped)
       //      & validation data (always uniformly)
       timer.restart();
 
       //      --- sampling
-      (b == 0) ? 
-        t_sampler.sample(t_b_n_samples, t_b_samples) :
-        t_sampler.sample(t_b_n_samples, model, t_b_samples);
+      (b == 0) ?
+        t_sampler.sample(t_b_n_samples, t_b_samples, threads) :
+        t_sampler.sample(t_b_n_samples, model, t_b_samples, threads);
       t_samples.insert(t_samples.end(), t_b_samples.begin(), t_b_samples.end());
 
-      v_sampler.sample(v_n_samples, v_samples);
+      v_sampler.sample(v_n_samples, v_samples, threads);
+      
+      bob::core::info << "Sampling time for step " << b << " (" << n_boots << " bootstraps) is " << timer.elapsed() << " seconds." << std::endl;
+      timer.restart();
 
       //      --- mapping
-      t_sampler.map(t_samples, model, t_data);
-      v_sampler.map(v_samples, model, v_data);
+      t_sampler.map(t_samples, model, t_data, threads);
+      v_sampler.map(v_samples, model, v_data, threads);
 
-      bob::core::info << "timing: sampling ~ " << timer.elapsed() << "." << std::endl;
+      bob::core::info << "Mapping time for step " << b << " (" << n_boots << " bootstraps) is " << timer.elapsed() << " seconds." << std::endl;
 
       // Train the model
       timer.restart();
 
       Generalizer<std::vector<std::vector<LUT> > > gen;
       m_param.m_rounds = b_n_rounds << b;
-      if (    train(t_data, v_data, model, gen) == false ||
-          model.set(gen.model()) == false)
-      {
-        bob::core::error << "Failed to train the model!" << std::endl;
-        return false;
+      if (train(t_data, v_data, model, gen, threads) == false || model.set(gen.model()) == false) {
+        throw std::runtime_error("TaylorBooster failed to train the model");
       }
 
-      bob::core::info << "timing: training ~ " << timer.elapsed() << "." << std::endl;
+      bob::core::info << "Training time for step " << b << " (" << n_boots << " bootstraps) is " << timer.elapsed() << " seconds." << std::endl;
     }
 
     // OK
@@ -94,29 +98,39 @@ namespace bob { namespace visioner {
   // Train a model
   bool TaylorBooster::train(
       const DataSet& t_data, const DataSet& v_data, const Model& model,
-      Generalizer<std::vector<std::vector<LUT> > >& gen) const
+      Generalizer<std::vector<std::vector<LUT> > >& gen, size_t threads) const
   {
-    // Check parameters
-    if (	t_data.empty() || v_data.empty() ||
-        t_data.n_outputs() < 1 ||
-        t_data.n_outputs() != v_data.n_outputs() ||
-        t_data.n_features() != v_data.n_features() ||
-        t_data.n_features() < 1)
-    {
-      bob::core::error << "Invalid training & validation samples!" << std::endl;
-      return false;
+    if (t_data.empty()) throw std::runtime_error("Empty training set");
+    if (v_data.empty()) throw std::runtime_error("Empty validation set");
+    if (t_data.n_outputs() < 1) {
+      boost::format m("Number of outputs in training set is %d (< 1)");
+      m % t_data.n_outputs();
+      throw std::runtime_error(m.str().c_str());
+    }
+    if (t_data.n_features() < 1) {
+      boost::format m("Number of features in training set is %d (< 1)");
+      m % t_data.n_features();
+      throw std::runtime_error(m.str().c_str());
+    }
+    if (t_data.n_outputs() != v_data.n_outputs()) {
+      boost::format m("Number of outputs in training set (%d) is different than the one on the validation set (%d)");
+      m % t_data.n_outputs() % v_data.n_outputs();
+      throw std::runtime_error(m.str().c_str());
+    }
+    if (t_data.n_features() != v_data.n_features()) {
+      boost::format m("Number of features in training set (%d) is different than the one on the validation set (%d)");
+      m % t_data.n_features() % v_data.n_features();
+      throw std::runtime_error(m.str().c_str());
     }
 
-    bob::core::info
-      << "using "
-      << t_data.n_samples() << " training and "
+    TDEBUG1("Using " << t_data.n_samples() << " training and "
       << v_data.n_samples() << " validation samples with "
       << t_data.n_features() << " features to train "
-      << m_param.m_rounds << " weak learners." << std::endl; 
+      << m_param.m_rounds << " weak learners.");
 
     // Regularization factors
     static const double lambdas[] = { 0.0, 0.1, 0.2, 0.5, 1.0 };
-    const uint64_t n_lambdas = 
+    const uint64_t n_lambdas =
       (make_optimization(m_param) == Variational) ? sizeof(lambdas)/sizeof(double) : 1;
 
     // Tune the regularization factor ...
@@ -124,22 +138,22 @@ namespace bob { namespace visioner {
     {
       const double lambda = lambdas[ilambda];
 
-      // Create the solvers 
+      // Create the solvers
       boost::shared_ptr<LUTProblem> t_lp, v_lp;
       switch (make_optimization(m_param))
       {
         case Expectation:
-          t_lp.reset(new LUTProblemEPT(t_data, m_param));
-          v_lp.reset(new LUTProblemEPT(v_data, m_param));
+          t_lp.reset(new LUTProblemEPT(t_data, m_param, threads));
+          v_lp.reset(new LUTProblemEPT(v_data, m_param, threads));
           break;
 
         case Variational:
-          t_lp.reset(new LUTProblemVAR(t_data, m_param, lambda));
-          v_lp.reset(new LUTProblemVAR(v_data, m_param, lambda));
+          t_lp.reset(new LUTProblemVAR(t_data, m_param, lambda, threads));
+          v_lp.reset(new LUTProblemVAR(v_data, m_param, lambda, threads));
           break;
       }
 
-      // And train the model                        
+      // And train the model
       const std::string base_description =
         "<<lambda " + boost::lexical_cast<std::string>(lambda) + ">>";
 
@@ -147,36 +161,38 @@ namespace bob { namespace visioner {
     }
 
     // OK
-    bob::core::info
-      << "optimal: " << gen.description()
-      << ": train = " << gen.train_error()
-      << ", valid = " << gen.valid_error() << "." << std::endl;
+    TDEBUG1("Optimal: " << gen.description() << ": train = " 
+        << gen.train_error() << ", valid = " << gen.valid_error() << ".");
 
     return true;
   }
 
   // Train a model
   void TaylorBooster::train(
-      const boost::shared_ptr<LUTProblem>& t_lp, const boost::shared_ptr<LUTProblem>& v_lp, 
+      const boost::shared_ptr<LUTProblem>& t_lp, const boost::shared_ptr<LUTProblem>& v_lp,
       const std::string& base_description, const Model& model, Generalizer<std::vector<std::vector<LUT> > >& gen) const
   {
     Timer timer;
 
     // Train the models in boosting rounds ...
     for (uint64_t nc = 0; nc < m_param.m_rounds; nc ++)
-    {                        
+    {
       // Train weak learners ...
-      timer.restart();                        
+      timer.restart();
       t_lp->update_loss_deriv();
-      t_lp->select();                        
+      t_lp->select();
+#     ifdef BOB_DEBUG
       const double time_select = timer.elapsed();
+#     endif
 
-      timer.restart();                        
+      timer.restart();
       if (t_lp->line_search() == false)
       {
         break;
-      }                            
+      }
+#     ifdef BOB_DEBUG
       const double time_optimize = timer.elapsed();
+#     endif
 
       // Check the generalization properties of the model
       const std::string description = base_description +
@@ -184,28 +200,26 @@ namespace bob { namespace visioner {
         boost::lexical_cast<std::string>(m_param.m_rounds) + ">>";
 
       t_lp->update_scores(t_lp->luts());
-      t_lp->update_loss();                        
+      t_lp->update_loss();
 
       v_lp->update_scores(t_lp->luts());
       //v_lp->update_loss();
 
       gen.process(t_lp->error(), v_lp->error(), t_lp->mluts(), description);
 
-      // Debug
-      bob::core::info
-        << description
+      TDEBUG1(description
         << ": train = " << t_lp->value() << " / " << t_lp->error()
         << ", valid = " << v_lp->error()
-        << " in " << time_select << "+" << time_optimize << "s." << std::endl;                        
+        << " in " << time_select << "+" << time_optimize << "seconds.");
 
-      // Debug
-      for (uint64_t o = 0; o < t_lp->n_outputs(); o ++)
-      {
-        const LUT& lut = t_lp->luts()[o];
-        bob::core::info
-          << "output <" << (o + 1) << "/" << t_lp->n_outputs() 
-          << "> selected feature <" << model.describe(lut.feature()) << ">." << std::endl;
+#     ifdef BOB_DEBUG
+      for (uint64_t o = 0; o < t_lp->n_outputs(); o ++) {
+        TDEBUG1("output <" << (o + 1) << "/" 
+            << t_lp->n_outputs() << "> selected feature <" 
+            << model.describe(t_lp->luts()[o].feature()) << ">.");
       }
+#     endif
+
     }
   }
 

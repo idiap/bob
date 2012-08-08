@@ -40,7 +40,8 @@ namespace bob { namespace visioner {
     public:
 
       // Constructor
-      LUTProblemVAR(const DataSet& data, const param_t& param, double lambda);
+      LUTProblemVAR(const DataSet& data, const param_t& param, double lambda,
+          size_t threads);
 
       // Destructor
       virtual ~LUTProblemVAR() {} 
@@ -55,6 +56,7 @@ namespace bob { namespace visioner {
 
       // Attributes
       double                        m_lambda;       // Regularization factor
+
   };	
 
 }}

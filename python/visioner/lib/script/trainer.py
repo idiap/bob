@@ -49,6 +49,8 @@ def main():
       default=defp.cols, help=bob.visioner.param.cols.__doc__ + " (defaults to %(default)s)")
   parser.add_argument("-s", "--seed", metavar='INT', type=int, dest='seed',
       default=defp.seed, help=bob.visioner.param.seed.__doc__ + " (defaults to %(default)s)")
+  parser.add_argument("-b", "--label", metavar='LABEL', nargs='+', type=str,
+      dest='labels', default=[], help=bob.visioner.param.labels.__doc__ + " (defaults to %(default)s)")
   parser.add_argument("-l", "--loss-type", metavar='LOSS', type=str,
       dest='loss', choices=bob.visioner.LOSSES, default=defp.loss,
       help=bob.visioner.param.loss.__doc__ + " (options: %s; default: %%(default)s)" % '|'.join(bob.visioner.LOSSES))
@@ -95,6 +97,8 @@ def main():
   parser.add_argument("-Z", "--subwindow-labelling", metavar='TAGGER', type=str,
       choices=bob.visioner.TAGGERS, default=defp.subwindow_labelling,
       dest = 'subwindow_labelling', help=bob.visioner.param.subwindow_labelling.__doc__ + " (options: %s; default: %%(default)s)" % '|'.join(bob.visioner.TAGGERS))
+  parser.add_argument("-y", "--threads", dest="threads", type=int,
+      default=0, help="Set to zero to execute the training in the current thread, set to 1 or greater to spawn that many threads (defaults to %(default)s)")
   parser.add_argument("-v", "--verbose", dest="verbose",
       default=False, action='store_true',
       help="enable verbose output")
@@ -103,14 +107,20 @@ def main():
 
   args = parser.parse_args()
 
+  if args.threads < 0:
+    parser.error("Number of threads should be greater or equal 0. The value '%d' is not valid" % args.threads)
+    sys.exit(1)
+
   # now we read and set the parameters
   param = as_parameter(args)
   model = bob.visioner.Model(param)
 
   if args.verbose: print "Loading training and validation data..."
   start = time.clock()
-  training = bob.visioner.Sampler(param, bob.visioner.SamplerType.Train)
-  validation = bob.visioner.Sampler(param, bob.visioner.SamplerType.Validation)
+  training = bob.visioner.Sampler(param, bob.visioner.SamplerType.Train,
+      args.threads)
+  validation = bob.visioner.Sampler(param, bob.visioner.SamplerType.Validation,
+      args.threads)
   total = time.clock() - start
   if args.verbose: print "Ok. Loading time was %.2f seconds" % total
 

@@ -39,7 +39,7 @@ namespace bob { namespace visioner {
     public:
 
       // Constructor
-      LUTProblem(const DataSet& dataset, const param_t& param);
+      LUTProblem(const DataSet& dataset, const param_t& param, size_t threads);
 
       // Destructor
       virtual ~LUTProblem() {}
@@ -102,6 +102,8 @@ namespace bob { namespace visioner {
       Matrix<double>            m_cscores;      // Current (strong + scale * weak) scores: (sample, output)
 
       Matrix<double>            m_umasks;       // Entries mask [0/1]: (feature, entry)
+
+      size_t m_threads; ///< number of threads to use
   };
 
 }}

@@ -22,6 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/thread.hpp>
+
 #include "core/logging.h"
 
 #include "visioner/util/timer.h"
@@ -36,15 +38,16 @@ static bool train(bob::visioner::Model& model) {
 
   // Load the data files        
   timer.restart();
-  const bob::visioner::Sampler t_sampler(param, bob::visioner::Sampler::TrainSampler);
-  const bob::visioner::Sampler v_sampler(param, bob::visioner::Sampler::ValidSampler); 
+  const bob::visioner::Sampler t_sampler(param, bob::visioner::Sampler::TrainSampler, boost::thread::hardware_concurrency());
+  const bob::visioner::Sampler v_sampler(param, bob::visioner::Sampler::ValidSampler, boost::thread::hardware_concurrency()); 
   bob::core::info << "timing: loading ~ " << timer.elapsed() << "." << std::endl;
 
   // Train the model using coarse-to-fine feature projection
   for (uint64_t p = 0; p <= param.m_projections; p ++, model.project())
   {
     timer.restart();
-    if (bob::visioner::make_trainer(param)->train(t_sampler, v_sampler, model) == false)
+    if (bob::visioner::make_trainer(param)->train(t_sampler, v_sampler, model,
+          boost::thread::hardware_concurrency()) == false)
     {
       bob::core::error << "Failed to train the model!" << std::endl;
       return false;

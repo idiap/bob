@@ -23,14 +23,15 @@
  */
 
 #include <numeric>
+#include <omp.h>
 
 #include "visioner/model/trainers/lutproblems/lut_problem_var.h"
 
 namespace bob { namespace visioner {
 
   // Constructor
-  LUTProblemVAR::LUTProblemVAR(const DataSet& data, const param_t& param, double lambda)
-    :       LUTProblemEPT(data, param), 
+  LUTProblemVAR::LUTProblemVAR(const DataSet& data, const param_t& param, double lambda, size_t threads)
+    :       LUTProblemEPT(data, param, threads), 
     m_lambda(lambda)
   {                
   }
@@ -53,6 +54,7 @@ namespace bob { namespace visioner {
     const double var_sum = scale1 * ept_sum_sq + scale2 * ept_sum * ept_sum;
 
     // Compute the variational loss gradients (replace the expectation values)
+    omp_set_num_threads(this->m_threads);
 # pragma omp parallel for
     for (uint64_t s = 0; s < n_samples(); s ++)
     {

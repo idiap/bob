@@ -109,8 +109,7 @@ namespace bob { namespace visioner {
     return model;
   }
 
-  boost::shared_ptr<Trainer> make_trainer(const param_t& param)
-  {
+  boost::shared_ptr<Trainer> make_trainer(const param_t& param) {
     boost::shared_ptr<Trainer> trainer = Manager<Trainer>::get_const_instance().get(param.m_trainer);
     trainer->reset(param);
     return trainer;

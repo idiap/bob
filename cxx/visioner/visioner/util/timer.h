@@ -29,24 +29,30 @@
 
 namespace bob { namespace visioner {
 
-  /////////////////////////////////////////////////////////////////////////////////////////
-  // Timer (Boost based, using the date_time library)
-  /////////////////////////////////////////////////////////////////////////////////////////
-  class Timer
-  {
-    public:
+  /**
+   * Timer (Boost based, using the date_time library)
+   */
+  class Timer {
 
-      Timer() : m_start(boost::posix_time::microsec_clock::local_time()) 
-    {
-    }
+    public: //api
 
-      void restart()
-      {
+      /**
+       * Default constructor, sets the start time as the current time.
+       */
+      Timer() : m_start(boost::posix_time::microsec_clock::local_time()) {
+      }
+
+      /**
+       * Resets the start time.
+       */
+      void restart() {
         m_start = boost::posix_time::microsec_clock::local_time();
       }
 
-      double elapsed() const
-      {
+      /**
+       * Returns the total time in seconds
+       */
+      double elapsed() const {
         const boost::posix_time::time_duration dt = 
           boost::posix_time::microsec_clock::local_time() - m_start;
         return 0.001 * dt.total_milliseconds();

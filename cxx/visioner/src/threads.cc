@@ -26,12 +26,15 @@
 
 // Split some objects to process using multiple threads
 void bob::visioner::thread_split(uint64_t n_objects, uint64_t* sbegins,
-    uint64_t* sends) {
-  uint64_t N_PROCESSORS = boost::thread::hardware_concurrency();
-  uint64_t n_objects_per_thread = n_objects / N_PROCESSORS + 1;
-  for (uint64_t ith = 0, sbegin = 0; ith < N_PROCESSORS; ith ++) {
+    uint64_t* sends, 
+    size_t num_of_threads=boost::thread::hardware_concurrency()) {
+
+  uint64_t n_objects_per_thread = n_objects / num_of_threads + 1;
+
+  for (uint64_t ith = 0, sbegin = 0; ith < num_of_threads; ith ++) {
     sbegins[ith] = sbegin;
     sbegin = std::min(sbegin + n_objects_per_thread, n_objects);
     sends[ith] = sbegin;
   }
+
 }
