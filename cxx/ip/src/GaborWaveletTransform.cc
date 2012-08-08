@@ -94,6 +94,69 @@ bob::ip::GaborKernel::GaborKernel(
   } // for y
 }
 
+bob::ip::GaborKernel::GaborKernel(
+  const bob::ip::GaborKernel& other
+)
+: m_kernel_pixel(other.m_kernel_pixel.size()),
+  m_x_resolution(other.m_x_resolution),
+  m_y_resolution(other.m_y_resolution)
+{
+  std::copy(other.m_kernel_pixel.begin(), other.m_kernel_pixel.end(), m_kernel_pixel.begin());
+}
+
+bob::ip::GaborKernel::GaborKernel&
+bob::ip::GaborKernel::operator =
+(
+  const bob::ip::GaborKernel::GaborKernel& other
+)
+{
+  m_x_resolution = other.m_x_resolution;
+  m_y_resolution = other.m_y_resolution;
+  m_kernel_pixel.resize(other.m_kernel_pixel.size());
+  std::copy(other.m_kernel_pixel.begin(), other.m_kernel_pixel.end(), m_kernel_pixel.begin());
+  return *this;
+}
+
+bool
+bob::ip::GaborKernel::operator ==
+(
+  const bob::ip::GaborKernel::GaborKernel& other
+) const
+{
+  if (m_x_resolution != other.m_x_resolution || m_y_resolution != other.m_y_resolution)
+    return false;
+  if (m_kernel_pixel.size() != other.m_kernel_pixel.size())
+    return false;
+
+  std::vector<std::pair<blitz::TinyVector<unsigned,2>, double> >::const_iterator it1 = m_kernel_pixel.begin(), it2 = other.m_kernel_pixel.begin(), it1end = m_kernel_pixel.end();
+  for (; it1 != it1end; ++it1, ++it2)
+    if (it1->first[0] != it2->first[0] || it1->first[1] != it2->first[1] || std::abs(it1->second - it2->second) > 1e-8)
+      return false;
+
+  // identical.
+  return true;
+}
+
+bool
+bob::ip::GaborKernel::operator !=
+(
+  const bob::ip::GaborKernel::GaborKernel& other
+) const
+{
+  if (m_x_resolution != other.m_x_resolution || m_y_resolution != other.m_y_resolution)
+    return true;
+  if (m_kernel_pixel.size() != other.m_kernel_pixel.size())
+    return true;
+
+  std::vector<std::pair<blitz::TinyVector<unsigned,2>, double> >::const_iterator it1 = m_kernel_pixel.begin(), it2 = other.m_kernel_pixel.begin(), it1end = m_kernel_pixel.end();
+  for (; it1 != it1end; ++it1, ++it2)
+    if (it1->first[0] != it2->first[0] || it1->first[1] != it2->first[1] || std::abs(it1->second - it2->second) > 1e-8)
+      return true;
+
+  // identical.
+  return false;
+}
+
 /**
  * Performs the convolution of the given image with this Gabor kernel.
  * Please note that both the inpus as well as the output image are in frequency domain.
@@ -165,6 +228,82 @@ bob::ip::GaborWaveletTransform::GaborWaveletTransform(
 {
   computeKernelFrequencies();
 }
+
+
+bob::ip::GaborWaveletTransform::GaborWaveletTransform(
+  const bob::ip::GaborWaveletTransform & other
+)
+: m_sigma(other.m_sigma),
+  m_pow_of_k(other.m_pow_of_k),
+  m_k_max(other.m_k_max),
+  m_k_fac(other.m_k_fac),
+  m_dc_free(other.m_dc_free),
+  m_fft(0,0),
+  m_ifft(0,0),
+  m_number_of_scales(other.m_number_of_scales),
+  m_number_of_directions(other.m_number_of_directions)
+{
+  computeKernelFrequencies();
+}
+
+bob::ip::GaborWaveletTransform&
+bob::ip::GaborWaveletTransform::operator =
+(
+  const bob::ip::GaborWaveletTransform & other
+)
+{
+  m_sigma = other.m_sigma;
+  m_pow_of_k = other.m_pow_of_k;
+  m_k_max = other.m_k_max;
+  m_k_fac = other.m_k_fac;
+  m_dc_free = other.m_dc_free;
+  m_fft = bob::sp::FFT2D(0,0);
+  m_ifft = bob::sp::IFFT2D(0,0);
+  m_number_of_scales = other.m_number_of_scales;
+  m_number_of_directions = other.m_number_of_directions;
+
+  computeKernelFrequencies();
+}
+
+bool
+bob::ip::GaborWaveletTransform::operator ==
+(
+  const bob::ip::GaborWaveletTransform & other
+) const
+{
+#define aeq(x1,x2) std::abs(x1-x2) < 1e-8
+
+  return aeq(m_sigma, other.m_sigma) &&
+         aeq(m_pow_of_k,other.m_pow_of_k) &&
+         aeq(m_k_max, other.m_k_max) &&
+         aeq(m_k_fac, other.m_k_fac) &&
+         m_dc_free == other.m_dc_free &&
+         m_number_of_scales == other.m_number_of_scales &&
+         m_number_of_directions == other.m_number_of_directions;
+
+#undef aeq
+}
+
+
+bool
+bob::ip::GaborWaveletTransform::operator !=
+(
+  const bob::ip::GaborWaveletTransform & other
+) const
+{
+#define neq(x1,x2) std::abs(x1-x2) > 1e-8
+
+  return neq(m_sigma, other.m_sigma) ||
+         neq(m_pow_of_k,other.m_pow_of_k) ||
+         neq(m_k_max, other.m_k_max) ||
+         neq(m_k_fac, other.m_k_fac) ||
+         m_dc_free != other.m_dc_free ||
+         m_number_of_scales != other.m_number_of_scales ||
+         m_number_of_directions != other.m_number_of_directions;
+
+#undef neq
+}
+
 
 /**
  * Private function that computes the frequency vectors of the Gabor kernels

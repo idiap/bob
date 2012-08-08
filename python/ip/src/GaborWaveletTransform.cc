@@ -173,21 +173,24 @@ void bind_ip_gabor_wavelet_transform() {
       "Initializes the Gabor wavelet of the given wavelet frequency to be used as a filter for the given image resolution. The optional parameters can be changed, but have useful default values."
     )
   )
-  
-  .def(
-    "__call__",
-    &gabor_wavelet_transform_2,
-    (boost::python::arg("self"), boost::python::arg("input_image")),
-    """This function Gabor-filters the given input_image, which can be of any type. The output image is of complex type. It will be automatically generated and returned."""
-  )
+
+  .def(boost::python::init<bob::ip::GaborKernel&>(boost::python::args("other")))
+  .def(boost::python::self == boost::python::self)
+  .def(boost::python::self != boost::python::self)
 
   .def(
     "__call__",
     &gabor_wavelet_transform_1,
     (boost::python::arg("self"), boost::python::arg("input_image"), boost::python::arg("output_image")),
-    """This function Gabor-filters the given input_image, which can be of any type, to the output image. The output image needs to have the same resolution as the input image and must be of complex type."""
-  );
+    "This function Gabor-filters the given input_image, which can be of any type, to the output image. The output image needs to have the same resolution as the input image and must be of complex type."
+  )
 
+  .def(
+    "__call__",
+    &gabor_wavelet_transform_2,
+    (boost::python::arg("self"), boost::python::arg("input_image")),
+    "This function Gabor-filters the given input_image, which can be of any type. The output image is of complex type. It will be automatically generated and returned."
+  );
     
 
   // declare GWT class
@@ -211,6 +214,10 @@ void bind_ip_gabor_wavelet_transform() {
       "Initializes the Gabor wavelet transform by generating Gabor wavelets in number_of_scales different frequencies and number_of_angles different directions. The remaining parameters are parameters of the Gabor wavelets to be generated. "
     )
   )
+
+  .def(boost::python::init<bob::ip::GaborWaveletTransform&>(boost::python::args("other")))
+  .def(boost::python::self == boost::python::self)
+  .def(boost::python::self != boost::python::self)
 
   .def(
     "save",

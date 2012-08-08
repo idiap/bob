@@ -50,6 +50,16 @@ namespace bob {
           const double epsilon = 1e-10
         );
 
+        //! Copy constructor
+        GaborKernel(const GaborKernel& other);
+
+        //! Assignment operator
+        GaborKernel& operator=(const GaborKernel& other);
+        //! Equality operator
+        bool operator==(const GaborKernel& other) const;
+        //! Non-equality operator
+        bool operator!=(const GaborKernel& other) const;
+
         //! Get the image represenation of the Gabor wavelet in frequency domain
         blitz::Array<double,2> kernelImage() const;
 
@@ -89,6 +99,16 @@ namespace bob {
           double pow_of_k = 0.,
           bool dc_free = true
         );
+
+        //! Copy constructor
+        GaborWaveletTransform(const GaborWaveletTransform& other);
+
+        //! Assignment operator
+        GaborWaveletTransform& operator=(const GaborWaveletTransform& other);
+        //! Equality operator
+        bool operator==(const GaborWaveletTransform& other) const;
+        //! Non-equality operator
+        bool operator!=(const GaborWaveletTransform& other) const;
 
         //! generate the kernels for the new resolution
         void generateKernels(blitz::TinyVector<unsigned,2> resolution);
