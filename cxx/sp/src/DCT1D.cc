@@ -39,6 +39,10 @@ bob::sp::DCT1DAbstract::DCT1DAbstract( const bob::sp::DCT1DAbstract& other):
   reset();
 }
 
+bob::sp::DCT1DAbstract::~DCT1DAbstract()
+{
+}
+
 const bob::sp::DCT1DAbstract& bob::sp::DCT1DAbstract::operator=(const DCT1DAbstract& other)
 {
   if(this != &other)
@@ -99,6 +103,10 @@ bob::sp::DCT1D::DCT1D( const bob::sp::DCT1D& other):
 {
 }
 
+bob::sp::DCT1D::~DCT1D()
+{
+}
+
 const bob::sp::DCT1D& bob::sp::DCT1D::operator=(const DCT1D& other)
 {
   if(this != &other)
@@ -156,6 +164,10 @@ bob::sp::IDCT1D::IDCT1D( const size_t length):
 
 bob::sp::IDCT1D::IDCT1D( const bob::sp::IDCT1D& other):
   bob::sp::DCT1DAbstract(other)
+{
+}
+
+bob::sp::IDCT1D::~IDCT1D()
 {
 }
 

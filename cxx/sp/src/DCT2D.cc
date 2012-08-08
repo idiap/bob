@@ -38,6 +38,10 @@ bob::sp::DCT2DAbstract::DCT2DAbstract( const bob::sp::DCT2DAbstract& other):
   reset();
 }
 
+bob::sp::DCT2DAbstract::~DCT2DAbstract()
+{
+}
+
 const bob::sp::DCT2DAbstract& bob::sp::DCT2DAbstract::operator=(const DCT2DAbstract& other)
 {
   if(this != &other)
@@ -106,6 +110,10 @@ bob::sp::DCT2D::DCT2D( const bob::sp::DCT2D& other):
 {
 }
 
+bob::sp::DCT2D::~DCT2D()
+{
+}
+
 const bob::sp::DCT2D& bob::sp::DCT2D::operator=(const DCT2D& other)
 {
   if(this != &other)
@@ -160,6 +168,10 @@ bob::sp::IDCT2D::IDCT2D( const size_t height, const size_t width):
 
 bob::sp::IDCT2D::IDCT2D( const bob::sp::IDCT2D& other):
   bob::sp::DCT2DAbstract(other)
+{
+}
+
+bob::sp::IDCT2D::~IDCT2D()
 {
 }
 

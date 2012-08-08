@@ -54,7 +54,7 @@ namespace bob {
         /**
           * @brief Destructor
           */
-        virtual ~DCT2DAbstract() { }
+        virtual ~DCT2DAbstract();
 
         /**
           * @brief Assignment operator
@@ -142,7 +142,7 @@ namespace bob {
         /**
           * @brief Destructor
           */
-        virtual ~DCT2D() { }
+        virtual ~DCT2D();
 
         /**
           * @brief Assignment operator
@@ -187,7 +187,7 @@ namespace bob {
         /**
           * @brief Destructor
           */
-        virtual ~IDCT2D() { }
+        virtual ~IDCT2D();
 
         /**
           * @brief Assignment operator

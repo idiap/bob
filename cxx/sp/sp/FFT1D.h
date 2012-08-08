@@ -56,7 +56,7 @@ namespace bob {
         /**
           * @brief Destructor
           */
-        virtual ~FFT1DAbstract() { }
+        virtual ~FFT1DAbstract();
 
         /**
           * @brief Assignment operator
@@ -121,7 +121,7 @@ namespace bob {
         /**
           * @brief Destructor
           */
-        virtual ~FFT1D() { }
+        virtual ~FFT1D();
 
         /**
           * @brief Assignment operator
@@ -166,7 +166,7 @@ namespace bob {
         /**
           * @brief Destructor
           */
-        virtual ~IFFT1D() { }
+        virtual ~IFFT1D();
 
         /**
           * @brief Assignment operator

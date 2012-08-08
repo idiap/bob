@@ -36,6 +36,10 @@ bob::sp::FFT2DAbstract::FFT2DAbstract( const bob::sp::FFT2DAbstract& other):
 {
 }
 
+bob::sp::FFT2DAbstract::~FFT2DAbstract()
+{
+}
+
 const bob::sp::FFT2DAbstract& bob::sp::FFT2DAbstract::operator=(const FFT2DAbstract& other)
 {
   if(this != &other)
@@ -70,6 +74,10 @@ bob::sp::FFT2D::FFT2D( const size_t height, const size_t width):
 
 bob::sp::FFT2D::FFT2D( const bob::sp::FFT2D& other):
   bob::sp::FFT2DAbstract(other)
+{
+}
+
+bob::sp::FFT2D::~FFT2D()
 {
 }
 
@@ -139,6 +147,10 @@ bob::sp::IFFT2D::IFFT2D( const size_t height, const size_t width):
 
 bob::sp::IFFT2D::IFFT2D( const bob::sp::IFFT2D& other):
   bob::sp::FFT2DAbstract(other)
+{
+}
+
+bob::sp::IFFT2D::~IFFT2D()
 {
 }
 

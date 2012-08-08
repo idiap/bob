@@ -38,6 +38,10 @@ bob::sp::FFT1DAbstract::FFT1DAbstract( const bob::sp::FFT1DAbstract& other):
 {
 }
 
+bob::sp::FFT1DAbstract::~FFT1DAbstract()
+{
+}
+
 const bob::sp::FFT1DAbstract& bob::sp::FFT1DAbstract::operator=(const FFT1DAbstract& other)
 {
   if(this != &other)
@@ -76,6 +80,10 @@ bob::sp::FFT1D::FFT1D( const size_t length):
 
 bob::sp::FFT1D::FFT1D( const bob::sp::FFT1D& other):
   bob::sp::FFT1DAbstract(other)
+{
+}
+
+bob::sp::FFT1D::~FFT1D()
 {
 }
 
@@ -128,6 +136,10 @@ bob::sp::IFFT1D::IFFT1D( const size_t length):
 
 bob::sp::IFFT1D::IFFT1D( const bob::sp::IFFT1D& other):
   bob::sp::FFT1DAbstract(other)
+{
+}
+
+bob::sp::IFFT1D::~IFFT1D()
 {
 }
 
