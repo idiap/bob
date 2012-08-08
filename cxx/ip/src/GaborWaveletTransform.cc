@@ -104,10 +104,10 @@ bob::ip::GaborKernel::GaborKernel(
   std::copy(other.m_kernel_pixel.begin(), other.m_kernel_pixel.end(), m_kernel_pixel.begin());
 }
 
-bob::ip::GaborKernel::GaborKernel&
+bob::ip::GaborKernel&
 bob::ip::GaborKernel::operator =
 (
-  const bob::ip::GaborKernel::GaborKernel& other
+  const bob::ip::GaborKernel& other
 )
 {
   m_x_resolution = other.m_x_resolution;
@@ -120,7 +120,7 @@ bob::ip::GaborKernel::operator =
 bool
 bob::ip::GaborKernel::operator ==
 (
-  const bob::ip::GaborKernel::GaborKernel& other
+  const bob::ip::GaborKernel& other
 ) const
 {
   if (m_x_resolution != other.m_x_resolution || m_y_resolution != other.m_y_resolution)
@@ -140,7 +140,7 @@ bob::ip::GaborKernel::operator ==
 bool
 bob::ip::GaborKernel::operator !=
 (
-  const bob::ip::GaborKernel::GaborKernel& other
+  const bob::ip::GaborKernel& other
 ) const
 {
   if (m_x_resolution != other.m_x_resolution || m_y_resolution != other.m_y_resolution)
@@ -263,6 +263,8 @@ bob::ip::GaborWaveletTransform::operator =
   m_number_of_directions = other.m_number_of_directions;
 
   computeKernelFrequencies();
+  
+  return *this;
 }
 
 bool
