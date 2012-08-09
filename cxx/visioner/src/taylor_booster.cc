@@ -70,14 +70,14 @@ namespace bob { namespace visioner {
 
       v_sampler.sample(v_n_samples, v_samples, threads);
       
-      bob::core::info << "Sampling time for step " << b << " (" << n_boots << " bootstraps) is " << timer.elapsed() << " seconds." << std::endl;
+      TDEBUG1("Sampling time for step " << b << " (" << n_boots << " bootstraps) is " << timer.elapsed() << " seconds.");
       timer.restart();
 
       //      --- mapping
       t_sampler.map(t_samples, model, t_data, threads);
       v_sampler.map(v_samples, model, v_data, threads);
 
-      bob::core::info << "Mapping time for step " << b << " (" << n_boots << " bootstraps) is " << timer.elapsed() << " seconds." << std::endl;
+      TDEBUG1("Mapping time for step " << b << " (" << n_boots << " bootstraps) is " << timer.elapsed() << " seconds.");
 
       // Train the model
       timer.restart();
@@ -88,7 +88,7 @@ namespace bob { namespace visioner {
         throw std::runtime_error("TaylorBooster failed to train the model");
       }
 
-      bob::core::info << "Training time for step " << b << " (" << n_boots << " bootstraps) is " << timer.elapsed() << " seconds." << std::endl;
+      TDEBUG1("Training time for step " << b << " (" << n_boots << " bootstraps) is " << timer.elapsed() << " seconds.");
     }
 
     // OK
