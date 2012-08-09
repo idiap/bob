@@ -139,23 +139,29 @@ drawned, for debugging purposes.
 Reference Manual
 ----------------
 
-.. autodata:: bob.visioner.DEFAULT_DETECTION_MODEL
-.. autodata:: bob.visioner.DEFAULT_LOCALIZATION_MODEL
-.. autoclass:: bob.visioner.MaxDetector
+.. ifconfig:: has_visioner
 
-:members:
+  .. autodata:: bob.visioner.DEFAULT_DETECTION_MODEL
+  .. autodata:: bob.visioner.DEFAULT_LOCALIZATION_MODEL
+  .. autoclass:: bob.visioner.MaxDetector
 
-:undoc-members:
+  :members:
 
-.. autoclass:: bob.visioner.Detector
+  :undoc-members:
 
-:members:
+  .. autoclass:: bob.visioner.Detector
 
-:undoc-members:
+  :members:
 
-.. autoclass:: bob.visioner.Localizer
+  :undoc-members:
 
-:members:
+  .. autoclass:: bob.visioner.Localizer
 
-:undoc-members:
+  :members:
 
+  :undoc-members:
+
+.. ifconfig:: not has_visioner
+
+  The ``visioner`` extension was not compiled with this version of |project|, 
+  possibly because you don't have Qt4 installed (an optional dependence).
