@@ -77,6 +77,15 @@ namespace bob { namespace visioner {
       // Setup the given feature for the given output
       void setup(uint64_t f, uint64_t o);
 
+
+    private: //multi-threading
+
+      void update_loss_deriv_mt(const Matrix<double>& scores, 
+          const std::pair<uint64_t,uint64_t>& range);
+
+      void update_loss_mt(const Matrix<double>& scores, 
+          const std::pair<uint64_t,uint64_t>& range);
+
     protected:
 
       // Attributes

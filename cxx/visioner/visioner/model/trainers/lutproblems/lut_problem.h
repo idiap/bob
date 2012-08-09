@@ -44,18 +44,12 @@ namespace bob { namespace visioner {
       // Destructor
       virtual ~LUTProblem() {}
 
-      // Update predictions
-      void update_scores(const std::vector<LUT>& luts);
-
       // Update loss values and derivatives
       virtual void update_loss_deriv() = 0;
       virtual void update_loss() = 0;
 
       // Select the optimal feature
       virtual void select() = 0;
-
-      // Optimize the LUT entries for the selected feature
-      bool line_search();
 
       // Compute the loss value/error
       virtual double value() const = 0;
@@ -78,10 +72,31 @@ namespace bob { namespace visioner {
       const std::vector<std::vector<LUT> >& mluts() const { return m_mluts; }
       const std::vector<LUT>& luts() const { return m_luts; }
 
+      // Update predictions
+      void update_scores(const std::vector<LUT>& luts);
+
+      // Optimize the LUT entries for the selected feature
+      bool line_search();
+
+    private: //multi-threading
+
+      // Update predictions
+      void update_scores_mt(const std::vector<LUT>& luts, 
+          const std::pair<uint64_t,uint64_t>& range);
+
+      // Optimize the LUT entries for the selected feature
+      void line_search_mt(const std::pair<uint64_t,uint64_t>& range);
+
     protected:
 
       // Update current scores
       void update_cscores(const double* x);
+
+    private:
+ 
+      // Update scores (worker thread)
+      void update_cscores_mt(const double* x,
+          const std::pair<uint64_t,uint64_t>& range);
 
     protected:
 

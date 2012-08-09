@@ -8,25 +8,26 @@
  * Bob coding standards and structure.
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <numeric>
-#include <omp.h>
 
-#include "visioner/util/threads.h"
+#include "core/logging.h"
+
 #include "visioner/model/trainers/lutproblems/lut_problem_ept.h"
+#include "visioner/util/threads.h"
 
 namespace bob { namespace visioner {
 
@@ -34,7 +35,7 @@ namespace bob { namespace visioner {
   LUTProblemEPT::LUTProblemEPT(const DataSet& data, const param_t& param,
       size_t threads)
     : LUTProblem(data, param, threads), m_values(n_samples())
-  {                
+  {
   }
 
   // Update loss values and derivatives
@@ -47,6 +48,21 @@ namespace bob { namespace visioner {
     update_loss(m_sscores);
   }
 
+  void LUTProblemEPT::update_loss_deriv_mt(const Matrix<double>& scores,
+      const std::pair<uint64_t,uint64_t>& range) {
+    for (uint64_t s = range.first; s < range.second; ++s) {
+      m_loss.eval(target(s), scores[s], n_outputs(), m_values[s], m_grad[s]);
+
+      // Adjust with costs
+      const double _cost = cost(s);
+
+      m_values[s] *= _cost;
+      for (uint64_t o = 0; o < n_outputs(); ++o) {
+        m_grad(s, o) *= _cost;
+      }
+    }
+  }
+
   // Update loss values and derivatives (for some particular scores)
   void LUTProblemEPT::update_loss_deriv(const Matrix<double>& scores)
   {
@@ -54,41 +70,41 @@ namespace bob { namespace visioner {
     m_grad.resize(n_samples(), n_outputs());
 
     // Compute the loss value + gradient
-    omp_set_num_threads(this->m_threads);
-# pragma omp parallel for
-    for (uint64_t s = 0; s < n_samples(); s ++)
-    {
-      m_loss.eval(target(s), scores[s], n_outputs(), m_values[s], m_grad[s]);
-
-      // Adjust with costs
-      const double _cost = cost(s);
-
-      m_values[s] *= _cost;
-      for (uint64_t o = 0; o < n_outputs(); o ++)
-      {
-        m_grad(s, o) *= _cost;
-      }
-    }                 
+    if (!m_threads) {
+      update_loss_deriv_mt(scores,
+          std::make_pair<uint64_t,uint64_t>(0, n_samples()));
+    }
+    else {
+      thread_loop(boost::bind(&LUTProblemEPT::update_loss_deriv_mt,
+            this, boost::cref(scores), boost::lambda::_1),
+          n_samples(), m_threads);
+    }
   }
-  void LUTProblemEPT::update_loss(const Matrix<double>& scores)
-  {
-    // Compute the loss value
-    omp_set_num_threads(this->m_threads);
-# pragma omp parallel for
-    for (uint64_t s = 0; s < n_samples(); s ++)
-    {
-      m_loss.eval(target(s), scores[s], n_outputs(), m_values[s]);
 
-      // Adjust with costs
-      m_values[s] *= cost(s);
+  void LUTProblemEPT::update_loss_mt(const Matrix<double>& scores,
+      const std::pair<uint64_t,uint64_t>& range) {
+    for (uint64_t s = range.first; s < range.second; ++s) {
+      m_loss.eval(target(s), scores[s], n_outputs(), m_values[s]);
+      m_values[s] *= cost(s); // Adjust with costs
+    }
+  }
+
+  void LUTProblemEPT::update_loss(const Matrix<double>& scores) {
+    if (!m_threads) {
+      update_loss_mt(scores, std::make_pair<uint64_t,uint64_t>(0, n_samples()));
+    }
+    else {
+      thread_loop(boost::bind(&LUTProblemEPT::update_loss_mt,
+            this, boost::cref(scores), boost::lambda::_1),
+          n_samples(), m_threads);
     }
   }
 
   // Compute the loss value/error
   double LUTProblemEPT::value() const
   {
-    return  std::accumulate(m_values.begin(), m_values.end(), 0.0) * 
-      inverse(n_samples()) * inverse(n_outputs());        
+    return  std::accumulate(m_values.begin(), m_values.end(), 0.0) *
+      inverse(n_samples()) * inverse(n_outputs());
   }
   double LUTProblemEPT::error() const
   {
@@ -161,7 +177,7 @@ namespace bob { namespace visioner {
             }
 
             setup(bestf, o);
-          }      
+          }
         }
         break;
 
@@ -172,7 +188,7 @@ namespace bob { namespace visioner {
           double besthv = 0.0;
           for (uint64_t f = 0; f < n_features(); f ++)
           {
-            const double hv = 
+            const double hv =
               std::accumulate(m_fldeltas[f], m_fldeltas[f] + n_outputs(), 0.0);
             if (hv < besthv)
             {
@@ -187,13 +203,13 @@ namespace bob { namespace visioner {
         }
         break;
     }
-  }      
+  }
 
   // Compute the local loss decrease for a range of features
   void LUTProblemEPT::select(std::pair<uint64_t, uint64_t> frange)
   {
     // Evaluate each feature ...
-    Matrix<double> histo_grad(n_entries(), n_outputs());                
+    Matrix<double> histo_grad(n_entries(), n_outputs());
     for (uint64_t f = frange.first; f < frange.second; f ++)
     {
       // - compute the loss gradient histogram
@@ -227,8 +243,8 @@ namespace bob { namespace visioner {
   // Setup the given feature for the given output
   void LUTProblemEPT::setup(uint64_t f, uint64_t o)
   {
-    Matrix<double> histo_grad(n_entries(), n_outputs());                
-    histo(f, histo_grad);                
+    Matrix<double> histo_grad(n_entries(), n_outputs());
+    histo(f, histo_grad);
 
     // - set feature
     LUT& lut = m_luts[o];

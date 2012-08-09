@@ -52,6 +52,12 @@ namespace bob { namespace visioner {
       virtual void update_loss_deriv(const Matrix<double>& scores);
       virtual void update_loss(const Matrix<double>& scores);
 
+    private: //multi-threading
+      
+      void update_loss_deriv_mt(const Matrix<double>& scores,
+          double scale1, double scale2, double ept_sum,
+          const std::pair<uint64_t,uint64_t>& range);
+
     protected:
 
       // Attributes

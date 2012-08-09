@@ -23,13 +23,13 @@
  */
 
 #include <numeric>
-#include <omp.h>
 
 #include "core/logging.h"
 #include "lbfgs/lbfgs.h"
 
 #include "visioner/model/trainers/lutproblems/lut_problem.h"
 #include "visioner/model/mdecoder.h"
+#include "visioner/util/threads.h"
 
 namespace bob { namespace visioner {
 
@@ -106,15 +106,10 @@ namespace bob { namespace visioner {
       }
     }
 
-  // Update predictions
-  void LUTProblem::update_scores(const std::vector<LUT>& luts)
-  {
-    omp_set_num_threads(this->m_threads);
-# pragma omp parallel for
-    for (uint64_t s = 0; s < n_samples(); s ++)
-    {
-      for (uint64_t o = 0; o < n_outputs(); o ++)
-      {
+  void LUTProblem::update_scores_mt(const std::vector<LUT>& luts,
+      const std::pair<uint64_t,uint64_t>& range) {
+    for (uint64_t s = range.first; s < range.second; ++s) {
+      for (uint64_t o = 0; o < n_outputs(); ++o) {
         const LUT& lut = luts[o];                        
         const uint16_t u = fvalue(lut.feature(), s);
         m_sscores(s, o) += lut[u];
@@ -122,34 +117,58 @@ namespace bob { namespace visioner {
     }
   }
 
-  // Update current scores
-  void LUTProblem::update_cscores(const double* x)
-  {
-    omp_set_num_threads(this->m_threads);
-# pragma omp parallel for
-    for (uint64_t s = 0; s < n_samples(); s ++)
-    {
-      for (uint64_t o = 0; o < n_outputs(); o ++)
-      {
+  void LUTProblem::update_scores(const std::vector<LUT>& luts) {
+    if (!m_threads) {
+      update_scores_mt(luts, std::make_pair<uint64_t,uint64_t>(0, n_samples()));
+    }
+    else {
+      thread_loop(boost::bind(&LUTProblem::update_scores_mt,
+            this, boost::cref(luts), boost::lambda::_1), 
+          n_samples(), m_threads);
+    }
+  }
+
+  void LUTProblem::update_cscores_mt(const double* x,
+      const std::pair<uint64_t,uint64_t>& range) {
+    for (uint64_t s = range.first; s < range.second; ++s) {
+      for (uint64_t o = 0; o < n_outputs(); ++o) {
         m_cscores(s, o) = m_sscores(s, o) + x[o] * m_wscores(s, o);
       }
     }
   }
 
-  // Optimize the LUT entries for the selected feature
-  bool LUTProblem::line_search()
-  {
-    // Buffer the weak learner scores
-    omp_set_num_threads(this->m_threads);
-# pragma omp parallel for
-    for (uint64_t s = 0; s < n_samples(); s ++)
-    {
-      for (uint64_t o = 0; o < n_outputs(); o ++)
-      {
+  void LUTProblem::update_cscores(const double* x) {
+    if (!m_threads) {
+      update_cscores_mt(x, std::make_pair<uint64_t,uint64_t>(0, n_samples()));
+    }
+    else {
+      thread_loop(boost::bind(&LUTProblem::update_cscores_mt,
+            this, boost::cref(x), boost::lambda::_1),
+          n_samples(), m_threads);
+    }
+  }
+
+  void LUTProblem::line_search_mt(const std::pair<uint64_t,uint64_t>& range) {
+    for (uint64_t s = range.first; s < range.second; ++s) {
+      for (uint64_t o = 0; o < n_outputs(); ++o) {
         const LUT& lut = m_luts[o];
         const uint64_t u = fvalue(lut.feature(), s);
         m_wscores(s, o) = lut[u];
       }
+    }
+  }
+
+  // Optimize the LUT entries for the selected feature
+  bool LUTProblem::line_search() {
+
+    // Buffer the weak learner scores, possibly in multiple threads
+    if (!m_threads) {
+      line_search_mt(std::make_pair<uint64_t,uint64_t>(0, n_samples()));
+    }
+    else {
+      thread_loop(boost::bind(&LUTProblem::line_search_mt,
+            this, boost::lambda::_1),
+          n_samples(), m_threads);
     }
 
     // Line-search to scale the LUT entries (using libLBFGS)
