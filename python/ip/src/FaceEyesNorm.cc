@@ -133,6 +133,7 @@ static object call2b(bob::ip::FaceEyesNorm& op, bob::python::const_ndarray src,
 
 void bind_ip_faceeyesnorm() {
   class_<bob::ip::FaceEyesNorm, boost::shared_ptr<bob::ip::FaceEyesNorm> >("FaceEyesNorm", faceeyesnorm_doc, init<const double, const size_t, const size_t, const double, const double>((arg("eyes_distance"), arg("crop_height"), arg("crop_width"), arg("crop_eyecenter_offset_h"), arg("crop_eyecenter_offset_w")), "Constructs a FaceEyeNorm object."))
+      .def(init<unsigned, unsigned, unsigned, unsigned, unsigned, unsigned>(args("crop_height", "crop_width", "re_y", "re_x", "le_y", "le_x"), "Creates a FaceEyesNorm class that will put the eyes to the given locations and crop the image to the desired size."))
       .def(init<bob::ip::FaceEyesNorm&>(args("other")))
       .def(self == self)
       .def(self != self)

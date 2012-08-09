@@ -25,20 +25,40 @@
 bob::ip::FaceEyesNorm::FaceEyesNorm( const double eyes_distance,
     const size_t crop_height, const size_t crop_width, const double crop_offset_h,
     const double crop_offset_w):
-  m_eyes_distance(eyes_distance), m_crop_height(crop_height),
-  m_crop_width(crop_width), m_crop_offset_h(crop_offset_h),
-  m_crop_offset_w(crop_offset_w), m_out_shape(crop_height, crop_width), 
-  m_geom_norm(new GeomNorm(0., 0., crop_height, crop_width, crop_offset_h, 
-    crop_offset_w) )
+  m_eyes_distance(eyes_distance), m_eyes_angle(0.),
+  m_crop_height(crop_height), m_crop_width(crop_width),
+  m_crop_offset_h(crop_offset_h), m_crop_offset_w(crop_offset_w),
+  m_out_shape(crop_height, crop_width),
+  m_geom_norm(new GeomNorm(0., 0., crop_height, crop_width, crop_offset_h, crop_offset_w) )
 {
 }
 
+bob::ip::FaceEyesNorm::FaceEyesNorm(
+    const unsigned crop_height, const unsigned crop_width,
+    const unsigned re_y, const unsigned re_x,
+    const unsigned le_y, const unsigned le_x)
+:
+  m_crop_height(crop_height),
+  m_crop_width(crop_width),
+  m_out_shape(crop_height, crop_width)
+{
+  double dy = (double)re_y - le_y, dx = (double)re_x - le_x;
+  m_eyes_distance = std::sqrt(dx * dx + dy * dy);
+  m_eyes_angle = getAngleToHorizontal(re_y, re_x, le_y, le_x);
+  m_crop_offset_h = (re_y + le_y) / 2.;
+  m_crop_offset_w = (re_x + le_x) / 2.;
+
+  std::cout << "dist: " << m_eyes_distance << "; angle: " << m_eyes_angle << "; oh: " << m_crop_offset_h << "; ow: " << m_crop_offset_w << std::endl;
+  m_geom_norm = boost::shared_ptr<GeomNorm>(new GeomNorm(0., 0., crop_height, crop_width, m_crop_offset_h, m_crop_offset_w));
+}
+
+
 bob::ip::FaceEyesNorm::FaceEyesNorm( const FaceEyesNorm& other):
-  m_eyes_distance(other.m_eyes_distance), m_crop_height(other.m_crop_height),
-  m_crop_width(other.m_crop_width), m_crop_offset_h(other.m_crop_offset_h),
-  m_crop_offset_w(other.m_crop_offset_w), m_out_shape(other.m_crop_height, other.m_crop_width), 
-  m_geom_norm(new GeomNorm(0., 0., m_crop_height, m_crop_width, m_crop_offset_h, 
-    m_crop_offset_w) )
+  m_eyes_distance(other.m_eyes_distance), m_eyes_angle(other.m_eyes_angle),
+  m_crop_height(other.m_crop_height), m_crop_width(other.m_crop_width),
+  m_crop_offset_h(other.m_crop_offset_h), m_crop_offset_w(other.m_crop_offset_w),
+  m_out_shape(other.m_crop_height, other.m_crop_width),
+  m_geom_norm(new GeomNorm(0., 0., m_crop_height, m_crop_width, m_crop_offset_h, m_crop_offset_w) )
 {
 }
 
@@ -48,6 +68,7 @@ bob::ip::FaceEyesNorm::operator=(const bob::ip::FaceEyesNorm& other)
   if (this != &other)
   {
     m_eyes_distance = other.m_eyes_distance;
+    m_eyes_angle = other.m_eyes_angle;
     m_crop_height = other.m_crop_height;
     m_crop_width = other.m_crop_width;
     m_crop_offset_h = other.m_crop_offset_h;

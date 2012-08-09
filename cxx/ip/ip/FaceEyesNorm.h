@@ -51,6 +51,13 @@ namespace bob {
           const double crop_offset_w);
 
         /**
+          * @brief Constructor taking the requested two eye positions
+          */
+        FaceEyesNorm( const unsigned crop_height, const unsigned crop_width,
+          const unsigned re_y, const unsigned re_x,
+          const unsigned le_y, const unsigned le_x);
+
+        /**
          * @brief Copy constructor
          */
         FaceEyesNorm(const FaceEyesNorm& other); 
@@ -129,6 +136,7 @@ namespace bob {
           * Attributes
           */
         double m_eyes_distance;
+        double m_eyes_angle;
         size_t m_crop_height;
         size_t m_crop_width;
         double m_crop_offset_h;
@@ -185,7 +193,7 @@ namespace bob {
       const double e2_y, const double e2_x) const
     { 
       // Get angle to horizontal
-      const double angle = getAngleToHorizontal(e1_y, e1_x, e2_y, e2_x);
+      const double angle = getAngleToHorizontal(e1_y, e1_x, e2_y, e2_x) - m_eyes_angle;
       m_geom_norm->setRotationAngle( angle);
 
       // Get scaling factor

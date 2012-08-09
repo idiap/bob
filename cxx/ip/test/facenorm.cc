@@ -149,5 +149,45 @@ BOOST_AUTO_TEST_CASE( test_facenorm2 )
   BOOST_CHECK_CLOSE(new_left_eye(1), 48., 1e-8);
 }
  
+BOOST_AUTO_TEST_CASE( test_facenorm3 )
+{
+  // Get path to the XML Schema definition
+  char *testdata_cpath = getenv("BOB_IP_TESTDATA_DIR");
+  if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
+    bob::core::error << "Environment variable $BOB_IP_TESTDATA_DIR " <<
+      "is not set. " << "Have you setup your working environment " <<
+      "correctly?" << std::endl;
+    throw bob::core::Exception();
+  }
+  // Load original image
+  boost::filesystem::path testdata_path_image(testdata_cpath);
+  testdata_path_image /= "Nicolas_Cage_0001.pgm";
+  bob::io::Array image(testdata_path_image.string());
+  blitz::Array<double,2> processed_image(80,64);
   
+  bob::ip::FaceEyesNorm facenorm(80,64,16,15,16,48);
+
+  // Process giving the coordinates of the eyes
+  facenorm(image.get<uint8_t,2>(),processed_image,116,104,116,147);
+  testdata_path_image = testdata_cpath;
+  testdata_path_image /= "Nicolas_Cage_0001.hdf5";
+//  bob::io::Array(processed_image).save(testdata_path_image.string());  // Re-generate reference data
+  bob::io::Array read_reference_image(testdata_path_image.string());
+  blitz::Array<double,2> reference_image = read_reference_image.get<double,2>();
+  checkBlitzClose(reference_image, processed_image, eps2);
+
+  // check that the eye positions are at the requested positions
+  blitz::TinyVector<double,2> right_eye(116,104), left_eye(116,147);
+
+  double center_y = 116.;
+  double center_x = (104. + 147.) / 2.;
+  blitz::TinyVector<double,2> new_right_eye = facenorm.getGeomNorm()->operator()(right_eye, center_y, center_x);
+  blitz::TinyVector<double,2> new_left_eye = facenorm.getGeomNorm()->operator()(left_eye, center_y, center_x);
+
+  BOOST_CHECK_CLOSE(new_right_eye(0), 16., 1e-8);
+  BOOST_CHECK_CLOSE(new_right_eye(1), 15., 1e-8);
+  BOOST_CHECK_CLOSE(new_left_eye(0), 16., 1e-8);
+  BOOST_CHECK_CLOSE(new_left_eye(1), 48., 1e-8);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
