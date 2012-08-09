@@ -21,31 +21,13 @@ class null(object):
   def flush(self):
     pass
 
-def location(dbname):
-  """Returns the location of the database. The location of the database, by
-  default, is the directory containing the database library. If the environment
-  variable $BOB_DB_DIR is defined, it is used as the base-location of the
-  file."""
-  
-  envvar = 'BOB_DB_DIR'
-
-  if os.environ.has_key(envvar) and os.environ[envvar].strip():
-    dirname = os.path.realpath(os.environ[envvar])
-    fname = os.path.join(dirname, dbname + '.sql3')
-
-  else:
-    dirname = os.path.dirname(os.path.realpath(__file__))
-    fname = os.path.join(dirname, dbname, 'db.sql3')
-
-  return 'sqlite:///%s' % fname
-
-def session(dbname, echo=False):
+def session(location, echo=False):
   """Creates a session to an SQLite database"""
 
   from sqlalchemy import create_engine
   from sqlalchemy.orm import sessionmaker
 
-  engine = create_engine(location(dbname), echo=echo)
+  engine = create_engine(location, echo=echo)
   Session = sessionmaker(bind=engine)
   return Session()
 
@@ -98,8 +80,8 @@ def location_command(subparsers):
 
   return parser
 
-def copyfrom(options):
-  """Copies the database from a given directory."""
+def get(options):
+  """Copies the database from a given directory to its official working location."""
 
   import shutil
   src = os.path.join(options.directory[0], options.dbname + '.sql3')
@@ -114,18 +96,18 @@ def copyfrom(options):
   if options.verbose: print "Copying %s -> %s" % (src, dest)
   shutil.copy2(src, dest)
 
-def copyfrom_command(subparsers):
+def get_command(subparsers):
   
-  parser = subparsers.add_parser('copyfrom', help=copyfrom.__doc__)
+  parser = subparsers.add_parser('get', help=get.__doc__)
   parser.add_argument('--verbose', dest="verbose", default=False,
       action='store_true', help="produces more output while copying")
   parser.add_argument('directory', help="sets the directory to which the database will be copied from", nargs=1)
-  parser.set_defaults(func=copyfrom)
+  parser.set_defaults(func=get)
 
   return parser
 
-def copy(options):
-  """Copies the database to a given directory."""
+def put(options):
+  """Copies the database from its official work location to a given directory."""
 
   import shutil
   d = options.directory[0]
@@ -138,13 +120,13 @@ def copy(options):
   if options.verbose: print "Copying %s -> %s" % (src, dest)
   shutil.copy2(src, dest)
 
-def copy_command(subparsers):
+def put_command(subparsers):
   
-  parser = subparsers.add_parser('copy', help=copy.__doc__)
+  parser = subparsers.add_parser('put', help=put.__doc__)
   parser.add_argument('--verbose', dest="verbose", default=False,
       action='store_true', help="produces more output while copying")
   parser.add_argument('directory', help="sets the directory to which the database will be copied to", nargs=1)
-  parser.set_defaults(func=copy)
+  parser.set_defaults(func=put)
 
   return parser
 
@@ -153,8 +135,8 @@ def standard_commands(subparsers):
 
   dbshell_command(subparsers)
   location_command(subparsers)
-  copy_command(subparsers)
-  copyfrom_command(subparsers)
+  put_command(subparsers)
+  get_command(subparsers)
 
 def makedirs_safe(fulldir):
   """Creates a directory if it does not exists, with concurrent access support"""

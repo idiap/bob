@@ -33,6 +33,6 @@ def main():
 
   from argparse import RawDescriptionHelpFormatter
   parser = create_parser(description=__doc__, epilog=epilog,
-      formatter_class=RawDescriptionHelpFormatter) 
+      formatter_class=RawDescriptionHelpFormatter)
   args = parser.parse_args()
   args.func(args)
