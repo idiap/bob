@@ -155,15 +155,7 @@ def fetch(source, etag=None, lastmodified=None, agent=USER_AGENT):
   f.close()
   return result
 
-def download(url, destdir, verbose):
-
-  # If the destdir does not exist, create it
-  if not os.path.exists(destdir):
-    if verbose: print "Creating directory '%s'..." % destdir
-    os.makedirs(destdir)
-
-  # Destination is the name of the directory plus the name of the database
-  destination = os.path.join(destdir, os.path.basename(url))
+def download(url, destination, verbose):
 
   # If destination exists and it has a .etag file with it, read it and
   # give it to the fetch method - this will avoid re-downloading databases

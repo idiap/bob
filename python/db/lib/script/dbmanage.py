@@ -27,12 +27,13 @@ epilog = """  For a list of available databases:
   >>> %(prog)s <database-name> --help
 """
 
+import sys
 from bob.db.manage import *
 
-def main():
+def main(user_input=None):
 
   from argparse import RawDescriptionHelpFormatter
   parser = create_parser(description=__doc__, epilog=epilog,
       formatter_class=RawDescriptionHelpFormatter)
-  args = parser.parse_args()
-  args.func(args)
+  args = parser.parse_args(args=user_input)
+  return args.func(args)
