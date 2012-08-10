@@ -331,6 +331,35 @@ def add_protocols(session):
   addProtocolMultiview(session, 'P130', 'eval', 'probe', 4, 2, cam130_shot)
 
 
+  # Protocol P110 (left profile): Enrol: 05_1; Probe: 11_0
+  session.add(ProtocolName('P110'))
+  addProtocolMultiview(session, 'P110', 'dev', 'enrol', 1, 1, cam051_shot)
+  addProtocolMultiview(session, 'P110', 'dev', 'probe', 2, 1, cam110_shot)
+  addProtocolMultiview(session, 'P110', 'dev', 'probe', 3, 1, cam110_shot)
+  addProtocolMultiview(session, 'P110', 'dev', 'probe', 4, 1, cam110_shot)
+  addProtocolMultiview(session, 'P110', 'dev', 'probe', 4, 2, cam110_shot)
+
+  addProtocolMultiview(session, 'P110', 'eval', 'enrol', 1, 1, cam051_shot)
+  addProtocolMultiview(session, 'P110', 'eval', 'probe', 2, 1, cam110_shot)
+  addProtocolMultiview(session, 'P110', 'eval', 'probe', 3, 1, cam110_shot)
+  addProtocolMultiview(session, 'P110', 'eval', 'probe', 4, 1, cam110_shot)
+  addProtocolMultiview(session, 'P110', 'eval', 'probe', 4, 2, cam110_shot)
+
+  # Protocol P240 (right profile): Enrol: 05_1; Probe: 24_0
+  session.add(ProtocolName('P240'))
+  addProtocolMultiview(session, 'P240', 'dev', 'enrol', 1, 1, cam051_shot)
+  addProtocolMultiview(session, 'P240', 'dev', 'probe', 2, 1, cam240_shot)
+  addProtocolMultiview(session, 'P240', 'dev', 'probe', 3, 1, cam240_shot)
+  addProtocolMultiview(session, 'P240', 'dev', 'probe', 4, 1, cam240_shot)
+  addProtocolMultiview(session, 'P240', 'dev', 'probe', 4, 2, cam240_shot)
+
+  addProtocolMultiview(session, 'P240', 'eval', 'enrol', 1, 1, cam051_shot)
+  addProtocolMultiview(session, 'P240', 'eval', 'probe', 2, 1, cam240_shot)
+  addProtocolMultiview(session, 'P240', 'eval', 'probe', 3, 1, cam240_shot)
+  addProtocolMultiview(session, 'P240', 'eval', 'probe', 4, 1, cam240_shot)
+  addProtocolMultiview(session, 'P240', 'eval', 'probe', 4, 2, cam240_shot)
+
+
 def add_expressions(session):
   """Adds expressions"""
 

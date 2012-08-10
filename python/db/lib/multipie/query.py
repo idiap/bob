@@ -20,6 +20,8 @@ class Database(object):
   def __init__(self):
     # opens a session to the database - keep it open until the end
     self.session = utils.session(dbname())
+    
+    self.s_protocols = ('M', 'U', 'G', 'P051', 'P050', 'P140', 'P041', 'P130', 'P110', 'P240')
 
   def __check_validity__(self, l, obj, valid):
     """Checks validity of user input data against a set of valid values"""
@@ -36,7 +38,7 @@ class Database(object):
     Keyword Parameters:
 
     protocol
-      The protocol to consider ('M', 'U', 'G')
+      The protocol to consider ('M', 'U', 'G', 'P051', 'P050', 'P140', 'P041', 'P130', 'P110', 'P240')
 
     groups
       The groups to which the clients belong ('dev', 'eval', 'world')
@@ -55,7 +57,7 @@ class Database(object):
     properties.
     """
 
-    VALID_PROTOCOLS = ('M', 'U', 'G', 'P051', 'P050', 'P140', 'P041', 'P130')
+    VALID_PROTOCOLS = self.s_protocols
     VALID_GROUPS = ('dev', 'eval', 'world')
     VALID_SUBWORLDS = ('sub41', 'sub81', 'sub121', 'sub161')
     VALID_GENDERS = ('m', 'f')
@@ -97,7 +99,7 @@ class Database(object):
     Keyword Parameters:
 
     protocol
-      The protocol to consider ('M', 'U', 'G')
+      The protocol to consider ('M', 'U', 'G', 'P051', 'P050', 'P140', 'P041', 'P130', 'P110', 'P240')
     
     groups
       The groups to which the clients belong ('dev', 'eval').
@@ -120,7 +122,7 @@ class Database(object):
     Keyword Parameters:
 
     protocol
-      The protocol to consider ('M', 'U', 'G')
+      The protocol to consider ('M', 'U', 'G', 'P051', 'P050', 'P140', 'P041', 'P130', 'P110', 'P240')
     
     groups
       The groups to which the clients belong ('dev', 'eval').
@@ -143,7 +145,7 @@ class Database(object):
     Keyword Parameters:
 
     protocol
-      The protocol to consider ('M', 'U', 'G')
+      The protocol to consider ('M', 'U', 'G', 'P051', 'P050', 'P140', 'P041', 'P130', 'P110', 'P240')
     
     groups
       The groups to which the subjects attached to the models belong ('dev', 'eval', 'world')
@@ -159,7 +161,7 @@ class Database(object):
     Keyword Parameters:
 
     protocol
-      The protocol to consider ('M', 'U', 'G')
+      The protocol to consider ('M', 'U', 'G', 'P051', 'P050', 'P140', 'P041', 'P130', 'P110', 'P240')
     
     groups
       The groups to which the models belong ('dev', 'eval').
@@ -175,7 +177,7 @@ class Database(object):
     Keyword Parameters:
 
     protocol
-      The protocol to consider ('M', 'U', 'G')
+      The protocol to consider ('M', 'U', 'G', 'P051', 'P050', 'P140', 'P041', 'P130', 'P110', 'P240')
     
     groups
       The groups to which the models belong ('dev', 'eval').
@@ -263,7 +265,7 @@ class Database(object):
       A filename extension that will be appended to the final filepath returned
 
     protocol
-      One of the Multi-PIE protocols ('M', 'U', 'G').
+      One of the Multi-PIE protocols ('M', 'U', 'G', 'P051', 'P050', 'P140', 'P041', 'P130', 'P110', 'P240').
 
     purposes
       The purposes required to be retrieved ('enrol', 'probe') or a tuple
@@ -341,7 +343,7 @@ class Database(object):
       if directory: return os.path.join(directory, stem + extension)
       return stem + extension
 
-    VALID_PROTOCOLS = ('M', 'U', 'G', 'P051', 'P050', 'P140', 'P041', 'P130')
+    VALID_PROTOCOLS = self.s_protocols
     VALID_PURPOSES = ('enrol', 'probe')
     VALID_GROUPS = ('dev', 'eval', 'world')
     VALID_CLASSES = ('client', 'impostor')
@@ -453,7 +455,10 @@ class Database(object):
                 filter(and_(ProtocolName.name.in_(protocol), Client.sgroup.in_(groups_de), FileProtocol.purpose == 'probe'))
           for k in q: 
             kk = k.file
-            retval[kk.id] = (make_path(kk.path, directory, extension), kk.client_id, kk.client_id, kk.client_id, kk.path)
+            if(model_ids and len(model_ids) == 1):
+              retval[kk.id] = (make_path(kk.path, directory, extension), model_ids[0], model_ids[0], kk.client_id, kk.path)
+            else:
+              retval[kk.id] = (make_path(kk.path, directory, extension), kk.client_id, kk.client_id, kk.client_id, kk.path)
         elif('client' in classes):
           q = self.session.query(FileProtocol).join(File).join(Client).join(ProtocolName).\
                 filter(and_(ProtocolName.name.in_(protocol), Client.sgroup.in_(groups_de), FileProtocol.purpose == 'probe'))
@@ -495,7 +500,7 @@ class Database(object):
       A filename extension that will be appended to the final filepath returned
 
     protocol
-      One of the Multi-PIE protocols ('M', 'U', 'G').
+      One of the Multi-PIE protocols ('M', 'U', 'G', 'P051', 'P050', 'P140', 'P041', 'P130', 'P110', 'P240').
 
     purposes
       The purposes required to be retrieved ('enrol', 'probe') or a tuple
@@ -588,7 +593,7 @@ class Database(object):
       A filename extension that will be appended to the final filepath returned
 
     protocol
-      One of the Multi-PIE protocols ('M', 'U', 'G').
+      One of the Multi-PIE protocols ('M', 'U', 'G', 'P051', 'P050', 'P140', 'P041', 'P130', 'P110', 'P240').
 
     model_ids
       Only retrieves the files for the provided list of model ids (claimed 
@@ -639,7 +644,7 @@ class Database(object):
       A filename extension that will be appended to the final filepath returned
 
     protocol
-      One of the Multi-PIE protocols ('M', 'U', 'G').
+      One of the Multi-PIE protocols ('M', 'U', 'G', 'P051', 'P050', 'P140', 'P041', 'P130', 'P110', 'P240').
 
     model_ids
       Only retrieves the files for the provided list of model ids (claimed 
@@ -686,7 +691,7 @@ class Database(object):
       A filename extension that will be appended to the final filepath returned
 
     protocol
-      One of the Multi-PIE protocols ('M', 'U', 'G').
+      One of the Multi-PIE protocols ('M', 'U', 'G', 'P051', 'P050', 'P140', 'P041', 'P130', 'P110', 'P240').
 
     model_ids
       Only retrieves the files for the provided list of model ids (client id).  
@@ -741,7 +746,7 @@ class Database(object):
       A filename extension that will be appended to the final filepath returned
 
     protocol
-      One of the Multi-PIE protocols ('M', 'U', 'G').
+      One of the Multi-PIE protocols ('M', 'U', 'G', 'P051', 'P050', 'P140', 'P041', 'P130', 'P110', 'P240').
 
     model_ids
       Only retrieves the files for the provided list of model ids (claimed 
