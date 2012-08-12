@@ -24,15 +24,12 @@
 #include "ip/VLSIFT.h"
 
 using namespace boost::python;
-namespace tp = bob::python;
-namespace ip = bob::ip;
-namespace ca = bob::core::array;
 
-
-static object call_vlsift(ip::VLSIFT& op, tp::const_ndarray src) {
-  const ca::typeinfo& info = src.type();  
+static object call_vlsift(bob::ip::VLSIFT& op, bob::python::const_ndarray src) 
+{
+  const bob::core::array::typeinfo& info = src.type();  
   if (info.nd != 2) PYTHON_ERROR(TypeError, "sift features extractor does not support input of type '%s'", info.str().c_str());
-  if(info.dtype != ca::t_uint8)
+  if(info.dtype != bob::core::array::t_uint8)
     PYTHON_ERROR(TypeError, "sift features does not support type '%s'", info.str().c_str());
 
   std::vector<blitz::Array<double,1> > dst;
@@ -42,11 +39,26 @@ static object call_vlsift(ip::VLSIFT& op, tp::const_ndarray src) {
   return t;
 }
 
+static object call_kp_vlsift(bob::ip::VLSIFT& op, bob::python::const_ndarray src, bob::python::const_ndarray kp) 
+{
+  const bob::core::array::typeinfo& info = src.type();  
+  if (info.nd != 2) PYTHON_ERROR(TypeError, "sift features extractor does not support input of type '%s'", info.str().c_str());
+  if(info.dtype != bob::core::array::t_uint8)
+    PYTHON_ERROR(TypeError, "sift features does not support type '%s'", info.str().c_str());
 
-void bind_ip_vlsift() {
+  std::vector<blitz::Array<double,1> > dst;
+  op(src.bz<uint8_t,2>(), kp.bz<double,2>(), dst);
+  list t;
+  for(size_t i=0; i<dst.size(); ++i) t.append(dst[i]);
+  return t;
+}
+
+void bind_ip_vlsift() 
+{
   static const char* VLSIFT_doc = "Computes SIFT features using the VLFeat library";
 
-  class_<ip::VLSIFT, boost::shared_ptr<ip::VLSIFT> >("VLSIFT", VLSIFT_doc, init<const int, const int, const int, const int, const int, optional<const double, const double, const double> >((arg("height"), arg("width"), arg("n_intervals"), arg("n_octaves"), arg("octave_min"), arg("peak_thres")=10, arg("edge_thres")=0.03, arg("magnif")=3), "Creates an object to compute SIFT features"))
-    .def("__call__", &call_vlsift, (arg("self"), arg("src")), "Computes the SIFT features from an input image. It returns a list of descriptors, one for each keypoint and orientation. The first four values are the x, y, sigma and orientation of the values. The 128 remaining values define the descriptor.")
+  class_<bob::ip::VLSIFT, boost::shared_ptr<bob::ip::VLSIFT> >("VLSIFT", VLSIFT_doc, init<const size_t, const size_t, const size_t, const size_t, const int, optional<const double, const double, const double> >((arg("height"), arg("width"), arg("n_intervals"), arg("n_octaves"), arg("octave_min"), arg("peak_thres")=0.03, arg("edge_thres")=10., arg("magnif")=3.), "Creates an object to compute SIFT features"))
+    .def("__call__", &call_vlsift, (arg("self"), arg("src")), "Computes the SIFT features from an input image (by first detecting keypoints). It returns a list of descriptors, one for each keypoint and orientation. The first four values are the x, y, sigma and orientation of the values. The 128 remaining values define the descriptor.")
+    .def("__call__", &call_kp_vlsift, (arg("self"), arg("src"), arg("keypoints")), "Computes the SIFT features from an input image and a set of keypoints. A keypoint is specified by a 3- or 4-tuple (y, x, sigma, [orientation]). The orientation is estimated if not specified. It returns a list of descriptors, one for each keypoint and orientation. The first four values are the x, y, sigma and orientation of the values. The 128 remaining values define the descriptor.")
     ;
 }

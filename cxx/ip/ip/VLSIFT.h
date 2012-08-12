@@ -121,6 +121,16 @@ namespace bob {
           */
         void operator()(const blitz::Array<uint8_t,2>& src, 
           std::vector<blitz::Array<double,1> >& dst);
+        /**
+          * @brief Extract SIFT features from a 2D blitz::Array, at the 
+          *   keypoints specified by the 2D blitz::Array (Each row of length 3
+          *   or 4 corresponds to a keypoint: y,x,sigma,[orientation]). The
+          *   the resulting features are saved in the dst vector of 
+          *   1D blitz::Arrays.
+          */
+        void operator()(const blitz::Array<uint8_t,2>& src, 
+          const blitz::Array<double,2>& keypoints,
+          std::vector<blitz::Array<double,1> >& dst);
 
 
       protected:

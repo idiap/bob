@@ -24,6 +24,7 @@
 
 #include <vl/pgm.h>
 #include "core/array_assert.h"
+#include "ip/Exception.h"
 
 bob::ip::VLSIFT::VLSIFT(const size_t height, const size_t width, 
     const size_t n_intervals, const size_t n_octaves, const int octave_min,
@@ -82,7 +83,7 @@ bool bob::ip::VLSIFT::operator!=(const bob::ip::VLSIFT& b) const
 }
 
 void bob::ip::VLSIFT::operator()(const blitz::Array<uint8_t,2>& src, 
- std::vector<blitz::Array<double,1> >& dst)
+  std::vector<blitz::Array<double,1> >& dst)
 {
   // Clears the vector
   dst.clear();
@@ -157,6 +158,101 @@ void bob::ip::VLSIFT::operator()(const blitz::Array<uint8_t,2>& src,
   }
 
 }
+
+void bob::ip::VLSIFT::operator()(const blitz::Array<uint8_t,2>& src, 
+  const blitz::Array<double,2>& keypoints,
+  std::vector<blitz::Array<double,1> >& dst)
+{
+  if(keypoints.extent(1) != 3 && keypoints.extent(1) != 4)
+    throw bob::ip::Exception();
+ 
+  // Clears the vector
+  dst.clear();
+  vl_bool err=VL_ERR_OK;
+
+  // Copies data
+  for(unsigned int q=0; q<(unsigned)(m_width * m_height); ++q) 
+    m_data[q] = src((int)(q/m_width), (int)(q%m_width));
+  // Converts data type
+  for(unsigned int q=0; q<(unsigned)(m_width * m_height); ++q) 
+    m_fdata[q] = m_data[q];
+
+  // Processes each octave
+  bool first=true;
+  while(1) 
+  {
+    VlSiftKeypoint const *keys = 0;
+    int nkeys;
+
+    // Calculates the GSS for the next octave
+    if(first) 
+    {
+      first = false;
+      err = vl_sift_process_first_octave(m_filt, m_fdata);
+    } 
+    else 
+      err = vl_sift_process_next_octave(m_filt);
+
+    if(err)
+    {
+      err = VL_ERR_OK;
+      break;
+    }
+
+    // Runs the detector
+    vl_sift_detect(m_filt);
+    keys = vl_sift_get_keypoints(m_filt);
+    nkeys = vl_sift_get_nkeypoints(m_filt);
+    
+    // Loops over the keypoint
+    for(int i=0; i<keypoints.extent(0); ++i) {
+      double angles[4];
+      int nangles;
+      VlSiftKeypoint ik;
+      VlSiftKeypoint const *k;
+
+      // Obtain keypoint orientations 
+      vl_sift_keypoint_init(m_filt, &ik,
+        keypoints(i,1), keypoints(i,0), keypoints(i,2)); // x, y, sigma
+
+      if(ik.o != vl_sift_get_octave_index(m_filt))
+        continue; // Not current scale/octave
+
+      k = &ik ;
+
+      // Compute orientations if required
+      if(keypoints.extent(1) == 4)
+      {
+        angles[0] = keypoints(i,3);
+        nangles = 1;
+      }
+      else
+        // TODO: No way to know if several keypoints are generated from one location
+        nangles = vl_sift_calc_keypoint_orientations(m_filt, angles, k);
+
+      // For each orientation
+      for(unsigned int q=0; q<(unsigned)nangles; ++q) {
+        blitz::Array<double,1> res(128+4);
+        vl_sift_pix descr[128];
+
+        // Computes the descriptor
+        vl_sift_calc_keypoint_descriptor(m_filt, descr, k, angles[q]);
+
+        int l;
+        res(0) = k->x;
+        res(1) = k->y;
+        res(2) = k->sigma;
+        res(3) = angles[q];
+        for(l=0; l<128; ++l)
+          res(4+l) = 512. * descr[l];
+
+        // Adds it to the vector
+        dst.push_back(res);
+      }
+    }
+  }
+}
+
 
 void bob::ip::VLSIFT::allocateBuffers()
 {

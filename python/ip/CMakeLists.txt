@@ -62,6 +62,7 @@ bob_python_add_unittest(ip lib/test/zigzag.py)
 # If we have VLFeat installed, enable the test of relevant modules
 if(VLFEAT_FOUND)
   bob_python_add_unittest(ip lib/test/vldsift.py)
+  bob_python_add_unittest(ip lib/test/vlsift.py)
 endif()
 
 # Our examples (run and install)
