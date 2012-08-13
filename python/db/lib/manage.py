@@ -43,6 +43,13 @@ def create_all(args):
     parsed.verbose = args.verbose
     parsed.func(parsed)
 
+def version_all(args):
+  """Executes all the default version commands from individual databases"""
+  
+  for name in [k.dbname() for k in args.modules]:
+    parsed = args.parser.parse_args([name, 'version'])
+    parsed.func(parsed)
+
 def add_all_commands(parser, top_subparser, modules):
   """Adds a subset of commands all databases must comply to and that can be
   triggered for all databases. This special "database" is just a mask to
@@ -56,7 +63,7 @@ def add_all_commands(parser, top_subparser, modules):
   attach the options from those.
   """
 
-  from .utils import location_command, put_command, get_command
+  from .utils import location_command, put_command, get_command, version_command
 
   # creates a top-level parser for this database
   top_level = top_subparser.add_parser('all',
@@ -92,26 +99,37 @@ def add_all_commands(parser, top_subparser, modules):
   create_parser.set_defaults(parser=parser)
   create_parser.set_defaults(modules=modules)
 
+  version_parser = version_command(subparsers)
+  version_parser.set_defaults(func=version_all)
+  version_parser.set_defaults(parser=parser)
+  version_parser.set_defaults(modules=modules)
+
 def create_parser(**kwargs):
   """Creates a parser for the central manager taking into consideration the
   options for every module that can provide those."""
 
   import pkg_resources
   import argparse
+  import imp
 
   parser = argparse.ArgumentParser(**kwargs)
   subparsers = parser.add_subparsers(title='databases')
 
-  dirname = os.path.dirname(__file__)
   all_modules = []
 
+  # for external entries
   for entrypoint in pkg_resources.iter_entry_points('bob.db'):
     plugin = entrypoint.load()
-
-    # adds command directives to the manager, for this specific database
-    if hasattr(plugin, 'add_commands'): plugin.add_commands(subparsers)
-
+    plugin.add_commands(subparsers)
     all_modules.append(plugin)
+
+  # for builtin entries
+  dirname = os.path.dirname(__file__)
+  for k in os.listdir(dirname):
+    d = os.path.join(dirname, k)
+    if not os.path.isdir(d): continue
+    if os.path.exists(os.path.join(dirname, k, '__init__.py')):
+      module = __import__(k, fromlist=('.',))
 
   add_all_commands(parser, subparsers, all_modules) #inserts the master driver
 

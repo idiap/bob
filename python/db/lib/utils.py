@@ -197,16 +197,31 @@ def put_command(subparsers):
 
   return parser
 
+def version(options):
+  """Outputs the database version"""
+
+  print '%s == %s' % (options.dbname, options.version)
+
+  return 0
+
+def version_command(subparsers):
+
+  parser = subparsers.add_parser('version', help=put.__doc__)
+  parser.set_defaults(func=version)
+
+  return parser
+
 def standard_commands(subparsers, type, files):
   """Adds all standard commands to databases that can respond to them."""
 
-  if type == 'sqlite': 
+  if type == 'sqlite':
     dbshell_command(subparsers)
 
   if files:
     location_command(subparsers)
-    put_command(subparsers)
-    get_command(subparsers)
+    if type != 'builtin':
+      put_command(subparsers)
+      get_command(subparsers)
 
 def makedirs_safe(fulldir, dryrun=False):
   """Creates a directory if it does not exists, with concurrent access support"""

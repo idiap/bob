@@ -22,125 +22,20 @@
  Databases
 ===========
 
+This package describes the database API for |project|. Database APIs establish
+how your programs can query for file lists using known pre-coded protocols that
+assure reproducibility. This package contains only the base API for you to
+create and distribute new databases and a single, very simple example using the
+publicly available Iris Flower Dataset.
+
+Build a database package for Bob goes pretty much like building a `satellite
+package <https://github.com/idiap/bob/wiki/Satellite-Packages>`. For examples
+and details, have a look at our `satellite package portal
+<https://github.com/idiap/bob/wiki/Satellite-Packages>` .
+
 .. automodule:: bob.db
-
-AR face database
-================
-
-.. automodule:: bob.db.arface
-
-.. autoclass:: bob.db.arface.Database
-
-
-AT&T database
-=============
-
-.. automodule:: bob.db.atnt
-
-
-BANCA Database
-==============
-
-.. automodule:: bob.db.banca
-
-.. autoclass:: bob.db.banca.Database
-
-BANCA small Database
-====================
-
-.. automodule:: bob.db.banca_small
-
-.. autoclass:: bob.db.banca_small.Database
-
-Biosecure Database
-==================
-
-.. automodule:: bob.db.biosecure
-
-.. autoclass:: bob.db.biosecure.Database
-
-CASIA_FASD Database
-===================
-
-.. automodule:: bob.db.casia_fasd
-
-FaceVerif_FL Database
-=====================
-
-.. automodule:: bob.db.faceverif_fl
-
-.. autoclass:: bob.db.faceverif_fl.Database
-
-FRGC Database
-=============
-
-.. automodule:: bob.db.frgc
-
-.. autoclass:: bob.db.frgc.Database
-
-GBU Database
-============
-
-.. automodule:: bob.db.gbu
-
-.. autoclass:: bob.db.gbu.Database
-
 
 Iris Database
 =============
 
 .. automodule:: bob.db.iris
-
-Labeled Faces in the Wild Database
-==================================
-
-.. automodule:: bob.db.lfw
-
-.. autoclass:: bob.db.lfw.Database
-
-MOBIO Database
-==============
-
-.. automodule:: bob.db.mobio
-
-.. autoclass:: bob.db.mobio.Database
-
-Multi-PIE Database
-==================
-
-.. automodule:: bob.db.multipie
-
-.. autoclass:: bob.db.multipie.Database
-
-NUAA Database
-=============
-
-.. automodule:: bob.db.nuaa
-
-Replay Attack Database
-======================
-
-.. automodule:: bob.db.replay
-
-.. autoclass:: bob.db.replay.Database
-
-SCface Database
-===============
-
-.. automodule:: bob.db.scface
-
-.. autoclass:: bob.db.scface.Database
-
-XM2VTS Database
-===============
-
-.. automodule:: bob.db.xm2vts
-
-.. autoclass:: bob.db.xm2vts.Database
-
-FIR Database
-===============
-
-.. automodule:: bob.db.fir
-
-.. autoclass:: bob.db.fir.Database
