@@ -98,7 +98,9 @@ static blitz::Array<std::complex<double>,2> gabor_wavelet_transform_2 (bob::ip::
 
 
 static blitz::Array<std::complex<double>,3> empty_trafo_image (bob::ip::GaborWaveletTransform& gwt, bob::python::const_ndarray input_image){
-  return blitz::Array<std::complex<double>,3>(gwt.numberOfKernels(), input_image.type().nd-2, input_image.type().nd-1);
+  int index = input_image.type().nd-2;
+  assert(index >= 0);
+  return blitz::Array<std::complex<double>,3>(gwt.numberOfKernels(), input_image.type().shape[index], input_image.type().shape[index+1]);
 }
 
 static void perform_gwt_1 (bob::ip::GaborWaveletTransform& gwt, bob::python::const_ndarray input_image, bob::python::ndarray output_trafo_image){
