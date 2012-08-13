@@ -110,9 +110,6 @@ def create_parser(**kwargs):
     # adds command directives to the manager, for this specific database
     if hasattr(plugin, 'add_commands'): plugin.add_commands(subparsers)
 
-    # adds SQLite infrastructure support for non-built-in databases
-    if not hasattr(plugin, '__builtin__'): all_modules.append(plugin)
-
   add_all_commands(parser, subparsers, all_modules) #inserts the master driver
 
   return parser
