@@ -12,31 +12,32 @@ import sys
 def location_all(args):
   """Executes all the location commands from individual databases"""
   
-  for name, module in args.modules:
+  for name in [k.dbname() for k in args.modules]:
     parsed = args.parser.parse_args([name, 'location'])
-    parsed.with_protocol = args.with_protocol
     parsed.func(parsed)
 
 def get_all(args):
   """Executes all the get commands from individual databases"""
   
-  for name, module in args.modules:
-    parsed = args.parser.parse_args([name, 'get', args.directory[0]])
+  for name in [k.dbname() for k in args.modules]:
+    parsed = args.parser.parse_args([name, 'get', args.url])
+    parsed.dryrun = args.dryrun
     parsed.verbose = args.verbose
     parsed.func(parsed)
 
 def put_all(args):
   """Executes all the put commands from individual databases"""
   
-  for name, module in args.modules:
-    parsed = args.parser.parse_args([name, 'put', args.directory[0]])
+  for name in [k.dbname() for k in args.modules]:
+    parsed = args.parser.parse_args([name, 'put', args.directory])
+    parsed.dryrun = args.dryrun
     parsed.verbose = args.verbose
     parsed.func(parsed)
 
 def create_all(args):
   """Executes all the default create commands from individual databases"""
   
-  for name, module in args.modules:
+  for name in [k.dbname() for k in args.modules if k.type() == 'sqlite']:
     parsed = args.parser.parse_args([name, 'create'])
     parsed.recreate = args.recreate
     parsed.verbose = args.verbose
@@ -109,6 +110,8 @@ def create_parser(**kwargs):
 
     # adds command directives to the manager, for this specific database
     if hasattr(plugin, 'add_commands'): plugin.add_commands(subparsers)
+
+    all_modules.append(plugin)
 
   add_all_commands(parser, subparsers, all_modules) #inserts the master driver
 
