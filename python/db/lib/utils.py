@@ -112,7 +112,7 @@ def get(options):
       if options.verbose: 
         print "Creating directory '%s'..." % options.location
 
-      makedirs_safe(options.location, options.dryrun)
+      makedirs_safe(os.path.dirname(dest), options.dryrun)
 
     if os.path.exists(dest):
       if options.verbose: print "Removing existing copy '%s'..." % dest
@@ -160,9 +160,10 @@ def put(options):
   import shutil
 
   d = os.path.join(options.directory, options.dbname, options.version)
-  makedirs_safe(d, options.dryrun)
   for f in options.files:
     dest = os.path.join(d, f)
+  
+    makedirs_safe(os.path.dirname(dest), options.dryrun)
 
     if os.path.exists(dest):
       if options.verbose: print "Removing existing file '%s'..." % dest
