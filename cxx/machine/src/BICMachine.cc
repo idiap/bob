@@ -142,7 +142,7 @@ void bob::machine::BICMachine::load(bob::io::HDF5File& config){
     m_use_DFFS = config.read<bool>("use_DFFS");
     m_Phi_I.reference(config.readArray<double,2>("intra_subspace"));
     initialize(false, m_Phi_I.shape()[1], m_Phi_I.shape()[0]);
-     m_rho_I = config.read<double>("intra_rho");
+    m_rho_I = config.read<double>("intra_rho");
   }
 
   m_mu_E.reference(config.readArray<double,1>("extra_mean"));
@@ -199,10 +199,10 @@ void bob::machine::BICMachine::forward_(const blitz::Array<double,1>& input, bli
     bob::math::prod(m_Phi_E, m_diff_E, m_proj_E);
 
     // compute Mahalanobis distance
-    for (int i = m_proj_I.shape()[0]; i--;){
-      res += sqr(m_proj_E(i)) / m_lambda_E(i)
-          -  sqr(m_proj_I(i)) / m_lambda_I(i);
-    }
+    for (int i = m_proj_E.shape()[0]; i--;)
+      res += sqr(m_proj_E(i)) / m_lambda_E(i);
+    for (int i = m_proj_I.shape()[0]; i--;)
+      res -= sqr(m_proj_I(i)) / m_lambda_I(i);
 
     // add the DFFS?
     if (m_use_DFFS){
