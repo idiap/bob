@@ -33,9 +33,9 @@ namespace bob { namespace machine {
   /**
    * Exceptions of this class are thrown when eigenvalues are too small.
    */
-  class ZeroEigenvalueException : Exception{
+  class ZeroEigenvalueException : public Exception{
     public:
-    ZeroEigenvalueException() throw(){}
+      ZeroEigenvalueException() throw(){}
       virtual ~ZeroEigenvalueException() throw(){}
       virtual const char* what() const throw(){return "One given/read/calculated eigenvalue is close to zero. Use a smaller number of kept eigenvalues!";}
   };

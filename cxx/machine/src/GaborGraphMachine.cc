@@ -93,6 +93,14 @@ bob::machine::GaborGraphMachine::GaborGraphMachine(
   }
 }
 
+void bob::machine::GaborGraphMachine::checkPositions(int height, int width) const throw(){
+  for (int i = m_node_positions.extent(0); i--;){
+    if (m_node_positions(i,0) < 0 || m_node_positions(i,0) >= height ||
+        m_node_positions(i,1) < 0 || m_node_positions(i,1) >= width)
+      throw ImageTooSmallException(height, width, m_node_positions(i,0), m_node_positions(i,1));
+  }
+}
+
 /**
  * Extracts the Gabor jets (including phase information) at the node positions
  * @param jet_image  The Gabor jet image to extract the Gabor jets from
@@ -102,6 +110,8 @@ void bob::machine::GaborGraphMachine::extract(
   const blitz::Array<double,4>& jet_image,
   blitz::Array<double,3>& graph_jets
 ) const {
+  // check the positions
+  checkPositions(jet_image.shape()[0], jet_image.shape()[1]);
   // extract Gabor jets
   blitz::Range all = blitz::Range::all();
   for (int i = 0; i < m_node_positions.extent(0); ++i){
@@ -118,6 +128,8 @@ void bob::machine::GaborGraphMachine::extract(
   const blitz::Array<double,3>& jet_image,
   blitz::Array<double,2>& graph_jets
 ) const {
+  // check the positions
+  checkPositions(jet_image.shape()[0], jet_image.shape()[1]);
   // extract Gabor jets
   blitz::Range all = blitz::Range::all();
   for (int i = 0; i < m_node_positions.extent(0); ++i){
