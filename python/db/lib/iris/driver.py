@@ -33,7 +33,7 @@ class Interface(AbstractInterface):
     '''Returns the current version number from Bob's build'''
 
     from ...build import version
-    return version
+    return 'bob-' + version + ' (built-in)'
 
   def type(self):
     '''Returns the type of auxiliary files you have for this database

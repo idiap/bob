@@ -12,14 +12,14 @@ import sys
 def location_all(args):
   """Executes all the location commands from individual databases"""
   
-  for name in [k.dbname() for k in args.modules]:
+  for name in [k.name() for k in args.modules]:
     parsed = args.parser.parse_args([name, 'location'])
     parsed.func(parsed)
 
 def get_all(args):
   """Executes all the get commands from individual databases"""
   
-  for name in [k.dbname() for k in args.modules]:
+  for name in [k.name() for k in args.modules if k.files() and not k.type() in ('builtin',)]:
     parsed = args.parser.parse_args([name, 'get', args.url])
     parsed.dryrun = args.dryrun
     parsed.verbose = args.verbose
@@ -28,7 +28,7 @@ def get_all(args):
 def put_all(args):
   """Executes all the put commands from individual databases"""
   
-  for name in [k.dbname() for k in args.modules]:
+  for name in [k.name() for k in args.modules if k.files() and not k.type() in ('builtin',)]:
     parsed = args.parser.parse_args([name, 'put', args.directory])
     parsed.dryrun = args.dryrun
     parsed.verbose = args.verbose
@@ -37,7 +37,7 @@ def put_all(args):
 def create_all(args):
   """Executes all the default create commands from individual databases"""
   
-  for name in [k.dbname() for k in args.modules if k.type() == 'sqlite']:
+  for name in [k.name() for k in args.modules if k.type() in ('sqlite',)]:
     parsed = args.parser.parse_args([name, 'create'])
     parsed.recreate = args.recreate
     parsed.verbose = args.verbose
@@ -46,7 +46,7 @@ def create_all(args):
 def version_all(args):
   """Executes all the default version commands from individual databases"""
   
-  for name in [k.dbname() for k in args.modules]:
+  for name in [k.name() for k in args.modules]:
     parsed = args.parser.parse_args([name, 'version'])
     parsed.func(parsed)
 
