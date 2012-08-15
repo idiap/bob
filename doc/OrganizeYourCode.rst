@@ -120,26 +120,38 @@ anything. Here is how to go from nothing to everything:
 .. code-block:: sh
 
   $ python bootstrap.py
-  Downloading http://pypi.python.org/packages/2.6/s/setuptools/setuptools-0.6c11-py2.6.egg
-  Creating directory '/Users/andre/Projects/bob.project.example/bin'.
-  Creating directory '/Users/andre/Projects/bob.project.example/parts'.
-  Creating directory '/Users/andre/Projects/bob.project.example/eggs'.
-  Creating directory '/Users/andre/Projects/bob.project.example/develop-eggs'.
-  Getting distribution for 'setuptools'.
-  Got setuptools 0.6c12dev-r88846.
-  Generated script '/Users/andre/Projects/bob.project.example/bin/buildout'.
+    Downloading http://pypi.python.org/packages/2.6/s/setuptools/setuptools-0.6c11-py2.6.egg
+    Creating directory '/Users/andre/Projects/bob.project.example/bin'.
+    Creating directory '/Users/andre/Projects/bob.project.example/parts'.
+    Creating directory '/Users/andre/Projects/bob.project.example/eggs'.
+    Creating directory '/Users/andre/Projects/bob.project.example/develop-eggs'.
+    Getting distribution for 'setuptools'.
+    Got setuptools 0.6c12dev-r88846.
+    Generated script '/Users/andre/Projects/bob.project.example/bin/buildout'.
   $ ./bin/buildout
-  Develop: '/Users/andre/Projects/bob.project.example/.'
-  Installing python.
-  Generated script '/Users/andre/Projects/bob.project.example/bin/version.py'.
-  Generated interpreter '/Users/andre/Projects/bob.project.example/bin/python'.
+    Develop: '/Users/andre/Projects/bob.project.example/.'
+    Installing python.
+    Generated script '/Users/andre/Projects/bob.project.example/bin/version.py'.
+    Generated interpreter '/Users/andre/Projects/bob.project.example/bin/python'.
+
+.. note::
+
+  The python shell used in the first line of the previous command set
+  determines the python interpreter that will be used for all scripts developed
+  inside this package. Because this package makes use of Bob, you must make
+  sure that the bootstrap.py script is called with the same interpreter used to
+  build Bob, or unexpected problems might occur.
+
+  If Bob is installed by the administrator of your system, it is safe to
+  consider it uses the default python interpreter. In this case, the above 2
+  command lines should work as expected.
 
 You should now be able to execute ``./bin/version.py``:
 
 .. code-block:: sh
 
   $ ./bin/version.py 
-  The installed version of Bob is '1.0.2'
+    The installed version of Bob is '1.0.2'
 
 Everything is now setup for you to continue the development of this package.
 Modify all required files to setup your own package name, description and
@@ -175,6 +187,18 @@ using the ``localbob.cfg`` configuration:
   $ ./bin/buildout -c localbob.cfg
 
 After buildout has run, you should be able to execute ``bin/version.py`` again.
+
+.. note::
+
+  The python shell used in the first line of the previous command set
+  determines the python interpreter that will be used for all scripts developed
+  inside this package. Because this package makes use of Bob, you must make
+  sure that the bootstrap.py script is called with the same interpreter used to
+  build Bob, or unexpected problems might occur.
+
+  If Bob is installed by the administrator of your system, it is safe to
+  consider it uses the default python interpreter. In this case, the above 2
+  command lines should work as expected.
 
 Document Generation and Unit Testing
 ====================================
