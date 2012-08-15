@@ -6,6 +6,6 @@
 """The db package contains simplified APIs to access data for various databases
 that can be used in Biometry, Machine Learning or Pattern Classification."""
 
-import iris
+from . import utils, driver, iris
 
 __all__ = dir()

@@ -3,7 +3,7 @@
 # Andre Anjos <andre.anjos@idiap.ch>
 # Thu 12 May 08:33:24 2011 
 
-"""Some utilities to talk to bob SQLite databases.
+"""Some utilities shared by many of the databases.
 """
 
 import os
@@ -16,9 +16,13 @@ class null(object):
   """A look-alike stream that discards the input"""
 
   def write(self, s):
+    """Writes contents of string ``s`` on this stream"""
+
     pass
   
   def flush(self):
+    """Flushes the stream"""
+
     pass
 
 def session(dbtype, dbdir, dbfile, echo=False):

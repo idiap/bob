@@ -29,13 +29,23 @@ create and distribute new databases and a single, very simple example using the
 publicly available Iris Flower Dataset.
 
 Build a database package for Bob goes pretty much like building a `satellite
-package <https://github.com/idiap/bob/wiki/Satellite-Packages>`. For examples
+package <https://github.com/idiap/bob/wiki/Satellite-Packages>`_. For examples
 and details, have a look at our `satellite package portal
-<https://github.com/idiap/bob/wiki/Satellite-Packages>` .
+<https://github.com/idiap/bob/wiki/Satellite-Packages>`_.
 
 .. automodule:: bob.db
 
-Iris Database
-=============
+General Utilities
+=================
+
+.. automodule:: bob.db.utils
+
+Central Database Manager API
+============================
+
+.. automodule:: bob.db.driver
+
+Iris Flower Dataset
+===================
 
 .. automodule:: bob.db.iris

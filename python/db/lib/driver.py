@@ -3,8 +3,9 @@
 # Andre Anjos <andre.anjos@idiap.ch>
 # Mon 13 Aug 2012 16:19:18 CEST 
 
-"""An abstract class that defines the required behavior of implemented
-databases.
+"""This module defines, among other less important constructions, a management
+interface that can be used by Bob to display information about the database and
+manage installed files.
 """
 
 import os
@@ -295,3 +296,5 @@ class Interface(object):
       ``add_argument()`` on.
     '''
     return
+
+__all__ = ('Interface',)

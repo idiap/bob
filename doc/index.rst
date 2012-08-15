@@ -82,6 +82,7 @@ User's Guide
    TutorialsDatabase
    TutorialsPerformance
    IrisExample
+   OrganizeYourCode
    TicketReporting
 
 Developer's Guide
