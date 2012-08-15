@@ -63,7 +63,7 @@ def add_all_commands(parser, top_subparser, modules):
   attach the options from those.
   """
 
-  from .utils import location_command, put_command, get_command, version_command
+  from .driver import location_command, put_command, get_command, version_command
 
   # creates a top-level parser for this database
   top_level = top_subparser.add_parser('all',
@@ -115,13 +115,9 @@ def create_parser(**kwargs):
   parser = argparse.ArgumentParser(**kwargs)
   subparsers = parser.add_subparsers(title='databases')
 
-  all_modules = []
-
   # for external entries
   for entrypoint in pkg_resources.iter_entry_points('bob.db'):
     plugin = entrypoint.load()
-    plugin.add_commands(subparsers)
-    all_modules.append(plugin)
 
   # for builtin entries
   dirname = os.path.dirname(__file__)
@@ -129,7 +125,15 @@ def create_parser(**kwargs):
     d = os.path.join(dirname, k)
     if not os.path.isdir(d): continue
     if os.path.exists(os.path.join(dirname, k, '__init__.py')):
-      module = __import__(k, fromlist=('.',))
+      exec('from . import %s as module' % k)
+
+  # at this point we should have loaded all databases
+  from .driver import Interface
+  all_modules = []
+  for plugin in Interface.__subclasses__():
+    driver = plugin()
+    driver.add_commands(subparsers)
+    all_modules.append(driver)
 
   add_all_commands(parser, subparsers, all_modules) #inserts the master driver
 
