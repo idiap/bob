@@ -52,11 +52,13 @@ class HistogramMeasureTest(unittest.TestCase):
   m_h3 = numpy.random.random_integers(0,99,size=(100000,))
   m_h4 = numpy.random.random_integers(0,99,size=(100000,))
   
-  m_h5 = numpy.array([1,0,0,1,0,0,1,0,1,1], dtype = numpy.float64);
-  m_h6 = numpy.array([1,0,1,0,0,0,1,0,1,1], dtype = numpy.float64);
+  m_h5 = numpy.array([1,0,0,1,0,0,1,0,1,1], dtype = numpy.float64)
+  m_h6 = numpy.array([1,0,1,0,0,0,1,0,1,1], dtype = numpy.float64)
 
-  
-  
+  index_1 = numpy.array([0,3,6,8,9], dtype = numpy.uint16)
+  index_2 = numpy.array([0,2,6,8,9], dtype = numpy.uint16)
+  values = numpy.array([1,1,1,1,1], dtype = numpy.float64)
+ 
   def test_histogram_intersection(self):
     # compare our implementation with bob.math
     self.assertEqual(
@@ -71,7 +73,9 @@ class HistogramMeasureTest(unittest.TestCase):
     # test specific (simple) case
     self.assertEqual(bob.math.histogram_intersection(self.m_h5, self.m_h5), 5.)
     self.assertEqual(bob.math.histogram_intersection(self.m_h5, self.m_h6), 4.)
-    
+
+    self.assertEqual(bob.math.histogram_intersection(self.index_1, self.values, self.index_1, self.values), 5.)
+    self.assertEqual(bob.math.histogram_intersection(self.index_1, self.values, self.index_2, self.values), 4.)
     
   def test_chi_square(self):
     # compare our implementation with bob.math
@@ -87,6 +91,9 @@ class HistogramMeasureTest(unittest.TestCase):
     # test specific (simple) case
     self.assertEqual(bob.math.chi_square(self.m_h5, self.m_h5), 0.)
     self.assertEqual(bob.math.chi_square(self.m_h5, self.m_h6), 2.)
+
+    self.assertEqual(bob.math.chi_square(self.index_1, self.values, self.index_1, self.values), 0.)
+    self.assertEqual(bob.math.chi_square(self.index_1, self.values, self.index_2, self.values), 2.)
     
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(HistogramMeasureTest)

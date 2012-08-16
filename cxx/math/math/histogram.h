@@ -65,6 +65,29 @@ namespace bob{
         );
       }
 
+    template <class T1, class T2>
+      //! Fast implementation of the sparse histogram intersection measure
+      inline T2 histogram_intersection(
+            const blitz::Array<T1,1>& index_1, const blitz::Array<T2,1>& values_1,
+            const blitz::Array<T1,1>& index_2, const blitz::Array<T2,1>& values_2
+      ){
+        bob::core::array::assertSameShape(index_1,values_1);
+        bob::core::array::assertSameShape(index_2,values_2);
+        int i1 = 0, i2 = 0, i1_end = index_1.shape()[0], i2_end = index_2.shape()[0];
+        T1 p1 = index_1(i1), p2 = index_2(i2);
+        T2 sum = T2(0);
+        while (i1 < i1_end && i2 < i2_end){
+          if (p1 == p2){
+            sum += minimum(values_1(i1), values_2(i2));
+            p1 = index_1(++i1);
+            p2 = index_2(++i2);
+          } else
+            if (p1 < p2) p1 = index_1(++i1);
+            else p2 = index_2(++i2);
+        }
+        return sum;
+      }
+
     template <class T>
       //! Fast implementation of the chi square histogram distance measure
       inline T chi_square(const blitz::Array<T,1>& h1, const blitz::Array<T,1>& h2){
@@ -83,6 +106,34 @@ namespace bob{
           bob::math::chi_square_distance<T>
         );
       }
+
+    template <class T1, class T2>
+      //! Fast implementation of the sparse chi square measure
+      inline T2 chi_square(
+            const blitz::Array<T1,1>& index_1, const blitz::Array<T2,1>& values_1,
+            const blitz::Array<T1,1>& index_2, const blitz::Array<T2,1>& values_2
+      ){
+        bob::core::array::assertSameShape(index_1,values_1);
+        bob::core::array::assertSameShape(index_2,values_2);
+        int i1 = 0, i2 = 0, i1_end = index_1.shape()[0], i2_end = index_2.shape()[0];
+        T1 p1 = index_1(i1), p2 = index_2(i2);
+        T2 sum = T2(0);
+        while (i1 < i1_end && i2 < i2_end){
+          if (p1 == p2){
+            sum += chi_square_distance(values_1(i1), values_2(i2));
+            p1 = index_1(++i1);
+            p2 = index_2(++i2);
+          } else if (p1 < p2) {
+            sum += chi_square_distance(values_1(i1), T2(0));
+            p1 = index_1(++i1);
+          } else{
+            sum += chi_square_distance(T2(0), values_2(i2));
+            p2 = index_2(++i2);
+          }
+        }
+        return sum;
+      }
+
   } // namespace math
 } // namespace bob
 
