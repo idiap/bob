@@ -63,14 +63,16 @@ def add_protocols(session):
   """Adds protocols"""
   for illumination in range(1,7):
     for shot in range(0,5):
-      session.add(Protocol('ir', 'world', 'enrol', True, illumination, shot))
-      session.add(Protocol('noir', 'world', 'enrol', False, illumination, shot))
       if illumination == 2:
+        session.add(Protocol('ir', 'world', 'enrol', True, illumination, shot))
+        session.add(Protocol('noir', 'world', 'enrol', False, illumination, shot))
         session.add(Protocol('ir', 'dev', 'enrol', True, illumination, shot))
         session.add(Protocol('noir', 'dev', 'enrol', False, illumination, shot))
         session.add(Protocol('ir', 'eval', 'enrol', True, illumination, shot))
         session.add(Protocol('noir', 'eval', 'enrol', False, illumination, shot))
       else:
+        session.add(Protocol('ir', 'world', 'probe', True, illumination, shot))
+        session.add(Protocol('noir', 'world', 'probe', False, illumination, shot))
         session.add(Protocol('ir', 'dev', 'probe', True, illumination, shot))
         session.add(Protocol('noir', 'dev', 'probe', False, illumination, shot))
         session.add(Protocol('ir', 'eval', 'probe', True, illumination, shot))

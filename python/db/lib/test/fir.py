@@ -38,7 +38,7 @@ class FIRDatabaseTest(unittest.TestCase):
     self.assertEqual(len(f.values()), 625) # number of all training files
    
     f = db.files(groups='dev')
-    self.assertEqual(len(f.values()), 419) # number of all test files
+    self.assertEqual(len(f.values()), 419) # number of all development files
     
     f = db.files(groups='dev', purposes = 'enrol')
     self.assertEqual(len(f.values()), 60) # number of enrol files
