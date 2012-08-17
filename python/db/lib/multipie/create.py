@@ -409,8 +409,8 @@ def add_fileprotocol(session):
     for prot in protocols_I:
       session.add(FileProtocol(k[0], prot, 'world'))
   
-  protocols_P = ('P051', 'P050', 'P140', 'P041', 'P130')
-  cameras_P = ('05_1', '05_0', '14_0', '04_1', '13_0')
+  protocols_P = ('P051', 'P050', 'P140', 'P041', 'P130', 'P110', 'P240')
+  cameras_P = ('05_1', '05_0', '14_0', '04_1', '13_0', '11_0', '24_0')
   for prot in range(len(protocols_P)):
     cams = []
     if prot == 0: cams = ['05_1']

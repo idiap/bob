@@ -22,6 +22,7 @@ class Database(object):
     self.session = utils.session(dbname())
     
     self.s_protocols = ('M', 'U', 'G', 'P051', 'P050', 'P140', 'P041', 'P130', 'P110', 'P240')
+    self.s_cameras = ('05_1', '05_0', '14_0', '04_1', '13_0', '11_0', '24_0')
 
   def __check_validity__(self, l, obj, valid):
     """Checks validity of user input data against a set of valid values"""
@@ -251,7 +252,7 @@ class Database(object):
 
   def objects(self, directory=None, extension=None, protocol=None,
       purposes=None, model_ids=None, groups=None, classes=None, subworld=None,
-      expressions=None, world_sampling=1, world_noflash=False, 
+      expressions=None, world_cameras=None, world_sampling=1, world_noflash=False, 
       world_first=False, world_second=False, world_third=False, world_fourth=False,
       world_nshots=None, world_shots=None):
     """Returns a set of filenames for the specific query by the user.
@@ -297,6 +298,13 @@ class Database(object):
       'squint', 'disgust', 'scream') or a tuple with several of them. 
       If 'None' is given (this is the default), it is considered the same as 
       a tuple with all possible values.
+
+    world_cameras
+      The cameras to be retrieved ('05_1', '05_0', '14_0', '04_1', '13_0',
+      '11_0', '24_0') or a tuple with several of them. 
+      If 'None' is given (this is the default), it is considered the same as 
+      a tuple with all possible values. The world_camera keyword is ignored in 
+      the 'dev' and 'eval' sets.  
 
     world_sampling
       Samples the files from the world data set. Keeps only files such as::
@@ -349,6 +357,7 @@ class Database(object):
     VALID_CLASSES = ('client', 'impostor')
     VALID_SUBWORLDS = ('sub41', 'sub81', 'sub121', 'sub161')
     VALID_EXPRESSIONS = ('neutral', 'smile', 'surprise', 'squint', 'disgust', 'scream')
+    VALID_CAMERAS = self.s_cameras
 
     protocol = self.__check_validity__(protocol, 'protocol', VALID_PROTOCOLS)
     purposes = self.__check_validity__(purposes, 'purpose', VALID_PURPOSES)
@@ -356,6 +365,7 @@ class Database(object):
     classes = self.__check_validity__(classes, 'class', VALID_CLASSES)
     if subworld: subworld = self.__check_validity__(subworld, 'subworld', VALID_SUBWORLDS)
     expressions = self.__check_validity__(expressions, 'expression', VALID_EXPRESSIONS)
+    world_cameras = self.__check_validity__(world_cameras, 'camera', VALID_CAMERAS)
 
     retval = {}
     
@@ -372,7 +382,7 @@ class Database(object):
                         File.recording_id == Expression.recording_id, FileMultiview.shot_id != 19))
       """
       q = self.session.query(FileProtocol).join(File).join(Client).join(ProtocolName).join(FileMultiview).\
-            filter(and_(ProtocolName.name.in_(protocol), Client.sgroup == 'world', FileProtocol.purpose == 'world'))
+            filter(and_(ProtocolName.name.in_(protocol), FileMultiview.camera_id.in_(world_cameras), Client.sgroup == 'world', FileProtocol.purpose == 'world'))
       if subworld:
         q = q.join(SubworldClient).filter(SubworldClient.name.in_(subworld))
       if model_ids:
@@ -486,7 +496,7 @@ class Database(object):
 
   def files(self, directory=None, extension=None, protocol=None,
       purposes=None, model_ids=None, groups=None, classes=None, subworld=None,
-      expressions=None, world_sampling=1, world_noflash=False, 
+      expressions=None, world_cameras=None, world_sampling=1, world_noflash=False, 
       world_first=False, world_second=False, world_third=False, world_fourth=False,
       world_nshots=None, world_shots=None):
     """Returns a set of filenames for the specific query by the user.
@@ -533,6 +543,13 @@ class Database(object):
       If 'None' is given (this is the default), it is considered the same as 
       a tuple with all possible values.
 
+    world_cameras
+      The cameras to be retrieved ('05_1', '05_0', '14_0', '04_1', '13_0',
+      '11_0', '24_0') or a tuple with several of them. 
+      If 'None' is given (this is the default), it is considered the same as 
+      a tuple with all possible values. The world_camera keyword is ignored in 
+      the 'dev' and 'eval' sets.  
+
     world_sampling
       Samples the files from the world data set. Keeps only files such as::
 
@@ -573,7 +590,7 @@ class Database(object):
     """
 
     retval = {}
-    d = self.objects(directory, extension, protocol, purposes, model_ids, groups, classes, subworld, expressions, world_sampling, world_noflash, world_first, world_second, world_third, world_fourth, world_nshots, world_shots)
+    d = self.objects(directory, extension, protocol, purposes, model_ids, groups, classes, subworld, expressions, world_cameras, world_sampling, world_noflash, world_first, world_second, world_third, world_fourth, world_nshots, world_shots)
     for k in d: retval[k] = d[k][0]
 
     return retval
