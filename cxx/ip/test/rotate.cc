@@ -6,16 +6,16 @@
  * @brief Test the rotation function for 2D and 3D arrays/images
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -60,7 +60,7 @@ struct T {
     a2r_180 = 11, 10, 9, 8,
         7, 6, 5, 4,
         3, 2, 1, 0;
-  
+
     a2r_270 = 8, 4, 0,
         9, 5, 1,
         10, 6, 2,
@@ -68,11 +68,11 @@ struct T {
 
     a8 = 1;
     a8m = true;
-    // The following might likely be improved. Do not consider that as a pure 
+    // The following might likely be improved. Do not consider that as a pure
     // reference mask. Bilinear interpolation might be better with masks, as
-    // the mask keep decreasing in size while performing successive shearing 
+    // the mask keep decreasing in size while performing successive shearing
     // operations.
-    a8m_45 = 
+    a8m_45 =
       false, false, false, false, false, false, false, false, false, false, false,
       false, false, false, false, true, false, false, false, false, false, false,
       false, false, false, true, true, true, false, false, false, false, false,
@@ -89,15 +89,15 @@ struct T {
   ~T() {}
 };
 
-template<typename T, typename U, int d>  
-void check_dimensions( blitz::Array<T,d>& t1, blitz::Array<U,d>& t2) 
+template<typename T, typename U, int d>
+void check_dimensions( blitz::Array<T,d>& t1, blitz::Array<U,d>& t2)
 {
   BOOST_REQUIRE_EQUAL(t1.dimensions(), t2.dimensions());
   for( int i=0; i<t1.dimensions(); ++i)
     BOOST_CHECK_EQUAL(t1.extent(i), t2.extent(i));
 }
 
-template<typename T, typename U>  
+template<typename T, typename U>
 void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
 {
   check_dimensions( t1, t2);
@@ -106,8 +106,8 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
       BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
-template<typename T, typename U>  
-void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2) 
+template<typename T, typename U>
+void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
 {
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
@@ -117,7 +117,7 @@ void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
 }
 
 
-template<typename T, typename U>  
+template<typename T, typename U>
 void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2,
   const double eps )
 {
@@ -129,12 +129,12 @@ void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2,
   for( int i=0; i<y_min; ++i)
     for( int j=0; j<x_min; ++j)
       diff += abs( t1(i,j) - bob::core::cast<T>(t2(i,j)) );
-  diff = (diff/(y_min*x_min)) / 
+  diff = (diff/(y_min*x_min)) /
     (std::numeric_limits<T>::max()-std::numeric_limits<T>::min()+1);
   BOOST_CHECK_SMALL( diff, eps );
 }
 
-template<typename T,typename U>  
+template<typename T,typename U>
 void checkBlitzClose( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2,
   const double eps )
 {
@@ -149,7 +149,7 @@ void checkBlitzClose( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2,
     for( int j=0; j<y_min; ++j)
       for( int k=0; k<x_min; ++k)
         diff += abs( t1(i,j,k) - bob::core::cast<T>(t2(i,j,k)) );
-  diff = (diff/(y_min*x_min*p_min)) / 
+  diff = (diff/(y_min*x_min*p_min)) /
     (std::numeric_limits<T>::max()-std::numeric_limits<T>::min()+1);
   BOOST_CHECK_SMALL( diff, eps );
 }
@@ -164,22 +164,22 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_mod90_uint32 )
   // Rotation of 0
   b2.resize( bob::ip::getRotatedShape(a2,0.) );
   bob::ip::rotate(a2, b2, 0.);
-  checkBlitzEqual(a2, b2); 
+  checkBlitzEqual(a2, b2);
 
   // Rotation of 90
   b2.resize( bob::ip::getRotatedShape(a2,90.) );
   bob::ip::rotate(a2, b2, 90.);
-  checkBlitzEqual(a2r_90, b2); 
+  checkBlitzEqual(a2r_90, b2);
 
   // Rotation of 180
   b2.resize( bob::ip::getRotatedShape(a2,180.) );
   bob::ip::rotate(a2, b2, 180.);
-  checkBlitzEqual(a2r_180, b2); 
+  checkBlitzEqual(a2r_180, b2);
 
   // Rotation of 270
   b2.resize( bob::ip::getRotatedShape(a2,270.) );
   bob::ip::rotate(a2, b2, 270.);
-  checkBlitzEqual(a2r_270, b2); 
+  checkBlitzEqual(a2r_270, b2);
 }
 
 
@@ -201,7 +201,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   blitz::Array<double,2> img_processed;
 
   // 5 degrees
-  img_processed.resize(bob::ip::getRotatedShape(img,5.) ); 
+  img_processed.resize(bob::ip::getRotatedShape(img,5.) );
   bob::ip::rotate( img, img_processed, 5., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r5.pgm";
@@ -209,8 +209,8 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   blitz::Array<uint8_t,2> img_ref_r5 = ar_img_r5.get<uint8_t,2>();
   checkBlitzClose( img_ref_r5, img_processed, eps);
 
-  // 10 degrees 
-  img_processed.resize(bob::ip::getRotatedShape(img,10.) ); 
+  // 10 degrees
+  img_processed.resize(bob::ip::getRotatedShape(img,10.) );
   bob::ip::rotate( img, img_processed, 10., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r10.pgm";
@@ -218,8 +218,8 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   blitz::Array<uint8_t,2> img_ref_r10 = ar_img_r10.get<uint8_t,2>();
   checkBlitzClose( img_ref_r10, img_processed, eps);
 
-  // 15 degrees 
-  img_processed.resize(bob::ip::getRotatedShape(img,15.) ); 
+  // 15 degrees
+  img_processed.resize(bob::ip::getRotatedShape(img,15.) );
   bob::ip::rotate( img, img_processed, 15., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r15.pgm";
@@ -227,8 +227,8 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   blitz::Array<uint8_t,2> img_ref_r15 = ar_img_r15.get<uint8_t,2>();
   checkBlitzClose( img_ref_r15, img_processed, eps);
 
-  // 30 degrees 
-  img_processed.resize(bob::ip::getRotatedShape(img,30.) ); 
+  // 30 degrees
+  img_processed.resize(bob::ip::getRotatedShape(img,30.) );
   bob::ip::rotate( img, img_processed, 30., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r30.pgm";
@@ -236,8 +236,8 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   blitz::Array<uint8_t,2> img_ref_r30 = ar_img_r30.get<uint8_t,2>();
   checkBlitzClose( img_ref_r30, img_processed, eps);
 
-  // 45 degrees 
-  img_processed.resize(bob::ip::getRotatedShape(img,45.) ); 
+  // 45 degrees
+  img_processed.resize(bob::ip::getRotatedShape(img,45.) );
   bob::ip::rotate( img, img_processed, 45., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r45.pgm";
@@ -245,8 +245,8 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   blitz::Array<uint8_t,2> img_ref_r45 = ar_img_r45.get<uint8_t,2>();
   checkBlitzClose( img_ref_r45, img_processed, eps);
 
-  // 70 degrees 
-  img_processed.resize(bob::ip::getRotatedShape(img,70.) ); 
+  // 70 degrees
+  img_processed.resize(bob::ip::getRotatedShape(img,70.) );
   bob::ip::rotate( img, img_processed, 70., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r70.pgm";
@@ -254,8 +254,8 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   blitz::Array<uint8_t,2> img_ref_r70 = ar_img_r70.get<uint8_t,2>();
   checkBlitzClose( img_ref_r70, img_processed, eps);
 
-  // 237 degrees 
-  img_processed.resize(bob::ip::getRotatedShape(img,237.) ); 
+  // 237 degrees
+  img_processed.resize(bob::ip::getRotatedShape(img,237.) );
   bob::ip::rotate( img, img_processed, 237., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r237.pgm";
@@ -263,8 +263,8 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   blitz::Array<uint8_t,2> img_ref_r237 = ar_img_r237.get<uint8_t,2>();
   checkBlitzClose( img_ref_r237, img_processed, eps);
 
-  // -25 degrees 
-  img_processed.resize(bob::ip::getRotatedShape(img,-25.) ); 
+  // -25 degrees
+  img_processed.resize(bob::ip::getRotatedShape(img,-25.) );
   bob::ip::rotate( img, img_processed, -25., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_rn25.pgm";
@@ -290,8 +290,8 @@ BOOST_AUTO_TEST_CASE( test_rotate_3d_generic_uint32 )
   blitz::Array<uint8_t,3> img = ar_img.get<uint8_t,3>();
   blitz::Array<double,3> img_processed;
 
-  // 5 degrees 
-  img_processed.resize(bob::ip::getRotatedShape(img,5.) ); 
+  // 5 degrees
+  img_processed.resize(bob::ip::getRotatedShape(img,5.) );
   bob::ip::rotate( img, img_processed, 5., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "imageColor_r5.ppm";
@@ -309,20 +309,20 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_mask )
   b8.resize( bob::ip::getRotatedShape(a8, 45.) );
   b8_mask.resize( b8.shape() );
   bob::ip::rotate(a8, a8m, b8, b8_mask, 45.);
-  checkBlitzEqual(a8m_45, b8_mask); 
+  checkBlitzEqual(a8m_45, b8_mask);
 }
 
 BOOST_AUTO_TEST_CASE( test_get_angle_to_horizontal )
 {
   // check that the getAngleToHorizontal function returns reasonable results
   const double epsilon = 1e-8;
-  
+
   // along the axis
-  BOOST_CHECK_CLOSE(bob::ip::getAngleToHorizontal(0,0,0,1), 0., epsilon);
+  BOOST_CHECK_SMALL(bob::ip::getAngleToHorizontal(0,0,0,1), epsilon);
   BOOST_CHECK_CLOSE(bob::ip::getAngleToHorizontal(0,1,0,0), 180., epsilon);
   BOOST_CHECK_CLOSE(bob::ip::getAngleToHorizontal(0,0,1,0), 90., epsilon);
   BOOST_CHECK_CLOSE(bob::ip::getAngleToHorizontal(1,0,0,0), -90., epsilon);
-  
+
   // 45 degrees
   BOOST_CHECK_CLOSE(bob::ip::getAngleToHorizontal(0,0,1,1), 45., epsilon);
   BOOST_CHECK_CLOSE(bob::ip::getAngleToHorizontal(0,1,1,0), 135., epsilon);

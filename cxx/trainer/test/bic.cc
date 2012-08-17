@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE( test_iec )
   blitz::Array<double,1> data(5), output(1);
   data = 10.;
   machine.forward(data, output);
-  BOOST_CHECK_CLOSE(output(0), 0., epsilon);
+  BOOST_CHECK_SMALL(output(0), epsilon);
 
   // now, re-train machine with both data
   trainer.train(machine, intra_data, extra_data);
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE( test_iec )
   // due to the training data, input 0 should return in a 0 output
   data = 0.;
   machine.forward(data, output);
-  BOOST_CHECK_CLOSE(output(0), 0., epsilon);
+  BOOST_CHECK_SMALL(output(0), epsilon);
 }
 
 BOOST_AUTO_TEST_CASE( test_bic )
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE( test_bic )
   blitz::Array<double,1> data(5), output(1);
   data = 10.;
   machine.forward(data, output);
-  BOOST_CHECK_CLOSE(output(0), 0., epsilon);
+  BOOST_CHECK_SMALL(output(0), epsilon);
 
   // now, re-train machine with both data
   trainer.train(machine, intra_data, extra_data);
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE( test_bic )
   // due to the training data, input 0 should return in a 0 output
   data = 0.;
   machine.forward(data, output);
-  BOOST_CHECK_CLOSE(output(0), 0., epsilon);
+  BOOST_CHECK_SMALL(output(0), epsilon);
 }
 
 
