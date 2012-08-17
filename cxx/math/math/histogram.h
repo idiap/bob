@@ -77,13 +77,11 @@ namespace bob{
         T1 p1 = index_1(i1), p2 = index_2(i2);
         T2 sum = T2(0);
         while (i1 < i1_end && i2 < i2_end){
-          if (p1 == p2){
-            sum += minimum(values_1(i1), values_2(i2));
-            p1 = index_1(++i1);
-            p2 = index_2(++i2);
-          } else
-            if (p1 < p2) p1 = index_1(++i1);
-            else p2 = index_2(++i2);
+          p1 = index_1(i1);
+          p2 = index_2(i2);
+          if (p1 == p2) sum += minimum(values_1(i1++), values_2(i2++));
+          else if (p1 < p2) ++i1;
+          else ++i2;
         }
         return sum;
       }
@@ -119,18 +117,19 @@ namespace bob{
         T1 p1 = index_1(i1), p2 = index_2(i2);
         T2 sum = T2(0);
         while (i1 < i1_end && i2 < i2_end){
+          p1 = index_1(i1);
+          p2 = index_2(i2);
           if (p1 == p2){
-            sum += chi_square_distance(values_1(i1), values_2(i2));
-            p1 = index_1(++i1);
-            p2 = index_2(++i2);
+            sum += chi_square_distance(values_1(i1++), values_2(i2++));
           } else if (p1 < p2) {
-            sum += chi_square_distance(values_1(i1), T2(0));
-            p1 = index_1(++i1);
+            sum += chi_square_distance(values_1(i1++), T2(0));
           } else{
-            sum += chi_square_distance(T2(0), values_2(i2));
-            p2 = index_2(++i2);
+            sum += chi_square_distance(T2(0), values_2(i2++));
           }
         }
+        // roll up the remaining parts of the histograms
+        while (i1 < i1_end) sum += chi_square_distance(values_1(i1++), T2(0));
+        while (i2 < i2_end) sum += chi_square_distance(T2(0), values_2(i2++));
         return sum;
       }
 
