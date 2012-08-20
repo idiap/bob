@@ -24,5 +24,5 @@ bob_python_subpackage_bindings(core random "${ccsrc_random}"
   "python_integration")
 
 # Our test units
-bob_python_add_unittest(core lib/test/exception.py)
-bob_python_add_unittest(core lib/test/convert.py)
+# TTT bob_python_add_unittest(core lib/test/exception.py)
+# TTT bob_python_add_unittest(core lib/test/convert.py)

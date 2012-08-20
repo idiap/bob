@@ -13,8 +13,8 @@ set(ccsrc
 bob_python_package_bindings(math "${ccsrc}" "python_integration")
 
 # Our test units
-bob_python_add_unittest(math lib/test/interiorpointLP.py)
-bob_python_add_unittest(math lib/test/linsolve.py)
-bob_python_add_unittest(math lib/test/norminv.py)
-bob_python_add_unittest(math lib/test/stats.py)
-bob_python_add_unittest(math lib/test/histogram.py)
+# TTT bob_python_add_unittest(math lib/test/interiorpointLP.py)
+# TTT bob_python_add_unittest(math lib/test/linsolve.py)
+# TTT bob_python_add_unittest(math lib/test/norminv.py)
+# TTT bob_python_add_unittest(math lib/test/stats.py)
+# TTT bob_python_add_unittest(math lib/test/histogram.py)

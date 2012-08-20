@@ -15,19 +15,11 @@ include (${QT_USE_FILE})
 include_directories(SYSTEM ${QT_INCLUDES})
 
 # Our test units
-bob_python_add_unittest(visioner lib/test/detection.py main
-  "${CMAKE_CURRENT_SOURCE_DIR}/../io/data")
-bob_python_add_unittest(visioner lib/test/localization.py main
-  "${CMAKE_CURRENT_SOURCE_DIR}/../io/data")
+# TTT bob_python_add_unittest(visioner lib/test/detection.py main "${CMAKE_CURRENT_SOURCE_DIR}/../io/data")
+# TTT bob_python_add_unittest(visioner lib/test/localization.py main "${CMAKE_CURRENT_SOURCE_DIR}/../io/data")
 
-bob_python_script(visioner bob_face_detect.py lib/script/facebox.py)
+# TTT bob_python_add_test(visioner-1 bob_face_detect.py "${CMAKE_CURRENT_SOURCE_DIR}/../io/data/test.mov" --self-test=1)
+# TTT bob_python_add_test(visioner-2 bob_face_detect.py "${CMAKE_CURRENT_SOURCE_DIR}/../ip/data/faceextract/test-faces.jpg" --self-test=2)
 
-bob_python_add_test(visioner-1 bob_face_detect.py "${CMAKE_CURRENT_SOURCE_DIR}/../io/data/test.mov" --self-test=1)
-bob_python_add_test(visioner-2 bob_face_detect.py "${CMAKE_CURRENT_SOURCE_DIR}/../ip/data/faceextract/test-faces.jpg" --self-test=2)
-
-bob_python_script(visioner bob_face_keypoints.py lib/script/facepoints.py)
-
-bob_python_add_test(visioner-1 bob_face_keypoints.py "${CMAKE_CURRENT_SOURCE_DIR}/../io/data/test.mov" --self-test=1)
-bob_python_add_test(visioner-2 bob_face_keypoints.py "${CMAKE_CURRENT_SOURCE_DIR}/../ip/data/faceextract/test-faces.jpg" --self-test=2)
-
-bob_python_script(visioner bob_visioner_trainer.py lib/script/trainer.py)
+# TTT bob_python_add_test(visioner-1 bob_face_keypoints.py "${CMAKE_CURRENT_SOURCE_DIR}/../io/data/test.mov" --self-test=1)
+# TTT bob_python_add_test(visioner-2 bob_face_keypoints.py "${CMAKE_CURRENT_SOURCE_DIR}/../ip/data/faceextract/test-faces.jpg" --self-test=2)

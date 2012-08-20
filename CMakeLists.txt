@@ -52,14 +52,11 @@ option(BOB_INSTALL_PYTHON_INTERPRETER "When enabled, installs a version of the p
 # bit.
 option(BOB_BUILD_PYTHON "Builds the python bindings." ON)
 
-set(BOB_DATABASE_URL "http://www.idiap.ch/software/bob/databases" CACHE STRING "Where to download databases from. If this variable is set empty, then we try to create the databases instead.")
-
 # ---------------
 # END of options.
 # ---------------
 
 message(STATUS "Bob version '${BOB_VERSION}' (${BOB_PLATFORM_STR})")
-message(STATUS "Bob database version: '${BOB_DATABASE_VERSION}'")
 
 # Force __LP64__ scheme on Mac OSX
 if(APPLE)
@@ -157,6 +154,3 @@ install(FILES cmake/bobConfig.cmake DESTINATION ${cmakedir})
 
 # Adds Doxygen and Sphinx generation
 include(cmake/documentation.cmake)
-
-# Adds targets for database management
-include(cmake/database.cmake)
