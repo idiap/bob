@@ -1,26 +1,26 @@
 /**
  * @file cxx/io/io/HDF5Dataset.h
  * @author Andre Anjos <andre.anjos@idiap.ch>
- * @date Wed 29 Feb 17:27:45 2012 
+ * @date Wed 29 Feb 17:27:45 2012
  *
  * @brief Describes HDF5 datasets
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB_IO_HDF5DATASET_H 
+#ifndef BOB_IO_HDF5DATASET_H
 #define BOB_IO_HDF5DATASET_H
 
 #include <vector>
@@ -72,15 +72,15 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
        *
        * The effect of setting "list" to false is that the created dataset:
        *
-       * a) Will not be expandible (chunked)
+       * a) Will not be expandable (chunked)
        * b) Will contain the exact number of dimensions of the input type.
        *
        * When you set "list" to true (the default), datasets are created with
        * chunking automatically enabled (the chunk size is set to the size of
-       * the given variable) and an extra dimension is inserted to accomodate
+       * the given variable) and an extra dimension is inserted to accommodate
        * list operations.
        */
-      Dataset(boost::shared_ptr<Group> parent, const std::string& name, 
+      Dataset(boost::shared_ptr<Group> parent, const std::string& name,
           const bob::io::HDF5Type& type, bool list=true,
           size_t compression=0);
 
@@ -137,7 +137,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
       virtual const std::string& name() const {
         return m_name;
       }
-      
+
       /**
        * Accesses the current location id of this dataset
        */
@@ -209,7 +209,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
        * variable. This variable has to be a zero-based C-style contiguous
        * storage array. If that is not the case, we will raise an exception.
        */
-      template <typename T, int N> 
+      template <typename T, int N>
         void readArray(size_t index, blitz::Array<T,N>& value) {
           bob::core::array::assertCZeroBaseContiguous(value);
           bob::io::HDF5Type dest_type(value);
@@ -223,7 +223,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
        * @param index Which of the arrays to read in the current dataset, by
        * order
        */
-      template <typename T, int N> 
+      template <typename T, int N>
         blitz::Array<T,N> readArray(size_t index) {
           for (size_t k=m_descr.size(); k>0; --k) {
             const bob::io::HDF5Shape& S = m_descr[k-1].type.shape();
@@ -235,7 +235,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
               return retval;
             }
           }
-          throw bob::io::HDF5IncompatibleIO(url(), 
+          throw bob::io::HDF5IncompatibleIO(url(),
               m_descr[0].type.str(), "dynamic shape unknown");
         }
 
@@ -248,7 +248,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
        * variable. This variable has to be a zero-based C-style contiguous
        * storage array. If that is not the case, we will raise an exception.
        */
-      template <typename T, int N> 
+      template <typename T, int N>
         void readArray(blitz::Array<T,N>& value) {
           readArray(0, value);
         }
@@ -258,7 +258,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
        * readArray(0). The same conditions as for readArray(index=0, value)
        * apply.
        */
-      template <typename T, int N> 
+      template <typename T, int N>
         blitz::Array<T,N> readArray() {
           return readArray<T,N>(0);
         }
@@ -287,7 +287,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
       /**
        * Modifies the value of a scalar inside the file. This is equivalent to
        * using replace(0, value). The same conditions as for replace(index=0,
-       * value) apply. 
+       * value) apply.
        */
       template <typename T> void replace(const T& value) {
         replace(0, value);
@@ -333,7 +333,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
        * variable. This variable has to be a zero-based C-style contiguous
        * storage array. If that is not the case, we will raise an exception.
        */
-      template <typename T, int N> 
+      template <typename T, int N>
         void replaceArray(size_t index, const blitz::Array<T,N>& value) {
           bob::io::HDF5Type dest_type(value);
           if(!bob::core::array::isCZeroBaseContiguous(value)) {
@@ -355,7 +355,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
        * variable. This variable has to be a zero-based C-style contiguous
        * storage array. If that is not the case, we will raise an exception.
        */
-      template <typename T, int N> 
+      template <typename T, int N>
         void replaceArray(const blitz::Array<T,N>& value) {
           replaceArray(0, value);
         }
@@ -369,7 +369,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
        * parlance). If you want to do this, first unlink and than use one of
        * the add() methods.
        */
-      template <typename T, int N> 
+      template <typename T, int N>
         void addArray(const blitz::Array<T,N>& value) {
           bob::io::HDF5Type dest_type(value);
           if(!bob::core::array::isCZeroBaseContiguous(value)) {
@@ -404,7 +404,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
        * Writes the contents of a given buffer into the file. The area that the
        * data will occupy should have been selected beforehand.
        */
-      void write_buffer (size_t index, const bob::io::HDF5Type& dest, 
+      void write_buffer (size_t index, const bob::io::HDF5Type& dest,
           const void* buffer);
 
       /**
@@ -420,7 +420,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
        *
        * @note Only simple scalars are supported for the time being
        */
-      template <typename T> void set_attribute(const std::string& name, 
+      template <typename T> void set_attribute(const std::string& name,
           const T& v) {
         bob::io::HDF5Type dest_type(v);
         write_attribute(m_id,name,dest_type,reinterpret_cast<const void*>(&v));
@@ -462,7 +462,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
       Dataset& operator= (const Dataset& other);
 
     public: //representation
-  
+
       boost::weak_ptr<Group> m_parent; ///< my parent group
       std::string m_name; ///< name of this object
       boost::shared_ptr<hid_t> m_id; ///< the HDF5 Dataset this type points to

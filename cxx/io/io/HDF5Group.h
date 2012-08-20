@@ -123,7 +123,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
       boost::shared_ptr<hid_t> location() {
         return m_id;
       }
-      
+
       /**
        * Path with filename. Constructed each time it is called.
        */
@@ -253,6 +253,18 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
       }
 
       /**
+       * Accesses all existing sub-groups in one shot. Input has to be a std
+       * container with T = std::string and accepting push_back()
+       */
+      template <typename T> void subgroup_paths (T& container, bool recursive = true) const {
+        for (std::map<std::string, boost::shared_ptr<io::detail::hdf5::Group> >::const_iterator it=m_groups.begin(); it != m_groups.end(); ++it){
+          container.push_back(it->first);
+          if (recursive)
+            it->second->subgroup_paths(container);
+        }
+      }
+
+      /**
        * Callback function for group iteration. Two cases are blessed here:
        *
        * 1. Object is another group. In this case just instantiate the group and
@@ -272,7 +284,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
        *
        * @note Only simple scalars are supported for the time being
        */
-      template <typename T> void set_attribute(const std::string& name, 
+      template <typename T> void set_attribute(const std::string& name,
           const T& v) {
         bob::io::HDF5Type dest_type(v);
         write_attribute(m_id,name,dest_type,reinterpret_cast<const void*>(&v));

@@ -6,16 +6,16 @@
  * @brief Implementation of the read/write functionality for HDF5 files
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -43,8 +43,21 @@ io::HDF5File::HDF5File(const std::string& filename, mode_t mode):
 {
 }
 
+io::HDF5File::HDF5File(const io::HDF5File& other_file):
+  m_file(other_file.m_file),
+  m_cwd(other_file.m_cwd)
+{
+}
+
 io::HDF5File::~HDF5File() {
 }
+
+io::HDF5File& io::HDF5File::operator =(const io::HDF5File& other_file){
+  m_file = other_file.m_file;
+  m_cwd = other_file.m_cwd;
+  return *this;
+}
+
 
 void io::HDF5File::cd(const std::string& path) {
   m_cwd = m_cwd->cd(path);
@@ -97,7 +110,7 @@ bool io::HDF5File::contains (const std::string& path) const {
   return m_cwd->has_dataset(path);
 }
 
-const std::vector<io::HDF5Descriptor>& io::HDF5File::describe 
+const std::vector<io::HDF5Descriptor>& io::HDF5File::describe
 (const std::string& path) const {
   return (*m_cwd)[path]->m_descr;
 }
@@ -138,7 +151,7 @@ void io::HDF5File::copy (HDF5File& other) {
       it != group_map.end(); ++it) {
     m_cwd->copy_group(it->second, it->first);
   }
-  
+
   //datasets
   typedef std::map<std::string, boost::shared_ptr<io::detail::hdf5::Dataset> > dataset_map_type;
   const dataset_map_type& dataset_map = other.m_file->root()->datasets();
@@ -159,12 +172,12 @@ void io::HDF5File::create (const std::string& path, const ca::typeinfo& ti,
   else (*m_cwd)[path]->size(io::HDF5Type(ti));
 }
 
-void io::HDF5File::read_buffer (const std::string& path, size_t pos, 
+void io::HDF5File::read_buffer (const std::string& path, size_t pos,
     ca::interface& b) {
   (*m_cwd)[path]->read_buffer(pos, io::HDF5Type(b.type()), b.ptr());
 }
 
-void io::HDF5File::write_buffer (const std::string& path, 
+void io::HDF5File::write_buffer (const std::string& path,
     size_t pos, const ca::interface& b) {
   if (!m_file->writeable()) {
     boost::format m("cannot write to object '%s' at path '%s' of file '%s' because it is not writeable");

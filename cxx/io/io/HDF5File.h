@@ -8,21 +8,21 @@
  * http://www.hdfgroup.org/HDF5
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB_IO_HDF5FILE_H 
+#ifndef BOB_IO_HDF5FILE_H
 #define BOB_IO_HDF5FILE_H
 
 #include <boost/format.hpp>
@@ -67,14 +67,14 @@ namespace bob { namespace io {
       virtual ~HDF5File();
 
       /**
-       * Changes the current prefix path. When this object is started, it 
+       * Changes the current prefix path. When this object is started, it
        * points to the root of the file. If you set this to a different
        * value, it will be used as a prefix to any subsequent operation on
        * relative paths until you reset it.
-       * 
+       *
        * @param path If path starts with '/', it is treated as an absolute
        * path. '..' and '.' are supported. This object should be a std::string.
-       * If the value is relative, it is added to the current path. 
+       * If the value is relative, it is added to the current path.
        *
        * @note All operations taking a relative path, following a cd(), will be
        * considered relative to the value returned by cwd().
@@ -172,6 +172,21 @@ namespace bob { namespace io {
       }
 
       /**
+       * Accesses all existing paths in one shot. Input has to be a std
+       * container with T = std::string and accepting push_back()
+       */
+      template <typename T> void sub_groups (T& container, bool relative = false, bool recursive = true) const {
+        m_cwd->subgroup_paths(container, recursive);
+        if (!relative){
+          const std::string d = cwd() + "/";
+          for (typename T::iterator it = container.begin(); it != container.end(); ++it){
+            // add current path
+            *it = d + *it;
+          }
+        }
+      }
+
+      /**
        * Copies the contents of the other file to this file. This is a blind
        * operation, so we try to copy everything from the given file to the
        * current one. It is the user responsibility to make sure the "path"
@@ -245,7 +260,7 @@ namespace bob { namespace io {
        * allocated internally.
        */
       template <typename T, int N> blitz::Array<T,N> readArray
-        (const std::string& path) { 
+        (const std::string& path) {
           return readArray<T,N>(path, 0);
       }
 
@@ -253,7 +268,7 @@ namespace bob { namespace io {
        * Modifies the value of a scalar inside the file. Relative paths are
        * accepted.
        */
-      template <typename T> void replace(const std::string& path, size_t pos, 
+      template <typename T> void replace(const std::string& path, size_t pos,
           const T& value) {
         if (!m_file->writeable()) {
           boost::format m("cannot replace value at dataset '%s' at path '%s' of file '%s' because it is not writeable");
@@ -268,7 +283,7 @@ namespace bob { namespace io {
        * accepted. Calling this method is equivalent to calling replace(path,
        * 0, value).
        */
-      template <typename T> void replace(const std::string& path, 
+      template <typename T> void replace(const std::string& path,
           const T& value) {
         replace(path, 0, value);
       }
@@ -402,10 +417,8 @@ namespace bob { namespace io {
       void extend_buffer (const std::string& path,
           const bob::core::array::interface& b);
 
-    private: //not implemented
-
       /**
-       * Copy construct an already opened HDF5File
+       * Copy construct an already opened HDF5File; just creates a shallow copy of the file
        */
       HDF5File (const HDF5File& other);
 
