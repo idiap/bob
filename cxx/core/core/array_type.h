@@ -6,16 +6,16 @@
  * @brief This file contains information about the supported arrays
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -45,10 +45,10 @@ namespace bob {
 
     /**
      * @brief Enumeration of the supported type for multidimensional arrays
-     * @warning float128 and complex256 are defined but currently not 
+     * @warning float128 and complex256 are defined but currently not
      * supported
      */
-    typedef enum ElementType { 
+    typedef enum ElementType {
       t_unknown=0,
       t_bool=1,
       t_int8=2,
@@ -68,7 +68,7 @@ namespace bob {
     } ElementType;
 
     /**
-     * @brief Maximum number of supported dimensions for multidimensional 
+     * @brief Maximum number of supported dimensions for multidimensional
      * arrays.
      */
     const size_t N_MAX_DIMENSIONS_ARRAY = BOB_MAX_DIM;
@@ -85,29 +85,29 @@ namespace bob {
      */
     template<> inline ElementType getElementType<bool>() { return t_bool; }
     template<> inline ElementType getElementType<int8_t>() { return t_int8; }
-    template<> inline ElementType getElementType<int16_t>() 
+    template<> inline ElementType getElementType<int16_t>()
     { return t_int16; }
-    template<> inline ElementType getElementType<int32_t>() 
+    template<> inline ElementType getElementType<int32_t>()
     { return t_int32; }
-    template<> inline ElementType getElementType<int64_t>() 
+    template<> inline ElementType getElementType<int64_t>()
     { return t_int64; }
-    template<> inline ElementType getElementType<uint8_t>() 
+    template<> inline ElementType getElementType<uint8_t>()
     { return t_uint8; }
-    template<> inline ElementType getElementType<uint16_t>() 
+    template<> inline ElementType getElementType<uint16_t>()
     { return t_uint16; }
-    template<> inline ElementType getElementType<uint32_t>() 
+    template<> inline ElementType getElementType<uint32_t>()
     { return t_uint32; }
-    template<> inline ElementType getElementType<uint64_t>() 
+    template<> inline ElementType getElementType<uint64_t>()
     { return t_uint64; }
-    template<> inline ElementType getElementType<float>() 
+    template<> inline ElementType getElementType<float>()
     { return t_float32; }
-    template<> inline ElementType getElementType<double>() 
+    template<> inline ElementType getElementType<double>()
     { return t_float64; }
-    template<> inline ElementType getElementType<long double>() 
+    template<> inline ElementType getElementType<long double>()
     { return t_float128; }
-    template<> inline ElementType getElementType<std::complex<float> >() 
+    template<> inline ElementType getElementType<std::complex<float> >()
     { return t_complex64; }
-    template<> inline ElementType getElementType<std::complex<double> >() 
+    template<> inline ElementType getElementType<std::complex<double> >()
     { return t_complex128; }
     template<> inline ElementType getElementType<std::complex<long double> >()
     { return t_complex256; }
@@ -120,43 +120,43 @@ namespace bob {
     }
 
     /**
-     * Some specializations tat convert the types we handle properly
+     * Some specializations that convert the types we handle properly
      */
     template<> inline size_t getElementSize<bool>() { return sizeof(bool); }
-    template<> inline size_t getElementSize<int8_t>() 
+    template<> inline size_t getElementSize<int8_t>()
     { return sizeof(int8_t); }
-    template<> inline size_t getElementSize<int16_t>() 
+    template<> inline size_t getElementSize<int16_t>()
     { return sizeof(int16_t); }
-    template<> inline size_t getElementSize<int32_t>() 
+    template<> inline size_t getElementSize<int32_t>()
     { return sizeof(int32_t); }
-    template<> inline size_t getElementSize<int64_t>() 
+    template<> inline size_t getElementSize<int64_t>()
     { return sizeof(int64_t); }
-    template<> inline size_t getElementSize<uint8_t>() 
+    template<> inline size_t getElementSize<uint8_t>()
     { return sizeof(uint8_t); }
-    template<> inline size_t getElementSize<uint16_t>() 
+    template<> inline size_t getElementSize<uint16_t>()
     { return sizeof(uint16_t); }
-    template<> inline size_t getElementSize<uint32_t>() 
+    template<> inline size_t getElementSize<uint32_t>()
     { return sizeof(uint32_t); }
-    template<> inline size_t getElementSize<uint64_t>() 
+    template<> inline size_t getElementSize<uint64_t>()
     { return sizeof(uint64_t); }
-    template<> inline size_t getElementSize<float>() 
+    template<> inline size_t getElementSize<float>()
     { return sizeof(float); }
-    template<> inline size_t getElementSize<double>() 
+    template<> inline size_t getElementSize<double>()
     { return sizeof(double); }
-    template<> inline size_t getElementSize<long double>() 
+    template<> inline size_t getElementSize<long double>()
     { return sizeof(long double); }
-    template<> inline size_t getElementSize<std::complex<float> >() 
+    template<> inline size_t getElementSize<std::complex<float> >()
     { return sizeof(std::complex<float>); }
-    template<> inline size_t getElementSize<std::complex<double> >() 
+    template<> inline size_t getElementSize<std::complex<double> >()
     { return sizeof(std::complex<double>); }
-    template<> inline size_t getElementSize<std::complex<long double> >() 
+    template<> inline size_t getElementSize<std::complex<long double> >()
     { return sizeof(std::complex<long double>); }
 
     /**
      * Returns the type size given the enumeration
      */
     size_t getElementSize(ElementType t);
-    
+
     /**
      * Gets a string representation of an element type value
      */
