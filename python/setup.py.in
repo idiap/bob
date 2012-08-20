@@ -19,7 +19,6 @@ def cmake_false(var):
   return var.lower() in ('no', '0', 'off', 'false', 'n', '') or \
       var.find('-NOTFOUND') != -1
 
-
 BOB_VERSION = '@BOB_VERSION@'
 ENABLE_RPATH = cmake_false('@BOB_SOVERSION@')
 CMAKE_BINARY_DIR = '@CMAKE_BINARY_DIR@'
@@ -48,7 +47,7 @@ class build_ext(build_ext_base):
     
     build_ext_base.initialize_options(self)
 
-    self.prefix = None
+    self.prefix = os.path.join(CMAKE_BINARY_DIR)
 
   def build_extension(self, ext):
     '''Concretely builds the extension given as input'''
