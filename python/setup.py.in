@@ -112,6 +112,12 @@ DATABASES = [
     'iris = bob.db.iris.driver:Interface',
     ]
 
+# data files to be shipped with the distribution
+DATAFILES = [
+    'db/iris/iris.names',
+    'db/iris/iris.data',
+    ]
+
 EXTENSIONS = [
     'core',
     'core_random',
@@ -155,8 +161,9 @@ setup(
       'Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence',
       ],
 
-    package_dir={'': 'lib'},
     packages=find_packages('lib'),
+    package_dir={'': 'lib'},
+    package_data={'bob': DATAFILES},
 
     ext_modules=[setup_extension(k) for k in EXTENSIONS],
     cmdclass = {'build_ext': build_ext},
