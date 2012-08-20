@@ -135,7 +135,7 @@ void bind_measure_error() {
   );
 
   def(
-    "roc",
+    "roc_for_far",
     &bob_roc_for_far,
     (arg("negatives"), arg("positives"), arg("far_list")),
     "Calculates the ROC curve given a set of positive and negative scores and the FAR values for which the CAR should be computed. The resulting ROC curve holds a copy of the given FAR values (row 0), and the corresponding FRR values (row 1)."
