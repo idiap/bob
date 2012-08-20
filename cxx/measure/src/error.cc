@@ -49,9 +49,11 @@ double err::eerThreshold(const blitz::Array<double,1>& negatives,
 }
 
 /**
- * Computes the threshold such that the FAR is directly below the given far_value.
- * @param  negatives The negative (non-client) scores to be used for computing the FAR
- * @param  positives The positive (client) scores; ignored by this function
+ * Computes the threshold such that the real FAR is as close as possible
+ * to the requested far_value.
+ *
+ * @param  negatives The impostor scores to be used for computing the FAR
+ * @param  positives The client scores; ignored by this function
  * @param  far_value  The FAR value where the threshold should be computed
  * @return The computed threshold
  */
@@ -64,9 +66,9 @@ double err::farThreshold(const blitz::Array<double,1>& negatives,
   std::sort(negatives_.begin(), negatives_.end());
 
   // compute position of the threshold
-  double crr = 1.-far_value;
+  double crr = 1.-far_value; // (Correct Rejection Rate; = 1 - FAR)
   double crr_index = crr * negatives_.size();
-  // compute the index above the current CRR indes
+  // compute the index above the current CRR value
   int index = (int)std::ceil(crr_index);
 
   // return score as a weighted sum of the two surrounding scores

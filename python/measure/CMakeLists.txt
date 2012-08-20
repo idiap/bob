@@ -20,3 +20,7 @@ bob_python_add_test(measure bob_eval_threshold.py --scores=${CMAKE_CURRENT_SOURC
 
 bob_python_script(measure bob_apply_threshold.py lib/script/apply_threshold.py)
 bob_python_add_test(measure bob_apply_threshold.py --scores=${CMAKE_CURRENT_SOURCE_DIR}/data/test-4col.txt --self-test)
+
+bob_python_script(measure bob_recurse_results.py lib/script/recurse_results.py)
+bob_python_add_test(measure bob_recurse_results.py --devel-name test-4col.txt --directory ${CMAKE_CURRENT_SOURCE_DIR}/ --nonorm-dir data --self-test)
+
