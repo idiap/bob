@@ -408,7 +408,7 @@ endmacro()
 # include_regex: globbing expressions for the included files
 # exclude_regex: globbing expressions for the excluded files
 # output_dir: directory to copy the files (path relative to CMAKE_BINARY_DIR)
-macro(copy_files input_dir include_regex exclude_regex output_dir)
+macro(copy_files input_dir include_regex exclude_regex output_dir output_files)
 
   set(input_files "")
   foreach(exp ${include_regex})
@@ -434,6 +434,7 @@ macro(copy_files input_dir include_regex exclude_regex output_dir)
 
     list(APPEND ${output_files} "${output_file}")
   endforeach()
+
 endmacro()
 
 # Creates a static library that will be used by setuptools to be build the
@@ -491,8 +492,7 @@ macro(bob_python_package cxx_package package cxx_src pydependencies)
     set(input_dir "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
     # Copy python files from lib folder to the "egg" setuptools folder
-    copy_files("${input_dir}" "*" "*~;.*.swp;.swp*;*.pyc;*.in" ${bin_path}
-               "" output_lib_files "pybob_${package}" FALSE "^test;^example")
+    copy_files("${input_dir}" "*" "*~;.*.swp;.swp*;*.pyc;*.in" ${bin_path} output_lib_files)
 
     # Configure files and install - note: only done during cmake...
     file(GLOB_RECURSE files RELATIVE "${input_dir}" "${input_dir}/*.in")
