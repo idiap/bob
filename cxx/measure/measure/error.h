@@ -6,21 +6,21 @@
  * @brief A set of methods that evaluates error from score sets
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB_MEASURE_ERROR_H 
+#ifndef BOB_MEASURE_ERROR_H
 #define BOB_MEASURE_ERROR_H
 
 #include <blitz/array.h>
@@ -32,18 +32,18 @@ namespace bob { namespace measure {
   /**
    * Calculates the FA ratio and the FR ratio given positive and negative
    * scores and a threshold. 'positives' holds the score information for
-   * samples that are labelled to belong to a certain class (a.k.a., "signal"
+   * samples that are labeled to belong to a certain class (a.k.a., "signal"
    * or "client"). 'negatives' holds the score information for samples that are
-   * labelled *not* to belong to the class (a.k.a., "noise" or "impostor").
+   * labeled *not* to belong to the class (a.k.a., "noise" or "impostor").
    *
    * It is expected that 'positive' scores are, at least by design, greater
    * than 'negative' scores. So, every positive value that falls bellow the
    * threshold is considered a false-rejection (FR). 'negative' samples that
-   * fall above the threshold are considered a false-accept (FA). 
+   * fall above the threshold are considered a false-accept (FA).
    *
    * Positives that fall on the threshold (exactly) are considered correctly
    * classified. Negatives that fall on the threshold (exactly) are considered
-   * *incorrectly* classified. This equivalent to setting the comparision like
+   * *incorrectly* classified. This equivalent to setting the comparison like
    * this pseudo-code:
    *
    * foreach (positive as K) if K < threshold: falseRejectionCount += 1
@@ -65,7 +65,7 @@ namespace bob { namespace measure {
    * normalize the scores so positive samples have greater scores before
    * feeding them into this method.
    */
-  std::pair<double, double> farfrr(const blitz::Array<double,1>& negatives, 
+  std::pair<double, double> farfrr(const blitz::Array<double,1>& negatives,
       const blitz::Array<double,1>& positives, double threshold);
 
   /**
@@ -73,7 +73,7 @@ namespace bob { namespace measure {
    * which positives where correctly classified in a 'positive' score sample,
    * given a threshold. It runs the formula:
    *
-   * foreach (element k in positive) 
+   * foreach (element k in positive)
    *   if positive[k] >= threshold: returnValue[k] = true
    *   else: returnValue[k] = false
    */
@@ -87,7 +87,7 @@ namespace bob { namespace measure {
    * which negatives where correctly classified in a 'negative' score sample,
    * given a threshold. It runs the formula:
    *
-   * foreach (element k in negative) 
+   * foreach (element k in negative)
    *   if negative[k] < threshold: returnValue[k] = true
    *   else: returnValue[k] = false
    */
@@ -103,18 +103,18 @@ namespace bob { namespace measure {
    */
   template <typename T>
   static double recursive_minimization(const blitz::Array<double,1>& negatives,
-      const blitz::Array<double,1>& positives, T& predicate, 
+      const blitz::Array<double,1>& positives, T& predicate,
       double min, double max, size_t steps) {
     static const double QUIT_THRESHOLD = 1e-10;
     const double diff = max - min;
     const double too_small = std::abs(diff/max);
-    
+
     //if the difference between max and min is too small, we quit.
     if ( too_small < QUIT_THRESHOLD ) return min; //or max, does not matter...
 
     double step_size = diff/(double)steps;
     double min_value = predicate(1.0, 0.0); ///< to the left of the range
-   
+
     //the accumulator holds the thresholds that given the minimum value for the
     //input predicate.
     std::vector<double> accumulator;
@@ -122,15 +122,15 @@ namespace bob { namespace measure {
 
     for (size_t i=0; i<steps; ++i) {
       double threshold = ((double)i * step_size) + min;
-      
-      std::pair<double, double> ratios = 
+
+      std::pair<double, double> ratios =
         farfrr(negatives, positives, threshold);
-      
+
       double current_cost = predicate(ratios.first, ratios.second);
-    
+
       if (current_cost < min_value) {
         min_value = current_cost;
-        accumulator.clear(); ///< clean-up, we got a better minima
+        accumulator.clear(); ///< clean-up, we got a better minimum
         accumulator.push_back(threshold); ///< remember this threshold
       }
       else if (std::abs(current_cost - min_value) < 1e-16) {
@@ -155,7 +155,7 @@ namespace bob { namespace measure {
    * This method can calculate a threshold based on a set of scores (positives
    * and negatives) given a certain minimization criteria, input as a
    * functional predicate. For a discussion on 'positive' and 'negative' see
-   * bob::measure::fafr().
+   * bob::measure::farfrr().
    *
    * The predicate method gives back the current minimum given false-acceptance
    * (FA) and false-rejection (FR) ratios for the input data. As a predicate,
@@ -164,24 +164,24 @@ namespace bob { namespace measure {
    *
    * double predicate(double fa_ratio, double fr_ratio);
    *
-   * Please note that this method will only work with single-minima smooth
+   * Please note that this method will only work with single-minimum smooth
    * predicates.
    *
    * The minimization is carried out in a recursive manner. First, we identify
    * the threshold that minimizes the predicate given a set of N (N=100)
    * thresholds between the min(negatives, positives) and the max(negatives,
-   * positives). If the minima lies in a range of values, the center value is
-   * picked up. 
+   * positives). If the minimum lies in a range of values, the center value is
+   * picked up.
    *
    * In a second round of minimization new minimum and maximum bounds are
    * defined based on the center value plus/minus the step (max-min/N) and a
    * new minimization round is restarted for N samples within the new bounds.
    *
    * The procedure continues until all calculated predicates in a given round
-   * give the same minima. At this point, the center threshold is picked up and
+   * give the same minimum. At this point, the center threshold is picked up and
    * returned.
    */
-  template <typename T> double 
+  template <typename T> double
     minimizingThreshold(const blitz::Array<double,1>& negatives,
         const blitz::Array<double,1>& positives, T& predicate) {
       const size_t N = 100; ///< number of steps in each iteration
@@ -225,11 +225,21 @@ namespace bob { namespace measure {
   }
 
   /**
+   * Calculates the threshold where the far reaches a certain limit
+   * @param negatives The sorted array of negative examples
+   * @param positives The sorted array of positive examples
+   * @param far_value The FAR threshold that should be tested
+   * @return The score threshold that was computed
+   */
+  double farThreshold(const blitz::Array<double,1>& negatives,
+      const blitz::Array<double,1>& positives, double far_value);
+
+  /**
    * Calculates the ROC curve given a set of positive and negative scores and a
    * number of desired points. Returns a two-dimensional blitz::Array of
    * doubles that express the X (FRR) and Y (FAR) coordinates in this order.
    * The points in which the ROC curve are calculated are distributed
-   * uniformily in the range [min(negatives, positives), max(negatives,
+   * uniformly in the range [min(negatives, positives), max(negatives,
    * positives)].
    */
   blitz::Array<double,2> roc
@@ -237,8 +247,18 @@ namespace bob { namespace measure {
      const blitz::Array<double,1>& positives, size_t points);
 
   /**
+   * Calculates the ROC curve given a set of positive and negative scores at
+   * the given FAR coordinates. Returns a two-dimensional blitz::Array of
+   * doubles that express the X (FAR) and Y (CAR) coordinates in this order.
+   */
+  blitz::Array<double,2> roc_for_far(
+      const blitz::Array<double,1>& negatives,
+      const blitz::Array<double,1>& positives,
+      const blitz::Array<double,1>& far_list);
+
+  /**
    * Returns the Deviate Scale equivalent of a false rejection/acceptance
-   * ratio. 
+   * ratio.
    *
    * The algorithm that calculates the deviate scale is based on function
    * ppndf() from the NIST package DETware version 2.1, freely available on the
@@ -252,7 +272,7 @@ namespace bob { namespace measure {
    * doubles that express on its rows:
    *
    * 0: X axis values in the normal deviate scale for the false-rejections
-   * 1: Y axis values in the normal deviate scale for the false-acepts
+   * 1: Y axis values in the normal deviate scale for the false-accepts
    *
    * You can plot the results using your preferred tool to first create a plot
    * using rows 0 and 1 from the returned value and then place replace the X/Y
@@ -287,13 +307,13 @@ namespace bob { namespace measure {
    * resulting HTER values are plotted in the EPC.
    *
    * The cost points in which the EPC curve are calculated are distributed
-   * uniformily in the range [0.0, 1.0].
+   * uniformly in the range [0.0, 1.0].
    */
   blitz::Array<double,2> epc
     (const blitz::Array<double,1>& dev_negatives,
-     const blitz::Array<double,1>& dev_positives, 
+     const blitz::Array<double,1>& dev_positives,
      const blitz::Array<double,1>& test_negatives,
-     const blitz::Array<double,1>& test_positives, 
+     const blitz::Array<double,1>& test_positives,
      size_t points);
 
 }}

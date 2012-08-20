@@ -6,27 +6,28 @@
  * @brief Implements the error evaluation routines
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <stdexcept>
+#include <algorithm>
 #include "measure/error.h"
 #include "core/blitz_compat.h"
 
 namespace err = bob::measure;
 
-std::pair<double, double> err::farfrr(const blitz::Array<double,1>& negatives, 
+std::pair<double, double> err::farfrr(const blitz::Array<double,1>& negatives,
     const blitz::Array<double,1>& positives, double threshold) {
   blitz::sizeType total_negatives = negatives.extent(blitz::firstDim);
   blitz::sizeType total_positives = positives.extent(blitz::firstDim);
@@ -48,15 +49,41 @@ double err::eerThreshold(const blitz::Array<double,1>& negatives,
 }
 
 /**
+ * Computes the threshold such that the FAR is directly below the given far_value.
+ * @param  negatives The negative (non-client) scores to be used for computing the FAR
+ * @param  positives The positive (client) scores; ignored by this function
+ * @param  far_value  The FAR value where the threshold should be computed
+ * @return The computed threshold
+ */
+double err::farThreshold(const blitz::Array<double,1>& negatives,
+  const blitz::Array<double,1>& positives, double far_value) {
+
+  // sort negative scores ascendingly
+  std::vector<double> negatives_(negatives.shape()[0]);;
+  std::copy(negatives.begin(), negatives.end(), negatives_.begin());
+  std::sort(negatives_.begin(), negatives_.end());
+
+  // compute position of the threshold
+  double crr = 1.-far_value;
+  double crr_index = crr * negatives_.size();
+  // compute the index above the current CRR indes
+  int index = (int)std::ceil(crr_index);
+
+  // return score as a weighted sum of the two surrounding scores
+  double weight = index - crr_index;
+  return weight * negatives_[std::max(index-1, 0)] + (1.-weight) * negatives_[std::min(index, (int)negatives_.size()-1)];
+}
+
+/**
  * Provides a functor predicate for weighted error calculation
  */
 class weighted_error {
-  
+
   double m_weight; ///< The weighting factor
 
   public: //api
 
-  weighted_error(double weight): m_weight(weight) { 
+  weighted_error(double weight): m_weight(weight) {
     if (weight > 1.0) m_weight = 1.0;
     if (weight < 0.0) m_weight = 0.0;
   }
@@ -91,9 +118,94 @@ blitz::Array<double,2> err::roc(const blitz::Array<double,1>& negatives,
 }
 
 /**
+ * This function computes the ROC coordinates for the given positive and
+ * negative values at the given FAR positions.
+ *
+ * @param negatives Impostor scores
+ * @param positives Client scores
+ * @param far_list  The list of FAR values where the FRR should be calculated
+ *
+ * @return The ROC curve with the FAR in the first row and the FRR in the second.
+ */
+blitz::Array<double,2> err::roc_for_far(const blitz::Array<double,1>& negatives,
+ const blitz::Array<double,1>& positives, const blitz::Array<double,1>& far_list) {
+  int n_points = far_list.extent(0);
+
+  // sort negative scores ascendingly
+  std::vector<double> negatives_(negatives.extent(0));;
+  std::copy(negatives.begin(), negatives.end(), negatives_.begin());
+  std::sort(negatives_.begin(), negatives_.end());
+  // sort positive scores ascendingly
+  std::vector<double> positives_(positives.extent(0));;
+  std::copy(positives.begin(), positives.end(), positives_.begin());
+  std::sort(positives_.begin(), positives_.end());
+
+  // do some magic to compute the FRR list
+  blitz::Array<double,2> retval(2, n_points);
+
+  // index into the FAR and FRR list
+  int far_index = n_points-1;
+  int pos_index = 0, neg_index = 0;
+  int n_pos = positives_.size(), n_neg = negatives_.size();
+
+  // iterators into the result lists
+  std::vector<double>::const_iterator pos_it = positives_.begin(), neg_it = negatives_.begin();
+  // do some fast magic to compute the FRR values ;-)
+  do{
+    // check whether the current positive value is less than the current negative one
+    if (*pos_it <= *neg_it){
+      // increase the positive count
+      ++pos_index;
+      // go to the next positive value
+      ++pos_it;
+    }else{
+      // increase the negative count
+      ++neg_index;
+      // go to the next negative value
+      ++neg_it;
+    }
+    // check, if we have reached a new FAR limit,
+    // i.e. if the relative number of negative similarities is greater than 1-FAR (which is the CRR)
+    if ((double)neg_index / (double)n_neg > 1. - far_list(far_index)){
+      // copy the far value
+      retval(0,far_index) = far_list(far_index);
+      // calculate the CAR (i.e., 1.-frr) for the current FAR
+      retval(1,far_index) = 1. - (double)pos_index / (double)n_pos;
+      // go to the next FAR value
+      --far_index;
+    }
+
+  // do this, as long as there are elements in both lists left and not all FRR elements where calculated yet
+  } while (pos_it != positives_.end() && neg_it != negatives_.end() && far_index >= 0);
+
+  // check if all CAR values have been set
+  if (far_index >= 0){
+    // walk to the end of both lists; at least one of both lists should already have reached its limit.
+    pos_index += positives_.end() - pos_it;
+    neg_index += negatives_.end() - neg_it;
+    // fill in the remaining elements of the CAR list
+    do {
+      // copy the FAR value
+      retval(0,far_index) = far_list(far_index);
+      // check if the criterion is fulfilled (should be, as long as the lowest far is not below 0)
+      if ((double)neg_index / (double)n_neg > 1. - far_list(far_index)){
+        // calculate the CAR (i.e., 1.-FRR) for the current FAR
+        retval(1,far_index) = 1. - (double)pos_index / (double)n_pos;
+      } else {
+        // set CAR to zero (this should never happen, but might be due to numerical issues)
+        retval(1,far_index) = 0.;
+      }
+    } while (far_index--);
+  }
+
+  return retval;
+}
+
+
+/**
  * The input to this function is a cumulative probability.  The output from
  * this function is the Normal deviate that corresponds to that probability.
- * For example: 
+ * For example:
  *
  *  INPUT | OUTPUT
  * -------+--------
@@ -106,7 +218,7 @@ blitz::Array<double,2> err::roc(const blitz::Array<double,1>& negatives,
  *  0.999 |  3.090
  */
 static double _ppndf(double p) {
-  //some constants we need for the calculation. 
+  //some constants we need for the calculation.
   //these come from the NIST implementation...
   static const double SPLIT = 0.42;
   static const double A0 = 2.5066282388;
@@ -164,7 +276,7 @@ blitz::Array<double,2> err::det(const blitz::Array<double,1>& negatives,
 
 blitz::Array<double,2> err::epc
 (const blitz::Array<double,1>& dev_negatives,
- const blitz::Array<double,1>& dev_positives, 
+ const blitz::Array<double,1>& dev_positives,
  const blitz::Array<double,1>& test_negatives,
  const blitz::Array<double,1>& test_positives, size_t points) {
   double step = 1.0/((double)points-1.0);
@@ -172,7 +284,7 @@ blitz::Array<double,2> err::epc
   for (int i=0; i<(int)points; ++i) {
     double alpha = (double)i*step;
     retval(0,i) = alpha;
-    double threshold = err::minWeightedErrorRateThreshold(dev_negatives, 
+    double threshold = err::minWeightedErrorRateThreshold(dev_negatives,
         dev_positives, alpha);
     std::pair<double, double> ratios =
       err::farfrr(test_negatives, test_positives, threshold);
