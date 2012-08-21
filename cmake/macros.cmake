@@ -487,14 +487,16 @@ macro(bob_python_package cxx_package package cxx_src pydependencies)
     add_dependencies(pybob_${package} pybob_${package}_files)
   endif()
 
-  if(NOT TARGET pybob_setuptools_local_install)
+  if(NOT TARGET egg)
     set(pybin "${CMAKE_BINARY_DIR}/bin/egg-build")
     set(pysetup "${CMAKE_BINARY_DIR}/egg/setup.py")
     get_filename_component(basedir ${pysetup} PATH)
-    add_custom_target(pybob_setuptools_local_install ALL mkdir -pv ${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES} COMMAND ${pybin} ${pysetup} clean --all COMMAND ${pybin} ${pysetup} build_ext --force --prefix=${CMAKE_BINARY_DIR} COMMAND ${pybin} ${pysetup} install --force --prefix=${CMAKE_BINARY_DIR} WORKING_DIRECTORY ${basedir} WORKING_DIRECTORY ${basedir})
+    add_custom_target(egg-pyonly ${pybin} ${pysetup} install --force --prefix=${CMAKE_BINARY_DIR} WORKING_DIRECTORY ${basedir} WORKING_DIRECTORY ${basedir})
+    add_custom_target(egg ALL mkdir -pv ${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES} COMMAND ${pybin} ${pysetup} clean --all COMMAND ${pybin} ${pysetup} build_ext --force --prefix=${CMAKE_BINARY_DIR} COMMAND ${pybin} ${pysetup} install --force --prefix=${CMAKE_BINARY_DIR} WORKING_DIRECTORY ${basedir} WORKING_DIRECTORY ${basedir})
   endif()
 
-  add_dependencies(pybob_setuptools_local_install pybob_${package})
+  add_dependencies(egg-pyonly pybob_${package})
+  add_dependencies(egg pybob_${package})
 
 endmacro()
 
