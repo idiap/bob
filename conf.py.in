@@ -20,10 +20,6 @@
 import os
 import sys
 
-site_packages = os.path.join('@CMAKE_BINARY_DIR@', '@PYTHON_SITE_PACKAGES@')
-for egg in os.listdir(site_packages):
-  if egg[-4:] == '.egg': sys.path.insert(0, os.path.join(site_packages, egg))
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
