@@ -12,5 +12,5 @@ set(ccsrc
 bob_python_package_bindings(sp "${ccsrc}" "python_integration")
 
 # Our test units
-# TTT bob_python_add_unittest(sp lib/test/fft_dct.py)
-# TTT bob_python_add_unittest(sp lib/test/extrapolate.py)
+bob_python_add_unittest(sp lib/test/fft_dct.py)
+bob_python_add_unittest(sp lib/test/extrapolate.py)
