@@ -17,9 +17,4 @@ include_directories(SYSTEM ${QT_INCLUDES})
 # Our test units
 bob_python_add_unittest(visioner lib/test/detection.py main "${CMAKE_CURRENT_SOURCE_DIR}/../io/data")
 bob_python_add_unittest(visioner lib/test/localization.py main "${CMAKE_CURRENT_SOURCE_DIR}/../io/data")
-
-bob_python_add_test(visioner-1 bob_face_detect.py "${CMAKE_CURRENT_SOURCE_DIR}/../io/data/test.mov" --self-test=1)
-bob_python_add_test(visioner-2 bob_face_detect.py "${CMAKE_CURRENT_SOURCE_DIR}/../ip/data/faceextract/test-faces.jpg" --self-test=2)
-
-bob_python_add_test(visioner-1 bob_face_keypoints.py "${CMAKE_CURRENT_SOURCE_DIR}/../io/data/test.mov" --self-test=1)
-bob_python_add_test(visioner-2 bob_face_keypoints.py "${CMAKE_CURRENT_SOURCE_DIR}/../ip/data/faceextract/test-faces.jpg" --self-test=2)
+bob_python_add_unittest(visioner lib/test/scripts.py main "${CMAKE_CURRENT_SOURCE_DIR}/../io/data")

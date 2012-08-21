@@ -176,7 +176,7 @@ def process_image_data(args):
     if args.verbose:
       print "Output file (with detections, if any) saved at %s" % args.output
 
-def main():
+def main(user_input=None):
 
   parser = argparse.ArgumentParser(description=__doc__, epilog=__epilog__,
       formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -205,7 +205,7 @@ def main():
   parser.add_argument("--self-test", metavar='INT', type=int, default=False,
       dest='selftest', help=argparse.SUPPRESS)
 
-  args = parser.parse_args()
+  args = parser.parse_args(args=user_input)
 
   if args.scan_levels < 0:
     parser.error("scanning levels have to be greater or equal 0")
@@ -246,3 +246,5 @@ def main():
 
   if args.selftest:
     os.unlink(args.output)
+
+  return 0
