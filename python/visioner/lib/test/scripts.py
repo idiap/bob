@@ -21,7 +21,7 @@ class VisionerScriptTest(unittest.TestCase):
     self.assertTrue(os.path.exists(MOVIE))
 
     from bob.visioner.script.facebox import main
-    cmdline = '%s ----self-test=1' % (MOVIE)
+    cmdline = '%s --self-test=1' % (MOVIE)
     self.assertEqual(main(cmdline.split()), 0)
 
   def test02_face_detect(self):
@@ -30,7 +30,7 @@ class VisionerScriptTest(unittest.TestCase):
     self.assertTrue(os.path.exists(IMAGE))
 
     from bob.visioner.script.facebox import main
-    cmdline = '%s ----self-test=2' % (IMAGE)
+    cmdline = '%s --self-test=2' % (IMAGE)
     self.assertEqual(main(cmdline.split()), 0)
 
   def test03_keypoint_localization(self):
@@ -39,7 +39,7 @@ class VisionerScriptTest(unittest.TestCase):
     self.assertTrue(os.path.exists(MOVIE))
 
     from bob.visioner.script.facepoints import main
-    cmdline = '%s ----self-test=1' % (MOVIE)
+    cmdline = '%s --self-test=1' % (MOVIE)
     self.assertEqual(main(cmdline.split()), 0)
 
   def test04_keypoint_localization(self):
@@ -48,7 +48,7 @@ class VisionerScriptTest(unittest.TestCase):
     self.assertTrue(os.path.exists(IMAGE))
 
     from bob.visioner.script.facepoints import main
-    cmdline = '%s ----self-test=2' % (IMAGE)
+    cmdline = '%s --self-test=2' % (IMAGE)
     self.assertEqual(main(cmdline.split()), 0)
 
 # Instantiates our standard main module for unittests
