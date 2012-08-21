@@ -176,6 +176,8 @@ setup(
       'scipy',
       ],
 
+    setup_requires=['nose>=1.0'],
+
     entry_points={
       'console_scripts': CONSOLE_SCRIPTS,
       'bob.db': DATABASES,
