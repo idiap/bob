@@ -27,7 +27,6 @@ epilog = """  For a list of available databases:
   >>> %(prog)s <database-name> --help
 """
 
-import sys
 from bob.db.manage import *
 
 def main(user_input=None):
