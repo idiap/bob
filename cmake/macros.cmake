@@ -398,7 +398,9 @@ macro(copy_files input_dir include_regex exclude_regex output_dir output_files)
 
   foreach(exp ${exclude_regex})
     file(GLOB_RECURSE files RELATIVE "${input_dir}" "${input_dir}/${exp}")
-    list(REMOVE_ITEM input_files "${files}")
+    foreach(file ${files})
+      list(REMOVE_ITEM input_files ${file})
+    endforeach()
   endforeach()
 
   set(${output_files} "")
