@@ -3,9 +3,8 @@ cmake_minimum_required(VERSION 2.6)
 
 bob_python_package_bindings(db "" "")
 
-# Iris database driver and example tests
-bob_python_add_test(db-iris-dump bob_dbmanage.py iris dump --self-test)
-bob_python_add_test(db-iris-dump-2 bob_dbmanage.py iris dump --class=versicolor --self-test)
+# Our test units
+bob_python_add_unittest(measure lib/test/scripts.py)
 
 # Our examples (run and install)
 bob_python_example(db iris_lda.py lib/example/iris_lda.py)
