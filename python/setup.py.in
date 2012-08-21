@@ -137,6 +137,11 @@ if QT4_FOUND:
       'daq',
       ]
 
+  DATAFILES += [
+      'visioner/detection.gz',
+      'visioner/localization.gz',
+      ]
+
 from setuptools import setup, find_packages
 
 setup(
