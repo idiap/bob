@@ -52,6 +52,7 @@ Many people have contributed to the development and maintenance of |project|, th
 * Roy Wallace
 * Sébastien Marcel
 * Venkatesh Bala
+* Tiago Freitas Pereira
 
 .. include:: links.rst
 
