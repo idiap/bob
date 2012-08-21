@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.6)
 bob_python_package_bindings(db "" "")
 
 # Our test units
-bob_python_add_unittest(measure lib/test/scripts.py)
+bob_python_add_unittest(db lib/test/scripts.py)
 
 # Our examples (run and install)
 bob_python_example(db iris_lda.py lib/example/iris_lda.py)

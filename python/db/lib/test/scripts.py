@@ -6,7 +6,6 @@
 """Tests various scripts for bob.db
 """
 
-import os
 import unittest
 import bob
 

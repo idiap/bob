@@ -114,4 +114,6 @@ def dump(args):
       s = ','.join(['%.1f' % array[i] for i in range(array.shape[0])] + [k])
       output.write('%s\n' % (s,))
 
+  return 0
+
 __all__ = ['names', 'stats', 'stat_names', 'data', 'dump']
