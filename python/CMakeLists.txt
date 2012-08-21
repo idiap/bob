@@ -21,8 +21,15 @@ if (PYTHON_EXECUTABLE AND PYTHONLIBS_FOUND AND Boost_FOUND)
   endif()
 
   # special version of python for setuptools usage on installation area
-  set(BOB_PYTHONPATH "${CMAKE_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES}")
-  configure_file(bin/python.in ${CMAKE_BINARY_DIR}/bin/install-python @ONLY)
+  if(IS_ABSOLUTE ${CMAKE_INSTALL_PREFIX})
+    set(ABSOLUTE_install_prefix "${CMAKE_INSTALL_PREFIX}")
+  else()
+    set(ABSOLUTE_install_prefix "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}")
+  endif()
+  set(BOB_PYTHONPATH "${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES}")
+  configure_file(bin/egg-python.in ${CMAKE_BINARY_DIR}/bin/egg-build @ONLY)
+  set(BOB_PYTHONPATH "${ABSOLUTE_install_prefix}/${PYTHON_SITE_PACKAGES}")
+  configure_file(bin/egg-python.in ${CMAKE_BINARY_DIR}/bin/egg-install @ONLY)
 
   # An easy handler to debug python stuff
   configure_file(bin/gdbpy.in ${CMAKE_BINARY_DIR}/bin/gdbpy @ONLY)

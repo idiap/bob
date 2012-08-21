@@ -6,8 +6,10 @@
 """Version information collected during Bob's build
 """
 
-version = "@BOB_VERSION@"
-system = "@BOB_SYSTEM_NAME@"
-platform = "@BOB_PLATFORM@"
+import pkg_resources
+distribution = pkg_resources.require('bob')[0]
+version = distribution.version
+system = distribution.platform.split('-')[0]
+platform = distribution.platform + "-@CMAKE_BUILD_TYPE@".lower()
 prefixes = "@CMAKE_PREFIX_PATH@"
-pyver = "@PYTHON_VERSION@"
+pyver = distribution.py_version
