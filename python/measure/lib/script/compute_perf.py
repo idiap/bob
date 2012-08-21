@@ -39,17 +39,6 @@ Examples:
   3. Don't plot (only calculate thresholds)
 
      $ %(prog)s --no-plot --devel=dev.scores --test=test.scores
-
-Note: 
-
-This is just an example program. It is not meant to be perfect or complete,
-just to give you the basis to develop your own scripts to plot things in the
-way you need. In order to tweak more options, just copy this file to your
-directory and modify it to fit your needs. You can easily copy this script like
-this:
-
-  $ cp `which %(prog)s` .
-  $ vim %(prog)s
 """
 
 import sys, os, bob
@@ -150,88 +139,80 @@ def plots(dev_neg, dev_pos, test_neg, test_pos, npoints, filename):
 
   pp.close()
 
-def get_options():
+def get_options(user_input):
   """Parse the program options"""
-
-  import optparse
-  
-  class MyParser(optparse.OptionParser):
-    def format_epilog(self, formatter):
-      return self.epilog
-    def format_description(self, formatter):
-      return self.description
 
   usage = 'usage: %s [arguments]' % os.path.basename(sys.argv[0])
 
-  parser = MyParser(usage=usage, 
+  import argparse
+  parser = argparse.ArgumentParser(usage=usage,
       description=(__doc__ % {'prog': os.path.basename(sys.argv[0])}),
-      epilog=(__epilog__ % {'prog': os.path.basename(sys.argv[0])}))
+      epilog=(__epilog__ % {'prog': os.path.basename(sys.argv[0])}),
+      formatter_class=argparse.RawDescriptionHelpFormatter)
 
-  parser.add_option('-d', '--devel', dest="dev", default=None,
-      help="Name of the file containing the development scores (defaults to %default)", metavar="FILE")
-  parser.add_option('-t', '--test', dest="test", default=None,
-      help="Name of the file containing the test scores (defaults to %default)", metavar="FILE")
-  parser.add_option('-n', '--points', dest="npoints", default=100, type="int",
-      help="Number of points to use in the curves (defaults to %default)",
+  parser.add_argument('-d', '--devel', dest="dev", default=None,
+      help="Name of the file containing the development scores (defaults to %(default)s)", metavar="FILE")
+  parser.add_argument('-t', '--test', dest="test", default=None,
+      help="Name of the file containing the test scores (defaults to %(default)s)", metavar="FILE")
+  parser.add_argument('-n', '--points', dest="npoints", default=100, type=int,
+      help="Number of points to use in the curves (defaults to %(default)s)",
       metavar="INT(>0)")
-  parser.add_option('-o', '--output', dest="plotfile", default="curves.pdf",
-      help="Name of the output file that will contain the plots (defaults to %default)", metavar="FILE")
-  parser.add_option('-x', '--no-plot', dest="doplot", default=True,
+  parser.add_argument('-o', '--output', dest="plotfile", default="curves.pdf",
+      help="Name of the output file that will contain the plots (defaults to %(default)s)", metavar="FILE")
+  parser.add_argument('-x', '--no-plot', dest="doplot", default=True,
       action='store_false', help="If set, then I'll execute no plotting")
-  parser.add_option('-p', '--parser', dest="parser", default="4column",
+  parser.add_argument('-p', '--parser', dest="parser", default="4column",
       help="Name of a known parser or of a python-importable function that can parse your input files and return a tuple (negatives, positives) as blitz 1-D arrays of 64-bit floats. Consult the API of bob.measure.load.split_four_column() for details", metavar="NAME.FUNCTION")
   
   # This option is not normally shown to the user...
-  parser.add_option("--self-test",
+  parser.add_argument("--self-test",
       action="store_true", dest="selftest", default=False,
-      help=optparse.SUPPRESS_HELP)
+      help=argparse.SUPPRESS)
       #help="if set, runs an internal verification test and erases any output")
 
-  options, args = parser.parse_args()
+  args = parser.parse_args(args=user_input)
 
-  if options.selftest:
+  if args.selftest:
     # then we go into test mode, all input is preset
     import tempfile
     outputdir = tempfile.mkdtemp()
-    options.plotfile = os.path.join(outputdir, "curves.pdf")
+    args.plotfile = os.path.join(outputdir, "curves.pdf")
 
-  if options.dev is None:
+  if args.dev is None:
     parser.error("you should give a development score set with --devel")
 
-  if options.test is None:
+  if args.test is None:
     parser.error("you should give a test score set with --test")
 
   #parse the score-parser
-  if options.parser.lower() in ('4column', '4col'):
-    options.parser = bob.measure.load.split_four_column
-  elif options.parser.lower() in ('5column', '5col'):
-    options.parser = bob.measure.load.split_five_column
+  if args.parser.lower() in ('4column', '4col'):
+    args.parser = bob.measure.load.split_four_column
+  elif args.parser.lower() in ('5column', '5col'):
+    args.parser = bob.measure.load.split_five_column
   else: #try an import
-    if options.parser.find('.') == -1:
-      parser.error("parser module should be either '4column', '5column' or a valid python function identifier in the format 'module.function': '%s' is invalid" % options.parser)
+    if args.parser.find('.') == -1:
+      parser.error("parser module should be either '4column', '5column' or a valid python function identifier in the format 'module.function': '%s' is invalid" % arg.parser)
 
-    mod, fct = options.parser.rsplit('.', 2)
+    mod, fct = args.parser.rsplit('.', 2)
     import imp
     try:
       fp, pathname, description = imp.find_module(mod, ['.'] + sys.path)
     except Exception, e:
-      parser.error("import error for '%s': %s" % (options.parser, e))
+      parser.error("import error for '%s': %s" % (args.parser, e))
 
     try:
       pmod = imp.load_module(mod, fp, pathname, description)
-      options.parser = getattr(pmod, fct)
+      args.parser = getattr(pmod, fct)
     except Exception, e:
-      parser.error("loading error for '%s': %s" % (options.parser, e))
+      parser.error("loading error for '%s': %s" % (args.parser, e))
     finally:
       fp.close()
 
-  if len(args) != 0:
-    parser.error("this program does not accept positional arguments")
+  return args
 
-  return options
+def main(user_input=None):
 
-def main():
-  options = get_options()
+  options = get_options(user_input)
 
   dev_neg, dev_pos = options.parser(options.dev)
   test_neg, test_pos = options.parser(options.test)
@@ -247,4 +228,4 @@ def main():
     import shutil
     shutil.rmtree(os.path.dirname(options.plotfile))
 
-  sys.exit(0)
+  return 0

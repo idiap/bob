@@ -30,6 +30,10 @@ TEST_SCORES = 'test-4col.txt'
 class MeasureScriptTest(unittest.TestCase):
 
   def test01_compute_perf(self):
+   
+    # sanity checks
+    self.assertTrue(os.path.exists(DEV_SCORES))
+    self.assertTrue(os.path.exists(TEST_SCORES))
 
     from bob.measure.script.compute_perf import main
     cmdline = '--devel=%s --test=%s --self-test' % (DEV_SCORES, TEST_SCORES)
@@ -37,15 +41,19 @@ class MeasureScriptTest(unittest.TestCase):
 
   def test02_eval_threshold(self):
 
+    # sanity checks
+    self.assertTrue(os.path.exists(DEV_SCORES))
+
     from bob.measure.script.eval_threshold import main
     cmdline = '--scores=%s --self-test' % (DEV_SCORES,)
     self.assertEqual(main(cmdline.split()), 0)
 
   def test03_apply_threshold(self):
 
+    # sanity checks
+    self.assertTrue(os.path.exists(TEST_SCORES))
+
     from bob.measure.script.apply_threshold import main
-    dev = bob.build.source_file('python/measure/data/test-4col.txt')
-    self.assertTrue(os.path.exists(test))
     cmdline = '--scores=%s --self-test' % (TEST_SCORES,)
     self.assertEqual(main(cmdline.split()), 0)
 
