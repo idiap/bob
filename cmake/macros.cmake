@@ -328,26 +328,6 @@ macro(bob_python_add_unittest package_name file_path)
   set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/data")
 endmacro()
 
-
-# Add python tests coded with the unittest module, but only when -DBOB_AT_IDIAP=On is defined
-#
-#   bob_python_add_unittest(package_name file_path [python_method] [working_directory])
-#
-# package_name: package name
-# file_path: path to the python file containing the test method
-# python_method: python test method (default "main")
-# working_directory: working directory where the test are executed. Default to
-#                    "data" dir in current source dir.
-#
-# Example: bob_python_add_unittest(io lib/test/array.py)
-macro(bob_python_add_idiap_unittest package_name file_path)
-  # test if the BOB_AT_IDIAP cmake variable is set
-  if (BOB_AT_IDIAP)
-    # add the unit test
-    bob_python_add_unittest(${package_name} ${file_path})
-  endif()
-endmacro()
-
 # Configure the wrapper to the python binary that automatically sets the
 # correct environment.
 #
@@ -475,7 +455,7 @@ macro(bob_python_package cxx_package package cxx_src pydependencies)
     add_custom_target(pybob_${package} ALL)
     ## TODO Add correct dependencies
   else()
-    add_library(pybob_${package} STATIC ${cxx_src})
+    add_library(pybob_${package} SHARED ${cxx_src})
     target_link_libraries(pybob_${package} ${pydeps_list})
     set_target_properties(pybob_${package} PROPERTIES COMPILE_FLAGS "-Wno-unused-function")
   endif()
@@ -574,42 +554,3 @@ function(bob_python_add_test)
   set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/data")
 
 endfunction()
-
-# add the python test, but only if -DBOB_AT_IDIAP=On is defined
-macro(bob_python_add_idiap_test)
-  # test if the BOB_AT_IDIAP cmake variable is set
-  if (BOB_AT_IDIAP)
-    # add the test
-    bob_python_add_test(${ARGV})
-  endif()
-endmacro()
-
-
-# This macro helps users to add python tests to cmake that depends on other
-# tests
-function(bob_python_add_dependent_test)
-
-  list(GET ARGV 0 test_name)
-  list(GET ARGV 1 dependencies)
-  list(GET ARGV 2 prog)
-  list(REMOVE_AT ARGV 0) #pop from front
-  list(REMOVE_AT ARGV 0) #pop from front
-  list(REMOVE_AT ARGV 0) #pop from front
-
-  bob_python_add_test(${test_name};${prog};${ARGV})
-
-  get_filename_component(prog_filename_we ${prog} NAME_WE)
-  set(test_name "python-${test_name}-${prog_filename_we}")
-
-  set_property(TEST ${test_name} APPEND PROPERTY DEPENDS "${dependencies}")
-
-endfunction()
-
-# add the dependent python test, but only if -DBOB_AT_IDIAP=On is defined
-macro(bob_python_add_dependent_idiap_test)
-  # test if the BOB_AT_IDIAP cmake variable is set
-  if (BOB_AT_IDIAP)
-    # add the dependent test
-    bob_python_add_dependent_test(${ARGV})
-  endif()
-endmacro()
