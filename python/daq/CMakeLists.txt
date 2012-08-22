@@ -32,5 +32,4 @@ if (V4L2_FOUND)
   # note: cannot test live capture
 endif()
 
-bob_python_add_unittest(daq lib/test/all.py main
-  "${CMAKE_CURRENT_SOURCE_DIR}/../io/data")
+bob_python_add_unittest(daq lib/test/all.py main "${CMAKE_CURRENT_SOURCE_DIR}/../io/data")

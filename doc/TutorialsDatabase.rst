@@ -16,9 +16,9 @@
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-**********
+==========
  Database
-**********
+==========
 
 |project| provides an API to easily query and interface with well known
 databases. Most of the examples we provide are for biometric databases though 

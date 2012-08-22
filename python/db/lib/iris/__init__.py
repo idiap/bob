@@ -26,13 +26,14 @@ References:
   Environments". IEEE Transactions on Pattern Analysis and Machine
   Intelligence, Vol. PAMI-2, No. 1, 67-71. 
 
-  4. Gates, G.W. (1972) "The Reduced Nearest Neighbor Rule". IEEE Transactions
-  on Information Theory, May 1972, 431-433. 
+  4. Gates, G.W. (1972) "The Reduced Nearest Neighbor Rule". IEEE
+  Transactions on Information Theory, May 1972, 431-433. 
 """
 
 import os
 import sys
 import numpy
+from . import driver #driver interface
 
 names = ['Sepal Length', 'Sepal Width', 'Petal Length', 'Petal Width']
 """Names of the features for each entry in the dataset."""
@@ -48,12 +49,8 @@ stats = {
 stat_names = ['Minimum', 'Maximum', 'Mean', 'Std.Dev.', 'Correlation']
 """These are the statistics available in each column of the stats variable."""
 
-# Use this variable to tell bob_dbmanage.py all driver that there is nothing to
-# download for this database.
-__builtin__ = True
-
 def data():
-  """Loads Fisher's Iris Dataset.
+  """Loads from (text) file and returns Fisher's Iris Dataset.
   
   This set is small and simple enough to require an SQL backend. We keep
   the single file it has in text and load it on-the-fly every time this
@@ -65,8 +62,11 @@ def data():
   features as described by "names". 
   """
   from ...io import Arrayset
+  from .driver import Interface
+
+  info = Interface() 
   
-  data = os.path.join(os.path.dirname(__file__), 'iris.data')
+  data = os.path.join(info.location(), 'iris.data')
 
   retval = {
       'setosa': Arrayset(),
@@ -90,12 +90,16 @@ def data():
 
   return retval
 
-def dbname():
-  """Calculates my own name automatically."""
-  import os
-  return os.path.basename(os.path.dirname(__file__))
-
 def dump(args):
+  """Dumps the database to stdout.
+
+  Keyword arguments:
+
+  args
+    A argparse.Arguments object with options set. We use two of the options:
+    ``cls`` for the class to be dumped (if None, then dump all data) and
+    ``selftest``, which runs the internal test.
+  """
 
   d = data()
   if args.cls: d = {args.cls: d[args.cls]}
@@ -110,26 +114,6 @@ def dump(args):
       s = ','.join(['%.1f' % array[i] for i in range(array.shape[0])] + [k])
       output.write('%s\n' % (s,))
 
-def add_commands(parser):
-  """A few commands this database can respond to."""
-  
-  from . import dbname
-  from argparse import RawDescriptionHelpFormatter, SUPPRESS
+  return 0
 
-  # creates a top-level parser for this database
-  top_level = parser.add_parser(dbname(),
-      formatter_class=RawDescriptionHelpFormatter,
-      help="Fisher's Iris plants database",
-      description=__doc__)
-
-  # declare it has subparsers for each of the supported commands
-  subparsers = top_level.add_subparsers(title="subcommands")
-
-  # get the "dumplist" action from a submodule
-  dump_message = "Dumps the database in comma-separate-value format"
-  dump_parser = subparsers.add_parser('dump', help=dump_message)
-  dump_parser.add_argument('-c', '--class', dest="cls", default='', help="if given, limits the dump to a particular subset of the data that corresponds to the given class (defaults to '%(default)s')", choices=('setosa', 'versicolor', 'virginica', ''))
-  dump_parser.add_argument('--self-test', dest="selftest", default=False,
-      action='store_true', help=SUPPRESS)
-
-  dump_parser.set_defaults(func=dump)
+__all__ = ['names', 'stats', 'stat_names', 'data', 'dump']

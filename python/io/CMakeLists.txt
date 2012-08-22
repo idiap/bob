@@ -35,6 +35,5 @@ endif(FFMPEG_FOUND)
 if(FFMPEG_FOUND AND ImageMagick_FOUND)
   # Our examples (run and install)
   bob_python_example(io video2frame.py lib/example/video2frame.py)
-  bob_python_add_test(io video2frame.py --test
-    ${CMAKE_CURRENT_SOURCE_DIR}/data/test.mov)
+  bob_python_add_test(io video2frame.py --test ${CMAKE_CURRENT_SOURCE_DIR}/data/test.mov)
 endif(FFMPEG_FOUND AND ImageMagick_FOUND)

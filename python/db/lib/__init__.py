@@ -6,24 +6,6 @@
 """The db package contains simplified APIs to access data for various databases
 that can be used in Biometry, Machine Learning or Pattern Classification."""
 
-import iris
-import replay
-import banca
-import banca_small
-import biosecure
-import faceverif_fl
-import lfw
-import mobio
-import multipie
-import scface
-import xm2vts
-import fir
-import nuaa
-import casia_fasd
-import atnt
-import gbu
-import arface
-import frgc
-
+from . import utils, driver, iris
 
 __all__ = dir()

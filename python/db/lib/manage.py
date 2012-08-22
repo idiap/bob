@@ -12,34 +12,24 @@ import sys
 def location_all(args):
   """Executes all the location commands from individual databases"""
   
-  for name, module in args.modules:
+  for name in [k.name() for k in args.modules]:
     parsed = args.parser.parse_args([name, 'location'])
-    parsed.with_protocol = args.with_protocol
-    parsed.func(parsed)
-
-def copyfrom_all(args):
-  """Executes all the copyfrom commands from individual databases"""
-  
-  for name, module in args.modules:
-    parsed = args.parser.parse_args([name, 'copyfrom', args.directory[0]])
-    parsed.verbose = args.verbose
-    parsed.func(parsed)
-
-def copy_all(args):
-  """Executes all the copy commands from individual databases"""
-  
-  for name, module in args.modules:
-    parsed = args.parser.parse_args([name, 'copy', args.directory[0]])
-    parsed.verbose = args.verbose
     parsed.func(parsed)
 
 def create_all(args):
   """Executes all the default create commands from individual databases"""
   
-  for name, module in args.modules:
+  for name in [k.name() for k in args.modules if k.type() in ('sqlite',)]:
     parsed = args.parser.parse_args([name, 'create'])
     parsed.recreate = args.recreate
     parsed.verbose = args.verbose
+    parsed.func(parsed)
+
+def version_all(args):
+  """Executes all the default version commands from individual databases"""
+  
+  for name in [k.name() for k in args.modules]:
+    parsed = args.parser.parse_args([name, 'version'])
     parsed.func(parsed)
 
 def add_all_commands(parser, top_subparser, modules):
@@ -55,7 +45,7 @@ def add_all_commands(parser, top_subparser, modules):
   attach the options from those.
   """
 
-  from .utils import location_command, copy_command, copyfrom_command
+  from .driver import location_command, version_command
 
   # creates a top-level parser for this database
   top_level = top_subparser.add_parser('all',
@@ -70,16 +60,6 @@ def add_all_commands(parser, top_subparser, modules):
   location_parser.set_defaults(parser=parser)
   location_parser.set_defaults(modules=modules)
 
-  copy_parser = copy_command(subparsers)
-  copy_parser.set_defaults(func=copy_all)
-  copy_parser.set_defaults(parser=parser)
-  copy_parser.set_defaults(modules=modules)
-
-  copyfrom_parser = copyfrom_command(subparsers)
-  copyfrom_parser.set_defaults(func=copyfrom_all)
-  copyfrom_parser.set_defaults(parser=parser)
-  copyfrom_parser.set_defaults(modules=modules)
-
   create_parser = subparsers.add_parser('create',
       help="create all databases with default settings")
   create_parser.add_argument('-R', '--recreate',
@@ -91,44 +71,41 @@ def add_all_commands(parser, top_subparser, modules):
   create_parser.set_defaults(parser=parser)
   create_parser.set_defaults(modules=modules)
 
-def load_db_module(name):
-  """Loads a given database module, if it exists"""
-  
-  exec("from . import %s as module" % name)
-  return module
-
-def add_argument(name, subparsers):
-  """Finds all catalogued commands for a certain DB"""
-
-  try:
-    module = load_db_module(name)
-  except ImportError:
-    return None
-
-  if hasattr(module, 'add_commands'):
-    module.add_commands(subparsers)
-    return (name, module)
-
-  return None
+  version_parser = version_command(subparsers)
+  version_parser.set_defaults(func=version_all)
+  version_parser.set_defaults(parser=parser)
+  version_parser.set_defaults(modules=modules)
 
 def create_parser(**kwargs):
   """Creates a parser for the central manager taking into consideration the
   options for every module that can provide those."""
 
+  import pkg_resources
   import argparse
+  import imp
 
   parser = argparse.ArgumentParser(**kwargs)
   subparsers = parser.add_subparsers(title='databases')
 
+  # for external entries
+  for entrypoint in pkg_resources.iter_entry_points('bob.db'):
+    plugin = entrypoint.load()
+
+  # for builtin entries
   dirname = os.path.dirname(__file__)
-  all_modules = []
   for k in os.listdir(dirname):
     d = os.path.join(dirname, k)
     if not os.path.isdir(d): continue
     if os.path.exists(os.path.join(dirname, k, '__init__.py')):
-      module = add_argument(k, subparsers)
-      if module is not None and not hasattr(module[1], '__builtin__'):
-        all_modules.append(module)
+      exec('from . import %s as module' % k)
+
+  # at this point we should have loaded all databases
+  from .driver import Interface
+  all_modules = []
+  for plugin in Interface.__subclasses__():
+    driver = plugin()
+    driver.add_commands(subparsers)
+    all_modules.append(driver)
 
   add_all_commands(parser, subparsers, all_modules) #inserts the master driver
 

@@ -34,4 +34,3 @@ Python coding guidelines
 
 .. include:: links.rst
 .. _`the google python style guide`: http://google-styleguide.googlecode.com/svn/trunk/pyguide.html
-

@@ -48,14 +48,26 @@ def version_table():
   except AttributeError:
     pass
 
-  bob_version = "%s (%s)" % (build.version, build.platform)
+  bob_version = "'%s' (%s)" % (build.version, build.platform)
   print 75*'='
-  print (" bob version %s" % bob_version).center(75)
+  print (" bob %s" % bob_version).center(75)
   print 75*'='
   print ""
 
-  print "Built-in Software"
-  print "-----------------\n"
+  print "Python Egg Properties"
+  print "---------------------\n"
+  print " * Version         : '%s'" % build.version
+  print " * System          : '%s'" % build.system
+  print " * Platform        : '%s'" % build.platform
+  print " * CMake Prefixes  : '%s'" % build.prefixes
+  print " * Python Version  : '%s'" % build.python_version
+  print " * Egg Dependencies: "
+  for name, version in build.python_dependencies:
+      print "   - %s, version '%s'" % (name, version)
+  print ""
+
+  print "Compiled-in Dependencies"
+  print "------------------------\n"
 
   sep = space + packsize*'=' + space + descsize*'='
   fmt = 2*space + ('%%%ds' % packsize) + space + ('%%%ds' % descsize)

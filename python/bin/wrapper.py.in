@@ -1,4 +1,8 @@
 #!/usr/bin/env @PYTHON_EXECUTABLE@
-import sys; sys.path.insert(0, "@BOB_PYTHONPATH@")
+import os
+import sys
+site_packages = '@BOB_PYTHONPATH@'
+for egg in os.listdir(site_packages):
+  if egg[-4:] == '.egg': sys.path.insert(0, os.path.join(site_packages, egg))
 from @BOB_MODULE@ import @BOB_METHOD@ as main
 main()

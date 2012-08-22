@@ -67,5 +67,4 @@ endif()
 
 # Our examples (run and install)
 bob_python_example(ip optflow_hs.py lib/example/optflow_hs.py)
-bob_python_add_test(ip optflow_hs.py --test
-  ${CMAKE_CURRENT_SOURCE_DIR}/../io/data/test.mov)
+bob_python_add_test(ip optflow_hs.py --test ${CMAKE_CURRENT_SOURCE_DIR}/../io/data/test.mov)

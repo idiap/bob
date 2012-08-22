@@ -1,2 +1,5 @@
 #!/usr/bin/env sh
-PYTHONPATH="@BOB_PYTHONPATH@:$PYTHONPATH" @IPYTHON_EXECUTABLE@ "${@}"
+for egg in @BOB_PYTHONPATH@/*.egg; do
+  export PYTHONPATH="${egg}:${PYTHONPATH}"; 
+done
+@IPYTHON_EXECUTABLE@ "${@}"

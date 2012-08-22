@@ -6,7 +6,6 @@ cmake_minimum_required(VERSION 2.6)
 if (PYTHON_EXECUTABLE AND PYTHONLIBS_FOUND AND Boost_FOUND)
 
   # Sets up a local version of the interpreter
-  set(BOB_PYTHONPATH "${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES}")
   if(BOB_INSTALL_PYTHON_INTERPRETER)
     bob_configure_bobpython(bin/python.in bin/python "ON")
     if(IPYTHON_EXECUTABLE)
@@ -14,28 +13,37 @@ if (PYTHON_EXECUTABLE AND PYTHONLIBS_FOUND AND Boost_FOUND)
     endif()
   else()
     # just configure it locally for build-time usage
+    set(BOB_PYTHONPATH "${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES}")
     configure_file(bin/python.in ${CMAKE_BINARY_DIR}/bin/python @ONLY)
     if(IPYTHON_EXECUTABLE)
       configure_file(bin/ipython.in ${CMAKE_BINARY_DIR}/bin/ipython @ONLY)
     endif()
   endif()
 
+  # special version of python for setuptools usage on installation area
+  if(IS_ABSOLUTE ${CMAKE_INSTALL_PREFIX})
+    set(ABSOLUTE_install_prefix "${CMAKE_INSTALL_PREFIX}")
+  else()
+    set(ABSOLUTE_install_prefix "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}")
+  endif()
+  set(BOB_PYTHONPATH "${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES}")
+  configure_file(bin/egg-python.in ${CMAKE_BINARY_DIR}/bin/egg-build @ONLY)
+  set(BOB_PYTHONPATH "${ABSOLUTE_install_prefix}/${PYTHON_SITE_PACKAGES}")
+  configure_file(bin/egg-python.in ${CMAKE_BINARY_DIR}/bin/egg-install @ONLY)
+
   # An easy handler to debug python stuff
   configure_file(bin/gdbpy.in ${CMAKE_BINARY_DIR}/bin/gdbpy @ONLY)
 
-  bob_python_bindings(root root "" "")
+  bob_python_package(root root "" "")
   
   # Installs and tests our scripts
-  bob_python_script(root bob_config.py lib/script/config.py)
-  bob_python_add_test(root bob_config.py)
+  # TTT bob_python_add_test(root bob_config.py)
 
-  # Installs the egg-info plugin so setuptools can find bob
-  if (BOB_SOVERSION)
-    # installs with a specific version number
-    bob_configure_bobpython(bob.egg-info.in ${PYTHON_SITE_PACKAGES}/bob-${BOB_VERSION}-py${PYTHON_VERSION}.egg-info "OFF")
-  else()
-    bob_configure_bobpython(bob.egg-info.in ${PYTHON_SITE_PACKAGES}/bob.egg-info "OFF")
-  endif()
+  get_property(BOB_PYTHON_COMPILE_DEFINITIONS DIRECTORY PROPERTY COMPILE_DEFINITIONS)
+  get_property(BOB_PYTHON_INCLUDE_DIRECTORIES DIRECTORY PROPERTY INCLUDE_DIRECTORIES)
+  get_property(BOB_PYTHON_LINK_DIRECTORIES DIRECTORY PROPERTY LINK_DIRECTORIES)
+
+  configure_file(setup.py.in ${CMAKE_BINARY_DIR}/egg/setup.py @ONLY)
 
   add_subdirectory(integration)
   add_subdirectory(core)
@@ -53,6 +61,7 @@ if (PYTHON_EXECUTABLE AND PYTHONLIBS_FOUND AND Boost_FOUND)
     add_subdirectory(daq)
   endif()
 
+  # Always keep this one last
   add_subdirectory(post_install)
 
 endif ()

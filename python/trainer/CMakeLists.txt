@@ -41,6 +41,5 @@ bob_python_add_unittest(trainer lib/test/plda.py)
 bob_python_add_unittest(trainer lib/test/bic.py)
 
 if(LIBSVM_FOUND)
-  bob_python_add_unittest(trainer lib/test/svm.py main 
-    "${CMAKE_CURRENT_SOURCE_DIR}/../machine/data")
+  bob_python_add_unittest(trainer lib/test/svm.py main "${CMAKE_CURRENT_SOURCE_DIR}/../machine/data")
 endif()

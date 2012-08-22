@@ -6,8 +6,35 @@
 """Version information collected during Bob's build
 """
 
-version = "@BOB_VERSION@"
-system = "@BOB_SYSTEM_NAME@"
-platform = "@BOB_PLATFORM@"
+import warnings #to account for ipython double readline import
+warnings.simplefilter('ignore')
+import pkg_resources
+warnings.simplefilter('default')
+
+distribution = pkg_resources.require('bob')[0]
+version = distribution.version
+system = distribution.platform.split('-')[0]
+platform = distribution.platform + "-@CMAKE_BUILD_TYPE@".lower()
 prefixes = "@CMAKE_PREFIX_PATH@"
-pyver = "@PYTHON_VERSION@"
+python_version = distribution.py_version
+python_dependencies = [(k.project_name, k.version) for k in pkg_resources.require('bob')[1:]]
+source_directory = "@CMAKE_SOURCE_DIR@"
+
+def source_file(relative_path):
+  """Gets the path to the given input file 'relative'
+
+  This method takes into consideration the build-set CMAKE_SOURCE_DIR and
+  returns the absolute path of the file with the relative path given as input.
+
+  Keyword parameters:
+
+  relative_path
+    The relative path of the file in the source tree you want to have the full
+    name of. The path should be given using unix '/' forward-slash separators
+    independently of the current OS you are running on.
+  """
+
+  from os.path import join
+  return join([source_directory] + '/'.split(relative_path))
+
+del pkg_resources
