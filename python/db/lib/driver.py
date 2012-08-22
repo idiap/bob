@@ -80,7 +80,7 @@ def version(arguments):
 
 def version_command(subparsers):
 
-  parser = subparsers.add_parser('version', help=put.__doc__)
+  parser = subparsers.add_parser('version', help=version.__doc__)
   parser.set_defaults(func=version)
 
   return parser
@@ -181,9 +181,9 @@ class Interface(object):
     
     You are not obliged to overwrite this method. If you do, you will have the
     chance to establish your own commands. You don't have to worry about stock
-    commands such as ``put``, ``get``, ``location`` or ``version``. They will
-    be automatically hooked-in depending on the values you return for
-    ``type()`` and ``files()``.
+    commands such as ``location`` or ``version``. They will be automatically
+    hooked-in depending on the values you return for ``type()`` and
+    ``files()``.
 
     Keyword arguments
 

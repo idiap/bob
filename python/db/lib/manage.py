@@ -16,24 +16,6 @@ def location_all(args):
     parsed = args.parser.parse_args([name, 'location'])
     parsed.func(parsed)
 
-def get_all(args):
-  """Executes all the get commands from individual databases"""
-  
-  for name in [k.name() for k in args.modules if k.files() and not k.type() in ('builtin',)]:
-    parsed = args.parser.parse_args([name, 'get', args.url])
-    parsed.dryrun = args.dryrun
-    parsed.verbose = args.verbose
-    parsed.func(parsed)
-
-def put_all(args):
-  """Executes all the put commands from individual databases"""
-  
-  for name in [k.name() for k in args.modules if k.files() and not k.type() in ('builtin',)]:
-    parsed = args.parser.parse_args([name, 'put', args.directory])
-    parsed.dryrun = args.dryrun
-    parsed.verbose = args.verbose
-    parsed.func(parsed)
-
 def create_all(args):
   """Executes all the default create commands from individual databases"""
   
@@ -63,7 +45,7 @@ def add_all_commands(parser, top_subparser, modules):
   attach the options from those.
   """
 
-  from .driver import location_command, put_command, get_command, version_command
+  from .driver import location_command, version_command
 
   # creates a top-level parser for this database
   top_level = top_subparser.add_parser('all',
@@ -77,16 +59,6 @@ def add_all_commands(parser, top_subparser, modules):
   location_parser.set_defaults(func=location_all)
   location_parser.set_defaults(parser=parser)
   location_parser.set_defaults(modules=modules)
-
-  put_parser = put_command(subparsers)
-  put_parser.set_defaults(func=put_all)
-  put_parser.set_defaults(parser=parser)
-  put_parser.set_defaults(modules=modules)
-
-  get_parser = get_command(subparsers)
-  get_parser.set_defaults(func=get_all)
-  get_parser.set_defaults(parser=parser)
-  get_parser.set_defaults(modules=modules)
 
   create_parser = subparsers.add_parser('create',
       help="create all databases with default settings")
