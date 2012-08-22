@@ -21,33 +21,31 @@ endif(DOXYGEN_FOUND)
 
 if(SPHINX_FOUND)
 
-  configure_file(${CMAKE_SOURCE_DIR}/conf.py.in ${CMAKE_CURRENT_BINARY_DIR}/conf.py)
-
   add_custom_target(sphinx
-    COMMAND ${CMAKE_BINARY_DIR}/bin/python ${SPHINX_EXECUTABLE} -c ${CMAKE_BINARY_DIR} -b html -E ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/html
+    COMMAND ${CMAKE_BINARY_DIR}/bin/python ${SPHINX_EXECUTABLE} -c ${CMAKE_SOURCE_DIR} -b html -E ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/html
     COMMENT "Generating (html) User Guide with Sphinx" VERBATIM
   )
 
   add_custom_target(sphinx-doctest
-    COMMAND ${CMAKE_BINARY_DIR}/bin/python ${SPHINX_EXECUTABLE} -c ${CMAKE_BINARY_DIR} -b doctest -E ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/html
+    COMMAND ${CMAKE_BINARY_DIR}/bin/python ${SPHINX_EXECUTABLE} -c ${CMAKE_SOURCE_DIR} -b doctest -E ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/html
     COMMENT "Running doctests with Sphinx" VERBATIM
   )
 
   if(PDFLATEX_COMPILER)
     add_custom_target(sphinx-latex 
-      COMMAND ${CMAKE_BINARY_DIR}/bin/python ${SPHINX_EXECUTABLE} -c ${CMAKE_BINARY_DIR} -b latex -E ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/latex 
+      COMMAND ${CMAKE_BINARY_DIR}/bin/python ${SPHINX_EXECUTABLE} -c ${CMAKE_SOURCE_DIR} -b latex -E ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/latex 
       COMMAND make -C ${CMAKE_BINARY_DIR}/sphinx/latex
       COMMENT "Generating (LaTeX2e) User Guide with Sphinx + PDF" VERBATIM
     )
   else()
     add_custom_target(sphinx-latex 
-      COMMAND ${CMAKE_BINARY_DIR}/bin/python ${SPHINX_EXECUTABLE} -c ${CMAKE_BINARY_DIR} -b latex -E ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/latex 
+      COMMAND ${CMAKE_BINARY_DIR}/bin/python ${SPHINX_EXECUTABLE} -c ${CMAKE_SOURCE_DIR} -b latex -E ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/latex 
       COMMENT "Generating (LaTeX2e) User Guide with Sphinx" VERBATIM
     )
   endif()
 
   add_custom_target(sphinx-coverage 
-    COMMAND ${CMAKE_BINARY_DIR}/bin/python ${SPHINX_EXECUTABLE} -c ${CMAKE_BINARY_DIR} -b coverage -E ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/coverage 
+    COMMAND ${CMAKE_BINARY_DIR}/bin/python ${SPHINX_EXECUTABLE} -c ${CMAKE_SOURCE_DIR} -b coverage -E ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/coverage 
     COMMENT "Generating (coverage) report with Sphinx" VERBATIM
   )
 
