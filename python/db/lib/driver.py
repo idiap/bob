@@ -71,106 +71,6 @@ def location_command(subparsers):
 
   return parser
 
-def get(arguments):
-  """Copies the database auxiliary files from a given directory to their installed working location."""
-
-  from .download import download
-  import shutil
-
-  for f in arguments.files:
-    src = '/'.join((arguments.url, arguments.name, arguments.version, f))
-    dest = os.path.join(arguments.location, f)
-
-    if not os.path.exists(arguments.location):
-      if arguments.verbose: 
-        print "Creating directory '%s'..." % arguments.location
-
-      makedirs_safe(os.path.dirname(dest), arguments.dryrun)
-
-    if os.path.exists(dest):
-      if arguments.verbose: print "Removing existing copy '%s'..." % dest
-
-      if arguments.dryrun:
-        print "[dry-run] rm -f '%s'" % dest
-      else:
-        os.unlink(dest)
-
-    if arguments.verbose: print "Getting %s -> %s" % (src, dest)
-
-    if src.find('http') == 0: #must download
-      if arguments.dryrun: 
-        print "[dry-run] wget --output-document=%s %s" % (dest, src)
-      else: 
-        download(src, dest, arguments.verbose)
-    else:
-      if arguments.dryrun: 
-        print "[dry-run] cp %s %s" % (src, dest)
-      else: 
-        shutil.copy2(src, dest)
-
-  return 0
-
-def get_command(subparsers):
-  
-  parser = subparsers.add_parser('get', help=get.__doc__)
-  parser.add_argument("-n", "--dry-run", dest="dryrun", default=False,
-      action='store_true',
-      help="does not actually run, just prints what would do instead")
-  parser.add_argument('-v', '--verbose', dest="verbose", default=False,
-      action='store_true', help="produces more output while copying")
-  parser.add_argument('-V', '--version', dest="version",
-      help="if set, overrides the default version set for this package when putting the database files on the given directory")
-  parser.add_argument('url', default="http://www.idiap.ch/software/bob/databases", 
-      help="sets the URL to which the database will be downloaded from (defaults to '%(default)s')",
-      nargs="?")
-  parser.set_defaults(func=get)
-
-  return parser
-
-def put(arguments):
-  """Copies database auxiliary files from their official work location to a
-  given directory."""
-
-  import shutil
-
-  d = os.path.join(arguments.directory, arguments.name, arguments.version)
-  for f in arguments.files:
-    dest = os.path.join(d, f)
-  
-    makedirs_safe(os.path.dirname(dest), arguments.dryrun)
-
-    if os.path.exists(dest):
-      if arguments.verbose: print "Removing existing file '%s'..." % dest
-      
-      if arguments.dryrun:
-        print "[dry-run] rm -f '%s'" % dest
-      else:
-        os.unlink(dest)
-
-    src = os.path.join(arguments.location, f)
-    
-    if arguments.verbose: print "Putting %s -> %s..." % (src, dest)
-
-    if arguments.dryrun: print "[dry-run] cp %s -> %s" % (src, dest)
-    else: shutil.copy2(src, dest)
-
-  return 0
-
-def put_command(subparsers):
-  
-  parser = subparsers.add_parser('put', help=put.__doc__)
-  parser.add_argument("-n", "--dry-run", dest="dryrun", default=False,
-      action='store_true',
-      help="does not actually run, just prints what would do instead")
-  parser.add_argument('-v', '--verbose', dest="verbose", default=False,
-      action='store_true', help="produces more output while copying")
-  parser.add_argument('-V', '--version', dest="version",
-      help="if set, overrides the default version set for this package when putting the database files on the given directory")
-  parser.add_argument('directory', help="sets the directory to which the database will be copied to")
-  parser.set_defaults(func=put)
-
-  return parser
-
 def version(arguments):
   """Outputs the database version"""
 
@@ -269,10 +169,6 @@ class Interface(object):
     if files:
       location_command(subparsers)
 
-      if type not in ('builtin',):
-        put_command(subparsers)
-        get_command(subparsers)
-  
     return subparsers
 
   @abc.abstractmethod
