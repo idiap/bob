@@ -4,13 +4,12 @@
 # Sun 24 Jul 17:50:01 2011 CEST
 
 from ._visioner import *
-from os import path
 from pkg_resources import resource_filename
 
-DEFAULT_DETECTION_MODEL = resource_filename(__name__, path.join('visioner', 'detection.gz'))
+DEFAULT_DETECTION_MODEL = resource_filename(__name__, 'detection.gz')
 """Default classification model for basic face detection"""
 
-DEFAULT_LOCALIZATION_MODEL = resource_filename(__name__, path.join('visioner', 'localization.gz'))
+DEFAULT_LOCALIZATION_MODEL = resource_filename(__name__, 'localization.gz')
 """Default keypoint localization model. TODO: How many points?"""
 
 class MaxDetector(CVDetector):
