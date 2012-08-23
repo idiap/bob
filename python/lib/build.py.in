@@ -18,6 +18,7 @@ version = distribution.version
 system = distribution.platform.split('-')[0]
 platform = distribution.platform + "-@CMAKE_BUILD_TYPE@".lower()
 prefixes = [k for k in [path.strip() for path in "@CMAKE_PREFIX_PATH@".split(os.pathsep)] if k]
+del k
 python_version = distribution.py_version
 python_dependencies = [(k.project_name, k.version) for k in pkg_resources.require('bob')[1:]]
 source_directory = "@CMAKE_SOURCE_DIR@"
@@ -40,3 +41,5 @@ def source_file(relative_path):
   return os.path.abspath(os.path.join(*components))
 
 del pkg_resources
+del warnings
+del os

@@ -159,10 +159,10 @@ setup(
       'Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence',
       ],
 
-    packages=find_packages('../lib'),
-    package_dir={'': '../lib'},
+    packages=find_packages('lib'),
+    package_dir={'': 'lib'},
     package_data={'bob': DATAFILES},
-    zip_safe=False, #we do use __file__ sometimes
+    zip_safe=False,
 
     ext_modules=[setup_extension(k) for k in EXTENSIONS],
     cmdclass = {'build_ext': build_ext},
@@ -174,8 +174,6 @@ setup(
       'sqlalchemy',
       'scipy',
       ],
-
-    setup_requires=['nose>=1.0'],
 
     entry_points={
       'console_scripts': CONSOLE_SCRIPTS,
