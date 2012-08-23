@@ -44,7 +44,7 @@ if (PYTHON_EXECUTABLE AND PYTHONLIBS_FOUND AND Boost_FOUND)
   get_property(BOB_PYTHON_LINK_DIRECTORIES DIRECTORY PROPERTY LINK_DIRECTORIES)
 
   set(BOB_PYTHON_LIBRARY_PREFIX ${CMAKE_BINARY_DIR})
-  configure_file(setup.py.in ${CMAKE_BINARY_DIR}/egg/build/setup.py @ONLY)
+  configure_file(setup.py.in ${CMAKE_BINARY_DIR}/egg/setup-build.py @ONLY)
 
   add_subdirectory(integration)
   add_subdirectory(core)
