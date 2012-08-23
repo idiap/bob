@@ -59,6 +59,7 @@ A description of the feature vector can be obtained using the attribute
 .. doctest::
 
    >>> descriptor_labels = bob.db.iris.names
+   >>> descriptor_labels
    ['Sepal Length', 'Sepal Width', 'Petal Length', 'Petal Width']
 
 The data (feature vectors) can be retrieved using the :py:meth:`bob.db.iris.data()` 
