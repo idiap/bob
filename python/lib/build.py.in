@@ -12,6 +12,7 @@ import warnings #to account for ipython double readline import
 warnings.simplefilter('ignore')
 import pkg_resources
 warnings.simplefilter('default')
+del warnings
 
 distribution = pkg_resources.require('bob')[0]
 version = distribution.version
@@ -22,6 +23,7 @@ del k
 python_version = distribution.py_version
 python_dependencies = [(k.project_name, k.version) for k in pkg_resources.require('bob')[1:]]
 source_directory = "@CMAKE_SOURCE_DIR@"
+del pkg_resources
 
 def source_file(relative_path):
   """Gets the path to the given input file 'relative'
@@ -39,7 +41,3 @@ def source_file(relative_path):
 
   components = [source_directory] + relative_path.split('/')
   return os.path.abspath(os.path.join(*components))
-
-del pkg_resources
-del warnings
-del os
