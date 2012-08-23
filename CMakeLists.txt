@@ -26,13 +26,6 @@ execute_process(COMMAND ${CMAKE_SOURCE_DIR}/bin/version.py OUTPUT_VARIABLE BOB_D
 set(BOB_VERSION_INTERNAL "${BOB_DISCOVERED_VERSION}" CACHE INTERNAL "The version of Bob that is currently being built")
 if(NOT BOB_VERSION)
   set(BOB_VERSION ${BOB_VERSION_INTERNAL})
-  if(NOT BOB_DATABASE_VERSION)
-    set(BOB_DATABASE_VERSION "nightlies/last")
-  endif()
-else()
-  if(NOT BOB_DATABASE_VERSION)
-    set(BOB_DATABASE_VERSION "releases/${BOB_VERSION}")
-  endif()
 endif()
 
 set(BOB_SOVERSION_INTERNAL "OFF" CACHE INTERNAL "If we need to use a SOVERSION
