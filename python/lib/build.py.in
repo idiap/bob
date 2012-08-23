@@ -35,6 +35,7 @@ def source_file(relative_path):
   """
 
   from os.path import join
-  return join([source_directory] + '/'.split(relative_path))
+  components = [source_directory] + '/'.split(relative_path)
+  return join(*components)
 
 del pkg_resources
