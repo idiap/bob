@@ -90,7 +90,7 @@ def data():
 
   return retval
 
-def dump(args):
+def __dump__(args):
   """Dumps the database to stdout.
 
   Keyword arguments:
@@ -116,4 +116,4 @@ def dump(args):
 
   return 0
 
-__all__ = ['names', 'stats', 'stat_names', 'data', 'dump']
+__all__ = ['names', 'stats', 'stat_names', 'data']

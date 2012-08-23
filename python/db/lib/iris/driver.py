@@ -65,5 +65,5 @@ class Interface(AbstractInterface):
     dump_parser.add_argument('--self-test', dest="selftest", default=False,
         action='store_true', help=SUPPRESS)
 
-    from . import dump
-    dump_parser.set_defaults(func=dump)
+    from . import __dump__
+    dump_parser.set_defaults(func=__dump__)
