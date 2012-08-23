@@ -91,14 +91,6 @@ def create_parser(**kwargs):
   for entrypoint in pkg_resources.iter_entry_points('bob.db'):
     plugin = entrypoint.load()
 
-  # for builtin entries
-  dirname = os.path.dirname(__file__)
-  for k in os.listdir(dirname):
-    d = os.path.join(dirname, k)
-    if not os.path.isdir(d): continue
-    if os.path.exists(os.path.join(dirname, k, '__init__.py')):
-      exec('from . import %s as module' % k)
-
   # at this point we should have loaded all databases
   from .driver import Interface
   all_modules = []

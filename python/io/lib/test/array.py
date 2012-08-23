@@ -176,49 +176,5 @@ class ArrayTest(unittest.TestCase):
     self.assertTrue( numpy.array_equal(a, b) )
     os.unlink(tname)
 
-
-def main():
-  import gc
-  import inspect
-
-  exclude = [
-      "function",
-      "type",
-      "list",
-      "dict",
-      "tuple",
-      "wrapper_descriptor",
-      "module",
-      "method_descriptor",
-      "member_descriptor",
-      "instancemethod",
-      "builtin_function_or_method",
-      "frame",
-      "classmethod",
-      "classmethod_descriptor",
-      "_Environ",
-      "MemoryError",
-      "_Printer",
-      "_Helper",
-      "getset_descriptor",
-      ]
-
-  def dumpObjects():
-    gc.collect()
-    oo = gc.get_objects()
-    for o in oo:
-      if getattr(o, "__class__", None):
-        name = o.__class__.__name__
-        if name not in exclude:
-          try:
-            filename = inspect.getabsfile(o.__class__)
-          except Exception, e:
-            print "Cannot get filename of %s" % o.__class__.__name__
-            continue
-
-          print "Object of class:", name, "...",
-          print "defined in file:", filename
- 
-  bob.helper.unittest_main(ArrayTest)()
-  
-  #dumpObjects()
+# Instantiates our standard main module for unittests
+main = bob.helper.unittest_main(ArrayTest)
