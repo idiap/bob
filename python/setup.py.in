@@ -162,12 +162,14 @@ setup(
     packages=find_packages('../lib'),
     package_dir={'': '../lib'},
     package_data={'bob': DATAFILES},
+    include_package_data=True,
     zip_safe=False,
 
     ext_modules=[setup_extension(k) for k in EXTENSIONS],
     cmdclass = {'build_ext': build_ext},
 
     install_requires=[
+      'setuptools',
       'argparse',
       'numpy',
       'matplotlib',
