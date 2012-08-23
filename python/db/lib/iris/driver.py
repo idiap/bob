@@ -15,11 +15,6 @@ class Interface(AbstractInterface):
     '''Returns a simple name for this database, w/o funny characters, spaces'''
     return 'iris'
 
-  def location(self):
-    '''Returns the directory that contains the data files'''
-    from os.path import dirname
-    return dirname(__file__)
-
   def files(self):
     '''Returns a python iterable with all auxiliary files needed.
     
@@ -27,7 +22,9 @@ class Interface(AbstractInterface):
     database is sitting at.
     '''
     
-    return ('iris.names', 'iris.data')
+    from pkg_resources import resource_filename
+    raw_files = ('iris.data', 'iris.names')
+    return [resource_filename(__name__, k) for k in raw_files]
 
   def version(self):
     '''Returns the current version number from Bob's build'''

@@ -15,26 +15,27 @@ from .utils import makedirs_safe
 def dbshell(arguments):
   """Drops you into a database shell"""
 
-  import subprocess
-
-  dbfile = os.path.join(arguments.location, arguments.files[0])
+  if len(arguments.files) != 1:
+    raise RuntimeError, "Something is wrong this database is supposed to be of type SQLite, but you have more than one data file available: %s" % argument.files
 
   if arguments.type == 'sqlite': 
     prog = 'sqlite3'
   else: 
     raise RuntimeError, "Error auxiliary database file '%s' cannot be used to initiate a database shell connection (type='%s')" % (dbfile, arguments.type)
 
-  arguments = [prog, dbfile]
+  cmdline = [prog, arguments.files[0]]
+
+  import subprocess
 
   try:
     if arguments.dryrun:
-      print "[dry-run] exec '%s'" % ' '.join(arguments)
+      print "[dry-run] exec '%s'" % ' '.join(cmdline)
       return 0
     else:
-      p = subprocess.Popen(arguments)
+      p = subprocess.Popen(cmdline)
   except OSError as e:
     # occurs when the file is not executable or not found
-    print("Error executing '%s': %s (%d)" % (' '.join(arguments), e.strerror,
+    print("Error executing '%s': %s (%d)" % (' '.join(cmdline), e.strerror,
         e.errno))
     sys.exit(e.errno)
   
@@ -56,18 +57,18 @@ def dbshell_command(subparsers):
       help="does not actually run, just prints what would do instead")
   parser.set_defaults(func=dbshell)
 
-def print_location(arguments):
-  """Prints the current location of the database SQL file."""
+def print_files(arguments):
+  """Prints the current location of raw database files."""
   
-  for k in arguments.files: print(os.path.join(arguments.location, k))
+  for k in arguments.files: print k
 
   return 0
 
-def location_command(subparsers):
-  """Adds a new location subcommand to your parser"""
+def files_command(subparsers):
+  """Adds a new 'files' subcommand to your parser"""
 
-  parser = subparsers.add_parser('location', help=print_location.__doc__)
-  parser.set_defaults(func=print_location)
+  parser = subparsers.add_parser('files', help=print_files.__doc__)
+  parser.set_defaults(func=print_files)
 
   return parser
 
@@ -93,11 +94,6 @@ class Interface(object):
   @abc.abstractmethod
   def name(self):
     '''Returns a simple name for this database, w/o funny characters, spaces'''
-    return
-
-  @abc.abstractmethod
-  def location(self):
-    '''Returns the directory that contains the data'''
     return
 
   @abc.abstractmethod
@@ -153,7 +149,6 @@ class Interface(object):
     files = self.files()
 
     top_level.set_defaults(name=self.name())
-    top_level.set_defaults(location=self.location())
     top_level.set_defaults(version=self.version())
     top_level.set_defaults(type=type)
     top_level.set_defaults(files=files)
@@ -167,7 +162,7 @@ class Interface(object):
       dbshell_command(subparsers)
 
     if files:
-      location_command(subparsers)
+      files_command(subparsers)
 
     return subparsers
 
@@ -181,7 +176,7 @@ class Interface(object):
     
     You are not obliged to overwrite this method. If you do, you will have the
     chance to establish your own commands. You don't have to worry about stock
-    commands such as ``location`` or ``version``. They will be automatically
+    commands such as ``files`` or ``version``. They will be automatically
     hooked-in depending on the values you return for ``type()`` and
     ``files()``.
 

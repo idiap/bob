@@ -11,6 +11,14 @@ import bob
 
 class IrisDBScriptTest(unittest.TestCase):
 
+  def test00_iris_files(self):
+
+    from bob.db.iris.driver import Interface
+    import os
+
+    for k in Interface().files():
+      self.assertTrue(os.path.exists(k))
+
   def test01_iris_dump(self):
    
     from bob.db.script.dbmanage import main
@@ -23,10 +31,10 @@ class IrisDBScriptTest(unittest.TestCase):
     cmdline = 'iris dump --class=versicolor --self-test'
     self.assertEqual(main(cmdline.split()), 0)
 
-  def test03_iris_location(self):
+  def test03_iris_files(self):
 
     from bob.db.script.dbmanage import main
-    self.assertEqual(main('iris location'.split()), 0)
+    self.assertEqual(main('iris files'.split()), 0)
 
   def test04_iris_version(self):
 

@@ -9,11 +9,11 @@
 import os
 import sys
 
-def location_all(args):
-  """Executes all the location commands from individual databases"""
+def files_all(args):
+  """Executes all the files commands from individual databases"""
   
   for name in [k.name() for k in args.modules]:
-    parsed = args.parser.parse_args([name, 'location'])
+    parsed = args.parser.parse_args([name, 'files'])
     parsed.func(parsed)
 
 def create_all(args):
@@ -45,7 +45,7 @@ def add_all_commands(parser, top_subparser, modules):
   attach the options from those.
   """
 
-  from .driver import location_command, version_command
+  from .driver import files_command, version_command
 
   # creates a top-level parser for this database
   top_level = top_subparser.add_parser('all',
@@ -55,10 +55,10 @@ def add_all_commands(parser, top_subparser, modules):
   # declare it has subparsers for each of the supported commands
   subparsers = top_level.add_subparsers(title="subcommands")
 
-  location_parser = location_command(subparsers)
-  location_parser.set_defaults(func=location_all)
-  location_parser.set_defaults(parser=parser)
-  location_parser.set_defaults(modules=modules)
+  files_parser = files_command(subparsers)
+  files_parser.set_defaults(func=files_all)
+  files_parser.set_defaults(parser=parser)
+  files_parser.set_defaults(modules=modules)
 
   create_parser = subparsers.add_parser('create',
       help="create all databases with default settings")
