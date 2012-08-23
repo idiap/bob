@@ -21,86 +21,63 @@
 ==========
 
 |project| provides an API to easily query and interface with well known
-databases. Most of the examples we provide are for biometric databases though 
-|project| is not at all limited to these kinds of databases. 
-A database contains information about the organization
+databases. A |project| database contains information about the organization
 of the files, functions to query information such as the data which might be
-used for training a model, but it does **not** contain the data itself.
-Most of the databases are stored in a sqlite_ file, whereas the smallest 
-ones are stored as filelists.
+used for training a model, but it usually does **not** contain the data itself
+(except for some toy examples). Most of the databases are stored in a sqlite_ 
+file, whereas the smallest ones are stored as filelists.
+
+As databases usually contain thousands of files, and as verification protocols 
+often require to store information about pairs of files, the size of such
+databases can become very large. For this reason, we have decided to externalize
+many of them in some `Satellite Packages`_.
+
 
 .. testsetup:: *
 
    import bob
 
 
-MOBIO database
-==============
+Iris Flower Data Set
+====================
 
-Let's consider an example with the freely available MOBIO_ database, which
-consists of bi-modal (audio and video) data from 150 people. For this example,
-we will use the still images of the database. The database query is 
-instantiated as any other Python_ object.
+The `Iris flower data set <http://en.wikipedia.org/wiki/Iris_flower_data_set>`_
+or Fisher's Iris data set is a multivariate data set introduced by Sir Ronald
+Aylmer Fisher (1936) as an example of discriminant analysis. The dataset 
+consists of 50 samples from three species of Iris flowers (Iris setosa, Iris 
+virginica and Iris versicolor). Four features were measured from each sample, 
+they are the length and the width of sepal and petal, in centimeters.
 
-.. doctest::
+As this data set is quite small and used for testing purpose, it is directly
+integrated into |project|, which provides both ways to access the data, as well
+as the data itself (feature vectors of length four for various samples of the 
+three species).
 
-   >>> mobioDb = bob.db.mobio.Database()
-
-Once the database has been instantiated, it is possible to query information 
-about it. For instance, to retrieve the list of client ids, the 
-:py:meth:`bob.db.mobio.Database.clients()` could be called.
-
-.. doctest::
-
-   >>> clientsList = mobioDb.clients()
-   >>> print len(clientsList)
-   150
-
-The |project| database also contains information about the protocols. In 
-particular, the :py:meth:`bob.db.mobio.Database.clients()` can be 
-parametrised to only return the list of identities which can be used to train
-a model (`world` subset) for a specified protocol.
+A description of the feature vector can be obtained using the attribute
+:py:attr:`bob.db.iris.names`.
 
 .. doctest::
 
-   >>> clientsSublist = mobioDb.clients(protocol = 'male', groups = 'world')
-   >>> clientsSublistSorted = sorted(clientsSublist)
-   >>> print clientsSublistSorted[0] # print the id of the first client
-   202
-   
-Then, if you would like to retrieve the list of files associated with this 
-identity, the :py:meth:`bob.db.mobio.Database.files()` method will be of 
-help.
+   >>> descriptor_labels = bob.db.iris.names
+   ['Sepal Length', 'Sepal Width', 'Petal Length', 'Petal Width']
+
+The data (feature vectors) can be retrieved using the :py:meth:`bob.db.iris.data()` 
+function. This returns a 3-key dictionary, with 3 :pyth:attr:`bob.io.Arrayset` 
+as values, one for each of the three species of Iris flowers.
 
 .. doctest::
 
-   >>> fileList0 = mobioDb.files(protocol = 'male', groups = 'world', model_ids = (clientsSublistSorted[0],))
-   >>> print len(fileList0)
-   192
+   >>> bob.db.iris.data()
+   {'setosa': <Arrayset[50] float64@(4,)>, 'versicolor': <Arrayset[50] float64@(4,)>, 'virginica': <Arrayset[50] float64@(4,)>}
 
-In the previous case, the returned list of filenames contains relative paths
-without extension. However, it is posssible to provides a base directory and
-an extension argument to the function, that will respectively prepend and 
-append them to the list of filenames.
+Each :pyth:attr:`bob.io.Arrayset` consists of 50 feature vectors of length four.
 
-.. doctest::
-
-   >>> fileList1 = mobioDb.files(protocol = 'male', groups = 'world', model_ids = (clientsSublistSorted[0],), directory = '/MYDIR', extension = '.pgm')
-   >>> print fileList1 # doctest: +SKIP
-
-Finally, it is possible to check that a given base directory contains all the
-files of a database using the `checkfiles` command of the `bob_dbmanage.py` script.
-
-.. code-block:: sh
-
-   $ bob_dbmanage.py mobio checkfiles -d /MYDIR -e '.pgm'
-
-If a file can not be found, its filename will be printed in the standard 
-output stream.
+The database also contains statistics about the feature vectors, which can be 
+obtained using the :py:attr:`bob.db.iris.stats` dictionary. A description
+of these statistics is provided by :py:attr:`bob.db.iris.stat_names`.
 
 .. include:: links.rst
 
 .. Place here your external references
 
-.. _mobio: http://www.idiap.ch/dataset/mobio
 .. _sqlite: http://www.sqlite.org/
