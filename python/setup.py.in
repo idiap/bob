@@ -162,7 +162,7 @@ setup(
     packages=find_packages('../lib'),
     package_dir={'': '../lib'},
     package_data={'bob': DATAFILES},
-    zip_safe=True, #we do use __file__ sometimes
+    zip_safe=False,
 
     ext_modules=[setup_extension(k) for k in EXTENSIONS],
     cmdclass = {'build_ext': build_ext},
