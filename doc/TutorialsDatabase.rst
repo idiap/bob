@@ -25,12 +25,12 @@ databases. A |project| database contains information about the organization
 of the files, functions to query information such as the data which might be
 used for training a model, but it usually does **not** contain the data itself
 (except for some toy examples). Most of the databases are stored in a sqlite_ 
-file, whereas the smallest ones are stored as filelists.
+file, whereas the smallest ones can be stored as filelists.
 
 As databases usually contain thousands of files, and as verification protocols 
 often require to store information about pairs of files, the size of such
-databases can become very large. For this reason, we have decided to externalize
-many of them in some `Satellite Packages`_.
+databases can become very large. For this reason, we have decided to
+externalize many of them in `Satellite Packages`_.
 
 
 .. testsetup:: *
@@ -63,7 +63,7 @@ A description of the feature vector can be obtained using the attribute
    ['Sepal Length', 'Sepal Width', 'Petal Length', 'Petal Width']
 
 The data (feature vectors) can be retrieved using the :py:meth:`bob.db.iris.data()` 
-function. This returns a 3-key dictionary, with 3 :pyth:attr:`bob.io.Arrayset` 
+function. This returns a 3-key dictionary, with 3 :py:attr:`bob.io.Arrayset` 
 as values, one for each of the three species of Iris flowers.
 
 .. doctest::
@@ -71,7 +71,7 @@ as values, one for each of the three species of Iris flowers.
    >>> bob.db.iris.data()
    {'setosa': <Arrayset[50] float64@(4,)>, 'versicolor': <Arrayset[50] float64@(4,)>, 'virginica': <Arrayset[50] float64@(4,)>}
 
-Each :pyth:attr:`bob.io.Arrayset` consists of 50 feature vectors of length four.
+Each :py:attr:`bob.io.Arrayset` consists of 50 feature vectors of length four.
 
 The database also contains statistics about the feature vectors, which can be 
 obtained using the :py:attr:`bob.db.iris.stats` dictionary. A description
@@ -80,5 +80,3 @@ of these statistics is provided by :py:attr:`bob.db.iris.stat_names`.
 .. include:: links.rst
 
 .. Place here your external references
-
-.. _sqlite: http://www.sqlite.org/

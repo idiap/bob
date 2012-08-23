@@ -262,9 +262,7 @@ using the application ``svm-train`` with default parameters).
     import bob
     import numpy
     
-    # the CMAKE_SOURCE_DIR is defined at conf.py.in
-    heart_model = os.path.join(os.environ['CMAKE_SOURCE_DIR'], 
-      'python/machine/data/heart.svmmodel')
+    heart_model = bob.build.source_file('python/machine/data/heart.svmmodel')
 
     svm = bob.machine.SupportVector(heart_model)
 
@@ -326,15 +324,11 @@ from the file like this:
     import numpy
     import bob
 
-    # the CMAKE_SOURCE_DIR is defined at conf.py.in
-    heart_data = os.path.join(os.environ['CMAKE_SOURCE_DIR'], 
-      'python/machine/data/heart.svmdata')
+    heart_data = bob.build.source_file('python/machine/data/heart.svmdata')
 
     f = bob.machine.SVMFile(heart_data)
 
-    # the CMAKE_SOURCE_DIR is defined at conf.py.in
-    heart_model = os.path.join(os.environ['CMAKE_SOURCE_DIR'], 
-      'python/machine/data/heart.svmmodel')
+    heart_model = bob.build.source_file('python/machine/data/heart.svmmodel')
 
     svm = bob.machine.SupportVector(heart_model)
 

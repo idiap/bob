@@ -54,6 +54,7 @@
 .. _scipy: http://www.scipy.org
 .. _sphinx: http://sphinx.pocoo.org
 .. _sqlalchemy: http://www.sqlalchemy.org/
+.. _sqlite: http://www.sqlite.org/
 .. _submit a new bug report: https://github.com/idiap/bob/issues
 .. _torch 3 vision: http://torch3vision.idiap.ch
 .. _torch 3: http://www.torch.ch
