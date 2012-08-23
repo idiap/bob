@@ -309,6 +309,29 @@ To distribute a package, we recommend you use PyPI. The `The Hitchhiker’s Guid
 to Packaging <http://guide.python-distribute.org/>`_ contains details and good
 examples on how to achieve this.
 
+Version Numbering Scheme
+------------------------
+
+We recommend you follow |project|'s version numbering scheme using a 3-tier
+string: ``M.m.p``. The value of ``M`` is a number starting at 1. This number is
+changed in case of a major release that brings new APIs and concepts to the
+table. The value of ``m`` is a number starting at 0 (zero). Every time a new
+API is available (but no conceptual modifications are done to the platform)
+that number is increased. Finally, the value of p represents the patch level,
+starting at 0 (zero). Every time we need to post a new version of |project|
+that does **not** bring incompatible API modifications, that number is
+increased. For example, version 1.0.0 is the first release of |project|.
+Version 1.0.1 would be the first patch release.
+
+.. note::
+
+  The numbering scheme for your package and |project|'s may look the same, but
+  should be totally independent of each other. |project| may be on version
+  3.4.2 while your package, still compatible with that release could be on
+  1.4.5. You should state on your ``setup.py`` file which version of |project|
+  your package is compatible with, using the standard notation defined for
+  setuptools installation requirements for packages.
+
 Satellite Packages Available
 ----------------------------
 
