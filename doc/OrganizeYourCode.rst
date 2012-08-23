@@ -246,9 +246,9 @@ resembles a test on the example package.
   <http://github.com/bioidiap/bob.db.aggregator>`_ package and looks `like this
   <https://github.com/bioidiap/bob.db.aggregator/blob/master/xbob/db/aggregator/test.py>`_:
 
-  ..code:: python
+  .. code-block:: python
 
-    # execute all declared ``bob.test`` entries
+    # execute all declared bob.test entries
     import pkg_resources
     for i, ep in enumerate(pkg_resources.iter_entry_points('bob.test')):
       cls = ep.load()
