@@ -5,12 +5,13 @@ if(IS_ABSOLUTE ${CMAKE_INSTALL_PREFIX})
 else()
   set(ABSOLUTE_install_prefix "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}")
 endif()
+  
+set(BOB_PYTHON_LIBRARY_PREFIX ${ABSOLUTE_install_prefix})
+configure_file(../setup.py.in ${CMAKE_BINARY_DIR}/egg/install/setup.py @ONLY)
 
 # Setuptools/Python Egg installation
 set(pybin "${CMAKE_BINARY_DIR}/bin/egg-install")
-set(pysetup "${CMAKE_BINARY_DIR}/egg/setup.py")
+set(pysetup "${CMAKE_BINARY_DIR}/egg/install/setup.py")
 get_filename_component(basedir ${pysetup} PATH)
-install(CODE "execute_process(COMMAND ${pybin} ${pysetup} clean --all WORKING_DIRECTORY ${basedir})")
 install(CODE "execute_process(COMMAND mkdir -pv ${ABSOLUTE_install_prefix}/${PYTHON_SITE_PACKAGES} WORKING_DIRECTORY ${basedir})")
-install(CODE "execute_process(COMMAND ${pybin} ${pysetup} build_ext --force --prefix=${ABSOLUTE_install_prefix} WORKING_DIRECTORY ${basedir})")
-install(CODE "execute_process(COMMAND ${pybin} ${pysetup} install --force --prefix=${ABSOLUTE_install_prefix} WORKING_DIRECTORY ${basedir})")
+install(CODE "execute_process(COMMAND ${pybin} ${pysetup} install --prefix=${ABSOLUTE_install_prefix} WORKING_DIRECTORY ${basedir})")

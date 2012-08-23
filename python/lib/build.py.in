@@ -6,6 +6,8 @@
 """Version information collected during Bob's build
 """
 
+import os
+
 import warnings #to account for ipython double readline import
 warnings.simplefilter('ignore')
 import pkg_resources
@@ -15,7 +17,7 @@ distribution = pkg_resources.require('bob')[0]
 version = distribution.version
 system = distribution.platform.split('-')[0]
 platform = distribution.platform + "-@CMAKE_BUILD_TYPE@".lower()
-prefixes = "@CMAKE_PREFIX_PATH@"
+prefixes = [k for k in [path.strip() for path in "@CMAKE_PREFIX_PATH@".split(os.pathsep)] if k]
 python_version = distribution.py_version
 python_dependencies = [(k.project_name, k.version) for k in pkg_resources.require('bob')[1:]]
 source_directory = "@CMAKE_SOURCE_DIR@"
@@ -34,8 +36,7 @@ def source_file(relative_path):
     independently of the current OS you are running on.
   """
 
-  from os.path import join
-  components = [source_directory] + '/'.split(relative_path)
-  return join(*components)
+  components = [source_directory] + relative_path.split('/')
+  return os.path.abspath(os.path.join(*components))
 
 del pkg_resources

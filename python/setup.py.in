@@ -23,6 +23,7 @@ BOB_VERSION = '@BOB_VERSION@'
 ENABLE_RPATH = cmake_false('@BOB_SOVERSION@')
 CMAKE_BINARY_DIR = '@CMAKE_BINARY_DIR@'
 QT4_FOUND = cmake_true('@QT4_FOUND@')
+LIBRARY_PREFIX = '@BOB_PYTHON_LIBRARY_PREFIX@'
 
 # ---------------------------------------------------------------------------#
 #  general utilities for the setup                                           # 
@@ -36,18 +37,8 @@ from setuptools import Extension
 class build_ext(build_ext_base):
   '''Customized extension to build bob.python bindings in the expected way'''
 
-  user_options = build_ext_base.user_options + \
-      [('prefix=', 'C', 'Which base directory to use for this install')]
-
   def __init__(self, *args, **kwargs):
     build_ext_base.__init__(self, *args, **kwargs)
-
-  def initialize_options(self):
-    '''Allows our user_options to be picked-up'''
-    
-    build_ext_base.initialize_options(self)
-
-    self.prefix = os.path.join(CMAKE_BINARY_DIR)
 
   def build_extension(self, ext):
     '''Concretely builds the extension given as input'''
@@ -60,17 +51,6 @@ class build_ext(build_ext_base):
 
     # Some clean-up on the linker which is screwed up...
     self.compiler.linker_so = [k for k in self.compiler.linker_so if ld_ok(k)]
-
-    # Fix library paths in case the '--prefix option was given'
-    if self.prefix is not None:
-      ext.library_dirs = [os.path.join(self.prefix, 'lib')] + ext.library_dirs
-
-      if ENABLE_RPATH:
-        # I'm installing locally, so we set the runtime path
-        ext.runtime_library_dirs = ext.library_dirs
-      else:
-        # The user is setting BOB_SOVERSION indicating a root installation
-        ext.runtime_library_dirs = []
 
     build_ext_base.build_extension(self, ext)
 
@@ -87,8 +67,21 @@ def setup_extension(name):
 
   ext_name = 'bob.%s._%s' % (name.replace('_', '.'), name)
 
+  library_dirs = []
+  runtime_library_dirs = []
+
+  # Fix library paths
+  if len(LIBRARY_PREFIX) != 0:
+    library_dirs = [os.path.join(LIBRARY_PREFIX, 'lib')] + library_dirs
+
+    if ENABLE_RPATH:
+      # I'm installing locally, so we set the runtime path
+      runtime_library_dirs = library_dirs
+
   return Extension(ext_name, sources=[],
       extra_objects=objects,
+      library_dirs=library_dirs,
+      runtime_library_dirs=runtime_library_dirs,
       libraries=['bob_python_integration', 'bob_' + package],
       )
 
@@ -166,8 +159,8 @@ setup(
       'Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence',
       ],
 
-    packages=find_packages('lib'),
-    package_dir={'': 'lib'},
+    packages=find_packages('../lib'),
+    package_dir={'': '../lib'},
     package_data={'bob': DATAFILES},
     zip_safe=False, #we do use __file__ sometimes
 
