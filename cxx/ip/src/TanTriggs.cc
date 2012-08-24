@@ -110,8 +110,8 @@ void bob::ip::TanTriggs::computeDoG(double sigma0, double sigma1, size_t size)
   const double inv_sigma0_2 = 0.5  / (sigma0*sigma0);
   const double inv_sigma1_2 = 0.5  / (sigma1*sigma1);
   int center = ((int)size) / 2;
-  for(int y=0; y<size; ++y)
-    for(int x=0; x<size; ++x)
+  for(int y=0; y<(int)size; ++y)
+    for(int x=0; x<(int)size; ++x)
     {
       int yy = y - center;
       int xx = x - center;
