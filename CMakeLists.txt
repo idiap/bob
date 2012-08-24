@@ -69,8 +69,10 @@ if(APPLE)
 endif(APPLE)
 
 # For both RELEASE and DEBUG builds
-set(COMMON_CXX_FLAGS "-std=c++0x")
-set(COMMON_C_FLAGS "-std=c99")
+if(NOT APPLE)
+  set(COMMON_CXX_FLAGS "-std=c++0x")
+  set(COMMON_C_FLAGS "-std=c99")
+endif()
 
 # For specific builds
 set(COMMON_RELEASE_FLAGS "-O2 -mtune=generic -DNDEBUG")
