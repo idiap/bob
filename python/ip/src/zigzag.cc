@@ -40,7 +40,7 @@ static void py_zigzag_C(bob::python::const_ndarray src,
   
   if(info.nd != 2) 
     PYTHON_ERROR(TypeError, "bob.ip.zigzag() does not support input array \
-      with '%ld' dimensions.", info.nd);
+      with " SIZE_T_FMT " dimensions.", info.nd);
 
   switch(info.dtype) 
   {
@@ -63,7 +63,7 @@ static object py_zigzag_P(bob::python::const_ndarray src,
 
   if(info.nd != 2) 
     PYTHON_ERROR(TypeError, "bob.ip.zigzag() does not support input array \
-      with '%ld' dimensions.", info.nd);
+      with " SIZE_T_FMT " dimensions.", info.nd);
 
   switch(info.dtype)
   {

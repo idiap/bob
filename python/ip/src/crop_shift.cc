@@ -71,7 +71,7 @@ static void py_crop1_c(bob::python::const_ndarray src,
       return inner_crop1_type<3>(src, dst, y, x, h, w, allow_out, zero_out);
     default:
       PYTHON_ERROR(TypeError, "bob.ip.crop() does not support array with \
-        '%ld' dimensions.", info.nd);
+        " SIZE_T_FMT " dimensions.", info.nd);
   }
 }
 
@@ -95,7 +95,7 @@ static object py_crop1_p(bob::python::const_ndarray src, const int y,
       }
     default:
       PYTHON_ERROR(TypeError, "bob.ip.crop() does not support array with \
-        '%ld' dimensions.", info.nd);
+        " SIZE_T_FMT " dimensions.", info.nd);
   }
 }
 
@@ -154,7 +154,7 @@ static void py_crop2_c(bob::python::const_ndarray src,
                                  allow_out, zero_out);
     default:
       PYTHON_ERROR(TypeError, "bob.ip.crop() does not support array with \
-        '%ld' dimensions.", info.nd);
+        " SIZE_T_FMT " dimensions.", info.nd);
   }
 }
 
@@ -202,7 +202,7 @@ static void py_shift1_c(bob::python::const_ndarray src,
       return inner_shift1_type<3>(src, dst, y, x, allow_out, zero_out);
     default:
       PYTHON_ERROR(TypeError, "bob.ip.shift() does not support array with \
-        '%ld' dimensions.", info.nd);
+        " SIZE_T_FMT " dimensions.", info.nd);
   }
 }
 
@@ -226,7 +226,7 @@ static object py_shift1_p(bob::python::const_ndarray src, const int y,
       }
     default:
       PYTHON_ERROR(TypeError, "bob.ip.shift() does not support array with \
-        '%ld' dimensions.", info.nd);
+        " SIZE_T_FMT " dimensions.", info.nd);
   }
 }
 
@@ -285,7 +285,7 @@ static void py_shift2_c(bob::python::const_ndarray src,
                                  allow_out, zero_out);
     default:
       PYTHON_ERROR(TypeError, "bob.ip.shift() does not support array with \
-        '%ld' dimensions.", info.nd);
+        " SIZE_T_FMT " dimensions.", info.nd);
   }
 }
 

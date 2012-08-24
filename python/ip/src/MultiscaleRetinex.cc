@@ -60,7 +60,7 @@ static void py_call1(bob::ip::MultiscaleRetinex& op, bob::python::const_ndarray 
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "MultiscaleRetinex __call__ does not support array with '%ld' dimensions", info.nd);
+      PYTHON_ERROR(TypeError, "MultiscaleRetinex __call__ does not support array with " SIZE_T_FMT " dimensions", info.nd);
   }
 }
 
@@ -118,7 +118,7 @@ static object py_call2(bob::ip::MultiscaleRetinex& op,
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "MultiscaleRetinex __call__ does not support array with '%ld' dimensions", info.nd);
+      PYTHON_ERROR(TypeError, "MultiscaleRetinex __call__ does not support array with " SIZE_T_FMT " dimensions", info.nd);
   }
 }
 

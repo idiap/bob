@@ -61,7 +61,7 @@ static void py_flip_c(bob::python::const_ndarray src,
     case 3: return inner_flip_type<3>(src, dst);
     default:
       PYTHON_ERROR(TypeError, 
-        "image flipping does not support array of '%ld' dimensions.", 
+        "image flipping does not support array of " SIZE_T_FMT " dimensions.",
         info.nd);
   }
 }
@@ -85,7 +85,7 @@ static object py_flip_p(bob::python::const_ndarray src)
       }
     default:
       PYTHON_ERROR(TypeError, 
-        "image flipping does not support array of '%ld' dimensions.", 
+        "image flipping does not support array of " SIZE_T_FMT " dimensions.",
         info.nd);
   }
 }
@@ -127,7 +127,7 @@ static void py_flop_c(bob::python::const_ndarray src,
     case 3: return inner_flop_type<3>(src, dst);
     default:
       PYTHON_ERROR(TypeError, 
-        "image flopping does not support array of '%ld' dimensions.", 
+        "image flopping does not support array of " SIZE_T_FMT " dimensions.",
         info.nd);
   }
 }
@@ -151,7 +151,7 @@ static object py_flop_p(bob::python::const_ndarray src)
       }
     default:
       PYTHON_ERROR(TypeError, 
-        "image flopping does not support array of '%ld' dimensions.", 
+        "image flopping does not support array of " SIZE_T_FMT " dimensions.", 
         info.nd);
   }
 }

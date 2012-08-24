@@ -86,7 +86,7 @@ static void call_gs1(bob::ip::Gaussian& op,
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "Gaussian __call__ does not support array with '%ld' dimensions", info.nd);
+      PYTHON_ERROR(TypeError, "Gaussian __call__ does not support array with " SIZE_T_FMT " dimensions", info.nd);
   }
 }
 
@@ -144,7 +144,7 @@ static object call_gs2(bob::ip::Gaussian& op,
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "Gaussian __call__ does not support array with '%ld' dimensions", info.nd);
+      PYTHON_ERROR(TypeError, "Gaussian __call__ does not support array with " SIZE_T_FMT " dimensions", info.nd);
   }
 }
 

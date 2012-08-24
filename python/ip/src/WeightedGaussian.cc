@@ -83,7 +83,7 @@ static void call_wgs_C(bob::ip::WeightedGaussian& op,
       break;
     default:
       PYTHON_ERROR(TypeError, "bob.ip.WeightedGaussian __call__ does not \
-        support array with '%ld' dimensions.", info.nd);
+        support array with " SIZE_T_FMT " dimensions.", info.nd);
   }    
 }
 
@@ -150,7 +150,7 @@ static object call_wgs_P(bob::ip::WeightedGaussian& op,
       break;
     default:
       PYTHON_ERROR(TypeError, "bob.ip.WeightedGaussian __call__ does not \
-        support array with '%ld' dimensions.", info.nd);
+        support array with " SIZE_T_FMT " dimensions.", info.nd);
   }
 }
 

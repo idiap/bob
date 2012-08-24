@@ -41,8 +41,8 @@ static void py_gamma_correction_c(bob::python::const_ndarray src,
 
   if (info.nd != 2) 
     PYTHON_ERROR(TypeError, 
-      "bob.ip.gamma_correction() does not support input array with '%ld' \
-       dimensions.",
+      "bob.ip.gamma_correction() does not support input array with \
+       " SIZE_T_FMT " dimensions.",
       info.nd);
 
   switch (info.dtype) {
@@ -79,8 +79,8 @@ static object py_gamma_correction_p(bob::python::const_ndarray src,
 
   if (info.nd != 2) 
     PYTHON_ERROR(TypeError, 
-      "bob.ip.gamma_correction() does not support input array with '%ld' \
-       dimensions.",
+      "bob.ip.gamma_correction() does not support input array with \
+       " SIZE_T_FMT " dimensions.",
       info.nd);
 
   switch (info.dtype) {

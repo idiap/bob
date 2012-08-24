@@ -95,7 +95,7 @@ static void block(bob::python::const_ndarray input,
     default: 
       PYTHON_ERROR(TypeError, 
         "bob.ip.block() operator does not support output array with number \
-         of dimensions '%lu'.", info.nd);
+         of dimensions " SIZE_T_FMT ".", info.nd);
   }
 }
 

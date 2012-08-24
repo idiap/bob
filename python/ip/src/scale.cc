@@ -67,7 +67,7 @@ static void scale(bob::python::const_ndarray src, bob::python::ndarray dst,
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "bob.ip.scale() does not support array with '%ld' dimensions.", info.nd);
+      PYTHON_ERROR(TypeError, "bob.ip.scale() does not support array with " SIZE_T_FMT " dimensions.", info.nd);
   }
 
 }
@@ -121,7 +121,7 @@ static void scale2(bob::python::const_ndarray src,
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "bob.ip.scale() does not support array with '%ld' dimensions.", info.nd);
+      PYTHON_ERROR(TypeError, "bob.ip.scale() does not support array with " SIZE_T_FMT " dimensions.", info.nd);
   }
 }
 
@@ -140,7 +140,7 @@ static object inner_scale_as_dim(bob::python::const_ndarray src, const double f)
     case 2: return inner_scale_as<T,2>(src, f);
     case 3: return inner_scale_as<T,3>(src, f);
     default:
-      PYTHON_ERROR(TypeError, "bob.ip.scale() does not support array with '%ld' dimensions.", info.nd);
+      PYTHON_ERROR(TypeError, "bob.ip.scale() does not support array with " SIZE_T_FMT " dimensions.", info.nd);
   }
 }
 
