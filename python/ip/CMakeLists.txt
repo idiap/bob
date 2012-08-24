@@ -56,6 +56,7 @@ bob_python_add_unittest(ip lib/test/gaussian.py)
 bob_python_add_unittest(ip lib/test/weightedGaussian.py)
 bob_python_add_unittest(ip lib/test/sqi.py)
 bob_python_add_unittest(ip lib/test/msr.py)
+bob_python_add_unittest(ip lib/test/tantriggs.py)
 bob_python_add_unittest(ip lib/test/zigzag.py)
 
 # If we have VLFeat installed, enable the test of relevant modules

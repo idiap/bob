@@ -67,7 +67,7 @@ bob::ip::TanTriggs::operator=(const bob::ip::TanTriggs& other)
 bool bob::ip::TanTriggs::operator==(const bob::ip::TanTriggs& b) const
 {
   return (this->m_gamma == b.m_gamma && this->m_sigma0 == b.m_sigma0 &&
-          this->m_sigma0 == b.m_sigma1 && this->m_radius == b.m_radius && 
+          this->m_sigma1 == b.m_sigma1 && this->m_radius == b.m_radius && 
           this->m_threshold == b.m_threshold && this->m_alpha == b.m_alpha && 
           this->m_border_type == b.m_border_type);
 }
