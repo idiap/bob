@@ -26,6 +26,7 @@
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
 #include <stdint.h>
+#include "core/logging.h"
 #include "core/convert.h"
 #include "ip/TanTriggs.h"
 
@@ -143,7 +144,7 @@ BOOST_AUTO_TEST_CASE( test_tantriggs_2d )
 
   // Second test (comparison with matlab implementation from X. Tan)
   bob::ip::TanTriggs tt_filter2(0.2, 1., 2., 6, 10., 0.1, 
-    bob::sp::Conv::Same, bob::sp::Extrapolation::Mirror);
+    bob::sp::Extrapolation::Mirror);
   tt_filter2(img,img_processed);
 
   testdata_path_img = testdata_cpath;

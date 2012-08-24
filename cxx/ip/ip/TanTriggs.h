@@ -23,8 +23,7 @@
 #ifndef BOB_IP_TAN_TRIGGS_H
 #define BOB_IP_TAN_TRIGGS_H
 
-#include "core/logging.h"
-#include "ip/Exception.h"
+#include "core/array_assert.h"
 #include "ip/gammaCorrection.h"
 #include "sp/conv.h"
 #include "sp/extrapolate.h"
@@ -55,18 +54,102 @@ namespace bob {
     public:
 
       /**
-        * @brief Constructor: generates the Difference of Gaussians filter
-        */
+       * @brief Creates an aboject to preprocess images using the algorithm of
+       *  Tan and Triggs.
+       * @param gamma The gamma value for the Gamma correction
+       * @param sigma0 The standard deviation of the inner Gaussian of the 
+       *  DOG filter
+       * @param sigma1 The standard deviation of the outer Gaussian of the 
+       *  DOG filter
+       * @param radius The radius (kernel_size=2*radius+1) of the kernel along
+       *  both axes
+       * @param threshold threshold value used for the contrast equalization
+       * @param alpha alpha value used for the contrast equalization
+       * @param border_type The interpolation type for the convolution
+       */
       TanTriggs(const double gamma=0.2, const double sigma0=1., 
-        const double sigma1=2., const int size=2, const double threshold=10., 
-        const double alpha=0.1, const bob::sp::Conv::SizeOption 
-        size_opt=sp::Conv::Same, const bob::sp::Extrapolation::BorderType 
+        const double sigma1=2., const int radius=2, const double threshold=10.,
+        const double alpha=0.1, const bob::sp::Extrapolation::BorderType 
         border_type=bob::sp::Extrapolation::Mirror);
+
+      /**
+       * @brief Copy constructor
+       */
+      TanTriggs(const TanTriggs& other): 
+        m_gamma(other.m_gamma), m_sigma0(other.m_sigma0), 
+        m_sigma1(other.m_sigma1), m_radius(other.m_radius), 
+        m_threshold(other.m_threshold), m_alpha(other.m_alpha),
+        m_border_type(other.m_border_type)
+      {
+        computeDoG(m_sigma0, m_sigma1, 2*m_radius+1);
+      }
 
       /**
         * @brief Destructor
         */
-      virtual ~TanTriggs();
+      virtual ~TanTriggs() { }
+
+      /**
+       * @brief Assignment operator
+       */
+      TanTriggs& operator=(const TanTriggs& other);
+
+      /**
+       * @brief Equal to
+       */
+      bool operator==(const TanTriggs& b) const;
+      /**
+       * @brief Not equal to
+       */
+      bool operator!=(const TanTriggs& b) const; 
+
+      /**
+       * @brief Resets the parameters of the filter
+       * @param gamma The gamma value for the Gamma correction
+       * @param sigma0 The standard deviation of the inner Gaussian of the 
+       *  DOG filter
+       * @param sigma1 The standard deviation of the outer Gaussian of the 
+       *  DOG filter
+       * @param radius The radius (kernel_size=2*radius+1) of the kernel along
+       *  both axes
+       * @param threshold threshold value used for the contrast equalization
+       * @param alpha alpha value used for the contrast equalization
+       * @param size_opt The output size of the filtered image, because of the 
+       *  convolution
+       * @param border_type The interpolation type for the convolution
+       */
+      void reset(const double gamma=0.2, const double sigma0=1., 
+        const double sigma1=2., const int radius=2, const double threshold=10.,
+        const double alpha=0.1, const bob::sp::Extrapolation::BorderType 
+        border_type=bob::sp::Extrapolation::Mirror);
+
+      /**
+       * @brief Getters
+       */
+      double getGamma() const { return m_gamma; }
+      double getSigma0() const { return m_sigma0; }
+      double getSigma1() const { return m_sigma1; }
+      int getRadius() const { return m_radius; }
+      double getThreshold() const { return m_threshold; }
+      double getAlpha() const { return m_alpha; }
+      bob::sp::Extrapolation::BorderType getConvBorder() const 
+      { return m_border_type; }
+      const blitz::Array<double,2>& getKernel() const { return m_kernel; }
+     
+      /**
+       * @brief Setters
+       */
+      void setGamma(const double gamma) { m_gamma = gamma; }
+      void setSigma0(const double sigma0) 
+      { m_sigma0 = sigma0; computeDoG(m_sigma0, m_sigma1, 2*m_radius+1); }
+      void setSigma1(const double sigma1) 
+      { m_sigma1 = sigma1; computeDoG(m_sigma0, m_sigma1, 2*m_radius+1); }
+      void setRadius(const int radius) 
+      { m_radius = radius; computeDoG(m_sigma0, m_sigma1, 2*m_radius+1); }
+      void setThreshold(const double threshold) { m_threshold = threshold; }
+      void setAlpha(const double alpha) { m_alpha = alpha; }
+      void setConvBorder(const bob::sp::Extrapolation::BorderType border_type)
+      { m_border_type = border_type; }
 
       /**
         * @brief Process a 2D blitz Array/Image by applying the preprocessing
@@ -94,10 +177,9 @@ namespace bob {
       double m_gamma;
       double m_sigma0;
       double m_sigma1;
-      int m_size;
+      int m_radius;
       double m_threshold;
       double m_alpha;
-      bob::sp::Conv::SizeOption m_size_opt;
       bob::sp::Extrapolation::BorderType m_border_type;
   };
 
@@ -105,16 +187,10 @@ namespace bob {
   void TanTriggs::operator()(const blitz::Array<T,2>& src, 
     blitz::Array<double,2>& dst) 
   { 
-    // Check and reindex if required
-    if( dst.base(0) != 0 || dst.base(1) != 0 ) { 
-      const blitz::TinyVector<int,2> zero_base = 0;
-      dst.reindexSelf( zero_base );
-    }
-    // Check and resize dst if required
-    if( dst.extent(0) != src.extent(0) || dst.extent(1) != src.extent(1) )
-    {
-      dst.resize( src.extent(0), src.extent(1) );
-    }
+    // Check input and output arrays
+    bob::core::array::assertZeroBase(src);
+    bob::core::array::assertZeroBase(dst);
+    bob::core::array::assertSameShape(src, dst);
 
     // Check and resize intermediate array if required
     if( m_img_tmp.extent(0) != src.extent(0) ||  
@@ -125,17 +201,11 @@ namespace bob {
     if( m_gamma > 0.)
       bob::ip::gammaCorrection( src, m_img_tmp, m_gamma);
     else
-    {
-      blitz::Range src_y( src.lbound(0), src.ubound(0)),
-                   src_x( src.lbound(1), src.ubound(1));
-      blitz::Range tmp_y( m_img_tmp.lbound(0), m_img_tmp.ubound(0)),
-                   tmp_x( m_img_tmp.lbound(1), m_img_tmp.ubound(1));
-      m_img_tmp(tmp_y,tmp_x) = log( 1. + src(src_y,src_x) );
-    }
+      m_img_tmp = blitz::log( 1. + src );
 
     // 2/ Convolution with the DoG Filter
-    if(m_border_type == bob::sp::Extrapolation::Zero || m_size_opt == bob::sp::Conv::Valid)
-      sp::conv( m_img_tmp, m_kernel, dst, m_size_opt);
+    if(m_border_type == bob::sp::Extrapolation::Zero)
+      sp::conv( m_img_tmp, m_kernel, dst, bob::sp::Conv::Same);
     else
     {
       m_img_tmp2.resize(bob::sp::getConvOutputSize(m_img_tmp, m_kernel, bob::sp::Conv::Full));
