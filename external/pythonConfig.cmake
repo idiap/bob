@@ -39,6 +39,7 @@ endfunction(find_python_module)
 # *************************** READ THIS ***********************************
 
 # Now double-check for all required python modules
+find_python_module(setuptools REQUIRED)
 find_python_module(argparse REQUIRED)
 find_python_module(numpy REQUIRED)
 find_python_module(matplotlib REQUIRED)
