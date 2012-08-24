@@ -70,7 +70,7 @@ namespace bob {
         /**
           * @brief Destructor
           */
-        virtual ~GeomNorm() { }
+        virtual ~GeomNorm();
 
         /**
          * @brief Assignment operator

@@ -39,6 +39,10 @@ bob::ip::GeomNorm::GeomNorm(const bob::ip::GeomNorm& other):
 {
 }
 
+bob::ip::GeomNorm::~GeomNorm()
+{
+}
+
 bob::ip::GeomNorm& 
 bob::ip::GeomNorm::operator=(const bob::ip::GeomNorm& other)
 {
