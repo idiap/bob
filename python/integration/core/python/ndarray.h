@@ -605,7 +605,6 @@ namespace bob { namespace python {
         // if we got here, we have to copy-cast
         // call the correct version of the cast function
         switch(info.dtype){
-          case bob::core::array::t_unknown: throw bob::core::NotImplementedError();
           // boolean types
           case bob::core::array::t_bool: return bob::core::cast<T>(bz<bool,N>());
 
@@ -630,6 +629,8 @@ namespace bob { namespace python {
           case bob::core::array::t_complex64: return bob::core::cast<T>(bz<std::complex<float>,N>());
           case bob::core::array::t_complex128: return bob::core::cast<T>(bz<std::complex<double>,N>());
           case bob::core::array::t_complex256: return bob::core::cast<T>(bz<std::complex<long double>,N>());
+          
+          default: throw bob::core::NotImplementedError();
         }
       }
 
