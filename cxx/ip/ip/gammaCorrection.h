@@ -52,11 +52,7 @@ namespace bob {
       void gammaCorrectionNoCheck(const blitz::Array<T,2>& src, 
         blitz::Array<double,2>& dst, const double gamma)
       {
-        blitz::Range src_y( src.lbound(0), src.ubound(0) ),
-                     src_x( src.lbound(1), src.ubound(1) );
-        blitz::Range dst_y( dst.lbound(0), dst.ubound(0) ),
-                     dst_x( dst.lbound(1), dst.ubound(1) );
-        dst(dst_y,dst_x) = pow( src(src_y,src_x), gamma);
+        dst = blitz::pow( src, gamma);
       }
 
     }
@@ -67,8 +63,6 @@ namespace bob {
       *   blitz::array/image of a given type.
       *   The first dimension is the height (y-axis), whereas the second
       *   one is the width (x-axis).
-      * @warning The dst blitz::array/image is resized and reindexed with zero
-      *   base index.
       * @param src The input blitz array
       * @param dst The output blitz array (always double)
       * @param gamma The gamma value for power-law gamma correction
@@ -77,15 +71,14 @@ namespace bob {
     void gammaCorrection(const blitz::Array<T,2>& src, 
       blitz::Array<double,2>& dst, const double gamma)
     {
-      // Check output
+      // Check input/output
+      bob::core::array::assertZeroBase(src);
       bob::core::array::assertZeroBase(dst);
       bob::core::array::assertSameShape(dst, src); 
 
       // Check parameters and throw exception if required
       if( gamma < 0.) 
-      {
         throw ParamOutOfBoundaryError("gamma", false, gamma, 0.);
-      }
     
       // Perform gamma correction for the 2D array
       detail::gammaCorrectionNoCheck(src, dst, gamma);
