@@ -97,7 +97,10 @@ static blitz::TinyVector<double,2> call3(bob::ip::GeomNorm& obj,
 
 void bind_ip_geomnorm() 
 {
-  class_<bob::ip::GeomNorm, boost::shared_ptr<bob::ip::GeomNorm> >("GeomNorm", GEOMNORM_DOC, init<const double, const double, const int, const int, const int, const int>((arg("rotation_angle"), arg("scaling_factor"), arg("crop_height"), arg("crop_width"), arg("crop_offset_h"), arg("crop_offset_w")), "Constructs a GeomNorm object."))
+  class_<bob::ip::GeomNorm, boost::shared_ptr<bob::ip::GeomNorm> >("GeomNorm", GEOMNORM_DOC, init<const double, const double, const size_t, const size_t, const double, const double>((arg("rotation_angle"), arg("scaling_factor"), arg("crop_height"), arg("crop_width"), arg("crop_offset_h"), arg("crop_offset_w")), "Constructs a GeomNorm object."))
+    .def(init<bob::ip::GeomNorm&>(args("other")))
+    .def(self == self)
+    .def(self != self)
     .add_property("rotation_angle", &bob::ip::GeomNorm::getRotationAngle, &bob::ip::GeomNorm::setRotationAngle, "Rotation angle for the geometric normalization (in radians)")
     .add_property("scaling_factor", &bob::ip::GeomNorm::getScalingFactor, &bob::ip::GeomNorm::setScalingFactor, "Scaling factor for the geometric normalization")
     .add_property("crop_height", &bob::ip::GeomNorm::getCropHeight, &bob::ip::GeomNorm::setCropHeight, "Height of the cropping area/output after the geometric normalization")
