@@ -28,7 +28,8 @@ using namespace boost::python;
 static object call_vlsift(bob::ip::VLSIFT& op, bob::python::const_ndarray src) 
 {
   const bob::core::array::typeinfo& info = src.type();  
-  if (info.nd != 2) PYTHON_ERROR(TypeError, "sift features extractor does not support input of type '%s'", info.str().c_str());
+  if(info.nd != 2) 
+    PYTHON_ERROR(TypeError, "sift features extractor does not support input of type " SIZE_T_FMT ".", info.nd);
   if(info.dtype != bob::core::array::t_uint8)
     PYTHON_ERROR(TypeError, "sift features does not support type '%s'", info.str().c_str());
 
@@ -42,7 +43,8 @@ static object call_vlsift(bob::ip::VLSIFT& op, bob::python::const_ndarray src)
 static object call_kp_vlsift(bob::ip::VLSIFT& op, bob::python::const_ndarray src, bob::python::const_ndarray kp) 
 {
   const bob::core::array::typeinfo& info = src.type();  
-  if (info.nd != 2) PYTHON_ERROR(TypeError, "sift features extractor does not support input of type '%s'", info.str().c_str());
+  if(info.nd != 2) 
+    PYTHON_ERROR(TypeError, "sift features extractor does not support input of type " SIZE_T_FMT ".", info.nd);
   if(info.dtype != bob::core::array::t_uint8)
     PYTHON_ERROR(TypeError, "sift features does not support type '%s'", info.str().c_str());
 
@@ -57,7 +59,18 @@ void bind_ip_vlsift()
 {
   static const char* VLSIFT_doc = "Computes SIFT features using the VLFeat library";
 
-  class_<bob::ip::VLSIFT, boost::shared_ptr<bob::ip::VLSIFT> >("VLSIFT", VLSIFT_doc, init<const size_t, const size_t, const size_t, const size_t, const int, optional<const double, const double, const double> >((arg("height"), arg("width"), arg("n_intervals"), arg("n_octaves"), arg("octave_min"), arg("peak_thres")=0.03, arg("edge_thres")=10., arg("magnif")=3.), "Creates an object to compute SIFT features"))
+  class_<bob::ip::VLSIFT, boost::shared_ptr<bob::ip::VLSIFT> >("VLSIFT", VLSIFT_doc, init<const size_t, const size_t, const size_t, const size_t, const int, optional<const double, const double, const double> >((arg("height"), arg("width"), arg("n_intervals"), arg("n_octaves"), arg("octave_min"), arg("peak_thres")=0.03, arg("edge_thres")=10., arg("magnif")=3.), "Creates an object to compute SIFT features using the VLFeat library"))
+    .def(init<bob::ip::VLSIFT&>(args("other")))
+    .def(self == self)
+    .def(self != self)
+    .add_property("height", &bob::ip::VLSIFT::getHeight, &bob::ip::VLSIFT::setHeight, "The height of the image to process")
+    .add_property("width", &bob::ip::VLSIFT::getWidth, &bob::ip::VLSIFT::setWidth, "The width of the image to process")
+    .add_property("n_intervals", &bob::ip::VLSIFT::getNIntervals, &bob::ip::VLSIFT::setNIntervals, "The number of intervals in each octave")
+    .add_property("n_octaves", &bob::ip::VLSIFT::getNOctaves, &bob::ip::VLSIFT::setNOctaves, "The number of intervals in each octave")
+    .add_property("octave_min", &bob::ip::VLSIFT::getOctaveMin, &bob::ip::VLSIFT::setOctaveMin, "The index of the minimum octave")
+    .add_property("peak_thres", &bob::ip::VLSIFT::getPeakThres, &bob::ip::VLSIFT::setPeakThres, "The peak threshold (minimum amount of contrast to accept a keypoint)")
+    .add_property("edge_thres", &bob::ip::VLSIFT::getEdgeThres, &bob::ip::VLSIFT::setEdgeThres, "The edge rejection threshold")
+    .add_property("magnif", &bob::ip::VLSIFT::getMagnif, &bob::ip::VLSIFT::setMagnif, "The magnification factor (descriptor size is determined by multiplying the keypoint scale by this factor)")
     .def("__call__", &call_vlsift, (arg("self"), arg("src")), "Computes the SIFT features from an input image (by first detecting keypoints). It returns a list of descriptors, one for each keypoint and orientation. The first four values are the x, y, sigma and orientation of the values. The 128 remaining values define the descriptor.")
     .def("__call__", &call_kp_vlsift, (arg("self"), arg("src"), arg("keypoints")), "Computes the SIFT features from an input image and a set of keypoints. A keypoint is specified by a 3- or 4-tuple (y, x, sigma, [orientation]). The orientation is estimated if not specified. It returns a list of descriptors, one for each keypoint and orientation. The first four values are the x, y, sigma and orientation of the values. The 128 remaining values define the descriptor.")
     ;
