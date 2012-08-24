@@ -90,10 +90,10 @@ namespace bob {
       public:
         /**
          * @brief Creates an object to filter images with a median filter
-         * @param radius_y The height of the kernel along the y-axis
-         * @param radius_x The width of the kernel along the x-axis
+         * @param radius_y The radius of the kernel along the y-axis (height=2*radius_y+1)
+         * @param radius_x The radius of the kernel along the x-axis (width=2*radius_x+1)
          */
-        Median(const int radius_y=1, const int radius_x=1): 
+        Median(const size_t radius_y=1, const size_t radius_x=1): 
           m_radius_y(radius_y), m_radius_x(radius_x),
           m_median_pos((2*radius_y+1)*(2*radius_x+1)/2)
         {
@@ -106,11 +106,11 @@ namespace bob {
         /**
           * @brief Resets the filter with different radius
           */
-        void reset( const int radius_y=1, const int radius_x=1)
+        void reset( const size_t radius_y=1, const size_t radius_x=1)
         {
-          m_radius_y = radius_y;
-          m_radius_x = radius_x;
-          m_median_pos = (2*radius_y+1)*(2*radius_x+1)/2;
+          m_radius_y = (int)radius_y;
+          m_radius_x = (int)radius_x;
+          m_median_pos = (2*(int)radius_y+1)*(2*(int)radius_x+1)/2;
         }
 
         /**
