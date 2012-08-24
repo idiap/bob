@@ -25,31 +25,32 @@
 #include "ip/extrapolateMask.h"
 
 using namespace boost::python;
-namespace tp = bob::python;
-namespace ip = bob::ip;
-namespace ca = bob::core::array;
 
 template <typename T>
-static void inner_extrapolateMask(tp::const_ndarray src, tp::ndarray img) {
+static void inner_extrapolateMask(bob::python::const_ndarray src, 
+  bob::python::ndarray img) 
+{
   blitz::Array<T,2> img_ = img.bz<T,2>();
-  ip::extrapolateMask<T>(src.bz<bool,2>(), img_);
+  bob::ip::extrapolateMask<T>(src.bz<bool,2>(), img_);
 }
 
-static void extrapolate_mask (tp::const_ndarray src, tp::const_ndarray img) {
-  
-  const ca::typeinfo& info = img.type();
-  
+static void extrapolate_mask(bob::python::const_ndarray src, 
+  bob::python::const_ndarray img) 
+{  
+  const bob::core::array::typeinfo& info = img.type(); 
   if (info.nd != 2) PYTHON_ERROR(TypeError, "mask extrapolation does not support input of type '%s'", info.str().c_str());
 
   switch (info.dtype) {
-    case ca::t_uint8: return inner_extrapolateMask<uint8_t>(src, img);
-    case ca::t_uint16: return inner_extrapolateMask<uint16_t>(src, img);
-    case ca::t_float64: return inner_extrapolateMask<double>(src, img);
+    case bob::core::array::t_uint8: return inner_extrapolateMask<uint8_t>(src, img);
+    case bob::core::array::t_uint16: return inner_extrapolateMask<uint16_t>(src, img);
+    case bob::core::array::t_float64: return inner_extrapolateMask<double>(src, img);
     default: PYTHON_ERROR(TypeError, "mask extrapolation does not support type '%s'", info.str().c_str());
   }
 
 }
 
 void bind_ip_extrapolate_mask() {
-  def("extrapolate_mask", &extrapolate_mask, (arg("src_mask"), arg("img")), "Extrapolate a 2D array/image, taking mask into account.");
+  def("extrapolate_mask", &extrapolate_mask, (arg("src_mask"), arg("img")), 
+    "Extrapolate a 2D array/image, taking a boolean mask into account. The img argument is used both as an input and an output. Only values where the mask is set to false are extrapolated.");
 }
+
