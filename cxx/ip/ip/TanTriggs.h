@@ -68,7 +68,7 @@ namespace bob {
        * @param border_type The interpolation type for the convolution
        */
       TanTriggs(const double gamma=0.2, const double sigma0=1., 
-        const double sigma1=2., const int radius=2, const double threshold=10.,
+        const double sigma1=2., const size_t radius=2, const double threshold=10.,
         const double alpha=0.1, const bob::sp::Extrapolation::BorderType 
         border_type=bob::sp::Extrapolation::Mirror);
 
@@ -119,7 +119,7 @@ namespace bob {
        * @param border_type The interpolation type for the convolution
        */
       void reset(const double gamma=0.2, const double sigma0=1., 
-        const double sigma1=2., const int radius=2, const double threshold=10.,
+        const double sigma1=2., const size_t radius=2, const double threshold=10.,
         const double alpha=0.1, const bob::sp::Extrapolation::BorderType 
         border_type=bob::sp::Extrapolation::Mirror);
 
@@ -129,7 +129,7 @@ namespace bob {
       double getGamma() const { return m_gamma; }
       double getSigma0() const { return m_sigma0; }
       double getSigma1() const { return m_sigma1; }
-      int getRadius() const { return m_radius; }
+      size_t getRadius() const { return m_radius; }
       double getThreshold() const { return m_threshold; }
       double getAlpha() const { return m_alpha; }
       bob::sp::Extrapolation::BorderType getConvBorder() const 
@@ -144,7 +144,7 @@ namespace bob {
       { m_sigma0 = sigma0; computeDoG(m_sigma0, m_sigma1, 2*m_radius+1); }
       void setSigma1(const double sigma1) 
       { m_sigma1 = sigma1; computeDoG(m_sigma0, m_sigma1, 2*m_radius+1); }
-      void setRadius(const int radius) 
+      void setRadius(const size_t radius) 
       { m_radius = radius; computeDoG(m_sigma0, m_sigma1, 2*m_radius+1); }
       void setThreshold(const double threshold) { m_threshold = threshold; }
       void setAlpha(const double alpha) { m_alpha = alpha; }
@@ -168,7 +168,7 @@ namespace bob {
       /**
         * @brief Generate the difference of Gaussian filter
         */
-      void computeDoG(double sigma0, double sigma1, int size);
+      void computeDoG(double sigma0, double sigma1, size_t size);
 
       // Attributes
       blitz::Array<double, 2> m_kernel;
@@ -177,7 +177,7 @@ namespace bob {
       double m_gamma;
       double m_sigma0;
       double m_sigma1;
-      int m_radius;
+      size_t m_radius;
       double m_threshold;
       double m_alpha;
       bob::sp::Extrapolation::BorderType m_border_type;

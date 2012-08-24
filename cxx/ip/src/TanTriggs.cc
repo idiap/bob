@@ -23,7 +23,7 @@
 #include "ip/TanTriggs.h"
 
 bob::ip::TanTriggs::TanTriggs( const double gamma, const double sigma0, 
-    const double sigma1, const int radius, const double threshold, 
+    const double sigma1, const size_t radius, const double threshold, 
     const double alpha, 
     const bob::sp::Extrapolation::BorderType border_type): 
   m_gamma(gamma), m_sigma0(sigma0), m_sigma1(sigma1), m_radius(radius), 
@@ -34,7 +34,7 @@ bob::ip::TanTriggs::TanTriggs( const double gamma, const double sigma0,
 }
 
 void bob::ip::TanTriggs::reset(const double gamma, const double sigma0,
-  const double sigma1, const int radius, const double threshold, 
+  const double sigma1, const size_t radius, const double threshold, 
   const double alpha,  const bob::sp::Extrapolation::BorderType border_type)
 {
   m_gamma = gamma;
@@ -101,7 +101,7 @@ bob::ip::TanTriggs::performContrastEqualization(blitz::Array<double,2>& dst)
 }
 
 
-void bob::ip::TanTriggs::computeDoG(double sigma0, double sigma1, int size)
+void bob::ip::TanTriggs::computeDoG(double sigma0, double sigma1, size_t size)
 {
   // Generates two Gaussians with the given standard deviations
   // Warning: size should be odd
@@ -109,23 +109,23 @@ void bob::ip::TanTriggs::computeDoG(double sigma0, double sigma1, int size)
   blitz::Array<double,2> g1(size,size);
   const double inv_sigma0_2 = 0.5  / (sigma0*sigma0);
   const double inv_sigma1_2 = 0.5  / (sigma1*sigma1);
-  int center=size/2;
-  for (int y=0; y<size ; ++y)
-    for (int x = 0; x<size ; ++x)
+  int center = ((int)size) / 2;
+  for(int y=0; y<size; ++y)
+    for(int x=0; x<size; ++x)
     {
       int yy = y - center;
       int xx = x - center;
       int xx2 = xx*xx;
       int yy2 = yy*yy;
 
-      g0(y,x) = exp( -inv_sigma0_2 * (xx2 + yy2) );
-      g1(y,x) = exp( -inv_sigma1_2 * (xx2 + yy2) );
+      g0(y,x) = exp( - inv_sigma0_2 * (xx2 + yy2) );
+      g1(y,x) = exp( - inv_sigma1_2 * (xx2 + yy2) );
     }
 
   // Normalize the kernels such that the sum over the area is equal to 1
   // and compute the Difference of Gaussian filter
-  const double inv_sum0 = 1.0 / blitz::sum( g0 );
-  const double inv_sum1 = 1.0 / blitz::sum( g1 );
+  const double inv_sum0 = 1. / blitz::sum(g0);
+  const double inv_sum1 = 1. / blitz::sum(g1);
   m_kernel.resize( size, size);
   m_kernel = inv_sum0 * g0 - inv_sum1 * g1;
 }

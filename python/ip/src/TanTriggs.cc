@@ -85,7 +85,7 @@ static object call2(bob::ip::TanTriggs& op, bob::python::const_ndarray src)
 }
 
 void bind_ip_tantriggs() {
-  class_<bob::ip::TanTriggs, boost::shared_ptr<bob::ip::TanTriggs> >("TanTriggs", ttdoc, init<optional<const double, const double, const double, const int, const double, const double, const bob::sp::Extrapolation::BorderType> >((arg("gamma")=0.2, arg("sigma0")=1., arg("sigma1")=2., arg("radius")=2, arg("threshold")=10., arg("alpha")=0.1, arg("conv_border")=bob::sp::Extrapolation::Mirror), "Constructs a new Tan and Triggs filter."))
+  class_<bob::ip::TanTriggs, boost::shared_ptr<bob::ip::TanTriggs> >("TanTriggs", ttdoc, init<optional<const double, const double, const double, const size_t, const double, const double, const bob::sp::Extrapolation::BorderType> >((arg("gamma")=0.2, arg("sigma0")=1., arg("sigma1")=2., arg("radius")=2, arg("threshold")=10., arg("alpha")=0.1, arg("conv_border")=bob::sp::Extrapolation::Mirror), "Constructs a new Tan and Triggs filter."))
       .def(init<bob::ip::TanTriggs&>(args("other")))
       .def(self == self)
       .def(self != self)
