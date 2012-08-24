@@ -46,7 +46,7 @@ static object predict_class_n(const mach::SupportVector& m,
     tp::const_ndarray input) {
   blitz::Array<double,2> i_ = input.bz<double,2>();
   if ((size_t)i_.extent(1) != m.inputSize()) {
-    PYTHON_ERROR(RuntimeError, "Input array should have %zu columns, but you have given me one with %d instead", m.inputSize(), i_.extent(1));
+    PYTHON_ERROR(RuntimeError, "Input array should have " SIZE_T_FMT " columns, but you have given me one with %d instead", m.inputSize(), i_.extent(1));
   }
   blitz::Range all = blitz::Range::all();
   list retval;
@@ -65,7 +65,7 @@ static object svm_call(const mach::SupportVector& m,
     case 2:
       return predict_class_n(m, input);
     default:
-      PYTHON_ERROR(RuntimeError, "Input array should be 1D or 2D. You passed an array with %zu dimensions instead", input.type().nd);
+      PYTHON_ERROR(RuntimeError, "Input array should be 1D or 2D. You passed an array with " SIZE_T_FMT " dimensions instead", input.type().nd);
   }
 }
 
@@ -93,7 +93,7 @@ static object predict_class_and_scores_n(const mach::SupportVector& m,
     tp::const_ndarray input) {
   blitz::Array<double,2> i_ = input.bz<double,2>();
   if ((size_t)i_.extent(1) != m.inputSize()) {
-    PYTHON_ERROR(RuntimeError, "Input array should have %zu columns, but you have given me one with %d instead", m.inputSize(), i_.extent(1));
+    PYTHON_ERROR(RuntimeError, "Input array should have " SIZE_T_FMT " columns, but you have given me one with %d instead", m.inputSize(), i_.extent(1));
   }
   blitz::Range all = blitz::Range::all();
   list classes, scores;
@@ -131,7 +131,7 @@ static object predict_class_and_probs_n(const mach::SupportVector& m,
     tp::const_ndarray input) {
   blitz::Array<double,2> i_ = input.bz<double,2>();
   if ((size_t)i_.extent(1) != m.inputSize()) {
-    PYTHON_ERROR(RuntimeError, "Input array should have %zu columns, but you have given me one with %d instead", m.inputSize(), i_.extent(1));
+    PYTHON_ERROR(RuntimeError, "Input array should have " SIZE_T_FMT " columns, but you have given me one with %d instead", m.inputSize(), i_.extent(1));
   }
   if (!m.supportsProbability()) {
     PYTHON_ERROR(RuntimeError, "this SVM does not support probabilities");
