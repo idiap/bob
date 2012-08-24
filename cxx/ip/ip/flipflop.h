@@ -25,7 +25,6 @@
 
 #include "core/array_assert.h"
 #include "ip/Exception.h"
-#include "ip/common.h"
 
 namespace bob {
 /**
