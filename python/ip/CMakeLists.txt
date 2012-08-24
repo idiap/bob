@@ -9,7 +9,6 @@ set(ccsrc
    "src/extrapolate_mask.cc"
    "src/flipflop.cc"
    "src/gamma_correction.cc"
-   "src/generate_with_center.cc"
    "src/integral.cc"
    "src/scale.cc"
    "src/shear.cc"

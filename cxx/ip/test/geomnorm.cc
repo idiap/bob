@@ -30,29 +30,15 @@
 #include "core/cast.h"
 #include "core/convert.h"
 #include "core/logging.h"
-#include "ip/generateWithCenter.h"
 #include "ip/GeomNorm.h"
 #include "io/Array.h"
 
 
 struct T {
-  blitz::Array<uint32_t,2> a2, a2_centered;
   double eps;
 
-  T(): a2(4,4), a2_centered(5,5), eps(1e-5)
+  T(): eps(1e-5)
   {
-    a2 = 
-      0, 1, 2, 3, 
-      4, 5, 6, 7,
-      8, 9, 10, 11, 
-      12, 13, 14, 15;
-
-    a2_centered = 
-      0, 0, 0, 0, 0,
-      0, 0, 1, 2, 3, 
-      0, 4, 5, 6, 7,
-      0, 8, 9, 10, 11, 
-      0, 12, 13, 14, 15;
   }
 
   ~T() {}
@@ -87,15 +73,6 @@ void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<T,2>& t2,
 
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
-
-BOOST_AUTO_TEST_CASE( test_generateWithCenter )
-{
-  blitz::Array<uint32_t,2> b2(bob::ip::getGenerateWithCenterShape(a2,1,1));
-  BOOST_CHECK_EQUAL( b2.extent(0), a2_centered.extent(0));
-  BOOST_CHECK_EQUAL( b2.extent(1), a2_centered.extent(1));
-  bob::ip::generateWithCenter(a2, b2, 1, 1);
-  checkBlitzEqual(a2_centered, b2); 
-}
 
 BOOST_AUTO_TEST_CASE( test_geomnorm )
 {

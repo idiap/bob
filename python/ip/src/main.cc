@@ -29,7 +29,6 @@ void bind_ip_crop_shift();
 void bind_ip_extrapolate_mask();
 void bind_ip_flipflop();
 void bind_ip_gamma_correction();
-void bind_ip_generate_with_center();
 void bind_ip_integral();
 void bind_ip_scale();
 void bind_ip_shear();
@@ -68,7 +67,6 @@ BOOST_PYTHON_MODULE(_ip) {
   bind_ip_extrapolate_mask();
   bind_ip_flipflop();
   bind_ip_gamma_correction();
-  bind_ip_generate_with_center();
   bind_ip_integral();
   bind_ip_scale();
   bind_ip_shear();
