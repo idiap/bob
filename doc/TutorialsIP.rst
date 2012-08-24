@@ -23,8 +23,8 @@
   import math
   import os
 
-  image_path = os.path.join(os.environ['CMAKE_SOURCE_DIR'], 'cxx/ip/test/data/image_r10.pgm')
-  color_image_path = os.path.join(os.environ['CMAKE_SOURCE_DIR'], 'cxx/ip/test/data/imageColor.ppm')
+  image_path = bob.build.source_file('cxx/ip/test/data/image_r10.pgm')
+  color_image_path = bob.build.source_file('cxx/ip/test/data/imageColor.ppm')
   numpy.set_printoptions(precision=3, suppress=True)
 
 

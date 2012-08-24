@@ -64,9 +64,7 @@ def data():
   from ...io import Arrayset
   from .driver import Interface
 
-  info = Interface() 
-  
-  data = os.path.join(info.location(), 'iris.data')
+  data = Interface().files()[0]
 
   retval = {
       'setosa': Arrayset(),

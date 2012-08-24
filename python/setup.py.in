@@ -168,9 +168,10 @@ setup(
     cmdclass = {'build_ext': build_ext},
 
     install_requires=[
+      'setuptools',
       'argparse',
       'numpy',
-      'matplotlib',
+      'matplotlib >= 1.1',
       'sqlalchemy',
       'scipy',
       ],

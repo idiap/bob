@@ -25,20 +25,20 @@ class null(object):
 
     pass
 
-def session(dbtype, dbdir, dbfile, echo=False):
+def session(dbtype, dbfile, echo=False):
   """Creates a session to an SQLite database"""
 
   from sqlalchemy import create_engine
   from sqlalchemy.orm import sessionmaker
 
-  engine = create_engine(connection_string(dbtype, dbdir, dbfile), echo=echo)
+  engine = create_engine(connection_string(dbtype, dbfile), echo=echo)
   Session = sessionmaker(bind=engine)
   return Session()
 
-def connection_string(dbtype, dbdir, dbfile):
+def connection_string(dbtype, dbfile):
   """Returns a connection string for supported platforms"""
 
-  if dbtype == 'sqlite': return 'sqlite:///' + os.path.join(dbdir, dbfile)
+  if dbtype == 'sqlite': return 'sqlite:///' + dbfile
     
   # otherwise, we just raise
   raise RuntimeError, "Cannot create connection strings for database types different than 'sqlite' and you have type='%s'" % (dbtype,)

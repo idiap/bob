@@ -65,7 +65,16 @@ The library has been designed to run on various platforms and to be easily inter
 Database support
 ----------------
 
-The library currently provides an API to easily query and interface with database protocols. In particular, several protocols for well-known biometric databases are integrated with the aim at improving reproducibility of scientific publications.
+Many signal processing and machine learning applications measure technique and
+algorithm performance use standard databases. |project| provides a unique
+perspective into database usage by providing base line APIs that allow users to
+define new database protocols that integrate right into |project|'s core.
+
+Users design database access APIs and distribute them as `satellite packages`_.
+Each package contains a set of APIs and backend support files that can be used
+to quickly access database information such as training, evaluation data or any
+other sophisticated requirement. Check our `Satellite Packages`_ webpage for
+the latest releases of Databases made available by the |project| community.
 
 Performance evaluation
 ----------------------

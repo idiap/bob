@@ -4,8 +4,7 @@
 # Sun 24 Jul 17:50:01 2011 CEST
 
 from ._visioner import *
-from os import path
-from pkg_resource import resource_filename
+from pkg_resources import resource_filename
 
 DEFAULT_DETECTION_MODEL = resource_filename(__name__, 'detection.gz')
 """Default classification model for basic face detection"""

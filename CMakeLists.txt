@@ -51,39 +51,38 @@ option(BOB_BUILD_PYTHON "Builds the python bindings." ON)
 
 message(STATUS "Bob version '${BOB_VERSION}' (${BOB_PLATFORM_STR})")
 
+# Flag setting
+
+# For both C and C++
+set(COMMON_FLAGS "-pedantic -Wall -pthread")
+if (NOT CMAKE_COMPILER_IS_GNUCC)
+  # Then, it must be clang/clang++
+  set(COMMON_FLAGS "-Qunused-arguments")
+endif ()
+
 # Force __LP64__ scheme on Mac OSX
 if(APPLE)
-  set(COMMON_FLAGS "-m64")
+  set(COMMON_FLAGS "${COMMON_FLAGS} -m64")
   # Bogus on OSX?
   set(CMAKE_INCLUDE_SYSTEM_FLAG_C "-isystem ")
   set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
 endif(APPLE)
 
-set(COMMON_FLAGS "${COMMON_FLAGS} -pthread -pedantic -Wno-variadic-macros -Wno-long-long -Wall")
+# For both RELEASE and DEBUG builds
+set(COMMON_CXX_FLAGS "-std=c++0x")
+set(COMMON_C_FLAGS "-std=c99")
 
-if (CMAKE_COMPILER_IS_GNUCC)
+# For specific builds
+set(COMMON_RELEASE_FLAGS "-O2 -mtune=generic -DNDEBUG")
+set(COMMON_DEBUG_FLAGS "-g -DBOB_DEBUG -DBZ_DEBUG")
 
-  set(CMAKE_CXX_FLAGS_RELEASE "-O2 -mtune=generic -DNDEBUG")
-
-  set(CMAKE_CXX_FLAGS_DEBUG "-g -DBOB_DEBUG -DBZ_DEBUG")
-
-else (CMAKE_COMPILER_IS_GNUCC)
-  # Then, it must be clang/clang++
-
-  set(COMMON_FLAGS "${COMMON_FLAGS} -Qunused-arguments")
-
-  set(CMAKE_CXX_FLAGS_RELEASE "-O2 -mtune=generic -DNDEBUG")
-
-  set(CMAKE_CXX_FLAGS_DEBUG "-g -DBOB_DEBUG -DBZ_DEBUG")
-
-endif (CMAKE_COMPILER_IS_GNUCC)
-
-set(CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE} CACHE STRING "Flags used by the compiler during release builds" FORCE)
-set(CMAKE_C_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE} CACHE STRING "Flags used by the compiler during release builds" FORCE)
-set(CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG} CACHE STRING "Flags used by the compiler during debug builds." FORCE)
-set(CMAKE_C_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG} CACHE STRING "Flags used by the compiler during debug builds." FORCE)
-set(CMAKE_CXX_FLAGS ${COMMON_FLAGS} CACHE STRING "Flags used by the compiler during all build types." FORCE)
-set(CMAKE_C_FLAGS ${COMMON_FLAGS} CACHE STRING "Flags used by the compiler during all build types." FORCE)
+# Cache into CMake
+set(CMAKE_CXX_FLAGS_RELEASE ${COMMON_RELEASE_FLAGS} CACHE STRING "Flags used by the compiler during release builds" FORCE)
+set(CMAKE_C_FLAGS_RELEASE ${COMMON_RELEASE_FLAGS} CACHE STRING "Flags used by the compiler during release builds" FORCE)
+set(CMAKE_CXX_FLAGS_DEBUG ${COMMON_DEBUG_FLAGS} CACHE STRING "Flags used by the compiler during debug builds." FORCE)
+set(CMAKE_C_FLAGS_DEBUG ${COMMON_DEBUG_FLAGS} CACHE STRING "Flags used by the compiler during debug builds." FORCE)
+set(CMAKE_CXX_FLAGS "${COMMON_CXX_FLAGS} ${COMMON_FLAGS}" CACHE STRING "Flags used by the compiler during all build types." FORCE)
+set(CMAKE_C_FLAGS "${COMMON_C_FLAGS} ${COMMON_FLAGS}" CACHE STRING "Flags used by the compiler during all build types." FORCE)
 
 if(SET_PUBLIC_LIBRARY_PATH)
   if (APPLE)

@@ -6,24 +6,17 @@
 """Version information collected during Bob's build
 """
 
+# variables from CMake
+CMAKE_BUILD_TYPE = '@CMAKE_BUILD_TYPE@'.lower()
+CMAKE_PREFIX_PATH = '@CMAKE_PREFIX_PATH@'
+CMAKE_SOURCE_DIR = '@CMAKE_SOURCE_DIR@'
+
 import os
 
 import warnings #to account for ipython double readline import
 warnings.simplefilter('ignore')
 import pkg_resources
 warnings.simplefilter('default')
-del warnings
-
-distribution = pkg_resources.require('bob')[0]
-version = distribution.version
-system = distribution.platform.split('-')[0]
-platform = distribution.platform + "-@CMAKE_BUILD_TYPE@".lower()
-prefixes = [k for k in [path.strip() for path in "@CMAKE_PREFIX_PATH@".split(os.pathsep)] if k]
-del k
-python_version = distribution.py_version
-python_dependencies = [(k.project_name, k.version) for k in pkg_resources.require('bob')[1:]]
-source_directory = "@CMAKE_SOURCE_DIR@"
-del pkg_resources
 
 def source_file(relative_path):
   """Gets the path to the given input file 'relative'
@@ -39,5 +32,18 @@ def source_file(relative_path):
     independently of the current OS you are running on.
   """
 
-  components = [source_directory] + relative_path.split('/')
+  components = [CMAKE_SOURCE_DIR] + relative_path.split('/')
   return os.path.abspath(os.path.join(*components))
+
+def parse_path(p):
+  '''Returns a list of paths, parsing the unix path given as input'''
+  return [i for i in [k.strip() for k in p.split(os.pathsep)] if i]
+
+distribution = pkg_resources.require('bob')[0]
+version = distribution.version
+system = distribution.platform.split('-')[0]
+platform = '-'.join((distribution.platform, '-', CMAKE_BUILD_TYPE)) 
+cmake_prefixes = parse_path(CMAKE_PREFIX_PATH)
+python_version = distribution.py_version
+python_dependencies = pkg_resources.require('bob')[1:]
+source_dir = CMAKE_SOURCE_DIR
