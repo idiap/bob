@@ -22,7 +22,7 @@ endif()
 string(TOLOWER "${BOB_SYSTEM_NAME}-${BOB_SYSTEM_PROCESSOR}-${CMAKE_BUILD_TYPE}" BOB_PLATFORM_STR)
 set(BOB_PLATFORM "${BOB_PLATFORM_STR}" CACHE STRING "The name of the platform Bob is being built to")
 
-execute_process(COMMAND ${CMAKE_SOURCE_DIR}/bin/version.py OUTPUT_VARIABLE BOB_DISCOVERED_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${CMAKE_SOURCE_DIR}/bin/version.py --counter=0 OUTPUT_VARIABLE BOB_DISCOVERED_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 set(BOB_VERSION_INTERNAL "${BOB_DISCOVERED_VERSION}" CACHE INTERNAL "The version of Bob that is currently being built")
 if(NOT BOB_VERSION)
   set(BOB_VERSION ${BOB_VERSION_INTERNAL})
@@ -69,8 +69,10 @@ if(APPLE)
 endif(APPLE)
 
 # For both RELEASE and DEBUG builds
-set(COMMON_CXX_FLAGS "-std=c++0x")
-set(COMMON_C_FLAGS "-std=c99")
+if(NOT APPLE)
+  set(COMMON_CXX_FLAGS "-std=c++0x")
+  set(COMMON_C_FLAGS "-std=c99")
+endif()
 
 # For specific builds
 set(COMMON_RELEASE_FLAGS "-O2 -mtune=generic -DNDEBUG")
