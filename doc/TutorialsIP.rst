@@ -171,8 +171,8 @@ One simple example of image filtering is to apply a Gaussian blur filter to an i
 
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
-  
-  >>> filter = bob.ip.Gaussian( radius_y = 1, radius_x = 1, sigma_y = 0.3, sigma_x = 0.3)
+
+  >>> filter = bob.ip.Gaussian( radius_y = 1, radius_x = 1, sigma_y = math.sqrt(0.3*0.5), sigma_x = math.sqrt(0.3*0.5))
   
 Now, let's see what happens to a small test image:
 

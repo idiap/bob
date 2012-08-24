@@ -52,7 +52,7 @@ namespace bob {
          * @param border_type The interpolation type for the convolution
          */
         Gaussian(const size_t radius_y=1, const size_t radius_x=1, 
-            const double sigma_y=sqrt(5.), const double sigma_x=sqrt(5.),
+            const double sigma_y=sqrt(2.5), const double sigma_x=sqrt(2.5),
             const bob::sp::Extrapolation::BorderType border_type =
               bob::sp::Extrapolation::Mirror):
           m_radius_y(radius_y), m_radius_x(radius_x), m_sigma_y(sigma_y),
@@ -101,7 +101,7 @@ namespace bob {
          */
 
         void reset( const size_t radius_y=1, const size_t radius_x=1,
-          const double sigma_y=sqrt(5.), const double sigma_x=sqrt(5.),
+          const double sigma_y=sqrt(2.5), const double sigma_x=sqrt(2.5),
           const bob::sp::Extrapolation::BorderType border_type =
             bob::sp::Extrapolation::Mirror);
 
