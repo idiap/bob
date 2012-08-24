@@ -153,7 +153,7 @@ static object call_gs2(bob::ip::Gaussian& op,
 void bind_ip_gaussian() {
   static const char* gaussiandoc = "This class allows after configuration to perform gaussian smoothing.";
 
-  class_<bob::ip::Gaussian, boost::shared_ptr<bob::ip::Gaussian> >("Gaussian", gaussiandoc, init<optional<const int, const int, const double, const double, const bob::sp::Extrapolation::BorderType> >((arg("radius_y")=1, arg("radius_x")=1, arg("sigma_y")=5., arg("sigma_x")=5., arg("conv_border")=bob::sp::Extrapolation::Mirror), "Creates a gaussian smoother."))
+  class_<bob::ip::Gaussian, boost::shared_ptr<bob::ip::Gaussian> >("Gaussian", gaussiandoc, init<optional<const size_t, const size_t, const double, const double, const bob::sp::Extrapolation::BorderType> >((arg("radius_y")=1, arg("radius_x")=1, arg("sigma_y")=sqrt(5.), arg("sigma_x")=sqrt(5.), arg("conv_border")=bob::sp::Extrapolation::Mirror), "Creates a gaussian smoother."))
       .def(init<bob::ip::Gaussian&>(args("other")))
       .def(self == self)
       .def(self != self)
@@ -164,7 +164,7 @@ void bind_ip_gaussian() {
       .add_property("conv_border", &bob::ip::Gaussian::getConvBorder, &bob::ip::Gaussian::setConvBorder, "The extrapolation method used by the convolution at the border")
       .add_property("kernel_y", &py_getKernelY, "The values of the y-kernel (read only access)")
       .add_property("kernel_x", &py_getKernelX, "The values of the x-kernel (read only access)")
-      .def("reset", &bob::ip::Gaussian::reset, (arg("self"), arg("radius_y")=1, arg("radius_x")=1, arg("sigma_y")=5., arg("sigma_x")=5., arg("conv_border")=bob::sp::Extrapolation::Mirror), "Resets the parametrization of the Gaussian")
+      .def("reset", &bob::ip::Gaussian::reset, (arg("self"), arg("radius_y")=1, arg("radius_x")=1, arg("sigma_y")=sqrt(5.), arg("sigma_x")=sqrt(5.), arg("conv_border")=bob::sp::Extrapolation::Mirror), "Resets the parametrization of the Gaussian")
       .def("__call__", &call_gs1, (arg("self"), arg("src"), arg("dst")), "Smoothes an image (2D/grayscale or color 3D/color). The dst array should have the expected type (numpy.float64) and the same size as the src array.")
       .def("__call__", &call_gs2, (arg("self"), arg("src")), "Smoothes an image (2D/grayscale or color 3D/color). The smoothed image is returned as a numpy array.")
     ;

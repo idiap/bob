@@ -47,12 +47,12 @@ namespace bob {
          * @brief Creates an object to smooth images with a Gaussian kernel
          * @param radius_y The height of the kernel along the y-axis
          * @param radius_x The width of the kernel along the x-axis
-         * @param sigma_y The variance of the kernel along the y-axis
-         * @param sigma_x The variance of the kernel along the x-axis
+         * @param sigma_y The standard deviation of the kernel along the y-axis
+         * @param sigma_x The standard deviation of the kernel along the x-axis
          * @param border_type The interpolation type for the convolution
          */
-        Gaussian(const int radius_y=1, const int radius_x=1, 
-            const double sigma_y=5., const double sigma_x=5.,
+        Gaussian(const size_t radius_y=1, const size_t radius_x=1, 
+            const double sigma_y=sqrt(5.), const double sigma_x=sqrt(5.),
             const bob::sp::Extrapolation::BorderType border_type =
               bob::sp::Extrapolation::Mirror):
           m_radius_y(radius_y), m_radius_x(radius_x), m_sigma_y(sigma_y),
@@ -95,21 +95,21 @@ namespace bob {
          * @brief Resets the parameters of the filter
          * @param radius_y The height of the kernel along the y-axis
          * @param radius_x The width of the kernel along the x-axis
-         * @param sigma The variance of the kernal
+         * @param sigma The standard deviation of the kernal
          * @param size_opt The size of the output wrt. to convolution
          * @param border_type The interpolation type for the convolution
          */
 
-        void reset( const int radius_y=1, const int radius_x=1,
-          const double sigma_y=5., const double sigma_x=5.,
+        void reset( const size_t radius_y=1, const size_t radius_x=1,
+          const double sigma_y=sqrt(5.), const double sigma_x=sqrt(5.),
           const bob::sp::Extrapolation::BorderType border_type =
             bob::sp::Extrapolation::Mirror);
 
         /**
          * @brief Getters
          */
-        int getRadiusY() const { return m_radius_y; }
-        int getRadiusX() const { return m_radius_x; }
+        size_t getRadiusY() const { return m_radius_y; }
+        size_t getRadiusX() const { return m_radius_x; }
         double getSigmaY() const { return m_sigma_y; }
         double getSigmaX() const { return m_sigma_x; }
         bob::sp::Extrapolation::BorderType getConvBorder() const { return m_conv_border; }
@@ -119,9 +119,9 @@ namespace bob {
         /**
          * @brief Setters
          */
-        void setRadiusY(const int radius_y) 
+        void setRadiusY(const size_t radius_y) 
         { m_radius_y = radius_y; computeKernel(); }
-        void setRadiusX(const int radius_x) 
+        void setRadiusX(const size_t radius_x) 
         { m_radius_x = radius_x; computeKernel(); }
         void setSigmaY(const double sigma_y) 
         { m_sigma_y = sigma_y; computeKernel(); }
@@ -154,8 +154,8 @@ namespace bob {
         /**
          * @brief Attributes
          */  
-        int m_radius_y;
-        int m_radius_x;
+        size_t m_radius_y;
+        size_t m_radius_x;
         double m_sigma_y;
         double m_sigma_x;
         bob::sp::Extrapolation::BorderType m_conv_border;

@@ -26,23 +26,23 @@ void bob::ip::Gaussian::computeKernel()
 {
   m_kernel_y.resize(2 * m_radius_y + 1);
   // Computes the kernel
-  const double inv_sigma_y = 1.0 / m_sigma_y;
-  for (int j = -m_radius_y; j <= m_radius_y; j ++)
-      m_kernel_y(j + m_radius_y) = exp(- inv_sigma_y * (j * j));
+  const double half_inv_sigma2_y = 0.5 / (m_sigma_y * m_sigma_y);
+  for (int j = -(int)m_radius_y; j <= (int)m_radius_y; j ++)
+      m_kernel_y(j + m_radius_y) = exp(- half_inv_sigma2_y * (j * j));
   // Normalizes the kernel
   m_kernel_y /= blitz::sum(m_kernel_y);
 
   m_kernel_x.resize(2 * m_radius_x + 1);
   // Computes the kernel
-  const double inv_sigma_x = 1.0 / m_sigma_x;
-  for (int i = -m_radius_x; i <= m_radius_x; i++) {
-    m_kernel_x(i + m_radius_x) = exp(- inv_sigma_x * (i * i));
+  const double half_inv_sigma2_x = 0.5 / (m_sigma_x * m_sigma_x);
+  for (int i = -(int)m_radius_x; i <= (int)m_radius_x; i++) {
+    m_kernel_x(i + m_radius_x) = exp(- half_inv_sigma2_x * (i * i));
   }
   // Normalizes the kernel
   m_kernel_x /= blitz::sum(m_kernel_x);
 }
 
-void bob::ip::Gaussian::reset(const int radius_y, const int radius_x,
+void bob::ip::Gaussian::reset(const size_t radius_y, const size_t radius_x,
   const double sigma_y, const double sigma_x, 
   const bob::sp::Extrapolation::BorderType border_type)
 {
