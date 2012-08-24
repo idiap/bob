@@ -29,7 +29,7 @@ import numpy
 eps = 1e-4
 
 class GaussianTest(unittest.TestCase):
-  """Performs various tests for the bob::ip::Gaussian class"""
+  """Performs various tests for the bob.ip.Gaussian class"""
 
   def test01_parametrization(self):
     # Parametrization tests
@@ -56,14 +56,12 @@ class GaussianTest(unittest.TestCase):
     self.assertEqual(op.sigma_x, 0.5)
     self.assertEqual(op.conv_border, bob.sp.BorderType.Mirror)
   
-  """
   def test02_processing(self):
     # Processing tests
-    # TODO
     op = bob.ip.Gaussian(1,1,0.5,0.5)
     a_uint8 = numpy.array([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]], dtype=numpy.uint8)
     a_float64 = numpy.array([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]], dtype=numpy.float64)
-    a_ref = numpy.array(TODO)
+    a_ref = numpy.array([[1.5325, 2.4260, 3.42602, 4.3195], [5.1065, 6., 7., 7.8935], [8.6805, 9.5740, 10.5740, 11.4675]])
     a_out = numpy.ndarray(dtype=numpy.float64, shape=(3,4))
 
     op(a_uint8, a_out)
@@ -72,7 +70,6 @@ class GaussianTest(unittest.TestCase):
     self.assertEqual(numpy.allclose(a_out, a_ref, eps, eps), True)
     a_out2 = op(a_float64)
     self.assertEqual(numpy.allclose(a_out2, a_ref, eps, eps), True)
-  """
 
   def test03_comparison(self):
     # Comparisons tests
