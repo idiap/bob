@@ -59,7 +59,7 @@ if(APPLE)
   set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
 endif(APPLE)
 
-set(COMMON_FLAGS "${COMMON_FLAGS} -pthread -pedantic -Wno-variadic-macros -Wno-long-long -Wall")
+set(COMMON_FLAGS "${COMMON_FLAGS} -std=c++0x -pthread -pedantic -Wno-variadic-macros -Wno-long-long -Wall")
 
 if (CMAKE_COMPILER_IS_GNUCC)
 
