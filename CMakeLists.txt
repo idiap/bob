@@ -22,14 +22,7 @@ endif()
 string(TOLOWER "${BOB_SYSTEM_NAME}-${BOB_SYSTEM_PROCESSOR}-${CMAKE_BUILD_TYPE}" BOB_PLATFORM_STR)
 set(BOB_PLATFORM "${BOB_PLATFORM_STR}" CACHE STRING "The name of the platform Bob is being built to")
 
-option(BOB_VERSION_COMMIT_COUNT "Adds the commit count for the currently checked-out branch to the version number" OFF)
-if(BOB_VERSION_COMMIT_COUNT)
-  # executed by buildbot
-  execute_process(COMMAND ${CMAKE_SOURCE_DIR}/bin/version.py OUTPUT_VARIABLE BOB_DISCOVERED_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-else()
-  # executed by normal users compiling locally
-  execute_process(COMMAND ${CMAKE_SOURCE_DIR}/bin/version.py --counter=0 OUTPUT_VARIABLE BOB_DISCOVERED_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-endif()
+execute_process(COMMAND ${CMAKE_SOURCE_DIR}/bin/version.py --counter=0 OUTPUT_VARIABLE BOB_DISCOVERED_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 set(BOB_VERSION_INTERNAL "${BOB_DISCOVERED_VERSION}" CACHE INTERNAL "The version of Bob that is currently being built")
 if(NOT BOB_VERSION)
   set(BOB_VERSION ${BOB_VERSION_INTERNAL})
