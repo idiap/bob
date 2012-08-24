@@ -88,10 +88,10 @@ namespace bob {
     }
 
     namespace Rescale {
-      enum Algorithm {
+      typedef enum Algorithm_ {
         NearestNeighbour,
         BilinearInterp
-      };
+      } Algorithm;
     }
 
     /**
@@ -105,7 +105,7 @@ namespace bob {
       */
     template<typename T>
     void scale(const blitz::Array<T,2>& src, blitz::Array<double,2>& dst, 
-      const enum Rescale::Algorithm alg=Rescale::BilinearInterp)
+      const Rescale::Algorithm alg=Rescale::BilinearInterp)
     {
       // Check and resize src if required
       bob::core::array::assertZeroBase(src);
@@ -164,7 +164,7 @@ namespace bob {
     template<typename T>
     void scale(const blitz::Array<T,2>& src, const blitz::Array<bool,2>& src_mask,
       blitz::Array<double,2>& dst, blitz::Array<bool,2>& dst_mask,
-      const enum Rescale::Algorithm alg=Rescale::BilinearInterp)
+      const Rescale::Algorithm alg=Rescale::BilinearInterp)
     {
       // Check and resize src if required
       bob::core::array::assertZeroBase(src);
@@ -215,7 +215,7 @@ namespace bob {
 
     template <typename T> 
     void scale(const blitz::Array<T,3>& src, blitz::Array<double,3>& dst, 
-      const enum Rescale::Algorithm alg=Rescale::BilinearInterp)
+      const Rescale::Algorithm alg=Rescale::BilinearInterp)
     {
       // Check number of planes
       bob::core::array::assertSameDimensionLength(src.extent(0), dst.extent(0));
@@ -235,7 +235,7 @@ namespace bob {
     template <typename T> 
     void scale(const blitz::Array<T,3>& src, const blitz::Array<bool,3>& src_mask,
       blitz::Array<double,3>& dst, blitz::Array<bool,3>& dst_mask,
-      const enum Rescale::Algorithm alg=Rescale::BilinearInterp)
+      const Rescale::Algorithm alg=Rescale::BilinearInterp)
     {
       // Check number of planes
       bob::core::array::assertSameDimensionLength(src.extent(0), dst.extent(0));

@@ -49,7 +49,7 @@ namespace bob {
       /**
         * @brief Internal enumeration of the possible algorithms
         */
-      typedef enum Algorithm {
+      typedef enum Algorithm_ {
         Shearing,
         BilinearInterp
       } Algorithm;
