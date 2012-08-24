@@ -24,50 +24,47 @@
 #include "ip/integral.h"
 
 using namespace boost::python;
-namespace tp = bob::python;
-namespace ip = bob::ip;
-namespace ca = bob::core::array;
 
 template <typename T, typename U, int N>
-static void inner_integral (tp::const_ndarray src, tp::ndarray dst, bool b) {
+static void inner_integral (bob::python::const_ndarray src, bob::python::ndarray dst, bool b) {
   blitz::Array<U,N> dst_ = dst.bz<U,N>();
-  ip::integral(src.bz<T,N>(), dst_, b);
+  bob::ip::integral(src.bz<T,N>(), dst_, b);
 }
 
 template <typename T, int N>
-static void integral2 (tp::const_ndarray src, tp::ndarray dst, bool b) {
-  const ca::typeinfo& info = dst.type();
+static void integral2 (bob::python::const_ndarray src, bob::python::ndarray dst, bool b) {
+  const bob::core::array::typeinfo& info = dst.type();
 
-  if (info.nd != 2)
-    PYTHON_ERROR(TypeError, "integral image operator does not support output type '%s'", info.str().c_str());
+  if(info.nd != 2)
+    PYTHON_ERROR(TypeError, "integral image operator does not support output with " SIZE_T_FMT " dimensions.", info.nd);
 
   switch (info.dtype) {
-    case ca::t_int8: return inner_integral<T,int8_t,N>(src, dst, b);
-    case ca::t_int16: return inner_integral<T,int16_t,N>(src, dst, b);
-    case ca::t_int32: return inner_integral<T,int32_t,N>(src, dst, b);
-    case ca::t_int64: return inner_integral<T,int64_t,N>(src, dst, b);
-    case ca::t_uint8: return inner_integral<T,uint8_t,N>(src, dst, b);
-    case ca::t_uint16: return inner_integral<T,uint16_t,N>(src, dst, b);
-    case ca::t_uint32: return inner_integral<T,uint32_t,N>(src, dst, b);
-    case ca::t_uint64: return inner_integral<T,uint64_t,N>(src, dst, b);
-    case ca::t_float32: return inner_integral<T,float,N>(src, dst, b);
-    case ca::t_float64: return inner_integral<T,double,N>(src, dst, b);
+    case bob::core::array::t_int8: return inner_integral<T,int8_t,N>(src, dst, b);
+    case bob::core::array::t_int16: return inner_integral<T,int16_t,N>(src, dst, b);
+    case bob::core::array::t_int32: return inner_integral<T,int32_t,N>(src, dst, b);
+    case bob::core::array::t_int64: return inner_integral<T,int64_t,N>(src, dst, b);
+    case bob::core::array::t_uint8: return inner_integral<T,uint8_t,N>(src, dst, b);
+    case bob::core::array::t_uint16: return inner_integral<T,uint16_t,N>(src, dst, b);
+    case bob::core::array::t_uint32: return inner_integral<T,uint32_t,N>(src, dst, b);
+    case bob::core::array::t_uint64: return inner_integral<T,uint64_t,N>(src, dst, b);
+    case bob::core::array::t_float32: return inner_integral<T,float,N>(src, dst, b);
+    case bob::core::array::t_float64: return inner_integral<T,double,N>(src, dst, b);
     default:
       PYTHON_ERROR(TypeError, "integral image operator does not support output type '%s'", info.str().c_str());
   }
 
 }
 
-static void integral (tp::const_ndarray src, tp::ndarray dst, bool b=false) {
-  const ca::typeinfo& info = src.type();
+static void integral (bob::python::const_ndarray src, bob::python::ndarray dst, bool b=false) {
+  const bob::core::array::typeinfo& info = src.type();
 
-  if (info.nd != 2)
-    PYTHON_ERROR(TypeError, "integral image operator does not support input type '%s'", info.str().c_str());
+  if(info.nd != 2)
+    PYTHON_ERROR(TypeError, "integral image operator does not support input with " SIZE_T_FMT " dimensions.", info.nd);
 
   switch (info.dtype) {
-    case ca::t_uint8: return integral2<uint8_t,2>(src, dst, b);
-    case ca::t_uint16: return integral2<uint16_t,2>(src, dst, b);
-    case ca::t_float64: return integral2<double,2>(src, dst, b);
+    case bob::core::array::t_uint8: return integral2<uint8_t,2>(src, dst, b);
+    case bob::core::array::t_uint16: return integral2<uint16_t,2>(src, dst, b);
+    case bob::core::array::t_float64: return integral2<double,2>(src, dst, b);
     default:
       PYTHON_ERROR(TypeError, "integral image operator does not support input type '%s'", info.str().c_str());
   }
@@ -77,5 +74,5 @@ static void integral (tp::const_ndarray src, tp::ndarray dst, bool b=false) {
 BOOST_PYTHON_FUNCTION_OVERLOADS(integral_overloads, integral, 2, 3)
 
 void bind_ip_integral() {
-  def(BOOST_PP_STRINGIZE(integral), &integral, integral_overloads((arg("src"), arg("dst"), arg("add_zero_border")=false), "Compute the integral image of a 2D blitz array (image).")); 
+  def(BOOST_PP_STRINGIZE(integral), &integral, integral_overloads((arg("src"), arg("dst"), arg("add_zero_border")=false), "Compute the integral image of a 2D blitz array (image). It is the responsibility of the user to select an appropriate type for the numpy array which will contain the integral image. By default, src and dst should have the same size. If add_zero_border is set to true, then dst should be one pixel larger than src in each dimension.")); 
 }
