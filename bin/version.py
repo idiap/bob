@@ -15,18 +15,26 @@ import sys
 import subprocess
 from distutils.version import StrictVersion
 
-# Set this variable to the value of the last known stable release +1. The
-# number to +1 will depend on which branch you are in. If you are in the master
-# branch, you will have to +1 either the first or the second digit. If you are
-# on a specific stable branch (e.g. 1.0), you will have to +1 the last digit.
-# The objective of this variable is to produce release numbers that are
-# consistent and growing with time. This is used by setuptools to determine
-# which distribution of bob to use. Be aware.
-NEXT_VERSION = '1.1.0'
-
 BRANCH_RE = re.compile(r'^\d+\.\d+$')
 TAG_RE = re.compile(r'^v\d+\.\d+\.\d+$')
 VERSION_RE = re.compile(r'^\d+\.\d+\.\d+$')
+BOB_REPOSITORY = 'https://github.com/idiap/bob.git'
+
+def git_remote_version_branches():
+  """Get the branches available on the origin using git ls-remote"""
+  
+  try:
+    p = subprocess.Popen(['git', 'ls-remote', '--heads', BOB_REPOSITORY], 
+        stdout=subprocess.PIPE, stdin=None)
+    stdout, stderr = p.communicate()
+    
+    if p.returncode != 0: raise RuntimeError
+  
+    cand = [k[-1].split('/')[-1] for k in [j.split() for j in stdout.split('\n')] if k]
+    return [k for k in cand if BRANCH_RE.match(k)]
+
+  except:
+    print "Warning: could retrieve remote branch list"
 
 def git_version_branches():
   """Get the branches available on the origin"""
@@ -91,7 +99,18 @@ def git_next_minor_version(branch):
 def git_next_major_version():
   """Gets the next major version"""
 
-  last = sorted([StrictVersion(k) for k in git_version_branches()])[-1]
+  # try local
+  candidates = sorted([StrictVersion(k) for k in git_version_branches()])
+
+  if not candidates:
+    # try remote
+    candidates = \
+        sorted([StrictVersion(k) for k in git_remote_version_branches()])
+
+  if not candidates:
+    return None
+
+  last = candidates[-1]
 
   next_version = list(last.version)[0:2]
   next_version[1] += 1
