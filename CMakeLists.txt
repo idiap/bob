@@ -72,6 +72,8 @@ endif(APPLE)
 if(NOT APPLE)
   set(COMMON_CXX_FLAGS "-std=c++0x")
   set(COMMON_C_FLAGS "-std=c99")
+else()
+  set(COMMON_FLAGS "${COMMON_FLAGS} -Wno-long-long")
 endif()
 
 # For specific builds
