@@ -126,7 +126,7 @@ void io::VideoReader::open() {
   }
 
   // Retrieve stream information
-# if LIBAVFORMAT_VERSION_INT < 0x350000
+# if LIBAVFORMAT_VERSION_INT < 0x350600
   if (av_find_stream_info(format_ctxt)<0) {
     av_close_input_file(format_ctxt);
 # else
@@ -150,7 +150,7 @@ void io::VideoReader::open() {
     }
   }
   if(stream_index == -1) {
-# if LIBAVFORMAT_VERSION_INT < 0x350000
+# if LIBAVFORMAT_VERSION_INT < 0x350600
     av_close_input_file(format_ctxt);
 # else
     avformat_close_input(&format_ctxt);
@@ -170,7 +170,7 @@ void io::VideoReader::open() {
   AVCodec* codec = avcodec_find_decoder(codec_ctxt->codec_id);
 
   if (!codec) {
-# if LIBAVFORMAT_VERSION_INT < 0x350000
+# if LIBAVFORMAT_VERSION_INT < 0x350600
     av_close_input_file(format_ctxt);
 # else
     avformat_close_input(&format_ctxt);
@@ -184,7 +184,7 @@ void io::VideoReader::open() {
 # else
   if (avcodec_open2(codec_ctxt, codec, 0) < 0) {
 # endif
-# if LIBAVFORMAT_VERSION_INT < 0x350000
+# if LIBAVFORMAT_VERSION_INT < 0x350600
     av_close_input_file(format_ctxt);
 # else
     avformat_close_input(&format_ctxt);
@@ -247,7 +247,7 @@ void io::VideoReader::open() {
   avcodec_close(codec_ctxt);
 
   //and we close the input file
-# if LIBAVFORMAT_VERSION_INT < 0x350000
+# if LIBAVFORMAT_VERSION_INT < 0x350600
   av_close_input_file(format_ctxt);
 # else
   avformat_close_input(&format_ctxt);
@@ -502,7 +502,7 @@ void io::VideoReader::const_iterator::reset() {
   
   //closes the video file we opened
   if (m_format_ctxt) {
-# if LIBAVFORMAT_VERSION_INT < 0x350000
+# if LIBAVFORMAT_VERSION_INT < 0x350600
     av_close_input_file(m_format_ctxt);
     m_format_ctxt = 0;
 # else
