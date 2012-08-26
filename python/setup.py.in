@@ -171,7 +171,7 @@ setup(
       'setuptools',
       'argparse',
       'numpy',
-      'matplotlib >= 1.1',
+      'matplotlib >= 1.0',
       'sqlalchemy',
       'scipy',
       ],
