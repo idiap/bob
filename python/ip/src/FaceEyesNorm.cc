@@ -29,15 +29,16 @@ static const char* faceeyesnorm_doc = "Objects of this class, after configuratio
 
 template <typename T> 
 static void inner_call1(bob::ip::FaceEyesNorm& obj, 
-    bob::python::const_ndarray input, bob::python::ndarray output,
-    double e1y, double e1x, double e2y, double e2x)
+  bob::python::const_ndarray input, bob::python::ndarray output,
+  double e1y, double e1x, double e2y, double e2x)
 {
   blitz::Array<double,2> output_ = output.bz<double,2>();
   obj(input.bz<T,2>(), output_, e1y, e1x, e2y, e2x);
 }
 
 static void call1(bob::ip::FaceEyesNorm& obj, bob::python::const_ndarray input,
-    bob::python::ndarray output, double e1y, double e1x, double e2y, double e2x) {
+    bob::python::ndarray output, double e1y, double e1x, double e2y, double e2x) 
+{
   const bob::core::array::typeinfo& info = input.type();
   switch (info.dtype) {
     case bob::core::array::t_uint8: 
@@ -46,13 +47,13 @@ static void call1(bob::ip::FaceEyesNorm& obj, bob::python::const_ndarray input,
       return inner_call1<uint16_t>(obj, input, output, e1y, e1x, e2y, e2x);
     case bob::core::array::t_float64: 
       return inner_call1<double>(obj, input, output, e1y, e1x, e2y, e2x);
-    default: PYTHON_ERROR(TypeError, "FaceEyesNorm does not support array with type '%s'", info.str().c_str());
+    default: PYTHON_ERROR(TypeError, "FaceEyesNorm __call__ does not support array of type '%s'.", info.str().c_str());
   }
 }
 
 template <typename T> 
 static object inner_call1b(bob::ip::FaceEyesNorm& op, 
-    bob::python::const_ndarray src, double e1y, double e1x, double e2y, double e2x)
+  bob::python::const_ndarray src, double e1y, double e1x, double e2y, double e2x)
 {
   bob::python::ndarray dst(bob::core::array::t_float64, op.getCropHeight(), 
     op.getCropWidth());
@@ -62,7 +63,7 @@ static object inner_call1b(bob::ip::FaceEyesNorm& op,
 }
 
 static object call1b(bob::ip::FaceEyesNorm& op, bob::python::const_ndarray src,
-    double e1y, double e1x, double e2y, double e2x)
+  double e1y, double e1x, double e2y, double e2x)
 {
   const bob::core::array::typeinfo& info = src.type();
   switch (info.dtype) {
@@ -72,23 +73,25 @@ static object call1b(bob::ip::FaceEyesNorm& op, bob::python::const_ndarray src,
       return inner_call1b<uint16_t>(op, src, e1y, e1x, e2y, e2x);
     case bob::core::array::t_float64: 
       return inner_call1b<double>(op, src, e1y, e1x, e2y, e2x);
-    default: PYTHON_ERROR(TypeError, "FaceEyesNorm does not support array with type '%s'", info.str().c_str());
+    default: PYTHON_ERROR(TypeError, "FaceEyesNorm __call__ does not support array of type '%s'.", info.str().c_str());
   }
 }
 
-template <typename T> static void inner_call2 (bob::ip::FaceEyesNorm& obj, 
-    bob::python::const_ndarray input, bob::python::const_ndarray input_mask,
-    bob::python::ndarray output, bob::python::ndarray output_mask,
-    double e1y, double e1x, double e2y, double e2x) {
+template <typename T> static void inner_call2(bob::ip::FaceEyesNorm& obj, 
+  bob::python::const_ndarray input, bob::python::const_ndarray input_mask,
+  bob::python::ndarray output, bob::python::ndarray output_mask,
+  double e1y, double e1x, double e2y, double e2x)
+{
   blitz::Array<double,2> output_ = output.bz<double,2>();
   blitz::Array<bool,2> output_mask_ = output_mask.bz<bool,2>();
   obj(input.bz<T,2>(), input_mask.bz<bool,2>(), output_, output_mask_,
       e1y, e1x, e2y, e2x);
 }
 
-static void call2 (bob::ip::FaceEyesNorm& obj, bob::python::const_ndarray input,
-    bob::python::const_ndarray input_mask, bob::python::ndarray output, bob::python::ndarray output_mask,
-    double e1y, double e1x, double e2y, double e2x) {
+static void call2(bob::ip::FaceEyesNorm& obj, bob::python::const_ndarray input,
+  bob::python::const_ndarray input_mask, bob::python::ndarray output, 
+  bob::python::ndarray output_mask, double e1y, double e1x, double e2y, double e2x) 
+{
   const bob::core::array::typeinfo& info = input.type();
   switch (info.dtype) {
     case bob::core::array::t_uint8: 
@@ -97,39 +100,9 @@ static void call2 (bob::ip::FaceEyesNorm& obj, bob::python::const_ndarray input,
       return inner_call2<uint16_t>(obj, input, input_mask, output, output_mask, e1y, e1x, e2y, e2x);
     case bob::core::array::t_float64: 
       return inner_call2<double>(obj, input, input_mask, output, output_mask, e1y, e1x, e2y, e2x);
-    default: PYTHON_ERROR(TypeError, "FaceEyesNorm does not support array with type '%s'", info.str().c_str());
+    default: PYTHON_ERROR(TypeError, "FaceEyesNorm __call__ does not support array of type '%s'.", info.str().c_str());
   }
 }
-
-template <typename T> static object inner_call2b(bob::ip::FaceEyesNorm& op, 
-    bob::python::const_ndarray src, bob::python::const_ndarray src_mask,
-    double e1y, double e1x, double e2y, double e2x)
-{
-  bob::python::ndarray dst(bob::core::array::t_float64, op.getCropHeight(), 
-    op.getCropWidth());
-  bob::python::ndarray dst_mask(bob::core::array::t_bool, op.getCropHeight(), 
-    op.getCropWidth());
-  blitz::Array<double,2> dst_ = dst.bz<double,2>();
-  blitz::Array<bool,2> dst_mask_ = dst_mask.bz<bool,2>();
-  op(src.bz<T,2>(), src_mask.bz<bool,2>(), dst_, dst_mask_, e1y, e1x, e2y, e2x);
-  return make_tuple(dst.self(), dst_mask.self());
-}
-
-static object call2b(bob::ip::FaceEyesNorm& op, bob::python::const_ndarray src,
-    bob::python::const_ndarray src_mask, double e1y, double e1x, double e2y, double e2x)
-{
-  const bob::core::array::typeinfo& info = src.type();
-  switch (info.dtype) {
-    case bob::core::array::t_uint8: 
-      return inner_call2b<uint8_t>(op, src, src_mask, e1y, e1x, e2y, e2x);
-    case bob::core::array::t_uint16:
-      return inner_call2b<uint16_t>(op, src, src_mask, e1y, e1x, e2y, e2x);
-    case bob::core::array::t_float64: 
-      return inner_call2b<double>(op, src, src_mask, e1y, e1x, e2y, e2x);
-    default: PYTHON_ERROR(TypeError, "FaceEyesNorm does not support array with type '%s'", info.str().c_str());
-  }
-}
-
 
 void bind_ip_faceeyesnorm() {
   class_<bob::ip::FaceEyesNorm, boost::shared_ptr<bob::ip::FaceEyesNorm> >("FaceEyesNorm", faceeyesnorm_doc, init<const double, const size_t, const size_t, const double, const double>((arg("eyes_distance"), arg("crop_height"), arg("crop_width"), arg("crop_eyecenter_offset_h"), arg("crop_eyecenter_offset_w")), "Constructs a FaceEyeNorm object."))
@@ -143,8 +116,7 @@ void bind_ip_faceeyesnorm() {
       .add_property("crop_offset_h", &bob::ip::FaceEyesNorm::getCropOffsetH, &bob::ip::FaceEyesNorm::setCropOffsetH, "y-coordinate of the point in the cropping area which is the middle of the segment defined by the eyes after the geometric normalization.")
       .add_property("crop_offset_w", &bob::ip::FaceEyesNorm::getCropOffsetW, &bob::ip::FaceEyesNorm::setCropOffsetW, "x-coordinate of the point in the cropping area which is the middle of the segment defined by the eyes after the geometric normalization.")
       .def("__call__", &call1, (arg("input"), arg("output"), arg("re_y"), arg("re_x"), arg("le_y"), arg("le_x")), "Extracts a face given the coordinates of the left (le_y, le_x) and right (re_y, re_x) eye centers. Please note that the horizontal position le_x of the left eye is usually larger than the position re_x of the right eye.")
-      //.def("__call__", &call1b, (arg("input"), arg("re_y"), arg("re_x"), arg("le_y"), arg("le_x")), "Extracts a face given the coordinates of the left (le_y, le_x) and right (re_y, re_x) eye centers. Please note that the horizontal position le_x of the left eye is usually larger than the position re_x of the right eye. The output is allocated and returned.")
+      .def("__call__", &call1b, (arg("input"), arg("re_y"), arg("re_x"), arg("le_y"), arg("le_x")), "Extracts a face given the coordinates of the left (le_y, le_x) and right (re_y, re_x) eye centers. Please note that the horizontal position le_x of the left eye is usually larger than the position re_x of the right eye. The output is allocated and returned.")
       .def("__call__", &call2, (arg("input"), arg("input_mask"), arg("output"), arg("output_mask"), arg("re_y"), arg("re_x"), arg("le_y"), arg("le_x")), "Extracts a face given the coordinates of the left (le_y, le_x) and right (re_y, re_x) eye centers, taking mask into account.")
-      //.def("__call__", &call2b, (arg("input"), arg("input_mask"), arg("re_y"), arg("re_x"), arg("le_y"), arg("le_x")), "Extracts a face given the coordinates of the left (le_y, le_x) and right (re_y, re_x) eye centers, taking mask into account. The outputs are allocated and returned as a tuple.")
     ;
 }
