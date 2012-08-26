@@ -317,8 +317,7 @@ namespace bob { namespace visioner {
   }
   bool ipyramid_t::check(const subwindow_t& sw, const param_t& param) const
   {
-    return	(uint64_t)sw.m_s >= 0 && (uint64_t)sw.m_s < m_ipscales.size() &&
-      sw.m_x >= 0 && sw.m_y >= 0 &&	
+    return	(uint64_t)sw.m_s < m_ipscales.size() &&	
       (uint64_t)sw.m_x + param.m_cols < (uint64_t)m_ipscales[sw.m_s].cols() &&
       (uint64_t)sw.m_y + param.m_rows < (uint64_t)m_ipscales[sw.m_s].rows();
   }
