@@ -227,7 +227,7 @@ AVStream* io::VideoWriter::add_video_stream() {
   AVCodecContext *c;
   AVStream *st;
 
-# if LIBAVFORMAT_VERSION_INT < 0x360000
+# if LIBAVFORMAT_VERSION_INT < 0x350000
   st = av_new_stream(m_format_ctxt, 0);
 #else
   st = avformat_new_stream(m_format_ctxt, 0);
