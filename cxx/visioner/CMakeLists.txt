@@ -6,7 +6,7 @@ set(deps "lbfgs;core") #other bob subprojects
 
 include (${QT_USE_FILE})
 include_directories(SYSTEM ${QT_INCLUDE_DIR})
-set(shared "${QT_LIBRARIES};${Boost_IOSTREAMS_LIBRARY_RELEASE};${Boost_SERIALIZATION_LIBRARY_RELEASE};${Boost_THREAD_LIBRARY_RELEASE};${Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE}")
+set(shared "${QT_LIBRARIES};${Boost_IOSTREAMS_LIBRARY_RELEASE};${Boost_SERIALIZATION_LIBRARY_RELEASE};${Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE}")
 
 # This defines the list of source files inside this package.
 set(src
