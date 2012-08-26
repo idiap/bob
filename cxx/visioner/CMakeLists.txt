@@ -6,13 +6,7 @@ set(deps "lbfgs;core") #other bob subprojects
 
 include (${QT_USE_FILE})
 include_directories(SYSTEM ${QT_INCLUDE_DIR})
-set(shared "${QT_LIBRARIES};${Boost_IOSTREAMS_LIBRARY_RELEASE};${Boost_SERIALIZATION_LIBRARY_RELEASE};${Boost_THREAD_LIBRARY_RELEASE}")
-
-# Enables OpenMP if found
-if (OPENMP_FOUND)
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${OpenMP_CXX_FLAGS}")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${OpenMP_CXX_FLAGS}")
-endif ()
+set(shared "${QT_LIBRARIES};${Boost_IOSTREAMS_LIBRARY_RELEASE};${Boost_SERIALIZATION_LIBRARY_RELEASE};${Boost_THREAD_LIBRARY_RELEASE};${Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE}")
 
 # This defines the list of source files inside this package.
 set(src
@@ -50,7 +44,7 @@ set(src
 
 bob_library(visioner "${src}" "${deps}" "${shared}")
 
-set(progshared "${Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE}")
+set(progshared "")
 
 # Visioner applications
 bob_add_executable(visioner classifier "programs/classifier.cc" "${progshared}")
