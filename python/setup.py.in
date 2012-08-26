@@ -19,23 +19,11 @@ def cmake_false(var):
   return var.lower() in ('no', '0', 'off', 'false', 'n', '') or \
       var.find('-NOTFOUND') != -1
 
-def explain_library(l):
-  """Separate path and linking component"""
-  from os.path import basename, splitext, dirname
-  return splitext(basename(l))[0].replace('lib',''), dirname(l)
-
 BOB_VERSION = '@BOB_VERSION@'
 ENABLE_RPATH = cmake_false('@BOB_SOVERSION@')
 CMAKE_BINARY_DIR = '@CMAKE_BINARY_DIR@'
 QT4_FOUND = cmake_true('@QT4_FOUND@')
 LIBRARY_PREFIX = '@BOB_PYTHON_LIBRARY_PREFIX@'
-
-GOOGLE_PERFTOOLS_FOUND = cmake_true('@GOOGLE_PERFTOOLS_FOUND@')
-
-if GOOGLE_PERFTOOLS_FOUND:
-  tmp = '@GOOGLE_PERFTOOLS_LIBRARY@'
-  GOOGLE_PERFTOOLS_LIBRARY, GOOGLE_PERFTOOLS_LIBDIR = explain_library(tmp)
-  del tmp
 
 # ---------------------------------------------------------------------------#
 #  general utilities for the setup                                           # 
@@ -79,6 +67,7 @@ def setup_extension(name):
 
   ext_name = 'bob.%s._%s' % (name.replace('_', '.'), name)
 
+  libraries = ['bob_python_integration', 'bob_' + package]
   library_dirs = []
   runtime_library_dirs = []
 
@@ -89,14 +78,6 @@ def setup_extension(name):
     if ENABLE_RPATH:
       # I'm installing locally, so we set the runtime path
       runtime_library_dirs = library_dirs #reference
-
-  libraries = ['bob_python_integration', 'bob_' + package]
-
-  # special hack for the core library (google profiler integration)
-  if GOOGLE_PERFTOOLS_FOUND and name == 'core': #special hack
-  
-    libraries.append(GOOGLE_PERFTOOLS_LIBRARY)
-    library_dirs.append(GOOGLE_PERFTOOLS_LIBDIR)
 
   return Extension(ext_name, sources=[],
       extra_objects=objects,
