@@ -55,6 +55,7 @@ namespace bob {
         * @param dst_mask The output blitz array mask, specifying the valid
         *   pixels of dst.
         * @param shear The shear parameter in the matrix [1 shear; 0 1]
+        * @param antialias Whether antialiasing is used or not
         */
       template<typename T, bool mask>
       void shearXNoCheck(
