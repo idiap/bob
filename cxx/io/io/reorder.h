@@ -34,11 +34,15 @@ namespace bob { namespace io {
    * matrixes given a certain index accessing a position in the matrix and the
    * matrix shape
    *
-   * @param linear indexes (row, col): a 2-tuple with the results: row-major
-   *        and column-major linear indexes
-   * @param indexes (i,j) a 2-tuple with the indexes as would be accessed
-   *        [col][row]; this is the same as accessing the matrix like on
-   *        directions [y][x]
+   * @param row The resulting row-major linear index. 
+   *            (row,col) is a 2-tuple with the results: row-major and 
+   *            column-major linear indexes
+   * @param col The resulting column-major linear index. (see above)
+   * @param i   Index of the column.
+   *            (i,j) a 2-tuple with the indexes as would be accessed
+   *            [col][row]; this is the same as accessing the matrix like
+   *            on directions [y][x]
+   * @param j   Index of the row. (see above)
    * @param shape a 2-tuple with the matrix shape like [col][row]; this is the
    *        same as thinking about the extends of the matrix like on directions
    *        [y][x]

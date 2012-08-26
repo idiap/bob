@@ -95,11 +95,10 @@ namespace bob {
          * @brief Resets the parameters of the filter
          * @param radius_y The height of the kernel along the y-axis
          * @param radius_x The width of the kernel along the x-axis
-         * @param sigma The standard deviation of the kernal
-         * @param size_opt The size of the output wrt. to convolution
+         * @param sigma_y The standard deviation of the kernel along the y-axis
+         * @param sigma_x The standard deviation of the kernel along the x-axis
          * @param border_type The interpolation type for the convolution
          */
-
         void reset( const size_t radius_y=1, const size_t radius_x=1,
           const double sigma_y=sqrt(2.5), const double sigma_x=sqrt(2.5),
           const bob::sp::Extrapolation::BorderType border_type =
@@ -133,7 +132,7 @@ namespace bob {
         /**
          * @brief Process a 2D blitz Array/Image
          * @param src The 2D input blitz array
-         * @param src The 2D input blitz array
+         * @param dst The 2D output blitz array
          */
         template <typename T> 
         void operator()(const blitz::Array<T,2>& src, 
@@ -142,7 +141,7 @@ namespace bob {
         /**
          * @brief Process a 3D blitz Array/Image
          * @param src The 3D input blitz array
-         * @param src The 3D input blitz array
+         * @param dst The 3D output blitz array
          */
         template <typename T> 
         void operator()(const blitz::Array<T,3>& src, 

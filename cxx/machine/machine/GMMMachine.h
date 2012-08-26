@@ -106,23 +106,21 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double>
     void setWeights(const blitz::Array<double,1> &weights);
 
     /**
-     * Get the weights
-     * @param[out] weights The weights ("mixing coefficients") of the Gaussian components
+     * Get the weights ("mixing coefficients") of the Gaussian components
      */
     inline const blitz::Array<double,1>& getWeights() const
     { return m_weights; }
 
     /**
-     * Get the weights in order to be updated
-     * @param[out] weights The weights ("mixing coefficients") of the Gaussian components
+     * Get the weights in order to be updated 
+     * ("mixing coefficients") of the Gaussian components
      * @warning Only trainers should use this function for efficiency reason
      */
     inline blitz::Array<double,1>& updateWeights()
     { return m_weights; }
 
     /**
-     * Get the logarithm of the weights
-     * @param[out] logWeights The logarithm of the weights of the Gaussian components
+     * Get the logarithm of the weights of the Gaussian components
      */
     inline const blitz::Array<double,1>& getLogWeights() const
     { return m_cache_log_weights; }

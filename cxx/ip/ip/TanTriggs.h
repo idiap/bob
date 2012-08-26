@@ -114,8 +114,6 @@ namespace bob {
        *  both axes
        * @param threshold threshold value used for the contrast equalization
        * @param alpha alpha value used for the contrast equalization
-       * @param size_opt The output size of the filtered image, because of the 
-       *  convolution
        * @param border_type The interpolation type for the convolution
        */
       void reset(const double gamma=0.2, const double sigma0=1., 

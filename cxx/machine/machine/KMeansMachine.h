@@ -124,16 +124,16 @@ class KMeansMachine: public Machine<blitz::Array<double,1>, double> {
     void getMean(const size_t i, blitz::Array<double,1>& mean) const;
     
     /**
-     * Get the means
-     * @param[out] means A 2D array, with as many rows as means, and as many columns as feature dimensions.
+     * Get the means (i.e. a 2D array, with as many rows as means, and as 
+     * many columns as feature dimensions.)
      */
     const blitz::Array<double,2>& getMeans() const
     { return m_means; }
 
      /**
-     * Get the means in order to be updated
+     * Get the means in order to be updated (i.e. a 2D array, with as many 
+     * rows as means, and as many columns as feature dimensions.)
      * @warning Only trainers should use this function for efficiency reasons
-     * @param[out] means A 2D array, with as many rows as means, and as many columns as feature dimensions.
      */
     blitz::Array<double,2>& updateMeans()
     { return m_means; }

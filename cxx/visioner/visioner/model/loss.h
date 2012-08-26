@@ -33,7 +33,7 @@ namespace bob { namespace visioner {
    * Generic multivariate loss function of two parameters: the target value to
    * predict and the current score estimation.
    *
-   * NB: The <grad> and <hess> objects should be a-priori resized to <size, 1>
+   * NB: The 'grad' and 'hess' objects should be a-priori resized to <size, 1>
    * and <size, size> respectively, before calling <::eval>.
    */
   class Loss : public Parametrizable {

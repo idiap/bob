@@ -76,7 +76,7 @@ namespace bob { namespace visioner {
   /**
    * Resize the string to obtain the given size
    *  (   if larger - characters will be removed from the end, 
-   *      if smaller - <app_char> will be inserted at the end)        
+   *      if smaller - 'app_char' will be inserted at the end)        
    */
   std::string resize(const std::string& str, uint64_t size, 
       char app_char = ' ');

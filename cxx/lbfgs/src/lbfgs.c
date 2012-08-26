@@ -1018,7 +1018,7 @@ static int line_search_morethuente(
  *  @param  du      The value of f'(u).
  *  @param  v       The value of another point, v.
  *  @param  fv      The value of f(v).
- *  @param  du      The value of f'(v).
+ *  @param  dv      The value of f'(v).
  */
 #define CUBIC_MINIMIZER(cm, u, fu, du, v, fv, dv) \
     d = (v) - (u); \
@@ -1044,9 +1044,9 @@ static int line_search_morethuente(
  *  @param  du      The value of f'(u).
  *  @param  v       The value of another point, v.
  *  @param  fv      The value of f(v).
- *  @param  du      The value of f'(v).
+ *  @param  dv      The value of f'(v).
  *  @param  xmin    The maximum value.
- *  @param  xmin    The minimum value.
+ *  @param  xmax    The minimum value.
  */
 #define CUBIC_MINIMIZER2(cm, u, fu, du, v, fv, dv, xmin, xmax) \
     d = (v) - (u); \

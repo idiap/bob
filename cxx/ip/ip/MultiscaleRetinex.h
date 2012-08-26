@@ -146,7 +146,7 @@ namespace bob {
         /**
          * @brief Process a 2D blitz Array/Image
          * @param src The 2D input blitz array
-         * @param src The 2D input blitz array
+         * @param dst The 2D output blitz array
          */
         template <typename T> 
         void operator()(const blitz::Array<T,2>& src, blitz::Array<double,2>& dst);
@@ -154,7 +154,7 @@ namespace bob {
         /**
          * @brief Process a 3D blitz Array/Image
          * @param src The 3D input blitz array
-         * @param src The 3D input blitz array
+         * @param dst The 3D output blitz array
          */
         template <typename T> 
         void operator()(const blitz::Array<T,3>& src, blitz::Array<double,3>& dst);

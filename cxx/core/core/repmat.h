@@ -87,6 +87,8 @@ namespace bob {
      * @brief Function which replicates an input 1D array, and generates a 2D 
      * array like the matlab repmat function.
      *
+     * @param src Input array
+     * @param dst Output array
      * @param row_vector_src Indicates whether the vector is considered as a
      *   row or as a column.
      *
@@ -122,6 +124,8 @@ namespace bob {
      * @brief Function which replicates an input 1D array, and generates a 2D 
      * array like the matlab repmat function.
      *
+     * @param src Input array
+     * @param dst Output array
      * @param row_vector_src Indicates whether the vector is considered as a
      *   row or as a column.
      *

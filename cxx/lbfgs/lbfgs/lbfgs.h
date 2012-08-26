@@ -683,10 +683,6 @@ libLBFGS is distributed under the term of the
 
 - @ref liblbfgs_api "libLBFGS API"
 
-@section sample Sample code
-
-@include sample.c
-
 @section ack Acknowledgements
 
 The L-BFGS algorithm is described in:

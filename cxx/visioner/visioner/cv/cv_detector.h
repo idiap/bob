@@ -183,7 +183,7 @@ namespace bob { namespace visioner {
       boost::shared_ptr<Model>    m_model;	       ///< Object classifier(s)
       Matrix<uint64_t> m_lmodel_begins; ///< Level classifiers for each output:
       Matrix<uint64_t> m_lmodel_ends;   ///< [begin, end) LUT range
-      uint64_t			m_levels;	       ///< #levels (speed-up scanning)
+      uint64_t			m_levels;	       ///< number of levels (speed-up scanning)
       ipyramid_t  m_ipyramid;	     ///< Pyramid of images
       mutable stats_t m_stats;     ///< Scanning statistics
 

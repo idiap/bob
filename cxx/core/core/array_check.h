@@ -220,8 +220,10 @@ namespace bob {
      * @param array The 3D blitz array to reindex and resize
      * @param base0 The base index of the first dimension
      * @param base1 The base index of the second dimension
+     * @param base2 The base index of the third dimension
      * @param size0 The size of the first dimension
      * @param size1 The size of the second dimension
+     * @param size2 The size of the third dimension
      * @warning If a resizing is performed, previous content of the array is 
      * lost.
      */
@@ -250,9 +252,11 @@ namespace bob {
      * @param base0 The base index of the first dimension
      * @param base1 The base index of the second dimension
      * @param base2 The base index of the third dimension
+     * @param base3 The base index of the fourth dimension
      * @param size0 The size of the first dimension
      * @param size1 The size of the second dimension
      * @param size2 The size of the third dimension
+     * @param size3 The size of the fourth dimension
      * @warning If a resizing is performed, previous content of the array is 
      * lost.
      */

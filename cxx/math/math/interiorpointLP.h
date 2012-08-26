@@ -48,6 +48,8 @@ namespace bob {
       * @warning The X blitz::array is resized and reindexed.
       * @param A The A squared-matrix of the system A*x=b (size NxN)
       * @param b The b vector of the system A*x=b (size N)
+      * @param c The c vector involved in the minimization
+      * @param theta Threshold
       * @param x The x vector of the system A*x=b which will be updated 
       *   at the end of the function.
       * @param epsilon The expected precision for the algorithm to stop
@@ -76,8 +78,12 @@ namespace bob {
       * @warning The X blitz::array is resized and reindexed.
       * @param A The A squared-matrix of the system A*x=b (size NxN)
       * @param b The b vector of the system A*x=b (size N)
+      * @param c The c vector involved in the minimization
+      * @param theta_pred For the prediction
+      * @param theta_corr For the correction
       * @param x The x vector of the system A*x=b which will be updated 
       *   at the end of the function.
+      * @param epsilon The expected precision for the algorithm to stop
       */
     void interiorpointPredictorCorrectorLP(const blitz::Array<double,2>& A, 
       const blitz::Array<double,1>& b, const blitz::Array<double,1>& c,
@@ -104,8 +110,12 @@ namespace bob {
       * @warning The X blitz::array is resized and reindexed.
       * @param A The A squared-matrix of the system A*x=b (size NxN)
       * @param b The b vector of the system A*x=b (size N)
+      * @param c The c vector involved in the minimization
+      * @param gamma
+      * @param sigma
       * @param x The x vector of the system A*x=b which will be updated 
       *   at the end of the function.
+      * @param epsilon The expected precision for the algorithm to stop
       */
     void interiorpointLongstepLP(const blitz::Array<double,2>& A, 
       const blitz::Array<double,1>& b, const blitz::Array<double,1>& c,
@@ -225,8 +235,6 @@ namespace bob {
         * @param A The A matrix of the linear equalities
         * @param c The c vector which defines the linear objective function
         * @param lambda The lambda dual variable
-        * @param epsilon The precision to determine whether an equality
-        *   constraint is fulfilled or not.
         */
       double logBarrierLP(const blitz::Array<double,2>& A,
         const blitz::Array<double,1>& c, blitz::Array<double,1>& lambda);
@@ -239,8 +247,8 @@ namespace bob {
         * @param A The A matrix of the linear equalities
         * @param c The c vector which defines the linear objective function
         * @param lambda The lambda dual variable
-        * @param epsilon The precision to determine whether an equality
-        *   constraint is fulfilled or not.
+        * @param work_array
+        * @param gradient
         */
       void gradientLogBarrierLP(const blitz::Array<double,2>& A,
         const blitz::Array<double,1>& c, blitz::Array<double,1>& lambda,
@@ -254,8 +262,6 @@ namespace bob {
         * @param c The c vector which defines the linear objective function
         * @param lambda The lambda dual variable, which should be initialized
         * @param mu The mu dual variable
-        * @param epsilon The precision to determine whether an equality
-        *   constraint is fulfilled or not.
         */
       void initializeDualLambdaMuLP(const blitz::Array<double,2>& A,
         const blitz::Array<double,1>& c, blitz::Array<double,1>& lambda, 
@@ -318,6 +324,7 @@ namespace bob {
         * @param mu The current mu dual solution of the linear program
         * @param sigma The coefficient sigma which quantifies how close we 
         *   want to stay from the central path.
+        * @param m
         * @param A_large The large left matrix of the system
         * @param b_large The large right vector of the system
         */

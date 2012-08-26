@@ -34,8 +34,8 @@ namespace bob { namespace machine {
    * @param rawscores_zprobes_vs_models
    * @param rawscores_probes_vs_tmodels
    * @param rawscores_zprobes_vs_tmodels
-   * @param mask_zprobes_tmodels_istruetrial
-   * @param[out] scores normalized scores
+   * @param mask_zprobes_vs_tmodels_istruetrial
+   * @param[out] normalizedscores normalized scores
    * @warning The destination score array should have the correct size
    *          (Same size as rawscores_probes_vs_models)
    */
@@ -56,7 +56,7 @@ namespace bob { namespace machine {
    * @param rawscores_zprobes_vs_models
    * @param rawscores_probes_vs_tmodels
    * @param rawscores_zprobes_vs_tmodels
-   * @param[out] scores normalized scores
+   * @param[out] normalizedscores normalized scores
    * @warning The destination score array should have the correct size
    *          (Same size as rawscores_probes_vs_models)
    */
