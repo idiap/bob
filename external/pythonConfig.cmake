@@ -45,6 +45,7 @@ find_python_module(numpy REQUIRED)
 find_python_module(matplotlib REQUIRED)
 find_python_module(sqlalchemy REQUIRED)
 find_python_module(scipy REQUIRED)
+find_python_module(sphinx REQUIRED)
 
 # A trick, to make FindPythonLibs work in the expected way in the presence of
 # externally compiled python versions.
