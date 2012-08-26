@@ -25,125 +25,188 @@
 #include "core/python/ndarray.h"
 #include <core/array_exception.h>
 
-
-static boost::python::tuple get_rotated_output_shape(bob::python::const_ndarray input_image, double angle, bool angle_in_degrees){
-  // compute angle in degrees, if desired
-  if (!angle_in_degrees)
+static boost::python::tuple get_rotated_output_shape(
+  bob::python::const_ndarray input, double angle, bool angle_in_degrees)
+{
+  // Computes angle in degrees, if desired
+  if(!angle_in_degrees)
     angle *= 180./M_PI;
   
-  // compute output scaling
+  // Computes output scaling
   blitz::TinyVector<int,2> size;
   
-  switch (input_image.type().dtype) {
+  switch(input.type().dtype) 
+  {
     case bob::core::array::t_uint8: 
-      size = bob::ip::getRotatedShape<uint8_t>(input_image.bz<uint8_t,2>(), angle);
+      size = bob::ip::getRotatedShape<uint8_t>(input.bz<uint8_t,2>(), angle);
       break;
     case bob::core::array::t_uint16:
-      size = bob::ip::getRotatedShape<uint16_t>(input_image.bz<uint16_t,2>(), angle);
+      size = bob::ip::getRotatedShape<uint16_t>(input.bz<uint16_t,2>(), angle);
       break;
     case bob::core::array::t_float64: 
-      size = bob::ip::getRotatedShape<double>(input_image.bz<double,2>(), angle);
+      size = bob::ip::getRotatedShape<double>(input.bz<double,2>(), angle);
       break;
-    default: PYTHON_ERROR(TypeError, "cannot get shape from unsupporter array of type '%s'", input_image.type().str().c_str());
+    default: 
+      PYTHON_ERROR(TypeError, "bob.ip.get_rotated_output_shape() does not support array of type '%s'.", input.type().str().c_str());
   }
    
   return boost::python::make_tuple(size[0], size[1]);
 }
 
 template <class T>
-  static void inner_rotate(bob::python::const_ndarray input_image, bob::python::ndarray output_image, double angle, const bob::ip::Rotate::Algorithm rotation_algorithm)
-{
-  
-  switch (input_image.type().nd){
-    case 2:{
-      const blitz::Array<T,2> input = input_image.bz<T,2>();
-      blitz::Array<double,2> output = output_image.bz<double,2>();
-      bob::ip::rotate(input, output, angle, rotation_algorithm);
-      break;
-    }
-    case 3:{
-      const blitz::Array<T,3> input = input_image.bz<T,3>();
-      blitz::Array<double,3> output = output_image.bz<double,3>();
-      bob::ip::rotate(input, output, angle, rotation_algorithm);
-      break;
-    }
+static void inner_rotate(bob::python::const_ndarray input, 
+  bob::python::ndarray output, double angle, 
+  const bob::ip::Rotate::Algorithm rotation_algorithm)
+{  
+  switch(input.type().nd)
+  {
+    case 2:
+      {
+        blitz::Array<double,2> output_ = output.bz<double,2>();
+        bob::ip::rotate(input.bz<T,2>(), output_, angle, rotation_algorithm);
+        break;
+      }
+    case 3:
+      {
+        blitz::Array<double,3> output_ = output.bz<double,3>();
+        bob::ip::rotate(input.bz<T,3>(), output_, angle, rotation_algorithm);
+        break;
+      }
     default:
-      throw bob::core::UnexpectedShapeError();
+      PYTHON_ERROR(TypeError, "bob.ip.rotate() does not support array with " SIZE_T_FMT " dimensions.", input.type().nd);
   }
 }
 
-static void rotate(bob::python::const_ndarray input_image, bob::python::ndarray output_image, double angle, bool angle_in_degrees = true, const bob::ip::Rotate::Algorithm rotation_algorithm = bob::ip::Rotate::Shearing){
+static void rotate(bob::python::const_ndarray input, 
+  bob::python::ndarray output, double angle, bool angle_in_degrees = true, 
+  const bob::ip::Rotate::Algorithm rotation_algorithm = bob::ip::Rotate::Shearing)
+{
   // compute angle in degrees, if desired
   if (!angle_in_degrees)
     angle *= 180./M_PI;
 
-  switch (input_image.type().dtype) {
-    case bob::core::array::t_uint8:{
-      inner_rotate<uint8_t>(input_image, output_image, angle, rotation_algorithm);
+  switch(input.type().dtype) 
+  {
+    case bob::core::array::t_uint8:
+      inner_rotate<uint8_t>(input, output, angle, rotation_algorithm);
       break;
-    }
-    case bob::core::array::t_uint16:{
-      inner_rotate<uint16_t>(input_image, output_image, angle, rotation_algorithm);
+    case bob::core::array::t_uint16:
+      inner_rotate<uint16_t>(input, output, angle, rotation_algorithm);
       break;
-    }
-    case bob::core::array::t_float64:{
-      inner_rotate<double>(input_image, output_image, angle, rotation_algorithm);
+    case bob::core::array::t_float64:
+      inner_rotate<double>(input, output, angle, rotation_algorithm);
       break;
-    }
-    default: PYTHON_ERROR(TypeError, "cannot get shape from unsupporter array of type '%s'", input_image.type().str().c_str());
+    default: 
+      PYTHON_ERROR(TypeError, "bob.ip.rotate() does not support array of type '%s'.", input.type().str().c_str());
   }
 }
 
 
 template <class T>
-  static void inner_rotate_with_mask(bob::python::const_ndarray input_image, const blitz::Array<bool,2>& i_mask, bob::python::ndarray output_image, blitz::Array<bool,2>& o_mask, double angle, const bob::ip::Rotate::Algorithm rotation_algorithm)
-{
-  
-  switch (input_image.type().nd){
-    case 2:{
-      const blitz::Array<T,2> input = input_image.bz<T,2>();
-      blitz::Array<double,2> output = output_image.bz<double,2>();
-      bob::ip::rotate(input, output, angle, rotation_algorithm);
-      break;
-    }
-    case 3:{
-      const blitz::Array<T,3> input = input_image.bz<T,3>();
-      blitz::Array<double,3> output = output_image.bz<double,3>();
-      bob::ip::rotate(input, output, angle, rotation_algorithm);
-      break;
-    }
+static boost::python::object inner_rotate_p(bob::python::const_ndarray input, 
+  double angle, const bob::ip::Rotate::Algorithm rotation_algorithm)
+{  
+  switch(input.type().nd)
+  {
+    case 2:
+      {
+        const blitz::TinyVector<int,2> shape = bob::ip::getRotatedShape<T>(input.bz<T,2>(), angle);
+        bob::python::ndarray output(bob::core::array::t_float64, shape(0), shape(1));
+        blitz::Array<double,2> output_ = output.bz<double,2>();
+        bob::ip::rotate(input.bz<T,2>(), output_, angle, rotation_algorithm);
+        return output.self();
+      }
+    case 3:
+      {
+        const blitz::TinyVector<int,3> shape = bob::ip::getRotatedShape<T>(input.bz<T,3>(), angle);
+        bob::python::ndarray output(bob::core::array::t_float64, shape(0), shape(1), shape(2));
+        blitz::Array<double,3> output_ = output.bz<double,3>();
+        bob::ip::rotate(input.bz<T,3>(), output_, angle, rotation_algorithm);
+        return output.self();
+      }
     default:
-      throw bob::core::UnexpectedShapeError();
+      PYTHON_ERROR(TypeError, "bob.ip.rotate() does not support array with " SIZE_T_FMT " dimensions.", input.type().nd);
+  }
+}
+
+static boost::python::object rotate_p(bob::python::const_ndarray input, 
+  double angle, bool angle_in_degrees = true, 
+  const bob::ip::Rotate::Algorithm rotation_algorithm = bob::ip::Rotate::Shearing)
+{
+  // compute angle in degrees, if desired
+  if (!angle_in_degrees)
+    angle *= 180./M_PI;
+
+  switch(input.type().dtype) 
+  {
+    case bob::core::array::t_uint8:
+      return inner_rotate_p<uint8_t>(input, angle, rotation_algorithm);
+    case bob::core::array::t_uint16:
+      return inner_rotate_p<uint16_t>(input, angle, rotation_algorithm);
+    case bob::core::array::t_float64:
+      return inner_rotate_p<double>(input, angle, rotation_algorithm);
+    default: 
+      PYTHON_ERROR(TypeError, "bob.ip.rotate() does not support array of type '%s'.", input.type().str().c_str());
+  }
+}
+
+template <class T>
+static void inner_rotate_with_mask(bob::python::const_ndarray input, 
+  const blitz::Array<bool,2>& i_mask, bob::python::ndarray output, 
+  blitz::Array<bool,2>& o_mask, double angle, 
+  const bob::ip::Rotate::Algorithm rotation_algorithm)
+{
+  switch (input.type().nd)
+  {
+    case 2:
+      {
+        blitz::Array<double,2> output_ = output.bz<double,2>();
+        bob::ip::rotate(input.bz<T,2>(), output_, angle, rotation_algorithm);
+        break;
+      }
+    case 3:
+      {
+        blitz::Array<double,3> output_ = output.bz<double,3>();
+        bob::ip::rotate(input.bz<T,3>(), output_, angle, rotation_algorithm);
+        break;
+      }
+    default:
+      PYTHON_ERROR(TypeError, "bob.ip.rotate() does not support array with " SIZE_T_FMT " dimensions.", input.type().nd);
   }
 }
 
 
-static void rotate_with_mask(bob::python::const_ndarray input_image, bob::python::const_ndarray input_mask, bob::python::ndarray output_image, bob::python::ndarray output_mask, double angle, bool angle_in_degrees = true, const bob::ip::Rotate::Algorithm rotation_algorithm = bob::ip::Rotate::Shearing){
-  // compute angle in degrees, if desired
+static void rotate_with_mask(bob::python::const_ndarray input, 
+  bob::python::const_ndarray input_mask, bob::python::ndarray output, 
+  bob::python::ndarray output_mask, double angle, bool angle_in_degrees=true, 
+  const bob::ip::Rotate::Algorithm rotation_algorithm = bob::ip::Rotate::Shearing)
+{
+  // computes angle in degrees, if desired
   if (!angle_in_degrees)
     angle *= 180./M_PI;
     
   const blitz::Array<bool,2> i_mask = input_mask.bz<bool,2>();
   blitz::Array<bool,2> o_mask = output_mask.bz<bool,2>();
   
-  switch (input_image.type().dtype) {
-    case bob::core::array::t_uint8:{
-      inner_rotate_with_mask<uint8_t>(input_image, i_mask, output_image, o_mask, angle, rotation_algorithm);
+  switch (input.type().dtype) 
+  {
+    case bob::core::array::t_uint8:
+      inner_rotate_with_mask<uint8_t>(input, i_mask, output, o_mask, angle, rotation_algorithm);
       break;
-    }
-    case bob::core::array::t_uint16:{
-      inner_rotate_with_mask<uint16_t>(input_image, i_mask, output_image, o_mask, angle, rotation_algorithm);
+    case bob::core::array::t_uint16:
+      inner_rotate_with_mask<uint16_t>(input, i_mask, output, o_mask, angle, rotation_algorithm);
       break;
-    }
-    case bob::core::array::t_float64:{
-      inner_rotate_with_mask<double>(input_image, i_mask, output_image, o_mask, angle, rotation_algorithm);
+    case bob::core::array::t_float64:
+      inner_rotate_with_mask<double>(input, i_mask, output, o_mask, angle, rotation_algorithm);
       break;
-    }
-    default: PYTHON_ERROR(TypeError, "cannot get shape from unsupporter array of type '%s'", input_image.type().str().c_str());
+    default:
+      PYTHON_ERROR(TypeError, "bob.ip.rotate() does not support array of type '%s'.", input.type().str().c_str());
   }
 }
 
 BOOST_PYTHON_FUNCTION_OVERLOADS(rotate_overloads, rotate, 3, 5)
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(rotate_p_overloads, rotate_p, 2, 4)
 
 BOOST_PYTHON_FUNCTION_OVERLOADS(rotate_with_mask_overloads, rotate_with_mask, 5, 7)
 
@@ -164,7 +227,16 @@ void bind_ip_rotate() {
     &rotate,
     rotate_overloads(
       (boost::python::arg("input"), boost::python::arg("output"), boost::python::arg("angle"), boost::python::arg("angle_in_degrees") = true, boost::python::arg("rotation_algorithm")="Shearing"),
-      "Rotates the given input image into the given output image. The size of the output image can be computed using the get_rotated_output_shape function. The angle might be given in degree or in radians (please set angle_in_degrees to False in the latter case)."
+      "Rotates the given input image into the given output image. The ouput image should have the expected size, which can be obtained using the get_rotated_output_shape function. The angle might be given in degree or in radians (please set angle_in_degrees to False in the latter case)."
+    )
+  );
+ 
+  boost::python::def(
+    "rotate",
+    &rotate_p,
+    rotate_p_overloads(
+      (boost::python::arg("input"), boost::python::arg("angle"), boost::python::arg("angle_in_degrees") = true, boost::python::arg("rotation_algorithm")="Shearing"),
+      "Rotates the given input image into the given output image. The angle might be given in degree or in radians (please set angle_in_degrees to False in the latter case). The rotated image is allocated and returned."
     )
   );
 
@@ -176,7 +248,6 @@ void bind_ip_rotate() {
       "Rotates the given input image into the given output image using the given mask images. The size of the output image and the output mask can be computed using the get_rotated_output_shape function. The angle might be given in degree or in radians (please set angle_in_degrees to False in the latter case)."
     )
   );
-
 
   boost::python::def(
     "get_angle_to_horizontal", 
