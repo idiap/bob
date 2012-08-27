@@ -117,8 +117,7 @@ void iod::TensorFileHeader::header_ok()
   }
 
   // Check the number of samples and dimensions
-  if( m_n_samples < 0 || m_type.nd < 1 || m_type.nd > 4)
-    throw io::DimensionError(m_type.nd,4);
+  if( m_type.nd < 1 || m_type.nd > 4) throw io::DimensionError(m_type.nd,4);
 
   // OK
   update();
