@@ -341,7 +341,7 @@ void mach::GMMMachine::accStatisticsInternal(const blitz::Array<double, 1>& x,
 
 
 boost::shared_ptr<mach::Gaussian> mach::GMMMachine::getGaussian(const size_t i) {
-  if(i<0 || i>=m_n_gaussians) 
+  if(i>=m_n_gaussians) 
     throw mach::Exception();
   return m_gaussians[i];
 }

@@ -41,13 +41,9 @@ void bob::ip::detail::blockCheckInput(const size_t height,
   if( block_w>width )
     throw ParamOutOfBoundaryError("block_w", true, block_w, 
       width); 
-  if( overlap_h<0)
-    throw ParamOutOfBoundaryError("overlap_h", false, overlap_h, 1);
   if( overlap_h>=block_h )
     throw ParamOutOfBoundaryError("overlap_h", true, overlap_h, 
       block_h); 
-  if( overlap_w<0)
-    throw ParamOutOfBoundaryError("overlap_w", false, overlap_w, 1);
   if( overlap_w>=block_w )
     throw ParamOutOfBoundaryError("overlap_w", true, overlap_w, 
       block_w); 
