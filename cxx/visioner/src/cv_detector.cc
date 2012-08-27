@@ -222,7 +222,7 @@ namespace bob { namespace visioner {
   }
   bool CVDetector::valid_output(uint64_t output) const
   {
-    return	output >= 0 && output < m_model->n_outputs();
+    return	output < m_model->n_outputs();
   }
 
   // Detect objects
