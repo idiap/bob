@@ -1,9 +1,9 @@
 /**
- * @file python/sp/src/main.cc
- * @date Tue Jan 18 17:07:26 2011 +0100
- * @author André Anjos <andre.anjos@idiap.ch>
+ * @file python/sp/src/conv.cc
+ * @date Mon Aug 27 18:00:00 2012 +0200
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * @brief Combines all modules to make up the complete bindings
+ * @brief Binds convolution options
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
@@ -20,21 +20,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/python/ndarray.h"
+#include <boost/python.hpp>
+#include "sp/conv.h"
 
-void bind_sp_version();
-void bind_sp_extrapolate();
-void bind_sp_dct();
-void bind_sp_fft();
-void bind_sp_convolution();
+using namespace boost::python;
 
-BOOST_PYTHON_MODULE(_sp) {
-
-  bob::python::setup_python("bob signal processing classes and sub-classes");
-
-  bind_sp_version();
-  bind_sp_extrapolate();
-  bind_sp_dct();
-  bind_sp_fft();
-  bind_sp_convolution();
+void bind_sp_convolution() 
+{
+  enum_<bob::sp::Conv::SizeOption>("SizeOption")
+    .value("Full", bob::sp::Conv::Full)
+    .value("Same", bob::sp::Conv::Same)
+    .value("Valid", bob::sp::Conv::Valid)
+    ; 
 }

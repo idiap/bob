@@ -6,6 +6,7 @@ set(ccsrc
    "src/extrapolate.cc"
    "src/dct.cc"
    "src/fft.cc"
+   "src/conv.cc"
    "src/main.cc"
    )
 

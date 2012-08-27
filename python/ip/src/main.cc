@@ -47,6 +47,7 @@ void bind_ip_wgaussian();
 void bind_ip_msr();
 void bind_ip_sqi();
 void bind_ip_median();
+void bind_ip_sobel();
 void bind_ip_drawing();
 void bind_ip_spatiotempgrad();
 void bind_ip_hog();
@@ -85,6 +86,7 @@ BOOST_PYTHON_MODULE(_ip) {
   bind_ip_msr();
   bind_ip_sqi();
   bind_ip_median();
+  bind_ip_sobel();
   bind_ip_drawing();
   bind_ip_spatiotempgrad();
   bind_ip_hog();

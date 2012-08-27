@@ -81,7 +81,7 @@ void bob::ip::Sobel::computeKernels()
     m_kernel_y = -1, -2, -1, 0, 0, 0, 1, 2, 1;
 
   if(m_left_positive)
-    m_kernel_x = 1, 0, -1, 2, 0, -1, 1, 0, -1;
+    m_kernel_x = 1, 0, -1, 2, 0, -2, 1, 0, -1;
   else
-    m_kernel_x = -1, 0, 1, -2, 0, 1, -1, 0, 1;
+    m_kernel_x = -1, 0, 1, -2, 0, 2, -1, 0, 1;
 }

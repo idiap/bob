@@ -18,6 +18,7 @@ set(ccsrc
    "src/gaussian.cc"
    "src/WeightedGaussian.cc"
    "src/Median.cc"
+   "src/Sobel.cc"
    "src/GaborWaveletTransform.cc"
    "src/GeomNorm.cc"
    "src/FaceEyesNorm.cc"
