@@ -24,9 +24,6 @@
 #include "ip/Gaussian.h"
 
 using namespace boost::python;
-namespace tp = bob::python;
-namespace ip = bob::ip;
-namespace ca = bob::core::array;
 
 static object py_getKernelY(const bob::ip::Gaussian& op) 
 {
@@ -59,13 +56,13 @@ static void inner_call_gs1(bob::ip::Gaussian& op,
 static void call_gs1(bob::ip::Gaussian& op, 
     bob::python::const_ndarray src, bob::python::ndarray dst) 
 {
-  const ca::typeinfo& info = src.type();
+  const bob::core::array::typeinfo& info = src.type();
   
   switch(info.nd)
   {
     case 2: 
       {
-        switch (info.dtype) {
+        switch(info.dtype) {
           case bob::core::array::t_uint8: return inner_call_gs1<uint8_t,2>(op, src, dst);
           case bob::core::array::t_uint16: return inner_call_gs1<uint16_t,2>(op, src, dst);
           case bob::core::array::t_float64: return inner_call_gs1<double,2>(op, src, dst);
@@ -76,7 +73,7 @@ static void call_gs1(bob::ip::Gaussian& op,
       break;
     case 3:
       {
-        switch (info.dtype) {
+        switch(info.dtype) {
           case bob::core::array::t_uint8: return inner_call_gs1<uint8_t,3>(op, src, dst);
           case bob::core::array::t_uint16: return inner_call_gs1<uint16_t,3>(op, src, dst);
           case bob::core::array::t_float64: return inner_call_gs1<double,3>(op, src, dst);
@@ -123,7 +120,7 @@ static object call_gs2(bob::ip::Gaussian& op,
   {
     case 2: 
       {
-        switch (info.dtype) {
+        switch(info.dtype) {
           case bob::core::array::t_uint8: return inner_call_gs2_2d<uint8_t>(op, src);
           case bob::core::array::t_uint16: return inner_call_gs2_2d<uint16_t>(op, src);
           case bob::core::array::t_float64: return inner_call_gs2_2d<double>(op, src);
@@ -134,7 +131,7 @@ static object call_gs2(bob::ip::Gaussian& op,
       break;
     case 3:
       {
-        switch (info.dtype) {
+        switch(info.dtype) {
           case bob::core::array::t_uint8: return inner_call_gs2_3d<uint8_t>(op, src);
           case bob::core::array::t_uint16: return inner_call_gs2_3d<uint16_t>(op, src);
           case bob::core::array::t_float64: return inner_call_gs2_3d<double>(op, src);
@@ -149,8 +146,8 @@ static object call_gs2(bob::ip::Gaussian& op,
 }
 
 
-
-void bind_ip_gaussian() {
+void bind_ip_gaussian() 
+{
   static const char* gaussiandoc = "This class allows after configuration to perform gaussian smoothing.";
 
   class_<bob::ip::Gaussian, boost::shared_ptr<bob::ip::Gaussian> >("Gaussian", gaussiandoc, init<optional<const size_t, const size_t, const double, const double, const bob::sp::Extrapolation::BorderType> >((arg("radius_y")=1, arg("radius_x")=1, arg("sigma_y")=sqrt(2.5), arg("sigma_x")=sqrt(2.5), arg("conv_border")=bob::sp::Extrapolation::Mirror), "Creates a gaussian smoother."))
