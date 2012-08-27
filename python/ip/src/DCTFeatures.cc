@@ -71,11 +71,17 @@ static object dct_apply2 (bob::ip::DCTFeatures& dct_features,
   }
 }
 
-void bind_ip_dctfeatures() {
-  class_<bob::ip::DCTFeatures, boost::shared_ptr<bob::ip::DCTFeatures> >("DCTFeatures", dctdoc, init<const size_t, const size_t, const size_t, const size_t, const size_t>((arg("block_h")="8", arg("block_w")="8", arg("overlap_h")="0", arg("overlap_w")="0", arg("n_dct_coefs")="15."), "Constructs a new DCT features extractor."))   
-//    .def("get_n_blocks", (const size_t (bob::ip::DCTFeatures::*)(const blitz::Array<uint8_t,2>& src))&bob::ip::DCTFeatures::getNBlocks<uint8_t>, (arg("self"),arg("input")), "Return the number of blocks generated when extracting DCT Features on the given input")
-//    .def("get_n_blocks", (const size_t (bob::ip::DCTFeatures::*)(const blitz::Array<uint16_t,2>& src))&bob::ip::DCTFeatures::getNBlocks<uint16_t>, (arg("self"),arg("input")), "Return the number of blocks generated when extracting DCT Features on the given input")
-//    .def("get_n_blocks", (const size_t (bob::ip::DCTFeatures::*)(const blitz::Array<double,2>& src))&bob::ip::DCTFeatures::getNBlocks<double>, (arg("self"),arg("input")), "Return the number of blocks generated when extracting DCT Features on the given input")
+void bind_ip_dctfeatures() 
+{
+  class_<bob::ip::DCTFeatures, boost::shared_ptr<bob::ip::DCTFeatures> >("DCTFeatures", dctdoc, init<const size_t, const size_t, const size_t, const size_t, const size_t>((arg("block_h")=8, arg("block_w")=8, arg("overlap_h")=0, arg("overlap_w")=0, arg("n_dct_coefs")=15), "Constructs a new DCT features extractor.")) 
+    .def(init<bob::ip::DCTFeatures&>(args("other")))
+    .def(self == self)
+    .def(self != self)
+    .add_property("block_h", &bob::ip::DCTFeatures::getBlockH, &bob::ip::DCTFeatures::setBlockH, "The height of each block for the block decomposition")
+    .add_property("block_w", &bob::ip::DCTFeatures::getBlockW, &bob::ip::DCTFeatures::setBlockW, "The width of each block for the block decomposition")
+    .add_property("overlap_h", &bob::ip::DCTFeatures::getOverlapH, &bob::ip::DCTFeatures::setOverlapH, "The overlap of the blocks along the y-axis")
+    .add_property("overlap_w", &bob::ip::DCTFeatures::getOverlapW, &bob::ip::DCTFeatures::setOverlapW, "The overlap of the blocks along the x-axis")
+    .add_property("n_dct_coefs", &bob::ip::DCTFeatures::getNDctCoefs, &bob::ip::DCTFeatures::setNDctCoefs, "The number of DCT coefficients")
     .def("__call__", &dct_apply, (arg("self"),arg("input")), "Call an object of this type to extract DCT features from either uint8, uint16 or double 2D arrays.")
     .def("__call__", &dct_apply2, (arg("self"), arg("blocks")), "Extract DCT features from a list of blocks.")
     ;

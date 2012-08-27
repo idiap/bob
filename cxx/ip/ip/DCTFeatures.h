@@ -69,10 +69,58 @@ namespace bob {
       }
 
       /**
+        * @brief Copy constructor
+        */
+      DCTFeatures(const DCTFeatures& other):
+        m_dct2d(new bob::sp::DCT2D(other.m_block_h, other.m_block_w)),
+        m_block_h(other.m_block_h), m_block_w(other.m_block_w), 
+        m_overlap_h(other.m_overlap_h), m_overlap_w(other.m_overlap_w),
+        m_n_dct_coefs(other.m_n_dct_coefs)
+      {
+      }
+
+      /**
         * @brief Destructor
         */
       virtual ~DCTFeatures() { }
 
+      /**
+        * @brief Assignment operator
+        */
+      DCTFeatures& operator=(const DCTFeatures& other);
+
+      /**
+        * @brief Equal to
+        */
+      bool operator==(const DCTFeatures& b) const;
+      /**
+        * @brief Not equal to
+        */
+      bool operator!=(const DCTFeatures& b) const; 
+
+      /**
+        * @brief Getters
+        */
+      size_t getBlockH() const { return m_block_h; }
+      size_t getBlockW() const { return m_block_w; }
+      size_t getOverlapH() const { return m_overlap_h; }
+      size_t getOverlapW() const { return m_overlap_w; }
+      size_t getNDctCoefs() const { return m_n_dct_coefs; }
+ 
+      /**
+        * @brief Setters
+        */
+      void setBlockH(const size_t block_h) 
+      { m_block_h = block_h; m_dct2d->setHeight(block_h); }
+      void setBlockW(const size_t block_w) 
+      { m_block_w = block_w; m_dct2d->setWidth(block_w); }
+      void setOverlapH(const size_t overlap_h) 
+      { m_overlap_h = overlap_h; }
+      void setOverlapW(const size_t overlap_w) 
+      { m_overlap_w = overlap_w; }
+      void setNDctCoefs(const size_t n_dct_coefs) 
+      { m_n_dct_coefs = n_dct_coefs; }
+ 
       /**
         * @brief Process a 2D blitz Array/Image by extracting DCT features.
         * @param src The 2D input blitz array

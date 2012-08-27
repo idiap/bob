@@ -32,6 +32,7 @@ set(src
    "src/MultiscaleRetinex.cc"
    "src/SelfQuotientImage.cc"
    "src/SpatioTemporalGradient.cc"
+   "src/DCTFeatures.cc"
 )
 
 # If we have VLFeat installed, enable the compilation of relevant modules
