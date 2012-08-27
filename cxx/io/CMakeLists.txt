@@ -5,12 +5,6 @@ cmake_minimum_required(VERSION 2.6)
 set(deps "core") #other bob subprojects
 set(shared "${HDF5_hdf5_LIBRARY_RELEASE}")
 
-# If we have google-perftools installed, enable the HAS_GOOGLE_PERFTOOLS flag,
-# so profiling extensions can be compiled in.
-if(GOOGLE_PERFTOOLS_FOUND)
-  set(shared ${shared} ${GOOGLE_PERFTOOLS_LIBRARIES})
-endif(GOOGLE_PERFTOOLS_FOUND)
-
 # This defines the list of source files inside this package.
 set(src
     "src/Exception.cc"

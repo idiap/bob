@@ -20,6 +20,12 @@ set(ccsrc_random
    )
 
 bob_python_package_bindings(core "${ccsrc}" "python_integration")
+
+if(GOOGLE_PERFTOOLS_FOUND)
+  # Special hack to get libprofiler.so linked in.
+  target_link_libraries(pybob_core ${GOOGLE_PERFTOOLS_LIBRARY})
+endif()
+
 bob_python_subpackage_bindings(core random "${ccsrc_random}"
   "python_integration")
 

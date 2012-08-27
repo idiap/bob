@@ -72,9 +72,12 @@ endmacro()
 # package: package the test belongs to
 # name: test name
 # src: test source files
+# dependencies: [optional] extra library dependencies this test may require to
+# link properly
 #
 # Example: bob_test(io array test/array.cc)
 macro(bob_test package name src)
+  
   set(testname bobtest_${package}_${name})
 
   # Please note we don't install test executables
@@ -82,6 +85,18 @@ macro(bob_test package name src)
   target_link_libraries(${testname} bob_${package} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_RELEASE})
   add_test(cxx-${package}-${name} ${testname} --log_level=test_suite)
   set_property(TEST cxx-${package}-${name} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/data")
+
+  if(${ARGC} GREATER 3)
+    set(dependencies "${ARGV3}")
+  else()
+    set(dependencies "")
+  endif()
+
+  # If dependencies were set, add them here
+  foreach(dep "${dependencies}")
+    target_link_libraries(${testname} ${dep})
+  endforeach()
+
 endmacro()
 
 # Creates a standard Bob binary application.
@@ -89,6 +104,8 @@ endmacro()
 # package: package the test belongs to
 # name: application name
 # src: test source files
+# dependencies: [optional] extra library dependencies this test may require to
+# link properly
 #
 # Example: bob_add_executable(io array test/array.cc)
 macro(bob_add_executable package name src)
@@ -99,6 +116,18 @@ macro(bob_add_executable package name src)
   target_link_libraries(${progname} bob_${package})
   
   install(TARGETS ${progname} DESTINATION bin)
+  
+  if(${ARGC} GREATER 3)
+    set(dependencies "${ARGV3}")
+  else()
+    set(dependencies "")
+  endif()
+
+  # If dependencies were set, add them here
+  foreach(dep "${dependencies}")
+    target_link_libraries(${progname} ${dep})
+  endforeach()
+
 endmacro()
 
 # Creates a standard Bob benchmark.
@@ -106,6 +135,8 @@ endmacro()
 # package: package the benchmark belongs to
 # name: benchmark name
 # src: benchmark source files
+# dependencies: [optional] extra library dependencies this test may require to
+# link properly
 #
 # Example: bob_benchmark(core bigtensor2d "benchmark/bigtensor2d.cc")
 macro(bob_benchmark package name src)
@@ -114,6 +145,17 @@ macro(bob_benchmark package name src)
 
   add_executable(${progname} ${src})
   target_link_libraries(${progname} bob_${package})
+  
+  if(${ARGC} GREATER 3)
+    set(dependencies "${ARGV3}")
+  else()
+    set(dependencies "")
+  endif()
+
+  # If dependencies were set, add them here
+  foreach(dep "${dependencies}")
+    target_link_libraries(${progname} ${dep})
+  endforeach()
 endmacro()
 
 #################
@@ -491,7 +533,7 @@ macro(bob_python_package cxx_package package cxx_src pydependencies)
     set(pybin "${CMAKE_BINARY_DIR}/bin/egg-build")
     set(pysetup "${CMAKE_BINARY_DIR}/egg/setup-build.py")
     get_filename_component(basedir ${pysetup} PATH)
-    add_custom_target(egg ALL mkdir -pv ${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES} COMMAND ${pybin} ${pysetup} build --force --build-base=files-build install --prefix=${CMAKE_BINARY_DIR} WORKING_DIRECTORY ${basedir} WORKING_DIRECTORY ${basedir})
+    add_custom_target(egg ALL mkdir -pv ${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES} COMMAND ${pybin} ${pysetup} build --force --build-base=files-build install --prefix=${CMAKE_BINARY_DIR} --record=record-build.txt --single-version-externally-managed WORKING_DIRECTORY ${basedir} WORKING_DIRECTORY ${basedir})
   endif()
 
   add_dependencies(egg pybob_${package})

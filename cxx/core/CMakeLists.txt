@@ -3,22 +3,13 @@ cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
 set(deps "") #other bob subprojects
-set(shared ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE}
-           ${Boost_FILESYSTEM_LIBRARY_RELEASE}
-           ${Boost_IOSTREAMS_LIBRARY_RELEASE} ${Boost_DATE_TIME_LIBRARY_RELEASE}
-           ${Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE})
+set(shared ${Boost_SYSTEM_LIBRARY_RELEASE};${Boost_FILESYSTEM_LIBRARY_RELEASE};${Boost_IOSTREAMS_LIBRARY_RELEASE};${Boost_THREAD_LIBRARY_RELEASE})
 
 string(TOLOWER "${CMAKE_BUILD_TYPE}" LOWER_BUILD_TYPE)
 # also add a dependency to Blitz in debug mode (needed to enable the -BZ_BLITZ debugging mode)
 if("${LOWER_BUILD_TYPE}" STREQUAL "debug")
   set(shared ${shared} ${Blitz_LIBRARIES})
 endif()
-
-# If we have google-perftools installed, enable the HAS_GOOGLE_PERFTOOLS flag,
-# so profiling extensions can be compiled in.
-if(GOOGLE_PERFTOOLS_FOUND)
-  set(shared ${shared} ${GOOGLE_PERFTOOLS_LIBRARIES})
-endif(GOOGLE_PERFTOOLS_FOUND)
 
 # This defines the list of source files inside this package.
 set(src
@@ -48,5 +39,5 @@ if((${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
 endif((${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
 
 # Defines benchmarks we make available
-bob_benchmark(core bigtensor2d "benchmark/bigtensor2d.cc")
+bob_benchmark(core bigtensor2d "benchmark/bigtensor2d.cc" "${Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE}")
 bob_example_install("cxx" "core" "benchmark/bigtensor2d.cc")
