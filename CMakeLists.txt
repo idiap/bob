@@ -88,7 +88,7 @@ endif()
 
 # Cache into CMake
 set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_CXX_FLAGS} ${COMMON_FLAGS} ${COMMON_RELEASE_FLAGS}" CACHE STRING "Flags used by the compiler during release builds" FORCE)
-set(CMAKE_C_FLAGS_RELEASE "${COMMON_CXX_FLAGS} ${COMMON_FLAGS} ${COMMON_RELEASE_FLAGS}" CACHE STRING "Flags used by the compiler during release builds" FORCE)
+set(CMAKE_C_FLAGS_RELEASE "${COMMON_C_FLAGS} ${COMMON_FLAGS} ${COMMON_RELEASE_FLAGS}" CACHE STRING "Flags used by the compiler during release builds" FORCE)
 set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_CXX_FLAGS} ${COMMON_FLAGS} ${COMMON_DEBUG_FLAGS}" CACHE STRING "Flags used by the compiler during release builds" FORCE)
 set(CMAKE_C_FLAGS_DEBUG "${COMMON_C_FLAGS} ${COMMON_FLAGS} ${COMMON_DEBUG_FLAGS}" CACHE STRING "Flags used by the compiler during release builds" FORCE)
 
