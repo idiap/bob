@@ -29,10 +29,9 @@
 bob::ip::VLDSIFT::VLDSIFT(const size_t height, const size_t width, 
   const size_t step, const size_t block_size):
     m_height(height), m_width(width), m_step_y(step), m_step_x(step),
-    m_block_size_y(block_size), m_block_size_x(block_size),
-    m_use_flat_window(false)
+    m_block_size_y(block_size), m_block_size_x(block_size)
 {
-  allocateAndSet();
+  allocateAndInit();
 }
 
 
@@ -151,6 +150,13 @@ void bob::ip::VLDSIFT::allocate()
   // Generates the filter
   m_filt = vl_dsift_new_basic((int)m_width, (int)m_height, (int)m_step_y, 
             (int)m_block_size_y);
+}
+
+void bob::ip::VLDSIFT::allocateAndInit()
+{
+  allocate();
+  m_use_flat_window = vl_dsift_get_flat_window(m_filt);
+  m_window_size = vl_dsift_get_window_size(m_filt);
 }
 
 void bob::ip::VLDSIFT::setFilterProperties()

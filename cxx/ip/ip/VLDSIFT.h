@@ -144,6 +144,10 @@ namespace bob {
           */
         void setFilterProperties(); 
         /**
+          * @brief Allocate and initialize the properties
+          */
+        void allocateAndInit();
+        /**
           * @brief Reallocate and resets the properties of the VLfeat objects
           */
         void allocateAndSet();
