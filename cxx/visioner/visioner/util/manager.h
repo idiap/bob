@@ -63,7 +63,7 @@ namespace bob { namespace visioner {
         if (it == m_prototypes.end()) {
           boost::format m("The manager cannot find object with id='%s'");
           m % id;
-          throw std::runtime_error(m.str().c_str());
+          throw std::runtime_error(m.str());
         }
         return it->second->clone();
       }

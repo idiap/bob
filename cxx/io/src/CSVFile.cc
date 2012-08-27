@@ -70,7 +70,7 @@ class CSVFile: public io::File {
         else if (entries != size) {
           boost::format m("line %d at file '%s' contains %d entries instead of %d (expected)");
           m % line_number % m_filename % size % entries;
-          throw std::runtime_error(m.str().c_str());
+          throw std::runtime_error(m.str());
         }
       }
 
@@ -105,7 +105,7 @@ class CSVFile: public io::File {
           if (!m_file.is_open()) {
             boost::format m("cannot open file '%s' for reading or appending");
             m % path;
-            throw std::runtime_error(m.str().c_str());
+            throw std::runtime_error(m.str());
           }
 
           peek(); ///< peek file properties
@@ -116,7 +116,7 @@ class CSVFile: public io::File {
           if (!m_file.is_open()) {
             boost::format m("cannot open file '%s' for writing");
             m % path;
-            throw std::runtime_error(m.str().c_str());
+            throw std::runtime_error(m.str());
           }
 
           m_newfile = true;
@@ -180,7 +180,7 @@ class CSVFile: public io::File {
       if (index >= m_pos.size()) {
         boost::format m("cannot array at position %d -- there is only %d entries at file '%s'");
         m % index % m_pos.size() % m_filename;
-        throw std::runtime_error(m.str().c_str());
+        throw std::runtime_error(m.str());
       }
 
       //reads a specific line from the file.
@@ -190,7 +190,7 @@ class CSVFile: public io::File {
       if (!std::getline(m_file, line)) {
         boost::format m("could not seek to line %u (offset %u) while reading file '%s'");
         m % index % m_pos[index] % m_filename;
-        throw std::runtime_error(m.str().c_str());
+        throw std::runtime_error(m.str());
       }
       Tokenizer tok(line);
       double* p = static_cast<double*>(buffer.ptr());
@@ -208,7 +208,7 @@ class CSVFile: public io::File {
         if (type.nd != 1 || type.dtype != bob::core::array::t_float64) {
           boost::format m("cannot append %s to file '%s' - CSV files only accept 1D double precision float arrays");
           m % type.str() % m_filename;
-          throw std::runtime_error(m.str().c_str());
+          throw std::runtime_error(m.str());
         }
         m_pos.clear();
         m_arrayset_type = m_array_type = type;
@@ -222,7 +222,7 @@ class CSVFile: public io::File {
         if (!m_arrayset_type.is_compatible(buffer.type())) {
           boost::format m("CSV file '%s' only accepts arrays of type %s");
           m % m_filename % m_arrayset_type.str();
-          throw std::runtime_error(m.str().c_str());
+          throw std::runtime_error(m.str());
         }
 
       }
@@ -246,7 +246,7 @@ class CSVFile: public io::File {
         if (type.nd != 2 || type.dtype != bob::core::array::t_float64) {
           boost::format m("cannot write %s to file '%s' - CSV files only accept a single 2D double precision float array as input");
           m % type.str() % m_filename;
-          throw std::runtime_error(m.str().c_str());
+          throw std::runtime_error(m.str());
         }
         const double* p = static_cast<const double*>(buffer.ptr());
         for (size_t l=1; l<type.shape[0]; ++l) {

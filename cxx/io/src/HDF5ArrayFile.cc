@@ -107,7 +107,7 @@ class HDF5ArrayFile: public io::File {
       if(m_newfile) {
         boost::format f("uninitialized HDF5 file at '%s' cannot be read");
         f % m_filename;
-        throw std::runtime_error(f.str().c_str());
+        throw std::runtime_error(f.str());
       }
 
       if(!buffer.type().is_compatible(m_type_array)) buffer.set(m_type_array);
@@ -120,7 +120,7 @@ class HDF5ArrayFile: public io::File {
       if(m_newfile) {
         boost::format f("uninitialized HDF5 file at '%s' cannot be read");
         f % m_filename;
-        throw std::runtime_error(f.str().c_str());
+        throw std::runtime_error(f.str());
       }
 
       if(!buffer.type().is_compatible(m_type_arrayset)) buffer.set(m_type_arrayset);
@@ -153,7 +153,7 @@ class HDF5ArrayFile: public io::File {
       if (!m_newfile) {
         boost::format f("cannot perform single (array-style) write on file/dataset at '%s' that have already been initialized -- try to use a new file");
         f % m_filename;
-        throw std::runtime_error(f.str().c_str());
+        throw std::runtime_error(f.str());
       }
 
       m_newfile = false;

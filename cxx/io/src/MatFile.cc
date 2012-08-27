@@ -106,7 +106,7 @@ class MatFile: public io::File {
       if (!mat) {
         boost::format f("uninitialized matlab file (%s) cannot be read");
         f % m_filename;
-        throw std::runtime_error(f.str().c_str());
+        throw std::runtime_error(f.str());
       }
 
       io::detail::read_array(mat, buffer);
@@ -125,7 +125,7 @@ class MatFile: public io::File {
       if (!mat) {
         boost::format f("uninitialized matlab file (%s) cannot be read");
         f % m_filename;
-        throw std::runtime_error(f.str().c_str());
+        throw std::runtime_error(f.str());
       }
 
       io::detail::read_array(mat, buffer, (*m_map)[m_id[index]].first);
@@ -144,14 +144,14 @@ class MatFile: public io::File {
       if (!mat) {
         boost::format f("cannot open matlab file at '%s' for writing");
         f % m_filename;
-        throw std::runtime_error(f.str().c_str());
+        throw std::runtime_error(f.str());
       }
 
       //checks typing is right
       if (m_type.is_valid() && !m_type.is_compatible(buffer.type())) {
         boost::format f("cannot append with different buffer type (%s) than the one already initialized (%s)");
         f % buffer.type().str() % m_type.str();
-        throw std::invalid_argument(f.str().c_str());
+        throw std::invalid_argument(f.str());
       }
 
       //all is good at this point, just write it. 
@@ -190,7 +190,7 @@ class MatFile: public io::File {
       if (!mat) {
         boost::format f("cannot open matlab file at '%s' for writing");
         f % m_filename;
-        throw std::runtime_error(f.str().c_str());
+        throw std::runtime_error(f.str());
       }
 
       io::detail::write_array(mat, varname, buffer);

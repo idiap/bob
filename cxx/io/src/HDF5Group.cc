@@ -121,7 +121,7 @@ h5::Group::Group(boost::shared_ptr<Group> parent,
   if (!m_name.size() || m_name == "." || m_name == "..") {
     boost::format m("Cannot create group with illegal name `%s' at `%s'");
     m % name % url();
-    throw std::runtime_error(m.str().c_str());
+    throw std::runtime_error(m.str());
   }
 }
 
@@ -185,7 +185,7 @@ boost::shared_ptr<h5::Group> h5::Group::cd(const std::string& dir) {
       if (!m_name.size()) { //this is the root group already
         boost::format m("Cannot go beyond root directory at file `%s'");
         m % file()->filename();
-        throw std::runtime_error(m.str().c_str());
+        throw std::runtime_error(m.str());
       }
       //else, just return its parent
       return parent();
@@ -193,7 +193,7 @@ boost::shared_ptr<h5::Group> h5::Group::cd(const std::string& dir) {
     if (!has_group(dir)) {
       boost::format m("Cannot find group `%s' at `%s'");
       m % dir % url();
-      throw std::runtime_error(m.str().c_str());
+      throw std::runtime_error(m.str());
     }
     //else, just return the named group
     return m_groups[dir];
@@ -206,7 +206,7 @@ boost::shared_ptr<h5::Group> h5::Group::cd(const std::string& dir) {
   if (!has_group(mydir)) {
     boost::format m("Cannot find group `%s' at `%s'");
     m % dir % url();
-    throw std::runtime_error(m.str().c_str());
+    throw std::runtime_error(m.str());
   }
 
   //else, just recurse to the next group
@@ -223,7 +223,7 @@ boost::shared_ptr<h5::Dataset> h5::Group::operator[] (const std::string& dir) {
     if (!has_dataset(dir)) {
       boost::format m("Cannot find dataset `%s' at `%s'");
       m % dir % url();
-      throw std::runtime_error(m.str().c_str());
+      throw std::runtime_error(m.str());
     }
     return m_datasets[dir];
   }

@@ -74,7 +74,7 @@ void io::Arrayset::add (const io::Array& array) {
   if (!m_info.is_compatible(array.type())) {
     boost::format s("input array type (%s) is incompatible with this arrayset of type '%s'");
     s % array.type().str() % m_info.str();
-    throw std::invalid_argument(s.str().c_str());
+    throw std::invalid_argument(s.str());
   }
   m_data.push_back(array);
 
@@ -88,7 +88,7 @@ void io::Arrayset::set (size_t id, const Array& array) {
   if (!m_info.is_compatible(array.type())) {
     boost::format s("input array type (%s) is incompatible with this arrayset of type '%s'");
     s % array.type().str() % m_info.str();
-    throw std::invalid_argument(s.str().c_str());
+    throw std::invalid_argument(s.str());
   }
 
   m_data[id] = array;

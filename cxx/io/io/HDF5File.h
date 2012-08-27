@@ -273,7 +273,7 @@ namespace bob { namespace io {
         if (!m_file->writeable()) {
           boost::format m("cannot replace value at dataset '%s' at path '%s' of file '%s' because it is not writeable");
           m % path % m_cwd->path() % m_file->filename();
-          throw std::runtime_error(m.str().c_str());
+          throw std::runtime_error(m.str());
         }
         (*m_cwd)[path]->replace(pos, value);
       }
@@ -297,7 +297,7 @@ namespace bob { namespace io {
         if (!m_file->writeable()) {
           boost::format m("cannot replace array at dataset '%s' at path '%s' of file '%s' because it is not writeable");
           m % path % m_cwd->path() % m_file->filename();
-          throw std::runtime_error(m.str().c_str());
+          throw std::runtime_error(m.str());
         }
         (*m_cwd)[path]->replaceArray(pos, value);
       }
@@ -321,7 +321,7 @@ namespace bob { namespace io {
         if (!m_file->writeable()) {
           boost::format m("cannot append value to dataset '%s' at path '%s' of file '%s' because it is not writeable");
           m % path % m_cwd->path() % m_file->filename();
-          throw std::runtime_error(m.str().c_str());
+          throw std::runtime_error(m.str());
         }
         if (!contains(path)) m_cwd->create_dataset(path, bob::io::HDF5Type(value), true, 0);
         (*m_cwd)[path]->add(value);
@@ -342,7 +342,7 @@ namespace bob { namespace io {
         if (!m_file->writeable()) {
           boost::format m("cannot append array to dataset '%s' at path '%s' of file '%s' because it is not writeable");
           m % path % m_cwd->path() % m_file->filename();
-          throw std::runtime_error(m.str().c_str());
+          throw std::runtime_error(m.str());
         }
         if (!contains(path)) m_cwd->create_dataset(path, bob::io::HDF5Type(value), true, compression);
         (*m_cwd)[path]->addArray(value);
@@ -357,7 +357,7 @@ namespace bob { namespace io {
         if (!m_file->writeable()) {
           boost::format m("cannot set value at dataset '%s' at path '%s' of file '%s' because it is not writeable");
           m % path % m_cwd->path() % m_file->filename();
-          throw std::runtime_error(m.str().c_str());
+          throw std::runtime_error(m.str());
         }
         if (!contains(path)) m_cwd->create_dataset(path, bob::io::HDF5Type(value), false, 0);
         (*m_cwd)[path]->replace(0, value);
@@ -379,7 +379,7 @@ namespace bob { namespace io {
         if (!m_file->writeable()) {
           boost::format m("cannot set array at dataset '%s' at path '%s' of file '%s' because it is not writeable");
           m % path % m_cwd->path() % m_file->filename();
-          throw std::runtime_error(m.str().c_str());
+          throw std::runtime_error(m.str());
         }
         if (!contains(path)) m_cwd->create_dataset(path, bob::io::HDF5Type(value), false, compression);
         (*m_cwd)[path]->replaceArray(0, value);

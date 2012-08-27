@@ -75,7 +75,7 @@ namespace bob { namespace visioner {
             ifiles.empty() || ifiles.size() != gfiles.size()) {
           boost::format m("Failed to load the dataset list '%s'");
           m % data;
-          throw std::runtime_error(m.str().c_str());
+          throw std::runtime_error(m.str());
         }
 
         this->load(ifiles, gfiles);
@@ -178,7 +178,7 @@ namespace bob { namespace visioner {
     if (threads > m_rgens.size()) {
       boost::format m("Sampling with a number of threads (%d) greater than the initially specified maximum (%d) cannot be done.");
       m % threads % m_rgens.size();
-      throw std::runtime_error(m.str().c_str());
+      throw std::runtime_error(m.str());
     }
 
     //computes the uniform sampling probabilities
@@ -239,7 +239,7 @@ namespace bob { namespace visioner {
     if (threads > m_rgens.size()) {
       boost::format m("Sampling with a number of threads (%d) greater than the initially specified maximum (%d) cannot be done.");
       m % threads % m_rgens.size();
-      throw std::runtime_error(m.str().c_str());
+      throw std::runtime_error(m.str());
     }
 
     //splits the computation (compute the error for each sample)
@@ -323,7 +323,7 @@ namespace bob { namespace visioner {
     if (threads > m_rgens.size()) {
       boost::format m("Sample mapping with a number of threads (%d) greater than the initially specified maximum (%d) cannot be done.");
       m % threads % m_rgens.size();
-      throw std::runtime_error(m.str().c_str());
+      throw std::runtime_error(m.str());
     }
 
     std::vector<uint64_t> samples = _samples;

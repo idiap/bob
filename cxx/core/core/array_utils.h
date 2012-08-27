@@ -63,13 +63,13 @@ namespace bob { namespace core { namespace array {
     if (type.dtype != bob::core::array::getElementType<T>()) {
       boost::format m("cannot efficiently retrieve blitz::Array<%s,%d> from buffer of type '%s'");
       m % stringize<T>() % N % type.str();
-      throw std::runtime_error(m.str().c_str());
+      throw std::runtime_error(m.str());
     }
 
     if (type.nd != N) {
       boost::format m("cannot retrieve blitz::Array<%s,%d> from buffer of type '%s'");
       m % stringize<T>() % N % type.str();
-      throw std::runtime_error(m.str().c_str());
+      throw std::runtime_error(m.str());
     }
           
     blitz::TinyVector<int,N> shape;
@@ -98,7 +98,7 @@ namespace bob { namespace core { namespace array {
     if (type.nd != N) {
       boost::format m("cannot cast blitz::Array<%s,%d> from buffer of type '%s'");
       m % stringize<T>() % N % type.str();
-      throw std::runtime_error(m.str().c_str());
+      throw std::runtime_error(m.str());
     }
 
     switch (type.dtype) {

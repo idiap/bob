@@ -103,7 +103,7 @@ static boost::shared_ptr<hid_t> open_attribute
   if (expected != t) {
     boost::format m("Trying to access attribute '%s' with incompatible buffer - expected `%s', but you gave me `%s'");
     m % name % expected.type_str() % t.type_str();
-    throw std::runtime_error(m.str().c_str());
+    throw std::runtime_error(m.str());
   }
 
   return retval;

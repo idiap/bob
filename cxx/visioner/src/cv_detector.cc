@@ -149,13 +149,13 @@ namespace bob { namespace visioner {
       if (Model::load(model, m_model) == false) {
         boost::format m("failed to load model from file '%s'");
         m % model;
-        throw std::runtime_error(m.str().c_str());
+        throw std::runtime_error(m.str());
       }
 
       if (valid_model() == false) {
         boost::format m("the model loaded from file '%s' is not valid");
         m % model;
-        throw std::runtime_error(m.str().c_str());
+        throw std::runtime_error(m.str());
       }
 
       param_t _param = param();

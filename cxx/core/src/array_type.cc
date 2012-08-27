@@ -79,7 +79,7 @@ size_t ca::getElementSize(ElementType t) {
       {
         boost::format m("unsupported element type (%d)");
         m % (int)t;
-        throw std::runtime_error(m.str().c_str());
+        throw std::runtime_error(m.str());
       }
   }
 }

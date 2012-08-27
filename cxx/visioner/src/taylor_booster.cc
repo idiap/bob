@@ -105,22 +105,22 @@ namespace bob { namespace visioner {
     if (t_data.n_outputs() < 1) {
       boost::format m("Number of outputs in training set is %d (< 1)");
       m % t_data.n_outputs();
-      throw std::runtime_error(m.str().c_str());
+      throw std::runtime_error(m.str());
     }
     if (t_data.n_features() < 1) {
       boost::format m("Number of features in training set is %d (< 1)");
       m % t_data.n_features();
-      throw std::runtime_error(m.str().c_str());
+      throw std::runtime_error(m.str());
     }
     if (t_data.n_outputs() != v_data.n_outputs()) {
       boost::format m("Number of outputs in training set (%d) is different than the one on the validation set (%d)");
       m % t_data.n_outputs() % v_data.n_outputs();
-      throw std::runtime_error(m.str().c_str());
+      throw std::runtime_error(m.str());
     }
     if (t_data.n_features() != v_data.n_features()) {
       boost::format m("Number of features in training set (%d) is different than the one on the validation set (%d)");
       m % t_data.n_features() % v_data.n_features();
-      throw std::runtime_error(m.str().c_str());
+      throw std::runtime_error(m.str());
     }
 
     TDEBUG1("Using " << t_data.n_samples() << " training and "

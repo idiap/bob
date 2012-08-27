@@ -653,7 +653,7 @@ void io::HDF5Type::copy_to (bob::core::array::typeinfo& ti) const {
   if (ti.nd > (BOB_MAX_DIM+1)) {
     boost::format f("HDF5 type has more (%d) than the allowed maximum number of dimensions (%d)");
     f % ti.nd % (BOB_MAX_DIM+1);
-    throw std::runtime_error(f.str().c_str());
+    throw std::runtime_error(f.str());
   }
   for (size_t i=0; i<ti.nd; ++i) ti.shape[i] = shape()[i];
   ti.update_strides();

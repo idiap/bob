@@ -49,7 +49,7 @@ static boost::shared_ptr<hid_t> open_dataset
   if (!name.size() || name == "." || name == "..") {
     boost::format m("Cannot open dataset with illegal name `%s' at `%s:%s'");
     m % name % par->file()->filename() % par->path();
-    throw std::runtime_error(m.str().c_str());
+    throw std::runtime_error(m.str());
   }
 
   boost::shared_ptr<hid_t> retval(new hid_t(-1),
@@ -235,7 +235,7 @@ static void create_dataset (boost::shared_ptr<h5::Group> par,
   if (!name.size() || name == "." || name == "..") {
     boost::format m("Cannot create dataset with illegal name `%s' at `%s:%s'");
     m % name % par->file()->filename() % par->path();
-    throw std::runtime_error(m.str().c_str());
+    throw std::runtime_error(m.str());
   }
 
   io::HDF5Shape xshape(type.shape());

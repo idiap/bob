@@ -70,7 +70,7 @@ void io::CodecRegistry::registerExtension(const std::string& extension,
   else {
     boost::format m("extension already registered: %s");
     m % extension;
-    throw std::runtime_error(m.str().c_str());
+    throw std::runtime_error(m.str());
   }
 
 }
@@ -87,7 +87,7 @@ io::file_factory_t io::CodecRegistry::findByExtension
   if (it == s_extension2codec.end()) {
     boost::format m("unregistered extension: %s");
     m % lower_extension;
-    throw std::runtime_error(m.str().c_str());
+    throw std::runtime_error(m.str());
   }
 
   return it->second;

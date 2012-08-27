@@ -133,7 +133,7 @@ namespace bob { namespace visioner {
       boost::format m("The number of scales for image file '%s' is empty. Relevant parameters are model shape: %d x %d; image shape: %d x %d, sliding windows: %d");
       m % ifile % m_param.m_rows % m_param.m_cols;
       m % tmp_image.rows() % tmp_image.cols() % m_param.m_ds;
-      throw std::runtime_error(m.str().c_str());
+      throw std::runtime_error(m.str());
     }
 
     m_ipscales.resize(scales.size());
@@ -144,7 +144,7 @@ namespace bob { namespace visioner {
     if (visioner::Object::load(gfile, m_ipscales[0].m_objects) == false) {
       boost::format m("The ground-thruth file '%s' could not be loaded");
       m % gfile;
-      throw std::runtime_error(m.str().c_str());
+      throw std::runtime_error(m.str());
     }
     m_ipscales[0].m_image = tmp_image;
     update_ipscale(m_ipscales[0], m_param);

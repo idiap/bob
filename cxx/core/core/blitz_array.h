@@ -224,13 +224,13 @@ namespace bob { namespace core { namespace array {
           if (m_type.dtype != getElementType<T>()) {
             boost::format m("cannot efficiently retrieve blitz::Array<%s,%d> from buffer of type '%s'");
             m % stringize<T>() % N % m_type.str();
-            throw std::runtime_error(m.str().c_str());
+            throw std::runtime_error(m.str());
           }
           
           if (m_type.nd != N) {
             boost::format m("cannot retrieve blitz::Array<%s,%d> from buffer of type '%s'");
             m % stringize<T>() % N % m_type.str();
-            throw std::runtime_error(m.str().c_str());
+            throw std::runtime_error(m.str());
           }
           
           return *boost::static_pointer_cast<blitz::Array<T,N> >(m_data).get();

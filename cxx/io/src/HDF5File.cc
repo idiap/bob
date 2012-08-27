@@ -71,7 +71,7 @@ void io::HDF5File::createGroup(const std::string& path) {
   if (!m_file->writeable()) {
     boost::format m("cannot create group '%s' at path '%s' of file '%s' because it is not writeable");
     m % path % m_cwd->path() % m_file->filename();
-    throw std::runtime_error(m.str().c_str());
+    throw std::runtime_error(m.str());
   }
   m_cwd->create_group(path);
 }
@@ -88,7 +88,7 @@ void io::HDF5File::setVersion(uint64_t version) {
   if (!m_file->writeable()) {
     boost::format m("cannot set version at path '%s' of file '%s' because it is not writeable");
     m % m_cwd->path() % m_file->filename();
-    throw std::runtime_error(m.str().c_str());
+    throw std::runtime_error(m.str());
   }
   m_cwd->set_attribute("version", version);
 }
@@ -97,7 +97,7 @@ void io::HDF5File::removeVersion() {
   if (!m_file->writeable()) {
     boost::format m("cannot remove version at path '%s' of file '%s' because it is not writeable");
     m % m_cwd->path() % m_file->filename();
-    throw std::runtime_error(m.str().c_str());
+    throw std::runtime_error(m.str());
   }
   m_cwd->delete_attribute("version");
 }
@@ -119,7 +119,7 @@ void io::HDF5File::unlink (const std::string& path) {
   if (!m_file->writeable()) {
     boost::format m("cannot remove dataset at path '%s' of file '%s' because it is not writeable");
     m % path % m_cwd->path() % m_file->filename();
-    throw std::runtime_error(m.str().c_str());
+    throw std::runtime_error(m.str());
   }
   m_cwd->remove_dataset(path);
 }
@@ -128,7 +128,7 @@ void io::HDF5File::rename (const std::string& from, const std::string& to) {
   if (!m_file->writeable()) {
     boost::format m("cannot rename dataset '%s' -> '%s' at path '%s' of file '%s' because it is not writeable");
     m % from % to % m_cwd->path() % m_file->filename();
-    throw std::runtime_error(m.str().c_str());
+    throw std::runtime_error(m.str());
   }
   m_cwd->rename_dataset(from, to);
   std::string current_path = m_cwd->path();
@@ -141,7 +141,7 @@ void io::HDF5File::copy (HDF5File& other) {
   if (!m_file->writeable()) {
     boost::format m("cannot copy data of file '%s' to path '%s' of file '%s' because it is not writeable");
     m % other.filename() % m_cwd->path() % m_file->filename();
-    throw std::runtime_error(m.str().c_str());
+    throw std::runtime_error(m.str());
   }
 
   //groups
@@ -166,7 +166,7 @@ void io::HDF5File::create (const std::string& path, const ca::typeinfo& ti,
   if (!m_file->writeable()) {
     boost::format m("cannot create dataset '%s' at path '%s' of file '%s' because it is not writeable");
     m % path % m_cwd->path() % m_file->filename();
-    throw std::runtime_error(m.str().c_str());
+    throw std::runtime_error(m.str());
   }
   if (!contains(path)) m_cwd->create_dataset(path, ti, list, compression);
   else (*m_cwd)[path]->size(io::HDF5Type(ti));
@@ -182,7 +182,7 @@ void io::HDF5File::write_buffer (const std::string& path,
   if (!m_file->writeable()) {
     boost::format m("cannot write to object '%s' at path '%s' of file '%s' because it is not writeable");
     m % path % m_cwd->path() % m_file->filename();
-    throw std::runtime_error(m.str().c_str());
+    throw std::runtime_error(m.str());
   }
   (*m_cwd)[path]->write_buffer(pos, io::HDF5Type(b.type()), b.ptr());
 }
@@ -192,7 +192,7 @@ void io::HDF5File::extend_buffer(const std::string& path,
   if (!m_file->writeable()) {
     boost::format m("cannot extend object '%s' at path '%s' of file '%s' because it is not writeable");
     m % path % m_cwd->path() % m_file->filename();
-    throw std::runtime_error(m.str().c_str());
+    throw std::runtime_error(m.str());
   }
   (*m_cwd)[path]->extend_buffer(io::HDF5Type(b.type()), b.ptr());
 }

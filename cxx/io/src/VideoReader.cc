@@ -271,7 +271,7 @@ size_t io::VideoReader::load(ca::interface& b,
   if (!m_typeinfo_video.is_compatible(b.type())) {
     boost::format s("input buffer (%s) does not conform to the video size specifications (%s)");
     s % b.type().str() % m_typeinfo_video.str();
-    throw std::invalid_argument(s.str().c_str());
+    throw std::invalid_argument(s.str());
   }
 
   unsigned long int frame_size = m_typeinfo_frame.buffer_size();
@@ -534,7 +534,7 @@ bool io::VideoReader::const_iterator::read(ca::interface& data,
     if (throw_on_error) {
       boost::format m("you are trying to read past the file end (next frame no. to be read would be %d) on file %s, which contains only %d frames");
       m % m_current_frame % m_parent->m_filepath % m_parent->m_nframes;
-      throw std::runtime_error(m.str().c_str());
+      throw std::runtime_error(m.str());
     }
     
     reset();
@@ -548,7 +548,7 @@ bool io::VideoReader::const_iterator::read(ca::interface& data,
   if (!info.is_compatible(m_parent->m_typeinfo_frame)) {
     boost::format s("input buffer (%s) does not conform to the video frame size specifications (%s)");
     s % info.str() % m_parent->m_typeinfo_frame.str();
-    throw std::invalid_argument(s.str().c_str());
+    throw std::invalid_argument(s.str());
   }
 
   int gotPicture = 0;
@@ -637,7 +637,7 @@ bool io::VideoReader::const_iterator::read(ca::interface& data,
         if (throw_on_error) {
           boost::format m("ffmpeg/av_read_frame() returned an error (%d) reading frame %d of file '%s' which contains %d frames - truncating file at this point.");
           m % av_error % m_current_frame % m_parent->m_filepath % m_parent->m_nframes;
-          throw std::runtime_error(m.str().c_str());
+          throw std::runtime_error(m.str());
         }
       }
 
@@ -654,7 +654,7 @@ bool io::VideoReader::const_iterator::read(ca::interface& data,
       if (throw_on_error) {
         boost::format m("ffmpeg/sws_scale() returned a number of lines read (%d) for frame %d that does not match the expected height (%d) of file '%s' which contains %d frames (you can continue to read the file, I'm not truncating it)");
         m % sws_height % m_current_frame % m_parent->height() % m_parent->m_nframes;
-        throw std::runtime_error(m.str().c_str());
+        throw std::runtime_error(m.str());
       }
       return false;
 

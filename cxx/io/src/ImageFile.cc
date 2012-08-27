@@ -77,7 +77,7 @@ static void im_peek(const std::string& path, ca::typeinfo& info) {
   else {
     boost::format m("unsupported image depth (%d) when reading file");
     m % image.depth();
-    throw std::runtime_error(m.str().c_str());
+    throw std::runtime_error(m.str());
   }
 }
 
@@ -234,7 +234,7 @@ class ImageFile: public io::File {
           catch (Magick::Exception &error_) {
             boost::format m("file '%s' is not readable; ImageMagick-%s reports: %s");
             m % path % MagickLibVersionText % error_.what();
-            throw std::runtime_error(m.str().c_str());
+            throw std::runtime_error(m.str());
           }
         }
         else {
@@ -288,7 +288,7 @@ class ImageFile: public io::File {
       catch( Magick::Exception &error_ ) {
         boost::format m("file '%s' is not readable; ImageMagick-%s reports: %s");
         m % m_filename % MagickLibVersionText % error_.what();
-        throw std::runtime_error(m.str().c_str());
+        throw std::runtime_error(m.str());
       }
 
     }

@@ -137,7 +137,7 @@ static boost::shared_ptr<svm_problem> data2problem
   if ((data.size() <= 1) | (data.size() > 16)) {
     boost::format m("Only supports SVMs for binary or multi-class classification problems (up to 16 classes). You passed me a list of %d arraysets.");
     m % data.size();
-    throw std::runtime_error(m.str().c_str());
+    throw std::runtime_error(m.str());
   }
 
   std::vector<double> labels;
@@ -254,7 +254,7 @@ boost::shared_ptr<bob::machine::SupportVector> trainer::SVMTrainer::train
     const_cast<double&>(m_param.gamma) = save_gamma;
     boost::format m("libsvm-%d reports: %s");
     m % libsvm_version % error_msg;
-    std::runtime_error(m.str().c_str());
+    std::runtime_error(m.str());
   }
 
   //do the training, returns the new machine
@@ -263,7 +263,7 @@ boost::shared_ptr<bob::machine::SupportVector> trainer::SVMTrainer::train
 #else
   boost::format m("libsvm-%d does not support debugging stream setting");
   m % libsvm_version;
-  debug_libsvm(m.str().c_str());
+  debug_libsvm(m.str());
 #endif
   boost::shared_ptr<svm_model> model(svm_train(problem.get(), &m_param),
       std::ptr_fun(svm_model_free));

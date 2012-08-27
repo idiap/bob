@@ -100,7 +100,7 @@ static enum matio_classes mio_class_type (ca::ElementType i) {
       {
         boost::format f("data type '%s' is not supported by matio backend");
         f % ca::stringize(i);
-        throw std::invalid_argument(f.str().c_str());
+        throw std::invalid_argument(f.str());
       }
   }
 }
@@ -138,7 +138,7 @@ static enum matio_types mio_data_type (ca::ElementType i) {
       {
         boost::format f("data type '%s' is not supported by matio backend");
         f % ca::stringize(i);
-        throw std::invalid_argument(f.str().c_str());
+        throw std::invalid_argument(f.str());
       }
   }
 }

@@ -50,7 +50,7 @@ mach::SVMFile::SVMFile (const std::string& filename):
   if (!m_file) {
     boost::format s("cannot open file '%s'");
     s % filename;
-    throw std::runtime_error(s.str().c_str());
+    throw std::runtime_error(s.str());
   }
   
   //scan the whole file, gets the shape and total size
@@ -99,7 +99,7 @@ bool mach::SVMFile::read(int& label, blitz::Array<double,1>& values) {
   if ((size_t)values.extent(0) != m_shape) {
     boost::format s("file '%s' contains %d entries per sample, but you gave me an array with only %d positions");
     s % m_filename % m_shape % values.extent(0);
-    throw std::invalid_argument(s.str().c_str());
+    throw std::invalid_argument(s.str());
   }
 
   //read the data.
@@ -159,7 +159,7 @@ blitz::Array<uint8_t,1> mach::svm_pickle
   if (svm_save_model(tmp_filename, model.get())) {
     boost::format s("cannot save SVM to file `%s' while copying model");
     s % tmp_filename;
-    throw std::runtime_error(s.str().c_str());
+    throw std::runtime_error(s.str());
   }
 
   //gets total size of file
@@ -229,7 +229,7 @@ mach::SupportVector::SupportVector(const std::string& model_file):
   if (!m_model) {
     boost::format s("cannot open model file '%s'");
     s % model_file;
-    throw std::runtime_error(s.str().c_str());
+    throw std::runtime_error(s.str());
   }
   reset();
 }
@@ -282,7 +282,7 @@ int mach::SupportVector::classLabel(size_t i) const {
   if (i >= (size_t)svm_get_nr_class(m_model.get())) {
     boost::format s("request for label of class %d in SVM with %d classes is not legal");
     s % (int)i % svm_get_nr_class(m_model.get());
-    throw std::invalid_argument(s.str().c_str());
+    throw std::invalid_argument(s.str());
   }
   return m_model->label[i];
 
@@ -356,7 +356,7 @@ int mach::SupportVector::predictClass
   if ((size_t)input.extent(0) != inputSize()) {
     boost::format s("input for this SVM should have %d components, but you provided an array with %d elements instead");
     s % inputSize() % input.extent(0);
-    throw std::invalid_argument(s.str().c_str());
+    throw std::invalid_argument(s.str());
   }
 
   return predictClass_(input); 
@@ -382,7 +382,7 @@ int mach::SupportVector::predictClassAndScores
   if ((size_t)input.extent(0) != inputSize()) {
     boost::format s("input for this SVM should have %d components, but you provided an array with %d elements instead");
     s % inputSize() % input.extent(0);
-    throw std::invalid_argument(s.str().c_str());
+    throw std::invalid_argument(s.str());
   }
 
   if (!array::isCContiguous(scores)) {
@@ -392,7 +392,7 @@ int mach::SupportVector::predictClassAndScores
   if ((size_t)scores.extent(0) != outputSize()) {
     boost::format s("output scores for this SVM should have %d components, but you provided an array with %d elements instead");
     s % outputSize() % scores.extent(0);
-    throw std::invalid_argument(s.str().c_str());
+    throw std::invalid_argument(s.str());
   }
 
   return predictClassAndScores_(input, scores);
@@ -413,7 +413,7 @@ int mach::SupportVector::predictClassAndProbabilities
   if ((size_t)input.extent(0) != inputSize()) {
     boost::format s("input for this SVM should have %d components, but you provided an array with %d elements instead");
     s % inputSize() % input.extent(0);
-    throw std::invalid_argument(s.str().c_str());
+    throw std::invalid_argument(s.str());
   }
 
   if (!supportsProbability()) {
@@ -427,7 +427,7 @@ int mach::SupportVector::predictClassAndProbabilities
   if ((size_t)probabilities.extent(0) != outputSize()) {
     boost::format s("output probabilities for this SVM should have %d components, but you provided an array with %d elements instead");
     s % outputSize() % probabilities.extent(0);
-    throw std::invalid_argument(s.str().c_str());
+    throw std::invalid_argument(s.str());
   }
 
   return predictClassAndProbabilities_(input, probabilities);
@@ -437,7 +437,7 @@ void mach::SupportVector::save(const std::string& filename) const {
   if (svm_save_model(filename.c_str(), m_model.get())) {
     boost::format s("cannot save SVM model to file '%s'");
     s % filename;
-    throw std::runtime_error(s.str().c_str());
+    throw std::runtime_error(s.str());
   }
 }
 
