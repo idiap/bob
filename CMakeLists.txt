@@ -66,25 +66,27 @@ if(APPLE)
   # Bogus on OSX?
   set(CMAKE_INCLUDE_SYSTEM_FLAG_C "-isystem ")
   set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
-endif()
+endif(APPLE)
 
 # For both RELEASE and DEBUG builds
-#if(NOT APPLE)
-set(COMMON_CXX_FLAGS "-std=c++0x")
-set(COMMON_C_FLAGS "-std=c99")
-  #else()
-  #  set(COMMON_FLAGS "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long")
-  #endif()
+if(NOT APPLE)
+  set(COMMON_CXX_FLAGS "-std=c++0x")
+  set(COMMON_C_FLAGS "-std=c99")
+else()
+  set(COMMON_FLAGS "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long")
+endif()
 
 # For specific builds
 set(COMMON_RELEASE_FLAGS "-O2 -mtune=generic -DNDEBUG")
 set(COMMON_DEBUG_FLAGS "-g -DBOB_DEBUG -DBZ_DEBUG")
 
 # Cache into CMake
-set(CMAKE_CXX_FLAGS_RELEASE ${COMMON_CXX_FLAGS} ${COMMON_FLAGS} ${COMMON_RELEASE_FLAGS} CACHE STRING "Flags used by the compiler during release builds" FORCE)
-set(CMAKE_C_FLAGS_RELEASE ${COMMON_C_FLAGS} ${COMMON_FLAGS} ${COMMON_RELEASE_FLAGS} CACHE STRING "Flags used by the compiler during release builds" FORCE)
-set(CMAKE_CXX_FLAGS_DEBUG ${COMMON_CXX_FLAGS} ${COMMON_FLAGS} ${COMMON_DEBUG_FLAGS} CACHE STRING "Flags used by the compiler during debug builds." FORCE)
-set(CMAKE_C_FLAGS_DEBUG ${COMMON_C_FLAGS} ${COMMON_FLAGS} ${COMMON_DEBUG_FLAGS} CACHE STRING "Flags used by the compiler during debug builds." FORCE)
+set(CMAKE_CXX_FLAGS_RELEASE ${COMMON_RELEASE_FLAGS} CACHE STRING "Flags used by the compiler during release builds" FORCE)
+set(CMAKE_C_FLAGS_RELEASE ${COMMON_RELEASE_FLAGS} CACHE STRING "Flags used by the compiler during release builds" FORCE)
+set(CMAKE_CXX_FLAGS_DEBUG ${COMMON_DEBUG_FLAGS} CACHE STRING "Flags used by the compiler during debug builds." FORCE)
+set(CMAKE_C_FLAGS_DEBUG ${COMMON_DEBUG_FLAGS} CACHE STRING "Flags used by the compiler during debug builds." FORCE)
+set(CMAKE_CXX_FLAGS "${COMMON_CXX_FLAGS} ${COMMON_FLAGS}" CACHE STRING "Flags used by the compiler during all build types." FORCE)
+set(CMAKE_C_FLAGS "${COMMON_C_FLAGS} ${COMMON_FLAGS}" CACHE STRING "Flags used by the compiler during all build types." FORCE)
 
 if(SET_PUBLIC_LIBRARY_PATH)
   if (APPLE)
