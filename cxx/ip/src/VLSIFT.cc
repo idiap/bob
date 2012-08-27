@@ -181,9 +181,6 @@ void bob::ip::VLSIFT::operator()(const blitz::Array<uint8_t,2>& src,
   bool first=true;
   while(1) 
   {
-    VlSiftKeypoint const *keys = 0;
-    int nkeys;
-
     // Calculates the GSS for the next octave
     if(first) 
     {
@@ -199,11 +196,6 @@ void bob::ip::VLSIFT::operator()(const blitz::Array<uint8_t,2>& src,
       break;
     }
 
-    // Runs the detector
-    vl_sift_detect(m_filt);
-    keys = vl_sift_get_keypoints(m_filt);
-    nkeys = vl_sift_get_nkeypoints(m_filt);
-    
     // Loops over the keypoint
     for(int i=0; i<keypoints.extent(0); ++i) {
       double angles[4];
