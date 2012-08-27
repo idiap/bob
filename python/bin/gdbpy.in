@@ -11,8 +11,6 @@ while [ "$(echo $1 | sed 's%^-%%')" != "$1" ]; do
 done
 
 # allows user created scripts to run
-for egg in @BOB_PYTHONPATH@/*.egg; do
-  export PYTHONPATH="${egg}:${PYTHONPATH}"; 
-done
+export PYTHONPATH="@BOB_PYTHONPATH@:${PYTHONPATH}"; 
 
 exec gdb ${gdbopt} --args @PYTHON_EXECUTABLE@ "$@"
