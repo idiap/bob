@@ -53,9 +53,51 @@ namespace bob {
           border_type=bob::sp::Extrapolation::Mirror);
 
       /**
+        * @brief Copy constructor
+        */
+      Sobel(const Sobel& other);
+
+      /**
         * @brief Destructor
         */
       virtual ~Sobel() {}
+
+      /**
+       * @brief Assignment operator
+       */
+      Sobel& operator=(const Sobel& other);
+
+      /**
+       * @brief Equal to
+       */
+      bool operator==(const Sobel& b) const;
+      /**
+       * @brief Not equal to
+       */
+      bool operator!=(const Sobel& b) const; 
+
+      /**
+       * @brief Getters
+       */
+      bool getUpPositive() const { return m_up_positive; }
+      bool getLeftPositive() const { return m_left_positive; }
+      bob::sp::Conv::SizeOption getSizeOption() const { return m_size_opt; }
+      bob::sp::Extrapolation::BorderType getConvBorder() const 
+      { return m_border_type; }
+      const blitz::Array<double, 2>& getKernelY() const { return m_kernel_y; }
+      const blitz::Array<double, 2>& getKernelX() const { return m_kernel_x; }
+
+      /**
+       * @brief Setters
+       */
+      void setUpPositive(const bool up_positive)
+      { m_up_positive = up_positive; computeKernels(); }
+      void setLeftPositive(const bool left_positive)
+      { m_left_positive = left_positive; computeKernels(); }
+      void setSizeOption(const bob::sp::Conv::SizeOption size_opt) 
+      { m_size_opt = size_opt; }
+      void setConvBorder(const bob::sp::Extrapolation::BorderType border_type) 
+      { m_border_type = border_type; }
 
       /**
         * @brief Process a 2D blitz Array/Image by applying the Sobel operator
