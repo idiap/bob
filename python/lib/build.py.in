@@ -7,6 +7,8 @@
 """
 
 # variables from CMake
+BOB_SYSTEM_NAME = '@BOB_SYSTEM_NAME@'
+BOB_PLATFORM = '@BOB_PLATFORM@'
 CMAKE_BUILD_TYPE = '@CMAKE_BUILD_TYPE@'.lower()
 CMAKE_PREFIX_PATH = '@CMAKE_PREFIX_PATH@'
 CMAKE_SOURCE_DIR = '@CMAKE_SOURCE_DIR@'
@@ -41,8 +43,8 @@ def parse_path(p):
 
 distribution = pkg_resources.require('bob')[0]
 version = distribution.version
-system = distribution.platform.split('-')[0]
-platform = '-'.join((distribution.platform, '-', CMAKE_BUILD_TYPE)) 
+system = BOB_SYSTEM_NAME
+platform = BOB_PLATFORM
 cmake_prefixes = parse_path(CMAKE_PREFIX_PATH)
 python_version = distribution.py_version
 python_dependencies = pkg_resources.require('bob')[1:]
