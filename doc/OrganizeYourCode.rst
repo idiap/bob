@@ -62,22 +62,22 @@ The anatomy of a minimal package should look like the following:
 .. code-block:: sh
 
   .
-  \|-- MANIFEST.in   # describes which files should be installed, besides the python ones
-  \|-- README.rst    # a descriptive explanation of the package contents, in restructured-text format
-  \|-- bootstrap.py  # stock script downloaded from http://svn.zope.org/*checkout*/zc.buildout/trunk/bootstrap/bootstrap.py
-  \|-- buildout.cfg  # buildout configuration to create a local working environment for this package
-  \|-- setup.py      # installation + requirements for this particular package
-  \|-- docs          # documentation directory
-  \|   \|-- conf.py   # Sphinx configuration
-  \|   \|-- index.rst # Documentation starting point for Sphinx
-  \|-- xbob          # python package (a.k.a. "the code")
-  \|   \|-- example
-  \|   \|   \|-- script
-  \|   \|   \|   \|-- __init__.py
-  \|   \|   \|   \|-- version.py
-  \|   \|   \|-- __init__.py
-  \|   \|   \|-- test.py
-  \|   \|-- __init__.py
+  |-- MANIFEST.in   # describes which files should be installed, besides the python ones
+  |-- README.rst    # a descriptive explanation of the package contents, in restructured-text format
+  |-- bootstrap.py  # stock script downloaded from http://svn.zope.org/*checkout*/zc.buildout/trunk/bootstrap/bootstrap.py
+  |-- buildout.cfg  # buildout configuration to create a local working environment for this package
+  |-- setup.py      # installation + requirements for this particular package
+  |-- docs          # documentation directory
+  |   |-- conf.py   # Sphinx configuration
+  |   |-- index.rst # Documentation starting point for Sphinx
+  |-- xbob          # python package (a.k.a. "the code")
+  |   |-- example
+  |   |   |-- script
+  |   |   |   |-- __init__.py
+  |   |   |   |-- version.py
+  |   |   |-- __init__.py
+  |   |   |-- test.py
+  |   |-- __init__.py
 
 Our example that you just downloaded contains these files and a few extra ones
 useful for this tutorial. Inspect the package so you are aware of its contents.
