@@ -64,7 +64,8 @@ namespace bob {
         const size_t overlap_w, const size_t n_dct_coefs): 
           m_dct2d(new bob::sp::DCT2D(block_h, block_w)),
           m_block_h(block_h), m_block_w(block_w), m_overlap_h(overlap_h), 
-          m_overlap_w(overlap_w), m_n_dct_coefs(n_dct_coefs)
+          m_overlap_w(overlap_w), m_n_dct_coefs(n_dct_coefs),
+          m_cache_block(block_h, block_w), m_cache_dct(n_dct_coefs)
       {
       }
 
@@ -75,7 +76,8 @@ namespace bob {
         m_dct2d(new bob::sp::DCT2D(other.m_block_h, other.m_block_w)),
         m_block_h(other.m_block_h), m_block_w(other.m_block_w), 
         m_overlap_h(other.m_overlap_h), m_overlap_w(other.m_overlap_w),
-        m_n_dct_coefs(other.m_n_dct_coefs)
+        m_n_dct_coefs(other.m_n_dct_coefs), 
+        m_cache_block(m_block_h, m_block_w), m_cache_dct(m_n_dct_coefs)
       {
       }
 
@@ -111,15 +113,17 @@ namespace bob {
         * @brief Setters
         */
       void setBlockH(const size_t block_h) 
-      { m_block_h = block_h; m_dct2d->setHeight(block_h); }
+      { m_block_h = block_h; m_dct2d->setHeight(block_h); 
+        m_cache_block.resize(m_block_h, m_block_w); }
       void setBlockW(const size_t block_w) 
-      { m_block_w = block_w; m_dct2d->setWidth(block_w); }
+      { m_block_w = block_w; m_dct2d->setWidth(block_w); 
+        m_cache_block.resize(m_block_h, m_block_w); }
       void setOverlapH(const size_t overlap_h) 
       { m_overlap_h = overlap_h; }
       void setOverlapW(const size_t overlap_w) 
       { m_overlap_w = overlap_w; }
       void setNDctCoefs(const size_t n_dct_coefs) 
-      { m_n_dct_coefs = n_dct_coefs; }
+      { m_n_dct_coefs = n_dct_coefs; m_cache_dct.resize(m_n_dct_coefs); }
  
       /**
         * @brief Process a 2D blitz Array/Image by extracting DCT features.
@@ -158,6 +162,12 @@ namespace bob {
       size_t m_overlap_h;
       size_t m_overlap_w;
       size_t m_n_dct_coefs;
+
+      /**
+        * Working arrays/variables in cache
+        */
+      mutable blitz::Array<double,2> m_cache_block;
+      mutable blitz::Array<double,1> m_cache_dct;
   };
 
   template <typename T, typename U> 
@@ -179,11 +189,13 @@ namespace bob {
       // extract dct using operator()
       blitz::Array<double,2> dct_tmp_block(m_block_h, m_block_w);
       // TODO: avoid the copy if possible
-      m_dct2d->operator()(bob::core::array::ccopy(*it), dct_tmp_block);
+      m_dct2d->operator()(bob::core::array::ccopy(*it), m_cache_block);
 
       // extract the required number of coefficients using the zigzag pattern
+      // Notice the allocation has push_back will call the copy constructor of
+      // the blitz array, which does NOT reallocate/copy the data part!
       blitz::Array<double,1> dct_block_zigzag(m_n_dct_coefs);
-      zigzag(dct_tmp_block, dct_block_zigzag);
+      zigzag(m_cache_block, dct_block_zigzag);
       
       // Push the resulting processed block in the container
       dst.push_back(dct_block_zigzag);
@@ -206,16 +218,12 @@ namespace bob {
       blitz::Array<double,2> dct_input = double_version(i, blitz::Range::all(), blitz::Range::all());
 
       // Extract dct using operator()
-      blitz::Array<double,2> dct_tmp_block(m_block_h, m_block_w);
-      m_dct2d->operator()(dct_input, dct_tmp_block);
+      m_dct2d->operator()(dct_input, m_cache_block);
 
       // Extract the required number of coefficients using the zigzag pattern
-      blitz::Array<double,1> dct_block_zigzag(m_n_dct_coefs);
-      zigzag(dct_tmp_block, dct_block_zigzag);
-      
-      // Push the resulting processed block in the right dst row
+      // and push it in the right dst row
       blitz::Array<double, 1> dst_row = dst(i, blitz::Range::all());
-      dst_row = dct_block_zigzag;
+      zigzag(m_cache_block, dst_row);
     }
   }
   
