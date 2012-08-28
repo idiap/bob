@@ -263,7 +263,7 @@ boost::shared_ptr<bob::machine::SupportVector> trainer::SVMTrainer::train
 #else
   boost::format m("libsvm-%d does not support debugging stream setting");
   m % libsvm_version;
-  debug_libsvm(m.str());
+  debug_libsvm(m.str().c_str());
 #endif
   boost::shared_ptr<svm_model> model(svm_train(problem.get(), &m_param),
       std::ptr_fun(svm_model_free));

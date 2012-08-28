@@ -50,7 +50,8 @@ namespace bob { namespace visioner {
 
     for (uint64_t ith = 0; ith < num_of_threads; ith ++) {
       std::pair<uint64_t, uint64_t> range(th_begins[ith], th_ends[ith]);
-      threads[ith] = boost::move(boost::thread(boost::bind(op, range)));
+      boost::thread t(boost::bind(op, range));
+      threads[ith] = boost::move(t);
     }
 
     for (uint64_t ith = 0; ith < num_of_threads; ith ++) {
@@ -72,7 +73,8 @@ namespace bob { namespace visioner {
 
     for (uint64_t ith = 0; ith < num_of_threads; ith ++) {
       std::pair<uint64_t, uint64_t> range(th_begins[ith], th_ends[ith]);
-      threads[ith] = boost::move(boost::thread(boost::bind(op, ith, range)));
+      boost::thread t(boost::bind(op, ith, range));
+      threads[ith] = boost::move(t);
     }
 
     for (uint64_t ith = 0; ith < num_of_threads; ith ++) {
@@ -95,8 +97,8 @@ namespace bob { namespace visioner {
 
     for (uint64_t ith = 0; ith < num_of_threads; ith ++) {
       std::pair<uint64_t, uint64_t> range(th_begins[ith], th_ends[ith]);
-      threads[ith] = boost::move(boost::thread(boost::bind(op, range,
-              boost::ref(results[ith]))));
+      boost::thread t(boost::bind(op, range, boost::ref(results[ith])));
+      threads[ith] = boost::move(t);
     }
 
     for (uint64_t ith = 0; ith < num_of_threads; ith ++) {
@@ -119,8 +121,8 @@ namespace bob { namespace visioner {
 
     for (uint64_t ith = 0; ith < num_of_threads; ith ++) {
       std::pair<uint64_t, uint64_t> range(th_begins[ith], th_ends[ith]);
-      threads[ith] = boost::move(boost::thread(boost::bind(op, ith, range, 
-            boost::ref(results[ith]))));
+      boost::thread t(boost::bind(op, ith, range, boost::ref(results[ith])));
+      threads[ith] = boost::move(t);
     }
 
     for (uint64_t ith = 0; ith < num_of_threads; ith ++) {
