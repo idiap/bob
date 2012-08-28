@@ -128,6 +128,16 @@ namespace bob {
       /**
         * @brief Process a 2D blitz Array/Image by extracting DCT features.
         * @param src The 2D input blitz array
+        * @param dst The 2D output array. The first dimension is for the block
+        *   index, whereas the second one is for the dct index. The number of 
+        *   expected blocks can be obtained using the getNBlocks() method
+        */
+      template <typename T> 
+      void operator()(const blitz::Array<T,2>& src, blitz::Array<double,2>& dst) const;
+
+      /**
+        * @brief Process a 2D blitz Array/Image by extracting DCT features.
+        * @param src The 2D input blitz array
         * @param dst A container (with a push_back method such as an STL list)
         *   of 1D double blitz arrays.
         */
@@ -170,6 +180,21 @@ namespace bob {
       mutable blitz::Array<double,1> m_cache_dct;
   };
 
+  // Declare template method full specialization
+  template <>  
+  void DCTFeatures::operator()<double>(const blitz::Array<double,2>& src, 
+    blitz::Array<double,2>& dst) const;
+
+  template <typename T>  
+  void DCTFeatures::operator()(const blitz::Array<T,2>& src, 
+    blitz::Array<double,2>& dst) const
+  {   
+    // Casts the input to double
+    blitz::Array<double,2> src_d = bob::core::cast<double>(src);
+    // Calls the specialized template function for double
+    this->operator()(src_d, dst);
+  }  
+
   template <typename T, typename U> 
   void DCTFeatures::operator()(const blitz::Array<T,2>& src, 
     U& dst) const
@@ -187,7 +212,6 @@ namespace bob {
       it != blocks.end(); ++it) 
     {
       // extract dct using operator()
-      blitz::Array<double,2> dct_tmp_block(m_block_h, m_block_w);
       // TODO: avoid the copy if possible
       m_dct2d->operator()(bob::core::array::ccopy(*it), m_cache_block);
 
@@ -212,7 +236,7 @@ namespace bob {
     dst.resize(src.extent(0), m_n_dct_coefs);
     
     // Dct extract each block
-    for(int i = 0; i < double_version.extent(0); i++)
+    for(int i = 0; i < double_version.extent(0); ++i)
     {
       // Get the current block
       blitz::Array<double,2> dct_input = double_version(i, blitz::Range::all(), blitz::Range::all());

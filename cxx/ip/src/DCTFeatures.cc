@@ -52,3 +52,33 @@ bob::ip::DCTFeatures::operator!=(const bob::ip::DCTFeatures& b) const
   return !(this->operator==(b));
 }
 
+template <> 
+void bob::ip::DCTFeatures::operator()<double>(const blitz::Array<double,2>& src, 
+  blitz::Array<double, 2>& dst) const
+{ 
+  // Checks input/output
+  bob::core::array::assertZeroBase(src);
+  bob::core::array::assertZeroBase(dst);
+  blitz::TinyVector<int,2> shape(getNBlocks(src), m_n_dct_coefs);
+  bob::core::array::assertSameShape(dst, shape);
+ 
+  // get all the blocks
+  std::list<blitz::Array<double,2> > blocks;
+  blockReference(src, blocks, m_block_h, m_block_w, m_overlap_h, m_overlap_w);
+ 
+  /// dct extract each block
+  int i=0;
+  for(std::list<blitz::Array<double,2> >::const_iterator it = blocks.begin();
+    it != blocks.end(); ++it, ++i) 
+  {
+    // Extract DCT for the current block
+    // TODO: avoid the copy if possible
+    m_dct2d->operator()(bob::core::array::ccopy(*it), m_cache_block);
+
+    // Extract the required number of coefficients using the zigzag pattern
+    // and push it in the right dst row
+    blitz::Array<double,1> dst_row = dst(i, blitz::Range::all());
+    zigzag(m_cache_block, dst_row);
+  }
+}
+

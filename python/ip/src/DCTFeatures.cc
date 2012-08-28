@@ -27,49 +27,69 @@ using namespace boost::python;
 
 static const char* dctdoc = "Objects of this class, after configuration, extract DCT features as described in the paper titled \"Polynomial Features for Robust Face Authentication\", published in 2002.";
 
-template <typename T> static object inner_dct_apply
-(bob::ip::DCTFeatures& dct_features, bob::python::const_ndarray src) {
-  std::vector<blitz::Array<double,1> > dst;
-  dct_features(src.bz<T,2>(), dst);
-  list t;
-  for(size_t i=0; i<dst.size(); ++i) t.append(dst[i]); //bz array copying!
-  return t;
-}
-
-static object dct_apply (bob::ip::DCTFeatures& dct_features, bob::python::const_ndarray src)
+template <typename T> static object inner_dct_apply(
+  bob::ip::DCTFeatures& dct_features, bob::python::const_ndarray src,
+  const bool output_array)
 {
-  const bob::core::array::typeinfo& info = src.type();
-  switch (info.dtype) {
-    case bob::core::array::t_uint8: 
-      return inner_dct_apply<uint8_t>(dct_features, src);
-    case bob::core::array::t_uint16:
-      return inner_dct_apply<uint16_t>(dct_features, src);
-    case bob::core::array::t_float64: 
-      return inner_dct_apply<double>(dct_features, src);
-    default: PYTHON_ERROR(TypeError, "DCT feature extraction does not support with array with type '%s'", info.str().c_str());
+  if(output_array)
+  {
+    bob::python::ndarray dst(bob::core::array::t_float64, 
+      dct_features.getNBlocks(src.bz<T,2>()), dct_features.getNDctCoefs());
+    blitz::Array<double,2> dst_ = dst.bz<double,2>();
+    dct_features(src.bz<T,2>(), dst_);
+    return dst.self();
+  }
+  else
+  {
+    std::vector<blitz::Array<double,1> > dst;
+    dct_features(src.bz<T,2>(), dst);
+    list t;
+    for(size_t i=0; i<dst.size(); ++i) t.append(dst[i]); //bz array copying!
+    return t;
   }
 }
 
-template <typename T> static object inner_dct_apply2
-(bob::ip::DCTFeatures& dct_features, bob::python::const_ndarray src) {
+template <typename T> static object inner_dct_apply3
+(bob::ip::DCTFeatures& dct_features, bob::python::const_ndarray src) 
+{
   blitz::Array<double,2> dst;
   dct_features(src.bz<T,3>(), dst);
   return object(dst);
 }
 
-static object dct_apply2 (bob::ip::DCTFeatures& dct_features,
-    bob::python::const_ndarray src) {
+static object dct_apply(bob::ip::DCTFeatures& dct_features, 
+  bob::python::const_ndarray src, const bool output_array=false)
+{
   const bob::core::array::typeinfo& info = src.type();
-  switch (info.dtype) {
-    case bob::core::array::t_uint8: 
-      return inner_dct_apply2<uint8_t>(dct_features, src);
-    case bob::core::array::t_uint16:
-      return inner_dct_apply2<uint16_t>(dct_features, src);
-    case bob::core::array::t_float64: 
-      return inner_dct_apply2<double>(dct_features, src);
-    default: PYTHON_ERROR(TypeError, "DCT feature extraction does not support with array with type '%s'", info.str().c_str());
+  switch(info.nd)
+  {
+    case 2:
+      switch (info.dtype) {
+        case bob::core::array::t_uint8: 
+          return inner_dct_apply<uint8_t>(dct_features, src, output_array);
+        case bob::core::array::t_uint16:
+          return inner_dct_apply<uint16_t>(dct_features, src, output_array);
+        case bob::core::array::t_float64: 
+          return inner_dct_apply<double>(dct_features, src, output_array);
+        default: 
+          PYTHON_ERROR(TypeError, "DCT feature extraction does not support input array of type '%s'.", info.str().c_str());
+      }
+    case 3:
+      switch (info.dtype) {
+        case bob::core::array::t_uint8: 
+          return inner_dct_apply3<uint8_t>(dct_features, src);
+        case bob::core::array::t_uint16:
+          return inner_dct_apply3<uint16_t>(dct_features, src);
+        case bob::core::array::t_float64: 
+          return inner_dct_apply3<double>(dct_features, src);
+        default: PYTHON_ERROR(TypeError, "DCT feature extraction does not input array of type '%s'", info.str().c_str());
+      }
+    default:
+      PYTHON_ERROR(TypeError, "DCT feature extraction does not support input array with " SIZE_T_FMT " dimensions", info.nd);
   }
 }
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(dct_apply_overloads, dct_apply, 2, 3)
 
 void bind_ip_dctfeatures() 
 {
@@ -82,7 +102,6 @@ void bind_ip_dctfeatures()
     .add_property("overlap_h", &bob::ip::DCTFeatures::getOverlapH, &bob::ip::DCTFeatures::setOverlapH, "The overlap of the blocks along the y-axis")
     .add_property("overlap_w", &bob::ip::DCTFeatures::getOverlapW, &bob::ip::DCTFeatures::setOverlapW, "The overlap of the blocks along the x-axis")
     .add_property("n_dct_coefs", &bob::ip::DCTFeatures::getNDctCoefs, &bob::ip::DCTFeatures::setNDctCoefs, "The number of DCT coefficients")
-    .def("__call__", &dct_apply, (arg("self"),arg("input")), "Call an object of this type to extract DCT features from either uint8, uint16 or double 2D arrays.")
-    .def("__call__", &dct_apply2, (arg("self"), arg("blocks")), "Extract DCT features from a list of blocks.")
+    .def("__call__", &dct_apply, dct_apply_overloads((arg("self"), arg("input"), arg("output_array")=false), "ExtractsDCT features from either uint8, uint16 or double arrays. The input numpy.array can be a 2D array, which will be interpreted as a grayscale image, OR a 3D array, which will be interpreted as a set of 2D blocks. This method returns a list of DCT features in a 1D numpy.array, or a 2D numpy.array with these DCT features  if the output_array argument is enabled AND the input is a 2D image array."))
     ;
 }

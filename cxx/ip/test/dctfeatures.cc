@@ -69,7 +69,23 @@ void checkBlitzClose( const blitz::Array<T,1>& t1, const blitz::Array<T,1>& t2,
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
-BOOST_AUTO_TEST_CASE( test_dct_feature_extract )
+
+BOOST_AUTO_TEST_CASE( test_dct_feature_extract_arrays )
+{
+  blitz::Array<double,2> dst(4,6);
+  bob::ip::DCTFeatures dctfeatures( 3, 4, 0, 0, 6);
+
+  dctfeatures( src, dst);
+  // Iterate over the rows  and compare the DCT coefficients with 
+  // the one obtained using matlab
+  for( int i=0; i<dst.extent(0); ++i)
+  {
+    blitz::Array<double,1> dst_i = dst(i, blitz::Range::all());
+    checkBlitzClose( dst_i, dst_mat[i], eps);
+  }
+}
+
+BOOST_AUTO_TEST_CASE( test_dct_feature_extract_vector )
 {
   std::vector<blitz::Array<double,1> > dst;
   bob::ip::DCTFeatures dctfeatures( 3, 4, 0, 0, 6);
@@ -86,7 +102,7 @@ BOOST_AUTO_TEST_CASE( test_dct_feature_extract )
   }
 }
 
-BOOST_AUTO_TEST_CASE( test_dct_feature_extract_norm )
+BOOST_AUTO_TEST_CASE( test_dct_feature_extract_block )
 {
   // Get the block shape
   blitz::TinyVector<int, 3> shape = bob::ip::getBlock3DOutputShape(src, 3, 4, 0, 0);
