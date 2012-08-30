@@ -332,8 +332,96 @@ Version 1.0.1 would be the first patch release.
   your package is compatible with, using the standard notation defined for
   setuptools installation requirements for packages.
 
+You may use version number extenders for alpha, beta, and candidate releases
+with the above scheme, by appending ``aN``, ``bN`` or ``cN`` to the version
+number. The value of ``N`` should be an integer starting at zero. Python's
+setuptools package will correctly classifier package versions following this
+simple scheme. For more information on package numbers, consult Python's `PEP
+386`_. Here are lists of valid python version numbers following this scheme::
+
+  0.0.1
+  0.1.0a35
+  1.2.3b44
+  2.4.99c32
+
+Release Methodology for Satellite Packages
+------------------------------------------
+
+Here is a set of steps we recommend you follow when releasing a new version of
+your satellite package:
+
+1. First decide on the new version number your package will get. If you are
+   making a minor, API preserving, modification on an existing stable package
+   (already published on PyPI), just increment the last digit on the version.
+   Bigger changes may require that you signal them to users by changing the
+   first digits of the package. Alpha, beta or candidate releases don't need to
+   have their main components of the version changed, just bump-up the last
+   digit. For example ``1.0.3a3`` would become ``1.0.3a4``;
+
+2. In case you are making an API modification to your package, you should think
+   if you would like to branch your repository at this position. You don't have
+   to care about this detail with new packages, naturally. 
+   
+   If required, branching will allow you to still make modifications (patches)
+   on the old version of the code and develop on the ``master`` branch for the
+   new release, in parallel.  It is important to branch when you break
+   functionality on existing code - for example to reach compatibility with an
+   upcoming version of |project|.  After a few major releases, your repository
+   should look somewhat like this::
+
+      ----> time
+
+      initial commit
+      o---------------o---------o-----o-----------------------> master 
+                      |         |     |                   
+                      |         |     |   v2.0.0
+                      |         |     +---x----------> 2.0
+                      |         |                         
+                      |         | v1.1.0  v1.1.1          
+                      |         +-x-------x------> 1.1
+                      |                                   
+                      |   v1.0.0  v1.0.1a0
+                      +---x-------x-------> 1.0
+
+   The ``o``'s mark the points in which you decided to branch your project.
+   The ``x``'s mark places where you decided to release a new version of your
+   satellite package on PyPI. The ``-``'s mark commits on your repository. Time
+   flies from left to right. 
+   
+   In this ficticious representation, the ``master`` branch continue under
+   development, but one can see older branches don't receive much attention
+   anymore.
+
+   Here is an example for creating a branch at github (many of our satellite
+   packages are hosted there). Let's create a branch called ``1.1``::
+
+    $ git branch 1.1
+    $ git checkout 1.1
+    $ git push origin 1.1
+
+3. When you decide to release something publicly, we recommend you **tag** the
+   version of the package on your repository, so you have a marker to what code
+   you actually published on PyPI. Tagging on github would go like this::
+
+    $ git tag v1.1.0
+    $ git push && git push --tags
+
+   Notice use prefix tag names with ``v``.
+
+4. Finally, after branching and tagging, it is time for you to publish your new
+   package on PyPI. When the package is ready and you have tested it, just do
+   the following::
+
+    $ python setup.py register #if you modified your setup.py or README.rst
+    $ python setup.py sdist --formats=zip upload
+
+5. Announce the update on the relevant channels.
+
 Satellite Packages Available
 ----------------------------
 
 Look `here for our growing list of Satellite Packages
 <https://github.com/idiap/bob/wiki/Satellite-Packages>`_.
+
+.. your links go here
+.. _pep 386: http://www.python.org/dev/peps/pep-0386/
