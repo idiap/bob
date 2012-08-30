@@ -575,12 +575,9 @@ bool io::VideoReader::const_iterator::read(ca::interface& data,
             m_frame_buffer->linesize, 0, m_parent->height(),
             m_rgb_frame_buffer->data, m_rgb_frame_buffer->linesize);
 
-        // Got the image - exit
+        // Got the image - account for that
         ++m_current_frame;
 
-        // Frees the packet that was allocated by av_read_frame
-        av_free_packet(&packet);
-        break;
       }
     }
 
@@ -745,12 +742,8 @@ io::VideoReader::const_iterator& io::VideoReader::const_iterator::operator++ () 
 
       // Did we get a video frame?
       if (gotPicture) {
-        // Got the image - exit
+        //got a valid frame, account for that.
         ++m_current_frame;
-
-        // Frees the packet that was allocated by av_read_frame
-        av_free_packet(&packet);
-        break;
       }
     }
 
