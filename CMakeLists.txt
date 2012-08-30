@@ -86,15 +86,15 @@ if(NOT APPLE OR CMAKE_COMPILER_IS_GNUCC) #linux builds or apple+gcc4.2
   set(COMMON_DEBUG_FLAGS "${COMMON_DEBUG_FLAGS} -DBZ_DEBUG")
 endif()
 
-# Cache into CMake
-set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_CXX_FLAGS} ${COMMON_FLAGS} ${COMMON_RELEASE_FLAGS}" CACHE STRING "Flags used by the compiler during release builds" FORCE)
-set(CMAKE_C_FLAGS_RELEASE "${COMMON_C_FLAGS} ${COMMON_FLAGS} ${COMMON_RELEASE_FLAGS}" CACHE STRING "Flags used by the compiler during release builds" FORCE)
-set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_CXX_FLAGS} ${COMMON_FLAGS} ${COMMON_DEBUG_FLAGS}" CACHE STRING "Flags used by the compiler during release builds" FORCE)
-set(CMAKE_C_FLAGS_DEBUG "${COMMON_C_FLAGS} ${COMMON_FLAGS} ${COMMON_DEBUG_FLAGS}" CACHE STRING "Flags used by the compiler during release builds" FORCE)
-
 # These are used in type checks for cmake, be aware and don't change those
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_RELEASE}" CACHE STRING "Flags used by the compiler during release builds" FORCE)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_RELEASE}" CACHE STRING "Flags used by the compiler during release builds" FORCE)
+set(CMAKE_CXX_FLAGS "${COMMON_CXX_FLAGS} ${COMMON_FLAGS}" CACHE STRING "Flags used by the compiler during release builds" FORCE)
+set(CMAKE_C_FLAGS "${COMMON_C_FLAGS} ${COMMON_FLAGS}" CACHE STRING "Flags used by the compiler during release builds" FORCE)
+
+# Cache into CMake
+set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_RELEASE_FLAGS}" CACHE STRING "Flags used by the C++ compiler during release builds" FORCE)
+set(CMAKE_C_FLAGS_RELEASE "${COMMON_RELEASE_FLAGS}" CACHE STRING "Flags used by the C compiler during release builds" FORCE)
+set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_DEBUG_FLAGS}" CACHE STRING "Flags used by the C++ compiler during debug builds" FORCE)
+set(CMAKE_C_FLAGS_DEBUG "${COMMON_DEBUG_FLAGS}" CACHE STRING "Flags used by the compiler C during debug builds" FORCE)
 
 if(SET_PUBLIC_LIBRARY_PATH)
   if (APPLE)
