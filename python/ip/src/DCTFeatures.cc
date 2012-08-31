@@ -102,8 +102,8 @@ void bind_ip_dctfeatures()
     .add_property("overlap_h", &bob::ip::DCTFeatures::getOverlapH, &bob::ip::DCTFeatures::setOverlapH, "The overlap of the blocks along the y-axis")
     .add_property("overlap_w", &bob::ip::DCTFeatures::getOverlapW, &bob::ip::DCTFeatures::setOverlapW, "The overlap of the blocks along the x-axis")
     .add_property("n_dct_coefs", &bob::ip::DCTFeatures::getNDctCoefs, &bob::ip::DCTFeatures::setNDctCoefs, "The number of DCT coefficients")
-    .add_property("norm_block", &bob::ip::DCTFeatures::getNormBlock, &bob::ip::DCTFeatures::setNormBlock, "Normalize each block to zero mean and unit variance before extracting DCT coefficients")
-    .add_property("norm_dct", &bob::ip::DCTFeatures::getNormDct, &bob::ip::DCTFeatures::setNormDct, "Normalize DCT coefficients to zero mean and unit variance after the DCT extraction")
+    .add_property("norm_block", &bob::ip::DCTFeatures::getNormalizeBlock, &bob::ip::DCTFeatures::setNormalizeBlock, "Normalize each block to zero mean and unit variance before extracting DCT coefficients")
+    .add_property("norm_dct", &bob::ip::DCTFeatures::getNormalizeDct, &bob::ip::DCTFeatures::setNormalizeDct, "Normalize DCT coefficients to zero mean and unit variance after the DCT extraction")
     .def("__call__", &dct_apply, dct_apply_overloads((arg("self"), arg("input"), arg("output_array")=false), "Extracts DCT features from either uint8, uint16 or double arrays. The input numpy.array can be a 2D array, which will be interpreted as a grayscale image, OR a 3D array, which will be interpreted as a set of 2D blocks. This method returns a list of DCT features in a 1D numpy.array, or a 2D numpy.array with these DCT features  if the output_array argument is enabled AND the input is a 2D image array."))
     ;
 }
