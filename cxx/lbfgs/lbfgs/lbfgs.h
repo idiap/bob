@@ -619,15 +619,15 @@ libLBFGS is distributed under the term of the
       library returns ::LBFGSERR_INVALID_LINESEARCH.
     - Renamed line search algorithms as follows:
         - ::LBFGS_LINESEARCH_BACKTRACKING: regular Wolfe condition.
-        - ::LBFGS_LINESEARCH_BACKTRACKING_LOOSE: regular Wolfe condition.
-        - ::LBFGS_LINESEARCH_BACKTRACKING_STRONG: strong Wolfe condition.
+        - LBFGS_LINESEARCH_BACKTRACKING_LOOSE: regular Wolfe condition.
+        - LBFGS_LINESEARCH_BACKTRACKING_STRONG: strong Wolfe condition.
     - Source code clean-up.
 - Version 1.6 (2008-11-02):
     - Improved line-search algorithm with strong Wolfe condition, which was
       contributed by Takashi Imamichi. This routine is now default for
       ::LBFGS_LINESEARCH_BACKTRACKING. The previous line search algorithm
       with regular Wolfe condition is still available as
-      ::LBFGS_LINESEARCH_BACKTRACKING_LOOSE.
+      LBFGS_LINESEARCH_BACKTRACKING_LOOSE.
     - Configurable stop index for L1-norm computation. A member variable
       ::lbfgs_parameter_t::orthantwise_end was added to specify the index
       number at which the library stops computing the L1 norm of the

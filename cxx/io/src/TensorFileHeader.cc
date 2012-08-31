@@ -26,33 +26,29 @@
 #include "io/TensorFileHeader.h"
 #include "io/Exception.h"
 
-namespace io = bob::io;
-namespace iod = io::detail;
-namespace core = bob::core;
-
-iod::TensorFileHeader::TensorFileHeader()
-  : m_tensor_type(io::Char),
+bob::io::detail::TensorFileHeader::TensorFileHeader()
+  : m_tensor_type(bob::io::Char),
     m_type(),
     m_n_samples(0),
     m_tensor_size(0)
 {
 }
 
-iod::TensorFileHeader::~TensorFileHeader() { }
+bob::io::detail::TensorFileHeader::~TensorFileHeader() { }
 
-size_t iod::TensorFileHeader::getArrayIndex (size_t index) const {
+size_t bob::io::detail::TensorFileHeader::getArrayIndex (size_t index) const {
   size_t header_size = 7 * sizeof(int);
   return header_size + index * m_tensor_size;
 }
 
-void iod::TensorFileHeader::read(std::istream& str) {
+void bob::io::detail::TensorFileHeader::read(std::istream& str) {
   // Start reading at the beginning of the stream
   str.seekg(std::ios_base::beg);
 
   int val;
   str.read( reinterpret_cast<char*>(&val), sizeof(int));
-  m_tensor_type = (io::TensorType)val;
-  m_type.dtype = io::tensorTypeToArrayType(m_tensor_type);
+  m_tensor_type = (bob::io::TensorType)val;
+  m_type.dtype = bob::io::tensorTypeToArrayType(m_tensor_type);
 
   str.read( reinterpret_cast<char*>(&val), sizeof(int));
   m_n_samples = (size_t)val;
@@ -76,7 +72,7 @@ void iod::TensorFileHeader::read(std::istream& str) {
   header_ok();
 }
 
-void iod::TensorFileHeader::write(std::ostream& str) const
+void bob::io::detail::TensorFileHeader::write(std::ostream& str) const
 {
   // Start writing at the beginning of the stream
   str.seekp(std::ios_base::beg);
@@ -98,44 +94,44 @@ void iod::TensorFileHeader::write(std::ostream& str) const
   str.write( reinterpret_cast<char*>(&val), sizeof(int));
 }
 
-void iod::TensorFileHeader::header_ok()
+void bob::io::detail::TensorFileHeader::header_ok()
 {
   // Check the type
   switch (m_tensor_type)
   {
     // supported tensor types
-    case io::Char:
-    case io::Short:
-    case io::Int:
-    case io::Long:
-    case io::Float:
-    case io::Double:
+    case bob::io::Char:
+    case bob::io::Short:
+    case bob::io::Int:
+    case bob::io::Long:
+    case bob::io::Float:
+    case bob::io::Double:
       break;
     // error
     default:
-      throw io::UnsupportedTypeError(core::array::t_unknown);
+      throw bob::io::UnsupportedTypeError(bob::core::array::t_unknown);
   }
 
   // Check the number of samples and dimensions
-  if( m_type.nd < 1 || m_type.nd > 4) throw io::DimensionError(m_type.nd,4);
+  if( m_type.nd < 1 || m_type.nd > 4) throw bob::io::DimensionError(m_type.nd,4);
 
   // OK
   update();
 }
 
-void iod::TensorFileHeader::update()
+void bob::io::detail::TensorFileHeader::update()
 {
   size_t base_size = 0;
   switch (m_tensor_type)
   {
-    case io::Char:    base_size = sizeof(char); break;
-    case io::Short:   base_size = sizeof(short); break;
-    case io::Int:     base_size = sizeof(int); break;
-    case io::Long:    base_size = sizeof(long); break;
-    case io::Float:   base_size = sizeof(float); break;
-    case io::Double:  base_size = sizeof(double); break;
+    case bob::io::Char:    base_size = sizeof(char); break;
+    case bob::io::Short:   base_size = sizeof(short); break;
+    case bob::io::Int:     base_size = sizeof(int); break;
+    case bob::io::Long:    base_size = sizeof(long); break;
+    case bob::io::Float:   base_size = sizeof(float); break;
+    case bob::io::Double:  base_size = sizeof(double); break;
     default:
-      throw io::UnsupportedTypeError(core::array::t_unknown);
+      throw bob::io::UnsupportedTypeError(bob::core::array::t_unknown);
   }
 
   size_t tsize = 1;
@@ -145,44 +141,44 @@ void iod::TensorFileHeader::update()
 }
 
 
-io::TensorType io::arrayTypeToTensorType(core::array::ElementType eltype)
+bob::io::TensorType bob::io::arrayTypeToTensorType(bob::core::array::ElementType eltype)
 {
   switch(eltype)
   {
-    case core::array::t_int8:
-      return io::Char;
-    case core::array::t_int16:
-      return io::Short;
-    case core::array::t_int32:
-      return io::Int;
-    case core::array::t_int64:
-      return io::Long;
-    case core::array::t_float32:
-      return io::Float;
-    case core::array::t_float64:
-      return io::Double;
+    case bob::core::array::t_int8:
+      return bob::io::Char;
+    case bob::core::array::t_int16:
+      return bob::io::Short;
+    case bob::core::array::t_int32:
+      return bob::io::Int;
+    case bob::core::array::t_int64:
+      return bob::io::Long;
+    case bob::core::array::t_float32:
+      return bob::io::Float;
+    case bob::core::array::t_float64:
+      return bob::io::Double;
     default:
-      throw io::UnsupportedTypeError(core::array::t_unknown);
+      throw bob::io::UnsupportedTypeError(bob::core::array::t_unknown);
   }
 }
   
-core::array::ElementType io::tensorTypeToArrayType(io::TensorType tensortype)
+bob::core::array::ElementType bob::io::tensorTypeToArrayType(bob::io::TensorType tensortype)
 {
   switch(tensortype)
   {
-    case io::Char:
-      return core::array::t_int8;
-    case io::Short:
-      return core::array::t_int16;
-    case io::Int:
-      return core::array::t_int32;
-    case io::Long:
-      return core::array::t_int64;
-    case io::Float:
-      return core::array::t_float32;
-    case io::Double:
-      return core::array::t_float64;
+    case bob::io::Char:
+      return bob::core::array::t_int8;
+    case bob::io::Short:
+      return bob::core::array::t_int16;
+    case bob::io::Int:
+      return bob::core::array::t_int32;
+    case bob::io::Long:
+      return bob::core::array::t_int64;
+    case bob::io::Float:
+      return bob::core::array::t_float32;
+    case bob::io::Double:
+      return bob::core::array::t_float64;
     default:
-      throw io::UnsupportedTypeError(core::array::t_unknown);
+      throw bob::io::UnsupportedTypeError(bob::core::array::t_unknown);
   }
 }

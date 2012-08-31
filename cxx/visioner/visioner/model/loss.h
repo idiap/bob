@@ -34,7 +34,7 @@ namespace bob { namespace visioner {
    * predict and the current score estimation.
    *
    * NB: The 'grad' and 'hess' objects should be a-priori resized to <size, 1>
-   * and <size, size> respectively, before calling <::eval>.
+   * and <size, size> respectively, before calling <Loss::eval>.
    */
   class Loss : public Parametrizable {
 

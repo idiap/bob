@@ -38,8 +38,8 @@ namespace bob { namespace visioner {
 
   /**
    * Multivariate model as a linear combination of std::vector<LUT>.
-   * NB: The ::preprocess() must be called before ::get() and ::score()
-   * functions.
+   * NB: The Model::preprocess() must be called before Model::get() and 
+   * Model::score() functions.
    */
   class Model : public Parametrizable {
 
