@@ -40,33 +40,55 @@
 
 namespace bob {
 /**
- * \ingroup libip_api
- * @{
- *
- */
+  * \ingroup libip_api
+  * @{
+  *
+  */
   namespace ip {
 
   /**
-   * @brief This class can be used to extract DCT features. This algorithm 
-   *   is described in the following article:
-   *   "Polynomial Features for Robust Face Authentication", 
-   *   from C. Sanderson and K. Paliwal, in the proceedings of the 
-   *   IEEE International Conference on Image Processing 2002.
-  */
+    * @brief This class can be used to extract DCT features. This algorithm 
+    *   is described in the following article:
+    *   "Polynomial Features for Robust Face Authentication", 
+    *   from C. Sanderson and K. Paliwal, in the proceedings of the 
+    *   IEEE International Conference on Image Processing 2002.
+    *   In addition, it support pre- and post-normalization (zero mean and 
+    *   unit variance)
+    */
   class DCTFeatures
   {
     public:
 
       /**
         * @brief Constructor: generates a DCTFeatures extractor
+        * @param block_h height of the blocks
+        * @param block_w width of the blocks
+        * @param overlap_h overlap of the blocks along the y-axis
+        * @param overlap_w overlap of the blocks along the x-axis
+        * @param n_dct_coefs number of DCT coefficients to keep
+        * @param norm_block Normalize the block to zero mean and
+        *   unit variance before the DCT extraction. If the variance is zero
+        *   (i.e. all the block values are the same), this will set all the 
+        *   block values to zero before the DCT extraction. If both norm_block
+        *   and norm_dct are set, the first DCT coefficient will always be 
+        *   zero and could be removed afterwards.
+        * @param norm_dct Normalize the DCT coefficients (across blocks) to 
+        *   zero mean and unit variance after the DCT extraction. If the 
+        *   variance is zero (i.e. a specific DCT coefficient is the same for 
+        *   all the blocks), this will set these coefficients to a zero 
+        *   constant. If both norm_block and norm_dct are set, the first DCT
+        *   coefficient will always be zero and could be removed afterwards.
         */
-      DCTFeatures( const size_t block_h, const size_t block_w, const size_t overlap_h, 
-        const size_t overlap_w, const size_t n_dct_coefs): 
+      DCTFeatures( const size_t block_h, const size_t block_w, 
+        const size_t overlap_h, const size_t overlap_w, 
+        const size_t n_dct_coefs, const bool norm_block=false,
+        const bool norm_dct=false): 
           m_dct2d(new bob::sp::DCT2D(block_h, block_w)),
           m_block_h(block_h), m_block_w(block_w), m_overlap_h(overlap_h), 
           m_overlap_w(overlap_w), m_n_dct_coefs(n_dct_coefs),
-          m_cache_block(block_h, block_w), m_cache_dct(n_dct_coefs)
+          m_norm_block(norm_block), m_norm_dct(norm_dct)
       {
+        resetCache();
       }
 
       /**
@@ -77,8 +99,9 @@ namespace bob {
         m_block_h(other.m_block_h), m_block_w(other.m_block_w), 
         m_overlap_h(other.m_overlap_h), m_overlap_w(other.m_overlap_w),
         m_n_dct_coefs(other.m_n_dct_coefs), 
-        m_cache_block(m_block_h, m_block_w), m_cache_dct(m_n_dct_coefs)
+        m_norm_block(other.m_norm_block), m_norm_dct(other.m_norm_dct)
       {
+        resetCache();
       }
 
       /**
@@ -108,22 +131,28 @@ namespace bob {
       size_t getOverlapH() const { return m_overlap_h; }
       size_t getOverlapW() const { return m_overlap_w; }
       size_t getNDctCoefs() const { return m_n_dct_coefs; }
+      bool getNormalizeBlock() const { return m_norm_block; }
+      bool getNormalizeDct() const { return m_norm_dct; }
  
       /**
         * @brief Setters
         */
       void setBlockH(const size_t block_h) 
       { m_block_h = block_h; m_dct2d->setHeight(block_h); 
-        m_cache_block.resize(m_block_h, m_block_w); }
+        resetCacheBlock(); }
       void setBlockW(const size_t block_w) 
       { m_block_w = block_w; m_dct2d->setWidth(block_w); 
-        m_cache_block.resize(m_block_h, m_block_w); }
+        resetCacheBlock(); }
       void setOverlapH(const size_t overlap_h) 
       { m_overlap_h = overlap_h; }
       void setOverlapW(const size_t overlap_w) 
       { m_overlap_w = overlap_w; }
       void setNDctCoefs(const size_t n_dct_coefs) 
-      { m_n_dct_coefs = n_dct_coefs; m_cache_dct.resize(m_n_dct_coefs); }
+      { m_n_dct_coefs = n_dct_coefs; resetCacheDct(); }
+      void setNormalizeBlock(const bool norm_block)
+      { m_norm_block = norm_block; }
+      void setNormalizeDct(const bool norm_dct)
+      { m_norm_dct = norm_dct; }
  
       /**
         * @brief Process a 2D blitz Array/Image by extracting DCT features.
@@ -136,6 +165,8 @@ namespace bob {
       void operator()(const blitz::Array<T,2>& src, blitz::Array<double,2>& dst) const;
 
       /**
+        * @deprecated Please use the version with blitz::Array output. This
+        *   version does not support block and/or dct normalization.
         * @brief Process a 2D blitz Array/Image by extracting DCT features.
         * @param src The 2D input blitz array
         * @param dst A container (with a push_back method such as an STL list)
@@ -145,10 +176,12 @@ namespace bob {
       void operator()(const blitz::Array<T,2>& src, U& dst) const;
 
       /**
-       * @brief Process a list of blocks by extracting DCT features.
-       * @param src 3D input blitz array (list of 2D blocks)
-       * @param dst 2D output blitz array
-       */
+        * @deprecated Please use the version with 2D input blitz::Array. This
+        *  version does not support block and/or dct normalization.
+        * @brief Process a list of blocks by extracting DCT features.
+        * @param src 3D input blitz array (list of 2D blocks)
+        * @param dst 2D output blitz array
+        */
       template <typename T>
       void operator()(const blitz::Array<T,3>& src, blitz::Array<double, 2>& dst) const;
       
@@ -163,6 +196,7 @@ namespace bob {
       size_t getNBlocks(const blitz::Array<T,2>& src) const;
 
     private:
+      
       /**
         * Attributes
         */
@@ -172,12 +206,20 @@ namespace bob {
       size_t m_overlap_h;
       size_t m_overlap_w;
       size_t m_n_dct_coefs;
+      bool m_norm_block;
+      bool m_norm_dct;
 
       /**
         * Working arrays/variables in cache
         */
-      mutable blitz::Array<double,2> m_cache_block;
-      mutable blitz::Array<double,1> m_cache_dct;
+      void resetCache() const;
+      void resetCacheBlock() const;
+      void resetCacheDct() const;
+
+      mutable blitz::Array<double,2> m_cache_block1;
+      mutable blitz::Array<double,2> m_cache_block2;
+      mutable blitz::Array<double,1> m_cache_dct1;
+      mutable blitz::Array<double,1> m_cache_dct2;
   };
 
   // Declare template method full specialization
@@ -212,14 +254,13 @@ namespace bob {
       it != blocks.end(); ++it) 
     {
       // extract dct using operator()
-      // TODO: avoid the copy if possible
-      m_dct2d->operator()(bob::core::array::ccopy(*it), m_cache_block);
+      m_dct2d->operator()(bob::core::array::ccopy(*it), m_cache_block1);
 
       // extract the required number of coefficients using the zigzag pattern
       // Notice the allocation has push_back will call the copy constructor of
       // the blitz array, which does NOT reallocate/copy the data part!
       blitz::Array<double,1> dct_block_zigzag(m_n_dct_coefs);
-      zigzag(m_cache_block, dct_block_zigzag);
+      zigzag(m_cache_block1, dct_block_zigzag);
       
       // Push the resulting processed block in the container
       dst.push_back(dct_block_zigzag);
@@ -242,12 +283,12 @@ namespace bob {
       blitz::Array<double,2> dct_input = double_version(i, blitz::Range::all(), blitz::Range::all());
 
       // Extract dct using operator()
-      m_dct2d->operator()(dct_input, m_cache_block);
+      m_dct2d->operator()(dct_input, m_cache_block1);
 
       // Extract the required number of coefficients using the zigzag pattern
       // and push it in the right dst row
       blitz::Array<double, 1> dst_row = dst(i, blitz::Range::all());
-      zigzag(m_cache_block, dst_row);
+      zigzag(m_cache_block1, dst_row);
     }
   }
   

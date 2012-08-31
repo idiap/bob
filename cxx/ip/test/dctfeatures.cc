@@ -29,13 +29,21 @@
 #include "core/cast.h"
 #include "ip/DCTFeatures.h"
 
+#include "core/logging.h"
+
 struct T {
   blitz::Array<uint32_t,2> src;
   blitz::Array<double,1> dst1, dst2, dst3, dst4;
   std::vector<blitz::Array<double,1> > dst_mat;
+
+  blitz::Array<double,2> srcB;
+  blitz::Array<double,2> dstB_ff, dstB_tf, dstB_ft, dstB_tt;
+
   double eps;
 
-  T(): src(6,8), dst1(6), dst2(6), dst3(6), dst4(6), dst_mat(0), eps(1e-3)
+  T(): src(6,8), dst1(6), dst2(6), dst3(6), dst4(6), dst_mat(0),
+       srcB(4,4), dstB_ff(4,3), dstB_tf(4,3), dstB_ft(4,3), dstB_tt(4,3),
+       eps(1e-3)
   {
     src = 0, 1, 2, 3, 4, 5, 6, 7,
       8, 9, 10, 11, 12, 13, 14, 15,
@@ -53,6 +61,16 @@ struct T {
     dst_mat.push_back(dst2);
     dst_mat.push_back(dst3);
     dst_mat.push_back(dst4);
+
+    // Reference values from the former (Idiap internal) facereclib python scripts
+    srcB = 1.,3.,5.,2., 5.,7.,3.,2., 4.,7.,6.,1., 1.,3.,5.,4.;
+    dstB_ff = 8., -2., -4., 6., 2., 1., 7.5, -2.5, 3.5, 8., 3., -1.;
+    dstB_tf = 0., -0.89442719, -1.78885438, 0., 1.63299316, 0.81649658,
+              0., -1.15470054, 1.61658075, 0., 1.60356745, -0.53452248;
+    dstB_ft = 0.76249285, -0.88259602, -1.41054884, -1.67748427, 0.7787612, 0.40951418,
+              0.15249857, -1.09026568, 1.31954569, 0.76249285, 1.1941005, -0.31851103;
+    dstB_tt = 0., -0.89931199, -1.39685855, 0., 1.00866019, 0.60685661,
+              0., -1.09579466, 1.22218284, 0., 0.98644646, -0.4321809;
   }
   
   ~T() {}
@@ -67,6 +85,16 @@ void checkBlitzClose( const blitz::Array<T,1>& t1, const blitz::Array<T,1>& t2,
     BOOST_CHECK_SMALL( fabs(t1(i)-t2(i)), eps);
 }
 
+template<typename T>  
+void checkBlitzClose( const blitz::Array<T,2>& t1, const blitz::Array<T,2>& t2,
+  const double eps )
+{
+  BOOST_CHECK_EQUAL( t1.extent(0), t2.extent(0) );
+  BOOST_CHECK_EQUAL( t1.extent(1), t2.extent(1) );
+  for( int i=0; i<t1.extent(0); ++i)
+    for( int j=0; j<t1.extent(1); ++j)
+      BOOST_CHECK_SMALL( fabs(t1(i,j)-t2(i,j)), eps);
+}
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
 
@@ -83,6 +111,28 @@ BOOST_AUTO_TEST_CASE( test_dct_feature_extract_arrays )
     blitz::Array<double,1> dst_i = dst(i, blitz::Range::all());
     checkBlitzClose( dst_i, dst_mat[i], eps);
   }
+}
+
+BOOST_AUTO_TEST_CASE( test_dct_feature_extract_arrays_normalize )
+{
+  blitz::Array<double,2> dst(4,3);
+  bob::ip::DCTFeatures dctfeatures( 2, 2, 0, 0, 3);
+
+  dctfeatures(srcB, dst);
+  checkBlitzClose( dst, dstB_ff, eps);
+
+  dctfeatures.setNormalizeBlock(true);
+  dctfeatures(srcB, dst);
+  checkBlitzClose( dst, dstB_tf, eps);
+
+  dctfeatures.setNormalizeBlock(false);
+  dctfeatures.setNormalizeDct(true);
+  dctfeatures(srcB, dst);
+  checkBlitzClose( dst, dstB_ft, eps);
+
+  dctfeatures.setNormalizeBlock(true);
+  dctfeatures(srcB, dst);
+  checkBlitzClose( dst, dstB_tt, eps);
 }
 
 BOOST_AUTO_TEST_CASE( test_dct_feature_extract_vector )
