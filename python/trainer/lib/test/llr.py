@@ -30,7 +30,6 @@ class LLRTest(unittest.TestCase):
   """Performs various tests for Linear Logistic Regression."""
   
   def test01_llr(self):
-    print "TEST LLR"
 
     # Tests our LLR Trainer.
     ar1 = bob.io.Arrayset()
@@ -53,7 +52,7 @@ class LLRTest(unittest.TestCase):
     ar2.append(numpy.array([-5.,-4.8,-0.2]))
 
 
-    # Expected results
+    # Expected trained machine
     weights_ref= numpy.array([[13.5714], [19.3997], [-0.6432]])
     bias_ref = numpy.array([55.3255])
 
@@ -62,6 +61,7 @@ class LLRTest(unittest.TestCase):
     out1 = 105.7668
     feat2 = numpy.array([2.,3.,4.])
     out2 = 138.0947
+
   
     # Trains a machine (method 1)
     T = bob.trainer.LLRTrainer()
@@ -76,8 +76,6 @@ class LLRTest(unittest.TestCase):
     # Trains a machine (method 2)
     machine2 = bob.machine.LinearMachine()
     T.train(machine2, ar1, ar2)
-    print machine2(feat1)
-    print machine2(feat2)
 
     # Makes sure results are good
     self.assertTrue( (abs(machine2.weights - weights_ref) < 2e-4).all() )
