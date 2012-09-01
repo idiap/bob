@@ -90,20 +90,18 @@ void bob::trainer::LLRTrainer::train(bob::machine::LinearMachine& machine,
     x(rd,i) = ar1.get<double,1>(i);
   for(size_t i=0; i<n_samples2; ++i)
     x(rd,i+n_samples1) = -ar2.get<double,1>(i);
-//bob::core::info << "x = " << x << std::endl;
+
   // Ratio between the two classes and weights vector
   double prop = (double)n_samples1 / (double)n_samples;
   blitz::Array<double,1> weights(n_samples);
   weights(r1) = m_prior / prop;
   weights(r2) = (1.-m_prior) / (1.-prop);
-//bob::core::info << "weights = " << weights << std::endl;
   
   // Initializes offset vector
   blitz::Array<double,1> offset(n_samples);
   const double logit = log(m_prior/(1.-m_prior));
   offset(r1) = logit;
   offset(r2) = -logit;
-//bob::core::info << "offset = " << offset << std::endl;
 
   // Initializes gradient and w vectors
   blitz::Array<double,1> g_old(n_features+1);
@@ -130,14 +128,12 @@ void bob::trainer::LLRTrainer::train(bob::machine::LinearMachine& machine,
   blitz::secondIndex j;
   for(size_t iter=0; ; ++iter) 
   {
-//bob::core::info << "Iteration " << iter << std::endl;
     tmp_n = blitz::sum(w(j)*x(j,i), j);
     s1 = 1. / (1. + blitz::exp(tmp_n + offset));
-//bob::core::info << " s1 = " << s1 << std::endl;
     tmp_n = s1 * weights;
     bob::math::prod(x, tmp_n, g);
-//bob::core::info << " g = " << g << std::endl;
 
+    // Conjugate gradient
     if(iter == 0) 
       u = g;
     else
@@ -153,19 +149,14 @@ void bob::trainer::LLRTrainer::train(bob::machine::LinearMachine& machine,
         u = g - beta * u;
       }
     }
-//bob::core::info << " u = " << u << std::endl;
 
+    // Line search along the direction u
     ug = blitz::sum(u*g);
-//bob::core::info << " ug = " << ug << std::endl;
     bob::math::prod(u,x,ux);
-//bob::core::info << " ux = " << ux << std::endl;
     a = weights * s1 * (1.-s1);
-//bob::core::info << " a = " << a << std::endl;
     tmp_n = blitz::pow2(ux);
     uhu = blitz::sum(tmp_n*a);
-//bob::core::info << " uhu = " << uhu << std::endl;
     w = w + (ug/uhu) * u;
-//bob::core::info << " w = " << w << std::endl;
     
     // Check if convergence has been reached
     if(blitz::max(blitz::fabs(w-w_old)) <= m_convergence_threshold) 
@@ -180,11 +171,12 @@ void bob::trainer::LLRTrainer::train(bob::machine::LinearMachine& machine,
       break;
     }
 
-    // Back-up previous values
+    // Backup previous values
     g_old = g;
     w_old = w;
   }
 
+  // Update the LinearMachine
   machine.resize(n_features, 1);
   machine.setInputSubtraction(0.);
   machine.setInputDivision(1.);

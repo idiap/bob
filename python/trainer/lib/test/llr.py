@@ -56,6 +56,12 @@ class LLRTest(unittest.TestCase):
     # Expected results
     weights_ref= numpy.array([[13.5714], [19.3997], [-0.6432]])
     bias_ref = numpy.array([55.3255])
+
+    # Features and expected outputs of the trained machine
+    feat1 = numpy.array([1.,2.,3.])
+    out1 = 105.7668
+    feat2 = numpy.array([2.,3.,4.])
+    out2 = 138.0947
   
     # Trains a machine (method 1)
     T = bob.trainer.LLRTrainer()
@@ -64,14 +70,20 @@ class LLRTest(unittest.TestCase):
     # Makes sure results are good
     self.assertTrue( (abs(machine1.weights - weights_ref) < 2e-4).all() )
     self.assertTrue( (abs(machine1.biases - bias_ref) < 2e-4).all() )
+    self.assertTrue( abs(machine1(feat1) - out1) < 2e-4 )
+    self.assertTrue( abs(machine1(feat2) - out2) < 2e-4 )
 
-    # Trains a machine (method 1)
+    # Trains a machine (method 2)
     machine2 = bob.machine.LinearMachine()
     T.train(machine2, ar1, ar2)
+    print machine2(feat1)
+    print machine2(feat2)
 
     # Makes sure results are good
     self.assertTrue( (abs(machine2.weights - weights_ref) < 2e-4).all() )
     self.assertTrue( (abs(machine2.biases - bias_ref) < 2e-4).all() )
+    self.assertTrue( abs(machine2(feat1) - out1) < 2e-4 )
+    self.assertTrue( abs(machine2(feat2) - out2) < 2e-4 )
 
 # Instantiates our standard main module for unittests
 main = bob.helper.unittest_main(LLRTest)
