@@ -65,8 +65,8 @@ def add_all_commands(parser, top_subparser, modules):
   create_parser.add_argument('-R', '--recreate',
       action='store_true', default=False,
       help="If set, I'll first erase the current database")
-  create_parser.add_argument('-v', '--verbose', action='append_const',
-      const=1, help="Do SQL operations in a verbose way")
+  parser.add_argument('-v', '--verbose', action='count',
+      help="Do SQL operations in a verbose way")
   create_parser.set_defaults(func=create_all)
   create_parser.set_defaults(parser=parser)
   create_parser.set_defaults(modules=modules)
