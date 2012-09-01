@@ -23,6 +23,7 @@ set(src
     "src/EMPCATrainer.cc"
     "src/PLDATrainer.cc"
     "src/BICTrainer.cc"
+    "src/LLRTrainer.cc"
 )
 
 if(LIBSVM_FOUND)

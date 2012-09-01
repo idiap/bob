@@ -12,6 +12,7 @@ set(ccsrc
    "src/empca.cc"
    "src/plda.cc"
    "src/bic.cc"
+   "src/llr.cc"
    "src/main.cc"
    )
 
@@ -39,6 +40,7 @@ bob_python_add_unittest(trainer lib/test/backprop.py)
 bob_python_add_unittest(trainer lib/test/jfa.py)
 bob_python_add_unittest(trainer lib/test/plda.py)
 bob_python_add_unittest(trainer lib/test/bic.py)
+bob_python_add_unittest(trainer lib/test/llr.py)
 
 if(LIBSVM_FOUND)
   bob_python_add_unittest(trainer lib/test/svm.py main "${CMAKE_CURRENT_SOURCE_DIR}/../machine/data")
