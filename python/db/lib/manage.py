@@ -8,6 +8,7 @@
   
 import os
 import sys
+import time
 
 def files_all(args):
   """Executes all the files commands from individual databases"""
@@ -18,12 +19,49 @@ def files_all(args):
 
 def create_all(args):
   """Executes all the default create commands from individual databases"""
-  
-  for name in [k.name() for k in args.modules if k.type() in ('sqlite',)]:
+ 
+  errors = 0
+  databases = 0
+  total_start = time.time()
+
+  sqlite_dbs = [k.name() for k in args.modules if k.type() in ('sqlite',)]
+
+  if args.verbose >= 1:
+    print '### Running %d SQLite database creation commands...' % len(sqlite_dbs)
+
+  for name in sqlite_dbs:
+    
+    start_time = time.time()
+    databases += 1
+
     parsed = args.parser.parse_args([name, 'create'])
     parsed.recreate = args.recreate
     parsed.verbose = args.verbose
-    parsed.func(parsed)
+
+    if args.verbose >= 1:
+      print '>>> Creating "%s" SQLite database...' % name
+
+    try:
+      parsed.func(parsed)
+
+    except Exception, e:
+      if args.keep_going:
+        errors += 1
+        if args.verbose >= 1:
+          print 'Warning: Error while creating "%s" SQLite database' % name
+        __import__('traceback').print_exc()
+        if args.verbose >= 1:
+          print '*** Keep going on user request...'
+      else: 
+        raise
+
+    if args.verbose >= 1:
+      print '<<< Finished creation of "%s" SQLite database (%.2f seconds).' % \
+          (name, time.time()-start_time)
+
+  if args.verbose >= 1:
+    print '### %d SQLite databases created in %.2f seconds, %d errors' % \
+        (databases, time.time()-total_start, errors)
 
 def version_all(args):
   """Executes all the default version commands from individual databases"""
@@ -62,11 +100,14 @@ def add_all_commands(parser, top_subparser, modules):
 
   create_parser = subparsers.add_parser('create',
       help="create all databases with default settings")
+  create_parser.add_argument('-k', '--keep-going',
+      action='store_true', default=False,
+      help="If set, will survive a database creation failure and keep-on trying to create other databases")
   create_parser.add_argument('-R', '--recreate',
       action='store_true', default=False,
       help="If set, I'll first erase the current database")
-  create_parser.add_argument('-v', '--verbose', action='append_const',
-      const=1, help="Do SQL operations in a verbose way")
+  create_parser.add_argument('-v', '--verbose', action='count',
+      help="Do SQL operations in a verbose way")
   create_parser.set_defaults(func=create_all)
   create_parser.set_defaults(parser=parser)
   create_parser.set_defaults(modules=modules)

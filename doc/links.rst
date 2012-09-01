@@ -26,6 +26,7 @@
 .. _bob's website: https://www.idiap.ch/software/bob
 .. _boost: http://www.boost.org
 .. _buildbot: http://trac.buildbot.net
+.. _buildout: http://pypi.python.org/pypi/zc.buildout/
 .. _c++: http://www2.research.att.com/~bs/C++.html
 .. _cmake: http://www.cmake.org
 .. _doxygen: http://www.doxygen.org
@@ -34,6 +35,7 @@
 .. _fftw: http://www.fftw.org/
 .. _fink: http://www.finkproject.org
 .. _git: http://git-scm.com/
+.. _github: http://github.com/
 .. _google perftools: http://code.google.com/p/google-perftools
 .. _hdf5: http://www.hdfgroup.org/HDF5
 .. _idiap: http://www.idiap.ch
@@ -49,6 +51,7 @@
 .. _numpy: http://numpy.scipy.org
 .. _opencv: http://opencv.willowgarage.com/
 .. _python: http://www.python.org
+.. _pypi: http://pypi.python.org
 .. _qt4: http://qt.nokia.com/ 
 .. _satellite packages: https://github.com/idiap/bob/wiki/Satellite-Packages
 .. _scipy: http://www.scipy.org
