@@ -179,13 +179,13 @@ void bob::trainer::LLRTrainer::train(bob::machine::LinearMachine& machine,
     // Terminates if convergence has been reached
     if(blitz::max(blitz::fabs(w-w_old)) <= m_convergence_threshold) 
     {
-      bob::core::info << "# LLR Training terminated: convergence" << std::endl;
+      bob::core::info << "# LLR Training terminated: convergence after " << iter << " iterations." << std::endl;
       break;
     }
     // Terminates if maximum number of iterations has been reached
     if(m_max_iterations > 0 && iter+1 >= m_max_iterations) 
     {
-      bob::core::info << "# EM terminated: maximum number of iterations reached." << std::endl;
+      bob::core::info << "# EM terminated: maximum number of iterations (" << m_max_iterations << ") reached." << std::endl;
       break;
     }
 
