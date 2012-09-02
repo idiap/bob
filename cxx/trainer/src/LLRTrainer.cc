@@ -171,7 +171,8 @@ void bob::trainer::LLRTrainer::train(bob::machine::LinearMachine& machine,
     // 5. Line search along the direction u
     // a. Compute ux
     bob::math::prod(u,x,tmp_n);
-    // b. Compute u^T H u
+    // b. Compute u^T H u 
+    //      = sum_{i} weights(i) sigmoid(w^T x_i) [1-sigmoid(w^T x_i)] (u^T x_i)
     double uhu = blitz::sum(blitz::pow2(tmp_n) * weights * s1 * (1.-s1));
     // c. Compute w = w_old - (g^T u)/(u^T H u) u
     w = w + blitz::sum(u*g) / uhu * u;
