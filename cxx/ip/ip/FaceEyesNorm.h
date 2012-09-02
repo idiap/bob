@@ -89,6 +89,8 @@ namespace bob {
         size_t getCropWidth() const { return m_crop_width; }
         double getCropOffsetH() const { return m_crop_offset_h; }
         double getCropOffsetW() const { return m_crop_offset_w; }
+        double getLastAngle() const { return m_cache_angle; }
+        double getLastScale() const { return m_cache_scale; }
 
         /**
           * @brief Mutators
@@ -144,6 +146,8 @@ namespace bob {
 
         blitz::TinyVector<int,2> m_out_shape;
         boost::shared_ptr<GeomNorm> m_geom_norm;
+        mutable double m_cache_angle;
+        mutable double m_cache_scale;
     };
 
     template <typename T> 
@@ -193,12 +197,12 @@ namespace bob {
       const double e2_y, const double e2_x) const
     { 
       // Get angle to horizontal
-      const double angle = getAngleToHorizontal(e1_y, e1_x, e2_y, e2_x) - m_eyes_angle;
-      m_geom_norm->setRotationAngle( angle);
+      m_cache_angle = getAngleToHorizontal(e1_y, e1_x, e2_y, e2_x) - m_eyes_angle;
+      m_geom_norm->setRotationAngle(m_cache_angle);
 
       // Get scaling factor
-      const double eyes_distance = sqrt( (e1_y-e2_y)*(e1_y-e2_y) + (e1_x-e2_x)*(e1_x-e2_x) );
-      m_geom_norm->setScalingFactor( m_eyes_distance / eyes_distance);
+      m_cache_scale = m_eyes_distance / sqrt( (e1_y-e2_y)*(e1_y-e2_y) + (e1_x-e2_x)*(e1_x-e2_x) );
+      m_geom_norm->setScalingFactor(m_cache_scale);
 
       // Get the center (of the eye centers segment)
       double center_y = (e1_y + e2_y) / 2.;

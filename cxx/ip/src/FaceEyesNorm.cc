@@ -29,7 +29,8 @@ bob::ip::FaceEyesNorm::FaceEyesNorm( const double eyes_distance,
   m_crop_height(crop_height), m_crop_width(crop_width),
   m_crop_offset_h(crop_offset_h), m_crop_offset_w(crop_offset_w),
   m_out_shape(crop_height, crop_width),
-  m_geom_norm(new GeomNorm(0., 0., crop_height, crop_width, crop_offset_h, crop_offset_w) )
+  m_geom_norm(new GeomNorm(0., 0., crop_height, crop_width, crop_offset_h, crop_offset_w) ),
+  m_cache_angle(0.), m_cache_scale(0.)
 {
 }
 
@@ -40,7 +41,8 @@ bob::ip::FaceEyesNorm::FaceEyesNorm(
 :
   m_crop_height(crop_height),
   m_crop_width(crop_width),
-  m_out_shape(crop_height, crop_width)
+  m_out_shape(crop_height, crop_width),
+  m_cache_angle(0.), m_cache_scale(0.)
 {
   double dy = (double)re_y - (double)le_y, dx = (double)re_x - (double)le_x;
   m_eyes_distance = std::sqrt(dx * dx + dy * dy);
@@ -76,6 +78,8 @@ bob::ip::FaceEyesNorm::operator=(const bob::ip::FaceEyesNorm& other)
     m_out_shape(1) = m_crop_width;
     m_geom_norm.reset(new GeomNorm(0., 0, m_crop_height, m_crop_width, 
       m_crop_offset_h, m_crop_offset_w) );
+    m_cache_angle = other.m_cache_angle;
+    m_cache_scale = other.m_cache_scale;
   }
   return *this;
 }
