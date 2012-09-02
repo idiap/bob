@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef BOB5SPRO_TRAINER_EXCEPTION_H
-#define BOB5SPRO_TRAINER_EXCEPTION_H
+#ifndef BOB_TRAINER_EXCEPTION_H
+#define BOB_TRAINER_EXCEPTION_H
 
 #include "core/Exception.h"
 
@@ -95,6 +95,19 @@ namespace bob { namespace trainer {
       virtual const char* what() const throw();
   };
 
+  /**
+   * Raised when an invalid prior for the Linear Logistic Regression is set.
+   */
+  class LLRPriorNotInRange: public Exception {
+    public:
+      LLRPriorNotInRange(const double got) throw();
+      virtual ~LLRPriorNotInRange() throw();
+      virtual const char* what() const throw();
+
+    private:
+      double m_got;
+      mutable std::string m_message;
+  };
 
 }}
 

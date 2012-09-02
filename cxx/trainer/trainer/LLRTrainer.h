@@ -25,42 +25,62 @@
 #define BOB_TRAINER_LLRTRAINER_H
 
 #include "machine/LinearMachine.h"
+#include "trainer/Exception.h"
 #include "io/Arrayset.h"
 
 namespace bob { namespace trainer {
   
   /**
     * Trains a Linear Logistic Regression model using a conjugate gradient 
-    * approach. Reference:
-    *   "A comparison of numerical optimizers for logistic regression", 
+    * approach. The objective function is normalized with respect to the 
+    * proportion of elements in class 1 to the ones in class 2, and 
+    * then weighted with respect to a given synthetic prior, P, as this is
+    * done in the FoCal toolkit.
+    * References:
+    *   1/ "A comparison of numerical optimizers for logistic regression", 
     *   T. Minka, Unpublished draft, 2003 (revision in 2007), 
     *   http://research.microsoft.com/en-us/um/people/minka/papers/logreg/
+    *   2/ FoCal, http://www.dsp.sun.ac.za/~nbrummer/focal/
     */
-  class LLRTrainer {
-
+  class LLRTrainer 
+  {
     public: //api
 
       /**
-       * Default constructor.
-       */
+        * Default constructor.
+        * @param prior The synthetic prior. It should be in the range ]0.,1.[
+        * @param convergence_threshold The threshold to detect the convergence
+        *           of the iterative conjugate gradient algorithm
+        * @param max_iterations The maximum number of iterations of the 
+        *           iterative conjugate gradient algorithm (0 <-> infinity)
+        */
       LLRTrainer(const double prior=0.5, 
         const double convergence_threshold=1e-5,
         const size_t max_iterations=10000);
 
       /**
-       * Copy construction.
+       * Copy constructor
        */
       LLRTrainer(const LLRTrainer& other);
 
       /**
-       * Destructor virtualisation
+       * Destructor
        */
       virtual ~LLRTrainer();
 
       /**
-       * Copy operator
+       * Assignment operator
        */
       LLRTrainer& operator=(const LLRTrainer& other);
+
+      /**
+        * @brief Equal to
+        */
+      bool operator==(const LLRTrainer& b) const;
+      /**
+        * @brief Not equal to
+        */
+      bool operator!=(const LLRTrainer& b) const; 
 
       /**
         * Getters
@@ -72,19 +92,21 @@ namespace bob { namespace trainer {
       /**
         * Setters
         */
-      void setPrior(const double prior) { m_prior = prior; }
+      void setPrior(const double prior) 
+      { if(prior<=0. || prior>=1.) throw bob::trainer::LLRPriorNotInRange(prior);
+        m_prior = prior; }
       void setConvergenceThreshold(const double convergence_threshold)
       { m_convergence_threshold = convergence_threshold; }
       void setMaxIterations(const size_t max_iterations) 
       { m_max_iterations = max_iterations; }
 
       /**
-       * Trains the LinearMachine to perform the Linear Logistic Regression.
+       * Trains the LinearMachine to perform Linear Logistic Regression
        */
       virtual void train(bob::machine::LinearMachine& machine, 
           const bob::io::Arrayset& data1, const bob::io::Arrayset& data2) const;
 
-    private: //representation
+    private: 
       // Attributes
       double m_prior;
       double m_convergence_threshold;

@@ -42,9 +42,11 @@ void train2(const bob::trainer::LLRTrainer& t, bob::machine::LinearMachine& m,
 
 void bind_trainer_llr() 
 {
-  class_<bob::trainer::LLRTrainer, boost::shared_ptr<bob::trainer::LLRTrainer> >("LLRTrainer", "Trains a linear machine to perform Linear Logistic Regression. Reference:\n A comparison of numerical optimizers for logistic regression, T. Minka, http://research.microsoft.com/en-us/um/people/minka/papers/logreg/.", init<optional<const double, const double, const size_t> >((arg("prior")=0.5, arg("convergence_threshold")=1e-5, arg("max_iterations")=10000), "Initializes a new Linear Logistic Regression trainer. The training stage will place the resulting weights (and bias) in a linear machine with a single output dimension."))
+  class_<bob::trainer::LLRTrainer, boost::shared_ptr<bob::trainer::LLRTrainer> >("LLRTrainer", "Trains a linear machine to perform Linear Logistic Regression. References:\n1. A comparison of numerical optimizers for logistic regression, T. Minka, http://research.microsoft.com/en-us/um/people/minka/papers/logreg/\n2. FoCal, http://www.dsp.sun.ac.za/~nbrummer/focal/.", init<optional<const double, const double, const size_t> >((arg("prior")=0.5, arg("convergence_threshold")=1e-5, arg("max_iterations")=10000), "Initializes a new Linear Logistic Regression trainer. The training stage will place the resulting weights (and bias) in a linear machine with a single output dimension."))
     .def(init<bob::trainer::LLRTrainer&>(args("other")))
-    .add_property("prior", &bob::trainer::LLRTrainer::getPrior, &bob::trainer::LLRTrainer::setPrior, "The prior")
+    .def(self == self)
+    .def(self != self)
+    .add_property("prior", &bob::trainer::LLRTrainer::getPrior, &bob::trainer::LLRTrainer::setPrior, "The synthetic prior (should be in range ]0.,1.[.")
     .add_property("convergence_threshold", &bob::trainer::LLRTrainer::getConvergenceThreshold, &bob::trainer::LLRTrainer::setConvergenceThreshold, "The convergence threshold for the conjugate gradient algorithm")
     .add_property("max_iterations", &bob::trainer::LLRTrainer::getMaxIterations, &bob::trainer::LLRTrainer::setMaxIterations, "The maximum number of iterations for the conjugate gradient algorithm")
     .def("train", &train1, (arg("self"), arg("data1"), arg("data2")), "Trains a LinearMachine to perform the Linear Logistic Regression, using two arraysets for training, one for each of the two classes (target vs. non-target). The trained LinearMachine is returned.")

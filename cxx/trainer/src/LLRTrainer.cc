@@ -19,7 +19,6 @@
  */
 
 #include "trainer/LLRTrainer.h"
-#include "io/Exception.h"
 #include "core/array_type.h"
 #include "math/linear.h"
 
@@ -30,6 +29,8 @@ bob::trainer::LLRTrainer::LLRTrainer(const double prior,
     m_prior(prior), m_convergence_threshold(convergence_threshold), 
     m_max_iterations(max_iterations)
 {
+  if(prior<=0. || prior>=1.) 
+    throw bob::trainer::LLRPriorNotInRange(prior);
 }
 
 bob::trainer::LLRTrainer::LLRTrainer(const bob::trainer::LLRTrainer& other):
@@ -53,10 +54,24 @@ bob::trainer::LLRTrainer& bob::trainer::LLRTrainer::operator=
   return *this;
 }
 
+bool 
+bob::trainer::LLRTrainer::operator==(const bob::trainer::LLRTrainer& b) const
+{
+  return (this->m_prior == b.m_prior &&
+          this->m_convergence_threshold == b.m_convergence_threshold &&
+          this->m_max_iterations == b.m_max_iterations);
+}
+
+bool 
+bob::trainer::LLRTrainer::operator!=(const bob::trainer::LLRTrainer& b) const
+{
+  return !(this->operator==(b));
+}
+
 void bob::trainer::LLRTrainer::train(bob::machine::LinearMachine& machine, 
   const bob::io::Arrayset& ar1, const bob::io::Arrayset& ar2) const 
 {
-  // checks for arraysets data type and shape once
+  // Checks for arraysets data type and shape once
   if(ar1.getElementType() != bob::core::array::t_float64) 
     throw bob::io::TypeError(ar1.getElementType(), bob::core::array::t_float64);
   if(ar1.getNDim() != 1) 
@@ -68,7 +83,7 @@ void bob::trainer::LLRTrainer::train(bob::machine::LinearMachine& machine,
   if(ar1.getShape()[0] != ar2.getShape()[0]) 
     throw bob::io::DimensionError(ar1.getShape()[0], ar2.getShape()[0]);
 
-  // data is checked now and conforms, just proceed w/o any further checks.
+  // Data is checked now and conforms, just proceed w/o any further checks.
   size_t n_samples1 = ar1.size();
   size_t n_samples2 = ar2.size();
   size_t n_samples = n_samples1 + n_samples2;
@@ -80,7 +95,7 @@ void bob::trainer::LLRTrainer::train(bob::machine::LinearMachine& machine,
   blitz::Range r1 = blitz::Range(0,n_samples1-1);
   blitz::Range r2 = blitz::Range(n_samples1,n_samples-1);
 
-  // Create a large Blitz array containing the samples
+  // Creates a large blitz::Array containing the samples
   // x = |ar1 -ar2|, of size (n_features+1,n_samples1+n_samples2)
   //     |1.  -1. |
   blitz::Array<double,2> x(n_features+1, n_samples);
@@ -116,10 +131,6 @@ void bob::trainer::LLRTrainer::train(bob::machine::LinearMachine& machine,
   // Initialize working arrays
   blitz::Array<double,1> s1(n_samples);
   blitz::Array<double,1> u(n_features+1);
-  double ug; 
-  blitz::Array<double,1> ux(n_samples);
-  blitz::Array<double,1> a(n_samples);
-  double uhu;
   blitz::Array<double,1> tmp_n(n_samples);
   blitz::Array<double,1> tmp_d(n_features+1);
 
@@ -128,12 +139,17 @@ void bob::trainer::LLRTrainer::train(bob::machine::LinearMachine& machine,
   blitz::secondIndex j;
   for(size_t iter=0; ; ++iter) 
   {
-    tmp_n = blitz::sum(w(j)*x(j,i), j);
-    s1 = 1. / (1. + blitz::exp(tmp_n + offset));
+    // 1. Computes the non-weighted version of the likelihood
+    // s1 = sum_{i=1}^{n}(1./(1.+exp(-y_i (w^T x_i + logit))
+    //   where - the x blitz::Array contains -y_i x_i values
+    //         - the offset blitz::Array contains -y_i logit values
+    s1 = 1. / (1. + blitz::exp(blitz::sum(w(j)*x(j,i), j) + offset));
+    // 2. Likelihood weighted by the prior/proportion
     tmp_n = s1 * weights;
+    // 3. Gradient g of this weighted likelihood wrt. the weight vector w
     bob::math::prod(x, tmp_n, g);
 
-    // Conjugate gradient
+    // 4. Conjugate gradient step
     if(iter == 0) 
       u = g;
     else
@@ -144,21 +160,23 @@ void bob::trainer::LLRTrainer::train(bob::machine::LinearMachine& machine,
         u = 0.;
       else
       {
-        // Hestenes-Stiefel
+        // Hestenes-Stiefel formula: Heuristic to set the scale factor beta
+        //   (chosen as it works well in practice)
+        // beta = g^t(g-g_old) / (u_old^T (g - g_old))
         double beta = blitz::sum(tmp_d * g) / den;
         u = g - beta * u;
       }
     }
 
-    // Line search along the direction u
-    ug = blitz::sum(u*g);
-    bob::math::prod(u,x,ux);
-    a = weights * s1 * (1.-s1);
-    tmp_n = blitz::pow2(ux);
-    uhu = blitz::sum(tmp_n*a);
-    w = w + (ug/uhu) * u;
+    // 5. Line search along the direction u
+    // a. Compute ux
+    bob::math::prod(u,x,tmp_n);
+    // b. Compute u^T H u
+    double uhu = blitz::sum(blitz::pow2(tmp_n) * weights * s1 * (1.-s1));
+    // c. Compute w = w_old - (g^T u)/(u^T H u) u
+    w = w + blitz::sum(u*g) / uhu * u;
     
-    // Check if convergence has been reached
+    // Terminates if convergence has been reached
     if(blitz::max(blitz::fabs(w-w_old)) <= m_convergence_threshold) 
     {
       bob::core::info << "# LLR Training terminated: convergence" << std::endl;
@@ -176,13 +194,12 @@ void bob::trainer::LLRTrainer::train(bob::machine::LinearMachine& machine,
     w_old = w;
   }
 
-  // Update the LinearMachine
+  // Updates the LinearMachine
   machine.resize(n_features, 1);
-  machine.setInputSubtraction(0.);
-  machine.setInputDivision(1.);
-  blitz::Array<double,2> w_(n_features, 1);
-  w_(rall,0) = w(rd);
-  machine.setWeights(w_);
-  machine.setBiases(w(n_features));
+  machine.setInputSubtraction(0.); // No subtraction
+  machine.setInputDivision(1.); // No division
+  blitz::Array<double,2>& w_ = machine.updateWeights();
+  w_(rall,0) = w(rd); // Weights: first D values
+  machine.setBiases(w(n_features)); // Bias: D+1 value
 }
 

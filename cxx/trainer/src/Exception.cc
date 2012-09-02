@@ -109,3 +109,23 @@ const char* train::EmptyTrainingSet::what() const throw() {
  static const char* what_string = "trainer::EmptyTrainingSet: you are trying to train a machine without any data";
  return what_string;
 }
+
+bob::trainer::LLRPriorNotInRange::LLRPriorNotInRange(const double got) throw() :
+  m_got(got)
+{
+}
+
+bob::trainer::LLRPriorNotInRange::~LLRPriorNotInRange() throw() { }
+
+const char* bob::trainer::LLRPriorNotInRange::what() const throw() {
+  try {
+    boost::format message("Cannot set prior to '%f', as it should be in the range ]0.,1.[.");
+    message % m_got;
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "bob::trainer::LLRPriorNotInRange: cannot format, exception raised";
+    return emergency;
+  }
+}
+
