@@ -25,7 +25,7 @@
 
 #include <complex>
 #include <blitz/array.h>
-#include "core/array_assert.h"
+#include "bob/core/array_assert.h"
 
 
 namespace bob {

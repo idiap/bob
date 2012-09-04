@@ -24,8 +24,8 @@
 #ifndef BOB5SPRO_TRAINER_SVDPCA_TRAINER_H
 #define BOB5SPRO_TRAINER_SVDPCA_TRAINER_H
 
-#include "machine/LinearMachine.h"
-#include "io/Arrayset.h"
+#include "bob/machine/LinearMachine.h"
+#include "bob/io/Arrayset.h"
 
 namespace bob { namespace trainer {
   

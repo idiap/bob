@@ -3,7 +3,7 @@ project(bob_daq)
 # This defines the dependencies of this package
 set(bob_deps "bob_ip;bob_visioner")
 set(shared "${bob_deps}")
-set(incdir "${ImageMagick_INCLUDE_DIRS}")
+set(incdir ${ImageMagick_INCLUDE_DIRS};${boost_INCLUDE_DIRS};${Blitz_INCLUDE_DIR})
 set(libdir "${ImageMagick_LIBRARY_DIRS}")
 
 # This defines the list of source files inside this package.

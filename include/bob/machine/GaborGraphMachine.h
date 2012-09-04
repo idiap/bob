@@ -23,10 +23,10 @@
 #ifndef BOB_MACHINE_GABOR_GRAPH_MACHINE_H
 #define BOB_MACHINE_GABOR_GRAPH_MACHINE_H
 
-#include <ip/GaborWaveletTransform.h>
-#include <machine/GaborJetSimilarities.h>
-#include <io/HDF5File.h>
-#include <machine/Exception.h>
+#include "bob/ip/GaborWaveletTransform.h"
+#include "bob/machine/GaborJetSimilarities.h"
+#include "bob/io/HDF5File.h"
+#include "bob/machine/Exception.h"
 
 #include <sstream>
 

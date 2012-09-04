@@ -29,7 +29,7 @@
 
 #include <limits>
 #include <blitz/array.h>
-#include "core/convert_exception.h"
+#include "bob/core/convert_exception.h"
 
 namespace bob {
 /**

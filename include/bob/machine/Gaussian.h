@@ -22,8 +22,8 @@
 #ifndef BOB_MACHINE_GAUSSIAN_H
 #define BOB_MACHINE_GAUSSIAN_H
 
-#include "machine/Machine.h"
-#include "io/HDF5File.h"
+#include "bob/machine/Machine.h"
+#include "bob/io/HDF5File.h"
 #include <blitz/array.h>
 #include <limits>
 

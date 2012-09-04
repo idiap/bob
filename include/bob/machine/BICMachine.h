@@ -23,9 +23,9 @@
 #define BOB_MACHINE_BICMACHINE_H
 
 #include <blitz/array.h>
-#include <io/HDF5File.h>
+#include "bob/io/HDF5File.h"
 
-#include <machine/Exception.h>
+#include "bob/machine/Exception.h"
 
 
 namespace bob { namespace machine {

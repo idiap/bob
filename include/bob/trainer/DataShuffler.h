@@ -28,7 +28,7 @@
 #include <blitz/array.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/random.hpp>
-#include "io/Arrayset.h"
+#include "bob/io/Arrayset.h"
 
 namespace bob { namespace trainer {
 

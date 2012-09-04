@@ -25,8 +25,8 @@
 #ifndef BOB_VISIONER_CV_LOCALIZER_H
 #define BOB_VISIONER_CV_LOCALIZER_H
 
-#include "visioner/cv/cv_detector.h"
-#include "visioner/util/histogram.h"
+#include "bob/visioner/cv/cv_detector.h"
+#include "bob/visioner/util/histogram.h"
 
 namespace bob { namespace visioner {
 

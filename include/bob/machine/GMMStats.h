@@ -23,7 +23,7 @@
 #define BOB_MACHINE_GMMSTATS_H
 
 #include <blitz/array.h>
-#include "io/HDF5File.h"
+#include "bob/io/HDF5File.h"
 
 namespace bob { namespace machine {
 

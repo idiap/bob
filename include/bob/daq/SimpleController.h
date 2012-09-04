@@ -20,7 +20,7 @@
 #ifndef SIMPLECONTROLER_H
 #define SIMPLECONTROLER_H
 
-#include "daq/Controller.h"
+#include "bob/daq/Controller.h"
 
 namespace bob { namespace daq {
 

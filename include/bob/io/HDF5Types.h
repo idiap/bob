@@ -23,6 +23,8 @@
 #ifndef BOB_IO_HDF5TYPES_H
 #define BOB_IO_HDF5TYPES_H
 
+#include "bob/config.h"
+
 #include <vector>
 #include <string>
 #include <boost/shared_ptr.hpp>
@@ -43,7 +45,7 @@
   (H5_VERS_MAJOR>Maj))
 #endif
 
-#include "core/array.h"
+#include "bob/core/array.h"
 
 namespace bob { namespace io {
 

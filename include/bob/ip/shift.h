@@ -23,9 +23,9 @@
 #ifndef BOB_IP_SHIFT_H
 #define BOB_IP_SHIFT_H
 
-#include "core/array_index.h"
-#include "core/array_assert.h"
-#include "ip/crop.h"
+#include "bob/core/array_index.h"
+#include "bob/core/array_assert.h"
+#include "bob/ip/crop.h"
 
 namespace bob {
 /**

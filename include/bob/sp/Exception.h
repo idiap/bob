@@ -23,7 +23,7 @@
 #ifndef BOB_SP_EXCEPTION_H 
 #define BOB_SP_EXCEPTION_H
 
-#include "core/Exception.h"
+#include "bob/core/Exception.h"
 
 namespace bob { namespace sp {
 

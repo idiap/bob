@@ -30,7 +30,7 @@
 #include <boost/shared_ptr.hpp>
 #include <blitz/array.h>
 
-#include "core/array_type.h"
+#include "bob/core/array_type.h"
 
 namespace bob { namespace core { namespace array {
 

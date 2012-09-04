@@ -24,11 +24,11 @@
 #ifndef BOB_IP_BLOCK_CELL_GRADIENT_DESCRIPTORS_H
 #define BOB_IP_BLOCK_CELL_GRADIENT_DESCRIPTORS_H
 
-#include "core/array_assert.h"
-#include "ip/Exception.h"
-#include "ip/BlockCellDescriptors.h"
-#include "ip/block.h"
-#include "math/gradient.h"
+#include "bob/core/array_assert.h"
+#include "bob/ip/Exception.h"
+#include "bob/ip/BlockCellDescriptors.h"
+#include "bob/ip/block.h"
+#include "bob/math/gradient.h"
 #include <boost/shared_ptr.hpp>
 
 namespace bob {

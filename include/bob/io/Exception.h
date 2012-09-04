@@ -24,8 +24,8 @@
 #define BOB_IO_EXCEPTION_H
 
 #include <cstdlib>
-#include "core/Exception.h"
-#include "core/array_type.h"
+#include "bob/core/Exception.h"
+#include "bob/core/array_type.h"
 
 namespace bob { namespace io {
 

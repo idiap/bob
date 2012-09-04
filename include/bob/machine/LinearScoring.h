@@ -23,7 +23,7 @@
 #include <blitz/array.h>
 #include <boost/shared_ptr.hpp>
 #include <vector>
-#include "machine/GMMMachine.h"
+#include "bob/machine/GMMMachine.h"
 
 namespace bob { namespace machine {
 

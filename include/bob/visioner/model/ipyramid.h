@@ -25,9 +25,9 @@
 #ifndef BOB_VISIONER_IPYRAMID_H
 #define BOB_VISIONER_IPYRAMID_H
 
-#include "visioner/vision/object.h"
-#include "visioner/vision/image.h"
-#include "visioner/model/param.h"
+#include "bob/visioner/vision/object.h"
+#include "bob/visioner/vision/image.h"
+#include "bob/visioner/model/param.h"
 
 namespace bob { namespace visioner {
 

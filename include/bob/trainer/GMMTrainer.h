@@ -24,10 +24,10 @@
 #ifndef BOB_TRAINER_GMMTRAINER_H
 #define BOB_TRAINER_GMMTRAINER_H
 
-#include "io/Arrayset.h"
-#include "trainer/EMTrainer.h"
-#include "machine/GMMMachine.h"
-#include "machine/GMMStats.h"
+#include "bob/io/Arrayset.h"
+#include "bob/trainer/EMTrainer.h"
+#include "bob/machine/GMMMachine.h"
+#include "bob/machine/GMMStats.h"
 #include <limits>
 
 namespace bob {

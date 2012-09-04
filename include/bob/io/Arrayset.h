@@ -28,7 +28,7 @@
 #include <boost/shared_ptr.hpp>
 #include <blitz/array.h>
 
-#include "io/Array.h"
+#include "bob/io/Array.h"
 
 namespace bob { namespace io {
     

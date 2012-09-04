@@ -20,7 +20,7 @@
 #ifndef NULLFACERECOGNTION_H
 #define NULLFACERECOGNTION_H
 
-#include <daq/FaceLocalization.h>
+#include "bob/daq/FaceLocalization.h"
 
 namespace bob { namespace daq {
 

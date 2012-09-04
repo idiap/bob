@@ -24,13 +24,13 @@
 #ifndef BOB_IP_LBPHS_FEATURES_H
 #define BOB_IP_LBPHS_FEATURES_H
 
-#include "core/cast.h"
-#include "ip/Exception.h"
-#include "ip/block.h"
-#include "ip/histo.h"
-#include "ip/LBP.h"
-#include "ip/LBP4R.h"
-#include "ip/LBP8R.h"
+#include "bob/core/cast.h"
+#include "bob/ip/Exception.h"
+#include "bob/ip/block.h"
+#include "bob/ip/histo.h"
+#include "bob/ip/LBP.h"
+#include "bob/ip/LBP4R.h"
+#include "bob/ip/LBP8R.h"
 #include <list>
 
 namespace bob {

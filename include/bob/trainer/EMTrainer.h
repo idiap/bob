@@ -24,10 +24,10 @@
 #ifndef BOB_TRAINER_EMTRAINER_H
 #define BOB_TRAINER_EMTRAINER_H
 
-#include "trainer/Trainer.h"
+#include "bob/trainer/Trainer.h"
 
 #include <limits>
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
 
 namespace bob { namespace trainer {

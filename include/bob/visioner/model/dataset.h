@@ -25,8 +25,8 @@
 #ifndef BOB_VISIONER_DATASET_H
 #define BOB_VISIONER_DATASET_H
 
-#include "visioner/util/matrix.h"
-#include "visioner/model/ml.h"
+#include "bob/visioner/util/matrix.h"
+#include "bob/visioner/model/ml.h"
 
 namespace bob { namespace visioner {
 

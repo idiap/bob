@@ -23,11 +23,11 @@
 #ifndef BOB_IP_SCALE_H
 #define BOB_IP_SCALE_H
 
-#include "core/array_assert.h"
-#include "core/array_index.h"
-#include "core/cast.h"
-#include "ip/Exception.h"
-#include "ip/common.h"
+#include "bob/core/array_assert.h"
+#include "bob/core/array_index.h"
+#include "bob/core/cast.h"
+#include "bob/ip/Exception.h"
+#include "bob/ip/common.h"
 
 namespace bob {
 /**

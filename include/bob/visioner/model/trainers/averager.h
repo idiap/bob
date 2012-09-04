@@ -25,7 +25,7 @@
 #ifndef BOB_VISIONER_AVERAGER_H
 #define ABOB_VISIONER_VERAGER_H
 
-#include "visioner/model/trainer.h"
+#include "bob/visioner/model/trainer.h"
 
 namespace bob { namespace visioner {
 

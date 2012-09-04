@@ -25,7 +25,7 @@
 #ifndef BOB_VISIONER_LUT_PROBLEM_EPT_H
 #define BOB_VISIONER_LUT_PROBLEM_EPT_H
 
-#include "visioner/model/trainers/lutproblems/lut_problem.h"
+#include "bob/visioner/model/trainers/lutproblems/lut_problem.h"
 
 namespace bob { namespace visioner {
 

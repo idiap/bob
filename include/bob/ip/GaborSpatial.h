@@ -24,9 +24,9 @@
 #ifndef BOB_IP_GABOR_SPATIAL_H
 #define BOB_IP_GABOR_SPATIAL_H
 
-#include "ip/Exception.h"
-#include "sp/conv.h"
-#include "sp/extrapolate.h"
+#include "bob/ip/Exception.h"
+#include "bob/sp/conv.h"
+#include "bob/sp/extrapolate.h"
 
 namespace bob {
 /**

@@ -24,7 +24,7 @@
 #define BOB5SPRO_MACHINE_TWODPCAMACHINE_H
 
 #include <blitz/array.h>
-#include "machine/Machine.h"
+#include "bob/machine/Machine.h"
 
 namespace bob {
 /**

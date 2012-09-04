@@ -24,8 +24,8 @@
 #define BOB_MACHINE_MLPEXCEPTION_H
 
 #include <blitz/array.h>
-#include "machine/Exception.h"
-#include "machine/Activation.h"
+#include "bob/machine/Exception.h"
+#include "bob/machine/Activation.h"
 
 namespace bob { namespace machine {
 

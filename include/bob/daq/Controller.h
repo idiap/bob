@@ -20,9 +20,9 @@
 #ifndef CONTROLER_H
 #define CONTROLER_H
 
-#include <daq/Camera.h>
-#include <daq/Callbacks.h>
-#include "daq/OutputWriter.h"
+#include "bob/daq/Camera.h"
+#include "bob/daq/Callbacks.h"
+#include "bob/daq/OutputWriter.h"
 
 namespace bob { namespace daq {
 

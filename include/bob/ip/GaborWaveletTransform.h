@@ -25,9 +25,9 @@
 #define BOB_IP_GABOR_WAVELET_TRANSFORM_H
 
 #include <blitz/array.h>
-#include <core/Exception.h>
-#include <io/HDF5File.h>
-#include <sp/FFT2D.h>
+#include "bob/core/Exception.h"
+#include "bob/io/HDF5File.h"
+#include "bob/sp/FFT2D.h"
 #include <vector>
 #include <utility>
 

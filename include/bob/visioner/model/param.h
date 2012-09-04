@@ -29,7 +29,7 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
-#include "visioner/model/ml.h"
+#include "bob/visioner/model/ml.h"
 
 namespace bob { namespace visioner {
 

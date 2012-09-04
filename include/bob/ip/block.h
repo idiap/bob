@@ -23,9 +23,9 @@
 #ifndef BOB_IP_BLOCK_H
 #define BOB_IP_BLOCK_H
 
-#include "core/array_assert.h"
-#include "ip/Exception.h"
-#include "ip/crop.h"
+#include "bob/core/array_assert.h"
+#include "bob/ip/Exception.h"
+#include "bob/ip/crop.h"
 
 namespace bob {
 /**

@@ -20,8 +20,8 @@
 #ifndef VIDEOREADERCAMERA_H
 #define VIDEOREADERCAMERA_H
 
-#include <daq/Camera.h>
-#include <io/VideoReader.h>
+#include "bob/daq/Camera.h"
+#include "bob/io/VideoReader.h"
 
 namespace bob { namespace daq {
 

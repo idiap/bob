@@ -27,9 +27,9 @@
 #include <blitz/array.h>
 #include <map>
 #include <vector>
-#include "trainer/EMTrainer.h"
-#include "machine/PLDAMachine.h"
-#include "io/Arrayset.h"
+#include "bob/trainer/EMTrainer.h"
+#include "bob/machine/PLDAMachine.h"
+#include "bob/io/Arrayset.h"
 
 namespace bob { namespace trainer {
   

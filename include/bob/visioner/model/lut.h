@@ -28,7 +28,7 @@
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/vector.hpp>
 
-#include "visioner/model/ml.h"
+#include "bob/visioner/model/ml.h"
 
 namespace bob { namespace visioner {	
 

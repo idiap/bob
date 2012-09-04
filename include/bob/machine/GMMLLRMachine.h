@@ -24,11 +24,11 @@
 #ifndef BOB_MACHINE_GMMLLRMACHINE_H
 #define BOB_MACHINE_GMMLLRMACHINE_H
 
-#include "io/Arrayset.h"
-#include "machine/Machine.h"
-#include "machine/GMMMachine.h"
-#include "machine/GMMLLRMachine.h"
-#include "io/HDF5File.h"
+#include "bob/io/Arrayset.h"
+#include "bob/machine/Machine.h"
+#include "bob/machine/GMMMachine.h"
+#include "bob/machine/GMMLLRMachine.h"
+#include "bob/io/HDF5File.h"
 #include <iostream>
 
 namespace bob { namespace machine {

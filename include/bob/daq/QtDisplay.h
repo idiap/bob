@@ -20,7 +20,7 @@
 #ifndef QTDISPLAY_H
 #define QTDISPLAY_H
 
-#include <daq/Display.h>
+#include "bob/daq/Display.h"
 #include <QtGui>
 
 

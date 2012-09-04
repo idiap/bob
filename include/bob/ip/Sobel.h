@@ -23,11 +23,11 @@
 #ifndef BOB_IP_SOBEL_H
 #define BOB_IP_SOBEL_H
 
-#include "core/array_assert.h"
-#include "core/cast.h"
-#include "ip/Exception.h"
-#include "sp/conv.h"
-#include "sp/extrapolate.h"
+#include "bob/core/array_assert.h"
+#include "bob/core/cast.h"
+#include "bob/ip/Exception.h"
+#include "bob/sp/conv.h"
+#include "bob/sp/extrapolate.h"
 
 namespace bob {
 /**

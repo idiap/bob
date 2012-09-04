@@ -23,7 +23,7 @@
 #ifndef BOB_CORE_RESHAPE_EXCEPTION_H 
 #define BOB_CORE_RESHAPE_EXCEPTION_H
 
-#include "core/Exception.h"
+#include "bob/core/Exception.h"
 
 namespace bob { 
   

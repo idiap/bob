@@ -22,7 +22,7 @@
 
 #include <vector>
 #include <pthread.h>
-#include <daq/Callbacks.h>
+#include "bob/daq/Callbacks.h"
 
 namespace bob { namespace daq {
 

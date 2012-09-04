@@ -27,9 +27,9 @@
 #ifndef BOB_IP_SELF_QUOTIENT_IMAGE_H
 #define BOB_IP_SELF_QUOTIENT_IMAGE_H
 
-#include "core/array_assert.h"
-#include "sp/extrapolate.h"
-#include "ip/WeightedGaussian.h"
+#include "bob/core/array_assert.h"
+#include "bob/sp/extrapolate.h"
+#include "bob/ip/WeightedGaussian.h"
 #include <boost/shared_array.hpp>
 
 namespace bob {

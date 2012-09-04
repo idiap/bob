@@ -22,10 +22,10 @@
 #define BOB_IP_FACE_EYES_NORM_H
 
 #include <boost/shared_ptr.hpp>
-#include "core/array_assert.h"
-#include "core/array_check.h"
-#include "ip/GeomNorm.h"
-#include "ip/rotate.h"
+#include "bob/core/array_assert.h"
+#include "bob/core/array_check.h"
+#include "bob/ip/GeomNorm.h"
+#include "bob/ip/rotate.h"
 
 namespace bob {
 /**

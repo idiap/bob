@@ -25,7 +25,7 @@
 #ifndef BOB_VISIONER_TAGGER_KEYPOINT_OXY_H
 #define BOB_VISIONER_TAGGER_KEYPOINT_OXY_H
 
-#include "visioner/model/tagger.h"
+#include "bob/visioner/model/tagger.h"
 
 namespace bob { namespace visioner {
 

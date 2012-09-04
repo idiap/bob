@@ -25,8 +25,8 @@
 #ifndef BOB_VISIONER_II_MODEL_H
 #define BOB_VISIONER_II_MODEL_H
 
-#include "visioner/model/model.h"
-#include "visioner/vision/integral.h"
+#include "bob/visioner/model/model.h"
+#include "bob/visioner/vision/integral.h"
 
 namespace bob { namespace visioner {
 

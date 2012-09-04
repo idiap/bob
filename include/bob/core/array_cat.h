@@ -25,12 +25,14 @@
 #ifndef BOB_CORE_ARRAY_CAT_H 
 #define BOB_CORE_ARRAY_CAT_H
 
+#include "bob/config.h"
+
 #include <vector>
 #include <blitz/array.h>
 #if !defined (HAVE_BLITZ_TINYVEC2_H)
 #include <blitz/tinyvec-et.h>
 #endif
-#include <core/Exception.h>
+#include "bob/core/Exception.h"
 
 namespace bob { namespace core { namespace array {
 

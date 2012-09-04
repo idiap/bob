@@ -26,11 +26,11 @@
 #include <blitz/array.h>
 #include <algorithm>
 #include <cmath>
-#include "core/array_assert.h"
-#include "core/cast.h"
-#include "ip/Exception.h"
-#include "ip/LBP.h"
-#include "sp/interpolate.h"
+#include "bob/core/array_assert.h"
+#include "bob/core/cast.h"
+#include "bob/ip/Exception.h"
+#include "bob/ip/LBP.h"
+#include "bob/sp/interpolate.h"
 
 namespace bob { namespace ip {
 

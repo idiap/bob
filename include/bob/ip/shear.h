@@ -28,10 +28,10 @@
 #define BOB_IP_SHEAR_H
 
 #include <blitz/array.h>
-#include "core/array_assert.h"
-#include "core/cast.h"
-#include "ip/Exception.h"
-#include "ip/common.h"
+#include "bob/core/array_assert.h"
+#include "bob/core/cast.h"
+#include "bob/ip/Exception.h"
+#include "bob/ip/common.h"
 
 namespace bob {
 /**

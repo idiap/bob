@@ -28,9 +28,9 @@
 
 #include <vector>
 
-#include "trainer/Trainer.h"
-#include "machine/LinearMachine.h"
-#include "io/Arrayset.h"
+#include "bob/trainer/Trainer.h"
+#include "bob/machine/LinearMachine.h"
+#include "bob/io/Arrayset.h"
 
 namespace bob { namespace trainer {
   

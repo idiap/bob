@@ -25,7 +25,7 @@
 #ifndef BOB_VISIONER_MB_XLBP_H
 #define BOB_VISIONER_MB_XLBP_H
 
-#include "visioner/util/matrix.h"
+#include "bob/visioner/util/matrix.h"
 
 namespace bob { namespace visioner {
 

@@ -23,8 +23,8 @@
 #ifndef BOB_IO_VIDEO_H 
 #define BOB_IO_VIDEO_H
 
-#include "io/VideoException.h"
-#include "io/VideoReader.h"
-#include "io/VideoWriter.h"
+#include "bob/io/VideoException.h"
+#include "bob/io/VideoReader.h"
+#include "bob/io/VideoWriter.h"
 
 #endif //BOB_IO_VIDEO_H

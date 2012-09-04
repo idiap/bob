@@ -25,11 +25,11 @@
 #ifndef BOB_MACHINE_GMMMACHINE_H
 #define BOB_MACHINE_GMMMACHINE_H
 
-#include "machine/Machine.h"
-#include "io/Arrayset.h"
-#include "machine/Gaussian.h"
-#include "machine/GMMStats.h"
-#include "io/HDF5File.h"
+#include "bob/machine/Machine.h"
+#include "bob/io/Arrayset.h"
+#include "bob/machine/Gaussian.h"
+#include "bob/machine/GMMStats.h"
+#include "bob/io/HDF5File.h"
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 #include <vector>

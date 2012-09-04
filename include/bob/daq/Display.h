@@ -20,7 +20,7 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#include <daq/Callbacks.h>
+#include "bob/daq/Callbacks.h"
 #include <vector>
 
 namespace bob { namespace daq {

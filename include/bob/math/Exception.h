@@ -24,7 +24,7 @@
 #define BOB_MATH_EXCEPTION_H
 
 #include <cstdlib>
-#include "core/Exception.h"
+#include "bob/core/Exception.h"
 
 namespace bob { namespace math {
 

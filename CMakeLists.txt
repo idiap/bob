@@ -62,7 +62,7 @@ endif(APPLE)
 
 # For both RELEASE and DEBUG builds
 if(APPLE AND CMAKE_COMPILER_IS_GNUCC)
-  set(COMMON_FLAGS "${COMMON_FLAGS} -Wno-long-long")
+  set(COMMON_FLAGS "${COMMON_FLAGS} -Wno-long-long -Wno-variadic-macros")
 else()
   set(COMMON_CXX_FLAGS "-std=c++0x")
   set(COMMON_C_FLAGS "-std=c99")
@@ -150,11 +150,11 @@ endmacro()
 # name: test name
 # src: test source files
 #
-# Example: bob_add_test(io array test/array.cc)
+# Example: bob_add_test(bob_io array test/array.cc)
 macro(bob_add_test package name src)
   set(tname test_${package}_${name})
   add_executable(test_${package}_${name} ${src})
-  target_link_libraries(test_${package}_${name} bob_${package};${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_RELEASE})
+  target_link_libraries(test_${package}_${name} ${package};${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_RELEASE})
   set_property(TARGET ${tname} APPEND PROPERTY INCLUDE_DIRECTORIES
     "${CMAKE_SOURCE_DIR}/include")
   set_property(TARGET ${tname} APPEND PROPERTY INCLUDE_DIRECTORIES

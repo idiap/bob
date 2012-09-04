@@ -24,9 +24,9 @@
 #ifndef BOB_IP_INTEGRAL_H
 #define BOB_IP_INTEGRAL_H
 
-#include "core/array_assert.h"
-#include "core/array_index.h"
-#include "core/cast.h"
+#include "bob/core/array_assert.h"
+#include "bob/core/array_index.h"
+#include "bob/core/cast.h"
 
 namespace bob {
 /**

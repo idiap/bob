@@ -20,7 +20,7 @@
 #ifndef BOB_TRAINER_EXCEPTION_H
 #define BOB_TRAINER_EXCEPTION_H
 
-#include "core/Exception.h"
+#include "bob/core/Exception.h"
 
 namespace bob { namespace trainer {
 

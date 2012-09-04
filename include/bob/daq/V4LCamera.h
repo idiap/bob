@@ -20,7 +20,7 @@
 #ifndef V4LCAMERA_H
 #define V4LCAMERA_H
 
-#include <daq/Camera.h>
+#include "bob/daq/Camera.h"
 
 namespace bob { namespace daq {
   

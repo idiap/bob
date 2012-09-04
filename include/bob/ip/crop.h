@@ -23,8 +23,8 @@
 #ifndef BOB_IP_CROP_H
 #define BOB_IP_CROP_H
 
-#include "core/array_assert.h"
-#include "core/array_index.h"
+#include "bob/core/array_assert.h"
+#include "bob/core/array_index.h"
 
 namespace bob {
 /**

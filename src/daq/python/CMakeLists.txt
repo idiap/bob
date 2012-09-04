@@ -3,7 +3,7 @@ project(bob_daq_py)
 # This defines the dependencies of this package
 set(bob_deps "bob_daq;bob_python")
 set(shared "${bob_deps}")
-set(incdir "${python_INCLUDE_DIRS};${ImageMagick_INCLUDE_DIRS}")
+set(incdir ${ImageMagick_INCLUDE_DIRS};${python_INCLUDE_DIRS};${boost_INCLUDE_DIRS};${Blitz_INCLUDE_DIR})
 
 set(src
    "version.cc"

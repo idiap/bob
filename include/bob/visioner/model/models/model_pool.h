@@ -25,7 +25,7 @@
 #ifndef BOB_VISIONER_MODEL_POOL_H
 #define BOB_VISIONER_MODEL_POOL_H
 
-#include "visioner/model/model.h"
+#include "bob/visioner/model/model.h"
 
 namespace bob { namespace visioner {
 

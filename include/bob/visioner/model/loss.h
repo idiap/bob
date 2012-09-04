@@ -25,7 +25,7 @@
 #ifndef BOB_VISIONER_LOSS_H
 #define BOB_VISIONER_LOSS_H
 
-#include "visioner/model/param.h"
+#include "bob/visioner/model/param.h"
 
 namespace bob { namespace visioner {
 

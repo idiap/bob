@@ -25,8 +25,8 @@
 #ifndef BOB_VISIONER_VISION_H
 #define BOB_VISIONER_VISION_H
 
-#include "visioner/util/geom.h"
-#include "visioner/util/util.h"
+#include "bob/visioner/util/geom.h"
+#include "bob/visioner/util/util.h"
 
 namespace bob { namespace visioner {
 

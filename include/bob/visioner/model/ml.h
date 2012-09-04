@@ -25,7 +25,7 @@
 #ifndef BOB_VISIONER_ML_H
 #define BOB_VISIONER_ML_H
 
-#include "visioner/util/util.h"
+#include "bob/visioner/util/util.h"
 
 namespace bob { namespace visioner {
 

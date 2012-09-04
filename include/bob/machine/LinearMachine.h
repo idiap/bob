@@ -31,8 +31,8 @@
 #define BOB_MACHINE_LINEARMACHINE_H
 
 #include <blitz/array.h>
-#include "io/HDF5File.h"
-#include "machine/Activation.h"
+#include "bob/io/HDF5File.h"
+#include "bob/machine/Activation.h"
 
 namespace bob { namespace machine {
 

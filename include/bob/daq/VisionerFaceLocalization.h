@@ -22,8 +22,8 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "daq/FaceLocalization.h"
-#include "visioner/cv/cv_detector.h"
+#include "bob/daq/FaceLocalization.h"
+#include "bob/visioner/cv/cv_detector.h"
 
 namespace bob { namespace daq {
 

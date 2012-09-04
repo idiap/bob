@@ -25,7 +25,7 @@
 #ifndef BOB_VISIONER_DIAG_EXP_LOSS_H
 #define BOB_VISIONER_DIAG_EXP_LOSS_H
 
-#include "visioner/model/losses/diag_loss.h"
+#include "bob/visioner/model/losses/diag_loss.h"
 
 namespace bob { namespace visioner {
 

@@ -27,8 +27,8 @@
 
 #include <limits>
 #include <blitz/array.h>
-#include "core/array_assert.h"
-#include "core/reshape_exception.h"
+#include "bob/core/array_assert.h"
+#include "bob/core/reshape_exception.h"
 
 namespace bob {
 /**

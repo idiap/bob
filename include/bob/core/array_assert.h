@@ -23,8 +23,8 @@
 #ifndef BOB_CORE_ARRAY_ASSERT_H
 #define BOB_CORE_ARRAY_ASSERT_H
 
-#include "core/array_check.h"
-#include "core/array_exception.h"
+#include "bob/core/array_check.h"
+#include "bob/core/array_exception.h"
 #if !defined (HAVE_BLITZ_TINYVEC2_H)
 #include <blitz/tinyvec-et.h>
 #endif

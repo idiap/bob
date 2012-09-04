@@ -26,7 +26,7 @@
 #include <cstdlib>
 #include <stdint.h>
 #include <blitz/array.h>
-#include "ip/SpatioTemporalGradient.h"
+#include "bob/ip/SpatioTemporalGradient.h"
 
 namespace bob { namespace ip { namespace optflow {
 

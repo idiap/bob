@@ -26,9 +26,9 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <hdf5.h>
-#include "io/HDF5Types.h"
-#include "io/HDF5Dataset.h"
-#include "io/HDF5Attribute.h"
+#include "bob/io/HDF5Types.h"
+#include "bob/io/HDF5Dataset.h"
+#include "bob/io/HDF5Attribute.h"
 
 namespace bob { namespace io { namespace detail { namespace hdf5 {
 

@@ -23,9 +23,9 @@
 #ifndef BOB_IP_HOG_H
 #define BOB_IP_HOG_H
 
-#include "core/array_assert.h"
-#include "ip/Exception.h"
-#include "ip/BlockCellGradientDescriptors.h"
+#include "bob/core/array_assert.h"
+#include "bob/ip/Exception.h"
+#include "bob/ip/BlockCellGradientDescriptors.h"
 #include <boost/shared_ptr.hpp>
 
 namespace bob {

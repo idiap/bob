@@ -23,8 +23,8 @@
 #ifndef BOB_SP_CONV_H
 #define BOB_SP_CONV_H
 
-#include "sp/Exception.h"
-#include "core/array_assert.h"
+#include "bob/sp/Exception.h"
+#include "bob/core/array_assert.h"
 #include <algorithm>
 #include <blitz/array.h>
 

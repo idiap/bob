@@ -23,6 +23,8 @@
 #ifndef BOB_CORE_ARRAY_CHECK_H
 #define BOB_CORE_ARRAY_CHECK_H
 
+#include "bob/config.h"
+
 #include <blitz/array.h>
 #if !defined (HAVE_BLITZ_TINYVEC2_H)
 #include <blitz/tinyvec-et.h>

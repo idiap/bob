@@ -25,10 +25,10 @@
 #ifndef BOB_VISIONER_TAYLOR_BOOSTER_H
 #define BOB_VISIONER_TAYLOR_BOOSTER_H
 
-#include "visioner/model/trainer.h"
-#include "visioner/model/generalizer.h"
-#include "visioner/model/mdecoder.h"
-#include "visioner/model/trainers/lutproblems/lut_problem.h"
+#include "bob/visioner/model/trainer.h"
+#include "bob/visioner/model/generalizer.h"
+#include "bob/visioner/model/mdecoder.h"
+#include "bob/visioner/model/trainers/lutproblems/lut_problem.h"
 
 namespace bob { namespace visioner {        
 

@@ -3,6 +3,7 @@ project(bob_core)
 # This defines the dependencies of this package
 set(bob_deps "")
 set(shared ${Boost_SYSTEM_LIBRARY_RELEASE};${Boost_FILESYSTEM_LIBRARY_RELEASE};${Boost_IOSTREAMS_LIBRARY_RELEASE};${Boost_THREAD_LIBRARY_RELEASE})
+set(incdir ${boost_INCLUDE_DIRS};${Blitz_INCLUDE_DIR})
 
 string(TOLOWER "${CMAKE_BUILD_TYPE}" LOWER_BUILD_TYPE)
 # also add a dependency to Blitz in debug mode (needed to enable the -BZ_BLITZ debugging mode)
@@ -25,6 +26,10 @@ set(src
     "repmat_exception.cc"
     )
 
+list(REMOVE_DUPLICATES incdir)
+foreach(inc ${incdir})
+  include_directories(SYSTEM ${inc})
+endforeach()
 bob_add_library(${PROJECT_NAME} "${src}")
 target_link_libraries(${PROJECT_NAME} ${shared})
 

@@ -22,13 +22,14 @@
 
 #include <boost/python.hpp>
 #include <boost/format.hpp>
+
+#include "bob/core/blitz_compat.h"
+
 #if defined(HAVE_BLITZ_TINYVEC2_H)
 #include <blitz/tinyvec2.h>
 #else
 #include <blitz/tinyvec.h>
 #endif
-
-#include "bob/core/blitz_compat.h"
 
 namespace bp = boost::python;
 

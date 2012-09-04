@@ -26,7 +26,7 @@
 
 #include "GMMTrainer.h"
 #include <limits>
-#include "core/Exception.h"
+#include "bob/core/Exception.h"
 
 namespace bob {
 namespace trainer {

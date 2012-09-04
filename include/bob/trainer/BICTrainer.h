@@ -21,8 +21,8 @@
 #ifndef BOB_TRAINER_BICTRAINER_H
 #define BOB_TRAINER_BICTRAINER_H
 
-#include <machine/BICMachine.h>
-#include <io/Arrayset.h>
+#include "bob/machine/BICMachine.h"
+#include "bob/io/Arrayset.h"
 
 namespace bob { namespace trainer {
 

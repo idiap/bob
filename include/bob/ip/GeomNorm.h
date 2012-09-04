@@ -29,9 +29,9 @@
 #define BOB_IP_GROM_NORM_H
 
 #include <boost/shared_ptr.hpp>
-#include "core/array_assert.h"
-#include "core/array_check.h"
-#include "ip/Exception.h"
+#include "bob/core/array_assert.h"
+#include "bob/core/array_check.h"
+#include "bob/ip/Exception.h"
 
 
 namespace bob {

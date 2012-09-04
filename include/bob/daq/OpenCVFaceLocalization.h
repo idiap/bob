@@ -21,7 +21,7 @@
 #define OPENCVFACELOCALIZATION_H
 
 #include <boost/shared_ptr.hpp>
-#include <daq/FaceLocalization.h>
+#include "bob/daq/FaceLocalization.h"
 
 #include <cxcore.h>
 #include <cvaux.h>

@@ -25,11 +25,11 @@
 #ifndef BOB_VISIONER_MB_LBP_MODEL_H
 #define BOB_VISIONER_MB_LBP_MODEL_H
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
-#include "visioner/model/models/ii_model.h"
-#include "visioner/vision/mb_xlbp.h"
-#include "visioner/vision/mb_xmct.h"
+#include "bob/visioner/model/models/ii_model.h"
+#include "bob/visioner/vision/mb_xlbp.h"
+#include "bob/visioner/vision/mb_xmct.h"
 
 namespace bob { namespace visioner {
 

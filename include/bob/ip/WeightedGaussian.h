@@ -24,11 +24,11 @@
 #ifndef BOB_IP_WEIGHTED_GAUSSIAN_H
 #define BOB_IP_WEIGHTED_GAUSSIAN_H
 
-#include "core/array_assert.h"
-#include "core/cast.h"
-#include "sp/Exception.h"
-#include "sp/extrapolate.h"
-#include "ip/integral.h"
+#include "bob/core/array_assert.h"
+#include "bob/core/cast.h"
+#include "bob/sp/Exception.h"
+#include "bob/sp/extrapolate.h"
+#include "bob/ip/integral.h"
 
 namespace bob {
 

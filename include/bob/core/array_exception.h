@@ -23,7 +23,7 @@
 #ifndef BOB_CORE_ARRAY_EXCEPTION_H 
 #define BOB_CORE_ARRAY_EXCEPTION_H
 
-#include "core/Exception.h"
+#include "bob/core/Exception.h"
 
 namespace bob { 
   

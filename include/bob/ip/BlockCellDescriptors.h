@@ -24,9 +24,9 @@
 #ifndef BOB_IP_CELL_BLOCK_DESCRIPTORS_H
 #define BOB_IP_CELL_BLOCK_DESCRIPTORS_H
 
-#include "core/array_assert.h"
-#include "ip/Exception.h"
-#include "ip/block.h"
+#include "bob/core/array_assert.h"
+#include "bob/ip/Exception.h"
+#include "bob/ip/block.h"
 #include <boost/shared_ptr.hpp>
 
 namespace bob {

@@ -22,6 +22,7 @@
 
 #include <boost/format.hpp>
 
+#include "bob/config.h"
 #include "bob/io/MatUtils.h"
 #include "bob/io/reorder.h"
 

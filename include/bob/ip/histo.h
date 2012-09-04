@@ -24,8 +24,8 @@
 #include <blitz/array.h>
 #include <algorithm>
 
-#include "core/array_assert.h"
-#include "core/array_type.h"
+#include "bob/core/array_assert.h"
+#include "bob/core/array_type.h"
 
 namespace tca = bob::core::array;
 namespace bob { 

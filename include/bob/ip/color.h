@@ -30,10 +30,10 @@
 #include <blitz/tinyvec-et.h>
 #endif
 
-#include "ip/Exception.h"
+#include "bob/ip/Exception.h"
 
-#include "core/array_type.h"
-#include "core/array_assert.h"
+#include "bob/core/array_type.h"
+#include "bob/core/array_assert.h"
 
 namespace bob { namespace ip {
 

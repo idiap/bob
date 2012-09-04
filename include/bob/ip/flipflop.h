@@ -23,8 +23,8 @@
 #ifndef BOB_IP_FLIPFLOP_H
 #define BOB_IP_FLIPFLOP_H
 
-#include "core/array_assert.h"
-#include "ip/Exception.h"
+#include "bob/core/array_assert.h"
+#include "bob/ip/Exception.h"
 
 namespace bob {
 /**

@@ -31,7 +31,7 @@
 #include <blitz/array.h>
 #include <stdint.h>
 
-#include "core/array.h"
+#include "bob/core/array.h"
 
 
 struct VideoReader;

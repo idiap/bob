@@ -30,7 +30,7 @@
 #include <blitz/array.h>
 #include <stdint.h>
 
-#include "core/python/ndarray.h"
+#include "bob/core/python/ndarray.h"
 
 namespace bob { namespace python {
 

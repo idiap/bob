@@ -23,8 +23,8 @@
 #ifndef BOB5SPRO_TRAINER_WIENER_TRAINER_H
 #define BOB5SPRO_TRAINER_WIENER_TRAINER_H
 
-#include "machine/WienerMachine.h"
-#include "io/Arrayset.h"
+#include "bob/machine/WienerMachine.h"
+#include "bob/io/Arrayset.h"
 
 namespace bob { namespace trainer {
   

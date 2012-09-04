@@ -29,7 +29,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "core/array.h"
+#include "bob/core/array.h"
 
 namespace bob { namespace io {
       

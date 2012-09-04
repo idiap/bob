@@ -20,7 +20,7 @@
 #ifndef FACERECOGNTION_H
 #define FACERECOGNTION_H
 
-#include <daq/Callbacks.h>
+#include "bob/daq/Callbacks.h"
 #include <vector>
 
 namespace bob { namespace daq {

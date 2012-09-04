@@ -25,8 +25,8 @@
 #ifndef BOB_VISIONER_TAGGER_H
 #define BOB_VISIONER_TAGGER_H
 
-#include "visioner/model/ipyramid.h"
-#include "visioner/model/param.h"
+#include "bob/visioner/model/ipyramid.h"
+#include "bob/visioner/model/param.h"
 
 namespace bob { namespace visioner {
 

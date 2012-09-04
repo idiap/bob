@@ -24,7 +24,7 @@
 #define BOB_IO_HDF5EXCEPTION_H
 
 #include <hdf5.h>
-#include "io/Exception.h"
+#include "bob/io/Exception.h"
 
 namespace bob { namespace io {
 

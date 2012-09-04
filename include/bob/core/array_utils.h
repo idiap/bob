@@ -29,8 +29,8 @@
 #include <stdexcept>
 #include <boost/format.hpp>
 
-#include "core/array.h"
-#include "core/cast.h"
+#include "bob/core/array.h"
+#include "bob/core/cast.h"
 
 namespace bob { namespace core { namespace array {
 

@@ -24,9 +24,9 @@
 #ifndef BOB_TRAINER_LLRTRAINER_H
 #define BOB_TRAINER_LLRTRAINER_H
 
-#include "machine/LinearMachine.h"
-#include "trainer/Exception.h"
-#include "io/Arrayset.h"
+#include "bob/machine/LinearMachine.h"
+#include "bob/trainer/Exception.h"
+#include "bob/io/Arrayset.h"
 
 namespace bob { namespace trainer {
   

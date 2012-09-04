@@ -25,7 +25,7 @@
 #ifndef BOB_VISIONER_CV_DRAW_H
 #define BOB_VISIONER_CV_DRAW_H
 
-#include "visioner/cv/cv_detector.h"
+#include "bob/visioner/cv/cv_detector.h"
 
 namespace bob { namespace visioner {
 

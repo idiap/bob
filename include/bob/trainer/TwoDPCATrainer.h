@@ -21,9 +21,9 @@
 #define BOB5SPRO_TRAINER_TWODPCA_TRAINER_H
 
 #include "Trainer.h"
-#include "core/logging.h"
-#include "io/Arrayset.h"
-#include "machine/TwoDPCAMachine.h"
+#include "bob/core/logging.h"
+#include "bob/io/Arrayset.h"
+#include "bob/machine/TwoDPCAMachine.h"
 #include <algorithm>
 #include <utility>
 #include <vector>

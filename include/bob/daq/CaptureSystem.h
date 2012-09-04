@@ -22,7 +22,7 @@
 
 #include <string>
 
-#include <daq/Camera.h>
+#include "bob/daq/Camera.h"
 #include <boost/shared_ptr.hpp>
 
 namespace bob { namespace daq {

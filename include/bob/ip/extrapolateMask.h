@@ -24,7 +24,7 @@
 #define BOB_IP_EXTRAPOLATE_MASK_H
 
 #include <blitz/array.h>
-#include "core/array_assert.h"
+#include "bob/core/array_assert.h"
 
 namespace bob {
 /**

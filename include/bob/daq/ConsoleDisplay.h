@@ -20,7 +20,7 @@
 #ifndef CONSOLEDISPLAY_H
 #define CONSOLEDISPLAY_H
 
-#include <daq/Display.h>
+#include "bob/daq/Display.h"
 
 namespace bob { namespace daq {
 

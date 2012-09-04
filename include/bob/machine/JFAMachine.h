@@ -24,11 +24,11 @@
 #ifndef BOB_MACHINE_JFAMACHINE_H
 #define BOB_MACHINE_JFAMACHINE_H
 
-#include "io/Arrayset.h"
-#include "io/HDF5File.h"
-#include "machine/GMMMachine.h"
-#include "machine/JFAMachineException.h"
-#include "machine/LinearScoring.h"
+#include "bob/io/Arrayset.h"
+#include "bob/io/HDF5File.h"
+#include "bob/machine/GMMMachine.h"
+#include "bob/machine/JFAMachineException.h"
+#include "bob/machine/LinearScoring.h"
 
 #include <boost/shared_ptr.hpp>
 

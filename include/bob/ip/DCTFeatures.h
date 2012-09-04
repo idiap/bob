@@ -26,16 +26,16 @@
 #ifndef BOB_IP_DCT_FEATURES_H
 #define BOB_IP_DCT_FEATURES_H
 
-#include "core/cast.h"
-#include "core/array_copy.h"
-#include "ip/Exception.h"
+#include "bob/core/cast.h"
+#include "bob/core/array_copy.h"
+#include "bob/ip/Exception.h"
 
 #include <list>
 #include <boost/shared_ptr.hpp>
 
-#include "ip/block.h"
-#include "sp/DCT2D.h"
-#include "ip/zigzag.h"
+#include "bob/ip/block.h"
+#include "bob/sp/DCT2D.h"
+#include "bob/ip/zigzag.h"
 
 
 namespace bob {

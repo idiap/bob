@@ -23,8 +23,8 @@
 
 #include <blitz/array.h>
 #include <complex>
-#include "io/HDF5File.h"
-#include "sp/FFT2D.h"
+#include "bob/io/HDF5File.h"
+#include "bob/sp/FFT2D.h"
 
 namespace bob { namespace machine {
 

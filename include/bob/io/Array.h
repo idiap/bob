@@ -29,8 +29,8 @@
 #include <boost/weak_ptr.hpp>
 #include <blitz/array.h>
 
-#include "core/blitz_array.h"
-#include "io/File.h"
+#include "bob/core/blitz_array.h"
+#include "bob/io/File.h"
 
 namespace bob {
 

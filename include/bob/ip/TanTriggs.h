@@ -23,10 +23,10 @@
 #ifndef BOB_IP_TAN_TRIGGS_H
 #define BOB_IP_TAN_TRIGGS_H
 
-#include "core/array_assert.h"
-#include "ip/gammaCorrection.h"
-#include "sp/conv.h"
-#include "sp/extrapolate.h"
+#include "bob/core/array_assert.h"
+#include "bob/ip/gammaCorrection.h"
+#include "bob/sp/conv.h"
+#include "bob/sp/extrapolate.h"
 
 namespace bob {
 /**

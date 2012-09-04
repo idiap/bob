@@ -27,7 +27,7 @@
 #define BOB_MACHINE_PLDAMACHINE_H
 
 #include <blitz/array.h>
-#include "io/HDF5File.h"
+#include "bob/io/HDF5File.h"
 
 namespace bob { namespace machine {
   

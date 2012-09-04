@@ -31,10 +31,10 @@
 #include <boost/shared_ptr.hpp>
 #include <blitz/array.h>
 #include <algorithm>
-#include "ip/LBP.h"
-#include "ip/LBP4R.h"
-#include "ip/LBP8R.h"
-#include "ip/Exception.h"
+#include "bob/ip/LBP.h"
+#include "bob/ip/LBP4R.h"
+#include "bob/ip/LBP8R.h"
+#include "bob/ip/Exception.h"
 
 namespace bob { namespace ip {
 

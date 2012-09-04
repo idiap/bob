@@ -26,7 +26,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <hdf5.h>
-#include <io/HDF5Types.h>
+#include "bob/io/HDF5Types.h"
 
 namespace bob { namespace io { namespace detail { namespace hdf5 {
 

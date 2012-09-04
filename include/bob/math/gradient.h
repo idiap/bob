@@ -23,8 +23,8 @@
 #ifndef BOB_MATH_GRADIENT_H
 #define BOB_MATH_GRADIENT_H
 
-#include "core/array_assert.h"
-#include "math/Exception.h"
+#include "bob/core/array_assert.h"
+#include "bob/math/Exception.h"
 
 namespace bob {
 /**

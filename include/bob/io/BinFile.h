@@ -23,10 +23,10 @@
 #ifndef BOB_IO_BINFILE_H
 #define BOB_IO_BINFILE_H
 
-#include "core/cast.h"
-#include "core/array.h"
-#include "io/BinFileHeader.h"
-#include "io/Exception.h"
+#include "bob/core/cast.h"
+#include "bob/core/array.h"
+#include "bob/io/BinFileHeader.h"
+#include "bob/io/Exception.h"
 
 namespace bob { namespace io {
 

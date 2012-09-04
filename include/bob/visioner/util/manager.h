@@ -31,7 +31,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/format.hpp>
 
-#include "visioner/util/util.h"
+#include "bob/visioner/util/util.h"
 
 namespace bob { namespace visioner {
 

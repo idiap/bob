@@ -25,9 +25,9 @@
 
 #include <boost/shared_ptr.hpp>
 #include <list>
-#include "core/array_assert.h"
-#include "core/cast.h"
-#include "ip/Exception.h"
+#include "bob/core/array_assert.h"
+#include "bob/core/cast.h"
+#include "bob/ip/Exception.h"
 
 namespace bob {
 

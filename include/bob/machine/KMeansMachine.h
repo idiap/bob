@@ -24,9 +24,9 @@
 #include <blitz/array.h>
 #include <cfloat>
 
-#include "io/Arrayset.h"
-#include "io/HDF5File.h"
-#include "machine/Machine.h"
+#include "bob/io/Arrayset.h"
+#include "bob/io/HDF5File.h"
+#include "bob/machine/Machine.h"
 
 namespace bob { namespace machine {
 

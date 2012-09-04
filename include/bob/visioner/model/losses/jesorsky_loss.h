@@ -25,7 +25,7 @@
 #ifndef BOB_VISIONER_JESORSKY_LOSS_H
 #define BOB_VISIONER_JESORSKY_LOSS_H
 
-#include "visioner/model/loss.h"
+#include "bob/visioner/model/loss.h"
 
 namespace bob { namespace visioner {
 

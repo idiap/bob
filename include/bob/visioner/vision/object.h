@@ -28,7 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "visioner/vision/vision.h"
+#include "bob/visioner/vision/vision.h"
 
 namespace bob { namespace visioner {
 

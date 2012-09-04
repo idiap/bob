@@ -25,8 +25,8 @@
 #ifndef BOB_VISIONER_CV_DETECTOR_H
 #define BOB_VISIONER_CV_DETECTOR_H
 
-#include "visioner/model/model.h"
-#include "visioner/util/geom.h"
+#include "bob/visioner/model/model.h"
+#include "bob/visioner/util/geom.h"
 
 namespace bob { namespace visioner {
 

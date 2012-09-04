@@ -25,7 +25,7 @@
 #ifndef BOB_VISIONER_GENERALIZER_H
 #define BOB_VISIONER_GENERALIZER_H
 
-#include "visioner/model/ml.h"
+#include "bob/visioner/model/ml.h"
 
 namespace bob { namespace visioner {
 

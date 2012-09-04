@@ -28,11 +28,11 @@
 #define BOB_IP_ROTATE_H
 
 #include <blitz/array.h>
-#include "core/array_assert.h"
-#include "core/cast.h"
-#include "ip/Exception.h"
-#include "ip/shear.h"
-#include "ip/crop.h"
+#include "bob/core/array_assert.h"
+#include "bob/core/cast.h"
+#include "bob/ip/Exception.h"
+#include "bob/ip/shear.h"
+#include "bob/ip/crop.h"
 
 
 namespace bob {

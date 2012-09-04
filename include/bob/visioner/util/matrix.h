@@ -30,7 +30,7 @@
 #include <boost/serialization/vector.hpp>
 #include <blitz/array.h>
 
-#include "visioner/util/iterators.h"
+#include "bob/visioner/util/iterators.h"
 
 namespace bob { namespace visioner {
 

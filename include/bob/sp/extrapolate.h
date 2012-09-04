@@ -25,8 +25,8 @@
 #define BOB_SP_EXTRAPOLATE_H
 
 #include <blitz/array.h>
-#include "sp/Exception.h"
-#include "core/array_assert.h"
+#include "bob/sp/Exception.h"
+#include "bob/core/array_assert.h"
 
 namespace bob {
   /**

@@ -20,9 +20,9 @@
 #ifndef BOB_TRAINER_KMEANSTRAINER_H
 #define BOB_TRAINER_KMEANSTRAINER_H
 
-#include "io/Arrayset.h"
-#include "machine/KMeansMachine.h"
-#include "trainer/EMTrainer.h"
+#include "bob/io/Arrayset.h"
+#include "bob/machine/KMeansMachine.h"
+#include "bob/trainer/EMTrainer.h"
 
 namespace bob {
 namespace trainer {

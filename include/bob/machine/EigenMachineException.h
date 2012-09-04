@@ -24,7 +24,7 @@
 #define BOB5SPRO_MACHINE_EIGENMACHINEEXCEPTION_H
 
 #include <cstdlib>
-#include "machine/Exception.h"
+#include "bob/machine/Exception.h"
 
 namespace bob { namespace machine {
 

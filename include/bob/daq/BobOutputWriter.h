@@ -24,8 +24,8 @@
 #include <fstream>
 #include <boost/shared_ptr.hpp>
 
-#include <daq/OutputWriter.h>
-#include <io/VideoWriter.h>
+#include "bob/daq/OutputWriter.h"
+#include "bob/io/VideoWriter.h"
 
 namespace bob { namespace daq {
 

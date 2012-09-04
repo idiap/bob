@@ -45,10 +45,10 @@
 #include <numpy/arrayobject.h>
 // ============================================================================
 
-#include "core/python/exception.h"
-#include "core/array.h"
-#include "core/cast.h"
-#include "core/Exception.h"
+#include "bob/core/python/exception.h"
+#include "bob/core/array.h"
+#include "bob/core/cast.h"
+#include "bob/core/Exception.h"
 
 #include <blitz/array.h>
 #include <stdint.h>

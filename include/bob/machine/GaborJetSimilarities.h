@@ -23,10 +23,10 @@
 #ifndef BOB_MACHINE_GABOR_JET_SIMILARITY_H
 #define BOB_MACHINE_GABOR_JET_SIMILARITY_H
 
-#include <core/array_assert.h>
+#include "bob/core/array_assert.h"
 #include <blitz/array.h>
 #include <numeric>
-#include <ip/GaborWaveletTransform.h>
+#include "bob/ip/GaborWaveletTransform.h"
 
 namespace bob { namespace machine {
 

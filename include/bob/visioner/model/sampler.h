@@ -29,10 +29,10 @@
 #include <boost/random.hpp>
 #include <boost/random/uniform_real.hpp>
 
-#include "visioner/model/model.h"
-#include "visioner/model/loss.h"
-#include "visioner/model/dataset.h"
-#include "visioner/model/tagger.h"
+#include "bob/visioner/model/model.h"
+#include "bob/visioner/model/loss.h"
+#include "bob/visioner/model/dataset.h"
+#include "bob/visioner/model/tagger.h"
 
 namespace bob { namespace visioner {
 

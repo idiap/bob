@@ -24,7 +24,7 @@
 #define BOB_IO_VIDEOEXCEPTION_H
 
 #include <string>
-#include "io/Exception.h"
+#include "bob/io/Exception.h"
 
 namespace bob { namespace io {
 

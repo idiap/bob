@@ -21,6 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "bob/config.h"
+
 #include <boost/python.hpp>
 #ifdef HAVE_QT4
 #include <qglobal.h>

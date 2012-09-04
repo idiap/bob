@@ -27,7 +27,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
-#include "io/File.h"
+#include "bob/io/File.h"
 
 namespace bob { namespace io {
 

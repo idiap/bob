@@ -24,7 +24,7 @@
 #define BOB_TRAINER_SVMTRAINER_H
 
 #include <vector>
-#include "machine/SVM.h"
+#include "bob/machine/SVM.h"
 
 namespace bob { namespace trainer {
 

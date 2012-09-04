@@ -25,9 +25,9 @@
 #ifndef BOB_VISIONER_LUT_PROBLEM_H
 #define BOB_VISIONER_LUT_PROBLEM_H
 
-#include "visioner/model/dataset.h"
-#include "visioner/model/model.h"
-#include "visioner/model/loss.h"
+#include "bob/visioner/model/dataset.h"
+#include "bob/visioner/model/model.h"
+#include "bob/visioner/model/loss.h"
 
 namespace bob { namespace visioner {
 

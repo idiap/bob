@@ -30,9 +30,9 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 
-#include "visioner/model/lut.h"
-#include "visioner/model/param.h"
-#include "visioner/model/ipyramid.h"
+#include "bob/visioner/model/lut.h"
+#include "bob/visioner/model/param.h"
+#include "bob/visioner/model/ipyramid.h"
 
 namespace bob { namespace visioner {	
 

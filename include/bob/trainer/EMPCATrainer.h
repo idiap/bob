@@ -25,9 +25,9 @@
 #define BOB5SPRO_TRAINER_EMPCA_TRAINER_H
 
 #include <blitz/array.h>
-#include "trainer/EMTrainer.h"
-#include "machine/LinearMachine.h"
-#include "io/Arrayset.h"
+#include "bob/trainer/EMTrainer.h"
+#include "bob/machine/LinearMachine.h"
+#include "bob/io/Arrayset.h"
 
 namespace bob { namespace trainer {
   

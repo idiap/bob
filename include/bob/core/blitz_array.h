@@ -29,13 +29,13 @@
 #include <boost/format.hpp>
 #include <blitz/array.h>
 
-#include "core/array.h"
-#include "core/array_utils.h"
+#include "bob/core/array.h"
+#include "bob/core/array_utils.h"
 
-#include "core/array_check.h"
-#include "core/array_type.h"
-#include "core/array_copy.h"
-#include "core/cast.h"
+#include "bob/core/array_check.h"
+#include "bob/core/array_type.h"
+#include "bob/core/array_copy.h"
+#include "bob/core/cast.h"
 
 namespace bob { namespace core { namespace array {
 

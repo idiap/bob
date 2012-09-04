@@ -26,10 +26,10 @@
 #ifndef BOB_IP_MULTISCALE_RETINEX_H
 #define BOB_IP_MULTISCALE_RETINEX_H
 
-#include "core/array_assert.h"
-#include "core/cast.h"
-#include "sp/extrapolate.h"
-#include "ip/Gaussian.h"
+#include "bob/core/array_assert.h"
+#include "bob/core/cast.h"
+#include "bob/sp/extrapolate.h"
+#include "bob/ip/Gaussian.h"
 #include <boost/shared_array.hpp>
 
 namespace bob {
