@@ -2,9 +2,9 @@ project(bob_visioner_py)
 
 # This defines the dependencies of this package
 set(bob_deps "bob_visioner;bob_python")
-set(shared "${bob_deps}")
-set(incdir "${python_INCLUDE_DIRS};${QT_INCLUDES}")
 include (${QT_USE_FILE})
+set(incdir ${py_incdir};${QT_INCLUDE_DIR})
+set(shared "${bob_deps}")
 
 # This defines the list of source files inside this package.
 set(src
@@ -15,7 +15,7 @@ set(src
    )
  
 # Define the library, compilation and linkage options
-list(REMOVE_DUPLICATES incdir)
+bob_sort_headers(incdir)
 foreach(inc ${incdir})
   include_directories(SYSTEM ${inc})
 endforeach()

@@ -3,7 +3,7 @@ project(bob_python)
 # This defines the dependencies of this package
 set(bob_deps "bob_core")
 set(shared "${bob_deps};${Boost_PYTHON_LIBRARY_RELEASE};${PYTHON_LIBRARIES}")
-set(incdir ${python_INCLUDE_DIRS})
+set(incdir ${py_incdir})
 
 # Python bindings
 set(src
@@ -12,6 +12,8 @@ set(src
    "ndarray_numpy.cc"
    )
 
+# Define the library, compilation and linkage options
+bob_sort_headers(incdir)
 foreach(inc ${incdir})
   include_directories(SYSTEM ${inc})
 endforeach()

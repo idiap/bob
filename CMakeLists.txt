@@ -171,14 +171,14 @@ endmacro()
 #
 # Example: bob_add_executable(io array test/array.cc)
 macro(bob_add_executable package name src)
-  set(ename bob_${package}_${name})
+  set(ename ${package}_${name})
   add_executable(${ename} ${src})
   set_property(TARGET ${ename} APPEND PROPERTY INCLUDE_DIRECTORIES
     "${CMAKE_SOURCE_DIR}/include")
   set_property(TARGET ${ename} APPEND PROPERTY INCLUDE_DIRECTORIES
     "${CMAKE_BINARY_DIR}/include")
-  target_link_libraries(bob_${package}_${name} bob_${package})
-  install(TARGETS bob_${package}_${name} DESTINATION bin)
+  target_link_libraries(${ename} ${package})
+  install(TARGETS ${ename} DESTINATION bin)
 endmacro()
 
 # Creates and installs a pkg-config file for each subpackage
@@ -218,6 +218,16 @@ macro(bob_pkgconfig package requires)
   # Adds this package to the pool
   list(APPEND ENABLED_PACKAGES ${package})
   set(ENABLED_PACKAGES "${ENABLED_PACKAGES}" PARENT_SCOPE)
+endmacro()
+
+# Sorts hears in order of priority:
+#
+# list_name: The name of the list you want to sort
+#
+# Example: bob_sort_headers(incdir) # incdir must be a list
+macro(bob_sort_headers list_name)
+  execute_process(COMMAND ${CMAKE_SOURCE_DIR}/bin/sort_headers.py "${CMAKE_CXX_COMPILER}" "${CMAKE_PREFIX_PATH}" "${${list_name}}" OUTPUT_VARIABLE sorted_list OUTPUT_STRIP_TRAILING_WHITESPACE)
+  set(${list_name} ${sorted_list})
 endmacro()
 
 # ----------------------------------------------------------------------------

@@ -8,6 +8,17 @@ include(FindHDF5)
 include(FindPkgConfig)
 pkg_check_modules(ImageMagick REQUIRED ImageMagick++>=6.5)
 
+if(ImageMagick_FOUND)
+  # Resolve ImageMagick libraries to a precise path
+  set(ImageMagick_RESOLVED_LIBRARIES "")
+  foreach(lib ${ImageMagick_LIBRARIES})
+    find_library(newlib ${lib} NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH HINTS ${ImageMagick_LIBDIR})
+    list(APPEND ImageMagick_RESOLVED_LIBRARIES ${newlib})
+    unset(newlib CACHE)
+  endforeach()
+  set(ImageMagick_RESOLVED_LIBRARIES ${ImageMagick_RESOLVED_LIBRARIES} CACHE INTERNAL "Resolved ImageMagick libraries")
+endif()
+
 # Matio
 pkg_check_modules(matio matio)
 if(matio_FOUND)
@@ -22,6 +33,15 @@ if(matio_FOUND)
   set(CMAKE_REQUIRED_LIBRARIES)
   set(CMAKE_REQUIRED_FLAGS)
   set(CMAKE_REQUIRED_INCLUDES)
+
+  # Resolve matio libraries to a precise path
+  set(matio_RESOLVED_LIBRARIES "")
+  foreach(lib ${matio_LIBRARIES})
+    find_library(newlib ${lib} NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH HINTS ${matio_LIBDIR})
+    list(APPEND matio_RESOLVED_LIBRARIES ${newlib})
+    unset(newlib CACHE)
+  endforeach()
+  set(matio_RESOLVED_LIBRARIES ${matio_RESOLVED_LIBRARIES} CACHE INTERNAL "Resolved matio libraries")
 endif()
 
 # FFMpeg
@@ -60,6 +80,15 @@ if(FFMPEG_FOUND)
 
   #set(FFMPEG_VERSION ${FFMPEG_VERSION} CACHE STRING "FFmpeg version")
   set(FFMPEG_VERSION "${FFMPEG_VERSION}" CACHE INTERNAL "FFmpeg version")
+
+  # Resolve ImageMagick libraries to a precise path
+  set(FFMPEG_RESOLVED_LIBRARIES "")
+  foreach(lib ${FFMPEG_LIBRARIES})
+    find_library(newlib ${lib} NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH HINTS ${FFMPEG_LIBRARY_DIRS})
+    list(APPEND FFMPEG_RESOLVED_LIBRARIES ${newlib})
+    unset(newlib CACHE)
+  endforeach()
+  set(FFMPEG_RESOLVED_LIBRARIES ${FFMPEG_RESOLVED_LIBRARIES} CACHE INTERNAL "Resolved FFMPEG libraries")
 
 endif(FFMPEG_FOUND)
 

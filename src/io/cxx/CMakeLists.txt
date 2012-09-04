@@ -3,7 +3,7 @@ project(bob_io)
 # This defines the dependencies of this package
 set(bob_deps "bob_core")
 set(shared "${bob_deps};${HDF5_hdf5_LIBRARY_RELEASE}")
-set(incdir ${HDF5_CXX_INCLUDE_DIR};${boost_INCLUDE_DIRS};${Blitz_INCLUDE_DIR})
+set(incdir ${cxx_incdir};${HDF5_CXX_INCLUDE_DIR})
 set(libdir "")
 
 # This defines the list of source files inside this package.
@@ -41,26 +41,24 @@ set(src
 
 # If we have matio installed, enable the compilation of relevant modules
 if(matio_FOUND)
-  list(APPEND shared "${matio_LIBRARIES}")
+  list(APPEND shared "${matio_RESOLVED_LIBRARIES}")
   list(APPEND src 
     "MatUtils.cc"
     "MatFile.cc"
     )
   list(APPEND incdir "${matio_INCLUDE_DIRS}")
-  list(APPEND libdir "${matio_LIBRARY_DIRS}")
 endif(matio_FOUND)
 
 if(ImageMagick_FOUND)
-  list(APPEND shared "${ImageMagick_LIBRARIES}")
+  list(APPEND shared "${ImageMagick_RESOLVED_LIBRARIES}")
   list(APPEND src
     "ImageFile.cc"
     )
   list(APPEND incdir "${ImageMagick_INCLUDE_DIRS}")
-  list(APPEND libdir "${ImageMagick_LIBRARY_DIRS}")
 endif(ImageMagick_FOUND)
 
 if(FFMPEG_FOUND)
-  list(APPEND shared "${FFMPEG_LIBRARIES}")
+  list(APPEND shared "${FFMPEG_RESOLVED_LIBRARIES}")
   list(APPEND src 
     "VideoReader.cc"
     "VideoException.cc"
@@ -68,19 +66,15 @@ if(FFMPEG_FOUND)
     "VideoFile.cc"
   )
   list(APPEND incdir "${FFMPEG_INCLUDE_DIRS}")
-  list(APPEND libdir "${FFMPEG_LIBRARY_DIRS}")
   add_definitions("-D__STDC_CONSTANT_MACROS")
 endif(FFMPEG_FOUND)
 
 # Define the library, compilation and linkage options
-list(REMOVE_DUPLICATES incdir)
+bob_sort_headers(incdir)
 foreach(inc ${incdir})
   include_directories(SYSTEM ${inc})
 endforeach()
 bob_add_library(${PROJECT_NAME} "${src}")
-list(REMOVE_DUPLICATES libdir)
-set_property(TARGET ${PROJECT_NAME} 
-  APPEND PROPERTY LINK_DIRECTORIES ${libdir})
 target_link_libraries(${PROJECT_NAME} ${shared})
 
 # Defines tests for this package

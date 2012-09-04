@@ -30,7 +30,7 @@ if(BLITZ_FOUND)
   # and has blitz/tinyvec2.h and not blitz/tinyvec-et.h
   find_file(HAVE_BLITZ_TINYVEC2_H "blitz/tinyvec2.h" ${Blitz_INCLUDE_DIR})
 
-  find_package_message(BLITZ "Found Blitz++: ${Blitz_LIBRARIES} (>2G-pointees: ${HAVE_BLITZ_SPECIAL_TYPES}; New: ${TINYVEC2_FOUND})" "[${Blitz_LIBRARIES}][${Blitz_INCLUDE_DIR}]")
+  find_package_message(BLITZ "Found Blitz++: ${Blitz_LIBRARIES} (>2G-pointees: ${HAVE_BLITZ_SPECIAL_TYPES}; New: ${HAVE_BLITZ_TINYVEC2_H})" "[${Blitz_LIBRARIES}][${Blitz_INCLUDE_DIR}]")
 
 endif(BLITZ_FOUND)
 

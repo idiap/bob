@@ -25,15 +25,16 @@
 
 #include <stdint.h>
 #include <boost/tuple/tuple.hpp>
+
+#include "bob/core/array_type.h"
+#include "bob/core/array_assert.h"
+
 #include <blitz/array.h>
 #if !defined (HAVE_BLITZ_TINYVEC2_H)
 #include <blitz/tinyvec-et.h>
 #endif
 
 #include "bob/ip/Exception.h"
-
-#include "bob/core/array_type.h"
-#include "bob/core/array_assert.h"
 
 namespace bob { namespace ip {
 

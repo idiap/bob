@@ -5,7 +5,7 @@ add_subdirectory(random)
 # This defines the dependencies of this package
 set(bob_deps "bob_core;bob_python")
 set(shared "${bob_deps}")
-set(incdir ${python_INCLUDE_DIRS};${boost_INCLUDE_DIRS};${Blitz_INCLUDE_DIR})
+set(incdir ${py_incdir})
 
 # Google Perftools detection and linkage
 find_path(GOOGLE_PERFTOOLS_INCLUDE_1 NAMES google/profiler.h)
@@ -14,7 +14,8 @@ find_library(GOOGLE_PERFTOOLS_LIBRARY NAMES profiler)
 
 if(GOOGLE_PERFTOOLS_INCLUDE_1 AND GOOGLE_PERFTOOLS_INCLUDE_2 AND 
    GOOGLE_PERFTOOLS_LIBRARY)
-  list(APPEND incdir "${GOOGLE_PERFTOOLS_INCLUDE_1};${GOOGLE_PERFTOOLS_INCLUDE_2}")
+  list(APPEND incdir "${GOOGLE_PERFTOOLS_INCLUDE_1}")
+  list(APPEND incdir "${GOOGLE_PERFTOOLS_INCLUDE_2}")
   list(REMOVE_DUPLICATES incdir)
   list(APPEND shared "${GOOGLE_PERFTOOLS_LIBRARY}")
   find_package_message(GOOGLE_PERFTOOLS "Found Google PerfTools: ${GOOGLE_PERFTOOLS_INCLUDE_DIRS}" "[${GOOGLE_PERFTOOLS_INCLUDE_DIRS}][${GOOGLE_PERFTOOLS_LIBRARY}]")
@@ -34,7 +35,7 @@ set(src
    )
 
 # Define the library, compilation and linkage options
-list(REMOVE_DUPLICATES incdir)
+bob_sort_headers(incdir)
 foreach(inc ${incdir})
   include_directories(SYSTEM ${inc})
 endforeach()

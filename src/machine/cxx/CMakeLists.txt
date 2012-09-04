@@ -3,6 +3,7 @@ project(bob_machine)
 # This defines the dependencies of this package
 set(bob_deps "bob_ip")
 set(shared "${bob_deps}")
+set(incdir ${cxx_incdir})
 
 # This defines the list of source files inside this package.
 set(src
@@ -30,11 +31,16 @@ set(src
 
 # If we have libsvm installed, enable the compilation of relevant modules
 if(LIBSVM_FOUND)
-  include_directories(SYSTEM ${LIBSVM_INCLUDE_DIR})
+  list(APPEND incdir ${LIBSVM_INCLUDE_DIR})
   list(APPEND shared "${LIBSVM_LIBRARY}")
   list(APPEND src "SVM.cc")
 endif(LIBSVM_FOUND)
 
+# Define the library, compilation and linkage options
+bob_sort_headers(incdir)
+foreach(inc ${incdir})
+  include_directories(SYSTEM ${inc})
+endforeach()
 bob_add_library(${PROJECT_NAME} "${src}")
 target_link_libraries(${PROJECT_NAME} ${shared})
 

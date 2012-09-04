@@ -5,7 +5,10 @@ add_subdirectory(lbfgs)
 # Required externals
 include(blitz.cmake)
 include(boost.cmake)
+set(cxx_incdir ${Blitz_INCLUDE_DIR};${boost_INCLUDE_DIRS})
+
 include(python.cmake)
+set(py_incdir ${cxx_incdir};${python_INCLUDE_DIRS})
 
 add_subdirectory(core)
 add_subdirectory(python)

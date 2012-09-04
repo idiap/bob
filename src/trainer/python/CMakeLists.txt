@@ -5,7 +5,7 @@ add_subdirectory(overload)
 # This defines the dependencies of this package
 set(bob_deps "bob_trainer;bob_python")
 set(shared "${bob_deps}")
-set(incdir ${python_INCLUDE_DIRS})
+set(incdir ${py_incdir})
 
 set(src
    "linear.cc"
@@ -34,7 +34,7 @@ set(ccsrc_overload
    )
 
 # Define the library, compilation and linkage options
-list(REMOVE_DUPLICATES incdir)
+bob_sort_headers(incdir)
 foreach(inc ${incdir})
   include_directories(SYSTEM ${inc})
 endforeach()

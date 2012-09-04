@@ -2,7 +2,8 @@ project(bob_io_py)
 
 # This defines the dependencies of this package
 set(bob_deps "bob_io;bob_python")
-set(incdir "${python_INCLUDE_DIRS};${HDF5_CXX_INCLUDE_DIR}")
+set(incdir ${py_incdir};${HDF5_CXX_INCLUDE_DIR})
+set(shared "${bob_deps}")
 
 # This defines the list of source files inside this package.
 set(src
@@ -17,14 +18,23 @@ set(src
    "main.cc"
    )
  
+# If we have matio installed, enable the compilation of relevant modules
+if(matio_FOUND)
+  list(APPEND incdir "${matio_INCLUDE_DIRS}")
+endif(matio_FOUND)
+
+if(ImageMagick_FOUND)
+  list(APPEND incdir "${ImageMagick_INCLUDE_DIRS}")
+endif(ImageMagick_FOUND)
+
 if(FFMPEG_FOUND)
-  set(ccsrc "${ccsrc};src/video.cc")
+  list(APPEND src "video.cc")
   list(APPEND incdir "${FFMPEG_INCLUDE_DIRS}")
   add_definitions("-D__STDC_CONSTANT_MACROS")
 endif(FFMPEG_FOUND)
 
 # Define the library, compilation and linkage options
-list(REMOVE_DUPLICATES incdir)
+bob_sort_headers(incdir)
 foreach(inc ${incdir})
   include_directories(SYSTEM ${inc})
 endforeach()

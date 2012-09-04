@@ -3,8 +3,7 @@ project(bob_daq)
 # This defines the dependencies of this package
 set(bob_deps "bob_ip;bob_visioner")
 set(shared "${bob_deps}")
-set(incdir ${ImageMagick_INCLUDE_DIRS};${boost_INCLUDE_DIRS};${Blitz_INCLUDE_DIR})
-set(libdir "${ImageMagick_LIBRARY_DIRS}")
+set(incdir ${cxx_incdir};${ImageMagick_INCLUDE_DIRS})
 
 # This defines the list of source files inside this package.
 set(src
@@ -26,6 +25,7 @@ if (V4L2_FOUND)
   list(APPEND src 
     "V4LCamera.cc"
     )
+  list(APPEND incdir ${V4L2_INCLUDE_DIRS})
 endif()
 
 if (OpenCV_FOUND)
@@ -33,7 +33,6 @@ if (OpenCV_FOUND)
     "OpenCVFaceLocalization.cc"
     )
   list(APPEND incdir ${OpenCV_INCLUDE_DIRS})
-  list(APPEND libdir ${OpenCV_LIB_DIR})
   list(APPEND shared ${OpenCV_LIBRARIES})
 endif()
 
@@ -44,14 +43,12 @@ list(APPEND shared ${QT_LIBRARIES})
 qt4_wrap_cpp(MOC_SRC "${CMAKE_SOURCE_DIR}/include/bob/daq/QtDisplay.h")
 list(INSERT src 0 "${MOC_SRC}")
 
-list(REMOVE_DUPLICATES incdir)
+# Define the library, compilation and linkage options
+bob_sort_headers(incdir)
 foreach(inc ${incdir})
   include_directories(SYSTEM ${inc})
 endforeach()
 bob_add_library(${PROJECT_NAME} "${src}")
-list(REMOVE_DUPLICATES libdir)
-set_property(TARGET ${PROJECT_NAME} 
-  APPEND PROPERTY LINK_DIRECTORIES ${libdir})
 target_link_libraries(${PROJECT_NAME} ${shared})
 
 # Pkg-Config generator
