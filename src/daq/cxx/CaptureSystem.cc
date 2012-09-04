@@ -17,19 +17,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "daq/CaptureSystem.h"
+#include "bob/daq/CaptureSystem.h"
 
 #include <cstdio>
 
 //#include "daq/OpenCVDisplay.h"
 //#include "daq/OpenCVFaceLocalization.h"
-#include "daq/VisionerFaceLocalization.h"
-#include "daq/Controller.h"
-#include "daq/SimpleController.h"
-#include "daq/V4LCamera.h"
+#include "bob/daq/VisionerFaceLocalization.h"
+#include "bob/daq/Controller.h"
+#include "bob/daq/SimpleController.h"
+#include "bob/daq/V4LCamera.h"
 //#include "daq/OpenCVOutputWriter.h"
-#include <daq/QtDisplay.h>
-#include <daq/BobOutputWriter.h>
+#include "bob/daq/QtDisplay.h"
+#include "bob/daq/BobOutputWriter.h"
 
 namespace bob { namespace daq {
 

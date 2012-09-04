@@ -21,7 +21,7 @@
  */
 
 #include <boost/format.hpp>
-#include "core/array.h"
+#include "bob/core/array.h"
 
 namespace ca = bob::core::array;
 

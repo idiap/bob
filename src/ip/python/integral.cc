@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/python/ndarray.h"
-#include "ip/integral.h"
+#include "bob/core/python/ndarray.h"
+#include "bob/ip/integral.h"
 
 using namespace boost::python;
 

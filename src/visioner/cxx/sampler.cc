@@ -28,11 +28,11 @@
 #include <boost/lambda/lambda.hpp>
 #include <boost/format.hpp>
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
-#include "visioner/model/sampler.h"
-#include "visioner/model/mdecoder.h"
-#include "visioner/util/threads.h"
+#include "bob/visioner/model/sampler.h"
+#include "bob/visioner/model/mdecoder.h"
+#include "bob/visioner/util/threads.h"
 
 // Cumulate a set of statistics indexed by an integer
 template <typename T> 

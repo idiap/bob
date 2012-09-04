@@ -26,9 +26,9 @@
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
 #include <stdint.h>
-#include "core/cast.h"
-#include "ip/shift.h"
-#include "ip/Exception.h"
+#include "bob/core/cast.h"
+#include "bob/ip/shift.h"
+#include "bob/ip/Exception.h"
 
 struct T {
   blitz::Array<uint32_t,2> a2, a2s_1, a2s_2;

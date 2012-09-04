@@ -27,9 +27,9 @@
 
 #include <QGraphicsItem>
 
-#include "visioner/util/matrix.h"
-#include "visioner/util/histogram.h"
-#include "visioner/vision/vision.h"
+#include "bob/visioner/util/matrix.h"
+#include "bob/visioner/util/histogram.h"
+#include "bob/visioner/vision/vision.h"
 
 #include "settings.h"
 

@@ -20,10 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
-#include "io/BinFileHeader.h"
-#include "io/Exception.h"
+#include "bob/io/BinFileHeader.h"
+#include "bob/io/Exception.h"
 
 const uint32_t bob::io::detail::MAGIC_ENDIAN_DW = 0x01020304;
 const uint8_t bob::io::detail::FORMAT_VERSION = 0;

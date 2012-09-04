@@ -26,8 +26,8 @@
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
 #include <stdint.h>
-#include "math/linear.h"
-#include "math/svd.h"
+#include "bob/math/linear.h"
+#include "bob/math/svd.h"
 
 
 struct T {

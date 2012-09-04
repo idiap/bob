@@ -20,11 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ip/VLSIFT.h"
+#include "bob/ip/VLSIFT.h"
 
 #include <vl/pgm.h>
-#include "core/array_assert.h"
-#include "ip/Exception.h"
+#include "bob/core/array_assert.h"
+#include "bob/ip/Exception.h"
 
 bob::ip::VLSIFT::VLSIFT(const size_t height, const size_t width, 
     const size_t n_intervals, const size_t n_octaves, const int octave_min,

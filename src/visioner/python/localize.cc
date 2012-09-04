@@ -24,11 +24,11 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 
-#include "core/python/ndarray.h"
+#include "bob/core/python/ndarray.h"
 
-#include "visioner/util/util.h"
-#include "visioner/cv/cv_detector.h"
-#include "visioner/cv/cv_localizer.h"
+#include "bob/visioner/util/util.h"
+#include "bob/visioner/cv/cv_detector.h"
+#include "bob/visioner/cv/cv_localizer.h"
 
 namespace bp = boost::python;
 namespace tp = bob::python;

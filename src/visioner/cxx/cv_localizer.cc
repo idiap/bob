@@ -24,11 +24,11 @@
 
 #include <boost/format.hpp>
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
-#include "visioner/cv/cv_localizer.h"
-#include "visioner/model/mdecoder.h"
-#include "visioner/util/timer.h"
+#include "bob/visioner/cv/cv_localizer.h"
+#include "bob/visioner/model/mdecoder.h"
+#include "bob/visioner/util/timer.h"
 
 namespace bob { namespace visioner {
 

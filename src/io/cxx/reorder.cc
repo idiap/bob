@@ -21,8 +21,8 @@
  */
 
 #include <cstring> //for memcpy
-#include "io/reorder.h"
-#include "io/Exception.h"
+#include "bob/io/reorder.h"
+#include "bob/io/Exception.h"
 
 namespace io = bob::io;
 namespace ca = bob::core::array;

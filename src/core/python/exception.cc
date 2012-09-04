@@ -23,10 +23,10 @@
  */
 
 #include <Python.h>
-#include "core/Exception.h"
-#include "core/array_exception.h"
-#include "core/convert_exception.h"
-#include "core/python/exception.h"
+#include "bob/core/Exception.h"
+#include "bob/core/array_exception.h"
+#include "bob/core/convert_exception.h"
+#include "bob/core/python/exception.h"
 
 using namespace bob::python;
 

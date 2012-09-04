@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ip/DCTFeatures.h"
+#include "bob/ip/DCTFeatures.h"
 
 bob::ip::DCTFeatures& 
 bob::ip::DCTFeatures::operator=(const bob::ip::DCTFeatures& other)

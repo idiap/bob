@@ -26,12 +26,12 @@
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
 #include <stdint.h>
-#include "core/logging.h"
-#include "core/convert.h"
-#include "ip/rotate.h"
-#include "ip/shear.h"
+#include "bob/core/logging.h"
+#include "bob/core/convert.h"
+#include "bob/ip/rotate.h"
+#include "bob/ip/shear.h"
 
-#include "io/Array.h"
+#include "bob/io/Array.h"
 #include <algorithm>
 
 #include <random/discrete-uniform.h>

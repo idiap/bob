@@ -26,14 +26,14 @@
 #include <boost/random.hpp>
 #include <cmath>
 
-#include "trainer/EMPCATrainer.h"
-#include "io/Exception.h"
-#include "core/array_copy.h"
-#include "core/array_type.h"
-#include "math/linear.h"
-#include "math/det.h"
-#include "math/inv.h"
-#include "math/stats.h"
+#include "bob/trainer/EMPCATrainer.h"
+#include "bob/io/Exception.h"
+#include "bob/core/array_copy.h"
+#include "bob/core/array_type.h"
+#include "bob/math/linear.h"
+#include "bob/math/det.h"
+#include "bob/math/inv.h"
+#include "bob/math/stats.h"
 
 namespace io = bob::io;
 namespace mach = bob::machine;

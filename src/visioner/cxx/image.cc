@@ -22,8 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "visioner/vision/image.h"
-#include "visioner/util/util.h"
+#include "bob/visioner/vision/image.h"
+#include "bob/visioner/util/util.h"
 
 namespace bob { namespace visioner {	
 

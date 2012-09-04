@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "machine/GaborJetSimilarities.h"
+#include "bob/machine/GaborJetSimilarities.h"
 
 bob::machine::GaborJetSimilarity::GaborJetSimilarity(bob::machine::GaborJetSimilarity::SimilarityType type, const bob::ip::GaborWaveletTransform& gwt)
 :

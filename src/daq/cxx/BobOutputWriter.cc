@@ -20,8 +20,8 @@
 
 #include <boost/make_shared.hpp>
 
-#include "daq/BobOutputWriter.h"
-#include <core/blitz_array.h>
+#include "bob/daq/BobOutputWriter.h"
+#include "bob/core/blitz_array.h"
 
 namespace bob { namespace daq {
   

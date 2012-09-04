@@ -26,8 +26,8 @@
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
 #include <stdint.h>
-#include "math/sqrtm.h"
-#include "math/linear.h"
+#include "bob/math/sqrtm.h"
+#include "bob/math/linear.h"
 
 struct T {
   blitz::Array<double,2> A44_1, S44_1;

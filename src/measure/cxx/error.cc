@@ -22,8 +22,8 @@
 
 #include <stdexcept>
 #include <algorithm>
-#include "measure/error.h"
-#include "core/blitz_compat.h"
+#include "bob/measure/error.h"
+#include "bob/core/blitz_compat.h"
 
 namespace err = bob::measure;
 

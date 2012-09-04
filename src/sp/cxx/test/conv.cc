@@ -26,7 +26,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
-#include "sp/conv.h"
+#include "bob/sp/conv.h"
 
 namespace sp = bob::sp;
 

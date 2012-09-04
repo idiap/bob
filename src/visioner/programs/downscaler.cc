@@ -25,9 +25,9 @@
 #include <fstream>
 #include <boost/filesystem.hpp>
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
-#include "visioner/model/ipyramid.h"
+#include "bob/visioner/model/ipyramid.h"
 
 int main(int argc, char *argv[]) {
 

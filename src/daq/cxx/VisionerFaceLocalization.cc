@@ -18,11 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/cast.h"
-#include "daq/VisionerFaceLocalization.h"
-#include "ip/color.h"
-#include "ip/scale.h"
-#include "io/Array.h"
+#include "bob/core/cast.h"
+#include "bob/daq/VisionerFaceLocalization.h"
+#include "bob/ip/color.h"
+#include "bob/ip/scale.h"
+#include "bob/io/Array.h"
 
 namespace bob { namespace daq {
 

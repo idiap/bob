@@ -24,10 +24,10 @@
 
 #include <cmath>
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
-#include "visioner/model/ipyramid.h"
-#include "visioner/util/timer.h"
+#include "bob/visioner/model/ipyramid.h"
+#include "bob/visioner/util/timer.h"
 
 // Compute the face bbx from the eye coordinates
 QRectF eyes2bbx(const QPointF& leye, const QPointF& reye)

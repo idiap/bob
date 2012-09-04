@@ -24,7 +24,7 @@
 #define BOOST_TEST_MODULE math-linear Tests
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
-#include "math/linear.h"
+#include "bob/math/linear.h"
 
 
 struct T {

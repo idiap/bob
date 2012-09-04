@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "sp/DCT1DNaive.h"
-#include "core/array_assert.h"
+#include "bob/sp/DCT1DNaive.h"
+#include "bob/core/array_assert.h"
 
 namespace ca = bob::core::array;
 namespace spd = bob::sp::detail;

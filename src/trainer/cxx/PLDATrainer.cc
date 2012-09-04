@@ -25,12 +25,12 @@
 #include <vector>
 #include <limits>
 
-#include "trainer/PLDATrainer.h"
-#include "core/array_copy.h"
-#include "math/linear.h"
-#include "math/inv.h"
-#include "math/svd.h"
-#include "trainer/Exception.h"
+#include "bob/trainer/PLDATrainer.h"
+#include "bob/core/array_copy.h"
+#include "bob/math/linear.h"
+#include "bob/math/inv.h"
+#include "bob/math/svd.h"
+#include "bob/trainer/Exception.h"
 
 
 namespace tca = bob::core::array;

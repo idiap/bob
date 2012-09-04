@@ -20,11 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/logging.h"
-#include "core/array_type.h"
+#include "bob/core/logging.h"
+#include "bob/core/array_type.h"
 
-#include "io/TensorFile.h"
-#include "io/reorder.h"
+#include "bob/io/TensorFile.h"
+#include "bob/io/reorder.h"
 
 namespace io = bob::io;
 namespace core = bob::core;

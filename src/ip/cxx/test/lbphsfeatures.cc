@@ -26,8 +26,8 @@
 #include <boost/test/unit_test.hpp>
 #include <vector>
 
-#include "core/cast.h"
-#include "ip/LBPHSFeatures.h"
+#include "bob/core/cast.h"
+#include "bob/ip/LBPHSFeatures.h"
 
 struct T {
   blitz::Array<uint32_t,2> src;

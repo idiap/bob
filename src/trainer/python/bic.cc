@@ -19,7 +19,7 @@
  */
 
 #include <boost/python.hpp>
-#include <trainer/BICTrainer.h>
+#include "bob/trainer/BICTrainer.h"
 
 void bind_trainer_bic(){
 

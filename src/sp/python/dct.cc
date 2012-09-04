@@ -22,12 +22,12 @@
 
 #include <boost/python.hpp>
 
-#include "sp/DCT1D.h"
-#include "sp/DCT2D.h"
-#include "sp/DCT1DNaive.h"
-#include "sp/DCT2DNaive.h"
+#include "bob/sp/DCT1D.h"
+#include "bob/sp/DCT2D.h"
+#include "bob/sp/DCT1DNaive.h"
+#include "bob/sp/DCT2DNaive.h"
 
-#include "core/python/ndarray.h"
+#include "bob/core/python/ndarray.h"
 
 using namespace boost::python;
 

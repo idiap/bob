@@ -22,9 +22,9 @@
  */
 
 #include <boost/python.hpp>
-#include "io/Arrayset.h"
-#include "machine/PLDAMachine.h"
-#include "trainer/PLDATrainer.h"
+#include "bob/io/Arrayset.h"
+#include "bob/machine/PLDAMachine.h"
+#include "bob/trainer/PLDATrainer.h"
 
 using namespace boost::python;
 namespace train = bob::trainer;

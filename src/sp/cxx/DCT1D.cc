@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "sp/DCT1D.h"
-#include "core/array_assert.h"
+#include "bob/sp/DCT1D.h"
+#include "bob/core/array_assert.h"
 #include <fftw3.h>
 
 bob::sp::DCT1DAbstract::DCT1DAbstract( const size_t length):

@@ -19,9 +19,9 @@
  */
 #include <boost/python.hpp>
 #include <boost/concept_check.hpp>
-#include "machine/Gaussian.h"
+#include "bob/machine/Gaussian.h"
 
-#include "core/python/ndarray.h"
+#include "bob/core/python/ndarray.h"
 
 using namespace boost::python;
 namespace io = bob::io;

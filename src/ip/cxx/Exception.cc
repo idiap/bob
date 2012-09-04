@@ -22,7 +22,7 @@
  */
 
 #include <boost/format.hpp>
-#include "ip/Exception.h"
+#include "bob/ip/Exception.h"
 
 namespace ip = bob::ip;
 namespace core = bob::core;

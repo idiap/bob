@@ -24,11 +24,11 @@
 
 #include <QApplication>
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
-#include "visioner/cv/cv_localizer.h"
-#include "visioner/cv/cv_draw.h"
-#include "visioner/util/timer.h"
+#include "bob/visioner/cv/cv_localizer.h"
+#include "bob/visioner/cv/cv_draw.h"
+#include "bob/visioner/util/timer.h"
 
 int main(int argc, char *argv[]) {	
 

@@ -22,23 +22,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "visioner/model/mdecoder.h"
-#include "visioner/util/manager.h"
+#include "bob/visioner/model/mdecoder.h"
+#include "bob/visioner/util/manager.h"
 
-#include "visioner/model/losses/diag_exp_loss.h"
-#include "visioner/model/losses/diag_log_loss.h"
-#include "visioner/model/losses/diag_symexp_loss.h"
-#include "visioner/model/losses/diag_symlog_loss.h"
-#include "visioner/model/losses/jesorsky_loss.h"
+#include "bob/visioner/model/losses/diag_exp_loss.h"
+#include "bob/visioner/model/losses/diag_log_loss.h"
+#include "bob/visioner/model/losses/diag_symexp_loss.h"
+#include "bob/visioner/model/losses/diag_symlog_loss.h"
+#include "bob/visioner/model/losses/jesorsky_loss.h"
 
-#include "visioner/model/trainers/taylor_booster.h"
-#include "visioner/model/trainers/averager.h"
+#include "bob/visioner/model/trainers/taylor_booster.h"
+#include "bob/visioner/model/trainers/averager.h"
 
-#include "visioner/model/taggers/tagger_object.h"
-#include "visioner/model/taggers/tagger_keypoint_oxy.h"
+#include "bob/visioner/model/taggers/tagger_object.h"
+#include "bob/visioner/model/taggers/tagger_keypoint_oxy.h"
 
-#include "visioner/model/models/mblbp_model.h"
-#include "visioner/model/models/model_pool.h"
+#include "bob/visioner/model/models/mblbp_model.h"
+#include "bob/visioner/model/models/model_pool.h"
 
 namespace bob { namespace visioner {
 

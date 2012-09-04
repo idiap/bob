@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "trainer/ML_GMMTrainer.h"
+#include "bob/trainer/ML_GMMTrainer.h"
 
 #include <algorithm>
 

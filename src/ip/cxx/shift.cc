@@ -18,8 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ip/shift.h"
-#include "ip/Exception.h"
+#include "bob/ip/shift.h"
+#include "bob/ip/Exception.h"
 
 void bob::ip::detail::shiftParameterCheck( const int shift_y, const int shift_x,
   const size_t src_height, const size_t src_width)

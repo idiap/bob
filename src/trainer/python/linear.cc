@@ -20,10 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/python/ndarray.h"
+#include "bob/core/python/ndarray.h"
 #include <boost/python/stl_iterator.hpp>
-#include "trainer/SVDPCATrainer.h"
-#include "trainer/FisherLDATrainer.h"
+#include "bob/trainer/SVDPCATrainer.h"
+#include "bob/trainer/FisherLDATrainer.h"
 
 using namespace boost::python;
 namespace io = bob::io;

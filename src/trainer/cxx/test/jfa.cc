@@ -27,9 +27,9 @@
 #include <blitz/array.h>
 #include <stdint.h>
 
-#include "core/cast.h"
-#include "trainer/JFATrainer.h"
-#include "machine/JFAMachine.h"
+#include "bob/core/cast.h"
+#include "bob/trainer/JFATrainer.h"
+#include "bob/machine/JFAMachine.h"
 
 
 struct T {

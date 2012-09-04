@@ -19,8 +19,8 @@
  */
 
 #include <boost/format.hpp>
-#include "core/logging.h"
-#include "daq/QtDisplay.h"
+#include "bob/core/logging.h"
+#include "bob/daq/QtDisplay.h"
 
 namespace bob { namespace daq {
 

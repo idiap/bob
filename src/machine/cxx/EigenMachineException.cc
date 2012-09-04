@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "machine/EigenMachineException.h"
+#include "bob/machine/EigenMachineException.h"
 #include <boost/format.hpp>
 
 namespace machine = bob::machine;

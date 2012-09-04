@@ -22,7 +22,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "visioner/model/dataset.h"
+#include "bob/visioner/model/dataset.h"
 
 namespace bob { namespace visioner {
 

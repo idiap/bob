@@ -21,10 +21,10 @@
  */
 
 #include <sys/time.h>
-#include "core/array_assert.h"
-#include "core/array_copy.h"
-#include "trainer/Exception.h"
-#include "trainer/DataShuffler.h"
+#include "bob/core/array_assert.h"
+#include "bob/core/array_copy.h"
+#include "bob/trainer/Exception.h"
+#include "bob/trainer/DataShuffler.h"
 
 namespace array = bob::core::array;
 namespace train = bob::trainer;

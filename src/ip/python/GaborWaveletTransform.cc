@@ -22,16 +22,16 @@
 
 
 #include <boost/python.hpp>
-#include <core/python/ndarray.h>
-#include <core/array_exception.h>
-#include <core/array_type.h>
+#include "bob/core/python/ndarray.h"
+#include "bob/core/array_exception.h"
+#include "bob/core/array_type.h"
 
-#include <ip/GaborWaveletTransform.h>
-#include <sp/FFT2D.h>
+#include "bob/ip/GaborWaveletTransform.h"
+#include "bob/sp/FFT2D.h"
 #include <blitz/array.h>
 
-#include <core/cast.h>
-#include <ip/color.h>
+#include "bob/core/cast.h"
+#include "bob/ip/color.h"
 
 
 template <class T> 

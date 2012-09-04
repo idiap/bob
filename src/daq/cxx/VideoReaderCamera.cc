@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "daq/VideoReaderCamera.h"
-#include <io/Array.h>
+#include "bob/daq/VideoReaderCamera.h"
+#include "bob/io/Array.h"
 
 //static pthread_mutex_t pthread_mutex_initializer = PTHREAD_MUTEX_INITIALIZER;
 

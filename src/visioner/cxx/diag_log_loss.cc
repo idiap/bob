@@ -22,7 +22,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "visioner/model/losses/diag_log_loss.h"
+#include "bob/visioner/model/losses/diag_log_loss.h"
 
 namespace bob { namespace visioner {
 

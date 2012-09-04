@@ -25,10 +25,10 @@
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
-#include "machine/SVM.h"
-#include "machine/MLPException.h"
-#include "core/array_check.h"
-#include "core/logging.h"
+#include "bob/machine/SVM.h"
+#include "bob/machine/MLPException.h"
+#include "bob/core/array_check.h"
+#include "bob/core/logging.h"
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>

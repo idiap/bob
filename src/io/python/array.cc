@@ -24,9 +24,9 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 
-#include "io/Array.h"
+#include "bob/io/Array.h"
 
-#include "core/python/ndarray.h"
+#include "bob/core/python/ndarray.h"
 
 using namespace boost::python;
 namespace io = bob::io;

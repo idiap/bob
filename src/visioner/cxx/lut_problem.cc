@@ -24,12 +24,12 @@
 
 #include <numeric>
 
-#include "core/logging.h"
-#include "lbfgs/lbfgs.h"
+#include "bob/core/logging.h"
+#include "bob/lbfgs/lbfgs.h"
 
-#include "visioner/model/trainers/lutproblems/lut_problem.h"
-#include "visioner/model/mdecoder.h"
-#include "visioner/util/threads.h"
+#include "bob/visioner/model/trainers/lutproblems/lut_problem.h"
+#include "bob/visioner/model/mdecoder.h"
+#include "bob/visioner/util/threads.h"
 
 namespace bob { namespace visioner {
 

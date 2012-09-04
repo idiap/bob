@@ -22,7 +22,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "visioner/model/param.h"
+#include "bob/visioner/model/param.h"
 
 #include "settings_dialog.h"
 #include "controls.h"

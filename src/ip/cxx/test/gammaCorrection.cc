@@ -26,8 +26,8 @@
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
 #include <stdint.h>
-#include "core/cast.h"
-#include "ip/gammaCorrection.h"
+#include "bob/core/cast.h"
+#include "bob/ip/gammaCorrection.h"
 
 
 struct T {

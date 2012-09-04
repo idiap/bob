@@ -21,7 +21,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ip/WeightedGaussian.h"
+#include "bob/ip/WeightedGaussian.h"
 
 void bob::ip::WeightedGaussian::computeKernel()
 {

@@ -25,7 +25,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 
-#include "io/CodecRegistry.h"
+#include "bob/io/CodecRegistry.h"
 
 #include<iostream>
 

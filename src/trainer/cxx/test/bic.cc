@@ -27,9 +27,9 @@
 #include <blitz/array.h>
 #include <stdint.h>
 
-#include "core/cast.h"
-#include "trainer/BICTrainer.h"
-#include "machine/BICMachine.h"
+#include "bob/core/cast.h"
+#include "bob/trainer/BICTrainer.h"
+#include "bob/machine/BICMachine.h"
 
 
 struct Data {

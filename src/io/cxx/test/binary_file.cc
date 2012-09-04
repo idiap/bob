@@ -29,9 +29,9 @@
 
 #include <blitz/array.h>
 #include <string>
-#include "core/logging.h"
-#include "core/cast.h"
-#include "io/BinFile.h"
+#include "bob/core/logging.h"
+#include "bob/core/cast.h"
+#include "bob/io/BinFile.h"
 
 
 struct T {

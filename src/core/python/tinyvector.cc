@@ -28,7 +28,7 @@
 #include <blitz/tinyvec.h>
 #endif
 
-#include "core/blitz_compat.h"
+#include "bob/core/blitz_compat.h"
 
 namespace bp = boost::python;
 

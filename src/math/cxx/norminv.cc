@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "math/norminv.h"
-#include "math/Exception.h"
+#include "bob/math/norminv.h"
+#include "bob/math/Exception.h"
 #include <cmath>
 
 namespace math = bob::math;

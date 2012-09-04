@@ -19,13 +19,13 @@
  */
 #include <boost/python.hpp>
 #include <boost/concept_check.hpp>
-#include "io/Arrayset.h"
-#include "machine/GMMStats.h"
-#include "machine/GMMMachine.h"
-#include "machine/GMMLLRMachine.h"
+#include "bob/io/Arrayset.h"
+#include "bob/machine/GMMStats.h"
+#include "bob/machine/GMMMachine.h"
+#include "bob/machine/GMMLLRMachine.h"
 #include <blitz/array.h>
 
-#include "core/python/ndarray.h"
+#include "bob/core/python/ndarray.h"
 
 using namespace boost::python;
 namespace io = bob::io;

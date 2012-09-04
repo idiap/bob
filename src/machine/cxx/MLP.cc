@@ -24,13 +24,13 @@
 #include <cmath>
 #include <boost/format.hpp>
 
-#include "core/array_check.h"
-#include "core/array_copy.h"
-#include "core/array_assert.h"
-#include "io/Arrayset.h"
-#include "machine/MLP.h"
-#include "machine/MLPException.h"
-#include "math/linear.h"
+#include "bob/core/array_check.h"
+#include "bob/core/array_copy.h"
+#include "bob/core/array_assert.h"
+#include "bob/io/Arrayset.h"
+#include "bob/machine/MLP.h"
+#include "bob/machine/MLPException.h"
+#include "bob/math/linear.h"
 
 namespace mach = bob::machine;
 namespace math = bob::math;

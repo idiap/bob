@@ -22,7 +22,7 @@
 
 #include <boost/python.hpp>
 
-#include "math/norminv.h"
+#include "bob/math/norminv.h"
 
 using namespace boost::python;
 

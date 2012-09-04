@@ -28,8 +28,8 @@
 #include <boost/shared_array.hpp>
 
 #include <blitz/array.h>
-#include "core/logging.h"
-#include "io/Array.h"
+#include "bob/core/logging.h"
+#include "bob/io/Array.h"
 
 struct T {
   blitz::Array<int8_t,2> a, b;

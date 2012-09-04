@@ -21,7 +21,7 @@
  */
 
 #include <boost/make_shared.hpp>
-#include "ip/LBP8R.h"
+#include "bob/ip/LBP8R.h"
 
 namespace ip = bob::ip;
 

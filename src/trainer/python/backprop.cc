@@ -21,7 +21,7 @@
  */
 
 #include <boost/python.hpp>
-#include "trainer/MLPBackPropTrainer.h"
+#include "bob/trainer/MLPBackPropTrainer.h"
 
 using namespace boost::python;
 namespace io = bob::io;

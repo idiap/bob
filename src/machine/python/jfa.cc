@@ -22,9 +22,9 @@
 
 #include <boost/python.hpp>
 #include <boost/shared_ptr.hpp>
-#include "core/python/ndarray.h"
-#include "machine/JFAMachine.h"
-#include "machine/GMMMachine.h"
+#include "bob/core/python/ndarray.h"
+#include "bob/machine/JFAMachine.h"
+#include "bob/machine/GMMMachine.h"
 
 using namespace boost::python;
 namespace mach = bob::machine;

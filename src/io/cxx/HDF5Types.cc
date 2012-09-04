@@ -37,9 +37,9 @@
 #warning Disabling MT locks because Boost < 1.35!
 #endif
 
-#include "core/logging.h"
-#include "io/HDF5Types.h"
-#include "io/HDF5Exception.h"
+#include "bob/core/logging.h"
+#include "bob/io/HDF5Types.h"
+#include "bob/io/HDF5Exception.h"
 
 namespace io = bob::io;
 

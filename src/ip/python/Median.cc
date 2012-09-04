@@ -23,7 +23,7 @@
 #include <boost/python.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/preprocessor/cat.hpp>
-#include "ip/Median.h"
+#include "bob/ip/Median.h"
 
 using namespace boost::python;
 

@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ip/GeomNorm.h"
+#include "bob/ip/GeomNorm.h"
 
 bob::ip::GeomNorm::GeomNorm( const double rotation_angle, const double scaling_factor,
     const size_t crop_height, const size_t crop_width, const double crop_offset_h,

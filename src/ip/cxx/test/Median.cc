@@ -25,7 +25,7 @@
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
-#include "ip/Median.h"
+#include "bob/ip/Median.h"
 
 struct T {
   double eps;

@@ -21,8 +21,8 @@
  */
 
 #include <boost/format.hpp>
-#include "io/HDF5Exception.h"
-#include "io/HDF5Types.h"
+#include "bob/io/HDF5Exception.h"
+#include "bob/io/HDF5Types.h"
 
 namespace io = bob::io;
 

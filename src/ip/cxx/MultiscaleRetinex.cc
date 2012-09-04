@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ip/MultiscaleRetinex.h"
+#include "bob/ip/MultiscaleRetinex.h"
 
 void bob::ip::MultiscaleRetinex::computeKernels()
 {

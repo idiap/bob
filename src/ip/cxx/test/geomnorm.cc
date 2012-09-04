@@ -27,11 +27,11 @@
 #include <blitz/array.h>
 #include <stdint.h>
 #include <boost/filesystem.hpp>
-#include "core/cast.h"
-#include "core/convert.h"
-#include "core/logging.h"
-#include "ip/GeomNorm.h"
-#include "io/Array.h"
+#include "bob/core/cast.h"
+#include "bob/core/convert.h"
+#include "bob/core/logging.h"
+#include "bob/ip/GeomNorm.h"
+#include "bob/io/Array.h"
 
 
 struct T {

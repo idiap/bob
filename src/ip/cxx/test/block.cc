@@ -27,8 +27,8 @@
 #include <blitz/array.h>
 #include <stdint.h>
 #include <vector>
-#include "core/logging.h"
-#include "ip/block.h"
+#include "bob/core/logging.h"
+#include "bob/ip/block.h"
 
 
 struct T {

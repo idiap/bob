@@ -18,8 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ip/crop.h"
-#include "ip/Exception.h"
+#include "bob/ip/crop.h"
+#include "bob/ip/Exception.h"
 
 void bob::ip::detail::cropParameterCheck( const int crop_y, 
   const int crop_x, const size_t crop_h, const size_t crop_w, 

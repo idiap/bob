@@ -31,9 +31,9 @@
 #include <blitz/array.h>
 #include <complex>
 #include <string>
-#include "core/logging.h" // for bob::core::tmpdir()
-#include "core/cast.h"
-#include "io/HDF5File.h"
+#include "bob/core/logging.h" // for bob::core::tmpdir()
+#include "bob/core/cast.h"
+#include "bob/io/HDF5File.h"
 
 struct T {
   blitz::Array<double,2> a;

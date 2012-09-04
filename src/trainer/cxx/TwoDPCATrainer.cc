@@ -17,9 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "trainer/TwoDPCATrainer.h"
-#include "math/eig.h"
-#include "math/linear.h"
+#include "bob/trainer/TwoDPCATrainer.h"
+#include "bob/math/eig.h"
+#include "bob/math/linear.h"
 
 void bob::trainer::TwoDPCATrainer::train(bob::machine::TwoDPCAMachine& machine, const bob::io::Arrayset& data) 
 {

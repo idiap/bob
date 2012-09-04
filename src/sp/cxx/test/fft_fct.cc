@@ -27,15 +27,15 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
-#include "sp/fftshift.h"
-#include "sp/FFT1D.h"
-#include "sp/FFT1DNaive.h"
-#include "sp/FFT2D.h"
-#include "sp/FFT2DNaive.h"
-#include "sp/DCT1D.h"
-#include "sp/DCT1DNaive.h"
-#include "sp/DCT2D.h"
-#include "sp/DCT2DNaive.h"
+#include "bob/sp/fftshift.h"
+#include "bob/sp/FFT1D.h"
+#include "bob/sp/FFT1DNaive.h"
+#include "bob/sp/FFT2D.h"
+#include "bob/sp/FFT2DNaive.h"
+#include "bob/sp/DCT1D.h"
+#include "bob/sp/DCT1DNaive.h"
+#include "bob/sp/DCT2D.h"
+#include "bob/sp/DCT2DNaive.h"
 // Random number
 #include <cstdlib>
 

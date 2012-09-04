@@ -20,11 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/array_copy.h"
-#include "core/cast.h"
-#include "io/Arrayset.h"
-#include "machine/WienerMachine.h"
-#include "machine/Exception.h"
+#include "bob/core/array_copy.h"
+#include "bob/core/cast.h"
+#include "bob/io/Arrayset.h"
+#include "bob/machine/WienerMachine.h"
+#include "bob/machine/Exception.h"
 #include <complex>
 
 namespace mach = bob::machine;

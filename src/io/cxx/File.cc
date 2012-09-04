@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "io/File.h"
+#include "bob/io/File.h"
 
 namespace io = bob::io;
 

@@ -23,7 +23,7 @@
  */
 
 #include <boost/format.hpp>
-#include "core/Exception.h"
+#include "bob/core/Exception.h"
 
 bob::core::Exception::Exception() throw() {
 }

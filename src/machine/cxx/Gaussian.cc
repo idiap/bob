@@ -19,10 +19,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "machine/Gaussian.h"
+#include "bob/machine/Gaussian.h"
 
-#include "core/array_assert.h"
-#include "math/log.h"
+#include "bob/core/array_assert.h"
+#include "bob/math/log.h"
 
 namespace ca = bob::core::array;
 namespace mathL = bob::math::Log;

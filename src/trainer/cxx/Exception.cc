@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "trainer/Exception.h"
+#include "bob/trainer/Exception.h"
 #include <boost/format.hpp>
 
 namespace train = bob::trainer;

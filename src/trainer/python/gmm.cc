@@ -18,10 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <boost/python.hpp>
-#include "io/Arrayset.h"
-#include "trainer/GMMTrainer.h"
-#include "trainer/MAP_GMMTrainer.h"
-#include "trainer/ML_GMMTrainer.h"
+#include "bob/io/Arrayset.h"
+#include "bob/trainer/GMMTrainer.h"
+#include "bob/trainer/MAP_GMMTrainer.h"
+#include "bob/trainer/ML_GMMTrainer.h"
 
 using namespace boost::python;
 namespace train = bob::trainer;

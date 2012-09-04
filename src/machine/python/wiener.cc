@@ -21,7 +21,7 @@
  */
 
 #include <boost/python.hpp>
-#include "machine/WienerMachine.h"
+#include "bob/machine/WienerMachine.h"
 
 using namespace boost::python;
 namespace mach = bob::machine;

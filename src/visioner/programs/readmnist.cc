@@ -26,9 +26,9 @@
 #include <boost/lexical_cast.hpp>
 #include <QImage>
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
-#include "visioner/vision/image.h"
+#include "bob/visioner/vision/image.h"
 
 bool read(const std::string& str_ifimage, const std::string& str_iflabel, int n_images, const std::string& str_ofimage, const std::string& str_oflabel)
 {

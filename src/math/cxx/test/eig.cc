@@ -26,9 +26,9 @@
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
 #include <stdint.h>
-#include "math/eig.h"
-#include "math/inv.h"
-#include "math/linear.h"
+#include "bob/math/eig.h"
+#include "bob/math/inv.h"
+#include "bob/math/linear.h"
 #include <algorithm>
 
 struct T {

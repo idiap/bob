@@ -25,12 +25,12 @@
 #include <boost/format.hpp>
 #include <boost/thread.hpp>
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
-#include "visioner/util/timer.h"
-#include "visioner/model/trainers/taylor_booster.h"
-#include "visioner/model/trainers/lutproblems/lut_problem_ept.h"
-#include "visioner/model/trainers/lutproblems/lut_problem_var.h"
+#include "bob/visioner/util/timer.h"
+#include "bob/visioner/model/trainers/taylor_booster.h"
+#include "bob/visioner/model/trainers/lutproblems/lut_problem_ept.h"
+#include "bob/visioner/model/trainers/lutproblems/lut_problem_var.h"
 
 namespace bob { namespace visioner {
 

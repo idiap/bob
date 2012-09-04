@@ -24,9 +24,9 @@
 
 #include <boost/format.hpp>
 
-#include "visioner/model/ipyramid.h"
-#include "visioner/vision/image.h"
-#include "visioner/vision/integral.h"
+#include "bob/visioner/model/ipyramid.h"
+#include "bob/visioner/vision/image.h"
+#include "bob/visioner/vision/integral.h"
 
 namespace bob { namespace visioner {
 

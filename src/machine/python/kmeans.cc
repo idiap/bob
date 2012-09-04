@@ -19,10 +19,10 @@
  */
 #include <boost/python.hpp>
 #include <boost/concept_check.hpp>
-#include "io/Arrayset.h"
-#include "machine/KMeansMachine.h"
+#include "bob/io/Arrayset.h"
+#include "bob/machine/KMeansMachine.h"
 
-#include "core/python/ndarray.h"
+#include "bob/core/python/ndarray.h"
 
 using namespace boost::python;
 namespace io = bob::io;

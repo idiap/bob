@@ -20,9 +20,9 @@
 #include <boost/python.hpp>
 #include <boost/concept_check.hpp>
 #include <blitz/array.h>
-#include "machine/Machine.h"
+#include "bob/machine/Machine.h"
 
-#include "core/python/ndarray.h"
+#include "bob/core/python/ndarray.h"
 
 using namespace boost::python;
 namespace mach = bob::machine;

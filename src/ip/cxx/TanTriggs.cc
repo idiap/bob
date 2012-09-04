@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ip/TanTriggs.h"
+#include "bob/ip/TanTriggs.h"
 
 bob::ip::TanTriggs::TanTriggs( const double gamma, const double sigma0, 
     const double sigma1, const size_t radius, const double threshold, 

@@ -26,7 +26,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
-#include "visioner/vision/object.h"
+#include "bob/visioner/vision/object.h"
 
 namespace bob { namespace visioner {
 

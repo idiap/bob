@@ -25,9 +25,9 @@
 #include <fstream>
 #include <boost/algorithm/string/split.hpp>
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
-#include "visioner/model/ipyramid.h"
+#include "bob/visioner/model/ipyramid.h"
 
 int main(int argc, char *argv[]) {	
 

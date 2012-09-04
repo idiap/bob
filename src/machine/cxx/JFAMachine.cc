@@ -19,14 +19,14 @@
  */
 
 
-#include "machine/JFAMachine.h"
-#include "core/array_copy.h"
-#include "core/repmat.h"
-#include "io/Arrayset.h"
-#include "math/linear.h"
-#include "math/inv.h"
-#include "machine/Exception.h"
-#include "machine/LinearScoring.h"
+#include "bob/machine/JFAMachine.h"
+#include "bob/core/array_copy.h"
+#include "bob/core/repmat.h"
+#include "bob/io/Arrayset.h"
+#include "bob/math/linear.h"
+#include "bob/math/inv.h"
+#include "bob/machine/Exception.h"
+#include "bob/machine/LinearScoring.h"
 #include <cmath>
 
 namespace mach = bob::machine;

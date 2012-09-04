@@ -20,12 +20,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "trainer/JFATrainer.h"
-#include "math/inv.h"
-#include "math/linear.h"
-#include "core/array_check.h"
-#include "core/Exception.h"
-#include "core/repmat.h"
+#include "bob/trainer/JFATrainer.h"
+#include "bob/math/inv.h"
+#include "bob/math/linear.h"
+#include "bob/core/array_check.h"
+#include "bob/core/Exception.h"
+#include "bob/core/repmat.h"
 #include <algorithm>
 #include <random/normal.h>
 

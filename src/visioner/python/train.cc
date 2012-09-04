@@ -32,10 +32,10 @@
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
 
-#include "core/python/ndarray.h"
+#include "bob/core/python/ndarray.h"
 
-#include "visioner/model/mdecoder.h"
-#include "visioner/model/sampler.h"
+#include "bob/visioner/model/mdecoder.h"
+#include "bob/visioner/model/sampler.h"
 
 namespace bp = boost::python;
 namespace tp = bob::python;

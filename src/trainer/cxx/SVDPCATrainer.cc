@@ -24,10 +24,10 @@
 #include <vector>
 #include <algorithm>
 
-#include "trainer/SVDPCATrainer.h"
-#include "math/svd.h"
-#include "io/Exception.h"
-#include "core/array_type.h"
+#include "bob/trainer/SVDPCATrainer.h"
+#include "bob/math/svd.h"
+#include "bob/io/Exception.h"
+#include "bob/core/array_type.h"
 
 namespace io = bob::io;
 namespace mach = bob::machine;

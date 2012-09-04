@@ -24,10 +24,10 @@
 
 #include <numeric>
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
-#include "visioner/model/trainers/lutproblems/lut_problem_ept.h"
-#include "visioner/util/threads.h"
+#include "bob/visioner/model/trainers/lutproblems/lut_problem_ept.h"
+#include "bob/visioner/util/threads.h"
 
 namespace bob { namespace visioner {
 

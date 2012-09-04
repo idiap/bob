@@ -24,12 +24,12 @@
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 
-#include "io/CodecRegistry.h"
+#include "bob/io/CodecRegistry.h"
 
-#include "io/HDF5File.h"
-#include "io/HDF5Exception.h"
+#include "bob/io/HDF5File.h"
+#include "bob/io/HDF5Exception.h"
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
 namespace fs = boost::filesystem;
 namespace io = bob::io;

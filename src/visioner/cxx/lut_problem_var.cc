@@ -24,8 +24,8 @@
 
 #include <numeric>
 
-#include "visioner/model/trainers/lutproblems/lut_problem_var.h"
-#include "visioner/util/threads.h"
+#include "bob/visioner/model/trainers/lutproblems/lut_problem_var.h"
+#include "bob/visioner/util/threads.h"
 
 namespace bob { namespace visioner {
 

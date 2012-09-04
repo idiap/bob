@@ -21,7 +21,7 @@
  */
 
 #include <boost/python.hpp>
-#include "machine/Activation.h"
+#include "bob/machine/Activation.h"
 
 using namespace boost::python;
 namespace mach = bob::machine;

@@ -18,8 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ip/block.h"
-#include "ip/Exception.h"
+#include "bob/ip/block.h"
+#include "bob/ip/Exception.h"
 
 
 /**

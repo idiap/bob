@@ -29,10 +29,10 @@
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/filesystem.hpp>
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
-#include "visioner/model/model.h"
-#include "visioner/model/mdecoder.h"
+#include "bob/visioner/model/model.h"
+#include "bob/visioner/model/mdecoder.h"
 
 /**
  * Determines if the input filename ends in ".gz"

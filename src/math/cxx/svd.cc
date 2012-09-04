@@ -20,11 +20,11 @@
 
 #include <boost/shared_array.hpp>
 
-#include "math/svd.h"
-#include "math/Exception.h"
-#include "core/array_assert.h"
-#include "core/array_check.h"
-#include "core/array_copy.h"
+#include "bob/math/svd.h"
+#include "bob/math/Exception.h"
+#include "bob/core/array_assert.h"
+#include "bob/core/array_check.h"
+#include "bob/core/array_copy.h"
 
 namespace math = bob::math;
 namespace ca = bob::core::array;

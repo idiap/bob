@@ -27,7 +27,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/shared_array.hpp>
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 #include <cstdio>
 #include <cstdlib>
 #include <string>

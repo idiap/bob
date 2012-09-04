@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "sp/FFT2D.h"
-#include "core/array_assert.h"
+#include "bob/sp/FFT2D.h"
+#include "bob/core/array_assert.h"
 #include <fftw3.h>
 
 

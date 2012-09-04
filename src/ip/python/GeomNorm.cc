@@ -20,9 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/python/ndarray.h"
-#include "ip/GeomNorm.h"
-#include "ip/maxRectInMask.h"
+#include "bob/core/python/ndarray.h"
+#include "bob/ip/GeomNorm.h"
+#include "bob/ip/maxRectInMask.h"
 
 using namespace boost::python;
 

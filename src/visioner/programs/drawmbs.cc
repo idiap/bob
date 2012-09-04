@@ -27,9 +27,9 @@
 #include <QColor>
 #include <boost/program_options.hpp>
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
-#include "visioner/util/util.h"
+#include "bob/visioner/util/util.h"
 
 /**
  * Drawing functions for displaying MB-LBP patterns

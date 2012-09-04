@@ -21,10 +21,10 @@
  */
 
 #include <boost/python.hpp>
-#include "io/File.h"
-#include "io/CodecRegistry.h"
+#include "bob/io/File.h"
+#include "bob/io/CodecRegistry.h"
 
-#include "core/python/ndarray.h"
+#include "bob/core/python/ndarray.h"
 
 using namespace boost::python;
 namespace tp = bob::python;

@@ -25,7 +25,7 @@
 #define BOOST_TEST_MAIN
 
 #include <boost/test/unit_test.hpp>
-#include "math/norminv.h"
+#include "bob/math/norminv.h"
 #include <cmath>
 
 namespace math = bob::math;

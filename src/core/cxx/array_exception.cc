@@ -21,7 +21,7 @@
  */
 
 #include <boost/format.hpp>
-#include "core/array_exception.h"
+#include "bob/core/array_exception.h"
 
 bob::core::NonZeroBaseError::NonZeroBaseError( const int dim, 
   const int base) throw(): 

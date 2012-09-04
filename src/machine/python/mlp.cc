@@ -20,11 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/python/ndarray.h"
+#include "bob/core/python/ndarray.h"
 #include <boost/make_shared.hpp>
 #include <boost/python/stl_iterator.hpp>
-#include "machine/MLP.h"
-#include "machine/MLPException.h"
+#include "bob/machine/MLP.h"
+#include "bob/machine/MLPException.h"
 
 using namespace boost::python;
 namespace mach = bob::machine;

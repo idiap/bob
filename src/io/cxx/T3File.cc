@@ -41,10 +41,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "core/array_check.h"
-#include "core/blitz_array.h"
-#include "io/CodecRegistry.h"
-#include "io/Exception.h"
+#include "bob/core/array_check.h"
+#include "bob/core/blitz_array.h"
+#include "bob/io/CodecRegistry.h"
+#include "bob/io/Exception.h"
 
 namespace fs = boost::filesystem;
 namespace io = bob::io;

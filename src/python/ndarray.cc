@@ -26,10 +26,10 @@
 #include <dlfcn.h>
 
 #define bob_IMPORT_ARRAY
-#include "core/python/ndarray.h"
+#include "bob/core/python/ndarray.h"
 #undef bob_IMPORT_ARRAY
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
 namespace bp = boost::python;
 namespace tp = bob::python;

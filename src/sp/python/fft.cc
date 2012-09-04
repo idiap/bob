@@ -23,13 +23,13 @@
 
 #include <boost/python.hpp>
 
-#include "sp/FFT1D.h"
-#include "sp/FFT2D.h"
-#include "sp/FFT1DNaive.h"
-#include "sp/FFT2DNaive.h"
-#include "sp/fftshift.h"
+#include "bob/sp/FFT1D.h"
+#include "bob/sp/FFT2D.h"
+#include "bob/sp/FFT1DNaive.h"
+#include "bob/sp/FFT2DNaive.h"
+#include "bob/sp/fftshift.h"
 
-#include "core/python/ndarray.h"
+#include "bob/core/python/ndarray.h"
 
 using namespace boost::python;
 

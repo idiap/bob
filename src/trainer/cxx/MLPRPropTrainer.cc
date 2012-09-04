@@ -21,12 +21,12 @@
  */
 
 #include <algorithm>
-#include "core/array_check.h"
-#include "core/array_copy.h"
-#include "math/linear.h"
-#include "machine/MLPException.h"
-#include "trainer/Exception.h"
-#include "trainer/MLPRPropTrainer.h"
+#include "bob/core/array_check.h"
+#include "bob/core/array_copy.h"
+#include "bob/math/linear.h"
+#include "bob/machine/MLPException.h"
+#include "bob/trainer/Exception.h"
+#include "bob/trainer/MLPRPropTrainer.h"
 
 namespace array = bob::core::array;
 namespace mach = bob::machine;

@@ -27,9 +27,9 @@
 #include <blitz/array.h>
 #include <stdint.h>
 
-#include "core/cast.h"
-#include "ip/crop.h"
-#include "ip/Exception.h"
+#include "bob/core/cast.h"
+#include "bob/ip/crop.h"
+#include "bob/ip/Exception.h"
 
 
 struct T {

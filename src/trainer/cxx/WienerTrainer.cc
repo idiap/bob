@@ -21,11 +21,11 @@
 #include <vector>
 #include <algorithm>
 
-#include "trainer/WienerTrainer.h"
-#include "io/Exception.h"
-#include "core/array_type.h"
-#include "core/cast.h"
-#include "sp/FFT2D.h"
+#include "bob/trainer/WienerTrainer.h"
+#include "bob/io/Exception.h"
+#include "bob/core/array_type.h"
+#include "bob/core/cast.h"
+#include "bob/sp/FFT2D.h"
 
 namespace io = bob::io;
 namespace mach = bob::machine;

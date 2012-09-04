@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "trainer/MAP_GMMTrainer.h"
-#include "trainer/Exception.h"
+#include "bob/trainer/MAP_GMMTrainer.h"
+#include "bob/trainer/Exception.h"
 
 namespace train = bob::trainer;
 namespace mach = bob::machine;

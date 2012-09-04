@@ -26,7 +26,7 @@
 #include <functional>
 #include <fstream>
 
-#include "visioner/util/histogram.h"
+#include "bob/visioner/util/histogram.h"
 
 namespace bob { namespace visioner {
 

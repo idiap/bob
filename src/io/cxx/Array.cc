@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "io/Array.h"
-#include "io/CodecRegistry.h"
+#include "bob/io/Array.h"
+#include "bob/io/CodecRegistry.h"
 
 namespace io = bob::io;
 namespace ca = bob::core::array;

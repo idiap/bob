@@ -21,7 +21,7 @@
  */
 
 #include <boost/format.hpp>
-#include "io/Exception.h"
+#include "bob/io/Exception.h"
 
 namespace io = bob::io;
 namespace core = bob::core;

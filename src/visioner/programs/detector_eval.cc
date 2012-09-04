@@ -22,9 +22,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
-#include "visioner/cv/cv_detector.h"
+#include "bob/visioner/cv/cv_detector.h"
 
 int main(int argc, char *argv[]) {	
 

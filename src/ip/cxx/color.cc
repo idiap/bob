@@ -23,7 +23,7 @@
 #include <cmath>
 #include <limits>
 #include <boost/format.hpp>
-#include "ip/color.h"
+#include "bob/ip/color.h"
 
 bob::ip::UnsupportedTypeForColorConversion::UnsupportedTypeForColorConversion(bob::core::array::ElementType eltype) throw(): m_eltype(eltype) {
 }

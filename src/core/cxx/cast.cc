@@ -21,7 +21,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/cast.h"
+#include "bob/core/cast.h"
 
 /**
   * @brief Specializations of the cast function for the std::complex type.

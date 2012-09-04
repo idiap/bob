@@ -22,10 +22,10 @@
  */
 
 #include <cmath>
-#include "ip/SpatioTemporalGradient.h"
-#include "sp/extrapolate.h"
-#include "sp/conv.h"
-#include "core/array_assert.h"
+#include "bob/ip/SpatioTemporalGradient.h"
+#include "bob/sp/extrapolate.h"
+#include "bob/sp/conv.h"
+#include "bob/core/array_assert.h"
 
 namespace ip = bob::ip;
 

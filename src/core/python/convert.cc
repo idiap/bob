@@ -22,8 +22,8 @@
 
 #include <boost/version.hpp>
 
-#include "core/python/ndarray.h"
-#include "core/convert.h"
+#include "bob/core/python/ndarray.h"
+#include "bob/core/convert.h"
 
 using namespace boost::python;
 namespace tp = bob::python;

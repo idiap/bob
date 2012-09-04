@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ip/GaborSpatial.h"
-#include "core/array_assert.h"
+#include "bob/ip/GaborSpatial.h"
+#include "bob/core/array_assert.h"
 
 namespace ca = bob::core::array;
 namespace ip = bob::ip;

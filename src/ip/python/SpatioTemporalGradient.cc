@@ -20,9 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ip/SpatioTemporalGradient.h"
-#include "core/cast.h"
-#include "core/python/ndarray.h"
+#include "bob/ip/SpatioTemporalGradient.h"
+#include "bob/core/cast.h"
+#include "bob/core/python/ndarray.h"
 
 using namespace boost::python;
 namespace ip = bob::ip;

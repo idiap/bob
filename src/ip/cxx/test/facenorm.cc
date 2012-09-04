@@ -27,12 +27,12 @@
 #include <blitz/array.h>
 #include <stdint.h>
 #include <boost/filesystem.hpp>
-#include "core/logging.h"
-#include "core/cast.h"
-#include "core/convert.h"
-#include "ip/color.h"
-#include "ip/FaceEyesNorm.h"
-#include "io/Array.h"
+#include "bob/core/logging.h"
+#include "bob/core/cast.h"
+#include "bob/core/convert.h"
+#include "bob/ip/color.h"
+#include "bob/ip/FaceEyesNorm.h"
+#include "bob/io/Array.h"
 
 #include <iostream>
 

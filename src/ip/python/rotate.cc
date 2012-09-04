@@ -21,9 +21,9 @@
  */
 
 
-#include "ip/rotate.h"
-#include "core/python/ndarray.h"
-#include <core/array_exception.h>
+#include "bob/ip/rotate.h"
+#include "bob/core/python/ndarray.h"
+#include "bob/core/array_exception.h"
 
 static boost::python::tuple get_rotated_output_shape(
   bob::python::const_ndarray input, double angle, bool angle_in_degrees)

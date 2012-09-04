@@ -35,7 +35,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "io/VideoReader.h"
+#include "bob/io/VideoReader.h"
 
 #include <stdexcept>
 #include <boost/format.hpp>
@@ -49,11 +49,11 @@ extern "C" {
 #include <libswscale/swscale.h>
 }
 
-#include "core/array_check.h"
-#include "io/Exception.h"
-#include "io/VideoException.h"
-#include "core/blitz_array.h"
-#include "core/logging.h"
+#include "bob/core/array_check.h"
+#include "bob/io/Exception.h"
+#include "bob/io/VideoException.h"
+#include "bob/core/blitz_array.h"
+#include "bob/core/logging.h"
 
 namespace io = bob::io;
 namespace ca = bob::core::array;

@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ip/Sobel.h"
+#include "bob/ip/Sobel.h"
 
 bob::ip::Sobel::Sobel( const bool up_positive, const bool left_positive,
     const bob::sp::Conv::SizeOption size_opt,

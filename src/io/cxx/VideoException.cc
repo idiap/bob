@@ -21,7 +21,7 @@
  */
 
 #include <boost/format.hpp>
-#include "io/VideoException.h"
+#include "bob/io/VideoException.h"
 
 namespace io = bob::io;
 

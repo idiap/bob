@@ -18,10 +18,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "machine/GMMMachine.h"
-#include "core/array_assert.h"
-#include "machine/Exception.h"
-#include "math/log.h"
+#include "bob/machine/GMMMachine.h"
+#include "bob/core/array_assert.h"
+#include "bob/machine/Exception.h"
+#include "bob/math/log.h"
 
 namespace mach = bob::machine;
 namespace ca = bob::core::array;

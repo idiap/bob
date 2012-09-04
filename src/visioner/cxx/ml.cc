@@ -25,7 +25,7 @@
 #include <fstream>
 #include <cmath>
 
-#include "visioner/model/ml.h"
+#include "bob/visioner/model/ml.h"
 
 namespace bob { namespace visioner {
 

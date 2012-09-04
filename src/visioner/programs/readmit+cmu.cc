@@ -24,9 +24,9 @@
 
 #include <boost/algorithm/string/split.hpp>
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
-#include "visioner/vision/object.h"
+#include "bob/visioner/vision/object.h"
 
 // Parse a MIT+CMU ground truth file
 bool parse(const std::string& file)

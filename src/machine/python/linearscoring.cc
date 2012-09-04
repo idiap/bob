@@ -19,10 +19,10 @@
  */
 #include <boost/python.hpp>
 #include <boost/shared_ptr.hpp>
-#include "machine/LinearScoring.h"
+#include "bob/machine/LinearScoring.h"
 #include <vector>
 
-#include "core/python/ndarray.h"
+#include "bob/core/python/ndarray.h"
 
 using namespace boost::python;
 namespace tp = bob::python;

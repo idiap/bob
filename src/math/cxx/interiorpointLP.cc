@@ -21,10 +21,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "math/linear.h"
-#include "math/interiorpointLP.h"
-#include "math/linsolve.h"
-#include "math/Exception.h"
+#include "bob/math/linear.h"
+#include "bob/math/interiorpointLP.h"
+#include "bob/math/linsolve.h"
+#include "bob/math/Exception.h"
 
 
 namespace math = bob::math;

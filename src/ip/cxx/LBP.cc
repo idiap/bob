@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ip/LBP.h"
+#include "bob/ip/LBP.h"
 
 namespace ip = bob::ip;
 

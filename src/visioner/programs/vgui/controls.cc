@@ -23,7 +23,7 @@
  */
 
 #include "controls.h"
-#include "visioner/util/util.h"
+#include "bob/visioner/util/util.h"
 
 // Create a tool button using the icon file path
 QToolButton* toolButton(const QString& iconPath, const QString& toolTip, const int size)

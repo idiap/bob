@@ -22,14 +22,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
 #include <QApplication>
 #include <QPainter>
 #include <QColor>
 #include <boost/program_options.hpp>
 
-#include "visioner/util/util.h"
+#include "bob/visioner/util/util.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // Drawing functions for displaying the:

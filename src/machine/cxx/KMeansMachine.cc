@@ -19,11 +19,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "machine/KMeansMachine.h"
+#include "bob/machine/KMeansMachine.h"
 
-#include "core/array_assert.h"
-#include "core/array_copy.h"
-#include "machine/Exception.h"
+#include "bob/core/array_assert.h"
+#include "bob/core/array_copy.h"
+#include "bob/machine/Exception.h"
 #include <limits>
 
 namespace ca = bob::core::array;

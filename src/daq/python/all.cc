@@ -24,22 +24,22 @@
 
 #include <boost/format.hpp>
 
-#include <daq/Camera.h>
-#include <daq/VideoReaderCamera.h>
-#include <daq/OutputWriter.h>
-#include <daq/BobOutputWriter.h>
-#include <daq/Controller.h>
-#include <daq/SimpleController.h>
-#include <daq/Display.h>
-#include <daq/QtDisplay.h>
-#include <daq/FaceLocalization.h>
-#include <daq/NullFaceLocalization.h>
-#include <daq/ConsoleDisplay.h>
-#include <daq/CaptureSystem.h>
-#include <daq/VisionerFaceLocalization.h>
+#include "bob/daq/Camera.h"
+#include "bob/daq/VideoReaderCamera.h"
+#include "bob/daq/OutputWriter.h"
+#include "bob/daq/BobOutputWriter.h"
+#include "bob/daq/Controller.h"
+#include "bob/daq/SimpleController.h"
+#include "bob/daq/Display.h"
+#include "bob/daq/QtDisplay.h"
+#include "bob/daq/FaceLocalization.h"
+#include "bob/daq/NullFaceLocalization.h"
+#include "bob/daq/ConsoleDisplay.h"
+#include "bob/daq/CaptureSystem.h"
+#include "bob/daq/VisionerFaceLocalization.h"
 
 #ifdef V4L2
-  #include <daq/V4LCamera.h>
+#include "bob/daq/V4LCamera.h"
 #endif
 
 using namespace bob::daq;

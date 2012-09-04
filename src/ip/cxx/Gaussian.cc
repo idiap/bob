@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ip/Gaussian.h"
+#include "bob/ip/Gaussian.h"
 
 void bob::ip::Gaussian::computeKernel()
 {

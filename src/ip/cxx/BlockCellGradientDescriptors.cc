@@ -18,9 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ip/BlockCellGradientDescriptors.h"
-#include "ip/Exception.h"
-#include "core/array_assert.h"
+#include "bob/ip/BlockCellGradientDescriptors.h"
+#include "bob/ip/Exception.h"
+#include "bob/core/array_assert.h"
 
 bob::ip::GradientMaps::GradientMaps(const size_t height, 
     const size_t width, const GradientMagnitudeType mag_type):

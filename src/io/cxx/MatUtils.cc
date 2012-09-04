@@ -22,8 +22,8 @@
 
 #include <boost/format.hpp>
 
-#include "io/MatUtils.h"
-#include "io/reorder.h"
+#include "bob/io/MatUtils.h"
+#include "bob/io/reorder.h"
 
 namespace io = bob::io;
 namespace iod = io::detail;

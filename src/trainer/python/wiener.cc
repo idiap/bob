@@ -22,7 +22,7 @@
 
 #include <boost/python.hpp>
 #include <boost/shared_ptr.hpp>
-#include "trainer/WienerTrainer.h"
+#include "bob/trainer/WienerTrainer.h"
 
 using namespace boost::python;
 namespace io = bob::io;

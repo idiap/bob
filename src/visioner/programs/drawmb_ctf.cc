@@ -28,9 +28,9 @@
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
-#include "visioner/util/util.h"
+#include "bob/visioner/util/util.h"
 
 QImage draw_init(int bw, int bh, int bcx, int bcy)
 {

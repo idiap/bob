@@ -22,9 +22,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
-#include "visioner/model/mdecoder.h"
+#include "bob/visioner/model/mdecoder.h"
 
 int main(int argc, char *argv[]) {
 

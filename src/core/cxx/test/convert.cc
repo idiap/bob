@@ -27,9 +27,9 @@
 #include <blitz/array.h>
 #include <stdint.h>
 #include <iostream>
-#include "core/logging.h"
-#include "core/convert.h"
-#include "core/cast.h"
+#include "bob/core/logging.h"
+#include "bob/core/convert.h"
+#include "bob/core/cast.h"
 
 struct T {
   blitz::Array<uint8_t,1> a8;

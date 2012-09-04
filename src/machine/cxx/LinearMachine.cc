@@ -22,11 +22,11 @@
 
 #include <cmath>
 
-#include "core/array_copy.h"
-#include "io/Arrayset.h"
-#include "machine/LinearMachine.h"
-#include "machine/Exception.h"
-#include "math/linear.h"
+#include "bob/core/array_copy.h"
+#include "bob/io/Arrayset.h"
+#include "bob/machine/LinearMachine.h"
+#include "bob/machine/Exception.h"
+#include "bob/math/linear.h"
 
 namespace mach = bob::machine;
 namespace math = bob::math;

@@ -20,9 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ip/HornAndSchunckFlow.h"
-#include "core/python/ndarray.h"
-#include "core/cast.h"
+#include "bob/ip/HornAndSchunckFlow.h"
+#include "bob/core/python/ndarray.h"
+#include "bob/core/cast.h"
 
 using namespace boost::python;
 namespace ip = bob::ip;

@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ip/DCTFeatures.h"
-#include "core/python/ndarray.h"
+#include "bob/ip/DCTFeatures.h"
+#include "bob/core/python/ndarray.h"
 
 using namespace boost::python;
 

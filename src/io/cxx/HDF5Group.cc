@@ -24,9 +24,9 @@
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
-#include "io/HDF5Group.h"
-#include "io/HDF5Utils.h"
-#include "core/logging.h"
+#include "bob/io/HDF5Group.h"
+#include "bob/io/HDF5Utils.h"
+#include "bob/core/logging.h"
 
 namespace h5 = bob::io::detail::hdf5;
 namespace io = bob::io;

@@ -20,10 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/array_assert.h"
-#include "sp/conv.h"
-#include "sp/extrapolate.h"
-#include "ip/HornAndSchunckFlow.h"
+#include "bob/core/array_assert.h"
+#include "bob/sp/conv.h"
+#include "bob/sp/extrapolate.h"
+#include "bob/ip/HornAndSchunckFlow.h"
 
 namespace of = bob::ip::optflow;
 

@@ -27,7 +27,7 @@
 
 #include <boost/serialization/singleton.hpp>
 
-#include "visioner/model/ipyramid.h"
+#include "bob/visioner/model/ipyramid.h"
 
 /**
  * Collection of images and ground truth, accessible to every object in the

@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ip/FaceEyesNorm.h"
+#include "bob/ip/FaceEyesNorm.h"
 
 bob::ip::FaceEyesNorm::FaceEyesNorm( const double eyes_distance,
     const size_t crop_height, const size_t crop_width, const double crop_offset_h,

@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ip/SelfQuotientImage.h"
+#include "bob/ip/SelfQuotientImage.h"
 
 void bob::ip::SelfQuotientImage::computeKernels()
 {

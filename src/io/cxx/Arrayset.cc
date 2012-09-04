@@ -21,8 +21,8 @@
  */
 
 #include <boost/format.hpp>
-#include "io/Arrayset.h"
-#include "io/CodecRegistry.h"
+#include "bob/io/Arrayset.h"
+#include "bob/io/CodecRegistry.h"
 
 namespace io = bob::io;
 

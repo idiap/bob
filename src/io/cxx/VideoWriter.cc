@@ -35,12 +35,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "io/VideoWriter.h"
+#include "bob/io/VideoWriter.h"
 
 #include <boost/format.hpp>
 #include <boost/preprocessor.hpp>
 
-#include "io/VideoException.h"
+#include "bob/io/VideoException.h"
 
 extern "C" {
 #include <libavutil/mathematics.h>

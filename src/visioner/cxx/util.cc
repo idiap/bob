@@ -30,9 +30,9 @@
 
 #include <QObject>
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
-#include "visioner/util/util.h"
+#include "bob/visioner/util/util.h"
 
 namespace bob { namespace visioner {
 

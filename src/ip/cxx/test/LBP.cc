@@ -24,9 +24,9 @@
 #define BOOST_TEST_MODULE IP-Lbp Tests
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
-#include "ip/LBP.h"
-#include "ip/LBP4R.h"
-#include "ip/LBP8R.h"
+#include "bob/ip/LBP.h"
+#include "bob/ip/LBP4R.h"
+#include "bob/ip/LBP8R.h"
 
 #include <iostream>
 

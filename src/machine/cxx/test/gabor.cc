@@ -28,13 +28,13 @@
 #include <boost/filesystem.hpp>
 #include <blitz/array.h>
 
-#include <machine/GaborGraphMachine.h>
-#include <machine/GaborJetSimilarities.h>
-#include <machine/Exception.h>
+#include "bob/machine/GaborGraphMachine.h"
+#include "bob/machine/GaborJetSimilarities.h"
+#include "bob/machine/Exception.h"
 
-#include <core/Exception.h>
-#include <core/logging.h>
-#include <io/Array.h>
+#include "bob/core/Exception.h"
+#include "bob/core/logging.h"
+#include "bob/io/Array.h"
 
 
 static const double epsilon = 1e-8;

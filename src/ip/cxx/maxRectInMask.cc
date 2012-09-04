@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ip/maxRectInMask.h"
+#include "bob/ip/maxRectInMask.h"
 
 bool
 bob::ip::detail::isTrue( const blitz::Array<bool,2>& src, int y0, int x0, 

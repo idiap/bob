@@ -27,8 +27,8 @@
 #include <blitz/array.h>
 #include <random/uniform.h>
 #include <stdint.h>
-#include "core/cast.h"
-#include "ip/shear.h"
+#include "bob/core/cast.h"
+#include "bob/ip/shear.h"
 
 struct T {
   blitz::Array<uint32_t,2> a2, a2sX_p27, a2sX_m27, a2sY_p27, a2sY_m27;

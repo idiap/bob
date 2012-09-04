@@ -27,8 +27,8 @@
 #include <blitz/array.h>
 #include <stdint.h>
 
-#include "core/cast.h"
-#include "ip/extrapolateMask.h"
+#include "bob/core/cast.h"
+#include "bob/ip/extrapolateMask.h"
 
 
 struct T {

@@ -24,10 +24,10 @@
 #include <boost/make_shared.hpp>
 #include <boost/format.hpp>
 
-#include "core/python/exception.h"
-#include "core/python/ndarray.h"
+#include "bob/core/python/exception.h"
+#include "bob/core/python/ndarray.h"
 
-#include "io/HDF5File.h"
+#include "bob/io/HDF5File.h"
 
 using namespace boost::python;
 namespace io = bob::io;

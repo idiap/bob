@@ -17,11 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "math/eig.h"
-#include "math/Exception.h"
-#include "core/array_assert.h"
-#include "core/array_check.h"
-#include "core/array_copy.h"
+#include "bob/math/eig.h"
+#include "bob/math/Exception.h"
+#include "bob/core/array_assert.h"
+#include "bob/core/array_check.h"
+#include "bob/core/array_copy.h"
 #if !defined (HAVE_BLITZ_TINYVEC2_H)
 #include <blitz/tinyvec-et.h>
 #endif

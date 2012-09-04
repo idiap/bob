@@ -24,8 +24,8 @@
 #define BOOST_TEST_MODULE IP-flipflop Tests
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
-#include "core/logging.h"
-#include "ip/flipflop.h"
+#include "bob/core/logging.h"
+#include "bob/ip/flipflop.h"
 
 
 struct T {

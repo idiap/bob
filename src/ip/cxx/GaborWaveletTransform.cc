@@ -20,9 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/array_assert.h"
-#include "core/array_copy.h"
-#include "ip/GaborWaveletTransform.h"
+#include "bob/core/array_assert.h"
+#include "bob/core/array_copy.h"
+#include "bob/ip/GaborWaveletTransform.h"
 #include <numeric>
 #include <sstream>
 #include <fstream>

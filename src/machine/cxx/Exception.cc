@@ -21,7 +21,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "machine/Exception.h"
+#include "bob/machine/Exception.h"
 #include <boost/format.hpp>
 
 namespace machine = bob::machine;

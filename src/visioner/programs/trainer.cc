@@ -24,11 +24,11 @@
 
 #include <boost/thread.hpp>
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
-#include "visioner/util/timer.h"
-#include "visioner/model/mdecoder.h"
-#include "visioner/model/sampler.h"
+#include "bob/visioner/util/timer.h"
+#include "bob/visioner/model/mdecoder.h"
+#include "bob/visioner/model/sampler.h"
 
 // Train the <model>
 static bool train(bob::visioner::Model& model) {

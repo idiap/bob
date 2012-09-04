@@ -20,15 +20,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/python/ndarray.h"
+#include "bob/core/python/ndarray.h"
 
 #include <stdint.h>
 #include <vector>
-#include "ip/LBP4R.h"
-#include "ip/LBP8R.h"
-#include "ip/LBP16R.h"
-#include "ip/LBPTop.h"
-#include "ip/LBPHSFeatures.h"
+#include "bob/ip/LBP4R.h"
+#include "bob/ip/LBP8R.h"
+#include "bob/ip/LBP16R.h"
+#include "bob/ip/LBPTop.h"
+#include "bob/ip/LBPHSFeatures.h"
 
 using namespace boost::python;
 namespace ip = bob::ip;

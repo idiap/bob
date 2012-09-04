@@ -22,10 +22,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
-#include "visioner/cv/cv_localizer.h"
-#include "visioner/util/timer.h"
+#include "bob/visioner/cv/cv_localizer.h"
+#include "bob/visioner/util/timer.h"
 
 int main(int argc, char *argv[]) {	
 

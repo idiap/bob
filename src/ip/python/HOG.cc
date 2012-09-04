@@ -21,9 +21,9 @@
  */
 
 #include <boost/python.hpp>
-#include "core/python/ndarray.h"
-#include "core/cast.h"
-#include "ip/HOG.h"
+#include "bob/core/python/ndarray.h"
+#include "bob/core/cast.h"
+#include "bob/ip/HOG.h"
 
 using namespace boost::python;
 

@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/array_type.h"
-#include "core/Exception.h"
+#include "bob/core/array_type.h"
+#include "bob/core/Exception.h"
 #include <boost/format.hpp>
 
 namespace ca = bob::core::array;

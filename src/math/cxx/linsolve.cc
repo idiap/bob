@@ -17,12 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "math/linsolve.h"
-#include "math/Exception.h"
-#include "math/linear.h"
-#include "core/array_assert.h"
-#include "core/array_check.h"
-#include "core/array_copy.h"
+#include "bob/math/linsolve.h"
+#include "bob/math/Exception.h"
+#include "bob/math/linear.h"
+#include "bob/core/array_assert.h"
+#include "bob/core/array_check.h"
+#include "bob/core/array_copy.h"
 
 namespace math = bob::math;
 namespace ca = bob::core::array;

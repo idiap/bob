@@ -28,12 +28,12 @@
 #include <blitz/array.h>
 #include <stdint.h>
 
-#include "machine/LinearMachine.h"
-#include "machine/Exception.h"
-#include "core/logging.h"
-#include "core/array_copy.h"
-#include "io/HDF5File.h"
-#include "math/linear.h"
+#include "bob/machine/LinearMachine.h"
+#include "bob/machine/Exception.h"
+#include "bob/core/logging.h"
+#include "bob/core/array_copy.h"
+#include "bob/io/HDF5File.h"
+#include "bob/math/linear.h"
 
 /**
  * Evaluates the presumed output of a linear machine through a different path.

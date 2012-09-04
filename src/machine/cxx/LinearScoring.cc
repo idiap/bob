@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "machine/LinearScoring.h"
-#include "math/linear.h"
+#include "bob/machine/LinearScoring.h"
+#include "bob/math/linear.h"
 
 namespace ca = bob::core::array;
 

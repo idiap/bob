@@ -21,7 +21,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "math/Exception.h"
+#include "bob/math/Exception.h"
 #include <boost/format.hpp>
 
 namespace math = bob::math;

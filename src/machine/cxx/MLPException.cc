@@ -21,7 +21,7 @@
  */
 
 #include <boost/format.hpp>
-#include "machine/MLPException.h"
+#include "bob/machine/MLPException.h"
 
 namespace mach = bob::machine;
 

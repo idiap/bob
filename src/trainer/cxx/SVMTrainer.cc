@@ -23,10 +23,10 @@
 #include <boost/format.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/algorithm/string.hpp>
-#include "trainer/Exception.h"
-#include "trainer/SVMTrainer.h"
-#include "core/blitz_compat.h"
-#include "core/logging.h"
+#include "bob/trainer/Exception.h"
+#include "bob/trainer/SVMTrainer.h"
+#include "bob/core/blitz_compat.h"
+#include "bob/core/logging.h"
 
 namespace trainer = bob::trainer;
 

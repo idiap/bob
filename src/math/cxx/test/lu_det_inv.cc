@@ -26,10 +26,10 @@
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
 #include <stdint.h>
-#include "math/lu.h"
-#include "math/det.h"
-#include "math/inv.h"
-#include "math/linear.h"
+#include "bob/math/lu.h"
+#include "bob/math/det.h"
+#include "bob/math/inv.h"
+#include "bob/math/linear.h"
 
 
 struct T {

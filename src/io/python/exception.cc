@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "io/Exception.h"
-#include "core/python/exception.h"
+#include "bob/io/Exception.h"
+#include "bob/core/python/exception.h"
 
 using namespace bob::python;
 namespace io = bob::io;

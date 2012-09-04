@@ -17,10 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "trainer/KMeansTrainer.h"
+#include "bob/trainer/KMeansTrainer.h"
 
-#include "io/Arrayset.h"
-#include "core/logging.h"
+#include "bob/io/Arrayset.h"
+#include "bob/core/logging.h"
 #include <boost/random.hpp>
 
 namespace io = bob::io;

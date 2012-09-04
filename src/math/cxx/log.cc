@@ -18,8 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "math/log.h"
-#include "math/Exception.h"
+#include "bob/math/log.h"
+#include "bob/math/Exception.h"
 #include <cstdio>
 
 namespace math = bob::math;

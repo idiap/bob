@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "ip/histo.h"
+#include "bob/ip/histo.h"
 
 bob::ip::UnsupportedTypeForHistogram::UnsupportedTypeForHistogram(tca::ElementType elementType)  throw(): elementType(elementType) {
   sprintf(description, "The source type \"%s\" is not supported", bob::core::array::stringize(elementType));

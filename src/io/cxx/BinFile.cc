@@ -20,10 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/logging.h"
-#include "core/array_type.h"
+#include "bob/core/logging.h"
+#include "bob/core/array_type.h"
 
-#include "io/BinFile.h"
+#include "bob/io/BinFile.h"
 
 namespace io = bob::io;
 namespace core = bob::core;

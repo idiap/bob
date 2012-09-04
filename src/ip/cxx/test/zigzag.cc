@@ -26,8 +26,8 @@
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
-#include "core/cast.h"
-#include "ip/zigzag.h"
+#include "bob/core/cast.h"
+#include "bob/ip/zigzag.h"
 
 struct T 
 {

@@ -22,7 +22,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "visioner/util/threads.h"
+#include "bob/visioner/util/threads.h"
 
 // Split some objects to process using multiple threads
 void bob::visioner::thread_split(uint64_t n_objects, 

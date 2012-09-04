@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/python/ndarray.h"
-#include "sp/extrapolate.h"
+#include "bob/core/python/ndarray.h"
+#include "bob/sp/extrapolate.h"
 
 using namespace boost::python;
 

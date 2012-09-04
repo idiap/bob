@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/python/ndarray.h"
+#include "bob/core/python/ndarray.h"
 
 void bind_ip_version();
 void bind_ip_color();

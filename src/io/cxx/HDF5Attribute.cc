@@ -21,9 +21,9 @@
  */
 
 #include <boost/format.hpp>
-#include "io/HDF5Attribute.h"
-#include "io/HDF5Exception.h"
-#include "core/logging.h"
+#include "bob/io/HDF5Attribute.h"
+#include "bob/io/HDF5Exception.h"
+#include "bob/core/logging.h"
 
 namespace h5 = bob::io::detail::hdf5;
 namespace io = bob::io;

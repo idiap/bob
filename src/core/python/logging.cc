@@ -22,7 +22,7 @@
 
 #include <boost/python.hpp>
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
 using namespace boost::python;
 

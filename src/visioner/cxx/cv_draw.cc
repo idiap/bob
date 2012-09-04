@@ -24,7 +24,7 @@
 
 #include <QPainter>
 
-#include "visioner/cv/cv_draw.h"
+#include "bob/visioner/cv/cv_draw.h"
 
 namespace bob { namespace visioner {
 

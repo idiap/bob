@@ -26,10 +26,10 @@
 #include <boost/test/unit_test.hpp>
 #include <vector>
 
-#include "core/cast.h"
-#include "ip/DCTFeatures.h"
+#include "bob/core/cast.h"
+#include "bob/ip/DCTFeatures.h"
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
 struct T {
   blitz::Array<uint32_t,2> src;

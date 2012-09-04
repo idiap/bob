@@ -25,8 +25,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ip/LBPTop.h"
-#include "ip/Exception.h"
+#include "bob/ip/LBPTop.h"
+#include "bob/ip/Exception.h"
 
 namespace ip = bob::ip;
 

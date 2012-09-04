@@ -26,9 +26,9 @@
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
 #include <stdint.h>
-#include "core/cast.h"
-#include "core/array_check.h"
-#include "core/array_copy.h"
+#include "bob/core/cast.h"
+#include "bob/core/array_check.h"
+#include "bob/core/array_copy.h"
 #include <map>
 #include <vector>
 

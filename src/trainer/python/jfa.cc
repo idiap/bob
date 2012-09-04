@@ -20,10 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/python/ndarray.h"
+#include "bob/core/python/ndarray.h"
 #include <boost/python/stl_iterator.hpp>
-#include "trainer/JFATrainer.h"
-#include "machine/JFAMachine.h"
+#include "bob/trainer/JFATrainer.h"
+#include "bob/machine/JFAMachine.h"
 #include <boost/shared_ptr.hpp>
 
 using namespace boost::python;

@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/blitz_array.h"
-#include "core/logging.h"
+#include "bob/core/blitz_array.h"
+#include "bob/core/logging.h"
 
 namespace ca = bob::core::array;
 

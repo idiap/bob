@@ -18,8 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "machine/ZTNorm.h"
-#include "core/array_assert.h"
+#include "bob/machine/ZTNorm.h"
+#include "bob/core/array_assert.h"
 #include <limits>
 
 namespace bob { 

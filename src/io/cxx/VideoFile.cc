@@ -24,10 +24,10 @@
 #include <boost/filesystem.hpp>
 #include <boost/make_shared.hpp>
 
-#include "core/blitz_array.h"
+#include "bob/core/blitz_array.h"
 
-#include "io/CodecRegistry.h"
-#include "io/Video.h"
+#include "bob/io/CodecRegistry.h"
+#include "bob/io/Video.h"
 
 namespace fs = boost::filesystem;
 namespace io = bob::io;

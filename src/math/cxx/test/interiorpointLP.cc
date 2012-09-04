@@ -26,12 +26,12 @@
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
 #include <stdint.h>
-#include "core/cast.h"
-#include "core/array_check.h"
-#include "core/array_copy.h"
-#include "core/array_type.h"
-#include "math/linear.h"
-#include "math/interiorpointLP.h"
+#include "bob/core/cast.h"
+#include "bob/core/array_check.h"
+#include "bob/core/array_copy.h"
+#include "bob/core/array_type.h"
+#include "bob/math/linear.h"
+#include "bob/math/interiorpointLP.h"
 
 struct T {
   double eps;

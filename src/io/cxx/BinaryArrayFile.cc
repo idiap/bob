@@ -22,8 +22,8 @@
 
 #include <boost/make_shared.hpp>
 
-#include "io/BinFile.h"
-#include "io/CodecRegistry.h"
+#include "bob/io/BinFile.h"
+#include "bob/io/CodecRegistry.h"
 
 namespace io = bob::io;
 namespace ca = bob::core::array;

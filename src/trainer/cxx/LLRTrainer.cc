@@ -18,11 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "trainer/LLRTrainer.h"
-#include "core/array_type.h"
-#include "math/linear.h"
+#include "bob/trainer/LLRTrainer.h"
+#include "bob/core/array_type.h"
+#include "bob/math/linear.h"
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
 bob::trainer::LLRTrainer::LLRTrainer(const double prior, 
   const double convergence_threshold, const size_t max_iterations):

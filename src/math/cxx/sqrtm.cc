@@ -22,11 +22,11 @@
  */
 
 
-#include "math/sqrtm.h"
+#include "bob/math/sqrtm.h"
 
-#include "core/array_assert.h"
-#include "math/eig.h"
-#include "math/linear.h"
+#include "bob/core/array_assert.h"
+#include "bob/math/eig.h"
+#include "bob/math/linear.h"
 
 
 namespace ca = bob::core::array;

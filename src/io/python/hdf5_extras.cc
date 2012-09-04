@@ -23,10 +23,10 @@
 #include <boost/python.hpp>
 #include <boost/make_shared.hpp>
 
-#include "core/python/ndarray.h"
-#include "core/python/exception.h"
+#include "bob/core/python/ndarray.h"
+#include "bob/core/python/exception.h"
 
-#include "io/HDF5File.h"
+#include "bob/io/HDF5File.h"
 
 using namespace boost::python;
 namespace tp = bob::python;

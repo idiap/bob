@@ -22,7 +22,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "visioner/model/taggers/tagger_keypoint_oxy.h"
+#include "bob/visioner/model/taggers/tagger_keypoint_oxy.h"
 
 namespace bob { namespace visioner {
 

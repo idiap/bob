@@ -23,11 +23,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/blitz_compat.h"
-#include "math/eig.h"
-#include "math/linear.h"
-#include "trainer/Exception.h"
-#include "trainer/FisherLDATrainer.h"
+#include "bob/core/blitz_compat.h"
+#include "bob/math/eig.h"
+#include "bob/math/linear.h"
+#include "bob/trainer/Exception.h"
+#include "bob/trainer/FisherLDATrainer.h"
 
 namespace train = bob::trainer;
 namespace mach = bob::machine;

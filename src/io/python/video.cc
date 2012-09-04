@@ -23,9 +23,9 @@
 #include <boost/python.hpp>
 #include <boost/python/slice.hpp>
 
-#include "io/Video.h"
-#include "core/python/exception.h"
-#include "core/python/ndarray.h"
+#include "bob/io/Video.h"
+#include "bob/core/python/exception.h"
+#include "bob/core/python/ndarray.h"
 
 using namespace boost::python;
 namespace io = bob::io;

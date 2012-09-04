@@ -27,8 +27,8 @@
 #include <QCursor>
 #include <functional>
 
-#include "visioner/vision/mb_xlbp.h"
-#include "visioner/vision/integral.h"
+#include "bob/visioner/vision/mb_xlbp.h"
+#include "bob/visioner/vision/integral.h"
 
 #include "fmap_item.h"
 #include "image_collection.h"

@@ -21,7 +21,7 @@
  */
 
 #include <boost/format.hpp>
-#include "core/convert_exception.h"
+#include "bob/core/convert_exception.h"
 
 bob::core::ConvertZeroInputRange::ConvertZeroInputRange() throw() {
 }

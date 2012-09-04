@@ -30,9 +30,9 @@
 #include <blitz/array.h>
 #include <complex>
 #include <string>
-#include "core/logging.h" // for bob::core::tmpdir()
-#include "core/cast.h"
-#include "io/Array.h"
+#include "bob/core/logging.h" // for bob::core::tmpdir()
+#include "bob/core/cast.h"
+#include "bob/io/Array.h"
 
 struct T {
   blitz::Array<double,1> a;

@@ -22,12 +22,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/logging.h"
+#include "bob/core/logging.h"
 
-#include "visioner/cv/cv_classifier.h"
-#include "visioner/model/mdecoder.h"
-#include "visioner/util/timer.h"
-#include "visioner/model/taggers/tagger_object.h"
+#include "bob/visioner/cv/cv_classifier.h"
+#include "bob/visioner/model/mdecoder.h"
+#include "bob/visioner/util/timer.h"
+#include "bob/visioner/model/taggers/tagger_object.h"
 
 namespace bob { namespace visioner {
 

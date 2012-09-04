@@ -22,7 +22,7 @@
  */
 
 #include <boost/format.hpp>
-#include "sp/Exception.h"
+#include "bob/sp/Exception.h"
 
 namespace sp = bob::sp;
 namespace core = bob::core;

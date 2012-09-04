@@ -20,12 +20,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "machine/TwoDPCAMachine.h"
-#include "machine/Exception.h"
-#include "machine/EigenMachineException.h"
-#include "core/cast.h"
-#include "core/logging.h"
-#include "math/linear.h"
+#include "bob/machine/TwoDPCAMachine.h"
+#include "bob/machine/Exception.h"
+#include "bob/machine/EigenMachineException.h"
+#include "bob/core/cast.h"
+#include "bob/core/logging.h"
+#include "bob/math/linear.h"
 
 bob::machine::TwoDPCAMachine::TwoDPCAMachine():
   m_dim_outputs(0), m_p_variance(0.), m_n_outputs(0), m_eigenvalues(0), 

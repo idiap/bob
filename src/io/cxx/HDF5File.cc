@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "io/HDF5File.h"
+#include "bob/io/HDF5File.h"
 
 namespace io = bob::io;
 namespace ca = bob::core::array;

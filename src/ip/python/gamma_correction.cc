@@ -21,8 +21,8 @@
  */
 
 
-#include "core/python/ndarray.h"
-#include "ip/gammaCorrection.h"
+#include "bob/core/python/ndarray.h"
+#include "bob/ip/gammaCorrection.h"
 
 using namespace boost::python;
 

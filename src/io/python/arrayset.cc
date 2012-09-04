@@ -28,11 +28,11 @@
 #include <boost/format.hpp>
 #include <blitz/array.h>
 
-#include "io/Arrayset.h"
-#include "core/array_assert.h"
-#include "core/python/exception.h"
+#include "bob/io/Arrayset.h"
+#include "bob/core/array_assert.h"
+#include "bob/core/python/exception.h"
 
-#include "core/python/ndarray.h"
+#include "bob/core/python/ndarray.h"
 
 using namespace boost::python;
 namespace io = bob::io;

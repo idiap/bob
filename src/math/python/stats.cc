@@ -22,8 +22,8 @@
 
 #include <boost/python.hpp>
 #include <boost/format.hpp>
-#include "math/stats.h"
-#include "core/python/ndarray.h"
+#include "bob/math/stats.h"
+#include "bob/core/python/ndarray.h"
 
 using namespace boost::python;
 namespace tp = bob::python;

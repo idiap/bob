@@ -20,9 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <core/python/ndarray.h>
+#include "bob/core/python/ndarray.h"
 #include <boost/python/stl_iterator.hpp>
-#include "trainer/SVMTrainer.h"
+#include "bob/trainer/SVMTrainer.h"
 
 using namespace boost::python;
 namespace tp = bob::python;
