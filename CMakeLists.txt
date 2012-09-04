@@ -1,5 +1,6 @@
 # Configures and builds bob
-# Andre Anjos - 13.august.2010
+# Andre Anjos <andre.anjos@idiap.ch>
+# Sat  1 Sep 20:36:15 2012 CEST
 
 project(bob)
 cmake_minimum_required(VERSION 2.6)
@@ -34,16 +35,7 @@ if(NOT BOB_SOVERSION)
   set(BOB_SOVERSION ${BOB_SOVERSION_INTERNAL})
 endif()
 
-option(SET_PUBLIC_LIBRARY_PATH "Use `ld -rpath' (Linux) or `install_name_tool' (Apple) when linking public libraries, executables. This option does not cover python bindings to C++ installed at the Python directories." ON)
-
-option(BOB_BUILD_CXX "Builds the C++ infrastructure." ON)
-
-option(BOB_INSTALL_PYTHON_INTERPRETER "When enabled, installs a version of the python interpreter preset to prepend Bob's environment." OFF)
-
-# Note you cannot build the Python stuff without the C++. This will work
-# though, if you build the whole project and then just wants to rebuild the C++
-# bit.
-option(BOB_BUILD_PYTHON "Builds the python bindings." ON)
+option(SET_PUBLIC_LIBRARY_PATH "Use `ld -rpath' (Linux) or `install_name_tool' (Apple) when linking public libraries, executables." ON)
 
 # ---------------
 # END of options.
@@ -57,7 +49,7 @@ message(STATUS "Bob version '${BOB_VERSION}' (${BOB_PLATFORM_STR})")
 set(COMMON_FLAGS "-pedantic -Wall -pthread")
 if (NOT CMAKE_COMPILER_IS_GNUCC)
   # Then, it must be clang/clang++
-  set(COMMON_FLAGS "${COMMON_FLAGS} -Wno-variadic-macros -Qunused-arguments")
+  set(COMMON_FLAGS "${COMMON_FLAGS} -Qunused-arguments")
 endif ()
 
 # Force __LP64__ scheme on Mac OSX
@@ -69,8 +61,8 @@ if(APPLE)
 endif(APPLE)
 
 # For both RELEASE and DEBUG builds
-if(APPLE AND CMAKE_COMPILER_IS_GNUCC) #still uses gcc-4.2
-  set(COMMON_FLAGS "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long")
+if(APPLE AND CMAKE_COMPILER_IS_GNUCC)
+  set(COMMON_FLAGS "${COMMON_FLAGS} -Wno-long-long")
 else()
   set(COMMON_CXX_FLAGS "-std=c++0x")
   set(COMMON_C_FLAGS "-std=c99")
@@ -119,42 +111,144 @@ if(CMAKE_PREFIX_PATH)
   endforeach()
 endif()
 
-# Sets up externals and install the central dependency file
-include(cmake/bob-external.cmake)
-
-foreach (ext ${bob_DEPENDENCIES})
-  find_package(${ext} REQUIRED PATHS external)
-endforeach ()
-
-foreach (ext ${bob_OPTIONALS})
-  find_package(${ext} PATHS external)
-endforeach ()
-
-# This is where we install cmake files for external projects
-set(cmakedir share/cmake/bob)
-install(DIRECTORY external/ DESTINATION ${cmakedir} PATTERN "*.cmake")
-install (FILES cmake/bob-external.cmake DESTINATION ${cmakedir})
-
 # Enables the testing framework
 enable_testing()
 
-# Some common definitions
-add_definitions("-DHAVE_LBFGS=1")
-
-include(cmake/macros.cmake)
-
 set(BUILD_SHARED_LIBS "ON" CACHE BOOL "Build shared libs")
 
-if (BOB_BUILD_CXX)
-  add_subdirectory(cxx)
-endif ()
+# Include file handling and installation
+install(DIRECTORY include/bob DESTINATION include FILES_MATCHING PATTERN "*.h")
 
-if (BOB_BUILD_PYTHON)
-  add_subdirectory(python)
-endif ()
+# ----------------------------------------------------------------------------
+# Some macros
+# ----------------------------------------------------------------------------
 
-install(EXPORT bob DESTINATION ${cmakedir})
-install(FILES cmake/bobConfig.cmake DESTINATION ${cmakedir})
+# Adds a C++ Bob library.
+#
+# package: name of the c++ package
+# src: list of c++ files to compile
+#
+# Example: bob_add_library(bob_core "foo.cc;bar.cc")
+macro(bob_add_library name src)
+  add_library(${name} ${src})
+  set_property(TARGET ${name} APPEND PROPERTY INCLUDE_DIRECTORIES
+    "${CMAKE_SOURCE_DIR}/include")
+  set_property(TARGET ${name} APPEND PROPERTY INCLUDE_DIRECTORIES
+    "${CMAKE_BINARY_DIR}/include")
+  set_target_properties(${name} PROPERTIES LIBRARY_OUTPUT_DIRECTORY  ${CMAKE_BINARY_DIR}/lib)
+  if (BOB_SOVERSION)
+    # adds versioning information
+    set_target_properties(${name} PROPERTIES VERSION ${BOB_VERSION})
+    set_target_properties(${name} PROPERTIES SOVERSION ${BOB_SOVERSION})
+  endif()
+  install(TARGETS ${name} EXPORT bob-targets DESTINATION lib)
+endmacro()
 
-# Adds Doxygen and Sphinx generation
-include(cmake/documentation.cmake)
+# Creates a standard test for Bob
+#
+# package: subpackage where the test is sitting
+# name: test name
+# src: test source files
+#
+# Example: bob_add_test(io array test/array.cc)
+macro(bob_add_test package name src)
+  set(tname test_${package}_${name})
+  add_executable(test_${package}_${name} ${src})
+  target_link_libraries(test_${package}_${name} bob_${package};${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_RELEASE})
+  set_property(TARGET ${tname} APPEND PROPERTY INCLUDE_DIRECTORIES
+    "${CMAKE_SOURCE_DIR}/include")
+  set_property(TARGET ${tname} APPEND PROPERTY INCLUDE_DIRECTORIES
+    "${CMAKE_BINARY_DIR}/include")
+  add_test(test_${package}_${name} test_${package}_${name} --log_level=test_suite)
+  set_property(TEST test_${package}_${name} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+endmacro()
+
+# Creates a standard Bob binary application.
+#
+# package: package the test belongs to
+# name: application name
+# src: test source files
+#
+# Example: bob_add_executable(io array test/array.cc)
+macro(bob_add_executable package name src)
+  set(ename bob_${package}_${name})
+  add_executable(${ename} ${src})
+  set_property(TARGET ${ename} APPEND PROPERTY INCLUDE_DIRECTORIES
+    "${CMAKE_SOURCE_DIR}/include")
+  set_property(TARGET ${ename} APPEND PROPERTY INCLUDE_DIRECTORIES
+    "${CMAKE_BINARY_DIR}/include")
+  target_link_libraries(bob_${package}_${name} bob_${package})
+  install(TARGETS bob_${package}_${name} DESTINATION bin)
+endmacro()
+
+# Creates and installs a pkg-config file for each subpackage
+#
+# package: package the test belongs to
+# requires: a list of other bob packages this package requires
+#
+# Example: bob_pkgconfig(bob_ip "bob_core;bob_sp;bob_math")
+macro(bob_pkgconfig package requires)
+  set(pkgconfigdir lib/pkgconfig)
+  string(REPLACE "_" "-" BOB_PACKAGE_NAME ${package})
+  set(BOB_PACKAGE_LIBRARY ${package})
+  
+  get_directory_property(my_defines COMPILE_DEFINITIONS)
+  list(REMOVE_DUPLICATES my_defines)
+  set(BOB_PACKAGE_DEFINES "")
+  foreach(def ${my_defines})
+    set(BOB_PACKAGE_DEFINES "${BOB_PACKAGE_DEFINES} -D${def}")
+  endforeach()
+
+  get_directory_property(my_includes INCLUDE_DIRECTORIES)
+  list(REMOVE_DUPLICATES my_includes)
+  set(BOB_PACKAGE_INCLUDES "")
+  foreach(inc ${my_includes})
+    set(BOB_PACKAGE_INCLUDES "${BOB_PACKAGE_INCLUDES} -I${inc}")
+  endforeach()
+
+  set(BOB_PACKAGE_REQUIRES "")
+  foreach(req ${requires})
+    string(REPLACE "_" "-" myreq ${req})
+    set(BOB_PACKAGE_REQUIRES "${BOB_PACKAGE_REQUIRES} ${myreq} = ${BOB_VERSION}")
+  endforeach()
+
+  configure_file(${CMAKE_SOURCE_DIR}/pkgconfig/bob-package.pc.in ${CMAKE_BINARY_DIR}/${pkgconfigdir}/${BOB_PACKAGE_NAME}.pc @ONLY)
+  install(FILES ${CMAKE_BINARY_DIR}/${pkgconfigdir}/${BOB_PACKAGE_NAME}.pc DESTINATION ${pkgconfigdir})
+
+  # Adds this package to the pool
+  list(APPEND ENABLED_PACKAGES ${package})
+  set(ENABLED_PACKAGES "${ENABLED_PACKAGES}" PARENT_SCOPE)
+endmacro()
+
+# ----------------------------------------------------------------------------
+# End of macros
+# ----------------------------------------------------------------------------
+
+# Project files
+set(ENABLED_PACKAGES "")
+add_subdirectory(src)
+add_subdirectory(doc)
+
+# Produce the config.h file
+execute_process(COMMAND date OUTPUT_VARIABLE BOB_BUILD_DATE OUTPUT_STRIP_TRAILING_WHITESPACE)
+configure_file(${CMAKE_SOURCE_DIR}/include/bob/config.h.in ${CMAKE_BINARY_DIR}/include/bob/config.h @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/include/bob/config.h DESTINATION include/bob)
+
+# Install cmake export target
+set(cmakedir lib/bob)
+install(EXPORT bob-targets DESTINATION ${cmakedir})
+install(FILES bob-config.cmake DESTINATION ${cmakedir})
+configure_file(cmake/bob-config-version.cmake.in
+  ${CMAKE_BINARY_DIR}/${cmakedir}/bob-config-version.cmake @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/${cmakedir}/bob-config-version.cmake
+  DESTINATION ${cmakedir})
+
+# Global pkg-config file
+set(pkgconfigdir lib/pkgconfig)
+set(BOB_PACKAGES "")
+foreach(pack ${ENABLED_PACKAGES})
+  set(BOB_PACKAGES "${BOB_PACKAGES} bob-${pack} = ${BOB_VERSION}")
+endforeach()
+configure_file(${CMAKE_SOURCE_DIR}/pkgconfig/bob.pc.in
+  ${CMAKE_BINARY_DIR}/${pkgconfigdir}/bob.pc @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/${pkgconfigdir}/bob.pc DESTINATION ${pkgconfigdir})

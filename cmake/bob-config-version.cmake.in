@@ -1,0 +1,13 @@
+set(PACKAGE_VERSION "@BOB_VERSION@")
+
+STRING(REGEX REPLACE "^([0-9]+)\\.[0-9]+\\..*$" "\\1" this_major "${PACKAGE_VERSION}")
+STRING(REGEX REPLACE "^[0-9]+\\.([0-9]+)\\..*$" "\\1" this_minor "${PACKAGE_VERSION}")
+
+if("${PACKAGE_FIND_VERSION_MAJOR}" EQUAL ${this_major})
+  set(PACKAGE_VERSION_COMPATIBLE 1) # compatible with this API
+  if("${PACKAGE_FIND_VERSION_MINOR}" EQUAL ${this_minor})
+    set(PACKAGE_VERSION_EXACT 1)    # exact match for minor revision
+  endif()
+else()
+  set(PACKAGE_VERSION_UNSUITABLE 1) # not suitable
+endif()

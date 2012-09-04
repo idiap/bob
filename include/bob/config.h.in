@@ -1,0 +1,55 @@
+/**
+ * @file bob/config.h
+ * @author André Anjos <andre.anjos@idiap.ch>
+ *
+ * @brief Bob compile-time configuration flags
+ *
+ * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef BOB_CONFIG_H 
+#define BOB_CONFIG_H
+
+#cmakedefine BOB_VERSION "@BOB_VERSION@"
+
+#cmakedefine BOB_BUILD_DATE "@BOB_BUILD_DATE@"
+
+#cmakedefine BOB_PLATFORM "@BOB_PLATFORM@"
+
+#cmakedefine HAVE_BLITZ_SPECIAL_TYPES 1
+
+#cmakedefine HAVE_BLITZ_TINYVEC2_H 1
+
+#cmakedefine HAVE_FFMPEG 1
+
+#define FFMPEG_VERSION "@FFMPEG_VERSION@"
+
+#cmakedefine HAVE_MATIO 1
+
+#cmakedefine HAVE_MATIO_OLD_COMPLEXSPLIT 1
+
+#cmakedefine HAVE_VLFEAT 1
+
+#cmakedefine HAVE_LIBSVM 1
+
+#cmakedefine HAVE_QT4 1
+
+#cmakedefine HAVE_OPENCV 1
+
+#define OPENCV_VERSION "@OPENCV_VERSION@"
+
+#cmakedefine HAVE_GOOGLE_PERFTOOLS 1
+
+#endif /* BOB_CONFIG_H */

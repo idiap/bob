@@ -107,18 +107,18 @@ Reference
 .. toctree::
    :maxdepth: 2
 
-   ../python/doc/introduction
-   ../python/core/doc/index
-   ../python/math/doc/index
-   ../python/io/doc/index
-   ../python/sp/doc/index
-   ../python/ip/doc/index
-   ../python/machine/doc/index
-   ../python/trainer/doc/index
-   ../python/db/doc/index
-   ../python/measure/doc/index
-   ../python/visioner/doc/index
-   ../python/daq/doc/index
+   PythonIntroduction
+   core/doc/index
+   math/doc/index
+   io/doc/index
+   sp/doc/index
+   ip/doc/index
+   machine/doc/index
+   trainer/doc/index
+   db/doc/index
+   measure/doc/index
+   visioner/doc/index
+   daq/doc/index
 
 History
 -------
