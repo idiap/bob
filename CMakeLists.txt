@@ -152,16 +152,17 @@ endmacro()
 #
 # Example: bob_add_test(bob_io array test/array.cc)
 macro(bob_add_test package name src)
-  set(tname test_${package}_${name})
-  add_executable(test_${package}_${name} ${src})
-  target_link_libraries(${tname} ${package};${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_RELEASE})
-  set_property(TARGET ${tname} APPEND PROPERTY INCLUDE_DIRECTORIES
+  set(bin_name test_${package}_${name})
+  string(REPLACE "test_bob_" "" test_name ${bin_name})
+  add_executable(${bin_name} ${src})
+  target_link_libraries(${bin_name} ${package};${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_RELEASE})
+  set_property(TARGET ${bin_name} APPEND PROPERTY INCLUDE_DIRECTORIES
     "${CMAKE_SOURCE_DIR}/include")
-  set_property(TARGET ${tname} APPEND PROPERTY INCLUDE_DIRECTORIES
+  set_property(TARGET ${bin_name} APPEND PROPERTY INCLUDE_DIRECTORIES
     "${CMAKE_BINARY_DIR}/include")
-  add_test(${tname} ${tname} --log_level=test_suite)
-  string(REPLACE "bob_" "" package_dir ${package})
-  set_property(TEST ${tname} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_SOURCE_DIR}/testdata/${package_dir}")
+  add_test(${test_name} ${bin_name} --log_level=test_suite)
+  string(REPLACE "bob_" "" short_package_name ${package})
+  set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_SOURCE_DIR}/testdata/${short_package_name}")
 endmacro()
 
 # Creates a standard Bob binary application.
@@ -258,7 +259,8 @@ install(FILES ${CMAKE_BINARY_DIR}/${cmakedir}/bob-config-version.cmake
 set(pkgconfigdir lib/pkgconfig)
 set(BOB_PACKAGES "")
 foreach(pack ${ENABLED_PACKAGES})
-  set(BOB_PACKAGES "${BOB_PACKAGES} bob-${pack} = ${BOB_VERSION}")
+  string(REPLACE "_" "-" pkg_name ${pack})
+  set(BOB_PACKAGES "${BOB_PACKAGES} ${pkg_name} = ${BOB_VERSION}")
 endforeach()
 configure_file(${CMAKE_SOURCE_DIR}/pkgconfig/bob.pc.in
   ${CMAKE_BINARY_DIR}/${pkgconfigdir}/bob.pc @ONLY)
