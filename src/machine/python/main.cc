@@ -43,7 +43,7 @@ void bind_machine_version();
 void bind_machine_svm();
 #endif
 
-BOOST_PYTHON_MODULE(_machine)
+BOOST_PYTHON_MODULE(_ext)
 {
   bob::python::setup_python("bob classes and sub-classes for machine access");
 

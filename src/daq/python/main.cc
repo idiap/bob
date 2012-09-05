@@ -25,7 +25,7 @@
 void bind_daq_version();
 void bind_daq_all();
 
-BOOST_PYTHON_MODULE(_daq) {
+BOOST_PYTHON_MODULE(_ext) {
 
   bob::python::setup_python("bob classes and sub-classes for data acquisition");
 
