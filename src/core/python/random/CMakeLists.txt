@@ -1,4 +1,4 @@
-project(bob_core_random_py)
+project(bob_core_random_py${PYVER})
 
 # This defines the dependencies of this package
 set(bob_deps "bob_core;bob_python")
@@ -7,9 +7,9 @@ set(incdir ${py_incdir})
 
 # Python bindings
 set(src
-   "random.cc"
-   "main.cc"
-   )
+  "random.cc"
+  "main.cc"
+  )
 
 # Define the library, compilation and linkage options
 bob_sort_headers(incdir)

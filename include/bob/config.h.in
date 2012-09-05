@@ -24,8 +24,6 @@
 
 #cmakedefine BOB_VERSION "@BOB_VERSION@"
 
-#cmakedefine BOB_BUILD_DATE "@BOB_BUILD_DATE@"
-
 #cmakedefine BOB_PLATFORM "@BOB_PLATFORM@"
 
 #cmakedefine HAVE_BLITZ_SPECIAL_TYPES 1

@@ -1,4 +1,4 @@
-project(bob_trainer_overload_py)
+project(bob_trainer_overload_py${PYVER})
 
 # This defines the dependencies of this package
 set(bob_deps "bob_trainer;bob_python")

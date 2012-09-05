@@ -1,0 +1,51 @@
+#!/usr/bin/env python
+# vim: set fileencoding=utf-8 :
+# Andre Anjos <andre.dos.anjos@gmail.com>
+# Tue 14 Feb 21:17:18 2012 
+
+"""Version information collected during Bob's build
+"""
+
+# variables from CMake
+BOB_SYSTEM_NAME = '@BOB_SYSTEM_NAME@'
+BOB_PLATFORM = '@BOB_PLATFORM@'
+CMAKE_BUILD_TYPE = '@CMAKE_BUILD_TYPE@'.lower()
+CMAKE_PREFIX_PATH = '@CMAKE_PREFIX_PATH@'
+CMAKE_SOURCE_DIR = '@CMAKE_SOURCE_DIR@'
+
+import os
+
+import warnings #to account for ipython double readline import
+warnings.simplefilter('ignore')
+import pkg_resources
+warnings.simplefilter('default')
+
+def source_file(relative_path):
+  """Gets the path to the given input file 'relative'
+
+  This method takes into consideration the build-set CMAKE_SOURCE_DIR and
+  returns the absolute path of the file with the relative path given as input.
+
+  Keyword parameters:
+
+  relative_path
+    The relative path of the file in the source tree you want to have the full
+    name of. The path should be given using unix '/' forward-slash separators
+    independently of the current OS you are running on.
+  """
+
+  components = [CMAKE_SOURCE_DIR] + relative_path.split('/')
+  return os.path.abspath(os.path.join(*components))
+
+def parse_path(p):
+  '''Returns a list of paths, parsing the unix path given as input'''
+  return [i for i in [k.strip() for k in p.split(os.pathsep)] if i]
+
+distribution = pkg_resources.require('bob')[0]
+version = distribution.version
+system = BOB_SYSTEM_NAME
+platform = BOB_PLATFORM
+cmake_prefixes = parse_path(CMAKE_PREFIX_PATH)
+python_version = distribution.py_version
+python_dependencies = pkg_resources.require('bob')[1:]
+source_dir = CMAKE_SOURCE_DIR

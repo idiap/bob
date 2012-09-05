@@ -242,14 +242,13 @@ add_subdirectory(src)
 add_subdirectory(doc)
 
 # Produce the config.h file
-execute_process(COMMAND date OUTPUT_VARIABLE BOB_BUILD_DATE OUTPUT_STRIP_TRAILING_WHITESPACE)
 configure_file(${CMAKE_SOURCE_DIR}/include/bob/config.h.in ${CMAKE_BINARY_DIR}/include/bob/config.h @ONLY)
 install(FILES ${CMAKE_BINARY_DIR}/include/bob/config.h DESTINATION include/bob)
 
 # Install cmake export target
 set(cmakedir lib/bob)
 install(EXPORT bob-targets DESTINATION ${cmakedir})
-install(FILES bob-config.cmake DESTINATION ${cmakedir})
+install(FILES cmake/bob-config.cmake DESTINATION ${cmakedir})
 configure_file(cmake/bob-config-version.cmake.in
   ${CMAKE_BINARY_DIR}/${cmakedir}/bob-config-version.cmake @ONLY)
 install(FILES ${CMAKE_BINARY_DIR}/${cmakedir}/bob-config-version.cmake
