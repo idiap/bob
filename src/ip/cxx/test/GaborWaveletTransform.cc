@@ -95,9 +95,9 @@ BOOST_AUTO_TEST_CASE( test_gwt_io )
 {
   bob::ip::GaborWaveletTransform gwt;
 
-  char* data = getenv("BOB_IP_TESTDATA_DIR");
+  char* data = getenv("BOB_TESTDATA_DIR");
   if (!data){
-    bob::core::error << "Environment variable $BOB_IP_TESTDATA_DIR "
+    bob::core::error << "Environment variable $BOB_TESTDATA_DIR "
         "is not set. Have you setup your working environment correctly?" << std::endl;
     throw bob::core::Exception();
   }
@@ -178,9 +178,9 @@ BOOST_AUTO_TEST_CASE( test_gwt_kernel_sanity )
 BOOST_AUTO_TEST_CASE( test_GWT_output )
 {
   // Get path to the XML Schema definition
-  char* data = getenv("BOB_IP_TESTDATA_DIR");
+  char* data = getenv("BOB_TESTDATA_DIR");
   if (!data){
-    bob::core::error << "Environment variable $BOB_IP_TESTDATA_DIR "
+    bob::core::error << "Environment variable $BOB_TESTDATA_DIR "
         "is not set. Have you setup your working environment correctly?" << std::endl;
     throw bob::core::Exception();
   }

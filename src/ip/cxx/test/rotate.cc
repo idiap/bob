@@ -186,9 +186,9 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_mod90_uint32 )
 BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
 {
   // Get path to the XML Schema definition
-  char *testdata_cpath = getenv("BOB_IP_TESTDATA_DIR");
+  char *testdata_cpath = getenv("BOB_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    bob::core::error << "Environment variable $BOB_IP_TESTDATA_DIR " <<
+    bob::core::error << "Environment variable $BOB_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
     throw bob::core::Exception();
@@ -276,9 +276,9 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
 BOOST_AUTO_TEST_CASE( test_rotate_3d_generic_uint32 )
 {
   // Get path to the XML Schema definition
-  char *testdata_cpath = getenv("BOB_IP_TESTDATA_DIR");
+  char *testdata_cpath = getenv("BOB_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    bob::core::error << "Environment variable $BOB_IP_TESTDATA_DIR " <<
+    bob::core::error << "Environment variable $BOB_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
     throw bob::core::Exception();

@@ -66,9 +66,9 @@ void test_close(const blitz::Array<double,3>& values, const blitz::Array<double,
 BOOST_AUTO_TEST_CASE( test_gabor_graph_machine )
 {
   // Get path to the XML Schema definition
-  char* data = getenv("BOB_MACHINE_TESTDATA_DIR");
+  char* data = getenv("BOB_TESTDATA_DIR");
   if (!data){
-    bob::core::error << "Environment variable $BOB_MACHINE_TESTDATA_DIR "
+    bob::core::error << "Environment variable $BOB_TESTDATA_DIR "
         "is not set. Have you setup your working environment correctly?" << std::endl;
     throw bob::core::Exception();
   }

@@ -117,9 +117,9 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 BOOST_AUTO_TEST_CASE( test_multiscaleRetinex_2d )
 {
 // Get path to the XML Schema definition
-  char *testdata_cpath = getenv("BOB_IP_TESTDATA_DIR");
+  char *testdata_cpath = getenv("BOB_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    bob::core::error << "Environment variable $BOB_IP_TESTDATA_DIR " <<
+    bob::core::error << "Environment variable $BOB_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
     throw bob::core::Exception();

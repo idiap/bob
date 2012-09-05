@@ -154,13 +154,14 @@ endmacro()
 macro(bob_add_test package name src)
   set(tname test_${package}_${name})
   add_executable(test_${package}_${name} ${src})
-  target_link_libraries(test_${package}_${name} ${package};${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_RELEASE})
+  target_link_libraries(${tname} ${package};${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_RELEASE})
   set_property(TARGET ${tname} APPEND PROPERTY INCLUDE_DIRECTORIES
     "${CMAKE_SOURCE_DIR}/include")
   set_property(TARGET ${tname} APPEND PROPERTY INCLUDE_DIRECTORIES
     "${CMAKE_BINARY_DIR}/include")
-  add_test(test_${package}_${name} test_${package}_${name} --log_level=test_suite)
-  set_property(TEST test_${package}_${name} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+  add_test(${tname} ${tname} --log_level=test_suite)
+  string(REPLACE "bob_" "" package_dir ${package})
+  set_property(TEST ${tname} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_SOURCE_DIR}/testdata/${package_dir}")
 endmacro()
 
 # Creates a standard Bob binary application.
