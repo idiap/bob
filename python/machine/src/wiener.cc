@@ -62,6 +62,7 @@ void bind_machine_wiener() {
     .add_property("variance_threshold", &mach::WienerMachine::getVarianceThreshold, &mach::WienerMachine::setVarianceThreshold)
     .add_property("ps", make_function(&mach::WienerMachine::getPs, return_internal_reference<>()), &set_Ps)
     .add_property("w", make_function(&mach::WienerMachine::getW, return_internal_reference<>()))
+    .add_property("shape", &get_shape, &set_shape)
     .def("resize", &mach::WienerMachine::resize, (arg("self"), arg("height"), arg("width")), "Resizes the filter.")
     .def("__call__", &mach::WienerMachine::forward, (arg("self"), arg("input"), arg("output")), "Filters the input and saves results on the output.")
     .def("forward", &mach::WienerMachine::forward, (arg("self"), arg("input"), arg("output")), "Filters the input and saves results on the output.")
