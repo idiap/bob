@@ -79,7 +79,7 @@ void checkBlitzAllocation( const unsigned int n_megabytes ) {
 
 // If we can't allocate more than 2GB adresses, throw an exception
 #if !((defined(__LP64__) || defined(__APPLE__)) \
-  && defined(HAVE_BLITZ_DIFFTYPE))
+  && defined(HAVE_BLITZ_SPECIAL_TYPES))
   static const int64_t TWO_GB = ((int64_t)2*1024)*((int64_t)1024*1024);
   if( n_e < TWO_GB ) {
     // Resize the blitz::Array and check that no exception is thrown
