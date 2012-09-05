@@ -1,2 +1,0 @@
-#!/usr/bin/env sh
-PYTHONPATH=@BOB_PYTHONPATH@ @PYTHON_EXECUTABLE@ "${@}"

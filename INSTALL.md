@@ -9,17 +9,12 @@ at http://idiap.github.com/bob/.
 Bob depends on:
 
  * Blitz++
- * Lapack
- * Python
  * Boost
- * NumPy
- * Scipy
- * Matplotlib
+ * Python & NumPy
+ * Lapack
  * fftw
- * SQLAlchemy
  * ImageMagick
  * HDF5
- * argparse
 
 There are also optional dependencies we strongly recommend:
 
@@ -33,7 +28,6 @@ There are also optional dependencies we strongly recommend:
 Building and documentation generation depends on the following packages:
 
  * CMake
- * Sphinx
  * Doxygen
  * Dvipng
 
@@ -55,7 +49,6 @@ Tests can be executed with:
 
 ```sh
 $ make test
-$ make sphinx-doctest
 ```
 
 ## Installing
@@ -75,7 +68,3 @@ Some variables that may be handy:
    listed above
  * WITH_PYTHON: if you would like to force a specific version of python, you
    can define it with this variable
- * BOB_INSTALL_PYTHON_INTERPRETER: installs a version of Python in the
-   `<CMAKE_PREFIX_PATH>/bin` directory. This variable is useful **only** for
-   local installations of Bob in with a non-default Python interpreter in
-   which you want to facilitate the end-user setup. It is OFF by default.

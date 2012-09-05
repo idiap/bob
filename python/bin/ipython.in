@@ -1,3 +1,0 @@
-#!/usr/bin/env sh
-export PYTHONPATH="@BOB_PYTHONPATH@:${PYTHONPATH}";
-@IPYTHON_EXECUTABLE@ "${@}"
