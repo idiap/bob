@@ -1,4 +1,4 @@
-project(bob_trainer_py)
+project(bob_trainer_py${PYVER})
 
 add_subdirectory(overload)
 

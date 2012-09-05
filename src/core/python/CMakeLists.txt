@@ -1,4 +1,4 @@
-project(bob_core_py)
+project(bob_core_py${PYVER})
 
 add_subdirectory(random)
 

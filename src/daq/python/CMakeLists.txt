@@ -1,4 +1,4 @@
-project(bob_daq_py)
+project(bob_daq_py${PYVER})
 
 # This defines the dependencies of this package
 set(bob_deps "bob_daq;bob_python")

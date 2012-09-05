@@ -1,4 +1,4 @@
-project(bob_visioner_py)
+project(bob_visioner_py${PYVER})
 
 # This defines the dependencies of this package
 set(bob_deps "bob_visioner;bob_python")
