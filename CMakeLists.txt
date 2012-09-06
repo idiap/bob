@@ -130,11 +130,9 @@ install(DIRECTORY include/bob DESTINATION include FILES_MATCHING PATTERN "*.h")
 #
 # Example: bob_add_library(bob_core "foo.cc;bar.cc")
 macro(bob_add_library name src)
+  include_directories(BEFORE 
+    "${CMAKE_SOURCE_DIR}/include" "${CMAKE_BINARY_DIR}/include")
   add_library(${name} ${src})
-  set_property(TARGET ${name} APPEND PROPERTY INCLUDE_DIRECTORIES
-    "${CMAKE_SOURCE_DIR}/include")
-  set_property(TARGET ${name} APPEND PROPERTY INCLUDE_DIRECTORIES
-    "${CMAKE_BINARY_DIR}/include")
   set_target_properties(${name} PROPERTIES LIBRARY_OUTPUT_DIRECTORY  ${CMAKE_BINARY_DIR}/lib)
   if (BOB_SOVERSION)
     # adds versioning information
@@ -154,12 +152,10 @@ endmacro()
 macro(bob_add_test package name src)
   set(bin_name test_${package}_${name})
   string(REPLACE "test_bob_" "" test_name ${bin_name})
+  include_directories(BEFORE 
+    "${CMAKE_SOURCE_DIR}/include" "${CMAKE_BINARY_DIR}/include")
   add_executable(${bin_name} ${src})
   target_link_libraries(${bin_name} ${package};${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_RELEASE})
-  set_property(TARGET ${bin_name} APPEND PROPERTY INCLUDE_DIRECTORIES
-    "${CMAKE_SOURCE_DIR}/include")
-  set_property(TARGET ${bin_name} APPEND PROPERTY INCLUDE_DIRECTORIES
-    "${CMAKE_BINARY_DIR}/include")
   add_test(${test_name} ${bin_name} --log_level=test_suite)
   string(REPLACE "bob_" "" short_package_name ${package})
   set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_SOURCE_DIR}/testdata/${short_package_name}")
@@ -174,11 +170,9 @@ endmacro()
 # Example: bob_add_executable(io array test/array.cc)
 macro(bob_add_executable package name src)
   set(ename ${package}_${name})
+  include_directories(BEFORE 
+    "${CMAKE_SOURCE_DIR}/include" "${CMAKE_BINARY_DIR}/include")
   add_executable(${ename} ${src})
-  set_property(TARGET ${ename} APPEND PROPERTY INCLUDE_DIRECTORIES
-    "${CMAKE_SOURCE_DIR}/include")
-  set_property(TARGET ${ename} APPEND PROPERTY INCLUDE_DIRECTORIES
-    "${CMAKE_BINARY_DIR}/include")
   target_link_libraries(${ename} ${package})
   install(TARGETS ${ename} DESTINATION bin)
 endmacro()
@@ -202,6 +196,8 @@ macro(bob_pkgconfig package requires)
   endforeach()
 
   get_directory_property(my_includes INCLUDE_DIRECTORIES)
+  list(REMOVE_ITEM my_includes "${CMAKE_SOURCE_DIR}/include" 
+    "${CMAKE_BINARY_DIR}/include")
   list(REMOVE_DUPLICATES my_includes)
   set(BOB_PACKAGE_INCLUDES "")
   foreach(inc ${my_includes})
