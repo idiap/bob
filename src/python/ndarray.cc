@@ -167,6 +167,8 @@ bob::core::array::ElementType bob::python::num_to_type(int num) {
 
 template <> int bob::python::ctype_to_num<bool>(void) 
 { return NPY_BOOL; }
+
+// @cond SKIP_DOXYGEN_WARNINGS
 template <> int bob::python::ctype_to_num<int8_t>(void) 
 { return NPY_INT8; }
 template <> int bob::python::ctype_to_num<uint8_t>(void) 
@@ -183,6 +185,8 @@ template <> int bob::python::ctype_to_num<int64_t>(void)
 { return NPY_INT64; }
 template <> int bob::python::ctype_to_num<uint64_t>(void)
 { return NPY_UINT64; }
+// @endcond SKIP_DOXYGEN_WARNINGS
+
 template <> int bob::python::ctype_to_num<float>(void)
 { return NPY_FLOAT32; }
 template <> int bob::python::ctype_to_num<double>(void) 
