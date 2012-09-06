@@ -49,6 +49,7 @@
 .. _matlab: http://www.mathworks.ch/products/matlab/
 .. _matplotlib: http://matplotlib.sourceforge.net
 .. _numpy: http://numpy.scipy.org
+.. _nose: http://nose.readthedocs.org
 .. _opencv: http://opencv.willowgarage.com/
 .. _python: http://www.python.org
 .. _pypi: http://pypi.python.org

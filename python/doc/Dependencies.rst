@@ -70,6 +70,8 @@ Required at runtime
 +----------------------+--------------+---------------------------------------+
 | `argparse`_          | 1.2          | `Python-2.0`_                         |
 +----------------------+--------------+---------------------------------------+
+| `nose`_              | 1.0?         | BSD-style                             |
++----------------------+--------------+---------------------------------------+
 
 Strongly recommended add-ons
 ----------------------------
@@ -117,7 +119,8 @@ Recommended software
 +======================+==============+==================+
 | `IPython`_           | any          | `BSD-3-Clause`_  |
 +----------------------+--------------+------------------+
-
+| `LaTeX`_             | any          | ?                |
++----------------------+--------------+------------------+
 
 Description of dependencies
 ===========================
@@ -173,6 +176,7 @@ Core dependencies
 * `argparse`_: is used for argument parsing in some of our python utilities. If
   you are not compiling against Python 2.7 or superior, you need to install it
   separately.
+* `nose`_: is used to run python unittests
 
 Data access
 -----------
@@ -223,6 +227,9 @@ during runtime.
 * `Dvipng`_: is required for LaTeX-like code conversion to HTML. Not having it
   will cause equations to be displayed using LaTeX-code instead of being nicely
   formatted.
+* `LaTeX`_: if it is installed, the target ``sphinx-latex`` will generate a PDF
+  (or DVI) document for the user guide. Otherwise, only the latex dump out of
+  sphinx is produced during the build.
 
 .. note::
    If your OS cannot satisfy the minimal required versions of the packages, you
@@ -259,7 +266,7 @@ A single command line that will install all required packages under Ubuntu:
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core, cmake, rsync, python-dev, python-support, python-numpy, python-argparse, python-scipy, python-matplotlib, python-sqlalchemy, liblapack-dev, libatlas-base-dev, libblitz1-dev, ffmpeg, libavcodec-dev, libswscale-dev, libboost-all-dev, libavformat-dev, graphviz, libmatio-dev, libmagick++-dev, libhdf5-serial-dev, libqt4-dev, libfftw3-dev, libcv-dev, libhighgui-dev, libcvaux-dev, texlive-latex-recommended, texlive-latex-extra, texlive-fonts-recommended, libsvm-dev, libvl-dev, doxygen, python-sphinx, dvipng
+   $ sudo apt-get install git-core cmake rsync python-dev python-support python-numpy python-argparse python-scipy python-matplotlib python-sqlalchemy liblapack-dev libatlas-base-dev libblitz1-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libmatio-dev libmagick++-dev libhdf5-serial-dev libqt4-dev libfftw3-dev libcv-dev libhighgui-dev libcvaux-dev texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended libsvm-dev libvl-dev doxygen python-sphinx dvipng python-nose
 
 .. note::
 
@@ -298,7 +305,7 @@ shell prompt:
 
 .. code-block:: sh
 
-   $ sudo port install cmake blitz ffmpeg python26 python_select gcc44 gcc_select py26-numpy -atlas matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx texlive-latex-extra texlive-fonts-recommended hdf5-18 py26-argparse qt4-mac boost +python26 py26-scipy +no_atlas fftw-3 vlfeat opencv +python26 +qt4 libsvm +python26 +tools dvipng py26-sqlalchemy
+   $ sudo port install cmake blitz ffmpeg python26 python_select py26-numpy -atlas matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx texlive-latex-extra texlive-fonts-recommended hdf5-18 py26-argparse qt4-mac boost +python26 py26-scipy +no_atlas fftw-3 vlfeat opencv +python26 +qt4 libsvm +python26 +tools dvipng py26-sqlalchemy py26-nose
    $ # go for a long coffee 
 
 After the installation has finished, make sure you select python 2.6 (macports)
@@ -339,28 +346,13 @@ You can also install git if you want to develop |project|.
 
    $ sudo port install git-core +python26
 
-For compiling |project| under OSX, we recommend the use of "llvm-gcc" instead
-of plain gcc. After running the command above, do the following:
+For compiling |project| under OSX, we recommend the use of "clang" instead of
+plain gcc. You will need to tell this to CMake when configuring, prefixing the
+command with two variables:
 
 .. code-block:: sh
 
-   $ sudo port select gcc llvm-gcc42
-   #or
-   $ sudo port select gcc mp-llvm-gcc42
-
-.. warning::
-
-  If you have an old ports tree, you may have to do instead:
-
-  .. code-block:: sh
-
-     $ sudo gcc_select llvm-gcc42
-     #or
-     $ sudo gcc_select mp-llvm-gcc42
-
-.. warning::
-   * The current MacPorts versionf blitz does not compile with anything newer
-     than gcc-4.2.
+   $ CC=clang CXX=clang++ cmake ...
 
 If you have followed the `MacPorts`_ installation guide to the letter, your
 environment should be correctly set. You **don't** need to setup any other

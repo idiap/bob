@@ -10,11 +10,19 @@ Bob depends on:
 
  * Blitz++
  * Boost
- * Python & NumPy
  * Lapack
  * fftw
  * ImageMagick
  * HDF5
+ * Python and the following packages:
+   * Setuptools
+   * NumPy
+   * SciPy
+   * argparse
+   * Sphinx
+   * Nose
+   * SqlAlchemy
+   * Matplotlib
 
 There are also optional dependencies we strongly recommend:
 
@@ -30,6 +38,7 @@ Building and documentation generation depends on the following packages:
  * CMake
  * Doxygen
  * Dvipng
+ * LaTeX
 
 ## Building
 
@@ -48,7 +57,9 @@ $ make
 Tests can be executed with:
 
 ```sh
-$ make test
+$ make test #run C++ tests
+$ make nosetests #run Python tests
+$ make sphinx-doctest #run Documentation tests
 ```
 
 ## Installing

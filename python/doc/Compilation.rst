@@ -41,17 +41,17 @@ checkout and build yourself as explained further below.
   Make sure you read and install all requirements defined in
   :doc:`Dependencies`, prior to compiling and using |project|.
 
-Grab a tarball and change into the directory of your choice, let's say
+Grab a release tarball and change into the directory of your choice, let's say
 ``mybob``:
 
 .. code-block:: sh
 
   $ mkdir workdir
   $ cd workdir
-  # getting version 1.0.0 as a tarball
-  $ wget https://github.com/idiap/bob/tarball/v1.0
-  $ tar xvfz bob-1.0.0.tar.gz
-  $ cd bob-1.0.0
+  # getting version 1.0.5 as a tarball
+  $ wget http://www.idiap.ch/software/bob/packages/bob-1.0.5.tar.gz
+  $ tar xvfz bob-1.0.5.tar.gz
+  $ cd bob-1.0.5
 
 .. _section-checkout:
 
@@ -64,14 +64,6 @@ To checkout |project|, do the following at your shell prompt:
 
    $ git clone https://github.com/idiap/bob
 
-After cloning, you will need a copy of the databases supported by the project.
-Just do the followin commands before attempting to compile |project|:
-
-.. code-block:: sh
-
-  $ cd bob
-  $ bin/dbdownload.py --verbose
-
 Compiling the code
 ------------------
 
@@ -79,10 +71,10 @@ Just execute:
 
 .. code-block:: sh
    
-   $ # supposing bob is unpackaged at ./bob-1.0.0
-   $ mkdir bob-1.0.0-build
-   $ cd bob-1.0.0-build
-   $ cmake -DCMAKE_BUILD_TYPE=Release ../bob-1.0.0
+   $ cd <bob-root>
+   $ mkdir build
+   $ cd build
+   $ cmake -DCMAKE_BUILD_TYPE=Release ..
    # run the whole build
    $ make
 
@@ -94,6 +86,8 @@ reliable (as it can be):
   $ make test
   # if you prefer, you can directly use ctest
   $ ctest -V
+  # to execute Python tests:
+  $ make nosetests
   # you can also run the built-in tests at the documentation
   $ make sphinx-doctest
 
@@ -101,7 +95,7 @@ The documentation can be generated with other specific make targets:
 
 .. code-block:: sh
 
-   $ make doxygen #generates the C++ API documentation
+   $ make doxygen #generates the C++ API documentation in html format
    $ make sphinx #generates the HTML user guide
    $ make sphinx-latex #generates the PDF user guide
 
@@ -115,14 +109,14 @@ you need to do it by calling ``make`` again:
   $ make install-sphinx
 
 The installation base directory is set to cmake's default, which is usually on
-an administrator restricted area, such as ``/usr/local``. If you wish to install
-the build in a different directory, you need to tell ``cmake`` the installation
-prefix:
+an administrator restricted area, such as ``/usr/local``. If you wish to
+install the build in a different directory, you need to tell ``cmake`` the
+installation prefix:
 
 .. code-block:: sh
 
-  # installs on ../bob-1.0.0-install
-  $ cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../bob-1.0.0-install ../bob-1.0.0
+  # installs on /my/preferred/path
+  $ cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/my/preferred/path ..
   $ make
   $ make install
 
@@ -153,5 +147,12 @@ possibilities you are still unable to compile |project|, please
 `submit a new bug report`_ in our tracking system. At this time make sure to
 specify your OS version and the versions of the external dependencies so we can
 try to reproduce the failure.
+
+Eager for more functionality?
+=============================
+
+|project| functionality can be augmented by the use of `Satellite Packages`_.
+Please check that page for more material before start developing your own tools
+based on |project|.
 
 .. include:: links.rst
