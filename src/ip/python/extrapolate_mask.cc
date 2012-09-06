@@ -3,7 +3,6 @@
  * @date Sun Jun 26 18:59:21 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * @Sun 20 Nov 17:39:02 2011 CET
  * @brief Binds the extrapolateMask operation into python
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
