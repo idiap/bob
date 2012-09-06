@@ -1,7 +1,6 @@
 include(FindDoxygen)
-include(FindLATEX)
 
-if(DOXYGEN_FOUND AND PDFLATEX_COMPILER)
+if(DOXYGEN_FOUND)
 
   configure_file(Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 

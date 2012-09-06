@@ -17,17 +17,21 @@ if(SPHINX_EXECUTABLE)
   )
   add_dependencies(sphinx-doctest egg)
 
+  include(FindLATEX)
+
   if(PDFLATEX_COMPILER)
     add_custom_target(sphinx-latex 
       COMMAND ${CMAKE_BINARY_DIR}/bin/python ${SPHINX_EXECUTABLE} -b latex -E ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/latex 
       COMMAND make -C ${CMAKE_BINARY_DIR}/sphinx/latex
       COMMENT "Generating (LaTeX2e) User Guide with Sphinx + PDF" VERBATIM
     )
-  else()
+  elseif(LATEX_COMPILER)
     add_custom_target(sphinx-latex 
       COMMAND ${CMAKE_BINARY_DIR}/bin/python ${SPHINX_EXECUTABLE} -b latex -E ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/latex 
       COMMENT "Generating (LaTeX2e) User Guide with Sphinx" VERBATIM
     )
+  else()
+    message(FATAL_ERROR "Sphinx PDF output requires either pdflatex or latex")
   endif()
   add_dependencies(sphinx-latex egg)
 
