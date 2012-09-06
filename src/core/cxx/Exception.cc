@@ -1,5 +1,5 @@
 /**
- * @file cxx/core/src/Exception.cc
+ * @file core/cxx/Exception.cc
  * @date Tue Jan 18 17:07:26 2011 +0100
  * @author André Anjos <andre.anjos@idiap.ch>
  *

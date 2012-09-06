@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/src/GaborBankSpatial.cc
+ * @file ip/cxx/GaborBankSpatial.cc
  * @date Wed Apr 13 20:45:32 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

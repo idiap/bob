@@ -1,5 +1,5 @@
 /**
- * @file cxx/trainer/trainer/MLPBackPropTrainer.h
+ * @file bob/trainer/MLPBackPropTrainer.h
  * @date Mon Jul 18 18:11:22 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

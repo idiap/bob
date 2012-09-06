@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/src/MultiscaleRetinex.cc
+ * @file ip/cxx/MultiscaleRetinex.cc
  * @date Mon May 2 10:01:08 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

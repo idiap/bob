@@ -1,5 +1,5 @@
 /**
- * @file cxx/trainer/src/FisherLDATrainer.cc
+ * @file trainer/cxx/FisherLDATrainer.cc
  * @date Sat Jun 4 21:38:59 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

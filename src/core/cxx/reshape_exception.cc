@@ -1,5 +1,5 @@
 /**
- * @file cxx/core/src/reshape_exception.cc
+ * @file core/cxx/reshape_exception.cc
  * @date Sun Jul 17 13:31:35 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

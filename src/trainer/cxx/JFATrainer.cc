@@ -1,5 +1,5 @@
 /**
- * @file cxx/trainer/src/JFATrainer.cc
+ * @file trainer/cxx/JFATrainer.cc
  * @date Tue Jul 19 12:16:17 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

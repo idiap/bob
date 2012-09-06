@@ -1,5 +1,5 @@
 /**
- * @file python/trainer/src/main_overload.cc
+ * @file trainer/python/overload/main.cc
  * @date Thu Jun 9 18:12:33 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

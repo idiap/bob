@@ -1,5 +1,5 @@
 /**
- * @file cxx/io/src/BinaryArrayFile.cc
+ * @file io/cxx/BinaryArrayFile.cc
  * @date Wed Oct 26 17:11:16 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

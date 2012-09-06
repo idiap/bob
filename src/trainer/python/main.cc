@@ -1,5 +1,5 @@
 /**
- * @file python/trainer/src/main.cc
+ * @file trainer/python/main.cc
  * @date Tue May 10 11:35:58 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
  *

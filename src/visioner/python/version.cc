@@ -1,5 +1,5 @@
 /**
- * @file python/visioner/src/version.cc
+ * @file visioner/python/version.cc
  * @date Tue Nov 29 14:11:41 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

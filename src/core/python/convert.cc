@@ -1,5 +1,5 @@
 /**
- * @file python/core/src/convert.cc
+ * @file core/python/convert.cc
  * @date Tue Mar 8 17:18:45 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

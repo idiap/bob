@@ -1,5 +1,5 @@
 /**
- * @file python/visioner/src/train.cc
+ * @file visioner/python/train.cc
  * @date Tue 31 Jul 2012 15:32:18 CEST
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

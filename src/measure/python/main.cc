@@ -1,5 +1,5 @@
 /**
- * @file python/measure/src/main.cc
+ * @file measure/python/main.cc
  * @date Wed Apr 20 08:19:36 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

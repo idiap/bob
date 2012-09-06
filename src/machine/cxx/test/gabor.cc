@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/test/gabor.cc
+ * @file machine/cxx/test/gabor.cc
  * @date 2012-03-05
  * @author Manuel Guenther <Manuel.Guenther@idiap.ch>
  *

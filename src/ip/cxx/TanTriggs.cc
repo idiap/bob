@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/src/TanTriggs.cc
+ * @file ip/cxx/TanTriggs.cc
  * @date Fri Mar 18 18:09:25 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

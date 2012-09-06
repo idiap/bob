@@ -1,5 +1,5 @@
 /**
- * @file cxx/math/test/eig.cc
+ * @file math/cxx/test/eig.cc
  * @date Fri Jan 27 17:30:18 2012 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

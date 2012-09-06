@@ -1,5 +1,5 @@
 /**
- * @file python/trainer/src/plda.cc
+ * @file trainer/python/plda.cc
  * @date Fri Oct 14 18:07:56 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

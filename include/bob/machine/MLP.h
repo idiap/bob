@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/machine/MLP.h
+ * @file bob/machine/MLP.h
  * @date Tue Jan 18 17:07:26 2011 +0100
  * @author André Anjos <andre.anjos@idiap.ch>
  *

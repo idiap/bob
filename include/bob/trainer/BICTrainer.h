@@ -1,5 +1,5 @@
 /**
- * @file cxx/trainer/trainer/BICTrainer.h
+ * @file bob/trainer/BICTrainer.h
  * @date Wed Jun  6 10:29:09 CEST 2012
  * @author Manuel Guenther <Manuel.Guenther@idiap.ch>
  *

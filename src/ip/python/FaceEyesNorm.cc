@@ -1,5 +1,5 @@
 /**
- * @file python/ip/src/FaceEyesNorm.cc
+ * @file ip/python/FaceEyesNorm.cc
  * @date Fri Apr 15 18:44:41 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

@@ -1,5 +1,5 @@
 /**
- * @file python/machine/src/version.cc
+ * @file machine/python/version.cc
  * @date Sat Dec 17 14:41:56 2011 +0100
  * @author André Anjos <andre.dos.anjos@gmail.com>
  *

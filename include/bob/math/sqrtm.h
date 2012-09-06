@@ -1,5 +1,5 @@
 /**
- * @file cxx/math/math/sqrtm.h
+ * @file bob/math/sqrtm.h
  * @date Wed Oct 12 18:02:26 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

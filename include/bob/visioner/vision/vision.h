@@ -1,5 +1,5 @@
 /**
- * @file visioner/visioner/vision/vision.h
+ * @file bob/visioner/vision/vision.h
  * @date Fri 27 Jul 13:58:57 2012 CEST
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

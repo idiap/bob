@@ -1,5 +1,5 @@
 /**
- * @file cxx/trainer/src/EMPCATrainer.cc
+ * @file trainer/cxx/EMPCATrainer.cc
  * @date Tue Oct 11 12:18:23 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

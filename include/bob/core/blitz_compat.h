@@ -1,5 +1,5 @@
 /**
- * @file cxx/core/core/blitz_compat.h
+ * @file bob/core/blitz_compat.h
  * @date Mon Apr 11 10:29:29 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

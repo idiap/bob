@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/src/BlockCellGradientDescriptors.cc
+ * @file ip/cxx/BlockCellGradientDescriptors.cc
  * @date Sun Apr 22 19:55:44 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/HOG.h
+ * @file bob/ip/HOG.h
  * @date Sun Apr 22 18:43:15 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/test/linear.cc
+ * @file machine/cxx/test/linear.cc
  * @date Mon Jun 20 17:58:16 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

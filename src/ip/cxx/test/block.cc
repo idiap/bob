@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/test/block.cc
+ * @file ip/cxx/test/block.cc
  * @date Tue Apr 5 12:38:15 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

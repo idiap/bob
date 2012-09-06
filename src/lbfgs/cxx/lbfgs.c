@@ -1,5 +1,5 @@
 /**
- * @file cxx/lbfgs/src/lbfgs.c
+ * @file lbfgs/cxx/lbfgs.c
  *
  * Limited memory BFGS (L-BFGS).
  *

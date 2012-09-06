@@ -1,5 +1,5 @@
 /**
- * @file visioner/visioner/util/util.h
+ * @file bob/visioner/util/util.h
  * @date Fri 27 Jul 13:58:57 2012 CEST
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

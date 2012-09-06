@@ -1,5 +1,5 @@
 /**
- * @file cxx/trainer/trainer/GMMTrainer.h
+ * @file bob/trainer/GMMTrainer.h
  * @date Tue May 10 11:35:58 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
  *

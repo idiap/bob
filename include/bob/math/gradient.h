@@ -1,5 +1,5 @@
 /**
- * @file cxx/math/math/gradient.h
+ * @file bob/math/gradient.h
  * @date Sat Apr 14 21:01:15 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

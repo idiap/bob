@@ -1,5 +1,5 @@
 /**
- * @file bob/config.h
+ * @file bob/config.h.in
  * @author André Anjos <andre.anjos@idiap.ch>
  *
  * @brief Bob compile-time configuration flags

@@ -1,5 +1,5 @@
 /**
- * @file cxx/core/src/array_type.cc
+ * @file core/cxx/array_type.cc
  * @date Sat Apr 9 18:10:10 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

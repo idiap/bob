@@ -1,5 +1,5 @@
 /**
- * @file cxx/trainer/src/TwoDPCATrainer.cc
+ * @file trainer/cxx/TwoDPCATrainer.cc
  * @date Wed May 18 21:51:16 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

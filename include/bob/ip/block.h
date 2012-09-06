@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/block.h
+ * @file bob/ip/block.h
  * @date Tue Apr 5 12:38:15 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

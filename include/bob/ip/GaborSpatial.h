@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/GaborSpatial.h
+ * @file bob/ip/GaborSpatial.h
  * @date Wed Apr 13 20:12:03 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

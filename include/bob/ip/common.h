@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/common.h
+ * @file bob/ip/common.h
  * @date Mon Mar 14 12:10:04 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

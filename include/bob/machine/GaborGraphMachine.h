@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/machine/GaborGraphMachine.h
+ * @file bob/machine/GaborGraphMachine.h
  * @date 2012-03-05
  * @author Manuel Guenther <Manuel.Guenther@idiap.ch>
  *

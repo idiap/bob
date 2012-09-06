@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/test/dctfeatures.cc
+ * @file ip/cxx/test/dctfeatures.cc
  * @date Thu Apr 7 19:52:29 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

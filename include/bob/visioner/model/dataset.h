@@ -1,5 +1,5 @@
 /**
- * @file visioner/visioner/model/dataset.h
+ * @file bob/visioner/model/dataset.h
  * @date Fri 27 Jul 13:58:57 2012 CEST
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

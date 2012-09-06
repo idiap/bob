@@ -1,5 +1,5 @@
 /**
- * @file python/core/src/version.cc
+ * @file core/python/version.cc
  * @date Wed Apr 27 23:16:03 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

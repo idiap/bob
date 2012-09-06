@@ -1,5 +1,5 @@
 /**
- * @file python/trainer/src/backprop.cc
+ * @file trainer/python/backprop.cc
  * @date Mon Jul 18 18:11:22 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

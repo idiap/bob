@@ -1,5 +1,5 @@
 /**
- * @file cxx/sp/sp/Exception.h
+ * @file bob/sp/Exception.h
  * @date Tue Feb 5 20:41:55 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

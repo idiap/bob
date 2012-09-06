@@ -1,5 +1,5 @@
 /**
- * @file cxx/daq/src/V4LCamera.cc
+ * @file daq/cxx/V4LCamera.cc
  * @date Thu Feb 2 11:22:57 2012 +0100
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
  *

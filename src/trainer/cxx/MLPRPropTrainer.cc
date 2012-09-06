@@ -1,5 +1,5 @@
 /**
- * @file cxx/trainer/src/MLPRPropTrainer.cc
+ * @file trainer/cxx/MLPRPropTrainer.cc
  * @date Mon Jul 11 16:19:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/LBPHSFeatures.h
+ * @file bob/ip/LBPHSFeatures.h
  * @date Wed Apr 27 20:40:12 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

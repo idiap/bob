@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/test/WeightedGaussian.cc
+ * @file ip/cxx/test/WeightedGaussian.cc
  * @date Fri Jul 20 14:54:15 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

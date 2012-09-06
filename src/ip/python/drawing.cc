@@ -1,5 +1,5 @@
 /**
- * @file python/ip/src/drawing.cc
+ * @file ip/python/drawing.cc
  * @date Sun Jul 24 21:13:21 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

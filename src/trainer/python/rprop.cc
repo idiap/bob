@@ -1,5 +1,5 @@
 /**
- * @file python/trainer/src/rprop.cc
+ * @file trainer/python/rprop.cc
  * @date Wed Jul 13 17:54:14 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

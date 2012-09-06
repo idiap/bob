@@ -1,5 +1,5 @@
 /**
- * @file python/core/src/random.cc
+ * @file core/python/random/random.cc
  * @date Mon Jul 11 18:31:22 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

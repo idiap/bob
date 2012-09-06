@@ -1,5 +1,5 @@
 /**
- * @file cxx/sp/sp/extrapolate.h
+ * @file bob/sp/extrapolate.h
  * @date Wed Apr 13 23:08:13 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

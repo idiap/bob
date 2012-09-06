@@ -1,5 +1,5 @@
 /**
- * @file python/core/src/exception.cc
+ * @file core/python/exception.cc
  * @date Tue Jan 18 17:07:26 2011 +0100
  * @author André Anjos <andre.anjos@idiap.ch>
  *

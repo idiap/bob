@@ -1,5 +1,5 @@
 /**
- * @file cxx/trainer/src/KMeansTrainer.cc
+ * @file trainer/cxx/KMeansTrainer.cc
  * @date Tue May 10 11:35:58 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
  *

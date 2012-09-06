@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/machine/GMMMachine.h
+ * @file bob/machine/GMMMachine.h
  * @date Tue May 10 11:35:58 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>

@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/src/JFAMachineException.cc
+ * @file machine/cxx/JFAMachineException.cc
  * @date Wed Feb 15 21:57:28 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

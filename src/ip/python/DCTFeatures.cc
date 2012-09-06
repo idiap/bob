@@ -1,5 +1,5 @@
 /**
- * @file python/ip/src/DCTFeatures.cc
+ * @file ip/python/DCTFeatures.cc
  * @date Fri Apr 8 17:05:23 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

@@ -1,5 +1,5 @@
 /**
- * @file python/trainer/src/kmeans_wrappers.cc
+ * @file trainer/python/overload/kmeans_wrappers.cc
  * @date Thu Jun 9 18:12:33 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

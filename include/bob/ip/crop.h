@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/crop.h
+ * @file bob/ip/crop.h
  * @date Mon Mar 7 18:00:00 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

@@ -1,5 +1,5 @@
 /**
- * @file python/ip/src/integral.cc
+ * @file ip/python/integral.cc
  * @date Sun Jun 26 18:59:21 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

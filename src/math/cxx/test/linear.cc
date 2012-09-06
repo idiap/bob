@@ -1,5 +1,5 @@
 /**
- * @file cxx/math/test/linear.cc
+ * @file math/cxx/test/linear.cc
  * @date Fri Apr 8 20:57:37 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

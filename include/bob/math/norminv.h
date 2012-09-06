@@ -1,5 +1,5 @@
 /**
- * @file cxx/math/math/norminv.h
+ * @file bob/math/norminv.h
  * @date Tue Apr 12 21:33:32 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

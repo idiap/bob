@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/src/BICMachine.cc
+ * @file machine/cxx/BICMachine.cc
  * @date Tue Jun  5 16:54:27 CEST 2012
  * @author Manuel Guenther <Manuel.Guenther@idiap.ch>
  *

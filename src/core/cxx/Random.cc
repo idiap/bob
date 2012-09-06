@@ -1,5 +1,5 @@
 /**
- * @file cxx/core/src/Random.cc
+ * @file core/cxx/Random.cc
  * @date Tue Jan 18 17:07:26 2011 +0100
  * @author André Anjos <andre.anjos@idiap.ch>
  *

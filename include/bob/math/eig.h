@@ -1,5 +1,5 @@
 /**
- * @file cxx/math/math/eig.h
+ * @file bob/math/eig.h
  * @date Mon May 16 21:45:27 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

@@ -1,5 +1,5 @@
 /**
- * @file python/io/src/hdf5_extras.cc
+ * @file io/python/hdf5_extras.cc
  * @date Thu Aug 11 12:25:19 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

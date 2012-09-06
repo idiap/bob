@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/maxRectInMask.h
+ * @file bob/ip/maxRectInMask.h
  * @date Mon Apr 18 20:25:30 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

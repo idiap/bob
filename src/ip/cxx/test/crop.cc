@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/test/crop.cc
+ * @file ip/cxx/test/crop.cc
  * @date Mon Mar 7 18:00:00 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

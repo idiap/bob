@@ -1,5 +1,5 @@
 /**
- * @file visioner/src/model.cc
+ * @file visioner/cxx/model.cc
  * @date Fri 27 Jul 13:58:57 2012 CEST
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

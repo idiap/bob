@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/machine/TwoDPCAMachine.h
+ * @file bob/machine/TwoDPCAMachine.h
  * @date Wed May 18 21:51:16 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

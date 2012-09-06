@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/src/PLDAMachine.cc
+ * @file machine/cxx/PLDAMachine.cc
  * @date Fri Oct 14 18:07:56 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

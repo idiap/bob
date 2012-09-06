@@ -1,5 +1,5 @@
 /**
- * @file cxx/sp/test/fft_fct.cc
+ * @file sp/cxx/test/fft_fct.cc
  * @date Thu Apr 14 13:39:40 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

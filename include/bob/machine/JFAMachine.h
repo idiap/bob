@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/machine/JFAMachine.h
+ * @file bob/machine/JFAMachine.h
  * @date Sat Jul 23 21:41:15 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

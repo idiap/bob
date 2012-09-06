@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/FaceEyesNorm.h
+ * @file bob/ip/FaceEyesNorm.h
  * @date Thu Apr 14 21:03:45 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

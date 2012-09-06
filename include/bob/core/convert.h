@@ -1,5 +1,5 @@
 /**
- * @file cxx/core/core/convert.h
+ * @file bob/core/convert.h
  * @date Thu Mar 3 20:17:53 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

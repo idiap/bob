@@ -1,5 +1,5 @@
 /**
- * @file cxx/sp/sp/DCT2DNaive.h
+ * @file bob/sp/DCT2DNaive.h
  * @date Thu Apr 7 17:02:42 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/WeightedGaussian.h
+ * @file bob/ip/WeightedGaussian.h
  * @date Sat Apr 30 17:52:15 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/src/Exception.cc
+ * @file machine/cxx/Exception.cc
  * @date Fri May 13 20:22:43 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

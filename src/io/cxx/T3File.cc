@@ -1,5 +1,5 @@
 /**
- * @file cxx/io/src/T3File.cc
+ * @file io/cxx/T3File.cc
  * @date Wed Oct 26 17:11:16 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

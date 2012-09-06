@@ -1,5 +1,5 @@
 /**
- * @file cxx/lbfgs/src/arithmetic_sse_float.h
+ * @file lbfgs/cxx/arithmetic_sse_float.h
  *
  * SSE/SSE3 implementation of vector oprations (32bit float).
  *

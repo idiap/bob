@@ -1,5 +1,5 @@
 /**
- * @file cxx/math/src/norminv.cc
+ * @file math/cxx/norminv.cc
  * @date Tue Apr 12 21:33:32 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

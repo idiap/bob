@@ -1,5 +1,5 @@
 /**
- * @file cxx/math/src/Exception.cc
+ * @file math/cxx/Exception.cc
  * @date Mon Jun 6 11:49:35 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

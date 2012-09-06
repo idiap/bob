@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/test/extrapolateMask.cc
+ * @file ip/cxx/test/extrapolateMask.cc
  * @date Mon May 9 19:54:44 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

@@ -1,5 +1,5 @@
 /**
- * @file cxx/sp/sp/interpolate.h
+ * @file bob/sp/interpolate.h
  * @date Mon Apr 25 18:06:14 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

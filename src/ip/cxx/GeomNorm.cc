@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/src/GeomNorm.cc
+ * @file ip/cxx/GeomNorm.cc
  * @date Mon Apr 11 22:17:04 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

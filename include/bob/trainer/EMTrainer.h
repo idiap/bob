@@ -1,5 +1,5 @@
 /**
- * @file cxx/trainer/trainer/EMTrainer.h
+ * @file bob/trainer/EMTrainer.h
  * @date Tue Jan 18 17:07:26 2011 +0100
  * @author André Anjos <andre.anjos@idiap.ch>
  *

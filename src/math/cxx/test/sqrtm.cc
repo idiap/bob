@@ -1,5 +1,5 @@
 /**
- * @file cxx/math/test/sqrtm.cc
+ * @file math/cxx/test/sqrtm.cc
  * @date Fri Jan 27 17:37:41 2012 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

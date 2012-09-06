@@ -1,5 +1,5 @@
 /**
- * @file python/ip/src/HOG.cc
+ * @file ip/python/HOG.cc
  * @date Wed Apr 18 18:35:48 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

@@ -1,5 +1,5 @@
 /**
- * @file cxx/io/src/HDF5Dataset.cc
+ * @file io/cxx/HDF5Dataset.cc
  * @author Andre Anjos <andre.anjos@idiap.ch>
  * @date Wed 29 Feb 17:51:21 2012
  *

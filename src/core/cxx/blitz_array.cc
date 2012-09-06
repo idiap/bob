@@ -1,5 +1,5 @@
 /**
- * @file cxx/core/src/blitz_array.cc
+ * @file core/cxx/blitz_array.cc
  * @date Tue Nov 8 15:34:31 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

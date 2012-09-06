@@ -1,5 +1,5 @@
 /**
- * @file cxx/sp/src/DCT1DNaive.cc
+ * @file sp/cxx/DCT1DNaive.cc
  * @date Thu Apr 7 17:02:42 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

@@ -1,5 +1,5 @@
 /**
- * @file cxx/math/test/linsolve.cc
+ * @file math/cxx/test/linsolve.cc
  * @date Sat Mar 19 19:49:51 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

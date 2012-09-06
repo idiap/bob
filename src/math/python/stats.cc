@@ -1,5 +1,5 @@
 /**
- * @file python/math/src/stats.cc
+ * @file math/python/stats.cc
  * @date Mon Jun 20 11:47:58 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

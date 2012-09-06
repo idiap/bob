@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/test/MSR.cc
+ * @file ip/cxx/test/MSR.cc
  * @date Mon May 2 11:37:29 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

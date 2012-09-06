@@ -1,5 +1,5 @@
 /**
- * @file python/trainer/src/linear.cc
+ * @file trainer/python/linear.cc
  * @date Fri Jun 10 16:43:41 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

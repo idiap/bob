@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/test/maxRectInMask.cc
+ * @file ip/cxx/test/maxRectInMask.cc
  * @date Mon Apr 18 20:25:30 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

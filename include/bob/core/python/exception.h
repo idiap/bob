@@ -1,5 +1,5 @@
 /**
- * @file python/core/core/python/exception.h
+ * @file bob/core/python/exception.h
  * @date Fri Mar 25 15:21:36 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

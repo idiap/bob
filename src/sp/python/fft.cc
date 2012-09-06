@@ -1,5 +1,5 @@
 /**
- * @file python/sp/src/fft_dct.cc
+ * @file sp/python/fft.cc
  * @date Thu Apr 14 13:39:40 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

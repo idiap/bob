@@ -1,5 +1,5 @@
 /**
- * @file cxx/math/math/Exception.h
+ * @file bob/math/Exception.h
  * @date Mon Jun 6 11:49:35 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

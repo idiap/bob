@@ -1,5 +1,5 @@
 /**
- * @file cxx/measure/src/error.cc
+ * @file measure/cxx/error.cc
  * @date Wed Apr 20 08:02:30 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

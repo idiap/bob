@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/Sobel.h
+ * @file bob/ip/Sobel.h
  * @date Fri Apr 29 12:13:22 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

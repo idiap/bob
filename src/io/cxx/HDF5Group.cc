@@ -1,5 +1,5 @@
 /**
- * @file cxx/io/src/HDF5Group.cc
+ * @file io/cxx/HDF5Group.cc
  * @author Andre Anjos <andre.anjos@idiap.ch>
  * @date Wed 29 Feb 17:24:10 2012
  *

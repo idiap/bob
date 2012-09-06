@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/src/SpatioTemporalGradient.cc
+ * @file ip/cxx/SpatioTemporalGradient.cc
  * @date Tue Sep 6 17:29:53 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

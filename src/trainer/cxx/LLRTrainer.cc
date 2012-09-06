@@ -1,5 +1,5 @@
 /**
- * @file cxx/trainer/src/LLRTrainer.cc
+ * @file trainer/cxx/LLRTrainer.cc
  * @date Sat Sep 1 19:26:00 2012 +0100
  * @author Laurent El Shafey <laurent.el-shafey@idiap.ch>
  *

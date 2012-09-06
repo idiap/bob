@@ -1,5 +1,5 @@
 /**
- * @file python/core/core/python/blitz_wrap.h
+ * @file bob/core/python/blitz_wrap.h
  * @date Tue Nov 8 15:34:31 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

@@ -1,5 +1,5 @@
 /**
- * @file python/daq/src/main.cc
+ * @file daq/python/main.cc
  * @date Mon 06 Feb 2012 15:19:05 CET
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

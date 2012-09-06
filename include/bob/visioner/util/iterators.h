@@ -1,5 +1,5 @@
 /**
- * @file visioner/visioner/util/iterators.h
+ * @file bob/visioner/util/iterators.h
  * @date Fri 27 Jul 13:58:57 2012 CEST
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

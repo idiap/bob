@@ -1,5 +1,5 @@
 /**
- * @file visioner/src/taylor_booster.cc
+ * @file visioner/cxx/taylor_booster.cc
  * @date Fri 27 Jul 13:58:57 2012 CEST
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

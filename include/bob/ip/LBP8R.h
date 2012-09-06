@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/LBP8R.h
+ * @file bob/ip/LBP8R.h
  * @date Wed Apr 20 21:44:36 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

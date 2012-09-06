@@ -1,5 +1,5 @@
 /**
- * @file cxx/math/math/stats.h
+ * @file bob/math/stats.h
  * @date Mon Jun 20 11:47:58 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

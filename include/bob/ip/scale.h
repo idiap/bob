@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/scale.h
+ * @file bob/ip/scale.h
  * @date Mon Mar 14 11:21:29 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

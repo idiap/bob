@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/test/Gaussian.cc
+ * @file ip/cxx/test/Gaussian.cc
  * @date Sat Apr 30 17:52:15 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

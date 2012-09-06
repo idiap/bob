@@ -1,5 +1,5 @@
 /**
- * @file cxx/math/test/gradient.cc
+ * @file math/cxx/test/gradient.cc
  * @date Sun Apr 15 13:40:23 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

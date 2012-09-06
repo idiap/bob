@@ -1,5 +1,5 @@
 /**
- * @file cxx/lbfgs/src/arithmetic_sse_double.h
+ * @file lbfgs/cxx/arithmetic_sse_double.h
  *
  * SSE2 implementation of vector oprations (64bit double).
  *

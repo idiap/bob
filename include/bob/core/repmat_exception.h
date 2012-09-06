@@ -1,5 +1,5 @@
 /**
- * @file cxx/core/core/repmat_exception.h
+ * @file bob/core/repmat_exception.h
  * @date Sun Jul 17 14:10:33 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

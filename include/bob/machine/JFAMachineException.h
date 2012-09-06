@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/machine/JFAMachineException.h
+ * @file bob/machine/JFAMachineException.h
  * @date Wed Feb 15 21:55:43 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

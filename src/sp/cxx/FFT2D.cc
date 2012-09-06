@@ -1,5 +1,5 @@
 /**
- * @file cxx/sp/src/FFT2D.cc
+ * @file sp/cxx/FFT2D.cc
  * @date Wed Apr 13 23:08:13 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

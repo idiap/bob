@@ -1,5 +1,5 @@
 /**
- * @file python/core/core/python/container.h
+ * @file bob/core/python/container.h
  * @date Tue Jun 21 17:28:25 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

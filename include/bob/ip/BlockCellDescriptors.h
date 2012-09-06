@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/BlockCellDescriptors.h
+ * @file bob/ip/BlockCellDescriptors.h
  * @date Sun Apr 22 16:03:15 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

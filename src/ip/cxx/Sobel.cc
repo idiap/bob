@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/src/Sobel.cc
+ * @file ip/cxx/Sobel.cc
  * @date Fri Apr 29 12:13:22 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

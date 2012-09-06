@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/test/rotate.cc
+ * @file ip/cxx/test/rotate.cc
  * @date Fri Mar 11 17:12:09 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

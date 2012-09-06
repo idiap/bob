@@ -1,5 +1,5 @@
 /**
- * @file cxx/core/core/logging.h
+ * @file bob/core/logging.h
  * @date Tue Jan 18 17:07:26 2011 +0100
  * @author André Anjos <andre.anjos@idiap.ch>
  *

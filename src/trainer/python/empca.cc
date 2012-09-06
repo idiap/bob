@@ -1,5 +1,5 @@
 /**
- * @file python/trainer/src/empca.cc
+ * @file trainer/python/empca.cc
  * @date Tue Oct 11 12:32:10 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

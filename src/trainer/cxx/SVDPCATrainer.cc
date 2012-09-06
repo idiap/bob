@@ -1,5 +1,5 @@
 /**
- * @file cxx/trainer/src/SVDPCATrainer.cc
+ * @file trainer/cxx/SVDPCATrainer.cc
  * @date Tue Jan 18 17:07:26 2011 +0100
  * @author André Anjos <andre.anjos@idiap.ch>
  *

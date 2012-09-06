@@ -1,5 +1,5 @@
 /**
- * @file python/ip/src/GaborWaveletTransform.cc
+ * @file ip/python/GaborWaveletTransform.cc
  * @date 2012-02-27
  * @author Manuel Guenther <Manuel.Guenther@idiap.ch>
  *

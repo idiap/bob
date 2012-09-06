@@ -1,5 +1,5 @@
 /**
- * @file visioner/visioner/model/trainers/lutproblems/lut_problem_var.h
+ * @file bob/visioner/model/trainers/lutproblems/lut_problem_var.h
  * @date Fri 27 Jul 13:58:57 2012 CEST
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

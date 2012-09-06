@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/test/integral.cc
+ * @file ip/cxx/test/integral.cc
  * @date Thu Apr 28 20:09:16 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

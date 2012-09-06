@@ -1,5 +1,5 @@
 /**
- * @file python/visioner/src/localize.cc
+ * @file visioner/python/localize.cc
  * @date Thu Jul 21 13:13:06 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

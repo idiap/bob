@@ -1,5 +1,5 @@
 /**
- * @file python/core/src/typeinfo.cc
+ * @file core/python/typeinfo.cc
  * @date Tue Nov 8 18:35:46 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

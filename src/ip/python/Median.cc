@@ -1,5 +1,5 @@
 /**
- * @file python/ip/src/Median.cc
+ * @file ip/python/Median.cc
  * @date Wed Sep 28 20:13:48 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

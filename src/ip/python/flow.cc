@@ -1,5 +1,5 @@
 /**
- * @file python/ip/src/flow.cc
+ * @file ip/python/flow.cc
  * @date Wed Mar 16 15:01:13 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

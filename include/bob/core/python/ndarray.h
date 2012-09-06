@@ -1,5 +1,5 @@
 /**
- * @file python/core/core/python/ndarray.h
+ * @file bob/core/python/ndarray.h
  * @date Tue Jan 18 17:07:26 2011 +0100
  * @author André Anjos <andre.anjos@idiap.ch>
  *

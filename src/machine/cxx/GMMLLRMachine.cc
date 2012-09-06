@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/src/GMMLLRMachine.cc
+ * @file machine/cxx/GMMLLRMachine.cc
  * @date Fri Jul 8 13:01:03 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

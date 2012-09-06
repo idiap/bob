@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/drawing.h
+ * @file bob/ip/drawing.h
  * @date Sun Jul 24 21:13:21 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

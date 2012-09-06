@@ -1,5 +1,5 @@
 /**
- * @file cxx/io/io/HDF5Attribute.h
+ * @file bob/io/HDF5Attribute.h
  * @author Andre Anjos <andre.anjos@idiap.ch>
  * @date Fri  2 Mar 08:19:03 2012 
  *

@@ -1,5 +1,5 @@
 /**
- * @file python/machine/src/ztnorm.cc
+ * @file machine/python/ztnorm.cc
  * @date Tue Jul 19 15:33:20 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
  *

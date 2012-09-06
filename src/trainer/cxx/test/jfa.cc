@@ -1,5 +1,5 @@
 /**
- * @file cxx/trainer/test/jfa.cc
+ * @file trainer/cxx/test/jfa.cc
  * @date Wed Aug 3 12:23:57 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

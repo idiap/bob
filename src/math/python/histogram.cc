@@ -1,5 +1,5 @@
 /**
- * @file python/math/src/histogram.cc
+ * @file math/python/histogram.cc
  * @date Mon Apr 16
  * @author Manuel Guenther <Manuel.Guenther@idiap.ch>
  *

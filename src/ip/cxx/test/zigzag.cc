@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/test/zigzag.cc
+ * @file ip/cxx/test/zigzag.cc
  * @date Tue Apr 5 16:55:23 2011 +0200
  * @author Niklas Johansson <niklas.johansson@idiap.ch>
  *

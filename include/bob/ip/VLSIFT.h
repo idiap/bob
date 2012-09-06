@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/VLSIFT.h
+ * @file bob/ip/VLSIFT.h
  * @date Mon Dec 19 16:35:13 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

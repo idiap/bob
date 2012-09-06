@@ -1,5 +1,5 @@
 /**
- * @file visioner/visioner/util/threads.h
+ * @file bob/visioner/util/threads.h
  * @author Andre Anjos <andre.anjos@idiap.ch>
  * @date Mon 06 Aug 2012 14:29:59 CEST
  *

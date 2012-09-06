@@ -1,5 +1,5 @@
 /**
- * @file cxx/lbfgs/lbfgs/lbfgs.h
+ * @file bob/lbfgs/lbfgs.h
  *
  * C library of Limited memory BFGS (L-BFGS).
  *

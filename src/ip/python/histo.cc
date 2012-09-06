@@ -1,5 +1,5 @@
 /**
- * @file python/ip/src/histo.cc
+ * @file ip/python/histo.cc
  * @date Mon Apr 18 16:08:34 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
  *

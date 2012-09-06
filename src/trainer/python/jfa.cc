@@ -1,5 +1,5 @@
 /**
- * @file python/trainer/src/jfa.cc
+ * @file trainer/python/jfa.cc
  * @date Tue Jul 19 12:16:17 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

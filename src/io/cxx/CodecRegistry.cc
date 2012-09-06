@@ -1,5 +1,5 @@
 /**
- * @file cxx/io/src/CodecRegistry.cc
+ * @file io/cxx/CodecRegistry.cc
  * @date Tue Oct 25 23:25:46 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

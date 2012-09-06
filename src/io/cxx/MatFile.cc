@@ -1,5 +1,5 @@
 /**
- * @file cxx/io/src/MatFile.cc
+ * @file io/cxx/MatFile.cc
  * @date Wed Oct 26 17:11:16 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

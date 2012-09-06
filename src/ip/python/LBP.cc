@@ -1,5 +1,5 @@
 /**
- * @file python/ip/src/LBP.cc
+ * @file ip/python/LBP.cc
  * @date Tue Apr 26 17:25:41 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

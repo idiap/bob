@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/machine/GaborJetSimilarities.h
+ * @file bob/machine/GaborJetSimilarities.h
  * @date 2012-03-05
  * @author Manuel Guenther <Manuel.Guenther@idiap.ch>
  *

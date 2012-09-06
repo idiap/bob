@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/GaborWaveletTransform.h
+ * @file bob/ip/GaborWaveletTransform.h
  * @date 2012-02-27
  * @author Manuel Guenther <Manuel.Guenther@idiap.ch>
  *

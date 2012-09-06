@@ -1,5 +1,5 @@
 /**
- * @file python/machine/src/gabor.cc
+ * @file machine/python/gabor.cc
  * @date 2012-03-05
  * @author Manuel Guenther <Manuel.Guenther@idiap.ch>
  *

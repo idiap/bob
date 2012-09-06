@@ -1,5 +1,5 @@
 /**
- * @file visioner/visioner/model/trainers/averager.h
+ * @file bob/visioner/model/trainers/averager.h
  * @date Fri 27 Jul 13:58:57 2012 CEST
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

@@ -1,5 +1,5 @@
 /**
- * @file cxx/io/src/reorder.cc
+ * @file io/cxx/reorder.cc
  * @date Tue Nov 22 11:24:44 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

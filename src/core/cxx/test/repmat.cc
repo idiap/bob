@@ -1,5 +1,5 @@
 /**
- * @file cxx/core/test/repmat.cc
+ * @file core/cxx/test/repmat.cc
  * @date Fri Jul 15 18:50:40 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

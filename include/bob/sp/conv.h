@@ -1,5 +1,5 @@
 /**
- * @file cxx/sp/sp/conv.h
+ * @file bob/sp/conv.h
  * @date Thu Feb 3 16:39:25 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

@@ -1,5 +1,5 @@
 /**
- * @file cxx/io/src/TensorArrayFile.cc
+ * @file io/cxx/TensorArrayFile.cc
  * @date Wed Oct 26 17:11:16 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

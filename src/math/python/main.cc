@@ -1,5 +1,5 @@
 /**
- * @file python/math/src/main.cc
+ * @file math/python/main.cc
  * @date Sat Mar 19 19:49:51 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

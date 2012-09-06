@@ -1,5 +1,5 @@
 /**
- * @file cxx/io/src/BinFileHeader.cc
+ * @file io/cxx/BinFileHeader.cc
  * @date Wed Jun 22 17:50:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/Exception.h
+ * @file bob/ip/Exception.h
  * @date Tue Mar 8 12:06:10 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

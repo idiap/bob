@@ -1,5 +1,5 @@
 /**
- * @file python/sp/src/conv.cc
+ * @file sp/python/conv.cc
  * @date Mon Aug 27 18:00:00 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

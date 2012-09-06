@@ -1,5 +1,5 @@
 /**
- * @file visioner/visioner/model/losses/diag_loss.h
+ * @file bob/visioner/model/losses/diag_loss.h
  * @date Fri 27 Jul 13:58:57 2012 CEST
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

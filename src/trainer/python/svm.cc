@@ -1,5 +1,5 @@
 /**
- * @file python/trainer/src/svm.cc
+ * @file trainer/python/svm.cc
  * @date Sun  4 Mar 20:06:49 2012 CET
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

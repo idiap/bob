@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/src/MLPException.cc
+ * @file machine/cxx/MLPException.cc
  * @date Thu Jul 7 16:49:35 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

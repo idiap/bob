@@ -1,5 +1,5 @@
 /**
- * @file python/core/src/blitz_numpy.cc
+ * @file python/blitz_numpy.cc
  * @date Mon Sep 26 11:47:30 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

@@ -1,5 +1,5 @@
 /**
- * @file python/machine/src/gmm.cc
+ * @file machine/python/gmm.cc
  * @date Tue Jul 26 15:11:33 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

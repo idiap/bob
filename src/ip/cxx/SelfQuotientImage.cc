@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/src/SelfQuotientImage.cc
+ * @file ip/cxx/SelfQuotientImage.cc
  * @date Thu Jul 19 11:52:08 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

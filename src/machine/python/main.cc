@@ -1,5 +1,5 @@
 /**
- * @file python/machine/src/main.cc
+ * @file machine/python/main.cc
  * @date Tue Jan 18 17:07:26 2011 +0100
  * @author André Anjos <andre.anjos@idiap.ch>
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>

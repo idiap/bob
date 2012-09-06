@@ -1,5 +1,5 @@
 /**
- * @file python/ip/src/gaussian.cc
+ * @file ip/python/gaussian.cc
  * @date Wed Apr 27 10:25:00 2011 +0200
  * @author Niklas Johansson <niklas.johansson@idiap.ch>
  *

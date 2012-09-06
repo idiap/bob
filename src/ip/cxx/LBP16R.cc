@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/src/LBP16R.cc
+ * @file ip/cxx/LBP16R.cc
  * @date Mon Feb 27 18:24:26 CET 2012
  * @author Ivana Chingovska <ivana.chingovska@idiap.ch>
  *

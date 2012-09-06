@@ -1,5 +1,5 @@
 /**
- * @file cxx/core/core/Random.h
+ * @file bob/core/Random.h
  * @date Mon Jan 31 20:02:21 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

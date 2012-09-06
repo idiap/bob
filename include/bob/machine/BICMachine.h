@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/machine/BICMachine.h
+ * @file bob/machine/BICMachine.h
  * @date Tue Jun  5 16:54:27 CEST 2012
  * @author Manuel Guenther <Manuel.Guenther@idiap.ch>
  *

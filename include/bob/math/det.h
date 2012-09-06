@@ -1,5 +1,5 @@
 /**
- * @file cxx/math/math/det.h
+ * @file bob/math/det.h
  * @date Fri Jan 27 14:10:23 2012 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

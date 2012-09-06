@@ -1,5 +1,5 @@
 /**
- * @file cxx/core/core/array_copy.h
+ * @file bob/core/array_copy.h
  * @date Thu Oct 20 11:25:46 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

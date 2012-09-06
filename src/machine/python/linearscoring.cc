@@ -1,5 +1,5 @@
 /**
- * @file python/machine/src/linearscoring.cc
+ * @file machine/python/linearscoring.cc
  * @date Wed Jul 13 16:00:04 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
  *

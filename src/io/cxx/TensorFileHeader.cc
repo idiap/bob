@@ -1,5 +1,5 @@
 /**
- * @file cxx/io/src/TensorFileHeader.cc
+ * @file io/cxx/TensorFileHeader.cc
  * @date Wed Jun 22 17:50:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

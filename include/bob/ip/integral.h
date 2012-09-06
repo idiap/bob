@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/integral.h
+ * @file bob/ip/integral.h
  * @date Thu Apr 28 20:09:16 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

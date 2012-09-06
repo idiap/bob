@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/test/scale.cc
+ * @file ip/cxx/test/scale.cc
  * @date Mon Mar 14 11:21:29 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

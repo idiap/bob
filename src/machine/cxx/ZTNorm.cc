@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/src/ZTNorm.cc
+ * @file machine/cxx/ZTNorm.cc
  * @date Tue Jul 19 15:33:20 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
  *

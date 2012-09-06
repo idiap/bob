@@ -1,5 +1,5 @@
 /**
- * @file cxx/core/core/array.h
+ * @file bob/core/array.h
  * @date Tue Nov 8 15:34:31 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

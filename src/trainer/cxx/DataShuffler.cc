@@ -1,5 +1,5 @@
 /**
- * @file cxx/trainer/src/DataShuffler.cc
+ * @file trainer/cxx/DataShuffler.cc
  * @date Wed Jul 13 16:58:26 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

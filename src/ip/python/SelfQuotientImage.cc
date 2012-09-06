@@ -1,5 +1,5 @@
 /**
- * @file python/ip/src/SelfQuotientImage.cc
+ * @file ip/python/SelfQuotientImage.cc
  * @date Thu Jul 2 18:54:08 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

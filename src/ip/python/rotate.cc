@@ -1,5 +1,5 @@
 /**
- * @file python/ip/src/Rotate.cc
+ * @file ip/python/rotate.cc
  * @date Mon Apr 18 11:30:08 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

@@ -1,5 +1,5 @@
 /**
- * @file python/trainer/src/bic.cc
+ * @file machine/python/bic.cc
  * @date Wed Jun  6 10:29:09 CEST 2012
  * @author Manuel Guenther <Manuel.Guenther@idiap.ch>
  *

@@ -1,5 +1,5 @@
 /**
- * @file cxx/core/src/convert_exception.cc
+ * @file core/cxx/convert_exception.cc
  * @date Thu Apr 28 16:09:21 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

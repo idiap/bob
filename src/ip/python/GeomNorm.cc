@@ -1,5 +1,5 @@
 /**
- * @file python/ip/src/GeomNorm.cc
+ * @file ip/python/GeomNorm.cc
  * @date Mon Apr 11 23:07:02 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

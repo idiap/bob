@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/DCTFeatures.h
+ * @file bob/ip/DCTFeatures.h
  * @date Thu Apr 7 19:52:29 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

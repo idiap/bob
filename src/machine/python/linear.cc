@@ -1,5 +1,5 @@
 /**
- * @file python/machine/src/linear.cc
+ * @file machine/python/linear.cc
  * @date Tue May 31 13:33:31 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

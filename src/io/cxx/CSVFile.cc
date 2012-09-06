@@ -1,5 +1,5 @@
 /**
- * @file cxx/io/src/CSVFile.cc
+ * @file io/cxx/CSVFile.cc
  * @date Thu 10 May 2012 15:19:24 CEST
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

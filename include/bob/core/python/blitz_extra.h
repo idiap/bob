@@ -1,5 +1,5 @@
 /**
- * @file python/core/core/python/blitz_extra.h
+ * @file bob/core/python/blitz_extra.h
  * @date Wed Mar 16 14:08:37 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

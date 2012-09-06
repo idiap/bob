@@ -1,5 +1,5 @@
 /**
- * @file visioner/visioner/cv/cv_detector.h
+ * @file bob/visioner/cv/cv_detector.h
  * @date Fri 27 Jul 13:58:57 2012 CEST
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

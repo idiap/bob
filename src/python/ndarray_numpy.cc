@@ -1,5 +1,5 @@
 /**
- * @file python/core/src/ndarray_numpy.cc
+ * @file python/ndarray_numpy.cc
  * @date Thu Nov 17 14:33:20 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

@@ -1,5 +1,5 @@
 /**
- * @file cxx/trainer/trainer/SVMTrainer.h
+ * @file bob/trainer/SVMTrainer.h
  * @date Sat Dec 17 14:41:56 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

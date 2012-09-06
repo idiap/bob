@@ -1,5 +1,5 @@
 /**
- * @file cxx/sp/sp/DCT2D.h
+ * @file bob/sp/DCT2D.h
  * @date Tue Apr 5 19:18:23 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

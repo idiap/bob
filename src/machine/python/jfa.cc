@@ -1,5 +1,5 @@
 /**
- * @file python/machine/src/jfa.cc
+ * @file machine/python/jfa.cc
  * @date Sat Jul 23 21:41:15 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

@@ -1,5 +1,5 @@
 /**
- * @file python/ip/src/shear.cc
+ * @file ip/python/shear.cc
  * @date Sun Jun 26 18:59:21 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

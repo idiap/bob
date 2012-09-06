@@ -1,5 +1,5 @@
 /**
- * @file cxx/core/core/reshape_exception.h
+ * @file bob/core/reshape_exception.h
  * @date Sun Jul 17 13:31:35 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

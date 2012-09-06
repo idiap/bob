@@ -1,5 +1,5 @@
 /**
- * @file cxx/lbfgs/src/arithmetic_ansi.h
+ * @file lbfgs/cxx/arithmetic_ansi.h
  *
  * ANSI C implementation of vector operations.
  *

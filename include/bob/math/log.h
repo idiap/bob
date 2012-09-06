@@ -1,5 +1,5 @@
 /**
- * @file cxx/math/math/log.h
+ * @file bob/math/log.h
  * @date Fri Feb 10 20:02:07 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

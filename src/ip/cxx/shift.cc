@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/src/shift.cc
+ * @file ip/cxx/shift.cc
  * @date Sun Apr 17 23:11:51 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

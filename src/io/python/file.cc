@@ -1,5 +1,5 @@
 /**
- * @file python/io/src/file.cc
+ * @file io/python/file.cc
  * @date Fri Oct 28 10:28:48 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

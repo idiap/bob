@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/test/flipflop.cc
+ * @file ip/cxx/test/flipflop.cc
  * @date Mon Mar 14 16:31:07 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

@@ -1,5 +1,5 @@
 /**
- * @file visioner/src/lut_problem_var.cc
+ * @file visioner/cxx/lut_problem_var.cc
  * @date Fri 27 Jul 13:58:57 2012 CEST
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

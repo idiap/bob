@@ -1,5 +1,5 @@
 /**
- * @file cxx/math/src/interiorpointLP.cc
+ * @file math/cxx/interiorpointLP.cc
  * @date Thu Mar 31 14:32:14 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

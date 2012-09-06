@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/VLDSIFT.h
+ * @file bob/ip/VLDSIFT.h
  * @date Mon Jan 23 20:46:07 2012 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

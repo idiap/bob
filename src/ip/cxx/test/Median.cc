@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/test/Median.cc
+ * @file ip/cxx/test/Median.cc
  * @date Wed Sep 28 13:34:10 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

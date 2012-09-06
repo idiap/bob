@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/color.h
+ * @file bob/ip/color.h
  * @date Fri Mar 25 10:02:16 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

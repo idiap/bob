@@ -1,5 +1,5 @@
 /**
- * @file python/sp/src/extrapolate.cc
+ * @file sp/python/extrapolate.cc
  * @date Tue Sep 27 23:26:46 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

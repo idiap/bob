@@ -1,5 +1,5 @@
 /**
- * @file cxx/math/src/log.cc
+ * @file math/cxx/log.cc
  * @date Fri Feb 10 20:02:07 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

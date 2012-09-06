@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/machine/Machine.h
+ * @file bob/machine/Machine.h
  * @date Tue Jan 18 17:07:26 2011 +0100
  * @author André Anjos <andre.anjos@idiap.ch>
  *

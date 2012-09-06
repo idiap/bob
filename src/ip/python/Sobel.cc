@@ -1,5 +1,5 @@
 /**
- * @file python/ip/src/Sobel.cc
+ * @file ip/python/Sobel.cc
  * @date Mon Aug 27 12:53:00 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

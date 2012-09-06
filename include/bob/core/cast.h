@@ -1,5 +1,5 @@
 /**
- * @file cxx/core/core/cast.h
+ * @file bob/core/cast.h
  * @date Wed Feb 9 12:26:11 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

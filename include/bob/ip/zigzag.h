@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/zigzag.h
+ * @file bob/ip/zigzag.h
  * @date Tue Apr 5 17:28:28 2011 +0200
  * @author Niklas Johansson <niklas.johansson@idiap.ch>
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>

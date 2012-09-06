@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/machine/Exception.h
+ * @file bob/machine/Exception.h
  * @date Fri May 13 20:22:43 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

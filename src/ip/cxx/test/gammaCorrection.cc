@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/test/gammaCorrection.cc
+ * @file ip/cxx/test/gammaCorrection.cc
  * @date Thu Mar 17 18:46:09 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

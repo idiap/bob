@@ -1,5 +1,5 @@
 /**
- * @file cxx/daq/daq/NullFaceLocalization.h
+ * @file bob/daq/NullFaceLocalization.h
  * @date Thu Feb 23 11:22:57 2012 +0100
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
  *

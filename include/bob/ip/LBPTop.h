@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/LBPTop.h
+ * @file bob/ip/LBPTop.h
  * @date Tue Apr 26 19:20:57 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  * @author Tiago Freitas Pereira <Tiago.Pereira@idiap.ch>

@@ -1,5 +1,5 @@
 /**
- * @file python/machine/src/kmeans.cc
+ * @file machine/python/kmeans.cc
  * @date Tue Jul 26 15:11:33 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/test/shear.cc
+ * @file ip/cxx/test/shear.cc
  * @date Wed Mar 9 19:09:08 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

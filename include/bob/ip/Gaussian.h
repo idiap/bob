@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/Gaussian.h
+ * @file bob/ip/Gaussian.h
  * @date Sat Apr 30 17:52:15 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

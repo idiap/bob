@@ -1,5 +1,5 @@
 /**
- * @file cxx/io/test/image_codec.cc
+ * @file io/cxx/test/image_codec.cc
  * @date Wed Jun 22 17:50:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

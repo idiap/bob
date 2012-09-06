@@ -1,5 +1,5 @@
 /**
- * @file python/machine/src/activation.cc
+ * @file machine/python/activation.cc
  * @date Thu Jul 7 16:49:35 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

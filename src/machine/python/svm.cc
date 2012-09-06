@@ -1,5 +1,5 @@
 /**
- * @file python/machine/src/svm.cc
+ * @file machine/python/svm.cc
  * @date Sat Dec 17 14:41:56 2011 +0100
  * @author André Anjos <andre.dos.anjos@gmail.com>
  *

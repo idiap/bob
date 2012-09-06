@@ -1,5 +1,5 @@
 /**
- * @file cxx/core/core/array_check.h
+ * @file bob/core/array_check.h
  * @date Sat Apr 9 18:10:10 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

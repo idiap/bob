@@ -1,5 +1,5 @@
 /**
- * @file cxx/math/math/svd.h
+ * @file bob/math/svd.h
  * @date Sat Mar 19 22:14:10 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

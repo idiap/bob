@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/src/color.cc
+ * @file ip/cxx/color.cc
  * @date Fri Mar 25 09:59:18 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/src/LinearMachine.cc
+ * @file machine/cxx/LinearMachine.cc
  * @date Tue May 31 09:22:33 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

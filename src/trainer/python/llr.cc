@@ -1,5 +1,5 @@
 /**
- * @file python/trainer/src/llr.cc
+ * @file trainer/python/llr.cc
  * @date Sat Sep 1 21:16:00 2012 +0200
  * @author Laurent El Shafey <laurent.el-shafey@idiap.ch>
  *

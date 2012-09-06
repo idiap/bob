@@ -1,5 +1,5 @@
 /**
- * @file cxx/math/math/linear.h
+ * @file bob/math/linear.h
  * @date Thu Mar 31 14:00:25 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

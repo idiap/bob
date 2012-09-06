@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/src/GMMStats.cc
+ * @file machine/cxx/GMMStats.cc
  * @date Tue May 10 11:35:58 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>

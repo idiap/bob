@@ -1,5 +1,5 @@
 /**
- * @file python/math/src/norminv.cc
+ * @file math/python/norminv.cc
  * @date Wed Apr 13 09:20:40 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

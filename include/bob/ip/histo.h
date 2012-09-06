@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/histo.h
+ * @file bob/ip/histo.h
  * @date Mon Apr 18 16:08:34 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
  *

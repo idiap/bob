@@ -1,5 +1,5 @@
 /**
- * @file cxx/trainer/trainer/Exception.h
+ * @file bob/trainer/Exception.h
  * @date Wed May 18 16:14:44 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
  *

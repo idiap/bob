@@ -1,5 +1,5 @@
 /**
- * @file cxx/io/test/binary_file.cc
+ * @file io/cxx/test/binary_file.cc
  * @date Wed Jun 22 17:50:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

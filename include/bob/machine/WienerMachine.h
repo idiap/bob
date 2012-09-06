@@ -1,5 +1,5 @@
 /**
- * @file cxx/machine/machine/WienerMachine.h
+ * @file bob/machine/WienerMachine.h
  * @date Fri Sep 30 16:56:06 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

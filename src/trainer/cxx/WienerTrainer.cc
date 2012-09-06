@@ -1,5 +1,5 @@
 /**
- * @file cxx/trainer/src/WienerTrainer.cc
+ * @file trainer/cxx/WienerTrainer.cc
  * @date Fri Sep 30 16:58:42 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

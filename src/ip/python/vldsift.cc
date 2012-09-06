@@ -1,5 +1,5 @@
 /**
- * @file python/ip/src/vldsift.cc
+ * @file ip/python/vldsift.cc
  * @date Mon Jan 23 20:46:07 2012 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

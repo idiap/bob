@@ -1,5 +1,5 @@
 /**
- * @file cxx/core/test/logging.cc
+ * @file core/cxx/test/logging.cc
  * @date Tue Jan 18 17:07:26 2011 +0100
  * @author André Anjos <andre.anjos@idiap.ch>
  *

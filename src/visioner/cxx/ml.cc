@@ -1,5 +1,5 @@
 /**
- * @file visioner/src/ml.cc
+ * @file visioner/cxx/ml.cc
  * @date Fri 27 Jul 13:58:57 2012 CEST
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *

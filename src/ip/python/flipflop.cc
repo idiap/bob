@@ -1,5 +1,5 @@
 /**
- * @file python/ip/src/flipflop.cc
+ * @file ip/python/flipflop.cc
  * @date Sun Jun 26 18:59:21 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

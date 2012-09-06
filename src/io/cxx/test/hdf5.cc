@@ -1,5 +1,5 @@
 /**
- * @file cxx/io/test/hdf5.cc
+ * @file io/cxx/test/hdf5.cc
  * @date Tue Aug 9 21:43:02 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

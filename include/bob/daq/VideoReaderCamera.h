@@ -1,5 +1,5 @@
 /**
- * @file cxx/daq/daq/VideoReaderCamera.h
+ * @file bob/daq/VideoReaderCamera.h
  * @date Thu Feb 2 11:22:57 2012 +0100
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
  *
