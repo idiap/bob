@@ -1,7 +1,7 @@
-prefix=@CMAKE_INSTALL_PREFIX@
-exec_prefix=@CMAKE_INSTALL_PREFIX@
-libdir=@CMAKE_INSTALL_PREFIX@/lib
-includedir=@CMAKE_INSTALL_PREFIX@/include
+prefix=@BOB_CMAKE_INSTALL_PREFIX@
+exec_prefix=@BOB_CMAKE_INSTALL_PREFIX@
+libdir=@BOB_CMAKE_INSTALL_PREFIX@/lib
+includedir=@BOB_CMAKE_INSTALL_PREFIX@/include
 
 Name: @BOB_PACKAGE_NAME@
 Description: Bob is a free signal-processing and machine learning toolbox

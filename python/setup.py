@@ -102,19 +102,7 @@ def bob_variables():
     raise RuntimeError, 'Cannot retrieve Bob version from pkg-config:\n%s' % \
         output
 
-  kw['boost_libdir'] = get_var('boost_libdir')
   kw['soversion'] = get_var('soversion')
-  kw['includedir'] = get_var('includedir')
-
-  # Get all installed header files
-  kw['headers'] = {}
-  for package in os.listdir(os.path.join(kw['includedir'], 'bob')):
-    kw['headers'][package] = []
-    package_dir = os.path.join(kw['includedir'], 'bob', package)
-    for path, dirs, files in os.walk(package_dir):
-      for f in files:
-        if f.endswith(".h"):
-          kw['headers'][package].append(os.path.join(path, f))
 
   return kw
 
@@ -148,9 +136,6 @@ def setup_extension(ext_name, pc_file):
 
   pc = pkgconfig(pc_file + '%d%d' % sys.version_info[:2])
 
-  if pc.has_key('extra_compile_args'):
-    cflags = pc['extra_compile_args']
-
   library_dirs=pc['library_dirs']
 
   runtime_library_dirs = None
@@ -162,7 +147,6 @@ def setup_extension(ext_name, pc_file):
       sources=[],
       language="c++",
       include_dirs=pc['include_dirs'] + [numpy.get_include()],
-      extra_compile_args=cflags,
       library_dirs=library_dirs,
       runtime_library_dirs=runtime_library_dirs,
       libraries=pc['libraries'],
@@ -230,7 +214,7 @@ EXTENSIONS = [
     setup_extension('bob.ip._ext', 'bob-ip-py'),
     setup_extension('bob.machine._ext', 'bob-machine-py'),
     setup_extension('bob.trainer._ext', 'bob-trainer-py'),
-    setup_extension('bob.trainer.overload._ext', 'bob-trainer-py'),
+    setup_extension('bob.trainer.overload._ext', 'bob-trainer-overload-py'),
     ]
 
 if pkgconfig('bob-daq'):
@@ -283,7 +267,7 @@ setup(
     zip_safe=False,
 
     ext_modules=EXTENSIONS,
-    cmdclass = {'build_ext': build_ext_mp},
+    cmdclass = {'build_ext': build_ext},
 
     install_requires=[
       'setuptools',

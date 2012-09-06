@@ -12,7 +12,7 @@ from copy_reg import pickle
 from types import MethodType
 
 def self_headers():
-  '''Discovers and catalogs all Bob headers'''
+  '''Discovers and catalogs all my headers'''
 
   retval = []
   for path, dirs, files in os.walk(os.path.join(PACKAGE_BASEDIR, 'include')):
@@ -22,6 +22,58 @@ def self_headers():
   return retval
 
 BOB_PYTHON_HEADERS = self_headers()
+
+def bob_variables():
+  '''Discovers properties from the installed Bob (C++) build
+
+  def get_var(name):
+    cmd = [
+        'pkg-config',
+        '--variable=%s' % name,
+        'bob',
+        ]
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT)
+    var = proc.communicate()[0].strip()
+    if proc.returncode != 0: return None
+    return var
+
+
+  cmd = [
+      'pkg-config',
+      '--modversion',
+      'bob',
+      ]
+
+  proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+      stderr=subprocess.STDOUT)
+
+  kw = {}
+  output = proc.communicate()[0].strip()
+  kw['version'] = output if proc.returncode == 0 else None
+
+  if kw['version'] is None:
+    raise RuntimeError, 'Cannot retrieve Bob version from pkg-config:\n%s' % \
+        output
+
+  kw['boost_libdir'] = get_var('boost_libdir')
+  kw['soversion'] = get_var('soversion')
+  kw['includedir'] = get_var('includedir')
+
+  # Get all installed header files
+  kw['headers'] = {}
+  for package in os.listdir(os.path.join(kw['includedir'], 'bob')):
+    kw['headers'][package] = []
+    package_dir = os.path.join(kw['includedir'], 'bob', package)
+    for path, dirs, files in os.walk(package_dir):
+      for f in files:
+        if f.endswith(".h"):
+          kw['headers'][package].append(os.path.join(path, f))
+
+  return kw
+
+# Retrieve central, global variables from Bob's C++ build
+BOB = bob_variables()
 
 class build_ext(build_ext_base):
   '''Customized extension to build bob.python bindings in the expected way'''
