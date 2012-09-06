@@ -1,0 +1,74 @@
+#!/usr/bin/env python
+# vim: set fileencoding=utf-8 :
+# Andre Anjos <andre.anjos@idiap.ch>
+# Fri Jul 22 07:59:06 2011 +0200
+#
+# Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+"""Tests bindings to the Visioner face localization framework.
+"""
+
+import os
+import sys
+import unittest
+import bob
+import pkg_resources
+
+def F(f, module=None):
+  """Returns the test file on the "data" subdirectory"""
+  if module is None:
+    return pkg_resources.resource_filename(__name__, os.path.join('data', f))
+  return pkg_resources.resource_filename('bob.%s.test' % module, 
+      os.path.join('data', f))
+
+TEST_VIDEO = F("test.mov", "io")
+
+class LocalizationTest(unittest.TestCase):
+  """Performs various face localization tests."""
+
+  def test01_Faster(self):
+
+    video = bob.io.VideoReader(TEST_VIDEO)
+    self.images = [bob.ip.rgb_to_gray(k) for k in video[:20]]
+    self.processor = bob.visioner.Localizer()
+    self.processor.detector.scanning_levels = 10
+
+    # find faces on the video
+    for image in self.images:
+      locdata = self.processor(image)
+      self.assertTrue(locdata is not None)
+
+  def test02_Fast(self):
+
+    video = bob.io.VideoReader(TEST_VIDEO)
+    self.images = [bob.ip.rgb_to_gray(k) for k in video[:10]]
+    self.processor = bob.visioner.Localizer()
+    self.processor.detector.scanning_levels = 5
+
+    # find faces on the video
+    for image in self.images:
+      locdata = self.processor(image)
+      self.assertTrue(locdata is not None)
+
+  def xtest03_Thorough(self):
+      
+    video = bob.io.VideoReader(TEST_VIDEO)
+    self.images = [bob.ip.rgb_to_gray(k) for k in video[:2]]
+    self.processor = bob.visioner.Localizer()
+
+    # find faces on the video
+    for image in self.images:
+      locdata = self.processor(image)
+      self.assertTrue(locdata is not None)

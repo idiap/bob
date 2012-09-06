@@ -1,0 +1,5 @@
+include README.rst bootstrap.py buildout.cfg
+recursive-include docs *
+recursive-include bob */test/data/*
+recursive-include bob db/iris/*.names db/iris/*.data
+recursive-include bob visioner/*.gz
