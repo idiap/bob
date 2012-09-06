@@ -31,7 +31,7 @@ if(SPHINX_EXECUTABLE)
       COMMENT "Generating (LaTeX2e) User Guide with Sphinx" VERBATIM
     )
   else()
-    message(FATAL_ERROR "Sphinx PDF output requires either pdflatex or latex")
+    message(WARNING "Sphinx PDF output requires either pdflatex or latex and I cannot find neither so 'make sphinx-latex' will only dump LaTeX sources")
   endif()
   add_dependencies(sphinx-latex egg)
 
