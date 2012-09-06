@@ -1,4 +1,4 @@
-from ._ext import *
+from ._core_random import *
 
 class variate_generator:
   """A pure-python version of the boost::variate_generator<> class"""

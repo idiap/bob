@@ -1,4 +1,4 @@
-from ._ext import *
+from ._machine import *
 
 def linearmachine_repr(self):
   """A funky way to display a bob Linear Machine"""

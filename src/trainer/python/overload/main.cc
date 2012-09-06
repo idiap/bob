@@ -25,7 +25,7 @@
 void bind_trainer_kmeans_wrappers();
 void bind_trainer_gmm_wrappers();
 
-BOOST_PYTHON_MODULE(_ext) {
+BOOST_PYTHON_MODULE(_trainer_overload) {
 
   bob::python::setup_python("bob classes and sub-classes for overloading trainers");
   

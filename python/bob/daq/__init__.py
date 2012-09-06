@@ -1,4 +1,4 @@
-from ._ext import *
+from ._daq import *
 from ..visioner import DEFAULT_DETECTION_MODEL
 from os import path
 import types

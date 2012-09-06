@@ -1,4 +1,4 @@
-from ._ext import *
+from ._core import *
 from . import array
 from . import random
 __all__ = dir()

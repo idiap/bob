@@ -28,7 +28,7 @@ void bind_math_norminv();
 void bind_math_stats();
 void bind_math_histogram();
 
-BOOST_PYTHON_MODULE(_ext) {
+BOOST_PYTHON_MODULE(_math) {
 
   bob::python::setup_python("bob mathematical classes and sub-classes");
 

@@ -34,7 +34,7 @@ void bind_core_typeinfo();
 void bind_core_convert();
 void bind_core_tinyvector();
 
-BOOST_PYTHON_MODULE(_ext) {
+BOOST_PYTHON_MODULE(_core) {
   docstring_options docopt; 
 # if !defined(BOB_DEBUG)
   docopt.disable_cpp_signatures();

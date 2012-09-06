@@ -8,8 +8,6 @@ set(incdir ${py_incdir})
 # Python bindings
 set(src
    "ndarray.cc"
-   "blitz_numpy.cc"
-   "ndarray_numpy.cc"
    )
 
 # Define the library, compilation and linkage options

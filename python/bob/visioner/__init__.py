@@ -3,7 +3,7 @@
 # Andre Anjos <andre.anjos@idiap.ch> 
 # Sun 24 Jul 17:50:01 2011 CEST
 
-from ._ext import *
+from ._visioner import *
 from pkg_resources import resource_filename
 
 DEFAULT_DETECTION_MODEL = resource_filename(__name__, 'detection.gz')

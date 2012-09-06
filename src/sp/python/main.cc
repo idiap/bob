@@ -28,7 +28,7 @@ void bind_sp_dct();
 void bind_sp_fft();
 void bind_sp_convolution();
 
-BOOST_PYTHON_MODULE(_ext) {
+BOOST_PYTHON_MODULE(_sp) {
 
   bob::python::setup_python("bob signal processing classes and sub-classes");
 

@@ -47,7 +47,7 @@ class TanTriggsTest(unittest.TestCase):
     op.radius = 3
     op.threshold = 8.
     op.alpha = 0.2
-    op.conv_border = bob.sp._ext.BorderType.Circular
+    op.conv_border = bob.sp._sp.BorderType.Circular
     self.assertEqual(op.gamma, 0.1)
     self.assertEqual(op.sigma0, 2.)
     self.assertEqual(op.sigma1, 3.)

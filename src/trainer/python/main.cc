@@ -39,7 +39,7 @@ void bind_trainer_llr();
 void bind_trainer_svm();
 #endif
 
-BOOST_PYTHON_MODULE(_ext) {
+BOOST_PYTHON_MODULE(_trainer) {
 
   bob::python::setup_python("bob classes and sub-classes for trainers");
   

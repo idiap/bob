@@ -31,6 +31,8 @@ set(src
    "tinyvector.cc"
    "typeinfo.cc"
    "version.cc"
+   "blitz_numpy.cc"
+   "ndarray_numpy.cc"
    "main.cc"
    )
 

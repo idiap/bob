@@ -1,4 +1,4 @@
-from ._ext import *
+from ._io import *
 
 from . import __arrayset__
 from . import __array__

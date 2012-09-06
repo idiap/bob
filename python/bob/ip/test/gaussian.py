@@ -43,7 +43,7 @@ class GaussianTest(unittest.TestCase):
     op.radius_x = 2
     op.sigma_y = 1.
     op.sigma_x = 1.
-    op.conv_border = bob.sp._ext.BorderType.Circular
+    op.conv_border = bob.sp._sp.BorderType.Circular
     self.assertEqual(op.radius_y, 2)
     self.assertEqual(op.radius_x, 2)
     self.assertEqual(op.sigma_y, 1.)

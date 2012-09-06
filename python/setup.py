@@ -205,26 +205,26 @@ DATAFILES += [
     ]
 
 EXTENSIONS = [
-    setup_extension('bob.core._ext', 'bob-core-py'),
-    setup_extension('bob.core.random._ext', 'bob-core-random-py'),
-    setup_extension('bob.io._ext', 'bob-io-py'),
-    setup_extension('bob.math._ext', 'bob-math-py'),
-    setup_extension('bob.measure._ext', 'bob-measure-py'),
-    setup_extension('bob.sp._ext', 'bob-sp-py'),
-    setup_extension('bob.ip._ext', 'bob-ip-py'),
-    setup_extension('bob.machine._ext', 'bob-machine-py'),
-    setup_extension('bob.trainer._ext', 'bob-trainer-py'),
-    setup_extension('bob.trainer.overload._ext', 'bob-trainer-overload-py'),
+    setup_extension('bob.core._core', 'bob-core-py'),
+    setup_extension('bob.core.random._core_random', 'bob-core-random-py'),
+    setup_extension('bob.io._io', 'bob-io-py'),
+    setup_extension('bob.math._math', 'bob-math-py'),
+    setup_extension('bob.measure._measure', 'bob-measure-py'),
+    setup_extension('bob.sp._sp', 'bob-sp-py'),
+    setup_extension('bob.ip._ip', 'bob-ip-py'),
+    setup_extension('bob.machine._machine', 'bob-machine-py'),
+    setup_extension('bob.trainer._trainer', 'bob-trainer-py'),
+    setup_extension('bob.trainer.overload._trainer_overload', 'bob-trainer-overload-py'),
     ]
 
 if pkgconfig('bob-daq'):
   EXTENSIONS.append(
-      setup_extension('bob.daq._ext', 'bob-daq-py')
+      setup_extension('bob.daq._daq', 'bob-daq-py')
       )
 
 if pkgconfig('bob-visioner'):
   EXTENSIONS.append(
-    setup_extension('bob.visioner._ext', 'bob-visioner-py')
+    setup_extension('bob.visioner._visioner', 'bob-visioner-py')
     )
 
   DATAFILES += [

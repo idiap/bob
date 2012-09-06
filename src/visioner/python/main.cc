@@ -26,7 +26,7 @@ void bind_visioner_version();
 void bind_visioner_localize();
 void bind_visioner_train();
 
-BOOST_PYTHON_MODULE(_ext) {
+BOOST_PYTHON_MODULE(_visioner) {
   
   bob::python::setup_python("Face detection, keypoint localization and pose estimation using Boosting and LBP-like features (Visioner)");
 

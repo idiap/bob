@@ -6,14 +6,14 @@
 """Video additions
 """
 
-from . import _ext
+from . import _io
 
-if hasattr(_ext, "VideoReader"):
+if hasattr(_io, "VideoReader"):
   
   # the VideoReader is an optional compile-in, so it may not exist on certain
   # installations.
 
-  from ._ext import VideoReader
+  from ._io import VideoReader
 
   def load(self, raise_on_error=False):
     """Loads all of the video stream in a numpy ndarray organized in this way:

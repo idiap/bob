@@ -1,4 +1,4 @@
-from ._ext import *
+from ._math import *
 
 # add some default distance functions
 import math

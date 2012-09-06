@@ -44,7 +44,7 @@ class WeightedGaussianTest(unittest.TestCase):
     op.radius_x = 2
     op.sigma2_y = 1.
     op.sigma2_x = 1.
-    op.conv_border = bob.sp._ext.BorderType.Circular
+    op.conv_border = bob.sp._sp.BorderType.Circular
     self.assertEqual(op.radius_y, 2)
     self.assertEqual(op.radius_x, 2)
     self.assertEqual(op.sigma2_y, 1.)
