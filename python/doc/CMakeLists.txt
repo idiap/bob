@@ -25,15 +25,16 @@ if(SPHINX_EXECUTABLE)
       COMMAND make -C ${CMAKE_BINARY_DIR}/sphinx/latex
       COMMENT "Generating (LaTeX2e) User Guide with Sphinx + PDF" VERBATIM
     )
+    add_dependencies(sphinx-latex egg)
   elseif(LATEX_COMPILER)
     add_custom_target(sphinx-latex 
       COMMAND ${CMAKE_BINARY_DIR}/bin/python ${SPHINX_EXECUTABLE} -b latex -E ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/latex 
       COMMENT "Generating (LaTeX2e) User Guide with Sphinx" VERBATIM
     )
+    add_dependencies(sphinx-latex egg)
   else()
     message(WARNING "Sphinx PDF output requires either pdflatex or latex and I cannot find neither so 'make sphinx-latex' will only dump LaTeX sources")
   endif()
-  add_dependencies(sphinx-latex egg)
 
   add_custom_target(sphinx-coverage 
     COMMAND ${CMAKE_BINARY_DIR}/bin/python ${SPHINX_EXECUTABLE} -b coverage -E ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/sphinx/coverage 
