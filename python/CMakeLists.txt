@@ -75,5 +75,13 @@ get_filename_component(basedir ${pysetup} PATH)
 add_custom_target(egg ALL mkdir -pv ${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES} COMMAND ${pybin} ${pysetup} build --force --build-base=${CMAKE_BINARY_DIR}/egg-build install --prefix=${CMAKE_BINARY_DIR} --record=${CMAKE_BINARY_DIR}/egg-build-record.txt --single-version-externally-managed WORKING_DIRECTORY ${basedir} DEPENDS ${ENABLED_PACKAGES})
 add_custom_target(egg-scripts ALL ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/bin/fix_scripts.py ${CMAKE_BINARY_DIR}/bin DEPENDS egg)
 
+# Testing
+# An easy handler for nose tests
+configure_file(bin/nosetests.py.in ${CMAKE_BINARY_DIR}/bin/nosetests.py @ONLY)
+add_custom_target(nosetests ${CMAKE_BINARY_DIR}/bin/nosetests.py -v bob DEPENDS egg)
+
+# Documentation
+add_subdirectory(doc)
+
 # Always keep this one last
 add_subdirectory(post_install)

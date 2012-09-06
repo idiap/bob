@@ -1,0 +1,5 @@
+#!/usr/bin/env @PYTHON_EXECUTABLE@
+import sys
+sys.path.insert(0, '@BOB_PYTHONPATH@')
+from nose import main
+main(argv=['nose']+sys.argv[1:])

@@ -276,6 +276,7 @@ setup(
       'matplotlib',
       'sqlalchemy',
       'scipy',
+      'nose',
       ],
 
     entry_points={
