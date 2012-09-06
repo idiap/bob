@@ -2,7 +2,7 @@ PROJECT(bob_math)
 
 set(suffixes sse2)
 find_library(lapack_LIBRARY NAMES lapack PATH_SUFFIXES ${suffixes}) 
-find_library(blas_LIBRARY NAMES cblas PATH_SUFFIXES ${suffixes})
+find_library(blas_LIBRARY NAMES cblas blas PATH_SUFFIXES ${suffixes})
 set(lapack_LIBRARIES ${lapack_LIBRARY};${blas_LIBRARY})
 list(REMOVE_DUPLICATES lapack_LIBRARIES)
 set(lapack_LIBRARIES ${lapack_LIBRARIES} CACHE INTERNAL "libraries")
