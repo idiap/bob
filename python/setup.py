@@ -133,7 +133,7 @@ class build_ext(build_ext_base):
       proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
           stderr=subprocess.STDOUT)
       output = proc.communicate()[0]
-      os.unlink(name)
+      if os.path.exists(name): os.unlink(name)
       return True if proc.returncode == 0 else False
 
     def ld_ok(opt):
