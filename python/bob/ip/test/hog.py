@@ -4,16 +4,16 @@
 # Thu Apr 19 10:06:07 2012 +0200
 #
 # Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 3 of the License.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -50,17 +50,17 @@ ORI_B = numpy.array([[0, 0, 0, 0, 0],  [0, 0, 0, 0, 0],  [0, 0, 0, 0, 0],
 HIST_B = numpy.array([20, 0, 0, 0, 0, 0, 0, 0], dtype='float64')
 EPSILON = 1e-10
 
-HIST_3D = numpy.array([[[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]], 
+HIST_3D = numpy.array([[[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]],
                        [[11, 12, 13, 14, 15], [16, 17, 18, 19, 20]]], dtype='float64')
 HIST_NORM_L1 = numpy.zeros(dtype='float64', shape=(20,))
 
 IMG_8x8_A = numpy.array([ [0, 2, 0, 0, 0, 0, 2, 0],
-                          [0, 2, 0, 0, 0, 0, 2, 0], 
-                          [0, 2, 0, 0, 0, 0, 2, 0], 
-                          [0, 2, 0, 0, 0, 0, 2, 0], 
-                          [0, 2, 0, 0, 0, 0, 2, 0], 
-                          [0, 2, 0, 0, 0, 0, 2, 0], 
-                          [0, 2, 0, 0, 0, 0, 2, 0], 
+                          [0, 2, 0, 0, 0, 0, 2, 0],
+                          [0, 2, 0, 0, 0, 0, 2, 0],
+                          [0, 2, 0, 0, 0, 0, 2, 0],
+                          [0, 2, 0, 0, 0, 0, 2, 0],
+                          [0, 2, 0, 0, 0, 0, 2, 0],
+                          [0, 2, 0, 0, 0, 0, 2, 0],
                           [0, 2, 0, 0, 0, 0, 2, 0]], dtype='float64')
 HIST_IMG_A = numpy.array([0, 0, 0, 0, 0.5, 0, 0, 0,
                           0, 0, 0, 0, 0.5, 0, 0, 0,
@@ -69,9 +69,9 @@ HIST_IMG_A = numpy.array([0, 0, 0, 0, 0.5, 0, 0, 0,
 
 class HOGTest(unittest.TestCase):
   """Performs various tests"""
-  
+
   def test01_GradientMaps(self):
-    """Test the Gradient maps computation"""
+    #"""Test the Gradient maps computation"""
 
     # Declare reference arrays
     hgm = bob.ip.GradientMaps(5,5)
@@ -113,7 +113,7 @@ class HOGTest(unittest.TestCase):
     # SqrtMagnitude
     hgm.forward(SRC_B, mag, ori)
     numpy.allclose(mag, MAG_B, EPSILON)
-    numpy.allclose(ori, ORI_B, EPSILON) 
+    numpy.allclose(ori, ORI_B, EPSILON)
 
     # Equal/Not equal operator
     hgm.magnitude_type = bob.ip.GradientMagnitudeType.Magnitude
@@ -148,10 +148,10 @@ class HOGTest(unittest.TestCase):
     hgm3 = bob.ip.GradientMaps(hgm)
     self.assertTrue(  hgm == hgm3 )
     self.assertFalse( hgm != hgm3 )
-    
-    
+
+
   def test02_hogComputeCellHistogram(self):
-    """Test the HOG computation for a given cell using hog_compute_cell()"""
+    #"""Test the HOG computation for a given cell using hog_compute_cell()"""
 
     # Check with first input array
     hist = numpy.ndarray(shape=(8,), dtype='float64')
@@ -163,15 +163,15 @@ class HOGTest(unittest.TestCase):
     numpy.allclose(hist2, HIST_A, EPSILON)
     hist2 = bob.ip.hog_compute_histogram_(MAG1_A, ORI_A, 8)
     numpy.allclose(hist, HIST_A, EPSILON)
-    
+
     # Check with second input array
     bob.ip.hog_compute_histogram(MAG_B, ORI_B, hist)
     numpy.allclose(hist, HIST_B, EPSILON)
     bob.ip.hog_compute_histogram_(MAG_B, ORI_B, hist)
     numpy.allclose(hist, HIST_B, EPSILON)
-  
+
   def test03_hogNormalizeBlock(self):
-    """Test the block normalization using hog_normalize_block()"""
+    #"""Test the block normalization using hog_normalize_block()"""
 
     # Vectorizes the 3D histogram into a 1D one
     HIST_1D = numpy.reshape(HIST_3D, (20,))
@@ -194,7 +194,7 @@ class HOGTest(unittest.TestCase):
     numpy.allclose(hist2, py_L2ref, EPSILON)
     # L2Hys Norm
     py_L2Hysref = HIST_1D / numpy.linalg.norm(HIST_1D)
-    numpy.clip(py_L2Hysref, a_min=0, a_max=0.2) 
+    numpy.clip(py_L2Hysref, a_min=0, a_max=0.2)
     py_L2Hysref = py_L2Hysref / numpy.linalg.norm(py_L2Hysref)
     bob.ip.normalize_block(HIST_3D, hist, bob.ip.BlockNorm.L2Hys)
     numpy.allclose(hist, py_L2Hysref, EPSILON)
@@ -202,9 +202,9 @@ class HOGTest(unittest.TestCase):
     numpy.allclose(hist, py_L2Hysref, EPSILON)
     # L1 Norm
     py_L1ref = HIST_1D / numpy.linalg.norm(HIST_1D, 1)
-    bob.ip.normalize_block(HIST_3D, hist, bob.ip.BlockNorm.L1) 
+    bob.ip.normalize_block(HIST_3D, hist, bob.ip.BlockNorm.L1)
     numpy.allclose(hist, py_L1ref, EPSILON)
-    bob.ip.normalize_block_(HIST_3D, hist, bob.ip.BlockNorm.L1) 
+    bob.ip.normalize_block_(HIST_3D, hist, bob.ip.BlockNorm.L1)
     numpy.allclose(hist, py_L1ref, EPSILON)
     # L1 Norm sqrt
     py_L1sqrtref = HIST_1D / math.sqrt(numpy.linalg.norm(HIST_1D, 1))
@@ -214,13 +214,13 @@ class HOGTest(unittest.TestCase):
     numpy.allclose(hist, py_L1sqrtref, EPSILON)
 
   def test04_HOG(self):
-    """Test the HOG class which is used to perform the full feature 
-      extraction"""
-    
-    # HOG features extractor 
+    #"""Test the HOG class which is used to perform the full feature
+    #  extraction"""
+
+    # HOG features extractor
     hog = bob.ip.HOG(8,12)
     # Check members
-    self.assertTrue( hog.height == 8) 
+    self.assertTrue( hog.height == 8)
     self.assertTrue( hog.width == 12)
     self.assertTrue( hog.magnitude_type == bob.ip.GradientMagnitudeType.Magnitude)
     self.assertTrue( hog.cell_dim == 8)
@@ -239,9 +239,9 @@ class HOGTest(unittest.TestCase):
 
     # Resize
     hog.resize(12, 16)
-    self.assertTrue( hog.height == 12) 
+    self.assertTrue( hog.height == 12)
     self.assertTrue( hog.width == 16)
-    
+
     # Disable block normalization
     hog.disable_block_normalization()
     self.assertTrue( hog.block_y == 1)
