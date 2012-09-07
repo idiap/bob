@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
 # Andre Anjos <andre.anjos@idiap.ch>
-# Tue 27 Mar 2012 08:42:30 CEST 
+# Tue 27 Mar 2012 08:42:30 CEST
 
 """Calculates the version number based on some indicators.
 
@@ -22,14 +22,14 @@ BOB_REPOSITORY = 'https://github.com/idiap/bob.git'
 
 def git_remote_version_branches():
   """Get the branches available on the origin using git ls-remote"""
-  
+
   try:
-    p = subprocess.Popen(['git', 'ls-remote', '--heads', BOB_REPOSITORY], 
+    p = subprocess.Popen(['git', 'ls-remote', '--heads', BOB_REPOSITORY],
         stdout=subprocess.PIPE, stdin=None)
     stdout, stderr = p.communicate()
-    
+
     if p.returncode != 0: raise RuntimeError
-  
+
     cand = [k[-1].split('/')[-1] for k in [j.split() for j in stdout.split('\n')] if k]
     return [k for k in cand if BRANCH_RE.match(k)]
 
@@ -38,14 +38,14 @@ def git_remote_version_branches():
 
 def git_version_branches():
   """Get the branches available on the origin"""
-  
+
   try:
-    p = subprocess.Popen(['git', 'branch', '-a'], stdout=subprocess.PIPE, 
+    p = subprocess.Popen(['git', 'branch', '-a'], stdout=subprocess.PIPE,
         stdin=None)
     stdout, stderr = p.communicate()
-    
+
     if p.returncode != 0: raise RuntimeError
-   
+
     cand = list(set([j.strip('* ').split('/')[-1] for j in stdout.split('\n')]))
     return [k for k in cand if k and BRANCH_RE.match(k)]
 
@@ -54,18 +54,18 @@ def git_version_branches():
 
 def git_current_branch():
   """Get the current branch we are sitting on"""
-  
+
   try:
     p = subprocess.Popen(['git', 'branch'], stdout=subprocess.PIPE, stdin=None)
     stdout, stderr = p.communicate()
 
     if p.returncode != 0: raise RuntimeError
-    
+
     for k in stdout.split('\n'):
       if not k: continue
       if k[0] == '*':
         return k[2:].strip()
- 
+
     # if you get to this, point something went wrong
     raise RuntimeError
 
@@ -76,7 +76,7 @@ def git_next_minor_version(branch):
   """Gets the next minor version"""
 
   try:
-    p = subprocess.Popen(['git', 'tag', '-l'], stdout=subprocess.PIPE, 
+    p = subprocess.Popen(['git', 'tag', '-l'], stdout=subprocess.PIPE,
         stdin=None)
     stdout, stderr = p.communicate()
 
@@ -91,7 +91,7 @@ def git_next_minor_version(branch):
     next_version[2] += 1
 
     return '.'.join([str(k) for k in next_version])
- 
+
   except:
     print "Warning: could not determine latest tag on branch (%s). Assuming it is %s.0" % (branch, branch)
     return branch + '.0'
@@ -125,16 +125,13 @@ def git_next_version(branch):
     # we are on a stable branch
     return git_next_minor_version(branch)
 
-  elif branch == 'master':
+  else:
     # we are on the master tip
     return git_next_major_version()
 
-  else:
-    print "Warning: not on 'master' or any known stable branch. Cannot guess next version"
-
 def git_count(branch):
   """Count the number of commits in the repository.
-  
+
   Note: This does not work right for shallow git clones.
   """
 
@@ -142,9 +139,9 @@ def git_count(branch):
     p = subprocess.Popen(['git', 'rev-list', branch],
         stdout=subprocess.PIPE, stdin=None)
     stdout, stderr = p.communicate()
-    
+
     if p.returncode != 0: raise RuntimeError
-    
+
     return stdout.count('\n')
 
   except:
@@ -193,12 +190,12 @@ if __name__ == '__main__':
     if not options.version:
       if branch is not None:
         options.version =  git_next_version(branch)
-        
+
   if options.count is None:
     options.count = git_count(branch)
 
   if not options.version: print 'unknown'
-  else: 
+  else:
     final = options.version + options.letter + str(options.count)
     StrictVersion(final) #double-checks all is good
     print final
