@@ -94,8 +94,9 @@ def bob_variables():
   proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
       stderr=subprocess.STDOUT)
 
-  kw = {}
   output = proc.communicate()[0].strip()
+
+  kw = {}
   kw['version'] = output if proc.returncode == 0 else None
 
   if kw['version'] is None:
@@ -112,11 +113,28 @@ BOB = bob_variables()
 class build_ext(build_ext_base):
   '''Customized extension to build bob.python bindings in the expected way'''
 
+  linker_is_smart = None
+
   def __init__(self, *args, **kwargs):
     build_ext_base.__init__(self, *args, **kwargs)
 
   def build_extension(self, ext):
     '''Concretely builds the extension given as input'''
+
+    def linker_can_remove_symbols(linker):
+      '''Tests if the `ld` linker can remove unused symbols from linked
+      libraries. In this case, use the --no-as-needed flag during link'''
+
+      import tempfile
+      f, name = tempfile.mkstemp()
+      del f
+
+      cmd = linker + ['-Wl,--no-as-needed', '-lm', '-o', name]
+      proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+          stderr=subprocess.STDOUT)
+      output = proc.communicate()[0]
+      os.unlink(name)
+      return True if proc.returncode == 0 else False
 
     def ld_ok(opt):
       '''Tells if a certain option is a go for the linker'''
@@ -126,6 +144,10 @@ class build_ext(build_ext_base):
 
     # Some clean-up on the linker which is screwed up...
     self.compiler.linker_so = [k for k in self.compiler.linker_so if ld_ok(k)]
+
+    if self.linker_is_smart is None:
+      self.linker_is_smart = linker_can_remove_symbols(self.compiler.linker_so)
+      if self.linker_is_smart: self.compiler.linker_so += ['-Wl,--no-as-needed']
 
     build_ext_base.build_extension(self, ext)
 
