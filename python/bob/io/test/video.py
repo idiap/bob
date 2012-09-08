@@ -23,6 +23,22 @@
 import os, sys
 import tempfile
 import pkg_resources
+from nose.plugins.skip import SkipTest
+import functools
+
+def ffmpeg_found(test):
+  '''Decorator to check if the FFMPEG is available before enabling a test'''
+
+  @functools.wraps(test)
+  def wrapper(*args, **kwargs):
+    try:
+      from .._io import VideoReader, VideoWriter
+      return test(*args, **kwargs)
+    except ImportError:
+      raise SkipTest('FFMpeg was not available at compile time')
+
+  return wrapper
+
 
 def F(f):
   """Returns the test file on the "data" subdirectory"""
@@ -44,6 +60,7 @@ import bob
 class VideoTest(unittest.TestCase):
   """Performs various combined read/write tests on video files"""
   
+  @ffmpeg_found
   def test01_CanOpen(self):
 
     # This test opens and verifies some properties of the test video available.
@@ -57,6 +74,7 @@ class VideoTest(unittest.TestCase):
     self.assertEqual(len(v), 375)
     self.assertEqual(v.codec_name, 'mjpeg')
 
+  @ffmpeg_found
   def test02_CanReadImages(self):
 
     # This test shows how you can read image frames from a VideoReader
@@ -72,6 +90,7 @@ class VideoTest(unittest.TestCase):
       self.assertEqual(frame.shape[1], 240) #height
       self.assertEqual(frame.shape[2], 320) #width
 
+  @ffmpeg_found
   def test03_CanGetSpecificFrames(self):
 
     # This test shows how to get specific frames from a VideoReader
@@ -100,6 +119,7 @@ class VideoTest(unittest.TestCase):
     # the last frame in the sequence is frame 27 as you can check
     self.assertTrue( numpy.array_equal(f18_30[-1], f27) )
 
+  @ffmpeg_found
   def test04_CanWriteVideo(self):
 
     # This test reads all frames in sequence from a initial video and records
@@ -127,6 +147,7 @@ class VideoTest(unittest.TestCase):
 
     del iv2 # triggers closing of the input video stream
 
+  @ffmpeg_found
   def test05_CanUseArrayInterface(self):
 
     # This shows you can use the array interface to read an entire video
