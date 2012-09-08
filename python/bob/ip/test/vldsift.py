@@ -25,6 +25,22 @@ import unittest
 import bob
 import numpy
 import pkg_resources
+from nose.plugins.skip import SkipTest
+import functools
+
+def vldsift_found(test):
+  '''Decorator to check if the VLDSIFT class is present before enabling a test'''
+
+  @functools.wraps(test)
+  def wrapper(*args, **kwargs):
+    try:
+      from .._ip import VLDSIFT
+      return test(*args, **kwargs)
+    except ImportError:
+      raise SkipTest('VLFeat was not available at compile time')
+
+  return wrapper
+
 
 def F(f):
   """Returns the test file on the "data" subdirectory"""
@@ -46,6 +62,7 @@ def equals(x, y, epsilon):
 class VLDSiftTest(unittest.TestCase):
   """Performs various tests"""
 
+  @vldsift_found
   def test01_VLDSiftPython(self):
     # Dense SIFT reference using VLFeat 0.9.13 
     # (First 3 descriptors, Gaussian window)

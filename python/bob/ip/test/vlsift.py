@@ -25,6 +25,21 @@ import unittest
 import bob
 import numpy
 import pkg_resources
+from nose.plugins.skip import SkipTest
+import functools
+
+def vlsift_found(test):
+  '''Decorator to check if the VLSIFT class is present before enabling a test'''
+
+  @functools.wraps(test)
+  def wrapper(*args, **kwargs):
+    try:
+      from .._ip import VLSIFT
+      return test(*args, **kwargs)
+    except ImportError:
+      raise SkipTest('VLFeat was not available at compile time')
+
+  return wrapper
 
 def F(f):
   """Returns the test file on the "data" subdirectory"""
@@ -46,6 +61,7 @@ def equals(x, y, epsilon):
 class VLSiftTest(unittest.TestCase):
   """Performs various tests"""
 
+  @vlsift_found
   def test01_VLSift_parametrization(self):
     # Creates a VLSIFT object in order to perform parametrization tests
     op = bob.ip.VLSIFT(48, 64, 3, 5, -1, 0.03, 10., 3.)
@@ -74,6 +90,7 @@ class VLSiftTest(unittest.TestCase):
     self.assertEqual(op.edge_thres, 8.)
     self.assertEqual(op.magnif, 2.)
 
+  @vlsift_found
   def test02_VLSiftKeypointsPython(self):
     # Computes SIFT feature using VLFeat binding
     img = load_image('vlimg_ref.pgm')
@@ -88,6 +105,7 @@ class VLSiftTest(unittest.TestCase):
       # First 4 values are the keypoint descriptions
       self.assertTrue(equals(out_vl[kp][4:], ref_vl[kp,:], 1e-3))
 
+  @vlsift_found
   def test03_comparison(self):
     # Comparisons tests
     op1 = bob.ip.VLSIFT(48, 64, 3, 5, -1, 0.03, 10., 3.)
