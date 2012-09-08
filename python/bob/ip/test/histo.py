@@ -234,7 +234,7 @@ class HistogramTest(unittest.TestCase):
     bob.ip.histogram_equalization(x,y)
     self.assertTrue((y - y_ref == 0).all())
 
-    y2 = bob.ip.histogram_equalize(x)
+    y2 = bob.ip.histogram_equalization(x)
     y2_ref = numpy.array(
       [[0, 12, 38, 63, 102],
        [0, 38, 102, 140, 165],
