@@ -67,6 +67,7 @@ set(BOB_PYTHONPATH "${ABSOLUTE_install_prefix}/${PYTHON_SITE_PACKAGES}")
 configure_file(bin/egg-python.in ${CMAKE_BINARY_DIR}/bin/egg-install @ONLY)
 
 # An easy handler to debug python stuff
+set(BOB_PYTHONPATH "${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES}")
 configure_file(bin/gdbpy.in ${CMAKE_BINARY_DIR}/bin/gdbpy @ONLY)
 
 set(pybin "${CMAKE_BINARY_DIR}/bin/egg-build")
