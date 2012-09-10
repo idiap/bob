@@ -1,7 +1,7 @@
 project(bob_daq)
 
 # This defines the dependencies of this package
-set(bob_deps "bob_ip;bob_visioner")
+set(bob_deps "bob_io;bob_ip;bob_visioner")
 set(shared "${bob_deps}")
 set(incdir ${cxx_incdir};${ImageMagick_INCLUDE_DIRS})
 
@@ -14,12 +14,19 @@ set(src
     "OutputWriter.cc"
     "SimpleController.cc"
     "QtDisplay.cc"
-    "BobOutputWriter.cc"
     "VideoReaderCamera.cc"
     "ConsoleDisplay.cc"
     "CaptureSystem.cc"
     "VisionerFaceLocalization.cc"
     )
+
+if (FFMPEG_FOUND)
+  list(APPEND src
+    "BobOutputWriter.cc"
+    )
+  list(APPEND incdir "${FFMPEG_INCLUDE_DIRS}")
+  add_definitions("-D__STDC_CONSTANT_MACROS")
+endif()
 
 if (V4L2_FOUND)
   list(APPEND src 
