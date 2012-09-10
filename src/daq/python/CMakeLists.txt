@@ -7,9 +7,16 @@ set(incdir ${py_incdir};${ImageMagick_INCLUDE_DIRS})
 
 set(src
    "version.cc"
-   "all.cc"
    "main.cc"
    )
+
+if (FFMPEG_FOUND)
+  list(APPEND src
+    "all.cc"
+    )
+  list(APPEND incdir "${FFMPEG_INCLUDE_DIRS}")
+  add_definitions("-D__STDC_CONSTANT_MACROS")
+endif()
 
 if (OPENCV_FOUND)
   list(APPEND incdir ${OpenCV_INCLUDE_DIRS})

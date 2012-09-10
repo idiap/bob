@@ -23,12 +23,18 @@
 #include "bob/core/python/ndarray.h"
 
 void bind_daq_version();
+
+#ifdef HAVE_FFMPEG
 void bind_daq_all();
+#endif
 
 BOOST_PYTHON_MODULE(_daq) {
 
   bob::python::setup_python("bob classes and sub-classes for data acquisition");
 
   bind_daq_version();
+
+# ifdef HAVE_FFMPEG
   bind_daq_all();
+# endif
 }
