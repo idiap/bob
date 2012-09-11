@@ -340,7 +340,7 @@ static int _GetArrayParamsFromObject(PyObject* op,
     }
 
     //if you get to this point, the types are equivalent or there was no type
-    (*out_arr) = arr;
+    (*out_arr) = (PyArrayObject*)PyArray_FromArray(arr, 0, 0);
     (*out_dtype) = 0;
     (*out_ndim) = 0;
     return writeable? (!PyArray_ISWRITEABLE(arr)) : 0;
@@ -406,6 +406,8 @@ bob::python::convert_t bob::python::convertible(boost::python::object array_like
 
     info.set<npy_intp>(bob::python::num_to_type(arr->descr->type_num),
         PyArray_NDIM(arr), PyArray_DIMS(arr));
+
+    Py_XDECREF(arr);
   }
 
   else { //the passed object is not an array
@@ -449,16 +451,24 @@ bob::python::convert_t bob::python::convertible_to (boost::python::object array_
   if (arr) { //the passed object is an array -- check compatibility
   
     if (info.nd) { //check number of dimensions and shape, if needs to
-      if (PyArray_NDIM(arr) != (int)info.nd) return bob::python::IMPOSSIBLE;
+      if (PyArray_NDIM(arr) != (int)info.nd) {
+        Py_XDECREF(arr);
+        return bob::python::IMPOSSIBLE;
+      }
       if (info.has_valid_shape())
         for (size_t i=0; i<info.nd; ++i)
-          if ((int)info.shape[i] != PyArray_DIM(arr,i)) return bob::python::IMPOSSIBLE;
+          if ((int)info.shape[i] != PyArray_DIM(arr,i)) {
+            Py_XDECREF(arr);
+            return bob::python::IMPOSSIBLE;
+          }
     }
 
     //checks behavior.
     if (behaved) {
       if (!PyArray_ISCARRAY_RO(arr)) retval = bob::python::WITHARRAYCOPY;
     }
+    
+    Py_XDECREF(arr);
 
     return retval;
 
@@ -516,6 +526,8 @@ bob::python::convert_t bob::python::convertible_to(boost::python::object array_l
     if (behaved) {
       if (!PyArray_ISCARRAY_RO(arr)) retval = bob::python::WITHARRAYCOPY;
     }
+        
+    Py_XDECREF(arr);
 
   }
 
@@ -562,6 +574,8 @@ bob::python::convert_t bob::python::convertible_to(boost::python::object array_l
     if (behaved) {
       if (!PyArray_ISCARRAY_RO(arr)) retval = bob::python::WITHARRAYCOPY;
     }
+        
+    Py_XDECREF(arr);
 
   }
 
@@ -636,7 +650,6 @@ bob::python::py_array::py_array(boost::python::object o, boost::python::object _
   m_is_numpy(true)
 {
   if (TPY_ISNONE(o)) PYTHON_ERROR(TypeError, "You cannot pass 'None' as input parameter to C++-bound bob methods that expect NumPy ndarrays (or blitz::Array<T,N>'s). Double-check your input!");
-
   boost::python::object mine = try_refer_ndarray(o, _dtype);
 
   //captures data from a numeric::array
@@ -831,7 +844,7 @@ boost::python::object bob::python::py_array::pyobject() {
   if (m_is_numpy) {
     boost::python::handle<> hdl(boost::python::borrowed(boost::static_pointer_cast<PyObject>(m_data).get()));
     boost::python::object mine(hdl);
-    return wrap_ndarray(mine);
+    return mine;
   }
 
   //if you really want, I can wrap it for you, but in this case I'll make it
