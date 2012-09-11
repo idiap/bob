@@ -341,7 +341,7 @@ static int _GetArrayParamsFromObject(PyObject* op,
     }
 
     //if you get to this point, the types are equivalent or there was no type
-    (*out_arr) = arr;
+    (*out_arr) = (PyArrayObject*)PyArray_FromArray(arr, 0, 0);
     (*out_dtype) = 0;
     (*out_ndim) = 0;
     return writeable? (!PyArray_ISWRITEABLE(arr)) : 0;
@@ -407,6 +407,8 @@ tp::convert_t tp::convertible(bp::object array_like, ca::typeinfo& info,
 
     info.set<npy_intp>(tp::num_to_type(arr->descr->type_num),
         PyArray_NDIM(arr), PyArray_DIMS(arr));
+
+    Py_XDECREF(arr);
   }
 
   else { //the passed object is not an array
@@ -450,16 +452,26 @@ tp::convert_t tp::convertible_to (bp::object array_like,
   if (arr) { //the passed object is an array -- check compatibility
   
     if (info.nd) { //check number of dimensions and shape, if needs to
-      if (PyArray_NDIM(arr) != (int)info.nd) return tp::IMPOSSIBLE;
+      if (PyArray_NDIM(arr) != (int)info.nd)
+      {
+        Py_XDECREF(arr);
+        return tp::IMPOSSIBLE;
+      }
       if (info.has_valid_shape())
         for (size_t i=0; i<info.nd; ++i)
-          if ((int)info.shape[i] != PyArray_DIM(arr,i)) return tp::IMPOSSIBLE;
+          if ((int)info.shape[i] != PyArray_DIM(arr,i))
+          {
+            Py_XDECREF(arr);
+            return tp::IMPOSSIBLE;
+          }
     }
 
     //checks behavior.
     if (behaved) {
       if (!PyArray_ISCARRAY_RO(arr)) retval = tp::WITHARRAYCOPY;
     }
+
+    Py_XDECREF(arr);
 
     return retval;
 
@@ -518,6 +530,8 @@ tp::convert_t tp::convertible_to(bp::object array_like, bp::object dtype_like,
       if (!PyArray_ISCARRAY_RO(arr)) retval = tp::WITHARRAYCOPY;
     }
 
+    Py_XDECREF(arr);
+
   }
 
   else { //the passed object is not an array
@@ -563,6 +577,8 @@ tp::convert_t tp::convertible_to(bp::object array_like, bool writeable,
     if (behaved) {
       if (!PyArray_ISCARRAY_RO(arr)) retval = tp::WITHARRAYCOPY;
     }
+
+    Py_XDECREF(arr);
 
   }
 
