@@ -28,7 +28,11 @@ find_package(Qt4 COMPONENTS QtCore QtGui)
 if(QT4_FOUND)
   set(HAVE_QT4 ON CACHE BOOL "Has Qt4 installed")
   add_subdirectory(visioner)
-  add_subdirectory(daq)
+
+  if (FFMPEG_FOUND) #daq also needs FFMPEG to be present
+    add_subdirectory(daq)
+  endif()
+
 endif()
 
 set(ENABLED_PACKAGES "${ENABLED_PACKAGES}" PARENT_SCOPE)
