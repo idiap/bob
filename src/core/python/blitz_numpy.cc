@@ -165,9 +165,9 @@ template <typename T, int N> struct bz_to_npy {
     PyArrayObject* retval = make_pyarray(N, dims, tp::ctype_to_num<T>());
 
     //wrap new PyArray in a blitz layer and then copy the data
-    shape_type shape;
+    shape_type shape=0;
     for (int k=0; k<retval->nd; ++k) shape[k] = retval->dimensions[k];
-    shape_type stride;
+    shape_type stride=0;
     for (int k=0; k<retval->nd; ++k) stride[k] = (retval->strides[k]/sizeof(T));
     array_type bzdest((T*)retval->data, shape, stride, blitz::neverDeleteData);
     bzdest = tv;
