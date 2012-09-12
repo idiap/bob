@@ -11,7 +11,6 @@ import sys
 import errno
 import stat
 import logging
-import sqlite3
 
 class null(object):
   """A look-alike stream that discards the input"""
@@ -25,12 +24,13 @@ class null(object):
     """Flushes the stream"""
 
     pass
-
+  
 def sqlite3_accepts_uris():
   """Checks lock-ability for SQLite on the current file system"""
+  from sqlite3 import connect
 
   try:
-    sqlite3.connect(':memory:', uri=True)
+    connect(':memory:', uri=True)
     return True
   except TypeError:
     return False
@@ -38,17 +38,73 @@ def sqlite3_accepts_uris():
 class SQLiteConnector(object):
   '''An object that handles the connection to SQLite databases.'''
 
+  @staticmethod
+  def filesystem_is_lockable(database):
+    """Checks if the filesystem is lockable"""
+    from sqlite3 import connect, OperationalError
+
+    old = os.path.exists(database) #memorize if the database was already there
+    conn = connect(database)
+
+    retval = True
+    try:
+      conn.execute('PRAGMA synchronous = OFF')
+    except OperationalError:
+      retval = False
+    finally:
+      if not old and os.path.exists(database): os.unlink(database)
+
+    return retval
+
   SQLITE3_WITH_URIS = sqlite3_accepts_uris()
 
   def __init__(self, filename, readonly=False, lock=None):
+    """Initializes the connector
+
+    Keyword arguments
+
+    filename
+      The name of the file containing the SQLite database
+
+    readonly
+      Should I try and open the database in read-only mode? URI support 
+      is required. If URI's are not supported, a warning is emitted.
+
+    lock
+      Use the given lock system. If not specified, use the default. Values that
+      can be given corresponds to the locking capabilities of the SQLite
+      driver. For UNIX filesystems the default list is:
+
+      unix-dotfile
+        uses dot-file locking rather than POSIX advisory locks.
+
+      unix-excl
+        obtains and holds an exclusive lock on database files, preventing other
+        processes from accessing the database. Also keeps the wal-index in heap
+        rather than in shared memory.
+
+      unix-none
+        all file locking operations are no-ops.
+
+      unix-namedsem
+        uses named semaphores for file locking. VXWorks only.
+
+    """
 
     opts = {}
     if readonly: opts['mode'] = 'ro'
     if isinstance(lock, (str, unicode)): opts['vfs'] =  lock
 
+    self.lockable = SQLiteConnector.filesystem_is_lockable(filename)
+
     if opts and not self.SQLITE3_WITH_URIS:
-      import warnings
-      warnings.warn('Got a request for a connection string to an SQLite session with options, but SQLite connection options are not supported at the installed version of Python (check http://bugs.python.org/issue13773 for a discussion and a patch). Returning a standard connection string.' % ('.'.join(sqlite_version),))
+
+      if not self.lockable:
+        import warnings
+        warnings.warn('Got a request for a connection string to an SQLite session with options, but SQLite connection options are not supported at the installed version of Python (check http://bugs.python.org/issue13773 for a discussion and a patch). Furthermore, the place where the database is sitting (%s) is on a filesystem that does not seem to support locks. Returning a standard connection string and hopping for the best.' % (filename, '.'.join(sqlite_version),))
+
+      # Note: the warning will only come if you are in a filesystem that does
+      # not support locks.
       opts = {}
 
     if self.SQLITE3_WITH_URIS:
@@ -61,10 +117,25 @@ class SQLiteConnector(object):
     
   def __call__(self):
 
-    if self.SQLITE3_WITH_URIS:
-      return sqlite3.connect(self.uri, uri=True)
+    from sqlite3 import connect
 
-    return sqlite3.connect(self.uri)
+    if self.SQLITE3_WITH_URIS:
+      return connect(self.uri, uri=True)
+
+    return connect(self.uri)
+
+  def create_engine(self, echo=False):
+    """Returns an SQLAlchemy engine"""
+
+    from sqlalchemy import create_engine
+    return create_engine('sqlite://', creator=self, echo=echo)
+
+  def session(self, echo=False):
+    """Returns an SQLAlchemy session"""
+  
+    from sqlalchemy.orm import sessionmaker
+    Session = sessionmaker(bind=self.create_engine(echo))
+    return Session()
 
 def session(dbtype, dbfile, echo=False):
   """Creates a session to an SQLite database"""
@@ -77,24 +148,54 @@ def session(dbtype, dbfile, echo=False):
   Session = sessionmaker(bind=engine)
   return Session()
 
-def session_readonly(dbtype, dbfile, echo=False):
-  """Creates a session to an SQLite database.
+def session_try_readonly(dbtype, dbfile, echo=False):
+  """Creates a read-only session to an SQLite database. If read-only sessions 
+  are not supported by the underlying sqlite3 python DB driver, then a normal
+  session is returned. A warning is emitted in case the underlying filesystem
+  does not support locking properly.
   
   Raises a RuntimeError if the file does not exist.
+  Raises a NotImplementedError if the dbtype is not supported.
   """
 
   if dbtype != 'sqlite':
-    raise NotImplemented, "Read-only sessions are only currently supported for SQLite databases"
+    raise NotImplementedError, "Read-only sessions are only currently supported for SQLite databases"
 
   if not os.path.exists(dbfile):
     raise RuntimeError, "Cannot open **read-only** SQLite session to a file that does not exist (%s)" % dbfile
 
-  from sqlalchemy import create_engine
-  from sqlalchemy.orm import sessionmaker
+  connector = SQLiteConnector(dbfile, readonly=True, lock='unix-none')
+  return connector.session(echo=echo)
 
-  engine = create_engine('sqlite://', creator=SQLiteConnector(dbfile, readonly=True, lock='unix-none'))
-  Session = sessionmaker(bind=engine)
-  return Session()
+def create_engine_try_nolock(dbtype, dbfile, echo=False):
+  """Creates an engine connected to an SQLite database with no locks. If
+  engines without locks are not supported by the underlying sqlite3 python DB
+  driver, then a normal engine is returned. A warning is emitted if the
+  underlying filesystem does not support locking properly in this case.
+
+  Raises a NotImplementedError if the dbtype is not supported.
+  """
+
+  if dbtype != 'sqlite':
+    raise NotImplementedError, "Unlocked engines are only currently supported for SQLite databases"
+
+  connector = SQLiteConnector(dbfile, lock='unix-none')
+  return connector.create_engine(echo=echo)
+
+def session_try_nolock(dbtype, dbfile, echo=False):
+  """Creates a session to an SQLite database with no locks. If sessions without
+  locks are not supported by the underlying sqlite3 python DB driver, then a
+  normal session is returned. A warning is emitted if the underlying filesystem
+  does not support locking properly in this case.
+
+  Raises a NotImplementedError if the dbtype is not supported.
+  """
+  
+  if dbtype != 'sqlite':
+    raise NotImplementedError, "Unlocked sessions are only currently supported for SQLite databases"
+
+  connector = SQLiteConnector(dbfile, lock='unix-none')
+  return connector.session(echo=echo)
 
 def connection_string(dbtype, dbfile, opts={}):
   """Returns a connection string for supported platforms
