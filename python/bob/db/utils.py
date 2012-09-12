@@ -101,7 +101,7 @@ class SQLiteConnector(object):
 
       if not self.lockable:
         import warnings
-        warnings.warn('Got a request for a connection string to an SQLite session with options, but SQLite connection options are not supported at the installed version of Python (check http://bugs.python.org/issue13773 for a discussion and a patch). Furthermore, the place where the database is sitting (%s) is on a filesystem that does not seem to support locks. Returning a standard connection string and hopping for the best.' % (filename, '.'.join(sqlite_version),))
+        warnings.warn('Got a request for an SQLite connection with options, but SQLite connection options are not supported at the installed version of Python (check http://bugs.python.org/issue13773 for a discussion and a patch). Furthermore, the place where the database is sitting ("%s") is on a filesystem that does **not** seem to support locks. I\'m returning a connection and hopping for the best.' % (filename,))
 
       # Note: the warning will only come if you are in a filesystem that does
       # not support locks.
