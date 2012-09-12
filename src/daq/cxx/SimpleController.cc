@@ -17,6 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include "bob/core/logging.h"
 #include "bob/daq/SimpleController.h"
 #include <pthread.h>
 #include <sys/time.h>
@@ -230,7 +232,7 @@ void SimpleController::imageReceived(unsigned char* image, Camera::PixelFormat p
   
   if (pixelFormat == Camera::YUYV) {
     if (2*width*sizeof(char) != (unsigned int)stride) {
-      fprintf(stderr, "SimpleController: stride not supported\n");
+      bob::core::error << "SimpleController: stride not supported" << std::endl;
       return;
     }
     
@@ -275,7 +277,7 @@ void SimpleController::imageReceived(unsigned char* image, Camera::PixelFormat p
     rgbimage = blitz::Array<unsigned char, 2>(image, blitz::shape(height, width*3), blitz::neverDeleteData);
   }
   else {
-    fprintf(stderr, "SimpleController: unsupported pixel format\n");
+    bob::core::error << "SimpleController: unsupported pixel format" << std::endl;
     return;
   }
 

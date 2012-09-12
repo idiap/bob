@@ -17,6 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include "bob/core/logging.h"
 #include "bob/daq/V4LCamera.h"
 #include <cstring>
 
@@ -147,14 +149,14 @@ int V4LCamera::open() {
 
     // Check if the device supports capture
     if (!(v4lstruct->cap.capabilities & V4L2_CAP_VIDEO_CAPTURE)) {
-      fprintf(stderr, "The device doesn't support video capture");
+      bob::core::error << "The device doesn't support video capture" << std::endl;
       close();
       return -1;
     }
 
     // Check if the camera supports streaming
     if (!(v4lstruct->cap.capabilities & V4L2_CAP_STREAMING)) {
-      fprintf(stderr, "The device doesn't support video streaming");
+      bob::core::error << "The device doesn't support video streaming" << std::endl;
       close();
       return -1;
     }
@@ -354,7 +356,7 @@ int V4LCamera::getSupportedFrameSizes(PixelFormat pixelFormat, std::vector<Frame
     
     while (xioctl(v4lstruct->device, VIDIOC_ENUM_FRAMESIZES, &frmsizeenum) != -1) {
       if (frmsizeenum.type != V4L2_FRMSIZE_TYPE_DISCRETE) {
-        fprintf(stderr, "Unsupported type of framesizes enumeration\n");
+        bob::core::error << "Unsupported type of framesizes enumeration" << std::endl;
         return -1;
       }
       
@@ -378,7 +380,7 @@ int V4LCamera::getSupportedFrameIntervals(PixelFormat pixelFormat, FrameSize& fr
     frmivalenum.index = 0;
     while (xioctl(v4lstruct->device, VIDIOC_ENUM_FRAMEINTERVALS, &frmivalenum) != -1) {
       if (frmivalenum.type != V4L2_FRMSIZE_TYPE_DISCRETE) {
-        fprintf(stderr, "Unsupported type of frameinterval enumeration\n");
+        bob::core::error << "Unsupported type of frameinterval enumeration" << std::endl;
         //return -1;
         break;
       }
@@ -476,19 +478,21 @@ void V4LCamera::setFrameInterval(FrameInterval& frameInterval) {
 
 void V4LCamera::printSummary() {
   if (v4lstruct->opened) {
-    printf("Device name: %s\n", v4lstruct->device_name);
-    printf("Bus info: %s\n", v4lstruct->cap.bus_info);
-    printf("Card: %s\n", v4lstruct->cap.card);
-    printf("Driver: %s\n", v4lstruct->cap.driver);
-    printf("Version: %d\n", v4lstruct->cap.version);
+    bob::core::info << "Device name: " << v4lstruct->device_name << std::endl;
+    bob::core::info << "Bus info: " << v4lstruct->cap.bus_info << std::endl;
+    bob::core::info << "Card: " << v4lstruct->cap.card << std::endl;
+    bob::core::info << "Driver: " << v4lstruct->cap.driver << std::endl;
+    bob::core::info << "Version: " << v4lstruct->cap.version << std::endl;
 
-    printf("Pixel format: %d\n", v4lstruct->format.pixelformat);
-    printf("  %dx%d @ %d/%d\n", v4lstruct->format.width, v4lstruct->format.height,
-          v4lstruct->param.timeperframe.numerator, v4lstruct->param.timeperframe.denominator);
+    bob::core::info << "Pixel format: " << v4lstruct->format.pixelformat << std::endl;
+    bob::core::info << "  " << v4lstruct->format.width << "x" 
+      << v4lstruct->format.height << " @ " 
+      << v4lstruct->param.timeperframe.numerator << "/" 
+      << v4lstruct->param.timeperframe.denominator << std::endl;
   }
   else {
-    printf("Device name: %s\n", v4lstruct->device_name);
-    printf("Device not open\n");
+    bob::core::info << "Device name: " << v4lstruct->device_name << std::endl;
+    bob::core::info << "Device not open" << std::endl;
   }
 }
 
@@ -553,7 +557,7 @@ int V4LCamera::start() {
                                   v4lstruct->device, buffer.m.offset);
     
     if (v4lstruct->buffers[i].start == MAP_FAILED) {
-      fprintf(stderr, "mmap error\n");
+      bob::core::error << "mmap error" << std::endl;
       
       for (unsigned int j = 0; j < i; j++) {
         munmap(v4lstruct->buffers[j].start, v4lstruct->buffers[j].length);
@@ -624,7 +628,7 @@ void V4LCamera::captureLoop() {
 
     if (ret == 0) {
       // Timeout expired
-      fprintf(stderr, "select timout: %d seconds without frame\n", 1);
+      bob::core::error << "select timout: " << 1 << " seconds without frame" << std::endl;
       continue;
     }
     else if (ret == -1) {

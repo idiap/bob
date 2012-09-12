@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "bob/core/logging.h"
 #include "bob/core/cast.h"
 #include "bob/daq/VisionerFaceLocalization.h"
 #include "bob/ip/color.h"
@@ -45,7 +46,7 @@ VisionerFaceLocalization::VisionerFaceLocalization(const char* model_path) :
   }
 
   if(!ok) {
-    fprintf(stderr, "Error loading Visioner model %s\n", model_path);
+    bob::core::error << "Error loading Visioner model " << model_path << std::endl;
     // FIXME Throw an exception
     exit(1);
   }
@@ -112,7 +113,7 @@ void VisionerFaceLocalization::localize() {
       bool ok = detector->load(gray.data(), gray.rows(), gray.cols());
 
       if (!ok) {
-        fprintf(stderr, "Visioner can't load image\n");
+        bob::core::error << "Visioner can't load image" << std::endl;
         continue;
       }
 
@@ -121,7 +122,7 @@ void VisionerFaceLocalization::localize() {
       detector->sort_desc(detections);
   
       if (detections.size() == 0) {
-        fprintf(stderr, "Visioner cannot find faces on image\n");
+        bob::core::error << "Visioner cannot find faces on image" << std::endl;
         continue;
       }
 
