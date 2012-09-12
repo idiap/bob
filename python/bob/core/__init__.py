@@ -8,15 +8,14 @@ import logging
 
 #this configures our core logger
 logger = logging.getLogger("bob")
-logger.setLevel(logging.INFO)
 ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
 formatter = logging.Formatter("%(name)s@%(asctime)s|%(levelname)s: %(message)s")
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
-cxx_logger = logging.getLogger('bob.cxx')
-debug.reset(PythonLoggingOutputDevice(logger.debug))
-info.reset(PythonLoggingOutputDevice(logger.info))
-warn.reset(PythonLoggingOutputDevice(logger.warn))
-error.reset(PythonLoggingOutputDevice(logger.error))
+cxx_logger = logging.getLogger('bob.c++')
+cxx_logger.setLevel(logging.WARNING)
+debug.reset(PythonLoggingOutputDevice(cxx_logger.debug))
+info.reset(PythonLoggingOutputDevice(cxx_logger.info))
+warn.reset(PythonLoggingOutputDevice(cxx_logger.warn))
+error.reset(PythonLoggingOutputDevice(cxx_logger.error))
