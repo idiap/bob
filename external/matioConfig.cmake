@@ -21,4 +21,6 @@ if(matio_FOUND)
     add_definitions(-DHAVE_MATIO_OLD_COMPLEXSPLIT=1)
   endif(HAVE_MATIO_OLD_COMPLEXSPLIT)
 
+  include_directories(${matio_INCLUDEDIR})
+
 endif()
