@@ -33,23 +33,21 @@ namespace io = bob::io;
 namespace mach = bob::machine;
 namespace train = bob::trainer;
 
-train::SVDPCATrainer::SVDPCATrainer(bool zscore_convert)
-  : m_zscore_convert(zscore_convert) {
-  }
-
 train::SVDPCATrainer::SVDPCATrainer()
-  : m_zscore_convert(false) {
+  {
   }
 
 train::SVDPCATrainer::SVDPCATrainer(const train::SVDPCATrainer& other)
-  : m_zscore_convert(other.m_zscore_convert) {
+  {
   }
 
 train::SVDPCATrainer::~SVDPCATrainer() {}
 
 train::SVDPCATrainer& train::SVDPCATrainer::operator=
 (const train::SVDPCATrainer& other) {
-  m_zscore_convert = other.m_zscore_convert;
+  if(this != &other)
+  {
+  }
   return *this;
 }
 
@@ -114,13 +112,6 @@ void train::SVDPCATrainer::train(bob::machine::LinearMachine& machine,
   // finally, we set also the eigen values in this version
   eigen_values.resize(n_sigma);
   eigen_values = blitz::pow2(sigma)/(n_samples-1);
-
-  // if the user wants z-score normalization
-  if (m_zscore_convert) {
-    blitz::Array<double,1> tmp(eigen_values.extent(0));
-    tmp = blitz::sqrt(eigen_values);
-    machine.setInputDivision(tmp);
-  }
 }
 
 void train::SVDPCATrainer::train(bob::machine::LinearMachine& machine, 
