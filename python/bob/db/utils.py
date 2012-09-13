@@ -25,15 +25,23 @@ class null(object):
 
     pass
   
-def sqlite3_accepts_uris():
+def apsw_is_available():
   """Checks lock-ability for SQLite on the current file system"""
-  from sqlite3 import connect
 
   try:
-    connect(':memory:', uri=True)
-    return True
-  except TypeError:
+    import apsw #another python sqlite wrapper (maybe supports URIs)
+  except ImportError:
     return False
+
+  # if you got here, apsw is available, check we have matching versions w.r.t
+  # the sqlit3 module
+  import sqlite3
+
+  if apsw.sqlitelibversion() != sqlite3.sqlite_version:
+    return False
+
+  # if you get to this point, all seems OK
+  return True
 
 class SQLiteConnector(object):
   '''An object that handles the connection to SQLite databases.'''
@@ -56,7 +64,7 @@ class SQLiteConnector(object):
 
     return retval
 
-  SQLITE3_WITH_URIS = sqlite3_accepts_uris()
+  APSW_IS_AVAILABLE = apsw_is_available()
 
   def __init__(self, filename, readonly=False, lock=None):
     """Initializes the connector
@@ -67,62 +75,35 @@ class SQLiteConnector(object):
       The name of the file containing the SQLite database
 
     readonly
-      Should I try and open the database in read-only mode? URI support 
-      is required. If URI's are not supported, a warning is emitted.
+      Should I try and open the database in read-only mode? 
 
     lock
-      Use the given lock system. If not specified, use the default. Values that
-      can be given corresponds to the locking capabilities of the SQLite
-      driver. For UNIX filesystems the default list is:
-
-      unix-dotfile
-        uses dot-file locking rather than POSIX advisory locks.
-
-      unix-excl
-        obtains and holds an exclusive lock on database files, preventing other
-        processes from accessing the database. Also keeps the wal-index in heap
-        rather than in shared memory.
-
-      unix-none
-        all file locking operations are no-ops.
-
-      unix-namedsem
-        uses named semaphores for file locking. VXWorks only.
-
+      Any vfs name as output by apsw.vfsnames()
     """
 
-    opts = {}
-    if readonly: opts['mode'] = 'ro'
-    if isinstance(lock, (str, unicode)): opts['vfs'] =  lock
+    self.readonly = readonly
+    self.vfs = lock
+    self.filename = filename
+    self.lockable = SQLiteConnector.filesystem_is_lockable(self.filename)
 
-    self.lockable = SQLiteConnector.filesystem_is_lockable(filename)
-
-    if opts and not self.SQLITE3_WITH_URIS:
-
-      if not self.lockable:
+    if (self.readonly or (self.vfs is not None)) and \
+        not self.APSW_IS_AVAILABLE and not self.lockable:
         import warnings
-        warnings.warn('Got a request for an SQLite connection with options, but SQLite connection options are not supported at the installed version of Python (check http://bugs.python.org/issue13773 for a discussion and a patch). Furthermore, the place where the database is sitting ("%s") is on a filesystem that does **not** seem to support locks. I\'m returning a connection and hopping for the best.' % (filename,))
-
-      # Note: the warning will only come if you are in a filesystem that does
-      # not support locks.
-      opts = {}
-
-    if self.SQLITE3_WITH_URIS:
-      ostr = ''
-      if opts:
-        ostr = '?' + '&'.join([k + '=' + v for (k, v) in opts.iteritems()])
-      self.uri = 'file:' + filename + ostr
-    else:
-      self.uri = filename
+        warnings.warn('Got a request for an SQLite connection using APSW, but I cannot find an sqlite3-compatible installed version of that module (or the module is not installed at all). Furthermore, the place where the database is sitting ("%s") is on a filesystem that does **not** seem to support locks. I\'m returning a stock connection and hopping for the best.' % (filename,))
     
   def __call__(self):
 
     from sqlite3 import connect
 
-    if self.SQLITE3_WITH_URIS:
-      return connect(self.uri, uri=True)
+    if (self.readonly or (self.vfs is not None)) and self.APSW_IS_AVAILABLE:
+      # and not self.lockable
+      import apsw
+      if self.readonly: flags = apsw.SQLITE_OPEN_READONLY #1
+      else: flags = apsw.SQLITE_OPEN_READWRITE | apsw.SQLITE_OPEN_CREATE #2|4
+      apsw_con = apsw.Connection(self.filename, vfs=self.vfs, flags=flags)
+      return connect(apsw_con)
 
-    return connect(self.uri)
+    return connect(self.filename)
 
   def create_engine(self, echo=False):
     """Returns an SQLAlchemy engine"""
@@ -154,15 +135,11 @@ def session_try_readonly(dbtype, dbfile, echo=False):
   session is returned. A warning is emitted in case the underlying filesystem
   does not support locking properly.
   
-  Raises a RuntimeError if the file does not exist.
   Raises a NotImplementedError if the dbtype is not supported.
   """
 
   if dbtype != 'sqlite':
     raise NotImplementedError, "Read-only sessions are only currently supported for SQLite databases"
-
-  if not os.path.exists(dbfile):
-    raise RuntimeError, "Cannot open **read-only** SQLite session to a file that does not exist (%s)" % dbfile
 
   connector = SQLiteConnector(dbfile, readonly=True, lock='unix-none')
   return connector.session(echo=echo)
