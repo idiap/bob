@@ -99,41 +99,42 @@ def optflow_hs(movie, iterations, alpha, template, stop=0):
 
   print "\nWrote %d frames to %s" % (k, output)
 
-def main():
-  parser=optparse.OptionParser(usage="usage: %prog [options] <movie> <output>",
-      description=__doc__)
-  parser.add_option("-a", "--alpha",
-      action="store", dest="alpha", default=2.0, type=float,
-      help="Modifies the proportion of smoothness in the H&S algorithm (defaults to %default)",
-      metavar="FLOAT")
-  parser.add_option("-i", "--iterations",
-      action="store", dest="iterations", default=1, type=int,
-      help="Modifies the proportion of smoothness in the H&S algorithm (defaults to %default)",
-      metavar="FLOAT")
+def main(user_input=None):
+
+  import argparse
+  
+  parser = argparse.ArgumentParser(description=__doc__,
+      formatter_class=argparse.RawDescriptionHelpFormatter)
+
+  parser.add_argument("movie", type=str, metavar='FILE',
+      help="Input movie to be treated by this script")
+  parser.add_argument("output", type=str, metavar='FILE',
+      help="Output movie containing the HSV representation of the flow")
+
+  parser.add_argument("-a", "--alpha",
+      action="store", dest="alpha", default=2.0, type=float, metavar='FLOAT',
+      help="Modifies the proportion of smoothness in the H&S algorithm (defaults to %(default)s)")
+  parser.add_argument("-i", "--iterations",
+      action="store", dest="iterations", default=1, type=int, metavar='FLOAT',
+      help="Modifies the proportion of smoothness in the H&S algorithm (defaults to %(default)s)")
 
   # This option is not normally shown to the user...
-  parser.add_option("--test",
-      action="store_true", dest="test", default=False,
-      help=optparse.SUPPRESS_HELP)
-      #help="if set, runs an internal verification test and erases any output")
+  parser.add_argument("--self-test", action="store_true", dest="selftest",
+      default=False, help=argparse.SUPPRESS)
 
-  (options, args) = parser.parse_args()
+  args = parser.parse_args(args=user_input)
 
-  if options.test:
+  if args.selftest:
     # then we go into test mode, all input is preset
     outputdir = tempfile.mkdtemp()
     output = os.path.join(outputdir, "%(stem)s.avi")
-    optflow_hs(args[0], 1, options.alpha, output, 10) #1 iter. per cycle is faster
-    shutil.rmtree(outputdir)
+    try:
+      #1 iter. per cycle is faster
+      optflow_hs(args.movie, 1, args.alpha, output, 10)
+    finally:
+      shutil.rmtree(outputdir)
 
   else:
-    # a user is trying to execute the example, act normally
-    if len(args) != 2:
-      parser.error("requires 2 arguments (the movie path and the output template file name) -- read the help message!")
+    optflow_hs(args.movie, args.iterations, args.alpha, args.output)
 
-    optflow_hs(args[0], options.iterations, options.alpha, args[1])
-
-  sys.exit(0)
-
-if __name__ == '__main__':
-  main()
+  return 0

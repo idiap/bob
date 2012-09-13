@@ -221,7 +221,7 @@ def convert(ifile, ofile, verbose):
     print "MLP/HDF5 machine saved at %s" % ofile
     print machine
 
-def main():
+def main(user_input=None):
 
   import argparse
 
@@ -237,7 +237,7 @@ def main():
       default=False, action='store_true',
       help=argparse.SUPPRESS)
 
-  args = parser.parse_args()
+  args = parser.parse_args(args=user_input)
 
   if args.selftest:
     import os
@@ -248,11 +248,10 @@ def main():
     os.unlink(name)
     convert(args.input, name, args.verbose)
     os.unlink(name)
-    sys.exit(0)
+    return 0
 
   output = args.output
   if not output: output = os.path.splitext(args.input)[0] + '.hdf5'
   convert(args.input, output, args.verbose)
 
-if __name__ == '__main__':
-  main()
+  return 0

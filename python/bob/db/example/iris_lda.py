@@ -78,7 +78,7 @@ def plotting(output, filename=None):
   if not filename: choose_matplotlib_iteractive_backend()
   else:
     import matplotlib
-    matplotlib.use('pdf') #non-interactive avoids exception on display
+    if not hasattr(matplotlib, 'backends'): matplotlib.use('Agg')
 
   import matplotlib.pyplot as mpl
 
@@ -103,33 +103,35 @@ def plotting(output, filename=None):
   else: #running in an interactive way, show the plot @ the user screen
     mpl.show()
 
-def main():
+def main(user_input=None):
+
+  import argparse
   
-  parser = optparse.OptionParser(description=__doc__,
-      usage='%prog [--file=FILE]')
-  parser.add_option("-f", "--file", dest="filename", default=None,
+  parser = argparse.ArgumentParser(description=__doc__,
+      formatter_class=argparse.RawDescriptionHelpFormatter)
+  parser.add_argument("-f", "--file", dest="filename", default=None,
       help="write plots to FILE (implies non-interactiveness)",
       metavar="FILE")
-  parser.add_option("--self-test",
-      action="store_true", dest="selftest", default=False,
-      help=optparse.SUPPRESS_HELP)
-  options, args = parser.parse_args()
+  parser.add_argument("--self-test", action="store_true", dest="selftest",
+      default=False, help=argparse.SUPPRESS)
+
+  args = parser.parse_args(args=user_input)
 
   # Loads the dataset and performs LDA
   data = bob.db.iris.data() #NOT RETURNING GOOD VALUES! STOPPED HERE!
   machine = create_machine(data)
   output = process_data(machine, data)
 
-  if options.selftest:
+  if args.selftest:
     (fd, filename) = tempfile.mkstemp('.pdf', 'bobtest_')
     os.close(fd)
     os.unlink(filename)
     plotting(output, filename)
     os.unlink(filename)
   else:
-    plotting(output, options.filename)
+    plotting(output, args.filename)
 
-  sys.exit(0)
+  return 0
 
 if __name__ == '__main__':
   main()

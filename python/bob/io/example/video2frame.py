@@ -44,37 +44,33 @@ def video2frame(movie, outputdir):
   sys.stdout.write('\n')
   print "Wrote %d frames to %s" % (i, outputdir)
 
-def main():
+def main(user_input=None):
 
-  parser = optparse.OptionParser(usage="usage: %prog [options] <movie>",
-      description=__doc__)
-  parser.add_option("-d", "--output-dir",
-      action="store", dest="outdir", default=os.curdir,
-      help="if you want the output on a different directory, set this variable",
-      metavar="DIR")
+  import argparse
+  
+  parser = argparse.ArgumentParser(description=__doc__,
+      formatter_class=argparse.RawDescriptionHelpFormatter)
+
+  parser.add_argument("inputvideo", metavar='FILE',
+      help="the name of the input video to treat")
+
+  parser.add_argument("-d", "--output-dir", metavar='DIR',
+      dest="outdir", default=os.curdir,
+      help="if you want the output on a different directory, set this variable")
 
   # This option is not normally shown to the user...
-  parser.add_option("--test",
-      action="store_true", dest="test", default=False,
-      help=optparse.SUPPRESS_HELP)
-      #help="if set, runs an internal verification test and erases any output")
+  parser.add_argument("--self-test", action="store_true", dest="selftest",
+      default=False, help=argparse.SUPPRESS)
 
-  (options, args) = parser.parse_args()
+  args = parser.parse_args(args=user_input)
 
-  if options.test:
+  if args.selftest:
     # then we go into test mode, all input is preset
     outputdir = tempfile.mkdtemp()
-    video2frame(args[0], outputdir)
+    video2frame(args.inputvideo, outputdir)
     shutil.rmtree(outputdir)
 
   else:
-    # a user is trying to execute the example, act normally
-    if len(args) != 1:
-      parser.error("can only accept 1 argument (the movie path)")
+    video2frame(args.inputvideo, os.path.realpath(args.outdir))
 
-    video2frame(args[0], os.path.realpath(options.outdir))
-
-  sys.exit(0)
-
-if __name__ == '__main__':
-  main()
+  return 0
