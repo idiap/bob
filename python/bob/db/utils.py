@@ -57,7 +57,7 @@ class SQLiteConnector(object):
     retval = True
     try:
       conn.execute('PRAGMA synchronous = OFF')
-    except OperationalError:
+    except Exception:
       retval = False
     finally:
       if not old and os.path.exists(database): os.unlink(database)
