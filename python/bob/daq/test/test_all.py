@@ -8,6 +8,21 @@ import sys
 import unittest
 import tempfile
 import pkg_resources
+from nose.plugins.skip import SkipTest
+import functools
+
+def ffmpeg_found(test):
+  '''Decorator to check if the FFMPEG is available before enabling a test'''
+
+  @functools.wraps(test)
+  def wrapper(*args, **kwargs):
+    try:
+      from ...io._io import VideoReader, VideoWriter
+      return test(*args, **kwargs)
+    except ImportError:
+      raise SkipTest('FFMpeg was not available at compile time')
+
+  return wrapper
 
 def F(f, module=None):
   """Returns the test file on the "data" subdirectory"""
@@ -16,7 +31,6 @@ def F(f, module=None):
   return pkg_resources.resource_filename('bob.%s.test' % module, 
       os.path.join('data', f))
 
-from ...io import VideoReader
 from .. import *
 
 def get_tempfilename(prefix='bobtest_', suffix='.avi'):
@@ -30,7 +44,9 @@ OUTPUT_VIDEO = get_tempfilename('bobtest_daq_video', suffix='')
 class DaqTest(unittest.TestCase):
   """Performs various data aquisition tests."""
   
+  @ffmpeg_found
   def test_VideoReaderCamera(self):
+    from ...io import VideoReader
     video = VideoReader(INPUT_VIDEO)
 
     pf = PixelFormat.RGB24
