@@ -49,7 +49,7 @@ class SQLiteConnector(object):
   @staticmethod
   def filesystem_is_lockable(database):
     """Checks if the filesystem is lockable"""
-    from sqlite3 import connect, OperationalError
+    from sqlite3 import connect
 
     old = os.path.exists(database) #memorize if the database was already there
     conn = connect(database)
