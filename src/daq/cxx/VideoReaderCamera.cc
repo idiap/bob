@@ -17,6 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include "bob/core/logging.h"
 #include "bob/daq/VideoReaderCamera.h"
 #include "bob/io/Array.h"
 
@@ -101,7 +103,7 @@ void VideoReaderCamera::wait() {
 }
 
 void VideoReaderCamera::printSummary() {
-  printf("%s\n", videoReader->info().c_str());
+  bob::core::info << videoReader->info().c_str() << std::endl;
 }
 
 Camera::PixelFormat VideoReaderCamera::getPixelFormat() const {

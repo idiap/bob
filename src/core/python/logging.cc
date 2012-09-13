@@ -41,7 +41,7 @@ struct PythonLoggingOutputDevice: public bob::core::OutputDevice {
      * @param callable A python callable object. Can be a function or an object
      * that implements the __call__() slot.
      */
-    PythonLoggingOutputDevice(object callable): m_callable(callable) {}
+    PythonLoggingOutputDevice(object callable): m_callable(callable) { }
 
     /**
      * D'tor
@@ -85,10 +85,10 @@ void bind_core_logging() {
     ;
 
   //binds the standard C++ streams for logging output to python
-  scope().attr("debug") = &bob::core::debug;
-  scope().attr("info") = &bob::core::info;
-  scope().attr("warn") = &bob::core::warn;
-  scope().attr("error") = &bob::core::error;
+  scope().attr("debug") = object(ptr(&bob::core::debug));
+  scope().attr("info") = object(ptr(&bob::core::info));
+  scope().attr("warn") = object(ptr(&bob::core::warn));
+  scope().attr("error") = object(ptr(&bob::core::error));
 
   //a test function
 }

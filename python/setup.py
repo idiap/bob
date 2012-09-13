@@ -14,6 +14,11 @@ import subprocess
 
 PACKAGE_BASEDIR = os.path.dirname(os.path.abspath(__file__))
 
+# If Python < 2.7 or 3.0 <= Python < 3.2, require some more stuff
+EXTRA_REQUIREMENTS = []
+if sys.version_info[:2] < (2, 7) or ((3,0) <= sys.version_info[:2] < (3,2)):
+  EXTRA_REQUIREMENTS.append('argparse')
+
 # ---------------------------------------------------------------------------#
 #  various functions and classes to help on the setup                        # 
 # ---------------------------------------------------------------------------#
@@ -293,13 +298,12 @@ setup(
 
     install_requires=[
       'setuptools',
-      'argparse',
       'numpy',
       'matplotlib',
       'sqlalchemy',
       'scipy',
       'nose',
-      ],
+      ] + EXTRA_REQUIREMENTS,
 
     entry_points={
       'console_scripts': CONSOLE_SCRIPTS,

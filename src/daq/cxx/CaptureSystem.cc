@@ -17,6 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include "bob/core/logging.h"
 #include "bob/daq/CaptureSystem.h"
 
 #include <cstdio>
@@ -71,7 +73,7 @@ void CaptureSystem::start() {
   
   int err = camera->open();
   if (err != 0) {
-    fprintf(stderr, "Can't open camera.\n");
+    bob::core::error << "Can't open camera." << std::endl;
     return;
   }
   
@@ -97,13 +99,13 @@ void CaptureSystem::start() {
   err = camera->start();
   
   if (err != 0) {
-    fprintf(stderr, "Error starting capture\n");
+    bob::core::error << "Error starting capture" << std::endl;
     return;
   }
 
   bool ok = fl.start();
   if (!ok) {
-    fprintf(stderr, "Error starting face localization\n");
+    bob::core::error << "Error starting face localization" << std::endl;
   }
 
   display.start();

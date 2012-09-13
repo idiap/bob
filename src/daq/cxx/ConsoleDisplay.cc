@@ -17,6 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include "bob/core/logging.h"
 #include "bob/daq/ConsoleDisplay.h"
 
 namespace bob { namespace daq {
@@ -53,12 +55,14 @@ void ConsoleDisplay::start() {
 }
 
 void ConsoleDisplay::imageReceived(blitz::Array<unsigned char, 2>& image, CaptureStatus& status) {
-  printf("Frame %d received (%f sec) %s\n", status.frameNb, status.elapsedTime,
-         (status.isRecording ? "recording" : "not recording"));
+  bob::core::info <<  "Frame " << status.frameNb << " received (" 
+    << status.elapsedTime << " sec) "
+    << (status.isRecording ? "recording" : "not recording") << std::endl;
 }
 
 void ConsoleDisplay::onDetection (BoundingBox& bb) {
-  printf("Face detect result: %s\n", (bb.detected ? "detected" : "not detected"));
+  bob::core::info << "Face detect result: " 
+    << (bb.detected ? "detected" : "not detected") << std::endl;
 }
 
 }}

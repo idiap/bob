@@ -136,7 +136,9 @@ class DataShufflerTest(unittest.TestCase):
 
     N = 100
 
+    # This will use the current time as seed.
     [data1, target1] = shuffle1(N)
+    time.sleep(1) # Sleeps 1 second to make sure we get different seeds
     [data2, target2] = shuffle2(N)
 
     self.assertFalse( (data1 == data2).all() )
