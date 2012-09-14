@@ -26,11 +26,11 @@
 using namespace boost::python;
 
 static tuple farfrr(
-    const blitz::Array<double,1>& negatives,
-    const blitz::Array<double,1>& positives,
+    bob::python::const_ndarray negatives, 
+    bob::python::const_ndarray positives,
     double threshold
 ){
-  std::pair<double, double> retval = bob::measure::farfrr(negatives, positives, threshold);
+  std::pair<double, double> retval = bob::measure::farfrr(negatives.cast<double,1>(), positives.cast<double,1>(), threshold);
   return make_tuple(retval.first, retval.second);
 }
 
