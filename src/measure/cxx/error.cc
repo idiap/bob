@@ -48,17 +48,8 @@ double err::eerThreshold(const blitz::Array<double,1>& negatives,
   return err::minimizingThreshold(negatives, positives, eer_predicate);
 }
 
-/**
- * Computes the threshold such that the real FAR is as close as possible
- * to the requested far_value.
- *
- * @param  negatives The impostor scores to be used for computing the FAR
- * @param  positives The client scores; ignored by this function
- * @param  far_value  The FAR value where the threshold should be computed
- * @return The computed threshold
- */
 double err::farThreshold(const blitz::Array<double,1>& negatives,
-  const blitz::Array<double,1>& positives, double far_value) {
+  const blitz::Array<double,1>&, double far_value) {
 
   // sort negative scores ascendingly
   std::vector<double> negatives_(negatives.shape()[0]);;
@@ -74,6 +65,25 @@ double err::farThreshold(const blitz::Array<double,1>& negatives,
   // return score as a weighted sum of the two surrounding scores
   double weight = index - crr_index;
   return weight * negatives_[std::max(index-1, 0)] + (1.-weight) * negatives_[std::min(index, (int)negatives_.size()-1)];
+}
+
+double err::frrThreshold(const blitz::Array<double,1>&,
+  const blitz::Array<double,1>& positives, double frr_value) {
+
+  // sort negative scores ascendingly
+  std::vector<double> positives_(positives.shape()[0]);;
+  std::copy(positives.begin(), positives.end(), positives_.begin());
+  std::sort(positives_.begin(), positives_.end());
+
+  // compute position of the threshold
+  double car = 1.-frr_value; // (Correct Acceptance Rate; = 1 - FRR)
+  double car_index = car * positives_.size();
+  // compute the index above the current CAR value
+  int index = (int)std::ceil(car_index);
+
+  // return score as a weighted sum of the two surrounding scores
+  double weight = index - car_index;
+  return weight * positives_[std::max(index-1, 0)] + (1.-weight) * positives_[std::min(index, (int)positives_.size()-1)];
 }
 
 /**
