@@ -29,8 +29,11 @@ def F(f):
   """Returns the test file on the "data" subdirectory"""
   return pkg_resources.resource_filename(__name__, os.path.join('data', f))
 
-DEV_SCORES = F('test-4col.txt')
+DEV_SCORES = F('dev-4col.txt')
 TEST_SCORES = F('test-4col.txt')
+
+DEV_SCORES_5COL = F('dev-5col.txt')
+TEST_SCORES_5COL = F('test-5col.txt')
 
 class MeasureScriptTest(unittest.TestCase):
 
@@ -61,3 +64,14 @@ class MeasureScriptTest(unittest.TestCase):
     from bob.measure.script.apply_threshold import main
     cmdline = '--scores=%s --self-test' % (TEST_SCORES,)
     self.assertEqual(main(cmdline.split()), 0)
+  
+  def test04_compute_perf_5col(self):
+   
+    # sanity checks
+    self.assertTrue(os.path.exists(DEV_SCORES_5COL))
+    self.assertTrue(os.path.exists(TEST_SCORES_5COL))
+
+    from bob.measure.script.compute_perf import main
+    cmdline = '--devel=%s --test=%s --parser=bob.measure.load.split_five_column --self-test' % (DEV_SCORES_5COL, TEST_SCORES_5COL)
+    self.assertEqual(main(cmdline.split()), 0)
+

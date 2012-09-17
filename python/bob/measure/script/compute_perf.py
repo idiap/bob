@@ -93,7 +93,8 @@ def print_crit(dev_neg, dev_pos, test_neg, test_pos, crit):
 def plots(dev_neg, dev_pos, test_neg, test_pos, npoints, filename):
   """Saves ROC, DET and EPC curves on the file pointed out by filename."""
 
-  import matplotlib; matplotlib.use('pdf') #avoids TkInter threaded start
+  import matplotlib
+  if not hasattr(matplotlib, 'backends'): matplotlib.use('pdf')
   import matplotlib.pyplot as mpl
   from matplotlib.backends.backend_pdf import PdfPages
 
@@ -194,19 +195,10 @@ def get_options(user_input):
       parser.error("parser module should be either '4column', '5column' or a valid python function identifier in the format 'module.function': '%s' is invalid" % arg.parser)
 
     mod, fct = args.parser.rsplit('.', 1)
-    import imp
     try:
-      fp, pathname, description = imp.find_module(mod, ['.'] + sys.path)
+      args.parser = getattr(__import__(mod, fromlist=['*']), fct)
     except Exception, e:
-      parser.error("import error for '%s': %s" % (args.parser, e))
-
-    try:
-      pmod = imp.load_module(mod, fp, pathname, description)
-      args.parser = getattr(pmod, fct)
-    except Exception, e:
-      parser.error("loading error for '%s': %s" % (args.parser, e))
-    finally:
-      fp.close()
+      parser.error("error importing '%s': %s" % (args.parser, e))
 
   return args
 
