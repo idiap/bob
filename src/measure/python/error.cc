@@ -26,7 +26,7 @@
 using namespace boost::python;
 
 static tuple farfrr(
-    bob::python::const_ndarray negatives, 
+    bob::python::const_ndarray negatives,
     bob::python::const_ndarray positives,
     double threshold
 ){
@@ -133,7 +133,7 @@ void bind_measure_error() {
     &bob_far_threshold,
     bob_far_threshold_overloads(
       (arg("negatives"), arg("positives"), arg("far_value")=0.001),
-      "Computes the threshold such that the real FAR is as close as possible to the requested ``far_value``.\n\nKeyword parameters:\n\nnegatives\n  The impostor scores to be used for computing the FAR\n\npositives\n  The client scores; ignored by this function\n\nfar_value\n  The FAR value where the threshold should be computed\n\nReturns the computed threshold (float)"
+      "Computes the threshold such that the real FAR is *at least* the requested ``far_value``.\n\nKeyword parameters:\n\nnegatives\n  The impostor scores to be used for computing the FAR\n\npositives\n  The client scores; ignored by this function\n\nfar_value\n  The FAR value where the threshold should be computed\n\nReturns the computed threshold (float)"
       )
   );
 
@@ -142,7 +142,7 @@ void bind_measure_error() {
     &bob_frr_threshold,
     bob_frr_threshold_overloads(
       (arg("negatives"), arg("positives"), arg("frr_value")=0.001),
-      "Computes the threshold such that the real FRR is as close as possible to the requested ``frr_value``.\n\nKeyword parameters:\n\nnegatives\n  The impostor scores; ignored by this function\n\npositives\n  The client scores to be used for computing the FRR\n\nfrr_value\n\n  The FRR value where the threshold should be computed\n\nReturns the computed threshold (float)"
+      "Computes the threshold such that the real FRR is *at least* the requested ``frr_value``.\n\nKeyword parameters:\n\nnegatives\n  The impostor scores; ignored by this function\n\npositives\n  The client scores to be used for computing the FRR\n\nfrr_value\n\n  The FRR value where the threshold should be computed\n\nReturns the computed threshold (float)"
       )
   );
 
