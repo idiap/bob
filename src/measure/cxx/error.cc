@@ -69,7 +69,7 @@ double err::farThreshold(const blitz::Array<double,1>& negatives,
   double crr = 1.-far_value; // (Correct Rejection Rate; = 1 - FAR)
   double crr_index = crr * negatives_.size();
   // compute the index above the current CRR value
-  int index = (int)std::floor(crr_index);
+  int index = std::min((int)std::floor(crr_index), (int)negatives_.size()-1);
 
   // correct index if we have multiple score values at the requested position
   while (index && negatives_[index] == negatives_[index-1]) --index;
@@ -108,7 +108,7 @@ double err::frrThreshold(const blitz::Array<double,1>&,
   double car = 1.-frr_value; // (Correct Acceptance Rate; = 1 - FRR)
   double car_index = car * positives_.size();
   // compute the index above the current CRR value
-  int index = (int)std::floor(car_index);
+  int index = std::min((int)std::floor(car_index), (int)positives_.size());
 
   // correct index if we have multiple score values at the requested position
   while (index && positives_[index] == positives_[index-1]) --index;
