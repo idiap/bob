@@ -124,8 +124,8 @@ class ErrorTest(unittest.TestCase):
       self.assertTrue(far + 1e-7 > t)
       self.assertTrue(frr + 1e-7 > t)
       # test that the values are at least somewhere in the range
-      self.assertTrue(far-t < 0.15)
-      self.assertTrue(frr-t < 0.15)
+      self.assertTrue(far-t < 0.2)
+      self.assertTrue(frr-t < 0.2)
 
 
     # If the set is separable, the calculation of the threshold is a little bit
