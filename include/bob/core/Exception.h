@@ -6,27 +6,28 @@
  * @brief A bob-based exception
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB_CORE_EXCEPTION_H 
+#ifndef BOB_CORE_EXCEPTION_H
 #define BOB_CORE_EXCEPTION_H
 
 #include <stdexcept>
+#include <sstream>
 
-namespace bob { 
-  
+namespace bob {
+
   namespace core {
 
     /**
@@ -104,6 +105,49 @@ namespace bob {
       private:
         std::string m_reason;
     };
+
+    /**
+     * An InvalidArgumentException is raised when a function receives a parameter
+     * that it cannot handle.
+     */
+    class InvalidArgumentException: public Exception {
+
+      public:
+        /** Create exception with a self-chosen error message
+         * @param  reason  The reason why the exception was thrown
+         */
+        InvalidArgumentException(const std::string& reason) throw();
+
+        /** Create exception with a default error message
+         * @param  parameter_name  The name of the parameter that was incorrect
+         * @param  value  The value of the parameter that was incorrect
+         */
+        template <typename T>
+          InvalidArgumentException(const std::string& parameter_name, const T& value) throw(){
+            std::ostringstream s;
+            s << "The given parameter '" << parameter_name << "' has an invalid value '" << value << "'.";
+            m_reason = s.str();
+          }
+
+        /** Create exception with a default error message
+         * @param  parameter_name  The name of the parameter that was incorrect
+         * @param  value  The value of the parameter that was incorrect
+         * @param  min    The minimum value the parameter accepts
+         * @param  max    The maximum value the parameter accepts
+         */
+        template <typename T>
+          InvalidArgumentException(const std::string& parameter_name, const T& value, const T& min, const T& max) throw(){
+            std::ostringstream s;
+            s << "The value '" << value << "' of parameter '" << parameter_name << "' is out of range [ " << min << ", " << max << "].";
+            m_reason = s.str();
+          }
+        virtual ~InvalidArgumentException() throw();
+        virtual const char* what() const throw();
+
+      private:
+        std::string m_reason;
+    };
+
   }
 
 }
