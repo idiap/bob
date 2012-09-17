@@ -173,11 +173,11 @@ def makemovie(machines, data, filename=None):
   """Plots each of the outputs, with the classes separated by colors.
   """
 
-  if not filename: 
+  if not filename:
     choose_matplotlib_iteractive_backend()
   else:
     import matplotlib
-    matplotlib.use('Agg') #non-interactive avoids exception on display
+    if not hasattr(matplotlib, 'backends'): matplotlib.use('Agg')
 
   import matplotlib.pyplot as mpl
 
@@ -213,35 +213,39 @@ def makemovie(machines, data, filename=None):
     sys.stdout.write('\n')
     sys.stdout.flush()
 
-def main():
+def main(user_input=None):
+
+  import argparse
   
-  parser = optparse.OptionParser(description=__doc__,
-      usage='%prog [--file=FILE]')
-  parser.add_option("-t", "--steps", dest="steps", default=10, type=int,
+  parser = argparse.ArgumentParser(description=__doc__,
+      formatter_class=argparse.RawDescriptionHelpFormatter)
+
+  parser.add_argument("-t", "--steps", dest="steps", default=10, type=int,
       help="how many training times to train the MLP",
       metavar="INT")
-  parser.add_option("-f", "--file", dest="filename", default=None,
+  parser.add_argument("-f", "--file", dest="filename", default=None,
       help="write plot movie to FILE (implies non-interactiveness)",
       metavar="FILE")
-  parser.add_option("--self-test",
+  parser.add_argument("--self-test",
       action="store_true", dest="selftest", default=False,
       help=optparse.SUPPRESS_HELP)
-  options, args = parser.parse_args()
+
+  args = parser.parse_args(args=user_input)
 
   # Loads the dataset and performs LDA
   data = bob.db.iris.data()
-  machines = create_machine(data, options.steps)
+  machines = create_machine(data, args.steps)
 
-  if options.selftest:
+  if args.selftest:
     (fd, filename) = tempfile.mkstemp('.avi', 'bobtest_')
     os.close(fd)
     os.unlink(filename)
     makemovie(machines, data, filename)
     os.unlink(filename)
   else:
-    makemovie(machines, data, options.filename)
+    makemovie(machines, data, args.filename)
 
-  sys.exit(0)
+  return 0
 
 if __name__ == '__main__':
   main()

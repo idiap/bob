@@ -42,6 +42,7 @@
 .. _imagemagick: http://www.imagemagick.org
 .. _ipython: http://ipython.scipy.org
 .. _lapack: http://www.netlib.org/lapack
+.. _latex: http://www.latex-project.org/
 .. _libsvm: http://www.csie.ntu.edu.tw/~cjlin/libsvm/
 .. _macports installation instructions: http://www.macports.org/install.php
 .. _macports: http://www.macports.org
@@ -80,4 +81,3 @@
 .. _lgpl-2.1: http://www.opensource.org/licenses/LGPL-2.1
 .. _mit: http://www.opensource.org/licenses/MIT
 .. _python-2.0: http://www.opensource.org/licenses/Python-2.0
-

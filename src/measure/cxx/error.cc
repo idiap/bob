@@ -24,6 +24,7 @@
 #include <algorithm>
 #include "bob/measure/error.h"
 #include "bob/core/blitz_compat.h"
+#include "bob/core/Exception.h"
 
 namespace err = bob::measure;
 
@@ -48,32 +49,82 @@ double err::eerThreshold(const blitz::Array<double,1>& negatives,
   return err::minimizingThreshold(negatives, positives, eer_predicate);
 }
 
-/**
- * Computes the threshold such that the real FAR is as close as possible
- * to the requested far_value.
- *
- * @param  negatives The impostor scores to be used for computing the FAR
- * @param  positives The client scores; ignored by this function
- * @param  far_value  The FAR value where the threshold should be computed
- * @return The computed threshold
- */
 double err::farThreshold(const blitz::Array<double,1>& negatives,
-  const blitz::Array<double,1>& positives, double far_value) {
+  const blitz::Array<double,1>&, double far_value) {
+  // check the parameters are valid
+  if (far_value < 0. || far_value > 1.){
+    std::ostringstream s;
+    throw bob::core::InvalidArgumentException("far_value", far_value, 0., 1.);
+  }
+  if (negatives.size() < 2){
+    throw bob::core::InvalidArgumentException("The number of negatives must at least be two!");
+  }
 
   // sort negative scores ascendingly
-  std::vector<double> negatives_(negatives.shape()[0]);;
+  std::vector<double> negatives_(negatives.shape()[0]);
   std::copy(negatives.begin(), negatives.end(), negatives_.begin());
-  std::sort(negatives_.begin(), negatives_.end());
+  std::sort(negatives_.begin(), negatives_.end(), std::less<double>());
 
   // compute position of the threshold
   double crr = 1.-far_value; // (Correct Rejection Rate; = 1 - FAR)
   double crr_index = crr * negatives_.size();
   // compute the index above the current CRR value
-  int index = (int)std::ceil(crr_index);
+  int index = (int)std::floor(crr_index);
 
-  // return score as a weighted sum of the two surrounding scores
-  double weight = index - crr_index;
-  return weight * negatives_[std::max(index-1, 0)] + (1.-weight) * negatives_[std::min(index, (int)negatives_.size()-1)];
+  // correct index if we have multiple score values at the requested position
+  while (index && negatives_[index] == negatives_[index-1]) --index;
+
+  // we compute a correction term
+  double correction;
+  if (index){
+    // assure that we are in the middle of two cases
+    correction = 0.5 * (negatives_[index] - negatives_[index-1]);
+  } else {
+    // add an overall correction term
+    correction = 0.5 * (negatives_.back() - negatives_.front()) / negatives_.size();
+  }
+
+  return negatives_[index] - correction;
+}
+
+double err::frrThreshold(const blitz::Array<double,1>&,
+  const blitz::Array<double,1>& positives, double frr_value) {
+
+  // check the parameters are valid
+  if (frr_value < 0. || frr_value > 1.){
+    std::ostringstream s;
+    throw bob::core::InvalidArgumentException("frr_value", frr_value, 0., 1.);
+  }
+  if (positives.size() < 2){
+    throw bob::core::InvalidArgumentException("The number of positives must at least be two!");
+  }
+
+  // sort positive scores descendingly
+  std::vector<double> positives_(positives.shape()[0]);
+  std::copy(positives.begin(), positives.end(), positives_.begin());
+  std::sort(positives_.begin(), positives_.end(), std::greater<double>());
+
+  // compute position of the threshold
+  double car = 1.-frr_value; // (Correct Acceptance Rate; = 1 - FRR)
+  double car_index = car * positives_.size();
+  // compute the index above the current CRR value
+  int index = (int)std::floor(car_index);
+
+  // correct index if we have multiple score values at the requested position
+  while (index && positives_[index] == positives_[index-1]) --index;
+
+  // we compute a correction term to assure that we are in the middle of two cases
+  // we compute a correction term
+  double correction;
+  if (index){
+    // assure that we are in the middle of two cases
+    correction = 0.5 * (positives_[index-1] - positives_[index]);
+  } else {
+    // add an overall correction term
+    correction = 0.5 * (positives_.front() - positives_.back()) / positives_.size();
+  }
+
+  return positives_[index] + correction;
 }
 
 /**

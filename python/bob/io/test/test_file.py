@@ -28,6 +28,24 @@ import bob
 import numpy
 import random
 import pkg_resources
+from nose.plugins.skip import SkipTest
+import functools
+
+def extension_available(extension):
+  '''Decorator to check if a extension is available before enabling a test'''
+
+  def test_wrapper(test):
+
+    @functools.wraps(test)
+    def wrapper(*args, **kwargs):
+      if bob.io.extensions().has_key(extension):
+        return test(*args, **kwargs)
+      else:
+        raise SkipTest('Extension to handle "%s" files was not available at compile time' % extension)
+
+    return wrapper
+
+  return test_wrapper
 
 def F(f):
   """Returns the test file on the "data" subdirectory"""
@@ -156,6 +174,7 @@ class FileTest(unittest.TestCase):
     self.transcode(F('matlab_1d.hdf5'))
     self.transcode(F('matlab_2d.hdf5'))
 
+  @extension_available('.bindata')
   def test01_t3binary(self):
 
     # array writing tests
@@ -186,6 +205,7 @@ class FileTest(unittest.TestCase):
     # complete transcoding test
     self.transcode(F('torch3.bindata'))
 
+  @extension_available('.mat')
   def test02_matlab(self):
 
     # array writing tests
@@ -226,6 +246,7 @@ class FileTest(unittest.TestCase):
     self.transcode(F('test_4d_cplx.mat'))
     self.transcode(F('test.mat')) #3D complex, large
 
+  @extension_available('.tensor')
   def test03_tensorfile(self):
     
     # array writing tests
@@ -253,6 +274,9 @@ class FileTest(unittest.TestCase):
     # complete transcoding test
     self.transcode(F('torch.tensor'))
 
+  @extension_available('.pgm')
+  @extension_available('.pbm')
+  @extension_available('.ppm')
   def test04_image(self):
 
     def image_transcode(filename):
@@ -280,6 +304,7 @@ class FileTest(unittest.TestCase):
     image_transcode(F('test.ppm')) #indexed, works fine
     #image_transcode(F('test.jpg')) #does not work because of re-compression
 
+  @extension_available('.csv')
   def test05_csv(self):
 
     # array writing tests
@@ -304,9 +329,10 @@ class FileTest(unittest.TestCase):
     self.arrayset_readwrite(".csv", a2, close=True)
     self.arrayset_readwrite('.csv', a3, close=True)
 
-  def xtest06_bin(self):
-
-    # DEPRECATED
+  @extension_available('.bin')
+  def test06_bin(self):
+    
+    raise SkipTest, "The extension '.bin' is deprecated"
 
     # array writing tests
     a1 = numpy.random.normal(size=(2,3)).astype('float32')

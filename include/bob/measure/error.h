@@ -225,14 +225,30 @@ namespace bob { namespace measure {
   }
 
   /**
-   * Calculates the threshold where the far reaches a certain limit
-   * @param negatives The sorted array of negative examples
-   * @param positives The sorted array of positive examples
-   * @param far_value The FAR threshold that should be tested
-   * @return The score threshold that was computed
+   * Computes the threshold such that the real FAR is as close as possible
+   * to the requested far_value.
+   *
+   * @param negatives The impostor scores to be used for computing the FAR
+   * @param positives The client scores; ignored by this function
+   * @param far_value The FAR value where the threshold should be computed
+   *
+   * @return The computed threshold
    */
   double farThreshold(const blitz::Array<double,1>& negatives,
       const blitz::Array<double,1>& positives, double far_value);
+
+  /**
+   * Computes the threshold such that the real FRR is as close as possible
+   * to the requested frr_value.
+   *
+   * @param negatives The impostor scores; ignored by this function
+   * @param positives The client scores to be used for computing the FRR
+   * @param frr_value The FRR value where the threshold should be computed
+   *
+   * @return The computed threshold
+   */
+  double frrThreshold(const blitz::Array<double,1>& negatives,
+      const blitz::Array<double,1>& positives, double frr_value);
 
   /**
    * Calculates the ROC curve given a set of positive and negative scores and a

@@ -4,16 +4,16 @@
 # Wed Apr 20 17:32:54 2011 +0200
 #
 # Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 3 of the License.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -103,7 +103,7 @@ class ErrorTest(unittest.TestCase):
 
     # This example will demonstrate and check the use of eer_threshold() to
     # calculate the threshold that minimizes the EER.
-   
+
     # This test set is not separable.
     positives = bob.io.load(F('nonsep-positives.hdf5'))
     negatives = bob.io.load(F('nonsep-negatives.hdf5'))
@@ -113,6 +113,20 @@ class ErrorTest(unittest.TestCase):
     ccp = count(bob.measure.correctly_classified_positives(positives,threshold))
     ccn = count(bob.measure.correctly_classified_negatives(negatives,threshold))
     self.assertTrue( (ccp - ccn) <= 1 )
+
+    for t in (0, 0.001, 0.1, 0.5, 0.9, 0.999, 1):
+      # Lets also test the far_threshold and the frr_threshold functions
+      threshold_far = bob.measure.far_threshold(negatives, positives, t)
+      threshold_frr = bob.measure.frr_threshold(negatives, positives, t)
+      # Check that the requested FAR and FRR values are smaller than the requested ones
+      far = bob.measure.farfrr(negatives, positives, threshold_far)[0]
+      frr = bob.measure.farfrr(negatives, positives, threshold_frr)[1]
+      self.assertTrue(far + 1e-7 > t)
+      self.assertTrue(frr + 1e-7 > t)
+      # test that the values are at least somewhere in the range
+      self.assertTrue(far-t < 0.15)
+      self.assertTrue(frr-t < 0.15)
+
 
     # If the set is separable, the calculation of the threshold is a little bit
     # trickier, as you have no points in the middle of the range to compare
@@ -168,7 +182,7 @@ class ErrorTest(unittest.TestCase):
     test_negatives = negatives[(negatives.shape[0]/2):]
     dev_positives = positives[:(positives.shape[0]/2)]
     test_positives = positives[(positives.shape[0]/2):]
-    xy = bob.measure.epc(dev_negatives, dev_positives, 
+    xy = bob.measure.epc(dev_negatives, dev_positives,
         test_negatives, test_positives, 100)
     # uncomment the next line to save a reference value
     # save('nonsep-epc.hdf5', xy)

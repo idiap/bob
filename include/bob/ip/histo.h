@@ -26,6 +26,7 @@
 
 #include "bob/core/array_assert.h"
 #include "bob/core/array_type.h"
+#include "bob/core/Exception.h"
 
 namespace tca = bob::core::array;
 namespace bob {
@@ -43,18 +44,6 @@ namespace bob {
     private:
       bob::core::array::ElementType elementType;
       char description[500];
-    };
-
-    /**
-     * This exception is thrown when a function argument is invalid
-     */
-    class InvalidArgument: public bob::core::Exception {
-    public:
-      InvalidArgument()  throw();
-      InvalidArgument(const InvalidArgument& other) throw();
-
-      virtual ~InvalidArgument() throw();
-      virtual const char* what() const throw();
     };
 
     namespace detail {
@@ -232,8 +221,11 @@ namespace bob {
           break;
       }
 
-      if (max <= min || nb_bins == 0) {
-        throw InvalidArgument();
+      if (max <= min){
+        throw bob::core::InvalidArgumentException("The max value must be larger than the min value!");
+      }
+      if (nb_bins == 0) {
+        throw bob::core::InvalidArgumentException("nb_bins", 0);
       }
 
       tca::assertSameShape<uint64_t, 1>(histo, blitz::shape(nb_bins));

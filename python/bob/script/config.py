@@ -123,4 +123,4 @@ def print_codecs():
 def main():
   version_table()
   print_codecs()
-  sys.exit(0)
+  return 0

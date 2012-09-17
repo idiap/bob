@@ -8,16 +8,16 @@
  * as expected.
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -39,7 +39,7 @@ const char* bob::core::Exception::what() const throw() {
  return what_string;
 }
 
-bob::core::DeprecationError::DeprecationError(const std::string& op) throw(): 
+bob::core::DeprecationError::DeprecationError(const std::string& op) throw():
   m_op(op) {
 }
 
@@ -66,6 +66,18 @@ bob::core::NotImplementedError::~NotImplementedError() throw() {
 }
 
 const char* bob::core::NotImplementedError::what() const throw() {
+  return m_reason.c_str();
+}
+
+
+bob::core::InvalidArgumentException::InvalidArgumentException(const std::string& reason) throw()
+  : m_reason(reason)
+  {}
+
+bob::core::InvalidArgumentException::~InvalidArgumentException() throw() {
+}
+
+const char* bob::core::InvalidArgumentException::what() const throw() {
   return m_reason.c_str();
 }
 
