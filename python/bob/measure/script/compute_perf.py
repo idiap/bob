@@ -193,7 +193,7 @@ def get_options(user_input):
     if args.parser.find('.') == -1:
       parser.error("parser module should be either '4column', '5column' or a valid python function identifier in the format 'module.function': '%s' is invalid" % arg.parser)
 
-    mod, fct = args.parser.rsplit('.', 2)
+    mod, fct = args.parser.rsplit('.', 1)
     import imp
     try:
       fp, pathname, description = imp.find_module(mod, ['.'] + sys.path)
