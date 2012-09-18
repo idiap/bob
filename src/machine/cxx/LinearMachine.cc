@@ -103,11 +103,23 @@ bob::machine::LinearMachine& bob::machine::LinearMachine::operator=
 bool 
 bob::machine::LinearMachine::operator==(const bob::machine::LinearMachine& b) const
 {
-  return (blitz::all(this->m_input_sub == b.m_input_sub) &&
-          blitz::all(this->m_input_div == b.m_input_div) &&
-          blitz::all(this->m_weight == b.m_weight) &&
-          blitz::all(this->m_bias == b.m_bias) &&
-          this->m_activation == b.m_activation);
+  // Check dimensions
+  if(this->m_input_sub.extent(0) != b.m_input_sub.extent(0) || 
+     this->m_input_div.extent(0) != b.m_input_div.extent(0) ||
+     this->m_weight.extent(0) != b.m_weight.extent(0) ||
+     this->m_weight.extent(1) != b.m_weight.extent(1) ||
+     this->m_bias.extent(0) != b.m_bias.extent(0))
+    return false;
+
+  // Check content
+  if(blitz::any(this->m_input_sub != b.m_input_sub) ||
+     blitz::any(this->m_input_div != b.m_input_div) ||
+     blitz::any(this->m_weight != b.m_weight) ||
+     blitz::any(this->m_bias != b.m_bias) ||
+     this->m_activation != b.m_activation)
+    return false;
+
+  return true;
 }
 
 bool 
