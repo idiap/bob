@@ -35,19 +35,19 @@ MAG2_A = numpy.array([[0, 4, 0, 4, 0], [0, 4, 0, 4, 0], [0, 4, 0, 4, 0],
 SQ = math.sqrt(2)
 MAGSQRT_A = numpy.array([[0, SQ, 0, SQ, 0], [0, SQ, 0, SQ, 0], [0, SQ, 0, SQ, 0],
                          [0, SQ, 0, SQ, 0], [0, SQ, 0, SQ, 0]], dtype='float64')
-PIH = math.pi / 2.
-ORI_A = numpy.array([[0, PIH, 0, -PIH, 0], [0, PIH, 0, -PIH, 0], [0, PIH, 0, -PIH, 0],
-                     [0, PIH, 0, -PIH, 0], [0, PIH, 0, -PIH, 0]], dtype='float64')
-HIST_A = numpy.array([0, 0, 0, 0, 20, 0, 0, 0], dtype='float64')
+PI = math.pi
+ORI_A = numpy.array([[0, 0, 0, PI, 0], [0, 0, 0, PI, 0], [0, 0, 0, PI, 0],
+                     [0, 0, 0, PI, 0], [0, 0, 0, PI, 0]], dtype='float64')
+HIST_A = numpy.array([20, 0, 0, 0, 0, 0, 0, 0], dtype='float64')
 
 SRC_B = numpy.array([[0, 0, 0, 0, 0],  [0, 0, 0, 0, 0],  [4, 4, 4, 4, 4],
                      [0, 0, 0, 0, 0],  [0, 0, 0, 0, 0]],  dtype='float64')
 MAG_B = numpy.array([[0, 0, 0, 0, 0],  [2, 2, 2, 2, 2],  [0, 0, 0, 0, 0],
                      [2, 2, 2, 2, 2],  [0, 0, 0, 0, 0]],  dtype='float64')
-PI = math.pi
-ORI_B = numpy.array([[0, 0, 0, 0, 0],  [0, 0, 0, 0, 0],  [0, 0, 0, 0, 0],
-                     [PI, PI, PI, PI, PI],  [0, 0, 0, 0, 0]],  dtype='float64')
-HIST_B = numpy.array([20, 0, 0, 0, 0, 0, 0, 0], dtype='float64')
+PIH = math.pi / 2.
+ORI_B = numpy.array([[0, 0, 0, 0, 0],  [PIH, PIH, PIH, PIH, PIH],  [0, 0, 0, 0, 0],
+                     [-PIH, -PIH, -PIH, -PIH, -PIH],  [0, 0, 0, 0, 0]],  dtype='float64')
+HIST_B = numpy.array([0, 0, 0, 0, 20, 0, 0, 0], dtype='float64')
 EPSILON = 1e-10
 
 HIST_3D = numpy.array([[[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]],
@@ -80,40 +80,41 @@ class HOGTest(unittest.TestCase):
 
     # Magnitude
     hgm(SRC_A, mag, ori)
-    numpy.allclose(mag, MAG1_A, EPSILON)
-    numpy.allclose(ori, ORI_A, EPSILON)
+    self.assertTrue( numpy.allclose(mag, MAG1_A, EPSILON) )
+    self.assertTrue( numpy.allclose(ori, ORI_A, EPSILON) )
     hgm.forward(SRC_A, mag, ori)
-    numpy.allclose(mag, MAG1_A, EPSILON)
-    numpy.allclose(ori, ORI_A, EPSILON)
+    self.assertTrue( numpy.allclose(mag, MAG1_A, EPSILON) )
+    self.assertTrue( numpy.allclose(ori, ORI_A, EPSILON) )
     hgm.forward_(SRC_A, mag, ori)
-    numpy.allclose(mag, MAG1_A, EPSILON)
-    numpy.allclose(ori, ORI_A, EPSILON)
+    self.assertTrue( numpy.allclose(mag, MAG1_A, EPSILON) )
+    self.assertTrue( numpy.allclose(ori, ORI_A, EPSILON) )
     (mag2, ori2) = hgm(SRC_A)
-    numpy.allclose(mag2, MAG1_A, EPSILON)
-    numpy.allclose(ori2, ORI_A, EPSILON)
+    self.assertTrue( numpy.allclose(mag2, MAG1_A, EPSILON) )
+    self.assertTrue( numpy.allclose(ori2, ORI_A, EPSILON) )
     (mag2, ori2) = hgm.forward(SRC_A)
-    numpy.allclose(mag2, MAG1_A, EPSILON)
-    numpy.allclose(ori2, ORI_A, EPSILON)
+    self.assertTrue( numpy.allclose(mag2, MAG1_A, EPSILON) )
+    self.assertTrue( numpy.allclose(ori2, ORI_A, EPSILON) )
     (mag2, ori2) = hgm.forward_(SRC_A)
-    numpy.allclose(mag2, MAG1_A, EPSILON)
-    numpy.allclose(ori2, ORI_A, EPSILON)
+    self.assertTrue( numpy.allclose(mag2, MAG1_A, EPSILON) )
+    self.assertTrue( numpy.allclose(ori2, ORI_A, EPSILON) )
 
     # MagnitudeSquare
     hgm.magnitude_type = bob.ip.GradientMagnitudeType.MagnitudeSquare
     hgm.forward(SRC_A, mag, ori)
-    numpy.allclose(mag, MAG2_A, EPSILON)
-    numpy.allclose(ori, ORI_A, EPSILON)
+    self.assertTrue( numpy.allclose(mag, MAG2_A, EPSILON) )
+    self.assertTrue( numpy.allclose(ori, ORI_A, EPSILON) )
 
     # SqrtMagnitude
     hgm.magnitude_type = bob.ip.GradientMagnitudeType.SqrtMagnitude
     hgm.forward(SRC_A, mag, ori)
-    numpy.allclose(mag, MAGSQRT_A, EPSILON)
-    numpy.allclose(ori, ORI_A, EPSILON)
+    self.assertTrue( numpy.allclose(mag, MAGSQRT_A, EPSILON) )
+    self.assertTrue( numpy.allclose(ori, ORI_A, EPSILON) )
 
     # SqrtMagnitude
+    hgm.magnitude_type = bob.ip.GradientMagnitudeType.Magnitude
     hgm.forward(SRC_B, mag, ori)
-    numpy.allclose(mag, MAG_B, EPSILON)
-    numpy.allclose(ori, ORI_B, EPSILON)
+    self.assertTrue( numpy.allclose(mag, MAG_B, EPSILON) )
+    self.assertTrue( numpy.allclose(ori, ORI_B, EPSILON) )
 
     # Equal/Not equal operator
     hgm.magnitude_type = bob.ip.GradientMagnitudeType.Magnitude
@@ -156,19 +157,19 @@ class HOGTest(unittest.TestCase):
     # Check with first input array
     hist = numpy.ndarray(shape=(8,), dtype='float64')
     bob.ip.hog_compute_histogram(MAG1_A, ORI_A, hist)
-    numpy.allclose(hist, HIST_A, EPSILON)
+    self.assertTrue(  numpy.allclose(hist, HIST_A, EPSILON) )
     bob.ip.hog_compute_histogram_(MAG1_A, ORI_A, hist)
-    numpy.allclose(hist, HIST_A, EPSILON)
+    self.assertTrue( numpy.allclose(hist, HIST_A, EPSILON) )
     hist2 = bob.ip.hog_compute_histogram(MAG1_A, ORI_A, 8)
-    numpy.allclose(hist2, HIST_A, EPSILON)
+    self.assertTrue( numpy.allclose(hist2, HIST_A, EPSILON) )
     hist2 = bob.ip.hog_compute_histogram_(MAG1_A, ORI_A, 8)
-    numpy.allclose(hist, HIST_A, EPSILON)
+    self.assertTrue( numpy.allclose(hist, HIST_A, EPSILON) )
 
     # Check with second input array
     bob.ip.hog_compute_histogram(MAG_B, ORI_B, hist)
-    numpy.allclose(hist, HIST_B, EPSILON)
+    self.assertTrue( numpy.allclose(hist, HIST_B, EPSILON) )
     bob.ip.hog_compute_histogram_(MAG_B, ORI_B, hist)
-    numpy.allclose(hist, HIST_B, EPSILON)
+    self.assertTrue( numpy.allclose(hist, HIST_B, EPSILON) )
 
   def test03_hogNormalizeBlock(self):
     #"""Test the block normalization using hog_normalize_block()"""
@@ -179,39 +180,39 @@ class HOGTest(unittest.TestCase):
     hist = numpy.ndarray(shape=(20,), dtype='float64')
     # No norm
     bob.ip.normalize_block(HIST_3D, hist, bob.ip.BlockNorm.None)
-    numpy.allclose(hist, HIST_1D, EPSILON)
+    self.assertTrue( numpy.allclose(hist, HIST_1D, EPSILON) )
     bob.ip.normalize_block_(HIST_3D, hist, bob.ip.BlockNorm.None)
-    numpy.allclose(hist, HIST_1D, EPSILON)
+    self.assertTrue( numpy.allclose(hist, HIST_1D, EPSILON) )
     # L2 Norm
     py_L2ref = HIST_1D / numpy.linalg.norm(HIST_1D)
     bob.ip.normalize_block(HIST_3D, hist)
-    numpy.allclose(hist, py_L2ref, EPSILON)
+    self.assertTrue( numpy.allclose(hist, py_L2ref, EPSILON) )
     bob.ip.normalize_block_(HIST_3D, hist)
-    numpy.allclose(hist, py_L2ref, EPSILON)
+    self.assertTrue( numpy.allclose(hist, py_L2ref, EPSILON) )
     hist2 = bob.ip.normalize_block(HIST_3D)
-    numpy.allclose(hist2, py_L2ref, EPSILON)
+    self.assertTrue( numpy.allclose(hist2, py_L2ref, EPSILON) )
     hist2 = bob.ip.normalize_block_(HIST_3D)
-    numpy.allclose(hist2, py_L2ref, EPSILON)
+    self.assertTrue( numpy.allclose(hist2, py_L2ref, EPSILON) )
     # L2Hys Norm
     py_L2Hysref = HIST_1D / numpy.linalg.norm(HIST_1D)
-    numpy.clip(py_L2Hysref, a_min=0, a_max=0.2)
+    py_L2Hysref = numpy.clip(py_L2Hysref, a_min=0, a_max=0.2)
     py_L2Hysref = py_L2Hysref / numpy.linalg.norm(py_L2Hysref)
     bob.ip.normalize_block(HIST_3D, hist, bob.ip.BlockNorm.L2Hys)
-    numpy.allclose(hist, py_L2Hysref, EPSILON)
+    self.assertTrue( numpy.allclose(hist, py_L2Hysref, EPSILON) )
     bob.ip.normalize_block_(HIST_3D, hist, bob.ip.BlockNorm.L2Hys)
-    numpy.allclose(hist, py_L2Hysref, EPSILON)
+    self.assertTrue( numpy.allclose(hist, py_L2Hysref, EPSILON) )
     # L1 Norm
     py_L1ref = HIST_1D / numpy.linalg.norm(HIST_1D, 1)
     bob.ip.normalize_block(HIST_3D, hist, bob.ip.BlockNorm.L1)
-    numpy.allclose(hist, py_L1ref, EPSILON)
+    self.assertTrue( numpy.allclose(hist, py_L1ref, EPSILON) )
     bob.ip.normalize_block_(HIST_3D, hist, bob.ip.BlockNorm.L1)
-    numpy.allclose(hist, py_L1ref, EPSILON)
+    self.assertTrue( numpy.allclose(hist, py_L1ref, EPSILON) )
     # L1 Norm sqrt
-    py_L1sqrtref = HIST_1D / math.sqrt(numpy.linalg.norm(HIST_1D, 1))
+    py_L1sqrtref = numpy.sqrt(HIST_1D / numpy.linalg.norm(HIST_1D, 1))
     bob.ip.normalize_block(HIST_3D, hist, bob.ip.BlockNorm.L1sqrt)
-    numpy.allclose(hist, py_L1sqrtref, EPSILON)
+    self.assertTrue( numpy.allclose(hist, py_L1sqrtref, EPSILON) )
     bob.ip.normalize_block_(HIST_3D, hist, bob.ip.BlockNorm.L1sqrt)
-    numpy.allclose(hist, py_L1sqrtref, EPSILON)
+    self.assertTrue( numpy.allclose(hist, py_L1sqrtref, EPSILON) )
 
   def test04_HOG(self):
     #"""Test the HOG class which is used to perform the full feature

@@ -48,23 +48,25 @@ void bob::ip::hogComputeHistogram_(const blitz::Array<double,2>& mag,
     {
       double energy = mag(i,j);
       double orientation = ori(i,j);
-      // Makes the orientation belongs to [0,2 PI] if required 
-      // (because of atan2 implementation) 
-      if(orientation < 0.) orientation += 2*M_PI; 
-      // Makes the orientation belongs to [0, PI] if required 
-      if( !full_orientation && (orientation > M_PI) ) orientation -= M_PI;
 
       // Computes "real" value of the closest bin
       double bin = orientation / range_orientation * nb_bins;
       // Computes the value of the "inferior" bin 
       // ("superior" bin corresponds to the one after the inferior bin)
-      int bin_index = floor(bin);
+      int bin_index1 = floor(bin);
       // Computes the weight for the "inferior" bin
-      double weight = 1.-(bin-bin_index);
+      double weight = 1.-(bin-bin_index1);
+
+      // Computes integer indices in the range [0,nb_bins-1]
+      bin_index1 = bin_index1 % nb_bins;
+      // Additional check, because bin can be negative (hence bin_index1 as well, as an integer remainder)
+      if(bin_index1<0) bin_index1+=nb_bins; 
+      // bin_index1 and nb_bins are positive. Thus, bin_index2 (integer remainder) as well!
+      int bin_index2 = (bin_index1+1) % nb_bins; 
 
       // Updates the histogram (bilinearly)
-      hist(bin_index % nb_bins) += weight * energy;
-      hist((bin_index+1) % nb_bins) += (1. - weight) * energy;
+      hist(bin_index1) += weight * energy;
+      hist(bin_index2) += (1. - weight) * energy;
     }
 }
 
