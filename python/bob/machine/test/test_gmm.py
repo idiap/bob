@@ -98,9 +98,13 @@ class GMMMachineTest(unittest.TestCase):
     """Test a GMMMachine basic features"""
 
     weights   = numpy.array([0.5, 0.5], 'float64')
+    weights2   = numpy.array([0.6, 0.4], 'float64')
     means     = numpy.array([[3, 70, 0], [4, 72, 0]], 'float64')
+    means2     = numpy.array([[3, 7, 0], [4, 72, 0]], 'float64')
     variances = numpy.array([[1, 10, 1], [2, 5, 2]], 'float64')
+    variances2 = numpy.array([[10, 10, 1], [2, 5, 2]], 'float64')
     varianceThresholds = numpy.array([[0, 0, 0], [0, 0, 0]], 'float64')
+    varianceThresholds2 = numpy.array([[0.0005, 0.0005, 0.0005], [0, 0, 0]], 'float64')
 
     # Initializes a GMMMachine 
     gmm = bob.machine.GMMMachine(2,3)
@@ -145,6 +149,40 @@ class GMMMachineTest(unittest.TestCase):
     gmm.resize(4,5)
     self.assertTrue( gmm.dim_c == 4 )
     self.assertTrue( gmm.dim_d == 5 )
+
+    # Checks comparison
+    gmm2 = bob.machine.GMMMachine(gmm)
+    gmm3 = bob.machine.GMMMachine(2,3)
+    gmm3.weights = weights2
+    gmm3.means = means
+    gmm3.variances = variances
+    gmm3.varianceThresholds = varianceThresholds
+    gmm4 = bob.machine.GMMMachine(2,3)
+    gmm4.weights = weights
+    gmm4.means = means2
+    gmm4.variances = variances
+    gmm4.varianceThresholds = varianceThresholds
+    gmm5 = bob.machine.GMMMachine(2,3)
+    gmm5.weights = weights
+    gmm5.means = means
+    gmm5.variances = variances2
+    gmm5.varianceThresholds = varianceThresholds
+    gmm6 = bob.machine.GMMMachine(2,3)
+    gmm6.weights = weights
+    gmm6.means = means
+    gmm6.variances = variances
+    gmm6.varianceThresholds = varianceThresholds2
+
+    self.assertTrue( gmm == gmm2)
+    self.assertFalse( gmm != gmm2)
+    self.assertTrue( gmm != gmm3)
+    self.assertFalse( gmm == gmm3)
+    self.assertTrue( gmm != gmm4)
+    self.assertFalse( gmm == gmm4)
+    self.assertTrue( gmm != gmm5)
+    self.assertFalse( gmm == gmm5)
+    self.assertTrue( gmm != gmm6)
+    self.assertFalse( gmm == gmm6)
 
   def test03_GMMMachine(self):
     """Test a GMMMachine (statistics)"""

@@ -75,6 +75,10 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double>
      * Equal to
      */
     bool operator==(const GMMMachine& b) const;
+    /**
+     * Not equal to
+     */
+    bool operator!=(const GMMMachine& b) const;
     
     /**
      * Destructor
