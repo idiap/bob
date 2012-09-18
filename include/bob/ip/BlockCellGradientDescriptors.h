@@ -152,7 +152,7 @@ namespace bob {
           magnitude = blitz::sqrt(blitz::pow2(m_gy) + blitz::pow2(m_gx));
       }
       // Computes the orientation map (range: [-PI,PI])
-      orientation = blitz::atan2(m_gx, m_gy);
+      orientation = blitz::atan2(m_gy, m_gx);
     }
  
     template <typename T>

@@ -62,10 +62,10 @@ IMG_8x8_A = numpy.array([ [0, 2, 0, 0, 0, 0, 2, 0],
                           [0, 2, 0, 0, 0, 0, 2, 0],
                           [0, 2, 0, 0, 0, 0, 2, 0],
                           [0, 2, 0, 0, 0, 0, 2, 0]], dtype='float64')
-HIST_IMG_A = numpy.array([0, 0, 0, 0, 0.5, 0, 0, 0,
-                          0, 0, 0, 0, 0.5, 0, 0, 0,
-                          0, 0, 0, 0, 0.5, 0, 0, 0,
-                          0, 0, 0, 0, 0.5, 0, 0, 0], dtype='float64')
+HIST_IMG_A = numpy.array([0.5, 0, 0, 0, 0, 0, 0, 0,
+                          0.5, 0, 0, 0, 0, 0, 0, 0,
+                          0.5, 0, 0, 0, 0, 0, 0, 0,
+                          0.5, 0, 0, 0, 0, 0, 0, 0], dtype='float64')
 
 class HOGTest(unittest.TestCase):
   """Performs various tests"""
