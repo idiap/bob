@@ -22,29 +22,27 @@
 #include "bob/machine/Exception.h"
 #include "bob/core/logging.h"
 
-namespace mach = bob::machine;
-namespace io = bob::io;
-
-mach::GMMStats::GMMStats() {
+bob::machine::GMMStats::GMMStats() {
   resize(0,0);
 }
 
-mach::GMMStats::GMMStats(const size_t n_gaussians, const size_t n_inputs) {
+bob::machine::GMMStats::GMMStats(const size_t n_gaussians, const size_t n_inputs) {
   resize(n_gaussians,n_inputs);
 }
 
-mach::GMMStats::GMMStats(io::HDF5File& config) {
+bob::machine::GMMStats::GMMStats(bob::io::HDF5File& config) {
   load(config);
 }
 
-mach::GMMStats::GMMStats(const mach::GMMStats& other) {
+bob::machine::GMMStats::GMMStats(const bob::machine::GMMStats& other) {
   copy(other);
 }
 
-mach::GMMStats::~GMMStats() { 
+bob::machine::GMMStats::~GMMStats() { 
 }
 
-mach::GMMStats& mach::GMMStats::operator=(const mach::GMMStats& other) {
+bob::machine::GMMStats& 
+bob::machine::GMMStats::operator=(const bob::machine::GMMStats& other) {
   // protect against invalid self-assignment
   if(this != &other) 
     copy(other);
@@ -53,7 +51,8 @@ mach::GMMStats& mach::GMMStats::operator=(const mach::GMMStats& other) {
   return *this;
 }
 
-bool mach::GMMStats::operator==(const mach::GMMStats& b) const {
+bool bob::machine::GMMStats::operator==(const bob::machine::GMMStats& b) const 
+{
   // Check dimensions
   if(n.extent(0) != b.n.extent(0) || 
       sumPx.extent(0) != b.sumPx.extent(0) || sumPx.extent(1) != b.sumPx.extent(1) ||
@@ -68,13 +67,19 @@ bool mach::GMMStats::operator==(const mach::GMMStats& b) const {
   return true;
 } 
 
-void mach::GMMStats::operator+=(const mach::GMMStats& b) {
+bool 
+bob::machine::GMMStats::operator!=(const bob::machine::GMMStats& b) const
+{
+  return !(this->operator==(b));
+}
+
+void bob::machine::GMMStats::operator+=(const bob::machine::GMMStats& b) {
   // Check dimensions
   if(n.extent(0) != b.n.extent(0) || 
       sumPx.extent(0) != b.sumPx.extent(0) || sumPx.extent(1) != b.sumPx.extent(1) ||
       sumPxx.extent(0) != b.sumPxx.extent(0) || sumPxx.extent(1) != b.sumPxx.extent(1))
     // TODO: add a specialized exception
-    throw mach::Exception();
+    throw bob::machine::Exception();
 
   // Update GMMStats object with the content of the other one
   T += b.T;
@@ -84,7 +89,7 @@ void mach::GMMStats::operator+=(const mach::GMMStats& b) {
   sumPxx += b.sumPxx;
 }
 
-void mach::GMMStats::copy(const GMMStats& other) {
+void bob::machine::GMMStats::copy(const GMMStats& other) {
   // Resize arrays
   resize(other.sumPx.extent(0),other.sumPx.extent(1));
   // Copy content
@@ -95,14 +100,14 @@ void mach::GMMStats::copy(const GMMStats& other) {
   sumPxx = other.sumPxx;
 }
 
-void mach::GMMStats::resize(const size_t n_gaussians, const size_t n_inputs) {
+void bob::machine::GMMStats::resize(const size_t n_gaussians, const size_t n_inputs) {
   n.resize(n_gaussians);
   sumPx.resize(n_gaussians, n_inputs);
   sumPxx.resize(n_gaussians, n_inputs);
   init();
 }
 
-void mach::GMMStats::init() {
+void bob::machine::GMMStats::init() {
   log_likelihood = 0;
   T = 0;
   n = 0.0;
@@ -110,7 +115,7 @@ void mach::GMMStats::init() {
   sumPxx = 0.0;
 }
 
-void mach::GMMStats::save(io::HDF5File& config) const {
+void bob::machine::GMMStats::save(bob::io::HDF5File& config) const {
   //please note we fix the output values to be of a precise type so they can be
   //retrieved at any platform with the exact same precision.
   // TODO: add versioning, replace int64_t by uint64_t and log_liklihood by log_likelihood
@@ -125,7 +130,7 @@ void mach::GMMStats::save(io::HDF5File& config) const {
   config.setArray("sumPxx", sumPxx); //Array2d
 }
 
-void mach::GMMStats::load(io::HDF5File& config) {
+void bob::machine::GMMStats::load(bob::io::HDF5File& config) {
   log_likelihood = config.read<double>("log_liklihood");
   int64_t n_gaussians = config.read<int64_t>("n_gaussians");
   int64_t n_inputs = config.read<int64_t>("n_inputs");

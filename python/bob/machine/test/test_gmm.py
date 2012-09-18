@@ -63,6 +63,7 @@ class GMMMachineTest(unittest.TestCase):
     # Makes them different
     gs_loaded.t = 58
     self.assertFalse( gs == gs_loaded )
+    self.assertTrue( gs != gs_loaded )
     # Accumulates from another GMMStats
     gs2 = bob.machine.GMMStats(2,3)
     gs2.log_likelihood = log_likelihood
