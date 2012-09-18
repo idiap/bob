@@ -402,7 +402,6 @@ Interfacing with OpenCV_ and PIL_
 As |project| relies on NumPy_ arrays, it is very easy to make use of other 
 popular libraries such as OpenCV_ and PIL_.
 
-
 OpenCV_
 -------
 
@@ -435,6 +434,13 @@ datatype is preserved by the previous operations.
 
 PIL_
 ----
+
+.. note::
+
+  To be able to execute these examples, you will need to install PIL_ on your
+  computer. For Ubuntu based distributions, the package should be called
+  ``python-imaging`` whereas on OSX, the MacPort package is called ``py26-pil``
+  (of course that depends on the version of Python you are using).
 
 PIL_ does not provide a generic multi-dimensional array structure. However, 
 its Image structure can be seen as 2D or 3D arrays. To convert a 2D NumPy_ 
