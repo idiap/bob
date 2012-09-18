@@ -157,3 +157,76 @@ class MachineTest(unittest.TestCase):
     for i, k in enumerate(testing):
       input = numpy.array(k, 'float64')
       self.assertTrue ( (abs(presumed(input) - output[i,:]) < maxerr).all() )
+
+  def test04_comparisons(self):
+
+    # Start by creating the data
+    w1 = numpy.array([[0.4, 0.1], [0.4, 0.2], [0.2, 0.7]], 'float64')
+    w2 = numpy.array([[0.4, 1.1], [0.4, 0.2], [0.2, 0.7]], 'float64')
+    b1 = numpy.array([0.3, -3.0], 'float64')
+    b2 = numpy.array([0.3, 3.0], 'float64')
+    isub1 = numpy.array([0., 0.5, 0.5], 'float64')
+    isub2 = numpy.array([0.5, 0.5, 0.5], 'float64')
+    idiv1 = numpy.array([0.5, 1.0, 1.0], 'float64')
+    idiv2 = numpy.array([1.5, 1.0, 1.0], 'float64')
+
+    # Creates LinearMachine's
+    m1 = bob.machine.LinearMachine(w1)
+    m1.input_subtract = isub1
+    m1.input_divide = idiv1
+    m1.biases = b1
+    m1.activation = bob.machine.Activation.TANH
+
+    m1b = bob.machine.LinearMachine(m1)
+    m1c = bob.machine.LinearMachine(w1)
+    m1c.input_subtract = isub1
+    m1c.input_divide = idiv1
+    m1c.biases = b1
+    m1c.activation = bob.machine.Activation.TANH
+
+    m2 = bob.machine.LinearMachine(w2)
+    m2.input_subtract = isub1
+    m2.input_divide = idiv1
+    m2.biases = b1
+    m2.activation = bob.machine.Activation.TANH
+
+    m3 = bob.machine.LinearMachine(w1)
+    m3.input_subtract = isub2
+    m3.input_divide = idiv1
+    m3.biases = b1
+    m3.activation = bob.machine.Activation.TANH
+
+    m4 = bob.machine.LinearMachine(w1)
+    m4.input_subtract = isub1
+    m4.input_divide = idiv2
+    m4.biases = b1
+    m4.activation = bob.machine.Activation.TANH
+
+    m5 = bob.machine.LinearMachine(w1)
+    m5.input_subtract = isub1
+    m5.input_divide = idiv1
+    m5.biases = b2
+    m5.activation = bob.machine.Activation.TANH
+
+    m6 = bob.machine.LinearMachine(w1)
+    m6.input_subtract = isub1
+    m6.input_divide = idiv1
+    m6.biases = b1
+    m6.activation = bob.machine.Activation.LINEAR
+
+    # Compares them using the overloaded operators == and !=
+    self.assertTrue( m1 == m1b )
+    self.assertFalse( m1 != m1b )
+    self.assertTrue( m1 == m1c )
+    self.assertFalse( m1 != m1c )
+    self.assertFalse( m1 == m2 )
+    self.assertTrue( m1 != m2 )
+    self.assertFalse( m1 == m3 )
+    self.assertTrue( m1 != m3 )
+    self.assertFalse( m1 == m4 )
+    self.assertTrue( m1 != m4 )
+    self.assertFalse( m1 == m5 )
+    self.assertTrue( m1 != m5 )
+    self.assertFalse( m1 == m6 )
+    self.assertTrue( m1 != m6 )
+

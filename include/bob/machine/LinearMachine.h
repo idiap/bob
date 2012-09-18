@@ -88,6 +88,15 @@ namespace bob { namespace machine {
       LinearMachine& operator= (const LinearMachine& other);
 
       /**
+        * @brief Equal to
+        */
+      bool operator==(const LinearMachine& b) const;
+      /**
+        * @brief Not equal to
+        */
+      bool operator!=(const LinearMachine& b) const; 
+
+      /**
        * Loads data from an existing configuration object. Resets the current
        * state.
        */

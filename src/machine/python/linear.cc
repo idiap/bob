@@ -24,12 +24,12 @@
 #include "bob/machine/LinearMachine.h"
 
 using namespace boost::python;
-namespace tp = bob::python;
+namespace bp = bob::python;
 namespace ca = bob::core::array;
 namespace mach = bob::machine;
 namespace io = bob::io;
 
-static object forward(const mach::LinearMachine& m, tp::const_ndarray input) {
+static object forward(const mach::LinearMachine& m, bp::const_ndarray input) {
   const ca::typeinfo& info = input.type();
 
   if (info.dtype != ca::t_float64)
@@ -38,14 +38,14 @@ static object forward(const mach::LinearMachine& m, tp::const_ndarray input) {
   switch(info.nd) {
     case 1:
       {
-        tp::ndarray output(ca::t_float64, m.outputSize());
+        bp::ndarray output(ca::t_float64, m.outputSize());
         blitz::Array<double,1> output_ = output.bz<double,1>();
         m.forward(input.bz<double,1>(), output_);
         return output.self();
       }
     case 2:
       {
-        tp::ndarray output(ca::t_float64, info.shape[0], m.outputSize());
+        bp::ndarray output(ca::t_float64, info.shape[0], m.outputSize());
         blitz::Array<double,2> input_ = input.bz<double,2>();
         blitz::Array<double,2> output_ = output.bz<double,2>();
         blitz::Range all = blitz::Range::all();
@@ -61,8 +61,8 @@ static object forward(const mach::LinearMachine& m, tp::const_ndarray input) {
   }
 }
 
-static void forward2(const mach::LinearMachine& m, tp::const_ndarray input,
-    tp::ndarray output) {
+static void forward2(const mach::LinearMachine& m, bp::const_ndarray input,
+    bp::ndarray output) {
   const ca::typeinfo& info = input.type();
 
   if (info.dtype != ca::t_float64)
@@ -171,6 +171,9 @@ void bind_machine_linear() {
     .def(init<const blitz::Array<double,2>&>((arg("weights")), "Constructs a new LinearMachine from a set of weight values. Each column of the weight matrix should represent a direction to which the input is projected."))
     .def(init<io::HDF5File&>((arg("config")), "Constructs a new LinearMachine from a configuration file. Both weights and biases have their dimensionalities checked between each other for consistency."))
     .def(init<>("Default constructor, builds a machine as with 'LinearMachine(0,0)' which, of course, does not accept inputs or produce outputs."))
+    .def(init<bob::machine::LinearMachine&>(args("other"), "Constructs a new LinearMachine from an existing one, using the copy constructor."))
+    .def(self == self)
+    .def(self != self)
     .def("load", &mach::LinearMachine::load, (arg("self"), arg("config")), "Loads the weights and biases from a configuration file. Both weights and biases have their dimensionalities checked between each other for consistency.")
     .def("save", &mach::LinearMachine::save, (arg("self"), arg("config")), "Saves the weights and biases to a configuration file.")
     .add_property("input_subtract", make_function(&mach::LinearMachine::getInputSubraction, return_value_policy<copy_const_reference>()), &set_input_sub, "Input subtraction factor, before feeding data through the weight matrix W. The subtraction is the first applied operation in the processing chain - by default, it is set to 0.0.")
