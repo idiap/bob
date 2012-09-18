@@ -70,6 +70,10 @@ class Gaussian: public Machine<blitz::Array<double,1>, double>
      * Equal to
      */
     bool operator==(const Gaussian& b) const;
+    /**
+     * Not equal to
+     */
+    bool operator!=(const Gaussian& b) const;
     
     /**
      * Set the input dimensionality, reset the mean to zero

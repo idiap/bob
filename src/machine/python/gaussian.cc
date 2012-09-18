@@ -98,6 +98,7 @@ void bind_machine_gaussian()
     .def(init<mach::Gaussian&>(args("other")))
     .def(init<io::HDF5File&>(args("config")))
     .def(self == self)
+    .def(self != self)
     .add_property("dim_d", &mach::Gaussian::getNInputs, &mach::Gaussian::setNInputs,
       "Dimensionality of the input feature space")
     .add_property("mean", &py_getMean, &py_setMean, "Mean of the Gaussian")

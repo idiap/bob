@@ -63,9 +63,11 @@ class GaussianMachineTest(unittest.TestCase):
     g.save(bob.io.HDF5File(filename, 'w'))
     g_loaded = bob.machine.Gaussian(bob.io.HDF5File(filename))
     self.assertTrue( g == g_loaded )
+    self.assertFalse( g != g_loaded )
     # Make them different
     g_loaded.set_variance_thresholds(0.001)
     self.assertFalse( g == g_loaded )
+    self.assertTrue( g != g_loaded )
 
     # Check likelihood computation
     sample1 = numpy.array([0, 1, 2], 'float64')
@@ -88,6 +90,10 @@ class GaussianMachineTest(unittest.TestCase):
     g2 = bob.machine.Gaussian()
     g2 = g
     self.assertTrue( g == g2 )
+    self.assertFalse( g != g2 )
+    g3 = bob.machine.Gaussian(g)
+    self.assertTrue( g == g3 )
+    self.assertFalse( g != g3 )
 
     # Clean-up
     os.unlink(filename)

@@ -24,46 +24,53 @@
 #include "bob/core/array_assert.h"
 #include "bob/math/log.h"
 
-namespace ca = bob::core::array;
-namespace mathL = bob::math::Log;
-namespace mach = bob::machine;
-namespace io = bob::io;
-
-mach::Gaussian::Gaussian() {
+bob::machine::Gaussian::Gaussian() {
   resize(0);
 }
 
-mach::Gaussian::Gaussian(const size_t n_inputs) {
+bob::machine::Gaussian::Gaussian(const size_t n_inputs) {
   resize(n_inputs);
 }
 
-mach::Gaussian::Gaussian(const mach::Gaussian& other) {
+bob::machine::Gaussian::Gaussian(const bob::machine::Gaussian& other) {
   copy(other);
 }
 
-mach::Gaussian::Gaussian(io::HDF5File& config) {
+bob::machine::Gaussian::Gaussian(bob::io::HDF5File& config) {
   load(config);
 }
 
-mach::Gaussian::~Gaussian() {
+bob::machine::Gaussian::~Gaussian() {
 }
 
-mach::Gaussian& mach::Gaussian::operator=(const mach::Gaussian &other) {
+bob::machine::Gaussian& bob::machine::Gaussian::operator=(const bob::machine::Gaussian &other) {
   if(this != &other) 
     copy(other);
 
   return *this;
 }
 
-bool mach::Gaussian::operator==(const mach::Gaussian& b) const {
-  return m_n_inputs == b.m_n_inputs &&
-         blitz::all(m_mean == b.m_mean) &&
-         blitz::all(m_variance == b.m_variance) &&
-         blitz::all(m_variance_thresholds == b.m_variance_thresholds);
+bool bob::machine::Gaussian::operator==(const bob::machine::Gaussian& b) const {
+  // Check dimensions
+  if(this->m_mean.extent(0) != b.m_mean.extent(0) ||
+     this->m_variance.extent(0) != b.m_variance.extent(0) ||
+     this->m_variance_thresholds.extent(0) != b.m_variance_thresholds.extent(0))
+    return false;
+
+  // Check content
+  if(this->m_n_inputs != b.m_n_inputs || blitz::any(this->m_mean != b.m_mean) ||
+     blitz::any(this->m_variance != b.m_variance) ||
+     blitz::any(this->m_variance_thresholds != b.m_variance_thresholds))
+    return false;
+
+  return true;
 }
 
+bool bob::machine::Gaussian::operator!=(const bob::machine::Gaussian& b) const {
+  return !(this->operator==(b));
+}
 
-void mach::Gaussian::copy(const mach::Gaussian& other) {
+void bob::machine::Gaussian::copy(const bob::machine::Gaussian& other) {
   m_n_inputs = other.m_n_inputs;
 
   m_mean.resize(m_n_inputs);
@@ -80,11 +87,11 @@ void mach::Gaussian::copy(const mach::Gaussian& other) {
 }
 
 
-void mach::Gaussian::setNInputs(const size_t n_inputs) {
+void bob::machine::Gaussian::setNInputs(const size_t n_inputs) {
   resize(n_inputs);
 }
 
-void mach::Gaussian::resize(const size_t n_inputs) {
+void bob::machine::Gaussian::resize(const size_t n_inputs) {
   m_n_inputs = n_inputs;
   m_mean.resize(m_n_inputs);
   m_mean = 0;
@@ -99,37 +106,37 @@ void mach::Gaussian::resize(const size_t n_inputs) {
   preComputeConstants();
 }
 
-void mach::Gaussian::setMean(const blitz::Array<double,1> &mean) {
+void bob::machine::Gaussian::setMean(const blitz::Array<double,1> &mean) {
   // Check and set
-  ca::assertSameShape(m_mean, mean);
+  bob::core::array::assertSameShape(m_mean, mean);
   m_mean = mean;
 }
 
-void mach::Gaussian::setVariance(const blitz::Array<double,1> &variance) {
+void bob::machine::Gaussian::setVariance(const blitz::Array<double,1> &variance) {
   // Check and set
-  ca::assertSameShape(m_variance, variance);
+  bob::core::array::assertSameShape(m_variance, variance);
   m_variance = variance;
 
   // Variance flooring
   applyVarianceThresholds();
 }
 
-void mach::Gaussian::setVarianceThresholds(const blitz::Array<double,1> &variance_thresholds) {
+void bob::machine::Gaussian::setVarianceThresholds(const blitz::Array<double,1> &variance_thresholds) {
   // Check and set
-  ca::assertSameShape(m_variance_thresholds, variance_thresholds);
+  bob::core::array::assertSameShape(m_variance_thresholds, variance_thresholds);
   m_variance_thresholds = variance_thresholds;
 
   // Variance flooring
   applyVarianceThresholds();
 }
 
-void mach::Gaussian::setVarianceThresholds(const double value) {
+void bob::machine::Gaussian::setVarianceThresholds(const double value) {
   blitz::Array<double,1> variance_thresholds(m_n_inputs);
   variance_thresholds = value;
   setVarianceThresholds(variance_thresholds);
 }
 
-void mach::Gaussian::applyVarianceThresholds() {
+void bob::machine::Gaussian::applyVarianceThresholds() {
    // Apply variance flooring threshold
   m_variance = blitz::where( m_variance < m_variance_thresholds, m_variance_thresholds, m_variance);
 
@@ -137,27 +144,27 @@ void mach::Gaussian::applyVarianceThresholds() {
   preComputeConstants(); 
 }
 
-double mach::Gaussian::logLikelihood(const blitz::Array<double,1> &x) const {
+double bob::machine::Gaussian::logLikelihood(const blitz::Array<double,1> &x) const {
   // Check 
-  ca::assertSameShape(x, m_mean);
+  bob::core::array::assertSameShape(x, m_mean);
   return logLikelihood_(x);
 }
 
-double mach::Gaussian::logLikelihood_(const blitz::Array<double,1> &x) const {
+double bob::machine::Gaussian::logLikelihood_(const blitz::Array<double,1> &x) const {
   double z = blitz::sum(blitz::pow2(x - m_mean) / m_variance);
   // Log Likelihood
   return (-0.5 * (m_g_norm + z));
 }
 
-void mach::Gaussian::preComputeNLog2Pi() {
-  m_n_log2pi = m_n_inputs * mathL::Log2Pi;
+void bob::machine::Gaussian::preComputeNLog2Pi() {
+  m_n_log2pi = m_n_inputs * bob::math::Log::Log2Pi;
 }
 
-void mach::Gaussian::preComputeConstants() {
+void bob::machine::Gaussian::preComputeConstants() {
   m_g_norm = m_n_log2pi + blitz::sum(blitz::log(m_variance));
 }
 
-void mach::Gaussian::save(bob::io::HDF5File& config) const {
+void bob::machine::Gaussian::save(bob::io::HDF5File& config) const {
   config.setArray("m_mean", m_mean);
   config.setArray("m_variance", m_variance);
   config.setArray("m_variance_thresholds", m_variance_thresholds);
@@ -166,7 +173,7 @@ void mach::Gaussian::save(bob::io::HDF5File& config) const {
   config.set("m_n_inputs", v);
 }
 
-void mach::Gaussian::load(bob::io::HDF5File& config) {
+void bob::machine::Gaussian::load(bob::io::HDF5File& config) {
   int64_t v = config.read<int64_t>("m_n_inputs");
   m_n_inputs = static_cast<size_t>(v);
   
