@@ -177,14 +177,24 @@ void bind_machine_gabor(){
       "This class implements functionality dealing with Gabor graphs, Gabor graph comparison and Gabor graph averaging.",
       boost::python::no_init
     )
-    
+
     .def(
       boost::python::init<>(
         boost::python::arg("self"),
         "Generates an empty Grid graph extractor. This extractor should only be used to compute average graphs or to compare two graphs!"
       )
     )
-    
+
+    .def(
+      boost::python::init<const bob::machine::GaborGraphMachine&>(
+          "Constructs a GaborGraphMachine from the one by doing a deep copy."
+      )
+    )
+
+    .def(
+      boost::python::self == boost::python::self
+    )
+
     .def(
       boost::python::init<blitz::TinyVector<int,2>, blitz::TinyVector<int,2>, int, int, int, int>(
         (boost::python::arg("self"), boost::python::arg("lefteye"), boost::python::arg("righteye"), boost::python::arg("between")=3, boost::python::arg("along")=2, boost::python::arg("above")=4, boost::python::arg("below")=6),
@@ -222,14 +232,14 @@ void bind_machine_gabor(){
       &bob::machine::GaborGraphMachine::nodes,
       "The node positions of the graph."
       )
-      
+
     .def(
       "__call__",
       &bob_extract,
       (boost::python::arg("self"), boost::python::arg("jet_image"), boost::python::arg("graph_jets")),
       "Extracts the Gabor jets at the desired locations from the given Gabor jet image"
     )
-    
+
     .def(
       "__call__",
       &bob_extract2,
@@ -243,12 +253,12 @@ void bind_machine_gabor(){
       (boost::python::arg("self"), boost::python::arg("many_graph_jets"), boost::python::arg("averaged_graph_jets")),
       "Averages the given list of Gabor graphs into one Gabor graph"
     )
-    
+
     .def(
       "similarity",
       &bob_similarity,
       (boost::python::arg("self"), boost::python::arg("model_graph_jets"), boost::python::arg("probe_graph_jets"), boost::python::arg("jet_similarity_function")),
       "Computes the similarity between the given probe graph and the gallery, which might be a single graph or a collection of graphs"
   );
-      
+
 }

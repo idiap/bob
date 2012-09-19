@@ -80,7 +80,7 @@ bob::machine::GaborGraphMachine::GaborGraphMachine(
 {
   int ycount = (last[0] - first[0]) / step[0] + 1;
   int xcount = (last[1] - first[1]) / step[1] + 1;
-  
+
   // create grid positions
   m_node_positions.resize(xcount*ycount,2);
   for (int y = 0, i = 0; y < ycount; ++y){
@@ -92,6 +92,49 @@ bob::machine::GaborGraphMachine::GaborGraphMachine(
     }
   }
 }
+
+/**
+ * Generates this machine as a copy of the other one
+ *
+ * @param other  The machine to copy
+ */
+bob::machine::GaborGraphMachine::GaborGraphMachine(
+  const GaborGraphMachine& other
+)
+{
+  m_node_positions.resize(other.m_node_positions.shape());
+  m_node_positions = other.m_node_positions;
+}
+
+
+/**
+ * Makes this machine a deep copy of the given one
+ *
+ * @param other  The machine to copy
+ * @return  A reference to *this
+ */
+bob::machine::GaborGraphMachine& bob::machine::GaborGraphMachine::operator =(
+  const GaborGraphMachine& other
+)
+{
+  m_node_positions.resize(other.m_node_positions.shape());
+  m_node_positions = other.m_node_positions;
+  return *this;
+}
+
+/**
+ * Checks if the parameterization of both machines is identical.
+ *
+ * @param other  The machine to test for equality to this
+ * @return true if the node positions of both machines are identical, otherwise false
+ */
+bool bob::machine::GaborGraphMachine::operator ==(
+  const GaborGraphMachine& other
+) const
+{
+  return (blitz::all(m_node_positions == other.m_node_positions));
+}
+
 
 void bob::machine::GaborGraphMachine::checkPositions(int height, int width) const throw(){
   for (int i = m_node_positions.extent(0); i--;){

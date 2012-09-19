@@ -63,6 +63,15 @@ namespace bob { namespace machine {
       //! generates an empty BIC machine
       BICMachine(bool use_DFFS = false);
 
+      //! Copy constructor
+      BICMachine(const BICMachine& other);
+
+      //! Assignment Operator
+      BICMachine& operator =(const BICMachine &other);
+
+      //! Equality operator
+      bool operator ==(const BICMachine& other) const;
+
       //! computes the BIC probability score for the given input difference vector
       void forward_(const blitz::Array<double,1>& input, blitz::Array<double,1>& output) const;
 
@@ -70,10 +79,10 @@ namespace bob { namespace machine {
       void forward (const blitz::Array<double,1>& input, blitz::Array<double,1>& output) const;
 
       //! sets the IEC vectors of the given class
-      void setIEC(bool clazz, const blitz::Array<double,1>& mean, const blitz::Array<double,1>& variances);
+      void setIEC(bool clazz, const blitz::Array<double,1>& mean, const blitz::Array<double,1>& variances, bool copy_data = false);
 
       //! sets the BIC projection details of the given class
-      void setBIC(bool clazz, const blitz::Array<double,1>& mean, const blitz::Array<double,1>& variances, const blitz::Array<double,2>& projection, const double rho);
+      void setBIC(bool clazz, const blitz::Array<double,1>& mean, const blitz::Array<double,1>& variances, const blitz::Array<double,2>& projection, const double rho, bool copy_data = false);
 
       //! loads this machine from the given hdf5 file.
       void load (bob::io::HDF5File& config);

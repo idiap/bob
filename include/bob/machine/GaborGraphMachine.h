@@ -60,13 +60,22 @@ namespace bob{ namespace machine {
         int above,
         int below
       );
-      
+
       //! creates a regular grid graph with specified first and last position, and the step size between two nodes
       GaborGraphMachine(
         blitz::TinyVector<int,2> first,
         blitz::TinyVector<int,2> last,
         blitz::TinyVector<int,2> step
       );
+
+      //! Copy constructor
+      GaborGraphMachine(const GaborGraphMachine& other);
+
+      //! Assignment operator
+      GaborGraphMachine& operator =(const GaborGraphMachine& other);
+
+      //! Equality operator
+      bool operator ==(const GaborGraphMachine& other) const;
 
       //! returns the number of nodes of this graph
       int numberOfNodes() const { return m_node_positions.extent(0);}

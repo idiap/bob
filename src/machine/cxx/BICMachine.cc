@@ -50,6 +50,75 @@ bob::machine::BICMachine::BICMachine(bool use_DFFS)
   m_use_DFFS(use_DFFS)
 {}
 
+/**
+ * Assigns the other BICMachine to this, i.e., makes a deep copy of the given machine.
+ *
+ * @param  other  The other BICMachine to get a shallow copy of
+ * @return a reference to *this
+ */
+bob::machine::BICMachine::BICMachine(const BICMachine& other)
+:
+  m_project_data(other.m_project_data),
+  m_use_DFFS(other.m_use_DFFS)
+{
+  if (m_project_data){
+    setBIC(false, other.m_mu_I, other.m_lambda_I, other.m_Phi_I, other.m_rho_I, true);
+    setBIC(true , other.m_mu_E, other.m_lambda_E, other.m_Phi_E, other.m_rho_E, true);
+  } else {
+    setIEC(false, other.m_mu_I, other.m_lambda_I, true);
+    setIEC(true , other.m_mu_E, other.m_lambda_E, true);
+  }
+}
+
+/**
+ * Assigns the other BICMachine to this, i.e., makes a deep copy of the given BICMachine
+ *
+ * @param  other  The other BICMachine to get a deep copy of
+ * @return a reference to *this
+ */
+bob::machine::BICMachine& bob::machine::BICMachine::operator =(const BICMachine& other)
+{
+  if (other.m_project_data){
+    m_use_DFFS = other.m_use_DFFS;
+    setBIC(false, other.m_mu_I, other.m_lambda_I, other.m_Phi_I, other.m_rho_I, true);
+    setBIC(true , other.m_mu_E, other.m_lambda_E, other.m_Phi_E, other.m_rho_E, true);
+  } else {
+    m_use_DFFS = false;
+    setIEC(false, other.m_mu_I, other.m_lambda_I, true);
+    setIEC(true , other.m_mu_E, other.m_lambda_E, true);
+  }
+  return *this;
+}
+
+/**
+ * Compares the given machine with this for equality
+ *
+ * @param  other  The BICMachine to compare with
+
+ * @return true if both machines are approximately equal, otherwise false
+ */
+bool bob::machine::BICMachine::operator ==(const BICMachine& other) const
+{
+  // basic tests
+  if (m_project_data != other.m_project_data) return false;
+  if (m_project_data && m_use_DFFS != other.m_use_DFFS) return false;
+
+  // compare the data that is common for both approaches
+  if (blitz::any(blitz::abs(m_mu_I - other.m_mu_I) > 1e-8 )) return false;
+  if (blitz::any(blitz::abs(m_mu_E - other.m_mu_E) > 1e-8 )) return false;
+  if (blitz::any(blitz::abs(m_lambda_I - other.m_lambda_I) > 1e-8 )) return false;
+  if (blitz::any(blitz::abs(m_lambda_E - other.m_lambda_E) > 1e-8 )) return false;
+
+  if (m_project_data){
+    // compare data
+    if (blitz::any(blitz::abs(m_Phi_I - other.m_Phi_I) > 1e-8 )) return false;
+    if (blitz::any(blitz::abs(m_Phi_E - other.m_Phi_E) > 1e-8 )) return false;
+    if (m_use_DFFS && (std::abs(m_rho_I - other.m_rho_I) > 1e-8 || std::abs(m_rho_I - other.m_rho_I) > 1e-8)) return false;
+  }
+  return true;
+}
+
+
 
 void bob::machine::BICMachine::initialize(bool clazz, int input_length, int projected_length){
   blitz::Array<double,1>& diff = clazz ? m_diff_E : m_diff_I;
@@ -64,11 +133,13 @@ void bob::machine::BICMachine::initialize(bool clazz, int input_length, int proj
  * @param  clazz   false for the intrapersonal class, true for the extrapersonal one.
  * @param  mean    The mean vector of the training data
  * @param  variances  The variances of the training data
+ * @param  copy_data  If true, makes a deep copy of the matrices, otherwise it just references it (the default)
  */
 void bob::machine::BICMachine::setIEC(
     bool clazz,
     const blitz::Array<double,1>& mean,
-    const blitz::Array<double,1>& variances
+    const blitz::Array<double,1>& variances,
+    bool copy_data
 ){
   m_project_data = false;
   // select the right matrices to write
@@ -76,8 +147,15 @@ void bob::machine::BICMachine::setIEC(
   blitz::Array<double,1>& lambda = clazz ? m_lambda_E : m_lambda_I;
 
   // copy mean and variances
-  mu.reference(mean);
-  lambda.reference(variances);
+  if (copy_data){
+    mu.resize(mean.shape());
+    mu = mean;
+    lambda.resize(variances.shape());
+    lambda = variances;
+  } else {
+    mu.reference(mean);
+    lambda.reference(variances);
+  }
 }
 
 /**
@@ -88,13 +166,15 @@ void bob::machine::BICMachine::setIEC(
  * @param  variances  The eigenvalues of the training data
  * @param  projection  The PCA projection matrix
  * @param  rho     The residual eigenvalues, used for DFFS calculation
+ * @param  copy_data  If true, makes a deep copy of the matrices, otherwise it just references it (the default)
  */
 void bob::machine::BICMachine::setBIC(
     bool clazz,
     const blitz::Array<double,1>& mean,
     const blitz::Array<double,1>& variances,
     const blitz::Array<double,2>& projection,
-    const double rho
+    const double rho,
+    bool copy_data
 ){
   m_project_data = true;
   // select the right matrices to write
@@ -104,18 +184,25 @@ void bob::machine::BICMachine::setBIC(
   double& rho_ = clazz ? m_rho_E : m_rho_I;
 
   // copy information
-  mu.reference(mean);
-  lambda.reference(variances);
-  Phi.resize(projection.shape());
-  Phi = projection;
-  Phi.transposeSelf(1,0);
+  if (copy_data){
+    mu.resize(mean.shape());
+    mu = mean;
+    lambda.resize(variances.shape());
+    lambda = variances;
+    Phi.resize(projection.shape());
+    Phi = projection;
+  } else {
+    mu.reference(mean);
+    lambda.reference(variances);
+    Phi.reference(projection);
+  }
   rho_ = rho;
 
   // check that rho has a reasonable value (if it is used)
   if (m_use_DFFS && rho_ < 1e-12) throw bob::machine::ZeroEigenvalueException();
 
   // initialize temporaries
-  initialize(clazz, Phi.shape()[1], Phi.shape()[0]);
+  initialize(clazz, Phi.shape()[0], Phi.shape()[1]);
 }
 
 /**
@@ -141,7 +228,7 @@ void bob::machine::BICMachine::load(bob::io::HDF5File& config){
   if (m_project_data){
     m_use_DFFS = config.read<bool>("use_DFFS");
     m_Phi_I.reference(config.readArray<double,2>("intra_subspace"));
-    initialize(false, m_Phi_I.shape()[1], m_Phi_I.shape()[0]);
+    initialize(false, m_Phi_I.shape()[0], m_Phi_I.shape()[1]);
     m_rho_I = config.read<double>("intra_rho");
   }
 
@@ -149,7 +236,7 @@ void bob::machine::BICMachine::load(bob::io::HDF5File& config){
   m_lambda_E.reference(config.readArray<double,1>("extra_variance"));
   if (m_project_data){
     m_Phi_E.reference(config.readArray<double,2>("extra_subspace"));
-    initialize(true, m_Phi_E.shape()[1], m_Phi_E.shape()[0]);
+    initialize(true, m_Phi_E.shape()[0], m_Phi_E.shape()[1]);
     m_rho_E = config.read<double>("extra_rho");
   }
   // check that rho has reasonable values
@@ -195,8 +282,8 @@ void bob::machine::BICMachine::forward_(const blitz::Array<double,1>& input, bli
     m_diff_I = input - m_mu_I;
     m_diff_E = input - m_mu_E;
     // project data to intrapersonal and extrapersonal subspace
-    bob::math::prod(m_Phi_I, m_diff_I, m_proj_I);
-    bob::math::prod(m_Phi_E, m_diff_E, m_proj_E);
+    bob::math::prod(m_diff_I, m_Phi_I, m_proj_I);
+    bob::math::prod(m_diff_E, m_Phi_E, m_proj_E);
 
     // compute Mahalanobis distance
     for (int i = m_proj_E.shape()[0]; i--;)
@@ -209,12 +296,14 @@ void bob::machine::BICMachine::forward_(const blitz::Array<double,1>& input, bli
       res += (sqr_norm(m_diff_E) - sqr_norm(m_proj_E)) / m_rho_E
           -  (sqr_norm(m_diff_I) - sqr_norm(m_proj_I)) / m_rho_I;
     }
+    res /= (m_proj_E.shape()[0] + m_proj_I.shape()[0]);
   } else {
     // forward without projection
     for (int i = input.shape()[0]; i--;){
       res += sqr(input(i) - m_mu_E(i)) / m_lambda_E(i)
           -  sqr(input(i) - m_mu_I(i)) / m_lambda_I(i);
     }
+    res /= input.shape()[0];
   }
 }
 
