@@ -1,18 +1,18 @@
 .. vim: set fileencoding=utf-8 :
 .. Andre Anjos <andre.anjos@idiap.ch>
 .. Wed Jan 11 14:43:35 2012 +0100
-.. 
+..
 .. Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
-.. 
+..
 .. This program is free software: you can redistribute it and/or modify
 .. it under the terms of the GNU General Public License as published by
 .. the Free Software Foundation, version 3 of the License.
-.. 
+..
 .. This program is distributed in the hope that it will be useful,
 .. but WITHOUT ANY WARRANTY; without even the implied warranty of
 .. MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 .. GNU General Public License for more details.
-.. 
+..
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -70,9 +70,9 @@ have to:
   python:
 
   .. code-block:: python
-    
+
     import os
-    os.environ['TORCH_DEBUG'] = '2'
+    os.environ['BOB_DEBUG'] = '2'
 
 * make sure the logging level is set at least to `logging.DEBUG` using the
   logger:
@@ -99,12 +99,53 @@ created automatically):
 
   import logging
 
-  # the logger bob.mypackage will inherit all configuration
-  from "bob" (parent)
+  # the logger bob.mypackage will inherit all configuration from "bob" (parent)
   # that is what you want!
   logger = logging.getLogger('bob.mypackage')
 
   logger.warn("Waw!")
+
+When you write scripts that are based on Bob, you might want to specify the
+verbosity level of your application. A nice pythonic way to achieve this, is by
+using the command line parsing utilities and specifying a verbose level:
+
+.. code-block:: python
+
+  import argparse
+
+  # create command line parser object
+  parser = argparse.ArgumentParser()
+
+  # add verbosity command line argument
+  parser.add_argument('-v', '--verbose', action='count', default=0, help="...")
+
+  # interpret the actual given command line arguments
+  args = parser.parse_args()
+
+Now, you can use the verbose level to set the logging level. As a default I
+would suggest to use something like:
+
+.. code-block:: python
+
+  import logging
+
+  # get any logger, here we use the base logger of Bob
+  logger = logging.getLogger('bob')
+
+  # set up the verbosity level of the logging system
+  logger.setLevel(
+    {
+      0: logging.ERROR,
+      1: logging.WARNING,
+      2: logging.INFO,
+      3: logging.DEBUG
+    }[args.verbose]
+  )
+
+Hence, by default only error messages are reported. When you finally call your
+script, you can specify, which log messages should be shown by adding multiple
+``--verbose`` arguments, or simply use one of the short-cuts ``-v``, ``-vv``, or
+``-vvv`` to get warning, info, or debug messages, respectively.
 
 Exception handling
 ------------------
@@ -126,4 +167,4 @@ actions, please make sure to follow the recipe used to bind the C++
 `bob::core::Exception` and provide good documentation.
 
 .. place here your references:
-.. _`Python Logging Module`: http://docs.python.org/library/logging.html 
+.. _`Python Logging Module`: http://docs.python.org/library/logging.html
