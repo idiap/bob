@@ -91,11 +91,11 @@ bob::machine::BICMachine& bob::machine::BICMachine::operator =(const BICMachine&
 }
 
 /**
- * Compares the given machine with this for equality
+ * Compares if this machine and the given one are identical
  *
  * @param  other  The BICMachine to compare with
 
- * @return true if both machines are approximately equal, otherwise false
+ * @return true if both machines are identical, i.e., have exactly the same parameters, otherwise false
  */
 bool bob::machine::BICMachine::operator ==(const BICMachine& other) const
 {
@@ -104,16 +104,57 @@ bool bob::machine::BICMachine::operator ==(const BICMachine& other) const
   if (m_project_data && m_use_DFFS != other.m_use_DFFS) return false;
 
   // compare the data that is common for both approaches
-  if (blitz::any(blitz::abs(m_mu_I - other.m_mu_I) > 1e-8 )) return false;
-  if (blitz::any(blitz::abs(m_mu_E - other.m_mu_E) > 1e-8 )) return false;
-  if (blitz::any(blitz::abs(m_lambda_I - other.m_lambda_I) > 1e-8 )) return false;
-  if (blitz::any(blitz::abs(m_lambda_E - other.m_lambda_E) > 1e-8 )) return false;
+  if (not bob::core::array::hasSameShape(m_mu_I, other.m_mu_I)) return false;
+  if (not bob::core::array::hasSameShape(m_mu_E, other.m_mu_E)) return false;
+  if (not bob::core::array::hasSameShape(m_lambda_I, other.m_lambda_I)) return false;
+  if (not bob::core::array::hasSameShape(m_lambda_E, other.m_lambda_E)) return false;
+  if (blitz::any(m_mu_I != other.m_mu_I)) return false;
+  if (blitz::any(m_mu_E != other.m_mu_E)) return false;
+  if (blitz::any(m_lambda_I != other.m_lambda_I)) return false;
+  if (blitz::any(m_lambda_E != other.m_lambda_E)) return false;
 
   if (m_project_data){
     // compare data
-    if (blitz::any(blitz::abs(m_Phi_I - other.m_Phi_I) > 1e-8 )) return false;
-    if (blitz::any(blitz::abs(m_Phi_E - other.m_Phi_E) > 1e-8 )) return false;
-    if (m_use_DFFS && (std::abs(m_rho_I - other.m_rho_I) > 1e-8 || std::abs(m_rho_I - other.m_rho_I) > 1e-8)) return false;
+    if (not bob::core::array::hasSameShape(m_Phi_I, other.m_Phi_I)) return false;
+    if (not bob::core::array::hasSameShape(m_Phi_E, other.m_Phi_E)) return false;
+    if (blitz::any(m_Phi_I != other.m_Phi_I)) return false;
+    if (blitz::any(m_Phi_E != other.m_Phi_E)) return false;
+    if (m_use_DFFS && (m_rho_I != other.m_rho_I || m_rho_I != other.m_rho_I)) return false;
+  }
+  return true;
+}
+
+/**
+ * Compares the given machine with this for similarity
+ *
+ * @param  other  The BICMachine to compare with
+ * @param  epsilon  The smallest value any parameter might differ between the two machines
+
+ * @return true if both machines are approximately equal, otherwise false
+ */
+bool bob::machine::BICMachine::is_similar_to(const BICMachine& other, const double epsilon) const
+{
+  // basic tests
+  if (m_project_data != other.m_project_data) return false;
+  if (m_project_data && m_use_DFFS != other.m_use_DFFS) return false;
+
+  // compare the data that is common for both approaches
+  if (not bob::core::array::hasSameShape(m_mu_I, other.m_mu_I)) return false;
+  if (not bob::core::array::hasSameShape(m_mu_E, other.m_mu_E)) return false;
+  if (not bob::core::array::hasSameShape(m_lambda_I, other.m_lambda_I)) return false;
+  if (not bob::core::array::hasSameShape(m_lambda_E, other.m_lambda_E)) return false;
+  if (blitz::any(blitz::abs(m_mu_I - other.m_mu_I) > epsilon )) return false;
+  if (blitz::any(blitz::abs(m_mu_E - other.m_mu_E) > epsilon )) return false;
+  if (blitz::any(blitz::abs(m_lambda_I - other.m_lambda_I) > epsilon )) return false;
+  if (blitz::any(blitz::abs(m_lambda_E - other.m_lambda_E) > epsilon )) return false;
+
+  if (m_project_data){
+    // compare data
+    if (not bob::core::array::hasSameShape(m_Phi_I, other.m_Phi_I)) return false;
+    if (not bob::core::array::hasSameShape(m_Phi_E, other.m_Phi_E)) return false;
+    if (blitz::any(blitz::abs(m_Phi_I - other.m_Phi_I) > epsilon )) return false;
+    if (blitz::any(blitz::abs(m_Phi_E - other.m_Phi_E) > epsilon )) return false;
+    if (m_use_DFFS && (std::abs(m_rho_I - other.m_rho_I) > epsilon || std::abs(m_rho_I - other.m_rho_I) > epsilon)) return false;
   }
   return true;
 }

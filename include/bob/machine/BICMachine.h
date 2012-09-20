@@ -72,6 +72,9 @@ namespace bob { namespace machine {
       //! Equality operator
       bool operator ==(const BICMachine& other) const;
 
+      //! Similarity operator
+      bool is_similar_to(const BICMachine& other, const double epsilon=1e-8) const;
+
       //! computes the BIC probability score for the given input difference vector
       void forward_(const blitz::Array<double,1>& input, blitz::Array<double,1>& output) const;
 
