@@ -24,6 +24,7 @@
 
 #include <boost/format.hpp>
 
+#include "bob/core/python/gil.h"
 #include "bob/daq/Camera.h"
 #include "bob/daq/VideoReaderCamera.h"
 #include "bob/daq/OutputWriter.h"
@@ -91,6 +92,31 @@ static std::string FrameInterval__str__(Camera::FrameInterval const &self) {
   return boost::str(boost::format("%d/%d") % self.numerator % self.denominator);
 }
 
+void CaptureSystem_start(CaptureSystem& cs) {
+  bob::python::no_gil unlock;
+  return cs.start();
+}
+
+void Display_start(bob::daq::Display& d) {
+  bob::python::no_gil unlock;
+  return d.start();
+}
+
+int Camera_start(Camera& c) {
+  bob::python::no_gil unlock;
+  return c.start();
+}
+
+bool FaceLocalization_start(FaceLocalization& c) {
+  bob::python::no_gil unlock;
+  return c.start();
+}
+
+void VisionerFaceLocalization_del(VisionerFaceLocalization& vfl) {
+  bob::python::no_gil unlock;
+  vfl.join();
+}
+
 void bind_daq_all() {
   using namespace boost::python;
 
@@ -105,7 +131,7 @@ void bind_daq_all() {
          "'camera' is properly initialized Camera (used to grab the images)\n"
          "'faceLocalizationModelPath' is path to the Visioner face localization "
          "model"))
-    .def("start", &CaptureSystem::start,(arg("self")), "Start the capture system. This call is blocking.")
+    .def("start", &CaptureSystem_start,(arg("self")), "Start the capture system. This call is blocking.")
     .add_property("length", &CaptureSystem::getLength, &CaptureSystem::setLength, "Recording length in seconds (recording delay excluded)")
     .add_property("recording_delay",  &CaptureSystem::getRecordingDelay,  &CaptureSystem::setRecordingDelay, "Recording delay in seconds, i.e. amount of seconds before the recording begins")
     .add_property("output_name", &CaptureSystem::getOutputName, &CaptureSystem::setOutputName, "Output name")
@@ -163,7 +189,7 @@ void bind_daq_all() {
     .def("__str__", &FrameInterval__str__);
     
   class_<Camera, bases<Stoppable>, boost::noncopyable>("Camera", "Camera is an abstract class which captures frames", no_init)
-    .def("start", &Camera::start, (arg("self")))
+    .def("start", &Camera_start, (arg("self")))
     .def("add_camera_callback", &Camera::addCameraCallback, (arg("self"), arg("callback")))
     .def("remove_camera_callback", &Camera::removeCameraCallback, (arg("self"), arg("callback")))
     .def("get_supported_pixel_formats", &getSupportedPixelFormats, (arg("self")), "Get the list of supported pixel formats")
@@ -212,7 +238,7 @@ void bind_daq_all() {
 
   /// Displays
     class_<bob::daq::Display, bases<ControllerCallback, FaceLocalizationCallback>, boost::noncopyable>("Display", "Display is an abstract class which is responsible to display an interface to the user", no_init)
-    .def("start", &bob::daq::Display::start, (arg("self")), "Start the interface. This call should be blocking")
+    .def("start", &Display_start, (arg("self")), "Start the interface. This call should be blocking")
     .def("stop", &bob::daq::Display::stop, (arg("self")), "")
     .def("add_key_press_callback", &bob::daq::Display::addKeyPressCallback, (arg("self"), arg("callback")), "Add a callback which listen to user keyboard interactions.")
     .def("remove_key_press_callback", &bob::daq::Display::removeKeyPressCallback, (arg("self"), arg("callback")))
@@ -230,12 +256,14 @@ void bind_daq_all() {
 
   /// FaceLocalizations
   class_<FaceLocalization, bases<ControllerCallback>, boost::noncopyable>("FaceLocalization", "FaceLocalization is an abstract class which provides face localization", no_init)
-    .def("start", &FaceLocalization::start, (arg("self")), "Start the face localization of incoming frames")
+    .def("start", &FaceLocalization_start, (arg("self")), "Start the face localization of incoming frames")
     .def("add_face_localization_callback", &FaceLocalization::addFaceLocalizationCallback, (arg("self"), arg("callback")))
     .def("remove_face_localization_callback", &FaceLocalization::removeFaceLocalizationCallback, (arg("self"), arg("callback")));
 
   class_<VisionerFaceLocalization, bases<FaceLocalization>, boost::noncopyable>("VisionerFaceLocalization", "Provide face localization using Visioner",
-                                                                                init<const char*>((arg("model_path")), "'model_path': path to a model file"));
+                                                                                init<const char*>((arg("model_path")), "'model_path': path to a model file"))
+    .def("__del__", &VisionerFaceLocalization_del, (arg("self")), "Destroys the face localization framework")
+    ;
   
   class_<NullFaceLocalization, bases<FaceLocalization>, boost::noncopyable>("NullFaceLocalization", "NullFaceLocalization is an FaceLocalization which does nothing");
 

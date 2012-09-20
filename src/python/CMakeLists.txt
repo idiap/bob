@@ -8,6 +8,7 @@ set(incdir ${py_incdir})
 # Python bindings
 set(src
    "ndarray.cc"
+   "gil.cc"
    )
 
 # Define the library, compilation and linkage options

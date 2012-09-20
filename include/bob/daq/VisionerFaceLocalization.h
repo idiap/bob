@@ -41,9 +41,9 @@ public:
   
   void imageReceived(blitz::Array<unsigned char, 2>& image, CaptureStatus& status);
 
+  void join();
   void stop();
   bool start();
-
   
   void localize();
 private:

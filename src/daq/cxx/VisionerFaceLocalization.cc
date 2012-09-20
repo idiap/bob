@@ -55,11 +55,16 @@ VisionerFaceLocalization::VisionerFaceLocalization(const char* model_path) :
   status.frameNb = -1;
 }
 
-VisionerFaceLocalization::~VisionerFaceLocalization() {
+void VisionerFaceLocalization::join() {
   stop();
   if (thread != 0) {
     pthread_join(thread, NULL);
+    thread = 0;
   }
+}
+
+VisionerFaceLocalization::~VisionerFaceLocalization() {
+  join();
 }
 
 static void* localize_(void* param) {

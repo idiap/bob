@@ -20,8 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <pthread.h>
 #include <boost/python.hpp>
 
+#include "bob/core/python/gil.h"
 #include "bob/core/logging.h"
 
 using namespace boost::python;
@@ -56,7 +58,8 @@ struct PythonLoggingOutputDevice: public bob::core::OutputDevice {
       if (std::isspace(value[n-1])) { //remove accidental newlines in the end
         value = value.substr(0, n-1);
       }
-      m_callable(value); 
+      bob::python::gil lock;
+      m_callable(value);
       return n;
     }
 

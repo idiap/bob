@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/python.hpp>
+#include "bob/core/python/ndarray.h"
 
 using namespace boost::python;
 
@@ -35,11 +35,7 @@ void bind_core_convert();
 void bind_core_tinyvector();
 
 BOOST_PYTHON_MODULE(_core) {
-  docstring_options docopt; 
-# if !defined(BOB_DEBUG)
-  docopt.disable_cpp_signatures();
-# endif
-  scope().attr("__doc__") = "bob core classes and sub-classes";
+  bob::python::setup_python("bob core classes and sub-classes");
 
   bind_core_version();
   bind_core_exception();
