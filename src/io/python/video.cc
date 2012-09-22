@@ -183,7 +183,7 @@ void bind_io_video() {
     .add_property("video_type", make_function(&io::VideoReader::video_type, return_value_policy<copy_const_reference>()), "Typing information to load all of the file at once")
     .add_property("frame_type", make_function(&io::VideoReader::frame_type, return_value_policy<copy_const_reference>()), "Typing information to load the file frame by frame.")
     .def("__load__", &videoreader_load, videoreader_load_overloads((arg("self"), arg("raise_on_error")=false), "Loads all of the video stream in a numpy ndarray organized in this way: (frames, color-bands, height, width). I'll dynamically allocate the output array and return it to you. The flag 'raise_on_error', which is set to 'False' by default influences the error reporting in case problems are found with the video file. If you set it to 'True', we will report problems raising exceptions. If you either don't set it or set it to 'False', we will truncate the file at the frame with problems and will not report anything. It is your task to verify if the number of frames returned matches the expected number of frames as reported by the property 'numberOfFrames' in this object."))
-    .def("__iter__", &io::VideoReader::begin)
+    .def("__iter__", &io::VideoReader::begin, with_custodian_and_ward_postcall<0,1>())
     .def("__getitem__", &videoreader_getitem)
     .def("__getitem__", &videoreader_getslice)
     ;

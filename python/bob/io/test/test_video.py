@@ -80,7 +80,7 @@ class VideoTest(unittest.TestCase):
     # This test shows how you can read image frames from a VideoReader
     v = bob.io.VideoReader(INPUT_VIDEO)
     for frame in v:
-      # Note that when you iterate, the frames are blitz::Array<> objects
+      # Note that when you iterate, the frames are numpy.ndarray objects
       # So, you can use them as you please. The organization of the data
       # follows the other encoding systems in bob: (color-bands, height,
       # width).
@@ -157,3 +157,15 @@ class VideoTest(unittest.TestCase):
    
     for frame_id, frame in zip(range(array.shape[0]), iv.__iter__()):
       self.assertTrue ( numpy.array_equal(array[frame_id,:,:,:], frame) )
+
+  @ffmpeg_found
+  def test06_CanIterateOnTheSpot(self):
+
+    # This test shows how you can read image frames from a VideoReader created
+    # on the spot
+    for k, frame in enumerate(k, bob.io.VideoReader(INPUT_VIDEO)):
+      self.assertTrue(isinstance(frame, numpy.ndarray))
+      self.assertEqual(len(frame.shape), 3)
+      self.assertEqual(frame.shape[0], 3) #color-bands (RGB)
+      self.assertEqual(frame.shape[1], 240) #height
+      self.assertEqual(frame.shape[2], 320) #width
