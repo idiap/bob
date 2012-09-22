@@ -163,7 +163,7 @@ class VideoTest(unittest.TestCase):
 
     # This test shows how you can read image frames from a VideoReader created
     # on the spot
-    for k, frame in enumerate(k, bob.io.VideoReader(INPUT_VIDEO)):
+    for frame in bob.io.VideoReader(INPUT_VIDEO):
       self.assertTrue(isinstance(frame, numpy.ndarray))
       self.assertEqual(len(frame.shape), 3)
       self.assertEqual(frame.shape[0], 3) #color-bands (RGB)
