@@ -55,13 +55,11 @@ to silence all messages coming from C++:
 
   class NullHandler(logging.Handler):
     def emit(self, record):
-  pass
+      pass
 
   cxx_logger = logging.getLogger('bob.cxx')
   cxx_logger.addHandler(NullHandler())
 
-Of course, you are free to change the logging format and other whistles as you
-want for your own application.
 
 To enable debug messages to be printed out while using the Python bindings you
 have to:
@@ -86,26 +84,7 @@ Without those precautions, no debug messages will appear.  Please note that by
 default the logging module comes with `logging.WARNING` set so not even info
 messages will show up unless you set it so.
 
-As a library developer
-----------------------
-
-If you plan to develop a package, you should follow the hierarchy convention
-proposed at the `logging` module documentation and inherit from the `bob` root
-logger, its properties. You can accomplish this by instantiating a version of
-the logger inside any file of your package (the first time it is used, it is
-created automatically):
-
-.. code-block:: python
-
-  import logging
-
-  # the logger bob.mypackage will inherit all configuration from "bob" (parent)
-  # that is what you want!
-  logger = logging.getLogger('bob.mypackage')
-
-  logger.warn("Waw!")
-
-When you write scripts that are based on Bob, you might want to specify the
+When you write applications based on |project|, you might want to specify the
 verbosity level of your application. A nice pythonic way to achieve this, is by
 using the command line parsing utilities and specifying a verbose level:
 
@@ -145,7 +124,47 @@ would suggest to use something like:
 Hence, by default only error messages are reported. When you finally call your
 script, you can specify, which log messages should be shown by adding multiple
 ``--verbose`` arguments, or simply use one of the short-cuts ``-v``, ``-vv``, or
-``-vvv`` to get warning, info, or debug messages, respectively.
+``-vvv`` to get warning, info, or debug messages, respectively. Now, the loggers
+of |project| write debug and info messages to the `sys.stdout` stream, while
+warning and error messages are written to `sys.stderr`.
+
+Usually, only the plain messages are written. To modify this behavior, you can
+personalize the output, e.g., by:
+
+.. code-block:: python
+
+  import logging
+  import bob
+
+  logger = logging.getLogger("bob")
+
+  # this formats the logger to print the name of the logger, the time, the type of message and the message itself
+  formatter = logging.Formatter("%(name)s@%(asctime)s|%(levelname)s: %(message)s")
+  # we have to set the formatter to all handlers registered in Bob
+  for handler in logger.handlers:
+    handler.setFormatter(formatter)
+
+If you don't like the way, |project| handles logging, feel free to remove the
+handlers in your application and replace them by your own.
+
+As a library developer
+----------------------
+
+If you plan to develop a package, you should follow the hierarchy convention
+proposed at the `logging` module documentation and inherit from the `bob` root
+logger, its properties. You can accomplish this by instantiating a version of
+the logger inside any file of your package (the first time it is used, it is
+created automatically):
+
+.. code-block:: python
+
+  import logging
+
+  # the logger bob.mypackage will inherit all configuration from "bob" (parent)
+  # that is what you want!
+  logger = logging.getLogger('bob.mypackage')
+
+  logger.warn("Waw!")
 
 Exception handling
 ------------------

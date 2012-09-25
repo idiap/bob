@@ -3,18 +3,27 @@ from . import array
 from . import random
 __all__ = dir()
 
-#this will setup divergence from C++ into python.logging correctly
 import logging
+import sys
 
-#this configures our core logger
-logger = logging.getLogger("bob")
-ch = logging.StreamHandler()
-formatter = logging.Formatter("%(name)s@%(asctime)s|%(levelname)s: %(message)s")
-ch.setFormatter(formatter)
-logger.addHandler(ch)
+# get the default logger of Bob
+logger = logging.getLogger('bob')
 
+# by default, warning and error messages should be written to sys.stderr
+warn_err = logging.StreamHandler(sys.stderr)
+warn_err.setLevel(logging.WARNING)
+logger.addHandler(warn_err)
+
+# debug and info messages are written to sys.stdout
+class InfoFilter:
+  def filter(self, record): return record.levelno <= logging.INFO
+debug_info = logging.StreamHandler(sys.stdout)
+debug_info.setLevel(logging.DEBUG)
+debug_info.addFilter(InfoFilter())
+logger.addHandler(debug_info)
+
+# this will setup divergence from C++ into python.logging correctly
 cxx_logger = logging.getLogger('bob.c++')
-cxx_logger.setLevel(logging.WARNING)
 debug.reset(PythonLoggingOutputDevice(cxx_logger.debug))
 info.reset(PythonLoggingOutputDevice(cxx_logger.info))
 warn.reset(PythonLoggingOutputDevice(cxx_logger.warn))
