@@ -51,6 +51,7 @@ void bind_trainer_gmm() {
   class_<train::GMMTrainer, boost::noncopyable, bases<EMTrainerGMMBase> >("GMMTrainer",
       "This class implements the E-step of the expectation-maximisation algorithm for a GMM Machine.\n"
       "See Section 9.2.2 of Bishop, \"Pattern recognition and machine learning\", 2006", no_init)
+    .add_property("gmm_statistics", &bob::trainer::GMMTrainer::getGMMStats, &bob::trainer::GMMTrainer::setGMMStats, "The internal GMM statistics. Useful to parallelize the E-step.")
   ;
 
   class_<train::MAP_GMMTrainer, boost::noncopyable, bases<train::GMMTrainer> >("MAP_GMMTrainer",

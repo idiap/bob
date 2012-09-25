@@ -76,7 +76,16 @@ class GMMTrainer : public EMTrainer<bob::machine::GMMMachine, bob::io::Arrayset>
      * Finalization after the EM steps
      */
     virtual void finalization(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data);
-    
+   
+    /**
+     * Returns the internal GMM statistics. Useful to parallelize the E-step
+     */
+    const bob::machine::GMMStats getGMMStats() const { return m_ss; }
+    /**
+     * Sets the internal GMM statistics. Useful to parallelize the E-step
+     */
+    void setGMMStats(const bob::machine::GMMStats& stats); 
+     
   protected:
 
     /**

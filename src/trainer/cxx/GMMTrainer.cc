@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "bob/trainer/GMMTrainer.h"
+#include "bob/core/array_assert.h"
 
 namespace train = bob::trainer;
 namespace mach = bob::machine;
@@ -50,4 +51,10 @@ double train::GMMTrainer::computeLikelihood(mach::GMMMachine& gmm) {
 }
 
 void train::GMMTrainer::finalization(mach::GMMMachine& gmm, const io::Arrayset& data) {
+}
+
+void train::GMMTrainer::setGMMStats(const bob::machine::GMMStats& stats)
+{
+  bob::core::array::assertSameShape(m_ss.sumPx, stats.sumPx);
+  m_ss = stats;
 }
