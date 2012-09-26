@@ -33,12 +33,12 @@ def load(inputs):
   """
   from collections import Iterable
   import numpy
-  if isinstance(inputs, str):
+  if isinstance(inputs, (str, unicode)):
     return Array(inputs).get()
   elif isinstance(inputs, Iterable):
     retval = []
     for obj in inputs:
-      if isinstance(obj, str):
+      if isinstance(obj, (str, unicode)):
         retval.append(load(obj))
       elif isinstance(obj, Array):
         retval.append(obj.get())
@@ -61,7 +61,7 @@ def merge(filenames):
        of 'external' bob.io.Arrays's
   """
   from collections import Iterable
-  if isinstance(filenames, str):
+  if isinstance(filenames, (str, unicode)):
     return [Array(filenames)]
   elif isinstance(filenames, Iterable):
     retval = []
