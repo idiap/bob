@@ -180,3 +180,46 @@ class ArrayTest(unittest.TestCase):
     b = bob.io.load(tname)
     self.assertTrue( numpy.array_equal(a, b) )
     os.unlink(tname)
+
+  def test06_load_and_merge_filenames_iterable(self):
+    """Test introduced for ticket #86"""
+
+    # Loads and merge Arrays
+    a=numpy.random.randn(3,10)
+    b=numpy.random.randn(5,10)
+    c=numpy.random.randn(1,10)
+    d=numpy.random.randn(10)
+    # Saving the contents on a file. 
+    tnamea = tempname('.hdf5')
+    tnameb = tempname('.hdf5')
+    tnamec = tempname('.hdf5')
+    tnamed = tempname('.hdf5')
+    bob.io.save(a, tnamea)
+    bob.io.save(b, tnameb)
+    bob.io.save(c, tnamec)
+    bob.io.save(d, tnamed)
+
+    # bob.io.merge
+    m = bob.io.merge([tnamea, tnameb, tnamec, tnamed])
+    m_ref = [bob.io.Array(tnamea), bob.io.Array(tnameb), bob.io.Array(tnamec), bob.io.Array(tnamed)]
+    for k in range(len(m)):
+      self.assertTrue( m[k] == m_ref[k])
+
+    # bob.io.load
+    # single filename
+    al = bob.io.load(tnamea)
+    self.assertTrue( numpy.array_equal(a, al) )
+    # iterable of filemames
+    ma = bob.io.load([tnamea, tnameb, tnamec, tnamed])
+    ma_ref = numpy.vstack([a, b, c, d])
+    self.assertTrue( numpy.array_equal(ma, ma_ref) )
+    # iterable of bob.io.Array's
+    ma2 = bob.io.load(m)
+    self.assertTrue( numpy.array_equal(ma2, ma_ref) )
+   
+    # Deletes temporary files 
+    os.unlink(tnamea)
+    os.unlink(tnameb)
+    os.unlink(tnamec)
+    os.unlink(tnamed)
+
