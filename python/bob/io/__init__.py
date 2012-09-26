@@ -8,29 +8,30 @@ from . import __video__
 
 def load(inputs):
   """Loads the contents of a file, an iterable of files, or an 
-     iterable of bob.io.Array's into a numpy ndarray
+  iterable of bob.io.Array's into a numpy ndarray
 
   Parameters:
 
   inputs
-    This might represent several different entities:
+    This might represent several different entities:\n
     1. The name of a file (full path) from where to load the data.
        In this case, this assumes that the file contains an array
        and returns a loaded numpy ndarray.
-    2. An iterable of filenames to be loaded in memory. In this 
-       case, this would assume that each file contains a single 
-       1D sample or a set of 1D samples, load them in memory and 
-       concatenate them into a single and returned 2D numpy 
+    2. An iterable of filenames to be loaded in memory. In this
+       case, this would assume that each file contains a single
+       1D sample or a set of 1D samples, load them in memory and
+       concatenate them into a single and returned 2D numpy
        ndarray.
-    3. An iterable of bob.io.Array. In this case, this would 
+    3. An iterable of bob.io.Array. In this case, this would
        assume that each bob.io.Array contains a single 1D sample
-       or a set of 1D samples, load them in memory if required 
+       or a set of 1D samples, load them in memory if required
        and concatenate them into a single and returned 2D numpy
        ndarray.
-    4. An iterable with mixed filenames and bob.io.Array. In 
+    4. An iterable with mixed filenames and bob.io.Array. In
        this case, this would returned a 2D numpy ndarray, as
        described by points 2. and 3..
   """
+
   from collections import Iterable
   import numpy
   if isinstance(inputs, (str, unicode)):
@@ -54,12 +55,13 @@ def merge(filenames):
   Parameters:
 
   filenames
-    This might represent:
-    1. A single filename. In this case, an iterable with a single 
+    This might represent:\n
+    1. A single filename. In this case, an iterable with a single
        'external' bob.io.Array is returned.
-    2. An iterable of filenames to be converted into an iterable 
+    2. An iterable of filenames to be converted into an iterable
        of 'external' bob.io.Arrays's
   """
+
   from collections import Iterable
   if isinstance(filenames, (str, unicode)):
     return [Array(filenames)]
