@@ -124,6 +124,115 @@ static boost::shared_ptr<io::Arrayset> make_from_array_iterable2(object iter,
   return retval;
 }
 
+template <typename T>
+static void fill_with_2d_array(io::Arrayset& s, tp::const_ndarray input) {
+  const blitz::Array<T,2> bz = input.bz<T,2>();
+  for (int i=0; i<bz.extent(0); ++i) {
+    const blitz::Array<T,1> bztmp = bz(i, blitz::Range::all());
+    s.add(bztmp); ///< uses the copy variant implicitly
+  }
+}
+
+struct arrayset_from_ndarray {
+
+  arrayset_from_ndarray() {
+    converter::registry::push_back(&convertible, &construct, 
+        type_id<io::Arrayset>());
+  }
+
+  static void* convertible(PyObject* obj_ptr) {
+    handle<> hdl(borrowed(obj_ptr));
+    object obj(hdl);
+    if (tp::convertible_to(obj, false, true)) { //writeable=false, behaved=true
+      handle<> hdl(borrowed(obj_ptr));
+      object tmp(hdl);
+      tp::const_ndarray pyarray(tmp);
+      ca::typeinfo info = pyarray.type();
+
+      if (info.nd != 2) return 0;
+
+      switch (info.dtype) {
+        case ca::t_int8:
+        case ca::t_int16:
+        case ca::t_int32:
+        case ca::t_int64:
+        case ca::t_uint8:
+        case ca::t_uint16:
+        case ca::t_uint32:
+        case ca::t_uint64:
+        case ca::t_float32:
+        case ca::t_float64:
+        case ca::t_complex128:
+        case ca::t_complex256:
+          return obj_ptr;
+        default:
+          return 0;
+      }
+
+      return obj_ptr;
+    }
+    return 0;
+  }
+
+  static void construct(PyObject* obj_ptr,
+      converter::rvalue_from_python_stage1_data* data) {
+
+    //setup destination Arrayset
+    void* storage = ((converter::rvalue_from_python_storage<io::Arrayset>*)data)->storage.bytes;
+    new (storage) io::Arrayset();
+    data->convertible = storage;
+    io::Arrayset& result = *((io::Arrayset*)storage);
+
+    //convert input obj_ptr
+    handle<> hdl(borrowed(obj_ptr));
+    object tmp(hdl);
+    tp::const_ndarray pyarray(tmp);
+
+    //create const_ndarray
+    switch (pyarray.type().dtype) {
+      case ca::t_int8: 
+        fill_with_2d_array<int8_t>(result, pyarray);
+        break;
+      case ca::t_int16: 
+        fill_with_2d_array<int16_t>(result, pyarray);
+        break;
+      case ca::t_int32: 
+        fill_with_2d_array<int32_t>(result, pyarray);
+        break;
+      case ca::t_int64: 
+        fill_with_2d_array<int64_t>(result, pyarray);
+        break;
+      case ca::t_uint8: 
+        fill_with_2d_array<uint8_t>(result, pyarray);
+        break;
+      case ca::t_uint16: 
+        fill_with_2d_array<uint16_t>(result, pyarray);
+        break;
+      case ca::t_uint32: 
+        fill_with_2d_array<uint32_t>(result, pyarray);
+        break;
+      case ca::t_uint64: 
+        fill_with_2d_array<uint64_t>(result, pyarray);
+        break;
+      case ca::t_float32: 
+        fill_with_2d_array<float>(result, pyarray);
+        break;
+      case ca::t_float64: 
+        fill_with_2d_array<double>(result, pyarray);
+        break;
+      case ca::t_complex128: 
+        fill_with_2d_array<std::complex<float> >(result, pyarray);
+        break;
+      case ca::t_complex256: 
+        fill_with_2d_array<std::complex<double> >(result, pyarray);
+        break;
+      default:
+        break;
+    }
+  }
+
+};
+
 static io::Array get_array(io::Arrayset& s, size_t index) {
   return s[index];
 }
@@ -198,4 +307,6 @@ void bind_io_arrayset() {
     .def("extend", &extend_with_ndarray, (arg("self"), arg("array"), arg("axis")), "Extends this array set with an ndarray one more dimension than what my type has (or will have), iterating over the specified axis. If this arrayset is not new, extension may be subject to type coertion.")
     .def("extend", &extend_with_iterable, (arg("self"), arg("iterable")), "Extends this array set with array-like objects coming from the given iterable. The current arrayset dtype is inforced on all required coertions.")
     ;
+
+  arrayset_from_ndarray();
 }
