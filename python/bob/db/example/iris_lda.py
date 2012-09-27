@@ -66,7 +66,7 @@ def process_data(machine, data):
   
   output = {}
   for cl in data.keys():
-    output[cl]=data[cl].foreach(machine.forward)
+    output[cl]=machine.forward(data[cl])
 
   return output
 

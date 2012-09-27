@@ -52,39 +52,29 @@ stat_names = ['Minimum', 'Maximum', 'Mean', 'Std.Dev.', 'Correlation']
 def data():
   """Loads from (text) file and returns Fisher's Iris Dataset.
   
-  This set is small and simple enough to require an SQL backend. We keep
-  the single file it has in text and load it on-the-fly every time this
-  method is called.
+  This set is small and simple enough to require an SQL backend. We keep the
+  single file it has in text and load it on-the-fly every time this method is
+  called.
 
-  We return a dictionary containing the 3 classes of Iris plants
-  catalogued in this dataset. Each dictionary entry contains an Arrayset
-  of 64-bit floats and 50 entries. Each entry is an Array with 4
-  features as described by "names". 
+  We return a dictionary containing the 3 classes of Iris plants catalogued in
+  this dataset. Each dictionary entry contains an 2D :py:class:`numpy.ndarray`
+  of 64-bit floats and 50 entries. Each entry is an Array with 4 features as
+  described by "names".
   """
-  from ...io import Arrayset
   from .driver import Interface
+  import csv
 
   data = Interface().files()[0]
 
-  retval = {
-      'setosa': Arrayset(),
-      'versicolor': Arrayset(),
-      'virginica': Arrayset()
-      }
+  retval = {}
+  with open(data, 'rb') as csvfile:
+    for row in csv.reader(csvfile):
+      name = row[4][5:].lower()
+      retval.setdefault(name, []).append([float(k) for k in row[:4]])
 
-  for line in open(data,'rt'):
-    if not line.strip(): continue #skip empty lines
-
-    s = [k.strip() for k in line.split(',') if line.strip()]
-
-    if s[4].find('setosa') != -1:
-      retval['setosa'].append(numpy.array([float(k) for k in s[0:4]], 'float64'))
-
-    elif s[4].find('versicolor') != -1:
-      retval['versicolor'].append(numpy.array([float(k) for k in s[0:4]], 'float64'))
-
-    elif s[4].find('virginica') != -1:
-      retval['virginica'].append(numpy.array([float(k) for k in s[0:4]], 'float64'))
+  # Convert to a float64 2D numpy.ndarray
+  for key, value in retval.iteritems():
+    retval[key] = numpy.array(value, dtype='float64')
 
   return retval
 

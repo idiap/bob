@@ -85,7 +85,7 @@ class ArrayTest(unittest.TestCase):
     self.assertEqual ( A1.dtype, numpy.dtype('uint16') )
     self.assertTrue ( numpy.array_equal( A1.get()[1,:], [12, 19, 35] ) )
 
-    # You can also read files in "Arrayset" mode, in which we discretize the
+    # You can also read files in "set" mode, in which we discretize the
     # first dimension. For example, reading a file that contains a single 2D
     # array [1, 2], [3, 4] at position 1 will actually only extract the 1D
     # array [3, 4]. See this:

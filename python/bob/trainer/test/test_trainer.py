@@ -59,36 +59,11 @@ def flipRows(array):
   else:
     raise Exception('Input type not supportd by flipRows')
 
-def NormalizeStdArrayset(path):
-  arrayset = bob.io.Arrayset(path)
-  arrayset.load()
+def NormalizeStdArray(path):
 
-  length = arrayset.shape[0]
-  n_samples = len(arrayset)
-  mean = numpy.ndarray(length, 'float64')
-  std = numpy.ndarray(length, 'float64')
-
-  mean.fill(0)
-  std.fill(0)
-
-  
-  for i in range(0, n_samples):
-    x = arrayset[i].astype('float64')
-    mean += x
-    std += (x ** 2)
-
-  mean /= n_samples
-  std /= n_samples
-  std -= (mean ** 2)
-  std = std ** 0.5 # sqrt(std)
-
-  arStd = bob.io.Arrayset()
-  for i in range(0, n_samples):
-    x = arrayset[i].astype('float64')
-    arStd.append(x / std)
-
-  return (arStd,std)
-
+  array = bob.io.load(path).astype('float64')
+  std = array.std(axis=0)
+  return (array/std, std)
 
 class MyTrainer1(bob.trainer.KMeansTrainer):
   """Simple example of python trainer: """
@@ -117,12 +92,13 @@ class TrainerTest(unittest.TestCase):
   """Performs various trainer tests."""
   
   def test00_kmeans(self):
-    """Train a KMeansMachine"""
+
+    # Trains a KMeansMachine
 
     # This files contains draws from two 1D Gaussian distributions:
     #   * 100 samples from N(-10,1)
     #   * 100 samples from N(10,1)
-    data = bob.io.Arrayset(F("samplesFrom2G_f64.hdf5"))
+    data = bob.io.load(F("samplesFrom2G_f64.hdf5"))
 
     machine = bob.machine.KMeansMachine(2, 1)
 
@@ -141,16 +117,16 @@ class TrainerTest(unittest.TestCase):
     self.assertTrue(equals(weights, numpy.array([0.5,0.5]), 1e-3))
 
   def test01_kmeans(self):
-    """Train a KMeansMachine"""
 
-    (arStd,std) = NormalizeStdArrayset(F("faithful.torch3.hdf5"))
+    # Trains a KMeansMachine
+
+    (arStd,std) = NormalizeStdArray(F("faithful.torch3.hdf5"))
 
     machine = bob.machine.KMeansMachine(2, 2)
 
     trainer = bob.trainer.KMeansTrainer()
     #trainer.seed = 1337
     trainer.train(machine, arStd)
-
 
     [variances, weights] = machine.get_variances_and_weights_for_each_cluster(arStd)
     means = machine.means
@@ -172,9 +148,10 @@ class TrainerTest(unittest.TestCase):
     self.assertTrue(equals(variances, gmmVariances, 1e-3))
     
   def test02_gmm_ML(self):
-    """Train a GMMMachine with ML_GMMTrainer"""
+
+    # Trains a GMMMachine with ML_GMMTrainer
     
-    ar = bob.io.Arrayset(F("faithful.torch3_f64.hdf5"))
+    ar = bob.io.load(F("faithful.torch3_f64.hdf5"))
     
     gmm = loadGMM()
 
@@ -191,9 +168,10 @@ class TrainerTest(unittest.TestCase):
     self.assertTrue((gmm == gmm_ref) or (gmm == gmm_ref_32bit_release) or (gmm == gmm_ref_32bit_debug))
 
   def test03_gmm_ML(self):
-    """Train a GMMMachine with ML_GMMTrainer and compare to torch3vision reference"""
+
+    # Trains a GMMMachine with ML_GMMTrainer; compares to an old reference
    
-    ar = bob.io.Arrayset(F('dataNormalized.hdf5')) 
+    ar = bob.io.load(F('dataNormalized.hdf5')) 
 
     # Initialize GMMMachine
     gmm = bob.machine.GMMMachine(5, 45)
@@ -227,9 +205,10 @@ class TrainerTest(unittest.TestCase):
     self.assertTrue(equals(gmm.weights, weightsML_ref, 1e-4))
     
   def test04_gmm_MAP(self):
-    """Train a GMMMachine with MAP_GMMTrainer"""
+
+    # Train a GMMMachine with MAP_GMMTrainer
     
-    ar = bob.io.Arrayset(F('faithful.torch3_f64.hdf5'))
+    ar = bob.io.load(F('faithful.torch3_f64.hdf5'))
     
     gmm = bob.machine.GMMMachine(bob.io.HDF5File(F("gmm_ML.hdf5")))
     gmmprior = bob.machine.GMMMachine(bob.io.HDF5File(F("gmm_ML.hdf5")))
@@ -247,10 +226,12 @@ class TrainerTest(unittest.TestCase):
     self.assertTrue((equals(gmm.means,gmm_ref.means,1e-3) and equals(gmm.variances,gmm_ref.variances,1e-3) and equals(gmm.weights,gmm_ref.weights,1e-3)))
     
   def test05_gmm_MAP(self):
-    """Train a GMMMachine with MAP_GMMTrainer and compare with matlab reference"""
+
+    # Train a GMMMachine with MAP_GMMTrainer and compare with matlab reference
 
     map_adapt = bob.trainer.MAP_GMMTrainer(4., True, False, False, 0.)
     data = bob.io.load(F('data.hdf5', 'machine'))
+    data = data.reshape((1, data.shape[0])) # make a 2D array out of it
     means = bob.io.load(F('means.hdf5', 'machine'))
     variances = bob.io.load(F('variances.hdf5', 'machine'))
     weights = bob.io.load(F('weights.hdf5', 'machine'))
@@ -260,9 +241,6 @@ class TrainerTest(unittest.TestCase):
     gmm.variances = variances
     gmm.weights = weights
 
-    arrayset = bob.io.Arrayset()
-    arrayset.append(data)
-
     map_adapt.set_prior_gmm(gmm)
 
     gmm_adapted = bob.machine.GMMMachine(2,50)
@@ -271,7 +249,8 @@ class TrainerTest(unittest.TestCase):
     gmm_adapted.weights = weights
 
     map_adapt.max_iterations = 1
-    map_adapt.train(gmm_adapted,arrayset)
+    print data.shape
+    map_adapt.train(gmm_adapted, data)
 
     new_means = bob.io.load(F('new_adapted_mean.hdf5'))
 
@@ -280,9 +259,10 @@ class TrainerTest(unittest.TestCase):
     self.assertTrue(equals(new_means[1,:], gmm_adapted.means[:,1], 1e-4))
    
   def test06_gmm_MAP(self):
-    """Train a GMMMachine with MAP_GMMTrainer and compare to torch3vision reference"""
+    
+    # Train a GMMMachine with MAP_GMMTrainer; compares to old reference
    
-    ar = bob.io.Arrayset(F('dataforMAP.hdf5')) 
+    ar = bob.io.load(F('dataforMAP.hdf5')) 
 
     # Initialize GMMMachine
     n_gaussians = 5
@@ -328,10 +308,11 @@ class TrainerTest(unittest.TestCase):
     self.assertTrue(equals(gmm.weights, weightsMAP_ref, 1e-4))
 
   def test07_gmm_test(self):
-    """Test a GMMMachine by computing scores against a model and compare to 
-    torch3vision reference"""
+
+    # Tests a GMMMachine by computing scores against a model and compare to 
+    # an old reference
    
-    ar = bob.io.Arrayset(F('dataforMAP.hdf5')) 
+    ar = bob.io.load(F('dataforMAP.hdf5')) 
 
     # Initialize GMMMachine
     n_gaussians = 5
@@ -354,9 +335,10 @@ class TrainerTest(unittest.TestCase):
     self.assertTrue(abs(score-score_mean_ref)/score_mean_ref<1e-4)
  
   def test08_custom_trainer(self):
-    """Custom python trainer"""
+
+    # Custom python trainer
     
-    ar = bob.io.Arrayset(F("faithful.torch3_f64.hdf5"))
+    ar = bob.io.load(F("faithful.torch3_f64.hdf5"))
     
     mytrainer = MyTrainer1()
 
@@ -367,7 +349,8 @@ class TrainerTest(unittest.TestCase):
       self.assertTrue((ar[i+1] == machine.means[i, :]).all())
 
   def test09_custom_initialization(self):
-    ar = bob.io.Arrayset(F("faithful.torch3_f64.hdf5"))
+
+    ar = bob.io.load(F("faithful.torch3_f64.hdf5"))
     
     mytrainer = MyTrainer2()
 

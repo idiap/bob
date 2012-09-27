@@ -32,20 +32,15 @@ class BICTrainerAndMachineTest(unittest.TestCase):
   """Performs various BIC trainer and machine tests."""
   
   def training_data(self):
-    data = ((10., 4., 6., 8., 2.),
-            (8., 2., 4., 6., 0.),
-            (12., 6., 8., 10., 4.),
-            (11., 3., 7., 7., 3.),
-            (9., 5., 5., 9., 1.))
+    data = numpy.array([
+      (10., 4., 6., 8., 2.),
+      (8., 2., 4., 6., 0.),
+      (12., 6., 8., 10., 4.),
+      (11., 3., 7., 7., 3.),
+      (9., 5., 5., 9., 1.)], dtype='float64')
+
+    return data, -1. * data
     
-    intra_data = bob.io.Arrayset()
-    extra_data = bob.io.Arrayset()
-    for i in range(5):
-      intra_data.append(numpy.array(data[i], dtype=numpy.float64))
-      extra_data.append(numpy.array(data[i], dtype=numpy.float64) * -1.)
-      
-    return (intra_data, extra_data)
-  
   def eval_data(self, which):
     eval_data = numpy.ndarray((5,), dtype=numpy.float64)
     if which == 0:

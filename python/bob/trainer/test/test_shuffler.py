@@ -31,26 +31,29 @@ class DataShufflerTest(unittest.TestCase):
 
   def setUp(self):
     
-    self.set1 = bob.io.Arrayset()
+    self.set1 = []
     self.data1 = numpy.array([1, 0, 0], dtype='float64')
     self.target1 = numpy.array([1], dtype='float64')
     self.set1.append(self.data1)
     self.set1.append(self.data1*2)
     self.set1.append(self.data1*3)
+    self.set1 = numpy.array(self.set1)
 
-    self.set2 = bob.io.Arrayset()
+    self.set2 = []
     self.data2 = numpy.array([0, 1, 0], dtype='float64')
     self.target2 = numpy.array([2], dtype='float64')
     self.set2.append(self.data2)
     self.set2.append(self.data2*2)
     self.set2.append(self.data2*3)
+    self.set2 = numpy.array(self.set2)
 
-    self.set3 = bob.io.Arrayset()
+    self.set3 = []
     self.data3 = numpy.array([0, 0, 1], dtype='float64')
     self.target3 = numpy.array([3], dtype='float64')
     self.set3.append(self.data3)
     self.set3.append(self.data3*2)
     self.set3.append(self.data3*3)
+    self.set3 = numpy.array(self.set3)
   
   def test01_Initialization(self):
 
@@ -201,16 +204,18 @@ class DataShufflerTest(unittest.TestCase):
 
     rng = bob.core.random.mt19937()
 
-    set1 = bob.io.Arrayset()
+    set1 = []
     draw25 = bob.core.random.normal_float64(mean=2.0, sigma=5.0)
     for i in range(10000):
       set1.append(numpy.array([draw25(rng)], dtype='float64'))
+    set1 = numpy.array(set1)
     target1 = numpy.array([1], dtype='float64')
 
-    set2 = bob.io.Arrayset()
+    set2 = []
     draw32 = bob.core.random.normal_float64(mean=3.0, sigma=2.0)
     for i in range(10000):
       set2.append(numpy.array([draw32(rng)], dtype='float64'))
+    set2 = numpy.array(set2)
     target2 = numpy.array([2], dtype='float64')
 
     shuffle = bob.trainer.DataShuffler([set1, set2], [target1, target2])

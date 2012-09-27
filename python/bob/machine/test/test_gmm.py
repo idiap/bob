@@ -187,7 +187,7 @@ class GMMMachineTest(unittest.TestCase):
   def test03_GMMMachine(self):
     """Test a GMMMachine (statistics)"""
 
-    arrayset = bob.io.Arrayset(F("faithful.torch3_f64.hdf5"))
+    arrayset = bob.io.load(F("faithful.torch3_f64.hdf5"))
     gmm = bob.machine.GMMMachine(2, 2)
     gmm.weights   = numpy.array([0.5, 0.5], 'float64')
     gmm.means     = numpy.array([[3, 70], [4, 72]], 'float64')

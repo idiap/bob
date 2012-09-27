@@ -30,7 +30,7 @@ namespace mach = bob::machine;
 namespace bp = bob::python;
 namespace ca = bob::core::array;
 
-static tuple py_getVariancesAndWeightsForEachCluster(const mach::KMeansMachine& machine, io::Arrayset& ar) {
+static tuple py_getVariancesAndWeightsForEachCluster(const mach::KMeansMachine& machine, const io::Arrayset& ar) {
   size_t n_means = machine.getNMeans();
   size_t n_inputs = machine.getNInputs();
   bp::ndarray variances(ca::t_float64, n_means, n_inputs);

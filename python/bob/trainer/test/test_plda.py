@@ -38,19 +38,25 @@ class PLDATrainerTest(unittest.TestCase):
     D = 7
     nf = 2
     ng = 3
+
     # first identity (4 samples)
-    a = bob.io.Arrayset()
-    a.append(numpy.array([1,2,3,4,5,6,7], 'float64'))
-    a.append(numpy.array([7,8,3,3,1,8,2], 'float64'))
-    a.append(numpy.array([3,2,1,4,5,1,7], 'float64'))
-    a.append(numpy.array([9,0,3,2,1,4,6], 'float64'))
+    a = numpy.array([
+      [1,2,3,4,5,6,7],
+      [7,8,3,3,1,8,2],
+      [3,2,1,4,5,1,7],
+      [9,0,3,2,1,4,6],
+      ], dtype='float64')
+
     # second identity (3 samples)
-    b = bob.io.Arrayset()
-    b.append(numpy.array([5,6,3,4,2,0,2], 'float64'))
-    b.append(numpy.array([1,7,8,9,4,4,8], 'float64'))
-    b.append(numpy.array([8,7,2,5,1,1,1], 'float64'))
-    # list of Arrayset (training data)
+    b = numpy.array([
+      [5,6,3,4,2,0,2],
+      [1,7,8,9,4,4,8],
+      [8,7,2,5,1,1,1],
+      ], dtype='float64')
+
+    # list of arrays (training data)
     l = [a,b]
+
     # initial values for F, G and sigma
     G_init=numpy.array([-1.1424, -0.5044, -0.1917,
       -0.6249,  0.1021, -0.8658,
@@ -59,6 +65,7 @@ class PLDATrainerTest(unittest.TestCase):
       1.3018, -1.0368, -0.2512,
       -0.5936, -0.8571, -0.2046,
       0.4364, -0.1699, -2.2015]).reshape(D,ng)
+
     # F <-> PCA on G
     F_init=numpy.array([-0.054222647972093, -0.000000000783146, 
       0.596449127693018,  0.000000006265167, 
@@ -241,10 +248,11 @@ class PLDATrainerTest(unittest.TestCase):
     X[0,:] = x1
     X[1,:] = x2
     X[2,:] = x3
-    a = bob.io.Arrayset()
+    a = []
     a.append(x1)
     a.append(x2)
     a.append(x3)
+    a = numpy.array(a)
 
     # reference likelihood from Prince implementation
     ll_ref = -182.8880743535197
@@ -306,9 +314,10 @@ class PLDATrainerTest(unittest.TestCase):
     x1 = numpy.array([0.8032, 0.3503, 0.4587, 0.9511, 0.1330, 0.0703, 0.7061])
     x2 = numpy.array([0.9317, 0.1089, 0.6517, 0.1461, 0.6940, 0.6256, 0.0437])
     x3 = numpy.array([0.7979, 0.9862, 0.4367, 0.3447, 0.0488, 0.2252, 0.5810])
-    a_enrol = bob.io.Arrayset()
+    a_enrol = []
     a_enrol.append(x1)
     a_enrol.append(x2)
+    a_enrol = numpy.array(a_enrol)
 
     # reference likelihood from Prince implementation
     ll_ref = -182.8880743535197

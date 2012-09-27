@@ -270,9 +270,9 @@ What we have shown so far is the generic API to read and write data using HDF5.
 You will use it when you want to import or export data from |project| into
 other software frameworks, debug your data or just implement your own classes
 that can serialize and de-serialize from HDF5 file containers. In |project|,
-most of the time you will be working with :py:class:`bob.io.Array`\s and
-:py:class:`bob.io.Arrayset`\s and it is even simpler to load and save those
-from/to files. 
+most of the time you will be working with :py:class:`numpy.ndarrays`\s and, in
+rarer moments, with :py:class:`bob.io.Array`\s. It is easy to load and save
+both types from files.
 
 To create an :py:class:`bob.io.Array` from a file, just do the following:
 

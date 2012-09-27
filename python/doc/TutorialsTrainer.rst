@@ -51,22 +51,17 @@ training procedure mainly relies on a singular value decomposition.
 **PCA** belongs to the category of `unsupervised` learning algorithms, which
 means that the training data is not labelled. Therefore, the training set can
 be represented by a set of features stored in a container. Using |project|, 
-this container is a :py:class:`bob.io.Arrayset`. 
+this container is a 2D :py:class:`numpy.ndarray`.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
 
-   >>> data = bob.io.Arrayset()  # Creates a container for the training data
-   >>> a = numpy.array([3,-3,100], 'float64')
-   >>> b = numpy.array([4,-4,50], 'float64')
-   >>> c = numpy.array([3.5,-3.5,-50], 'float64')
-   >>> d = numpy.array([3.8,-3.7,-100], 'float64')
-   >>> data.append(a)
-   >>> data.append(b)
-   >>> data.append(c)
-   >>> data.append(d)
+   >>> data = numpy.array([[3,-3,100], [4,-4,50], [3.5,-3.5,-50], [3.8,-3.7,-100]], dtype='float64')
    >>> print data
-   <Arrayset[4] float64@(3,)>
+   [[   3.    -3.   100. ]
+    [   4.    -4.    50. ]
+    [   3.5   -3.5  -50. ]
+    [   3.8   -3.7 -100. ]]
 
 Once the training set has been defined, the overall procedure to train a 
 :py:class:`bob.machine.LinearMachine` with a 
@@ -103,28 +98,14 @@ The associated |project| class is :py:class:`bob.trainer.FisherLDATrainer`.
 
 In contrast to **PCA** [1]_, **LDA** [2]_ is a `supervised` technique.
 Furthermore, the training data should be organized differently. It is indeed 
-required to be a list of :py:class:`bob.io.Arrayset`, one for each class.
+required to be a list of 2D :py:class:`numpy.ndarray`\'s, one for each class.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
    
-   >>> data1 = bob.io.Arrayset()  # Creates a container for the training data of class 1
-   >>> a1 = numpy.array([3,-3,100], 'float64')
-   >>> b1 = numpy.array([4,-4,50], 'float64')
-   >>> c1 = numpy.array([40,-40,150], 'float64')
-   >>> data1.append(a1)
-   >>> data1.append(b1)
-   >>> data1.append(c1)
-   >>> data2 = bob.io.Arrayset()  # Creates a container for the training data of class 2
-   >>> a2 = numpy.array([3,6,-50], 'float64')
-   >>> b2 = numpy.array([4,8,-100], 'float64')
-   >>> c2 = numpy.array([40,79,-800], 'float64')
-   >>> data2.append(a2)
-   >>> data2.append(b2)
-   >>> data2.append(c2)
+   >>> data1 = numpy.array([[3,-3,100], [4,-4,50], [40,-40,150]], dtype='float64')
+   >>> data2 = numpy.array([[3,6,-50], [4,8,-100], [40,79,-800]], dtype='float64')
    >>> data = [data1,data2]
-   >>> print data
-   [<Arrayset[3] float64@(3,)>, <Arrayset[3] float64@(3,)>]
 
 Once the training set has been defined, the procedure to train the 
 :py:class:`bob.machine.LinearMachine` with **LDA** is very similar to the one
@@ -306,24 +287,12 @@ K-means
 **k-means** [7]_ is a clustering method, which aims to partition a 
 set of observations into :math:`k` clusters. This is an `unsupervised` 
 technique. As for **PCA** [1]_, the training data is passed
-in a :py:class:`bob.io.Arrayset` container.
+in a 2D :py:class:`numpy.ndarray` container.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
 
-   >>> data = bob.io.Arrayset()  # Creates a container for the training data
-   >>> a = numpy.array([3,-3,100], 'float64')
-   >>> b = numpy.array([4,-4,98], 'float64')
-   >>> c = numpy.array([3.5,-3.5,99], 'float64')
-   >>> d = numpy.array([-7,7,-100], 'float64')
-   >>> e = numpy.array([-5,5,-101], 'float64')
-   >>> data.append(a)
-   >>> data.append(b)
-   >>> data.append(c)
-   >>> data.append(d)
-   >>> data.append(e)
-   >>> print data
-   <Arrayset[5] float64@(3,)>
+   >>> data = numpy.array([[3,-3,100], [4,-4,98], [3.5,-3.5,99], [-7,7,-100], [-5,5,-101]], dtype='float64')
 
 The training procedure will learn the `means` for the :py:class:`bob.machine.KMeansMachine`. The 
 number :math:`k` of `means` is given when creating the `machine`, as well as the dimensionality of
@@ -334,10 +303,11 @@ the features.
 
    >>> kmeans = bob.machine.KMeansMachine(2, 3) # Create a machine with k=2 clusters with a dimensionality equal to 3
 
-Then training procedure for `k-means` is an **Expectation-Maximization**-based [8]_ algorithm. There
-are several options that can be set such as the maximum number of iterations and the criterion used to 
-determine if the convergence has occurred. After setting all of these options, the training procedure can 
-then be called.
+Then training procedure for `k-means` is an **Expectation-Maximization**-based
+[8]_ algorithm. There are several options that can be set such as the maximum
+number of iterations and the criterion used to determine if the convergence has
+occurred. After setting all of these options, the training procedure can then
+be called.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -389,10 +359,11 @@ used to determine if the parameters have converged.
 MAP-adaptation for Gaussian mixture model
 =========================================
 
-|project| also supports the training of GMMs [9]_ using a **maximum a posteriori** (MAP) 
-approach [11]_. MAP is closely related to the ML [10]_ technique but it incorporates a prior 
-on the quantity that we want to estimate. In our case, this prior is a GMM [9]_. Based on 
-this prior model and some training data, a new model, the MAP estimate, will be `adapted`.
+|project| also supports the training of GMMs [9]_ using a **maximum a
+posteriori** (MAP) approach [11]_. MAP is closely related to the ML [10]_
+technique but it incorporates a prior on the quantity that we want to estimate.
+In our case, this prior is a GMM [9]_. Based on this prior model and some
+training data, a new model, the MAP estimate, will be `adapted`.
 
 Let's consider that the previously trained GMM [9]_ is our prior model.
 
@@ -402,29 +373,22 @@ Let's consider that the previously trained GMM [9]_ is our prior model.
    >>> print gmm # doctest: +SKIP
 
 The training data used to compute the MAP estimate [11]_ is again stored in a
-:py:class:`bob.io.Arrayset` container.
+2D :py:class:`numpy.ndarray` container.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
 
-   >>> dataMAP = bob.io.Arrayset()  # Creates a container for the training data
-   >>> a = numpy.array([7,-7,102], 'float64')
-   >>> b = numpy.array([6,-6,103], 'float64')
-   >>> c = numpy.array([-3.5,3.5,-97], 'float64')
-   >>> dataMAP.append(a)
-   >>> dataMAP.append(b)
-   >>> dataMAP.append(c)
-   >>> print dataMAP
-   <Arrayset[3] float64@(3,)>
+   >>> dataMAP = numpy.array([[7,-7,102], [6,-6,103], [-3.5,3.5,-97]], dtype='float64')
 
-The |project| class used to perform MAP adaptation training [11]_ is 
-:py:class:`bob.trainer.MAP_GMMTrainer`. As with the ML estimate [10]_, it uses 
-an **EM**-based [8]_ algorithm and requires the user to specify which parts of the GMM
-are adapted at each iteration (means, variances and/or weights). In addition, 
-it also has parameters such as the maximum number of iterations and the 
-criterion used to determine if the parameters have converged, in addition to this there
-is also a relevance factor which indicates the importance we give to the prior.
-Once the trainer has been created, a prior GMM [9]_ needs to be set.
+The |project| class used to perform MAP adaptation training [11]_ is
+:py:class:`bob.trainer.MAP_GMMTrainer`. As with the ML estimate [10]_, it uses
+an **EM**-based [8]_ algorithm and requires the user to specify which parts of
+the GMM are adapted at each iteration (means, variances and/or weights). In
+addition, it also has parameters such as the maximum number of iterations and
+the criterion used to determine if the parameters have converged, in addition
+to this there is also a relevance factor which indicates the importance we give
+to the prior.  Once the trainer has been created, a prior GMM [9]_ needs to be
+set.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE

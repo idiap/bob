@@ -32,25 +32,26 @@ class LLRTest(unittest.TestCase):
   def test01_llr(self):
 
     # Tests our LLR Trainer.
-    ar1 = bob.io.Arrayset()
-    ar1.append(numpy.array([1.,1.2,-1.]))
-    ar1.append(numpy.array([2.,2.1,2.2]))
-    ar1.append(numpy.array([3.,2.9,3.1]))
-    ar1.append(numpy.array([4.,3.7,4.]))
-    ar1.append(numpy.array([5.,5.2,4.9]))
-    ar1.append(numpy.array([6.,6.1,5.9]))
-    ar1.append(numpy.array([7.,7.,7.3]))
+    ar1 = numpy.array([
+      [1.,1.2,-1.],
+      [2.,2.1,2.2],
+      [3.,2.9,3.1],
+      [4.,3.7,4.],
+      [5.,5.2,4.9],
+      [6.,6.1,5.9],
+      [7.,7.,7.3],
+      ], dtype='float64')
 
-    ar2 = bob.io.Arrayset()
-    ar2.append(numpy.array([-10.,-9.2,-1.]))
-    ar2.append(numpy.array([-5.,-4.1,-0.5]))
-    ar2.append(numpy.array([-10.,-9.9,-1.8]))
-    ar2.append(numpy.array([-5.,-5.4,-0.3]))
-    ar2.append(numpy.array([-10.,-9.3,-0.7]))
-    ar2.append(numpy.array([-5.,-4.5,-0.5]))
-    ar2.append(numpy.array([-10.,-9.7,-1.2]))
-    ar2.append(numpy.array([-5.,-4.8,-0.2]))
-
+    ar2 = numpy.array([
+      [-10.,-9.2,-1.],
+      [-5.,-4.1,-0.5],
+      [-10.,-9.9,-1.8],
+      [-5.,-5.4,-0.3],
+      [-10.,-9.3,-0.7],
+      [-5.,-4.5,-0.5],
+      [-10.,-9.7,-1.2],
+      [-5.,-4.8,-0.2],
+      ], dtype='float64')
 
     # Expected trained machine
     weights_ref= numpy.array([[13.5714], [19.3997], [-0.6432]])

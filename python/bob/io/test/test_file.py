@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""A combined test for all built-in types of Array/Arrayset/File interaction in
+"""A combined test for all built-in types of Array/interaction in
 python.
 """
 

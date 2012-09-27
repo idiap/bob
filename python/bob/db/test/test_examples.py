@@ -23,7 +23,7 @@ class ExampleTest(unittest.TestCase):
     cmdline = ['--self-test']
     self.assertEqual(main(cmdline), 0)
 
-  def test03_iris_lda(self):
+  def test03_iris_rprop(self):
 
     from bob.db.example.iris_rprop import main
     cmdline = ['--self-test']

@@ -63,22 +63,26 @@ The Iris dataset
   if not hasattr(matplotlib, 'backends'):
     matplotlib.use('pdf') #non-interactive avoids exception on display
 
-The Iris dataset is built into |project|. Currently, it is the only
-dataset completely available with the source code (you will need to download
-the other ones yourself as explained at :doc:`TutorialsDatabase`). The
-reference manual for this dataset is available at :py:mod:`bob.db.iris`. The
-most important method is :py:func:`bob.db.iris.data`, that returns a standard
-python dictionary containing one :py:func:`bob.io.Arrayset` for each class.
-Each :py:func:`bob.io.Arrayset` contains the 4 features described in the
-database for the given Iris type.
+The Iris dataset is built into |project|. Currently, it is the only dataset
+completely available with the source code (you will need to download the other
+ones yourself as explained at :doc:`TutorialsDatabase`). The reference manual
+for this dataset is available at :py:mod:`bob.db.iris`. The most important
+method is :py:func:`bob.db.iris.data`, that returns a standard python
+dictionary containing one 2D :py:func:`numpy.ndarray` for each class.  Each
+:py:func:`numpy.ndarray` contains the 4 features described in the database for
+the given Iris type.
 
 .. doctest:: iris
 
   >>> data = bob.db.iris.data()
-  >>> data
-  {'setosa': <Arrayset[50] float64@(4,)>, 'versicolor': <Arrayset[50] float64@(4,)>, 'virginica': <Arrayset[50] float64@(4,)>}
+  >>> type(data['setosa'])
+  <type 'numpy.ndarray'>
+  >>> data['setosa'].shape
+  (50, 4)
+  >>> data.keys()
+  ['setosa', 'versicolor', 'virginica']
 
-  >>> #the properties in each Arrayset, if you are curious!
+  >>> #the features in each array, if you are curious!
   >>> bob.db.iris.names
   ['Sepal Length', 'Sepal Width', 'Petal Length', 'Petal Width']
 

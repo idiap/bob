@@ -250,15 +250,13 @@ class HDF5FileTest(unittest.TestCase):
     # shows we can load a 2D matlab array and interpret it as a bunch of 1D
     # arrays, correctly
 
-    t = bob.io.Arrayset(F('matlab_1d.hdf5'))
-    self.assertEqual( len(t), 512 )
-    self.assertEqual( t.shape, (1,) )
-    self.assertEqual( t.elementType.name, 'float64' )
+    t = bob.io.load(F('matlab_1d.hdf5'))
+    self.assertEqual( t.shape, (512,) )
+    self.assertEqual( t.dtype, numpy.float64 )
 
-    t = bob.io.Arrayset(F('matlab_2d.hdf5'))
-    self.assertEqual( len(t), 512 )
-    self.assertEqual( t.shape, (2,) )
-    self.assertEqual( t.elementType.name, 'float64' )
+    t = bob.io.load(F('matlab_2d.hdf5'))
+    self.assertEqual( t.shape, (512,2) )
+    self.assertEqual( t.dtype, numpy.float64 )
 
     # interestingly enough, if you load those files as arrays, you will read
     # the whole data at once:

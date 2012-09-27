@@ -9,11 +9,7 @@ machine, eigen_values = trainer.train(data.values())
 
 # A simple way to forward the data
 output = {}
-for key in data.keys(): output[key] = data[key].foreach(machine)
-
-# From bob.io.Arrayset => numpy.ndarray 2D/float64
-for key, value in output.iteritems():
-  output[key] = numpy.vstack(value)
+for key in data.keys(): output[key] = machine(data[key])
 
 # Performance
 negatives = numpy.vstack([output['setosa'], output['versicolor']])[:,0]

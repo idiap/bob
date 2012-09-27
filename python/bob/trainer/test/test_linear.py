@@ -32,17 +32,18 @@ class LinearTest(unittest.TestCase):
   def test01a_pca_via_svd(self):
 
     # Tests our SVD/PCA extractor.
-    data = bob.io.Arrayset()
-    data.append(numpy.array([2.5, 2.4]))
-    data.append(numpy.array([0.5, 0.7]))
-    data.append(numpy.array([2.2, 2.9]))
-    data.append(numpy.array([1.9, 2.2]))
-    data.append(numpy.array([3.1, 3.0]))
-    data.append(numpy.array([2.3, 2.7]))
-    data.append(numpy.array([2., 1.6]))
-    data.append(numpy.array([1., 1.1]))
-    data.append(numpy.array([1.5, 1.6]))
-    data.append(numpy.array([1.1, 0.9]))
+    data = numpy.array([
+        [2.5, 2.4],
+        [0.5, 0.7],
+        [2.2, 2.9],
+        [1.9, 2.2],
+        [3.1, 3.0],
+        [2.3, 2.7],
+        [2., 1.6],
+        [1., 1.1],
+        [1.5, 1.6],
+        [1.1, 0.9],
+        ], dtype='float64')
 
     # Expected results
     eig_val_correct = numpy.array([1.28402771, 0.0490834], 'float64')
@@ -58,11 +59,12 @@ class LinearTest(unittest.TestCase):
   def test01b_pca_via_svd(self):
 
     # Tests our SVD/PCA extractor.
-    data = bob.io.Arrayset()
-    data.append(numpy.array([1,2, 3,5,7], 'float64'))
-    data.append(numpy.array([2,4,19,0,2], 'float64'))
-    data.append(numpy.array([3,6, 5,3,3], 'float64'))
-    data.append(numpy.array([4,8,13,4,2], 'float64'))
+    data = numpy.array([
+      [1,2, 3,5,7],
+      [2,4,19,0,2],
+      [3,6, 5,3,3],
+      [4,8,13,4,2],
+      ], dtype='float64')
 
     # Expected results
     eig_val_correct = numpy.array([61.9870996, 9.49613738, 1.85009634, 0.],
@@ -79,17 +81,22 @@ class LinearTest(unittest.TestCase):
 
     # Tests our Fisher/LDA trainer for linear machines for a simple 2-class
     # "fake" problem:
-    data = [bob.io.Arrayset(), bob.io.Arrayset()]
-    data[0].append(numpy.array([2.5, 2.4]))
-    data[0].append(numpy.array([2.2, 2.9]))
-    data[0].append(numpy.array([1.9, 2.2]))
-    data[0].append(numpy.array([3.1, 3.0]))
-    data[0].append(numpy.array([2.3, 2.7]))
-    data[1].append(numpy.array([0.5, 0.7]))
-    data[1].append(numpy.array([2., 1.6]))
-    data[1].append(numpy.array([1., 1.1]))
-    data[1].append(numpy.array([1.5, 1.6]))
-    data[1].append(numpy.array([1.1, 0.9]))
+    data = [
+        numpy.array([
+          [2.5, 2.4],
+          [2.2, 2.9],
+          [1.9, 2.2],
+          [3.1, 3.0],
+          [2.3, 2.7],
+          ], dtype='float64'),
+        numpy.array([
+          [0.5, 0.7],
+          [2., 1.6],
+          [1., 1.1],
+          [1.5, 1.6],
+          [1.1, 0.9],
+          ], dtype='float64'),
+        ]
 
     # Expected results
     exp_trans_data = [
@@ -112,17 +119,22 @@ class LinearTest(unittest.TestCase):
 
     # Tests our Fisher/LDA trainer for linear machines for a simple 2-class
     # "fake" problem:
-    data = [bob.io.Arrayset(), bob.io.Arrayset()]
-    data[0].append(numpy.array([2.5, 2.4, 2.5]))
-    data[0].append(numpy.array([2.2, 2.9, 3.]))
-    data[0].append(numpy.array([1.9, 2.2, 2.]))
-    data[0].append(numpy.array([3.1, 3.0, 3.1]))
-    data[0].append(numpy.array([2.3, 2.7, 2.4]))
-    data[1].append(numpy.array([-0.5, -0.7, -1.]))
-    data[1].append(numpy.array([-2., -1.6, -2.]))
-    data[1].append(numpy.array([-1., -1.1, -1.]))
-    data[1].append(numpy.array([-1.5, -1.6, -1.6]))
-    data[1].append(numpy.array([-1.1, -0.9, -1.]))
+    data = [
+        numpy.array([
+          [2.5, 2.4, 2.5],
+          [2.2, 2.9, 3.],
+          [1.9, 2.2, 2.],
+          [3.1, 3.0, 3.1],
+          [2.3, 2.7, 2.4],
+          ], dtype='float64'),
+        numpy.array([
+          [-0.5, -0.7, -1.],
+          [-2., -1.6, -2.],
+          [-1., -1.1, -1.],
+          [-1.5, -1.6, -1.6],
+          [-1.1, -0.9, -1.],
+          ], dtype='float64'),
+        ]
 
     # Expected results
     exp_mean = numpy.array([0.59, 0.73, 0.64])
@@ -142,11 +154,12 @@ class LinearTest(unittest.TestCase):
 
     # Tests our Probabilistic PCA trainer for linear machines for a simple 
     # problem:
-    ar=bob.io.Arrayset()
-    ar.append(numpy.array([1,2,3], 'float64'))
-    ar.append(numpy.array([2,4,19], 'float64'))
-    ar.append(numpy.array([3,6,5], 'float64'))
-    ar.append(numpy.array([4,8,13], 'float64'))
+    ar=numpy.array([
+      [1, 2, 3],
+      [2, 4, 19],
+      [3, 6, 5],
+      [4, 8, 13],
+      ], dtype='float64')
     
     # Expected llh 1 and 2 (Reference values)
     exp_llh1 =  -32.8443

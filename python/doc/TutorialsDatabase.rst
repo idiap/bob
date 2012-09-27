@@ -63,15 +63,20 @@ A description of the feature vector can be obtained using the attribute
    ['Sepal Length', 'Sepal Width', 'Petal Length', 'Petal Width']
 
 The data (feature vectors) can be retrieved using the :py:meth:`bob.db.iris.data()` 
-function. This returns a 3-key dictionary, with 3 :py:attr:`bob.io.Arrayset` 
+function. This returns a 3-key dictionary, with 3 :py:class:`numpy.ndarray` 
 as values, one for each of the three species of Iris flowers.
 
 .. doctest::
 
-   >>> bob.db.iris.data()
-   {'setosa': <Arrayset[50] float64@(4,)>, 'versicolor': <Arrayset[50] float64@(4,)>, 'virginica': <Arrayset[50] float64@(4,)>}
+  >>> data = bob.db.iris.data()
+  >>> type(data['setosa'])
+  <type 'numpy.ndarray'>
+  >>> data['setosa'].shape
+  (50, 4)
+  >>> data.keys()
+  ['setosa', 'versicolor', 'virginica']
 
-Each :py:attr:`bob.io.Arrayset` consists of 50 feature vectors of length four.
+Each :py:class:`numpy.ndarray` consists of 50 feature vectors of length four.
 
 The database also contains statistics about the feature vectors, which can be 
 obtained using the :py:attr:`bob.db.iris.stats` dictionary. A description
