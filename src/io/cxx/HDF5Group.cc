@@ -474,12 +474,27 @@ bool h5::Group::has_dataset(const std::string& dir) const {
   return g->has_dataset(dir.substr(pos+1));
 }
 
+void h5::Group::gettype_attribute(const std::string& name,
+          bob::core::array::typeinfo& type) const {
+  h5::gettype_attribute(m_id, name, type);
+}
+
 bool h5::Group::has_attribute(const std::string& name) const {
   return h5::has_attribute(m_id, name);
 }
 
 void h5::Group::delete_attribute (const std::string& name) {
   h5::delete_attribute(m_id, name);
+}
+
+void h5::Group::read_attribute (const std::string& name,
+    const bob::io::HDF5Type& dest_type, void* buffer) const {
+  h5::read_attribute(m_id, name, dest_type, buffer);
+}
+
+void h5::Group::write_attribute (const std::string& name,
+    const bob::io::HDF5Type& dest_type, const void* buffer) {
+  h5::write_attribute(m_id, name, dest_type, buffer);
 }
 
 h5::RootGroup::RootGroup(boost::shared_ptr<File> parent):

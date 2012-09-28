@@ -93,27 +93,6 @@ namespace bob { namespace io {
       void createGroup(const std::string& path);
 
       /**
-       * Tells if there is a version number on the current directory
-       */
-      bool hasVersion() const;
-
-      /**
-       * Reads the version number - works if there is one, otherwise, raises an
-       * exception.
-       */
-      uint64_t getVersion() const;
-
-      /**
-       * Sets the version number, overwrites if it already exists
-       */
-      void setVersion(uint64_t version);
-
-      /**
-       * Removes the version number, if one exists
-       */
-      void removeVersion();
-
-      /**
        * Returns the name of the file currently opened
        */
       const std::string& filename() const { return m_file->filename(); }
@@ -426,6 +405,45 @@ namespace bob { namespace io {
        * Drop the current settings and load new ones from the other file.
        */
       HDF5File& operator= (const HDF5File& other);
+
+    public: // attribute handling
+
+      /**
+       * Tells if there is an attribute with a given name on the given path,
+       * relative to the current location, possibly.
+       */
+      bool hasAttribute(const std::string& path, const std::string& name) const;
+
+      /**
+       * Reads data from the file into a scalar. Raises an exception if the
+       * type is incompatible. Relative paths are accepted.
+       */
+      template <typename T>
+        void readAttribute(const std::string& path, const std::string& name, 
+            T& value) {
+          if (m_cwd->has_dataset(path)) {
+            value = m_cwd[path]->get_attribute<T>(name);
+          }
+          else if (m_cwd->has_group(path)) {
+            value = m_cwd->cd(path)->get_attribute<T>(name);
+          }
+          else {
+            boost::format m("cannot read attribute '%s' at path/dataset '%s' of file '%s' because it does not currently exist");
+            m % name % path % m_cwd->path() % m_file->filename();
+            throw std::runtime_error(m.str());
+          }
+        }
+
+      /**
+       * Reads data from the file into a scalar. Returns by copy. Raises if the
+       * type T is incompatible. Relative paths are accepted.
+       */
+      template <typename T> T readAttribute(const std::string& path, 
+          const std::string& name) {
+        T value;
+        readArray(path, name, value);
+        return value;
+      }
 
     private: //representation
 

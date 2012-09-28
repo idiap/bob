@@ -279,6 +279,12 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
     public: //attribute support
 
       /**
+       * Gets the current type set for an attribute
+       */
+      void gettype_attribute(const std::string& name,
+          bob::core::array::typeinfo& type) const;
+
+      /**
        * Sets a scalar attribute on the current group. Setting an existing
        * attribute overwrites its value.
        *
@@ -311,6 +317,62 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
        * Deletes an attribute
        */
       void delete_attribute(const std::string& name);
+
+    public: //array attribute support
+
+      /**
+       * Sets a array attribute on the current group. Setting an existing
+       * attribute overwrites its value. If the attribute exists it is erased
+       * and re-written.
+       */
+      template <typename T, int N> void set_array_attribute(const std::string& name,
+          const blitz::Array<T,N>& v) {
+        bob::io::HDF5Type dest_type(v);
+        if(!bob::core::array::isCZeroBaseContiguous(v)) {
+          blitz::Array<T,N> tmp = bob::core::array::ccopy(v);
+          write_attribute(name, dest_type, reinterpret_cast<const void*>(tmp.data()));
+        }
+        else {
+          write_attribute(name, dest_type, reinterpret_cast<const void*>(v.data()));
+        }
+      }
+
+      /**
+       * Reads an attribute from the current dataset. Raises an error if such
+       * attribute does not exist on the group. To check for existence, use
+       * has_attribute().
+       */
+      template <typename T,N> blitz::Array<T,N> get_array_attribute(const std::string& name) const {
+        blitz::Array<T,N> v;
+        bob::io::HDF5Type dest_type(v);
+        read_attribute(name, dest_type, reinterpret_cast<void*>(v.data()));
+        return v;
+      }
+
+      /**
+       * Reads an attribute from the current dataset. Places the data in an
+       * already allocated array.
+       */
+      template <typename T,N> void get_array_attribute(const std::string& name,
+          blitz::Array<T,N>& v) const {
+        bob::io::HDF5Type dest_type(v);
+        read_attribute(name, dest_type, reinterpret_cast<void*>(v.data()));
+      }
+
+    public: //buffer attribute support
+
+      /**
+       * Reads an attribute into a user buffer. It is the user's responsibility
+       * to have a buffer that represents the given type.
+       */
+      void read_attribute (const std::string& name, 
+          const bob::io::HDF5Type& dest, void* buffer) const;
+
+      /**
+       * Writes the contents of a given buffer into the attribute.
+       */
+      void write_attribute (const std::string& name,
+          const bob::io::HDF5Type& dest, const void* buffer);
 
     private: //not implemented
 

@@ -31,13 +31,19 @@
 namespace bob { namespace io { namespace detail { namespace hdf5 {
 
   /**
-   * reads the attribute value, place it in "buffer"
+   * Finds out the type of the attribute, if it exists, raises otherwise.
+   */
+  void gettype_attribute (const boost::shared_ptr<hid_t> location,
+      const std::string& name, bob::core::array::typeinfo& type);
+
+  /**
+   * Reads the attribute value, place it in "buffer"
    */
   void read_attribute (const boost::shared_ptr<hid_t> location,
       const std::string& name, const bob::io::HDF5Type& dest, void* buffer);
 
   /**
-   * writes an attribute value from "buffer"
+   * Writes an attribute value from "buffer"
    */
   void write_attribute (boost::shared_ptr<hid_t> location,
       const std::string& name, const bob::io::HDF5Type& dest,

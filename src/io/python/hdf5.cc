@@ -197,6 +197,21 @@ static object set_version(io::HDF5File& f, object o) {
   PYTHON_ERROR(TypeError, "Setting the version requires either an integer object or None (to remove it)");
 }
 
+static void hdf5file_get_properties(io::HDF5File& f,
+    const std::string& path) {
+  if (!f.contains(path)) {
+    PYTHON_ERROR(RuntimeError, "Path '%s' does not currently exist at file %s:%s", path, 
+  }
+}
+
+static void hdf5file_set_property(io::HDF5File& f,
+    const std::string& path, str key, object value) {
+}
+
+static void hdf5file_set_properties(io::HDF5File& f,
+    const std::string& path, dict d) {
+}
+
 void bind_io_hdf5() {
   class_<io::HDF5File, boost::shared_ptr<io::HDF5File> >("HDF5File", "A HDF5File allows users to read and write data from and to files containing standard bob binary coded data in HDF5 format. For an introduction to HDF5, please visit http://www.hdfgroup.org/HDF5.", no_init)
     .def(boost::python::init<const io::HDF5File&>(boost::python::args("other"), "Generates a shallow copy of the already opened file."))
