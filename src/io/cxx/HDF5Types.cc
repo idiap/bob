@@ -47,6 +47,8 @@ const char* io::stringize (hdf5type t) {
   switch (t) {
     case io::s: 
       return "string";
+    case io::b:
+      return "bool";
     case io::i8:
       return "int8";
     case io::i16:
@@ -283,6 +285,28 @@ static io::hdf5type equivctype(const boost::shared_ptr<hid_t>& dt) {
 }
 
 /**
+ * Checks if a given type can be read as boolean
+ */
+static void checkbool(const boost::shared_ptr<hid_t>& dt) {
+
+  if (H5Tget_nmembers(*dt) != 2) throw io::HDF5UnsupportedTypeError(dt);
+  
+  int8_t value;
+  herr_t status = H5Tget_member_value(*dt, 0, &value);
+  if (status < 0) throw io::HDF5StatusError("H5Tget_member_value", status);
+  bool next_is_false = false;
+  if (value != 0) next_is_false = true;
+  status = H5Tget_member_value(*dt, 1, &value);
+  if (status < 0) throw io::HDF5StatusError("H5Tget_member_value", status);
+  if (next_is_false) {
+    if (value != 0) throw io::HDF5UnsupportedTypeError(dt);
+  }
+  else {
+    if (value == 0) throw io::HDF5UnsupportedTypeError(dt);
+  }
+}
+
+/**
  * Given a datatype, returns the supported type equivalent or raises
  */
 static io::hdf5type get_datatype
@@ -308,6 +332,9 @@ static io::hdf5type get_datatype
 # endif
   
   switch (classtype) {
+    case H5T_ENUM:
+      checkbool(dt);
+      return io::b;
     case H5T_INTEGER:
       switch (typesize) {
         case 1: //int8 or uint8
@@ -388,6 +415,30 @@ boost::shared_ptr<hid_t> io::HDF5Type::htype() const {
   switch (m_type) {
     case io::s:
       return boost::make_shared<hid_t>(H5T_STRING);
+    case io::b:
+      {
+        //why? HDF5 is a C library and in C there is no boolean type
+        //bottom-line => we have to define our own...
+
+        boost::shared_ptr<hid_t> retval(new hid_t(-1),
+            std::ptr_fun(delete_h5datatype));
+        *retval = H5Tenum_create(H5T_NATIVE_INT8);
+        if (*retval < 0) throw io::HDF5StatusError("H5Tenum_create", *retval);
+        int8_t val;
+        herr_t status;
+       
+        //defines false
+        val = 0;
+        status = H5Tenum_insert(*retval, "false", &val);
+        if (status < 0) throw io::HDF5StatusError("H5Tenum_insert", status);
+
+        //defines true
+        val = 1;
+        status = H5Tenum_insert(*retval, "true",  &val);
+        if (*retval < 0) throw io::HDF5StatusError("H5Tenum_insert", status);
+
+        return retval;
+      }
     case io::i8:
       return boost::make_shared<hid_t>(H5T_NATIVE_INT8);
     case io::i16:
@@ -416,8 +467,10 @@ boost::shared_ptr<hid_t> io::HDF5Type::htype() const {
             std::ptr_fun(delete_h5datatype));
         *retval = H5Tcreate(H5T_COMPOUND, 2*sizeof(float));
         if (*retval < 0) throw io::HDF5StatusError("H5Tcreate", *retval);
-        H5Tinsert(*retval, "real", 0, H5T_NATIVE_FLOAT);
-        H5Tinsert(*retval, "imag", sizeof(float), H5T_NATIVE_FLOAT);
+        herr_t status = H5Tinsert(*retval, "real", 0, H5T_NATIVE_FLOAT);
+        if (status < 0) throw io::HDF5StatusError("H5Tinsert", status);
+        status = H5Tinsert(*retval, "imag", sizeof(float), H5T_NATIVE_FLOAT);
+        if (status < 0) throw io::HDF5StatusError("H5Tinsert", status);
         return retval;
       }
     case io::c128: 
@@ -426,8 +479,10 @@ boost::shared_ptr<hid_t> io::HDF5Type::htype() const {
             std::ptr_fun(delete_h5datatype));
         *retval = H5Tcreate(H5T_COMPOUND, 2*sizeof(double));
         if (*retval < 0) throw io::HDF5StatusError("H5Tcreate", *retval);
-        H5Tinsert(*retval, "real", 0, H5T_NATIVE_DOUBLE);
-        H5Tinsert(*retval, "imag", sizeof(double), H5T_NATIVE_DOUBLE);
+        herr_t status = H5Tinsert(*retval, "real", 0, H5T_NATIVE_DOUBLE);
+        if (status < 0) throw io::HDF5StatusError("H5Tinsert", status);
+        status = H5Tinsert(*retval, "imag", sizeof(double), H5T_NATIVE_DOUBLE);
+        if (status < 0) throw io::HDF5StatusError("H5Tinsert", status);
         return retval;
       }
     case io::c256:
@@ -436,8 +491,10 @@ boost::shared_ptr<hid_t> io::HDF5Type::htype() const {
             std::ptr_fun(delete_h5datatype));
         *retval = H5Tcreate(H5T_COMPOUND, 2*sizeof(long double));
         if (*retval < 0) throw io::HDF5StatusError("H5Tcreate", *retval);
-        H5Tinsert(*retval, "real", 0, H5T_NATIVE_LDOUBLE);
-        H5Tinsert(*retval, "imag", sizeof(long double), H5T_NATIVE_LDOUBLE);
+        herr_t status = H5Tinsert(*retval, "real", 0, H5T_NATIVE_LDOUBLE);
+        if (status < 0) throw io::HDF5StatusError("H5Tinsert", status);
+        status = H5Tinsert(*retval, "imag", sizeof(long double), H5T_NATIVE_LDOUBLE);
+        if (status < 0) throw io::HDF5StatusError("H5Tinsert", status);
         return retval;
       }
     default:
@@ -448,7 +505,7 @@ boost::shared_ptr<hid_t> io::HDF5Type::htype() const {
   
 #define DEFINE_SUPPORT(T,E) io::HDF5Type::HDF5Type(const T& value): \
     m_type(E), m_shape(1) { m_shape[0] = 1; }
-DEFINE_SUPPORT(bool,io::u8)
+DEFINE_SUPPORT(bool,io::b)
 DEFINE_SUPPORT(int8_t,io::i8)
 DEFINE_SUPPORT(int16_t,io::i16)
 DEFINE_SUPPORT(int32_t,io::i32)
@@ -480,7 +537,7 @@ DEFINE_SUPPORT(std::string,io::s)
   DEFINE_SUPPORT(T,E,3) \
   DEFINE_SUPPORT(T,E,4)
 
-DEFINE_BZ_SUPPORT(bool,io::u8)
+DEFINE_BZ_SUPPORT(bool,io::b)
 DEFINE_BZ_SUPPORT(int8_t,io::i8)
 DEFINE_BZ_SUPPORT(int16_t,io::i16)
 DEFINE_BZ_SUPPORT(int32_t,io::i32)
@@ -522,7 +579,7 @@ static io::hdf5type array_to_hdf5 (bob::core::array::ElementType eltype) {
     case bob::core::array::t_unknown:
       return io::unsupported;
     case bob::core::array::t_bool:
-      return io::u8;
+      return io::b;
     case bob::core::array::t_int8:
       return io::i8;
     case bob::core::array::t_int16:
@@ -613,6 +670,8 @@ std::string io::HDF5Type::str() const {
 
 bob::core::array::ElementType io::HDF5Type::element_type() const {
   switch (m_type) {
+    case b:
+      return bob::core::array::t_bool;
     case i8:
       return bob::core::array::t_int8;
     case i16:

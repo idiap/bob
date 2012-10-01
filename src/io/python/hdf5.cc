@@ -98,6 +98,8 @@ static object hdf5file_xread(io::HDF5File& f, const std::string& p,
 
   if (shape.n() == 1 && shape[0] == 1) { //read as scalar
     switch(type.type()) {
+      case io::b:
+        return object(f.read<bool>(p, pos));
       case io::i8:
         return object(f.read<int8_t>(p, pos));
       case io::i16:
@@ -237,6 +239,8 @@ static void inner_replace(io::HDF5File& f, const std::string& path,
 
   if (scalar) { //write as a scalar
     switch(type.type()) {
+      case io::b:  
+        return inner_replace_scalar<bool>(f, path, obj, pos);
       case io::i8:  
         return inner_replace_scalar<int8_t>(f, path, obj, pos);
       case io::i16: 
@@ -297,6 +301,8 @@ static void inner_append(io::HDF5File& f, const std::string& path,
 
   if (scalar) { //write as a scalar
     switch(type.type()) {
+      case io::b:  
+        return inner_append_scalar<bool>(f, path, obj);
       case io::i8:  
         return inner_append_scalar<int8_t>(f, path, obj);
       case io::i16: 
@@ -376,6 +382,8 @@ static void inner_set(io::HDF5File& f, const std::string& path,
 
   if (scalar) { //write as a scalar
     switch(type.type()) {
+      case io::b:  
+        return inner_set_scalar<bool>(f, path, obj);
       case io::i8:  
         return inner_set_scalar<int8_t>(f, path, obj);
       case io::i16: 
@@ -458,6 +466,8 @@ static object inner_get_attr(const io::HDF5File& f, const std::string& path,
 
   if (shape.n() == 1 && shape[0] == 1) { //read as scalar
     switch(type.type()) {
+      case io::b:  
+        return inner_get_scalar_attr<bool>(f, path, name, type);
       case io::i8:  
         return inner_get_scalar_attr<int8_t>(f, path, name, type);
       case io::i16: 
@@ -551,6 +561,8 @@ static void inner_set_attr(io::HDF5File& f, const std::string& path,
 
   if (scalar) { //write as a scalar
     switch(type.type()) {
+      case io::b:  
+        return inner_set_scalar_attr<bool>(f, path, name, type, obj);
       case io::i8:  
         return inner_set_scalar_attr<int8_t>(f, path, name, type, obj);
       case io::i16: 

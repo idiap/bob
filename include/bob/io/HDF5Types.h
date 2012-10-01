@@ -54,6 +54,7 @@ namespace bob { namespace io {
    */
   typedef enum hdf5type {
     s=0, //std::string
+    b, //bool
     i8, //int8_t
     i16, //int16_t
     i32, //int32_t
