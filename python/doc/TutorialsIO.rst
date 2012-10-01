@@ -121,7 +121,7 @@ directory like this:
 
   >>> f = bob.io.HDF5File('testfile1.hdf5', 'a')
   >>> f.create_group('/test')
-  >>> f.set('/test/my_float', 6.28, dtype='float32')
+  >>> f.set('/test/my_float', numpy.float32(6.28))
   >>> del f
 
 
