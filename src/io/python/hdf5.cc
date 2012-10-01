@@ -135,7 +135,7 @@ static object hdf5file_xread(io::HDF5File& f, const std::string& p,
   ca::typeinfo atype;
   type.copy_to(atype);
   tp::py_array retval(atype);
-  f.read_buffer(p, pos, retval);
+  f.read_buffer(p, pos, atype, retval.ptr());
   return retval.pyobject();
 }
 
@@ -156,61 +156,482 @@ static inline object hdf5file_read(io::HDF5File& f, const std::string& p) {
   return hdf5file_xread(f, p, 1, 0);
 }
 
-template <typename T> static void hdf5file_replace_scalar(io::HDF5File& f, const std::string& p, size_t pos, const T& value) {
-  f.replace(p, pos, value);
+template <typename T> void set_type(io::HDF5Type& t) {
+  T v;
+  t = io::HDF5Type(v);
 }
 
-static void hdf5file_replace_array(io::HDF5File& f, const std::string& p,
-    size_t pos, object array_like) {
-  f.write_buffer(p, pos, tp::py_array(array_like, object()));
-}
+/**
+ * Sets at 't', the type of the object 'o' according to our support types.
+ * Raise in case of problems. Furthermore, returns 'true' if the object is as
+ * simple scalar.
+ */
+static bool get_object_type(object o, io::HDF5Type& t) {
+  PyObject* op = o.ptr();
 
-static void hdf5file_append_array(io::HDF5File& f,
-    const std::string& path, object array_like, size_t compression) {
-  tp::py_array tmp(array_like, object());
-  if (!f.contains(path)) f.create(path, tmp.type(), true, compression);
-  f.extend_buffer(path, tmp);
-}
-
-static void hdf5file_set_array(io::HDF5File& f,
-    const std::string& path, object array_like, size_t compression) {
-  tp::py_array tmp(array_like, object());
-  if (!f.contains(path)) f.create(path, tmp.type(), false, compression);
-  f.write_buffer(path, 0, tmp);
-}
-
-static object get_version(const io::HDF5File& f) {
-  if (!f.hasVersion()) return object();
-  return object(f.getVersion());
-}
-
-static object set_version(io::HDF5File& f, object o) {
-  if (o.ptr() == Py_None) {
-    f.removeVersion();
-    return o;
+  if (PyArray_IsAnyScalar(op)) {
+    if (PyBool_Check(op)) set_type<bool>(t);
+    else if (PyInt_Check(op)) set_type<int32_t>(t);
+    else if (PyLong_Check(op)) set_type<int64_t>(t);
+    else if (PyFloat_Check(op)) set_type<double>(t);
+    else if (PyComplex_Check(op)) set_type<std::complex<double> >(t);
+    else if (PyString_Check(op)) set_type<std::string>(t);
+    else if (PyArray_IsScalar(op, Bool)) set_type<bool>(t);
+    else if (PyArray_IsScalar(op, Int8)) set_type<int8_t>(t);
+    else if (PyArray_IsScalar(op, UInt8)) set_type<uint8_t>(t);
+    else if (PyArray_IsScalar(op, Int16)) set_type<int16_t>(t);
+    else if (PyArray_IsScalar(op, UInt16)) set_type<uint16_t>(t);
+    else if (PyArray_IsScalar(op, Int32)) set_type<int32_t>(t);
+    else if (PyArray_IsScalar(op, UInt32)) set_type<uint32_t>(t);
+    else if (PyArray_IsScalar(op, Int64)) set_type<int64_t>(t);
+    else if (PyArray_IsScalar(op, UInt64)) set_type<uint64_t>(t);
+    else if (PyArray_IsScalar(op, Float)) set_type<float>(t);
+    else if (PyArray_IsScalar(op, Double)) set_type<double>(t);
+    else if (PyArray_IsScalar(op, LongDouble)) set_type<long double>(t);
+    else if (PyArray_IsScalar(op, CFloat)) set_type<std::complex<float> >(t);
+    else if (PyArray_IsScalar(op, CDouble)) set_type<std::complex<double> >(t);
+    else if (PyArray_IsScalar(op, CLongDouble)) set_type<std::complex<long double> >(t);
+    //else if (PyArray_IsScalar(op, String)) set_type<std::string>(t);
+    else {
+      str so(o);
+      std::string s = extract<std::string>(so);
+      PYTHON_ERROR(TypeError, "No support for HDF5 type conversion for scalar object '%s'", s.c_str());
+    }
+    return true;
   }
-  extract<uint64_t> int_check(o);
-  if (int_check.check()) {
-    f.setVersion(int_check());
-    return o;
+
+  else if (PyArray_Check(op)) {
+    bob::core::array::typeinfo ti;
+    bob::python::typeinfo_ndarray_(o, ti);
+    t = io::HDF5Type(ti);
+    return false;
   }
-  PYTHON_ERROR(TypeError, "Setting the version requires either an integer object or None (to remove it)");
+
+  else {
+    //checks for convertibility to numpy.ndarray (not necessarily writeable,
+    //but has to be "behaved" = C-style contiguous).
+    bob::core::array::typeinfo ti;
+    if (tp::convertible(o, ti, false, true) != tp::IMPOSSIBLE) {
+      t = io::HDF5Type(ti);
+      return false;
+    }
+  }
+
+  //if you get to this point, then this object is not supported
+  str so(o);
+  std::string printout = extract<std::string>(so);
+  PYTHON_ERROR(TypeError, "No support for HDF5 type conversion for object of unknown type %s", printout.c_str());
 }
 
-static void hdf5file_get_properties(io::HDF5File& f,
-    const std::string& path) {
-  if (!f.contains(path)) {
-    PYTHON_ERROR(RuntimeError, "Path '%s' does not currently exist at file %s:%s", path, 
+template <typename T>
+static void inner_replace_scalar(io::HDF5File& f,
+  const std::string& path, object obj, size_t pos) {
+  T value = extract<T>(obj);
+  f.replace(path, pos, value);
+}
+
+static void inner_replace(io::HDF5File& f, const std::string& path,
+    const io::HDF5Type& type, object obj, size_t pos, bool scalar) {
+
+  //no error detection: this should be done before reaching this method
+
+  if (scalar) { //write as a scalar
+    switch(type.type()) {
+      case io::i8:  
+        return inner_replace_scalar<int8_t>(f, path, obj, pos);
+      case io::i16: 
+        return inner_replace_scalar<int16_t>(f, path, obj, pos);
+      case io::i32:
+        return inner_replace_scalar<int32_t>(f, path, obj, pos);
+      case io::i64: 
+        return inner_replace_scalar<int64_t>(f, path, obj, pos);
+      case io::u8:  
+        return inner_replace_scalar<uint8_t>(f, path, obj, pos);
+      case io::u16: 
+        return inner_replace_scalar<uint16_t>(f, path, obj, pos);
+      case io::u32: 
+        return inner_replace_scalar<uint32_t>(f, path, obj, pos);
+      case io::u64: 
+        return inner_replace_scalar<uint64_t>(f, path, obj, pos);
+      case io::f32: 
+        return inner_replace_scalar<float>(f, path, obj, pos);
+      case io::f64: 
+        return inner_replace_scalar<double>(f, path, obj, pos);
+      case io::f128: 
+        return inner_replace_scalar<long double>(f, path, obj, pos);
+      case io::c64:
+        return inner_replace_scalar<std::complex<float> >(f, path, obj, pos);
+      case io::c128:
+        return inner_replace_scalar<std::complex<double> >(f, path, obj, pos);
+      case io::c256:
+        return inner_replace_scalar<std::complex<long double> >(f, path, obj, pos);
+      default:
+        break;
+    }
+  }
+
+  else { //write as an numpy array
+    tp::py_array tmp(obj, object());
+    f.write_buffer(path, pos, tmp.type(), tmp.ptr());
   }
 }
 
-static void hdf5file_set_property(io::HDF5File& f,
-    const std::string& path, str key, object value) {
+static void hdf5file_replace(io::HDF5File& f, const std::string& path,
+    size_t pos, object obj) {
+  io::HDF5Type type;
+  bool scalar = get_object_type(obj, type);
+  inner_replace(f, path, type, obj, pos, scalar);
 }
 
-static void hdf5file_set_properties(io::HDF5File& f,
-    const std::string& path, dict d) {
+template <typename T>
+static void inner_append_scalar(io::HDF5File& f, const std::string& path,
+    object obj) {
+  T value = extract<T>(obj);
+  f.append(path, value);
 }
+
+static void inner_append(io::HDF5File& f, const std::string& path,
+    const io::HDF5Type& type, object obj, size_t compression, bool scalar) {
+
+  //no error detection: this should be done before reaching this method
+
+  if (scalar) { //write as a scalar
+    switch(type.type()) {
+      case io::i8:  
+        return inner_append_scalar<int8_t>(f, path, obj);
+      case io::i16: 
+        return inner_append_scalar<int16_t>(f, path, obj);
+      case io::i32:
+        return inner_append_scalar<int32_t>(f, path, obj);
+      case io::i64: 
+        return inner_append_scalar<int64_t>(f, path, obj);
+      case io::u8:  
+        return inner_append_scalar<uint8_t>(f, path, obj);
+      case io::u16: 
+        return inner_append_scalar<uint16_t>(f, path, obj);
+      case io::u32: 
+        return inner_append_scalar<uint32_t>(f, path, obj);
+      case io::u64: 
+        return inner_append_scalar<uint64_t>(f, path, obj);
+      case io::f32: 
+        return inner_append_scalar<float>(f, path, obj);
+      case io::f64: 
+        return inner_append_scalar<double>(f, path, obj);
+      case io::f128: 
+        return inner_append_scalar<long double>(f, path, obj);
+      case io::c64:
+        return inner_append_scalar<std::complex<float> >(f, path, obj);
+      case io::c128:
+        return inner_append_scalar<std::complex<double> >(f, path, obj);
+      case io::c256:
+        return inner_append_scalar<std::complex<long double> >(f, path, obj);
+      default:
+        break;
+    }
+  }
+
+  else { //write as an numpy array
+    tp::py_array tmp(obj, object());
+    if (!f.contains(path)) f.create(path, tmp.type(), true, compression);
+    f.extend_buffer(path, tmp.type(), tmp.ptr());
+  }
+}
+
+static void hdf5file_append_iterable(io::HDF5File& f, const std::string& path,
+  object iterable, size_t compression) {
+  for (size_t k=0; k<len(iterable); ++k) {
+    object obj = iterable[k];
+    io::HDF5Type type;
+    bool scalar = get_object_type(obj, type);
+    inner_append(f, path, type, obj, compression, scalar);
+  }
+}
+
+static void hdf5file_append(io::HDF5File& f, const std::string& path,
+    object obj, size_t compression=0) {
+  PyObject* op = obj.ptr();
+  if (PyList_Check(op) || PyTuple_Check(op)) {
+    hdf5file_append_iterable(f, path, obj, compression);
+  }
+  else {
+    io::HDF5Type type;
+    bool scalar = get_object_type(obj, type);
+    inner_append(f, path, type, obj, compression, scalar);
+  }
+}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(hdf5file_append_overloads, hdf5file_append, 3, 4)
+
+template <typename T>
+static void inner_set_scalar(io::HDF5File& f, const std::string& path,
+    object obj) {
+  T value = extract<T>(obj);
+  f.set(path, value);
+}
+
+static void inner_set(io::HDF5File& f, const std::string& path,
+    const io::HDF5Type& type, object obj, size_t compression, bool scalar) {
+
+  //no error detection: this should be done before reaching this method
+
+  if (scalar) { //write as a scalar
+    switch(type.type()) {
+      case io::i8:  
+        return inner_set_scalar<int8_t>(f, path, obj);
+      case io::i16: 
+        return inner_set_scalar<int16_t>(f, path, obj);
+      case io::i32:
+        return inner_set_scalar<int32_t>(f, path, obj);
+      case io::i64: 
+        return inner_set_scalar<int64_t>(f, path, obj);
+      case io::u8:  
+        return inner_set_scalar<uint8_t>(f, path, obj);
+      case io::u16: 
+        return inner_set_scalar<uint16_t>(f, path, obj);
+      case io::u32: 
+        return inner_set_scalar<uint32_t>(f, path, obj);
+      case io::u64: 
+        return inner_set_scalar<uint64_t>(f, path, obj);
+      case io::f32: 
+        return inner_set_scalar<float>(f, path, obj);
+      case io::f64: 
+        return inner_set_scalar<double>(f, path, obj);
+      case io::f128: 
+        return inner_set_scalar<long double>(f, path, obj);
+      case io::c64:
+        return inner_set_scalar<std::complex<float> >(f, path, obj);
+      case io::c128:
+        return inner_set_scalar<std::complex<double> >(f, path, obj);
+      case io::c256:
+        return inner_set_scalar<std::complex<long double> >(f, path, obj);
+      default:
+        break;
+    }
+  }
+
+  else { //write as an numpy array
+    tp::py_array tmp(obj, object());
+    if (!f.contains(path)) f.create(path, tmp.type(), false, compression);
+    f.write_buffer(path, 0, tmp.type(), tmp.ptr());
+  }
+}
+
+static void hdf5file_set_iterable(io::HDF5File& f, const std::string& path,
+    object iterable, size_t compression) {
+  for (size_t k=0; k<len(iterable); ++k) {
+    object obj = iterable[k];
+    io::HDF5Type type;
+    bool scalar = get_object_type(obj, type);
+    inner_set(f, path, type, obj, compression, scalar);
+  }
+}
+
+static void hdf5file_set(io::HDF5File& f, const std::string& path,
+    object obj, size_t compression=0) {
+  PyObject* op = obj.ptr();
+  if (PyList_Check(op) || PyTuple_Check(op)) {
+    hdf5file_set_iterable(f, path, obj, compression);
+  }
+  else {
+    io::HDF5Type type;
+    bool scalar = get_object_type(obj, type);
+    inner_set(f, path, type, obj, compression, scalar);
+  }
+}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(hdf5file_set_overloads, hdf5file_set, 3, 4)
+
+template <typename T>
+static object inner_get_scalar_attr(const io::HDF5File& f,
+  const std::string& path, const std::string& name, const io::HDF5Type& type) {
+  T value;
+  f.read_attribute(path, name, type, static_cast<void*>(&value));
+  return object(value);
+}
+
+static object inner_get_attr(const io::HDF5File& f, const std::string& path,
+    const std::string& name, const io::HDF5Type& type) {
+
+  //no error detection: this should be done before reaching this method
+
+  const io::HDF5Shape& shape = type.shape();
+
+  if (shape.n() == 1 && shape[0] == 1) { //read as scalar
+    switch(type.type()) {
+      case io::i8:  
+        return inner_get_scalar_attr<int8_t>(f, path, name, type);
+      case io::i16: 
+        return inner_get_scalar_attr<int16_t>(f, path, name, type);
+      case io::i32:
+        return inner_get_scalar_attr<int32_t>(f, path, name, type);
+      case io::i64: 
+        return inner_get_scalar_attr<int64_t>(f, path, name, type);
+      case io::u8:  
+        return inner_get_scalar_attr<uint8_t>(f, path, name, type);
+      case io::u16: 
+        return inner_get_scalar_attr<uint16_t>(f, path, name, type);
+      case io::u32: 
+        return inner_get_scalar_attr<uint32_t>(f, path, name, type);
+      case io::u64: 
+        return inner_get_scalar_attr<uint64_t>(f, path, name, type);
+      case io::f32: 
+        return inner_get_scalar_attr<float>(f, path, name, type);
+      case io::f64: 
+        return inner_get_scalar_attr<double>(f, path, name, type);
+      case io::f128: 
+        return inner_get_scalar_attr<long double>(f, path, name, type);
+      case io::c64:
+        return inner_get_scalar_attr<std::complex<float> >(f, path, name, type);
+      case io::c128:
+        return inner_get_scalar_attr<std::complex<double> >(f, path, name, type);
+      case io::c256:
+        return inner_get_scalar_attr<std::complex<long double> >(f, path, name, type);
+      default:
+        break;
+    }
+  }
+
+  //read as an numpy array
+  ca::typeinfo atype;
+  type.copy_to(atype);
+  tp::py_array retval(atype);
+  f.read_attribute(path, name, type, retval.ptr());
+  return retval.pyobject();
+}
+
+static dict hdf5file_get_attributes(const io::HDF5File& f, const std::string& path=".") {
+  std::map<std::string, io::HDF5Type> attributes;
+  f.listAttributes(path, attributes);
+  dict retval;
+  for (auto k=attributes.begin(); k!=attributes.end(); ++k) {
+    if (k->second.type() == io::unsupported) {
+      boost::format m("unsupported HDF5 data type detected for attribute '%s' - setting None");
+      m % k->first;
+      PYTHON_WARNING(UserWarning, m.str().c_str());
+      retval[k->first] = object(); //None
+    }
+    else {
+      retval[k->first] = inner_get_attr(f, path, k->first, k->second);
+    }
+  }
+  return retval;
+}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(hdf5file_get_attributes_overloads, hdf5file_get_attributes, 1, 2)
+
+static object hdf5file_get_attribute(const io::HDF5File& f, const std::string& name, const std::string& path=".") {
+  io::HDF5Type type;
+  f.getAttributeType(path, name, type);
+  if (type.type() == io::unsupported) {
+    boost::format m("unsupported HDF5 data type detected for attribute '%s' - returning None");
+    m % name;
+    PYTHON_WARNING(UserWarning, m.str().c_str());
+    return object();
+  }
+  else {
+    return inner_get_attr(f, path, name, type);
+  }
+}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(hdf5file_get_attribute_overloads, hdf5file_get_attribute, 2, 3)
+
+template <typename T>
+static void inner_set_scalar_attr(io::HDF5File& f, 
+  const std::string& path, const std::string& name, const io::HDF5Type& type,
+  object obj) {
+  T value = extract<T>(obj);
+  f.write_attribute(path, name, type, static_cast<void*>(&value));
+}
+
+static void inner_set_attr(io::HDF5File& f, const std::string& path,
+    const std::string& name, const io::HDF5Type& type, object obj,
+    bool scalar) {
+
+  //no error detection: this should be done before reaching this method
+
+  if (scalar) { //write as a scalar
+    switch(type.type()) {
+      case io::i8:  
+        return inner_set_scalar_attr<int8_t>(f, path, name, type, obj);
+      case io::i16: 
+        return inner_set_scalar_attr<int16_t>(f, path, name, type, obj);
+      case io::i32:
+        return inner_set_scalar_attr<int32_t>(f, path, name, type, obj);
+      case io::i64: 
+        return inner_set_scalar_attr<int64_t>(f, path, name, type, obj);
+      case io::u8:  
+        return inner_set_scalar_attr<uint8_t>(f, path, name, type, obj);
+      case io::u16: 
+        return inner_set_scalar_attr<uint16_t>(f, path, name, type, obj);
+      case io::u32: 
+        return inner_set_scalar_attr<uint32_t>(f, path, name, type, obj);
+      case io::u64: 
+        return inner_set_scalar_attr<uint64_t>(f, path, name, type, obj);
+      case io::f32: 
+        return inner_set_scalar_attr<float>(f, path, name, type, obj);
+      case io::f64: 
+        return inner_set_scalar_attr<double>(f, path, name, type, obj);
+      case io::f128: 
+        return inner_set_scalar_attr<long double>(f, path, name, type, obj);
+      case io::c64:
+        return inner_set_scalar_attr<std::complex<float> >(f, path, name, type, obj);
+      case io::c128:
+        return inner_set_scalar_attr<std::complex<double> >(f, path, name, type, obj);
+      case io::c256:
+        return inner_set_scalar_attr<std::complex<long double> >(f, path, name, type, obj);
+      default:
+        break;
+    }
+  }
+
+  else { //write as an numpy array
+    tp::py_array retval(obj, object());
+    f.write_attribute(path, name, type, retval.ptr());
+  }
+}
+
+static void hdf5file_set_attributes(io::HDF5File& f, dict attributes, const std::string& path=".") {
+  object keys = attributes.iterkeys();
+  for (size_t k=0; k<len(keys); ++k) {
+    std::string key = extract<std::string>(keys[k]);
+    io::HDF5Type type;
+    object obj = attributes[keys[k]];
+    bool scalar = get_object_type(obj, type);
+    inner_set_attr(f, path, key, type, obj, scalar);
+  }
+}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(hdf5file_set_attributes_overloads, hdf5file_set_attributes, 2, 3)
+
+static void hdf5file_set_attribute(io::HDF5File& f, const std::string& key, object obj, const std::string& path=".") {
+  io::HDF5Type type;
+  bool scalar = get_object_type(obj, type);
+  inner_set_attr(f, path, key, type, obj, scalar);
+}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(hdf5file_set_attribute_overloads, hdf5file_set_attribute, 3, 4)
+
+static bool hdf5file_has_attribute(const io::HDF5File& f, const std::string& name, const std::string& path=".") {
+  return f.hasAttribute(path, name);
+}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(hdf5file_has_attribute_overloads, hdf5file_has_attribute, 2, 3)
+
+static void hdf5file_del_attribute(io::HDF5File& f, const std::string& name, const std::string& path=".") {
+  f.deleteAttribute(path, name);
+}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(hdf5file_del_attribute_overloads, hdf5file_del_attribute, 2, 3)
+
+static void hdf5file_del_attributes(io::HDF5File& f, const std::string& path=".") {
+  std::map<std::string, io::HDF5Type> attributes;
+  f.listAttributes(path, attributes);
+  for (auto k=attributes.begin(); k!=attributes.end(); ++k) {
+    f.deleteAttribute(path, k->first);
+  }
+}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(hdf5file_del_attributes_overloads, hdf5file_del_attributes, 1, 2)
 
 void bind_io_hdf5() {
   class_<io::HDF5File, boost::shared_ptr<io::HDF5File> >("HDF5File", "A HDF5File allows users to read and write data from and to files containing standard bob binary coded data in HDF5 format. For an introduction to HDF5, please visit http://www.hdfgroup.org/HDF5.", no_init)
@@ -219,7 +640,6 @@ void bind_io_hdf5() {
     .def("cd", &io::HDF5File::cd, (arg("self"), arg("path")), "Changes the current prefix path. When this object is started, the prefix path is empty, which means all following paths to data objects should be given using the full path. If you set this to a different value, it will be used as a prefix to any subsequent operation until you reset it. If path starts with '/', it is treated as an absolute path. '..' and '.' are supported. This object should be a std::string. If the value is relative, it is added to the current path. If it is absolute, it causes the prefix to be reset. Note all operations taking a relative path, following a cd(), will be considered relative to the value defined by the 'cwd' property of this object.")
     .def("has_group", &io::HDF5File::hasGroup, (arg("self"), arg("path")), "Checks if a path exists inside a file - does not work for datasets, only for directories. If the given path is relative, it is take w.r.t. to the current working directory")
     .def("create_group", &io::HDF5File::createGroup, (arg("self"), arg("path")), "Creates a new directory inside the file. A relative path is taken w.r.t. to the current directory. If the directory already exists (check it with hasGroup()), an exception will be raised.")
-    .add_property("version", &get_version, &set_version)
     .add_property("cwd", &io::HDF5File::cwd)
     .def("__contains__", &io::HDF5File::contains, (arg("self"), arg("key")), "Returns True if the file contains an HDF5 dataset with a given path")
     .def("has_key", &io::HDF5File::contains, (arg("self"), arg("key")), "Returns True if the file contains an HDF5 dataset with a given path")
@@ -232,29 +652,37 @@ void bind_io_hdf5() {
     .def("copy", &io::HDF5File::copy, (arg("self"), arg("file")), "Copies all accessible content to another HDF5 file")
     .def("read", &hdf5file_read, (arg("self"), arg("key")), "Reads the whole dataset in a single shot. Returns a single object with all contents.")
     .def("lread", (object(*)(io::HDF5File&, const std::string&, int64_t))0, hdf5file_lread_overloads((arg("self"), arg("key"), arg("pos")=-1), "Reads a given position from the dataset. Returns a single object if 'pos' >= 0, otherwise a list by reading all objects in sequence."))
-#   define DECLARE_SUPPORT(T,E) \
-    .def(BOOST_PP_STRINGIZE(__replace_ ## E ## __), &hdf5file_replace_scalar<T>, (arg("self"), arg("key"), arg("pos"), arg("value")), "Modifies the value of a scalar inside the file.") \
-    .def(BOOST_PP_STRINGIZE(__append_ ## E ## __), &io::HDF5File::append<T>, (arg("self"), arg("key"), arg("value")), "Appends a scalar to a dataset. If the dataset does not yet exist, one is created with the type characteristics.") \
-    .def(BOOST_PP_STRINGIZE(__set_ ## E ## __), &io::HDF5File::set<T>, (arg("self"), arg("key"), arg("value")), "Sets the scalar at position 0 to the given value. This method is equivalent to checking if the scalar at position 0 exists and then replacing it. If the path does not exist, we append the new scalar.")
-    DECLARE_SUPPORT(bool, bool)
-    DECLARE_SUPPORT(int8_t, int8)
-    DECLARE_SUPPORT(int16_t, int16)
-    DECLARE_SUPPORT(int32_t, int32)
-    DECLARE_SUPPORT(int64_t, int64)
-    DECLARE_SUPPORT(uint8_t, uint8)
-    DECLARE_SUPPORT(uint16_t, uint16)
-    DECLARE_SUPPORT(uint32_t, uint32)
-    DECLARE_SUPPORT(uint64_t, uint64)
-    DECLARE_SUPPORT(float, float32)
-    DECLARE_SUPPORT(double, float64)
-    //DECLARE_SUPPORT(long double, float128)
-    DECLARE_SUPPORT(std::complex<float>, complex64)
-    DECLARE_SUPPORT(std::complex<double>, complex128)
-    //DECLARE_SUPPORT(std::complex<long double>, complex256)
-    DECLARE_SUPPORT(std::string, string)
-#   undef DECLARE_SUPPORT
-    .def("__append_array__", &hdf5file_append_array, (arg("self"), arg("key"), arg("array"), arg("compression")), "Appends a array to a dataset. If the dataset does not yet exist, one is created with the type characteristics.\n\nIf a new Dataset is to be created you can set its compression level. Note these settings have no effect if the Dataset already exists on file, in which case the current settings for that dataset are respected. The maximum value for the gzip compression is 9. The value of zero turns compression off (the default).")
-    .def("__replace_array__", &hdf5file_replace_array, (arg("self"), arg("key"), arg("pos"), arg("array")), "Modifies the value of a array inside the file.")
-    .def("__set_array__", &hdf5file_set_array, (arg("self"), arg("key"), arg("array"), arg("compression")), "Sets the array at position 0 to the given value. This method is equivalent to checking if the array at position 0 exists and then replacing it. If the path does not exist, you can set the compression level. Note these settings have no effect if the Dataset already exists on file, in which case the current settings for that dataset are respected. The maximum value for the gzip compression is 9. The value of zero turns compression off (the default).")
+    .def("replace", &hdf5file_replace, (arg("self"), arg("path"), arg("pos"), arg("data")), "Modifies the value of a scalar/array inside a dataset in the file.\n\n" \
+  "Keyword Parameters:\n\n" \
+  "path\n" \
+  "  This is the path to the HDF5 dataset to replace data at\n\n" \
+  "pos\n" \
+  "  This is the position we should replace\n\n" \
+  "data\n" \
+  "  This is the data that will be set on the position indicated")
+    .def("append", &hdf5file_append, hdf5file_append_overloads((arg("self"), arg("path"), arg("data"), arg("compression")=0), "Appends a scalar or an array to a dataset. If the dataset does not yet exist, one is created with the type characteristics.\n\n" \
+  "Keyword Parameters:\n\n" \
+  "path\n" \
+  "  This is the path to the HDF5 dataset to replace data at\n\n" \
+  "data\n" \
+  "  This is the data that will be set on the position indicated. It may be a simple python or numpy scalar (such as :py:class:`numpy.uint8`) or a :py:class:`numpy.ndarray` of any of the supported data types. You can also, optionally, set this to a list or tuple of scalars or arrays. This will cause this method to iterate over the elements and add each individually.\n\n" \
+  "compresssion\n" \
+  "  This parameter is effective when appending arrays. Set this to a number betwen 0 (default) and 9 (maximum) to compress the contents of this dataset. This setting is only effective if the dataset does not yet exist, otherwise, the previous setting is respected."))
+    .def("set", &hdf5file_set, hdf5file_set_overloads((arg("self"), arg("path"), arg("data"), arg("compression")=0), "Sets the scalar or array at position 0 to the given value. This method is equivalent to checking if the scalar or array at position 0 exists and then replacing it. If the path does not exist, we append the new scalar or array.\n\n" \
+  "Keyword Parameters:\n\n" \
+  "path\n" \
+  "  This is the path to the HDF5 dataset to replace data at\n\n" \
+  "data\n" \
+  "  This is the data that will be set on the position indicated. It may be a simple python or numpy scalar (such as :py:class:`numpy.uint8`) or a :py:class:`numpy.ndarray` of any of the supported data types. You can also, optionally, set this to a list or tuple of scalars or arrays. This will cause this method to iterate over the elements and add each individually.\n\n" \
+  "compresssion\n" \
+  "  This parameter is effective when setting arrays. Set this to a number betwen 0 (default) and 9 (maximum) to compress the contents of this dataset. This setting is only effective if the dataset does not yet exist, otherwise, the previous setting is respected."))
+    // attribute manipulation
+    .def("get_attributes", &hdf5file_get_attributes, hdf5file_get_attributes_overloads((arg("self"), arg("path")="."), "Returns a dictionary containing all attributes related to a particular (existing) path in this file. The path may point to a subdirectory or to a particular dataset. If the path does not exist, a RuntimeError is raised."))
+    .def("get_attribute", &hdf5file_get_attribute, hdf5file_get_attribute_overloads((arg("self"), arg("name"), arg("path")="."), "Returns an object representing an attribute attached to a particular (existing) path in this file. The path may point to a subdirectory or to a particular dataset. If the path does not exist, a RuntimeError is raised."))
+    .def("set_attributes", &hdf5file_set_attributes, hdf5file_set_attributes_overloads((arg("self"), arg("attrs"), arg("path")="."), "Sets attributes in a given (existing) path using a dictionary containing the names (keys) and values of those attributes. The path may point to a subdirectory or to a particular dataset. Only simple scalars (booleans, integers, floats and complex numbers) and arrays of those are supported at the time being. You can use :py:module:`numpy` scalars to set values with arbitrary precision (e.g. :py:class:`numpy.uint8`). If the path does not exist, a RuntimeError is raised."))
+    .def("set_attribute", &hdf5file_set_attribute, hdf5file_set_attribute_overloads((arg("self"), arg("name"), arg("value"), arg("path")="."), "Sets the attribute in a given (existing) path using the value provided. The path may point to a subdirectory or to a particular dataset. Only simple scalars (booleans, integers, floats and complex numbers) and arrays of those are supported at the time being. You can use :py:module:`numpy` scalars to set values with arbitrary precision (e.g. :py:class:`numpy.uint8`). If the path does not exist, a RuntimeError is raised."))
+    .def("has_attribute", &hdf5file_has_attribute, hdf5file_has_attribute_overloads((arg("self"), arg("name"), arg("path")="."), "Checks if given attribute exists in a given (existing) path. The path may point to a subdirectory or to a particular dataset. If the path does not exist, a RuntimeError is raised."))
+    .def("delete_attribute", &hdf5file_del_attribute, hdf5file_del_attribute_overloads((arg("self"), arg("name"), arg("path")="."), "Deletes a given attribute associated to a (existing) path in the file. The path may point to a subdirectory or to a particular dataset. If the path does not exist, a RuntimeError is raised."))
+    .def("delete_attributes", &hdf5file_del_attributes, hdf5file_del_attributes_overloads((arg("self"), arg("path")="."), "Deletes **all** attributes associated to a (existing) path in the file. The path may point to a subdirectory or to a particular dataset. If the path does not exist, a RuntimeError is raised."))
     ;
 }

@@ -458,7 +458,7 @@ void h5::Dataset::extend_buffer (const bob::io::HDF5Type& dest, const void* buff
 }
 
 void h5::Dataset::gettype_attribute(const std::string& name,
-          bob::core::array::typeinfo& type) const {
+          io::HDF5Type& type) const {
   h5::gettype_attribute(m_id, name, type);
 }
 
@@ -478,4 +478,8 @@ void h5::Dataset::read_attribute (const std::string& name,
 void h5::Dataset::write_attribute (const std::string& name,
     const bob::io::HDF5Type& dest_type, const void* buffer) {
   h5::write_attribute(m_id, name, dest_type, buffer);
+}
+      
+void h5::Dataset::list_attributes(std::map<std::string, io::HDF5Type>& attributes) const {
+  h5::list_attributes(m_id, attributes);
 }

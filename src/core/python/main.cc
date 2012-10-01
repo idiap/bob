@@ -33,6 +33,7 @@ void bind_core_ndarray_numpy();
 void bind_core_typeinfo();
 void bind_core_convert();
 void bind_core_tinyvector();
+void bind_core_numpy_scalars();
 
 BOOST_PYTHON_MODULE(_core) {
   bob::python::setup_python("bob core classes and sub-classes");
@@ -46,4 +47,5 @@ BOOST_PYTHON_MODULE(_core) {
   bind_core_typeinfo();
   bind_core_convert();
   bind_core_tinyvector();
+  bind_core_numpy_scalars();
 }

@@ -237,10 +237,12 @@ mach::SupportVector::SupportVector(const std::string& model_file):
 mach::SupportVector::SupportVector(bob::io::HDF5File& config):
   m_model()
 {
-  if ( (LIBSVM_VERSION/100) > (config.getVersion()/100) ) {
+  uint64_t version = 0;
+  config.getAttribute(".", "version", version);
+  if ( (LIBSVM_VERSION/100) > (version/100) ) {
     //if the major version changes... be aware!
     boost::format m("SVM being loaded from `%s:%s' (created with libsvm-%d) with libsvm-%d. You may want to read the libsvm FAQ at http://www.csie.ntu.edu.tw/~cjlin/libsvm/log to check if there were format changes between these versions. If not, you can safely ignore this warning and even tell us to remove it via our bug tracker: https://github.com/idiap/bob/issues");
-    m % config.filename() % config.cwd() % config.getVersion() % LIBSVM_VERSION;
+    m % config.filename() % config.cwd() % version % LIBSVM_VERSION;
     bob::core::warn << m.str() << std::endl;
   }
   m_model = mach::svm_unpickle(config.readArray<uint8_t,1>("svm_model"));
@@ -445,5 +447,6 @@ void mach::SupportVector::save(bob::io::HDF5File& config) const {
   config.setArray("svm_model", mach::svm_pickle(m_model));
   config.setArray("input_subtract", m_input_sub);
   config.setArray("input_divide", m_input_div);
-  config.setVersion(LIBSVM_VERSION);
+  uint64_t version = LIBSVM_VERSION;
+  config.setAttribute(".", "version", version);
 }

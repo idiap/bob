@@ -41,14 +41,16 @@ def get_tempfilename(prefix='bobtest_', suffix='.hdf5'):
 def readWriteTest(self, outfile, dname, data, dtype=None):
   """Tests scalar input/output on HDF5 files"""
 
+  if dtype is not None: data = [dtype(k) for k in data]
+
   # First, we test that we can read and write 1 single element
-  outfile.append(dname + '_single', data[0], dtype=dtype)
+  outfile.append(dname + '_single', data[0])
 
   # Makes sure we can read the value out
   self.assertTrue( numpy.array_equal(outfile.lread(dname + '_single', 0), data[0]) )
 
   # Now we go for the full set
-  outfile.append(dname, data, dtype=dtype)
+  outfile.append(dname, data)
 
   # And that we can read it back
   back = outfile.lread(dname) #we read all at once as it is simpler
@@ -64,7 +66,7 @@ def readWriteTestArray(self, outfile, dtype):
     data = [random.uniform(0,N) for z in range(numpy.product(SHAPE))]
     nparray = numpy.array(data, dtype=dtype).reshape(SHAPE)
     arrays.append(nparray)
-  self.readWriteTest(outfile, dtype + '_array', arrays)
+  self.readWriteTest(outfile, dtype.__name__ + '_array', arrays)
 
 unittest.TestCase.readWriteTestArray = readWriteTestArray
 
@@ -144,50 +146,50 @@ class HDF5FileTest(unittest.TestCase):
     self.readWriteTest(outfile, 'bool_data', data)
     data = [int(random.uniform(0,100)) for z in range(N)]
     self.readWriteTest(outfile, 'int_data', data)
-    self.readWriteTest(outfile, 'int8_data', data, 'int8')
-    self.readWriteTest(outfile, 'uint8_data', data, 'uint8')
-    self.readWriteTest(outfile, 'int16_data', data, 'int16')
-    self.readWriteTest(outfile, 'uint16_data', data, 'uint16')
-    self.readWriteTest(outfile, 'int32_data', data, 'int32')
-    self.readWriteTest(outfile, 'uint32_data', data, 'uint32')
+    self.readWriteTest(outfile, 'int8_data', data, numpy.int8)
+    self.readWriteTest(outfile, 'uint8_data', data, numpy.uint8)
+    self.readWriteTest(outfile, 'int16_data', data, numpy.int16)
+    self.readWriteTest(outfile, 'uint16_data', data, numpy.uint16)
+    self.readWriteTest(outfile, 'int32_data', data, numpy.int32)
+    self.readWriteTest(outfile, 'uint32_data', data, numpy.uint32)
 
     data = [long(random.uniform(0,1000000000)) for z in range(N)]
     self.readWriteTest(outfile, 'long_data', data)
-    self.readWriteTest(outfile, 'int64_data', data, 'int64')
-    self.readWriteTest(outfile, 'uint64_data', data, 'uint64')
+    self.readWriteTest(outfile, 'int64_data', data, numpy.int64)
+    self.readWriteTest(outfile, 'uint64_data', data, numpy.uint64)
 
     data = [float(random.uniform(0,1)) for z in range(N)]
-    self.readWriteTest(outfile, 'float_data', data)
+    self.readWriteTest(outfile, 'float_data', data, float)
     #Note that because of double => float precision issues, the next test will
     #fail. Python floats are actually double precision.
-    #self.readWriteTest(outfile, 'float32_data', data, 'float32')
-    self.readWriteTest(outfile, 'float64_data', data, 'float64')
+    #self.readWriteTest(outfile, 'float32_data', data, numpy.float32)
+    self.readWriteTest(outfile, 'float64_data', data, numpy.float64)
     #The next construction is not supported by bob
-    #self.readWriteTest(outfile, 'float128_data', data, 'float128')
+    #self.readWriteTest(outfile, 'float128_data', data, numpy.float128)
 
     data = [complex(random.uniform(0,1),random.uniform(-1,0)) for z in range(N)]
-    self.readWriteTest(outfile, 'complex_data', data)
+    self.readWriteTest(outfile, 'complex_data', data, complex)
     #Note that because of double => float precision issues, the next test will
     #fail. Python floats are actually double precision.
-    #self.readWriteTest(outfile, 'complex64_data', data, 'complex64')
-    self.readWriteTest(outfile, 'complex128_data', data, 'complex128')
+    #self.readWriteTest(outfile, 'complex64_data', data, numpy.complex64)
+    self.readWriteTest(outfile, 'complex128_data', data, numpy.complex128)
     #The next construction is not supported by bob
-    #self.readWriteTest(outfile, 'complex256_data', data, 'complex256')
+    #self.readWriteTest(outfile, 'complex256_data', data, numpy.complex256)
 
-    self.readWriteTestArray(outfile, 'int8')
-    self.readWriteTestArray(outfile, 'int16')
-    self.readWriteTestArray(outfile, 'int32')
-    self.readWriteTestArray(outfile, 'int64')
-    self.readWriteTestArray(outfile, 'uint8')
-    self.readWriteTestArray(outfile, 'uint16')
-    self.readWriteTestArray(outfile, 'uint32')
-    self.readWriteTestArray(outfile, 'uint64')
-    self.readWriteTestArray(outfile, 'float32')
-    self.readWriteTestArray(outfile, 'float64')
-    #self.readWriteTestArray(outfile, 'float128') #no numpy conversion
-    self.readWriteTestArray(outfile, 'complex64')
-    self.readWriteTestArray(outfile, 'complex128')
-    #self.readWriteTestArray(outfile, 'complex256') #no numpy conversion
+    self.readWriteTestArray(outfile, numpy.int8)
+    self.readWriteTestArray(outfile, numpy.int16)
+    self.readWriteTestArray(outfile, numpy.int32)
+    self.readWriteTestArray(outfile, numpy.int64)
+    self.readWriteTestArray(outfile, numpy.uint8)
+    self.readWriteTestArray(outfile, numpy.uint16)
+    self.readWriteTestArray(outfile, numpy.uint32)
+    self.readWriteTestArray(outfile, numpy.uint64)
+    self.readWriteTestArray(outfile, numpy.float32)
+    self.readWriteTestArray(outfile, numpy.float64)
+    #self.readWriteTestArray(outfile, numpy.float128) #no numpy conversion
+    self.readWriteTestArray(outfile, numpy.complex64)
+    self.readWriteTestArray(outfile, numpy.complex128)
+    #self.readWriteTestArray(outfile, numpy.complex256) #no numpy conversion
 
     os.unlink(tmpname)
 
@@ -282,14 +284,10 @@ class HDF5FileTest(unittest.TestCase):
     mfile = bob.io.load(F('test7_unlimited.hdf5'))
     self.assertTrue ( mfile.ndim == 2 )
 
-  def test08_version(self):
+  def test08_attribute_simple(self):
 
     tmpname = get_tempfilename()
     outfile = bob.io.HDF5File(tmpname, 'w')
-    self.assertEqual(outfile.version, None)
-    outfile.version = 32
-    self.assertEqual(outfile.version, 32)
-    outfile.version = None
-    self.assertEqual(outfile.version, None)
-
+    outfile.set_attribute('version', 32)
+    self.assertEqual(outfile.get_attribute('version'), 32)
     os.unlink(tmpname)

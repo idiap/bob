@@ -24,6 +24,7 @@
 #define BOB_IO_HDF5ATTRIBUTE_H
 
 #include <string>
+#include <map>
 #include <boost/shared_ptr.hpp>
 #include <hdf5.h>
 #include "bob/io/HDF5Types.h"
@@ -34,7 +35,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
    * Finds out the type of the attribute, if it exists, raises otherwise.
    */
   void gettype_attribute (const boost::shared_ptr<hid_t> location,
-      const std::string& name, bob::core::array::typeinfo& type);
+      const std::string& name, HDF5Type& type);
 
   /**
    * Reads the attribute value, place it in "buffer"
@@ -86,6 +87,12 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
    */
   void delete_attribute(boost::shared_ptr<hid_t> location,
       const std::string& name);
+
+  /**
+   * Lists all attributes and associated types currently available somewhere
+   */
+  void list_attributes(boost::shared_ptr<hid_t> location,
+    std::map<std::string, HDF5Type>& attributes);
 
 }}}}
 

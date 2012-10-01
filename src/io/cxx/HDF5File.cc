@@ -76,32 +76,6 @@ void io::HDF5File::createGroup(const std::string& path) {
   m_cwd->create_group(path);
 }
 
-bool io::HDF5File::hasVersion() const {
-  return m_cwd->has_attribute("version");
-}
-
-uint64_t io::HDF5File::getVersion() const {
-  return m_cwd->get_attribute<uint64_t>("version");
-}
-
-void io::HDF5File::setVersion(uint64_t version) {
-  if (!m_file->writeable()) {
-    boost::format m("cannot set version at path '%s' of file '%s' because it is not writeable");
-    m % m_cwd->path() % m_file->filename();
-    throw std::runtime_error(m.str());
-  }
-  m_cwd->set_attribute("version", version);
-}
-
-void io::HDF5File::removeVersion() {
-  if (!m_file->writeable()) {
-    boost::format m("cannot remove version at path '%s' of file '%s' because it is not writeable");
-    m % m_cwd->path() % m_file->filename();
-    throw std::runtime_error(m.str());
-  }
-  m_cwd->delete_attribute("version");
-}
-
 std::string io::HDF5File::cwd() const {
   return m_cwd->path();
 }
@@ -161,38 +135,124 @@ void io::HDF5File::copy (HDF5File& other) {
   }
 }
 
-void io::HDF5File::create (const std::string& path, const ca::typeinfo& ti,
+void io::HDF5File::create (const std::string& path, const io::HDF5Type& type,
     bool list, size_t compression) {
   if (!m_file->writeable()) {
     boost::format m("cannot create dataset '%s' at path '%s' of file '%s' because it is not writeable");
     m % path % m_cwd->path() % m_file->filename();
     throw std::runtime_error(m.str());
   }
-  if (!contains(path)) m_cwd->create_dataset(path, ti, list, compression);
-  else (*m_cwd)[path]->size(io::HDF5Type(ti));
+  if (!contains(path)) m_cwd->create_dataset(path, type, list, compression);
+  else (*m_cwd)[path]->size(type);
 }
 
 void io::HDF5File::read_buffer (const std::string& path, size_t pos,
-    ca::interface& b) {
-  (*m_cwd)[path]->read_buffer(pos, io::HDF5Type(b.type()), b.ptr());
+    const io::HDF5Type& type, void* buffer) const {
+  (*m_cwd)[path]->read_buffer(pos, type, buffer);
 }
 
 void io::HDF5File::write_buffer (const std::string& path,
-    size_t pos, const ca::interface& b) {
+    size_t pos, const io::HDF5Type& type, const void* buffer) {
   if (!m_file->writeable()) {
     boost::format m("cannot write to object '%s' at path '%s' of file '%s' because it is not writeable");
     m % path % m_cwd->path() % m_file->filename();
     throw std::runtime_error(m.str());
   }
-  (*m_cwd)[path]->write_buffer(pos, io::HDF5Type(b.type()), b.ptr());
+  (*m_cwd)[path]->write_buffer(pos, type, buffer);
 }
 
 void io::HDF5File::extend_buffer(const std::string& path,
-    const ca::interface& b) {
+    const io::HDF5Type& type, const void* buffer) {
   if (!m_file->writeable()) {
-    boost::format m("cannot extend object '%s' at path '%s' of file '%s' because it is not writeable");
+    boost::format m("cannot extend object '%s' at path '%s' of file '%s' because the file is not writeable");
     m % path % m_cwd->path() % m_file->filename();
     throw std::runtime_error(m.str());
   }
-  (*m_cwd)[path]->extend_buffer(io::HDF5Type(b.type()), b.ptr());
+  (*m_cwd)[path]->extend_buffer(type, buffer);
+}
+
+bool io::HDF5File::hasAttribute(const std::string& path,
+    const std::string& name) const {
+  if (m_cwd->has_dataset(path)) {
+    return (*m_cwd)[path]->has_attribute(name);
+  }
+  else if (m_cwd->has_group(path)) {
+    return m_cwd->cd(path)->has_attribute(name);
+  }
+  return false;
+}
+
+void io::HDF5File::getAttributeType(const std::string& path,
+    const std::string& name, HDF5Type& type) const {
+  if (m_cwd->has_dataset(path)) {
+    (*m_cwd)[path]->gettype_attribute(name, type);
+  }
+  else if (m_cwd->has_group(path)) {
+    m_cwd->cd(path)->gettype_attribute(name, type);
+  }
+  else {
+    boost::format m("cannot read attribute '%s' type at path/dataset '%s' of file '%s' (cwd: '%s') because this path/dataset does not currently exist");
+    m % name % path % m_file->filename() % m_cwd->path();
+    throw std::runtime_error(m.str());
+  }
+}
+
+void io::HDF5File::deleteAttribute(const std::string& path,
+    const std::string& name) {
+  if (m_cwd->has_dataset(path)) {
+    (*m_cwd)[path]->delete_attribute(name);
+  }
+  else if (m_cwd->has_group(path)) {
+    m_cwd->cd(path)->delete_attribute(name);
+  }
+  else {
+    boost::format m("cannot delete attribute '%s' at path/dataset '%s' of file '%s' (cwd: '%s') because this path/dataset does not currently exist");
+    m % name % path % m_file->filename() % m_cwd->path();
+    throw std::runtime_error(m.str());
+  }
+}
+
+void io::HDF5File::listAttributes(const std::string& path,
+    std::map<std::string, io::HDF5Type>& attributes) const {
+  if (m_cwd->has_dataset(path)) {
+    (*m_cwd)[path]->list_attributes(attributes);
+  }
+  else if (m_cwd->has_group(path)) {
+    m_cwd->cd(path)->list_attributes(attributes);
+  }
+  else {
+    boost::format m("cannot list attributes at path/dataset '%s' of file '%s' (cwd: '%s') because this path/dataset does not currently exist");
+    m % path % m_file->filename() % m_cwd->path();
+    throw std::runtime_error(m.str());
+  }
+}
+
+void io::HDF5File::read_attribute(const std::string& path, 
+    const std::string& name, const HDF5Type& type, void* buffer) const {
+  if (m_cwd->has_dataset(path)) {
+    (*m_cwd)[path]->read_attribute(name, type, buffer);
+  }
+  else if (m_cwd->has_group(path)) {
+    m_cwd->cd(path)->read_attribute(name, type, buffer);
+  }
+  else {
+    boost::format m("cannot get attribute '%s' at path/dataset '%s' of file '%s' (cwd: '%s') because this path/dataset does not currently exist");
+    m % name % path % m_file->filename() % m_cwd->path();
+    throw std::runtime_error(m.str());
+  }
+}
+
+void io::HDF5File::write_attribute(const std::string& path,
+    const std::string& name, const HDF5Type& type, const void* buffer) {
+  if (m_cwd->has_dataset(path)) {
+    (*m_cwd)[path]->write_attribute(name, type, buffer);
+  }
+  else if (m_cwd->has_group(path)) {
+    m_cwd->cd(path)->write_attribute(name, type, buffer);
+  }
+  else {
+    boost::format m("cannot set attribute '%s' at path/dataset '%s' of file '%s' (cwd: '%s') because this path/dataset does not currently exist");
+    m % name % path % m_file->filename() % m_cwd->path();
+    throw std::runtime_error(m.str());
+  }
 }

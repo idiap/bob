@@ -35,6 +35,14 @@
   throw boost::python::error_already_set(); \
 }
 
+/**
+ * Raises a python warning with a formatted message
+ */
+#define PYTHON_WARNING(TYPE, MESSAGE) \
+{ \
+  PyErr_Warn(PyExc_##TYPE, MESSAGE); \
+}
+
 namespace bob { namespace python {
 
   /**

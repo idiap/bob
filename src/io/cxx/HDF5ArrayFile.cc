@@ -112,7 +112,7 @@ class HDF5ArrayFile: public io::File {
 
       if(!buffer.type().is_compatible(m_type_array)) buffer.set(m_type_array);
 
-      m_file.read_buffer(m_path, 0, buffer);
+      m_file.read_buffer(m_path, 0, buffer.type(), buffer.ptr());
     }
 
     virtual void arrayset_read(ca::interface& buffer, size_t index) {
@@ -125,7 +125,7 @@ class HDF5ArrayFile: public io::File {
 
       if(!buffer.type().is_compatible(m_type_arrayset)) buffer.set(m_type_arrayset);
 
-      m_file.read_buffer(m_path, index, buffer);
+      m_file.read_buffer(m_path, index, buffer.type(), buffer.ptr());
     }
 
     virtual size_t arrayset_append (const ca::interface& buffer) {
@@ -141,7 +141,7 @@ class HDF5ArrayFile: public io::File {
         if (m_type_array.shape[0] == 1) m_type_array = m_type_arrayset;
       }
 
-      m_file.extend_buffer(m_path, buffer);
+      m_file.extend_buffer(m_path, buffer.type(), buffer.ptr());
       ++m_size_arrayset;
       //needs to flush the data to the file
       return m_size_arrayset - 1; ///< index of this object in the file
@@ -166,7 +166,7 @@ class HDF5ArrayFile: public io::File {
       if (m_type_array.shape[0] == 1) m_type_array = m_type_arrayset;
 
       //otherwise, all must be in place...
-      m_file.write_buffer(m_path, 0, buffer);
+      m_file.write_buffer(m_path, 0, buffer.type(), buffer.ptr());
     }
 
   private: //representation

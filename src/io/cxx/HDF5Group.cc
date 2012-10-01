@@ -361,6 +361,7 @@ void h5::Group::copy_group(const boost::shared_ptr<Group> other,
 bool h5::Group::has_group(const std::string& dir) const {
   std::string::size_type pos = dir.find_last_of('/');
   if (pos == std::string::npos) { //search on the current group
+    if (dir == "." || dir == "..") return true; //special case
     typedef std::map<std::string, boost::shared_ptr<h5::Group> > map_type;
     map_type::const_iterator it = m_groups.find(dir);
     return (it != m_groups.end());
@@ -475,7 +476,7 @@ bool h5::Group::has_dataset(const std::string& dir) const {
 }
 
 void h5::Group::gettype_attribute(const std::string& name,
-          bob::core::array::typeinfo& type) const {
+    io::HDF5Type& type) const {
   h5::gettype_attribute(m_id, name, type);
 }
 
@@ -495,6 +496,10 @@ void h5::Group::read_attribute (const std::string& name,
 void h5::Group::write_attribute (const std::string& name,
     const bob::io::HDF5Type& dest_type, const void* buffer) {
   h5::write_attribute(m_id, name, dest_type, buffer);
+}
+
+void h5::Group::list_attributes(std::map<std::string, io::HDF5Type>& attributes) const {
+  h5::list_attributes(m_id, attributes);
 }
 
 h5::RootGroup::RootGroup(boost::shared_ptr<File> parent):

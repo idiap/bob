@@ -26,7 +26,6 @@
 #define BOB_IO_HDF5FILE_H
 
 #include <boost/format.hpp>
-#include "bob/core/array.h"
 #include "bob/io/HDF5Utils.h"
 
 namespace bob { namespace io {
@@ -370,8 +369,7 @@ namespace bob { namespace io {
        * creates a new dataset. If the dataset already exists, checks if the
        * existing data is compatible with the required type.
        */
-      void create (const std::string& path,
-          const bob::core::array::typeinfo& dest, bool list,
+      void create (const std::string& path, const HDF5Type& dest, bool list,
           size_t compression);
 
       /**
@@ -381,23 +379,24 @@ namespace bob { namespace io {
        * file. Relative paths are accepted.
        */
       void read_buffer (const std::string& path, size_t pos,
-          bob::core::array::interface& b);
+          const HDF5Type& type, void* buffer) const;
 
       /**
        * writes the contents of a given buffer into the file. the area that the
        * data will occupy should have been selected beforehand.
        */
       void write_buffer (const std::string& path, size_t pos,
-          const bob::core::array::interface& b);
+          const HDF5Type& type, const void* buffer);
 
       /**
        * extend the dataset with one extra variable.
        */
       void extend_buffer (const std::string& path,
-          const bob::core::array::interface& b);
+          const HDF5Type& type, const void* buffer);
 
       /**
-       * Copy construct an already opened HDF5File; just creates a shallow copy of the file
+       * Copy construct an already opened HDF5File; just creates a shallow copy
+       * of the file
        */
       HDF5File (const HDF5File& other);
 
@@ -415,35 +414,110 @@ namespace bob { namespace io {
       bool hasAttribute(const std::string& path, const std::string& name) const;
 
       /**
-       * Reads data from the file into a scalar. Raises an exception if the
-       * type is incompatible. Relative paths are accepted.
+       * Reads data from an attribute into a scalar. If the attribute does not
+       * exist, raise an exception. Raises a TypeError if the types are not
+       * compatible.
        */
       template <typename T>
-        void readAttribute(const std::string& path, const std::string& name, 
-            T& value) {
+        void getAttribute(const std::string& path, const std::string& name, 
+            T& value) const {
           if (m_cwd->has_dataset(path)) {
-            value = m_cwd[path]->get_attribute<T>(name);
+            value = (*m_cwd)[path]->get_attribute<T>(name);
           }
           else if (m_cwd->has_group(path)) {
             value = m_cwd->cd(path)->get_attribute<T>(name);
           }
           else {
-            boost::format m("cannot read attribute '%s' at path/dataset '%s' of file '%s' because it does not currently exist");
-            m % name % path % m_cwd->path() % m_file->filename();
+            boost::format m("cannot read attribute '%s' at path/dataset '%s' of file '%s' (cwd: '%s') because this path/dataset does not currently exist");
+            m % name % path % m_file->filename() % m_cwd->path();
             throw std::runtime_error(m.str());
           }
         }
 
       /**
-       * Reads data from the file into a scalar. Returns by copy. Raises if the
-       * type T is incompatible. Relative paths are accepted.
+       * Reads data from an attribute into an array. If the attribute does not
+       * exist, raise an exception. Raises a type error if the types are not
+       * compatible.
        */
-      template <typename T> T readAttribute(const std::string& path, 
-          const std::string& name) {
-        T value;
-        readArray(path, name, value);
-        return value;
-      }
+      template <typename T, int N>
+        void getArrayAttribute(const std::string& path, 
+            const std::string& name, blitz::Array<T,N>& value) const {
+          if (m_cwd->has_dataset(path)) {
+            value = (*m_cwd)[path]->get_array_attribute<T,N>(name);
+          }
+          else if (m_cwd->has_group(path)) {
+            value = m_cwd->cd(path)->get_array_attribute<T,N>(name);
+          }
+          else {
+            boost::format m("cannot read (array) attribute '%s' at path/dataset '%s' of file '%s' (cwd: '%s') because this path/dataset does not currently exist");
+            m % name % path % m_file->filename() % m_cwd->path();
+            throw std::runtime_error(m.str());
+          }
+        }
+
+      /**
+       * Writes a scalar as an attribute to a path in this file.
+       */
+      template <typename T>
+        void setAttribute(const std::string& path, const std::string& name, 
+            const T value) {
+          if (m_cwd->has_dataset(path)) {
+            (*m_cwd)[path]->set_attribute(name, value);
+          }
+          else if (m_cwd->has_group(path)) {
+            m_cwd->cd(path)->set_attribute(name, value);
+          }
+          else {
+            boost::format m("cannot write attribute '%s' at path/dataset '%s' of file '%s' (cwd: '%s') because this path/dataset does not currently exist");
+            m % name % path % m_file->filename() % m_cwd->path();
+            throw std::runtime_error(m.str());
+          }
+        }
+
+      /**
+       * Writes an array as an attribute to a path in this file.
+       */
+      template <typename T, int N>
+        void setArrayAttribute(const std::string& path,
+            const std::string& name, const blitz::Array<T,N>& value) {
+          if (m_cwd->has_dataset(path)) {
+            (*m_cwd)[path]->set_array_attribute(name, value);
+          }
+          else if (m_cwd->has_group(path)) {
+            m_cwd->cd(path)->set_array_attribute(name, value);
+          }
+          else {
+            boost::format m("cannot write (array) attribute '%s' at path/dataset '%s' of file '%s' (cwd: '%s') because this path/dataset does not currently exist");
+            m % name % path % m_file->filename() % m_cwd->path();
+            throw std::runtime_error(m.str());
+          }
+        }
+
+      /**
+       * Gets the type information of an attribute
+       */
+      void getAttributeType(const std::string& path,
+          const std::string& name, HDF5Type& type) const;
+
+      /**
+       * Deletes a given attribute
+       */
+      void deleteAttribute(const std::string& path,
+          const std::string& name);
+
+      /**
+       * List attributes available on a certain object.
+       */
+      void listAttributes(const std::string& path,
+          std::map<std::string, HDF5Type>& attributes) const;
+
+    public: //raw accessors to attributes
+
+      void read_attribute(const std::string& path, const std::string& name,
+          const HDF5Type& type, void* buffer) const;
+
+      void write_attribute(const std::string& path, const std::string& name,
+          const HDF5Type& type, const void* buffer);
 
     private: //representation
 
