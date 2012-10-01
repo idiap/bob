@@ -128,10 +128,12 @@ static boost::shared_ptr<hid_t> open_attribute
 
   //checks if the opened attribute is compatible w/ the expected type
   boost::shared_ptr<hid_t> atype = get_type(*retval);
-  io::HDF5Type expected(atype);
+  boost::shared_ptr<hid_t> aspace = get_memspace(*retval);
+  bob::io::HDF5Shape shape = get_extents(*aspace);
+  io::HDF5Type expected(atype, shape);
   if (expected != t) {
     boost::format m("Trying to access attribute '%s' with incompatible buffer - expected `%s', but you gave me `%s'");
-    m % name % expected.type_str() % t.type_str();
+    m % name % expected.str() % t.str();
     throw std::runtime_error(m.str());
   }
 
