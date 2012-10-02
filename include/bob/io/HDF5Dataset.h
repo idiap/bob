@@ -537,6 +537,15 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
       boost::shared_ptr<hid_t> m_memspace; ///< read/write space
 
   };
+      
+  /**
+   * std::string specialization
+   */
+  template <> void Dataset::read<std::string>(size_t index, std::string& value);
+  template <> void Dataset::replace<std::string>(size_t index, const std::string& value);
+  template <> void Dataset::add<std::string>(const std::string& value);
+  template <> void Dataset::set_attribute<std::string>(const std::string& name, const std::string& v);
+  template <> std::string Dataset::get_attribute(const std::string& name) const;
 
 }}}}
 

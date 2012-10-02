@@ -464,6 +464,12 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
 
   };
 
+  /**
+   * std::string specialization
+   */
+  template <> void Group::set_attribute<std::string>(const std::string& name, const std::string& v);
+  template <> std::string Group::get_attribute(const std::string& name) const;
+
 }}}}
 
 #endif /* BOB_IO_HDF5GROUP_H */

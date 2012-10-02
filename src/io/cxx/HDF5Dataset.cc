@@ -22,6 +22,7 @@
 
 #include <boost/format.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/shared_array.hpp>
 #include "bob/io/HDF5Utils.h"
 #include "bob/io/HDF5Group.h"
 #include "bob/io/HDF5Dataset.h"
@@ -131,15 +132,15 @@ static boost::shared_ptr<hid_t> open_filespace
   return retval;
 }
 
-static boost::shared_ptr<hid_t> open_memspace(const io::HDF5Type& t) {
+static boost::shared_ptr<hid_t> open_memspace(const io::HDF5Shape& sh) {
   boost::shared_ptr<hid_t> retval(new hid_t(-1), std::ptr_fun(delete_h5dataspace));
-  *retval = H5Screate_simple(t.shape().n(), t.shape().get(), 0);
+  *retval = H5Screate_simple(sh.n(), sh.get(), 0);
   if (*retval < 0) throw io::HDF5StatusError("H5Screate_simple", *retval);
   return retval;
 }
 
-static void set_memspace(boost::shared_ptr<hid_t> s, const io::HDF5Type& t) {
-  herr_t status = H5Sset_extent_simple(*s, t.shape().n(), t.shape().get(), 0);
+static void set_memspace(boost::shared_ptr<hid_t> s, const io::HDF5Shape& sh) {
+  herr_t status = H5Sset_extent_simple(*s, sh.n(), sh.get(), 0);
   if (status < 0) throw io::HDF5StatusError("H5Sset_extent_simple", status);
 }
 
@@ -222,7 +223,16 @@ h5::Dataset::Dataset(boost::shared_ptr<Group> parent,
 {
   io::HDF5Type type(m_dt, get_extents(m_filespace));
   reset_compatibility_list(m_filespace, type, m_descr);
-  m_memspace = open_memspace(m_descr[0].type);
+  
+  //strings have to be treated slightly differently
+  if (H5Tget_class(*m_dt) == H5T_STRING) {
+    hsize_t strings = 1;
+    HDF5Shape shape(1, &strings);
+    m_memspace = open_memspace(shape);
+  }
+  else {
+    m_memspace = open_memspace(m_descr[0].type.shape());
+  }
 }
 
 /**
@@ -295,6 +305,59 @@ static void create_dataset (boost::shared_ptr<h5::Group> par,
   if (*dataset < 0) throw io::HDF5StatusError("H5Dcreate2", *dataset);
 }
 
+/**
+ * Creates and writes an "empty" std::string Dataset in an existing file.
+ */
+static void create_string_dataset (boost::shared_ptr<h5::Group> par,
+ const std::string& name, const io::HDF5Type& type, size_t compression) {
+
+  if (!name.size() || name == "." || name == "..") {
+    boost::format m("Cannot create dataset with illegal name `%s' at `%s:%s'");
+    m % name % par->file()->filename() % par->path();
+    throw std::runtime_error(m.str());
+  }
+
+  //there can be only 1 string in a string dataset (for the time being)
+  hsize_t strings = 1;
+  bob::io::HDF5Shape xshape(1, &strings);
+
+  //creates the data space.
+  boost::shared_ptr<hid_t> space(new hid_t(-1),
+      std::ptr_fun(delete_h5dataspace));
+  *space = H5Screate_simple(xshape.n(), xshape.get(), xshape.get());
+  if (*space < 0) throw io::HDF5StatusError("H5Screate_simple", *space);
+
+  //creates the property list saying we need the data to be chunked if this is
+  //supposed to be a list -- HDF5 only supports expandability like this.
+  boost::shared_ptr<hid_t> dcpl = open_plist(H5P_DATASET_CREATE);
+
+  //if the user has decided to compress the dataset, do it with gzip.
+  if (compression) {
+    if (compression > 9) compression = 9;
+    herr_t status = H5Pset_deflate(*dcpl, compression);
+    if (status < 0) throw io::HDF5StatusError("H5Pset_deflate", status);
+  }
+
+  //our link creation property list for HDF5
+  boost::shared_ptr<hid_t> lcpl = open_plist(H5P_LINK_CREATE);
+  herr_t status = H5Pset_create_intermediate_group(*lcpl, 1); //1 == true
+  if (status < 0)
+    throw io::HDF5StatusError("H5Pset_create_intermediate_group", status);
+
+  //please note that we don't define the fill value as in the example, but
+  //according to the HDF5 documentation, this value is set to zero by default.
+
+  boost::shared_ptr<hid_t> cls = type.htype();
+
+  //finally create the dataset on the file.
+  boost::shared_ptr<hid_t> dataset(new hid_t(-1),
+      std::ptr_fun(delete_h5dataset));
+  *dataset = H5Dcreate2(*par->location(), name.c_str(),
+      *cls, *space, *lcpl, *dcpl, H5P_DEFAULT);
+
+  if (*dataset < 0) throw io::HDF5StatusError("H5Dcreate2", *dataset);
+}
+
 h5::Dataset::Dataset(boost::shared_ptr<Group> parent,
     const std::string& name, const io::HDF5Type& type,
     bool list, size_t compression):
@@ -311,7 +374,12 @@ h5::Dataset::Dataset(boost::shared_ptr<Group> parent,
   hid_t set_id = H5Dopen2(*parent->location(),m_name.c_str(),H5P_DEFAULT);
   io::DefaultHDF5ErrorStack->unmute();
 
-  if (set_id < 0) create_dataset(parent, m_name, type, list, compression);
+  if (set_id < 0) {
+    if (type.type() == bob::io::s) 
+      create_string_dataset(parent, m_name, type, compression);
+    else 
+      create_dataset(parent, m_name, type, list, compression);
+  }
   else H5Dclose(set_id); //close it, will re-open it properly
 
   m_id = open_dataset(parent, m_name);
@@ -319,7 +387,16 @@ h5::Dataset::Dataset(boost::shared_ptr<Group> parent,
   m_filespace = open_filespace(m_id);
   io::HDF5Type file_type(m_dt, get_extents(m_filespace));
   reset_compatibility_list(m_filespace, file_type, m_descr);
-  m_memspace = open_memspace(m_descr[0].type);
+
+  //strings have to be treated slightly differently
+  if (H5Tget_class(*m_dt) == H5T_STRING) {
+    hsize_t strings = 1;
+    HDF5Shape shape(1, &strings);
+    m_memspace = open_memspace(shape);
+  }
+  else {
+    m_memspace = open_memspace(m_descr[0].type.shape());
+  }
 }
 
 h5::Dataset::~Dataset() { }
@@ -390,7 +467,7 @@ h5::Dataset::select (size_t index, const io::HDF5Type& dest) {
   if (index >= it->size)
     throw bob::io::HDF5IndexError(url(), it->size, index);
 
-  set_memspace(m_memspace, it->type);
+  set_memspace(m_memspace, it->type.shape());
 
   it->hyperslab_start[0] = index;
 
@@ -458,7 +535,7 @@ void h5::Dataset::extend_buffer (const bob::io::HDF5Type& dest, const void* buff
 }
 
 void h5::Dataset::gettype_attribute(const std::string& name,
-          io::HDF5Type& type) const {
+          bob::io::HDF5Type& type) const {
   h5::gettype_attribute(m_id, name, type);
 }
 
@@ -482,4 +559,44 @@ void h5::Dataset::write_attribute (const std::string& name,
       
 void h5::Dataset::list_attributes(std::map<std::string, io::HDF5Type>& attributes) const {
   h5::list_attributes(m_id, attributes);
+}
+
+template <> void h5::Dataset::read<std::string>(size_t index, std::string& value) {
+  if (index != 0) throw std::runtime_error("Bob's HDF5 bindings do not (yet) support string vectors - reading something on position > 0 is therefore not possible");
+
+  size_t str_size = H5Tget_size(*m_dt); ///< finds out string size
+  boost::shared_array<char> storage(new char[str_size+1]);
+  storage[str_size] = 0; ///< null termination
+
+  herr_t status = H5Dread(*m_id, *m_dt, *m_memspace, *m_filespace, H5P_DEFAULT, storage.get());
+  if (status < 0) throw io::HDF5StatusError("H5Dread", status);
+
+  value = storage.get();
+}
+
+template <> void h5::Dataset::replace<std::string>(size_t index, const std::string& value) {
+  if (index != 0) throw std::runtime_error("Bob's HDF5 bindings do not (yet) support string vectors - indexing something on position > 0 is therefore not possible");
+
+  herr_t status = H5Dwrite(*m_id, *m_dt, *m_memspace, *m_filespace, H5P_DEFAULT, value.c_str());
+  if (status < 0) throw io::HDF5StatusError("H5Dwrite", status);
+}
+
+template <> void h5::Dataset::add<std::string>(const std::string& value) {
+  herr_t status = H5Dwrite(*m_id, *m_dt, *m_memspace, *m_filespace, H5P_DEFAULT, value.c_str());
+  if (status < 0) throw io::HDF5StatusError("H5Dwrite", status);
+}
+  
+template <> void h5::Dataset::set_attribute<std::string>(const std::string& name, const std::string& v) {
+  bob::io::HDF5Type dest_type(v);
+  write_attribute(name, dest_type, reinterpret_cast<const void*>(v.c_str()));
+}
+
+template <> std::string h5::Dataset::get_attribute(const std::string& name) const {
+  HDF5Type type;
+  gettype_attribute(name, type);
+  boost::shared_array<char> v(new char[type.shape()[0]+1]);
+  v[type.shape()[0]] = 0; ///< null termination
+  read_attribute(name, type, reinterpret_cast<void*>(v.get()));
+  std::string retval(v.get());
+  return retval;
 }

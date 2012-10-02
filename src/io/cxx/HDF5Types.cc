@@ -312,6 +312,9 @@ static void checkbool(const boost::shared_ptr<hid_t>& dt) {
 static io::hdf5type get_datatype
 (const boost::shared_ptr<hid_t>& dt) {
   H5T_class_t classtype = H5Tget_class(*dt);
+    
+  if (classtype == H5T_STRING) return io::s; //no need to check further
+
   size_t typesize = H5Tget_size(*dt); ///< element size
   H5T_sign_t signtype = H5Tget_sign(*dt);
   
@@ -393,8 +396,6 @@ static io::hdf5type get_datatype
           break;
       }
       break;
-    case H5T_STRING:
-      return io::s;
     case H5T_COMPOUND: //complex
       return equivctype(dt);
     default:
@@ -414,7 +415,18 @@ bool io::HDF5Type::compatible (const bob::core::array::typeinfo& value) const
 boost::shared_ptr<hid_t> io::HDF5Type::htype() const {
   switch (m_type) {
     case io::s:
-      return boost::make_shared<hid_t>(H5T_STRING);
+      {
+        boost::shared_ptr<hid_t> retval(new hid_t(-1),
+            std::ptr_fun(delete_h5datatype));
+        *retval = H5Tcopy(H5T_C_S1);
+        if (*retval < 0) throw io::HDF5StatusError("H5Tcopy", *retval);
+
+        //set string size
+        herr_t status = H5Tset_size(*retval, m_shape[0]);
+        if (status < 0) throw io::HDF5StatusError("H5Tset_size", status);
+
+        return retval;
+      }
     case io::b:
       {
         //why? HDF5 is a C library and in C there is no boolean type
@@ -520,8 +532,14 @@ DEFINE_SUPPORT(long double,io::f128)
 DEFINE_SUPPORT(std::complex<float>,io::c64)
 DEFINE_SUPPORT(std::complex<double>,io::c128)
 DEFINE_SUPPORT(std::complex<long double>,io::c256)
-DEFINE_SUPPORT(std::string,io::s)
 #undef DEFINE_SUPPORT
+
+io::HDF5Type::HDF5Type(const std::string& value): 
+  m_type(io::s), 
+  m_shape(1) 
+{ 
+  m_shape[0] = value.size();
+}
 
 #define DEFINE_SUPPORT(T,E,N) io::HDF5Type::HDF5Type \
     (const blitz::Array<T,N>& value): \
@@ -609,7 +627,7 @@ static io::hdf5type array_to_hdf5 (bob::core::array::ElementType eltype) {
     case bob::core::array::t_complex256:
       return io::c256;
   }
-  throw std::runtime_error("unsupported dtyle <=> hdf5 type conversion -- debug me");
+  throw std::runtime_error("unsupported dtype <=> hdf5 type conversion -- FIXME");
 }
 
 io::HDF5Type::HDF5Type(const bob::core::array::typeinfo& ti): 
@@ -636,7 +654,9 @@ io::HDF5Type::HDF5Type(const boost::shared_ptr<hid_t>& type):
   m_type(get_datatype(type)),
   m_shape(1) 
 {
-  m_shape[0] = 1; 
+  //strings have to be treated slightly differently
+  if (H5Tget_class(*type) == H5T_STRING) m_shape[0] = H5Tget_size(*type);
+  else m_shape[0] = 1;
 }
 
 io::HDF5Type::HDF5Type(const HDF5Type& other):
@@ -700,6 +720,8 @@ bob::core::array::ElementType io::HDF5Type::element_type() const {
       return bob::core::array::t_complex128;
     case c256:
       return bob::core::array::t_complex256;
+    case s:
+      throw std::runtime_error("Cannot convert HDF5 string type to an element type to be used in blitz::Array's - FIXME: something is wrong in the logic");
     default:
       break;
   }

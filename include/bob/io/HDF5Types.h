@@ -230,7 +230,7 @@ namespace bob { namespace io {
       /**
        * Accesses a certain position of this shape (unchecked!)
        */
-      inline hsize_t operator[] (size_t pos) const { return m_shape[pos]; }
+      inline const hsize_t& operator[] (size_t pos) const { return m_shape[pos]; }
       inline hsize_t& operator[] (size_t pos) { return m_shape[pos]; }
 
       /**

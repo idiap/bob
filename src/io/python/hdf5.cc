@@ -98,6 +98,8 @@ static object hdf5file_xread(io::HDF5File& f, const std::string& p,
 
   if (shape.n() == 1 && shape[0] == 1) { //read as scalar
     switch(type.type()) {
+      case io::s:
+        return object(f.read<std::string>(p, pos));
       case io::b:
         return object(f.read<bool>(p, pos));
       case io::i8:
@@ -158,6 +160,10 @@ static inline object hdf5file_read(io::HDF5File& f, const std::string& p) {
   return hdf5file_xread(f, p, 1, 0);
 }
 
+void set_string_type(io::HDF5Type& t, object o) {
+  t = io::HDF5Type(extract<std::string>(o));
+}
+
 template <typename T> void set_type(io::HDF5Type& t) {
   T v;
   t = io::HDF5Type(v);
@@ -172,12 +178,13 @@ static bool get_object_type(object o, io::HDF5Type& t) {
   PyObject* op = o.ptr();
 
   if (PyArray_IsAnyScalar(op)) {
-    if (PyBool_Check(op)) set_type<bool>(t);
+    if (PyArray_IsScalar(op, String)) set_string_type(t, o);
+    else if (PyString_Check(op)) set_string_type(t, o);
+    else if (PyBool_Check(op)) set_type<bool>(t);
     else if (PyInt_Check(op)) set_type<int32_t>(t);
     else if (PyLong_Check(op)) set_type<int64_t>(t);
     else if (PyFloat_Check(op)) set_type<double>(t);
     else if (PyComplex_Check(op)) set_type<std::complex<double> >(t);
-    else if (PyString_Check(op)) set_type<std::string>(t);
     else if (PyArray_IsScalar(op, Bool)) set_type<bool>(t);
     else if (PyArray_IsScalar(op, Int8)) set_type<int8_t>(t);
     else if (PyArray_IsScalar(op, UInt8)) set_type<uint8_t>(t);
@@ -193,7 +200,6 @@ static bool get_object_type(object o, io::HDF5Type& t) {
     else if (PyArray_IsScalar(op, CFloat)) set_type<std::complex<float> >(t);
     else if (PyArray_IsScalar(op, CDouble)) set_type<std::complex<double> >(t);
     else if (PyArray_IsScalar(op, CLongDouble)) set_type<std::complex<long double> >(t);
-    //else if (PyArray_IsScalar(op, String)) set_type<std::string>(t);
     else {
       str so(o);
       std::string s = extract<std::string>(so);
@@ -239,6 +245,8 @@ static void inner_replace(io::HDF5File& f, const std::string& path,
 
   if (scalar) { //write as a scalar
     switch(type.type()) {
+      case io::s:  
+        return inner_replace_scalar<std::string>(f, path, obj, pos);
       case io::b:  
         return inner_replace_scalar<bool>(f, path, obj, pos);
       case io::i8:  
@@ -301,6 +309,8 @@ static void inner_append(io::HDF5File& f, const std::string& path,
 
   if (scalar) { //write as a scalar
     switch(type.type()) {
+      case io::s:  
+        return inner_append_scalar<std::string>(f, path, obj);
       case io::b:  
         return inner_append_scalar<bool>(f, path, obj);
       case io::i8:  
@@ -382,6 +392,8 @@ static void inner_set(io::HDF5File& f, const std::string& path,
 
   if (scalar) { //write as a scalar
     switch(type.type()) {
+      case io::s:  
+        return inner_set_scalar<std::string>(f, path, obj);
       case io::b:  
         return inner_set_scalar<bool>(f, path, obj);
       case io::i8:  
@@ -424,21 +436,11 @@ static void inner_set(io::HDF5File& f, const std::string& path,
   }
 }
 
-static void hdf5file_set_iterable(io::HDF5File& f, const std::string& path,
-    object iterable, size_t compression) {
-  for (size_t k=0; k<len(iterable); ++k) {
-    object obj = iterable[k];
-    io::HDF5Type type;
-    bool scalar = get_object_type(obj, type);
-    inner_set(f, path, type, obj, compression, scalar);
-  }
-}
-
 static void hdf5file_set(io::HDF5File& f, const std::string& path,
     object obj, size_t compression=0) {
   PyObject* op = obj.ptr();
   if (PyList_Check(op) || PyTuple_Check(op)) {
-    hdf5file_set_iterable(f, path, obj, compression);
+    PYTHON_ERROR(TypeError, "Cannot use set() for tuples or lists. If you wish to add all elements in such iterables, use append() instead.");
   }
   else {
     io::HDF5Type type;
@@ -457,6 +459,14 @@ static object inner_get_scalar_attr(const io::HDF5File& f,
   return object(value);
 }
 
+template <>
+object inner_get_scalar_attr<std::string>(const io::HDF5File& f,
+  const std::string& path, const std::string& name, const io::HDF5Type&) {
+  std::string retval;
+  f.getAttribute(path, name, retval);
+  return object(retval);
+}
+
 static object inner_get_attr(const io::HDF5File& f, const std::string& path,
     const std::string& name, const io::HDF5Type& type) {
 
@@ -464,8 +474,11 @@ static object inner_get_attr(const io::HDF5File& f, const std::string& path,
 
   const io::HDF5Shape& shape = type.shape();
 
-  if (shape.n() == 1 && shape[0] == 1) { //read as scalar
+  if (type.type() == bob::io::s || (shape.n() == 1 && shape[0] == 1)) { 
+    //read as scalar
     switch(type.type()) {
+      case io::s:  
+        return inner_get_scalar_attr<std::string>(f, path, name, type);
       case io::b:  
         return inner_get_scalar_attr<bool>(f, path, name, type);
       case io::i8:  
@@ -553,6 +566,14 @@ static void inner_set_scalar_attr(io::HDF5File& f,
   f.write_attribute(path, name, type, static_cast<void*>(&value));
 }
 
+template <>
+void inner_set_scalar_attr<std::string>(io::HDF5File& f, 
+  const std::string& path, const std::string& name, const io::HDF5Type& type,
+  object obj) {
+  std::string value = extract<std::string>(obj);
+  f.write_attribute(path, name, type, static_cast<const void*>(value.c_str()));
+}
+
 static void inner_set_attr(io::HDF5File& f, const std::string& path,
     const std::string& name, const io::HDF5Type& type, object obj,
     bool scalar) {
@@ -561,6 +582,8 @@ static void inner_set_attr(io::HDF5File& f, const std::string& path,
 
   if (scalar) { //write as a scalar
     switch(type.type()) {
+      case io::s:  
+        return inner_set_scalar_attr<std::string>(f, path, name, type, obj);
       case io::b:  
         return inner_set_scalar_attr<bool>(f, path, name, type, obj);
       case io::i8:  
@@ -680,12 +703,12 @@ void bind_io_hdf5() {
   "  This is the data that will be set on the position indicated. It may be a simple python or numpy scalar (such as :py:class:`numpy.uint8`) or a :py:class:`numpy.ndarray` of any of the supported data types. You can also, optionally, set this to a list or tuple of scalars or arrays. This will cause this method to iterate over the elements and add each individually.\n\n" \
   "compresssion\n" \
   "  This parameter is effective when appending arrays. Set this to a number betwen 0 (default) and 9 (maximum) to compress the contents of this dataset. This setting is only effective if the dataset does not yet exist, otherwise, the previous setting is respected."))
-    .def("set", &hdf5file_set, hdf5file_set_overloads((arg("self"), arg("path"), arg("data"), arg("compression")=0), "Sets the scalar or array at position 0 to the given value. This method is equivalent to checking if the scalar or array at position 0 exists and then replacing it. If the path does not exist, we append the new scalar or array.\n\n" \
+    .def("set", &hdf5file_set, hdf5file_set_overloads((arg("self"), arg("path"), arg("data"), arg("compression")=0), "Sets the scalar or array at position 0 to the given value. This method is equivalent to checking if the scalar or array at position 0 exists and then replacing it. If the path does not exist, we append the new scalar or array. Note it is an error to pass lists (or tuples) to this method. If you wish to add a number of elements, use ``append()`` instead.\n\n" \
   "Keyword Parameters:\n\n" \
   "path\n" \
   "  This is the path to the HDF5 dataset to replace data at\n\n" \
   "data\n" \
-  "  This is the data that will be set on the position indicated. It may be a simple python or numpy scalar (such as :py:class:`numpy.uint8`) or a :py:class:`numpy.ndarray` of any of the supported data types. You can also, optionally, set this to a list or tuple of scalars or arrays. This will cause this method to iterate over the elements and add each individually.\n\n" \
+  "  This is the data that will be set on the position indicated. It may be a simple python or numpy scalar (such as :py:class:`numpy.uint8`) or a :py:class:`numpy.ndarray` of any of the supported data types.\n\n" \
   "compresssion\n" \
   "  This parameter is effective when setting arrays. Set this to a number betwen 0 (default) and 9 (maximum) to compress the contents of this dataset. This setting is only effective if the dataset does not yet exist, otherwise, the previous setting is respected."))
     // attribute manipulation

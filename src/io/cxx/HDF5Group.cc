@@ -21,6 +21,7 @@
  */
 
 #include <boost/make_shared.hpp>
+#include <boost/shared_array.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
@@ -500,6 +501,21 @@ void h5::Group::write_attribute (const std::string& name,
 
 void h5::Group::list_attributes(std::map<std::string, io::HDF5Type>& attributes) const {
   h5::list_attributes(m_id, attributes);
+}
+
+template <> void h5::Group::set_attribute<std::string>(const std::string& name, const std::string& v) {
+  bob::io::HDF5Type dest_type(v);
+  write_attribute(name, dest_type, reinterpret_cast<const void*>(v.c_str()));
+}
+
+template <> std::string h5::Group::get_attribute(const std::string& name) const {
+  HDF5Type type;
+  gettype_attribute(name, type);
+  boost::shared_array<char> v(new char[type.shape()[0]+1]);
+  v[type.shape()[0]] = 0; ///< null termination
+  read_attribute(name, type, reinterpret_cast<void*>(v.get()));
+  std::string retval(v.get());
+  return retval;
 }
 
 h5::RootGroup::RootGroup(boost::shared_ptr<File> parent):

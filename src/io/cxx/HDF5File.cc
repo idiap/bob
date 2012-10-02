@@ -213,7 +213,7 @@ void io::HDF5File::deleteAttribute(const std::string& path,
 }
 
 void io::HDF5File::listAttributes(const std::string& path,
-    std::map<std::string, io::HDF5Type>& attributes) const {
+    std::map<std::string, bob::io::HDF5Type>& attributes) const {
   if (m_cwd->has_dataset(path)) {
     (*m_cwd)[path]->list_attributes(attributes);
   }
@@ -228,7 +228,7 @@ void io::HDF5File::listAttributes(const std::string& path,
 }
 
 void io::HDF5File::read_attribute(const std::string& path, 
-    const std::string& name, const HDF5Type& type, void* buffer) const {
+    const std::string& name, const bob::io::HDF5Type& type, void* buffer) const {
   if (m_cwd->has_dataset(path)) {
     (*m_cwd)[path]->read_attribute(name, type, buffer);
   }
@@ -243,7 +243,7 @@ void io::HDF5File::read_attribute(const std::string& path,
 }
 
 void io::HDF5File::write_attribute(const std::string& path,
-    const std::string& name, const HDF5Type& type, const void* buffer) {
+    const std::string& name, const bob::io::HDF5Type& type, const void* buffer) {
   if (m_cwd->has_dataset(path)) {
     (*m_cwd)[path]->write_attribute(name, type, buffer);
   }
