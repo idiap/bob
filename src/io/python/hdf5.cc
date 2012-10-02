@@ -355,7 +355,7 @@ static void inner_append(io::HDF5File& f, const std::string& path,
 
 static void hdf5file_append_iterable(io::HDF5File& f, const std::string& path,
   object iterable, size_t compression) {
-  for (size_t k=0; k<len(iterable); ++k) {
+  for (auto k=0; k<len(iterable); ++k) {
     object obj = iterable[k];
     io::HDF5Type type;
     bool scalar = get_object_type(obj, type);
@@ -438,15 +438,9 @@ static void inner_set(io::HDF5File& f, const std::string& path,
 
 static void hdf5file_set(io::HDF5File& f, const std::string& path,
     object obj, size_t compression=0) {
-  PyObject* op = obj.ptr();
-  if (PyList_Check(op) || PyTuple_Check(op)) {
-    PYTHON_ERROR(TypeError, "Cannot use set() for tuples or lists. If you wish to add all elements in such iterables, use append() instead.");
-  }
-  else {
-    io::HDF5Type type;
-    bool scalar = get_object_type(obj, type);
-    inner_set(f, path, type, obj, compression, scalar);
-  }
+  io::HDF5Type type;
+  bool scalar = get_object_type(obj, type);
+  inner_set(f, path, type, obj, compression, scalar);
 }
 
 BOOST_PYTHON_FUNCTION_OVERLOADS(hdf5file_set_overloads, hdf5file_set, 3, 4)
@@ -627,7 +621,7 @@ static void inner_set_attr(io::HDF5File& f, const std::string& path,
 
 static void hdf5file_set_attributes(io::HDF5File& f, dict attributes, const std::string& path=".") {
   object keys = attributes.iterkeys();
-  for (size_t k=0; k<len(keys); ++k) {
+  for (auto k=0; k<len(keys); ++k) {
     std::string key = extract<std::string>(keys[k]);
     io::HDF5Type type;
     object obj = attributes[keys[k]];
@@ -703,12 +697,12 @@ void bind_io_hdf5() {
   "  This is the data that will be set on the position indicated. It may be a simple python or numpy scalar (such as :py:class:`numpy.uint8`) or a :py:class:`numpy.ndarray` of any of the supported data types. You can also, optionally, set this to a list or tuple of scalars or arrays. This will cause this method to iterate over the elements and add each individually.\n\n" \
   "compresssion\n" \
   "  This parameter is effective when appending arrays. Set this to a number betwen 0 (default) and 9 (maximum) to compress the contents of this dataset. This setting is only effective if the dataset does not yet exist, otherwise, the previous setting is respected."))
-    .def("set", &hdf5file_set, hdf5file_set_overloads((arg("self"), arg("path"), arg("data"), arg("compression")=0), "Sets the scalar or array at position 0 to the given value. This method is equivalent to checking if the scalar or array at position 0 exists and then replacing it. If the path does not exist, we append the new scalar or array. Note it is an error to pass lists (or tuples) to this method. If you wish to add a number of elements, use ``append()`` instead.\n\n" \
+    .def("set", &hdf5file_set, hdf5file_set_overloads((arg("self"), arg("path"), arg("data"), arg("compression")=0), "Sets the scalar or array at position 0 to the given value. This method is equivalent to checking if the scalar or array at position 0 exists and then replacing it. If the path does not exist, we append the new scalar or array.\n\n" \
   "Keyword Parameters:\n\n" \
   "path\n" \
   "  This is the path to the HDF5 dataset to replace data at\n\n" \
   "data\n" \
-  "  This is the data that will be set on the position indicated. It may be a simple python or numpy scalar (such as :py:class:`numpy.uint8`) or a :py:class:`numpy.ndarray` of any of the supported data types.\n\n" \
+  "  This is the data that will be set on the position indicated. It may be a simple python or numpy scalar (such as :py:class:`numpy.uint8`) or a :py:class:`numpy.ndarray` of any of the supported data types. You can also, optionally, set this to an iterable of scalars or arrays. This will cause this method to collapse the whole iterable into a :py:class:`numpy.ndarray` and set that into the file.\n\n" \
   "compresssion\n" \
   "  This parameter is effective when setting arrays. Set this to a number betwen 0 (default) and 9 (maximum) to compress the contents of this dataset. This setting is only effective if the dataset does not yet exist, otherwise, the previous setting is respected."))
     // attribute manipulation
