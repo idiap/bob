@@ -22,7 +22,6 @@
  */
 
 #include <boost/python.hpp>
-#include "bob/io/Arrayset.h"
 #include "bob/machine/PLDAMachine.h"
 #include "bob/trainer/PLDATrainer.h"
 
@@ -35,11 +34,11 @@ namespace io = bob::io;
 static void plda_train(train::PLDABaseTrainer& t, mach::PLDABaseMachine& m, list l_arraysets)
 {
   int n_ids = len(l_arraysets);
-  std::vector<io::Arrayset> v_arraysets;
+  std::vector<blitz::Array<double,2> > v_arraysets;
 
   // Extracts the vector of Arraysets from the python list of Arraysets
   for(int id=0; id<n_ids; ++id) {
-    io::Arrayset ar = extract<io::Arrayset>(l_arraysets[id]);
+    blitz::Array<double,2> ar = extract<blitz::Array<double,2> >(l_arraysets[id]);
     v_arraysets.push_back(ar);
   }
 
@@ -50,11 +49,11 @@ static void plda_train(train::PLDABaseTrainer& t, mach::PLDABaseMachine& m, list
 static void plda_initialization(train::PLDABaseTrainer& t, mach::PLDABaseMachine& m, list l_arraysets)
 {
   int n_ids = len(l_arraysets);
-  std::vector<io::Arrayset> v_arraysets;
+  std::vector<blitz::Array<double,2> > v_arraysets;
 
   // Extracts the vector of Arraysets from the python list of Arraysets
   for(int id=0; id<n_ids; ++id) {
-    io::Arrayset ar = extract<io::Arrayset>(l_arraysets[id]);
+    blitz::Array<double,2> ar = extract<blitz::Array<double,2> >(l_arraysets[id]);
     v_arraysets.push_back(ar);
   }
 
@@ -65,11 +64,11 @@ static void plda_initialization(train::PLDABaseTrainer& t, mach::PLDABaseMachine
 static void plda_eStep(train::PLDABaseTrainer& t, mach::PLDABaseMachine& m, list l_arraysets)
 {
   int n_ids = len(l_arraysets);
-  std::vector<io::Arrayset> v_arraysets;
+  std::vector<blitz::Array<double,2> > v_arraysets;
 
   // Extracts the vector of Arraysets from the python list of Arraysets
   for(int id=0; id<n_ids; ++id) {
-    io::Arrayset ar = extract<io::Arrayset>(l_arraysets[id]);
+    blitz::Array<double,2> ar = extract<blitz::Array<double,2> >(l_arraysets[id]);
     v_arraysets.push_back(ar);
   }
 
@@ -80,11 +79,11 @@ static void plda_eStep(train::PLDABaseTrainer& t, mach::PLDABaseMachine& m, list
 static void plda_mStep(train::PLDABaseTrainer& t, mach::PLDABaseMachine& m, list l_arraysets)
 {
   int n_ids = len(l_arraysets);
-  std::vector<io::Arrayset> v_arraysets;
+  std::vector<blitz::Array<double,2> > v_arraysets;
 
   // Extracts the vector of Arraysets from the python list of Arraysets
   for(int id=0; id<n_ids; ++id) {
-    io::Arrayset ar = extract<io::Arrayset>(l_arraysets[id]);
+    blitz::Array<double,2> ar = extract<blitz::Array<double,2> >(l_arraysets[id]);
     v_arraysets.push_back(ar);
   }
 
@@ -95,11 +94,11 @@ static void plda_mStep(train::PLDABaseTrainer& t, mach::PLDABaseMachine& m, list
 static void plda_finalization(train::PLDABaseTrainer& t, mach::PLDABaseMachine& m, list l_arraysets)
 {
   int n_ids = len(l_arraysets);
-  std::vector<io::Arrayset> v_arraysets;
+  std::vector<blitz::Array<double,2> > v_arraysets;
 
   // Extracts the vector of Arraysets from the python list of Arraysets
   for(int id=0; id<n_ids; ++id) {
-    io::Arrayset ar = extract<io::Arrayset>(l_arraysets[id]);
+    blitz::Array<double,2> ar = extract<blitz::Array<double,2> >(l_arraysets[id]);
     v_arraysets.push_back(ar);
   }
 
@@ -115,7 +114,7 @@ static object get_z_first_order(train::PLDABaseTrainer& m) {
 }
 
 void bind_trainer_plda() {
-  typedef train::EMTrainer<mach::PLDABaseMachine, std::vector<io::Arrayset> > EMTrainerPLDABase; 
+  typedef train::EMTrainer<mach::PLDABaseMachine, std::vector<blitz::Array<double,2> > > EMTrainerPLDABase; 
 
   class_<EMTrainerPLDABase, boost::noncopyable>("EMTrainerPLDA", "The base python class for all EM/PLDA-based trainers.", no_init)
     .add_property("convergence_threshold", &EMTrainerPLDABase::getConvergenceThreshold, &EMTrainerPLDABase::setConvergenceThreshold, "Convergence threshold")
@@ -150,7 +149,7 @@ void bind_trainer_plda() {
 
 
   class_<train::PLDATrainer, boost::noncopyable>("PLDATrainer", "Create a trainer for the PLDA.", init<mach::PLDAMachine&>((arg("plda")),"Initializes a new PLDATrainer."))
-    .def("enrol", (void (train::PLDATrainer::*)(const io::Arrayset&))&train::PLDATrainer::enrol, (arg("self"), arg("arrayset")), "Call the enrollment procedure.")
+    .def("enrol", (void (train::PLDATrainer::*)(const blitz::Array<double,2>&))&train::PLDATrainer::enrol, (arg("self"), arg("arrayset")), "Call the enrollment procedure.")
     ;
 
 

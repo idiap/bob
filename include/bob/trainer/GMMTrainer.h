@@ -24,7 +24,6 @@
 #ifndef BOB_TRAINER_GMMTRAINER_H
 #define BOB_TRAINER_GMMTRAINER_H
 
-#include "bob/io/Arrayset.h"
 #include "bob/trainer/EMTrainer.h"
 #include "bob/machine/GMMMachine.h"
 #include "bob/machine/GMMStats.h"
@@ -37,7 +36,7 @@ namespace trainer {
  * @brief This class implements the E-step of the expectation-maximisation algorithm for a GMM Machine.
  * @details See Section 9.2.2 of Bishop, "Pattern recognition and machine learning", 2006
  */
-class GMMTrainer : public EMTrainer<bob::machine::GMMMachine, bob::io::Arrayset> {
+class GMMTrainer : public EMTrainer<bob::machine::GMMMachine, blitz::Array<double,2> > {
   public:
 
     /**
@@ -54,7 +53,7 @@ class GMMTrainer : public EMTrainer<bob::machine::GMMMachine, bob::io::Arrayset>
     /**
      * Initialization before the EM steps
      */
-    virtual void initialization(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data);
+    virtual void initialization(bob::machine::GMMMachine& gmm, const blitz::Array<double,2>& data);
     
     /**
      * Calculates and saves statistics across the dataset, 
@@ -65,7 +64,7 @@ class GMMTrainer : public EMTrainer<bob::machine::GMMMachine, bob::io::Arrayset>
      * The statistics, m_ss, will be used in the mStep() that follows.
      * Implements EMTrainer::eStep(double &)
      */
-    virtual void eStep(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data);
+    virtual void eStep(bob::machine::GMMMachine& gmm, const blitz::Array<double,2>& data);
 
     /**
      * Computes the likelihood using current estimates of the latent variables
@@ -75,7 +74,7 @@ class GMMTrainer : public EMTrainer<bob::machine::GMMMachine, bob::io::Arrayset>
     /**
      * Finalization after the EM steps
      */
-    virtual void finalization(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data);
+    virtual void finalization(bob::machine::GMMMachine& gmm, const blitz::Array<double,2>& data);
    
     /**
      * Returns the internal GMM statistics. Useful to parallelize the E-step

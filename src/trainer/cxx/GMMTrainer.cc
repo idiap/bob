@@ -26,7 +26,7 @@ namespace io = bob::io;
 
 train::GMMTrainer::GMMTrainer(bool update_means, bool update_variances, bool update_weights, 
     double mean_var_update_responsibilities_threshold):
-  EMTrainer<mach::GMMMachine, io::Arrayset>(), update_means(update_means), update_variances(update_variances), 
+  EMTrainer<mach::GMMMachine, blitz::Array<double,2> >(), update_means(update_means), update_variances(update_variances), 
   update_weights(update_weights), m_mean_var_update_responsibilities_threshold(mean_var_update_responsibilities_threshold) {
 
 }
@@ -35,12 +35,12 @@ train::GMMTrainer::~GMMTrainer() {
   
 }
 
-void train::GMMTrainer::initialization(mach::GMMMachine& gmm, const io::Arrayset& data) {
+void train::GMMTrainer::initialization(mach::GMMMachine& gmm, const blitz::Array<double,2>& data) {
   // Allocate memory for the sufficient statistics and initialise
   m_ss.resize(gmm.getNGaussians(),gmm.getNInputs());
 }
 
-void train::GMMTrainer::eStep(mach::GMMMachine& gmm, const io::Arrayset& data) {
+void train::GMMTrainer::eStep(mach::GMMMachine& gmm, const blitz::Array<double,2>& data) {
   m_ss.init();
   // Calculate the sufficient statistics and save in m_ss
   gmm.accStatistics(data, m_ss);
@@ -50,7 +50,7 @@ double train::GMMTrainer::computeLikelihood(mach::GMMMachine& gmm) {
   return m_ss.log_likelihood / m_ss.T;
 }
 
-void train::GMMTrainer::finalization(mach::GMMMachine& gmm, const io::Arrayset& data) {
+void train::GMMTrainer::finalization(mach::GMMMachine& gmm, const blitz::Array<double,2>& data) {
 }
 
 void train::GMMTrainer::setGMMStats(const bob::machine::GMMStats& stats)

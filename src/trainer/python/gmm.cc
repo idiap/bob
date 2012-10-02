@@ -18,7 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <boost/python.hpp>
-#include "bob/io/Arrayset.h"
 #include "bob/trainer/GMMTrainer.h"
 #include "bob/trainer/MAP_GMMTrainer.h"
 #include "bob/trainer/ML_GMMTrainer.h"
@@ -30,7 +29,7 @@ namespace io = bob::io;
 
 void bind_trainer_gmm() {
 
-  typedef train::EMTrainer<mach::GMMMachine, io::Arrayset> EMTrainerGMMBase; 
+  typedef train::EMTrainer<mach::GMMMachine, blitz::Array<double,2> > EMTrainerGMMBase; 
 
   class_<EMTrainerGMMBase, boost::noncopyable>("EMTrainerGMM", "The base python class for all EM-based trainers.", no_init)
     .add_property("convergence_threshold", &EMTrainerGMMBase::getConvergenceThreshold, &EMTrainerGMMBase::setConvergenceThreshold, "Convergence threshold")

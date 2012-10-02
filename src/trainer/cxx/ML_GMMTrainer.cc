@@ -36,7 +36,7 @@ train::ML_GMMTrainer::~ML_GMMTrainer() {
   
 }
 
-void train::ML_GMMTrainer::initialization(mach::GMMMachine& gmm, const io::Arrayset& data) {
+void train::ML_GMMTrainer::initialization(mach::GMMMachine& gmm, const blitz::Array<double,2>& data) {
   train::GMMTrainer::initialization(gmm, data);
   // Allocate cache
   size_t n_gaussians = gmm.getNGaussians();
@@ -44,7 +44,7 @@ void train::ML_GMMTrainer::initialization(mach::GMMMachine& gmm, const io::Array
 }
 
 
-void train::ML_GMMTrainer::mStep(mach::GMMMachine& gmm, const io::Arrayset& data) {
+void train::ML_GMMTrainer::mStep(mach::GMMMachine& gmm, const blitz::Array<double,2>& data) {
   // Read options and variables
   size_t n_gaussians = gmm.getNGaussians();
 

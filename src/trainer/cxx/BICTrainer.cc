@@ -34,11 +34,11 @@ static double sqr(const double& x){
  * @param  machine  The machine to be trained.
  * @param  differences  A set of (intra/extra)-personal difference vectors that should be trained.
  */
-void bob::trainer::BICTrainer::train_single(bool clazz, bob::machine::BICMachine& machine, const bob::io::Arrayset& differences) const {
-  if (differences.getNDim() != 1) throw bob::core::UnexpectedShapeError();
+void bob::trainer::BICTrainer::train_single(bool clazz, bob::machine::BICMachine& machine, const blitz::Array<double,2>& differences) const {
   int subspace_dim = clazz ? m_M_E : m_M_I;
-  int input_dim = differences.getShape()[0];
-  int data_count = differences.size();
+  int input_dim = differences.extent(1);
+  int data_count = differences.extent(0);
+  blitz::Range a = blitz::Range::all();
 
   if (subspace_dim){
     // train the class using BIC
@@ -82,7 +82,7 @@ void bob::trainer::BICTrainer::train_single(bool clazz, bob::machine::BICMachine
     mean = 0.;
     variance = 0.;
     for (int n = data_count; n--;){
-      const blitz::Array<double,1>& diff = differences[n].get<double,1>();
+      const blitz::Array<double,1>& diff = differences(n,a);
       assert(diff.shape()[0] == input_dim);
       for (int i = input_dim; i--;){
         mean(i) += diff(i);

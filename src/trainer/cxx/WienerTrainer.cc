@@ -50,31 +50,23 @@ train::WienerTrainer& train::WienerTrainer::operator=
 }
 
 void train::WienerTrainer::train(bob::machine::WienerMachine& machine, 
-    const io::Arrayset& ar) const 
+    const blitz::Array<double,3>& ar) const 
 {
-  // Checks for arrayset data type and shape once
-  if (ar.getElementType() != bob::core::array::t_float64) {
-    throw bob::io::TypeError(ar.getElementType(),
-        bob::core::array::t_float64);
-  }
-  if (ar.getNDim() != 2) {
-    throw bob::io::DimensionError(ar.getNDim(), 2);
-  }
-
   // Data is checked now and conforms, just proceed w/o any further checks.
-  size_t n_samples = ar.size();
-  size_t height = ar.getShape()[0];
-  size_t width = ar.getShape()[1];
+  size_t n_samples = ar.extent(0);
+  size_t height = ar.extent(1);
+  size_t width = ar.extent(0);
 
   // FFT2D
   bob::sp::FFT2D fft2d(height, width);
 
   // Loads the data
+  blitz::Range a = blitz::Range::all();
   blitz::Array<double,3> data(height, width, n_samples);
   blitz::Array<std::complex<double>,2> sample_fft(height, width);
   blitz::Range all = blitz::Range::all();
   for (size_t i=0; i<n_samples; ++i) {
-    blitz::Array<double,2> sample = ar.get<double,2>(i);
+    blitz::Array<double,2> sample = ar(i,a,a);
     blitz::Array<std::complex<double>,2> sample_c = bob::core::cast<std::complex<double> >(sample);
     fft2d(sample_c, sample_fft);
     data(all,all,i) = blitz::abs(sample_fft);

@@ -82,8 +82,8 @@ static boost::shared_ptr<train::DataShuffler> shuffler_from_arrays
 static boost::shared_ptr<train::DataShuffler> shuffler_from_arraysets
 (object data, object target) {
   //data
-  stl_input_iterator<io::Arrayset> dbegin(data), dend;
-  std::vector<io::Arrayset> vdata_ref(dbegin, dend);
+  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
+  std::vector<blitz::Array<double,2> > vdata_ref(dbegin, dend);
 
   //target
   stl_input_iterator<tp::const_ndarray> vtarget(target), tend;
@@ -114,7 +114,7 @@ static boost::shared_ptr<train::DataShuffler> shuffler_from_arrays_or_arraysets
   }
 
   //Let's test the first element.
-  extract<io::Arrayset> check_set(data[0]);
+  extract<blitz::Array<double,2> > check_set(data[0]);
 
   if (check_set.check()) { //good, those are arraysets
     return shuffler_from_arraysets(data, target); 

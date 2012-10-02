@@ -52,35 +52,24 @@ train::SVDPCATrainer& train::SVDPCATrainer::operator=
 }
 
 void train::SVDPCATrainer::train(bob::machine::LinearMachine& machine, 
-    blitz::Array<double,1>& eigen_values, const io::Arrayset& ar) const {
-
-  // checks for arrayset data type and shape once
-  if (ar.getElementType() != bob::core::array::t_float64) {
-    throw bob::io::TypeError(ar.getElementType(),
-        bob::core::array::t_float64);
-  }
-  if (ar.getNDim() != 1) {
-    throw bob::io::DimensionError(ar.getNDim(), 1);
-  }
+    blitz::Array<double,1>& eigen_values, const blitz::Array<double,2>& ar) const {
 
   // data is checked now and conforms, just proceed w/o any further checks.
-  size_t n_samples = ar.size();
-  size_t n_features = ar.getShape()[0];
+  size_t n_samples = ar.extent(0);
+  size_t n_features = ar.extent(1);
 
-  // loads all the data in a single shot - required for SVD
+  // removes the empirical mean from the training data
   blitz::Array<double,2> data(n_features, n_samples);
-  blitz::Range all = blitz::Range::all();
-  for (size_t i=0; i<n_samples; ++i) {
-    data(all,i) = ar.get<double,1>(i);
-  }
+  blitz::Range a = blitz::Range::all();
+  for (size_t i=0; i<n_samples; ++i) data(a,i) = ar(i,a);
 
   // computes the mean of the training data
   blitz::secondIndex j;
   blitz::Array<double,1> mean(n_features);
   mean = blitz::mean(data, j);
 
-  // removes the empirical mean from the training data
-  for (size_t i=0; i<n_samples; ++i) data(all,i) -= mean;
+  // applies the training data mean
+  for (size_t i=0; i<n_samples; ++i) data(a,i) -= mean;
 
   /**
    * computes the singular value decomposition using lapack
@@ -115,7 +104,7 @@ void train::SVDPCATrainer::train(bob::machine::LinearMachine& machine,
 }
 
 void train::SVDPCATrainer::train(bob::machine::LinearMachine& machine, 
-    const io::Arrayset& ar) const {
+    const blitz::Array<double,2>& ar) const {
   blitz::Array<double,1> throw_away;
   train(machine, throw_away, ar);
 }

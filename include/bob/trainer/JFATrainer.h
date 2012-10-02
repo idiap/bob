@@ -28,7 +28,6 @@
 #include <vector>
 #include <string>
 #include "bob/core/array_copy.h"
-#include "bob/io/Arrayset.h"
 #include "bob/machine/JFAMachine.h"
 #include <boost/shared_ptr.hpp>
 

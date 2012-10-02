@@ -41,7 +41,7 @@ namespace train = bob::trainer;
 
 train::PLDABaseTrainer::PLDABaseTrainer(int nf, int ng, 
     double convergence_threshold, int max_iterations, bool compute_likelihood):
-  EMTrainer<mach::PLDABaseMachine, std::vector<io::Arrayset> >
+  EMTrainer<mach::PLDABaseMachine, std::vector<blitz::Array<double,2> > >
     (convergence_threshold, max_iterations, compute_likelihood), 
   m_nf(nf), m_ng(ng), m_limited_memory(false), m_S(0,0),
   m_z_first_order(0), m_sum_z_second_order(0,0),
@@ -58,7 +58,7 @@ train::PLDABaseTrainer::PLDABaseTrainer(int nf, int ng,
 }
 
 train::PLDABaseTrainer::PLDABaseTrainer(const train::PLDABaseTrainer& other):
-  EMTrainer<mach::PLDABaseMachine, std::vector<io::Arrayset> >
+  EMTrainer<mach::PLDABaseMachine, std::vector<blitz::Array<double,2> > >
     (other.m_convergence_threshold, other.m_max_iterations, 
      other.m_compute_likelihood),
   m_nf(other.m_nf), m_ng(other.m_ng), m_limited_memory(other.m_limited_memory),
@@ -127,13 +127,13 @@ train::PLDABaseTrainer& train::PLDABaseTrainer::operator=
 }
 
 void train::PLDABaseTrainer::initialization(mach::PLDABaseMachine& machine,
-  const std::vector<bob::io::Arrayset>& v_ar) 
+  const std::vector<blitz::Array<double,2> >& v_ar) 
 {
   // Checks training data
   checkTrainingData(v_ar);
 
   // Gets dimension (first Arrayset)
-  size_t n_features = v_ar[0].getShape()[0];
+  size_t n_features = v_ar[0].extent(1);
   // Resizes the PLDABaseMachine
   machine.resize(n_features, m_nf, m_ng);
 
@@ -148,7 +148,7 @@ void train::PLDABaseTrainer::initialization(mach::PLDABaseMachine& machine,
 }
 
 void train::PLDABaseTrainer::finalization(mach::PLDABaseMachine& machine,
-  const std::vector<bob::io::Arrayset>& v_ar) 
+  const std::vector<blitz::Array<double,2> >& v_ar) 
 {
   // Precomputes constant parts of the log likelihood and (gamma_a)
   precomputeLogLike(machine, v_ar);
@@ -157,34 +157,25 @@ void train::PLDABaseTrainer::finalization(mach::PLDABaseMachine& machine,
   machine.getAddLogLikeConstTerm(1);
 }
 
-void train::PLDABaseTrainer::checkTrainingData(const std::vector<bob::io::Arrayset>& v_ar)
+void train::PLDABaseTrainer::checkTrainingData(const std::vector<blitz::Array<double,2> >& v_ar)
 {
   // Checks that the vector of Arraysets is not empty
   if(v_ar.size() == 0)
     throw bob::trainer::EmptyTrainingSet();
 
   // Gets dimension (first Arrayset)
-  size_t n_features = v_ar[0].getShape()[0];
+  int n_features = v_ar[0].extent(1);
   // Checks dimension consistency
   for(size_t i=0; i<v_ar.size(); ++i) {
-    // Checks for arrayset data type and shape
-    if(v_ar[i].getElementType() != bob::core::array::t_float64) {
-      throw bob::io::TypeError(v_ar[i].getElementType(),
-        bob::core::array::t_float64);
-    }
-    if(v_ar[i].getNDim() != 1) {
-      throw bob::io::DimensionError(v_ar[i].getNDim(), 1);
-    }
-    if(v_ar[i].getShape()[0] != n_features)
-      throw bob::trainer::WrongNumberOfFeatures(v_ar[i].getShape()[0], 
-                                                  n_features, i);
+    if(v_ar[i].extent(1) != n_features)
+      throw bob::trainer::WrongNumberOfFeatures(v_ar[i].extent(1), n_features, i);
   } 
 }
 
-void train::PLDABaseTrainer::initMembers(const std::vector<bob::io::Arrayset>& v_ar)
+void train::PLDABaseTrainer::initMembers(const std::vector<blitz::Array<double,2> >& v_ar)
 {
   // Gets dimension (first Arrayset)
-  size_t n_features = v_ar[0].getShape()[0]; // dimensionality of the data
+  size_t n_features = v_ar[0].extent(1); // dimensionality of the data
   size_t n_identities = v_ar.size();
 
   m_S.resize(n_features,n_features);
@@ -194,7 +185,7 @@ void train::PLDABaseTrainer::initMembers(const std::vector<bob::io::Arrayset>& v
   for(size_t i=0; i<n_identities; ++i) 
   {
     // Number of training samples for this identity
-    size_t n_i = v_ar[i].size(); 
+    size_t n_i = v_ar[i].extent(0); 
     // m_z_first_order
     blitz::Array<double,2> z_i(n_i, m_nf+m_ng);
     m_z_first_order.push_back(z_i);
@@ -232,17 +223,17 @@ void train::PLDABaseTrainer::initMembers(const std::vector<bob::io::Arrayset>& v
 }
 
 void train::PLDABaseTrainer::computeMeanVariance(mach::PLDABaseMachine& machine, 
-  const std::vector<bob::io::Arrayset>& v_ar) 
+  const std::vector<blitz::Array<double,2> >& v_ar) 
 {
   blitz::Array<double,1>& mu = machine.updateMu();
+  blitz::Range all = blitz::Range::all();
   // TODO: Uncomment variance computation if required
   /*  if(m_compute_likelihood) 
   {
     // loads all the data in a single shot - required for scatter
     blitz::Array<double,2> data(n_features, n_samples);
-    blitz::Range all = blitz::Range::all();
     for (size_t i=0; i<n_samples; ++i)
-      data(all,i) = ar.get<double,1>(i);
+      data(all,i) = ar(i,all);
     // Mean and scatter computation
     math::scatter(data, m_S, mu);
     // divides scatter by N-1
@@ -254,16 +245,16 @@ void train::PLDABaseTrainer::computeMeanVariance(mach::PLDABaseMachine& machine,
     mu = 0.;
     size_t n_samples = 0;
     for(size_t j=0; j<v_ar.size(); ++j) {
-      n_samples += v_ar[j].size();
-      for (size_t i=0; i<v_ar[j].size(); ++i)
-        mu += v_ar[j].get<double,1>(i);
+      n_samples += v_ar[j].extent(0);
+      for (int i=0; i<v_ar[j].extent(0); ++i)
+        mu += v_ar[j](i,all);
     }
     mu /= static_cast<double>(n_samples);
   }
 }
 
 void train::PLDABaseTrainer::initFGSigma(mach::PLDABaseMachine& machine, 
-  const std::vector<bob::io::Arrayset>& v_ar) 
+  const std::vector<blitz::Array<double,2> >& v_ar) 
 {
   // Initializes F, G and sigma
   initF(machine, v_ar);
@@ -275,9 +266,10 @@ void train::PLDABaseTrainer::initFGSigma(mach::PLDABaseMachine& machine,
 }
 
 void train::PLDABaseTrainer::initF(mach::PLDABaseMachine& machine, 
-  const std::vector<bob::io::Arrayset>& v_ar) 
+  const std::vector<blitz::Array<double,2> >& v_ar) 
 {
   blitz::Array<double,2>& F = machine.updateF();
+  blitz::Range a = blitz::Range::all();
 
   // 1: between-class scatter
   if(m_initF_method==1) 
@@ -292,13 +284,13 @@ void train::PLDABaseTrainer::initF(mach::PLDABaseMachine& machine,
     {
       blitz::Array<double,1> Si = S(blitz::Range::all(),i);
       Si = 0.;
-      for(size_t j=0; j<v_ar[i].size(); ++j)
+      for(int j=0; j<v_ar[i].extent(0); ++j)
       {
         // Si += x_ij
-        Si += v_ar[i].get<double,1>(j);
+        Si += v_ar[i](j,a);
       }
       // Si = mean of the samples class i
-      Si /= static_cast<double>(v_ar[i].size());
+      Si /= static_cast<double>(v_ar[i].extent(0));
       m_cache_D_1 += Si;
     }
     m_cache_D_1 /= static_cast<double>(v_ar.size());
@@ -313,7 +305,7 @@ void train::PLDABaseTrainer::initF(mach::PLDABaseMachine& machine,
     bob::math::svd(S, U, sigma);
 
     // d/ Updates F
-    blitz::Array<double,2> Uslice = U(blitz::Range::all(), blitz::Range(0,machine.getDimF()-1));
+    blitz::Array<double,2> Uslice = U(a, blitz::Range(0,machine.getDimF()-1));
     blitz::Array<double,1> sigma_slice = sigma(blitz::Range(0,machine.getDimF()-1));
     sigma_slice = blitz::sqrt(sigma_slice);
     F = Uslice(bi,bj) / sigma_slice(bj);
@@ -336,9 +328,10 @@ void train::PLDABaseTrainer::initF(mach::PLDABaseMachine& machine,
 }
 
 void train::PLDABaseTrainer::initG(mach::PLDABaseMachine& machine, 
-  const std::vector<bob::io::Arrayset>& v_ar) 
+  const std::vector<blitz::Array<double,2> >& v_ar) 
 {
   blitz::Array<double,2>& G = machine.updateG();
+  blitz::Range a = blitz::Range::all();
 
   // 1: within-class scatter
   if(m_initG_method==1) 
@@ -348,7 +341,7 @@ void train::PLDABaseTrainer::initG(mach::PLDABaseMachine& machine,
     blitz::secondIndex bj;
     size_t Nsamples=0;
     for(size_t i=0; i<v_ar.size(); ++i)
-      Nsamples += v_ar[i].size();
+      Nsamples += v_ar[i].extent(0);
         
     blitz::Array<double,2> S(machine.getDimD(), Nsamples);
     S = 0.;
@@ -358,20 +351,20 @@ void train::PLDABaseTrainer::initG(mach::PLDABaseMachine& machine,
     {
       // Computes the mean of the samples class i
       m_cache_D_2 = 0.;
-      for(size_t j=0; j<v_ar[i].size(); ++j)
+      for(int j=0; j<v_ar[i].extent(0); ++j)
       {
         // m_cache_D_2 += x_ij
-        m_cache_D_2 += v_ar[i].get<double,1>(j);
+        m_cache_D_2 += v_ar[i](j,a);
       }
       // m_cache_D_2 = mean of the samples class i
-      m_cache_D_2 /= static_cast<double>(v_ar[i].size());
+      m_cache_D_2 /= static_cast<double>(v_ar[i].extent(0));
 
       // Generates the scatter
-      for(size_t j=0; j<v_ar[i].size(); ++j)
+      for(int j=0; j<v_ar[i].extent(0); ++j)
       {
-        blitz::Array<double,1> Si = S(blitz::Range::all(), counter);
+        blitz::Array<double,1> Si = S(a, counter);
         // Si = x_ij - mean_i
-        Si = v_ar[i].get<double,1>(j) - m_cache_D_2;
+        Si = v_ar[i](j,a) - m_cache_D_2;
         // mean of the within class
         m_cache_D_1 += Si;
         ++counter;
@@ -411,9 +404,10 @@ void train::PLDABaseTrainer::initG(mach::PLDABaseMachine& machine,
 }
 
 void train::PLDABaseTrainer::initSigma(mach::PLDABaseMachine& machine, 
-  const std::vector<bob::io::Arrayset>& v_ar) 
+  const std::vector<blitz::Array<double,2> >& v_ar) 
 {
   blitz::Array<double,1>& sigma = machine.updateSigma();
+  blitz::Range a = blitz::Range::all();
   double eps = std::numeric_limits<double>::epsilon(); // Sigma should be invertible...
 
   // 1: percentage of the variance of G
@@ -436,17 +430,17 @@ void train::PLDABaseTrainer::initSigma(mach::PLDABaseMachine& machine,
     size_t Ns = 0;
     for(size_t i=0; i<v_ar.size(); ++i)
     {
-      for(size_t j=0; j<v_ar[i].size(); ++j) 
-        m_cache_D_1 += v_ar[i].get<double,1>(j);
-      Ns += v_ar[i].size();
+      for(int j=0; j<v_ar[i].extent(0); ++j) 
+        m_cache_D_1 += v_ar[i](j,a);
+      Ns += v_ar[i].extent(0);
     }
     m_cache_D_1 /= static_cast<double>(Ns);
   
     // b/ Computes the variance:
     m_cache_D_2 = 0.;
     for(size_t i=0; i<v_ar.size(); ++i)
-      for(size_t j=0; j<v_ar[i].size(); ++j) 
-        m_cache_D_2 += blitz::pow2(v_ar[i].get<double,1>(j) - m_cache_D_1);
+      for(int j=0; j<v_ar[i].extent(0); ++j) 
+        m_cache_D_2 += blitz::pow2(v_ar[i](j,a) - m_cache_D_1);
     sigma = m_initSigma_ratio * m_cache_D_2 / static_cast<double>(Ns-1);
   }
   // otherwise: random initialization
@@ -499,7 +493,7 @@ void train::PLDABaseTrainer::initRandomFGSigma(mach::PLDABaseMachine& machine)
 
 
 void train::PLDABaseTrainer::eStep(mach::PLDABaseMachine& machine, 
-  const std::vector<bob::io::Arrayset>& v_ar)
+  const std::vector<blitz::Array<double,2> >& v_ar)
 {  
   // Precomputes useful variables using current estimates of F,G, and sigma
   precomputeFromFGSigma(machine);
@@ -509,6 +503,7 @@ void train::PLDABaseTrainer::eStep(mach::PLDABaseMachine& machine,
   const blitz::Array<double,2>& F = machine.getF();
   const blitz::Array<double,2>& FtBeta = machine.getFtBeta();
   const blitz::Array<double,2>& GtISigma = machine.getGtISigma();
+  blitz::Range a = blitz::Range::all();
 
   // blitz indices
   blitz::firstIndex bi;
@@ -521,17 +516,17 @@ void train::PLDABaseTrainer::eStep(mach::PLDABaseMachine& machine,
     // 1/a/ Computes expectation of h_i
     // Loop over the samples
     m_cache_nf_1 = 0.;
-    for(size_t j=0; j<v_ar[i].size(); ++j)
+    for(int j=0; j<v_ar[i].extent(0); ++j)
     {
       // m_cache_D_1 = x_sj-mu
-      m_cache_D_1 = v_ar[i].get<double,1>(j) - mu;
+      m_cache_D_1 = v_ar[i](j,a) - mu;
 
       // m_cache_nf_2 = F^T.beta.(x_sj-mu)
       bob::math::prod(FtBeta, m_cache_D_1, m_cache_nf_2);
       // m_cache_nf_1 = sum_j F^T.beta.(x_sj-mu)
       m_cache_nf_1 += m_cache_nf_2;
     }
-    const blitz::Array<double,2>& gamma_a = machine.getAddGamma(v_ar[i].size());
+    const blitz::Array<double,2>& gamma_a = machine.getAddGamma(v_ar[i].extent(0));
     blitz::Range r_hi(0, m_nf-1);
     // m_cache_nf_2 = E(h_i) = gamma_A  sum_j F^T.beta.(x_sj-mu)
     bob::math::prod(gamma_a, m_cache_nf_1, m_cache_nf_2);
@@ -541,20 +536,20 @@ void train::PLDABaseTrainer::eStep(mach::PLDABaseMachine& machine,
 
     // 2/ First and second order statistics of z
     // Precomputed values 
-    blitz::Array<double,2>& zeta_a = m_zeta[v_ar[i].size()];
-    blitz::Array<double,2>& iota_a = m_iota[v_ar[i].size()];
+    blitz::Array<double,2>& zeta_a = m_zeta[v_ar[i].extent(0)];
+    blitz::Array<double,2>& iota_a = m_iota[v_ar[i].extent(0)];
     blitz::Array<double,2> iotat_a = iota_a.transpose(1,0);
 
     // Extracts statistics of z_ij = [h_i w_ij] from y_i = [h_i w_i1 ... w_iJ]
     blitz::Range r1(0, m_nf-1);
     blitz::Range r2(m_nf, m_nf+m_ng-1);
-    for(size_t j=0; j<v_ar[i].size(); ++j)
+    for(int j=0; j<v_ar[i].extent(0); ++j)
     {
       // 1/ First order statistics of z
       blitz::Array<double,1> z_first_order_ij_1 = m_z_first_order[i](j,r1);
       z_first_order_ij_1 = m_cache_nf_2; // E{h_i}
       // m_cache_D_1 = x_sj - mu - F.E{h_i}
-      m_cache_D_1 = v_ar[i].get<double,1>(j) - mu - m_cache_D_2;
+      m_cache_D_1 = v_ar[i](j,a) - mu - m_cache_D_2;
       // m_cache_ng_1 = G^T.sigma^-1.(x_sj-mu-fhi)
       bob::math::prod(GtISigma, m_cache_D_1, m_cache_ng_1);
       // z_first_order_ij_2 = (Id+G^T.sigma^-1.G)^-1.G^T.sigma^-1.(x_sj-mu) = E{w_ij}
@@ -620,7 +615,7 @@ void train::PLDABaseTrainer::precomputeFromFGSigma(mach::PLDABaseMachine& machin
 }
 
 void train::PLDABaseTrainer::precomputeLogLike(mach::PLDABaseMachine& machine, 
-  const std::vector<bob::io::Arrayset>& v_ar) 
+  const std::vector<blitz::Array<double,2> >& v_ar) 
 {
   // Precomputes the log determinant of alpha and sigma
   machine.precomputeLogLike();
@@ -638,7 +633,7 @@ void train::PLDABaseTrainer::precomputeLogLike(mach::PLDABaseMachine& machine,
 
 
 void train::PLDABaseTrainer::mStep(mach::PLDABaseMachine& machine, 
-  const std::vector<bob::io::Arrayset>& v_ar) 
+  const std::vector<blitz::Array<double,2> >& v_ar) 
 {
   // TODO: 0/ Add mean update rule as an option?
 
@@ -655,7 +650,7 @@ void train::PLDABaseTrainer::mStep(mach::PLDABaseMachine& machine,
 }
 
 void train::PLDABaseTrainer::updateFG(mach::PLDABaseMachine& machine,
-  const std::vector<bob::io::Arrayset>& v_ar)
+  const std::vector<blitz::Array<double,2> >& v_ar)
 {
   /// Computes the B matrix (B = [F G])
   /// B = (sum_ij (x_ij-mu).E{z_i}^T).(sum_ij E{z_i.z_i^T})^-1
@@ -663,16 +658,17 @@ void train::PLDABaseTrainer::updateFG(mach::PLDABaseMachine& machine,
   // 1/ Computes the numerator (sum_ij (x_ij-mu).E{z_i}^T)
   // Gets the mean mu from the machine
   const blitz::Array<double,1>& mu = machine.getMu();
+  blitz::Range a = blitz::Range::all();
   m_cache_D_nfng_2 = 0.;
   for(size_t i=0; i<v_ar.size(); ++i)
   {
     // Loop over the samples
-    for(size_t j=0; j<v_ar[i].size(); ++j)
+    for(int j=0; j<v_ar[i].extent(0); ++j)
     {
       // m_cache_D_1 = x_sj-mu
-      m_cache_D_1 = v_ar[i].get<double,1>(j) - mu;
+      m_cache_D_1 = v_ar[i](j,a) - mu;
       // z_first_order_ij = E{z_ij}
-      blitz::Array<double,1> z_first_order_ij = m_z_first_order[i](j, blitz::Range::all());
+      blitz::Array<double,1> z_first_order_ij = m_z_first_order[i](j, a);
       // m_cache_D_nfng_1 = (x_sj-mu).E{z_ij}^T
       bob::math::prod(m_cache_D_1, z_first_order_ij, m_cache_D_nfng_1);
       m_cache_D_nfng_2 += m_cache_D_nfng_1;
@@ -695,7 +691,7 @@ void train::PLDABaseTrainer::updateFG(mach::PLDABaseMachine& machine,
 }
 
 void train::PLDABaseTrainer::updateSigma(mach::PLDABaseMachine& machine,
-  const std::vector<bob::io::Arrayset>& v_ar)
+  const std::vector<blitz::Array<double,2> >& v_ar)
 {
   /// Computes the Sigma matrix
   /// Sigma = 1/IJ sum_ij Diag{(x_ij-mu).(x_ij-mu)^T - B.E{z_i}.(x_ij-mu)^T}
@@ -703,21 +699,22 @@ void train::PLDABaseTrainer::updateSigma(mach::PLDABaseMachine& machine,
   // Gets the mean mu and the matrix sigma from the machine
   blitz::Array<double,1>& sigma = machine.updateSigma();
   const blitz::Array<double,1>& mu = machine.getMu();
+  blitz::Range a = blitz::Range::all();
 
   sigma = 0.;
   size_t n_IJ=0; /// counts the number of samples
   for(size_t i=0; i<v_ar.size(); ++i)
   {
     // Loop over the samples
-    for(size_t j=0; j<v_ar[i].size(); ++j)
+    for(size_t j=0; j<v_ar[i].extent(0); ++j)
     {
       // m_cache_D_1 = x_ij-mu
-      m_cache_D_1 = v_ar[i].get<double,1>(j) - mu;
+      m_cache_D_1 = v_ar[i](j,a) - mu;
       // sigma += Diag{(x_ij-mu).(x_ij-mu)^T}
       sigma += blitz::pow2(m_cache_D_1);
 
       // z_first_order_ij = E{z_ij}
-      blitz::Array<double,1> z_first_order_ij = m_z_first_order[i](j, blitz::Range::all());
+      blitz::Array<double,1> z_first_order_ij = m_z_first_order[i](j,a);
       // m_cache_D_2 = B.E{z_ij}
       bob::math::prod(m_B, z_first_order_ij, m_cache_D_2);
       // sigma -= Diag{B.E{z_ij}.(x_ij-mu)
@@ -767,26 +764,17 @@ train::PLDATrainer& train::PLDATrainer::operator=
 }
 
 
-void train::PLDATrainer::enrol(const io::Arrayset& ar)
+void train::PLDATrainer::enrol(const blitz::Array<double,2>& ar)
 {
   // Checks Arrayset using the check function from the PLDABaseTrainer
   // Gets dimension (first Arrayset)
-  size_t n_features = ar.getShape()[0];
-  size_t n_samples = ar.size();
+  int n_features = ar.extent(1);
+  int n_samples = ar.extent(0);
     
-  // Checks for arrayset data type and shape
-  if(ar.getElementType() != bob::core::array::t_float64) {
-    throw bob::io::TypeError(ar.getElementType(),
-      bob::core::array::t_float64);
-  }
-  if(ar.getNDim() != 1) {
-    throw bob::io::DimensionError(ar.getNDim(), 1);
-  }
   // TODO: Do a useful comparison against the dimensionality from the base 
   // trainer/machine
-  if(ar.getShape()[0] != n_features)
-    throw bob::trainer::WrongNumberOfFeatures(ar.getShape()[0], 
-                                                n_features, 0);
+  if(ar.extent(1) != n_features)
+    throw bob::trainer::WrongNumberOfFeatures(ar.extent(1), n_features, 0);
 
   // Useful values from the base machine
   blitz::Array<double, 1>& weighted_sum = m_plda_machine.updateWeightedSum();
@@ -802,8 +790,9 @@ void train::PLDATrainer::enrol(const io::Arrayset& ar)
   m_plda_machine.setNSamples(n_samples);
   double terma = 0.;
   weighted_sum = 0.;
-  for(size_t i=0; i<n_samples; ++i) {
-    m_cache_D_1 =  ar.get<double,1>(i) - mu;
+  blitz::Range a = blitz::Range::all();
+  for(int i=0; i<n_samples; ++i) {
+    m_cache_D_1 =  ar(i,a) - mu;
     // a/ weighted sum
     bob::math::prod(FtBeta, m_cache_D_1, m_cache_nf_1);
     weighted_sum += m_cache_nf_1;

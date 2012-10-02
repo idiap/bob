@@ -27,7 +27,7 @@
 using namespace boost::python;
 
 object train1(const bob::trainer::LLRTrainer& t, 
-  const bob::io::Arrayset& data1, const bob::io::Arrayset& data2) 
+  const blitz::Array<double,2>& data1, const blitz::Array<double,2>& data2) 
 {
   bob::machine::LinearMachine m;
   t.train(m, data1, data2);
@@ -35,7 +35,7 @@ object train1(const bob::trainer::LLRTrainer& t,
 }
 
 void train2(const bob::trainer::LLRTrainer& t, bob::machine::LinearMachine& m, 
-  const bob::io::Arrayset& data1, const bob::io::Arrayset& data2) 
+  const blitz::Array<double,2>& data1, const blitz::Array<double,2>& data2) 
 {
   t.train(m, data1, data2);
 }

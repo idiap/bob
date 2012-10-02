@@ -29,14 +29,14 @@ namespace io = bob::io;
 namespace mach = bob::machine;
 namespace train = bob::trainer;
 
-boost::shared_ptr<mach::WienerMachine> wiener_train1 (const train::WienerTrainer& t, const io::Arrayset& data) {
+boost::shared_ptr<mach::WienerMachine> wiener_train1 (const train::WienerTrainer& t, const blitz::Array<double,3>& data) {
   boost::shared_ptr<mach::WienerMachine> m;
   t.train(*m, data);
   return m;
 }
 
 void wiener_train2 (const train::WienerTrainer& t, mach::WienerMachine& m,
-    const io::Arrayset& data) {
+    const blitz::Array<double,3>& data) {
   t.train(m, data);
 }
 

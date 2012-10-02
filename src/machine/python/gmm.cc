@@ -19,7 +19,6 @@
  */
 #include <boost/python.hpp>
 #include <boost/concept_check.hpp>
-#include "bob/io/Arrayset.h"
 #include "bob/machine/GMMStats.h"
 #include "bob/machine/GMMMachine.h"
 #include "bob/machine/GMMLLRMachine.h"
@@ -286,10 +285,10 @@ void bind_machine_gmm()
     .def("acc_statistics_", &py_gmmmachine_accStatistics_, args("self", "x", "stats"),
          "Accumulate the GMM statistics for this sample. Inputs are NOT checked.")
     .def("acc_statistics",
-         (void (mach::GMMMachine::*)(const io::Arrayset&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics,
+         (void (mach::GMMMachine::*)(const blitz::Array<double,2>&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics,
          args("sampler", "stats"), "Accumulates the GMM statistics over a set of samples. Inputs are checked.")
     .def("acc_statistics_",
-         (void (mach::GMMMachine::*)(const io::Arrayset&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics_,
+         (void (mach::GMMMachine::*)(const blitz::Array<double,2>&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics_,
          args("sampler", "stats"), "Accumulates the GMM statistics over a set of samples. Inputs are NOT checked.")
     .def("load", &mach::GMMMachine::load, "Load from a Configuration")
     .def("save", &mach::GMMMachine::save, "Save to a Configuration")

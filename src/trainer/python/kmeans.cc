@@ -18,7 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <boost/python.hpp>
-#include "bob/io/Arrayset.h"
 #include "bob/trainer/KMeansTrainer.h"
 
 using namespace boost::python;
@@ -29,7 +28,7 @@ namespace io = bob::io;
 
 void bind_trainer_kmeans() {
 
-  typedef train::EMTrainer<mach::KMeansMachine, io::Arrayset> EMTrainerKMeansBase; 
+  typedef train::EMTrainer<mach::KMeansMachine, blitz::Array<double,2> > EMTrainerKMeansBase; 
 
   class_<EMTrainerKMeansBase, boost::noncopyable>("EMTrainerKMeans", "The base python class for all EM-based trainers.", no_init)
     .add_property("convergence_threshold", &EMTrainerKMeansBase::getConvergenceThreshold, &EMTrainerKMeansBase::setConvergenceThreshold, "Convergence threshold")

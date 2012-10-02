@@ -52,7 +52,7 @@ class MAP_GMMTrainer : public GMMTrainer {
     /**
      * Initialization
      */
-    virtual void initialization(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data);
+    virtual void initialization(bob::machine::GMMMachine& gmm, const blitz::Array<double,2>& data);
 
     /**
      * Set the GMM to use as a prior for MAP adaptation.
@@ -67,7 +67,7 @@ class MAP_GMMTrainer : public GMMTrainer {
      * parameters of the prior model
      * Implements EMTrainer::mStep()
      */
-    void mStep(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data);
+    void mStep(bob::machine::GMMMachine& gmm, const blitz::Array<double,2>& data);
 
     /**
      * Use a Torch3-like adaptation rule rather than Reynolds'one

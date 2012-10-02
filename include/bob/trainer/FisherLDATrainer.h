@@ -30,7 +30,6 @@
 
 #include "bob/trainer/Trainer.h"
 #include "bob/machine/LinearMachine.h"
-#include "bob/io/Arrayset.h"
 
 namespace bob { namespace trainer {
   
@@ -78,7 +77,7 @@ namespace bob { namespace trainer {
        * output further using resize() if necessary.
        */
       virtual void train(bob::machine::LinearMachine& machine, 
-          const std::vector<bob::io::Arrayset>& data) const;
+          const std::vector<blitz::Array<double,2> >& data) const;
 
       /**
        * Trains the LinearMachine to perform Fisher/LDA discrimination. The
@@ -95,7 +94,7 @@ namespace bob { namespace trainer {
        */
       virtual void train(bob::machine::LinearMachine& machine,
           blitz::Array<double,1>& eigen_values,
-          const std::vector<bob::io::Arrayset>& data) const;
+          const std::vector<blitz::Array<double,2> >& data) const;
 
   };
 

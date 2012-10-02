@@ -30,51 +30,6 @@ namespace array = bob::core::array;
 namespace train = bob::trainer;
 
 train::DataShuffler::DataShuffler
-(const std::vector<bob::io::Arrayset>& data,
- const std::vector<blitz::Array<double,1> >& target):
-  m_data(data.size()),
-  m_target(target.size()),
-  m_range(),
-  m_do_stdnorm(false),
-  m_mean(),
-  m_stddev()
-{
-  if (data.size() == 0) throw train::WrongNumberOfClasses(0);
-  if (target.size() == 0) throw train::WrongNumberOfClasses(0);
-  
-  array::assertSameDimensionLength(data.size(), target.size());
-  
-  // checks shapes, minimum number of examples
-  for (size_t k=0; k<data.size(); ++k) {
-    if (data[k].size() == 0) throw WrongNumberOfFeatures(0, 1, k);
-    //this may also trigger if I cannot get doubles from the Arrayset
-    array::assertSameShape(data[0].get<double,1>(0), data[k].get<double,1>(0));
-    array::assertSameShape(target[0], target[k]);
-  }
-
-  // set save values for the mean and stddev (even if not used at start)
-  m_mean.resize(data[0].getShape()[0]);
-  m_mean = 0.;
-  m_stddev.resize(data[0].getShape()[0]);
-  m_stddev = 1.;
-
-  // copies the target and data to my own variables
-  blitz::Range all = blitz::Range::all();
-  for (size_t k=0; k<target.size(); ++k) {
-    m_data[k].reference(blitz::Array<double,2>(data[k].size(),
-          data[k].getShape()[0]));
-    for (size_t i=0; i<data[k].size(); ++i)
-      m_data[k](i,all) = data[k].get<double,1>(i);
-    m_target[k].reference(bob::core::array::ccopy(target[k]));
-  }
-
-  // creates one range tailored for the range of each data object
-  for (size_t i=0; i<data.size(); ++i) {
-    m_range.push_back(boost::uniform_int<size_t>(0, m_data[i].extent(0)-1));
-  }
-}
-
-train::DataShuffler::DataShuffler
 (const std::vector<blitz::Array<double,2> >& data,
  const std::vector<blitz::Array<double,1> >& target):
   m_data(data.size()),

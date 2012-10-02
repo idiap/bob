@@ -25,7 +25,6 @@
 #define BOB_TRAINER_SVDPCA_TRAINER_H
 
 #include "bob/machine/LinearMachine.h"
-#include "bob/io/Arrayset.h"
 
 namespace bob { namespace trainer {
   
@@ -74,7 +73,7 @@ namespace bob { namespace trainer {
        * decreasing energy automatically. You don't need to sort the results.
        */
       virtual void train(bob::machine::LinearMachine& machine, 
-          const bob::io::Arrayset& data) const;
+          const blitz::Array<double,2>& data) const;
 
       /**
        * Trains the LinearMachine to perform the KLT. The resulting machine
@@ -85,7 +84,7 @@ namespace bob { namespace trainer {
        */
       virtual void train(bob::machine::LinearMachine& machine,
           blitz::Array<double,1>& eigen_values,
-          const bob::io::Arrayset& data) const;
+          const blitz::Array<double,2>& data) const;
 
     private: //representation
 

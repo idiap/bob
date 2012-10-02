@@ -24,7 +24,6 @@
 #ifndef BOB_MACHINE_JFAMACHINE_H
 #define BOB_MACHINE_JFAMACHINE_H
 
-#include "bob/io/Arrayset.h"
 #include "bob/io/HDF5File.h"
 #include "bob/machine/GMMMachine.h"
 #include "bob/machine/JFAMachineException.h"

@@ -19,7 +19,6 @@
  */
 #include <boost/python.hpp>
 #include <boost/concept_check.hpp>
-#include "bob/io/Arrayset.h"
 #include "bob/machine/KMeansMachine.h"
 
 #include "bob/core/python/ndarray.h"
@@ -30,7 +29,7 @@ namespace mach = bob::machine;
 namespace bp = bob::python;
 namespace ca = bob::core::array;
 
-static tuple py_getVariancesAndWeightsForEachCluster(const mach::KMeansMachine& machine, const io::Arrayset& ar) {
+static tuple py_getVariancesAndWeightsForEachCluster(const mach::KMeansMachine& machine, const blitz::Array<double,2>& ar) {
   size_t n_means = machine.getNMeans();
   size_t n_inputs = machine.getNInputs();
   bp::ndarray variances(ca::t_float64, n_means, n_inputs);

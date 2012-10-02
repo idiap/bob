@@ -29,14 +29,13 @@
 #include <vector>
 #include "bob/trainer/EMTrainer.h"
 #include "bob/machine/PLDAMachine.h"
-#include "bob/io/Arrayset.h"
 
 namespace bob { namespace trainer {
   
   /**
     */
   class PLDABaseTrainer: public EMTrainer<bob::machine::PLDABaseMachine, 
-                                             std::vector<bob::io::Arrayset> >
+                                             std::vector<blitz::Array<double,2> > >
   {
     public: //api
       /**
@@ -66,13 +65,13 @@ namespace bob { namespace trainer {
         * This methods performs some initialization before the E- and M-steps.
         */
       virtual void initialization(bob::machine::PLDABaseMachine& machine, 
-        const std::vector<bob::io::Arrayset>& v_ar);
+        const std::vector<blitz::Array<double,2> >& v_ar);
       /**
         * This methods performs some actions after the end of the E- and 
         * M-steps.
         */
       virtual void finalization(bob::machine::PLDABaseMachine& machine, 
-        const std::vector<bob::io::Arrayset>& v_ar);
+        const std::vector<blitz::Array<double,2> >& v_ar);
       
       /**
         * Calculates and saves statistics across the dataset, and saves these 
@@ -81,13 +80,13 @@ namespace bob { namespace trainer {
         * The statistics will be used in the mStep() that follows.
         */
       virtual void eStep(bob::machine::PLDABaseMachine& machine, 
-        const std::vector<bob::io::Arrayset>& v_ar);
+        const std::vector<blitz::Array<double,2> >& v_ar);
 
       /**
         * Performs a maximization step to update the parameters of the 
         */
       virtual void mStep(bob::machine::PLDABaseMachine& machine,
-         const std::vector<bob::io::Arrayset>& v_ar);
+         const std::vector<blitz::Array<double,2> >& v_ar);
 
       /**
         * Computes the average log likelihood using the current estimates of 
@@ -222,27 +221,27 @@ namespace bob { namespace trainer {
 
       // internal methods
       void computeMeanVariance(bob::machine::PLDABaseMachine& machine,
-        const std::vector<bob::io::Arrayset>& v_ar);
-      void initMembers(const std::vector<bob::io::Arrayset>& v_ar);
+        const std::vector<blitz::Array<double,2> >& v_ar);
+      void initMembers(const std::vector<blitz::Array<double,2> >& v_ar);
       void initFGSigma(bob::machine::PLDABaseMachine& machine, 
-        const std::vector<bob::io::Arrayset>& v_ar);
+        const std::vector<blitz::Array<double,2> >& v_ar);
       void initF(bob::machine::PLDABaseMachine& machine, 
-        const std::vector<bob::io::Arrayset>& v_ar);
+        const std::vector<blitz::Array<double,2> >& v_ar);
       void initG(bob::machine::PLDABaseMachine& machine, 
-        const std::vector<bob::io::Arrayset>& v_ar);
+        const std::vector<blitz::Array<double,2> >& v_ar);
       void initSigma(bob::machine::PLDABaseMachine& machine, 
-        const std::vector<bob::io::Arrayset>& v_ar);
+        const std::vector<blitz::Array<double,2> >& v_ar);
       void initRandomFGSigma(bob::machine::PLDABaseMachine& machine);
 
-      void checkTrainingData(const std::vector<bob::io::Arrayset>& v_ar);
+      void checkTrainingData(const std::vector<blitz::Array<double,2> >& v_ar);
       void precomputeFromFGSigma(bob::machine::PLDABaseMachine& machine);
       void precomputeLogLike(bob::machine::PLDABaseMachine& machine, 
-        const std::vector<bob::io::Arrayset>& v_ar);
+        const std::vector<blitz::Array<double,2> >& v_ar);
 
       void updateFG(bob::machine::PLDABaseMachine& machine,
-        const std::vector<bob::io::Arrayset>& v_ar);
+        const std::vector<blitz::Array<double,2> >& v_ar);
       void updateSigma(bob::machine::PLDABaseMachine& machine,
-        const std::vector<bob::io::Arrayset>& v_ar);
+        const std::vector<blitz::Array<double,2> >& v_ar);
   };
 
 
@@ -273,7 +272,7 @@ namespace bob { namespace trainer {
       /**
         * Main procedure for enrolling with this PLDA trainer
         */
-      void enrol(const bob::io::Arrayset& ar);
+      void enrol(const blitz::Array<double,2>& ar);
 
     private:
 

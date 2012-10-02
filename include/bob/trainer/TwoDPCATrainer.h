@@ -22,7 +22,6 @@
 
 #include "Trainer.h"
 #include "bob/core/logging.h"
-#include "bob/io/Arrayset.h"
 #include "bob/machine/TwoDPCAMachine.h"
 #include <algorithm>
 #include <utility>
@@ -33,13 +32,13 @@ namespace bob
   namespace trainer 
   {
   
-    class TwoDPCATrainer : virtual public Trainer<bob::machine::TwoDPCAMachine, bob::io::Arrayset>
+    class TwoDPCATrainer : virtual public Trainer<bob::machine::TwoDPCAMachine, blitz::Array<double,2> >
     {
       public:
         TwoDPCATrainer() {}
         virtual ~TwoDPCATrainer() {}
   
-        void train(bob::machine::TwoDPCAMachine& machine, const bob::io::Arrayset& data); 
+        void train(bob::machine::TwoDPCAMachine& machine, const blitz::Array<double,3>& data); 
 
       protected:
 

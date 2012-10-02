@@ -264,25 +264,29 @@ void bob::machine::GMMMachine::forward(const blitz::Array<double,1>& input, doub
   forward_(input,output);
 }
 
-void bob::machine::GMMMachine::forward_(const blitz::Array<double,1>& input, double& output) const {
+void bob::machine::GMMMachine::forward_(const blitz::Array<double,1>& input,
+    double& output) const {
   output = logLikelihood(input);
 }
 
-void bob::machine::GMMMachine::accStatistics(const bob::io::Arrayset& ar, bob::machine::GMMStats& stats) const {
+void bob::machine::GMMMachine::accStatistics(const blitz::Array<double,2>& input,
+    bob::machine::GMMStats& stats) const {
   // iterate over data
-  for(size_t i=0; i<ar.size(); ++i) {
+  blitz::Range a = blitz::Range::all();
+  for(int i=0; i<input.extent(0); ++i) {
     // Get example
-    blitz::Array<double,1> x(ar.get<double,1>(i));
+    blitz::Array<double,1> x(input(i,a));
     // Accumulate statistics
     accStatistics(x,stats);
   }
 }
 
-void bob::machine::GMMMachine::accStatistics_(const bob::io::Arrayset& ar, bob::machine::GMMStats& stats) const {
+void bob::machine::GMMMachine::accStatistics_(const blitz::Array<double,2>& input, bob::machine::GMMStats& stats) const {
   // iterate over data
-  for(size_t i=0; i<ar.size(); ++i) {
+  blitz::Range a = blitz::Range::all();
+  for(int i=0; i<input.extent(0); ++i) {
     // Get example
-    blitz::Array<double,1> x(ar.get<double,1>(i));
+    blitz::Array<double,1> x(input(i, a));
     // Accumulate statistics
     accStatistics_(x,stats);
   }

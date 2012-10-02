@@ -18,7 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <boost/python.hpp>
-#include "bob/io/Arrayset.h"
 #include "bob/trainer/GMMTrainer.h"
 #include "bob/trainer/MAP_GMMTrainer.h"
 #include "bob/trainer/ML_GMMTrainer.h"
@@ -30,20 +29,20 @@ namespace mach = bob::machine;
 namespace io = bob::io;
 
 
-class EMTrainerGMMWrapper: public train::EMTrainer<mach::GMMMachine, io::Arrayset>, 
-                           public wrapper<train::EMTrainer<mach::GMMMachine, io::Arrayset> > 
+class EMTrainerGMMWrapper: public train::EMTrainer<mach::GMMMachine, blitz::Array<double,2> >, 
+                           public wrapper<train::EMTrainer<mach::GMMMachine, blitz::Array<double,2> > > 
 {
 public:
   EMTrainerGMMWrapper(double convergence_threshold = 0.001, int max_iterations = 10, bool compute_likelihood = true):
-    train::EMTrainer<mach::GMMMachine, io::Arrayset >(convergence_threshold, max_iterations, compute_likelihood) {}
+    train::EMTrainer<mach::GMMMachine, blitz::Array<double,2> >(convergence_threshold, max_iterations, compute_likelihood) {}
 
   virtual ~EMTrainerGMMWrapper() {}
  
-  void initialization(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void initialization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     this->get_override("initialization")(machine, data);
   }
   
-  void eStep(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void eStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     this->get_override("e_step")(machine, data);
   }
 
@@ -51,23 +50,23 @@ public:
     return this->get_override("compute_likelihood")(machine);
   }
   
-  void mStep(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void mStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     this->get_override("m_step")(machine, data);
   }
 
-  void finalization(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void finalization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     this->get_override("finalization")(machine, data);
   }
  
-  void train(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void train(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_train = this->get_override("train")) 
       python_train(machine, data);
     else
-      train::EMTrainer<mach::GMMMachine, io::Arrayset>::train(machine, data);
+      train::EMTrainer<mach::GMMMachine, blitz::Array<double,2> >::train(machine, data);
   }
 
-  void d_train(mach::GMMMachine& machine, const io::Arrayset& data) {
-    train::EMTrainer<mach::GMMMachine, io::Arrayset>::train(machine, data);
+  void d_train(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
+    train::EMTrainer<mach::GMMMachine, blitz::Array<double,2> >::train(machine, data);
   }
 
 };
@@ -83,23 +82,23 @@ public:
 
   virtual ~GMMTrainerWrapper() {}
   
-  void initialization(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void initialization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_initialization = this->get_override("initialization")) 
       python_initialization(machine, data);
     else
       train::GMMTrainer::initialization(machine, data);
   }
   
-  void d_initialization(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void d_initialization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     train::GMMTrainer::initialization(machine, data);
   }
   
-  void eStep(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void eStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_eStep = this->get_override("e_step")) python_eStep(machine, data);
     train::GMMTrainer::eStep(machine, data);
   }
   
-  void d_eStep(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void d_eStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     train::GMMTrainer::eStep(machine, data);
   }
 
@@ -112,29 +111,29 @@ public:
     return train::GMMTrainer::computeLikelihood(machine);
   }
 
-  void mStep(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void mStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     this->get_override("m_step")(machine, data);
   }
 
-  void finalization(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void finalization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_finalization = this->get_override("finalization")) 
       python_finalization(machine, data);
     else
       train::GMMTrainer::finalization(machine, data);
   }
   
-  void d_finalization(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void d_finalization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     train::GMMTrainer::finalization(machine, data);
   } 
 
-  void train(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void train(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_train = this->get_override("train")) 
       python_train(machine, data);
     else
       train::GMMTrainer::train(machine, data);
   }
 
-  void d_train(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void d_train(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     train::GMMTrainer::train(machine, data);
   }
  
@@ -151,23 +150,23 @@ public:
 
   virtual ~MAP_GMMTrainerWrapper() {}
 
-  void initialization(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void initialization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_initialization = this->get_override("initialization")) 
       python_initialization(machine, data);
     else
       train::MAP_GMMTrainer::initialization(machine, data);
   }
   
-  void d_initialization(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void d_initialization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     train::MAP_GMMTrainer::initialization(machine, data);
   }
   
-  void eStep(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void eStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_eStep = this->get_override("e_step")) python_eStep(machine, data);
     train::MAP_GMMTrainer::eStep(machine, data);
   }
   
-  void d_eStep(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void d_eStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     train::MAP_GMMTrainer::eStep(machine, data);
   }
 
@@ -180,36 +179,36 @@ public:
     return train::MAP_GMMTrainer::computeLikelihood(machine);
   }
 
-  void mStep(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void mStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_mStep = this->get_override("m_step")) 
       python_mStep(machine, data);
     else
       train::MAP_GMMTrainer::mStep(machine, data);
   }
   
-  void d_mStep(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void d_mStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     train::MAP_GMMTrainer::mStep(machine, data);
   }
 
-  void finalization(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void finalization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_finalization = this->get_override("finalization")) 
       python_finalization(machine, data);
     else
       train::MAP_GMMTrainer::finalization(machine, data);
   }
   
-  void d_finalization(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void d_finalization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     train::MAP_GMMTrainer::finalization(machine, data);
   } 
 
-  void train(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void train(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_train = this->get_override("train")) 
       python_train(machine, data);
     else
       train::MAP_GMMTrainer::train(machine, data);
   }
 
-  void d_train(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void d_train(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     train::MAP_GMMTrainer::train(machine, data);
   }
  
@@ -225,23 +224,23 @@ public:
 
   virtual ~ML_GMMTrainerWrapper() {}
 
-  void initialization(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void initialization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_initialization = this->get_override("initialization")) 
       python_initialization(machine, data);
     else
       train::ML_GMMTrainer::initialization(machine, data);
   }
   
-  void d_initialization(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void d_initialization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     train::ML_GMMTrainer::initialization(machine, data);
   }
   
-  void eStep(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void eStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_eStep = this->get_override("e_step")) python_eStep(machine, data);
     train::ML_GMMTrainer::eStep(machine, data);
   }
   
-  void d_eStep(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void d_eStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     train::ML_GMMTrainer::eStep(machine, data);
   }
 
@@ -255,36 +254,36 @@ public:
   }
 
 
-  void mStep(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void mStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_mStep = this->get_override("m_step")) 
       python_mStep(machine, data);
     else
       train::ML_GMMTrainer::mStep(machine, data);
   }
   
-  void d_mStep(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void d_mStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     train::ML_GMMTrainer::mStep(machine, data);
   }
 
-  void finalization(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void finalization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_finalization = this->get_override("finalization")) 
       python_finalization(machine, data);
     else
       train::ML_GMMTrainer::finalization(machine, data);
   }
   
-  void d_finalization(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void d_finalization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     train::ML_GMMTrainer::finalization(machine, data);
   }
  
-  void train(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void train(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_train = this->get_override("train")) 
       python_train(machine, data);
     else
       train::ML_GMMTrainer::train(machine, data);
   }
 
-  void d_train(mach::GMMMachine& machine, const io::Arrayset& data) {
+  void d_train(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
     train::ML_GMMTrainer::train(machine, data);
   }
  
@@ -293,7 +292,7 @@ public:
 
 void bind_trainer_gmm_wrappers() {
 
-  typedef train::EMTrainer<mach::GMMMachine, io::Arrayset> EMTrainerGMMBase; 
+  typedef train::EMTrainer<mach::GMMMachine, blitz::Array<double,2> > EMTrainerGMMBase; 
 
   class_<EMTrainerGMMWrapper, boost::noncopyable >("EMTrainerGMM", no_init)
     .def(init<optional<double, int, bool> >((arg("convergence_threshold")=0.001, arg("max_iterations")=10, arg("compute_likelihood")=true)))

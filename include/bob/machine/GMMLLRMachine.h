@@ -24,7 +24,6 @@
 #ifndef BOB_MACHINE_GMMLLRMACHINE_H
 #define BOB_MACHINE_GMMLLRMACHINE_H
 
-#include "bob/io/Arrayset.h"
 #include "bob/machine/Machine.h"
 #include "bob/machine/GMMMachine.h"
 #include "bob/machine/GMMLLRMachine.h"

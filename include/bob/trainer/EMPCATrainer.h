@@ -27,7 +27,6 @@
 #include <blitz/array.h>
 #include "bob/trainer/EMTrainer.h"
 #include "bob/machine/LinearMachine.h"
-#include "bob/io/Arrayset.h"
 
 namespace bob { namespace trainer {
   
@@ -48,7 +47,7 @@ namespace bob { namespace trainer {
     *      Gaussian with zero-mean and covariance matrix sigma^2 * Id
     */
   class EMPCATrainer: public EMTrainer<bob::machine::LinearMachine, 
-                                          bob::io::Arrayset> 
+                                          blitz::Array<double,2> > 
   {
     public: //api
       /**
@@ -78,13 +77,13 @@ namespace bob { namespace trainer {
         * This methods performs some initialization before the E- and M-steps.
         */
       virtual void initialization(bob::machine::LinearMachine& machine, 
-        const bob::io::Arrayset& ar);
+        const blitz::Array<double,2>& ar);
       /**
         * This methods performs some actions after the end of the E- and 
         * M-steps.
         */
       virtual void finalization(bob::machine::LinearMachine& machine, 
-        const bob::io::Arrayset& ar);
+        const blitz::Array<double,2>& ar);
       
       /**
         * Calculates and saves statistics across the dataset, and saves these 
@@ -93,13 +92,13 @@ namespace bob { namespace trainer {
         * The statistics will be used in the mStep() that follows.
         */
       virtual void eStep(bob::machine::LinearMachine& machine, 
-        const bob::io::Arrayset& ar);
+        const blitz::Array<double,2>& ar);
 
       /**
         * Performs a maximization step to update the parameters of the 
         */
       virtual void mStep(bob::machine::LinearMachine& machine,
-         const bob::io::Arrayset& ar);
+         const blitz::Array<double,2>& ar);
 
       /**
         * Computes the average log likelihood using the current estimates of 
@@ -154,12 +153,12 @@ namespace bob { namespace trainer {
       /**
         * Initializes/resizes the (array) members
         */
-      void initMembers(const io::Arrayset& ar);
+      void initMembers(const blitz::Array<double,2>& ar);
       /**
         * Computes the mean and the variance (if required) of the training data
         */
       void computeMeanVariance(bob::machine::LinearMachine& machine, 
-        const io::Arrayset& ar);
+        const blitz::Array<double,2>& ar);
       /**
         * Random initialization of W and sigma2
         * W is the projection matrix (from the LinearMachine)
@@ -180,13 +179,13 @@ namespace bob { namespace trainer {
         * estimated statistics
         */
       void updateW(bob::machine::LinearMachine& machine,
-         const bob::io::Arrayset& ar);
+         const blitz::Array<double,2>& ar);
       /**
         * M-Step (part 2): Computes the new estimate of sigma2 using the new 
         * estimated statistics
         */
       void updateSigma2(bob::machine::LinearMachine& machine,
-         const bob::io::Arrayset& ar);
+         const blitz::Array<double,2>& ar);
   };
 
 }}

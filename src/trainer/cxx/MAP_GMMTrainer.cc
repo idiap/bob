@@ -35,7 +35,7 @@ train::MAP_GMMTrainer::~MAP_GMMTrainer() {
   
 }
 
-void train::MAP_GMMTrainer::initialization(mach::GMMMachine& gmm, const io::Arrayset& data) {
+void train::MAP_GMMTrainer::initialization(mach::GMMMachine& gmm, const blitz::Array<double,2>& data) {
   // Allocate memory for the sufficient statistics and initialise
   train::GMMTrainer::initialization(gmm, data);
 
@@ -59,7 +59,7 @@ bool train::MAP_GMMTrainer::setPriorGMM(boost::shared_ptr<bob::machine::GMMMachi
   return true;
 }
 
-void train::MAP_GMMTrainer::mStep(mach::GMMMachine& gmm, const io::Arrayset& data) {
+void train::MAP_GMMTrainer::mStep(mach::GMMMachine& gmm, const blitz::Array<double,2>& data) {
   // Read options and variables
   double n_gaussians = gmm.getNGaussians();
   

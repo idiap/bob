@@ -18,7 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <boost/python.hpp>
-#include "bob/io/Arrayset.h"
 #include "bob/machine/LinearMachine.h"
 #include "bob/trainer/EMPCATrainer.h"
 
@@ -27,7 +26,7 @@ namespace train = bob::trainer;
 namespace mach = bob::machine;
 namespace io = bob::io;
 
-object ppca_train(train::EMPCATrainer& t, const io::Arrayset& data) {
+object ppca_train(train::EMPCATrainer& t, const blitz::Array<double,2>& data) {
   mach::LinearMachine m;
   t.train(m, data);
   return object(m);
@@ -35,7 +34,7 @@ object ppca_train(train::EMPCATrainer& t, const io::Arrayset& data) {
 
 void bind_trainer_empca() {
 
-  typedef train::EMTrainer<mach::LinearMachine, io::Arrayset> EMTrainerLinearBase; 
+  typedef train::EMTrainer<mach::LinearMachine, blitz::Array<double,2> > EMTrainerLinearBase; 
 
   class_<EMTrainerLinearBase, boost::noncopyable>("EMTrainerLinear", "The base python class for all EM-based trainers.", no_init)
     .add_property("convergence_threshold", &EMTrainerLinearBase::getConvergenceThreshold, &EMTrainerLinearBase::setConvergenceThreshold, "Convergence threshold")

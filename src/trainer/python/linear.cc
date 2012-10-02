@@ -30,24 +30,24 @@ namespace io = bob::io;
 namespace mach = bob::machine;
 namespace train = bob::trainer;
 
-tuple eig_train1 (const train::SVDPCATrainer& t, const io::Arrayset& data) {
-  blitz::Array<double,1> eig_val(data.getShape()[0]);
+tuple eig_train1 (const train::SVDPCATrainer& t, const blitz::Array<double,2>& data) {
+  blitz::Array<double,1> eig_val(data.extent(1));
   mach::LinearMachine m;
   t.train(m, eig_val, data);
   return make_tuple(m, eig_val);
 }
 
 object eig_train2 (const train::SVDPCATrainer& t, mach::LinearMachine& m,
-    const io::Arrayset& data) {
-  blitz::Array<double,1> eig_val(data.getShape()[0]);
+    const blitz::Array<double,2>& data) {
+  blitz::Array<double,1> eig_val(data.extent(1));
   t.train(m, eig_val, data);
   return object(eig_val);
 }
 
 tuple lda_train1 (const train::FisherLDATrainer& t, object data) {
-  stl_input_iterator<io::Arrayset> dbegin(data), dend;
-  std::vector<io::Arrayset> vdata(dbegin, dend);
-  blitz::Array<double,1> eig_val(vdata[0].getShape()[0]);
+  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
+  std::vector<blitz::Array<double,2> > vdata(dbegin, dend);
+  blitz::Array<double,1> eig_val(vdata[0].extent(1));
   mach::LinearMachine m;
   t.train(m, eig_val, vdata);
   return make_tuple(m, eig_val);
@@ -55,9 +55,9 @@ tuple lda_train1 (const train::FisherLDATrainer& t, object data) {
 
 object lda_train2 (const train::FisherLDATrainer& t, mach::LinearMachine& m,
     object data) {
-  stl_input_iterator<io::Arrayset> dbegin(data), dend;
-  std::vector<io::Arrayset> vdata(dbegin, dend);
-  blitz::Array<double,1> eig_val(vdata[0].getShape()[0]);
+  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
+  std::vector<blitz::Array<double,2> > vdata(dbegin, dend);
+  blitz::Array<double,1> eig_val(vdata[0].extent(1));
   t.train(m, eig_val, vdata);
   return object(eig_val);
 }

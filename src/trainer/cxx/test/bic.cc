@@ -34,27 +34,15 @@
 
 struct Data {
   double epsilon;
-  bob::io::Arrayset intra_data, extra_data;
+  blitz::Array<double,2> intra_data, extra_data;
 
-  Data():epsilon(1e-10)
+  Data():
+    epsilon(1e-10),
+    intra_data(5,5),
+    extra_data(5,5)
   {
-    double data[5][5] = {
-        {10., 4., 6., 8., 2.},
-        {8., 2., 4., 6., 0.},
-        {12., 6., 8., 10., 4.},
-        {9., 3., 5., 7., 1.},
-        {11., 5., 7., 9., 3.}
-    };
-
-    for (int i = 0; i < 5; ++i){
-      blitz::Array<double,1> intra(5), extra(5);
-      for (int j = 0; j < 5; ++j){
-        intra(j) = data[i][j];
-        extra(j) = -data[i][j];
-      }
-      intra_data.add(intra);
-      extra_data.add(extra);
-    }
+    intra_data = 10., 4., 6., 8., 2., 8., 2., 4., 6., 0., 12., 6., 8., 10., 4., 9., 3., 5., 7., 1., 11., 5., 7., 9., 3.;
+    extra_data = -intra_data;
   }
 };
 

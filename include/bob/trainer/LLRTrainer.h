@@ -26,7 +26,6 @@
 
 #include "bob/machine/LinearMachine.h"
 #include "bob/trainer/Exception.h"
-#include "bob/io/Arrayset.h"
 
 namespace bob { namespace trainer {
   
@@ -104,7 +103,7 @@ namespace bob { namespace trainer {
        * Trains the LinearMachine to perform Linear Logistic Regression
        */
       virtual void train(bob::machine::LinearMachine& machine, 
-          const bob::io::Arrayset& data1, const bob::io::Arrayset& data2) const;
+          const blitz::Array<double,2>& data1, const blitz::Array<double,2>& data2) const;
 
     private: 
       // Attributes

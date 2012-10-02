@@ -49,14 +49,14 @@ class ML_GMMTrainer : public GMMTrainer {
     /**
      * Initialisation before the EM steps
      */
-    virtual void initialization(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data);
+    virtual void initialization(bob::machine::GMMMachine& gmm, const blitz::Array<double,2>& data);
 
     /**
      * Performs a maximum likelihood (ML) update of the GMM parameters
      * using the accumulated statistics in m_ss
      * Implements EMTrainer::mStep()
      */
-    void mStep(bob::machine::GMMMachine& gmm, const bob::io::Arrayset& data);
+    void mStep(bob::machine::GMMMachine& gmm, const blitz::Array<double,2>& data);
   
   private:
     /**

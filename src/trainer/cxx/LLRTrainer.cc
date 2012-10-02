@@ -69,25 +69,17 @@ bob::trainer::LLRTrainer::operator!=(const bob::trainer::LLRTrainer& b) const
 }
 
 void bob::trainer::LLRTrainer::train(bob::machine::LinearMachine& machine, 
-  const bob::io::Arrayset& ar1, const bob::io::Arrayset& ar2) const 
+  const blitz::Array<double,2>& ar1, const blitz::Array<double,2>& ar2) const 
 {
   // Checks for arraysets data type and shape once
-  if(ar1.getElementType() != bob::core::array::t_float64) 
-    throw bob::io::TypeError(ar1.getElementType(), bob::core::array::t_float64);
-  if(ar1.getNDim() != 1) 
-    throw bob::io::DimensionError(ar1.getNDim(), 1);
-  if(ar2.getElementType() != bob::core::array::t_float64) 
-    throw bob::io::TypeError(ar2.getElementType(), bob::core::array::t_float64);
-  if(ar2.getNDim() != 1) 
-    throw bob::io::DimensionError(ar2.getNDim(), 1);
-  if(ar1.getShape()[0] != ar2.getShape()[0]) 
-    throw bob::io::DimensionError(ar1.getShape()[0], ar2.getShape()[0]);
+  if(ar1.extent(1) != ar2.extent(1)) 
+    throw bob::io::DimensionError(ar1.extent(1), ar2.extent(1));
 
   // Data is checked now and conforms, just proceed w/o any further checks.
-  size_t n_samples1 = ar1.size();
-  size_t n_samples2 = ar2.size();
+  size_t n_samples1 = ar1.extent(0);
+  size_t n_samples2 = ar2.extent(0);
   size_t n_samples = n_samples1 + n_samples2;
-  size_t n_features = ar1.getShape()[0];
+  size_t n_features = ar1.extent(1);
 
   // Defines useful ranges  
   blitz::Range rall = blitz::Range::all();
@@ -102,9 +94,9 @@ void bob::trainer::LLRTrainer::train(bob::machine::LinearMachine& machine,
   x(n_features,r1) = 1.;
   x(n_features,r2) = -1.;
   for(size_t i=0; i<n_samples1; ++i)
-    x(rd,i) = ar1.get<double,1>(i);
+    x(rd,i) = ar1(i,rall);
   for(size_t i=0; i<n_samples2; ++i)
-    x(rd,i+n_samples1) = -ar2.get<double,1>(i);
+    x(rd,i+n_samples1) = -ar2(i,rall);
 
   // Ratio between the two classes and weights vector
   double prop = (double)n_samples1 / (double)n_samples;

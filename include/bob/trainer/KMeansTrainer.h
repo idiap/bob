@@ -20,7 +20,6 @@
 #ifndef BOB_TRAINER_KMEANSTRAINER_H
 #define BOB_TRAINER_KMEANSTRAINER_H
 
-#include "bob/io/Arrayset.h"
 #include "bob/machine/KMeansMachine.h"
 #include "bob/trainer/EMTrainer.h"
 
@@ -33,7 +32,7 @@ namespace trainer {
  * @details See Section 9.1 of Bishop, "Pattern recognition and machine learning", 2006
  *          It uses a random initialisation of the means followed by the expectation-maximization algorithm
  */
-class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, bob::io::Arrayset>
+class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, blitz::Array<double,2> >
 {
   public: 
     /**
@@ -54,7 +53,7 @@ class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, bob::io::Arra
      * then each mean is set to a random example within each chunk.
      */
     virtual void initialization(bob::machine::KMeansMachine& kMeansMachine,
-      const bob::io::Arrayset& sampler);
+      const blitz::Array<double,2>& sampler);
     
     /**
      * Accumulate across the dataset:
@@ -63,13 +62,13 @@ class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, bob::io::Arra
      * Implements EMTrainer::eStep(double &)
      */
     virtual void eStep(bob::machine::KMeansMachine& kmeans,
-      const bob::io::Arrayset& data);
+      const blitz::Array<double,2>& data);
     
     /**
      * Updates the mean based on the statistics from the E-step.
      */
     virtual void mStep(bob::machine::KMeansMachine& kmeans, 
-      const bob::io::Arrayset&);
+      const blitz::Array<double,2>&);
     
     /**
      * This functions returns the average min distance (average distance to the
@@ -80,7 +79,7 @@ class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, bob::io::Arra
     /**
      * Function called at the end of the training 
      */
-    virtual void finalization(bob::machine::KMeansMachine& kMeansMachine, const bob::io::Arrayset& sampler);
+    virtual void finalization(bob::machine::KMeansMachine& kMeansMachine, const blitz::Array<double,2>& sampler);
 
     /**
      * Reset the statistics accumulators

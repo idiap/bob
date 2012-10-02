@@ -24,7 +24,6 @@
 #include <blitz/array.h>
 #include <cfloat>
 
-#include "bob/io/Arrayset.h"
 #include "bob/io/HDF5File.h"
 #include "bob/machine/Machine.h"
 
@@ -167,13 +166,12 @@ class KMeansMachine: public Machine<blitz::Array<double,1>, double> {
      * that is closest to that mean, and calculate
      * 1) the variance of that subset (the cluster variance)
      * 2) the proportion of the samples represented by that subset (the cluster weight)
-     * @param[in]  ar        The sampler
+     * @param[in]  sampler   The sampler
      * @param[out] variances The cluster variances (one row per cluster), 
      *                       with as many columns as feature dimensions.
      * @param[out] weights   A vector of weights, one per cluster
      */
-    void getVariancesAndWeightsForEachCluster(const bob::io::Arrayset &ar,
-      blitz::Array<double,2>& variances, blitz::Array<double,1>& weights) const;
+    void getVariancesAndWeightsForEachCluster(const blitz::Array<double,2> &sampler, blitz::Array<double,2>& variances, blitz::Array<double,1>& weights) const;
        
     /**
      * Resize the means

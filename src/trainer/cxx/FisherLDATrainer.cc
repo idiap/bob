@@ -50,17 +50,15 @@ train::FisherLDATrainer& train::FisherLDATrainer::operator=
  * class means 'm_k' and computes the total number of elements in each class
  * 'N'.
  */
-static void evalMeans (const std::vector<io::Arrayset>& data,
+static void evalMeans (const std::vector<blitz::Array<double,2> >& data,
     blitz::Array<double,1>& m, blitz::Array<double,2>& m_k,
     blitz::Array<double,1>& N) {
-  int n_features = data[0].getShape()[0];
-  blitz::Array<double,1> buffer(n_features);
 
   blitz::Range a = blitz::Range::all();
   for (size_t k=0; k<data.size(); ++k) { //class loop
-    N(k) = data[k].size();
-    for (size_t example=0; example<data[k].size(); ++example) {
-      buffer = data[k].get<double,1>(example);
+    N(k) = data[k].extent(0);
+    for (int example=0; example<data[k].extent(0); ++example) {
+      blitz::Array<double,1> buffer(data[k](example,a));
       m_k(a,k) += buffer;
       m += buffer;
     }
@@ -80,10 +78,10 @@ static void evalMeans (const std::vector<io::Arrayset>& data,
  *
  * This code is useless out of a testing scenario.
  */
-static void evalTotalScatter (const std::vector<io::Arrayset>& data,
+static void evalTotalScatter (const std::vector<blitz::Array<double, 2> >& data,
     blitz::Array<double,1>& m, blitz::Array<double,2>& St) {
 
-  int n_features = data[0].getShape()[0];
+  int n_features = data[0].extent(1);
   blitz::Array<double,1> buffer(n_features);
 
   blitz::firstIndex i;
@@ -91,9 +89,10 @@ static void evalTotalScatter (const std::vector<io::Arrayset>& data,
 
   // within class scatter Sw
   St = 0;
+  blitz::Range a = blitz::Range::all();
   for (size_t k=0; k<data.size(); ++k) { //class loop
-    for (size_t example=0; example<data[k].size(); ++example) {
-      buffer = data[k].get<double,1>(example) - m;
+    for (int example=0; example<data[k].extent(0); ++example) {
+      buffer = data[k](example,a) - m;
       St += buffer(i) * buffer(j); //outer product
     }
   }
@@ -103,17 +102,9 @@ static void evalTotalScatter (const std::vector<io::Arrayset>& data,
  * Calculates the within and between class scatter matrices Sw and Sb. Returns
  * those matrices and the overall means vector (m).
  *
- * @note This method will hit the Arraysets twice for each example. If you want
- * to save memory, just make sure all arrays in the set are stored on external
- * files (either as a single Arrayset or as multiple external Arrays). Storing
- * Arrays individually may show improved throughput, but this is untested as of
- * this moment. If you want to have more speed, preload all arrays on the set
- * in memory.
- *
  * Strategy implemented:
  * 1. Evaluate the overall mean (m), class means (m_k) and the total class
- *    counts (N). This will trigger a Arrayset::get<> to be executed once for
- *    each example.
+ *    counts (N).
  * 2. Evaluate Sw and Sb using normal loops.
  *
  * Note that Sw and Sb, in this implementation, will be normalized by N-1
@@ -128,12 +119,12 @@ static void evalTotalScatter (const std::vector<io::Arrayset>& data,
  * This method was designed based on the previous design at bob3Vision 2.1,
  * by SM.
  */
-static void evalScatters (const std::vector<io::Arrayset>& data,
+static void evalScatters (const std::vector<blitz::Array<double, 2> >& data,
     blitz::Array<double,1>& m,
     blitz::Array<double,2>& Sw, blitz::Array<double,2>& Sb) {
   
   // checks for data shape should have been done before...
-  int n_features = data[0].getShape()[0];
+  int n_features = data[0].extent(1);
 
   m = 0; //overall mean
   blitz::Array<double,2> m_k(n_features, data.size());
@@ -159,8 +150,8 @@ static void evalScatters (const std::vector<io::Arrayset>& data,
   // within class scatter Sw
   Sw = 0;
   for (size_t k=0; k<data.size(); ++k) { //class loop
-    for (size_t example=0; example<data[k].size(); ++example) {
-      buffer = data[k].get<double,1>(example) - m_k(a,k);
+    for (int example=0; example<data[k].extent(0); ++example) {
+      buffer = data[k](example,a) - m_k(a,k);
       Sw += buffer(i) * buffer(j); //outer product
     }
   }
@@ -177,24 +168,17 @@ static void evalScatters (const std::vector<io::Arrayset>& data,
 
 void train::FisherLDATrainer::train(mach::LinearMachine& machine,
     blitz::Array<double,1>& eigen_values,
-    const std::vector<bob::io::Arrayset>& data) const {
+    const std::vector<blitz::Array<double, 2> >& data) const {
 
   // if #classes < 2, then throw
   if (data.size() < 2) throw train::WrongNumberOfClasses(data.size());
 
   // checks for arrayset data type and shape once
-  int n_features = data[0].getShape()[0];
+  int n_features = data[0].extent(1);
 
   for (size_t cl=0; cl<data.size(); ++cl) {
-    if (data[cl].getElementType() != bob::core::array::t_float64) {
-      throw io::TypeError(data[cl].getElementType(),
-          bob::core::array::t_float64);
-    }
-    if (data[cl].getNDim() != 1) {
-      throw bob::io::DimensionError(data[cl].getNDim(), 1);
-    }
-    if (data[cl].getShape()[0] != (size_t)n_features) {
-      throw bob::trainer::WrongNumberOfFeatures(data[cl].getShape()[0],
+    if (data[cl].extent(1) != n_features) {
+      throw bob::trainer::WrongNumberOfFeatures(data[cl].extent(1),
           n_features, cl);
     }
   }
@@ -236,7 +220,7 @@ void train::FisherLDATrainer::train(mach::LinearMachine& machine,
 }
 
 void train::FisherLDATrainer::train(mach::LinearMachine& machine,
-    const std::vector<bob::io::Arrayset>& data) const {
+    const std::vector<blitz::Array<double,2> >& data) const {
   blitz::Array<double,1> throw_away;
   train(machine, throw_away, data);
 }

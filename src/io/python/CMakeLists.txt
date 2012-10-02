@@ -11,7 +11,6 @@ set(src
    "exception.cc"
    "file.cc"
    "array.cc"
-   "arrayset.cc"
    "hdf5_extras.cc"
    "hdf5.cc"
    "datetime.cc"

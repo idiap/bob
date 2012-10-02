@@ -18,7 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <boost/python.hpp>
-#include "bob/io/Arrayset.h"
 #include "bob/trainer/KMeansTrainer.h"
 
 using namespace boost::python;
@@ -27,24 +26,24 @@ namespace mach = bob::machine;
 namespace io = bob::io;
 
 
-class EMTrainerKMeansWrapper: public train::EMTrainer<mach::KMeansMachine, io::Arrayset>, 
-                              public wrapper<train::EMTrainer<mach::KMeansMachine, io::Arrayset> > 
+class EMTrainerKMeansWrapper: public train::EMTrainer<mach::KMeansMachine, blitz::Array<double,2> >, 
+                              public wrapper<train::EMTrainer<mach::KMeansMachine, blitz::Array<double,2> > > 
 {
 public:
   EMTrainerKMeansWrapper(double convergence_threshold = 0.001, int max_iterations = 10, bool compute_likelihood=true):
-    train::EMTrainer<mach::KMeansMachine, io::Arrayset >(convergence_threshold, max_iterations, compute_likelihood) {}
+    train::EMTrainer<mach::KMeansMachine, blitz::Array<double,2> >(convergence_threshold, max_iterations, compute_likelihood) {}
 
   virtual ~EMTrainerKMeansWrapper() {}
  
-  virtual void initialization(mach::KMeansMachine& machine, const io::Arrayset& data) {
+  virtual void initialization(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
     this->get_override("initialization")(machine, data);
   }
   
-  virtual void eStep(mach::KMeansMachine& machine, const io::Arrayset& data) {
+  virtual void eStep(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
     this->get_override("e_step")(machine, data);
   }
   
-  virtual void mStep(mach::KMeansMachine& machine, const io::Arrayset& data) {
+  virtual void mStep(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
     this->get_override("m_step")(machine, data);
   }
 
@@ -52,19 +51,19 @@ public:
     return this->get_override("compute_likelihood")(machine);
   }
 
-  virtual void finalization(mach::KMeansMachine& machine, const io::Arrayset& data) {
+  virtual void finalization(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
     this->get_override("finalization")(machine, data);
   }
  
-  virtual void train(mach::KMeansMachine& machine, const io::Arrayset& data) {
+  virtual void train(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_train = this->get_override("train")) 
       python_train(machine, data);
     else
-      train::EMTrainer<mach::KMeansMachine, io::Arrayset>::train(machine, data);
+      train::EMTrainer<mach::KMeansMachine, blitz::Array<double,2> >::train(machine, data);
   }
 
-  virtual void d_train(mach::KMeansMachine& machine, const io::Arrayset& data) {
-    train::EMTrainer<mach::KMeansMachine, io::Arrayset>::train(machine, data);
+  virtual void d_train(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
+    train::EMTrainer<mach::KMeansMachine, blitz::Array<double,2> >::train(machine, data);
   }
 
 };
@@ -78,34 +77,34 @@ public:
 
   virtual ~KMeansTrainerWrapper() {}
  
-  void initialization(mach::KMeansMachine& machine, const io::Arrayset& data) {
+  void initialization(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_initialization = this->get_override("initialization"))
       python_initialization(machine, data);
     else
       train::KMeansTrainer::initialization(machine, data);
   }
   
-  void d_initialization(mach::KMeansMachine& machine, const io::Arrayset& data) {
+  void d_initialization(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
     train::KMeansTrainer::initialization(machine, data);
   }
   
-  void eStep(mach::KMeansMachine& machine, const io::Arrayset& data) {
+  void eStep(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_eStep = this->get_override("e_step")) python_eStep(machine, data);
     train::KMeansTrainer::eStep(machine, data);
   }
   
-  void d_eStep(mach::KMeansMachine& machine, const io::Arrayset& data) {
+  void d_eStep(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
     train::KMeansTrainer::eStep(machine, data);
   }
   
-  void mStep(mach::KMeansMachine& machine, const io::Arrayset& data) {
+  void mStep(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_mStep = this->get_override("m_step")) 
       python_mStep(machine, data);
     else
       train::KMeansTrainer::mStep(machine, data);
   }
 
-  void d_mStep(mach::KMeansMachine& machine, const io::Arrayset& data) {
+  void d_mStep(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
     train::KMeansTrainer::mStep(machine, data);
   }
 
@@ -118,25 +117,25 @@ public:
     return train::KMeansTrainer::computeLikelihood(machine);
   }
 
-  void finalization(mach::KMeansMachine& machine, const io::Arrayset& data) {
+  void finalization(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_finalization = this->get_override("finalization"))
       python_finalization(machine, data);
     else
       train::KMeansTrainer::finalization(machine, data);
   }
   
-  void d_finalization(mach::KMeansMachine& machine, const io::Arrayset& data) {
+  void d_finalization(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
     train::KMeansTrainer::finalization(machine, data);
   }
   
-  void train(mach::KMeansMachine& machine, const io::Arrayset& data) {
+  void train(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_train = this->get_override("train")) 
       python_train(machine, data);
     else
       train::KMeansTrainer::train(machine, data);
   }
 
-  void d_train(mach::KMeansMachine& machine, const io::Arrayset& data) {
+  void d_train(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
     train::KMeansTrainer::train(machine, data);
   }
 
@@ -145,7 +144,7 @@ public:
 
 void bind_trainer_kmeans_wrappers() {
 
-  typedef train::EMTrainer<mach::KMeansMachine, io::Arrayset> EMTrainerKMeansBase; 
+  typedef train::EMTrainer<mach::KMeansMachine, blitz::Array<double,2> > EMTrainerKMeansBase; 
 
   class_<EMTrainerKMeansWrapper, boost::noncopyable>("EMTrainerKMeans", no_init)
     .def(init<optional<double, int, bool> >((arg("convergence_threshold")=0.001, arg("max_iterations")=10, arg("compute_likelihood")=true)))

@@ -43,7 +43,7 @@ namespace tca = bob::core::array;
 
 train::EMPCATrainer::EMPCATrainer(int dimensionality, 
     double convergence_threshold, int max_iterations, bool compute_likelihood):
-  EMTrainer<mach::LinearMachine, io::Arrayset>(convergence_threshold, 
+  EMTrainer<mach::LinearMachine, blitz::Array<double,2> >(convergence_threshold, 
   max_iterations, compute_likelihood), 
   m_dimensionality(dimensionality), m_S(0,0),
   m_z_first_order(0,dimensionality), 
@@ -58,7 +58,7 @@ train::EMPCATrainer::EMPCATrainer(int dimensionality,
 }
 
 train::EMPCATrainer::EMPCATrainer(const train::EMPCATrainer& other):
-  EMTrainer<mach::LinearMachine, io::Arrayset>(other.m_convergence_threshold, 
+  EMTrainer<mach::LinearMachine, blitz::Array<double,2> >(other.m_convergence_threshold, 
     other.m_max_iterations, other.m_compute_likelihood),
   m_dimensionality(other.m_dimensionality), 
   m_S(tca::ccopy(other.m_S)),
@@ -110,19 +110,10 @@ train::EMPCATrainer& train::EMPCATrainer::operator=
 }
 
 void train::EMPCATrainer::initialization(mach::LinearMachine& machine,
-  const io::Arrayset& ar) 
+  const blitz::Array<double,2>& ar) 
 {
-  // checks for arrayset data type and shape once
-  if(ar.getElementType() != bob::core::array::t_float64) {
-    throw bob::io::TypeError(ar.getElementType(),
-        bob::core::array::t_float64);
-  }
-  if(ar.getNDim() != 1) {
-    throw bob::io::DimensionError(ar.getNDim(), 1);
-  }
-
   // Gets dimension
-  size_t n_features = ar.getShape()[0];
+  size_t n_features = ar.extent(1);
 
   // resizes the LinearMachine
   machine.resize(n_features, m_dimensionality); 
@@ -143,15 +134,15 @@ void train::EMPCATrainer::initialization(mach::LinearMachine& machine,
 }
 
 void train::EMPCATrainer::finalization(mach::LinearMachine& machine,
-  const io::Arrayset& ar) 
+  const blitz::Array<double,2>& ar) 
 {
 }
 
-void train::EMPCATrainer::initMembers(const io::Arrayset& ar) 
+void train::EMPCATrainer::initMembers(const blitz::Array<double,2>& ar) 
 {
   // Gets dimensions
-  size_t n_samples = ar.size();
-  size_t n_features = ar.getShape()[0];
+  size_t n_samples = ar.extent(0);
+  size_t n_features = ar.extent(1);
 
   // Covariance matrix S is only required to compute the log likelihood
   if(m_compute_likelihood)
@@ -188,18 +179,18 @@ void train::EMPCATrainer::initMembers(const io::Arrayset& ar)
 }
 
 void train::EMPCATrainer::computeMeanVariance(mach::LinearMachine& machine, 
-  const io::Arrayset& ar) 
+  const blitz::Array<double,2>& ar) 
 {
-  size_t n_samples = ar.size();
-  size_t n_features = ar.getShape()[0];
+  size_t n_samples = ar.extent(0);
+  size_t n_features = ar.extent(1);
   blitz::Array<double,1> mu = machine.updateInputDivision();
+  blitz::Range all = blitz::Range::all();
   if(m_compute_likelihood) 
   {
     // loads all the data in a single shot - required for scatter
     blitz::Array<double,2> data(n_features, n_samples);
-    blitz::Range all = blitz::Range::all();
     for (size_t i=0; i<n_samples; ++i)
-      data(all,i) = ar.get<double,1>(i);
+      data(all,i) = ar(i,all);
     // Mean and scatter computation
     math::scatter(data, m_S, mu);
     // divides scatter by N-1
@@ -210,7 +201,7 @@ void train::EMPCATrainer::computeMeanVariance(mach::LinearMachine& machine,
     // computes the mean and updates mu
     mu = 0.;
     for (size_t i=0; i<n_samples; ++i)
-      mu += ar.get<double,1>(i);
+      mu += ar(i,all);
     mu /= static_cast<double>(n_samples);
   }
 }
@@ -252,7 +243,7 @@ void train::EMPCATrainer::computeInvM()
  
 
 
-void train::EMPCATrainer::eStep(mach::LinearMachine& machine, const io::Arrayset& ar) 
+void train::EMPCATrainer::eStep(mach::LinearMachine& machine, const blitz::Array<double,2>& ar) 
 {  
   // Gets mu and W from the machine
   const blitz::Array<double,1>& mu = machine.getInputDivision();
@@ -260,11 +251,12 @@ void train::EMPCATrainer::eStep(mach::LinearMachine& machine, const io::Arrayset
   const blitz::Array<double,2> Wt = W.transpose(1,0); // W^T
 
   // Computes the statistics
-  for(size_t i=0; i<ar.size(); ++i)
+  blitz::Range a = blitz::Range::all();
+  for(int i=0; i<ar.extent(0); ++i)
   {
     /// 1/ First order statistics: z_first_order_i = inv(M) * W^T * (t - mu)
     // m_cache_f = t (sample) - mu (normalized sample)
-    m_cache_f = ar.get<double,1>(i) - mu;
+    m_cache_f = ar(i,a) - mu;
     // m_cache_dxf = inv(M) * W^T
     bob::math::prod(m_invM, Wt, m_cache_dxf);
     blitz::Array<double,1> z_first_order_i = m_z_first_order(i,blitz::Range::all());
@@ -284,7 +276,7 @@ void train::EMPCATrainer::eStep(mach::LinearMachine& machine, const io::Arrayset
   }
 }
 
-void train::EMPCATrainer::mStep(mach::LinearMachine& machine, const io::Arrayset& ar) 
+void train::EMPCATrainer::mStep(mach::LinearMachine& machine, const blitz::Array<double,2>& ar) 
 {
   // 1/ New estimate of W
   updateW(machine, ar);
@@ -296,7 +288,7 @@ void train::EMPCATrainer::mStep(mach::LinearMachine& machine, const io::Arrayset
   computeInvM();
 }
 
-void train::EMPCATrainer::updateW(mach::LinearMachine& machine, const io::Arrayset& ar) {
+void train::EMPCATrainer::updateW(mach::LinearMachine& machine, const blitz::Array<double,2>& ar) {
   // Get the mean mu and the projection matrix W
   const blitz::Array<double,1>& mu = machine.getInputDivision();
   blitz::Array<double,2>& W = machine.updateWeights();
@@ -305,10 +297,11 @@ void train::EMPCATrainer::updateW(mach::LinearMachine& machine, const io::Arrays
   // Compute W = sum{ (t_{i} - mu) z_first_order_i^T} * inv( sum{z_second_order_i} )
   m_cache_fxd_1 = 0.;
   m_cache_dxd_1 = 0.;
-  for(size_t i=0; i<ar.size(); ++i)
+  blitz::Range a = blitz::Range::all();
+  for(int i=0; i<ar.extent(0); ++i)
   {
     // m_cache_f = t (sample) - mu (normalized sample)
-    m_cache_f = ar.get<double,1>(i) - mu;
+    m_cache_f = ar(i,a) - mu;
     // first order statistics of sample i
     blitz::Array<double,1> z_first_order_i = m_z_first_order(i,blitz::Range::all());
     // m_cache_fxd_2 = (t - mu)*z_first_order_i
@@ -328,18 +321,19 @@ void train::EMPCATrainer::updateW(mach::LinearMachine& machine, const io::Arrays
   math::prod(Wt, W, m_inW);
 }
 
-void train::EMPCATrainer::updateSigma2(mach::LinearMachine& machine, const io::Arrayset& ar) {
+void train::EMPCATrainer::updateSigma2(mach::LinearMachine& machine, const blitz::Array<double,2>& ar) {
   // Get the mean mu and the projection matrix W
   const blitz::Array<double,1>& mu = machine.getInputDivision();
   blitz::Array<double,2>& W = machine.updateWeights();
   const blitz::Array<double,2> Wt = W.transpose(1,0); // W^T
 
   m_sigma2 = 0.;
-  for(size_t i=0; i<ar.size(); ++i)
+  blitz::Range a = blitz::Range::all();
+  for(int i=0; i<ar.extent(0); ++i)
   {
     // a. sigma2 += || t - mu ||^2
     // m_cache_f = t (sample) - mu (normalized sample)
-    m_cache_f = ar.get<double,1>(i) - mu;
+    m_cache_f = ar(i,a) - mu;
     // sigma2 += || t - mu ||^2
     m_sigma2 += blitz::sum(blitz::pow2(m_cache_f));
 
@@ -360,7 +354,7 @@ void train::EMPCATrainer::updateSigma2(mach::LinearMachine& machine, const io::A
     m_sigma2 += bob::math::trace(m_cache_dxd_1);
   }
   // Normalization factor
-  m_sigma2 /= (static_cast<double>(ar.size()) * mu.extent(0));
+  m_sigma2 /= (static_cast<double>(ar.extent(0)) * mu.extent(0));
 }
 
 double train::EMPCATrainer::computeLikelihood(mach::LinearMachine& machine)

@@ -28,7 +28,6 @@
 #include <blitz/array.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/random.hpp>
-#include "bob/io/Arrayset.h"
 
 namespace bob { namespace trainer {
 
@@ -43,14 +42,6 @@ namespace bob { namespace trainer {
   class DataShuffler {
 
     public: //api
-
-      /**
-       * Initializes the shuffler with some data classes and corresponding
-       * targets. The Arraysets are concatenated and data is copied internally
-       * for faster access.
-       */
-      DataShuffler(const std::vector<bob::io::Arrayset>& data,
-          const std::vector<blitz::Array<double,1> >& target);
 
       /**
        * Initializes the shuffler with some data classes and corresponding

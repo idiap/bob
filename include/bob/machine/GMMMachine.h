@@ -26,7 +26,6 @@
 #define BOB_MACHINE_GMMMACHINE_H
 
 #include "bob/machine/Machine.h"
-#include "bob/io/Arrayset.h"
 #include "bob/machine/Gaussian.h"
 #include "bob/machine/GMMStats.h"
 #include "bob/io/HDF5File.h"
@@ -246,14 +245,14 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double>
      * @see bool accStatistics(const blitz::Array<double,1> &x, GMMStats stats)
      * Dimensions of the parameters are checked
      */
-    void accStatistics(const bob::io::Arrayset &arrayset, GMMStats &stats) const;
+    void accStatistics(const blitz::Array<double,2>& input, GMMStats &stats) const;
 
     /**
      * Accumulates the GMM statistics over a set of samples.
      * @see bool accStatistics(const blitz::Array<double,1> &x, GMMStats stats)
      * @warning Dimensions of the parameters are not checked
      */
-    void accStatistics_(const bob::io::Arrayset &arrayset, GMMStats &stats) const;
+    void accStatistics_(const blitz::Array<double,2>& input, GMMStats &stats) const;
 
     /**
      * Accumulate the GMM statistics for this sample.

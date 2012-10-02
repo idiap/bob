@@ -19,7 +19,6 @@
  */
 #include "bob/trainer/KMeansTrainer.h"
 
-#include "bob/io/Arrayset.h"
 #include "bob/core/logging.h"
 #include <boost/random.hpp>
 
@@ -30,7 +29,7 @@ namespace train = bob::trainer;
 
 train::KMeansTrainer::KMeansTrainer(double convergence_threshold,
     size_t max_iterations, bool compute_likelihood):
-  train::EMTrainer<mach::KMeansMachine, bob::io::Arrayset>(
+  train::EMTrainer<mach::KMeansMachine, blitz::Array<double,2> >(
     convergence_threshold, max_iterations, compute_likelihood), 
   m_seed(-1), m_average_min_distance(0),
   m_zeroethOrderStats(0), m_firstOrderStats(0,0)
@@ -38,16 +37,17 @@ train::KMeansTrainer::KMeansTrainer(double convergence_threshold,
 }
   
 void train::KMeansTrainer::initialization(mach::KMeansMachine& kmeans,
-  const io::Arrayset& ar) 
+  const blitz::Array<double,2>& ar) 
 {
   // split data into as many chunks as there are means
-  size_t n_data = ar.size();
+  size_t n_data = ar.extent(0);
   unsigned int n_chunk = n_data / kmeans.getNMeans();
   
   boost::mt19937 rng;
   if(m_seed != -1) rng.seed((uint32_t)m_seed);
   
   // assign the i'th mean to a random example within the i'th chunk
+  blitz::Range a = blitz::Range::all();
   for(size_t i=0; i<kmeans.getNMeans(); ++i) 
   {
     // TODO: Check that samples are not equal?
@@ -58,7 +58,7 @@ void train::KMeansTrainer::initialization(mach::KMeansMachine& kmeans,
     unsigned int index = die();
 
     // get the example at that index
-    const blitz::Array<double, 1>& mean = ar.get<double,1>(index);
+    blitz::Array<double, 1> mean = ar(index,a);
     
     // set the mean
     kmeans.setMean(i, mean);
@@ -70,16 +70,16 @@ void train::KMeansTrainer::initialization(mach::KMeansMachine& kmeans,
 }
 
 void train::KMeansTrainer::eStep(mach::KMeansMachine& kmeans, 
-  const io::Arrayset& ar)
+  const blitz::Array<double,2>& ar)
 {
   // initialise the accumulators
   resetAccumulators(kmeans);
 
   // iterate over data samples
-  for(size_t i=0; i<ar.size(); ++i) 
-  {
+  blitz::Range a = blitz::Range::all();
+  for(int i=0; i<ar.extent(0); ++i) {
     // get example
-    blitz::Array<double, 1> x(ar.get<double,1>(i));
+    blitz::Array<double, 1> x(ar(i,a));
 
     // find closest mean, and distance from that mean
     size_t closest_mean = 0;
@@ -91,11 +91,11 @@ void train::KMeansTrainer::eStep(mach::KMeansMachine& kmeans,
     ++m_zeroethOrderStats(closest_mean);
     m_firstOrderStats(closest_mean,blitz::Range::all()) += x;
   }
-  m_average_min_distance /= static_cast<double>(ar.size());
+  m_average_min_distance /= static_cast<double>(ar.extent(0));
 }
 
 void train::KMeansTrainer::mStep(mach::KMeansMachine& kmeans, 
-  const io::Arrayset&) 
+  const blitz::Array<double,2>&) 
 {
   blitz::Array<double,2>& means = kmeans.updateMeans();
   for(size_t i=0; i<kmeans.getNMeans(); ++i)
@@ -111,7 +111,7 @@ double train::KMeansTrainer::computeLikelihood(mach::KMeansMachine& kmeans)
 }
 
 void train::KMeansTrainer::finalization(mach::KMeansMachine& kmeans,
-  const io::Arrayset& ar) 
+  const blitz::Array<double,2>& ar) 
 {
 }
 

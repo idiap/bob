@@ -22,7 +22,6 @@
 #include "bob/machine/JFAMachine.h"
 #include "bob/core/array_copy.h"
 #include "bob/core/repmat.h"
-#include "bob/io/Arrayset.h"
 #include "bob/math/linear.h"
 #include "bob/math/inv.h"
 #include "bob/machine/Exception.h"

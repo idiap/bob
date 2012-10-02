@@ -22,7 +22,6 @@
 
 #include "bob/core/array_copy.h"
 #include "bob/core/cast.h"
-#include "bob/io/Arrayset.h"
 #include "bob/machine/WienerMachine.h"
 #include "bob/machine/Exception.h"
 #include <complex>

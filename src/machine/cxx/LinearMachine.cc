@@ -23,7 +23,6 @@
 #include <cmath>
 
 #include "bob/core/array_copy.h"
-#include "bob/io/Arrayset.h"
 #include "bob/machine/LinearMachine.h"
 #include "bob/machine/Exception.h"
 #include "bob/math/linear.h"

@@ -21,17 +21,18 @@
 #include "bob/math/eig.h"
 #include "bob/math/linear.h"
 
-void bob::trainer::TwoDPCATrainer::train(bob::machine::TwoDPCAMachine& machine, const bob::io::Arrayset& data) 
+void bob::trainer::TwoDPCATrainer::train(bob::machine::TwoDPCAMachine& machine, const blitz::Array<double,3>& data) 
 {
-  int n_samples = data.size();
-  int m = data.getShape()[0];
-  int n = data.getShape()[1];
+  int n_samples = data.extent(0);
+  int m = data.extent(1);
+  int n = data.extent(2);
 
   blitz::Array<double,2> mean(m,n);
   mean = 0.;
+  blitz::Range a = blitz::Range::all();
   // 1/ Compute the mean of the training data
   for( int i=0; i<n_samples; ++i)
-    mean += data.get<double,2>(i);
+    mean += data(i,a,a);
   mean /= static_cast<double>(n_samples);
 
   // 2/ Generate the image covariance (scatter) matrix
@@ -39,9 +40,8 @@ void bob::trainer::TwoDPCATrainer::train(bob::machine::TwoDPCAMachine& machine, 
   blitz::Array<double,2> tmp_i(n,n);
   G_mat = 0.;
   blitz::Array<double,2> sample_nomean(m,n);
-  for( int i=0; i<n_samples; ++i)
-  {
-    sample_nomean = data.get<double,2>(i) - mean;
+  for( int i=0; i<n_samples; ++i) {
+    sample_nomean = data(i,a,a) - mean;
     blitz::Array<double,2> sample_nomean_t = sample_nomean.transpose(1,0);
     // Compute tmp_i=(Aj-Am)'*(Aj-Am)
     bob::math::prod(sample_nomean_t, sample_nomean, tmp_i);

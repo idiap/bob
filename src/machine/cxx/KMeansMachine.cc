@@ -142,8 +142,7 @@ double mach::KMeansMachine::getMinDistance(const blitz::Array<double,1>& input) 
   return min_distance;
 }
 
-void mach::KMeansMachine::getVariancesAndWeightsForEachCluster(const io::Arrayset &ar, 
-  blitz::Array<double,2>& variances, blitz::Array<double,1>& weights) const 
+void mach::KMeansMachine::getVariancesAndWeightsForEachCluster(const blitz::Array<double,2>& sampler, blitz::Array<double,2>& variances, blitz::Array<double,1>& weights) const 
 {
   // check and initialise output arrays
   ca::assertSameShape(variances, m_means);
@@ -155,9 +154,10 @@ void mach::KMeansMachine::getVariancesAndWeightsForEachCluster(const io::Arrayse
   m_cache_means = 0;
   
   // iterate over data
-  for(size_t i=0; i<ar.size(); ++i) {
+  blitz::Range a = blitz::Range::all();
+  for(int i=0; i<sampler.extent(0); ++i) {
     // - get example
-    blitz::Array<double,1> x = ar.get<double,1>(i);
+    blitz::Array<double,1> x(sampler(i,a));
     
     // - find closest mean
     size_t closest_mean = 0;

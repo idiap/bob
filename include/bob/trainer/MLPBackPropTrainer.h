@@ -28,7 +28,6 @@
 #include <vector>
 #include <boost/function.hpp>
 
-#include "bob/io/Arrayset.h"
 #include "bob/machine/MLP.h"
 
 namespace bob { namespace trainer {

@@ -24,7 +24,6 @@
 #define BOB5SPRO_TRAINER_WIENER_TRAINER_H
 
 #include "bob/machine/WienerMachine.h"
-#include "bob/io/Arrayset.h"
 
 namespace bob { namespace trainer {
   
@@ -64,7 +63,7 @@ namespace bob { namespace trainer {
        * Trains the WienerMachine to perform the filtering. 
        */
       virtual void train(bob::machine::WienerMachine& machine, 
-          const bob::io::Arrayset& data) const;
+          const blitz::Array<double,3>& data) const;
 
     private: //representation
 
