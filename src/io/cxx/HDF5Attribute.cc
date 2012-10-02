@@ -214,6 +214,6 @@ static herr_t attr_iterator (hid_t attr, const char* name, const H5A_info_t*,
 void h5::list_attributes(boost::shared_ptr<hid_t> location,
     std::map<std::string, io::HDF5Type>& attributes) {
   hsize_t offset=0;
-  H5Aiterate(*location, H5_INDEX_NAME, H5_ITER_NATIVE, &offset, attr_iterator, 
+  H5Aiterate2(*location, H5_INDEX_NAME, H5_ITER_NATIVE, &offset, attr_iterator, 
       static_cast<void*>(&attributes));
 }
