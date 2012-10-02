@@ -30,7 +30,7 @@
 #include "bob/core/convert.h"
 #include "bob/ip/MultiscaleRetinex.h"
 
-#include "bob/io/Array.h"
+#include "bob/io/CodecRegistry.h"
 #include <algorithm>
 
 #include <random/discrete-uniform.h>
@@ -127,8 +127,7 @@ BOOST_AUTO_TEST_CASE( test_multiscaleRetinex_2d )
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "image.pgm";
-  bob::io::Array ar_img(testdata_path_img.string());
-  blitz::Array<uint8_t,2> img = ar_img.get<uint8_t,2>();
+  blitz::Array<uint8_t,2> img = bob::io::open(testdata_path_img.string(), 'r')->read_all<uint8_t,2>();
   blitz::Array<double,2> img_d = bob::core::cast<double>(img);
   blitz::Array<double,2> img_processed_d(img.extent(0),img.extent(1));
   bob::ip::MultiscaleRetinex msr_filter(3);
@@ -139,8 +138,7 @@ BOOST_AUTO_TEST_CASE( test_multiscaleRetinex_2d )
   // Compare to reference image
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_msr_3scales.pgm";
-  bob::io::Array ar_img_ref(testdata_path_img.string());
-  blitz::Array<uint8_t,2> img_ref = ar_img_ref.get<uint8_t,2>();
+  blitz::Array<uint8_t,2> img_ref = bob::io::open(testdata_path_img.string(), 'r')->read_all<uint8_t,2>();
   checkBlitzClose( img_processed, img_ref, eps);
 }
 

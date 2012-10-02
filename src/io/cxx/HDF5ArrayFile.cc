@@ -86,15 +86,15 @@ class HDF5ArrayFile: public io::File {
       return m_filename;
     }
 
-    virtual const ca::typeinfo& array_type () const {
+    virtual const ca::typeinfo& type_all () const {
       return m_type_array;
     }
 
-    virtual const ca::typeinfo& arrayset_type () const {
+    virtual const ca::typeinfo& type () const {
       return m_type_arrayset;
     }
 
-    virtual size_t arrayset_size() const {
+    virtual size_t size() const {
       return m_size_arrayset;
     }
 
@@ -102,7 +102,7 @@ class HDF5ArrayFile: public io::File {
       return s_codecname;
     }
 
-    virtual void array_read(ca::interface& buffer) {
+    virtual void read_all(ca::interface& buffer) {
 
       if(m_newfile) {
         boost::format f("uninitialized HDF5 file at '%s' cannot be read");
@@ -115,7 +115,7 @@ class HDF5ArrayFile: public io::File {
       m_file.read_buffer(m_path, 0, buffer.type(), buffer.ptr());
     }
 
-    virtual void arrayset_read(ca::interface& buffer, size_t index) {
+    virtual void read(ca::interface& buffer, size_t index) {
 
       if(m_newfile) {
         boost::format f("uninitialized HDF5 file at '%s' cannot be read");
@@ -128,7 +128,7 @@ class HDF5ArrayFile: public io::File {
       m_file.read_buffer(m_path, index, buffer.type(), buffer.ptr());
     }
 
-    virtual size_t arrayset_append (const ca::interface& buffer) {
+    virtual size_t append (const ca::interface& buffer) {
 
       if (m_newfile) {
         //creates non-compressible, extensible dataset on HDF5 file
@@ -148,7 +148,7 @@ class HDF5ArrayFile: public io::File {
 
     }
 
-    virtual void array_write (const ca::interface& buffer) {
+    virtual void write (const ca::interface& buffer) {
 
       if (!m_newfile) {
         boost::format f("cannot perform single (array-style) write on file/dataset at '%s' that have already been initialized -- try to use a new file");

@@ -250,15 +250,15 @@ class ImageFile: public io::File {
       return m_filename;
     }
 
-    virtual const ca::typeinfo& array_type() const {
+    virtual const ca::typeinfo& type_all() const {
       return m_type;
     }
 
-    virtual const ca::typeinfo& arrayset_type() const {
+    virtual const ca::typeinfo& type() const {
       return m_type;
     }
 
-    virtual size_t arrayset_size() const {
+    virtual size_t size() const {
       return m_length;
     }
 
@@ -266,11 +266,11 @@ class ImageFile: public io::File {
       return s_codecname;
     }
 
-    virtual void array_read(ca::interface& buffer) {
-      arrayset_read(buffer, 0); ///we only have 1 image in an image file anyways
+    virtual void read_all(ca::interface& buffer) {
+      read(buffer, 0); ///we only have 1 image in an image file anyways
     }
 
-    virtual void arrayset_read(ca::interface& buffer, size_t index) {
+    virtual void read(ca::interface& buffer, size_t index) {
 
       if (m_newfile) 
         throw std::runtime_error("uninitialized image file cannot be read");
@@ -293,7 +293,7 @@ class ImageFile: public io::File {
 
     }
 
-    virtual size_t arrayset_append (const ca::interface& buffer) {
+    virtual size_t append (const ca::interface& buffer) {
 
       if (m_newfile) {
         im_save(m_filename, buffer);
@@ -307,11 +307,11 @@ class ImageFile: public io::File {
 
     }
 
-    virtual void array_write (const ca::interface& buffer) {
+    virtual void write (const ca::interface& buffer) {
 
       //overwriting position 0 should always work
       if (m_newfile) {
-        arrayset_append(buffer);
+        append(buffer);
         return;
       }
 

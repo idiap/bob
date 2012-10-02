@@ -42,15 +42,15 @@ class TensorArrayFile: public io::File {
       return m_filename;
     }
 
-    virtual const ca::typeinfo& array_type () const {
+    virtual const ca::typeinfo& type_all () const {
       return m_type;
     }
 
-    virtual const ca::typeinfo& arrayset_type () const {
+    virtual const ca::typeinfo& type () const {
       return m_type;
     }
 
-    virtual size_t arrayset_size() const {
+    virtual size_t size() const {
       return m_file.size();
     }
 
@@ -58,7 +58,7 @@ class TensorArrayFile: public io::File {
       return s_codecname;
     }
 
-    virtual void array_read(ca::interface& buffer) {
+    virtual void read_all(ca::interface& buffer) {
 
       if(!m_file) 
         throw std::runtime_error("uninitialized binary file cannot be read");
@@ -67,7 +67,7 @@ class TensorArrayFile: public io::File {
 
     }
 
-    virtual void arrayset_read(ca::interface& buffer, size_t index) {
+    virtual void read(ca::interface& buffer, size_t index) {
 
       if(!m_file) 
         throw std::runtime_error("uninitialized binary file cannot be read");
@@ -76,20 +76,20 @@ class TensorArrayFile: public io::File {
 
     }
 
-    virtual size_t arrayset_append (const ca::interface& buffer) {
+    virtual size_t append (const ca::interface& buffer) {
 
       m_file.write(buffer);
 
-      if (arrayset_size() == 1) m_file.peek(m_type);
+      if (size() == 1) m_file.peek(m_type);
 
-      return arrayset_size() - 1;
+      return size() - 1;
 
     }
     
-    virtual void array_write (const ca::interface& buffer) {
+    virtual void write (const ca::interface& buffer) {
 
       //we don't have a special way to treat write()'s like in HDF5.
-      arrayset_append(buffer);
+      append(buffer);
 
     }
 

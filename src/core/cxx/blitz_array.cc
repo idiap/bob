@@ -62,7 +62,7 @@ void ca::blitz_array::set(boost::shared_ptr<blitz_array> other) {
 }
 
 void ca::blitz_array::set(const interface& other) {
-  TDEBUG1("[non-optimal] buffer data copy requested: " << other_type.str());
+  TDEBUG1("[non-optimal] buffer data copy requested: " << other.type().str());
   set(other.type());
   memcpy(m_ptr, other.ptr(), m_type.buffer_size());
 }

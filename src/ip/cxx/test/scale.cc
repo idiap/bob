@@ -30,7 +30,7 @@
 #include "bob/core/cast.h"
 #include "bob/ip/scale.h"
 
-#include "bob/io/Array.h"
+#include "bob/io/CodecRegistry.h"
 #include <algorithm>
 
 #include <random/discrete-uniform.h>
@@ -108,10 +108,8 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "image.pgm";
-  bob::io::Array ar_img(testdata_path_img.string());
-  blitz::Array<uint8_t,2> img = ar_img.get<uint8_t,2>();
+  auto img = bob::io::load<uint8_t,2>(testdata_path_img.string());
   blitz::Array<double,2> img_processed;
-
 
   // Scale original image and compare with ImageMagick reference image
 
@@ -121,10 +119,9 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_s137x137.pgm";
 #ifdef REGENERATE_REFERENCE_IMAGES
-  bob::io::Array (bob::core::cast<uint8_t>(img_processed)).save(testdata_path_img.string());
+  bob::io::save(testdata_path_img.string(), bob::core::cast<uint8_t>(img_processed));
 #else // REGENERATE_REFERENCE_IMAGES
-  bob::io::Array ar_img_s137(testdata_path_img.string());
-  blitz::Array<uint8_t,2> img_ref_s137 = ar_img_s137.get<uint8_t,2>();
+  auto img_ref_s137 = bob::io::load<uint8_t,2>(testdata_path_img.string());
   checkBlitzClose( img_ref_s137, img_processed, eps);
 #endif // REGENERATE_REFERENCE_IMAGES
 
@@ -134,10 +131,9 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_s77x77.pgm";
 #ifdef REGENERATE_REFERENCE_IMAGES
-  bob::io::Array (bob::core::cast<uint8_t>(img_processed)).save(testdata_path_img.string());
+  bob::io::save(testdata_path_img.string(), bob::core::cast<uint8_t>(img_processed));
 #else // REGENERATE_REFERENCE_IMAGES
-  bob::io::Array ar_img_s77(testdata_path_img.string());
-  blitz::Array<uint8_t,2> img_ref_s77 = ar_img_s77.get<uint8_t,2>();
+  auto img_ref_s77 = bob::io::load<uint8_t,2>(testdata_path_img.string());
   checkBlitzClose( img_ref_s77, img_processed, eps);
 #endif // REGENERATE_REFERENCE_IMAGES
 
@@ -147,10 +143,9 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_s125x75.pgm";
 #ifdef REGENERATE_REFERENCE_IMAGES
-  bob::io::Array (bob::core::cast<uint8_t>(img_processed)).save(testdata_path_img.string());
+  bob::io::save(testdata_path_img.string(), bob::core::cast<uint8_t>(img_processed));
 #else // REGENERATE_REFERENCE_IMAGES
-  bob::io::Array ar_img_s125x75(testdata_path_img.string());
-  blitz::Array<uint8_t,2> img_ref_s125x75 = ar_img_s125x75.get<uint8_t,2>();
+  auto img_ref_s125x75 = bob::io::load<uint8_t,2>(testdata_path_img.string());
   checkBlitzClose( img_ref_s125x75, img_processed, eps);
 #endif // REGENERATE_REFERENCE_IMAGES
 

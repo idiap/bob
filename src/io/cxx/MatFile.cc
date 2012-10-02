@@ -78,15 +78,15 @@ class MatFile: public io::File {
       return m_filename;
     }
 
-    virtual const ca::typeinfo& array_type () const {
+    virtual const ca::typeinfo& type_all () const {
       return m_type;
     }
 
-    virtual const ca::typeinfo& arrayset_type () const {
+    virtual const ca::typeinfo& type () const {
       return m_type;
     }
 
-    virtual size_t arrayset_size() const {
+    virtual size_t size() const {
       return m_size;
     }
 
@@ -94,7 +94,7 @@ class MatFile: public io::File {
       return s_codecname;
     }
 
-    virtual void array_read(ca::interface& buffer) {
+    virtual void read_all(ca::interface& buffer) {
       
       //do we need to reload the file?
       if (!m_type.is_valid()) try_reload_map();
@@ -113,7 +113,7 @@ class MatFile: public io::File {
 
     }
 
-    virtual void arrayset_read(ca::interface& buffer, size_t index) {
+    virtual void read(ca::interface& buffer, size_t index) {
       
       //do we need to reload the file?
       if (!m_type.is_valid()) try_reload_map();
@@ -132,7 +132,7 @@ class MatFile: public io::File {
 
     }
 
-    virtual size_t arrayset_append (const ca::interface& buffer) {
+    virtual size_t append (const ca::interface& buffer) {
 
       //do we need to reload the file?
       if (!m_type.is_valid()) try_reload_map();
@@ -177,7 +177,7 @@ class MatFile: public io::File {
       return m_size-1;
     }
     
-    virtual void array_write (const ca::interface& buffer) {
+    virtual void write (const ca::interface& buffer) {
 
       static std::string varname("array");
 

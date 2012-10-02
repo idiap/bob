@@ -80,11 +80,31 @@ namespace bob { namespace io {
    * filename extension itself if that is empty. The opening mode is passed
    * to the underlying registered File implementation.
    */
-  boost::shared_ptr<File> open
-    (const std::string& filename, const std::string& pretend_extension, 
-     char mode);
+  boost::shared_ptr<File> open (const std::string& filename, char mode);
+
+  /**
+   * Opens the file pretending it has a different extension (that is, using a
+   * different codec) then the one expected (if any). This allows you to write
+   * a file with the extension you want, but still using one of the available
+   * codecs.
+   */
+  boost::shared_ptr<File> open (const std::string& filename, char mode, 
+      const std::string& pretend_extension);
+
+  /**
+   * Opens for reading and load all contents
+   */
+  template <typename T, int N> blitz::Array<T,N> load (const std::string& filename) {
+    return open(filename, 'r')->read_all<T,N>();
+  }
+
+  /**
+   * Opens for writing and write array to it
+   */
+  template <typename T, int N> void save (const std::string& filename, const blitz::Array<T,N>& data) {
+    open(filename, 'w')->write(data);
+  }
 
 }}
 
 #endif /* BOB_IO_CODECREGISTRY_H */
-

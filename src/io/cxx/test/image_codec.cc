@@ -29,7 +29,7 @@
 
 #include <blitz/array.h>
 #include "bob/core/logging.h"
-#include "bob/io/Array.h"
+#include "bob/io/CodecRegistry.h"
 
 struct T {
   blitz::Array<uint8_t,2> a;
@@ -55,7 +55,7 @@ struct T {
 
 
 template<typename T, typename U> 
-void check_equal(const blitz::Array<T,2>& a, const blitz::Array<U,2>& b) 
+void check_equal(blitz::Array<T,2> a, blitz::Array<U,2> b) 
 {
   BOOST_REQUIRE_EQUAL(a.extent(0), b.extent(0));
   BOOST_REQUIRE_EQUAL(a.extent(1), b.extent(1));
@@ -67,7 +67,7 @@ void check_equal(const blitz::Array<T,2>& a, const blitz::Array<U,2>& b)
 }
 
 template<typename T, typename U> 
-void check_equal(const blitz::Array<T,3>& a, const blitz::Array<U,3>& b) 
+void check_equal(blitz::Array<T,3> a, blitz::Array<U,3> b) 
 {
   BOOST_REQUIRE_EQUAL(a.extent(0), b.extent(0));
   BOOST_REQUIRE_EQUAL(a.extent(1), b.extent(1));
@@ -85,236 +85,76 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
 BOOST_AUTO_TEST_CASE( image_gif ) 
 {
-  // Prepare io Array from blitz array
-  bob::io::Array db_b(b);
-  BOOST_CHECK_EQUAL(db_b.getNDim(), b.dimensions());
-  BOOST_CHECK_EQUAL(db_b.getElementType(), bob::core::array::t_uint8);
-  BOOST_CHECK_EQUAL(db_b.isLoaded(), true);
-  BOOST_CHECK_EQUAL(db_b.getFilename().size(), 0);
-  BOOST_CHECK_EQUAL(db_b.getCodec().use_count(), 0);
-  for(size_t i=0; i<db_b.getNDim(); ++i)
-    BOOST_CHECK_EQUAL(db_b.getShape()[i], b.extent(i));
-  check_equal( db_b.get<uint8_t,3>(), b );
-
-  // Save to gif image
   std::string filename = bob::core::tmpfile(".gif");
-  db_b.save( filename);
-
-  // Load from gif image
-  bob::io::Array db_b_read( filename);
-  db_b_read.get<uint8_t,3>();
-  check_equal( db_b_read.get<uint8_t,3>(), b );
-
-  // Clean-up
+  bob::io::save(filename, b);
+  check_equal( bob::io::load<uint8_t,3>(filename), b );
   boost::filesystem::remove(filename);
 }
 
 BOOST_AUTO_TEST_CASE( image_bmp )
 {
-  // Prepare io Array from blitz array
-  bob::io::Array db_b(b);
-  BOOST_CHECK_EQUAL(db_b.getNDim(), b.dimensions());
-  BOOST_CHECK_EQUAL(db_b.getElementType(), bob::core::array::t_uint8);
-  BOOST_CHECK_EQUAL(db_b.isLoaded(), true);
-  BOOST_CHECK_EQUAL(db_b.getFilename().size(), 0);
-  BOOST_CHECK_EQUAL(db_b.getCodec().use_count(), 0);
-  for(size_t i=0; i<db_b.getNDim(); ++i)
-    BOOST_CHECK_EQUAL(db_b.getShape()[i], b.extent(i));
-  check_equal( db_b.get<uint8_t,3>(), b );
-
-  // Save to bmp image
   std::string filename = bob::core::tmpfile(".bmp");
-  db_b.save( filename);
-
-  // Load from bmp image
-  bob::io::Array db_b_read( filename);
-  db_b_read.get<uint8_t,3>();
-  check_equal( db_b_read.get<uint8_t,3>(), b );
-
-  // Clean-up
+  bob::io::save(filename, b);
+  check_equal( bob::io::load<uint8_t,3>(filename), b );
   boost::filesystem::remove(filename);
 }
 
 /*
 BOOST_AUTO_TEST_CASE( image_jpg )
 {
-  // Prepare io Array from blitz array
-  bob::io::Array db_b(b);
-  BOOST_CHECK_EQUAL(db_b.getNDim(), b.dimensions());
-  BOOST_CHECK_EQUAL(db_b.getElementType(), bob::core::array::t_uint8);
-  BOOST_CHECK_EQUAL(db_b.isLoaded(), true);
-  BOOST_CHECK_EQUAL(db_b.getFilename().size(), 0);
-  BOOST_CHECK_EQUAL(db_b.getCodec().use_count(), 0);
-  for(size_t i=0; i<db_b.getNDim(); ++i)
-    BOOST_CHECK_EQUAL(db_b.getShape()[i], b.extent(i));
-  check_equal( db_b.get<uint8_t,3>(), b );
-
-  // Save to jpg image
   std::string filename = bob::core::tmpfile(".jpg");
-  db_b.save( filename);
-
-  // Load from jpg image
-  bob::io::Array db_b_read( filename);
-  db_b_read.get<uint8_t,3>();
-  check_equal( db_b_read.get<uint8_t,3>(), b );
-
-  // Clean-up
+  bob::io::save(filename, b);
+  check_equal( bob::io::load<uint8_t,3>(filename), b );
   boost::filesystem::remove(filename);
 }
 */
 
 BOOST_AUTO_TEST_CASE( image_pbm )
 {
-  // Prepare io Array from blitz array
-  bob::io::Array db_a(a);
-  BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
-  BOOST_CHECK_EQUAL(db_a.getElementType(), bob::core::array::t_uint8);
-  BOOST_CHECK_EQUAL(db_a.isLoaded(), true);
-  BOOST_CHECK_EQUAL(db_a.getFilename().size(), 0);
-  BOOST_CHECK_EQUAL(db_a.getCodec().use_count(), 0);
-  for(size_t i=0; i<db_a.getNDim(); ++i)
-    BOOST_CHECK_EQUAL(db_a.getShape()[i], a.extent(i));
-  check_equal( db_a.get<uint8_t,2>(), a );
-
-  // Save to pbm image
   std::string filename = bob::core::tmpfile(".pbm");
-  db_a.save( filename);
-
-  // Load from pbm image
-  bob::io::Array db_a_read( filename);
-//  check_equal( db_a_read.get<uint8_t,2>(), a );
-
-  // Clean-up
+  bob::io::save(filename, a);
+  check_equal( bob::io::load<uint8_t,2>(filename), a );
   boost::filesystem::remove(filename);
 }
 
 BOOST_AUTO_TEST_CASE( image_pgm )
 {
-  // Prepare io Array from blitz array
-  bob::io::Array db_a(a);
-  BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
-  BOOST_CHECK_EQUAL(db_a.getElementType(), bob::core::array::t_uint8);
-  BOOST_CHECK_EQUAL(db_a.isLoaded(), true);
-  BOOST_CHECK_EQUAL(db_a.getFilename().size(), 0);
-  BOOST_CHECK_EQUAL(db_a.getCodec().use_count(), 0);
-  for(size_t i=0; i<db_a.getNDim(); ++i)
-    BOOST_CHECK_EQUAL(db_a.getShape()[i], a.extent(i));
-  check_equal( db_a.get<uint8_t,2>(), a );
-
-  // Save to pgm image
   std::string filename = bob::core::tmpfile(".pgm");
-  db_a.save( filename);
-
-  // Load from pgm image
-  bob::io::Array db_a_read( filename);
-  check_equal( db_a_read.get<uint8_t,2>(), a );
-
-  // Clean-up
+  bob::io::save(filename, a);
+  check_equal( bob::io::load<uint8_t,2>(filename), a );
   boost::filesystem::remove(filename);
 }
 
 BOOST_AUTO_TEST_CASE( image_png )
 {
-  // Prepare io Array from blitz array
-  bob::io::Array db_b(b);
-  BOOST_CHECK_EQUAL(db_b.getNDim(), b.dimensions());
-  BOOST_CHECK_EQUAL(db_b.getElementType(), bob::core::array::t_uint8);
-  BOOST_CHECK_EQUAL(db_b.isLoaded(), true);
-  BOOST_CHECK_EQUAL(db_b.getFilename().size(), 0);
-  BOOST_CHECK_EQUAL(db_b.getCodec().use_count(), 0);
-  for(size_t i=0; i<db_b.getNDim(); ++i)
-    BOOST_CHECK_EQUAL(db_b.getShape()[i], b.extent(i));
-  check_equal( db_b.get<uint8_t,3>(), b );
-
-  // Save to png image
   std::string filename = bob::core::tmpfile(".png");
-  db_b.save( filename);
-
-  // Load from png image
-  bob::io::Array db_b_read( filename);
-  db_b_read.get<uint8_t,3>();
-  check_equal( db_b_read.get<uint8_t,3>(), b );
-
-  // Clean-up
+  bob::io::save(filename, b);
+  check_equal( bob::io::load<uint8_t,3>(filename), b );
   boost::filesystem::remove(filename);
 }
 
 BOOST_AUTO_TEST_CASE( image_ppm )
 {
-  // Prepare io Array from blitz array
-  bob::io::Array db_b(b);
-  BOOST_CHECK_EQUAL(db_b.getNDim(), b.dimensions());
-  BOOST_CHECK_EQUAL(db_b.getElementType(), bob::core::array::t_uint8);
-  BOOST_CHECK_EQUAL(db_b.isLoaded(), true);
-  BOOST_CHECK_EQUAL(db_b.getFilename().size(), 0);
-  BOOST_CHECK_EQUAL(db_b.getCodec().use_count(), 0);
-  for(size_t i=0; i<db_b.getNDim(); ++i)
-    BOOST_CHECK_EQUAL(db_b.getShape()[i], b.extent(i));
-  check_equal( db_b.get<uint8_t,3>(), b );
-
-  // Save to ppm image
   std::string filename = bob::core::tmpfile(".ppm");
-  db_b.save( filename);
-
-  // Load from ppm image
-  bob::io::Array db_b_read( filename);
-  db_b_read.get<uint8_t,3>();
-  check_equal( db_b_read.get<uint8_t,3>(), b );
-
-  // Clean-up
+  bob::io::save(filename, b);
+  check_equal( bob::io::load<uint8_t,3>(filename), b );
   boost::filesystem::remove(filename);
 }
 
 BOOST_AUTO_TEST_CASE( image_tiff ) 
 {
-  // Prepare io Array from blitz array
-  bob::io::Array db_b(b);
-  BOOST_CHECK_EQUAL(db_b.getNDim(), b.dimensions());
-  BOOST_CHECK_EQUAL(db_b.getElementType(), bob::core::array::t_uint8);
-  BOOST_CHECK_EQUAL(db_b.isLoaded(), true);
-  BOOST_CHECK_EQUAL(db_b.getFilename().size(), 0);
-  BOOST_CHECK_EQUAL(db_b.getCodec().use_count(), 0);
-  for(size_t i=0; i<db_b.getNDim(); ++i)
-    BOOST_CHECK_EQUAL(db_b.getShape()[i], b.extent(i));
-  check_equal( db_b.get<uint8_t,3>(), b );
-
-  // Save to tiff image
   std::string filename = bob::core::tmpfile(".tiff");
-  db_b.save( filename);
-
-  // Load from tiff image
-  bob::io::Array db_b_read( filename);
-  db_b_read.get<uint8_t,3>();
-  check_equal( db_b_read.get<uint8_t,3>(), b );
-
-  // Clean-up
+  bob::io::save(filename, b);
+  check_equal( bob::io::load<uint8_t,3>(filename), b );
   boost::filesystem::remove(filename);
 }
 
 /*
 BOOST_AUTO_TEST_CASE( image_xcf ) 
 {
-  // Prepare io Array from blitz array
-  bob::io::Array db_b(b);
-  BOOST_CHECK_EQUAL(db_b.getNDim(), b.dimensions());
-  BOOST_CHECK_EQUAL(db_b.getElementType(), bob::core::array::t_uint8);
-  BOOST_CHECK_EQUAL(db_b.isLoaded(), true);
-  BOOST_CHECK_EQUAL(db_b.getFilename().size(), 0);
-  BOOST_CHECK_EQUAL(db_b.getCodec().use_count(), 0);
-  for(size_t i=0; i<db_b.getNDim(); ++i)
-    BOOST_CHECK_EQUAL(db_b.getShape()[i], b.extent(i));
-  check_equal( db_b.get<uint8_t,3>(), b );
-
-  // Save to xcf image
   std::string filename = bob::core::tmpfile(".xcf");
-  db_b.save( filename);
-
-  // Load from xcf image
-  bob::io::Array db_b_read( filename);
-  db_b_read.get<uint8_t,3>();
-  check_equal( db_b_read.get<uint8_t,3>(), b );
-
-  // Clean-up
+  bob::io::save(filename, b);
+  check_equal( bob::io::load<uint8_t,3>(filename), b );
   boost::filesystem::remove(filename);
 }
 */

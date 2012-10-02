@@ -35,7 +35,7 @@
 #include "bob/core/logging.h"
 #include "bob/core/convert.h"
 #include "bob/core/cast.h"
-#include "bob/io/Array.h"
+#include "bob/io/CodecRegistry.h"
 #include "bob/ip/GaborWaveletTransform.h"
 
 
@@ -188,8 +188,7 @@ BOOST_AUTO_TEST_CASE( test_GWT_output )
 
   // Load original image
   boost::filesystem::path image_file = boost::filesystem::path(data_dir) / "image.pgm";
-  bob::io::Array io_image(image_file.string());
-  blitz::Array<uint8_t,2> uint8_image = io_image.get<uint8_t,2>();
+  blitz::Array<uint8_t,2> uint8_image = bob::io::open(image_file.string(), 'r')->read_all<uint8_t,2>();
   blitz::Array<std::complex<double>,2> image = bob::core::cast<std::complex<double> >(uint8_image);
 
   // transform the image
@@ -205,10 +204,9 @@ BOOST_AUTO_TEST_CASE( test_GWT_output )
   boost::filesystem::path reference_kernel_file = boost::filesystem::path(data_dir) / "Gabor" / "gabor_filter_bank.hdf5";
   blitz::Array<double,3> kernels = gwt.kernelImages();
 #ifdef GENERATE_NEW_REFERENCE_FILES
-  bob::io::Array(kernels).save(reference_kernel_file.string());
+  bob::io::open(reference_kernel_file.string(), 'w')->write(kernels);
 #else
-  bob::io::Array io_reference_kernel(reference_kernel_file.string());
-  blitz::Array<double,3> ref_kernel = io_reference_kernel.get<double,3>();
+  blitz::Array<double,3> ref_kernel = bob::io::open(reference_kernel_file.string(), 'r')->read_all<double,3>();
   blitz::Array<double,3> gwt_kernel = gwt.kernelImages();
   test_close(gwt_kernel, ref_kernel, epsilon);
 #endif
@@ -217,20 +215,18 @@ BOOST_AUTO_TEST_CASE( test_GWT_output )
   // Check the transformed image
   boost::filesystem::path ref_image_file = boost::filesystem::path(data_dir) / "Gabor" / "gabor_filtered_complex.hdf5";
 #ifdef GENERATE_NEW_REFERENCE_FILES
-  bob::io::Array(gwt_image).save(ref_image_file.string());
+  bob::io::open(ref_image_file.string(), 'w')->write(gwt_image);
 #else
-  bob::io::Array io_reference_image(ref_image_file.string());
-  blitz::Array<std::complex<double>,3> reference_image = io_reference_image.get<std::complex<double>,3>();
+  blitz::Array<std::complex<double>,3> reference_image = bob::io::open(ref_image_file.string(), 'r')->read_all<std::complex<double>,3>();
   test_close(gwt_image, reference_image, epsilon);
 #endif
 
   // Check the gabor jet image
   boost::filesystem::path ref_jet_image_file = boost::filesystem::path(data_dir) / "Gabor" / "gabor_jet_image.hdf5";
 #ifdef GENERATE_NEW_REFERENCE_FILES
-  bob::io::Array(jet_image).save(ref_jet_image_file.string());
+  bob::io::open(ref_jet_image_file.string(), 'w')->write(jet_image);
 #else
-  bob::io::Array io_reference_jet_image(ref_jet_image_file.string());
-  blitz::Array<double,4> reference_jet_image = io_reference_jet_image.get<double,4>();
+  blitz::Array<double,4> reference_jet_image = bob::io::open(ref_jet_image_file.string(), 'r')->read_all<double,4>();
   test_close(jet_image, reference_jet_image, epsilon);
 #endif
 

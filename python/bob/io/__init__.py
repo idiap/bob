@@ -1,6 +1,5 @@
 from ._io import *
 
-from . import __array__
 from . import __file__
 from . import __hdf5__
 from . import __video__

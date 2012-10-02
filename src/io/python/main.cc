@@ -26,7 +26,6 @@
 void bind_io_version();
 void bind_io_exception();
 void bind_io_file();
-void bind_io_array();
 void bind_io_hdf5();
 void bind_io_hdf5_extras();
 void bind_io_datetime();
@@ -42,7 +41,6 @@ BOOST_PYTHON_MODULE(_io) {
   bind_io_version();
   bind_io_exception();
   bind_io_file();
-  bind_io_array();
   bind_io_hdf5();
   bind_io_hdf5_extras();
   bind_io_datetime();

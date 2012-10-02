@@ -134,15 +134,15 @@ class CSVFile: public io::File {
       return m_filename;
     }
 
-    virtual const ca::typeinfo& array_type() const {
-      return m_array_type;
-    }
-
-    virtual const ca::typeinfo& arrayset_type() const {
+    virtual const ca::typeinfo& type() const {
       return m_arrayset_type;
     }
 
-    virtual size_t arrayset_size() const {
+    virtual const ca::typeinfo& type_all() const {
+      return m_array_type;
+    }
+
+    virtual size_t size() const {
       return m_pos.size();
     }
 
@@ -150,7 +150,7 @@ class CSVFile: public io::File {
       return s_codecname;
     }
 
-    virtual void array_read(ca::interface& buffer) {
+    virtual void read_all(ca::interface& buffer) {
       if (m_newfile)
         throw std::runtime_error("uninitialized CSV file cannot be read");
 
@@ -169,7 +169,7 @@ class CSVFile: public io::File {
       }
     }
 
-    virtual void arrayset_read(ca::interface& buffer, size_t index) {
+    virtual void read(ca::interface& buffer, size_t index) {
 
       if (m_newfile)
         throw std::runtime_error("uninitialized CSV file cannot be read");
@@ -200,7 +200,7 @@ class CSVFile: public io::File {
 
     }
 
-    virtual size_t arrayset_append (const ca::interface& buffer) {
+    virtual size_t append (const ca::interface& buffer) {
 
       const ca::typeinfo& type = buffer.type();
 
@@ -238,7 +238,7 @@ class CSVFile: public io::File {
 
     }
 
-    virtual void array_write (const ca::interface& buffer) {
+    virtual void write (const ca::interface& buffer) {
 
       const ca::typeinfo& type = buffer.type();
 

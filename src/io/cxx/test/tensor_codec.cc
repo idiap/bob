@@ -29,7 +29,7 @@
 
 #include <blitz/array.h>
 #include "bob/core/logging.h"
-#include "bob/io/Array.h"
+#include "bob/io/CodecRegistry.h"
 
 struct T {
   blitz::Array<int8_t,2> a, b;
@@ -65,26 +65,9 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
 BOOST_AUTO_TEST_CASE( tensor_2d )
 {
-  // Prepare io Array from blitz array
-  bob::io::Array db_a(a);
-  BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
-  BOOST_CHECK_EQUAL(db_a.getElementType(), bob::core::array::t_int8);
-  BOOST_CHECK_EQUAL(db_a.isLoaded(), true);
-  BOOST_CHECK_EQUAL(db_a.getFilename().size(), 0);
-  BOOST_CHECK_EQUAL(db_a.getCodec().use_count(), 0);
-  for(size_t i=0; i<db_a.getNDim(); ++i)
-    BOOST_CHECK_EQUAL(db_a.getShape()[i], a.extent(i));
-  check_equal( db_a.get<int8_t,2>(), a );
-
-  // Save to .tensor
   std::string filename = bob::core::tmpfile(".tensor");
-  db_a.save(filename);
-
-  // Readd .tensor
-  bob::io::Array db_a_read(filename);
-  check_equal( db_a_read.get<int8_t,2>(), a);
-
-  // Clean-up
+  bob::io::save(filename, a);
+  check_equal( bob::io::load<int8_t,2>(filename), a );
   boost::filesystem::remove(filename);
 }
 
@@ -98,14 +81,7 @@ BOOST_AUTO_TEST_CASE( tensor_2d_read_T5alpha )
   boost::filesystem::path testdata_path( testdata_cpath);
   testdata_path /= "tensor_char.tensor";
 
-  // Prepare io Array from Tensor file saved with torch5spro alpha
-  bob::io::Array db_b(testdata_path.string());
-  BOOST_CHECK_EQUAL(db_b.getNDim(), b.dimensions());
-  BOOST_CHECK_EQUAL(db_b.getElementType(), bob::core::array::t_int8);
-  BOOST_CHECK_EQUAL(db_b.isLoaded(), false);
-  for(size_t i=0; i<db_b.getNDim(); ++i)
-    BOOST_CHECK_EQUAL(db_b.getShape()[i], b.extent(i));
-  check_equal( db_b.get<int8_t,2>(), b );
+  check_equal( bob::io::load<int8_t,2>(testdata_path.string()), b );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

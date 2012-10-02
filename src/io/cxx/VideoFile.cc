@@ -70,15 +70,15 @@ class VideoFile: public io::File {
       return m_filename;
     }
 
-    virtual const ca::typeinfo& array_type() const {
+    virtual const ca::typeinfo& type_all() const {
       return (m_reader)? m_reader->video_type() : m_writer->video_type();
     }
 
-    virtual const ca::typeinfo& arrayset_type() const {
+    virtual const ca::typeinfo& type() const {
       return (m_reader)? m_reader->video_type() : m_writer->video_type();
     }
 
-    virtual size_t arrayset_size() const {
+    virtual size_t size() const {
       return (m_reader)? 1:(!m_newfile);
     }
 
@@ -86,11 +86,11 @@ class VideoFile: public io::File {
       return s_codecname;
     }
 
-    virtual void array_read(ca::interface& buffer) {
-      arrayset_read(buffer, 0); ///we only have 1 video in a video file anyways
+    virtual void read_all(ca::interface& buffer) {
+      read(buffer, 0); ///we only have 1 video in a video file anyways
     }
 
-    virtual void arrayset_read(ca::interface& buffer, size_t index) {
+    virtual void read(ca::interface& buffer, size_t index) {
 
       if (index != 0) 
         throw std::runtime_error("can only read all frames at once in video codecs");
@@ -104,7 +104,7 @@ class VideoFile: public io::File {
       m_reader->load(buffer);
     }
 
-    virtual size_t arrayset_append (const ca::interface& buffer) {
+    virtual size_t append (const ca::interface& buffer) {
 
       const ca::typeinfo& type = buffer.type();
   
@@ -124,9 +124,9 @@ class VideoFile: public io::File {
       return 1;
     }
 
-    virtual void array_write (const ca::interface& buffer) {
+    virtual void write (const ca::interface& buffer) {
 
-      arrayset_append(buffer);
+      append(buffer);
 
     }
 

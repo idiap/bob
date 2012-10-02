@@ -23,7 +23,6 @@
 #include "bob/daq/VisionerFaceLocalization.h"
 #include "bob/ip/color.h"
 #include "bob/ip/scale.h"
-#include "bob/io/Array.h"
 
 namespace bob { namespace daq {
 

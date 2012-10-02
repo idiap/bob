@@ -29,7 +29,7 @@
 #include "bob/core/logging.h"
 #include "bob/ip/WeightedGaussian.h"
 
-#include "bob/io/Array.h"
+#include "bob/io/CodecRegistry.h"
 #include <algorithm>
 
 #include <random/discrete-uniform.h>
@@ -94,8 +94,7 @@ BOOST_AUTO_TEST_CASE( test_gaussianSmoothing_2d_image )
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "image.pgm";
-  bob::io::Array ar_img(testdata_path_img.string());
-  blitz::Array<uint8_t,2> img = ar_img.get<uint8_t,2>();
+  auto img = bob::io::load<uint8_t,2>(testdata_path_img.string());
   blitz::Array<double,2> img_processed(img.shape());
   bob::ip::WeightedGaussian g_filter(1,1,0.5,0.5);
   g_filter(img,img_processed);
@@ -103,8 +102,7 @@ BOOST_AUTO_TEST_CASE( test_gaussianSmoothing_2d_image )
   // Compare to reference image
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_WeightedGaussian.hdf5";
-  bob::io::Array ar_img_ref(testdata_path_img.string());
-  blitz::Array<double,2> img_ref = ar_img_ref.get<double,2>();
+  auto img_ref = bob::io::load<double,2>(testdata_path_img.string());
   checkBlitzClose( img_processed, img_ref, eps);
 }
 

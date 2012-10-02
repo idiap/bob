@@ -30,6 +30,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "bob/core/array.h"
+#include "bob/core/blitz_array.h"
 
 namespace bob { namespace io {
       
@@ -110,13 +111,13 @@ namespace bob { namespace io {
        */
       virtual void write (const bob::core::array::interface& buffer) =0;
 
-    public: //blitz::Array API (easing usage)
+    public: //blitz::Array specific API
 
       /**
        * This method returns a copy of the array in the file with the element
        * type you wish (just have to get the number of dimensions right!).
        */
-      template <typename T, int N> blitz::Array<T,N> cast(size_t index) const {
+      template <typename T, int N> blitz::Array<T,N> cast(size_t index) {
         bob::core::array::blitz_array tmp(type());
         read(tmp, index);
         return tmp.cast<T,N>();
@@ -128,36 +129,47 @@ namespace bob { namespace io {
        *
        * This variant loads all data available into the file in a single array.
        */
-      template <typename T, int N> blitz::Array<T,N> cast_all() const {
+      template <typename T, int N> blitz::Array<T,N> cast_all() {
         bob::core::array::blitz_array tmp(type_all());
         read_all(tmp);
         return tmp.cast<T,N>();
       }
 
-      /**
-       * Loads the data into a previously allocated blitz::Array. The array is
-       * re-dimensioned if it does not have sufficient space to hold the data.
-       */
-      template <typename T, int N> void read(blitz::Array<T,N>& tmp, 
-          size_t index) const {
-        bob::core::array::blitz_array use_this(tmp);
+      template <typename T, int N> void read(blitz::Array<T,N>& io, 
+          size_t index) {
+        bob::core::array::blitz_array use_this(io);
         use_this.set(type());
-        read(tmp, index);
-        tmp.reference(use_this.get<T,N>());
+        read(use_this, index);
+        io.reference(use_this.get<T,N>());
       }
 
-      /**
-       * Loads the data into a dynamically allocated blitz::Array with the
-       * right size and returns a reference to it. The allocation will occur
-       * every time you call this method.
-       *
-       * This variant loads all data available into the file in a single array.
-       */
-      template <typename T, int N> void read_all(blitz::Array<T,N>& tmp) const {
-        bob::core::array::blitz_array use_this(tmp);
-        use_this.set(type_all());
+      template <typename T, int N> blitz::Array<T,N> read(size_t index) {
+        bob::core::array::blitz_array tmp(type());
         read(tmp, index);
-        tmp.reference(use_this.get<T,N>());
+        return tmp.get<T,N>();
+      }
+
+      template <typename T, int N> void read_all(blitz::Array<T,N>& io) {
+        bob::core::array::blitz_array use_this(io);
+        use_this.set(type_all());
+        read_all(use_this);
+        io.reference(use_this.get<T,N>());
+      }
+
+      template <typename T, int N> blitz::Array<T,N> read_all() {
+        bob::core::array::blitz_array tmp(type_all());
+        read_all(tmp);
+        return tmp.get<T,N>();
+      }
+
+      template <typename T, int N> size_t append(const blitz::Array<T,N>& in) {
+        bob::core::array::blitz_array use_this(in);
+        append(use_this);
+      }
+
+      template <typename T, int N> void write (const blitz::Array<T,N>& in) {
+        bob::core::array::blitz_array use_this(in);
+        append(use_this);
       }
 
   };

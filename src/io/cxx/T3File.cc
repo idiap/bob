@@ -109,15 +109,15 @@ class T3File: public io::File {
       return m_filename;
     }
 
-    virtual const ca::typeinfo& array_type () const {
+    virtual const ca::typeinfo& type_all () const {
       return m_type_array;
     }
 
-    virtual const ca::typeinfo& arrayset_type () const {
+    virtual const ca::typeinfo& type () const {
       return m_type_arrayset;
     }
 
-    virtual size_t arrayset_size() const {
+    virtual size_t size() const {
       return m_length;
     }
 
@@ -125,7 +125,7 @@ class T3File: public io::File {
       return s_codecname;
     }
 
-    virtual void array_read(ca::interface& buffer) {
+    virtual void read_all(ca::interface& buffer) {
 
       if (m_newfile) {
         boost::format f("cannot read uninitialized t3 binary file at '%s'");
@@ -144,7 +144,7 @@ class T3File: public io::File {
 
     }
 
-    virtual void arrayset_read(ca::interface& buffer, size_t index) {
+    virtual void read(ca::interface& buffer, size_t index) {
 
       if (m_newfile) {
         boost::format f("cannot read uninitialized t3 binary file at '%s'");
@@ -165,7 +165,7 @@ class T3File: public io::File {
 
     }
 
-    virtual size_t arrayset_append (const ca::interface& buffer) {
+    virtual size_t append (const ca::interface& buffer) {
 
       const ca::typeinfo& info = buffer.type();
 
@@ -236,13 +236,13 @@ class T3File: public io::File {
      * matrix. In this last case, vectors are formed from the rows of the given
      * matrix.
      */
-    virtual void array_write (const ca::interface& buffer) {
+    virtual void write (const ca::interface& buffer) {
 
       m_newfile = true; //force file re-setting
       const ca::typeinfo& info = buffer.type();
 
       if (info.nd == 1) {//just do a normal append
-        arrayset_append(buffer);
+        append(buffer);
       }
 
       else if (info.nd == 2) { //append every array individually
@@ -253,7 +253,7 @@ class T3File: public io::File {
         for (size_t k=0; k<info.shape[0]; ++k) {
           const void* slice_ptr=static_cast<const void*>(ptr+k*slice_info.buffer_size());
           ca::blitz_array slice(const_cast<void*>(slice_ptr), slice_info);
-          arrayset_append(slice);
+          append(slice);
         }
 
       }

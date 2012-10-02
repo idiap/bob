@@ -10,7 +10,6 @@ set(src
    "version.cc"
    "exception.cc"
    "file.cc"
-   "array.cc"
    "hdf5_extras.cc"
    "hdf5.cc"
    "datetime.cc"

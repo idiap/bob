@@ -11,7 +11,6 @@ set(src
     "Exception.cc"
     "reorder.cc"
 
-    "Array.cc"
     "File.cc"
     "CodecRegistry.cc"
     
@@ -76,7 +75,6 @@ bob_add_library(${PROJECT_NAME} "${src}")
 target_link_libraries(${PROJECT_NAME} ${shared})
 
 # Defines tests for this package
-bob_add_test(${PROJECT_NAME} array test/array.cc)
 bob_add_test(${PROJECT_NAME} hdf5 test/hdf5.cc)
 bob_add_test(${PROJECT_NAME} tensor_codec test/tensor_codec.cc)
 
