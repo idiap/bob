@@ -39,7 +39,7 @@ namespace bob { namespace io {
    */
   class File {
 
-    public:
+    public: //abstract API
 
       virtual ~File();
 
@@ -50,36 +50,26 @@ namespace bob { namespace io {
 
       /**
        * The typeinfo of data within this file, if it is supposed to be read as
-       * a single array.
+       * as a sequence of arrays
        */
-      virtual const bob::core::array::typeinfo& array_type() const =0;
+      virtual const bob::core::array::typeinfo& type() const =0;
 
       /**
        * The typeinfo of data within this file, if it is supposed to be read as
-       * as an array set.
+       * a single array.
        */
-      virtual const bob::core::array::typeinfo& arrayset_type() const =0;
+      virtual const bob::core::array::typeinfo& type_all() const =0;
 
       /**
        * The number of arrays available in this file, if it is supposed to be
-       * read as an array set.
+       * read as a sequence of arrays.
        */
-      virtual size_t arrayset_size() const =0;
+      virtual size_t size() const =0;
 
       /**
        * Returns the name of the codec, for compatibility reasons.
        */
       virtual const std::string& name() const =0;
-
-      /**
-       * Loads all the data available at the file into memory.
-       *
-       * This method will check to see if the given array has enough space. If
-       * that is not the case, it will allocate enough space internally by
-       * reseting the input array and putting the data read from the file
-       * inside.
-       */
-      virtual void array_read(bob::core::array::interface& buffer) =0;
 
       /**
        * Loads the data of the array into memory. If an index is specified
@@ -91,8 +81,18 @@ namespace bob { namespace io {
        * reseting the input array and putting the data read from the file
        * inside.
        */
-      virtual void arrayset_read(bob::core::array::interface& buffer, 
-          size_t index) =0;
+      virtual void read(bob::core::array::interface& buffer, size_t index) =0;
+
+      /**
+       * Loads all the data available at the file into a single in-memory
+       * array.
+       *
+       * This method will check to see if the given array has enough space. If
+       * that is not the case, it will allocate enough space internally by
+       * reseting the input array and putting the data read from the file
+       * inside.
+       */
+      virtual void read_all(bob::core::array::interface& buffer) =0;
 
       /**
        * Appends the given buffer into a file. If the file does not exist,
@@ -101,15 +101,64 @@ namespace bob { namespace io {
        *
        * Returns the current position of the newly written array.
        */
-      virtual size_t arrayset_append 
-        (const bob::core::array::interface& buffer) =0;
+      virtual size_t append (const bob::core::array::interface& buffer) =0;
 
       /**
        * Writes the data from the given buffer into the file and act like it is
        * the only piece of data that will ever be written to such a file. Not
        * more data appending may happen after a call to this method.
        */
-      virtual void array_write (const bob::core::array::interface& buffer) =0;
+      virtual void write (const bob::core::array::interface& buffer) =0;
+
+    public: //blitz::Array API (easing usage)
+
+      /**
+       * This method returns a copy of the array in the file with the element
+       * type you wish (just have to get the number of dimensions right!).
+       */
+      template <typename T, int N> blitz::Array<T,N> cast(size_t index) const {
+        bob::core::array::blitz_array tmp(type());
+        read(tmp, index);
+        return tmp.cast<T,N>();
+      }
+
+      /**
+       * This method returns a copy of the array in the file with the element
+       * type you wish (just have to get the number of dimensions right!).
+       *
+       * This variant loads all data available into the file in a single array.
+       */
+      template <typename T, int N> blitz::Array<T,N> cast_all() const {
+        bob::core::array::blitz_array tmp(type_all());
+        read_all(tmp);
+        return tmp.cast<T,N>();
+      }
+
+      /**
+       * Loads the data into a previously allocated blitz::Array. The array is
+       * re-dimensioned if it does not have sufficient space to hold the data.
+       */
+      template <typename T, int N> void read(blitz::Array<T,N>& tmp, 
+          size_t index) const {
+        bob::core::array::blitz_array use_this(tmp);
+        use_this.set(type());
+        read(tmp, index);
+        tmp.reference(use_this.get<T,N>());
+      }
+
+      /**
+       * Loads the data into a dynamically allocated blitz::Array with the
+       * right size and returns a reference to it. The allocation will occur
+       * every time you call this method.
+       *
+       * This variant loads all data available into the file in a single array.
+       */
+      template <typename T, int N> void read_all(blitz::Array<T,N>& tmp) const {
+        bob::core::array::blitz_array use_this(tmp);
+        use_this.set(type_all());
+        read(tmp, index);
+        tmp.reference(use_this.get<T,N>());
+      }
 
   };
 
