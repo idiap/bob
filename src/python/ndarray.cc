@@ -126,26 +126,66 @@ int bob::python::type_to_num(bob::core::array::ElementType type) {
 
 }
 
+static bob::core::array::ElementType signed_integer_type(int bits) {
+  switch(bits) {
+    case 8:
+      return bob::core::array::t_int8;
+    case 16:
+      return bob::core::array::t_int16;
+    case 32:
+      return bob::core::array::t_int32;
+    case 64:
+      return bob::core::array::t_int64;
+    default:
+      PYTHON_ERROR(TypeError, "unsupported signed integer element type with %d bits", bits);
+  }
+}
+
+static bob::core::array::ElementType unsigned_integer_type(int bits) {
+  switch(bits) {
+    case 8:
+      return bob::core::array::t_uint8;
+    case 16:
+      return bob::core::array::t_uint16;
+    case 32:
+      return bob::core::array::t_uint32;
+    case 64:
+      return bob::core::array::t_uint64;
+    default:
+      PYTHON_ERROR(TypeError, "unsupported unsigned integer element type with %d bits", bits);
+  }
+}
+
 bob::core::array::ElementType bob::python::num_to_type(int num) {
   switch(num) {
     case NPY_BOOL:
       return bob::core::array::t_bool;
-    case NPY_INT8:
-      return bob::core::array::t_int8;
-    case NPY_INT16:
-      return bob::core::array::t_int16;
-    case NPY_INT32:
-      return bob::core::array::t_int32;
-    case NPY_INT64:
-      return bob::core::array::t_int64;
-    case NPY_UINT8:
-      return bob::core::array::t_uint8;
-    case NPY_UINT16:
-      return bob::core::array::t_uint16;
-    case NPY_UINT32:
-      return bob::core::array::t_uint32;
-    case NPY_UINT64:
-      return bob::core::array::t_uint64;
+
+    //signed integers
+    case NPY_BYTE:
+      return signed_integer_type(NPY_BITSOF_CHAR);
+    case NPY_SHORT:
+      return signed_integer_type(NPY_BITSOF_SHORT);
+    case NPY_INT:
+      return signed_integer_type(NPY_BITSOF_INT);
+    case NPY_LONG:
+      return signed_integer_type(NPY_BITSOF_LONG);
+    case NPY_LONGLONG:
+      return signed_integer_type(NPY_BITSOF_LONGLONG);
+
+    //unsigned integers
+    case NPY_UBYTE:
+      return unsigned_integer_type(NPY_BITSOF_CHAR);
+    case NPY_USHORT:
+      return unsigned_integer_type(NPY_BITSOF_SHORT);
+    case NPY_UINT:
+      return unsigned_integer_type(NPY_BITSOF_INT);
+    case NPY_ULONG:
+      return unsigned_integer_type(NPY_BITSOF_LONG);
+    case NPY_ULONGLONG:
+      return unsigned_integer_type(NPY_BITSOF_LONGLONG);
+
+    //floats
     case NPY_FLOAT32:
       return bob::core::array::t_float32;
     case NPY_FLOAT64:
@@ -154,6 +194,8 @@ bob::core::array::ElementType bob::python::num_to_type(int num) {
     case NPY_FLOAT128:
       return bob::core::array::t_float128;
 #endif
+
+    //complex
     case NPY_COMPLEX64:
       return bob::core::array::t_complex64;
     case NPY_COMPLEX128:
@@ -162,7 +204,14 @@ bob::core::array::ElementType bob::python::num_to_type(int num) {
     case NPY_COMPLEX256:
       return bob::core::array::t_complex256;
 #endif
+
     default:
+      static auto compile(NPY_LONGLONG);
+      std::cout << "NPY_LONGLONG was " << compile << std::endl;
+      std::cout << "NPY_LONGLONG is " << NPY_LONGLONG << std::endl;
+      static auto compile2(NPY_INT64);
+      std::cout << "NPY_INT64 was " << compile2 << std::endl;
+      std::cout << "NPY_INT64 is " << NPY_INT64 << std::endl;
       PYTHON_ERROR(TypeError, "unsupported NumPy element type (%d)", num);
   }
 
