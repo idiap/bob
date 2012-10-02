@@ -46,15 +46,31 @@ def readWriteTest(self, outfile, dname, data, dtype=None):
   # First, we test that we can read and write 1 single element
   outfile.append(dname + '_single', data[0])
 
+  # Set attributes on the dataset and current path (single scalar)
+  outfile.set_attribute(dname + '_single_attr', data[0], dname + '_single')
+  outfile.set_attribute(dname + '_single_attr', data[0])
+
   # Makes sure we can read the value out
   self.assertTrue( numpy.array_equal(outfile.lread(dname + '_single', 0), data[0]) )
+
+  # Makes sure we can read the attributes out
+  self.assertTrue( numpy.array_equal(outfile.get_attribute(dname + '_single_attr', dname + '_single'), data[0]) )
+  self.assertTrue( numpy.array_equal(outfile.get_attribute(dname + '_single_attr'), data[0]) )
 
   # Now we go for the full set
   outfile.append(dname, data)
 
+  # Also create big attributes to see if that works
+  outfile.set_attribute(dname + '_attr', data, dname + '_single')
+  outfile.set_attribute(dname + '_attr', data)
+
   # And that we can read it back
   back = outfile.lread(dname) #we read all at once as it is simpler
   for i, b in enumerate(back): self.assertTrue( numpy.array_equal(b, data[i]) )
+
+  # Check the attributes
+  self.assertTrue( numpy.array_equal(outfile.get_attribute(dname + '_attr', dname + '_single'), data) )
+  self.assertTrue( numpy.array_equal(outfile.get_attribute(dname + '_attr'), data) )
 
 unittest.TestCase.readWriteTest = readWriteTest
 
@@ -307,30 +323,46 @@ class HDF5FileTest(unittest.TestCase):
     finally:
       os.unlink(tmpname)
   
-  def test09_attribute_complex(self):
+  def test09_string_support(self):
 
     try:
       tmpname = get_tempfilename()
       outfile = bob.io.HDF5File(tmpname, 'w')
-      attribute = numpy.array([complex(32,29), complex(55,21), complex(-22,44.5), complex(17,19)]).reshape(2,2)
-      outfile.set_attribute('complicated', attribute)
-      recovered = outfile.get_attribute('complicated')
-      self.assertTrue(numpy.array_equal(recovered, attribute))
+      attribute = 'this is my long test string with \nNew lines'
+      outfile.set('string', attribute)
+      recovered = outfile.read('string')
+      self.assertEqual(attribute, recovered)
 
     finally:
       os.unlink(tmpname)
 
-  def test10_attribute_dataset(self):
-    
+  def test10_string_attribute_support(self):
+
     try:
       tmpname = get_tempfilename()
       outfile = bob.io.HDF5File(tmpname, 'w')
-      data = numpy.array([1,3,2,4,7,9.2]).reshape(3,2)
+      attribute = 'this is my long test string with \nNew lines'
+      outfile.set_attribute('string', attribute)
+      recovered = outfile.get_attribute('string')
+      self.assertEqual(attribute, recovered)
+
+      data = [1,2,3,4,5]
       outfile.set('data', data)
-      attribute = numpy.array([complex(32,29), complex(55,21), complex(-22,44.5), complex(17,19)]).reshape(2,2)
-      outfile.set_attribute('complicated', attribute, 'data')
-      recovered = outfile.get_attribute('complicated', 'data')
-      self.assertTrue(numpy.array_equal(recovered, attribute))
+      outfile.set_attribute('string', attribute, 'data')
+      recovered = outfile.get_attribute('string', 'data')
+      self.assertEqual(attribute, recovered)
+
+    finally:
+      os.unlink(tmpname)
+
+  def test11_can_use_set_with_iterables(self):
+
+    try:
+      tmpname = get_tempfilename()
+      outfile = bob.io.HDF5File(tmpname, 'w')
+      data = [1, 34.5, True]
+      outfile.set('data', data)
+      self.assertTrue( numpy.array_equal(data, outfile.read('data')) )
 
     finally:
       os.unlink(tmpname)
