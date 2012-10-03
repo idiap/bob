@@ -85,7 +85,6 @@ void bind_io_file() {
     .add_property("codec_name", make_function(&io::File::name, return_value_policy<copy_const_reference>()), "Name of the File class implementation -- for compatibility reasons with the previous versions of this library")
     .def("read", &file_read_all, (arg("self")), "Reads the whole contents of the file into a NumPy ndarray")
     .def("write", &file_write, (arg("self"), arg("array")), "Writes an array into the file, truncating it first")
-    
     .def("__len__", &io::File::size, (arg("self")), "Size of the file if it is supposed to be read as a set of arrays instead of performing a single read")
     .def("read", &file_read, (arg("self"), arg("index")), "Reads a single array from the file considering it to be an arrayset list")
     .def("__getitem__", &file_read, (arg("self"), arg("index")), "Reads a single array from the file considering it to be an arrayset list")

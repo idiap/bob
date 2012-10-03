@@ -26,8 +26,8 @@ def load(inputs):
        of 1D samples, load them in memory if required and concatenate them into
        a single and returned 2D numpy ndarray.
     4. An iterable with mixed filenames and :py:class:`bob.io.File`. In this
-       case, this would returned a 2D numpy ndarray, as described by points 2.
-       and 3.
+       case, this would returned a 2D :py:class:`numpy.ndarray`, as described
+       by points 2 and 3 above.
   """
 
   from collections import Iterable

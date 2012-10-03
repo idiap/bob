@@ -155,8 +155,9 @@ as it was defined.
 
   If you need to place lots of variables in a subfolder, it may be better to
   setup the prefix folder before starting the writing operations on the
-  :py:class:`bob.io.HDF5File` object. You can do this using the method :py:meth:`HDF5File.cd()`.
-  Look up its help for more information and usage instructions.
+  :py:class:`bob.io.HDF5File` object. You can do this using the method
+  :py:meth:`HDF5File.cd`.  Look up its help for more information and usage
+  instructions.
 
 Writing arrays is a little simpler as the :py:class:`numpy.ndarray` objects encode 
 all the type information we need to write and read them correctly. Here is an example:
@@ -184,8 +185,8 @@ The result of running ``h5dump`` on the file ``testfile3.hdf5`` should be:
   ...
 
 You don't need to limit yourself to single variables, you can also save lists
-of scalars and arrays using the function :py:meth:`bob.io.HDF5.append()` instead 
-of :py:meth:`bob.io.HDF5.set()`.
+of scalars and arrays using the function :py:meth:`bob.io.HDF5.append` instead 
+of :py:meth:`bob.io.HDF5.set`.
 
 Reading operations
 ------------------
@@ -193,9 +194,9 @@ Reading operations
 Reading data from a file that you just wrote to is just as easy. For this task you should use
 :py:meth:`bob.io.HDF5File.read`. The read method will read all the
 contents of the variable pointed to by the given path. This is the normal way to
-read a variable you have written with :py:meth:`bob.io.HDF5File.set()`. If
+read a variable you have written with :py:meth:`bob.io.HDF5File.set`. If
 you decided to create a list of scalar or arrays, the way to read that up would
-be using :py:meth:`bob.io.HDF5File.lread()` instead. Here is an example:
+be using :py:meth:`bob.io.HDF5File.lread` instead. Here is an example:
 
 .. doctest::
 
@@ -208,8 +209,8 @@ be using :py:meth:`bob.io.HDF5File.lread()` instead. Here is an example:
   >>> del f
 
 Now let's look at an example where we have used
-:py:meth:`bob.io.HDF5File.append()` instead of
-:py:meth:`bob.io.HDF5File.set()` to write data to a file. That is normally
+:py:meth:`bob.io.HDF5File.append` instead of
+:py:meth:`bob.io.HDF5File.set` to write data to a file. That is normally
 the case when you write lists of variables to a dataset.
 
 .. doctest::
@@ -255,12 +256,12 @@ shot:
    [  0.   2.   4.   6.   8.  10.  12.  14.  16.  18.]
    [  0.   3.   6.   9.  12.  15.  18.  21.  24.  27.]]
   
-As you can see, the only difference between :py:meth:`bob.io.HDF5File.read()`
-and :py:meth:`bob.io.HDF5File.lread()` is on how |project| considers the
+As you can see, the only difference between :py:meth:`bob.io.HDF5File.read`
+and :py:meth:`bob.io.HDF5File.lread` is on how |project| considers the
 available data (as a single array with N dimensions or as a set of arrays with N-1
 dimensions). In the first example, you would have also been able to read the
-variable `my_array` as an arrayset using :py:meth:`bob.io.HDF5File.lread()`
-instead of :py:meth:`bob.io.HDF5File.read()`. In this case, each position
+variable `my_array` as an arrayset using :py:meth:`bob.io.HDF5File.lread`
+instead of :py:meth:`bob.io.HDF5File.read`. In this case, each position
 readout would return a 1D uint8 array instead of a 2D array.
  
 Array interfaces
@@ -270,74 +271,53 @@ What we have shown so far is the generic API to read and write data using HDF5.
 You will use it when you want to import or export data from |project| into
 other software frameworks, debug your data or just implement your own classes
 that can serialize and de-serialize from HDF5 file containers. In |project|,
-most of the time you will be working with :py:class:`numpy.ndarrays`\s and, in
-rarer moments, with :py:class:`bob.io.Array`\s. It is easy to load and save
-both types from files.
+most of the time you will be working with :py:class:`numpy.ndarrays`\s. In
+special situations though, you may be asked to handle
+:py:class:`bob.io.File`\s. :py:class:`bob.io.File` objects create a transparent
+connection between C++ (`Blitz++`_) / Python (`NumPy`_) arrays and file access.
+You specify the filename from which you want to input data and the
+:py:class:`bob.io.File` object decides what is the best codec to be used (from
+the extension) and how to read the data back into your array.
 
-To create an :py:class:`bob.io.Array` from a file, just do the following:
+To create an :py:class:`bob.io.File` from a file path, just do the following:
 
 .. doctest::
 
-  >>> a = bob.io.Array('testfile2.hdf5')
+  >>> a = bob.io.File('testfile2.hdf5', 'r')
   >>> a.filename
   'testfile2.hdf5'
 
-Arrays are containers for :py:class:`numpy.ndarray`\s **or** just pointers
-to a file.  When you instantiate an :py:class:`bob.io.Array` it does **not**
-load the file contents into memory. It waits until you emit another explicit
-instruction to do so. We do this with the :py:meth:`bob.io.Array.get()`
-method:
+:py:class:`bob.io.File`\s simulate containers for :py:class:`numpy.ndarray`\s,
+transparently accessing the file data when requested. Note, however, that when
+you instantiate an :py:class:`bob.io.File` it does **not** load the file
+contents into memory. It waits until you emit another explicit instruction to
+do so. We do this with the :py:meth:`bob.io.File.read` method:
 
 .. doctest::
 
-  >>> array = a.get()
+  >>> array = a.read()
   >>> array
   array([[  0.,   1.,   2.,   3.,   4.,   5.,   6.,   7.,   8.,   9.],
          [  0.,   2.,   4.,   6.,   8.,  10.,  12.,  14.,  16.,  18.],
          [  0.,   3.,   6.,   9.,  12.,  15.,  18.,  21.,  24.,  27.]])
 
-Every time you say :py:meth:`bob.io.Array.get()`, the file contents will be
-read from the file and into a new array. Try again:
+Every time you say :py:meth:`bob.io.File.read`, the file contents will be
+read from the file and into a new array.
+
+Saving arrays to the :py:class:`bob.io.File` is as easy, just call the
+:py:meth:`bob.io.File.write` method:
 
 .. doctest::
 
-  >>> array = a.get()
-  >>> array
-  array([[  0.,   1.,   2.,   3.,   4.,   5.,   6.,   7.,   8.,   9.],
-         [  0.,   2.,   4.,   6.,   8.,  10.,  12.,  14.,  16.,  18.],
-         [  0.,   3.,   6.,   9.,  12.,  15.,  18.,  21.,  24.,  27.]])
-
-
-Calling :py:meth:`bob.io.Array.get()` will, by default, load the contents of the
-file into memory. Doing this means that subsequent calls to :py:meth:`bob.io.Array.get()`
-avoid having to read the file again and so do not incur an additional I/O cost.
-
-.. doctest::
-
-  >>> a.load() #move contents to memory
-  >>> a.filename
-  ''
-  >>> array = a.get() # if you do 'get()' again, you will get a reference to same object!
-  >>> array_reference = a.get()
-  >>> print array_reference[0,0]
-  0.0
-
-Notice that, once the array is loaded in memory, a reference to the same array
-is shared every time you call :py:meth:`bob.io.Array.get()`.
-
-Saving the :py:class:`bob.io.Array` is as easy, just call the
-:py:meth:`bob.io.Array.save()` method:
-
-.. doctest::
-
-  >>> a.save('copy1.hdf5')
+  >>> f = bob.io.File('copy1.hdf5', 'w')
+  >>> f.write(a)
 
 Numpy ndarray shortcuts
 =======================
 
-To just load an :py:class:`numpy.ndarray` in memory, you can use a short cut that
-lives at :py:func:`bob.io.load`. This short cut means that you don't have to go 
-through the :py:class:`bob.io.Array` container:
+To just load an :py:class:`numpy.ndarray` in memory, you can use a short cut
+that lives at :py:func:`bob.io.load`. With it, you don't have to go through the
+:py:class:`bob.io.File` container:
 
 .. doctest::
 
@@ -356,20 +336,21 @@ through the :py:class:`bob.io.Array` container:
 
 .. note::
 
-  Under the hood, we still use the :py:class:`bob.io.Array` API to execute
-  the read and write operations. This avoids code duplication and hooks data
-  loading and saving to the powerful |project| transcoding framework that is
-  explained next. 
+  Under the hood, we still use the :py:class:`bob.io.File` API to execute
+  the read and write operations. Have a look at the manual section for
+  :py:mod:`bob.io` for more details and other shortcuts available.
 
 Reading and writing image and video data
 ========================================
 
-|project| provides support to load and save data from many different
-file types including Matlab ``.mat`` files, various image file types and video
-data. File types and specific serialization and de-serialization is switched
-automatically using filename extensions. Knowing this, saving an array in a different format is just a matter of
-choosing the right extension. This is illustrated in the following example, where an image generated randomly using the 
-method `NumPy` :py:meth:`numpy.random.random_integers()`, is saved in JPEG format. The image must be of type uint8 or uint16.
+|project| provides support to load and save data from many different file types
+including Matlab ``.mat`` files, various image file types and video data. File
+types and specific serialization and de-serialization is switched automatically
+using filename extensions. Knowing this, saving an array in a different format
+is just a matter of choosing the right extension. This is illustrated in the
+following example, where an image generated randomly using the method `NumPy`
+:py:meth:`numpy.random.random_integers`, is saved in JPEG format. The image
+must be of type uint8 or uint16.
 
 .. doctest::
 
@@ -377,11 +358,14 @@ method `NumPy` :py:meth:`numpy.random.random_integers()`, is saved in JPEG forma
   >>> bob.io.save(my_image.astype('uint8'), 'testimage.jpg') # saving the image in jpeg format
   >>> my_copy_image = bob.io.load('testimage.jpg')
 
-As for reading the video files, although it is possible to read a video using the :py:meth:`bob.io.load()`, you should use the 
-methods of the class :py:class:`bob.io.VideoReader` to read frame by frame and avoid overloading your machine's memory. In the following 
-example you can see how to create a video and save it using the class :py:class:`bob.io.VideoWriter` and load it again using the 
-class :py:class:`bob.io.VideoReader`. The created video will have 30 frames generated randomly. Due 
-to *FFMPEG* constrains, the width and height of the video need to be multiples of two.
+As for reading the video files, although it is possible to read a video using
+the :py:meth:`bob.io.load`, you should use the methods of the class
+:py:class:`bob.io.VideoReader` to read frame by frame and avoid overloading
+your machine's memory. In the following example you can see how to create a
+video and save it using the class :py:class:`bob.io.VideoWriter` and load it
+again using the class :py:class:`bob.io.VideoReader`. The created video will
+have 30 frames generated randomly. Due to *FFMPEG* constrains, the width and
+height of the video need to be multiples of two.
 
 .. doctest::
 
@@ -401,18 +385,21 @@ to *FFMPEG* constrains, the width and height of the video need to be multiples o
   >>> type(inv)
   <type 'numpy.ndarray'>
 
-The loaded image files are 3D arrays (for RGB format) or 2D arrays (for greyscale) of type uint8 or uint16, while the loaded videos are 
-sequences of frames, usually 4D arrays of type uint8. All the extensions and formats for images and videos supported in your version 
-of |project| can be listed using the |project|'s utility `bob-config.py`.
+The loaded image files are 3D arrays (for RGB format) or 2D arrays (for
+greyscale) of type uint8 or uint16, while the loaded videos are sequences of
+frames, usually 4D arrays of type uint8. All the extensions and formats for
+images and videos supported in your version of |project| can be listed using
+the |project|'s utility `bob-config.py`.
 
-|project| supports a number of binary formats in a manner similar to the cases shown above. Writing binary files is achieved using 
-the :py:class:`bob.io.save()` with the right file extension passed as an argument, just as was shown in the example above. These additional 
-formats are:
-  
-  * Matlab (``.mat``), Matlab arrays, supports all integer, float and complex varieties [``matlab.array.binary``];
-  * bob3 (``.bindata``), supports single or double precision float numbers, only 1-D [``bob3.array.binary``];
-  * bob beta (``.bin``), supports all element types in |project| and any dimensionality [``bob.array.binary``] (*deprecated*);
-  * bob alpha (``.tensor``) [``tensor.array.binary``] (*deprecated*);
+|project| supports a number of binary formats in a manner similar to the cases
+shown above. Writing binary files is achieved using the
+:py:class:`bob.io.save` with the right file extension on the filename
+argument, just as was shown in the example above. For an overview of existing
+codecs installed with |project|, execute the command-line utility:
+
+.. code-block:: sh
+
+  $ bob_config.py
 
 .. testcleanup:: *
 
@@ -423,19 +410,22 @@ formats are:
 Loading and saving Matlab data
 ==============================
 
-An alternative for saving data in ``.mat`` files using :py:meth:`bob.io.save()`, would be to save them as a `HDF5`_ file which then can 
-be easily read in Matlab. Similarly, instead of having to read ``.mat`` files using :py:meth:`bob.io.load()`, you can save your Matlab data 
-in `HDF5`_ format, which then can be easily read from |project|. Detailed instructions about how to save and load data from Matlab to and 
-from `HDF5`_ files can be found `here`__.
+An alternative for saving data in ``.mat`` files using
+:py:meth:`bob.io.save`, would be to save them as a `HDF5`_ file which then
+can be easily read in Matlab. Similarly, instead of having to read ``.mat``
+files using :py:meth:`bob.io.load`, you can save your Matlab data in `HDF5`_
+format, which then can be easily read from |project|. Detailed instructions
+about how to save and load data from Matlab to and from `HDF5`_ files can be
+found `here`__.
 
 .. _audiosignal:
 
 Loading and saving audio files
 ==============================
 
-|project| does not yet support audio files (no wav codec). However, it is 
-possible to use the `SciPy`_ module :py:mod:`scipy.io.wavfile` to do
-the job. For instance, to read a wave file, just use the
+|project| does not yet support audio files (no wav codec). However, it is
+possible to use the `SciPy`_ module :py:mod:`scipy.io.wavfile` to do the job.
+For instance, to read a wave file, just use the
 :py:func:`scipy.io.wavfile.read` function.
 
 .. code-block:: python
@@ -448,16 +438,15 @@ the job. For instance, to read a wave file, just use the
    >>> print data.shape
    (132474, 2)
 
-In the above example, the stereo audio signal is represented as a 2D 
-`NumPy` :py:class:`numpy.ndarray`. The first dimension corresponds to the
-time index (132474 frames) and the second dimesnion correpsonds to one of
-the audio channel (2 channels, stereo). The values in the array correpsond
-to the wave magnitudes.
+In the above example, the stereo audio signal is represented as a 2D `NumPy`
+:py:class:`numpy.ndarray`. The first dimension corresponds to the time index
+(132474 frames) and the second dimesnion correpsonds to one of the audio
+channel (2 channels, stereo). The values in the array correpsond to the wave
+magnitudes.
 
-To save a `NumPy` :py:class:`numpy.ndarray` into a wave file, the 
+To save a `NumPy` :py:class:`numpy.ndarray` into a wave file, the
 :py:func:`scipy.io.wavfile.write` could be used, which also requires the
 framerate to be specified.
-
 
 .. include:: links.rst
 
