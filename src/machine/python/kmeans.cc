@@ -88,7 +88,8 @@ static void py_setMeans(bob::machine::KMeansMachine& machine, bob::python::const
   const bob::core::array::typeinfo& info = means.type();
   if(info.dtype != bob::core::array::t_float64 || info.nd != 2)
     PYTHON_ERROR(TypeError, "cannot set array of type '%s'", info.str().c_str());
-  machine.setMeans(means.bz<double,2>());
+  blitz::Array<double,2> means_ = means.bz<double,2>();
+  machine.setMeans(means_);
 }
 
 static double py_getDistanceFromMean(const bob::machine::KMeansMachine& machine, bob::python::const_ndarray x, const size_t i) 
