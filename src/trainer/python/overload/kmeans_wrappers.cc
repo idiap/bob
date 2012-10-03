@@ -89,8 +89,10 @@ public:
   }
   
   void eStep(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
-    if (override python_eStep = this->get_override("e_step")) python_eStep(machine, data);
-    train::KMeansTrainer::eStep(machine, data);
+    if (override python_eStep = this->get_override("e_step")) 
+      python_eStep(machine, data);
+    else
+      train::KMeansTrainer::eStep(machine, data);
   }
   
   void d_eStep(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
