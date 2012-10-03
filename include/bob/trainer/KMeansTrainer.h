@@ -40,7 +40,8 @@ class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, blitz::Array<
      * Constructor
      */
     KMeansTrainer(double convergence_threshold=0.001, 
-      size_t max_iterations=10, bool compute_likelihood=true);
+      size_t max_iterations=10, bool compute_likelihood=true, 
+      bool check_no_duplicate=false);
     
     /**
      * virtualize destructor
@@ -115,8 +116,18 @@ class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, blitz::Array<
     /**
      * Get the seed
      */
-    inline int getSeed() const { return m_seed; }
-   
+    int getSeed() const { return m_seed; }
+
+    /**
+     * Tell whether duplicate means are checked or not during the initialization
+     */
+    void setCheckNoDuplicate(bool v) { m_check_no_duplicate = v; }
+
+    /**
+     * Tell whether duplicate means are checked or not during the initialization
+     */
+    bool getCheckNoDuplicate() const { return m_check_no_duplicate; }
+  
     /**
      * Returns the internal statistics. Useful to parallelize the E-step
      */
@@ -132,6 +143,11 @@ class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, blitz::Array<
 
  
   protected:
+
+    /**
+     * Check that there is no duplicated means during the random initialization
+     */
+    bool m_check_no_duplicate;
 
     /**
      * Seed used to generate pseudo-random numbers

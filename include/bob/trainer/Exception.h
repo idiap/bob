@@ -109,6 +109,16 @@ namespace bob { namespace trainer {
       mutable std::string m_message;
   };
 
+  /**
+   * Raised when the K-means initialization fails.
+   */
+  class KMeansInitializationFailure: public Exception {
+    public:
+      KMeansInitializationFailure() throw();
+      virtual ~KMeansInitializationFailure() throw();
+      virtual const char* what() const throw();
+  };
+
 }}
 
-#endif /* BOB5SPRO_TRAINER_EXCEPTION_H */
+#endif /* BOB_TRAINER_EXCEPTION_H */

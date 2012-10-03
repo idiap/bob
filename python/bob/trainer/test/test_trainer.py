@@ -163,6 +163,14 @@ class TrainerTest(unittest.TestCase):
     trainer1.seed = 1337
     self.assertFalse( trainer1 == trainer2)
     self.assertTrue( trainer1 != trainer2)
+
+    # Check that there is no duplicate means during initialization
+    machine = bob.machine.KMeansMachine(2, 1)
+    trainer = bob.trainer.KMeansTrainer()
+    trainer.check_no_duplicate = True
+    data = numpy.array([[1.], [1.], [1.], [1.], [1.], [1.], [2.], [3.]])
+    trainer.train(machine, data)
+    self.assertFalse( numpy.isnan(machine.means).any())
     
   def test02_gmm_ML(self):
 

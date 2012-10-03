@@ -129,3 +129,13 @@ const char* bob::trainer::LLRPriorNotInRange::what() const throw() {
   }
 }
 
+bob::trainer::KMeansInitializationFailure::KMeansInitializationFailure() throw() {
+}
+
+bob::trainer::KMeansInitializationFailure::~KMeansInitializationFailure() throw() {
+}
+
+const char* bob::trainer::KMeansInitializationFailure::what() const throw() {
+ static const char* what_string = "bob::trainer::KMeansInitializationFailure: this usually happens when many samples are identical, as the initial means should all be different.";
+ return what_string;
+}

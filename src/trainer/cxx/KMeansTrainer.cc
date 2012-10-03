@@ -21,12 +21,14 @@
 
 #include "bob/trainer/KMeansTrainer.h"
 #include "bob/core/array_copy.h"
+#include "bob/trainer/Exception.h"
 #include <boost/random.hpp>
 
 bob::trainer::KMeansTrainer::KMeansTrainer(double convergence_threshold,
-    size_t max_iterations, bool compute_likelihood):
+    size_t max_iterations, bool compute_likelihood, bool check_no_duplicate):
   bob::trainer::EMTrainer<bob::machine::KMeansMachine, blitz::Array<double,2> >(
     convergence_threshold, max_iterations, compute_likelihood), 
+  m_check_no_duplicate(check_no_duplicate),
   m_seed(-1), m_average_min_distance(0),
   m_zeroethOrderStats(0), m_firstOrderStats(0,0)
 {
@@ -35,6 +37,7 @@ bob::trainer::KMeansTrainer::KMeansTrainer(double convergence_threshold,
 bob::trainer::KMeansTrainer::KMeansTrainer(const bob::trainer::KMeansTrainer& other):
   bob::trainer::EMTrainer<bob::machine::KMeansMachine, blitz::Array<double,2> >(
     other.m_convergence_threshold, other.m_max_iterations, other.m_compute_likelihood), 
+  m_check_no_duplicate(other.m_check_no_duplicate),
   m_seed(other.m_seed), m_average_min_distance(other.m_average_min_distance),
   m_zeroethOrderStats(bob::core::array::ccopy(other.m_zeroethOrderStats)), 
   m_firstOrderStats(bob::core::array::ccopy(other.m_firstOrderStats))
@@ -47,6 +50,7 @@ bob::trainer::KMeansTrainer& bob::trainer::KMeansTrainer::operator=
   if(this != &other)
   {
     EMTrainer<bob::machine::KMeansMachine, blitz::Array<double,2> >::operator=(other);
+    m_check_no_duplicate = other.m_check_no_duplicate;
     m_seed = other.m_seed;
     m_average_min_distance = other.m_average_min_distance;
     m_zeroethOrderStats.reference(bob::core::array::ccopy(other.m_zeroethOrderStats));
@@ -56,7 +60,8 @@ bob::trainer::KMeansTrainer& bob::trainer::KMeansTrainer::operator=
 }
 
 bool bob::trainer::KMeansTrainer::operator==(const bob::trainer::KMeansTrainer& b) const {
-  return EMTrainer<bob::machine::KMeansMachine, blitz::Array<double,2> >::operator==(b) && 
+  return EMTrainer<bob::machine::KMeansMachine, blitz::Array<double,2> >::operator==(b) &&
+         m_check_no_duplicate == b.m_check_no_duplicate &&
          m_seed == b.m_seed && m_average_min_distance == b.m_average_min_distance &&
          bob::core::array::hasSameShape(m_zeroethOrderStats, b.m_zeroethOrderStats) &&
          bob::core::array::hasSameShape(m_firstOrderStats, b.m_firstOrderStats) &&
@@ -74,6 +79,10 @@ void bob::trainer::KMeansTrainer::initialization(bob::machine::KMeansMachine& km
   // split data into as many chunks as there are means
   size_t n_data = ar.extent(0);
   unsigned int n_chunk = n_data / kmeans.getNMeans();
+  size_t n_max_trials = (size_t)n_chunk * 5;
+  blitz::Array<double,1> cur_mean;
+  if(m_check_no_duplicate)
+    cur_mean.resize(kmeans.getNInputs());
   
   boost::mt19937 rng;
   if(m_seed != -1) rng.seed((uint32_t)m_seed);
@@ -82,7 +91,6 @@ void bob::trainer::KMeansTrainer::initialization(bob::machine::KMeansMachine& km
   blitz::Range a = blitz::Range::all();
   for(size_t i=0; i<kmeans.getNMeans(); ++i) 
   {
-    // TODO: Check that samples are not equal?
     boost::uniform_int<> range(i*n_chunk, (i+1)*n_chunk-1);
     boost::variate_generator<boost::mt19937&, boost::uniform_int<> > die(rng, range);
     
@@ -91,6 +99,34 @@ void bob::trainer::KMeansTrainer::initialization(bob::machine::KMeansMachine& km
 
     // get the example at that index
     blitz::Array<double, 1> mean = ar(index,a);
+
+    if(m_check_no_duplicate)
+    {
+      size_t count = 0;
+      while(count < n_max_trials)
+      {
+        // check that the selected sampled is different than all the previously 
+        // selected ones
+        bool valid = true;
+        for(size_t j=0; j<i && valid; ++j)
+        {
+          kmeans.getMean(j, cur_mean);
+          valid = blitz::any(mean != cur_mean);
+        }
+        // if different, stop otherwise, try with another one
+        if(valid) 
+          break;
+        else
+        {
+          index = die();
+          mean = ar(index,a);
+          ++count;
+        }
+      }
+      // Initialization fails
+      if(count >= n_max_trials)
+        throw bob::trainer::KMeansInitializationFailure();
+    }
     
     // set the mean
     kmeans.setMean(i, mean);
