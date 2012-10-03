@@ -26,61 +26,61 @@
 #include "bob/machine/Exception.h"
 #include <limits>
 
-namespace ca = bob::core::array;
-namespace mach = bob::machine;
-namespace io = bob::io;
-
-mach::KMeansMachine::KMeansMachine(): 
+bob::machine::KMeansMachine::KMeansMachine(): 
   m_n_means(0), m_n_inputs(0), m_means(0,0),
   m_cache_means(0,0) 
 {
   m_means = 0;
 }
 
-mach::KMeansMachine::KMeansMachine(const size_t n_means, const size_t n_inputs): 
+bob::machine::KMeansMachine::KMeansMachine(const size_t n_means, const size_t n_inputs): 
   m_n_means(n_means), m_n_inputs(n_inputs), m_means(n_means, n_inputs),
   m_cache_means(n_means, n_inputs) 
 {
   m_means = 0;
 }
 
-mach::KMeansMachine::KMeansMachine(const blitz::Array<double,2>& means): 
+bob::machine::KMeansMachine::KMeansMachine(const blitz::Array<double,2>& means): 
   m_n_means(means.extent(0)), m_n_inputs(means.extent(1)), 
-  m_means(ca::ccopy(means)),
+  m_means(bob::core::array::ccopy(means)),
   m_cache_means(means.shape()) 
 {
 }
 
-mach::KMeansMachine::KMeansMachine(const mach::KMeansMachine& other): 
+bob::machine::KMeansMachine::KMeansMachine(const bob::machine::KMeansMachine& other): 
   m_n_means(other.m_n_means), m_n_inputs(other.m_n_inputs), 
-  m_means(ca::ccopy(other.m_means)),
+  m_means(bob::core::array::ccopy(other.m_means)),
   m_cache_means(other.m_cache_means.shape()) 
 {
 }
 
-mach::KMeansMachine::KMeansMachine(io::HDF5File& config) 
+bob::machine::KMeansMachine::KMeansMachine(bob::io::HDF5File& config) 
 {
   load(config);
 }
 
-mach::KMeansMachine::~KMeansMachine() { }
+bob::machine::KMeansMachine::~KMeansMachine() { }
 
-mach::KMeansMachine& mach::KMeansMachine::operator=
-(const mach::KMeansMachine& other) 
+bob::machine::KMeansMachine& bob::machine::KMeansMachine::operator=
+(const bob::machine::KMeansMachine& other) 
 {
   m_n_means = other.m_n_means;
   m_n_inputs = other.m_n_inputs;
-  m_means.reference(ca::ccopy(other.m_means));
+  m_means.reference(bob::core::array::ccopy(other.m_means));
   m_cache_means.resize(other.m_means.shape());
   return *this;
 }
 
-bool mach::KMeansMachine::operator==(const mach::KMeansMachine& b) const {
+bool bob::machine::KMeansMachine::operator==(const bob::machine::KMeansMachine& b) const {
   return m_n_inputs == b.m_n_inputs && m_n_means == b.m_n_means &&
          blitz::all(m_means == b.m_means);
 }
 
-void mach::KMeansMachine::load(io::HDF5File& config) 
+bool bob::machine::KMeansMachine::operator!=(const bob::machine::KMeansMachine& b) const {
+  return !(this->operator==(b));
+}
+
+void bob::machine::KMeansMachine::load(bob::io::HDF5File& config) 
 {
   //reads all data directly into the member variables
   m_means.reference(config.readArray<double,2>("means"));
@@ -89,38 +89,38 @@ void mach::KMeansMachine::load(io::HDF5File& config)
   m_cache_means.resize(m_n_means, m_n_inputs);
 }
 
-void mach::KMeansMachine::save(io::HDF5File& config) const 
+void bob::machine::KMeansMachine::save(bob::io::HDF5File& config) const 
 {
   config.setArray("means", m_means);
 } 
 
-void mach::KMeansMachine::setMeans(const blitz::Array<double,2> &means) 
+void bob::machine::KMeansMachine::setMeans(const blitz::Array<double,2> &means) 
 {
-  ca::assertSameShape(means, m_means);
+  bob::core::array::assertSameShape(means, m_means);
   m_means = means;
 }
 
-void mach::KMeansMachine::setMean(const size_t i, const blitz::Array<double,1> &mean) 
+void bob::machine::KMeansMachine::setMean(const size_t i, const blitz::Array<double,1> &mean) 
 {
-  // TODO: check i is in range
-  ca::assertSameDimensionLength(mean.extent(0), m_means.extent(1));
+  if(i>=m_n_means) throw bob::core::InvalidArgumentException("mean index", i);
+  bob::core::array::assertSameDimensionLength(mean.extent(0), m_means.extent(1));
   m_means(i,blitz::Range::all()) = mean;
 }
 
-void mach::KMeansMachine::getMean(const size_t i, blitz::Array<double,1> &mean) const 
+void bob::machine::KMeansMachine::getMean(const size_t i, blitz::Array<double,1> &mean) const 
 {
-  // TODO: check i is in range
-  ca::assertSameDimensionLength(mean.extent(0), m_means.extent(1));
+  if(i>=m_n_means) throw bob::core::InvalidArgumentException("mean index", i);
+  bob::core::array::assertSameDimensionLength(mean.extent(0), m_means.extent(1));
   mean = m_means(i,blitz::Range::all());
 }
 
-double mach::KMeansMachine::getDistanceFromMean(const blitz::Array<double,1> &x, 
+double bob::machine::KMeansMachine::getDistanceFromMean(const blitz::Array<double,1> &x, 
   const size_t i) const 
 {
   return blitz::sum(blitz::pow2(m_means(i,blitz::Range::all()) - x));
 }
 
-void mach::KMeansMachine::getClosestMean(const blitz::Array<double,1> &x, 
+void bob::machine::KMeansMachine::getClosestMean(const blitz::Array<double,1> &x, 
   size_t &closest_mean, double &min_distance) const 
 {
   min_distance = std::numeric_limits<double>::max();
@@ -134,7 +134,7 @@ void mach::KMeansMachine::getClosestMean(const blitz::Array<double,1> &x,
   } 
 }
 
-double mach::KMeansMachine::getMinDistance(const blitz::Array<double,1>& input) const 
+double bob::machine::KMeansMachine::getMinDistance(const blitz::Array<double,1>& input) const 
 {
   size_t closest_mean = 0;
   double min_distance = 0;
@@ -142,22 +142,33 @@ double mach::KMeansMachine::getMinDistance(const blitz::Array<double,1>& input) 
   return min_distance;
 }
 
-void mach::KMeansMachine::getVariancesAndWeightsForEachCluster(const blitz::Array<double,2>& sampler, blitz::Array<double,2>& variances, blitz::Array<double,1>& weights) const 
+void bob::machine::KMeansMachine::getVariancesAndWeightsForEachClusterInit(blitz::Array<double,2>& variances, blitz::Array<double,1>& weights) const 
 {
-  // check and initialise output arrays
-  ca::assertSameShape(variances, m_means);
-  ca::assertSameDimensionLength(weights.extent(0), m_n_means);
+  // check arguments
+  bob::core::array::assertSameShape(variances, m_means);
+  bob::core::array::assertSameDimensionLength(weights.extent(0), m_n_means);
+
+  // initialise output arrays
+  bob::core::array::assertSameShape(variances, m_means);
+  bob::core::array::assertSameDimensionLength(weights.extent(0), m_n_means);
   variances = 0;
   weights = 0;
   
   // initialise (temporary) mean array
   m_cache_means = 0;
+}
   
+void bob::machine::KMeansMachine::getVariancesAndWeightsForEachClusterAcc(const blitz::Array<double,2>& data, blitz::Array<double,2>& variances, blitz::Array<double,1>& weights) const 
+{
+  // check arguments
+  bob::core::array::assertSameShape(variances, m_means);
+  bob::core::array::assertSameDimensionLength(weights.extent(0), m_n_means);
+
   // iterate over data
   blitz::Range a = blitz::Range::all();
-  for(int i=0; i<sampler.extent(0); ++i) {
+  for(int i=0; i<data.extent(0); ++i) {
     // - get example
-    blitz::Array<double,1> x(sampler(i,a));
+    blitz::Array<double,1> x(data(i,a));
     
     // - find closest mean
     size_t closest_mean = 0;
@@ -169,7 +180,14 @@ void mach::KMeansMachine::getVariancesAndWeightsForEachCluster(const blitz::Arra
     variances(closest_mean, blitz::Range::all()) += blitz::pow2(x);
     ++weights(closest_mean);
   }
+}
   
+void bob::machine::KMeansMachine::getVariancesAndWeightsForEachClusterFin(blitz::Array<double,2>& variances, blitz::Array<double,1>& weights) const 
+{
+  // check arguments
+  bob::core::array::assertSameShape(variances, m_means);
+  bob::core::array::assertSameDimensionLength(weights.extent(0), m_n_means);
+
   // calculate final variances and weights
   blitz::firstIndex idx1;
   blitz::secondIndex idx2;
@@ -185,7 +203,23 @@ void mach::KMeansMachine::getVariancesAndWeightsForEachCluster(const blitz::Arra
   weights = weights / blitz::sum(weights);
 }
 
-void mach::KMeansMachine::forward(const blitz::Array<double,1>& input, double& output) const 
+void bob::machine::KMeansMachine::setCacheMeans(const blitz::Array<double,2> &cache_means) 
+{
+  bob::core::array::assertSameShape(cache_means, m_cache_means);
+  m_cache_means = cache_means;
+}
+
+void bob::machine::KMeansMachine::getVariancesAndWeightsForEachCluster(const blitz::Array<double,2>& data, blitz::Array<double,2>& variances, blitz::Array<double,1>& weights) const 
+{
+  // initialise
+  getVariancesAndWeightsForEachClusterInit(variances, weights);
+  // accumulate
+  getVariancesAndWeightsForEachClusterAcc(data, variances, weights);
+  // merge/finalize
+  getVariancesAndWeightsForEachClusterFin(variances, weights);
+}
+
+void bob::machine::KMeansMachine::forward(const blitz::Array<double,1>& input, double& output) const 
 {
   if(static_cast<size_t>(input.extent(0)) != m_n_inputs) {
     throw NInputsMismatch(m_n_inputs, input.extent(0));
@@ -193,12 +227,12 @@ void mach::KMeansMachine::forward(const blitz::Array<double,1>& input, double& o
   forward_(input,output); 
 }
 
-void mach::KMeansMachine::forward_(const blitz::Array<double,1>& input, double& output) const 
+void bob::machine::KMeansMachine::forward_(const blitz::Array<double,1>& input, double& output) const 
 {
   output = getMinDistance(input);
 }
 
-void mach::KMeansMachine::resize(const size_t n_means, const size_t n_inputs) 
+void bob::machine::KMeansMachine::resize(const size_t n_means, const size_t n_inputs) 
 {
   m_n_means = n_means;
   m_n_inputs = n_inputs;

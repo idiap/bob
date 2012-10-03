@@ -24,65 +24,85 @@
 #include "bob/core/python/ndarray.h"
 
 using namespace boost::python;
-namespace io = bob::io;
-namespace mach = bob::machine;
-namespace bp = bob::python;
-namespace ca = bob::core::array;
 
-static tuple py_getVariancesAndWeightsForEachCluster(const mach::KMeansMachine& machine, const blitz::Array<double,2>& ar) {
+static tuple py_getVariancesAndWeightsForEachCluster(const bob::machine::KMeansMachine& machine, bob::python::const_ndarray ar) {
   size_t n_means = machine.getNMeans();
   size_t n_inputs = machine.getNInputs();
-  bp::ndarray variances(ca::t_float64, n_means, n_inputs);
-  bp::ndarray weights(ca::t_float64, n_means);
+  bob::python::ndarray variances(bob::core::array::t_float64, n_means, n_inputs);
+  bob::python::ndarray weights(bob::core::array::t_float64, n_means);
   blitz::Array<double,2> variances_ = variances.bz<double,2>();
   blitz::Array<double,1> weights_ = weights.bz<double,1>();
-  machine.getVariancesAndWeightsForEachCluster(ar, variances_, weights_);
+  const bob::core::array::typeinfo& info = ar.type();
+  if(info.dtype != bob::core::array::t_float64 || info.nd != 2)
+    PYTHON_ERROR(TypeError, "cannot set array of type '%s'", info.str().c_str());
+  machine.getVariancesAndWeightsForEachCluster(ar.bz<double,2>(), variances_, weights_);
   return boost::python::make_tuple(variances.self(), weights.self());
 }
 
-static object py_getMean(const mach::KMeansMachine& kMeansMachine, const size_t i) {
+static void py_getVariancesAndWeightsForEachClusterInit(const bob::machine::KMeansMachine& machine, bob::python::ndarray variances, bob::python::ndarray weights) {
+  blitz::Array<double,2> variances_ = variances.bz<double,2>();
+  blitz::Array<double,1> weights_ = weights.bz<double,1>();
+  machine.getVariancesAndWeightsForEachClusterInit(variances_, weights_);
+}
+
+static void py_getVariancesAndWeightsForEachClusterAcc(const bob::machine::KMeansMachine& machine, bob::python::const_ndarray ar, bob::python::ndarray variances, bob::python::ndarray weights) {
+  blitz::Array<double,2> variances_ = variances.bz<double,2>();
+  blitz::Array<double,1> weights_ = weights.bz<double,1>();
+  const bob::core::array::typeinfo& info = ar.type();
+  if(info.dtype != bob::core::array::t_float64 || info.nd != 2)
+    PYTHON_ERROR(TypeError, "cannot set array of type '%s'", info.str().c_str());
+  machine.getVariancesAndWeightsForEachClusterAcc(ar.bz<double,2>(), variances_, weights_);
+}
+
+static void py_getVariancesAndWeightsForEachClusterFin(const bob::machine::KMeansMachine& machine, bob::python::ndarray variances, bob::python::ndarray weights) {
+  blitz::Array<double,2> variances_ = variances.bz<double,2>();
+  blitz::Array<double,1> weights_ = weights.bz<double,1>();
+  machine.getVariancesAndWeightsForEachClusterFin(variances_, weights_);
+}
+
+static object py_getMean(const bob::machine::KMeansMachine& kMeansMachine, const size_t i) {
   size_t n_inputs = kMeansMachine.getNInputs();
-  bp::ndarray mean(ca::t_float64, n_inputs);
+  bob::python::ndarray mean(bob::core::array::t_float64, n_inputs);
   blitz::Array<double,1> mean_ = mean.bz<double,1>();
   kMeansMachine.getMean(i, mean_);
   return mean.self();
 }
 
-static void py_setMean(mach::KMeansMachine& machine, const size_t i, bp::const_ndarray mean) {
-  const ca::typeinfo& info = mean.type();
-  if(info.dtype != ca::t_float64 || info.nd != 1)
+static void py_setMean(bob::machine::KMeansMachine& machine, const size_t i, bob::python::const_ndarray mean) {
+  const bob::core::array::typeinfo& info = mean.type();
+  if(info.dtype != bob::core::array::t_float64 || info.nd != 1)
     PYTHON_ERROR(TypeError, "cannot set array of type '%s'", info.str().c_str());
   machine.setMean(i, mean.bz<double,1>());
 }
 
-static object py_getMeans(const mach::KMeansMachine& kMeansMachine) {
+static object py_getMeans(const bob::machine::KMeansMachine& kMeansMachine) {
   size_t n_means = kMeansMachine.getNMeans();
   size_t n_inputs = kMeansMachine.getNInputs();
-  bp::ndarray means(ca::t_float64, n_means, n_inputs);
+  bob::python::ndarray means(bob::core::array::t_float64, n_means, n_inputs);
   blitz::Array<double,2> means_ = means.bz<double,2>();
   means_ = kMeansMachine.getMeans();
   return means.self();
 }
 
-static void py_setMeans(mach::KMeansMachine& machine, bp::const_ndarray means) {
-  const ca::typeinfo& info = means.type();
-  if(info.dtype != ca::t_float64 || info.nd != 2)
+static void py_setMeans(bob::machine::KMeansMachine& machine, bob::python::const_ndarray means) {
+  const bob::core::array::typeinfo& info = means.type();
+  if(info.dtype != bob::core::array::t_float64 || info.nd != 2)
     PYTHON_ERROR(TypeError, "cannot set array of type '%s'", info.str().c_str());
   machine.setMeans(means.bz<double,2>());
 }
 
-static double py_getDistanceFromMean(const mach::KMeansMachine& machine, bp::const_ndarray x, const size_t i) 
+static double py_getDistanceFromMean(const bob::machine::KMeansMachine& machine, bob::python::const_ndarray x, const size_t i) 
 {
-  const ca::typeinfo& info = x.type();
-  if(info.dtype != ca::t_float64 || info.nd != 1)
+  const bob::core::array::typeinfo& info = x.type();
+  if(info.dtype != bob::core::array::t_float64 || info.nd != 1)
     PYTHON_ERROR(TypeError, "cannot set array of type '%s'", info.str().c_str());
   return machine.getDistanceFromMean(x.bz<double,1>(), i);
 }
 
-static tuple py_getClosestMean(const mach::KMeansMachine& machine, bp::const_ndarray x) 
+static tuple py_getClosestMean(const bob::machine::KMeansMachine& machine, bob::python::const_ndarray x) 
 {
-  const ca::typeinfo& info = x.type();
-  if(info.dtype != ca::t_float64 || info.nd != 1)
+  const bob::core::array::typeinfo& info = x.type();
+  if(info.dtype != bob::core::array::t_float64 || info.nd != 1)
     PYTHON_ERROR(TypeError, "cannot set array of type '%s'", info.str().c_str());
   size_t closest_mean;
   double min_distance;
@@ -90,29 +110,47 @@ static tuple py_getClosestMean(const mach::KMeansMachine& machine, bp::const_nda
   return boost::python::make_tuple(closest_mean, min_distance);
 }
 
-static double py_getMinDistance(const mach::KMeansMachine& machine, bp::const_ndarray input) 
+static double py_getMinDistance(const bob::machine::KMeansMachine& machine, bob::python::const_ndarray input) 
 {
-  const ca::typeinfo& info = input.type();
-  if(info.dtype != ca::t_float64 || info.nd != 1)
+  const bob::core::array::typeinfo& info = input.type();
+  if(info.dtype != bob::core::array::t_float64 || info.nd != 1)
     PYTHON_ERROR(TypeError, "cannot set array of type '%s'", info.str().c_str());
   return machine.getMinDistance(input.bz<double,1>());
 }
 
+static object py_getCacheMeans(const bob::machine::KMeansMachine& kMeansMachine) {
+  size_t n_means = kMeansMachine.getNMeans();
+  size_t n_inputs = kMeansMachine.getNInputs();
+  bob::python::ndarray cache_means(bob::core::array::t_float64, n_means, n_inputs);
+  blitz::Array<double,2> cache_means_ = cache_means.bz<double,2>();
+  cache_means_ = kMeansMachine.getCacheMeans();
+  return cache_means.self();
+}
+
+static void py_setCacheMeans(bob::machine::KMeansMachine& machine, bob::python::const_ndarray cache_means) {
+  const bob::core::array::typeinfo& info = cache_means.type();
+  if(info.dtype != bob::core::array::t_float64 || info.nd != 2)
+    PYTHON_ERROR(TypeError, "cannot set array of type '%s'", info.str().c_str());
+  machine.setCacheMeans(cache_means.bz<double,2>());
+}
 
 void bind_machine_kmeans() 
 {
-  class_<mach::KMeansMachine, bases<mach::Machine<blitz::Array<double,1>, double> > >("KMeansMachine",
+  class_<bob::machine::KMeansMachine, boost::shared_ptr<bob::machine::KMeansMachine>, 
+         bases<bob::machine::Machine<blitz::Array<double,1>, double> > >("KMeansMachine",
       "This class implements a k-means classifier.\n"
       "See Section 9.1 of Bishop, \"Pattern recognition and machine learning\", 2006",
       init<>())
     .def(init<const size_t, const size_t>(args("n_means", "n_inputs")))
-    .def(init<mach::KMeansMachine&>())
-    .def(init<io::HDF5File&>(args("config")))
+    .def(init<bob::machine::KMeansMachine&>())
+    .def(init<bob::io::HDF5File&>(args("config")))
     .def(self == self)
+    .def(self != self)
     .add_property("means", &py_getMeans, &py_setMeans, "The mean vectors")
-    .add_property("dim_d", &mach::KMeansMachine::getNInputs, "Number of inputs")
-    .add_property("dim_c", &mach::KMeansMachine::getNMeans, "Number of means (k)")
-    .def("resize", &mach::KMeansMachine::resize, (arg("n_means"), arg("n_inputs")), "Resize the number of means and inputs")
+    .add_property("__cache_means__", &py_getCacheMeans, &py_setCacheMeans, "The cache mean vectors. This should only be used when parallelizing the get_variances_and_weights_for_each_cluster() method")
+    .add_property("dim_d", &bob::machine::KMeansMachine::getNInputs, "Number of inputs")
+    .add_property("dim_c", &bob::machine::KMeansMachine::getNMeans, "Number of means (k)")
+    .def("resize", &bob::machine::KMeansMachine::resize, (arg("n_means"), arg("n_inputs")), "Resize the number of means and inputs")
     .def("get_mean", &py_getMean, (arg("i"), arg("mean")), "Get the i'th mean")
     .def("set_mean", &py_setMean, (arg("i"), arg("mean")), "Set the i'th mean")
     .def("get_distance_from_mean", &py_getDistanceFromMean, (arg("x"), arg("i")),
@@ -125,8 +163,17 @@ void bind_machine_kmeans()
         "For each mean, find the subset of the samples that is closest to that mean, and calculate\n"
         "1) the variance of that subset (the cluster variance)\n"
         "2) the proportion of the samples represented by that subset (the cluster weight)")
-    .def("load", &mach::KMeansMachine::load, "Load from a Configuration")
-    .def("save", &mach::KMeansMachine::save, "Save to a Configuration")
+    .def("__get_variances_and_weights_for_each_cluster_init__", &py_getVariancesAndWeightsForEachClusterInit, (arg("machine"), arg("variances"), arg("weights")),
+        "For the parallel version of get_variances_and_weights_for_each_cluster()\n"
+        "Initialization step")
+    .def("__get_variances_and_weights_for_each_cluster_acc__", &py_getVariancesAndWeightsForEachClusterAcc, (arg("machine"), arg("data"), arg("variances"), arg("weights")),
+        "For the parallel version of get_variances_and_weights_for_each_cluster()\n"
+        "Accumulation step")
+    .def("__get_variances_and_weights_for_each_cluster_fin__", &py_getVariancesAndWeightsForEachClusterFin, (arg("machine"), arg("variances"), arg("weights")),
+        "For the parallel version of get_variances_and_weights_for_each_cluster()\n"
+        "Finalization step")
+    .def("load", &bob::machine::KMeansMachine::load, "Load from a Configuration")
+    .def("save", &bob::machine::KMeansMachine::save, "Save to a Configuration")
     .def(self_ns::str(self_ns::self))
   ;
 }

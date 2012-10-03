@@ -106,6 +106,11 @@ class TrainerTest(unittest.TestCase):
     trainer.train(machine, data)
 
     [variances, weights] = machine.get_variances_and_weights_for_each_cluster(data)
+    variances_b = numpy.ndarray(shape=(2,1), dtype=numpy.float64)
+    weights_b = numpy.ndarray(shape=(2,), dtype=numpy.float64)
+    machine.__get_variances_and_weights_for_each_cluster_init__(variances_b, weights_b)
+    machine.__get_variances_and_weights_for_each_cluster_acc__(data, variances_b, weights_b)
+    machine.__get_variances_and_weights_for_each_cluster_fin__(variances_b, weights_b)
     m1 = machine.get_mean(0)
     m2 = machine.get_mean(1)
 
@@ -115,6 +120,9 @@ class TrainerTest(unittest.TestCase):
     self.assertTrue(equals(means, numpy.array([-10.,10.]), 2e-1))
     self.assertTrue(equals(variances, numpy.array([1.,1.]), 2e-1))
     self.assertTrue(equals(weights, numpy.array([0.5,0.5]), 1e-3))
+
+    self.assertTrue(equals(variances, variances_b, 1e-8))
+    self.assertTrue(equals(weights, weights_b, 1e-8))
 
   def test01_kmeans(self):
 

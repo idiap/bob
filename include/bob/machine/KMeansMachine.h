@@ -81,6 +81,11 @@ class KMeansMachine: public Machine<blitz::Array<double,1>, double> {
     bool operator==(const KMeansMachine& b) const;
 
     /**
+     * Not equal to
+     */
+    bool operator!=(const KMeansMachine& b) const;
+
+    /**
      * Loads data from an existing configuration object. Resets the current
      * state.
      */
@@ -166,13 +171,38 @@ class KMeansMachine: public Machine<blitz::Array<double,1>, double> {
      * that is closest to that mean, and calculate
      * 1) the variance of that subset (the cluster variance)
      * 2) the proportion of the samples represented by that subset (the cluster weight)
-     * @param[in]  sampler   The sampler
+     * @param[in]  data      The data
      * @param[out] variances The cluster variances (one row per cluster), 
      *                       with as many columns as feature dimensions.
      * @param[out] weights   A vector of weights, one per cluster
      */
-    void getVariancesAndWeightsForEachCluster(const blitz::Array<double,2> &sampler, blitz::Array<double,2>& variances, blitz::Array<double,1>& weights) const;
-       
+    void getVariancesAndWeightsForEachCluster(const blitz::Array<double,2> &data, blitz::Array<double,2>& variances, blitz::Array<double,1>& weights) const;
+    /**
+     * Methods consecutively called by getVariancesAndWeightsForEachCluster()
+     * This should help for the parallelization on several nodes by splitting the data and calling
+     * getVariancesAndWeightsForEachClusterAcc() for each split. In this case, there is a need to sum
+     * with the m_cache_means, variances, and weights variables before performing the merge on one
+     * node using getVariancesAndWeightsForEachClusterFin().
+     */
+    void getVariancesAndWeightsForEachClusterInit(blitz::Array<double,2>& variances, blitz::Array<double,1>& weights) const;
+    void getVariancesAndWeightsForEachClusterAcc(const blitz::Array<double,2> &data, blitz::Array<double,2>& variances, blitz::Array<double,1>& weights) const;
+    void getVariancesAndWeightsForEachClusterFin(blitz::Array<double,2>& variances, blitz::Array<double,1>& weights) const;
+
+    /**
+     * Get the m_cache_means array. 
+     * @warning This variable should only be used in the case you want to parallelize the 
+     * getVariancesAndWeightsForEachCluster() method!
+     */
+    const blitz::Array<double,2>& getCacheMeans() const
+    { return m_cache_means; }
+
+    /**
+     * Set the m_cache_means array. 
+     * @warning This variable should only be used in the case you want to parallelize the 
+     * getVariancesAndWeightsForEachCluster() method!
+     */
+    void setCacheMeans(const blitz::Array<double,2>& cache_means);
+ 
     /**
      * Resize the means
      */

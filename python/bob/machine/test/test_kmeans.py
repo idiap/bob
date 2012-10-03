@@ -71,5 +71,14 @@ class KMeansMachineTest(unittest.TestCase):
     self.assertTrue( km.dim_c == 4 )
     self.assertTrue( km.dim_d == 5 )
 
+    # Copy constructor and comparison operators
+    km2 = bob.machine.KMeansMachine(km)
+    self.assertTrue( km2 == km)
+    self.assertFalse( km2 != km)
+    means2 = numpy.array([[3, 70, 1], [4, 72, 0]], 'float64')
+    km2.means == means2
+    self.assertFalse( km2 == km)
+    self.assertTrue( km2 != km)
+
     # Clean-up
     os.unlink(filename)
