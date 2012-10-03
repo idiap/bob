@@ -409,7 +409,7 @@ static int _GetArrayParamsFromObject(PyObject* op,
 
     //if the conversion worked, you can now fill in the parameters
     (*out_arr) = 0;
-    (*out_dtype) = requested_dtype;
+    (*out_dtype) = PyArray_DESCR(TP_ARRAY(array));
     (*out_ndim) = PyArray_NDIM(TP_ARRAY(array));
     for (int i=0; i<PyArray_NDIM(TP_ARRAY(array)); ++i) 
       out_dims[i] = PyArray_DIM(TP_ARRAY(array),i);
