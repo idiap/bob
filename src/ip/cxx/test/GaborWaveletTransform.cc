@@ -35,7 +35,7 @@
 #include "bob/core/logging.h"
 #include "bob/core/convert.h"
 #include "bob/core/cast.h"
-#include "bob/io/CodecRegistry.h"
+#include "bob/io/utils.h"
 #include "bob/ip/GaborWaveletTransform.h"
 
 

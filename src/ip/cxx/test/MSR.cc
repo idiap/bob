@@ -30,7 +30,7 @@
 #include "bob/core/convert.h"
 #include "bob/ip/MultiscaleRetinex.h"
 
-#include "bob/io/CodecRegistry.h"
+#include "bob/io/utils.h"
 #include <algorithm>
 
 #include <random/discrete-uniform.h>

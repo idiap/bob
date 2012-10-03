@@ -13,6 +13,7 @@ set(src
 
     "File.cc"
     "CodecRegistry.cc"
+    "utils.cc"
     
     "HDF5Exception.cc"
     "HDF5Types.cc"
@@ -21,18 +22,18 @@ set(src
     "HDF5Dataset.cc"
     "HDF5Attribute.cc"
     "HDF5File.cc"
-    "HDF5ArrayFile.cc"
-
-    "CSVFile.cc"
 
     "BinFileHeader.cc"
     "BinFile.cc"
-    "BinaryArrayFile.cc"
-    
+
     "TensorFileHeader.cc"
     "TensorFile.cc"
-    "TensorArrayFile.cc"
 
+    # File implementations
+    "HDF5ArrayFile.cc"
+    "CSVFile.cc"
+    "BinaryArrayFile.cc"
+    "TensorArrayFile.cc"
     "T3File.cc"
     )
 

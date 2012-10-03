@@ -31,7 +31,7 @@
 #include "bob/core/convert.h"
 #include "bob/core/logging.h"
 #include "bob/ip/GeomNorm.h"
-#include "bob/io/CodecRegistry.h"
+#include "bob/io/utils.h"
 
 
 struct T {
@@ -87,8 +87,7 @@ BOOST_AUTO_TEST_CASE( test_geomnorm )
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "image_r10.pgm";
-  boost::shared_ptr<bob::io::File> image_file = bob::io::open(testdata_path_img.string(), 'r');
-  blitz::Array<uint8_t,2> img = image_file->read_all<uint8_t,2>();
+  auto img = bob::io::load<uint8_t,2>(testdata_path_img.string());
   blitz::Array<double,2> img_processed_d(40,40);
   
   // Define a Geometric normalizer 
@@ -104,9 +103,8 @@ BOOST_AUTO_TEST_CASE( test_geomnorm )
   blitz::Array<uint8_t,2> img_processed = bob::core::convertFromRange<uint8_t>( img_processed_d, 0., 255.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r10_geomnorm.pgm";
-//  bob::io::open(testdata_path_img.string(), 'w')->write(img_processed); // Re-generate reference data
-  boost::shared_ptr<bob::io::File> ref_file = bob::io::open(testdata_path_img.string(), 'r');
-  blitz::Array<uint8_t,2> img_ref_geomnorm = ref_file->read_all<uint8_t,2>();
+//  bob::io::save(testdata_path_img.string(), img_processed); // Re-generate reference data
+  auto img_ref_geomnorm = bob::io::load<uint8_t,2>(testdata_path_img.string());
   checkBlitzClose( img_ref_geomnorm, img_processed, eps);
 }
 
@@ -123,8 +121,7 @@ BOOST_AUTO_TEST_CASE( test_geomnorm_with_mask )
   // Load original image
   boost::filesystem::path testdata_path(testdata_cpath);
   testdata_path /= "image_r70.pgm";
-  boost::shared_ptr<bob::io::File> image_file = bob::io::open(testdata_path.string(), 'r');
-  blitz::Array<uint8_t,2> input_image = image_file->read_all<uint8_t,2>(); 
+  auto input_image = bob::io::load<uint8_t,2>(testdata_path.string());
   blitz::Array<double,2> output_image(160,160);
   
   blitz::Array<bool,2> input_mask(input_image.shape()[0],input_image.shape()[1]);
@@ -147,15 +144,14 @@ BOOST_AUTO_TEST_CASE( test_geomnorm_with_mask )
   testdata_path = testdata_cpath;
   testdata_path /= "image_r70_geomnorm.pgm";
 //  bob::io::open(testdata_path.string(), 'w')->write(output_image_uint8); // Re-generate reference data
-  boost::shared_ptr<bob::io::File> ref_file = bob::io::open(testdata_path.string(), 'r');
-  checkBlitzClose( output_image_uint8, ref_file->read_all<uint8_t,2>(), eps);
+  checkBlitzClose( output_image_uint8, bob::io::load<uint8_t,2>(testdata_path.string()), eps);
   
   // check that the mask is identical to the reference mask
   blitz::Array<uint8_t,2> output_mask_uint8 = bob::core::convertFromRange<uint8_t>(output_mask, false, true);
   testdata_path = testdata_cpath;
   testdata_path /= "image_r70_mask.pgm";
 //  bob::io::open(testdata_path.string(), 'w')->write(output_mask_uint8); // Re-generate reference data
-  blitz::Array<uint8_t,2> output_reference = bob::io::open(testdata_path.string(), 'r')->read_all<uint8_t,2>();
+  auto output_reference = bob::io::load<uint8_t,2>(testdata_path.string());
   checkBlitzEqual(output_mask_uint8, output_reference);
 }
 

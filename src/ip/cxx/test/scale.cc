@@ -30,7 +30,7 @@
 #include "bob/core/cast.h"
 #include "bob/ip/scale.h"
 
-#include "bob/io/CodecRegistry.h"
+#include "bob/io/utils.h"
 #include <algorithm>
 
 #include <random/discrete-uniform.h>

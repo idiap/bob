@@ -20,8 +20,10 @@
 """This example bob application breaks a video file in a sequence of jpeg
 files."""
 
-import sys, os, optparse
-import tempfile, shutil #for package tests
+import sys
+import os
+import tempfile
+import shutil #for package tests
 import bob
 
 def video2frame(movie, outputdir):
@@ -40,7 +42,7 @@ def video2frame(movie, outputdir):
   for i, frame in enumerate(v):
     sys.stdout.write('.')
     sys.stdout.flush()
-    bob.io.Array(frame).save(template % i)
+    bob.io.write(frame, template % i)
   sys.stdout.write('\n')
   print "Wrote %d frames to %s" % (i, outputdir)
 

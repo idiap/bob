@@ -34,7 +34,7 @@
 
 #include "bob/core/Exception.h"
 #include "bob/core/logging.h"
-#include "bob/io/CodecRegistry.h"
+#include "bob/io/utils.h"
 
 
 static const double epsilon = 1e-8;

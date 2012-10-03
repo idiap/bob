@@ -225,6 +225,13 @@ class ImageFile: public io::File {
       m_filename(path),
       m_newfile(true) {
 
+        //checks if file exists
+        if (mode == 'r' && !fs::exists(path)) {
+          boost::format m("file '%s' is not readable");
+          m % path;
+          throw std::runtime_error(m.str());
+        }
+
         if (mode == 'r' || (mode == 'a' && fs::exists(path))) { //try peeking
           try {
             im_peek(path, m_type);

@@ -100,14 +100,3 @@ io::file_factory_t io::CodecRegistry::findByFilenameExtension
   return findByExtension(boost::filesystem::path(filename).extension().c_str());
 
 }
-
-boost::shared_ptr<io::File> io::open (const std::string& filename, char mode, 
-    const std::string& pretend_extension) {
-  boost::shared_ptr<io::CodecRegistry> instance = io::CodecRegistry::instance();
-  return instance->findByExtension(pretend_extension)(filename, mode);
-}
-
-boost::shared_ptr<io::File> io::open (const std::string& filename, char mode) {
-  boost::shared_ptr<io::CodecRegistry> instance = io::CodecRegistry::instance();
-  return instance->findByFilenameExtension(filename)(filename, mode);
-}

@@ -31,7 +31,7 @@
 #include "bob/ip/rotate.h"
 #include "bob/ip/shear.h"
 
-#include "bob/io/CodecRegistry.h"
+#include "bob/io/utils.h"
 #include <algorithm>
 
 #include <random/discrete-uniform.h>

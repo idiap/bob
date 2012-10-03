@@ -71,21 +71,21 @@ def _transcode(self, filename):
 
   try:
     # transcode from test format into the test format -- test array access modes
-    orig_data = bob.io.open(filename, 'r').read()
-    bob.io.open(tmpname, 'w').write(orig_data)
-    rewritten_data = bob.io.open(tmpname, 'r').read()
+    orig_data = bob.io.load(filename)
+    bob.io.write(orig_data, tmpname)
+    rewritten_data = bob.io.load(tmpname)
 
     self.assertTrue( numpy.array_equal(orig_data, rewritten_data) )
 
     # transcode to test format -- test arrayset access modes
-    trans_file = bob.io.open(tmpname, 'w')
+    trans_file = bob.io.File(tmpname, 'w')
     index = [slice(orig_data.shape[k]) for k in range(len(orig_data.shape))]
     for k in range(orig_data.shape[0]):
       index[0] = k
       trans_file.append(orig_data[index]) #slice from first dimension
     del trans_file
 
-    rewritten_file = bob.io.open(tmpname, 'r')
+    rewritten_file = bob.io.File(tmpname, 'r')
 
     for k in range(orig_data.shape[0]):
       rewritten_data = rewritten_file.read(k)
@@ -104,11 +104,8 @@ def _array_readwrite(self, extension, arr, close=False):
   """Runs a read/write verify step using the given numpy data"""
   tmpname = tempname(extension)
   try:
-    f = bob.io.open(tmpname, 'w')
-    f.write(arr)
-    del f
-    f = bob.io.open(tmpname, 'r')
-    reloaded = f.read() #read the contents
+    bob.io.write(arr, tmpname)
+    reloaded = bob.io.load(tmpname)
     if close: self.assertTrue(numpy.allclose(arr, reloaded))
     else: self.assertTrue(numpy.array_equal(arr, reloaded))
   finally:
@@ -121,11 +118,11 @@ def _arrayset_readwrite(self, extension, arrays, close=False):
   """Runs a read/write verify step using the given numpy data"""
   tmpname = tempname(extension)
   try:
-    f = bob.io.open(tmpname, 'w')
+    f = bob.io.File(tmpname, 'w')
     for k in arrays: 
       f.append(k)
     del f
-    f = bob.io.open(tmpname, 'r')
+    f = bob.io.File(tmpname, 'r')
     for k, array in enumerate(arrays):
       reloaded = f.read(k) #read the contents
       if close: 
@@ -285,14 +282,13 @@ class FileTest(unittest.TestCase):
 
       try:
         # complete transcoding test
-        image = bob.io.open(filename, 'r').read()
+        image = bob.io.load(filename)
 
         # save with the same extension
-        outfile = bob.io.open(tmpname, 'w')
-        outfile.write(image)
+        bob.io.write(image, tmpname)
 
         # reload the image from the file
-        image2 = bob.io.open(tmpname, 'r').read()
+        image2 = bob.io.load(tmpname)
 
         self.assertTrue ( numpy.array_equal(image, image2) )
 

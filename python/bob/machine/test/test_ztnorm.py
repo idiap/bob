@@ -67,12 +67,12 @@ class ZTNormTest(unittest.TestCase):
     self.assertTrue((abs(scores - ref_scores) < 1e-7).all())
 
   def test02_ztnorm_big(self):
-    my_A = bob.io.Array(F("ztnorm_eval_eval.mat")).get()
-    my_B = bob.io.Array(F("ztnorm_znorm_eval.mat")).get()
-    my_C = bob.io.Array(F("ztnorm_eval_tnorm.mat")).get()
-    my_D = bob.io.Array(F("ztnorm_znorm_tnorm.mat")).get()
+    my_A = bob.io.load(F("ztnorm_eval_eval.mat"))
+    my_B = bob.io.load(F("ztnorm_znorm_eval.mat"))
+    my_C = bob.io.load(F("ztnorm_eval_tnorm.mat"))
+    my_D = bob.io.load(F("ztnorm_znorm_tnorm.mat"))
 
-    ref_scores = bob.io.Array(F("ztnorm_result.mat")).get()
+    ref_scores = bob.io.load(F("ztnorm_result.mat"))
     scores = bob.machine.ztnorm(my_A, my_B, my_C, my_D)
     
     self.assertTrue((abs(scores - ref_scores) < 1e-7).all())

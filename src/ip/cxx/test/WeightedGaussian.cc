@@ -29,7 +29,7 @@
 #include "bob/core/logging.h"
 #include "bob/ip/WeightedGaussian.h"
 
-#include "bob/io/CodecRegistry.h"
+#include "bob/io/utils.h"
 #include <algorithm>
 
 #include <random/discrete-uniform.h>

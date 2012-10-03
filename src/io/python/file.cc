@@ -21,8 +21,9 @@
  */
 
 #include <boost/python.hpp>
-#include "bob/io/File.h"
 #include "bob/io/CodecRegistry.h"
+#include "bob/io/File.h"
+#include "bob/io/utils.h"
 
 #include "bob/core/python/ndarray.h"
 
@@ -76,6 +77,8 @@ static dict extensions() {
 void bind_io_file() {
   
   class_<io::File, boost::shared_ptr<io::File>, boost::noncopyable>("File", "Abstract base class for all Array/Arrayset i/o operations", no_init)
+    .def("__init__", make_constructor(string_open1, default_call_policies(), (arg("filename"), arg("mode"))), "Opens a (supported) file for reading arrays. The mode is a **single** character which takes one of the following values: 'r' - opens the file for read-only operations; 'w' - truncates the file and open it for reading and writing; 'a' - opens the file for reading and writing w/o truncating it.")
+    .def("__init__", make_constructor(string_open2, default_call_policies(), (arg("filename"), arg("mode"), arg("pretend_extension"))), "Opens a (supported) file for reading arrays but pretends its extension is as given by the last parameter - this way you can, potentially, override the default encoder/decoder used to read and write on the file. The mode is a **single** character which takes one of the following values: 'r' - opens the file for read-only operations; 'w' - truncates the file and open it for reading and writing; 'a' - opens the file for reading and writing w/o truncating it.")
     .add_property("filename", make_function(&io::File::filename, return_value_policy<copy_const_reference>()), "The path to the file being read/written")
     .add_property("type_all", make_function(&io::File::type_all, return_value_policy<copy_const_reference>()), "Typing information to load all of the file at once")
     .add_property("type", make_function(&io::File::type, return_value_policy<copy_const_reference>()), "Typing information to load the file as an Arrayset")
@@ -88,9 +91,6 @@ void bind_io_file() {
     .def("__getitem__", &file_read, (arg("self"), arg("index")), "Reads a single array from the file considering it to be an arrayset list")
     .def("append", &file_append, (arg("self"), arg("array")), "Appends an array to a file. Compatibility requirements may be enforced.")
     ;
-
-  def("open", &string_open1, (arg("filename"), arg("mode")), "Opens a (supported) file for reading arrays. The mode is a **single** character which takes one of the following values: 'r' - opens the file for read-only operations; 'w' - truncates the file and open it for reading and writing; 'a' - opens the file for reading and writing w/o truncating it.");
-  def("open", &string_open2, (arg("filename"), arg("mode"), arg("pretend_extension")), "Opens a (supported) file for reading arrays but pretends its extension is as given by the last parameter - this way you can, potentially, override the default encoder/decoder used to read and write on the file. The mode is a **single** character which takes one of the following values: 'r' - opens the file for read-only operations; 'w' - truncates the file and open it for reading and writing; 'a' - opens the file for reading and writing w/o truncating it.");
 
   def("extensions", &extensions, "Returns a dictionary containing all extensions and descriptions currently stored on the global codec registry");
 

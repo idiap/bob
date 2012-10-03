@@ -291,13 +291,13 @@ class HDF5FileTest(unittest.TestCase):
     # interestingly enough, if you load those files as arrays, you will read
     # the whole data at once:
 
-    t = bob.io.Array(F('matlab_1d.hdf5'))
+    t = bob.io.peek_all(F('matlab_1d.hdf5'))
     self.assertEqual( t.shape, (512,) )
-    self.assertEqual( t.elementType.name, 'float64' )
+    self.assertEqual( t.dtype, numpy.dtype('float64') )
 
-    t = bob.io.Array(F('matlab_2d.hdf5'))
+    t = bob.io.peek_all(F('matlab_2d.hdf5'))
     self.assertEqual( t.shape, (512,2) )
-    self.assertEqual( t.elementType.name, 'float64' )
+    self.assertEqual( t.dtype, numpy.dtype('float64') )
 
   def test06_matlabImport(self):
 

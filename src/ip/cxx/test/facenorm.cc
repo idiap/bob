@@ -32,7 +32,7 @@
 #include "bob/core/convert.h"
 #include "bob/ip/color.h"
 #include "bob/ip/FaceEyesNorm.h"
-#include "bob/io/CodecRegistry.h"
+#include "bob/io/utils.h"
 
 #include <iostream>
 

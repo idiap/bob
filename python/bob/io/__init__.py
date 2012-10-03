@@ -5,86 +5,138 @@ from . import __hdf5__
 from . import __video__
 
 def load(inputs):
-  """Loads the contents of a file, an iterable of files, or an 
-  iterable of bob.io.Array's into a numpy ndarray
+  """Loads the contents of a file, an iterable of files, or an iterable of
+  :py:class:`bob.io.File`'s into a :py:class:`numpy.ndarray`.
 
   Parameters:
 
   inputs
-    This might represent several different entities:\n
-    1. The name of a file (full path) from where to load the data.
-       In this case, this assumes that the file contains an array
-       and returns a loaded numpy ndarray.
-    2. An iterable of filenames to be loaded in memory. In this
-       case, this would assume that each file contains a single
-       1D sample or a set of 1D samples, load them in memory and
-       concatenate them into a single and returned 2D numpy
-       ndarray.
-    3. An iterable of bob.io.Array. In this case, this would
-       assume that each bob.io.Array contains a single 1D sample
-       or a set of 1D samples, load them in memory if required
-       and concatenate them into a single and returned 2D numpy
-       ndarray.
-    4. An iterable with mixed filenames and bob.io.Array. In
-       this case, this would returned a 2D numpy ndarray, as
-       described by points 2. and 3..
+     
+    This might represent several different entities:
+     
+    1. The name of a file (full path) from where to load the data. In this
+       case, this assumes that the file contains an array and returns a loaded
+       numpy ndarray.
+    2. An iterable of filenames to be loaded in memory. In this case, this
+       would assume that each file contains a single 1D sample or a set of 1D
+       samples, load them in memory and concatenate them into a single and
+       returned 2D numpy ndarray.
+    3. An iterable of :py:class:`bob.io.File`. In this case, this would assume
+       that each :py:class:`bob.io.File` contains a single 1D sample or a set
+       of 1D samples, load them in memory if required and concatenate them into
+       a single and returned 2D numpy ndarray.
+    4. An iterable with mixed filenames and :py:class:`bob.io.File`. In this
+       case, this would returned a 2D numpy ndarray, as described by points 2.
+       and 3.
   """
 
   from collections import Iterable
   import numpy
   if isinstance(inputs, (str, unicode)):
-    return Array(inputs).get()
+    return File(inputs, 'r').read()
   elif isinstance(inputs, Iterable):
     retval = []
     for obj in inputs:
       if isinstance(obj, (str, unicode)):
         retval.append(load(obj))
-      elif isinstance(obj, Array):
-        retval.append(obj.get())
+      elif isinstance(obj, File):
+        retval.append(obj.read())
       else:
-        raise TypeError("Iterable contains an object which is not a filename nor a bob.io.Array.")
+        raise TypeError("Iterable contains an object which is not a filename nor a bob.io.File.")
     return numpy.vstack(retval)
   else:
-    raise TypeError("Unexpected input object. This function is expecting a filename, or an iterable of filenames and/or bob.io.Array's")
+    raise TypeError("Unexpected input object. This function is expecting a filename, or an iterable of filenames and/or bob.io.File's")
 
 def merge(filenames):
-  """Converts an iterable of files into an iterable over bob.io.Array's 
+  """Converts an iterable of filenames into an iterable over read-only
+  bob.io.File's.
 
   Parameters:
 
   filenames
-    This might represent:\n
+     
+    This might represent:
+     
     1. A single filename. In this case, an iterable with a single
-       'external' bob.io.Array is returned.
-    2. An iterable of filenames to be converted into an iterable
-       of 'external' bob.io.Arrays's
+       :py:class:`bob.io.File` is returned.
+    2. An iterable of filenames to be converted into an iterable of 
+       :py:class:`bob.io.File`'s.
   """
 
   from collections import Iterable
   if isinstance(filenames, (str, unicode)):
-    return [Array(filenames)]
+    return [File(filenames, 'r')]
   elif isinstance(filenames, Iterable):
-    retval = []
-    for filename in filenames:
-      retval.append(Array(filename))
-    return retval
+    return [File(k, 'r') for k in filenames]
   else:
     raise TypeError("Unexpected input object. This function is expecting an iterable of filenames.")
 
-def save(array, filename, dtype=None):
-  """Saves the contents of an array-like object to file
+def save(array, filename):
+  """Saves the contents of an array-like object to file.
+
+  Effectively, this is the same as creating a :py:class:`bob.io.File` object
+  with the mode flag set to `w` (write with truncation) and calling
+  :py:meth:`bob.io.File.write` passing `array` as parameter.
   
   Parameters:
 
   array
-    The array-like object
+    The array-like object to be saved on the file
 
   filename
     The name of the file where you need the contents saved to
-
-  dtype
-    A description type to coerce the input data to, if required.
   """
-  return Array(array, dtype).save(filename)
+  return File(filename, 'w').write(array)
+
+# Just to make it homogenous with the C++ API
+write = save
+
+def append(array, filename):
+  """Appends the contents of an array-like object to file.
+
+  Effectively, this is the same as creating a :py:class:`bob.io.File` object
+  with the mode flag set to `a` (append) and calling
+  :py:meth:`bob.io.File.append` passing `array` as parameter.
+  
+  Parameters:
+
+  array
+    The array-like object to be saved on the file
+
+  filename
+    The name of the file where you need the contents saved to
+  """
+  return File(filename, 'a').append(array)
+
+def peek(filename):
+  """Returns the type of array (frame or sample) saved in the given file.
+
+  Effectively, this is the same as creating a :py:class:`bob.io.File` object
+  with the mode flag set to `r` (read-only) and returning
+  :py:attr:`bob.io.File.type`.
+  
+  Parameters:
+
+  filename
+    The name of the file to peek information from
+  """
+  return File(filename, 'r').type
+
+def peek_all(filename):
+  """Returns the type of array (for full readouts) saved in the given file.
+
+  Effectively, this is the same as creating a :py:class:`bob.io.File` object
+  with the mode flag set to `r` (read-only) and returning
+  :py:attr:`bob.io.File.type_all`.
+  
+  Parameters:
+
+  filename
+    The name of the file to peek information from
+  """
+  return File(filename, 'r').type_all
+
+# Keeps compatibility with the previously existing API
+open = File
 
 __all__ = dir()

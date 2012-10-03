@@ -29,7 +29,7 @@
 
 #include <blitz/array.h>
 #include "bob/core/logging.h"
-#include "bob/io/CodecRegistry.h"
+#include "bob/io/utils.h"
 
 struct T {
   blitz::Array<int8_t,2> a, b;
