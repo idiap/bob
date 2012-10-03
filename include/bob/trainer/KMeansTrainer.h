@@ -2,6 +2,7 @@
  * @file bob/trainer/KMeansTrainer.h
  * @date Tue May 10 11:35:58 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
@@ -46,7 +47,26 @@ class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, blitz::Array<
      */
     virtual ~KMeansTrainer() {}
 
+    /**
+     * Copy constructor
+     */
+    KMeansTrainer(const KMeansTrainer& other);
 
+    /**
+     * Assigns from a different machine
+     */
+    KMeansTrainer& operator=(const KMeansTrainer& other);
+
+    /**
+     * Equal to
+     */
+    bool operator==(const KMeansTrainer& b) const;
+
+    /**
+     * Not equal to
+     */
+    bool operator!=(const KMeansTrainer& b) const;
+ 
     /**
      * Initialise the means randomly. 
      * Data is split into as many chunks as there are means, 
@@ -96,7 +116,21 @@ class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, blitz::Array<
      * Get the seed
      */
     inline int getSeed() const { return m_seed; }
-    
+   
+    /**
+     * Returns the internal statistics. Useful to parallelize the E-step
+     */
+    const blitz::Array<double,1>& getZeroethOrderStats() const { return m_zeroethOrderStats; }
+    const blitz::Array<double,2>& getFirstOrderStats() const { return m_firstOrderStats; }
+    double getAverageMinDistance() const { return m_average_min_distance; }
+    /**
+     * Sets the internal statistics. Useful to parallelize the E-step
+     */
+    void setZeroethOrderStats(const blitz::Array<double,1>& zeroethOrderStats); 
+    void setFirstOrderStats(const blitz::Array<double,2>& firstOrderStats);
+    void setAverageMinDistance(const double value) { m_average_min_distance = value; }
+
+ 
   protected:
 
     /**
@@ -127,4 +161,4 @@ class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, blitz::Array<
 }
 }
 
-#endif // KMEANSTRAINER_H
+#endif // BOB_TRAINER_KMEANSTRAINER_H

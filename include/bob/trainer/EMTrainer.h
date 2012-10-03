@@ -2,6 +2,7 @@
  * @file bob/trainer/EMTrainer.h
  * @date Tue Jan 18 17:07:26 2011 +0100
  * @author André Anjos <andre.anjos@idiap.ch>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Base class for Expectation-Maximization-like algorithms
  *
@@ -42,7 +43,37 @@ namespace bob { namespace trainer {
   {
   public:
     virtual ~EMTrainer() {}
-    
+   
+    /**
+      * Assignment operator
+      */
+    virtual EMTrainer& operator=(const EMTrainer& other)
+    {
+      if(this != &other)
+      {
+        m_compute_likelihood = other.m_compute_likelihood;
+        m_convergence_threshold = other.m_convergence_threshold;
+        m_max_iterations = other.m_max_iterations;
+      }
+      return *this;
+    }
+
+    /**
+      * Equal to
+      */
+    virtual bool operator==(const EMTrainer& b) const {
+      return m_compute_likelihood == b.m_compute_likelihood &&
+             m_convergence_threshold == b.m_convergence_threshold &&
+             m_max_iterations == b.m_max_iterations;
+    }
+
+    /**
+      * Not equal to
+      */
+    virtual bool operator!=(const EMTrainer& b) const {
+      return !(this->operator==(b));
+    }
+ 
     virtual void train(T_machine& machine, const T_sampler& sampler) 
     {
       bob::core::info << "# EMTrainer:" << std::endl;

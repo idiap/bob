@@ -154,6 +154,15 @@ class TrainerTest(unittest.TestCase):
     self.assertTrue(equals(means, gmmMeans, 1e-3))
     self.assertTrue(equals(weights, gmmWeights, 1e-3))
     self.assertTrue(equals(variances, gmmVariances, 1e-3))
+
+    # Check comparison operators
+    trainer1 = bob.trainer.KMeansTrainer()
+    trainer2 = bob.trainer.KMeansTrainer()
+    self.assertTrue( trainer1 == trainer2)
+    self.assertFalse( trainer1 != trainer2)
+    trainer1.seed = 1337
+    self.assertFalse( trainer1 == trainer2)
+    self.assertTrue( trainer1 != trainer2)
     
   def test02_gmm_ML(self):
 
