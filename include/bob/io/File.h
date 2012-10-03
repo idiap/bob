@@ -164,12 +164,12 @@ namespace bob { namespace io {
 
       template <typename T, int N> size_t append(const blitz::Array<T,N>& in) {
         bob::core::array::blitz_array use_this(in);
-        append(use_this);
+        return append(use_this);
       }
 
       template <typename T, int N> void write (const blitz::Array<T,N>& in) {
         bob::core::array::blitz_array use_this(in);
-        append(use_this);
+        write(use_this);
       }
 
   };
