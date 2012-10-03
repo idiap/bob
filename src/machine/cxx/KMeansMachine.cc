@@ -64,10 +64,13 @@ bob::machine::KMeansMachine::~KMeansMachine() { }
 bob::machine::KMeansMachine& bob::machine::KMeansMachine::operator=
 (const bob::machine::KMeansMachine& other) 
 {
-  m_n_means = other.m_n_means;
-  m_n_inputs = other.m_n_inputs;
-  m_means.reference(bob::core::array::ccopy(other.m_means));
-  m_cache_means.resize(other.m_means.shape());
+  if(this != &other)
+  {
+    m_n_means = other.m_n_means;
+    m_n_inputs = other.m_n_inputs;
+    m_means.reference(bob::core::array::ccopy(other.m_means));
+    m_cache_means.resize(other.m_means.shape());
+  }
   return *this;
 }
 
