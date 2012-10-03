@@ -706,7 +706,7 @@ void train::PLDABaseTrainer::updateSigma(mach::PLDABaseMachine& machine,
   for(size_t i=0; i<v_ar.size(); ++i)
   {
     // Loop over the samples
-    for(size_t j=0; j<v_ar[i].extent(0); ++j)
+    for(int j=0; j<v_ar[i].extent(0); ++j)
     {
       // m_cache_D_1 = x_ij-mu
       m_cache_D_1 = v_ar[i](j,a) - mu;
