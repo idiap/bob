@@ -497,7 +497,7 @@ namespace bob { namespace io {
        * Gets the type information of an attribute
        */
       void getAttributeType(const std::string& path,
-          const std::string& name, HDF5Type& type) const;
+          const std::string& name, bob::io::HDF5Type& type) const;
 
       /**
        * Deletes a given attribute
@@ -509,15 +509,15 @@ namespace bob { namespace io {
        * List attributes available on a certain object.
        */
       void listAttributes(const std::string& path,
-          std::map<std::string, HDF5Type>& attributes) const;
+          std::map<std::string, bob::io::HDF5Type>& attributes) const;
 
     public: //raw accessors to attributes
 
       void read_attribute(const std::string& path, const std::string& name,
-          const HDF5Type& type, void* buffer) const;
+          const bob::io::HDF5Type& type, void* buffer) const;
 
       void write_attribute(const std::string& path, const std::string& name,
-          const HDF5Type& type, const void* buffer);
+          const bob::io::HDF5Type& type, const void* buffer);
 
     private: //representation
 

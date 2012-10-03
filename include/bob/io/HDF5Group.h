@@ -320,7 +320,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
       /**
        * List attributes available on this dataset.
        */
-      void list_attributes(std::map<std::string, HDF5Type>& attributes) const;
+      void list_attributes(std::map<std::string, bob::io::HDF5Type>& attributes) const;
 
     public: //array attribute support
 

@@ -92,7 +92,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
    * Lists all attributes and associated types currently available somewhere
    */
   void list_attributes(boost::shared_ptr<hid_t> location,
-    std::map<std::string, HDF5Type>& attributes);
+    std::map<std::string, bob::io::HDF5Type>& attributes);
 
 }}}}
 

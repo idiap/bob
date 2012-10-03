@@ -313,8 +313,12 @@ namespace bob { namespace io {
       DECLARE_SUPPORT(std::complex<float>)
       DECLARE_SUPPORT(std::complex<double>)
       DECLARE_SUPPORT(std::complex<long double>)
-      DECLARE_SUPPORT(std::string)
 #     undef DECLARE_SUPPORT
+
+      /**
+       * Builds the type from a string (special HDF5 handling)
+       */
+      HDF5Type(const std::string& value);
 
 #     define DECLARE_SUPPORT(T,N) HDF5Type(const blitz::Array<T,N>& value);
 

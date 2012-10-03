@@ -499,7 +499,7 @@ void h5::Group::write_attribute (const std::string& name,
   h5::write_attribute(m_id, name, dest_type, buffer);
 }
 
-void h5::Group::list_attributes(std::map<std::string, io::HDF5Type>& attributes) const {
+void h5::Group::list_attributes(std::map<std::string, bob::io::HDF5Type>& attributes) const {
   h5::list_attributes(m_id, attributes);
 }
 
