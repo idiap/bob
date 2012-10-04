@@ -381,3 +381,24 @@ class TrainerTest(unittest.TestCase):
 
     machine = bob.machine.KMeansMachine(2, 2)
     mytrainer.train(machine, ar)
+
+  def test10_overload_initialization(self):
+    """Test introduces after ticket #87"""
+    
+    machine = bob.machine.KMeansMachine(2,1)
+    data = numpy.array([[-3],[-2],[-1],[0.],[1.],[2.],[3.]])
+
+    class MyKMeansTrainer(bob.trainer.overload.KMeansTrainer):
+      """Simple example of python trainer: """
+      def __init__(self):
+        bob.trainer.overload.KMeansTrainer.__init__(self)
+ 
+      def initialization(self, machine, data):
+        bob.trainer.overload.KMeansTrainer.initialization(self, machine, data)
+        machine.means = numpy.array([[-0.5], [ 0.5]])
+
+    trainer = MyKMeansTrainer()
+    trainer.convergence_threshold = 0.0005
+    trainer.max_iterations = 1;
+    trainer.train(machine, data) # After the initialization the means are still [0.,0.] (at the C++ level)
+    self.assertFalse( numpy.isnan(machine.means).any())

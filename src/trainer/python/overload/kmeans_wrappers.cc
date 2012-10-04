@@ -19,126 +19,154 @@
  */
 #include <boost/python.hpp>
 #include "bob/trainer/KMeansTrainer.h"
+#include <boost/shared_ptr.hpp>
 
 using namespace boost::python;
-namespace train = bob::trainer;
-namespace mach = bob::machine;
-namespace io = bob::io;
 
+void deletor(bob::machine::KMeansMachine*)
+{
+}
 
-class EMTrainerKMeansWrapper: public train::EMTrainer<mach::KMeansMachine, blitz::Array<double,2> >, 
-                              public wrapper<train::EMTrainer<mach::KMeansMachine, blitz::Array<double,2> > > 
+class EMTrainerKMeansWrapper: public bob::trainer::EMTrainer<bob::machine::KMeansMachine, blitz::Array<double,2> >, 
+                              public wrapper<bob::trainer::EMTrainer<bob::machine::KMeansMachine, blitz::Array<double,2> > > 
 {
 public:
   EMTrainerKMeansWrapper(double convergence_threshold = 0.001, int max_iterations = 10, bool compute_likelihood=true):
-    train::EMTrainer<mach::KMeansMachine, blitz::Array<double,2> >(convergence_threshold, max_iterations, compute_likelihood) {}
+    bob::trainer::EMTrainer<bob::machine::KMeansMachine, blitz::Array<double,2> >(convergence_threshold, max_iterations, compute_likelihood) {}
 
   virtual ~EMTrainerKMeansWrapper() {}
  
-  virtual void initialization(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
-    this->get_override("initialization")(machine, data);
+  virtual void initialization(bob::machine::KMeansMachine& machine, const blitz::Array<double,2>& data) {
+    boost::shared_ptr<bob::machine::KMeansMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+    this->get_override("initialization")(machine_ptr, data);
   }
   
-  virtual void eStep(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
-    this->get_override("e_step")(machine, data);
+  virtual void eStep(bob::machine::KMeansMachine& machine, const blitz::Array<double,2>& data) {
+    boost::shared_ptr<bob::machine::KMeansMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+    this->get_override("e_step")(machine_ptr, data);
   }
   
-  virtual void mStep(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
-    this->get_override("m_step")(machine, data);
+  virtual void mStep(bob::machine::KMeansMachine& machine, const blitz::Array<double,2>& data) {
+    boost::shared_ptr<bob::machine::KMeansMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+    this->get_override("m_step")(machine_ptr, data);
   }
 
-  virtual double computeLikelihood(mach::KMeansMachine& machine) {
-    return this->get_override("compute_likelihood")(machine);
+  virtual double computeLikelihood(bob::machine::KMeansMachine& machine) {
+    boost::shared_ptr<bob::machine::KMeansMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+    return this->get_override("compute_likelihood")(machine_ptr);
   }
 
-  virtual void finalization(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
-    this->get_override("finalization")(machine, data);
+  virtual void finalization(bob::machine::KMeansMachine& machine, const blitz::Array<double,2>& data) {
+    boost::shared_ptr<bob::machine::KMeansMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+    this->get_override("finalization")(machine_ptr, data);
   }
  
-  virtual void train(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
-    if (override python_train = this->get_override("train")) 
-      python_train(machine, data);
+  virtual void train(bob::machine::KMeansMachine& machine, const blitz::Array<double,2>& data) {
+    if (override python_train = this->get_override("train"))
+    { 
+      boost::shared_ptr<bob::machine::KMeansMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      python_train(machine_ptr, data);
+    }
     else
-      train::EMTrainer<mach::KMeansMachine, blitz::Array<double,2> >::train(machine, data);
+      bob::trainer::EMTrainer<bob::machine::KMeansMachine, blitz::Array<double,2> >::train(machine, data);
   }
 
-  virtual void d_train(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
-    train::EMTrainer<mach::KMeansMachine, blitz::Array<double,2> >::train(machine, data);
+  virtual void d_train(bob::machine::KMeansMachine& machine, const blitz::Array<double,2>& data) {
+    bob::trainer::EMTrainer<bob::machine::KMeansMachine, blitz::Array<double,2> >::train(machine, data);
   }
 
 };
 
-class KMeansTrainerWrapper: public train::KMeansTrainer,
-                            public wrapper<train::KMeansTrainer>
+class KMeansTrainerWrapper: public bob::trainer::KMeansTrainer,
+                            public wrapper<bob::trainer::KMeansTrainer>
 {
 public:
   KMeansTrainerWrapper(double convergence_threshold = 0.001, int max_iterations = 10, bool compute_likelihood = true):
-    train::KMeansTrainer(convergence_threshold, max_iterations, compute_likelihood) {}
+    bob::trainer::KMeansTrainer(convergence_threshold, max_iterations, compute_likelihood) {}
 
   virtual ~KMeansTrainerWrapper() {}
  
-  void initialization(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
+  void initialization(bob::machine::KMeansMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_initialization = this->get_override("initialization"))
-      python_initialization(machine, data);
+    {
+      boost::shared_ptr<bob::machine::KMeansMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      python_initialization(machine_ptr, data);
+    }
     else
-      train::KMeansTrainer::initialization(machine, data);
+      bob::trainer::KMeansTrainer::initialization(machine, data);
   }
   
-  void d_initialization(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
-    train::KMeansTrainer::initialization(machine, data);
+  void d_initialization(bob::machine::KMeansMachine& machine, const blitz::Array<double,2>& data) {
+    bob::trainer::KMeansTrainer::initialization(machine, data);
   }
   
-  void eStep(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
+  void eStep(bob::machine::KMeansMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_eStep = this->get_override("e_step")) 
-      python_eStep(machine, data);
+    {
+      boost::shared_ptr<bob::machine::KMeansMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      python_eStep(machine_ptr, data);
+    }
     else
-      train::KMeansTrainer::eStep(machine, data);
+      bob::trainer::KMeansTrainer::eStep(machine, data);
   }
   
-  void d_eStep(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
-    train::KMeansTrainer::eStep(machine, data);
+  void d_eStep(bob::machine::KMeansMachine& machine, const blitz::Array<double,2>& data) {
+    bob::trainer::KMeansTrainer::eStep(machine, data);
   }
   
-  void mStep(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
+  void mStep(bob::machine::KMeansMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_mStep = this->get_override("m_step")) 
-      python_mStep(machine, data);
+    {
+      boost::shared_ptr<bob::machine::KMeansMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      python_mStep(machine_ptr, data);
+    }
     else
-      train::KMeansTrainer::mStep(machine, data);
+      bob::trainer::KMeansTrainer::mStep(machine, data);
   }
 
-  void d_mStep(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
-    train::KMeansTrainer::mStep(machine, data);
+  void d_mStep(bob::machine::KMeansMachine& machine, const blitz::Array<double,2>& data) {
+    bob::trainer::KMeansTrainer::mStep(machine, data);
   }
 
-  double computeLikelihood(mach::KMeansMachine& machine) {
-    if (override python_computeLikelihood = this->get_override("compute_likelihood")) return python_computeLikelihood(machine);
-    return train::KMeansTrainer::computeLikelihood(machine);
+  double computeLikelihood(bob::machine::KMeansMachine& machine) {
+    if (override python_computeLikelihood = this->get_override("compute_likelihood")) 
+    {
+      boost::shared_ptr<bob::machine::KMeansMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      return python_computeLikelihood(machine_ptr);
+    }
+    return bob::trainer::KMeansTrainer::computeLikelihood(machine);
   }
   
-  double d_computeLikelihood(mach::KMeansMachine& machine) {
-    return train::KMeansTrainer::computeLikelihood(machine);
+  double d_computeLikelihood(bob::machine::KMeansMachine& machine) {
+    return bob::trainer::KMeansTrainer::computeLikelihood(machine);
   }
 
-  void finalization(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
+  void finalization(bob::machine::KMeansMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_finalization = this->get_override("finalization"))
-      python_finalization(machine, data);
+    {
+      boost::shared_ptr<bob::machine::KMeansMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      python_finalization(machine_ptr, data);
+    }
     else
-      train::KMeansTrainer::finalization(machine, data);
+      bob::trainer::KMeansTrainer::finalization(machine, data);
   }
   
-  void d_finalization(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
-    train::KMeansTrainer::finalization(machine, data);
+  void d_finalization(bob::machine::KMeansMachine& machine, const blitz::Array<double,2>& data) {
+    bob::trainer::KMeansTrainer::finalization(machine, data);
   }
   
-  void train(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
+  void train(bob::machine::KMeansMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_train = this->get_override("train")) 
-      python_train(machine, data);
+    {
+      boost::shared_ptr<bob::machine::KMeansMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      python_train(machine_ptr, data);
+    }
     else
-      train::KMeansTrainer::train(machine, data);
+      bob::trainer::KMeansTrainer::train(machine, data);
   }
 
-  void d_train(mach::KMeansMachine& machine, const blitz::Array<double,2>& data) {
-    train::KMeansTrainer::train(machine, data);
+  void d_train(bob::machine::KMeansMachine& machine, const blitz::Array<double,2>& data) {
+    bob::trainer::KMeansTrainer::train(machine, data);
   }
 
 };
@@ -146,7 +174,7 @@ public:
 
 void bind_trainer_kmeans_wrappers() {
 
-  typedef train::EMTrainer<mach::KMeansMachine, blitz::Array<double,2> > EMTrainerKMeansBase; 
+  typedef bob::trainer::EMTrainer<bob::machine::KMeansMachine, blitz::Array<double,2> > EMTrainerKMeansBase; 
 
   class_<EMTrainerKMeansWrapper, boost::noncopyable>("EMTrainerKMeans", no_init)
     .def(init<optional<double, int, bool> >((arg("convergence_threshold")=0.001, arg("max_iterations")=10, arg("compute_likelihood")=true)))
@@ -176,12 +204,12 @@ void bind_trainer_kmeans_wrappers() {
     .add_property("convergence_threshold", &KMeansTrainerWrapper::getConvergenceThreshold, &KMeansTrainerWrapper::setConvergenceThreshold, "Convergence threshold")
     .add_property("max_iterations", &KMeansTrainerWrapper::getMaxIterations, &KMeansTrainerWrapper::setMaxIterations, "Max iterations")
     .add_property("seed", &KMeansTrainerWrapper::getSeed, &KMeansTrainerWrapper::setSeed, "Seed used to genrated pseudo-random numbers")
-    .def("train", &train::KMeansTrainer::train, &KMeansTrainerWrapper::d_train, (arg("machine"), arg("data")), "Train a machine using some data")
-    .def("initialization", &train::KMeansTrainer::initialization, &KMeansTrainerWrapper::d_initialization, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
-    .def("e_step", &train::KMeansTrainer::eStep, &KMeansTrainerWrapper::d_eStep, (arg("machine"), arg("data")), "Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
-    .def("m_step", &train::KMeansTrainer::mStep, &KMeansTrainerWrapper::d_mStep, (arg("machine"), arg("data")), "M-step of the EM-algorithm.")
-    .def("compute_likelihood", &train::KMeansTrainer::computeLikelihood, &KMeansTrainerWrapper::d_computeLikelihood, (arg("machine")), "Returns the average min distance.")
-    .def("finalization", &train::KMeansTrainer::finalization, &KMeansTrainerWrapper::d_finalization, (arg("machine"), arg("data")), "This method is called after the EM algorithm")
+    .def("train", &bob::trainer::KMeansTrainer::train, &KMeansTrainerWrapper::d_train, (arg("machine"), arg("data")), "Train a machine using some data")
+    .def("initialization", &bob::trainer::KMeansTrainer::initialization, &KMeansTrainerWrapper::d_initialization, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
+    .def("e_step", &bob::trainer::KMeansTrainer::eStep, &KMeansTrainerWrapper::d_eStep, (arg("machine"), arg("data")), "Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
+    .def("m_step", &bob::trainer::KMeansTrainer::mStep, &KMeansTrainerWrapper::d_mStep, (arg("machine"), arg("data")), "M-step of the EM-algorithm.")
+    .def("compute_likelihood", &bob::trainer::KMeansTrainer::computeLikelihood, &KMeansTrainerWrapper::d_computeLikelihood, (arg("machine")), "Returns the average min distance.")
+    .def("finalization", &bob::trainer::KMeansTrainer::finalization, &KMeansTrainerWrapper::d_finalization, (arg("machine"), arg("data")), "This method is called after the EM algorithm")
   ;
 
 

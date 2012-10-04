@@ -21,270 +21,340 @@
 #include "bob/trainer/GMMTrainer.h"
 #include "bob/trainer/MAP_GMMTrainer.h"
 #include "bob/trainer/ML_GMMTrainer.h"
+#include <boost/shared_ptr.hpp>
 #include <limits>
 
 using namespace boost::python;
-namespace train = bob::trainer;
-namespace mach = bob::machine;
-namespace io = bob::io;
 
+void deletor(bob::machine::GMMMachine*)
+{
+}
 
-class EMTrainerGMMWrapper: public train::EMTrainer<mach::GMMMachine, blitz::Array<double,2> >, 
-                           public wrapper<train::EMTrainer<mach::GMMMachine, blitz::Array<double,2> > > 
+class EMTrainerGMMWrapper: public bob::trainer::EMTrainer<bob::machine::GMMMachine, blitz::Array<double,2> >, 
+                           public wrapper<bob::trainer::EMTrainer<bob::machine::GMMMachine, blitz::Array<double,2> > > 
 {
 public:
   EMTrainerGMMWrapper(double convergence_threshold = 0.001, int max_iterations = 10, bool compute_likelihood = true):
-    train::EMTrainer<mach::GMMMachine, blitz::Array<double,2> >(convergence_threshold, max_iterations, compute_likelihood) {}
+    bob::trainer::EMTrainer<bob::machine::GMMMachine, blitz::Array<double,2> >(convergence_threshold, max_iterations, compute_likelihood) {}
 
   virtual ~EMTrainerGMMWrapper() {}
  
-  void initialization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
-    this->get_override("initialization")(machine, data);
+  void initialization(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
+    boost::shared_ptr<bob::machine::GMMMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+    this->get_override("initialization")(machine_ptr, data);
   }
   
-  void eStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
-    this->get_override("e_step")(machine, data);
+  void eStep(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
+    boost::shared_ptr<bob::machine::GMMMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+    this->get_override("e_step")(machine_ptr, data);
   }
 
-  double computeLikelihood(mach::GMMMachine& machine) {
-    return this->get_override("compute_likelihood")(machine);
+  double computeLikelihood(bob::machine::GMMMachine& machine) {
+    boost::shared_ptr<bob::machine::GMMMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+    return this->get_override("compute_likelihood")(machine_ptr);
   }
   
-  void mStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
-    this->get_override("m_step")(machine, data);
+  void mStep(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
+    boost::shared_ptr<bob::machine::GMMMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+    this->get_override("m_step")(machine_ptr, data);
   }
 
-  void finalization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
-    this->get_override("finalization")(machine, data);
+  void finalization(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
+    boost::shared_ptr<bob::machine::GMMMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+    this->get_override("finalization")(machine_ptr, data);
   }
  
-  void train(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
+  void train(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_train = this->get_override("train")) 
-      python_train(machine, data);
+    {
+      boost::shared_ptr<bob::machine::GMMMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      python_train(machine_ptr, data);
+    }
     else
-      train::EMTrainer<mach::GMMMachine, blitz::Array<double,2> >::train(machine, data);
+      bob::trainer::EMTrainer<bob::machine::GMMMachine, blitz::Array<double,2> >::train(machine, data);
   }
 
-  void d_train(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
-    train::EMTrainer<mach::GMMMachine, blitz::Array<double,2> >::train(machine, data);
+  void d_train(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
+    bob::trainer::EMTrainer<bob::machine::GMMMachine, blitz::Array<double,2> >::train(machine, data);
   }
 
 };
 
 
-class GMMTrainerWrapper: public train::GMMTrainer,
-                         public wrapper<train::GMMTrainer>
+class GMMTrainerWrapper: public bob::trainer::GMMTrainer,
+                         public wrapper<bob::trainer::GMMTrainer>
 {
 public:
   GMMTrainerWrapper(bool update_means = true, bool update_variances = false, bool update_weights = false,
       double mean_var_update_responsibilities_threshold = std::numeric_limits<double>::epsilon()):
-    train::GMMTrainer(update_means, update_variances, update_weights, mean_var_update_responsibilities_threshold) {}
+    bob::trainer::GMMTrainer(update_means, update_variances, update_weights, mean_var_update_responsibilities_threshold) {}
 
   virtual ~GMMTrainerWrapper() {}
   
-  void initialization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
+  void initialization(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_initialization = this->get_override("initialization")) 
-      python_initialization(machine, data);
+    {
+      boost::shared_ptr<bob::machine::GMMMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      python_initialization(machine_ptr, data);
+    }
     else
-      train::GMMTrainer::initialization(machine, data);
+      bob::trainer::GMMTrainer::initialization(machine, data);
   }
   
-  void d_initialization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
-    train::GMMTrainer::initialization(machine, data);
+  void d_initialization(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
+    bob::trainer::GMMTrainer::initialization(machine, data);
   }
   
-  void eStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
-    if (override python_eStep = this->get_override("e_step")) python_eStep(machine, data);
-    train::GMMTrainer::eStep(machine, data);
+  void eStep(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
+    if (override python_eStep = this->get_override("e_step")) 
+    {
+      boost::shared_ptr<bob::machine::GMMMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      python_eStep(machine_ptr, data);
+    }
+    else
+      bob::trainer::GMMTrainer::eStep(machine, data);
   }
   
-  void d_eStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
-    train::GMMTrainer::eStep(machine, data);
+  void d_eStep(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
+    bob::trainer::GMMTrainer::eStep(machine, data);
   }
 
-  double computeLikelihood(mach::GMMMachine& machine) {
-    if (override python_computeLikelihood = this->get_override("compute_likelihood")) return python_computeLikelihood(machine);
-    return train::GMMTrainer::computeLikelihood(machine);
+  double computeLikelihood(bob::machine::GMMMachine& machine) {
+    if (override python_computeLikelihood = this->get_override("compute_likelihood")) 
+    {
+      boost::shared_ptr<bob::machine::GMMMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      return python_computeLikelihood(machine_ptr);
+    }
+    return bob::trainer::GMMTrainer::computeLikelihood(machine);
   }
   
-  double d_computeLikelihood(mach::GMMMachine& machine) {
-    return train::GMMTrainer::computeLikelihood(machine);
+  double d_computeLikelihood(bob::machine::GMMMachine& machine) {
+    return bob::trainer::GMMTrainer::computeLikelihood(machine);
   }
 
-  void mStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
-    this->get_override("m_step")(machine, data);
+  void mStep(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
+    boost::shared_ptr<bob::machine::GMMMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+    this->get_override("m_step")(machine_ptr, data);
   }
 
-  void finalization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
+  void finalization(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_finalization = this->get_override("finalization")) 
-      python_finalization(machine, data);
+    {
+      boost::shared_ptr<bob::machine::GMMMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      python_finalization(machine_ptr, data);
+    }
     else
-      train::GMMTrainer::finalization(machine, data);
+      bob::trainer::GMMTrainer::finalization(machine, data);
   }
   
-  void d_finalization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
-    train::GMMTrainer::finalization(machine, data);
+  void d_finalization(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
+    bob::trainer::GMMTrainer::finalization(machine, data);
   } 
 
-  void train(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
+  void train(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_train = this->get_override("train")) 
-      python_train(machine, data);
+    {
+      boost::shared_ptr<bob::machine::GMMMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      python_train(machine_ptr, data);
+    }
     else
-      train::GMMTrainer::train(machine, data);
+      bob::trainer::GMMTrainer::train(machine, data);
   }
 
-  void d_train(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
-    train::GMMTrainer::train(machine, data);
+  void d_train(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
+    bob::trainer::GMMTrainer::train(machine, data);
   }
  
 };
 
 
-class MAP_GMMTrainerWrapper: public train::MAP_GMMTrainer,
-                             public wrapper<train::MAP_GMMTrainer>
+class MAP_GMMTrainerWrapper: public bob::trainer::MAP_GMMTrainer,
+                             public wrapper<bob::trainer::MAP_GMMTrainer>
 {
 public:
   MAP_GMMTrainerWrapper(double relevance_factor = 0, bool update_means = true, bool update_variances = false, bool update_weights = false,
       double mean_var_update_responsibilities_threshold = std::numeric_limits<double>::epsilon()):
-    train::MAP_GMMTrainer(relevance_factor, update_means, update_variances, update_weights, mean_var_update_responsibilities_threshold) {}
+    bob::trainer::MAP_GMMTrainer(relevance_factor, update_means, update_variances, update_weights, mean_var_update_responsibilities_threshold) {}
 
   virtual ~MAP_GMMTrainerWrapper() {}
 
-  void initialization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
+  void initialization(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_initialization = this->get_override("initialization")) 
-      python_initialization(machine, data);
+    {
+      boost::shared_ptr<bob::machine::GMMMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      python_initialization(machine_ptr, data);
+    }
     else
-      train::MAP_GMMTrainer::initialization(machine, data);
+      bob::trainer::MAP_GMMTrainer::initialization(machine, data);
   }
   
-  void d_initialization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
-    train::MAP_GMMTrainer::initialization(machine, data);
+  void d_initialization(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
+    bob::trainer::MAP_GMMTrainer::initialization(machine, data);
   }
   
-  void eStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
-    if (override python_eStep = this->get_override("e_step")) python_eStep(machine, data);
-    train::MAP_GMMTrainer::eStep(machine, data);
+  void eStep(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
+    if (override python_eStep = this->get_override("e_step")) 
+    {
+      boost::shared_ptr<bob::machine::GMMMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      python_eStep(machine_ptr, data);
+    }
+    else
+      bob::trainer::MAP_GMMTrainer::eStep(machine, data);
   }
   
-  void d_eStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
-    train::MAP_GMMTrainer::eStep(machine, data);
+  void d_eStep(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
+    bob::trainer::MAP_GMMTrainer::eStep(machine, data);
   }
 
-  double computeLikelihood(mach::GMMMachine& machine) {
-    if (override python_computeLikelihood = this->get_override("compute_likelihood")) return python_computeLikelihood(machine);
-    return train::MAP_GMMTrainer::computeLikelihood(machine);
+  double computeLikelihood(bob::machine::GMMMachine& machine) {
+    if (override python_computeLikelihood = this->get_override("compute_likelihood")) 
+    {
+      boost::shared_ptr<bob::machine::GMMMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      return python_computeLikelihood(machine_ptr);
+    }
+    return bob::trainer::MAP_GMMTrainer::computeLikelihood(machine);
   }
   
-  double d_computeLikelihood(mach::GMMMachine& machine) {
-    return train::MAP_GMMTrainer::computeLikelihood(machine);
+  double d_computeLikelihood(bob::machine::GMMMachine& machine) {
+    return bob::trainer::MAP_GMMTrainer::computeLikelihood(machine);
   }
 
-  void mStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
+  void mStep(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_mStep = this->get_override("m_step")) 
-      python_mStep(machine, data);
+    {
+      boost::shared_ptr<bob::machine::GMMMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      python_mStep(machine_ptr, data);
+    }
     else
-      train::MAP_GMMTrainer::mStep(machine, data);
+      bob::trainer::MAP_GMMTrainer::mStep(machine, data);
   }
   
-  void d_mStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
-    train::MAP_GMMTrainer::mStep(machine, data);
+  void d_mStep(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
+    bob::trainer::MAP_GMMTrainer::mStep(machine, data);
   }
 
-  void finalization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
+  void finalization(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_finalization = this->get_override("finalization")) 
-      python_finalization(machine, data);
+    {
+      boost::shared_ptr<bob::machine::GMMMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      python_finalization(machine_ptr, data);
+    }
     else
-      train::MAP_GMMTrainer::finalization(machine, data);
+      bob::trainer::MAP_GMMTrainer::finalization(machine, data);
   }
   
-  void d_finalization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
-    train::MAP_GMMTrainer::finalization(machine, data);
+  void d_finalization(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
+    bob::trainer::MAP_GMMTrainer::finalization(machine, data);
   } 
 
-  void train(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
+  void train(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_train = this->get_override("train")) 
-      python_train(machine, data);
+    {
+      boost::shared_ptr<bob::machine::GMMMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      python_train(machine_ptr, data);
+    }
     else
-      train::MAP_GMMTrainer::train(machine, data);
+      bob::trainer::MAP_GMMTrainer::train(machine, data);
   }
 
-  void d_train(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
-    train::MAP_GMMTrainer::train(machine, data);
+  void d_train(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
+    bob::trainer::MAP_GMMTrainer::train(machine, data);
   }
  
 };
 
-class ML_GMMTrainerWrapper: public train::ML_GMMTrainer,
-                            public wrapper<train::ML_GMMTrainer>
+class ML_GMMTrainerWrapper: public bob::trainer::ML_GMMTrainer,
+                            public wrapper<bob::trainer::ML_GMMTrainer>
 {
 public:
   ML_GMMTrainerWrapper(bool update_means = true, bool update_variances = false, bool update_weights = false,
       double mean_var_update_responsibilities_threshold = std::numeric_limits<double>::epsilon()):
-    train::ML_GMMTrainer(update_means, update_variances, update_weights, mean_var_update_responsibilities_threshold) {}
+    bob::trainer::ML_GMMTrainer(update_means, update_variances, update_weights, mean_var_update_responsibilities_threshold) {}
 
   virtual ~ML_GMMTrainerWrapper() {}
 
-  void initialization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
+  void initialization(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_initialization = this->get_override("initialization")) 
-      python_initialization(machine, data);
+    {
+      boost::shared_ptr<bob::machine::GMMMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      python_initialization(machine_ptr, data);
+    }
     else
-      train::ML_GMMTrainer::initialization(machine, data);
+      bob::trainer::ML_GMMTrainer::initialization(machine, data);
   }
   
-  void d_initialization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
-    train::ML_GMMTrainer::initialization(machine, data);
+  void d_initialization(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
+    bob::trainer::ML_GMMTrainer::initialization(machine, data);
   }
   
-  void eStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
-    if (override python_eStep = this->get_override("e_step")) python_eStep(machine, data);
-    train::ML_GMMTrainer::eStep(machine, data);
+  void eStep(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
+    if (override python_eStep = this->get_override("e_step")) 
+    {
+      boost::shared_ptr<bob::machine::GMMMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      python_eStep(machine_ptr, data);
+    }
+    else
+      bob::trainer::ML_GMMTrainer::eStep(machine, data);
   }
   
-  void d_eStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
-    train::ML_GMMTrainer::eStep(machine, data);
+  void d_eStep(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
+    bob::trainer::ML_GMMTrainer::eStep(machine, data);
   }
 
-  double computeLikelihood(mach::GMMMachine& machine) {
-    if (override python_computeLikelihood = this->get_override("compute_likelihood")) return python_computeLikelihood(machine);
-    return train::ML_GMMTrainer::computeLikelihood(machine);
+  double computeLikelihood(bob::machine::GMMMachine& machine) {
+    if (override python_computeLikelihood = this->get_override("compute_likelihood")) 
+    {
+      boost::shared_ptr<bob::machine::GMMMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      return python_computeLikelihood(machine_ptr);
+    }
+    return bob::trainer::ML_GMMTrainer::computeLikelihood(machine);
   }
   
-  double d_computeLikelihood(mach::GMMMachine& machine) {
-    return train::ML_GMMTrainer::computeLikelihood(machine);
+  double d_computeLikelihood(bob::machine::GMMMachine& machine) {
+    return bob::trainer::ML_GMMTrainer::computeLikelihood(machine);
   }
 
 
-  void mStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
+  void mStep(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_mStep = this->get_override("m_step")) 
-      python_mStep(machine, data);
+    {
+      boost::shared_ptr<bob::machine::GMMMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      python_mStep(machine_ptr, data);
+    }
     else
-      train::ML_GMMTrainer::mStep(machine, data);
+      bob::trainer::ML_GMMTrainer::mStep(machine, data);
   }
   
-  void d_mStep(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
-    train::ML_GMMTrainer::mStep(machine, data);
+  void d_mStep(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
+    bob::trainer::ML_GMMTrainer::mStep(machine, data);
   }
 
-  void finalization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
+  void finalization(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_finalization = this->get_override("finalization")) 
-      python_finalization(machine, data);
+    {
+      boost::shared_ptr<bob::machine::GMMMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      python_finalization(machine_ptr, data);
+    }
     else
-      train::ML_GMMTrainer::finalization(machine, data);
+      bob::trainer::ML_GMMTrainer::finalization(machine, data);
   }
   
-  void d_finalization(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
-    train::ML_GMMTrainer::finalization(machine, data);
+  void d_finalization(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
+    bob::trainer::ML_GMMTrainer::finalization(machine, data);
   }
  
-  void train(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
+  void train(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
     if (override python_train = this->get_override("train")) 
-      python_train(machine, data);
+    {
+      boost::shared_ptr<bob::machine::GMMMachine> machine_ptr(&machine, std::ptr_fun(deletor));
+      python_train(machine_ptr, data);
+    }
     else
-      train::ML_GMMTrainer::train(machine, data);
+      bob::trainer::ML_GMMTrainer::train(machine, data);
   }
 
-  void d_train(mach::GMMMachine& machine, const blitz::Array<double,2>& data) {
-    train::ML_GMMTrainer::train(machine, data);
+  void d_train(bob::machine::GMMMachine& machine, const blitz::Array<double,2>& data) {
+    bob::trainer::ML_GMMTrainer::train(machine, data);
   }
  
 };
@@ -292,7 +362,7 @@ public:
 
 void bind_trainer_gmm_wrappers() {
 
-  typedef train::EMTrainer<mach::GMMMachine, blitz::Array<double,2> > EMTrainerGMMBase; 
+  typedef bob::trainer::EMTrainer<bob::machine::GMMMachine, blitz::Array<double,2> > EMTrainerGMMBase; 
 
   class_<EMTrainerGMMWrapper, boost::noncopyable >("EMTrainerGMM", no_init)
     .def(init<optional<double, int, bool> >((arg("convergence_threshold")=0.001, arg("max_iterations")=10, arg("compute_likelihood")=true)))
@@ -316,15 +386,15 @@ void bind_trainer_gmm_wrappers() {
       "This class implements the E-step of the expectation-maximisation algorithm for a GMM Machine.\n"
       "See Section 9.2.2 of Bishop, \"Pattern recognition and machine learning\", 2006",
       init<optional<bool, bool, bool, double> >((arg("update_means"), arg("update_variances"), arg("update_weights"), arg("mean_var_update_responsibilities_threshold"))))
-    .add_property("convergence_threshold", &train::GMMTrainer::getConvergenceThreshold, &train::GMMTrainer::setConvergenceThreshold, "Convergence threshold")
-    .add_property("max_iterations", &train::GMMTrainer::getMaxIterations, &train::GMMTrainer::setMaxIterations, "Max iterations")
+    .add_property("convergence_threshold", &bob::trainer::GMMTrainer::getConvergenceThreshold, &bob::trainer::GMMTrainer::setConvergenceThreshold, "Convergence threshold")
+    .add_property("max_iterations", &bob::trainer::GMMTrainer::getMaxIterations, &bob::trainer::GMMTrainer::setMaxIterations, "Max iterations")
     .add_property("gmm_statistics", &bob::trainer::GMMTrainer::getGMMStats, &bob::trainer::GMMTrainer::setGMMStats, "The internal GMM statistics. Useful to parallelize the E-step.")
-    .def("train", &train::GMMTrainer::train, &GMMTrainerWrapper::d_train, (arg("machine"), arg("data")), "Train a machine using some data")
-    .def("initialization", &train::GMMTrainer::initialization, &GMMTrainerWrapper::d_initialization, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
-    .def("finalization", &train::GMMTrainer::finalization, &GMMTrainerWrapper::d_finalization, (arg("machine"), arg("data")), "This method is called after the EM algorithm")
-    .def("e_step", &train::GMMTrainer::eStep, &GMMTrainerWrapper::d_eStep, (arg("machine"), arg("data")), "Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
-    .def("compute_likelihood", &train::GMMTrainer::computeLikelihood, &GMMTrainerWrapper::d_computeLikelihood, (arg("machine")), "Returns the likelihood")
-    .def("m_step", pure_virtual(&train::GMMTrainer::mStep), (arg("machine"), arg("data")), "M-step of the EM-algorithm.")
+    .def("train", &bob::trainer::GMMTrainer::train, &GMMTrainerWrapper::d_train, (arg("machine"), arg("data")), "Train a machine using some data")
+    .def("initialization", &bob::trainer::GMMTrainer::initialization, &GMMTrainerWrapper::d_initialization, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
+    .def("finalization", &bob::trainer::GMMTrainer::finalization, &GMMTrainerWrapper::d_finalization, (arg("machine"), arg("data")), "This method is called after the EM algorithm")
+    .def("e_step", &bob::trainer::GMMTrainer::eStep, &GMMTrainerWrapper::d_eStep, (arg("machine"), arg("data")), "Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
+    .def("compute_likelihood", &bob::trainer::GMMTrainer::computeLikelihood, &GMMTrainerWrapper::d_computeLikelihood, (arg("machine")), "Returns the likelihood")
+    .def("m_step", pure_virtual(&bob::trainer::GMMTrainer::mStep), (arg("machine"), arg("data")), "M-step of the EM-algorithm.")
   ;
 
 
@@ -335,19 +405,19 @@ void bind_trainer_gmm_wrappers() {
       "The EM algorithm thus performs GMM adaptation.\n"
       "See Section 3.4 of Reynolds et al., \"Speaker Verification Using Adapted Gaussian Mixture Models\", Digital Signal Processing, 2000. We use a \"single adaptation coefficient\", alpha_i, and thus a single relevance factor, r.",
       init<optional<double, bool, bool, bool, double> >((arg("relevance_factor"), arg("update_means"), arg("update_variances"), arg("update_weights"), arg("mean_var_update_responsibilities_threshold"))))
-    .def("set_prior_gmm", &train::MAP_GMMTrainer::setPriorGMM, 
+    .def("set_prior_gmm", &bob::trainer::MAP_GMMTrainer::setPriorGMM, 
       "Set the GMM to use as a prior for MAP adaptation. "
       "Generally, this is a \"universal background model\" (UBM), "
       "also referred to as a \"world model\".")
-    .add_property("convergence_threshold", &train::MAP_GMMTrainer::getConvergenceThreshold, &train::MAP_GMMTrainer::setConvergenceThreshold, "Convergence threshold")
-    .add_property("max_iterations", &train::MAP_GMMTrainer::getMaxIterations, &train::MAP_GMMTrainer::setMaxIterations, "Max iterations")
+    .add_property("convergence_threshold", &bob::trainer::MAP_GMMTrainer::getConvergenceThreshold, &bob::trainer::MAP_GMMTrainer::setConvergenceThreshold, "Convergence threshold")
+    .add_property("max_iterations", &bob::trainer::MAP_GMMTrainer::getMaxIterations, &bob::trainer::MAP_GMMTrainer::setMaxIterations, "Max iterations")
     .add_property("gmm_statistics", &bob::trainer::MAP_GMMTrainer::getGMMStats, &bob::trainer::MAP_GMMTrainer::setGMMStats, "The internal GMM statistics. Useful to parallelize the E-step.")
-    .def("train", &train::MAP_GMMTrainer::train, &MAP_GMMTrainerWrapper::d_train, (arg("machine"), arg("data")), "Train a machine using some data")
-    .def("initialization", &train::MAP_GMMTrainer::initialization, &MAP_GMMTrainerWrapper::d_initialization, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
-    .def("finalization", &train::MAP_GMMTrainer::finalization, &MAP_GMMTrainerWrapper::d_finalization, (arg("machine"), arg("data")), "This method is called after the EM algorithm")
-    .def("e_step", &train::MAP_GMMTrainer::eStep, &MAP_GMMTrainerWrapper::d_eStep, (arg("machine"), arg("data")), "Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
-    .def("compute_likelihood", &train::MAP_GMMTrainer::computeLikelihood, &MAP_GMMTrainerWrapper::d_computeLikelihood, (arg("machine")), "Returns the likelihood")
-    .def("m_step", &train::MAP_GMMTrainer::mStep, &MAP_GMMTrainerWrapper::d_mStep, (arg("machine"), arg("data")), "M-step of the EM-algorithm.")
+    .def("train", &bob::trainer::MAP_GMMTrainer::train, &MAP_GMMTrainerWrapper::d_train, (arg("machine"), arg("data")), "Train a machine using some data")
+    .def("initialization", &bob::trainer::MAP_GMMTrainer::initialization, &MAP_GMMTrainerWrapper::d_initialization, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
+    .def("finalization", &bob::trainer::MAP_GMMTrainer::finalization, &MAP_GMMTrainerWrapper::d_finalization, (arg("machine"), arg("data")), "This method is called after the EM algorithm")
+    .def("e_step", &bob::trainer::MAP_GMMTrainer::eStep, &MAP_GMMTrainerWrapper::d_eStep, (arg("machine"), arg("data")), "Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
+    .def("compute_likelihood", &bob::trainer::MAP_GMMTrainer::computeLikelihood, &MAP_GMMTrainerWrapper::d_computeLikelihood, (arg("machine")), "Returns the likelihood")
+    .def("m_step", &bob::trainer::MAP_GMMTrainer::mStep, &MAP_GMMTrainerWrapper::d_mStep, (arg("machine"), arg("data")), "M-step of the EM-algorithm.")
   ;
 
    
@@ -355,15 +425,15 @@ void bind_trainer_gmm_wrappers() {
       "This class implements the maximum likelihood M-step of the expectation-maximisation algorithm for a GMM Machine.\n"
       "See Section 9.2.2 of Bishop, \"Pattern recognition and machine learning\", 2006",
       init<optional<bool, bool, bool, double> >((arg("update_means"), arg("update_variances"), arg("update_weights"), arg("mean_var_update_responsibilities_threshold"))))
-    .add_property("convergence_threshold", &train::ML_GMMTrainer::getConvergenceThreshold, &train::ML_GMMTrainer::setConvergenceThreshold, "Convergence threshold")
-    .add_property("max_iterations", &train::ML_GMMTrainer::getMaxIterations, &train::ML_GMMTrainer::setMaxIterations, "Max iterations")
+    .add_property("convergence_threshold", &bob::trainer::ML_GMMTrainer::getConvergenceThreshold, &bob::trainer::ML_GMMTrainer::setConvergenceThreshold, "Convergence threshold")
+    .add_property("max_iterations", &bob::trainer::ML_GMMTrainer::getMaxIterations, &bob::trainer::ML_GMMTrainer::setMaxIterations, "Max iterations")
     .add_property("gmm_statistics", &bob::trainer::ML_GMMTrainer::getGMMStats, &bob::trainer::ML_GMMTrainer::setGMMStats, "The internal GMM statistics. Useful to parallelize the E-step.")
-    .def("train", &train::ML_GMMTrainer::train, &ML_GMMTrainerWrapper::d_train, (arg("machine"), arg("data")), "Train a machine using some data")
-    .def("initialization", &train::ML_GMMTrainer::initialization, &ML_GMMTrainerWrapper::d_initialization, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
-    .def("finalization", &train::ML_GMMTrainer::finalization, &ML_GMMTrainerWrapper::d_finalization, (arg("machine"), arg("data")), "This method is called after the EM algorithm")
-    .def("e_step", &train::ML_GMMTrainer::eStep, &ML_GMMTrainerWrapper::d_eStep, (arg("machine"), arg("data")), "Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
-    .def("compute_likelihood", &train::ML_GMMTrainer::eStep, &ML_GMMTrainerWrapper::d_eStep, (arg("machine")), "Returns the likelihood")
-    .def("m_step", &train::ML_GMMTrainer::mStep, &ML_GMMTrainerWrapper::d_mStep, (arg("machine"), arg("data")), "M-step of the EM-algorithm.")
+    .def("train", &bob::trainer::ML_GMMTrainer::train, &ML_GMMTrainerWrapper::d_train, (arg("machine"), arg("data")), "Train a machine using some data")
+    .def("initialization", &bob::trainer::ML_GMMTrainer::initialization, &ML_GMMTrainerWrapper::d_initialization, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
+    .def("finalization", &bob::trainer::ML_GMMTrainer::finalization, &ML_GMMTrainerWrapper::d_finalization, (arg("machine"), arg("data")), "This method is called after the EM algorithm")
+    .def("e_step", &bob::trainer::ML_GMMTrainer::eStep, &ML_GMMTrainerWrapper::d_eStep, (arg("machine"), arg("data")), "Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
+    .def("compute_likelihood", &bob::trainer::ML_GMMTrainer::eStep, &ML_GMMTrainerWrapper::d_eStep, (arg("machine")), "Returns the likelihood")
+    .def("m_step", &bob::trainer::ML_GMMTrainer::mStep, &ML_GMMTrainerWrapper::d_mStep, (arg("machine"), arg("data")), "M-step of the EM-algorithm.")
   ;
 
 }
