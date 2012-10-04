@@ -169,9 +169,9 @@ def setup_extension(ext_name, pc_file):
 
   pc = pkgconfig(pc_file + '%d%d' % sys.version_info[:2])
 
-  library_dirs=pc['library_dirs']
+  library_dirs=pc.get('library_dirs', [])
   library_dirs=[k for k in library_dirs if os.path.exists(k)]
-  include_dirs=pc['include_dirs']
+  include_dirs=pc.get('include_dirs', [])
   include_dirs=[k for k in include_dirs if os.path.exists(k)]
 
   if len(DESTDIR) != 0:
