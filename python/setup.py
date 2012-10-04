@@ -19,6 +19,10 @@ EXTRA_REQUIREMENTS = []
 if sys.version_info[:2] < (2, 7) or ((3,0) <= sys.version_info[:2] < (3,2)):
   EXTRA_REQUIREMENTS.append('argparse')
 
+# Installing in a caged environment
+DESTDIR = os.environ.get('DESTDIR', '')
+print "DESTDIR set to %s" % DESTDIR
+
 # ---------------------------------------------------------------------------#
 #  various functions and classes to help on the setup                        # 
 # ---------------------------------------------------------------------------#
@@ -42,7 +46,7 @@ def pkgconfig(package):
    return result
 
   flag_map = {
-      '-I': 'include_dirs', 
+      '-I': 'include_dirs',
       '-L': 'library_dirs',
       '-l': 'libraries',
       }
@@ -110,6 +114,9 @@ def bob_variables():
 
   kw['soversion'] = get_var('soversion')
 
+  kw['base_libdir'] = get_var('libdir')
+  kw['base_includedir'] = get_var('includedir')
+
   return kw
 
 # Retrieve central, global variables from Bob's C++ build
@@ -164,6 +171,14 @@ def setup_extension(ext_name, pc_file):
   pc = pkgconfig(pc_file + '%d%d' % sys.version_info[:2])
 
   library_dirs=pc['library_dirs']
+  library_dirs=[k for k in library_dirs if os.path.exists(k)]
+  include_dirs=pc['include_dirs']
+  include_dirs=[k for k in include_dirs if os.path.exists(k)]
+
+  if len(DESTDIR) != 0:
+    # Treat special caged builds
+    library_dirs.insert(0, os.path.join(DESTDIR, BOB['base_libdir'].lstrip(os.sep)))
+    include_dirs.insert(0, os.path.join(DESTDIR, BOB['base_includedir'].strip(os.sep)))
 
   runtime_library_dirs = None
   if BOB['soversion'].lower() == 'off':
@@ -173,7 +188,7 @@ def setup_extension(ext_name, pc_file):
       ext_name,
       sources=[],
       language="c++",
-      include_dirs=pc['include_dirs'] + [numpy.get_include()],
+      include_dirs=include_dirs + [numpy.get_include()],
       library_dirs=library_dirs,
       runtime_library_dirs=runtime_library_dirs,
       libraries=pc['libraries'],

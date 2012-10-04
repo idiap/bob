@@ -1,4 +1,0 @@
-#!/usr/bin/env @CMAKE_BINARY_DIR@/bin/python
-import sys
-from nose import main
-main(argv=['nose']+sys.argv[1:])

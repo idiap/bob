@@ -60,11 +60,11 @@ endif()
 
 set(BOB_PYTHONPATH "${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES}")
 set(BOB_PKG_CONFIG_PATH "${CMAKE_BINARY_DIR}/lib/pkgconfig")
-configure_file(bin/egg-python.in ${CMAKE_BINARY_DIR}/bin/egg-build @ONLY)
+configure_file(bin/egg-build.in ${CMAKE_BINARY_DIR}/bin/egg-build @ONLY)
 
 set(BOB_PKG_CONFIG_PATH "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
 set(BOB_PYTHONPATH "${ABSOLUTE_install_prefix}/${PYTHON_SITE_PACKAGES}")
-configure_file(bin/egg-python.in ${CMAKE_BINARY_DIR}/bin/egg-install @ONLY)
+configure_file(bin/egg-install.in ${CMAKE_BINARY_DIR}/bin/egg-install @ONLY)
 
 # An easy handler to debug python stuff
 set(BOB_PYTHONPATH "${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES}")
@@ -79,10 +79,14 @@ add_dependencies(egg-scripts egg)
 
 # Testing
 # An easy handler for nose tests
+find_program(NOSETESTS_EXECUTABLE NAMES nosetests-${PYTHON_VERSION} nosetests
+  HINTS $ENV{SPHINX_DIR} PATH_SUFFIXES bin
+  DOC "Nose python test scanner and runner"
+  )
 set(BOB_PYTHONPATH "${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES}")
-configure_file(bin/nosetests.py.in ${CMAKE_BINARY_DIR}/bin/nosetests.py @ONLY)
-add_custom_target(nosetests ${CMAKE_BINARY_DIR}/bin/nosetests.py -v bob)
-add_dependencies(nosetests egg)
+configure_file(bin/nosetests.in ${CMAKE_BINARY_DIR}/bin/nosetests @ONLY)
+add_custom_target(nosetests ${CMAKE_BINARY_DIR}/bin/nosetests -v bob)
+add_dependencies(nosetests egg-scripts)
 
 # Documentation
 add_subdirectory(doc)

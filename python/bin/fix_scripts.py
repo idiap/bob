@@ -18,9 +18,14 @@ import os
 import sys
 import fnmatch
 
+if len(sys.argv) > 2:
+  print "Not tunning scripts (DESTDIR environment set to '%s')" % sys.argv[2]
+  sys.exit(0)
+
 for script in fnmatch.filter(os.listdir(sys.argv[1]), 'bob_*.py'):
 
   path = os.path.join(sys.argv[1], script)
+
   print "Tunning %s script at %s" % (os.path.basename(path), os.path.dirname(path))
   site = os.path.abspath(os.path.join(
     os.path.dirname(sys.argv[1]),
