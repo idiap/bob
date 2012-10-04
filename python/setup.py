@@ -21,7 +21,6 @@ if sys.version_info[:2] < (2, 7) or ((3,0) <= sys.version_info[:2] < (3,2)):
 
 # Installing in a caged environment
 DESTDIR = os.environ.get('DESTDIR', '')
-print "DESTDIR set to %s" % DESTDIR
 
 # ---------------------------------------------------------------------------#
 #  various functions and classes to help on the setup                        # 
