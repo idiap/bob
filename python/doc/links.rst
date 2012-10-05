@@ -57,6 +57,7 @@
 .. _qt4: http://qt.nokia.com/ 
 .. _satellite packages: https://github.com/idiap/bob/wiki/Satellite-Packages
 .. _scipy: http://www.scipy.org
+.. _setuptools: http://trac.edgewall.org/wiki/setuptools
 .. _sphinx: http://sphinx.pocoo.org
 .. _sqlalchemy: http://www.sqlalchemy.org/
 .. _sqlite: http://www.sqlite.org/

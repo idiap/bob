@@ -110,6 +110,8 @@ Build dependencies
 +----------------------+--------------+------------------+
 | `Dvipng`_            | 1.12?        | `GPL-3.0`_       |
 +----------------------+--------------+------------------+
+| `Setuptools`_        | any          | `Python-2.0`_    |
++----------------------+--------------+------------------+
 
 Recommended software
 --------------------
@@ -230,6 +232,7 @@ during runtime.
 * `LaTeX`_: if it is installed, the target ``sphinx-latex`` will generate a PDF
   (or DVI) document for the user guide. Otherwise, only the latex dump out of
   sphinx is produced during the build.
+* `Setuptools`_: is used for managing the python modules.
 
 .. note::
    If your OS cannot satisfy the minimal required versions of the packages, you
@@ -266,7 +269,7 @@ A single command line that will install all required packages under Ubuntu:
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core cmake rsync python-dev python-support python-numpy python-argparse python-scipy python-matplotlib python-sqlalchemy liblapack-dev libatlas-base-dev libblitz1-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libmatio-dev libmagick++-dev libhdf5-serial-dev libqt4-dev libfftw3-dev libcv-dev libhighgui-dev libcvaux-dev texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended libsvm-dev libvl-dev doxygen python-sphinx dvipng python-nose
+   $ sudo apt-get install git-core cmake python-dev python-support python-numpy python-argparse python-scipy python-matplotlib python-sqlalchemy liblapack-dev libatlas-base-dev libblitz1-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libmatio-dev libmagick++-dev libhdf5-serial-dev libqt4-dev libfftw3-dev libcv-dev libhighgui-dev libcvaux-dev texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended libsvm-dev libvl-dev doxygen python-sphinx dvipng python-nose python-setuptools
 
 .. note::
 
@@ -284,8 +287,7 @@ A single command line that will install all required packages under Ubuntu:
 
   .. code-block:: sh
 
-    $ sudo apt-add-repository ppa:biometrics/blitz
-    $ sudo apt-add-repository ppa:biometrics/vlfeat
+    $ sudo apt-add-repository ppa:biometrics/bob
     $ sudo apt-get update
     $ sudo apt-get install libblitz1-dev libvl-dev
 
@@ -305,7 +307,7 @@ shell prompt:
 
 .. code-block:: sh
 
-   $ sudo port install cmake blitz ffmpeg python26 python_select py26-numpy -atlas matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx texlive-latex-extra texlive-fonts-recommended hdf5-18 py26-argparse qt4-mac boost +python26 py26-scipy +no_atlas fftw-3 vlfeat opencv +python26 +qt4 libsvm +python26 +tools dvipng py26-sqlalchemy py26-nose
+   $ sudo port install cmake blitz ffmpeg python26 python_select py26-numpy -atlas matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx texlive-latex-extra texlive-fonts-recommended hdf5-18 py26-argparse qt4-mac boost +python26 py26-scipy +no_atlas fftw-3 vlfeat opencv +python26 +qt4 libsvm +python26 +tools dvipng py26-sqlalchemy py26-nose py26-distribute
    $ # go for a long coffee 
 
 After the installation has finished, make sure you select python 2.6 (macports)
