@@ -20,7 +20,7 @@ TAG_RE = re.compile(r'^v\d+\.\d+\.\d+$')
 VERSION_RE = re.compile(r'^\d+\.\d+\.\d+$')
 BOB_REPOSITORY = 'https://github.com/idiap/bob.git'
 
-def git_remote_version_branches():
+def git_remote_version_branches(verbose):
   """Get the branches available on the origin using git ls-remote"""
 
   try:
@@ -34,9 +34,10 @@ def git_remote_version_branches():
     return [k for k in cand if BRANCH_RE.match(k)]
 
   except:
-    print "Warning: could retrieve remote branch list"
+    if verbose: 
+      print "Warning: could retrieve remote branch list"
 
-def git_version_branches():
+def git_version_branches(verbose):
   """Get the branches available on the origin"""
 
   try:
@@ -50,9 +51,10 @@ def git_version_branches():
     return [k for k in cand if k and BRANCH_RE.match(k)]
 
   except:
-    print "Warning: could retrieve branch list"
+    if verbose:
+      print "Warning: could retrieve branch list"
 
-def git_current_branch():
+def git_current_branch(verbose):
   """Get the current branch we are sitting on"""
 
   try:
@@ -70,9 +72,10 @@ def git_current_branch():
     raise RuntimeError
 
   except:
-    print "Warning: could not determine in which branch I'm on"
+    if verbose:
+      print "Warning: could not determine in which branch I'm on"
 
-def git_next_minor_version(branch):
+def git_next_minor_version(branch, verbose):
   """Gets the next minor version"""
 
   try:
@@ -93,19 +96,20 @@ def git_next_minor_version(branch):
     return '.'.join([str(k) for k in next_version])
 
   except:
-    print "Warning: could not determine latest tag on branch (%s). Assuming it is %s.0" % (branch, branch)
+    if verbose:
+      print "Warning: could not determine latest tag on branch (%s). Assuming it is %s.0" % (branch, branch)
     return branch + '.0'
 
-def git_next_major_version():
+def git_next_major_version(verbose):
   """Gets the next major version"""
 
   # try local
-  candidates = sorted([StrictVersion(k) for k in git_version_branches()])
+  candidates = sorted([StrictVersion(k) for k in git_version_branches(verbose)])
 
   if not candidates:
     # try remote
     candidates = \
-        sorted([StrictVersion(k) for k in git_remote_version_branches()])
+        sorted([StrictVersion(k) for k in git_remote_version_branches(verbose)])
 
   if not candidates:
     return None
@@ -118,18 +122,18 @@ def git_next_major_version():
 
   return '.'.join([str(k) for k in next_version])
 
-def git_next_version(branch):
+def git_next_version(branch, verbose):
   """Gets the next version given the branch I'm on"""
 
   if BRANCH_RE.match(branch):
     # we are on a stable branch
-    return git_next_minor_version(branch)
+    return git_next_minor_version(branch, verbose)
 
   else:
     # we are on the master tip
-    return git_next_major_version()
+    return git_next_major_version(verbose)
 
-def git_count(branch):
+def git_count(branch, verbose):
   """Count the number of commits in the repository.
 
   Note: This does not work right for shallow git clones.
@@ -145,14 +149,15 @@ def git_count(branch):
     return stdout.count('\n')
 
   except:
-    print "Warning: could not determine commit count on branch '%s'" % branch
+    if verbose:
+      print "Warning: could not determine commit count on branch '%s'" % branch
 
-def package_version():
+def package_version(verbose):
   """Interprets the package version from the directory name"""
 
   dirname = os.path.basename(os.path.realpath(os.curdir))
 
-  match = re.match(r'^bob[-_](\d+\.\d+\.\d+[abcd]\d+)$', dirname)
+  match = re.match(r'^bob[-_](\d+\.\d+\.\d+([abcd]\d+)?)$', dirname)
 
   if match: return match.groups()[0]
 
@@ -164,8 +169,9 @@ if __name__ == '__main__':
 
   parser = optparse.OptionParser()
   parser.add_option("-v", "--version", dest="version", metavar='VERSION', help="force version to a given string (format M.m.p; by default calculates the version number of the next build based on the currently existing branch and tags)", type='str')
-  parser.add_option("-l", "--letter", dest="letter", metavar='LETTER', choices=('a', 'b', 'c'), default='a', help="force the suffix letter to be one of ([a]alpha, [b]beta, [c]candidate; defaults to 'a')")
+  parser.add_option("-l", "--letter", dest="letter", metavar='LETTER', choices=('a', 'b', 'c'), help="force the suffix letter to be one of ([a]alpha, [b]beta, [c]candidate; defaults to None)")
   parser.add_option("-c", "--counter", dest="count", metavar='COUNT', type='int', help="force the counter after the letter (by default use number of commits in the current branch)")
+  parser.add_option("-V", "--verbose", dest="verbose", default=False, action='store_true', help="be verbose about potential issues (warnings)")
 
   (options, args) = parser.parse_args()
 
@@ -182,21 +188,26 @@ if __name__ == '__main__':
   # change directories to my parent's
   os.chdir(os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[0]))))
 
-  branch = git_current_branch()
+  branch = git_current_branch(options.verbose)
 
   if options.version is None:
-    options.version = package_version()
+    options.version = package_version(options.verbose)
 
     if not options.version:
       if branch is not None:
-        options.version =  git_next_version(branch)
+        options.version =  git_next_version(branch, options.verbose)
 
   if options.count is None:
-    options.count = git_count(branch)
+    options.count = git_count(branch, options.verbose)
 
-  if not options.version: print 'unknown'
-  else:
+  if not options.version: 
+    print 'unknown'
+  elif options.letter:
     final = options.version + options.letter + str(options.count)
+    StrictVersion(final) #double-checks all is good
+    print final
+  else:
+    final = options.version
     StrictVersion(final) #double-checks all is good
     print final
 
