@@ -206,12 +206,6 @@ bob::core::array::ElementType bob::python::num_to_type(int num) {
 #endif
 
     default:
-      static auto compile(NPY_LONGLONG);
-      std::cout << "NPY_LONGLONG was " << compile << std::endl;
-      std::cout << "NPY_LONGLONG is " << NPY_LONGLONG << std::endl;
-      static auto compile2(NPY_INT64);
-      std::cout << "NPY_INT64 was " << compile2 << std::endl;
-      std::cout << "NPY_INT64 is " << NPY_INT64 << std::endl;
       PYTHON_ERROR(TypeError, "unsupported NumPy element type (%d)", num);
   }
 
