@@ -83,13 +83,13 @@ BOOST_AUTO_TEST_CASE( test_gabor_graph_machine )
 #ifdef GENERATE_NEW_REFERENCE_FILES
   bob::io::save(node_position_file.string(), machine.nodes());
 #else // GENERATE_NEW_REFERENCE_FILES
-  auto node_positions = bob::io::load<int,2>(node_position_file.string());
+  blitz::Array<int,2> node_positions = bob::io::load<int,2>(node_position_file.string());
   test_identical(machine.nodes(), node_positions);
 #endif // GENERATE_NEW_REFERENCE_FILES
 
   // Load original image
   boost::filesystem::path image_file = boost::filesystem::path(data_dir) / "image.pgm";
-  auto uint8_image = bob::io::load<uint8_t,2>(image_file.string());
+  blitz::Array<uint8_t,2> uint8_image = bob::io::load<uint8_t,2>(image_file.string());
   blitz::Array<std::complex<double>,2> image = bob::core::cast<std::complex<double> >(uint8_image);
 
   // perform Gabor wavelet transform
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE( test_gabor_graph_machine )
   bob::io::save(graph_jets_file.string(), graph);
   blitz::Array<double,3> graph_jets = graph;
 #else // GENERATE_NEW_REFERENCE_FILES
-  auto graph_jets = bob::io::load<double,3>(graph_jets_file.string());
+  blitz::Array<double,3> graph_jets = bob::io::load<double,3>(graph_jets_file.string());
   test_close(graph, graph_jets);
 #endif // GENERATE_NEW_REFERENCE_FILES
 
