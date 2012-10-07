@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE( test_geomnorm )
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "image_r10.pgm";
-  auto img = bob::io::load<uint8_t,2>(testdata_path_img.string());
+  blitz::Array<uint8_t,2> img = bob::io::load<uint8_t,2>(testdata_path_img.string());
   blitz::Array<double,2> img_processed_d(40,40);
   
   // Define a Geometric normalizer 
@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_CASE( test_geomnorm )
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r10_geomnorm.pgm";
 //  bob::io::save(testdata_path_img.string(), img_processed); // Re-generate reference data
-  auto img_ref_geomnorm = bob::io::load<uint8_t,2>(testdata_path_img.string());
+  blitz::Array<uint8_t,2> img_ref_geomnorm = bob::io::load<uint8_t,2>(testdata_path_img.string());
   checkBlitzClose( img_ref_geomnorm, img_processed, eps);
 }
 
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE( test_geomnorm_with_mask )
   // Load original image
   boost::filesystem::path testdata_path(testdata_cpath);
   testdata_path /= "image_r70.pgm";
-  auto input_image = bob::io::load<uint8_t,2>(testdata_path.string());
+  blitz::Array<uint8_t,2> input_image = bob::io::load<uint8_t,2>(testdata_path.string());
   blitz::Array<double,2> output_image(160,160);
   
   blitz::Array<bool,2> input_mask(input_image.shape()[0],input_image.shape()[1]);
@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE( test_geomnorm_with_mask )
   testdata_path = testdata_cpath;
   testdata_path /= "image_r70_mask.pgm";
 //  bob::io::open(testdata_path.string(), 'w')->write(output_mask_uint8); // Re-generate reference data
-  auto output_reference = bob::io::load<uint8_t,2>(testdata_path.string());
+  blitz::Array<uint8_t,2> output_reference = bob::io::load<uint8_t,2>(testdata_path.string());
   checkBlitzEqual(output_mask_uint8, output_reference);
 }
 

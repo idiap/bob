@@ -355,7 +355,7 @@ static void inner_append(io::HDF5File& f, const std::string& path,
 
 static void hdf5file_append_iterable(io::HDF5File& f, const std::string& path,
   object iterable, size_t compression) {
-  for (auto k=0; k<len(iterable); ++k) {
+  for (int k=0; k<len(iterable); ++k) {
     object obj = iterable[k];
     io::HDF5Type type;
     bool scalar = get_object_type(obj, type);
@@ -520,7 +520,7 @@ static dict hdf5file_get_attributes(const io::HDF5File& f, const std::string& pa
   std::map<std::string, io::HDF5Type> attributes;
   f.listAttributes(path, attributes);
   dict retval;
-  for (auto k=attributes.begin(); k!=attributes.end(); ++k) {
+  for (std::map<std::string, io::HDF5Type>::iterator k=attributes.begin(); k!=attributes.end(); ++k) {
     if (k->second.type() == io::unsupported) {
       boost::format m("unsupported HDF5 data type detected for attribute '%s' - setting None");
       m % k->first;
@@ -621,7 +621,7 @@ static void inner_set_attr(io::HDF5File& f, const std::string& path,
 
 static void hdf5file_set_attributes(io::HDF5File& f, dict attributes, const std::string& path=".") {
   object keys = attributes.iterkeys();
-  for (auto k=0; k<len(keys); ++k) {
+  for (int k=0; k<len(keys); ++k) {
     std::string key = extract<std::string>(keys[k]);
     io::HDF5Type type;
     object obj = attributes[keys[k]];
@@ -655,7 +655,7 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(hdf5file_del_attribute_overloads, hdf5file_del_a
 static void hdf5file_del_attributes(io::HDF5File& f, const std::string& path=".") {
   std::map<std::string, io::HDF5Type> attributes;
   f.listAttributes(path, attributes);
-  for (auto k=attributes.begin(); k!=attributes.end(); ++k) {
+  for (std::map<std::string, io::HDF5Type>::iterator k=attributes.begin(); k!=attributes.end(); ++k) {
     f.deleteAttribute(path, k->first);
   }
 }

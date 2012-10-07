@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "image.pgm";
-  auto img = bob::io::load<uint8_t,2>(testdata_path_img.string());
+  blitz::Array<uint8_t,2> img = bob::io::load<uint8_t,2>(testdata_path_img.string());
   blitz::Array<double,2> img_processed;
 
   // Scale original image and compare with ImageMagick reference image
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
 #ifdef REGENERATE_REFERENCE_IMAGES
   bob::io::save(testdata_path_img.string(), bob::core::cast<uint8_t>(img_processed));
 #else // REGENERATE_REFERENCE_IMAGES
-  auto img_ref_s137 = bob::io::load<uint8_t,2>(testdata_path_img.string());
+  blitz::Array<uint8_t,2> img_ref_s137 = bob::io::load<uint8_t,2>(testdata_path_img.string());
   checkBlitzClose( img_ref_s137, img_processed, eps);
 #endif // REGENERATE_REFERENCE_IMAGES
 
@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
 #ifdef REGENERATE_REFERENCE_IMAGES
   bob::io::save(testdata_path_img.string(), bob::core::cast<uint8_t>(img_processed));
 #else // REGENERATE_REFERENCE_IMAGES
-  auto img_ref_s77 = bob::io::load<uint8_t,2>(testdata_path_img.string());
+  blitz::Array<uint8_t,2> img_ref_s77 = bob::io::load<uint8_t,2>(testdata_path_img.string());
   checkBlitzClose( img_ref_s77, img_processed, eps);
 #endif // REGENERATE_REFERENCE_IMAGES
 
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
 #ifdef REGENERATE_REFERENCE_IMAGES
   bob::io::save(testdata_path_img.string(), bob::core::cast<uint8_t>(img_processed));
 #else // REGENERATE_REFERENCE_IMAGES
-  auto img_ref_s125x75 = bob::io::load<uint8_t,2>(testdata_path_img.string());
+  blitz::Array<uint8_t,2> img_ref_s125x75 = bob::io::load<uint8_t,2>(testdata_path_img.string());
   checkBlitzClose( img_ref_s125x75, img_processed, eps);
 #endif // REGENERATE_REFERENCE_IMAGES
 
