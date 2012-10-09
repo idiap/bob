@@ -46,7 +46,7 @@ Here is an example:
   $ python
   ...
   >>> import bob
-  >>> print bob.build.version
+  >>> print bob.version
 
 .. If you decided to use |project| from the build location (without
 .. properly installing it) or 
@@ -63,7 +63,7 @@ Example:
   $ PYTHONPATH=<your-bob-build>/lib/python2.6 python2.6
   ...
   >>> import bob
-  >>> print bob.build.version
+  >>> print bob.version
 
 |project| also includes some executables that are immediately usable after installation. For
 example, to print the version details of your |project| installation, just run:

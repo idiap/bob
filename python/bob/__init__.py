@@ -52,3 +52,4 @@ __all__ = [
 
 if has_visioner: __all__.append('visioner')
 if has_daq: __all__.append('daq')
+version = __import__('pkg_resources').require('bob')[0]
