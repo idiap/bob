@@ -295,23 +295,39 @@ Mac OSX
 -------
 
 This is a recipe for installing |project| dependencies under your Mac OSX using
-Snow Leopard (10.6) or Lion (10.7). It should be possible, but remains
-untested, to execute similar steps under OSX Leopard (10.5.X). We would like to
-hear from you! If you have a success story or problems `submit a new bug
-report`_.
+Snow Leopard (10.6), Lion (10.7) or Mountain Lion (10.8). We would like to hear
+from you! If you have a success story or problems `submit a new bug report`_.
 
 This recipe assumes you have already gone through the standard,
-well-documented, `MacPorts installation instructions`_ and have a prompt just in
-front of you and a checkout of bob you want to try out. Then, just do, at your
-shell prompt:
+well-documented, `MacPorts installation instructions`_ and have a prompt just
+in front of you and a checkout of bob you want to try out. Then, just do, at
+your shell prompt (for using Python 2.7 as the default interpreter):
+   
+.. code-block:: sh
+
+  $ sudo port install cmake blitz ffmpeg python27 python_select py27-numpy -atlas matio imagemagick py27-ipython py27-matplotlib google-perftools doxygen py27-sphinx texlive-latex-extra texlive-fonts-recommended hdf5-18 qt4-mac boost +python27 py27-scipy +no_atlas fftw-3 vlfeat opencv +python27 +qt4 libsvm +python27 +tools dvipng py27-sqlalchemy py27-nose py27-distribute
+   $ # go for a long coffee 
+
+**Or**, for Python 2.6 as the default interpreter:
 
 .. code-block:: sh
 
    $ sudo port install cmake blitz ffmpeg python26 python_select py26-numpy -atlas matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx texlive-latex-extra texlive-fonts-recommended hdf5-18 py26-argparse qt4-mac boost +python26 py26-scipy +no_atlas fftw-3 vlfeat opencv +python26 +qt4 libsvm +python26 +tools dvipng py26-sqlalchemy py26-nose py26-distribute
-   $ # go for a long coffee 
 
-After the installation has finished, make sure you select python 2.6 (macports)
-as your default shell:
+.. note::
+
+  Python 2.6 requires one more dependence for compilation, namely
+  ``py26-argparse``. Python 2.7 already includes that package in the standard
+  distribution.
+
+After the installation has finished, make sure you select python 2.7 (macports)
+as your default Python interpreter, it that is not already the case:
+
+.. code-block:: sh
+
+  $ sudo port select python python27
+
+**Or**, for Python 2.6 as the default interperter:
 
 .. code-block:: sh
 
@@ -323,30 +339,26 @@ prompt manually.
 
 .. note::
 
-  This setup will guide you to choose Python_ 2.6 as the interpreter where
-  |project| will run. You can use either Python_ 2.5 or Python_ 2.7 as well.
-  Make the required modifications on the instructions above so to install
-  packages for that version of python instead. It is very important that the
-  version of Python chosen matches that with which Boost.Python has been
-  compiled with. You can check how Boost (and therefore Boost.Python) has been
-  installed with the following command:
+  It is very important that the version of Python chosen matches that with
+  which Boost.Python has been compiled with. You can check how Boost (and
+  therefore Boost.Python) has been installed with the following command:
 
   .. code-block:: sh
 
     $ port installed boost
     The following ports are currently installed:
-      boost @1.49.0_0+python26 (active)
+      boost @1.51.0_0+python27 (active)
 
   That defines that boost is effectively installed. It was compiled with
-  version 2.6 of Python_. This is the version you **should** use when compiling
-  |project|. If you start getting crashes on the python bindings, verify this
-  first.
+  version 2.7 of Python_. So, Python 2.7 in this case is the version you
+  **should** use when compiling |project|. If you start getting crashes on the
+  python bindings, verify this first.
 
 You can also install git if you want to develop |project|.
 
 .. code-block:: sh
 
-   $ sudo port install git-core +python26
+   $ sudo port install git-core
 
 For compiling |project| under OSX, we recommend the use of "clang" instead of
 plain gcc. You will need to tell this to CMake when configuring, prefixing the
