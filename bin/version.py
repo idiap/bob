@@ -193,9 +193,13 @@ if __name__ == '__main__':
   if options.version is None:
     options.version = package_version(options.verbose)
 
-    if not options.version:
-      if branch is not None:
-        options.version =  git_next_version(branch, options.verbose)
+    if options.version:
+      # the directory in which this program is, is versioned
+      print options.version
+      sys.exit(0)
+
+    if branch is not None:
+      options.version =  git_next_version(branch, options.verbose)
 
   if options.count is None:
     options.count = git_count(branch, options.verbose)
