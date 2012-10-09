@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE( test_tantriggs_2d )
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "image.pgm";
-  auto img = bob::io::load<uint8_t,2>(testdata_path_img.string());
+  blitz::Array<uint8_t,2> img = bob::io::load<uint8_t,2>(testdata_path_img.string());
   blitz::Array<double,2> img_processed(img.shape());
   bob::ip::TanTriggs tt_filter;
   tt_filter(img,img_processed);
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE( test_tantriggs_2d )
   // First test
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_tantriggs.pgm";
-  auto img_ref = bob::io::load<uint8_t,2>(testdata_path_img.string());
+  blitz::Array<uint8_t,2> img_ref = bob::io::load<uint8_t,2>(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_processed_u = bob::core::convertFromRange<uint8_t>(
       img_processed, blitz::min(img_processed), blitz::max(img_processed));
   checkBlitzClose( img_processed_u, img_ref, eps);
