@@ -40,7 +40,7 @@ using namespace bob::core;
  */
 std::string temp_file() {
   std::string tpl = bob::core::tmpdir();
-  tpl += "/bobtest_core_loggingXXXXXX";
+  tpl += "bobtest_core_loggingXXXXXX";
   boost::shared_array<char> char_tpl(new char[tpl.size()+1]);
   strcpy(char_tpl.get(), tpl.c_str());
   int fd = mkstemp(char_tpl.get());
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE( test_basic )
  */
 std::string get_contents(const std::string& fname) {
   std::string cmd;
-  if (boost::filesystem::path(fname).extension() == ".gz") cmd = "zcat ";
+  if (boost::filesystem::path(fname).extension() == ".gz") cmd = "gunzip -c ";
   else cmd = "cat ";
   cmd += fname;
   FILE* pipe = popen(cmd.c_str(), "r");
