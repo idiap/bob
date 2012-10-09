@@ -26,12 +26,16 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/shared_array.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+#include <boost/iostreams/copy.hpp>
 
 #include "bob/core/logging.h"
 #include <cstdio>
 #include <cstdlib>
 #include <string>
 #include <iostream>
+#include <fstream>
 
 using namespace bob::core;
 
@@ -68,19 +72,18 @@ BOOST_AUTO_TEST_CASE( test_basic )
  * output of logging.
  */
 std::string get_contents(const std::string& fname) {
-  std::string cmd;
-  if (boost::filesystem::path(fname).extension() == ".gz") cmd = "gunzip -c ";
-  else cmd = "cat ";
-  cmd += fname;
-  FILE* pipe = popen(cmd.c_str(), "r");
-  if (!pipe) return "ERROR";
-  char buffer[128];
-  std::string result = "";
-  while(!feof(pipe)) {
-      if(fgets(buffer, 128, pipe) != NULL) result += buffer;
+  std::ifstream file(fname.c_str(), std::ios_base::in | std::ios_base::binary);
+  std::ostringstream retval;
+  if (boost::filesystem::path(fname).extension() == ".gz") {
+    boost::iostreams::filtering_istream in;
+    in.push(boost::iostreams::gzip_decompressor());
+    in.push(file);
+    boost::iostreams::copy(in, retval);
   }
-  pclose(pipe);
-  return result;
+  else {
+    boost::iostreams::copy(file, retval);
+  }
+  return retval.str();
 }
 
 //tests if I can easily switch streams 
