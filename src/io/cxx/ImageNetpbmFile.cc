@@ -23,9 +23,9 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/shared_array.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/format.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 #include <string>
 
@@ -33,23 +33,34 @@
 #include "bob/io/Exception.h"
 
 extern "C" {
-// This header must come last, as it brings a lot of stuff that
-// messes up other headers...
+// This header must come last, as it brings a lot of global stuff that messes up other headers...
 #include <pam.h>
 }
 
+static boost::shared_ptr<std::FILE> make_cfile(const char *filename, const char *flags)
+{
+  std::FILE* fp;
+  if(strcmp(flags, "r") == 0)
+    fp = pm_openr(filename);
+  else // write
+    fp = pm_openw(filename);
+  if(fp == 0) throw bob::io::FileNotReadable(filename);
+  return boost::shared_ptr<std::FILE>(fp, pm_close);
+}
 
-
+/**
+ * LOADING
+ */
 static void im_peek(const std::string& path, bob::core::array::typeinfo& info) {
 
   struct pam in_pam;
-  FILE *in_file = pm_openr(path.c_str());
-#ifdef PAM_STRUCT_SIZE // For version >= 10.23
-  pnm_readpaminit(in_file, &in_pam, PAM_STRUCT_SIZE(tuple_type));
+  boost::shared_ptr<std::FILE> in_file = make_cfile(path.c_str(), "r");
+#ifdef PAM_STRUCT_SIZE 
+  // For version >= 10.23
+  pnm_readpaminit(in_file.get(), &in_pam, PAM_STRUCT_SIZE(tuple_type));
 #else
-  pnm_readpaminit(in_file, &in_pam, sizeof(struct pam));
+  pnm_readpaminit(in_file.get(), &in_pam, sizeof(struct pam));
 #endif
-  pm_close(in_file);
 
   if( in_pam.depth != 1 && in_pam.depth != 3)
   {
@@ -82,6 +93,86 @@ static void im_peek(const std::string& path, bob::core::array::typeinfo& info) {
   }
 }
 
+template <typename T> static
+void im_load_gray(struct pam *in_pam, bob::core::array::interface& b) {
+  const bob::core::array::typeinfo& info = b.type();
+
+  T *element = static_cast<T*>(b.ptr());
+  tuple *tuplerow = pnm_allocpamrow(in_pam);
+  for(size_t y=0; y<info.shape[0]; ++y)
+  {
+    pnm_readpamrow(in_pam, tuplerow);
+    for(size_t x=0; x<info.shape[1]; ++x)
+    {
+      *element = tuplerow[x][0];
+      ++element;
+    }
+  }
+  pnm_freepamrow(tuplerow);  
+}
+
+template <typename T> static
+void imbuffer_to_rgb(size_t size, const tuple* tuplerow, T* r, T* g, T* b) {
+  for (size_t k=0; k<size; ++k) {
+    r[k] = tuplerow[k][0];
+    g[k] = tuplerow[k][1];
+    b[k] = tuplerow[k][2];
+  }
+}
+
+template <typename T> static
+void im_load_color(struct pam *in_pam, bob::core::array::interface& b) {
+  const bob::core::array::typeinfo& info = b.type();
+  
+  long unsigned int frame_size = info.shape[2] * info.shape[1]; 
+  T *element_r = static_cast<T*>(b.ptr());
+  T *element_g = element_r+frame_size;
+  T *element_b = element_g+frame_size;
+
+  int row_color_stride = info.shape[2]; // row_stride for each component 
+  tuple *tuplerow = pnm_allocpamrow(in_pam);
+  for(size_t y=0; y<info.shape[1]; ++y)
+  {
+    pnm_readpamrow(in_pam, tuplerow);
+    imbuffer_to_rgb(row_color_stride, tuplerow, element_r, element_g, element_b);
+    element_r += row_color_stride;
+    element_g += row_color_stride;
+    element_b += row_color_stride;
+  }
+  pnm_freepamrow(tuplerow);  
+}
+
+static void im_load (const std::string& filename, bob::core::array::interface& b) {
+
+  struct pam in_pam;
+  boost::shared_ptr<std::FILE> in_file = make_cfile(filename.c_str(), "r");
+#ifdef PAM_STRUCT_SIZE 
+  // For version >= 10.23
+  pnm_readpaminit(in_file.get(), &in_pam, PAM_STRUCT_SIZE(tuple_type));
+#else
+  pnm_readpaminit(in_file.get(), &in_pam, sizeof(struct pam));
+#endif
+
+  const bob::core::array::typeinfo& info = b.type();
+
+  if (info.dtype == bob::core::array::t_uint8) {
+    if(info.nd == 2) im_load_gray<uint8_t>(&in_pam, b);
+    else if( info.nd == 3) im_load_color<uint8_t>(&in_pam, b); 
+    else throw bob::io::ImageUnsupportedDimension(info.nd);
+  }
+
+  else if (info.dtype == bob::core::array::t_uint16) {
+    if(info.nd == 2) im_load_gray<uint16_t>(&in_pam, b);
+    else if( info.nd == 3) im_load_color<uint16_t>(&in_pam, b); 
+    else throw bob::io::ImageUnsupportedDimension(info.nd);
+  }
+
+  else throw bob::io::ImageUnsupportedType(info.dtype);
+}
+
+/**
+ * SAVING
+ */
 template <typename T>
 static void im_save_gray(const bob::core::array::interface& b, struct pam *out_pam) {
   const bob::core::array::typeinfo& info = b.type();
@@ -100,11 +191,11 @@ static void im_save_gray(const bob::core::array::interface& b, struct pam *out_p
 }
 
 template <typename T> static
-void rgb_to_imbuffer(size_t size, const T* r, const T* g, const T* b, T* im) {
+void rgb_to_imbuffer(size_t size, const T* r, const T* g, const T* b, tuple* tuplerow) {
   for (size_t k=0; k<size; ++k) {
-    im[3*k]    = r[k];
-    im[3*k+1] = g[k];
-    im[3*k+2] = b[k];
+    tuplerow[k][0] = r[k];
+    tuplerow[k][1] = g[k];
+    tuplerow[k][2] = b[k];
   }
 }
 
@@ -117,105 +208,16 @@ static void im_save_color(const bob::core::array::interface& b, struct pam *out_
   const T *element_g = element_r + frame_size;
   const T *element_b = element_g + frame_size;
 
+  int row_color_stride = info.shape[2]; // row_stride for each component 
   tuple *tuplerow = pnm_allocpamrow(out_pam);
   for(size_t y=0; y<info.shape[1]; ++y) {
-    for(size_t x=0; x<info.shape[2]; ++x) {
-      tuplerow[x][0] = *element_r;
-      tuplerow[x][1] = *element_g;
-      tuplerow[x][2] = *element_b;
-      ++element_r;
-      ++element_g;
-      ++element_b;
-    }
+    rgb_to_imbuffer(row_color_stride, element_r, element_g, element_b, tuplerow);
     pnm_writepamrow(out_pam, tuplerow); 
+    element_r += row_color_stride;
+    element_g += row_color_stride;
+    element_b += row_color_stride;
   }
   pnm_freepamrow(tuplerow);
-}
-
-template <typename T> static
-void imbuffer_to_rgb(size_t size, const T* im, T* r, T* g, T* b) {
-  for (size_t k=0; k<size; ++k) {
-    r[k] = im[3*k];
-    g[k] = im[3*k +1];
-    b[k] = im[3*k +2];
-  }
-}
-
-template <typename T> static
-void im_load_gray(const FILE* in_file, struct pam *in_pam, bob::core::array::interface& b) {
-  const bob::core::array::typeinfo& info = b.type();
-
-  T *element = static_cast<T*>(b.ptr());
-  tuple *tuplerow = pnm_allocpamrow(in_pam);
-  for(size_t y=0; y<info.shape[0]; ++y)
-  {
-    pnm_readpamrow(in_pam, tuplerow);
-    for(size_t x=0; x<info.shape[1]; ++x)
-    {
-      *element = tuplerow[x][0];
-      ++element;
-    }
-  }
-  pnm_freepamrow(tuplerow);  
-}
-
-template <typename T> static
-void im_load_color(const FILE* in_file, struct pam *in_pam, bob::core::array::interface& b) {
-  const bob::core::array::typeinfo& info = b.type();
-  
-  long unsigned int frame_size = info.shape[2] * info.shape[1]; 
-  T *element_r = static_cast<T*>(b.ptr());
-  T *element_g = element_r+frame_size;
-  T *element_b = element_g+frame_size;
-
-  tuple *tuplerow = pnm_allocpamrow(in_pam);
-  for(size_t y=0; y<info.shape[1]; ++y)
-  {
-    pnm_readpamrow(in_pam, tuplerow);
-    for(size_t x=0; x<info.shape[2]; ++x)
-    {
-      *element_r = tuplerow[x][0];
-      *element_g = tuplerow[x][1];
-      *element_b = tuplerow[x][2];
-      ++element_r;
-      ++element_g;
-      ++element_b;
-    }
-  }
-  pnm_freepamrow(tuplerow);  
-}
-
-/**
- * Reads the data.
- */
-static void im_load (const std::string& filename, bob::core::array::interface& b) {
-
-  struct pam in_pam;
-  FILE *in_file = pm_openr(filename.c_str());
-#ifdef PAM_STRUCT_SIZE 
-  // For version >= 10.23
-  pnm_readpaminit(in_file, &in_pam, PAM_STRUCT_SIZE(tuple_type));
-#else
-  pnm_readpaminit(in_file, &in_pam, sizeof(struct pam));
-#endif
-
-  const bob::core::array::typeinfo& info = b.type();
-
-  if (info.dtype == bob::core::array::t_uint8) {
-    if(info.nd == 2) im_load_gray<uint8_t>(in_file, &in_pam, b);
-    else if( info.nd == 3) im_load_color<uint8_t>(in_file, &in_pam, b); 
-    else { pm_close(in_file); throw bob::io::ImageUnsupportedDimension(info.nd); }
-  }
-
-  else if (info.dtype == bob::core::array::t_uint16) {
-    if(info.nd == 2) im_load_gray<uint16_t>(in_file, &in_pam, b);
-    else if( info.nd == 3) im_load_color<uint16_t>(in_file, &in_pam, b); 
-    else { pm_close(in_file); throw bob::io::ImageUnsupportedDimension(info.nd); }
-  }
-
-  else { pm_close(in_file); throw bob::io::ImageUnsupportedType(info.dtype); }
-  // Close file if no exception
-  pm_close(in_file);
 }
 
 static void im_save (const std::string& filename, const bob::core::array::interface& array) {
@@ -223,7 +225,7 @@ static void im_save (const std::string& filename, const bob::core::array::interf
   const bob::core::array::typeinfo& info = array.type();
 
   struct pam out_pam;
-  FILE *out_file = pm_openw(filename.c_str());
+  boost::shared_ptr<std::FILE> out_file = make_cfile(filename.c_str(), "w");
 
   std::string ext = boost::filesystem::path(filename).extension().c_str();
   boost::algorithm::to_lower(ext);
@@ -236,7 +238,7 @@ static void im_save (const std::string& filename, const bob::core::array::interf
 #else
   out_pam.len = out_pam.size;
 #endif
-  out_pam.file = out_file;
+  out_pam.file = out_file.get();
   out_pam.plainformat = 0; // writes in binary
   out_pam.height = (info.nd == 2 ? info.shape[0] : info.shape[1]);
   out_pam.width = (info.nd == 2 ? info.shape[1] : info.shape[2]);
@@ -253,7 +255,6 @@ static void im_save (const std::string& filename, const bob::core::array::interf
   else strcpy(out_pam.tuple_type, PAM_PPM_TUPLETYPE);
 
   if(out_pam.depth == 3 && ext.compare(".ppm")) {
-    pm_close(out_file);
     throw std::runtime_error("cannot save a color image into a file of this type.");
   }
 
@@ -265,10 +266,10 @@ static void im_save (const std::string& filename, const bob::core::array::interf
 
     if(info.nd == 2) im_save_gray<uint8_t>(array, &out_pam);
     else if(info.nd == 3) {
-      if(info.shape[0] != 3) { pm_close(out_file); throw std::runtime_error("color image does not have 3 planes on 1st. dimension");}
+      if(info.shape[0] != 3) throw std::runtime_error("color image does not have 3 planes on 1st. dimension");
       im_save_color<uint8_t>(array, &out_pam);
     }
-    else { pm_close(out_file); throw bob::io::ImageUnsupportedDimension(info.nd); }
+    else throw bob::io::ImageUnsupportedDimension(info.nd);
 
   }
 
@@ -279,14 +280,13 @@ static void im_save (const std::string& filename, const bob::core::array::interf
       if(info.shape[0] != 3) throw std::runtime_error("color image does not have 3 planes on 1st. dimension");
       im_save_color<uint16_t>(array, &out_pam);
     }
-    else { pm_close(out_file); throw bob::io::ImageUnsupportedDimension(info.nd); }
+    else throw bob::io::ImageUnsupportedDimension(info.nd); 
 
   }
 
-  else { pm_close(out_file); throw bob::io::ImageUnsupportedType(info.dtype); }
-
-  pm_close(out_file);
+  else throw bob::io::ImageUnsupportedType(info.dtype);
 }
+
 
 
 class ImageNetpbmFile: public bob::io::File {
@@ -417,7 +417,6 @@ std::string ImageNetpbmFile::s_codecname = "bob.image_netpbm";
  *
  * @note: This method can be static.
  */
-
 static boost::shared_ptr<bob::io::File> 
 make_file (const std::string& path, char mode) {
   return boost::make_shared<ImageNetpbmFile>(path, mode);
