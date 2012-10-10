@@ -50,10 +50,18 @@ endif(matio_FOUND)
 if(ImageMagick_FOUND)
   list(APPEND shared "${ImageMagick_RESOLVED_LIBRARIES}")
   list(APPEND src
-    "ImageFile.cc"
+    "ImageMagickFile.cc"
     )
   list(APPEND incdir "${ImageMagick_INCLUDE_DIRS}")
 endif(ImageMagick_FOUND)
+
+if(NETPBM_FOUND)
+  list(APPEND shared "${NETPBM_LIBRARIES}")
+  list(APPEND src
+    "ImageNetpbmFile.cc"
+    )
+  list(APPEND incdir "${NETPBM_INCLUDE_DIRS}")
+endif(NETPBM_FOUND)
 
 if(FFMPEG_FOUND)
   list(APPEND shared "${FFMPEG_RESOLVED_LIBRARIES}")
@@ -79,9 +87,9 @@ target_link_libraries(${PROJECT_NAME} ${shared})
 bob_add_test(${PROJECT_NAME} hdf5 test/hdf5.cc)
 bob_add_test(${PROJECT_NAME} tensor_codec test/tensor_codec.cc)
 
-if(ImageMagick_FOUND)
+if(ImageMagick_FOUND AND NETPBM_FOUND)
   bob_add_test(${PROJECT_NAME} image_codec test/image_codec.cc)
-endif(ImageMagick_FOUND)
+endif(ImageMagick_FOUND AND NETPBM_FOUND)
 
 # Pkg-Config generator
 bob_pkgconfig(${PROJECT_NAME} "${bob_deps}")

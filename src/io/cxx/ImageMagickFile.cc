@@ -1,5 +1,5 @@
 /**
- * @file io/cxx/ImageFile.cc
+ * @file io/cxx/ImageMagickFile.cc
  * @date Tue Oct 25 23:25:46 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
@@ -33,43 +33,19 @@
 #include "bob/io/CodecRegistry.h"
 #include "bob/io/Exception.h"
 
-namespace fs = boost::filesystem;
-namespace io = bob::io;
-namespace ca = bob::core::array;
-
-static void im_peek(const std::string& path, ca::typeinfo& info) {
+static void im_peek(const std::string& path, bob::core::array::typeinfo& info) {
 
   Magick::Image image;
   image.ping(path.c_str());
   std::string ext = boost::filesystem::path(path).extension().c_str();
   boost::algorithm::to_lower(ext);
 
-  if( (!image.magick().compare("PBM") || 
-        !image.magick().compare("PGM") ||
-        (
-         !image.magick().compare("PNM") && 
-         (
-          image.type() == Magick::BilevelType ||
-          image.type() == Magick::GrayscaleMatteType || 
-          image.type() == Magick::GrayscaleType) 
-        )
-      ) && ext != ".ppm" //hack to get around ImageMagic-6.6.x
-    )
-  {
-    // Assume Grayscale image
-    info.nd = 2;
-    info.shape[0] = image.rows();
-    info.shape[1] = image.columns();
-    info.update_strides();
-  } 
-  else {
-    // Assume RGB image
-    info.nd = 3;
-    info.shape[0] = 3;
-    info.shape[1] = image.rows();
-    info.shape[2] = image.columns();
-    info.update_strides();
-  }
+  // Assume RGB image
+  info.nd = 3;
+  info.shape[0] = 3;
+  info.shape[1] = image.rows();
+  info.shape[2] = image.columns();
+  info.update_strides();
 
   // Set depth
   if (image.depth() <= 8) info.dtype = bob::core::array::t_uint8;
@@ -95,8 +71,8 @@ template <> Magick::StorageType magick_storage_type<uint16_t>() {
 }
 
 template <typename T>
-static void im_save_gray(const ca::interface& b, const std::string& name) {
-  const ca::typeinfo& info = b.type();
+static void im_save_gray(const bob::core::array::interface& b, const std::string& name) {
+  const bob::core::array::typeinfo& info = b.type();
 
   Magick::Image image;
   image.size(Magick::Geometry(info.shape[1], info.shape[0]));
@@ -117,8 +93,8 @@ void rgb_to_imbuffer(size_t size, const T* r, const T* g, const T* b, T* im) {
 }
 
 template <typename T>
-static void im_save_color(const ca::interface& b, const std::string& name) {
-  const ca::typeinfo& info = b.type();
+static void im_save_color(const bob::core::array::interface& b, const std::string& name) {
+  const bob::core::array::typeinfo& info = b.type();
 
   Magick::Image image;
   image.size(Magick::Geometry(info.shape[2], info.shape[1]));
@@ -145,16 +121,16 @@ void imbuffer_to_rgb(size_t size, const T* im, T* r, T* g, T* b) {
 }
 
 template <typename T> static
-void im_load_gray(Magick::Image& image, ca::interface& b) {
-  const ca::typeinfo& info = b.type();
+void im_load_gray(Magick::Image& image, bob::core::array::interface& b) {
+  const bob::core::array::typeinfo& info = b.type();
 
   image.write(0, 0, info.shape[1], info.shape[0], "I", 
       magick_storage_type<T>(), static_cast<T*>(b.ptr()));
 }
 
 template <typename T> static
-void im_load_color(Magick::Image& image, ca::interface& b) {
-  const ca::typeinfo& info = b.type();
+void im_load_color(Magick::Image& image, bob::core::array::interface& b) {
+  const bob::core::array::typeinfo& info = b.type();
 
   long unsigned int frame_size = info.shape[2] * info.shape[1];
   boost::shared_array<T> tmp(new T[3*frame_size]);
@@ -169,28 +145,28 @@ void im_load_color(Magick::Image& image, ca::interface& b) {
 /**
  * Reads the data.
  */
-static void im_load (Magick::Image& image, ca::interface& b) {
+static void im_load (Magick::Image& image, bob::core::array::interface& b) {
 
-  const ca::typeinfo& info = b.type();
+  const bob::core::array::typeinfo& info = b.type();
 
   if (info.dtype == bob::core::array::t_uint8) {
     if(info.nd == 2) im_load_gray<uint8_t>(image, b);
     else if( info.nd == 3) im_load_color<uint8_t>(image, b); 
-    else throw io::ImageUnsupportedDimension(info.nd);
+    else throw bob::io::ImageUnsupportedDimension(info.nd);
   }
 
   else if (info.dtype == bob::core::array::t_uint16) {
     if(info.nd == 2) im_load_gray<uint16_t>(image, b);
     else if( info.nd == 3) im_load_color<uint16_t>(image, b); 
-    else throw io::ImageUnsupportedDimension(info.nd);
+    else throw bob::io::ImageUnsupportedDimension(info.nd);
   }
 
-  else throw io::ImageUnsupportedType(info.dtype);
+  else throw bob::io::ImageUnsupportedType(info.dtype);
 }
 
-static void im_save (const std::string& filename, const ca::interface& array) {
+static void im_save (const std::string& filename, const bob::core::array::interface& array) {
 
-  const ca::typeinfo& info = array.type();
+  const bob::core::array::typeinfo& info = array.type();
 
   if(info.dtype == bob::core::array::t_uint8) {
 
@@ -199,7 +175,7 @@ static void im_save (const std::string& filename, const ca::interface& array) {
       if(info.shape[0] != 3) throw std::runtime_error("color image does not have 3 planes on 1st. dimension");
       im_save_color<uint8_t>(array, filename);
     }
-    else throw io::ImageUnsupportedDimension(info.nd);
+    else throw bob::io::ImageUnsupportedDimension(info.nd);
 
   }
 
@@ -210,14 +186,14 @@ static void im_save (const std::string& filename, const ca::interface& array) {
       if(info.shape[0] != 3) throw std::runtime_error("color image does not have 3 planes on 1st. dimension");
       im_save_color<uint16_t>(array, filename);
     }
-    else throw io::ImageUnsupportedDimension(info.nd);
+    else throw bob::io::ImageUnsupportedDimension(info.nd);
 
   }
 
-  else throw io::ImageUnsupportedType(info.dtype);
+  else throw bob::io::ImageUnsupportedType(info.dtype);
 }
 
-class ImageFile: public io::File {
+class ImageFile: public bob::io::File {
 
   public: //api
 
@@ -226,13 +202,13 @@ class ImageFile: public io::File {
       m_newfile(true) {
 
         //checks if file exists
-        if (mode == 'r' && !fs::exists(path)) {
+        if (mode == 'r' && !boost::filesystem::exists(path)) {
           boost::format m("file '%s' is not readable");
           m % path;
           throw std::runtime_error(m.str());
         }
 
-        if (mode == 'r' || (mode == 'a' && fs::exists(path))) { //try peeking
+        if (mode == 'r' || (mode == 'a' && boost::filesystem::exists(path))) { //try peeking
           try {
             im_peek(path, m_type);
             m_length = 1;
@@ -257,11 +233,11 @@ class ImageFile: public io::File {
       return m_filename;
     }
 
-    virtual const ca::typeinfo& type_all() const {
+    virtual const bob::core::array::typeinfo& type_all() const {
       return m_type;
     }
 
-    virtual const ca::typeinfo& type() const {
+    virtual const bob::core::array::typeinfo& type() const {
       return m_type;
     }
 
@@ -273,11 +249,11 @@ class ImageFile: public io::File {
       return s_codecname;
     }
 
-    virtual void read_all(ca::interface& buffer) {
+    virtual void read_all(bob::core::array::interface& buffer) {
       read(buffer, 0); ///we only have 1 image in an image file anyways
     }
 
-    virtual void read(ca::interface& buffer, size_t index) {
+    virtual void read(bob::core::array::interface& buffer, size_t index) {
 
       if (m_newfile) 
         throw std::runtime_error("uninitialized image file cannot be read");
@@ -300,7 +276,7 @@ class ImageFile: public io::File {
 
     }
 
-    virtual size_t append (const ca::interface& buffer) {
+    virtual size_t append (const bob::core::array::interface& buffer) {
 
       if (m_newfile) {
         im_save(m_filename, buffer);
@@ -314,7 +290,7 @@ class ImageFile: public io::File {
 
     }
 
-    virtual void write (const ca::interface& buffer) {
+    virtual void write (const bob::core::array::interface& buffer) {
 
       //overwriting position 0 should always work
       if (m_newfile) {
@@ -328,14 +304,14 @@ class ImageFile: public io::File {
   private: //representation
     std::string m_filename;
     bool m_newfile;
-    ca::typeinfo m_type;
+    bob::core::array::typeinfo m_type;
     size_t m_length;
 
     static std::string s_codecname;
 
 };
 
-std::string ImageFile::s_codecname = "bob.image";
+std::string ImageFile::s_codecname = "bob.image_magick";
 
 /**
  * From this point onwards we have the registration procedure. If you are
@@ -363,7 +339,7 @@ std::string ImageFile::s_codecname = "bob.image";
  *
  * @note: This method can be static.
  */
-static boost::shared_ptr<io::File> 
+static boost::shared_ptr<bob::io::File> 
 make_file (const std::string& path, char mode) {
 
   return boost::make_shared<ImageFile>(path, mode);
@@ -375,19 +351,16 @@ make_file (const std::string& path, char mode) {
  */
 static bool register_codec() {
 
-  boost::shared_ptr<io::CodecRegistry> instance =
-    io::CodecRegistry::instance();
+  boost::shared_ptr<bob::io::CodecRegistry> instance =
+    bob::io::CodecRegistry::instance();
   
   instance->registerExtension(".bmp", "Windows bitmap (Image Magick)", &make_file);
   instance->registerExtension(".eps", "Encapsulated Postscript (Image Magick)", &make_file);
   instance->registerExtension(".gif", "GIF, indexed (Image Magick)", &make_file);
   instance->registerExtension(".jpg", "JPG, compressed (Image Magick)", &make_file);
   instance->registerExtension(".jpeg", "JPEG, compressed (Image Magick)", &make_file);
-  instance->registerExtension(".pbm", "PBM, indexed (Image Magick)", &make_file);
   instance->registerExtension(".pdf", "Portable Document Format (Image Magick)", &make_file);
-  instance->registerExtension(".pgm", "PGM, indexed (Image Magick)", &make_file);
   instance->registerExtension(".png", "Portable Network Graphics, indexed (Image Magick)", &make_file);
-  instance->registerExtension(".ppm", "PPM, indexed (Image Magick)", &make_file);
   instance->registerExtension(".ps", "Postscript (Image Magick)", &make_file);
   instance->registerExtension(".tiff", "TIFF, uncompressed (Image Magick)", &make_file);
   instance->registerExtension(".xcf", "Gimp Native format (ImageMagick)", &make_file);
