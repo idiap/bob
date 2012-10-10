@@ -103,8 +103,11 @@ def git_next_minor_version(branch, verbose):
 def git_next_major_version(verbose):
   """Gets the next major version"""
 
-  # try local
-  candidates = sorted([StrictVersion(k) for k in git_version_branches(verbose)])
+  env = 'BOB_VERSION_ONLY_REMOTE'
+  candidates = None
+  if not os.environ.has_key(env) or (os.environ.has_key(env) and os.environ[env].lower() in ('', '0', 'false', 'off', 'no')):
+    # try local
+    candidates = sorted([StrictVersion(k) for k in git_version_branches(verbose)])
 
   if not candidates:
     # try remote
