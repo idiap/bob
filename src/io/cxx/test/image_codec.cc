@@ -99,6 +99,23 @@ BOOST_AUTO_TEST_CASE( image_bmp )
   boost::filesystem::remove(filename);
 }
 
+BOOST_AUTO_TEST_CASE( image_png )
+{
+  std::string filename = bob::core::tmpfile(".png");
+  bob::io::save(filename, b);
+  check_equal( bob::io::load<uint8_t,3>(filename), b );
+  boost::filesystem::remove(filename);
+}
+
+
+BOOST_AUTO_TEST_CASE( image_tiff ) 
+{
+  std::string filename = bob::core::tmpfile(".tiff");
+  bob::io::save(filename, b);
+  check_equal( bob::io::load<uint8_t,3>(filename), b );
+  boost::filesystem::remove(filename);
+}
+
 /*
 BOOST_AUTO_TEST_CASE( image_jpg )
 {
@@ -113,7 +130,7 @@ BOOST_AUTO_TEST_CASE( image_pbm )
 {
   std::string filename = bob::core::tmpfile(".pbm");
   bob::io::save(filename, a);
-  //check_equal( bob::io::load<uint8_t,2>(filename), a );
+  check_equal( bob::io::load<uint8_t,2>(filename), a );
   boost::filesystem::remove(filename);
 }
 
@@ -125,14 +142,6 @@ BOOST_AUTO_TEST_CASE( image_pgm )
   boost::filesystem::remove(filename);
 }
 
-BOOST_AUTO_TEST_CASE( image_png )
-{
-  std::string filename = bob::core::tmpfile(".png");
-  bob::io::save(filename, b);
-  check_equal( bob::io::load<uint8_t,3>(filename), b );
-  boost::filesystem::remove(filename);
-}
-
 BOOST_AUTO_TEST_CASE( image_ppm )
 {
   std::string filename = bob::core::tmpfile(".ppm");
@@ -140,23 +149,5 @@ BOOST_AUTO_TEST_CASE( image_ppm )
   check_equal( bob::io::load<uint8_t,3>(filename), b );
   boost::filesystem::remove(filename);
 }
-
-BOOST_AUTO_TEST_CASE( image_tiff ) 
-{
-  std::string filename = bob::core::tmpfile(".tiff");
-  bob::io::save(filename, b);
-  check_equal( bob::io::load<uint8_t,3>(filename), b );
-  boost::filesystem::remove(filename);
-}
-
-/*
-BOOST_AUTO_TEST_CASE( image_xcf ) 
-{
-  std::string filename = bob::core::tmpfile(".xcf");
-  bob::io::save(filename, b);
-  check_equal( bob::io::load<uint8_t,3>(filename), b );
-  boost::filesystem::remove(filename);
-}
-*/
 
 BOOST_AUTO_TEST_SUITE_END()

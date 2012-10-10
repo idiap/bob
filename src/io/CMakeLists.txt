@@ -58,6 +58,9 @@ if(ImageMagick_FOUND)
   set(ImageMagick_RESOLVED_LIBRARIES ${ImageMagick_RESOLVED_LIBRARIES} CACHE INTERNAL "Resolved ImageMagick libraries")
 endif()
 
+# netpbm
+include(netpbm.cmake)
+
 # Matio
 pkg_check_modules(matio matio)
 if(matio_FOUND)
