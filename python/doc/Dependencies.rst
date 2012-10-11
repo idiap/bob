@@ -66,6 +66,10 @@ Required at runtime
 +----------------------+--------------+---------------------------------------+
 | `ImageMagick`_       | 6.5          | `Apache-2.0`_                         |
 +----------------------+--------------+---------------------------------------+
+| `libjpeg`_           | 6.2?         | `GPL-2.0`_ or later (also commercial) |
++----------------------+--------------+---------------------------------------+
+| `libnetpbm`_         | 10.0?        | `MIT`_                                |
++----------------------+--------------+---------------------------------------+
 | `HDF5`_              | 1.8.4        | `HDF5 License`_ (BSD-like, 5 clauses) |
 +----------------------+--------------+---------------------------------------+
 | `argparse`_          | 1.2          | `Python-2.0`_                         |
@@ -195,6 +199,10 @@ Data access
 * `ImageMagick`_: is used for reading and writing image output. We
   currently compile against version 6.6.7, but other versions should work.
   Please note we make use of the C++ API (a.k.a. ImageMagick++).
+* `libjpeg`_: is used for reading and writing JPEG images. We
+  currently compile against version 6.2, but older versions might work.
+* `libnetpbm`_: is used for reading and writing PBM/PGM/PMM images. We
+  currently compile against version 10.0, but older versions might work.
 * `HDF5`_: HDF5 is the format of choice for binary representation of data
   or configuration items in bob. We currently compile against version 1.8.6,
   Version 1.8.4 (and before) might not work.

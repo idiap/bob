@@ -43,6 +43,8 @@
 .. _ipython: http://ipython.scipy.org
 .. _lapack: http://www.netlib.org/lapack
 .. _latex: http://www.latex-project.org/
+.. _libjpeg: http://libjpeg.sourceforge.net/
+.. _libnetpbm: http://netpbm.sourceforge.net/doc/libnetpbm.html
 .. _libsvm: http://www.csie.ntu.edu.tw/~cjlin/libsvm/
 .. _macports installation instructions: http://www.macports.org/install.php
 .. _macports: http://www.macports.org
