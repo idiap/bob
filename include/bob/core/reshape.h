@@ -81,8 +81,9 @@ namespace bob {
     {
       bob::core::array::assertZeroBase(src);
       bob::core::array::assertZeroBase(dst);
-      bob::core::ReshapeDifferentNumberOfElements(
-        src.extent(0)*src.extent(1), dst.extent(0)*dst.extent(1));
+      const int d0 = src.extent(0)*src.extent(1);
+      const int d1 = dst.extent(0)*dst.extent(1);
+      if(d0 != d1) throw bob::core::ReshapeDifferentNumberOfElements(d0, d1);
       reshape_(src, dst);
     }
 
@@ -120,8 +121,9 @@ namespace bob {
     {
       bob::core::array::assertZeroBase(src);
       bob::core::array::assertZeroBase(dst);
-      bob::core::ReshapeDifferentNumberOfElements(
-        src.extent(0)*src.extent(1), dst.extent(0));
+      const int d0 = src.extent(0)*src.extent(1);
+      const int d1 = dst.extent(0);
+      if(d0 != d1) throw bob::core::ReshapeDifferentNumberOfElements(d0, d1);
       reshape_(src, dst);
     }
 
@@ -159,8 +161,9 @@ namespace bob {
     {
       bob::core::array::assertZeroBase(src);
       bob::core::array::assertZeroBase(dst);
-      bob::core::ReshapeDifferentNumberOfElements(
-        src.extent(0), dst.extent(0)*dst.extent(1));
+      const int d0 = src.extent(0);
+      const int d1 = dst.extent(0)*dst.extent(1);
+      if(d0 != d1) throw bob::core::ReshapeDifferentNumberOfElements(d0, d1);
       reshape_(src, dst);
     }
 
