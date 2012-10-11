@@ -63,6 +63,14 @@ if(NETPBM_FOUND)
   list(APPEND incdir "${NETPBM_INCLUDE_DIRS}")
 endif(NETPBM_FOUND)
 
+if(JPEG_FOUND)
+  list(APPEND shared "${JPEG_LIBRARIES}")
+  list(APPEND src
+    "ImageJpegFile.cc"
+    )
+  list(APPEND incdir "${JPEG_INCLUDE_DIRS}")
+endif(JPEG_FOUND)
+
 if(FFMPEG_FOUND)
   list(APPEND shared "${FFMPEG_RESOLVED_LIBRARIES}")
   list(APPEND src 

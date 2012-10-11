@@ -30,6 +30,7 @@
 
 extern "C" {
 #include <hdf5.h>
+#include <jpeglib.h>
 
 #if defined(HAVE_FFMPEG)
 #  include <libavformat/avformat.h>
@@ -83,6 +84,16 @@ static str magick_version() {
 }
 
 /**
+ * LibJPEG version
+ */
+static str libjpeg_version() {
+  boost::format f("%d (compiled with %d bits depth)");
+  f % JPEG_LIB_VERSION;
+  f % BITS_IN_JSAMPLE;
+  return str(f.str());
+}
+
+/**
  * Matio, if compiled with such support
  */
 static str matio_version() {
@@ -101,7 +112,9 @@ void bind_io_version() {
   dict vdict;
   vdict["HDF5"] = hdf5_version();
   vdict["FFmpeg"] = ffmpeg_version();
-  vdict["Image Magick"] = magick_version();
+  vdict["ImageMagick"] = magick_version();
+  vdict["libjpeg"] = libjpeg_version();
+  vdict["libnetpbm"] = str("Unknown version");
   vdict["MatIO"] = matio_version();
   scope().attr("version") = vdict;
 }
