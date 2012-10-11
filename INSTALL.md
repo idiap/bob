@@ -13,6 +13,8 @@ Bob depends on:
  * Lapack
  * fftw
  * ImageMagick
+ * libjpeg
+ * libnetpbm
  * HDF5
  * Python and the following packages:
    * Setuptools
