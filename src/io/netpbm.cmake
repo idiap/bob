@@ -36,6 +36,12 @@ if(NETPBM_INCLUDE_DIR AND NETPBM_LIBRARY)
   find_package_message(MyNetpbm "Found libnetpbm: ${NETPBM_INCLUDE_DIR} - ${NETPBM_LIBRARY}" "[${NETPBM_LIBRARY}][${NETPBM_INCLUDE_DIR}]")
 endif()
 
+# handle the QUIETLY and REQUIRED arguments and set NETPBM_FOUND to TRUE if 
+# all listed variables are TRUE
+include(FindPackageHandleStandardArgs)
+set(NETPBM_FIND_REQUIRED ON)
+find_package_handle_standard_args(NETPBM DEFAULT_MSG NETPBM_LIBRARY NETPBM_INCLUDE_DIR)
+
 mark_as_advanced(
   NETPBM_LIBRARY
   NETPBM_LIBRARIES
