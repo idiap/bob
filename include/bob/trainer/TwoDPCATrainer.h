@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef BOB5SPRO_TRAINER_TWODPCA_TRAINER_H
-#define BOB5SPRO_TRAINER_TWODPCA_TRAINER_H
+#ifndef BOB_TRAINER_TWODPCA_TRAINER_H
+#define BOB_TRAINER_TWODPCA_TRAINER_H
 
 #include "Trainer.h"
 #include "bob/core/logging.h"
@@ -32,13 +32,13 @@ namespace bob
   namespace trainer 
   {
   
-    class TwoDPCATrainer : virtual public Trainer<bob::machine::TwoDPCAMachine, blitz::Array<double,2> >
+    class TwoDPCATrainer: public Trainer<bob::machine::TwoDPCAMachine, blitz::Array<double,2> >
     {
       public:
         TwoDPCATrainer() {}
         virtual ~TwoDPCATrainer() {}
   
-        void train(bob::machine::TwoDPCAMachine& machine, const blitz::Array<double,3>& data); 
+        virtual void train(bob::machine::TwoDPCAMachine& machine, const blitz::Array<double,3>& data); 
 
       protected:
 
@@ -47,4 +47,4 @@ namespace bob
   }
 }
 
-#endif /* BOB5SPRO_TRAINER_TWODPCA_TRAINER_H */
+#endif /* BOB_TRAINER_TWODPCA_TRAINER_H */
