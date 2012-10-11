@@ -61,6 +61,12 @@ endif()
 # netpbm
 include(netpbm.cmake)
 
+# libjpeg
+include(FindJPEG)
+if(JPEG_FOUND)
+  set(HAVE_LIBJPEG ON CACHE BOOL "Has libjpeg installed")
+endif(JPEG_FOUND)
+
 # Matio
 pkg_check_modules(matio matio)
 if(matio_FOUND)
