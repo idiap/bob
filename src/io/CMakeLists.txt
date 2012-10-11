@@ -65,6 +65,8 @@ include(netpbm.cmake)
 include(FindJPEG)
 if(JPEG_FOUND)
   set(HAVE_LIBJPEG ON CACHE BOOL "Has libjpeg installed")
+else(JPEG_FOUND)
+  message(FATAL_ERROR "libjpeg has not been found.")
 endif(JPEG_FOUND)
 
 # Matio

@@ -14,6 +14,7 @@ find_library(Blitz_LIBRARY NAMES blitz)
 # handle the QUIETLY and REQUIRED arguments and set Blitz_FOUND to TRUE if 
 # all listed variables are TRUE
 include(FindPackageHandleStandardArgs)
+set(Blitz_FIND_REQUIRED ON)
 find_package_handle_standard_args(Blitz DEFAULT_MSG Blitz_LIBRARY Blitz_INCLUDE_DIR)
 
 if(BLITZ_FOUND)
