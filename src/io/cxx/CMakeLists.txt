@@ -71,6 +71,14 @@ if(JPEG_FOUND)
   list(APPEND incdir "${JPEG_INCLUDE_DIRS}")
 endif(JPEG_FOUND)
 
+if(PNG_FOUND)
+  list(APPEND shared "${PNG_LIBRARIES}")
+  list(APPEND src
+    "ImagePngFile.cc"
+    )
+  list(APPEND incdir "${PNG_INCLUDE_DIRS}")
+endif(PNG_FOUND)
+
 if(FFMPEG_FOUND)
   list(APPEND shared "${FFMPEG_RESOLVED_LIBRARIES}")
   list(APPEND src 

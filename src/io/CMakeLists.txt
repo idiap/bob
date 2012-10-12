@@ -69,6 +69,14 @@ else(JPEG_FOUND)
   message(FATAL_ERROR "libjpeg has not been found.")
 endif(JPEG_FOUND)
 
+# libpng
+include(FindPNG)
+if(PNG_FOUND)
+  set(HAVE_LIBPNG ON CACHE BOOL "Has libpng installed")
+else(PNG_FOUND)
+  message(FATAL_ERROR "libpng has not been found.")
+endif(PNG_FOUND)
+
 # Matio
 pkg_check_modules(matio matio)
 if(matio_FOUND)
