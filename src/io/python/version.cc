@@ -2,6 +2,7 @@
  * @file io/python/version.cc
  * @date Tue Nov 29 14:11:41 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
+ * @author Laurent El Shafey <laurent.el-shafey@idiap.ch>
  *
  * @brief Describes ways to retrieve version information about all dependent
  * packages.
@@ -31,6 +32,12 @@
 extern "C" {
 #include <hdf5.h>
 #include <jpeglib.h>
+
+#define PNG_SKIP_SETJMP_CHECK
+// #define requires because of the problematic pngconf.h.
+// Look at the thread here: 
+// https://bugs.launchpad.net/ubuntu/+source/libpng/+bug/218409
+#include <png.h>
 
 #if defined(HAVE_FFMPEG)
 #  include <libavformat/avformat.h>
@@ -94,6 +101,13 @@ static str libjpeg_version() {
 }
 
 /**
+ * Libpng version
+ */
+static str libpng_version() {
+  return str(PNG_LIBPNG_VER_STRING);
+}
+
+/**
  * Matio, if compiled with such support
  */
 static str matio_version() {
@@ -115,6 +129,7 @@ void bind_io_version() {
   vdict["ImageMagick"] = magick_version();
   vdict["libjpeg"] = libjpeg_version();
   vdict["libnetpbm"] = str("Unknown version");
+  vdict["libpng"] = libpng_version();
   vdict["MatIO"] = matio_version();
   scope().attr("version") = vdict;
 }

@@ -25,6 +25,14 @@ if(ImageMagick_FOUND)
   list(APPEND incdir "${ImageMagick_INCLUDE_DIRS}")
 endif(ImageMagick_FOUND)
 
+if(JPEG_FOUND)
+  list(APPEND incdir "${JPEG_INCLUDE_DIRS}")
+endif(JPEG_FOUND)
+
+if(PNG_FOUND)
+  list(APPEND incdir "${PNG_INCLUDE_DIRS}")
+endif(PNG_FOUND)
+
 if(FFMPEG_FOUND)
   list(APPEND src "video.cc")
   list(APPEND incdir "${FFMPEG_INCLUDE_DIRS}")
