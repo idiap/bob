@@ -70,6 +70,8 @@ Required at runtime
 +----------------------+--------------+---------------------------------------+
 | `libnetpbm`_         | 10.0?        | `MIT`_                                |
 +----------------------+--------------+---------------------------------------+
+| `libpng`_            | 1.2.42?       | `libpng License`_                     |
++----------------------+--------------+---------------------------------------+
 | `HDF5`_              | 1.8.4        | `HDF5 License`_ (BSD-like, 5 clauses) |
 +----------------------+--------------+---------------------------------------+
 | `argparse`_          | 1.2          | `Python-2.0`_                         |
@@ -203,6 +205,8 @@ Data access
   currently compile against version 6.2, but older versions might work.
 * `libnetpbm`_: is used for reading and writing PBM/PGM/PMM images. We
   currently compile against version 10.0, but older versions might work.
+* `libpng`_: is used for reading and writing PNG images. We currently compile 
+  against version 1.2.42, but older versions might work.
 * `HDF5`_: HDF5 is the format of choice for binary representation of data
   or configuration items in bob. We currently compile against version 1.8.6,
   Version 1.8.4 (and before) might not work.
@@ -277,13 +281,18 @@ A single command line that will install all required packages under Ubuntu:
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core cmake python-dev python-support python-numpy python-argparse python-scipy python-matplotlib python-sqlalchemy liblapack-dev libatlas-base-dev libblitz1-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libmatio-dev libmagick++-dev libhdf5-serial-dev libqt4-dev libfftw3-dev libcv-dev libhighgui-dev libcvaux-dev texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended libsvm-dev libvl-dev doxygen python-sphinx dvipng python-nose python-setuptools
+   $ sudo apt-get install git-core cmake python-dev python-support python-numpy python-argparse python-scipy python-matplotlib python-sqlalchemy liblapack-dev libatlas-base-dev libblitz1-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libmatio-dev libmagick++-dev libjpeg8-dev libnetpbm10-dev libpng12-dev libhdf5-serial-dev libqt4-dev libfftw3-dev libcv-dev libhighgui-dev libcvaux-dev texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended libsvm-dev libvl-dev doxygen python-sphinx dvipng python-nose python-setuptools
 
 .. note::
 
   Support for libgoogle-perftools-dev in Ubuntu 10.04 LTS is broken so you will
   not be able to profile |project| using this support. You may still use
   Valgrind or other profiling tools of your choice.
+
+.. note::
+  
+  Ubuntu does not provide a version independent pacakge for libjpeg. In ubuntu 10.04 LTS, 
+  a different version of this library is available whose package name is libjpeg62-dev.
 
 .. note::
 
@@ -313,14 +322,14 @@ your shell prompt (for using Python 2.7 as the default interpreter):
    
 .. code-block:: sh
 
-  $ sudo port install cmake blitz ffmpeg python27 python_select py27-numpy -atlas matio imagemagick py27-ipython py27-matplotlib google-perftools doxygen py27-sphinx texlive-latex-extra texlive-fonts-recommended hdf5-18 qt4-mac boost +python27 py27-scipy +no_atlas fftw-3 vlfeat opencv +python27 +qt4 libsvm +python27 +tools dvipng py27-sqlalchemy py27-nose py27-distribute
+  $ sudo port install cmake blitz ffmpeg python27 python_select py27-numpy -atlas matio imagemagick jpeg netpbm libpng py27-ipython py27-matplotlib google-perftools doxygen py27-sphinx texlive-latex-extra texlive-fonts-recommended hdf5-18 qt4-mac boost +python27 py27-scipy +no_atlas fftw-3 vlfeat opencv +python27 +qt4 libsvm +python27 +tools dvipng py27-sqlalchemy py27-nose py27-distribute
    $ # go for a long coffee 
 
 **Or**, for Python 2.6 as the default interpreter:
 
 .. code-block:: sh
 
-   $ sudo port install cmake blitz ffmpeg python26 python_select py26-numpy -atlas matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx texlive-latex-extra texlive-fonts-recommended hdf5-18 py26-argparse qt4-mac boost +python26 py26-scipy +no_atlas fftw-3 vlfeat opencv +python26 +qt4 libsvm +python26 +tools dvipng py26-sqlalchemy py26-nose py26-distribute
+   $ sudo port install cmake blitz ffmpeg python26 python_select py26-numpy -atlas matio imagemagick jpeg netpbm libpng py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx texlive-latex-extra texlive-fonts-recommended hdf5-18 py26-argparse qt4-mac boost +python26 py26-scipy +no_atlas fftw-3 vlfeat opencv +python26 +qt4 libsvm +python26 +tools dvipng py26-sqlalchemy py26-nose py26-distribute
 
 .. note::
 

@@ -45,6 +45,7 @@
 .. _latex: http://www.latex-project.org/
 .. _libjpeg: http://libjpeg.sourceforge.net/
 .. _libnetpbm: http://netpbm.sourceforge.net/doc/libnetpbm.html
+.. _libpng: http://libpng.org/pub/png/libpng.html
 .. _libsvm: http://www.csie.ntu.edu.tw/~cjlin/libsvm/
 .. _macports installation instructions: http://www.macports.org/install.php
 .. _macports: http://www.macports.org
@@ -82,5 +83,6 @@
 .. _gpl-3.0: http://www.opensource.org/licenses/GPL-3.0
 .. _hdf5 license: ftp://ftp.hdfgroup.org/HDF5/current/src/unpacked/COPYING
 .. _lgpl-2.1: http://www.opensource.org/licenses/LGPL-2.1
+.. _libpng license: http://www.libpng.org/pub/png/src/libpng-LICENSE.txt
 .. _mit: http://www.opensource.org/licenses/MIT
 .. _python-2.0: http://www.opensource.org/licenses/Python-2.0
