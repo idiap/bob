@@ -15,6 +15,7 @@ Bob depends on:
  * ImageMagick
  * libjpeg
  * libnetpbm
+ * libpng
  * HDF5
  * Python and the following packages:
    * Setuptools
