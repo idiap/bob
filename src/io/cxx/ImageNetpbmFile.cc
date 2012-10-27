@@ -249,10 +249,19 @@ static void im_save (const std::string& filename, const bob::core::array::interf
   if( ext.compare(".pbm") == 0) 
   {
     out_pam.maxval = 1;
+    out_pam.format = PBM_FORMAT;
     strcpy(out_pam.tuple_type, PAM_PBM_TUPLETYPE);
   }
-  else if( ext.compare(".pgm") == 0) strcpy(out_pam.tuple_type, PAM_PGM_TUPLETYPE);
-  else strcpy(out_pam.tuple_type, PAM_PPM_TUPLETYPE);
+  else if( ext.compare(".pgm") == 0) 
+  {
+    out_pam.format = PGM_FORMAT;
+    strcpy(out_pam.tuple_type, PAM_PGM_TUPLETYPE);
+  }
+  else 
+  {
+    out_pam.format = PPM_FORMAT;
+    strcpy(out_pam.tuple_type, PAM_PPM_TUPLETYPE);
+  }
 
   if(out_pam.depth == 3 && ext.compare(".ppm")) {
     throw std::runtime_error("cannot save a color image into a file of this type.");
