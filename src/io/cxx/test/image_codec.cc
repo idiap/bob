@@ -35,6 +35,7 @@ struct T {
   blitz::Array<uint8_t,2> a;
   blitz::Array<uint8_t,3> b;
   blitz::Array<uint16_t,3> c;
+  blitz::Array<uint8_t,2> d;
 
   T() {
     a.resize(6,4);
@@ -47,6 +48,10 @@ struct T {
         17, 18, 19, 20, 21, 22, 23, 24;
     c.resize(3,6,4);
     c = 2;
+    d.resize(6,4);
+    d = 1, 0, 0, 0, 1, 1, 0, 1,
+        1, 0, 1, 0, 1, 1, 1, 1,
+        0, 1, 0, 1, 0, 0, 0, 1;
   }
 
   ~T() { }
@@ -147,8 +152,8 @@ BOOST_AUTO_TEST_CASE( image_jpg )
 BOOST_AUTO_TEST_CASE( image_pbm )
 {
   std::string filename = bob::core::tmpfile(".pbm");
-  bob::io::save(filename, a);
-  check_equal( bob::io::load<uint8_t,2>(filename), a );
+  bob::io::save(filename, d);
+  check_equal( bob::io::load<uint8_t,2>(filename), d );
   boost::filesystem::remove(filename);
 }
 
