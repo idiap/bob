@@ -153,7 +153,7 @@ namespace bob { namespace machine {
       /**
        * Returns the input subtraction factor
        */
-      inline const blitz::Array<double, 1>& getInputSubraction() const
+      inline const blitz::Array<double, 1>& getInputSubtraction() const
       { return m_input_sub; }
 
       /**

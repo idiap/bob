@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE( test_initialization )
 
   BOOST_CHECK( blitz::all(M.getWeights() == N.getWeights()) );
   BOOST_CHECK( blitz::all(M.getBiases() == N.getBiases()) );
-  BOOST_CHECK( blitz::all(M.getInputSubraction() == N.getInputSubraction()) );
+  BOOST_CHECK( blitz::all(M.getInputSubtraction() == N.getInputSubtraction()) );
   BOOST_CHECK( blitz::all(M.getInputDivision() == N.getInputDivision()) );
   BOOST_CHECK_EQUAL( M.getActivation(), N.getActivation() );
 }

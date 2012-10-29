@@ -71,7 +71,7 @@ void bob::trainer::BICTrainer::train_single(bool clazz, bob::machine::BICMachine
 
     // initialize the machine
     blitz::Array<double, 2> projection = pca.getWeights();
-    blitz::Array<double, 1> mean = pca.getInputSubraction();
+    blitz::Array<double, 1> mean = pca.getInputSubtraction();
     machine.setBIC(clazz, mean, variances, projection, rho);
   } else {
     // train the class using IEC
