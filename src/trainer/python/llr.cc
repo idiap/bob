@@ -26,18 +26,28 @@
 
 using namespace boost::python;
 
-object train1(const bob::trainer::LLRTrainer& t, 
-  const blitz::Array<double,2>& data1, const blitz::Array<double,2>& data2) 
+object train1(const bob::trainer::LLRTrainer& t,
+  bob::python::const_ndarray data1, bob::python::const_ndarray data2)
 {
+  const bob::core::array::typeinfo& info1 = data1.type();
+  const bob::core::array::typeinfo& info2 = data2.type();
+  if(info1.dtype != bob::core::array::t_float64 || info1.nd != 2 ||
+     info2.dtype != bob::core::array::t_float64 || info2.nd != 2)
+    PYTHON_ERROR(TypeError, "Can only train with double precision array of 2 dimensions.");
   bob::machine::LinearMachine m;
-  t.train(m, data1, data2);
+  t.train(m, data1.bz<double,2>(), data2.bz<double,2>());
   return object(m);
 }
 
 void train2(const bob::trainer::LLRTrainer& t, bob::machine::LinearMachine& m, 
-  const blitz::Array<double,2>& data1, const blitz::Array<double,2>& data2) 
+  bob::python::const_ndarray data1, bob::python::const_ndarray data2)
 {
-  t.train(m, data1, data2);
+  const bob::core::array::typeinfo& info1 = data1.type();
+  const bob::core::array::typeinfo& info2 = data2.type();
+  if(info1.dtype != bob::core::array::t_float64 || info1.nd != 2 ||
+     info2.dtype != bob::core::array::t_float64 || info2.nd != 2)
+    PYTHON_ERROR(TypeError, "Can only train with double precision array of 2 dimensions.");
+  t.train(m, data1.bz<double,2>(), data2.bz<double,2>());
 }
 
 void bind_trainer_llr() 
