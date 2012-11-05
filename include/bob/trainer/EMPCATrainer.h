@@ -3,8 +3,8 @@
  * @date Tue Oct 11 12:18:23 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * @brief Probabilistic Principal Component Analysis implemented using
- * Expectation Maximization.
+ * @brief Expectation Maximization Algorithm for Principal Component 
+ * Analysis
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_TRAINER_EMPCA_TRAINER_H
-#define BOB5SPRO_TRAINER_EMPCA_TRAINER_H
+#ifndef BOB_TRAINER_EMPCA_TRAINER_H
+#define BOB_TRAINER_EMPCA_TRAINER_H
 
 #include <blitz/array.h>
 #include "bob/trainer/EMTrainer.h"
@@ -32,12 +32,16 @@ namespace bob { namespace trainer {
   
   /**
     * Sets a linear machine to perform Expectation Maximization on a
-    * given dataset. Reference:
-    *  Probabilistic Principal Component Analysis, 
-    *    Michael Tipping and Christopher Bishop,
-    *    Journal of the Royal Statistical Society,
+    * given dataset. References:
+    *  1. "Probabilistic Principal Component Analysis", 
+    *     Michael Tipping and Christopher Bishop,
+    *     Journal of the Royal Statistical Society,
     *      Series B, 61, Part 3, pp. 611–622
+    *  2. "EM Algorithms for PCA and SPCA", 
+    *     Sam Roweis, Neural Information Processing Systems 10 (NIPS'97), 
+    *     pp.626-632 (Sensible Principal Component Analysis part)
     *
+    * Notations used are the ones from reference 1.
     * The probabilistic model is given by: t = W x + mu + epsilon
     *  - t is the observed data (dimension f)
     *  - W is a projection matrix (dimension f x d)
@@ -59,7 +63,7 @@ namespace bob { namespace trainer {
         int max_iterations=10, bool compute_likelihood=true); 
 
       /**
-        * Copy construction.
+        * Copy constructor
         */
       EMPCATrainer(const EMPCATrainer& other);
 
@@ -190,4 +194,4 @@ namespace bob { namespace trainer {
 
 }}
 
-#endif /* BOB5SPRO_TRAINER_EMPCA_TRAINER_H */
+#endif /* BOB_TRAINER_EMPCA_TRAINER_H */

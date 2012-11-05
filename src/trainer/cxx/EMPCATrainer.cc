@@ -3,9 +3,6 @@
  * @date Tue Oct 11 12:18:23 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * @brief Probabilistic Principal Component Analysis implemented using
- * Expectation Maximization. Implementation.
- *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -35,15 +32,9 @@
 #include "bob/math/inv.h"
 #include "bob/math/stats.h"
 
-namespace io = bob::io;
-namespace mach = bob::machine;
-namespace math = bob::math;
-namespace train = bob::trainer;
-namespace tca = bob::core::array;
-
-train::EMPCATrainer::EMPCATrainer(int dimensionality, 
+bob::trainer::EMPCATrainer::EMPCATrainer(int dimensionality, 
     double convergence_threshold, int max_iterations, bool compute_likelihood):
-  EMTrainer<mach::LinearMachine, blitz::Array<double,2> >(convergence_threshold, 
+  EMTrainer<bob::machine::LinearMachine, blitz::Array<double,2> >(convergence_threshold, 
   max_iterations, compute_likelihood), 
   m_dimensionality(dimensionality), m_S(0,0),
   m_z_first_order(0,dimensionality), 
@@ -57,59 +48,62 @@ train::EMPCATrainer::EMPCATrainer(int dimensionality,
 {
 }
 
-train::EMPCATrainer::EMPCATrainer(const train::EMPCATrainer& other):
-  EMTrainer<mach::LinearMachine, blitz::Array<double,2> >(other.m_convergence_threshold, 
+bob::trainer::EMPCATrainer::EMPCATrainer(const bob::trainer::EMPCATrainer& other):
+  EMTrainer<bob::machine::LinearMachine, blitz::Array<double,2> >(other.m_convergence_threshold, 
     other.m_max_iterations, other.m_compute_likelihood),
   m_dimensionality(other.m_dimensionality), 
-  m_S(tca::ccopy(other.m_S)),
-  m_z_first_order(tca::ccopy(other.m_z_first_order)), 
-  m_z_second_order(tca::ccopy(other.m_z_second_order)), 
-  m_inW(tca::ccopy(other.m_inW)),
-  m_invM(tca::ccopy(other.m_invM)),
+  m_S(bob::core::array::ccopy(other.m_S)),
+  m_z_first_order(bob::core::array::ccopy(other.m_z_first_order)), 
+  m_z_second_order(bob::core::array::ccopy(other.m_z_second_order)), 
+  m_inW(bob::core::array::ccopy(other.m_inW)),
+  m_invM(bob::core::array::ccopy(other.m_invM)),
   m_sigma2(other.m_sigma2), m_f_log2pi(other.m_f_log2pi),
   m_seed(other.m_seed),
-  m_cache_dxf(tca::ccopy(other.m_cache_dxf)),
-  m_cache_d(tca::ccopy(other.m_cache_d)),
-  m_cache_f(tca::ccopy(other.m_cache_f)),
-  m_cache_dxd_1(tca::ccopy(other.m_cache_dxd_1)),
-  m_cache_dxd_2(tca::ccopy(other.m_cache_dxd_2)),
-  m_cache_fxd_1(tca::ccopy(other.m_cache_fxd_1)),
-  m_cache_fxd_2(tca::ccopy(other.m_cache_fxd_2)),
-  m_cache_fxf_1(tca::ccopy(other.m_cache_fxf_1)),
-  m_cache_fxf_2(tca::ccopy(other.m_cache_fxf_2))
+  m_cache_dxf(bob::core::array::ccopy(other.m_cache_dxf)),
+  m_cache_d(bob::core::array::ccopy(other.m_cache_d)),
+  m_cache_f(bob::core::array::ccopy(other.m_cache_f)),
+  m_cache_dxd_1(bob::core::array::ccopy(other.m_cache_dxd_1)),
+  m_cache_dxd_2(bob::core::array::ccopy(other.m_cache_dxd_2)),
+  m_cache_fxd_1(bob::core::array::ccopy(other.m_cache_fxd_1)),
+  m_cache_fxd_2(bob::core::array::ccopy(other.m_cache_fxd_2)),
+  m_cache_fxf_1(bob::core::array::ccopy(other.m_cache_fxf_1)),
+  m_cache_fxf_2(bob::core::array::ccopy(other.m_cache_fxf_2))
 {
 }
 
-train::EMPCATrainer::~EMPCATrainer() {}
+bob::trainer::EMPCATrainer::~EMPCATrainer() {}
 
-train::EMPCATrainer& train::EMPCATrainer::operator=
-(const train::EMPCATrainer& other) 
+bob::trainer::EMPCATrainer& bob::trainer::EMPCATrainer::operator=
+(const bob::trainer::EMPCATrainer& other) 
 {
-  m_convergence_threshold = other.m_convergence_threshold;
-  m_max_iterations = other.m_max_iterations;
-  m_compute_likelihood = other.m_compute_likelihood;
-  m_dimensionality = other.m_dimensionality;
-  m_S = tca::ccopy(other.m_S);
-  m_z_first_order = tca::ccopy(other.m_z_first_order);
-  m_z_second_order = tca::ccopy(other.m_z_second_order);
-  m_inW = tca::ccopy(other.m_inW);
-  m_invM = tca::ccopy(other.m_invM);
-  m_sigma2 = other.m_sigma2;
-  m_f_log2pi = other.m_f_log2pi;
-  m_seed = other.m_seed;
-  m_cache_dxf = tca::ccopy(other.m_cache_dxf);
-  m_cache_d = tca::ccopy(other.m_cache_d);
-  m_cache_f = tca::ccopy(other.m_cache_f);
-  m_cache_dxd_1 = tca::ccopy(other.m_cache_dxd_1);
-  m_cache_dxd_2 = tca::ccopy(other.m_cache_dxd_2);
-  m_cache_fxd_1 = tca::ccopy(other.m_cache_fxd_1);
-  m_cache_fxd_2 = tca::ccopy(other.m_cache_fxd_2);
-  m_cache_fxf_1 = tca::ccopy(other.m_cache_fxf_1);
-  m_cache_fxf_2 = tca::ccopy(other.m_cache_fxf_2);
+  if(this != &other)
+  {
+    m_convergence_threshold = other.m_convergence_threshold;
+    m_max_iterations = other.m_max_iterations;
+    m_compute_likelihood = other.m_compute_likelihood;
+    m_dimensionality = other.m_dimensionality;
+    m_S = bob::core::array::ccopy(other.m_S);
+    m_z_first_order = bob::core::array::ccopy(other.m_z_first_order);
+    m_z_second_order = bob::core::array::ccopy(other.m_z_second_order);
+    m_inW = bob::core::array::ccopy(other.m_inW);
+    m_invM = bob::core::array::ccopy(other.m_invM);
+    m_sigma2 = other.m_sigma2;
+    m_f_log2pi = other.m_f_log2pi;
+    m_seed = other.m_seed;
+    m_cache_dxf = bob::core::array::ccopy(other.m_cache_dxf);
+    m_cache_d = bob::core::array::ccopy(other.m_cache_d);
+    m_cache_f = bob::core::array::ccopy(other.m_cache_f);
+    m_cache_dxd_1 = bob::core::array::ccopy(other.m_cache_dxd_1);
+    m_cache_dxd_2 = bob::core::array::ccopy(other.m_cache_dxd_2);
+    m_cache_fxd_1 = bob::core::array::ccopy(other.m_cache_fxd_1);
+    m_cache_fxd_2 = bob::core::array::ccopy(other.m_cache_fxd_2);
+    m_cache_fxf_1 = bob::core::array::ccopy(other.m_cache_fxf_1);
+    m_cache_fxf_2 = bob::core::array::ccopy(other.m_cache_fxf_2);
+  }
   return *this;
 }
 
-void train::EMPCATrainer::initialization(mach::LinearMachine& machine,
+void bob::trainer::EMPCATrainer::initialization(bob::machine::LinearMachine& machine,
   const blitz::Array<double,2>& ar) 
 {
   // Gets dimension
@@ -133,12 +127,12 @@ void train::EMPCATrainer::initialization(mach::LinearMachine& machine,
   computeInvM();
 }
 
-void train::EMPCATrainer::finalization(mach::LinearMachine& machine,
+void bob::trainer::EMPCATrainer::finalization(bob::machine::LinearMachine& machine,
   const blitz::Array<double,2>& ar) 
 {
 }
 
-void train::EMPCATrainer::initMembers(const blitz::Array<double,2>& ar) 
+void bob::trainer::EMPCATrainer::initMembers(const blitz::Array<double,2>& ar) 
 {
   // Gets dimensions
   size_t n_samples = ar.extent(0);
@@ -178,7 +172,7 @@ void train::EMPCATrainer::initMembers(const blitz::Array<double,2>& ar)
   }
 }
 
-void train::EMPCATrainer::computeMeanVariance(mach::LinearMachine& machine, 
+void bob::trainer::EMPCATrainer::computeMeanVariance(bob::machine::LinearMachine& machine, 
   const blitz::Array<double,2>& ar) 
 {
   size_t n_samples = ar.extent(0);
@@ -192,7 +186,7 @@ void train::EMPCATrainer::computeMeanVariance(mach::LinearMachine& machine,
     for (size_t i=0; i<n_samples; ++i)
       data(all,i) = ar(i,all);
     // Mean and scatter computation
-    math::scatter(data, m_S, mu);
+    bob::math::scatter(data, m_S, mu);
     // divides scatter by N-1
     m_S /= static_cast<double>(n_samples-1);
   }
@@ -206,7 +200,7 @@ void train::EMPCATrainer::computeMeanVariance(mach::LinearMachine& machine,
   }
 }
 
-void train::EMPCATrainer::initRandomWSigma2(mach::LinearMachine& machine) 
+void bob::trainer::EMPCATrainer::initRandomWSigma2(bob::machine::LinearMachine& machine) 
 {
   // Initializes the random number generator
   boost::mt19937 rng;
@@ -225,14 +219,14 @@ void train::EMPCATrainer::initRandomWSigma2(mach::LinearMachine& machine)
   m_sigma2 = die() * ratio;
 }
 
-void train::EMPCATrainer::computeWtW(mach::LinearMachine& machine) 
+void bob::trainer::EMPCATrainer::computeWtW(bob::machine::LinearMachine& machine) 
 {
   blitz::Array<double,2> W = machine.updateWeights();
   const blitz::Array<double,2> Wt = W.transpose(1,0);
-  math::prod(Wt, W, m_inW);
+  bob::math::prod(Wt, W, m_inW);
 }
 
-void train::EMPCATrainer::computeInvM() 
+void bob::trainer::EMPCATrainer::computeInvM() 
 {
   // Compute inverse(M), where M = W^T * W + sigma2 * Id
   bob::math::eye(m_cache_dxd_1); // m_cache_dxd_1 = Id
@@ -243,7 +237,7 @@ void train::EMPCATrainer::computeInvM()
  
 
 
-void train::EMPCATrainer::eStep(mach::LinearMachine& machine, const blitz::Array<double,2>& ar) 
+void bob::trainer::EMPCATrainer::eStep(bob::machine::LinearMachine& machine, const blitz::Array<double,2>& ar) 
 {  
   // Gets mu and W from the machine
   const blitz::Array<double,1>& mu = machine.getInputDivision();
@@ -276,7 +270,7 @@ void train::EMPCATrainer::eStep(mach::LinearMachine& machine, const blitz::Array
   }
 }
 
-void train::EMPCATrainer::mStep(mach::LinearMachine& machine, const blitz::Array<double,2>& ar) 
+void bob::trainer::EMPCATrainer::mStep(bob::machine::LinearMachine& machine, const blitz::Array<double,2>& ar) 
 {
   // 1/ New estimate of W
   updateW(machine, ar);
@@ -288,7 +282,7 @@ void train::EMPCATrainer::mStep(mach::LinearMachine& machine, const blitz::Array
   computeInvM();
 }
 
-void train::EMPCATrainer::updateW(mach::LinearMachine& machine, const blitz::Array<double,2>& ar) {
+void bob::trainer::EMPCATrainer::updateW(bob::machine::LinearMachine& machine, const blitz::Array<double,2>& ar) {
   // Get the mean mu and the projection matrix W
   const blitz::Array<double,1>& mu = machine.getInputDivision();
   blitz::Array<double,2>& W = machine.updateWeights();
@@ -318,10 +312,10 @@ void train::EMPCATrainer::updateW(mach::LinearMachine& machine, const blitz::Arr
   // New estimates of W
   bob::math::prod(m_cache_fxd_1, m_cache_dxd_2, W);
   // Updates W'*W as well
-  math::prod(Wt, W, m_inW);
+  bob::math::prod(Wt, W, m_inW);
 }
 
-void train::EMPCATrainer::updateSigma2(mach::LinearMachine& machine, const blitz::Array<double,2>& ar) {
+void bob::trainer::EMPCATrainer::updateSigma2(bob::machine::LinearMachine& machine, const blitz::Array<double,2>& ar) {
   // Get the mean mu and the projection matrix W
   const blitz::Array<double,1>& mu = machine.getInputDivision();
   blitz::Array<double,2>& W = machine.updateWeights();
@@ -357,7 +351,7 @@ void train::EMPCATrainer::updateSigma2(mach::LinearMachine& machine, const blitz
   m_sigma2 /= (static_cast<double>(ar.extent(0)) * mu.extent(0));
 }
 
-double train::EMPCATrainer::computeLikelihood(mach::LinearMachine& machine)
+double bob::trainer::EMPCATrainer::computeLikelihood(bob::machine::LinearMachine& machine)
 {
   // Get W projection matrix
   blitz::Array<double,2>& W = machine.updateWeights();
