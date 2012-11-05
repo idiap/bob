@@ -24,6 +24,8 @@
 
 #include "bob/core/logging.h"
 
+#include <limits>
+
 bob::trainer::LLRTrainer::LLRTrainer(const double prior, 
   const double convergence_threshold, const size_t max_iterations):
     m_prior(prior), m_convergence_threshold(convergence_threshold), 
@@ -129,6 +131,7 @@ void bob::trainer::LLRTrainer::train(bob::machine::LinearMachine& machine,
   // Iterates...
   blitz::firstIndex i;
   blitz::secondIndex j;
+  static const double ten_epsilon = 10*std::numeric_limits<double>::epsilon();
   for(size_t iter=0; ; ++iter) 
   {
     // 1. Computes the non-weighted version of the likelihood
@@ -166,6 +169,13 @@ void bob::trainer::LLRTrainer::train(bob::machine::LinearMachine& machine,
     // b. Compute u^T H u 
     //      = sum_{i} weights(i) sigmoid(w^T x_i) [1-sigmoid(w^T x_i)] (u^T x_i)
     double uhu = blitz::sum(blitz::pow2(tmp_n) * weights * s1 * (1.-s1));
+    // Terminates if uhu is close to zero
+    if(fabs(uhu) < ten_epsilon)
+    {
+      bob::core::info << ten_epsilon << std::endl;
+      bob::core::info << "# LLR Training terminated: convergence after " << iter << " iterations (u^T H u == 0)." << std::endl;
+      break;
+    }
     // c. Compute w = w_old - (g^T u)/(u^T H u) u
     w = w + blitz::sum(u*g) / uhu * u;
     

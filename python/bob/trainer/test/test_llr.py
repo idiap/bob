@@ -54,21 +54,27 @@ class LLRTest(unittest.TestCase):
       ], dtype='float64')
 
     # Expected trained machine
-    weights_ref= numpy.array([[13.5714], [19.3997], [-0.6432]])
-    bias_ref = numpy.array([55.3255])
+    #weights_ref= numpy.array([[13.5714], [19.3997], [-0.6432]])
+    weights_ref= numpy.array([[1.75536], [2.69297], [-0.54142]])
+    #bias_ref = numpy.array([55.3255])
+    bias_ref = numpy.array([7.26999])
 
     # Features and expected outputs of the trained machine
     feat1 = numpy.array([1.,2.,3.])
-    out1 = 105.7668
+    #out1 = 105.7668
+    out1 = 12.78703
     feat2 = numpy.array([2.,3.,4.])
-    out2 = 138.0947
+    #out2 = 138.0947
+    out2 = 16.69394
 
   
     # Trains a machine (method 1)
-    T = bob.trainer.LLRTrainer()
+    T = bob.trainer.LLRTrainer(0.5, 1e-5, 30)
     machine1 = T.train(ar1,ar2)
 
     # Makes sure results are good
+    print machine1.weights
+    print machine1.biases
     self.assertTrue( (abs(machine1.weights - weights_ref) < 2e-4).all() )
     self.assertTrue( (abs(machine1.biases - bias_ref) < 2e-4).all() )
     self.assertTrue( abs(machine1(feat1) - out1) < 2e-4 )
