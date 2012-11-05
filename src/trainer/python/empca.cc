@@ -22,19 +22,16 @@
 #include "bob/trainer/EMPCATrainer.h"
 
 using namespace boost::python;
-namespace train = bob::trainer;
-namespace mach = bob::machine;
-namespace io = bob::io;
 
-object ppca_train(train::EMPCATrainer& t, const blitz::Array<double,2>& data) {
-  mach::LinearMachine m;
+object ppca_train(bob::trainer::EMPCATrainer& t, const blitz::Array<double,2>& data) {
+  bob::machine::LinearMachine m;
   t.train(m, data);
   return object(m);
 }
 
 void bind_trainer_empca() {
 
-  typedef train::EMTrainer<mach::LinearMachine, blitz::Array<double,2> > EMTrainerLinearBase; 
+  typedef bob::trainer::EMTrainer<bob::machine::LinearMachine, blitz::Array<double,2> > EMTrainerLinearBase; 
 
   class_<EMTrainerLinearBase, boost::noncopyable>("EMTrainerLinear", "The base python class for all EM-based trainers.", no_init)
     .add_property("convergence_threshold", &EMTrainerLinearBase::getConvergenceThreshold, &EMTrainerLinearBase::setConvergenceThreshold, "Convergence threshold")
@@ -49,12 +46,12 @@ void bind_trainer_empca() {
     .def("compute_likelihood", &EMTrainerLinearBase::computeLikelihood, (arg("machine")), "Computes the current log likelihood given the hidden variable distribution (or the sufficient statistics)")
   ;
 
-  class_<train::EMPCATrainer, boost::noncopyable, bases<EMTrainerLinearBase> >("EMPCATrainer",
+  class_<bob::trainer::EMPCATrainer, boost::noncopyable, bases<EMTrainerLinearBase> >("EMPCATrainer",
       "This class implements the EM algorithm for a Linear Machine (Probabilistic PCA).\n"
       "See Section 12.2 of Bishop, \"Pattern recognition and machine learning\", 2006", init<int,optional<double,double,bool> >((arg("dimensionality"), arg("convergence_threshold"), arg("max_iterations"), arg("compute_likelihood"))))
     .def("train", &ppca_train, (arg("self"), arg("data")), "Trains and returns a Linear machine using the provided data")
-    .add_property("seed", &train::EMPCATrainer::getSeed, &train::EMPCATrainer::setSeed, "The seed for the random initialization of W and sigma2")
-    .add_property("sigma2", &train::EMPCATrainer::getSigma2, &train::EMPCATrainer::setSigma2, "The noise sigma2 of the probabilistic model")
+    .add_property("seed", &bob::trainer::EMPCATrainer::getSeed, &bob::trainer::EMPCATrainer::setSeed, "The seed for the random initialization of W and sigma2")
+    .add_property("sigma2", &bob::trainer::EMPCATrainer::getSigma2, &bob::trainer::EMPCATrainer::setSigma2, "The noise sigma2 of the probabilistic model")
   ;
 
 }
