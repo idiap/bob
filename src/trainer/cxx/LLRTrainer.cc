@@ -172,7 +172,6 @@ void bob::trainer::LLRTrainer::train(bob::machine::LinearMachine& machine,
     // Terminates if uhu is close to zero
     if(fabs(uhu) < ten_epsilon)
     {
-      bob::core::info << ten_epsilon << std::endl;
       bob::core::info << "# LLR Training terminated: convergence after " << iter << " iterations (u^T H u == 0)." << std::endl;
       break;
     }
