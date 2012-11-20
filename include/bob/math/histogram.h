@@ -29,6 +29,7 @@
 #include <blitz/array.h>
 #include <numeric>
 #include <functional>
+#include <cmath>
 
 namespace bob{
   namespace math{
@@ -43,6 +44,16 @@ namespace bob{
       // helper function to compute the chi_square distance between the given values
       static inline T chi_square_distance(const T& v1, const T& v2){
         return v1 != v2 ? (v1 - v2) * (v1 - v2) / (v1 + v2) : T(0);
+      }
+
+    template <class T>
+      // helper function to compute the symmetric Kullback-Leibler divergence
+      static inline double kullback_leibler_divergence(const T& v1, const T& v2){
+        // This implementation is inspired by http://www.informatik.uni-freiburg.de/~tipaldi/FLIRTLib/HistogramDistances_8hpp_source.html
+        // and http://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/WAHL1/node5.html
+        double a1 = std::max((double)v1, 1e-5);
+        double a2 = std::max((double)v2, 1e-5);
+        return (a1 - a2) * std::log(a1/a2);
       }
 
 
@@ -79,7 +90,7 @@ namespace bob{
         while (i1 < i1_end && i2 < i2_end){
           p1 = index_1(i1);
           p2 = index_2(i2);
-          if (p1 == p2) sum += minimum(values_1(i1++), values_2(i2++));
+          if (p1 == p2) sum += bob::math::minimum(values_1(i1++), values_2(i2++));
           else if (p1 < p2) ++i1;
           else ++i2;
         }
@@ -120,16 +131,62 @@ namespace bob{
           p1 = index_1(i1);
           p2 = index_2(i2);
           if (p1 == p2){
-            sum += chi_square_distance(values_1(i1++), values_2(i2++));
+            sum += bob::math::chi_square_distance(values_1(i1++), values_2(i2++));
           } else if (p1 < p2) {
-            sum += chi_square_distance(values_1(i1++), T2(0));
+            sum += bob::math::chi_square_distance(values_1(i1++), T2(0));
           } else{
-            sum += chi_square_distance(T2(0), values_2(i2++));
+            sum += bob::math::chi_square_distance(T2(0), values_2(i2++));
           }
         }
         // roll up the remaining parts of the histograms
         while (i1 < i1_end) sum += chi_square_distance(values_1(i1++), T2(0));
         while (i2 < i2_end) sum += chi_square_distance(T2(0), values_2(i2++));
+        return sum;
+      }
+
+    template <class T>
+      //! Fast implementation of the symmetric Kullback-Leibler histogram divergence measure (a distance measure)
+      inline double kullback_leibler(const blitz::Array<T,1>& h1, const blitz::Array<T,1>& h2){
+        bob::core::array::assertCContiguous(h1);
+        bob::core::array::assertCContiguous(h2);
+        bob::core::array::assertSameShape(h1,h2);
+        // we use the std::inner_product function (using blitz iterators!)
+        // calling out implementation of the Kullback-Leibler divergence of two values
+        return std::inner_product(
+          h1.begin(),
+          h1.end(),
+          h2.begin(),
+          0.,
+          std::plus<T>(),
+          bob::math::kullback_leibler_divergence<T>
+        );
+      }
+
+    template <class T1, class T2>
+      //! Fast implementation of the sparse symmetric Kullback-Leibler histogram divergence measure (a distance measure)
+      inline double kullback_leibler(
+            const blitz::Array<T1,1>& index_1, const blitz::Array<T2,1>& values_1,
+            const blitz::Array<T1,1>& index_2, const blitz::Array<T2,1>& values_2
+      ){
+        bob::core::array::assertSameShape(index_1,values_1);
+        bob::core::array::assertSameShape(index_2,values_2);
+        int i1 = 0, i2 = 0, i1_end = index_1.shape()[0], i2_end = index_2.shape()[0];
+        T1 p1 = index_1(i1), p2 = index_2(i2);
+        double sum = 0.;
+        while (i1 < i1_end && i2 < i2_end){
+          p1 = index_1(i1);
+          p2 = index_2(i2);
+          if (p1 == p2){
+            sum += bob::math::kullback_leibler_divergence(values_1(i1++), values_2(i2++));
+          } else if (p1 < p2) {
+            sum += bob::math::kullback_leibler_divergence(values_1(i1++), T2(0));
+          } else{
+            sum += bob::math::kullback_leibler_divergence(T2(0), values_2(i2++));
+          }
+        }
+        // roll up the remaining parts of the histograms
+        while (i1 < i1_end) sum += bob::math::kullback_leibler_divergence(values_1(i1++), T2(0));
+        while (i2 < i2_end) sum += bob::math::kullback_leibler_divergence(T2(0), values_2(i2++));
         return sum;
       }
 
