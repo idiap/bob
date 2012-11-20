@@ -110,7 +110,7 @@ static boost::python::object inner_chi_square_2(bob::python::const_ndarray index
     case bob::core::array::t_float64:
       return boost::python::object(bob::math::chi_square(index_1.bz<T1,1>(), values_1.bz<double,1>(), index_2.bz<T1,1>(), values_2.bz<double,1>()));
     default:
-      PYTHON_ERROR(TypeError, "Histogram intersection currently not implemented for type '%s'", values_1.type().str().c_str());
+      PYTHON_ERROR(TypeError, "Chi square measure currently not implemented for type '%s'", values_1.type().str().c_str());
   }
 }
 
@@ -128,6 +128,61 @@ static boost::python::object chi_square_2(bob::python::const_ndarray index_1, bo
       return inner_chi_square_2<int64_t>(index_1, values_1, index_2, values_2);
     case bob::core::array::t_float64:
       return inner_chi_square_2<double>(index_1, values_1, index_2, values_2);
+    default:
+      PYTHON_ERROR(TypeError, "Histogram index type '%s' is currently not implemented.", index_1.type().str().c_str());
+  }
+}
+
+
+static double kullback_leibler(bob::python::const_ndarray h1, bob::python::const_ndarray h2){
+  switch(h1.type().dtype){
+    case bob::core::array::t_uint8:
+      return bob::math::kullback_leibler(h1.bz<uint8_t,1>(), h2.bz<uint8_t, 1>());
+    case bob::core::array::t_uint16:
+      return bob::math::kullback_leibler(h1.bz<uint16_t,1>(), h2.bz<uint16_t, 1>());
+    case bob::core::array::t_int32:
+      return bob::math::kullback_leibler(h1.bz<int32_t,1>(), h2.bz<int32_t, 1>());
+    case bob::core::array::t_int64:
+      return bob::math::kullback_leibler(h1.bz<int64_t,1>(), h2.bz<int64_t, 1>());
+    case bob::core::array::t_float64:
+      return bob::math::kullback_leibler(h1.bz<double,1>(), h2.bz<double, 1>());
+    default:
+      PYTHON_ERROR(TypeError, "Kullback-Leibler divergence currently not implemented for type '%s'", h1.type().str().c_str());
+  }
+}
+
+template <class T1>
+static double inner_kullback_leibler_2(bob::python::const_ndarray index_1, bob::python::const_ndarray values_1, bob::python::const_ndarray index_2, bob::python::const_ndarray values_2){
+  switch(values_1.type().dtype){
+    case bob::core::array::t_uint8:
+      return bob::math::kullback_leibler(index_1.bz<T1,1>(), values_1.bz<uint8_t,1>(), index_2.bz<T1,1>(), values_2.bz<uint8_t,1>());
+    case bob::core::array::t_uint16:
+      return bob::math::kullback_leibler(index_1.bz<T1,1>(), values_1.bz<uint16_t,1>(), index_2.bz<T1,1>(), values_2.bz<uint16_t,1>());
+    case bob::core::array::t_int32:
+      return bob::math::kullback_leibler(index_1.bz<T1,1>(), values_1.bz<int32_t,1>(), index_2.bz<T1,1>(), values_2.bz<int32_t,1>());
+    case bob::core::array::t_int64:
+      return bob::math::kullback_leibler(index_1.bz<T1,1>(), values_1.bz<int64_t,1>(), index_2.bz<T1,1>(), values_2.bz<int64_t,1>());
+    case bob::core::array::t_float64:
+      return bob::math::kullback_leibler(index_1.bz<T1,1>(), values_1.bz<double,1>(), index_2.bz<T1,1>(), values_2.bz<double,1>());
+    default:
+      PYTHON_ERROR(TypeError, "Kullback-Leibler divergence currently not implemented for type '%s'", values_1.type().str().c_str());
+  }
+}
+
+static double kullback_leibler_2(bob::python::const_ndarray index_1, bob::python::const_ndarray values_1, bob::python::const_ndarray index_2, bob::python::const_ndarray values_2){
+  assert(index_1.type().dtype == index_2.type().dtype);
+  assert(values_1.type().dtype == values_2.type().dtype);
+  switch(index_1.type().dtype){
+    case bob::core::array::t_uint8:
+      return inner_kullback_leibler_2<uint8_t>(index_1, values_1, index_2, values_2);
+    case bob::core::array::t_uint16:
+      return inner_kullback_leibler_2<uint16_t>(index_1, values_1, index_2, values_2);
+    case bob::core::array::t_int32:
+      return inner_kullback_leibler_2<int32_t>(index_1, values_1, index_2, values_2);
+    case bob::core::array::t_int64:
+      return inner_kullback_leibler_2<int64_t>(index_1, values_1, index_2, values_2);
+    case bob::core::array::t_float64:
+      return inner_kullback_leibler_2<double>(index_1, values_1, index_2, values_2);
     default:
       PYTHON_ERROR(TypeError, "Histogram index type '%s' is currently not implemented.", index_1.type().str().c_str());
   }
@@ -164,4 +219,17 @@ void bind_math_histogram()
     "Computes the chi square distance between the given sparse histograms (each given by index and value matrix), which might be of singular dimension only. The chi square function is a distance measure, so lower values are better."
   );
 
+  boost::python::def(
+    "kullback_leibler",
+    &kullback_leibler,
+    (boost::python::arg("h1"), boost::python::arg("h2")),
+    "Computes the Kullback-Leibler histogram divergence between the given histograms, which might be of singular dimension only. The Kullback-Leibler divergence is a distance measure, so lower values are better."
+  );
+
+  boost::python::def(
+    "kullback_leibler",
+    &kullback_leibler_2,
+    (boost::python::arg("index_1"), boost::python::arg("value_1"), boost::python::arg("index_2"), boost::python::arg("value_2")),
+    "Computes the Kullback-Leibler histogram divergence between the given sparse histograms (each given by index and value matrix), which might be of singular dimension only. The Kullback-Leibler divergence is a distance measure, so lower values are better."
+  );
 }
