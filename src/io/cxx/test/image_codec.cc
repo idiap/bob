@@ -133,10 +133,29 @@ BOOST_AUTO_TEST_CASE( image_png )
 
 BOOST_AUTO_TEST_CASE( image_tiff ) 
 {
-  std::string filename = bob::core::tmpfile(".tiff");
-  bob::io::save(filename, b);
-  check_equal( bob::io::load<uint8_t,3>(filename), b );
-  boost::filesystem::remove(filename);
+  // Grayscale 8 bits
+  {
+    std::string filename = bob::core::tmpfile(".tiff");
+    bob::io::save(filename, a);
+    check_equal( bob::io::load<uint8_t,2>(filename), a);
+    boost::filesystem::remove(filename);
+  }
+
+  // Color 8 bits
+  {
+    std::string filename = bob::core::tmpfile(".tiff");
+    bob::io::save(filename, b);
+    check_equal( bob::io::load<uint8_t,3>(filename), b);
+    boost::filesystem::remove(filename);
+  }
+
+  // Color 16 bits
+  {
+    std::string filename = bob::core::tmpfile(".tiff");
+    bob::io::save(filename, c);
+    check_equal( bob::io::load<uint16_t,3>(filename), c);
+    boost::filesystem::remove(filename);
+  }
 }
 
 /*
