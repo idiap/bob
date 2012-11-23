@@ -4,6 +4,34 @@ from . import __file__
 from . import __hdf5__
 from . import __video__
 
+import os
+
+def create_directories_save(directory, dryrun=False):
+  """Creates a directory if it does not exists, with concurrent access support.
+  This function will also create any parent directories that might be required.
+  If the dryrun option is selected, it does not actually create the directory,
+  but just writes the (Linux) command that would have been executed.
+
+  Parameters:
+
+  directory
+    The directory that you want to create.
+
+  dryrun
+    Only write the command, but do not execute it.
+  """
+  try:
+    if dryrun:
+      print "[dry-run] mkdir -p '%s'" % directory
+    else:
+      if directory and not os.path.exists(directory): os.makedirs(directory)
+
+  except OSError as exc: # Python >2.5
+    import errno
+    if exc.errno != errno.EEXIST:
+      raise
+
+
 def load(inputs):
   """Loads the contents of a file, an iterable of files, or an iterable of
   :py:class:`bob.io.File`'s into a :py:class:`numpy.ndarray`.
@@ -11,9 +39,9 @@ def load(inputs):
   Parameters:
 
   inputs
-     
+
     This might represent several different entities:
-     
+
     1. The name of a file (full path) from where to load the data. In this
        case, this assumes that the file contains an array and returns a loaded
        numpy ndarray.
@@ -54,12 +82,12 @@ def merge(filenames):
   Parameters:
 
   filenames
-     
+
     This might represent:
-     
+
     1. A single filename. In this case, an iterable with a single
        :py:class:`bob.io.File` is returned.
-    2. An iterable of filenames to be converted into an iterable of 
+    2. An iterable of filenames to be converted into an iterable of
        :py:class:`bob.io.File`'s.
   """
 
@@ -71,13 +99,13 @@ def merge(filenames):
   else:
     raise TypeError("Unexpected input object. This function is expecting an iterable of filenames.")
 
-def save(array, filename):
+def save(array, filename, create_directories = False):
   """Saves the contents of an array-like object to file.
 
   Effectively, this is the same as creating a :py:class:`bob.io.File` object
   with the mode flag set to `w` (write with truncation) and calling
   :py:meth:`bob.io.File.write` passing `array` as parameter.
-  
+
   Parameters:
 
   array
@@ -85,7 +113,14 @@ def save(array, filename):
 
   filename
     The name of the file where you need the contents saved to
+
+  create_directories
+    Automatically generate the directories if required
   """
+  # create directory if not existent yet
+  if create_directories:
+    create_directories_save(os.path.dirname(filename))
+
   return File(filename, 'w').write(array)
 
 # Just to make it homogenous with the C++ API
@@ -97,7 +132,7 @@ def append(array, filename):
   Effectively, this is the same as creating a :py:class:`bob.io.File` object
   with the mode flag set to `a` (append) and calling
   :py:meth:`bob.io.File.append` passing `array` as parameter.
-  
+
   Parameters:
 
   array
@@ -114,7 +149,7 @@ def peek(filename):
   Effectively, this is the same as creating a :py:class:`bob.io.File` object
   with the mode flag set to `r` (read-only) and returning
   :py:attr:`bob.io.File.type`.
-  
+
   Parameters:
 
   filename
@@ -128,7 +163,7 @@ def peek_all(filename):
   Effectively, this is the same as creating a :py:class:`bob.io.File` object
   with the mode flag set to `r` (read-only) and returning
   :py:attr:`bob.io.File.type_all`.
-  
+
   Parameters:
 
   filename
