@@ -39,8 +39,6 @@ extern "C" {
 // https://bugs.launchpad.net/ubuntu/+source/libpng/+bug/218409
 #include <png.h>
 
-#include <tiffio.h>
-
 #if defined(HAVE_FFMPEG)
 #  include <libavformat/avformat.h>
 #  include <libavcodec/avcodec.h>
@@ -51,6 +49,8 @@ extern "C" {
 #ifdef HAVE_MATIO
 #include <matio.h>
 #endif
+
+#include <tiffio.h>
 }
 
 using namespace boost::python;
