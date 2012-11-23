@@ -39,6 +39,8 @@ extern "C" {
 // https://bugs.launchpad.net/ubuntu/+source/libpng/+bug/218409
 #include <png.h>
 
+#include <tiffio.h>
+
 #if defined(HAVE_FFMPEG)
 #  include <libavformat/avformat.h>
 #  include <libavcodec/avcodec.h>
@@ -108,6 +110,13 @@ static str libpng_version() {
 }
 
 /**
+ * Libtiff version
+ */
+static str libtiff_version() {
+  return str(TIFFGetVersion());
+}
+
+/**
  * Matio, if compiled with such support
  */
 static str matio_version() {
@@ -130,6 +139,7 @@ void bind_io_version() {
   vdict["libjpeg"] = libjpeg_version();
   vdict["libnetpbm"] = str("Unknown version");
   vdict["libpng"] = libpng_version();
+  vdict["libtiff"] = libtiff_version();
   vdict["MatIO"] = matio_version();
   scope().attr("version") = vdict;
 }

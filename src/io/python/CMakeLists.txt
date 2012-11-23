@@ -33,6 +33,10 @@ if(PNG_FOUND)
   list(APPEND incdir "${PNG_INCLUDE_DIRS}")
 endif(PNG_FOUND)
 
+if(TIFF_FOUND)
+  list(APPEND incdir "${TIFF_INCLUDE_DIR}")
+endif(TIFF_FOUND)
+
 if(FFMPEG_FOUND)
   list(APPEND src "video.cc")
   list(APPEND incdir "${FFMPEG_INCLUDE_DIRS}")

@@ -286,3 +286,20 @@ const char* io::ImageUnsupportedDepth::what() const throw() {
     return emergency;
   }
 }
+
+io::ImageUnsupportedColorspace::ImageUnsupportedColorspace() throw()
+{
+}
+
+io::ImageUnsupportedColorspace::~ImageUnsupportedColorspace() throw() { }
+
+const char* io::ImageUnsupportedColorspace::what() const throw() {
+  try {
+    boost::format message("Does not support image with this colorspace.");
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "io::ImageUnsupportedColorspace: cannot format, exception raised";
+    return emergency;
+  }
+}

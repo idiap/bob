@@ -52,6 +52,8 @@
 
 #cmakedefine HAVE_LIBPNG 1
 
+#cmakedefine HAVE_LIBTIFF 1
+
 #define OPENCV_VERSION "@OPENCV_VERSION@"
 
 #cmakedefine HAVE_GOOGLE_PERFTOOLS 1

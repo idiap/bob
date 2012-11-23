@@ -77,6 +77,14 @@ else(PNG_FOUND)
   message(FATAL_ERROR "libpng has not been found.")
 endif(PNG_FOUND)
 
+#libtiff
+include(FindTIFF)
+if(TIFF_FOUND)
+  set(HAVE_LIBTIFF ON CACHE BOOL "Has libtiff installed")
+else(TIFF_FOUND)
+  message(FATAL_ERROR "libtiff has not been found.")
+endif(TIFF_FOUND) 
+
 # Matio
 pkg_check_modules(matio matio)
 if(matio_FOUND)

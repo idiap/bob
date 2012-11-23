@@ -188,6 +188,16 @@ namespace bob { namespace io {
       mutable std::string m_message;
   };
 
+  class ImageUnsupportedColorspace: public Exception {
+    public:
+      ImageUnsupportedColorspace() throw();
+      virtual ~ImageUnsupportedColorspace() throw();
+      virtual const char* what() const throw();
+
+    private:
+      mutable std::string m_message;
+  };
+
 }}
 
 #endif /* BOB_IO_EXCEPTION_H */

@@ -27,6 +27,7 @@ set(src
   "GaborGraphMachine.cc"
   "GaborJetSimilarities.cc"
   "BICMachine.cc"
+  "MixtureLinearMachine.cc"
   )
 
 # If we have libsvm installed, enable the compilation of relevant modules
