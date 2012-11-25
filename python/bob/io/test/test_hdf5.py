@@ -366,3 +366,70 @@ class HDF5FileTest(unittest.TestCase):
 
     finally:
       os.unlink(tmpname)
+
+  def test13_has_attribute(self):
+    
+    try:
+      tmpname = get_tempfilename()
+      outfile = bob.io.HDF5File(tmpname, 'w')
+      i = 35
+      f = 3.14
+      outfile.set_attribute('int', i)
+      outfile.set_attribute('float', f)
+      self.assertTrue(outfile.has_attribute('int'))
+      self.assertEqual(outfile.get_attribute('int'), 35)
+      self.assertTrue(outfile.has_attribute('float'))
+      self.assertEqual(outfile.get_attribute('float'), 3.14)
+
+    finally:
+      os.unlink(tmpname)
+
+  def test14_get_attributes(self):
+    
+    try:
+      tmpname = get_tempfilename()
+      outfile = bob.io.HDF5File(tmpname, 'w')
+      nothing = outfile.get_attributes()
+      self.assertEqual( len(nothing), 0 )
+      self.assertTrue( isinstance(nothing, dict) )
+      i = 35
+      f = 3.14
+      outfile.set_attribute('int', i)
+      outfile.set_attribute('float', f)
+      d = outfile.get_attributes()
+      self.assertEqual(d['int'], i)
+      self.assertEqual(d['float'], f)
+
+    finally:
+      os.unlink(tmpname)
+
+  def test15_set_compression(self):
+
+    try:
+
+      tmpname = get_tempfilename()
+      outfile = bob.io.HDF5File(tmpname, 'w')
+      data = numpy.random.random((50,50))
+      outfile.set('data', data, compression=9)
+      recovered = outfile.read('data')
+      self.assertTrue( numpy.array_equal(data, recovered) )
+      del outfile
+
+    finally:
+
+      os.unlink(tmpname)
+
+  def test16_append_compression(self):
+
+    try:
+
+      tmpname = get_tempfilename()
+      outfile = bob.io.HDF5File(tmpname, 'w')
+      data = numpy.random.random((50,50))
+      for k in range(len(data)): outfile.append('data', data[k], compression=9)
+      recovered = outfile.read('data')
+      self.assertTrue( numpy.array_equal(data, recovered) )
+
+    finally:
+
+      os.unlink(tmpname)

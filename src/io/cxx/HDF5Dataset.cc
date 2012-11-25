@@ -273,7 +273,7 @@ static void create_dataset (boost::shared_ptr<h5::Group> par,
   //array shape.
   io::HDF5Shape chunking(xshape);
   chunking[0] = 1;
-  if (list) {
+  if (list || compression) { ///< note: compression requires chunking
     herr_t status = H5Pset_chunk(*dcpl, chunking.n(), chunking.get());
     if (status < 0) throw io::HDF5StatusError("H5Pset_chunk", status);
   }

@@ -219,19 +219,28 @@ void h5::write_attribute (boost::shared_ptr<hid_t> location,
   if (err < 0) throw io::HDF5StatusError("H5Awrite", err);
 }
 
-static herr_t attr_iterator (hid_t attr, const char* name, const H5A_info_t*, 
+static herr_t attr_iterator (hid_t obj, const char* name, const H5A_info_t*, 
     void* cookie) {
   std::map<std::string, io::HDF5Type>& dict =
     *static_cast<std::map<std::string, io::HDF5Type>*>(cookie);
-  boost::shared_ptr<hid_t> atype = get_type(attr);
+
+  boost::shared_ptr<hid_t> attr(new hid_t(-1),
+      std::ptr_fun(delete_h5attribute));
+
+  *attr = H5Aopen(obj, name, H5P_DEFAULT);
+
+  if (*attr < 0) throw io::HDF5StatusError("H5Aopen", *attr);
+
+  boost::shared_ptr<hid_t> atype = get_type(*attr);
   if (H5Tget_class(*atype) == H5T_STRING) {
     dict[name] = bob::io::HDF5Type(atype);
   }
   else {
-    boost::shared_ptr<hid_t> aspace = get_memspace(attr);
+    boost::shared_ptr<hid_t> aspace = get_memspace(*attr);
     bob::io::HDF5Shape shape = get_extents(*aspace);
     dict[name] = bob::io::HDF5Type(atype, shape);
   }
+
   return 0;
 }
 
