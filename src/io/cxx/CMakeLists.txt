@@ -87,6 +87,14 @@ if(TIFF_FOUND)
   list(APPEND incdir "${TIFF_INCLUDE_DIR}")
 endif(TIFF_FOUND)
 
+if(GIF_FOUND)
+  list(APPEND shared "${GIF_LIBRARIES}")
+  list(APPEND src
+    "ImageGifFile.cc"
+    )
+  list(APPEND incdir "${GIF_INCLUDE_DIR}")
+endif(GIF_FOUND)
+
 if(FFMPEG_FOUND)
   list(APPEND shared "${FFMPEG_RESOLVED_LIBRARIES}")
   list(APPEND src 

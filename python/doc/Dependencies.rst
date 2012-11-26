@@ -74,6 +74,8 @@ Required at runtime
 +----------------------+--------------+---------------------------------------+
 | `libtiff`_           | 3.9.2        | BSD-style                             |
 +----------------------+--------------+---------------------------------------+
+| `giflib`_            | 4.1.6-9      | `MIT`_                                |
++----------------------+--------------+---------------------------------------+
 | `HDF5`_              | 1.8.4        | `HDF5 License`_ (BSD-like, 5 clauses) |
 +----------------------+--------------+---------------------------------------+
 | `argparse`_          | 1.2          | `Python-2.0`_                         |
@@ -211,6 +213,8 @@ Data access
   against version 1.2.42, but older versions might work.
 * `libtiff`_: is used for reading and writing TIFF images. We currently compile 
   against version 3.9.2, but older versions might work.
+* `giflib`_: is used for reading and writing GIF images. We currently compile 
+  against version 4.1.6-9, but older versions might work.
 * `HDF5`_: HDF5 is the format of choice for binary representation of data
   or configuration items in bob. We currently compile against version 1.8.6,
   Version 1.8.4 (and before) might not work.
@@ -285,7 +289,7 @@ A single command line that will install all required packages under Ubuntu:
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core cmake python-dev python-support python-numpy python-argparse python-scipy python-matplotlib python-sqlalchemy liblapack-dev libatlas-base-dev libblitz1-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libmatio-dev libmagick++-dev libjpeg8-dev libnetpbm10-dev libpng12-dev libtiff4-dev libhdf5-serial-dev libqt4-dev libfftw3-dev libcv-dev libhighgui-dev libcvaux-dev texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended libsvm-dev libvl-dev doxygen python-sphinx dvipng python-nose python-setuptools
+   $ sudo apt-get install git-core cmake python-dev python-support python-numpy python-argparse python-scipy python-matplotlib python-sqlalchemy liblapack-dev libatlas-base-dev libblitz1-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libmatio-dev libmagick++-dev libjpeg8-dev libnetpbm10-dev libpng12-dev libtiff4-dev libgif-dev libhdf5-serial-dev libqt4-dev libfftw3-dev libcv-dev libhighgui-dev libcvaux-dev texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended libsvm-dev libvl-dev doxygen python-sphinx dvipng python-nose python-setuptools
 
 .. note::
 
@@ -326,14 +330,14 @@ your shell prompt (for using Python 2.7 as the default interpreter):
    
 .. code-block:: sh
 
-  $ sudo port install cmake blitz ffmpeg python27 python_select py27-numpy -atlas matio imagemagick jpeg netpbm libpng tiff py27-ipython py27-matplotlib google-perftools doxygen py27-sphinx texlive-latex-extra texlive-fonts-recommended hdf5-18 qt4-mac boost +python27 py27-scipy +no_atlas fftw-3 vlfeat opencv +python27 +qt4 libsvm +python27 +tools dvipng py27-sqlalchemy py27-nose py27-distribute
+  $ sudo port install cmake blitz ffmpeg python27 python_select py27-numpy -atlas matio imagemagick jpeg netpbm libpng tiff giflib py27-ipython py27-matplotlib google-perftools doxygen py27-sphinx texlive-latex-extra texlive-fonts-recommended hdf5-18 qt4-mac boost +python27 py27-scipy +no_atlas fftw-3 vlfeat opencv +python27 +qt4 libsvm +python27 +tools dvipng py27-sqlalchemy py27-nose py27-distribute
    $ # go for a long coffee 
 
 **Or**, for Python 2.6 as the default interpreter:
 
 .. code-block:: sh
 
-   $ sudo port install cmake blitz ffmpeg python26 python_select py26-numpy -atlas matio imagemagick jpeg netpbm libpng tiff py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx texlive-latex-extra texlive-fonts-recommended hdf5-18 py26-argparse qt4-mac boost +python26 py26-scipy +no_atlas fftw-3 vlfeat opencv +python26 +qt4 libsvm +python26 +tools dvipng py26-sqlalchemy py26-nose py26-distribute
+   $ sudo port install cmake blitz ffmpeg python26 python_select py26-numpy -atlas matio imagemagick jpeg netpbm libpng tiff giflib py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx texlive-latex-extra texlive-fonts-recommended hdf5-18 py26-argparse qt4-mac boost +python26 py26-scipy +no_atlas fftw-3 vlfeat opencv +python26 +qt4 libsvm +python26 +tools dvipng py26-sqlalchemy py26-nose py26-distribute
 
 .. note::
 

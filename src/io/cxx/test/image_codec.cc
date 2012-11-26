@@ -36,6 +36,7 @@ struct T {
   blitz::Array<uint8_t,3> b;
   blitz::Array<uint16_t,3> c;
   blitz::Array<uint8_t,2> d;
+  blitz::Array<uint8_t,3> e;
 
   T() {
     a.resize(6,4);
@@ -52,6 +53,10 @@ struct T {
     d = 1, 0, 0, 0, 1, 1, 0, 1,
         1, 0, 1, 0, 1, 1, 1, 1,
         0, 1, 0, 1, 0, 0, 0, 1;
+    e.resize(3,2,4); // Colours are multiple of 8 for GIF quantization
+    e = 0, 8, 64,  0, 248,   0, 128,  0,
+        0, 8, 32,  0, 248, 248,  64, 64,
+        0, 8,  8, 64,   0, 248,  32,  0;
   }
 
   ~T() { }
@@ -91,8 +96,8 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 BOOST_AUTO_TEST_CASE( image_gif ) 
 {
   std::string filename = bob::core::tmpfile(".gif");
-  bob::io::save(filename, b);
-  check_equal( bob::io::load<uint8_t,3>(filename), b );
+  bob::io::save(filename, e);
+  check_equal( bob::io::load<uint8_t,3>(filename), e );
   boost::filesystem::remove(filename);
 }
 
