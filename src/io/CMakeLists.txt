@@ -85,6 +85,14 @@ else(TIFF_FOUND)
   message(FATAL_ERROR "libtiff has not been found.")
 endif(TIFF_FOUND) 
 
+#giflib
+include(FindGIF)
+if(GIF_FOUND)
+  set(HAVE_GIFLIB ON CACHE BOOL "Has giflib installed")
+else(GIF_FOUND)
+  message(FATAL_ERROR "giflib has not been found.")
+endif(GIF_FOUND) 
+
 # Matio
 pkg_check_modules(matio matio)
 if(matio_FOUND)

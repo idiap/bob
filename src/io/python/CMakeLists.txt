@@ -37,6 +37,10 @@ if(TIFF_FOUND)
   list(APPEND incdir "${TIFF_INCLUDE_DIR}")
 endif(TIFF_FOUND)
 
+if(GIF_FOUND)
+  list(APPEND incdir "${GIF_INCLUDE_DIR}")
+endif(GIF_FOUND)
+
 if(FFMPEG_FOUND)
   list(APPEND src "video.cc")
   list(APPEND incdir "${FFMPEG_INCLUDE_DIRS}")

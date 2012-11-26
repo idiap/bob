@@ -356,7 +356,6 @@ static bool register_codec() {
   
   instance->registerExtension(".bmp", "Windows bitmap (Image Magick)", &make_file);
   instance->registerExtension(".eps", "Encapsulated Postscript (Image Magick)", &make_file);
-  instance->registerExtension(".gif", "GIF, indexed (Image Magick)", &make_file);
   instance->registerExtension(".pdf", "Portable Document Format (Image Magick)", &make_file);
   instance->registerExtension(".ps", "Postscript (Image Magick)", &make_file);
   instance->registerExtension(".xcf", "Gimp Native format (ImageMagick)", &make_file);

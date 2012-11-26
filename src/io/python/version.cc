@@ -46,6 +46,8 @@ extern "C" {
 #  include <libswscale/swscale.h>
 #endif 
 
+#include <gif_lib.h>
+
 #ifdef HAVE_MATIO
 #include <matio.h>
 #endif
@@ -117,6 +119,18 @@ static str libtiff_version() {
 }
 
 /**
+ * Version of giflib support
+ */
+static str giflib_version() {
+  boost::format f("%s.%s.%s");
+  f % BOOST_PP_STRINGIZE(GIFLIB_MAJOR);
+  f % BOOST_PP_STRINGIZE(GIFLIB_MINOR);
+  f % BOOST_PP_STRINGIZE(GIFLIB_RELEASE);
+  return str(f.str());
+}
+
+
+/**
  * Matio, if compiled with such support
  */
 static str matio_version() {
@@ -140,6 +154,7 @@ void bind_io_version() {
   vdict["libnetpbm"] = str("Unknown version");
   vdict["libpng"] = libpng_version();
   vdict["libtiff"] = libtiff_version();
+  vdict["giflib"] = giflib_version();
   vdict["MatIO"] = matio_version();
   scope().attr("version") = vdict;
 }

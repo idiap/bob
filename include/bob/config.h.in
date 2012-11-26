@@ -46,6 +46,8 @@
 
 #cmakedefine HAVE_OPENCV 1
 
+#cmakedefine HAVE_GIFLIB 1
+
 #cmakedefine HAVE_NETPBM 1
 
 #cmakedefine HAVE_LIBJPEG 1
