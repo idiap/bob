@@ -122,11 +122,17 @@ static str libtiff_version() {
  * Version of giflib support
  */
 static str giflib_version() {
+  str v;
+#ifdef GIF_LIB_VERSION
+ v = str(GIF_LIB_VERSION);
+#else
   boost::format f("%s.%s.%s");
   f % BOOST_PP_STRINGIZE(GIFLIB_MAJOR);
   f % BOOST_PP_STRINGIZE(GIFLIB_MINOR);
   f % BOOST_PP_STRINGIZE(GIFLIB_RELEASE);
-  return str(f.str());
+  v = str(f.str());
+#endif
+  return v;
 }
 
 
