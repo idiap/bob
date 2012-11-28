@@ -14,7 +14,11 @@ namespace ffmpeg = bob::io::detail::ffmpeg;
 
 void ffmpeg::codecs_installed (std::map<std::string, const AVCodec*>& installed) {
   for (AVCodec* it = av_codec_next(0); it != 0; it = av_codec_next(it) ) {
+# if LIBAVCODEC_VERSION_MAJOR >= 53
     if (it->type == AVMEDIA_TYPE_VIDEO) {
+# else
+    if (it->type == CODEC_TYPE_VIDEO) {
+# endif
       auto exists = installed.find(std::string(it->name));
       if (exists != installed.end()) {
         bob::core::warn << "Not overriding video codec \"" << it->long_name 
