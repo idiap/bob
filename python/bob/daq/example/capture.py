@@ -4,17 +4,17 @@ from bob.daq import *
 
 def main():
   cam = V4LCamera("/dev/video0")
-  pfs = cam.getSupportedPixelFormats()
+  pfs = cam.get_supported_pixel_formats()
   pf = pfs[0]
-  fss = cam.getSupportedFrameSizes(pf)
+  fss = cam.get_supported_frame_sizes(pf)
   fs = fss[5]
-  fis = cam.getSupportedFrameIntervals(pf, fs)
+  fis = cam.get_supported_frame_intervals(pf, fs)
   fi = fis[1]
 
 
-  cam.pixelFormat = pf
-  cam.frameSize = fs
-  cam.frameInterval = fi
+  cam.pixel_format = pf
+  cam.frame_size = fs
+  cam.frame_interval = fi
 
   print pf
   print fs
@@ -28,12 +28,12 @@ def main():
   a.outputdir = '.'
 
   a.thumbnail = ''
-  a.setExecuteOnStartRecording('echo "Start" &')
-  a.setExecuteOnStopRecording('echo "Stop" &')
-  a.setText("Custom text")
+  a.set_execute_on_start_recording('echo "Start" &')
+  a.set_execute_on_stop_recording('echo "Stop" &')
+  a.set_text("Custom text")
 
   a.fullscreen = True
-  #a.setDisplaySize(200, 100)
+  #a.set_display_size(200, 100)
 
   a.start()
 

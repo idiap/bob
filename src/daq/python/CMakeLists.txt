@@ -21,6 +21,10 @@ endif()
 include(${QT_USE_FILE})
 list(APPEND incdir ${QT_INCLUDE_DIR})
 
+if (V4L2_FOUND)
+  add_definitions(-DV4L2)
+endif () 
+
 # Define the library, compilation and linkage options
 bob_sort_headers(incdir)
 foreach(inc ${incdir})

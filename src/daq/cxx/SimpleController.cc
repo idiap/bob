@@ -26,8 +26,8 @@
 #include <cstdio>
 #include <cstring>
 
-#include <Magick++/Blob.h>
-#include <Magick++/Image.h>
+#include <jpeglib.h>
+#include <jerror.h>
 
 namespace bob { namespace daq {
   
@@ -200,6 +200,53 @@ static unsigned char MJPGDHTSeg[20 + 0x1A4] = {
   0xF9, 0xFA
 };
 
+//////////////////////////////////////////////////////////////////////////////
+// Read JPEG compressed data directly from memory (not natively available in libjpeg 6b)
+// (copied from http://stackoverflow.com/questions/5280756/libjpeg-ver-6b-jpeg-stdio-src-vs-jpeg-mem-src)
+static void init_source(j_decompress_ptr cinfo) 
+{
+}
+
+static boolean fill_input_buffer(j_decompress_ptr cinfo)
+{
+  ERREXIT(cinfo, JERR_INPUT_EMPTY);
+  return TRUE;
+}
+
+static void skip_input_data(j_decompress_ptr cinfo, long num_bytes)
+{
+  struct jpeg_source_mgr* src = (struct jpeg_source_mgr*)cinfo->src;
+
+  if(num_bytes > 0) {
+    src->next_input_byte += (size_t) num_bytes;
+    src->bytes_in_buffer -= (size_t) num_bytes;
+  }
+}
+static void term_source(j_decompress_ptr cinfo) 
+{
+}
+
+static void jpeg_mem_src(j_decompress_ptr cinfo, void* buffer, long nbytes)
+{
+  struct jpeg_source_mgr* src;
+
+  if(cinfo->src == NULL) {   // first time for this JPEG object?
+    cinfo->src = (struct jpeg_source_mgr *)
+      (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
+          sizeof(struct jpeg_source_mgr));
+  }
+
+  src = (struct jpeg_source_mgr*) cinfo->src;
+  src->init_source = init_source;
+  src->fill_input_buffer = fill_input_buffer;
+  src->skip_input_data = skip_input_data;
+  src->resync_to_restart = jpeg_resync_to_restart; // use default method
+  src->term_source = term_source;
+  src->bytes_in_buffer = nbytes;
+  src->next_input_byte = (JOCTET*)buffer;
+}
+//////////////////////////////////////////////////////////////////////////////
+
 void SimpleController::imageReceived(unsigned char* image, Camera::PixelFormat pixelFormat,
                                     int width, int height, int stride, int size, int frameNb, double timestamp) {
   ControllerCallback::CaptureStatus status;
@@ -261,16 +308,44 @@ void SimpleController::imageReceived(unsigned char* image, Camera::PixelFormat p
     // Copy image content to buffer
     memcpy(buffer + sizeof(MJPGDHTSeg), image_, size);
 
-    // Convert byte buffer to ImageMagic Blob
-    Magick::Blob blob(buffer, sizeof(MJPGDHTSeg) + size);
-
-    // Load JPEG
-    Magick::Image mimage(blob);
-
+    // Resize output buffer
     rgbimage.resize(height, width*3);
-    
-    // Convert to RGB
-    mimage.write(0, 0, width, height, "RGB", Magick::CharPixel, rgbimage.data());
+
+    // Step 1: allocate and initialize JPEG decompression object
+    struct jpeg_decompress_struct cinfo;
+    // We set up the normal JPEG error routines.
+    struct jpeg_error_mgr jerr;
+    cinfo.err = jpeg_std_error(&jerr);
+    // Now we can initialize the JPEG decompression object.
+    jpeg_create_decompress(&cinfo);
+
+    // Step 2: specify data source buffer
+    jpeg_mem_src(&cinfo, buffer, sizeof(MJPGDHTSeg) + size);
+
+    // Step 3: read file parameters with jpeg_read_header()
+    (void) jpeg_read_header(&cinfo, TRUE);
+
+    // Step 4: set parameters for decompression (here, use default ones)
+
+    // Step 5: Start decompressor
+    (void) jpeg_start_decompress(&cinfo);
+
+    // Step 6: while (scan lines remain to be read)
+    //           jpeg_read_scanlines(...);
+    JSAMPROW obuffer[1];
+    unsigned char* data_ptr = rgbimage.data();
+    const int data_stride = width*3;
+    while(cinfo.output_scanline < cinfo.output_height) {
+      obuffer[0] = data_ptr;
+      (void) jpeg_read_scanlines(&cinfo, obuffer, 1);
+      data_ptr += data_stride;
+    }
+
+    // Step 7: Finish decompression
+    (void) jpeg_finish_decompress(&cinfo);
+
+    // Step 8: Release JPEG decompression object
+    jpeg_destroy_decompress(&cinfo);
   }
   else if(pixelFormat == Camera::RGB24) {
     rgbimage.resize(height, width*3);
