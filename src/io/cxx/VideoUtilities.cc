@@ -12,8 +12,8 @@
 
 namespace ffmpeg = bob::io::detail::ffmpeg;
 
-void ffmpeg::codecs_installed (std::map<std::string, const AVCodecDescriptor*>& installed) {
-  for (const AVCodecDescriptor* it = avcodec_descriptor_next(0); it != 0; it = avcodec_descriptor_next(it) ) {
+void ffmpeg::codecs_installed (std::map<std::string, const AVCodec*>& installed) {
+  for (AVCodec* it = av_codec_next(0); it != 0; it = av_codec_next(it) ) {
     if (it->type == AVMEDIA_TYPE_VIDEO) {
       auto exists = installed.find(std::string(it->name));
       if (exists != installed.end()) {

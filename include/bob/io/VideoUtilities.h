@@ -16,13 +16,12 @@ extern "C" {
 #include <libavformat/avformat.h>
 }
 
-
 namespace bob { namespace io { namespace detail { namespace ffmpeg {
 
   /**
    * Returns a list of installed codecs, with their capabilities
    */
-  void codecs_installed (std::map<std::string, const AVCodecDescriptor*>& installed);
+  void codecs_installed (std::map<std::string, const AVCodec*>& installed);
 
   /**
    * Returns a list of input formats this installation can handle, with details
