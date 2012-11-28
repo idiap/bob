@@ -102,6 +102,7 @@ if(FFMPEG_FOUND)
     "VideoException.cc"
     "VideoWriter.cc"
     "VideoFile.cc"
+    "VideoUtilities.cc"
   )
   list(APPEND incdir "${FFMPEG_INCLUDE_DIRS}")
   add_definitions("-D__STDC_CONSTANT_MACROS")

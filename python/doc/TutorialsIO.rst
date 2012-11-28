@@ -373,8 +373,8 @@ height of the video need to be multiples of two.
   >>> framerate = 24
   >>> outv = bob.io.VideoWriter('testvideo.avi', height, width, framerate) # output video
   >>> for i in range(0, 30):
-  ...  newframe = (numpy.random.random_integers(0,255,(3,50,50)))
-  ...  outv.append(newframe.astype('uint8'))
+  ...   newframe = (numpy.random.random_integers(0,255,(3,height,width)))
+  ...   outv.append(newframe.astype('uint8'))
   >>> outv.close()
   >>> input = bob.io.VideoReader('testvideo.avi')
   >>> input.number_of_frames
