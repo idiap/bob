@@ -3,7 +3,7 @@ project(bob_daq)
 # This defines the dependencies of this package
 set(bob_deps "bob_io;bob_ip;bob_visioner")
 set(shared "${bob_deps}")
-set(incdir ${cxx_incdir};${ImageMagick_INCLUDE_DIRS};${FFMPEG_INCLUDE_DIRS})
+set(incdir ${cxx_incdir};${JPEG_INCLUDE_DIRS};${FFMPEG_INCLUDE_DIRS})
 
 # This is required for FFMPEG compilation
 add_definitions("-D__STDC_CONSTANT_MACROS")
