@@ -35,6 +35,7 @@ set(src
     "BinaryArrayFile.cc"
     "TensorArrayFile.cc"
     "T3File.cc"
+    "ImageBmpFile.cc"
     )
 
 # If we have matio installed, enable the compilation of relevant modules

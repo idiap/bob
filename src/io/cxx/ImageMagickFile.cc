@@ -354,7 +354,6 @@ static bool register_codec() {
   boost::shared_ptr<bob::io::CodecRegistry> instance =
     bob::io::CodecRegistry::instance();
   
-  instance->registerExtension(".bmp", "Windows bitmap (Image Magick)", &make_file);
   instance->registerExtension(".eps", "Encapsulated Postscript (Image Magick)", &make_file);
   instance->registerExtension(".pdf", "Portable Document Format (Image Magick)", &make_file);
   instance->registerExtension(".ps", "Postscript (Image Magick)", &make_file);
