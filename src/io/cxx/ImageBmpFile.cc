@@ -180,7 +180,7 @@ typedef struct
 } pixel_t;
 
 
-/** Commented helper functions
+/* Commented helper functions
   Useful for debugging or to extend the support of additional bmp files in the future/
 
 #include <bitset>

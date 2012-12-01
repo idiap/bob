@@ -27,7 +27,6 @@
 #include <boost/python.hpp>
 #include <boost/format.hpp>
 #include <cstdlib>
-#include <ImageMagick/Magick++.h>
 
 extern "C" {
 #include <hdf5.h>
@@ -85,13 +84,6 @@ static dict ffmpeg_version() {
   v["ffmpeg"] = str("unavailable");
 #endif
   return v;
-}
-
-/**
- * ImageMagick version
- */
-static str magick_version() {
-  return str(MagickLibVersionText);
 }
 
 /**
@@ -155,7 +147,6 @@ void bind_io_version() {
   dict vdict;
   vdict["HDF5"] = hdf5_version();
   vdict["FFmpeg"] = ffmpeg_version();
-  vdict["ImageMagick"] = magick_version();
   vdict["libjpeg"] = libjpeg_version();
   vdict["libnetpbm"] = str("Unknown version");
   vdict["libpng"] = libpng_version();

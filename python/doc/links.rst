@@ -39,7 +39,6 @@
 .. _google perftools: http://code.google.com/p/google-perftools
 .. _hdf5: http://www.hdfgroup.org/HDF5
 .. _idiap: http://www.idiap.ch
-.. _imagemagick: http://www.imagemagick.org
 .. _ipython: http://ipython.scipy.org
 .. _lapack: http://www.netlib.org/lapack
 .. _latex: http://www.latex-project.org/

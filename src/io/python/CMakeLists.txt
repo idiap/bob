@@ -21,9 +21,9 @@ if(matio_FOUND)
   list(APPEND incdir "${matio_INCLUDE_DIRS}")
 endif(matio_FOUND)
 
-if(ImageMagick_FOUND)
-  list(APPEND incdir "${ImageMagick_INCLUDE_DIRS}")
-endif(ImageMagick_FOUND)
+if(NETPBM_FOUND)
+  list(APPEND incdir "${NETPBM_INCLUDE_DIRS}")
+endif(NETPBM_FOUND)
 
 if(JPEG_FOUND)
   list(APPEND incdir "${JPEG_INCLUDE_DIRS}")

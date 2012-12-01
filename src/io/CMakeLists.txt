@@ -6,7 +6,7 @@ include(FindHDF5)
 
 # Resolves library locations for the "broken" pkg-config cmake bridge
 #
-# lib: The library name, like "ImageMagic"  or "z"
+# lib: The library name, like "z"
 # path: Library path to search for lib
 # l: The list where we should append the resolved library path
 #
@@ -45,19 +45,6 @@ macro(resolve_library library dirs l)
   unset(newlib CACHE)
 endmacro()
 
-# ImageMagick
-include(FindPkgConfig)
-pkg_check_modules(ImageMagick REQUIRED ImageMagick++>=6.5)
-
-if(ImageMagick_FOUND)
-  # Resolve ImageMagick libraries to a precise path
-  set(ImageMagick_RESOLVED_LIBRARIES "")
-  foreach(lib ${ImageMagick_LIBRARIES})
-    resolve_library(${lib} ${ImageMagick_LIBDIR} ImageMagick_RESOLVED_LIBRARIES)
-  endforeach()
-  set(ImageMagick_RESOLVED_LIBRARIES ${ImageMagick_RESOLVED_LIBRARIES} CACHE INTERNAL "Resolved ImageMagick libraries")
-endif()
-
 # netpbm
 include(netpbm.cmake)
 
@@ -94,6 +81,7 @@ else(GIF_FOUND)
 endif(GIF_FOUND) 
 
 # Matio
+include(FindPkgConfig)
 pkg_check_modules(matio matio)
 if(matio_FOUND)
   set(HAVE_MATIO ON CACHE BOOL "Has matio installed")
@@ -153,7 +141,7 @@ if(FFMPEG_FOUND)
   #set(FFMPEG_VERSION ${FFMPEG_VERSION} CACHE STRING "FFmpeg version")
   set(FFMPEG_VERSION "${FFMPEG_VERSION}" CACHE INTERNAL "FFmpeg version")
 
-  # Resolve ImageMagick libraries to a precise path
+  # Resolve FFMPEG libraries to a precise path
   set(FFMPEG_RESOLVED_LIBRARIES "")
   foreach(lib ${FFMPEG_LIBRARIES})
     resolve_library(${lib} "${FFMPEG_LIBRARY_DIRS}" FFMPEG_RESOLVED_LIBRARIES)

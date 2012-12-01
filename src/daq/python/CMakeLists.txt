@@ -3,7 +3,7 @@ project(bob_daq_py${PYVER})
 # This defines the dependencies of this package
 set(bob_deps "bob_daq;bob_python")
 set(shared "${bob_deps}")
-set(incdir ${py_incdir};${ImageMagick_INCLUDE_DIRS};${FFMPEG_INCLUDE_DIRS})
+set(incdir ${py_incdir};${JPEG_INCLUDE_DIRS};${FFMPEG_INCLUDE_DIRS})
 
 # This is required for FFMPEG compilation
 add_definitions("-D__STDC_CONSTANT_MACROS")
