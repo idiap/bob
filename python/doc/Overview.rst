@@ -60,7 +60,7 @@ Machine learning
 Storing and managing data
 -------------------------
 
-The library has been designed to run on various platforms and to be easily interfaced with other software. We have chosen the open and portable `HDF5`_ library and file format as our core feature for storing and managing data. `HDF5`_ is very flexible and hence allows us to store simple multi-dimensional arrays as well as complex machine learning models. Many tools for viewing, and analyzing the data are already available. In addition, we also support the loading and storing of most image formats thanks to `libjpeg`_, `libnetpbm`_ and `ImageMagick`_, videos through `FFmpeg`_ as well as standard `MATLAB`_ file using `MatIO`_.
+The library has been designed to run on various platforms and to be easily interfaced with other software. We have chosen the open and portable `HDF5`_ library and file format as our core feature for storing and managing data. `HDF5`_ is very flexible and hence allows us to store simple multi-dimensional arrays as well as complex machine learning models. Many tools for viewing, and analyzing the data are already available. In addition, we also support the loading and storing of most image formats thanks to `libjpeg`_, `libnetpbm`_, `libpng`_, `libtiff`_ and `giflib`_, videos through `FFmpeg`_ as well as standard `MATLAB`_ file using `MatIO`_.
 
 Database support
 ----------------

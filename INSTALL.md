@@ -13,7 +13,6 @@ Bob depends on:
  * Lapack
  * fftw
  * giflib
- * ImageMagick
  * libjpeg
  * libnetpbm
  * libpng
