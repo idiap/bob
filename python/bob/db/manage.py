@@ -44,7 +44,7 @@ def create_all(args):
     try:
       parsed.func(parsed)
 
-    except Exception, e:
+    except:
       if args.keep_going:
         errors += 1
         if args.verbose >= 1:
@@ -52,12 +52,12 @@ def create_all(args):
         __import__('traceback').print_exc()
         if args.verbose >= 1:
           print '*** Keep going on user request...'
-      else: 
-        raise
 
-    if args.verbose >= 1:
-      print '<<< Finished creation of "%s" SQLite database (%.2f seconds).' % \
-          (name, time.time()-start_time)
+    finally:
+
+      if args.verbose >= 1:
+        print '<<< Finished creation of "%s" SQLite database (%.2f seconds).' % \
+            (name, time.time()-start_time)
 
   if args.verbose >= 1:
     print '### %d SQLite databases created in %.2f seconds, %d errors' % \
