@@ -78,9 +78,10 @@ typedef struct {
 //   - BITMAPV5HEADER (124 bytes)
 //      -> Windows 98/2000 and newer
 
-// We only support the following two popular DIB headers
-// a/ BITMAPINFOHEADER
+// We currently only support the following four DIB headers
+// a/ BITMAPINFOHEADER / BITMAPV4HEADER / BITMAPV5HEADER
 typedef struct {
+  //// BITMAPINFOHEADER ////
   // 1. The size of this header (40 bytes)
   uint32_t header_size;
   // 2. The bitmap width in pixels (signed integer).
@@ -107,7 +108,32 @@ typedef struct {
   // 11. The number of important colors used, or 0 when every color is 
   //     important; generally ignored.
   uint32_t n_impcolors;
-} bmp_dib_winv1_header_t;
+
+  //// BITMAPV4HEADER ////
+  // 12. RGBA bitmask
+  uint32_t r_bitmask;
+  uint32_t g_bitmask;
+  uint32_t b_bitmask;
+  uint32_t a_bitmask;
+  // 13. Colorspace type
+  uint32_t colorspace_type;
+  // 14. Colorspace endpoints
+  uint32_t colorspace_endpoints[9];
+  // 15. Gamma for RGB channels
+  uint32_t r_gamma;
+  uint32_t g_gamma;
+  uint32_t b_gamma;
+
+  //// BITMAPV5HEADER ////
+  // 16. Intent
+  uint32_t intent;
+  // 17. Profile data
+  uint32_t profile_data;
+  // 18. Profile size
+  uint32_t profile_size;
+  // 19. reserved
+  uint32_t reserved;
+} bmp_dib_win_header_t;
 
 // Compression methods
 typedef enum {
@@ -122,7 +148,7 @@ typedef enum {
   BI_ALPHABITFIELDS // Bit field. This value is valid in Windows CE .NET 4.0 and later.
 } bmp_compression_method;
 
-// b/ BITMAPCOREHEADER/OS21XBITMAPHEADER
+// d/ BITMAPCOREHEADER/OS21XBITMAPHEADER
 typedef struct {
   // 1. The size of this header (12 bytes)
   uint32_t header_size;
@@ -139,7 +165,9 @@ typedef struct {
 
 typedef enum {
   OS2V1=0,
-  WINV1=2
+  WINV1=2,
+  WINV4=4,
+  WINV5=5
 } bmp_dib_header_type;
 
 typedef struct {
@@ -166,7 +194,7 @@ typedef struct
   uint32_t b_bitmask;
   bmp_bitmask_t bitmask;
   union {
-    bmp_dib_winv1_header_t winv1;
+    bmp_dib_win_header_t win;
     bmp_dib_os2v1_header_t os2v1;
   } dib_header;
 } bmp_dib_header_t;
@@ -215,17 +243,17 @@ bmp_print_dib_header(bmp_dib_header_t *hdr)
   switch(hdr->header_type)
   {
     case WINV1:
-      std::cout << "Header size=" << hdr->dib_header.winv1.header_size << std::endl;
-      std::cout << "Width=" << hdr->dib_header.winv1.width << std::endl;
-      std::cout << "Height=" << hdr->dib_header.winv1.height << std::endl;
-      std::cout << "N-planes=" << hdr->dib_header.winv1.n_planes << std::endl;
-      std::cout << "Depth=" << hdr->dib_header.winv1.depth << std::endl;
-      std::cout << "Compresion type=" << hdr->dib_header.winv1.compression_type << std::endl;
-      std::cout << "Image size=" << hdr->dib_header.winv1.image_size << std::endl;
-      std::cout << "Horizontal resolution=" << hdr->dib_header.winv1.hres << std::endl;
-      std::cout << "Vertical resolution=" << hdr->dib_header.winv1.vres << std::endl;
-      std::cout << "N-colors=" << hdr->dib_header.winv1.n_colors << std::endl;
-      std::cout << "N-impcolors=" << hdr->dib_header.winv1.n_impcolors << std::endl;
+      std::cout << "Header size=" << hdr->dib_header.win.header_size << std::endl;
+      std::cout << "Width=" << hdr->dib_header.win.width << std::endl;
+      std::cout << "Height=" << hdr->dib_header.win.height << std::endl;
+      std::cout << "N-planes=" << hdr->dib_header.win.n_planes << std::endl;
+      std::cout << "Depth=" << hdr->dib_header.win.depth << std::endl;
+      std::cout << "Compresion type=" << hdr->dib_header.win.compression_type << std::endl;
+      std::cout << "Image size=" << hdr->dib_header.win.image_size << std::endl;
+      std::cout << "Horizontal resolution=" << hdr->dib_header.win.hres << std::endl;
+      std::cout << "Vertical resolution=" << hdr->dib_header.win.vres << std::endl;
+      std::cout << "N-colors=" << hdr->dib_header.win.n_colors << std::endl;
+      std::cout << "N-impcolors=" << hdr->dib_header.win.n_impcolors << std::endl;
       break;
     case OS2V1:
       std::cout << "Header size=" << hdr->dib_header.os2v1.header_size << std::endl;
@@ -297,6 +325,160 @@ static void bmp_update_bitmask_structure(uint32_t r, uint32_t g, uint32_t b, bmp
   bm->b_mask =  (1 << (bmp_lastone_index(b) - bm->b_shift + 1)) -1;
 }
 
+
+// Read the and parse the windows DIB header bitmasks from the current FILE position
+static void bmp_read_bitmask_win_dib_header(FILE * const input_file, bmp_dib_header_t *dib_hdr)
+{
+  dib_hdr->has_bitmask = true;
+  if(fread(&dib_hdr->r_bitmask, sizeof(uint32_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (Red bitmask)");
+  if(fread(&dib_hdr->g_bitmask, sizeof(uint32_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (Green bitmask)");
+  if(fread(&dib_hdr->b_bitmask, sizeof(uint32_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (Blue bitmask)");
+  bmp_update_bitmask_structure(dib_hdr->r_bitmask, dib_hdr->g_bitmask, dib_hdr->b_bitmask, &dib_hdr->bitmask);
+}
+
+// Read the Winv1 DIB header from the current FILE position
+// The FILE pointer is increased according to the size of the DIB header 
+//  (if DIB type is supported)
+static void 
+bmp_read_winv1_dib_header(FILE * const input_file, bmp_dib_header_t *dib_hdr, const bool winv1=true)
+{
+  if(fread(&dib_hdr->dib_header.win.width, sizeof(int32_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (width)");
+  if(fread(&dib_hdr->dib_header.win.height, sizeof(int32_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (height)");
+  if(fread(&dib_hdr->dib_header.win.n_planes, sizeof(uint16_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (number of planes)");
+  if(fread(&dib_hdr->dib_header.win.depth, sizeof(uint16_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (depth)");
+  if(fread(&dib_hdr->dib_header.win.compression_type, sizeof(uint32_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (compression type)");
+  if(dib_hdr->dib_header.win.compression_type != BI_RGB && 
+     dib_hdr->dib_header.win.compression_type != BI_BITFIELDS)
+    throw std::runtime_error("bmp: unsupported compression type in header");
+  if(fread(&dib_hdr->dib_header.win.image_size, sizeof(uint32_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (image size)");
+  if(fread(&dib_hdr->dib_header.win.hres, sizeof(int32_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (horizontal resolution)");
+  if(fread(&dib_hdr->dib_header.win.vres, sizeof(int32_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (vertical resolution)");
+  if(fread(&dib_hdr->dib_header.win.n_colors, sizeof(uint32_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (number of colors)");
+  if(fread(&dib_hdr->dib_header.win.n_impcolors, sizeof(uint32_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (number of important colors)");
+
+  // Update "standard" DIB attributes 
+  dib_hdr->bottom_up = (dib_hdr->dib_header.win.height > 0);
+  dib_hdr->height = (dib_hdr->dib_header.win.height > 0 ? dib_hdr->dib_header.win.height : -dib_hdr->dib_header.win.height);
+  dib_hdr->width = (dib_hdr->dib_header.win.width > 0 ? dib_hdr->dib_header.win.width : -dib_hdr->dib_header.win.width);
+  dib_hdr->depth = dib_hdr->dib_header.win.depth;
+
+  // Update color map size attribute
+  if(dib_hdr->depth <= 8) 
+  {
+    uint16_t n_colors = dib_hdr->dib_header.win.n_colors;
+    if(n_colors != 0) {
+      if(n_colors > (1 << dib_hdr->depth))
+        throw std::runtime_error("bmp: error while reading bmp DIB header (Colormap).");
+      else
+        dib_hdr->cmap_size = n_colors;
+    } 
+    else
+      dib_hdr->cmap_size = (1 << dib_hdr->depth);
+  } 
+  else if (dib_hdr->depth == 24 || dib_hdr->depth == 16 || dib_hdr->depth == 32)
+    dib_hdr->cmap_size = 0;
+  else
+    throw std::runtime_error("bmp: error while reading bmp DIB header (Colormap: Unrecognized bits per pixel in Windows BMP file header).");
+
+  // If BIT_FIELD COMPRESSION_TYPE is set, we need to read the bitmasks
+  if(winv1 && dib_hdr->dib_header.win.compression_type == BI_BITFIELDS)
+    bmp_read_bitmask_win_dib_header(input_file, dib_hdr);
+  else
+    dib_hdr->has_bitmask = false; 
+}
+
+// Read the Winv4 DIB header part from the current FILE position
+// The FILE pointer is increased according to the size of the DIB header 
+//  (if DIB type is supported)
+static void 
+bmp_read_winv4_dib_header(FILE * const input_file, bmp_dib_header_t *dib_hdr)
+{
+  // 1. RGBA bitmask
+  bmp_read_bitmask_win_dib_header(input_file, dib_hdr);
+  dib_hdr->dib_header.win.r_bitmask = dib_hdr->r_bitmask;
+  dib_hdr->dib_header.win.g_bitmask = dib_hdr->g_bitmask;
+  dib_hdr->dib_header.win.b_bitmask = dib_hdr->b_bitmask;
+  if(fread(&dib_hdr->dib_header.win.a_bitmask, sizeof(uint32_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (Alpha bitmask)");
+  // 2. Colorspace type
+  if(fread(&dib_hdr->dib_header.win.colorspace_type, sizeof(uint32_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (Colorspace type)");
+  // 3. Colorspace endpoints
+  if(fread(&dib_hdr->dib_header.win.colorspace_endpoints, sizeof(uint32_t), 9, input_file) != 9)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (Colorspace endpoints)");
+  // 4. Gamma RGB channels
+  if(fread(&dib_hdr->dib_header.win.r_gamma, sizeof(uint32_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (Gamma red channel)");
+  if(fread(&dib_hdr->dib_header.win.g_gamma, sizeof(uint32_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (Gamma green channel)");
+  if(fread(&dib_hdr->dib_header.win.b_gamma, sizeof(uint32_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (Gamma blue channel)");
+}
+
+// Read the Winv5 DIB header part from the current FILE position
+// The FILE pointer is increased according to the size of the DIB header 
+//  (if DIB type is supported)
+static void 
+bmp_read_winv5_dib_header(FILE * const input_file, bmp_dib_header_t *dib_hdr)
+{
+  // 1. Intent
+  if(fread(&dib_hdr->dib_header.win.intent, sizeof(uint32_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (Intent)");
+  // 2. Profile data
+  if(fread(&dib_hdr->dib_header.win.profile_data, sizeof(uint32_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (Profile data)");
+  // 3. Profile size
+  if(fread(&dib_hdr->dib_header.win.profile_size, sizeof(uint32_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (Profile size)");
+  // 4. Reserved
+  if(fread(&dib_hdr->dib_header.win.reserved, sizeof(uint32_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (Reserved)");
+}
+
+// Read the OS2v1 DIB header from the current FILE position
+// The FILE pointer is increased according to the size of the DIB header 
+//  (if DIB type is supported)
+static void 
+bmp_read_os2v1_dib_header(FILE * const input_file, bmp_dib_header_t *dib_hdr)
+{
+  // Read the OS2v1 DIB header
+  if(fread(&dib_hdr->dib_header.os2v1.width, sizeof(uint16_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (width)");
+  if(fread(&dib_hdr->dib_header.os2v1.height, sizeof(uint16_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (height)");
+  if(fread(&dib_hdr->dib_header.os2v1.n_planes, sizeof(uint16_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (number of planes)");
+  if(fread(&dib_hdr->dib_header.os2v1.depth, sizeof(uint16_t), 1, input_file) != 1)
+    throw std::runtime_error("bmp: error while reading bmp DIB header (depth)");
+
+  // Update "standard" DIB attributes 
+  dib_hdr->bottom_up = true;
+  dib_hdr->height = dib_hdr->dib_header.os2v1.height;
+  dib_hdr->width = dib_hdr->dib_header.os2v1.width;
+  dib_hdr->depth = dib_hdr->dib_header.os2v1.depth;
+
+  // Update color map size attribute
+  if(dib_hdr->depth <= 8)
+    dib_hdr->cmap_size = (1 << dib_hdr->depth);
+  else if(dib_hdr->depth == 24)
+    dib_hdr->cmap_size = 0;
+  else
+    throw std::runtime_error("bmp: error while reading bmp DIB header (Colormap: Unrecognized bits per pixel in OS2 BMP file header).");
+}
+
 // Read the DIB header from the current FILE position
 // The FILE pointer is increased according to the size of the DIB header 
 //  (if DIB type is supported)
@@ -315,8 +497,16 @@ bmp_read_dib_header(FILE * const input_file, bmp_dib_header_t *dib_hdr)
       dib_hdr->header_type = OS2V1;
       break;
     case 40: // Windows V1
-      dib_hdr->dib_header.winv1.header_size = dib_hdr_size;
+      dib_hdr->dib_header.win.header_size = dib_hdr_size;
       dib_hdr->header_type = WINV1;
+      break;
+    case 108: // Windows V4
+      dib_hdr->dib_header.win.header_size = dib_hdr_size;
+      dib_hdr->header_type = WINV4;
+      break;
+    case 124: // Windows V5
+      dib_hdr->dib_header.win.header_size = dib_hdr_size;
+      dib_hdr->header_type = WINV5;
       break;
     default:
       throw std::runtime_error("bmp: Unsupported bmp file (DIB header type unsupported).");
@@ -326,99 +516,29 @@ bmp_read_dib_header(FILE * const input_file, bmp_dib_header_t *dib_hdr)
   switch(dib_hdr->header_type)
   {
     case WINV1:
-      {
-        // Read the windows WINV1 DIB header
-        if(fread(&dib_hdr->dib_header.winv1.width, sizeof(int32_t), 1, input_file) != 1)
-          throw std::runtime_error("bmp: error while reading bmp DIB header (width)");
-        if(fread(&dib_hdr->dib_header.winv1.height, sizeof(int32_t), 1, input_file) != 1)
-          throw std::runtime_error("bmp: error while reading bmp DIB header (height)");
-        if(fread(&dib_hdr->dib_header.winv1.n_planes, sizeof(uint16_t), 1, input_file) != 1)
-          throw std::runtime_error("bmp: error while reading bmp DIB header (number of planes)");
-        if(fread(&dib_hdr->dib_header.winv1.depth, sizeof(uint16_t), 1, input_file) != 1)
-          throw std::runtime_error("bmp: error while reading bmp DIB header (depth)");
-        if(fread(&dib_hdr->dib_header.winv1.compression_type, sizeof(uint32_t), 1, input_file) != 1)
-          throw std::runtime_error("bmp: error while reading bmp DIB header (compression type)");
-        if(dib_hdr->dib_header.winv1.compression_type != BI_RGB && 
-           dib_hdr->dib_header.winv1.compression_type != BI_BITFIELDS)
-          throw std::runtime_error("bmp: unsupported compression type in header");
-        if(fread(&dib_hdr->dib_header.winv1.image_size, sizeof(uint32_t), 1, input_file) != 1)
-          throw std::runtime_error("bmp: error while reading bmp DIB header (image size)");
-        if(fread(&dib_hdr->dib_header.winv1.hres, sizeof(int32_t), 1, input_file) != 1)
-          throw std::runtime_error("bmp: error while reading bmp DIB header (horizontal resolution)");
-        if(fread(&dib_hdr->dib_header.winv1.vres, sizeof(int32_t), 1, input_file) != 1)
-          throw std::runtime_error("bmp: error while reading bmp DIB header (vertical resolution)");
-        if(fread(&dib_hdr->dib_header.winv1.n_colors, sizeof(uint32_t), 1, input_file) != 1)
-          throw std::runtime_error("bmp: error while reading bmp DIB header (number of colors)");
-        if(fread(&dib_hdr->dib_header.winv1.n_impcolors, sizeof(uint32_t), 1, input_file) != 1)
-          throw std::runtime_error("bmp: error while reading bmp DIB header (number of important colors)");
+      // Read the windows WINV1 DIB header
+      bmp_read_winv1_dib_header(input_file, dib_hdr);
+      break;
+    
+    case WINV4:
+      // Read the windows WINV1 DIB header part
+      bmp_read_winv1_dib_header(input_file, dib_hdr, false);
+      // Read the windows WINV4 DIB header part
+      bmp_read_winv4_dib_header(input_file, dib_hdr);
+      break;
 
-        // Update "standard" DIB attributes 
-        dib_hdr->bottom_up = (dib_hdr->dib_header.winv1.height > 0);
-        dib_hdr->height = (dib_hdr->dib_header.winv1.height > 0 ? dib_hdr->dib_header.winv1.height : -dib_hdr->dib_header.winv1.height);
-        dib_hdr->width = (dib_hdr->dib_header.winv1.width > 0 ? dib_hdr->dib_header.winv1.width : -dib_hdr->dib_header.winv1.width);
-        dib_hdr->depth = dib_hdr->dib_header.winv1.depth;
-
-        // Update color map size attribute
-        if(dib_hdr->depth <= 8) 
-        {
-          uint16_t n_colors = dib_hdr->dib_header.winv1.n_colors;
-          if(n_colors != 0) {
-            if(n_colors > (1 << dib_hdr->depth))
-              throw std::runtime_error("bmp: error while reading bmp DIB header (Colormap).");
-            else
-              dib_hdr->cmap_size = n_colors;
-          } 
-          else
-            dib_hdr->cmap_size = (1 << dib_hdr->depth);
-        } 
-        else if (dib_hdr->depth == 24 || dib_hdr->depth == 16 || dib_hdr->depth == 32)
-          dib_hdr->cmap_size = 0;
-        else
-          throw std::runtime_error("bmp: error while reading bmp DIB header (Colormap: Unrecognized bits per pixel in Windows BMP file header).");
-
-        // If BIT_FIELD COMPRESSION_TYPE is set, we need to read the bitmasks
-        if(dib_hdr->dib_header.winv1.compression_type == BI_BITFIELDS)
-        {
-          dib_hdr->has_bitmask = true;
-          if(fread(&dib_hdr->r_bitmask, sizeof(uint32_t), 1, input_file) != 1)
-            throw std::runtime_error("bmp: error while reading bmp DIB header (Red bitmask)");
-          if(fread(&dib_hdr->g_bitmask, sizeof(uint32_t), 1, input_file) != 1)
-            throw std::runtime_error("bmp: error while reading bmp DIB header (Green bitmask)");
-          if(fread(&dib_hdr->b_bitmask, sizeof(uint32_t), 1, input_file) != 1)
-            throw std::runtime_error("bmp: error while reading bmp DIB header (Blue bitmask)");
-          bmp_update_bitmask_structure(dib_hdr->r_bitmask, dib_hdr->g_bitmask, dib_hdr->b_bitmask, &dib_hdr->bitmask);
-        }
-        else
-          dib_hdr->has_bitmask = false; 
-      }
+    case WINV5:
+      // Read the windows WINV1 DIB header part
+      bmp_read_winv1_dib_header(input_file, dib_hdr, false);
+      // Read the windows WINV4 DIB header part
+      bmp_read_winv4_dib_header(input_file, dib_hdr);
+      // Read the windows WINV5 DIB header part
+      bmp_read_winv5_dib_header(input_file, dib_hdr);
       break;
 
     case OS2V1:
-      {
-        // Read the windows winv1 DIB header
-        if(fread(&dib_hdr->dib_header.os2v1.width, sizeof(uint16_t), 1, input_file) != 1)
-          throw std::runtime_error("bmp: error while reading bmp DIB header (width)");
-        if(fread(&dib_hdr->dib_header.os2v1.height, sizeof(uint16_t), 1, input_file) != 1)
-          throw std::runtime_error("bmp: error while reading bmp DIB header (height)");
-        if(fread(&dib_hdr->dib_header.os2v1.n_planes, sizeof(uint16_t), 1, input_file) != 1)
-          throw std::runtime_error("bmp: error while reading bmp DIB header (number of planes)");
-        if(fread(&dib_hdr->dib_header.os2v1.depth, sizeof(uint16_t), 1, input_file) != 1)
-          throw std::runtime_error("bmp: error while reading bmp DIB header (depth)");
-   
-        // Update "standard" DIB attributes 
-        dib_hdr->bottom_up = true;
-        dib_hdr->height = dib_hdr->dib_header.os2v1.height;
-        dib_hdr->width = dib_hdr->dib_header.os2v1.width;
-        dib_hdr->depth = dib_hdr->dib_header.os2v1.depth;
-   
-        // Update color map size attribute
-        if(dib_hdr->depth <= 8)
-          dib_hdr->cmap_size = (1 << dib_hdr->depth);
-        else if(dib_hdr->depth == 24)
-          dib_hdr->cmap_size = 0;
-        else
-          throw std::runtime_error("bmp: error while reading bmp DIB header (Colormap: Unrecognized bits per pixel in OS2 BMP file header).");
-      }
+      // Read the OS2v1 DIB header
+      bmp_read_os2v1_dib_header(input_file, dib_hdr);
       break;
 
     default:
