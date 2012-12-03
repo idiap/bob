@@ -24,6 +24,7 @@
 #include <boost/python/slice.hpp>
 
 #include "bob/io/Video.h"
+#include "bob/io/VideoUtilities.h"
 #include "bob/core/python/exception.h"
 #include "bob/core/python/ndarray.h"
 
@@ -190,15 +191,31 @@ void bind_io_video() {
 
   class_<io::VideoWriter, boost::shared_ptr<io::VideoWriter>, boost::noncopyable>("VideoWriter",
      "Use objects of this class to create and write video files using FFMPEG.",
-     init<const std::string&, size_t, size_t, optional<float, float, size_t> >((arg("filename"), arg("height"), arg("width"), arg("framerate")=25.f, arg("bitrate")=1500000.f, arg("gop")=12), "Creates a new output file given the input parameters. The codec to be used will be derived from the filename extension."))
+#ifdef BOB_IO_VIDEOWRITER2_H
+     init<const std::string&, size_t, size_t, optional<float, float, size_t, const std::string&, const std::string&> >((arg("filename"), arg("height"), arg("width"), arg("framerate")=25.f, arg("bitrate")=1500000.f, arg("gop")=12, arg("codec")="", arg("format")=""), "Creates a new output file given the input parameters. The format and codec to be used will be derived from the filename extension unless you define them explicetly (you can set both or just one of these two optional parameters)")
+#else
+     init<const std::string&, size_t, size_t, optional<float, float, size_t> >((arg("filename"), arg("height"), arg("width"), arg("framerate")=25.f, arg("bitrate")=1500000.f, arg("gop")=12), "Creates a new output file given the input parameters. The format and codec to be used will be derived from the filename extension unless you define them explicetly")
+#endif
+     )
+#ifdef BOB_IO_VIDEOWRITER2_H
+    .add_property("filename", &io::VideoWriter::filename)
+#else
     .add_property("filename", make_function(&io::VideoWriter::filename, return_value_policy<copy_const_reference>()))
+#endif
     .add_property("height", &io::VideoWriter::height)
     .add_property("width", &io::VideoWriter::width)
     .add_property("number_of_frames", &io::VideoWriter::numberOfFrames)
     .def("__len__", &io::VideoWriter::numberOfFrames)
     .add_property("duration", &io::VideoWriter::duration)
+#ifdef BOB_IO_VIDEOWRITER2_H
+    .add_property("format_name", &io::VideoWriter::formatName)
+    .add_property("format_long_name", &io::VideoWriter::formatLongName)
+    .add_property("codec_name", &io::VideoWriter::codecName)
+    .add_property("codec_long_name", &io::VideoWriter::codecLongName)
+#else
     .add_property("codec_name", make_function(&io::VideoWriter::codecName, return_value_policy<copy_const_reference>()))
     .add_property("codec_long_name", make_function(&io::VideoWriter::codecLongName, return_value_policy<copy_const_reference>()))
+#endif
     .add_property("frame_rate", &io::VideoWriter::frameRate)
     .add_property("bit_rate", &io::VideoWriter::bitRate)
     .add_property("gop", &io::VideoWriter::gop)
