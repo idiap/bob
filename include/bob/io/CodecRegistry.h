@@ -63,6 +63,8 @@ namespace bob { namespace io {
       file_factory_t findByExtension(const std::string& ext);
       file_factory_t findByFilenameExtension(const std::string& fn);
 
+      bool isRegistered(const std::string& ext);
+
     private:
 
       CodecRegistry(): s_extension2codec() {}

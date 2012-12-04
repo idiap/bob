@@ -163,6 +163,107 @@ static void videowriter_append(io::VideoWriter& writer, object a) {
   }
 }
 
+/**
+ * Describes a given codec or returns an empty dictionary, in case the codec
+ * cannot be accessed
+ */
+static object describe_codec(const AVCodec* codec) {
+
+  dict retval;
+
+  retval["name"] = codec->name;
+  retval["long_name"] = codec->long_name;
+  retval["id"] = (unsigned)codec->id;
+
+  // get specific framerates for the codec, if any:
+  const AVRational* rate = codec->supported_framerates;
+  list rates;
+  while (rate && rate->num && rate->den) {
+    rates.append( ((double)rate->num)/((double)rate->den) );
+    ++rate;
+  }
+  retval["specific_framerates_hz"] = tuple(rates);
+
+  // get codec capabilities
+  retval["lossless"] = (bool)(codec->capabilities & CODEC_CAP_LOSSLESS);
+  retval["hardware_accelerated"] = (bool)(codec->capabilities & CODEC_CAP_HWACCEL);
+  retval["experimental"] = (bool)(codec->capabilities & CODEC_CAP_EXPERIMENTAL);
+  retval["encode"] = (bool)(avcodec_find_encoder(codec->id));
+  retval["decode"] = (bool)(avcodec_find_decoder(codec->id));
+  
+  return retval;
+}
+
+/**
+ * Describes a given codec or returns an empty dictionary, in case the codec
+ * cannot be accessed
+ */
+static object describe_encoder_by_name(const char* name) {
+  AVCodec* codec = avcodec_find_encoder_by_name(name);
+  if (!codec) return object();
+  return describe_codec(codec);
+}
+
+/**
+ * Describes a given codec or returns an empty dictionary, in case the codec
+ * cannot be accessed
+ */
+static object describe_decoder_by_name(const char* name) {
+  AVCodec* codec = avcodec_find_decoder_by_name(name);
+  if (!codec) return object();
+  return describe_codec(codec);
+}
+
+/**
+ * Returns all output formats supported, related codecs and extensions
+ */
+static dict oformat_dictionary() {
+  std::map<std::string, AVOutputFormat*> m;
+  io::detail::ffmpeg::oformats_installed(m);
+  dict retval;
+
+  for (auto k=m.begin(); k!=m.end(); ++k) {
+    dict property;
+    property["name"] = k->second->name;
+    property["long_name"] = k->second->long_name;
+    property["mime_type"] = k->second->mime_type;
+
+    // get extensions
+    std::vector<std::string> exts;
+    io::detail::ffmpeg::tokenize_csv(k->second->extensions, exts);
+    list ext_list;
+    for (auto ext=exts.begin(); ext!=exts.end(); ++ext) ext_list.append(*ext);
+    property["extensions"] = tuple(ext_list);
+
+    // get recommended codec
+    if (!k->second->video_codec) {
+      property["default_codec"] = object();
+    }
+    else {
+      AVCodec* codec = avcodec_find_encoder(k->second->video_codec);
+      if (!codec) property["default_codec"] = object();
+      else property["default_codec"] = describe_codec(codec);
+    }
+
+    retval[k->first] = property;
+  }
+
+  return retval;
+}
+
+/**
+ * Returns a dictionary of available codecs
+ */
+static object codec_dictionary() {
+  std::map<std::string, const AVCodec*> m;
+  io::detail::ffmpeg::codecs_installed(m);
+  dict retval;
+  for (auto k=m.begin(); k!=m.end(); ++k) {
+    retval[k->first] = describe_codec(k->second);
+  }
+  return retval;
+}
+
 void bind_io_video() {
   //special exceptions for videos
   tp::register_exception_translator<bob::io::VideoIsClosed>(PyExc_IOError);
@@ -226,4 +327,9 @@ void bind_io_video() {
     .add_property("frame_type", make_function(&io::VideoWriter::frame_type, return_value_policy<copy_const_reference>()), "Typing information to load the file frame by frame.")
     .def("append", &videowriter_append, (arg("self"), arg("frame")), "Writes a new frame or set of frames to the file. The frame should be setup as a array with 3 dimensions organized in this way (RGB color-bands, height, width). Sets of frames should be setup as a 4D array in this way: (frame-number, RGB color-bands, height, width). WARNING: At present time we only support arrays that have C-style storages (if you pass reversed arrays or arrays with Fortran-style storage, the result is undefined).")
     ;
+
+  def("video_codecs", &codec_dictionary, "Returns a dictionary containing a detailed description of the built-in codecs for videos");
+  def("describe_video_encoder", &describe_encoder_by_name, "Describes a given video encoder (codec) starting with a name");
+  def("describe_video_decoder", &describe_decoder_by_name, "Describes a given video decoder (codec) starting with a name");
+  def("videowriter_formats", &oformat_dictionary, "Returns a dictionary containing a detailed description of the built-in output formats and default encoders for videos");
 }

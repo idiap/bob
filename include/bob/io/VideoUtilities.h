@@ -94,6 +94,11 @@ typedef CodecID AVCodecID;
 namespace bob { namespace io { namespace detail { namespace ffmpeg {
 
   /**
+   * Breaks a list of words separated by commands into a word list
+   */
+  void tokenize_csv(const char* what, std::vector<std::string>& values);
+
+  /**
    * Returns a list of installed codecs, with their capabilities
    */
   void codecs_installed (std::map<std::string, const AVCodec*>& installed);

@@ -26,6 +26,14 @@
 
 namespace ffmpeg = bob::io::detail::ffmpeg;
 
+void ffmpeg::tokenize_csv(const char* what, std::vector<std::string>& values) {
+  if (!what) return;
+  boost::char_separator<char> sep(",");
+  std::string w(what);
+  boost::tokenizer< boost::char_separator<char> > tok(w, sep);
+  for (auto k = tok.begin(); k != tok.end(); ++k) values.push_back(*k);
+}
+
 void ffmpeg::codecs_installed (std::map<std::string, const AVCodec*>& installed) {
   for (AVCodec* it = av_codec_next(0); it != 0; it = av_codec_next(it) ) {
 # if LIBAVCODEC_VERSION_MAJOR >= 53
@@ -34,7 +42,7 @@ void ffmpeg::codecs_installed (std::map<std::string, const AVCodec*>& installed)
     if (it->type == CODEC_TYPE_VIDEO) {
 # endif
       auto exists = installed.find(std::string(it->name));
-      if (exists != installed.end()) {
+      if (exists != installed.end() && exists->second->id != it->id) {
         bob::core::warn << "Not overriding video codec \"" << it->long_name 
           << "\" (" << it->name << ")" << std::endl;
       }
@@ -45,28 +53,13 @@ void ffmpeg::codecs_installed (std::map<std::string, const AVCodec*>& installed)
 
 void ffmpeg::iformats_installed (std::map<std::string, AVInputFormat*>& installed) {
   for (AVInputFormat* it = av_iformat_next(0); it != 0; it = av_iformat_next(it) ) {
-
-    boost::char_separator<char> sep(",");
-    std::string name(it->name);
-    boost::tokenizer< boost::char_separator<char> > tok(name, sep);
-    for (auto k = tok.begin(); k != tok.end(); ++k) {
+    std::vector<std::string> names;
+    ffmpeg::tokenize_csv(it->name, names);
+    for (auto k = names.begin(); k != names.end(); ++k) {
       auto exists = installed.find(*k);
       if (exists != installed.end()) {
         bob::core::warn << "Not overriding input video format \"" 
           << it->long_name << "\" (" << *k 
-          << ") which is already assigned to \"" << exists->second->long_name 
-          << "\"" << std::endl;
-      }
-      else installed[*k] = it;
-    }
-    if (!it->extensions) continue;
-    std::string extensions(it->extensions);
-    boost::tokenizer< boost::char_separator<char> > tok2(extensions, sep);
-    for (auto k = tok2.begin(); k != tok2.end(); ++k) {
-      auto exists = installed.find(*k);
-      if (exists != installed.end()) {
-        bob::core::warn << "Not overriding input video format \"" 
-          << it->long_name << "\" (" << *k
           << ") which is already assigned to \"" << exists->second->long_name 
           << "\"" << std::endl;
       }
@@ -78,23 +71,9 @@ void ffmpeg::iformats_installed (std::map<std::string, AVInputFormat*>& installe
 void ffmpeg::oformats_installed (std::map<std::string, AVOutputFormat*>& installed) {
   for (AVOutputFormat* it = av_oformat_next(0); it != 0; it = av_oformat_next(it) ) {
     if (!it->video_codec) continue;
-    boost::char_separator<char> sep(",");
-    std::string name(it->name);
-    boost::tokenizer< boost::char_separator<char> > tok(name, sep);
-    for (auto k = tok.begin(); k != tok.end(); ++k) {
-      auto exists = installed.find(*k);
-      if (exists != installed.end()) {
-        bob::core::warn << "Not overriding output video format \""
-          << it->long_name << "\" (" << *k 
-          << ") which is already assigned to \"" << exists->second->long_name 
-          << "\"" << std::endl;
-      }
-      else installed[*k] = it;
-    }
-    if (!it->extensions) continue;
-    std::string extensions(it->extensions);
-    boost::tokenizer< boost::char_separator<char> > tok2(extensions, sep);
-    for (auto k = tok2.begin(); k != tok2.end(); ++k) {
+    std::vector<std::string> names;
+    ffmpeg::tokenize_csv(it->name, names);
+    for (auto k = names.begin(); k != names.end(); ++k) {
       auto exists = installed.find(*k);
       if (exists != installed.end()) {
         bob::core::warn << "Not overriding output video format \""

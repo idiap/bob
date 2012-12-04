@@ -75,6 +75,12 @@ void io::CodecRegistry::registerExtension(const std::string& extension,
 
 }
 
+bool io::CodecRegistry::isRegistered(const std::string& extension) {
+  std::string lower_extension = extension;
+  std::transform(extension.begin(), extension.end(), lower_extension.begin(), ::tolower);
+  return (s_extension2codec.find(lower_extension) != s_extension2codec.end());
+}
+
 io::file_factory_t io::CodecRegistry::findByExtension
 (const std::string& extension) {
 
