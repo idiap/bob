@@ -32,7 +32,7 @@ namespace bob
   namespace trainer 
   {
   
-    class TwoDPCATrainer: public Trainer<bob::machine::TwoDPCAMachine, blitz::Array<double,2> >
+    class TwoDPCATrainer: public Trainer<bob::machine::TwoDPCAMachine, blitz::Array<double,3> >
     {
       public:
         TwoDPCATrainer() {}
