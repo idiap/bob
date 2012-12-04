@@ -1,5 +1,5 @@
 /**
- * @file io/cxx/VideoWriter.cc
+ * @file io/cxx/VideoWriter2.cc
  * @date Wed 28 Nov 2012 13:51:58 CET
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
