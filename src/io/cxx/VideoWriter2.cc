@@ -119,13 +119,14 @@ static void deallocate_stream(AVStream* s) {
 }
 
 #if FFMPEG_VERSION_INT >= 0x000900
+
 static AVStream* allocate_stream(
     const boost::filesystem::path& filename,
     boost::shared_ptr<AVFormatContext> fmtctxt,
     const std::string& codecname,
     size_t height, size_t width,
-    float framerate, float bitrate, size_t gop
-    AVCodec* codec) {
+    float framerate, float bitrate, size_t gop,
+    AVCodec*& codec) {
 
   AVStream* retval = avformat_new_stream(fmtctxt.get(), codec);
 
