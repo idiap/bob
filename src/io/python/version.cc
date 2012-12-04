@@ -27,6 +27,7 @@
 #include <boost/python.hpp>
 #include <boost/format.hpp>
 #include <cstdlib>
+#include <string>
 
 extern "C" {
 #include <hdf5.h>
@@ -107,7 +108,20 @@ static str libpng_version() {
  * Libtiff version
  */
 static str libtiff_version() {
-  return str(TIFFGetVersion());
+  static const std::string beg_str("LIBTIFF, Version ");
+  static const size_t beg_len = beg_str.size();
+  std::string vtiff(TIFFGetVersion());
+
+  // Remove first part if it starts with "LIBTIFF, Version "
+  if(vtiff.compare(0, beg_len, beg_str) == 0)
+    vtiff = vtiff.substr(beg_len); 
+
+  // Remove multiple (copyright) lines if any
+  size_t end_line = vtiff.find("\n");
+  if(end_line != std::string::npos)
+    vtiff = vtiff.substr(0,end_line); 
+
+  return str(vtiff);
 }
 
 /**
