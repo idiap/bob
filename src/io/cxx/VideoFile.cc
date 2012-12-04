@@ -29,6 +29,9 @@
 #include "bob/io/CodecRegistry.h"
 #include "bob/io/Video.h"
 
+extern "C" {
+#include <libavformat/avformat.h>
+}
 namespace fs = boost::filesystem;
 namespace io = bob::io;
 namespace ca = bob::core::array;
@@ -180,6 +183,9 @@ make_file (const std::string& path, char mode) {
  */
 static bool register_codec() {
   static const char* descr = "Video file (FFmpeg)";
+
+  /* Initialize libavcodec, and register all codecs and formats. */
+  av_register_all();
 
   boost::shared_ptr<io::CodecRegistry> instance =
     io::CodecRegistry::instance();
