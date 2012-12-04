@@ -279,6 +279,21 @@ static AVFrame* allocate_frame(const boost::filesystem::path& filename,
     m % size % filename.string();
   }
 
+  /**
+   * This method will distributed the allocated memory for "picture_buf" into
+   * the several frame "data" pointers. This will make sure that, for example,
+   * multi-plane formats have the necessary amount of space pre-set and
+   * indicated for each plane in each of the "data" placeholders (4 at total).
+   *
+   * For example, for the YUV420P format (1 byte per Y value and 0.5 byte per U
+   * and V values), it will make sure that the data allocated for picture_buf
+   * is split following the correct plane proportion 2:1:1 for each plane
+   * Y:U:V.
+   *
+   * For an RGB24 (packed RGB) format, it will make sure the linesize is set to
+   * 3 times the image width so it can pack the R, G and B bytes together in a
+   * single line.
+   */
   avpicture_fill((AVPicture *)retval, picture_buf, pixfmt,
       stream->codec->width, stream->codec->height);
 
@@ -511,7 +526,6 @@ static void bob_image_to_context(const blitz::Array<uint8_t,3>& data,
   if (stream->codec->pix_fmt != PIX_FMT_RGB24) {
     //transpose Bob data from "planar" RGB24 to "packed" RGB24 on temporary
     //frame space
-    tmp_frame->linesize[0] = width*3;
     blitz::Array<uint8_t,3> ordered(tmp_frame->data[0],
         blitz::shape(height, width, 3), blitz::neverDeleteData);
     ordered = const_cast<blitz::Array<uint8_t,3>&>(data).transpose(1,2,0);

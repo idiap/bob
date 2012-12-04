@@ -101,7 +101,7 @@ if(FFMPEG_FOUND)
 
   if(FFMPEG_VERSION VERSION_LESS "0.8.0")
     list(APPEND src 
-      "VideoWriter.cc"
+      "VideoWriter1.cc"
       )
   else()
     list(APPEND src 
