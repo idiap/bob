@@ -212,7 +212,7 @@ static void list_formats(std::map<std::string, std::string>& formats) {
  * Takes care of codec registration per se.
  */
 static bool register_codec() {
-  static std::set<std::string> avoid = {
+  static std::string tmp[] = {
     ".bmp",
     ".dpx",
     ".jpeg", 
@@ -232,6 +232,7 @@ static bool register_codec() {
     ".tif", 
     ".tiff"
   };
+  static std::set<std::string> avoid(tmp, tmp+sizeof(tmp) / sizeof(tmp[0]));
 
   /* Initialize libavcodec, and register all codecs and formats. */
   av_register_all();
