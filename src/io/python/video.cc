@@ -334,4 +334,5 @@ void bind_io_video() {
   def("describe_video_encoder", &describe_encoder_by_name, "Describes a given video encoder (codec) starting with a name");
   def("describe_video_decoder", &describe_decoder_by_name, "Describes a given video decoder (codec) starting with a name");
   def("videowriter_formats", &oformat_dictionary, "Returns a dictionary containing a detailed description of the built-in output formats and default encoders for videos");
+  scope().attr("__ffmpeg_version_int__") = FFMPEG_VERSION_INT;
 }

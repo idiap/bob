@@ -26,18 +26,24 @@ import pkg_resources
 from nose.plugins.skip import SkipTest
 import functools
 
-def ffmpeg_found(test):
-  '''Decorator to check if the FFMPEG is available before enabling a test'''
+def ffmpeg_found(version_geq=None):
+  '''Decorator to check if a codec is available before enabling a test'''
 
-  @functools.wraps(test)
-  def wrapper(*args, **kwargs):
-    try:
-      from .._io import VideoReader, VideoWriter
-      return test(*args, **kwargs)
-    except ImportError:
-      raise SkipTest('FFMpeg was not available at compile time')
+  def test_wrapper(test):
 
-  return wrapper
+    @functools.wraps(test)
+    def wrapper(*args, **kwargs):
+      try:
+        from .._io import __ffmpeg_version_int__
+        if version_geq is not None and __ffmpeg_version_int__ < version_geq:
+          raise SkipTest('FFMpeg version (0x%08x) is smaller than required for this test (0x%08x)' % (__ffmpeg_version_int__, version_geq))
+        return test(*args, **kwargs)
+      except ImportError:
+        raise SkipTest('FFMpeg was not available at compile time')
+
+    return wrapper
+
+  return test_wrapper
 
 def codec_available(codec):
   '''Decorator to check if a codec is available before enabling a test'''
@@ -76,7 +82,7 @@ import bob
 class VideoTest(unittest.TestCase):
   """Performs various combined read/write tests on video files"""
   
-  @ffmpeg_found
+  @ffmpeg_found()
   def test01_CanOpen(self):
 
     # This test opens and verifies some properties of the test video available.
@@ -90,7 +96,7 @@ class VideoTest(unittest.TestCase):
     self.assertEqual(len(v), 375)
     self.assertEqual(v.codec_name, 'mjpeg')
 
-  @ffmpeg_found
+  @ffmpeg_found()
   def test02_CanReadImages(self):
 
     # This test shows how you can read image frames from a VideoReader
@@ -106,7 +112,7 @@ class VideoTest(unittest.TestCase):
       self.assertEqual(frame.shape[1], 240) #height
       self.assertEqual(frame.shape[2], 320) #width
 
-  @ffmpeg_found
+  @ffmpeg_found()
   def test03_CanGetSpecificFrames(self):
 
     # This test shows how to get specific frames from a VideoReader
@@ -135,7 +141,7 @@ class VideoTest(unittest.TestCase):
     # the last frame in the sequence is frame 27 as you can check
     self.assertTrue( numpy.array_equal(f18_30[-1], f27) )
 
-  @ffmpeg_found
+  @ffmpeg_found()
   def test04_CanWriteVideo(self):
 
     # This test reads all frames in sequence from a initial video and records
@@ -163,7 +169,7 @@ class VideoTest(unittest.TestCase):
 
     del iv2 # triggers closing of the input video stream
 
-  @ffmpeg_found
+  @ffmpeg_found()
   def test05_CanUseArrayInterface(self):
 
     # This shows you can use the array interface to read an entire video
@@ -174,7 +180,7 @@ class VideoTest(unittest.TestCase):
     for frame_id, frame in zip(range(array.shape[0]), iv.__iter__()):
       self.assertTrue ( numpy.array_equal(array[frame_id,:,:,:], frame) )
 
-  @ffmpeg_found
+  @ffmpeg_found()
   def test06_CanIterateOnTheSpot(self):
 
     # This test shows how you can read image frames from a VideoReader created
@@ -198,8 +204,10 @@ class VideoTest(unittest.TestCase):
       height = 50
       frames = 30
       framerate = 30 #Hz
-      # use a lossless codec for this test
-      outv = bob.io.VideoWriter(fname, height, width, framerate, codec=codec)
+      if codec:
+        outv = bob.io.VideoWriter(fname, height, width, framerate, codec=codec)
+      else:
+        outv = bob.io.VideoWriter(fname, height, width, framerate)
       orig = []
       for i in range(0, frames):
         newframe = numpy.random.random_integers(0,255,(3,50,50))
@@ -234,7 +242,10 @@ class VideoTest(unittest.TestCase):
       height = 50
       frames = 30
       framerate = 30 #Hz
-      outv = bob.io.VideoWriter(fname, height, width, framerate, codec=codec)
+      if codec:
+        outv = bob.io.VideoWriter(fname, height, width, framerate, codec=codec)
+      else:
+        outv = bob.io.VideoWriter(fname, height, width, framerate)
       orig = []
       for i in range(0, frames):
         newframe = numpy.random.random_integers(0,255,(3,50,50))
@@ -268,7 +279,10 @@ class VideoTest(unittest.TestCase):
       height = 50
       frames = 30
       framerate = 30 #Hz
-      outv = bob.io.VideoWriter(fname, height, width, framerate, codec=codec)
+      if codec:
+        outv = bob.io.VideoWriter(fname, height, width, framerate, codec=codec)
+      else:
+        outv = bob.io.VideoWriter(fname, height, width, framerate)
       orig = []
       for i in range(0, frames):
         newframe = numpy.random.random_integers(0,255,(3,50,50))
@@ -291,29 +305,29 @@ class VideoTest(unittest.TestCase):
 
       if os.path.exists(fname): os.unlink(fname)
 
-  @ffmpeg_found
-  def test07_RandomReadWrite(self):
+  @ffmpeg_found()
+  def xtest07_RandomReadWrite(self):
     self.randomReadWrite("")
     self.randomReadTwice("")
     self.randomReadTwice2("")
       
-  @ffmpeg_found
+  @ffmpeg_found(0x000800)
   @codec_available('mpeg4')
-  def test08_RandomReadWrite_mpeg4(self):
+  def xtest08_RandomReadWrite_mpeg4(self):
     self.randomReadWrite("mpeg4")
     self.randomReadTwice("mpeg4")
     self.randomReadTwice2("mpeg4")
       
-  @ffmpeg_found
+  @ffmpeg_found(0x000800)
   @codec_available('ffv1')
-  def test09_RandomReadWrite_ffv1(self):
+  def xtest09_RandomReadWrite_ffv1(self):
     self.randomReadWrite("ffv1")
     self.randomReadTwice("ffv1")
     self.randomReadTwice2("ffv1")
       
-  @ffmpeg_found
+  @ffmpeg_found(0x000800)
   @codec_available('h264')
-  def test10_RandomReadWrite_h264(self):
+  def xtest10_RandomReadWrite_h264(self):
     self.randomReadWrite("h264")
     self.randomReadTwice("h264")
     self.randomReadTwice2("h264")
