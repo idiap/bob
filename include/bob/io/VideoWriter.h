@@ -24,14 +24,12 @@
 #ifndef BOB_IO_VIDEOWRITER_H
 #define BOB_IO_VIDEOWRITER_H
 
-extern "C" {
-#include <libavformat/version.h>
-}
+#include "bob/io/VideoUtilities.h"
 
-#if LIBAVFORMAT_VERSION_MAJOR >= 53 && LIBAVFORMAT_VERSION_MINOR >= 5
-#include "bob/io/VideoWriter2.h"
-#else
+#if FFMPEG_VERSION_INT < 0x000800
 #include "bob/io/VideoWriter1.h"
+#else
+#include "bob/io/VideoWriter2.h"
 #endif
 
 #endif /* BOB_IO_VIDEOWRITER_H */

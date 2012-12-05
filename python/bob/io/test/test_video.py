@@ -39,6 +39,22 @@ def ffmpeg_found(test):
 
   return wrapper
 
+def codec_available(codec):
+  '''Decorator to check if a codec is available before enabling a test'''
+
+  def test_wrapper(test):
+
+    @functools.wraps(test)
+    def wrapper(*args, **kwargs):
+      d = bob.io.video_codecs()
+      if d.has_key(codec) and d[codec]['encode'] and d[codec]['decode']:
+        return test(*args, **kwargs)
+      else:
+        raise SkipTest('A full codec for "%s" is not installed with FFmpeg' % codec)
+
+    return wrapper
+
+  return test_wrapper
 
 def F(f):
   """Returns the test file on the "data" subdirectory"""
@@ -169,3 +185,135 @@ class VideoTest(unittest.TestCase):
       self.assertEqual(frame.shape[0], 3) #color-bands (RGB)
       self.assertEqual(frame.shape[1], 240) #height
       self.assertEqual(frame.shape[2], 320) #width
+
+  def randomReadWrite(self, codec=""):
+      
+    # This test shows we can do a random encoding/decoding and get video
+    # readout right
+
+    fname = get_tempfilename(suffix=".avi")
+  
+    try:
+      width = 50 
+      height = 50
+      frames = 30
+      framerate = 30 #Hz
+      # use a lossless codec for this test
+      outv = bob.io.VideoWriter(fname, height, width, framerate, codec=codec)
+      orig = []
+      for i in range(0, frames):
+        newframe = numpy.random.random_integers(0,255,(3,50,50))
+        outv.append(newframe.astype('uint8'))
+        orig.append(newframe.astype('uint8'))
+      outv.close()
+
+      input = bob.io.VideoReader(fname)
+      reloaded = input.load()
+
+      self.assertEqual( reloaded.shape[1:], orig[0].shape )
+      self.assertEqual( len(reloaded), len(orig) )
+
+      for i in range(len(reloaded)):
+        diff = abs(reloaded[i].astype('float32')-orig[i].astype('float32'))
+        m = numpy.mean(diff)
+        self.assertTrue(m < 3.0) # average difference is less than 3 gray levels
+
+    finally:
+
+      if os.path.exists(fname): os.unlink(fname)
+
+  def randomReadTwice(self, codec=""):
+
+    # This test shows if we can read twice the same video and get the 
+    # same results all the time.
+
+    fname = get_tempfilename(suffix=".avi")
+  
+    try:
+      width = 50 
+      height = 50
+      frames = 30
+      framerate = 30 #Hz
+      outv = bob.io.VideoWriter(fname, height, width, framerate, codec=codec)
+      orig = []
+      for i in range(0, frames):
+        newframe = numpy.random.random_integers(0,255,(3,50,50))
+        outv.append(newframe.astype('uint8'))
+        orig.append(newframe.astype('uint8'))
+      outv.close()
+
+      input1 = bob.io.load(fname)
+      input2 = bob.io.load(fname)
+
+      self.assertEqual( input1.shape, input2.shape )
+
+      for i in range(len(input1)):
+        diff = abs(input1[i].astype('float32')-input2[i].astype('float32'))
+        m = numpy.mean(diff)
+        self.assertEqual(m, 0.0)
+
+    finally:
+
+      if os.path.exists(fname): os.unlink(fname)
+
+  def randomReadTwice2(self, codec=""):
+
+    # This test shows if we can read twice the same video and get the 
+    # same results all the time.
+
+    fname = get_tempfilename(suffix=".avi")
+  
+    try:
+      width = 50 
+      height = 50
+      frames = 30
+      framerate = 30 #Hz
+      outv = bob.io.VideoWriter(fname, height, width, framerate, codec=codec)
+      orig = []
+      for i in range(0, frames):
+        newframe = numpy.random.random_integers(0,255,(3,50,50))
+        outv.append(newframe.astype('uint8'))
+        orig.append(newframe.astype('uint8'))
+      outv.close()
+
+      inv = bob.io.VideoReader(fname)
+      input1 = inv.load()
+      input2 = bob.io.load(fname)
+
+      self.assertEqual( input1.shape, input2.shape )
+
+      for i in range(len(input1)):
+        diff = abs(input1[i].astype('float32')-input2[i].astype('float32'))
+        m = numpy.mean(diff)
+        self.assertEqual(m, 0.0)
+
+    finally:
+
+      if os.path.exists(fname): os.unlink(fname)
+
+  @ffmpeg_found
+  def test07_RandomReadWrite(self):
+    self.randomReadWrite("")
+    self.randomReadTwice("")
+    self.randomReadTwice2("")
+      
+  @ffmpeg_found
+  @codec_available('mpeg4')
+  def test08_RandomReadWrite_mpeg4(self):
+    self.randomReadWrite("mpeg4")
+    self.randomReadTwice("mpeg4")
+    self.randomReadTwice2("mpeg4")
+      
+  @ffmpeg_found
+  @codec_available('ffv1')
+  def test09_RandomReadWrite_ffv1(self):
+    self.randomReadWrite("ffv1")
+    self.randomReadTwice("ffv1")
+    self.randomReadTwice2("ffv1")
+      
+  @ffmpeg_found
+  @codec_available('h264')
+  def test10_RandomReadWrite_h264(self):
+    self.randomReadWrite("h264")
+    self.randomReadTwice("h264")
+    self.randomReadTwice2("h264")

@@ -36,6 +36,7 @@
 
 #include <map>
 #include <vector>
+#include <string>
 
 extern "C" {
 #include <libavcodec/avcodec.h>

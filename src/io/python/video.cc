@@ -185,9 +185,11 @@ static object describe_codec(const AVCodec* codec) {
   retval["specific_framerates_hz"] = tuple(rates);
 
   // get codec capabilities
+# if FFMPEG_VERSION_INT >= 0x000800
   retval["lossless"] = (bool)(codec->capabilities & CODEC_CAP_LOSSLESS);
-  retval["hardware_accelerated"] = (bool)(codec->capabilities & CODEC_CAP_HWACCEL);
   retval["experimental"] = (bool)(codec->capabilities & CODEC_CAP_EXPERIMENTAL);
+# endif
+  retval["hardware_accelerated"] = (bool)(codec->capabilities & CODEC_CAP_HWACCEL);
   retval["encode"] = (bool)(avcodec_find_encoder(codec->id));
   retval["decode"] = (bool)(avcodec_find_decoder(codec->id));
   
