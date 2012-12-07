@@ -185,10 +185,16 @@ static object describe_codec(const AVCodec* codec) {
   retval["specific_framerates_hz"] = tuple(rates);
 
   // get codec capabilities
-# if FFMPEG_VERSION_INT >= 0x000800
+# ifdef CODEC_CAP_LOSSLESS
   retval["lossless"] = (bool)(codec->capabilities & CODEC_CAP_LOSSLESS);
+# endif
+# ifdef CODEC_CAP_EXPERIMENTAL
   retval["experimental"] = (bool)(codec->capabilities & CODEC_CAP_EXPERIMENTAL);
+# endif
+# ifdef CODEC_CAP_DELAY
   retval["delay"] = (bool)(codec->capabilities & CODEC_CAP_DELAY);
+# endif
+# ifdef CODEC_CAP_HWACCEL
   retval["hardware_accelerated"] = (bool)(codec->capabilities & CODEC_CAP_HWACCEL);
 # endif
   retval["encode"] = (bool)(avcodec_find_encoder(codec->id));
@@ -335,5 +341,4 @@ void bind_io_video() {
   def("describe_video_encoder", &describe_encoder_by_name, "Describes a given video encoder (codec) starting with a name");
   def("describe_video_decoder", &describe_decoder_by_name, "Describes a given video decoder (codec) starting with a name");
   def("videowriter_formats", &oformat_dictionary, "Returns a dictionary containing a detailed description of the built-in output formats and default encoders for videos");
-  scope().attr("__ffmpeg_version_int__") = FFMPEG_VERSION_INT;
 }
