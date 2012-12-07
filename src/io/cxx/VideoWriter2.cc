@@ -681,7 +681,7 @@ void bob::io::VideoWriter::write_video_frame (const blitz::Array<uint8_t,3>& dat
       pkt.size         = out_size;
 
       /* Write the compressed frame to the media file. */
-      ok = av_interleaved_write_frame(m_format_context.get(), &pkt);
+      int ok = av_interleaved_write_frame(m_format_context.get(), &pkt);
       if (ok && (ok != AVERROR(EINVAL))) {
         boost::format m("ffmpeg::av_interleaved_write_frame() failed: failed to write video frame (error = %d) while encoding file `%s'");
         m % ok % m_filename.string();
