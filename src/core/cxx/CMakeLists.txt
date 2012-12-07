@@ -8,7 +8,7 @@ set(incdir ${cxx_incdir})
 string(TOLOWER "${CMAKE_BUILD_TYPE}" LOWER_BUILD_TYPE)
 # also add a dependency to Blitz in debug mode (needed to enable the -BZ_BLITZ debugging mode)
 if("${LOWER_BUILD_TYPE}" STREQUAL "debug")
-  set(shared ${shared} ${Blitz_LIBRARIES})
+  set(shared ${shared} ${Blitz_RESOLVED_LIBRARY})
 endif()
 
 # This defines the list of source files inside this package.
