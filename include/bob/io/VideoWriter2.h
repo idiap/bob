@@ -195,6 +195,12 @@ namespace bob { namespace io {
        * Writes a single video frame into the video file.
        */
       void write_video_frame(const blitz::Array<uint8_t,3>& data);
+      
+      /**
+       * Flushes remaining frames that may be stuck on the encoder, when
+       * it has a delayed insertion capability.
+       */
+      void flush_encoder();
     
     private: //not implemented
 

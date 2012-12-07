@@ -453,7 +453,57 @@ bob::io::VideoWriter::~VideoWriter() {
   if (m_opened) close();
 }
 
+void bob::io::VideoWriter::flush_encoder () {
+
+#if FFMPEG_VERSION_INT >= 0x000b00 // FFmpeg version >= 0.11.0
+    
+  //We only need to flush codecs that have delayed data processing
+  if (!(m_codec->capabilities & CODEC_CAP_DELAY)) return;
+
+  while (true) {
+
+    /* encode the image */
+    AVPacket pkt;
+    av_init_packet(&pkt);
+
+    pkt.data = 0; // packet data will be allocated by the encoder
+    pkt.size = 0;
+
+    int got_output;
+    int ok = avcodec_encode_video2(m_stream->codec, &pkt, 0, &got_output);
+
+    if (ok < 0) {
+      boost::format m("ffmpeg::avcodec_encode_video2() failed: failed to encode video frame (error = %d) while writing to file `%s'");
+      m % ok % m_filename.string();
+      throw std::runtime_error(m.str());
+    }
+
+    /* If size is zero, it means the image was buffered. */
+    else if (got_output) {
+      if (m_stream->codec->coded_frame->key_frame) pkt.flags |= AV_PKT_FLAG_KEY;
+      pkt.stream_index = m_stream->index;
+
+      /* Write the compressed frame to the media file. */
+      ok = av_interleaved_write_frame(m_format_context.get(), &pkt);
+      if (ok && (ok != AVERROR(EINVAL))) {
+        boost::format m("ffmpeg::av_interleaved_write_frame() failed: failed to encode video frame (error = %d) while flushing remaining frames to file `%s'");
+        m % ok % m_filename.string();
+        throw std::runtime_error(m.str());
+      }
+    }
+
+    /* encoded the video, but no pkt got back => video is flushed */
+    else if (ok == 0) break;
+
+  }
+
+#endif
+}
+
 void bob::io::VideoWriter::close() {
+
+  /* Flushes the current encoder if necessary */
+  flush_encoder();
 
   /* Write the trailer, if any. The trailer must be written before you
    * close the CodecContexts open when you wrote the header; otherwise
@@ -548,8 +598,6 @@ static void bob_image_to_context(const blitz::Array<uint8_t,3>& data,
  
 void bob::io::VideoWriter::write_video_frame (const blitz::Array<uint8_t,3>& data) {
 
-  int ok; ///< error status output saved here sometimes during this routine
-
   bob_image_to_context(data, m_stream, m_swscaler, m_context_frame, 
       m_packed_rgb_frame);
 
@@ -564,7 +612,12 @@ void bob::io::VideoWriter::write_video_frame (const blitz::Array<uint8_t,3>& dat
     pkt.data          = m_context_frame->data[0];
     pkt.size          = sizeof(AVPicture);
 
-    ok = av_interleaved_write_frame(m_format_context.get(), &pkt);
+    int ok = av_interleaved_write_frame(m_format_context.get(), &pkt);
+    if (ok && (ok != AVERROR(EINVAL))) {
+      boost::format m("ffmpeg::av_interleaved_write_frame() failed: failed to write video frame (error = %d) while encoding file `%s'");
+      m % ok % m_filename.string();
+      throw std::runtime_error(m.str());
+    }
 
   }
 #if FFMPEG_VERSION_INT >= 0x000b00 // FFmpeg version >= 0.11.0
@@ -579,8 +632,7 @@ void bob::io::VideoWriter::write_video_frame (const blitz::Array<uint8_t,3>& dat
     pkt.size = 0;
 
     int got_output;
-    ok = avcodec_encode_video2(m_stream->codec, &pkt, m_context_frame.get(), &got_output);
-
+    int ok = avcodec_encode_video2(m_stream->codec, &pkt, m_context_frame.get(), &got_output);
     if (ok < 0) {
       boost::format m("ffmpeg::avcodec_encode_video2() failed: failed to encode video frame (error = %d) while writing to file `%s'");
       m % ok % m_filename.string();
@@ -594,10 +646,13 @@ void bob::io::VideoWriter::write_video_frame (const blitz::Array<uint8_t,3>& dat
 
       /* Write the compressed frame to the media file. */
       ok = av_interleaved_write_frame(m_format_context.get(), &pkt);
+      if (ok && (ok != AVERROR(EINVAL))) {
+        boost::format m("ffmpeg::av_interleaved_write_frame() failed: failed to write video frame (error = %d) while encoding file `%s'");
+        m % ok % m_filename.string();
+        throw std::runtime_error(m.str());
+      }
+
     } 
-    else {
-      ok = 0;
-    }
 
   }
 
@@ -627,20 +682,16 @@ void bob::io::VideoWriter::write_video_frame (const blitz::Array<uint8_t,3>& dat
 
       /* Write the compressed frame to the media file. */
       ok = av_interleaved_write_frame(m_format_context.get(), &pkt);
+      if (ok && (ok != AVERROR(EINVAL))) {
+        boost::format m("ffmpeg::av_interleaved_write_frame() failed: failed to write video frame (error = %d) while encoding file `%s'");
+        m % ok % m_filename.string();
+        throw std::runtime_error(m.str());
+      }
 
-    } 
-    else {
-      ok = 0;
     }
   }
 
 #endif // FFmpeg version >= 0.11.0
-
-  if (ok != 0) {
-    boost::format m("ffmpeg failed writing video frame (error = %d) while writing to file `%s'");
-    m % ok % m_filename.string();
-    throw std::runtime_error(m.str());
-  }
 
   // Ok, update frame counters
   ++m_current_frame;
