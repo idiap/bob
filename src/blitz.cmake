@@ -11,48 +11,6 @@ include(FindPkgConfig)
 
 execute_process(COMMAND ${PKG_CONFIG_EXECUTABLE} blitz --silence-errors --modversion OUTPUT_VARIABLE PKG_CONFIG_blitz_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-# Resolves library locations for the "broken" pkg-config cmake bridge
-#
-# lib: The library name, like "z"
-# path: Library path to search for lib
-# l: The list where we should append the resolved library path
-#
-# Raises a WARNING if it cannot resolve the library using the given
-# path. Raises a FATAL_ERROR if it cannot resolve the library path even
-# using the standard cmake search paths.
-macro(resolve_library library dirs l)
-  if(${dirs})
-    foreach(dir "${dirs}")
-      find_library(newlib ${library} NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH HINTS ${dir})
-      if (newlib)
-        break()
-      endif()
-    endforeach()
-
-    if(NOT newlib)
-      message(WARNING "Could not resolve library path for 'lib${library}' using '${dirs}'. Trying with the system paths...")
-    endif()
-  endif()
-
-  if(NOT newlib)
-    foreach(dir "${dirs}")
-      find_library(newlib ${library} HINTS ${dir})
-      if (newlib)
-        break()
-      endif()
-    endforeach()
-  endif()
-
-  if(NOT newlib)
-    message(WARNING "Could not resolve library path for 'lib${library}' using '${dirs}' or cmake's standard paths. Stopping here.")
-  endif()
-
-  # if you survived to this point, just append.
-  list(APPEND ${l} ${newlib})
-  unset(newlib CACHE)
-endmacro()
-
-
 if(PKG_CONFIG_blitz_VERSION)
   #use pkg-config to find blitz
   if(CMAKE_VERSION VERSION_LESS "2.8.2")
