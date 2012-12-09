@@ -1,7 +1,7 @@
 project(bob_measure)
 
 # This defines the dependencies of this package
-set(bob_deps "bob_core")
+set(bob_deps "bob_core;bob_math")
 set(shared "${bob_deps}")
 set(incdir ${cxx_incdir})
 
