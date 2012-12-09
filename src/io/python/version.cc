@@ -55,7 +55,9 @@ extern "C" {
 #include <tiffio.h>
 }
 
+#if defined(HAVE_FFMPEG)
 #include "bob/io/VideoUtilities.h"
+#endif
 
 using namespace boost::python;
 
