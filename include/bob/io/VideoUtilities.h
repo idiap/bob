@@ -3,18 +3,8 @@
  * @date Mon 26 Nov 17:33:19 2012 
  *
  * @brief A simple set of utilities to query ffmpeg
- * ##
- * FFMpeg versions for your reference
- * ffmpeg | avformat   |  avcodec     
- * =======+============+=============
- * 0.5    | 52. 31.  0 | 52. 20.  1  
- * 0.6    | 52. 64.  2 | 52. 72.  2  
- * 0.7    | 52.111.  0 | 52.123.  0  
- * 0.8    | 53.  5.  0 | 53.  8.  0  
- * 0.9    | 53. 24.  2 | 53. 42.  4  
- * 0.10   | 53. 32.100 | 53. 61.100  
- * 0.11   | 54.  6.100 | 54. 23.100  
- * 1.0    | 54. 29.104 | 54. 59.100  
+ * To update this table, clone the FFmpeg git repository and use, e.g.:
+ * $ git show n0.6.4:libavcodec/avcodec.h | grep -e 'VERSION_' | grep define
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 

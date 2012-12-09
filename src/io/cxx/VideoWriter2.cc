@@ -32,13 +32,74 @@
 
 extern "C" {
 #include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
+#include <libavutil/opt.h>
 #include <libavutil/pixdesc.h>
+#include <libavutil/avstring.h>
+#include <libavutil/mathematics.h>
 }
 
 #if FFMPEG_VERSION_INT < 0x000b00
 #define FFMPEG_VIDEO_BUFFER_SIZE 200000
 #endif
+
+/**
+ * A copy of avformat_alloc_output_context2() from complete versions of ffmpeg
+ * - addresses a lack on Ubuntu 12.04 and 12.10
+ */
+static int bob_avformat_alloc_output_context2(AVFormatContext **avctx, AVOutputFormat *oformat,
+    const char *format, const char *filename)
+{
+  AVFormatContext *s = avformat_alloc_context();
+  int ret = 0;
+
+  *avctx = NULL;
+  if (!s)
+    goto nomem;
+
+  if (!oformat) {
+    if (format) {
+      oformat = av_guess_format(format, NULL, NULL);
+      if (!oformat) {
+        av_log(s, AV_LOG_ERROR, "Requested output format '%s' is not a suitable output format\n", format);
+        ret = AVERROR(EINVAL);
+        goto error;
+      }
+    } else {
+      oformat = av_guess_format(NULL, filename, NULL);
+      if (!oformat) {
+        ret = AVERROR(EINVAL);
+        av_log(s, AV_LOG_ERROR, "Unable to find a suitable output format for '%s'\n",
+            filename);
+        goto error;
+      }
+    }
+  }
+
+  s->oformat = oformat;
+  if (s->oformat->priv_data_size > 0) {
+    s->priv_data = av_mallocz(s->oformat->priv_data_size);
+    if (!s->priv_data)
+      goto nomem;
+    if (s->oformat->priv_class) {
+      *(const AVClass**)s->priv_data= s->oformat->priv_class;
+      av_opt_set_defaults(s->priv_data);
+    }
+  } else
+    s->priv_data = NULL;
+
+  if (filename)
+    av_strlcpy(s->filename, filename, sizeof(s->filename));
+  *avctx = s;
+  return 0;
+nomem:
+  av_log(s, AV_LOG_ERROR, "Out of memory\n");
+  ret = AVERROR(ENOMEM);
+error:
+  avformat_free_context(s);
+  return ret;
+}
 
 /**
  * Safely allocate the output format media context
@@ -49,14 +110,14 @@ static AVFormatContext* allocate_format_context(
   AVFormatContext* retval;
 
   if (formatname.size() != 0) {
-    avformat_alloc_output_context2(&retval, 0, formatname.c_str(), filename.string().c_str());
+    bob_avformat_alloc_output_context2(&retval, 0, formatname.c_str(), filename.string().c_str());
   }
   else {
-    avformat_alloc_output_context2(&retval, 0, 0, filename.string().c_str());
+    bob_avformat_alloc_output_context2(&retval, 0, 0, filename.string().c_str());
   }
 
   if (!retval) { //try mpeg encoder
-    avformat_alloc_output_context2(&retval, 0, "mpeg", filename.string().c_str());
+    bob_avformat_alloc_output_context2(&retval, 0, "mpeg", filename.string().c_str());
   }
 
   if (!retval) {

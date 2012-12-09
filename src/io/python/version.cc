@@ -55,6 +55,8 @@ extern "C" {
 #include <tiffio.h>
 }
 
+#include "bob/io/VideoUtilities.h"
+
 using namespace boost::python;
 
 /**
@@ -81,6 +83,12 @@ static dict ffmpeg_version() {
   v["avcodec"] = str(BOOST_PP_STRINGIZE(LIBAVFORMAT_VERSION));
   v["avutil"] = str(BOOST_PP_STRINGIZE(LIBAVUTIL_VERSION));
   v["swscale"] = str(BOOST_PP_STRINGIZE(LIBSWSCALE_VERSION));
+
+  boost::format f("%d.%d.%d");
+  f % ((0xff0000 & FFMPEG_VERSION_INT) >> 16)
+    % ((0xff00 & FFMPEG_VERSION_INT) >> 8)
+    % (0xff & FFMPEG_VERSION_INT);
+  v["estimated"] = str(f.str());
 #else
   v["ffmpeg"] = str("unavailable");
 #endif
