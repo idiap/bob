@@ -3,8 +3,6 @@
  * @date Mon 26 Nov 17:33:19 2012 
  *
  * @brief A simple set of utilities to query ffmpeg
- * To update this table, clone the FFmpeg git repository and use, e.g.:
- * $ git show n0.6.4:libavcodec/avcodec.h | grep -e 'VERSION_' | grep define
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
