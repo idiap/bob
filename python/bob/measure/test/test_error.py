@@ -188,3 +188,36 @@ class ErrorTest(unittest.TestCase):
     # save('nonsep-epc.hdf5', xy)
     xyref = bob.io.load(F('nonsep-epc.hdf5'))
     self.assertTrue( numpy.allclose(xy, xyref, atol=1e-15) )
+
+  def test05_rocch(self):
+
+    # This example will demonstrate and check the use of eer_rocch_threshold() to
+    # calculate the threshold that minimizes the EER on the ROC Convex Hull
+
+    # This test set is separable.
+    positives = bob.io.load(F('linsep-positives.hdf5'))
+    negatives = bob.io.load(F('linsep-negatives.hdf5'))
+    # References obtained using Bosaris 1.06
+    pmiss_pfa_ref = numpy.array([[0., 0, 1], [1, 0, 0]])
+    eer_ref = 0.
+    # Computes
+    pmiss_pfa = bob.measure.rocch(negatives, positives)
+    self.assertTrue( numpy.allclose(pmiss_pfa, pmiss_pfa_ref, atol=1e-15) )
+    eer = bob.measure.rocch2eer(pmiss_pfa)
+    self.assertTrue( abs(eer-eer_ref) < 1e-4)
+    eer = bob.measure.eer_rocch(negatives, positives)
+    self.assertTrue( abs(eer-eer_ref) < 1e-4)
+
+    # This test set is not separable.
+    positives = bob.io.load(F('nonsep-positives.hdf5'))
+    negatives = bob.io.load(F('nonsep-negatives.hdf5'))
+    # References obtained using Bosaris 1.06
+    pmiss_pfa_ref = numpy.array([[0, 0, 0.08, 0.12, 0.22, 0.48, 1.], [1., 0.68, 0.28, 0.1, 0.06, 0., 0.]])
+    eer_ref = 0.116363636363636
+    # Computes
+    pmiss_pfa = bob.measure.rocch(negatives, positives)
+    self.assertTrue( numpy.allclose(pmiss_pfa, pmiss_pfa_ref, atol=1e-15) )
+    eer = bob.measure.rocch2eer(pmiss_pfa)
+    self.assertTrue( abs(eer-eer_ref) < 1e-4)
+    eer = bob.measure.eer_rocch(negatives, positives)
+    self.assertTrue( abs(eer-eer_ref) < 1e-4)

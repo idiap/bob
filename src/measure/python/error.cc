@@ -47,6 +47,10 @@ static double bob_eer_threshold(bob::python::const_ndarray negatives, bob::pytho
   return bob::measure::eerThreshold(negatives.cast<double,1>(), positives.cast<double,1>());
 }
 
+static double bob_eer_rocch(bob::python::const_ndarray negatives, bob::python::const_ndarray positives){
+  return bob::measure::eerRocch(negatives.cast<double,1>(), positives.cast<double,1>());
+}
+
 static double bob_min_weighted_error_rate_threshold(bob::python::const_ndarray negatives, bob::python::const_ndarray positives, const double costs){
   return bob::measure::minWeightedErrorRateThreshold(negatives.cast<double,1>(), positives.cast<double,1>(), costs);
 }
@@ -71,6 +75,15 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(bob_frr_threshold_overloads, bob_frr_threshold, 
 static blitz::Array<double,2> bob_roc(bob::python::const_ndarray negatives, bob::python::const_ndarray positives, int n_points){
   return bob::measure::roc(negatives.cast<double,1>(), positives.cast<double,1>(), n_points);
 }
+
+static blitz::Array<double,2> bob_rocch(bob::python::const_ndarray negatives, bob::python::const_ndarray positives){
+  return bob::measure::rocch(negatives.cast<double,1>(), positives.cast<double,1>());
+}
+
+static double bob_rocch2eer(bob::python::const_ndarray pmiss_pfa){
+  return bob::measure::rocch2eer(pmiss_pfa.cast<double,2>());
+}
+
 
 static blitz::Array<double,2> bob_roc_for_far(bob::python::const_ndarray negatives, bob::python::const_ndarray positives, bob::python::const_ndarray far_list){
   return bob::measure::roc_for_far(negatives.cast<double,1>(), positives.cast<double,1>(), far_list.cast<double,1>());
@@ -114,6 +127,13 @@ void bind_measure_error() {
     "Calculates the threshold that is as close as possible to the equal-error-rate (EER) given the input data. The EER should be the point where the FAR equals the FRR. Graphically, this would be equivalent to the intersection between the ROC (or DET) curves and the identity."
   );
 
+ def(
+    "eer_rocch",
+    &bob_eer_rocch,
+    (arg("negatives"), arg("positives")),
+    "Calculates the equal-error-rate (EER) given the input data, on the ROC Convex Hull as done in the Bosaris toolkit (https://sites.google.com/site/bosaristoolkit/)."
+  );
+
   def(
     "min_weighted_error_rate_threshold",
     &bob_min_weighted_error_rate_threshold,
@@ -151,6 +171,20 @@ void bind_measure_error() {
     &bob_roc,
     (arg("negatives"), arg("positives"), arg("n_points")),
     "Calculates the ROC curve given a set of positive and negative scores and a desired number of points. Returns a two-dimensional blitz::Array of doubles that express the X (FRR) and Y (FAR) coordinates in this order. The points in which the ROC curve are calculated are distributed uniformily in the range [min(negatives, positives), max(negatives, positives)]."
+  );
+
+  def(
+    "rocch",
+    &bob_rocch,
+    (arg("negatives"), arg("positives")),
+    "Calculates the ROC Convex Hull curve given a set of positive and negative scores. Returns a two-dimensional blitz::Array of doubles that express the X (FRR) and Y (FAR) coordinates in this order."
+  );
+
+  def(
+    "rocch2eer",
+    &bob_rocch2eer,
+    (arg("pmiss_pfa")),
+    "Calculates the threshold that is as close as possible to the equal-error-rate (EER) given the input data."
   );
 
   def(

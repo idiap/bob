@@ -22,9 +22,14 @@
 
 #include <stdexcept>
 #include <algorithm>
+#include <limits>
 #include "bob/measure/error.h"
 #include "bob/core/blitz_compat.h"
 #include "bob/core/Exception.h"
+#include "bob/core/array_assert.h"
+#include "bob/core/cast.h"
+#include "bob/math/pavx.h"
+#include "bob/math/linsolve.h"
 
 namespace err = bob::measure;
 
@@ -47,6 +52,11 @@ double eer_predicate(double far, double frr) {
 double err::eerThreshold(const blitz::Array<double,1>& negatives,
     const blitz::Array<double,1>& positives) {
   return err::minimizingThreshold(negatives, positives, eer_predicate);
+}
+
+double err::eerRocch(const blitz::Array<double,1>& negatives,
+    const blitz::Array<double,1>& positives) {
+  return err::rocch2eer(err::rocch(negatives, positives));
 }
 
 double err::farThreshold(const blitz::Array<double,1>& negatives,
@@ -168,6 +178,144 @@ blitz::Array<double,2> err::roc(const blitz::Array<double,1>& negatives,
     retval(1,i) = ratios.first;
   }
   return retval;
+}
+
+/**
+  * Structure for getting permutations when sorting an array
+  */
+struct ComparePairs 
+{
+  ComparePairs(const blitz::Array<double,1> &v): 
+    m_v(v) 
+  {
+  }
+
+  bool operator()(size_t a, size_t b)
+  { 
+    return m_v(a) < m_v(b); 
+  }
+
+  blitz::Array<double,1> m_v;
+};
+
+ComparePairs CreateComparePairs(const blitz::Array<double,1>& v) 
+{ 
+  return ComparePairs(v); 
+}
+
+/**
+  * Sort an array and get the permutations (using stable_sort)
+  */
+void sortWithPermutation(const blitz::Array<double,1>& values, std::vector<size_t>& v)
+{
+  int N = values.extent(0);
+  bob::core::array::assertSameDimensionLength(N, v.size());
+  for(int i=0; i<N; ++i)
+    v[i] = i;
+
+  std::stable_sort(v.begin(), v.end(), CreateComparePairs(values));
+}
+
+blitz::Array<double,2> err::rocch(const blitz::Array<double,1>& negatives,
+ const blitz::Array<double,1>& positives) 
+{
+  // Number of positive and negative scores
+  size_t Nt = positives.extent(0);
+  size_t Nn = negatives.extent(0);
+  size_t N = Nt + Nn;
+
+  // Create a big array with all scores
+  blitz::Array<double,1> scores(N);
+  blitz::Range rall = blitz::Range::all();
+  scores(blitz::Range(0,Nt-1)) = positives(rall);
+  scores(blitz::Range(Nt,N-1)) = negatives(rall);
+
+  // It is important here that scores that are the same (i.e. already in order) should NOT be swapped.
+  // std::stable_sort has this property.
+  std::vector<size_t> perturb(N);
+  sortWithPermutation(scores, perturb);
+
+  // Apply permutation
+  blitz::Array<size_t,1> Pideal(N);
+  for(size_t i=0; i<N; ++i)
+    Pideal(i) = (perturb[i] < Nt ? 1 : 0);
+  blitz::Array<double,1> Pideal_d = bob::core::cast<double>(Pideal);
+
+  // Apply the PAVA algorithm
+  blitz::Array<double,1> Popt(N);
+  blitz::Array<size_t,1> width = bob::math::pavxWidth(Pideal_d, Popt);
+
+  // Allocate output
+  int nbins = width.extent(0);
+  blitz::Array<double,2> retval(2,nbins+1); // FAR, FRR
+
+  // Fill in output
+  size_t left = 0;
+  size_t fa = Nn;
+  size_t miss = 0;
+  for(int i=0; i<nbins; ++i)
+  {
+    retval(0,i) = miss / (double)Nt; // pmiss
+    retval(1,i) = fa / (double)Nn; // pfa
+    left += width(i);
+    if(left >= 1)
+      miss = blitz::sum(Pideal(blitz::Range(0,left-1)));
+    else
+      miss = 0;
+    if(Pideal.extent(0)-1 >= (int)left)
+      fa = N - left - blitz::sum(Pideal(blitz::Range(left,Pideal.extent(0)-1)));
+    else
+      fa = 0;
+  }
+  retval(0,nbins) = miss / (double)Nt; // pmiss
+  retval(1,nbins) = fa / (double)Nn; // pfa
+
+  return retval;
+}
+
+double err::rocch2eer(const blitz::Array<double,2>& pmiss_pfa) 
+{
+  bob::core::array::assertSameDimensionLength(2, pmiss_pfa.extent(0));
+  const int N = pmiss_pfa.extent(1);  
+
+  double eer = 0.;
+  blitz::Array<double,2> XY(2,2);
+  blitz::Array<double,1> one(2);
+  one = 1.;
+  blitz::Array<double,1> seg(2);
+  double& XY00 = XY(0,0); 
+  double& XY01 = XY(0,1); 
+  double& XY10 = XY(1,0); 
+  double& XY11 = XY(1,1); 
+
+  double eerseg = 0.;
+  for(int i=0; i<N-1; ++i)
+  {
+    // Define XY matrix
+    XY00 = pmiss_pfa(1,i); // pfa
+    XY10 = pmiss_pfa(1,i+1); // pfa
+    XY01 = pmiss_pfa(0,i); // pmiss
+    XY11 = pmiss_pfa(0,i+1); // pmiss
+    // xx and yy should be sorted:
+    assert(XY10 <= XY00 && XY01 <= XY11);
+
+    // Commpute "dd"
+    double abs_dd0 = std::fabs(XY00 - XY10);
+    double abs_dd1 = std::fabs(XY01 - XY11);
+    if(std::min(abs_dd0,abs_dd1) < std::numeric_limits<double>::epsilon())
+      eerseg = 0.;
+    else
+    {
+      // Find line coefficients seg s.t. XY.seg = 1,
+      bob::math::linsolve_(XY, seg, one);
+      // Candidate for the EER (to be compared to current value)
+      eerseg = 1. / blitz::sum(seg); 
+    }
+  
+    eer = std::max(eer, eerseg);
+  }
+
+  return eer;
 }
 
 /**

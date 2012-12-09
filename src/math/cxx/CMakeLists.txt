@@ -36,6 +36,7 @@ set(src
   "sqrtm.cc"
   "svd.cc"
   "interiorpointLP.cc"
+  "pavx.cc"
 )
 
 # Define the library, compilation and linkage options
