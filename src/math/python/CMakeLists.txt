@@ -12,6 +12,7 @@ set(src
    "norminv.cc"
    "stats.cc"
    "histogram.cc"
+   "pavx.cc"
    "main.cc"
    )
 

@@ -201,6 +201,14 @@ namespace bob { namespace measure {
       const blitz::Array<double,1>& positives);
 
   /**
+   * Calculates the equal-error-rate (EER) given the input data, on the ROC 
+   * Convex Hull, as performed in the Bosaris toolkit.
+   * (https://sites.google.com/site/bosaristoolkit/)
+   */
+  double eerRocch(const blitz::Array<double,1>& negatives,
+      const blitz::Array<double,1>& positives);
+
+  /**
    * Calculates the threshold that minimizes the error rate, given the input
    * data. An optional parameter 'cost' determines the relative importance
    * between false-accepts and false-rejections. This number should be between
@@ -261,6 +269,30 @@ namespace bob { namespace measure {
   blitz::Array<double,2> roc
     (const blitz::Array<double,1>& negatives,
      const blitz::Array<double,1>& positives, size_t points);
+
+  /**
+   * Calculates the ROC Convex Hull (ROCCH) given a set of positive and 
+   * negative scores and a number of desired points. Returns a 
+   * two-dimensional blitz::Array of doubles that contain the coordinates
+   * of the vertices of the ROC Convex Hull (the first row is for "pmiss"
+   * and the second row is for "pfa").
+   * Reference: Bosaris toolkit
+   * (https://sites.google.com/site/bosaristoolkit/)
+   */
+  blitz::Array<double,2> rocch
+    (const blitz::Array<double,1>& negatives,
+     const blitz::Array<double,1>& positives);
+
+  /**
+   * Calculates the Equal Error Rate (EER) on the ROC Convex Hull (ROCCH)
+   * from the 2-row matrices containing the pmiss and pfa vectors 
+   * (which is the output of the bob::measure::rocch()).
+   * Note: pmiss and pfa contain the coordinates of the vertices of the
+   *       ROC Convex Hull. 
+   * Reference: Bosaris toolkit
+   * (https://sites.google.com/site/bosaristoolkit/)
+   */
+  double rocch2eer(const blitz::Array<double,2>& pmiss_pfa);
 
   /**
    * Calculates the ROC curve given a set of positive and negative scores at
