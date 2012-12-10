@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
 # Andre Anjos <andre.anjos@idiap.ch>
-# Mon 13 Aug 2012 16:19:18 CEST 
+# Mon 13 Aug 2012 16:19:18 CEST
 
 """This module defines, among other less important constructions, a management
 interface that can be used by Bob to display information about the database and
@@ -18,9 +18,9 @@ def dbshell(arguments):
   if len(arguments.files) != 1:
     raise RuntimeError, "Something is wrong this database is supposed to be of type SQLite, but you have more than one data file available: %s" % argument.files
 
-  if arguments.type == 'sqlite': 
+  if arguments.type == 'sqlite':
     prog = 'sqlite3'
-  else: 
+  else:
     raise RuntimeError, "Error auxiliary database file '%s' cannot be used to initiate a database shell connection (type='%s')" % (dbfile, arguments.type)
 
   cmdline = [prog, arguments.files[0]]
@@ -37,8 +37,9 @@ def dbshell(arguments):
     # occurs when the file is not executable or not found
     print("Error executing '%s': %s (%d)" % (' '.join(cmdline), e.strerror,
         e.errno))
+    import sys
     sys.exit(e.errno)
-  
+
   try:
     p.communicate()
   except KeyboardInterrupt: # the user CTRL-C'ed
@@ -59,7 +60,7 @@ def dbshell_command(subparsers):
 
 def print_files(arguments):
   """Prints the current location of raw database files."""
-  
+
   for k in arguments.files: print k
 
   return 0
@@ -99,7 +100,7 @@ class Interface(object):
   @abc.abstractmethod
   def files(self):
     '''Returns a python iterable with all auxiliary files needed.
-    
+
     The values should be take w.r.t. where the python file that declares the
     database is sitting at.
     '''
@@ -113,7 +114,7 @@ class Interface(object):
   @abc.abstractmethod
   def type(self):
     '''Returns the type of auxiliary files you have for this database
-    
+
     If you return 'sqlite', then we append special actions such as 'dbshell'
     on 'bob_dbmanage.py' automatically for you. Otherwise, we don't.
 
@@ -126,7 +127,7 @@ class Interface(object):
 
   def setup_parser(self, parser, short_description, long_description):
     '''Sets up the base parser for this database.
-    
+
     Keyword arguments:
 
     short_description
@@ -152,7 +153,7 @@ class Interface(object):
     top_level.set_defaults(version=self.version())
     top_level.set_defaults(type=type)
     top_level.set_defaults(files=files)
-    
+
     subparsers = top_level.add_subparsers(title="subcommands")
 
     # adds some stock commands
@@ -169,11 +170,11 @@ class Interface(object):
   @abc.abstractmethod
   def add_commands(self, parser):
     '''Adds commands to a given (argparse) parser.
-    
+
     This method, effectively, allows you to define special commands that your
     database will be able to perform when called from the common driver like
     for example ``create`` or ``checkfiles``.
-    
+
     You are not obliged to overwrite this method. If you do, you will have the
     chance to establish your own commands. You don't have to worry about stock
     commands such as ``files`` or ``version``. They will be automatically
