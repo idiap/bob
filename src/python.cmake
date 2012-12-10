@@ -83,7 +83,7 @@ endif()
 
 # Finally, we setup the python installation prefix centrally. This value is
 # standardized by Python as defined in http://docs.python.org/install/index.html
-set(PYTHON_SITE_PACKAGES "lib/python${PYTHON_VERSION}/site-packages" CACHE
+set(PYTHON_SITE_PACKAGES "${CMAKE_INSTALL_LIBDIR}/python${PYTHON_VERSION}/site-packages" CACHE
   PATH "Default package installation prefix for Python packages")
 
 # And we also try to find ipython, if it is installed

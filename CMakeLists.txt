@@ -5,6 +5,12 @@
 project(bob)
 cmake_minimum_required(VERSION 2.6)
 
+if(${CMAKE_MAJOR_VERSION} GREATER 2 AND ${CMAKE_MINOR_VERSION} GREATER 8 AND ${CMAKE_PATCH_VERSION} GREATER 5)
+  include(GNUInstallDirs)
+else()
+  include(src/BobGNUInstallDirs.cmake)
+endif()
+
 # -----------------
 # START of options.
 # -----------------
@@ -95,7 +101,7 @@ if(SET_PUBLIC_LIBRARY_PATH)
     # This is our RPATH policy under Linux
     set(CMAKE_SKIP_BUILD_RPATH  FALSE)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
   endif()
 endif()
@@ -105,8 +111,8 @@ endif()
 if(CMAKE_PREFIX_PATH)
   string(REPLACE ":" ";" PKG_CONFIG_CHECK_PATH ${CMAKE_PREFIX_PATH})
   foreach (ext ${PKG_CONFIG_CHECK_PATH})
-    if(EXISTS ${ext}/lib/pkgconfig)
-      set(ENV{PKG_CONFIG_PATH} "${ext}/lib/pkgconfig:$ENV{PKG_CONFIG_PATH}")
+    if(EXISTS ${ext}/${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+      set(ENV{PKG_CONFIG_PATH} "${ext}/${CMAKE_INSTALL_LIBDIR}/pkgconfig:$ENV{PKG_CONFIG_PATH}")
     endif()
   endforeach()
 endif()
@@ -133,13 +139,14 @@ macro(bob_add_library name src)
   include_directories(BEFORE 
     "${CMAKE_SOURCE_DIR}/include" "${CMAKE_BINARY_DIR}/include")
   add_library(${name} ${src})
-  set_target_properties(${name} PROPERTIES LIBRARY_OUTPUT_DIRECTORY  ${CMAKE_BINARY_DIR}/lib)
+  set_target_properties(${name} PROPERTIES LIBRARY_OUTPUT_DIRECTORY  ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
   if (BOB_SOVERSION)
     # adds versioning information
     set_target_properties(${name} PROPERTIES VERSION ${BOB_VERSION})
     set_target_properties(${name} PROPERTIES SOVERSION ${BOB_SOVERSION})
   endif()
-  install(TARGETS ${name} EXPORT bob-targets DESTINATION lib)
+  #message("CMAKE_INSTALL_LIBDIR = " ${CMAKE_INSTALL_LIBDIR})
+  install(TARGETS ${name} EXPORT bob-targets DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endmacro()
 
 # Creates a standard test for Bob
@@ -184,7 +191,7 @@ endmacro()
 #
 # Example: bob_pkgconfig(bob_ip "bob_core;bob_sp;bob_math")
 macro(bob_pkgconfig package requires)
-  set(pkgconfigdir lib/pkgconfig)
+  set(pkgconfigdir "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
   string(REPLACE "_" "-" BOB_PACKAGE_NAME ${package})
   set(BOB_PACKAGE_LIBRARY ${package})
   
@@ -249,7 +256,7 @@ configure_file(${CMAKE_SOURCE_DIR}/include/bob/config.h.in ${CMAKE_BINARY_DIR}/i
 install(FILES ${CMAKE_BINARY_DIR}/include/bob/config.h DESTINATION include/bob)
 
 # Install cmake export target
-set(cmakedir lib/bob)
+set(cmakedir "${CMAKE_INSTALL_LIBDIR}/bob")
 install(EXPORT bob-targets DESTINATION ${cmakedir})
 install(FILES cmake/bob-config.cmake DESTINATION ${cmakedir})
 configure_file(cmake/bob-config-version.cmake.in
@@ -258,7 +265,7 @@ install(FILES ${CMAKE_BINARY_DIR}/${cmakedir}/bob-config-version.cmake
   DESTINATION ${cmakedir})
 
 # Global pkg-config file
-set(pkgconfigdir lib/pkgconfig)
+set(pkgconfigdir "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 set(BOB_PACKAGES "")
 foreach(pack ${ENABLED_PACKAGES})
   string(REPLACE "_" "-" pkg_name ${pack})
