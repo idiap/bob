@@ -59,10 +59,10 @@ else()
 endif()
 
 set(BOB_PYTHONPATH "${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES}")
-set(BOB_PKG_CONFIG_PATH "${CMAKE_BINARY_DIR}/lib/pkgconfig")
+set(BOB_PKG_CONFIG_PATH "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 configure_file(bin/egg-build.in ${CMAKE_BINARY_DIR}/bin/egg-build @ONLY)
 
-set(BOB_PKG_CONFIG_PATH "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
+set(BOB_PKG_CONFIG_PATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 set(BOB_PYTHONPATH "${ABSOLUTE_install_prefix}/${PYTHON_SITE_PACKAGES}")
 configure_file(bin/egg-install.in ${CMAKE_BINARY_DIR}/bin/egg-install @ONLY)
 
