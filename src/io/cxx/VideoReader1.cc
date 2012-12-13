@@ -1,5 +1,5 @@
 /**
- * @file io/cxx/VideoReader.cc
+ * @file io/cxx/VideoReader1.cc
  * @date Wed Jun 22 17:50:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
@@ -7,18 +7,6 @@
  * something that bob can understand. This implementation is heavily based on
  * the excellent tutorial here: http://dranger.com/ffmpeg/, with some personal
  * modifications.
- * FFMpeg versions for your reference
- * ffmpeg | avformat | avcodec  | avutil  | swscale | old style | swscale GPL?
- * =======+==========+==========+=========+=========+===========+==============
- * 0.5    | 52.31.0  | 52.20.0  | 49.15.0 | 0.7.1   | yes       | yes
- * 0.5.1  | 52.31.0  | 52.20.1  | 49.15.0 | 0.7.1   | yes       | yes
- * 0.5.2  | 52.31.0  | 52.20.1  | 49.15.0 | 0.7.1   | yes       | yes
- * 0.5.3  | 52.31.0  | 52.20.1  | 49.15.0 | 0.7.1   | yes       | yes
- * 0.6    | 52.64.2  | 52.72.2  | 50.15.1 | 0.11.0  | no        | no
- * 0.6.1  | 52.64.2  | 52.72.2  | 50.15.1 | 0.11.0  | no        | no
- * 0.7    | 52.110.0 | 52.122.0 | 50.43.0 | 0.14.1  | no        | no
- * 0.7.1  | 52.110.0 | 52.122.0 | 50.43.0 | 0.14.1  | no        | no
- * 0.8    | 53.4.0   | 53.7.0   | 51.9.1  | 2.0.0   | no        | no
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
@@ -57,17 +45,6 @@ extern "C" {
 
 namespace io = bob::io;
 namespace ca = bob::core::array;
-
-/**
- * When called, initializes the ffmpeg library
- */
-static bool initialize_ffmpeg() {
-  av_register_all();
-  av_log_set_level(-1);
-  return true;
-}
-
-bool io::VideoReader::s_ffmpeg_initialized = initialize_ffmpeg();
 
 io::VideoReader::VideoReader(const std::string& filename):
   m_filepath(filename),

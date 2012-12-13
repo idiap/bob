@@ -236,6 +236,7 @@ static bool register_codec() {
 
   /* Initialize libavcodec, and register all codecs and formats. */
   av_register_all();
+  av_log_set_level(-1);
 
   boost::shared_ptr<io::CodecRegistry> instance =
     io::CodecRegistry::instance();

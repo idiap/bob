@@ -91,7 +91,6 @@ endif(GIF_FOUND)
 if(FFMPEG_FOUND)
   list(APPEND shared "${FFMPEG_RESOLVED_LIBRARIES}")
   list(APPEND src 
-    "VideoReader.cc"
     "VideoException.cc"
     "VideoFile.cc"
     "VideoUtilities.cc"
@@ -102,10 +101,12 @@ if(FFMPEG_FOUND)
   if(FFMPEG_VERSION VERSION_LESS "0.8.0")
     list(APPEND src 
       "VideoWriter1.cc"
+      "VideoReader1.cc"
       )
   else()
     list(APPEND src 
       "VideoWriter2.cc"
+      "VideoReader2.cc"
       )
   endif()
 

@@ -25,62 +25,24 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <blitz/array.h>
+#include <stdint.h>
+
+#include <boost/shared_ptr.hpp>
+#include <boost/shared_array.hpp>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
+#include <libswscale/swscale.h>
+#include <libavutil/avutil.h>
 }
 
-/**
- * These macros will ease the handling of ffmpeg versions
- */
-#if   LIBAVFORMAT_VERSION_INT < 0x341f00 && LIBAVCODEC_VERSION_INT < 0x341401
-#error Bob can only be compiled against FFmpeg >= 0.5.0
-#elif LIBAVFORMAT_VERSION_INT < 0x344002 && LIBAVCODEC_VERSION_INT < 0x344802
-#define FFMPEG_VERSION_INT 0x000500 //0.5.0
-#elif LIBAVFORMAT_VERSION_INT < 0x346f00 && LIBAVCODEC_VERSION_INT < 0x347b00
-#define FFMPEG_VERSION_INT 0x000600 //0.6.0
-#elif LIBAVFORMAT_VERSION_INT < 0x350500 && LIBAVCODEC_VERSION_INT < 0x350800
-#define FFMPEG_VERSION_INT 0x000700 //0.7.0
-#elif LIBAVFORMAT_VERSION_INT < 0x351802 && LIBAVCODEC_VERSION_INT < 0x352a04
-#define FFMPEG_VERSION_INT 0x000800 //0.8.0
-#elif LIBAVFORMAT_VERSION_INT < 0x352064 && LIBAVCODEC_VERSION_INT < 0x353d64
-#define FFMPEG_VERSION_INT 0x000900 //0.9.0
-#elif LIBAVFORMAT_VERSION_INT < 0x360664 && LIBAVCODEC_VERSION_INT < 0x361764
-#define FFMPEG_VERSION_INT 0x000a00 //0.10.0
-#elif LIBAVFORMAT_VERSION_INT < 0x361d68 && LIBAVCODEC_VERSION_INT < 0x363b64
-#define FFMPEG_VERSION_INT 0x000b00 //0.11.0
-#else
-#define FFMPEG_VERSION_INT 0x010000 //1.0.0
-#endif
-
-/**
- * Some code to account for older versions of ffmpeg
- */
-#ifndef AV_CODEC_ID_NONE
-#define AV_CODEC_ID_NONE CODEC_ID_NONE
-#define AV_CODEC_ID_MPEG1VIDEO CODEC_ID_MPEG1VIDEO
-#define AV_CODEC_ID_MPEG2VIDEO CODEC_ID_MPEG2VIDEO
-typedef CodecID AVCodecID;
-#endif
-
-#ifndef AV_PIX_FMT_RGB24
-#define AV_PIX_FMT_RGB24 PIX_FMT_RGB24
-#endif
-
-#ifndef AV_PIX_FMT_YUV420P
-#define AV_PIX_FMT_YUV420P PIX_FMT_YUV420P
-#endif
-
-#ifndef AV_PIX_FMT_NONE
-#define AV_PIX_FMT_NONE PIX_FMT_NONE
-#endif
-
-#ifndef AV_PKT_FLAG_KEY
-#define AV_PKT_FLAG_KEY PKG_FLAG_KEY
-#endif
-
 namespace bob { namespace io { namespace detail { namespace ffmpeg {
+
+  /************************************************************************
+   * General Utilities
+   ************************************************************************/
 
   /**
    * Breaks a list of words separated by commands into a word list
@@ -102,6 +64,184 @@ namespace bob { namespace io { namespace detail { namespace ffmpeg {
    * details
    */
   void oformats_installed (std::map<std::string, AVOutputFormat*>& installed);
+
+  /************************************************************************
+   * Video reading and writing utilities (shared)
+   ************************************************************************/
+
+  /**
+   * Creates a new codec context and verify all is good.
+   *
+   * @note The returned object knows how to correctly delete itself, freeing
+   * all acquired resources. Nonetheless, when this object is used in
+   * conjunction with other objects required for file encoding, order must be
+   * respected.
+   */
+  boost::shared_ptr<AVCodecContext> make_codec_context(
+      const std::string& filename, AVStream* stream, AVCodec* codec);
+
+  /**
+   * Allocates the software scaler that handles size and pixel format
+   * conversion.
+   *
+   * @note The returned object knows how to correctly delete itself, freeing
+   * all acquired resources. Nonetheless, when this object is used in
+   * conjunction with other objects required for file encoding, order must be
+   * respected.
+   */
+  boost::shared_ptr<SwsContext> make_scaler(const std::string& filename,
+      boost::shared_ptr<AVCodecContext> stream, 
+      PixelFormat source_pixel_format, PixelFormat dest_pixel_format);
+
+  /**
+   * Allocates a frame for a particular context. The frame space will be
+   * allocated to accomodate the type of encoding you defined, upon the
+   * selection of the pixel format (last parameter).
+   *
+   * @note The returned object knows how to correctly delete itself, freeing
+   * all acquired resources. Nonetheless, when this object is used in
+   * conjunction with other objects required for file encoding, order must be
+   * respected.
+   */
+  boost::shared_ptr<AVFrame> make_frame(const std::string& filename,
+      boost::shared_ptr<AVCodecContext> stream, PixelFormat pixfmt);
+
+  /**
+   * Reads a single video frame from the stream. Input data must be previously
+   * allocated and be of the right type and size for holding the frame
+   * contents. It is an error to try to read past the end of the file.
+   */
+  bool read_video_frame (const std::string& filename, int current_frame,
+      int stream_index, boost::shared_ptr<AVFormatContext> format_context,
+      boost::shared_ptr<AVCodecContext> codec_context,
+      boost::shared_ptr<SwsContext> swscaler,
+      boost::shared_ptr<AVFrame> context_frame,
+      boost::shared_ptr<AVFrame> packed_rgb_frame,
+      bool throw_on_error);
+
+  /************************************************************************
+   * Video reading specific utilities
+   ************************************************************************/
+
+  /**
+   * Opens a video file for input, makes sure it finds the stream information
+   * on that file. Otherwise, raises.
+   *
+   * @note The returned object knows how to correctly delete itself, freeing
+   * all acquired resources. Nonetheless, when this object is used in
+   * conjunction with other objects required for file encoding, order must be
+   * respected.
+   */
+  boost::shared_ptr<AVFormatContext> make_input_format_context
+    (const std::string& filename);
+
+  /**
+   * Finds the location of the video stream in the file or raises, if no video
+   * stream can be found.
+   */
+  int find_video_stream(const std::string& filename,
+      boost::shared_ptr<AVFormatContext> format_context);
+
+  /**
+   * Finds a proper decoder (codec) for the video stream.
+   */
+  AVCodec* find_decoder(const std::string& filename,
+      boost::shared_ptr<AVFormatContext> format_context, int stream_index);
+
+  /**
+   * Allocates an empty frame.
+   *
+   * @note The returned object knows how to correctly delete itself, freeing
+   * all acquired resources. Nonetheless, when this object is used in
+   * conjunction with other objects required for file encoding, order must be
+   * respected.
+   */
+  boost::shared_ptr<AVFrame> make_empty_frame(const std::string& filename);
+
+  /************************************************************************
+   * Video writing specific utilities
+   ************************************************************************/
+
+  /**
+   * Creates a new AVFormatContext object based on a filename and a desired
+   * multimedia format this file will contain.
+   *
+   * @note The returned object knows how to correctly delete itself, freeing
+   * all acquired resources. Nonetheless, when this object is used in
+   * conjunction with other objects required for file encoding, order must be
+   * respected.
+   */
+  boost::shared_ptr<AVFormatContext> make_output_format_context
+    (const std::string& filename, const std::string& formatname);
+
+  /**
+   * Finds the encoder that best suits the filename/codecname combination. You
+   * don't need to delete the returned object.
+   */
+  AVCodec* find_encoder(const std::string& filename,
+      boost::shared_ptr<AVFormatContext> fmtctxt, 
+      const std::string& codecname);
+
+  /**
+   * Creates a new AVStream on the output file given by the format context
+   * pointer, with the given configurations.
+   *
+   * @note The returned object knows how to correctly delete itself, freeing
+   * all acquired resources. Nonetheless, when this object is used in
+   * conjunction with other objects required for file encoding, order must be
+   * respected.
+   */
+  boost::shared_ptr<AVStream> make_stream(const std::string& filename,
+      boost::shared_ptr<AVFormatContext> fmtctxt, const std::string& codecname,
+      size_t height, size_t width, float framerate, float bitrate, size_t gop,
+      AVCodec* codec);
+
+  /**
+   * Allocates a video buffer (useful for ffmpeg < 0.11)
+   */
+  boost::shared_array<uint8_t> make_buffer
+    (boost::shared_ptr<AVFormatContext> format_context, size_t size);
+
+  /**
+   * Opens the output file using the given context, writes a header, if the
+   * format requires.
+   */
+  void open_output_file(const std::string& filename,
+      boost::shared_ptr<AVFormatContext> format_context);
+
+  /**
+   * Closes the output file using the given context, writes a trailer, if the
+   * format requires.
+   */
+  void close_output_file(const std::string& filename,
+      boost::shared_ptr<AVFormatContext> format_context);
+
+  /**
+   * Flushes frames which are buffered on the given encoder stream. This only
+   * happens if (codec->capabilities & CODEC_CAP_DELAY) is true.
+   */
+  void flush_encoder(const std::string& filename,
+      boost::shared_ptr<AVFormatContext> format_context,
+      boost::shared_ptr<AVStream> stream, AVCodec* codec,
+      boost::shared_array<uint8_t> buffer,
+      size_t buffer_size);
+
+  /**
+   * Writes a data frame into the encoder stream.
+   *
+   * @note The encoder may have a CODEC_CAP_DELAY capability, which means that
+   * the frame insertion is not always instantaneous.
+   */
+  void write_video_frame (const blitz::Array<uint8_t,3>& data,
+    const std::string& filename,
+    boost::shared_ptr<AVFormatContext> format_context,
+    boost::shared_ptr<AVStream> stream,
+    boost::shared_ptr<AVFrame> context_frame,
+    boost::shared_ptr<AVFrame> packed_rgb_frame,
+    boost::shared_ptr<SwsContext> swscaler,
+    boost::shared_array<uint8_t> buffer,
+    size_t buffer_size);
+
 
 }}}}
 

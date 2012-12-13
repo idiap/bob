@@ -23,7 +23,10 @@
 #include <boost/python.hpp>
 #include <boost/python/slice.hpp>
 
-#include "bob/io/Video.h"
+#include "bob/io/VideoException.h"
+#include "bob/io/VideoReader.h"
+#include "bob/io/VideoWriter.h"
+
 #include "bob/io/VideoUtilities.h"
 #include "bob/core/python/exception.h"
 #include "bob/core/python/ndarray.h"
@@ -287,6 +290,10 @@ void bind_io_video() {
     .add_property("number_of_frames", &io::VideoReader::numberOfFrames)
     .def("__len__", &io::VideoReader::numberOfFrames)
     .add_property("duration", &io::VideoReader::duration)
+#ifdef BOB_IO_VIDEOREADER2_H
+    .add_property("format_name", make_function(&io::VideoReader::formatName, return_value_policy<copy_const_reference>()))
+    .add_property("format_long_name", make_function(&io::VideoReader::formatLongName, return_value_policy<copy_const_reference>()))
+#endif
     .add_property("codec_name", make_function(&io::VideoReader::codecName, return_value_policy<copy_const_reference>()))
     .add_property("codec_long_name", make_function(&io::VideoReader::codecLongName, return_value_policy<copy_const_reference>()))
     .add_property("frame_rate", &io::VideoReader::frameRate)
@@ -307,11 +314,7 @@ void bind_io_video() {
      init<const std::string&, size_t, size_t, optional<float, float, size_t> >((arg("filename"), arg("height"), arg("width"), arg("framerate")=25.f, arg("bitrate")=1500000.f, arg("gop")=12), "Creates a new output file given the input parameters. The format and codec to be used will be derived from the filename extension unless you define them explicetly")
 #endif
      )
-#ifdef BOB_IO_VIDEOWRITER2_H
-    .add_property("filename", &io::VideoWriter::filename)
-#else
-    .add_property("filename", make_function(&io::VideoWriter::filename, return_value_policy<copy_const_reference>()))
-#endif
+    .add_property("filename", make_function(&io::VideoReader::filename, return_value_policy<copy_const_reference>()))
     .add_property("height", &io::VideoWriter::height)
     .add_property("width", &io::VideoWriter::width)
     .add_property("number_of_frames", &io::VideoWriter::numberOfFrames)

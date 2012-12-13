@@ -24,18 +24,8 @@
 #ifndef BOB_IO_VIDEOWRITER2_H
 #define BOB_IO_VIDEOWRITER2_H
 
-#include <string>
-#include <blitz/array.h>
-#include <stdint.h>
-
-#include <boost/filesystem.hpp>
-
 #include "bob/core/array.h"
-
-extern "C" {
-#include <libavformat/avformat.h>
-#include <libswscale/swscale.h>
-}
+#include "bob/io/VideoUtilities.h"
 
 namespace bob { namespace io {
 
@@ -83,7 +73,7 @@ namespace bob { namespace io {
       /**
        * Access to the filename
        */
-      inline std::string filename() const { return m_filename.string(); }
+      inline const std::string& filename() const { return m_filename; }
 
       /**
        * Access to the height (number of rows) of the video
@@ -189,19 +179,6 @@ namespace bob { namespace io {
        */
       void append(const bob::core::array::interface& data);
 
-    private: //api
-
-      /**
-       * Writes a single video frame into the video file.
-       */
-      void write_video_frame(const blitz::Array<uint8_t,3>& data);
-      
-      /**
-       * Flushes remaining frames that may be stuck on the encoder, when
-       * it has a delayed insertion capability.
-       */
-      void flush_encoder();
-    
     private: //not implemented
 
       VideoWriter(const VideoWriter& other);
@@ -210,7 +187,7 @@ namespace bob { namespace io {
 
     private: //representation
       
-      boost::filesystem::path m_filename; ///< file being written
+      std::string m_filename; ///< file being written
       bool m_opened; ///< is the file currently opened?
       boost::shared_ptr<AVFormatContext> m_format_context; ///< format context
       AVCodec* m_codec; ///< the codec we will be using
@@ -219,7 +196,7 @@ namespace bob { namespace io {
       boost::shared_ptr<AVFrame> m_context_frame; ///< output frame data
       boost::shared_ptr<AVFrame> m_packed_rgb_frame; ///< temporary
       boost::shared_ptr<SwsContext> m_swscaler; ///< software scaler
-      boost::shared_ptr<uint8_t> m_buffer; ///< buffer for ffmpeg < 0.11.0
+      boost::shared_array<uint8_t> m_buffer; ///< buffer for ffmpeg < 0.11.0
       size_t m_height;
       size_t m_width;
       float m_framerate;

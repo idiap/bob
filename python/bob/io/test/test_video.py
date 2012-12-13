@@ -34,8 +34,8 @@ def ffmpeg_found(version_geq=None):
     @functools.wraps(test)
     def wrapper(*args, **kwargs):
       try:
-        from .._io import __ffmpeg_version_int__
-        if version_geq is not None and __ffmpeg_version_int__ < version_geq:
+        from .._io import version
+        if version_geq is not None and version['libavformat'] < version_geq:
           raise SkipTest('FFMpeg version (0x%08x) is smaller than required for this test (0x%08x)' % (__ffmpeg_version_int__, version_geq))
         return test(*args, **kwargs)
       except ImportError:

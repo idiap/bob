@@ -3,8 +3,7 @@
  * @date Thu 29 Nov 2012 17:02:18 CET
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
- * @brief A class to help you write videos. This code originates from
- * http://ffmpeg.org/doxygen/1.0/, "decoding & encoding example".
+ * @brief A switch between different versions of ffmpeg/libav
  *
  * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
  * 
@@ -24,9 +23,11 @@
 #ifndef BOB_IO_VIDEOWRITER_H
 #define BOB_IO_VIDEOWRITER_H
 
-#include "bob/io/VideoUtilities.h"
+extern "C" {
+#include <libavcodec/avcodec.h>
+}
 
-#if FFMPEG_VERSION_INT < 0x000800
+#if LIBAVCODEC_VERSION_INT < 0x350700 //53.7.0 @ ffmpeg 0.8
 #include "bob/io/VideoWriter1.h"
 #else
 #include "bob/io/VideoWriter2.h"
