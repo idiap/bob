@@ -339,7 +339,7 @@ namespace bob { namespace io {
           boost::shared_ptr<AVStream> m_stream; ///< the video stream
           boost::shared_ptr<AVCodecContext> m_codec_context; ///< format context
           boost::shared_ptr<AVFrame> m_context_frame; ///< from file
-          boost::shared_ptr<AVFrame> m_packed_rgb_frame; ///< temporary
+          blitz::Array<uint8_t,3> m_rgb_array; ///< temporary
           boost::shared_ptr<SwsContext> m_swscaler; ///< software scaler
           size_t m_current_frame; ///< the current frame to be read
 

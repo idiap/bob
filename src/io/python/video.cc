@@ -200,29 +200,45 @@ static object describe_codec(const AVCodec* codec) {
 # ifdef CODEC_CAP_HWACCEL
   retval["hardware_accelerated"] = (bool)(codec->capabilities & CODEC_CAP_HWACCEL);
 # endif
-  retval["encode"] = (bool)(avcodec_find_encoder(codec->id));
-  retval["decode"] = (bool)(avcodec_find_decoder(codec->id));
+  retval["encode"] = (bool)(avcodec_find_encoder(codec->id) && avcodec_find_encoder_by_name(codec->name));
+  retval["decode"] = (bool)(avcodec_find_decoder(codec->id) && avcodec_find_decoder_by_name(codec->name));
   
   return retval;
 }
 
 /**
- * Describes a given codec or returns an empty dictionary, in case the codec
- * cannot be accessed
+ * Describes a given codec or raises, in case the codec cannot be accessed
  */
 static object describe_encoder_by_name(const char* name) {
   AVCodec* codec = avcodec_find_encoder_by_name(name);
-  if (!codec) return object();
+  if (!codec) PYTHON_ERROR(RuntimeError, "ffmpeg::avcodec_find_encoder_by_name(`%s') did not return a valid codec", name);
   return describe_codec(codec);
 }
 
 /**
- * Describes a given codec or returns an empty dictionary, in case the codec
- * cannot be accessed
+ * Describes a given codec or raises, in case the codec cannot be accessed
+ */
+static object describe_encoder_by_id(int id) {
+  AVCodec* codec = avcodec_find_encoder((AVCodecID)id);
+  if (!codec) PYTHON_ERROR(RuntimeError, "ffmpeg::avcodec_find_encoder(%d == 0x%x) did not return a valid codec", id, id);
+  return describe_codec(codec);
+}
+
+/**
+ * Describes a given codec or raises, in case the codec cannot be accessed
  */
 static object describe_decoder_by_name(const char* name) {
   AVCodec* codec = avcodec_find_decoder_by_name(name);
-  if (!codec) return object();
+  if (!codec) PYTHON_ERROR(RuntimeError, "ffmpeg::avcodec_find_decoder_by_name(`%s') did not return a valid codec", name);
+  return describe_codec(codec);
+}
+
+/**
+ * Describes a given codec or raises, in case the codec cannot be accessed
+ */
+static object describe_decoder_by_id(int id) {
+  AVCodec* codec = avcodec_find_decoder((AVCodecID)id);
+  if (!codec) PYTHON_ERROR(RuntimeError, "ffmpeg::avcodec_find_encoder(%d == 0x%x) did not return a valid codec", id, id);
   return describe_codec(codec);
 }
 
@@ -342,6 +358,8 @@ void bind_io_video() {
 
   def("video_codecs", &codec_dictionary, "Returns a dictionary containing a detailed description of the built-in codecs for videos");
   def("describe_video_encoder", &describe_encoder_by_name, "Describes a given video encoder (codec) starting with a name");
+  def("describe_video_encoder", &describe_encoder_by_id, "Describes a given video encoder (codec) starting with an integer identifier");
   def("describe_video_decoder", &describe_decoder_by_name, "Describes a given video decoder (codec) starting with a name");
+  def("describe_video_decoder", &describe_decoder_by_id, "Describes a given video decoder (codec) starting with an integer identifier");
   def("videowriter_formats", &oformat_dictionary, "Returns a dictionary containing a detailed description of the built-in output formats and default encoders for videos");
 }

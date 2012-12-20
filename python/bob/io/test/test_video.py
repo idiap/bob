@@ -26,6 +26,57 @@ import pkg_resources
 from nose.plugins.skip import SkipTest
 import functools
 
+# Here is a table of ffmpeg versions against libavcodec, libavformat and
+# libavutil versions
+from distutils.version import StrictVersion as SV
+ffmpeg_versions = {
+    '0.5.0':  [ SV('52.20.0'),   SV('52.31.0'),   SV('49.15.0')   ],
+    '0.6.0':  [ SV('52.72.2'),   SV('52.64.2'),   SV('50.15.1')   ],
+    '0.7.0':  [ SV('52.122.0'),  SV('52.110.0'),  SV('50.43.0')   ],
+    '0.8.0':  [ SV('53.7.0'),    SV('53.4.0'),    SV('51.9.1')    ],
+    '0.9.0':  [ SV('53.42.0'),   SV('53.24.0'),   SV('51.32.0')   ],
+    '0.10.0': [ SV('53.60.100'), SV('53.31.100'), SV('51.34.101') ],
+    '0.11.0': [ SV('54.23.100'), SV('54.6.100'),  SV('51.54.100') ],
+    '1.0.0':  [ SV('54.59.100'), SV('54.29.104'), SV('51.54.100') ],
+    }
+
+def generate_pattern(height, width, counter):
+  """Generates an image that serves as a test pattern for encoding/decoding and
+  accuracy tests."""
+
+  retval = numpy.ndarray((3, height, width), dtype='uint8') 
+
+  # standard color test pattern
+  w = width / 7; w2 = 2*w; w3 = 3*w; w4 = 4*w; w5 = 5*w; w6 = 6*w
+  retval[0,:,0:w]   = 255; retval[1,:,0:w]   = 255; retval[2,:,0:w]   = 255;
+  retval[0,:,w:w2]  = 255; retval[1,:,w:w2]  = 255; retval[2,:,w:w2]  = 0;
+  retval[0,:,w2:w3] = 0;   retval[1,:,w2:w3] = 255; retval[2,:,w2:w3] = 255;
+  retval[0,:,w3:w4] = 0;   retval[1,:,w3:w4] = 255; retval[2,:,w3:w4] = 0;
+  retval[0,:,w4:w5] = 255; retval[1,:,w4:w5] = 0;   retval[2,:,w4:w5] = 255;
+  retval[0,:,w5:w6] = 255; retval[1,:,w5:w6] = 0;   retval[2,:,w5:w6] = 0;
+  retval[0,:,w6:]   = 0;   retval[1,:,w6:]  = 0;   retval[2,:,w6:]   = 255;
+
+  # black bar by the end
+  h = height - height/4
+  retval[:,h:,:] = 0
+
+  try:
+    # text indicating the frame number 
+
+    import Image, ImageFont, ImageDraw
+    text = 'frame #%d' % counter
+    font = ImageFont.load_default()
+    (text_width, text_height) = font.getsize(text)
+    img = Image.fromarray(retval.transpose(1,2,0))
+    draw = ImageDraw.Draw(img)
+    draw.text((5, 5*height/6), text, font=font, fill=(255,255,255))
+    retval = numpy.asarray(img).transpose(2,0,1)
+
+  except ImportError, e:
+    pass
+
+  return retval
+
 def ffmpeg_found(version_geq=None):
   '''Decorator to check if a codec is available before enabling a test'''
 
@@ -35,8 +86,13 @@ def ffmpeg_found(version_geq=None):
     def wrapper(*args, **kwargs):
       try:
         from .._io import version
-        if version_geq is not None and version['libavformat'] < version_geq:
-          raise SkipTest('FFMpeg version (0x%08x) is smaller than required for this test (0x%08x)' % (__ffmpeg_version_int__, version_geq))
+        avcodec_inst= SV(version['FFmpeg']['avcodec'])
+        avformat_inst= SV(version['FFmpeg']['avformat'])
+        avutil_inst= SV(version['FFmpeg']['avutil'])
+        if version_geq is not None:
+          avcodec_req,avformat_req,avutil_req = ffmpeg_versions[version_geq]
+          if avcodec_inst < avcodec_req:
+            raise SkipTest('FFMpeg/libav version installed (%s) is smaller than required for this test (%s)' % (version['FFmpeg']['ffmpeg'], version_geq))
         return test(*args, **kwargs)
       except ImportError:
         raise SkipTest('FFMpeg was not available at compile time')
@@ -56,7 +112,7 @@ def codec_available(codec):
       if d.has_key(codec) and d[codec]['encode'] and d[codec]['decode']:
         return test(*args, **kwargs)
       else:
-        raise SkipTest('A full codec for "%s" is not installed with FFmpeg' % codec)
+        raise SkipTest('A functional codec for "%s" is not installed with FFmpeg' % codec)
 
     return wrapper
 
@@ -192,16 +248,21 @@ class VideoTest(unittest.TestCase):
       self.assertEqual(frame.shape[1], 240) #height
       self.assertEqual(frame.shape[2], 320) #width
 
-  def randomReadWrite(self, codec=""):
+  def patternReadWrite(self, codec="", suffix=".avi"):
       
-    # This test shows we can do a random encoding/decoding and get video
+    # This test shows we can do a pattern encoding/decoding and get video
     # readout right
 
-    fname = get_tempfilename(suffix=".avi")
+    fname = get_tempfilename(suffix=suffix)
   
     try:
-      width = 50 
-      height = 50
+      # Width and height should be powers of 2 as the encoded image is going 
+      # to be approximated to the closest one, would not not be the case. 
+      # In this case, the encoding is subject to more noise as the filtered,
+      # final image that is encoded will contain added noise on the extra
+      # borders.
+      width = 128
+      height = 128
       frames = 30
       framerate = 30 #Hz
       if codec:
@@ -210,11 +271,11 @@ class VideoTest(unittest.TestCase):
         outv = bob.io.VideoWriter(fname, height, width, framerate)
       orig = []
       for i in range(0, frames):
-        newframe = numpy.random.random_integers(0,255,(3,50,50))
-        outv.append(newframe.astype('uint8'))
-        orig.append(newframe.astype('uint8'))
+        #newframe = numpy.random.random_integers(0,255,(3,height,width)).astype('u8')
+        newframe = generate_pattern(height, width, i)
+        outv.append(newframe)
+        orig.append(newframe)
       outv.close()
-
       input = bob.io.VideoReader(fname)
       reloaded = input.load()
 
@@ -222,24 +283,29 @@ class VideoTest(unittest.TestCase):
       self.assertEqual( len(reloaded), len(orig) )
 
       for i in range(len(reloaded)):
-        diff = abs(reloaded[i].astype('float32')-orig[i].astype('float32'))
+        diff = abs(reloaded[i].astype('float')-orig[i].astype('float'))
         m = numpy.mean(diff)
-        self.assertTrue(m < 3.0) # average difference is less than 3 gray levels
+        self.assertTrue(m < 5.0) # compression loss
 
     finally:
 
       if os.path.exists(fname): os.unlink(fname)
 
-  def randomReadTwice(self, codec=""):
+  def patternReadTwice(self, codec="", suffix=".avi"):
 
     # This test shows if we can read twice the same video and get the 
     # same results all the time.
 
-    fname = get_tempfilename(suffix=".avi")
+    fname = get_tempfilename(suffix=suffix)
   
     try:
-      width = 50 
-      height = 50
+      # Width and height should be powers of 2 as the encoded image is going 
+      # to be approximated to the closest one, would not not be the case. 
+      # In this case, the encoding is subject to more noise as the filtered,
+      # final image that is encoded will contain added noise on the extra
+      # borders.
+      width = 128
+      height = 128
       frames = 30
       framerate = 30 #Hz
       if codec:
@@ -248,9 +314,10 @@ class VideoTest(unittest.TestCase):
         outv = bob.io.VideoWriter(fname, height, width, framerate)
       orig = []
       for i in range(0, frames):
-        newframe = numpy.random.random_integers(0,255,(3,50,50))
-        outv.append(newframe.astype('uint8'))
-        orig.append(newframe.astype('uint8'))
+        #newframe = numpy.random.random_integers(0,255,(3,height,width)).astype('u8')
+        newframe = generate_pattern(height, width, i)
+        outv.append(newframe)
+        orig.append(newframe)
       outv.close()
 
       input1 = bob.io.load(fname)
@@ -259,75 +326,33 @@ class VideoTest(unittest.TestCase):
       self.assertEqual( input1.shape, input2.shape )
 
       for i in range(len(input1)):
-        diff = abs(input1[i].astype('float32')-input2[i].astype('float32'))
+        diff = abs(input1[i].astype('float')-input2[i].astype('float'))
         m = numpy.mean(diff)
-        self.assertEqual(m, 0.0)
-
-    finally:
-
-      if os.path.exists(fname): os.unlink(fname)
-
-  def randomReadTwice2(self, codec=""):
-
-    # This test shows if we can read twice the same video and get the 
-    # same results all the time.
-
-    fname = get_tempfilename(suffix=".avi")
-  
-    try:
-      width = 50 
-      height = 50
-      frames = 30
-      framerate = 30 #Hz
-      if codec:
-        outv = bob.io.VideoWriter(fname, height, width, framerate, codec=codec)
-      else:
-        outv = bob.io.VideoWriter(fname, height, width, framerate)
-      orig = []
-      for i in range(0, frames):
-        newframe = numpy.random.random_integers(0,255,(3,50,50))
-        outv.append(newframe.astype('uint8'))
-        orig.append(newframe.astype('uint8'))
-      outv.close()
-
-      inv = bob.io.VideoReader(fname)
-      input1 = inv.load()
-      input2 = bob.io.load(fname)
-
-      self.assertEqual( input1.shape, input2.shape )
-
-      for i in range(len(input1)):
-        diff = abs(input1[i].astype('float32')-input2[i].astype('float32'))
-        m = numpy.mean(diff)
-        self.assertEqual(m, 0.0)
+        self.assertTrue(m < 0.1)
 
     finally:
 
       if os.path.exists(fname): os.unlink(fname)
 
   @ffmpeg_found()
-  def xtest07_RandomReadWrite(self):
-    self.randomReadWrite("")
-    self.randomReadTwice("")
-    self.randomReadTwice2("")
+  def test07_PatternReadWrite(self):
+    self.patternReadWrite("")
+    self.patternReadTwice("")
       
-  @ffmpeg_found(0x000800)
+  @ffmpeg_found('0.8.0')
   @codec_available('mpeg4')
-  def xtest08_RandomReadWrite_mpeg4(self):
-    self.randomReadWrite("mpeg4")
-    self.randomReadTwice("mpeg4")
-    self.randomReadTwice2("mpeg4")
+  def test08_PatternReadWrite_mpeg4(self):
+    self.patternReadWrite("mpeg4")
+    self.patternReadTwice("mpeg4")
       
-  @ffmpeg_found(0x000800)
+  @ffmpeg_found('0.8.0')
   @codec_available('ffv1')
-  def xtest09_RandomReadWrite_ffv1(self):
-    self.randomReadWrite("ffv1")
-    self.randomReadTwice("ffv1")
-    self.randomReadTwice2("ffv1")
+  def test09_PatternReadWrite_ffv1(self):
+    self.patternReadWrite("ffv1")
+    self.patternReadTwice("ffv1")
       
-  @ffmpeg_found(0x000800)
+  @ffmpeg_found('0.8.0')
   @codec_available('h264')
-  def xtest10_RandomReadWrite_h264(self):
-    self.randomReadWrite("h264")
-    self.randomReadTwice("h264")
-    self.randomReadTwice2("h264")
+  def test10_PatternReadWrite_h264(self):
+    self.patternReadWrite("h264", ".mov")
+    self.patternReadTwice("h264", ".mov")

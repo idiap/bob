@@ -46,6 +46,10 @@ typedef CodecID AVCodecID;
 #define AV_PIX_FMT_RGB24 PIX_FMT_RGB24
 #endif
 
+#ifndef AV_PIX_FMT_GBRP
+#define AV_PIX_FMT_GBRP PIX_FMT_GBRP
+#endif
+
 #ifndef AV_PIX_FMT_YUV420P
 #define AV_PIX_FMT_YUV420P PIX_FMT_YUV420P
 #endif
@@ -556,7 +560,7 @@ boost::shared_ptr<SwsContext> ffmpeg::make_scaler
       SWS_BICUBIC, 0, 0, 0);
 
   if (!retval) {
-    boost::format m("ffmpeg::sws_getContext(src_width=%d, src_height=%d, src_pix_format=`%s', dest_width=%d, dest_height=%d, dest_pix_format=`%s', flags=SWS_BICUBIC, 0, 0, 0) failed: cannot get software scaler context to start encoding video file `%s'");
+    boost::format m("ffmpeg::sws_getContext(src_width=%d, src_height=%d, src_pix_format=`%s', dest_width=%d, dest_height=%d, dest_pix_format=`%s', flags=SWS_BICUBIC, 0, 0, 0) failed: cannot get software scaler context to start encoding or decoding video file `%s'");
     m % ctxt->width % ctxt->height % av_get_pix_fmt_name(source_pixel_format)
       % ctxt->width % ctxt->height % av_get_pix_fmt_name(dest_pixel_format)
       % filename;
@@ -601,43 +605,25 @@ boost::shared_array<uint8_t> ffmpeg::make_buffer
  * Transforms from Bob's planar 8-bit RGB representation to whatever is
  * required by the FFmpeg encoder output context (peeked from the AVStream
  * object passed).
- *
- * If the destination stream accepts packed RGB, we pack it from Bob's planar
- * representation directly into the output buffer (frame). Otherwise, we have
- * to go through a temporary resource, first pack and then convert to the final
- * representation. Unfortunately, the software scaler in ffmpeg cannot handle a
- * planar 8-bit RGB representation used by Bob.
  */
 static void image_to_context(const blitz::Array<uint8_t,3>& data,
     boost::shared_ptr<AVStream> stream,
     boost::shared_ptr<SwsContext> scaler,
-    boost::shared_ptr<AVFrame> output_frame,
-    boost::shared_ptr<AVFrame> tmp_frame) {
+    boost::shared_ptr<AVFrame> output_frame) {
 
-  size_t width = stream->codec->width;
-  size_t height = stream->codec->height;
+  int width = stream->codec->width;
+  int height = stream->codec->height;
   
-  if (stream->codec->pix_fmt != PIX_FMT_RGB24) {
-    //transpose Bob data from "planar" RGB24 to "packed" RGB24 on temporary
-    //frame space
-    blitz::Array<uint8_t,3> ordered(tmp_frame->data[0],
-        blitz::shape(height, width, 3), blitz::neverDeleteData);
-    ordered = const_cast<blitz::Array<uint8_t,3>&>(data).transpose(1,2,0);
-
-    // converts from packed RGB, 24-bits -> what is required by the context
-    // using a software scaler
-    sws_scale(scaler.get(), tmp_frame->data, tmp_frame->linesize,
-        0, height, output_frame->data, output_frame->linesize);
+  const uint8_t* datap = data.data();
+  int plane_size = width * height;
+  const uint8_t* planes[] = {datap+plane_size, datap+2*plane_size, datap, 0};
+  int linesize[] = {width, width, width, 0};
+  int ok = sws_scale(scaler.get(), planes, linesize, 0, height, output_frame->data, output_frame->linesize);
+  if (ok < 0) {
+    boost::format m("ffmpeg::sws_scale() failed: could not scale frame while encoding - ffmpeg reports error %d");
+    m % ok;
+    throw std::runtime_error(m.str());
   }
-  
-  else {
-    //transpose Bob data from "planar" RGB24 to "packed" RGB24
-    output_frame->linesize[0] = width*3;
-    blitz::Array<uint8_t,3> ordered(output_frame->data[0],
-        blitz::shape(height, width, 3), blitz::neverDeleteData);
-    ordered = const_cast<blitz::Array<uint8_t,3>&>(data).transpose(1,2,0); //organize for ffmpeg
-  }
-
 }
 
 static void deallocate_codec_context(AVCodecContext* c) {
@@ -842,13 +828,11 @@ void ffmpeg::write_video_frame (const blitz::Array<uint8_t,3>& data,
     boost::shared_ptr<AVFormatContext> format_context,
     boost::shared_ptr<AVStream> stream,
     boost::shared_ptr<AVFrame> context_frame,
-    boost::shared_ptr<AVFrame> packed_rgb_frame,
     boost::shared_ptr<SwsContext> swscaler,
     boost::shared_array<uint8_t> buffer,
     size_t buffer_size) {
 
-  image_to_context(data, stream, swscaler, context_frame,
-      packed_rgb_frame);
+  image_to_context(data, stream, swscaler, context_frame);
 
   if (format_context->oformat->flags & AVFMT_RAWPICTURE) {
     
@@ -895,7 +879,7 @@ void ffmpeg::write_video_frame (const blitz::Array<uint8_t,3>& data,
       ok = av_interleaved_write_frame(format_context.get(), pkt.get());
       if (ok && (ok != AVERROR(EINVAL))) {
         boost::format m("ffmpeg::av_interleaved_write_frame() failed: failed to write video frame while encoding file `%s' - ffmpeg reports error %d == `%s'");
-        m % m_filename % ok % ffmpeg_error(ok);
+        m % filename % ok % ffmpeg_error(ok);
         throw std::runtime_error(m.str());
       }
 
@@ -957,50 +941,64 @@ void ffmpeg::write_video_frame (const blitz::Array<uint8_t,3>& data,
   context_frame->pts += 1;
 }
 
-static bool decode_frame (const std::string& filename, int current_frame,
+static int decode_frame (const std::string& filename, int current_frame,
     boost::shared_ptr<AVCodecContext> codec_context,
     boost::shared_ptr<SwsContext> scaler,
-    boost::shared_ptr<AVFrame> context_frame,
-    boost::shared_ptr<AVFrame> packed_rgb_frame,
+    boost::shared_ptr<AVFrame> context_frame, uint8_t* data,
     boost::shared_ptr<AVPacket> pkt, 
     int& got_frame, bool throw_on_error) {
 
+  // In this call, 3 things can happen:
+  //
+  // 1. if ok < 0, an error has been detected
+  // 2. if ok >=0, something was read from the file, correctly. In this
+  // condition, **only* if "got_frame" == 1, a frame is ready to be decoded.
+  //
+  // It is **not** an error that ok is >= 0 and got_frame == 0. This, in fact,
+  // happens often with recent versions of ffmpeg.
+  
 #if LIBAVCODEC_VERSION_INT >= 0x344802 //52.72.2 @ ffmpeg-0.6
 
   int ok = avcodec_decode_video2(codec_context.get(), context_frame.get(),
       &got_frame, pkt.get());
-  if (ok < 0) {
-    if (throw_on_error) {
-      boost::format m("ffmpeg::avcodec_decode_video2() failed: could not decode frame %d of file `%s' - ffmpeg reports error %d == `%s'");
-      m % current_frame % filename % ok % ffmpeg_error(ok);
-      throw std::runtime_error(m.str());
-    }
-    else return false;
-  }
 
 #else
 
   int ok = avcodec_decode_video(codec_context.get(), context_frame.get(), &got_frame, pkt->data, pkt->size);
-  if (ok < 0) {
-    if (throw_on_error) {
-      boost::format m("ffmpeg::avcodec_decode_video() failed: could not decode frame %d of file `%s' - ffmpeg reports error %d == `%s'");
-      m % current_frame % filename % ok % ffmpeg_error(ok);
-      throw std::runtime_error(m.str());
-    }
-    else return false;
-  }
 
 #endif
 
-  int height = 0;
-
-  if (got_frame) {
-    height = sws_scale(scaler.get(), context_frame->data,
-        context_frame->linesize, 0, codec_context->height,
-        packed_rgb_frame->data, packed_rgb_frame->linesize);
+  if (ok < 0 && throw_on_error) {
+    boost::format m("ffmpeg::avcodec_decode_video/2() failed: could not decode frame %d of file `%s' - ffmpeg reports error %d == `%s'");
+    m % current_frame % filename % ok % ffmpeg_error(ok);
+    throw std::runtime_error(m.str());
   }
 
-  return (height > 0);
+  if (got_frame) {
+
+    // In this case, we call the software scaler to decode the frame data.
+    // Normally, this means converting from planar YUV420 into packed RGB.
+
+    uint8_t* planes[] = {data, 0};
+    int linesize[] = {3*codec_context->width, 0};
+
+    int conv_height = sws_scale(scaler.get(), context_frame->data,
+        context_frame->linesize, 0, codec_context->height, planes, linesize);
+
+    if (conv_height < 0) {
+
+      if (throw_on_error) {
+        boost::format m("ffmpeg::sws_scale() failed: could not scale frame %d of file `%s' - ffmpeg reports error %d");
+        m % current_frame % filename % conv_height;
+        throw std::runtime_error(m.str());
+      }
+
+      return -1;
+    }
+
+  }
+
+  return ok;
 }
 
 bool ffmpeg::read_video_frame (const std::string& filename, 
@@ -1008,15 +1006,14 @@ bool ffmpeg::read_video_frame (const std::string& filename,
     boost::shared_ptr<AVFormatContext> format_context,
     boost::shared_ptr<AVCodecContext> codec_context,
     boost::shared_ptr<SwsContext> swscaler,
-    boost::shared_ptr<AVFrame> context_frame,
-    boost::shared_ptr<AVFrame> packed_rgb_frame,
+    boost::shared_ptr<AVFrame> context_frame, uint8_t* data,
     bool throw_on_error) {
 
   boost::shared_ptr<AVPacket> pkt = make_packet();
 
   int ok = av_read_frame(format_context.get(), pkt.get());
 
-  if (ok < 0 and ok != AVERROR_EOF) {
+  if (ok < 0 && ok != AVERROR_EOF) {
     if (throw_on_error) {
       boost::format m("ffmpeg::av_read_frame() failed: on file `%s' - ffmpeg reports error %d == `%s'");
       m % filename % ok % ffmpeg_error(ok);
@@ -1025,7 +1022,7 @@ bool ffmpeg::read_video_frame (const std::string& filename,
     else return false;
   }
 
-  bool retval = true;
+  int retval = 0;
   int got_frame = 0;
 
   // if we have reached the end-of-file, frames can still be cached
@@ -1033,25 +1030,90 @@ bool ffmpeg::read_video_frame (const std::string& filename,
     pkt->data = 0;
     pkt->size = 0;
     retval = decode_frame(filename, current_frame, codec_context, swscaler,
-        context_frame, packed_rgb_frame, pkt, got_frame, throw_on_error);
+        context_frame, data, pkt, got_frame, throw_on_error);
   }
   else {
     if (pkt->stream_index == stream_index) {
       retval = decode_frame(filename, current_frame, codec_context,
-          swscaler, context_frame, packed_rgb_frame, pkt, got_frame,
+          swscaler, context_frame, data, pkt, got_frame,
           throw_on_error);
     }
   }
 
-  if (got_frame == 0) {
+  return (got_frame > 0);
+}
+
+static int dummy_decode_frame (const std::string& filename, int current_frame,
+    boost::shared_ptr<AVCodecContext> codec_context,
+    boost::shared_ptr<AVFrame> context_frame,
+    boost::shared_ptr<AVPacket> pkt, 
+    int& got_frame, bool throw_on_error) {
+
+  // In this call, 3 things can happen:
+  //
+  // 1. if ok < 0, an error has been detected
+  // 2. if ok >=0, something was read from the file, correctly. In this
+  // condition, **only* if "got_frame" == 1, a frame is ready to be decoded.
+  //
+  // It is **not** an error that ok is >= 0 and got_frame == 0. This, in fact,
+  // happens often with recent versions of ffmpeg.
+  
+#if LIBAVCODEC_VERSION_INT >= 0x344802 //52.72.2 @ ffmpeg-0.6
+
+  int ok = avcodec_decode_video2(codec_context.get(), context_frame.get(),
+      &got_frame, pkt.get());
+
+#else
+
+  int ok = avcodec_decode_video(codec_context.get(), context_frame.get(), &got_frame, pkt->data, pkt->size);
+
+#endif
+
+  if (ok < 0 && throw_on_error) {
+    boost::format m("ffmpeg::avcodec_decode_video/2() failed: could not skip frame %d of file `%s' - ffmpeg reports error %d == `%s'");
+    m % current_frame % filename % ok % ffmpeg_error(ok);
+    throw std::runtime_error(m.str());
+  }
+
+  return ok;
+}
+
+bool ffmpeg::skip_video_frame (const std::string& filename,
+    int current_frame, int stream_index,
+    boost::shared_ptr<AVFormatContext> format_context,
+    boost::shared_ptr<AVCodecContext> codec_context,
+    boost::shared_ptr<AVFrame> context_frame,
+    bool throw_on_error) {
+
+  boost::shared_ptr<AVPacket> pkt = make_packet();
+
+  int ok = av_read_frame(format_context.get(), pkt.get());
+
+  if (ok < 0 && ok != AVERROR_EOF) {
     if (throw_on_error) {
-      //user asked to read a frame, but there are no more frames left!
-      boost::format m("failed to find an extra frame to read at frame %d of file `%s' - did not get any more frames from decoder (even after flushing it out)");
-      m % current_frame % filename;
+      boost::format m("ffmpeg::av_read_frame() failed: on file `%s' - ffmpeg reports error %d == `%s'");
+      m % filename % ok % ffmpeg_error(ok);
       throw std::runtime_error(m.str());
     }
     else return false;
   }
 
-  return retval;
+  int retval = 0;
+  int got_frame = 0;
+
+  // if we have reached the end-of-file, frames can still be cached
+  if (ok == AVERROR_EOF) {
+    pkt->data = 0;
+    pkt->size = 0;
+    retval = dummy_decode_frame(filename, current_frame, codec_context,
+        context_frame, pkt, got_frame, throw_on_error);
+  }
+  else {
+    if (pkt->stream_index == stream_index) {
+      retval = dummy_decode_frame(filename, current_frame, codec_context,
+          context_frame, pkt, got_frame, throw_on_error);
+    }
+  }
+
+  return (got_frame > 0);
 }

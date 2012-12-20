@@ -106,19 +106,6 @@ namespace bob { namespace io { namespace detail { namespace ffmpeg {
   boost::shared_ptr<AVFrame> make_frame(const std::string& filename,
       boost::shared_ptr<AVCodecContext> stream, PixelFormat pixfmt);
 
-  /**
-   * Reads a single video frame from the stream. Input data must be previously
-   * allocated and be of the right type and size for holding the frame
-   * contents. It is an error to try to read past the end of the file.
-   */
-  bool read_video_frame (const std::string& filename, int current_frame,
-      int stream_index, boost::shared_ptr<AVFormatContext> format_context,
-      boost::shared_ptr<AVCodecContext> codec_context,
-      boost::shared_ptr<SwsContext> swscaler,
-      boost::shared_ptr<AVFrame> context_frame,
-      boost::shared_ptr<AVFrame> packed_rgb_frame,
-      bool throw_on_error);
-
   /************************************************************************
    * Video reading specific utilities
    ************************************************************************/
@@ -157,6 +144,32 @@ namespace bob { namespace io { namespace detail { namespace ffmpeg {
    * respected.
    */
   boost::shared_ptr<AVFrame> make_empty_frame(const std::string& filename);
+
+  /**
+   * Reads a single video frame from the stream. Input data must be previously
+   * allocated and be of the right type and size for holding the frame
+   * contents. It is an error to try to read past the end of the file.
+   *
+   * @return true if it manages to load a video frame or false otherwise.
+   */
+  bool read_video_frame (const std::string& filename, int current_frame,
+      int stream_index, boost::shared_ptr<AVFormatContext> format_context,
+      boost::shared_ptr<AVCodecContext> codec_context,
+      boost::shared_ptr<SwsContext> swscaler,
+      boost::shared_ptr<AVFrame> context_frame, uint8_t* data,
+      bool throw_on_error);
+
+  /**
+   * Reads a single video frame from the stream, but skip it in the fastest
+   * possible way. This method can be used for a somewhat fast forward strategy
+   * with read iterators.
+   *
+   * @return true if it manages to skip a video frame or false otherwise.
+   */
+  bool skip_video_frame (const std::string& filename, int current_frame,
+      int stream_index, boost::shared_ptr<AVFormatContext> format_context,
+      boost::shared_ptr<AVCodecContext> codec_context,
+      boost::shared_ptr<AVFrame> context_frame, bool throw_on_error);
 
   /************************************************************************
    * Video writing specific utilities
@@ -230,14 +243,14 @@ namespace bob { namespace io { namespace detail { namespace ffmpeg {
    * Writes a data frame into the encoder stream.
    *
    * @note The encoder may have a CODEC_CAP_DELAY capability, which means that
-   * the frame insertion is not always instantaneous.
+   * the frame insertion is not always instantaneous. You must use 
+   * flush_encoder() in such conditions.
    */
   void write_video_frame (const blitz::Array<uint8_t,3>& data,
     const std::string& filename,
     boost::shared_ptr<AVFormatContext> format_context,
     boost::shared_ptr<AVStream> stream,
     boost::shared_ptr<AVFrame> context_frame,
-    boost::shared_ptr<AVFrame> packed_rgb_frame,
     boost::shared_ptr<SwsContext> swscaler,
     boost::shared_array<uint8_t> buffer,
     size_t buffer_size);

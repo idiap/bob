@@ -215,8 +215,8 @@ void io::VideoReader::const_iterator::init() {
   m_swscaler = ffmpeg::make_scaler(filename, m_codec_context,
       m_codec_context->pix_fmt, PIX_FMT_RGB24);
   m_context_frame = ffmpeg::make_empty_frame(filename);
-  m_packed_rgb_frame = ffmpeg::make_frame(filename, m_codec_context,
-      AV_PIX_FMT_RGB24);
+  m_rgb_array.reference(blitz::Array<uint8_t,3>(m_codec_context->height, 
+      m_codec_context->width, 3));
 
   //at this point we are ready to start reading out frames.
   m_current_frame = 0;
@@ -231,7 +231,6 @@ void io::VideoReader::const_iterator::init() {
 
 void io::VideoReader::const_iterator::reset() {
   m_context_frame.reset();
-  m_packed_rgb_frame.reset();
   m_swscaler.reset();
   m_codec_context.reset();
   m_codec = 0;
@@ -249,9 +248,10 @@ bool io::VideoReader::const_iterator::read(blitz::Array<uint8_t,3>& data,
 bool io::VideoReader::const_iterator::read(bob::core::array::interface& data,
   bool throw_on_error) {
 
-  if (!m_parent)
+  if (!m_parent) {
     //we are already past the end of the stream
     throw std::runtime_error("video iterator for file has already reached its end and was reset");
+  }
 
   //checks if we have not passed the end of the video sequence already
   if(m_current_frame >= m_parent->numberOfFrames()) {
@@ -275,31 +275,15 @@ bool io::VideoReader::const_iterator::read(bob::core::array::interface& data,
     s % info.str() % m_parent->m_typeinfo_frame.str();
     throw std::invalid_argument(s.str());
   }
-    
-  blitz::TinyVector<int,3> shape;
-  blitz::TinyVector<int,3> stride;
 
-  shape = info.shape[0], info.shape[1], info.shape[2];
-  stride = info.stride[0], info.stride[1], info.stride[2];
-  blitz::Array<uint8_t,3> bzdata(static_cast<uint8_t*>(data.ptr()),
-      shape, stride, blitz::neverDeleteData);
-
-  bool ok = ffmpeg::read_video_frame(m_parent->m_filepath, m_current_frame++,
+  //we are going to need another copy step - use our internal array
+  bool ok = ffmpeg::read_video_frame(m_parent->m_filepath, m_current_frame,
       m_stream_index, m_format_context, m_codec_context, m_swscaler,
-      m_context_frame, m_packed_rgb_frame, throw_on_error);
+      m_context_frame, m_rgb_array.data(), throw_on_error);
 
   if (ok) {
-    
-    // Copies the data into the destination array. Here is some background: bob
-    // arranges the data for a colored image like: (color-bands, height,
-    // width).  That makes it easy to extract a given band from the image as
-    // its memory is contiguous. FFmpeg prefers the following encoding (height,
-    // width, color-bands).
-    //
-    // Note: The FFmpeg way to read and write image data is hard-coded and
-    // impossible to circumvent by passing a different stride setup.
 
-    // transpose the data.
+    //now we copy from one container to the other, using our Blitz++ technique
     blitz::TinyVector<int,3> shape;
     blitz::TinyVector<int,3> stride;
 
@@ -308,10 +292,8 @@ bool io::VideoReader::const_iterator::read(bob::core::array::interface& data,
     blitz::Array<uint8_t,3> dst(static_cast<uint8_t*>(data.ptr()), 
         shape, stride, blitz::neverDeleteData);
 
-    shape = info.shape[1], info.shape[2], info.shape[0];
-    blitz::Array<uint8_t,3> src(m_packed_rgb_frame->data[0], shape, 
-        blitz::neverDeleteData);
-    dst = src.transpose(2,0,1);
+    dst = m_rgb_array.transpose(2,0,1);
+    ++m_current_frame;
 
   }
 
@@ -323,54 +305,25 @@ bool io::VideoReader::const_iterator::read(bob::core::array::interface& data,
  * operations to get a better performance.
  */
 io::VideoReader::const_iterator& io::VideoReader::const_iterator::operator++ () {
-  if (!m_parent)
+  if (!m_parent) {
     //we are already past the end of the stream
     throw std::runtime_error("video iterator for file has already reached its end and was reset");
+  }
 
+  //checks if we have not passed the end of the video sequence already
   if(m_current_frame >= m_parent->numberOfFrames()) {
     reset();
     return *this;
   }
 
-  //read the frame
-  int gotPicture = 0;
-  AVPacket packet;
-  av_init_packet(&packet);
-  int av_error = 0;
-
-  while ((av_error=av_read_frame(m_format_context.get(), &packet)) >= 0) {
-    // Is this a packet from the video stream?
-    if (packet.stream_index == m_stream_index) {
-      // Decodes video frame, store it on my buffer
-#if LIBAVCODEC_VERSION_INT >= 0x344802
-      avcodec_decode_video2(m_codec_context.get(), m_context_frame.get(), &gotPicture, &packet);
-#else
-      avcodec_decode_video(m_codec_context.get(), m_context_frame.get(), &gotPicture, packet.data, packet.size);
-#endif
-
-      // Did we get a video frame?
-      if (gotPicture) {
-        // Got the image - exit
-        ++m_current_frame;
-
-        // Frees the packet that was allocated by av_read_frame
-        av_free_packet(&packet);
-        break;
-      }
-    }
-
-    // Frees the packet that was allocated by av_read_frame
-    av_free_packet(&packet);
+  //we are going to need another copy step - use our internal array
+  try {
+    bool ok = ffmpeg::skip_video_frame(m_parent->m_filepath, m_current_frame,
+        m_stream_index, m_format_context, m_codec_context, m_context_frame,
+        true);
+    if (ok) ++m_current_frame;
   }
-
-  if (av_error < 0) {
-    if (m_current_frame < m_parent->numberOfFrames()) {
-      boost::format m("ffmpeg/av_read_frame() returned an error (%d) reading frame %d of file '%s' which contains %d frames - truncating file at this point.");
-      m % av_error % m_current_frame % m_parent->m_filepath % m_parent->m_nframes;
-      bob::core::info << m.str(); //goes to stdout
-    }
-
-    //transform the current iterator in "end"
+  catch (std::runtime_error& e) {
     reset();
   }
 

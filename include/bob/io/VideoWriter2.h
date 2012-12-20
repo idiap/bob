@@ -194,7 +194,6 @@ namespace bob { namespace io {
       boost::shared_ptr<AVStream> m_stream; ///< the video stream
       boost::shared_ptr<AVCodecContext> m_codec_context; ///< codec context
       boost::shared_ptr<AVFrame> m_context_frame; ///< output frame data
-      boost::shared_ptr<AVFrame> m_packed_rgb_frame; ///< temporary
       boost::shared_ptr<SwsContext> m_swscaler; ///< software scaler
       boost::shared_array<uint8_t> m_buffer; ///< buffer for ffmpeg < 0.11.0
       size_t m_height;
