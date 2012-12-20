@@ -35,6 +35,10 @@ using namespace boost::python;
 namespace io = bob::io;
 namespace tp = bob::python;
 
+#if !HAVE_FFMPEG_AVCODEC_AVCODECID
+#define AVCodecID CodecID
+#endif
+
 /**
  * Helper method for the the iterator wrapping
  */

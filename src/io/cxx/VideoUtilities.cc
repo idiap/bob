@@ -135,7 +135,7 @@ static std::string ffmpeg_error(int num) {
 }
 
 static void deallocate_input_format_context(AVFormatContext* c) {
-# if LIBAVFORMAT_VERSION_INT < 0x351800 //53.24.0 @ ffmpeg-0.9
+# if LIBAVFORMAT_VERSION_INT < 0x351500 //53.21.0 @ ffmpeg-0.9 + libav-0.8.4
 
   av_close_input_file(c);
 
@@ -255,7 +255,7 @@ AVCodec* ffmpeg::find_decoder(const std::string& filename,
   return retval;
 }
 
-#if LIBAVFORMAT_VERSION_INT < 0x346e00 // 52.110.0 @ ffmpeg-0.7
+#if !HAVE_FFMPEG_AVFORMAT_ALLOC_OUTPUT_CONTEXT2
 
 /**
  * This method was copied from ffmpeg-0.8 and is used in case it is not defined
@@ -398,7 +398,7 @@ boost::shared_ptr<AVStream> ffmpeg::make_stream(
     float framerate, float bitrate, size_t gop,
     AVCodec* codec) {
 
-#if LIBAVFORMAT_VERSION_INT >= 0x351800 //53.24.0 @ ffmpeg-0.9
+#if LIBAVFORMAT_VERSION_INT >= 0x351500 //53.21.0 @ ffmpeg-0.9
 
   AVStream* retval = avformat_new_stream(fmtctxt.get(), codec);
 
@@ -1013,7 +1013,7 @@ bool ffmpeg::read_video_frame (const std::string& filename,
 
   int ok = av_read_frame(format_context.get(), pkt.get());
 
-  if (ok < 0 && ok != AVERROR_EOF) {
+  if (ok < 0 && ok != (long)AVERROR_EOF) {
     if (throw_on_error) {
       boost::format m("ffmpeg::av_read_frame() failed: on file `%s' - ffmpeg reports error %d == `%s'");
       m % filename % ok % ffmpeg_error(ok);
@@ -1022,19 +1022,18 @@ bool ffmpeg::read_video_frame (const std::string& filename,
     else return false;
   }
 
-  int retval = 0;
   int got_frame = 0;
 
   // if we have reached the end-of-file, frames can still be cached
-  if (ok == AVERROR_EOF) {
+  if (ok == (long)AVERROR_EOF) {
     pkt->data = 0;
     pkt->size = 0;
-    retval = decode_frame(filename, current_frame, codec_context, swscaler,
+    decode_frame(filename, current_frame, codec_context, swscaler,
         context_frame, data, pkt, got_frame, throw_on_error);
   }
   else {
     if (pkt->stream_index == stream_index) {
-      retval = decode_frame(filename, current_frame, codec_context,
+      decode_frame(filename, current_frame, codec_context,
           swscaler, context_frame, data, pkt, got_frame,
           throw_on_error);
     }
@@ -1089,7 +1088,7 @@ bool ffmpeg::skip_video_frame (const std::string& filename,
 
   int ok = av_read_frame(format_context.get(), pkt.get());
 
-  if (ok < 0 && ok != AVERROR_EOF) {
+  if (ok < 0 && ok != (long)AVERROR_EOF) {
     if (throw_on_error) {
       boost::format m("ffmpeg::av_read_frame() failed: on file `%s' - ffmpeg reports error %d == `%s'");
       m % filename % ok % ffmpeg_error(ok);
@@ -1098,19 +1097,18 @@ bool ffmpeg::skip_video_frame (const std::string& filename,
     else return false;
   }
 
-  int retval = 0;
   int got_frame = 0;
 
   // if we have reached the end-of-file, frames can still be cached
-  if (ok == AVERROR_EOF) {
+  if (ok == (long)AVERROR_EOF) {
     pkt->data = 0;
     pkt->size = 0;
-    retval = dummy_decode_frame(filename, current_frame, codec_context,
+    dummy_decode_frame(filename, current_frame, codec_context,
         context_frame, pkt, got_frame, throw_on_error);
   }
   else {
     if (pkt->stream_index == stream_index) {
-      retval = dummy_decode_frame(filename, current_frame, codec_context,
+      dummy_decode_frame(filename, current_frame, codec_context,
           context_frame, pkt, got_frame, throw_on_error);
     }
   }
