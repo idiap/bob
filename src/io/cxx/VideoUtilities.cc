@@ -31,6 +31,7 @@ extern "C" {
 
 #include "bob/io/VideoUtilities.h"
 #include "bob/core/logging.h"
+#include "bob/config.h"
 
 /**
  * Some code to account for older versions of ffmpeg
@@ -255,7 +256,7 @@ AVCodec* ffmpeg::find_decoder(const std::string& filename,
   return retval;
 }
 
-#if !HAVE_FFMPEG_AVFORMAT_ALLOC_OUTPUT_CONTEXT2
+#ifndef HAVE_FFMPEG_AVFORMAT_ALLOC_OUTPUT_CONTEXT2
 
 /**
  * This method was copied from ffmpeg-0.8 and is used in case it is not defined
