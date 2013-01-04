@@ -86,6 +86,11 @@ class JFABaseMachine
     bool operator==(const JFABaseMachine& b) const;    
 
     /**
+     * Similar to
+     */
+    bool is_similar_to(const JFABaseMachine& b, const double epsilon=1e-8) const;    
+
+    /**
      * Loads data from an existing configuration object. Resets the current
      * state.
      */
@@ -277,6 +282,11 @@ class JFAMachine
      * @warning Also checks that the UBM are equal if any
      */
     bool operator==(const JFAMachine &m) const;    
+
+    /**
+     * Similar to
+     */
+    bool is_similar_to(const JFAMachine& b, const double epsilon=1e-8) const;    
 
     /**
      * Loads data from an existing configuration object. Resets the current
