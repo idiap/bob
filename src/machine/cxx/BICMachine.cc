@@ -152,8 +152,19 @@ bool bob::machine::BICMachine::is_similar_to(const BICMachine& other, const doub
     // compare data
     if (not bob::core::array::hasSameShape(m_Phi_I, other.m_Phi_I)) return false;
     if (not bob::core::array::hasSameShape(m_Phi_E, other.m_Phi_E)) return false;
-    if (blitz::any(blitz::abs(m_Phi_I - other.m_Phi_I) > epsilon )) return false;
-    if (blitz::any(blitz::abs(m_Phi_E - other.m_Phi_E) > epsilon )) return false;
+    // check that the projection matrices are close,
+    // but allow that eigen vectors might have opposite directions
+    // (i.e., they are either identical -> difference is 0, or opposite -> sum is zero)
+    for (int i = m_Phi_I.shape()[1]; i--;){
+      const blitz::Array<double,1>& sub1 = m_Phi_I(blitz::Range::all(), i);
+      const blitz::Array<double,1>& sub2 = other.m_Phi_I(blitz::Range::all(), i);
+      if (blitz::any(blitz::abs(sub1 - sub2) > epsilon) && blitz::any(blitz::abs(sub1 + sub2) > epsilon)) return false;
+    }
+    for (int i = m_Phi_E.shape()[1]; i--;){
+      const blitz::Array<double,1>& sub1 = m_Phi_E(blitz::Range::all(), i);
+      const blitz::Array<double,1>& sub2 = other.m_Phi_E(blitz::Range::all(), i);
+      if (blitz::any(blitz::abs(sub1 - sub2) > epsilon) && blitz::any(blitz::abs(sub1 + sub2) > epsilon)) return false;
+    }
     if (m_use_DFFS && (std::abs(m_rho_I - other.m_rho_I) > epsilon || std::abs(m_rho_I - other.m_rho_I) > epsilon)) return false;
   }
   return true;
