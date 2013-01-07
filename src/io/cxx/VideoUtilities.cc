@@ -23,6 +23,7 @@
 #include <boost/format.hpp>
 
 extern "C" {
+#include <libavcodec/avcodec.h>
 #if LIBAVUTIL_VERSION_INT >= 0x320f01 //50.15.1 @ ffmpeg-0.6
 #  include <libavutil/opt.h>
 #  include <libavutil/pixdesc.h>
