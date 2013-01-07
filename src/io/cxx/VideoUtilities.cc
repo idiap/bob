@@ -1014,7 +1014,7 @@ bool ffmpeg::read_video_frame (const std::string& filename,
 
   int ok = av_read_frame(format_context.get(), pkt.get());
 
-  if (ok < 0 && ok != (long)AVERROR_EOF) {
+  if (ok < 0 && ok != (int)AVERROR_EOF) {
     if (throw_on_error) {
       boost::format m("ffmpeg::av_read_frame() failed: on file `%s' - ffmpeg reports error %d == `%s'");
       m % filename % ok % ffmpeg_error(ok);
@@ -1026,7 +1026,7 @@ bool ffmpeg::read_video_frame (const std::string& filename,
   int got_frame = 0;
 
   // if we have reached the end-of-file, frames can still be cached
-  if (ok == (long)AVERROR_EOF) {
+  if (ok == (int)AVERROR_EOF) {
     pkt->data = 0;
     pkt->size = 0;
     decode_frame(filename, current_frame, codec_context, swscaler,
@@ -1089,7 +1089,7 @@ bool ffmpeg::skip_video_frame (const std::string& filename,
 
   int ok = av_read_frame(format_context.get(), pkt.get());
 
-  if (ok < 0 && ok != (long)AVERROR_EOF) {
+  if (ok < 0 && ok != (int)AVERROR_EOF) {
     if (throw_on_error) {
       boost::format m("ffmpeg::av_read_frame() failed: on file `%s' - ffmpeg reports error %d == `%s'");
       m % filename % ok % ffmpeg_error(ok);
@@ -1101,7 +1101,7 @@ bool ffmpeg::skip_video_frame (const std::string& filename,
   int got_frame = 0;
 
   // if we have reached the end-of-file, frames can still be cached
-  if (ok == (long)AVERROR_EOF) {
+  if (ok == (int)AVERROR_EOF) {
     pkt->data = 0;
     pkt->size = 0;
     dummy_decode_frame(filename, current_frame, codec_context,
