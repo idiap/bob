@@ -94,22 +94,11 @@ if(FFMPEG_FOUND)
     "VideoException.cc"
     "VideoFile.cc"
     "VideoUtilities.cc"
+    "VideoWriter.cc"
+    "VideoReader.cc"
   )
   list(APPEND incdir "${FFMPEG_INCLUDE_DIRS}")
   add_definitions("-D__STDC_CONSTANT_MACROS")
-
-  if(FFMPEG_VERSION VERSION_LESS "0.8.0")
-    list(APPEND src 
-      "VideoWriter1.cc"
-      "VideoReader1.cc"
-      )
-  else()
-    list(APPEND src 
-      "VideoWriter2.cc"
-      "VideoReader2.cc"
-      )
-  endif()
-
 endif(FFMPEG_FOUND)
 
 # Define the library, compilation and linkage options

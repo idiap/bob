@@ -251,6 +251,7 @@ namespace bob { namespace io { namespace detail { namespace ffmpeg {
     boost::shared_ptr<AVFormatContext> format_context,
     boost::shared_ptr<AVStream> stream,
     boost::shared_ptr<AVFrame> context_frame,
+    boost::shared_ptr<AVFrame> tmp_frame,
     boost::shared_ptr<SwsContext> swscaler,
     boost::shared_array<uint8_t> buffer,
     size_t buffer_size);
