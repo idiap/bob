@@ -1,5 +1,5 @@
 /**
- * @file io/cxx/VideoWriter2.cc
+ * @file io/cxx/VideoWriter.cc
  * @date Wed 28 Nov 2012 13:51:58 CET
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
@@ -31,10 +31,6 @@
 #define FFMPEG_VIDEO_BUFFER_SIZE 0
 #endif
 
-#if !defined(AV_PIX_FMT_GBRP) && defined(PIX_FMT_GBRP)
-#define AV_PIX_FMT_GBRP PIX_FMT_GBRP
-#endif
-
 #ifndef AV_PIX_FMT_RGB24
 #define AV_PIX_FMT_RGB24 PIX_FMT_RGB24
 #endif
@@ -58,7 +54,7 @@ bob::io::VideoWriter::VideoWriter(
         width, framerate, bitrate, gop, m_codec)),
   m_codec_context(ffmpeg::make_codec_context(filename, m_stream.get(), m_codec)),
   m_context_frame(ffmpeg::make_frame(filename, m_codec_context, m_stream->codec->pix_fmt)),
-#if defined(AV_PIX_FMT_GBRP)
+#if LIBAVCODEC_VERSION_INT >= 0x352a00 //53.42.0 @ ffmpeg-0.9
   m_swscaler(ffmpeg::make_scaler(filename, m_codec_context, AV_PIX_FMT_GBRP, m_stream->codec->pix_fmt)),
 #else
   m_rgb24_frame(ffmpeg::make_frame(filename, m_codec_context, AV_PIX_FMT_RGB24)),

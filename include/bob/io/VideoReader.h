@@ -1,5 +1,5 @@
 /**
- * @file bob/io/VideoReader2.h
+ * @file bob/io/VideoReader.h
  * @date Wed Jun 22 17:50:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB_IO_VIDEOREADER2_H
-#define BOB_IO_VIDEOREADER2_H
+#ifndef BOB_IO_VIDEOREADER_H
+#define BOB_IO_VIDEOREADER_H
 
 #include <string>
 #include <blitz/array.h>
@@ -378,4 +378,4 @@ namespace bob { namespace io {
 
 }}
 
-#endif //BOB_IO_VIDEOREADER2_H
+#endif //BOB_IO_VIDEOREADER_H

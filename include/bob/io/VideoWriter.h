@@ -1,5 +1,5 @@
 /**
- * @file bob/io/VideoWriter2.h
+ * @file bob/io/VideoWriter.h
  * @date Wed 28 Nov 2012 13:52:08 CET
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB_IO_VIDEOWRITER2_H
-#define BOB_IO_VIDEOWRITER2_H
+#ifndef BOB_IO_VIDEOWRITER_H
+#define BOB_IO_VIDEOWRITER_H
 
 #include "bob/core/array.h"
 #include "bob/io/VideoUtilities.h"
@@ -212,4 +212,4 @@ namespace bob { namespace io {
 
 }}
 
-#endif /* BOB_IO_VIDEOWRITER2_H */
+#endif /* BOB_IO_VIDEOWRITER_H */

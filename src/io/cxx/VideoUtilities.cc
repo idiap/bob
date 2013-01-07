@@ -46,14 +46,6 @@ extern "C" {
 typedef CodecID AVCodecID;
 #endif
 
-#ifndef AV_PIX_FMT_RGB24
-#define AV_PIX_FMT_RGB24 PIX_FMT_RGB24
-#endif
-
-#ifndef AV_PIX_FMT_GBRP
-#define AV_PIX_FMT_GBRP PIX_FMT_GBRP
-#endif
-
 #ifndef AV_PIX_FMT_YUV420P
 #define AV_PIX_FMT_YUV420P PIX_FMT_YUV420P
 #endif
