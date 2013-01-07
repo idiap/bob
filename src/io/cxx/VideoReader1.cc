@@ -531,6 +531,8 @@ bool io::VideoReader::const_iterator::read(ca::interface& data,
   int gotPicture = 0;
   AVPacket packet;
   av_init_packet(&packet);
+  packet.data = 0;
+  packet.size = 0;
   int av_error = 0;
   int sws_height = 0;
 
