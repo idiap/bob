@@ -23,7 +23,6 @@
 #include <boost/python.hpp>
 #include <boost/python/slice.hpp>
 
-#include "bob/io/VideoException.h"
 #include "bob/io/VideoReader.h"
 #include "bob/io/VideoWriter.h"
 
@@ -297,9 +296,6 @@ static object codec_dictionary() {
 }
 
 void bind_io_video() {
-  //special exceptions for videos
-  tp::register_exception_translator<bob::io::VideoIsClosed>(PyExc_IOError);
-
   iterator_wrapper().wrap(); //wraps io::VideoReader::const_iterator
 
   class_<io::VideoReader, boost::shared_ptr<io::VideoReader> >("VideoReader",

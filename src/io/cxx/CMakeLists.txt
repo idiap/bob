@@ -91,7 +91,6 @@ endif(GIF_FOUND)
 if(FFMPEG_FOUND)
   list(APPEND shared "${FFMPEG_RESOLVED_LIBRARIES}")
   list(APPEND src 
-    "VideoException.cc"
     "VideoFile.cc"
     "VideoUtilities.cc"
     "VideoWriter.cc"

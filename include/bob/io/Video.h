@@ -25,6 +25,5 @@
 
 #include "bob/io/VideoReader.h"
 #include "bob/io/VideoWriter.h"
-#include "bob/io/VideoException.h"
 
 #endif //BOB_IO_VIDEO_H
