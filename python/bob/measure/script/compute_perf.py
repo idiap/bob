@@ -4,21 +4,21 @@
 # Wed May 25 13:27:46 2011 +0200
 #
 # Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 3 of the License.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """This script runs error analysis on the development and test set scores, in a
-four column format: 
+four column format:
   1. Computes the threshold using either EER or min. HTER criteria on
      develoment set scores;
   2. Applies the above threshold on test set scores to compute the HTER
@@ -32,7 +32,7 @@ Examples:
 
      $ %(prog)s --output=mycurves.pdf --devel=dev.scores --test=test.scores
 
-  2. Specify a different number of points 
+  2. Specify a different number of points
 
      $ %(prog)s --points=500 --devel=dev.scores --test=test.scores
 
@@ -58,7 +58,7 @@ def print_crit(dev_neg, dev_pos, test_neg, test_pos, crit):
   test_hter = (test_far + test_frr)/2.0
 
   print("[Min. criterium: %s] Threshold on Development set: %e" % (crit, thres))
-  
+
   dev_ni = dev_neg.shape[0] #number of impostors
   dev_fa = int(round(dev_far*dev_ni)) #number of false accepts
   dev_nc = dev_pos.shape[0] #number of clients
@@ -78,7 +78,7 @@ def print_crit(dev_neg, dev_pos, test_neg, test_pos, crit):
   def fmt(s, space):
     return ('%' + ('%d' % space) + 's') % s
 
-  print("       | %s | %s" % (fmt("Development", -1*dev_max_len), 
+  print("       | %s | %s" % (fmt("Development", -1*dev_max_len),
     fmt("Test", -1*test_max_len)))
   print("-------+-%s-+-%s" % (dev_max_len*"-", (2+test_max_len)*"-"))
   print("  FAR  | %s | %s" % (fmt(dev_far_str, dev_max_len), fmt(test_far_str,
@@ -87,7 +87,7 @@ def print_crit(dev_neg, dev_pos, test_neg, test_pos, crit):
     test_max_len)))
   dev_hter_str = "%.3f%%" % (100*dev_hter)
   test_hter_str = "%.3f%%" % (100*test_hter)
-  print("  HTER | %s | %s" % (fmt(dev_hter_str, -1*dev_max_len), 
+  print("  HTER | %s | %s" % (fmt(dev_hter_str, -1*dev_max_len),
     fmt(test_hter_str, -1*test_max_len)))
 
 def plots(dev_neg, dev_pos, test_neg, test_pos, npoints, filename):
@@ -102,7 +102,7 @@ def plots(dev_neg, dev_pos, test_neg, test_pos, npoints, filename):
 
   # ROC
   fig = mpl.figure()
-  bob.measure.plot.roc(dev_neg, dev_pos, npoints, color=(0.3,0.3,0.3), 
+  bob.measure.plot.roc(dev_neg, dev_pos, npoints, color=(0.3,0.3,0.3),
       linestyle='--', dashes=(6,2), label='development')
   bob.measure.plot.roc(test_neg, test_pos, npoints, color=(0,0,0),
       linestyle='-', label='test')
@@ -116,7 +116,7 @@ def plots(dev_neg, dev_pos, test_neg, test_pos, npoints, filename):
 
   # DET
   fig = mpl.figure()
-  bob.measure.plot.det(dev_neg, dev_pos, npoints, color=(0.3,0.3,0.3), 
+  bob.measure.plot.det(dev_neg, dev_pos, npoints, color=(0.3,0.3,0.3),
       linestyle='--', dashes=(6,2), label='development')
   bob.measure.plot.det(test_neg, test_pos, npoints, color=(0,0,0),
       linestyle='-', label='test')
@@ -130,7 +130,7 @@ def plots(dev_neg, dev_pos, test_neg, test_pos, npoints, filename):
 
   # EPC
   fig = mpl.figure()
-  bob.measure.plot.epc(dev_neg, dev_pos, test_neg, test_pos, npoints, 
+  bob.measure.plot.epc(dev_neg, dev_pos, test_neg, test_pos, npoints,
       color=(0,0,0), linestyle='-')
   mpl.title('EPC Curve')
   mpl.xlabel('Cost')
@@ -164,7 +164,7 @@ def get_options(user_input):
       action='store_false', help="If set, then I'll execute no plotting")
   parser.add_argument('-p', '--parser', dest="parser", default="4column",
       help="Name of a known parser or of a python-importable function that can parse your input files and return a tuple (negatives, positives) as blitz 1-D arrays of 64-bit floats. Consult the API of bob.measure.load.split_four_column() for details", metavar="NAME.FUNCTION")
-  
+
   # This option is not normally shown to the user...
   parser.add_argument("--self-test",
       action="store_true", dest="selftest", default=False,
@@ -176,7 +176,7 @@ def get_options(user_input):
   if args.selftest:
     # then we go into test mode, all input is preset
     import tempfile
-    outputdir = tempfile.mkdtemp()
+    outputdir = tempfile.mkdtemp(prefix='bobtest_')
     args.plotfile = os.path.join(outputdir, "curves.pdf")
 
   if args.dev is None:
@@ -212,7 +212,7 @@ def main(user_input=None):
   print_crit(dev_neg, dev_pos, test_neg, test_pos, 'EER')
   print_crit(dev_neg, dev_pos, test_neg, test_pos, 'Min. HTER')
   if options.doplot:
-    plots(dev_neg, dev_pos, test_neg, test_pos, 
+    plots(dev_neg, dev_pos, test_neg, test_pos,
         options.npoints, options.plotfile)
     print("[Plots] Performance curves => '%s'" % options.plotfile)
 

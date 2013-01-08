@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
 # Andre Anjos <andre.anjos@idiap.ch>
-# Thu 16 Aug 2012 11:36:19 CEST 
+# Thu 16 Aug 2012 11:36:19 CEST
 
 """A setup file for Bob Python bindings using Boost.Python
 """
@@ -23,12 +23,12 @@ if sys.version_info[:2] < (2, 7) or ((3,0) <= sys.version_info[:2] < (3,2)):
 DESTDIR = os.environ.get('DESTDIR', '')
 
 # ---------------------------------------------------------------------------#
-#  various functions and classes to help on the setup                        # 
+#  various functions and classes to help on the setup                        #
 # ---------------------------------------------------------------------------#
 
 def pkgconfig(package):
 
-  def uniq(seq, idfun=None): 
+  def uniq(seq, idfun=None):
    # order preserving
    if idfun is None:
        def idfun(x): return x
@@ -194,7 +194,7 @@ def setup_extension(ext_name, pc_file):
       )
 
 # ---------------------------------------------------------------------------#
-#  setup variables, modules and extra files declarations                     # 
+#  setup variables, modules and extra files declarations                     #
 # ---------------------------------------------------------------------------#
 
 CONSOLE_SCRIPTS = [
@@ -203,6 +203,7 @@ CONSOLE_SCRIPTS = [
   'bob_compute_perf.py = bob.measure.script.compute_perf:main',
   'bob_eval_threshold.py = bob.measure.script.eval_threshold:main',
   'bob_apply_threshold.py = bob.measure.script.apply_threshold:main',
+  'bob_plot_cmc.py = bob.measure.script.plot_cmc:main',
   'bob_face_detect.py = bob.visioner.script.facebox:main',
   'bob_face_keypoints.py = bob.visioner.script.facepoints:main',
   'bob_visioner_trainer.py = bob.visioner.script.trainer:main',
@@ -274,7 +275,7 @@ if pkgconfig('bob-visioner'):
       ]
 
 # ---------------------------------------------------------------------------#
-#  setup starts here                                                         # 
+#  setup starts here                                                         #
 # ---------------------------------------------------------------------------#
 
 from setuptools import setup, find_packages
@@ -291,7 +292,7 @@ setup(
     author_email='bob-devel@googlegroups.com',
     keywords=['signal processing', 'machine learning', 'biometrics'],
     license='GPLv3',
-    
+
     classifiers=[
       'Classifier: Development Status :: 5 - Production/Stable',
       'Classifier: Environment :: Console (Text Based)',

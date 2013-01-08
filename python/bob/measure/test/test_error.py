@@ -221,3 +221,29 @@ class ErrorTest(unittest.TestCase):
     self.assertTrue( abs(eer-eer_ref) < 1e-4)
     eer = bob.measure.eer_rocch(negatives, positives)
     self.assertTrue( abs(eer-eer_ref) < 1e-4)
+
+  def test06_cmc(self):
+    # tests the CMC calculation
+    # test data; should give match characteristics [1/2,1/4,1/3] and CMC [1/3,2/3,1]
+    test_data = [((0.3, 1.1, 0.5), (0.7)), ((1.4, -1.3, 0.6), (0.2)), ((0.8, 0., 1.5), (-0.8, 1.8)), ((2., 1.3, 1.6, 0.9), (2.4))]
+    # compute recognition rate
+    rr = bob.measure.recognition_rate(test_data)
+    self.assertEqual(rr, 0.5)
+    # compute CMC
+    cmc = bob.measure.cmc(test_data)
+    self.assertTrue((cmc == [0.5, 0.75, 1., 1., 1]).all())
+
+    # load test data
+    desired_rr = 0.76
+    desired_cmc = [0.76, 0.89, 0.96, 0.98, 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.]
+    data = bob.measure.load.cmc_four_column(pkg_resources.resource_filename(__name__, os.path.join('data','scores-cmc-4col.txt')))
+    rr = bob.measure.recognition_rate(data)
+    self.assertEqual(rr, desired_rr)
+    cmc = bob.measure.cmc(data)
+    self.assertTrue((cmc == desired_cmc).all())
+
+    data = bob.measure.load.cmc_five_column(pkg_resources.resource_filename(__name__, os.path.join('data','scores-cmc-5col.txt')))
+    rr = bob.measure.recognition_rate(data)
+    self.assertEqual(rr, desired_rr)
+    cmc = bob.measure.cmc(data)
+    self.assertTrue((cmc == desired_cmc).all())

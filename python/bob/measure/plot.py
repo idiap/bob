@@ -25,7 +25,7 @@ def roc(negatives, positives, npoints=100, CAR=False, **kwargs):
   negatives
     a blitz array of negative class scores in float64 format
 
-  positives 
+  positives
     a blitz array of positive class scores in float64 format
 
   npoints
@@ -37,12 +37,12 @@ def roc(negatives, positives, npoints=100, CAR=False, **kwargs):
   kwargs
     a dictionary of extra plotting parameters, that is passed directly to
     matplotlib.pyplot.plot().
-  
+
   .. note::
-  
+
     This function does not initiate and save the figure instance, it only
     issues the plotting command. You are the responsible for setting up and
-    saving the figure as you see fit.  
+    saving the figure as you see fit.
 
   Return value is the matplotlib line that was added as defined by the
   matplotlib.pyplot.plot() command.
@@ -53,7 +53,7 @@ def roc(negatives, positives, npoints=100, CAR=False, **kwargs):
   except ImportError:
     print("Cannot import matplotlib. This package is not essential, but required if you wish to use the plotting functionality.")
     raise
-  
+
   from . import roc as calc
   out = calc(negatives, positives, npoints)
   if not CAR:
@@ -61,7 +61,7 @@ def roc(negatives, positives, npoints=100, CAR=False, **kwargs):
   else:
     return mpl.semilogx(100.0*out[1,:], 100.0*(1-out[0,:]), **kwargs)
 
-def epc(dev_negatives, dev_positives, test_negatives, test_positives, 
+def epc(dev_negatives, dev_positives, test_negatives, test_positives,
     npoints=100, **kwargs):
   """Plots Expected Performance Curve (EPC) as defined in the paper:
 
@@ -85,7 +85,7 @@ def epc(dev_negatives, dev_positives, test_negatives, test_positives,
   Input arguments:
 
   dev_negatives
-    blitz array of negative class scores on development set in float64 format  
+    blitz array of negative class scores on development set in float64 format
 
   dev_positives
     blitz array of positive class scores on development set in float64 format
@@ -93,23 +93,23 @@ def epc(dev_negatives, dev_positives, test_negatives, test_positives,
   test_negatives
     blitz array of negative class scores on test set in float64 format, or a
     list of those
-  
+
   test_positives
     blitz array of positive class scores on test set in float64 format, or a
     list of those
-  
+
   npoints
     number of points to use when drawing the EPC curve
 
   kwargs
     a dictionary of extra plotting parameters, that is passed directly to
     matplotlib.pyplot.plot().
-  
+
   .. note::
-  
+
     This function does not initiate and save the figure instance, it only
     issues the plotting commands. You are the responsible for setting up and
-    saving the figure as you see fit.  
+    saving the figure as you see fit.
 
   Return value is the matplotlib line that was added as defined by the
   matplotlib.pyplot.plot() command.
@@ -120,10 +120,10 @@ def epc(dev_negatives, dev_positives, test_negatives, test_positives,
   except ImportError:
     print("Cannot import matplotlib. This package is not essential, but required if you wish to use the plotting functionality.")
     raise
-  
+
   from . import epc as calc
 
-  out = calc(dev_negatives, dev_positives, test_negatives, test_positives, 
+  out = calc(dev_negatives, dev_positives, test_negatives, test_positives,
       npoints)
   return mpl.plot(out[0,:], 100.0*out[1,:], **kwargs)
 
@@ -133,7 +133,7 @@ def det(negatives, positives, npoints=100, axisfontsize='x-small', **kwargs):
   Martin, A., Doddington, G., Kamm, T., Ordowski, M., & Przybocki, M. (1997).
   The DET curve in assessment of detection task performance. Fifth European
   Conference on Speech Communication and Technology (pp. 1895-1898). Available:
-  http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.117.4489&rep=rep1&type=pdf 
+  http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.117.4489&rep=rep1&type=pdf
 
   This method will call matplotlib to plot the DET curve(s) for a system which
   contains a particular set of negatives (impostors) and positives (clients)
@@ -156,10 +156,10 @@ def det(negatives, positives, npoints=100, axisfontsize='x-small', **kwargs):
 
   positives
     numpy.array of positive class scores in float64 format
-    
+
   negatives
     numpy.array of negative class scores in float64 format
-    
+
   npoints
     number of points to use when drawing the EPC curve
 
@@ -171,7 +171,7 @@ def det(negatives, positives, npoints=100, axisfontsize='x-small', **kwargs):
     matplotlib.pyplot.plot().
 
   .. note::
-  
+
     This function does not initiate and save the figure instance, it only
     issues the plotting commands. You are the responsible for setting up and
     saving the figure as you see fit.
@@ -263,7 +263,7 @@ def det_axis(v, **kwargs):
 
   Keyword parameters:
 
-  v 
+  v
     Python iterable (list or tuple) with the X and Y limits in the order (xmin,
     xmax, ymin, ymax). Expected values should be in percentage (between 0 and
     100%). If v is not a list or tuple that contains 4 numbers it is passed
@@ -277,7 +277,8 @@ def det_axis(v, **kwargs):
   """
 
   import logging
-  
+  logger = logging.getLogger("bob")
+
   try:
     import matplotlib.pyplot as mpl
   except ImportError:
@@ -295,19 +296,37 @@ def det_axis(v, **kwargs):
 
     # limits must be within bounds
     if tv[0] < cur[0]:
-      logging.warn("Readjusting xmin: the provided value is out of bounds")
+      logger.warn("Readjusting xmin: the provided value is out of bounds")
       tv[0] = cur[0]
-    if tv[1] > cur[1]: 
-      logging.warn("Readjusting xmax: the provided value is out of bounds")
+    if tv[1] > cur[1]:
+      logger.warn("Readjusting xmax: the provided value is out of bounds")
       tv[1] = cur[1]
-    if tv[2] < cur[2]: 
-      logging.warn("Readjusting ymin: the provided value is out of bounds")
+    if tv[2] < cur[2]:
+      logger.warn("Readjusting ymin: the provided value is out of bounds")
       tv[2] = cur[2]
-    if tv[3] > cur[3]: 
-      logging.warn("Readjusting ymax: the provided value is out of bounds")
+    if tv[3] > cur[3]:
+      logger.warn("Readjusting ymax: the provided value is out of bounds")
       tv[3] = cur[3]
 
   except:
     tv = v
 
   return mpl.axis(tv, **kwargs)
+
+def cmc(cmc_scores, logx = True, **kwargs):
+  """Plots the (cumulative) match characteristics curve and returns the maximum rank."""
+  try:
+    import matplotlib.pyplot as mpl
+  except ImportError:
+    print("Cannot import matplotlib. This package is not essential, but required if you wish to use the plotting functionality.")
+    raise
+
+  from . import cmc as calc
+  out = calc(cmc_scores)
+
+  if logx:
+    mpl.semilogx(range(1, len(out)+1), out * 100, **kwargs)
+  else:
+    mpl.plot(range(1, len(out)+1), out * 100, **kwargs)
+
+  return len(out)
