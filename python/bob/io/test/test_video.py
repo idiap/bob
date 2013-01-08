@@ -339,19 +339,19 @@ class VideoTest(unittest.TestCase):
     self.patternReadWrite("")
     self.patternReadTwice("")
       
-  @ffmpeg_found('0.8.0')
+  @ffmpeg_found()
   @codec_available('mpeg4')
   def test08_PatternReadWrite_mpeg4(self):
     self.patternReadWrite("mpeg4")
     self.patternReadTwice("mpeg4")
       
-  @ffmpeg_found('0.8.0')
+  @ffmpeg_found()
   @codec_available('ffv1')
   def test09_PatternReadWrite_ffv1(self):
     self.patternReadWrite("ffv1")
     self.patternReadTwice("ffv1")
       
-  @ffmpeg_found('0.8.0')
+  @ffmpeg_found()
   @codec_available('h264')
   def test10_PatternReadWrite_h264(self):
     self.patternReadWrite("h264", ".mov")
