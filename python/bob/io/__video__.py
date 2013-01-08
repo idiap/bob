@@ -20,13 +20,14 @@ if hasattr(_io, "VideoReader"):
     (frames, color-bands, height, width). I'll dynamically allocate the output
     array and return it to you. 
     
-    The flag 'raise_on_error', which is set to 'False' by default influences
-    the error reporting in case problems are found with the video file. If you
-    set it to 'True', we will report problems raising exceptions. If you either
-    don't set it or set it to 'False', we will truncate the file at the frame
-    with problems and will not report anything. It is your task to verify if
-    the number of frames returned matches the expected number of frames as
-    reported by the property 'numberOfFrames' in this object.  
+    The flag ``raise_on_error``, which is set to ``False`` by default
+    influences the error reporting in case problems are found with the video
+    file. If you set it to ``True``, we will report problems raising
+    exceptions. If you either don't set it or set it to ``False``, we will
+    truncate the file at the frame with problems and will not report anything.
+    It is your task to verify if the number of frames returned matches the
+    expected number of frames as reported by the property ``number_of_frames``
+    (or ``len``) of this object.
     """
 
     (frames, data) = self.__load__(raise_on_error=raise_on_error)

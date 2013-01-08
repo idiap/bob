@@ -299,56 +299,56 @@ void bind_io_video() {
   iterator_wrapper().wrap(); //wraps io::VideoReader::const_iterator
 
   class_<io::VideoReader, boost::shared_ptr<io::VideoReader> >("VideoReader",
-      "VideoReader objects can read data from video files. The current implementation uses FFMPEG which is a stable freely available implementation for these tasks. You can read an entire video in memory by using the 'load()' method or use video iterators to read frame-by-frame and avoid overloading your machine's memory. The maximum precision FFMPEG will output is a 24-bit (8-bit per band) representation of each pixel (32-bit with transparency when supported by bob, which is not the case presently). So, the input of data using this class uses uint8_t as base element type. Output will be colored using the RGB standard, with each band varying between 0 and 255, with zero meaning pure black and 255, pure white (color).", init<const std::string&>((arg("filename")), "Initializes a new VideoReader object by giving the input file name to read"))
-    .add_property("filename", make_function(&io::VideoReader::filename, return_value_policy<copy_const_reference>()))
-    .add_property("height", &io::VideoReader::height)
-    .add_property("width", &io::VideoReader::width)
-    .add_property("number_of_frames", &io::VideoReader::numberOfFrames)
+      "VideoReader objects can read data from video files. The current implementation uses `FFmpeg <http://ffmpeg.org>`_ (or `libav <http://libav.org>`_ if FFmpeg is not available) which is a stable freely available video encoding and decoding library, designed specifically for these tasks. You can read an entire video in memory by using the 'load()' method or use video iterators to read it frame by frame and avoid overloading your machine's memory. The maximum precision data `FFmpeg` will yield is a 24-bit (8-bit per band) representation of each pixel (32-bit depths are also supported by `FFmpeg`, but not by Bob presently). So, the input of data using this class uses ``uint8`` as base element type. Output will be colored using the RGB standard, with each band varying between 0 and 255, with zero meaning pure black and 255, pure white (color).", init<const std::string&>((arg("self"), arg("filename")), "Initializes a new VideoReader object by giving the input file path to read. Format and codec will be extracted from the video metadata, automatically, by `FFmpeg`."))
+    .add_property("filename", make_function(&io::VideoReader::filename, return_value_policy<copy_const_reference>()), "The full path to the file that will be decoded by this object")
+    .add_property("height", &io::VideoReader::height, "The height of each frame in the video (a multiple of 2)")
+    .add_property("width", &io::VideoReader::width, "The width of each frame in the video (a multiple of 2)")
+    .add_property("number_of_frames", &io::VideoReader::numberOfFrames, "The number of frames in this video file")
     .def("__len__", &io::VideoReader::numberOfFrames)
-    .add_property("duration", &io::VideoReader::duration)
-    .add_property("format_name", make_function(&io::VideoReader::formatName, return_value_policy<copy_const_reference>()))
-    .add_property("format_long_name", make_function(&io::VideoReader::formatLongName, return_value_policy<copy_const_reference>()))
-    .add_property("codec_name", make_function(&io::VideoReader::codecName, return_value_policy<copy_const_reference>()))
-    .add_property("codec_long_name", make_function(&io::VideoReader::codecLongName, return_value_policy<copy_const_reference>()))
-    .add_property("frame_rate", &io::VideoReader::frameRate)
-    .add_property("info", make_function(&io::VideoReader::info, return_value_policy<copy_const_reference>()))
+    .add_property("duration", &io::VideoReader::duration, "Total duration of this video file in microseconds (long)")
+    .add_property("format_name", make_function(&io::VideoReader::formatName, return_value_policy<copy_const_reference>()), "Short name of the format in which this video file was recorded in")
+    .add_property("format_long_name", make_function(&io::VideoReader::formatLongName, return_value_policy<copy_const_reference>()), "Verbose name of the format in which this video file was recorded in")
+    .add_property("codec_name", make_function(&io::VideoReader::codecName, return_value_policy<copy_const_reference>()), "Short name of the codec that will be used to decode this video file")
+    .add_property("codec_long_name", make_function(&io::VideoReader::codecLongName, return_value_policy<copy_const_reference>()), "Verbose name of the codec that will be used to decode this video file")
+    .add_property("frame_rate", &io::VideoReader::frameRate, "Video's announced frame rate (note there are video formats with variable frame rates)")
+    .add_property("info", make_function(&io::VideoReader::info, return_value_policy<copy_const_reference>()), "Informative string containing many details of this video and available ffmpeg bindings that will read it")
     .add_property("video_type", make_function(&io::VideoReader::video_type, return_value_policy<copy_const_reference>()), "Typing information to load all of the file at once")
     .add_property("frame_type", make_function(&io::VideoReader::frame_type, return_value_policy<copy_const_reference>()), "Typing information to load the file frame by frame.")
-    .def("__load__", &videoreader_load, videoreader_load_overloads((arg("self"), arg("raise_on_error")=false), "Loads all of the video stream in a numpy ndarray organized in this way: (frames, color-bands, height, width). I'll dynamically allocate the output array and return it to you. The flag 'raise_on_error', which is set to 'False' by default influences the error reporting in case problems are found with the video file. If you set it to 'True', we will report problems raising exceptions. If you either don't set it or set it to 'False', we will truncate the file at the frame with problems and will not report anything. It is your task to verify if the number of frames returned matches the expected number of frames as reported by the property 'numberOfFrames' in this object."))
+    .def("__load__", &videoreader_load, videoreader_load_overloads((arg("self"), arg("raise_on_error")=false), "Loads all of the video stream in a numpy ndarray organized in this way: (frames, color-bands, height, width). I'll dynamically allocate the output array and return it to you. The flag ``raise_on_error``, which is set to ``False`` by default influences the error reporting in case problems are found with the video file. If you set it to ``True``, we will report problems raising exceptions. If you either don't set it or set it to ``False``, we will truncate the file at the frame with problems and will not report anything. It is your task to verify if the number of frames returned matches the expected number of frames as reported by the property ``number_of_frames`` in this object."))
     .def("__iter__", &io::VideoReader::begin, with_custodian_and_ward_postcall<0,1>())
     .def("__getitem__", &videoreader_getitem)
     .def("__getitem__", &videoreader_getslice)
     ;
 
   class_<io::VideoWriter, boost::shared_ptr<io::VideoWriter>, boost::noncopyable>("VideoWriter",
-     "Use objects of this class to create and write video files using FFMPEG.",
-     init<const std::string&, size_t, size_t, optional<float, float, size_t, const std::string&, const std::string&> >((arg("filename"), arg("height"), arg("width"), arg("framerate")=25.f, arg("bitrate")=1500000.f, arg("gop")=12, arg("codec")="", arg("format")=""), "Creates a new output file given the input parameters. The format and codec to be used will be derived from the filename extension unless you define them explicetly (you can set both or just one of these two optional parameters)")
+     "Use objects of this class to create and write video files using `FFmpeg <http://ffmpeg.org>`_ (or `libav <http://libav.org>`_ if FFmpeg is not available).",
+     init<const std::string&, size_t, size_t, optional<float, float, size_t, const std::string&, const std::string&> >((arg("self"), arg("filename"), arg("height"), arg("width"), arg("framerate")=25.f, arg("bitrate")=1500000.f, arg("gop")=12, arg("codec")="", arg("format")=""), "Creates a new output file given the input parameters. The format and codec to be used will be derived from the filename extension unless you define them explicetly (you can set both or just one of these two optional parameters)")
      )
-    .add_property("filename", make_function(&io::VideoReader::filename, return_value_policy<copy_const_reference>()))
-    .add_property("height", &io::VideoWriter::height)
-    .add_property("width", &io::VideoWriter::width)
-    .add_property("number_of_frames", &io::VideoWriter::numberOfFrames)
+    .add_property("filename", make_function(&io::VideoReader::filename, return_value_policy<copy_const_reference>()), "The full path to the file that will be encoded by this object")
+    .add_property("height", &io::VideoWriter::height, "The height of the output video file (must be a multiple of 2)")
+    .add_property("width", &io::VideoWriter::width, "The width of the output video file (must be a multiple of 2)")
+    .add_property("number_of_frames", &io::VideoWriter::numberOfFrames, "The current number of frames pushed into this video file by the user")
     .def("__len__", &io::VideoWriter::numberOfFrames)
-    .add_property("duration", &io::VideoWriter::duration)
-    .add_property("format_name", &io::VideoWriter::formatName)
-    .add_property("format_long_name", &io::VideoWriter::formatLongName)
-    .add_property("codec_name", &io::VideoWriter::codecName)
-    .add_property("codec_long_name", &io::VideoWriter::codecLongName)
-    .add_property("frame_rate", &io::VideoWriter::frameRate)
-    .add_property("bit_rate", &io::VideoWriter::bitRate)
-    .add_property("gop", &io::VideoWriter::gop)
-    .add_property("info", &io::VideoWriter::info)
-    .add_property("is_opened", &io::VideoWriter::is_opened)
-    .def("close", &io::VideoWriter::close, "Closes the current video stream and forces writing the trailer. After this point the video is finalized and cannot be written to anymore.")
+    .add_property("duration", &io::VideoWriter::duration, "The duration of this video file in microseconds (long)")
+    .add_property("format_name", &io::VideoWriter::formatName, "Short name of the format in which this video file will be recorded in")
+    .add_property("format_long_name", &io::VideoWriter::formatLongName, "Verbose name of the format in which this video file will be recorded in")
+    .add_property("codec_name", &io::VideoWriter::codecName, "Short name of the `FFmpeg` that will be used to encode the video stream in this file")
+    .add_property("codec_long_name", &io::VideoWriter::codecLongName, "Verbose name of the `FFmpeg` that will be used to encode the video stream in this file")
+    .add_property("frame_rate", &io::VideoWriter::frameRate, "The indicative frame rate of this video file")
+    .add_property("bit_rate", &io::VideoWriter::bitRate, "The indicative bit rate for this video file, given as a hint to `FFmpeg` (compression levels are subject to the picture textures)")
+    .add_property("gop", &io::VideoWriter::gop, "Group of pictures setting (see the `Wikipedia entry <http://en.wikipedia.org/wiki/Group_of_pictures>`_ for details on this setting)")
+    .add_property("info", &io::VideoWriter::info, "Informative string containing many details of this video and available ffmpeg bindings that will read it")
+    .add_property("is_opened", &io::VideoWriter::is_opened, "A boolean flag, indicating if the video is still opened for writing (or has already been closed by the user using ``close()``)")
+    .def("close", &io::VideoWriter::close, (arg("self")), "Closes the current video stream and forces writing the trailer. After this point the video is finalized and cannot be written to anymore.")
     .add_property("video_type", make_function(&io::VideoWriter::video_type, return_value_policy<copy_const_reference>()), "Typing information to load all of the file at once")
     .add_property("frame_type", make_function(&io::VideoWriter::frame_type, return_value_policy<copy_const_reference>()), "Typing information to load the file frame by frame.")
-    .def("append", &videowriter_append, (arg("self"), arg("frame")), "Writes a new frame or set of frames to the file. The frame should be setup as a array with 3 dimensions organized in this way (RGB color-bands, height, width). Sets of frames should be setup as a 4D array in this way: (frame-number, RGB color-bands, height, width). WARNING: At present time we only support arrays that have C-style storages (if you pass reversed arrays or arrays with Fortran-style storage, the result is undefined).")
+    .def("append", &videowriter_append, (arg("self"), arg("frame")), "Writes a new frame or set of frames to the file. The frame should be setup as a array with 3 dimensions organized in this way (RGB color-bands, height, width). Sets of frames should be setup as a 4D array in this way: (frame-number, RGB color-bands, height, width).\n\n.. note::\n\n  At present time we only support arrays that have C-style storages (if you pass reversed arrays or arrays with Fortran-style storage, the result is undefined).")
     ;
 
   def("video_codecs", &codec_dictionary, "Returns a dictionary containing a detailed description of the built-in codecs for videos");
-  def("describe_video_encoder", &describe_encoder_by_name, "Describes a given video encoder (codec) starting with a name");
-  def("describe_video_encoder", &describe_encoder_by_id, "Describes a given video encoder (codec) starting with an integer identifier");
-  def("describe_video_decoder", &describe_decoder_by_name, "Describes a given video decoder (codec) starting with a name");
-  def("describe_video_decoder", &describe_decoder_by_id, "Describes a given video decoder (codec) starting with an integer identifier");
+  def("describe_video_encoder", &describe_encoder_by_name, (arg("name")), "Describes a given video encoder (codec) starting with a name");
+  def("describe_video_encoder", &describe_encoder_by_id, (arg("id")), "Describes a given video encoder (codec) starting with an integer identifier");
+  def("describe_video_decoder", &describe_decoder_by_name, (arg("name")), "Describes a given video decoder (codec) starting with a name");
+  def("describe_video_decoder", &describe_decoder_by_id, (arg("id")), "Describes a given video decoder (codec) starting with an integer identifier");
   def("videowriter_formats", &oformat_dictionary, "Returns a dictionary containing a detailed description of the built-in output formats and default encoders for videos");
 }

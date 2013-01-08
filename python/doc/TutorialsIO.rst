@@ -388,14 +388,15 @@ mentioned earlier. `FFmpeg`_ will then choose a default codec for the format
 and perform encoding. The output file can be as easily loaded using
 :py:meth:`bob.io.load`.
 
-For improved control over the format and codecs used for a specific encoding or
-decoding operation, you must directly use either :py:class:`bob.io.VideoReader`
-or :py:class:`bob.io.VideoWriter` classes. For example, it is possible to use
-:py:class:`bob.io.VideoReader` to read videos frame by frame and avoid
-overloading your machine's memory. In the following example you can see how to
-create a video, save it using the class :py:class:`bob.io.VideoWriter` and load
-it again using the class :py:class:`bob.io.VideoReader`. The created video will
-have 30 frames generated randomly.
+For finer control over the loading, saving, format and codecs used for a
+specific encoding or decoding operation, you must directly use either
+:py:class:`bob.io.VideoReader` or :py:class:`bob.io.VideoWriter` classes. For
+example, it is possible to use :py:class:`bob.io.VideoReader` to read videos
+frame by frame and avoid overloading your machine's memory. In the following
+example you can see how to create a video, save it using the class
+:py:class:`bob.io.VideoWriter` and load it again using the class
+:py:class:`bob.io.VideoReader`. The created video will have 30 frames generated
+randomly.
 
 .. note::
 
