@@ -627,7 +627,7 @@ static void im_peek(const std::string& path, bob::core::array::typeinfo& info) {
   boost::shared_array<pixel_t> cmap(new pixel_t[bmp_dib_hdr.cmap_size]);
   bmp_read_colormap(in_file.get(), cmap.get(), bmp_dib_hdr.cmap_size, bmp_dib_hdr.header_type);
 
-  if(ftell(in_file.get()) != bmp_hdr.offset)
+  if(ftell(in_file.get()) != (long)bmp_hdr.offset)
     throw std::runtime_error("bmp: error while parsing bmp header (current file position does not match the offset value indicating where the data is stored)");
 
   // 5.  Set depth and number of dimensions
