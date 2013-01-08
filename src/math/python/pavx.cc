@@ -23,6 +23,7 @@
 #include "bob/math/pavx.h"
 
 #include "bob/core/python/ndarray.h"
+#include "bob/core/cast.h"
 
 using namespace boost::python;
 
@@ -60,7 +61,7 @@ static object p_pavxWidth(bob::python::const_ndarray y, bob::python::ndarray gha
   blitz::Array<size_t,1> w_ = bob::math::pavxWidth(y.bz<double,1>(), ghat_);
   bob::python::ndarray width(bob::core::array::t_uint64, w_.extent(0));
   blitz::Array<uint64_t,1> width_ = width.bz<uint64_t,1>();
-  width_ = w_; 
+  width_ = bob::core::cast<uint64_t>(w_); 
   return width.self();
 }
 
@@ -70,7 +71,7 @@ static object p_pavxWidthHeight(bob::python::const_ndarray y, bob::python::ndarr
   std::pair<blitz::Array<size_t,1>,blitz::Array<double,1> > pair = bob::math::pavxWidthHeight(y.bz<double,1>(), ghat_);
   bob::python::ndarray width(bob::core::array::t_uint64, pair.first.extent(0));
   blitz::Array<uint64_t,1> width_ = width.bz<uint64_t,1>();
-  width_ = pair.first;
+  width_ = bob::core::cast<uint64_t>(pair.first);
   bob::python::ndarray height(bob::core::array::t_float64, pair.second.extent(0));
   blitz::Array<double,1> height_ = height.bz<double,1>();
   height_ = pair.second;
