@@ -45,13 +45,18 @@ def create_all(args):
       parsed.func(parsed)
 
     except:
+      
+      errors += 1
+
       if args.keep_going:
-        errors += 1
         if args.verbose >= 1:
           print 'Warning: Error while creating "%s" SQLite database' % name
         __import__('traceback').print_exc()
         if args.verbose >= 1:
           print '*** Keep going on user request...'
+
+      else:
+        raise
 
     finally:
 
