@@ -48,6 +48,10 @@ extern "C" {
 #include <libswscale/swscale.h>
 }
 
+#ifndef AV_PKT_FLAG_KEY
+#define AV_PKT_FLAG_KEY PKT_FLAG_KEY
+#endif
+
 static std::string ffmpeg_error(int num) {
 #if LIBAVUTIL_VERSION_INT >= 0x320f01 //50.15.1 @ ffmpeg-0.6
   static const int ERROR_SIZE = 1024;
