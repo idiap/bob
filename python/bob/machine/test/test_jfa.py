@@ -200,5 +200,12 @@ class JFAMachineTest(unittest.TestCase):
     self.assertTrue( numpy.allclose(m.x, x_ref, eps) )
     self.assertTrue( abs(score_ref-score) < eps )
 
+    # Check using alternate forward() method
+    Ux = numpy.ndarray(shape=(m.dim_cd,), dtype=numpy.float64)
+    print Ux.shape
+    m.estimate_ux(gs, Ux)
+    score = m.forward_ux(gs, Ux)
+    self.assertTrue( abs(score_ref-score) < eps )
+
     # Clean-up
     os.unlink(filename)
