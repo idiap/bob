@@ -199,6 +199,8 @@ io::VideoWriter::~VideoWriter() {
   if (m_isopen) close();
 }
 
+// libavformat >= 54.6.100 && libavcodec >= 54.23.100 == ffmpeg-0.11
+#if LIBAVFORMAT_VERSION_INT >= 0x360664 && LIBAVCODEC_VERSION_INT >= 0x361764
 static AVPacket* allocate_packet() {
   AVPacket* retval = new AVPacket;
   av_init_packet(retval);
@@ -216,6 +218,7 @@ static boost::shared_ptr<AVPacket> make_packet() {
     return boost::shared_ptr<AVPacket>(allocate_packet(), 
               std::ptr_fun(deallocate_packet));
 }
+#endif
 
 static void flush_encoder (const std::string& filename,
     AVFormatContext* format_context, AVStream* stream,
