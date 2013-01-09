@@ -55,19 +55,40 @@ extern "C" {
 #include "bob/core/blitz_array.h"
 #include "bob/core/logging.h"
 
-namespace io = bob::io;
-namespace ca = bob::core::array;
-
-/**
- * When called, initializes the ffmpeg library
- */
-static bool initialize_ffmpeg() {
-  av_register_all();
-  av_log_set_level(-1);
-  return true;
+static std::string ffmpeg_error(int num) {
+#if LIBAVUTIL_VERSION_INT >= 0x320f01 //50.15.1 @ ffmpeg-0.6
+  static const int ERROR_SIZE = 1024;
+  char message[ERROR_SIZE];
+  int ok = av_strerror(num, message, ERROR_SIZE);
+  if (ok < 0) {
+    throw std::runtime_error("ffmpeg::av_strerror() failed to report - maybe you have a memory issue?");
+  }
+  return std::string(message);
+#else
+  return std::string("unknown error - ffmpeg version < 0.6");
+#endif
 }
 
-bool io::VideoReader::s_ffmpeg_initialized = initialize_ffmpeg();
+static AVPacket* allocate_packet() {
+  AVPacket* retval = new AVPacket;
+  av_init_packet(retval);
+  retval->data = 0;
+  retval->size = 0;
+  return retval;
+}
+
+static void deallocate_packet(AVPacket* p) {
+    if (p->size || p->data) av_free_packet(p);
+      delete p;
+}
+
+static boost::shared_ptr<AVPacket> make_packet() {
+    return boost::shared_ptr<AVPacket>(allocate_packet(), 
+              std::ptr_fun(deallocate_packet));
+}
+
+namespace io = bob::io;
+namespace ca = bob::core::array;
 
 io::VideoReader::VideoReader(const std::string& filename):
   m_filepath(filename),
@@ -257,7 +278,7 @@ void io::VideoReader::open() {
 io::VideoReader::~VideoReader() {
 }
 
-size_t io::VideoReader::load(blitz::Array<uint8_t,4>& data, 
+size_t io::VideoReader::load(blitz::Array<uint8_t,4>& data,
   bool throw_on_error) const {
   ca::blitz_array tmp(data);
   return load(tmp, throw_on_error);
@@ -521,12 +542,111 @@ bool io::VideoReader::const_iterator::read(blitz::Array<uint8_t,3>& data,
   return read(tmp, throw_on_error);
 }
 
-bool io::VideoReader::const_iterator::read(ca::interface& data,
-  bool throw_on_error) {
+static int decode_frame (const std::string& filename, int current_frame,
+    AVCodecContext* codec_context, SwsContext* scaler,
+    AVFrame* context_frame, uint8_t* data, boost::shared_ptr<AVPacket> pkt,
+    int& got_frame, bool throw_on_error) {
 
-  if (!m_parent)
+  // In this call, 3 things can happen:
+  //
+  // 1. if ok < 0, an error has been detected
+  // 2. if ok >=0, something was read from the file, correctly. In this
+  // condition, **only* if "got_frame" == 1, a frame is ready to be decoded.
+  //
+  // It is **not** an error that ok is >= 0 and got_frame == 0. This, in fact,
+  // happens often with recent versions of ffmpeg.
+
+#if LIBAVCODEC_VERSION_INT >= 0x344802 //52.72.2 @ ffmpeg-0.6
+
+  int ok = avcodec_decode_video2(codec_context, context_frame,
+      &got_frame, pkt.get());
+
+#else
+
+  int ok = avcodec_decode_video(codec_context, context_frame, &got_frame, pkt->data, pkt->size);
+
+#endif
+
+  if (ok < 0 && throw_on_error) {
+    boost::format m("ffmpeg::avcodec_decode_video/2() failed: could not decode frame %d of file `%s' - ffmpeg reports error %d == `%s'");
+    m % current_frame % filename % ok % ffmpeg_error(ok);
+    throw std::runtime_error(m.str());
+  }
+
+  if (got_frame) {
+
+    // In this case, we call the software scaler to decode the frame data.
+    // Normally, this means converting from planar YUV420 into packed RGB.
+
+    uint8_t* planes[] = {data, 0};
+    int linesize[] = {3*codec_context->width, 0};
+
+    int conv_height = sws_scale(scaler, context_frame->data,
+        context_frame->linesize, 0, codec_context->height, planes, linesize);
+
+    if (conv_height < 0) {
+
+      if (throw_on_error) {
+        boost::format m("ffmpeg::sws_scale() failed: could not scale frame %d of file `%s' - ffmpeg reports error %d");
+        m % current_frame % filename % conv_height;
+        throw std::runtime_error(m.str());
+      }
+
+      return -1;
+    }
+
+  }
+
+  return ok;
+}
+
+static bool read_video_frame (const std::string& filename, 
+    int current_frame, int stream_index, AVFormatContext* format_context,
+    AVCodecContext* codec_context, SwsContext* swscaler,
+    AVFrame* context_frame, AVFrame* rgb_frame, bool throw_on_error) {
+
+  uint8_t* data = rgb_frame->data[0];
+
+  boost::shared_ptr<AVPacket> pkt = make_packet();
+
+  int ok = av_read_frame(format_context, pkt.get());
+
+  if (ok < 0 && ok != (int)AVERROR_EOF) {
+    if (throw_on_error) {
+      boost::format m("ffmpeg::av_read_frame() failed: on file `%s' - ffmpeg reports error %d == `%s'");
+      m % filename % ok % ffmpeg_error(ok);
+      throw std::runtime_error(m.str());
+    }
+    else return false;
+  }
+
+  int got_frame = 0;
+
+  // if we have reached the end-of-file, frames can still be cached
+  if (ok == (int)AVERROR_EOF) {
+    pkt->data = 0;
+    pkt->size = 0;
+    decode_frame(filename, current_frame, codec_context, swscaler,
+        context_frame, data, pkt, got_frame, throw_on_error);
+  }
+  else {
+    if (pkt->stream_index == stream_index) {
+      decode_frame(filename, current_frame, codec_context,
+          swscaler, context_frame, data, pkt, got_frame,
+          throw_on_error);
+    }
+  }
+
+  return (got_frame > 0);
+}
+
+bool io::VideoReader::const_iterator::read(bob::core::array::interface& data,
+    bool throw_on_error) {
+
+  if (!m_parent) {
     //we are already past the end of the stream
     throw std::runtime_error("video iterator for file has already reached its end and was reset");
+  }
 
   //checks if we have not passed the end of the video sequence already
   if(m_current_frame >= m_parent->numberOfFrames()) {
@@ -536,12 +656,12 @@ bool io::VideoReader::const_iterator::read(ca::interface& data,
       m % m_current_frame % m_parent->m_filepath % m_parent->m_nframes;
       throw std::runtime_error(m.str());
     }
-    
+
     reset();
     return false;
   }
 
-  const ca::typeinfo& info = data.type();
+  const bob::core::array::typeinfo& info = data.type();
 
   //checks if the output array shape conforms to the video specifications,
   //otherwise, throw
@@ -551,221 +671,123 @@ bool io::VideoReader::const_iterator::read(ca::interface& data,
     throw std::invalid_argument(s.str());
   }
 
-  int gotPicture = 0;
-  AVPacket packet;
-  av_init_packet(&packet);
-  int av_error = 0;
-  int sws_height = 0;
+  //we are going to need another copy step - use our internal array
+  bool ok = read_video_frame(m_parent->m_filepath, m_current_frame,
+      m_stream_index, m_format_ctxt, m_codec_ctxt, m_sws_context,
+      m_frame_buffer, m_rgb_frame_buffer, throw_on_error);
 
-  while ((av_error=av_read_frame(m_format_ctxt, &packet)) >= 0) {
-    // Is this a packet from the video stream?
-    if (packet.stream_index == m_stream_index) {
-  
-      // Decodes video frame, store it on my buffer
-      // ffmpeg 0.6 and above [libavcodec 52.72.2 = 0x344802]
-#if LIBAVCODEC_VERSION_INT >= 0x344802
-      avcodec_decode_video2(m_codec_ctxt, m_frame_buffer, &gotPicture, &packet);
-#else
-      avcodec_decode_video(m_codec_ctxt, m_frame_buffer, &gotPicture, packet.data, packet.size);
-#endif
+  if (ok) {
 
-      // Did we get a video frame?
-      if (gotPicture) {
-        sws_height = sws_scale(m_sws_context, m_frame_buffer->data, 
-            m_frame_buffer->linesize, 0, m_parent->height(),
-            m_rgb_frame_buffer->data, m_rgb_frame_buffer->linesize);
-
-        // Got the image - exit
-        ++m_current_frame;
-
-        // Frees the packet that was allocated by av_read_frame
-        av_free_packet(&packet);
-        break;
-      }
-    }
-
-    // Frees the packet that was allocated by av_read_frame
-    av_free_packet(&packet);
-  }
-
-  // if the converted height of the frame matches my expected value, proceed
-  // transferring the data to the destination array
-  if (sws_height == (int)m_parent->height()) {
-    
-    // Copies the data into the destination array. Here is some background: bob
-    // arranges the data for a colored image like: (color-bands, height,
-    // width).  That makes it easy to extract a given band from the image as
-    // its memory is contiguous. FFmpeg prefers the following encoding (height,
-    // width, color-bands).
-    //
-    // Note: The FFmpeg way to read and write image data is hard-coded and
-    // impossible to circumvent by passing a different stride setup.
-
-    // transpose the data.
+    //now we copy from one container to the other, using our Blitz++ technique
     blitz::TinyVector<int,3> shape;
     blitz::TinyVector<int,3> stride;
-    
+
     shape = info.shape[0], info.shape[1], info.shape[2];
     stride = info.stride[0], info.stride[1], info.stride[2];
-    blitz::Array<uint8_t,3> dst(static_cast<uint8_t*>(data.ptr()), 
+    blitz::Array<uint8_t,3> dst(static_cast<uint8_t*>(data.ptr()),
         shape, stride, blitz::neverDeleteData);
-    
-    shape = info.shape[1], info.shape[2], info.shape[0];
-    blitz::Array<uint8_t,3> src(m_rgb_frame_buffer->data[0], shape, 
-        blitz::neverDeleteData);
-    dst = src.transpose(2,0,1);
 
+    shape = info.shape[1], info.shape[2], info.shape[0];
+    blitz::Array<uint8_t,3> rgb_array(m_rgb_frame_buffer->data[0], shape,
+        blitz::neverDeleteData);
+    dst = rgb_array.transpose(2,0,1);
+    ++m_current_frame;
+
+  }
+
+  return ok;
+}
+
+static int dummy_decode_frame (const std::string& filename, int current_frame,
+    AVCodecContext* codec_context, AVFrame* context_frame,
+    boost::shared_ptr<AVPacket> pkt, int& got_frame, bool throw_on_error) {
+
+  // In this call, 3 things can happen:
+  //
+  // 1. if ok < 0, an error has been detected
+  // 2. if ok >=0, something was read from the file, correctly. In this
+  // condition, **only* if "got_frame" == 1, a frame is ready to be decoded.
+  //
+  // It is **not** an error that ok is >= 0 and got_frame == 0. This, in fact,
+  // happens often with recent versions of ffmpeg.
+
+#if LIBAVCODEC_VERSION_INT >= 0x344802 //52.72.2 @ ffmpeg-0.6
+
+  int ok = avcodec_decode_video2(codec_context, context_frame,
+      &got_frame, pkt.get());
+
+#else
+
+  int ok = avcodec_decode_video(codec_context, context_frame, &got_frame, pkt->data, pkt->size);
+
+#endif
+
+  if (ok < 0 && throw_on_error) {
+    boost::format m("ffmpeg::avcodec_decode_video/2() failed: could not skip frame %d of file `%s' - ffmpeg reports error %d == `%s'");
+    m % current_frame % filename % ok % ffmpeg_error(ok);
+    throw std::runtime_error(m.str());
+  }
+
+  return ok;
+}
+
+static bool skip_video_frame (const std::string& filename,
+    int current_frame, int stream_index, AVFormatContext* format_context,
+    AVCodecContext* codec_context, AVFrame* context_frame,
+    bool throw_on_error) {
+
+  boost::shared_ptr<AVPacket> pkt = make_packet();
+
+  int ok = av_read_frame(format_context, pkt.get());
+
+  if (ok < 0 && ok != (int)AVERROR_EOF) {
+    if (throw_on_error) {
+      boost::format m("ffmpeg::av_read_frame() failed: on file `%s' - ffmpeg reports error %d == `%s'");
+      m % filename % ok % ffmpeg_error(ok);
+      throw std::runtime_error(m.str());
+    }
+    else return false;
+  }
+
+  int got_frame = 0;
+
+  // if we have reached the end-of-file, frames can still be cached
+  if (ok == (int)AVERROR_EOF) {
+    pkt->data = 0;
+    pkt->size = 0;
+    dummy_decode_frame(filename, current_frame, codec_context,
+        context_frame, pkt, got_frame, throw_on_error);
   }
   else {
-    
-    //error analysis
-
-    if (sws_height == 0) {
-
-      //We left the reading loop without converting any data. Two things might
-      //have occurred:
-      // (1) the file is over
-      // (2) there is a problem reading the current frame
-
-      //no matter our decision, this file cannot be read anymore
-      //let's reset the iterator so to mark this is the end of it.
-      //this also addresses (1).
-
-      // addresses (2) above
-      if (m_current_frame < m_parent->numberOfFrames()) {
-
-        if (throw_on_error) {
-          boost::format m("ffmpeg/av_read_frame() returned an error (%d) reading frame %d of file '%s' which contains %d frames - truncating file at this point.");
-          m % av_error % m_current_frame % m_parent->m_filepath % m_parent->m_nframes;
-          throw std::runtime_error(m.str());
-        }
-      }
-
-      //this is the normal way out, addressing (1) above
-      reset();
-      return false; 
+    if (pkt->stream_index == stream_index) {
+      dummy_decode_frame(filename, current_frame, codec_context,
+          context_frame, pkt, got_frame, throw_on_error);
     }
-
-    else {
-
-      //in this case there was a scaling operation taking place, but the output
-      //is not consistent with what I expect.
-      //anyways, the m_current_frame was correctly incremented.
-      if (throw_on_error) {
-        boost::format m("ffmpeg/sws_scale() returned a number of lines read (%d) for frame %d that does not match the expected height (%d) of file '%s' which contains %d frames (you can continue to read the file, I'm not truncating it)");
-        m % sws_height % m_current_frame % m_parent->height() % m_parent->m_nframes;
-        throw std::runtime_error(m.str());
-      }
-      return false;
-
-    }
-
   }
 
-  return true;
+  return (got_frame > 0);
 }
 
-/**
- * frame seek functions extracted from:
- * http://stackoverflow.com/questions/5261658/how-to-seek-in-ffmpeg-c-c
- * TODO: Based on the methods bellow, implement better frame seeking.
- */
-
-/**
-bool seekMs(int tsms)
-{
-   //printf("**** SEEK TO ms %d. LLT: %d. LT: %d. LLF: %d. LF: %d. LastFrameOk: %d\n",tsms,LastLastFrameTime,LastFrameTime,LastLastFrameNumber,LastFrameNumber,(int)LastFrameOk);
-
-   // Convert time into frame number
-   DesiredFrameNumber = ffmpeg::av_rescale(tsms,pFormatCtx->streams[videoStream]->time_base.den,pFormatCtx->streams[videoStream]->time_base.num);
-   DesiredFrameNumber/=1000;
-
-   return seekFrame(DesiredFrameNumber);
-}
-
-bool seekFrame(ffmpeg::int64_t frame)
-{
-
-   //printf("**** seekFrame to %d. LLT: %d. LT: %d. LLF: %d. LF: %d. LastFrameOk: %d\n",(int)frame,LastLastFrameTime,LastFrameTime,LastLastFrameNumber,LastFrameNumber,(int)LastFrameOk);
-
-   // Seek if:
-   // - we don't know where we are (Ok=false)
-   // - we know where we are but:
-   //    - the desired frame is after the last decoded frame (this could be optimized: if the distance is small, calling decodeSeekFrame may be faster than seeking from the last key frame)
-   //    - the desired frame is smaller or equal than the previous to the last decoded frame. Equal because if frame==LastLastFrameNumber we don't want the LastFrame, but the one before->we need to seek there
-   if( (LastFrameOk==false) || ((LastFrameOk==true) && (frame<=LastLastFrameNumber || frame>LastFrameNumber) ) )
-   {
-      //printf("\t avformat_seek_file\n");
-      if(ffmpeg::avformat_seek_file(pFormatCtx,videoStream,0,frame,frame,AVSEEK_FLAG_FRAME)<0)
-         return false;
-
-      avcodec_flush_buffers(pCodecCtx);
-
-      DesiredFrameNumber = frame;
-      LastFrameOk=false;
-   }
-   //printf("\t decodeSeekFrame\n");
-
-   return decodeSeekFrame(frame);
-
-   return true;
-}
-
-**/
-
-/**
- * This method does essentially the same as read(), except it skips a few
- * operations to get a better performance.
- */
 io::VideoReader::const_iterator& io::VideoReader::const_iterator::operator++ () {
-  if (!m_parent)
+  if (!m_parent) {
     //we are already past the end of the stream
     throw std::runtime_error("video iterator for file has already reached its end and was reset");
+  }
 
+  //checks if we have not passed the end of the video sequence already
   if(m_current_frame >= m_parent->numberOfFrames()) {
     reset();
     return *this;
   }
 
-  //read the frame
-  int gotPicture = 0;
-  AVPacket packet;
-  av_init_packet(&packet);
-  int av_error = 0;
-
-  while ((av_error=av_read_frame(m_format_ctxt, &packet)) >= 0) {
-    // Is this a packet from the video stream?
-    if (packet.stream_index == m_stream_index) {
-      // Decodes video frame, store it on my buffer
-#if LIBAVCODEC_VERSION_INT >= 0x344802
-      avcodec_decode_video2(m_codec_ctxt, m_frame_buffer, &gotPicture, &packet);
-#else
-      avcodec_decode_video(m_codec_ctxt, m_frame_buffer, &gotPicture, packet.data, packet.size);
-#endif
-
-      // Did we get a video frame?
-      if (gotPicture) {
-        // Got the image - exit
-        ++m_current_frame;
-
-        // Frees the packet that was allocated by av_read_frame
-        av_free_packet(&packet);
-        break;
-      }
-    }
-
-    // Frees the packet that was allocated by av_read_frame
-    av_free_packet(&packet);
+  //we are going to need another copy step - use our internal array
+  try {
+    bool ok = skip_video_frame(m_parent->m_filepath, m_current_frame,
+        m_stream_index, m_format_ctxt, m_codec_ctxt, m_frame_buffer,
+        true);
+    if (ok) ++m_current_frame;
   }
-
-  if (av_error < 0) {
-    if (m_current_frame < m_parent->numberOfFrames()) {
-      boost::format m("ffmpeg/av_read_frame() returned an error (%d) reading frame %d of file '%s' which contains %d frames - truncating file at this point.");
-      m % av_error % m_current_frame % m_parent->m_filepath % m_parent->m_nframes;
-      bob::core::info << m.str(); //goes to stdout
-    }
-
-    //transform the current iterator in "end"
+  catch (std::runtime_error& e) {
     reset();
   }
 

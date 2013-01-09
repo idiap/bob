@@ -21,13 +21,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <set>
+
 #include <boost/filesystem.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/token_iterator.hpp>
 
+#include "bob/core/logging.h"
 #include "bob/core/blitz_array.h"
 
 #include "bob/io/CodecRegistry.h"
-#include "bob/io/Video.h"
+#include "bob/io/VideoReader.h"
+#include "bob/io/VideoWriter.h"
+
+extern "C" {
+#include <libavformat/avformat.h>
+}
 
 namespace fs = boost::filesystem;
 namespace io = bob::io;
@@ -175,37 +184,117 @@ make_file (const std::string& path, char mode) {
 
 }
 
+static void tokenize_csv(const char* what, std::vector<std::string>& values) {
+  if (!what) return;
+  boost::char_separator<char> sep(",");
+  std::string w(what);
+  boost::tokenizer< boost::char_separator<char> > tok(w, sep);
+  for (auto k = tok.begin(); k != tok.end(); ++k) values.push_back(*k);
+}
+
+static void iformats_installed (std::map<std::string, AVInputFormat*>& installed) {
+  for (AVInputFormat* it = av_iformat_next(0); it != 0; it = av_iformat_next(it) ) {
+    std::vector<std::string> names;
+    tokenize_csv(it->name, names);
+    for (auto k = names.begin(); k != names.end(); ++k) {
+      auto exists = installed.find(*k);
+      if (exists != installed.end()) {
+        bob::core::warn << "Not overriding input video format \"" 
+          << it->long_name << "\" (" << *k 
+          << ") which is already assigned to \"" << exists->second->long_name 
+          << "\"" << std::endl;
+      }
+      else installed[*k] = it;
+    }
+  }
+}
+
+static void oformats_installed (std::map<std::string, AVOutputFormat*>& installed) {
+  for (AVOutputFormat* it = av_oformat_next(0); it != 0; it = av_oformat_next(it) ) {
+    if (!it->video_codec) continue;
+    std::vector<std::string> names;
+    tokenize_csv(it->name, names);
+    for (auto k = names.begin(); k != names.end(); ++k) {
+      auto exists = installed.find(*k);
+      if (exists != installed.end()) {
+        bob::core::warn << "Not overriding output video format \""
+          << it->long_name << "\" (" << *k 
+          << ") which is already assigned to \"" << exists->second->long_name 
+          << "\"" << std::endl;
+      }
+      else installed[*k] = it;
+    }
+  }
+}
+
+/**
+ * Arranges a listing of input and output file formats
+ */
+static void list_formats(std::map<std::string, std::string>& formats) {
+  std::map<std::string, AVInputFormat*> iformat;
+  iformats_installed(iformat);
+  std::map<std::string, AVOutputFormat*> oformat;
+  oformats_installed(oformat);
+
+  for (auto k=iformat.begin(); k!=iformat.end(); ++k) {
+    auto o=oformat.find(k->first);
+    if (o!=oformat.end()) {
+      //format can be used for input and output
+      std::vector<std::string> extensions;
+      tokenize_csv(o->second->extensions, extensions);
+      for (auto e=extensions.begin(); e!=extensions.end(); ++e) {
+        std::string key = ".";
+        key += *e;
+        std::string value = k->second->long_name;
+        value += " (video/ffmpeg)";
+        formats[key] = value;
+      }
+    }
+  }
+}
+
 /**
  * Takes care of codec registration per se.
  */
 static bool register_codec() {
-  static const char* descr = "Video file (FFmpeg)";
+  static std::string tmp[] = {
+    ".bmp",
+    ".dpx",
+    ".jpeg", 
+    ".jpg", 
+    ".jp2", 
+    ".ljpg", 
+    ".png", 
+    ".pam",
+    ".pcx",
+    ".pbm",
+    ".pnm",
+    ".ppm",
+    ".pgm",
+    ".pgmyuv",
+    ".sgi",
+    ".tga", 
+    ".tif", 
+    ".tiff"
+  };
+  static std::set<std::string> avoid(tmp, tmp+sizeof(tmp) / sizeof(tmp[0]));
+
+  /* Initialize libavcodec, and register all codecs and formats. */
+  av_log_set_level(AV_LOG_QUIET);
+  av_register_all();
 
   boost::shared_ptr<io::CodecRegistry> instance =
     io::CodecRegistry::instance();
-  
-  instance->registerExtension(".avi", descr, &make_file);
-  instance->registerExtension(".dv", descr, &make_file);
-  instance->registerExtension(".filmstrip", descr, &make_file);
-  instance->registerExtension(".flv", descr, &make_file);
-  instance->registerExtension(".h261", descr, &make_file);
-  instance->registerExtension(".h263", descr, &make_file);
-  instance->registerExtension(".h264", descr, &make_file);
-  instance->registerExtension(".mov", descr, &make_file);
-  instance->registerExtension(".image2", descr, &make_file);
-  instance->registerExtension(".image2pipe", descr, &make_file);
-  instance->registerExtension(".m4v", descr, &make_file);
-  instance->registerExtension(".mjpeg", descr, &make_file);
-  instance->registerExtension(".mpeg", descr, &make_file);
-  instance->registerExtension(".mpegts", descr, &make_file);
-  instance->registerExtension(".ogg", descr, &make_file);
-  instance->registerExtension(".rawvideo", descr, &make_file);
-  instance->registerExtension(".rm", descr, &make_file);
-  instance->registerExtension(".rtsp", descr, &make_file);
-  instance->registerExtension(".yuv4mpegpipe", descr, &make_file);
+
+  std::map<std::string, std::string> formats;
+  list_formats(formats);
+  for (auto k=formats.begin(); k!=formats.end(); ++k) {
+    if (avoid.find(k->first) == avoid.end()) {
+      instance->registerExtension(k->first, k->second, &make_file);
+    }
+  }
 
   return true;
-
 }
 
 static bool codec_registered = register_codec();

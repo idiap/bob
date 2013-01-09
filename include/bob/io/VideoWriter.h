@@ -211,11 +211,6 @@ namespace bob { namespace io {
        */
       void close_video();
 
-      /**
-       * Writes a single video frame into the video file.
-       */
-      void write_video_frame(const blitz::Array<uint8_t,3>& data);
-
     private: //representation
 
       std::string m_filename;

@@ -48,6 +48,20 @@ extern "C" {
 #include <libswscale/swscale.h>
 }
 
+static std::string ffmpeg_error(int num) {
+#if LIBAVUTIL_VERSION_INT >= 0x320f01 //50.15.1 @ ffmpeg-0.6
+  static const int ERROR_SIZE = 1024;
+  char message[ERROR_SIZE];
+  int ok = av_strerror(num, message, ERROR_SIZE);
+  if (ok < 0) {
+    throw std::runtime_error("ffmpeg::av_strerror() failed to report - maybe you have a memory issue?");
+  }
+  return std::string(message);
+#else
+  return std::string("unknown error - ffmpeg version < 0.6");
+#endif
+}
+
 namespace io = bob::io;
 namespace ca = bob::core::array;
 
@@ -185,7 +199,127 @@ io::VideoWriter::~VideoWriter() {
   if (m_isopen) close();
 }
 
+static AVPacket* allocate_packet() {
+  AVPacket* retval = new AVPacket;
+  av_init_packet(retval);
+  retval->data = 0;
+  retval->size = 0;
+  return retval;
+}
+
+static void deallocate_packet(AVPacket* p) {
+    if (p->size || p->data) av_free_packet(p);
+      delete p;
+}
+
+static boost::shared_ptr<AVPacket> make_packet() {
+    return boost::shared_ptr<AVPacket>(allocate_packet(), 
+              std::ptr_fun(deallocate_packet));
+}
+
+static void flush_encoder (const std::string& filename,
+    AVFormatContext* format_context, AVStream* stream,
+    uint8_t* buffer, size_t buffer_size) {
+
+  const AVCodec* codec = stream->codec->codec;
+
+  //We only need to flush codecs that have delayed data processing
+   if (!(codec->capabilities & CODEC_CAP_DELAY)) return;
+  
+   while (true) {
+
+     // libavformat >= 54.6.100 && libavcodec >= 54.23.100 == ffmpeg-0.11
+#if LIBAVFORMAT_VERSION_INT >= 0x360664 && LIBAVCODEC_VERSION_INT >= 0x361764
+
+     /* encode the image */
+     boost::shared_ptr<AVPacket> pkt = make_packet();
+
+     int got_output;
+     int ok = avcodec_encode_video2(stream->codec, pkt.get(), 0, &got_output);
+
+     if (ok < 0) {
+       boost::format m("ffmpeg::avcodec_encode_video2() failed: failed to encode video frame while writing to file `%s' -- ffmpeg reports error %d == `%s'");
+       m % filename % ok % ffmpeg_error(ok);
+       throw std::runtime_error(m.str());
+     }
+
+     /* If size is zero, it means the image was buffered. */
+     else if (got_output) {
+       if (stream->codec->coded_frame->key_frame) pkt->flags |= AV_PKT_FLAG_KEY;
+       pkt->stream_index = stream->index;
+
+       /* Write the compressed frame to the media file. */
+       ok = av_interleaved_write_frame(format_context, pkt.get());
+       if (ok && (ok != AVERROR(EINVAL))) {
+         boost::format m("ffmpeg::av_interleaved_write_frame() failed: failed to encode video frame while flushing remaining frames to file `%s' -- ffmpeg reports error %d == `%s'");
+         m % filename % ok % ffmpeg_error(ok);
+         throw std::runtime_error(m.str());
+       }
+     }
+
+     /* encoded the video, but no pkt got back => video is flushed */
+     else if (ok == 0) break;
+
+#else // == #if FFmpeg version < 0.11.0 or using libav
+
+     /**
+      * The main difference in this way of encoding is what we are
+      * responsible for allocating ourselves the buffer in which the
+      * encoding will occur. If that space is too small, encoding the data
+      * will result in an error. 
+      */
+
+     /* encode the image */
+     int out_size = avcodec_encode_video(stream->codec, 
+         buffer, buffer_size, 0);
+
+     if (out_size < 0) {
+       boost::format m("ffmpeg::avcodec_encode_video() failed: failed to encode video frame while writing to file `%s' -- ffmpeg reports error %d == `%s'");
+       m % filename % out_size % ffmpeg_error(out_size);
+       throw std::runtime_error(m.str());
+     }
+
+     /* If size is zero, it means the image was buffered. */
+     else if (out_size > 0) {
+
+       /* encode the image */
+       AVPacket pkt;
+       av_init_packet(&pkt);
+
+       if ((size_t)stream->codec->coded_frame->pts != AV_NOPTS_VALUE)
+         pkt.pts = av_rescale_q(stream->codec->coded_frame->pts,
+             stream->codec->time_base, stream->time_base);
+       if (stream->codec->coded_frame->key_frame)
+         pkt.flags |= AV_PKT_FLAG_KEY;
+
+       pkt.stream_index = stream->index;
+       pkt.data         = buffer;
+       pkt.size         = out_size;
+
+       /* Write the compressed frame to the media file. */
+       int ok = av_interleaved_write_frame(format_context, &pkt);
+       if (ok && (ok != AVERROR(EINVAL))) {
+         boost::format m("ffmpeg::av_interleaved_write_frame() failed: failed to write video frame while encoding file `%s' - ffmpeg reports error %d == `%s'");
+         m % filename % ok % ffmpeg_error(ok);
+         throw std::runtime_error(m.str());
+       }
+
+     }
+
+     /* encoded the video, but no pkt got back => video is flushed */
+     else break;
+
+#endif // FFmpeg version >= 0.11.0
+
+   }
+
+}
+
 void io::VideoWriter::close() {
+
+  // flushes the encoder, just in case
+  flush_encoder(m_filename, m_format_ctxt, m_video_stream, video_outbuf, video_outbuf_size);
+
   // writes the trailer, if any.  the trailer must be written
   // before you close the CodecContexts open when you wrote the
   // header; otherwise write_trailer may try to use memory that
@@ -328,6 +462,7 @@ void io::VideoWriter::open_video() {
 
   // allocates the encoded raw picture
   picture = alloc_picture(c->pix_fmt);
+  picture->pts = 0;
 
   // if the output format is not RGB24, then a temporary RGB24
   // picture is needed too. It is then converted to the required
@@ -336,101 +471,146 @@ void io::VideoWriter::open_video() {
 }
 
 /**
- * Very chaotic implementation extracted from the old Video implementation in
- * bob. Seems to work, but is probably doing too many memcpy's.
+ * Transforms from Bob's planar 8-bit RGB representation to whatever is
+ * required by the FFmpeg encoder output context (peeked from the AVStream
+ * object passed).
  */
-void io::VideoWriter::write_video_frame(const blitz::Array<uint8_t,3>& data) {
-  int out_size, ret;
-  AVCodecContext *c;
+static void image_to_context(const blitz::Array<uint8_t,3>& data,
+    AVStream* stream, SwsContext* scaler, 
+    AVFrame* output_frame, AVFrame* tmp_frame) {
 
-  c = m_video_stream->codec;
+  int width = stream->codec->width;
+  int height = stream->codec->height;
 
-  if (false) { //m_current_frame >= STREAM_NB_FRAMES)
-    // no more frame to compress. The codec has a latency of a few
-    //      frames if using B frames, so we get the last frames by
-    //  passing the same picture again
+  // replace data in the buffer frame by the pixmap to encode
+  tmp_frame->linesize[0] = width*3;
+  blitz::Array<uint8_t,3> ordered(tmp_frame->data[0],
+      blitz::shape(height, width, 3), blitz::neverDeleteData);
+  ordered =
+    const_cast<blitz::Array<uint8_t,3>&>(data).transpose(1,2,0);
+  //organize for ffmpeg
+
+  int ok = sws_scale(scaler, tmp_frame->data, tmp_frame->linesize,
+      0, height, output_frame->data, output_frame->linesize);
+  if (ok < 0) {
+    boost::format m("ffmpeg::sws_scale() failed: could not scale frame while encoding - ffmpeg reports error %d");
+    m % ok;
+    throw std::runtime_error(m.str());
   }
-  else {
-    if (c->pix_fmt != PIX_FMT_RGB24) {
-      // replace data in the buffer frame by the pixmap to encode
-      tmp_picture->linesize[0] = c->width*3;
-      blitz::Array<uint8_t,3> ordered(tmp_picture->data[0],
-          blitz::shape(c->height, c->width, 3), blitz::neverDeleteData);
-      ordered = const_cast<blitz::Array<uint8_t,3>&>(data).transpose(1,2,0); //organize for ffmpeg
-      sws_scale(m_sws_context, tmp_picture->data, tmp_picture->linesize,
-          0, c->height, picture->data, picture->linesize);
-    }
-    else {
-      picture->linesize[0] = c->width*3;
-      blitz::Array<uint8_t,3> ordered(picture->data[0],
-          blitz::shape(c->height, c->width, 3), blitz::neverDeleteData);
-      ordered = const_cast<blitz::Array<uint8_t,3>&>(data).transpose(1,2,0); //organize for ffmpeg
-    }
-  }
+}
 
-  if (m_format_ctxt->oformat->flags & AVFMT_RAWPICTURE) {
-    // raw video case. The API will change slightly in the near future for that
+static void write_video_frame (const blitz::Array<uint8_t,3>& data,
+    const std::string& filename, AVFormatContext* format_context,
+    AVStream* stream, AVFrame* context_frame, AVFrame* tmp_frame,
+    SwsContext* swscaler, uint8_t* buffer, size_t buffer_size) {
+
+  image_to_context(data, stream, swscaler, context_frame, tmp_frame);
+
+  if (format_context->oformat->flags & AVFMT_RAWPICTURE) {
+
+    /* Raw video case - directly store the picture in the packet */
     AVPacket pkt;
     av_init_packet(&pkt);
 
-#   if LIBAVCODEC_VERSION_INT >= 0x350000
-    pkt.flags |= AV_PKT_FLAG_KEY;
-#   else
-    pkt.flags |= PKT_FLAG_KEY;
-#   endif
-    pkt.stream_index= m_video_stream->index;
-    pkt.data= (uint8_t *)picture;
-    pkt.size= sizeof(AVPicture);
+    pkt.flags        |= AV_PKT_FLAG_KEY;
+    pkt.stream_index  = stream->index;
+    pkt.data          = context_frame->data[0];
+    pkt.size          = sizeof(AVPicture);
 
-    ret = av_interleaved_write_frame(m_format_ctxt, &pkt);
+    int ok = av_interleaved_write_frame(format_context, &pkt);
+    if (ok && (ok != AVERROR(EINVAL))) {
+      boost::format m("ffmpeg::av_interleaved_write_frame() failed: failed to write video frame while encoding file `%s' - ffmpeg reports error %d == `%s'");
+      m % filename % ok % ffmpeg_error(ok);
+      throw std::runtime_error(m.str());
+    }
+
   }
+
+  // libavformat >= 54.6.100 && libavcodec >= 54.23.100 == ffmpeg-0.11
+#if LIBAVFORMAT_VERSION_INT >= 0x360664 && LIBAVCODEC_VERSION_INT >= 0x361764
+
   else {
-    // encodes the image
-#   if LIBAVCODEC_VERSION_INT >= 0x360000
-    AVPacket pkt;
-    av_init_packet(&pkt);
-    pkt.data = video_outbuf;
-    pkt.size = video_outbuf_size;
-    int got_packet_ptr = -1;
-    out_size = avcodec_encode_video2(c, &pkt, picture, &got_packet_ptr);
 
-    // if zero size, it means the image was buffered
-    if (out_size >= 0 && got_packet_ptr) {
-#   else
-    out_size = avcodec_encode_video(c, video_outbuf, video_outbuf_size, picture);
+    /* encode the image */
+    boost::shared_ptr<AVPacket> pkt = make_packet();
 
-    // if zero size, it means the image was buffered
+    int got_output;
+    int ok = avcodec_encode_video2(stream->codec, pkt.get(), context_frame, &got_output);
+    if (ok < 0) {
+      boost::format m("ffmpeg::avcodec_encode_video2() failed: failed to encode video frame while writing to file `%s' - ffmpeg reports error %d == `%s'");
+      m % filename % ok % ffmpeg_error(ok);
+      throw std::runtime_error(m.str());
+    }
+
+    /* If size is zero, it means the image was buffered. */
+    if (got_output) {
+      if (stream->codec->coded_frame->key_frame) pkt->flags |= AV_PKT_FLAG_KEY;
+      pkt->stream_index = stream->index;
+
+      /* Write the compressed frame to the media file. */
+      ok = av_interleaved_write_frame(format_context, pkt.get());
+      if (ok && (ok != AVERROR(EINVAL))) {
+        boost::format m("ffmpeg::av_interleaved_write_frame() failed: failed to write video frame while encoding file `%s' - ffmpeg reports error %d == `%s'");
+        m % filename % ok % ffmpeg_error(ok);
+        throw std::runtime_error(m.str());
+      }
+
+    }
+
+  }
+
+#else // == #if FFmpeg version < 0.11.0 or using libav
+
+  /**
+   * The main difference in this way of encoding is what we are responsible
+   * for allocating ourselves the buffer in which the encoding will occur. If
+   * that space is too small, encoding the data will result in an error. 
+   */
+
+  else {
+    /* encode the image */
+    int out_size = avcodec_encode_video(stream->codec, 
+        buffer, buffer_size, context_frame);
+
+    if (out_size < 0) {
+      boost::format m("ffmpeg::avcodec_encode_video() failed: failed to encode video frame while writing to file `%s' -- ffmpeg reports error %d == `%s'");
+      m % filename % out_size % ffmpeg_error(out_size);
+      throw std::runtime_error(m.str());
+    }
+
+    /* If size is zero, it means the image was buffered. */
     if (out_size > 0) {
-#   endif
+
+      /* encode the image */
       AVPacket pkt;
       av_init_packet(&pkt);
 
-      if (static_cast<uint64_t>(c->coded_frame->pts) != AV_NOPTS_VALUE)
-        pkt.pts= av_rescale_q(c->coded_frame->pts, c->time_base, m_video_stream->time_base);
-      if(c->coded_frame->key_frame)
-#       if LIBAVCODEC_VERSION_INT >= 0x350000
+      if ((size_t)stream->codec->coded_frame->pts != AV_NOPTS_VALUE)
+        pkt.pts = av_rescale_q(stream->codec->coded_frame->pts,
+            stream->codec->time_base, stream->time_base);
+      if (stream->codec->coded_frame->key_frame)
         pkt.flags |= AV_PKT_FLAG_KEY;
-#       else
-        pkt.flags |= PKT_FLAG_KEY;
-#       endif
-      pkt.stream_index= m_video_stream->index;
-      pkt.data= video_outbuf;
-      pkt.size= out_size;
 
-      // writes the compressed frame in the media file
-      ret = av_interleaved_write_frame(m_format_ctxt, &pkt);
+      pkt.stream_index = stream->index;
+      pkt.data         = buffer;
+      pkt.size         = out_size;
+
+      /* Write the compressed frame to the media file. */
+      int ok = av_interleaved_write_frame(format_context, &pkt);
+      av_free_packet(&pkt);
+      if (ok && (ok != AVERROR(EINVAL))) {
+        boost::format m("ffmpeg::av_interleaved_write_frame() failed: failed to write video frame while encoding file `%s' - ffmpeg reports error %d == `%s'");
+        m % filename % ok % ffmpeg_error(ok);
+        throw std::runtime_error(m.str());
+      }
+
     }
-    else {
-      ret = 0;
-    }
-  }
-  if (ret != 0) {
-    throw io::FFmpegException(m_filename.c_str(), "error writing video frame");
+
   }
 
-  // OK
-  ++m_current_frame;
-  m_typeinfo_video.shape[0] += 1;
+#endif // FFmpeg version >= 0.11.0
+
+  context_frame->pts += 1;
 }
 
 void io::VideoWriter::close_video() {
@@ -454,7 +634,11 @@ void io::VideoWriter::append(const blitz::Array<uint8_t,3>& data) {
     throw io::FFmpegException(m_filename.c_str(), 
         "input data does not conform with video specifications");
   }
-  write_video_frame(data);
+  write_video_frame(data, m_filename, m_format_ctxt,
+      m_video_stream, picture, tmp_picture, m_sws_context,
+      video_outbuf, video_outbuf_size);
+  ++m_current_frame;
+  m_typeinfo_video.shape[0] += 1;
 }
 
 void io::VideoWriter::append(const blitz::Array<uint8_t,4>& data) {
@@ -470,7 +654,11 @@ void io::VideoWriter::append(const blitz::Array<uint8_t,4>& data) {
 
   blitz::Range a = blitz::Range::all();
   for(int i=data.lbound(0); i<(data.extent(0)+data.lbound(0)); ++i) {
-    write_video_frame(data(i, a, a, a));
+    write_video_frame(data(i, a, a, a), m_filename, m_format_ctxt,
+        m_video_stream, picture, tmp_picture, m_sws_context,
+        video_outbuf, video_outbuf_size);
+    ++m_current_frame;
+    m_typeinfo_video.shape[0] += 1;
   }
 }
 
@@ -495,9 +683,12 @@ void io::VideoWriter::append(const ca::interface& data) {
     
     blitz::TinyVector<int,3> shape;
     shape = 3, m_height, m_width;
-    blitz::Array<uint8_t,3> tmp(const_cast<uint8_t*>(static_cast<const uint8_t*>(data.ptr())), shape,
-        blitz::neverDeleteData);
-    write_video_frame(tmp);
+    blitz::Array<uint8_t,3> tmp(const_cast<uint8_t*>(static_cast<const uint8_t*>(data.ptr())), shape, blitz::neverDeleteData);
+    write_video_frame(tmp, m_filename, m_format_ctxt,
+        m_video_stream, picture, tmp_picture, m_sws_context,
+        video_outbuf, video_outbuf_size);
+    ++m_current_frame;
+    m_typeinfo_video.shape[0] += 1;
   }
   
   else if ( type.nd == 4 ) { //appends a sequence of frames
@@ -515,7 +706,11 @@ void io::VideoWriter::append(const ca::interface& data) {
 
     for(size_t i=0; i<type.shape[0]; ++i) {
       blitz::Array<uint8_t,3> tmp(ptr, shape, blitz::neverDeleteData);
-      write_video_frame(tmp);
+      write_video_frame(tmp, m_filename, m_format_ctxt,
+          m_video_stream, picture, tmp_picture, m_sws_context,
+          video_outbuf, video_outbuf_size);
+      ++m_current_frame;
+      m_typeinfo_video.shape[0] += 1;
       ptr += frame_size;
     }
   }

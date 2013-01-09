@@ -357,10 +357,6 @@ namespace bob { namespace io {
        */
       const_iterator end() const;
 
-    private: //static stuff that is required.
-
-      static bool s_ffmpeg_initialized; ///< is ffmpeg initialized?
-
     private: //our representation
 
       std::string m_filepath; ///< the name of the file we are manipulating
