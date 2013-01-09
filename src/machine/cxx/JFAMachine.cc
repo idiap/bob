@@ -346,6 +346,20 @@ void bob::machine::JFAMachine::estimateX(boost::shared_ptr<const bob::machine::G
   updateX_fromCache(); // Estimates the value of x using the current cache
 }
 
+void bob::machine::JFAMachine::estimateUx(boost::shared_ptr<const bob::machine::GMMStats> gmm_stats, blitz::Array<double,1>& Ux)
+{
+  bob::core::array::assertSameDimensionLength(Ux.extent(0),getDimCD());
+  // Checks that a Base machine has been set
+  if(!m_jfa_base) throw bob::machine::JFAMachineNoJFABaseSet();
+
+  // Ux and GMMStats
+  estimateX(gmm_stats);
+
+  std::vector<boost::shared_ptr<const bob::machine::GMMStats> > stats;
+  stats.push_back(gmm_stats);
+  math::prod(m_jfa_base->getU(), m_x, Ux);
+}
+
 void bob::machine::JFAMachine::forward(boost::shared_ptr<const bob::machine::GMMStats> gmm_stats, double& score)
 {
   // Checks that a Base machine has been set
@@ -406,3 +420,30 @@ void bob::machine::JFAMachine::forward(const std::vector<boost::shared_ptr<const
     samples, channelOffset, true, scores);
   score = scores(0,blitz::Range::all());
 }
+
+void bob::machine::JFAMachine::forward(boost::shared_ptr<const bob::machine::GMMStats> gmm_stats, 
+  const blitz::Array<double,1>& Ux, double& score)
+{
+  // Checks that a Base machine has been set
+  if(!m_jfa_base) throw bob::machine::JFAMachineNoJFABaseSet();
+
+  std::vector<boost::shared_ptr<const bob::machine::GMMStats> > stats;
+  stats.push_back(gmm_stats);
+  std::vector<blitz::Array<double,1> > channelOffset;
+  channelOffset.push_back(Ux);
+
+  // m + Vy + Dz
+  m_cache_mVyDz.resize(getDimCD());
+  math::prod(m_jfa_base->getV(), m_y, m_cache_mVyDz);
+  m_cache_mVyDz += m_jfa_base->getD()*m_z + m_jfa_base->getUbm()->getMeanSupervector();
+  std::vector<blitz::Array<double,1> > models;
+  models.push_back(m_cache_mVyDz);
+
+  // Linear scoring
+  blitz::Array<double,2> scores(1,1);
+  bob::machine::linearScoring(models, 
+    m_jfa_base->getUbm()->getMeanSupervector(), m_jfa_base->getUbm()->getVarianceSupervector(),
+    stats, channelOffset, true, scores);
+  score = scores(0,0);
+}
+

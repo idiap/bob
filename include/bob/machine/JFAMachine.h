@@ -388,15 +388,24 @@ class JFAMachine
     void setJFABase(const boost::shared_ptr<bob::machine::JFABaseMachine> jfa_base);
 
     /**
-      * Estimates from a 2D blitz::Array
+      * Estimates x from the GMM statistics
       */
     void estimateX(boost::shared_ptr<const bob::machine::GMMStats> gmm_stats);
+    /**
+      * Estimates Ux from the GMM statistics.
+      * @warning Ux should be allocated array with rank(U) elements
+      */
+    void estimateUx(boost::shared_ptr<const bob::machine::GMMStats> gmm_stats, blitz::Array<double,1>& Ux);
 
     /**
      * Estimates x and computes a score for the given UBM statistics
      */
     void forward(boost::shared_ptr<const bob::machine::GMMStats> gmm_stats, double& score);
     void forward(const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& samples, blitz::Array<double,1>& scores);
+    /**
+     * Computes a score for the given UBM statistics and given the Ux vector
+     */
+    void forward(boost::shared_ptr<const bob::machine::GMMStats> gmm_stats, const blitz::Array<double,1>& Ux, double& score);
 
 
   private:

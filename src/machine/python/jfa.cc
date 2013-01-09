@@ -143,6 +143,31 @@ static double jfa_forward_sample(bob::machine::JFAMachine& m,
   return score;
 }
 
+ 
+static void jfa_estimateUx(bob::machine::JFAMachine& m, object stats, bob::python::ndarray Ux)
+{
+  // Extracts the vector of GMMStats from the python list
+  boost::shared_ptr<bob::machine::GMMStats> gs = extract<boost::shared_ptr<bob::machine::GMMStats> >(stats);
+
+  // Calls the forward function
+  blitz::Array<double,1> Ux_ = Ux.bz<double,1>();
+  m.estimateUx(gs, Ux_);
+}
+
+static double jfa_forward_sample_Ux(bob::machine::JFAMachine& m, object stats, bob::python::const_ndarray Ux)
+{
+  // Extracts the vector of GMMStats from the python list
+  boost::shared_ptr<bob::machine::GMMStats> gs = extract<boost::shared_ptr<bob::machine::GMMStats> >(stats);
+
+  // Calls the forward function
+  double score;
+  blitz::Array<double,1> Ux_ = Ux.bz<double,1>();
+  m.forward(gs, Ux_, score);
+  return score;
+}
+
+
+
 void bind_machine_jfa() 
 {
   class_<bob::machine::JFABaseMachine, boost::shared_ptr<bob::machine::JFABaseMachine> >("JFABaseMachine", "A JFABaseMachine", init<boost::shared_ptr<bob::machine::GMMMachine>, optional<const size_t, const size_t> >((arg("ubm"), arg("ru")=1, arg("rv")=1), "Builds a new JFABaseMachine. A JFABaseMachine can be seen as a container for U, V and D when performing Joint Factor Analysis (JFA)."))
@@ -173,8 +198,10 @@ void bind_machine_jfa()
     .def("save", &bob::machine::JFAMachine::save, (arg("self"), arg("config")), "Saves the configuration parameters to a configuration file.")
     .def("__call__", &jfa_forward_sample, (arg("self"), arg("gmm_stats")), "Processes GMM statistics and returns a score.")
     .def("forward", &jfa_forward_sample, (arg("self"), arg("gmm_stats")), "Processes GMM statistics and returns a score.")
+    .def("estimate_ux", &jfa_estimateUx, (arg("self"), arg("gmm_stats")), "Processes GMM statistics to estimate Ux.")
     .def("__call__", &jfa_forward_list, (arg("self"), arg("gmm_stats"), arg("scores")), "Processes a list of GMM statistics and updates a score list.")
     .def("forward", &jfa_forward_list, (arg("self"), arg("gmm_stats"), arg("scores")), "Processes a list of GMM statistics and updates a score list.")
+    .def("forward_ux", &jfa_forward_sample_Ux, (arg("self"), arg("gmm_stats"), arg("Ux")), "Processes GMM statistics and Ux to return a score.")
     .add_property("jfa_base", &bob::machine::JFAMachine::getJFABase, &bob::machine::JFAMachine::setJFABase)
     .add_property("x", &py_getX)
     .add_property("y", &py_getY, &py_setY)
