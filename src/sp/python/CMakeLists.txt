@@ -12,6 +12,7 @@ set(src
    "dct.cc"
    "fft.cc"
    "conv.cc"
+   "ceps.cc"
    "main.cc"
    )
 

@@ -16,6 +16,7 @@ set(src
     "DCT1DNaive.cc"
     "DCT2D.cc"
     "DCT2DNaive.cc"
+    "Ceps.cc"
     )
 
 # Define the library, compilation and linkage options
