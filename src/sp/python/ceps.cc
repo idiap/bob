@@ -79,7 +79,7 @@ static object py_logFilterBank(bob::sp::TestCeps& ceps, bob::python::ndarray dat
 {
 
 	blitz::Array<double,1> data_ = data.bz<double,1>();
-	ceps.logFilterBank(data_, m_win_size);
+	ceps.logFilterBank(data_);
 	bob::python::ndarray filter(bob::core::array::t_float64, n_filters);
 	blitz::Array<double,1> filter_ = filter.bz<double,1>();
 
@@ -88,9 +88,9 @@ static object py_logFilterBank(bob::sp::TestCeps& ceps, bob::python::ndarray dat
 	return filter.self();
 }
 
-static object py_DCTransform(bob::sp::TestCeps& ceps, int n_ceps)
+static object py_transformDCT(bob::sp::TestCeps& ceps, int n_ceps)
 {
-	ceps.DCTransform();
+	ceps.transformDCT();
 	bob::python::ndarray features(bob::core::array::t_float64, n_ceps);
 	blitz::Array<double,1> features_ = features.bz<double,1>();
 
@@ -117,7 +117,7 @@ void bind_sp_ceps()
 				.def("pre_emphasis", &py_emphasis, (arg("data"), arg("n"),arg("a")), "compute pre-emphasis")
 				.def("hamming_window", &py_hammingWindow, (arg("data")), "compute the wraped signal on a hamming Window")
 				.def("log_filter_bank", &py_logFilterBank, (arg("data"), arg("m_win_size"), arg("n_filters")), "compute log Filter Bank")
-				.def("dct_transform", &py_DCTransform, (arg("n_ceps")), "DCT Transform")
+				.def("dct_transform", &py_transformDCT, (arg("n_ceps")), "DCT Transform")
 			;
 }
 
