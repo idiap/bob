@@ -175,7 +175,7 @@ void bob::sp::Ceps::CepsAnalysis(int n_size, blitz::Array<double,2>& ceps_matrix
 			m_frame(j) = m_frame(j) - som;
 		}
 
-		double energy;
+		double energy=0.;
 		if (m_withEnergy)
 			energy = logEnergy(m_frame);
 
@@ -183,9 +183,9 @@ void bob::sp::Ceps::CepsAnalysis(int n_size, blitz::Array<double,2>& ceps_matrix
 		hammingWindow(m_frame);
 
 		// Apply the transformation
-		logFilterBank(m_frame,m_win_size);
+		logFilterBank(m_frame);
 
-		DCTransform();
+		transformDCT();
 
 		for(int k=0; k<m_nceps; ++k)
 			ceps_matrix(i,k)=m_ceps_coeff(k);
@@ -219,18 +219,22 @@ void bob::sp::Ceps::hammingWindow(blitz::Array<double,1> &data)
 		data(i) *= m_hamming_kernel(i);
 }
 
-void bob::sp::Ceps::logFilterBank(blitz::Array<double,1>& x, int m_win_size)
+void bob::sp::Ceps::logFilterBank(blitz::Array<double,1>& x)
 {
-	blitz::Array<std::complex<double>,1> x1(m_win_size);
+	int win_size = x.shape()[0];
+	blitz::Array<std::complex<double>,1> x1(win_size);
 
-	for(int i=0; i<m_win_size; ++i)
-		x1(i).real(x(i));
+	//real(x1)=x;
+	x1 = x;
 
-	blitz::Array<std::complex<double>,1> complex_(m_win_size);
-	bob::sp::FFT1D fft(m_win_size);
+	//for(int i=0; i<m_win_size; ++i)
+		//x1(i).real(x(i));
+
+	blitz::Array<std::complex<double>,1> complex_(win_size);
+	bob::sp::FFT1D fft(win_size);
 	fft(x1,complex_);
 
-	int sh = m_win_size/2;
+	int sh = win_size/2;
 	blitz::Array<double,1> x_half(x(blitz::Range(0,sh)));
 	blitz::Array<std::complex<double>,1> complex_half(complex_(blitz::Range(0,sh)));
 	x_half = blitz::abs(complex_half);
@@ -308,7 +312,7 @@ double bob::sp::Ceps::logEnergy(blitz::Array<double,1> &data)
  * This is what is implemented here with arrays indexed from 0 to N-1.
  *
  */
-void bob::sp::Ceps::DCTransform()
+void bob::sp::Ceps::transformDCT()
 {
 	for(int i=1; i<=m_nceps; ++i) {
 		m_ceps_coeff(i-1)=0.0;

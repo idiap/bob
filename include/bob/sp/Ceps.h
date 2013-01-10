@@ -98,10 +98,10 @@ private:
 	static double MelInv(double f);
 	void emphasis(blitz::Array<double,1> &data,int n,double a);
 	void hammingWindow(blitz::Array<double,1> &data);
-	void logFilterBank(blitz::Array<double,1>& x, int len);
+	void logFilterBank(blitz::Array<double,1>& x);
 	void logTriangularFBank(blitz::Array<double,1>& data);
 	double logEnergy(blitz::Array<double,1> &data);
-	void DCTransform();
+	void transformDCT();
 	void initWindowSize();
 	void initCache();
 
@@ -151,10 +151,10 @@ public:
 	}
 	void hammingWindow(blitz::Array<double,1>& data){ m_ceps.hammingWindow(data);}
 	void emphasis(blitz::Array<double,1>& data,int n,double a){m_ceps.emphasis(data, n, a);}
-	void logFilterBank(blitz::Array<double,1>& x, int m_win_size){m_ceps.logFilterBank(x, m_win_size);}
+	void logFilterBank(blitz::Array<double,1>& x){m_ceps.logFilterBank(x);}
 	void logTriangularFBank(blitz::Array<double,1>& data){m_ceps.logTriangularFBank(data);}
 	double logEnergy(blitz::Array<double,1> &data){return m_ceps.logEnergy(data);}
-	void DCTransform(){m_ceps.DCTransform();}
+	void transformDCT(){m_ceps.transformDCT();}
 	void addDelta(blitz::Array<double,2>& frames, int win_size, int n_frames, int frame_size){
 		m_ceps.addDelta(frames, win_size, n_frames, frame_size);
 	}
