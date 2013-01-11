@@ -52,7 +52,10 @@ message(STATUS "Bob version '${BOB_VERSION}' (${BOB_PLATFORM_STR})")
 # Flag setting
 
 # For both C and C++
-set(COMMON_FLAGS "-pedantic -Wall -pthread")
+set(COMMON_FLAGS "-pedantic -Wall")
+if (NOT CYGWIN)
+  set(COMMON_FLAGS "${COMMON_FLAGS} -pthread")
+endif (NOT CYGWIN)
 if (NOT CMAKE_COMPILER_IS_GNUCC)
   # Then, it must be clang/clang++
   set(COMMON_FLAGS "${COMMON_FLAGS} -Qunused-arguments")
@@ -69,6 +72,9 @@ endif(APPLE)
 # For both RELEASE and DEBUG builds
 if(APPLE AND CMAKE_COMPILER_IS_GNUCC)
   set(COMMON_FLAGS "${COMMON_FLAGS} -Wno-long-long -Wno-variadic-macros")
+elseif(CYGWIN)
+  set(COMMON_CXX_FLAGS "-std=gnu++0x")
+  set(COMMON_C_FLAGS "-std=gnu99")
 else()
   set(COMMON_CXX_FLAGS "-std=c++0x")
   set(COMMON_C_FLAGS "-std=c99")
@@ -122,6 +128,11 @@ enable_testing()
 
 set(BUILD_SHARED_LIBS "ON" CACHE BOOL "Build shared libs")
 
+# Install libraries and executables
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR})
+
 # Include file handling and installation
 install(DIRECTORY include/bob DESTINATION include FILES_MATCHING PATTERN "*.h")
 
@@ -139,7 +150,6 @@ macro(bob_add_library name src)
   include_directories(BEFORE 
     "${CMAKE_SOURCE_DIR}/include" "${CMAKE_BINARY_DIR}/include")
   add_library(${name} ${src})
-  set_target_properties(${name} PROPERTIES LIBRARY_OUTPUT_DIRECTORY  ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
   if (BOB_SOVERSION)
     # adds versioning information
     set_target_properties(${name} PROPERTIES VERSION ${BOB_VERSION})
@@ -163,7 +173,7 @@ macro(bob_add_test package name src)
     "${CMAKE_SOURCE_DIR}/include" "${CMAKE_BINARY_DIR}/include")
   add_executable(${bin_name} ${src})
   target_link_libraries(${bin_name} ${package};${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_RELEASE})
-  add_test(${test_name} ${bin_name} --log_level=test_suite)
+  add_test(${test_name} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${bin_name} --log_level=test_suite)
   string(REPLACE "bob_" "" short_package_name ${package})
   set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "BOB_TESTDATA_DIR=${CMAKE_SOURCE_DIR}/testdata/${short_package_name}")
 endmacro()
