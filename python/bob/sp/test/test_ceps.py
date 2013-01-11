@@ -155,14 +155,14 @@ def cepstral_features_extraction(obj, rate_wavsample, win_length_ms, win_shift_m
   else:
     # Mel scale
     m_max = mel_python(f_max);
-    obj.assertEqual(ct.mel(f_max), m_max, "Error in Mel...")
+    obj.assertAlmostEqual(ct.mel(f_max), m_max, 7, "Error in Mel...")
     m_min = mel_python(f_min);
-    obj.assertEqual(ct.mel(f_min), m_min, "Error in Mel...")
+    obj.assertAlmostEqual(ct.mel(f_min), m_min, 7, "Error in Mel...")
   
     for i in range(n_filters + 2):
       alpha = ((i) / (n_filters + 1.0));
       f = mel_inv_python(m_min * (1 - alpha) + m_max * alpha);
-      obj.assertEqual(ct.mel_inv(m_min * (1 - alpha) + m_max * alpha), f, "Error in MelInv...")
+      obj.assertAlmostEqual(ct.mel_inv(m_min * (1 - alpha) + m_max * alpha), f, 7, "Error in MelInv...")
       factor = f / (sf * 1.0);
       p_index[i] = int (round((win_size) * factor));
 
@@ -220,7 +220,7 @@ def cepstral_features_extraction(obj, rate_wavsample, win_length_ms, win_shift_m
     if (withEnergy):
       energy = sig_norm(win_length, frame, False)
       e1 = ct.log_energy(frame)
-      obj.assertEqual(e1, energy, "Error in Energy Computation...")
+      obj.assertAlmostEqual(e1, energy, 7, "Error in Energy Computation...")
     
     f2 = numpy.copy(frame)  
     
