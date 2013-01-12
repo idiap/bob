@@ -254,6 +254,7 @@ EXTENSIONS = [
     setup_extension('bob.measure._measure', 'bob-measure-py'),
     setup_extension('bob.sp._sp', 'bob-sp-py'),
     setup_extension('bob.ip._ip', 'bob-ip-py'),
+    setup_extension('bob.ap._ap', 'bob-ap-py'),
     setup_extension('bob.machine._machine', 'bob-machine-py'),
     setup_extension('bob.trainer._trainer', 'bob-trainer-py'),
     setup_extension('bob.trainer.overload._trainer_overload', 'bob-trainer-overload-py'),

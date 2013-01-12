@@ -60,6 +60,7 @@ add_subdirectory(measure)
 add_subdirectory(sp)
 add_subdirectory(math)
 add_subdirectory(ip)
+add_subdirectory(ap)
 
 include(libsvm.cmake)
 add_subdirectory(machine)
