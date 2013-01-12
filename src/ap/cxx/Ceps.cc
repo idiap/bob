@@ -24,12 +24,8 @@
 #include "bob/ap/Ceps.h"
 #include "bob/core/array_assert.h"
 #include "bob/core/cast.h"
-#include "bob/sp/FFT1D.h"
 #include <cmath>
 #include <blitz/array.h>
-
-bob::ap::TestCeps::TestCeps(Ceps& ceps): m_ceps(ceps) {
-}
 
 bob::ap::Ceps::Ceps( double sf, int win_length_ms, int win_shift_ms, int n_filters, int n_ceps,
     double f_min, double f_max, double delta_win):
@@ -37,12 +33,15 @@ bob::ap::Ceps::Ceps( double sf, int win_length_ms, int win_shift_ms, int n_filte
   m_n_filters(n_filters), m_n_ceps(n_ceps), 
   m_f_min(f_min), m_f_max(f_max), m_delta_win(delta_win),
   m_fb_linear(true), m_dct_norm(1.), m_with_energy(true), m_with_delta(true), m_with_delta_delta(true), 
-  m_with_delta_energy(true), m_with_delta_delta_energy(true)
+  m_with_delta_energy(true), m_with_delta_delta_energy(true), m_filter_bank(), m_fft(1)
 {
   initWinLength();
   initWinShift();
-  initWinSize();
-  initCache();
+
+  m_filters.resize(m_n_filters);
+  m_ceps_coeff.resize(m_n_ceps);
+
+  initCacheDctKernel();
 }
 
 bob::ap::Ceps::~Ceps()
@@ -68,38 +67,38 @@ void bob::ap::Ceps::setWinShiftMs(int win_shift_ms)
   initWinShift(); 
 }
 
-void bob::ap::Ceps::setNFilters(int n_filters)
+void bob::ap::Ceps::setNFilters(size_t n_filters)
 { 
   m_n_filters = n_filters; 
   m_filters.resize(m_n_filters); 
-  initCachePIndex(); 
+  initCacheFilterBank(); 
   initCacheDctKernel(); 
 }
 
-void bob::ap::Ceps::setNCeps(int n_ceps)
+void bob::ap::Ceps::setNCeps(size_t n_ceps)
 { 
   m_n_ceps = n_ceps; 
   m_ceps_coeff.resize(m_n_ceps);
-  initCachePIndex(); 
+  initCacheFilterBank(); 
   initCacheDctKernel(); 
 } 
 
 void bob::ap::Ceps::setFMin(double f_min)
 { 
   m_f_min = f_min; 
-  initCachePIndex(); 
+  initCacheFilterBank(); 
 }
 
 void bob::ap::Ceps::setFMax(double f_max)
 { 
   m_f_max = f_max; 
-  initCachePIndex();
+  initCacheFilterBank();
 }
 
 void bob::ap::Ceps::setFbLinear(bool fb_linear)
 { 
   m_fb_linear = fb_linear; 
-  initCachePIndex(); 
+  initCacheFilterBank(); 
 }
 
 //Auxilary functions needed to set mel scale
@@ -107,17 +106,18 @@ double bob::ap::Ceps::mel(double f)
 {
   return(2595.*log10(1+f/700.));
 }
-double bob::ap::Ceps::MelInv(double f)
+
+double bob::ap::Ceps::melInv(double f)
 {
   return((double)(700.*(pow(10,f/2595.)-1)));
 }
 
 void bob::ap::Ceps::initWinLength()
 { 
-  m_win_length = (int)(m_sf * m_win_length_ms / 1000); 
+  m_win_length = (int)(m_sf * m_win_length_ms / 1000);
   initWinSize();
   initCacheHammingKernel(); 
-  initCachePIndex(); 
+  initCacheFilterBank(); 
 }
 
 void bob::ap::Ceps::initWinShift()
@@ -129,26 +129,14 @@ void bob::ap::Ceps::initWinSize()
 {
   m_win_size = (int)pow(2.0,(double)ceil(log(m_win_length)/log(2)));
   m_frame.resize(m_win_size);
-}
-
-void bob::ap::Ceps::reinit(double dct_norm, bool fb_linear, bool with_energy,
-    bool with_delta, bool with_delta_delta, bool with_delta_energy, bool with_delta_delta_energy)
-{
-  m_dct_norm = dct_norm;
-  m_fb_linear = fb_linear;
-  m_with_energy = with_energy;
-  m_with_delta = with_delta ;
-  m_with_delta_delta = with_delta_delta;
-  m_with_delta_energy = with_delta_energy;
-  m_with_delta_delta_energy = with_delta_delta_energy;
-
-  initWinSize();
-  initCache();
+  m_fft.reset(m_win_size);
+  m_cache_complex1.resize(m_win_size);
+  m_cache_complex2.resize(m_win_size);
 }
 
 void bob::ap::Ceps::initCacheHammingKernel()
 {
-  // Hamming initialization
+  // Hamming Window initialization
   m_hamming_kernel.resize(m_win_length);
   double cst = 2*M_PI/(m_win_length-1);
   blitz::firstIndex i;
@@ -162,43 +150,86 @@ void bob::ap::Ceps::initCacheDctKernel()
   blitz::firstIndex i;
   blitz::secondIndex j;
   m_dct_kernel = blitz::cos(M_PI*(i+1)*(j+0.5)/(double)(m_n_filters));
-  //m_dct_norm=(double)sqrt(2.0/(double)(m_n_filters));
+  // TODO: DCT normalization
+  // m_dct_norm=(double)sqrt(2.0/(double)(m_n_filters));
 }
 
+
+void bob::ap::Ceps::initCacheFilterBank()
+{
+  initCachePIndex();
+  initCacheFilters();
+}
+
+/**
+ * @brief Iniatilize the table m_p_index, which contains the indices of the
+ * cut-off frequencies. It looks like something like this:
+ *
+ *                      filter 2
+ *                   <------------->
+ *                filter 1           filter 4
+ *             <----------->       <------------->
+ *        | | | | | | | | | | | | | | | | | | | | | ..........
+ *         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9  ..........
+ *             ^     ^     ^       ^             ^
+ *             |     |     |       |             |
+ *          p_in[0]  |  p_in[2]    |          p_in[4]
+ *                p_in[1]       p_in[3]
+ *
+ */
 void bob::ap::Ceps::initCachePIndex()
 {
+  // Compute the indices for the triangular filter bank
   m_p_index.resize(m_n_filters+2);
-  blitz::Array<double,1> p_index_d(m_n_filters+2);
-  if(m_fb_linear) {
-    // Linear scale
-    //blitz::firstIndex i;
-    //m_p_index = blitz::round(m_win_size/m_sf * (m_f_min + (m_f_max-m_f_min)*i/(double)(m_n_filters+1)));
+  // Linear frequency decomposition (for LFCC)
+  if(m_fb_linear) 
+  {
+    const double cst_a = (m_win_size/m_sf) * (m_f_max-m_f_min)/(double)(m_n_filters+1);
+    const double cst_b = (m_win_size/m_sf) * m_f_min;
     for(int i=0; i<(int)m_n_filters+2; ++i) {
-      double alpha = (double)(i)/ (double)(m_n_filters+1);
-      double f = m_f_min + (m_f_max - m_f_min) * alpha;
-      m_p_index(i) = (int)round(m_win_size/m_sf * f);
+      m_p_index(i) = (int)round(cst_a * i + cst_b);
     }
-  } else {
-    // Mel scale
+  }
+  // 'Mel' frequency decomposition (for MFCC)
+  else 
+  {
     double m_max = mel(m_f_max);
     double m_min = mel(m_f_min);
     for(int i=0; i<(int)m_n_filters+2; ++i) {
       double alpha = (double) (i)/ (double) (m_n_filters+1);
-      double f = MelInv(m_min * (1-alpha) + m_max * alpha);
+      double f = melInv(m_min * (1-alpha) + m_max * alpha);
       double factor = f / m_sf;
       m_p_index(i)=(int)round(m_win_size * factor);
     }
   }
 }
 
-void bob::ap::Ceps::initCache()
+void bob::ap::Ceps::initCacheFilters()
 {
-  m_filters.resize(m_n_filters);
-  m_ceps_coeff.resize(m_n_ceps);
-
-  initCacheHammingKernel();
-  initCacheDctKernel();
-  initCachePIndex();
+  // Create the Triangular filter bank
+  m_filter_bank.clear();
+  blitz::firstIndex ii;
+  for(int i=0; i<(int)m_n_filters; ++i) 
+  {
+    // Integer indices of the boundary of the triangular filter in the 
+    // Fourier domain
+    int li = m_p_index(i);
+    int mi = m_p_index(i+1);
+    int ri = m_p_index(i+2);
+    blitz::Array<double,1> filt(ri-li+1);
+    // Fill in the left slice of the triangular filter
+    blitz::Array<double,1> filt_p1(filt(blitz::Range(0,mi-li-1)));
+    int len = mi-li+1;
+    double a = 1. / len;
+    filt_p1 = 1.-a*(len-1-ii);
+    // Fill in the right slice of the triangular filter
+    blitz::Array<double,1> filt_p2(filt(blitz::Range(mi-li,ri-li)));
+    len = ri-mi+1;
+    a = 1. / len;
+    filt_p2 = 1.-a*ii;
+    // Append filter into the filterbank vector
+    m_filter_bank.push_back(filt);
+  }
 }
 
 blitz::TinyVector<int,2> bob::ap::Ceps::getCepsShape(const size_t input_size) const
@@ -228,7 +259,7 @@ blitz::TinyVector<int,2> bob::ap::Ceps::getCepsShape(const size_t input_size) co
 
 blitz::TinyVector<int,2> bob::ap::Ceps::getCepsShape(const blitz::Array<double,1>& input) const
 {
-  return this->getCepsShape(input.extent(0));
+  return getCepsShape(input.extent(0));
 }
 
 void bob::ap::Ceps::CepsAnalysis(const blitz::Array<double,1>& input, 
@@ -243,24 +274,28 @@ void bob::ap::Ceps::CepsAnalysis(const blitz::Array<double,1>& input,
 
   //compute the center of the cut-off frequencies
   blitz::Range r1(0,m_n_ceps-1);
-  for(int i=0; i<n_frames; ++i) {
-    // Create a frame
-    double sum=0.;
+  blitz::Range rf(0,m_win_length-1); 
+  for(int i=0; i<n_frames; ++i) 
+  {
+    // Set padded frame to zero
     m_frame = 0.;
-    for(int j=0; j<m_win_length; ++j)
-      m_frame(j) = input(j+i*m_win_shift);
-    sum = blitz::sum(m_frame) / (double)m_win_size;
-    m_frame -= sum;
+    // Extract frame input vector
+    blitz::Range ri(i*m_win_shift,i*m_win_shift+m_win_length-1);
+    m_frame(rf) = input(ri);
+    // Substract mean value
+    m_frame -= blitz::mean(m_frame);
 
-    // Update output
+    // Update output with energy if required
     if(m_with_energy)
       ceps_matrix(i,(int)m_n_ceps) = logEnergy(m_frame);
 
+    // Apply pre-emphasis
     emphasis(m_frame, 0.95);
+    // Apply the Hamming window
     hammingWindow(m_frame);
-
-    // Apply the transformation
+    // Filter with the triangular filter bank (either in linear or Mel domain)
     logFilterBank(m_frame);
+    // Apply DCT kernel
     transformDCT();
 
     // Update output
@@ -281,11 +316,13 @@ void bob::ap::Ceps::emphasis(blitz::Array<double,1> &data, double a)
   }
   if(a!=0.)
   { 
-    double v0 = (1.-a)*data(0);
+    // Pre-emphasise the signal by applying the first order equation
+    // \f$data_{n} := data_{n} − a*data_{n−1}\f$
+//    double v0 = (1.-a)*data(0); // Backup of the first element
     blitz::Range r0(m_win_length-2,0,-1); 
     blitz::Range r1(m_win_length-1,1,-1); 
-    data(r1) -= a*data(r0);
-    data(0) = v0;
+    data(r1) -= a*data(r0); // Apply first order equation
+    data(0) *= 1.-a; // Update first element with the backup
   }
 }
 
@@ -297,66 +334,31 @@ void bob::ap::Ceps::hammingWindow(blitz::Array<double,1> &data)
 
 void bob::ap::Ceps::logFilterBank(blitz::Array<double,1>& x)
 {
-  int win_size = x.shape()[0];
-  blitz::Array<std::complex<double>,1> x1(win_size);
+  // Apply the FFT
+  m_cache_complex1 = bob::core::cast<std::complex<double> >(x);
+  m_fft(m_cache_complex1, m_cache_complex2);
 
-  x1 = bob::core::cast<std::complex<double> >(x);
-
-  blitz::Array<std::complex<double>,1> complex_(win_size);
-  bob::sp::FFT1D fft(win_size);
-  fft(x1,complex_);
-
-  blitz::Range r(0,win_size/2);
+  // Take the the power spectrum of the first part of the output of the FFT
+  blitz::Range r(0,m_win_size/2);
   blitz::Array<double,1> x_half(x(r));
-  blitz::Array<std::complex<double>,1> complex_half(complex_(r));
+  blitz::Array<std::complex<double>,1> complex_half(m_cache_complex2(r));
   x_half = blitz::abs(complex_half);
 
+  // Apply the Triangular filter bank to this power spectrum
   logTriangularFBank(x);
 }
 
 
-/* -------------------------------------------------------------------- */
-/* ----- void LogTriangularFBank(vector_t *,int,int *,vector_t *) ----- */
-/* -------------------------------------------------------------------- */
-/*
- * Apply triangular filter bank to module vector and return the log of
- * the energy in each band. Table m_p_index contains the indexes of the
- * cut-off frequencies. Looks like something like this:
- *
- *                      filter 2
- *                   <------------->
- *                filter 1           filter 3
- *             <----------->       <------------->
- *        | | | | | | | | | | | | | | | | | | | | | ..........
- *         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9  ..........
- *             ^     ^     ^       ^             ^
- *             |     |     |       |             |
- *          p_in[0]  |  p_in[2]    |          p_in[4]
- *                p_in[1]       p_in[3]
- *
+/**
+ * @brief Apply triangular filter bank to the input array and return the log
+ * of the energy in each band. 
  */
 void bob::ap::Ceps::logTriangularFBank(blitz::Array<double,1>& data)
 {
-  int j;
-  double a;
-  double res;
-
   for(int i=0; i<(int)m_n_filters; ++i)
   {
-    res=0.0;
-
-    a=1.0/(double)(m_p_index(i+1)-m_p_index(i)+1);
-
-    for(j=m_p_index(i); j<m_p_index(i+1); ++j)
-    {
-      res += data(j)*(1.0-a*(m_p_index(i+1)-j));
-    }
-    a=1.0/(double)(m_p_index(i+2)-m_p_index(i+1)+1);
-
-    for(j=m_p_index(i+1); j<=m_p_index(i+2); ++j)
-    {
-      res += data(j)*(1.0-a*((double)(j-m_p_index(i+1))));
-    }
+    blitz::Array<double,1> data_slice(data(blitz::Range(m_p_index(i),m_p_index(i+2))));
+    double res = blitz::sum(data_slice * m_filter_bank[i]);
     m_filters(i)=(res < FBANK_OUT_FLOOR)?(double)log(FBANK_OUT_FLOOR):(double)log(res);
   }
 }
@@ -448,3 +450,8 @@ blitz::Array<double,2> bob::ap::Ceps::dataZeroMean(blitz::Array<double,2>& frame
   }
   return frames;
 }
+
+bob::ap::TestCeps::TestCeps(Ceps& ceps): m_ceps(ceps) {
+}
+
+

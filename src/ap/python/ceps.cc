@@ -136,13 +136,11 @@ void bind_ap_ceps()
         .add_property("with_delta_delta_energy", &bob::ap::Ceps::getWithDeltaDeltaEnergy, &bob::ap::Ceps::setWithDeltaDeltaEnergy, "Tells if we add the second derivative of the energy to the output feature")
         .def("ceps_analysis", &py_ceps_analysis, (arg("input")), "Compute the features")
         .def("get_ceps_shape", &py_get_ceps_shape, (arg("n_size"), arg("input_data")), "Compute the shape of the output features")
-        .def("reinit", &bob::ap::Ceps::reinit, (arg("m_dct_norm"), arg("fb_linear"), arg("withEnergy"), arg("withDelta"),
-                    arg("withDeltaDelta"), arg("withDeltaEnergy"), arg("withDeltaDeltaEnergy")),"reinitialisation")
         ;
 
   class_<bob::ap::TestCeps, boost::shared_ptr<bob::ap::TestCeps> >("TestCeps", TESTCEPS_DOC, init<bob::ap::Ceps&>((arg("ceps"))))
         .def("mel", &bob::ap::TestCeps::mel, (arg("f")), "Compute a mel scale.")
-        .def("mel_inv", &bob::ap::TestCeps::MelInv, (arg("f")), "Compute an inverse mel scale.")
+        .def("mel_inv", &bob::ap::TestCeps::melInv, (arg("f")), "Compute an inverse mel scale.")
         .def("log_energy", &py_logEnergy, (arg("data")), "compute the gain")
         .def("pre_emphasis", &py_emphasis, (arg("data"), arg("a")), "compute pre-emphasis")
         .def("hamming_window", &py_hammingWindow, (arg("data")), "compute the wraped signal on a hamming Window")
