@@ -14,6 +14,7 @@ from . import math
 from . import measure
 from . import sp
 from . import ip
+from . import ap
 from . import db
 from . import machine
 from . import trainer
@@ -43,6 +44,7 @@ __all__ = [
     'measure',
     'sp',
     'ip',
+    'ap',
     'db',
     'machine',
     'trainer',
