@@ -26,6 +26,8 @@
 #define BOB_AP_CEPS_H
 
 #include <blitz/array.h>
+#include <vector>
+#include "bob/sp/FFT1D.h"
 
 const double ENERGY_FLOOR = 1.0;
 const double FBANK_OUT_FLOOR = 1.0;
@@ -68,12 +70,6 @@ class Ceps
      * @brief Compute Cepstral features
      */
     void CepsAnalysis(const blitz::Array<double,1>& input, blitz::Array<double,2>& output);
-
-    /**
-     * @brief Reinitialize member variables
-     */
-    void reinit(double dct_norm, bool fb_linear, bool with_energy, bool with_delta,
-        bool with_delta_delta, bool with_delta_energy, bool with_delta_delta_energy);
 
     /**
      * @brief Destructor
@@ -126,8 +122,8 @@ class Ceps
     void setSampleFrequency(const double sf);
     void setWinLengthMs(int win_length_ms);
     void setWinShiftMs(int win_shift_ms);
-    void setNFilters(int n_filters);
-    void setNCeps(int n_ceps);
+    void setNFilters(size_t n_filters);
+    void setNCeps(size_t n_ceps);
     inline void setDeltaWin(size_t delta_win)
     { m_delta_win = (int)delta_win; } 
     void setFMin(double f_min);
@@ -162,7 +158,7 @@ class Ceps
     blitz::Array<double,2> dataZeroMean(blitz::Array<double,2>& frames, bool norm_energy, int n_frames, int frame_size);
 
     static double mel(double f);
-    static double MelInv(double f);
+    static double melInv(double f);
     void emphasis(blitz::Array<double,1> &data, double a);
     void hammingWindow(blitz::Array<double,1> &data);
     void logFilterBank(blitz::Array<double,1>& x);
@@ -172,10 +168,11 @@ class Ceps
     void initWinSize();
     void initWinLength();
     void initWinShift();
-    void initCache();
     void initCacheHammingKernel();
     void initCacheDctKernel();
+    void initCacheFilterBank();
     void initCachePIndex();
+    void initCacheFilters();
 
     double m_sf;
     int m_win_length_ms;
@@ -201,6 +198,10 @@ class Ceps
     blitz::Array<double,1> m_filters;
     blitz::Array<double,1> m_ceps_coeff;
     blitz::Array<int,1>  m_p_index;
+    std::vector<blitz::Array<double,1> > m_filter_bank;
+    bob::sp::FFT1D m_fft;
+    blitz::Array<std::complex<double>,1>  m_cache_complex1;
+    blitz::Array<std::complex<double>,1>  m_cache_complex2;
 
     friend class TestCeps;
 };
@@ -213,7 +214,7 @@ class TestCeps
 
     // Methods to test
     double mel(double f) { return m_ceps.mel(f); }
-    double MelInv(double f) { return m_ceps.MelInv(f); }
+    double melInv(double f) { return m_ceps.melInv(f); }
     blitz::TinyVector<int,2> getCepsShape(const size_t input_length) const
     { return m_ceps.getCepsShape(input_length); }
     blitz::TinyVector<int,2> getCepsShape(const blitz::Array<double,1>& input) const

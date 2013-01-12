@@ -120,13 +120,19 @@ def dct_transform(filters, n_filters, dct_kernel, n_ceps, dct_norm):
 
 
 def cepstral_features_extraction(obj, rate_wavsample, win_length_ms, win_shift_ms, n_filters, n_ceps, dct_norm, f_min, f_max,
-                               delta_win, fb_linear, withEnergy, withDelta, withDeltaDelta, withDeltaEnergy, withDeltaDeltaEnergy):
+                               delta_win, fb_linear, with_energy, with_delta, with_delta_delta, with_delta_energy, with_delta_delta_energy):
   #########################
   ## Initialisation part ##
   #########################
   
   c = bob.ap.Ceps(rate_wavsample[0], 20, 10, 24, 19, 0., 4000., 2)
-  c.reinit(dct_norm, fb_linear, withEnergy, withDelta, withDeltaDelta, withDeltaEnergy, withDeltaDeltaEnergy);
+  c.dct_norm = dct_norm
+  c.fb_linear = fb_linear
+  c.with_energy = with_energy
+  c.with_delta = with_delta
+  c.with_delta_delta = with_delta_delta
+  c.with_delta_energy = with_delta_energy
+  c.with_delta_delta_energy = with_delta_delta_energy
   ct = bob.ap.TestCeps(c)
 
   sf = rate_wavsample[0]
@@ -188,19 +194,19 @@ def cepstral_features_extraction(obj, rate_wavsample, win_length_ms, win_shift_m
   ceps_sequence = numpy.zeros(n_ceps);
   dim = n_ceps;
   
-  if (withEnergy):
+  if (with_energy):
     dim = n_ceps + 1;
   
-  if (withDelta):
+  if (with_delta):
     dim = dim + n_ceps;
   
-  if (withDeltaEnergy):
+  if (with_delta_energy):
     dim = dim + 1;
   
-  if (withDeltaDelta):
+  if (with_delta_delta):
     dim = dim + n_ceps;
   
-  if(withDeltaDeltaEnergy):
+  if(with_delta_delta_energy):
     dim = dim + 1;
   
   params = [ [ 0 for i in range(dim) ] for j in range(n_frames) ] ;
@@ -217,7 +223,7 @@ def cepstral_features_extraction(obj, rate_wavsample, win_length_ms, win_shift_m
     som = som / win_size
     frame = frame - som  
     
-    if (withEnergy):
+    if (with_energy):
       energy = sig_norm(win_length, frame, False)
       e1 = ct.log_energy(frame)
       obj.assertAlmostEqual(e1, energy, 7, "Error in Energy Computation...")
@@ -248,7 +254,7 @@ def cepstral_features_extraction(obj, rate_wavsample, win_length_ms, win_shift_m
     ceps2 = ct.dct_transform(n_ceps);
 
 
-    if (withEnergy):
+    if(with_energy):
       d1 = n_ceps + 1;
       #print energy
       ceps[n_ceps] = energy;
@@ -261,7 +267,7 @@ def cepstral_features_extraction(obj, rate_wavsample, win_length_ms, win_shift_m
     params[i][0:d1]=ceps[vec];
 
   # compute Delta coefficient
-  if (withDelta):
+  if(with_delta):
     som = 0.0;
     for i in range(1,delta_win+1):
       som = som + i*i;
@@ -283,7 +289,7 @@ def cepstral_features_extraction(obj, rate_wavsample, win_length_ms, win_shift_m
         params[i][d1+k] = params[i][d1+k] / som;
 
   # compute Delta of the Energy
-  if (withDeltaEnergy):
+  if(with_delta_energy):
     som = 0.0;
     
     vec=numpy.arange(1,delta_win+1);
@@ -305,7 +311,7 @@ def cepstral_features_extraction(obj, rate_wavsample, win_length_ms, win_shift_m
       params[i][d1+k] = params[i][d1+k] / som;
    
   # compute Delta Delta of the coefficients
-  if (withDeltaDelta):
+  if(with_delta_delta):
     som = 0.0;
     for i in range(1,delta_win+1):
       som = som + i*i;
@@ -326,7 +332,7 @@ def cepstral_features_extraction(obj, rate_wavsample, win_length_ms, win_shift_m
         params[i][2*d1+k] = params[i][2*d1+k] / som; 
   
   # compute Delta Delta of the energy
-  if (withDeltaDeltaEnergy):
+  if(with_delta_delta_energy):
     som = 0.0;
     for i in range(1,delta_win+1):
       som = som + i*i;
@@ -359,7 +365,13 @@ class CepsTest(unittest.TestCase):
     rate_wavsample = _read(pkg_resources.resource_filename(__name__, os.path.join('data', 'sample.wav')))
     data_array = rate_wavsample[1]
     c = bob.ap.Ceps(rate_wavsample[0], 20, 10, 24, 19, 0., 4000., 2)
-    c.reinit(1.0, False, True, True, True, True, True);
+    c.dct_norm = 1.
+    c.fb_linear = False
+    c.with_energy = True
+    c.with_delta = True 
+    c.with_delta_delta = True
+    c.with_delta_energy = True
+    c.with_delta_delta_energy = True 
     ct = bob.ap.TestCeps(c)
     A = c.ceps_analysis(data_array)
     B = cepstral_features_extraction(self, rate_wavsample, 20, 10, 24, 19, 1.0, 0., 4000., 2, False, True, True, True, True, True)
@@ -372,10 +384,16 @@ class CepsTest(unittest.TestCase):
     rate_wavsample = _read(pkg_resources.resource_filename(__name__, os.path.join('data', 'sample.wav')))
     data_array = rate_wavsample[1]
     c = bob.ap.Ceps(rate_wavsample[0], 20, 10, 24, 19, 0., 4000., 2)
-    c.reinit(1.0, False, True, True, True, True, True);
+    c.dct_norm = 1.
+    c.fb_linear = True
+    c.with_energy = True
+    c.with_delta = True 
+    c.with_delta_delta = True
+    c.with_delta_energy = True
+    c.with_delta_delta_energy = True 
     ct = bob.ap.TestCeps(c)
     A = c.ceps_analysis(data_array)
-    B = cepstral_features_extraction(self, rate_wavsample, 20, 10, 24, 19, 1.0, 0., 4000., 2, False, True, True, True, True, True)
+    B = cepstral_features_extraction(self, rate_wavsample, 20, 10, 24, 19, 1.0, 0., 4000., 2, True, True, True, True, True, True)
     diff=numpy.sum(numpy.sum((A-B)*(A-B)))
     self.assertAlmostEqual(diff, 0., 7, "Error in Ceps Analysis")
     
