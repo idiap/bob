@@ -33,15 +33,13 @@ static const char* TESTCEPS_DOC = "Objects of this class, after configuration, c
 
 static object py_ceps_analysis(bob::ap::Ceps& ceps, bob::python::const_ndarray input)
 {
-  // Get the shape of the feature
+  // Gets the shape of the feature
   const blitz::Array<double,1> input_ = input.bz<double,1>();
   blitz::TinyVector<size_t,2> s = ceps.getCepsShape(input_);
-
-  // Allocate numpy array and define blitz wrapper
+  // Allocates a numpy array and defines the corresponding blitz wrapper
   bob::python::ndarray ceps_matrix(bob::core::array::t_float64, s(0), s(1));
   blitz::Array<double,2> ceps_matrix_ = ceps_matrix.bz<double,2>();
-
-  // Extract the features
+  // Extracts the features
   ceps.CepsAnalysis(input_, ceps_matrix_);
   return ceps_matrix.self();
 }
@@ -51,7 +49,7 @@ static boost::python::tuple py_get_ceps_shape(bob::ap::Ceps& ceps, object input_
   boost::python::tuple res;
   extract<int> int_check(input_object);
   if (int_check.check()) { //is int
-    blitz::TinyVector<int,2> size = ceps.getCepsShape((ulong)int_check());
+    blitz::TinyVector<int,2> size = ceps.getCepsShape(int_check());
     res = boost::python::make_tuple(size[0], size[1]);
   }
   else {
@@ -74,16 +72,12 @@ static double py_logEnergy(bob::ap::TestCeps& ceps, bob::python::ndarray data)
 static void py_emphasis(bob::ap::TestCeps& ceps, bob::python::ndarray data)
 {
   blitz::Array<double,1> data_ = data.bz<double,1>();
-
-  //Compute the Pre-Emphasis
-  ceps.emphasis(data_);
+  ceps.pre_emphasis(data_);
 }
 
 static void py_hammingWindow(bob::ap::TestCeps& ceps, bob::python::ndarray data)
 {
   blitz::Array<double,1> data_ = data.bz<double,1>();
-
-  //Compute the Hamming Wrapping
   ceps.hammingWindow(data_);
 }
 
@@ -94,29 +88,26 @@ static object py_logFilterBank(bob::ap::TestCeps& ceps, bob::python::ndarray dat
   ceps.logFilterBank(data_);
   bob::python::ndarray filter(bob::core::array::t_float64, n_filters);
   blitz::Array<double,1> filter_ = filter.bz<double,1>();
-
-  // Get the filter Bank
+  // Gets the filter Bank
   filter_ = ceps.getFilter();
   return filter.self();
 }
 
 static object py_transformDCT(bob::ap::TestCeps& ceps, int n_ceps)
 {
-  ceps.transformDCT();
-  bob::python::ndarray features(bob::core::array::t_float64, n_ceps);
-  blitz::Array<double,1> features_ = features.bz<double,1>();
-
+  bob::python::ndarray ceps_row(bob::core::array::t_float64, n_ceps);
+  blitz::Array<double,1> ceps_row_ = ceps_row.bz<double,1>();
   // Get the Cepstral features
-  features_ = ceps.getFeatures();
-  return features.self();
+  ceps.transformDCT(ceps_row_);
+  return ceps_row.self();
 }
 
 
 void bind_ap_ceps()
 {
-  class_<bob::ap::Ceps, boost::shared_ptr<bob::ap::Ceps> >("Ceps", CEPS_DOC, init<double, int, int, int, int, double, double, int, double>
+  class_<bob::ap::Ceps, boost::shared_ptr<bob::ap::Ceps> >("Ceps", CEPS_DOC, init<double, int, int, size_t, size_t, double, double, int, double>
   ((arg("sf"), arg("win_length_ms"), arg("win_shift_ms"), arg("n_filters"), arg("n_ceps"), arg("f_min"), arg("f_max"), arg("delta_win"), arg("pre_emphasis_coeff"))))
-        .add_property("sample_frequency", &bob::ap::Ceps::getSampleFrequency, &bob::ap::Ceps::setSampleFrequency, "The sample frequency of the input data")
+        .add_property("sampling_frequency", &bob::ap::Ceps::getSamplingFrequency, &bob::ap::Ceps::setSamplingFrequency, "The sample frequency of the input data")
         .add_property("win_length_ms", &bob::ap::Ceps::getWinLengthMs, &bob::ap::Ceps::setWinLengthMs, "The window length of the cepstral analysis in milliseconds")
         .add_property("win_length", &bob::ap::Ceps::getWinLength, "The normalized window length wrt. to the sample frequency")
         .add_property("win_shift_ms", &bob::ap::Ceps::getWinShiftMs, &bob::ap::Ceps::setWinShiftMs, "The window shift of the cepstral analysis in milliseconds")
@@ -133,8 +124,6 @@ void bind_ap_ceps()
         .add_property("with_energy", &bob::ap::Ceps::getWithEnergy, &bob::ap::Ceps::setWithEnergy, "Tells if we add the energy to the output feature")
         .add_property("with_delta", &bob::ap::Ceps::getWithDelta, &bob::ap::Ceps::setWithDelta, "Tells if we add the first derivatives to the output feature")
         .add_property("with_delta_delta", &bob::ap::Ceps::getWithDeltaDelta, &bob::ap::Ceps::setWithDeltaDelta, "Tells if we add the second derivatives to the output feature")
-        .add_property("with_delta_energy", &bob::ap::Ceps::getWithDeltaEnergy, &bob::ap::Ceps::setWithDeltaEnergy, "Tells if we add the first derivative of the energy to the output feature")
-        .add_property("with_delta_delta_energy", &bob::ap::Ceps::getWithDeltaDeltaEnergy, &bob::ap::Ceps::setWithDeltaDeltaEnergy, "Tells if we add the second derivative of the energy to the output feature")
         .def("ceps_analysis", &py_ceps_analysis, (arg("input")), "Compute the features")
         .def("get_ceps_shape", &py_get_ceps_shape, (arg("n_size"), arg("input_data")), "Compute the shape of the output features")
         ;
