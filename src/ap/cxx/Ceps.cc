@@ -27,19 +27,19 @@
 #include <cmath>
 #include <blitz/array.h>
 
-bob::ap::Ceps::Ceps( double sf, int win_length_ms, int win_shift_ms, int n_filters, int n_ceps,
-    double f_min, double f_max, double delta_win, double pre_emphasis_coeff):
+bob::ap::Ceps::Ceps( double sf, int win_length_ms, int win_shift_ms, 
+    size_t n_filters, size_t n_ceps, double f_min, double f_max, 
+    double delta_win, double pre_emphasis_coeff):
   m_sf(sf), m_win_length_ms(win_length_ms), m_win_shift_ms(win_shift_ms), 
   m_n_filters(n_filters), m_n_ceps(n_ceps), 
   m_f_min(f_min), m_f_max(f_max), m_delta_win(delta_win), m_pre_emphasis_coeff(pre_emphasis_coeff),
   m_fb_linear(true), m_dct_norm(false), m_with_energy(true), m_with_delta(true), m_with_delta_delta(true),
-  m_with_delta_energy(true), m_with_delta_delta_energy(true), m_filter_bank(), m_fft(1)
+  m_filter_bank(), m_fft(1)
 {
   initWinLength();
   initWinShift();
 
   m_filters.resize(m_n_filters);
-  m_ceps_coeff.resize(m_n_ceps);
 
   initCacheDctKernel();
 }
@@ -48,7 +48,7 @@ bob::ap::Ceps::~Ceps()
 {
 }
 
-void bob::ap::Ceps::setSampleFrequency(const double sf) 
+void bob::ap::Ceps::setSamplingFrequency(const double sf) 
 { 
   m_sf = sf; 
   initWinLength();
@@ -78,7 +78,6 @@ void bob::ap::Ceps::setNFilters(size_t n_filters)
 void bob::ap::Ceps::setNCeps(size_t n_ceps)
 { 
   m_n_ceps = n_ceps; 
-  m_ceps_coeff.resize(m_n_ceps);
   initCacheFilterBank(); 
   initCacheDctKernel(); 
 } 
@@ -101,7 +100,6 @@ void bob::ap::Ceps::setFbLinear(bool fb_linear)
   initCacheFilterBank(); 
 }
 
-//Auxilary functions needed to set mel scale
 double bob::ap::Ceps::mel(double f)
 {
   return(2595.*log10(1+f/700.));
@@ -128,7 +126,7 @@ void bob::ap::Ceps::initWinShift()
 void bob::ap::Ceps::initWinSize()
 {
   m_win_size = (int)pow(2.0,(double)ceil(log(m_win_length)/log(2)));
-  m_frame.resize(m_win_size);
+  m_cache_frame.resize(m_win_size);
   m_fft.reset(m_win_size);
   m_cache_complex1.resize(m_win_size);
   m_cache_complex2.resize(m_win_size);
@@ -151,9 +149,7 @@ void bob::ap::Ceps::initCacheDctKernel()
   blitz::secondIndex j;
   m_dct_kernel = blitz::cos(M_PI*(i+1)*(j+0.5)/(double)(m_n_filters));
   // TODO: DCT normalization
-
 }
-
 
 void bob::ap::Ceps::initCacheFilterBank()
 {
@@ -179,7 +175,7 @@ void bob::ap::Ceps::initCacheFilterBank()
  */
 void bob::ap::Ceps::initCachePIndex()
 {
-  // Compute the indices for the triangular filter bank
+  // Computes the indices for the triangular filter bank
   m_p_index.resize(m_n_filters+2);
   // Linear frequency decomposition (for LFCC)
   if(m_fb_linear) 
@@ -206,7 +202,7 @@ void bob::ap::Ceps::initCachePIndex()
 
 void bob::ap::Ceps::initCacheFilters()
 {
-  // Create the Triangular filter bank
+  // Creates the Triangular filter bank
   m_filter_bank.clear();
   blitz::firstIndex ii;
   for(int i=0; i<(int)m_n_filters; ++i) 
@@ -241,17 +237,14 @@ blitz::TinyVector<int,2> bob::ap::Ceps::getCepsShape(const size_t input_size) co
   res(0) = 1+((input_size-(int)(m_win_length))/(int)(m_win_shift));
 
   // 2. Dimension of the feature vector
-  int dim=m_n_ceps;
-  if(m_with_energy)
-    dim = m_n_ceps + 1;
+  int dim0=m_n_ceps;
+  if(m_with_energy) dim0 += 1;
+  int dim = dim0;
   if(m_with_delta)
-    dim = dim + m_n_ceps;
-  if(m_with_delta_energy)
-    dim = dim + 1;
-  if(m_with_delta_delta)
-    dim = dim + m_n_ceps;
-  if(m_with_delta_delta_energy)
-    dim = dim + 1;
+  {
+    dim += dim0;
+    if(m_with_delta_delta) dim += dim0;
+  }
   res(1) = dim;
 
   return res;
@@ -278,29 +271,26 @@ void bob::ap::Ceps::CepsAnalysis(const blitz::Array<double,1>& input,
   for(int i=0; i<n_frames; ++i) 
   {
     // Set padded frame to zero
-    m_frame = 0.;
+    m_cache_frame = 0.;
     // Extract frame input vector
     blitz::Range ri(i*m_win_shift,i*m_win_shift+m_win_length-1);
-    m_frame(rf) = input(ri);
+    m_cache_frame(rf) = input(ri);
     // Substract mean value
-    m_frame -= blitz::mean(m_frame);
+    m_cache_frame -= blitz::mean(m_cache_frame);
 
     // Update output with energy if required
     if(m_with_energy)
-      ceps_matrix(i,(int)m_n_ceps) = logEnergy(m_frame);
+      ceps_matrix(i,(int)m_n_ceps) = logEnergy(m_cache_frame);
 
     // Apply pre-emphasis
-    emphasis(m_frame);
+    pre_emphasis(m_cache_frame);
     // Apply the Hamming window
-    hammingWindow(m_frame);
+    hammingWindow(m_cache_frame);
     // Filter with the triangular filter bank (either in linear or Mel domain)
-    logFilterBank(m_frame);
-    // Apply DCT kernel
-    transformDCT();
-
-    // Update output
+    logFilterBank(m_cache_frame);
+    // Apply DCT kernel and update the output 
     blitz::Array<double,1> ceps_matrix_row(ceps_matrix(i,r1));
-    ceps_matrix_row = m_ceps_coeff;
+    transformDCT(ceps_matrix_row);
   }
 
   blitz::Range rall = blitz::Range::all();
@@ -321,21 +311,16 @@ void bob::ap::Ceps::CepsAnalysis(const blitz::Array<double,1>& input,
   }
 }
 
-void bob::ap::Ceps::emphasis(blitz::Array<double,1> &data)
+void bob::ap::Ceps::pre_emphasis(blitz::Array<double,1> &data)
 {
-  if(m_pre_emphasis_coeff < 0. || m_pre_emphasis_coeff >= 1.0) {
-    // TODO
-    printf("Invalid emphasis coefficient %.2f (should be between 0 and 1)\n", m_pre_emphasis_coeff);
-  }
   if(m_pre_emphasis_coeff!=0.)
   { 
     // Pre-emphasise the signal by applying the first order equation
     // \f$data_{n} := data_{n} − a*data_{n−1}\f$
-//    double v0 = (1.-a)*data(0); // Backup of the first element
     blitz::Range r0(m_win_length-2,0,-1); 
     blitz::Range r1(m_win_length-1,1,-1); 
     data(r1) -= m_pre_emphasis_coeff * data(r0); // Apply first order equation
-    data(0) *= 1. - m_pre_emphasis_coeff; // Update first element with the backup
+    data(0) *= 1. - m_pre_emphasis_coeff; // Update first element
   }
 }
 
@@ -386,23 +371,19 @@ double bob::ap::Ceps::logEnergy(blitz::Array<double,1> &data)
 }
 
 
-/* -------------------------------------------------------- */
 /*
  * Apply a p order DCT to vector v1.
  * Results are returned through v2.
- *
  * If {m[1],...,m[N]} are the output of the filters, then
  *    c[i]=sqrt(2/N)*sum for j=1 to N of(m[j]cos(M_PI*i*(j-0.5)/N) i=1,...,p
- *
  * This is what is implemented here with arrays indexed from 0 to N-1.
- *
  */
-void bob::ap::Ceps::transformDCT()
+void bob::ap::Ceps::transformDCT(blitz::Array<double,1>& ceps_row)
 {
   double dct_coeff = m_dct_norm ? (double)sqrt(2.0/(double)(m_n_filters)) : 1.0;
   blitz::firstIndex i;
   blitz::secondIndex j;
-  m_ceps_coeff = dct_coeff * blitz::sum(m_filters(j) * m_dct_kernel(i,j), j);
+  ceps_row = dct_coeff * blitz::sum(m_filters(j) * m_dct_kernel(i,j), j);
 }
 
 void bob::ap::Ceps::addDerivative(const blitz::Array<double,2>& input, blitz::Array<double,2>& output)
