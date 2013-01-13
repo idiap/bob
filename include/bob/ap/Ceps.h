@@ -58,7 +58,7 @@ class Ceps
      * @brief Constructor: Initialize working arrays
      */
     Ceps( double sf, int win_length_ms, int win_shift_ms, int n_filters, int n_ceps,
-        double f_min, double f_max, double delta_win);
+        double f_min, double f_max, double delta_win, double pre_emphasis);
 
     /**
      * @brief Get the Cepstral Shape
@@ -103,7 +103,9 @@ class Ceps
     { return m_fb_linear; }
     inline size_t getDeltaWin() const
     { return m_delta_win; }
-    inline double getDctNorm() const
+    inline double getPreEmphasisCoeff() const
+    { return m_pre_emphasis_coeff; }
+    inline bool getDctNorm() const
     { return m_dct_norm; }
     inline bool getWithEnergy() const
     { return m_with_energy; }
@@ -126,10 +128,12 @@ class Ceps
     void setNCeps(size_t n_ceps);
     inline void setDeltaWin(size_t delta_win)
     { m_delta_win = (int)delta_win; } 
+    inline void setPreEmphasisCoeff(double pre_emphasis_coeff)
+    { m_pre_emphasis_coeff = pre_emphasis_coeff; }
     void setFMin(double f_min);
     void setFMax(double f_max);
     void setFbLinear(bool fb_linear);
-    inline void setDctNorm(double dct_norm)
+    inline void setDctNorm(bool dct_norm)
     { m_dct_norm = dct_norm; }
     inline void setWithEnergy(bool with_energy)
     { m_with_energy = with_energy; }
@@ -145,13 +149,10 @@ class Ceps
 
   private:
     /**
-     * @brief Compute the first derivatives
+     * @brief Compute the first order derivative from the given input
      */
-    void addDelta(blitz::Array<double,2>& frames, int win_size, int n_frames, int frame_size);
-    /**
-     * @brief Compute the second derivatives
-     */
-    void addDeltaDelta(blitz::Array<double,2>& frames, int win_size, int n_frames, int frame_size);
+    void addDerivative(const blitz::Array<double,2>& input, blitz::Array<double,2>& output);
+
     /**
      * @brief Mean Normalisation of the features
      */
@@ -159,7 +160,7 @@ class Ceps
 
     static double mel(double f);
     static double melInv(double f);
-    void emphasis(blitz::Array<double,1> &data, double a);
+    void emphasis(blitz::Array<double,1> &data);
     void hammingWindow(blitz::Array<double,1> &data);
     void logFilterBank(blitz::Array<double,1>& x);
     void logTriangularFBank(blitz::Array<double,1>& data);
@@ -185,8 +186,9 @@ class Ceps
     double m_f_min;
     double m_f_max;
     int m_delta_win;
+    double m_pre_emphasis_coeff;
     bool m_fb_linear;
-    double m_dct_norm;
+    bool m_dct_norm;
     bool m_with_energy;
     bool m_with_delta;
     bool m_with_delta_delta;
@@ -225,17 +227,17 @@ class TestCeps
     void CepsAnalysis(const blitz::Array<double,1>& input, blitz::Array<double,2>& ceps_2D)
     { m_ceps.CepsAnalysis(input, ceps_2D);}
     void hammingWindow(blitz::Array<double,1>& data){ m_ceps.hammingWindow(data); }
-    void emphasis(blitz::Array<double,1>& data, double a){ m_ceps.emphasis(data, a); }
+    void emphasis(blitz::Array<double,1>& data){ m_ceps.emphasis(data); }
     void logFilterBank(blitz::Array<double,1>& x){m_ceps.logFilterBank(x);}
     void logTriangularFBank(blitz::Array<double,1>& data){m_ceps.logTriangularFBank(data);}
     double logEnergy(blitz::Array<double,1> &data){return m_ceps.logEnergy(data);}
     void transformDCT(){m_ceps.transformDCT();}
-    void addDelta(blitz::Array<double,2>& frames, int win_size, int n_frames, int frame_size){
+    /*void addDelta(blitz::Array<double,2>& frames, int win_size, int n_frames, int frame_size){
       m_ceps.addDelta(frames, win_size, n_frames, frame_size);
     }
     void addDeltaDelta(blitz::Array<double,2>& frames, int win_size, int n_frames, int frame_size){
       m_ceps.addDeltaDelta(frames, win_size, n_frames, frame_size);
-    }
+    }*/
     blitz::Array<double,2> dataZeroMean(blitz::Array<double,2>& frames, bool norm_energy, int n_frames, int frame_size){
       return m_ceps.dataZeroMean(frames,norm_energy, n_frames, frame_size);
     }

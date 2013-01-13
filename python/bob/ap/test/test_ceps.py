@@ -110,22 +110,27 @@ def log_triangular_bank(data, n_filters, p_index):
   return filters
 
 def dct_transform(filters, n_filters, dct_kernel, n_ceps, dct_norm):
+  if dct_norm:
+    dct_coeff = numpy.sqrt(2.0/(n_filters))
+  else :
+    dct_coeff = 1.0
+
   ceps = numpy.zeros(n_ceps + 1);
   vec = numpy.array(range(1, n_filters + 1))
   for i in range(1, n_ceps + 1):
     ceps[i - 1] = numpy.sum(filters[vec - 1] * dct_kernel[i - 1][0:n_filters])
-    ceps[i - 1] = ceps[i - 1] * dct_norm;
+    ceps[i - 1] = ceps[i - 1] * dct_coeff;
     
   return ceps
 
 
-def cepstral_features_extraction(obj, rate_wavsample, win_length_ms, win_shift_ms, n_filters, n_ceps, dct_norm, f_min, f_max,
-                               delta_win, fb_linear, with_energy, with_delta, with_delta_delta, with_delta_energy, with_delta_delta_energy):
+def cepstral_features_extraction(obj, rate_wavsample, win_length_ms, win_shift_ms, n_filters, n_ceps, dct_norm, f_min, f_max, delta_win,
+                               pre_emphasis_coeff, fb_linear, with_energy, with_delta, with_delta_delta, with_delta_energy, with_delta_delta_energy):
   #########################
   ## Initialisation part ##
   #########################
   
-  c = bob.ap.Ceps(rate_wavsample[0], 20, 10, 24, 19, 0., 4000., 2)
+  c = bob.ap.Ceps(rate_wavsample[0], win_length_ms, win_shift_ms, n_filters, n_ceps, f_min, f_max, delta_win, pre_emphasis_coeff)
   c.dct_norm = dct_norm
   c.fb_linear = fb_linear
   c.with_energy = with_energy
@@ -231,8 +236,8 @@ def cepstral_features_extraction(obj, rate_wavsample, win_length_ms, win_shift_m
     f2 = numpy.copy(frame)  
     
     # pre-emphasis filtering
-    frame = pre_emphasis(frame, win_length, 0.95)
-    ct.pre_emphasis(f2, 0.95)
+    frame = pre_emphasis(frame, win_length, pre_emphasis_coeff)
+    ct.pre_emphasis(f2)
     obj.assertTrue(numpy.all(frame == f2), "Error in Pre-Emphasis Computation...")
     
     # Hamming windowing
@@ -360,40 +365,41 @@ def cepstral_features_extraction(obj, rate_wavsample, win_length_ms, win_shift_m
 class CepsTest(unittest.TestCase):
   """Performs extrapolation product"""
   
-  def test_mfcc(self):
-    import pkg_resources
-    rate_wavsample = _read(pkg_resources.resource_filename(__name__, os.path.join('data', 'sample.wav')))
-    data_array = rate_wavsample[1]
-    c = bob.ap.Ceps(rate_wavsample[0], 20, 10, 24, 19, 0., 4000., 2)
-    c.dct_norm = 1.
-    c.fb_linear = False
-    c.with_energy = True
-    c.with_delta = True 
-    c.with_delta_delta = True
-    c.with_delta_energy = True
-    c.with_delta_delta_energy = True 
-    ct = bob.ap.TestCeps(c)
-    A = c.ceps_analysis(data_array)
-    B = cepstral_features_extraction(self, rate_wavsample, 20, 10, 24, 19, 1.0, 0., 4000., 2, False, True, True, True, True, True)
-    diff=numpy.sum(numpy.sum((A-B)*(A-B)))
-    self.assertAlmostEqual(diff, 0., 7, "Error in Ceps Analysis")
-    
-
   def test_lfcc(self):
     import pkg_resources
     rate_wavsample = _read(pkg_resources.resource_filename(__name__, os.path.join('data', 'sample.wav')))
     data_array = rate_wavsample[1]
-    c = bob.ap.Ceps(rate_wavsample[0], 20, 10, 24, 19, 0., 4000., 2)
-    c.dct_norm = 1.
+    c = bob.ap.Ceps(rate_wavsample[0], 20, 10, 24, 19, 0., 4000., 2, 0.97)
+    c.dct_norm = True
     c.fb_linear = True
     c.with_energy = True
     c.with_delta = True 
     c.with_delta_delta = True
     c.with_delta_energy = True
     c.with_delta_delta_energy = True 
+    
     ct = bob.ap.TestCeps(c)
     A = c.ceps_analysis(data_array)
-    B = cepstral_features_extraction(self, rate_wavsample, 20, 10, 24, 19, 1.0, 0., 4000., 2, True, True, True, True, True, True)
+    B = cepstral_features_extraction(self, rate_wavsample, 20, 10, 24, 19, True, 0., 4000., 2, 0.97, True, True, True, True, True, True)
+    diff=numpy.sum(numpy.sum((A-B)*(A-B)))
+    self.assertAlmostEqual(diff, 0., 7, "Error in Ceps Analysis")
+    
+  def test_mfcc(self):
+    import pkg_resources
+    rate_wavsample = _read(pkg_resources.resource_filename(__name__, os.path.join('data', 'sample.wav')))
+    data_array = rate_wavsample[1]
+    c = bob.ap.Ceps(rate_wavsample[0], 20, 10, 24, 19, 0., 4000., 2, 0.97)
+    c.dct_norm = False
+    c.fb_linear = False
+    c.with_energy = True
+    c.with_delta = True 
+    c.with_delta_delta = True
+    c.with_delta_energy = True
+    c.with_delta_delta_energy = True 
+    
+    ct = bob.ap.TestCeps(c)
+    A = c.ceps_analysis(data_array)
+    B = cepstral_features_extraction(self, rate_wavsample, 20, 10, 24, 19, False, 0., 4000., 2, 0.97, False, True, True, True, True, True)
     diff=numpy.sum(numpy.sum((A-B)*(A-B)))
     self.assertAlmostEqual(diff, 0., 7, "Error in Ceps Analysis")
     
