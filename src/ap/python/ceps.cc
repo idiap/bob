@@ -51,7 +51,7 @@ static boost::python::tuple py_get_ceps_shape(bob::ap::Ceps& ceps, object input_
   boost::python::tuple res;
   extract<int> int_check(input_object);
   if (int_check.check()) { //is int
-    blitz::TinyVector<int,2> size = ceps.getCepsShape(int_check());
+    blitz::TinyVector<int,2> size = ceps.getCepsShape((ulong)int_check());
     res = boost::python::make_tuple(size[0], size[1]);
   }
   else {
@@ -71,12 +71,12 @@ static double py_logEnergy(bob::ap::TestCeps& ceps, bob::python::ndarray data)
   return ceps.logEnergy(data_);
 }
 
-static void py_emphasis(bob::ap::TestCeps& ceps, bob::python::ndarray data, double a)
+static void py_emphasis(bob::ap::TestCeps& ceps, bob::python::ndarray data)
 {
   blitz::Array<double,1> data_ = data.bz<double,1>();
 
   //Compute the Pre-Emphasis
-  ceps.emphasis(data_, a);
+  ceps.emphasis(data_);
 }
 
 static void py_hammingWindow(bob::ap::TestCeps& ceps, bob::python::ndarray data)
@@ -114,12 +114,12 @@ static object py_transformDCT(bob::ap::TestCeps& ceps, int n_ceps)
 
 void bind_ap_ceps()
 {
-  class_<bob::ap::Ceps, boost::shared_ptr<bob::ap::Ceps> >("Ceps", CEPS_DOC, init<double, int, int, int, int, double, double, double>
-  ((arg("sf"), arg("win_length_ms"), arg("win_shift_ms"), arg("n_filters"), arg("n_ceps"), arg("f_min"), arg("f_max"), arg("delta_win"))))
+  class_<bob::ap::Ceps, boost::shared_ptr<bob::ap::Ceps> >("Ceps", CEPS_DOC, init<double, int, int, int, int, double, double, int, double>
+  ((arg("sf"), arg("win_length_ms"), arg("win_shift_ms"), arg("n_filters"), arg("n_ceps"), arg("f_min"), arg("f_max"), arg("delta_win"), arg("pre_emphasis_coeff"))))
         .add_property("sample_frequency", &bob::ap::Ceps::getSampleFrequency, &bob::ap::Ceps::setSampleFrequency, "The sample frequency of the input data")
-        .add_property("win_length_ms", &bob::ap::Ceps::getWinLengthMs, &bob::ap::Ceps::setWinLengthMs, "The window length of the cepstral analysis in miliseconds")
+        .add_property("win_length_ms", &bob::ap::Ceps::getWinLengthMs, &bob::ap::Ceps::setWinLengthMs, "The window length of the cepstral analysis in milliseconds")
         .add_property("win_length", &bob::ap::Ceps::getWinLength, "The normalized window length wrt. to the sample frequency")
-        .add_property("win_shift_ms", &bob::ap::Ceps::getWinShiftMs, &bob::ap::Ceps::setWinShiftMs, "The window shift of the cepstral analysis in miliseconds")
+        .add_property("win_shift_ms", &bob::ap::Ceps::getWinShiftMs, &bob::ap::Ceps::setWinShiftMs, "The window shift of the cepstral analysis in milliseconds")
         .add_property("win_shift", &bob::ap::Ceps::getWinShift, "The normalized window shift wrt. to the sample frequency")
         .add_property("win_size", &bob::ap::Ceps::getWinSize, "The window size")
         .add_property("n_filters", &bob::ap::Ceps::getNFilters, &bob::ap::Ceps::setNFilters, "The number of filter bands")
@@ -128,6 +128,7 @@ void bind_ap_ceps()
         .add_property("f_max", &bob::ap::Ceps::getFMax, &bob::ap::Ceps::setFMax, "The maximal frequency of the filter bank")
         .add_property("fb_linear", &bob::ap::Ceps::getFbLinear, &bob::ap::Ceps::setFbLinear, "Tell whether cepstral features are extracted on a linear (LFCC) or Mel (MFCC) scale")
         .add_property("delta_win", &bob::ap::Ceps::getDeltaWin, &bob::ap::Ceps::setDeltaWin, "The integer delta value used for computing the first and second order derivatives")
+        .add_property("pre_emphasis_coeff", &bob::ap::Ceps::getPreEmphasisCoeff, &bob::ap::Ceps::setPreEmphasisCoeff, "The coefficient used for the pre-emphasis")
         .add_property("dct_norm", &bob::ap::Ceps::getDctNorm, &bob::ap::Ceps::setDctNorm, "A factor by which the cepstral coefficients are multiplied")
         .add_property("with_energy", &bob::ap::Ceps::getWithEnergy, &bob::ap::Ceps::setWithEnergy, "Tells if we add the energy to the output feature")
         .add_property("with_delta", &bob::ap::Ceps::getWithDelta, &bob::ap::Ceps::setWithDelta, "Tells if we add the first derivatives to the output feature")
@@ -142,7 +143,7 @@ void bind_ap_ceps()
         .def("mel", &bob::ap::TestCeps::mel, (arg("f")), "Compute a mel scale.")
         .def("mel_inv", &bob::ap::TestCeps::melInv, (arg("f")), "Compute an inverse mel scale.")
         .def("log_energy", &py_logEnergy, (arg("data")), "compute the gain")
-        .def("pre_emphasis", &py_emphasis, (arg("data"), arg("a")), "compute pre-emphasis")
+        .def("pre_emphasis", &py_emphasis, (arg("data")), "compute pre-emphasis")
         .def("hamming_window", &py_hammingWindow, (arg("data")), "compute the wraped signal on a hamming Window")
         .def("log_filter_bank", &py_logFilterBank, (arg("data"), arg("m_win_size"), arg("n_filters")), "compute log Filter Bank")
         .def("dct_transform", &py_transformDCT, (arg("n_ceps")), "DCT Transform")
