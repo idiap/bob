@@ -25,14 +25,14 @@
 #include "bob/core/array_assert.h"
 #include "bob/core/cast.h"
 
-bob::ap::Ceps::Ceps( double sf, double win_length_ms, double win_shift_ms, 
+bob::ap::Ceps::Ceps( double sampling_frequency, double win_length_ms, double win_shift_ms,
     size_t n_filters, size_t n_ceps, double f_min, double f_max, 
-    size_t delta_win, double pre_emphasis_coeff, bool fb_linear,
+    size_t delta_win, double pre_emphasis_coeff, bool mel_scale,
     bool dct_norm):
-  m_sf(sf), m_win_length_ms(win_length_ms), m_win_shift_ms(win_shift_ms), 
+  m_sampling_frequency(sampling_frequency), m_win_length_ms(win_length_ms), m_win_shift_ms(win_shift_ms),
   m_n_filters(n_filters), m_n_ceps(n_ceps), m_f_min(f_min), m_f_max(f_max), 
   m_delta_win(delta_win), m_pre_emphasis_coeff(pre_emphasis_coeff),
-  m_fb_linear(fb_linear), m_dct_norm(dct_norm), 
+  m_mel_scale(mel_scale), m_dct_norm(dct_norm),
   m_with_energy(true), m_with_delta(true), m_with_delta_delta(true),
   m_filter_bank(), m_fft(1)
 {
@@ -48,9 +48,9 @@ bob::ap::Ceps::~Ceps()
 {
 }
 
-void bob::ap::Ceps::setSamplingFrequency(const double sf) 
+void bob::ap::Ceps::setSamplingFrequency(const double sampling_frequency)
 { 
-  m_sf = sf; 
+  m_sampling_frequency = sampling_frequency;
   initWinLength();
   initWinShift();
 }
@@ -94,9 +94,9 @@ void bob::ap::Ceps::setFMax(double f_max)
   initCacheFilterBank();
 }
 
-void bob::ap::Ceps::setFbLinear(bool fb_linear)
+void bob::ap::Ceps::setMelScale(bool mel_scale)
 { 
-  m_fb_linear = fb_linear; 
+  m_mel_scale = mel_scale;
   initCacheFilterBank(); 
 }
 
@@ -118,7 +118,7 @@ double bob::ap::Ceps::melToHerz(double f)
 
 void bob::ap::Ceps::initWinLength()
 { 
-  m_win_length = (size_t)(m_sf * m_win_length_ms / 1000);
+  m_win_length = (size_t)(m_sampling_frequency * m_win_length_ms / 1000);
   initWinSize();
   initCacheHammingKernel(); 
   initCacheFilterBank(); 
@@ -126,7 +126,7 @@ void bob::ap::Ceps::initWinLength()
 
 void bob::ap::Ceps::initWinShift()
 { 
-  m_win_shift = (size_t)(m_sf * m_win_shift_ms / 1000);
+  m_win_shift = (size_t)(m_sampling_frequency * m_win_shift_ms / 1000);
 }
 
 void bob::ap::Ceps::initWinSize()
@@ -163,45 +163,30 @@ void bob::ap::Ceps::initCacheFilterBank()
   initCacheFilters();
 }
 
-/**
- * @brief Iniatilize the table m_p_index, which contains the indices of the
- * cut-off frequencies. It looks like something like this:
- *
- *                      filter 2
- *                   <------------->
- *                filter 1           filter 4
- *             <----------->       <------------->
- *        | | | | | | | | | | | | | | | | | | | | | ..........
- *         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9  ..........
- *             ^     ^     ^       ^             ^
- *             |     |     |       |             |
- *          p_in[0]  |  p_in[2]    |          p_in[4]
- *                p_in[1]       p_in[3]
- *
- */
 void bob::ap::Ceps::initCachePIndex()
 {
   // Computes the indices for the triangular filter bank
   m_p_index.resize(m_n_filters+2);
-  // Linear frequency decomposition (for LFCC)
-  if(m_fb_linear) 
-  {
-    const double cst_a = (m_win_size/m_sf) * (m_f_max-m_f_min)/(double)(m_n_filters+1);
-    const double cst_b = (m_win_size/m_sf) * m_f_min;
-    for(int i=0; i<(int)m_n_filters+2; ++i) {
-      m_p_index(i) = (int)round(cst_a * i + cst_b);
-    }
-  }
   // 'Mel' frequency decomposition (for MFCC)
-  else 
+  if(m_mel_scale)
   {
     double m_max = herzToMel(m_f_max);
     double m_min = herzToMel(m_f_min);
     for(int i=0; i<(int)m_n_filters+2; ++i) {
       double alpha = i/ (double)(m_n_filters+1);
       double f = melToHerz(m_min * (1-alpha) + m_max * alpha);
-      double factor = f / m_sf;
+      double factor = f / m_sampling_frequency;
       m_p_index(i)=(int)round(m_win_size * factor);
+    }
+  }
+
+  else
+  // Linear frequency decomposition (for LFCC)
+  {
+    const double cst_a = (m_win_size/m_sampling_frequency) * (m_f_max-m_f_min)/(double)(m_n_filters+1);
+    const double cst_b = (m_win_size/m_sampling_frequency) * m_f_min;
+    for(int i=0; i<(int)m_n_filters+2; ++i) {
+      m_p_index(i) = (int)round(cst_a * i + cst_b);
     }
   }
 }
@@ -352,11 +337,6 @@ void bob::ap::Ceps::logFilterBank(blitz::Array<double,1>& x)
   logTriangularFBank(x);
 }
 
-
-/**
- * @brief Apply triangular filter bank to the input array and return the log
- * of the energy in each band. 
- */
 void bob::ap::Ceps::logTriangularFBank(blitz::Array<double,1>& data)
 {
   for(int i=0; i<(int)m_n_filters; ++i)
@@ -376,14 +356,6 @@ double bob::ap::Ceps::logEnergy(blitz::Array<double,1> &data)
   return (gain);
 }
 
-
-/*
- * Apply a p order DCT to vector v1.
- * Results are returned through v2.
- * If {m[1],...,m[N]} are the output of the filters, then
- *    c[i]=sqrt(2/N)*sum for j=1 to N of(m[j]cos(M_PI*i*(j-0.5)/N) i=1,...,p
- * This is what is implemented here with arrays indexed from 0 to N-1.
- */
 void bob::ap::Ceps::transformDCT(blitz::Array<double,1>& ceps_row)
 {
   blitz::firstIndex i;

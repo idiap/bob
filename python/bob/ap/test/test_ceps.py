@@ -40,7 +40,7 @@ def _read(filename):
   fileName, fileExtension = os.path.splitext(filename)
   wav_filename = filename
   import scipy.io.wavfile
-  rate, data = scipy.io.wavfile.read(str(wav_filename)); # the data is read in its native format
+  rate, data = scipy.io.wavfile.read(str(wav_filename)) # the data is read in its native format
   if data.dtype =='int16':
     data = numpy.cast['float'](data)
   return [rate,data]
@@ -61,7 +61,7 @@ def sig_norm(win_length, frame, flag):
   for i in range(win_length):
     gain = gain + frame[i] * frame[i]
   
-  ENERGY_FLOOR = 1.0;
+  ENERGY_FLOOR = 1.0
   if gain < ENERGY_FLOOR:
     gain = math.log(ENERGY_FLOOR)
   else:
@@ -76,12 +76,12 @@ def pre_emphasis(frame, win_length, a):
   if (a < 0.0) or (a >= 1.0):
     print "Error: The emphasis coeff. should be between 0 and 1"
   if (a == 0.0):
-    return frame;
+    return frame
   else:
     for i in range(win_length - 1, 0, -1):
-      frame[i] = frame[i] - a * frame[i - 1];
-    frame[0] = (1. - a) * frame[0];  
-  return frame;
+      frame[i] = frame[i] - a * frame[i - 1]
+    frame[0] = (1. - a) * frame[0]  
+  return frame
 
 def hamming_window(vector, hamming_kernel, win_length):
   for i in range(win_length):
@@ -89,23 +89,23 @@ def hamming_window(vector, hamming_kernel, win_length):
   return vector
 
 def log_filter_bank(x, n_filters, p_index, win_size):
-  x1 = numpy.array(x, dtype=numpy.complex128);
-  complex_ = bob.sp.fft(x1);
+  x1 = numpy.array(x, dtype=numpy.complex128)
+  complex_ = bob.sp.fft(x1)
   for i in range(0, win_size / 2 + 1):
-    re = complex_[i].real;
-    im = complex_[i].imag;
-    x[i] = math.sqrt(re * re + im * im); 
-  filters = log_triangular_bank(x, n_filters, p_index);
-  return filters;
+    re = complex_[i].real
+    im = complex_[i].imag
+    x[i] = math.sqrt(re * re + im * im) 
+  filters = log_triangular_bank(x, n_filters, p_index)
+  return filters
 
 def log_triangular_bank(data, n_filters, p_index):
-  a = 1.0 / (p_index[1:n_filters+2] - p_index[0:n_filters+1] + 1);
+  a = 1.0 / (p_index[1:n_filters+2] - p_index[0:n_filters+1] + 1)
   vec1 =  list(numpy.arange(p_index[i], p_index[i + 1]) for i in range(0, n_filters))
   vec2 =  list(numpy.arange(p_index[i+1], p_index[i + 2] + 1) for i in range(0, n_filters))
   res_ = numpy.array([(numpy.sum(data[vec1[i]]*(1.0 - a [i]* (p_index[i + 1]-(vec1[i])))) + 
           numpy.sum(data[vec2[i]] * (1.0 - a[i+1] * ( (vec2[i]) - p_index[i + 1])))) 
           for i in range(0, n_filters)])
-  FBANK_OUT_FLOOR = 1.0;
+  FBANK_OUT_FLOOR = 1.0
   filters = numpy.log(numpy.where(res_ < FBANK_OUT_FLOOR, FBANK_OUT_FLOOR, res_))
   return filters
 
@@ -115,24 +115,23 @@ def dct_transform(filters, n_filters, dct_kernel, n_ceps, dct_norm):
   else :
     dct_coeff = 1.0
 
-  ceps = numpy.zeros(n_ceps + 1);
+  ceps = numpy.zeros(n_ceps + 1)
   vec = numpy.array(range(1, n_filters + 1))
   for i in range(1, n_ceps + 1):
     ceps[i - 1] = numpy.sum(filters[vec - 1] * dct_kernel[i - 1][0:n_filters])
-    ceps[i - 1] = ceps[i - 1] * dct_coeff;
+    ceps[i - 1] = ceps[i - 1] * dct_coeff
     
   return ceps
 
-
 def cepstral_features_extraction(obj, rate_wavsample, win_length_ms, win_shift_ms, n_filters, n_ceps, dct_norm, f_min, f_max, delta_win,
-                               pre_emphasis_coeff, fb_linear, with_energy, with_delta, with_delta_delta):
+                               pre_emphasis_coef, mel_scale, with_energy, with_delta, with_delta_delta):
   #########################
   ## Initialisation part ##
   #########################
   
-  c = bob.ap.Ceps(rate_wavsample[0], win_length_ms, win_shift_ms, n_filters, n_ceps, f_min, f_max, delta_win, pre_emphasis_coeff)
+  c = bob.ap.Ceps(rate_wavsample[0], win_length_ms, win_shift_ms, n_filters, n_ceps, f_min, f_max, delta_win, pre_emphasis_coef)
   c.dct_norm = dct_norm
-  c.fb_linear = fb_linear
+  c.mel_scale = mel_scale
   c.with_energy = with_energy
   c.with_delta = with_delta
   c.with_delta_delta = with_delta_delta
@@ -141,46 +140,46 @@ def cepstral_features_extraction(obj, rate_wavsample, win_length_ms, win_shift_m
   sf = rate_wavsample[0]
   data = rate_wavsample[1]
 
-  win_length = int (sf * win_length_ms / 1000);
-  win_shift = int (sf * win_shift_ms / 1000);
-  win_size = int (2.0 ** math.ceil(math.log(win_length) / math.log(2)));
-  m = int (math.log(win_size) / math.log(2));
+  win_length = int (sf * win_length_ms / 1000)
+  win_shift = int (sf * win_shift_ms / 1000)
+  win_size = int (2.0 ** math.ceil(math.log(win_length) / math.log(2)))
+  m = int (math.log(win_size) / math.log(2))
 
   # Hamming initialisation 
-  cst = 2 * math.pi / (win_length - 1.0);
-  hamming_kernel = numpy.zeros(win_length);
+  cst = 2 * math.pi / (win_length - 1.0)
+  hamming_kernel = numpy.zeros(win_length)
   
   for i in range(win_length):
     hamming_kernel[i] = (0.54 - 0.46 * math.cos(i * cst))
 
   # Compute cut-off frequencies 
-  p_index = numpy.array(numpy.zeros(n_filters + 2), dtype=numpy.int16);
-  if(fb_linear):
-    #linear scale
-    for i in range(n_filters + 2):
-      alpha = (i) / (n_filters + 1.0);
-      f = f_min * (1.0 - alpha) + f_max * alpha;
-      p_index[i] = int (round((win_size / (sf * 1.0) * f)));
-  else:
+  p_index = numpy.array(numpy.zeros(n_filters + 2), dtype=numpy.int16)
+  if(mel_scale):
     # Mel scale
-    m_max = mel_python(f_max);
+    m_max = mel_python(f_max)
     obj.assertAlmostEqual(ct.herz_to_mel(f_max), m_max, 7, "Error in Mel...")
-    m_min = mel_python(f_min);
+    m_min = mel_python(f_min)
     obj.assertAlmostEqual(ct.herz_to_mel(f_min), m_min, 7, "Error in Mel...")
   
     for i in range(n_filters + 2):
-      alpha = ((i) / (n_filters + 1.0));
-      f = mel_inv_python(m_min * (1 - alpha) + m_max * alpha);
+      alpha = ((i) / (n_filters + 1.0))
+      f = mel_inv_python(m_min * (1 - alpha) + m_max * alpha)
       obj.assertAlmostEqual(ct.mel_to_herz(m_min * (1 - alpha) + m_max * alpha), f, 7, "Error in MelInv...")
-      factor = f / (sf * 1.0);
-      p_index[i] = int (round((win_size) * factor));
+      factor = f / (sf * 1.0)
+      p_index[i] = int (round((win_size) * factor))
+  else:
+    #linear scale
+    for i in range(n_filters + 2):
+      alpha = (i) / (n_filters + 1.0)
+      f = f_min * (1.0 - alpha) + f_max * alpha
+      p_index[i] = int (round((win_size / (sf * 1.0) * f)))
 
   #Cosine transform initialisation
-  dct_kernel = [ [ 0 for i in range(n_filters) ] for j in range(n_ceps) ] ;
+  dct_kernel = [ [ 0 for i in range(n_filters) ] for j in range(n_ceps) ] 
   
   for i in range(1, n_ceps + 1):
     for j in range(1, n_filters + 1):
-      dct_kernel[i - 1][j - 1] = math.cos(math.pi * i * (j - 0.5) / n_filters);
+      dct_kernel[i - 1][j - 1] = math.cos(math.pi * i * (j - 0.5) / n_filters)
 
   ######################################
   ### End of the Initialisation part ###
@@ -190,28 +189,30 @@ def cepstral_features_extraction(obj, rate_wavsample, win_length_ms, win_shift_m
   ###          Core code             ###
   ######################################
 
-  data_size = data.shape[0];
-  n_frames = 1 + (data_size - win_length) / win_shift;
+  data_size = data.shape[0]
+  n_frames = 1 + (data_size - win_length) / win_shift
  
   # create features set
-  ceps_sequence = numpy.zeros(n_ceps);
-  dim0 = n_ceps;
+  ceps_sequence = numpy.zeros(n_ceps)
+  dim0 = n_ceps
   if(with_energy):
-    dim0 += + 1;
+    dim0 += + 1
   dim = dim0
   if(with_delta):
-    dim += dim0;
+    dim += dim0
     if(with_delta_delta):
-      dim += dim0;
+      dim += dim0
+  else:
+    with_delta_delta = False
   
-  params = [ [ 0 for i in range(dim) ] for j in range(n_frames) ] ;
+  params = [ [ 0 for i in range(dim) ] for j in range(n_frames) ] 
    
   # compute cepstral coefficients
-  delta = 0;
+  delta = 0
   for i in range(n_frames):
     # create a frame
-    frame = numpy.zeros(win_size, dtype=numpy.float64);
-    som = 0.0;
+    frame = numpy.zeros(win_size, dtype=numpy.float64)
+    som = 0.0
     vec = numpy.arange(win_length)  
     frame[vec] = data[vec + i * win_shift]
     som = numpy.sum(frame)
@@ -226,193 +227,230 @@ def cepstral_features_extraction(obj, rate_wavsample, win_length_ms, win_shift_m
     f2 = numpy.copy(frame)  
     
     # pre-emphasis filtering
-    frame = pre_emphasis(frame, win_length, pre_emphasis_coeff)
+    frame = pre_emphasis(frame, win_length, pre_emphasis_coef)
     ct.pre_emphasis(f2)
-    obj.assertTrue(numpy.all(frame == f2), "Error in Pre-Emphasis Computation...")
+    for kk in range(len(frame)):
+      obj.assertAlmostEqual(frame[kk], f2[kk], 7, "Error in Pre-Emphasis Computation...")
     
     # Hamming windowing
     f2 = numpy.copy(frame)
     frame = hamming_window(frame, hamming_kernel, win_length)
     ct.hamming_window(f2)
-    obj.assertTrue(numpy.all(frame == f2), "Error in Hamming Windowing Computation...")
-
+    for kk in range(len(frame)):
+      obj.assertAlmostEqual(frame[kk], f2[kk], 7, "Error in Pre-Emphasis Computation...")
+    
     f2=numpy.copy(frame)
     filters = log_filter_bank(frame, n_filters, p_index, win_size)
 
     filt2 = ct.log_filter_bank(f2, win_size, n_filters)
     
     for kk in range(len(filters)):
-      #print filters[kk], filt2[kk]
       obj.assertAlmostEqual(filters[kk], filt2[kk], 7, "Error in log Filtering")
           
     ceps = dct_transform(filters, n_filters, dct_kernel, n_ceps, dct_norm)
-    ceps2 = ct.dct_transform(n_ceps);
+    ceps2 = ct.dct_transform(n_ceps)
 
 
     if(with_energy):
-      d1 = n_ceps + 1;
-      #print energy
-      ceps[n_ceps] = energy;
+      d1 = n_ceps + 1
+      ceps[n_ceps] = energy
         #print ceps
     else:
-      d1 = n_ceps;
+      d1 = n_ceps
 
     # stock the results in params matrix
-    vec=numpy.arange(d1);
-    params[i][0:d1]=ceps[vec];
+    vec=numpy.arange(d1)
+    params[i][0:d1]=ceps[vec]
 
   # compute Delta coefficient
   if(with_delta):
-    som = 0.0;
+    som = 0.0
     for i in range(1,delta_win+1):
-      som = som + i*i;
-    som = som *2;
+      som = som + i*i
+    som = som *2
          
     for i in range(n_frames):
       for k in range(n_ceps):
-        params[i][d1+k] = 0.0;
+        params[i][d1+k] = 0.0
         for l in range(1, delta_win+1):
           if (i+l < n_frames):
-            p_ind = i+l;
+            p_ind = i+l
           else:
-            p_ind = n_frames - 1;
+            p_ind = n_frames - 1
           if (i-l > 0):
-            n_ind = i-l;
+            n_ind = i-l
           else:
-            n_ind = 0;
-          params[i][d1+k] = params[i][d1+k] + l * (params[p_ind][k] - params[n_ind][k]);
-        params[i][d1+k] = params[i][d1+k] / som;
+            n_ind = 0
+          params[i][d1+k] = params[i][d1+k] + l * (params[p_ind][k] - params[n_ind][k])
+        params[i][d1+k] = params[i][d1+k] / som
 
   # compute Delta of the Energy
   if(with_delta and with_energy):
-    som = 0.0;
+    som = 0.0
     
-    vec=numpy.arange(1,delta_win+1);
+    vec=numpy.arange(1,delta_win+1)
     som = 2.0* numpy.sum(vec*vec)
     
     for i in range(n_frames):
-      k = n_ceps;
-      params[i][d1+k] = 0.0;
+      k = n_ceps
+      params[i][d1+k] = 0.0
       for l in range(1, delta_win+1):
         if (i+l < n_frames):
-          p_ind = i+l;
+          p_ind = i+l
         else:
-          p_ind = n_frames - 1;
+          p_ind = n_frames - 1
         if (i-l > 0):
-          n_ind = i-l;
+          n_ind = i-l
         else:
-          n_ind = 0;
-        params[i][d1+k] = params[i][d1+k] + l* (params[p_ind][k] - params[n_ind][k]);
-      params[i][d1+k] = params[i][d1+k] / som;
+          n_ind = 0
+        params[i][d1+k] = params[i][d1+k] + l* (params[p_ind][k] - params[n_ind][k])
+      params[i][d1+k] = params[i][d1+k] / som
    
   # compute Delta Delta of the coefficients
   if(with_delta_delta):
-    som = 0.0;
+    som = 0.0
     for i in range(1,delta_win+1):
-      som = som + i*i;
-    som = som *2;
+      som = som + i*i
+    som = som *2
     for i in range(n_frames):
       for k in range(n_ceps):
-        params[i][2*d1+k] = 0.0;
+        params[i][2*d1+k] = 0.0
         for l in range(1, delta_win+1):
           if (i+l < n_frames):
-            p_ind = i+l;
+            p_ind = i+l
           else:
-            p_ind = n_frames - 1;
+            p_ind = n_frames - 1
           if (i-l > 0):
-            n_ind = i-l;
+            n_ind = i-l
           else:
-            n_ind = 0;
-          params[i][2*d1+k] = params[i][2*d1+k] + l * (params[p_ind][d1+k] - params[n_ind][d1+k]);
-        params[i][2*d1+k] = params[i][2*d1+k] / som; 
+            n_ind = 0
+          params[i][2*d1+k] = params[i][2*d1+k] + l * (params[p_ind][d1+k] - params[n_ind][d1+k])
+        params[i][2*d1+k] = params[i][2*d1+k] / som 
   
   # compute Delta Delta of the energy
   if(with_delta_delta and with_energy):
-    som = 0.0;
+    som = 0.0
     for i in range(1,delta_win+1):
-      som = som + i*i;
-    som = som *2;
+      som = som + i*i
+    som = som *2
     for i in range(n_frames):
       k = n_ceps
-      params[i][2*d1+k] = 0.0;
+      params[i][2*d1+k] = 0.0
       for l in range(1, delta_win+1):
         if (i+l < n_frames):
-          p_ind = i+l;
+          p_ind = i+l
         else:
-          p_ind = n_frames - 1;
+          p_ind = n_frames - 1
         if (i-l > 0):
-          n_ind = i-l;
+          n_ind = i-l
         else:
-          n_ind = 0;
-        params[i][2*d1+k] = params[i][2*d1+k] + l * (params[p_ind][d1+k] - params[n_ind][d1+k]);
-      params[i][2*d1+k] = params[i][2*d1+k] / som;
+          n_ind = 0
+        params[i][2*d1+k] = params[i][2*d1+k] + l * (params[p_ind][d1+k] - params[n_ind][d1+k])
+      params[i][2*d1+k] = params[i][2*d1+k] / som
   data = numpy.array(params)
   
   return data
 
-
+def cepstral_comparison_run(obj, rate_wavsample, win_length_ms, win_shift_ms, n_filters, n_ceps, dct_norm, f_min, f_max, delta_win,
+                               pre_emphasis_coef, mel_scale, with_energy, with_delta, with_delta_delta):
+  c = bob.ap.Ceps(rate_wavsample[0], win_length_ms, win_shift_ms, n_filters, n_ceps, f_min, f_max, delta_win, pre_emphasis_coef, mel_scale, dct_norm)
+  c.with_energy = with_energy
+  c.with_delta = with_delta
+  if c.with_delta:
+    c.with_delta_delta = with_delta_delta
+  ct = bob.ap.TestCeps(c)
+  A = c(rate_wavsample[1])
+  B = cepstral_features_extraction(obj, rate_wavsample, win_length_ms, win_shift_ms, n_filters, n_ceps, dct_norm, 
+        f_min, f_max, delta_win, pre_emphasis_coef, mel_scale, with_energy, with_delta, with_delta_delta)
+  diff=numpy.sum(numpy.sum((A-B)*(A-B)))
+  obj.assertAlmostEqual(diff, 0., 7, "Error in Ceps Analysis")
+    
 ##################### Unit Tests ##################  
 class CepsTest(unittest.TestCase):
-  """Performs extrapolation product"""
-  
-  def test01_lfcc(self):
+  """Test the Cepstral feature extraction"""
+
+  def test_cepstral(self):
     import pkg_resources
     rate_wavsample = _read(pkg_resources.resource_filename(__name__, os.path.join('data', 'sample.wav')))
-    samples = rate_wavsample[1]
-    sampling_rate = rate_wavsample[0]
-
-    win_length_ms = 20
-    win_shift_ms = 10
-    n_filters = 24
-    n_ceps = 19
-    f_min = 0.
-    f_max = 4000.
-    win_delta = 2
-    pre_emphasis_coef = 0.97
-    fb_linear = True
-    dct_norm = True
-    with_energy = True
-    with_delta = True
-    with_delta_delta = True
-
-    c = bob.ap.Ceps(sampling_rate, win_length_ms, win_shift_ms, n_filters, n_ceps, f_min, f_max, win_delta, pre_emphasis_coef, fb_linear, dct_norm)
-    c.with_energy = with_energy
-    c.with_delta = with_delta
-    c.with_delta_delta = with_delta_delta 
-    ct = bob.ap.TestCeps(c)
-    A = c(samples)
-    B = cepstral_features_extraction(self, rate_wavsample, win_length_ms, win_shift_ms, n_filters, n_ceps, dct_norm, 
-          f_min, f_max, win_delta, pre_emphasis_coef, fb_linear, with_energy, with_delta, with_delta_delta)
-    diff=numpy.sum(numpy.sum((A-B)*(A-B)))
-    self.assertAlmostEqual(diff, 0., 7, "Error in Ceps Analysis")
     
-  def test02_mfcc(self):
-    import pkg_resources
-    rate_wavsample = _read(pkg_resources.resource_filename(__name__, os.path.join('data', 'sample.wav')))
-    samples = rate_wavsample[1]
-    sampling_rate = rate_wavsample[0]
-
     win_length_ms = 20
     win_shift_ms = 10
     n_filters = 24
     n_ceps = 19
     f_min = 0.
     f_max = 4000.
-    win_delta = 2
+    delta_win = 2
     pre_emphasis_coef = 0.97
     dct_norm = True
-    fb_linear = False 
+    mel_scale = True 
     with_energy = True
     with_delta = True
     with_delta_delta = True
+    
+    cepstral_comparison_run(self,rate_wavsample, win_length_ms, win_shift_ms, n_filters, n_ceps, dct_norm, f_min, f_max, delta_win,
+                               pre_emphasis_coef, mel_scale, with_energy, with_delta, with_delta_delta)
 
-    c = bob.ap.Ceps(sampling_rate, win_length_ms, win_shift_ms, n_filters, n_ceps, f_min, f_max, win_delta, pre_emphasis_coef, fb_linear, dct_norm)
-    c.with_energy = with_energy
-    c.with_delta = with_delta
-    c.with_delta_delta = with_delta_delta 
-    ct = bob.ap.TestCeps(c)
-    A = c(samples)
-    B = cepstral_features_extraction(self, rate_wavsample, win_length_ms, win_shift_ms, n_filters, n_ceps, dct_norm, 
-          f_min, f_max, win_delta, pre_emphasis_coef, fb_linear, with_energy, with_delta, with_delta_delta)
-    diff=numpy.sum(numpy.sum((A-B)*(A-B)))
-    self.assertAlmostEqual(diff, 0., 7, "Error in Ceps Analysis")
+    # Varying win_length_ms
+    win_length_ms = 30
+    cepstral_comparison_run(self,rate_wavsample, win_length_ms, win_shift_ms, n_filters, n_ceps, dct_norm, f_min, f_max, delta_win,
+                               pre_emphasis_coef, mel_scale, with_energy, with_delta, with_delta_delta)
+    # Varying win_shift_ms
+    win_shift_ms = 15
+    cepstral_comparison_run(self,rate_wavsample, win_length_ms, win_shift_ms, n_filters, n_ceps, dct_norm, f_min, f_max, delta_win,
+                               pre_emphasis_coef, mel_scale, with_energy, with_delta, with_delta_delta)
+    
+    # Varying n_filters
+    n_filters = 20
+    cepstral_comparison_run(self,rate_wavsample, win_length_ms, win_shift_ms, n_filters, n_ceps, dct_norm, f_min, f_max, delta_win,
+                               pre_emphasis_coef, mel_scale, with_energy, with_delta, with_delta_delta)
+    
+    # Varying n_ceps
+    n_ceps = 12
+    cepstral_comparison_run(self,rate_wavsample, win_length_ms, win_shift_ms, n_filters, n_ceps, dct_norm, f_min, f_max, delta_win,
+                               pre_emphasis_coef, mel_scale, with_energy, with_delta, with_delta_delta)
+    
+    # Varying f_min
+    f_min = 300.
+    cepstral_comparison_run(self,rate_wavsample, win_length_ms, win_shift_ms, n_filters, n_ceps, dct_norm, f_min, f_max, delta_win,
+                               pre_emphasis_coef, mel_scale, with_energy, with_delta, with_delta_delta)
+    
+    # Varying f_max
+    f_max = 3300.
+    cepstral_comparison_run(self,rate_wavsample, win_length_ms, win_shift_ms, n_filters, n_ceps, dct_norm, f_min, f_max, delta_win,
+                               pre_emphasis_coef, mel_scale, with_energy, with_delta, with_delta_delta)
+    
+    # Varying delta_win
+    delta_win = 5
+    cepstral_comparison_run(self,rate_wavsample, win_length_ms, win_shift_ms, n_filters, n_ceps, dct_norm, f_min, f_max, delta_win,
+                               pre_emphasis_coef, mel_scale, with_energy, with_delta, with_delta_delta)
+    
+    # Varying pre_emphasis_coef
+    pre_emphasis_coef = 0.7
+    cepstral_comparison_run(self,rate_wavsample, win_length_ms, win_shift_ms, n_filters, n_ceps, dct_norm, f_min, f_max, delta_win,
+                               pre_emphasis_coef, mel_scale, with_energy, with_delta, with_delta_delta)
+    
+    # Varying dct_norm
+    dct_norm = False
+    cepstral_comparison_run(self,rate_wavsample, win_length_ms, win_shift_ms, n_filters, n_ceps, dct_norm, f_min, f_max, delta_win,
+                               pre_emphasis_coef, mel_scale, with_energy, with_delta, with_delta_delta)
+    
+    # Varying mel_scale : linear scale
+    mel_scale = False
+    cepstral_comparison_run(self,rate_wavsample, win_length_ms, win_shift_ms, n_filters, n_ceps, dct_norm, f_min, f_max, delta_win,
+                               pre_emphasis_coef, mel_scale, with_energy, with_delta, with_delta_delta)
+    
+    # Varying with_energy
+    with_energy = False
+    cepstral_comparison_run(self,rate_wavsample, win_length_ms, win_shift_ms, n_filters, n_ceps, dct_norm, f_min, f_max, delta_win,
+                               pre_emphasis_coef, mel_scale, with_energy, with_delta, with_delta_delta)
+
+    # Varying with_delta
+    with_delta = False
+    cepstral_comparison_run(self,rate_wavsample, win_length_ms, win_shift_ms, n_filters, n_ceps, dct_norm, f_min, f_max, delta_win,
+                               pre_emphasis_coef, mel_scale, with_energy, with_delta, with_delta_delta)
+   
+    # Varying with_delta_delta
+    with_delta_delta = False
+    cepstral_comparison_run(self,rate_wavsample, win_length_ms, win_shift_ms, n_filters, n_ceps, dct_norm, f_min, f_max, delta_win,
+                               pre_emphasis_coef, mel_scale, with_energy, with_delta, with_delta_delta)
+    

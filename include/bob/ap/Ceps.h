@@ -57,10 +57,10 @@ class Ceps
     /**
      * @brief Constructor: Initialize working arrays
      */
-    Ceps(double sf, double win_length_ms=20., double win_shift_ms=10., 
+    Ceps(double sampling_frequency, double win_length_ms=20., double win_shift_ms=10.,
       size_t n_filters=24, size_t n_ceps=19, double f_min=0., 
-      double f_max=4000., size_t delta_win=2, double pre_emphasis_coef=0.97, 
-      bool fb_linear=true, bool dct_norm=false); 
+      double f_max=4000., size_t delta_win=2, double pre_emphasis_coef=0.95,
+      bool mel_scale=true, bool dct_norm=false);
 
     /**
      * @brief Get the Cepstral Shape
@@ -82,7 +82,7 @@ class Ceps
      * @brief Returns the sampling frequency/frequency rate
      */
     inline double getSamplingFrequency() const
-    { return m_sf; }
+    { return m_sampling_frequency; }
     /**
      * @brief Returns the window length in miliseconds
      */
@@ -129,8 +129,8 @@ class Ceps
      * @brief Tells whether the frequencies of the filters in the filter bank
      * are taken from the linear or the Mel scale
      */
-    inline bool getFbLinear() const
-    { return m_fb_linear; }
+    inline bool getMelScale() const
+    { return m_mel_scale; }
     /**
      * @brief Rerturns the size of the window used to compute first and second
      * order derivatives
@@ -169,7 +169,7 @@ class Ceps
     /**
      * @brief Sets the sampling frequency/frequency rate
      */
-    void setSamplingFrequency(const double sf);
+    void setSamplingFrequency(const double sampling_frequency);
     /**
      * @brief Sets the window length in miliseconds
      */
@@ -213,7 +213,7 @@ class Ceps
      * @brief Sets whether the frequencies of the filters in the filter bank
      * are taken from the linear or the Mel scale
      */
-    void setFbLinear(bool fb_linear);
+    void setMelScale(bool mel_scale);
     /**
      * @brief Sets whether the DCT coefficients are normalized or not
      */
@@ -229,7 +229,8 @@ class Ceps
      * cepstral coefficients or not
      */
     inline void setWithDelta(bool with_delta)
-    { m_with_delta = with_delta; }
+    { if(!with_delta) m_with_delta_delta = false;
+      m_with_delta = with_delta; }
     /**
      * @brief Sets whether the first order derivatives are added to the 
      * cepstral coefficients or not. If enabled, first order derivatives are
@@ -264,8 +265,19 @@ class Ceps
     void hammingWindow(blitz::Array<double,1> &data);
 
     void logFilterBank(blitz::Array<double,1>& x);
+    /**
+     * @brief Apply triangular filter bank to the input array and return the log
+     * of the energy in each band.
+     */
     void logTriangularFBank(blitz::Array<double,1>& data);
     double logEnergy(blitz::Array<double,1> &data);
+    /**
+     * @brief Apply a p order DCT to vector v1.
+     * Results are returned through v2.
+     * If {m[1],...,m[N]} are the output of the filters, then
+     *    c[i]=sqrt(2/N)*sum for j=1 to N of(m[j]cos(M_PI*i*(j-0.5)/N) i=1,...,p
+     * This is what is implemented here with arrays indexed from 0 to N-1.
+     */
     void transformDCT(blitz::Array<double,1>& ceps_row);
     void initWinSize();
     void initWinLength();
@@ -274,10 +286,26 @@ class Ceps
     void initCacheHammingKernel();
     void initCacheDctKernel();
     void initCacheFilterBank();
+    /**
+     * @brief Initialize the table m_p_index, which contains the indices of the
+     * cut-off frequencies. It looks like something like this:
+     *
+     *                      filter 2
+     *                   <------------->
+     *                filter 1           filter 4
+     *             <----------->       <------------->
+     *        | | | | | | | | | | | | | | | | | | | | | ..........
+     *         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9  ..........
+     *             ^     ^     ^       ^             ^
+     *             |     |     |       |             |
+     *          p_in[0]  |  p_in[2]    |          p_in[4]
+     *                p_in[1]       p_in[3]
+     *
+     */
     void initCachePIndex();
     void initCacheFilters();
 
-    double m_sf; ///< The sampling frequency
+    double m_sampling_frequency; ///< The sampling frequency
     double m_win_length_ms; ///< The window length in miliseconds 
     size_t m_win_length;
     double m_win_shift_ms;
@@ -289,7 +317,7 @@ class Ceps
     double m_f_max;
     size_t m_delta_win;
     double m_pre_emphasis_coeff;
-    bool m_fb_linear;
+    bool m_mel_scale;
     bool m_dct_norm;
     bool m_with_energy;
     bool m_with_delta;
