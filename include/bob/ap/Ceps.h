@@ -29,9 +29,6 @@
 #include <vector>
 #include "bob/sp/FFT1D.h"
 
-const double ENERGY_FLOOR = 1.0;
-const double FBANK_OUT_FLOOR = 1.0;
-
 namespace bob {
 /**
  * \ingroup libap_api
@@ -55,7 +52,7 @@ class Ceps
 {
   public:
     /**
-     * @brief Constructor: Initialize working arrays
+     * @brief Constructor. Initializes working arrays
      */
     Ceps(double sampling_frequency, double win_length_ms=20., double win_shift_ms=10.,
       size_t n_filters=24, size_t n_ceps=19, double f_min=0., 
@@ -63,13 +60,13 @@ class Ceps
       bool mel_scale=true, bool dct_norm=false);
 
     /**
-     * @brief Get the Cepstral Shape
+     * @brief Gets the Cepstral features shape for a given input/input length
      */
     blitz::TinyVector<int,2> getCepsShape(const size_t input_length) const;
     blitz::TinyVector<int,2> getCepsShape(const blitz::Array<double,1>& input) const;
 
     /**
-     * @brief Compute Cepstral features
+     * @brief Computes Cepstral features
      */
     void operator()(const blitz::Array<double,1>& input, blitz::Array<double,2>& output);
 
@@ -245,7 +242,7 @@ class Ceps
      * @brief Computes the first order derivative from the given input. 
      * This methods is used to compute both the delta's and double delta's.
      */
-    void addDerivative(const blitz::Array<double,2>& input, blitz::Array<double,2>& output);
+    void addDerivative(const blitz::Array<double,2>& input, blitz::Array<double,2>& output) const;
     /**
      * @brief Converts a frequency in Herz to the corresponding one in Mel
      */
@@ -258,27 +255,32 @@ class Ceps
      * @brief Pre-emphasises the signal by applying the first order equation
      * \f$data_{n} := data_{n} − a*data_{n−1}\f$
      */
-    void pre_emphasis(blitz::Array<double,1> &data);
+    void pre_emphasis(blitz::Array<double,1> &data) const;
     /**
      * @brief Applies the Hamming window to the signal
      */
-    void hammingWindow(blitz::Array<double,1> &data);
+    void hammingWindow(blitz::Array<double,1> &data) const;
 
+    /**
+     * @brief Computes the power-spectrum of the FFT of the input frame and
+     * applies the triangular filter bank
+     */
     void logFilterBank(blitz::Array<double,1>& x);
     /**
-     * @brief Apply triangular filter bank to the input array and return the log
-     * of the energy in each band.
+     * @brief Applies the triangular filter bank to the input array and 
+     * returns the logarithm of the energy in each band.
      */
-    void logTriangularFBank(blitz::Array<double,1>& data);
-    double logEnergy(blitz::Array<double,1> &data);
+    void logTriangularFilterBank(blitz::Array<double,1>& data) const;
     /**
-     * @brief Apply a p order DCT to vector v1.
-     * Results are returned through v2.
-     * If {m[1],...,m[N]} are the output of the filters, then
-     *    c[i]=sqrt(2/N)*sum for j=1 to N of(m[j]cos(M_PI*i*(j-0.5)/N) i=1,...,p
-     * This is what is implemented here with arrays indexed from 0 to N-1.
+     * @brief Computes the logarithm of the energy
      */
-    void transformDCT(blitz::Array<double,1>& ceps_row);
+    double logEnergy(blitz::Array<double,1> &data) const;
+    /**
+     * @brief Applies the DCT to the cepstral features:
+     * \f$out[i]=sqrt(2/N)*sum_{j=1}^{N} (in[j]cos(M_PI*i*(j-0.5)/N)\f$
+     */
+    void applyDct(blitz::Array<double,1>& ceps_row) const;
+
     void initWinSize();
     void initWinLength();
     void initWinShift();
@@ -287,8 +289,8 @@ class Ceps
     void initCacheDctKernel();
     void initCacheFilterBank();
     /**
-     * @brief Initialize the table m_p_index, which contains the indices of the
-     * cut-off frequencies. It looks like something like this:
+     * @brief Initialize the table m_p_index, which contains the indices of
+     * the cut-off frequencies of the triangular filters.. It looks like:
      *
      *                      filter 2
      *                   <------------->
@@ -298,8 +300,8 @@ class Ceps
      *         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9  ..........
      *             ^     ^     ^       ^             ^
      *             |     |     |       |             |
-     *          p_in[0]  |  p_in[2]    |          p_in[4]
-     *                p_in[1]       p_in[3]
+     *            t[0]   |    t[2]     |           t[4]
+     *                  t[1]          t[3]
      *
      */
     void initCachePIndex();
@@ -322,16 +324,21 @@ class Ceps
     bool m_with_energy;
     bool m_with_delta;
     bool m_with_delta_delta;
+    double m_energy_floor;
+    double m_fb_out_floor;
+    double m_log_energy_floor;
+    double m_log_fb_out_floor;
+
     blitz::Array<double,2> m_dct_kernel;
     blitz::Array<double,1> m_hamming_kernel;
-    blitz::Array<double,1> m_filters;
     blitz::Array<int,1>  m_p_index;
     std::vector<blitz::Array<double,1> > m_filter_bank;
     bob::sp::FFT1D m_fft;
 
-    mutable blitz::Array<double,1> m_cache_frame;
-    mutable blitz::Array<std::complex<double>,1>  m_cache_complex1;
-    mutable blitz::Array<std::complex<double>,1>  m_cache_complex2;
+    mutable blitz::Array<double,1> m_cache_frame_d;
+    mutable blitz::Array<std::complex<double>,1>  m_cache_frame_c1;
+    mutable blitz::Array<std::complex<double>,1>  m_cache_frame_c2;
+    mutable blitz::Array<double,1> m_cache_filters;
 
     friend class TestCeps;
 };
@@ -349,16 +356,16 @@ class TestCeps
     { return m_ceps.getCepsShape(input_length); }
     blitz::TinyVector<int,2> getCepsShape(const blitz::Array<double,1>& input) const
     { return m_ceps.getCepsShape(input); }
-    blitz::Array<double,1> getFilter(void) { return m_ceps.m_filters; }
+    blitz::Array<double,1> getFilterOutput() { return m_ceps.m_cache_filters; }
 
     void operator()(const blitz::Array<double,1>& input, blitz::Array<double,2>& ceps_2D)
     { m_ceps(input, ceps_2D);}
     void hammingWindow(blitz::Array<double,1>& data){ m_ceps.hammingWindow(data); }
     void pre_emphasis(blitz::Array<double,1>& data){ m_ceps.pre_emphasis(data); }
     void logFilterBank(blitz::Array<double,1>& x){ m_ceps.logFilterBank(x); }
-    void logTriangularFBank(blitz::Array<double,1>& data){ m_ceps.logTriangularFBank(data); }
+    void logTriangularFilterBank(blitz::Array<double,1>& data){ m_ceps.logTriangularFilterBank(data); }
     double logEnergy(blitz::Array<double,1> &data){ return m_ceps.logEnergy(data); }
-    void transformDCT(blitz::Array<double,1>& ceps_row) { m_ceps.transformDCT(ceps_row); }
+    void applyDct(blitz::Array<double,1>& ceps_row) { m_ceps.applyDct(ceps_row); }
 };
 
 }

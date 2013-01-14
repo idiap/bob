@@ -248,7 +248,7 @@ def cepstral_features_extraction(obj, rate_wavsample, win_length_ms, win_shift_m
       obj.assertAlmostEqual(filters[kk], filt2[kk], 7, "Error in log Filtering")
           
     ceps = dct_transform(filters, n_filters, dct_kernel, n_ceps, dct_norm)
-    ceps2 = ct.dct_transform(n_ceps)
+    ceps2 = ct.apply_dct(n_ceps)
 
 
     if(with_energy):

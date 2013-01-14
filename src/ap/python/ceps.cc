@@ -31,7 +31,7 @@ using namespace boost::python;
 static const char* CEPS_DOC = "Objects of this class, after configuration, can extract Cepstral Features from a 1D array/signal.";
 static const char* TESTCEPS_DOC = "Objects of this class, after configuration, can be used to test the private methods of bob.ap.Ceps.";
 
-static object py_ceps_analysis(bob::ap::Ceps& ceps, bob::python::const_ndarray input)
+static object py_forward(bob::ap::Ceps& ceps, bob::python::const_ndarray input)
 {
   // Gets the shape of the feature
   const blitz::Array<double,1> input_ = input.bz<double,1>();
@@ -64,8 +64,6 @@ static boost::python::tuple py_get_ceps_shape(bob::ap::Ceps& ceps, object input_
 static double py_logEnergy(bob::ap::TestCeps& ceps, bob::python::ndarray data)
 {
   blitz::Array<double,1> data_ = data.bz<double,1>();
-
-  // Get the logEnergy
   return ceps.logEnergy(data_);
 }
 
@@ -88,17 +86,17 @@ static object py_logFilterBank(bob::ap::TestCeps& ceps, bob::python::ndarray dat
   ceps.logFilterBank(data_);
   bob::python::ndarray filter(bob::core::array::t_float64, n_filters);
   blitz::Array<double,1> filter_ = filter.bz<double,1>();
-  // Gets the filter Bank
-  filter_ = ceps.getFilter();
+  // Gets the filter bank output
+  filter_ = ceps.getFilterOutput();
   return filter.self();
 }
 
-static object py_transformDCT(bob::ap::TestCeps& ceps, int n_ceps)
+static object py_applyDct(bob::ap::TestCeps& ceps, int n_ceps)
 {
   bob::python::ndarray ceps_row(bob::core::array::t_float64, n_ceps);
   blitz::Array<double,1> ceps_row_ = ceps_row.bz<double,1>();
-  // Get the Cepstral features
-  ceps.transformDCT(ceps_row_);
+  // Gets the Cepstral features
+  ceps.applyDct(ceps_row_);
   return ceps_row.self();
 }
 
@@ -107,7 +105,7 @@ void bind_ap_ceps()
 {
   class_<bob::ap::Ceps, boost::shared_ptr<bob::ap::Ceps> >("Ceps", CEPS_DOC, init<double, optional<double, double, size_t, size_t, double, double, int, double, bool, bool> >
   ((arg("sampling_frequency"), arg("win_length_ms")=20., arg("win_shift_ms")=10., arg("n_filters")=24, arg("n_ceps")=19, arg("f_min")=0., arg("f_max")=4000., arg("delta_win"), arg("pre_emphasis_coeff")=0.95, arg("mel_scale")=true, arg("dct_norm")=false)))
-        .add_property("sampling_frequency", &bob::ap::Ceps::getSamplingFrequency, &bob::ap::Ceps::setSamplingFrequency, "The sample frequency of the input data")
+        .add_property("sampling_frequency", &bob::ap::Ceps::getSamplingFrequency, &bob::ap::Ceps::setSamplingFrequency, "The sampling frequency of the input data")
         .add_property("win_length_ms", &bob::ap::Ceps::getWinLengthMs, &bob::ap::Ceps::setWinLengthMs, "The window length of the cepstral analysis in milliseconds")
         .add_property("win_length", &bob::ap::Ceps::getWinLength, "The normalized window length wrt. to the sample frequency")
         .add_property("win_shift_ms", &bob::ap::Ceps::getWinShiftMs, &bob::ap::Ceps::setWinShiftMs, "The window shift of the cepstral analysis in milliseconds")
@@ -123,8 +121,8 @@ void bind_ap_ceps()
         .add_property("with_energy", &bob::ap::Ceps::getWithEnergy, &bob::ap::Ceps::setWithEnergy, "Tells if we add the energy to the output feature")
         .add_property("with_delta", &bob::ap::Ceps::getWithDelta, &bob::ap::Ceps::setWithDelta, "Tells if we add the first derivatives to the output feature")
         .add_property("with_delta_delta", &bob::ap::Ceps::getWithDeltaDelta, &bob::ap::Ceps::setWithDeltaDelta, "Tells if we add the second derivatives to the output feature")
-        .def("__call__", &py_ceps_analysis, (arg("input")), "Compute the features")
-        .def("get_ceps_shape", &py_get_ceps_shape, (arg("n_size"), arg("input_data")), "Compute the shape of the output features")
+        .def("__call__", &py_forward, (arg("input")), "Computes the cepstral features")
+        .def("get_ceps_shape", &py_get_ceps_shape, (arg("n_size"), arg("input_data")), "Computes the shape of the output features")
         ;
 
   class_<bob::ap::TestCeps, boost::shared_ptr<bob::ap::TestCeps> >("TestCeps", TESTCEPS_DOC, init<bob::ap::Ceps&>((arg("ceps"))))
@@ -134,7 +132,7 @@ void bind_ap_ceps()
         .def("pre_emphasis", &py_emphasis, (arg("data")), "compute pre-emphasis")
         .def("hamming_window", &py_hammingWindow, (arg("data")), "compute the wraped signal on a hamming Window")
         .def("log_filter_bank", &py_logFilterBank, (arg("data"), arg("m_win_size"), arg("n_filters")), "compute log Filter Bank")
-        .def("dct_transform", &py_transformDCT, (arg("n_ceps")), "DCT Transform")
+        .def("apply_dct", &py_applyDct, (arg("n_ceps")), "DCT Transform")
       ;
 }
 
