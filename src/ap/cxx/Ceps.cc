@@ -106,12 +106,12 @@ void bob::ap::Ceps::setDctNorm(bool dct_norm)
   initCacheDctKernel();
 }
 
-double bob::ap::Ceps::mel(double f)
+double bob::ap::Ceps::herzToMel(double f)
 {
   return(2595.*log10(1+f/700.));
 }
 
-double bob::ap::Ceps::melInv(double f)
+double bob::ap::Ceps::melToHerz(double f)
 {
   return((double)(700.*(pow(10,f/2595.)-1)));
 }
@@ -195,11 +195,11 @@ void bob::ap::Ceps::initCachePIndex()
   // 'Mel' frequency decomposition (for MFCC)
   else 
   {
-    double m_max = mel(m_f_max);
-    double m_min = mel(m_f_min);
+    double m_max = herzToMel(m_f_max);
+    double m_min = herzToMel(m_f_min);
     for(int i=0; i<(int)m_n_filters+2; ++i) {
       double alpha = i/ (double)(m_n_filters+1);
-      double f = melInv(m_min * (1-alpha) + m_max * alpha);
+      double f = melToHerz(m_min * (1-alpha) + m_max * alpha);
       double factor = f / m_sf;
       m_p_index(i)=(int)round(m_win_size * factor);
     }

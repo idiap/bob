@@ -164,14 +164,14 @@ def cepstral_features_extraction(obj, rate_wavsample, win_length_ms, win_shift_m
   else:
     # Mel scale
     m_max = mel_python(f_max);
-    obj.assertAlmostEqual(ct.mel(f_max), m_max, 7, "Error in Mel...")
+    obj.assertAlmostEqual(ct.herz_to_mel(f_max), m_max, 7, "Error in Mel...")
     m_min = mel_python(f_min);
-    obj.assertAlmostEqual(ct.mel(f_min), m_min, 7, "Error in Mel...")
+    obj.assertAlmostEqual(ct.herz_to_mel(f_min), m_min, 7, "Error in Mel...")
   
     for i in range(n_filters + 2):
       alpha = ((i) / (n_filters + 1.0));
       f = mel_inv_python(m_min * (1 - alpha) + m_max * alpha);
-      obj.assertAlmostEqual(ct.mel_inv(m_min * (1 - alpha) + m_max * alpha), f, 7, "Error in MelInv...")
+      obj.assertAlmostEqual(ct.mel_to_herz(m_min * (1 - alpha) + m_max * alpha), f, 7, "Error in MelInv...")
       factor = f / (sf * 1.0);
       p_index[i] = int (round((win_size) * factor));
 
@@ -369,15 +369,13 @@ class CepsTest(unittest.TestCase):
     f_max = 4000.
     win_delta = 2
     pre_emphasis_coef = 0.97
-    dct_norm = True
     fb_linear = True
+    dct_norm = True
     with_energy = True
     with_delta = True
     with_delta_delta = True
 
-    c = bob.ap.Ceps(sampling_rate, win_length_ms, win_shift_ms, n_filters, n_ceps, f_min, f_max, win_delta, pre_emphasis_coef)
-    c.dct_norm = dct_norm
-    c.fb_linear = fb_linear
+    c = bob.ap.Ceps(sampling_rate, win_length_ms, win_shift_ms, n_filters, n_ceps, f_min, f_max, win_delta, pre_emphasis_coef, fb_linear, dct_norm)
     c.with_energy = with_energy
     c.with_delta = with_delta
     c.with_delta_delta = with_delta_delta 
@@ -408,9 +406,7 @@ class CepsTest(unittest.TestCase):
     with_delta = True
     with_delta_delta = True
 
-    c = bob.ap.Ceps(sampling_rate, win_length_ms, win_shift_ms, n_filters, n_ceps, f_min, f_max, win_delta, pre_emphasis_coef)
-    c.dct_norm = dct_norm
-    c.fb_linear = fb_linear
+    c = bob.ap.Ceps(sampling_rate, win_length_ms, win_shift_ms, n_filters, n_ceps, f_min, f_max, win_delta, pre_emphasis_coef, fb_linear, dct_norm)
     c.with_energy = with_energy
     c.with_delta = with_delta
     c.with_delta_delta = with_delta_delta 
