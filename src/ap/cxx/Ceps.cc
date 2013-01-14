@@ -24,16 +24,16 @@
 #include "bob/ap/Ceps.h"
 #include "bob/core/array_assert.h"
 #include "bob/core/cast.h"
-#include <cmath>
-#include <blitz/array.h>
 
-bob::ap::Ceps::Ceps( double sf, int win_length_ms, int win_shift_ms, 
+bob::ap::Ceps::Ceps( double sf, double win_length_ms, double win_shift_ms, 
     size_t n_filters, size_t n_ceps, double f_min, double f_max, 
-    double delta_win, double pre_emphasis_coeff):
+    size_t delta_win, double pre_emphasis_coeff, bool fb_linear,
+    bool dct_norm):
   m_sf(sf), m_win_length_ms(win_length_ms), m_win_shift_ms(win_shift_ms), 
-  m_n_filters(n_filters), m_n_ceps(n_ceps), 
-  m_f_min(f_min), m_f_max(f_max), m_delta_win(delta_win), m_pre_emphasis_coeff(pre_emphasis_coeff),
-  m_fb_linear(true), m_dct_norm(false), m_with_energy(true), m_with_delta(true), m_with_delta_delta(true),
+  m_n_filters(n_filters), m_n_ceps(n_ceps), m_f_min(f_min), m_f_max(f_max), 
+  m_delta_win(delta_win), m_pre_emphasis_coeff(pre_emphasis_coeff),
+  m_fb_linear(fb_linear), m_dct_norm(dct_norm), 
+  m_with_energy(true), m_with_delta(true), m_with_delta_delta(true),
   m_filter_bank(), m_fft(1)
 {
   initWinLength();
@@ -55,13 +55,13 @@ void bob::ap::Ceps::setSamplingFrequency(const double sf)
   initWinShift();
 }
 
-void bob::ap::Ceps::setWinLengthMs(int win_length_ms)
+void bob::ap::Ceps::setWinLengthMs(double win_length_ms)
 { 
   m_win_length_ms = win_length_ms;
   initWinLength(); 
 }
 
-void bob::ap::Ceps::setWinShiftMs(int win_shift_ms)
+void bob::ap::Ceps::setWinShiftMs(double win_shift_ms)
 { 
   m_win_shift_ms = win_shift_ms;
   initWinShift(); 
@@ -100,6 +100,12 @@ void bob::ap::Ceps::setFbLinear(bool fb_linear)
   initCacheFilterBank(); 
 }
 
+void bob::ap::Ceps::setDctNorm(bool dct_norm)
+{ 
+  m_dct_norm = dct_norm;
+  initCacheDctKernel();
+}
+
 double bob::ap::Ceps::mel(double f)
 {
   return(2595.*log10(1+f/700.));
@@ -112,7 +118,7 @@ double bob::ap::Ceps::melInv(double f)
 
 void bob::ap::Ceps::initWinLength()
 { 
-  m_win_length = (int)(m_sf * m_win_length_ms / 1000);
+  m_win_length = (size_t)(m_sf * m_win_length_ms / 1000);
   initWinSize();
   initCacheHammingKernel(); 
   initCacheFilterBank(); 
@@ -120,12 +126,12 @@ void bob::ap::Ceps::initWinLength()
 
 void bob::ap::Ceps::initWinShift()
 { 
-  m_win_shift = (int)(m_sf * m_win_shift_ms / 1000);
+  m_win_shift = (size_t)(m_sf * m_win_shift_ms / 1000);
 }
 
 void bob::ap::Ceps::initWinSize()
 {
-  m_win_size = (int)pow(2.0,(double)ceil(log(m_win_length)/log(2)));
+  m_win_size = (size_t)pow(2.0,ceil(log((double)m_win_length)/log(2)));
   m_cache_frame.resize(m_win_size);
   m_fft.reset(m_win_size);
   m_cache_complex1.resize(m_win_size);
@@ -136,7 +142,7 @@ void bob::ap::Ceps::initCacheHammingKernel()
 {
   // Hamming Window initialization
   m_hamming_kernel.resize(m_win_length);
-  double cst = 2*M_PI/(m_win_length-1);
+  double cst = 2*M_PI/(double)(m_win_length-1);
   blitz::firstIndex i;
   m_hamming_kernel = 0.54-0.46*blitz::cos(i*cst);
 }
@@ -147,8 +153,8 @@ void bob::ap::Ceps::initCacheDctKernel()
   m_dct_kernel.resize(m_n_ceps,m_n_filters);
   blitz::firstIndex i;
   blitz::secondIndex j;
-  m_dct_kernel = blitz::cos(M_PI*(i+1)*(j+0.5)/(double)(m_n_filters));
-  // TODO: DCT normalization
+  double dct_coeff = m_dct_norm ? (double)sqrt(2./(double)(m_n_filters)) : 1.;
+  m_dct_kernel = dct_coeff * blitz::cos(M_PI*(i+1)*(j+0.5)/(double)(m_n_filters));
 }
 
 void bob::ap::Ceps::initCacheFilterBank()
@@ -192,7 +198,7 @@ void bob::ap::Ceps::initCachePIndex()
     double m_max = mel(m_f_max);
     double m_min = mel(m_f_min);
     for(int i=0; i<(int)m_n_filters+2; ++i) {
-      double alpha = (double) (i)/ (double) (m_n_filters+1);
+      double alpha = i/ (double)(m_n_filters+1);
       double f = melInv(m_min * (1-alpha) + m_max * alpha);
       double factor = f / m_sf;
       m_p_index(i)=(int)round(m_win_size * factor);
@@ -234,7 +240,7 @@ blitz::TinyVector<int,2> bob::ap::Ceps::getCepsShape(const size_t input_size) co
   blitz::TinyVector<int,2> res;
 
   // 1. Number of frames
-  res(0) = 1+((input_size-(int)(m_win_length))/(int)(m_win_shift));
+  res(0) = 1+((input_size-m_win_length)/m_win_shift);
 
   // 2. Dimension of the feature vector
   int dim0=m_n_ceps;
@@ -255,7 +261,7 @@ blitz::TinyVector<int,2> bob::ap::Ceps::getCepsShape(const blitz::Array<double,1
   return getCepsShape(input.extent(0));
 }
 
-void bob::ap::Ceps::CepsAnalysis(const blitz::Array<double,1>& input, 
+void bob::ap::Ceps::operator()(const blitz::Array<double,1>& input, 
   blitz::Array<double,2>& ceps_matrix)
 {
   // Get expected dimensionality of output array
@@ -267,13 +273,13 @@ void bob::ap::Ceps::CepsAnalysis(const blitz::Array<double,1>& input,
   //compute the center of the cut-off frequencies
   const int n_coefs = (m_with_energy ?  m_n_ceps + 1 :  m_n_ceps);
   blitz::Range r1(0,m_n_ceps-1);
-  blitz::Range rf(0,m_win_length-1); 
+  blitz::Range rf(0,(int)m_win_length-1); 
   for(int i=0; i<n_frames; ++i) 
   {
     // Set padded frame to zero
     m_cache_frame = 0.;
     // Extract frame input vector
-    blitz::Range ri(i*m_win_shift,i*m_win_shift+m_win_length-1);
+    blitz::Range ri(i*(int)m_win_shift,i*(int)m_win_shift+(int)m_win_length-1);
     m_cache_frame(rf) = input(ri);
     // Substract mean value
     m_cache_frame -= blitz::mean(m_cache_frame);
@@ -317,8 +323,8 @@ void bob::ap::Ceps::pre_emphasis(blitz::Array<double,1> &data)
   { 
     // Pre-emphasise the signal by applying the first order equation
     // \f$data_{n} := data_{n} − a*data_{n−1}\f$
-    blitz::Range r0(m_win_length-2,0,-1); 
-    blitz::Range r1(m_win_length-1,1,-1); 
+    blitz::Range r0((int)m_win_length-2,0,-1); 
+    blitz::Range r1((int)m_win_length-1,1,-1); 
     data(r1) -= m_pre_emphasis_coeff * data(r0); // Apply first order equation
     data(0) *= 1. - m_pre_emphasis_coeff; // Update first element
   }
@@ -326,7 +332,7 @@ void bob::ap::Ceps::pre_emphasis(blitz::Array<double,1> &data)
 
 void bob::ap::Ceps::hammingWindow(blitz::Array<double,1> &data)
 {
-  blitz::Range r(0,m_win_length-1);
+  blitz::Range r(0,(int)m_win_length-1);
   data(r) *= m_hamming_kernel;
 }
 
@@ -337,7 +343,7 @@ void bob::ap::Ceps::logFilterBank(blitz::Array<double,1>& x)
   m_fft(m_cache_complex1, m_cache_complex2);
 
   // Take the the power spectrum of the first part of the output of the FFT
-  blitz::Range r(0,m_win_size/2);
+  blitz::Range r(0,(int)m_win_size/2);
   blitz::Array<double,1> x_half(x(r));
   blitz::Array<std::complex<double>,1> complex_half(m_cache_complex2(r));
   x_half = blitz::abs(complex_half);
@@ -363,7 +369,7 @@ void bob::ap::Ceps::logTriangularFBank(blitz::Array<double,1>& data)
 
 double bob::ap::Ceps::logEnergy(blitz::Array<double,1> &data)
 {
-  blitz::Array<double,1> data_p(data(blitz::Range(0,m_win_length-1)));
+  blitz::Array<double,1> data_p(data(blitz::Range(0,(int)m_win_length-1)));
   double gain = blitz::sum(blitz::pow2(data_p));
   gain = gain < ENERGY_FLOOR ?
       (double)(log(ENERGY_FLOOR)) : (double)(log(gain));
@@ -380,10 +386,9 @@ double bob::ap::Ceps::logEnergy(blitz::Array<double,1> &data)
  */
 void bob::ap::Ceps::transformDCT(blitz::Array<double,1>& ceps_row)
 {
-  double dct_coeff = m_dct_norm ? (double)sqrt(2.0/(double)(m_n_filters)) : 1.0;
   blitz::firstIndex i;
   blitz::secondIndex j;
-  ceps_row = dct_coeff * blitz::sum(m_filters(j) * m_dct_kernel(i,j), j);
+  ceps_row = blitz::sum(m_filters(j) * m_dct_kernel(i,j), j);
 }
 
 void bob::ap::Ceps::addDerivative(const blitz::Array<double,2>& input, blitz::Array<double,2>& output)
@@ -396,7 +401,7 @@ void bob::ap::Ceps::addDerivative(const blitz::Array<double,2>& input, blitz::Ar
 
   // Fill in the inner part as follows:
   // \f$output[i] += \sum_{l=1}^{DW} l * (input[i+l] - input[i-l])\f$
-  for(int l=1; l<=m_delta_win; ++l) {
+  for(int l=1; l<=(int)m_delta_win; ++l) {
     blitz::Range rout(l,n_frames-l-1);
     blitz::Range rp(2*l,n_frames-1);
     blitz::Range rn(0,n_frames-2*l-1);
@@ -406,46 +411,24 @@ void bob::ap::Ceps::addDerivative(const blitz::Array<double,2>& input, blitz::Ar
   const double factor = m_delta_win*(m_delta_win+1)/2;
   // Continue to fill the left boundary part as follows:
   // \f$output[i] += (\sum_{l=1+i}^{DW} l*input[i+l]) - (\sum_{l=i+1}^{DW}l)*input[0])\f$
-  for(int i=0; i<m_delta_win; ++i) {
+  for(int i=0; i<(int)m_delta_win; ++i) {
     output(i,rall) -= (factor - i*(i+1)/2) * input(0,rall);
-    for(int l=1+i; l<=m_delta_win; ++l) {
+    for(int l=1+i; l<=(int)m_delta_win; ++l) {
       output(i,rall) += l*(input(i+l,rall));
     }
   }
   // Continue to fill the right boundary part as follows:
   // \f$output[i] += (\sum_{l=Nframes-1-i}^{DW}l)*input[Nframes-1]) - (\sum_{l=Nframes-1-i}^{DW} l*input[i-l])\f$
-  for(int i=n_frames-m_delta_win; i<n_frames;  ++i) {
+  for(int i=n_frames-(int)m_delta_win; i<n_frames;  ++i) {
     int ii = (n_frames-1)-i;
     output(i,rall) += (factor - ii*(ii+1)/2) * input(n_frames-1,rall);
-    for(int l=1+ii; l<=m_delta_win; ++l) {
+    for(int l=1+ii; l<=(int)m_delta_win; ++l) {
       output(i,rall) -= l*input(i-l,rall);
     }
   }
   // Sum of the integer squared from 1 to delta_win
-  const double sum = (double)(m_delta_win*(m_delta_win+1)*(2*m_delta_win+1)/3);
+  const double sum = m_delta_win*(m_delta_win+1)*(2*m_delta_win+1)/3;
   output /= sum;
-}
-
-blitz::Array<double,2> bob::ap::Ceps::dataZeroMean(blitz::Array<double,2>& frames, bool norm_energy, int n_frames, int frame_size) 
-{
-  blitz::Array<double,1> mean(frame_size);
-  for(int i=0; i<n_frames; ++i) {
-    for(int j=0; j<frame_size; ++j)
-      mean(j) += frames(i,j);
-  }
-
-  for(int j=0; j<frame_size; ++j)
-    mean(j) /= n_frames;
-
-  if(!norm_energy)
-    mean(frame_size) = 0.0;
-
-  for(int i=0; i<n_frames; ++i){
-
-    for(int j=0;j<frame_size; ++j)
-      frames(i,j) -= mean(j);
-  }
-  return frames;
 }
 
 bob::ap::TestCeps::TestCeps(Ceps& ceps): m_ceps(ceps) {

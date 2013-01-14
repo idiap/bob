@@ -40,7 +40,7 @@ static object py_ceps_analysis(bob::ap::Ceps& ceps, bob::python::const_ndarray i
   bob::python::ndarray ceps_matrix(bob::core::array::t_float64, s(0), s(1));
   blitz::Array<double,2> ceps_matrix_ = ceps_matrix.bz<double,2>();
   // Extracts the features
-  ceps.CepsAnalysis(input_, ceps_matrix_);
+  ceps(input_, ceps_matrix_);
   return ceps_matrix.self();
 }
 
@@ -105,14 +105,13 @@ static object py_transformDCT(bob::ap::TestCeps& ceps, int n_ceps)
 
 void bind_ap_ceps()
 {
-  class_<bob::ap::Ceps, boost::shared_ptr<bob::ap::Ceps> >("Ceps", CEPS_DOC, init<double, int, int, size_t, size_t, double, double, int, double>
-  ((arg("sf"), arg("win_length_ms"), arg("win_shift_ms"), arg("n_filters"), arg("n_ceps"), arg("f_min"), arg("f_max"), arg("delta_win"), arg("pre_emphasis_coeff"))))
+  class_<bob::ap::Ceps, boost::shared_ptr<bob::ap::Ceps> >("Ceps", CEPS_DOC, init<double, optional<double, double, size_t, size_t, double, double, int, double, bool, bool> >
+  ((arg("sf"), arg("win_length_ms")=20., arg("win_shift_ms")=10., arg("n_filters")=24, arg("n_ceps")=19, arg("f_min")=0., arg("f_max")=4000., arg("delta_win"), arg("pre_emphasis_coeff")=0.97, arg("fb_linear")=true, arg("dct_norm")=false)))
         .add_property("sampling_frequency", &bob::ap::Ceps::getSamplingFrequency, &bob::ap::Ceps::setSamplingFrequency, "The sample frequency of the input data")
         .add_property("win_length_ms", &bob::ap::Ceps::getWinLengthMs, &bob::ap::Ceps::setWinLengthMs, "The window length of the cepstral analysis in milliseconds")
         .add_property("win_length", &bob::ap::Ceps::getWinLength, "The normalized window length wrt. to the sample frequency")
         .add_property("win_shift_ms", &bob::ap::Ceps::getWinShiftMs, &bob::ap::Ceps::setWinShiftMs, "The window shift of the cepstral analysis in milliseconds")
         .add_property("win_shift", &bob::ap::Ceps::getWinShift, "The normalized window shift wrt. to the sample frequency")
-        .add_property("win_size", &bob::ap::Ceps::getWinSize, "The window size")
         .add_property("n_filters", &bob::ap::Ceps::getNFilters, &bob::ap::Ceps::setNFilters, "The number of filter bands")
         .add_property("n_ceps", &bob::ap::Ceps::getNCeps, &bob::ap::Ceps::setNCeps, "The number of cepstral coefficients")
         .add_property("f_min", &bob::ap::Ceps::getFMin, &bob::ap::Ceps::setFMin, "The minimal frequency of the filter bank")
@@ -124,7 +123,7 @@ void bind_ap_ceps()
         .add_property("with_energy", &bob::ap::Ceps::getWithEnergy, &bob::ap::Ceps::setWithEnergy, "Tells if we add the energy to the output feature")
         .add_property("with_delta", &bob::ap::Ceps::getWithDelta, &bob::ap::Ceps::setWithDelta, "Tells if we add the first derivatives to the output feature")
         .add_property("with_delta_delta", &bob::ap::Ceps::getWithDeltaDelta, &bob::ap::Ceps::setWithDeltaDelta, "Tells if we add the second derivatives to the output feature")
-        .def("ceps_analysis", &py_ceps_analysis, (arg("input")), "Compute the features")
+        .def("__call__", &py_ceps_analysis, (arg("input")), "Compute the features")
         .def("get_ceps_shape", &py_get_ceps_shape, (arg("n_size"), arg("input_data")), "Compute the shape of the output features")
         ;
 
