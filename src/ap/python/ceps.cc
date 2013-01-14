@@ -128,8 +128,8 @@ void bind_ap_ceps()
         ;
 
   class_<bob::ap::TestCeps, boost::shared_ptr<bob::ap::TestCeps> >("TestCeps", TESTCEPS_DOC, init<bob::ap::Ceps&>((arg("ceps"))))
-        .def("mel", &bob::ap::TestCeps::mel, (arg("f")), "Compute a mel scale.")
-        .def("mel_inv", &bob::ap::TestCeps::melInv, (arg("f")), "Compute an inverse mel scale.")
+        .def("herz_to_mel", &bob::ap::TestCeps::herzToMel, (arg("f")), "Converts a frequency in Herz into the corresponding one in Mel.")
+        .def("mel_to_herz", &bob::ap::TestCeps::melToHerz, (arg("f")), "Converts a frequency in Mel into the corresponding one in Herz.")
         .def("log_energy", &py_logEnergy, (arg("data")), "compute the gain")
         .def("pre_emphasis", &py_emphasis, (arg("data")), "compute pre-emphasis")
         .def("hamming_window", &py_hammingWindow, (arg("data")), "compute the wraped signal on a hamming Window")

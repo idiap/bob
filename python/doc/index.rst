@@ -113,6 +113,7 @@ Reference
    io/index
    sp/index
    ip/index
+   ap/index
    machine/index
    trainer/index
    db/index

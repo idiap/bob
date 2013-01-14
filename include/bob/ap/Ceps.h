@@ -241,14 +241,28 @@ class Ceps
 
   private:
     /**
-     * @brief Compute the first order derivative from the given input
+     * @brief Computes the first order derivative from the given input. 
+     * This methods is used to compute both the delta's and double delta's.
      */
     void addDerivative(const blitz::Array<double,2>& input, blitz::Array<double,2>& output);
-
-    static double mel(double f);
-    static double melInv(double f);
+    /**
+     * @brief Converts a frequency in Herz to the corresponding one in Mel
+     */
+    static double herzToMel(double f);
+    /**
+     * @brief Converts a frequency in Mel to the corresponding one in Herz
+     */
+    static double melToHerz(double f);
+    /**
+     * @brief Pre-emphasises the signal by applying the first order equation
+     * \f$data_{n} := data_{n} − a*data_{n−1}\f$
+     */
     void pre_emphasis(blitz::Array<double,1> &data);
+    /**
+     * @brief Applies the Hamming window to the signal
+     */
     void hammingWindow(blitz::Array<double,1> &data);
+
     void logFilterBank(blitz::Array<double,1>& x);
     void logTriangularFBank(blitz::Array<double,1>& data);
     double logEnergy(blitz::Array<double,1> &data);
@@ -256,6 +270,7 @@ class Ceps
     void initWinSize();
     void initWinLength();
     void initWinShift();
+
     void initCacheHammingKernel();
     void initCacheDctKernel();
     void initCacheFilterBank();
@@ -300,8 +315,8 @@ class TestCeps
     Ceps& m_ceps;
 
     // Methods to test
-    double mel(double f) { return m_ceps.mel(f); }
-    double melInv(double f) { return m_ceps.melInv(f); }
+    double herzToMel(double f) { return m_ceps.herzToMel(f); }
+    double melToHerz(double f) { return m_ceps.melToHerz(f); }
     blitz::TinyVector<int,2> getCepsShape(const size_t input_length) const
     { return m_ceps.getCepsShape(input_length); }
     blitz::TinyVector<int,2> getCepsShape(const blitz::Array<double,1>& input) const
