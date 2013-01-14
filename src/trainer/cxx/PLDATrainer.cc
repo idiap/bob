@@ -33,22 +33,18 @@
 #include "bob/trainer/Exception.h"
 
 
-namespace tca = bob::core::array;
-namespace io = bob::io;
-namespace mach = bob::machine;
-namespace math = bob::math;
-namespace train = bob::trainer;
-
-train::PLDABaseTrainer::PLDABaseTrainer(int nf, int ng, 
-    double convergence_threshold, int max_iterations, bool compute_likelihood):
-  EMTrainer<mach::PLDABaseMachine, std::vector<blitz::Array<double,2> > >
+bob::trainer::PLDABaseTrainer::PLDABaseTrainer(double convergence_threshold, 
+    int max_iterations, bool compute_likelihood, bool use_sum_second_order):
+  EMTrainer<bob::machine::PLDABaseMachine, std::vector<blitz::Array<double,2> > >
     (convergence_threshold, max_iterations, compute_likelihood), 
-  m_nf(nf), m_ng(ng), m_limited_memory(false), m_S(0,0),
-  m_z_first_order(0), m_sum_z_second_order(0,0),
+  m_dim_f(0), m_dim_g(0),
+  m_use_sum_second_order(use_sum_second_order), m_S(0,0), 
+  m_z_first_order(0), m_sum_z_second_order(0,0), m_z_second_order(0),
   m_seed(-1), 
-  m_initF_method(0), m_initF_ratio(1.),
-  m_initG_method(0), m_initG_ratio(1.),
-  m_initSigma_method(0), m_initSigma_ratio(1.),
+  m_initF_method(bob::trainer::PLDABaseTrainer::RANDOM_F), m_initF_ratio(1.),
+  m_initG_method(bob::trainer::PLDABaseTrainer::RANDOM_G), m_initG_ratio(1.),
+  m_initSigma_method(bob::trainer::PLDABaseTrainer::RANDOM_SIGMA), 
+  m_initSigma_ratio(1.),
   m_n_samples_per_id(0), m_n_samples_in_training(), m_B(0,0),
   m_Ft_isigma_G(0,0), m_eta(0,0), m_zeta(), m_iota(),
   m_cache_nf_1(0), m_cache_nf_2(0), m_cache_ng_1(0),
@@ -57,76 +53,83 @@ train::PLDABaseTrainer::PLDABaseTrainer(int nf, int ng,
 {
 }
 
-train::PLDABaseTrainer::PLDABaseTrainer(const train::PLDABaseTrainer& other):
-  EMTrainer<mach::PLDABaseMachine, std::vector<blitz::Array<double,2> > >
+bob::trainer::PLDABaseTrainer::PLDABaseTrainer(const bob::trainer::PLDABaseTrainer& other):
+  EMTrainer<bob::machine::PLDABaseMachine, std::vector<blitz::Array<double,2> > >
     (other.m_convergence_threshold, other.m_max_iterations, 
      other.m_compute_likelihood),
-  m_nf(other.m_nf), m_ng(other.m_ng), m_limited_memory(other.m_limited_memory),
-  m_S(tca::ccopy(other.m_S)),
+  m_dim_f(other.m_dim_f), m_dim_g(other.m_dim_g), 
+  m_use_sum_second_order(other.m_use_sum_second_order),
+  m_S(bob::core::array::ccopy(other.m_S)),
   m_z_first_order(),
-  m_sum_z_second_order(tca::ccopy(other.m_sum_z_second_order)),
+  m_sum_z_second_order(bob::core::array::ccopy(other.m_sum_z_second_order)),
+  m_z_second_order(),
   m_seed(other.m_seed),
   m_initF_method(other.m_initF_method), m_initF_ratio(other.m_initF_ratio),
   m_initG_method(other.m_initG_method), m_initG_ratio(other.m_initG_ratio),
   m_initSigma_method(other.m_initSigma_method), m_initSigma_ratio(other.m_initSigma_ratio),
   m_n_samples_per_id(other.m_n_samples_per_id),
   m_n_samples_in_training(other.m_n_samples_in_training), 
-  m_B(tca::ccopy(other.m_B)), 
-  m_Ft_isigma_G(tca::ccopy(other.m_Ft_isigma_G)), 
-  m_eta(tca::ccopy(other.m_eta)), 
-  m_cache_nf_1(tca::ccopy(other.m_cache_nf_1)),
-  m_cache_nf_2(tca::ccopy(other.m_cache_nf_2)),
-  m_cache_ng_1(tca::ccopy(other.m_cache_ng_1)),
-  m_cache_D_1(tca::ccopy(other.m_cache_D_1)),
-  m_cache_D_2(tca::ccopy(other.m_cache_D_2)),
-  m_cache_nfng_nfng(tca::ccopy(other.m_cache_nfng_nfng)),
-  m_cache_D_nfng_1(tca::ccopy(other.m_cache_D_nfng_1)),
-  m_cache_D_nfng_2(tca::ccopy(other.m_cache_D_nfng_2))
+  m_B(bob::core::array::ccopy(other.m_B)), 
+  m_Ft_isigma_G(bob::core::array::ccopy(other.m_Ft_isigma_G)), 
+  m_eta(bob::core::array::ccopy(other.m_eta)), 
+  m_cache_nf_1(bob::core::array::ccopy(other.m_cache_nf_1)),
+  m_cache_nf_2(bob::core::array::ccopy(other.m_cache_nf_2)),
+  m_cache_ng_1(bob::core::array::ccopy(other.m_cache_ng_1)),
+  m_cache_D_1(bob::core::array::ccopy(other.m_cache_D_1)),
+  m_cache_D_2(bob::core::array::ccopy(other.m_cache_D_2)),
+  m_cache_nfng_nfng(bob::core::array::ccopy(other.m_cache_nfng_nfng)),
+  m_cache_D_nfng_1(bob::core::array::ccopy(other.m_cache_D_nfng_1)),
+  m_cache_D_nfng_2(bob::core::array::ccopy(other.m_cache_D_nfng_2))
 {
-  tca::ccopy(other.m_z_first_order, m_z_first_order);
-  tca::ccopy(other.m_zeta, m_zeta);
-  tca::ccopy(other.m_iota, m_iota);
+  bob::core::array::ccopy(other.m_z_first_order, m_z_first_order);
+  bob::core::array::ccopy(other.m_z_second_order, m_z_second_order);
+  bob::core::array::ccopy(other.m_zeta, m_zeta);
+  bob::core::array::ccopy(other.m_iota, m_iota);
 }
 
-train::PLDABaseTrainer::~PLDABaseTrainer() {}
+bob::trainer::PLDABaseTrainer::~PLDABaseTrainer() {}
 
-train::PLDABaseTrainer& train::PLDABaseTrainer::operator=
-(const train::PLDABaseTrainer& other) 
+bob::trainer::PLDABaseTrainer& bob::trainer::PLDABaseTrainer::operator=
+(const bob::trainer::PLDABaseTrainer& other) 
 {
-  m_convergence_threshold = other.m_convergence_threshold;
-  m_max_iterations = other.m_max_iterations;
-  m_compute_likelihood = other.m_compute_likelihood;
-  m_nf = other.m_nf;
-  m_ng = other.m_ng;
-  m_limited_memory = other.m_limited_memory;
-  m_S = tca::ccopy(other.m_S);
-  tca::ccopy(other.m_z_first_order, m_z_first_order);
-  m_sum_z_second_order = tca::ccopy(other.m_sum_z_second_order);
-  m_seed = other.m_seed;
-  m_initF_method = other.m_initF_method;
-  m_initF_ratio = other.m_initF_ratio;
-  m_initG_method = other.m_initG_method;
-  m_initG_ratio = other.m_initG_ratio;
-  m_initSigma_method = other.m_initSigma_method;
-  m_initSigma_ratio = other.m_initSigma_ratio;
-  m_n_samples_per_id = other.m_n_samples_per_id;
-  m_n_samples_in_training = other.m_n_samples_in_training;
-  m_B = tca::ccopy(other.m_B); 
-  m_Ft_isigma_G = tca::ccopy(other.m_Ft_isigma_G); 
-  m_eta = tca::ccopy(other.m_eta); 
-  tca::ccopy(other.m_iota, m_iota);
-  m_cache_nf_1 = tca::ccopy(other.m_cache_nf_1);
-  m_cache_nf_2 = tca::ccopy(other.m_cache_nf_2);
-  m_cache_ng_1 = tca::ccopy(other.m_cache_ng_1);
-  m_cache_D_1 = tca::ccopy(other.m_cache_D_1);
-  m_cache_D_2 = tca::ccopy(other.m_cache_D_2);
-  m_cache_nfng_nfng = tca::ccopy(other.m_cache_nfng_nfng);
-  m_cache_D_nfng_1 = tca::ccopy(other.m_cache_D_nfng_1);
-  m_cache_D_nfng_2 = tca::ccopy(other.m_cache_D_nfng_2);
+  if(this != &other)
+  {
+    m_convergence_threshold = other.m_convergence_threshold;
+    m_max_iterations = other.m_max_iterations;
+    m_compute_likelihood = other.m_compute_likelihood;
+    m_use_sum_second_order = other.m_use_sum_second_order;
+    m_dim_f = other.m_dim_f;
+    m_dim_g = other.m_dim_g;
+    m_S = bob::core::array::ccopy(other.m_S);
+    bob::core::array::ccopy(other.m_z_first_order, m_z_first_order);
+    m_sum_z_second_order = bob::core::array::ccopy(other.m_sum_z_second_order);
+    bob::core::array::ccopy(other.m_z_second_order, m_z_second_order);
+    m_seed = other.m_seed;
+    m_initF_method = other.m_initF_method;
+    m_initF_ratio = other.m_initF_ratio;
+    m_initG_method = other.m_initG_method;
+    m_initG_ratio = other.m_initG_ratio;
+    m_initSigma_method = other.m_initSigma_method;
+    m_initSigma_ratio = other.m_initSigma_ratio;
+    m_n_samples_per_id = other.m_n_samples_per_id;
+    m_n_samples_in_training = other.m_n_samples_in_training;
+    m_B = bob::core::array::ccopy(other.m_B); 
+    m_Ft_isigma_G = bob::core::array::ccopy(other.m_Ft_isigma_G); 
+    m_eta = bob::core::array::ccopy(other.m_eta); 
+    bob::core::array::ccopy(other.m_iota, m_iota);
+    m_cache_nf_1 = bob::core::array::ccopy(other.m_cache_nf_1);
+    m_cache_nf_2 = bob::core::array::ccopy(other.m_cache_nf_2);
+    m_cache_ng_1 = bob::core::array::ccopy(other.m_cache_ng_1);
+    m_cache_D_1 = bob::core::array::ccopy(other.m_cache_D_1);
+    m_cache_D_2 = bob::core::array::ccopy(other.m_cache_D_2);
+    m_cache_nfng_nfng = bob::core::array::ccopy(other.m_cache_nfng_nfng);
+    m_cache_D_nfng_1 = bob::core::array::ccopy(other.m_cache_D_nfng_1);
+    m_cache_D_nfng_2 = bob::core::array::ccopy(other.m_cache_D_nfng_2);
+  }
   return *this;
 }
 
-void train::PLDABaseTrainer::initialization(mach::PLDABaseMachine& machine,
+void bob::trainer::PLDABaseTrainer::initialization(bob::machine::PLDABaseMachine& machine,
   const std::vector<blitz::Array<double,2> >& v_ar) 
 {
   // Checks training data
@@ -134,8 +137,10 @@ void train::PLDABaseTrainer::initialization(mach::PLDABaseMachine& machine,
 
   // Gets dimension (first Arrayset)
   size_t n_features = v_ar[0].extent(1);
-  // Resizes the PLDABaseMachine
-  machine.resize(n_features, m_nf, m_ng);
+  // Get dimensionalities from the PLDABaseMachine
+  bob::core::array::assertSameDimensionLength(n_features, machine.getDimD());
+  m_dim_f = machine.getDimF();
+  m_dim_g = machine.getDimG();
 
   // Reinitializes array members
   initMembers(v_ar);
@@ -147,7 +152,7 @@ void train::PLDABaseTrainer::initialization(mach::PLDABaseMachine& machine,
   initFGSigma(machine, v_ar);
 }
 
-void train::PLDABaseTrainer::finalization(mach::PLDABaseMachine& machine,
+void bob::trainer::PLDABaseTrainer::finalization(bob::machine::PLDABaseMachine& machine,
   const std::vector<blitz::Array<double,2> >& v_ar) 
 {
   // Precomputes constant parts of the log likelihood and (gamma_a)
@@ -157,7 +162,7 @@ void train::PLDABaseTrainer::finalization(mach::PLDABaseMachine& machine,
   machine.getAddLogLikeConstTerm(1);
 }
 
-void train::PLDABaseTrainer::checkTrainingData(const std::vector<blitz::Array<double,2> >& v_ar)
+void bob::trainer::PLDABaseTrainer::checkTrainingData(const std::vector<blitz::Array<double,2> >& v_ar)
 {
   // Checks that the vector of Arraysets is not empty
   if(v_ar.size() == 0)
@@ -172,14 +177,14 @@ void train::PLDABaseTrainer::checkTrainingData(const std::vector<blitz::Array<do
   } 
 }
 
-void train::PLDABaseTrainer::initMembers(const std::vector<blitz::Array<double,2> >& v_ar)
+void bob::trainer::PLDABaseTrainer::initMembers(const std::vector<blitz::Array<double,2> >& v_ar)
 {
   // Gets dimension (first Arrayset)
   size_t n_features = v_ar[0].extent(1); // dimensionality of the data
   size_t n_identities = v_ar.size();
 
   m_S.resize(n_features,n_features);
-  m_sum_z_second_order.resize(m_nf+m_ng, m_nf+m_ng);
+  m_sum_z_second_order.resize((int)(m_dim_f+m_dim_g), (int)(m_dim_f+m_dim_g));
 
   // Loops over the identities
   for(size_t i=0; i<n_identities; ++i) 
@@ -187,8 +192,14 @@ void train::PLDABaseTrainer::initMembers(const std::vector<blitz::Array<double,2
     // Number of training samples for this identity
     size_t n_i = v_ar[i].extent(0); 
     // m_z_first_order
-    blitz::Array<double,2> z_i(n_i, m_nf+m_ng);
+    blitz::Array<double,2> z_i(n_i, (int)(m_dim_f+m_dim_g));
     m_z_first_order.push_back(z_i);
+    // m_z_second_order
+    if(!m_use_sum_second_order)
+    {
+      blitz::Array<double,3> z2_i(n_i, (int)(m_dim_f+m_dim_g), (int)(m_dim_f+m_dim_g));
+      m_z_second_order.push_back(z2_i);
+    }
 
     // m_n_samples_per_id
     m_n_samples_per_id.push_back(n_i);
@@ -202,27 +213,27 @@ void train::PLDABaseTrainer::initMembers(const std::vector<blitz::Array<double,2
       // corresponding matrices are up to date.
       m_n_samples_in_training[n_i] = false;
       // Allocates arrays for identities with n_i training samples
-      m_zeta[n_i].reference(blitz::Array<double,2>(m_ng, m_ng));
-      m_iota[n_i].reference(blitz::Array<double,2>(m_nf, m_ng));
+      m_zeta[n_i].reference(blitz::Array<double,2>((int)m_dim_g, (int)m_dim_g));
+      m_iota[n_i].reference(blitz::Array<double,2>((int)m_dim_f, (int)m_dim_g));
     }
   }
 
-  m_B.resize(n_features, m_nf+m_ng);
-  m_Ft_isigma_G.resize(m_nf,m_ng);
-  m_eta.resize(m_nf,m_ng);
+  m_B.resize(n_features, (int)(m_dim_f+m_dim_g));
+  m_Ft_isigma_G.resize((int)m_dim_f,(int)m_dim_g);
+  m_eta.resize((int)m_dim_f,(int)m_dim_g);
 
   // Cache
-  m_cache_nf_1.resize(m_nf);
-  m_cache_nf_2.resize(m_nf);
-  m_cache_ng_1.resize(m_ng);
+  m_cache_nf_1.resize((int)m_dim_f);
+  m_cache_nf_2.resize((int)m_dim_f);
+  m_cache_ng_1.resize((int)m_dim_g);
   m_cache_D_1.resize(n_features);
   m_cache_D_2.resize(n_features);
-  m_cache_nfng_nfng.resize(m_nf+m_ng,m_nf+m_ng);
-  m_cache_D_nfng_1.resize(n_features,m_nf+m_ng);
-  m_cache_D_nfng_2.resize(n_features,m_nf+m_ng);
+  m_cache_nfng_nfng.resize((int)(m_dim_f+m_dim_g),(int)(m_dim_f+m_dim_g));
+  m_cache_D_nfng_1.resize(n_features,(int)(m_dim_f+m_dim_g));
+  m_cache_D_nfng_2.resize(n_features,(int)(m_dim_f+m_dim_g));
 }
 
-void train::PLDABaseTrainer::computeMeanVariance(mach::PLDABaseMachine& machine, 
+void bob::trainer::PLDABaseTrainer::computeMeanVariance(bob::machine::PLDABaseMachine& machine, 
   const std::vector<blitz::Array<double,2> >& v_ar) 
 {
   blitz::Array<double,1>& mu = machine.updateMu();
@@ -235,7 +246,7 @@ void train::PLDABaseTrainer::computeMeanVariance(mach::PLDABaseMachine& machine,
     for (size_t i=0; i<n_samples; ++i)
       data(all,i) = ar(i,all);
     // Mean and scatter computation
-    math::scatter(data, m_S, mu);
+    bob::math::scatter(data, m_S, mu);
     // divides scatter by N-1
     m_S /= static_cast<double>(n_samples-1);
   }
@@ -253,7 +264,7 @@ void train::PLDABaseTrainer::computeMeanVariance(mach::PLDABaseMachine& machine,
   }
 }
 
-void train::PLDABaseTrainer::initFGSigma(mach::PLDABaseMachine& machine, 
+void bob::trainer::PLDABaseTrainer::initFGSigma(bob::machine::PLDABaseMachine& machine, 
   const std::vector<blitz::Array<double,2> >& v_ar) 
 {
   // Initializes F, G and sigma
@@ -265,14 +276,14 @@ void train::PLDABaseTrainer::initFGSigma(mach::PLDABaseMachine& machine,
   machine.precompute();
 }
 
-void train::PLDABaseTrainer::initF(mach::PLDABaseMachine& machine, 
+void bob::trainer::PLDABaseTrainer::initF(bob::machine::PLDABaseMachine& machine, 
   const std::vector<blitz::Array<double,2> >& v_ar) 
 {
   blitz::Array<double,2>& F = machine.updateF();
   blitz::Range a = blitz::Range::all();
 
   // 1: between-class scatter
-  if(m_initF_method==1) 
+  if(m_initF_method==bob::trainer::PLDABaseTrainer::BETWEEN_SCATTER) 
   {
     // a/ Computes between-class scatter matrix
     blitz::firstIndex bi;
@@ -327,14 +338,14 @@ void train::PLDABaseTrainer::initF(mach::PLDABaseMachine& machine,
   }
 }
 
-void train::PLDABaseTrainer::initG(mach::PLDABaseMachine& machine, 
+void bob::trainer::PLDABaseTrainer::initG(bob::machine::PLDABaseMachine& machine, 
   const std::vector<blitz::Array<double,2> >& v_ar) 
 {
   blitz::Array<double,2>& G = machine.updateG();
   blitz::Range a = blitz::Range::all();
 
   // 1: within-class scatter
-  if(m_initG_method==1) 
+  if(m_initG_method==bob::trainer::PLDABaseTrainer::WITHIN_SCATTER) 
   {
     // a/ Computes within-class scatter matrix
     blitz::firstIndex bi;
@@ -403,7 +414,7 @@ void train::PLDABaseTrainer::initG(mach::PLDABaseMachine& machine,
   }
 }
 
-void train::PLDABaseTrainer::initSigma(mach::PLDABaseMachine& machine, 
+void bob::trainer::PLDABaseTrainer::initSigma(bob::machine::PLDABaseMachine& machine, 
   const std::vector<blitz::Array<double,2> >& v_ar) 
 {
   blitz::Array<double,1>& sigma = machine.updateSigma();
@@ -411,7 +422,7 @@ void train::PLDABaseTrainer::initSigma(mach::PLDABaseMachine& machine,
   double eps = std::numeric_limits<double>::epsilon(); // Sigma should be invertible...
 
   // 1: percentage of the variance of G
-  if(m_initSigma_method==1) {
+  if(m_initSigma_method==bob::trainer::PLDABaseTrainer::VARIANCE_G) {
     blitz::Array<double,2>& G = machine.updateG();
     blitz::secondIndex bj;
     m_cache_D_1 = blitz::mean(G, bj);
@@ -419,11 +430,11 @@ void train::PLDABaseTrainer::initSigma(mach::PLDABaseMachine& machine,
     sigma = blitz::fabs(m_cache_D_1) * m_initSigma_ratio + eps;
   }
   // 2: constant value
-  else if(m_initSigma_method==2) {
+  else if(m_initSigma_method==bob::trainer::PLDABaseTrainer::CONSTANT) {
     sigma = m_initSigma_ratio;
   }
   // 3: percentage of the variance of the data
-  else if(m_initSigma_method==3) {
+  else if(m_initSigma_method==bob::trainer::PLDABaseTrainer::VARIANCE_DATA) {
     // a/ Computes the global mean
     //    m_cache_D_1 = 1/N sum_i x_i
     m_cache_D_1 = 0.;
@@ -457,42 +468,11 @@ void train::PLDABaseTrainer::initSigma(mach::PLDABaseMachine& machine,
     for(int j=0; j<sigma.extent(0); ++j)
       sigma(j) = fabs(die_n()) * m_initSigma_ratio + eps;
   }
-
+  // Apply variance threshold
+  machine.applyVarianceThresholds();
 }
 
-void train::PLDABaseTrainer::initRandomFGSigma(mach::PLDABaseMachine& machine)
-{
-  // Initializes the random number generator
-  boost::mt19937 rng;
-  if(m_seed != -1)
-    rng.seed((uint32_t)m_seed);
-  boost::normal_distribution<> range_n;
-  boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > 
-    die_n(rng, range_n);
-    
-  double ratio = 1.; // TODO: check if a ratio is required
-  // F initialization
-  blitz::Array<double,2>& F = machine.updateF();
-  for(int j=0; j<F.extent(0); ++j)
-    for(int i=0; i<F.extent(1); ++i)
-      F(j,i) = die_n() * ratio;
-  // G initialization
-  blitz::Array<double,2>& G = machine.updateG();
-  for(int j=0; j<G.extent(0); ++j)
-    for(int i=0; i<G.extent(1); ++i)
-      G(j,i) = die_n() * ratio;
-  // sigma2 initialization
-  blitz::Array<double,1>& sigma = machine.updateSigma();
-  double eps = std::numeric_limits<double>::epsilon(); // Sigma should be invertible...
-  for(int j=0; j<sigma.extent(0); ++j)
-    sigma(j) = fabs(die_n()) * ratio + eps;
-
-  // Precompute values
-  machine.precompute();
-}
-
-
-void train::PLDABaseTrainer::eStep(mach::PLDABaseMachine& machine, 
+void bob::trainer::PLDABaseTrainer::eStep(bob::machine::PLDABaseMachine& machine, 
   const std::vector<blitz::Array<double,2> >& v_ar)
 {  
   // Precomputes useful variables using current estimates of F,G, and sigma
@@ -527,7 +507,7 @@ void train::PLDABaseTrainer::eStep(mach::PLDABaseMachine& machine,
       m_cache_nf_1 += m_cache_nf_2;
     }
     const blitz::Array<double,2>& gamma_a = machine.getAddGamma(v_ar[i].extent(0));
-    blitz::Range r_hi(0, m_nf-1);
+    blitz::Range r_hi(0, (int)m_dim_f-1);
     // m_cache_nf_2 = E(h_i) = gamma_A  sum_j F^T.beta.(x_sj-mu)
     bob::math::prod(gamma_a, m_cache_nf_1, m_cache_nf_2);
 
@@ -541,8 +521,8 @@ void train::PLDABaseTrainer::eStep(mach::PLDABaseMachine& machine,
     blitz::Array<double,2> iotat_a = iota_a.transpose(1,0);
 
     // Extracts statistics of z_ij = [h_i w_ij] from y_i = [h_i w_i1 ... w_iJ]
-    blitz::Range r1(0, m_nf-1);
-    blitz::Range r2(m_nf, m_nf+m_ng-1);
+    blitz::Range r1(0, (int)m_dim_f-1);
+    blitz::Range r2((int)m_dim_f, (int)m_dim_f+(int)m_dim_g-1);
     for(int j=0; j<v_ar[i].extent(0); ++j)
     {
       // 1/ First order statistics of z
@@ -557,25 +537,44 @@ void train::PLDABaseTrainer::eStep(mach::PLDABaseMachine& machine,
       bob::math::prod(alpha, m_cache_ng_1, z_first_order_ij_2); 
 
       // 2/ Second order statistics of z
-      blitz::Array<double,2> z_so_11 = m_sum_z_second_order(r1,r1);
-      z_so_11 += gamma_a + z_first_order_ij_1(bi) * z_first_order_ij_1(bj);
-      blitz::Array<double,2> z_so_12 = m_sum_z_second_order(r1,r2);
-      z_so_12 += iota_a + z_first_order_ij_1(bi) * z_first_order_ij_2(bj);
-      blitz::Array<double,2> z_so_21 = m_sum_z_second_order(r2,r1);
-      z_so_21 += iotat_a + z_first_order_ij_2(bi) * z_first_order_ij_1(bj);
-      blitz::Array<double,2> z_so_22 = m_sum_z_second_order(r2,r2);
-      z_so_22 += zeta_a + z_first_order_ij_2(bi) * z_first_order_ij_2(bj);
+      blitz::Array<double,2> z_sum_so_11 = m_sum_z_second_order(r1,r1);
+      blitz::Array<double,2> z_sum_so_12 = m_sum_z_second_order(r1,r2);
+      blitz::Array<double,2> z_sum_so_21 = m_sum_z_second_order(r2,r1);
+      blitz::Array<double,2> z_sum_so_22 = m_sum_z_second_order(r2,r2);
+      if(m_use_sum_second_order)
+      {
+        z_sum_so_11 += gamma_a + z_first_order_ij_1(bi) * z_first_order_ij_1(bj);
+        z_sum_so_12 += iota_a + z_first_order_ij_1(bi) * z_first_order_ij_2(bj);
+        z_sum_so_21 += iotat_a + z_first_order_ij_2(bi) * z_first_order_ij_1(bj);
+        z_sum_so_22 += zeta_a + z_first_order_ij_2(bi) * z_first_order_ij_2(bj);
+      }
+      else
+      {
+        blitz::Array<double,2> z_so_11 = m_z_second_order[i](j,r1,r1);
+        z_so_11 = gamma_a + z_first_order_ij_1(bi) * z_first_order_ij_1(bj);
+        z_sum_so_11 += z_so_11;
+        blitz::Array<double,2> z_so_12 = m_z_second_order[i](j,r1,r2);
+        z_so_12 = iota_a + z_first_order_ij_1(bi) * z_first_order_ij_2(bj);
+        z_sum_so_12 += z_so_12;
+        blitz::Array<double,2> z_so_21 = m_z_second_order[i](j,r2,r1);
+        z_so_21 = iotat_a + z_first_order_ij_2(bi) * z_first_order_ij_1(bj);
+        z_sum_so_21 += z_so_21;
+        blitz::Array<double,2> z_so_22 = m_z_second_order[i](j,r2,r2);
+        z_so_22 = zeta_a + z_first_order_ij_2(bi) * z_first_order_ij_2(bj);
+        z_sum_so_22 += z_so_22;
+      }
     }
   }
 }
 
-void train::PLDABaseTrainer::precomputeFromFGSigma(mach::PLDABaseMachine& machine)
+void bob::trainer::PLDABaseTrainer::precomputeFromFGSigma(bob::machine::PLDABaseMachine& machine)
 {
-  // non const because of transpose() (compability with old blitz versions)  
-  blitz::Array<double,2>& F = machine.updateF();
-  blitz::Array<double,2> Ft = F.transpose(1,0);
-  blitz::Array<double,2>& Gt_isigma = machine.updateGtISigma();
-  blitz::Array<double,2> Gt_isigma_t = Gt_isigma.transpose(1,0);
+  // Blitz compatibility: ugly fix (const_cast, as old blitz version does not  
+  // provide a non-const version of transpose()) 
+  const blitz::Array<double,2>& F = machine.getF();
+  const blitz::Array<double,2> Ft = const_cast<blitz::Array<double,2>&>(F).transpose(1,0);
+  const blitz::Array<double,2>& Gt_isigma = machine.getGtISigma();
+  const blitz::Array<double,2> Gt_isigma_t = const_cast<blitz::Array<double,2>&>(Gt_isigma).transpose(1,0);
   const blitz::Array<double,2>& alpha = machine.getAlpha();
 
   // blitz indices
@@ -601,7 +600,7 @@ void train::PLDABaseTrainer::precomputeFromFGSigma(mach::PLDABaseMachine& machin
     // if not already done
     if(!it->second)
     {
-      blitz::Array<double,2>& gamma_a = machine.getAddGamma(n_i);
+      const blitz::Array<double,2>& gamma_a = machine.getAddGamma(n_i);
       blitz::Array<double,2>& zeta_a = m_zeta[n_i];
       blitz::Array<double,2>& iota_a = m_iota[n_i];
       bob::math::prod(gamma_a, m_eta, iota_a);
@@ -614,7 +613,7 @@ void train::PLDABaseTrainer::precomputeFromFGSigma(mach::PLDABaseMachine& machin
   }
 }
 
-void train::PLDABaseTrainer::precomputeLogLike(mach::PLDABaseMachine& machine, 
+void bob::trainer::PLDABaseTrainer::precomputeLogLike(bob::machine::PLDABaseMachine& machine, 
   const std::vector<blitz::Array<double,2> >& v_ar) 
 {
   // Precomputes the log determinant of alpha and sigma
@@ -632,7 +631,7 @@ void train::PLDABaseTrainer::precomputeLogLike(mach::PLDABaseMachine& machine,
 }
 
 
-void train::PLDABaseTrainer::mStep(mach::PLDABaseMachine& machine, 
+void bob::trainer::PLDABaseTrainer::mStep(bob::machine::PLDABaseMachine& machine, 
   const std::vector<blitz::Array<double,2> >& v_ar) 
 {
   // TODO: 0/ Add mean update rule as an option?
@@ -649,7 +648,7 @@ void train::PLDABaseTrainer::mStep(mach::PLDABaseMachine& machine,
   precomputeFromFGSigma(machine);
 }
 
-void train::PLDABaseTrainer::updateFG(mach::PLDABaseMachine& machine,
+void bob::trainer::PLDABaseTrainer::updateFG(bob::machine::PLDABaseMachine& machine,
   const std::vector<blitz::Array<double,2> >& v_ar)
 {
   /// Computes the B matrix (B = [F G])
@@ -686,11 +685,11 @@ void train::PLDABaseTrainer::updateFG(mach::PLDABaseMachine& machine,
   //       finalization()
   blitz::Array<double, 2>& F = machine.updateF();
   blitz::Array<double, 2>& G = machine.updateG();
-  F = m_B(blitz::Range::all(), blitz::Range(0,m_nf-1));
-  G = m_B(blitz::Range::all(), blitz::Range(m_nf,m_nf+m_ng-1));
+  F = m_B(blitz::Range::all(), blitz::Range(0,(int)m_dim_f-1));
+  G = m_B(blitz::Range::all(), blitz::Range((int)m_dim_f,(int)m_dim_f+(int)m_dim_g-1));
 }
 
-void train::PLDABaseTrainer::updateSigma(mach::PLDABaseMachine& machine,
+void bob::trainer::PLDABaseTrainer::updateSigma(bob::machine::PLDABaseMachine& machine,
   const std::vector<blitz::Array<double,2> >& v_ar)
 {
   /// Computes the Sigma matrix
@@ -724,9 +723,11 @@ void train::PLDABaseTrainer::updateSigma(mach::PLDABaseMachine& machine,
   }
   // Normalizes by the number of samples
   sigma /= static_cast<double>(n_IJ);
+  // Apply variance threshold
+  machine.applyVarianceThresholds();
 }
 
-double train::PLDABaseTrainer::computeLikelihood(mach::PLDABaseMachine& machine)
+double bob::trainer::PLDABaseTrainer::computeLikelihood(bob::machine::PLDABaseMachine& machine)
 {
   double llh = 0.;
   // TODO: implement log likelihood computation
@@ -734,60 +735,61 @@ double train::PLDABaseTrainer::computeLikelihood(mach::PLDABaseMachine& machine)
 }
 
 
-train::PLDATrainer::PLDATrainer(mach::PLDAMachine& plda_machine): 
-  m_plda_machine(plda_machine),
-  m_cache_D_1(plda_machine.getDimD()),
-  m_cache_D_2(plda_machine.getDimD()),
-  m_cache_nf_1(plda_machine.getDimF())
+bob::trainer::PLDATrainer::PLDATrainer(): 
+  m_cache_D_1(0),
+  m_cache_D_2(0),
+  m_cache_nf_1(0)
 {
 }
 
-train::PLDATrainer::PLDATrainer(const train::PLDATrainer& other):
-  m_plda_machine(other.m_plda_machine),
-  m_cache_D_1(tca::ccopy(other.m_cache_D_1)),
-  m_cache_D_2(tca::ccopy(other.m_cache_D_2)),
-  m_cache_nf_1(tca::ccopy(other.m_cache_nf_1))
+bob::trainer::PLDATrainer::PLDATrainer(const bob::trainer::PLDATrainer& other):
+  m_cache_D_1(bob::core::array::ccopy(other.m_cache_D_1)),
+  m_cache_D_2(bob::core::array::ccopy(other.m_cache_D_2)),
+  m_cache_nf_1(bob::core::array::ccopy(other.m_cache_nf_1))
 {
 }
 
-train::PLDATrainer::~PLDATrainer() {
+bob::trainer::PLDATrainer::~PLDATrainer() {
 }
 
-train::PLDATrainer& train::PLDATrainer::operator=
-(const train::PLDATrainer& other) 
+bob::trainer::PLDATrainer& bob::trainer::PLDATrainer::operator=
+(const bob::trainer::PLDATrainer& other) 
 {
-  m_plda_machine = other.m_plda_machine;
-  m_cache_D_1.reference(tca::ccopy(other.m_cache_D_1));
-  m_cache_D_2.reference(tca::ccopy(other.m_cache_D_2));
-  m_cache_nf_1.reference(tca::ccopy(other.m_cache_nf_1));
+  if(this!=&other)
+  {
+    m_cache_D_1.reference(bob::core::array::ccopy(other.m_cache_D_1));
+    m_cache_D_2.reference(bob::core::array::ccopy(other.m_cache_D_2));
+    m_cache_nf_1.reference(bob::core::array::ccopy(other.m_cache_nf_1));
+  }
   return *this;
 }
 
-
-void train::PLDATrainer::enrol(const blitz::Array<double,2>& ar)
+void bob::trainer::PLDATrainer::enrol(bob::machine::PLDAMachine& plda_machine,
+  const blitz::Array<double,2>& ar) const
 {
   // Checks Arrayset using the check function from the PLDABaseTrainer
   // Gets dimension (first Arrayset)
-  int n_features = ar.extent(1);
-  int n_samples = ar.extent(0);
-    
-  // TODO: Do a useful comparison against the dimensionality from the base 
-  // trainer/machine
-  if(ar.extent(1) != n_features)
-    throw bob::trainer::WrongNumberOfFeatures(ar.extent(1), n_features, 0);
+  size_t dim_d = ar.extent(1);
+  int n_samples = ar.extent(0);  
+  // Comparise the dimensionality from the base trainer/machine with the one
+  // of the enrollment samples
+  if(plda_machine.getDimD() != dim_d)
+    throw bob::trainer::WrongNumberOfFeatures(plda_machine.getDimD(), dim_d, 0);
+  size_t dim_f = plda_machine.getDimF();
+ 
+  // Resize working arrays
+  m_cache_D_1.resize(dim_d);
+  m_cache_D_2.resize(dim_d);
+  m_cache_nf_1.resize(dim_f);
 
   // Useful values from the base machine
-  blitz::Array<double, 1>& weighted_sum = m_plda_machine.updateWeightedSum();
-  const blitz::Array<double, 1>& mu = m_plda_machine.getPLDABase()->getMu();
-  const blitz::Array<double, 2>& beta = m_plda_machine.getPLDABase()->getBeta();
-  const blitz::Array<double, 2>& FtBeta = m_plda_machine.getPLDABase()->getFtBeta();
-
-  // Resizes the PLDA machine
-  m_plda_machine.resize(m_plda_machine.getDimD(), m_plda_machine.getDimF(), 
-    m_plda_machine.getDimG());
+  blitz::Array<double, 1>& weighted_sum = plda_machine.updateWeightedSum();
+  const blitz::Array<double, 1>& mu = plda_machine.getPLDABase()->getMu();
+  const blitz::Array<double, 2>& beta = plda_machine.getPLDABase()->getBeta();
+  const blitz::Array<double, 2>& FtBeta = plda_machine.getPLDABase()->getFtBeta();
 
   // Updates the PLDA machine
-  m_plda_machine.setNSamples(n_samples);
+  plda_machine.setNSamples(n_samples);
   double terma = 0.;
   weighted_sum = 0.;
   blitz::Range a = blitz::Range::all();
@@ -800,14 +802,14 @@ void train::PLDATrainer::enrol(const blitz::Array<double,2>& ar)
     bob::math::prod(beta, m_cache_D_1, m_cache_D_2);
     terma += -1 / 2. * blitz::sum(m_cache_D_1 * m_cache_D_2);
   }
-  m_plda_machine.setWSumXitBetaXi(terma);
+  plda_machine.setWSumXitBetaXi(terma);
 
   // Adds the precomputed values for the cases N and N+1 if not already 
   // in the base machine (used by the forward function, 1 already added)
-  m_plda_machine.getAddGamma(n_samples);
-  m_plda_machine.getAddLogLikeConstTerm(n_samples);
-  m_plda_machine.getAddGamma(n_samples+1);
-  m_plda_machine.getAddLogLikeConstTerm(n_samples+1);
-  m_plda_machine.setLogLikelihood(m_plda_machine.computeLikelihood(
-                                    blitz::Array<double,2>(0,0),true));
+  plda_machine.getAddGamma(n_samples);
+  plda_machine.getAddLogLikeConstTerm(n_samples);
+  plda_machine.getAddGamma(n_samples+1);
+  plda_machine.getAddLogLikeConstTerm(n_samples+1);
+  plda_machine.setLogLikelihood(plda_machine.computeLogLikelihood(
+                                  blitz::Array<double,2>(0,dim_d),true));
 }

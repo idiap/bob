@@ -29,6 +29,212 @@ import numpy
 def equals(x, y, epsilon):
   return (abs(x - y) < epsilon).all()
 
+def compute_sufficient_statistics_given_observations(observations, machine):
+  """
+  We compute the expected values of the latent variables given the observations 
+  and parameters of the model.
+  
+  The observations are assumed to be of dimension (J_i, D_x), where J_i is the number
+  of observations for this identity "i" and D_x is the dimensions of the feature 
+  space.
+  
+  First order or the expected value of the latent variables.:
+    F = (I+A^{T}\Sigma'^{-1}A)^{-1} * A^{T}\Sigma^{-1} (\tilde{x}_{s}-\mu').
+    
+    - We break this up into separate parts of h_i part and w_ij parts for each
+    observation; they will have the same h_i but different w_ij's.
+    
+  Second order stats:
+    S = (I+A^{T}\Sigma'^{-1}A)^{-1} + (F*F^{T}).
+
+    - We break this up into separate parts of for each separate observation w_ij.
+          
+  The observations matrix is of size:
+    (J_i, D_x)
+  """
+
+  # Get the number of observations 
+  J_i                       = observations.shape[0];                  # An integer > 0
+  # Useful values
+  mu                        = machine.mu
+  F                         = machine.f
+  G                         = machine.g
+  sigma                     = machine.sigma
+  isigma                    = machine.__isigma__
+  alpha                     = machine.__alpha__
+  ft_beta                   = machine.__ft_beta__
+  gamma                     = machine.get_add_gamma(J_i)
+  # Normalise the observations
+  normalised_observations   = observations - numpy.tile(mu, [J_i,1]); # (D_x, J_i)
+
+  ### Expected value of the latent variables using the scalable solution
+  # Identity part first
+  dim_d                     = observations.shape[1]             # A scalar
+  dim_f                     = F.shape[1]
+  dim_g                     = G.shape[1]
+  sum_ft_beta_part          = numpy.zeros((dim_f,1));         # (nf, 1)
+  for j in range(0, J_i):
+    current_observation     = numpy.reshape(normalised_observations[j,:], (dim_d, 1));    # (D_x, 1)
+    sum_ft_beta_part        = sum_ft_beta_part + numpy.dot(ft_beta, current_observation); # (nf, 1)
+  h_i                       = numpy.dot(gamma, sum_ft_beta_part);                         # (nf, 1)
+  # Reproject the identity part to work out the session parts
+  Fh_i                      = numpy.dot(F, h_i);                                          # (D_x, 1)
+  F_stats = numpy.zeros((J_i, dim_f+dim_g, 1));
+  for j in range(0, J_i):
+    current_observation         = numpy.reshape(normalised_observations[j,:], (dim_d, 1));   # (D_x, 1)
+    w_ij                        = numpy.dot(alpha, G.transpose());      # (ng, D_x)
+    w_ij                        = numpy.multiply(w_ij, isigma);         # (ng, D_x)
+    w_ij                        = numpy.dot(w_ij, (current_observation - Fh_i));                # (ng, 1)
+    F_stats[j,:,:]              = numpy.vstack([h_i,w_ij]);                                      # J_i of (nf+ng, 1)
+
+  ### Calculate the expected value of the squared of the latent variables
+  # The constant matrix we use has the following parts: [top_left, top_right; bottom_left, bottom_right]
+  # P             = Inverse_I_plus_GTEG * G^T * Sigma^{-1} * F       (ng, nf)
+  # top_left      = gamma                                 (nf, nf)
+  # bottom_left   = top_right^T = P * gamma               (ng, nf)
+  # bottom_right  = Inverse_I_plus_GTEG - bottom_left * P^T          (ng, ng)
+  top_left                 = gamma;
+  P                        = numpy.dot(alpha, G.transpose());
+  P                        = numpy.dot(numpy.multiply(P,isigma.transpose()), F);
+  bottom_left              = -1 * numpy.dot(P, top_left);
+  top_right                = bottom_left.transpose();
+  bottom_right             = alpha -1 * numpy.dot(bottom_left, P.transpose());
+  constant_matrix          = numpy.bmat([[top_left,top_right],[bottom_left, bottom_right]]);
+
+  # Now get the actual expected value
+  S_stats = numpy.zeros((J_i, dim_f+dim_g, dim_f+dim_g));
+  for j in range(0, J_i):
+    current_F              = F_stats[j,:,:]
+    current_S              = constant_matrix + numpy.dot(current_F,current_F.transpose());   # (nf+ng,nf+ng)
+    S_stats[j,:,:]         = current_S;                                                      # J_i of (nf+ng,nf+ng)
+
+  ### Return the first and second order statistics
+  return(F_stats, S_stats);
+
+
+def e_step(data, machine):
+  """ 
+  Performing the EStep of Prince and Elder. This obtains, from the LabelledDataset, the first and second
+  order statistics. They're returned as a dictionary indexed by the label (ID) of the sample, within this
+  they are then a list of, for:
+    - F a list of (1,nf+ng) vectors, and
+    - S a list of (nf+ng,nf+ng) matrices.
+  """
+  ### Find the size of the sub-spaces for convenience later on
+  dim_f                        = machine.dim_f;  # An integer > 0
+  dim_g                        = machine.dim_g;  # An integer > 0
+  
+  ################### EXPECTATION STEP (get the first and second order statistics)
+  ### Go through and process on a per subjectid basis (based on the labels we were given.
+  F_stats                   = {};  # A dictionary with I entries, for entry i=[1...I] there are J_i observations
+  S_stats                   = {};  # A dictionary with I entries, for entry i=[1...I] there are J_i observations
+  observations_for_h_i      = {};  # A dictionary with I entries, for entry i=[1...I] there are J_i observations
+  for i in range(len(data)):
+    ### Get the observations for this label and the number of observations for this label.
+    observations_for_h_i      = data[i]
+    J_i                       = observations_for_h_i.shape[0];                           # An integer > 0
+  
+    ### Gather the statistics for this identity and then separate them for each observation.
+    [F_stats_, S_stats_]      = compute_sufficient_statistics_given_observations(observations_for_h_i, machine);
+    F_stats[i]                = F_stats_;
+    S_stats[i]                = S_stats_;
+ 
+  # sum of the second order stats
+  S_stats_sum = numpy.zeros((dim_f+dim_g,dim_f+dim_g))
+  for i in range(len(S_stats)):
+    J_i = len(S_stats[i])
+    for j in range(0, J_i):
+      S_stats_sum = S_stats_sum + S_stats[i][j]
+
+  ### Return the set of statistics
+  return (F_stats, S_stats, S_stats_sum);
+
+
+def update_f_and_g(data, machine, F_stats, S_stats_sum):
+  """
+  This is the way of updating the B matrix (containing F and G) using the update rule
+  provided by Prince and Elder. It will update the internal parameters F and G of the 
+  model.
+  """
+
+  ### Initialise the numerator and the denominator.
+  dim_d                          = machine.dim_d
+  dim_f                          = machine.dim_f
+  dim_g                          = machine.dim_g
+  accumulated_B_numerator        = numpy.zeros((dim_d,dim_f+dim_g));
+  accumulated_B_denominator      = numpy.linalg.inv(S_stats_sum)
+  mu                             = machine.mu
+
+  ### Go through and process on a per subjectid basis
+  for i in range(len(data)):
+    # Normalise the observations
+    J_i                       = data[i].shape[0]
+    normalised_observations   = data[i] - numpy.tile(mu, [J_i,1]); # (J_i, dim_d)
+
+    ### Gather the statistics for this label
+    F_list                    = F_stats[i];   # List of (1,nf+ng) vectors
+    #S_list                    = S_stats[current_label];   # List of (nf+ng,nf+ng) matrices
+
+    ### Accumulate for the B matrix for this identity (current_label).
+    for j in range(0, J_i):
+      current_observation_for_h_i   = numpy.reshape(normalised_observations[j,:],(dim_d,1));   # (dim_d, 1)
+      accumulated_B_numerator       = accumulated_B_numerator + numpy.dot(current_observation_for_h_i, F_list[j].transpose());  # (dim_d, dim_f+dim_g);
+
+  ### Update the B matrix which we can then use this to update the F and G matrices.
+  B                                  = numpy.dot(accumulated_B_numerator,accumulated_B_denominator);
+  F                                  = B[:,0:dim_f].copy();
+  G                                  = B[:,dim_f:dim_f+dim_g].copy();
+  return (F, G);   # Return everything because normally we have to paste together G anyway.
+
+
+def update_sigma(data, machine, F_stats):
+  """
+  This function goes through and updates the value for Sigma based on the update
+  rule provided by Prince and Elder.
+  
+  It returns the updated Sigma.
+  """
+
+  ### Initialise the accumulated Sigma
+  dim_d                          = machine.dim_d
+  mu                             = machine.mu
+  accumulated_sigma              = numpy.zeros((dim_d,1));                        # An array (D_x, 1)
+  number_of_observations         = 0
+  B = numpy.hstack([machine.f, machine.g])
+
+  ### Go through and process on a per subjectid basis (based on the labels we were given.
+  for i in range(len(data)):
+    # Normalise the observations
+    J_i                       = data[i].shape[0]
+    normalised_observations   = data[i] - numpy.tile(mu, [J_i,1]); # (J_i, dim_d)
+
+    ### Gather the statistics for this identity and then separate them for each
+    ### observation.
+    F_stats_i                 = F_stats[i];
+
+    ### Accumulate for the sigma matrix, which will be diagonalised
+    for j in range(0, J_i):
+      current_observation_for_h_i   = numpy.reshape(normalised_observations[j,:],(dim_d,1));         # (dim_d, 1)
+      left                          = current_observation_for_h_i * current_observation_for_h_i;   # (dim_d, 1)
+      projected_direction           = numpy.dot(B, F_stats_i[j,:,:]);                                     # (dim_d, 1)       
+      right                         = projected_direction * current_observation_for_h_i;           # (dim_d, 1)
+      accumulated_sigma             = accumulated_sigma + (left - right);                          # (dim_d, 1)
+      number_of_observations        = number_of_observations + 1
+
+  ### Normalise by the number of observations (1/IJ)
+  sigma                              = accumulated_sigma / number_of_observations;
+
+  return sigma;
+
+def m_step(data, machine, F_stats, S_stats_sum):
+  m = bob.machine.PLDABaseMachine(machine)
+  [F,G] = update_f_and_g(data, m, F_stats, S_stats_sum)
+  m.f = F
+  m.g = G
+  sigma = update_sigma(data, machine, F_stats)
+  return (F, G, sigma)
+
+
 class PLDATrainerTest(unittest.TestCase):
   """Performs various PLDA trainer tests."""
   
@@ -167,8 +373,8 @@ class PLDATrainerTest(unittest.TestCase):
 
     # Runs the PLDA trainer EM-steps (2 steps)
     # Defines base trainer and machine
-    t = bob.trainer.PLDABaseTrainer(nf,ng)
-    # TODO: constructor without argument
+    t = bob.trainer.PLDABaseTrainer()
+    t0 = bob.trainer.PLDABaseTrainer(t)
     m = bob.machine.PLDABaseMachine(D,nf,ng)
 
     # Calls the initialization methods and resets randomly initialized values
@@ -180,32 +386,94 @@ class PLDATrainerTest(unittest.TestCase):
 
     # E-step 1
     t.e_step(m,l)
+    [F_stats, S_stats, S_stats_sum] = e_step(l, m)
     # Compares statistics to Prince matlab reference
     self.assertTrue(equals(t.z_first_order[0], z_first_order_a_1, 1e-10))
     self.assertTrue(equals(t.z_first_order[1], z_first_order_b_1, 1e-10))
     self.assertTrue(equals(t.z_second_order_sum, z_second_order_sum_1, 1e-10))
+    # Compares statistics against the ones of the python implementation
+    self.assertTrue(equals(t.z_first_order[0], F_stats[0][:,:,0], 1e-10))
+    self.assertTrue(equals(t.z_first_order[1], F_stats[1][:,:,0], 1e-10))
+    self.assertTrue(equals(t.z_second_order_sum, S_stats_sum, 1e-10))
 
     # M-step 1
     t.m_step(m,l)
+    [F, G, sigma] = m_step(l, m, F_stats, S_stats_sum)
     # Compares F, G and sigma to Prince matlab reference
     self.assertTrue(equals(m.f, F_1, 1e-10))
     self.assertTrue(equals(m.g, G_1, 1e-10))
     self.assertTrue(equals(m.sigma, sigma_1, 1e-10))
+    # Compares F, G and sigma to the ones of the python implementation
+    self.assertTrue(equals(m.f, F, 1e-10))
+    self.assertTrue(equals(m.g, G, 1e-10))
+    self.assertTrue(equals(m.sigma, sigma[:,0], 1e-10))
 
     # E-step 2
     t.e_step(m,l)
+    [F_stats, S_stats, S_stats_sum] = e_step(l, m)
     # Compares statistics to Prince matlab reference
     self.assertTrue(equals(t.z_first_order[0], z_first_order_a_2, 1e-10))
     self.assertTrue(equals(t.z_first_order[1], z_first_order_b_2, 1e-10))
     self.assertTrue(equals(t.z_second_order_sum, z_second_order_sum_2, 1e-10))
+    # Compares statistics against the ones of the python implementation
+    self.assertTrue(equals(t.z_first_order[0], F_stats[0][:,:,0], 1e-10))
+    self.assertTrue(equals(t.z_first_order[1], F_stats[1][:,:,0], 1e-10))
+    self.assertTrue(equals(t.z_second_order_sum, S_stats_sum, 1e-10))
 
     # M-step 2
     t.m_step(m,l)
+    [F, G, sigma] = m_step(l, m, F_stats, S_stats_sum)
     # Compares F, G and sigma to Prince matlab reference
     self.assertTrue(equals(m.f, F_2, 1e-10))
     self.assertTrue(equals(m.g, G_2, 1e-10))
     self.assertTrue(equals(m.sigma, sigma_2, 1e-10))
+    # Compares F, G and sigma to the ones of the python implementation
+    self.assertTrue(equals(m.f, F, 1e-10))
+    self.assertTrue(equals(m.g, G, 1e-10))
+    self.assertTrue(equals(m.sigma, sigma[:,0], 1e-10))
 
+    # Test the second order statistics computation
+    # Calls the initialization methods and resets randomly initialized values
+    # to new reference ones (to make the tests deterministic)
+    t.use_sum_second_order = False
+    t.initialization(m,l)
+    m.sigma = sigma_init
+    m.g = G_init
+    m.f = F_init
+
+    # E-step 1
+    t.e_step(m,l)
+    [F_stats, S_stats, S_stats_sum] = e_step(l, m)
+    # Compares statistics against the ones of the python implementation
+    self.assertTrue(equals(t.z_first_order[0], F_stats[0][:,:,0], 1e-10))
+    self.assertTrue(equals(t.z_first_order[1], F_stats[1][:,:,0], 1e-10))
+    self.assertTrue(equals(t.z_second_order[0], S_stats[0][:,:,:], 1e-10))
+    self.assertTrue(equals(t.z_second_order[1], S_stats[1][:,:,:], 1e-10))
+
+    # M-step 1
+    t.m_step(m,l)
+    [F, G, sigma] = m_step(l, m, F_stats, S_stats_sum)
+    # Compares F, G and sigma to the ones of the python implementation
+    self.assertTrue(equals(m.f, F, 1e-10))
+    self.assertTrue(equals(m.g, G, 1e-10))
+    self.assertTrue(equals(m.sigma, sigma[:,0], 1e-10))
+
+    # E-step 2
+    t.e_step(m,l)
+    [F_stats, S_stats, S_stats_sum] = e_step(l, m)
+    # Compares statistics against the ones of the python implementation
+    self.assertTrue(equals(t.z_first_order[0], F_stats[0][:,:,0], 1e-10))
+    self.assertTrue(equals(t.z_first_order[1], F_stats[1][:,:,0], 1e-10))
+    self.assertTrue(equals(t.z_second_order[0], S_stats[0][:,:,:], 1e-10))
+    self.assertTrue(equals(t.z_second_order[1], S_stats[1][:,:,:], 1e-10))
+
+    # M-step 2
+    t.m_step(m,l)
+    [F, G, sigma] = m_step(l, m, F_stats, S_stats_sum)
+    # Compares F, G and sigma to the ones of the python implementation
+    self.assertTrue(equals(m.f, F, 1e-10))
+    self.assertTrue(equals(m.g, G, 1e-10))
+    self.assertTrue(equals(m.sigma, sigma[:,0], 1e-10))
 
   def test02_plda_likelihood(self):
     # Data used for performing the tests
@@ -259,7 +527,7 @@ class PLDATrainerTest(unittest.TestCase):
 
     # machine
     m = bob.machine.PLDAMachine(mb)
-    ll = m.compute_likelihood(X)
+    ll = m.compute_log_likelihood(X)
     self.assertTrue(abs(ll - ll_ref) < 1e-10)
 
     # log likelihood ratio
@@ -268,9 +536,9 @@ class PLDATrainerTest(unittest.TestCase):
     Y[1,:] = x2
     Z = numpy.ndarray((1,D), 'float64')
     Z[0,:] = x3
-    llX = m.compute_likelihood(X)
-    llY = m.compute_likelihood(Y)
-    llZ = m.compute_likelihood(Z)
+    llX = m.compute_log_likelihood(X)
+    llY = m.compute_log_likelihood(Y)
+    llZ = m.compute_log_likelihood(Z)
     # reference obtained by computing the likelihood of [x1,x2,x3], [x1,x2] 
     # and [x3] separately
     llr_ref = -4.43695386675
@@ -325,9 +593,9 @@ class PLDATrainerTest(unittest.TestCase):
     # Computes the likelihood using x1 and x2 as enrollment samples
     # and x3 as a probe sample
     m = bob.machine.PLDAMachine(mb)
-    t = bob.trainer.PLDATrainer(m)
-    t.enrol(a_enrol)
-    ll = m.compute_likelihood(x3)
+    t = bob.trainer.PLDATrainer()
+    t.enrol(m, a_enrol)
+    ll = m.compute_log_likelihood(x3)
     self.assertTrue(abs(ll - ll_ref) < 1e-10)
 
     # reference obtained by computing the likelihood of [x1,x2,x3], [x1,x2] 
@@ -335,3 +603,8 @@ class PLDATrainerTest(unittest.TestCase):
     llr_ref = -4.43695386675
     llr = m.forward(x3)
     self.assertTrue(abs(llr - llr_ref) < 1e-10)
+    #
+    llr_separate = m.compute_log_likelihood(numpy.array([x1,x2,x3]), False) - \
+      (m.compute_log_likelihood(numpy.array([x1,x2]), False) + m.compute_log_likelihood(numpy.array([x3]), False))
+    self.assertTrue(abs(llr - llr_separate) < 1e-10)
+    
