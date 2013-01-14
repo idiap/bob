@@ -34,13 +34,16 @@ bob::ap::Ceps::Ceps( double sampling_frequency, double win_length_ms, double win
   m_delta_win(delta_win), m_pre_emphasis_coeff(pre_emphasis_coeff),
   m_mel_scale(mel_scale), m_dct_norm(dct_norm),
   m_with_energy(true), m_with_delta(true), m_with_delta_delta(true),
-  m_filter_bank(), m_fft(1)
+  m_energy_floor(1.), m_fb_out_floor(1.), m_fft(1)
 {
   initWinLength();
   initWinShift();
 
-  m_filters.resize(m_n_filters);
+  // Initializes logarithm of flooring values
+  m_log_energy_floor = log(m_energy_floor);
+  m_log_fb_out_floor = log(m_fb_out_floor);
 
+  m_cache_filters.resize(m_n_filters);
   initCacheDctKernel();
 }
 
@@ -70,7 +73,7 @@ void bob::ap::Ceps::setWinShiftMs(double win_shift_ms)
 void bob::ap::Ceps::setNFilters(size_t n_filters)
 { 
   m_n_filters = n_filters; 
-  m_filters.resize(m_n_filters); 
+  m_cache_filters.resize(m_n_filters); 
   initCacheFilterBank(); 
   initCacheDctKernel(); 
 }
@@ -132,10 +135,10 @@ void bob::ap::Ceps::initWinShift()
 void bob::ap::Ceps::initWinSize()
 {
   m_win_size = (size_t)pow(2.0,ceil(log((double)m_win_length)/log(2)));
-  m_cache_frame.resize(m_win_size);
+  m_cache_frame_d.resize(m_win_size);
   m_fft.reset(m_win_size);
-  m_cache_complex1.resize(m_win_size);
-  m_cache_complex2.resize(m_win_size);
+  m_cache_frame_c1.resize(m_win_size);
+  m_cache_frame_c2.resize(m_win_size);
 }
 
 void bob::ap::Ceps::initCacheHammingKernel()
@@ -262,26 +265,26 @@ void bob::ap::Ceps::operator()(const blitz::Array<double,1>& input,
   for(int i=0; i<n_frames; ++i) 
   {
     // Set padded frame to zero
-    m_cache_frame = 0.;
+    m_cache_frame_d = 0.;
     // Extract frame input vector
     blitz::Range ri(i*(int)m_win_shift,i*(int)m_win_shift+(int)m_win_length-1);
-    m_cache_frame(rf) = input(ri);
+    m_cache_frame_d(rf) = input(ri);
     // Substract mean value
-    m_cache_frame -= blitz::mean(m_cache_frame);
+    m_cache_frame_d -= blitz::mean(m_cache_frame_d);
 
     // Update output with energy if required
     if(m_with_energy)
-      ceps_matrix(i,(int)m_n_ceps) = logEnergy(m_cache_frame);
+      ceps_matrix(i,(int)m_n_ceps) = logEnergy(m_cache_frame_d);
 
     // Apply pre-emphasis
-    pre_emphasis(m_cache_frame);
+    pre_emphasis(m_cache_frame_d);
     // Apply the Hamming window
-    hammingWindow(m_cache_frame);
+    hammingWindow(m_cache_frame_d);
     // Filter with the triangular filter bank (either in linear or Mel domain)
-    logFilterBank(m_cache_frame);
+    logFilterBank(m_cache_frame_d);
     // Apply DCT kernel and update the output 
     blitz::Array<double,1> ceps_matrix_row(ceps_matrix(i,r1));
-    transformDCT(ceps_matrix_row);
+    applyDct(ceps_matrix_row);
   }
 
   blitz::Range rall = blitz::Range::all();
@@ -302,7 +305,7 @@ void bob::ap::Ceps::operator()(const blitz::Array<double,1>& input,
   }
 }
 
-void bob::ap::Ceps::pre_emphasis(blitz::Array<double,1> &data)
+void bob::ap::Ceps::pre_emphasis(blitz::Array<double,1> &data) const
 {
   if(m_pre_emphasis_coeff!=0.)
   { 
@@ -315,7 +318,7 @@ void bob::ap::Ceps::pre_emphasis(blitz::Array<double,1> &data)
   }
 }
 
-void bob::ap::Ceps::hammingWindow(blitz::Array<double,1> &data)
+void bob::ap::Ceps::hammingWindow(blitz::Array<double,1> &data) const
 {
   blitz::Range r(0,(int)m_win_length-1);
   data(r) *= m_hamming_kernel;
@@ -324,46 +327,44 @@ void bob::ap::Ceps::hammingWindow(blitz::Array<double,1> &data)
 void bob::ap::Ceps::logFilterBank(blitz::Array<double,1>& x)
 {
   // Apply the FFT
-  m_cache_complex1 = bob::core::cast<std::complex<double> >(x);
-  m_fft(m_cache_complex1, m_cache_complex2);
+  m_cache_frame_c1 = bob::core::cast<std::complex<double> >(x);
+  m_fft(m_cache_frame_c1, m_cache_frame_c2);
 
   // Take the the power spectrum of the first part of the output of the FFT
   blitz::Range r(0,(int)m_win_size/2);
   blitz::Array<double,1> x_half(x(r));
-  blitz::Array<std::complex<double>,1> complex_half(m_cache_complex2(r));
+  blitz::Array<std::complex<double>,1> complex_half(m_cache_frame_c2(r));
   x_half = blitz::abs(complex_half);
 
   // Apply the Triangular filter bank to this power spectrum
-  logTriangularFBank(x);
+  logTriangularFilterBank(x);
 }
 
-void bob::ap::Ceps::logTriangularFBank(blitz::Array<double,1>& data)
+void bob::ap::Ceps::logTriangularFilterBank(blitz::Array<double,1>& data) const
 {
   for(int i=0; i<(int)m_n_filters; ++i)
   {
     blitz::Array<double,1> data_slice(data(blitz::Range(m_p_index(i),m_p_index(i+2))));
     double res = blitz::sum(data_slice * m_filter_bank[i]);
-    m_filters(i)=(res < FBANK_OUT_FLOOR)?(double)log(FBANK_OUT_FLOOR):(double)log(res);
+    m_cache_filters(i)= (res < m_fb_out_floor ? m_log_fb_out_floor : log(res));
   }
 }
 
-double bob::ap::Ceps::logEnergy(blitz::Array<double,1> &data)
+double bob::ap::Ceps::logEnergy(blitz::Array<double,1> &data) const
 {
   blitz::Array<double,1> data_p(data(blitz::Range(0,(int)m_win_length-1)));
   double gain = blitz::sum(blitz::pow2(data_p));
-  gain = gain < ENERGY_FLOOR ?
-      (double)(log(ENERGY_FLOOR)) : (double)(log(gain));
-  return (gain);
+  return (gain < m_energy_floor ? m_log_energy_floor : log(gain)); 
 }
 
-void bob::ap::Ceps::transformDCT(blitz::Array<double,1>& ceps_row)
+void bob::ap::Ceps::applyDct(blitz::Array<double,1>& ceps_row) const
 {
   blitz::firstIndex i;
   blitz::secondIndex j;
-  ceps_row = blitz::sum(m_filters(j) * m_dct_kernel(i,j), j);
+  ceps_row = blitz::sum(m_cache_filters(j) * m_dct_kernel(i,j), j);
 }
 
-void bob::ap::Ceps::addDerivative(const blitz::Array<double,2>& input, blitz::Array<double,2>& output)
+void bob::ap::Ceps::addDerivative(const blitz::Array<double,2>& input, blitz::Array<double,2>& output) const
 {
   // Initialize output to zero
   output = 0.;
