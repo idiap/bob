@@ -3,7 +3,7 @@
  * @date Tue Oct 25 23:25:46 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
- * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

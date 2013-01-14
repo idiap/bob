@@ -9,7 +9,7 @@
  *  in Proceedings of the IEEE International Conference on Image Processing, 
  *     October 2004, vol. 2, p. 1397-1400
  *
- * Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

@@ -2,7 +2,7 @@
 .. Andre Anjos <andre.anjos@idiap.ch>
 .. Fri 23 Mar 2012 11:41:00 CET 
 .. 
-.. Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
+.. Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
 .. 
 .. This program is free software: you can redistribute it and/or modify
 .. it under the terms of the GNU General Public License as published by
