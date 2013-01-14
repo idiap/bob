@@ -57,9 +57,10 @@ class Ceps
     /**
      * @brief Constructor: Initialize working arrays
      */
-    Ceps(double sf, int win_length_ms, int win_shift_ms, size_t n_filters, 
-      size_t n_ceps, double f_min, double f_max, double delta_win, 
-      double pre_emphasis_coef);
+    Ceps(double sf, double win_length_ms=20., double win_shift_ms=10., 
+      size_t n_filters=24, size_t n_ceps=19, double f_min=0., 
+      double f_max=4000., size_t delta_win=2, double pre_emphasis_coef=0.97, 
+      bool fb_linear=true, bool dct_norm=false); 
 
     /**
      * @brief Get the Cepstral Shape
@@ -70,7 +71,7 @@ class Ceps
     /**
      * @brief Compute Cepstral features
      */
-    void CepsAnalysis(const blitz::Array<double,1>& input, blitz::Array<double,2>& output);
+    void operator()(const blitz::Array<double,1>& input, blitz::Array<double,2>& output);
 
     /**
      * @brief Destructor
@@ -85,29 +86,23 @@ class Ceps
     /**
      * @brief Returns the window length in miliseconds
      */
-    inline int getWinLengthMs() const
+    inline double getWinLengthMs() const
     { return m_win_length_ms; }
     /**
      * @brief Returns the window length in number of samples
      */
-    inline int getWinLength() const
+    inline size_t getWinLength() const
     { return m_win_length; }
     /**
      * @brief Returns the window shift in miliseconds
      */
-    inline int getWinShiftMs() const
+    inline double getWinShiftMs() const
     { return m_win_shift_ms; }
     /**
      * @brief Returns the window shift in number of samples
      */
-    inline int getWinShift() const
+    inline size_t getWinShift() const
     { return m_win_shift; }
-    /**
-     * @brief Returns the window size in number of samples. This is equal to
-     * the next power of 2 integer larger or equal to the window length.
-     */
-    inline int getWinSize() const
-    { return m_win_size; }
     /**
      * @brief Returns the number of filters used in the filter bank.
      */
@@ -178,11 +173,11 @@ class Ceps
     /**
      * @brief Sets the window length in miliseconds
      */
-    void setWinLengthMs(int win_length_ms);
+    void setWinLengthMs(double win_length_ms);
     /**
      * @brief Sets the window shift in miliseconds
      */
-    void setWinShiftMs(int win_shift_ms);
+    void setWinShiftMs(double win_shift_ms);
     /**
      * @brief Sets the number of filters used in the filter bank.
      */
@@ -196,7 +191,7 @@ class Ceps
      * order derivatives
      */
     inline void setDeltaWin(size_t delta_win)
-    { m_delta_win = (int)delta_win; } 
+    { m_delta_win = delta_win; } 
     /**
      * @brief Sets the pre-emphasis coefficient. It should be a value in the 
      * range [0,1].
@@ -222,8 +217,7 @@ class Ceps
     /**
      * @brief Sets whether the DCT coefficients are normalized or not
      */
-    inline void setDctNorm(bool dct_norm)
-    { m_dct_norm = dct_norm; }
+    void setDctNorm(bool dct_norm);
     /**
      * @brief Sets whether the energy is added to the cepstral coefficients 
      * or not
@@ -251,11 +245,6 @@ class Ceps
      */
     void addDerivative(const blitz::Array<double,2>& input, blitz::Array<double,2>& output);
 
-    /**
-     * @brief Mean Normalisation of the features
-     */
-    blitz::Array<double,2> dataZeroMean(blitz::Array<double,2>& frames, bool norm_energy, int n_frames, int frame_size);
-
     static double mel(double f);
     static double melInv(double f);
     void pre_emphasis(blitz::Array<double,1> &data);
@@ -273,25 +262,23 @@ class Ceps
     void initCachePIndex();
     void initCacheFilters();
 
-    double m_sf;
-    int m_win_length_ms;
-    int m_win_length;
-    int m_win_shift_ms;
-    int m_win_shift;
-    int m_win_size;
+    double m_sf; ///< The sampling frequency
+    double m_win_length_ms; ///< The window length in miliseconds 
+    size_t m_win_length;
+    double m_win_shift_ms;
+    size_t m_win_shift;
+    size_t m_win_size;
     size_t m_n_filters;
     size_t m_n_ceps;
     double m_f_min;
     double m_f_max;
-    int m_delta_win;
+    size_t m_delta_win;
     double m_pre_emphasis_coeff;
     bool m_fb_linear;
     bool m_dct_norm;
     bool m_with_energy;
     bool m_with_delta;
     bool m_with_delta_delta;
-    bool m_with_delta_energy;
-    bool m_with_delta_delta_energy;
     blitz::Array<double,2> m_dct_kernel;
     blitz::Array<double,1> m_hamming_kernel;
     blitz::Array<double,1> m_filters;
@@ -321,16 +308,14 @@ class TestCeps
     { return m_ceps.getCepsShape(input); }
     blitz::Array<double,1> getFilter(void) { return m_ceps.m_filters; }
 
-    void CepsAnalysis(const blitz::Array<double,1>& input, blitz::Array<double,2>& ceps_2D)
-    { m_ceps.CepsAnalysis(input, ceps_2D);}
+    void operator()(const blitz::Array<double,1>& input, blitz::Array<double,2>& ceps_2D)
+    { m_ceps(input, ceps_2D);}
     void hammingWindow(blitz::Array<double,1>& data){ m_ceps.hammingWindow(data); }
     void pre_emphasis(blitz::Array<double,1>& data){ m_ceps.pre_emphasis(data); }
     void logFilterBank(blitz::Array<double,1>& x){ m_ceps.logFilterBank(x); }
     void logTriangularFBank(blitz::Array<double,1>& data){ m_ceps.logTriangularFBank(data); }
     double logEnergy(blitz::Array<double,1> &data){ return m_ceps.logEnergy(data); }
     void transformDCT(blitz::Array<double,1>& ceps_row) { m_ceps.transformDCT(ceps_row); }
-    blitz::Array<double,2> dataZeroMean(blitz::Array<double,2>& frames, bool norm_energy, int n_frames, int frame_size)
-    { return m_ceps.dataZeroMean(frames,norm_energy, n_frames, frame_size); }
 };
 
 }
