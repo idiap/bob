@@ -85,7 +85,7 @@ find_program(NOSETESTS_EXECUTABLE NAMES nosetests-${PYTHON_VERSION} nosetests
   )
 set(BOB_PYTHONPATH "${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES}")
 configure_file(bin/nosetests.in ${CMAKE_BINARY_DIR}/bin/nosetests @ONLY)
-add_custom_target(nosetests ${CMAKE_BINARY_DIR}/bin/nosetests -v bob)
+add_custom_target(nosetests ${CMAKE_BINARY_DIR}/bin/nosetests --with-insulate --insulate-skip-after-crash -v bob)
 add_dependencies(nosetests egg-scripts)
 
 # Documentation
