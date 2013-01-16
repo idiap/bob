@@ -475,8 +475,8 @@ class PLDAMachine
     PLDAMachine& operator=(const PLDAMachine &other);
 
     /**
-     * @brief Equal to.\n The two PLDAMachine's should have a pointer to the
-     * same PLDABaseMachine. Precomputed members such as \f$\gamma_a\f$'s 
+     * @brief Equal to.\n The two PLDAMachine's should have the same 
+     * PLDABaseMachine. Precomputed members such as \f$\gamma_a\f$'s 
      * are compared!
      */
     bool operator==(const PLDAMachine& b) const;

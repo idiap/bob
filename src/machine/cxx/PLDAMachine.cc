@@ -675,8 +675,8 @@ bob::machine::PLDAMachine& bob::machine::PLDAMachine::operator=
 bool bob::machine::PLDAMachine::operator==
     (const bob::machine::PLDAMachine& b) const
 {
-  // Check PLDABaseMachine pointer!
-  if(this->m_plda_base != b.m_plda_base)
+  // Check PLDABaseMachine 
+  if(*(this->m_plda_base) != *(b.m_plda_base))
     return false;
 
   // Check content

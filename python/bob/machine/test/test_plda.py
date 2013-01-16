@@ -422,6 +422,8 @@ class PLDAMachineTest(unittest.TestCase):
     m_loaded.plda_base = mb
 
     # Compares the values loaded with the former ones
+    self.assertTrue(m_loaded == m)
+    self.assertFalse(m_loaded != m)
     self.assertTrue(abs(m_loaded.n_samples - n_samples) < 1e-10)
     self.assertTrue(abs(m_loaded.w_sum_xit_beta_xi - WSumXitBetaXi) < 1e-10)
     self.assertTrue(equals(m_loaded.weighted_sum, weightedSum, 1e-10))
