@@ -1,3 +1,5 @@
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/f5ae22a59f9ad7fff9255dfa9d5308ec "githalytics.com")](http://githalytics.com/idiap/bob)
+
 Bob
 ===
 
