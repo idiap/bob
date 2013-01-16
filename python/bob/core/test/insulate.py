@@ -178,7 +178,7 @@ class TestWrapper(object):
         testMethod = getattr(self.orgtest, method_name)
 
         try:
-            status, (ev, tb) = self.plugin.runTestInSlave(self.orgtest)
+            status, (ev, tb), data = self.plugin.runTestInSlave(self.orgtest)
             if isinstance(ev, types.InstanceType):
                 et = ev.__class__
             else:
@@ -196,6 +196,9 @@ class TestWrapper(object):
 
             elif status == ResultCollector.ABORT:
                 result.addError(self.orgtest, exc_info)
+
+            elif status == ResultCollector.SKIP:
+                result.addSkip(self.orgtest, data['reason'])
 
             else:
                 raise RuntimeError('Protocol error in master/slave communications')
@@ -337,22 +340,18 @@ class TestSlave(object):
         except (EOFError, IOError, socket.error), e:
             _, _, tb = sys.exc_info()
             self.dropSlave()
-            return ResultCollector.ERROR, (e, tb)
+            return ResultCollector.ERROR, (e, tb), None
 
         try:
-            status, exc, (stdout, stderr), func_dict = self.readFromSlave()
-
-            if func_dict is not None:
-                orgtest.test.func_dict.update(func_dict)
-            
+            status, exc, (stdout, stderr), data = self.readFromSlave()
             sys.stdout.write(stdout)
             sys.stderr.write(stderr)
-            return status, exc
+            return status, exc, data
 
         except (EOFError, IOError, socket.error), e:
             _, _, tb = sys.exc_info()
             self.dropSlave()
-            return ResultCollector.ERROR, (CrashInTestError(), tb)
+            return ResultCollector.ERROR, (CrashInTestError(), tb), None
 
 class SkipAfterCrash(SkipTest):
     "After crash marker when using the --insulate-skip-after-crash flag"
@@ -469,7 +468,7 @@ class TestSlaveWrapper(object):
     def __call__(self, result):
         """
         Runs the test, pickling data and outputting it to
-        the master to retrive.
+        the master to retrieve.
 
         Arguments: result - where to put the results
         Returns:   None
@@ -503,19 +502,17 @@ class TestSlaveWrapper(object):
         orgstderr = sys.stderr
         stdout = sys.stdout = StringIO()
         stderr = sys.stderr = StringIO()
-        
+
+        # this call actually executes the test
         self.orgtest(res)
 
         sys.stdout = orgstdout
         sys.stderr = orgstderr
 
         data = None
-        func_dict = getattr(getattr(self.orgtest, 'test', None), 'func_dict', None)
-        if func_dict is not None:
-            if 'suiteId' in func_dict:	# This is an asgard test copy func_dict
-                data = func_dict.copy()
-                del data['suiteId']
-                
+        if res._status == ResultCollector.SKIP: #needs extra data
+          data = {'reason': res._reason}
+
         self.plugin.sendToMaster(res._status, res._exc_info,
                           (stdout.getvalue(), stderr.getvalue()), data)
 
@@ -527,6 +524,7 @@ class ResultCollector(object):
     FAILURE = 1		# Test failure
     ERROR = 2		# Test error
     ABORT = 3		# Error in master/slave protocol, test aborted
+    SKIP = 4    # Test was skipped, reason will be given
 
     def __init__(self, result):
         """
@@ -538,6 +536,7 @@ class ResultCollector(object):
         self._result = result
         self._status = None
         self._exc_info = (None, None)
+        self._reason = None
 
     def addSuccess(self, test):
         """
@@ -570,6 +569,18 @@ class ResultCollector(object):
         self._result.addError(test, exc_info)
         self._status = self.ERROR
         self._exc_info = exc_info[1], Traceback.make(exc_info[2])
+
+    def addSkip(self, test, reason):
+        """
+        Add skip status
+
+        Arguments: test - the test objective
+                   reason - the reason the test was skipped
+        Returns:   None
+        """
+        self._result.addSkip(test, reason)
+        self._status = self.SKIP
+        self._reason = reason
 
     def __getattr__(self, attr):
         """
