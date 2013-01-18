@@ -1,5 +1,5 @@
 /**
- * @file math/cxx/test/normv.cc
+ * @file math/cxx/test/norm.cc
  * @date Thu Jan 17 17:50:00 2013 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -21,7 +21,7 @@
  */
 
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE math-frobenius Tests
+#define BOOST_TEST_MODULE math-norm Tests
 #define BOOST_TEST_MAIN
 
 #include <boost/test/unit_test.hpp>
