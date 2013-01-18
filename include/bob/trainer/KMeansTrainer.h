@@ -23,6 +23,7 @@
 
 #include "bob/machine/KMeansMachine.h"
 #include "bob/trainer/EMTrainer.h"
+#include <boost/version.hpp>
 
 namespace bob {
 namespace trainer {
@@ -37,39 +38,53 @@ class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, blitz::Array<
 {
   public: 
     /**
-     * Constructor
+     * @brief This enumeration defines different initialization methods for
+     * K-means
+     */
+    typedef enum {
+      RANDOM=0,
+      RANDOM_NO_DUPLICATE
+#if BOOST_VERSION >= 104700
+      ,
+      KMEANS_PLUS_PLUS
+#endif
+    }   
+    InitializationMethod;
+
+    /**
+     * @brief Constructor
      */
     KMeansTrainer(double convergence_threshold=0.001, 
       size_t max_iterations=10, bool compute_likelihood=true, 
-      bool check_no_duplicate=false);
+      InitializationMethod=RANDOM);
     
     /**
-     * virtualize destructor
+     * @brief Virtualize destructor
      */
     virtual ~KMeansTrainer() {}
 
     /**
-     * Copy constructor
+     * @brief Copy constructor
      */
     KMeansTrainer(const KMeansTrainer& other);
 
     /**
-     * Assigns from a different machine
+     * @brief Assigns from a different machine
      */
     KMeansTrainer& operator=(const KMeansTrainer& other);
 
     /**
-     * Equal to
+     * @brief Equal to
      */
     bool operator==(const KMeansTrainer& b) const;
 
     /**
-     * Not equal to
+     * @brief Not equal to
      */
     bool operator!=(const KMeansTrainer& b) const;
  
     /**
-     * Initialise the means randomly. 
+     * @brief Initialise the means randomly. 
      * Data is split into as many chunks as there are means, 
      * then each mean is set to a random example within each chunk.
      */
@@ -77,7 +92,7 @@ class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, blitz::Array<
       const blitz::Array<double,2>& sampler);
     
     /**
-     * Accumulate across the dataset:
+     * @brief Accumulate across the dataset:
      * - zeroeth and first order statistics
      * - average distance from the closest mean 
      * Implements EMTrainer::eStep(double &)
@@ -86,56 +101,56 @@ class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, blitz::Array<
       const blitz::Array<double,2>& data);
     
     /**
-     * Updates the mean based on the statistics from the E-step.
+     * @brief Updates the mean based on the statistics from the E-step.
      */
     virtual void mStep(bob::machine::KMeansMachine& kmeans, 
       const blitz::Array<double,2>&);
     
     /**
-     * This functions returns the average min distance (average distance to the
+     * @brief This functions returns the average min distance (average distance to the
      * closest mean)
      */
     virtual double computeLikelihood(bob::machine::KMeansMachine& kmeans);
 
     /**
-     * Function called at the end of the training 
+     * @brief Function called at the end of the training 
      */
     virtual void finalization(bob::machine::KMeansMachine& kMeansMachine, const blitz::Array<double,2>& sampler);
 
     /**
-     * Reset the statistics accumulators
+     * @brief Reset the statistics accumulators
      * to the correct size and a value of zero.
      */
     bool resetAccumulators(bob::machine::KMeansMachine& kMeansMachine);
 
     /**
-     * Set the seed used to genrated pseudo-random numbers
+     * @brief Set the seed used to genrated pseudo-random numbers
      */
     void setSeed(int seed);
 
     /**
-     * Get the seed
+     * @brief Get the seed
      */
     int getSeed() const { return m_seed; }
 
     /**
-     * Tell whether duplicate means are checked or not during the initialization
+     * @brief Sets the initialization method used to generate the initial means
      */
-    void setCheckNoDuplicate(bool v) { m_check_no_duplicate = v; }
+    void setInitializationMethod(InitializationMethod v) { m_initialization_method = v; }
 
     /**
-     * Tell whether duplicate means are checked or not during the initialization
+     * @brief Gets the initialization method used to generate the initial means
      */
-    bool getCheckNoDuplicate() const { return m_check_no_duplicate; }
+    InitializationMethod getInitializationMethod() const { return m_initialization_method; }
   
     /**
-     * Returns the internal statistics. Useful to parallelize the E-step
+     * @brief Returns the internal statistics. Useful to parallelize the E-step
      */
     const blitz::Array<double,1>& getZeroethOrderStats() const { return m_zeroethOrderStats; }
     const blitz::Array<double,2>& getFirstOrderStats() const { return m_firstOrderStats; }
     double getAverageMinDistance() const { return m_average_min_distance; }
     /**
-     * Sets the internal statistics. Useful to parallelize the E-step
+     * @brief Sets the internal statistics. Useful to parallelize the E-step
      */
     void setZeroethOrderStats(const blitz::Array<double,1>& zeroethOrderStats); 
     void setFirstOrderStats(const blitz::Array<double,2>& firstOrderStats);
@@ -145,29 +160,30 @@ class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, blitz::Array<
   protected:
 
     /**
+     * @brief The initialization method
      * Check that there is no duplicated means during the random initialization
      */
-    bool m_check_no_duplicate;
+    InitializationMethod m_initialization_method;
 
     /**
-     * Seed used to generate pseudo-random numbers
+     * @brief Seed used to generate pseudo-random numbers
      */
     int m_seed;
    
     /**
-     * Average min distance
+     * @brief Average min distance
      */
     double m_average_min_distance;
 
     /**
-     * Zeroeth order statistics accumulator.
+     * @brief Zeroeth order statistics accumulator.
      * The k'th value in m_zeroethOrderStats is the denominator of 
      * equation 9.4, Bishop, "Pattern recognition and machine learning", 2006
      */
     blitz::Array<double,1> m_zeroethOrderStats;
 
     /** 
-     * First order statistics accumulator.
+     * @brief First order statistics accumulator.
      * The k'th row of m_firstOrderStats is the numerator of 
      * equation 9.4, Bishop, "Pattern recognition and machine learning", 2006
      */

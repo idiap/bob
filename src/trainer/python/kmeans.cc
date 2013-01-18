@@ -80,20 +80,37 @@ void bind_trainer_kmeans()
     .def("finalization", &EMTrainerKMeansBase::finalization, (arg("machine"), arg("data")), "This method is called after the EM algorithm")
   ;
 
-  class_<bob::trainer::KMeansTrainer, boost::shared_ptr<bob::trainer::KMeansTrainer>, boost::noncopyable, bases<EMTrainerKMeansBase> >("KMeansTrainer",
+  // Starts binding the KMeansTrainer
+  class_<bob::trainer::KMeansTrainer, boost::shared_ptr<bob::trainer::KMeansTrainer>, boost::noncopyable, bases<EMTrainerKMeansBase> > KMT("KMeansTrainer",
       "Trains a KMeans machine.\n"
       "This class implements the expectation-maximisation algorithm for a k-means machine.\n"
       "See Section 9.1 of Bishop, \"Pattern recognition and machine learning\", 2006\n"
       "It uses a random initialisation of the means followed by the expectation-maximization algorithm"
-      )
-    .def(self == self)
-    .def(self != self)
-    .def(init<optional<double,int,bool,bool> >((arg("convergence_threshold")=0.001, arg("max_iterations")=10, arg("compute_likelihood")=true, arg("check_no_duplicate")=false)))
-    .add_property("check_no_duplicate", &bob::trainer::KMeansTrainer::getCheckNoDuplicate, &bob::trainer::KMeansTrainer::setCheckNoDuplicate, "Tells whether we check for duplicate means during initialization or not.")
-    .add_property("seed", &bob::trainer::KMeansTrainer::getSeed, &bob::trainer::KMeansTrainer::setSeed, "Seed used to genrated pseudo-random numbers")
-    .add_property("average_min_distance", &bob::trainer::KMeansTrainer::getAverageMinDistance, &bob::trainer::KMeansTrainer::setAverageMinDistance, "Average min distance. Useful to parallelize the E-step.")
-    .add_property("zeroeth_order_statistics", &py_getZeroethOrderStats, &py_setZeroethOrderStats, "The zeroeth order statistics. Useful to parallelize the E-step.")
-    .add_property("first_order_statistics", &py_getFirstOrderStats, &py_setFirstOrderStats, "The first order statistics. Useful to parallelize the E-step.")
-  ;
+      );
 
+  // Binds methods that does not have nested enum values as default parameters
+  KMT.def(self == self)
+     .def(self != self)
+     .add_property("initialization_method", &bob::trainer::KMeansTrainer::getInitializationMethod, &bob::trainer::KMeansTrainer::setInitializationMethod, "The initialization method to generate the initial means.")
+     .add_property("seed", &bob::trainer::KMeansTrainer::getSeed, &bob::trainer::KMeansTrainer::setSeed, "Seed used to genrated pseudo-random numbers")
+     .add_property("average_min_distance", &bob::trainer::KMeansTrainer::getAverageMinDistance, &bob::trainer::KMeansTrainer::setAverageMinDistance, "Average min distance. Useful to parallelize the E-step.")
+     .add_property("zeroeth_order_statistics", &py_getZeroethOrderStats, &py_setZeroethOrderStats, "The zeroeth order statistics. Useful to parallelize the E-step.")
+     .add_property("first_order_statistics", &py_getFirstOrderStats, &py_setFirstOrderStats, "The first order statistics. Useful to parallelize the E-step.")
+    ;
+
+  // Sets the scope to the one of the KMeansTrainer
+  scope s(KMT);
+
+  // Adds enum in the previously defined current scope
+  enum_<bob::trainer::KMeansTrainer::InitializationMethod>("initialization_method_type")
+    .value("RANDOM", bob::trainer::KMeansTrainer::RANDOM)
+    .value("RANDOM_NO_DUPLICATE", bob::trainer::KMeansTrainer::RANDOM_NO_DUPLICATE)
+#if BOOST_VERSION >= 104700
+    .value("KMEANS_PLUS_PLUS", bob::trainer::KMeansTrainer::KMEANS_PLUS_PLUS)
+#endif
+    .export_values()
+    ;   
+
+  // Binds methods that has nested enum values as default parameters
+  KMT.def(init<optional<double,int,bool,bob::trainer::KMeansTrainer::InitializationMethod> >((arg("convergence_threshold")=0.001, arg("max_iterations")=10, arg("compute_likelihood")=true, arg("initialization_method")=bob::trainer::KMeansTrainer::RANDOM)));
 }

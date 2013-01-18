@@ -43,11 +43,6 @@ def loadGMM():
 
   return gmm
 
-def multiplyVectorsByFactors(matrix, vector):
-  for i in range(0, matrix.shape[0]):
-    for j in range(0, matrix.shape[1]):
-      matrix[i, j] *= vector[j]
-
 def equals(x, y, epsilon):
   return (abs(x - y) < epsilon).all()
 
@@ -58,12 +53,6 @@ def flipRows(array):
     return numpy.array([array[1], array[0]], 'float64')
   else:
     raise Exception('Input type not supportd by flipRows')
-
-def NormalizeStdArray(path):
-
-  array = bob.io.load(path).astype('float64')
-  std = array.std(axis=0)
-  return (array/std, std)
 
 class MyTrainer1(bob.trainer.KMeansTrainer):
   """Simple example of python trainer: """
@@ -88,91 +77,10 @@ class MyTrainer2(bob.trainer.overload.KMeansTrainer):
     print "Leaving initialization(), back into C++"
 
 
-class TrainerTest(unittest.TestCase):
+class GMMTest(unittest.TestCase):
   """Performs various trainer tests."""
-  
-  def test00_kmeans(self):
-
-    # Trains a KMeansMachine
-
-    # This files contains draws from two 1D Gaussian distributions:
-    #   * 100 samples from N(-10,1)
-    #   * 100 samples from N(10,1)
-    data = bob.io.load(F("samplesFrom2G_f64.hdf5"))
-
-    machine = bob.machine.KMeansMachine(2, 1)
-
-    trainer = bob.trainer.KMeansTrainer()
-    trainer.train(machine, data)
-
-    [variances, weights] = machine.get_variances_and_weights_for_each_cluster(data)
-    variances_b = numpy.ndarray(shape=(2,1), dtype=numpy.float64)
-    weights_b = numpy.ndarray(shape=(2,), dtype=numpy.float64)
-    machine.__get_variances_and_weights_for_each_cluster_init__(variances_b, weights_b)
-    machine.__get_variances_and_weights_for_each_cluster_acc__(data, variances_b, weights_b)
-    machine.__get_variances_and_weights_for_each_cluster_fin__(variances_b, weights_b)
-    m1 = machine.get_mean(0)
-    m2 = machine.get_mean(1)
-
-    # Check means [-10,10] / variances [1,1] / weights [0.5,0.5]
-    if(m1<m2): means=numpy.array(([m1[0],m2[0]]), 'float64')
-    else: means=numpy.array(([m2[0],m1[0]]), 'float64')
-    self.assertTrue(equals(means, numpy.array([-10.,10.]), 2e-1))
-    self.assertTrue(equals(variances, numpy.array([1.,1.]), 2e-1))
-    self.assertTrue(equals(weights, numpy.array([0.5,0.5]), 1e-3))
-
-    self.assertTrue(equals(variances, variances_b, 1e-8))
-    self.assertTrue(equals(weights, weights_b, 1e-8))
-
-  def test01_kmeans(self):
-
-    # Trains a KMeansMachine
-
-    (arStd,std) = NormalizeStdArray(F("faithful.torch3.hdf5"))
-
-    machine = bob.machine.KMeansMachine(2, 2)
-
-    trainer = bob.trainer.KMeansTrainer()
-    #trainer.seed = 1337
-    trainer.train(machine, arStd)
-
-    [variances, weights] = machine.get_variances_and_weights_for_each_cluster(arStd)
-    means = machine.means
-
-    multiplyVectorsByFactors(means, std)
-    multiplyVectorsByFactors(variances, std ** 2)
-
-    gmmWeights = bob.io.load(F('gmm.init_weights.hdf5'))
-    gmmMeans = bob.io.load(F('gmm.init_means.hdf5'))
-    gmmVariances = bob.io.load(F('gmm.init_variances.hdf5'))
-
-    if (means[0, 0] < means[1, 0]):
-      means = flipRows(means)
-      variances = flipRows(variances)
-      weights = flipRows(weights)
-   
-    self.assertTrue(equals(means, gmmMeans, 1e-3))
-    self.assertTrue(equals(weights, gmmWeights, 1e-3))
-    self.assertTrue(equals(variances, gmmVariances, 1e-3))
-
-    # Check comparison operators
-    trainer1 = bob.trainer.KMeansTrainer()
-    trainer2 = bob.trainer.KMeansTrainer()
-    self.assertTrue( trainer1 == trainer2)
-    self.assertFalse( trainer1 != trainer2)
-    trainer1.seed = 1337
-    self.assertFalse( trainer1 == trainer2)
-    self.assertTrue( trainer1 != trainer2)
-
-    # Check that there is no duplicate means during initialization
-    machine = bob.machine.KMeansMachine(2, 1)
-    trainer = bob.trainer.KMeansTrainer()
-    trainer.check_no_duplicate = True
-    data = numpy.array([[1.], [1.], [1.], [1.], [1.], [1.], [2.], [3.]])
-    trainer.train(machine, data)
-    self.assertFalse( numpy.isnan(machine.means).any())
-    
-  def test02_gmm_ML(self):
+      
+  def test01_gmm_ML(self):
 
     # Trains a GMMMachine with ML_GMMTrainer
     
@@ -192,7 +100,7 @@ class TrainerTest(unittest.TestCase):
 
     self.assertTrue((gmm == gmm_ref) or (gmm == gmm_ref_32bit_release) or (gmm == gmm_ref_32bit_debug))
 
-  def test03_gmm_ML(self):
+  def test02_gmm_ML(self):
 
     # Trains a GMMMachine with ML_GMMTrainer; compares to an old reference
    
@@ -229,7 +137,7 @@ class TrainerTest(unittest.TestCase):
     self.assertTrue(equals(gmm.variances, variancesML_ref, 3e-3))
     self.assertTrue(equals(gmm.weights, weightsML_ref, 1e-4))
     
-  def test04_gmm_MAP(self):
+  def test03_gmm_MAP(self):
 
     # Train a GMMMachine with MAP_GMMTrainer
     
@@ -250,7 +158,7 @@ class TrainerTest(unittest.TestCase):
 
     self.assertTrue((equals(gmm.means,gmm_ref.means,1e-3) and equals(gmm.variances,gmm_ref.variances,1e-3) and equals(gmm.weights,gmm_ref.weights,1e-3)))
     
-  def test05_gmm_MAP(self):
+  def test04_gmm_MAP(self):
 
     # Train a GMMMachine with MAP_GMMTrainer and compare with matlab reference
 
@@ -283,7 +191,7 @@ class TrainerTest(unittest.TestCase):
     self.assertTrue(equals(new_means[0,:], gmm_adapted.means[:,0], 1e-4))
     self.assertTrue(equals(new_means[1,:], gmm_adapted.means[:,1], 1e-4))
    
-  def test06_gmm_MAP(self):
+  def test05_gmm_MAP(self):
     
     # Train a GMMMachine with MAP_GMMTrainer; compares to old reference
    
@@ -332,7 +240,7 @@ class TrainerTest(unittest.TestCase):
     self.assertTrue(equals(gmm.variances, variancesMAP_ref, 1e-4))
     self.assertTrue(equals(gmm.weights, weightsMAP_ref, 1e-4))
 
-  def test07_gmm_test(self):
+  def test06_gmm_test(self):
 
     # Tests a GMMMachine by computing scores against a model and compare to 
     # an old reference
@@ -359,7 +267,7 @@ class TrainerTest(unittest.TestCase):
     # Compare current results to torch3vision
     self.assertTrue(abs(score-score_mean_ref)/score_mean_ref<1e-4)
  
-  def test08_custom_trainer(self):
+  def test07_custom_trainer(self):
 
     # Custom python trainer
     
@@ -373,7 +281,7 @@ class TrainerTest(unittest.TestCase):
     for i in range(0, 2):
       self.assertTrue((ar[i+1] == machine.means[i, :]).all())
 
-  def test09_custom_initialization(self):
+  def test08_custom_initialization(self):
 
     ar = bob.io.load(F("faithful.torch3_f64.hdf5"))
     
@@ -382,7 +290,7 @@ class TrainerTest(unittest.TestCase):
     machine = bob.machine.KMeansMachine(2, 2)
     mytrainer.train(machine, ar)
 
-  def test10_overload_initialization(self):
+  def test09_overload_initialization(self):
     """Test introduces after ticket #87"""
     
     machine = bob.machine.KMeansMachine(2,1)
