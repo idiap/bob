@@ -325,8 +325,8 @@ setup(
       'console_scripts': CONSOLE_SCRIPTS,
       'bob.db': DATABASES,
       'nose.plugins.0.10': [
-        'insulate = bob.core.test.insulate:Insulate',
-        'insulateslave = bob.core.test.insulate:InsulateSlave',
+        'insulate = bob.test.insulate:Insulate',
+        'insulateslave = bob.test.insulate:InsulateSlave',
         ]
       },
 
