@@ -44,7 +44,7 @@ static object py_getFirstOrderStats(const bob::trainer::KMeansTrainer& op)
 {
   const blitz::Array<double,2>& stats = op.getFirstOrderStats();
   bob::python::ndarray stats_new(bob::core::array::t_float64, 
-    stats.extent(0), stats.extent(2));
+    stats.extent(0), stats.extent(1));
   blitz::Array<double,2> stats_new_ = stats_new.bz<double,2>();
   stats_new_ = stats;
   return stats_new.self();
