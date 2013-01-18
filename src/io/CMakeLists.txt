@@ -94,14 +94,18 @@ if(FFMPEG_FOUND)
 
   include(CheckCSourceCompiles)
   set(CMAKE_REQUIRED_INCLUDES "${FFMPEG_INCLUDE_DIRS}")
-  set(CMAKE_REQUIRED_FLAGS "-L${FFMPEG_LIBRARY_DIRS}")
+  if (FFMPEG_LIBRARY_DIRS)
+    set(CMAKE_REQUIRED_FLAGS "-L${FFMPEG_LIBRARY_DIRS}")
+  endif()
   set(CMAKE_REQUIRED_LIBRARIES "${FFMPEG_LIBRARIES}")
   CHECK_C_SOURCE_COMPILES("#include <libavformat/avformat.h>
   int main() { int res = avformat_alloc_output_context2(0, 0, 0, 0); }" HAVE_FFMPEG_AVFORMAT_ALLOC_OUTPUT_CONTEXT2)
   CHECK_C_SOURCE_COMPILES("#include <libavcodec/avcodec.h>
   int main() { enum AVCodecID test; }" HAVE_FFMPEG_AVCODEC_AVCODECID)
   set(CMAKE_REQUIRED_LIBRARIES)
-  set(CMAKE_REQUIRED_FLAGS)
+  if (FFMPEG_LIBRARY_DIRS)
+    set(CMAKE_REQUIRED_FLAGS)
+  endif()
   set(CMAKE_REQUIRED_INCLUDES)
 
 endif(FFMPEG_FOUND)
