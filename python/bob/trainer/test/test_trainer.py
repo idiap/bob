@@ -46,14 +46,6 @@ def loadGMM():
 def equals(x, y, epsilon):
   return (abs(x - y) < epsilon).all()
 
-def flipRows(array):
-  if len(array.shape) == 2:
-    return numpy.array([numpy.array(array[1, :]), numpy.array(array[0, :])], 'float64')
-  elif len(array.shape) == 1:
-    return numpy.array([array[1], array[0]], 'float64')
-  else:
-    raise Exception('Input type not supportd by flipRows')
-
 class MyTrainer1(bob.trainer.KMeansTrainer):
   """Simple example of python trainer: """
   def __init__(self):

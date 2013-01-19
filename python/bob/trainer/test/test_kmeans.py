@@ -69,6 +69,14 @@ def multiplyVectorsByFactors(matrix, vector):
     for j in range(0, matrix.shape[1]):
       matrix[i, j] *= vector[j]
 
+def flipRows(array):
+  if len(array.shape) == 2:
+    return numpy.array([numpy.array(array[1, :]), numpy.array(array[0, :])], 'float64')
+  elif len(array.shape) == 1:
+    return numpy.array([array[1], array[0]], 'float64')
+  else:
+    raise Exception('Input type not supportd by flipRows')
+
 class KMeansTest(unittest.TestCase):
   """Performs various trainer tests."""
   
