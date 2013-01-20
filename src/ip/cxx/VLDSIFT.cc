@@ -64,7 +64,7 @@ bob::ip::VLDSIFT& bob::ip::VLDSIFT::operator=(const bob::ip::VLDSIFT& other)
     m_use_flat_window = other.m_use_flat_window;
     m_window_size = other.m_window_size;
   
-    // Allocates filter, and set filter properties TODO: function for that?
+    // Allocates filter, and set filter properties
     allocateAndSet();
   }
   return *this;

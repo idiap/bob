@@ -168,7 +168,7 @@ void bind_ip_scale()
     .value("BilinearInterp", bob::ip::Rescale::BilinearInterp)
     ;
 
-  def("scale", &scale, scale_overloads((arg("src"), arg("dst"), arg("algorithm")="BilinearInterp"), "Scales a 2D array/image to the dimensions given by the destination array."));
-  def("scale", &scale2, scale2_overloads((arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("algorithm")="BilinearInterp"), "Scales a 2D array/image to the dimensions given by the destination array, taking boolean mask into account."));
+  def("scale", &scale, scale_overloads((arg("src"), arg("dst"), arg("algorithm")=bob::ip::Rescale::BilinearInterp), "Scales a 2D array/image to the dimensions given by the destination array."));
+  def("scale", &scale2, scale2_overloads((arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("algorithm")=bob::ip::Rescale::BilinearInterp), "Scales a 2D array/image to the dimensions given by the destination array, taking boolean mask into account."));
   def("scale_as", &scale_as, (arg("original"), arg("scale_factor")), "Gives back a scaled version of the original 2D or 3D array/image.");
 }
