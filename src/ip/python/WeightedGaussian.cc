@@ -157,9 +157,7 @@ static object call_wgs_P(bob::ip::WeightedGaussian& op,
 
 void bind_ip_wgaussian() 
 {
-  static const char* wgaussiandoc = "This class performs weighted gaussian \
-    smoothing (anisotropic filtering). In particular, it is used by the Self \
-    Quotient Image (SQI) algorithm.";
+  static const char* wgaussiandoc = "This class performs weighted gaussian smoothing (anisotropic filtering). In particular, it is used by the Self Quotient Image (SQI) algorithm.";
 
   class_<bob::ip::WeightedGaussian, 
     boost::shared_ptr<bob::ip::WeightedGaussian> >("WeightedGaussian", 
@@ -176,13 +174,11 @@ void bind_ip_wgaussian()
       .add_property("radius_y", 
         &bob::ip::WeightedGaussian::getRadiusY, 
         &bob::ip::WeightedGaussian::setRadiusY, 
-        "The radius of the unweighted Gaussian along the y-axis \
-          (height of the kernel=2*radius_y+1)")
+        "The radius of the unweighted Gaussian along the y-axis (height of the kernel=2*radius_y+1)")
       .add_property("radius_x", 
         &bob::ip::WeightedGaussian::getRadiusX, 
         &bob::ip::WeightedGaussian::setRadiusX, 
-        "The radius of the unweighted Gaussian along the x-axis \
-          (width of the kernel=2*radius_x+1)")
+        "The radius of the unweighted Gaussian along the x-axis (width of the kernel=2*radius_x+1)")
       .add_property("sigma2_y", 
         &bob::ip::WeightedGaussian::getSigma2Y, 
         &bob::ip::WeightedGaussian::setSigma2Y, 
@@ -205,12 +201,9 @@ void bind_ip_wgaussian()
         arg("conv_border")=bob::sp::Extrapolation::Mirror), 
         "Resets the parametrization of the Weighted Gaussian")
       .def("__call__", &call_wgs_C, (arg("self"), arg("src"), arg("dst")), 
-        "Smoothes an image (2D/grayscale or color 3D/color). The dst array \
-          should have the expected type (numpy.float64) and the same size as \
-          the src array.")
+        "Smoothes an image (2D/grayscale or color 3D/color). The dst array should have the expected type (numpy.float64) and the same size as the src array.")
       .def("__call__", &call_wgs_P, (arg("self"), arg("src")), 
-        "Smoothes an image (2D/grayscale or color 3D/color). The smoothed \
-          image is returned as a numpy array.")
+        "Smoothes an image (2D/grayscale or color 3D/color). The smoothed image is returned as a numpy array.")
     ;
 }
 
