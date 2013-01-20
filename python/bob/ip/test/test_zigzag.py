@@ -36,20 +36,20 @@ class ZigzagTest(unittest.TestCase):
   def test01_zigzag(self):
     B = numpy.array((0, 0, 0), 'float64')
     bob.ip.zigzag(A_org, B)
-    self.assertEqual( (B == A_ans_3).all(), True)
+    self.assertTrue( (B == A_ans_3).all())
     C = bob.ip.zigzag(A_org, 3)
-    self.assertEqual( (C == A_ans_3).all(), True)
+    self.assertTrue( (C == A_ans_3).all())
     
   def test02_zigzag(self):
     B = numpy.array((0, 0, 0, 0, 0, 0), 'float64')
     bob.ip.zigzag(A_org, B)
-    self.assertEqual( (B == A_ans_6).all(), True)
+    self.assertTrue( (B == A_ans_6).all())
     C = bob.ip.zigzag(A_org, 6)
-    self.assertEqual( (C == A_ans_6).all(), True)
+    self.assertTrue( (C == A_ans_6).all())
 
   def test03_zigzag(self):
     B = numpy.array((0, 0, 0, 0, 0, 0, 0, 0, 0, 0), 'float64')
     bob.ip.zigzag(A_org, B)
-    self.assertEqual( (B == A_ans_10).all(), True)
+    self.assertTrue( (B == A_ans_10).all())
     C = bob.ip.zigzag(A_org, 10)
-    self.assertEqual( (C == A_ans_10).all(), True)
+    self.assertTrue( (C == A_ans_10).all())

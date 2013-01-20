@@ -27,87 +27,86 @@ using namespace boost::python;
 
 template <typename T>
 static void inner_zigzag(bob::python::const_ndarray src, 
-  bob::python::ndarray dst, const bool rf) 
+  blitz::Array<T,1>& dst, const bool rf) 
 {
-  blitz::Array<T,1> dst_ = dst.bz<T,1>();
-  bob::ip::zigzag(src.bz<T,2>(), dst_, rf);
+  bob::ip::zigzag(src.bz<T,2>(), dst, rf);
 }
 
-static void py_zigzag_C(bob::python::const_ndarray src, 
-  bob::python::ndarray dst, const bool rf=false) 
+static object py_zigzag(bob::python::const_ndarray src, 
+  object py_object, const bool rf=false)
 {
   const bob::core::array::typeinfo& info = src.type();
-  
+
   if(info.nd != 2) 
     PYTHON_ERROR(TypeError, "bob.ip.zigzag() does not support input array \
       with " SIZE_T_FMT " dimensions.", info.nd);
 
-  switch(info.dtype) 
-  {
-    case bob::core::array::t_uint8: 
-      return inner_zigzag<uint8_t>(src, dst, rf);
-    case bob::core::array::t_uint16: 
-      return inner_zigzag<uint16_t>(src, dst, rf);
-    case bob::core::array::t_float64: 
-      return inner_zigzag<double>(src, dst, rf);
-    default: 
-      PYTHON_ERROR(TypeError, "bob.ip.zigzag() does not support array of \
-        type '%s'.", info.str().c_str());
+  extract<int> int_check(py_object);
+  if(int_check.check()) 
+  { //is int
+    int n_coef = int_check();
+    switch(info.dtype)
+    {
+      case bob::core::array::t_uint8:
+        {
+          bob::python::ndarray dst(bob::core::array::t_uint8, n_coef);
+          blitz::Array<uint8_t,1> dst_ = dst.bz<uint8_t,1>();
+          inner_zigzag<uint8_t>(src, dst_, rf);
+          return dst.self();
+        }
+      case bob::core::array::t_uint16:
+        {
+          bob::python::ndarray dst(bob::core::array::t_uint16, n_coef);
+          blitz::Array<uint16_t,1> dst_ = dst.bz<uint16_t,1>();
+          inner_zigzag<uint16_t>(src, dst_, rf);
+          return dst.self();
+        }
+      case bob::core::array::t_float64:
+        {
+          bob::python::ndarray dst(bob::core::array::t_float64, n_coef);
+          blitz::Array<double,1> dst_ = dst.bz<double,1>();
+          inner_zigzag<double>(src, dst_, rf);
+          return dst.self();
+        }
+      default: 
+        PYTHON_ERROR(TypeError, "bob.ip.zigzag() does not support array of type '%s'.", info.str().c_str());
+    }
   }
-}
-
-static object py_zigzag_P(bob::python::const_ndarray src, 
-  const size_t n_coef, const bool rf=false)
-{
-  const bob::core::array::typeinfo& info = src.type();
-
-  if(info.nd != 2) 
-    PYTHON_ERROR(TypeError, "bob.ip.zigzag() does not support input array \
-      with " SIZE_T_FMT " dimensions.", info.nd);
-
-  switch(info.dtype)
+  else
   {
-    case bob::core::array::t_uint8:
+    switch(info.dtype) 
+    {
+      case bob::core::array::t_uint8: 
       {
-        bob::python::ndarray dst(bob::core::array::t_uint8, n_coef);
-        blitz::Array<uint8_t,1> dst_ = dst.bz<uint8_t,1>();
+        blitz::Array<uint8_t,1> dst = extract<blitz::Array<uint8_t,1> >(py_object);
         inner_zigzag<uint8_t>(src, dst, rf);
-        return dst.self();
+        return object();
       }
-    case bob::core::array::t_uint16:
+      case bob::core::array::t_uint16: 
       {
-        bob::python::ndarray dst(bob::core::array::t_uint16, n_coef);
-        blitz::Array<uint16_t,1> dst_ = dst.bz<uint16_t,1>();
+        blitz::Array<uint16_t,1> dst = extract<blitz::Array<uint16_t,1> >(py_object);
         inner_zigzag<uint16_t>(src, dst, rf);
-        return dst.self();
+        return object();
       }
-    case bob::core::array::t_float64:
+      case bob::core::array::t_float64: 
       {
-        bob::python::ndarray dst(bob::core::array::t_float64, n_coef);
-        blitz::Array<double,1> dst_ = dst.bz<double,1>();
+        blitz::Array<double,1> dst = extract<blitz::Array<double,1> >(py_object);
         inner_zigzag<double>(src, dst, rf);
-        return dst.self();
+        return object();
       }
-    default: 
-      PYTHON_ERROR(TypeError, "bob.ip.zigzag() does not support array of \
-        type '%s'.", info.str().c_str());
+      default: 
+        PYTHON_ERROR(TypeError, "bob.ip.zigzag() does not support array of type '%s'.", info.str().c_str());
+    }
   }
 }
 
 
-BOOST_PYTHON_FUNCTION_OVERLOADS(zigzag_C_overloads, py_zigzag_C, 2, 3)
-BOOST_PYTHON_FUNCTION_OVERLOADS(zigzag_P_overloads, py_zigzag_P, 2, 3)
+BOOST_PYTHON_FUNCTION_OVERLOADS(zigzag_overloads, py_zigzag, 2, 3)
 
 void bind_ip_zigzag() 
 {
-  def("zigzag", &py_zigzag_C,
-    zigzag_C_overloads((arg("src"), arg("dst"), arg("right_first")=false),
-    "Extracts a 1D array using a zigzag pattern from a 2D array/image. \
-      The number of coefficients to keep is given by the length of the dst \
-      array."));
-  def("zigzag", &py_zigzag_P,
-    zigzag_P_overloads((arg("src"), arg("n_coefs"), arg("right_first")=false),
-    "Extracts a 1D array using a zigzag pattern from a 2D array/image. This \
-      function allocates and returns an array with n_coefs coefficients."));
+  def("zigzag", &py_zigzag,
+    zigzag_overloads((arg("src"), arg("obj"), arg("right_first")=false),
+    "Extracts a 1D NumPy array using a zigzag pattern from a 2D array/image. The second argument is\n 1. either the number of output coefficients to keep. In this case, an output 1D NumPy array is allocated and returned.\n 2. or a 1D NumPy array which will be updated with the zizag coefficients. In this case, nothing is returned (a None object)."));
 }
 
