@@ -33,7 +33,7 @@ bob::ap::Ceps::Ceps( double sampling_frequency, double win_length_ms, double win
   m_n_filters(n_filters), m_n_ceps(n_ceps), m_f_min(f_min), m_f_max(f_max), 
   m_delta_win(delta_win), m_pre_emphasis_coeff(pre_emphasis_coeff),
   m_mel_scale(mel_scale), m_dct_norm(dct_norm),
-  m_with_energy(true), m_with_delta(true), m_with_delta_delta(true),
+  m_with_energy(false), m_with_delta(false), m_with_delta_delta(false),
   m_energy_floor(1.), m_fb_out_floor(1.), m_fft(1)
 {
   initWinLength();

@@ -77,6 +77,7 @@ User's Guide
    TutorialsArrays
    TutorialsIO
    TutorialsIP
+   TutorialsAP
    TutorialsMachine
    TutorialsTrainer
    TutorialsDatabase
