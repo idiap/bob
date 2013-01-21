@@ -4,7 +4,7 @@ execute_process(COMMAND ${PKG_CONFIG_EXECUTABLE} opencv --silence-errors --modve
 
 if(PKG_CONFIG_OpenCV_VERSION)
 
-  if(PKG_CONFIG_OpenCV_VERSION VERSION_LESS "2.5")
+  if(PKG_CONFIG_OpenCV_VERSION VERSION_LESS "2.4" OR CYGWIN)
 
     #use pkg-config to find opencv
     if(CMAKE_VERSION VERSION_LESS "2.8.2")
