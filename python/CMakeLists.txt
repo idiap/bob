@@ -73,7 +73,8 @@ configure_file(bin/gdbpy.in ${CMAKE_BINARY_DIR}/bin/gdbpy @ONLY)
 set(pybin "${CMAKE_BINARY_DIR}/bin/egg-build")
 set(pysetup "${CMAKE_SOURCE_DIR}/python/setup.py")
 get_filename_component(basedir ${pysetup} PATH)
-add_custom_target(egg ALL mkdir -pv ${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES} COMMAND ${pybin} ${pysetup} build --force --build-base=${CMAKE_BINARY_DIR}/egg-build install --force --prefix=${CMAKE_BINARY_DIR} --record=${CMAKE_BINARY_DIR}/egg-build-record.txt --single-version-externally-managed WORKING_DIRECTORY ${basedir} DEPENDS ${ENABLED_PACKAGES})
+add_custom_target(egg ALL mkdir -pv ${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES}
+  COMMAND ${pybin} ${pysetup} build --compiler=cygwin --force --build-base=${CMAKE_BINARY_DIR}/egg-build install --force --prefix=${CMAKE_BINARY_DIR} --record=${CMAKE_BINARY_DIR}/egg-build-record.txt --single-version-externally-managed WORKING_DIRECTORY ${basedir} DEPENDS ${ENABLED_PACKAGES})
 add_custom_target(egg-scripts ALL ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/bin/fix_scripts.py ${CMAKE_BINARY_DIR}/bin)
 add_dependencies(egg-scripts egg)
 

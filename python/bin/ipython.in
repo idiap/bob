@@ -2,5 +2,8 @@
 if [ "@BOB_SOVERSION@" != "OFF" ]; then
   export LD_LIBRARY_PATH=$(dirname $(dirname "@BOB_PYTHONPATH@"))
 fi
+if [ "@CYGWIN@" == "1" ]; then
+  export PATH=@CMAKE_RUNTIME_OUTPUT_DIRECTORY@:${PATH};
+fi
 export PYTHONPATH="@BOB_PYTHONPATH@:${PYTHONPATH}";
 @IPYTHON_EXECUTABLE@ "${@}"

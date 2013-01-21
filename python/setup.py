@@ -160,6 +160,10 @@ class build_ext(build_ext_base):
       self.linker_is_smart = linker_can_remove_symbols(self.compiler.linker_so)
       if self.linker_is_smart: self.compiler.linker_so += ['-Wl,--no-as-needed']
 
+    if hasattr(self.compiler, 'dll_libraries') and \
+        self.compiler.dll_libraries is None:
+      self.compiler.dll_libraries = []
+
     build_ext_base.build_extension(self, ext)
 
 def setup_extension(ext_name, pc_file):
@@ -183,9 +187,15 @@ def setup_extension(ext_name, pc_file):
   if BOB['soversion'].lower() == 'off':
     runtime_library_dirs = library_dirs
 
+  # Tricks setuptools into letting us use the --compiler=cygwin during
+  # extension building. Unfortunately, for that option to work, at least one
+  # compiled file has to go into the extension.
+  sources = []
+  if __import__('platform').system().find('CYGWIN') != -1: sources = ['empty.c']
+
   return Extension(
       ext_name,
-      sources=[],
+      sources=sources,
       language="c++",
       include_dirs=include_dirs + [numpy.get_include()],
       library_dirs=library_dirs,
