@@ -16,20 +16,19 @@
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-.. testsetup:: iptest
+.. testsetup:: aptest
   
   import bob
   import numpy
   import math
   import os
     
+
   def F(m, f):
     from pkg_resources import resource_filename
     return resource_filename('bob.%s.test' % m, os.path.join('data', f))
 
-  image_path = F('ip', 'image_r10.pgm')
-  color_image_path = F('ip', 'imageColor.ppm')
-  numpy.set_printoptions(precision=3, suppress=True)
+  wave_path = F('ap', 'sample.wav')
 
 
 *****************************
@@ -55,9 +54,10 @@ The usual native formats can be read with **scipy.io.wavfile** module. Other wav
 .. doctest:: aptest
   :options: +NORMALIZE_WHITESPACE
   
-  >>> import scipy.io.wavfile, os
-  >>> wav_filename = os.path.join(root_bob, 'python/bob/ap/test/data/sample.wav')
-  >>> rate, signal = scipy.io.wavfile.read(str(wav_filename)); # the data is read in its native format
+  >>> import scipy.io.wavfile
+  >>> print wave_path
+  /idiap/user/ekhoury/cxx_features/bob/bob_elie_3/build/lib/python2.7/site-packages/bob/ap/test/data/sample.wav
+  >>> rate, signal = scipy.io.wavfile.read(str(wave_path)) # the data is read in its native format
   >>> print rate
   8000
   >>> print signal
@@ -70,16 +70,16 @@ User can directly compute the duration of signal (in seconds):
 .. doctest:: aptest
   :options: +NORMALIZE_WHITESPACE
   
-  >>> len(signal)/rate 
+  >>> print len(signal)/rate 
   2
 
 
 LFCC and MFCC Extraction
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-The LFCC and MFCC coefficients can be extracted from a audio signal by using :py:func:`bob.ap.Ceps`. To do so, several parameters can be precised by the user. The following values are the default ones:
+The LFCC and MFCC coefficients can be extracted from a audio signal by using :py:func:`bob.ap.Ceps`. To do so, several parameters can be precised by the user. Typically, these are precised in a configuration file. The following values are the default ones:
  
-.. doctest:: iptest
+.. doctest:: aptest
   :options: +NORMALIZE_WHITESPACE
   
   >>> win_length_ms = 20 # The window length of the cepstral analysis in milliseconds
@@ -95,46 +95,47 @@ The LFCC and MFCC coefficients can be extracted from a audio signal by using :py
 
 Once the parameters are precised, :py:func:`bob.ap.Ceps` can be called as follows:
 
-.. doctest:: iptest
+.. doctest:: aptest
   :options: +NORMALIZE_WHITESPACE
   
   >>> c = bob.ap.Ceps(rate, win_length_ms, win_shift_ms, n_filters, n_ceps, f_min, f_max, delta_win, pre_emphasis_coef, mel_scale, dct_norm)
   >>> signal = numpy.cast['float'](signal) # vector should be in **float**
   >>> mfcc = c(signal)
-  >>> len(mfcc)
+  >>> print len(mfcc)
   199
-  >>> len(mfcc[0])
+  >>> print len(mfcc[0])
   19
 
- 
 LFCCs can be computed instead of MFCCs by setting **mel_scale** to **False**
    
-.. doctest:: iptest
+.. doctest:: aptest
   :options: +NORMALIZE_WHITESPACE
   
   >>> c.mel_scale = False
-  >>> c = bob.ap.Ceps(rate, win_length_ms, win_shift_ms, n_filters, n_ceps, f_min, f_max, delta_win, pre_emphasis_coef, mel_scale, dct_norm)
   >>> lfcc = c(signal)
   
 User can also choose to extract the energy. This is typically used for Voice Activity Detection. Please check spkRecLib or FaceRecLib for more details about VAD.
 
-.. doctest:: iptest
+.. doctest:: aptest
   :options: +NORMALIZE_WHITESPACE
   
   >>> c.with_energy = True
   >>> lfcc_e = c(signal)
-  >>> len(lfcc_e)
+  >>> print len(lfcc_e)
   199
-  >>> len(lfcc_e[0])
+  >>> print len(lfcc_e[0])
   20
 
 It is also possible to compute first and second derivatives for those features:
 
+.. doctest:: aptest
+  :options: +NORMALIZE_WHITESPACE
+  
   >>> c.with_delta = True
   >>> c.with_delta_delta = True
   >>> lfcc_e_d_dd = c(signal)
-  >>> len(lfcc_e_d_dd)
+  >>> print len(lfcc_e_d_dd)
   199
-  >>> len(lfcc_e_d_dd[0])
+  >>> print len(lfcc_e_d_dd[0])
   60
   
