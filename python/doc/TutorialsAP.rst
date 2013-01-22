@@ -49,14 +49,12 @@ Below are 3 examples on how to read a wavefile and how to compute Linear frequen
 Reading audio files
 ~~~~~~~~~~~~~~~~~~~~
 
-The usual native formats can be read with **scipy.io.wavfile** module. Other wave formats can be found in some other python modules like **pysox**.
+The usual native formats can be read with **scipy.io.wavfile** module. Other wave formats can be found in some other python modules like **pysox**. An example of wave file can be found here **bob/ap/test/data/sample.wav**
 
 .. doctest:: aptest
   :options: +NORMALIZE_WHITESPACE
   
   >>> import scipy.io.wavfile
-  >>> print wave_path
-  /idiap/user/ekhoury/cxx_features/bob/bob_elie_3/build/lib/python2.7/site-packages/bob/ap/test/data/sample.wav
   >>> rate, signal = scipy.io.wavfile.read(str(wave_path)) # the data is read in its native format
   >>> print rate
   8000
