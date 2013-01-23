@@ -22,13 +22,18 @@
   import numpy
   import math
   import os
-    
+  import logging
+  logger = logging.getLogger()
+  logger.propagate = False  
 
   def F(m, f):
     from pkg_resources import resource_filename
     return resource_filename('bob.%s.test' % m, os.path.join('data', f))
 
   wave_path = F('ap', 'sample.wav')
+  
+  import scipy.io.wavfile 
+  rate, signal = scipy.io.wavfile.read(str(wave_path))
 
 
 *****************************
@@ -54,8 +59,8 @@ The usual native formats can be read with **scipy.io.wavfile** module. Other wav
 .. doctest:: aptest
   :options: +NORMALIZE_WHITESPACE
   
-  >>> import scipy.io.wavfile
-  >>> rate, signal = scipy.io.wavfile.read(str(wave_path)) # the data is read in its native format
+  >>> import scipy.io.wavfile #doctest: +SKIP
+  >>> rate, signal = scipy.io.wavfile.read(str(wave_path)) #doctest: +SKIP
   >>> print rate
   8000
   >>> print signal
