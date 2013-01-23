@@ -4,16 +4,16 @@
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -35,7 +35,7 @@ bob::machine::JFABaseMachine::JFABaseMachine():
 {
 }
 
-bob::machine::JFABaseMachine::JFABaseMachine(const boost::shared_ptr<bob::machine::GMMMachine> ubm, 
+bob::machine::JFABaseMachine::JFABaseMachine(const boost::shared_ptr<bob::machine::GMMMachine> ubm,
     const size_t ru, const size_t rv):
   m_ubm(ubm), m_ru(ru), m_rv(rv),
   m_U(getDimCD(),ru), m_V(getDimCD(),rv), m_d(getDimCD())
@@ -50,7 +50,7 @@ bob::machine::JFABaseMachine::JFABaseMachine(const bob::machine::JFABaseMachine&
 }
 
 bob::machine::JFABaseMachine::JFABaseMachine(bob::io::HDF5File& config):
-  m_ubm(boost::shared_ptr<bob::machine::GMMMachine>()) 
+  m_ubm(boost::shared_ptr<bob::machine::GMMMachine>())
 {
   load(config);
 }
@@ -70,22 +70,25 @@ bob::machine::JFABaseMachine& bob::machine::JFABaseMachine::operator=
 }
 
 bool bob::machine::JFABaseMachine::operator==(const bob::machine::JFABaseMachine& b) const {
-  return (((m_ubm && b.m_ubm) && *m_ubm == *(b.m_ubm)) || (!m_ubm && !b.m_ubm)) && 
+  return (((m_ubm && b.m_ubm) && *m_ubm == *(b.m_ubm)) || (!m_ubm && !b.m_ubm)) &&
          m_ru == b.m_ru && m_rv == b.m_rv &&
          blitz::all(m_U == b.m_U) && blitz::all(m_V == b.m_V) &&
          blitz::all(m_d == b.m_d);
 }
 
 bool bob::machine::JFABaseMachine::is_similar_to(const bob::machine::JFABaseMachine& b, const double epsilon) const {
+  if (m_ubm && b.m_ubm && !m_ubm->is_similar_to(*b.m_ubm, epsilon))
+    return false;
+
   if (m_ru != b.m_ru && m_rv != b.m_rv)
     return false;
-  
+
   if (blitz::any(blitz::abs(m_U - b.m_U) > epsilon))
     return false;
-   
+
   if (blitz::any(blitz::abs(m_V - b.m_V) > epsilon))
     return false;
-    
+
   if (blitz::any(blitz::abs(m_d - b.m_d) > epsilon))
     return false;
   return true;
@@ -157,7 +160,7 @@ bob::machine::JFAMachine::JFAMachine():
 {
 }
 
-bob::machine::JFAMachine::JFAMachine(const boost::shared_ptr<bob::machine::JFABaseMachine> jfa_base): 
+bob::machine::JFAMachine::JFAMachine(const boost::shared_ptr<bob::machine::JFABaseMachine> jfa_base):
   m_jfa_base(jfa_base),
   m_y(jfa_base->getDimRv()), m_z(jfa_base->getDimCD()),
   m_y_for_x(jfa_base->getDimRv()), m_z_for_x(jfa_base->getDimCD()),
@@ -203,15 +206,13 @@ bool bob::machine::JFAMachine::operator==(const bob::machine::JFAMachine& m) con
 }
 
 bool bob::machine::JFAMachine::is_similar_to(const bob::machine::JFAMachine& b, const double epsilon) const {
-  if (m_jfa_base && b.m_jfa_base){
-    return m_jfa_base->is_similar_to(*b.m_jfa_base, epsilon);
-  }else{
-    if (blitz::any(blitz::abs(m_y - b.m_y) > epsilon))
-      return false; 
-    if (blitz::any(blitz::abs(m_z - b.m_z) > epsilon))
-      return false;
-    return true;
-  }
+  if (m_jfa_base && b.m_jfa_base && !m_jfa_base->is_similar_to(*b.m_jfa_base, epsilon))
+    return false;
+  if (blitz::any(blitz::abs(m_y - b.m_y) > epsilon))
+    return false;
+  if (blitz::any(blitz::abs(m_z - b.m_z) > epsilon))
+    return false;
+  return true;
 }
 
 void bob::machine::JFAMachine::load(bob::io::HDF5File& config) {
@@ -226,7 +227,7 @@ void bob::machine::JFAMachine::save(bob::io::HDF5File& config) const {
 }
 
 void bob::machine::JFAMachine::setJFABase(const boost::shared_ptr<bob::machine::JFABaseMachine> jfa_base) {
-  m_jfa_base = jfa_base; 
+  m_jfa_base = jfa_base;
   // Resize variables
   resize();
 }
@@ -272,7 +273,7 @@ void bob::machine::JFAMachine::setZ(const blitz::Array<double,1>& z) {
 
 
 void bob::machine::JFAMachine::cacheSupervectors()
-{ 
+{
   // Put supervectors in cache
   m_jfa_base->getUbm()->getMeanSupervector(m_cache_mean);
   m_jfa_base->getUbm()->getVarianceSupervector(m_cache_sigma);
@@ -290,7 +291,7 @@ void bob::machine::JFAMachine::computeIdPlusUSProdInv(boost::shared_ptr<const bo
 {
   // Computes (Id + U^T.Sigma^-1.U.N_{i,h}.U)^-1 = (Id + sum_{c=1..C} N_{i,h}.U_{c}^T.Sigma_{c}^-1.U_{c})^-1
   const blitz::Array<double,2>& U = m_jfa_base->getU();
-  // Blitz compatibility: ugly fix (const_cast, as old blitz version does not 
+  // Blitz compatibility: ugly fix (const_cast, as old blitz version does not
   // provide a non-const version of transpose())
   blitz::Array<double,2> Ut = const_cast<blitz::Array<double,2>&>(U).transpose(1,0);
 
@@ -332,12 +333,12 @@ void bob::machine::JFAMachine::computeFn_x(boost::shared_ptr<const bob::machine:
 void bob::machine::JFAMachine::updateX_fromCache()
 {
   // m_tmp_ru = m_cache_UtSigmaInv * m_cache_Fn_x = Ut*diag(sigma)^-1 * N*(o - m)
-  bob::math::prod(m_cache_UtSigmaInv, m_cache_Fn_x, m_tmp_ru); 
-  // x = m_cache_IdPlusUSProdInv * m_cache_UtSigmaInv * m_cache_Fn_x 
+  bob::math::prod(m_cache_UtSigmaInv, m_cache_Fn_x, m_tmp_ru);
+  // x = m_cache_IdPlusUSProdInv * m_cache_UtSigmaInv * m_cache_Fn_x
   bob::math::prod(m_cache_IdPlusUSProdInv, m_tmp_ru, m_x);
 }
 
-void bob::machine::JFAMachine::estimateX(boost::shared_ptr<const bob::machine::GMMStats> gmm_stats) 
+void bob::machine::JFAMachine::estimateX(boost::shared_ptr<const bob::machine::GMMStats> gmm_stats)
 {
   cacheSupervectors(); // Put supervector in cache
   computeUtSigmaInv(); // Computes U^T.Sigma^-1
@@ -384,7 +385,7 @@ void bob::machine::JFAMachine::forward(boost::shared_ptr<const bob::machine::GMM
 
   // Linear scoring
   blitz::Array<double,2> scores(1,1);
-  bob::machine::linearScoring(models, 
+  bob::machine::linearScoring(models,
     m_jfa_base->getUbm()->getMeanSupervector(), m_jfa_base->getUbm()->getVarianceSupervector(),
     stats, channelOffset, true, scores);
   score = scores(0,0);
@@ -415,13 +416,13 @@ void bob::machine::JFAMachine::forward(const std::vector<boost::shared_ptr<const
   // Linear scoring
   // TODO: try to avoid this 2D array allocation or put in cache
   blitz::Array<double,2> scores(1,samples.size());
-  bob::machine::linearScoring(models, 
+  bob::machine::linearScoring(models,
     m_jfa_base->getUbm()->getMeanSupervector(), m_jfa_base->getUbm()->getVarianceSupervector(),
     samples, channelOffset, true, scores);
   score = scores(0,blitz::Range::all());
 }
 
-void bob::machine::JFAMachine::forward(boost::shared_ptr<const bob::machine::GMMStats> gmm_stats, 
+void bob::machine::JFAMachine::forward(boost::shared_ptr<const bob::machine::GMMStats> gmm_stats,
   const blitz::Array<double,1>& Ux, double& score)
 {
   // Checks that a Base machine has been set
@@ -441,7 +442,7 @@ void bob::machine::JFAMachine::forward(boost::shared_ptr<const bob::machine::GMM
 
   // Linear scoring
   blitz::Array<double,2> scores(1,1);
-  bob::machine::linearScoring(models, 
+  bob::machine::linearScoring(models,
     m_jfa_base->getUbm()->getMeanSupervector(), m_jfa_base->getUbm()->getVarianceSupervector(),
     stats, channelOffset, true, scores);
   score = scores(0,0);

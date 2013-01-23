@@ -5,16 +5,16 @@
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -27,19 +27,19 @@ bob::machine::GMMMachine::GMMMachine(): m_gaussians(0) {
   resize(0,0);
 }
 
-bob::machine::GMMMachine::GMMMachine(const size_t n_gaussians, const size_t n_inputs): 
+bob::machine::GMMMachine::GMMMachine(const size_t n_gaussians, const size_t n_inputs):
   m_gaussians(0)
 {
   resize(n_gaussians,n_inputs);
 }
 
-bob::machine::GMMMachine::GMMMachine(bob::io::HDF5File& config): 
+bob::machine::GMMMachine::GMMMachine(bob::io::HDF5File& config):
   m_gaussians(0)
 {
   load(config);
 }
 
-bob::machine::GMMMachine::GMMMachine(const GMMMachine& other): 
+bob::machine::GMMMachine::GMMMachine(const GMMMachine& other):
   Machine<blitz::Array<double,1>, double>(other), m_gaussians(0)
 {
   copy(other);
@@ -47,15 +47,15 @@ bob::machine::GMMMachine::GMMMachine(const GMMMachine& other):
 
 bob::machine::GMMMachine& bob::machine::GMMMachine::operator=(const bob::machine::GMMMachine &other) {
   // protect against invalid self-assignment
-  if (this != &other) 
+  if (this != &other)
     copy(other);
-  
+
   // by convention, always return *this
   return *this;
 }
 
 bool bob::machine::GMMMachine::operator==(const bob::machine::GMMMachine& b) const {
-  if(m_n_gaussians != b.m_n_gaussians || m_n_inputs != b.m_n_inputs) 
+  if(m_n_gaussians != b.m_n_gaussians || m_n_inputs != b.m_n_inputs)
     return false;
 
   for(size_t i=0; i<m_n_gaussians; ++i) {
@@ -72,7 +72,22 @@ bool bob::machine::GMMMachine::operator==(const bob::machine::GMMMachine& b) con
 bool bob::machine::GMMMachine::operator!=(const bob::machine::GMMMachine& b) const {
   return !(this->operator==(b));
 }
- 
+
+bool bob::machine::GMMMachine::is_similar_to(const bob::machine::GMMMachine& b, const double epsilon) const {
+  if (m_n_gaussians != b.m_n_gaussians ||
+      m_n_inputs != b.m_n_inputs)
+    return false;
+
+  for (size_t i = 0; i < m_n_gaussians; ++i)
+    if (!m_gaussians[i]->is_similar_to(*b.m_gaussians[i], epsilon))
+      return false;
+
+  if (blitz::any(blitz::abs(m_weights - b.m_weights) > epsilon))
+    return false;
+
+  return true;
+}
+
 void bob::machine::GMMMachine::copy(const GMMMachine& other) {
   m_n_gaussians = other.m_n_gaussians;
   m_n_inputs = other.m_n_inputs;
@@ -108,7 +123,7 @@ void bob::machine::GMMMachine::resize(const size_t n_gaussians, const size_t n_i
 
   // Initialise Gaussians
   m_gaussians.clear();
-  for(size_t i=0; i<m_n_gaussians; ++i) 
+  for(size_t i=0; i<m_n_gaussians; ++i)
     m_gaussians.push_back(boost::shared_ptr<bob::machine::Gaussian>(new bob::machine::Gaussian(n_inputs)));
 
   // Initialise cache arrays
@@ -138,13 +153,13 @@ void bob::machine::GMMMachine::setMeans(const blitz::Array<double,2> &means) {
 void bob::machine::GMMMachine::getMeans(blitz::Array<double,2> &means) const {
   bob::core::array::assertSameDimensionLength(means.extent(0), m_n_gaussians);
   bob::core::array::assertSameDimensionLength(means.extent(1), m_n_inputs);
-  for(size_t i=0; i<m_n_gaussians; ++i) 
-    means(i,blitz::Range::all()) = m_gaussians[i]->getMean(); 
+  for(size_t i=0; i<m_n_gaussians; ++i)
+    means(i,blitz::Range::all()) = m_gaussians[i]->getMean();
 }
 
 void bob::machine::GMMMachine::setMeanSupervector(const blitz::Array<double,1> &mean_supervector) {
   bob::core::array::assertSameDimensionLength(mean_supervector.extent(0), m_n_gaussians*m_n_inputs);
-  for(size_t i=0; i<m_n_gaussians; ++i) 
+  for(size_t i=0; i<m_n_gaussians; ++i)
     m_gaussians[i]->updateMean() = mean_supervector(blitz::Range(i*m_n_inputs, (i+1)*m_n_inputs-1));
   m_cache_supervector = false;
 }
@@ -152,7 +167,7 @@ void bob::machine::GMMMachine::setMeanSupervector(const blitz::Array<double,1> &
 void bob::machine::GMMMachine::getMeanSupervector(blitz::Array<double,1> &mean_supervector) const {
   bob::core::array::assertSameDimensionLength(mean_supervector.extent(0), m_n_gaussians*m_n_inputs);
   for(size_t i=0; i<m_n_gaussians; ++i)
-    mean_supervector(blitz::Range(i*m_n_inputs, (i+1)*m_n_inputs-1)) = m_gaussians[i]->getMean(); 
+    mean_supervector(blitz::Range(i*m_n_inputs, (i+1)*m_n_inputs-1)) = m_gaussians[i]->getMean();
 }
 
 void bob::machine::GMMMachine::setVariances(const blitz::Array<double, 2 >& variances) {
@@ -168,7 +183,7 @@ void bob::machine::GMMMachine::setVariances(const blitz::Array<double, 2 >& vari
 void bob::machine::GMMMachine::getVariances(blitz::Array<double, 2 >& variances) const {
   bob::core::array::assertSameDimensionLength(variances.extent(0), m_n_gaussians);
   bob::core::array::assertSameDimensionLength(variances.extent(1), m_n_inputs);
-  for(size_t i=0; i<m_n_gaussians; ++i) 
+  for(size_t i=0; i<m_n_gaussians; ++i)
     variances(i,blitz::Range::all()) = m_gaussians[i]->getVariance();
 }
 
@@ -184,19 +199,19 @@ void bob::machine::GMMMachine::setVarianceSupervector(const blitz::Array<double,
 void bob::machine::GMMMachine::getVarianceSupervector(blitz::Array<double,1> &variance_supervector) const {
   bob::core::array::assertSameDimensionLength(variance_supervector.extent(0), m_n_gaussians*m_n_inputs);
   for(size_t i=0; i<m_n_gaussians; ++i) {
-    variance_supervector(blitz::Range(i*m_n_inputs, (i+1)*m_n_inputs-1)) = m_gaussians[i]->getVariance(); 
+    variance_supervector(blitz::Range(i*m_n_inputs, (i+1)*m_n_inputs-1)) = m_gaussians[i]->getVariance();
   }
 }
 
 void bob::machine::GMMMachine::setVarianceThresholds(const double value) {
-  for(size_t i=0; i<m_n_gaussians; ++i) 
+  for(size_t i=0; i<m_n_gaussians; ++i)
     m_gaussians[i]->setVarianceThresholds(value);
   m_cache_supervector = false;
 }
 
 void bob::machine::GMMMachine::setVarianceThresholds(blitz::Array<double, 1> variance_thresholds) {
   bob::core::array::assertSameDimensionLength(variance_thresholds.extent(0), m_n_inputs);
-  for(size_t i=0; i<m_n_gaussians; ++i) 
+  for(size_t i=0; i<m_n_gaussians; ++i)
     m_gaussians[i]->setVarianceThresholds(variance_thresholds);
   m_cache_supervector = false;
 }
@@ -205,19 +220,19 @@ void bob::machine::GMMMachine::setVarianceThresholds(const blitz::Array<double, 
   bob::core::array::assertSameDimensionLength(variance_thresholds.extent(0), m_n_gaussians);
   bob::core::array::assertSameDimensionLength(variance_thresholds.extent(1), m_n_inputs);
   for(size_t i=0; i<m_n_gaussians; ++i)
-    m_gaussians[i]->setVarianceThresholds(variance_thresholds(i,blitz::Range::all())); 
+    m_gaussians[i]->setVarianceThresholds(variance_thresholds(i,blitz::Range::all()));
   m_cache_supervector = false;
 }
 
 void bob::machine::GMMMachine::getVarianceThresholds(blitz::Array<double, 2>& variance_thresholds) const {
   bob::core::array::assertSameDimensionLength(variance_thresholds.extent(0), m_n_gaussians);
   bob::core::array::assertSameDimensionLength(variance_thresholds.extent(1), m_n_inputs);
-  for(size_t i=0; i<m_n_gaussians; ++i) 
+  for(size_t i=0; i<m_n_gaussians; ++i)
     variance_thresholds(i,blitz::Range::all()) = m_gaussians[i]->getVarianceThresholds();
 }
 
-double bob::machine::GMMMachine::logLikelihood(const blitz::Array<double, 1> &x, 
-  blitz::Array<double,1> &log_weighted_gaussian_likelihoods) const 
+double bob::machine::GMMMachine::logLikelihood(const blitz::Array<double, 1> &x,
+  blitz::Array<double,1> &log_weighted_gaussian_likelihoods) const
 {
   // Check dimension
   bob::core::array::assertSameDimensionLength(log_weighted_gaussian_likelihoods.extent(0), m_n_gaussians);
@@ -225,8 +240,8 @@ double bob::machine::GMMMachine::logLikelihood(const blitz::Array<double, 1> &x,
   return logLikelihood_(x,log_weighted_gaussian_likelihoods);
 }
 
-double bob::machine::GMMMachine::logLikelihood_(const blitz::Array<double, 1> &x, 
-  blitz::Array<double,1> &log_weighted_gaussian_likelihoods) const 
+double bob::machine::GMMMachine::logLikelihood_(const blitz::Array<double, 1> &x,
+  blitz::Array<double,1> &log_weighted_gaussian_likelihoods) const
 {
   // Initialise variables
   double log_likelihood = bob::math::Log::LogZero;
@@ -315,7 +330,7 @@ void bob::machine::GMMMachine::accStatistics_(const blitz::Array<double, 1>& x, 
 }
 
 void bob::machine::GMMMachine::accStatisticsInternal(const blitz::Array<double, 1>& x,
-  bob::machine::GMMStats& stats, const double log_likelihood) const 
+  bob::machine::GMMStats& stats, const double log_likelihood) const
 {
   // Calculate responsibilities
   m_cache_P = blitz::exp(m_cache_log_weighted_gaussian_likelihoods - log_likelihood);
@@ -333,9 +348,9 @@ void bob::machine::GMMMachine::accStatisticsInternal(const blitz::Array<double, 
   // - first order stats
   blitz::firstIndex i;
   blitz::secondIndex j;
-  
+
   m_cache_Px = m_cache_P(i) * x(j);
-  
+
   stats.sumPx += m_cache_Px;
 
   // - second order stats
@@ -344,7 +359,7 @@ void bob::machine::GMMMachine::accStatisticsInternal(const blitz::Array<double, 
 
 
 boost::shared_ptr<bob::machine::Gaussian> bob::machine::GMMMachine::getGaussian(const size_t i) {
-  if(i>=m_n_gaussians) 
+  if(i>=m_n_gaussians)
     throw bob::machine::Exception();
   return m_gaussians[i];
 }
@@ -358,7 +373,7 @@ void bob::machine::GMMMachine::save(bob::io::HDF5File& config) const {
   for(size_t i=0; i<m_n_gaussians; ++i) {
     std::ostringstream oss;
     oss << "m_gaussians" << i;
-   
+
     if (!config.hasGroup(oss.str())) config.createGroup(oss.str());
     config.cd(oss.str());
     m_gaussians[i]->save(config);
@@ -374,7 +389,7 @@ void bob::machine::GMMMachine::load(bob::io::HDF5File& config) {
   m_n_gaussians = static_cast<size_t>(v);
   v = config.read<int64_t>("m_n_inputs");
   m_n_inputs = static_cast<size_t>(v);
-  
+
   m_gaussians.clear();
   for(size_t i=0; i<m_n_gaussians; ++i) {
     m_gaussians.push_back(boost::shared_ptr<bob::machine::Gaussian>(new bob::machine::Gaussian(m_n_inputs)));
@@ -396,7 +411,7 @@ void bob::machine::GMMMachine::updateCacheSupervectors() const
 {
   m_cache_mean_supervector.resize(m_n_gaussians*m_n_inputs);
   m_cache_variance_supervector.resize(m_n_gaussians*m_n_inputs);
-  
+
   for(size_t i=0; i<m_n_gaussians; ++i) {
     blitz::Range range(i*m_n_inputs, (i+1)*m_n_inputs-1);
     m_cache_mean_supervector(range) = m_gaussians[i]->getMean();
@@ -424,13 +439,13 @@ const blitz::Array<double,1>& bob::machine::GMMMachine::getMeanSupervector() con
   if(!m_cache_supervector)
     updateCacheSupervectors();
   return m_cache_mean_supervector;
-} 
+}
 
 const blitz::Array<double,1>& bob::machine::GMMMachine::getVarianceSupervector() const {
   if(!m_cache_supervector)
     updateCacheSupervectors();
   return m_cache_variance_supervector;
-} 
+}
 
 namespace bob {
   namespace machine {

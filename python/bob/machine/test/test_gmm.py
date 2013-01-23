@@ -4,16 +4,16 @@
 # Thu Feb 16 17:57:10 2012 +0200
 #
 # Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 3 of the License.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -88,8 +88,8 @@ class GMMMachineTest(unittest.TestCase):
     self.assertTrue( (gs_loaded.sum_pxx == 0).all() )
     # Resize and checks size
     gs_loaded.resize(4,5)
-    self.assertTrue( gs_loaded.sum_px.shape[0] == 4) 
-    self.assertTrue( gs_loaded.sum_px.shape[1] == 5) 
+    self.assertTrue( gs_loaded.sum_px.shape[0] == 4)
+    self.assertTrue( gs_loaded.sum_px.shape[1] == 5)
 
     # Clean-up
     os.unlink(filename)
@@ -106,7 +106,7 @@ class GMMMachineTest(unittest.TestCase):
     varianceThresholds = numpy.array([[0, 0, 0], [0, 0, 0]], 'float64')
     varianceThresholds2 = numpy.array([[0.0005, 0.0005, 0.0005], [0, 0, 0]], 'float64')
 
-    # Initializes a GMMMachine 
+    # Initializes a GMMMachine
     gmm = bob.machine.GMMMachine(2,3)
     # Sets the weights, means, variances and varianceThresholds and
     # Checks correctness
@@ -120,7 +120,7 @@ class GMMMachineTest(unittest.TestCase):
     self.assertTrue( (gmm.means == means).all() )
     self.assertTrue( (gmm.variances == variances).all() )
     self.assertTrue( (gmm.variance_thresholds == varianceThresholds).all() )
-   
+
     # Checks supervector-like accesses
     self.assertTrue( (gmm.mean_supervector == means.reshape(means.size)).all() )
     self.assertTrue( (gmm.variance_supervector == variances.reshape(variances.size)).all() )
@@ -196,7 +196,7 @@ class GMMMachineTest(unittest.TestCase):
 
     stats = bob.machine.GMMStats(2, 2)
     gmm.acc_statistics(arrayset, stats)
-    
+
     stats_ref = bob.machine.GMMStats(bob.io.HDF5File(F("stats.hdf5")))
 
     self.assertTrue(stats.t == stats_ref.t)
@@ -208,14 +208,14 @@ class GMMMachineTest(unittest.TestCase):
 
   def test04_GMMMachine(self):
     """Test a GMMMachine (log-likelihood computation)"""
-    
+
     data = bob.io.load(F('data.hdf5'))
     gmm = bob.machine.GMMMachine(2, 50)
     gmm.weights   = bob.io.load(F('weights.hdf5'))
     gmm.means     = bob.io.load(F('means.hdf5'))
     gmm.variances = bob.io.load(F('variances.hdf5'))
 
-    # Compare the log-likelihood with the one obtained using Chris Matlab 
+    # Compare the log-likelihood with the one obtained using Chris Matlab
     # implementation
     matlab_ll_ref = -2.361583051672024e+02
     self.assertTrue( abs(gmm(data) - matlab_ll_ref) < 1e-10)

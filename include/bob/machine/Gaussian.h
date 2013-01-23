@@ -5,16 +5,16 @@
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -30,9 +30,9 @@
 namespace bob { namespace machine {
 
 /**
- * @brief This class implements a multivariate diagonal Gaussian distribution. 
+ * @brief This class implements a multivariate diagonal Gaussian distribution.
  */
-class Gaussian: public Machine<blitz::Array<double,1>, double> 
+class Gaussian: public Machine<blitz::Array<double,1>, double>
 {
   public:
     /**
@@ -74,7 +74,12 @@ class Gaussian: public Machine<blitz::Array<double,1>, double>
      * Not equal to
      */
     bool operator!=(const Gaussian& b) const;
-    
+
+    /**
+     * Similar to
+     */
+    bool is_similar_to(const Gaussian& b, const double epsilon=1e-8) const;
+
     /**
      * Set the input dimensionality, reset the mean to zero
      * and the variance to one.
@@ -89,7 +94,7 @@ class Gaussian: public Machine<blitz::Array<double,1>, double>
      */
     size_t getNInputs() const
     { return m_n_inputs; }
-    
+
     /**
      * Set the input dimensionality, reset the mean to zero
      * and the variance to one.
@@ -103,14 +108,14 @@ class Gaussian: public Machine<blitz::Array<double,1>, double>
      */
     inline const blitz::Array<double,1>& getMean() const
     { return m_mean; }
-    
+
     /**
      * Get the mean in order to be updated
      * @warning Only trainers should use this function for efficiency reason
      */
     inline blitz::Array<double,1>& updateMean()
     { return m_mean; }
-    
+
     /**
      * Set the mean
      */
@@ -128,7 +133,7 @@ class Gaussian: public Machine<blitz::Array<double,1>, double>
      */
     inline blitz::Array<double,1>& updateVariance()
     { return m_variance; }
-    
+
     /**
      * Set the variance
      */
@@ -139,14 +144,14 @@ class Gaussian: public Machine<blitz::Array<double,1>, double>
      */
     const blitz::Array<double,1>& getVarianceThresholds() const
     { return m_variance_thresholds; }
-    
+
     /**
      * Get the variance thresholds in order to be updated
      * @warning Only trainers should use this function for efficiency reason
      */
     inline blitz::Array<double,1>& updateVarianceThreshods()
     { return m_variance_thresholds; }
-    
+
     /**
      * Set the variance flooring thresholds
      */
@@ -166,20 +171,20 @@ class Gaussian: public Machine<blitz::Array<double,1>, double>
     void applyVarianceThresholds();
 
     /**
-     * Output the log likelihood of the sample, x 
+     * Output the log likelihood of the sample, x
      * @param x The data sample (feature vector)
      */
     double logLikelihood(const blitz::Array<double,1>& x) const;
 
     /**
-     * Output the log likelihood of the sample, x 
+     * Output the log likelihood of the sample, x
      * @param x The data sample (feature vector)
      * @warning The input is NOT checked
      */
     double logLikelihood_(const blitz::Array<double,1>& x) const;
 
     /**
-     * Computes the log likelihood of the sample, x 
+     * Computes the log likelihood of the sample, x
      * @param x The data sample (feature vector)
      * @param output The computed log likelihood
      */
@@ -187,7 +192,7 @@ class Gaussian: public Machine<blitz::Array<double,1>, double>
     { output = logLikelihood(x); }
 
     /**
-     * Computes the log likelihood of the sample, x 
+     * Computes the log likelihood of the sample, x
      * @param x The data sample (feature vector)
      * @param output The computed log likelihood
      * @warning The input is NOT checked
@@ -199,7 +204,7 @@ class Gaussian: public Machine<blitz::Array<double,1>, double>
      * Saves to a Configuration
      */
     void save(bob::io::HDF5File& config) const;
-    
+
     /**
      * Loads from a Configuration
      */
@@ -221,9 +226,9 @@ class Gaussian: public Machine<blitz::Array<double,1>, double>
      * Computes n_inputs * log(2*pi)
      */
     void preComputeNLog2Pi();
-     
+
     /**
-     * Computes and stores the value of g_norm, 
+     * Computes and stores the value of g_norm,
      * to later speed up evaluation of logLikelihood()
      * Note: g_norm is defined as follows:
      * log(Gaussian pdf) = log(1/((2pi)^(k/2)(det)^(1/2)) * exp(...))

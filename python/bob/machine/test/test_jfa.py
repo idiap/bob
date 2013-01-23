@@ -4,16 +4,16 @@
 # Wed Feb 15 23:24:35 2012 +0200
 #
 # Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 3 of the License.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -29,13 +29,13 @@ import tempfile
 
 class JFAMachineTest(unittest.TestCase):
   """Performs various JFAMachine tests."""
-  
+
   def test01_JFABaseMachine(self):
 
     # Creates a UBM
     weights = numpy.array([0.4, 0.6], 'float64')
     means = numpy.array([[1, 6, 2], [4, 3, 2]], 'float64')
-    variances = numpy.array([[1, 2, 1], [2, 1, 2]], 'float64') 
+    variances = numpy.array([[1, 2, 1], [2, 1, 2]], 'float64')
     ubm = bob.machine.GMMMachine(2,3)
     ubm.weights = weights
     ubm.means = means
@@ -50,10 +50,10 @@ class JFAMachineTest(unittest.TestCase):
     self.assertTrue( m.dim_rv == 1)
 
     # Checks for correctness
-    m.resize(2,2) 
+    m.resize(2,2)
     m.u = U
     m.v = V
-    m.d = d 
+    m.d = d
     self.assertTrue( (m.u == U).all() )
     self.assertTrue( (m.v == V).all() )
     self.assertTrue( (m.d == d).all() )
@@ -62,7 +62,7 @@ class JFAMachineTest(unittest.TestCase):
     self.assertTrue( m.dim_cd == 6)
     self.assertTrue( m.dim_ru == 2)
     self.assertTrue( m.dim_rv == 2)
-   
+
     # Saves and loads
     filename = str(tempfile.mkstemp(".hdf5")[1])
     m.save(bob.io.HDF5File(filename, 'w'))
@@ -78,7 +78,7 @@ class JFAMachineTest(unittest.TestCase):
     # Creates a UBM
     weights = numpy.array([0.4, 0.6], 'float64')
     means = numpy.array([[1, 6, 2], [4, 3, 2]], 'float64')
-    variances = numpy.array([[1, 2, 1], [2, 1, 2]], 'float64') 
+    variances = numpy.array([[1, 2, 1], [2, 1, 2]], 'float64')
     ubm = bob.machine.GMMMachine(2,3)
     ubm.weights = weights
     ubm.means = means
@@ -91,7 +91,7 @@ class JFAMachineTest(unittest.TestCase):
     base = bob.machine.JFABaseMachine(ubm,2,2)
     base.u = U
     base.v = V
-    base.d = d 
+    base.d = d
 
     # Creates a JFAMachine
     y = numpy.array([1,2], 'float64')
@@ -113,6 +113,7 @@ class JFAMachineTest(unittest.TestCase):
     m_loaded = bob.machine.JFAMachine(bob.io.HDF5File(filename))
     m_loaded.jfa_base = base
     self.assertTrue( m == m_loaded )
+    self.assertTrue(m.is_similar_to(m_loaded))
 
     # Defines GMMStats
     gs = bob.machine.GMMStats(2,3)
@@ -137,13 +138,13 @@ class JFAMachineTest(unittest.TestCase):
 
     # Clean-up
     os.unlink(filename)
-  
+
   def test03_ISVMachine(self):
 
     # Creates a UBM
     weights = numpy.array([0.4, 0.6], 'float64')
     means = numpy.array([[1, 6, 2], [4, 3, 2]], 'float64')
-    variances = numpy.array([[1, 2, 1], [2, 1, 2]], 'float64') 
+    variances = numpy.array([[1, 2, 1], [2, 1, 2]], 'float64')
     ubm = bob.machine.GMMMachine(2,3)
     ubm.weights = weights
     ubm.means = means

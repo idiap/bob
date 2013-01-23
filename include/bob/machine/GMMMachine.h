@@ -8,16 +8,16 @@
  * @details See Section 2.3.9 of Bishop, "Pattern recognition and machine learning", 2006
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -34,12 +34,12 @@
 #include <vector>
 
 namespace bob { namespace machine {
-  
-/** 
+
+/**
  * @brief This class implements a multivariate diagonal Gaussian distribution.
  * @details See Section 2.3.9 of Bishop, "Pattern recognition and machine learning", 2006
  */
-class GMMMachine: public Machine<blitz::Array<double,1>, double> 
+class GMMMachine: public Machine<blitz::Array<double,1>, double>
 {
   public:
     /**
@@ -66,7 +66,7 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double>
     GMMMachine(bob::io::HDF5File& config);
 
     /**
-     * Assigment
+     * Assignment
      */
     GMMMachine& operator=(const GMMMachine &other);
 
@@ -74,15 +74,21 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double>
      * Equal to
      */
     bool operator==(const GMMMachine& b) const;
+
     /**
      * Not equal to
      */
     bool operator!=(const GMMMachine& b) const;
-    
+
+    /**
+     * Similar to
+     */
+    bool is_similar_to(const GMMMachine& b, const double epsilon=1e-8) const;
+
     /**
      * Destructor
      */
-    virtual ~GMMMachine(); 
+    virtual ~GMMMachine();
 
     /**
      * Set the feature dimensionality
@@ -100,7 +106,7 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double>
      * Initialises the weights to uniform distribution.
      * @param n_gaussians The number of Gaussian components
      * @param n_inputs    The feature dimensionality
-     */ 
+     */
     void resize(const size_t n_gaussians, const size_t n_inputs);
 
     /**
@@ -115,7 +121,7 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double>
     { return m_weights; }
 
     /**
-     * Get the weights in order to be updated 
+     * Get the weights in order to be updated
      * ("mixing coefficients") of the Gaussian components
      * @warning Only trainers should use this function for efficiency reason
      */
@@ -142,7 +148,7 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double>
      * Set the means from a supervector
      */
     void setMeanSupervector(const blitz::Array<double,1> &mean_supervector);
-    /** 
+    /**
      * Get the means
      */
     void getMeans(blitz::Array<double,2> &means) const;
@@ -175,9 +181,9 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double>
      * Returns a const reference to the supervector (Put in cache)
      */
     const blitz::Array<double,1>& getVarianceSupervector() const;
-    
+
     /**
-     * Set the variance flooring thresholds in each dimension 
+     * Set the variance flooring thresholds in each dimension
      */
     void setVarianceThresholds(const double value);
     /**
@@ -193,7 +199,7 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double>
      * Get the variance flooring thresholds for each Gaussian in each dimension
      */
     void getVarianceThresholds(blitz::Array<double,2> &variance_thresholds) const;
-    
+
     /**
      * Output the log likelihood of the sample, x, i.e. log(p(x|GMMMachine))
      * @param[in]  x                                 The sample
@@ -227,19 +233,19 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double>
     double logLikelihood_(const blitz::Array<double, 1> &x) const;
 
     /**
-     * Output the log likelihood of the sample, x 
+     * Output the log likelihood of the sample, x
      * (overrides Machine::forward)
      * Dimension of the input is checked
      */
     void forward(const blitz::Array<double,1>& input, double& output) const;
-    
+
     /**
-     * Output the log likelihood of the sample, x 
+     * Output the log likelihood of the sample, x
      * (overrides Machine::forward_)
      * @warning Dimension of the input is not checked
-     */ 
+     */
     void forward_(const blitz::Array<double,1>& input, double& output) const;
-    
+
     /**
      * Accumulates the GMM statistics over a set of samples.
      * @see bool accStatistics(const blitz::Array<double,1> &x, GMMStats stats)
@@ -271,7 +277,7 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double>
      * @warning Dimensions of the parameters are not checked
      */
     void accStatistics_(const blitz::Array<double,1> &x, GMMStats &stats) const;
-    
+
     /**
      * Get a pointer to a particular Gaussian component
      * @param[in] i The index of the Gaussian component
@@ -290,7 +296,7 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double>
      * Save to a Configuration
      */
     void save(bob::io::HDF5File& config) const;
-    
+
     /**
      * Load from a Configuration
      */
@@ -300,21 +306,21 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double>
      * Load/Reload mean/variance supervector in cache
      */
     void reloadCacheSupervectors() const;
-    
+
     friend std::ostream& operator<<(std::ostream& os, const GMMMachine& machine);
 
-    
+
   private:
     /**
      * Copy another GMMMachine
      */
     void copy(const GMMMachine&);
-    
+
     /**
      * The number of Gaussian components
      */
     size_t m_n_gaussians;
-    
+
     /**
      * The feature dimensionality
      */
@@ -331,7 +337,7 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double>
     blitz::Array<double,1> m_weights;
 
     /**
-     * Update the mean and variance supervectors 
+     * Update the mean and variance supervectors
      * in cache (into a 1D blitz array)
      */
     void updateCacheSupervectors() const;
@@ -342,7 +348,7 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double>
     void initCache() const;
 
     /**
-     * Accumulate the GMM statistics for this sample. 
+     * Accumulate the GMM statistics for this sample.
      * Called by accStatistics() and accStatistics_()
      *
      * @param[in]  x     The current sample
@@ -350,9 +356,9 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double>
      * @param[in]  log_likelihood  The current log_likelihood
      * @warning Dimensions of the parameters are not checked
      */
-    void accStatisticsInternal(const blitz::Array<double,1> &x, 
+    void accStatisticsInternal(const blitz::Array<double,1> &x,
       GMMStats &stats, const double log_likelihood) const;
-    
+
 
     /// Some cache arrays to avoid re-allocation when computing log-likelihoods
     mutable blitz::Array<double,1> m_cache_log_weights;
@@ -363,7 +369,7 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double>
     mutable blitz::Array<double,1> m_cache_mean_supervector;
     mutable blitz::Array<double,1> m_cache_variance_supervector;
     mutable bool m_cache_supervector;
-    
+
 };
 
 }}

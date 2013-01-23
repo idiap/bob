@@ -5,16 +5,16 @@
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -44,7 +44,7 @@ bob::machine::Gaussian::~Gaussian() {
 }
 
 bob::machine::Gaussian& bob::machine::Gaussian::operator=(const bob::machine::Gaussian &other) {
-  if(this != &other) 
+  if(this != &other)
     copy(other);
 
   return *this;
@@ -68,6 +68,22 @@ bool bob::machine::Gaussian::operator==(const bob::machine::Gaussian& b) const {
 
 bool bob::machine::Gaussian::operator!=(const bob::machine::Gaussian& b) const {
   return !(this->operator==(b));
+}
+
+bool bob::machine::Gaussian::is_similar_to(const bob::machine::Gaussian& b, const double epsilon) const {
+  // Check dimensions
+  if (m_mean.extent(0) != b.m_mean.extent(0) ||
+      m_variance.extent(0) != b.m_variance.extent(0) ||
+      m_variance_thresholds.extent(0) != b.m_variance_thresholds.extent(0))
+    return false;
+
+  // Check content
+  if (m_n_inputs != b.m_n_inputs || blitz::any(blitz::abs(m_mean - b.m_mean) > epsilon) ||
+      blitz::any(blitz::abs(m_variance - b.m_variance) > epsilon) ||
+      blitz::any(blitz::abs(m_variance_thresholds - b.m_variance_thresholds) > epsilon))
+    return false;
+
+  return true;
 }
 
 void bob::machine::Gaussian::copy(const bob::machine::Gaussian& other) {
@@ -141,11 +157,11 @@ void bob::machine::Gaussian::applyVarianceThresholds() {
   m_variance = blitz::where( m_variance < m_variance_thresholds, m_variance_thresholds, m_variance);
 
   // Re-compute g_norm, because m_variance has changed
-  preComputeConstants(); 
+  preComputeConstants();
 }
 
 double bob::machine::Gaussian::logLikelihood(const blitz::Array<double,1> &x) const {
-  // Check 
+  // Check
   bob::core::array::assertSameShape(x, m_mean);
   return logLikelihood_(x);
 }
@@ -176,11 +192,11 @@ void bob::machine::Gaussian::save(bob::io::HDF5File& config) const {
 void bob::machine::Gaussian::load(bob::io::HDF5File& config) {
   int64_t v = config.read<int64_t>("m_n_inputs");
   m_n_inputs = static_cast<size_t>(v);
-  
+
   m_mean.resize(m_n_inputs);
   m_variance.resize(m_n_inputs);
   m_variance_thresholds.resize(m_n_inputs);
- 
+
   config.readArray("m_mean", m_mean);
   config.readArray("m_variance", m_variance);
   config.readArray("m_variance_thresholds", m_variance_thresholds);

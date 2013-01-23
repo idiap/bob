@@ -4,16 +4,16 @@
 # Thu Feb 16 16:54:45 2012 +0200
 #
 # Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 3 of the License.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -28,7 +28,7 @@ import tempfile
 
 def equals(x, y, epsilon):
   return (abs(x - y) < epsilon)
-  
+
 class GaussianMachineTest(unittest.TestCase):
   """Performs various Gaussian machine tests."""
 
@@ -38,7 +38,7 @@ class GaussianMachineTest(unittest.TestCase):
     # By default, initialized with zero mean and unit variance
     logLH = gaussian.log_likelihood(numpy.array([0.4, 0.2], 'float64'))
     self.assertTrue( equals(logLH, -1.93787706641, 1e-10))
- 
+
   def test02_GaussianMachine(self):
     """Test a GaussianMachine more thoroughly"""
 
@@ -48,7 +48,7 @@ class GaussianMachineTest(unittest.TestCase):
     self.assertTrue( (g.variance == 1.0).all() )
     self.assertTrue( g.dim_d == 3 )
 
-    # Set and check mean, variance, variance thresholds 
+    # Set and check mean, variance, variance thresholds
     mean     = numpy.array([0, 1, 2], 'float64')
     variance = numpy.array([3, 2, 1], 'float64')
     g.mean     = mean
@@ -57,13 +57,14 @@ class GaussianMachineTest(unittest.TestCase):
     self.assertTrue( (g.mean == mean).all() )
     self.assertTrue( (g.variance == variance).all() )
     self.assertTrue( (g.variance_thresholds == 0.0005).all() )
-    
+
     # Save and read from file
     filename = str(tempfile.mkstemp(".hdf5")[1])
     g.save(bob.io.HDF5File(filename, 'w'))
     g_loaded = bob.machine.Gaussian(bob.io.HDF5File(filename))
     self.assertTrue( g == g_loaded )
     self.assertFalse( g != g_loaded )
+    self.assertTrue(g.is_similar_to(g_loaded))
     # Make them different
     g_loaded.set_variance_thresholds(0.001)
     self.assertFalse( g == g_loaded )
