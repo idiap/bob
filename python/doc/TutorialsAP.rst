@@ -22,9 +22,6 @@
   import numpy
   import math
   import os
-  import logging
-  logger = logging.getLogger()
-  logger.propagate = False  
 
   def F(m, f):
     from pkg_resources import resource_filename
@@ -32,9 +29,13 @@
 
   wave_path = F('ap', 'sample.wav')
   
+  
   import scipy.io.wavfile 
+  import sys
+  sys.stdout = open(os.devnull, 'w')
   rate, signal = scipy.io.wavfile.read(str(wave_path))
-
+  sys.stdout = os.fdopen(1, 'w')
+  
 
 *****************************
  Audio processing
