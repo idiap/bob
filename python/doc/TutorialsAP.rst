@@ -32,9 +32,10 @@
   
   import scipy.io.wavfile 
   import sys
-  sys.stdout = open(os.devnull, 'w')
+  sys.stdout =  open(os.devnull, 'w')
   rate, signal = scipy.io.wavfile.read(str(wave_path))
-  sys.stdout = os.fdopen(1, 'w')
+  sys.stdout = sys.__stdout__
+
   
 
 *****************************
