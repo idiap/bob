@@ -352,6 +352,7 @@ class PLDAMachineTest(unittest.TestCase):
     # Clean-up
     os.unlink(filename)
 
+
   def test02_plda_basemachine_loglikelihood_pointestimate(self):
     # Data used for performing the tests
     # Features and subspaces dimensionality
@@ -372,6 +373,7 @@ class PLDAMachineTest(unittest.TestCase):
 
     self.assertTrue(equals(m.compute_log_likelihood_point_estimate(xij, hi, wij), 
                            compute_log_likelihood_point_estimate(xij, mu, C_F, C_G, sigma, hi, wij), 1e-6))
+
 
   def test03_plda_machine(self):
     # Data used for performing the tests
@@ -445,7 +447,8 @@ class PLDAMachineTest(unittest.TestCase):
     # Clean-up
     os.unlink(filename)
 
-  def test04_plda_machine_log_likelihood(self):
+
+  def test04_plda_machine_log_likelihood_Python(self):
     # Data used for performing the tests
     # Features and subspaces dimensionality
     sigma = numpy.ndarray(C_dim_d, 'float64')
@@ -483,3 +486,73 @@ class PLDAMachineTest(unittest.TestCase):
     ar2_s2d = numpy.vstack([ar2_e, ar2_p2d])
     llr2d = m.compute_log_likelihood(ar2_s2d, True) - (m.compute_log_likelihood(ar2_s2d, False) + m.log_likelihood)
     self.assertTrue(abs(m.forward(ar2_s2d) - llr2d) < 1e-10)
+
+
+  def test05_plda_machine_log_likelihood_Prince(self):
+    # Data used for performing the tests
+    # Features and subspaces dimensionality
+    D = 7
+    nf = 2
+    ng = 3
+
+    # initial values for F, G and sigma
+    G_init=numpy.array([-1.1424, -0.5044, -0.1917,
+      -0.6249,  0.1021, -0.8658,
+      -1.1687,  1.1963,  0.1807,
+      0.3926,  0.1203,  1.2665,
+      1.3018, -1.0368, -0.2512,
+      -0.5936, -0.8571, -0.2046,
+      0.4364, -0.1699, -2.2015]).reshape(D,ng)
+    # F <-> PCA on G
+    F_init=numpy.array([-0.054222647972093, -0.000000000783146, 
+      0.596449127693018,  0.000000006265167, 
+      0.298224563846509,  0.000000003132583, 
+      0.447336845769764,  0.000000009397750, 
+      -0.108445295944185, -0.000000001566292, 
+      -0.501559493741856, -0.000000006265167, 
+      -0.298224563846509, -0.000000003132583]).reshape(D,nf)
+    sigma_init = 0.01 * numpy.ones((D,), 'float64')
+    mean_zero = numpy.zeros((D,), 'float64')
+
+    # base machine
+    mb = bob.machine.PLDABaseMachine(D,nf,ng)
+    mb.sigma = sigma_init
+    mb.g = G_init
+    mb.f = F_init
+    mb.mu = mean_zero
+
+    # Data for likelihood computation
+    x1 = numpy.array([0.8032, 0.3503, 0.4587, 0.9511, 0.1330, 0.0703, 0.7061])
+    x2 = numpy.array([0.9317, 0.1089, 0.6517, 0.1461, 0.6940, 0.6256, 0.0437])
+    x3 = numpy.array([0.7979, 0.9862, 0.4367, 0.3447, 0.0488, 0.2252, 0.5810])
+    X = numpy.ndarray((3,D), 'float64')
+    X[0,:] = x1
+    X[1,:] = x2
+    X[2,:] = x3
+    a = []
+    a.append(x1)
+    a.append(x2)
+    a.append(x3)
+    a = numpy.array(a)
+
+    # reference likelihood from Prince implementation
+    ll_ref = -182.8880743535197
+
+    # machine
+    m = bob.machine.PLDAMachine(mb)
+    ll = m.compute_log_likelihood(X)
+    self.assertTrue(abs(ll - ll_ref) < 1e-10)
+
+    # log likelihood ratio
+    Y = numpy.ndarray((2,D), 'float64')
+    Y[0,:] = x1
+    Y[1,:] = x2
+    Z = numpy.ndarray((1,D), 'float64')
+    Z[0,:] = x3
+    llX = m.compute_log_likelihood(X)
+    llY = m.compute_log_likelihood(Y)
+    llZ = m.compute_log_likelihood(Z)
+    # reference obtained by computing the likelihood of [x1,x2,x3], [x1,x2] 
+    # and [x3] separately
+    llr_ref = -4.43695386675
+    self.assertTrue(abs((llX - (llY + llZ)) - llr_ref) < 1e-10)

@@ -24,10 +24,303 @@ import os, sys
 import unittest
 import bob
 import random
-import numpy
+import numpy, numpy.linalg
 
 def equals(x, y, epsilon):
   return (abs(x - y) < epsilon).all()
+
+class PythonPLDABaseTrainer():
+  """A simplified (and slower) version of the PLDABaseTrainer"""
+
+  def __init__(self, convergence_threshold=0.001, max_iterations=10, 
+      compute_likelihood=False, use_sum_second_order=True):
+    # Our state
+    self.m_convergence_threshold = convergence_threshold
+    self.m_max_iterations = max_iterations
+    self.m_compute_likelihood = compute_likelihood
+    self.m_dim_f = 0
+    self.m_dim_g = 0
+    self.m_B = numpy.ndarray(shape=(0,0), dtype=numpy.float64)
+    self.m_n_samples_per_id = numpy.ndarray(shape=(0,), dtype=numpy.float64)
+    self.m_z_first_order = []
+    self.m_z_second_order = []
+    self.m_sum_z_second_order = numpy.ndarray(shape=(0,0), dtype=numpy.float64)
+
+  def reset(self):
+    """Resets our internal state"""
+    self.m_convergence_threshold = 0.001
+    self.m_max_iterations = 10
+    self.m_compute_likelihood = False
+    self.m_dim_f = 0
+    self.m_dim_g = 0
+    self.m_n_samples_per_id = numpy.ndarray(shape=(0,), dtype=numpy.float64)
+    self.m_z_first_order = []
+    self.m_z_second_order = []
+    self.m_sum_z_second_order = numpy.ndarray(shape=(0,0), dtype=numpy.float64)
+
+  def __check_training_data__(self, data):
+    if len(data) == 0:
+      raise RuntimeError("Training data set is empty")
+    n_features = data[0].shape[1]
+    for v in data:
+      if(v.shape[1] != n_features):
+        raise RuntimeError("Inconsistent feature dimensionality in training data set")
+
+  def __init_members__(self, data):
+    n_features = data[0].shape[1]
+    self.m_z_first_order = []
+    df_dg = self.m_dim_f+self.m_dim_g
+    self.m_sum_z_second_order.resize(df_dg, df_dg)
+    self.m_n_samples_per_id.resize(len(data))
+    self.m_B.resize(n_features, self.m_dim_f+self.m_dim_g)
+    for i in range(len(data)):
+      ns_i = data[i].shape[0]
+      self.m_n_samples_per_id[i] = ns_i
+      self.m_z_first_order.append(numpy.ndarray(shape=(ns_i, df_dg), dtype=numpy.float64))
+      self.m_z_second_order.append(numpy.ndarray(shape=(ns_i, df_dg, df_dg), dtype=numpy.float64))
+
+  def __init_mu__(self, machine, data):
+    mu = numpy.zeros(shape=machine.mu.shape[0], dtype=numpy.float64)
+    c = 0
+    for v in data:
+      for i in range(v.shape[0]):
+        mu += v[i,:]
+        c +=1
+    mu /= c
+    machine.mu = mu
+ 
+  def __init_f__(self, machine, data):
+    n_ids = len(data)
+    S = numpy.zeros(shape=(machine.dim_d, n_ids), dtype=numpy.float64)
+    Si_sum = numpy.zeros(shape=(machine.dim_d,), dtype=numpy.float64)
+    for i in range(n_ids):
+      Si = S[:,i]
+      data_i = data[i]
+      for j in range(data_i.shape[0]):
+        Si += data_i[j,:]
+      Si /= data_i.shape[0]
+      Si_sum += Si
+    Si_sum /= n_ids
+
+    S = S - numpy.tile(Si_sum.reshape([machine.dim_d,1]), [1,n_ids])
+    U, sigma, S_ = numpy.linalg.svd(S, full_matrices=False)
+    U_slice = U[:,0:self.m_dim_f]
+    sigma_slice = sigma[0:self.m_dim_f]
+    sigma_slice_sqrt = numpy.sqrt(sigma_slice)
+    machine.f = U_slice / sigma_slice_sqrt
+
+  def __init_g__(self, machine, data):
+    n_samples = 0
+    for v in data:
+      n_samples += v.shape[0]
+    S = numpy.zeros(shape=(machine.dim_d, n_samples), dtype=numpy.float64)
+    Si_sum = numpy.zeros(shape=(machine.dim_d,), dtype=numpy.float64)
+    cache = numpy.zeros(shape=(machine.dim_d,), dtype=numpy.float64)
+    c = 0
+    for i in range(len(data)):
+      cache = 0
+      data_i = data[i]
+      for j in range(data_i.shape[0]):
+        cache += data_i[j,:]
+      cache /= data_i.shape[0]
+      for j in range(data_i.shape[0]):
+        S[:,c] = data_i[j,:] - cache
+        Si_sum += S[:,c]
+        c += 1
+    Si_sum /= n_samples
+
+    S = S - numpy.tile(Si_sum.reshape([machine.dim_d,1]), [1,n_samples])
+    U, sigma, S_ = numpy.linalg.svd(S, full_matrices=False)
+    U_slice = U[:,0:self.m_dim_g]
+    sigma_slice_sqrt = numpy.sqrt(sigma[0:self.m_dim_g])
+    machine.g = U_slice / sigma_slice_sqrt
+
+  def __init_sigma__(self, machine, data, factor = 1.):
+    """As a variance of the data""" 
+    cache1 = numpy.zeros(shape=(machine.dim_d,), dtype=numpy.float64)
+    cache2 = numpy.zeros(shape=(machine.dim_d,), dtype=numpy.float64)
+    n_samples = 0
+    for v in data:
+      for j in range(v.shape[0]):
+        cache1 += v[j,:]
+      n_samples += v.shape[0]
+    cache1 /= n_samples
+    for v in data:
+      for j in range(v.shape[0]):
+        cache2 += numpy.square(v[j,:] - cache1)
+    machine.sigma = factor * cache2 / (n_samples - 1)
+
+  def __init_mu_f_g_sigma__(self, machine, data):
+    self.__init_mu__(machine, data)
+    self.__init_f__(machine, data)
+    self.__init_g__(machine, data)
+    self.__init_sigma__(machine, data)
+
+  def initialization(self, machine, data):
+    self.__check_training_data__(data)
+    n_features = data[0].shape[1]
+    if(machine.dim_d != n_features):
+      raise RuntimeError("Inconsistent feature dimensionality between the machine and the training data set")
+    self.m_dim_f = machine.dim_f
+    self.m_dim_g = machine.dim_g
+    self.__init_members__(data)
+    # Warning: Default initialization of mu, F, G, sigma using scatters
+    self.__init_mu_f_g_sigma__(machine, data)
+    # Make sure that the precomputation has been performed
+    machine.__precompute__()
+
+  def __compute_sufficient_statistics_given_observations__(self, machine, observations):
+    """
+    We compute the expected values of the latent variables given the observations 
+    and parameters of the model.
+    """
+
+    # Get the number of observations 
+    J_i                       = observations.shape[0];            # An integer > 0
+    dim_d                     = observations.shape[1]             # A scalar
+    # Useful values
+    mu                        = machine.mu
+    F                         = machine.f
+    G                         = machine.g
+    sigma                     = machine.sigma
+    isigma                    = machine.__isigma__
+    alpha                     = machine.__alpha__
+    ft_beta                   = machine.__ft_beta__
+    gamma                     = machine.get_add_gamma(J_i)
+    # Normalise the observations
+    normalised_observations   = observations - numpy.tile(mu, [J_i,1]); # (D_x, J_i)
+
+    ### Expected value of the latent variables using the scalable solution
+    # Identity part first
+    sum_ft_beta_part          = numpy.zeros(self.m_dim_f);         # (nf)
+    for j in range(0, J_i):
+      current_observation     = normalised_observations[j,:]
+      sum_ft_beta_part        = sum_ft_beta_part + numpy.dot(ft_beta, current_observation); # (nf)
+    h_i                       = numpy.dot(gamma, sum_ft_beta_part);                         # (nf)
+    # Reproject the identity part to work out the session parts
+    Fh_i                      = numpy.dot(F, h_i);                                          # (D_x)
+    z_first_order = numpy.zeros((J_i, self.m_dim_f+self.m_dim_g));
+    for j in range(0, J_i):
+      current_observation       = normalised_observations[j,:]   # (D_x)
+      w_ij                      = numpy.dot(alpha, G.transpose());      # (ng, D_x)
+      w_ij                      = numpy.multiply(w_ij, isigma);         # (ng, D_x)
+      w_ij                      = numpy.dot(w_ij, (current_observation - Fh_i));                # (ng)
+      z_first_order[j,:]        = numpy.hstack([h_i,w_ij]);                                     # J_i of (nf+ng)
+
+    ### Calculate the expected value of the squared of the latent variables
+    # The constant matrix we use has the following parts: [top_left, top_right; bottom_left, bottom_right]
+    # P             = Inverse_I_plus_GTEG * G^T * Sigma^{-1} * F       (ng, nf)
+    # top_left      = gamma                                 (nf, nf)
+    # bottom_left   = top_right^T = P * gamma               (ng, nf)
+    # bottom_right  = Inverse_I_plus_GTEG - bottom_left * P^T          (ng, ng)
+    top_left                 = gamma;
+    P                        = numpy.dot(alpha, G.transpose());
+    P                        = numpy.dot(numpy.dot(P,numpy.diag(isigma)), F);
+    bottom_left              = -1 * numpy.dot(P, top_left);
+    top_right                = bottom_left.transpose();
+    bottom_right             = alpha -1 * numpy.dot(bottom_left, P.transpose());
+    constant_matrix          = numpy.bmat([[top_left,top_right],[bottom_left, bottom_right]]);
+
+    # Now get the actual expected value
+    z_second_order = numpy.zeros((J_i, self.m_dim_f+self.m_dim_g, self.m_dim_f+self.m_dim_g));
+    for j in range(0, J_i):
+      z_second_order[j,:,:] = constant_matrix + numpy.outer(z_first_order[j,:],z_first_order[j,:]);   # (nf+ng,nf+ng)
+
+    ### Return the first and second order statistics
+    return(z_first_order, z_second_order);
+
+  def e_step(self, machine, data):
+    self.m_sum_z_second_order.fill(0.)
+    for i in range(len(data)):
+      ### Get the observations for this label and the number of observations for this label.
+      observations_for_h_i      = data[i]
+      J_i                       = observations_for_h_i.shape[0];                           # An integer > 0
+    
+      ### Gather the statistics for this identity and then separate them for each observation.
+      [z_first_order, z_second_order]       = self.__compute_sufficient_statistics_given_observations__(machine, observations_for_h_i);
+      self.m_z_first_order[i]    = z_first_order;
+      J_i = len(z_second_order)
+      for j in range(0, J_i):
+        self.m_sum_z_second_order += z_second_order[j];
+
+  def __update_f_and_g__(self, machine, data):
+    ### Initialise the numerator and the denominator.
+    dim_d                          = machine.dim_d
+    accumulated_B_numerator        = numpy.zeros((dim_d,self.m_dim_f+self.m_dim_g));
+    accumulated_B_denominator      = numpy.linalg.inv(self.m_sum_z_second_order)
+    mu                             = machine.mu
+
+    ### Go through and process on a per subjectid basis
+    for i in range(len(data)):
+      # Normalise the observations
+      J_i                       = data[i].shape[0]
+      normalised_observations   = data[i] - numpy.tile(mu, [J_i,1]); # (J_i, dim_d)
+
+      ### Gather the statistics for this label
+      z_first_order_i                    = self.m_z_first_order[i];   # List of (1,nf+ng) vectors
+
+      ### Accumulate for the B matrix for this identity (current_label).
+      for j in range(0, J_i):
+        current_observation_for_h_i   = normalised_observations[j,:];   # (dim_d )
+        accumulated_B_numerator       = accumulated_B_numerator + numpy.outer(current_observation_for_h_i, z_first_order_i[j,:]);  # (dim_d, dim_f+dim_g);
+
+    ### Update the B matrix which we can then use this to update the F and G matrices.
+    B                                  = numpy.dot(accumulated_B_numerator,accumulated_B_denominator);
+    machine.f                          = B[:,0:self.m_dim_f].copy();
+    machine.g                          = B[:,self.m_dim_f:self.m_dim_f+self.m_dim_g].copy();
+
+  def __update_sigma__(self, machine, data):
+    ### Initialise the accumulated Sigma
+    dim_d                          = machine.dim_d
+    mu                             = machine.mu
+    accumulated_sigma              = numpy.zeros(dim_d);                        # An array (D_x)
+    number_of_observations         = 0
+    B = numpy.hstack([machine.f, machine.g])
+
+    ### Go through and process on a per subjectid basis (based on the labels we were given.
+    for i in range(len(data)):
+      # Normalise the observations
+      J_i                       = data[i].shape[0]
+      normalised_observations   = data[i] - numpy.tile(mu, [J_i,1]); # (J_i, dim_d)
+
+      ### Gather the statistics for this identity and then separate them for each
+      ### observation.
+      z_first_order_i                    = self.m_z_first_order[i];   # List of (1,nf+ng) vectors
+
+      ### Accumulate for the sigma matrix, which will be diagonalised
+      for j in range(0, J_i):
+        current_observation_for_h_i   = normalised_observations[j,:];         # (dim_d)
+        left                          = current_observation_for_h_i * current_observation_for_h_i;   # (dim_d)
+        projected_direction           = numpy.dot(B, z_first_order_i[j,:]);                        # (dim_d)
+        right                         = projected_direction * current_observation_for_h_i;           # (dim_d)
+        accumulated_sigma             = accumulated_sigma + (left - right);                          # (dim_d)
+        number_of_observations        = number_of_observations + 1
+
+    ### Normalise by the number of observations (1/IJ)
+    machine.sigma                     = accumulated_sigma / number_of_observations;
+
+  def m_step(self, machine, data):
+    self.__update_f_and_g__(machine, data)
+    self.__update_sigma__(machine, data)
+    machine.__precompute__()
+
+  def finalization(self, machine, data):
+    machine.__precompute_log_like__()
+
+  def train(self, machine, data):
+    self.initialization(machine, data)
+    average_output_previous = -sys.maxint
+    average_output = -sys.maxint
+    self.e_step(machine, data)
+    
+    i = 0
+    while True:
+      average_output_previous = average_output
+      self.m_step(machine, data)
+      self.e_step(machine, data)
+      if(self.m_max_iterations > 0 and i+1 >= self.m_max_iterations):
+        break
+      i += 1
 
 def compute_sufficient_statistics_given_observations(observations, machine):
   """
@@ -238,7 +531,97 @@ def m_step(data, machine, F_stats, S_stats_sum):
 class PLDATrainerTest(unittest.TestCase):
   """Performs various PLDA trainer tests."""
   
-  def test01_plda_EM(self):
+  def test01_plda_EM_vs_Python(self):
+
+    # Data used for performing the tests
+    # Features and subspaces dimensionality
+    D = 7
+    nf = 2
+    ng = 3
+
+    # first identity (4 samples)
+    a = numpy.array([
+      [1,2,3,4,5,6,7],
+      [7,8,3,3,1,8,2],
+      [3,2,1,4,5,1,7],
+      [9,0,3,2,1,4,6],
+      ], dtype='float64')
+
+    # second identity (3 samples)
+    b = numpy.array([
+      [5,6,3,4,2,0,2],
+      [1,7,8,9,4,4,8],
+      [8,7,2,5,1,1,1],
+      ], dtype='float64')
+
+    # list of arrays (training data)
+    l = [a,b]
+
+    # initial values for F, G and sigma
+    G_init=numpy.array([-1.1424, -0.5044, -0.1917,
+      -0.6249,  0.1021, -0.8658,
+      -1.1687,  1.1963,  0.1807,
+      0.3926,  0.1203,  1.2665,
+      1.3018, -1.0368, -0.2512,
+      -0.5936, -0.8571, -0.2046,
+      0.4364, -0.1699, -2.2015]).reshape(D,ng)
+
+    # F <-> PCA on G
+    F_init=numpy.array([-0.054222647972093, -0.000000000783146, 
+      0.596449127693018,  0.000000006265167, 
+      0.298224563846509,  0.000000003132583, 
+      0.447336845769764,  0.000000009397750, 
+      -0.108445295944185, -0.000000001566292, 
+      -0.501559493741856, -0.000000006265167, 
+      -0.298224563846509, -0.000000003132583]).reshape(D,nf)
+    sigma_init = 0.01 * numpy.ones(D, 'float64')
+
+    # Runs the PLDA trainer EM-steps (2 steps)
+    # Defines base trainer and machine
+    t = bob.trainer.PLDABaseTrainer()
+    t_py = PythonPLDABaseTrainer()
+    m = bob.machine.PLDABaseMachine(D,nf,ng)
+    m_py = bob.machine.PLDABaseMachine(D,nf,ng)
+
+    # Calls the initialization methods and resets randomly initialized values
+    # to new reference ones (to make the tests deterministic)
+    t.init_f_method = bob.trainer.init_f_method.BETWEEN_SCATTER
+    t.init_g_method = bob.trainer.init_g_method.WITHIN_SCATTER
+    t.init_sigma_method = bob.trainer.init_sigma_method.VARIANCE_DATA
+    t.initialization(m,l)
+    t_py.initialization(m_py,l)
+    self.assertTrue(numpy.allclose(m.mu, m_py.mu))
+    self.assertTrue(numpy.allclose(m.f, m_py.f))
+    self.assertTrue(numpy.allclose(m.g, m_py.g))
+    self.assertTrue(numpy.allclose(m.sigma, m_py.sigma))
+
+    t.train(m, l)
+    t_py.train(m_py, l)
+    self.assertTrue(numpy.allclose(m.mu, m_py.mu))
+    self.assertTrue(numpy.allclose(m.f, m_py.f))
+    self.assertTrue(numpy.allclose(m.g, m_py.g))
+    self.assertTrue(numpy.allclose(m.sigma, m_py.sigma))
+    """
+    n_iterations = 50
+    for it in range(n_iterations):
+      # E-step 1
+      t.e_step(m,l)
+      t_py.e_step(m_py, l)
+      self.assertTrue(equals(t.z_first_order[0], t_py.m_z_first_order[0], 1e-10))
+      self.assertTrue(equals(t.z_first_order[1], t_py.m_z_first_order[1], 1e-10))
+      self.assertTrue(equals(t.z_second_order_sum, t_py.m_sum_z_second_order, 1e-10))
+   
+      # M-step 1
+      t.m_step(m,l)
+      t_py.m_step(m_py, l)
+      self.assertTrue(equals(m.mu, m_py.mu, 1e-10))
+      self.assertTrue(equals(m.f, m_py.f, 1e-10))
+      self.assertTrue(equals(m.g, m_py.g, 1e-10))
+      self.assertTrue(equals(m.sigma, m_py.sigma, 1e-10))
+    """
+
+
+  def test02_plda_EM(self):
     # Data used for performing the tests
     # Features and subspaces dimensionality
     D = 7
@@ -475,75 +858,6 @@ class PLDATrainerTest(unittest.TestCase):
     self.assertTrue(equals(m.g, G, 1e-10))
     self.assertTrue(equals(m.sigma, sigma[:,0], 1e-10))
 
-  def test02_plda_likelihood(self):
-    # Data used for performing the tests
-    # Features and subspaces dimensionality
-    D = 7
-    nf = 2
-    ng = 3
-
-    # initial values for F, G and sigma
-    G_init=numpy.array([-1.1424, -0.5044, -0.1917,
-      -0.6249,  0.1021, -0.8658,
-      -1.1687,  1.1963,  0.1807,
-      0.3926,  0.1203,  1.2665,
-      1.3018, -1.0368, -0.2512,
-      -0.5936, -0.8571, -0.2046,
-      0.4364, -0.1699, -2.2015]).reshape(D,ng)
-    # F <-> PCA on G
-    F_init=numpy.array([-0.054222647972093, -0.000000000783146, 
-      0.596449127693018,  0.000000006265167, 
-      0.298224563846509,  0.000000003132583, 
-      0.447336845769764,  0.000000009397750, 
-      -0.108445295944185, -0.000000001566292, 
-      -0.501559493741856, -0.000000006265167, 
-      -0.298224563846509, -0.000000003132583]).reshape(D,nf)
-    sigma_init = 0.01 * numpy.ones((D,), 'float64')
-    mean_zero = numpy.zeros((D,), 'float64')
-
-    # base machine
-    mb = bob.machine.PLDABaseMachine(D,nf,ng)
-    mb.sigma = sigma_init
-    mb.g = G_init
-    mb.f = F_init
-    mb.mu = mean_zero
-
-    # Data for likelihood computation
-    x1 = numpy.array([0.8032, 0.3503, 0.4587, 0.9511, 0.1330, 0.0703, 0.7061])
-    x2 = numpy.array([0.9317, 0.1089, 0.6517, 0.1461, 0.6940, 0.6256, 0.0437])
-    x3 = numpy.array([0.7979, 0.9862, 0.4367, 0.3447, 0.0488, 0.2252, 0.5810])
-    X = numpy.ndarray((3,D), 'float64')
-    X[0,:] = x1
-    X[1,:] = x2
-    X[2,:] = x3
-    a = []
-    a.append(x1)
-    a.append(x2)
-    a.append(x3)
-    a = numpy.array(a)
-
-    # reference likelihood from Prince implementation
-    ll_ref = -182.8880743535197
-
-    # machine
-    m = bob.machine.PLDAMachine(mb)
-    ll = m.compute_log_likelihood(X)
-    self.assertTrue(abs(ll - ll_ref) < 1e-10)
-
-    # log likelihood ratio
-    Y = numpy.ndarray((2,D), 'float64')
-    Y[0,:] = x1
-    Y[1,:] = x2
-    Z = numpy.ndarray((1,D), 'float64')
-    Z[0,:] = x3
-    llX = m.compute_log_likelihood(X)
-    llY = m.compute_log_likelihood(Y)
-    llZ = m.compute_log_likelihood(Z)
-    # reference obtained by computing the likelihood of [x1,x2,x3], [x1,x2] 
-    # and [x3] separately
-    llr_ref = -4.43695386675
-    self.assertTrue(abs((llX - (llY + llZ)) - llr_ref) < 1e-10)
-
 
   def test03_plda_enrollment(self):
     # Data used for performing the tests
@@ -607,4 +921,4 @@ class PLDATrainerTest(unittest.TestCase):
     llr_separate = m.compute_log_likelihood(numpy.array([x1,x2,x3]), False) - \
       (m.compute_log_likelihood(numpy.array([x1,x2]), False) + m.compute_log_likelihood(numpy.array([x3]), False))
     self.assertTrue(abs(llr - llr_separate) < 1e-10)
-    
+
