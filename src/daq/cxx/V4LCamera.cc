@@ -292,9 +292,9 @@ int V4LCamera::open() {
 }
 
 /**
- * Convert v4l2 pixel format to Camera::PixelFormat
+ * Convert v4l2 pixel format to Camera::CamPixFormat
  */
-Camera::PixelFormat convertPixelFormat(unsigned int v4l2_pixelFormat) {
+Camera::CamPixFormat convertCamPixFormat(unsigned int v4l2_pixelFormat) {
   switch (v4l2_pixelFormat) {
     case V4L2_PIX_FMT_YUYV:
       return Camera::YUYV;
@@ -308,9 +308,9 @@ Camera::PixelFormat convertPixelFormat(unsigned int v4l2_pixelFormat) {
 }
 
 /**
- * Convert Camera::PixelFormat to v4l2 pixel format
+ * Convert Camera::CamPixFormat to v4l2 pixel format
  */
-unsigned int convertPixelFormat(Camera::PixelFormat pixelFormat) {
+unsigned int convertCamPixFormat(Camera::CamPixFormat pixelFormat) {
   switch (pixelFormat) {
     case Camera::YUYV:
       return V4L2_PIX_FMT_YUYV;
@@ -327,7 +327,7 @@ unsigned int convertPixelFormat(Camera::PixelFormat pixelFormat) {
   }
 }
 
-int V4LCamera::getSupportedPixelFormats(std::vector<PixelFormat>& pixelFormats) {
+int V4LCamera::getSupportedCamPixFormats(std::vector<CamPixFormat>& pixelFormats) {
   if (v4lstruct->opened) {
     pixelFormats.clear();
     
@@ -337,7 +337,7 @@ int V4LCamera::getSupportedPixelFormats(std::vector<PixelFormat>& pixelFormats) 
     fmtdesc.index = 0;
 
     while (xioctl(v4lstruct->device, VIDIOC_ENUM_FMT, &fmtdesc) != -1) {
-      pixelFormats.push_back(convertPixelFormat(fmtdesc.pixelformat));
+      pixelFormats.push_back(convertCamPixFormat(fmtdesc.pixelformat));
       fmtdesc.index++;
     }
   }
@@ -345,13 +345,13 @@ int V4LCamera::getSupportedPixelFormats(std::vector<PixelFormat>& pixelFormats) 
   return 0;
 }
 
-int V4LCamera::getSupportedFrameSizes(PixelFormat pixelFormat, std::vector<FrameSize>& frameSizes) {
+int V4LCamera::getSupportedFrameSizes(CamPixFormat pixelFormat, std::vector<FrameSize>& frameSizes) {
   if (v4lstruct->opened) {
     frameSizes.clear();
     
     v4l2_frmsizeenum frmsizeenum;
     memset(&frmsizeenum, 0, sizeof(v4l2_frmsizeenum));
-    frmsizeenum.pixel_format = convertPixelFormat(pixelFormat);
+    frmsizeenum.pixel_format = convertCamPixFormat(pixelFormat);
     frmsizeenum.index = 0;
     
     while (xioctl(v4lstruct->device, VIDIOC_ENUM_FRAMESIZES, &frmsizeenum) != -1) {
@@ -369,12 +369,12 @@ int V4LCamera::getSupportedFrameSizes(PixelFormat pixelFormat, std::vector<Frame
   return 0;
 }
 
-int V4LCamera::getSupportedFrameIntervals(PixelFormat pixelFormat, FrameSize& frameSize,
+int V4LCamera::getSupportedFrameIntervals(CamPixFormat pixelFormat, FrameSize& frameSize,
                                          std::vector<FrameInterval>& frameIntervals) {
   if (v4lstruct->opened) {
     v4l2_frmivalenum frmivalenum;
     memset(&frmivalenum, 0, sizeof(v4l2_frmivalenum));
-    frmivalenum.pixel_format = convertPixelFormat(pixelFormat);
+    frmivalenum.pixel_format = convertCamPixFormat(pixelFormat);
     frmivalenum.height = frameSize.height;
     frmivalenum.width = frameSize.width;
     frmivalenum.index = 0;
@@ -394,23 +394,23 @@ int V4LCamera::getSupportedFrameIntervals(PixelFormat pixelFormat, FrameSize& fr
   return 0;
 }
 
-Camera::PixelFormat V4LCamera::getPixelFormat() const {
+Camera::CamPixFormat V4LCamera::getCamPixFormat() const {
   if (v4lstruct->opened) {
-    return convertPixelFormat(v4lstruct->format.pixelformat);
+    return convertCamPixFormat(v4lstruct->format.pixelformat);
   }
   else {
     return Camera::OTHER;
   }
 }
 
-void V4LCamera::setPixelFormat(PixelFormat pixelFormat) {
+void V4LCamera::setCamPixFormat(CamPixFormat pixelFormat) {
   if (v4lstruct->opened) {
     v4l2_format format;
     memset(&format, 0, sizeof(v4l2_format));
     format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     format.fmt.pix = v4lstruct->format;
 
-    format.fmt.pix.pixelformat = convertPixelFormat(pixelFormat);
+    format.fmt.pix.pixelformat = convertCamPixFormat(pixelFormat);
 
     if (xioctl(v4lstruct->device, VIDIOC_S_FMT, &format) == -1) {
       perror("Error setting parameters (VIDIOC_S_FMT)");
@@ -601,7 +601,7 @@ int V4LCamera::start() {
 
 
 void V4LCamera::captureLoop() {
-  const PixelFormat pixelformat = getPixelFormat();
+  const CamPixFormat pixelformat = getCamPixFormat();
   
   while(!mustStop) {
     // Select manpage say that we can't trust the value of timeout after

@@ -35,7 +35,7 @@ public:
   /**
    * Pixel format
    */
-  enum PixelFormat {
+  enum CamPixFormat {
     OTHER,
     YUYV,
     MJPEG,
@@ -61,7 +61,7 @@ public:
      * @param frameNb     frame number
      * @param timestamp   frame timestamp (in seconds)
      */
-    virtual void imageReceived(unsigned char* image, PixelFormat pixelFormat, int width, int height, int stride, int size, int frameNb, double timestamp) = 0;
+    virtual void imageReceived(unsigned char* image, CamPixFormat pixelFormat, int width, int height, int stride, int size, int frameNb, double timestamp) = 0;
   };
 
   /**
@@ -134,7 +134,7 @@ public:
    * @param[out] pixelFormats supported pixel formats
    * @return 0 on success
    */
-  virtual int getSupportedPixelFormats(std::vector<PixelFormat>& pixelFormats) = 0;
+  virtual int getSupportedCamPixFormats(std::vector<CamPixFormat>& pixelFormats) = 0;
   
   /**
    * Get the list of supported frame sizes for a pixel format
@@ -143,7 +143,7 @@ public:
    * @param[out] frameSizes supported frame sizes
    * @return 0 on success
    */
-  virtual int getSupportedFrameSizes(PixelFormat pixelFormat, std::vector<FrameSize>& frameSizes) = 0;
+  virtual int getSupportedFrameSizes(CamPixFormat pixelFormat, std::vector<FrameSize>& frameSizes) = 0;
   
   /**
    * Get the list of supported frame intervals for a pixel format and a frame size
@@ -153,10 +153,10 @@ public:
    * @param[out] frameIntervals supported frame intervals
    * @return 0 on success
    */
-  virtual int getSupportedFrameIntervals(PixelFormat pixelFormat, FrameSize& frameSize, std::vector<FrameInterval>& frameIntervals) = 0;
+  virtual int getSupportedFrameIntervals(CamPixFormat pixelFormat, FrameSize& frameSize, std::vector<FrameInterval>& frameIntervals) = 0;
 
-  virtual PixelFormat getPixelFormat() const = 0;
-  virtual void setPixelFormat(PixelFormat pixelFormat) = 0;
+  virtual CamPixFormat getCamPixFormat() const = 0;
+  virtual void setCamPixFormat(CamPixFormat pixelFormat) = 0;
   
   virtual FrameSize getFrameSize() const = 0;
   virtual void setFrameSize(FrameSize& frameSize) = 0;

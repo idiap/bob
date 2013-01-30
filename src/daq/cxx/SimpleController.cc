@@ -247,7 +247,7 @@ static void jpeg_mem_src(j_decompress_ptr cinfo, void* buffer, long nbytes)
 }
 //////////////////////////////////////////////////////////////////////////////
 
-void SimpleController::imageReceived(unsigned char* image, Camera::PixelFormat pixelFormat,
+void SimpleController::imageReceived(unsigned char* image, Camera::CamPixFormat pixelFormat,
                                     int width, int height, int stride, int size, int frameNb, double timestamp) {
   ControllerCallback::CaptureStatus status;
   status.totalSessionTime = length + recordingDelay;
