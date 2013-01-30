@@ -169,7 +169,7 @@ void bind_daq_all() {
     .def("on_detection", &FaceLocalizationCallback::onDetection, (arg("boundingbox")));
     
   /// Cameras
-  enum_<Camera::CamPixFormat>("CamPixFormat")
+  enum_<Camera::CamPixFormat>("PixelFormat")
     .value("YUYV", Camera::YUYV)
     .value("MJPEG", Camera::MJPEG)
     .value("RGB24", Camera::RGB24)
