@@ -105,11 +105,11 @@ void VideoReaderCamera::printSummary() {
   bob::core::info << videoReader->info().c_str() << std::endl;
 }
 
-Camera::PixelFormat VideoReaderCamera::getPixelFormat() const {
-  return RGB24;
+Camera::CamPixFormat VideoReaderCamera::getCamPixFormat() const {
+  return Camera::RGB24;
 }
 
-void VideoReaderCamera::setPixelFormat(Camera::PixelFormat pixelFormat) {
+void VideoReaderCamera::setCamPixFormat(Camera::CamPixFormat pixelFormat) {
   return;
 }
 
@@ -129,26 +129,26 @@ void VideoReaderCamera::setFrameInterval(Camera::FrameInterval& frameInterval) {
   return;
 }
 
-int VideoReaderCamera::getSupportedPixelFormats(std::vector<PixelFormat>& pixelFormats) {
+int VideoReaderCamera::getSupportedCamPixFormats(std::vector<Camera::CamPixFormat>& pixelFormats) {
   pixelFormats.clear();;
-  pixelFormats.push_back(getPixelFormat());
+  pixelFormats.push_back(getCamPixFormat());
 
   return 0;
 }
 
-int VideoReaderCamera::getSupportedFrameSizes(PixelFormat pixelFormat, std::vector<FrameSize>& frameSizes) {
+int VideoReaderCamera::getSupportedFrameSizes(Camera::CamPixFormat pixelFormat, std::vector<FrameSize>& frameSizes) {
   frameSizes.clear();
-  if (pixelFormat == getPixelFormat()) {
+  if (pixelFormat == getCamPixFormat()) {
     frameSizes.push_back(getFrameSize());
   }
 
   return 0;
 }
 
-int VideoReaderCamera::getSupportedFrameIntervals(PixelFormat pixelFormat, FrameSize& frameSize,
+int VideoReaderCamera::getSupportedFrameIntervals(Camera::CamPixFormat pixelFormat, FrameSize& frameSize,
                                          std::vector<FrameInterval>& frameIntervals) {
   frameIntervals.clear();
-  if (pixelFormat == getPixelFormat() && frameSize == getFrameSize()) {
+  if (pixelFormat == getCamPixFormat() && frameSize == getFrameSize()) {
     frameIntervals.push_back(getFrameInterval());
   }
   
