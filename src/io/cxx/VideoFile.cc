@@ -215,6 +215,7 @@ static bool register_codec() {
   static std::string tmp[] = {
     ".bmp",
     ".dpx",
+    ".gif",
     ".jpeg", 
     ".jpg", 
     ".jp2", 
