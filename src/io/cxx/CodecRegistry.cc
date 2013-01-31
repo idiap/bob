@@ -25,6 +25,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 
+#include "bob/core/logging.h"
 #include "bob/io/CodecRegistry.h"
 
 #include<iostream>
@@ -68,8 +69,9 @@ void io::CodecRegistry::registerExtension(const std::string& extension,
     s_extension2description[extension] = description;
   }
   else {
-    boost::format m("extension already registered: %s");
-    m % extension;
+    boost::format m("extension already registered: %s - ignoring second registration with description `%s'");
+    m % extension % description;
+    bob::core::error << m.str() << std::endl;
     throw std::runtime_error(m.str());
   }
 
