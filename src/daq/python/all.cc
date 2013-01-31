@@ -45,9 +45,9 @@
 
 using namespace bob::daq;
 
-static boost::python::object getSupportedPixelFormats(Camera& cam) {
-  std::vector<Camera::PixelFormat> pfs;
-  cam.getSupportedPixelFormats(pfs);
+static boost::python::object getSupportedCamPixFormats(Camera& cam) {
+  std::vector<Camera::CamPixFormat> pfs;
+  cam.getSupportedCamPixFormats(pfs);
 
   boost::python::list l;
 
@@ -58,7 +58,7 @@ static boost::python::object getSupportedPixelFormats(Camera& cam) {
   return l;
 }
 
-static boost::python::object getSupportedFrameSizes(Camera& cam, Camera::PixelFormat pf) {
+static boost::python::object getSupportedFrameSizes(Camera& cam, Camera::CamPixFormat pf) {
   std::vector<Camera::FrameSize> vec;
   cam.getSupportedFrameSizes(pf, vec);
 
@@ -71,7 +71,7 @@ static boost::python::object getSupportedFrameSizes(Camera& cam, Camera::PixelFo
   return l;
 }
 
-static boost::python::object getSupportedFrameIntervals(Camera& cam, Camera::PixelFormat pf, Camera::FrameSize& fs) {
+static boost::python::object getSupportedFrameIntervals(Camera& cam, Camera::CamPixFormat pf, Camera::FrameSize& fs) {
   std::vector<Camera::FrameInterval> vec;
   cam.getSupportedFrameIntervals(pf, fs, vec);
 
@@ -169,7 +169,7 @@ void bind_daq_all() {
     .def("on_detection", &FaceLocalizationCallback::onDetection, (arg("boundingbox")));
     
   /// Cameras
-  enum_<Camera::PixelFormat>("PixelFormat")
+  enum_<Camera::CamPixFormat>("PixelFormat")
     .value("YUYV", Camera::YUYV)
     .value("MJPEG", Camera::MJPEG)
     .value("RGB24", Camera::RGB24)
@@ -192,10 +192,10 @@ void bind_daq_all() {
     .def("start", &Camera_start, (arg("self")))
     .def("add_camera_callback", &Camera::addCameraCallback, (arg("self"), arg("callback")))
     .def("remove_camera_callback", &Camera::removeCameraCallback, (arg("self"), arg("callback")))
-    .def("get_supported_pixel_formats", &getSupportedPixelFormats, (arg("self")), "Get the list of supported pixel formats")
+    .def("get_supported_pixel_formats", &getSupportedCamPixFormats, (arg("self")), "Get the list of supported pixel formats")
     .def("get_supported_frame_sizes", &getSupportedFrameSizes, (arg("self"), arg("pixel_format")), "Get the list of supported frame sizes for a pixel format")
     .def("get_supported_frame_intervals", &getSupportedFrameIntervals, (arg("self"), arg("pixel_format"), arg("frame_size")), "Get the list of supported frame intervals for a pixel format and a frame size")
-    .add_property("pixel_format", &Camera::getPixelFormat, &Camera::setPixelFormat)
+    .add_property("pixel_format", &Camera::getCamPixFormat, &Camera::setCamPixFormat)
     .add_property("frame_size", &Camera::getFrameSize, &Camera::setFrameSize)
     .add_property("frame_interval", &Camera::getFrameInterval, &Camera::setFrameInterval)
     .def("print_summary", &Camera::printSummary, (arg("self")), "Print information about the device");

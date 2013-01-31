@@ -34,7 +34,7 @@ public:
   virtual ~SimpleController();
   
   virtual void keyPressed(int key);
-  virtual void imageReceived(unsigned char* image, Camera::PixelFormat pixelformat, int width, int height, int stride, int size, int frameNb, double timestamp);
+  virtual void imageReceived(unsigned char* image, Camera::CamPixFormat pixelformat, int width, int height, int stride, int size, int frameNb, double timestamp);
 
   void stop();
   
