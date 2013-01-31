@@ -178,6 +178,15 @@ blitz::Array<uint8_t,1> mach::svm_pickle
   return buffer;
 }
 
+static boost::shared_ptr<svm_model> make_model(const char* filename) {
+  boost::shared_ptr<svm_model> retval(svm_load_model(filename), 
+      std::ptr_fun(svm_model_free));
+#if LIBSVM_VERSION > 315
+  if (retval) retval->sv_indices = 0; ///< force initialization: see ticket #109
+#endif 
+  return retval;
+}
+
 /**
  * Reverts the pickling process, returns the model
  */
@@ -193,16 +202,13 @@ boost::shared_ptr<svm_model> mach::svm_unpickle
   binfile.close();
 
   //reload the file using the appropriate libsvm loading method
-  boost::shared_ptr<svm_model> retval(svm_load_model(tmp_filename), 
-      std::ptr_fun(svm_model_free));
+  boost::shared_ptr<svm_model> retval = make_model(tmp_filename);
 
   if (!retval) {
     boost::format s("cannot open model file '%s'");
     s % tmp_filename;
     throw std::runtime_error(s.str());
   }
-
-  retval->sv_indices = 0; ///< force initialization: see ticket #109
 
   //unlinks the temporary file
   boost::filesystem::remove(tmp_filename); 
@@ -232,14 +238,13 @@ void mach::SupportVector::reset() {
 }
 
 mach::SupportVector::SupportVector(const std::string& model_file):
-  m_model(svm_load_model(model_file.c_str()), std::ptr_fun(svm_model_free))
+  m_model(make_model(model_file.c_str()))
 {
   if (!m_model) {
     boost::format s("cannot open model file '%s'");
     s % model_file;
     throw std::runtime_error(s.str());
   }
-  m_model->sv_indices = 0; ///< force initialization: see ticket #109
   reset();
 }
 
