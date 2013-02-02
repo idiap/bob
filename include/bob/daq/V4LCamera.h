@@ -43,12 +43,12 @@ public:
   void stop();
   void wait();
 
-  int getSupportedPixelFormats(std::vector<PixelFormat>& pixelFormats);
-  int getSupportedFrameSizes(PixelFormat pixelFormat, std::vector<FrameSize>& frameSizes);
-  int getSupportedFrameIntervals(PixelFormat pixelFormat, FrameSize& frameSize, std::vector<FrameInterval>& frameIntervals);
+  int getSupportedCamPixFormats(std::vector<CamPixFormat>& pixelFormats);
+  int getSupportedFrameSizes(CamPixFormat pixelFormat, std::vector<FrameSize>& frameSizes);
+  int getSupportedFrameIntervals(CamPixFormat pixelFormat, FrameSize& frameSize, std::vector<FrameInterval>& frameIntervals);
 
-  PixelFormat getPixelFormat() const;
-  void setPixelFormat(PixelFormat pixelFormat);
+  CamPixFormat getCamPixFormat() const;
+  void setCamPixFormat(CamPixFormat pixelFormat);
   
   FrameSize getFrameSize() const;
   void setFrameSize(FrameSize& frameSize);
