@@ -35,12 +35,6 @@ IMG_3x6_A = numpy.array([ [1, 1, 4, 2, 1, 0],
                           [2, 3, 3, 4, 0, 2],
                           [0, 2, 3, 1, 4, 4]], dtype='uint8')
     
-eps = 1e-4                     
- 
-def F(f):
-  """Returns the test file on the "data" subdirectory"""
-  return pkg_resources.resource_filename(__name__, os.path.join('data', f))
-   
                           
 class GLCMTest(unittest.TestCase):
   """Performs various tests on the GLCM functionalities"""

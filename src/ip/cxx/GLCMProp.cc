@@ -25,6 +25,12 @@
 #include "bob/core/array_assert.h"
 #include <boost/make_shared.hpp>
 
+static double sqr(const double x)
+{
+  return x*x;
+}
+
+
 bob::ip::GLCMProp::GLCMProp(){ }
 
 bob::ip::GLCMProp::~GLCMProp() { }
@@ -96,7 +102,7 @@ void bob::ip::GLCMProp::variance(const blitz::Array<double,3>& glcm, blitz::Arra
   for (int l=0; l < glcm_norm.extent(2); ++l)
   {
     mat = glcm_norm(rall, rall, l);
-    prop(l) = blitz::sum(pow(i-blitz::mean(mat),2)*mat);
+    prop(l) = blitz::sum(sqr(i-blitz::mean(mat))*mat);
   }  
 }
 
@@ -159,8 +165,8 @@ void bob::ip::GLCMProp::correlation(const blitz::Array<double,3>& glcm, blitz::A
     mat = glcm_norm(rall, rall, l);
     double mean_x = blitz::sum(i*mat);
     double mean_y = blitz::sum(j*mat);
-    double std_x = sqrt(blitz::sum(pow(i-mean_x,2)*mat));
-    double std_y = sqrt(blitz::sum(pow(j-mean_y,2)*mat));
+    double std_x = sqrt(blitz::sum(sqr(i-mean_x)*mat));
+    double std_y = sqrt(blitz::sum(sqr(j-mean_y)*mat));
     prop(l) = (blitz::sum(i*j*mat) - mean_x*mean_y) / (std_x * std_y);
   }
 }
@@ -185,7 +191,7 @@ void bob::ip::GLCMProp::inv_diff_mom(const blitz::Array<double,3>& glcm, blitz::
   for (int l=0; l < glcm_norm.extent(2); ++l)
   {
     mat = glcm_norm(rall, rall, l);
-    prop(l) = blitz::sum(mat / (1 + pow(i-j,2)));
+    prop(l) = blitz::sum(mat / (1 + sqr(i-j)));
   }
 }
 
@@ -243,7 +249,7 @@ void bob::ip::GLCMProp::sum_var(const blitz::Array<double,3>& glcm, blitz::Array
     double sum_var = 0;
     for (int t = 0; t < 2 * glcm_norm.extent(0) -1; t++) // iterate through all the levels
     {
-      sum_var += pow(t-prop_sum_entropy(l), 2) * blitz::sum(blitz::where(i+j==t, mat, 0));
+      sum_var += sqr(t-prop_sum_entropy(l)) * blitz::sum(blitz::where(i+j==t, mat, 0));
     }
     prop(l) = sum_var;
   }
@@ -509,7 +515,7 @@ void bob::ip::GLCMProp::inf_meas_corr1(const blitz::Array<double,3>& glcm, blitz
     double hxy1 = -blitz::sum(mat * blitz::log(marg_prob_i(i) * marg_prob_j(j) + std::numeric_limits<double>::min())); // small numeric value is added to avoid 0 as an argument to the logarithm
     double px_entropy = -blitz::sum(marg_prob_i * blitz::log(marg_prob_i + std::numeric_limits<double>::min()));
     double py_entropy = -blitz::sum(marg_prob_j * blitz::log(marg_prob_j + std::numeric_limits<double>::min()));
-    prop(l) = (prop_entropy(l) - hxy1) / std::fmax(px_entropy, py_entropy);  
+    prop(l) = (prop_entropy(l) - hxy1) / std::max(px_entropy, py_entropy);  
   }
 }
 
@@ -591,7 +597,7 @@ void bob::ip::GLCMProp::inv_diff_mom_norm(const blitz::Array<double,3>& glcm, bl
   for (int l=0; l < glcm_norm.extent(2); ++l)
   {
     mat = glcm_norm(rall, rall, l);
-    prop(l) = blitz::sum(mat / (1 + (pow(i-j,2) / pow(mat.extent(0),2))));
+    prop(l) = blitz::sum(mat / (1 + (sqr(i-j) / sqr(mat.extent(0)))));
   }
 }
 

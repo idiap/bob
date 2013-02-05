@@ -289,76 +289,7 @@ void bob::ip::GLCM::operator()(const blitz::Array<T,2>& src, blitz::Array<double
     //std::cout << "glcm after normalization: " << glcm(blitz::Range(0,1),blitz::Range(0,1),blitz::Range(0,1)) << std::endl;    
   }
   
-}
-
-
-
-
-
-
-
-
-/*
-template <typename T>
-void bob::ip::GLCM::operator()(const blitz::Array<T,2>& src, blitz::Array<double,4>& glcm) const
-{
-  glcm=0;
-  for(int alpha = 0; alpha < m_angles.extent(0); ++alpha) // loop over all the given angles
-  {
-    for(int dist = 0; dist < m_distances.extent(0); ++dist) // loop over all the given distances
-    {
-      const double x_cath = m_distances(dist) * cos(m_angles(alpha));
-      const double y_cath = m_distances(dist) * sin(m_angles(alpha));
-      
-      for(int y = 0; y < src.extent(0); ++y)
-      {
-        for(int x = 0; x < src.extent(1); ++x)
-        {
-          int i_level = (int)(src(y,x)); // the grey level of the current pixel
-          
-          if (m_interpolation == true) // we don't need to round the pixel coordinates, the output will be interpolated
-          {
-            const double y1 = y + y_cath; // the y coordinate of the pixel we examine
-            const double x1 = x + x_cath; // the x coordinate of the pixel we examine
-            if(y1 >= 0 && y1 < src.extent(0) && x1 >= 0 && x1 < src.extent(1))
-            {
-              int j_level = (int)(bob::sp::detail::bilinearInterpolationNoCheck(src,y1,x1) + 0.5); // find the value of the pixel we want to examine
-              glcm(i_level, j_level, dist, alpha) += 1; 
-            }
-          }
-          else // we have to round the pixel coordinates
-          {
-            const int y1 = y + (int)(y_cath + 0.5); // the y coordinate of the pixel we examine
-            const int x1 = x + (int)(x_cath + 0.5); // the x coordinate of the pixel we examine
-            if(y1 >= 0 && y1 < src.extent(0) && x1 >= 0 && x1 < src.extent(1))
-            {
-              int j_level = (int)(src(y1, x1));
-              glcm(i_level, j_level, dist, alpha) += 1; 
-            }
-          }
-            
-        }
-      }
-    }
-  }
-  
-  if(m_symmetric == true) 
-  {
-    glcm = glcm + glcm.transpose(1,0,2,3);
-  }
-
-  if (m_normalized == true)
-  {
-    blitz::firstIndex i;
-    blitz::secondIndex j;
-    blitz::thirdIndex k;
-    blitz::fourthIndex l;
-    blitz::Array<double, 2> summations(blitz::sum(blitz::sum(glcm(k,l,i,j), l), k));
-    
-    glcm /= summations(k,l);
-  }
-}  
-*/        
+}        
 
 }}
 
