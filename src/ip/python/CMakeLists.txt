@@ -30,6 +30,8 @@ set(src
    "TanTriggs.cc"
    "histo.cc"
    "LBP.cc"
+   "GLCM.cc"
+   "GLCMProp.cc"
    "MultiscaleRetinex.cc"
    "SelfQuotientImage.cc"
    "drawing.cc"
