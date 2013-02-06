@@ -29,7 +29,7 @@ endif()
 string(TOLOWER "${BOB_SYSTEM_NAME}-${BOB_SYSTEM_PROCESSOR}-${CMAKE_BUILD_TYPE}" BOB_PLATFORM_STR)
 set(BOB_PLATFORM "${BOB_PLATFORM_STR}" CACHE STRING "The name of the platform Bob is being built to")
 
-execute_process(COMMAND ${CMAKE_SOURCE_DIR}/bin/version.py --letter=a --counter=0 OUTPUT_VARIABLE BOB_DISCOVERED_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${WITH_PYTHON} ${CMAKE_SOURCE_DIR}/bin/version.py --letter=a --counter=0 OUTPUT_VARIABLE BOB_DISCOVERED_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 set(BOB_VERSION_INTERNAL "${BOB_DISCOVERED_VERSION}" CACHE INTERNAL "The version of Bob that is currently being built")
 if(NOT BOB_VERSION)
   set(BOB_VERSION ${BOB_VERSION_INTERNAL})
@@ -251,7 +251,7 @@ endmacro()
 #
 # Example: bob_sort_headers(incdir) # incdir must be a list
 macro(bob_sort_headers list_name)
-  execute_process(COMMAND ${CMAKE_SOURCE_DIR}/bin/sort_headers.py "${CMAKE_CXX_COMPILER}" "${CMAKE_PREFIX_PATH}" "${${list_name}}" OUTPUT_VARIABLE sorted_list OUTPUT_STRIP_TRAILING_WHITESPACE)
+  execute_process(COMMAND ${WITH_PYTHON} ${CMAKE_SOURCE_DIR}/bin/sort_headers.py "${CMAKE_CXX_COMPILER}" "${CMAKE_PREFIX_PATH}" "${${list_name}}" OUTPUT_VARIABLE sorted_list OUTPUT_STRIP_TRAILING_WHITESPACE)
   set(${list_name} ${sorted_list})
 endmacro()
 
