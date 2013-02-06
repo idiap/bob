@@ -2,7 +2,7 @@
 # Andre Anjos - 09.july.2010
 
 # If the user has not opted for something fixed, just get the first one
-find_program(PYTHON_EXECUTABLE ${WITH_PYTHON} python DOC "Default python interpreter")
+find_program(PYTHON_EXECUTABLE ${WITH_PYTHON} python2 python DOC "Default python interpreter")
 
 execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; print '%d.%d' % (sys.version_info[0], sys.version_info[1])" OUTPUT_VARIABLE PYTHON_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 set(PYTHON_VERSION "${PYTHON_VERSION}" CACHE STRING "Python version")
