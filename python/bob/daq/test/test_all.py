@@ -23,7 +23,7 @@ class DaqTest(unittest.TestCase):
 
     if not has_daq: raise SkipTest, "DAQ module was not compiled in"
 
-    from .. import *
+    from .. import VideoReaderCamera, VisionerFaceLocalization, SimpleController, ConsoleDisplay, BobOutputWriter, PixelFormat, FrameSize, FrameInterval
     from ...io import VideoReader
 
     video = VideoReader(INPUT_VIDEO)
