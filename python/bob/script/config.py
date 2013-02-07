@@ -50,12 +50,10 @@ def version_table():
   version_dict.update(bob.ip.version)
   if hasattr(bob.machine, 'version'): 
     version_dict.update(bob.machine.version)
-  version_dict.update(bob.daq.version)
-
-  try: #the visioner may be compiled in, or not
+  if bob.has_daq and hasattr(bob.daq, 'version'):
+    version_dict.update(bob.daq.version)
+  if bob.has_visioner and hasattr(bob.visioner, 'version'):
     version_dict.update(bob.visioner.version)
-  except AttributeError:
-    pass
 
   build = pkg_resources.require('bob')[0]
 

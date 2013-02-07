@@ -7,17 +7,15 @@
 """
 
 import unittest
-import bob
+from ...test import utils
+from ...io import test as iotest
 
 class ExampleTest(unittest.TestCase):
 
+  @utils.ffmpeg_found()
   def test01_optflow_hs(self):
 
-    import os
-
-    from pkg_resources import resource_filename
-    movie = resource_filename(bob.io.__name__, os.path.join('test', 'data', 'test.mov'))
-
-    from bob.ip.example.optflow_hs import main
+    movie = utils.datafile('test.mov', iotest)
+    from ..example.optflow_hs import main
     cmdline = ['--self-test', movie, '__ignored__']
     self.assertEqual(main(cmdline), 0)

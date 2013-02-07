@@ -23,48 +23,53 @@
 import os
 import sys
 import unittest
-import bob
-import pkg_resources
+from ...test import utils
+from ... import io, ip
+from ...ip import test as iptest
+from .. import MaxDetector
 
-def F(f, module=None):
-  """Returns the test file on the "data" subdirectory"""
-  if module is None:
-    return pkg_resources.resource_filename(__name__, os.path.join('data', f))
-  return pkg_resources.resource_filename('bob.%s.test' % module, 
-      os.path.join('data', f))
-
-TEST_VIDEO = F("test.mov", "io")
+TEST_VIDEO = utils.datafile("test.mov", io)
+IMAGE = utils.datafile('test-faces.jpg', iptest, os.path.join('data', 'faceextract'))
 
 class DetectionTest(unittest.TestCase):
   """Performs various face detection tests."""
-  
+
+  def test00_Single(self):
+
+    self.processor = MaxDetector(scanning_levels=10)
+    locdata = self.processor(ip.rgb_to_gray(io.load(IMAGE)))
+    self.assertTrue(locdata is not None)
+
+  @utils.ffmpeg_found()
   def test01_Faster(self):
 
-    video = bob.io.VideoReader(TEST_VIDEO)
-    self.images = [bob.ip.rgb_to_gray(k) for k in video[:20]]
-    self.processor = bob.visioner.MaxDetector(scanning_levels=10)
+    video = io.VideoReader(TEST_VIDEO)
+    self.images = [ip.rgb_to_gray(k) for k in video[:20]]
+    self.processor = MaxDetector(scanning_levels=10)
 
     # find faces on the video
     for image in self.images:
       locdata = self.processor(image)
       self.assertTrue(locdata is not None)
 
+  @utils.ffmpeg_found()
   def test02_Fast(self):
 
-    video = bob.io.VideoReader(TEST_VIDEO)
-    self.images = [bob.ip.rgb_to_gray(k) for k in video[:10]]
-    self.processor = bob.visioner.MaxDetector(scanning_levels=5)
+    video = io.VideoReader(TEST_VIDEO)
+    self.images = [ip.rgb_to_gray(k) for k in video[:10]]
+    self.processor = MaxDetector(scanning_levels=5)
 
     # find faces on the video
     for image in self.images:
       locdata = self.processor(image)
       self.assertTrue(locdata is not None)
 
+  @utils.ffmpeg_found()
   def xtest03_Thorough(self):
     
-    video = bob.io.VideoReader(TEST_VIDEO)
-    self.images = [bob.ip.rgb_to_gray(k) for k in video[:2]]
-    self.processor = bob.visioner.MaxDetector()
+    video = io.VideoReader(TEST_VIDEO)
+    self.images = [ip.rgb_to_gray(k) for k in video[:2]]
+    self.processor = MaxDetector()
 
     # find faces on the video
     for image in self.images:

@@ -8,47 +8,46 @@
 
 import os
 import unittest
-import bob
-import pkg_resources
+from ...test import utils
+from ..script import facebox, facepoints
+from ... import io, ip
+from ...ip import test as iptest
 
-MOVIE = pkg_resources.resource_filename('bob.io.test', 'data/test.mov')
-IMAGE = pkg_resources.resource_filename('bob.ip.test', 
-  'data/faceextract/test-faces.jpg')
+MOVIE = utils.datafile('test.mov', io)
+IMAGE = utils.datafile('test-faces.jpg', iptest, os.path.join('data', 'faceextract'))
 
 class VisionerScriptTest(unittest.TestCase):
 
+  @utils.ffmpeg_found()
   def test01_face_detect(self):
    
     # sanity checks
     self.assertTrue(os.path.exists(MOVIE))
 
-    from bob.visioner.script.facebox import main
     cmdline = '%s --self-test=1' % (MOVIE)
-    self.assertEqual(main(cmdline.split()), 0)
+    self.assertEqual(facebox.main(cmdline.split()), 0)
 
   def test02_face_detect(self):
    
     # sanity checks
     self.assertTrue(os.path.exists(IMAGE))
 
-    from bob.visioner.script.facebox import main
     cmdline = '%s --self-test=2' % (IMAGE)
-    self.assertEqual(main(cmdline.split()), 0)
+    self.assertEqual(facebox.main(cmdline.split()), 0)
 
+  @utils.ffmpeg_found()
   def test03_keypoint_localization(self):
    
     # sanity checks
     self.assertTrue(os.path.exists(MOVIE))
 
-    from bob.visioner.script.facepoints import main
     cmdline = '%s --self-test=1' % (MOVIE)
-    self.assertEqual(main(cmdline.split()), 0)
+    self.assertEqual(facepoints.main(cmdline.split()), 0)
 
   def test04_keypoint_localization(self):
    
     # sanity checks
     self.assertTrue(os.path.exists(IMAGE))
 
-    from bob.visioner.script.facepoints import main
     cmdline = '%s --self-test=2' % (IMAGE)
-    self.assertEqual(main(cmdline.split()), 0)
+    self.assertEqual(facepoints.main(cmdline.split()), 0)

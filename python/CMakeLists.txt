@@ -85,6 +85,25 @@ add_dependencies(egg-scripts egg)
 
 # Testing
 # An easy handler for nose tests
+macro(list_contains var value)
+  set(${var})
+  foreach (value2 ${ARGN})
+    if (${value} STREQUAL ${value2})
+      set(${var} TRUE)
+    endif (${value} STREQUAL ${value2})
+  endforeach (value2)
+endmacro(list_contains)
+list_contains(have_daq bob_daq ${ENABLED_PACKAGES})
+list_contains(have_visioner bob_visioner ${ENABLED_PACKAGES})
+if(NOT have_daq)
+  set(BOB_NOSE_EXCLUDE "daq")
+endif()
+if(NOT have_visioner)
+  set(BOB_NOSE_EXCLUDE "visioner")
+endif()
+if(NOT have_visioner AND NOT have_daq)
+  set(BOB_NOSE_EXCLUDE "visioner|daq")
+endif()
 find_program(NOSETESTS_EXECUTABLE NAMES nosetests-${PYTHON_VERSION} nosetests
   HINTS $ENV{SPHINX_DIR} PATH_SUFFIXES bin
   DOC "Nose python test scanner and runner"

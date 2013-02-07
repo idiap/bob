@@ -21,24 +21,7 @@
 """
 
 import os, sys
-import tempfile
-import pkg_resources
-from nose.plugins.skip import SkipTest
-import functools
-
-# Here is a table of ffmpeg versions against libavcodec, libavformat and
-# libavutil versions
-from distutils.version import StrictVersion as SV
-ffmpeg_versions = {
-    '0.5.0':  [ SV('52.20.0'),   SV('52.31.0'),   SV('49.15.0')   ],
-    '0.6.0':  [ SV('52.72.2'),   SV('52.64.2'),   SV('50.15.1')   ],
-    '0.7.0':  [ SV('52.122.0'),  SV('52.110.0'),  SV('50.43.0')   ],
-    '0.8.0':  [ SV('53.7.0'),    SV('53.4.0'),    SV('51.9.1')    ],
-    '0.9.0':  [ SV('53.42.0'),   SV('53.24.0'),   SV('51.32.0')   ],
-    '0.10.0': [ SV('53.60.100'), SV('53.31.100'), SV('51.34.101') ],
-    '0.11.0': [ SV('54.23.100'), SV('54.6.100'),  SV('51.54.100') ],
-    '1.0.0':  [ SV('54.59.100'), SV('54.29.104'), SV('51.54.100') ],
-    }
+from ...test import utils
 
 def generate_pattern(height, width, counter):
   """Generates an image that serves as a test pattern for encoding/decoding and
@@ -77,59 +60,9 @@ def generate_pattern(height, width, counter):
 
   return retval
 
-def ffmpeg_found(version_geq=None):
-  '''Decorator to check if a codec is available before enabling a test'''
-
-  def test_wrapper(test):
-
-    @functools.wraps(test)
-    def wrapper(*args, **kwargs):
-      try:
-        from .._io import version
-        avcodec_inst= SV(version['FFmpeg']['avcodec'])
-        avformat_inst= SV(version['FFmpeg']['avformat'])
-        avutil_inst= SV(version['FFmpeg']['avutil'])
-        if version_geq is not None:
-          avcodec_req,avformat_req,avutil_req = ffmpeg_versions[version_geq]
-          if avcodec_inst < avcodec_req:
-            raise SkipTest('FFMpeg/libav version installed (%s) is smaller than required for this test (%s)' % (version['FFmpeg']['ffmpeg'], version_geq))
-        return test(*args, **kwargs)
-      except ImportError:
-        raise SkipTest('FFMpeg was not available at compile time')
-
-    return wrapper
-
-  return test_wrapper
-
-def codec_available(codec):
-  '''Decorator to check if a codec is available before enabling a test'''
-
-  def test_wrapper(test):
-
-    @functools.wraps(test)
-    def wrapper(*args, **kwargs):
-      d = bob.io.video_codecs()
-      if d.has_key(codec) and d[codec]['encode'] and d[codec]['decode']:
-        return test(*args, **kwargs)
-      else:
-        raise SkipTest('A functional codec for "%s" is not installed with FFmpeg' % codec)
-
-    return wrapper
-
-  return test_wrapper
-
-def F(f):
-  """Returns the test file on the "data" subdirectory"""
-  return pkg_resources.resource_filename(__name__, os.path.join('data', f))
-
-def get_tempfilename(prefix='bobtest_', suffix='.avi'):
-  (fd, name) = tempfile.mkstemp(suffix, prefix)
-  os.unlink(name)
-  return name
-
 # These are some global parameters for the test.
-INPUT_VIDEO = F('test.mov')
-OUTPUT_VIDEO = get_tempfilename()
+INPUT_VIDEO = utils.datafile('test.mov')
+OUTPUT_VIDEO = utils.temporary_filename(suffix='.avi')
 
 import unittest
 import numpy
@@ -138,7 +71,7 @@ import bob
 class VideoTest(unittest.TestCase):
   """Performs various combined read/write tests on video files"""
   
-  @ffmpeg_found()
+  @utils.ffmpeg_found()
   def test01_CanOpen(self):
 
     # This test opens and verifies some properties of the test video available.
@@ -152,7 +85,7 @@ class VideoTest(unittest.TestCase):
     self.assertEqual(len(v), 375)
     self.assertEqual(v.codec_name, 'mjpeg')
 
-  @ffmpeg_found()
+  @utils.ffmpeg_found()
   def test02_CanReadImages(self):
 
     # This test shows how you can read image frames from a VideoReader
@@ -168,7 +101,7 @@ class VideoTest(unittest.TestCase):
       self.assertEqual(frame.shape[1], 240) #height
       self.assertEqual(frame.shape[2], 320) #width
 
-  @ffmpeg_found()
+  @utils.ffmpeg_found()
   def test03_CanGetSpecificFrames(self):
 
     # This test shows how to get specific frames from a VideoReader
@@ -197,7 +130,7 @@ class VideoTest(unittest.TestCase):
     # the last frame in the sequence is frame 27 as you can check
     self.assertTrue( numpy.array_equal(f18_30[-1], f27) )
 
-  @ffmpeg_found()
+  @utils.ffmpeg_found()
   def test04_CanWriteVideo(self):
 
     # This test reads all frames in sequence from a initial video and records
@@ -225,7 +158,7 @@ class VideoTest(unittest.TestCase):
 
     del iv2 # triggers closing of the input video stream
 
-  @ffmpeg_found()
+  @utils.ffmpeg_found()
   def test05_CanUseArrayInterface(self):
 
     # This shows you can use the array interface to read an entire video
@@ -236,7 +169,7 @@ class VideoTest(unittest.TestCase):
     for frame_id, frame in zip(range(array.shape[0]), iv.__iter__()):
       self.assertTrue ( numpy.array_equal(array[frame_id,:,:,:], frame) )
 
-  @ffmpeg_found()
+  @utils.ffmpeg_found()
   def test06_CanIterateOnTheSpot(self):
 
     # This test shows how you can read image frames from a VideoReader created
@@ -253,7 +186,7 @@ class VideoTest(unittest.TestCase):
     # This test shows we can do a pattern encoding/decoding and get video
     # readout right
 
-    fname = get_tempfilename(suffix=suffix)
+    fname = utils.temporary_filename(suffix=suffix)
   
     try:
       # Width and height should be powers of 2 as the encoded image is going 
@@ -296,7 +229,7 @@ class VideoTest(unittest.TestCase):
     # This test shows if we can read twice the same video and get the 
     # same results all the time.
 
-    fname = get_tempfilename(suffix=suffix)
+    fname = utils.temporary_filename(suffix=suffix)
   
     try:
       # Width and height should be powers of 2 as the encoded image is going 
@@ -334,25 +267,25 @@ class VideoTest(unittest.TestCase):
 
       if os.path.exists(fname): os.unlink(fname)
 
-  @ffmpeg_found()
+  @utils.ffmpeg_found()
   def test07_PatternReadWrite(self):
     self.patternReadWrite("")
     self.patternReadTwice("")
       
-  @ffmpeg_found()
-  @codec_available('mpeg4')
+  @utils.ffmpeg_found()
+  @utils.codec_available('mpeg4')
   def test08_PatternReadWrite_mpeg4(self):
     self.patternReadWrite("mpeg4")
     self.patternReadTwice("mpeg4")
       
-  @ffmpeg_found()
-  @codec_available('ffv1')
+  @utils.ffmpeg_found()
+  @utils.codec_available('ffv1')
   def test09_PatternReadWrite_ffv1(self):
     self.patternReadWrite("ffv1")
     self.patternReadTwice("ffv1")
       
-  @ffmpeg_found()
-  @codec_available('h264')
+  @utils.ffmpeg_found()
+  @utils.codec_available('h264')
   def test10_PatternReadWrite_h264(self):
     self.patternReadWrite("h264", ".mov")
     self.patternReadTwice("h264", ".mov")
