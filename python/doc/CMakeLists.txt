@@ -1,4 +1,4 @@
-find_program(SPHINX_EXECUTABLE NAMES sphinx-build-${PYTHON_VERSION} sphinx-build
+find_program(SPHINX_EXECUTABLE NAMES sphinx-build-${PYTHON_VERSION} sphinx-build${PYTHON_MAJOR_VERSION} sphinx-build
   HINTS $ENV{SPHINX_DIR} PATH_SUFFIXES bin
   DOC "Sphinx documentation generator"
   )
