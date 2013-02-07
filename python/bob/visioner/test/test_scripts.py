@@ -3,7 +3,7 @@
 # Andre Anjos <andre.anjos@idiap.ch>
 # Tue 21 Aug 2012 13:30:54 CEST 
 
-"""Test scripts in bob.visioner
+"""Test scripts for the visioner
 """
 
 import os
@@ -12,8 +12,9 @@ from ...test import utils
 from ..script import facebox, facepoints
 from ... import io, ip
 from ...ip import test as iptest
+from ...io import test as iotest
 
-MOVIE = utils.datafile('test.mov', io)
+MOVIE = utils.datafile('test.mov', iotest)
 IMAGE = utils.datafile('test-faces.jpg', iptest, os.path.join('data', 'faceextract'))
 
 class VisionerScriptTest(unittest.TestCase):

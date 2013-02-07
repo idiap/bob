@@ -110,7 +110,8 @@ def codec_available(codec):
 
     @functools.wraps(test)
     def wrapper(*args, **kwargs):
-      d = bob.io.video_codecs()
+      from ..io import video_codecs
+      d = video_codecs()
       if d.has_key(codec) and d[codec]['encode'] and d[codec]['decode']:
         return test(*args, **kwargs)
       else:

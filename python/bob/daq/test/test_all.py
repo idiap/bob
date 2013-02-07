@@ -16,7 +16,7 @@ OUTPUT_VIDEO = utils.temporary_filename('bobtest_daq_video', suffix='.avi')
 class DaqTest(unittest.TestCase):
   """Performs various data aquisition tests."""
   
-  @utils.ffmpeg_found
+  @utils.ffmpeg_found()
   def test_VideoReaderCamera(self):
 
     from ... import has_daq

@@ -22,6 +22,8 @@
 
 import os, sys
 from ...test import utils
+import unittest
+import numpy
 
 def generate_pattern(height, width, counter):
   """Generates an image that serves as a test pattern for encoding/decoding and
@@ -61,12 +63,8 @@ def generate_pattern(height, width, counter):
   return retval
 
 # These are some global parameters for the test.
-INPUT_VIDEO = utils.datafile('test.mov')
+INPUT_VIDEO = utils.datafile('test.mov', sys.modules[__name__])
 OUTPUT_VIDEO = utils.temporary_filename(suffix='.avi')
-
-import unittest
-import numpy
-import bob
 
 class VideoTest(unittest.TestCase):
   """Performs various combined read/write tests on video files"""
@@ -77,7 +75,8 @@ class VideoTest(unittest.TestCase):
     # This test opens and verifies some properties of the test video available.
     # It examplifies how to directly call the VideoReader and how to access
     # some of its properties.
-    v = bob.io.VideoReader(INPUT_VIDEO)
+    from .. import VideoReader
+    v = VideoReader(INPUT_VIDEO)
     self.assertEqual(v.height, 240)
     self.assertEqual(v.width, 320)
     self.assertEqual(v.duration, 15000000) #microseconds
@@ -89,7 +88,8 @@ class VideoTest(unittest.TestCase):
   def test02_CanReadImages(self):
 
     # This test shows how you can read image frames from a VideoReader
-    v = bob.io.VideoReader(INPUT_VIDEO)
+    from .. import VideoReader
+    v = VideoReader(INPUT_VIDEO)
     for frame in v:
       # Note that when you iterate, the frames are numpy.ndarray objects
       # So, you can use them as you please. The organization of the data
@@ -106,7 +106,8 @@ class VideoTest(unittest.TestCase):
 
     # This test shows how to get specific frames from a VideoReader
 
-    v = bob.io.VideoReader(INPUT_VIDEO)
+    from .. import VideoReader
+    v = VideoReader(INPUT_VIDEO)
 
     # get frame 27 (we start counting at zero)
     f27 = v[27]
@@ -135,8 +136,9 @@ class VideoTest(unittest.TestCase):
 
     # This test reads all frames in sequence from a initial video and records
     # them into an output video, possibly transcoding it.
-    iv = bob.io.VideoReader(INPUT_VIDEO)
-    ov = bob.io.VideoWriter(OUTPUT_VIDEO, iv.height, iv.width)
+    from .. import VideoReader, VideoWriter
+    iv = VideoReader(INPUT_VIDEO)
+    ov = VideoWriter(OUTPUT_VIDEO, iv.height, iv.width)
     for k, frame in enumerate(iv): ov.append(frame)
    
     # We verify that both videos have similar properties
@@ -147,7 +149,7 @@ class VideoTest(unittest.TestCase):
     ov.close() # forces close; see github issue #6
     del ov # trigger closing of the output video stream
 
-    iv2 = bob.io.VideoReader(OUTPUT_VIDEO)
+    iv2 = VideoReader(OUTPUT_VIDEO)
 
     # We verify that both videos have similar frames
     for orig, copied in zip(iv.__iter__(), iv2.__iter__()):
@@ -163,8 +165,9 @@ class VideoTest(unittest.TestCase):
 
     # This shows you can use the array interface to read an entire video
     # sequence in a single shot
-    array = bob.io.load(INPUT_VIDEO)
-    iv = bob.io.VideoReader(INPUT_VIDEO)
+    from .. import load, VideoReader
+    array = load(INPUT_VIDEO)
+    iv = VideoReader(INPUT_VIDEO)
    
     for frame_id, frame in zip(range(array.shape[0]), iv.__iter__()):
       self.assertTrue ( numpy.array_equal(array[frame_id,:,:,:], frame) )
@@ -174,7 +177,8 @@ class VideoTest(unittest.TestCase):
 
     # This test shows how you can read image frames from a VideoReader created
     # on the spot
-    for frame in bob.io.VideoReader(INPUT_VIDEO):
+    from .. import VideoReader
+    for frame in VideoReader(INPUT_VIDEO):
       self.assertTrue(isinstance(frame, numpy.ndarray))
       self.assertEqual(len(frame.shape), 3)
       self.assertEqual(frame.shape[0], 3) #color-bands (RGB)
@@ -186,6 +190,7 @@ class VideoTest(unittest.TestCase):
     # This test shows we can do a pattern encoding/decoding and get video
     # readout right
 
+    from .. import VideoReader, VideoWriter
     fname = utils.temporary_filename(suffix=suffix)
   
     try:
@@ -199,9 +204,9 @@ class VideoTest(unittest.TestCase):
       frames = 30
       framerate = 30 #Hz
       if codec:
-        outv = bob.io.VideoWriter(fname, height, width, framerate, codec=codec)
+        outv = VideoWriter(fname, height, width, framerate, codec=codec)
       else:
-        outv = bob.io.VideoWriter(fname, height, width, framerate)
+        outv = VideoWriter(fname, height, width, framerate)
       orig = []
       for i in range(0, frames):
         #newframe = numpy.random.random_integers(0,255,(3,height,width)).astype('u8')
@@ -209,7 +214,7 @@ class VideoTest(unittest.TestCase):
         outv.append(newframe)
         orig.append(newframe)
       outv.close()
-      input = bob.io.VideoReader(fname)
+      input = VideoReader(fname)
       reloaded = input.load()
 
       self.assertEqual( reloaded.shape[1:], orig[0].shape )
@@ -229,6 +234,7 @@ class VideoTest(unittest.TestCase):
     # This test shows if we can read twice the same video and get the 
     # same results all the time.
 
+    from .. import load, VideoReader, VideoWriter
     fname = utils.temporary_filename(suffix=suffix)
   
     try:
@@ -242,9 +248,9 @@ class VideoTest(unittest.TestCase):
       frames = 30
       framerate = 30 #Hz
       if codec:
-        outv = bob.io.VideoWriter(fname, height, width, framerate, codec=codec)
+        outv = VideoWriter(fname, height, width, framerate, codec=codec)
       else:
-        outv = bob.io.VideoWriter(fname, height, width, framerate)
+        outv = VideoWriter(fname, height, width, framerate)
       orig = []
       for i in range(0, frames):
         #newframe = numpy.random.random_integers(0,255,(3,height,width)).astype('u8')
@@ -253,8 +259,8 @@ class VideoTest(unittest.TestCase):
         orig.append(newframe)
       outv.close()
 
-      input1 = bob.io.load(fname)
-      input2 = bob.io.load(fname)
+      input1 = load(fname)
+      input2 = load(fname)
 
       self.assertEqual( input1.shape, input2.shape )
 

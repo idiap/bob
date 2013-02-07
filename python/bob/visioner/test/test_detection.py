@@ -26,9 +26,10 @@ import unittest
 from ...test import utils
 from ... import io, ip
 from ...ip import test as iptest
+from ...io import test as iotest
 from .. import MaxDetector
 
-TEST_VIDEO = utils.datafile("test.mov", io)
+TEST_VIDEO = utils.datafile("test.mov", iotest)
 IMAGE = utils.datafile('test-faces.jpg', iptest, os.path.join('data', 'faceextract'))
 
 class DetectionTest(unittest.TestCase):
