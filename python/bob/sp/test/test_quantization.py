@@ -35,7 +35,7 @@ class QuantizationTest(unittest.TestCase):
     self.assertEqual(quant.num_levels, 256)
     self.assertEqual(quant.max_level, 255)
     self.assertEqual(quant.min_level, 0)
-    self.assertEqual(quant.type, "uniform")
+    self.assertEqual(quant.quantization_type, "uniform")
     self.assertEqual(quant.quantization_level(5), 5)
     
     quant = bob.sp.Quantization('uint16', "uniform", 8)

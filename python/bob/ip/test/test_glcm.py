@@ -30,6 +30,18 @@ import pkg_resources
 IMG_3x3_A = numpy.array([ [0, 1, 0],
                           [0, 1, 1],
                           [0, 1, 0]], dtype='uint8')
+                          
+IMG_3x3_B = numpy.array([ [0, 32, 64],
+                          [64, 96, 128],
+                          [128, 160, 192]], dtype='uint8')  
+                          
+IMG_3x3_C = numpy.array([ [0, 32, 64],
+                          [64, 96, 128],
+                          [128, 164, 201]], dtype='uint16')  
+                                                  
+                 
+expected = numpy.array([[0,1,0,0,0,0,0,0],[0,0,1,0,0,0,0,0],[0,0,0,1,0,0,0,0],[0,0,0,0,1,0,0,0],[0,0,0,0,0,1,0,0],[0,0,0,0,0,0,1,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]], dtype='double')                 
+                 
                      
 IMG_3x6_A = numpy.array([ [1, 1, 4, 2, 1, 0],
                           [2, 3, 3, 4, 0, 2],
@@ -41,13 +53,13 @@ class GLCMTest(unittest.TestCase):
   
   def test01_GLCM(self):
     # Test the computation of GLCM matrix
-    glcm = bob.ip.GLCM()
-    self.assertTrue(glcm.get_glcm_shape(IMG_3x3_A) == (256, 256, 1))
+    glcm = bob.ip.GLCM('uint8')
+    self.assertTrue(glcm.get_glcm_shape() == (256, 256, 1))
     res = glcm(IMG_3x3_A)    
     self.assertTrue( (res[0:2, 0:2, 0] == numpy.array([[0,3],[2,1]], dtype='float64')).all())
     
     glcm.offset = numpy.array([[1,0],[0,-1]], dtype='int32')    
-    self.assertTrue(glcm.get_glcm_shape(IMG_3x3_A) == (256, 256, 2))
+    self.assertTrue(glcm.get_glcm_shape() == (256, 256, 2))
     res = glcm(IMG_3x3_A)
     self.assertTrue( (res[0:2, 0:2, 0] == numpy.array([[0,3],[2,1]], dtype='float64')).all())
     self.assertTrue( (res[0:2, 0:2, 1] == numpy.array([[2,1],[1,2]], dtype='float64')).all())
@@ -57,7 +69,8 @@ class GLCMTest(unittest.TestCase):
     self.assertTrue( (res[0:2, 0:2, 0] == numpy.array([[0,5],[5,2]], dtype='float64')).all())
     self.assertTrue( (res[0:2, 0:2, 1] == numpy.array([[4,2],[2,4]], dtype='float64')).all())
       
-    glcm.set_glcmtype_params(True, True) # normalization is alse True
+    glcm.symmetric = True
+    glcm.normalized = True
     res = glcm(IMG_3x3_A)
     self.assertTrue( (res[0:2, 0:2, 0] == numpy.array([[0,5./12],[5./12,2./12]], dtype='float64')).all())
     self.assertTrue( (res[0:2, 0:2, 1] == numpy.array([[4./12,2./12],[2./12,4./12]], dtype='float64')).all())
@@ -72,46 +85,36 @@ class GLCMTest(unittest.TestCase):
     self.assertTrue( (res[0:2, 0:2, 2] == numpy.array([[2,1],[1,2]], dtype='float64')).all())
     self.assertTrue( (res[0:2, 0:2, 3] == numpy.array([[0,1],[2,1]], dtype='float64')).all())
   
-
   
   def test02_GLCM(self):
-    # Additional tests on the computation of GLCM matrix  
-    glcm = bob.ip.GLCM()
-    glcm.max_level=4
+    # Additional tests on the computation of GLCM matrix    
+    glcm = bob.ip.GLCM('uint8', num_levels=8);
+    self.assertTrue(glcm.get_glcm_shape() == (8, 8, 1))
+    self.assertTrue( (glcm.quantization_table == numpy.array([0,32,64,96,128,160,192,224])).all() )
+    res = glcm(IMG_3x3_B)  
+    self.assertTrue( (res[:,:,0] == expected).all())
     
-    self.assertTrue(glcm.get_glcm_shape(IMG_3x6_A) == (5, 5, 1))
-    res = glcm(IMG_3x6_A)
-    self.assertTrue( (res[:,:,0] == numpy.array([[0,0,2,0,0],[1,1,0,0,2],[0,1,0,2,0],[0,1,0,1,1],[1,0,1,0,1]], dtype='float64')).all())
-    
-    glcm.num_levels=3
-    self.assertTrue(glcm.get_glcm_shape(IMG_3x6_A) == (3, 3, 1))
-    res = glcm(IMG_3x6_A)
-    self.assertTrue( (res[:,:,0] == numpy.array([[2,2,2],[2,3,1],[1,1,1]], dtype='float64')).all())
-    glcm.round_scaling = True
-    res = glcm(IMG_3x6_A)
-    self.assertTrue( (res[:,:,0] == numpy.array([[0,2,0],[1,6,3],[1,1,1]], dtype='float64')).all())
-    
+  
   def test03_GLCM(self):
-    # Additional tests on the computation of GLCM directly on an image
-    input_image = numpy.array([range(0,256)], dtype='uint8')
-    glcm = bob.ip.GLCM()
-    glcm.num_levels = 8
-    glcm.round_scaling = True # scaling as in Matlab 
-    self.assertTrue(glcm.get_glcm_shape(input_image) == (8, 8, 1))
-    res = glcm(input_image)
-    expected = numpy.array([[17,1,0,0,0,0,0,0], [0,35,1,0,0,0,0,0], [0,0,35,1,0,0,0,0], [0,0,0,35,1,0,0,0], [0,0,0,0,35,1,0,0], [0,0,0,0,0,35,1,0], [0,0,0,0,0,0,35,1],[0,0,0,0,0,0,0,21]], dtype='float64') # currently it's still not working exactly like matlab
-    self.assertTrue( (res[:,:,0] == expected).all() )  
+    # Additional tests on the computation of GLCM matrix  
+    glcm = bob.ip.GLCM('uint16', numpy.array([0,19,55,92,128,164,201,237], dtype='uint16')) # thresholds selected according to Matlab quantization
+    self.assertTrue(glcm.get_glcm_shape() == (8, 8, 1))
+    self.assertEqual(glcm.num_levels,8)
+    self.assertEqual(glcm.max_level,65535)
+    self.assertEqual(glcm.min_level,0)
+    res = glcm(IMG_3x3_C)
+    self.assertTrue( (res[:,:,0] == expected).all())
     
-      
+ 
+    
   def test04_GLCM(self):
     # Test GLCM properties
     # The testing of the properties tests whether the results are compatible with the code given in http://www.mathworks.com/matlabcentral/fileexchange/22354-glcmfeatures4-m-vectorized-version-of-glcmfeatures1-m-with-code-changes. However, the indexing of the arrays there starts from 1 and in Bob it starts from 0. To avoid the descrepencies, some changes in that code is needed, in particluar in the i_matrix and j_matrix variables, as well as xplusy_index 
-    glcm = bob.ip.GLCM()
     glcm_prop = bob.ip.GLCMProp()
-    glcm.max_level=4
-    res_matrix = glcm(IMG_3x6_A)
-    self.assertTrue(glcm_prop.get_glcmprop_shape(res_matrix) == (1,))
-   
+    glcm_matrix = numpy.array([[[0,0,2,0,0],[1,1,0,0,2],[0,1,0,2,0],[0,1,0,1,1],[1,0,1,0,1]]], dtype='double')
+    res_matrix = numpy.ndarray((5,5,1), 'double')
+    res_matrix[:,:,0] = glcm_matrix
+    
     self.assertTrue(numpy.allclose(glcm_prop.angular_second_moment(res_matrix), [0.09333333])) # energy in [5],[6]
     self.assertTrue(numpy.allclose(glcm_prop.energy(res_matrix), [0.305505])) # doesn't exist in [6]
     self.assertTrue(numpy.allclose(glcm_prop.contrast(res_matrix), [3.66666666666667])) # contrast in [5],[6] 
@@ -134,7 +137,7 @@ class GLCMTest(unittest.TestCase):
     self.assertTrue(numpy.allclose(glcm_prop.inv_diff(res_matrix), [0.50222222])) # inverse difference in [5]
     self.assertTrue(numpy.allclose(glcm_prop.inv_diff_norm(res_matrix), [ 0.788624338624339])) # inverse difference normalized in [5]
     self.assertTrue(numpy.allclose(glcm_prop.inv_diff_mom_norm(res_matrix), [0.8890875])) # inverse difference moment normalized in [5]
-
+  
 
     
     

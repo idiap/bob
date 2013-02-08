@@ -10,20 +10,30 @@ class Quantization:
   
   """Class attributes"""
   
-  quantization_type=None
-  __doc__ += ' quantization_type \n   Possible types of quantization: "uniform" (uniform quantization of the input signal within the range between min_level and max_level); "uniform_rounding" (uniform quantization of the input signal within the range between min_level and max_level, but similar to Matlab quantization (see http://www.mathworks.com/matlabcentral/newsreader/view_thread/275291); "user_spec" (quantization according to user-specified quantization table of thresholds.)'
+  @property
+  def quantization_type(self):
+    'Possible types of quantization: "uniform" (uniform quantization of the input signal within the range between min_level and max_level); "uniform_rounding" (uniform quantization of the input signal within the range between min_level and max_level, but similar to Matlab quantization (see http://www.mathworks.com/matlabcentral/newsreader/view_thread/275291); "user_spec" (quantization according to user-specified quantization table of thresholds.)'
+    return self._quantization_type
   
-  num_levels=None
-  __doc__ += 'num_levels \n    Number of quantization levels.'
+  @property
+  def num_levels(self):
+    'Number of quantization levels.'
+    return self._num_levels
+    
+  @property
+  def max_level(self):
+    'Input values greater then this value are scaled to this value prior to quantization. As a result, they will be quantized in the highest quantization level.'
+    return self._max_level
+
+  @property
+  def min_level(self):
+    'Input values smaller than or equal to this value are scaled to this value prior to quantization. As a result, they will be scaled in the lowest qunatization level.'
+    return self._min_level
   
-  max_levels=None
-  __doc__ += 'max_level \n    Input values greater then this value are scaled to this value prior to quantization. As a result, they will be quantized in the highest quantization level.'
-     
-  min_level=None
-  __doc__ += 'min_level \n    Input values smaller than or equal to this value are scaled to this value prior to quantization. As a result, they will be scaled in the lowest qunatization level.'
-  
-  quantization_table=None
-  __doc__ += 'quantization_table \n   1D numpy.ndarray containing user-specified thresholds of the quantization. Each element corresponds to the lower boundary of the particular quantization level. Eg. array([ 0,  5, 10]) means quantization in 3 levels. Input values in the range [0,4] will be quantized to level 0, input values in the range[5,9] will be quantized to level 1 and input values in the range [10-max_level] will be quantized to level 2.'
+  @property
+  def quantization_table(self):
+    '1D numpy.ndarray containing user-specified thresholds of the quantization. Each element corresponds to the lower boundary of the particular quantization level. Eg. array([ 0,  5, 10]) means quantization in 3 levels. Input values in the range [0,4] will be quantized to level 0, input values in the range[5,9] will be quantized to level 1 and input values in the range [10-max_level] will be quantized to level 2.'
+    return self._quantization_table
   
   
   def __init__(self, dtype, quantization_type=None, num_levels=None, min_level=None, max_level=None, quantization_table=None):
@@ -84,13 +94,13 @@ class Quantization:
     else:
       raise RuntimeError, 'Quantization does not support data of type ', dt   
       
-    self.quantization_table = self.Q.thresholds     
-    self.type = quant_type_invdict[self.Q.type]     
-    self.min_level = self.Q.min_level
-    self.max_level = self.Q.max_level 
-    self.num_levels = self.Q.num_levels    
+    self._quantization_table = self.Q.thresholds     
+    self._quantization_type = quant_type_invdict[self.Q.type]     
+    self._min_level = self.Q.min_level
+    self._max_level = self.Q.max_level 
+    self._num_levels = self.Q.num_levels    
 
-
+  
 
   def __call__(self, input_signal):
     """

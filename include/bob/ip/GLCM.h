@@ -32,7 +32,7 @@
 #include "bob/core/array_copy.h"
 #include "bob/core/cast.h"
 #include "bob/ip/Exception.h"
-#include "bob/sp/interpolate.h"
+#include "bob/sp/Quantization.h"
 
 namespace bob { namespace ip {
 
@@ -49,6 +49,7 @@ namespace bob { namespace ip {
    * in IEEE Transactions on Systems, Man and Cybernetics, vol.SMC-3, No. 6, p. 610-621.
    * [2] http://www.mathworks.ch/ch/help/images/ref/graycomatrix.html
    */
+  template <typename T> 
   class GLCM {
 
     public: //api
@@ -58,6 +59,9 @@ namespace bob { namespace ip {
        */
        
       GLCM();
+      GLCM(const int num_levels);
+      GLCM(const int num_levels, const T min_level, const T max_level);
+      GLCM(const blitz::Array<T,1>& quant_thres); 
 
       /**
        * Copy constructor
@@ -77,47 +81,22 @@ namespace bob { namespace ip {
       /**
        * Clone self into a boost::shared_ptr<GLCM>
        */
-      boost::shared_ptr<GLCM> clone() const;
-
-      /**
-      * Set the parameters for the quantization (scaling) of the gray-levels intensities
-      */
-      void setQuantizationParams(const int num_levels, const int min_level, const int max_level);
+      //boost::shared_ptr<GLCM> clone() const;
       
-      /**
-      * Set the parameters for the type of the output matrix (symmetric, normalized)
-      */
-      void setGLCMTypeParams(const bool symmetric, const bool normalized);
+      
       
       /**
        * Get the required shape of the GLCM output blitz array, before calling
        * the operator() method.
        */
-      template <typename T>  
-        const blitz::TinyVector<int,3> getGLCMShape(const blitz::Array<T,2>& src) const;
-
-      const blitz::TinyVector<int,3> getGLCMShape(const blitz::Array<uint8_t,2>& src) const
-        { return getGLCMShape<uint8_t>(src); }
-        
-      const blitz::TinyVector<int,3> getGLCMShape(const blitz::Array<uint16_t,2>& src) const
-        { return getGLCMShape<uint16_t>(src); }
-
+      const blitz::TinyVector<int,3> getGLCMShape() const;
 
 
       /**
        * Compute Gray-Level Co-occurences from a 2D blitz::Array, and save the resulting
        * GLCM matrix in the dst 3D blitz::Array.
        */
-      template <typename T> 
-        void operator()(const blitz::Array<T,2>& src, blitz::Array<double,3>& glcm) const;
-        
-      void 
-        operator()(const blitz::Array<uint8_t,2>& src, blitz::Array<double,3>& glcm) const 
-        { operator()<uint8_t>(src, glcm); }
-      void 
-        operator()(const blitz::Array<uint16_t,2>& src, blitz::Array<double,3>& glcm) const 
-        { operator()<uint16_t>(src, glcm); }
-
+      void operator()(const blitz::Array<T,2>& src, blitz::Array<double,3>& glcm) const;
 
       /**
       * Accessors
@@ -125,12 +104,13 @@ namespace bob { namespace ip {
       
       const blitz::Array<int32_t,2>&  getOffset() const
       { return m_offset; }
-      const int getMaxLevel() const { return m_maxLevel; }
-      const int getMinLevel() const { return m_minLevel; }
-      const int getNumLevels() const { return m_numLevels; }
+      const int getMaxLevel() const { return m_quantization.getMaxLevel(); }
+      const int getMinLevel() const { return m_quantization.getMinLevel(); }
+      const int getNumLevels() const { return m_quantization.getNumLevels(); }
       const bool getSymmetric() const { return m_symmetric; }
       const bool getNormalized() const { return m_normalized; }
-      const bool getRoundScaling() const { return m_roundScaling; }
+      const bob::sp::Quantization<T> getQuantization() const { return m_quantization; }
+      const blitz::Array<T,1>&  getQuantizationTable() const{ return m_quantization.getThresholds(); }
       
       
       /**
@@ -139,15 +119,6 @@ namespace bob { namespace ip {
       
       void setOffset(const blitz::Array<int32_t, 2>& offset)
       { m_offset.reference(bob::core::array::ccopy(offset)); }
-            
-      void setMaxLevel(const int maxLevel)
-      { m_maxLevel = maxLevel; }
-
-      void setMinLevel(const int minLevel)
-      { m_minLevel = minLevel; }
-
-      void setNumLevels(const int numLevels)
-      { m_numLevels = numLevels; }
       
       void setSymmetric(const bool symmetric)
       { m_symmetric = symmetric; }
@@ -155,9 +126,6 @@ namespace bob { namespace ip {
       void setNormalized(const bool normalized)
       { m_normalized = normalized; }
       
-      void setRoundScaling(const bool roundScaling)
-      { m_roundScaling = roundScaling; }
-
     protected:
     /**
     * Attributes
@@ -165,47 +133,94 @@ namespace bob { namespace ip {
     
 
     blitz::Array<int32_t,2> m_offset;
-    int m_maxLevel;
-    int m_minLevel;
-    int m_numLevels;
+    bob::sp::Quantization<T> m_quantization;
     bool m_symmetric;
     bool m_normalized;
-    bool m_roundScaling; // if true, the quantization (scaling) of the grey-scale values will be done as in Matlab, i.e. with rounding the discrete level. If false, the quantization (scaling) will be done uniformly
     
-    /**
-    * Methods
-    */
-    /**
-    * Scales the input gray-scale value into a new value depending on the nuber of values, as well as the max and min values
-    */
-    const int scale_gray_value(int value, int max_value, int min_value, int num_values) const;
     
    };
 
 
 template <typename T>
-const blitz::TinyVector<int,3> bob::ip::GLCM::getGLCMShape(const blitz::Array<T,2>& src) const
+bob::ip::GLCM<T>::GLCM()
+{
+  m_offset.reference(blitz::Array<int32_t,2>(1,2));
+  m_offset = 1, 0; // this is the default offset
+  m_symmetric = false;
+  m_normalized = false;
+  m_quantization = bob::sp::Quantization<T>();
+}
+
+template <typename T>
+bob::ip::GLCM<T>::GLCM(int num_levels)
+{
+  m_offset.reference(blitz::Array<int32_t,2>(1,2));
+  m_offset = 1, 0; // this is the default offset
+  m_symmetric = false;
+  m_normalized = false;
+  m_quantization = bob::sp::Quantization<T>(1, num_levels);
+}
+
+template <typename T>
+bob::ip::GLCM<T>::GLCM(int num_levels, T min_level, T max_level)
+{
+  m_offset.reference(blitz::Array<int32_t,2>(1,2));
+  m_offset = 1, 0; // this is the default offset
+  m_symmetric = false;
+  m_normalized = false;
+  m_quantization = bob::sp::Quantization<T>(1, num_levels, min_level, max_level);
+}
+
+template <typename T>
+bob::ip::GLCM<T>::GLCM(const blitz::Array<T,1>& quant_thres)
+{
+  m_offset.reference(blitz::Array<int32_t,2>(1,2));
+  m_offset = 1, 0; // this is the default offset
+  m_symmetric = false;
+  m_normalized = false;
+  m_quantization = bob::sp::Quantization<T>(quant_thres);
+}
+
+template <typename T>
+bob::ip::GLCM<T>::GLCM(const bob::ip::GLCM<T>& other)
+{
+  m_offset.reference(bob::core::array::ccopy(other.getOffset()));
+  m_symmetric = other.getSymmetric();
+  m_normalized = other.getNormalized();
+  m_quantization = other.getQuantization();
+}
+
+template <typename T>
+bob::ip::GLCM<T>::~GLCM() { }
+
+template <typename T>
+bob::ip::GLCM<T>& bob::ip::GLCM<T>::operator=(const bob::ip::GLCM<T>& other) {
+  if(this != &other)
+  {
+    m_offset.reference(bob::core::array::ccopy(other.getOffset()));
+    m_symmetric = other.getSymmetric();
+    m_normalized = other.getNormalized();
+    m_quantization = other.getQuantization();
+  }
+  return *this;
+}
+
+/*
+template <typename T>
+boost::shared_ptr<bob::ip::GLCM<T>> bob::ip::GLCM<T>::clone() const {
+  return boost::make_shared<bob::ip::GLCM>(*this);
+}
+*/
+
+
+template <typename T>
+const blitz::TinyVector<int,3> bob::ip::GLCM<T>::getGLCMShape() const
 { 
   blitz::TinyVector<int,3> res;
-  int num_levels, max_level, min_level;
   
-  if (m_maxLevel == -1) // define the max level
-    max_level = std::numeric_limits<T>::max();
-  else
-    max_level = m_maxLevel;
-
-  if (m_minLevel == -1) // define the min level
-    min_level = std::numeric_limits<T>::min();
-  else
-    min_level = m_minLevel;  
   
-  if (m_numLevels == -1) // define the number of gray-scale levels
-    num_levels = max_level - min_level + 1;
-  else
-    num_levels = m_numLevels; 
-  
-  res(0) = num_levels;
-  res(1) = num_levels;
+  res(0) = m_quantization.getNumLevels();
+  res(1) = m_quantization.getNumLevels();
   res(2) = m_offset.extent(0); // the total number of offsets
   return res;
 }
@@ -214,46 +229,31 @@ const blitz::TinyVector<int,3> bob::ip::GLCM::getGLCMShape(const blitz::Array<T,
 
 
 template <typename T>
-void bob::ip::GLCM::operator()(const blitz::Array<T,2>& src, blitz::Array<double,3>& glcm) const
+void bob::ip::GLCM<T>::operator()(const blitz::Array<T,2>& src, blitz::Array<double,3>& glcm) const
 {
   // check if the size of the output matrix is as expected
-  blitz::TinyVector<int,3> shape(getGLCMShape(src));
+  blitz::TinyVector<int,3> shape(getGLCMShape());
   bob::core::array::assertSameShape(glcm, shape);
 
   glcm=0;
-  int num_levels, min_level, max_level;
   
-  if (m_maxLevel == -1) // define the max level
-    max_level = std::numeric_limits<T>::max();
-  else
-    max_level = m_maxLevel;
-
-  if (m_minLevel == -1) // define the min level
-    min_level = std::numeric_limits<T>::min();
-  else
-    min_level = m_minLevel;  
-  
-  if (m_numLevels == -1) // define the number of gray-scale levels
-    num_levels = max_level - min_level + 1;
-  else
-    num_levels = m_numLevels; 
-    
+  blitz::Array<uint32_t,2> src_quant = m_quantization(src);
   
   for(int off_ind = 0; off_ind < m_offset.extent(0); ++off_ind) // loop over all the possible offsets
   {
       // loop over each pixel of the image
-      for(int y = 0; y < src.extent(0); ++y)
+      for(int y = 0; y < src_quant.extent(0); ++y)
       {
-        for(int x = 0; x < src.extent(1); ++x)
+        for(int x = 0; x < src_quant.extent(1); ++x)
         {
-          int i_level = (int)(src(y,x)); // the grey level of the current pixel
+          int i_level = (int)(src_quant(y,x)); // the grey level of the current pixel
           const int y1 = y + m_offset(off_ind, 1);
           const int x1 = x + m_offset(off_ind, 0);
 
-          if(y1 >= 0 && y1 < src.extent(0) && x1 >= 0 && x1 < src.extent(1))
+          if(y1 >= 0 && y1 < src_quant.extent(0) && x1 >= 0 && x1 < src_quant.extent(1))
           {
-            int j_level = (int)(src(y1, x1));
-            glcm(scale_gray_value(i_level, max_level, min_level, num_levels), scale_gray_value(j_level, max_level, min_level, num_levels), off_ind) += 1; 
+            int j_level = (int)(src_quant(y1, x1));
+            glcm(i_level, j_level, off_ind) += 1; 
               
           }
         }

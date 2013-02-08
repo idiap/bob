@@ -29,11 +29,6 @@ using namespace boost::python;
 
 static const char* quantization_doc = "Objects of this class, after configuration, can quantize 1D or 2D signal into different number of levels. At the moment, only uint8 and uint16 input signals are supported.";
 
-
-/*static boost::shared_ptr<bob::sp::Quantization<uint8_t>> py_constructor_quantization_uint8() 
-{  
-  return boost::make_shared<bob::sp::Quantization<uint8_t>>();
-}*/
   
     
 template <typename T> 
@@ -77,7 +72,7 @@ void bind_sp_quantization_uint8()
     
     .def(init<const bob::sp::Quantization<uint8_t>&>((arg("quantization_operator")), "Copy constructs a Quantization operator"))
     
-    .add_property("thresholds", &call_get_thresholds<uint8_t>, "1D numpy.ndarray of dtype='int' containing the thresholds of the quantization. Should be pre-given if the the type of quantization m_type=3. Otherwise, it is recalculated according to other quantization parameters. Each element corresponds to the lower boundary of the particular quantization level. Eg. array([ 0,  5, 10]) means quantization in 3 levels. Input values in the range [0,4] will be quantized to level 0, input values in the range[5,9] will be quantized to level 1 and input values in the range [10-max_level] will be quantized to level 2.")
+    .add_property("thresholds", &call_get_thresholds<uint8_t>, "1D numpy.ndarray of dtype='int' containing the thresholds of the quantization. Eg. array([ 0,  5, 10]) means quantization in 3 levels. Input values in the range [0,4] will be quantized to level 0, input values in the range[5,9] will be quantized to level 1 and input values in the range [10-max_level] will be quantized to level 2.")
     .add_property("max_level", &bob::sp::Quantization<uint8_t>::getMaxLevel, "Input values greater then this value are scaled to this value prior to quantization. As a result, they will be quantized in the highest quantization level. The default is the maximum value permitted by the data type of the class.")
     .add_property("min_level", &bob::sp::Quantization<uint8_t>::getMinLevel, "Input values smaller than or equal to this value are scaled to this value prior to quantization. As a result, they will be scaled in the lowest qunatization level. The default is the minimum value permitted by the data type. ")
     .add_property("num_levels", &bob::sp::Quantization<uint8_t>::getNumLevels, "Number of quantization levels. The default is the total number of discreet values permitted by the data type of the class.")
@@ -99,7 +94,7 @@ void bind_sp_quantization_uint16()
     
     .def(init<const bob::sp::Quantization<uint16_t>&>((arg("quantization_operator")), "Copy constructs a Quantization operator"))
     
-    .add_property("thresholds", &call_get_thresholds<uint16_t>, "1D numpy.ndarray of dtype='int' containing the thresholds of the quantization. Should be pre-given if the the type of quantization m_type=3. Otherwise, it is recalculated according to other quantization parameters. Each element corresponds to the lower boundary of the particular quantization level. Eg. array([ 0,  5, 10]) means quantization in 3 levels. Input values in the range [0,4] will be quantized to level 0, input values in the range[5,9] will be quantized to level 1 and input values in the range [10-max_level] will be quantized to level 2.")
+    .add_property("thresholds", &call_get_thresholds<uint16_t>, "1D numpy.ndarray of dtype='int' containing the thresholds of the quantization. Each element corresponds to the lower boundary of the particular quantization level. Eg. array([ 0,  5, 10]) means quantization in 3 levels. Input values in the range [0,4] will be quantized to level 0, input values in the range[5,9] will be quantized to level 1 and input values in the range [10-max_level] will be quantized to level 2.")
     .add_property("max_level", &bob::sp::Quantization<uint16_t>::getMaxLevel, "Input values greater then this value are scaled to this value prior to quantization. As a result, they will be quantized in the highest quantization level. The default is the maximum value permitted by the data type of the class.")
     .add_property("min_level", &bob::sp::Quantization<uint16_t>::getMinLevel, "Input values smaller than or equal to this value are scaled to this value prior to quantization. As a result, they will be scaled in the lowest qunatization level. The default is the minimum value permitted by the data type. ")
     .add_property("num_levels", &bob::sp::Quantization<uint16_t>::getNumLevels, "Number of quantization levels. The default is the total number of discreet values permitted by the data type of the class.")

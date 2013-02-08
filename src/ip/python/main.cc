@@ -52,7 +52,8 @@ void bind_ip_sobel();
 void bind_ip_drawing();
 void bind_ip_spatiotempgrad();
 void bind_ip_hog();
-void bind_ip_glcm();
+void bind_ip_glcm_uint8();
+void bind_ip_glcm_uint16();
 void bind_ip_glcmprop();
 
 #if defined(HAVE_VLFEAT)
@@ -93,7 +94,8 @@ BOOST_PYTHON_MODULE(_ip) {
   bind_ip_drawing();
   bind_ip_spatiotempgrad();
   bind_ip_hog();
-  bind_ip_glcm();
+  bind_ip_glcm_uint8();
+  bind_ip_glcm_uint16();
   bind_ip_glcmprop();
 
 #if defined(HAVE_VLFEAT)
