@@ -48,8 +48,6 @@ __all__ = [
     'db',
     'machine',
     'trainer',
-    'build',
-    'helper',
     ]
 
 if has_visioner: __all__.append('visioner')

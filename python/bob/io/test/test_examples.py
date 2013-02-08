@@ -6,18 +6,17 @@
 """Tests various examples for bob.io
 """
 
+import sys
 import unittest
-import bob
+from ...test import utils
 
 class ExampleTest(unittest.TestCase):
 
+  @utils.ffmpeg_found()
   def test01_video2frame(self):
 
-    import os
+    movie = utils.datafile('test.mov', sys.modules[__name__])
 
-    from pkg_resources import resource_filename
-    movie = resource_filename(__name__, os.path.join('data', 'test.mov'))
-
-    from bob.io.example.video2frame import main
+    from ..example.video2frame import main
     cmdline = ['--self-test', movie]
     self.assertEqual(main(cmdline), 0)

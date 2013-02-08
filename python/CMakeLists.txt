@@ -79,12 +79,31 @@ set(pybin "${CMAKE_BINARY_DIR}/bin/egg-build")
 set(pysetup "${CMAKE_SOURCE_DIR}/python/setup.py")
 get_filename_component(basedir ${pysetup} PATH)
 add_custom_target(egg ALL mkdir -pv ${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES}
-  COMMAND ${pybin} ${pysetup} build ${BOB_SETUPTOOLS_COMPILER} --force --build-base=${CMAKE_BINARY_DIR}/egg-build install --force --prefix=${CMAKE_BINARY_DIR} --record=${CMAKE_BINARY_DIR}/egg-build-record.txt --single-version-externally-managed WORKING_DIRECTORY ${basedir} DEPENDS ${ENABLED_PACKAGES})
+  COMMAND ${pybin} ${pysetup} build ${BOB_SETUPTOOLS_COMPILER} --force --build-base=${CMAKE_BINARY_DIR}/egg-build install --force --prefix=${CMAKE_BINARY_DIR} --install-lib=${CMAKE_BINARY_DIR}/${PYTHON_SITE_PACKAGES} --record=${CMAKE_BINARY_DIR}/egg-build-record.txt --single-version-externally-managed WORKING_DIRECTORY ${basedir} DEPENDS ${ENABLED_PACKAGES})
 add_custom_target(egg-scripts ALL ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/bin/fix_scripts.py ${CMAKE_BINARY_DIR}/bin)
 add_dependencies(egg-scripts egg)
 
 # Testing
 # An easy handler for nose tests
+macro(list_contains var value)
+  set(${var})
+  foreach (value2 ${ARGN})
+    if (${value} STREQUAL ${value2})
+      set(${var} TRUE)
+    endif (${value} STREQUAL ${value2})
+  endforeach (value2)
+endmacro(list_contains)
+list_contains(have_daq bob_daq ${ENABLED_PACKAGES})
+list_contains(have_visioner bob_visioner ${ENABLED_PACKAGES})
+if(NOT have_daq)
+  set(BOB_NOSE_EXCLUDE "daq")
+endif()
+if(NOT have_visioner)
+  set(BOB_NOSE_EXCLUDE "visioner")
+endif()
+if(NOT have_visioner AND NOT have_daq)
+  set(BOB_NOSE_EXCLUDE "visioner|daq")
+endif()
 find_program(NOSETESTS_EXECUTABLE NAMES nosetests-${PYTHON_VERSION} nosetests
   HINTS $ENV{SPHINX_DIR} PATH_SUFFIXES bin
   DOC "Nose python test scanner and runner"
