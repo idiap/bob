@@ -1,5 +1,5 @@
 /**
- * @file bob/ip/GLCM.h
+ * @file bob/ip/GLCMProp.h
  * @author Ivana Chingovska <ivana.chingovska@idiap.ch>
  * @date Wed Jan 30 12:09:24 CET 2013
  *

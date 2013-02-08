@@ -33,7 +33,6 @@
 #include "bob/core/cast.h"
 #include "bob/ip/Exception.h"
 #include "bob/sp/interpolate.h"
-#include "bob/ip/GLCMProp.h"
 
 namespace bob { namespace ip {
 
@@ -58,15 +57,6 @@ namespace bob { namespace ip {
        * Complete constructor
        */
        
-      /* 
-      GLCM(const blitz::Array<int32_t, 1>& colOffset,
-        const blitz::Array<int32_t, 1>& rowOffset,
-        const bool autoMaxLevel = true,
-        const bool autoMinLevel = true,
-        const bool autoNumLevels = true,
-        const bool symmetric=true,
-        const bool normalized=true); 
-      */
       GLCM();
 
       /**

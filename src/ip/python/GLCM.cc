@@ -27,7 +27,7 @@
 
 using namespace boost::python;
 
-static const char* glcm_doc = "Objects of this class, after configuration, can compute Grey-Level Co-occurence Matrix of an image.";
+static const char* glcm_doc = "Objects of this class, after configuration, can compute Grey-Level Co-occurence Matrix of an image.\n This class allows to extract Grey-Level Co-occurence Matrix (GLCM). A thorough tutorial about GLCM and the textural (so-called Haralick) properties that can be derived from it, can be found at: http://www.fp.ucalgary.ca/mhallbey/tutorial.htm \n List of references: \n [1] R. M. Haralick, K. Shanmugam, I. Dinstein; \"Textural Features for Image calssification\", in IEEE Transactions on Systems, Man and Cybernetics, vol.SMC-3, No. 6, p. 610-621. [2] http://www.mathworks.ch/ch/help/images/ref/graycomatrix.html";
 
 
 static boost::shared_ptr<bob::ip::GLCM> py_constructor_glcm() 
