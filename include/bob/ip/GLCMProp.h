@@ -104,15 +104,19 @@ namespace bob { namespace ip {
         f18. information measure of correlation 1 [1]
         f19. information measure of correlation 2 [1]
         f20. inverse difference (INV) is homom [3]  
-        f21. inverse difference normalized (INN) [3] ---
-        f22. inverse difference moment normalized [3] ---
+        f21. inverse difference normalized (INN) [3]
+        f22. inverse difference moment normalized [3]
+        f23. auto-correlation [2]
+        f24. correlation as in MATLAB Image Processing Toolbox method graycoprops() ([6])
     */
         
       void angular_second_moment(const blitz::Array<double,3>& glcm, blitz::Array<double,1>& prop) const;
       void energy(const blitz::Array<double,3>& glcm, blitz::Array<double,1>& prop) const;
       void variance(const blitz::Array<double,3>& glcm, blitz::Array<double,1>& prop) const;
       void contrast(const blitz::Array<double,3>& glcm, blitz::Array<double,1>& prop) const;
+      void auto_correlation(const blitz::Array<double,3>& glcm, blitz::Array<double,1>& prop) const;
       void correlation(const blitz::Array<double,3>& glcm, blitz::Array<double,1>& prop) const;
+      void correlation_m(const blitz::Array<double,3>& glcm, blitz::Array<double,1>& prop) const;
       void inv_diff_mom(const blitz::Array<double,3>& glcm, blitz::Array<double,1>& prop) const;
       void sum_avg(const blitz::Array<double,3>& glcm, blitz::Array<double,1>& prop) const;
       void sum_var(const blitz::Array<double,3>& glcm, blitz::Array<double,1>& prop) const;

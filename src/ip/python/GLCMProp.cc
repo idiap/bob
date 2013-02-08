@@ -106,6 +106,23 @@ static object call_contrast_p(const bob::ip::GLCMProp& op, bob::python::const_nd
   return output.self();
 }   
 
+
+static void call_auto_correlation_c(const bob::ip::GLCMProp& op, bob::python::const_ndarray input, bob::python::ndarray output) 
+{
+  blitz::Array<double,1> output_ = output.bz<double,1>();
+  return op.auto_correlation(input.bz<double,3>(), output_);
+}  
+  
+static object call_auto_correlation_p(const bob::ip::GLCMProp& op, bob::python::const_ndarray input) 
+{
+  const blitz::TinyVector<int,1> sh = op.get_prop_shape(input.bz<double,3>());
+  bob::python::ndarray output(bob::core::array::t_float64, sh(0));
+  blitz::Array<double,1> output_ = output.bz<double,1>();
+  op.auto_correlation(input.bz<double,3>(), output_);
+  return output.self();
+}   
+
+
 static void call_correlation_c(const bob::ip::GLCMProp& op, bob::python::const_ndarray input, bob::python::ndarray output) 
 {
   blitz::Array<double,1> output_ = output.bz<double,1>();
@@ -118,6 +135,21 @@ static object call_correlation_p(const bob::ip::GLCMProp& op, bob::python::const
   bob::python::ndarray output(bob::core::array::t_float64, sh(0));
   blitz::Array<double,1> output_ = output.bz<double,1>();
   op.correlation(input.bz<double,3>(), output_);
+  return output.self();
+}   
+
+static void call_correlation_m_c(const bob::ip::GLCMProp& op, bob::python::const_ndarray input, bob::python::ndarray output) 
+{
+  blitz::Array<double,1> output_ = output.bz<double,1>();
+  return op.correlation_m(input.bz<double,3>(), output_);
+}  
+  
+static object call_correlation_m_p(const bob::ip::GLCMProp& op, bob::python::const_ndarray input) 
+{
+  const blitz::TinyVector<int,1> sh = op.get_prop_shape(input.bz<double,3>());
+  bob::python::ndarray output(bob::core::array::t_float64, sh(0));
+  blitz::Array<double,1> output_ = output.bz<double,1>();
+  op.correlation_m(input.bz<double,3>(), output_);
   return output.self();
 }   
 
@@ -396,9 +428,13 @@ void bind_ip_glcmprop()
     .def("variance", &call_variance_c, (arg("self"),arg("input"), arg("output")), "Extract Variance property of the input GLCM (see ref [1])")    
     .def("variance", &call_variance_p, (arg("self"),arg("input")), "Extract Variance property of the input GLCM (see ref [1])")    
     .def("contrast", &call_contrast_c, (arg("self"),arg("input"), arg("output")), "Extract Contrast property of the input GLCM (see ref [1])")    
-    .def("contrast", &call_contrast_p, (arg("self"),arg("input")), "Extract Contrast property of the input GLCM (see ref [1])")    
+    .def("contrast", &call_contrast_p, (arg("self"),arg("input")), "Extract Contrast property of the input GLCM (see ref [1])") 
+    .def("auto_correlation", &call_auto_correlation_c, (arg("self"),arg("input"), arg("output")), "Extract Auto-Correlation property of the input GLCM (see ref [2])")    
+    .def("auto_correlation", &call_auto_correlation_p, (arg("self"),arg("input")), "Extract Auto-Correlation property of the input GLCM (see ref [2])")       
     .def("correlation", &call_correlation_c, (arg("self"),arg("input"), arg("output")), "Extract Correlation property of the input GLCM (see ref [1])")    
-    .def("correlation", &call_correlation_p, (arg("self"),arg("input")), "Extract Correlation property of the input GLCM (see ref [1])")    
+    .def("correlation", &call_correlation_p, (arg("self"),arg("input")), "Extract Correlation property of the input GLCM (see ref [1])")
+    .def("correlation_m", &call_correlation_m_c, (arg("self"),arg("input"), arg("output")), "Extract Correlation property of the input GLCM as in MATLAB Image Processing Toolbox method graycoprops() (see ref [6])")    
+    .def("correlation_m", &call_correlation_m_p, (arg("self"),arg("input")), "Extract Correlation property of the input GLCM as in MATLAB Image Processing Toolbox method graycoprops() (see ref [6])")        
     .def("inv_diff_mom", &call_inv_diff_mom_c, (arg("self"),arg("input"), arg("output")), "Extract Inverse Difference moment property of the input GLCM (see ref [1])")    
     .def("inv_diff_mom", &call_inv_diff_mom_p, (arg("self"),arg("input")), "Extract Inverse Difference moment property of the input GLCM (see ref [1])")    
     .def("sum_avg", &call_sum_avg_c, (arg("self"),arg("input"), arg("output")), "Extract Sum Average property of the input GLCM (see ref [1])")    

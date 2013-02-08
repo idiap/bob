@@ -143,6 +143,29 @@ void bob::ip::GLCMProp::contrast(const blitz::Array<double,3>& glcm, blitz::Arra
   */
 }
 
+void bob::ip::GLCMProp::auto_correlation(const blitz::Array<double,3>& glcm, blitz::Array<double,1>& prop) const
+{
+  // check if the size of the output matrix is as expected
+  blitz::TinyVector<int,1> shape(get_prop_shape(glcm));
+  bob::core::array::assertSameShape(prop, shape); 
+  
+  // normalize the input GLCM matrix
+  blitz::Array<double,3> glcm_norm = normalize_glcm(glcm);
+  
+  blitz::Array<double,2> mat(glcm.extent(0), glcm.extent(1)); // auxiliary matrix that will be used for glcm matrix for one particular offset
+  
+  blitz::Range rall = blitz::Range::all();
+  blitz::firstIndex i;
+  blitz::secondIndex j;
+  
+  //do the computation of the feature
+  for (int l=0; l < glcm_norm.extent(2); ++l)
+  {
+    mat = glcm_norm(rall, rall, l);
+    prop(l) = blitz::sum(i*j*mat);
+  }
+}
+
 
 void bob::ip::GLCMProp::correlation(const blitz::Array<double,3>& glcm, blitz::Array<double,1>& prop) const
 {
@@ -171,6 +194,32 @@ void bob::ip::GLCMProp::correlation(const blitz::Array<double,3>& glcm, blitz::A
   }
 }
 
+void bob::ip::GLCMProp::correlation_m(const blitz::Array<double,3>& glcm, blitz::Array<double,1>& prop) const
+{
+  // check if the size of the output matrix is as expected
+  blitz::TinyVector<int,1> shape(get_prop_shape(glcm));
+  bob::core::array::assertSameShape(prop, shape); 
+  
+  // normalize the input GLCM matrix
+  blitz::Array<double,3> glcm_norm = normalize_glcm(glcm);
+  
+  blitz::Array<double,2> mat(glcm.extent(0), glcm.extent(1)); // auxiliary matrix that will be used for glcm matrix for one particular offset
+  
+  blitz::Range rall = blitz::Range::all();
+  blitz::firstIndex i;
+  blitz::secondIndex j;
+  
+  //do the computation of the feature
+  for (int l=0; l < glcm_norm.extent(2); ++l)
+  {
+    mat = glcm_norm(rall, rall, l);
+    double mean_x = blitz::sum(i*mat);
+    double mean_y = blitz::sum(j*mat);
+    double std_x = sqrt(blitz::sum(sqr(i-mean_x)*mat));
+    double std_y = sqrt(blitz::sum(sqr(j-mean_y)*mat));
+    prop(l) = blitz::sum(((i-mean_x) * (j-mean_x) * mat) / (std_x * std_y));
+  }
+}
 
 void bob::ip::GLCMProp::inv_diff_mom(const blitz::Array<double,3>& glcm, blitz::Array<double,1>& prop) const
 { 

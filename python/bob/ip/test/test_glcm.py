@@ -119,10 +119,12 @@ class GLCMTest(unittest.TestCase):
     self.assertTrue(numpy.allclose(glcm_prop.energy(res_matrix), [0.305505])) # doesn't exist in [6]
     self.assertTrue(numpy.allclose(glcm_prop.contrast(res_matrix), [3.66666666666667])) # contrast in [5],[6] 
     self.assertTrue(numpy.allclose(glcm_prop.variance(res_matrix), [5.90293333333333])) # sum of squares (variance) in [5]
+    self.assertTrue(numpy.allclose(glcm_prop.auto_correlation(res_matrix), [4.73333333])) # auto-correlation in [5]
     self.assertTrue(numpy.allclose(glcm_prop.correlation(res_matrix), [0.0262698])) # correlation-p in [5]
+    self.assertTrue(numpy.allclose(glcm_prop.correlation_m(res_matrix), [0.0262698])) # correlation-m in [5]
     self.assertTrue(numpy.allclose(glcm_prop.inv_diff_mom(res_matrix), [0.4372549])) # homogeneity-p in [5]
     self.assertTrue(numpy.allclose(glcm_prop.sum_avg(res_matrix), [4.33333333333333])) # sum average in [5] 
-    self.assertTrue(numpy.allclose(glcm_prop.sum_var(res_matrix), [9.57993445])) # sum avg in [5]
+    self.assertTrue(numpy.allclose(glcm_prop.sum_var(res_matrix), [9.57993445])) # sum variance in [5]
     self.assertTrue(numpy.allclose(glcm_prop.sum_entropy(res_matrix), [1.93381])) # sum entropy in [5]
     self.assertTrue(numpy.allclose(glcm_prop.entropy(res_matrix), [2.43079132887823])) # entropy in [5]
     self.assertTrue(numpy.allclose(glcm_prop.dissimilarity(res_matrix), [1.53333333])) # dissimilarity in [5]
@@ -138,9 +140,6 @@ class GLCMTest(unittest.TestCase):
     self.assertTrue(numpy.allclose(glcm_prop.inv_diff_norm(res_matrix), [ 0.788624338624339])) # inverse difference normalized in [5]
     self.assertTrue(numpy.allclose(glcm_prop.inv_diff_mom_norm(res_matrix), [0.8890875])) # inverse difference moment normalized in [5]
   
-
-    
-    
-    
+    self.assertTrue(numpy.allclose(glcm_prop.properties_by_name(res_matrix, ["angular second moment"]), numpy.array([0.09333333]))) # energy in [5],[6]
     
     
