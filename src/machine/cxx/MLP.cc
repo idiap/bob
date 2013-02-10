@@ -24,7 +24,7 @@
 #include <cmath>
 #include <boost/format.hpp>
 
-#include "bob/core/array_check.h"
+#include "bob/core/check.h"
 #include "bob/core/array_copy.h"
 #include "bob/core/array_assert.h"
 #include "bob/machine/MLP.h"

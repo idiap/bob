@@ -21,7 +21,7 @@
 #include "bob/math/Exception.h"
 #include "bob/math/linear.h"
 #include "bob/core/array_assert.h"
-#include "bob/core/array_check.h"
+#include "bob/core/check.h"
 #include "bob/core/array_copy.h"
 
 namespace math = bob::math;

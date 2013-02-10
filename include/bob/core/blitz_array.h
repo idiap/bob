@@ -32,7 +32,7 @@
 #include "bob/core/array.h"
 #include "bob/core/array_utils.h"
 
-#include "bob/core/array_check.h"
+#include "bob/core/check.h"
 #include "bob/core/array_type.h"
 #include "bob/core/array_copy.h"
 #include "bob/core/cast.h"

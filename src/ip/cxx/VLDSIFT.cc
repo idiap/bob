@@ -23,7 +23,7 @@
 #include "bob/ip/VLDSIFT.h"
 
 #include "bob/core/array_assert.h"
-#include "bob/core/array_check.h"
+#include "bob/core/check.h"
 #include "bob/core/array_copy.h"
 
 bob::ip::VLDSIFT::VLDSIFT(const size_t height, const size_t width, 

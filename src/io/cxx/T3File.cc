@@ -41,7 +41,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "bob/core/array_check.h"
+#include "bob/core/check.h"
 #include "bob/core/blitz_array.h"
 #include "bob/io/CodecRegistry.h"
 #include "bob/io/Exception.h"
