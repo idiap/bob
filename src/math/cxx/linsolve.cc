@@ -20,7 +20,7 @@
 #include "bob/math/linsolve.h"
 #include "bob/math/Exception.h"
 #include "bob/math/linear.h"
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/core/check.h"
 #include "bob/core/array_copy.h"
 

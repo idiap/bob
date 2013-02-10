@@ -24,7 +24,7 @@
 #ifndef BOB_IP_INTEGRAL_H
 #define BOB_IP_INTEGRAL_H
 
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/core/array_index.h"
 #include "bob/core/cast.h"
 

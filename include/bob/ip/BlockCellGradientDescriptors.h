@@ -24,7 +24,7 @@
 #ifndef BOB_IP_BLOCK_CELL_GRADIENT_DESCRIPTORS_H
 #define BOB_IP_BLOCK_CELL_GRADIENT_DESCRIPTORS_H
 
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/ip/Exception.h"
 #include "bob/ip/BlockCellDescriptors.h"
 #include "bob/ip/block.h"

@@ -21,7 +21,7 @@
  */
 
 #include <sys/time.h>
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/core/array_copy.h"
 #include "bob/trainer/Exception.h"
 #include "bob/trainer/DataShuffler.h"

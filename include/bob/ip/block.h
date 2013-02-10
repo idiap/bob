@@ -23,7 +23,7 @@
 #ifndef BOB_IP_BLOCK_H
 #define BOB_IP_BLOCK_H
 
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/ip/Exception.h"
 #include "bob/ip/crop.h"
 

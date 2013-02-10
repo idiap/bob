@@ -23,7 +23,7 @@
 #ifndef BOB_MATH_PAVX_H
 #define BOB_MATH_PAVX_H
 
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include <utility>
 
 namespace bob {

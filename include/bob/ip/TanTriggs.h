@@ -23,7 +23,7 @@
 #ifndef BOB_IP_TAN_TRIGGS_H
 #define BOB_IP_TAN_TRIGGS_H
 
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/ip/gammaCorrection.h"
 #include "bob/sp/conv.h"
 #include "bob/sp/extrapolate.h"

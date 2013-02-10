@@ -28,7 +28,7 @@
 #define BOB_IP_ROTATE_H
 
 #include <blitz/array.h>
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/core/cast.h"
 #include "bob/ip/Exception.h"
 #include "bob/ip/shear.h"

@@ -25,7 +25,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <list>
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/core/cast.h"
 #include "bob/ip/Exception.h"
 

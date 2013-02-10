@@ -19,7 +19,7 @@
  */
 
 #include "bob/machine/ZTNorm.h"
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include <limits>
 
 namespace bob { 

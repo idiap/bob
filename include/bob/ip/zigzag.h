@@ -28,7 +28,7 @@
 #ifndef BOB_IP_ZIGZAG_H
 #define BOB_IP_ZIGZAG_H
 
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/ip/Exception.h"
 
 namespace bob {

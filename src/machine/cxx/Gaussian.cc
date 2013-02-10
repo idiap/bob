@@ -21,7 +21,7 @@
 
 #include "bob/machine/Gaussian.h"
 
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/math/log.h"
 
 bob::machine::Gaussian::Gaussian() {

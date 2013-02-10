@@ -23,7 +23,7 @@
 #ifndef BOB_MACHINE_GABOR_JET_SIMILARITY_H
 #define BOB_MACHINE_GABOR_JET_SIMILARITY_H
 
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include <blitz/array.h>
 #include <numeric>
 #include "bob/ip/GaborWaveletTransform.h"

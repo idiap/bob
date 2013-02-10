@@ -29,7 +29,7 @@
 #define BOB_IP_GROM_NORM_H
 
 #include <boost/shared_ptr.hpp>
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/core/check.h"
 #include "bob/ip/Exception.h"
 

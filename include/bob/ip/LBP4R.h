@@ -25,7 +25,7 @@
 
 #include <blitz/array.h>
 #include <algorithm>
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/core/cast.h"
 #include "bob/ip/Exception.h"
 #include "bob/ip/LBP.h"

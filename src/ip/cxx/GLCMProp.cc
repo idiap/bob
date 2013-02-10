@@ -22,7 +22,7 @@
 
 #include "bob/ip/GLCMProp.h"
 #include "bob/core/array_copy.h"
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include <boost/make_shared.hpp>
 
 static double sqr(const double x)

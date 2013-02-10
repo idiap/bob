@@ -28,7 +28,7 @@
 #include <blitz/array.h>
 #include <algorithm>
 #include <boost/shared_ptr.hpp>
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/core/array_copy.h"
 #include "bob/core/cast.h"
 #include "bob/ip/Exception.h"

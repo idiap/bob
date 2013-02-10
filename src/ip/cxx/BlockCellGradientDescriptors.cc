@@ -20,7 +20,7 @@
 
 #include "bob/ip/BlockCellGradientDescriptors.h"
 #include "bob/ip/Exception.h"
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 
 bob::ip::GradientMaps::GradientMaps(const size_t height, 
     const size_t width, const GradientMagnitudeType mag_type):

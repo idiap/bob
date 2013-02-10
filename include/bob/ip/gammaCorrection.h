@@ -26,7 +26,7 @@
 
 #include <blitz/array.h>
 #include <cmath>
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/ip/Exception.h"
 
 namespace bob {

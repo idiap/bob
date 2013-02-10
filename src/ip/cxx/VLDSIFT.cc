@@ -22,7 +22,7 @@
 
 #include "bob/ip/VLDSIFT.h"
 
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/core/check.h"
 #include "bob/core/array_copy.h"
 

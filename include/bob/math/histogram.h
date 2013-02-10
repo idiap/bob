@@ -25,7 +25,7 @@
 #define BOB_MATH_HISTOGRAM_H
 
 #include "bob/core/array.h"
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include <blitz/array.h>
 #include <numeric>
 #include <functional>

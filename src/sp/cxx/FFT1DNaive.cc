@@ -21,7 +21,7 @@
  */
 
 #include "bob/sp/FFT1DNaive.h"
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 
 namespace ca = bob::core::array;
 namespace spd = bob::sp::detail;

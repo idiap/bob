@@ -27,7 +27,7 @@
 #include <boost/tuple/tuple.hpp>
 
 #include "bob/core/array_type.h"
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 
 #include <blitz/array.h>
 #if !defined (HAVE_BLITZ_TINYVEC2_H)

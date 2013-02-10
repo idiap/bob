@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/core/array_copy.h"
 #include "bob/machine/Exception.h"
 #include "bob/machine/PLDAMachine.h"

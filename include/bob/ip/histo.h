@@ -24,7 +24,7 @@
 #include <blitz/array.h>
 #include <algorithm>
 
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/core/array_type.h"
 #include "bob/core/Exception.h"
 

@@ -21,7 +21,7 @@
 
 #include "bob/machine/KMeansMachine.h"
 
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/core/array_copy.h"
 #include "bob/machine/Exception.h"
 #include <limits>

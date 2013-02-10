@@ -20,7 +20,7 @@
 
 #include "bob/ip/HOG.h"
 #include "bob/ip/Exception.h"
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 
 void bob::ip::hogComputeHistogram(const blitz::Array<double,2>& mag, 
   const blitz::Array<double,2>& ori, blitz::Array<double,1>& hist, 
