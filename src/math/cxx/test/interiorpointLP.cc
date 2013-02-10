@@ -89,10 +89,10 @@ void generateProblem( const int n, blitz::Array<double,2>& A,
   blitz::Array<double,1>& b, blitz::Array<double,1>& c, 
   blitz::Array<double,1>& x0)
 {
-  bob::core::array::reindexAndResize( A, 0, 0, n, 2*n);
-  bob::core::array::reindexAndResize( b, 0, n);
-  bob::core::array::reindexAndResize( c, 0, 2*n);
-  bob::core::array::reindexAndResize( x0, 0, 2*n);
+  A.resize(n, 2*n);
+  b.resize(n);
+  c.resize(2*n);
+  x0.resize(2*n);
   A = 0.;
   c = 0.;
   for( int i=0; i<n; ++i) {
