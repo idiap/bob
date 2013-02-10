@@ -227,6 +227,7 @@ bool hasSameShape( const blitz::Array<T,D>& a,
 
 /**
  * @brief Checks that two (floating point) 1D blitz arrays are close.
+ * This also checks that the shapes are the same.
  */
 template<typename T> 
 bool isClose(const blitz::Array<T,1>& left, const blitz::Array<T,1>& right,
@@ -244,6 +245,7 @@ bool isClose(const blitz::Array<T,1>& left, const blitz::Array<T,1>& right,
 
 /**
  * @brief Checks that two (floating point) 2D blitz arrays are close.
+ * This also checks that the shapes are the same.
  */
 template<typename T> 
 bool isClose(const blitz::Array<T,2>& left, const blitz::Array<T,2>& right, 
@@ -262,6 +264,7 @@ bool isClose(const blitz::Array<T,2>& left, const blitz::Array<T,2>& right,
 
 /**
  * @brief Checks that two (floating point) 3D blitz arrays are close.
+ * This also checks that the shapes are the same.
  */
 template<typename T> 
 bool isClose(const blitz::Array<T,3>& left, const blitz::Array<T,3>& right,
@@ -281,6 +284,7 @@ bool isClose(const blitz::Array<T,3>& left, const blitz::Array<T,3>& right,
 
 /**
  * @brief Checks that two (floating point) 4D blitz arrays are close.
+ * This also checks that the shapes are the same.
  */
 template<typename T> 
 bool isClose(const blitz::Array<T,4>& left, const blitz::Array<T,4>& right,
@@ -301,6 +305,7 @@ bool isClose(const blitz::Array<T,4>& left, const blitz::Array<T,4>& right,
 
 /**
  * @brief Checks that two (complex floating point) 1D blitz arrays are close.
+ * This also checks that the shapes are the same.
  */
 template<typename T> 
 bool isClose(const blitz::Array<std::complex<T>,1>& left, 
@@ -319,6 +324,7 @@ bool isClose(const blitz::Array<std::complex<T>,1>& left,
 
 /**
  * @brief Checks that two (complex floating point) 2D blitz arrays are close.
+ * This also checks that the shapes are the same.
  */
 template<typename T> 
 bool isClose(const blitz::Array<std::complex<T>,2>& left, 
@@ -338,6 +344,7 @@ bool isClose(const blitz::Array<std::complex<T>,2>& left,
 
 /**
  * @brief Checks that two (complex floating point) 3D blitz arrays are close.
+ * This also checks that the shapes are the same.
  */
 template<typename T> 
 bool isClose(const blitz::Array<std::complex<T>,3>& left, 
@@ -358,6 +365,7 @@ bool isClose(const blitz::Array<std::complex<T>,3>& left,
 
 /**
  * @brief Checks that two (complex floating point) 4D blitz arrays are close.
+ * This also checks that the shapes are the same.
  */
 template<typename T> 
 bool isClose(const blitz::Array<std::complex<T>,4>& left, 
@@ -375,6 +383,19 @@ bool isClose(const blitz::Array<std::complex<T>,4>& left,
             return false;
 
   return true;
+}
+
+/**
+ * @brief Checks that two blitz arrays are equal, also checking that the shapes
+ * are the same.
+ */
+template <typename T, int D>
+bool isEqual(const blitz::Array<T,D>& left, const blitz::Array<T,D>& right)
+{ 
+  if (!hasSameShape(left, right))
+    return false;
+
+  return !(blitz::any(left != right));
 }
 
 }}

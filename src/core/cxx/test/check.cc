@@ -35,10 +35,12 @@ struct T {
   float z, t, u;
   blitz::Array<double,1> a, b, c;
   blitz::Array<std::complex<double>,1> d, e, f;
+  blitz::Array<uint8_t,1> g, h, i, j;
   T(): x(1e-5), y(x+1e-8),
     z(1.f), t(1.f), u(1.1f),
     a(2), b(2), c(2),
-    d(1), e(1), f(1)
+    d(1), e(1), f(1),
+    g(2), h(2), i(2), j(3)
   {
     a = 0., 1.;
     b = 0.+1e-12, 1.+1e-12;
@@ -46,6 +48,10 @@ struct T {
     d = std::complex<double>(0.,0.);
     e = std::complex<double>(1e-10,1e-10);
     f = std::complex<double>(1e-10,1.);
+    g = 0, 1;
+    h = 0, 1;
+    i = 0, 2;
+    j = 0, 1, 2;
   }
   ~T() {}
 };
@@ -117,6 +123,11 @@ BOOST_AUTO_TEST_CASE( test_check )
   BOOST_CHECK(  bob::core::array::isClose( d, e, 1e-5, 1e-8) );
   BOOST_CHECK( !bob::core::array::isClose( d, f, 1e-5, 1e-8) );
   BOOST_CHECK( !bob::core::array::isClose( e, f, 1e-5, 1e-8) );
+  
+  // Integer arrays
+  BOOST_CHECK(  bob::core::array::isEqual( g, h) );
+  BOOST_CHECK( !bob::core::array::isEqual( g, i) );
+  BOOST_CHECK( !bob::core::array::isEqual( g, j) );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
