@@ -16,7 +16,7 @@ def properties_by_name(self, glcm_matrix, prop_names=None):
                "inverse difference moment":self.inv_diff_mom,
                "sum average":self.sum_avg,
                "sum variance":self.sum_var,
-               "sum_entropy":self.sum_entropy,
+               "sum entropy":self.sum_entropy,
                "entropy":self.entropy,
                "difference variance":self.diff_var,
                "difference entropy":self.diff_entropy,

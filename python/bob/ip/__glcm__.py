@@ -52,7 +52,7 @@ class GLCM(object):
     
   @property
   def offset(self):
-    "2D numpy.ndarray of dtype='int32_t' specifying the column and row distance betwee pixel pairs. The shape of this array is (num_offsets, 2), where num_offsets is the total number of offsets to be taken into account when computing GLCM."
+    "2D numpy.ndarray of dtype='int32' specifying the column and row distance between pixel pairs. The shape of this array is (num_offsets, 2), where num_offsets is the total number of offsets to be taken into account when computing GLCM."
     return self._offset    
   
   @offset.setter
@@ -69,10 +69,10 @@ class GLCM(object):
         Data type (eg. numpy.dtype object. Supported data types are uint8 and uint16
         
       num_levels
-        Number of quantization levels. The default is the total number of discreet values permitted by the dtype
+        Number of quantization levels. The default is the total number of discreet values permitted by dtype
         
       min_level
-        Input values smaller than or equal to this value are scaled to this value prior to quantization. As a result, they will be scaled in the lowest qunatization level. The default is the minimum value permitted by dtpe "  
+        Input values smaller than or equal to this value are scaled to this value prior to quantization. As a result, they will be scaled in the lowest qunatization level. The default is the minimum value permitted by dtype "  
         
       max_level
         Input values greater then this value are scaled to this value prior to quantization. As a result, they will be quantized in the highest quantization level. The default is the maximum value permitted by dtype.      
