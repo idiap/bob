@@ -58,6 +58,24 @@ class ColorTest(unittest.TestCase):
           self.assertTrue(abs(g2 - g) < 1e-6)
           self.assertTrue(abs(b2 - b) < 1e-6)
 
+    v0 = 1e-10
+    v1 = 1. - v0
+    l = [v0, v1]
+    for r in l:
+      for g in l:
+        for b in l:
+          # First test the correctness
+          ht, st, vt = bob.ip.rgb_to_hsv_f(r, g, b)
+          hp, sp, vp = colorsys.rgb_to_hsv(r, g, b)
+          self.assertTrue(abs(ht - hp) < 1e-6)
+          self.assertTrue(abs(st - sp) < 1e-6)
+          self.assertTrue(abs(vt - vp) < 1e-6)
+          # And that we can invert the result using bob
+          r2, g2, b2 = bob.ip.hsv_to_rgb_f(ht, st, vt)
+          self.assertTrue(abs(r2 - r) < 1e-6)
+          self.assertTrue(abs(g2 - g) < 1e-6)
+          self.assertTrue(abs(b2 - b) < 1e-6)
+
   def test02_hsl(self):
 
     # This test verifies that color conversion is reversible for HSL <=> RGB
@@ -69,6 +87,24 @@ class ColorTest(unittest.TestCase):
     for r in numpy.arange(0, 1+step, step):
       for g in numpy.arange(0, 1+step, step):
         for b in numpy.arange(0, 1+step, step):
+          # First test the correctness
+          ht, st, lt = bob.ip.rgb_to_hsl_f(r, g, b)
+          hp, lp, sp = colorsys.rgb_to_hls(r, g, b)
+          self.assertTrue(abs(ht - hp) < 1e-6)
+          self.assertTrue(abs(st - sp) < 1e-6)
+          self.assertTrue(abs(lt - lp) < 1e-6)
+          # And that we can invert the result using bob
+          r2, g2, b2 = bob.ip.hsl_to_rgb_f(ht, st, lt)
+          self.assertTrue(abs(r2 - r) < 1e-6)
+          self.assertTrue(abs(g2 - g) < 1e-6)
+          self.assertTrue(abs(b2 - b) < 1e-6)
+
+    v0 = 1e-10
+    v1 = 1. - v0
+    l = [v0, v1]
+    for r in l:
+      for g in l:
+        for b in l:
           # First test the correctness
           ht, st, lt = bob.ip.rgb_to_hsl_f(r, g, b)
           hp, lp, sp = colorsys.rgb_to_hls(r, g, b)

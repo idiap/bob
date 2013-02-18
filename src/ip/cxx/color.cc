@@ -133,8 +133,11 @@ template <> void bob::ip::rgb_to_hsv_one (double r, double g, double b,
     double& h, double& s, double& v) {
   v = tmax(r, g, b); //value
   
-  //if the Value is 0, then we also set the other values to zero
-  if (v == 0.0) { 
+  // Define a threshold to avoid division by zero
+  static const double thrd = 10*std::numeric_limits<double>::epsilon();
+
+  //if the Value is (almost) 0, then we also set the other values to zero
+  if (v < thrd) { 
     h = s = v;
     return;
   }
@@ -143,8 +146,8 @@ template <> void bob::ip::rgb_to_hsv_one (double r, double g, double b,
   double C = v - tmin(r, g, b);
   s = C / v;
 
-  //if the Saturation value is zero, set Hue to zero and return
-  if (s == 0.0) {
+  //if the chroma value C is (almost) zero, set Hue to zero and return
+  if (C < thrd) {
     h = s;
     return;
   }
@@ -247,6 +250,9 @@ template <> void bob::ip::rgb_to_hsl_one (uint16_t r, uint16_t g, uint16_t b,
 
 template <> void bob::ip::rgb_to_hsl_one (double r, double g, double b,
     double& h, double& s, double& l) {
+  // Define a threshold to avoid division by zero
+  static const double thrd = 10*std::numeric_limits<double>::epsilon();
+
   //lightness calculation: L = (M + m)/2
   const double M = tmax(r, g, b);
   const double m = tmin(r, g, b);
@@ -262,13 +268,13 @@ template <> void bob::ip::rgb_to_hsl_one (double r, double g, double b,
   //S = C / (1 - |2*L -1|)
   double C = M - m; //chroma
   double delta = 1-fabsf(2*l - 1);
-  if (delta == 0)
+  if (delta < thrd)
     s = 0;
   else
     s = clamp(C / delta); 
 
-  //if the Saturation value is zero, set Hue to zero and return
-  if (s == 0) {
+  //if the chroma value C is (almost) zero, set Hue to zero and return
+  if (C < thrd) {
     h = s;
     return;
   }
