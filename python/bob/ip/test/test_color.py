@@ -43,9 +43,9 @@ class ColorTest(unittest.TestCase):
     # against python's.
 
     step = 0.02
-    for r in numpy.arange(0, 1, step):
-      for g in numpy.arange(0, 1, step):
-        for b in numpy.arange(0, 1, step):
+    for r in numpy.arange(0, 1+step, step):
+      for g in numpy.arange(0, 1+step, step):
+        for b in numpy.arange(0, 1+step, step):
           # First test the correctness
           ht, st, vt = bob.ip.rgb_to_hsv_f(r, g, b)
           hp, sp, vp = colorsys.rgb_to_hsv(r, g, b)
@@ -66,9 +66,9 @@ class ColorTest(unittest.TestCase):
     # against python's.
 
     step = 0.02
-    for r in numpy.arange(0, 1, step):
-      for g in numpy.arange(0, 1, step):
-        for b in numpy.arange(0, 1, step):
+    for r in numpy.arange(0, 1+step, step):
+      for g in numpy.arange(0, 1+step, step):
+        for b in numpy.arange(0, 1+step, step):
           # First test the correctness
           ht, st, lt = bob.ip.rgb_to_hsl_f(r, g, b)
           hp, lp, sp = colorsys.rgb_to_hls(r, g, b)
@@ -88,9 +88,9 @@ class ColorTest(unittest.TestCase):
     # to YUV and vice-versa.
 
     step = 0.02
-    for r in numpy.arange(0, 1, step):
-      for g in numpy.arange(0, 1, step):
-        for b in numpy.arange(0, 1, step):
+    for r in numpy.arange(0, 1+step, step):
+      for g in numpy.arange(0, 1+step, step):
+        for b in numpy.arange(0, 1+step, step):
           # First test the correctness
           yt, ut, vt = bob.ip.rgb_to_yuv_f(r, g, b)
           # And that we can invert the result using bob
