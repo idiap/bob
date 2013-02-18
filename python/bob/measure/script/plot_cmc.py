@@ -80,7 +80,10 @@ def main(command_line_options = None):
     fig = mpl.figure()
     max_rank = bob.measure.plot.cmc(data, color=(0,0,1), linestyle='--', dashes=(6,2), logx = args.log_x_scale)
     mpl.title("CMC Curve")
-    mpl.xlabel('Rank (log)')
+    if args.log_x_scale:
+      mpl.xlabel('Rank (log)')
+    else:
+      mpl.xlabel('Rank')
     mpl.ylabel('Recognition Rate in %')
     mpl.grid(True, color=(0.3,0.3,0.3))
     mpl.ylim(ymax=101)
