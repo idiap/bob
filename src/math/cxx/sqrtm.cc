@@ -24,7 +24,7 @@
 
 #include "bob/math/sqrtm.h"
 
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/math/eig.h"
 #include "bob/math/linear.h"
 

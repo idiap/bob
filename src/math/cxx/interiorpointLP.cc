@@ -339,9 +339,9 @@ void mathdetail::initializeLargeSystem(const blitz::Array<double,2>& A,
   const int n = A.extent(1);
 
   // Reindex and resize A_large, b_large and x_large
-  bob::core::array::reindexAndResize( A_large, 0, 0, m+2*n, m+2*n);
-  bob::core::array::reindexAndResize( b_large, 0, m+2*n);
-  bob::core::array::reindexAndResize( x_large, 0, m+2*n);
+  bob::math::reindexAndResize( A_large, 0, 0, m+2*n, m+2*n);
+  bob::math::reindexAndResize( b_large, 0, m+2*n);
+  bob::math::reindexAndResize( x_large, 0, m+2*n);
 
   // 'Compute' transpose(A)
   const blitz::Array<double,2> A_t = 

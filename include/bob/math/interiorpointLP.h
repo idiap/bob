@@ -33,6 +33,118 @@ namespace bob {
  *
  */
   namespace math {
+/**
+ * @brief This function reindex and resize a 1D blitz array with the given
+ * parameters
+ * @param array The 1D blitz array to reindex and resize
+ * @param base0 The base index of the first dimension
+ * @param size0 The size of the first dimension
+ * @warning If a resizing is performed, previous content of the array is 
+ * lost.
+ */
+template <typename T>
+void reindexAndResize( blitz::Array<T,1>& array, const int base0, 
+  const int size0)
+{
+  // Check and reindex if required
+  if( array.base(0) != base0) {
+    const blitz::TinyVector<int,1> base( base0);
+    array.reindexSelf( base );
+  }
+  // Check and resize if required
+  if( array.extent(0) != size0)
+    array.resize( size0);
+}
+
+/**
+ * @brief This function reindex and resize a 2D blitz array with the given
+ * parameters
+ * @param array The 2D blitz array to reindex and resize
+ * @param base0 The base index of the first dimension
+ * @param base1 The base index of the second dimension
+ * @param size0 The size of the first dimension
+ * @param size1 The size of the second dimension
+ * @warning If a resizing is performed, previous content of the array is 
+ * lost.
+ */
+template <typename T>
+void reindexAndResize( blitz::Array<T,2>& array, const int base0, 
+  const int base1, const int size0, const int size1)
+{
+  // Check and reindex if required
+  if( array.base(0) != base0 || array.base(1) != base1) {
+    const blitz::TinyVector<int,2> base( base0, base1);
+    array.reindexSelf( base );
+  }
+  // Check and resize if required
+  if( array.extent(0) != size0 || array.extent(1) != size1)
+    array.resize( size0, size1);
+}
+
+/**
+ * @brief This function reindex and resize a 3D blitz array with the given
+ * parameters
+ * @param array The 3D blitz array to reindex and resize
+ * @param base0 The base index of the first dimension
+ * @param base1 The base index of the second dimension
+ * @param base2 The base index of the third dimension
+ * @param size0 The size of the first dimension
+ * @param size1 The size of the second dimension
+ * @param size2 The size of the third dimension
+ * @warning If a resizing is performed, previous content of the array is 
+ * lost.
+ */
+template <typename T>
+void reindexAndResize( blitz::Array<T,3>& array, const int base0, 
+  const int base1, const int base2, const int size0, const int size1, 
+  const int size2)
+{
+  // Check and reindex if required
+  if( array.base(0) != base0 || array.base(1) != base1 || 
+    array.base(2) != base2) 
+  {
+    const blitz::TinyVector<int,3> base( base0, base1, base2);
+    array.reindexSelf( base );
+  }
+  // Check and resize if required
+  if( array.extent(0) != size0 || array.extent(1) != size1 || 
+      array.extent(2) != size2)
+    array.resize( size0, size1, size2);
+}
+
+/**
+ * @brief This function reindex and resize a 4D blitz array with the given
+ * parameters
+ * @param array The 4D blitz array to reindex and resize
+ * @param base0 The base index of the first dimension
+ * @param base1 The base index of the second dimension
+ * @param base2 The base index of the third dimension
+ * @param base3 The base index of the fourth dimension
+ * @param size0 The size of the first dimension
+ * @param size1 The size of the second dimension
+ * @param size2 The size of the third dimension
+ * @param size3 The size of the fourth dimension
+ * @warning If a resizing is performed, previous content of the array is 
+ * lost.
+ */
+template <typename T>
+void reindexAndResize( blitz::Array<T,4>& array, const int base0,
+  const int base1, const int base2, const int base3, const int size0, 
+  const int size1, const int size2, const int size3)
+{
+  // Check and reindex if required
+  if( array.base(0) != base0 || array.base(1) != base1 || 
+    array.base(2) != base2 || array.base(3) != base3) 
+  {
+    const blitz::TinyVector<int,3> base( base0, base1, base2, base3);
+    array.reindexSelf( base );
+  }
+  // Check and resize if required
+  if( array.extent(0) != size0 || array.extent(1) != size1 || 
+      array.extent(2) != size2 || array.extent(3) != size3)
+    array.resize( size0, size1, size2, size3);
+}
+
     /**
       * @brief Function which solves a linear program using a short-step
       *   interior point method. For more details about this algorithm,

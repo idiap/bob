@@ -26,7 +26,7 @@
 #ifndef BOB_IP_MULTISCALE_RETINEX_H
 #define BOB_IP_MULTISCALE_RETINEX_H
 
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/core/cast.h"
 #include "bob/sp/extrapolate.h"
 #include "bob/ip/Gaussian.h"

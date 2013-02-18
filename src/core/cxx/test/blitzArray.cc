@@ -27,7 +27,7 @@
 #include <blitz/array.h>
 #include <stdint.h>
 #include "bob/core/cast.h"
-#include "bob/core/array_check.h"
+#include "bob/core/check.h"
 #include "bob/core/array_copy.h"
 #include <map>
 #include <vector>

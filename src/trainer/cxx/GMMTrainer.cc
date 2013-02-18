@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "bob/trainer/GMMTrainer.h"
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 
 namespace train = bob::trainer;
 namespace mach = bob::machine;

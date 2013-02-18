@@ -6,47 +6,26 @@
 import os
 import sys
 import unittest
-import tempfile
-import pkg_resources
-from nose.plugins.skip import SkipTest
-import functools
+from nose import SkipTest
+from ...test import utils
+from ...io import test as iotest
 
-def ffmpeg_found(test):
-  '''Decorator to check if the FFMPEG is available before enabling a test'''
-
-  @functools.wraps(test)
-  def wrapper(*args, **kwargs):
-    try:
-      from ...io._io import VideoReader, VideoWriter
-      return test(*args, **kwargs)
-    except ImportError:
-      raise SkipTest('FFMpeg was not available at compile time')
-
-  return wrapper
-
-def F(f, module=None):
-  """Returns the test file on the "data" subdirectory"""
-  if module is None:
-    return pkg_resources.resource_filename(__name__, os.path.join('data', f))
-  return pkg_resources.resource_filename('bob.%s.test' % module, 
-      os.path.join('data', f))
-
-from .. import *
-
-def get_tempfilename(prefix='bobtest_', suffix='.avi'):
-  (fd, name) = tempfile.mkstemp(suffix, prefix)
-  os.unlink(name)
-  return name
-
-INPUT_VIDEO = F('test.mov', 'io')
-OUTPUT_VIDEO = get_tempfilename('bobtest_daq_video', suffix='')
+INPUT_VIDEO = utils.datafile('test.mov', iotest)
+OUTPUT_VIDEO = utils.temporary_filename('bobtest_daq_video', suffix='.avi')
 
 class DaqTest(unittest.TestCase):
   """Performs various data aquisition tests."""
   
-  @ffmpeg_found
+  @utils.ffmpeg_found()
   def test_VideoReaderCamera(self):
+
+    from ... import has_daq
+
+    if not has_daq: raise SkipTest, "DAQ module was not compiled in"
+
+    from .. import VideoReaderCamera, VisionerFaceLocalization, SimpleController, ConsoleDisplay, BobOutputWriter, PixelFormat, FrameSize, FrameInterval
     from ...io import VideoReader
+
     video = VideoReader(INPUT_VIDEO)
 
     pf = PixelFormat.RGB24

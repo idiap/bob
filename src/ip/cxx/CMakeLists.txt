@@ -26,6 +26,8 @@ set(src
    "LBP8R.cc"
    "LBP16R.cc"
    "LBPTop.cc"
+   "GLCM.cc"
+   "GLCMProp.cc"
    "Sobel.cc"
    "Gaussian.cc"
    "WeightedGaussian.cc"

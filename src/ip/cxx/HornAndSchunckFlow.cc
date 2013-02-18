@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/sp/conv.h"
 #include "bob/sp/extrapolate.h"
 #include "bob/ip/HornAndSchunckFlow.h"

@@ -21,7 +21,7 @@
  */
 
 #include "bob/ip/GaborSpatial.h"
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 
 namespace ca = bob::core::array;
 namespace ip = bob::ip;

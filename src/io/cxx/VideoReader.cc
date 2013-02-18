@@ -28,7 +28,7 @@
 #include <boost/preprocessor.hpp>
 #include <limits>
 
-#include "bob/core/array_check.h"
+#include "bob/core/check.h"
 #include "bob/core/blitz_array.h"
 #include "bob/core/logging.h"
 

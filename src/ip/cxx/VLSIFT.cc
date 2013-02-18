@@ -23,7 +23,7 @@
 #include "bob/ip/VLSIFT.h"
 
 #include <vl/pgm.h>
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/ip/Exception.h"
 
 bob::ip::VLSIFT::VLSIFT(const size_t height, const size_t width, 

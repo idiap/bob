@@ -26,7 +26,7 @@
 #include "bob/measure/error.h"
 #include "bob/core/blitz_compat.h"
 #include "bob/core/Exception.h"
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/core/cast.h"
 #include "bob/math/pavx.h"
 #include "bob/math/linsolve.h"

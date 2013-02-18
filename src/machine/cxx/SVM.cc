@@ -27,7 +27,7 @@
 #include <boost/filesystem.hpp>
 #include "bob/machine/SVM.h"
 #include "bob/machine/MLPException.h"
-#include "bob/core/array_check.h"
+#include "bob/core/check.h"
 #include "bob/core/logging.h"
 #include <cstdio>
 #include <cstdlib>

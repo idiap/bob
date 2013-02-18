@@ -22,7 +22,7 @@
  */
 
 #include "bob/sp/DCT2D.h"
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include <fftw3.h>
 
 

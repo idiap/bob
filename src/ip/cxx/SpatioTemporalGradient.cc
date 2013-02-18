@@ -25,7 +25,7 @@
 #include "bob/ip/SpatioTemporalGradient.h"
 #include "bob/sp/extrapolate.h"
 #include "bob/sp/conv.h"
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 
 namespace ip = bob::ip;
 

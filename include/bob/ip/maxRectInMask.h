@@ -25,7 +25,7 @@
 #define BOB_IP_MAX_RECT_IN_MASK_H
 
 #include <blitz/array.h>
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/core/array_index.h"
 
 namespace bob {

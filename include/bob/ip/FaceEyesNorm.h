@@ -22,8 +22,8 @@
 #define BOB_IP_FACE_EYES_NORM_H
 
 #include <boost/shared_ptr.hpp>
-#include "bob/core/array_assert.h"
-#include "bob/core/array_check.h"
+#include "bob/core/assert.h"
+#include "bob/core/check.h"
 #include "bob/ip/GeomNorm.h"
 #include "bob/ip/rotate.h"
 

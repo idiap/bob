@@ -19,11 +19,11 @@ recipe you will be able to:
   covering functionality that does not necessarily exists in |project|;
 * Distribute your work to others in a clean and organized manner.
 
-The advantaged of using ``zc.buildout`` is that it does **not** require
-administrator privileges for setting up all of the above. Furthermore, you will
-be able to create **isolated** environments for each project you have,
-individually. This is a great way, for example, to release code for laboratory
-exercises or for a particular publication that depends on |project|.
+One important advantage of using ``zc.buildout`` is that it does **not**
+require administrator privileges for setting up all of the above. Furthermore,
+you will be able to create **isolated** environments for each project you have.
+This is a great way to release code for laboratory exercises or for a
+particular publication that depends on |project|.
 
 .. note::
   The core of our strategy is based on standard tools for *defining* and
@@ -37,7 +37,7 @@ exercises or for a particular publication that depends on |project|.
   distribution portal. 
   
   `Buildout <http://www.buildout.org>`_ is a tool to *deploy* Python packages
-  locally, automatically setting up and isolating your environment.
+  locally, automatically setting up and encapsulating your work environment.
 
 Anatomy of a buildout Python package
 ------------------------------------
@@ -52,7 +52,7 @@ it, modifying what you need. Fire-up a shell window and than do this:
   $ cd bob.project.example
   $ rm -rf .git #this is optional - you won't need the .git directory
 
-We now recommend you read the file ``readme.rst`` situated at the root of the
+We now recommend you read the file ``README.rst`` situated at the root of the
 just downloaded material. It contains important information on other
 functionality such as document generation and unit testing, which will not be
 covered on this introductory material.
@@ -90,19 +90,16 @@ accordingly. Before doing so, it is suggested you go through all of this
 tutorial so you are familiar with the whole environment. The example package,
 as it is distributed, contains a fully working example.
 
-In the remaining of this text, we start by explaining the simplest use case:
-when you have |project| centrally installed so you can import it on your Python
-prompt without further setup. If that is not the case, you will need to follow
-the supplementary instructions down below so to make ``buildout`` aware of
-|project|'s installation location. Both are easy, but let's start with the
-simplest one.
+In the remaining of this document, we explain how to setup ``buildout.cfg`` so
+you can work in different operational modes - the ones which are more common
+development scenarios.
 
-You have |project| centrally installed
-======================================
+A Simple Python-only Package - Bob installed on the Host System
+===============================================================
 
 This is the typical case when you have installed one of our `pre-packaged
 versions of Bob <https://github.com/idiap/bob/wiki/Packages>`_ or you have
-setup your account or machine so that |project| is automatically found when you
+setup your account on machine so that |project| is automatically found when you
 start your Python prompt. To check if you satisfy that condition, just fire up
 Python and try to ``import bob``:
 
@@ -112,15 +109,15 @@ Python and try to ``import bob``:
   >>> import bob
 
 If that works, setting-up your work environment is no different than what is
-described on the ``buildout`` website. `Here is a screencast
+described on the ``zc.buildout`` website. `Here is a screencast
 <http://video.google.com/videoplay?docid=3428163188647461098&hl=en>`_ by the
-author of ``buildout`` that explains that process in details.
+author of ``zc.buildout`` that explains that process in details.
 
 The package you cloned above contains all elements to get you started. It
-defines a single library inside called ``example``, which declares a simple
-script, called ``version.py`` that prints out the version of |project|. When you
-clone the package, you will not find any executable as ``buildout`` needs to
-check all dependencies and install missing ones before you can execute
+defines a single library inside called ``xbob.example``, which declares a
+simple script, called ``version.py`` that prints out the version of |project|.
+When you clone the package, you will not find any executable as ``buildout``
+needs to check all dependencies and install missing ones before you can execute
 anything. Here is how to go from nothing to everything:
 
 .. code-block:: sh
@@ -177,25 +174,23 @@ This is the typical case when you compile |project| from scratch, yourself, and
 decided not to install it formally in some automatically scanned location (like
 ``/usr``). For example, you may want to test a new version of |project| with
 your setup or check which API changes will affect your released code. In such
-cases, you will need to tell ``buildout`` what is the base build directory
+cases, you will need to tell ``zc.buildout`` what is the base build directory
 **or** installation prefix for |project|.
 
-To do that, alter the section ``external`` in ``buildout.cfg`` and replace or
+To do that, alter the entry ``prefixes`` in ``buildout.cfg`` and replace or
 add directories (one per line) in which buildout will search for |project|
-python eggs (compiled and distributed with |project| builds). |project| Python
-Eggs are located inside the ``lib`` directory at the build or installation
-prefixes. Here are some examples:
+python eggs (compiled and distributed with |project| builds). Here is an
+example:
 
 .. code-block:: ini
 
-  [external]
-  recipe = xbob.buildout:external
-  egg-directories = /my/bob/build/directory/lib
+  prefixes = /my/bob/installed/directory
+             /my/bob/build/directory
 
-The ``xbob.buildout:external`` buildout recipe will search recursively all
-directories given in the ``egg-directories`` entry and setup all |project|
-python eggs found in those. For more information and options for this recipe,
-`refer to its manual <http://pypi.python.org/pypi/xbob.buildout/>`.
+The current used recipes for building scripts should be enough to hook-in
+locally built versions of |project| if one is found. Return ``./bin/buildout``
+and that should reset your scripts to take into considerations newly found
+versions of |project|.
 
 Document Generation and Unit Testing
 ------------------------------------
@@ -215,11 +210,21 @@ To write documentation, use the `Sphinx Document Generator
 you.
 
 Once you have edited both ``docs/conf.py`` and ``docs/index.rst`` you can run
-the document generator executing ``./bin/sphinx``. The system is setup to
-generate output at the ``sphinx`` directory.
+the document generator executing:
 
-For more details and tweaking hints checkout the manual for
-`xbob.buildout <http://github.com/bioidiap/bob.buildout.recipes/>`_.
+.. code-block:: sh
+  
+  $ ./bin/sphinx-build docs sphinx
+  ...
+
+This example generates the output of the sphinx processing in the directory
+``sphinx``. You can find more options for ``sphinx-build`` using the ``-h``
+flag:
+
+.. code-block:: sh
+  
+  $ ./bin/sphinx-build -h
+  ...
 
 .. note::
 
@@ -230,21 +235,29 @@ Unit Tests
 ==========
 
 Writing unit tests is an important asset on code that needs to run in different
-platforms and a great way to make sure all is OK. We have setup a template for
-tests under ``example/test.py``. Tests are setup in `buildout`` using the
-recipe `xbob.buildout:nose`` <http://pypi.python.org/pypi/xbob.buildout/>`_. A
-script called ``./bin/tests.py`` will be created which can run anything that
-resembles a test on the example package.
+platforms and a great way to make sure all is OK. Test units are run with `nose
+<https://nose.readthedocs.org/en/latest/>`_. To run the test unitson your
+package:
+
+.. code-block:: sh
+  
+  $ ./bin/nosetests -v xbob
+  test_version (xbob.example.test.MyTests) ... ok
+
+  ----------------------------------------------------------------------
+  Ran 1 test in 0.001s
+
+  OK
 
 .. note::
 
   Packages are sometimes distributed so that can be useful to other packages.
   If you plan to distribute your package, make sure to declare a ``bob.test``
   entry-point on your ``setup.py``. If you do that, others may be able to run
-  your tests from their package. An example script that could do that is
-  installed in our `bob.db.aggregator
-  <http://github.com/bioidiap/bob.db.aggregator>`_ package and looks `like this
-  <https://github.com/bioidiap/bob.db.aggregator/blob/master/xbob/db/aggregator/test.py>`_:
+  your tests from their package easily. An example script that could do that is
+  installed in our `xbob.db.aggregator
+  <http://github.com/bioidiap/xbob.db.aggregator>`_ package and looks `like this
+  <https://github.com/bioidiap/xbob.db.aggregator/blob/master/xbob/db/aggregator/test.py>`_:
 
   .. code-block:: python
 
@@ -277,6 +290,65 @@ At present, there is no formal design guide for databases. Nevertheless, it is
 considered a good practice to follow the design of `currently existing database
 packages <https://github.com/idiap/bob/wiki/Satellite-Packages>`_. This should
 ease migration in case of future changes.
+
+Creating C++/Python Bindings
+----------------------------
+
+Creating C++/Python bindings should be trivial. Firstly, edit your ``setup.py``
+so that you include the following:
+
+.. code-block:: python
+
+  from setuptools import setup, find_packages
+  from xbob.extension import Extension
+  ...
+
+  setup(
+    
+    name="xbob.myext",
+    version="1.0.0",
+    ...
+
+    setup_requires=[
+        'xbob.extension',
+        ],
+
+    ...
+    ext_modules=[
+      Extension("xbob.myext._myext",
+        [
+          "xbob/myext/ext/file1.cpp",
+          "xbob/myext/ext/file2.cpp",
+          "xbob/myext/ext/main.cpp",
+        ],
+        pkgconfig = [ #bob modules you depend on
+          'bob-math',
+          'bob-sp',
+          ]
+        ),
+      ... #add more extensions if you wish
+    ],
+
+    ...
+    )
+
+These modifications will allow you to compile extensions that are linked
+against |project|. You can specify the modules of |project| you want to link
+against. You **don't** have to specify ``bob-python``, which is automatically
+added. Furthermore, you can specify any ``pkg-config`` module and that will be
+linked in (for example, ``opencv``). Other modules and options can be set
+manually using `the standard options for python extensions
+<http://docs.python.org/2/extending/building.html>`_. To hook-in the building
+on the package through ``zc.buildout``, add the following section to your
+``buildout.cfg``:
+
+.. code-block:: ini
+
+  [xbob.myext]
+  recipe = xbob.buildout:develop
+
+This recipe for ``zc.buildout`` also can look at the ``prefixes`` setting, in
+case you are compiling against your own version of |project|.
 
 Python Package Namespace
 ------------------------

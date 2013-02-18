@@ -22,7 +22,7 @@
  */
 
 #include "bob/ap/Ceps.h"
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include "bob/core/cast.h"
 
 bob::ap::Ceps::Ceps( double sampling_frequency, double win_length_ms, double win_shift_ms,

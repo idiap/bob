@@ -29,7 +29,7 @@
 
 #include "bob/machine/BICMachine.h"
 #include "bob/math/linear.h"
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 
 static double sqr(const double& x){
   return x*x;

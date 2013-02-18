@@ -9,6 +9,9 @@ set(PYTHON_VERSION "${PYTHON_VERSION}" CACHE STRING "Python version")
 
 string(REPLACE "." "" PYVER ${PYTHON_VERSION})
 
+execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; print sys.version_info[0]" OUTPUT_VARIABLE PYTHON_MAJOR_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+set(PYTHON_MAJOR_VERSION "${PYTHON_MAJOR_VERSION}" CACHE STRING "Python major version")
+
 include(FindPackageHandleStandardArgs)
 
 # This function checks for python packages that should be installed before you

@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "bob/math/pavx.h"
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 #include <algorithm>
 
 void bob::math::pavx(const blitz::Array<double,1>& y, blitz::Array<double,1>& ghat)

@@ -26,7 +26,7 @@
 
 #include <blitz/array.h>
 #include "bob/sp/Exception.h"
-#include "bob/core/array_assert.h"
+#include "bob/core/assert.h"
 
 namespace bob {
   /**
