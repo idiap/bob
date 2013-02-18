@@ -1,5 +1,5 @@
 /**
- * @file ip/python/Quantization.cc
+ * @file sp/python/Quantization.cc
  * @date Wed Feb  6 10:24:57 CET 2013
  * @author Ivana Chingovska <ivana.chingovska@idiap.ch>
  *
