@@ -261,7 +261,11 @@ template <> void bob::ip::rgb_to_hsl_one (double r, double g, double b,
   //computing the saturation based on the lightness:
   //S = C / (1 - |2*L -1|)
   double C = M - m; //chroma
-  s = clamp(C / (1-fabsf(2*l - 1)));
+  double delta = 1-fabsf(2*l - 1);
+  if (delta == 0)
+    s = 0;
+  else
+    s = clamp(C / delta); 
 
   //if the Saturation value is zero, set Hue to zero and return
   if (s == 0) {
