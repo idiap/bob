@@ -3,8 +3,8 @@ from ._ip import *
 def properties_by_name(self, glcm_matrix, prop_names=None):
   """Possibility to query the properties of GLCM by specifying a name. Returns a list of numpy.array of the queried properties.
   
-     glcm the Input GLCM as 3D numpy.ndarray of dtype='float64'
-     prop_names A list GLCM texture properties' names
+    glcm The input GLCM as 3D numpy.ndarray of dtype='float64'
+    prop_names A list GLCM texture properties' names
   """
   prop_dict = {"angular second moment":self.angular_second_moment, 
                "energy":self.energy, 

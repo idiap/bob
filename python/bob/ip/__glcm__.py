@@ -132,7 +132,3 @@ class GLCM(object):
     Returns the shape of the output GLCM.
     """
     return self.G.get_glcm_shape()
-
-__all__ = dir()      
-           
-           
