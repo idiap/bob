@@ -97,14 +97,14 @@ class KMeansMachine: public Machine<blitz::Array<double,1>, double> {
     void save(bob::io::HDF5File& config) const;
 
     /**
-     * Output the minimum distance between the input and one of the means
-     * (overrides Machine::forward)
+     * Output the minimum (Square Euclidean) distance between the input and 
+     * one of the means (overrides Machine::forward)
      */
     void forward(const blitz::Array<double,1>& input, double& output) const;
     
     /**
-     * Output the minimum distance between the input and one of the means
-     * (overrides Machine::forward_)
+     * Output the minimum (Square Euclidean) distance between the input and 
+     * one of the means (overrides Machine::forward_)
      * @warning Inputs are NOT checked
      */
     void forward_(const blitz::Array<double,1>& input, double& output) const;
@@ -143,8 +143,8 @@ class KMeansMachine: public Machine<blitz::Array<double,1>, double> {
     { return m_means; }
    
     /**
-     * Return the power of two of the Euclidean distance of the sample, x, 
-     * to the i'th mean
+     * Return the power of two of the (Square Euclidean) distance of the
+     * sample, x, to the i'th mean
      * @param x The data sample (feature vector)
      * @param i The index of the mean
      */
@@ -153,7 +153,7 @@ class KMeansMachine: public Machine<blitz::Array<double,1>, double> {
     
     /**
      * Calculate the index of the mean that is closest
-     * (in terms of Euclidean distance) to the data sample, x
+     * (in terms of Square Euclidean distance) to the data sample, x
      * @param x The data sample (feature vector)
      * @param closest_mean (output) The index of the mean closest to the sample
      * @param min_distance (output) The distance of the sample from the closest mean
@@ -162,7 +162,8 @@ class KMeansMachine: public Machine<blitz::Array<double,1>, double> {
       size_t &closest_mean, double &min_distance) const;
     
     /**
-     * Output the minimum distance between the input and one of the means
+     * Output the minimum (Square Euclidean) distance between the input and 
+     * one of the means
      */
     double getMinDistance(const blitz::Array<double,1>& input) const;
 

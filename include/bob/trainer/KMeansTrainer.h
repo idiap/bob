@@ -79,7 +79,7 @@ class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, blitz::Array<
     /**
      * Accumulate across the dataset:
      * - zeroeth and first order statistics
-     * - average distance from the closest mean 
+     * - average (Square Euclidean) distance from the closest mean 
      * Implements EMTrainer::eStep(double &)
      */
     virtual void eStep(bob::machine::KMeansMachine& kmeans,
@@ -92,8 +92,8 @@ class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, blitz::Array<
       const blitz::Array<double,2>&);
     
     /**
-     * This functions returns the average min distance (average distance to the
-     * closest mean)
+     * @brief This functions returns the average min (Square Euclidean) 
+     * distance (average distance to the closest mean)
      */
     virtual double computeLikelihood(bob::machine::KMeansMachine& kmeans);
 
@@ -155,7 +155,7 @@ class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, blitz::Array<
     int m_seed;
    
     /**
-     * Average min distance
+     * @brief Average min (Square Euclidean) distance
      */
     double m_average_min_distance;
 
