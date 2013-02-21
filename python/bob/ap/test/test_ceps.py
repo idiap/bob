@@ -453,4 +453,13 @@ class CepsTest(unittest.TestCase):
     with_delta_delta = False
     cepstral_comparison_run(self,rate_wavsample, win_length_ms, win_shift_ms, n_filters, n_ceps, dct_norm, f_min, f_max, delta_win,
                                pre_emphasis_coef, mel_scale, with_energy, with_delta, with_delta_delta)
-    
+   
+    # Test comparison operators and copy constructor
+    c0 = bob.ap.Ceps(rate_wavsample[0], win_length_ms, win_shift_ms, n_filters, n_ceps, f_min, f_max, delta_win, pre_emphasis_coef, mel_scale, dct_norm)
+    c1 = bob.ap.Ceps(c0)
+    c2 = bob.ap.Ceps(c1)
+    c2.win_length_ms = 27. 
+    self.assertTrue( c0 == c1)
+    self.assertFalse(c0 != c1)
+    self.assertFalse(c0 == c2)
+    self.assertTrue( c0 != c2)

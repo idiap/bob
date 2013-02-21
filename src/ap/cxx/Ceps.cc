@@ -22,6 +22,7 @@
  */
 
 #include "bob/ap/Ceps.h"
+#include "bob/core/check.h"
 #include "bob/core/assert.h"
 #include "bob/core/cast.h"
 
@@ -47,8 +48,112 @@ bob::ap::Ceps::Ceps( double sampling_frequency, double win_length_ms, double win
   initCacheDctKernel();
 }
 
+bob::ap::Ceps::Ceps(const Ceps& other):
+  m_sampling_frequency(other.m_sampling_frequency), 
+  m_win_length_ms(other.m_win_length_ms), 
+  m_win_shift_ms(other.m_win_shift_ms),
+  m_n_filters(other.m_n_filters), 
+  m_n_ceps(other.m_n_ceps), 
+  m_f_min(other.m_f_min), 
+  m_f_max(other.m_f_max), 
+  m_delta_win(other.m_delta_win), 
+  m_pre_emphasis_coeff(other.m_pre_emphasis_coeff),
+  m_mel_scale(other.m_mel_scale), 
+  m_dct_norm(other.m_dct_norm),
+  m_with_energy(other.m_with_energy), 
+  m_with_delta(other.m_with_delta), 
+  m_with_delta_delta(other.m_with_delta_delta),
+  m_energy_floor(other.m_energy_floor), 
+  m_fb_out_floor(other.m_fb_out_floor), 
+  m_fft(other.m_fft.getLength())
+{
+  initWinLength();
+  initWinShift();
+
+  // Initializes logarithm of flooring values
+  m_log_energy_floor = log(m_energy_floor);
+  m_log_fb_out_floor = log(m_fb_out_floor);
+
+  m_cache_filters.resize(m_n_filters);
+  initCacheDctKernel();
+}
+
 bob::ap::Ceps::~Ceps()
 {
+}
+
+bob::ap::Ceps& bob::ap::Ceps::operator=(const bob::ap::Ceps& other)
+{
+  if (this != &other)
+  {
+    m_sampling_frequency = other.m_sampling_frequency;
+    m_win_length_ms = other.m_win_length_ms;
+    m_win_shift_ms = other.m_win_shift_ms;
+    m_n_filters = other.m_n_filters;
+    m_n_ceps = other.m_n_ceps;
+    m_f_min = other.m_f_min;
+    m_f_max = other.m_f_max;
+    m_delta_win = other.m_delta_win;
+    m_pre_emphasis_coeff = other.m_pre_emphasis_coeff;
+    m_mel_scale = other.m_mel_scale;
+    m_dct_norm = other.m_dct_norm;
+    m_with_energy = other.m_with_energy;
+    m_with_delta = other.m_with_delta;
+    m_with_delta_delta = other.m_with_delta_delta;
+    m_energy_floor = other.m_energy_floor;
+    m_fb_out_floor = other.m_fb_out_floor; 
+    m_fft.setLength(other.m_fft.getLength());
+    
+    initWinLength();
+    initWinShift();
+
+    // Initializes logarithm of flooring values
+    m_log_energy_floor = log(m_energy_floor);
+    m_log_fb_out_floor = log(m_fb_out_floor);
+
+    m_cache_filters.resize(m_n_filters);
+    initCacheDctKernel();
+  }
+  return *this;
+}
+
+bool bob::ap::Ceps::operator==(const bob::ap::Ceps& other) const
+{
+  if (m_sampling_frequency != other.m_sampling_frequency ||
+      m_win_length_ms != other.m_win_length_ms ||
+      m_win_shift_ms != other.m_win_shift_ms ||
+      m_n_filters != other.m_n_filters ||
+      m_n_ceps != other.m_n_ceps ||
+      m_f_min != other.m_f_min ||
+      m_f_max != other.m_f_max ||
+      m_delta_win != other.m_delta_win ||
+      m_pre_emphasis_coeff != other.m_pre_emphasis_coeff ||
+      m_mel_scale != other.m_mel_scale ||
+      m_dct_norm != other.m_dct_norm ||
+      m_with_energy != other.m_with_energy ||
+      m_with_delta != other.m_with_delta ||
+      m_with_delta_delta != other.m_with_delta_delta ||
+      m_energy_floor != other.m_energy_floor ||
+      m_fb_out_floor != other.m_fb_out_floor ||
+      m_fft != other.m_fft)
+    return false;
+
+  if (!bob::core::array::isEqual(m_dct_kernel, other.m_dct_kernel) ||
+      !bob::core::array::isEqual(m_hamming_kernel, other.m_hamming_kernel) ||
+      !bob::core::array::isEqual(m_p_index, other.m_p_index) ||
+      m_filter_bank.size() != other.m_filter_bank.size())
+    return false;
+
+  for (size_t i=0; i<m_filter_bank.size(); ++i)
+    if (!bob::core::array::isEqual(m_filter_bank[i], other.m_filter_bank[i]))
+      return false;
+
+  return true;
+}
+
+bool bob::ap::Ceps::operator!=(const bob::ap::Ceps& other) const
+{
+  return !(this->operator==(other));
 }
 
 void bob::ap::Ceps::setSamplingFrequency(const double sampling_frequency)

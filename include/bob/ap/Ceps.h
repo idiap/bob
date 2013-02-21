@@ -60,6 +60,11 @@ class Ceps
       bool mel_scale=true, bool dct_norm=false);
 
     /**
+     * @brief Copy constructor
+     */
+    Ceps(const Ceps& other);
+
+    /**
      * @brief Gets the Cepstral features shape for a given input/input length
      */
     blitz::TinyVector<int,2> getCepsShape(const size_t input_length) const;
@@ -74,6 +79,20 @@ class Ceps
      * @brief Destructor
      */
     virtual ~Ceps();
+
+    /**
+     * Assigns from a different class instance
+     */
+    Ceps& operator=(const Ceps& other);
+
+    /**
+      * @brief Equal to
+      */
+    bool operator==(const Ceps& b) const;
+    /**
+      * @brief Not equal to
+      */
+    bool operator!=(const Ceps& b) const; 
 
     /**
      * @brief Returns the sampling frequency/frequency rate

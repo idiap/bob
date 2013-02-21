@@ -105,6 +105,9 @@ void bind_ap_ceps()
 {
   class_<bob::ap::Ceps, boost::shared_ptr<bob::ap::Ceps> >("Ceps", CEPS_DOC, init<double, optional<double, double, size_t, size_t, double, double, int, double, bool, bool> >
   ((arg("sampling_frequency"), arg("win_length_ms")=20., arg("win_shift_ms")=10., arg("n_filters")=24, arg("n_ceps")=19, arg("f_min")=0., arg("f_max")=4000., arg("delta_win"), arg("pre_emphasis_coeff")=0.95, arg("mel_scale")=true, arg("dct_norm")=false)))
+        .def(init<bob::ap::Ceps&>(args("other"), "Constructs a new Ceps feature extractor from an existing one, using the copy constructor."))
+        .def(self == self)
+        .def(self != self)
         .add_property("sampling_frequency", &bob::ap::Ceps::getSamplingFrequency, &bob::ap::Ceps::setSamplingFrequency, "The sampling frequency of the input data")
         .add_property("win_length_ms", &bob::ap::Ceps::getWinLengthMs, &bob::ap::Ceps::setWinLengthMs, "The window length of the cepstral analysis in milliseconds")
         .add_property("win_length", &bob::ap::Ceps::getWinLength, "The normalized window length wrt. to the sample frequency")
