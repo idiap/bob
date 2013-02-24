@@ -6,7 +6,7 @@
 """HDF5 additions
 """
 
-from ._io import HDF5Type, HDF5File
+from . import HDF5Type, HDF5File
 
 # Some HDF5 addons
 def hdf5type_str(self):

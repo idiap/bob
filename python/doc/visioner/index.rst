@@ -142,22 +142,8 @@ Reference Manual
   .. autodata:: bob.visioner.DEFAULT_DETECTION_MODEL
   .. autodata:: bob.visioner.DEFAULT_LOCALIZATION_MODEL
   .. autoclass:: bob.visioner.MaxDetector
-
-  :members:
-
-  :undoc-members:
-
   .. autoclass:: bob.visioner.Detector
-
-  :members:
-
-  :undoc-members:
-
   .. autoclass:: bob.visioner.Localizer
-
-  :members:
-
-  :undoc-members:
 
 .. ifconfig:: not has_visioner
 

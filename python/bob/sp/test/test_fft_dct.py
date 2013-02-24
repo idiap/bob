@@ -19,9 +19,9 @@
 
 import os, sys
 import unittest
-import bob
 import numpy
 import random
+from .. import *
 
 #############################################################################
 # Test fast DCT/FFT implementation based on FFTW
@@ -34,12 +34,12 @@ def compare(v1, v2, width):
 def _dct1D(N, t, eps, obj):
   # process using DCT
   u_dct = numpy.zeros((N,), 'float64')
-  dct = bob.sp.DCT1D(N)
+  dct = DCT1D(N)
   dct(t,u_dct)
 
   # process using inverse DCT 
   u_dct_idct = numpy.zeros((N,), 'float64')
-  idct = bob.sp.IDCT1D(N)
+  idct = IDCT1D(N)
   idct(u_dct,u_dct_idct)
 
   # get answer and compare to original
@@ -49,12 +49,12 @@ def _dct1D(N, t, eps, obj):
 def _dct2D(M, N, t, eps, obj):
   # process using DCT
   u_dct = numpy.zeros((M,N), 'float64')
-  dct = bob.sp.DCT2D(M,N)
+  dct = DCT2D(M,N)
   dct(t,u_dct)
 
   # process using inverse DCT 
   u_dct_idct = numpy.zeros((M,N), 'float64')
-  idct = bob.sp.IDCT2D(M,N)
+  idct = IDCT2D(M,N)
   idct(u_dct,u_dct_idct)
 
   # get answer and compare to original
@@ -66,12 +66,12 @@ def _dct2D(M, N, t, eps, obj):
 def _fft1D(N, t, eps, obj):
   # process using FFT
   u_fft = numpy.zeros((N,), 'complex128')
-  fft = bob.sp.FFT1D(N)
+  fft = FFT1D(N)
   fft(t,u_fft)
 
   # process using inverse FFT 
   u_fft_ifft = numpy.zeros((N,), 'complex128')
-  ifft = bob.sp.IFFT1D(N)
+  ifft = IFFT1D(N)
   ifft(u_fft,u_fft_ifft)
 
   # get answer and compare to original
@@ -82,12 +82,12 @@ def _fft1D(N, t, eps, obj):
 def _fft2D(M, N, t, eps, obj):
   # process using FFT
   u_fft = numpy.zeros((M,N), 'complex128')
-  fft = bob.sp.FFT2D(M,N)
+  fft = FFT2D(M,N)
   fft(t,u_fft)
 
   # process using inverse FFT 
   u_fft_ifft = numpy.zeros((M,N), 'complex128')
-  ifft = bob.sp.IFFT2D(M,N)
+  ifft = IFFT2D(M,N)
   ifft(u_fft,u_fft_ifft)
 
   # get answer and compare to original

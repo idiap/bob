@@ -1,4 +1,5 @@
-from ._measure import *
+from ..core import __from_extension_import__
+__from_extension_import__('._measure', __package__, locals())
 from . import plot
 from . import load
 import numpy
@@ -117,5 +118,4 @@ def cmc(cmc_scores):
 
   return cumulative_match_characteristic
 
-
-__all__ = dir()
+__all__ = [k for k in dir() if not k.startswith('_')]

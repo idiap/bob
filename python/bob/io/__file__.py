@@ -6,7 +6,7 @@
 """Addons to files.
 """
 
-from ._io import File, typeinfo
+from . import File, typeinfo
 
 def typeinfo_str(self):
   return "%s@%s" % (self.dtype, self.shape)

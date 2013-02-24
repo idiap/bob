@@ -8,4 +8,4 @@ that can be used in Biometry, Machine Learning or Pattern Classification."""
 
 from . import utils, driver, iris
 
-__all__ = dir()
+__all__ = [k for k in dir() if not k.startswith('_')]

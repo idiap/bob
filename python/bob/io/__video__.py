@@ -6,14 +6,11 @@
 """Video additions
 """
 
-from . import _io
-
-if hasattr(_io, "VideoReader"):
-  
+try:
   # the VideoReader is an optional compile-in, so it may not exist on certain
   # installations.
 
-  from ._io import VideoReader
+  from . import VideoReader
 
   def load(self, raise_on_error=False):
     """Loads all of the video stream in a numpy ndarray organized in this way:
@@ -36,3 +33,6 @@ if hasattr(_io, "VideoReader"):
 
   VideoReader.load = load
   del load
+
+except ImportError:
+  pass

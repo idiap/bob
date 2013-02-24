@@ -1,4 +1,5 @@
-from ._ip import *
+from ..core import __from_extension_import__
+__from_extension_import__('._ip', __package__, locals(), ['GLCMProp'])
 
 def properties_by_name(self, glcm_matrix, prop_names=None):
   """Possibility to query the properties of GLCM by specifying a name. Returns a list of numpy.array of the queried properties.

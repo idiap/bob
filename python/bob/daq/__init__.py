@@ -1,4 +1,5 @@
-from ._daq import *
+from ..core import __from_extension_import__
+__from_extension_import__('._daq', __package__, locals())
 from ..visioner import DEFAULT_DETECTION_MODEL
 from os import path
 import types
@@ -16,4 +17,4 @@ def _VisionerFaceLocalization__init__(self, model = DEFAULT_DETECTION_MODEL):
 VisionerFaceLocalization.__init__ = _VisionerFaceLocalization__init__
 del _VisionerFaceLocalization__init__
 
-__all__ = [d for d in dir() if d[:1] != '_']
+__all__ = [k for k in dir() if not k.startswith('_')]

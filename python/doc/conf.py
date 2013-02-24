@@ -295,7 +295,11 @@ autodoc_default_flags = ['members', 'undoc-members', 'special-members', 'inherit
 # Used to filter some documentation in/out
 bob_modules = dir(__import__('bob'))
 has_libsvm = hasattr(__import__('bob').machine, 'SupportVector')
-has_visioner = hasattr(__import__('bob'), 'visioner')
+try:
+  __import__('bob.visioner')
+  has_visioner = True
+except ImportError:
+  has_visioner = False
 
 def smaller_than(v1, v2):
   """Compares scipy/numpy version numbers"""

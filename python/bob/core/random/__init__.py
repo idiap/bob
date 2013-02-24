@@ -1,4 +1,5 @@
-from ._core_random import *
+from .. import __from_extension_import__
+__from_extension_import__('._core_random', __package__, locals())
 
 class variate_generator:
   """A pure-python version of the boost::variate_generator<> class"""
@@ -14,4 +15,4 @@ class variate_generator:
   def __call__(self):
     return self.distribution(self.engine)
 
-__all__ = dir()
+__all__ = [k for k in dir() if not k.startswith('_')]

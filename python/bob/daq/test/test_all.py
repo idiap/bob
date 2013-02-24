@@ -19,9 +19,10 @@ class DaqTest(unittest.TestCase):
   @utils.ffmpeg_found()
   def test_VideoReaderCamera(self):
 
-    from ... import has_daq
-
-    if not has_daq: raise SkipTest, "DAQ module was not compiled in"
+    try:
+      from ... import daq
+    except ImportError:
+      raise SkipTest, "DAQ module was not compiled in"
 
     from .. import VideoReaderCamera, VisionerFaceLocalization, SimpleController, ConsoleDisplay, BobOutputWriter, PixelFormat, FrameSize, FrameInterval
     from ...io import VideoReader

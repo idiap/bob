@@ -1,4 +1,5 @@
-from ._io import *
+from ..core import __from_extension_import__
+__from_extension_import__('._io', __package__, locals())
 
 from . import __file__
 from . import __hdf5__
@@ -174,4 +175,4 @@ def peek_all(filename):
 # Keeps compatibility with the previously existing API
 open = File
 
-__all__ = dir()
+__all__ = [k for k in dir() if not k.startswith('_')]

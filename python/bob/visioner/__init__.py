@@ -3,7 +3,8 @@
 # Andre Anjos <andre.anjos@idiap.ch> 
 # Sun 24 Jul 17:50:01 2011 CEST
 
-from ._visioner import *
+from ..core import __from_extension_import__
+__from_extension_import__('._visioner', __package__, locals())
 from pkg_resources import resource_filename
 
 DEFAULT_DETECTION_MODEL = resource_filename(__name__, 'detection.gz')
@@ -198,4 +199,4 @@ def param_str(self):
 param.__str__ = param_str
 del param_str
 
-__all__ = dir()
+__all__ = [k for k in dir() if not k.startswith('_')]

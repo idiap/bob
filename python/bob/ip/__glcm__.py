@@ -1,5 +1,6 @@
-from ._ip import __GLCM_uint8__
-from ._ip import __GLCM_uint16__
+from ..core import __from_extension_import__
+__from_extension_import__('._ip', __package__, locals(),
+    ['__GLCM_uint8__', '__GLCM_uint16__'])
 
 import numpy
 

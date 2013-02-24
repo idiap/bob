@@ -1,4 +1,5 @@
-from ._machine import *
+from ..core import __from_extension_import__
+__from_extension_import__('._machine', __package__, locals())
 
 def linearmachine_repr(self):
   """A funky way to display a bob Linear Machine"""
@@ -78,4 +79,4 @@ def ztnorm_same_value(vect_a, vect_b):
       sameMatrix[j, i] = (vect_a[j] == vect_b[i])
   return sameMatrix
 
-__all__ = dir()
+__all__ = [k for k in dir() if not k.startswith('_')]

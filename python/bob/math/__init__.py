@@ -1,4 +1,5 @@
-from ._math import *
+from ..core import __from_extension_import__
+__from_extension_import__('._math', __package__, locals())
 
 # add some default distance functions
 import math
@@ -17,4 +18,4 @@ def normalized_scalar_product(x1, x2):
   return numpy.dot(x1, x2) / math.sqrt(numpy.dot(x1,x1) * numpy.dot(x2,x2))
 
 
-__all__ = dir()
+__all__ = [k for k in dir() if not k.startswith('_')]

@@ -1,5 +1,6 @@
-from ._sp import __quantization_uint8__
-from ._sp import __quantization_uint16__
+from ..core import __from_extension_import__
+__from_extension_import__('._sp', __package__, locals(),
+    ['__quantization_uint8__', '__quantization_uint16__'])
 
 import numpy
 
@@ -115,7 +116,3 @@ class Quantization:
     Returns the quantization level of a single input-value
     """
     return self.Q.quantization_level(input_value)  
-
-__all__ = dir()      
-           
-           

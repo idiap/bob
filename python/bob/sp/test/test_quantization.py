@@ -19,26 +19,25 @@
 
 import os, sys
 import unittest
-import bob
+from .. import Quantization
 import numpy
 
 #############################################################################
 # Tests blitz-based Quantization implementation
 #############################################################################
 
-
 class QuantizationTest(unittest.TestCase):
 
   def test01_Quantization(self):
     # Test quantization
-    quant = bob.sp.Quantization('uint8')
+    quant = Quantization('uint8')
     self.assertEqual(quant.num_levels, 256)
     self.assertEqual(quant.max_level, 255)
     self.assertEqual(quant.min_level, 0)
     self.assertEqual(quant.quantization_type, "uniform")
     self.assertEqual(quant.quantization_level(5), 5)
     
-    quant = bob.sp.Quantization('uint16', "uniform", 8)
+    quant = Quantization('uint16', "uniform", 8)
     self.assertEqual(quant.num_levels, 8)
     self.assertEqual(quant.max_level, 65535)
     self.assertEqual(quant.min_level, 0)
@@ -47,7 +46,7 @@ class QuantizationTest(unittest.TestCase):
     self.assertTrue( (res == numpy.array([0,1,1,2])).all() )
     
     
-    quant = bob.sp.Quantization('uint8', "uniform", 4, 64, 192)
+    quant = Quantization('uint8', "uniform", 4, 64, 192)
     self.assertEqual(quant.num_levels, 4)
     self.assertEqual(quant.max_level, 192)
     self.assertEqual(quant.min_level, 64)
@@ -59,7 +58,7 @@ class QuantizationTest(unittest.TestCase):
     
     
     quantization_table = numpy.array([50, 100, 150, 200, 250], dtype='uint8')
-    quant = bob.sp.Quantization('uint8', quantization_table = quantization_table)
+    quant = Quantization('uint8', quantization_table = quantization_table)
     self.assertEqual(quant.num_levels, 5)
     self.assertEqual(quant.max_level, 255)
     self.assertEqual(quant.min_level, 50)
@@ -67,7 +66,7 @@ class QuantizationTest(unittest.TestCase):
     res = quant(img)
     self.assertTrue( (res == numpy.array([0,0,0,1,1,4,4])).all() )
 
-    quant = bob.sp.Quantization('uint8', 'uniform_rounding', 8)
+    quant = Quantization('uint8', 'uniform_rounding', 8)
     self.assertEqual(quant.num_levels, 8)
     self.assertEqual(quant.max_level, 255)
     self.assertEqual(quant.min_level, 0)
