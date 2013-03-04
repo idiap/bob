@@ -127,7 +127,7 @@ bool bob::sp::DCT1D::operator!=(const bob::sp::DCT1D& b) const
 }
 
 void bob::sp::DCT1D::operator()(const blitz::Array<double,1>& src, 
-  blitz::Array<double,1>& dst)
+  blitz::Array<double,1>& dst) const
 {
   // check input
   bob::core::array::assertCZeroBaseContiguous(src);
@@ -191,7 +191,7 @@ bool bob::sp::IDCT1D::operator!=(const bob::sp::IDCT1D& b) const
 }
 
 void bob::sp::IDCT1D::operator()(const blitz::Array<double,1>& src, 
-  blitz::Array<double,1>& dst)
+  blitz::Array<double,1>& dst) const
 {
   // check input
   bob::core::array::assertCZeroBaseContiguous(src);

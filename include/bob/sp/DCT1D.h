@@ -76,7 +76,7 @@ namespace bob {
           * @brief process an array by applying the DCT
           */
         virtual void operator()(const blitz::Array<double,1>& src, 
-          blitz::Array<double,1>& dst) = 0;
+          blitz::Array<double,1>& dst) const = 0;
 
         /**
           * @brief Reset the DCT1D object for the given 1D shape
@@ -161,7 +161,7 @@ namespace bob {
           * @brief process an array by applying the direct DCT
           */
         virtual void operator()(const blitz::Array<double,1>& src, 
-          blitz::Array<double,1>& dst);
+          blitz::Array<double,1>& dst) const;
     };
 
 
@@ -206,7 +206,7 @@ namespace bob {
           * @brief process an array by applying the inverse DCT
           */
         virtual void operator()(const blitz::Array<double,1>& src, 
-          blitz::Array<double,1>& dst);
+          blitz::Array<double,1>& dst) const;
     };
 
   }
