@@ -46,7 +46,7 @@ bob::ip::DCTFeatures::operator=(const bob::ip::DCTFeatures& other)
 
 void bob::ip::DCTFeatures::setCheckSqrtNDctCoefs()
 {
-  m_sqrt_n_dct_coefs = (size_t)sqrt(m_sqrt_n_dct_coefs);
+  m_sqrt_n_dct_coefs = (size_t)sqrt(m_n_dct_coefs);
   if (m_square_pattern)
   {
     // Check that m_n_dct_coefs is a square integer
