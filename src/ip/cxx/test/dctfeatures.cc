@@ -135,6 +135,7 @@ BOOST_AUTO_TEST_CASE( test_dct_feature_extract_arrays_normalize )
   checkBlitzClose( dst, dstB_tt, eps);
 }
 
+/*
 BOOST_AUTO_TEST_CASE( test_dct_feature_extract_vector )
 {
   std::vector<blitz::Array<double,1> > dst;
@@ -176,5 +177,5 @@ BOOST_AUTO_TEST_CASE( test_dct_feature_extract_block )
     checkBlitzClose(row, dst_mat[i], eps);
   }
 }
-  
+*/
 BOOST_AUTO_TEST_SUITE_END()
