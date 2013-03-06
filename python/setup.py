@@ -270,11 +270,6 @@ EXTENSIONS = [
     setup_extension('bob.trainer.overload._trainer_overload', 'bob-trainer-overload-py'),
     ]
 
-if pkgconfig('bob-daq'):
-  EXTENSIONS.append(
-      setup_extension('bob.daq._daq', 'bob-daq-py')
-      )
-
 if pkgconfig('bob-visioner'):
   EXTENSIONS.append(
     setup_extension('bob.visioner._visioner', 'bob-visioner-py')

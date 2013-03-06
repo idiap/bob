@@ -120,7 +120,6 @@ Reference
    db/index
    measure/index
    visioner/index
-   daq/index
 
 History
 -------

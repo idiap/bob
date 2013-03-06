@@ -53,12 +53,6 @@ def version_table():
     version_dict.update(bob.machine.version)
   
   try:
-    from bob import daq
-    if hasattr(daq, 'version'): version_dict.update(daq.version)
-  except ImportError:
-    pass
-  
-  try:
     from bob import visioner
     if hasattr(visioner, 'version'): version_dict.update(visioner.version)
   except ImportError:
