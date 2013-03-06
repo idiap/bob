@@ -622,19 +622,23 @@ static bool read_video_frame (const std::string& filename,
 
   int got_frame = 0;
 
-  // if we have reached the end-of-file, frames can still be cached
-  if (ok == (int)AVERROR_EOF) {
-    pkt->data = 0;
-    pkt->size = 0;
-    decode_frame(filename, current_frame, codec_context, swscaler,
-        context_frame, data, pkt, got_frame, throw_on_error);
-  }
-  else {
-    if (pkt->stream_index == stream_index) {
-      decode_frame(filename, current_frame, codec_context,
-          swscaler, context_frame, data, pkt, got_frame,
-          throw_on_error);
+  while(!got_frame) {
+
+    // if we have reached the end-of-file, frames can still be cached
+    if (ok == (int)AVERROR_EOF) {
+      pkt->data = 0;
+      pkt->size = 0;
+      decode_frame(filename, current_frame, codec_context, swscaler,
+          context_frame, data, pkt, got_frame, throw_on_error);
     }
+    else {
+      if (pkt->stream_index == stream_index) {
+        decode_frame(filename, current_frame, codec_context,
+            swscaler, context_frame, data, pkt, got_frame,
+            throw_on_error);
+      }
+    }
+
   }
 
   return (got_frame > 0);

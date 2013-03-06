@@ -112,6 +112,7 @@ def get_tempfilename(prefix='bobtest_', suffix='.avi'):
 
 # These are some global parameters for the test.
 INPUT_VIDEO = F('test.mov')
+INPUT_H264_VIDEO = F('test_h264.mov')
 OUTPUT_VIDEO = get_tempfilename()
 
 import unittest
@@ -135,11 +136,12 @@ class VideoTest(unittest.TestCase):
     self.assertEqual(len(v), 375)
     self.assertEqual(v.codec_name, 'mjpeg')
 
-  @ffmpeg_found()
-  def test02_CanReadImages(self):
-
+  def canReadImages(self, filename):
+    
     # This test shows how you can read image frames from a VideoReader
-    v = bob.io.VideoReader(INPUT_VIDEO)
+    from .. import VideoReader
+    v = VideoReader(filename)
+    counter = 0
     for frame in v:
       # Note that when you iterate, the frames are numpy.ndarray objects
       # So, you can use them as you please. The organization of the data
@@ -150,13 +152,30 @@ class VideoTest(unittest.TestCase):
       self.assertEqual(frame.shape[0], 3) #color-bands (RGB)
       self.assertEqual(frame.shape[1], 240) #height
       self.assertEqual(frame.shape[2], 320) #width
+      counter += 1
+
+    self.assertEqual(counter, len(v)) #we have gone through all frames
 
   @ffmpeg_found()
-  def test03_CanGetSpecificFrames(self):
+  def test02_CanReadImages(self):
+
+    self.canReadImages(INPUT_VIDEO)
+
+  @ffmpeg_found()
+  def test02a_CanReadImagesH264(self):
+
+    self.canReadImages(INPUT_H264_VIDEO)
+
+  def canGetSpecificFrames(self, filename):
 
     # This test shows how to get specific frames from a VideoReader
 
     v = bob.io.VideoReader(INPUT_VIDEO)
+
+    # This test shows how to get specific frames from a VideoReader
+
+    from .. import VideoReader
+    v = VideoReader(filename)
 
     # get frame 27 (we start counting at zero)
     f27 = v[27]
@@ -181,32 +200,51 @@ class VideoTest(unittest.TestCase):
     self.assertTrue( numpy.array_equal(f18_30[-1], f27) )
 
   @ffmpeg_found()
+  def test03_CanGetSpecificFrames(self):
+
+    self.canGetSpecificFrames(INPUT_VIDEO)
+
+  @ffmpeg_found()
+  def test03a_CanGetSpecificFramesH264(self):
+
+    self.canGetSpecificFrames(INPUT_H264_VIDEO)
+
+  @ffmpeg_found()
   def test04_CanWriteVideo(self):
+    
+    try:
 
-    # This test reads all frames in sequence from a initial video and records
-    # them into an output video, possibly transcoding it.
-    iv = bob.io.VideoReader(INPUT_VIDEO)
-    ov = bob.io.VideoWriter(OUTPUT_VIDEO, iv.height, iv.width)
-    for k, frame in enumerate(iv): ov.append(frame)
-   
-    # We verify that both videos have similar properties
-    self.assertEqual(len(iv), len(ov))
-    self.assertEqual(iv.width, ov.width)
-    self.assertEqual(iv.height, ov.height)
-   
-    ov.close() # forces close; see github issue #6
-    del ov # trigger closing of the output video stream
+      # This test reads all frames in sequence from a initial video and records
+      # them into an output video, possibly transcoding it.
+      from .. import VideoReader, VideoWriter
+      iv = VideoReader(INPUT_VIDEO)
+      ov = VideoWriter(OUTPUT_VIDEO, iv.height, iv.width)
+      for k, frame in enumerate(iv): ov.append(frame)
+     
+      # We verify that both videos have similar properties
+      self.assertEqual(len(iv), len(ov))
+      self.assertEqual(iv.width, ov.width)
+      self.assertEqual(iv.height, ov.height)
+     
+      ov.close() # forces close; see github issue #6
+      del ov # trigger closing of the output video stream
 
-    iv2 = bob.io.VideoReader(OUTPUT_VIDEO)
+      iv2 = VideoReader(OUTPUT_VIDEO)
 
-    # We verify that both videos have similar frames
-    for orig, copied in zip(iv.__iter__(), iv2.__iter__()):
-      diff = abs(orig.astype('float32')-copied.astype('float32'))
-      m = numpy.mean(diff)
-      self.assertTrue(m < 3.0) # average difference is less than 3 gray levels
-    os.unlink(OUTPUT_VIDEO)
+      # We verify that both videos have similar frames
+      counter = 0
+      for orig, copied in zip(iv.__iter__(), iv2.__iter__()):
+        diff = abs(orig.astype('float32')-copied.astype('float32'))
+        m = numpy.mean(diff)
+        self.assertTrue(m < 10) # average difference is less than 10 gray levels
+        counter += 1
 
-    del iv2 # triggers closing of the input video stream
+      self.assertEqual(counter, len(iv)) #we have gone through all frames
+      
+      del iv2 # triggers closing of the input video stream
+
+    finally:
+      os.unlink(OUTPUT_VIDEO)
 
   @ffmpeg_found()
   def test05_CanUseArrayInterface(self):
@@ -219,17 +257,32 @@ class VideoTest(unittest.TestCase):
     for frame_id, frame in zip(range(array.shape[0]), iv.__iter__()):
       self.assertTrue ( numpy.array_equal(array[frame_id,:,:,:], frame) )
 
-  @ffmpeg_found()
-  def test06_CanIterateOnTheSpot(self):
+  def canIterateOnTheSpot(self, filename):
 
     # This test shows how you can read image frames from a VideoReader created
     # on the spot
-    for frame in bob.io.VideoReader(INPUT_VIDEO):
+    from .. import VideoReader
+    video = VideoReader(filename)
+    counter = 0
+    for frame in video:
       self.assertTrue(isinstance(frame, numpy.ndarray))
       self.assertEqual(len(frame.shape), 3)
       self.assertEqual(frame.shape[0], 3) #color-bands (RGB)
       self.assertEqual(frame.shape[1], 240) #height
       self.assertEqual(frame.shape[2], 320) #width
+      counter += 1
+    
+    self.assertEqual(counter, len(video)) #we have gone through all frames
+
+  @ffmpeg_found()
+  def test06_CanIterateOnTheSpot(self):
+
+    self.canIterateOnTheSpot(INPUT_VIDEO)
+
+  @ffmpeg_found()
+  def test06a_CanIterateOnTheSpotH264(self):
+
+    self.canIterateOnTheSpot(INPUT_H264_VIDEO)
 
   def patternReadWrite(self, suffix=".avi"):
       
