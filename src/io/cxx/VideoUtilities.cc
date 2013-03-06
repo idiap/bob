@@ -364,6 +364,14 @@ boost::shared_ptr<AVFormatContext> ffmpeg::make_output_format_context(
   return boost::shared_ptr<AVFormatContext>(retval, std::ptr_fun(deallocate_output_format_context));
 }
 
+/**
+ * Tries to find an encoder name through a decoder 
+ */
+static AVCodec* try_find_through_decoder(const std::string& codecname) {
+  AVCodec* tmp = avcodec_find_decoder_by_name(codecname.c_str());
+  return avcodec_find_encoder(tmp->id);
+}
+
 AVCodec* ffmpeg::find_encoder(const std::string& filename,
     boost::shared_ptr<AVFormatContext> fmtctxt, const std::string& codecname) {
 
@@ -372,6 +380,7 @@ AVCodec* ffmpeg::find_encoder(const std::string& filename,
   /* find the video encoder */
   if (codecname.size() != 0) {
     retval = avcodec_find_encoder_by_name(codecname.c_str());
+    if (!retval) retval = try_find_through_decoder(codecname);
     if (!retval) {
       boost::format m("ffmpeg::avcodec_find_encoder_by_name(`%s') failed: could not find a suitable codec for encoding video file `%s' using the output format `%s' == `%s'");
       m % codecname % filename % fmtctxt->oformat->name 
@@ -1109,19 +1118,23 @@ bool ffmpeg::read_video_frame (const std::string& filename,
 
   int got_frame = 0;
 
-  // if we have reached the end-of-file, frames can still be cached
-  if (ok == (int)AVERROR_EOF) {
-    pkt->data = 0;
-    pkt->size = 0;
-    decode_frame(filename, current_frame, codec_context, swscaler,
-        context_frame, data, pkt, got_frame, throw_on_error);
-  }
-  else {
-    if (pkt->stream_index == stream_index) {
-      decode_frame(filename, current_frame, codec_context,
-          swscaler, context_frame, data, pkt, got_frame,
-          throw_on_error);
+  while(!got_frame) {
+
+    // if we have reached the end-of-file, frames may still be cached
+    if (ok == (int)AVERROR_EOF) {
+      pkt->data = 0;
+      pkt->size = 0;
+      decode_frame(filename, current_frame, codec_context, swscaler,
+          context_frame, data, pkt, got_frame, throw_on_error);
     }
+    else {
+      if (pkt->stream_index == stream_index) {
+        decode_frame(filename, current_frame, codec_context,
+            swscaler, context_frame, data, pkt, got_frame,
+            throw_on_error);
+      }
+    }
+
   }
 
   return (got_frame > 0);
