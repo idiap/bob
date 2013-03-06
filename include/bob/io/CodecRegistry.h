@@ -50,6 +50,12 @@ namespace bob { namespace io {
         boost::shared_ptr<CodecRegistry> ptr = instance();
         return ptr->s_extension2description;
       }
+ 
+      /**
+       * Sets and unsets double-registration ignore flag
+       */
+      static bool ignoreDoubleRegistration() { return instance()->s_ignore; }
+      static void ignoreDoubleRegistration(bool v) { instance()->s_ignore = v; }
 
     public: //object access
 
@@ -67,13 +73,14 @@ namespace bob { namespace io {
 
     private:
 
-      CodecRegistry(): s_extension2codec() {}
+      CodecRegistry(): s_extension2codec(), s_ignore(false) {}
 
       // Not implemented
       CodecRegistry( const CodecRegistry&);
 
       std::map<std::string, file_factory_t> s_extension2codec;
       std::map<std::string, std::string> s_extension2description;
+      bool s_ignore; ///< shall I ignore double-registrations?
     
   };
 

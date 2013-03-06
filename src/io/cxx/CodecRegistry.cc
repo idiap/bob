@@ -34,7 +34,7 @@ namespace io = bob::io;
 
 boost::shared_ptr<io::CodecRegistry> io::CodecRegistry::instance() {
   static boost::shared_ptr<io::CodecRegistry> s_instance(new CodecRegistry());
-  return s_instance; 
+  return s_instance;
 }
     
 void io::CodecRegistry::deregisterExtension(const std::string& ext) {
@@ -68,7 +68,7 @@ void io::CodecRegistry::registerExtension(const std::string& extension,
     s_extension2codec[extension] = codec;
     s_extension2description[extension] = description;
   }
-  else {
+  else if (!s_ignore) {
     boost::format m("extension already registered: %s - ignoring second registration with description `%s'");
     m % extension % description;
     bob::core::error << m.str() << std::endl;

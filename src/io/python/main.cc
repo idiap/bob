@@ -22,6 +22,16 @@
 
 #include "bob/config.h"
 #include "bob/core/python/ndarray.h"
+#include <boost/python.hpp>
+#include "bob/io/CodecRegistry.h"
+
+static bool get_ignore_double_registration() {
+  return bob::io::CodecRegistry::instance()->ignoreDoubleRegistration();
+}
+
+static void set_ignore_double_registration(bool v) {
+  bob::io::CodecRegistry::instance()->ignoreDoubleRegistration(v);
+}
 
 void bind_io_version();
 void bind_io_exception();
@@ -48,4 +58,7 @@ BOOST_PYTHON_MODULE(_io) {
 #ifdef HAVE_FFMPEG
   bind_io_video();
 #endif
+
+  boost::python::def("__get_ignore_double_registration__", &get_ignore_double_registration);
+  boost::python::def("__set_ignore_double_registration__", &set_ignore_double_registration);
 }

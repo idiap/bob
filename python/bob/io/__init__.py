@@ -1,6 +1,15 @@
 from ..core import __from_extension_import__
 __from_extension_import__('._io', __package__, locals())
 
+# Some specific hidden functionality
+__from_extension_import__('._io', __package__, locals(), [
+  '__get_ignore_double_registration__',
+  '__set_ignore_double_registration__'
+  ])
+
+# Set current ignore functionality so external modules do not crash
+__set_ignore_double_registration__(True)
+
 from . import __file__
 from . import __hdf5__
 from . import __video__
