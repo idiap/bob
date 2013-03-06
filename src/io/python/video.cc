@@ -204,7 +204,6 @@ static object describe_codec(const AVCodec* codec) {
   retval["hardware_accelerated"] = (bool)(codec->capabilities & CODEC_CAP_HWACCEL);
 # endif
   retval["encode"] = (bool)(avcodec_find_encoder(codec->id));
-
   retval["decode"] = (bool)(avcodec_find_decoder(codec->id));
   
   return retval;
