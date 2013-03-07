@@ -22,7 +22,7 @@ set(src
    "main.cc"
    )
 
-if(LIBSVM_FOUND)
+if(WITH_LIBSVM)
   list(APPEND incdir ${LIBSVM_INCLUDE_DIR})
   list(APPEND src "svm.cc")
 endif()

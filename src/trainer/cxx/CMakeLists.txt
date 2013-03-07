@@ -26,7 +26,7 @@ set(src
   "LLRTrainer.cc"
   )
 
-if(LIBSVM_FOUND)
+if(WITH_LIBSVM)
   list(APPEND incdir ${LIBSVM_INCLUDE_DIR})
   list(APPEND shared "${LIBSVM_LIBRARY}")
   list(APPEND src "SVMTrainer.cc")

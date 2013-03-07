@@ -163,7 +163,3 @@ mark_as_advanced (
   LIBSVM_ROOT_DIR
   LIBSVM_VERSION
   )
-
-if(LIBSVM_FOUND)
-  set(HAVE_LIBSVM ON CACHE BOOL "Has libsvm installed")
-endif()

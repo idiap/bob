@@ -17,35 +17,35 @@ set(src
    )
  
 # If we have matio installed, enable the compilation of relevant modules
-if(matio_FOUND)
+if(WITH_MATIO)
   list(APPEND incdir "${matio_INCLUDE_DIRS}")
-endif(matio_FOUND)
+endif()
 
 if(NETPBM_FOUND)
   list(APPEND incdir "${NETPBM_INCLUDE_DIRS}")
-endif(NETPBM_FOUND)
+endif()
 
 if(JPEG_FOUND)
   list(APPEND incdir "${JPEG_INCLUDE_DIRS}")
-endif(JPEG_FOUND)
+endif()
 
 if(PNG_FOUND)
   list(APPEND incdir "${PNG_INCLUDE_DIRS}")
-endif(PNG_FOUND)
+endif()
 
 if(TIFF_FOUND)
   list(APPEND incdir "${TIFF_INCLUDE_DIR}")
-endif(TIFF_FOUND)
+endif()
 
 if(GIF_FOUND)
   list(APPEND incdir "${GIF_INCLUDE_DIR}")
-endif(GIF_FOUND)
+endif()
 
-if(FFMPEG_FOUND)
+if(WITH_FFMPEG)
   list(APPEND src "video.cc")
   list(APPEND incdir "${FFMPEG_INCLUDE_DIRS}")
   add_definitions("-D__STDC_CONSTANT_MACROS")
-endif(FFMPEG_FOUND)
+endif()
 
 # Define the library, compilation and linkage options
 bob_sort_headers(incdir)

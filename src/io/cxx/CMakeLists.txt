@@ -39,14 +39,14 @@ set(src
     )
 
 # If we have matio installed, enable the compilation of relevant modules
-if(matio_FOUND)
+if(WITH_MATIO)
   list(APPEND shared "${matio_RESOLVED_LIBRARIES}")
   list(APPEND src 
     "MatUtils.cc"
     "MatFile.cc"
     )
   list(APPEND incdir "${matio_INCLUDE_DIRS}")
-endif(matio_FOUND)
+endif()
 
 if(NETPBM_FOUND)
   list(APPEND shared "${NETPBM_LIBRARIES}")
@@ -54,7 +54,7 @@ if(NETPBM_FOUND)
     "ImageNetpbmFile.cc"
     )
   list(APPEND incdir "${NETPBM_INCLUDE_DIRS}")
-endif(NETPBM_FOUND)
+endif()
 
 if(JPEG_FOUND)
   list(APPEND shared "${JPEG_LIBRARIES}")
@@ -62,7 +62,7 @@ if(JPEG_FOUND)
     "ImageJpegFile.cc"
     )
   list(APPEND incdir "${JPEG_INCLUDE_DIRS}")
-endif(JPEG_FOUND)
+endif()
 
 if(PNG_FOUND)
   list(APPEND shared "${PNG_LIBRARIES}")
@@ -70,7 +70,7 @@ if(PNG_FOUND)
     "ImagePngFile.cc"
     )
   list(APPEND incdir "${PNG_INCLUDE_DIRS}")
-endif(PNG_FOUND)
+endif()
 
 if(TIFF_FOUND)
   list(APPEND shared "${TIFF_LIBRARIES}")
@@ -78,7 +78,7 @@ if(TIFF_FOUND)
     "ImageTiffFile.cc"
     )
   list(APPEND incdir "${TIFF_INCLUDE_DIR}")
-endif(TIFF_FOUND)
+endif()
 
 if(GIF_FOUND)
   list(APPEND shared "${GIF_LIBRARIES}")
@@ -86,9 +86,9 @@ if(GIF_FOUND)
     "ImageGifFile.cc"
     )
   list(APPEND incdir "${GIF_INCLUDE_DIR}")
-endif(GIF_FOUND)
+endif()
 
-if(FFMPEG_FOUND)
+if(WITH_FFMPEG)
   list(APPEND shared "${FFMPEG_RESOLVED_LIBRARIES}")
   list(APPEND src 
     "VideoFile.cc"
@@ -98,7 +98,7 @@ if(FFMPEG_FOUND)
   )
   list(APPEND incdir "${FFMPEG_INCLUDE_DIRS}")
   add_definitions("-D__STDC_CONSTANT_MACROS")
-endif(FFMPEG_FOUND)
+endif()
 
 # Define the library, compilation and linkage options
 bob_sort_headers(incdir)
@@ -114,7 +114,7 @@ bob_add_test(${PROJECT_NAME} tensor_codec test/tensor_codec.cc)
 
 if(NETPBM_FOUND AND JPEG_FOUND AND PNG_FOUND AND TIFF_FOUND AND GIF_FOUND)
   bob_add_test(${PROJECT_NAME} image_codec test/image_codec.cc)
-endif(NETPBM_FOUND AND JPEG_FOUND AND PNG_FOUND AND TIFF_FOUND AND GIF_FOUND)
+endif()
 
 # Pkg-Config generator
 bob_pkgconfig(${PROJECT_NAME} "${bob_deps}")

@@ -30,11 +30,11 @@ set(src
   )
 
 # If we have libsvm installed, enable the compilation of relevant modules
-if(LIBSVM_FOUND)
+if(WITH_LIBSVM)
   list(APPEND incdir ${LIBSVM_INCLUDE_DIR})
   list(APPEND shared "${LIBSVM_LIBRARY}")
   list(APPEND src "SVM.cc")
-endif(LIBSVM_FOUND)
+endif(WITH_LIBSVM)
 
 # Define the library, compilation and linkage options
 bob_sort_headers(incdir)

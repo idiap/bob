@@ -27,7 +27,6 @@ from ...test import utils
 from ... import io, ip
 from ...ip import test as iptest
 from ...io import test as iotest
-from .. import MaxDetector
 
 TEST_VIDEO = utils.datafile("test.mov", iotest)
 IMAGE = utils.datafile('test-faces.jpg', iptest, os.path.join('data', 'faceextract'))
@@ -35,15 +34,19 @@ IMAGE = utils.datafile('test-faces.jpg', iptest, os.path.join('data', 'faceextra
 class DetectionTest(unittest.TestCase):
   """Performs various face detection tests."""
 
+  @utils.visioner_available
   def test00_Single(self):
 
+    from .. import MaxDetector
     self.processor = MaxDetector(scanning_levels=10)
     locdata = self.processor(ip.rgb_to_gray(io.load(IMAGE)))
     self.assertTrue(locdata is not None)
 
+  @utils.visioner_available
   @utils.ffmpeg_found()
   def test01_Faster(self):
 
+    from .. import MaxDetector
     video = io.VideoReader(TEST_VIDEO)
     self.images = [ip.rgb_to_gray(k) for k in video[:20]]
     self.processor = MaxDetector(scanning_levels=10)
@@ -53,9 +56,11 @@ class DetectionTest(unittest.TestCase):
       locdata = self.processor(image)
       self.assertTrue(locdata is not None)
 
+  @utils.visioner_available
   @utils.ffmpeg_found()
   def test02_Fast(self):
 
+    from .. import MaxDetector
     video = io.VideoReader(TEST_VIDEO)
     self.images = [ip.rgb_to_gray(k) for k in video[:10]]
     self.processor = MaxDetector(scanning_levels=5)
@@ -65,9 +70,11 @@ class DetectionTest(unittest.TestCase):
       locdata = self.processor(image)
       self.assertTrue(locdata is not None)
 
+  @utils.visioner_available
   @utils.ffmpeg_found()
   def xtest03_Thorough(self):
     
+    from .. import MaxDetector
     video = io.VideoReader(TEST_VIDEO)
     self.images = [ip.rgb_to_gray(k) for k in video[:2]]
     self.processor = MaxDetector()

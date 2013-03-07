@@ -23,7 +23,7 @@
 #include "bob/config.h"
 #include <boost/python.hpp>
 
-#ifdef HAVE_GOOGLE_PERFTOOLS
+#if WITH_PERFTOOLS
 #include <google/profiler.h>
 #endif
 
@@ -31,7 +31,7 @@ using namespace boost::python;
 
 void bind_core_profiler()
 {
-#ifdef HAVE_GOOGLE_PERFTOOLS
+#if WITH_PERFTOOLS
   def("ProfilerStart", &ProfilerStart);
   def("ProfilerStop", &ProfilerStop);
   def("ProfilerFlush", &ProfilerFlush);

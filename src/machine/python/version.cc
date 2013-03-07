@@ -26,7 +26,7 @@
 #include <boost/python.hpp>
 #include <boost/format.hpp>
 
-#if defined(HAVE_LIBSVM)
+#if WITH_LIBSVM
 #include <svm.h>
 #endif
 
@@ -36,7 +36,7 @@ using namespace boost::python;
  * libsvm version
  */
 static str get_libsvm_version() {
-#if defined(HAVE_LIBSVM)
+#if WITH_LIBSVM
   boost::format s("%d.%d.%d");
   s % (LIBSVM_VERSION / 100);
   s % ((LIBSVM_VERSION % 100) / 10);

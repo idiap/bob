@@ -24,7 +24,7 @@
 #include "bob/config.h"
 
 #include <boost/python.hpp>
-#ifdef HAVE_QT4
+#if WITH_QT4
 #include <qglobal.h>
 #endif
 
@@ -34,7 +34,7 @@ using namespace boost::python;
  * Qt4 version, if available
  */
 static tuple qt4_version() {
-#ifdef HAVE_QT4
+#if WITH_QT4
   return make_tuple(str(QT_VERSION_STR), str(QT_PACKAGEDATE_STR));
 #else
   return make_tuple(str("unavailable"), str("unknown"));

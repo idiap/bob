@@ -28,6 +28,7 @@ import bob
 import numpy
 import tempfile
 import pkg_resources
+from ...test import utils
 
 def F(f, module=None):
   """Returns the test file on the "data" subdirectory"""
@@ -51,6 +52,7 @@ HEART_EXPECTED = F('heart.out', 'machine') #expected probabilities
 class SvmTrainingTest(unittest.TestCase):
   """Performs various SVM training tests."""
 
+  @utils.libsvm_available
   def test01_initialization(self):
 
     # tests and examplifies some initialization parameters
@@ -58,6 +60,7 @@ class SvmTrainingTest(unittest.TestCase):
     # all defaults
     trainer = bob.trainer.SVMTrainer()
 
+  @utils.libsvm_available
   def test02_training(self):
    
     # For this example I'm using an SVM file because of convinience. You only
@@ -98,6 +101,7 @@ class SvmTrainingTest(unittest.TestCase):
     prev_scores = numpy.array(prev_scores)
     self.assertTrue( numpy.all(abs(curr_scores - prev_scores) < 1e-8) )
 
+  @utils.libsvm_available
   def test03_training_with_probability(self):
    
     f = bob.machine.SVMFile(HEART_DATA)

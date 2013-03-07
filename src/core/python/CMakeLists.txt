@@ -7,19 +7,22 @@ set(bob_deps "bob_core;bob_python")
 set(shared "${bob_deps}")
 set(incdir ${py_incdir})
 
-# Google Perftools detection and linkage
-find_path(GOOGLE_PERFTOOLS_INCLUDE_1 NAMES google/profiler.h)
-find_path(GOOGLE_PERFTOOLS_INCLUDE_2 NAMES google/tcmalloc.h)
-find_library(GOOGLE_PERFTOOLS_LIBRARY NAMES profiler)
+if(WITH_PERFTOOLS)
+  # Google Perftools detection and linkage
+  find_path(GOOGLE_PERFTOOLS_INCLUDE_1 NAMES google/profiler.h)
+  find_path(GOOGLE_PERFTOOLS_INCLUDE_2 NAMES google/tcmalloc.h)
+  find_library(GOOGLE_PERFTOOLS_LIBRARY NAMES profiler)
 
-if(GOOGLE_PERFTOOLS_INCLUDE_1 AND GOOGLE_PERFTOOLS_INCLUDE_2 AND 
-   GOOGLE_PERFTOOLS_LIBRARY)
-  list(APPEND incdir "${GOOGLE_PERFTOOLS_INCLUDE_1}")
-  list(APPEND incdir "${GOOGLE_PERFTOOLS_INCLUDE_2}")
-  list(REMOVE_DUPLICATES incdir)
-  list(APPEND shared "${GOOGLE_PERFTOOLS_LIBRARY}")
-  find_package_message(GOOGLE_PERFTOOLS "Found Google PerfTools: ${GOOGLE_PERFTOOLS_INCLUDE_DIRS}" "[${GOOGLE_PERFTOOLS_INCLUDE_DIRS}][${GOOGLE_PERFTOOLS_LIBRARY}]")
-  set(HAVE_GOOGLE_PERFTOOLS ON CACHE BOOL "Has Google's Perftools installed")
+  if(GOOGLE_PERFTOOLS_INCLUDE_1 AND GOOGLE_PERFTOOLS_INCLUDE_2 AND 
+     GOOGLE_PERFTOOLS_LIBRARY)
+    list(APPEND incdir "${GOOGLE_PERFTOOLS_INCLUDE_1}")
+    list(APPEND incdir "${GOOGLE_PERFTOOLS_INCLUDE_2}")
+    list(REMOVE_DUPLICATES incdir)
+    list(APPEND shared "${GOOGLE_PERFTOOLS_LIBRARY}")
+    find_package_message(GOOGLE_PERFTOOLS "Found Google PerfTools: ${GOOGLE_PERFTOOLS_INCLUDE_DIRS}" "[${GOOGLE_PERFTOOLS_INCLUDE_DIRS}][${GOOGLE_PERFTOOLS_LIBRARY}]")
+  else()
+    message(FATAL_ERROR "Google Perftools has not been found. use '-DWITH_PERFTOOLS=OFF' to disable this check.")
+  endif()
 endif()
   
 # Python bindings

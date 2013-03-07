@@ -120,3 +120,27 @@ def codec_available(codec):
     return wrapper
 
   return test_wrapper
+
+def visioner_available(test):
+
+  @functools.wraps(test)
+  def wrapper(*args, **kwargs):
+    try:
+      from .. import visioner
+      return test(*args, **kwargs)
+    except ImportError:
+      raise SkipTest("The visioner module is not available")
+
+  return wrapper
+
+def libsvm_available(test):
+
+  @functools.wraps(test)
+  def wrapper(*args, **kwargs):
+    try:
+      from ..machine import SupportVector
+      return test(*args, **kwargs)
+    except ImportError:
+      raise SkipTest("The visioner module is not available")
+
+  return wrapper

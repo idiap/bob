@@ -40,7 +40,7 @@ void bind_machine_plda();
 void bind_machine_wiener();
 void bind_machine_version();
 
-#if defined(HAVE_LIBSVM)
+#if WITH_LIBSVM
 void bind_machine_svm();
 #endif
 
@@ -64,7 +64,7 @@ BOOST_PYTHON_MODULE(_machine)
   bind_machine_wiener();
   bind_machine_version();
 
-#if defined(HAVE_LIBSVM)
+#if WITH_LIBSVM
   bind_machine_svm();
 #endif
 }

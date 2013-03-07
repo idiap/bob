@@ -62,15 +62,23 @@ add_subdirectory(math)
 add_subdirectory(ip)
 add_subdirectory(ap)
 
-include(libsvm.cmake)
+if(WITH_LIBSVM)
+  include(libsvm.cmake)
+  if(NOT LIBSVM_FOUND)
+    message(FATAL_ERROR "LibSVM has not been found. use '-DWITH_LIBSVM=OFF' to disable this check.")
+  endif()
+else()
+  message(STATUS "LibSVM modules DISABLED by user request")
+endif()
+
 add_subdirectory(machine)
 add_subdirectory(trainer)
 
-find_package(Qt4 COMPONENTS QtCore QtGui)
-
-if(QT4_FOUND)
-  set(HAVE_QT4 ON CACHE BOOL "Has Qt4 installed")
+if(WITH_QT4)
+  find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
   add_subdirectory(visioner)
+else()
+  message(STATUS "Qt4 modules DISABLED by user request")
 endif()
 
 set(ENABLED_PACKAGES "${ENABLED_PACKAGES}" PARENT_SCOPE)

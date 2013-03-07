@@ -29,7 +29,7 @@
 #include <boost/version.hpp>
 #include <boost/format.hpp>
 #include <cstring>
-#ifdef HAVE_GOOGLE_PERFTOOLS
+#if WITH_PERFTOOLS
 #include <google/tcmalloc.h>
 #endif
 
@@ -103,7 +103,7 @@ static str numpy_version() {
  * Google profiler version, if available
  */
 static str perftools_version() {
-#ifdef HAVE_GOOGLE_PERFTOOLS
+#if WITH_PERFTOOLS
   boost::format f("%s.%s.%s");
   f % BOOST_PP_STRINGIZE(TC_VERSION_MAJOR);
   f % BOOST_PP_STRINGIZE(TC_VERSION_MINOR);

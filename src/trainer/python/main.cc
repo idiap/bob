@@ -35,7 +35,7 @@ void bind_trainer_empca();
 void bind_trainer_bic();
 void bind_trainer_llr();
 
-#if defined(HAVE_LIBSVM)
+#if WITH_LIBSVM
 void bind_trainer_svm();
 #endif
 
@@ -55,7 +55,7 @@ BOOST_PYTHON_MODULE(_trainer) {
   bind_trainer_bic();
   bind_trainer_llr();
 
-# if defined(HAVE_LIBSVM)
+# if WITH_LIBSVM
   bind_trainer_svm();
 # endif
 }

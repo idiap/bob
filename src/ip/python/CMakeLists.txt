@@ -41,13 +41,13 @@ set(src
    )
 
 # If we have VLFeat installed, enable the compilation of relevant modules
-if(VLFEAT_FOUND)
+if(WITH_VLFEAT)
   list(APPEND incdir "${VLFEAT_INCLUDE_DIR}")
   list(APPEND src 
     "vlsift.cc"
     "vldsift.cc"
     )
-endif(VLFEAT_FOUND)
+endif()
 
 # Define the library, compilation and linkage options
 bob_sort_headers(incdir)

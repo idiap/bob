@@ -39,7 +39,7 @@ extern "C" {
 // https://bugs.launchpad.net/ubuntu/+source/libpng/+bug/218409
 #include <png.h>
 
-#if defined(HAVE_FFMPEG)
+#if WITH_FFMPEG
 #  include <libavformat/avformat.h>
 #  include <libavcodec/avcodec.h>
 #  include <libavutil/avutil.h>
@@ -48,7 +48,7 @@ extern "C" {
 
 #include <gif_lib.h>
 
-#ifdef HAVE_MATIO
+#if WITH_MATIO
 #include <matio.h>
 #endif
 
@@ -73,7 +73,7 @@ static str hdf5_version() {
  */
 static dict ffmpeg_version() {
   dict v;
-#if defined(HAVE_FFMPEG)
+#if WITH_FFMPEG
 # if defined(FFMPEG_VERSION)
   if (std::strlen(FFMPEG_VERSION)) v["ffmpeg"] = str(FFMPEG_VERSION);
 # endif
@@ -146,7 +146,7 @@ static str giflib_version() {
  * Matio, if compiled with such support
  */
 static str matio_version() {
-#ifdef HAVE_MATIO
+#if WITH_MATIO
   boost::format f("%s.%s.%s");
   f % BOOST_PP_STRINGIZE(MATIO_MAJOR_VERSION);
   f % BOOST_PP_STRINGIZE(MATIO_MINOR_VERSION);

@@ -44,6 +44,14 @@ if(NOT BOB_SOVERSION)
   set(BOB_SOVERSION ${BOB_SOVERSION_INTERNAL})
 endif()
 
+# Flags for switching ON/OFF optional requirements
+option(WITH_QT4 "Make Qt4 detection obligatory" ON)
+option(WITH_LIBSVM "Make LibSVM detection obligatory" ON)
+option(WITH_VLFEAT "Make VLFEAT detection obligatory" ON)
+option(WITH_MATIO "Make Matio detection obligatory" ON)
+option(WITH_FFMPEG "Make FFmpeg detection obligatory" ON)
+option(WITH_PERFTOOLS "Make Google Perftools detection obligatory" OFF)
+
 message(STATUS "Bob version '${BOB_VERSION}' (${BOB_PLATFORM_STR})")
 
 # ---------------

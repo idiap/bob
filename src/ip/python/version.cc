@@ -27,7 +27,7 @@
 
 extern "C" {
 #include <numpy/arrayobject.h>
-#ifdef HAVE_VLFEAT
+#if WITH_VLFEAT
 #include <vl/generic.h>
 #endif
 }
@@ -38,7 +38,7 @@ using namespace boost::python;
  * VLFeat, if compiled with such support
  */
 static str vlfeat_version() {
-#ifdef HAVE_VLFEAT
+#if WITH_VLFEAT
   return str(VL_VERSION_STRING);
 #else
   return str("unavailable");

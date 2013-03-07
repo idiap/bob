@@ -48,7 +48,3 @@ mark_as_advanced(
   NETPBM_INCLUDE_DIR
   NETPBM_INCLUDE_DIRS
 )
-
-if(NETPBM_FOUND)
-  set(HAVE_NETPBM ON CACHE BOOL "Has libnetpbm installed")
-endif()

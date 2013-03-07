@@ -27,6 +27,7 @@ import bob
 import numpy
 import tempfile
 import pkg_resources
+from ...test import utils
 
 def F(f):
   """Returns the test file on the "data" subdirectory"""
@@ -90,6 +91,7 @@ expected_iris_predictions = (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 class SvmTest(unittest.TestCase):
   """Performs various SVM tests."""
 
+  @utils.libsvm_available
   def test01_can_load(self):
 
     machine = bob.machine.SupportVector(HEART_MACHINE)
@@ -101,6 +103,7 @@ class SvmTest(unittest.TestCase):
     self.assertTrue( +1 in machine.labels )
     self.assertTrue( abs(machine.gamma - 0.0769231) < 1e-6 )
 
+  @utils.libsvm_available
   def test02_can_save(self):
 
     machine = bob.machine.SupportVector(HEART_MACHINE)
@@ -120,6 +123,7 @@ class SvmTest(unittest.TestCase):
 
     os.unlink(tmp)
 
+  @utils.libsvm_available
   def test02a_can_save_hdf5(self):
 
     machine = bob.machine.SupportVector(HEART_MACHINE)
@@ -141,6 +145,7 @@ class SvmTest(unittest.TestCase):
 
     os.unlink(tmp)
 
+  @utils.libsvm_available
   def test03_data_loading(self):
 
     #tests if I can load data in libsvm format using SVMFile
@@ -194,6 +199,7 @@ class SvmTest(unittest.TestCase):
       self.assertEqual( l, labels[k] )
       self.assertTrue ( numpy.array_equal(e, data[k]) )
 
+  @utils.libsvm_available
   def test04_raises(self):
 
     #tests that the normal machine raises because probabilities are not
@@ -204,6 +210,7 @@ class SvmTest(unittest.TestCase):
     self.assertRaises(RuntimeError, machine.predict_classes_and_probabilities,
         data)
 
+  @utils.libsvm_available
   def test05_correctness_heart(self):
 
     #tests the correctness of the libSVM bindings
@@ -242,6 +249,7 @@ class SvmTest(unittest.TestCase):
     self.assertTrue( numpy.all(abs(numpy.vstack(pred_probs) -
       numpy.vstack(real_probs)) < 1e-6) )
 
+  @utils.libsvm_available
   def test06_correctness_iris(self):
 
     #same test as above, but with a 3-class problem.

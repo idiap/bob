@@ -19,6 +19,7 @@ IMAGE = utils.datafile('test-faces.jpg', iptest, os.path.join('data', 'faceextra
 
 class VisionerScriptTest(unittest.TestCase):
 
+  @utils.visioner_available
   @utils.ffmpeg_found()
   def test01_face_detect(self):
    
@@ -28,6 +29,7 @@ class VisionerScriptTest(unittest.TestCase):
     cmdline = '%s --self-test=1' % (MOVIE)
     self.assertEqual(facebox.main(cmdline.split()), 0)
 
+  @utils.visioner_available
   def test02_face_detect(self):
    
     # sanity checks
@@ -36,6 +38,7 @@ class VisionerScriptTest(unittest.TestCase):
     cmdline = '%s --self-test=2' % (IMAGE)
     self.assertEqual(facebox.main(cmdline.split()), 0)
 
+  @utils.visioner_available
   @utils.ffmpeg_found()
   def test03_keypoint_localization(self):
    
@@ -45,6 +48,7 @@ class VisionerScriptTest(unittest.TestCase):
     cmdline = '%s --self-test=1' % (MOVIE)
     self.assertEqual(facepoints.main(cmdline.split()), 0)
 
+  @utils.visioner_available
   def test04_keypoint_localization(self):
    
     # sanity checks

@@ -30,7 +30,7 @@
 
 #cmakedefine HAVE_BLITZ_TINYVEC2_H 1
 
-#cmakedefine HAVE_FFMPEG 1
+#cmakedefine01 WITH_FFMPEG
 
 #define FFMPEG_VERSION "@FFMPEG_VERSION@"
 
@@ -38,26 +38,16 @@
 
 #cmakedefine HAVE_FFMPEG_AVCODEC_AVCODECID 1
 
-#cmakedefine HAVE_MATIO 1
+#cmakedefine01 WITH_MATIO
 
 #cmakedefine HAVE_MATIO_OLD_COMPLEXSPLIT 1
 
-#cmakedefine HAVE_VLFEAT 1
+#cmakedefine01 WITH_VLFEAT
 
-#cmakedefine HAVE_LIBSVM 1
+#cmakedefine01 WITH_LIBSVM
 
-#cmakedefine HAVE_QT4 1
+#cmakedefine01 WITH_QT4
 
-#cmakedefine HAVE_GIFLIB 1
-
-#cmakedefine HAVE_NETPBM 1
-
-#cmakedefine HAVE_LIBJPEG 1
-
-#cmakedefine HAVE_LIBPNG 1
-
-#cmakedefine HAVE_LIBTIFF 1
-
-#cmakedefine HAVE_GOOGLE_PERFTOOLS 1
+#cmakedefine01 WITH_PERFTOOLS
 
 #endif /* BOB_CONFIG_H */
