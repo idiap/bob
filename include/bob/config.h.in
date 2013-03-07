@@ -48,8 +48,6 @@
 
 #cmakedefine HAVE_QT4 1
 
-#cmakedefine HAVE_OPENCV 1
-
 #cmakedefine HAVE_GIFLIB 1
 
 #cmakedefine HAVE_NETPBM 1
@@ -59,8 +57,6 @@
 #cmakedefine HAVE_LIBPNG 1
 
 #cmakedefine HAVE_LIBTIFF 1
-
-#define OPENCV_VERSION "@OPENCV_VERSION@"
 
 #cmakedefine HAVE_GOOGLE_PERFTOOLS 1
 
