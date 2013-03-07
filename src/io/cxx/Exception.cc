@@ -38,24 +38,6 @@ const char* io::Exception::what() const throw() {
  return what_string;
 }
 
-io::NameError::NameError(const std::string& key) throw(): m_name(key) {
-}
-
-io::NameError::~NameError() throw() {
-}
-
-const char* io::NameError::what() const throw() {
-  try {
-    boost::format message("Cannot use key '%s'");
-    message % m_name;
-    m_message = message.str();
-    return m_message.c_str();
-  } catch (...) {
-    static const char* emergency = "io::NameError: cannot format, exception raised";
-    return emergency;
-  }
-}
-
 io::IndexError::IndexError(size_t id) throw(): m_id(id) {
 }
 
@@ -134,15 +116,6 @@ const char* io::UnsupportedTypeError::what() const throw() {
   }
 }
 
-io::NonExistingElement::NonExistingElement() { }
-
-io::NonExistingElement::~NonExistingElement() throw() { }
-
-const char* io::NonExistingElement::what() const throw() {
-  static const char* message = "The type of element input is unknown";
-  return message;
-}
-
 io::Uninitialized::Uninitialized() throw() { }
 io::Uninitialized::~Uninitialized() throw() { }
 const char* io::Uninitialized::what() const throw() {
@@ -169,66 +142,6 @@ const char* io::FileNotReadable::what() const throw() {
   }
 }
 
-io::ExtensionNotRegistered::ExtensionNotRegistered(const std::string& extension) throw() :
-  m_extension(extension) 
-{
-}
-
-io::ExtensionNotRegistered::~ExtensionNotRegistered() throw() {
-}
-
-const char* io::ExtensionNotRegistered::what() const throw() {
-  try {
-    boost::format message("Cannot find codec that matches file extension '%s'");
-    message % m_extension;
-    m_message = message.str();
-    return m_message.c_str();
-  } catch (...) {
-    static const char* emergency = "io::ExtensionNotRegistered: cannot format, exception raised";
-    return emergency;
-  }
-}
-
-io::CodecNotFound::CodecNotFound(const std::string& codecname) throw()
-  : m_name(codecname)
-{
-}
-
-io::CodecNotFound::~CodecNotFound() throw() {
-}
-
-const char* io::CodecNotFound::what() const throw() {
-  try {
-    boost::format message("Cannot find codec named '%s'");
-    message % m_name;
-    m_message = message.str();
-    return m_message.c_str();
-  } catch (...) {
-    static const char* emergency = "io::CodecNotFound: cannot format, exception raised";
-    return emergency;
-  }
-}
-
-io::PathIsNotAbsolute::PathIsNotAbsolute(const std::string& path) throw()
-  : m_path(path)
-{
-}
-
-io::PathIsNotAbsolute::~PathIsNotAbsolute() throw() {
-}
-
-const char* io::PathIsNotAbsolute::what() const throw() {
-  try {
-    boost::format message("'%s' is not absolute");
-    message % m_path;
-    m_message = message.str();
-    return m_message.c_str();
-  } catch (...) {
-    static const char* emergency = "io::PathIsNotAbsolute: cannot format, exception raised";
-    return emergency;
-  }
-}
-
 io::ImageUnsupportedDimension::ImageUnsupportedDimension(size_t n_dim) throw() :
   m_n_dim(n_dim)
 {
@@ -248,12 +161,7 @@ const char* io::ImageUnsupportedDimension::what() const throw() {
   }
 }
 
-io::ImageUnsupportedType::ImageUnsupportedType(
-    const bob::core::array::ElementType el_type) throw() :
-  m_el_type(el_type)
-{
-}
-
+io::ImageUnsupportedType::ImageUnsupportedType() throw() { }
 io::ImageUnsupportedType::~ImageUnsupportedType() throw() { }
 
 const char* io::ImageUnsupportedType::what() const throw() {
@@ -263,26 +171,6 @@ const char* io::ImageUnsupportedType::what() const throw() {
     return m_message.c_str();
   } catch (...) {
     static const char* emergency = "io::ImageUnsupportedType: cannot format, exception raised";
-    return emergency;
-  }
-}
-
-io::ImageUnsupportedDepth::ImageUnsupportedDepth(
-    const unsigned int depth) throw() :
-  m_depth(depth)
-{
-}
-
-io::ImageUnsupportedDepth::~ImageUnsupportedDepth() throw() { }
-
-const char* io::ImageUnsupportedDepth::what() const throw() {
-  try {
-    boost::format message("Does not support image with depth '%u' (only depth up to 16bits is supported).");
-    message % m_depth;
-    m_message = message.str();
-    return m_message.c_str();
-  } catch (...) {
-    static const char* emergency = "io::ImageUnsupportedDepth: cannot format, exception raised";
     return emergency;
   }
 }

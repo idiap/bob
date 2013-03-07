@@ -38,17 +38,6 @@ namespace bob { namespace io {
 
   };
 
-  class NameError: public Exception {
-    public:
-      NameError(const std::string& key) throw();
-      virtual ~NameError() throw();
-      virtual const char* what() const throw();
-
-    private:
-      std::string m_name;
-      mutable std::string m_message;
-  };
-
   class IndexError: public Exception {
     public:
       IndexError(size_t id) throw();
@@ -96,13 +85,6 @@ namespace bob { namespace io {
       mutable std::string m_message;
   };
 
-  class NonExistingElement: public Exception {
-    public:
-      NonExistingElement();
-      virtual ~NonExistingElement() throw();
-      virtual const char* what() const throw();
-  };
-
   class Uninitialized: public Exception {
     public:
       Uninitialized() throw();
@@ -121,39 +103,6 @@ namespace bob { namespace io {
       mutable std::string m_message;
   };
 
-  class ExtensionNotRegistered: public Exception {
-    public:
-      ExtensionNotRegistered(const std::string& extension) throw();
-      virtual ~ExtensionNotRegistered() throw();
-      virtual const char* what() const throw();
-
-    private:
-      std::string m_extension;
-      mutable std::string m_message;
-  };
-
-  class CodecNotFound: public Exception {
-    public:
-      CodecNotFound(const std::string& codecname) throw();
-      virtual ~CodecNotFound() throw();
-      virtual const char* what() const throw();
-
-    private:
-      std::string m_name;
-      mutable std::string m_message;
-  };
-
-  class PathIsNotAbsolute: public Exception {
-    public:
-      PathIsNotAbsolute(const std::string& path) throw();
-      virtual ~PathIsNotAbsolute() throw();
-      virtual const char* what() const throw();
-
-    private:
-      std::string m_path;
-      mutable std::string m_message;
-  };
-
   class ImageUnsupportedDimension: public Exception {
     public:
       ImageUnsupportedDimension(const size_t n_dim) throw();
@@ -167,24 +116,11 @@ namespace bob { namespace io {
   
   class ImageUnsupportedType: public Exception {
     public:
-      ImageUnsupportedType(const bob::core::array::ElementType el_type)
-        throw();
+      ImageUnsupportedType() throw();
       virtual ~ImageUnsupportedType() throw();
       virtual const char* what() const throw();
 
     private:
-      bob::core::array::ElementType m_el_type;
-      mutable std::string m_message;
-  };
-
-  class ImageUnsupportedDepth: public Exception {
-    public:
-      ImageUnsupportedDepth(const unsigned int depth) throw();
-      virtual ~ImageUnsupportedDepth() throw();
-      virtual const char* what() const throw();
-
-    private:
-      unsigned int m_depth;
       mutable std::string m_message;
   };
 
