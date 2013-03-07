@@ -55,6 +55,10 @@ if(Blitz_FOUND)
   include(FindPackageHandleStandardArgs)
   find_package_message(Blitz "Found Blitz++: ${Blitz_LIBRARIES} (>2G-pointees: ${HAVE_BLITZ_SPECIAL_TYPES}; New: ${HAVE_BLITZ_TINYVEC2_H})" "[${Blitz_LIBRARIES}][${Blitz_INCLUDE_DIR}]")
 
+else(Blitz_FOUND)
+
+  message(FATAL_ERROR "Blitz++ was not found. Bob requires it for building.")
+
 endif(Blitz_FOUND)
 
 mark_as_advanced(Blitz_INCLUDE_DIR Blitz_LIBRARY)
