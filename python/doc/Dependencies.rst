@@ -158,16 +158,15 @@ Core dependencies
   versions that offer equivalent speed, more documentation and stability. You
   should use version 0.9 or superior. '''Please note that if you want to
   allocate very big arrays (> 2^31^ ''elements'' or 2G ''elements''), it is
-  recommended that you download the latest CVS version as it includes important
+  recommended that you download the latest version as it includes important
   64-bit fixes'''. Also note that Blitz++ does not support 64-bit array
   indexing, so the maximum amount of positions in a single dimension is limited
   to 2^31^  (that is what fits in a signed integer), even if you decide to use
-  the CVS version. This is true to the date (18/January/2011). If you plan to 
-  use your own built version of blitz++ from the mercurial repository on a 
-  Linux 32bits platform, '''you must enable the configuration flag 
-  ''--enable-simd-width=8'' (multiples of 8 should also be fine).''' This is 
-  required as BLAS/LAPACK need 8-byte aligned double arrays (cf. ticket #46 on
-  the github bug tracker).
+  the latest version. If you plan to use your own built version of blitz++ from
+  the mercurial repository on a Linux 32bits platform, '''you must enable the
+  configuration flag ''--enable-simd-width=8'' (multiples of 8 should also be
+  fine).''' This is required as BLAS/LAPACK need 8-byte aligned double arrays
+  (cf. ticket #46 on the github bug tracker).
 * `Lapack`_: we use this library for mathematical operations
   on vectors and matrices. Any modern version of this library will do.
 * `FFTW`_: provides fast computation of Fourier, Sine and Cosine transforms
@@ -280,7 +279,7 @@ A single command line that will install all required packages under Ubuntu:
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core cmake python-dev python-support python-numpy python-argparse python-scipy python-matplotlib python-sqlalchemy liblapack-dev libatlas-base-dev libblitz1-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libmatio-dev libjpeg8-dev libnetpbm10-dev libpng12-dev libtiff4-dev libgif-dev libhdf5-serial-dev libqt4-dev libfftw3-dev libcv-dev libhighgui-dev libcvaux-dev texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended libsvm-dev libvl-dev doxygen python-sphinx dvipng python-nose python-setuptools
+   $ sudo apt-get install git-core cmake python-dev python-support python-numpy python-argparse python-scipy python-matplotlib python-sqlalchemy liblapack-dev libatlas-base-dev libblitz1-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libmatio-dev libjpeg8-dev libnetpbm10-dev libpng12-dev libtiff4-dev libgif-dev libhdf5-serial-dev libqt4-dev libfftw3-dev texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended libsvm-dev libvl-dev doxygen python-sphinx dvipng python-nose python-setuptools
 
 .. note::
 
