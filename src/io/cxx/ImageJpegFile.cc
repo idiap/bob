@@ -165,7 +165,7 @@ static void im_load(const std::string& filename, bob::core::array::interface& b)
     else if( info.nd == 3) im_load_color<uint8_t>(&cinfo, b); 
     else throw bob::io::ImageUnsupportedDimension(info.nd);
   }
-  else throw bob::io::ImageUnsupportedType(info.dtype);
+  else throw bob::io::ImageUnsupportedType();
   
 
   // 7. Finish decompression
@@ -261,7 +261,7 @@ static void im_save (const std::string& filename, const bob::core::array::interf
     }
     else throw bob::io::ImageUnsupportedDimension(info.nd); 
   }
-  else throw bob::io::ImageUnsupportedType(info.dtype);
+  else throw bob::io::ImageUnsupportedType();
 
   // 6.
   jpeg_finish_compress(&cinfo);

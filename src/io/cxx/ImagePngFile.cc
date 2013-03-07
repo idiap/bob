@@ -288,7 +288,7 @@ static void im_load(const std::string& filename, bob::core::array::interface& b)
   }
   else {
     png_destroy_read_struct(&png_ptr, &info_ptr, NULL); 
-    throw bob::io::ImageUnsupportedType(info.dtype);
+    throw bob::io::ImageUnsupportedType();
   }
 
   // 8. Clean up after the read, and free any memory allocated
@@ -450,7 +450,7 @@ static void im_save(const std::string& filename, const bob::core::array::interfa
   else 
   {
     png_destroy_write_struct(&png_ptr, &info_ptr);
-    throw bob::io::ImageUnsupportedType(info.dtype);
+    throw bob::io::ImageUnsupportedType();
   }
 
   // It is REQUIRED to call this to finish writing the rest of the file

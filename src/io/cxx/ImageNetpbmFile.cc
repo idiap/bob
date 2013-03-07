@@ -167,7 +167,7 @@ static void im_load (const std::string& filename, bob::core::array::interface& b
     else throw bob::io::ImageUnsupportedDimension(info.nd);
   }
 
-  else throw bob::io::ImageUnsupportedType(info.dtype);
+  else throw bob::io::ImageUnsupportedType();
 }
 
 /**
@@ -293,7 +293,7 @@ static void im_save (const std::string& filename, const bob::core::array::interf
 
   }
 
-  else throw bob::io::ImageUnsupportedType(info.dtype);
+  else throw bob::io::ImageUnsupportedType();
 }
 
 

@@ -929,7 +929,7 @@ static void im_save(const std::string& filename, const bob::core::array::interfa
     }
     else throw bob::io::ImageUnsupportedDimension(info.nd); 
   }
-  else throw bob::io::ImageUnsupportedType(info.dtype);
+  else throw bob::io::ImageUnsupportedType();
 }
 
 class ImageBmpFile: public bob::io::File {
