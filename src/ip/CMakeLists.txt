@@ -9,6 +9,8 @@ if(WITH_VLFEAT)
   else()
     message(FATAL_ERROR "VLFeat has not been found. use '-DWITH_VLFEAT=OFF' to disable this check.")
   endif()
+else()
+  message(STATUS "VLfeat modules DISABLED by user request")
 endif()
 
 add_subdirectory(cxx)
