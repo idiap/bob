@@ -29,10 +29,14 @@
 #include <algorithm>
 #include <vector>
 #include <stdint.h>
+
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 
+// See bug: https://bugreports.qt-project.org/browse/QTBUG-22829
+#ifndef Q_MOC_RUN
 #include <boost/lexical_cast.hpp>
+#endif
 
 namespace bob { namespace visioner {
 
