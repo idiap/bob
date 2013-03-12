@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
 # Francois Moulin <Francois.Moulin@idiap.ch>
+# Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
 # Tue Jul 19 15:33:20 2011 +0200
 #
 # Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
@@ -38,7 +39,24 @@ def sameValue(vect_A, vect_B):
       sameMatrix[j, i] = (vect_A[j] == vect_B[i])
 
   return sameMatrix
+ 
+def tnorm(A, C):
+  Cmean = numpy.mean(C, axis=0)
+  if C.shape[1] > 1:
+    Cstd = numpy.sqrt(numpy.sum((C - numpy.tile(Cmean.reshape(1,C.shape[1]), (C.shape[0],1))) ** 2, axis=0) / (C.shape[0]-1))
+  else:
+    Cstd = numpy.ones(shape=(C.shape[1],), dtype=numpy.float64)
+  return (A - numpy.tile(Cmean.reshape(1,C.shape[1]), (A.shape[0],1))) / numpy.tile(Cstd.reshape(1,C.shape[1]), (A.shape[0],1))
   
+def znorm(A, B):
+  Bmean = numpy.mean(B, axis=1)
+  if B.shape[1] > 1:
+    Bstd = numpy.sqrt(numpy.sum((B - numpy.tile(Bmean.reshape(B.shape[0],1), (1,B.shape[1]))) ** 2, axis=1) / (B.shape[1]-1))
+  else:
+    Bstd = numpy.ones(shape=(B.shape[0],), dtype=numpy.float64)
+  
+  return (A - numpy.tile(Bmean.reshape(B.shape[0],1), (1,A.shape[1]))) / numpy.tile(Bstd.reshape(B.shape[0],1), (1,A.shape[1]))
+ 
 class ZTNormTest(unittest.TestCase):
   """Performs various ZTNorm tests."""
 
@@ -72,7 +90,49 @@ class ZTNormTest(unittest.TestCase):
     my_C = bob.io.load(F("ztnorm_eval_tnorm.mat"))
     my_D = bob.io.load(F("ztnorm_znorm_tnorm.mat"))
 
+    # ZT-Norm
     ref_scores = bob.io.load(F("ztnorm_result.mat"))
     scores = bob.machine.ztnorm(my_A, my_B, my_C, my_D)
+    self.assertTrue((abs(scores - ref_scores) < 1e-7).all()) 
+
+    # T-Norm
+    scores = bob.machine.tnorm(my_A, my_C)
+    scores_py = tnorm(my_A, my_C)
+    self.assertTrue((abs(scores - scores_py) < 1e-7).all()) 
+
+    # Z-Norm
+    scores = bob.machine.znorm(my_A, my_B)
+    scores_py = znorm(my_A, my_B)
+    self.assertTrue((abs(scores - scores_py) < 1e-7).all()) 
+
+  def test03_tnorm_simple(self):
+    # 3x5
+    my_A = numpy.array([[1, 2, 3, 4, 5],
+                        [6, 7, 8, 9, 8],
+                        [7, 6, 5, 4, 3]],'float64')
+    # 2x5
+    my_C = numpy.array([[5, 4, 3, 2, 1],[2, 1, 2, 3, 4]],'float64')
     
-    self.assertTrue((abs(scores - ref_scores) < 1e-7).all())
+    zC = bob.machine.tnorm(my_A, my_C)
+    zC_py = tnorm(my_A, my_C)
+    self.assertTrue((abs(zC - zC_py) < 1e-7).all())
+
+    empty = numpy.zeros(shape=(0,0), dtype=numpy.float64)
+    zC = bob.machine.ztnorm(my_A, empty, my_C, empty)
+    self.assertTrue((abs(zC - zC_py) < 1e-7).all())
+
+  def test04_znorm_simple(self):
+    # 3x5
+    my_A = numpy.array([[1, 2, 3, 4, 5],
+                        [6, 7, 8, 9, 8],
+                        [7, 6, 5, 4, 3]], numpy.float64)
+    # 3x4
+    my_B = numpy.array([[5, 4, 7, 8],[9, 8, 7, 4],[5, 6, 3, 2]], numpy.float64)
+ 
+    zA = bob.machine.znorm(my_A, my_B)
+    zA_py = znorm(my_A, my_B)
+    self.assertTrue((abs(zA - zA_py) < 1e-7).all())
+
+    empty = numpy.zeros(shape=(0,0), dtype=numpy.float64)
+    zA = bob.machine.ztnorm(my_A, my_B, empty, empty)
+    self.assertTrue((abs(zA - zA_py) < 1e-7).all())
