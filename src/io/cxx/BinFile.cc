@@ -25,17 +25,13 @@
 
 #include "bob/io/BinFile.h"
 
-namespace io = bob::io;
-namespace core = bob::core;
-namespace ca = bob::core::array;
-
-io::BinFile::BinFile(const std::string& filename, io::BinFile::openmode flag):
+bob::io::BinFile::BinFile(const std::string& filename, bob::io::BinFile::openmode flag):
   m_header_init(false),
   m_current_array(0),
   m_n_arrays_written(0),
   m_openmode(flag)
 {
-  if((flag & io::BinFile::out) && (flag & io::BinFile::in)) {
+  if((flag & bob::io::BinFile::out) && (flag & bob::io::BinFile::in)) {
     m_stream.open(filename.c_str(), std::ios::in | std::ios::out | 
         std::ios::binary);
     if(m_stream)
@@ -44,14 +40,14 @@ io::BinFile::BinFile(const std::string& filename, io::BinFile::openmode flag):
       m_header_init = true;
       m_n_arrays_written = m_header.m_n_samples;
 
-      if (flag & io::BinFile::append) {
+      if (flag & bob::io::BinFile::append) {
         m_stream.seekp(0, std::ios::end);
         m_current_array = m_header.m_n_samples;
       }
     }
   }
-  else if(flag & io::BinFile::out) {  
-    if(m_stream && (flag & io::BinFile::append)) {
+  else if(flag & bob::io::BinFile::out) {  
+    if(m_stream && (flag & bob::io::BinFile::append)) {
       m_stream.open(filename.c_str(), std::ios::out | std::ios::in);
       m_header.read(m_stream);
       m_header_init = true;
@@ -62,39 +58,39 @@ io::BinFile::BinFile(const std::string& filename, io::BinFile::openmode flag):
     else
       m_stream.open(filename.c_str(), std::ios::out | std::ios::binary);
   }
-  else if(flag & io::BinFile::in) {
+  else if(flag & bob::io::BinFile::in) {
     m_stream.open(filename.c_str(), std::ios::in | std::ios::binary);
     if(m_stream) {
       m_header.read(m_stream);
       m_header_init = true;
       m_n_arrays_written = m_header.m_n_samples;
 
-      if (flag & io::BinFile::append) {
-        core::error << "Cannot append data in read only mode." << std::endl;
-        throw core::Exception();
+      if (flag & bob::io::BinFile::append) {
+        bob::core::error << "Cannot append data in read only mode." << std::endl;
+        throw bob::core::Exception();
       }
     }
   }
   else
   {
-    core::error << "Invalid combination of flags." << std::endl;
-    throw core::Exception();
+    bob::core::error << "Invalid combination of flags." << std::endl;
+    throw bob::core::Exception();
   }
 }
 
-io::BinFile::~BinFile() {
+bob::io::BinFile::~BinFile() {
   close();
 }
 
-void io::BinFile::close() {
+void bob::io::BinFile::close() {
   // Rewrite the header and update the number of samples
   m_header.m_n_samples = m_n_arrays_written;
-  if(m_openmode & io::BinFile::out) m_header.write(m_stream);
+  if(m_openmode & bob::io::BinFile::out) m_header.write(m_stream);
 
   m_stream.close();
 }
 
-void io::BinFile::initHeader(const bob::core::array::ElementType type, 
+void bob::io::BinFile::initHeader(const bob::core::array::ElementType type, 
     size_t ndim, const size_t* shape) {
   // Check that data have not already been written
   if (m_n_arrays_written > 0 ) {
@@ -111,13 +107,13 @@ void io::BinFile::initHeader(const bob::core::array::ElementType type,
   m_header_init = true;
 }
 
-void io::BinFile::write(const ca::interface& data) {
+void bob::io::BinFile::write(const bob::core::array::interface& data) {
 
   /**
    * @warning: Please convert your files to HDF5, this format is
    * deprecated starting on 16.04.2011 - AA
    */
-  throw core::DeprecationError("BinFile format deprecated on 16.04.2011, use HDF5");
+  throw bob::core::DeprecationError("BinFile format deprecated on 16.04.2011, use HDF5");
 
   if(!m_header_init) {
     //initializes the header
@@ -141,10 +137,10 @@ void io::BinFile::write(const ca::interface& data) {
   if (m_current_array>m_n_arrays_written) ++m_n_arrays_written;
 }
 
-void io::BinFile::read (ca::interface& a) {
+void bob::io::BinFile::read (bob::core::array::interface& a) {
   if(!m_header_init) throw Uninitialized();
 
-  ca::typeinfo compat(getElementType(), m_header.getNDim(), m_header.getShape());
+  bob::core::array::typeinfo compat(getElementType(), m_header.getNDim(), m_header.getShape());
   
   if(!a.type().is_compatible(compat)) a.set(compat);
 
@@ -152,7 +148,7 @@ void io::BinFile::read (ca::interface& a) {
   ++m_current_array;
 }
 
-void io::BinFile::read (size_t index, ca::interface& a) {
+void bob::io::BinFile::read (size_t index, bob::core::array::interface& a) {
   // Check that we are reaching an existing array
   if( index >= m_header.m_n_samples ) {
     throw IndexError(index);
