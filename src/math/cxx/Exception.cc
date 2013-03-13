@@ -21,67 +21,47 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/math/Exception.h"
+#include <bob/math/Exception.h>
 #include <boost/format.hpp>
 
-namespace math = bob::math;
-
-math::Exception::Exception() throw() {
+bob::math::Exception::Exception() throw() {
 }
 
-math::Exception::~Exception() throw() {
+bob::math::Exception::~Exception() throw() {
 }
 
-const char* math::Exception::what() const throw() {
- static const char* what_string = "Generic math::Exception: user specialization has not overwritten what() or is throwing an object of this class (in which case, please fix it!)";
+const char* bob::math::Exception::what() const throw() {
+ static const char* what_string = "Generic bob::math::Exception: user specialization has not overwritten what() or is throwing an object of this class (in which case, please fix it!)";
  return what_string;
 }
 
-math::LapackError::LapackError(const std::string& msg) throw(): m_submessage(msg) {
+bob::math::LapackError::LapackError(const std::string& msg) throw(): m_submessage(msg) {
 }
 
-math::LapackError::~LapackError() throw() {
+bob::math::LapackError::~LapackError() throw() {
 }
 
-const char* math::LapackError::what() const throw() {
+const char* bob::math::LapackError::what() const throw() {
   try {
     boost::format message("Error when executing a LAPACK function. '%s'");
     message % m_submessage;
     m_message = message.str();
     return m_message.c_str();
   } catch (...) {
-    static const char* emergency = "math::LapackError: cannot format, exception raised";
+    static const char* emergency = "bob::math::LapackError: cannot format, exception raised";
     return emergency;
   }
 }
 
-math::NorminvPNotInRangeError::NorminvPNotInRangeError(const double p) throw(): m_p(p) {
-}
-
-math::NorminvPNotInRangeError::~NorminvPNotInRangeError() throw() {
-}
-
-const char* math::NorminvPNotInRangeError::what() const throw() {
-  try {
-    boost::format message("The parameter p of the norminv function has value '%f', not in the range [0,1].");
-    message % m_p;
-    m_message = message.str();
-    return m_message.c_str();
-  } catch (...) {
-    static const char* emergency = "math::NorminvPNotInRangeError: cannot format, exception raised";
-    return emergency;
-  }
-}
-
-math::GradientDimTooSmall::GradientDimTooSmall(const size_t ind, const size_t size) throw(): 
+bob::math::GradientDimTooSmall::GradientDimTooSmall(const size_t ind, const size_t size) throw(): 
   m_ind(ind), m_size(size)
 {
 }
 
-math::GradientDimTooSmall::~GradientDimTooSmall() throw() {
+bob::math::GradientDimTooSmall::~GradientDimTooSmall() throw() {
 }
 
-const char* math::GradientDimTooSmall::what() const throw() {
+const char* bob::math::GradientDimTooSmall::what() const throw() {
   try {
     boost::format message("The dimension '%d' is of length '%d', strictly smaller than 2. \
       No Gradient could be computed.");
@@ -90,21 +70,21 @@ const char* math::GradientDimTooSmall::what() const throw() {
     m_message = message.str();
     return m_message.c_str();
   } catch (...) {
-    static const char* emergency = "math::GradientDimTooSmall: cannot format, exception raised";
+    static const char* emergency = "bob::math::GradientDimTooSmall: cannot format, exception raised";
     return emergency;
   }
 }
 
-math::GradientNonPositiveSampleDistance::GradientNonPositiveSampleDistance(
+bob::math::GradientNonPositiveSampleDistance::GradientNonPositiveSampleDistance(
   const size_t ind, const double val) throw(): 
   m_ind(ind), m_val(val)
 {
 }
 
-math::GradientNonPositiveSampleDistance::~GradientNonPositiveSampleDistance() throw() {
+bob::math::GradientNonPositiveSampleDistance::~GradientNonPositiveSampleDistance() throw() {
 }
 
-const char* math::GradientNonPositiveSampleDistance::what() const throw() {
+const char* bob::math::GradientNonPositiveSampleDistance::what() const throw() {
   try {
     boost::format message("The sample distance '%f' for dimension '%d' is NOT strictly positive.\
       No Gradient could be computed.");
@@ -113,7 +93,7 @@ const char* math::GradientNonPositiveSampleDistance::what() const throw() {
     m_message = message.str();
     return m_message.c_str();
   } catch (...) {
-    static const char* emergency = "math::GradientNonPositiveSampleDistance: cannot format, exception raised";
+    static const char* emergency = "bob::math::GradientNonPositiveSampleDistance: cannot format, exception raised";
     return emergency;
   }
 }

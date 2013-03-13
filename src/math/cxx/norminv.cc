@@ -21,19 +21,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/math/norminv.h"
-#include "bob/math/Exception.h"
+#include <bob/math/norminv.h>
+#include <bob/core/Exception.h>
 #include <cmath>
 
-namespace math = bob::math;
-
-double math::norminv(const double p, const double mu, const double sigma)
+double bob::math::norminv(const double p, const double mu, const double sigma)
 {
   // Take the mean and sigma (standard deviation) into account
-  return sigma * math::normsinv(p) + mu;
+  return sigma * bob::math::normsinv(p) + mu;
 }
 
-double math::normsinv(const double p)
+double bob::math::normsinv(const double p)
 {
   // Coefficients in rational approximations
   static const double a1 = -3.969683028665376e+01;
@@ -66,15 +64,14 @@ double math::normsinv(const double p)
   static const double p_high = 1 - p_low;
 
   // Declare output value
-  double x = 0;
+  double x = 0.;
 
   // Error p should be between 0 and 1
-  if (p < 0 || p > 1)
-  {
-    throw math::NorminvPNotInRangeError(p);
-  }
+  if (p < 0. || p > 1.)
+    throw bob::core::InvalidArgumentException("p", p, 0., 1.);
+  
   // Rational approximation for lower region.
-  else if (0 < p && p < p_low)
+  else if (0. < p && p < p_low)
   {
     double q = sqrt(-2*log(p));
     x =  ( ( ( ( (c1*q+c2)*q+c3)*q+c4)*q+c5)*q+c6) / ( ( ( (d1*q+d2)*q+d3)*q+d4)*q+1);
@@ -87,7 +84,7 @@ double math::normsinv(const double p)
     x = ( ( ( ( (a1*r+a2)*r+a3)*r+a4)*r+a5)*r+a6)*q / ( ( ( ( (b1*r+b2)*r+b3)*r+b4)*r+b5)*r+1);
   }
   // Rational approximation for upper region.
-  else if (p_high < p && p < 1)
+  else if (p_high < p && p < 1.)
   {
     double q = sqrt(-2*log(1-p));
     x = -( ( ( ( (c1*q+c2)*q+c3)*q+c4)*q+c5)*q+c6) / ( ( ( (d1*q+d2)*q+d3)*q+d4)*q+1);

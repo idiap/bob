@@ -24,7 +24,7 @@
 #define BOB_MATH_EXCEPTION_H
 
 #include <cstdlib>
-#include "bob/core/Exception.h"
+#include <bob/core/Exception.h>
 
 namespace bob { namespace math {
 
@@ -37,7 +37,7 @@ namespace bob { namespace math {
   };
 
   /**
-   * Raised when a LAPACK function returns a non-zero value.
+   * @brief Raised when a LAPACK function returns a non-zero value.
    */
   class LapackError: public Exception {
     public:
@@ -51,23 +51,8 @@ namespace bob { namespace math {
   };
 
   /**
-   * Raised when the parameter p of the norminv function is not in the range 
-   * ]0,1[.
-   */
-  class NorminvPNotInRangeError: public Exception {
-    public:
-      NorminvPNotInRangeError(const double p) throw();
-      virtual ~NorminvPNotInRangeError() throw();
-      virtual const char* what() const throw();
-
-    private:
-      double m_p;
-      mutable std::string m_message;
-  };
-
-  /**
-   * Raised when a gradient is computed along a dimension whose length is 
-   * strictly smaller than 2.
+   * @brief Raised when a gradient is computed along a dimension whose length
+   * is strictly smaller than 2.
    */
   class GradientDimTooSmall: public Exception {
     public:
