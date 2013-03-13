@@ -25,17 +25,15 @@
 #include "bob/core/python/ndarray.h"
 
 using namespace boost::python;
-namespace tp = bob::python;
-namespace ca = bob::core::array;
 
 static const char* LINSOLVE_DOC = "Solve the linear system a*x=b and return the result as a blitz array. The solver is from the LAPACK library (use of dgesv).";
 static const char* LINSOLVE_SYMPOS_DOC = "Solve the linear system a*x=b, where a is symmetric definite positive, and return the result as a blitz array. The solver is from the LAPACK library (use of dposv).";
 static const char* LINSOLVE_CG_SYMPOS_DOC = "Solve the linear system a*x=b via conjugate gradients, where a is symmetric definite positive, and return the result as a blitz array.";
 
-static void script_linsolve(tp::const_ndarray A, tp::ndarray x, tp::const_ndarray b) {
-  const ca::typeinfo& info_x = x.type();
-  const ca::typeinfo& info_b = b.type();
-  if(info_x.dtype == ca::t_float64 && info_b.dtype == ca::t_float64)
+static void script_linsolve(bob::python::const_ndarray A, bob::python::ndarray x, bob::python::const_ndarray b) {
+  const bob::core::array::typeinfo& info_x = x.type();
+  const bob::core::array::typeinfo& info_b = b.type();
+  if(info_x.dtype == bob::core::array::t_float64 && info_b.dtype == bob::core::array::t_float64)
   {
     if(info_x.nd == info_b.nd)
     {
@@ -61,10 +59,10 @@ static void script_linsolve(tp::const_ndarray A, tp::ndarray x, tp::const_ndarra
     PYTHON_ERROR(TypeError, "Linear solver does only support float64 type");
 }
 
-static void script_linsolve_(tp::const_ndarray A, tp::ndarray x, tp::const_ndarray b) {
-  const ca::typeinfo& info_x = x.type();
-  const ca::typeinfo& info_b = b.type();
-  if(info_x.dtype == ca::t_float64 && info_b.dtype == ca::t_float64)
+static void script_linsolve_(bob::python::const_ndarray A, bob::python::ndarray x, bob::python::const_ndarray b) {
+  const bob::core::array::typeinfo& info_x = x.type();
+  const bob::core::array::typeinfo& info_b = b.type();
+  if(info_x.dtype == bob::core::array::t_float64 && info_b.dtype == bob::core::array::t_float64)
   {
     if(info_x.nd == info_b.nd)
     {
@@ -90,13 +88,13 @@ static void script_linsolve_(tp::const_ndarray A, tp::ndarray x, tp::const_ndarr
     PYTHON_ERROR(TypeError, "Linear solver does only support float64 type");
 }
 
-static object py_script_linsolve(tp::const_ndarray A, tp::const_ndarray b) {
-  const ca::typeinfo& info_b = b.type();
-  if(info_b.dtype == ca::t_float64)
+static object py_script_linsolve(bob::python::const_ndarray A, bob::python::const_ndarray b) {
+  const bob::core::array::typeinfo& info_b = b.type();
+  if(info_b.dtype == bob::core::array::t_float64)
   {
     if(info_b.nd == 1)
     {
-      tp::ndarray x(info_b.dtype, info_b.shape[0]);
+      bob::python::ndarray x(info_b.dtype, info_b.shape[0]);
       blitz::Array<double,1> x_ = x.bz<double,1>();
       bob::math::linsolve_(A.bz<double,2>(), x_, 
         b.bz<double,1>());
@@ -104,7 +102,7 @@ static object py_script_linsolve(tp::const_ndarray A, tp::const_ndarray b) {
     }
     else if(info_b.nd == 2)
     {
-      tp::ndarray x(info_b.dtype, info_b.shape[0], info_b.shape[1]);
+      bob::python::ndarray x(info_b.dtype, info_b.shape[0], info_b.shape[1]);
       blitz::Array<double,2> x_ = x.bz<double,2>();
       bob::math::linsolve_(A.bz<double,2>(), x_, 
         b.bz<double,2>());
@@ -117,10 +115,10 @@ static object py_script_linsolve(tp::const_ndarray A, tp::const_ndarray b) {
     PYTHON_ERROR(TypeError, "Linear solver does only support float64 type");
 }
 
-static void script_linsolveSympos(tp::const_ndarray A, tp::ndarray x, tp::const_ndarray b) {
-  const ca::typeinfo& info_x = x.type();
-  const ca::typeinfo& info_b = b.type();
-  if(info_x.dtype == ca::t_float64 && info_b.dtype == ca::t_float64)
+static void script_linsolveSympos(bob::python::const_ndarray A, bob::python::ndarray x, bob::python::const_ndarray b) {
+  const bob::core::array::typeinfo& info_x = x.type();
+  const bob::core::array::typeinfo& info_b = b.type();
+  if(info_x.dtype == bob::core::array::t_float64 && info_b.dtype == bob::core::array::t_float64)
   {
     if(info_x.nd == info_b.nd)
     {
@@ -146,10 +144,10 @@ static void script_linsolveSympos(tp::const_ndarray A, tp::ndarray x, tp::const_
     PYTHON_ERROR(TypeError, "Linear solver does only support float64 type");
 }
 
-static void script_linsolveSympos_(tp::const_ndarray A, tp::ndarray x, tp::const_ndarray b) {
-  const ca::typeinfo& info_x = x.type();
-  const ca::typeinfo& info_b = b.type();
-  if(info_x.dtype == ca::t_float64 && info_b.dtype == ca::t_float64)
+static void script_linsolveSympos_(bob::python::const_ndarray A, bob::python::ndarray x, bob::python::const_ndarray b) {
+  const bob::core::array::typeinfo& info_x = x.type();
+  const bob::core::array::typeinfo& info_b = b.type();
+  if(info_x.dtype == bob::core::array::t_float64 && info_b.dtype == bob::core::array::t_float64)
   {
     if(info_x.nd == info_b.nd)
     {
@@ -175,13 +173,13 @@ static void script_linsolveSympos_(tp::const_ndarray A, tp::ndarray x, tp::const
     PYTHON_ERROR(TypeError, "Linear solver does only support float64 type");
 }
 
-static object py_script_linsolveSympos(tp::const_ndarray A, tp::const_ndarray b) {
-  const ca::typeinfo& info_b = b.type();
-  if(info_b.dtype == ca::t_float64)
+static object py_script_linsolveSympos(bob::python::const_ndarray A, bob::python::const_ndarray b) {
+  const bob::core::array::typeinfo& info_b = b.type();
+  if(info_b.dtype == bob::core::array::t_float64)
   {
     if(info_b.nd == 1)
     {
-      tp::ndarray x(info_b.dtype, info_b.shape[0]);
+      bob::python::ndarray x(info_b.dtype, info_b.shape[0]);
       blitz::Array<double,1> x_ = x.bz<double,1>();
       bob::math::linsolveSympos_(A.bz<double,2>(), x_, 
         b.bz<double,1>());
@@ -189,7 +187,7 @@ static object py_script_linsolveSympos(tp::const_ndarray A, tp::const_ndarray b)
     }
     else if(info_b.nd == 2)
     {
-      tp::ndarray x(info_b.dtype, info_b.shape[0], info_b.shape[1]);
+      bob::python::ndarray x(info_b.dtype, info_b.shape[0], info_b.shape[1]);
       blitz::Array<double,2> x_ = x.bz<double,2>();
       bob::math::linsolveSympos_(A.bz<double,2>(), x_, 
         b.bz<double,2>());
@@ -202,24 +200,24 @@ static object py_script_linsolveSympos(tp::const_ndarray A, tp::const_ndarray b)
     PYTHON_ERROR(TypeError, "Linear solver does only support float64 type");
 }
 
-static void script_linsolveCGSympos(tp::const_ndarray A, tp::ndarray x, tp::const_ndarray b,
+static void script_linsolveCGSympos(bob::python::const_ndarray A, bob::python::ndarray x, bob::python::const_ndarray b,
     const double acc, const int max_iter) {
   blitz::Array<double,1> x_ = x.bz<double,1>();
   bob::math::linsolveCGSympos(A.bz<double,2>(), x_, 
       b.bz<double,1>(), acc, max_iter);
 }
 
-static void script_linsolveCGSympos_(tp::const_ndarray A, tp::ndarray x, tp::const_ndarray b,
+static void script_linsolveCGSympos_(bob::python::const_ndarray A, bob::python::ndarray x, bob::python::const_ndarray b,
     const double acc, const int max_iter) {
   blitz::Array<double,1> x_ = x.bz<double,1>();
   bob::math::linsolveCGSympos_(A.bz<double,2>(), x_, 
       b.bz<double,1>(), acc, max_iter);
 }
 
-static object py_script_linsolveCGSympos(tp::const_ndarray A, tp::const_ndarray b,
+static object py_script_linsolveCGSympos(bob::python::const_ndarray A, bob::python::const_ndarray b,
     const double acc, const int max_iter) {
-  const ca::typeinfo& info = b.type();
-  tp::ndarray res(info.dtype, info.shape[0]);
+  const bob::core::array::typeinfo& info = b.type();
+  bob::python::ndarray res(info.dtype, info.shape[0]);
   blitz::Array<double,1> res_ = res.bz<double,1>();
   bob::math::linsolveCGSympos(A.bz<double,2>(), res_, 
       b.bz<double,1>(), acc, max_iter);

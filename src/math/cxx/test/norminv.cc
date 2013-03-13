@@ -28,8 +28,6 @@
 #include "bob/math/norminv.h"
 #include <cmath>
 
-namespace math = bob::math;
-
 struct T {
   double sols_d05, sols_d25, sols_d50, sols_d75, sols_d95;
   double sol_m2s4_d37, sol_m2s4_d48, sol_m2s4_d79;
@@ -49,19 +47,19 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 BOOST_AUTO_TEST_CASE( test_normsinv )
 {
   // Compute and compare again OpenOffice! reference values
-  BOOST_CHECK_SMALL( fabs( sols_d05 - math::normsinv(0.05)), eps);
-  BOOST_CHECK_SMALL( fabs( sols_d25 - math::normsinv(0.25)), eps);
-  BOOST_CHECK_SMALL( fabs( sols_d50 - math::normsinv(0.5)), eps);
-  BOOST_CHECK_SMALL( fabs( sols_d75 - math::normsinv(0.75)), eps);
-  BOOST_CHECK_SMALL( fabs( sols_d95 - math::normsinv(0.95)), eps);
+  BOOST_CHECK_SMALL( fabs( sols_d05 - bob::math::normsinv(0.05)), eps);
+  BOOST_CHECK_SMALL( fabs( sols_d25 - bob::math::normsinv(0.25)), eps);
+  BOOST_CHECK_SMALL( fabs( sols_d50 - bob::math::normsinv(0.5)), eps);
+  BOOST_CHECK_SMALL( fabs( sols_d75 - bob::math::normsinv(0.75)), eps);
+  BOOST_CHECK_SMALL( fabs( sols_d95 - bob::math::normsinv(0.95)), eps);
 }
 
 BOOST_AUTO_TEST_CASE( test_norminv )
 {
   // Compute and compare again OpenOffice! reference values
-  BOOST_CHECK_SMALL( fabs( sol_m2s4_d37 - math::norminv(0.37, 2., 4.)), eps);
-  BOOST_CHECK_SMALL( fabs( sol_m2s4_d48 - math::norminv(0.48, 2., 4.)), eps);
-  BOOST_CHECK_SMALL( fabs( sol_m2s4_d79 - math::norminv(0.79, 2., 4.)), eps);
+  BOOST_CHECK_SMALL( fabs( sol_m2s4_d37 - bob::math::norminv(0.37, 2., 4.)), eps);
+  BOOST_CHECK_SMALL( fabs( sol_m2s4_d48 - bob::math::norminv(0.48, 2., 4.)), eps);
+  BOOST_CHECK_SMALL( fabs( sol_m2s4_d79 - bob::math::norminv(0.79, 2., 4.)), eps);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
