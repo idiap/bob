@@ -20,10 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/core/logging.h"
+#include <bob/core/logging.h>
 
-#include "bob/io/BinFileHeader.h"
-#include "bob/io/Exception.h"
+#include <bob/io/BinFileHeader.h>
+#include <bob/io/Exception.h>
 
 const uint32_t bob::io::detail::MAGIC_ENDIAN_DW = 0x01020304;
 const uint8_t bob::io::detail::FORMAT_VERSION = 0;
@@ -31,7 +31,7 @@ const uint8_t bob::io::detail::FORMAT_VERSION = 0;
 bob::io::detail::BinFileHeader::BinFileHeader()
   : m_version(bob::io::detail::FORMAT_VERSION),
     m_elem_type(bob::core::array::t_unknown), 
-    m_elem_sizeof(0),//bob::core::array::getElementSize(m_elem_type)),
+    m_elem_sizeof(0),
     m_endianness(bob::io::detail::MAGIC_ENDIAN_DW),
     m_n_dimensions(0), 
     m_n_samples(0)
