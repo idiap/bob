@@ -27,7 +27,8 @@
 
 #include <blitz/array.h>
 #include <vector>
-#include "bob/sp/FFT1D.h"
+#include <bob/sp/FFT1D.h>
+#include <bob/core/Exception.h>
 
 namespace bob {
 /**
@@ -213,7 +214,9 @@ class Ceps
      * range [0,1].
      */
     inline void setPreEmphasisCoeff(double pre_emphasis_coeff)
-    { // TODO: check paramater value is in range [0,1]
+    { if (pre_emphasis_coeff < 0. || pre_emphasis_coeff > 1.)
+        throw bob::core::InvalidArgumentException("pre_emphasis_coeff", 
+          pre_emphasis_coeff, 0., 1.);
       m_pre_emphasis_coeff = pre_emphasis_coeff; }
     /**
      * @brief Returns the frequency of the lowest triangular filter in the

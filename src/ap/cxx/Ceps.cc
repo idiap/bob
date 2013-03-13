@@ -21,10 +21,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/ap/Ceps.h"
-#include "bob/core/check.h"
-#include "bob/core/assert.h"
-#include "bob/core/cast.h"
+#include <bob/ap/Ceps.h>
+#include <bob/core/check.h>
+#include <bob/core/assert.h>
+#include <bob/core/cast.h>
 
 bob::ap::Ceps::Ceps( double sampling_frequency, double win_length_ms, double win_shift_ms,
     size_t n_filters, size_t n_ceps, double f_min, double f_max, 
@@ -37,6 +37,12 @@ bob::ap::Ceps::Ceps( double sampling_frequency, double win_length_ms, double win
   m_with_energy(false), m_with_delta(false), m_with_delta_delta(false),
   m_energy_floor(1.), m_fb_out_floor(1.), m_fft(1)
 {
+  // Check pre-emphasis coefficient
+  if (pre_emphasis_coeff < 0. || pre_emphasis_coeff > 1.)
+    throw bob::core::InvalidArgumentException("pre_emphasis_coeff", 
+      pre_emphasis_coeff, 0., 1.);
+
+  // Initialization
   initWinLength();
   initWinShift();
 
