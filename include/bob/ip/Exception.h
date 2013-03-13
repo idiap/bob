@@ -37,21 +37,6 @@ namespace bob { namespace ip {
 
   };
 
-  class ParamOutOfBoundaryError: public Exception {
-    public:
-      ParamOutOfBoundaryError(const std::string& paramname, const bool larger, 
-        const int value, const int limit) throw();
-      virtual ~ParamOutOfBoundaryError() throw();
-      virtual const char* what() const throw();
-
-    private:
-      std::string m_paramname;
-      bool m_larger;
-      int m_value;
-      int m_limit;
-      mutable std::string m_message;
-  };
-
   class UnknownScalingAlgorithm: public Exception {
     public:
       UnknownScalingAlgorithm() throw();

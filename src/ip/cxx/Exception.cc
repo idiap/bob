@@ -24,89 +24,55 @@
 #include <boost/format.hpp>
 #include "bob/ip/Exception.h"
 
-namespace ip = bob::ip;
-namespace core = bob::core;
-
-ip::Exception::Exception() throw() {
+bob::ip::Exception::Exception() throw() {
 }
 
-ip::Exception::~Exception() throw() {
+bob::ip::Exception::~Exception() throw() {
 }
 
-const char* ip::Exception::what() const throw() {
-  static const char* what_string = "Generic ip::Exception: user \
+const char* bob::ip::Exception::what() const throw() {
+  static const char* what_string = "Generic bob::ip::Exception: user \
     specialization has not overwritten what() or is throwing an object of \
     this class (in which case, please fix it!)";
   return what_string;
 }
 
 
-ip::ParamOutOfBoundaryError::ParamOutOfBoundaryError(
-  const std::string& paramname, const bool larger, const int value, 
-  const int limit) throw(): 
-    m_paramname(paramname), m_larger(larger), m_value(value), m_limit(limit) 
-{
+bob::ip::UnknownScalingAlgorithm::UnknownScalingAlgorithm() throw() {
 }
 
-ip::ParamOutOfBoundaryError::~ParamOutOfBoundaryError() throw() {
+bob::ip::UnknownScalingAlgorithm::~UnknownScalingAlgorithm() throw() {
 }
 
-const char* ip::ParamOutOfBoundaryError::what() const throw() {
-  try {
-    static const char* s_larger = "larger";
-    static const char* s_smaller = "smaller";
-    const char* s_selected = ( m_larger ? s_larger : s_smaller);
-    boost::format message(
-      "Parameter '%s' (value=%d) is %s than the limit %d.");
-    message % m_paramname;
-    message % m_value;
-    message % s_selected;
-    message % m_limit;
-    m_message = message.str();
-    return m_message.c_str();
-  } catch (...) {
-    static const char* emergency = "ip::ParamOutOfBoundaryError: cannot \
-      format, exception raised";
-    return emergency;
-  }
-}
-
-
-ip::UnknownScalingAlgorithm::UnknownScalingAlgorithm() throw() {
-}
-
-ip::UnknownScalingAlgorithm::~UnknownScalingAlgorithm() throw() {
-}
-
-const char* ip::UnknownScalingAlgorithm::what() const throw() {
-  static const char* what_string = "Generic ip::UnknownScalingAlgorithm:  \
+const char* bob::ip::UnknownScalingAlgorithm::what() const throw() {
+  static const char* what_string = "Generic bob::ip::UnknownScalingAlgorithm:  \
     The given scaling algorithm is not valid!";
   return what_string;
 }
 
 
-ip::UnknownRotatingAlgorithm::UnknownRotatingAlgorithm() throw() {
+bob::ip::UnknownRotatingAlgorithm::UnknownRotatingAlgorithm() throw() {
 }
 
-ip::UnknownRotatingAlgorithm::~UnknownRotatingAlgorithm() throw() {
+bob::ip::UnknownRotatingAlgorithm::~UnknownRotatingAlgorithm() throw() {
 }
 
-const char* ip::UnknownRotatingAlgorithm::what() const throw() {
-  static const char* what_string = "Generic ip::UnknownRotatingAlgorithm:  \
+const char* bob::ip::UnknownRotatingAlgorithm::what() const throw() {
+  static const char* what_string = "Generic bob::ip::UnknownRotatingAlgorithm:  \
     The given rotating algorithm is not valid!";
   return what_string;
 }
 
-ip::LBPRadiusDoesNotMatch::LBPRadiusDoesNotMatch(const std::string& axis,const std::string& plane1,const std::string& plane2) throw(): 
+bob::ip::LBPRadiusDoesNotMatch::LBPRadiusDoesNotMatch(const std::string& axis,const std::string& plane1,const std::string& plane2) throw(): 
     m_axis(axis), m_plane1(plane1), m_plane2(plane2)
 {
 }
 
-ip::LBPRadiusDoesNotMatch::~LBPRadiusDoesNotMatch() throw(){
+bob::ip::LBPRadiusDoesNotMatch::~LBPRadiusDoesNotMatch() throw(){
 }
 
 
-const char* ip::LBPRadiusDoesNotMatch::what() const throw() {
+const char* bob::ip::LBPRadiusDoesNotMatch::what() const throw() {
    boost::format message(
    "The radius in '%s' direction does not match in planes %s and %s ");
    message % m_axis;
@@ -119,16 +85,16 @@ const char* ip::LBPRadiusDoesNotMatch::what() const throw() {
 
 
 
-ip::LBPUnsupportedNNeighbours::LBPUnsupportedNNeighbours(
+bob::ip::LBPUnsupportedNNeighbours::LBPUnsupportedNNeighbours(
   const int N) throw(): 
     m_n_neighbours(N)
 {
 }
 
-ip::LBPUnsupportedNNeighbours::~LBPUnsupportedNNeighbours() throw() {
+bob::ip::LBPUnsupportedNNeighbours::~LBPUnsupportedNNeighbours() throw() {
 }
 
-const char* ip::LBPUnsupportedNNeighbours::what() const throw() {
+const char* bob::ip::LBPUnsupportedNNeighbours::what() const throw() {
   try {
     boost::format message(
       "The LBP operator is not implemented for a number '%d' of neighbour \
@@ -137,7 +103,7 @@ const char* ip::LBPUnsupportedNNeighbours::what() const throw() {
     m_message = message.str();
     return m_message.c_str();
   } catch (...) {
-    static const char* emergency = "ip::LBPUnsupportedNNeighbours: cannot \
+    static const char* emergency = "bob::ip::LBPUnsupportedNNeighbours: cannot \
       format, exception raised";
     return emergency;
   }

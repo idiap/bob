@@ -28,7 +28,7 @@
 #include <stdint.h>
 #include "bob/core/cast.h"
 #include "bob/ip/shift.h"
-#include "bob/ip/Exception.h"
+#include "bob/core/Exception.h"
 
 struct T {
   blitz::Array<uint32_t,2> a2, a2s_1, a2s_2;
@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE( test_shift_2d_uint8 )
 
   // Shift fully out and check exception
   BOOST_CHECK_THROW( bob::ip::shift(a2, b2, 4, 0),
-    bob::ip::ParamOutOfBoundaryError );
+    bob::core::InvalidArgumentException );
 
   // Shift +2y +1x (fill with zero)
   bob::ip::shift(a2, b2, 2, 1, false, true);
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE( test_shift_3d_uint8 )
 
   // Shift fully out and check exception
   BOOST_CHECK_THROW( bob::ip::shift(a3, b3, 4, 0),
-    bob::ip::ParamOutOfBoundaryError );
+    bob::core::InvalidArgumentException );
 
   // Shift +2y +1x (fill with zero)
   bob::ip::shift(a3, b3, 2, 1, false, true);

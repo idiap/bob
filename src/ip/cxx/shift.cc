@@ -25,21 +25,11 @@ void bob::ip::detail::shiftParameterCheck( const int shift_y, const int shift_x,
   const size_t src_height, const size_t src_width)
 {
   // Check parameters and throw exception if required
-  if( shift_y <= -(int)src_height ) {
-    throw ParamOutOfBoundaryError("shift_y", false, shift_y, 
-      -src_height+1);
-  }
-  if( shift_x <= -(int)src_width ) {
-    throw ParamOutOfBoundaryError("shift_x", false, shift_x, 
-      -src_width+1);
-  }
-  if( shift_y >= (int)src_height ) {
-    throw ParamOutOfBoundaryError("shift_y", true, shift_y, 
-      src_height-1);
-  }
-  if( shift_x >= (int)src_width ) {
-    throw ParamOutOfBoundaryError("shift_x", true, shift_x, 
-      src_width-1);
-  }
+  if (shift_y <= -(int)src_height || shift_y >= (int)src_height)
+    throw bob::core::InvalidArgumentException("shift_y", shift_y, 
+            -(int)src_height+1, (int)src_height-1);
+  if (shift_x <= -(int)src_width || shift_x >= (int)src_width)
+    throw bob::core::InvalidArgumentException("shift_x", shift_x, 
+            -(int)src_width+1, (int)src_width-1);
 }
 

@@ -31,6 +31,7 @@
 #include <boost/shared_ptr.hpp>
 #include <blitz/array.h>
 #include <algorithm>
+#include <limits>
 #include "bob/ip/LBP.h"
 #include "bob/ip/LBP4R.h"
 #include "bob/ip/LBP8R.h"
@@ -194,7 +195,8 @@ namespace bob { namespace ip {
       /**** Get XT plane (Intersect in one point is enough) ****/
       int limitT = ceil(2*radius_t + 1);
       if( Tlength < limitT )
-        throw ParamOutOfBoundaryError("t_radius", false, Tlength, limitT);
+        throw bob::core::InvalidArgumentException("t_radius", Tlength, limitT, 
+                std::numeric_limits<int>::max());
 
 
       /***** Checking the outputs *****/
@@ -206,27 +208,27 @@ namespace bob { namespace ip {
 
       /*Checking XY*/
       if( xy.extent(0) != limitTime)
-        throw ParamOutOfBoundaryError("Time parameter in  XY ", (xy.extent(0) > limitTime), xy.extent(0), limitTime);
+        throw bob::core::InvalidArgumentException("Time parameter in  XY ", xy.extent(0), limitTime, limitTime);
       if( xy.extent(1) != limitHeight)
-        throw ParamOutOfBoundaryError("Height parameter in  XY ", (xy.extent(1) > limitWidth), xy.extent(1), limitWidth);
+        throw bob::core::InvalidArgumentException("Height parameter in  XY ", xy.extent(1), limitHeight, limitHeight);
       if( xy.extent(2) != limitWidth)
-        throw ParamOutOfBoundaryError("Width parameter in  XY ", (xy.extent(2) > limitHeight), xy.extent(2), limitHeight);
+        throw bob::core::InvalidArgumentException("Width parameter in  XY ", xy.extent(2), limitWidth, limitWidth);
 
       /*Checking XT*/
       if( xt.extent(0) != limitTime)
-        throw ParamOutOfBoundaryError("Time parameter in  XT ", (xt.extent(0) > limitTime), xt.extent(0), limitTime);
+        throw bob::core::InvalidArgumentException("Time parameter in  XT ", xt.extent(0), limitTime, limitTime);
       if( xt.extent(1) != limitHeight)
-        throw ParamOutOfBoundaryError("Height parameter in  XT ", (xt.extent(1) > limitWidth), xt.extent(1), limitWidth);
+        throw bob::core::InvalidArgumentException("Height parameter in  XT ", xt.extent(1), limitHeight, limitHeight);
       if( xt.extent(2) != limitWidth)
-        throw ParamOutOfBoundaryError("Width parameter in  XT ", (xt.extent(2) > limitHeight), xt.extent(2), limitHeight);
+        throw bob::core::InvalidArgumentException("Width parameter in  XT ", xt.extent(2), limitWidth, limitWidth);
 
       /*Checking YT*/
       if( yt.extent(0) != limitTime)
-        throw ParamOutOfBoundaryError("Time parameter in  YT ", (yt.extent(0) > limitTime), yt.extent(0), limitTime);
+        throw bob::core::InvalidArgumentException("Time parameter in  YT ", yt.extent(0), limitTime, limitTime);
       if( yt.extent(1) != limitHeight)
-        throw ParamOutOfBoundaryError("Height parameter in  YT ", (yt.extent(1) > limitWidth), yt.extent(1), limitWidth);
+        throw bob::core::InvalidArgumentException("Height parameter in  YT ", yt.extent(1), limitHeight, limitHeight);
       if( yt.extent(2) != limitWidth)
-        throw ParamOutOfBoundaryError("Width parameter in  YT ", (yt.extent(2) > limitHeight), yt.extent(2), limitHeight);
+        throw bob::core::InvalidArgumentException("Width parameter in  YT ", yt.extent(2), limitWidth, limitWidth);
 
 
       //for each element in time domain (the simplest way to see what is happening)

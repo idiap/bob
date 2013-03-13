@@ -29,7 +29,7 @@
 #define BOB_IP_ZIGZAG_H
 
 #include "bob/core/assert.h"
-#include "bob/ip/Exception.h"
+#include "bob/core/Exception.h"
 
 namespace bob {
   /**
@@ -144,12 +144,9 @@ namespace bob {
       const int n_coef_kept = dst.extent(0);
 
       // Check that we ask to keep a valid number of coefficients
-      if( n_coef_kept > max_n_coef )
-        throw ParamOutOfBoundaryError("n_coef_kept", true, 
-            n_coef_kept, max_n_coef);
-      if( n_coef_kept < 0 )
-        throw ParamOutOfBoundaryError("n_coef_kept", false, 
-            n_coef_kept, 0);
+      if( n_coef_kept < 1 || n_coef_kept > max_n_coef )
+        throw bob::core::InvalidArgumentException("n_coef_kept", n_coef_kept,
+          1, n_coef_kept);
 
       // Apply the zigzag function
       detail::zigzagNoCheck( src, dst, right_first);

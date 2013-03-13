@@ -19,26 +19,24 @@
  */
 
 #include "bob/ip/crop.h"
-#include "bob/ip/Exception.h"
+#include "bob/core/Exception.h"
 
 void bob::ip::detail::cropParameterCheck( const int crop_y, 
   const int crop_x, const size_t crop_h, const size_t crop_w, 
   const size_t src_height, const size_t src_width)
 {
   // Check parameters and throw exception if required
-  if( crop_y<0) {
-    throw ParamOutOfBoundaryError("crop_y", false, crop_y, 0);
-  }
-  if( crop_x<0 ) {
-    throw ParamOutOfBoundaryError("crop_x", false, crop_x, 0);
-  }
-  if( crop_y+crop_h>src_height ) {
-    throw ParamOutOfBoundaryError("crop_y+crop_h", true, crop_y+crop_h, 
-      src_height );
-  }
-  if( crop_x+crop_w>src_width ) {
-    throw ParamOutOfBoundaryError("crop_x+crop_w", true, crop_x+crop_w, 
-      src_width );
-  }
+  if (crop_y < 0)
+    throw bob::core::InvalidArgumentException("crop_y", crop_y, 0, 
+            (int)src_height);
+  if (crop_x < 0)
+    throw bob::core::InvalidArgumentException("crop_x", crop_x, 0, 
+            (int)src_width);
+  if (crop_y+crop_h > src_height)
+    throw bob::core::InvalidArgumentException("crop_y+crop_h",
+            crop_y+(int)crop_h, 0, (int)src_height);
+  if (crop_x+crop_w > src_width)
+    throw bob::core::InvalidArgumentException("crop_x+crop_w",
+            crop_x+(int)crop_w, 0, (int)src_width);
 }
 

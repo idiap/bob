@@ -196,14 +196,12 @@ namespace bob { namespace ip {
       bob::core::array::assertZeroBase(src);
       if( m_circular)
       {
-        if( yc<ceil(m_R) )
-          throw ParamOutOfBoundaryError("yc", false, yc, ceil(m_R));
-        if( yc>=src.extent(0)-ceil(m_R) )
-          throw ParamOutOfBoundaryError("yc", true, yc, src.extent(0)-ceil(m_R)-1);
-        if( xc<ceil(m_R2) )
-          throw ParamOutOfBoundaryError("xc", false, xc, ceil(m_R2));
-        if( xc>=src.extent(1)-ceil(m_R2) )
-          throw ParamOutOfBoundaryError("xc", true, xc, src.extent(1)-ceil(m_R2)-1);
+        if( yc < ceil(m_R) || yc >= src.extent(0)-ceil(m_R) )
+          throw bob::core::InvalidArgumentException("yc", yc, (int)ceil(m_R), 
+            src.extent(0)-(int)ceil(m_R)-1);
+        if( xc < ceil(m_R2) || xc >= src.extent(1)-ceil(m_R2) )
+          throw bob::core::InvalidArgumentException("xc", xc, (int)ceil(m_R2), 
+            src.extent(1)-(int)ceil(m_R2)-1);
         return bob::ip::LBP16R::processNoCheck<T,true>( src, yc, xc);
       }
       else // there is no possibility for non-circular LBP16

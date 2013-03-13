@@ -118,12 +118,12 @@ namespace bob {
       const int width = dst.extent(1);
 
       // Check parameters and throw exception if required
-      if( height<1 ) {
-        throw ParamOutOfBoundaryError("height", false, height, 1);
-      }
-      if( width<1 ) {
-        throw ParamOutOfBoundaryError("width", false, width, 1);
-      }
+      if (height < 1)
+        throw bob::core::InvalidArgumentException("height", height,
+          1, std::numeric_limits<int>::max());
+      if (width < 1)
+        throw bob::core::InvalidArgumentException("width", width,
+          1, std::numeric_limits<int>::max());
   
       // If src and dst have the same shape, do a simple copy
       if( height==src.extent(0) && width==src.extent(1)) {
@@ -181,12 +181,12 @@ namespace bob {
       const int width = dst.extent(1);
 
       // Check parameters and throw exception if required
-      if( height<1 ) {
-        throw ParamOutOfBoundaryError("height", false, height, 1);
-      }
-      if( width<1 ) {
-        throw ParamOutOfBoundaryError("width", false, width, 1);
-      }
+      if (height < 1)
+        throw bob::core::InvalidArgumentException("height", height,
+          1, std::numeric_limits<int>::max());
+      if (width < 1)
+        throw bob::core::InvalidArgumentException("width", width,
+          1, std::numeric_limits<int>::max());
   
       // If src and dst have the same shape, do a simple copy
       if( height==src.extent(0) && width==src.extent(1)) {

@@ -29,7 +29,7 @@
 
 #include "bob/core/cast.h"
 #include "bob/ip/crop.h"
-#include "bob/ip/Exception.h"
+#include "bob/core/Exception.h"
 
 
 struct T {
@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE( test_crop_2d_uint8 )
   // Crop the middle part with out of boundary and check exception
   b2.resize(2,6);
   BOOST_CHECK_THROW( bob::ip::crop(a2, b2, 1, -1, 2, 6), 
-    bob::ip::ParamOutOfBoundaryError );
+    bob::core::InvalidArgumentException );
 
   // Crop the middle part with out of boundary (fill with zero)
   bob::ip::crop(a2, b2, 1, -1, 2, 6, true, true);
@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE( test_crop_3d_uint8 )
   // Crop the middle part with out of boundary and check exception
   b3.resize(3,2,6);
   BOOST_CHECK_THROW( bob::ip::crop(a3, b3, 1, -1, 2, 6), 
-    bob::ip::ParamOutOfBoundaryError );
+    bob::core::InvalidArgumentException );
 
   // Crop the middle part with out of boundary (fill with zero)
   bob::ip::crop(a3, b3, 1, -1, 2, 6, true, true);

@@ -26,8 +26,9 @@
 
 #include <blitz/array.h>
 #include <cmath>
+#include <limits>
 #include "bob/core/assert.h"
-#include "bob/ip/Exception.h"
+#include "bob/core/Exception.h"
 
 namespace bob {
 /**
@@ -78,7 +79,8 @@ namespace bob {
 
       // Check parameters and throw exception if required
       if( gamma < 0.) 
-        throw ParamOutOfBoundaryError("gamma", false, gamma, 0.);
+        throw bob::core::InvalidArgumentException("gamma", gamma, 0.,
+                std::numeric_limits<double>::max());
     
       // Perform gamma correction for the 2D array
       detail::gammaCorrectionNoCheck(src, dst, gamma);

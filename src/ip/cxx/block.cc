@@ -19,7 +19,7 @@
  */
 
 #include "bob/ip/block.h"
-#include "bob/ip/Exception.h"
+#include "bob/core/Exception.h"
 
 
 /**
@@ -31,22 +31,18 @@ void bob::ip::detail::blockCheckInput(const size_t height,
   const size_t overlap_h, const size_t overlap_w)
 {
   // Check parameters and throw exception if required
-  if( block_h<1)
-    throw ParamOutOfBoundaryError("block_h", false, block_h, 1); 
-  if( block_h>height )
-    throw ParamOutOfBoundaryError("block_h", true, block_h, 
-      height); 
-  if( block_w<1)
-    throw ParamOutOfBoundaryError("block_w", false, block_w, 1); 
-  if( block_w>width )
-    throw ParamOutOfBoundaryError("block_w", true, block_w, 
-      width); 
-  if( overlap_h>=block_h )
-    throw ParamOutOfBoundaryError("overlap_h", true, overlap_h, 
-      block_h); 
-  if( overlap_w>=block_w )
-    throw ParamOutOfBoundaryError("overlap_w", true, overlap_w, 
-      block_w); 
+  if (block_h < 1 || block_h > height)
+    throw bob::core::InvalidArgumentException("block_h", block_h, 
+            (size_t)1, height);
+  if (block_w < 1 || block_h > width)
+    throw bob::core::InvalidArgumentException("block_w", block_w, 
+            (size_t)1, width);
+  if (overlap_h >= block_h)
+    throw bob::core::InvalidArgumentException("overlap_h", overlap_h, 
+            (size_t)0, block_h-1);
+  if (overlap_w >= block_w)
+    throw bob::core::InvalidArgumentException("overlap_w", overlap_w, 
+            (size_t)0, block_w-1);
 }
 
 /**
