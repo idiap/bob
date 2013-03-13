@@ -24,7 +24,7 @@
 #define BOB_MATH_STATS_H
 
 #include <blitz/array.h>
-#include "bob/core/assert.h"
+#include <bob/core/assert.h>
 
 namespace bob { namespace math {
 

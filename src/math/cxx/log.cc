@@ -18,11 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/math/log.h"
-#include "bob/math/Exception.h"
-#include <cstdio>
-
-namespace math = bob::math;
+#include <bob/math/log.h>
+#include <bob/math/Exception.h>
+#include <bob/core/logging.h>
 
 /**
  * Computes log(a+b)=log(exp(log(a))+exp(log(b))) from log(a) and log(b), 
@@ -41,8 +39,9 @@ double bob::math::Log::logAdd(double log_a, double log_b)
   //#ifdef DEBUG
   if(std::isnan(minusdif)) 
   {
-    printf("LogAdd: minusdif (%f) log_b (%f) or log_a (%f) is nan\n", minusdif, log_b, log_a);
-    throw math::Exception();
+    bob::core::error << "LogAdd: minusdif (" << minusdif << ") log_b (" << 
+      log_b << ") or log_a (" << log_a << ") is nan" << std::endl;
+    throw bob::math::Exception();
   }
   //#endif
   if(minusdif < MINUS_LOG_THRESHOLD) return log_a;
@@ -59,19 +58,21 @@ double bob::math::Log::logSub(double log_a, double log_b)
 
   if(log_a < log_b) 
   {
-    printf("LogSub: log_a (%f) should be greater than log_b (%f)", log_a, log_b);
-    throw math::Exception();
+    bob::core::error << "LogSub: log_a (" << log_a << 
+      ") should be greater than log_b (" << log_b << ")" << std::endl;
+    throw bob::math::Exception();
   }
 
   minusdif = log_b - log_a;
   //#ifdef DEBUG
   if(std::isnan(minusdif)) 
   {
-    printf("LogSub: minusdif (%f) log_b (%f) or log_a (%f) is nan", minusdif, log_b, log_a);
-    throw math::Exception();
+    bob::core::error << "LogSub: minusdif (" << minusdif << ") log_b (" << 
+      log_b << ") or log_a (" << log_a << ") is nan" << std::endl;
+    throw bob::math::Exception();
   }
   //#endif
-  if(log_a == log_b) return math::Log::LogZero;
+  if(log_a == log_b) return bob::math::Log::LogZero;
   else if(minusdif < MINUS_LOG_THRESHOLD) return log_a;
   else return log_a + log1p(-exp(minusdif));
 }

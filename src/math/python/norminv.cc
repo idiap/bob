@@ -22,16 +22,16 @@
 
 #include <boost/python.hpp>
 
-#include "bob/math/norminv.h"
+#include <bob/math/norminv.h>
 
 using namespace boost::python;
 
-static const char* NORMSINV_DOC = "Compute the inverse normal cumulative distribution for a probability p, given a distribution with zero mean and and unit variance.";
-static const char* NORMINV_DOC = "Compute the inverse normal cumulative distribution for a probability p, given a distribution with mean mu and standard deviation sigma.";
+static const char* NORMSINV_DOC = "Compute the inverse normal cumulative distribution for a probability p, given a distribution with zero mean and and unit variance.\nReference: http://home.online.no/~pjacklam/notes/invnorm/";
+static const char* NORMINV_DOC = "Compute the inverse normal cumulative distribution for a probability p, given a distribution with mean mu and standard deviation sigma.\nReference: http://home.online.no/~pjacklam/notes/invnorm/";
 
 void bind_math_norminv()
 {
-  def("normsinv", (double (*)(const double))&bob::math::normsinv, (arg("p")), NORMSINV_DOC);
-  def("norminv", (double (*)(const double, const double, const double))&bob::math::norminv, (arg("p"), arg("mu"), arg("sigma")), NORMINV_DOC);
+  def("normsinv", &bob::math::normsinv, (arg("p")), NORMSINV_DOC);
+  def("norminv", &bob::math::norminv, (arg("p"), arg("mu"), arg("sigma")), NORMINV_DOC);
 }
 

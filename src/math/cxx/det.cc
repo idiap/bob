@@ -17,26 +17,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "bob/math/linear.h"
-#include "bob/math/det.h"
-#include "bob/math/lu.h"
-#include "bob/math/Exception.h"
-#include "bob/core/assert.h"
-#if !defined (HAVE_BLITZ_TINYVEC2_H)
-#include <blitz/tinyvec-et.h>
-#endif
-#include <algorithm>
 
-namespace math = bob::math;
-namespace ca = bob::core::array;
+#include <bob/math/det.h>
+#include <bob/math/linear.h>
+#include <bob/math/lu.h>
+#include <bob/core/assert.h>
 
-double math::det(const blitz::Array<double,2>& A)
+double bob::math::det(const blitz::Array<double,2>& A)
 {
-  ca::assertSameDimensionLength(A.extent(0),A.extent(1));
-  return math::det_(A);
+  bob::core::array::assertSameDimensionLength(A.extent(0),A.extent(1));
+  return bob::math::det_(A);
 }
 
-double math::det_(const blitz::Array<double,2>& A)
+double bob::math::det_(const blitz::Array<double,2>& A)
 {
   // Size variable
   int N = A.extent(0);
@@ -54,10 +47,10 @@ double math::det_(const blitz::Array<double,2>& A)
   math::prod(P,L,Lperm);
   int s = 1;
   double Udiag=1.;
-  for( int i=0; i<N; ++i) 
+  for (int i=0; i<N; ++i) 
   {
-    for(int j=i+1; j<N; ++j)
-      if( P(i,j) > 0)
+    for (int j=i+1; j<N; ++j)
+      if (P(i,j) > 0)
       {
         s = -s; 
         break;

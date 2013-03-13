@@ -22,33 +22,28 @@
  */
 
 
-#include "bob/math/sqrtm.h"
+#include <bob/math/sqrtm.h>
 
-#include "bob/core/assert.h"
-#include "bob/math/eig.h"
-#include "bob/math/linear.h"
+#include <bob/core/assert.h>
+#include <bob/math/eig.h>
+#include <bob/math/linear.h>
 
-
-namespace ca = bob::core::array;
-namespace math = bob::math;
-
-
-void math::sqrtSymReal(const blitz::Array<double,2>& A, 
+void bob::math::sqrtSymReal(const blitz::Array<double,2>& A, 
   blitz::Array<double,2>& B)
 {
   // Size variable
   int N = A.extent(0);
   const blitz::TinyVector<int,2> shape(N,N);
-  ca::assertZeroBase(A);
-  ca::assertZeroBase(B);
+  bob::core::array::assertZeroBase(A);
+  bob::core::array::assertZeroBase(B);
 
-  ca::assertSameShape(A,shape);
-  ca::assertSameShape(B,shape);
+  bob::core::array::assertSameShape(A,shape);
+  bob::core::array::assertSameShape(B,shape);
 
-  math::sqrtSymReal_(A, B);
+  bob::math::sqrtSymReal_(A, B);
 }
 
-void math::sqrtSymReal_(const blitz::Array<double,2>& A, 
+void bob::math::sqrtSymReal_(const blitz::Array<double,2>& A, 
   blitz::Array<double,2>& B)
 {
   // Size variable
@@ -60,7 +55,7 @@ void math::sqrtSymReal_(const blitz::Array<double,2>& A,
   blitz::Array<double,2> Vt = V.transpose(1,0);
   blitz::Array<double,1> D(N);
   blitz::Array<double,2> tmp(N,N); // Cache for multiplication
-  math::eigSym_(A,V,D);
+  bob::math::eigSym_(A,V,D);
 
   // 2/ Updates the diagonal matrix D, such that D=sqrt(|D|)
   //    |.| is used to deal with values close to zero (-epsilon)
@@ -72,5 +67,5 @@ void math::sqrtSymReal_(const blitz::Array<double,2>& A,
   blitz::firstIndex i;
   blitz::secondIndex j;
   tmp = V(i,j) * D(j); // tmp = V.sqrt(D)
-  math::prod_(tmp, Vt, B); // B = V.sqrt(D).V^T  
+  bob::math::prod_(tmp, Vt, B); // B = V.sqrt(D).V^T  
 }

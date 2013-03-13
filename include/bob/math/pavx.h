@@ -23,7 +23,7 @@
 #ifndef BOB_MATH_PAVX_H
 #define BOB_MATH_PAVX_H
 
-#include "bob/core/assert.h"
+#include <blitz/array.h>
 #include <utility>
 
 namespace bob {

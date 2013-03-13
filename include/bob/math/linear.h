@@ -25,7 +25,7 @@
 #define BOB_MATH_LINEAR_H
 
 #include <blitz/array.h>
-#include "bob/core/assert.h"
+#include <bob/core/assert.h>
 
 namespace bob { namespace math {
 
@@ -224,8 +224,7 @@ namespace bob { namespace math {
    */
   template<typename T1, typename T2>
     T1 dot_(const blitz::Array<T1,1>& a, const blitz::Array<T2,1>& b) {
-      blitz::firstIndex i;
-      return blitz::sum(a(i) * b(i));
+      return blitz::sum(a * b);
     }
 
   /**

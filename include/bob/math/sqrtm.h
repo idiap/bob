@@ -25,7 +25,6 @@
 #define BOB_MATH_SQRTM_H
 
 #include <blitz/array.h>
-#include "eig.h"
 
 namespace bob {
 /**

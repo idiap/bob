@@ -18,23 +18,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <bob/math/svd.h>
+#include <bob/math/Exception.h>
+#include <bob/core/assert.h>
+#include <bob/core/check.h>
+#include <bob/core/array_copy.h>
 #include <boost/shared_array.hpp>
-
-#include "bob/math/svd.h"
-#include "bob/math/Exception.h"
-#include "bob/core/assert.h"
-#include "bob/core/check.h"
-#include "bob/core/array_copy.h"
-
-namespace math = bob::math;
-namespace ca = bob::core::array;
 
 // Declaration of the external LAPACK function (Divide and conquer SVD)
 extern "C" void dgesdd_( const char *jobz, const int *M, const int *N, 
   double *A, const int *lda, double *S, double *U, const int* ldu, double *VT,
   const int *ldvt, double *work, const int *lwork, int *iwork, int *info);
 
-void math::svd(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
+void bob::math::svd(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   blitz::Array<double,1>& sigma, blitz::Array<double,2>& Vt)
 {
   // Size variables
@@ -43,21 +39,21 @@ void math::svd(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   const int nb_singular = std::min(M,N);
 
   // Checks zero base
-  ca::assertZeroBase(A);
-  ca::assertZeroBase(U);
-  ca::assertZeroBase(sigma);
-  ca::assertZeroBase(Vt);
+  bob::core::array::assertZeroBase(A);
+  bob::core::array::assertZeroBase(U);
+  bob::core::array::assertZeroBase(sigma);
+  bob::core::array::assertZeroBase(Vt);
   // Checks and resizes if required
-  ca::assertSameDimensionLength(U.extent(0), M);
-  ca::assertSameDimensionLength(U.extent(1), M);
-  ca::assertSameDimensionLength(sigma.extent(0), nb_singular);
-  ca::assertSameDimensionLength(Vt.extent(0), N);
-  ca::assertSameDimensionLength(Vt.extent(1), N);
+  bob::core::array::assertSameDimensionLength(U.extent(0), M);
+  bob::core::array::assertSameDimensionLength(U.extent(1), M);
+  bob::core::array::assertSameDimensionLength(sigma.extent(0), nb_singular);
+  bob::core::array::assertSameDimensionLength(Vt.extent(0), N);
+  bob::core::array::assertSameDimensionLength(Vt.extent(1), N);
 
-  math::svd_(A, U, sigma, Vt);
+  bob::math::svd_(A, U, sigma, Vt);
 }
 
-void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
+void bob::math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   blitz::Array<double,1>& sigma, blitz::Array<double,2>& Vt)
 {
   // Size variables
@@ -81,26 +77,26 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   const int l_iwork = 8*std::min(M,N);
   boost::shared_array<int> iwork(new int[l_iwork]);
   // Initialises LAPACK arrays
-  blitz::Array<double,2> A_blitz_lapack(ca::ccopy(A));
+  blitz::Array<double,2> A_blitz_lapack(bob::core::array::ccopy(A));
   double* A_lapack = A_blitz_lapack.data();
   // Tries to use U, Vt and S directly to limit the number of copy()
   // S_lapack = S
   blitz::Array<double,1> S_blitz_lapack;
-  const bool sigma_direct_use = ca::isCZeroBaseContiguous(sigma);
-  if( !sigma_direct_use ) S_blitz_lapack.resize(nb_singular);
-  else                    S_blitz_lapack.reference(sigma);
+  const bool sigma_direct_use = bob::core::array::isCZeroBaseContiguous(sigma);
+  if (!sigma_direct_use) S_blitz_lapack.resize(nb_singular);
+  else                   S_blitz_lapack.reference(sigma);
   double *S_lapack = S_blitz_lapack.data();
   // U_lapack = V^T
   blitz::Array<double,2> U_blitz_lapack;
-  const bool U_direct_use = ca::isCZeroBaseContiguous(Vt);
-  if( !U_direct_use )   U_blitz_lapack.resize(N,N);
-  else                  U_blitz_lapack.reference(Vt);
+  const bool U_direct_use = bob::core::array::isCZeroBaseContiguous(Vt);
+  if (!U_direct_use) U_blitz_lapack.resize(N,N);
+  else               U_blitz_lapack.reference(Vt);
   double *U_lapack = U_blitz_lapack.data();
   // V^T_lapack = U
   blitz::Array<double,2> VT_blitz_lapack;
-  const bool VT_direct_use = ca::isCZeroBaseContiguous(U);
-  if( !VT_direct_use )  VT_blitz_lapack.resize(M,M);
-  else                  VT_blitz_lapack.reference(U);
+  const bool VT_direct_use = bob::core::array::isCZeroBaseContiguous(U);
+  if (!VT_direct_use) VT_blitz_lapack.resize(M,M);
+  else                VT_blitz_lapack.reference(U);
   double *VT_lapack = VT_blitz_lapack.data();
 
   // Calls the LAPACK function:
@@ -121,18 +117,18 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
     VT_lapack, &ldvt, work.get(), &lwork, iwork.get(), &info );
  
   // Check info variable
-  if( info != 0)
-    throw math::LapackError("The LAPACK dgesdd function returned a non-zero\
+  if (info != 0)
+    throw bob::math::LapackError("The LAPACK dgesdd function returned a non-zero\
        value.");
 
   // Copy singular vectors back to U, V and sigma if required
-  if( !U_direct_use )  Vt = U_blitz_lapack;
-  if( !VT_direct_use ) U = VT_blitz_lapack;
-  if( !sigma_direct_use ) sigma = S_blitz_lapack;
+  if (!U_direct_use)  Vt = U_blitz_lapack;
+  if (!VT_direct_use) U = VT_blitz_lapack;
+  if (!sigma_direct_use) sigma = S_blitz_lapack;
 }
 
 
-void math::svd(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
+void bob::math::svd(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   blitz::Array<double,1>& sigma)
 {
   // Size variables
@@ -141,18 +137,18 @@ void math::svd(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   const int nb_singular = std::min(M,N);
 
   // Checks zero base
-  ca::assertZeroBase(A);
-  ca::assertZeroBase(U);
-  ca::assertZeroBase(sigma);
+  bob::core::array::assertZeroBase(A);
+  bob::core::array::assertZeroBase(U);
+  bob::core::array::assertZeroBase(sigma);
   // Checks and resizes if required
-  ca::assertSameDimensionLength(U.extent(0), M);
-  ca::assertSameDimensionLength(U.extent(1), nb_singular);
-  ca::assertSameDimensionLength(sigma.extent(0), nb_singular);
+  bob::core::array::assertSameDimensionLength(U.extent(0), M);
+  bob::core::array::assertSameDimensionLength(U.extent(1), nb_singular);
+  bob::core::array::assertSameDimensionLength(sigma.extent(0), nb_singular);
  
-  math::svd_(A, U, sigma);
+  bob::math::svd_(A, U, sigma);
 }
 
-void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
+void bob::math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   blitz::Array<double,1>& sigma)
 {
   // Size variables
@@ -173,21 +169,21 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   const int l_iwork = 8*std::min(M,N);
   boost::shared_array<int> iwork(new int[l_iwork]);
   // Initialises LAPACK arrays
-  blitz::Array<double,2> A_blitz_lapack(ca::ccopy(const_cast<blitz::Array<double,2>&>(A).transpose(1,0)));
+  blitz::Array<double,2> A_blitz_lapack(bob::core::array::ccopy(const_cast<blitz::Array<double,2>&>(A).transpose(1,0)));
   double* A_lapack = A_blitz_lapack.data();
   // Tries to use U and S directly to limit the number of copy()
   // S_lapack = S
   blitz::Array<double,1> S_blitz_lapack;
-  const bool sigma_direct_use = ca::isCZeroBaseContiguous(sigma);
-  if( !sigma_direct_use ) S_blitz_lapack.resize(nb_singular);
-  else                    S_blitz_lapack.reference(sigma);
+  const bool sigma_direct_use = bob::core::array::isCZeroBaseContiguous(sigma);
+  if (!sigma_direct_use) S_blitz_lapack.resize(nb_singular);
+  else                   S_blitz_lapack.reference(sigma);
   double *S_lapack = S_blitz_lapack.data();
   // U_lapack = U^T
   blitz::Array<double,2> U_blitz_lapack;
   blitz::Array<double,2> Ut = U.transpose(1,0);
-  const bool U_direct_use = ca::isCZeroBaseContiguous(Ut);
-  if( !U_direct_use )   U_blitz_lapack.resize(nb_singular,M);
-  else                  U_blitz_lapack.reference(Ut);
+  const bool U_direct_use = bob::core::array::isCZeroBaseContiguous(Ut);
+  if (!U_direct_use) U_blitz_lapack.resize(nb_singular,M);
+  else               U_blitz_lapack.reference(Ut);
   double *U_lapack = U_blitz_lapack.data();
   boost::shared_array<double> VT_lapack(new double[nb_singular*N]);
 
@@ -209,17 +205,16 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
     VT_lapack.get(), &ldvt, work.get(), &lwork, iwork.get(), &info );
  
   // Check info variable
-  if( info != 0)
-    throw math::LapackError("The LAPACK dgesdd function returned a non-zero\
-       value.");
+  if (info != 0)
+    throw bob::math::LapackError("The LAPACK dgesdd function returned a non-zero value.");
   
   // Copy singular vectors back to U, V and sigma if required
-  if( !U_direct_use )  Ut = U_blitz_lapack;
-  if( !sigma_direct_use ) sigma = S_blitz_lapack;
+  if (!U_direct_use) Ut = U_blitz_lapack;
+  if (!sigma_direct_use) sigma = S_blitz_lapack;
 }
 
 
-void math::svd(const blitz::Array<double,2>& A, blitz::Array<double,1>& sigma)
+void bob::math::svd(const blitz::Array<double,2>& A, blitz::Array<double,1>& sigma)
 {
   // Size variables
   const int M = A.extent(0);
@@ -227,15 +222,15 @@ void math::svd(const blitz::Array<double,2>& A, blitz::Array<double,1>& sigma)
   const int nb_singular = std::min(M,N);
 
   // Checks zero base
-  ca::assertZeroBase(A);
-  ca::assertZeroBase(sigma);
+  bob::core::array::assertZeroBase(A);
+  bob::core::array::assertZeroBase(sigma);
   // Checks and resizes if required
-  ca::assertSameDimensionLength(sigma.extent(0), nb_singular);
+  bob::core::array::assertSameDimensionLength(sigma.extent(0), nb_singular);
  
-  math::svd_(A, sigma);
+  bob::math::svd_(A, sigma);
 }
 
-void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,1>& sigma)
+void bob::math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,1>& sigma)
 {
   // Size variables
   const int M = A.extent(0);
@@ -256,14 +251,14 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,1>& sigma)
   boost::shared_array<int> iwork(new int[l_iwork]);
   // Initialises LAPACK arrays
   blitz::Array<double,2> A_blitz_lapack(
-    ca::ccopy(const_cast<blitz::Array<double,2>&>(A).transpose(1,0)));
+    bob::core::array::ccopy(const_cast<blitz::Array<double,2>&>(A).transpose(1,0)));
   double* A_lapack = A_blitz_lapack.data();
   // Tries to use S directly to limit the number of copy()
   // S_lapack = S
   blitz::Array<double,1> S_blitz_lapack;
-  const bool sigma_direct_use = ca::isCZeroBaseContiguous(sigma);
-  if( !sigma_direct_use ) S_blitz_lapack.resize(nb_singular);
-  else                    S_blitz_lapack.reference(sigma);
+  const bool sigma_direct_use = bob::core::array::isCZeroBaseContiguous(sigma);
+  if (!sigma_direct_use) S_blitz_lapack.resize(nb_singular);
+  else                   S_blitz_lapack.reference(sigma);
   double *S_lapack = S_blitz_lapack.data();
   double *U_lapack = 0;
   double *VT_lapack = 0;
@@ -286,10 +281,9 @@ void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,1>& sigma)
     VT_lapack, &ldvt, work.get(), &lwork, iwork.get(), &info );
  
   // Check info variable
-  if( info != 0)
-    throw math::LapackError("The LAPACK dgesdd function returned a non-zero\
-       value.");
+  if (info != 0)
+    throw bob::math::LapackError("The LAPACK dgesdd function returned a non-zero value.");
 
   // Copy singular vectors back to U, V and sigma if required
-  if( !sigma_direct_use ) sigma = S_blitz_lapack;
+  if (!sigma_direct_use) sigma = S_blitz_lapack;
 }

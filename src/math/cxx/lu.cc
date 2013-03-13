@@ -17,17 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "bob/math/lu.h"
-#include "bob/math/Exception.h"
-#include "bob/core/assert.h"
-#include "bob/core/array_copy.h"
+
+#include <bob/math/lu.h>
+#include <bob/math/Exception.h>
+#include <bob/core/assert.h>
+#include <bob/core/array_copy.h>
 #if !defined (HAVE_BLITZ_TINYVEC2_H)
 #include <blitz/tinyvec-et.h>
 #endif
 #include <algorithm>
-
-namespace math = bob::math;
-namespace ca = bob::core::array;
+#include <boost/shared_array.hpp>
 
 // Declaration of the external LAPACK functions
 // LU decomposition of a general matrix (dgetrf)
@@ -35,7 +34,7 @@ extern "C" void dgetrf_( const int *M, const int *N, double *A,
   const int *lda, int *ipiv, int *info);
 
 
-void math::lu(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
+void bob::math::lu(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
   blitz::Array<double,2>& U, blitz::Array<double,2>& P)
 {
   // Size variable
@@ -48,19 +47,19 @@ void math::lu(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
   const blitz::TinyVector<int,2> shapeU(minMN,N);
   const blitz::TinyVector<int,2> shapeP(minMN,minMN);
 
-  ca::assertZeroBase(A);
-  ca::assertZeroBase(L);
-  ca::assertZeroBase(U);
-  ca::assertZeroBase(P);
+  bob::core::array::assertZeroBase(A);
+  bob::core::array::assertZeroBase(L);
+  bob::core::array::assertZeroBase(U);
+  bob::core::array::assertZeroBase(P);
 
-  ca::assertSameShape(L,shapeL);
-  ca::assertSameShape(U,shapeU);
-  ca::assertSameShape(P,shapeP);
+  bob::core::array::assertSameShape(L,shapeL);
+  bob::core::array::assertSameShape(U,shapeU);
+  bob::core::array::assertSameShape(P,shapeP);
 
-  math::lu_(A, L, U, P);
+  bob::math::lu_(A, L, U, P);
 }
 
-void math::lu_(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
+void bob::math::lu_(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
   blitz::Array<double,2>& U, blitz::Array<double,2>& P)
 {
   // Size variable
@@ -76,17 +75,16 @@ void math::lu_(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
 
   // Initialises LAPACK arrays
   blitz::Array<double,2> A_blitz_lapack(
-    ca::ccopy(const_cast<blitz::Array<double,2>&>(A).transpose(1,0)));
+    bob::core::array::ccopy(const_cast<blitz::Array<double,2>&>(A).transpose(1,0)));
   double *A_lapack = A_blitz_lapack.data();
-  int *ipiv = new int[minMN];
+  boost::shared_array<int> ipiv(new int[minMN]);
 
   // Calls the LAPACK function 
-  dgetrf_( &M, &N, A_lapack, &lda, ipiv, &info);
+  dgetrf_( &M, &N, A_lapack, &lda, ipiv.get(), &info);
  
   // Checks info variable
-  if( info != 0)
-    throw bob::math::LapackError("The LAPACK dgetrf function returned a \
-      non-zero value.");
+  if (info != 0)
+    throw bob::math::LapackError("The LAPACK dgetrf function returned a non-zero value.");
 
   // Copy result back to L and U
   blitz::firstIndex bi;
@@ -102,7 +100,7 @@ void math::lu_(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
   blitz::Array<int,1> Pp(minMN);
   Pp = bi;
   int temp;
-  for( int i=0; i<minMN-1; ++i)
+  for (int i=0; i<minMN-1; ++i)
   {
     temp = Pp(ipiv[i]-1);
     Pp(ipiv[i]-1) = Pp(i);
@@ -110,10 +108,7 @@ void math::lu_(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
   }
   // Updates P
   P = 0.;
-  for(int j = 0; j<minMN; ++j)
+  for (int j = 0; j<minMN; ++j)
     P(j,Pp(j)) = 1.;
-  
-  // Free memory
-  delete [] ipiv;
 }
 

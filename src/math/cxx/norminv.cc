@@ -68,8 +68,7 @@ double bob::math::normsinv(const double p)
 
   // Error p should be between 0 and 1
   if (p < 0. || p > 1.)
-    throw bob::core::InvalidArgumentException("p", p, 0., 1.);
-  
+    throw bob::core::InvalidArgumentException("p", p, 0., 1.); 
   // Rational approximation for lower region.
   else if (0. < p && p < p_low)
   {

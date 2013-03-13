@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "bob/math/pavx.h"
-#include "bob/core/assert.h"
+#include <bob/math/pavx.h>
+#include <bob/core/assert.h>
 #include <algorithm>
 
 void bob::math::pavx(const blitz::Array<double,1>& y, blitz::Array<double,1>& ghat)
@@ -42,14 +42,14 @@ static size_t pavx_1(const blitz::Array<double,1>& y, blitz::Array<double,1>& gh
   index(ci) = 0;
   len(ci) = 1;
   ghat(ci) = y(ci);
-  for(int j=1; j<y.extent(0); ++j)
+  for (int j=1; j<y.extent(0); ++j)
   {
     // a new index interval "j" is created:
     ++ci;
     index(ci) = j;
     len(ci) = 1;
     ghat(ci) = y(j);
-    while(ci >= 1 && ghat(std::max((int)ci-1,0)) >= ghat(ci))
+    while (ci >= 1 && ghat(std::max((int)ci-1,0)) >= ghat(ci))
     {
       // "pool adjacent violators"
       double nw = len(ci-1) + len(ci);
@@ -65,7 +65,7 @@ static void pavx_2(blitz::Array<double,1>& ghat, blitz::Array<size_t,1>& index, 
 {
   // define ghat for all indices
   int n = index.extent(0);
-  while(n >= 1)
+  while (n >= 1)
   {
     blitz::Range r((int)index(ci),n-1);
     ghat(r) = ghat(ci);
