@@ -68,15 +68,13 @@ static void im_peek(const std::string& path, bob::core::array::typeinfo& info)
   //    is supplied, so that we know if the application was compiled with a 
   //    compatible version of the library.
   png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-  // TODO: specialized exception
-  if(png_ptr == NULL) throw bob::io::Exception();
+  if(png_ptr == NULL) throw std::runtime_error("PNG: error while creating read png structure (function png_create_read_struct())");
 
   // Allocate/initialize the memory for image information.
   info_ptr = png_create_info_struct(png_ptr);
   if(info_ptr == NULL) { 
     png_destroy_read_struct(&png_ptr, NULL, NULL); 
-    // TODO: specialized exception
-    throw bob::io::Exception(); 
+    throw std::runtime_error("PNG: error while creating info png structure (function png_create_info_struct())");
   }
 
   // 4. Set error handling if you are using the setjmp/longjmp method (this is
@@ -86,7 +84,7 @@ static void im_peek(const std::string& path, bob::core::array::typeinfo& info)
   {
     // Free all of the memory associated with the png_ptr and info_ptr
     png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-    throw bob::io::Exception(); 
+    throw std::runtime_error("PNG: error while setting error handling (function setjmp(png_jmpbuf(()))");
   }
 
   // 5. Initialize
@@ -111,8 +109,7 @@ static void im_peek(const std::string& path, bob::core::array::typeinfo& info)
   else if (color_type == PNG_COLOR_TYPE_RGB)
     info.nd = 3;
   else // Unsupported color type
-    // TODO: specialized exception
-    throw bob::io::Exception();
+    throw bob::io::ImageUnsupportedColorspace();
   if(info.nd == 2)
   {
     info.shape[0] = height;
@@ -221,15 +218,13 @@ static void im_load(const std::string& filename, bob::core::array::interface& b)
   // functions. The compiler header file version is supplied, so that we 
   // know if the application was compiled with a compatible version of the library.
   png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-  // TODO: specialized exception
-  if(png_ptr == NULL) throw bob::io::Exception();
+  if(png_ptr == NULL) throw std::runtime_error("PNG: error while creating read png structure (function png_create_read_struct())");
 
   // Allocate/initialize the memory for image informatio
   info_ptr = png_create_info_struct(png_ptr);
   if(info_ptr == NULL) { 
     png_destroy_read_struct(&png_ptr, NULL, NULL); 
-  // TODO: specialized exception
-    throw bob::io::Exception(); 
+    throw std::runtime_error("PNG: error while creating info png structure (function png_create_info_struct())");
   }
 
   // 4. Set error handling if you are using the setjmp/longjmp method (this is
@@ -239,8 +234,7 @@ static void im_load(const std::string& filename, bob::core::array::interface& b)
   {
     // Free all of the memory associated with the png_ptr and info_ptr
     png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-    // TODO: specialized exception
-    throw bob::io::Exception(); 
+    throw std::runtime_error("PNG: error while setting error handling (function setjmp(png_jmpbuf(()))");
   }
 
   // 5. Initialize
@@ -265,8 +259,7 @@ static void im_load(const std::string& filename, bob::core::array::interface& b)
 
   // We currently only support grayscale and rgb images
   if(color_type != PNG_COLOR_TYPE_GRAY && color_type != PNG_COLOR_TYPE_RGB)
-    // TODO: specialized exception
-    throw bob::io::Exception();
+    throw bob::io::ImageUnsupportedColorspace();
 
   // 7. Read content
   const bob::core::array::typeinfo& info = b.type();
@@ -375,8 +368,7 @@ static void im_save(const std::string& filename, const bob::core::array::interfa
   if(info_ptr == NULL)
   {
     png_destroy_write_struct(&png_ptr,  NULL);
-    // TODO: specialized exception
-    throw bob::io::Exception();
+    throw std::runtime_error("PNG: error while creating info png structure (function png_create_info_struct())");
   }
 
   // 4. Set error handling. 
@@ -386,8 +378,7 @@ static void im_save(const std::string& filename, const bob::core::array::interfa
   {
     // If we get here, we had a problem writing the file
     png_destroy_write_struct(&png_ptr, &info_ptr);
-    // TODO: specialized exception
-    throw bob::io::Exception();
+    throw std::runtime_error("PNG: error while setting error handling (function setjmp(png_jmpbuf(()))");
   }
 
   // 5. Initialize

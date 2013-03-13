@@ -98,21 +98,21 @@ void im_load_gray(boost::shared_ptr<TIFF> in_file, bob::core::array::interface& 
   unsigned long buffer_size = n_strips * strip_size;
   boost::shared_array<unsigned char> buffer_(new unsigned char[buffer_size]);
   unsigned char* buffer = buffer_.get();
-  if(buffer == 0) throw bob::io::Exception();
+  if(buffer == 0) throw std::runtime_error("TIFF: error while getting the color buffer");
   
   tsize_t result;
   tsize_t image_offset = 0;
   for(tstrip_t strip_count=0; strip_count<n_strips; ++strip_count) 
   {
     if((result = TIFFReadEncodedStrip(in_file.get(), strip_count, buffer+image_offset, strip_size)) == -1)
-      throw bob::io::Exception();
+      throw std::runtime_error("TIFF: error in function TIFFReadEncodedStrip()");
     image_offset += result;
   }
 
   // Deal with photometric interpretations
   uint16 photo = PHOTOMETRIC_MINISBLACK;
   if(TIFFGetField(in_file.get(), TIFFTAG_PHOTOMETRIC, &photo) == 0 || (photo != PHOTOMETRIC_MINISBLACK && photo != PHOTOMETRIC_MINISWHITE))
-    throw bob::io::Exception(); 
+    throw std::runtime_error("TIFF: error in function TIFFGetField()");
 
   if(photo != PHOTOMETRIC_MINISBLACK) 
   {
@@ -176,14 +176,14 @@ void im_load_color(boost::shared_ptr<TIFF> in_file, bob::core::array::interface&
   unsigned long buffer_size = n_strips * strip_size;
   boost::shared_array<unsigned char> buffer_(new unsigned char[buffer_size]);
   unsigned char* buffer = buffer_.get();
-  if(buffer == 0) throw bob::io::Exception();
+  if(buffer == 0) throw std::runtime_error("TIFF: error while getting the color buffer");
   
   tsize_t result;
   tsize_t image_offset = 0;
   for(tstrip_t strip_count=0; strip_count<n_strips; ++strip_count) 
   {
     if((result = TIFFReadEncodedStrip(in_file.get(), strip_count, buffer+image_offset, strip_size)) == -1)
-      throw bob::io::Exception();
+      throw std::runtime_error("TIFF: error in function TIFFReadEncodedStrip()");
 
     image_offset += result;
   }
@@ -191,7 +191,7 @@ void im_load_color(boost::shared_ptr<TIFF> in_file, bob::core::array::interface&
   // Deal with photometric interpretations
   uint16 photo = PHOTOMETRIC_RGB;
   if(TIFFGetField(in_file.get(), TIFFTAG_PHOTOMETRIC, &photo) == 0 || photo != PHOTOMETRIC_RGB)
-    throw bob::io::Exception(); 
+    throw std::runtime_error("TIFF: error in function TIFFGetField()");
 
   // Deal with fillorder
   uint16 fillorder = FILLORDER_MSB2LSB;
