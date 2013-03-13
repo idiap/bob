@@ -56,7 +56,7 @@ Required at runtime
 +----------------------+--------------+---------------------------------------+
 | `NumPy`_             | 1.3          | `BSD-3-Clause`_                       |
 +----------------------+--------------+---------------------------------------+
-| `Scipy`_             | 0.7?         | `BSD-3-Clause`_                       |
+| `SciPy`_             | 0.7?         | `BSD-3-Clause`_                       |
 +----------------------+--------------+---------------------------------------+
 | `Matplotlib`_        | 0.99         | Based on `Python-2.0`_                |
 +----------------------+--------------+---------------------------------------+
@@ -175,7 +175,7 @@ Core dependencies
 * `Python`_: if you want to compile our python bindings we recommend using
   Python 2.5 or up.
 * `NumPy`_: this dependence is used to bridge blitz::Arrays to python.
-* `Scipy`_: a set of scientific-related python-based utilities.
+* `SciPy`_: a set of scientific-related python-based utilities.
 * `Matplotlib`_: a `MATLAB`_-like python plotting environment.
 * `Qt4`_: this library is used as the basis for the face detection and
   localization framework (Visioner). This dependence is *optional*. Face
