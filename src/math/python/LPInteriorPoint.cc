@@ -1,5 +1,5 @@
 /**
- * @file math/python/interiorpointLP.cc
+ * @file math/python/LPInteriorPoint.cc
  * @date Fri Jan 27 21:06:59 2012 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

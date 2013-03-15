@@ -1,5 +1,5 @@
 /**
- * @file bob/math/interiorpointLP.h
+ * @file bob/math/LPInteriorPoint.h
  * @date Thu Mar 31 14:32:14 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -135,8 +135,6 @@ class LPInteriorPoint
      * @param x The x primal variable
      * @param lambda The lambda dual variable
      * @param mu The mu dual variable
-     * @param epsilon The precision to determine whether an equality
-     *   constraint is fulfilled or not.
      */
     virtual bool isFeasible(const blitz::Array<double,2>& A,
       const blitz::Array<double,1>& b, const blitz::Array<double,1>& c,
@@ -169,8 +167,6 @@ class LPInteriorPoint
      * @param x The x primal variable
      * @param lambda The lambda dual variable
      * @param mu The mu dual variable
-     * @param epsilon The precision to determine whether an equality
-     *   constraint is fulfilled or not.
      * @param theta The value defining the size of the V2 neighborhood
      */
     virtual bool isInVS(const blitz::Array<double,2>& A,
@@ -221,12 +217,9 @@ class LPInteriorPoint
      *   indices.
      *
      * @param x The current x primal solution of the linear program
-     * @param mu The current mu dual solution of the linear program
      * @param sigma The coefficient sigma which quantifies how close we 
      *   want to stay from the central path.
      * @param m
-     * @param A_large The large left matrix of the system
-     * @param b_large The large right vector of the system
      */
     virtual void updateLargeSystem(const blitz::Array<double,1>& x, 
       const double sigma, const int m) const;
