@@ -21,18 +21,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/sp/DCT1D.h"
-#include "bob/core/assert.h"
+#include <bob/sp/DCT1D.h>
+#include <bob/core/assert.h>
 #include <fftw3.h>
 
-bob::sp::DCT1DAbstract::DCT1DAbstract( const size_t length):
+bob::sp::DCT1DAbstract::DCT1DAbstract(const size_t length):
   m_length(length)
 {
   // Initialize working array and normalization factors
   reset();
 }
 
-bob::sp::DCT1DAbstract::DCT1DAbstract( const bob::sp::DCT1DAbstract& other):
+bob::sp::DCT1DAbstract::DCT1DAbstract(const bob::sp::DCT1DAbstract& other):
   m_length(other.m_length)
 {
   // Initialize working array and normalization factors
@@ -43,10 +43,9 @@ bob::sp::DCT1DAbstract::~DCT1DAbstract()
 {
 }
 
-const bob::sp::DCT1DAbstract& bob::sp::DCT1DAbstract::operator=(const DCT1DAbstract& other)
+bob::sp::DCT1DAbstract& bob::sp::DCT1DAbstract::operator=(const DCT1DAbstract& other)
 {
-  if(this != &other)
-  {
+  if (this != &other) {
     reset(other.m_length);
   }
   return *this;
@@ -64,7 +63,7 @@ bool bob::sp::DCT1DAbstract::operator!=(const bob::sp::DCT1DAbstract& b) const
 
 void bob::sp::DCT1DAbstract::reset(const size_t length)
 {
-  if( m_length != length) {
+  if (m_length != length) {
     // Update the length
     m_length = length;
     // Reset given the new height and width
@@ -86,10 +85,10 @@ void bob::sp::DCT1DAbstract::reset()
 void bob::sp::DCT1DAbstract::initNormFactors()
 {
   // Precompute multiplicative factors
-  m_sqrt_1byl=sqrt(1./(double)m_length);
-  m_sqrt_2byl=sqrt(2./(double)m_length);
-  m_sqrt_1l=sqrt(1.*(double)m_length);
-  m_sqrt_2l=sqrt(2.*(double)m_length);
+  m_sqrt_1byl = sqrt(1./(double)m_length);
+  m_sqrt_2byl = sqrt(2./(double)m_length);
+  m_sqrt_1l = sqrt(1.*(double)m_length);
+  m_sqrt_2l = sqrt(2.*(double)m_length);
 }
 
 
@@ -105,25 +104,6 @@ bob::sp::DCT1D::DCT1D( const bob::sp::DCT1D& other):
 
 bob::sp::DCT1D::~DCT1D()
 {
-}
-
-const bob::sp::DCT1D& bob::sp::DCT1D::operator=(const DCT1D& other)
-{
-  if(this != &other)
-  {
-    bob::sp::DCT1DAbstract::operator=(other);
-  }
-  return *this;
-}
-
-bool bob::sp::DCT1D::operator==(const bob::sp::DCT1D& b) const
-{
-  return (bob::sp::DCT1DAbstract::operator==(b));
-}
-
-bool bob::sp::DCT1D::operator!=(const bob::sp::DCT1D& b) const
-{
-  return !(this->operator==(b));
 }
 
 void bob::sp::DCT1D::operator()(const blitz::Array<double,1>& src, 
@@ -149,45 +129,25 @@ void bob::sp::DCT1D::operator()(const blitz::Array<double,1>& src,
 
   // Normalize
   dst(0) *= m_sqrt_1byl/2.;
-  if(dst.extent(0)>1)
-  {
+  if (dst.extent(0)>1) {
     blitz::Range r_dst(1, dst.ubound(0) );
     dst(r_dst) *= m_sqrt_2byl/2.;
   }
 }
 
 
-bob::sp::IDCT1D::IDCT1D( const size_t length):
+bob::sp::IDCT1D::IDCT1D(const size_t length):
   bob::sp::DCT1DAbstract(length)
 {
 }
 
-bob::sp::IDCT1D::IDCT1D( const bob::sp::IDCT1D& other):
+bob::sp::IDCT1D::IDCT1D(const bob::sp::IDCT1D& other):
   bob::sp::DCT1DAbstract(other)
 {
 }
 
 bob::sp::IDCT1D::~IDCT1D()
 {
-}
-
-const bob::sp::IDCT1D& bob::sp::IDCT1D::operator=(const IDCT1D& other)
-{
-  if(this != &other)
-  {
-    bob::sp::DCT1DAbstract::operator=(other);
-  }
-  return *this;
-}
-
-bool bob::sp::IDCT1D::operator==(const bob::sp::IDCT1D& b) const
-{
-  return (bob::sp::DCT1DAbstract::operator==(b));
-}
-
-bool bob::sp::IDCT1D::operator!=(const bob::sp::IDCT1D& b) const
-{
-  return !(this->operator==(b));
 }
 
 void bob::sp::IDCT1D::operator()(const blitz::Array<double,1>& src, 
@@ -205,9 +165,8 @@ void bob::sp::IDCT1D::operator()(const blitz::Array<double,1>& src,
 
   // Normalize
   dst(0) /= m_sqrt_1l;
-  if(dst.extent(0)>1)
-  {
-    blitz::Range r_dst(1, dst.ubound(0) );
+  if (dst.extent(0)>1) {
+    blitz::Range r_dst(1, dst.ubound(0));
     dst(r_dst) /= m_sqrt_2l;
   }
 

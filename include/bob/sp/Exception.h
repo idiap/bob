@@ -23,54 +23,53 @@
 #ifndef BOB_SP_EXCEPTION_H 
 #define BOB_SP_EXCEPTION_H
 
-#include "bob/core/Exception.h"
+#include <bob/core/Exception.h>
 
 namespace bob { namespace sp {
 
-  class Exception: public bob::core::Exception {
+class Exception: public bob::core::Exception {
 
-    public:
-      Exception() throw();
-      virtual ~Exception() throw();
-      virtual const char* what() const throw();
+  public:
+    Exception() throw();
+    virtual ~Exception() throw();
+    virtual const char* what() const throw();
 
-  };
+};
 
-  class ExtrapolationDstTooSmall: public Exception {
-    public:
-      ExtrapolationDstTooSmall() throw();
-      virtual ~ExtrapolationDstTooSmall() throw();
-      virtual const char* what() const throw();
+class ExtrapolationDstTooSmall: public Exception {
+  public:
+    ExtrapolationDstTooSmall() throw();
+    virtual ~ExtrapolationDstTooSmall() throw();
+    virtual const char* what() const throw();
 
-    private:
-      mutable std::string m_message;
-  };
+  private:
+    mutable std::string m_message;
+};
 
-  class ConvolutionKernelTooLarge: public Exception {
-    public:
-      ConvolutionKernelTooLarge(int dim, int size_array, int size_kernel) throw();
-      virtual ~ConvolutionKernelTooLarge() throw();
-      virtual const char* what() const throw();
+class ConvolutionKernelTooLarge: public Exception {
+  public:
+    ConvolutionKernelTooLarge(int dim, int size_array, int size_kernel) throw();
+    virtual ~ConvolutionKernelTooLarge() throw();
+    virtual const char* what() const throw();
 
-    private:
-      mutable std::string m_message;
-      int m_dim;
-      int m_size_array;
-      int m_size_kernel;
-  };
+  private:
+    mutable std::string m_message;
+    int m_dim;
+    int m_size_array;
+    int m_size_kernel;
+};
 
-  class SeparableConvolutionInvalidDim: public Exception {
-    public:
-      SeparableConvolutionInvalidDim(int dim, int max_dim) throw();
-      virtual ~SeparableConvolutionInvalidDim() throw();
-      virtual const char* what() const throw();
+class SeparableConvolutionInvalidDim: public Exception {
+  public:
+    SeparableConvolutionInvalidDim(int dim, int max_dim) throw();
+    virtual ~SeparableConvolutionInvalidDim() throw();
+    virtual const char* what() const throw();
 
-    private:
-      mutable std::string m_message;
-      int m_dim;
-      int m_max_dim;
-  };
-
+  private:
+    mutable std::string m_message;
+    int m_dim;
+    int m_max_dim;
+};
 
 }}
 

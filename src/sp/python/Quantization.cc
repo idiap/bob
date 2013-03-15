@@ -20,9 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/sp/Quantization.h"
+#include <bob/sp/Quantization.h>
 
-#include "bob/core/python/ndarray.h"
+#include <bob/core/python/ndarray.h>
 #include <boost/make_shared.hpp>
 
 using namespace boost::python;

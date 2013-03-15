@@ -21,19 +21,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <bob/sp/Exception.h>
 #include <boost/format.hpp>
-#include "bob/sp/Exception.h"
 
-namespace sp = bob::sp;
-namespace core = bob::core;
-
-sp::Exception::Exception() throw() {
+bob::sp::Exception::Exception() throw() {
 }
 
-sp::Exception::~Exception() throw() {
+bob::sp::Exception::~Exception() throw() {
 }
 
-const char* sp::Exception::what() const throw() {
+const char* bob::sp::Exception::what() const throw() {
   static const char* what_string = "Generic ip::Exception: user \
     specialization has not overwritten what() or is throwing an object of \
     this class (in which case, please fix it!)";
@@ -41,37 +38,37 @@ const char* sp::Exception::what() const throw() {
 }
 
 
-sp::ExtrapolationDstTooSmall::ExtrapolationDstTooSmall() throw()
+bob::sp::ExtrapolationDstTooSmall::ExtrapolationDstTooSmall() throw()
 {
 }
 
-sp::ExtrapolationDstTooSmall::~ExtrapolationDstTooSmall() throw()
+bob::sp::ExtrapolationDstTooSmall::~ExtrapolationDstTooSmall() throw()
 {
 }
 
-const char* sp::ExtrapolationDstTooSmall::what() const throw() {
+const char* bob::sp::ExtrapolationDstTooSmall::what() const throw() {
   try {
     boost::format message(
       "The destination array is smaller than the source input array.");
     m_message = message.str();
     return m_message.c_str();
   } catch (...) {
-    static const char* emergency = "sp::ExtrapolationDstTooSmall: cannot \
+    static const char* emergency = "bob::sp::ExtrapolationDstTooSmall: cannot \
       format, exception raised";
     return emergency;
   }
 }
 
-sp::ConvolutionKernelTooLarge::ConvolutionKernelTooLarge(int dim, int s_a, int s_k) throw():
+bob::sp::ConvolutionKernelTooLarge::ConvolutionKernelTooLarge(int dim, int s_a, int s_k) throw():
   m_dim(dim), m_size_array(s_a), m_size_kernel(s_k)
 {
 }
 
-sp::ConvolutionKernelTooLarge::~ConvolutionKernelTooLarge() throw()
+bob::sp::ConvolutionKernelTooLarge::~ConvolutionKernelTooLarge() throw()
 {
 }
 
-const char* sp::ConvolutionKernelTooLarge::what() const throw() {
+const char* bob::sp::ConvolutionKernelTooLarge::what() const throw() {
   try {
     boost::format message(
       "The convolutional kernel has dimension %d larger than the corresponding \
@@ -83,22 +80,22 @@ const char* sp::ConvolutionKernelTooLarge::what() const throw() {
     m_message = message.str();
     return m_message.c_str();
   } catch (...) {
-    static const char* emergency = "sp::ConvolutionKernelTooLarge: cannot \
+    static const char* emergency = "bob::sp::ConvolutionKernelTooLarge: cannot \
       format, exception raised";
     return emergency;
   }
 }
 
-sp::SeparableConvolutionInvalidDim::SeparableConvolutionInvalidDim(int dim, int max_dim) throw():
+bob::sp::SeparableConvolutionInvalidDim::SeparableConvolutionInvalidDim(int dim, int max_dim) throw():
   m_dim(dim), m_max_dim(max_dim)
 {
 }
 
-sp::SeparableConvolutionInvalidDim::~SeparableConvolutionInvalidDim() throw()
+bob::sp::SeparableConvolutionInvalidDim::~SeparableConvolutionInvalidDim() throw()
 {
 }
 
-const char* sp::SeparableConvolutionInvalidDim::what() const throw() {
+const char* bob::sp::SeparableConvolutionInvalidDim::what() const throw() {
   try {
     boost::format message(
       "Cannot perform a separable convolution along dimension %d. The maximal dimension \
@@ -108,7 +105,7 @@ const char* sp::SeparableConvolutionInvalidDim::what() const throw() {
     m_message = message.str();
     return m_message.c_str();
   } catch (...) {
-    static const char* emergency = "sp::SeparableConvolutionInvalidDim: cannot \
+    static const char* emergency = "bob::sp::SeparableConvolutionInvalidDim: cannot \
       format, exception raised";
     return emergency;
   }

@@ -20,23 +20,52 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/sp/FFT2DNaive.h"
-#include "bob/core/assert.h"
+#include <bob/sp/FFT2DNaive.h>
+#include <bob/core/assert.h>
 
-namespace ca = bob::core::array;
-namespace spd = bob::sp::detail;
-
-spd::FFT2DNaiveAbstract::FFT2DNaiveAbstract( const int height, const int width):
-  m_height(height), m_width(width), m_wsave_h(0), m_wsave_w(0)
+bob::sp::detail::FFT2DNaiveAbstract::FFT2DNaiveAbstract(
+    const size_t height, const size_t width):
+  m_height(height), m_width(width)
 {
   // Initialize working array and normalization factors
   reset();
 }
 
-void spd::FFT2DNaiveAbstract::reset(const int height, const int width)
+bob::sp::detail::FFT2DNaiveAbstract::FFT2DNaiveAbstract(
+    const bob::sp::detail::FFT2DNaiveAbstract& other):
+  m_height(other.m_height), m_width(other.m_width)
+{
+  // Initialize working array and normalization factors
+  reset();
+}
+
+bob::sp::detail::FFT2DNaiveAbstract::~FFT2DNaiveAbstract()
+{
+}
+
+bob::sp::detail::FFT2DNaiveAbstract& 
+bob::sp::detail::FFT2DNaiveAbstract::operator=(const FFT2DNaiveAbstract& other)
+{
+  if (this != &other) {
+    reset(other.m_height, other.m_width);
+  }
+  return *this;
+}
+
+bool bob::sp::detail::FFT2DNaiveAbstract::operator==(const bob::sp::detail::FFT2DNaiveAbstract& b) const
+{
+  return (this->m_height == b.m_height && this->m_width == b.m_width);
+}
+
+bool bob::sp::detail::FFT2DNaiveAbstract::operator!=(const bob::sp::detail::FFT2DNaiveAbstract& b) const
+{
+  return !(this->operator==(b));
+}
+
+void bob::sp::detail::FFT2DNaiveAbstract::reset(const size_t height, const size_t width)
 {
   // Reset if required
-  if( m_height != height || m_width != width) {
+  if (m_height != height || m_width != width) {
     // Update
     m_height = height;
     m_width = width;
@@ -44,101 +73,124 @@ void spd::FFT2DNaiveAbstract::reset(const int height, const int width)
     reset();
   }
 }
+
+void bob::sp::detail::FFT2DNaiveAbstract::setHeight(const size_t height)
+{
+  reset(height, m_width);
+}
+
+void bob::sp::detail::FFT2DNaiveAbstract::setWidth(const size_t width)
+{
+  reset(m_height, width);
+}
  
-void spd::FFT2DNaiveAbstract::reset()
+void bob::sp::detail::FFT2DNaiveAbstract::reset()
 {
   // Precompute working array to save computation time
   initWorkingArrays();
 }
 
-spd::FFT2DNaiveAbstract::~FFT2DNaiveAbstract()
+void bob::sp::detail::FFT2DNaiveAbstract::initWorkingArrays() 
 {
-}
-
-void spd::FFT2DNaiveAbstract::initWorkingArrays() 
-{
+  blitz::firstIndex i;
   std::complex<double> J(0.,1.);
-  if( m_wsave_h.extent(0) != m_height)
+  if (m_wsave_h.extent(0) != (int)m_height)
     m_wsave_h.resize(m_height);
-  for( int i=0; i<m_height; ++i)
-    m_wsave_h(i) = exp(-(J * 2. * (M_PI * i))/(double)m_height);
-  if( m_wsave_w.extent(0) != m_width)
+  m_wsave_h = exp(-(J * 2. * (M_PI * i))/(double)m_height);
+  if (m_wsave_w.extent(0) != (int)m_width)
     m_wsave_w.resize(m_width);
-  for( int i=0; i<m_width; ++i)
-    m_wsave_w(i) = exp(-(J * 2. * (M_PI * i))/(double)m_width);
+  m_wsave_w = exp(-(J * 2. * (M_PI * i))/(double)m_width);
 }
 
-spd::FFT2DNaive::FFT2DNaive( const int height, const int width):
-  spd::FFT2DNaiveAbstract::FFT2DNaiveAbstract(height,width)
+bob::sp::detail::FFT2DNaive::FFT2DNaive(const size_t height, const size_t width):
+  bob::sp::detail::FFT2DNaiveAbstract::FFT2DNaiveAbstract(height,width)
 {
 }
 
-void spd::FFT2DNaive::operator()(const blitz::Array<std::complex<double>,2>& src, 
+bob::sp::detail::FFT2DNaive::FFT2DNaive(const bob::sp::detail::FFT2DNaive& other):
+  bob::sp::detail::FFT2DNaiveAbstract(other)
+{
+}
+
+bob::sp::detail::FFT2DNaive::~FFT2DNaive()
+{
+}
+
+void bob::sp::detail::FFT2DNaive::operator()(const blitz::Array<std::complex<double>,2>& src, 
   blitz::Array<std::complex<double>,2>& dst)
 {
   // Check input, inclusive dimension
-  ca::assertZeroBase(src);
+  bob::core::array::assertZeroBase(src);
   const blitz::TinyVector<int,2> shape(m_height,m_width);
-  ca::assertSameShape(src, shape);
+  bob::core::array::assertSameShape(src, shape);
 
   // Check output
-  ca::assertCZeroBaseContiguous(dst);
-  ca::assertSameShape( dst, src);
+  bob::core::array::assertCZeroBaseContiguous(dst);
+  bob::core::array::assertSameShape(dst, src);
 
   // Process
   processNoCheck(src, dst);
 }
 
-void spd::FFT2DNaive::processNoCheck(const blitz::Array<std::complex<double>,2>& src, 
+void bob::sp::detail::FFT2DNaive::processNoCheck(const blitz::Array<std::complex<double>,2>& src, 
   blitz::Array<std::complex<double>,2>& dst)
 {
   // Compute the FFT
   dst = 0.;
   int ind_yv, ind_xu; // indices in the working array using the periodicity of exp(J*x)
-  for( int y=0; y<m_height; ++y)
-    for( int x=0; x<m_width; ++x)
-      for( int v=0; v<m_height; ++v)
-        for( int u=0; u<m_width; ++u) {
-          ind_yv = (y*v) % m_height;
-          ind_xu = (x*u) % m_width;
+  for (int y=0; y<(int)m_height; ++y)
+    for (int x=0; x<(int)m_width; ++x)
+      for (int v=0; v<(int)m_height; ++v)
+        for (int u=0; u<(int)m_width; ++u) {
+          ind_yv = (y*v) % (int)m_height;
+          ind_xu = (x*u) % (int)m_width;
           dst(y,x) += src(v,u) * m_wsave_h(ind_yv) * m_wsave_w(ind_xu);
         }
 }
 
 
-spd::IFFT2DNaive::IFFT2DNaive( const int height, const int width):
-  spd::FFT2DNaiveAbstract::FFT2DNaiveAbstract(height,width)
+bob::sp::detail::IFFT2DNaive::IFFT2DNaive(const size_t height, const size_t width):
+  bob::sp::detail::FFT2DNaiveAbstract::FFT2DNaiveAbstract(height,width)
 {
 }
 
-void spd::IFFT2DNaive::operator()(const blitz::Array<std::complex<double>,2>& src, 
+bob::sp::detail::IFFT2DNaive::IFFT2DNaive(const bob::sp::detail::IFFT2DNaive& other):
+  bob::sp::detail::FFT2DNaiveAbstract(other)
+{
+}
+
+bob::sp::detail::IFFT2DNaive::~IFFT2DNaive()
+{
+}
+
+void bob::sp::detail::IFFT2DNaive::operator()(const blitz::Array<std::complex<double>,2>& src, 
   blitz::Array<std::complex<double>,2>& dst)
 {
   // Check input, inclusive dimension
-  ca::assertZeroBase(src);
+  bob::core::array::assertZeroBase(src);
   const blitz::TinyVector<int,2> shape(m_height,m_width);
-  ca::assertSameShape(src, shape);
+  bob::core::array::assertSameShape(src, shape);
 
   // Check output
-  ca::assertCZeroBaseContiguous(dst);
-  ca::assertSameShape( dst, src);
+  bob::core::array::assertCZeroBaseContiguous(dst);
+  bob::core::array::assertSameShape( dst, src);
 
   // Process
   processNoCheck(src, dst);
 }
 
-void spd::IFFT2DNaive::processNoCheck(const blitz::Array<std::complex<double>,2>& src, 
+void bob::sp::detail::IFFT2DNaive::processNoCheck(const blitz::Array<std::complex<double>,2>& src, 
   blitz::Array<std::complex<double>,2>& dst)
 {
   // Compute the IFFT
   dst = 0.;
   int ind_yv, ind_xu; // indices in the working array using the periodicity of exp(J*x)
-  for( int y=0; y<m_height; ++y)
-    for( int x=0; x<m_width; ++x)
-      for( int v=0; v<m_height; ++v)
-        for( int u=0; u<m_width; ++u) {
-          ind_yv = (((-y*v) % m_height) + m_height) % m_height;
-          ind_xu = (((-x*u) % m_width) + m_width) % m_width;
+  for (int y=0; y<(int)m_height; ++y)
+    for (int x=0; x<(int)m_width; ++x)
+      for (int v=0; v<(int)m_height; ++v)
+        for (int u=0; u<(int)m_width; ++u) {
+          ind_yv = (((-y*v) % (int)m_height) + (int)m_height) % (int)m_height;
+          ind_xu = (((-x*u) % (int)m_width) + (int)m_width) % (int)m_width;
           dst(y,x) += src(v,u) * m_wsave_h(ind_yv) * m_wsave_w(ind_xu);
         }
   dst /= (double)(m_height*m_width);

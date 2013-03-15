@@ -20,23 +20,51 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/sp/DCT1DNaive.h"
-#include "bob/core/assert.h"
+#include <bob/sp/DCT1DNaive.h>
+#include <bob/core/assert.h>
 
-namespace ca = bob::core::array;
-namespace spd = bob::sp::detail;
-
-spd::DCT1DNaiveAbstract::DCT1DNaiveAbstract( const int length):
-  m_length(length), m_wsave(0)
+bob::sp::detail::DCT1DNaiveAbstract::DCT1DNaiveAbstract(const size_t length):
+  m_length(length)
 {
   // Initialize working array and normalization factors
   reset();
 }
 
-void spd::DCT1DNaiveAbstract::reset(const int length)
+bob::sp::detail::DCT1DNaiveAbstract::DCT1DNaiveAbstract(
+    const bob::sp::detail::DCT1DNaiveAbstract& other):
+  m_length(other.m_length)
+{
+  // Initialize working array and normalization factors
+  reset();
+}
+
+bob::sp::detail::DCT1DNaiveAbstract::~DCT1DNaiveAbstract()
+{
+}
+
+bob::sp::detail::DCT1DNaiveAbstract& 
+bob::sp::detail::DCT1DNaiveAbstract::operator=(const DCT1DNaiveAbstract& other)
+{
+  if (this != &other) {
+    reset(other.m_length);
+  }
+  return *this;
+}
+
+bool bob::sp::detail::DCT1DNaiveAbstract::operator==(const bob::sp::detail::DCT1DNaiveAbstract& b) const
+{
+  return (this->m_length == b.m_length);
+}
+
+bool bob::sp::detail::DCT1DNaiveAbstract::operator!=(const bob::sp::detail::DCT1DNaiveAbstract& b) const
+{
+  return !(this->operator==(b));
+}
+
+void bob::sp::detail::DCT1DNaiveAbstract::reset(const size_t length)
 {
   // Reset if required
-  if( m_length != length) {
+  if (m_length != length) {
     // Update the length
     m_length = length;
     // Reset given the new height and width
@@ -44,7 +72,12 @@ void spd::DCT1DNaiveAbstract::reset(const int length)
   }
 }
  
-void spd::DCT1DNaiveAbstract::reset()
+void bob::sp::detail::DCT1DNaiveAbstract::setLength(const size_t length)
+{
+  reset(length);
+}
+ 
+void bob::sp::detail::DCT1DNaiveAbstract::reset()
 {
   // Precompute some normalization factors
   initNormFactors();
@@ -52,57 +85,61 @@ void spd::DCT1DNaiveAbstract::reset()
   initWorkingArray();
 }
 
-spd::DCT1DNaiveAbstract::~DCT1DNaiveAbstract()
-{
-}
-
-void spd::DCT1DNaiveAbstract::initNormFactors()
+void bob::sp::detail::DCT1DNaiveAbstract::initNormFactors()
 {
   // Precompute multiplicative factors
-  m_sqrt_1l=sqrt(1./m_length);
-  m_sqrt_2l=sqrt(2./m_length);
+  m_sqrt_1l = sqrt(1./(int)m_length);
+  m_sqrt_2l = sqrt(2./(int)m_length);
 }
 
-void spd::DCT1DNaiveAbstract::initWorkingArray() 
+void bob::sp::detail::DCT1DNaiveAbstract::initWorkingArray() 
 {
-  int n_wsave = 4*m_length;
+  int n_wsave = 4*(int)m_length;
   m_wsave.resize(n_wsave);
   blitz::firstIndex i;
-  m_wsave = cos(M_PI/(2*m_length)*i);
+  m_wsave = cos(M_PI/(2*(int)m_length)*i);
 }
 
-spd::DCT1DNaive::DCT1DNaive( const int length):
-  spd::DCT1DNaiveAbstract::DCT1DNaiveAbstract(length)
+bob::sp::detail::DCT1DNaive::DCT1DNaive(const size_t length):
+  bob::sp::detail::DCT1DNaiveAbstract(length)
 {
 }
 
-void spd::DCT1DNaive::operator()(const blitz::Array<double,1>& src, 
+bob::sp::detail::DCT1DNaive::DCT1DNaive(const bob::sp::detail::DCT1DNaive& other):
+  bob::sp::detail::DCT1DNaiveAbstract(other)
+{
+}
+
+bob::sp::detail::DCT1DNaive::~DCT1DNaive()
+{
+}
+
+void bob::sp::detail::DCT1DNaive::operator()(const blitz::Array<double,1>& src, 
   blitz::Array<double,1>& dst)
 {
   // Check input, inclusive dimension
-  ca::assertZeroBase(src);
-  const blitz::TinyVector<int,1> shape(m_length);
-  ca::assertSameShape(src, shape);
+  bob::core::array::assertZeroBase(src);
+  bob::core::array::assertSameDimensionLength(src.extent(0), (int)m_length);
 
   // Check output
-  ca::assertCZeroBaseContiguous(dst);
-  ca::assertSameShape( dst, src);
+  bob::core::array::assertCZeroBaseContiguous(dst);
+  bob::core::array::assertSameShape(dst, src);
 
   // Process
   processNoCheck(src, dst);
 }
 
-void spd::DCT1DNaive::processNoCheck(const blitz::Array<double,1>& src, 
+void bob::sp::detail::DCT1DNaive::processNoCheck(const blitz::Array<double,1>& src, 
   blitz::Array<double,1>& dst)
 {
   // Compute the DCT
   dst = 0.;
   int ind; // index in the working array using the periodicity of cos()
   double val;
-  for( int k=0; k<m_length; ++k) {
+  for (int k=0; k<(int)m_length; ++k) {
     val = 0.;
-    for( int n=0; n<m_length; ++n) {
-      ind = ((2*n+1)*k) % (4*m_length);
+    for (int n=0; n<(int)m_length; ++n) {
+      ind = ((2*n+1)*k) % (4*(int)m_length);
       val += src(n) * m_wsave(ind);
     }
     dst(k) = val * (k==0?m_sqrt_1l:m_sqrt_2l);
@@ -110,28 +147,36 @@ void spd::DCT1DNaive::processNoCheck(const blitz::Array<double,1>& src,
 }
 
 
-spd::IDCT1DNaive::IDCT1DNaive( const int length):
-  spd::DCT1DNaiveAbstract::DCT1DNaiveAbstract(length)
+bob::sp::detail::IDCT1DNaive::IDCT1DNaive(const size_t length):
+  bob::sp::detail::DCT1DNaiveAbstract(length)
 {
 }
 
-void spd::IDCT1DNaive::operator()(const blitz::Array<double,1>& src, 
+bob::sp::detail::IDCT1DNaive::IDCT1DNaive(const bob::sp::detail::IDCT1DNaive& other):
+  bob::sp::detail::DCT1DNaiveAbstract(other)
+{
+}
+
+bob::sp::detail::IDCT1DNaive::~IDCT1DNaive()
+{
+}
+
+void bob::sp::detail::IDCT1DNaive::operator()(const blitz::Array<double,1>& src, 
   blitz::Array<double,1>& dst)
 {
   // Check input, inclusive dimension
-  ca::assertZeroBase(src);
-  const blitz::TinyVector<int,1> shape(m_length);
-  ca::assertSameShape(src, shape);
+  bob::core::array::assertZeroBase(src);
+  bob::core::array::assertSameDimensionLength(src.extent(0), (int)m_length);
 
   // Check output
-  ca::assertCZeroBaseContiguous(dst);
-  ca::assertSameShape( dst, src);
+  bob::core::array::assertCZeroBaseContiguous(dst);
+  bob::core::array::assertSameShape(dst, src);
 
   // Process
   processNoCheck(src, dst);
 }
 
-void spd::IDCT1DNaive::processNoCheck(const blitz::Array<double,1>& src, 
+void bob::sp::detail::IDCT1DNaive::processNoCheck(const blitz::Array<double,1>& src, 
   blitz::Array<double,1>& dst)
 {
   // Compute the DCT
@@ -139,9 +184,9 @@ void spd::IDCT1DNaive::processNoCheck(const blitz::Array<double,1>& src,
   dst = m_sqrt_1l * src(0) * m_wsave(0);
   // Process n==1 to length
   int ind;
-  for( int k=0; k<m_length; ++k) {
-    for( int n=1; n<m_length; ++n) {
-      ind = ((2*k+1)*n) % (4*m_length);
+  for (int k=0; k<(int)m_length; ++k) {
+    for (int n=1; n<(int)m_length; ++n) {
+      ind = ((2*k+1)*n) % (4*(int)m_length);
       dst(k) += m_sqrt_2l * src(n) * m_wsave(ind);
     }
   }

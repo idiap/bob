@@ -21,7 +21,7 @@
  */
 
 #include <boost/python.hpp>
-#include "bob/sp/conv.h"
+#include <bob/sp/conv.h>
 
 using namespace boost::python;
 

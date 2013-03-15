@@ -26,9 +26,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
-#include "bob/sp/conv.h"
-
-namespace sp = bob::sp;
+#include <bob/sp/conv.h>
 
 struct T {
   blitz::Array<double,1> A1_10;
@@ -229,7 +227,7 @@ void test_conv_1D_nopt( T eps, const blitz::Array<T,1>& a1,
 {
   blitz::Array<T,1> res( bob::sp::getConvOutputSize(a1, a2) );
   bob::sp::conv( a1, a2, res);
-  for(int i=0; i<res.extent(0); ++i)
+  for (int i=0; i<res.extent(0); ++i)
     BOOST_CHECK_SMALL(res(i) - mat(i), eps);
 }
 
@@ -239,8 +237,8 @@ void test_conv_2D_nopt( T eps, const blitz::Array<T,2>& a1,
 {
   blitz::Array<T,2> res( bob::sp::getConvOutputSize(a1, a2) );
   bob::sp::conv( a1, a2, res);
-  for(int i=0; i<res.extent(0); ++i)
-    for(int j=0; j<res.extent(1); ++j)
+  for (int i=0; i<res.extent(0); ++i)
+    for (int j=0; j<res.extent(1); ++j)
       BOOST_CHECK_SMALL(res(i,j) - mat(i,j), eps);
 }
 
@@ -251,7 +249,7 @@ void test_conv_1D( T eps, const blitz::Array<T,1>& a1,
 {
   blitz::Array<T,1> res( bob::sp::getConvOutputSize(a1, a2, opt1) );
   bob::sp::conv( a1, a2, res, opt1);
-  for(int i=0; i<res.extent(0); ++i)
+  for (int i=0; i<res.extent(0); ++i)
     BOOST_CHECK_SMALL(res(i) - mat(i), eps);
 }
 
@@ -262,8 +260,8 @@ void test_conv_2D( T eps, const blitz::Array<T,2>& a1,
 {
   blitz::Array<T,2> res( bob::sp::getConvOutputSize(a1, a2, opt1) );
   bob::sp::conv( a1, a2, res, opt1);
-  for(int i=0; i<res.extent(0); ++i)
-    for(int j=0; j<res.extent(1); ++j)
+  for (int i=0; i<res.extent(0); ++i)
+    for (int j=0; j<res.extent(1); ++j)
       BOOST_CHECK_SMALL(res(i,j) - mat(i,j), eps);
 }
 

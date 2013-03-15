@@ -20,14 +20,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/python.hpp>
+#include <bob/core/python/ndarray.h>
 
-#include "bob/sp/DCT1D.h"
-#include "bob/sp/DCT2D.h"
-#include "bob/sp/DCT1DNaive.h"
-#include "bob/sp/DCT2DNaive.h"
+#include <bob/sp/DCT1D.h>
+#include <bob/sp/DCT2D.h>
+#include <bob/sp/DCT1DNaive.h>
+#include <bob/sp/DCT2DNaive.h>
 
-#include "bob/core/python/ndarray.h"
 
 using namespace boost::python;
 
@@ -165,8 +164,7 @@ static object script_idct(bob::python::const_ndarray ar) {
 void bind_sp_dct()
 {
   // (Fast) Discrete Cosine Transform
-  class_<bob::sp::DCT1DAbstract, boost::noncopyable>("DCT1DAbstract", 
-    "Abstract class for DCT1D", no_init)
+  class_<bob::sp::DCT1DAbstract, boost::noncopyable>("DCT1DAbstract", "Abstract class for DCT1D", no_init)
       .def("reset", (void (bob::sp::DCT1D::*)(const size_t))&bob::sp::DCT1D::reset, (arg("self"),arg("length")), "Reset the length of the expected input signals.")
       .add_property("length", &bob::sp::DCT1D::getLength, &bob::sp::DCT1D::setLength, "Length of the array to process.")
     ;
@@ -179,8 +177,7 @@ void bind_sp_dct()
       .def("__call__", &py_dct1d_p, (arg("self"), arg("input")), "Compute the DCT of the input 1D array/signal. The output is allocated and returned.")
     ;
 
-  class_<bob::sp::IDCT1D, boost::shared_ptr<bob::sp::IDCT1D>, bases<bob::sp::DCT1DAbstract> >("IDCT1D", 
-    IDCT1D_DOC, init<const size_t>((arg("length"))))
+  class_<bob::sp::IDCT1D, boost::shared_ptr<bob::sp::IDCT1D>, bases<bob::sp::DCT1DAbstract> >("IDCT1D", IDCT1D_DOC, init<const size_t>((arg("length"))))
       .def(init<bob::sp::IDCT1D&>(args("other")))
       .def(self == self)
       .def(self != self)

@@ -33,183 +33,152 @@ namespace bob {
  * @{
  *
  */
-  namespace sp {
+namespace sp {
+
+/**
+ * @brief This class implements a Discrete Fourier Transform based on the
+ * FFTW library. It is used as a base class for FFT2D and IFFT2D classes.
+ */
+class FFT2DAbstract
+{
+  public:
+    /**
+     * @brief Constructor: Initialize working arrays
+     */
+    FFT2DAbstract(const size_t height, const size_t width);
 
     /**
-      * @brief This class implements a Discrete Fourier Transform based on the
-      * FFTW library. It is used as a base class for FFT2D and 
-      * IFFT2D classes.
-      */
-    class FFT2DAbstract
-    {
-      public:
-        /**
-          * @brief Constructor: Initialize working arrays
-          */
-        FFT2DAbstract( const size_t height, const size_t width);
-
-        /**
-          * @brief Copy constructor
-          */
-        FFT2DAbstract( const FFT2DAbstract& other);
-
-        /**
-          * @brief Destructor
-          */
-        virtual ~FFT2DAbstract();
-
-        /**
-          * @brief Assignment operator
-          */
-        const FFT2DAbstract& operator=(const FFT2DAbstract& other);
-
-        /**
-          * @brief Equal operator
-          */
-        bool operator==(const FFT2DAbstract& other) const;
-
-        /**
-          * @brief Not equal operator
-          */
-        bool operator!=(const FFT2DAbstract& other) const;
-
-        /**
-          * @brief process an array by applying the FFT
-          */
-        virtual void operator()(const blitz::Array<std::complex<double>,2>& src, 
-          blitz::Array<std::complex<double>,2>& dst) = 0;
-
-        /**
-          * @brief process an array by applying the FFT inplace
-          */
-        virtual void operator()(blitz::Array<std::complex<double>,2>& src_dst) = 0;
-
-        /**
-          * @brief Reset the FFT2D object for the given 2D shape
-          */
-        void reset(const size_t height, const size_t width);
-
-        /**
-          * @brief Getters
-          */
-        size_t getHeight() const { return m_height; }
-        size_t getWidth() const { return m_width; }
-
-        /**
-          * @brief Setters
-          */
-        void setHeight(const size_t height);
-        void setWidth(const size_t width);
-
-      protected:
-        /**
-          * Private attributes
-          */
-        size_t m_height;
-        size_t m_width;
-    };
-
+     * @brief Copy constructor
+     */
+    FFT2DAbstract(const FFT2DAbstract& other);
 
     /**
-      * @brief This class implements a direct 2D Discrete Fourier Transform 
-      * based on the FFTW library
-      */
-    class FFT2D: public FFT2DAbstract
-    {
-      public:
-        /**
-          * @brief Constructor: Initialize working arrays
-          */ 
-        FFT2D( const size_t height, const size_t width);
-
-        /**
-          * @brief Copy constructor
-          */
-        FFT2D( const FFT2D& other);
-
-        /**
-          * @brief Destructor
-          */
-        virtual ~FFT2D();
-
-        /**
-          * @brief Assignment operator
-          */
-        const FFT2D& operator=(const FFT2D& other);
-
-        /**
-          * @brief Equal operator
-          */
-        bool operator==(const FFT2D& other) const;
-
-        /**
-          * @brief Not equal operator
-          */
-        bool operator!=(const FFT2D& other) const;
-
-        /**
-          * @brief process an array by applying the direct FFT
-          */
-        virtual void operator()(const blitz::Array<std::complex<double>,2>& src, 
-          blitz::Array<std::complex<double>,2>& dst);
-
-        /**
-          * @brief process an array by applying the FFT inplace
-          */
-        virtual void operator()(blitz::Array<std::complex<double>,2>& src_dst);
-    };
-
+     * @brief Destructor
+     */
+    virtual ~FFT2DAbstract();
 
     /**
-      * @brief This class implements a inverse 2D Discrete Fourier Transform 
-      * based on the FFTW library
-      */
-    class IFFT2D: public FFT2DAbstract
-    {
-      public:
-        /**
-          * @brief Constructor: Initialize working arrays
-          */ 
-        IFFT2D( const size_t height, const size_t width);
+     * @brief Assignment operator
+     */
+    FFT2DAbstract& operator=(const FFT2DAbstract& other);
 
-        /**
-          * @brief Copy constructor
-          */
-        IFFT2D( const IFFT2D& other);
+    /**
+     * @brief Equal operator
+     */
+    bool operator==(const FFT2DAbstract& other) const;
 
-        /**
-          * @brief Destructor
-          */
-        virtual ~IFFT2D();
+    /**
+     * @brief Not equal operator
+     */
+    bool operator!=(const FFT2DAbstract& other) const;
 
-        /**
-          * @brief Assignment operator
-          */
-        const IFFT2D& operator=(const IFFT2D& other);
+    /**
+     * @brief process an array by applying the FFT
+     */
+    virtual void operator()(const blitz::Array<std::complex<double>,2>& src, 
+      blitz::Array<std::complex<double>,2>& dst) = 0;
 
-        /**
-          * @brief Equal operator
-          */
-        bool operator==(const IFFT2D& other) const;
+    /**
+     * @brief process an array by applying the FFT inplace
+     */
+    virtual void operator()(blitz::Array<std::complex<double>,2>& src_dst) = 0;
 
-        /**
-          * @brief Not equal operator
-          */
-        bool operator!=(const IFFT2D& other) const;
+    /**
+     * @brief Reset the FFT2D object for the given 2D shape
+     */
+    void reset(const size_t height, const size_t width);
 
-        /**
-          * @brief process an array by applying the inverse FFT
-          */
-        virtual void operator()(const blitz::Array<std::complex<double>,2>& src, 
-          blitz::Array<std::complex<double>,2>& dst);
+    /**
+     * @brief Getters
+     */
+    size_t getHeight() const { return m_height; }
+    size_t getWidth() const { return m_width; }
 
-        /**
-          * @brief process an array by applying the inverse FFT inplace
-          */
-        virtual void operator()(blitz::Array<std::complex<double>,2>& src_dst);
-    };
+    /**
+     * @brief Setters
+     */
+    void setHeight(const size_t height);
+    void setWidth(const size_t width);
 
-  }
+  protected:
+    /**
+     * Private attributes
+     */
+    size_t m_height;
+    size_t m_width;
+};
+
+
+/**
+ * @brief This class implements a direct 2D Discrete Fourier Transform 
+ * based on the FFTW library
+ */
+class FFT2D: public FFT2DAbstract
+{
+  public:
+    /**
+     * @brief Constructor: Initialize working arrays
+     */ 
+    FFT2D(const size_t height, const size_t width);
+
+    /**
+     * @brief Copy constructor
+     */
+    FFT2D(const FFT2D& other);
+
+    /**
+     * @brief Destructor
+     */
+    virtual ~FFT2D();
+
+    /**
+     * @brief process an array by applying the direct FFT
+     */
+    virtual void operator()(const blitz::Array<std::complex<double>,2>& src, 
+      blitz::Array<std::complex<double>,2>& dst);
+
+    /**
+     * @brief process an array by applying the FFT inplace
+     */
+    virtual void operator()(blitz::Array<std::complex<double>,2>& src_dst);
+};
+
+
+/**
+ * @brief This class implements a inverse 2D Discrete Fourier Transform 
+ * based on the FFTW library
+ */
+class IFFT2D: public FFT2DAbstract
+{
+  public:
+    /**
+     * @brief Constructor: Initialize working arrays
+     */ 
+    IFFT2D(const size_t height, const size_t width);
+
+    /**
+     * @brief Copy constructor
+     */
+    IFFT2D(const IFFT2D& other);
+
+    /**
+     * @brief Destructor
+     */
+    virtual ~IFFT2D();
+
+    /**
+     * @brief process an array by applying the inverse FFT
+     */
+    virtual void operator()(const blitz::Array<std::complex<double>,2>& src, 
+      blitz::Array<std::complex<double>,2>& dst);
+
+    /**
+     * @brief process an array by applying the inverse FFT inplace
+     */
+    virtual void operator()(blitz::Array<std::complex<double>,2>& src_dst);
+};
+
+}
 /**
  * @}
  */

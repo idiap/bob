@@ -21,15 +21,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/python.hpp>
+#include <bob/core/python/ndarray.h>
 
-#include "bob/sp/FFT1D.h"
-#include "bob/sp/FFT2D.h"
-#include "bob/sp/FFT1DNaive.h"
-#include "bob/sp/FFT2DNaive.h"
-#include "bob/sp/fftshift.h"
+#include <bob/sp/FFT1D.h>
+#include <bob/sp/FFT2D.h>
+#include <bob/sp/FFT1DNaive.h>
+#include <bob/sp/FFT2DNaive.h>
+#include <bob/sp/fftshift.h>
 
-#include "bob/core/python/ndarray.h"
 
 using namespace boost::python;
 

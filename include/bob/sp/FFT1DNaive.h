@@ -32,118 +32,162 @@ namespace bob {
  * @{
  *
  */
-  namespace sp { namespace detail {
+namespace sp { namespace detail {
+
+/**
+ * @brief This class implements a naive 1D Discrete Fourier Transform.
+ */
+class FFT1DNaiveAbstract
+{
+  public:
+    /**
+     * @brief Constructor: Initialize working array
+     */
+    FFT1DNaiveAbstract(const size_t length);
 
     /**
-      * @brief This class implements a naive 1D Discrete Fourier Transform.
-      */
-    class FFT1DNaiveAbstract
-    {
-      public:
-        /**
-          * @brief Constructor: Initialize working array
-          */
-        FFT1DNaiveAbstract( const int length);
-
-        /**
-          * @brief Destructor
-          */
-        virtual ~FFT1DNaiveAbstract();
-
-        /**
-          * @brief process an array by applying the FFT
-          */
-        virtual void operator()(const blitz::Array<std::complex<double>,1>& src, 
-          blitz::Array<std::complex<double>,1>& dst) = 0;
-
-        /**
-          * @brief Reset the FFT1DNaive object for the given 1D shape
-          */
-        void reset(const int length);
-
-        /**
-          * @brief Get the current height of the FFT1D object
-          */
-        inline const int getLength() { return m_length; }
-
-      private:
-        /**
-          * @brief Initialize the working array
-          */
-        void initWorkingArray();
-
-        /**
-          * @brief Call the initialization procedures
-          */
-        void reset();
-
-      protected:
-        /**
-          * Private attributes
-          */
-        int m_length;
-
-        /**
-          * Working array
-          */
-        blitz::Array<std::complex<double>,1> m_wsave; 
-    };
-
+     * @brief Copy constructor
+     */
+    FFT1DNaiveAbstract(const FFT1DNaiveAbstract& other);
 
     /**
-      * @brief This class implements a naive direct 1D Discrete Fourier 
-      * Transform
-      */
-    class FFT1DNaive: public FFT1DNaiveAbstract
-    {
-      public:
-        /**
-          * @brief Constructor: Initialize working arrays
-          */ 
-        FFT1DNaive( const int length);
-
-        /**
-          * @brief process an array by applying the direct FFT
-          */
-        virtual void operator()(const blitz::Array<std::complex<double>,1>& src, 
-          blitz::Array<std::complex<double>,1>& dst);
-      
-      private:
-        /**
-          * @brief process an array assuming that all the 'check' are done
-          */
-        void processNoCheck(const blitz::Array<std::complex<double>,1>& src,
-          blitz::Array<std::complex<double>,1>& dst);
-    };
-
+     * @brief Destructor
+     */
+    virtual ~FFT1DNaiveAbstract();
 
     /**
-      * @brief This class implements a naive inverse 1D Discrete Fourier
-      * Transform 
-      */
-    class IFFT1DNaive: public FFT1DNaiveAbstract
-    {
-      public:
-        /**
-          * @brief Constructor: Initialize working array
-          */ 
-        IFFT1DNaive( const int length);
+     * @brief Assignment operator
+     */
+    FFT1DNaiveAbstract& operator=(const FFT1DNaiveAbstract& other);
 
-        /**
-          * @brief process an array by applying the inverse DFT
-          */
-        virtual void operator()(const blitz::Array<std::complex<double>,1>& src, 
-          blitz::Array<std::complex<double>,1>& dst);
+    /**
+     * @brief Equal operator
+     */
+    bool operator==(const FFT1DNaiveAbstract& other) const;
 
-      private:
-        /**
-          * @brief process an array assuming that all the 'check' are done
-          */
-        void processNoCheck(const blitz::Array<std::complex<double>,1>& src,
-          blitz::Array<std::complex<double>,1>& dst);
-    };
+    /**
+     * @brief Not equal operator
+     */
+    bool operator!=(const FFT1DNaiveAbstract& other) const;
 
-  }}
+    /**
+     * @brief process an array by applying the FFT
+     */
+    virtual void operator()(const blitz::Array<std::complex<double>,1>& src, 
+      blitz::Array<std::complex<double>,1>& dst) = 0;
+
+    /**
+     * @brief Reset the FFT1DNaive object for the given 1D shape
+     */
+    void reset(const size_t length);
+
+    /**
+     * @brief Get the current height of the FFT1D object
+     */
+    size_t getLength() const { return m_length; }
+    /**
+     * @brief Set the current length of the DCT1D object
+     */
+    void setLength(const size_t length);
+
+  private:
+    /**
+     * @brief Initialize the working array
+     */
+    void initWorkingArray();
+
+    /**
+     * @brief Call the initialization procedures
+     */
+    void reset();
+
+  protected:
+    /**
+     * Private attributes
+     */
+    size_t m_length;
+
+    /**
+     * Working array
+     */
+    blitz::Array<std::complex<double>,1> m_wsave; 
+};
+
+
+/**
+ * @brief This class implements a naive direct 1D Discrete Fourier 
+ * Transform
+ */
+class FFT1DNaive: public FFT1DNaiveAbstract
+{
+  public:
+    /**
+     * @brief Constructor: Initialize working arrays
+     */ 
+    FFT1DNaive(const size_t length);
+
+    /**
+     * @brief Copy constructor
+     */
+    FFT1DNaive(const FFT1DNaive& other);
+
+    /**
+     * @brief Destructor
+     */
+    virtual ~FFT1DNaive();
+
+    /**
+     * @brief process an array by applying the direct FFT
+     */
+    virtual void operator()(const blitz::Array<std::complex<double>,1>& src, 
+      blitz::Array<std::complex<double>,1>& dst);
+  
+  private:
+    /**
+     * @brief process an array assuming that all the 'check' are done
+     */
+    void processNoCheck(const blitz::Array<std::complex<double>,1>& src,
+      blitz::Array<std::complex<double>,1>& dst);
+};
+
+
+/**
+ * @brief This class implements a naive inverse 1D Discrete Fourier
+ * Transform 
+ */
+class IFFT1DNaive: public FFT1DNaiveAbstract
+{
+  public:
+    /**
+     * @brief Constructor: Initialize working array
+     */ 
+    IFFT1DNaive(const size_t length);
+
+    /**
+     * @brief Copy constructor
+     */
+    IFFT1DNaive(const IFFT1DNaive& other);
+
+    /**
+     * @brief Destructor
+     */
+    virtual ~IFFT1DNaive();
+
+    /**
+     * @brief process an array by applying the inverse DFT
+     */
+    virtual void operator()(const blitz::Array<std::complex<double>,1>& src, 
+      blitz::Array<std::complex<double>,1>& dst);
+
+  private:
+    /**
+     * @brief process an array assuming that all the 'check' are done
+     */
+    void processNoCheck(const blitz::Array<std::complex<double>,1>& src,
+      blitz::Array<std::complex<double>,1>& dst);
+};
+
+}}
 /**
  * @}
  */

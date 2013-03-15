@@ -21,18 +21,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/sp/DCT2D.h"
-#include "bob/core/assert.h"
+#include <bob/sp/DCT2D.h>
+#include <bob/core/assert.h>
 #include <fftw3.h>
 
 
-bob::sp::DCT2DAbstract::DCT2DAbstract( const size_t height, const size_t width):
+bob::sp::DCT2DAbstract::DCT2DAbstract(const size_t height, const size_t width):
   m_height(height), m_width(width)
 {
   reset();
 }
 
-bob::sp::DCT2DAbstract::DCT2DAbstract( const bob::sp::DCT2DAbstract& other):
+bob::sp::DCT2DAbstract::DCT2DAbstract(const bob::sp::DCT2DAbstract& other):
   m_height(other.m_height), m_width(other.m_width)
 {
   reset();
@@ -42,9 +42,10 @@ bob::sp::DCT2DAbstract::~DCT2DAbstract()
 {
 }
 
-const bob::sp::DCT2DAbstract& bob::sp::DCT2DAbstract::operator=(const DCT2DAbstract& other)
+bob::sp::DCT2DAbstract& 
+bob::sp::DCT2DAbstract::operator=(const DCT2DAbstract& other)
 {
-  if(this != &other)
+  if (this != &other)
   {
     reset(other.m_height, other.m_width);
   }
@@ -63,7 +64,7 @@ bool bob::sp::DCT2DAbstract::operator!=(const bob::sp::DCT2DAbstract& b) const
 
 void bob::sp::DCT2DAbstract::reset(const size_t height, const size_t width)
 {
-  if( m_height != height && m_width != width) {
+  if (m_height != height && m_width != width) {
     // Update the height and width
     m_height = height;
     m_width = width;
@@ -93,44 +94,25 @@ void bob::sp::DCT2DAbstract::reset()
 void bob::sp::DCT2DAbstract::initNormFactors() 
 {
   // Precompute multiplicative factors
-  m_sqrt_1h=sqrt(1./(double)m_height);
-  m_sqrt_2h=sqrt(2./(double)m_height);
-  m_sqrt_1w=sqrt(1./(double)m_width);
-  m_sqrt_2w=sqrt(2./(double)m_width);
+  m_sqrt_1h = sqrt(1./(double)m_height);
+  m_sqrt_2h = sqrt(2./(double)m_height);
+  m_sqrt_1w = sqrt(1./(double)m_width);
+  m_sqrt_2w = sqrt(2./(double)m_width);
 }
 
 
-bob::sp::DCT2D::DCT2D( const size_t height, const size_t width):
+bob::sp::DCT2D::DCT2D(const size_t height, const size_t width):
   bob::sp::DCT2DAbstract(height, width)
 {
 }
 
-bob::sp::DCT2D::DCT2D( const bob::sp::DCT2D& other):
+bob::sp::DCT2D::DCT2D(const bob::sp::DCT2D& other):
   bob::sp::DCT2DAbstract(other)
 {
 }
 
 bob::sp::DCT2D::~DCT2D()
 {
-}
-
-const bob::sp::DCT2D& bob::sp::DCT2D::operator=(const DCT2D& other)
-{
-  if(this != &other)
-  {
-    bob::sp::DCT2DAbstract::operator=(other);
-  }
-  return *this;
-}
-
-bool bob::sp::DCT2D::operator==(const bob::sp::DCT2D& b) const
-{
-  return (bob::sp::DCT2DAbstract::operator==(b));
-}
-
-bool bob::sp::DCT2D::operator!=(const bob::sp::DCT2D& b) const
-{
-  return !(this->operator==(b));
 }
 
 void bob::sp::DCT2D::operator()(const blitz::Array<double,2>& src, 
@@ -155,18 +137,18 @@ void bob::sp::DCT2D::operator()(const blitz::Array<double,2>& src,
   fftw_destroy_plan(p);
 
   // Rescale the result
-  for(int i=0; i<(int)m_height; ++i)
-    for(int j=0; j<(int)m_width; ++j)
+  for (int i=0; i<(int)m_height; ++i)
+    for (int j=0; j<(int)m_width; ++j)
       dst(i,j) = dst(i,j)/4.*(i==0?m_sqrt_1h:m_sqrt_2h)*(j==0?m_sqrt_1w:m_sqrt_2w);
 }
 
 
-bob::sp::IDCT2D::IDCT2D( const size_t height, const size_t width):
+bob::sp::IDCT2D::IDCT2D(const size_t height, const size_t width):
   bob::sp::DCT2DAbstract::DCT2DAbstract(height, width)
 {
 }
 
-bob::sp::IDCT2D::IDCT2D( const bob::sp::IDCT2D& other):
+bob::sp::IDCT2D::IDCT2D(const bob::sp::IDCT2D& other):
   bob::sp::DCT2DAbstract(other)
 {
 }
@@ -174,26 +156,6 @@ bob::sp::IDCT2D::IDCT2D( const bob::sp::IDCT2D& other):
 bob::sp::IDCT2D::~IDCT2D()
 {
 }
-
-const bob::sp::IDCT2D& bob::sp::IDCT2D::operator=(const IDCT2D& other)
-{
-  if(this != &other)
-  {
-    bob::sp::DCT2DAbstract::operator=(other);
-  }
-  return *this;
-}
-
-bool bob::sp::IDCT2D::operator==(const bob::sp::IDCT2D& b) const
-{
-  return (bob::sp::DCT2DAbstract::operator==(b));
-}
-
-bool bob::sp::IDCT2D::operator!=(const bob::sp::IDCT2D& b) const
-{
-  return !(this->operator==(b));
-}
-
 
 void bob::sp::IDCT2D::operator()(const blitz::Array<double,2>& src, 
   blitz::Array<double,2>& dst) const
@@ -206,10 +168,10 @@ void bob::sp::IDCT2D::operator()(const blitz::Array<double,2>& src,
   bob::core::array::assertSameShape( dst, src);
 
   // Normalize
-  for(int j=0; j<(int)m_width; ++j)
+  for (int j=0; j<(int)m_width; ++j)
   {
     // Copy the column into the C array and normalize it
-    for( int i=0; i<(int)m_height; ++i)
+    for (int i=0; i<(int)m_height; ++i)
       dst(i,j) = src(i,j)*4/(i==0?m_sqrt_1h:m_sqrt_2h)/(j==0?m_sqrt_1w:m_sqrt_2w);
   }
 
@@ -224,7 +186,7 @@ void bob::sp::IDCT2D::operator()(const blitz::Array<double,2>& src,
   fftw_destroy_plan(p);
   
   // Rescale the result by the size of the input 
-  // (as this is not performed by FFTPACK)
+  // (as this is not performed by FFW)
   double norm_factor = 4.*(int)m_width*(int)m_height;
   dst /= norm_factor;
 }

@@ -21,19 +21,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/sp/FFT1D.h"
-#include "bob/core/assert.h"
+#include <bob/sp/FFT1D.h>
+#include <bob/core/assert.h>
 #include <fftw3.h>
 
 
-namespace sp = bob::sp;
-
-bob::sp::FFT1DAbstract::FFT1DAbstract( const size_t length):
+bob::sp::FFT1DAbstract::FFT1DAbstract(const size_t length):
   m_length(length)
 {
 }
 
-bob::sp::FFT1DAbstract::FFT1DAbstract( const bob::sp::FFT1DAbstract& other):
+bob::sp::FFT1DAbstract::FFT1DAbstract(const bob::sp::FFT1DAbstract& other):
   m_length(other.m_length)
 {
 }
@@ -42,10 +40,10 @@ bob::sp::FFT1DAbstract::~FFT1DAbstract()
 {
 }
 
-const bob::sp::FFT1DAbstract& bob::sp::FFT1DAbstract::operator=(const FFT1DAbstract& other)
+bob::sp::FFT1DAbstract& 
+bob::sp::FFT1DAbstract::operator=(const FFT1DAbstract& other)
 {
-  if(this != &other)
-  {
+  if (this != &other) {
     reset(other.m_length);
   }
   return *this;
@@ -73,37 +71,18 @@ void bob::sp::FFT1DAbstract::setLength(const size_t length)
 }
 
 
-bob::sp::FFT1D::FFT1D( const size_t length):
+bob::sp::FFT1D::FFT1D(const size_t length):
   bob::sp::FFT1DAbstract(length)
 {
 }
 
-bob::sp::FFT1D::FFT1D( const bob::sp::FFT1D& other):
+bob::sp::FFT1D::FFT1D(const bob::sp::FFT1D& other):
   bob::sp::FFT1DAbstract(other)
 {
 }
 
 bob::sp::FFT1D::~FFT1D()
 {
-}
-
-const bob::sp::FFT1D& bob::sp::FFT1D::operator=(const FFT1D& other)
-{
-  if(this != &other)
-  {
-    bob::sp::FFT1DAbstract::operator=(other);
-  }
-  return *this;
-}
-
-bool bob::sp::FFT1D::operator==(const bob::sp::FFT1D& b) const
-{
-  return (bob::sp::FFT1DAbstract::operator==(b));
-}
-
-bool bob::sp::FFT1D::operator!=(const bob::sp::FFT1D& b) const
-{
-  return !(this->operator==(b));
 }
 
 void bob::sp::FFT1D::operator()(const blitz::Array<std::complex<double>,1>& src, 
@@ -114,7 +93,7 @@ void bob::sp::FFT1D::operator()(const blitz::Array<std::complex<double>,1>& src,
 
   // Check output
   bob::core::array::assertCZeroBaseContiguous(dst);
-  bob::core::array::assertSameShape( dst, src);
+  bob::core::array::assertSameShape(dst, src);
 
   // Reinterpret cast to fftw format
   fftw_complex* src_ = reinterpret_cast<fftw_complex*>(const_cast<std::complex<double>* >(src.data()));
@@ -129,37 +108,18 @@ void bob::sp::FFT1D::operator()(const blitz::Array<std::complex<double>,1>& src,
 }
 
 
-bob::sp::IFFT1D::IFFT1D( const size_t length):
+bob::sp::IFFT1D::IFFT1D(const size_t length):
   bob::sp::FFT1DAbstract(length)
 {
 }
 
-bob::sp::IFFT1D::IFFT1D( const bob::sp::IFFT1D& other):
+bob::sp::IFFT1D::IFFT1D(const bob::sp::IFFT1D& other):
   bob::sp::FFT1DAbstract(other)
 {
 }
 
 bob::sp::IFFT1D::~IFFT1D()
 {
-}
-
-const bob::sp::IFFT1D& bob::sp::IFFT1D::operator=(const IFFT1D& other)
-{
-  if(this != &other)
-  {
-    bob::sp::FFT1DAbstract::operator=(other);
-  }
-  return *this;
-}
-
-bool bob::sp::IFFT1D::operator==(const bob::sp::IFFT1D& b) const
-{
-  return (bob::sp::FFT1DAbstract::operator==(b));
-}
-
-bool bob::sp::IFFT1D::operator!=(const bob::sp::IFFT1D& b) const
-{
-  return !(this->operator==(b));
 }
 
 void bob::sp::IFFT1D::operator()(const blitz::Array<std::complex<double>,1>& src, 
@@ -170,7 +130,7 @@ void bob::sp::IFFT1D::operator()(const blitz::Array<std::complex<double>,1>& src
 
   // Check output
   bob::core::array::assertCZeroBaseContiguous(dst);
-  bob::core::array::assertSameShape( dst, src);
+  bob::core::array::assertSameShape(dst, src);
 
   // Reinterpret cast to fftw format
   fftw_complex* src_ = reinterpret_cast<fftw_complex*>(const_cast<std::complex<double>* >(src.data()));
