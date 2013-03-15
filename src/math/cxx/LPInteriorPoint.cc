@@ -96,6 +96,8 @@ bool bob::math::LPInteriorPoint::operator!=(
 
 void bob::math::LPInteriorPoint::reset(const size_t M, const size_t N)
 {
+  m_M = M;
+  m_N = N;
   m_lambda.resize(M);
   m_mu.resize(N);
   resetCache();
