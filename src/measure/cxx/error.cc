@@ -23,17 +23,15 @@
 #include <stdexcept>
 #include <algorithm>
 #include <limits>
-#include "bob/measure/error.h"
-#include "bob/core/blitz_compat.h"
-#include "bob/core/Exception.h"
-#include "bob/core/assert.h"
-#include "bob/core/cast.h"
-#include "bob/math/pavx.h"
-#include "bob/math/linsolve.h"
+#include <bob/measure/error.h>
+#include <bob/core/blitz_compat.h>
+#include <bob/core/Exception.h>
+#include <bob/core/assert.h>
+#include <bob/core/cast.h>
+#include <bob/math/pavx.h>
+#include <bob/math/linsolve.h>
 
-namespace err = bob::measure;
-
-std::pair<double, double> err::farfrr(const blitz::Array<double,1>& negatives,
+std::pair<double, double> bob::measure::farfrr(const blitz::Array<double,1>& negatives,
     const blitz::Array<double,1>& positives, double threshold) {
   blitz::sizeType total_negatives = negatives.extent(blitz::firstDim);
   blitz::sizeType total_positives = positives.extent(blitz::firstDim);
@@ -49,17 +47,17 @@ double eer_predicate(double far, double frr) {
   return std::abs(far - frr);
 }
 
-double err::eerThreshold(const blitz::Array<double,1>& negatives,
+double bob::measure::eerThreshold(const blitz::Array<double,1>& negatives,
     const blitz::Array<double,1>& positives) {
-  return err::minimizingThreshold(negatives, positives, eer_predicate);
+  return bob::measure::minimizingThreshold(negatives, positives, eer_predicate);
 }
 
-double err::eerRocch(const blitz::Array<double,1>& negatives,
+double bob::measure::eerRocch(const blitz::Array<double,1>& negatives,
     const blitz::Array<double,1>& positives) {
-  return err::rocch2eer(err::rocch(negatives, positives));
+  return bob::measure::rocch2eer(bob::measure::rocch(negatives, positives));
 }
 
-double err::farThreshold(const blitz::Array<double,1>& negatives,
+double bob::measure::farThreshold(const blitz::Array<double,1>& negatives,
   const blitz::Array<double,1>&, double far_value) {
   // check the parameters are valid
   if (far_value < 0. || far_value > 1.){
@@ -97,7 +95,7 @@ double err::farThreshold(const blitz::Array<double,1>& negatives,
   return negatives_[index] - correction;
 }
 
-double err::frrThreshold(const blitz::Array<double,1>&,
+double bob::measure::frrThreshold(const blitz::Array<double,1>&,
   const blitz::Array<double,1>& positives, double frr_value) {
 
   // check the parameters are valid
@@ -157,14 +155,14 @@ class weighted_error {
 
 };
 
-double err::minWeightedErrorRateThreshold
+double bob::measure::minWeightedErrorRateThreshold
 (const blitz::Array<double,1>& negatives,
  const blitz::Array<double,1>& positives, double cost) {
   weighted_error predicate(cost);
-  return err::minimizingThreshold(negatives, positives, predicate);
+  return bob::measure::minimizingThreshold(negatives, positives, predicate);
 }
 
-blitz::Array<double,2> err::roc(const blitz::Array<double,1>& negatives,
+blitz::Array<double,2> bob::measure::roc(const blitz::Array<double,1>& negatives,
  const blitz::Array<double,1>& positives, size_t points) {
   double min = std::min(blitz::min(negatives), blitz::min(positives));
   double max = std::max(blitz::max(negatives), blitz::max(positives));
@@ -172,7 +170,7 @@ blitz::Array<double,2> err::roc(const blitz::Array<double,1>& negatives,
   blitz::Array<double,2> retval(2, points);
   for (int i=0; i<(int)points; ++i) {
     std::pair<double, double> ratios =
-      err::farfrr(negatives, positives, min + i*step);
+      bob::measure::farfrr(negatives, positives, min + i*step);
     //note: inversion to preserve X x Y ordering (FRR x FAR)
     retval(0,i) = ratios.second;
     retval(1,i) = ratios.first;
@@ -216,7 +214,7 @@ void sortWithPermutation(const blitz::Array<double,1>& values, std::vector<size_
   std::stable_sort(v.begin(), v.end(), CreateComparePairs(values));
 }
 
-blitz::Array<double,2> err::rocch(const blitz::Array<double,1>& negatives,
+blitz::Array<double,2> bob::measure::rocch(const blitz::Array<double,1>& negatives,
  const blitz::Array<double,1>& positives) 
 {
   // Number of positive and negative scores
@@ -273,7 +271,7 @@ blitz::Array<double,2> err::rocch(const blitz::Array<double,1>& negatives,
   return retval;
 }
 
-double err::rocch2eer(const blitz::Array<double,2>& pmiss_pfa) 
+double bob::measure::rocch2eer(const blitz::Array<double,2>& pmiss_pfa) 
 {
   bob::core::array::assertSameDimensionLength(2, pmiss_pfa.extent(0));
   const int N = pmiss_pfa.extent(1);  
@@ -328,7 +326,7 @@ double err::rocch2eer(const blitz::Array<double,2>& pmiss_pfa)
  *
  * @return The ROC curve with the FAR in the first row and the FRR in the second.
  */
-blitz::Array<double,2> err::roc_for_far(const blitz::Array<double,1>& negatives,
+blitz::Array<double,2> bob::measure::roc_for_far(const blitz::Array<double,1>& negatives,
  const blitz::Array<double,1>& positives, const blitz::Array<double,1>& far_list) {
   int n_points = far_list.extent(0);
 
@@ -466,16 +464,16 @@ namespace blitz {
   BZ_DECLARE_FUNCTION(_ppndf) ///< A blitz::Array binding
 }
 
-double err::ppndf (double value) { return _ppndf(value); }
+double bob::measure::ppndf (double value) { return _ppndf(value); }
 
-blitz::Array<double,2> err::det(const blitz::Array<double,1>& negatives,
+blitz::Array<double,2> bob::measure::det(const blitz::Array<double,1>& negatives,
     const blitz::Array<double,1>& positives, size_t points) {
   blitz::Array<double,2> retval(2, points);
-  retval = blitz::_ppndf(err::roc(negatives, positives, points));
+  retval = blitz::_ppndf(bob::measure::roc(negatives, positives, points));
   return retval;
 }
 
-blitz::Array<double,2> err::epc
+blitz::Array<double,2> bob::measure::epc
 (const blitz::Array<double,1>& dev_negatives,
  const blitz::Array<double,1>& dev_positives,
  const blitz::Array<double,1>& test_negatives,
@@ -485,10 +483,10 @@ blitz::Array<double,2> err::epc
   for (int i=0; i<(int)points; ++i) {
     double alpha = (double)i*step;
     retval(0,i) = alpha;
-    double threshold = err::minWeightedErrorRateThreshold(dev_negatives,
+    double threshold = bob::measure::minWeightedErrorRateThreshold(dev_negatives,
         dev_positives, alpha);
     std::pair<double, double> ratios =
-      err::farfrr(test_negatives, test_positives, threshold);
+      bob::measure::farfrr(test_negatives, test_positives, threshold);
     retval(1,i) = (ratios.first + ratios.second) / 2;
   }
   return retval;
