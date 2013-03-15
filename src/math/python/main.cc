@@ -22,7 +22,7 @@
 
 #include "bob/core/python/ndarray.h"
 
-void bind_math_interiorpointLP();
+void bind_math_lp_interiorpoint();
 void bind_math_linsolve();
 void bind_math_norminv();
 void bind_math_stats();
@@ -33,7 +33,7 @@ BOOST_PYTHON_MODULE(_math) {
 
   bob::python::setup_python("bob mathematical classes and sub-classes");
 
-  bind_math_interiorpointLP();
+  bind_math_lp_interiorpoint();
   bind_math_linsolve();
   bind_math_norminv();
   bind_math_stats();
