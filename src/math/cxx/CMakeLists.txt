@@ -35,7 +35,7 @@ set(src
   "inv.cc"
   "sqrtm.cc"
   "svd.cc"
-  "interiorpointLP.cc"
+  "LPInteriorPoint.cc"
   "pavx.cc"
 )
 
@@ -57,7 +57,7 @@ bob_add_test(${PROJECT_NAME} norm test/norm.cc)
 bob_add_test(${PROJECT_NAME} norminv test/norminv.cc)
 bob_add_test(${PROJECT_NAME} sqrtm test/sqrtm.cc)
 bob_add_test(${PROJECT_NAME} svd test/svd.cc)
-bob_add_test(${PROJECT_NAME} interiorpointLP test/interiorpointLP.cc)
+bob_add_test(${PROJECT_NAME} LPInteriorPoint test/LPInteriorPoint.cc)
 
 # Pkg-Config generator
 bob_pkgconfig(${PROJECT_NAME} "${bob_deps}")

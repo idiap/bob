@@ -7,7 +7,7 @@ set(incdir ${py_incdir})
 
 # Python bindings
 set(src
-   "interiorpointLP.cc"
+   "LPInteriorPoint.cc"
    "linsolve.cc"
    "norminv.cc"
    "stats.cc"
