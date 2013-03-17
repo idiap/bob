@@ -158,7 +158,7 @@ bob::ip::GLCM<T>::GLCM(int num_levels)
   m_offset = 1, 0; // this is the default offset
   m_symmetric = false;
   m_normalized = false;
-  m_quantization = bob::sp::Quantization<T>(1, num_levels);
+  m_quantization = bob::sp::Quantization<T>(bob::sp::quantization::UNIFORM, num_levels);
 }
 
 template <typename T>
@@ -168,7 +168,7 @@ bob::ip::GLCM<T>::GLCM(int num_levels, T min_level, T max_level)
   m_offset = 1, 0; // this is the default offset
   m_symmetric = false;
   m_normalized = false;
-  m_quantization = bob::sp::Quantization<T>(1, num_levels, min_level, max_level);
+  m_quantization = bob::sp::Quantization<T>(bob::sp::quantization::UNIFORM, num_levels, min_level, max_level);
 }
 
 template <typename T>

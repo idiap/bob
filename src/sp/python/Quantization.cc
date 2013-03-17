@@ -28,8 +28,6 @@
 using namespace boost::python;
 
 static const char* quantization_doc = "Objects of this class, after configuration, can quantize 1D or 2D signal into different number of levels. At the moment, only uint8 and uint16 input signals are supported.";
-
-  
     
 template <typename T> 
 static object call_get_thresholds(const bob::sp::Quantization<T>& op)
@@ -37,9 +35,6 @@ static object call_get_thresholds(const bob::sp::Quantization<T>& op)
   blitz::Array<T,1> output=op.getThresholds();
   return object(output);
 }  
-
-
-
 
 template <typename T, int N> 
 static void inner_call_quantization(const bob::sp::Quantization<T>& op, bob::python::const_ndarray input, bob::python::ndarray output) 
@@ -62,12 +57,12 @@ static void call_quantization_c(const bob::sp::Quantization<T>& op, bob::python:
 }
 
 
-void bind_sp_quantization_uint8() 
+void bind_sp_quantization()
 {
   class_<bob::sp::Quantization<uint8_t>, boost::shared_ptr<bob::sp::Quantization<uint8_t>>, boost::noncopyable>("__quantization_uint8__", quantization_doc, no_init)
     .def(init<>("Constructor. "))
-    .def(init<const int, const int>((arg("quantization_type"), arg("num_levels")),"Constructor"))
-    .def(init<const int, const int, const uint8_t, const uint8_t>((arg("quantization_type"), arg("num_levels"), arg("min_level"), arg("max_level")),"Constructor"))
+    .def(init<const bob::sp::quantization::QuantizationType, const int>((arg("quantization_type"), arg("num_levels")),"Constructor"))
+    .def(init<const bob::sp::quantization::QuantizationType, const int, const uint8_t, const uint8_t>((arg("quantization_type"), arg("num_levels"), arg("min_level"), arg("max_level")),"Constructor"))
     .def(init<const blitz::Array<uint8_t,1>&>((arg("quantization_table")),"Constructor"))
     
     .def(init<const bob::sp::Quantization<uint8_t>&>((arg("quantization_operator")), "Copy constructs a Quantization operator"))
@@ -82,14 +77,11 @@ void bind_sp_quantization_uint8()
     
     .def("quantization_level", &bob::sp::Quantization<uint8_t>::quantization_level, (arg("self"),arg("input")), "Calculates the quantization level for a single input value, given the current thresholds table.")
     ;
-}
 
-void bind_sp_quantization_uint16() 
-{
   class_<bob::sp::Quantization<uint16_t>, boost::shared_ptr<bob::sp::Quantization<uint16_t>>, boost::noncopyable>("__quantization_uint16__", quantization_doc, no_init)
     .def(init<>("Constructor"))
-    .def(init<const int, const int>((arg("quantization_type"), arg("num_levels")),"Constructor"))
-    .def(init<const int, const int, const uint16_t, const uint16_t>((arg("quantization_type"), arg("num_levels"), arg("min_level"), arg("max_level")),"Constructor"))
+    .def(init<const bob::sp::quantization::QuantizationType, const int>((arg("quantization_type"), arg("num_levels")),"Constructor"))
+    .def(init<const bob::sp::quantization::QuantizationType, const int, const uint16_t, const uint16_t>((arg("quantization_type"), arg("num_levels"), arg("min_level"), arg("max_level")),"Constructor"))
     .def(init<const blitz::Array<uint16_t,1>&>((arg("quantization_table")),"Constructor"))
     
     .def(init<const bob::sp::Quantization<uint16_t>&>((arg("quantization_operator")), "Copy constructs a Quantization operator"))
@@ -103,5 +95,12 @@ void bind_sp_quantization_uint16()
     .def("__call__", &call_quantization_c<uint16_t>, (arg("self"),arg("input"), arg("output")), "Calls an object of this type to perform quantization for the input signal.")
     
     .def("quantization_level", &bob::sp::Quantization<uint16_t>::quantization_level, (arg("self"),arg("input")), "Calculates the quantization level for a single input value, given the current thresholds table.")
+    ;
+
+  enum_<bob::sp::quantization::QuantizationType>("quantization_type")
+    .value("QUANTIZATION_UNIFORM", bob::sp::quantization::UNIFORM)
+    .value("QUANTIZATION_UNIFORM_ROUNDING", bob::sp::quantization::UNIFORM_ROUNDING)
+    .value("QUANTIZATION_USER_SPEC", bob::sp::quantization::USER_SPEC)
+    .export_values()
     ;
 }
