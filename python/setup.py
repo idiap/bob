@@ -217,6 +217,7 @@ CONSOLE_SCRIPTS = [
   'bob_face_detect.py = bob.visioner.script.facebox:main',
   'bob_face_keypoints.py = bob.visioner.script.facepoints:main',
   'bob_visioner_trainer.py = bob.visioner.script.trainer:main',
+  'bob_video_test.py = bob.io.script.video_test:main',
   ]
 
 # built-in databases
@@ -254,6 +255,8 @@ DATAFILES = find_all_test_data()
 DATAFILES += [
     'db/iris/iris.names',
     'db/iris/iris.data',
+    'io/fonts/*.txt',
+    'io/fonts/*.ttf',
     ]
 
 EXTENSIONS = [
@@ -324,6 +327,7 @@ setup(
       'sqlalchemy',
       'scipy',
       'nose',
+      'pil',
       ] + EXTRA_REQUIREMENTS,
 
     entry_points={

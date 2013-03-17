@@ -187,9 +187,9 @@ make_file (const std::string& path, char mode) {
  */
 static void list_formats(std::map<std::string, std::string>& formats) {
   std::map<std::string, AVInputFormat*> iformat;
-  io::detail::ffmpeg::iformats_installed(iformat);
+  io::detail::ffmpeg::iformats_supported(iformat);
   std::map<std::string, AVOutputFormat*> oformat;
-  io::detail::ffmpeg::oformats_installed(oformat);
+  io::detail::ffmpeg::oformats_supported(oformat);
 
   for (auto k=iformat.begin(); k!=iformat.end(); ++k) {
     auto o=oformat.find(k->first);
@@ -212,29 +212,6 @@ static void list_formats(std::map<std::string, std::string>& formats) {
  * Takes care of codec registration per se.
  */
 static bool register_codec() {
-  static std::string tmp[] = {
-    ".bmp",
-    ".dpx",
-    ".gif",
-    ".jpeg", 
-    ".jpg", 
-    ".jp2", 
-    ".ljpg", 
-    ".png", 
-    ".pam",
-    ".pcx",
-    ".pbm",
-    ".pnm",
-    ".ppm",
-    ".pgm",
-    ".pgmyuv",
-    ".sgi",
-    ".tga", 
-    ".tif", 
-    ".tiff"
-  };
-  static std::set<std::string> avoid(tmp, tmp+sizeof(tmp) / sizeof(tmp[0]));
-
   /* Initialize libavcodec, and register all codecs and formats. */
   av_log_set_level(AV_LOG_QUIET);
   av_register_all();
@@ -245,7 +222,7 @@ static bool register_codec() {
   std::map<std::string, std::string> formats;
   list_formats(formats);
   for (auto k=formats.begin(); k!=formats.end(); ++k) {
-    if (!instance->isRegistered(k->first) && avoid.find(k->first) == avoid.end()) {
+    if (!instance->isRegistered(k->first)) {
       instance->registerExtension(k->first, k->second, &make_file);
     }
   }

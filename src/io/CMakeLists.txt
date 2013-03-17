@@ -101,6 +101,8 @@ if (WITH_FFMPEG)
     int main() { int res = avformat_alloc_output_context2(0, 0, 0, 0); }" HAVE_FFMPEG_AVFORMAT_ALLOC_OUTPUT_CONTEXT2)
     CHECK_C_SOURCE_COMPILES("#include <libavcodec/avcodec.h>
     int main() { enum AVCodecID test; }" HAVE_FFMPEG_AVCODEC_AVCODECID)
+    CHECK_C_SOURCE_COMPILES("#include <libavcodec/avcodec.h>
+    int main() { enum AVColorRange test; }" HAVE_FFMPEG_AVCOLOR_RANGE)
     set(CMAKE_REQUIRED_LIBRARIES)
     if (FFMPEG_LIBRARY_DIRS)
       set(CMAKE_REQUIRED_FLAGS)

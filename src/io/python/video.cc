@@ -250,7 +250,7 @@ static object describe_decoder_by_id(int id) {
  */
 static dict oformat_dictionary() {
   std::map<std::string, AVOutputFormat*> m;
-  io::detail::ffmpeg::oformats_installed(m);
+  io::detail::ffmpeg::oformats_supported(m);
   dict retval;
 
   for (auto k=m.begin(); k!=m.end(); ++k) {
@@ -287,7 +287,7 @@ static dict oformat_dictionary() {
  */
 static object codec_dictionary() {
   std::map<std::string, const AVCodec*> m;
-  io::detail::ffmpeg::codecs_installed(m);
+  io::detail::ffmpeg::codecs_supported(m);
   dict retval;
   for (auto k=m.begin(); k!=m.end(); ++k) {
     retval[k->first] = describe_codec(k->second);

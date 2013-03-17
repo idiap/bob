@@ -3,3 +3,4 @@ recursive-include doc *
 recursive-include bob */test/data/*
 recursive-include bob db/iris/*.names db/iris/*.data
 recursive-include bob visioner/*.gz
+recursive-include bob io/fonts/*.ttf io/fonts/*.txt

@@ -184,4 +184,6 @@ def peek_all(filename):
 # Keeps compatibility with the previously existing API
 open = File
 
+from . import utils
+
 __all__ = [k for k in dir() if not k.startswith('_')]

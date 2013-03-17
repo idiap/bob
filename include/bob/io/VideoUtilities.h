@@ -50,6 +50,11 @@ namespace bob { namespace io { namespace detail { namespace ffmpeg {
   void tokenize_csv(const char* what, std::vector<std::string>& values);
 
   /**
+   * Returns a list of supported codecs, with their capabilities
+   */
+  void codecs_supported (std::map<std::string, const AVCodec*>& installed);
+
+  /**
    * Returns a list of installed codecs, with their capabilities
    */
   void codecs_installed (std::map<std::string, const AVCodec*>& installed);
@@ -57,7 +62,18 @@ namespace bob { namespace io { namespace detail { namespace ffmpeg {
   /**
    * Returns a list of input formats this installation can handle, with details
    */
+  void iformats_supported (std::map<std::string, AVInputFormat*>& installed);
+
+  /**
+   * Returns a list of input formats this installation can handle, with details
+   */
   void iformats_installed (std::map<std::string, AVInputFormat*>& installed);
+
+  /**
+   * Returns a list of output formats this installation can handle, with
+   * details
+   */
+  void oformats_supported (std::map<std::string, AVOutputFormat*>& installed);
 
   /**
    * Returns a list of output formats this installation can handle, with

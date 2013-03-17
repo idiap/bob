@@ -81,7 +81,7 @@ void io::VideoReader::open(const std::string& filename) {
   m_nframes = format_ctxt->streams[stream_index]->nb_frames;
   if (m_nframes > 0) {
     //number of frames is known
-    m_framerate = m_nframes * AV_TIME_BASE / m_duration;
+    m_framerate = (double(m_nframes) * AV_TIME_BASE) / double(m_duration);
   }
   else {
     //number of frames is not known
