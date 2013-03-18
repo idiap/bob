@@ -98,9 +98,8 @@ void bind_sp_quantization()
     ;
 
   enum_<bob::sp::quantization::QuantizationType>("quantization_type")
-    .value("QUANTIZATION_UNIFORM", bob::sp::quantization::UNIFORM)
-    .value("QUANTIZATION_UNIFORM_ROUNDING", bob::sp::quantization::UNIFORM_ROUNDING)
-    .value("QUANTIZATION_USER_SPEC", bob::sp::quantization::USER_SPEC)
-    .export_values()
+    .value("UNIFORM", bob::sp::quantization::UNIFORM)
+    .value("UNIFORM_ROUNDING", bob::sp::quantization::UNIFORM_ROUNDING)
+    .value("USER_SPEC", bob::sp::quantization::USER_SPEC)
     ;
 }

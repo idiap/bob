@@ -60,8 +60,8 @@ class Quantization:
         1D numpy.ndarray containing user-specified thresholds of the quantization. If this parameter is given, quantization_type_ is automatically set to "user_spec". Otherwise, it is recalculated according to other quantization parameters. Each element corresponds to the lower boundary of the particular quantization level. Eg. array([ 0,  5, 10]) means quantization in 3 levels. Input values in the range [0,4] will be quantized to level 0, input values in the range[5,9] will be quantized to level 1 and input values in the range [10-max_level] will be quantized to level 2.
     """
     
-    quant_type_dict = {'uniform': quantization_type.QUANTIZATION_UNIFORM, 'uniform_rounding': quantization_type.QUANTIZATION_UNIFORM_ROUNDING, 'user_spec': quantization_type.QUANTIZATION_USER_SPEC}
-    quant_type_invdict = {quantization_type.QUANTIZATION_UNIFORM:'uniform', quantization_type.QUANTIZATION_UNIFORM_ROUNDING:'uniform_rounding', quantization_type.QUANTIZATION_USER_SPEC:'user_spec'}
+    quant_type_dict = {'uniform': quantization_type.UNIFORM, 'uniform_rounding': quantization_type.UNIFORM_ROUNDING, 'user_spec': quantization_type.USER_SPEC}
+    quant_type_invdict = {quantization_type.UNIFORM:'uniform', quantization_type.UNIFORM_ROUNDING:'uniform_rounding', quantization_type.USER_SPEC:'user_spec'}
     
     if quantization_type_ != None and quantization_type_ not in quant_type_dict.keys():
       raise RuntimeError, 'Unknown quantization type'  
