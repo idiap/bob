@@ -1388,6 +1388,7 @@ bool ffmpeg::read_video_frame (const std::string& filename,
           swscaler, context_frame, data, pkt, got_frame,
           throw_on_error);
     }
+    else break;
   } while (got_frame == 0);
 
   return true;
@@ -1467,6 +1468,7 @@ bool ffmpeg::skip_video_frame (const std::string& filename,
       dummy_decode_frame(filename, current_frame, codec_context,
           context_frame, pkt, got_frame, throw_on_error);
     }
+    else break;
   } while (got_frame == 0);
 
   return true;
