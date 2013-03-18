@@ -42,7 +42,7 @@ namespace ip {
 typedef struct GSSKeypoint_
 {
   GSSKeypoint_(const double s, const double y_, const double x_, 
-    const double o_=0.): 
+      const double o_=0.): 
     sigma(s), y(y_), x(x_), orientation(o_)
   {   
   }
@@ -60,8 +60,9 @@ typedef struct GSSKeypoint_
  */
 typedef struct GSSKeypointInfo_
 {
-  GSSKeypointInfo_(const size_t o_, const size_t s_, const int iy_, 
-    const int ix_, const double peak_score_=0., const double edge_score_=0.):
+  GSSKeypointInfo_(const size_t o_=0, const size_t s_=0, 
+      const int iy_=0, const int ix_=0, 
+      const double peak_score_=0., const double edge_score_=0.):
     o(o_), s(s_), iy(iy_), ix(ix_), peak_score(peak_score_),
     edge_score(edge_score_)
   {   
