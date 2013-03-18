@@ -438,7 +438,7 @@ void bind_io_video() {
 
   class_<io::VideoWriter, boost::shared_ptr<io::VideoWriter>, boost::noncopyable>("VideoWriter",
      "Use objects of this class to create and write video files using `FFmpeg <http://ffmpeg.org>`_ (or `libav <http://libav.org>`_ if FFmpeg is not available).",
-     init<const std::string&, size_t, size_t, optional<float, float, size_t, const std::string&, const std::string&, bool> >((arg("self"), arg("filename"), arg("height"), arg("width"), arg("framerate")=25.f, arg("bitrate")=1500000.f, arg("gop")=12, arg("codec")="", arg("format")="", arg("check")=true), "Creates a new output file given the input parameters. The format and codec to be used will be derived from the filename extension unless you define them explicetly (you can set both or just one of these two optional parameters)")
+     init<const std::string&, size_t, size_t, optional<float, float, size_t, const std::string&, const std::string&, bool> >((arg("self"), arg("filename"), arg("height"), arg("width"), arg("framerate")=25., arg("bitrate")=1500000., arg("gop")=12, arg("codec")="", arg("format")="", arg("check")=true), "Creates a new output file given the input parameters. The format and codec to be used will be derived from the filename extension unless you define them explicetly (you can set both or just one of these two optional parameters)")
      )
     .add_property("filename", make_function(&io::VideoReader::filename, return_value_policy<copy_const_reference>()), "The full path to the file that will be encoded by this object")
     .add_property("height", &io::VideoWriter::height, "The height of the output video file (must be a multiple of 2)")
