@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/test/gaussianScaleSpace.cc
+ * @file ip/cxx/test/GaussianScaleSpace.cc
  * @date Mon Sep 3 11:32:00 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *

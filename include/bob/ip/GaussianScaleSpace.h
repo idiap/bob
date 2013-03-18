@@ -1,5 +1,5 @@
 /**
- * @file cxx/ip/ip/GaussianScaleSpace.h
+ * @file bob/ip/GaussianScaleSpace.h
  * @date Thu Apr 7 19:52:29 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -75,6 +75,8 @@ class GaussianScaleSpace
      *   large kernels, and might cause run-time exceptions, as our
      *   implementation requires kernels too be smaller than inputs while 
      *   performing convolutions.
+     * @param border_type The way we deal with convolution at the boundaries
+     *   of the input image.
      */
     GaussianScaleSpace(const size_t height, const size_t width,
       const size_t n_octaves, const size_t n_intervals, const int octave_min,
@@ -166,7 +168,6 @@ class GaussianScaleSpace
 
     /**
      * @brief Allocate output vector of blitz Arrays.
-     * @param src The 2D input blitz array
      * @param dst A vector of 3D blitz Arrays. Previous content will be erased.
      *   New blitz Arrays of suitable sizes will be allocated and will populate the vector.
      */
