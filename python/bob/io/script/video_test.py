@@ -136,11 +136,18 @@ def user_test(original, max_frames, format, codec, filename):
   from .. import VideoReader, VideoWriter
   vreader = VideoReader(original, check=True)
   orig = vreader[:max_frames]
+  
+  # rounding frame rate - some older codecs do not accept random frame rates
+  framerate = vreader.frame_rate
+  if codec in ('mpegvideo', 'mpeg1video', 'mpeg2video'):
+    import math
+    framerate = math.ceil(vreader.frame_rate)
+
   vwriter = VideoWriter(filename, vreader.height, vreader.width,
-      vreader.frame_rate, codec=codec, format=format, check=False)
+      framerate, codec=codec, format=format, check=False)
   for k in orig: vwriter.append(k)
   del vwriter
-  return orig, vreader.frame_rate, VideoReader(filename, check=False)
+  return orig, framerate, VideoReader(filename, check=False)
 
 def summarize(function, shape, framerate, format, codec, output=None):
   """Summarizes distortion patterns for a given set of video settings and 
@@ -356,7 +363,7 @@ def main(user_input=None):
   for k, (f, code) in test_function.iteritems():
     print("  %s: %s test" % (code, k.capitalize()))
 
-  sys.stdout.write("Running %d tests..." %
+  sys.stdout.write("Running %d test(s)..." %
       (len(args.test)*len(args.format)*len(args.codec)))
   sys.stdout.flush()
 
