@@ -103,7 +103,7 @@ static object videoreader_getitem (io::VideoReader& v, Py_ssize_t sframe) {
  * Python wrapper to read multiple frames from a video sequence, allowing the
  * implementation of a __getitem__() functionality on VideoReader objects.
  */
-static tuple videoreader_getslice (io::VideoReader& v, slice sobj) {
+static object videoreader_getslice (io::VideoReader& v, slice sobj) {
   size_t start = 0;
   PySliceObject* sl = (PySliceObject*)sobj.ptr();
   if (sl->start != Py_None) {
@@ -144,7 +144,8 @@ static tuple videoreader_getslice (io::VideoReader& v, slice sobj) {
     retval.append(tmp.pyobject());
   }
  
-  return tuple(retval);
+  tp::py_array py_retval(retval, str("uint8"));
+  return py_retval.pyobject();
 }
 
 static object videoreader_load(io::VideoReader& reader, 
@@ -414,7 +415,7 @@ void bind_io_video() {
   iterator_wrapper().wrap(); //wraps io::VideoReader::const_iterator
 
   class_<io::VideoReader, boost::shared_ptr<io::VideoReader> >("VideoReader",
-      "VideoReader objects can read data from video files. The current implementation uses `FFmpeg <http://ffmpeg.org>`_ (or `libav <http://libav.org>`_ if FFmpeg is not available) which is a stable freely available video encoding and decoding library, designed specifically for these tasks. You can read an entire video in memory by using the 'load()' method or use video iterators to read it frame by frame and avoid overloading your machine's memory. The maximum precision data `FFmpeg` will yield is a 24-bit (8-bit per band) representation of each pixel (32-bit depths are also supported by `FFmpeg`, but not by Bob presently). So, the input of data using this class uses ``uint8`` as base element type. Output will be colored using the RGB standard, with each band varying between 0 and 255, with zero meaning pure black and 255, pure white (color).", init<const std::string&, optional<bool> >((arg("self"), arg("filename"), arg("check")=true), "Initializes a new VideoReader object by giving the input file path to read. Format and codec will be extracted from the video metadata, automatically, by `FFmpeg`. By default, if the format and/or the codec are not supported by this version of Bob, an exception will be raised. You can (at your own risk) set the `check' to 'False' to avoid this check."))
+      "VideoReader objects can read data from video files. The current implementation uses `FFmpeg <http://ffmpeg.org>`_ (or `libav <http://libav.org>`_ if FFmpeg is not available) which is a stable freely available video encoding and decoding library, designed specifically for these tasks. You can read an entire video in memory by using the 'load()' method or use video iterators to read it frame by frame and avoid overloading your machine's memory. The maximum precision data `FFmpeg` will yield is a 24-bit (8-bit per band) representation of each pixel (32-bit depths are also supported by `FFmpeg`, but not by Bob presently). So, the input of data using this class uses ``uint8`` as base element type. Output will be colored using the RGB standard, with each band varying between 0 and 255, with zero meaning pure black and 255, pure white (color).", init<const std::string&, optional<bool> >((arg("self"), arg("filename"), arg("check")=true), "Initializes a new VideoReader object by giving the input file path to read. Format and codec will be extracted from the video metadata, automatically, by ``FFmpeg``. By default, if the format and/or the codec are not supported by this version of Bob, an exception will be raised. You can (at your own risk) set the ``check`` to ``False`` to avoid this check."))
     .add_property("filename", make_function(&io::VideoReader::filename, return_value_policy<copy_const_reference>()), "The full path to the file that will be decoded by this object")
     .add_property("height", &io::VideoReader::height, "The height of each frame in the video (a multiple of 2)")
     .add_property("width", &io::VideoReader::width, "The width of each frame in the video (a multiple of 2)")

@@ -250,12 +250,14 @@ void ffmpeg::tokenize_csv(const char* what, std::vector<std::string>& values) {
 void ffmpeg::codecs_installed (std::map<std::string, const AVCodec*>& installed) {
   for (AVCodec* it = av_codec_next(0); it != 0; it = av_codec_next(it) ) {
     if (it->type == AVMEDIA_TYPE_VIDEO) {
+      /**
       auto exists = installed.find(std::string(it->name));
       if (exists != installed.end() && exists->second->id != it->id) {
         bob::core::warn << "Not overriding video codec \"" << it->long_name 
           << "\" (" << it->name << ")" << std::endl;
       }
-      else installed[it->name] = it;
+      else **/
+      installed[it->name] = it;
     }
   }
 }

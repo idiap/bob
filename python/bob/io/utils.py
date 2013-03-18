@@ -103,7 +103,8 @@ def color_distortion(shape, framerate, format, codec, filename):
     outv.append(newframe)
     orig.append(newframe)
   outv.close()
-  return orig, VideoReader(filename, check=False)
+  orig = numpy.array(orig, dtype='uint8')
+  return orig, framerate, VideoReader(filename, check=False)
 
 def frameskip_detection(shape, framerate, format, codec, filename):
   """Returns distortion patterns for a set of frames with big numbers.
@@ -136,7 +137,8 @@ def frameskip_detection(shape, framerate, format, codec, filename):
     outv.append(newframe)
     orig.append(newframe)
   outv.close()
-  return orig, VideoReader(filename, check=False)
+  orig = numpy.array(orig, dtype='uint8')
+  return orig, framerate, VideoReader(filename, check=False)
 
 def quality_degradation(shape, framerate, format, codec, filename):
   """Returns noise patterns for a set of frames.
@@ -170,4 +172,5 @@ def quality_degradation(shape, framerate, format, codec, filename):
     outv.append(newframe)
     orig.append(newframe)
   outv.close()
-  return orig, VideoReader(filename, check=False)
+  orig = numpy.array(orig, dtype='uint8')
+  return orig, framerate, VideoReader(filename, check=False)

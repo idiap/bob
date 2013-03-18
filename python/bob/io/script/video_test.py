@@ -28,6 +28,7 @@ from .. import utils, create_directories_save
 from ... import version
 from .. import save as save_to_file
 from ...test import utils as test_utils
+from ...io import test as io_test
 
 CODECS = supported_video_codecs()
 ALL_CODECS = available_video_codecs()
@@ -107,6 +108,36 @@ container:
     'prog': os.path.basename(sys.argv[0]),
     }
 
+def user_test(original, max_frames, format, codec, filename):
+  """Returns distortion patterns for a set of frames with moving colors.
+
+  Keyword parameters:
+
+  original
+    The name (path) to the original user file that will be used for the test
+
+  max_frames
+    The maximum number of frames to read from user input
+
+  format
+    The string that identifies the format to be used for the output file
+
+  codec
+    The codec to be used for the output file
+
+  filename
+    The name (path) of the file to use for encoding the test
+  """
+
+  from .. import VideoReader, VideoWriter
+  vreader = VideoReader(original, check=True)
+  orig = vreader[:max_frames]
+  vwriter = VideoWriter(filename, vreader.height, vreader.width,
+      vreader.frame_rate, codec=codec, format=format, check=False)
+  for k in orig: vwriter.append(k)
+  del vwriter
+  return orig, vreader.frame_rate, VideoReader(filename, check=False)
+
 def summarize(function, shape, framerate, format, codec, output=None):
   """Summarizes distortion patterns for a given set of video settings and 
   for a given input function.
@@ -144,12 +175,12 @@ def summarize(function, shape, framerate, format, codec, output=None):
     # In this case, the encoding is subject to more noise as the filtered,
     # final image that is encoded will contain added noise on the extra
     # borders.
-    orig, encoded = function(shape, framerate, format, codec, fname)
+    orig, framerate, encoded = function(shape, framerate, format, codec, fname)
 
     tmp = []
     for k, of in enumerate(orig):
       tmp.append(abs(of.astype('float64')-encoded[k].astype('float64')).sum())
-    size = float(3 * width * height)
+    size = numpy.prod(orig[0].shape)
     S = sum(tmp)/size
     M = S/len(tmp)
     Min = min(tmp)/size
@@ -191,14 +222,16 @@ def detail(function, shape, framerate, format, codec, outdir):
 
   Returns a single a single string summarizing the distortion results. 
   """
-  
-  length, height, width = shape
 
+  length, height, width = shape
+  
   text_format = "%%0%dd" % len(str(length-1))
 
   output = os.path.join(outdir, "video." + format)
   retval, orig, encoded = summarize(function, shape, framerate, 
       format, codec, output)
+  
+  length, _, height, width = orig.shape
 
   # save original, reloaded and difference images on output directories
   for i, orig_frame in enumerate(orig):
@@ -225,7 +258,7 @@ def main(user_input=None):
       'color',
       'frameskip',
       'noise',
-      #'access',
+      'user',
       ]
 
   parser.add_argument("test", metavar='TEST', type=str, nargs='*', 
@@ -265,6 +298,12 @@ def main(user_input=None):
   parser.add_argument("-o", "--output", type=str,
       help="If set, then videos created for the tests are stored on the given directory. By default this option is empty and videos are created on a temporary directory and deleted after tests are done. If you set it, we also produced detailed output analysis for manual inspection.")
 
+  parser.add_argument("-u", "--user-video", type=str,
+      help="Set the path to the user video that will be used for distortion tests (if not set use default test video)")
+
+  parser.add_argument("-n", "--user-frames", type=int, default=10,
+      help="Set the number of maximum frames to read from the user video (reads %(default)s by default)")
+
   args = parser.parse_args(args=user_input)
 
   # manual check because of argparse limitation
@@ -291,12 +330,19 @@ def main(user_input=None):
     print list_all_formats()
     sys.exit(0)
 
+  if 'user' in args.test and args.user_video is None:
+    # in this case, take our standard video test
+    args.user_video = test_utils.datafile("test.mov", io_test)
+
+  def wrap_user_function(shape, framerate, format, codec, filename):
+    return user_test(args.user_video, args.user_frames, format, codec, filename)
+
   # mapping between test name and function
   test_function = {
       'color': (utils.color_distortion, 'C'),
       'frameskip': (utils.frameskip_detection, 'S'),
       'noise': (utils.quality_degradation, 'N'),
-      #'access': (utils.random_access, 'A'),
+      'user': (wrap_user_function, 'U'),
       }
 
   # result table
