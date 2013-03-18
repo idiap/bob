@@ -30,6 +30,8 @@
 #include "bob/core/python/exception.h"
 #include "bob/core/python/ndarray.h"
 
+#include "libavutil/pixdesc.h"
+
 using namespace boost::python;
 namespace io = bob::io;
 namespace tp = bob::python;
@@ -180,6 +182,17 @@ static object describe_codec(const AVCodec* codec) {
   retval["name"] = codec->name;
   retval["long_name"] = codec->long_name;
   retval["id"] = (unsigned)codec->id;
+
+  // get pix formats
+  if (codec->pix_fmts) {
+    list pixfmt;
+    unsigned int i=0;
+    while(codec->pix_fmts[i] != -1) {
+      pixfmt.append((int)codec->pix_fmts[i++]);
+    }
+    retval["pixfmts"] = tuple(pixfmt);
+  }
+  else retval["pixfmts"] = object();
 
   // get specific framerates for the codec, if any:
   const AVRational* rate = codec->supported_framerates;
