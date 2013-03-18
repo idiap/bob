@@ -149,7 +149,7 @@ def summarize(function, shape, framerate, format, codec, output=None):
     tmp = []
     for k, of in enumerate(orig):
       tmp.append(abs(of.astype('float64')-encoded[k].astype('float64')).sum())
-    size = float(width * height)
+    size = float(3 * width * height)
     S = sum(tmp)/size
     M = S/len(tmp)
     Min = min(tmp)/size
