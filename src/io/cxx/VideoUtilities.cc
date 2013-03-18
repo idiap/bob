@@ -1113,9 +1113,9 @@ void ffmpeg::write_video_frame (const blitz::Array<uint8_t,3>& data,
         throw std::runtime_error(m.str());
       }
 
-      context_frame->pts += 1;
-
     }
+      
+    context_frame->pts += 1;
 
   }
 
