@@ -36,6 +36,46 @@ namespace bob {
  */
 namespace ip {
 
+/** 
+ * @brief Structure for the GSS keypoints (location)
+ */
+typedef struct GSSKeypoint_
+{
+  GSSKeypoint_(const double s, const double y_, const double x_, 
+    const double o_=0.): 
+    sigma(s), y(y_), x(x_), orientation(o_)
+  {   
+  }
+
+  double sigma; //< sigma
+  double y; //< y-coordinate
+  double x; //< x-coordinate
+  double orientation; //< orientation (0 if not estimated)
+} GSSKeypoint;
+
+/** 
+ * @brief Additional structure for the GSS keypoints (location)
+ * This keeps track of more detailed information. This can be useful for 
+ * paramater tuning.
+ */
+typedef struct GSSKeypointInfo_
+{
+  GSSKeypointInfo_(const size_t o_, const size_t s_, const int iy_, 
+    const int ix_, const double peak_score_=0., const double edge_score_=0.):
+    o(o_), s(s_), iy(iy_), ix(ix_), peak_score(peak_score_),
+    edge_score(edge_score_)
+  {   
+  }
+
+  size_t o; //< octave index in the vector of octaves
+  size_t s; //< scale index in the vector of the GSS pyramid
+  int iy; //< integer unnormalized y coordinate
+  int ix; //< integer unnormalized x coordinate
+  double peak_score; // score of the peak (D(x) in section 4 of Lowe's paper)
+  double edge_score; // score of the edge response (ratio Tr(H)^2/det(H) in section 4.1 of Lowe's paper)
+} GSSKeypointInfo;
+
+
 /**
  * @brief This class can be used to extract a Gaussian Scale Space
  * Reference: "Distinctive Image Features from Scale-Invariant Keypoints", 
@@ -44,7 +84,6 @@ namespace ip {
 class GaussianScaleSpace
 {
   public:
-
     /**
      * @brief Constructor: generates a GaussianScaleSpace extractor
      * @param height Height of the images to process
@@ -185,7 +224,6 @@ class GaussianScaleSpace
     const blitz::TinyVector<int,3> getOutputShape(const int octave) const;
 
   private:
-    
     /**
      * Attributes
      */

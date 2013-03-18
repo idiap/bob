@@ -67,11 +67,11 @@ static object call_c(bob::ip::GaussianScaleSpace& op,
       case bob::core::array::t_uint16: return inner_call_c<uint16_t>(op, src, dst);
       case bob::core::array::t_float64: return inner_call_c<double>(op, src, dst);
       default:
-        PYTHON_ERROR(TypeError, "GaussianScaleSpace __call__ does not support array with type '%s'", info.str().c_str());
+        PYTHON_ERROR(TypeError, "bob.ip.GaussianScaleSpace __call__ does not support array with type '%s'", info.str().c_str());
     }
   }
   else
-    PYTHON_ERROR(TypeError, "Gaussian __call__ does not support array with " SIZE_T_FMT " dimensions", info.nd);
+    PYTHON_ERROR(TypeError, "bob.ip.GaussianScaleSpace __call__ does not support array with " SIZE_T_FMT " dimensions", info.nd);
 }
 
 
@@ -106,15 +106,31 @@ static object call_p(const bob::ip::GaussianScaleSpace& op,
       case bob::core::array::t_uint16: return inner_call_p<uint16_t>(op, src);
       case bob::core::array::t_float64: return inner_call_p<double>(op, src);
       default:
-        PYTHON_ERROR(TypeError, "GaussianScaleSpace __call__ does not support array with type '%s'", info.str().c_str());
+        PYTHON_ERROR(TypeError, "bob.ip.GaussianScaleSpace __call__ does not support array with type '%s'", info.str().c_str());
     }
   }
   else
-    PYTHON_ERROR(TypeError, "Gaussian __call__ does not support array with " SIZE_T_FMT " dimensions", info.nd);
+    PYTHON_ERROR(TypeError, "bob.ip.GaussianScaleSpace __call__ does not support array with " SIZE_T_FMT " dimensions", info.nd);
 }
 
 void bind_ip_gaussian_scale_space() 
 {
+  class_<bob::ip::GSSKeypoint, boost::shared_ptr<bob::ip::GSSKeypoint> >("GSSKeypoint", "Structure to describe a keypoint on the Gaussian Scale Space. It consists of a scale sigma, a location (x,y) and an orientation o.", init<const double, const double, const double, optional<const double> >((arg("self"), arg("scale"), arg("y"), arg("x"), arg("o")=0.), "Creates a GSS keypoint"))
+    .def_readwrite("sigma", &bob::ip::GSSKeypoint::sigma, "The floating point value describing the scale of the keypoint")
+    .def_readwrite("y", &bob::ip::GSSKeypoint::y, "The y-coordinate of the keypoint")
+    .def_readwrite("x", &bob::ip::GSSKeypoint::x, "The x-coordinate of the keypoint")
+    .def_readwrite("orientation", &bob::ip::GSSKeypoint::orientation, "The orientation of the keypoint (in radians)")
+    ;
+
+  class_<bob::ip::GSSKeypointInfo, boost::shared_ptr<bob::ip::GSSKeypointInfo> >("GSSKeypointInfo", "This is a companion structure to the bob.ip.GSSKeypoin. It provides additional and practical information such as the octave and scale indices, the integer location (ix,iy), and eventually the scores associated to the detection step (peak_score and edge_score).", init<const size_t, const size_t, const int, const int, optional<const double, const double> >((arg("self"), arg("octave_index"), arg("scale_index"), arg("iy"), arg("ix"), arg("peak_score")=0., arg("edge_score")=0.), "Creates a GSS keypoint structure with more detailed information"))
+    .def_readwrite("o", &bob::ip::GSSKeypointInfo::o, "The octave index associated with the keypoint in the bob.ip.GaussianScaleSpace object")
+    .def_readwrite("s", &bob::ip::GSSKeypointInfo::s, "The scale index associated with the keypoint in the bob.ip.GaussianScaleSpace object")
+    .def_readwrite("iy", &bob::ip::GSSKeypointInfo::iy, "The integer unnormalized y-coordinate of the keypoint")
+    .def_readwrite("ix", &bob::ip::GSSKeypointInfo::ix, "The integer unnormalized x-coordinate of the keypoint")
+    .def_readwrite("peak_score", &bob::ip::GSSKeypointInfo::peak_score, "The peak score of the keypoint during the SIFT-like detection step")
+    .def_readwrite("edge_score", &bob::ip::GSSKeypointInfo::edge_score, "The edge score of the keypoint during the SIFT-like detection step")
+    ;
+
   class_<bob::ip::GaussianScaleSpace, boost::shared_ptr<bob::ip::GaussianScaleSpace> >("GaussianScaleSpace", "This class allows after configuration the generation of Gaussian Pyramids that can be used to extract SIFT features.\n\nReference:\n'Distinctive Image Features from Scale-Invariant Keypoints', D. Lowe, International Journal of Computer Vision, 2004", init<const size_t, const size_t, const size_t, const size_t, const int, optional<const double, const double, const double, const bob::sp::Extrapolation::BorderType> >((arg("height"), arg("width"), arg("n_octaves"), arg("n_scales"), arg("octave_min"), arg("sigma_n")=0.5, arg("sigma0")=1.6, arg("kernel_radius_factor")=4., arg("border_type")=bob::sp::Extrapolation::Mirror), "Creates an object that allows the construction of Gaussian pyramids."))
       .def(init<bob::ip::GaussianScaleSpace&>(args("other")))
       .def(self == self)
