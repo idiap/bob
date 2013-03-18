@@ -10,6 +10,7 @@ manual inspection. It tries to help identifying problems with:
   1. Color distortion
   2. Frame skipping or delay
   3. Encoding or decoding quality
+  4. Frame searching (random access)
 
 You can parameterize the program with the type of file, (FFmpeg) codec and a
 few other parameters. The program then generates artificial input signals to
@@ -66,7 +67,7 @@ __epilog__ = """Example usage:
 3. Check for encoding/decoding quality using a FFV1 codec in a '.wmv' video
 container:
 
-  $ %(prog)s --format='wmv' --codec='ffv1' codec
+  $ %(prog)s --format='wmv' --codec='ffv1' noise
 
 4. To list all available codecs:
 
@@ -121,11 +122,10 @@ def summarize(function, shape, framerate, format, codec, output=None):
     # final image that is encoded will contain added noise on the extra
     # borders.
     orig, encoded = function(shape, framerate, format, codec, fname)
-    reloaded = encoded.load()
 
     tmp = []
     for k, of in enumerate(orig):
-      tmp.append(abs(of.astype('float64')-reloaded[k].astype('float64')).sum())
+      tmp.append(abs(of.astype('float64')-encoded[k].astype('float64')).sum())
     size = float(width * height)
     S = sum(tmp)/size
     M = S/len(tmp)
@@ -135,16 +135,16 @@ def summarize(function, shape, framerate, format, codec, output=None):
     ArgMax = tmp.index(max(tmp))
     retval = "%.3f min=%.3f@%d max=%.3f@%d" % (M, Min, ArgMin, Max, ArgMax)
     if abs(encoded.frame_rate - framerate) > 0.01:
-      retval += " !FR(%g)" % encoded.frame_rate
-    if len(reloaded) != len(orig):
-      retval += " !LEN(%d)" % len(reloaded)
+      retval += " !FR(%g)" % abs(encoded.frame_rate - framerate)
+    if len(encoded) != len(orig):
+      retval += " !LEN(%d)" % len(encoded)
 
   finally:
 
     if os.path.exists(fname) and output is None: os.unlink(fname)
 
   if output:
-    return retval, orig, reloaded
+    return retval, orig, encoded
   else:
     return retval
 
@@ -174,17 +174,16 @@ def detail(function, shape, framerate, format, codec, outdir):
   text_format = "%%0%dd" % len(str(length-1))
 
   output = os.path.join(outdir, "video." + format)
-  retval, orig, reloaded = summarize(function, shape, framerate, 
+  retval, orig, encoded = summarize(function, shape, framerate, 
       format, codec, output)
 
   # save original, reloaded and difference images on output directories
-  for i, rframe in enumerate(reloaded):
+  for i, orig_frame in enumerate(orig):
     out = numpy.ndarray((3, height, 3*width), dtype='uint8')
-    out[:,:,:width] = orig[i]
-    out[:,:,width:(2*width)] = rframe
-    diff = abs(orig[i].astype('int64')-rframe.astype('int64'))
-    diff /= float(diff.max())
-    diff *= 255
+    out[:,:,:width] = orig_frame
+    out[:,:,width:(2*width)] = encoded[i]
+    diff = abs(encoded[i].astype('int64')-orig_frame.astype('int64'))
+    diff[diff>0] = 255 #binary output
     out[:,:,(2*width):] = diff.astype('uint8')
     save_to_file(out, os.path.join(outdir, 'frame-' + (text_format%i) + '.png'))
 
@@ -203,6 +202,7 @@ def main(user_input=None):
       'color',
       'frameskip',
       'noise',
+      #'access',
       ]
 
   parser.add_argument("test", metavar='TEST', type=str, nargs='*', 
@@ -258,6 +258,7 @@ def main(user_input=None):
       'color': (utils.color_distortion, 'C'),
       'frameskip': (utils.frameskip_detection, 'S'),
       'noise': (utils.quality_degradation, 'N'),
+      #'access': (utils.random_access, 'A'),
       }
 
   # result table
