@@ -20,6 +20,7 @@ set(src
    "flow.cc"
    "DCTFeatures.cc"
    "gaussian.cc"
+   "gaussianScaleSpace.cc"
    "WeightedGaussian.cc"
    "Median.cc"
    "Sobel.cc"

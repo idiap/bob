@@ -35,6 +35,7 @@ set(src
    "SelfQuotientImage.cc"
    "SpatioTemporalGradient.cc"
    "DCTFeatures.cc"
+   "GaussianScaleSpace.cc"
 )
 
 # If we have VLFeat installed, enable the compilation of relevant modules
@@ -63,6 +64,7 @@ bob_add_test(${PROJECT_NAME} extrapolateMask test/extrapolateMask.cc)
 bob_add_test(${PROJECT_NAME} flipflop test/flipflop.cc)
 bob_add_test(${PROJECT_NAME} gwt test/GaborWaveletTransform.cc)
 bob_add_test(${PROJECT_NAME} gaussian test/Gaussian.cc)
+bob_add_test(${PROJECT_NAME} gaussianScaleSpace test/GaussianScaleSpace.cc)
 bob_add_test(${PROJECT_NAME} weightedGaussian test/WeightedGaussian.cc)
 bob_add_test(${PROJECT_NAME} median test/Median.cc)
 bob_add_test(${PROJECT_NAME} gammaCorrection test/gammaCorrection.cc)
