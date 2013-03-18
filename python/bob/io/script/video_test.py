@@ -112,7 +112,7 @@ container:
     'prog': os.path.basename(sys.argv[0]),
     }
 
-def user_test(original, max_frames, format, codec, filename):
+def user_video(original, max_frames, format, codec, filename):
   """Returns distortion patterns for a set of frames with moving colors.
 
   Keyword parameters:
@@ -345,7 +345,7 @@ def main(user_input=None):
     args.user_video = test_utils.datafile("test.mov", io_test)
 
   def wrap_user_function(shape, framerate, format, codec, filename):
-    return user_test(args.user_video, args.user_frames, format, codec, filename)
+    return user_video(args.user_video, args.user_frames, format, codec, filename)
 
   # mapping between test name and function
   test_function = {
