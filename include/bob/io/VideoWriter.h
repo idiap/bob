@@ -54,10 +54,15 @@ namespace bob { namespace io {
        * @param format If you must, specify a valid FFmpeg output format name
        * and that will be used to encode the video on the output file. Leave
        * it empty to guess from the filename extension.
+       * @param check The video will be created if the combination of format
+       * and codec are known to work and have been tested, otherwise an
+       * exception is raised. If you set 'check' to 'false', though, we will
+       * ignore this check.
        */
       VideoWriter(const std::string& filename, size_t height, size_t width,
           double framerate=25., double bitrate=1500000., size_t gop=12,
-          const std::string& codec="", const std::string& format="");
+          const std::string& codec="", const std::string& format="",
+          bool check=true);
 
       /**
        * Destructor virtualization

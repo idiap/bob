@@ -60,6 +60,11 @@ namespace bob { namespace io { namespace detail { namespace ffmpeg {
   void codecs_installed (std::map<std::string, const AVCodec*>& installed);
 
   /**
+   * Returns 'true' if a given codec is supported
+   */
+  bool codec_is_supported (const std::string& codecname);
+
+  /**
    * Returns a list of input formats this installation can handle, with details
    */
   void iformats_supported (std::map<std::string, AVInputFormat*>& installed);
@@ -68,6 +73,11 @@ namespace bob { namespace io { namespace detail { namespace ffmpeg {
    * Returns a list of input formats this installation can handle, with details
    */
   void iformats_installed (std::map<std::string, AVInputFormat*>& installed);
+
+  /**
+   * Returns 'true' if a given input format is supported
+   */
+  bool iformat_is_supported (const std::string& formatname);
 
   /**
    * Returns a list of output formats this installation can handle, with
@@ -80,6 +90,23 @@ namespace bob { namespace io { namespace detail { namespace ffmpeg {
    * details
    */
   void oformats_installed (std::map<std::string, AVOutputFormat*>& installed);
+
+  /**
+   * Returns 'true' if a given output format is supported
+   */
+  bool oformat_is_supported (const std::string& formatname);
+
+  /**
+   * List the codecs supported by a given output format
+   */
+  void oformat_supported_codecs (const std::string& formatname,
+      std::vector<const AVCodec*>& installed);
+
+  /**
+   * Tells if a certain output format supports a given codec.
+   */
+  bool oformat_supports_codec (const std::string& formatname, 
+      const std::string& codecname);
 
   /************************************************************************
    * Video reading and writing utilities (shared)

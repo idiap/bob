@@ -45,7 +45,8 @@ bob::io::VideoWriter::VideoWriter(
     double bitrate,
     size_t gop,
     const std::string& codec,
-    const std::string& format) :
+    const std::string& format,
+    bool check) :
   m_filename(filename),
   m_opened(false),
   m_format_context(ffmpeg::make_output_format_context(filename, format)),
@@ -70,6 +71,25 @@ bob::io::VideoWriter::VideoWriter(
   m_formatname(format),
   m_current_frame(0)
 {
+  //runs a codec/format check if the user asked so
+  if (check) {
+    if (!ffmpeg::oformat_is_supported(formatName())) {
+      boost::format s("The detected format (`%s' = `%s') of the output video file `%s' is not currently supported by this version of Bob. Choose one of the supported formats or disable the `check' flag on the VideoWriter object (if you are sure of what you are doing).");
+      s % formatName() % formatLongName() % filename;
+      throw std::runtime_error(s.str());
+    }
+    if (!ffmpeg::codec_is_supported(codecName())) {
+      boost::format s("The detected encoder (`%s' = `%s') for the video stream on the output video file `%s' is not currently supported by this version of Bob. Choose a supported codec or disable the `check' flag on the VideoWriter object (if you are sure of what you are doing).");
+      s % codecName() % codecLongName() % filename;
+      throw std::runtime_error(s.str());
+    }
+    if (!ffmpeg::oformat_supports_codec(formatName(), codecName())) {
+      boost::format s("The detected pair of format and codec chosen for video file `%s' is not currently supported by this version of Bob. Choose a supported combination of formats and codecs or disable the `check' flag on the VideoWriter object (if you are sure of what you are doing).");
+      s % codecName() % codecLongName() % filename;
+      throw std::runtime_error(s.str());
+    }
+  }
+
   ffmpeg::open_output_file(m_filename, m_format_context);
 
   //sets up the io layer typeinfo

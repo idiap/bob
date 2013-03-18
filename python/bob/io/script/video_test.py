@@ -23,17 +23,18 @@ import argparse
 import numpy
 
 # internal
-from .. import video_codecs, videowriter_formats
+from .. import supported_video_codecs, available_video_codecs, supported_videowriter_formats, available_videowriter_formats
 from .. import utils, create_directories_save
 from ... import version
 from .. import save as save_to_file
 from ...test import utils as test_utils
 
-CODECS = video_codecs()
+CODECS = supported_video_codecs()
+ALL_CODECS = available_video_codecs()
 
 def list_codecs(*args, **kwargs):
   retval = """\
-  Available Codecs:
+  Supported Codecs:
   -----------------\n"""
 
   for k in sorted(CODECS.keys()):
@@ -41,16 +42,38 @@ def list_codecs(*args, **kwargs):
 
   return retval[:-1]
 
-FORMATS = videowriter_formats()
+def list_all_codecs(*args, **kwargs):
+  retval = """\
+  Available Codecs:
+  -----------------\n"""
+
+  for k in sorted(ALL_CODECS.keys()):
+    retval += ("  %-20s  %s\n" % (k, ALL_CODECS[k]['long_name']))[:80]
+
+  return retval[:-1]
+
+FORMATS = supported_videowriter_formats()
+ALL_FORMATS = available_videowriter_formats()
 
 def list_formats(*args, **kwargs):
+
+  retval = """\
+  Supported Formats:
+  ------------------\n"""
+
+  for k in sorted(FORMATS.keys()):
+    retval += ("  %-20s  %s\n" % (k, FORMATS[k]['long_name']))[:80]
+
+  return retval[:-1]
+
+def list_all_formats(*args, **kwargs):
 
   retval = """\
   Available Formats:
   ------------------\n"""
 
-  for k in sorted(FORMATS.keys()):
-    retval += ("  %-20s  %s\n" % (k, FORMATS[k]['long_name']))[:80]
+  for k in sorted(ALL_FORMATS.keys()):
+    retval += ("  %-20s  %s\n" % (k, ALL_FORMATS[k]['long_name']))[:80]
 
   return retval[:-1]
 
@@ -208,16 +231,23 @@ def main(user_input=None):
   parser.add_argument("test", metavar='TEST', type=str, nargs='*', 
       default=test_choices, help="The name of the test or tests you want to run. Choose between `%s'. If none given, run through all." % ('|'.join(test_choices)))
  
-  codec_choices = sorted(CODECS.keys())
+  supported_codecs = sorted(CODECS.keys())
+  available_codecs = sorted(ALL_CODECS.keys())
+
   parser.add_argument("-c", "--codec", metavar='CODEC', type=str, nargs='*',
-      default=codec_choices, choices=codec_choices, help="The name of the codec you want to test with. For a list of available codecs, look below. If none given, run through all.")
+      default=supported_codecs, choices=available_codecs, help="The name of the codec you want to test with. For a list of available codecs, look below. If none given, run through all.")
   parser.add_argument("--list-codecs", action="store_true", default=False,
+      help="List all supported codecs and exits")
+  parser.add_argument("--list-all-codecs", action="store_true", default=False,
       help="List all available codecs and exits")
   
-  format_choices = sorted(FORMATS.keys())
+  supported_formats = sorted(FORMATS.keys())
+  available_formats = sorted(ALL_FORMATS.keys())
   parser.add_argument("-f", "--format", metavar='FORMAT', type=str, nargs='*',
-      default=format_choices, choices=format_choices, help="The name of the format you want to test with. For a list of available formats, look below. If none given, run through all.")
+      default=supported_formats, choices=available_formats, help="The name of the format you want to test with. For a list of available formats, look below. If none given, run through all.")
   parser.add_argument("--list-formats", action="store_true", default=False,
+      help="List all supported formats and exits")
+  parser.add_argument("--list-all-formats", action="store_true", default=False,
       help="List all available formats and exits")
 
   parser.add_argument("-t", "--height", metavar="INT", type=int, 
@@ -249,8 +279,16 @@ def main(user_input=None):
     print list_codecs()
     sys.exit(0)
 
+  if args.list_all_codecs: 
+    print list_all_codecs()
+    sys.exit(0)
+
   if args.list_formats: 
     print list_formats()
+    sys.exit(0)
+
+  if args.list_all_formats:
+    print list_all_formats()
     sys.exit(0)
 
   # mapping between test name and function
@@ -282,6 +320,13 @@ def main(user_input=None):
       format_table = test_table.setdefault(format, {})
 
       for codec in args.codec:
+
+        if codec not in supported_videowriter_formats()[format]['supported_codecs'].keys():
+          # skip this test...
+          sys.stdout.write(code)
+          sys.stdout.flush()
+          format_table[codec] = "%s+%s is unsupported" % (format, codec)
+          continue
 
         if args.output:
   
@@ -328,12 +373,12 @@ def main(user_input=None):
   print "  Framerate: %f Hz"     % args.framerate
   print ""
 
-  print " %-9s | %-12s | %-12s | %s" % ('test', 'format', 'codec', 'figure (lower is better quality)')
-  print ((11*'-') + '+' + (14*'-') + '+' + (14*'-') + '+' + ((80-45)*'-'))
+  print " %-9s | %-3s | %-16s | %s" % ('test', 'fmt', 'codec', 'figure (lower is better quality)')
+  print ((11*'-') + '+' + (5*'-') + '+' + (18*'-') + '+' + ((80-45)*'-'))
   for test in sorted(table.iterkeys()):
     test_table = table[test]
     for format in sorted(test_table.iterkeys()):
       format_table = test_table[format]
       for codec in sorted(format_table.iterkeys()):
         figure = format_table[codec]
-        print " %-9s | %-12s | %-12s | %s" % (test, format, codec, figure)
+        print " %-9s | %-3s | %-16s | %s" % (test, format, codec, figure)

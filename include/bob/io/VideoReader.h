@@ -52,9 +52,12 @@ namespace bob { namespace io {
     public:
 
       /**
-       * Opens a new Video stream for reading. 
+       * Opens a new Video stream for reading. The video will be loaded if the
+       * combination of format and codec are known to work and have been
+       * tested, otherwise an exception is raised. If you set 'check' to
+       * 'false', though, we will ignore this check.
        */
-      VideoReader(const std::string& filename);
+      VideoReader(const std::string& filename, bool check=true);
 
       /**
        * Opens a new Video stream copying information from another VideoStream
@@ -179,7 +182,7 @@ namespace bob { namespace io {
       /**
        * Opens the previously set up Video stream for the reader
        */
-      void open(const std::string& filename);
+      void open(const std::string& filename, bool check);
 
     public: //iterators
 
@@ -362,6 +365,7 @@ namespace bob { namespace io {
     private: //our representation
 
       std::string m_filepath; ///< the name of the file we are manipulating
+      bool m_check; ///< shall I check for compatibility when opening?
       size_t m_height; ///< the height of the video frames (number of rows)
       size_t m_width; ///< the width of the video frames (number of columns)
       size_t m_nframes; ///< the number of frames in this video file
