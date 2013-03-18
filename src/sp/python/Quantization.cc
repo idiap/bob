@@ -97,7 +97,7 @@ void bind_sp_quantization()
     .def("quantization_level", &bob::sp::Quantization<uint16_t>::quantization_level, (arg("self"),arg("input")), "Calculates the quantization level for a single input value, given the current thresholds table.")
     ;
 
-  enum_<bob::sp::quantization::QuantizationType>("quantization_type")
+  enum_<bob::sp::quantization::QuantizationType>("quantization_type", "The type/method for the quantization")
     .value("UNIFORM", bob::sp::quantization::UNIFORM)
     .value("UNIFORM_ROUNDING", bob::sp::quantization::UNIFORM_ROUNDING)
     .value("USER_SPEC", bob::sp::quantization::USER_SPEC)

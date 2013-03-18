@@ -1,5 +1,5 @@
 /**
- * @file python/ip/src/gaussianScaleSpace.cc
+ * @file ip/python/GaussianScaleSpace.cc
  * @date Thu Sp 4 15:40:00 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
