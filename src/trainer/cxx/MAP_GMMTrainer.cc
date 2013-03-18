@@ -44,9 +44,9 @@ void train::MAP_GMMTrainer::initialization(mach::GMMMachine& gmm, const blitz::A
   gmm.setWeights(m_prior_gmm->getWeights());
   for(size_t i=0; i<n_gaussians; ++i)
   {
-    gmm.getGaussian(i)->updateMean() = m_prior_gmm->getGaussian(i)->getMean();
-    gmm.getGaussian(i)->updateVariance() = m_prior_gmm->getGaussian(i)->getVariance();
-    gmm.getGaussian(i)->applyVarianceThresholds();
+    gmm.updateGaussian(i)->updateMean() = m_prior_gmm->getGaussian(i)->getMean();
+    gmm.updateGaussian(i)->updateVariance() = m_prior_gmm->getGaussian(i)->getVariance();
+    gmm.updateGaussian(i)->applyVarianceThresholds();
   }
   // Initializes cache
   m_cache_alpha.resize(n_gaussians);
@@ -106,7 +106,7 @@ void train::MAP_GMMTrainer::mStep(mach::GMMMachine& gmm, const blitz::Array<doub
     // Calculate new means
     for(size_t i=0; i<n_gaussians; ++i) {
       const blitz::Array<double,1>& prior_means = m_prior_gmm->getGaussian(i)->getMean();
-      blitz::Array<double,1>& means = gmm.getGaussian(i)->updateMean();
+      blitz::Array<double,1>& means = gmm.updateGaussian(i)->updateMean();
       if(m_ss.n(i) < m_mean_var_update_responsibilities_threshold) {
         means = prior_means;
       }
@@ -123,16 +123,16 @@ void train::MAP_GMMTrainer::mStep(mach::GMMMachine& gmm, const blitz::Array<doub
     // Calculate new variances (equation 13)
     for(size_t i=0; i<n_gaussians; ++i) {
       const blitz::Array<double,1>& prior_means = m_prior_gmm->getGaussian(i)->getMean();
-      blitz::Array<double,1>& means = gmm.getGaussian(i)->updateMean();
+      blitz::Array<double,1>& means = gmm.updateGaussian(i)->updateMean();
       const blitz::Array<double,1>& prior_variances = m_prior_gmm->getGaussian(i)->getVariance();
-      blitz::Array<double,1>& variances = gmm.getGaussian(i)->updateVariance();
+      blitz::Array<double,1>& variances = gmm.updateGaussian(i)->updateVariance();
       if(m_ss.n(i) < m_mean_var_update_responsibilities_threshold) {
         variances = (prior_variances + prior_means) - blitz::pow2(means);
       }
       else {
         variances = m_cache_alpha(i) * m_ss.sumPxx(i,blitz::Range::all()) / m_ss.n(i) + (1-m_cache_alpha(i)) * (prior_variances + prior_means) - blitz::pow2(means);
       }
-      gmm.getGaussian(i)->applyVarianceThresholds();
+      gmm.updateGaussian(i)->applyVarianceThresholds();
     }
   }
 }

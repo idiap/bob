@@ -357,9 +357,15 @@ void bob::machine::GMMMachine::accStatisticsInternal(const blitz::Array<double, 
   stats.sumPxx += (m_cache_Px(i,j) * x(j));
 }
 
+boost::shared_ptr<const bob::machine::Gaussian> bob::machine::GMMMachine::getGaussian(const size_t i) const {
+  if (i>=m_n_gaussians)
+    throw bob::machine::Exception();
+  boost::shared_ptr<const bob::machine::Gaussian> res = m_gaussians[i];
+  return res;
+}
 
-boost::shared_ptr<bob::machine::Gaussian> bob::machine::GMMMachine::getGaussian(const size_t i) {
-  if(i>=m_n_gaussians)
+boost::shared_ptr<bob::machine::Gaussian> bob::machine::GMMMachine::updateGaussian(const size_t i) {
+  if (i>=m_n_gaussians)
     throw bob::machine::Exception();
   return m_gaussians[i];
 }

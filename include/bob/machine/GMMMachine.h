@@ -284,7 +284,16 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double>
      * @return A smart pointer to the i'th Gaussian component
      *         if it exists, otherwise throws an exception
      */
-    boost::shared_ptr<bob::machine::Gaussian> getGaussian(const size_t i);
+    boost::shared_ptr<const bob::machine::Gaussian> getGaussian(const size_t i) const;
+
+    /**
+     * Get a pointer to a particular Gaussian component
+     * @param[in] i The index of the Gaussian component
+     * @return A smart pointer to the i'th Gaussian component
+     *         if it exists, otherwise throws an exception
+     */
+    boost::shared_ptr<bob::machine::Gaussian> updateGaussian(const size_t i);
+
 
     /**
      * Return the number of Gaussian components

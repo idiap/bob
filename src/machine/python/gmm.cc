@@ -266,7 +266,7 @@ void bind_machine_gmm()
          "Initialises the weights to uniform distribution.")
     .def("set_variance_thresholds", &py_gmmmachine_setVarianceThresholdsOther, args("variance_threshold"),
          "Set the variance flooring thresholds in each dimension to the same vector for all Gaussian components if the argument is a 1D numpy arrray, and equal for all Gaussian components and dimensions if the parameter is a scalar.")
-    .def("get_gaussian", &bob::machine::GMMMachine::getGaussian, args("i"),
+    .def("update_gaussian", &bob::machine::GMMMachine::updateGaussian, args("i"),
          "Get the specified Gaussian component. An exception is thrown if i is out of range.")
 
     .def("log_likelihood", &py_gmmmachine_loglikelihoodA, args("self", "x", "log_weighted_gaussian_likelihoods"),

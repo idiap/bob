@@ -69,7 +69,7 @@ void train::ML_GMMTrainer::mStep(mach::GMMMachine& gmm, const blitz::Array<doubl
   //   Equation 9.24 of Bishop, "Pattern recognition and machine learning", 2006
   if (update_means) {
     for(size_t i=0; i<n_gaussians; ++i) {
-      blitz::Array<double,1>& means = gmm.getGaussian(i)->updateMean();
+      blitz::Array<double,1>& means = gmm.updateGaussian(i)->updateMean();
       means = m_ss.sumPx(i, blitz::Range::all()) / m_cache_ss_n_thresholded(i);
     }   
   }
@@ -82,9 +82,9 @@ void train::ML_GMMTrainer::mStep(mach::GMMMachine& gmm, const blitz::Array<doubl
   if (update_variances) {
     for(size_t i=0; i<n_gaussians; ++i) {
       const blitz::Array<double,1>& means = gmm.getGaussian(i)->getMean();
-      blitz::Array<double,1>& variances = gmm.getGaussian(i)->updateVariance();
+      blitz::Array<double,1>& variances = gmm.updateGaussian(i)->updateVariance();
       variances = m_ss.sumPxx(i, blitz::Range::all()) / m_cache_ss_n_thresholded(i) - blitz::pow2(means);
-      gmm.getGaussian(i)->applyVarianceThresholds();
+      gmm.updateGaussian(i)->applyVarianceThresholds();
     }
   }
 }

@@ -140,10 +140,10 @@ class GMMMachineTest(unittest.TestCase):
     self.assertTrue( (gmm.variance_thresholds == 0.005).all() )
 
     # Checks Gaussians access
-    self.assertTrue( (gmm.get_gaussian(0).mean == newMeans[0,:]).all() )
-    self.assertTrue( (gmm.get_gaussian(1).mean == newMeans[1,:]).all() )
-    self.assertTrue( (gmm.get_gaussian(0).variance == newVariances[0,:]).all() )
-    self.assertTrue( (gmm.get_gaussian(1).variance == newVariances[1,:]).all() )
+    self.assertTrue( (gmm.update_gaussian(0).mean == newMeans[0,:]).all() )
+    self.assertTrue( (gmm.update_gaussian(1).mean == newMeans[1,:]).all() )
+    self.assertTrue( (gmm.update_gaussian(0).variance == newVariances[0,:]).all() )
+    self.assertTrue( (gmm.update_gaussian(1).variance == newVariances[1,:]).all() )
 
     # Checks resize
     gmm.resize(4,5)
