@@ -66,7 +66,7 @@ static bool FFMPEG_INITIALIZED = false;
  */
 static void check_codec_support(std::map<std::string, const AVCodec*>& retval) {
 
-  static std::set<std::string> wishlist = {
+  std::string tmp[] = {
     //"libvpx", //the same as vp8
     "vp8",
     "wmv1",
@@ -93,6 +93,8 @@ static void check_codec_support(std::map<std::string, const AVCodec*>& retval) {
     "zlib",
   };
 
+  std::set<std::string> wishlist(tmp, tmp + (sizeof(tmp)/sizeof(tmp[0])));
+
   if (!FFMPEG_INITIALIZED) {
     /* Initialize libavcodec, and register all codecs and formats. */
     av_log_set_level(AV_LOG_QUIET);
@@ -115,12 +117,14 @@ static void check_codec_support(std::map<std::string, const AVCodec*>& retval) {
 
 static void check_iformat_support(std::map<std::string, AVInputFormat*>& retval) {
   
-  static std::set<std::string> FORMAT_WISHLIST = {
+  std::string tmp[] = {
     "avi",
     "mov",
     "flv",
     "mp4",
   };
+
+  std::set<std::string> wishlist(tmp, tmp + (sizeof(tmp)/sizeof(tmp[0])));
 
   if (!FFMPEG_INITIALIZED) {
     /* initialize libavcodec, and register all codecs and formats. */
@@ -133,7 +137,7 @@ static void check_iformat_support(std::map<std::string, AVInputFormat*>& retval)
     std::vector<std::string> names;
     ffmpeg::tokenize_csv(it->name, names);
     for (auto k = names.begin(); k != names.end(); ++k) {
-      if (FORMAT_WISHLIST.find(*k) == FORMAT_WISHLIST.end()) continue; ///< ignore this format
+      if (wishlist.find(*k) == wishlist.end()) continue; ///< ignore this format
       auto exists = retval.find(*k);
       if (exists != retval.end()) {
         bob::core::warn << "Not overriding input video format \"" 
@@ -148,12 +152,14 @@ static void check_iformat_support(std::map<std::string, AVInputFormat*>& retval)
 
 static void check_oformat_support(std::map<std::string, AVOutputFormat*>& retval) {
   
-  static std::set<std::string> FORMAT_WISHLIST = {
+  std::string tmp[] = {
     "avi",
     "mov",
     "flv",
     "mp4",
   };
+
+  std::set<std::string> wishlist(tmp, tmp + (sizeof(tmp)/sizeof(tmp[0])));
 
   if (!FFMPEG_INITIALIZED) {
     /* initialize libavcodec, and register all codecs and formats. */
@@ -166,7 +172,7 @@ static void check_oformat_support(std::map<std::string, AVOutputFormat*>& retval
     std::vector<std::string> names;
     ffmpeg::tokenize_csv(it->name, names);
     for (auto k = names.begin(); k != names.end(); ++k) {
-      if (FORMAT_WISHLIST.find(*k) == FORMAT_WISHLIST.end()) continue; ///< ignore this format
+      if (wishlist.find(*k) == wishlist.end()) continue; ///< ignore this format
       auto exists = retval.find(*k);
       if (exists != retval.end()) {
         bob::core::warn << "Not overriding input video format \"" 
@@ -207,7 +213,8 @@ static void define_output_support_map(std::map<AVOutputFormat*, std::vector<cons
   it = odict.find("mp4");
   if (it != odict.end()) { // ".flv" format is available
     retval[it->second].clear();
-    std::vector<std::string> codecs = {"h264", "h264_vdpau"};
+    std::string tmp[] = {"h264", "h264_vdpau"};
+    std::vector<std::string> codecs(tmp, tmp + (sizeof(tmp)/sizeof(tmp[0])));
     for (auto jt = codecs.begin(); jt != codecs.end(); ++jt) {
       auto kt = cdict.find(*jt);
       if (kt != cdict.end()) retval[it->second].push_back(kt->second);
@@ -217,7 +224,14 @@ static void define_output_support_map(std::map<AVOutputFormat*, std::vector<cons
   it = odict.find("mp4");
   if (it != odict.end()) { // ".mp4" format is available
     retval[it->second].clear();
-    std::vector<std::string> codecs = {"h264", "h264_vdpau", "mjpeg", "mpeg1video", "mpegvideo_vdpau"};
+    std::string tmp[] = {
+      "h264", 
+      "h264_vdpau", 
+      "mjpeg", 
+      "mpeg1video", 
+      "mpegvideo_vdpau"
+    };
+    std::vector<std::string> codecs(tmp, tmp + (sizeof(tmp)/sizeof(tmp[0])));
     for (auto jt = codecs.begin(); jt != codecs.end(); ++jt) {
       auto kt = cdict.find(*jt);
       if (kt != cdict.end()) retval[it->second].push_back(kt->second);
