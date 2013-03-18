@@ -88,8 +88,6 @@ static void check_codec_support(std::map<std::string, const AVCodec*>& retval) {
     "msmpeg4v2", // the same as msmpeg4
     "ffv1",
     "theora",
-    "v210",
-    "v410",
     "zlib",
   };
 
