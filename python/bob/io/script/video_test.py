@@ -10,7 +10,7 @@ manual inspection. It tries to help identifying problems with:
   1. Color distortion
   2. Frame skipping or delay
   3. Encoding or decoding quality
-  4. Frame searching (random access)
+  4. User test (with a user provided video sample)
 
 You can parameterize the program with the type of file, (FFmpeg) codec and a
 few other parameters. The program then generates artificial input signals to
@@ -93,15 +93,19 @@ container:
 
   $ %(prog)s --format='wmv' --codec='ffv1' noise
 
-4. To list all available codecs:
+4. To run-only the user-video test and provide a test video:
+
+  $ %(prog)s --format='mov' --user-video=test_sample.avi user
+
+5. To list all available codecs:
 
   $ %(prog)s --list-codecs
 
-5. To list all available formats:
+6. To list all available formats:
 
   $ %(prog)s --list-formats
 
-6. Run all tests for all codecs and formats:
+7. Run all tests for all codecs and formats:
 
   $ %(prog)s
 """ % {
@@ -298,11 +302,10 @@ def main(user_input=None):
   parser.add_argument("-o", "--output", type=str,
       help="If set, then videos created for the tests are stored on the given directory. By default this option is empty and videos are created on a temporary directory and deleted after tests are done. If you set it, we also produced detailed output analysis for manual inspection.")
 
-  parser.add_argument("-u", "--user-video", type=str,
+  parser.add_argument("-u", "--user-video", type=str, metavar="PATH",
       help="Set the path to the user video that will be used for distortion tests (if not set use default test video)")
 
-  parser.add_argument("-n", "--user-frames", type=int, default=10,
-      help="Set the number of maximum frames to read from the user video (reads %(default)s by default)")
+  parser.add_argument("-n", "--user-frames", type=int, default=10, metavar="INT", help="Set the number of maximum frames to read from the user video (reads %(default)s by default)")
 
   args = parser.parse_args(args=user_input)
 
