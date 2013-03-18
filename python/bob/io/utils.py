@@ -92,7 +92,7 @@ def color_distortion(shape, framerate, format, codec, filename):
   length, height, width = shape
   from . import VideoReader, VideoWriter
   outv = VideoWriter(filename, height, width, framerate, codec=codec,
-      format=format)
+      format=format, check=False)
   orig = []
   text_format = "%%0%dd" % len(str(length-1))
   fontsize = estimate_fontsize(height, width, text_format)
@@ -103,7 +103,7 @@ def color_distortion(shape, framerate, format, codec, filename):
     outv.append(newframe)
     orig.append(newframe)
   outv.close()
-  return orig, VideoReader(filename)
+  return orig, VideoReader(filename, check=False)
 
 def frameskip_detection(shape, framerate, format, codec, filename):
   """Returns distortion patterns for a set of frames with big numbers.
@@ -128,7 +128,7 @@ def frameskip_detection(shape, framerate, format, codec, filename):
   text_format = "%%0%dd" % len(str(length-1))
   fontsize = estimate_fontsize(height, width, text_format)
   outv = VideoWriter(filename, height, width, framerate, codec=codec,
-      format=format)
+      format=format, check=False)
   orig = []
   for i in range(0, length):
     newframe = numpy.zeros((3, height, width), dtype='uint8')
@@ -136,7 +136,7 @@ def frameskip_detection(shape, framerate, format, codec, filename):
     outv.append(newframe)
     orig.append(newframe)
   outv.close()
-  return orig, VideoReader(filename)
+  return orig, VideoReader(filename, check=False)
 
 def quality_degradation(shape, framerate, format, codec, filename):
   """Returns noise patterns for a set of frames.
@@ -162,7 +162,7 @@ def quality_degradation(shape, framerate, format, codec, filename):
   fontsize = estimate_fontsize(height, width, text_format)
   fontsize /= 4
   outv = VideoWriter(filename, height, width, framerate, codec=codec,
-      format=format)
+      format=format, check=False)
   orig = []
   for i in range(0, length):
     newframe = numpy.random.randint(0, 256, (3, height, width)).astype('uint8')
@@ -170,4 +170,4 @@ def quality_degradation(shape, framerate, format, codec, filename):
     outv.append(newframe)
     orig.append(newframe)
   outv.close()
-  return orig, VideoReader(filename)
+  return orig, VideoReader(filename, check=False)

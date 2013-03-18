@@ -259,11 +259,103 @@ static object describe_decoder_by_id(int id) {
 }
 
 /**
+ * Returns all input formats supported, related codecs and extensions
+ */
+static dict supported_iformat_dictionary() {
+  std::map<std::string, AVInputFormat*> m;
+  io::detail::ffmpeg::iformats_supported(m);
+  dict retval;
+
+  for (auto k=m.begin(); k!=m.end(); ++k) {
+    dict property;
+    property["name"] = k->second->name;
+    property["long_name"] = k->second->long_name;
+
+    // get extensions
+    std::vector<std::string> exts;
+    io::detail::ffmpeg::tokenize_csv(k->second->extensions, exts);
+    list ext_list;
+    for (auto ext=exts.begin(); ext!=exts.end(); ++ext) ext_list.append(*ext);
+    property["extensions"] = tuple(ext_list);
+
+    retval[k->first] = property;
+  }
+
+  return retval;
+}
+
+static dict available_iformat_dictionary() {
+  std::map<std::string, AVInputFormat*> m;
+  io::detail::ffmpeg::iformats_installed(m);
+  dict retval;
+
+  for (auto k=m.begin(); k!=m.end(); ++k) {
+    dict property;
+    property["name"] = k->second->name;
+    property["long_name"] = k->second->long_name;
+
+    // get extensions
+    std::vector<std::string> exts;
+    io::detail::ffmpeg::tokenize_csv(k->second->extensions, exts);
+    list ext_list;
+    for (auto ext=exts.begin(); ext!=exts.end(); ++ext) ext_list.append(*ext);
+    property["extensions"] = tuple(ext_list);
+
+    retval[k->first] = property;
+  }
+
+  return retval;
+}
+
+/**
  * Returns all output formats supported, related codecs and extensions
  */
-static dict oformat_dictionary() {
+static dict supported_oformat_dictionary() {
   std::map<std::string, AVOutputFormat*> m;
   io::detail::ffmpeg::oformats_supported(m);
+  dict retval;
+
+  for (auto k=m.begin(); k!=m.end(); ++k) {
+    dict property;
+    property["name"] = k->second->name;
+    property["long_name"] = k->second->long_name;
+    property["mime_type"] = k->second->mime_type;
+
+    // get extensions
+    std::vector<std::string> exts;
+    io::detail::ffmpeg::tokenize_csv(k->second->extensions, exts);
+    list ext_list;
+    for (auto ext=exts.begin(); ext!=exts.end(); ++ext) ext_list.append(*ext);
+    property["extensions"] = tuple(ext_list);
+
+    // get recommended codec
+    if (!k->second->video_codec) {
+      property["default_codec"] = object();
+    }
+    else {
+      AVCodec* codec = avcodec_find_encoder(k->second->video_codec);
+      if (!codec) property["default_codec"] = object();
+      else property["default_codec"] = describe_codec(codec);
+    }
+
+    // supported codec list
+    std::vector<const AVCodec*> codecs;
+    io::detail::ffmpeg::oformat_supported_codecs(k->second->name, codecs);
+    dict supported_codecs;
+    for (auto c=codecs.begin(); c!=codecs.end(); ++c) {
+      supported_codecs[(*c)->name] = describe_codec(*c);
+    }
+    property["supported_codecs"] = supported_codecs;
+
+    retval[k->first] = property;
+  }
+
+  return retval;
+}
+
+static dict available_oformat_dictionary() {
+  std::map<std::string, AVOutputFormat*> m;
+  io::detail::ffmpeg::oformats_installed(m);
   dict retval;
 
   for (auto k=m.begin(); k!=m.end(); ++k) {
@@ -298,9 +390,19 @@ static dict oformat_dictionary() {
 /**
  * Returns a dictionary of available codecs
  */
-static object codec_dictionary() {
+static object supported_codec_dictionary() {
   std::map<std::string, const AVCodec*> m;
   io::detail::ffmpeg::codecs_supported(m);
+  dict retval;
+  for (auto k=m.begin(); k!=m.end(); ++k) {
+    retval[k->first] = describe_codec(k->second);
+  }
+  return retval;
+}
+
+static object available_codec_dictionary() {
+  std::map<std::string, const AVCodec*> m;
+  io::detail::ffmpeg::codecs_installed(m);
   dict retval;
   for (auto k=m.begin(); k!=m.end(); ++k) {
     retval[k->first] = describe_codec(k->second);
@@ -312,7 +414,7 @@ void bind_io_video() {
   iterator_wrapper().wrap(); //wraps io::VideoReader::const_iterator
 
   class_<io::VideoReader, boost::shared_ptr<io::VideoReader> >("VideoReader",
-      "VideoReader objects can read data from video files. The current implementation uses `FFmpeg <http://ffmpeg.org>`_ (or `libav <http://libav.org>`_ if FFmpeg is not available) which is a stable freely available video encoding and decoding library, designed specifically for these tasks. You can read an entire video in memory by using the 'load()' method or use video iterators to read it frame by frame and avoid overloading your machine's memory. The maximum precision data `FFmpeg` will yield is a 24-bit (8-bit per band) representation of each pixel (32-bit depths are also supported by `FFmpeg`, but not by Bob presently). So, the input of data using this class uses ``uint8`` as base element type. Output will be colored using the RGB standard, with each band varying between 0 and 255, with zero meaning pure black and 255, pure white (color).", init<const std::string&>((arg("self"), arg("filename")), "Initializes a new VideoReader object by giving the input file path to read. Format and codec will be extracted from the video metadata, automatically, by `FFmpeg`."))
+      "VideoReader objects can read data from video files. The current implementation uses `FFmpeg <http://ffmpeg.org>`_ (or `libav <http://libav.org>`_ if FFmpeg is not available) which is a stable freely available video encoding and decoding library, designed specifically for these tasks. You can read an entire video in memory by using the 'load()' method or use video iterators to read it frame by frame and avoid overloading your machine's memory. The maximum precision data `FFmpeg` will yield is a 24-bit (8-bit per band) representation of each pixel (32-bit depths are also supported by `FFmpeg`, but not by Bob presently). So, the input of data using this class uses ``uint8`` as base element type. Output will be colored using the RGB standard, with each band varying between 0 and 255, with zero meaning pure black and 255, pure white (color).", init<const std::string&, optional<bool> >((arg("self"), arg("filename"), arg("check")=true), "Initializes a new VideoReader object by giving the input file path to read. Format and codec will be extracted from the video metadata, automatically, by `FFmpeg`. By default, if the format and/or the codec are not supported by this version of Bob, an exception will be raised. You can (at your own risk) set the `check' to 'False' to avoid this check."))
     .add_property("filename", make_function(&io::VideoReader::filename, return_value_policy<copy_const_reference>()), "The full path to the file that will be decoded by this object")
     .add_property("height", &io::VideoReader::height, "The height of each frame in the video (a multiple of 2)")
     .add_property("width", &io::VideoReader::width, "The width of each frame in the video (a multiple of 2)")
@@ -335,7 +437,7 @@ void bind_io_video() {
 
   class_<io::VideoWriter, boost::shared_ptr<io::VideoWriter>, boost::noncopyable>("VideoWriter",
      "Use objects of this class to create and write video files using `FFmpeg <http://ffmpeg.org>`_ (or `libav <http://libav.org>`_ if FFmpeg is not available).",
-     init<const std::string&, size_t, size_t, optional<float, float, size_t, const std::string&, const std::string&> >((arg("self"), arg("filename"), arg("height"), arg("width"), arg("framerate")=25.f, arg("bitrate")=1500000.f, arg("gop")=12, arg("codec")="", arg("format")=""), "Creates a new output file given the input parameters. The format and codec to be used will be derived from the filename extension unless you define them explicetly (you can set both or just one of these two optional parameters)")
+     init<const std::string&, size_t, size_t, optional<float, float, size_t, const std::string&, const std::string&, bool> >((arg("self"), arg("filename"), arg("height"), arg("width"), arg("framerate")=25.f, arg("bitrate")=1500000.f, arg("gop")=12, arg("codec")="", arg("format")="", arg("check")=true), "Creates a new output file given the input parameters. The format and codec to be used will be derived from the filename extension unless you define them explicetly (you can set both or just one of these two optional parameters)")
      )
     .add_property("filename", make_function(&io::VideoReader::filename, return_value_policy<copy_const_reference>()), "The full path to the file that will be encoded by this object")
     .add_property("height", &io::VideoWriter::height, "The height of the output video file (must be a multiple of 2)")
@@ -358,10 +460,14 @@ void bind_io_video() {
     .def("append", &videowriter_append, (arg("self"), arg("frame")), "Writes a new frame or set of frames to the file. The frame should be setup as a array with 3 dimensions organized in this way (RGB color-bands, height, width). Sets of frames should be setup as a 4D array in this way: (frame-number, RGB color-bands, height, width).\n\n.. note::\n\n  At present time we only support arrays that have C-style storages (if you pass reversed arrays or arrays with Fortran-style storage, the result is undefined).")
     ;
 
-  def("video_codecs", &codec_dictionary, "Returns a dictionary containing a detailed description of the built-in codecs for videos");
+  def("available_video_codecs", &available_codec_dictionary, "Returns a dictionary containing a detailed description of the built-in codecs for videos that are available but **not necessarily supported**");
+  def("supported_video_codecs", &supported_codec_dictionary, "Returns a dictionary containing a detailed description of the built-in codecs for videos that are fully supported");
   def("describe_video_encoder", &describe_encoder_by_name, (arg("name")), "Describes a given video encoder (codec) starting with a name");
   def("describe_video_encoder", &describe_encoder_by_id, (arg("id")), "Describes a given video encoder (codec) starting with an integer identifier");
   def("describe_video_decoder", &describe_decoder_by_name, (arg("name")), "Describes a given video decoder (codec) starting with a name");
   def("describe_video_decoder", &describe_decoder_by_id, (arg("id")), "Describes a given video decoder (codec) starting with an integer identifier");
-  def("videowriter_formats", &oformat_dictionary, "Returns a dictionary containing a detailed description of the built-in output formats and default encoders for videos");
+  def("available_videoreader_formats", &available_iformat_dictionary, "Returns a dictionary containing a detailed description of the built-in input formats that are available, but **not necessarily supported**");
+  def("supported_videoreader_formats", &supported_iformat_dictionary, "Returns a dictionary containing a detailed description of the built-in input formats that are fully supported");
+  def("available_videowriter_formats", &available_oformat_dictionary, "Returns a dictionary containing a detailed description of the built-in output formats and default encoders for videos that are available, but **not necessarily supported**");
+  def("supported_videowriter_formats", &supported_oformat_dictionary, "Returns a dictionary containing a detailed description of the built-in output formats and default encoders for videos that are fully supported");
 }

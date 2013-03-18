@@ -39,8 +39,8 @@
 namespace io = bob::io;
 namespace ffmpeg = bob::io::detail::ffmpeg;
 
-io::VideoReader::VideoReader(const std::string& filename) {
-  open(filename);
+io::VideoReader::VideoReader(const std::string& filename, bool check) {
+  open(filename, check);
 }
 
 io::VideoReader::VideoReader(const io::VideoReader& other) {
@@ -48,11 +48,11 @@ io::VideoReader::VideoReader(const io::VideoReader& other) {
 }
 
 io::VideoReader& io::VideoReader::operator= (const io::VideoReader& other) {
-  open(other.filename());
+  open(other.filename(), other.m_check);
   return *this;
 }
 
-void io::VideoReader::open(const std::string& filename) {
+void io::VideoReader::open(const std::string& filename, bool check) {
   m_filepath = filename;
 
   boost::shared_ptr<AVFormatContext> format_ctxt =
@@ -67,6 +67,22 @@ void io::VideoReader::open(const std::string& filename) {
   
   m_codecname = codec->name;
   m_codecname_long = codec->long_name;
+
+  /**
+   * Runs a format/codec check on user request
+   */
+  if (check) {
+    if (!ffmpeg::iformat_is_supported(m_formatname)) {
+      boost::format s("The detected format (`%s' = `%s') of the input video file `%s' is not currently supported by this version of Bob. Convert the video file to a supported wrapping format or disable the `check' flag on the VideoReader object (if you are sure of what you are doing).");
+      s % m_formatname % m_formatname_long % m_filepath;
+      throw std::runtime_error(s.str());
+    }
+    if (!ffmpeg::codec_is_supported(m_codecname)) {
+      boost::format s("The detected decoder (`%s' = `%s') for the video stream on the input video file `%s' is not currently supported by this version of Bob. Convert the video file to a supported codec or disable the `check' flag on the VideoReader object (if you are sure of what you are doing).");
+      s % m_codecname % m_codecname_long % m_filepath;
+      throw std::runtime_error(s.str());
+    }
+  }
 
   boost::shared_ptr<AVCodecContext> codec_ctxt = 
     ffmpeg::make_codec_context(m_filepath, 

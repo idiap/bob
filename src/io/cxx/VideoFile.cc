@@ -33,9 +33,6 @@
 #include "bob/io/VideoWriter.h"
 #include "bob/io/VideoUtilities.h"
 
-extern "C" {
-#include <libavformat/avformat.h>
-}
 namespace fs = boost::filesystem;
 namespace io = bob::io;
 namespace ca = bob::core::array;
@@ -212,10 +209,6 @@ static void list_formats(std::map<std::string, std::string>& formats) {
  * Takes care of codec registration per se.
  */
 static bool register_codec() {
-  /* Initialize libavcodec, and register all codecs and formats. */
-  av_log_set_level(AV_LOG_QUIET);
-  av_register_all();
-
   boost::shared_ptr<io::CodecRegistry> instance =
     io::CodecRegistry::instance();
 
