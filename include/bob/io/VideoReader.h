@@ -94,7 +94,7 @@ namespace bob { namespace io {
       /**
        * Returns the frame rate of the first video stream, in seconds
        */
-      float frameRate() const { return m_framerate; }
+      double frameRate() const { return m_framerate; }
 
       /**
        * Duration of the video stream, in microseconds
@@ -365,7 +365,7 @@ namespace bob { namespace io {
       size_t m_height; ///< the height of the video frames (number of rows)
       size_t m_width; ///< the width of the video frames (number of columns)
       size_t m_nframes; ///< the number of frames in this video file
-      float m_framerate; ///< rate of frames in the video stream
+      double m_framerate; ///< rate of frames in the video stream
       uint64_t m_duration; ///< in microsseconds, for the whole video
       std::string m_formatname; ///< the name of the ffmpeg format to be used
       std::string m_formatname_long; ///< long version of m_formatname

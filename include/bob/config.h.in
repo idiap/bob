@@ -38,6 +38,8 @@
 
 #cmakedefine HAVE_FFMPEG_AVCODEC_AVCODECID 1
 
+#cmakedefine HAVE_FFMPEG_AVCOLOR_RANGE 1
+
 #cmakedefine01 WITH_MATIO
 
 #cmakedefine HAVE_MATIO_OLD_COMPLEXSPLIT 1

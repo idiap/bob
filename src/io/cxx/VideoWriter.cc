@@ -41,8 +41,8 @@ bob::io::VideoWriter::VideoWriter(
     const std::string& filename,
     size_t height,
     size_t width,
-    float framerate,
-    float bitrate,
+    double framerate,
+    double bitrate,
     size_t gop,
     const std::string& codec,
     const std::string& format) :

@@ -19,6 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <set>
 #include <boost/token_iterator.hpp>
 #include <boost/format.hpp>
 
@@ -43,15 +44,8 @@ extern "C" {
 #define AV_CODEC_ID_NONE CODEC_ID_NONE
 #define AV_CODEC_ID_MPEG1VIDEO CODEC_ID_MPEG1VIDEO
 #define AV_CODEC_ID_MPEG2VIDEO CODEC_ID_MPEG2VIDEO
+#define AV_CODEC_ID_MJPEG CODEC_ID_MJPEG
 typedef CodecID AVCodecID;
-#endif
-
-#ifndef AV_PIX_FMT_YUV420P
-#define AV_PIX_FMT_YUV420P PIX_FMT_YUV420P
-#endif
-
-#ifndef AV_PIX_FMT_NONE
-#define AV_PIX_FMT_NONE PIX_FMT_NONE
 #endif
 
 #ifndef AV_PKT_FLAG_KEY
@@ -85,6 +79,63 @@ void ffmpeg::codecs_installed (std::map<std::string, const AVCodec*>& installed)
   }
 }
 
+void ffmpeg::codecs_supported (std::map<std::string, const AVCodec*>& installed) {
+  static std::string tmp[] = {
+    //"libvpx", //the same as vp8
+    "vp8",
+    "wmv1",
+    "wmv2",
+    //"wmv3", /* no encoding support */
+    "h264",
+    //"libx264", //the same as h264
+    //"mpegvideo", // the same as mpeg2video
+    "mpeg1video", 
+    "mpeg2video",
+    "mpeg4",
+    "mjpeg",
+    "ffv1",
+  };
+  static std::set<std::string> allowed(tmp, tmp+sizeof(tmp) / sizeof(tmp[0]));
+
+  for (AVCodec* it = av_codec_next(0); it != 0; it = av_codec_next(it) ) {
+    if (allowed.count(it->name) == 0) continue; ///< ignore this codec
+    if (it->type == AVMEDIA_TYPE_VIDEO) {
+      auto exists = installed.find(std::string(it->name));
+      if (exists != installed.end() && exists->second->id != it->id) {
+        bob::core::warn << "Not overriding video codec \"" << it->long_name 
+          << "\" (" << it->name << ")" << std::endl;
+      }
+      else installed[it->name] = it;
+    }
+  }
+
+}
+
+void ffmpeg::iformats_supported (std::map<std::string, AVInputFormat*>& installed) {
+  static std::string tmp[] = {
+    "avi",
+    "mov",
+    "mkv",
+  };
+  static std::set<std::string> allowed(tmp, tmp+sizeof(tmp) / sizeof(tmp[0]));
+
+  for (AVInputFormat* it = av_iformat_next(0); it != 0; it = av_iformat_next(it) ) {
+    std::vector<std::string> names;
+    ffmpeg::tokenize_csv(it->name, names);
+    for (auto k = names.begin(); k != names.end(); ++k) {
+      if (allowed.count(*k) == 0) continue; ///< ignore this format
+      auto exists = installed.find(*k);
+      if (exists != installed.end()) {
+        bob::core::warn << "Not overriding input video format \"" 
+          << it->long_name << "\" (" << *k 
+          << ") which is already assigned to \"" << exists->second->long_name 
+          << "\"" << std::endl;
+      }
+      else installed[*k] = it;
+    }
+  }
+}
+
 void ffmpeg::iformats_installed (std::map<std::string, AVInputFormat*>& installed) {
   for (AVInputFormat* it = av_iformat_next(0); it != 0; it = av_iformat_next(it) ) {
     std::vector<std::string> names;
@@ -93,6 +144,32 @@ void ffmpeg::iformats_installed (std::map<std::string, AVInputFormat*>& installe
       auto exists = installed.find(*k);
       if (exists != installed.end()) {
         bob::core::warn << "Not overriding input video format \"" 
+          << it->long_name << "\" (" << *k 
+          << ") which is already assigned to \"" << exists->second->long_name 
+          << "\"" << std::endl;
+      }
+      else installed[*k] = it;
+    }
+  }
+}
+
+void ffmpeg::oformats_supported (std::map<std::string, AVOutputFormat*>& installed) {
+  static std::string tmp[] = {
+    "avi",
+    "mov",
+    "mkv"
+  };
+  static std::set<std::string> allowed(tmp, tmp+sizeof(tmp) / sizeof(tmp[0]));
+
+  for (AVOutputFormat* it = av_oformat_next(0); it != 0; it = av_oformat_next(it) ) {
+    if (!it->video_codec) continue;
+    std::vector<std::string> names;
+    ffmpeg::tokenize_csv(it->name, names);
+    for (auto k = names.begin(); k != names.end(); ++k) {
+      if (allowed.count(*k) == 0) continue; ///< ignore this format
+      auto exists = installed.find(*k);
+      if (exists != installed.end()) {
+        bob::core::warn << "Not overriding output video format \""
           << it->long_name << "\" (" << *k 
           << ") which is already assigned to \"" << exists->second->long_name 
           << "\"" << std::endl;
@@ -477,7 +554,14 @@ boost::shared_ptr<AVStream> ffmpeg::make_stream(
   retval->codec->time_base.den = framerate;
   retval->codec->time_base.num = 1;
   retval->codec->gop_size      = gop; /* emit one intra frame every X at most */
-  retval->codec->pix_fmt       = AV_PIX_FMT_YUV420P;
+  retval->codec->pix_fmt       = codec->pix_fmts[0];
+
+# ifdef HAVE_FFMPEG_AVCOLOR_RANGE
+  if (retval->codec->codec_id == AV_CODEC_ID_MJPEG) {
+    /* set jpeg color range */
+    retval->codec->color_range = AVCOL_RANGE_JPEG;
+  }
+# endif
 
   if (retval->codec->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
     /* just for testing, we also add B frames */
@@ -965,19 +1049,22 @@ void ffmpeg::write_video_frame (const blitz::Array<uint8_t,3>& data,
     }
 
     /* If size is zero, it means the image was buffered. */
-    if (got_output) {
+    if (!ok && got_output && pkt->size) {
       if (stream->codec->coded_frame->key_frame) pkt->flags |= AV_PKT_FLAG_KEY;
       pkt->stream_index = stream->index;
 
       /* Write the compressed frame to the media file. */
       ok = av_interleaved_write_frame(format_context.get(), pkt.get());
-      if (ok && (ok != AVERROR(EINVAL))) {
+      if (ok != 0) {
         boost::format m("ffmpeg::av_interleaved_write_frame() failed: failed to write video frame while encoding file `%s' - ffmpeg reports error %d == `%s'");
         m % filename % ok % ffmpeg_error(ok);
         throw std::runtime_error(m.str());
       }
 
     }
+
+    context_frame->pts += av_rescale_q(1, stream->codec->time_base, 
+        stream->time_base);
 
   }
 
@@ -1027,12 +1114,12 @@ void ffmpeg::write_video_frame (const blitz::Array<uint8_t,3>& data,
       }
 
     }
+      
+    context_frame->pts += 1;
 
   }
 
 #endif // FFmpeg version >= 0.11.0
-
-  context_frame->pts += 1;
 }
 
 static int decode_frame (const std::string& filename, int current_frame,
@@ -1105,7 +1192,18 @@ bool ffmpeg::read_video_frame (const std::string& filename,
 
   boost::shared_ptr<AVPacket> pkt = make_packet();
 
-  int ok = av_read_frame(format_context.get(), pkt.get());
+  int ok = 0;
+  int got_frame = 0;
+
+  while ((ok = av_read_frame(format_context.get(), pkt.get())) >= 0) {
+    if (pkt->stream_index == stream_index) {
+      decode_frame(filename, current_frame, codec_context,
+          swscaler, context_frame, data, pkt, got_frame,
+          throw_on_error);
+    }
+    av_free_packet(pkt.get());
+    if (got_frame) return true; //break loop
+  }
 
   if (ok < 0 && ok != (int)AVERROR_EOF) {
     if (throw_on_error) {
@@ -1116,28 +1214,19 @@ bool ffmpeg::read_video_frame (const std::string& filename,
     else return false;
   }
 
-  int got_frame = 0;
-
-  while(!got_frame) {
-
-    // if we have reached the end-of-file, frames may still be cached
-    if (ok == (int)AVERROR_EOF) {
-      pkt->data = 0;
-      pkt->size = 0;
-      decode_frame(filename, current_frame, codec_context, swscaler,
-          context_frame, data, pkt, got_frame, throw_on_error);
+  // it is the end of the file
+  pkt->data = NULL;
+  pkt->size = 0;
+  //N.B.: got_frame == 0
+  do {
+    if (pkt->stream_index == stream_index) {
+      decode_frame(filename, current_frame, codec_context,
+          swscaler, context_frame, data, pkt, got_frame,
+          throw_on_error);
     }
-    else {
-      if (pkt->stream_index == stream_index) {
-        decode_frame(filename, current_frame, codec_context,
-            swscaler, context_frame, data, pkt, got_frame,
-            throw_on_error);
-      }
-    }
+  } while (got_frame == 0);
 
-  }
-
-  return (got_frame > 0);
+  return true;
 }
 
 static int dummy_decode_frame (const std::string& filename, int current_frame,
@@ -1184,7 +1273,17 @@ bool ffmpeg::skip_video_frame (const std::string& filename,
 
   boost::shared_ptr<AVPacket> pkt = make_packet();
 
-  int ok = av_read_frame(format_context.get(), pkt.get());
+  int ok = 0;
+  int got_frame = 0;
+
+  while ((ok = av_read_frame(format_context.get(), pkt.get())) >= 0) {
+    if (pkt->stream_index == stream_index) {
+      dummy_decode_frame(filename, current_frame, codec_context,
+          context_frame, pkt, got_frame, throw_on_error);
+    }
+    av_free_packet(pkt.get());
+    if (got_frame) return true; //break loop
+  }
 
   if (ok < 0 && ok != (int)AVERROR_EOF) {
     if (throw_on_error) {
@@ -1195,21 +1294,16 @@ bool ffmpeg::skip_video_frame (const std::string& filename,
     else return false;
   }
 
-  int got_frame = 0;
-
-  // if we have reached the end-of-file, frames can still be cached
-  if (ok == (int)AVERROR_EOF) {
-    pkt->data = 0;
-    pkt->size = 0;
-    dummy_decode_frame(filename, current_frame, codec_context,
-        context_frame, pkt, got_frame, throw_on_error);
-  }
-  else {
+  // it is the end of the file
+  pkt->data = NULL;
+  pkt->size = 0;
+  //N.B.: got_frame == 0
+  do {
     if (pkt->stream_index == stream_index) {
       dummy_decode_frame(filename, current_frame, codec_context,
           context_frame, pkt, got_frame, throw_on_error);
     }
-  }
+  } while (got_frame == 0);
 
-  return (got_frame > 0);
+  return true;
 }

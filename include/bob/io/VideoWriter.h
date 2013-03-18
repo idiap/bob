@@ -56,7 +56,7 @@ namespace bob { namespace io {
        * it empty to guess from the filename extension.
        */
       VideoWriter(const std::string& filename, size_t height, size_t width,
-          float framerate=25.f, float bitrate=1500000.f, size_t gop=12,
+          double framerate=25., double bitrate=1500000., size_t gop=12,
           const std::string& codec="", const std::string& format="");
 
       /**
@@ -88,12 +88,12 @@ namespace bob { namespace io {
       /**
        * Returns the target bitrate for this encoding
        */
-      inline float bitRate() const { return m_bitrate; }
+      inline double bitRate() const { return m_bitrate; }
 
       /**
        * Returns the frame rate to be set in the header
        */
-      inline float frameRate() const { return m_framerate; }
+      inline double frameRate() const { return m_framerate; }
 
       /**
        * Returns the group of pictures around key frames
@@ -199,8 +199,8 @@ namespace bob { namespace io {
       boost::shared_array<uint8_t> m_buffer; ///< buffer for ffmpeg < 0.11.0
       size_t m_height;
       size_t m_width;
-      float m_framerate;
-      float m_bitrate;
+      double m_framerate;
+      double m_bitrate;
       size_t m_gop;
       std::string m_codecname;
       std::string m_formatname;

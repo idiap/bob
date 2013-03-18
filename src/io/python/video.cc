@@ -30,6 +30,8 @@
 #include "bob/core/python/exception.h"
 #include "bob/core/python/ndarray.h"
 
+#include "libavutil/pixdesc.h"
+
 using namespace boost::python;
 namespace io = bob::io;
 namespace tp = bob::python;
@@ -181,6 +183,17 @@ static object describe_codec(const AVCodec* codec) {
   retval["long_name"] = codec->long_name;
   retval["id"] = (unsigned)codec->id;
 
+  // get pix formats
+  if (codec->pix_fmts) {
+    list pixfmt;
+    unsigned int i=0;
+    while(codec->pix_fmts[i] != -1) {
+      pixfmt.append((int)codec->pix_fmts[i++]);
+    }
+    retval["pixfmts"] = tuple(pixfmt);
+  }
+  else retval["pixfmts"] = object();
+
   // get specific framerates for the codec, if any:
   const AVRational* rate = codec->supported_framerates;
   list rates;
@@ -250,7 +263,7 @@ static object describe_decoder_by_id(int id) {
  */
 static dict oformat_dictionary() {
   std::map<std::string, AVOutputFormat*> m;
-  io::detail::ffmpeg::oformats_installed(m);
+  io::detail::ffmpeg::oformats_supported(m);
   dict retval;
 
   for (auto k=m.begin(); k!=m.end(); ++k) {
@@ -287,7 +300,7 @@ static dict oformat_dictionary() {
  */
 static object codec_dictionary() {
   std::map<std::string, const AVCodec*> m;
-  io::detail::ffmpeg::codecs_installed(m);
+  io::detail::ffmpeg::codecs_supported(m);
   dict retval;
   for (auto k=m.begin(); k!=m.end(); ++k) {
     retval[k->first] = describe_codec(k->second);
