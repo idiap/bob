@@ -39,6 +39,8 @@ namespace ip {
 
 /**
  * @brief This class can be used to extract SIFT descriptors
+ * Reference: "Distinctive Image Features from Scale-Invariant Keypoints", 
+ * D. Lowe, International Journal of Computer Vision, 2004.
  */
 class SIFT
 {

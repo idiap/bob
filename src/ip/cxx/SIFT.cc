@@ -361,7 +361,7 @@ void bob::ip::SIFT::computeKeypointInfo(const bob::ip::GSSKeypoint& keypoint,
   // TODO: check if +0.5/Ns or 0!
   int o = (int)floor(phi + 0.5/Ns);
   // Check boundaries
-  if ( o< omin) o = omin; // min
+  if (o < omin) o = omin; // min
   if (o > omin+No-1) o = omin+No-1; // max
   keypoint_i.o = o-omin;
 

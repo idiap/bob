@@ -38,6 +38,7 @@ set(src
    "drawing.cc"
    "SpatioTemporalGradient.cc"
    "HOG.cc"
+   "SIFT.cc"
    "main.cc"
    )
 

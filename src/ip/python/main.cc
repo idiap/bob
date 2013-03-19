@@ -56,6 +56,7 @@ void bind_ip_hog();
 void bind_ip_glcm_uint8();
 void bind_ip_glcm_uint16();
 void bind_ip_glcmprop();
+void bind_ip_sift();
 
 #if WITH_VLFEAT
 void bind_ip_vlsift();
@@ -99,6 +100,7 @@ BOOST_PYTHON_MODULE(_ip) {
   bind_ip_glcm_uint8();
   bind_ip_glcm_uint16();
   bind_ip_glcmprop();
+  bind_ip_sift();
 
 #if WITH_VLFEAT
   bind_ip_vlsift();
