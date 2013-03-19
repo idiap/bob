@@ -24,138 +24,19 @@ import os, sys
 from ...test import utils
 import unittest
 import numpy
+from .. import supported_videowriter_formats
+from ..utils import color_distortion, frameskip_detection, quality_degradation
+from nose.tools import nottest
 
 # These are some global parameters for the test.
 INPUT_VIDEO = utils.datafile('test.mov', sys.modules[__name__])
-INPUT_H264_VIDEO = utils.datafile('test_h264.mov', sys.modules[__name__])
-OUTPUT_VIDEO = utils.temporary_filename(suffix='.avi')
+SUPPORTED = supported_videowriter_formats()
 
 class VideoTest(unittest.TestCase):
   """Performs various combined read/write tests on video files"""
   
   @utils.ffmpeg_found()
-  def test01_CanOpen(self):
-
-    # This test opens and verifies some properties of the test video available.
-    # It examplifies how to directly call the VideoReader and how to access
-    # some of its properties.
-    from .. import VideoReader
-    v = VideoReader(INPUT_VIDEO)
-    self.assertEqual(v.height, 240)
-    self.assertEqual(v.width, 320)
-    self.assertEqual(v.duration, 15000000) #microseconds
-    self.assertEqual(v.number_of_frames, 375)
-    self.assertEqual(len(v), 375)
-    self.assertEqual(v.codec_name, 'mjpeg')
-
-  def canReadImages(self, filename):
-    
-    # This test shows how you can read image frames from a VideoReader
-    from .. import VideoReader
-    v = VideoReader(filename)
-    counter = 0
-    for frame in v:
-      # Note that when you iterate, the frames are numpy.ndarray objects
-      # So, you can use them as you please. The organization of the data
-      # follows the other encoding systems in bob: (color-bands, height,
-      # width).
-      self.assertTrue(isinstance(frame, numpy.ndarray))
-      self.assertEqual(len(frame.shape), 3)
-      self.assertEqual(frame.shape[0], 3) #color-bands (RGB)
-      self.assertEqual(frame.shape[1], 240) #height
-      self.assertEqual(frame.shape[2], 320) #width
-      counter += 1
-
-    self.assertEqual(counter, len(v)) #we have gone through all frames
-
-  @utils.ffmpeg_found()
-  def test02_CanReadImages(self):
-    self.canReadImages(INPUT_VIDEO)
-
-  @utils.ffmpeg_found()
-  @utils.codec_available('h264')
-  def test02a_CanReadImagesH264(self):
-    self.canReadImages(INPUT_H264_VIDEO)
-
-  def canGetSpecificFrames(self, filename):
-
-    # This test shows how to get specific frames from a VideoReader
-
-    from .. import VideoReader
-    v = VideoReader(filename)
-
-    # get frame 27 (we start counting at zero)
-    f27 = v[27]
-
-    self.assertTrue(isinstance(f27, numpy.ndarray))
-    self.assertEqual(len(f27.shape), 3)
-    self.assertEqual(f27.shape, (3, 240, 320))
-
-    # you can also use negative notation...
-    self.assertTrue(isinstance(v[-1], numpy.ndarray))
-    self.assertEqual(len(v[-1].shape), 3)
-    self.assertEqual(v[-1].shape, (3, 240, 320))
-
-    # get frames 18 a 30 (exclusive), skipping 3: 18, 21, 24, 27
-    f18_30 = v[18:30:3]
-    for k in f18_30:
-      self.assertTrue(isinstance(k, numpy.ndarray))
-      self.assertEqual(len(k.shape), 3)
-      self.assertEqual(k.shape, (3, 240, 320))
-
-    # the last frame in the sequence is frame 27 as you can check
-    self.assertTrue( numpy.array_equal(f18_30[-1], f27) )
-
-  @utils.ffmpeg_found()
-  def test03_CanGetSpecificFrames(self):
-
-    self.canGetSpecificFrames(INPUT_VIDEO)
-
-  @utils.ffmpeg_found()
-  @utils.codec_available('h264')
-  def test03a_CanGetSpecificFramesH264(self):
-
-    self.canGetSpecificFrames(INPUT_H264_VIDEO)
-
-  @utils.ffmpeg_found()
-  def test04_CanWriteVideo(self):
-    
-    try:
-
-      # This test reads all frames in sequence from a initial video and records
-      # them into an output video, possibly transcoding it.
-      from .. import VideoReader, VideoWriter
-      iv = VideoReader(INPUT_VIDEO)
-      ov = VideoWriter(OUTPUT_VIDEO, iv.height, iv.width)
-      for k, frame in enumerate(iv): ov.append(frame)
-     
-      # We verify that both videos have similar properties
-      self.assertEqual(len(iv), len(ov))
-      self.assertEqual(iv.width, ov.width)
-      self.assertEqual(iv.height, ov.height)
-     
-      ov.close() # forces close; see github issue #6
-      del ov # trigger closing of the output video stream
-
-      iv2 = VideoReader(OUTPUT_VIDEO)
-
-      # We verify that both videos have similar frames
-      counter = 0
-      for orig, copied in zip(iv.__iter__(), iv2.__iter__()):
-        diff = abs(orig.astype('float32')-copied.astype('float32'))
-        m = numpy.mean(diff)
-        self.assertTrue(m < 10) # average difference is less than 10 gray levels
-        counter += 1
-
-      self.assertEqual(counter, len(iv)) #we have gone through all frames
-      
-      del iv2 # triggers closing of the input video stream
-
-    finally:
-      os.unlink(OUTPUT_VIDEO)
-
-  @utils.ffmpeg_found()
-  def test05_CanUseArrayInterface(self):
+  def test001_CanUseArrayInterface(self):
 
     # This shows you can use the array interface to read an entire video
     # sequence in a single shot
@@ -166,12 +47,13 @@ class VideoTest(unittest.TestCase):
     for frame_id, frame in zip(range(array.shape[0]), iv.__iter__()):
       self.assertTrue ( numpy.array_equal(array[frame_id,:,:,:], frame) )
 
-  def canIterateOnTheSpot(self, filename):
+  @utils.ffmpeg_found()
+  def test002_canIterateOnTheSpot(self):
 
     # This test shows how you can read image frames from a VideoReader created
     # on the spot
     from .. import VideoReader
-    video = VideoReader(filename)
+    video = VideoReader(INPUT_VIDEO)
     counter = 0
     for frame in video:
       self.assertTrue(isinstance(frame, numpy.ndarray))
@@ -183,126 +65,167 @@ class VideoTest(unittest.TestCase):
     
     self.assertEqual(counter, len(video)) #we have gone through all frames
 
-  @utils.ffmpeg_found()
-  def test06_CanIterateOnTheSpot(self):
+TEST_NUMBER = 3
 
-    self.canIterateOnTheSpot(INPUT_VIDEO)
+@utils.ffmpeg_found()
+def check_format_codec(function, shape, framerate, format, codec, maxdist):
 
-  @utils.ffmpeg_found()
-  @utils.codec_available('h264')
-  def test06a_CanIterateOnTheSpotH264(self):
+  length, height, width = shape
+  fname = utils.temporary_filename(suffix='.%s' % format)
+ 
+  try:
+    orig, framerate, encoded = function(shape, framerate, format, codec, fname)
+    reloaded = encoded.load()
 
-    self.canIterateOnTheSpot(INPUT_H264_VIDEO)
+    # test number of frames is correct
+    assert len(orig) == len(encoded)
+    assert len(orig) == len(reloaded)
 
-  def patternReadWrite(self, codec="", suffix=".avi"):
-      
-    # This test shows we can do a pattern encoding/decoding and get video
-    # readout right
+    # test distortion patterns (quick sequential check)
+    dist = []
+    for k, of in enumerate(orig):
+      dist.append(abs(of.astype('float64')-reloaded[k].astype('float64')).mean())
+    assert max(dist) <= maxdist
 
-    from .. import VideoReader, VideoWriter
-    from ..utils import generate_colors
-    fname = utils.temporary_filename(suffix=suffix)
+    # assert we can randomly access any frame (choose 3 at random)
+    for k in numpy.random.randint(length, size=(3,)):
+       assert abs(orig[k].astype('float64')-encoded[k].astype('float64')).mean() <= maxdist
+
+    # make sure that the encoded frame rate is not off by a big amount
+    assert abs(framerate - encoded.frame_rate) <= (1.0/length)
+
+  finally:
+
+    if os.path.exists(fname): os.unlink(fname)
+
+def test_format_codecs():
   
-    try:
-      # Width and height should be powers of 2 as the encoded image is going 
-      # to be approximated to the closest one, would not not be the case. 
-      # In this case, the encoding is subject to more noise as the filtered,
-      # final image that is encoded will contain added noise on the extra
-      # borders.
-      width = 128
-      height = 128
-      frames = 30
-      framerate = 30 #Hz
-      if codec:
-        outv = VideoWriter(fname, height, width, framerate, codec=codec)
-      else:
-        outv = VideoWriter(fname, height, width, framerate)
-      orig = []
-      for i in range(0, frames):
-        #newframe = numpy.random.random_integers(0,255,(3,height,width)).astype('u8')
-        newframe = generate_colors(height, width, i%width)
-        outv.append(newframe)
-        orig.append(newframe)
-      outv.close()
-      input = VideoReader(fname)
-      reloaded = input.load()
+  length = 30
+  width = 128
+  height = 128
+  framerate = 30.
+  shape = (length, height, width)
+  methods = dict(
+      frameskip = frameskip_detection,
+      color     = color_distortion,
+      noise     = quality_degradation,
+      )
 
-      self.assertEqual( reloaded.shape[1:], orig[0].shape )
-      self.assertEqual( len(reloaded), len(orig) )
+  # distortion patterns for specific codecs
+  distortions = dict(
+      # we require high standards by default
+      default    = dict(frameskip=0.1,  color=8.5,  noise=45.),
 
-      for i in range(len(reloaded)):
-        diff = abs(reloaded[i].astype('float')-orig[i].astype('float'))
-        m = numpy.mean(diff)
-        self.assertTrue(m < 50.0) # TODO: too much compression loss
+      # high-quality encoders
+      zlib       = dict(frameskip=0.0,  color=0.0, noise=0.0),
+      ffv1       = dict(frameskip=0.05, color=9.,  noise=45.),
+      vp8        = dict(frameskip=0.3,  color=9.0, noise=55.),
+      libvpx     = dict(frameskip=0.3,  color=9.0, noise=55.),
+      h264       = dict(frameskip=0.4,  color=8.5, noise=50.),
+      libx264    = dict(frameskip=0.4,  color=8.5, noise=50.),
+      theora     = dict(frameskip=0.5,  color=9.0, noise=65.),
+      libtheora  = dict(frameskip=0.5,  color=9.0, noise=65.),
+      mpeg4      = dict(frameskip=1.0,  color=9.0, noise=55.),
 
-    finally:
+      # older, but still good quality encoders
+      mjpeg      = dict(frameskip=1.2,  color=8.5, noise=50.),
+      mpegvideo  = dict(frameskip=1.3,  color=8.5, noise=55.),
+      mpeg2video = dict(frameskip=1.3,  color=8.5, noise=55.),
+      mpeg1video = dict(frameskip=1.4,  color=9.0, noise=50.),
 
-      if os.path.exists(fname): os.unlink(fname)
+      # low quality encoders - avoid using - available for compatibility
+      wmv2       = dict(frameskip=3.0,  color=10., noise=50.),
+      wmv1       = dict(frameskip=2.5,  color=10., noise=50.),
+      msmpeg4    = dict(frameskip=5.,   color=10., noise=50.),
+      msmpeg4v2  = dict(frameskip=5.,   color=10., noise=50.),
+      )
 
-  def patternReadTwice(self, codec="", suffix=".avi"):
+  global TEST_NUMBER
 
-    # This test shows if we can read twice the same video and get the 
-    # same results all the time.
+  for format in SUPPORTED:
+    for codec in SUPPORTED[format]['supported_codecs']:
+      for method in methods:
+        check_format_codec.description = "test%03d_%sDistortion_Format=%s_Codec=%s" % (TEST_NUMBER, method.capitalize(), format, codec)
+        TEST_NUMBER += 1
+        distortion = distortions.get(codec, distortions['default'])[method]
+        yield check_format_codec, methods[method], shape, framerate, format, codec, distortion
 
-    from .. import load, VideoReader, VideoWriter
-    from ..utils import generate_colors
-    fname = utils.temporary_filename(suffix=suffix)
+@utils.ffmpeg_found()
+def check_user_video(format, codec, maxdist):
+
+  from .. import VideoReader, VideoWriter
+  fname = utils.temporary_filename(suffix='.%s' % format)
+  MAXLENTH = 10 #use only the first 10 frames
   
-    try:
-      # Width and height should be powers of 2 as the encoded image is going 
-      # to be approximated to the closest one, would not not be the case. 
-      # In this case, the encoding is subject to more noise as the filtered,
-      # final image that is encoded will contain added noise on the extra
-      # borders.
-      width = 128
-      height = 128
-      frames = 30
-      framerate = 30 #Hz
-      if codec:
-        outv = VideoWriter(fname, height, width, framerate, codec=codec)
-      else:
-        outv = VideoWriter(fname, height, width, framerate)
-      orig = []
-      for i in range(0, frames):
-        #newframe = numpy.random.random_integers(0,255,(3,height,width)).astype('u8')
-        newframe = generate_colors(height, width, i%width)
-        outv.append(newframe)
-        orig.append(newframe)
-      outv.close()
+  try:
+    orig_vreader = VideoReader(INPUT_VIDEO)
+    orig = orig_vreader[:MAXLENTH]
+    (olength, _, oheight, owidth) = orig.shape
+    assert len(orig) == MAXLENTH #make sure we have loaded the original video
+    
+    # encode the input video using the format and codec provided by the user
+    outv = VideoWriter(fname, oheight, owidth, orig_vreader.frame_rate, 
+        codec=codec, format=format)
+    for k in orig: outv.append(k)
+    del outv #flush video to output file
 
-      input1 = load(fname)
-      input2 = load(fname)
+    # reload from saved file
+    encoded = VideoReader(fname)
+    reloaded = encoded.load()
 
-      self.assertEqual( input1.shape, input2.shape )
+    # test number of frames is correct
+    assert len(orig) == len(encoded)
+    assert len(orig) == len(reloaded)
 
-      for i in range(len(input1)):
-        diff = abs(input1[i].astype('float')-input2[i].astype('float'))
-        m = numpy.mean(diff)
-        self.assertTrue(m < 0.1)
+    # test distortion patterns (quick sequential check)
+    dist = []
+    for k, of in enumerate(orig):
+      dist.append(abs(of.astype('float64')-reloaded[k].astype('float64')).mean())
+    assert max(dist) <= maxdist
 
-    finally:
+    # make sure that the encoded frame rate is not off by a big amount
+    assert abs(orig_vreader.frame_rate - encoded.frame_rate) <= (1.0/MAXLENTH)
 
-      if os.path.exists(fname): os.unlink(fname)
+  finally:
 
-  @utils.ffmpeg_found()
-  def test07_PatternReadWrite(self):
-    self.patternReadWrite("")
-    self.patternReadTwice("")
-      
-  @utils.ffmpeg_found()
-  @utils.codec_available('mpeg4')
-  def test08_PatternReadWrite_mpeg4(self):
-    self.patternReadWrite("mpeg4")
-    self.patternReadTwice("mpeg4")
-      
-  @utils.ffmpeg_found()
-  @utils.codec_available('ffv1')
-  def test09_PatternReadWrite_ffv1(self):
-    self.patternReadWrite("ffv1")
-    self.patternReadTwice("ffv1")
-      
-  @utils.ffmpeg_found()
-  @utils.codec_available('h264')
-  def test10_PatternReadWrite_h264(self):
-    self.patternReadWrite("h264", ".mov")
-    self.patternReadTwice("h264", ".mov")
+    if os.path.exists(fname): os.unlink(fname)
+
+def xtest_user_video():
+  
+  # distortion patterns for specific codecs
+  distortions = dict(
+      # we require high standards by default
+      default    = 1.5,
+
+      # high-quality encoders
+      zlib       = 0.0,
+      ffv1       = 1.7,
+      vp8        = 2.7,
+      libvpx     = 2.7,
+      h264       = 2.5,
+      libx264    = 2.5,
+      theora     = 2.0,
+      libtheora  = 2.0,
+      mpeg4      = 2.3,
+
+      # older, but still good quality encoders
+      mjpeg      = 1.8,
+      mpegvideo  = 2.3,
+      mpeg2video = 2.3,
+      mpeg1video = 2.3,
+
+      # low quality encoders - avoid using - available for compatibility
+      wmv2       = 2.3,
+      wmv1       = 2.3,
+      msmpeg4    = 2.3,
+      msmpeg4v2  = 2.3,
+      )
+
+  global TEST_NUMBER
+
+  for format in SUPPORTED:
+    for codec in SUPPORTED[format]['supported_codecs']:
+      check_user_video.description = "test%03d_UserVideoDistortion_Format=%s_Codec=%s" % (TEST_NUMBER, format, codec)
+      TEST_NUMBER += 1
+      distortion = distortions.get(codec, distortions['default'])
+      yield check_user_video, format, codec, distortion
