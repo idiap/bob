@@ -67,7 +67,7 @@ static bool FFMPEG_INITIALIZED = false;
 static void check_codec_support(std::map<std::string, const AVCodec*>& retval) {
 
   std::string tmp[] = {
-    //"libvpx", //the same as vp8
+    "libvpx",
     "vp8",
     "wmv1",
     "wmv2",
@@ -88,6 +88,7 @@ static void check_codec_support(std::map<std::string, const AVCodec*>& retval) {
     "msmpeg4v2", // the same as msmpeg4
     "ffv1",
     "theora",
+    "libtheora",
     "zlib",
   };
 
@@ -211,7 +212,11 @@ static void define_output_support_map(std::map<AVOutputFormat*, std::vector<cons
   it = odict.find("mp4");
   if (it != odict.end()) { // ".flv" format is available
     retval[it->second].clear();
-    std::string tmp[] = {"h264", "h264_vdpau"};
+    std::string tmp[] = {
+      "libx264", 
+      "h264", 
+      "h264_vdpau"
+    };
     std::vector<std::string> codecs(tmp, tmp + (sizeof(tmp)/sizeof(tmp[0])));
     for (auto jt = codecs.begin(); jt != codecs.end(); ++jt) {
       auto kt = cdict.find(*jt);
@@ -223,6 +228,7 @@ static void define_output_support_map(std::map<AVOutputFormat*, std::vector<cons
   if (it != odict.end()) { // ".mp4" format is available
     retval[it->second].clear();
     std::string tmp[] = {
+      "libx264", 
       "h264", 
       "h264_vdpau", 
       "mjpeg", 
