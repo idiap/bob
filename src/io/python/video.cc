@@ -84,7 +84,8 @@ struct iterator_wrapper {
  * Python wrapper to read a single frame from a video sequence, allowing the
  * implementation of a __getitem__() functionality on VideoReader objects.
  */
-static object videoreader_getitem (io::VideoReader& v, Py_ssize_t sframe) {
+static object videoreader_getitem (io::VideoReader& v, object intobj) {
+  Py_ssize_t sframe = extract<Py_ssize_t>(long_(intobj));
   size_t frame = sframe;
   if (sframe < 0) frame = v.numberOfFrames() + sframe;
 
