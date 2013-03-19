@@ -55,6 +55,14 @@ bob::ip::SIFT::SIFT(const SIFT& other):
 {
   updateEdgeEffThreshold();
   resetCache();
+  // Update cache content
+  for (size_t i=0; i<m_gss_pyr.size(); ++i)
+  {
+    m_gss_pyr[i] = other.m_gss_pyr[i];
+    m_dog_pyr[i] = other.m_dog_pyr[i];
+    m_gss_pyr_grad_mag[i] = other.m_gss_pyr_grad_mag[i];
+    m_gss_pyr_grad_or[i] = other.m_gss_pyr_grad_or[i];
+  }
 }
 
 bob::ip::SIFT::~SIFT()
@@ -77,6 +85,14 @@ bob::ip::SIFT::operator=(const bob::ip::SIFT& other)
     updateEdgeEffThreshold();
     m_norm_thres = other.m_norm_thres;
     resetCache();
+    // Update cache content
+    for (size_t i=0; i<m_gss_pyr.size(); ++i)
+    {
+      m_gss_pyr[i] = other.m_gss_pyr[i];
+      m_dog_pyr[i] = other.m_dog_pyr[i];
+      m_gss_pyr_grad_mag[i] = other.m_gss_pyr_grad_mag[i];
+      m_gss_pyr_grad_or[i] = other.m_gss_pyr_grad_or[i];
+    }
   }
   return *this;
 }
@@ -155,6 +171,10 @@ void bob::ip::SIFT::resetCache()
       m_gss_pyr[i].extent(1), m_gss_pyr[i].extent(2)));
     m_gradient_maps.push_back(boost::shared_ptr<bob::ip::GradientMaps>(new 
       bob::ip::GradientMaps(m_gss_pyr[i].extent(1), m_gss_pyr[i].extent(2))));
+    m_gss_pyr[i] = 0.;
+    m_dog_pyr[i] = 0.;
+    m_gss_pyr_grad_mag[i] = 0.;
+    m_gss_pyr_grad_or[i] = 0.;
   }
 }
 
