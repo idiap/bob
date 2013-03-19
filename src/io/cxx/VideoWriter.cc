@@ -84,8 +84,8 @@ bob::io::VideoWriter::VideoWriter(
       throw std::runtime_error(s.str());
     }
     if (!ffmpeg::oformat_supports_codec(formatName(), codecName())) {
-      boost::format s("The detected pair of format and codec chosen for video file `%s' is not currently supported by this version of Bob. Choose a supported combination of formats and codecs or disable the `check' flag on the VideoWriter object (if you are sure of what you are doing).");
-      s % codecName() % codecLongName() % filename;
+      boost::format s("The detected pair of format (%s) and codec (%s) chosen for video file `%s' is not currently supported by this version of Bob. Choose a supported combination of formats and codecs or disable the `check' flag on the VideoWriter object (if you are sure of what you are doing).");
+      s % formatName() % codecName() % filename;
       throw std::runtime_error(s.str());
     }
   }
