@@ -36,6 +36,7 @@ set(src
    "SpatioTemporalGradient.cc"
    "DCTFeatures.cc"
    "GaussianScaleSpace.cc"
+   "SIFT.cc"
 )
 
 # If we have VLFeat installed, enable the compilation of relevant modules
@@ -79,6 +80,7 @@ bob_add_test(${PROJECT_NAME} rotate test/rotate.cc)
 bob_add_test(${PROJECT_NAME} scale test/scale.cc)
 bob_add_test(${PROJECT_NAME} shear test/shear.cc)
 bob_add_test(${PROJECT_NAME} shift test/shift.cc)
+bob_add_test(${PROJECT_NAME} sift test/SIFT.cc)
 bob_add_test(${PROJECT_NAME} tantriggs test/TanTriggs.cc)
 bob_add_test(${PROJECT_NAME} sobel test/Sobel.cc)
 bob_add_test(${PROJECT_NAME} zigzag test/zigzag.cc)
