@@ -1,5 +1,5 @@
 /**
- * @file ip/python/sift.cc
+ * @file ip/python/SIFT.cc
  * @date Thu Sep 13 12:11:00 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
