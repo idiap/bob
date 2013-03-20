@@ -3,7 +3,7 @@ PROJECT(bob_visioner)
 # This defines the dependencies of this package
 set(bob_deps "bob_lbfgs;bob_core")
 include (${QT_USE_FILE})
-set(incdir ${cxx_incdir};${QT_INCLUDE_DIR})
+set(incdir ${cxx_incdir};${QT_INCLUDES})
 set(shared "${bob_deps};${QT_LIBRARIES};${Boost_IOSTREAMS_LIBRARY_RELEASE};${Boost_SERIALIZATION_LIBRARY_RELEASE};${Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE}")
 
 # This defines the list of source files inside this package.

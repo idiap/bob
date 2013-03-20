@@ -1,7 +1,7 @@
 project(visioner_programs)
 
 include (${QT_USE_FILE})
-set(incdir ${cxx_incdir};${QT_INCLUDE_DIR})
+set(incdir ${cxx_incdir};${QT_INCLUDES})
 
 # Define compilation options
 bob_sort_headers(incdir)

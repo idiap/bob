@@ -3,7 +3,7 @@ project(bob_visioner_py${PYVER})
 # This defines the dependencies of this package
 set(bob_deps "bob_visioner;bob_python")
 include (${QT_USE_FILE})
-set(incdir ${py_incdir};${QT_INCLUDE_DIR})
+set(incdir ${py_incdir};${QT_INCLUDES})
 set(shared "${bob_deps}")
 
 # This defines the list of source files inside this package.
