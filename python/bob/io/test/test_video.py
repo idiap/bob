@@ -141,6 +141,16 @@ def test_format_codecs():
       msmpeg4v2  = dict(frameskip=5.,   color=10., noise=50.),
       )
 
+  # some exceptions
+  if utils.ffmpeg_version_lessthan('0.6'):
+    distortions['ffv1']['frameskip'] = 0.55
+    distortions['mpeg1video']['frameskip'] = 1.5
+    distortions['mpegvideo']['color'] = 9.0
+    distortions['mpegvideo']['frameskip'] = 1.4
+    distortions['mpeg2video']['color'] = 9.0
+    distortions['mpeg2video']['frameskip'] = 1.4
+
+
   global TEST_NUMBER
 
   for format in SUPPORTED:

@@ -53,6 +53,10 @@ typedef CodecID AVCodecID;
 #define AV_PKT_FLAG_KEY PKT_FLAG_KEY
 #endif
 
+#ifndef AV_PIX_FMT_YUV420P
+#define AV_PIX_FMT_YUV420P PIX_FMT_YUV420P
+#endif
+
 #if LIBAVCODEC_VERSION_INT < 0x347a00 //52.122.0 @ ffmpeg-0.7
 #define AVMEDIA_TYPE_VIDEO CODEC_TYPE_VIDEO
 #endif
@@ -81,10 +85,6 @@ static void check_codec_support(std::map<std::string, const AVCodec*>& retval) {
     "wmv1",
     "wmv2",
     //"wmv3", /* no encoding support */
-    //"h263p", //bogus on libav-0.8.4
-    "h264",
-    //"h264_vdpau", //hw accelerated h264 decoding
-    "libx264",
     "mjpeg",
     "mpegvideo", // the same as mpeg2video
     "mpeg1video", 
@@ -96,9 +96,15 @@ static void check_codec_support(std::map<std::string, const AVCodec*>& retval) {
     //"msmpeg4v1", /* no encoding support */
     "msmpeg4v2", // the same as msmpeg4
     "ffv1",
+#if LIBAVUTIL_VERSION_INT >= 0x320f01 //50.15.1 @ ffmpeg-0.6
+    //"h263p", //bogus on libav-0.8.4
+    "h264",
+    //"h264_vdpau", //hw accelerated h264 decoding
     "theora",
     "libtheora",
+    "libx264",
     "zlib",
+#endif
   };
 
   std::set<std::string> wishlist(tmp, tmp + (sizeof(tmp)/sizeof(tmp[0])));
@@ -733,7 +739,10 @@ boost::shared_ptr<AVStream> ffmpeg::make_stream(
   retval->codec->time_base.den = framerate;
   retval->codec->time_base.num = 1;
   retval->codec->gop_size      = gop; /* emit one intra frame every X at most */
-  retval->codec->pix_fmt       = codec->pix_fmts[0];
+  retval->codec->pix_fmt       = AV_PIX_FMT_YUV420P;
+  if (codec->pix_fmts && codec->pix_fmts[0] != -1) {
+    retval->codec->pix_fmt     = codec->pix_fmts[0];
+  }
 
 # ifdef HAVE_FFMPEG_AVCOLOR_RANGE
   if (retval->codec->codec_id == AV_CODEC_ID_MJPEG) {
@@ -1391,6 +1400,7 @@ bool ffmpeg::read_video_frame (const std::string& filename,
     if (got_frame) return true; //break loop
   }
 
+#if LIBAVCODEC_VERSION_INT >= 0x344802 //52.72.2 @ ffmpeg-0.6
   if (ok < 0 && ok != (int)AVERROR_EOF) {
     if (throw_on_error) {
       boost::format m("ffmpeg::av_read_frame() failed: on file `%s' - ffmpeg reports error %d == `%s'");
@@ -1399,6 +1409,7 @@ bool ffmpeg::read_video_frame (const std::string& filename,
     }
     else return false;
   }
+#endif
 
   // it is the end of the file
   pkt->data = NULL;
@@ -1483,6 +1494,7 @@ bool ffmpeg::skip_video_frame (const std::string& filename,
     if (got_frame) return true; //break loop
   }
 
+#if LIBAVCODEC_VERSION_INT >= 0x344802 //52.72.2 @ ffmpeg-0.6
   if (ok < 0 && ok != (int)AVERROR_EOF) {
     if (throw_on_error) {
       boost::format m("ffmpeg::av_read_frame() failed: on file `%s' - ffmpeg reports error %d == `%s'");
@@ -1491,6 +1503,7 @@ bool ffmpeg::skip_video_frame (const std::string& filename,
     }
     else return false;
   }
+#endif
 
   // it is the end of the file
   pkt->data = NULL;

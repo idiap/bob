@@ -63,6 +63,15 @@ ffmpeg_versions = {
     '1.1':  [ SV('54.86.100'), SV('54.59.106'), SV('52.13.100') ],
     }
 
+def ffmpeg_version_lessthan(v):
+  '''Returns true if the version of ffmpeg compiled-in is at least the version
+  indicated as a string parameter.'''
+
+  from ..io._io import version
+  avcodec_inst= SV(version['FFmpeg']['avcodec'])
+  avcodec_req = ffmpeg_versions[v][0]
+  return avcodec_inst < avcodec_req
+
 def ffmpeg_found(version_geq=None):
   '''Decorator to check if a codec is available before enabling a test
   
