@@ -10,7 +10,6 @@ import numpy
 import pkg_resources
 import os
 import sys
-import Image, ImageFont, ImageDraw
 from ..test import utils
 from . import save as save_to_file
 
@@ -19,6 +18,8 @@ DEFAULT_FONT = pkg_resources.resource_filename(__name__,
 
 def estimate_fontsize(height, width, format):
   """Estimates the best fontsize to fit into a image that is (height, width)"""
+
+  import Image, ImageFont, ImageDraw
 
   best_size = min(height, width)
   fit = False
@@ -36,6 +37,8 @@ def estimate_fontsize(height, width, format):
 def print_numbers(frame, counter, format, fontsize):
   """Generates an image that serves as a test pattern for encoding/decoding and
   accuracy tests."""
+
+  import Image, ImageFont, ImageDraw
 
   _, height, width = frame.shape
 
