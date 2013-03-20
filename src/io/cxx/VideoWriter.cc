@@ -397,6 +397,10 @@ AVStream* io::VideoWriter::add_video_stream() {
   c->time_base.num = 1;
   c->gop_size = m_gop; // emit one intra frame every N frames at most
   c->pix_fmt = PIX_FMT_YUV420P;
+  if (c->codec_id == CODEC_ID_MJPEG) {
+    // mjpeg needs special encoding settings
+    c->color_range = AVCOL_RANGE_JPEG;
+  }
   if (c->codec_id == CODEC_ID_MPEG2VIDEO) {
     // just for testing, we also add B frames
     c->max_b_frames = 2;
@@ -550,19 +554,22 @@ static void write_video_frame (const blitz::Array<uint8_t,3>& data,
     }
 
     /* If size is zero, it means the image was buffered. */
-    if (got_output) {
+    if (!ok && got_output && pkt->size) {
       if (stream->codec->coded_frame->key_frame) pkt->flags |= AV_PKT_FLAG_KEY;
       pkt->stream_index = stream->index;
 
       /* Write the compressed frame to the media file. */
       ok = av_interleaved_write_frame(format_context, pkt.get());
-      if (ok && (ok != AVERROR(EINVAL))) {
+      if (ok != 0) {
         boost::format m("ffmpeg::av_interleaved_write_frame() failed: failed to write video frame while encoding file `%s' - ffmpeg reports error %d == `%s'");
         m % filename % ok % ffmpeg_error(ok);
         throw std::runtime_error(m.str());
       }
 
     }
+
+    context_frame->pts += av_rescale_q(1, stream->codec->time_base, 
+        stream->time_base);
 
   }
 
@@ -613,11 +620,11 @@ static void write_video_frame (const blitz::Array<uint8_t,3>& data,
 
     }
 
+  context_frame->pts += 1;
+
   }
 
 #endif // FFmpeg version >= 0.11.0
-
-  context_frame->pts += 1;
 }
 
 void io::VideoWriter::close_video() {

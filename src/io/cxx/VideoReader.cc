@@ -222,7 +222,7 @@ void io::VideoReader::open() {
   m_nframes = format_ctxt->streams[stream_index]->nb_frames;
   if (m_nframes > 0) {
     //number of frames is known
-    m_framerate = m_nframes * AV_TIME_BASE / m_duration;
+    m_framerate = ((float)m_nframes * AV_TIME_BASE) / (float)m_duration;
   }
   else {
     //number of frames is not known
@@ -609,8 +609,20 @@ static bool read_video_frame (const std::string& filename,
 
   boost::shared_ptr<AVPacket> pkt = make_packet();
 
-  int ok = av_read_frame(format_context, pkt.get());
+  int ok = 0;
+  int got_frame = 0;
 
+  while ((ok = av_read_frame(format_context, pkt.get())) >= 0) {
+    if (pkt->stream_index == stream_index) {
+      decode_frame(filename, current_frame, codec_context,
+          swscaler, context_frame, data, pkt, got_frame,
+          throw_on_error);
+    }
+    av_free_packet(pkt.get());
+    if (got_frame) return true; //break loop
+  }
+
+#if LIBAVCODEC_VERSION_INT >= 0x344802 //52.72.2 @ ffmpeg-0.6
   if (ok < 0 && ok != (int)AVERROR_EOF) {
     if (throw_on_error) {
       boost::format m("ffmpeg::av_read_frame() failed: on file `%s' - ffmpeg reports error %d == `%s'");
@@ -619,29 +631,33 @@ static bool read_video_frame (const std::string& filename,
     }
     else return false;
   }
+#endif
 
-  int got_frame = 0;
-
-  while(!got_frame) {
-
-    // if we have reached the end-of-file, frames can still be cached
-    if (ok == (int)AVERROR_EOF) {
-      pkt->data = 0;
-      pkt->size = 0;
-      decode_frame(filename, current_frame, codec_context, swscaler,
-          context_frame, data, pkt, got_frame, throw_on_error);
-    }
-    else {
-      if (pkt->stream_index == stream_index) {
-        decode_frame(filename, current_frame, codec_context,
-            swscaler, context_frame, data, pkt, got_frame,
-            throw_on_error);
+  // it is the end of the file
+  pkt->data = NULL;
+  pkt->size = 0;
+  //N.B.: got_frame == 0
+  const unsigned int MAX_FLUSH_ITERATIONS = 128;
+  unsigned int iteration_counter = MAX_FLUSH_ITERATIONS;
+  do {
+    if (pkt->stream_index == stream_index) {
+      decode_frame(filename, current_frame, codec_context,
+          swscaler, context_frame, data, pkt, got_frame,
+          throw_on_error);
+      --iteration_counter;
+      if (iteration_counter == 0) {
+        if (throw_on_error) {
+          boost::format m("ffmpeg::decode_frame() failed: on file `%s' - I've been iterating for over %d times and I cannot find a new frame: this codec (%s) must be buggy!");
+          m % filename % MAX_FLUSH_ITERATIONS % codec_context->codec->name; 
+          throw std::runtime_error(m.str());
+        }
+        break;
       }
     }
+    else break;
+  } while (got_frame == 0);
 
-  }
-
-  return (got_frame > 0);
+  return true;
 }
 
 bool io::VideoReader::const_iterator::read(bob::core::array::interface& data,
@@ -742,8 +758,19 @@ static bool skip_video_frame (const std::string& filename,
 
   boost::shared_ptr<AVPacket> pkt = make_packet();
 
-  int ok = av_read_frame(format_context, pkt.get());
+  int ok = 0;
+  int got_frame = 0;
 
+  while ((ok = av_read_frame(format_context, pkt.get())) >= 0) {
+    if (pkt->stream_index == stream_index) {
+      dummy_decode_frame(filename, current_frame, codec_context,
+          context_frame, pkt, got_frame, throw_on_error);
+    }
+    av_free_packet(pkt.get());
+    if (got_frame) return true; //break loop
+  }
+
+#if LIBAVCODEC_VERSION_INT >= 0x344802 //52.72.2 @ ffmpeg-0.6
   if (ok < 0 && ok != (int)AVERROR_EOF) {
     if (throw_on_error) {
       boost::format m("ffmpeg::av_read_frame() failed: on file `%s' - ffmpeg reports error %d == `%s'");
@@ -752,24 +779,32 @@ static bool skip_video_frame (const std::string& filename,
     }
     else return false;
   }
+#endif
 
-  int got_frame = 0;
-
-  // if we have reached the end-of-file, frames can still be cached
-  if (ok == (int)AVERROR_EOF) {
-    pkt->data = 0;
-    pkt->size = 0;
-    dummy_decode_frame(filename, current_frame, codec_context,
-        context_frame, pkt, got_frame, throw_on_error);
-  }
-  else {
+  // it is the end of the file
+  pkt->data = NULL;
+  pkt->size = 0;
+  //N.B.: got_frame == 0
+  const unsigned int MAX_FLUSH_ITERATIONS = 128;
+  unsigned int iteration_counter = MAX_FLUSH_ITERATIONS;
+  do {
     if (pkt->stream_index == stream_index) {
       dummy_decode_frame(filename, current_frame, codec_context,
           context_frame, pkt, got_frame, throw_on_error);
+      --iteration_counter;
+      if (iteration_counter == 0) {
+        if (throw_on_error) {
+          boost::format m("ffmpeg::decode_frame() failed: on file `%s' - I've been iterating for over %d times and I cannot find a new frame: this codec (%s) must be buggy!");
+          m % filename % MAX_FLUSH_ITERATIONS % codec_context->codec->name; 
+          throw std::runtime_error(m.str());
+        }
+        break;
+      }
     }
-  }
+    else break;
+  } while (got_frame == 0);
 
-  return (got_frame > 0);
+  return true;
 }
 
 io::VideoReader::const_iterator& io::VideoReader::const_iterator::operator++ () {
