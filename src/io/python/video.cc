@@ -31,7 +31,12 @@
 #include "bob/core/python/ndarray.h"
 #include "bob/core/python/gil.h"
 
-#include "libavutil/pixdesc.h"
+extern "C" {
+#if LIBAVUTIL_VERSION_INT >= 0x320f01 //50.15.1 @ ffmpeg-0.6
+#  include <libavutil/opt.h>
+#  include <libavutil/pixdesc.h>
+#endif
+}
 
 using namespace boost::python;
 namespace io = bob::io;
@@ -193,7 +198,11 @@ static object describe_codec(const AVCodec* codec) {
     list pixfmt;
     unsigned int i=0;
     while(codec->pix_fmts[i] != -1) {
-      pixfmt.append((int)codec->pix_fmts[i++]);
+#if LIBAVUTIL_VERSION_INT >= 0x320f01 //50.15.1 @ ffmpeg-0.6
+      pixfmt.append(av_get_pix_fmt_name(codec->pix_fmts[i++]));
+#else
+      pixfmt.append(avcodec_get_pix_fmt_name(codec->pix_fmts[i++]));
+#endif
     }
     retval["pixfmts"] = tuple(pixfmt);
   }

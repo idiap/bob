@@ -1054,7 +1054,7 @@ void ffmpeg::close_output_file(const std::string& filename,
 # if LIBAVFORMAT_VERSION_INT >= 0x346e00 //52.110.0 @ ffmpeg-0.7
   avio_close(format_context->pb);
 # else
-  url_close(format_context->pb);
+  url_fclose(format_context->pb);
 # endif
 
 }
