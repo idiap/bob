@@ -236,7 +236,7 @@ class VideoTest(unittest.TestCase):
       for orig, copied in zip(iv.__iter__(), iv2.__iter__()):
         diff = abs(orig.astype('float32')-copied.astype('float32'))
         m = numpy.mean(diff)
-        self.assertTrue(m < 10) # average difference is less than 10 gray levels
+        self.assertTrue(m < 3) # average difference is less than 3 gray levels
         counter += 1
 
       self.assertEqual(counter, len(iv)) #we have gone through all frames
@@ -318,7 +318,7 @@ class VideoTest(unittest.TestCase):
       for i in range(len(reloaded)):
         diff = abs(reloaded[i].astype('float')-orig[i].astype('float'))
         m = numpy.mean(diff)
-        self.assertTrue(m < 5.0) # compression loss
+        self.assertTrue(m < 1.0) # compression loss
 
     finally:
 
@@ -358,7 +358,7 @@ class VideoTest(unittest.TestCase):
       for i in range(len(input1)):
         diff = abs(input1[i].astype('float')-input2[i].astype('float'))
         m = numpy.mean(diff)
-        self.assertTrue(m < 0.1)
+        self.assertTrue(m < 0.01)
 
     finally:
 
