@@ -100,8 +100,8 @@ static void check_codec_support(std::map<std::string, const AVCodec*>& retval) {
     //"h263p", //bogus on libav-0.8.4
     "h264",
     //"h264_vdpau", //hw accelerated h264 decoding
-    "theora",
-    "libtheora",
+    //"theora", //buggy on some platforms
+    //"libtheora", //buggy on some platforms
     "libx264",
     "zlib",
 #endif
