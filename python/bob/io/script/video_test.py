@@ -358,7 +358,14 @@ def main(user_input=None):
   # result table
   table = {}
 
+  # report results in a readable way
   print version_info
+  print "Settings:"
+  print "  Width    : %d pixels" % args.width
+  print "  Height   : %d pixels" % args.height
+  print "  Length   : %d frames" % args.length
+  print "  Framerate: %f Hz"     % args.framerate
+
   print("Legend:")
   for k, (f, code) in test_function.iteritems():
     print("  %s: %s test" % (code, k.capitalize()))
@@ -420,14 +427,7 @@ def main(user_input=None):
   sys.stdout.write("\n")
   sys.stdout.flush()
 
-  # report results in a readable way
-  print "Settings:"
-  print "  Width    : %d pixels" % args.width
-  print "  Height   : %d pixels" % args.height
-  print "  Length   : %d frames" % args.length
-  print "  Framerate: %f Hz"     % args.framerate
   print ""
-
   print " %-9s | %-3s | %-16s | %s" % ('test', 'fmt', 'codec', 'figure (lower is better quality)')
   print ((11*'-') + '+' + (5*'-') + '+' + (18*'-') + '+' + ((80-45)*'-'))
   for test in sorted(table.iterkeys()):

@@ -100,6 +100,7 @@ Developer's Guide
    Development
    Contributing
    Optimizing
+   UsingVideos
    TicketReportingDev
 
 Reference

@@ -432,6 +432,12 @@ the |project|'s utility ``bob_config.py``.
   os.chdir(current_directory)
   shutil.rmtree(temp_dir)
 
+.. warning::
+
+  Please read :doc:`UsingVideos` for details on choosing codecs and formats
+  that are adequate to your application, as well as drawbacks and pitfalls with
+  video encoding and decoding.
+
 Loading and saving Matlab data
 ==============================
 
