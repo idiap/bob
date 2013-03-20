@@ -57,6 +57,7 @@
 .. _numpy: http://numpy.scipy.org
 .. _nose: http://nose.readthedocs.org
 .. _opencv: http://opencv.willowgarage.com/
+.. _pil: http://www.pythonware.com/products/pil/
 .. _python: http://www.python.org
 .. _pypi: http://pypi.python.org
 .. _qt4: http://qt.nokia.com/ 
