@@ -145,13 +145,13 @@ io::VideoReader::~VideoReader() {
 }
 
 size_t io::VideoReader::load(blitz::Array<uint8_t,4>& data, 
-  bool throw_on_error) const {
+  bool throw_on_error, void (*check)(void)) const {
   bob::core::array::blitz_array tmp(data);
-  return load(tmp, throw_on_error);
+  return load(tmp, throw_on_error, check);
 }
 
 size_t io::VideoReader::load(bob::core::array::interface& b, 
-  bool throw_on_error) const {
+  bool throw_on_error, void (*check)(void)) const {
 
   //checks if the output array shape conforms to the video specifications,
   //otherwise, throw.
@@ -166,6 +166,7 @@ size_t io::VideoReader::load(bob::core::array::interface& b,
   size_t frames_read = 0;
 
   for (const_iterator it=begin(); it!=end();) {
+    if (check) check(); ///< runs user check function before we start our work
     bob::core::array::blitz_array ref(static_cast<void*>(ptr), m_typeinfo_frame);
     if (it.read(ref, throw_on_error)) {
       ptr += frame_size;

@@ -62,6 +62,12 @@ namespace bob { namespace python {
 
   };
 
+  /**
+   * Checks for keyboard interrupts and raises KeyboardInterrupt if
+   * appropriate. This function must be called before you release the GIL.
+   */
+  void check_signals();
+
 }}
 
 #endif /* BOB_CORE_PYTHON_GIL_H */

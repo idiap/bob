@@ -29,6 +29,7 @@
 #include "bob/io/VideoUtilities.h"
 #include "bob/core/python/exception.h"
 #include "bob/core/python/ndarray.h"
+#include "bob/core/python/gil.h"
 
 #include "libavutil/pixdesc.h"
 
@@ -140,6 +141,7 @@ static object videoreader_getslice (io::VideoReader& v, slice sobj) {
   io::VideoReader::const_iterator it = v.begin();
   it += start;
   for (size_t i=start; it.parent() && i<stop; i+=step, it+=(step-1)) {
+    tp::check_signals(); //catches keyboard interruption
     tp::py_array tmp(v.frame_type());
     it.read(tmp); //throw if a problem occurs while reading the video
     retval.append(tmp.pyobject());
@@ -152,7 +154,8 @@ static object videoreader_getslice (io::VideoReader& v, slice sobj) {
 static object videoreader_load(io::VideoReader& reader, 
   bool raise_on_error=false) {
   tp::py_array tmp(reader.video_type());
-  size_t frames_read = reader.load(tmp, raise_on_error);
+  size_t frames_read = 0;
+  frames_read = reader.load(tmp, raise_on_error, tp::check_signals);
   return make_tuple(frames_read, tmp.pyobject());
 }
 

@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <pthread.h>
+#include <boost/python.hpp>
 #include "bob/core/python/gil.h"
 
 bob::python::gil::gil () 
@@ -25,4 +26,11 @@ bob::python::no_gil::no_gil()
 
 bob::python::no_gil::~no_gil() {
   PyEval_RestoreThread(m_state);
+}
+
+void bob::python::check_signals() {
+  if(PyErr_CheckSignals() == -1) {
+    if (!PyErr_Occurred()) PyErr_SetInterrupt();
+    throw boost::python::error_already_set();
+  }
 }

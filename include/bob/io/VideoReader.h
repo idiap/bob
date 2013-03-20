@@ -157,9 +157,11 @@ namespace bob { namespace io {
        * matter what you chose here, it is your task to verify the return value
        * of this method matches the number of frames indicated by
        * numberOfFrames().
+       *
+       * The op
        */
-      size_t load(blitz::Array<uint8_t,4>& data, 
-          bool throw_on_error=false) const;
+      size_t load(blitz::Array<uint8_t,4>& data,
+          bool throw_on_error=false, void (*check)(void)=0) const;
 
       /**
        * Loads all of the video stream in a buffer. Resizes the buffer if
@@ -175,7 +177,7 @@ namespace bob { namespace io {
        * numberOfFrames().
        */
       size_t load(bob::core::array::interface& b, 
-          bool throw_on_error=false) const;
+          bool throw_on_error=false, void (*check)(void)=0) const;
 
     private: //methods
 
