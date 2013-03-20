@@ -78,21 +78,22 @@ def check_format_codec(function, shape, framerate, format, codec, maxdist):
     reloaded = encoded.load()
 
     # test number of frames is correct
-    assert len(orig) == len(encoded)
-    assert len(orig) == len(reloaded)
+    assert len(orig) == len(encoded), "original length %d != %d encoded" % (len(orig), len(encoded))
+    assert len(orig) == len(reloaded), "original length %d != %d reloaded" % (len(orig), len(reloaded))
 
     # test distortion patterns (quick sequential check)
     dist = []
     for k, of in enumerate(orig):
       dist.append(abs(of.astype('float64')-reloaded[k].astype('float64')).mean())
-    assert max(dist) <= maxdist
+    assert max(dist) <= maxdist, "max(distortion) %g > %g allowed" % (max(dist), maxdist)
 
     # assert we can randomly access any frame (choose 3 at random)
     for k in numpy.random.randint(length, size=(3,)):
-       assert abs(orig[k].astype('float64')-encoded[k].astype('float64')).mean() <= maxdist
+      rdist = abs(orig[k].astype('float64')-encoded[k].astype('float64')).mean()
+      assert rdist <= maxdist, "distortion(frame[%d]) %g > %g allowed" % (k, rdist, maxdist)
 
     # make sure that the encoded frame rate is not off by a big amount
-    assert abs(framerate - encoded.frame_rate) <= (1.0/length)
+    assert abs(framerate - encoded.frame_rate) <= (1.0/length), "reloaded framerate %g differs from original %g by more than %g" % (encoded.frame_rate, framerate, 1.0/length)
 
   finally:
 
@@ -119,12 +120,12 @@ def test_format_codecs():
       # high-quality encoders
       zlib       = dict(frameskip=0.0,  color=0.0, noise=0.0),
       ffv1       = dict(frameskip=0.05, color=9.,  noise=45.),
-      vp8        = dict(frameskip=0.3,  color=9.0, noise=55.),
-      libvpx     = dict(frameskip=0.3,  color=9.0, noise=55.),
+      vp8        = dict(frameskip=0.3,  color=9.0, noise=65.),
+      libvpx     = dict(frameskip=0.3,  color=9.0, noise=65.),
       h264       = dict(frameskip=0.4,  color=8.5, noise=50.),
       libx264    = dict(frameskip=0.4,  color=8.5, noise=50.),
-      theora     = dict(frameskip=0.5,  color=9.0, noise=65.),
-      libtheora  = dict(frameskip=0.5,  color=9.0, noise=65.),
+      theora     = dict(frameskip=0.5,  color=9.0, noise=70.),
+      libtheora  = dict(frameskip=0.5,  color=9.0, noise=70.),
       mpeg4      = dict(frameskip=1.0,  color=9.0, noise=55.),
 
       # older, but still good quality encoders
@@ -162,7 +163,7 @@ def check_user_video(format, codec, maxdist):
     orig_vreader = VideoReader(INPUT_VIDEO)
     orig = orig_vreader[:MAXLENTH]
     (olength, _, oheight, owidth) = orig.shape
-    assert len(orig) == MAXLENTH #make sure we have loaded the original video
+    assert len(orig) == MAXLENTH, "original length %d != %d MAXLENTH" % (len(orig), MAXLENTH)
     
     # encode the input video using the format and codec provided by the user
     outv = VideoWriter(fname, oheight, owidth, orig_vreader.frame_rate, 
@@ -175,17 +176,17 @@ def check_user_video(format, codec, maxdist):
     reloaded = encoded.load()
 
     # test number of frames is correct
-    assert len(orig) == len(encoded)
-    assert len(orig) == len(reloaded)
+    assert len(orig) == len(encoded), "original length %d != %d encoded" % (len(orig), len(encoded))
+    assert len(orig) == len(reloaded), "original length %d != %d reloaded" % (len(orig), len(reloaded))
 
     # test distortion patterns (quick sequential check)
     dist = []
     for k, of in enumerate(orig):
       dist.append(abs(of.astype('float64')-reloaded[k].astype('float64')).mean())
-    assert max(dist) <= maxdist
+    assert max(dist) <= maxdist, "max(distortion) %g > %g allowed" % (max(dist), maxdist)
 
     # make sure that the encoded frame rate is not off by a big amount
-    assert abs(orig_vreader.frame_rate - encoded.frame_rate) <= (1.0/MAXLENTH)
+    assert abs(orig_vreader.frame_rate - encoded.frame_rate) <= (1.0/MAXLENTH), "original video framerate %g differs from encoded %g by more than %g" % (encoded.frame_rate, framerate, 1.0/MAXLENTH)
 
   finally:
 
