@@ -119,8 +119,8 @@ def test_format_codecs():
       # high-quality encoders
       zlib       = dict(frameskip=0.0,  color=0.0, noise=0.0),
       ffv1       = dict(frameskip=0.05, color=9.,  noise=45.),
-      vp8        = dict(frameskip=0.3,  color=9.0, noise=60.),
-      libvpx     = dict(frameskip=0.3,  color=9.0, noise=60.),
+      vp8        = dict(frameskip=0.3,  color=9.0, noise=55.),
+      libvpx     = dict(frameskip=0.3,  color=9.0, noise=55.),
       h264       = dict(frameskip=0.4,  color=8.5, noise=50.),
       libx264    = dict(frameskip=0.4,  color=8.5, noise=50.),
       theora     = dict(frameskip=0.5,  color=9.0, noise=65.),
