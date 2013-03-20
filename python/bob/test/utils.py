@@ -45,6 +45,7 @@ def temporary_filename(prefix='bobtest_', suffix='.hdf5'):
   """Generates a temporary filename to be used in tests"""
 
   (fd, name) = tempfile.mkstemp(suffix, prefix)
+  os.close(fd)
   os.unlink(name)
   return name
 

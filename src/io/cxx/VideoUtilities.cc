@@ -74,14 +74,14 @@ static void check_codec_support(std::map<std::string, const AVCodec*>& retval) {
     //"wmv3", /* no encoding support */
     //"h263p", //bogus on libav-0.8.4
     "h264",
-    "h264_vdpau", //hw accelerated h264 decoding
+    //"h264_vdpau", //hw accelerated h264 decoding
     "libx264",
     "mjpeg",
     "mpegvideo", // the same as mpeg2video
     "mpeg1video", 
-    "mpeg1video_vdpau", //hw accelerated mpeg1video decoding
+    //"mpeg1video_vdpau", //hw accelerated mpeg1video decoding
     "mpeg2video", // the same as mpegvideo
-    "mpegvideo_vdpau", //hw accelerated mpegvideo decoding
+    //"mpegvideo_vdpau", //hw accelerated mpegvideo decoding
     "mpeg4",
     "msmpeg4",
     //"msmpeg4v1", /* no encoding support */
@@ -1050,6 +1050,13 @@ void ffmpeg::close_output_file(const std::string& filename,
     throw std::runtime_error(m.str());
   }
 
+  /* Closes the output file */
+# if LIBAVFORMAT_VERSION_INT >= 0x346e00 //52.110.0 @ ffmpeg-0.7
+  avio_close(format_context->pb);
+# else
+  url_close(format_context->pb);
+# endif
+
 }
 
 static AVPacket* allocate_packet() {
@@ -1388,11 +1395,22 @@ bool ffmpeg::read_video_frame (const std::string& filename,
   pkt->data = NULL;
   pkt->size = 0;
   //N.B.: got_frame == 0
+  const unsigned int MAX_FLUSH_ITERATIONS = 128;
+  unsigned int iteration_counter = MAX_FLUSH_ITERATIONS;
   do {
     if (pkt->stream_index == stream_index) {
       decode_frame(filename, current_frame, codec_context,
           swscaler, context_frame, data, pkt, got_frame,
           throw_on_error);
+      --iteration_counter;
+      if (iteration_counter == 0) {
+        if (throw_on_error) {
+          boost::format m("ffmpeg::decode_frame() failed: on file `%s' - I've been iterating for over %d times and I cannot find a new frame: this codec (%s) must be buggy!");
+          m % filename % MAX_FLUSH_ITERATIONS % codec_context->codec->name; 
+          throw std::runtime_error(m.str());
+        }
+        break;
+      }
     }
     else break;
   } while (got_frame == 0);
@@ -1469,10 +1487,21 @@ bool ffmpeg::skip_video_frame (const std::string& filename,
   pkt->data = NULL;
   pkt->size = 0;
   //N.B.: got_frame == 0
+  const unsigned int MAX_FLUSH_ITERATIONS = 128;
+  unsigned int iteration_counter = MAX_FLUSH_ITERATIONS;
   do {
     if (pkt->stream_index == stream_index) {
       dummy_decode_frame(filename, current_frame, codec_context,
           context_frame, pkt, got_frame, throw_on_error);
+      --iteration_counter;
+      if (iteration_counter == 0) {
+        if (throw_on_error) {
+          boost::format m("ffmpeg::decode_frame() failed: on file `%s' - I've been iterating for over %d times and I cannot find a new frame: this codec (%s) must be buggy!");
+          m % filename % MAX_FLUSH_ITERATIONS % codec_context->codec->name; 
+          throw std::runtime_error(m.str());
+        }
+        break;
+      }
     }
     else break;
   } while (got_frame == 0);

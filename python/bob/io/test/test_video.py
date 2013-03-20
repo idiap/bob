@@ -158,6 +158,7 @@ def check_user_video(format, codec, maxdist):
   MAXLENTH = 10 #use only the first 10 frames
   
   try:
+  
     orig_vreader = VideoReader(INPUT_VIDEO)
     orig = orig_vreader[:MAXLENTH]
     (olength, _, oheight, owidth) = orig.shape
@@ -167,7 +168,7 @@ def check_user_video(format, codec, maxdist):
     outv = VideoWriter(fname, oheight, owidth, orig_vreader.frame_rate, 
         codec=codec, format=format)
     for k in orig: outv.append(k)
-    del outv #flush video to output file
+    outv.close()
 
     # reload from saved file
     encoded = VideoReader(fname)
@@ -190,7 +191,7 @@ def check_user_video(format, codec, maxdist):
 
     if os.path.exists(fname): os.unlink(fname)
 
-def xtest_user_video():
+def test_user_video():
   
   # distortion patterns for specific codecs
   distortions = dict(
