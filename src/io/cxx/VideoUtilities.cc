@@ -62,6 +62,15 @@ namespace ffmpeg = bob::io::detail::ffmpeg;
 static bool FFMPEG_INITIALIZED = false;
 
 /**
+ * Tries to find an encoder name through a decoder 
+ */
+static AVCodec* try_find_through_decoder(const char* codecname) {
+  AVCodec* tmp = avcodec_find_decoder_by_name(codecname);
+  if (tmp) return avcodec_find_encoder(tmp->id);
+  return 0;
+}
+
+/**
  * Returns a list of available codecs from what I wish to support
  */
 static void check_codec_support(std::map<std::string, const AVCodec*>& retval) {
@@ -109,7 +118,16 @@ static void check_codec_support(std::map<std::string, const AVCodec*>& retval) {
         bob::core::warn << "Not overriding video codec \"" << it->long_name 
           << "\" (" << it->name << ")" << std::endl;
       }
-      else retval[it->name] = it;
+      else {
+        // a codec is potentially available, check encoder and decoder
+        bool has_decoder = (bool)(avcodec_find_decoder(it->id));
+        bool has_encoder = (bool)(avcodec_find_encoder(it->id));
+        if (!has_encoder) {
+          has_encoder = (bool)try_find_through_decoder(it->name);
+        }
+        if (has_encoder && has_decoder) retval[it->name] = it;
+        // else, skip this one (cannot test encoding loop)
+      }
     }
   }
 }
@@ -215,7 +233,7 @@ static void define_output_support_map(std::map<AVOutputFormat*, std::vector<cons
     std::string tmp[] = {
       "libx264", 
       "h264", 
-      "h264_vdpau"
+      //"h264_vdpau"
     };
     std::vector<std::string> codecs(tmp, tmp + (sizeof(tmp)/sizeof(tmp[0])));
     for (auto jt = codecs.begin(); jt != codecs.end(); ++jt) {
@@ -230,10 +248,10 @@ static void define_output_support_map(std::map<AVOutputFormat*, std::vector<cons
     std::string tmp[] = {
       "libx264", 
       "h264", 
-      "h264_vdpau", 
+      //"h264_vdpau", 
       "mjpeg", 
       "mpeg1video", 
-      "mpegvideo_vdpau"
+      //"mpegvideo_vdpau"
     };
     std::vector<std::string> codecs(tmp, tmp + (sizeof(tmp)/sizeof(tmp[0])));
     for (auto jt = codecs.begin(); jt != codecs.end(); ++jt) {
@@ -610,15 +628,6 @@ boost::shared_ptr<AVFormatContext> ffmpeg::make_output_format_context(
   return boost::shared_ptr<AVFormatContext>(retval, std::ptr_fun(deallocate_output_format_context));
 }
 
-/**
- * Tries to find an encoder name through a decoder 
- */
-static AVCodec* try_find_through_decoder(const std::string& codecname) {
-  AVCodec* tmp = avcodec_find_decoder_by_name(codecname.c_str());
-  if (tmp) return avcodec_find_encoder(tmp->id);
-  return 0;
-}
-
 AVCodec* ffmpeg::find_encoder(const std::string& filename,
     boost::shared_ptr<AVFormatContext> fmtctxt, const std::string& codecname) {
 
@@ -627,7 +636,7 @@ AVCodec* ffmpeg::find_encoder(const std::string& filename,
   /* find the video encoder */
   if (codecname.size() != 0) {
     retval = avcodec_find_encoder_by_name(codecname.c_str());
-    if (!retval) retval = try_find_through_decoder(codecname);
+    if (!retval) retval = try_find_through_decoder(codecname.c_str());
     if (!retval) {
       boost::format m("ffmpeg::avcodec_find_encoder_by_name(`%s') failed: could not find a suitable codec for encoding video file `%s' using the output format `%s' == `%s'");
       m % codecname % filename % fmtctxt->oformat->name 

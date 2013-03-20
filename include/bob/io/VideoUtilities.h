@@ -235,8 +235,7 @@ namespace bob { namespace io { namespace detail { namespace ffmpeg {
    * don't need to delete the returned object.
    */
   AVCodec* find_encoder(const std::string& filename,
-      boost::shared_ptr<AVFormatContext> fmtctxt, 
-      const std::string& codecname);
+      boost::shared_ptr<AVFormatContext> fmtctxt, const std::string& codecname);
 
   /**
    * Creates a new AVStream on the output file given by the format context
