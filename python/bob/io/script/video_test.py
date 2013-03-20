@@ -421,7 +421,6 @@ def main(user_input=None):
   sys.stdout.flush()
 
   # report results in a readable way
-  print version_info
   print "Settings:"
   print "  Width    : %d pixels" % args.width
   print "  Height   : %d pixels" % args.height
