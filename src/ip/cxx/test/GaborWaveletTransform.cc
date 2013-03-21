@@ -33,7 +33,7 @@
 #include <blitz/array.h>
 #include <stdint.h>
 #include "bob/core/logging.h"
-#include "bob/core/convert.h"
+#include "bob/core/array_convert.h"
 #include "bob/core/cast.h"
 #include "bob/io/utils.h"
 #include "bob/ip/GaborWaveletTransform.h"

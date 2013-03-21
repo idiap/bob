@@ -28,7 +28,7 @@
 #include <stdint.h>
 #include <boost/filesystem.hpp>
 #include "bob/core/cast.h"
-#include "bob/core/convert.h"
+#include "bob/core/array_convert.h"
 #include "bob/core/logging.h"
 #include "bob/ip/GeomNorm.h"
 #include "bob/io/utils.h"
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE( test_geomnorm )
 
   // Process giving the upper left corner as the rotation center (and the offset of the cropping area)
   geomnorm(img, img_processed_d, 54, 27);
-  blitz::Array<uint8_t,2> img_processed = bob::core::convertFromRange<uint8_t>( img_processed_d, 0., 255.);
+  blitz::Array<uint8_t,2> img_processed = bob::core::array::convertFromRange<uint8_t>( img_processed_d, 0., 255.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r10_geomnorm.pgm";
 //  bob::io::save(testdata_path_img.string(), img_processed); // Re-generate reference data
@@ -140,14 +140,14 @@ BOOST_AUTO_TEST_CASE( test_geomnorm_with_mask )
   geomnorm(input_image, input_mask, output_image, output_mask, 64, 69);
   
   // check that the image is close to the reference image
-  blitz::Array<uint8_t,2> output_image_uint8 = bob::core::convertFromRange<uint8_t>(output_image, 0., 255.);
+  blitz::Array<uint8_t,2> output_image_uint8 = bob::core::array::convertFromRange<uint8_t>(output_image, 0., 255.);
   testdata_path = testdata_cpath;
   testdata_path /= "image_r70_geomnorm.pgm";
 //  bob::io::open(testdata_path.string(), 'w')->write(output_image_uint8); // Re-generate reference data
   checkBlitzClose( output_image_uint8, bob::io::load<uint8_t,2>(testdata_path.string()), eps);
   
   // check that the mask is identical to the reference mask
-  blitz::Array<uint8_t,2> output_mask_uint8 = bob::core::convertFromRange<uint8_t>(output_mask, false, true);
+  blitz::Array<uint8_t,2> output_mask_uint8 = bob::core::array::convertFromRange<uint8_t>(output_mask, false, true);
   testdata_path = testdata_cpath;
   testdata_path /= "image_r70_mask.pgm";
 //  bob::io::open(testdata_path.string(), 'w')->write(output_mask_uint8); // Re-generate reference data

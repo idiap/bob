@@ -28,7 +28,7 @@
 #include <stdint.h>
 #include <iostream>
 #include <bob/core/logging.h>
-#include <bob/core/convert.h>
+#include <bob/core/array_convert.h>
 #include <bob/core/cast.h>
 
 struct T {
@@ -95,19 +95,19 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 /*************************** ALLOCATION TESTS ******************************/
 BOOST_AUTO_TEST_CASE( test_convert_uint8_to_uint16 )
 {
-  blitz::Array<uint16_t,1> b = bob::core::convert<uint16_t,uint8_t>(a8);
+  blitz::Array<uint16_t,1> b = bob::core::array::convert<uint16_t,uint8_t>(a8);
   checkBlitzEqual( b, a16);
 
-  blitz::Array<uint16_t,1> c = bob::core::convert<uint16_t,uint8_t>(a8,0,255,0,255);
+  blitz::Array<uint16_t,1> c = bob::core::array::convert<uint16_t,uint8_t>(a8,0,255,0,255);
   checkBlitzEqual( c, a8);
 
-  blitz::Array<uint16_t,1> d = bob::core::convertFromRange<uint16_t,uint8_t>(a8,0,255);
+  blitz::Array<uint16_t,1> d = bob::core::array::convertFromRange<uint16_t,uint8_t>(a8,0,255);
   checkBlitzEqual( d, a16);
 
-  blitz::Array<uint16_t,1> e = bob::core::convertToRange<uint16_t,uint8_t>(a8,0,255);
+  blitz::Array<uint16_t,1> e = bob::core::array::convertToRange<uint16_t,uint8_t>(a8,0,255);
   checkBlitzEqual( e, a8);
 
-  blitz::Array<uint8_t,1> f = bob::core::convertFromRange<uint8_t,double>(f64,0.,255.);
+  blitz::Array<uint8_t,1> f = bob::core::array::convertFromRange<uint8_t,double>(f64,0.,255.);
   checkBlitzEqual( f, f64);
 }
 

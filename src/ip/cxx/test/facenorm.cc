@@ -29,7 +29,7 @@
 #include <boost/filesystem.hpp>
 #include "bob/core/logging.h"
 #include "bob/core/cast.h"
-#include "bob/core/convert.h"
+#include "bob/core/array_convert.h"
 #include "bob/ip/color.h"
 #include "bob/ip/FaceEyesNorm.h"
 #include "bob/io/utils.h"
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE( test_facenorm )
   facenorm(img,img_processed_d,67,47,62,71);
   // bob::io::open(testdata_path_img.string(), 'w')->write(img_processed); // Re-generate reference data
 
-  blitz::Array<uint8_t,2> img_processed = bob::core::convertFromRange<uint8_t>( img_processed_d, 0., 255.);
+  blitz::Array<uint8_t,2> img_processed = bob::core::array::convertFromRange<uint8_t>( img_processed_d, 0., 255.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r10_facenorm.pgm";
   boost::shared_ptr<bob::io::File> ref_file = bob::io::open(testdata_path_img.string(), 'r');

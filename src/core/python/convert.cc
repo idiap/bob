@@ -23,7 +23,7 @@
 #include <boost/version.hpp>
 
 #include <bob/core/python/ndarray.h>
-#include <bob/core/convert.h>
+#include <bob/core/array_convert.h>
 
 using namespace boost::python;
 
@@ -38,13 +38,13 @@ static object inner_convert (bob::python::const_ndarray src,
 
       Tdst dst_min = extract<Tdst>(dst_range[0]);
       Tdst dst_max = extract<Tdst>(dst_range[1]);
-      blitz::Array<Tdst,N> dst = bob::core::convert<Tdst,Tsrc>(src.bz<Tsrc,N>(),
+      blitz::Array<Tdst,N> dst = bob::core::array::convert<Tdst,Tsrc>(src.bz<Tsrc,N>(),
           dst_min, dst_max, src_min, src_max);
       return object(dst); ///< must copy again
     }
     else { //only src_range is valid
       blitz::Array<Tdst,N> dst = 
-        bob::core::convertFromRange<Tdst,Tsrc>(src.bz<Tsrc,N>(), src_min, src_max);
+        bob::core::array::convertFromRange<Tdst,Tsrc>(src.bz<Tsrc,N>(), src_min, src_max);
       return object(dst); ///< must copy again
     }
   }
@@ -54,11 +54,11 @@ static object inner_convert (bob::python::const_ndarray src,
       Tdst dst_min = extract<Tdst>(dst_range[0]);
       Tdst dst_max = extract<Tdst>(dst_range[1]);
       blitz::Array<Tdst,N> dst = 
-        bob::core::convertToRange<Tdst,Tsrc>(src.bz<Tsrc,N>(), dst_min, dst_max);
+        bob::core::array::convertToRange<Tdst,Tsrc>(src.bz<Tsrc,N>(), dst_min, dst_max);
       return object(dst); ///< must copy again
     }
     else { //use all defaults
-      blitz::Array<Tdst,N> dst = bob::core::convert<Tdst,Tsrc>(src.bz<Tsrc,N>());
+      blitz::Array<Tdst,N> dst = bob::core::array::convert<Tdst,Tsrc>(src.bz<Tsrc,N>());
       return object(dst); ///< must copy again
     }
   }

@@ -27,7 +27,7 @@
 #include <blitz/array.h>
 #include <stdint.h>
 #include "bob/core/logging.h"
-#include "bob/core/convert.h"
+#include "bob/core/array_convert.h"
 #include "bob/ip/MultiscaleRetinex.h"
 
 #include "bob/io/utils.h"
@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE( test_multiscaleRetinex_2d )
   blitz::Array<double,2> img_processed_d(img.extent(0),img.extent(1));
   bob::ip::MultiscaleRetinex msr_filter(3);
   msr_filter(img_d,img_processed_d);
-  blitz::Array<uint8_t,2> img_processed = bob::core::convertFromRange<uint8_t>(
+  blitz::Array<uint8_t,2> img_processed = bob::core::array::convertFromRange<uint8_t>(
       img_processed_d, blitz::min(img_processed_d), blitz::max(img_processed_d));
 
   // Compare to reference image

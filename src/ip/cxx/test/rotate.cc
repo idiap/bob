@@ -27,7 +27,7 @@
 #include <blitz/array.h>
 #include <stdint.h>
 #include "bob/core/logging.h"
-#include "bob/core/convert.h"
+#include "bob/core/array_convert.h"
 #include "bob/ip/rotate.h"
 #include "bob/ip/shear.h"
 

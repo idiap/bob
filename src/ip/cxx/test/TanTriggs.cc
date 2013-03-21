@@ -27,7 +27,7 @@
 #include <blitz/array.h>
 #include <stdint.h>
 #include "bob/core/logging.h"
-#include "bob/core/convert.h"
+#include "bob/core/array_convert.h"
 #include "bob/ip/TanTriggs.h"
 
 #include "bob/io/utils.h"
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE( test_tantriggs_2d )
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_tantriggs.pgm";
   blitz::Array<uint8_t,2> img_ref = bob::io::load<uint8_t,2>(testdata_path_img.string());
-  blitz::Array<uint8_t,2> img_processed_u = bob::core::convertFromRange<uint8_t>(
+  blitz::Array<uint8_t,2> img_processed_u = bob::core::array::convertFromRange<uint8_t>(
       img_processed, blitz::min(img_processed), blitz::max(img_processed));
   checkBlitzClose( img_processed_u, img_ref, eps);
 
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE( test_tantriggs_2d )
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_tantriggs_MATLABREF.pgm";
   img_ref = bob::io::load<uint8_t,2>(testdata_path_img.string());
-  img_processed_u = bob::core::convertFromRange<uint8_t>(
+  img_processed_u = bob::core::array::convertFromRange<uint8_t>(
       img_processed, blitz::min(img_processed), blitz::max(img_processed));
   checkBlitzClose( img_processed_u, img_ref, eps); 
 }
