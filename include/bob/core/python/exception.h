@@ -27,7 +27,7 @@
 #include <boost/python.hpp>
 
 /**
- * Raises a python exception with a formatted message
+ * @brief Raises a python exception with a formatted message
  */
 #define PYTHON_ERROR(TYPE, ...) \
 { \
@@ -36,7 +36,7 @@
 }
 
 /**
- * Raises a python warning with a formatted message
+ * @brief Raises a python warning with a formatted message
  */
 #define PYTHON_WARNING(TYPE, MESSAGE) \
 { \
@@ -46,10 +46,10 @@
 namespace bob { namespace python {
 
   /**
-   * This is a generalized exception translator for boost python. It simplifies
-   * translation declaration for as long as you provide a what() method in your
-   * exception classes that return a const char* with the exception
-   * description.
+   * @brief This is a generalized exception translator for boost python. It 
+   * simplifies translation declaration for as long as you provide a what() 
+   * method in your exception classes that return a const char* with the 
+   * exception description.
    *
    * If you follow that protocol, you should be able to do something like:
    *
@@ -81,8 +81,9 @@ namespace bob { namespace python {
   };
 
   /**
-   * A thin wrapper to call the translator and escape the variable naming
-   * issue when declaring multiple ExceptionTranslator's on the same module. 
+   * @brief A thin wrapper to call the translator and escape the variable
+   * naming issue when declaring multiple ExceptionTranslator's on the same 
+   * module. 
    *
    * If you think about it, it would have to look like this:
    *

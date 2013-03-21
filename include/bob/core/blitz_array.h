@@ -29,89 +29,90 @@
 #include <boost/format.hpp>
 #include <blitz/array.h>
 
-#include "bob/core/array.h"
-#include "bob/core/array_utils.h"
+#include <bob/core/array.h>
+#include <bob/core/array_utils.h>
 
-#include "bob/core/check.h"
-#include "bob/core/array_type.h"
-#include "bob/core/array_copy.h"
-#include "bob/core/cast.h"
+#include <bob/core/check.h>
+#include <bob/core/array_type.h>
+#include <bob/core/array_copy.h>
+#include <bob/core/cast.h>
 
 namespace bob { namespace core { namespace array {
 
   /**
-   * A blitz::Array representation of an array.
+   * @brief A blitz::Array representation of an array.
    */
   class blitz_array: public interface {
 
     public:
 
       /**
-       * Starts by refering to the data from another blitz array.
+       * @brief Starts by refering to the data from another blitz array.
        */
       blitz_array(boost::shared_ptr<blitz_array> other);
 
       /**
-       * Starts by copying the data from another blitz array.
+       * @brief Starts by copying the data from another blitz array.
        */
       blitz_array(const blitz_array& other);
 
       /**
-       * Starts by refering to the data from another buffer.
+       * @brief Starts by refering to the data from another buffer.
        */
       blitz_array(boost::shared_ptr<interface> other);
 
       /**
-       * Starts by copying the data from another buffer.
+       * @brief Starts by copying the data from another buffer.
        */
       blitz_array(const interface& other);
 
       /**
-       * Starts with an uninitialized, pre-allocated array.
+       * @brief Starts with an uninitialized, pre-allocated array.
        */
       blitz_array(const typeinfo& info);
 
       /**
-       * Borrows the given pointer - if you use this constructor, you must make
-       * sure the pointed data outlives this object.
+       * @brief Borrows the given pointer - if you use this constructor, you
+       * must make sure the pointed data outlives this object.
        */
       blitz_array(void* data, const typeinfo& info);
 
       /**
-       * Destroyes me
+       * @brief Destroyes me
        */
       virtual ~blitz_array();
 
       /**
-       * Copies the data from another buffer.
+       * @brief Copies the data from another buffer.
        */
       virtual void set(const interface& other);
 
       /**
-       * Refers to the data of another buffer.
+       * @brief Refers to the data of another buffer.
        */
       virtual void set(boost::shared_ptr<interface> other);
 
       /**
-       * Re-allocates this buffer taking into consideration new requirements.
-       * The internal memory should be considered uninitialized.
+       * @brief Re-allocates this buffer taking into consideration new 
+       * requirements. The internal memory should be considered uninitialized.
        */
       virtual void set (const typeinfo& req);
 
       /**
-       * Refers to the data of another blitz array.
+       * @brief Refers to the data of another blitz array.
        */
       void set(boost::shared_ptr<blitz_array> other);
 
       /**
-       * Element type
+       * @brief Element type
        */
       virtual const typeinfo& type() const { return m_type; }
 
       /**
-       * Borrows a reference from the underlying memory. This means this object
-       * continues to be responsible for deleting the memory and you should
-       * make sure that it outlives the usage of the returned pointer.
+       * @brief Borrows a reference from the underlying memory. This means 
+       * this object continues to be responsible for deleting the memory and 
+       * you should make sure that it outlives the usage of the returned 
+       * pointer.
        */
       virtual void* ptr() { return m_ptr; }
       virtual const void* ptr() const { return m_ptr; }
@@ -126,9 +127,9 @@ namespace bob { namespace core { namespace array {
 
 
       /**
-       * Starts me with new arbitrary data. Please note we refer to the given
-       * array. External modifications to the array memory will affect me. If
-       * you don't want that to be the case, use the const variant.
+       * @brief Starts me with new arbitrary data. Please note we refer to the
+       * given array. External modifications to the array memory will affect 
+       * me. If you don't want that to be the case, use the const variant.
        */
       template <typename T, int N> 
         blitz_array(boost::shared_ptr<blitz::Array<T,N> > data) {
@@ -136,10 +137,10 @@ namespace bob { namespace core { namespace array {
         }
 
       /**
-       * Starts me with new arbitrary data. Please note we copy the given
-       * array. External modifications to the array memory will not affect me.
-       * If you don't want that to be the case, start with a non-const
-       * reference.
+       * @brief Starts me with new arbitrary data. Please note we copy the 
+       * given array. External modifications to the array memory will not 
+       * affect me. If you don't want that to be the case, start with a 
+       * non-const reference.
        */
       template <typename T, int N> 
         blitz_array(const blitz::Array<T,N>& data) {
@@ -147,8 +148,8 @@ namespace bob { namespace core { namespace array {
         }
 
       /**
-       * Starts me with new arbitrary data. Please note we don't copy the given
-       * array.
+       * @brief Starts me with new arbitrary data. Please note we don't copy
+       * the given array.
        * @warning Any resize of the given blitz::Array after this call leads to
        * unexpected results
        */
@@ -158,8 +159,8 @@ namespace bob { namespace core { namespace array {
         }
 
       /**
-       * This method will set my internal data to the value you specify. We
-       * will do this by referring to the data you gave.
+       * @brief This method will set my internal data to the value you 
+       * specify. We will do this by referring to the data you gave.
        */
       template <typename T, int N>
         void set(boost::shared_ptr<blitz::Array<T,N> > data) {
@@ -180,16 +181,16 @@ namespace bob { namespace core { namespace array {
         }
 
       /**
-       * This method will set my internal data to the value you specify. We
-       * will do this by copying the data you gave.
+       * @brief This method will set my internal data to the value you 
+       * specify. We will do this by copying the data you gave.
        */
       template <typename T, int N> void set(const blitz::Array<T,N>& data) {
         set(boost::make_shared<blitz::Array<T,N> >(ccopy(data)));
       }
 
       /**
-       * This method will set my internal data to the value you specify. We
-       * will do this by referencing the data you gave.
+       * @brief This method will set my internal data to the value you specify.
+       * We will do this by referencing the data you gave.
        * @warning Any resize of the given blitz::Array after this call leads to
        * unexpected results
        */
@@ -198,7 +199,7 @@ namespace bob { namespace core { namespace array {
       }
 
       /**
-       * This method returns a reference to my internal data.  It is the
+       * @brief This method returns a reference to my internal data. It is the
        * fastest way to get access to my data because it involves no data
        * copying. This method has two limitations:
        *
@@ -250,7 +251,7 @@ namespace bob { namespace core { namespace array {
       }
 
       /**
-       * This method returns a copy to my internal data (not a
+       * @brief This method returns a copy to my internal data (not a
        * reference) in the type you wish. It is the easiest method to use
        * because I'll never throw, no matter which type you want to receive
        * data at. Only get the number of dimensions right!

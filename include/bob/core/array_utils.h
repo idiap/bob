@@ -29,13 +29,13 @@
 #include <stdexcept>
 #include <boost/format.hpp>
 
-#include "bob/core/array.h"
-#include "bob/core/cast.h"
+#include <bob/core/array.h>
+#include <bob/core/cast.h>
 
 namespace bob { namespace core { namespace array {
 
   /**
-   * Fills in shape and stride starting from a typeinfo object
+   * @brief Fills in shape and stride starting from a typeinfo object
    */
   template <int N> void set_shape_and_stride(const typeinfo& info,
       blitz::TinyVector<int,N>& shape, blitz::TinyVector<int,N>& stride) {
@@ -47,11 +47,11 @@ namespace bob { namespace core { namespace array {
 
 
   /**
-   * Takes a data pointer and assumes it is a C-style array for the defined
-   * type. Creates a wrapper as a blitz::Array<T,N> with the same number of
-   * dimensions and type. Notice that the blitz::Array<> created will have its
-   * memory tied to the passed buffer. In other words you have to make sure
-   * that the buffer outlives the returned blitz::Array<>.
+   * @brief Takes a data pointer and assumes it is a C-style array for the 
+   * defined type. Creates a wrapper as a blitz::Array<T,N> with the same 
+   * number of dimensions and type. Notice that the blitz::Array<> created 
+   * will have its memory tied to the passed buffer. In other words you have 
+   * to make sure that the buffer outlives the returned blitz::Array<>.
    */
   template <typename T, int N>
   blitz::Array<T,N> wrap(const interface& buf) {
@@ -82,9 +82,9 @@ namespace bob { namespace core { namespace array {
 
 
   /**
-   * Takes a data pointer and assumes it is a C-style array for the defined
-   * type. Creates a copy as a blitz::Array<T,N> with the same number of
-   * dimensions, but with a type as specified by you. If the type does not
+   * @brief Takes a data pointer and assumes it is a C-style array for the 
+   * defined type. Creates a copy as a blitz::Array<T,N> with the same number
+   * of dimensions, but with a type as specified by you. If the type does not
    * match the type of the original C-style array, a cast will happen. 
    *
    * If a certain type cast is not supported. An appropriate exception will

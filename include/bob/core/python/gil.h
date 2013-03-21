@@ -14,22 +14,22 @@
 namespace bob { namespace python {
 
   /**
-   * Creates and destroyes the Python GIL. Use this to prefix code that needs
-   * to execute in a Python-thread-safe environment, but is not instantiated
-   * from Python it self. Examples are asynchronous calls or from threads
-   * created from C++.
+   * @brief Creates and destroyes the Python GIL. Use this to prefix code that
+   * needs to execute in a Python-thread-safe environment, but is not 
+   * instantiated from Python it self. Examples are asynchronous calls or from 
+   * threads created from C++.
    */
   class gil {
 
     public:
 
       /**
-       * Constructor - acquires the lock
+       * @brief Constructor - acquires the lock
        */
       gil ();
 
       /**
-       * Destructor - releases the lock
+       * @brief Destructor - releases the lock
        */
       ~gil ();
 
@@ -40,19 +40,19 @@ namespace bob { namespace python {
   };
 
   /**
-   * Unlocks the Python GIL
+   * @brief Unlocks the Python GIL
    */
   class no_gil {
 
     public:
 
       /**
-       * Releases the Python GIL lock until the end of the current scope
+       * @brief Releases the Python GIL lock until the end of the current scope
        */
       no_gil ();
 
       /**
-       * Re-acquires the GIL lock
+       * @brief Re-acquires the GIL lock
        */
       ~no_gil ();
 
@@ -63,7 +63,7 @@ namespace bob { namespace python {
   };
 
   /**
-   * Checks for keyboard interrupts and raises KeyboardInterrupt if
+   * @brief Checks for keyboard interrupts and raises KeyboardInterrupt if
    * appropriate. This function must be called before you release the GIL.
    */
   void check_signals();

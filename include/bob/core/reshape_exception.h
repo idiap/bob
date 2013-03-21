@@ -23,16 +23,16 @@
 #ifndef BOB_CORE_RESHAPE_EXCEPTION_H 
 #define BOB_CORE_RESHAPE_EXCEPTION_H
 
-#include "bob/core/Exception.h"
+#include <bob/core/Exception.h>
 
 namespace bob { 
   
   namespace core {
 
     /**
-     * The DifferentNumberOfElements exception occurs when the 2D dst array
-     * of the reshape() functions does not contain the same number of elements
-     * as the 2D src array.
+     * @brief The DifferentNumberOfElements exception occurs when the 2D dst 
+     * array of the reshape() functions does not contain the same number of 
+     * elements as the 2D src array.
      */
     class ReshapeDifferentNumberOfElements: public Exception {
       public:

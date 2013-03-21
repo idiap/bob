@@ -23,16 +23,16 @@
 #ifndef BOB_CORE_CONVERT_EXCEPTION_H 
 #define BOB_CORE_CONVERT_EXCEPTION_H
 
-#include "bob/core/Exception.h"
+#include <bob/core/Exception.h>
 
 namespace bob { 
   
   namespace core {
 
     /**
-      * A ConvertZeroInputRange is thrown when the specified input range is
-      * empty
-      */
+     * @brief A ConvertZeroInputRange is thrown when the specified input range
+     * is empty
+     */
     class ConvertZeroInputRange: public Exception {
 
       public:
@@ -45,9 +45,9 @@ namespace bob {
     };
 
     /**
-      * A ConvertInputAboveMaxRange is thrown when an input value is above 
-      * the maximum of the given input range.
-      */
+     * @brief A ConvertInputAboveMaxRange is thrown when an input value is 
+     * above the maximum of the given input range.
+     */
     class ConvertInputAboveMaxRange: public Exception {
 
       public:
@@ -62,9 +62,9 @@ namespace bob {
     };
 
     /**
-      * A ConvertInputBelowMinRange is thrown when an input value is below 
-      * the minimum of the given input range.
-      */
+     * @brief A ConvertInputBelowMinRange is thrown when an input value is 
+     * below the minimum of the given input range.
+     */
     class ConvertInputBelowMinRange: public Exception {
 
       public:

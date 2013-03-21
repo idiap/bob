@@ -23,15 +23,15 @@
 #ifndef BOB_CORE_ARRAY_EXCEPTION_H 
 #define BOB_CORE_ARRAY_EXCEPTION_H
 
-#include "bob/core/Exception.h"
+#include <bob/core/Exception.h>
 
 namespace bob { 
   
   namespace core {
 
     /**
-     * The non-zero base error exception occurs when some function, which 
-     * requires blitz Arrays to have zero base indices (for efficiency 
+     * @brief The non-zero base error exception occurs when some function,
+     * which requires blitz Arrays to have zero base indices (for efficiency 
      * purpose), is used with an array which does not fulfill this 
      * requirement.
      */
@@ -49,8 +49,8 @@ namespace bob {
 
 
     /**
-     * The non-one base error exception occurs when some function, which 
-     * requires blitz Arrays to have one base indices (for efficiency 
+     * @brief The non-one base error exception occurs when some function,
+     * which requires blitz Arrays to have one base indices (for efficiency 
      * purpose), is used with an array which does not fulfill this 
      * requirement.
      */
@@ -68,9 +68,9 @@ namespace bob {
 
 
     /**
-     * The non-C contiguous error exception occurs when some function, which 
-     * requires blitz Arrays to be stored contiguously in memory, is used 
-     * with an array which does not fulfill this requirement.
+     * @brief The non-C contiguous error exception occurs when some function,
+     * which requires blitz Arrays to be stored contiguously in memory, is 
+     * used with an array which does not fulfill this requirement.
      */
     class NonCContiguousError: public Exception {
       public:
@@ -84,9 +84,9 @@ namespace bob {
 
 
     /**
-     * The non-Fortran contiguous error exception occurs when some function, 
-     * which requires blitz Arrays to be stored contiguously in memory, is 
-     * used with an array which does not fulfill this requirement.
+     * @brief The non-Fortran contiguous error exception occurs when some
+     * function, which requires blitz Arrays to be stored contiguously in 
+     * memory, is used with an array which does not fulfill this requirement.
      */
     class NonFortranContiguousError: public Exception {
       public:
@@ -99,8 +99,8 @@ namespace bob {
     };
 
     /**
-     * The UnexpectedShapeError exception occurs when a blitz array does not
-     * have the expected size.
+     * @brief The UnexpectedShapeError exception occurs when a blitz array 
+     * does not have the expected size.
      */
     class UnexpectedShapeError: public Exception {
       public:
@@ -113,8 +113,8 @@ namespace bob {
     };
 
     /**
-     * The DifferentBaseError exception occurs when two blitz arrays do not
-     * have the same base indices, whereas this is required.
+     * @brief The DifferentBaseError exception occurs when two blitz arrays 
+     * do not have the same base indices, whereas this is required.
      */
     class DifferentBaseError: public Exception {
       public:

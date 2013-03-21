@@ -45,10 +45,10 @@
 #include <numpy/arrayobject.h>
 // ============================================================================
 
-#include "bob/core/python/exception.h"
-#include "bob/core/array.h"
-#include "bob/core/cast.h"
-#include "bob/core/Exception.h"
+#include <bob/core/python/exception.h>
+#include <bob/core/array.h>
+#include <bob/core/cast.h>
+#include <bob/core/Exception.h>
 
 #include <blitz/array.h>
 #include <stdint.h>
@@ -74,7 +74,8 @@
 namespace bob { namespace python {
 
   /**
-   * Initializes numpy and boost bindings. Should be called once per module.
+   * @brief Initializes numpy and boost bindings. Should be called once per 
+   * module.
    *
    * Pass to it the module doc string and it will also update the module
    * documentation string.
@@ -82,22 +83,23 @@ namespace bob { namespace python {
   void setup_python(const char* module_docstring);
 
   /**
-   * A generic method to convert from ndarray type_num to bob's ElementType
+   * @brief A generic method to convert from ndarray type_num to bob's 
+   * ElementType
    */
   bob::core::array::ElementType num_to_type(int num);
 
   /**
-   * A method to retrieve the type of element of an array
+   * @brief A method to retrieve the type of element of an array
    */
   bob::core::array::ElementType array_to_type(const boost::python::numeric::array& a);
 
   /**
-   * Retrieves the number of dimensions in an array
+   * @brief Retrieves the number of dimensions in an array
    */
   size_t array_to_ndim(const boost::python::numeric::array& a);
 
   /**
-   * Converts from C/C++ type to ndarray type_num.
+   * @brief Converts from C/C++ type to ndarray type_num.
    */
   template <typename T> int ctype_to_num(void) {
     PYTHON_ERROR(TypeError, "unsupported C/C++ type (%s)", bob::core::array::stringize<T>());
@@ -127,12 +129,12 @@ namespace bob { namespace python {
 #endif
 
   /**
-   * Converts from bob's Element type to ndarray type_num
+   * @brief Converts from bob's Element type to ndarray type_num
    */
   int type_to_num(bob::core::array::ElementType type);
 
   /**
-   * Handles conversion checking possibilities
+   * @brief Handles conversion checking possibilities
    */
   typedef enum {
     IMPOSSIBLE = 0,    ///< not possible to get array from object
@@ -142,7 +144,7 @@ namespace bob { namespace python {
   } convert_t;
 
   /**
-   * Extracts the typeinfo object from a numeric::array (passed as
+   * @brief Extracts the typeinfo object from a numeric::array (passed as
    * boost::python::object). We check the input object to assure it is a valid
    * ndarray. An exception may be thrown otherwise.
    */
@@ -150,16 +152,16 @@ namespace bob { namespace python {
       bob::core::array::typeinfo& i);
 
   /**
-   * This is the same as above, but does not run any check on the input object
-   * "o".
+   * @brief This is the same as above, but does not run any check on the input
+   * object "o".
    */
   void typeinfo_ndarray_ (const boost::python::object& o,
       bob::core::array::typeinfo& i);
 
   /**
-   * Checks if an array-like object is convertible to become a NumPy ndarray
-   * (boost::python::numeric::array). If so, write the typeinfo information
-   * that such array would have upon automatic conversion to "info".
+   * @brief Checks if an array-like object is convertible to become a NumPy 
+   * ndarray (boost::python::numeric::array). If so, write the typeinfo 
+   * information that such array would have upon automatic conversion to "info".
    *
    * Optionally, you can specify you do *not* want writeable or behavior to be
    * checked. Write-ability means that an array area can be extracted from the
@@ -197,7 +199,7 @@ namespace bob { namespace python {
       bool behaved=true);
 
   /**
-   * This method does the same as convertible(), but specifies a type
+   * @brief This method does the same as convertible(), but specifies a type
    * information to which the destination array needs to have. Same rules
    * apply.
    *
@@ -212,14 +214,14 @@ namespace bob { namespace python {
       bool behaved=true);
 
   /**
-   * Same as above, but only requires dtype convertibility.
+   * @brief Same as above, but only requires dtype convertibility.
    */
   convert_t convertible_to (boost::python::object array_like,
       boost::python::object dtype_like, bool writeable=true,
       bool behaved=true);
 
   /**
-   * Same as above, but requires nothing, just simple convertibility.
+   * @brief Same as above, but requires nothing, just simple convertibility.
    */
   convert_t convertible_to (boost::python::object array_like,
       bool writeable=true, bool behaved=true);
@@ -229,75 +231,77 @@ namespace bob { namespace python {
     public: //api
 
       /**
-       * Builds a new dtype object from another object.
+       * @brief Builds a new dtype object from another object.
        */
       dtype (boost::python::object dtype_like);
 
       /**
-       * Builds a new dtype object from a PyArray_Descr object that will have
-       * its own reference counting increased internally. So, the object is
-       * *not* stolen and you can Py_(X)DECREF() it when done if you so wish.
+       * @brief Builds a new dtype object from a PyArray_Descr object that 
+       * will have its own reference counting increased internally. So, the 
+       * object is *not* stolen and you can Py_(X)DECREF() it when done if 
+       * you so wish.
        */
       dtype (PyArray_Descr* descr);
 
       /**
-       * Builds a new dtype object from a numpy type_num integer
+       * @brief Builds a new dtype object from a numpy type_num integer
        */
       dtype(int npy_typenum);
 
       /**
-       * Builds a new dtype object from a bob element type
+       * @brief Builds a new dtype object from a bob element type
        */
       dtype(bob::core::array::ElementType eltype);
 
       /**
-       * Copy constructor
+       * @brief Copy constructor
        */
       dtype(const dtype& other);
 
       /**
-       * Default constructor -- use default dtype from NumPy
+       * @brief Default constructor -- use default dtype from NumPy
        */
       dtype();
 
       /**
-       * D'tor virtualization
+       * @brief D'tor virtualization
        */
       virtual ~dtype();
 
       /**
-       * Assignment
+       * @brief Assignment
        */
       dtype& operator= (const dtype& other);
 
       /**
-       * Somme checks
+       * @brief Some checks
        */
       bool has_native_byteorder() const; ///< byte order is native
       bool has_type(bob::core::array::ElementType eltype) const; ///< matches
 
       /**
-       * Returns the current element type
+       * @brief Returns the current element type
        */
       bob::core::array::ElementType eltype() const;
 
       /**
-       * Returns the current type num or -1, if I'm None
+       * @brief Returns the current type num or -1, if I'm None
        */
       int type_num() const;
 
       /**
-       * Returns a boost::python representation of this object - maybe None.
+       * @brief Returns a boost::python representation of this object - maybe 
+       * None.
        */
       inline boost::python::object self() const { return m_self; }
 
       /**
-       * Returns the bp::str() object for myself
+       * @brief Returns the bp::str() object for myself
        */
       boost::python::str str() const;
 
       /**
-       * Returns str(*this) as a std::string
+       * @brief Returns str(*this) as a std::string
        */
       std::string cxx_str() const;
 
@@ -312,8 +316,8 @@ namespace bob { namespace python {
     public: //api
 
       /**
-       * Builds a new array from an array-like object but coerces to a certain
-       * type.
+       * @brief Builds a new array from an array-like object but coerces to a
+       * certain type.
        *
        * @param array_like An ndarray object, inherited type or any object that
        * can be cast into an array. Note that, in case of casting, we will need
@@ -325,18 +329,19 @@ namespace bob { namespace python {
               boost::python::object dtype_like);
 
       /**
-       * Builds a new array copying the data of an existing buffer.
+       * @brief Builds a new array copying the data of an existing buffer.
        */
       py_array(const bob::core::array::interface& buffer);
 
       /**
-       * Builds a new array by referring to the data of an existing buffer.
+       * @brief Builds a new array by referring to the data of an existing 
+       * buffer.
        */
       py_array(boost::shared_ptr<bob::core::array::interface> buffer);
 
       /**
-       * Builds a new array from scratch using the typeinfo. This array will be
-       * a NumPy ndarray internally.
+       * @brief Builds a new array from scratch using the typeinfo. This array
+       * will be a NumPy ndarray internally.
        */
       py_array(const bob::core::array::typeinfo& info);
 
@@ -367,57 +372,58 @@ namespace bob { namespace python {
       }
 
       /**
-       * D'tor virtualization
+       * @brief D'tor virtualization
        */
       virtual ~py_array();
 
       /**
-       * Copies the data from another buffer.
+       * @brief Copies the data from another buffer.
        */
       virtual void set(const bob::core::array::interface& buffer);
 
       /**
-       * Refers to the data of another buffer.
+       * @brief Refers to the data of another buffer.
        */
       virtual void set(boost::shared_ptr<bob::core::array::interface> buffer);
 
       /**
-       * Re-allocates this buffer taking into consideration new requirements.
-       * The internal memory should be considered uninitialized.
+       * @brief Re-allocates this buffer taking into consideration new 
+       * requirements. The internal memory should be considered uninitialized.
        */
       virtual void set (const bob::core::array::typeinfo& req);
 
       /**
-       * Type information for this buffer.
+       * @brief Type information for this buffer.
        */
       virtual const bob::core::array::typeinfo& type() const { return m_type; }
 
       /**
-       * Borrows a reference from the underlying memory. This means this object
-       * continues to be responsible for deleting the memory and you should
-       * make sure that it outlives the usage of the returned pointer.
+       * @brief Borrows a reference from the underlying memory. This means 
+       * this object continues to be responsible for deleting the memory and 
+       * you should make sure that it outlives the usage of the returned 
+       * pointer.
        */
       virtual void* ptr() { return m_ptr; }
       virtual const void* ptr() const { return m_ptr; }
 
       /**
-       * Gets a handle to the owner of this buffer.
+       * @brief Gets a handle to the owner of this buffer.
        */
       virtual boost::shared_ptr<void> owner() { return m_data; }
       virtual boost::shared_ptr<const void> owner() const { return m_data; }
 
       /**
-       * Cast the array to a different type by copying. If the type is omitted,
-       * we just make a plain copy of this array.
+       * @brief Cast the array to a different type by copying. If the type is
+       * omitted, we just make a plain copy of this array.
        */
       virtual boost::python::object copy
         (const boost::python::object& dtype = boost::python::object());
 
       /**
-       * Gets a shallow copy of this array, if internally it is a NumPy array.
-       * Otherwise, returns a wrapper around the internal buffer memory and
-       * correctly reference counts it so the given object becomes responsible
-       * for the internal buffer as well.
+       * @brief Gets a shallow copy of this array, if internally it is a NumPy
+       * array. Otherwise, returns a wrapper around the internal buffer memory
+       * and correctly reference counts it so the given object becomes
+       * responsible for the internal buffer as well.
        *
        * For this technique to always succeed, we use the recommendation for
        * generating the numpy arrays with a special de-allocator as found here:
@@ -426,7 +432,7 @@ namespace bob { namespace python {
       virtual boost::python::object pyobject();
 
       /**
-       * Tells if the buffer is writeable
+       * @brief Tells if the buffer is writeable
        */
       virtual bool is_writeable() const; ///< PyArray_ISWRITEABLE
 
@@ -440,16 +446,16 @@ namespace bob { namespace python {
   };
 
   /**
-   * The ndarray class is just a smart pointer wrapper over the concrete
-   * implementation of py_array.
+   * @brief The ndarray class is just a smart pointer wrapper over the
+   * concrete implementation of py_array.
    */
   class ndarray {
 
     public: //api
 
       /**
-       * Builds a new array from an array-like object but coerces to a certain
-       * type.
+       * @brief Builds a new array from an array-like object but coerces to a
+       * certain type.
        *
        * @param array_like An ndarray object, inherited type or any object that
        * can be cast into an array. Note that, in case of casting, we will need
@@ -461,8 +467,8 @@ namespace bob { namespace python {
           boost::python::object dtype_like);
 
       /**
-       * Builds a new array from an array-like object but coerces to a certain
-       * type.
+       * @brief Builds a new array from an array-like object but coerces to a
+       * certain type.
        *
        * @param array_like An ndarray object, inherited type or any object that
        * can be cast into an array. Note that, in case of casting, we will need
@@ -471,7 +477,7 @@ namespace bob { namespace python {
       ndarray(boost::python::object array_like);
 
       /**
-       * Builds a new array from scratch using a type and shape
+       * @brief Builds a new array from scratch using a type and shape
        */
       ndarray(const bob::core::array::typeinfo& info);
 
@@ -492,22 +498,22 @@ namespace bob { namespace python {
         : px(new py_array(t, d0, d1, d2, d3, d4)) { }
 
       /**
-       * D'tor virtualization
+       * @brief D'tor virtualization
        */
       virtual ~ndarray();
 
       /**
-       * Returns the type information
+       * @brief Returns the type information
        */
       virtual const bob::core::array::typeinfo& type() const;
 
       /**
-       * Returns the underlying python representation.
+       * @brief Returns the underlying python representation.
        */
       virtual boost::python::object self();
 
       /**
-       * Returns a temporary blitz::Array<> skin over this ndarray.
+       * @brief Returns a temporary blitz::Array<> skin over this ndarray.
        *
        * Attention: If you use this method, you have to make sure that this
        * ndarray outlives the blitz::Array<> and that such blitz::Array<> will
@@ -553,8 +559,8 @@ namespace bob { namespace python {
   };
 
   /**
-   * A specialization of ndarray that is used to cast types from python that
-   * will **not** be modified in C++.
+   * @brief A specialization of ndarray that is used to cast types from python
+   * that will **not** be modified in C++.
    *
    * Conversion requirements for this type can be made less restrictive since
    * we consider the user just wants to pass a value to the method or function
@@ -566,8 +572,8 @@ namespace bob { namespace python {
     public: //api
 
       /**
-       * Builds a new array from an array-like object but coerces to a certain
-       * type.
+       * @brief Builds a new array from an array-like object but coerces to a 
+       * certain type.
        *
        * @param array_like An ndarray object, inherited type or any object that
        * can be cast into an array. Note that, in case of casting, we will need
@@ -576,13 +582,14 @@ namespace bob { namespace python {
       const_ndarray(boost::python::object array_like);
 
       /**
-       * D'tor virtualization
+       * @brief D'tor virtualization
        */
       virtual ~const_ndarray();
 
       /**
-       * Returns a temporary blitz::Array<> skin over this const_ndarray, if possible,
-       * otherwise it will COPY the array to the requested type and returns the copy.
+       * @brief Returns a temporary blitz::Array<> skin over this const_ndarray,
+       * if possible, otherwise it will COPY the array to the requested type 
+       * and returns the copy.
        *
        * Attention: If you use this method, you have to make sure that this
        * ndarray outlives the blitz::Array<>, in case the data is not copied.

@@ -23,16 +23,16 @@
 #ifndef BOB_CORE_REPMAT_EXCEPTION_H 
 #define BOB_CORE_REPMAT_EXCEPTION_H
 
-#include "bob/core/Exception.h"
+#include <bob/core/Exception.h>
 
 namespace bob { 
   
   namespace core {
 
     /**
-     * The NonMultipleLength exception occurs when a dimension of the 2D dst 
-     * array of the repmat() function is not a multiple of the corresponding
-     * dimension in the 2D src array.
+     * @brief The NonMultipleLength exception occurs when a dimension of the
+     * 2D dst array of the repmat() function is not a multiple of the 
+     * corresponding dimension in the 2D src array.
      */
     class RepmatNonMultipleLength: public Exception {
       public:

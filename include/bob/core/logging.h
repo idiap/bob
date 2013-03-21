@@ -38,64 +38,64 @@ namespace bob {
   namespace core {
 
     /**
-     * The device is what tells the sink where to actually send the messages
-     * to. If the AutoOutputDevice does not have a device, the messages are
-     * discarded.
+     * @brief The device is what tells the sink where to actually send the
+     * messages to. If the AutoOutputDevice does not have a device, the 
+     * messages are discarded.
      */
     struct OutputDevice {
       /**
-       * Virtual destructor.
+       * @brief Virtual destructor.
        */
       virtual ~OutputDevice();
 
       /**
-       * Writes n bytes of data into this device
+       * @brief Writes n bytes of data into this device
        */
       virtual std::streamsize write(const char* s, std::streamsize n) =0;
 
       /**
-       * Closes this device
+       * @brief Closes this device
        */
       virtual void close() {}
     };
 
     /**
-     * The device is what tells the source where to actually read the messages
-     * from. If the AutoInputDevice does not have a device, the messages are 
-     * discarded.
+     * @brief The device is what tells the source where to actually read the
+     * messages from. If the AutoInputDevice does not have a device, the 
+     * messages are discarded.
      */
     struct InputDevice {
       /**
-       * Virtual destructor.
+       * @brief Virtual destructor.
        */
       virtual ~InputDevice();
 
       /**
-       * Reads n bytes of data from this device
+       * @brief Reads n bytes of data from this device
        */
       virtual std::streamsize read(char* s, std::streamsize n) =0;
 
       /**
-       * Closes this device
+       * @brief Closes this device
        */
       virtual void close() {}
     };
 
     /**
-     * Use this sink always in bob C++ programs. You can configure it to send
-     * messages to stdout, stderr, to a file or discard them. 
+     * @brief Use this sink always in bob C++ programs. You can configure it
+     * to send messages to stdout, stderr, to a file or discard them. 
      */
     class AutoOutputDevice: public boost::iostreams::sink { 
 
       public:
 
         /**
-         * C'tor, empty, discards all input.
+         * @brief C'tor, empty, discards all input.
          */
         AutoOutputDevice();
 
         /**
-         * Creates a new sink using one of the built-in strategies.
+         * @brief Creates a new sink using one of the built-in strategies.
          * - null: discards all messages
          * - stdout: send all messages to stdout
          * - stderr: send all messages to stderr
@@ -109,35 +109,35 @@ namespace bob {
         AutoOutputDevice(const std::string& configuration);
 
         /**
-         * Copies the configuration from the other AutoOutputDevice
+         * @brief Copies the configuration from the other AutoOutputDevice
          */
         AutoOutputDevice(const AutoOutputDevice& other);
 
         /**
-         * Intializes with a device.
+         * @brief Intializes with a device.
          */
         AutoOutputDevice(const boost::shared_ptr<OutputDevice>& device);
 
         /**
-         * D'tor
+         * @brief D'tor
          */
         virtual ~AutoOutputDevice();
 
         /**
-         * Resets the current sink and use a new strategy according to the
-         * possible settings in 
+         * @brief Resets the current sink and use a new strategy according to
+         * the possible settings in 
          * `AutoOutputDevice(const std::string& configuration)`.
          */
         void reset(const std::string& configuration);
         void reset(const boost::shared_ptr<OutputDevice>& device);
 
         /**
-         * Forwards call to underlying OutputDevice
+         * @brief Forwards call to underlying OutputDevice
          */
         virtual std::streamsize write(const char* s, std::streamsize n);
 
         /**
-         * Closes this base sink
+         * @brief Closes this base sink
          */
         virtual void close();
 
@@ -148,20 +148,20 @@ namespace bob {
     };
 
     /**
-     * Use this source always in bob C++ programs. You can configure it to
-     * read messages from stdin or a file.
+     * @brief Use this source always in bob C++ programs. You can configure it
+     * to read messages from stdin or a file.
      */
     class AutoInputDevice: public boost::iostreams::source { 
 
       public:
 
         /**
-         * C'tor, empty, reads from stdin.
+         * @brief C'tor, empty, reads from stdin.
          */
         AutoInputDevice();
 
         /**
-         * Creates a new source using one of the built-in strategies.
+         * @brief Creates a new source using one of the built-in strategies.
          * - stdin: reads from the standard input
          * - filename: read all messages from the file named "filename"
          * - filename.gz: read all messagses from the file named "filename.gz",
@@ -173,35 +173,35 @@ namespace bob {
         AutoInputDevice(const std::string& configuration);
 
         /**
-         * Copies the configuration from the other AutoInputDevice
+         * @brief Copies the configuration from the other AutoInputDevice
          */
         AutoInputDevice(const AutoInputDevice& other);
 
         /**
-         * Intializes with a device.
+         * @brief Intializes with a device.
          */
         AutoInputDevice(const boost::shared_ptr<InputDevice>& device);
 
         /**
-         * D'tor
+         * @brief D'tor
          */
         virtual ~AutoInputDevice();
 
         /**
-         * Resets the current source and use a new strategy according to the
-         * possible settings in 
+         * @brief Resets the current source and use a new strategy according
+         * to the possible settings in 
          * `AutoInputDevice(const std::string& configuration)`.
          */
         void reset(const std::string& configuration);
         void reset(const boost::shared_ptr<InputDevice>& device);
 
         /**
-         * Forwards call to underlying InputDevice
+         * @brief Forwards call to underlying InputDevice
          */
         virtual std::streamsize read(char* s, std::streamsize n);
 
         /**
-         * Closes this base source
+         * @brief Closes this base source
          */
         virtual void close();
 
@@ -212,26 +212,26 @@ namespace bob {
     };
 
     /**
-     * Usage example: Re-setting the output error stream
+     * @brief Usage example: Re-setting the output error stream
      *
      * bob::core::error->reset("null");
      */
     struct OutputStream: public boost::iostreams::stream<AutoOutputDevice> {
 
       /**
-       * Constructs an empty version of the stream, uses NullOutputDevice.
+       * @brief Constructs an empty version of the stream, uses NullOutputDevice.
        */
       OutputStream()
         : boost::iostreams::stream<AutoOutputDevice>() {}
 
       /**
-       * Copy construct the current stream.
+       * @brief Copy construct the current stream.
        */
       OutputStream(const OutputStream& other)
         : boost::iostreams::stream<AutoOutputDevice>(*const_cast<OutputStream&>(other)) {}
 
       /**
-       * Constructs the current stream 
+       * @brief Constructs the current stream 
        */
       template <typename T> OutputStream(const T& value)
         : boost::iostreams::stream<AutoOutputDevice>(value) {}
@@ -239,8 +239,8 @@ namespace bob {
       virtual ~OutputStream();
 
       /**
-       * Resets the current sink and use a new strategy according to the
-       * possible settings in `AutoOutputDevice()`.
+       * @brief Resets the current sink and use a new strategy according to
+       * the possible settings in `AutoOutputDevice()`.
        */
       template <typename T> void reset(const T& value) {
         (*this)->reset(value);
@@ -249,24 +249,24 @@ namespace bob {
     };
 
     /**
-     * Create streams of this type to input data into bob
+     * @brief Create streams of this type to input data into bob
      */
     struct InputStream: public boost::iostreams::stream<AutoInputDevice> {
 
       /**
-       * Constructs an empty version of the stream, uses NullInputDevice.
+       * @brief Constructs an empty version of the stream, uses NullInputDevice.
        */
       InputStream()
         : boost::iostreams::stream<AutoInputDevice>() {}
 
       /**
-       * Copy construct the current stream.
+       * @brief Copy construct the current stream.
        */
       InputStream(const InputStream& other)
         : boost::iostreams::stream<AutoInputDevice>(*const_cast<InputStream&>(other)) {}
 
       /**
-       * Constructs the current stream 
+       * @brief Constructs the current stream 
        */
       template <typename T> InputStream(const T& value)
         : boost::iostreams::stream<AutoInputDevice>(value) {}
@@ -274,8 +274,8 @@ namespace bob {
       virtual ~InputStream();
 
       /**
-       * Resets the current sink and use a new strategy according to the
-       * possible settings in `AutoInputDevice()`.
+       * @brief Resets the current sink and use a new strategy according to
+       * the possible settings in `AutoInputDevice()`.
        */
       template <typename T> void reset(const T& value) {
         (*this)->reset(value);
@@ -289,9 +289,9 @@ namespace bob {
     extern OutputStream error; ///< default error stream
 
     /**
-     * This method is used by our TDEBUGX macros to define if the current debug
-     * level set in the environment is enough to print the current debug
-     * message.
+     * @brief This method is used by our TDEBUGX macros to define if the
+     * current debug level set in the environment is enough to print the
+     * current debug message.
      *
      * If BOB_DEBUG is defined and has an integer value of 1, 2 or 3, this
      * method will return 'true', if the value of 'i' is smaller or equal to
@@ -300,7 +300,7 @@ namespace bob {
     bool debug_level(unsigned int i);
 
     /**
-     * Chooses the correct temporary directory to use, like this:
+     * @brief Chooses the correct temporary directory to use, like this:
      *
      * - The environment variable TMPDIR, if it is defined. For security reasons
      *   this only happens if the program is not SUID or SGID enabled.
@@ -309,7 +309,7 @@ namespace bob {
     std::string tmpdir();
 
     /**
-     * Returns the full path of a temporary file in tmpdir().
+     * @brief Returns the full path of a temporary file in tmpdir().
      *
      * @param extension The desired extension for the file
      */

@@ -28,8 +28,8 @@
 #include <complex>
 
 /**
- * This macro defines the maximum number of dimensions supported by bob. A
- * variable in the bob.core.array namespace is created from this macro
+ * @brief This macro defines the maximum number of dimensions supported by bob.
+ * A variable in the bob.core.array namespace is created from this macro
  * receiving the same value. Use that variable on your programs, or this macro
  * on your preprocessor code.
  */
@@ -74,14 +74,14 @@ namespace bob {
     const size_t N_MAX_DIMENSIONS_ARRAY = BOB_MAX_DIM;
 
     /**
-     * These are some type to element type conversions
+     * @brief These are some type to element type conversions
      */
     template<typename T> ElementType getElementType() {
       return t_unknown;
     }
 
     /**
-     * Some specializations that convert type to element type.
+     * @brief Some specializations that convert type to element type.
      */
     template<> inline ElementType getElementType<bool>() { return t_bool; }
     template<> inline ElementType getElementType<int8_t>() { return t_int8; }
@@ -113,14 +113,14 @@ namespace bob {
     { return t_complex256; }
 
     /**
-     * These are some type to element size conversions
+     * @brief These are some type to element size conversions
      */
     template<typename T> size_t getElementSize() {
       return 0;
     }
 
     /**
-     * Some specializations that convert the types we handle properly
+     * @brief Some specializations that convert the types we handle properly
      */
     template<> inline size_t getElementSize<bool>() { return sizeof(bool); }
     template<> inline size_t getElementSize<int8_t>()
@@ -153,24 +153,25 @@ namespace bob {
     { return sizeof(std::complex<long double>); }
 
     /**
-     * Returns the type size given the enumeration
+     * @brief Returns the type size given the enumeration
      */
     size_t getElementSize(ElementType t);
 
     /**
-     * Gets a string representation of an element type value
+     * @brief Gets a string representation of an element type value
      */
     const char* stringize(ElementType t);
 
     /**
-     * Equivalent to call stringize() on the result of getElementType<T>().
+     * @brief Equivalent to call stringize() on the result of 
+     * getElementType<T>().
      */
     template<typename T> const char* stringize() {
       return stringize(getElementType<T>());
     }
 
     /**
-     * Returns the ElementType given the string representation
+     * @brief Returns the ElementType given the string representation
      */
     ElementType unstringize(const char* name);
 

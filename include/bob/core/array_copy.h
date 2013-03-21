@@ -23,12 +23,7 @@
 #ifndef BOB_CORE_ARRAY_COPY_H
 #define BOB_CORE_ARRAY_COPY_H
 
-#include "bob/config.h"
-
 #include <blitz/array.h>
-#if !defined (HAVE_BLITZ_TINYVEC2_H)
-#include <blitz/tinyvec-et.h>
-#endif
 #include <map>
 #include <vector>
 
@@ -45,7 +40,7 @@ namespace bob {
      * ordering.
      */
     template <typename T, int D>
-    blitz::Array<T,D> ccopy( const blitz::Array<T,D>& a)
+    blitz::Array<T,D> ccopy(const blitz::Array<T,D>& a)
     {
       blitz::Array<T,D> b(a.shape());
       b = a;

@@ -25,21 +25,21 @@
 #ifndef BOB_CORE_ARRAY_CAT_H 
 #define BOB_CORE_ARRAY_CAT_H
 
-#include "bob/config.h"
+#include <bob/config.h>
 
 #include <vector>
 #include <blitz/array.h>
 #if !defined (HAVE_BLITZ_TINYVEC2_H)
 #include <blitz/tinyvec-et.h>
 #endif
-#include "bob/core/Exception.h"
+#include <bob/core/Exception.h>
 
 namespace bob { namespace core { namespace array {
 
   /**
-   * Copies the data of one array into the other, specifying a precise position
-   * and a dimension along which the copy will take place. No checks are done,
-   * just trust the user.
+   * @brief Copies the data of one array into the other, specifying a precise
+   * position and a dimension along which the copy will take place. No checks
+   * are done, just trust the user.
    *
    * Requires: Arrays have the same shape, except for the dimension in which
    * the copy will occur.
@@ -59,8 +59,8 @@ namespace bob { namespace core { namespace array {
     }
 
   /**
-   * Copies the data of one array into the other, specifying a precise position
-   * and a dimension along which the copy will take place.
+   * @brief Copies the data of one array into the other, specifying a precise
+   * position and a dimension along which the copy will take place.
    *
    * Requires: Arrays have the same shape, except for the concatenation
    * dimension. 
@@ -92,9 +92,9 @@ namespace bob { namespace core { namespace array {
     }
 
   /**
-   * Copies the data of array a into the destination array d without checking
-   * the shape. "a" has N-1 dimensions and is copied along dimension "D" in "d"
-   * at position "pos".
+   * @brief Copies the data of array a into the destination array d without
+   * checking the shape. "a" has N-1 dimensions and is copied along dimension
+   * "D" in "d" at position "pos".
    */
   template <typename T, int N> struct copy__ {
 
@@ -112,7 +112,7 @@ namespace bob { namespace core { namespace array {
     };
 
   /**
-   * Here are the specializations that do compile.
+   * @brief Here is the 2D specializations that do compile.
    */
   template <typename T> struct copy__<T,2> {
 
@@ -131,6 +131,9 @@ namespace bob { namespace core { namespace array {
 
   };
 
+  /**
+   * @brief Here is the 3D specializations that do compile.
+   */
   template <typename T> struct copy__<T,3> {
 
       static void f(const blitz::Array<T,2>& a,
@@ -151,6 +154,9 @@ namespace bob { namespace core { namespace array {
 
   };
 
+  /**
+   * @brief Here is the 4D specializations that do compile.
+   */
   template <typename T> struct copy__<T,4> {
 
       static void f(const blitz::Array<T,3>& a,
@@ -175,9 +181,9 @@ namespace bob { namespace core { namespace array {
   };
 
   /**
-   * Copies the data of "source" along the given dimension of "dest".  Special
-   * case: source has dimension N-1. Does not check any of the requirements
-   * (trust the user).
+   * @brief Copies the data of "source" along the given dimension of "dest".
+   * Special case: source has dimension N-1. Does not check any of the 
+   * requirements (trust the user).
    *
    * Requires: Arrays have the same shape, except for the copy dimension.
    *
@@ -192,8 +198,8 @@ namespace bob { namespace core { namespace array {
     }
 
   /**
-   * Copies the data of "source" along the given dimension of "dest".  Special
-   * case: source has dimension N-1.
+   * @brief Copies the data of "source" along the given dimension of "dest".
+   * Special case: source has dimension N-1.
    *
    * Requires: Arrays have the same shape, except for the copy dimension.
    *
@@ -226,7 +232,7 @@ namespace bob { namespace core { namespace array {
     }
 
   /**
-   * Concatenates a bunch of arrays with the same shape together, along
+   * @brief Concatenates a bunch of arrays with the same shape together, along
    * dimension D. Does not check the user input.
    *
    * Requires: The source and destination shapes are identical except along
@@ -245,7 +251,7 @@ namespace bob { namespace core { namespace array {
     }
 
   /**
-   * Concatenates a bunch of arrays with the same shape together, along
+   * @brief Concatenates a bunch of arrays with the same shape together, along
    * dimension D.
    *
    * Requires: The source and destination shapes are identical except along
@@ -264,8 +270,8 @@ namespace bob { namespace core { namespace array {
     }
 
   /**
-   * Stacks a bunch of arrays with N-1 dimensions together, along the first
-   * dimension of the destination array. Does not check the user input.
+   * @brief Stacks a bunch of arrays with N-1 dimensions together, along the
+   * first dimension of the destination array. Does not check the user input.
    *
    * Note: If you want to stack along a different dimension, just transpose the
    * result or give a transposed destination.
@@ -285,8 +291,8 @@ namespace bob { namespace core { namespace array {
     }
 
   /**
-   * Stacks a bunch of arrays with N-1 dimensions together, along the first
-   * dimension of the destination array.
+   * @brief Stacks a bunch of arrays with N-1 dimensions together, along the
+   * first dimension of the destination array.
    *
    * Note: If you want to stack along a different dimension, just transpose the
    * result or give a transposed destination.

@@ -31,10 +31,10 @@ namespace bob {
   namespace core {
 
     /**
-     * The stock bob exception class should be used as a base of any other
-     * exception type in bob. There are no input parameters you can specify
-     * and that is on purpose. If you need to be specific about a problem,
-     * derive from this one.
+     * @brief The stock bob exception class should be used as a base of any
+     * other exception type in bob. There are no input parameters you can
+     * specify and that is on purpose. If you need to be specific about a 
+     * problem, derive from this one.
      *
      * Example: My filter only accepts gray-scaled images.
      *
@@ -50,33 +50,33 @@ namespace bob {
       public:
 
       /**
-       * C'tor
+       * @brief C'tor
        */
       Exception() throw();
 
       /**
-       * Copy c'tor
+       * @brief Copy c'tor
        *
        * @param other Copying data from the other exception.
        */
       Exception(const Exception& other) throw();
 
       /**
-       * Virtual d'tor as on the manual ;-)
+       * @brief Virtual d'tor as on the manual ;-)
        */
       virtual ~Exception() throw();
 
       /**
-       * Returns a string representation of myself.
+       * @brief Returns a string representation of myself.
        */
       virtual const char* what() const throw();
 
     };
 
     /**
-     * A deprecation error is raised when the developer wants to avoid the use
-     * of certain functionality in the code and for the user to migrate his
-     * code.
+     * @brief A deprecation error is raised when the developer wants to avoid
+     * the use of certain functionality in the code and for the user to
+     * migrate the code.
      */
     class DeprecationError: public Exception {
 
@@ -92,7 +92,7 @@ namespace bob {
 
 
     /**
-     * A NotImplementedError is raised when a specific function of a class
+     * @brief A NotImplementedError is raised when a specific function of a class
      * is only implementable in certain subclasses, but not in the current one.
      */
     class NotImplementedError: public Exception {
@@ -107,18 +107,20 @@ namespace bob {
     };
 
     /**
-     * An InvalidArgumentException is raised when a function receives a parameter
-     * that it cannot handle.
+     * @brief An InvalidArgumentException is raised when a function receives a 
+     * parameter that it cannot handle.
      */
     class InvalidArgumentException: public Exception {
 
       public:
-        /** Create exception with a self-chosen error message
+        /** 
+         * @brief Create exception with a self-chosen error message
          * @param  reason  The reason why the exception was thrown
          */
         InvalidArgumentException(const std::string& reason) throw();
 
-        /** Create exception with a default error message
+        /**
+         * @brief Create exception with a default error message
          * @param  parameter_name  The name of the parameter that was incorrect
          * @param  value  The value of the parameter that was incorrect
          */
@@ -129,7 +131,8 @@ namespace bob {
             m_reason = s.str();
           }
 
-        /** Create exception with a default error message
+        /** 
+         * @brief Create exception with a default error message
          * @param  parameter_name  The name of the parameter that was incorrect
          * @param  value  The value of the parameter that was incorrect
          * @param  min    The minimum value the parameter accepts

@@ -23,7 +23,7 @@
 #ifndef BOB_CORE_BLITZ_COMPAT_H
 #define BOB_CORE_BLITZ_COMPAT_H
 
-#include "bob/config.h"
+#include <bob/config.h>
 
 /**
  * Defines the diffType and sizeType in case blitz (old) don't have it defined

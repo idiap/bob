@@ -30,12 +30,12 @@
 #include <boost/shared_ptr.hpp>
 #include <blitz/array.h>
 
-#include "bob/core/array_type.h"
+#include <bob/core/array_type.h>
 
 namespace bob { namespace core { namespace array {
 
   /**
-   * Encapsulation of special type information of interfaces.
+   * @brief Encapsulation of special type information of interfaces.
    */
   struct typeinfo {
 
@@ -45,37 +45,37 @@ namespace bob { namespace core { namespace array {
     size_t stride[BOB_MAX_DIM+1]; ///< strides along each dimension
 
     /**
-     * Default constructor
+     * @brief Default constructor
      */
     typeinfo();
 
     /**
-     * Simplification to build a typeinfo from a size
+     * @brief Simplification to build a typeinfo from a size
      */
     template <typename T> typeinfo(ElementType dtype_, T nd_) {
       set(dtype_, nd_);
     }
 
     /**
-     * Simplification to build a typeinfo from a shape pointer.
+     * @brief Simplification to build a typeinfo from a shape pointer.
      */
     template <typename T> typeinfo(ElementType dtype_, T nd_, const T* shape_) {
       set(dtype_, nd_, shape_);
     }
 
     /**
-     * Copies information from another typeinfo
+     * @brief Copies information from another typeinfo
      */
     typeinfo(const typeinfo& other);
 
     /**
-     * Assignment
+     * @brief Assignment
      */
     typeinfo& operator= (const typeinfo& other);
 
     /**
-     * Builds with type and number of dimensions, but set the shape and strides
-     * to all zeros.
+     * @brief Builds with type and number of dimensions, but set the shape and
+     * strides to all zeros.
      */
     template <typename T>
     void set(ElementType dtype_, T nd_) {
@@ -85,7 +85,7 @@ namespace bob { namespace core { namespace array {
     }
 
     /**
-     * Set to specific values
+     * @brief Set to specific values
      */
     template <typename T>
     void set(ElementType dtype_, T nd_, const T* shape_) {
@@ -94,7 +94,7 @@ namespace bob { namespace core { namespace array {
     }
 
     /**
-     * Set to specific values, including strides
+     * @brief Set to specific values, including strides
      */
     template <typename T>
     void set(ElementType dtype_, T nd_, const T* shape_,
@@ -108,22 +108,22 @@ namespace bob { namespace core { namespace array {
     }
 
     /**
-     * Reset to defaults -- as if uninitialized.
+     * @brief Reset to defaults -- as if uninitialized.
      */
     void reset();
 
     /**
-     * Is this a valid type information?
+     * @brief Is this a valid type information?
      */
     bool is_valid() const;
 
     /**
-     * Does this has a valid shape information?
+     * @brief Does this has a valid shape information?
      */
     bool has_valid_shape() const;
 
     /**
-     * sets the shape
+     * @brief sets the shape
      */
     template <typename T> void set_shape(T nd_, const T* shape_) {
       if (nd_ > (BOB_MAX_DIM+1))
@@ -134,49 +134,50 @@ namespace bob { namespace core { namespace array {
     }
 
     /**
-     * resets the shape to all zeros
+     * @brief resets the shape to all zeros
      */
     void reset_shape();
 
     /**
-     * Update my own stride vector. Called automatically after any use of
-     * set_shape().
+     * @brief Update my own stride vector. Called automatically after any use
+     * of set_shape().
      */
     void update_strides();
 
     /**
-     * Returns the total number of elements available
+     * @brief Returns the total number of elements available
      */
     size_t size() const;
 
     /**
-     * Returns the size of each element
+     * @brief Returns the size of each element
      */
     inline size_t item_size() const { return getElementSize(dtype); }
 
     /**
-     * Returns the total size (in bytes) of the buffer that I'm associated
-     * with.
+     * @brief Returns the total size (in bytes) of the buffer that I'm 
+     * associated with.
      */
     size_t buffer_size() const;
 
     /**
-     * Returns the item type description
+     * @brief Returns the item type description
      */
     const char* item_str() const { return stringize(dtype); }
 
     /**
-     * Checks compatibility with other typeinfo
+     * @brief Checks compatibility with other typeinfo
      */
     bool is_compatible(const typeinfo& other) const;
 
     /**
-     * Formats and returns a string containing the full typeinfo description.
+     * @brief Formats and returns a string containing the full typeinfo 
+     * description.
      */
     std::string str() const;
 
     /**
-     * Make it easy to set for blitz::Array<T,N>
+     * @brief Make it easy to set for blitz::Array<T,N>
      */ 
     template <typename T, int N> void set(const blitz::Array<T,N>& array) {
       dtype = getElementType<T>();
@@ -198,9 +199,9 @@ namespace bob { namespace core { namespace array {
   };
 
   /**
-   * The interface manager introduces a concept for managing the interfaces that
-   * can be handled as C-style arrays. It encapsulates methods to store and
-   * delete the buffer contents in a safe way.
+   * @brief The interface manager introduces a concept for managing the 
+   * interfaces that can be handled as C-style arrays. It encapsulates methods
+   * to store and delete the buffer contents in a safe way.
    *
    * The interface is an entity that either stores a copy of its own data or
    * refers to data belonging to another interface.
@@ -210,42 +211,44 @@ namespace bob { namespace core { namespace array {
     public: //api
 
       /**
-       * By default, the interface is never freed. You must override this method
-       * to do something special for your class type.
+       * @brief By default, the interface is never freed. You must override 
+       * this method to do something special for your class type.
        */
       virtual ~interface() { }
 
       /**
-       * Copies the data from another interface.
+       * @brief Copies the data from another interface.
        */
       virtual void set(const interface& other) =0;
 
       /**
-       * Refers to the data of another interface.
+       * @brief Refers to the data of another interface.
        */
       virtual void set(boost::shared_ptr<interface> other) =0;
 
       /**
-       * Re-allocates this interface taking into consideration new requirements.
-       * The internal memory should be considered uninitialized.
+       * @brief Re-allocates this interface taking into consideration new
+       * requirements. The internal memory should be considered uninitialized.
        */
       virtual void set (const typeinfo& req) =0;
 
       /**
-       * Type information for this interface.
+       * @brief Type information for this interface.
        */
       virtual const typeinfo& type() const =0;
 
       /**
-       * Borrows a reference from the underlying memory. This means this object
-       * continues to be responsible for deleting the memory and you should
-       * make sure that it outlives the usage of the returned pointer.
+       * @brief Borrows a reference from the underlying memory. This means 
+       * this object continues to be responsible for deleting the memory and 
+       * you should make sure that it outlives the usage of the returned 
+       * pointer.
        */
       virtual void* ptr() =0;
       virtual const void* ptr() const =0;
 
       /**
-       * Returns a representation of the internal cache using shared pointers.
+       * @brief Returns a representation of the internal cache using shared
+       * pointers.
        */
       virtual boost::shared_ptr<void> owner() =0;
       virtual boost::shared_ptr<const void> owner() const =0;
