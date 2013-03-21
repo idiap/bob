@@ -15,15 +15,12 @@ endif()
 set(src
     "Random.cc"
     "Exception.cc"
-    "convert_exception.cc"
     "logging.cc"
     "array_exception.cc"
     "array_type.cc"
     "array.cc"
     "blitz_array.cc"
     "cast.cc"
-    "reshape_exception.cc"
-    "repmat_exception.cc"
     )
 
 # Define the library, compilation and linkage options

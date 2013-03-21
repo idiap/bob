@@ -152,3 +152,116 @@ const char* bob::core::DifferentBaseError::what() const throw() {
   }
 }
 
+
+bob::core::ConvertZeroInputRange::ConvertZeroInputRange() throw() {
+}
+
+bob::core::ConvertZeroInputRange::~ConvertZeroInputRange() throw() {
+}
+
+const char* bob::core::ConvertZeroInputRange::what() const throw() {
+  try {
+    boost::format message("Cannot convert an array with a zero width input range.");
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "core::ConvertZeroInputRange: cannot format, exception raised";
+    return emergency;
+  }
+}
+
+bob::core::ConvertInputAboveMaxRange::ConvertInputAboveMaxRange(const double v, const double m) throw():
+  m_val(v), m_max(m)
+{
+}
+
+bob::core::ConvertInputAboveMaxRange::~ConvertInputAboveMaxRange() throw() {
+}
+
+const char* bob::core::ConvertInputAboveMaxRange::what() const throw() {
+  try {
+    boost::format message("The value %f of the input array is above the maximum %f of the given input range.");
+    message % m_val;
+    message % m_max;
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "core::ConvertInputAboveMaxRange: cannot format, exception raised";
+    return emergency;
+  }
+}
+
+bob::core::ConvertInputBelowMinRange::ConvertInputBelowMinRange(const double v, const double m) throw():
+  m_val(v), m_min(m)
+{
+}
+
+bob::core::ConvertInputBelowMinRange::~ConvertInputBelowMinRange() throw() {
+}
+
+const char* bob::core::ConvertInputBelowMinRange::what() const throw() {
+  try {
+    boost::format message("The value %f of the input array is below the minimum %f of the given input range.");
+    message % m_val;
+    message % m_min;
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "core::ConvertInputBelowMinRange: cannot format, exception raised";
+    return emergency;
+  }
+}
+
+
+bob::core::RepmatNonMultipleLength::RepmatNonMultipleLength( 
+  const int src_dim, const int dst_dim) throw(): 
+    m_src_dim(src_dim), m_dst_dim(dst_dim) 
+{
+}
+
+bob::core::RepmatNonMultipleLength::~RepmatNonMultipleLength() throw() {
+}
+
+const char* bob::core::RepmatNonMultipleLength::what() const throw() {
+  try {
+    boost::format message(
+      "The 2D src array has a dimension of length '%d', whereas the 2D dst\
+      array has a corresponding dimension of length '%d', which is not a\
+      multiple of '%d'.");
+    message % m_src_dim;
+    message % m_dst_dim;
+    message % m_src_dim;
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "core::RepmatNonMultipleLength: cannot \
+      format, exception raised";
+    return emergency;
+  }
+}
+
+
+bob::core::ReshapeDifferentNumberOfElements::ReshapeDifferentNumberOfElements( 
+  const int expected, const int got) throw(): 
+    m_expected(expected), m_got(got) 
+{
+}
+
+bob::core::ReshapeDifferentNumberOfElements::~ReshapeDifferentNumberOfElements() throw() {
+}
+
+const char* bob::core::ReshapeDifferentNumberOfElements::what() const throw() {
+  try {
+    boost::format message(
+      "The 2D dst array has '%d' elements whereas tje 2D src array as '%d' elements.");
+    message % m_got;
+    message % m_expected;
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "core::DifferentNumberOfElements: cannot \
+      format, exception raised";
+    return emergency;
+  }
+}
+

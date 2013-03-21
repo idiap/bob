@@ -25,7 +25,6 @@
 #include <Python.h>
 #include <bob/core/Exception.h>
 #include <bob/core/array_exception.h>
-#include <bob/core/convert_exception.h>
 #include <bob/core/python/exception.h>
 
 using namespace bob::python;

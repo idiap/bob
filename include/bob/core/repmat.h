@@ -27,7 +27,7 @@
 
 #include <limits>
 #include <blitz/array.h>
-#include <bob/core/repmat_exception.h>
+#include <bob/core/array_exception.h>
 #include <bob/core/assert.h>
 
 namespace bob { namespace core {

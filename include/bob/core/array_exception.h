@@ -129,6 +129,89 @@ namespace bob { namespace core {
     };
 
     /**
+     * @brief A ConvertZeroInputRange is thrown when the specified input range
+     * is empty
+     */
+    class ConvertZeroInputRange: public Exception {
+
+      public:
+        ConvertZeroInputRange() throw();
+        virtual ~ConvertZeroInputRange() throw();
+        virtual const char* what() const throw();
+
+      private:
+        mutable std::string m_message;
+    };
+
+    /**
+     * @brief A ConvertInputAboveMaxRange is thrown when an input value is 
+     * above the maximum of the given input range.
+     */
+    class ConvertInputAboveMaxRange: public Exception {
+
+      public:
+        ConvertInputAboveMaxRange(const double v, const double m) throw();
+        virtual ~ConvertInputAboveMaxRange() throw();
+        virtual const char* what() const throw();
+
+      private:
+        double m_val;
+        double m_max;
+        mutable std::string m_message;
+    };
+
+    /**
+     * @brief A ConvertInputBelowMinRange is thrown when an input value is 
+     * below the minimum of the given input range.
+     */
+    class ConvertInputBelowMinRange: public Exception {
+
+      public:
+        ConvertInputBelowMinRange(const double v, const double m) throw();
+        virtual ~ConvertInputBelowMinRange() throw();
+        virtual const char* what() const throw();
+
+      private:
+        double m_val;
+        double m_min;
+        mutable std::string m_message;
+    };
+
+    /**
+     * @brief The NonMultipleLength exception occurs when a dimension of the
+     * 2D dst array of the repmat() function is not a multiple of the 
+     * corresponding dimension in the 2D src array.
+     */
+    class RepmatNonMultipleLength: public Exception {
+      public:
+        RepmatNonMultipleLength(const int src_dim, const int dst_dim) throw();
+        virtual ~RepmatNonMultipleLength() throw();
+        virtual const char* what() const throw();
+
+      private:
+        int m_src_dim;
+        int m_dst_dim;
+        mutable std::string m_message;
+    };
+
+    /**
+     * @brief The DifferentNumberOfElements exception occurs when the 2D dst 
+     * array of the reshape() functions does not contain the same number of 
+     * elements as the 2D src array.
+     */
+    class ReshapeDifferentNumberOfElements: public Exception {
+      public:
+        ReshapeDifferentNumberOfElements(const int expected, const int got) throw();
+        virtual ~ReshapeDifferentNumberOfElements() throw();
+        virtual const char* what() const throw();
+
+      private:
+        int m_expected;
+        int m_got;
+        mutable std::string m_message;
+    };
+
+    /**
      * @}
      */
 }}
