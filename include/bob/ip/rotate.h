@@ -178,7 +178,7 @@ template<typename T, bool mask>
 { 
   for( int y=0; y<dst.extent(0); ++y)
     for( int x=0; x<dst.extent(1); ++x)
-      dst(y,x) = static_cast<double>(src( x, (src.extent(1)-1-y) ));
+      dst(y,x) = bob::core::cast<double>(src( x, (src.extent(1)-1-y) ));
   if(mask) {
     for( int y=0; y<dst.extent(0); ++y)
       for( int x=0; x<dst.extent(1); ++x)

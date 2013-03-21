@@ -67,7 +67,7 @@ void train::WienerTrainer::train(bob::machine::WienerMachine& machine,
   blitz::Range all = blitz::Range::all();
   for (size_t i=0; i<n_samples; ++i) {
     blitz::Array<double,2> sample = ar(i,a,a);
-    blitz::Array<std::complex<double>,2> sample_c = bob::core::cast<std::complex<double> >(sample);
+    blitz::Array<std::complex<double>,2> sample_c = bob::core::array::cast<std::complex<double> >(sample);
     fft2d(sample_c, sample_fft);
     data(all,all,i) = blitz::abs(sample_fft);
   }

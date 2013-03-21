@@ -87,7 +87,7 @@ void check_equal_1d(const blitz::Array<T,1>& a, const blitz::Array<U,1>& b)
 {
   BOOST_REQUIRE_EQUAL(a.extent(0), b.extent(0));
   for (int i=0; i<a.extent(0); ++i) {
-    BOOST_CHECK_EQUAL(a(i), bob::core::cast<T>(b(i)) );
+    BOOST_CHECK_EQUAL(a(i), bob::core::array::cast<T>(b(i)) );
   }
 }
 
@@ -98,7 +98,7 @@ void check_equal_2d(const blitz::Array<T,2>& a, const blitz::Array<U,2>& b)
   BOOST_REQUIRE_EQUAL(a.extent(1), b.extent(1));
   for (int i=0; i<a.extent(0); ++i) {
     for (int j=0; j<a.extent(1); ++j) {
-      BOOST_CHECK_EQUAL(a(i,j), bob::core::cast<T>(b(i,j)));
+      BOOST_CHECK_EQUAL(a(i,j), bob::core::array::cast<T>(b(i,j)));
     }
   }
 }
@@ -114,7 +114,7 @@ void check_equal_4d(const blitz::Array<T,4>& a, const blitz::Array<U,4>& b)
     for (int j=0; j<a.extent(1); ++j) {
       for (int k=0; k<a.extent(2); ++k) {
         for (int l=0; l<a.extent(3); ++l) {
-          BOOST_CHECK_EQUAL(a(i,j,k,l), bob::core::cast<T>(b(i,j,k,l)));
+          BOOST_CHECK_EQUAL(a(i,j,k,l), bob::core::array::cast<T>(b(i,j,k,l)));
         }
       }
     }

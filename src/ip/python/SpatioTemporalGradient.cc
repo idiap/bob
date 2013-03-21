@@ -43,8 +43,8 @@ static tuple forward_gradient_1(const ip::ForwardGradient& g,
     case ca::t_uint8:
       {
         blitz::Array<uint8_t,3> i_ = i.bz<uint8_t,3>();
-        i1.reference(tc::cast<double,uint8_t>(i_(0,all,all)));
-        i2.reference(tc::cast<double,uint8_t>(i_(1,all,all)));
+        i1.reference(ca::cast<double,uint8_t>(i_(0,all,all)));
+        i2.reference(ca::cast<double,uint8_t>(i_(1,all,all)));
       }
       break;
     case ca::t_float64:
@@ -83,8 +83,8 @@ static void forward_gradient_2(const ip::ForwardGradient& g,
   switch (info.dtype) {
     case ca::t_uint8:
       {
-        g(tc::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
-            tc::cast<double,uint8_t>(i2.bz<uint8_t,2>()), Ex_, Ey_, Et_);
+        g(ca::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
+            ca::cast<double,uint8_t>(i2.bz<uint8_t,2>()), Ex_, Ey_, Et_);
       }
       break;
     case ca::t_float64:
@@ -123,9 +123,9 @@ static tuple central_gradient_1(const ip::CentralGradient& g,
     case ca::t_uint8:
       {
         blitz::Array<uint8_t,3> i_ = i.bz<uint8_t,3>();
-        i1.reference(tc::cast<double,uint8_t>(i_(0,all,all)));
-        i2.reference(tc::cast<double,uint8_t>(i_(1,all,all)));
-        i3.reference(tc::cast<double,uint8_t>(i_(2,all,all)));
+        i1.reference(ca::cast<double,uint8_t>(i_(0,all,all)));
+        i2.reference(ca::cast<double,uint8_t>(i_(1,all,all)));
+        i3.reference(ca::cast<double,uint8_t>(i_(2,all,all)));
       }
       break;
     case ca::t_float64:
@@ -165,9 +165,9 @@ static void central_gradient_2(const ip::CentralGradient& g,
   switch (info.dtype) {
     case ca::t_uint8:
       {
-        g(tc::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
-            tc::cast<double,uint8_t>(i2.bz<uint8_t,2>()),
-            tc::cast<double,uint8_t>(i3.bz<uint8_t,2>()), Ex_, Ey_, Et_);
+        g(ca::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
+            ca::cast<double,uint8_t>(i2.bz<uint8_t,2>()),
+            ca::cast<double,uint8_t>(i3.bz<uint8_t,2>()), Ex_, Ey_, Et_);
       }
       break;
     case ca::t_float64:

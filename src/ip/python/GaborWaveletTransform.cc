@@ -38,7 +38,7 @@ template <class T>
 static inline const blitz::Array<std::complex<double>,2> complex_cast (bob::python::const_ndarray input){
   blitz::Array<T,2> gray(input.type().shape[1],input.type().shape[2]);
   bob::ip::rgb_to_gray(input.bz<T,3>(), gray);
-  return bob::core::cast<std::complex<double> >(gray);
+  return bob::core::array::cast<std::complex<double> >(gray);
 }
 
 static inline const blitz::Array<std::complex<double>, 2> convert_image(bob::python::const_ndarray input){
@@ -52,9 +52,9 @@ static inline const blitz::Array<std::complex<double>, 2> convert_image(bob::pyt
     }
   } else {
     switch (input.type().dtype){
-      case bob::core::array::t_uint8: return bob::core::cast<std::complex<double> >(input.bz<uint8_t,2>());
-      case bob::core::array::t_uint16: return bob::core::cast<std::complex<double> >(input.bz<uint16_t,2>());
-      case bob::core::array::t_float64: return bob::core::cast<std::complex<double> >(input.bz<double,2>());
+      case bob::core::array::t_uint8: return bob::core::array::cast<std::complex<double> >(input.bz<uint8_t,2>());
+      case bob::core::array::t_uint16: return bob::core::array::cast<std::complex<double> >(input.bz<uint16_t,2>());
+      case bob::core::array::t_float64: return bob::core::array::cast<std::complex<double> >(input.bz<double,2>());
       case bob::core::array::t_complex128: return input.bz<std::complex<double>,2>();
       default: throw bob::core::Exception();
     }

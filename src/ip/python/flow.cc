@@ -43,8 +43,8 @@ static tuple vanillahs_call(const of::VanillaHornAndSchunckFlow& f,
   v_ = 0;
   switch (info.nd) {
     case ca::t_uint8:
-      f(alpha, iterations, tc::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
-          tc::cast<double,uint8_t>(i2.bz<uint8_t,2>()), u_, v_);
+      f(alpha, iterations, ca::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
+          ca::cast<double,uint8_t>(i2.bz<uint8_t,2>()), u_, v_);
       break;
     case ca::t_float64:
       f(alpha, iterations, i1.bz<double,2>(), i2.bz<double,2>(), u_, v_);
@@ -62,8 +62,8 @@ static void vanillahs_call2(const of::VanillaHornAndSchunckFlow& f,
   blitz::Array<double,2> v_ = v.bz<double,2>();
   switch (i1.type().dtype) {
     case ca::t_uint8:
-      f(alpha, iterations, tc::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
-          tc::cast<double,uint8_t>(i2.bz<uint8_t,2>()), u_, v_);
+      f(alpha, iterations, ca::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
+          ca::cast<double,uint8_t>(i2.bz<uint8_t,2>()), u_, v_);
       break;
     case ca::t_float64:
       f(alpha, iterations, i1.bz<double,2>(), i2.bz<double,2>(), u_, v_);
@@ -90,8 +90,8 @@ static object vanillahs_eb(const of::VanillaHornAndSchunckFlow& f,
   blitz::Array<double,2> error_ = error.bz<double,2>();
   switch (i1.type().dtype) {
     case ca::t_uint8:
-      f.evalEb(tc::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
-          tc::cast<double,uint8_t>(i2.bz<uint8_t,2>()), 
+      f.evalEb(ca::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
+          ca::cast<double,uint8_t>(i2.bz<uint8_t,2>()), 
           u.bz<double,2>(), v.bz<double,2>(), error_);
       break;
     case ca::t_float64:
@@ -115,9 +115,9 @@ static tuple hs_call(const of::HornAndSchunckFlow& f,
   v_ = 0;
   switch (info.nd) {
     case ca::t_uint8:
-      f(alpha, iterations, tc::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
-          tc::cast<double,uint8_t>(i2.bz<uint8_t,2>()), 
-          tc::cast<double,uint8_t>(i3.bz<uint8_t,2>()), u_, v_);
+      f(alpha, iterations, ca::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
+          ca::cast<double,uint8_t>(i2.bz<uint8_t,2>()), 
+          ca::cast<double,uint8_t>(i3.bz<uint8_t,2>()), u_, v_);
       break;
     case ca::t_float64:
       f(alpha, iterations, i1.bz<double,2>(), i2.bz<double,2>(), 
@@ -136,9 +136,9 @@ static void hs_call2(const of::HornAndSchunckFlow& f,
   blitz::Array<double,2> v_ = v.bz<double,2>();
   switch (i1.type().dtype) {
     case ca::t_uint8:
-      f(alpha, iterations, tc::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
-          tc::cast<double,uint8_t>(i2.bz<uint8_t,2>()), 
-          tc::cast<double,uint8_t>(i3.bz<uint8_t,2>()), u_, v_);
+      f(alpha, iterations, ca::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
+          ca::cast<double,uint8_t>(i2.bz<uint8_t,2>()), 
+          ca::cast<double,uint8_t>(i3.bz<uint8_t,2>()), u_, v_);
       break;
     case ca::t_float64:
       f(alpha, iterations, i1.bz<double,2>(), i2.bz<double,2>(),
@@ -166,9 +166,9 @@ static object hs_eb(const of::HornAndSchunckFlow& f,
   blitz::Array<double,2> error_ = error.bz<double,2>();
   switch (i1.type().dtype) {
     case ca::t_uint8:
-      f.evalEb(tc::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
-          tc::cast<double,uint8_t>(i2.bz<uint8_t,2>()), 
-          tc::cast<double,uint8_t>(i3.bz<uint8_t,2>()),
+      f.evalEb(ca::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
+          ca::cast<double,uint8_t>(i2.bz<uint8_t,2>()), 
+          ca::cast<double,uint8_t>(i3.bz<uint8_t,2>()),
           u.bz<double,2>(), v.bz<double,2>(), error_);
       break;
     case ca::t_float64:
@@ -186,8 +186,8 @@ static object flow_error(tp::const_ndarray i1, tp::const_ndarray i2,
   blitz::Array<double,2> error_ = error.bz<double,2>();
   switch (i1.type().dtype) {
     case ca::t_uint8:
-      of::flowError(tc::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
-          tc::cast<double,uint8_t>(i2.bz<uint8_t,2>()), u.bz<double,2>(),
+      of::flowError(ca::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
+          ca::cast<double,uint8_t>(i2.bz<uint8_t,2>()), u.bz<double,2>(),
           v.bz<double,2>(), error_);
       break;
     case ca::t_float64:

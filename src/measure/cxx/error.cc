@@ -237,7 +237,7 @@ blitz::Array<double,2> bob::measure::rocch(const blitz::Array<double,1>& negativ
   blitz::Array<size_t,1> Pideal(N);
   for(size_t i=0; i<N; ++i)
     Pideal(i) = (perturb[i] < Nt ? 1 : 0);
-  blitz::Array<double,1> Pideal_d = bob::core::cast<double>(Pideal);
+  blitz::Array<double,1> Pideal_d = bob::core::array::cast<double>(Pideal);
 
   // Apply the PAVA algorithm
   blitz::Array<double,1> Popt(N);

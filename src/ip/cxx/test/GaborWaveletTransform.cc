@@ -189,7 +189,7 @@ BOOST_AUTO_TEST_CASE( test_GWT_output )
   // Load original image
   boost::filesystem::path image_file = boost::filesystem::path(data_dir) / "image.pgm";
   blitz::Array<uint8_t,2> uint8_image = bob::io::open(image_file.string(), 'r')->read_all<uint8_t,2>();
-  blitz::Array<std::complex<double>,2> image = bob::core::cast<std::complex<double> >(uint8_image);
+  blitz::Array<std::complex<double>,2> image = bob::core::array::cast<std::complex<double> >(uint8_image);
 
   // transform the image
   bob::ip::GaborWaveletTransform gwt(5, 8, std::sqrt(2.) * M_PI, M_PI/2, 1./1.414);

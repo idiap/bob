@@ -456,7 +456,7 @@ template <typename T>
 static void inner_hog_call1_cast(bob::ip::HOG<double>& obj, 
   bob::python::const_ndarray input, bob::python::ndarray output)
 {
-  blitz::Array<double,2> input_c = bob::core::cast<double>(input.bz<T,2>());
+  blitz::Array<double,2> input_c = bob::core::array::cast<double>(input.bz<T,2>());
   blitz::Array<double,3> output_ = output.bz<double,3>();
   obj.forward_(input_c, output_);
 }
@@ -518,7 +518,7 @@ template <typename T>
 static void inner_hog_call2_cast(bob::ip::HOG<double>& obj, 
   bob::python::const_ndarray input, bob::python::ndarray output)
 {
-  blitz::Array<double,2> input_c = bob::core::cast<double>(input.bz<T,2>());
+  blitz::Array<double,2> input_c = bob::core::array::cast<double>(input.bz<T,2>());
   blitz::Array<double,3> output_ = output.bz<double,3>();
   obj.forward_(input_c, output_);
 }

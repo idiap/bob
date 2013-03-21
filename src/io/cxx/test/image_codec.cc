@@ -28,6 +28,7 @@
 #include <boost/shared_array.hpp>
 
 #include <blitz/array.h>
+#include <bob/core/cast.h>
 #include "bob/core/logging.h"
 #include "bob/io/utils.h"
 
@@ -104,9 +105,9 @@ BOOST_AUTO_TEST_CASE( image_gif )
 BOOST_AUTO_TEST_CASE( image_bmp )
 {
   std::string filename = bob::core::tmpfile(".bmp");
-  std::cout << "saved = " << bob::core::cast<uint32_t>(b) << std::endl;
+  std::cout << "saved = " << bob::core::array::cast<uint32_t>(b) << std::endl;
   bob::io::save(filename, b);
-  std::cout << "loaded = " << bob::core::cast<uint32_t>(bob::io::load<uint8_t,3>(filename)) << std::endl;
+  std::cout << "loaded = " << bob::core::array::cast<uint32_t>(bob::io::load<uint8_t,3>(filename)) << std::endl;
   check_equal( bob::io::load<uint8_t,3>(filename), b );
   boost::filesystem::remove(filename);
 }

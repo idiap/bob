@@ -139,7 +139,7 @@ void mach::WienerMachine::computeW () {
 
 void mach::WienerMachine::forward_
 (const blitz::Array<double,2>& input, blitz::Array<double,2>& output) const {
-  m_fft->operator()(bob::core::cast<std::complex<double> >(input), m_buffer1);
+  m_fft->operator()(bob::core::array::cast<std::complex<double> >(input), m_buffer1);
   m_buffer1 *= m_W;
   m_ifft->operator()(m_buffer1, m_buffer2);
   output = blitz::abs(m_buffer2);

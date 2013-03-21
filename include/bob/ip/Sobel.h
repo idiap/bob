@@ -139,13 +139,13 @@ namespace bob {
     // TODO: improve the way we deal with types
     if(m_border_type == bob::sp::Extrapolation::Zero || m_size_opt == bob::sp::Conv::Valid)
     {
-     bob::sp::conv(src, bob::core::cast<T>(m_kernel_y), dst_y, m_size_opt);
-     bob::sp::conv(src, bob::core::cast<T>(m_kernel_x), dst_x, m_size_opt);
+     bob::sp::conv(src, bob::core::array::cast<T>(m_kernel_y), dst_y, m_size_opt);
+     bob::sp::conv(src, bob::core::array::cast<T>(m_kernel_x), dst_x, m_size_opt);
     }
     else
     {
-      blitz::Array<T,2> tmpy(bob::sp::getConvOutputSize(src, bob::core::cast<T>(m_kernel_y), bob::sp::Conv::Full));
-      blitz::Array<T,2> tmpx(bob::sp::getConvOutputSize(src, bob::core::cast<T>(m_kernel_x), bob::sp::Conv::Full));
+      blitz::Array<T,2> tmpy(bob::sp::getConvOutputSize(src, bob::core::array::cast<T>(m_kernel_y), bob::sp::Conv::Full));
+      blitz::Array<T,2> tmpx(bob::sp::getConvOutputSize(src, bob::core::array::cast<T>(m_kernel_x), bob::sp::Conv::Full));
       if(m_border_type == bob::sp::Extrapolation::NearestNeighbour) {
         bob::sp::extrapolateNearest(src, tmpy);
         bob::sp::extrapolateNearest(src, tmpx);
@@ -158,8 +158,8 @@ namespace bob {
         bob::sp::extrapolateMirror(src, tmpy);
         bob::sp::extrapolateMirror(src, tmpx);
       }
-      bob::sp::conv(tmpy, bob::core::cast<T>(m_kernel_y), dst_y, bob::sp::Conv::Valid);
-      bob::sp::conv(tmpx, bob::core::cast<T>(m_kernel_x), dst_x, bob::sp::Conv::Valid);
+      bob::sp::conv(tmpy, bob::core::array::cast<T>(m_kernel_y), dst_y, bob::sp::Conv::Valid);
+      bob::sp::conv(tmpx, bob::core::array::cast<T>(m_kernel_x), dst_x, bob::sp::Conv::Valid);
     }
   }
 

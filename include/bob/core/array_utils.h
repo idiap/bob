@@ -107,35 +107,35 @@ namespace bob { namespace core { namespace array {
 
     switch (type.dtype) {
       case bob::core::array::t_bool: 
-        return bob::core::cast<T>(wrap<bool,N>(buf));
+        return bob::core::array::cast<T>(wrap<bool,N>(buf));
       case bob::core::array::t_int8: 
-        return bob::core::cast<T>(wrap<int8_t,N>(buf));
+        return bob::core::array::cast<T>(wrap<int8_t,N>(buf));
       case bob::core::array::t_int16: 
-        return bob::core::cast<T>(wrap<int16_t,N>(buf));
+        return bob::core::array::cast<T>(wrap<int16_t,N>(buf));
       case bob::core::array::t_int32: 
-        return bob::core::cast<T>(wrap<int32_t,N>(buf));
+        return bob::core::array::cast<T>(wrap<int32_t,N>(buf));
       case bob::core::array::t_int64: 
-        return bob::core::cast<T>(wrap<int64_t,N>(buf));
+        return bob::core::array::cast<T>(wrap<int64_t,N>(buf));
       case bob::core::array::t_uint8: 
-        return bob::core::cast<T>(wrap<uint8_t,N>(buf));
+        return bob::core::array::cast<T>(wrap<uint8_t,N>(buf));
       case bob::core::array::t_uint16: 
-        return bob::core::cast<T>(wrap<uint16_t,N>(buf));
+        return bob::core::array::cast<T>(wrap<uint16_t,N>(buf));
       case bob::core::array::t_uint32: 
-        return bob::core::cast<T>(wrap<uint32_t,N>(buf));
+        return bob::core::array::cast<T>(wrap<uint32_t,N>(buf));
       case bob::core::array::t_uint64: 
-        return bob::core::cast<T>(wrap<uint64_t,N>(buf));
+        return bob::core::array::cast<T>(wrap<uint64_t,N>(buf));
       case bob::core::array::t_float32: 
-        return bob::core::cast<T>(wrap<float,N>(buf));
+        return bob::core::array::cast<T>(wrap<float,N>(buf));
       case bob::core::array::t_float64: 
-        return bob::core::cast<T>(wrap<double,N>(buf));
+        return bob::core::array::cast<T>(wrap<double,N>(buf));
       case bob::core::array::t_float128: 
-        return bob::core::cast<T>(wrap<long double,N>(buf));
+        return bob::core::array::cast<T>(wrap<long double,N>(buf));
       case bob::core::array::t_complex64: 
-        return bob::core::cast<T>(wrap<std::complex<float>,N>(buf));
+        return bob::core::array::cast<T>(wrap<std::complex<float>,N>(buf));
       case bob::core::array::t_complex128: 
-        return bob::core::cast<T>(wrap<std::complex<double>,N>(buf));
+        return bob::core::array::cast<T>(wrap<std::complex<double>,N>(buf));
       case bob::core::array::t_complex256: 
-        return bob::core::cast<T>(wrap<std::complex<long double>,N>(buf));
+        return bob::core::array::cast<T>(wrap<std::complex<long double>,N>(buf));
       default:
         break;
   }

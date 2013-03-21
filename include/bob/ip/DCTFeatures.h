@@ -254,7 +254,7 @@ void DCTFeatures::operator()(const blitz::Array<T,2>& src,
   blitz::Array<double,2>& dst) const
 {   
   // Casts the input to double
-  blitz::Array<double,2> src_d = bob::core::cast<double>(src);
+  blitz::Array<double,2> src_d = bob::core::array::cast<double>(src);
   // Calls the specialized template function for double
   this->operator()(src_d, dst);
 }  
@@ -268,7 +268,7 @@ void DCTFeatures::operator()(const blitz::Array<T,2>& src,
   blitz::Array<double,3>& dst) const
 {   
   // Casts the input to double
-  blitz::Array<double,2> src_d = bob::core::cast<double>(src);
+  blitz::Array<double,2> src_d = bob::core::array::cast<double>(src);
   // Calls the specialized template function for double
   this->operator()(src_d, dst);
 }

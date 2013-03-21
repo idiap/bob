@@ -123,7 +123,7 @@ namespace bob {
     U& dst) 
   { 
     // cast to double
-    blitz::Array<double,2> double_version = bob::core::cast<double>(src);
+    blitz::Array<double,2> double_version = bob::core::array::cast<double>(src);
 
     // get all the blocks
     std::list<blitz::Array<double,2> > blocks;

@@ -613,29 +613,29 @@ namespace bob { namespace python {
         // call the correct version of the cast function
         switch(info.dtype){
           // boolean types
-          case bob::core::array::t_bool: return bob::core::cast<T>(bz<bool,N>());
+          case bob::core::array::t_bool: return bob::core::array::cast<T>(bz<bool,N>());
 
           // integral types
-          case bob::core::array::t_int8: return bob::core::cast<T>(bz<int8_t,N>());
-          case bob::core::array::t_int16: return bob::core::cast<T>(bz<int16_t,N>());
-          case bob::core::array::t_int32: return bob::core::cast<T>(bz<int32_t,N>());
-          case bob::core::array::t_int64: return bob::core::cast<T>(bz<int64_t,N>());
+          case bob::core::array::t_int8: return bob::core::array::cast<T>(bz<int8_t,N>());
+          case bob::core::array::t_int16: return bob::core::array::cast<T>(bz<int16_t,N>());
+          case bob::core::array::t_int32: return bob::core::array::cast<T>(bz<int32_t,N>());
+          case bob::core::array::t_int64: return bob::core::array::cast<T>(bz<int64_t,N>());
 
           // unsigned integral types
-          case bob::core::array::t_uint8: return bob::core::cast<T>(bz<uint8_t,N>());
-          case bob::core::array::t_uint16: return bob::core::cast<T>(bz<uint16_t,N>());
-          case bob::core::array::t_uint32: return bob::core::cast<T>(bz<uint32_t,N>());
-          case bob::core::array::t_uint64: return bob::core::cast<T>(bz<uint64_t,N>());
+          case bob::core::array::t_uint8: return bob::core::array::cast<T>(bz<uint8_t,N>());
+          case bob::core::array::t_uint16: return bob::core::array::cast<T>(bz<uint16_t,N>());
+          case bob::core::array::t_uint32: return bob::core::array::cast<T>(bz<uint32_t,N>());
+          case bob::core::array::t_uint64: return bob::core::array::cast<T>(bz<uint64_t,N>());
 
           // floating point types
-          case bob::core::array::t_float32: return bob::core::cast<T>(bz<float,N>());
-          case bob::core::array::t_float64: return bob::core::cast<T>(bz<double,N>());
-          case bob::core::array::t_float128: return bob::core::cast<T>(bz<long double,N>());
+          case bob::core::array::t_float32: return bob::core::array::cast<T>(bz<float,N>());
+          case bob::core::array::t_float64: return bob::core::array::cast<T>(bz<double,N>());
+          case bob::core::array::t_float128: return bob::core::array::cast<T>(bz<long double,N>());
 
           // complex types
-          case bob::core::array::t_complex64: return bob::core::cast<T>(bz<std::complex<float>,N>());
-          case bob::core::array::t_complex128: return bob::core::cast<T>(bz<std::complex<double>,N>());
-          case bob::core::array::t_complex256: return bob::core::cast<T>(bz<std::complex<long double>,N>());
+          case bob::core::array::t_complex64: return bob::core::array::cast<T>(bz<std::complex<float>,N>());
+          case bob::core::array::t_complex128: return bob::core::array::cast<T>(bz<std::complex<double>,N>());
+          case bob::core::array::t_complex256: return bob::core::array::cast<T>(bz<std::complex<long double>,N>());
           
           default: throw bob::core::NotImplementedError();
         }

@@ -183,7 +183,7 @@ namespace bob {
       blitz::Array<double,2>& dst)
     {
       // Casts the input to double
-      blitz::Array<double,2> src_d = bob::core::cast<double>(src);
+      blitz::Array<double,2> src_d = bob::core::array::cast<double>(src);
       // Calls the specialized template function for double
       this->operator()(src_d, dst);
     }

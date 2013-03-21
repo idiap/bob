@@ -81,7 +81,7 @@ void checkBlitzEqual( const blitz::Array<T,2>& t1, const blitz::Array<U,2>& t2)
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
-      BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
+      BOOST_CHECK_EQUAL(t1(i,j), bob::core::array::cast<T>(t2(i,j)));
 }
 
 template<typename T, typename U>  
@@ -91,7 +91,7 @@ void checkBlitzEqual( const blitz::Array<T,3>& t1, const blitz::Array<U,3>& t2)
   for( int i=0; i<t1.extent(0); ++i)
     for( int j=0; j<t1.extent(1); ++j)
       for( int k=0; k<t1.extent(2); ++k)
-        BOOST_CHECK_EQUAL(t1(i,j,k), bob::core::cast<T>(t2(i,j,k)));
+        BOOST_CHECK_EQUAL(t1(i,j,k), bob::core::array::cast<T>(t2(i,j,k)));
 }
 
 template<typename T>  

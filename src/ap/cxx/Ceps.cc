@@ -438,7 +438,7 @@ void bob::ap::Ceps::hammingWindow(blitz::Array<double,1> &data) const
 void bob::ap::Ceps::logFilterBank(blitz::Array<double,1>& x)
 {
   // Apply the FFT
-  m_cache_frame_c1 = bob::core::cast<std::complex<double> >(x);
+  m_cache_frame_c1 = bob::core::array::cast<std::complex<double> >(x);
   m_fft(m_cache_frame_c1, m_cache_frame_c2);
 
   // Take the the power spectrum of the first part of the output of the FFT

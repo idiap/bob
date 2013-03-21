@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE( test_gabor_graph_machine )
   // Load original image
   boost::filesystem::path image_file = boost::filesystem::path(data_dir) / "image.pgm";
   blitz::Array<uint8_t,2> uint8_image = bob::io::load<uint8_t,2>(image_file.string());
-  blitz::Array<std::complex<double>,2> image = bob::core::cast<std::complex<double> >(uint8_image);
+  blitz::Array<std::complex<double>,2> image = bob::core::array::cast<std::complex<double> >(uint8_image);
 
   // perform Gabor wavelet transform
   bob::ip::GaborWaveletTransform gwt;
