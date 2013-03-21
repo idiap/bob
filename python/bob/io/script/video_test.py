@@ -88,10 +88,10 @@ __epilog__ = """Example usage:
 
   $ %(prog)s --format='avi' --codec='mjpeg' frameskip
 
-3. Check for encoding/decoding quality using a FFV1 codec in a '.wmv' video
-container:
+3. Check for encoding/decoding quality using a FFV1 codec in a '.flv' video
+container (not supported - note the usage of the '--force' flag):
 
-  $ %(prog)s --format='wmv' --codec='ffv1' noise
+  $ %(prog)s --force --format='flv' --codec='ffv1' noise
 
 4. To run-only the user-video test and provide a test video:
 
@@ -105,7 +105,7 @@ container:
 
   $ %(prog)s --list-formats
 
-7. Run all tests for all codecs and formats:
+7. Run all tests for all **supported** codecs and formats:
 
   $ %(prog)s
 """ % {
@@ -294,6 +294,9 @@ def main(user_input=None):
   parser.add_argument("--list-all-formats", action="store_true", default=False,
       help="List all available formats and exits")
 
+  parser.add_argument("-F", "--force", action="store_true", default=False,
+      help="Force command execution (possibly generating an error) even if the format or the combination of format+codec is not supported. This flag is needed in case you need to test new formats or combinations of formats and codecs which are unsupported by the build")
+
   parser.add_argument("-t", "--height", metavar="INT", type=int, 
       default=128, help="Height of the test video (defaults to %(default)s pixels). Note this number has to be even.")
   
@@ -375,6 +378,7 @@ def main(user_input=None):
   sys.stdout.flush()
 
   # run tests
+  need_notes = False
   for test in args.test:
     test_table = table.setdefault(test, {})
     f, code = test_function[test]
@@ -384,12 +388,30 @@ def main(user_input=None):
 
       for codec in args.codec:
 
-        if codec not in supported_videowriter_formats()[format]['supported_codecs'].keys():
-          # skip this test...
-          sys.stdout.write(code)
-          sys.stdout.flush()
-          format_table[codec] = "%s+%s is unsupported" % (format, codec)
-          continue
+        # cautionary settings
+        notes = ""
+        if not FORMATS.has_key(format):
+          if args.force:
+            notes += "[!F] "
+            need_notes = True
+
+          else:
+            sys.stdout.write(code)
+            sys.stdout.flush()
+            format_table[codec] = "unsupported format"
+            continue
+
+        else:
+          if codec not in FORMATS[format]['supported_codecs'].keys():
+            if args.force:
+              notes += "[!F+C] "
+              need_notes = True
+
+            else:
+              sys.stdout.write(code)
+              sys.stdout.flush()
+              format_table[codec] = "format+codec unsupported"
+              continue
 
         if args.output:
   
@@ -408,7 +430,7 @@ def main(user_input=None):
             sys.stdout.write(code)
             sys.stdout.flush()
           finally:
-            format_table[codec] = result
+            format_table[codec] = notes + result
 
         else:
 
@@ -422,18 +444,27 @@ def main(user_input=None):
             sys.stdout.write(code)
             sys.stdout.flush()
           finally:
-            format_table[codec] = result
+            format_table[codec] = notes + result
 
   sys.stdout.write("\n")
   sys.stdout.flush()
 
   print ""
-  print " %-9s | %-3s | %-16s | %s" % ('test', 'fmt', 'codec', 'figure (lower is better quality)')
-  print ((11*'-') + '+' + (5*'-') + '+' + (18*'-') + '+' + ((80-45)*'-'))
+  print ((11*'=') + ' ' + (5*'=') + ' ' + (18*'=') + ' ' + ((80-40)*'='))
+  print " %-9s   %-3s   %-16s   %s" % ('test', 'fmt', 'codec', 'figure (lower is better quality)')
+  print ((11*'=') + ' ' + (5*'=') + ' ' + (18*'=') + ' ' + ((80-40)*'='))
   for test in sorted(table.iterkeys()):
     test_table = table[test]
     for format in sorted(test_table.iterkeys()):
       format_table = test_table[format]
       for codec in sorted(format_table.iterkeys()):
         figure = format_table[codec]
-        print " %-9s | %-3s | %-16s | %s" % (test, format, codec, figure)
+        print " %-9s   %-3s   %-16s   %s" % (test, format, codec, figure)
+  print ((11*'=') + ' ' + (5*'=') + ' ' + (18*'=') + ' ' + ((80-40)*'='))
+
+  # only printed if unsupported combinations of formats and codecs are used
+  if need_notes:
+    print ""
+    print "Notes:"
+    print "  [!F] Format is available, but not supported by this build"
+    print "  [!F+C] Format is supported, but not in combination with this codec"
