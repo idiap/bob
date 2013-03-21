@@ -30,20 +30,21 @@
 #include <bob/sp/FFT1D.h>
 #include <bob/core/Exception.h>
 
+/**
+ * @addtogroup AP ap
+ * @brief Audio Processing module API
+ */
+
 namespace bob {
 /**
- * \ingroup libap_api
- * @{
- *
+ * @ingroup AP 
  */
 namespace ap {
 
-/**
- * @brief This class is used to test the Ceps class (private methods)
- */
 class CepsTest;
 
 /**
+ * @ingroup AP
  * @brief This class allows the extraction of features from raw audio data.
  * References:
  *  1. SPro tools (http://www.irisa.fr/metiss/guig/spro/spro-4.0.1/spro.html)
@@ -82,7 +83,7 @@ class Ceps
     virtual ~Ceps();
 
     /**
-     * Assigns from a different class instance
+     * @brief Assigns from a different class instance
      */
     Ceps& operator=(const Ceps& other);
 
@@ -98,89 +99,89 @@ class Ceps
     /**
      * @brief Returns the sampling frequency/frequency rate
      */
-    inline double getSamplingFrequency() const
+    double getSamplingFrequency() const
     { return m_sampling_frequency; }
     /**
      * @brief Returns the window length in miliseconds
      */
-    inline double getWinLengthMs() const
+    double getWinLengthMs() const
     { return m_win_length_ms; }
     /**
      * @brief Returns the window length in number of samples
      */
-    inline size_t getWinLength() const
+    size_t getWinLength() const
     { return m_win_length; }
     /**
      * @brief Returns the window shift in miliseconds
      */
-    inline double getWinShiftMs() const
+    double getWinShiftMs() const
     { return m_win_shift_ms; }
     /**
      * @brief Returns the window shift in number of samples
      */
-    inline size_t getWinShift() const
+    size_t getWinShift() const
     { return m_win_shift; }
     /**
      * @brief Returns the number of filters used in the filter bank.
      */
-    inline size_t getNFilters() const
+    size_t getNFilters() const
     { return m_n_filters; }
     /**
      * @brief Returns the number of cepstral coefficient to keep
      */
-    inline size_t getNCeps() const
+    size_t getNCeps() const
     { return m_n_ceps; }
     /**
      * @brief Returns the frequency of the lowest triangular filter in the
      * filter bank
      */
-    inline double getFMin() const
+    double getFMin() const
     { return m_f_min; }
     /**
      * @brief Returns the frequency of the highest triangular filter in the
      * filter bank
      */
-    inline double getFMax() const
+    double getFMax() const
     { return m_f_max; }
     /**
      * @brief Tells whether the frequencies of the filters in the filter bank
      * are taken from the linear or the Mel scale
      */
-    inline bool getMelScale() const
+    bool getMelScale() const
     { return m_mel_scale; }
     /**
      * @brief Rerturns the size of the window used to compute first and second
      * order derivatives
      */
-    inline size_t getDeltaWin() const
+    size_t getDeltaWin() const
     { return m_delta_win; }
     /**
      * @brief Returns the pre-emphasis coefficient.
      */
-    inline double getPreEmphasisCoeff() const
+    double getPreEmphasisCoeff() const
     { return m_pre_emphasis_coeff; }
     /**
      * @brief Tells whether the DCT coefficients are normalized or not
      */
-    inline bool getDctNorm() const
+    bool getDctNorm() const
     { return m_dct_norm; }
     /**
      * @brief Tells whether the energy is added to the cepstral coefficients 
      * or not
      */
-    inline bool getWithEnergy() const
+    bool getWithEnergy() const
     { return m_with_energy; }
     /**
      * @brief Tells whether the first order derivatives are added to the 
      * cepstral coefficients or not
      */
-    inline bool getWithDelta() const
+    bool getWithDelta() const
     { return m_with_delta; }
     /**
      * @brief Tells whether the second order derivatives are added to the 
      * cepstral coefficients or not
      */
-    inline bool getWithDeltaDelta() const
+    bool getWithDeltaDelta() const
     { return m_with_delta_delta; }
 
     /**
@@ -241,13 +242,13 @@ class Ceps
      * @brief Sets whether the energy is added to the cepstral coefficients 
      * or not
      */
-    inline void setWithEnergy(bool with_energy)
+    void setWithEnergy(bool with_energy)
     { m_with_energy = with_energy; }
     /**
      * @brief Sets whether the first order derivatives are added to the 
      * cepstral coefficients or not
      */
-    inline void setWithDelta(bool with_delta)
+    void setWithDelta(bool with_delta)
     { if(!with_delta) m_with_delta_delta = false;
       m_with_delta = with_delta; }
     /**
@@ -255,7 +256,7 @@ class Ceps
      * cepstral coefficients or not. If enabled, first order derivatives are
      * automatically enabled as well.
      */
-    inline void setWithDeltaDelta(bool with_delta_delta)
+    void setWithDeltaDelta(bool with_delta_delta)
     { if(with_delta_delta) m_with_delta = true;
       m_with_delta_delta = with_delta_delta; }
 
@@ -365,6 +366,10 @@ class Ceps
     friend class TestCeps;
 };
 
+/**
+ * @ingroup AP
+ * @brief This class is used to test the Ceps class (private methods)
+ */
 class TestCeps
 {
   public:
@@ -390,7 +395,9 @@ class TestCeps
     void applyDct(blitz::Array<double,1>& ceps_row) { m_ceps.applyDct(ceps_row); }
 };
 
-}
-}
+/**
+ * @}
+ */
+}}
 
 #endif /* BOB_AP_CEPS_H */
