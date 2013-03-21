@@ -22,8 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB_CORE_REPMAT_H
-#define BOB_CORE_REPMAT_H
+#ifndef BOB_CORE_ARRAY_REPMAT_H
+#define BOB_CORE_ARRAY_REPMAT_H
 
 #include <limits>
 #include <blitz/array.h>
@@ -236,4 +236,4 @@ void repelem(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
  */
 }}}
 
-#endif /* BOB_CORE_REPMAT_H */
+#endif /* BOB_CORE_ARRAY_REPMAT_H */
