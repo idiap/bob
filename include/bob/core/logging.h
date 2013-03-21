@@ -33,11 +33,19 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 
+/**
+ * @addtogroup CORE core
+ * @brief Core module API
+ */
 namespace bob {
 
+  /**
+   * @ingroup CORE
+   */
   namespace core {
 
     /**
+     * @ingroup CORE
      * @brief The device is what tells the sink where to actually send the
      * messages to. If the AutoOutputDevice does not have a device, the 
      * messages are discarded.
@@ -60,6 +68,7 @@ namespace bob {
     };
 
     /**
+     * @ingroup CORE
      * @brief The device is what tells the source where to actually read the
      * messages from. If the AutoInputDevice does not have a device, the 
      * messages are discarded.
@@ -82,6 +91,7 @@ namespace bob {
     };
 
     /**
+     * @ingroup CORE
      * @brief Use this sink always in bob C++ programs. You can configure it
      * to send messages to stdout, stderr, to a file or discard them. 
      */
@@ -148,6 +158,7 @@ namespace bob {
     };
 
     /**
+     * @ingroup CORE
      * @brief Use this source always in bob C++ programs. You can configure it
      * to read messages from stdin or a file.
      */
@@ -212,6 +223,7 @@ namespace bob {
     };
 
     /**
+     * @ingroup CORE
      * @brief Usage example: Re-setting the output error stream
      *
      * bob::core::error->reset("null");
@@ -249,6 +261,7 @@ namespace bob {
     };
 
     /**
+     * @ingroup CORE
      * @brief Create streams of this type to input data into bob
      */
     struct InputStream: public boost::iostreams::stream<AutoInputDevice> {
@@ -283,12 +296,20 @@ namespace bob {
 
     };
 
+    /**
+     * @ingroup CORE
+     * @{
+     */
     extern OutputStream debug; ///< default debug stream
     extern OutputStream info; ///< default info stream
     extern OutputStream warn; ///< default warning stream
     extern OutputStream error; ///< default error stream
+    /**
+     * @}
+     */
 
     /**
+     * @ingroup CORE
      * @brief This method is used by our TDEBUGX macros to define if the
      * current debug level set in the environment is enough to print the
      * current debug message.
@@ -300,6 +321,7 @@ namespace bob {
     bool debug_level(unsigned int i);
 
     /**
+     * @ingroup CORE
      * @brief Chooses the correct temporary directory to use, like this:
      *
      * - The environment variable TMPDIR, if it is defined. For security reasons
@@ -309,6 +331,7 @@ namespace bob {
     std::string tmpdir();
 
     /**
+     * @ingroup CORE
      * @brief Returns the full path of a temporary file in tmpdir().
      *
      * @param extension The desired extension for the file
