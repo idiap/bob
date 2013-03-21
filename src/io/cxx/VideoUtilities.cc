@@ -233,7 +233,7 @@ static void define_output_support_map(std::map<AVOutputFormat*, std::vector<cons
     }
   }
   
-  it = odict.find("mp4");
+  it = odict.find("flv");
   if (it != odict.end()) { // ".flv" format is available
     retval[it->second].clear();
     std::string tmp[] = {
@@ -252,12 +252,15 @@ static void define_output_support_map(std::map<AVOutputFormat*, std::vector<cons
   if (it != odict.end()) { // ".mp4" format is available
     retval[it->second].clear();
     std::string tmp[] = {
-      "libx264", 
+      "libx264",
       "h264", 
       //"h264_vdpau", 
       "mjpeg", 
       "mpeg1video", 
       //"mpegvideo_vdpau"
+      "mpeg2video",
+      "mpegvideo",
+      "mpeg4",
     };
     std::vector<std::string> codecs(tmp, tmp + (sizeof(tmp)/sizeof(tmp[0])));
     for (auto jt = codecs.begin(); jt != codecs.end(); ++jt) {
