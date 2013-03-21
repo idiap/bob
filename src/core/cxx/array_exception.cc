@@ -23,16 +23,16 @@
 #include <boost/format.hpp>
 #include <bob/core/array_exception.h>
 
-bob::core::NonZeroBaseError::NonZeroBaseError( const int dim, 
+bob::core::array::NonZeroBaseError::NonZeroBaseError( const int dim, 
   const int base) throw(): 
     m_dim(dim), m_base(base) 
 {
 }
 
-bob::core::NonZeroBaseError::~NonZeroBaseError() throw() {
+bob::core::array::NonZeroBaseError::~NonZeroBaseError() throw() {
 }
 
-const char* bob::core::NonZeroBaseError::what() const throw() {
+const char* bob::core::array::NonZeroBaseError::what() const throw() {
   try {
     boost::format message(
       "The input array has dimension '%d' with a non-zero base index (base=%d).");
@@ -48,16 +48,16 @@ const char* bob::core::NonZeroBaseError::what() const throw() {
 }
 
 
-bob::core::NonOneBaseError::NonOneBaseError( const int dim, 
+bob::core::array::NonOneBaseError::NonOneBaseError( const int dim, 
   const int base) throw(): 
     m_dim(dim), m_base(base) 
 {
 }
 
-bob::core::NonOneBaseError::~NonOneBaseError() throw() {
+bob::core::array::NonOneBaseError::~NonOneBaseError() throw() {
 }
 
-const char* bob::core::NonOneBaseError::what() const throw() {
+const char* bob::core::array::NonOneBaseError::what() const throw() {
   try {
     boost::format message(
       "The input array has dimension '%d' with a non-one base index (base=%d).");
@@ -73,13 +73,13 @@ const char* bob::core::NonOneBaseError::what() const throw() {
 }
 
 
-bob::core::NonCContiguousError::NonCContiguousError() throw() {
+bob::core::array::NonCContiguousError::NonCContiguousError() throw() {
 }
 
-bob::core::NonCContiguousError::~NonCContiguousError() throw() {
+bob::core::array::NonCContiguousError::~NonCContiguousError() throw() {
 }
 
-const char* bob::core::NonCContiguousError::what() const throw() {
+const char* bob::core::array::NonCContiguousError::what() const throw() {
   try {
     boost::format message(
       "The input array is not a C-style array (row-major order) stored in contiguous memory area.");
@@ -93,13 +93,13 @@ const char* bob::core::NonCContiguousError::what() const throw() {
 }
 
 
-bob::core::NonFortranContiguousError::NonFortranContiguousError() throw() {
+bob::core::array::NonFortranContiguousError::NonFortranContiguousError() throw() {
 }
 
-bob::core::NonFortranContiguousError::~NonFortranContiguousError() throw() {
+bob::core::array::NonFortranContiguousError::~NonFortranContiguousError() throw() {
 }
 
-const char* bob::core::NonFortranContiguousError::what() const throw() {
+const char* bob::core::array::NonFortranContiguousError::what() const throw() {
   try {
     boost::format message(
       "The input array is not a Fortran-style array (column-major order) stored in contiguous memory area.");
@@ -113,13 +113,13 @@ const char* bob::core::NonFortranContiguousError::what() const throw() {
 }
 
 
-bob::core::UnexpectedShapeError::UnexpectedShapeError() throw() {
+bob::core::array::UnexpectedShapeError::UnexpectedShapeError() throw() {
 }
 
-bob::core::UnexpectedShapeError::~UnexpectedShapeError() throw() {
+bob::core::array::UnexpectedShapeError::~UnexpectedShapeError() throw() {
 }
 
-const char* bob::core::UnexpectedShapeError::what() const throw() {
+const char* bob::core::array::UnexpectedShapeError::what() const throw() {
   try {
     boost::format message(
       "The array does not have the expected size.");
@@ -133,13 +133,13 @@ const char* bob::core::UnexpectedShapeError::what() const throw() {
 }
 
 
-bob::core::DifferentBaseError::DifferentBaseError() throw() {
+bob::core::array::DifferentBaseError::DifferentBaseError() throw() {
 }
 
-bob::core::DifferentBaseError::~DifferentBaseError() throw() {
+bob::core::array::DifferentBaseError::~DifferentBaseError() throw() {
 }
 
-const char* bob::core::DifferentBaseError::what() const throw() {
+const char* bob::core::array::DifferentBaseError::what() const throw() {
   try {
     boost::format message(
       "The array does not have the expected size.");
@@ -153,13 +153,13 @@ const char* bob::core::DifferentBaseError::what() const throw() {
 }
 
 
-bob::core::ConvertZeroInputRange::ConvertZeroInputRange() throw() {
+bob::core::array::ConvertZeroInputRange::ConvertZeroInputRange() throw() {
 }
 
-bob::core::ConvertZeroInputRange::~ConvertZeroInputRange() throw() {
+bob::core::array::ConvertZeroInputRange::~ConvertZeroInputRange() throw() {
 }
 
-const char* bob::core::ConvertZeroInputRange::what() const throw() {
+const char* bob::core::array::ConvertZeroInputRange::what() const throw() {
   try {
     boost::format message("Cannot convert an array with a zero width input range.");
     m_message = message.str();
@@ -170,15 +170,15 @@ const char* bob::core::ConvertZeroInputRange::what() const throw() {
   }
 }
 
-bob::core::ConvertInputAboveMaxRange::ConvertInputAboveMaxRange(const double v, const double m) throw():
+bob::core::array::ConvertInputAboveMaxRange::ConvertInputAboveMaxRange(const double v, const double m) throw():
   m_val(v), m_max(m)
 {
 }
 
-bob::core::ConvertInputAboveMaxRange::~ConvertInputAboveMaxRange() throw() {
+bob::core::array::ConvertInputAboveMaxRange::~ConvertInputAboveMaxRange() throw() {
 }
 
-const char* bob::core::ConvertInputAboveMaxRange::what() const throw() {
+const char* bob::core::array::ConvertInputAboveMaxRange::what() const throw() {
   try {
     boost::format message("The value %f of the input array is above the maximum %f of the given input range.");
     message % m_val;
@@ -191,15 +191,15 @@ const char* bob::core::ConvertInputAboveMaxRange::what() const throw() {
   }
 }
 
-bob::core::ConvertInputBelowMinRange::ConvertInputBelowMinRange(const double v, const double m) throw():
+bob::core::array::ConvertInputBelowMinRange::ConvertInputBelowMinRange(const double v, const double m) throw():
   m_val(v), m_min(m)
 {
 }
 
-bob::core::ConvertInputBelowMinRange::~ConvertInputBelowMinRange() throw() {
+bob::core::array::ConvertInputBelowMinRange::~ConvertInputBelowMinRange() throw() {
 }
 
-const char* bob::core::ConvertInputBelowMinRange::what() const throw() {
+const char* bob::core::array::ConvertInputBelowMinRange::what() const throw() {
   try {
     boost::format message("The value %f of the input array is below the minimum %f of the given input range.");
     message % m_val;
@@ -213,16 +213,16 @@ const char* bob::core::ConvertInputBelowMinRange::what() const throw() {
 }
 
 
-bob::core::RepmatNonMultipleLength::RepmatNonMultipleLength( 
+bob::core::array::RepmatNonMultipleLength::RepmatNonMultipleLength( 
   const int src_dim, const int dst_dim) throw(): 
     m_src_dim(src_dim), m_dst_dim(dst_dim) 
 {
 }
 
-bob::core::RepmatNonMultipleLength::~RepmatNonMultipleLength() throw() {
+bob::core::array::RepmatNonMultipleLength::~RepmatNonMultipleLength() throw() {
 }
 
-const char* bob::core::RepmatNonMultipleLength::what() const throw() {
+const char* bob::core::array::RepmatNonMultipleLength::what() const throw() {
   try {
     boost::format message(
       "The 2D src array has a dimension of length '%d', whereas the 2D dst\
@@ -241,16 +241,16 @@ const char* bob::core::RepmatNonMultipleLength::what() const throw() {
 }
 
 
-bob::core::ReshapeDifferentNumberOfElements::ReshapeDifferentNumberOfElements( 
+bob::core::array::ReshapeDifferentNumberOfElements::ReshapeDifferentNumberOfElements( 
   const int expected, const int got) throw(): 
     m_expected(expected), m_got(got) 
 {
 }
 
-bob::core::ReshapeDifferentNumberOfElements::~ReshapeDifferentNumberOfElements() throw() {
+bob::core::array::ReshapeDifferentNumberOfElements::~ReshapeDifferentNumberOfElements() throw() {
 }
 
-const char* bob::core::ReshapeDifferentNumberOfElements::what() const throw() {
+const char* bob::core::array::ReshapeDifferentNumberOfElements::what() const throw() {
   try {
     boost::format message(
       "The 2D dst array has '%d' elements whereas tje 2D src array as '%d' elements.");

@@ -25,9 +25,9 @@
 
 #include <bob/core/Exception.h>
 
-namespace bob { namespace core {
+namespace bob { namespace core { namespace array {
     /**
-     * @ingroup CORE
+     * @ingroup CORE_ARRAY
      * @{
      */
 
@@ -214,6 +214,6 @@ namespace bob { namespace core {
     /**
      * @}
      */
-}}
+}}}
 
 #endif /* BOB_CORE_ARRAY_EXCEPTION_H */
