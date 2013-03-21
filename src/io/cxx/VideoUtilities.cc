@@ -143,7 +143,7 @@ static void check_iformat_support(std::map<std::string, AVInputFormat*>& retval)
   std::string tmp[] = {
     "avi",
     "mov",
-    "flv",
+    //"flv", //buggy
     "mp4",
   };
 
@@ -178,7 +178,7 @@ static void check_oformat_support(std::map<std::string, AVOutputFormat*>& retval
   std::string tmp[] = {
     "avi",
     "mov",
-    "flv",
+    //"flv", //buggy
     "mp4",
   };
 
@@ -233,21 +233,6 @@ static void define_output_support_map(std::map<AVOutputFormat*, std::vector<cons
     }
   }
   
-  it = odict.find("flv");
-  if (it != odict.end()) { // ".flv" format is available
-    retval[it->second].clear();
-    std::string tmp[] = {
-      "libx264", 
-      "h264", 
-      //"h264_vdpau"
-    };
-    std::vector<std::string> codecs(tmp, tmp + (sizeof(tmp)/sizeof(tmp[0])));
-    for (auto jt = codecs.begin(); jt != codecs.end(); ++jt) {
-      auto kt = cdict.find(*jt);
-      if (kt != cdict.end()) retval[it->second].push_back(kt->second);
-    }
-  }
-
   it = odict.find("mp4");
   if (it != odict.end()) { // ".mp4" format is available
     retval[it->second].clear();
