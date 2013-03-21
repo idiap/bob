@@ -23,9 +23,7 @@
 #ifndef BOB_CORE_ARRAY_INDEX_H
 #define BOB_CORE_ARRAY_INDEX_H
 
-#include <stdint.h>
 #include <cstdlib>
-#include <complex>
 
 namespace bob { namespace core { namespace array {
 /**

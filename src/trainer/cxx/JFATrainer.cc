@@ -25,7 +25,7 @@
 #include "bob/math/linear.h"
 #include "bob/core/check.h"
 #include "bob/core/Exception.h"
-#include "bob/core/repmat.h"
+#include "bob/core/array_repmat.h"
 #include <algorithm>
 #include <random/normal.h>
 
@@ -193,7 +193,7 @@ void bob::trainer::jfa::estimateXandU(const blitz::Array<double,2> &F, const bli
     for(int jj=cur_start_ind; jj<=cur_end_ind; ++jj)
     {
       blitz::Array<double,1> Nhint = N(jj, blitz::Range::all());
-      core::repelem(Nhint, tmp2);  
+      core::array::repelem(Nhint, tmp2);  
       Fh = F(jj, blitz::Range::all()) - tmp2 * spk_shift;
       
       // L=Identity
@@ -333,7 +333,7 @@ void bob::trainer::jfa::estimateYandV(const blitz::Array<double,2> &F, const bli
     blitz::secondIndex j;
     Fs = blitz::sum(Fs_sessions(j,i), j);
     Nss = blitz::sum(Nss_sessions(j,i), j);
-    core::repelem(Nss, Ns);
+    core::array::repelem(Nss, Ns);
 
     blitz::Array<double,1> z_ii = z(cur_elem,blitz::Range::all());
     Fs -= ((m + z_ii * d) * Ns);
@@ -345,7 +345,7 @@ void bob::trainer::jfa::estimateYandV(const blitz::Array<double,2> &F, const bli
       blitz::Array<double,1> x_jj = x(jj,blitz::Range::all());
       math::prod(x_jj, u, tmp2);
       blitz::Array<double,1> N_jj = N(jj,blitz::Range::all());
-      core::repelem(N_jj, tmp4);
+      core::array::repelem(N_jj, tmp4);
       Fs -= tmp2 * tmp4;
     }
 
@@ -468,7 +468,7 @@ void bob::trainer::jfa::estimateZandD(const blitz::Array<double,2> &F, const bli
     blitz::secondIndex j;
     Fs = blitz::sum(Fs_sessions(j,i), j);
     Nss = blitz::sum(Nss_sessions(j,i), j);
-    core::repelem(Nss, Ns);
+    core::array::repelem(Nss, Ns);
 
     // Compute shift
     shift = m;
@@ -484,7 +484,7 @@ void bob::trainer::jfa::estimateZandD(const blitz::Array<double,2> &F, const bli
       blitz::Array<double,1> x_jj = x(jj,blitz::Range::all());
       math::prod(x_jj, u, shift);
       blitz::Array<double,1> N_jj = N(jj,blitz::Range::all());
-      core::repelem(N_jj, tmp1);
+      core::array::repelem(N_jj, tmp1);
       Fs -= shift * tmp1;
     }
 
@@ -753,7 +753,7 @@ void train::JFABaseTrainer::computeFn_y_i(const std::vector<std::vector<boost::s
   const blitz::Array<double,1>& m = m_cache_ubm_mean;
   const blitz::Array<double,1>& d = m_jfa_machine.getD();
   const blitz::Array<double,1>& z = m_z[id];
-  core::repelem(m_Nacc[id], m_tmp_CD);
+  core::array::repelem(m_Nacc[id], m_tmp_CD);
   m_cache_Fn_y_i = Fi - m_tmp_CD * (m + d * z); // Fn_yi = sum_{sessions h}(N_{i,h}*(o_{i,h} - m - D*z_{i}) 
   const blitz::Array<double,2>& X = m_x[id];
   const blitz::Array<double,2>& U = m_jfa_machine.getU();
@@ -762,7 +762,7 @@ void train::JFABaseTrainer::computeFn_y_i(const std::vector<std::vector<boost::s
     blitz::Array<double,1> Xh = X(blitz::Range::all(), h); // Xh = x_{i,h} (length: ru)
     math::prod(U, Xh, m_tmp_CD_b); // m_tmp_CD_b = U*x_{i,h}
     const blitz::Array<double,1>& Nih = stats[id][h]->n;
-    core::repelem(Nih, m_tmp_CD);
+    core::array::repelem(Nih, m_tmp_CD);
     m_cache_Fn_y_i -= m_tmp_CD * m_tmp_CD_b; // N_{i,h} * U * x_{i,h}
   }
   // Fn_yi = sum_{sessions h}(N_{i,h}*(o_{i,h} - m - D*z_{i} - U*x_{i,h})
@@ -875,7 +875,7 @@ void train::JFABaseTrainer::computeFn_x_ih(const std::vector<std::vector<boost::
   const blitz::Array<double,1>& d = m_jfa_machine.getD();
   const blitz::Array<double,1>& z = m_z[id];
   const blitz::Array<double,1>& Nih = stats[id][h]->n;
-  core::repelem(Nih, m_tmp_CD); 
+  core::array::repelem(Nih, m_tmp_CD); 
   for(size_t c=0; c<m_jfa_machine.getDimC(); ++c) {
     blitz::Array<double,1> Fn_x_ih_c = m_cache_Fn_x_ih(blitz::Range(c*m_jfa_machine.getDimD(),(c+1)*m_jfa_machine.getDimD()-1));
     Fn_x_ih_c = Fih(c,blitz::Range::all());
@@ -970,7 +970,7 @@ void train::JFABaseTrainer::computeDProd()
 void train::JFABaseTrainer::computeIdPlusDProd_i(const size_t id)
 {
   const blitz::Array<double,1>& Ni = m_Nacc[id];
-  core::repelem(Ni, m_tmp_CD); // m_tmp_CD = Ni 'repmat'
+  core::array::repelem(Ni, m_tmp_CD); // m_tmp_CD = Ni 'repmat'
   m_cache_IdPlusDProd_i = 1.; // m_cache_IdPlusDProd_i = Id
   m_cache_IdPlusDProd_i += m_cache_DProd * m_tmp_CD; // m_cache_IdPlusDProd_i = I+Dt*diag(sigma)^-1*Ni*D
   m_cache_IdPlusDProd_i = 1 / m_cache_IdPlusDProd_i; // m_cache_IdPlusVProd_i = (I+Dt*diag(sigma)^-1*Ni*D)^-1
@@ -983,7 +983,7 @@ void train::JFABaseTrainer::computeFn_z_i(const std::vector<std::vector<boost::s
   const blitz::Array<double,1>& m = m_cache_ubm_mean;
   const blitz::Array<double,2>& V = m_jfa_machine.getV();
   const blitz::Array<double,1>& y = m_y[id];
-  core::repelem(m_Nacc[id], m_tmp_CD);
+  core::array::repelem(m_Nacc[id], m_tmp_CD);
   math::prod(V, y, m_tmp_CD_b); // m_tmp_CD_b = V * y
   m_cache_Fn_z_i = Fi - m_tmp_CD * (m + m_tmp_CD_b); // Fn_yi = sum_{sessions h}(N_{i,h}*(o_{i,h} - m - V*y_{i}) 
 
@@ -992,7 +992,7 @@ void train::JFABaseTrainer::computeFn_z_i(const std::vector<std::vector<boost::s
   for(int h=0; h<X.extent(1); ++h) // Loops over the sessions
   {
     const blitz::Array<double,1>& Nh = stats[id][h]->n; // Nh = N_{i,h} (length: C)
-    core::repelem(Nh, m_tmp_CD);
+    core::array::repelem(Nh, m_tmp_CD);
     blitz::Array<double,1> Xh = X(blitz::Range::all(), h); // Xh = x_{i,h} (length: ru)
     math::prod(U, Xh, m_tmp_CD_b);
     m_cache_Fn_z_i -= m_tmp_CD * m_tmp_CD_b;
@@ -1035,7 +1035,7 @@ void train::JFABaseTrainer::updateD(const std::vector<std::vector<boost::shared_
 
     // Needs to return values to be accumulated for estimating D
     blitz::Array<double,1> z = m_z[id];
-    core::repelem(m_Nacc[id], m_tmp_CD);
+    core::array::repelem(m_Nacc[id], m_tmp_CD);
     m_cache_A1_z += (m_cache_IdPlusDProd_i + z * z) * m_tmp_CD;
     m_cache_A2_z += m_cache_Fn_z_i * z;
   } 
