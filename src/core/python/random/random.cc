@@ -31,7 +31,7 @@
 
 #if BOOST_VERSION >= 104700
 #include <boost/random/discrete_distribution.hpp>
-#include "bob/core/python/ndarray.h"
+#include <bob/core/python/ndarray.h>
 #endif
 
 using namespace boost::python;

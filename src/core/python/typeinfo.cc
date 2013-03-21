@@ -3,7 +3,7 @@
  * @date Tue Nov 8 18:35:46 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
- * @brief Binds ca::typeinfo
+ * @brief Binds bob::core::array::typeinfo
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
  * 
@@ -20,23 +20,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/core/python/ndarray.h"
+#include <bob/core/python/ndarray.h>
 
 using namespace boost::python;
-namespace tp = bob::python;
-namespace ca = bob::core::array;
 
-static object typeinfo_dtype (const ca::typeinfo& info) {
-  return tp::dtype(info.dtype).self();
+static object typeinfo_dtype (const bob::core::array::typeinfo& info) {
+  return bob::python::dtype(info.dtype).self();
 }
 
-static tuple ti_shape(const ca::typeinfo& ti) {
+static tuple ti_shape(const bob::core::array::typeinfo& ti) {
   list retval;
   for (size_t i=0; i<ti.nd; ++i) retval.append(ti.shape[i]);
   return tuple(retval);
 }
 
-static tuple ti_stride(const ca::typeinfo& ti) {
+static tuple ti_stride(const bob::core::array::typeinfo& ti) {
   list retval;
   for (size_t i=0; i<ti.nd; ++i) retval.append(ti.stride[i]);
   return tuple(retval);
@@ -45,14 +43,14 @@ static tuple ti_stride(const ca::typeinfo& ti) {
 
 void bind_core_typeinfo() {
   
-  class_<ca::typeinfo>("typeinfo", "Type information for bob C++ data", 
+  class_<bob::core::array::typeinfo>("typeinfo", "Type information for bob C++ data", 
       no_init)
     .add_property("dtype", &typeinfo_dtype)
-    .def_readonly("cxxtype", &ca::typeinfo::dtype)
-    .def_readonly("nd", &ca::typeinfo::nd)
+    .def_readonly("cxxtype", &bob::core::array::typeinfo::dtype)
+    .def_readonly("nd", &bob::core::array::typeinfo::nd)
     .add_property("shape", &ti_shape)
     .add_property("stride", &ti_stride)
-    .def("__str__", &ca::typeinfo::str)
+    .def("__str__", &bob::core::array::typeinfo::str)
     ;
 
 }

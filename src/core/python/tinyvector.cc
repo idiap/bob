@@ -23,15 +23,14 @@
 #include <boost/python.hpp>
 #include <boost/format.hpp>
 
-#include "bob/core/blitz_compat.h"
+#include <bob/core/blitz_compat.h>
 
+#include <bob/config.h>
 #if defined(HAVE_BLITZ_TINYVEC2_H)
 #include <blitz/tinyvec2.h>
 #else
 #include <blitz/tinyvec.h>
 #endif
-
-namespace bp = boost::python;
 
 /**
  * Objects of this type create a binding between blitz::TinyVector<T,N> and
@@ -47,8 +46,8 @@ struct tinyvec_from_sequence {
    * Registers converter from any python sequence into a blitz::TinyVector<T,N>
    */
   tinyvec_from_sequence() {
-    bp::converter::registry::push_back(&convertible, &construct, 
-        bp::type_id<container_type>());
+    boost::python::converter::registry::push_back(&convertible, &construct, 
+        boost::python::type_id<container_type>());
   }
 
   /**
@@ -128,7 +127,7 @@ struct tinyvec_from_sequence {
    * method, the object has already been checked for convertibility.
    */
   static void construct(PyObject* obj_ptr,
-      bp::converter::rvalue_from_python_stage1_data* data) {
+      boost::python::converter::rvalue_from_python_stage1_data* data) {
     boost::python::handle<> obj_iter(PyObject_GetIter(obj_ptr));
     void* storage = ((boost::python::converter::rvalue_from_python_storage<container_type>*)data)->storage.bytes;
     new (storage) container_type();
@@ -178,7 +177,7 @@ struct tinyvec_to_tuple {
 
 template <typename T, int N>
 void register_tinyvec_to_tuple() {
-  bp::to_python_converter<typename blitz::TinyVector<T,N>, 
+  boost::python::to_python_converter<typename blitz::TinyVector<T,N>, 
                           tinyvec_to_tuple<T,N>
 #if defined BOOST_PYTHON_SUPPORTS_PY_SIGNATURES
                           ,true

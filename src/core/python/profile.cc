@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/config.h"
+#include <bob/config.h>
 #include <boost/python.hpp>
 
 #if WITH_PERFTOOLS

@@ -20,12 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/core/python/ndarray.h"
+#include <bob/core/python/ndarray.h>
 
-namespace bp = boost::python;
-namespace tp = bob::python;
-namespace ca = bob::core::array;
-      
 template<typename T, int N>
 void npy_copy_cast(blitz::Array<T,N>& bz, PyArrayObject* arrobj) {
   PYTHON_ERROR(TypeError, "unsupported number of dimensions: %d", N);
@@ -83,8 +79,8 @@ template <typename T, int N> struct bz_from_npy {
    * Registers converter from numpy array into a blitz::Array<T,N>
    */
   bz_from_npy() {
-    bp::converter::registry::push_back(&convertible, &construct, 
-        bp::type_id<array_type>());
+    boost::python::converter::registry::push_back(&convertible, &construct, 
+        boost::python::type_id<array_type>());
   }
 
   /**
@@ -92,22 +88,22 @@ template <typename T, int N> struct bz_from_npy {
    * a Array<T,N>
    */
   static void* convertible(PyObject* obj_ptr) {
-    bp::handle<> hdl(bp::borrowed(bp::allow_null(obj_ptr)));
-    bp::object obj(hdl);
+    boost::python::handle<> hdl(boost::python::borrowed(boost::python::allow_null(obj_ptr)));
+    boost::python::object obj(hdl);
 
-    ca::typeinfo tinfo(ca::getElementType<T>(), N);
+    bob::core::array::typeinfo tinfo(bob::core::array::getElementType<T>(), N);
 
-    tp::convert_t result = tp::convertible_to(obj, tinfo, false, true);
+    bob::python::convert_t result = bob::python::convertible_to(obj, tinfo, false, true);
 
     // we cannot afford copying, only referencing.
-    if (result == tp::BYREFERENCE) return obj_ptr;
+    if (result == bob::python::BYREFERENCE) return obj_ptr;
 
     // but, if the user passed an array of the right type, but we still need to
     // copy, warn the user as this is a tricky case to debug.
     PyArrayObject* arr = reinterpret_cast<PyArrayObject*>(obj_ptr);
-    if (result == tp::WITHARRAYCOPY && 
-        tp::ctype_to_num<T>() == arr->descr->type_num) {
-      PYTHON_ERROR(RuntimeError, "The bindings you are trying to use to this C++ method require a numpy.ndarray -> blitz::Array<%s,%d> conversion, but the array you passed, despite the correct type, is not C-style contiguous and/or properly aligned, so I cannot automatically wrap it. You can check this by yourself by printing the flags on such a variable with the command 'print(<varname>.flags)'. The only way to circumvent this problem, from python, is to create a copy the variable by issuing '<varname>.copy()' before calling the bound method. Otherwise, if you wish the copy to be executed automatically, you have to re-bind the method to use our custom 'const_ndarray' type.", ca::stringize<T>(), N);
+    if (result == bob::python::WITHARRAYCOPY && 
+        bob::python::ctype_to_num<T>() == arr->descr->type_num) {
+      PYTHON_ERROR(RuntimeError, "The bindings you are trying to use to this C++ method require a numpy.ndarray -> blitz::Array<%s,%d> conversion, but the array you passed, despite the correct type, is not C-style contiguous and/or properly aligned, so I cannot automatically wrap it. You can check this by yourself by printing the flags on such a variable with the command 'print(<varname>.flags)'. The only way to circumvent this problem, from python, is to create a copy the variable by issuing '<varname>.copy()' before calling the bound method. Otherwise, if you wish the copy to be executed automatically, you have to re-bind the method to use our custom 'const_ndarray' type.", bob::core::array::stringize<T>(), N);
     }
 
     return 0;
@@ -119,7 +115,7 @@ template <typename T, int N> struct bz_from_npy {
    * method, the object has already been checked for convertibility.
    */
   static void construct(PyObject* obj_ptr,
-      bp::converter::rvalue_from_python_stage1_data* data) {
+      boost::python::converter::rvalue_from_python_stage1_data* data) {
 
     //black-magic required to setup the blitz::Array<> storage area
     void* storage = ((boost::python::converter::rvalue_from_python_storage<array_type>*)data)->storage.bytes;
@@ -162,7 +158,7 @@ template <typename T, int N> struct bz_to_npy {
     npy_intp dims[N];
     for (int i=0; i<N; ++i) dims[i] = tv.extent(i);
 
-    PyArrayObject* retval = make_pyarray(N, dims, tp::ctype_to_num<T>());
+    PyArrayObject* retval = make_pyarray(N, dims, bob::python::ctype_to_num<T>());
 
     //wrap new PyArray in a blitz layer and then copy the data
     shape_type shape=0;
@@ -181,7 +177,7 @@ template <typename T, int N> struct bz_to_npy {
 
 template <typename T, int N>
 void register_bz_to_npy() {
-  bp::to_python_converter<typename blitz::Array<T,N>, bz_to_npy<T,N>
+  boost::python::to_python_converter<typename blitz::Array<T,N>, bz_to_npy<T,N>
 #if defined BOOST_PYTHON_SUPPORTS_PY_SIGNATURES
                           ,true
 #endif

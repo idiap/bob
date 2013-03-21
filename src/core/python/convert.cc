@@ -22,16 +22,13 @@
 
 #include <boost/version.hpp>
 
-#include "bob/core/python/ndarray.h"
-#include "bob/core/convert.h"
+#include <bob/core/python/ndarray.h>
+#include <bob/core/convert.h>
 
 using namespace boost::python;
-namespace tp = bob::python;
-namespace ca = bob::core::array;
-namespace tc = bob::core;
 
 template <typename Tdst, typename Tsrc, int N>
-static object inner_convert (tp::const_ndarray src,
+static object inner_convert (bob::python::const_ndarray src,
     object dst_range, object src_range) {
 
   if (!TPY_ISNONE(src_range)) {
@@ -41,13 +38,13 @@ static object inner_convert (tp::const_ndarray src,
 
       Tdst dst_min = extract<Tdst>(dst_range[0]);
       Tdst dst_max = extract<Tdst>(dst_range[1]);
-      blitz::Array<Tdst,N> dst = tc::convert<Tdst,Tsrc>(src.bz<Tsrc,N>(),
+      blitz::Array<Tdst,N> dst = bob::core::convert<Tdst,Tsrc>(src.bz<Tsrc,N>(),
           dst_min, dst_max, src_min, src_max);
       return object(dst); ///< must copy again
     }
     else { //only src_range is valid
       blitz::Array<Tdst,N> dst = 
-        tc::convertFromRange<Tdst,Tsrc>(src.bz<Tsrc,N>(), src_min, src_max);
+        bob::core::convertFromRange<Tdst,Tsrc>(src.bz<Tsrc,N>(), src_min, src_max);
       return object(dst); ///< must copy again
     }
   }
@@ -57,11 +54,11 @@ static object inner_convert (tp::const_ndarray src,
       Tdst dst_min = extract<Tdst>(dst_range[0]);
       Tdst dst_max = extract<Tdst>(dst_range[1]);
       blitz::Array<Tdst,N> dst = 
-        tc::convertToRange<Tdst,Tsrc>(src.bz<Tsrc,N>(), dst_min, dst_max);
+        bob::core::convertToRange<Tdst,Tsrc>(src.bz<Tsrc,N>(), dst_min, dst_max);
       return object(dst); ///< must copy again
     }
     else { //use all defaults
-      blitz::Array<Tdst,N> dst = tc::convert<Tdst,Tsrc>(src.bz<Tsrc,N>());
+      blitz::Array<Tdst,N> dst = bob::core::convert<Tdst,Tsrc>(src.bz<Tsrc,N>());
       return object(dst); ///< must copy again
     }
   }
@@ -70,9 +67,9 @@ static object inner_convert (tp::const_ndarray src,
 }
 
 template <typename Tdst, typename Tsrc> 
-static object convert_to_dim (tp::const_ndarray src,
+static object convert_to_dim (bob::python::const_ndarray src,
     object dst_range, object src_range) {
-  const ca::typeinfo& src_type = src.type();
+  const bob::core::array::typeinfo& src_type = src.type();
   switch (src_type.nd) {
     case 1: return inner_convert<Tdst, Tsrc, 1>(src, dst_range, src_range);
     case 2: return inner_convert<Tdst, Tsrc, 2>(src, dst_range, src_range);
@@ -84,31 +81,31 @@ static object convert_to_dim (tp::const_ndarray src,
 }
 
 template <typename T> 
-static object convert_to (tp::const_ndarray src, 
+static object convert_to (bob::python::const_ndarray src, 
     object dst_range, object src_range) {
-  const ca::typeinfo& src_type = src.type();
+  const bob::core::array::typeinfo& src_type = src.type();
   switch (src_type.dtype) {
-    case ca::t_bool:
+    case bob::core::array::t_bool:
       return convert_to_dim<T, bool>(src, dst_range, src_range);
-    case ca::t_int8:
+    case bob::core::array::t_int8:
       return convert_to_dim<T, int8_t>(src, dst_range, src_range);
-    case ca::t_int16:
+    case bob::core::array::t_int16:
       return convert_to_dim<T, int16_t>(src, dst_range, src_range);
-    case ca::t_int32:
+    case bob::core::array::t_int32:
       return convert_to_dim<T, int32_t>(src, dst_range, src_range);
-    case ca::t_int64:
+    case bob::core::array::t_int64:
       return convert_to_dim<T, int64_t>(src, dst_range, src_range);
-    case ca::t_uint8:
+    case bob::core::array::t_uint8:
       return convert_to_dim<T, uint8_t>(src, dst_range, src_range);
-    case ca::t_uint16:
+    case bob::core::array::t_uint16:
       return convert_to_dim<T, uint16_t>(src, dst_range, src_range);
-    case ca::t_uint32:
+    case bob::core::array::t_uint32:
       return convert_to_dim<T, uint32_t>(src, dst_range, src_range);
-    case ca::t_uint64:
+    case bob::core::array::t_uint64:
       return convert_to_dim<T, uint64_t>(src, dst_range, src_range);
-    case ca::t_float32:
+    case bob::core::array::t_float32:
       return convert_to_dim<T, float>(src, dst_range, src_range);
-    case ca::t_float64:
+    case bob::core::array::t_float64:
       return convert_to_dim<T, double>(src, dst_range, src_range);
     default:
       PYTHON_ERROR(TypeError, "conversion from '%s' is not supported", src_type.str().c_str());
@@ -133,20 +130,20 @@ static void assert_2tuple_or_none (object o) {
   }
 }
 
-static object convert (tp::const_ndarray src, object dtype_like,
+static object convert (bob::python::const_ndarray src, object dtype_like,
     object dst_range=object(), object src_range=object()) {
 
   //check input parameters
   assert_2tuple_or_none(dst_range);
   assert_2tuple_or_none(src_range);
 
-  tp::dtype dst_type(dtype_like);
+  bob::python::dtype dst_type(dtype_like);
   switch (dst_type.eltype()) {
-    case ca::t_uint8: 
+    case bob::core::array::t_uint8: 
       return convert_to<uint8_t>(src, dst_range, src_range);
-    case ca::t_uint16:
+    case bob::core::array::t_uint16:
       return convert_to<uint16_t>(src, dst_range, src_range);
-    case ca::t_float64:
+    case bob::core::array::t_float64:
       return convert_to<double>(src, dst_range, src_range);
     default:
       PYTHON_ERROR(TypeError, "conversion to '%s' is not supported", dst_type.cxx_str().c_str());

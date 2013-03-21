@@ -6,10 +6,7 @@
  * @brief Declares from-python converters to some numpy scalar types
  */
 
-#include "bob/core/python/ndarray.h"
-
-namespace bp = boost::python;
-namespace tp = bob::python;
+#include <bob/core/python/ndarray.h>
 
 template<typename T> bool checker(PyObject* o) {
   PYTHON_ERROR(TypeError, "Type '%s' is not supported as a numpy scalar to C++ conversion", typeid(T).name());
@@ -56,8 +53,8 @@ template<typename T> struct scalar_from_npy {
    * Registers converter from numpy scalar into a C++ scalar
    */
   scalar_from_npy() {
-    bp::converter::registry::push_back(&convertible, &construct, 
-        bp::type_id<T>());
+    boost::python::converter::registry::push_back(&convertible, &construct, 
+        boost::python::type_id<T>());
   }
 
   /**
@@ -74,10 +71,10 @@ template<typename T> struct scalar_from_npy {
    * method, the object has already been checked for convertibility.
    */
   static void construct(PyObject* obj_ptr,
-      bp::converter::rvalue_from_python_stage1_data* data) {
+      boost::python::converter::rvalue_from_python_stage1_data* data) {
 
-    //black-magic required to setup the tp::ndarray storage area
-    void* storage = ((bp::converter::rvalue_from_python_storage<T>*)data)->storage.bytes;
+    //black-magic required to setup the bob::python::ndarray storage area
+    void* storage = ((boost::python::converter::rvalue_from_python_storage<T>*)data)->storage.bytes;
     new (storage) T();
     PyArray_ScalarAsCtype(obj_ptr, storage);
     data->convertible = storage;
