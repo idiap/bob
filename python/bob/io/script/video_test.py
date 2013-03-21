@@ -449,18 +449,45 @@ def main(user_input=None):
   sys.stdout.write("\n")
   sys.stdout.flush()
 
+  # builds a nicely organized dynamically sized table
+  test_size   = max([len(k) for k in args.test] + [len('test')])
+  fmt_size    = max([len(k) for k in args.format] + [len('fmt')])
+  codec_size  = max([len(k) for k in args.codec] + [len('codec')])
+  figure_size = 79 - (test_size + 3 + fmt_size + 3 + codec_size + 3 + 2)
+  if figure_size <= 0: figure_size = 40
+
+  test_cover   = (test_size + 2) * '='
+  fmt_cover    = (fmt_size + 2) * '='
+  codec_cover  = (codec_size + 2) * '='
+  figure_cover = (figure_size + 2) * '='
+
+  sep  = test_cover + ' ' + fmt_cover + ' ' + codec_cover + ' ' + figure_cover
+  line = " %s   %s   %s   %s"
+
   print ""
-  print ((11*'=') + ' ' + (5*'=') + ' ' + (18*'=') + ' ' + ((80-40)*'='))
-  print " %-9s   %-3s   %-16s   %s" % ('test', 'fmt', 'codec', 'figure (lower is better quality)')
-  print ((11*'=') + ' ' + (5*'=') + ' ' + (18*'=') + ' ' + ((80-40)*'='))
+  print sep
+  print line % (
+      'test'.ljust(test_size),
+      'fmt'.center(fmt_size),
+      'codec'.center(codec_size),
+      'figure (lower means better quality)'.ljust(figure_size),
+      )
+  print sep
+
   for test in sorted(table.iterkeys()):
     test_table = table[test]
     for format in sorted(test_table.iterkeys()):
       format_table = test_table[format]
       for codec in sorted(format_table.iterkeys()):
         figure = format_table[codec]
-        print " %-9s   %-3s   %-16s   %s" % (test, format, codec, figure)
-  print ((11*'=') + ' ' + (5*'=') + ' ' + (18*'=') + ' ' + ((80-40)*'='))
+        print line % (
+            test.ljust(test_size),
+            format.center(fmt_size),
+            codec.ljust(codec_size),
+            figure.ljust(figure_size),
+            )
+
+  print sep
 
   # only printed if unsupported combinations of formats and codecs are used
   if need_notes:
