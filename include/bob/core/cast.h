@@ -24,6 +24,7 @@
 #ifndef BOB_CORE_CAST_H
 #define BOB_CORE_CAST_H
 
+#include <bob/core/assert.h>
 #include <blitz/array.h>
 #include <stdint.h>
 #include <complex>
@@ -48,8 +49,8 @@ namespace bob {
 
 
     /**
-      * @brief Specializations of the cast function for the std::complex type.
-      */
+     * @brief Specializations of the cast function for the std::complex type.
+     */
     // Complex to regular
     #define COMPLEX_TO_REGULAR_DECL(COMP, REG) template<> \
       REG cast<REG, COMP>( const COMP& in); 
@@ -89,39 +90,43 @@ namespace bob {
 
 template<typename T, typename U> 
 blitz::Array<T,1> cast(const blitz::Array<U,1>& in) {
+  bob::core::array::assertZeroBase(in);
   blitz::Array<T,1> out(in.extent(0));
   for( int i=0; i<in.extent(0); ++i)
-    out(i) = cast<T>( in(i+in.lbound(0)));
+    out(i) = cast<T>( in(i));
   return out;
 }
 
 template<typename T, typename U> 
 blitz::Array<T,2> cast(const blitz::Array<U,2>& in) {
+  bob::core::array::assertZeroBase(in);
   blitz::Array<T,2> out(in.extent(0),in.extent(1));
   for( int i=0; i<in.extent(0); ++i)
     for( int j=0; j<in.extent(1); ++j)
-      out(i,j) = cast<T>( in(i+in.lbound(0),j+in.lbound(1)) );
+      out(i,j) = cast<T>( in(i,j) );
   return out;
 }
 
 template<typename T, typename U> 
 blitz::Array<T,3> cast(const blitz::Array<U,3>& in) {
+  bob::core::array::assertZeroBase(in);
   blitz::Array<T,3> out(in.extent(0),in.extent(1),in.extent(2));
   for( int i=0; i<in.extent(0); ++i)
     for( int j=0; j<in.extent(1); ++j)
       for( int k=0; k<in.extent(2); ++k)
-        out(i,j,k) = cast<T>( in(i+in.lbound(0),j+in.lbound(1),k+in.lbound(2)) );
+        out(i,j,k) = cast<T>( in(i,j,k) );
   return out;
 }
 
 template<typename T, typename U> 
 blitz::Array<T,4> cast(const blitz::Array<U,4>& in) {
+  bob::core::array::assertZeroBase(in);
   blitz::Array<T,4> out(in.extent(0),in.extent(1),in.extent(2),in.extent(3));
   for( int i=0; i<in.extent(0); ++i)
     for( int j=0; j<in.extent(1); ++j)
       for( int k=0; k<in.extent(2); ++k)
         for( int l=0; l<in.extent(3); ++l)
-          out(i,j,k,l) = cast<T>( in(i+in.lbound(0),j+in.lbound(1),k+in.lbound(2),l+in.lbound(3)) );
+          out(i,j,k,l) = cast<T>( in(i,j,k,l) );
   return out;
 }
 
