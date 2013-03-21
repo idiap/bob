@@ -26,9 +26,9 @@
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
 #include <stdint.h>
-#include "bob/core/cast.h"
-#include "bob/core/check.h"
-#include "bob/core/array_copy.h"
+#include <bob/core/cast.h>
+#include <bob/core/check.h>
+#include <bob/core/array_copy.h>
 #include <map>
 #include <vector>
 
@@ -38,8 +38,6 @@
 #else
 # include <unistd.h>
 #endif
-
-namespace ca = bob::core::array;
 
 struct T {
   double eps;
@@ -379,60 +377,60 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_check_C_fortran)
   blitz::Array<uint8_t,2> a(4,7);
   a = 0;
   // Check contiguous C-style array
-  BOOST_CHECK_EQUAL( ca::isZeroBase(a), true);
-  BOOST_CHECK_EQUAL( ca::isCContiguous(a), true);
-  BOOST_CHECK_EQUAL( ca::isCZeroBaseContiguous(a), true);
-  BOOST_CHECK_EQUAL( ca::isOneBase(a), false);
-  BOOST_CHECK_EQUAL( ca::isFortranContiguous(a), false);
-  BOOST_CHECK_EQUAL( ca::isFortranOneBaseContiguous(a), false);
+  BOOST_CHECK_EQUAL( bob::core::array::isZeroBase(a), true);
+  BOOST_CHECK_EQUAL( bob::core::array::isCContiguous(a), true);
+  BOOST_CHECK_EQUAL( bob::core::array::isCZeroBaseContiguous(a), true);
+  BOOST_CHECK_EQUAL( bob::core::array::isOneBase(a), false);
+  BOOST_CHECK_EQUAL( bob::core::array::isFortranContiguous(a), false);
+  BOOST_CHECK_EQUAL( bob::core::array::isFortranOneBaseContiguous(a), false);
 
   blitz::Array<uint8_t,2> b = a.transpose(1,0);
   // Check non-contiguous C-style array
-  BOOST_CHECK_EQUAL( ca::isZeroBase(b), true);
-  BOOST_CHECK_EQUAL( ca::isCContiguous(b), false);
-  BOOST_CHECK_EQUAL( ca::isCZeroBaseContiguous(b), false);
-  BOOST_CHECK_EQUAL( ca::isOneBase(b), false);
-  BOOST_CHECK_EQUAL( ca::isFortranContiguous(b), true);
-  BOOST_CHECK_EQUAL( ca::isFortranOneBaseContiguous(b), false);
+  BOOST_CHECK_EQUAL( bob::core::array::isZeroBase(b), true);
+  BOOST_CHECK_EQUAL( bob::core::array::isCContiguous(b), false);
+  BOOST_CHECK_EQUAL( bob::core::array::isCZeroBaseContiguous(b), false);
+  BOOST_CHECK_EQUAL( bob::core::array::isOneBase(b), false);
+  BOOST_CHECK_EQUAL( bob::core::array::isFortranContiguous(b), true);
+  BOOST_CHECK_EQUAL( bob::core::array::isFortranOneBaseContiguous(b), false);
 
   blitz::Array<uint8_t,2> c(blitz::Range(1,4),blitz::Range(1,2));
   c = 0;
   // Check contiguous C-style array (non-zero base indices)
-  BOOST_CHECK_EQUAL( ca::isZeroBase(c), false);
-  BOOST_CHECK_EQUAL( ca::isCContiguous(c), true);
-  BOOST_CHECK_EQUAL( ca::isCZeroBaseContiguous(c), false);
-  BOOST_CHECK_EQUAL( ca::isOneBase(c), true);
-  BOOST_CHECK_EQUAL( ca::isFortranContiguous(c), false);
-  BOOST_CHECK_EQUAL( ca::isFortranOneBaseContiguous(c), false);
+  BOOST_CHECK_EQUAL( bob::core::array::isZeroBase(c), false);
+  BOOST_CHECK_EQUAL( bob::core::array::isCContiguous(c), true);
+  BOOST_CHECK_EQUAL( bob::core::array::isCZeroBaseContiguous(c), false);
+  BOOST_CHECK_EQUAL( bob::core::array::isOneBase(c), true);
+  BOOST_CHECK_EQUAL( bob::core::array::isFortranContiguous(c), false);
+  BOOST_CHECK_EQUAL( bob::core::array::isFortranOneBaseContiguous(c), false);
 
   blitz::Array<uint8_t,2> d(5,2,blitz::FortranArray<2>());
   d = 0;
   // Check contiguous Fortran array
-  BOOST_CHECK_EQUAL( ca::isZeroBase(d), false);
-  BOOST_CHECK_EQUAL( ca::isCContiguous(d), false);
-  BOOST_CHECK_EQUAL( ca::isCZeroBaseContiguous(d), false);
-  BOOST_CHECK_EQUAL( ca::isOneBase(d), true);
-  BOOST_CHECK_EQUAL( ca::isFortranContiguous(d), true);
-  BOOST_CHECK_EQUAL( ca::isFortranOneBaseContiguous(d), true);
+  BOOST_CHECK_EQUAL( bob::core::array::isZeroBase(d), false);
+  BOOST_CHECK_EQUAL( bob::core::array::isCContiguous(d), false);
+  BOOST_CHECK_EQUAL( bob::core::array::isCZeroBaseContiguous(d), false);
+  BOOST_CHECK_EQUAL( bob::core::array::isOneBase(d), true);
+  BOOST_CHECK_EQUAL( bob::core::array::isFortranContiguous(d), true);
+  BOOST_CHECK_EQUAL( bob::core::array::isFortranOneBaseContiguous(d), true);
 
   blitz::Array<uint8_t,2> e = d.transpose(1,0);
   // Check non-contiguous Fortran array
-  BOOST_CHECK_EQUAL( ca::isZeroBase(e), false);
-  BOOST_CHECK_EQUAL( ca::isCContiguous(e), true);
-  BOOST_CHECK_EQUAL( ca::isCZeroBaseContiguous(e), false);
-  BOOST_CHECK_EQUAL( ca::isOneBase(e), true);
-  BOOST_CHECK_EQUAL( ca::isFortranContiguous(e), false);
-  BOOST_CHECK_EQUAL( ca::isFortranOneBaseContiguous(e), false);
+  BOOST_CHECK_EQUAL( bob::core::array::isZeroBase(e), false);
+  BOOST_CHECK_EQUAL( bob::core::array::isCContiguous(e), true);
+  BOOST_CHECK_EQUAL( bob::core::array::isCZeroBaseContiguous(e), false);
+  BOOST_CHECK_EQUAL( bob::core::array::isOneBase(e), true);
+  BOOST_CHECK_EQUAL( bob::core::array::isFortranContiguous(e), false);
+  BOOST_CHECK_EQUAL( bob::core::array::isFortranOneBaseContiguous(e), false);
 
   blitz::Array<uint8_t,2> f(blitz::Range(0,4), blitz::Range(0,2),blitz::FortranArray<2>());
   f = 0;
   // Check contiguous C-style array (non-zero base indices)
-  BOOST_CHECK_EQUAL( ca::isZeroBase(f), true);
-  BOOST_CHECK_EQUAL( ca::isCContiguous(f), false);
-  BOOST_CHECK_EQUAL( ca::isCZeroBaseContiguous(f), false);
-  BOOST_CHECK_EQUAL( ca::isOneBase(f), false);
-  BOOST_CHECK_EQUAL( ca::isFortranContiguous(f), true);
-  BOOST_CHECK_EQUAL( ca::isFortranOneBaseContiguous(f), false);
+  BOOST_CHECK_EQUAL( bob::core::array::isZeroBase(f), true);
+  BOOST_CHECK_EQUAL( bob::core::array::isCContiguous(f), false);
+  BOOST_CHECK_EQUAL( bob::core::array::isCZeroBaseContiguous(f), false);
+  BOOST_CHECK_EQUAL( bob::core::array::isOneBase(f), false);
+  BOOST_CHECK_EQUAL( bob::core::array::isFortranContiguous(f), true);
+  BOOST_CHECK_EQUAL( bob::core::array::isFortranOneBaseContiguous(f), false);
 }
 
 BOOST_AUTO_TEST_CASE( test_blitz_array_vector_map_ccopy )

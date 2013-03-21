@@ -21,7 +21,7 @@
  */
 
 #include <boost/format.hpp>
-#include "bob/core/reshape_exception.h"
+#include <bob/core/reshape_exception.h>
 
 bob::core::ReshapeDifferentNumberOfElements::ReshapeDifferentNumberOfElements( 
   const int expected, const int got) throw(): 

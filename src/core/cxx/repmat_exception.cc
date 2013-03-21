@@ -21,7 +21,7 @@
  */
 
 #include <boost/format.hpp>
-#include "bob/core/repmat_exception.h"
+#include <bob/core/repmat_exception.h>
 
 bob::core::RepmatNonMultipleLength::RepmatNonMultipleLength( 
   const int src_dim, const int dst_dim) throw(): 

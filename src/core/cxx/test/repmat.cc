@@ -26,7 +26,7 @@
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
 #include <stdint.h>
-#include "bob/core/repmat.h"
+#include <bob/core/repmat.h>
 
 struct T {
   blitz::Array<uint32_t,2> a, a33_s;

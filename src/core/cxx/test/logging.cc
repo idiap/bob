@@ -30,7 +30,7 @@
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/copy.hpp>
 
-#include "bob/core/logging.h"
+#include <bob/core/logging.h>
 #include <cstdio>
 #include <cstdlib>
 #include <string>

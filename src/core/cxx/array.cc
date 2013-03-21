@@ -21,38 +21,36 @@
  */
 
 #include <boost/format.hpp>
-#include "bob/core/array.h"
+#include <bob/core/array.h>
 
-namespace ca = bob::core::array;
-
-ca::typeinfo::typeinfo():
-  dtype(ca::t_unknown),
+bob::core::array::typeinfo::typeinfo():
+  dtype(bob::core::array::t_unknown),
   nd(0)
 {
 }
 
-ca::typeinfo::typeinfo(const ca::typeinfo& other): 
+bob::core::array::typeinfo::typeinfo(const bob::core::array::typeinfo& other): 
   dtype(other.dtype)
 {
   set_shape(other.nd, other.shape);
 }
 
-ca::typeinfo& ca::typeinfo::operator= (const ca::typeinfo& other) {
+bob::core::array::typeinfo& bob::core::array::typeinfo::operator= (const bob::core::array::typeinfo& other) {
   dtype = other.dtype;
   set_shape(other.nd, other.shape);
   return *this;
 }
 
-void ca::typeinfo::reset() {
-  dtype = ca::t_unknown;
+void bob::core::array::typeinfo::reset() {
+  dtype = bob::core::array::t_unknown;
   nd = 0;
 }
 
-bool ca::typeinfo::is_valid() const {
-  return (dtype != ca::t_unknown) && (nd > 0) && (nd <= (BOB_MAX_DIM+1)) && has_valid_shape();
+bool bob::core::array::typeinfo::is_valid() const {
+  return (dtype != bob::core::array::t_unknown) && (nd > 0) && (nd <= (BOB_MAX_DIM+1)) && has_valid_shape();
 }
 
-void ca::typeinfo::update_strides() {
+void bob::core::array::typeinfo::update_strides() {
   switch (nd) {
     case 0:
       return;
@@ -87,14 +85,14 @@ void ca::typeinfo::update_strides() {
   throw std::invalid_argument("unsupported number of dimensions");
 }
 
-size_t ca::typeinfo::size() const {
+size_t bob::core::array::typeinfo::size() const {
   size_t retval = 1;
   for (size_t k=0; k<nd; ++k) retval *= shape[k];
   return retval;
 }
 
-size_t ca::typeinfo::buffer_size() const {
-  return size()*ca::getElementSize(dtype);
+size_t bob::core::array::typeinfo::buffer_size() const {
+  return size()*bob::core::array::getElementSize(dtype);
 }
 
 static bool same_shape(size_t nd, const size_t* s1, const size_t* s2) {
@@ -102,15 +100,15 @@ static bool same_shape(size_t nd, const size_t* s1, const size_t* s2) {
   return true;
 }
 
-bool ca::typeinfo::is_compatible(const ca::typeinfo& other) const {
+bool bob::core::array::typeinfo::is_compatible(const bob::core::array::typeinfo& other) const {
   return (dtype == other.dtype) && (nd == other.nd) && same_shape(nd, shape, other.shape);
 }
 
-std::string ca::typeinfo::str() const {
+std::string bob::core::array::typeinfo::str() const {
   boost::format s("dtype: %s (%d); shape: [%s]; size: %d bytes");
   size_t sz = 0;
   size_t buf_sz = 0;
-  if (dtype != ca::t_unknown) {
+  if (dtype != bob::core::array::t_unknown) {
     //otherwise it throws
     sz = item_size();
     buf_sz = buffer_size();
@@ -140,10 +138,10 @@ std::string ca::typeinfo::str() const {
   return s.str();
 }
 
-void ca::typeinfo::reset_shape() {
+void bob::core::array::typeinfo::reset_shape() {
   shape[0] = 0;
 }
 
-bool ca::typeinfo::has_valid_shape() const {
+bool bob::core::array::typeinfo::has_valid_shape() const {
   return shape[0] != 0;
 }

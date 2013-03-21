@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/core/Random.h"
+#include <bob/core/Random.h>
 
 boost::mt19937& 
 bob::core::random::generator::instance()

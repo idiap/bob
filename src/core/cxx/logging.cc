@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/core/logging.h"
+#include <bob/core/logging.h>
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
