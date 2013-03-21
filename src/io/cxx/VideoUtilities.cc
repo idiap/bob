@@ -241,10 +241,10 @@ static void define_output_support_map(std::map<AVOutputFormat*, std::vector<cons
       "h264", 
       //"h264_vdpau", 
       "mjpeg", 
-      "mpeg1video", 
+      //"mpeg1video", 
       //"mpegvideo_vdpau"
-      "mpeg2video",
-      "mpegvideo",
+      //"mpeg2video",
+      //"mpegvideo",
       "mpeg4",
     };
     std::vector<std::string> codecs(tmp, tmp + (sizeof(tmp)/sizeof(tmp[0])));
