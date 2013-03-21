@@ -30,12 +30,11 @@
 #include <complex>
 
 namespace bob {
-/**
- * \ingroup libcore_api
- * @{
- *
- */
   namespace core {
+    /**
+     * @ingroup CORE
+     * @{
+     */
 
     /**
      * @brief Functions which add std::complex support to the static_cast
@@ -134,10 +133,10 @@ blitz::Array<T,4> cast(const blitz::Array<U,4>& in) {
 
 
 
+    /**
+     * @}
+     */
   }
-/**
- * @}
- */
 }
 
 #endif /* BOB_CORE_CAST_H */

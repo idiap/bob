@@ -32,7 +32,21 @@
 
 #include <bob/core/array_type.h>
 
-namespace bob { namespace core { namespace array {
+/**
+ * @addtogroup CORE_ARRAY core_array
+ * @brief Array submodule API of the core module
+ */
+namespace bob { namespace core { 
+
+/**
+ * @ingroup CORE
+ * @ingroup CORE_ARRAY
+ */
+namespace array {
+  /**
+   * @ingroup CORE_ARRAY
+   * @{
+   */
 
   /**
    * @brief Encapsulation of special type information of interfaces.
@@ -255,6 +269,9 @@ namespace bob { namespace core { namespace array {
 
   };
 
+  /**
+   * @}
+   */
 }}}
 
 #endif /* BOB_CORE_ARRAY_INTERFACE_H */

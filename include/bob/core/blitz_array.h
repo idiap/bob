@@ -38,6 +38,10 @@
 #include <bob/core/cast.h>
 
 namespace bob { namespace core { namespace array {
+  /**
+   * @ingroup CORE_ARRAY
+   * @{
+   */
 
   /**
    * @brief A blitz::Array representation of an array.
@@ -269,6 +273,9 @@ namespace bob { namespace core { namespace array {
 
   };
 
+  /**
+   * @}
+   */
 }}}
 
 #endif /* BOB_CORE_BLITZ_ARRAY_H */

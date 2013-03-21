@@ -28,12 +28,11 @@
 #include <vector>
 
 namespace bob {
-/**
- * \ingroup libcore_api
- * @{
- *
- */
   namespace core { namespace array {
+    /**
+     * @ingroup CORE_ARRAY
+     * @{
+     */
 
     /**
      * @brief Copies a blitz array like copy() does, but resets the storage 
@@ -77,10 +76,10 @@ namespace bob {
         dst[it->first].reference(ccopy(it->second));
     }
 
+    /**
+     * @}
+     */
   }}
-/**
- * @}
- */
 }
 
 #endif /* BOB_CORE_ARRAY_COPY_H */

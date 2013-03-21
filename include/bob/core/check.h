@@ -31,13 +31,11 @@
 #include <blitz/tinyvec-et.h>
 #endif
 
-namespace bob {
+namespace bob { namespace core {
 /**
- * \ingroup libcore_api
+ * @ingroup CORE
  * @{
- *
  */
-namespace core {
 
 /**
  * @brief Compare two floating point values using two different comparison 
@@ -75,8 +73,15 @@ bool isClose(const std::complex<T>& left, const std::complex<T>& right,
   return (diff <= (a_epsilon + r_epsilon * min));
 }
 
+/**
+ * @}
+ */
 
 namespace array {
+/**
+ * @ingroup CORE_ARRAY
+ * @{
+ */
 
 /**
  * @brief Checks if a blitz array has zero base indices, for each of its 
@@ -398,10 +403,9 @@ bool isEqual(const blitz::Array<T,D>& left, const blitz::Array<T,D>& right)
   return !(blitz::any(left != right));
 }
 
-}}
 /**
  * @}
  */
-}
+}}}
 
 #endif /* BOB_CORE_CHECK_H */

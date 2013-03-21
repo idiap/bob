@@ -33,12 +33,11 @@
 #include <bob/core/assert.h>
 
 namespace bob {
-/**
- * \ingroup libcore_api
- * @{
- *
- */
   namespace core {
+    /**
+     * @ingroup CORE
+     * @{
+     */
 
     /**
      * @brief Function which converts a 1D blitz::array of a given type into
@@ -201,10 +200,10 @@ namespace bob {
         std::numeric_limits<T>::max(), src_min, src_max );
     }
 
+    /**
+     * @}
+     */
   }
-/**
- * @}
- */
 }
 
 #endif /* BOB_CORE_CONVERT_H */

@@ -29,6 +29,10 @@
 namespace bob {
 
   namespace core {
+    /**
+     * @ingroup CORE
+     * @{
+     */
 
     /**
      * @brief The stock bob exception class should be used as a base of any
@@ -151,6 +155,9 @@ namespace bob {
         std::string m_reason;
     };
 
+    /**
+     * @}
+     */
   }
 
 }

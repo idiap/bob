@@ -33,6 +33,10 @@
 #include <bob/core/cast.h>
 
 namespace bob { namespace core { namespace array {
+  /**
+   * @ingroup CORE_ARRAY
+   * @{
+   */
 
   /**
    * @brief Fills in shape and stride starting from a typeinfo object
@@ -141,6 +145,9 @@ namespace bob { namespace core { namespace array {
 
   }
 
+  /**
+   * @}
+   */
 }}}
 
 #endif /* BOB_CORE_ARRAY_UTILS_H */

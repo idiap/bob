@@ -25,9 +25,11 @@
 
 #include <bob/core/Exception.h>
 
-namespace bob { 
-  
-  namespace core {
+namespace bob { namespace core {
+    /**
+     * @ingroup CORE
+     * @{
+     */
 
     /**
      * @brief The non-zero base error exception occurs when some function,
@@ -126,8 +128,9 @@ namespace bob {
         mutable std::string m_message;
     };
 
-  }
-
-}
+    /**
+     * @}
+     */
+}}
 
 #endif /* BOB_CORE_ARRAY_EXCEPTION_H */

@@ -30,13 +30,11 @@
 #include <bob/core/repmat_exception.h>
 #include <bob/core/assert.h>
 
-namespace bob {
-/**
- * \ingroup libcore_api
- * @{
- *
- */
-  namespace core {
+namespace bob { namespace core {
+    /**
+     * @ingroup CORE
+     * @{
+     */
 
     /**
      * @brief Function which replicates an input 2D array like the matlab
@@ -233,10 +231,10 @@ namespace bob {
       repelem_(src,dst);
     }
 
+    /**
+     * @}
+     */
   }
-/**
- * @}
- */
 }
 
 #endif /* BOB_CORE_REPMAT_H */

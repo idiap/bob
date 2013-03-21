@@ -28,6 +28,7 @@
 #include <complex>
 
 /**
+ * @ingroup CORE_ARRAY
  * @brief This macro defines the maximum number of dimensions supported by bob.
  * A variable in the bob.core.array namespace is created from this macro
  * receiving the same value. Use that variable on your programs, or this macro
@@ -36,12 +37,11 @@
 #define BOB_MAX_DIM 4
 
 namespace bob {
-/**
- * \ingroup libcore_api
- * @{
- *
- */
   namespace core { namespace array {
+    /**
+     * @ingroup CORE_ARRAY
+     * @{
+     */
 
     /**
      * @brief Enumeration of the supported type for multidimensional arrays
@@ -175,10 +175,10 @@ namespace bob {
      */
     ElementType unstringize(const char* name);
 
+    /**
+     * @}
+     */
   }}
-/**
- * @}
- */
 }
 
 #endif /* BOB_CORE_ARRAY_TYPE_H */

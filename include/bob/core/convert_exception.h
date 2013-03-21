@@ -28,6 +28,10 @@
 namespace bob { 
   
   namespace core {
+    /**
+     * @ingroup CORE
+     * @{
+     */
 
     /**
      * @brief A ConvertZeroInputRange is thrown when the specified input range
@@ -78,6 +82,9 @@ namespace bob {
         mutable std::string m_message;
     };
 
+    /**
+     * @}
+     */
   }
 
 }

@@ -30,6 +30,7 @@ namespace bob {
   namespace core {
 
     /**
+     * @ingroup CORE
      * @brief The NonMultipleLength exception occurs when a dimension of the
      * 2D dst array of the repmat() function is not a multiple of the 
      * corresponding dimension in the 2D src array.

@@ -31,12 +31,11 @@
 #include <bob/core/reshape_exception.h>
 
 namespace bob {
-/**
- * \ingroup libcore_api
- * @{
- *
- */
   namespace core {
+    /**
+     * @ingroup CORE
+     * @{
+     */
 
     /**
      * TODO: Allows to reshape arrays of any number of dimensions
@@ -167,10 +166,10 @@ namespace bob {
       reshape_(src, dst);
     }
 
+    /**
+     * @}
+     */
   }
-/**
- * @}
- */
 }
 
 #endif /* BOB_CORE_RESHAPE_H */

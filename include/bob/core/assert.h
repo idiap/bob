@@ -27,12 +27,11 @@
 #include <bob/core/array_exception.h>
 
 namespace bob {
-/**
- * \ingroup libcore_api
- * @{
- *
- */
 namespace core { namespace array {
+/**
+ * @ingroup CORE_ARRAY
+ * @{
+ */
 
 /**
  * @brief Checks that a blitz array has zero base indices, and throws
@@ -165,10 +164,9 @@ inline void assertSameDimensionLength(const int d1, const int d2)
     throw UnexpectedShapeError();
 }
 
-}}
 /**
  * @}
  */
-}
+}}}
 
 #endif /* BOB_ARRAY_ASSERT_H */

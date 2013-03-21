@@ -25,16 +25,20 @@
 #ifndef BOB_CORE_ARRAY_CAT_H 
 #define BOB_CORE_ARRAY_CAT_H
 
-#include <bob/config.h>
 
-#include <vector>
 #include <blitz/array.h>
+#include <bob/config.h>
 #if !defined (HAVE_BLITZ_TINYVEC2_H)
 #include <blitz/tinyvec-et.h>
 #endif
+#include <vector>
 #include <bob/core/Exception.h>
 
 namespace bob { namespace core { namespace array {
+  /**
+   * @ingroup CORE_ARRAY
+   * @{
+   */
 
   /**
    * @brief Copies the data of one array into the other, specifying a precise
@@ -155,6 +159,7 @@ namespace bob { namespace core { namespace array {
   };
 
   /**
+   * @ingroup CORE_ARRAY
    * @brief Here is the 4D specializations that do compile.
    */
   template <typename T> struct copy__<T,4> {
@@ -311,6 +316,9 @@ namespace bob { namespace core { namespace array {
       }
     }
 
+  /**
+   * @}
+   */
 }}}
 
 #endif /* BOB_CORE_ARRAY_CAT_H */
