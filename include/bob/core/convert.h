@@ -30,6 +30,7 @@
 #include <limits>
 #include <blitz/array.h>
 #include <bob/core/convert_exception.h>
+#include <bob/core/assert.h>
 
 namespace bob {
 /**
@@ -47,19 +48,20 @@ namespace bob {
     blitz::Array<T,1> convert(const blitz::Array<U,1>& src, 
       T dst_min, T dst_max, U src_min, U src_max) 
     {
+      bob::core::array::assertZeroBase(src);
       blitz::Array<T,1> dst( src.extent(0) );
-      if( src_min == src_max)
+      if (src_min == src_max)
         throw bob::core::ConvertZeroInputRange();
       double src_ratio = 1. / ( src_max - src_min);
       T dst_diff = dst_max - dst_min;
-      for( int i=0; i<src.extent(0); ++i) {
-        if( src(i+src.lbound(0)) < src_min)
-          throw bob::core::ConvertInputBelowMinRange(src(i+src.lbound(0)), src_min);
-        if( src(i+src.lbound(0)) > src_max)
-          throw bob::core::ConvertInputAboveMaxRange(src(i+src.lbound(0)), src_max);
+      for (int i=0; i<src.extent(0); ++i) {
+        if (src(i) < src_min)
+          throw bob::core::ConvertInputBelowMinRange(src(i), src_min);
+        if (src(i) > src_max)
+          throw bob::core::ConvertInputAboveMaxRange(src(i), src_max);
         // If the destination is an integer-like type, we need to add 0.5 s.t.
         // the round done by the implicit conversion is correct
-        dst(i) = dst_min + (((src(i+src.lbound(0))-src_min)*src_ratio) * 
+        dst(i) = dst_min + (((src(i)-src_min)*src_ratio) * 
           dst_diff + (std::numeric_limits<T>::is_integer?0.5:0));
       }
       return dst;
@@ -73,20 +75,21 @@ namespace bob {
     blitz::Array<T,2> convert(const blitz::Array<U,2>& src, 
       T dst_min, T dst_max, U src_min, U src_max) 
     {
+      bob::core::array::assertZeroBase(src);
       blitz::Array<T,2> dst( src.extent(0), src.extent(1) );
-      if( src_min == src_max)
+      if (src_min == src_max)
         throw bob::core::ConvertZeroInputRange();
       double src_ratio = 1. / ( src_max - src_min);
       T dst_diff = dst_max - dst_min;
-      for( int i=0; i<src.extent(0); ++i) 
-        for( int j=0; j<src.extent(1); ++j) {
-          if( src(i+src.lbound(0),j+src.lbound(1)) < src_min)
-            throw bob::core::ConvertInputBelowMinRange(src(i+src.lbound(0),j+src.lbound(1)), src_min); 
-          if( src(i+src.lbound(0),j+src.lbound(1)) > src_max )
-            throw bob::core::ConvertInputAboveMaxRange(src(i+src.lbound(0),j+src.lbound(1)), src_max);
+      for (int i=0; i<src.extent(0); ++i) 
+        for (int j=0; j<src.extent(1); ++j) {
+          if (src(i,j) < src_min)
+            throw bob::core::ConvertInputBelowMinRange(src(i,j), src_min); 
+          if (src(i,j) > src_max )
+            throw bob::core::ConvertInputAboveMaxRange(src(i,j), src_max);
           // If the destination is an integer-like type, we need to add 0.5 
           // s.t. the round done by the implicit conversion is correct
-          dst(i,j) = dst_min + (((src(i+src.lbound(0),j+src.lbound(1))-src_min)*src_ratio) * 
+          dst(i,j) = dst_min + (((src(i,j)-src_min)*src_ratio) * 
             dst_diff + (std::numeric_limits<T>::is_integer?0.5:0));
         }
       return dst;
@@ -100,21 +103,22 @@ namespace bob {
     blitz::Array<T,3> convert(const blitz::Array<U,3>& src, 
       T dst_min, T dst_max, U src_min, U src_max) 
     {
+      bob::core::array::assertZeroBase(src);
       blitz::Array<T,3> dst( src.extent(0), src.extent(1), src.extent(2) );
-      if( src_min == src_max)
+      if (src_min == src_max)
         throw bob::core::ConvertZeroInputRange();
       double src_ratio = 1. / ( src_max - src_min);
       T dst_diff = dst_max - dst_min;
-      for( int i=0; i<src.extent(0); ++i)
-        for( int j=0; j<src.extent(1); ++j) 
-          for( int k=0; k<src.extent(2); ++k) {
-            if( src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2)) < src_min)
-              throw bob::core::ConvertInputBelowMinRange(src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2)), src_min); 
-            if( src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2)) > src_max )
-              throw bob::core::ConvertInputAboveMaxRange(src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2)), src_max);
+      for (int i=0; i<src.extent(0); ++i)
+        for (int j=0; j<src.extent(1); ++j) 
+          for (int k=0; k<src.extent(2); ++k) {
+            if (src(i,j,k) < src_min)
+              throw bob::core::ConvertInputBelowMinRange(src(i,j,k), src_min); 
+            if (src(i,j,k) > src_max )
+              throw bob::core::ConvertInputAboveMaxRange(src(i,j,k), src_max);
             // If the destination is an integer-like type, we need to add 0.5 
             // s.t. the round done by the implicit conversion is correct
-            dst(i,j,k) = dst_min + (((src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2))-src_min)*src_ratio) * 
+            dst(i,j,k) = dst_min + (((src(i,j,k)-src_min)*src_ratio) * 
               dst_diff + (std::numeric_limits<T>::is_integer?0.5:0));
           }
       return dst;
@@ -128,23 +132,24 @@ namespace bob {
     blitz::Array<T,4> convert(const blitz::Array<U,4>& src, 
       T dst_min, T dst_max, U src_min, U src_max) 
     {
+      bob::core::array::assertZeroBase(src);
       blitz::Array<T,4> dst( src.extent(0), src.extent(1), src.extent(2),
         src.extent(3) );
-      if( src_min == src_max)
+      if (src_min == src_max)
         throw bob::core::ConvertZeroInputRange();
       double src_ratio = 1. / ( src_max - src_min);
       T dst_diff = dst_max - dst_min;
-      for( int i=0; i<src.extent(0); ++i)
-        for( int j=0; j<src.extent(1); ++j) 
-          for( int k=0; k<src.extent(2); ++k)
-            for( int l=0; l<src.extent(3); ++l) {
-              if( src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2),l+src.lbound(3)) < src_min)
-                throw bob::core::ConvertInputBelowMinRange(src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2),l+src.lbound(3)), src_min); 
-              if( src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2),l+src.lbound(3)) > src_max )
-                throw bob::core::ConvertInputAboveMaxRange(src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2),l+src.lbound(3)), src_max);
+      for (int i=0; i<src.extent(0); ++i)
+        for (int j=0; j<src.extent(1); ++j) 
+          for (int k=0; k<src.extent(2); ++k)
+            for (int l=0; l<src.extent(3); ++l) {
+              if (src(i,j,k,l) < src_min)
+                throw bob::core::ConvertInputBelowMinRange(src(i,j,k,l), src_min); 
+              if (src(i,j,k,l) > src_max )
+                throw bob::core::ConvertInputAboveMaxRange(src(i,j,k,l), src_max);
               // If the destination is an integer-like type, we need to add 0.5
               // s.t. the round done by the implicit conversion is correct
-              dst(i,j,k,l) = dst_min + (((src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2),l+src.lbound(3))-src_min)*src_ratio) *
+              dst(i,j,k,l) = dst_min + (((src(i,j,k,l)-src_min)*src_ratio) *
                 dst_diff + (std::numeric_limits<T>::is_integer?0.5:0));
             }
       return dst;
