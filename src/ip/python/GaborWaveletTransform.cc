@@ -134,7 +134,7 @@ static void compute_jets_1(bob::ip::GaborWaveletTransform& gwt, bob::python::con
   } else if (output_jet_image.type().nd == 4){
     blitz::Array<double,4> jet_image = output_jet_image.bz<double,4>();
     gwt.computeJetImage(image, jet_image, normalized);
-  } else throw bob::core::UnexpectedShapeError();
+  } else throw bob::core::array::UnexpectedShapeError();
 }
 
 static bob::python::ndarray compute_jets_2(bob::ip::GaborWaveletTransform& gwt, bob::python::const_ndarray input_image, bool include_phases, bool normalized){
@@ -151,7 +151,7 @@ static void normalize_gabor_jet(bob::python::ndarray gabor_jet){
   } else if (gabor_jet.type().nd == 2){
     blitz::Array<double,2> jet(gabor_jet.bz<double,2>());
     bob::ip::normalizeGaborJet(jet);
-  } else throw bob::core::UnexpectedShapeError();
+  } else throw bob::core::array::UnexpectedShapeError();
 }
 
 void bind_ip_gabor_wavelet_transform() {

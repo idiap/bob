@@ -39,7 +39,7 @@ static void bob_extract(bob::machine::GaborGraphMachine& self, bob::python::cons
     const blitz::Array<double,4> jet_image = input_jet_image.bz<double,4>();
     blitz::Array<double,3> graph = output_graph.bz<double,3>();
     self.extract(jet_image, graph);
-  } else throw bob::core::UnexpectedShapeError();
+  } else throw bob::core::array::UnexpectedShapeError();
 }
 
 static bob::python::ndarray bob_extract2(bob::machine::GaborGraphMachine& self, bob::python::const_ndarray input_jet_image){
@@ -55,7 +55,7 @@ static bob::python::ndarray bob_extract2(bob::machine::GaborGraphMachine& self, 
     blitz::Array<double,3> graph = output_graph.bz<double,3>();
     self.extract(jet_image, graph);
     return output_graph;
-  } else throw bob::core::UnexpectedShapeError();
+  } else throw bob::core::array::UnexpectedShapeError();
 }
 
 static void bob_average(bob::machine::GaborGraphMachine& self, bob::python::const_ndarray many_graph_jets, bob::python::ndarray averaged_graph_jets){
@@ -78,7 +78,7 @@ static double bob_similarity(bob::machine::GaborGraphMachine& self, bob::python:
           return self.similarity(model, probe, similarity_function);
         }
         default:
-          throw bob::core::UnexpectedShapeError();
+          throw bob::core::array::UnexpectedShapeError();
       }
     }
 
@@ -94,12 +94,12 @@ static double bob_similarity(bob::machine::GaborGraphMachine& self, bob::python:
           return self.similarity(model, probe, similarity_function);
         }
         default:
-          throw bob::core::UnexpectedShapeError();
+          throw bob::core::array::UnexpectedShapeError();
       }
     }
 
     default: // unknown graph shape
-      throw bob::core::UnexpectedShapeError();
+      throw bob::core::array::UnexpectedShapeError();
   }
 }
 
@@ -114,7 +114,7 @@ static double bob_jet_sim(const bob::machine::GaborJetSimilarity& self, bob::pyt
       return self(j1, j2);
     }
     default:
-      throw bob::core::UnexpectedShapeError();
+      throw bob::core::array::UnexpectedShapeError();
   }
 }
 
