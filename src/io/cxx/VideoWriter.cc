@@ -112,10 +112,12 @@ bob::io::VideoWriter::VideoWriter(
 }
 
 bob::io::VideoWriter::~VideoWriter() {
-  if (m_opened) close();
+  close();
 }
 
 void bob::io::VideoWriter::close() {
+
+  if (!m_opened) return;
 
   ffmpeg::flush_encoder(m_filename, m_format_context, m_stream, m_codec,
       m_buffer, FFMPEG_VIDEO_BUFFER_SIZE);
