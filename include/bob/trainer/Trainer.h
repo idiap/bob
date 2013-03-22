@@ -17,14 +17,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef TRAINER_H
-#define TRAINER_H
+#ifndef BOB_TRAINER_TRAINER_H
+#define BOB_TRAINER_TRAINER_H
 
-namespace bob {
-namespace trainer {
+namespace bob { namespace trainer {
+/**
+ * @ingroup TRAINER
+ * @{
+ */
 
 /**
- * Root class for all trainers
+ * @brief Root class for all trainers
  */
 template<class T_machine, class T_sampler>
 class Trainer
@@ -33,14 +36,17 @@ public:
   virtual ~Trainer() {};
 
   /**
-   * Train a \c machine using a sampler
+   * @brief Train a \c machine using a sampler
    *
    * @param machine machine to train
    * @param sampler sampler that provides training data
    */
-  virtual void train (T_machine& machine, const T_sampler& sampler) = 0;
+  virtual void train(T_machine& machine, const T_sampler& sampler) = 0;
 };
 
-}
-}
-#endif // TRAINER_H
+/**
+ * @}
+ */
+}}
+
+#endif // BOB_TRAINER_TRAINER_H
