@@ -25,10 +25,14 @@
 #define BOB_TRAINER_EMPCA_TRAINER_H
 
 #include <blitz/array.h>
-#include "bob/trainer/EMTrainer.h"
-#include "bob/machine/LinearMachine.h"
+#include <bob/trainer/EMTrainer.h>
+#include <bob/machine/LinearMachine.h>
 
 namespace bob { namespace trainer {
+  /**
+   * @ingroup TRAINER
+   * @{
+   */
   
   /**
     * Sets a linear machine to perform Expectation Maximization on a
@@ -192,6 +196,9 @@ namespace bob { namespace trainer {
          const blitz::Array<double,2>& ar);
   };
 
+  /**
+   * @}
+   */
 }}
 
 #endif /* BOB_TRAINER_EMPCA_TRAINER_H */

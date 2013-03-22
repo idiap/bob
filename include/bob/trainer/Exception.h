@@ -20,9 +20,13 @@
 #ifndef BOB_TRAINER_EXCEPTION_H
 #define BOB_TRAINER_EXCEPTION_H
 
-#include "bob/core/Exception.h"
+#include <bob/core/Exception.h>
 
 namespace bob { namespace trainer {
+  /**
+   * @ingroup TRAINER
+   * @{
+   */
 
   class Exception: public bob::core::Exception {
 
@@ -119,6 +123,9 @@ namespace bob { namespace trainer {
       virtual const char* what() const throw();
   };
 
+  /**
+   * @}
+   */
 }}
 
 #endif /* BOB_TRAINER_EXCEPTION_H */

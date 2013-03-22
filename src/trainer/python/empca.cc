@@ -18,8 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <boost/python.hpp>
-#include "bob/machine/LinearMachine.h"
-#include "bob/trainer/EMPCATrainer.h"
+#include <bob/machine/LinearMachine.h>
+#include <bob/trainer/EMPCATrainer.h>
 
 using namespace boost::python;
 

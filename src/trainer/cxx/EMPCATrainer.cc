@@ -23,14 +23,14 @@
 #include <boost/random.hpp>
 #include <cmath>
 
-#include "bob/trainer/EMPCATrainer.h"
-#include "bob/io/Exception.h"
-#include "bob/core/array_copy.h"
-#include "bob/core/array_type.h"
-#include "bob/math/linear.h"
-#include "bob/math/det.h"
-#include "bob/math/inv.h"
-#include "bob/math/stats.h"
+#include <bob/trainer/EMPCATrainer.h>
+#include <bob/io/Exception.h>
+#include <bob/core/array_copy.h>
+#include <bob/core/array_type.h>
+#include <bob/math/linear.h>
+#include <bob/math/det.h>
+#include <bob/math/inv.h>
+#include <bob/math/stats.h>
 
 bob::trainer::EMPCATrainer::EMPCATrainer(int dimensionality, 
     double convergence_threshold, int max_iterations, bool compute_likelihood):
