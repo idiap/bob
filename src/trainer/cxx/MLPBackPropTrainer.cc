@@ -21,18 +21,13 @@
  */
 
 #include <algorithm>
-#include "bob/core/check.h"
-#include "bob/math/linear.h"
-#include "bob/machine/MLPException.h"
-#include "bob/trainer/Exception.h"
-#include "bob/trainer/MLPBackPropTrainer.h"
+#include <bob/core/check.h>
+#include <bob/math/linear.h>
+#include <bob/machine/MLPException.h>
+#include <bob/trainer/Exception.h>
+#include <bob/trainer/MLPBackPropTrainer.h>
 
-namespace array = bob::core::array;
-namespace mach = bob::machine;
-namespace math = bob::math;
-namespace train = bob::trainer;
-
-train::MLPBackPropTrainer::MLPBackPropTrainer(const mach::MLP& machine,
+bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(const bob::machine::MLP& machine,
     size_t batch_size):
   m_learning_rate(0.1),
   m_momentum(0.0),
@@ -65,25 +60,25 @@ train::MLPBackPropTrainer::MLPBackPropTrainer(const mach::MLP& machine,
   reset();
 
   switch (machine.getActivation()) {
-    case mach::LINEAR:
-      m_bwdfun = mach::linear_derivative;
+    case bob::machine::LINEAR:
+      m_bwdfun = bob::machine::linear_derivative;
       break;
-    case mach::TANH:
-      m_bwdfun = mach::tanh_derivative;
+    case bob::machine::TANH:
+      m_bwdfun = bob::machine::tanh_derivative;
       break;
-    case mach::LOG:
-      m_bwdfun = mach::logistic_derivative;
+    case bob::machine::LOG:
+      m_bwdfun = bob::machine::logistic_derivative;
       break;
     default:
-      throw mach::UnsupportedActivation(machine.getActivation());
+      throw bob::machine::UnsupportedActivation(machine.getActivation());
   }
 
   setBatchSize(batch_size);
 }
 
-train::MLPBackPropTrainer::~MLPBackPropTrainer() { }
+bob::trainer::MLPBackPropTrainer::~MLPBackPropTrainer() { }
 
-train::MLPBackPropTrainer::MLPBackPropTrainer(const MLPBackPropTrainer& other):
+bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(const MLPBackPropTrainer& other):
   m_learning_rate(other.m_learning_rate),
   m_momentum(other.m_momentum),
   m_train_bias(other.m_train_bias),
@@ -111,8 +106,8 @@ train::MLPBackPropTrainer::MLPBackPropTrainer(const MLPBackPropTrainer& other):
   m_output[m_H + 1].reference(bob::core::array::ccopy(other.m_output[m_H + 1]));
 }
 
-train::MLPBackPropTrainer& train::MLPBackPropTrainer::operator=
-(const train::MLPBackPropTrainer& other) {
+bob::trainer::MLPBackPropTrainer& bob::trainer::MLPBackPropTrainer::operator=
+(const bob::trainer::MLPBackPropTrainer& other) {
   m_learning_rate = other.m_learning_rate;
   m_momentum = other.m_momentum;
   m_train_bias = other.m_train_bias;
@@ -142,14 +137,14 @@ train::MLPBackPropTrainer& train::MLPBackPropTrainer::operator=
   return *this;
 }
 
-void train::MLPBackPropTrainer::reset() {
+void bob::trainer::MLPBackPropTrainer::reset() {
   for (size_t k=0; k<(m_H + 1); ++k) {
     m_prev_delta[k] = 0;
     m_prev_delta_bias[k] = 0;
   }
 }
 
-void train::MLPBackPropTrainer::setBatchSize (size_t batch_size) {
+void bob::trainer::MLPBackPropTrainer::setBatchSize (size_t batch_size) {
   // m_output: values after the activation function; note that "output" will
   //           accomodate the input to ease on the calculations
   // m_target: sampled target values
@@ -168,7 +163,7 @@ void train::MLPBackPropTrainer::setBatchSize (size_t batch_size) {
   }
 }
 
-bool train::MLPBackPropTrainer::isCompatible(const mach::MLP& machine) const 
+bool bob::trainer::MLPBackPropTrainer::isCompatible(const bob::machine::MLP& machine) const 
 {
   if (m_H != machine.numOfHiddenLayers()) return false;
   
@@ -178,17 +173,17 @@ bool train::MLPBackPropTrainer::isCompatible(const mach::MLP& machine) const
 
   //also, each layer should be of the same size
   for (size_t k=0; k<(m_H + 1); ++k) {
-    if (!array::hasSameShape(m_delta[k], machine.getWeights()[k])) return false;
+    if (!bob::core::array::hasSameShape(m_delta[k], machine.getWeights()[k])) return false;
   }
 
   //if you get to this point, you can only return true
   return true;
 }
 
-void train::MLPBackPropTrainer::forward_step() {
+void bob::trainer::MLPBackPropTrainer::forward_step() {
   size_t batch_size = m_target.extent(0);
   for (size_t k=0; k<m_weight_ref.size(); ++k) { //for all layers
-    math::prod_(m_output[k], m_weight_ref[k], m_output[k+1]);
+    bob::math::prod_(m_output[k], m_weight_ref[k], m_output[k+1]);
     for (int i=0; i<(int)batch_size; ++i) { //for every example
       for (int j=0; j<m_output[k+1].extent(1); ++j) { //for all variables
         m_output[k+1](i,j) = m_actfun(m_output[k+1](i,j) + m_bias_ref[k](j));
@@ -197,7 +192,7 @@ void train::MLPBackPropTrainer::forward_step() {
   }
 }
 
-void train::MLPBackPropTrainer::backward_step() {
+void bob::trainer::MLPBackPropTrainer::backward_step() {
   size_t batch_size = m_target.extent(0);
   //last layer
   m_error[m_H] = m_target - m_output.back();
@@ -209,7 +204,7 @@ void train::MLPBackPropTrainer::backward_step() {
 
   //all other layers
   for (size_t k=m_H; k>0; --k) {
-    math::prod_(m_error[k], m_weight_ref[k].transpose(1,0), m_error[k-1]);
+    bob::math::prod_(m_error[k], m_weight_ref[k].transpose(1,0), m_error[k-1]);
     for (int i=0; i<(int)batch_size; ++i) { //for every example
       for (int j=0; j<m_error[k-1].extent(1); ++j) { //for all variables
         m_error[k-1](i,j) *= m_bwdfun(m_output[k](i,j));
@@ -218,10 +213,10 @@ void train::MLPBackPropTrainer::backward_step() {
   }
 }
 
-void train::MLPBackPropTrainer::backprop_weight_update() {
+void bob::trainer::MLPBackPropTrainer::backprop_weight_update() {
   size_t batch_size = m_target.extent(0);
   for (size_t k=0; k<m_weight_ref.size(); ++k) { //for all layers
-    math::prod_(m_output[k].transpose(1,0), m_error[k], m_delta[k]);
+    bob::math::prod_(m_output[k].transpose(1,0), m_error[k], m_delta[k]);
     m_delta[k] *= m_learning_rate / batch_size;
     m_weight_ref[k] += ((1-m_momentum)*m_delta[k]) + 
       (m_momentum*m_prev_delta[k]);
@@ -243,16 +238,16 @@ void train::MLPBackPropTrainer::backprop_weight_update() {
   }
 }
 
-void train::MLPBackPropTrainer::train(bob::machine::MLP& machine,
+void bob::trainer::MLPBackPropTrainer::train(bob::machine::MLP& machine,
     const blitz::Array<double,2>& input,
     const blitz::Array<double,2>& target) {
-  if (!isCompatible(machine)) throw train::IncompatibleMachine();
-  array::assertSameDimensionLength(getBatchSize(), input.extent(0));
-  array::assertSameDimensionLength(getBatchSize(), target.extent(0));
+  if (!isCompatible(machine)) throw bob::trainer::IncompatibleMachine();
+  bob::core::array::assertSameDimensionLength(getBatchSize(), input.extent(0));
+  bob::core::array::assertSameDimensionLength(getBatchSize(), target.extent(0));
   train_(machine, input, target);
 }
 
-void train::MLPBackPropTrainer::train_(bob::machine::MLP& machine,
+void bob::trainer::MLPBackPropTrainer::train_(bob::machine::MLP& machine,
     const blitz::Array<double,2>& input,
     const blitz::Array<double,2>& target) {
 
