@@ -19,9 +19,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/trainer/KMeansTrainer.h"
-#include "bob/core/array_copy.h"
-#include "bob/trainer/Exception.h"
+#include <bob/trainer/KMeansTrainer.h>
+#include <bob/core/array_copy.h>
+#include <bob/trainer/Exception.h>
 #include <boost/random.hpp>
 
 #if BOOST_VERSION >= 104700

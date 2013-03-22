@@ -21,12 +21,15 @@
 #ifndef BOB_TRAINER_KMEANSTRAINER_H
 #define BOB_TRAINER_KMEANSTRAINER_H
 
-#include "bob/machine/KMeansMachine.h"
-#include "bob/trainer/EMTrainer.h"
+#include <bob/machine/KMeansMachine.h>
+#include <bob/trainer/EMTrainer.h>
 #include <boost/version.hpp>
 
-namespace bob {
-namespace trainer {
+namespace bob { namespace trainer {
+/**
+ * @ingroup TRAINER
+ * @{
+ */
 
 /**
  * Trains a KMeans machine.
@@ -190,7 +193,9 @@ class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, blitz::Array<
     blitz::Array<double,2> m_firstOrderStats;
 };
 
-}
-}
+/**
+ * @}
+ */
+}}
 
 #endif // BOB_TRAINER_KMEANSTRAINER_H
