@@ -24,9 +24,13 @@
 #define BOB_TRAINER_SVMTRAINER_H
 
 #include <vector>
-#include "bob/machine/SVM.h"
+#include <bob/machine/SVM.h>
 
 namespace bob { namespace trainer {
+  /**
+   * @ingroup TRAINER
+   * @{
+   */
 
   /**
    * This class emulates the behavior of the command line utility called
@@ -133,6 +137,9 @@ namespace bob { namespace trainer {
       
   };
 
+  /**
+   * @}
+   */
 }}
 
 #endif /* BOB_TRAINER_SVMTRAINER_H */

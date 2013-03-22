@@ -23,12 +23,10 @@
 #include <boost/format.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/algorithm/string.hpp>
-#include "bob/trainer/Exception.h"
-#include "bob/trainer/SVMTrainer.h"
-#include "bob/core/blitz_compat.h"
-#include "bob/core/logging.h"
-
-namespace trainer = bob::trainer;
+#include <bob/trainer/Exception.h>
+#include <bob/trainer/SVMTrainer.h>
+#include <bob/core/blitz_compat.h>
+#include <bob/core/logging.h>
 
 #ifdef BOB_DEBUG
 //remove newline
@@ -43,7 +41,7 @@ static void debug_libsvm(const char* s) {
   TDEBUG1("[libsvm-" << libsvm_version << "] " << strip(s));
 }
 
-trainer::SVMTrainer::SVMTrainer(
+bob::trainer::SVMTrainer::SVMTrainer(
     bob::machine::SupportVector::svm_t svm_type,
     bob::machine::SupportVector::kernel_t kernel_type,
     int degree,
@@ -77,7 +75,7 @@ trainer::SVMTrainer::SVMTrainer(
   m_param.weight = 0;
 }
 
-trainer::SVMTrainer::~SVMTrainer() { }
+bob::trainer::SVMTrainer::~SVMTrainer() { }
 
 /**
  * Erases an SVM problem:
@@ -226,7 +224,7 @@ static void svm_model_free(svm_model*& m) {
 #endif
 }
 
-boost::shared_ptr<bob::machine::SupportVector> trainer::SVMTrainer::train
+boost::shared_ptr<bob::machine::SupportVector> bob::trainer::SVMTrainer::train
 (const std::vector<blitz::Array<double, 2> >& data,
  const blitz::Array<double,1>& input_subtraction,
  const blitz::Array<double,1>& input_division) const {
@@ -285,7 +283,7 @@ boost::shared_ptr<bob::machine::SupportVector> trainer::SVMTrainer::train
   return retval;
 }
 
-boost::shared_ptr<bob::machine::SupportVector> trainer::SVMTrainer::train
+boost::shared_ptr<bob::machine::SupportVector> bob::trainer::SVMTrainer::train
 (const std::vector<blitz::Array<double,2> >& data) const {
   int n_features = data[0].extent(blitz::secondDim);
   blitz::Array<double,1> sub(n_features);
