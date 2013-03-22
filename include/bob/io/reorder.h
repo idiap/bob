@@ -23,7 +23,7 @@
 #ifndef BOB_IO_REORDER_H 
 #define BOB_IO_REORDER_H
 
-#include "bob/core/array.h"
+#include <bob/core/array.h>
 #include <stdint.h>
 
 namespace bob { namespace io {

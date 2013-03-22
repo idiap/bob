@@ -32,13 +32,13 @@
 #endif
 #include <hdf5.h>
 
-#include "bob/core/Exception.h"
-#include "bob/core/assert.h"
-#include "bob/core/array_copy.h"
+#include <bob/core/Exception.h>
+#include <bob/core/assert.h>
+#include <bob/core/array_copy.h>
 
-#include "bob/io/HDF5Attribute.h"
-#include "bob/io/HDF5Exception.h"
-#include "bob/io/HDF5Types.h"
+#include <bob/io/HDF5Attribute.h>
+#include <bob/io/HDF5Exception.h>
+#include <bob/io/HDF5Types.h>
 
 namespace bob { namespace io { namespace detail { namespace hdf5 {
 

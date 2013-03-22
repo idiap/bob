@@ -23,7 +23,7 @@
 #ifndef BOB_IO_MATUTILS_H 
 #define BOB_IO_MATUTILS_H
 
-#include "bob/core/array_type.h"
+#include <bob/core/array_type.h>
 #include <blitz/array.h>
 
 #include <matio.h>
@@ -32,8 +32,8 @@
 #include <map>
 #include <string>
 
-#include "bob/core/array.h"
-#include "bob/io/Exception.h"
+#include <bob/core/array.h>
+#include <bob/io/Exception.h>
 
 namespace bob { namespace io { namespace detail {
 

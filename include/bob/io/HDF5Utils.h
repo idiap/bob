@@ -44,7 +44,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <hdf5.h>
-#include "bob/io/HDF5Group.h"
+#include <bob/io/HDF5Group.h>
 
 namespace bob { namespace io { namespace detail { namespace hdf5 {
 

@@ -23,9 +23,9 @@
 #ifndef BOB_IO_TENSORFILE_H
 #define BOB_IO_TENSORFILE_H
 
-#include "bob/core/blitz_array.h"
-#include "bob/io/TensorFileHeader.h"
-#include "bob/io/Exception.h"
+#include <bob/core/blitz_array.h>
+#include <bob/io/TensorFileHeader.h>
+#include <bob/io/Exception.h>
 
 namespace bob { namespace io {
 

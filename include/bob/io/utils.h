@@ -8,8 +8,8 @@
 #ifndef BOB_IO_UTILS_H 
 #define BOB_IO_UTILS_H
 
-#include "boost/shared_ptr.hpp"
-#include "bob/io/File.h"
+#include <boost/shared_ptr.hpp>
+#include <bob/io/File.h>
 
 namespace bob { namespace io {
 

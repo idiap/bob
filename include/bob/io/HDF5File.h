@@ -26,7 +26,7 @@
 #define BOB_IO_HDF5FILE_H
 
 #include <boost/format.hpp>
-#include "bob/io/HDF5Utils.h"
+#include <bob/io/HDF5Utils.h>
 
 namespace bob { namespace io {
 
