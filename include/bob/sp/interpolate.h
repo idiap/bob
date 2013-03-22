@@ -26,13 +26,7 @@
 
 #include <blitz/array.h>
 
-namespace bob {
-/**
- * \ingroup libsp_api
- * @{
- *
- */
-namespace sp { namespace detail {
+namespace bob { namespace sp { namespace detail {
   /** 
    * @brief Perform bilinear interpolation in the 1D src array for the
    *   given floating point coordinates.
@@ -73,10 +67,6 @@ namespace sp { namespace detail {
 
     return (yh-y)*Il + (1-(yh-y))*Ih;
   }
-}}
-/**
- * @}
- */
-}
+}}}
 
 #endif /* BOB_SP_INTERPOLATE_H */

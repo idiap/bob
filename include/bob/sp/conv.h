@@ -28,15 +28,19 @@
 #include <algorithm>
 #include <blitz/array.h>
 
+/**
+ * @addtogroup SP sp
+ * @brief Signal Processing module API
+ */
+
 namespace bob {
 /**
- * \ingroup libsp_api
- * @{
- *
+ * @ingroup SP
  */
 namespace sp {
 
 /**
+ * @ingroup SP
  * @brief Enumerations of the possible output size options
  */
 namespace Conv {
@@ -112,6 +116,10 @@ namespace detail {
 
 }
 
+/**
+ * @ingroup SP
+ * @{
+ */
 
 /**
  * @brief Gets the required size of the output of a 1D convolution product
@@ -382,10 +390,9 @@ template<typename T, int N> void convSep(const blitz::Array<T,N>& A,
     throw SeparableConvolutionInvalidDim(dim,N-1);
 }
 
-}
 /**
  * @}
  */
-}
+}}
 
 #endif /* BOB_SP_CONV_H */

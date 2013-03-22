@@ -28,13 +28,7 @@
 #include <bob/core/assert.h>
 
 
-namespace bob {
-/**
- * \ingroup libsp_api
- * @{
- *
- */
-namespace sp {
+namespace bob { namespace sp {
 
 namespace detail {
 
@@ -104,6 +98,11 @@ namespace detail {
     }
   }
 }
+
+/**
+ * @ingroup SP
+ * @{
+ */
 
 /**
  * @brief Rearrange the output of the fft by moving the zero-frequency 
@@ -187,10 +186,9 @@ void ifftshift(const blitz::Array<T,2>& A, blitz::Array<T,2>& B)
   detail::fftshiftNoCheck(h_by_2, w_by_2, A, B);
 }
 
-}
 /**
  * @}
  */
-}
+}}
 
 #endif /* BOB_SP_FFTSHIFT_H */

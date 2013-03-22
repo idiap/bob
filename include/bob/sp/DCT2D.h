@@ -26,13 +26,11 @@
 
 #include <blitz/array.h>
 
-namespace bob {
+namespace bob { namespace sp {
 /**
- * \ingroup libsp_api
+ * @ingroup SP
  * @{
- *
  */
-namespace sp {
 
 /**
  * @brief This class implements a Discrete Cosine Transform based on the
@@ -181,10 +179,9 @@ class IDCT2D: public DCT2DAbstract
       blitz::Array<double,2>& dst) const;
 };
 
-}
 /**
  * @}
  */
-}
+}}
 
 #endif /* BOB_SP_DCT2D_H */

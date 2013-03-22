@@ -28,14 +28,10 @@
 #include <bob/sp/Exception.h>
 #include <bob/core/assert.h>
 
-namespace bob {
+namespace bob { namespace sp {
 /**
- * \ingroup libsp_api
- * @{
- *
+ * @ingroup SP
  */
-namespace sp {
-
 namespace Extrapolation {
   typedef enum BorderType_ {
     Zero,
@@ -45,6 +41,11 @@ namespace Extrapolation {
     Mirror
   } BorderType;
 }
+
+/**
+ * @ingroup SP
+ * @{
+ */
 
 /**
  * @brief Extrapolates a 1D array, padding with a constant
@@ -222,6 +223,10 @@ void extrapolateNearest(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
   }
 }
 
+
+/**
+ * @}
+ */
 
 namespace detail {
   template<typename T>
@@ -451,6 +456,11 @@ namespace detail {
 }
 
 /**
+ * @ingroup SP
+ * @{
+ */
+
+/**
  * @brief Extrapolates a 1D array, using circular extrapolation
  *   This code is longer than the simple algorithm which uses 
  *   a single loop to set the values of dst, but much 
@@ -600,11 +610,9 @@ void extrapolate(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst,
   }
 }
 
-
-}
 /**
  * @}
  */
-}
+}}
 
 #endif /* BOB_SP_EXTRAPOLATE_H */

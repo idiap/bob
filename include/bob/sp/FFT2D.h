@@ -27,13 +27,11 @@
 #include <complex>
 #include <blitz/array.h>
 
-namespace bob {
+namespace bob { namespace sp {
 /**
- * \ingroup libsp_api
+ * @ingroup SP
  * @{
- *
  */
-namespace sp {
 
 /**
  * @brief This class implements a Discrete Fourier Transform based on the
@@ -178,10 +176,9 @@ class IFFT2D: public FFT2DAbstract
     virtual void operator()(blitz::Array<std::complex<double>,2>& src_dst);
 };
 
-}
 /**
  * @}
  */
-}
+}}
 
 #endif /* BOB_SP_FFT2D_H */

@@ -26,6 +26,10 @@
 #include <bob/core/Exception.h>
 
 namespace bob { namespace sp {
+/**
+ * @ingroup SP
+ * @{
+ */
 
 class Exception: public bob::core::Exception {
 
@@ -71,6 +75,9 @@ class SeparableConvolutionInvalidDim: public Exception {
     int m_max_dim;
 };
 
+/**
+ * @}
+ */
 }}
 
 #endif /* BOB_SP_EXCEPTION_H */

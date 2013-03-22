@@ -28,14 +28,11 @@
 #include <bob/core/assert.h>
 #include <limits>
 
-namespace bob {
-/**
- * \ingroup libsp_api
- * @{
- *
- */
-namespace sp {
+namespace bob { namespace sp {
 
+/**
+ * @ingroup SP
+ */
 namespace quantization {
   /** 
    * @brief This enumeration defines different quantization methods
@@ -47,6 +44,11 @@ namespace quantization {
   }   
   QuantizationType;
 }
+
+/**
+ * @ingroup SP
+ * @{
+ */
 
 /**
  * @brief This class implements a Quantization of signals.
@@ -131,7 +133,9 @@ template <typename T> class Quantization
     void create_threshold_table();
 };
 
-
+/**
+ * @}
+ */
 }}
 
 

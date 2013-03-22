@@ -27,13 +27,11 @@
 #include <complex>
 #include <blitz/array.h>
 
-namespace bob {
+namespace bob { namespace sp {
 /**
- * \ingroup libsp_api
+ * @ingroup SP
  * @{
- *
  */
-namespace sp {
 
 /**
  * @brief This class implements a 1D Discrete Fourier Transform based on 
@@ -160,10 +158,9 @@ class IFFT1D: public FFT1DAbstract
       blitz::Array<std::complex<double>,1>& dst);
 };
 
-}
 /**
  * @}
  */
-}
+}}
 
 #endif /* BOB_SP_FFT1D_H */
