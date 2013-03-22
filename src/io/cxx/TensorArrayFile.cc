@@ -20,17 +20,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/io/TensorFile.h"
-#include "bob/io/CodecRegistry.h"
+#include <bob/io/TensorFile.h>
+#include <bob/io/CodecRegistry.h>
 
-namespace io = bob::io;
-namespace ca = bob::core::array;
-
-class TensorArrayFile: public io::File {
+class TensorArrayFile: public bob::io::File {
 
   public: //api
 
-    TensorArrayFile(const std::string& path, io::TensorFile::openmode mode):
+    TensorArrayFile(const std::string& path, bob::io::TensorFile::openmode mode):
       m_file(path, mode),
       m_filename(path) {
         if (m_file.size()) m_file.peek(m_type);
@@ -42,11 +39,11 @@ class TensorArrayFile: public io::File {
       return m_filename;
     }
 
-    virtual const ca::typeinfo& type_all () const {
+    virtual const bob::core::array::typeinfo& type_all () const {
       return m_type;
     }
 
-    virtual const ca::typeinfo& type () const {
+    virtual const bob::core::array::typeinfo& type () const {
       return m_type;
     }
 
@@ -58,7 +55,7 @@ class TensorArrayFile: public io::File {
       return s_codecname;
     }
 
-    virtual void read_all(ca::interface& buffer) {
+    virtual void read_all(bob::core::array::interface& buffer) {
 
       if(!m_file) 
         throw std::runtime_error("uninitialized binary file cannot be read");
@@ -67,7 +64,7 @@ class TensorArrayFile: public io::File {
 
     }
 
-    virtual void read(ca::interface& buffer, size_t index) {
+    virtual void read(bob::core::array::interface& buffer, size_t index) {
 
       if(!m_file) 
         throw std::runtime_error("uninitialized binary file cannot be read");
@@ -76,7 +73,7 @@ class TensorArrayFile: public io::File {
 
     }
 
-    virtual size_t append (const ca::interface& buffer) {
+    virtual size_t append (const bob::core::array::interface& buffer) {
 
       m_file.write(buffer);
 
@@ -86,7 +83,7 @@ class TensorArrayFile: public io::File {
 
     }
     
-    virtual void write (const ca::interface& buffer) {
+    virtual void write (const bob::core::array::interface& buffer) {
 
       //we don't have a special way to treat write()'s like in HDF5.
       append(buffer);
@@ -95,8 +92,8 @@ class TensorArrayFile: public io::File {
 
   private: //representation
 
-    io::TensorFile m_file;
-    ca::typeinfo m_type;
+    bob::io::TensorFile m_file;
+    bob::core::array::typeinfo m_type;
     std::string m_filename;
 
     static std::string s_codecname;
@@ -131,13 +128,13 @@ std::string TensorArrayFile::s_codecname = "bob.tensor";
  *
  * @note: This method can be static.
  */
-static boost::shared_ptr<io::File> 
+static boost::shared_ptr<bob::io::File> 
 make_file (const std::string& path, char mode) {
 
-  io::TensorFile::openmode _mode;
-  if (mode == 'r') _mode = io::TensorFile::in;
-  else if (mode == 'w') _mode = io::TensorFile::out;
-  else if (mode == 'a') _mode = io::TensorFile::append;
+  bob::io::TensorFile::openmode _mode;
+  if (mode == 'r') _mode = bob::io::TensorFile::in;
+  else if (mode == 'w') _mode = bob::io::TensorFile::out;
+  else if (mode == 'a') _mode = bob::io::TensorFile::append;
   else throw std::invalid_argument("unsupported tensor file opening mode");
 
   return boost::make_shared<TensorArrayFile>(path, _mode);
@@ -149,8 +146,8 @@ make_file (const std::string& path, char mode) {
  */
 static bool register_codec() {
 
-  boost::shared_ptr<io::CodecRegistry> instance =
-    io::CodecRegistry::instance();
+  boost::shared_ptr<bob::io::CodecRegistry> instance =
+    bob::io::CodecRegistry::instance();
   
   instance->registerExtension(".tensor", "torch3vision v2.1 tensor files", &make_file);
 

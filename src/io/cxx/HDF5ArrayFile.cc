@@ -24,25 +24,21 @@
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 
-#include "bob/io/CodecRegistry.h"
+#include <bob/io/CodecRegistry.h>
 
-#include "bob/io/HDF5File.h"
-#include "bob/io/HDF5Exception.h"
+#include <bob/io/HDF5File.h>
+#include <bob/io/HDF5Exception.h>
 
-#include "bob/core/logging.h"
-
-namespace fs = boost::filesystem;
-namespace io = bob::io;
-namespace ca = bob::core::array;
+#include <bob/core/logging.h>
 
 /**
  * Read and write arrays in HDF5 format
  */
-class HDF5ArrayFile: public io::File {
+class HDF5ArrayFile: public bob::io::File {
 
   public:
 
-    HDF5ArrayFile (const std::string& filename, io::HDF5File::mode_t mode):
+    HDF5ArrayFile (const std::string& filename, bob::io::HDF5File::mode_t mode):
       m_file(filename, mode), 
       m_filename(filename),
       m_size_arrayset(0),
@@ -57,12 +53,12 @@ class HDF5ArrayFile: public io::File {
           m_newfile = false; ///< blocks re-initialization
 
           //arrayset reading
-          const io::HDF5Descriptor& desc_arrayset = m_file.describe(m_path)[0];
+          const bob::io::HDF5Descriptor& desc_arrayset = m_file.describe(m_path)[0];
           desc_arrayset.type.copy_to(m_type_arrayset);
           m_size_arrayset = desc_arrayset.size;
 
           //array reading
-          const io::HDF5Descriptor& desc_array = m_file.describe(m_path)[1];
+          const bob::io::HDF5Descriptor& desc_array = m_file.describe(m_path)[1];
           desc_array.type.copy_to(m_type_array);
 
           //if m_type_all has extent == 1 on the first dimension and dimension
@@ -86,11 +82,11 @@ class HDF5ArrayFile: public io::File {
       return m_filename;
     }
 
-    virtual const ca::typeinfo& type_all () const {
+    virtual const bob::core::array::typeinfo& type_all () const {
       return m_type_array;
     }
 
-    virtual const ca::typeinfo& type () const {
+    virtual const bob::core::array::typeinfo& type () const {
       return m_type_arrayset;
     }
 
@@ -102,7 +98,7 @@ class HDF5ArrayFile: public io::File {
       return s_codecname;
     }
 
-    virtual void read_all(ca::interface& buffer) {
+    virtual void read_all(bob::core::array::interface& buffer) {
 
       if(m_newfile) {
         boost::format f("uninitialized HDF5 file at '%s' cannot be read");
@@ -115,7 +111,7 @@ class HDF5ArrayFile: public io::File {
       m_file.read_buffer(m_path, 0, buffer.type(), buffer.ptr());
     }
 
-    virtual void read(ca::interface& buffer, size_t index) {
+    virtual void read(bob::core::array::interface& buffer, size_t index) {
 
       if(m_newfile) {
         boost::format f("uninitialized HDF5 file at '%s' cannot be read");
@@ -128,7 +124,7 @@ class HDF5ArrayFile: public io::File {
       m_file.read_buffer(m_path, index, buffer.type(), buffer.ptr());
     }
 
-    virtual size_t append (const ca::interface& buffer) {
+    virtual size_t append (const bob::core::array::interface& buffer) {
 
       if (m_newfile) {
         //creates non-compressible, extensible dataset on HDF5 file
@@ -148,7 +144,7 @@ class HDF5ArrayFile: public io::File {
 
     }
 
-    virtual void write (const ca::interface& buffer) {
+    virtual void write (const bob::core::array::interface& buffer) {
 
       if (!m_newfile) {
         boost::format f("cannot perform single (array-style) write on file/dataset at '%s' that have already been initialized -- try to use a new file");
@@ -171,10 +167,10 @@ class HDF5ArrayFile: public io::File {
 
   private: //representation
     
-    io::HDF5File m_file;
+    bob::io::HDF5File m_file;
     std::string  m_filename;
-    ca::typeinfo m_type_array;    ///< type for reading all data at once
-    ca::typeinfo m_type_arrayset; ///< type for reading data by sub-arrays
+    bob::core::array::typeinfo m_type_array;    ///< type for reading all data at once
+    bob::core::array::typeinfo m_type_arrayset; ///< type for reading data by sub-arrays
     size_t       m_size_arrayset; ///< number of arrays in arrayset mode
     std::string  m_path; ///< default path to use
     bool         m_newfile; ///< path check optimization
@@ -211,13 +207,13 @@ std::string HDF5ArrayFile::s_codecname = "bob.hdf5";
  *
  * @note: This method can be static.
  */
-static boost::shared_ptr<io::File> 
+static boost::shared_ptr<bob::io::File> 
 make_file (const std::string& path, char mode) {
 
-  io::HDF5File::mode_t h5mode;
-  if (mode == 'r') h5mode = io::HDF5File::in;
-  else if (mode == 'w') h5mode = io::HDF5File::trunc;
-  else if (mode == 'a') h5mode = io::HDF5File::inout;
+  bob::io::HDF5File::mode_t h5mode;
+  if (mode == 'r') h5mode = bob::io::HDF5File::in;
+  else if (mode == 'w') h5mode = bob::io::HDF5File::trunc;
+  else if (mode == 'a') h5mode = bob::io::HDF5File::inout;
   else throw std::invalid_argument("unsupported file opening mode");
 
   return boost::make_shared<HDF5ArrayFile>(path, h5mode);
@@ -230,8 +226,8 @@ make_file (const std::string& path, char mode) {
 static bool register_codec() {
   static const char* description = "Hierarchical Data Format v5 (default)";
 
-  boost::shared_ptr<io::CodecRegistry> instance =
-    io::CodecRegistry::instance();
+  boost::shared_ptr<bob::io::CodecRegistry> instance =
+    bob::io::CodecRegistry::instance();
   
   instance->registerExtension(".h5", description, &make_file);
   instance->registerExtension(".hdf5", description, &make_file);

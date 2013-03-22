@@ -30,9 +30,9 @@
 #include <boost/algorithm/string.hpp>
 #include <string>
 
-#include "bob/io/CodecRegistry.h"
-#include "bob/io/Exception.h"
-#include "bob/core/logging.h"
+#include <bob/io/CodecRegistry.h>
+#include <bob/io/Exception.h>
+#include <bob/core/logging.h>
 
 #include <jpeglib.h>
 

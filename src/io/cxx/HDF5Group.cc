@@ -25,12 +25,9 @@
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
-#include "bob/io/HDF5Group.h"
-#include "bob/io/HDF5Utils.h"
-#include "bob/core/logging.h"
-
-namespace h5 = bob::io::detail::hdf5;
-namespace io = bob::io;
+#include <bob/io/HDF5Group.h>
+#include <bob/io/HDF5Utils.h>
+#include <bob/core/logging.h>
 
 /**
  * Creates an "auto-destructible" HDF5 Group
@@ -51,7 +48,7 @@ static boost::shared_ptr<hid_t> create_new_group(boost::shared_ptr<hid_t> p,
   boost::shared_ptr<hid_t> retval(new hid_t(-1), std::ptr_fun(delete_h5g));
   *retval = H5Gcreate2(*p, name.c_str(), H5P_DEFAULT, H5P_DEFAULT,
       H5P_DEFAULT);
-  if (*retval < 0) throw io::HDF5StatusError("H5Gcreate", *retval);
+  if (*retval < 0) throw bob::io::HDF5StatusError("H5Gcreate", *retval);
   return retval;
 }
 
@@ -59,11 +56,11 @@ static boost::shared_ptr<hid_t> open_group(boost::shared_ptr<hid_t> g,
     const char* name) {
   boost::shared_ptr<hid_t> retval(new hid_t(-1), std::ptr_fun(delete_h5g));
   *retval = H5Gopen2(*g, name, H5P_DEFAULT);
-  if (*retval < 0) throw io::HDF5StatusError("H5Gopen", *retval);
+  if (*retval < 0) throw bob::io::HDF5StatusError("H5Gopen", *retval);
   return retval;
 }
 
-h5::Group::Group(boost::shared_ptr<Group> parent, const std::string& name):
+bob::io::detail::hdf5::Group::Group(boost::shared_ptr<Group> parent, const std::string& name):
   m_name(name),
   m_id(create_new_group(parent->location(), name)),
   m_parent(parent)
@@ -71,16 +68,16 @@ h5::Group::Group(boost::shared_ptr<Group> parent, const std::string& name):
 }
 
 /**
- * Simple wrapper to call internal h5::Group::iterate_callback, that can call
+ * Simple wrapper to call internal bob::io::detail::hdf5::Group::iterate_callback, that can call
  * Group and Dataset constructors. Note that those are private or protected for
  * design reasons.
  */
 static herr_t group_iterate_callback(hid_t self, const char *name,
     const H5L_info_t *info, void *object) {
-  return static_cast<h5::Group*>(object)->iterate_callback(self, name, info);
+  return static_cast<bob::io::detail::hdf5::Group*>(object)->iterate_callback(self, name, info);
 }
 
-herr_t h5::Group::iterate_callback(hid_t self, const char *name,
+herr_t bob::io::detail::hdf5::Group::iterate_callback(hid_t self, const char *name,
     const H5L_info_t *info) {
 
   // If we are not looking at a hard link to the data, just ignore
@@ -92,17 +89,17 @@ herr_t h5::Group::iterate_callback(hid_t self, const char *name,
   // Get information about the HDF5 object
   H5O_info_t obj_info;
   herr_t status = H5Oget_info_by_name(self, name, &obj_info, H5P_DEFAULT);
-  if (status < 0) throw io::HDF5StatusError("H5Oget_info_by_name", status);
+  if (status < 0) throw bob::io::HDF5StatusError("H5Oget_info_by_name", status);
 
   switch(obj_info.type) {
     case H5O_TYPE_GROUP:
       //creates with recursion
-      m_groups[name] = boost::make_shared<h5::Group>(shared_from_this(),
+      m_groups[name] = boost::make_shared<bob::io::detail::hdf5::Group>(shared_from_this(),
           name, true);
       m_groups[name]->open_recursively();
       break;
     case H5O_TYPE_DATASET:
-      m_datasets[name] = boost::make_shared<h5::Dataset>(shared_from_this(),
+      m_datasets[name] = boost::make_shared<bob::io::detail::hdf5::Dataset>(shared_from_this(),
           std::string(name));
       break;
     default:
@@ -112,7 +109,7 @@ herr_t h5::Group::iterate_callback(hid_t self, const char *name,
   return 0;
 }
 
-h5::Group::Group(boost::shared_ptr<Group> parent,
+bob::io::detail::hdf5::Group::Group(boost::shared_ptr<Group> parent,
     const std::string& name, bool):
   m_name(name),
   m_id(open_group(parent->location(), name.c_str())),
@@ -126,51 +123,51 @@ h5::Group::Group(boost::shared_ptr<Group> parent,
   }
 }
 
-void h5::Group::open_recursively() {
+void bob::io::detail::hdf5::Group::open_recursively() {
   //iterates over this group only and instantiates what needs to be instantiated
   herr_t status = H5Literate(*m_id, H5_INDEX_NAME,
       H5_ITER_NATIVE, 0, group_iterate_callback, static_cast<void*>(this));
-  if (status < 0) throw io::HDF5StatusError("H5Literate", status);
+  if (status < 0) throw bob::io::HDF5StatusError("H5Literate", status);
 }
 
-h5::Group::Group(boost::shared_ptr<File> parent):
+bob::io::detail::hdf5::Group::Group(boost::shared_ptr<File> parent):
   m_name(""),
   m_id(open_group(parent->location(), "/")),
   m_parent()
 {
 }
 
-h5::Group::~Group() { }
+bob::io::detail::hdf5::Group::~Group() { }
 
-const boost::shared_ptr<h5::Group> h5::Group::parent() const {
+const boost::shared_ptr<bob::io::detail::hdf5::Group> bob::io::detail::hdf5::Group::parent() const {
   return m_parent.lock();
 }
 
-boost::shared_ptr<h5::Group> h5::Group::parent() {
+boost::shared_ptr<bob::io::detail::hdf5::Group> bob::io::detail::hdf5::Group::parent() {
   return m_parent.lock();
 }
 
-const std::string& h5::Group::filename() const {
+const std::string& bob::io::detail::hdf5::Group::filename() const {
   return parent()->filename();
 }
 
-std::string h5::Group::path() const {
+std::string bob::io::detail::hdf5::Group::path() const {
   return (m_name.size()?parent()->path():"") + "/" + m_name;
 }
 
-std::string h5::Group::url() const {
+std::string bob::io::detail::hdf5::Group::url() const {
   return filename() + ":" + path();
 }
 
-const boost::shared_ptr<h5::File> h5::Group::file() const {
+const boost::shared_ptr<bob::io::detail::hdf5::File> bob::io::detail::hdf5::Group::file() const {
   return parent()->file();
 }
 
-boost::shared_ptr<h5::File> h5::Group::file() {
+boost::shared_ptr<bob::io::detail::hdf5::File> bob::io::detail::hdf5::Group::file() {
   return parent()->file();
 }
 
-boost::shared_ptr<h5::Group> h5::Group::cd(const std::string& dir) {
+boost::shared_ptr<bob::io::detail::hdf5::Group> bob::io::detail::hdf5::Group::cd(const std::string& dir) {
   //empty dir == void action, return self
   if (!dir.size()) return shared_from_this();
 
@@ -214,11 +211,11 @@ boost::shared_ptr<h5::Group> h5::Group::cd(const std::string& dir) {
   return m_groups[mydir]->cd(dir.substr(pos+1));
 }
 
-const boost::shared_ptr<h5::Group> h5::Group::cd(const std::string& dir) const {
-  return const_cast<h5::Group*>(this)->cd(dir);
+const boost::shared_ptr<bob::io::detail::hdf5::Group> bob::io::detail::hdf5::Group::cd(const std::string& dir) const {
+  return const_cast<bob::io::detail::hdf5::Group*>(this)->cd(dir);
 }
 
-boost::shared_ptr<h5::Dataset> h5::Group::operator[] (const std::string& dir) {
+boost::shared_ptr<bob::io::detail::hdf5::Dataset> bob::io::detail::hdf5::Group::operator[] (const std::string& dir) {
   std::string::size_type pos = dir.find_last_of('/');
   if (pos == std::string::npos) { //search on the current group
     if (!has_dataset(dir)) {
@@ -235,22 +232,22 @@ boost::shared_ptr<h5::Dataset> h5::Group::operator[] (const std::string& dir) {
   //until we find the place defined by the user or raise an exception.
   std::string dest = dir.substr(0, pos);
   if (!dest.size()) dest = "/";
-  boost::shared_ptr<h5::Group> g = cd(dest);
+  boost::shared_ptr<bob::io::detail::hdf5::Group> g = cd(dest);
   return g->operator[](dir.substr(pos+1));
 }
 
-const boost::shared_ptr<h5::Dataset> h5::Group::operator[] (const std::string& dir) const {
-  return const_cast<h5::Group*>(this)->operator[](dir);
+const boost::shared_ptr<bob::io::detail::hdf5::Dataset> bob::io::detail::hdf5::Group::operator[] (const std::string& dir) const {
+  return const_cast<bob::io::detail::hdf5::Group*>(this)->operator[](dir);
 }
 
-void h5::Group::reset() {
-  typedef std::map<std::string, boost::shared_ptr<h5::Group> > group_map_type;
+void bob::io::detail::hdf5::Group::reset() {
+  typedef std::map<std::string, boost::shared_ptr<bob::io::detail::hdf5::Group> > group_map_type;
   for (group_map_type::const_iterator it = m_groups.begin();
       it != m_groups.end(); ++it) {
     remove_group(it->first);
   }
 
-  typedef std::map<std::string, boost::shared_ptr<h5::Dataset> >
+  typedef std::map<std::string, boost::shared_ptr<bob::io::detail::hdf5::Dataset> >
     dataset_map_type;
   for (dataset_map_type::const_iterator it = m_datasets.begin();
       it != m_datasets.end(); ++it) {
@@ -258,11 +255,11 @@ void h5::Group::reset() {
   }
 }
 
-boost::shared_ptr<h5::Group> h5::Group::create_group(const std::string& dir) {
+boost::shared_ptr<bob::io::detail::hdf5::Group> bob::io::detail::hdf5::Group::create_group(const std::string& dir) {
   std::string::size_type pos = dir.find_last_of('/');
   if (pos == std::string::npos) { //creates on the current group
-    boost::shared_ptr<h5::Group> g =
-      boost::make_shared<h5::Group>(shared_from_this(), dir);
+    boost::shared_ptr<bob::io::detail::hdf5::Group> g =
+      boost::make_shared<bob::io::detail::hdf5::Group>(shared_from_this(), dir);
     m_groups[dir] = g;
     return g;
   }
@@ -273,16 +270,16 @@ boost::shared_ptr<h5::Group> h5::Group::create_group(const std::string& dir) {
   //until we find the place defined by the user or raise an exception.
   std::string dest = dir.substr(0, pos);
   if (!dest.size()) dest = "/";
-  boost::shared_ptr<h5::Group> g = cd(dest);
+  boost::shared_ptr<bob::io::detail::hdf5::Group> g = cd(dest);
   return g->create_group(dir.substr(pos+1));
 }
 
-void h5::Group::remove_group(const std::string& dir) {
+void bob::io::detail::hdf5::Group::remove_group(const std::string& dir) {
   std::string::size_type pos = dir.find_last_of('/');
   if (pos == std::string::npos) { //copy on the current group
     herr_t status = H5Ldelete(*m_id, dir.c_str(), H5P_DEFAULT);
-    if (status < 0) throw io::HDF5StatusError("H5Ldelete", status);
-    typedef std::map<std::string, boost::shared_ptr<h5::Group> > map_type;
+    if (status < 0) throw bob::io::HDF5StatusError("H5Ldelete", status);
+    typedef std::map<std::string, boost::shared_ptr<bob::io::detail::hdf5::Group> > map_type;
     map_type::iterator it = m_groups.find(dir);
     m_groups.erase(it);
     return;
@@ -294,7 +291,7 @@ void h5::Group::remove_group(const std::string& dir) {
   //until we find the place defined by the user or raise an exception.
   std::string dest = dir.substr(0, pos);
   if (!dest.size()) dest = "/";
-  boost::shared_ptr<h5::Group> g = cd(dest);
+  boost::shared_ptr<bob::io::detail::hdf5::Group> g = cd(dest);
   return g->remove_group(dir.substr(pos+1));
 }
 
@@ -316,31 +313,31 @@ static boost::shared_ptr<hid_t> open_plist(hid_t classid) {
   boost::shared_ptr<hid_t> retval(new hid_t(-1), std::ptr_fun(delete_h5plist));
   *retval = H5Pcreate(classid);
   if (*retval < 0) {
-    throw io::HDF5StatusError("H5Pcreate", *retval);
+    throw bob::io::HDF5StatusError("H5Pcreate", *retval);
   }
   return retval;
 }
 
-void h5::Group::rename_group(const std::string& from, const std::string& to) {
+void bob::io::detail::hdf5::Group::rename_group(const std::string& from, const std::string& to) {
   boost::shared_ptr<hid_t> create_props = open_plist(H5P_LINK_CREATE);
   H5Pset_create_intermediate_group(*create_props, 1);
   herr_t status = H5Lmove(*m_id, from.c_str(), H5L_SAME_LOC, to.c_str(),
       *create_props, H5P_DEFAULT);
-  if (status < 0) throw io::HDF5StatusError("H5Lmove", status);
+  if (status < 0) throw bob::io::HDF5StatusError("H5Lmove", status);
 }
 
-void h5::Group::copy_group(const boost::shared_ptr<Group> other,
+void bob::io::detail::hdf5::Group::copy_group(const boost::shared_ptr<Group> other,
     const std::string& dir) {
   std::string::size_type pos = dir.find_last_of('/');
   if (pos == std::string::npos) { //copy on the current group
     const char* use_name = dir.size()?dir.c_str():other->name().c_str();
     herr_t status = H5Ocopy(*other->parent()->location(),
         other->name().c_str(), *m_id, use_name, H5P_DEFAULT, H5P_DEFAULT);
-    if (status < 0) throw io::HDF5StatusError("H5Ocopy", status);
+    if (status < 0) throw bob::io::HDF5StatusError("H5Ocopy", status);
 
     //read new group contents
-    boost::shared_ptr<h5::Group> copied =
-      boost::make_shared<h5::Group>(shared_from_this(), use_name);
+    boost::shared_ptr<bob::io::detail::hdf5::Group> copied =
+      boost::make_shared<bob::io::detail::hdf5::Group>(shared_from_this(), use_name);
     copied->open_recursively();
 
     //index it
@@ -355,15 +352,15 @@ void h5::Group::copy_group(const boost::shared_ptr<Group> other,
   //until we find the place defined by the user or return false.
   std::string dest = dir.substr(0, pos);
   if (!dest.size()) dest = "/";
-  boost::shared_ptr<h5::Group> g = cd(dest);
+  boost::shared_ptr<bob::io::detail::hdf5::Group> g = cd(dest);
   return g->copy_group(other, dir.substr(pos+1));
 }
 
-bool h5::Group::has_group(const std::string& dir) const {
+bool bob::io::detail::hdf5::Group::has_group(const std::string& dir) const {
   std::string::size_type pos = dir.find_last_of('/');
   if (pos == std::string::npos) { //search on the current group
     if (dir == "." || dir == "..") return true; //special case
-    typedef std::map<std::string, boost::shared_ptr<h5::Group> > map_type;
+    typedef std::map<std::string, boost::shared_ptr<bob::io::detail::hdf5::Group> > map_type;
     map_type::const_iterator it = m_groups.find(dir);
     return (it != m_groups.end());
   }
@@ -374,17 +371,17 @@ bool h5::Group::has_group(const std::string& dir) const {
   //until we find the place defined by the user or return false.
   std::string dest = dir.substr(0, pos);
   if (!dest.size()) dest = "/";
-  boost::shared_ptr<h5::Group> g = cd(dest);
+  boost::shared_ptr<bob::io::detail::hdf5::Group> g = cd(dest);
   return g->has_group(dir.substr(pos+1));
 }
 
-boost::shared_ptr<h5::Dataset> h5::Group::create_dataset
+boost::shared_ptr<bob::io::detail::hdf5::Dataset> bob::io::detail::hdf5::Group::create_dataset
 (const std::string& dir, const bob::io::HDF5Type& type, bool list,
  size_t compression) {
   std::string::size_type pos = dir.find_last_of('/');
   if (pos == std::string::npos) { //creates on the current group
-    boost::shared_ptr<h5::Dataset> d =
-      boost::make_shared<h5::Dataset>(shared_from_this(), dir, type,
+    boost::shared_ptr<bob::io::detail::hdf5::Dataset> d =
+      boost::make_shared<bob::io::detail::hdf5::Dataset>(shared_from_this(), dir, type,
           list, compression);
     m_datasets[dir] = d;
     return d;
@@ -395,7 +392,7 @@ boost::shared_ptr<h5::Dataset> h5::Group::create_dataset
   //the same as we do here. This will recurse through the directory structure
   //until we find the place defined by the user or return false.
   std::string dest = dir.substr(0, pos);
-  boost::shared_ptr<h5::Group> g;
+  boost::shared_ptr<bob::io::detail::hdf5::Group> g;
   if (!dest.size()) g = cd("/");
   else {
     //let's make sure the directory exists, or let's create it recursively
@@ -405,12 +402,12 @@ boost::shared_ptr<h5::Dataset> h5::Group::create_dataset
   return g->create_dataset(dir.substr(pos+1), type, list, compression);
 }
 
-void h5::Group::remove_dataset(const std::string& dir) {
+void bob::io::detail::hdf5::Group::remove_dataset(const std::string& dir) {
   std::string::size_type pos = dir.find_last_of('/');
   if (pos == std::string::npos) { //removes on the current group
     herr_t status = H5Ldelete(*m_id, dir.c_str(), H5P_DEFAULT);
-    if (status < 0) throw io::HDF5StatusError("H5Ldelete", status);
-    typedef std::map<std::string, boost::shared_ptr<h5::Dataset> > map_type;
+    if (status < 0) throw bob::io::HDF5StatusError("H5Ldelete", status);
+    typedef std::map<std::string, boost::shared_ptr<bob::io::detail::hdf5::Dataset> > map_type;
     map_type::iterator it = m_datasets.find(dir);
     m_datasets.erase(it);
     return;
@@ -422,19 +419,19 @@ void h5::Group::remove_dataset(const std::string& dir) {
   //until we find the place defined by the user or raise an exception.
   std::string dest = dir.substr(0, pos);
   if (!dest.size()) dest = "/";
-  boost::shared_ptr<h5::Group> g = cd(dest);
+  boost::shared_ptr<bob::io::detail::hdf5::Group> g = cd(dest);
   return g->remove_dataset(dir.substr(pos+1));
 }
 
-void h5::Group::rename_dataset(const std::string& from, const std::string& to) {
+void bob::io::detail::hdf5::Group::rename_dataset(const std::string& from, const std::string& to) {
   boost::shared_ptr<hid_t> create_props = open_plist(H5P_LINK_CREATE);
   H5Pset_create_intermediate_group(*create_props, 1);
   herr_t status = H5Lmove(*m_id, from.c_str(), H5L_SAME_LOC, to.c_str(),
       *create_props, H5P_DEFAULT);
-  if (status < 0) throw io::HDF5StatusError("H5Ldelete", status);
+  if (status < 0) throw bob::io::HDF5StatusError("H5Ldelete", status);
 }
 
-void h5::Group::copy_dataset(const boost::shared_ptr<Dataset> other,
+void bob::io::detail::hdf5::Group::copy_dataset(const boost::shared_ptr<Dataset> other,
     const std::string& dir) {
 
   std::string::size_type pos = dir.find_last_of('/');
@@ -442,9 +439,9 @@ void h5::Group::copy_dataset(const boost::shared_ptr<Dataset> other,
     const char* use_name = dir.size()?dir.c_str():other->name().c_str();
     herr_t status = H5Ocopy(*other->parent()->location(),
         other->name().c_str(), *m_id, use_name, H5P_DEFAULT, H5P_DEFAULT);
-    if (status < 0) throw io::HDF5StatusError("H5Ocopy", status);
+    if (status < 0) throw bob::io::HDF5StatusError("H5Ocopy", status);
     //read new group contents
-    m_datasets[use_name] = boost::make_shared<h5::Dataset>(shared_from_this(), use_name);
+    m_datasets[use_name] = boost::make_shared<bob::io::detail::hdf5::Dataset>(shared_from_this(), use_name);
     return;
   }
 
@@ -454,14 +451,14 @@ void h5::Group::copy_dataset(const boost::shared_ptr<Dataset> other,
   //until we find the place defined by the user.
   std::string dest = dir.substr(0, pos);
   if (!dest.size()) dest = "/";
-  boost::shared_ptr<h5::Group> g = cd(dest);
+  boost::shared_ptr<bob::io::detail::hdf5::Group> g = cd(dest);
   return g->copy_dataset(other, dir.substr(pos+1));
 }
 
-bool h5::Group::has_dataset(const std::string& dir) const {
+bool bob::io::detail::hdf5::Group::has_dataset(const std::string& dir) const {
   std::string::size_type pos = dir.find_last_of('/');
   if (pos == std::string::npos) { //search on the current group
-    typedef std::map<std::string, boost::shared_ptr<h5::Dataset> > map_type;
+    typedef std::map<std::string, boost::shared_ptr<bob::io::detail::hdf5::Dataset> > map_type;
     map_type::const_iterator it = m_datasets.find(dir);
     return (it != m_datasets.end());
   }
@@ -472,43 +469,43 @@ bool h5::Group::has_dataset(const std::string& dir) const {
   //until we find the place defined by the user or return false.
   std::string dest = dir.substr(0, pos);
   if (!dest.size()) dest = "/";
-  boost::shared_ptr<h5::Group> g = cd(dest);
+  boost::shared_ptr<bob::io::detail::hdf5::Group> g = cd(dest);
   return g->has_dataset(dir.substr(pos+1));
 }
 
-void h5::Group::gettype_attribute(const std::string& name,
-    io::HDF5Type& type) const {
-  h5::gettype_attribute(m_id, name, type);
+void bob::io::detail::hdf5::Group::gettype_attribute(const std::string& name,
+    bob::io::HDF5Type& type) const {
+  bob::io::detail::hdf5::gettype_attribute(m_id, name, type);
 }
 
-bool h5::Group::has_attribute(const std::string& name) const {
-  return h5::has_attribute(m_id, name);
+bool bob::io::detail::hdf5::Group::has_attribute(const std::string& name) const {
+  return bob::io::detail::hdf5::has_attribute(m_id, name);
 }
 
-void h5::Group::delete_attribute (const std::string& name) {
-  h5::delete_attribute(m_id, name);
+void bob::io::detail::hdf5::Group::delete_attribute (const std::string& name) {
+  bob::io::detail::hdf5::delete_attribute(m_id, name);
 }
 
-void h5::Group::read_attribute (const std::string& name,
+void bob::io::detail::hdf5::Group::read_attribute (const std::string& name,
     const bob::io::HDF5Type& dest_type, void* buffer) const {
-  h5::read_attribute(m_id, name, dest_type, buffer);
+  bob::io::detail::hdf5::read_attribute(m_id, name, dest_type, buffer);
 }
 
-void h5::Group::write_attribute (const std::string& name,
+void bob::io::detail::hdf5::Group::write_attribute (const std::string& name,
     const bob::io::HDF5Type& dest_type, const void* buffer) {
-  h5::write_attribute(m_id, name, dest_type, buffer);
+  bob::io::detail::hdf5::write_attribute(m_id, name, dest_type, buffer);
 }
 
-void h5::Group::list_attributes(std::map<std::string, bob::io::HDF5Type>& attributes) const {
-  h5::list_attributes(m_id, attributes);
+void bob::io::detail::hdf5::Group::list_attributes(std::map<std::string, bob::io::HDF5Type>& attributes) const {
+  bob::io::detail::hdf5::list_attributes(m_id, attributes);
 }
 
-template <> void h5::Group::set_attribute<std::string>(const std::string& name, const std::string& v) {
+template <> void bob::io::detail::hdf5::Group::set_attribute<std::string>(const std::string& name, const std::string& v) {
   bob::io::HDF5Type dest_type(v);
   write_attribute(name, dest_type, reinterpret_cast<const void*>(v.c_str()));
 }
 
-template <> std::string h5::Group::get_attribute(const std::string& name) const {
+template <> std::string bob::io::detail::hdf5::Group::get_attribute(const std::string& name) const {
   HDF5Type type;
   gettype_attribute(name, type);
   boost::shared_array<char> v(new char[type.shape()[0]+1]);
@@ -518,15 +515,15 @@ template <> std::string h5::Group::get_attribute(const std::string& name) const 
   return retval;
 }
 
-h5::RootGroup::RootGroup(boost::shared_ptr<File> parent):
-  h5::Group(parent),
+bob::io::detail::hdf5::RootGroup::RootGroup(boost::shared_ptr<File> parent):
+  bob::io::detail::hdf5::Group(parent),
   m_parent(parent)
 {
 }
 
-h5::RootGroup::~RootGroup() {
+bob::io::detail::hdf5::RootGroup::~RootGroup() {
 }
 
-const std::string& h5::RootGroup::filename() const {
+const std::string& bob::io::detail::hdf5::RootGroup::filename() const {
   return m_parent.lock()->filename();
 }

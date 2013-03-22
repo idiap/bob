@@ -21,32 +21,29 @@
  */
 
 #include <cstring> //for memcpy
-#include "bob/io/reorder.h"
-#include "bob/io/Exception.h"
+#include <bob/io/reorder.h>
+#include <bob/io/Exception.h>
 
-namespace io = bob::io;
-namespace ca = bob::core::array;
-
-void io::rc2d(size_t& row, size_t& col, const size_t i, const size_t j,
+void bob::io::rc2d(size_t& row, size_t& col, const size_t i, const size_t j,
     const size_t* shape) {
   row = (i * shape[1]) + j;
   col = (j * shape[0]) + i;
 }
 
-void io::rc3d(size_t& row, size_t& col, const size_t i, const size_t j,
+void bob::io::rc3d(size_t& row, size_t& col, const size_t i, const size_t j,
     const size_t k, const size_t* shape) {
   row = ( (i * shape[1]) + j ) * shape[2] + k;
   col = ( (k * shape[1]) + j ) * shape[0] + i;
 }
 
-void io::rc4d(size_t& row, size_t& col, const size_t i, const size_t j,
+void bob::io::rc4d(size_t& row, size_t& col, const size_t i, const size_t j,
     const size_t k, const size_t l, const size_t* shape) {
   row = ( ( i * shape[1] + j ) * shape[2] + k ) * shape[3] + l;
   col = ( ( l * shape[2] + k ) * shape[1] + j ) * shape[0] + i;
 }
 
-void io::row_to_col_order(const void* src_, void* dst_,
-    const ca::typeinfo& info) {
+void bob::io::row_to_col_order(const void* src_, void* dst_,
+    const bob::core::array::typeinfo& info) {
 
   size_t dsize = info.item_size();
 
@@ -64,7 +61,7 @@ void io::row_to_col_order(const void* src_, void* dst_,
       for (size_t i=0; i<info.shape[0]; ++i)
         for (size_t j=0; j<info.shape[1]; ++j) {
           size_t row_major, col_major;
-          io::rc2d(row_major, col_major, i, j, info.shape);
+          bob::io::rc2d(row_major, col_major, i, j, info.shape);
           row_major *= dsize;
           col_major *= dsize;
           std::memcpy(&dst[col_major], &src[row_major], dsize);
@@ -76,7 +73,7 @@ void io::row_to_col_order(const void* src_, void* dst_,
         for (size_t j=0; j<info.shape[1]; ++j)
           for (size_t k=0; k<info.shape[2]; ++k) {
             size_t row_major, col_major;
-            io::rc3d(row_major, col_major, i, j, k, info.shape);
+            bob::io::rc3d(row_major, col_major, i, j, k, info.shape);
             row_major *= dsize;
             col_major *= dsize;
             std::memcpy(&dst[col_major], &src[row_major], dsize);
@@ -89,7 +86,7 @@ void io::row_to_col_order(const void* src_, void* dst_,
           for (size_t k=0; k<info.shape[2]; ++k)
             for (size_t l=0; l<info.shape[3]; ++l) {
               size_t row_major, col_major;
-              io::rc4d(row_major, col_major, i, j, k, l, info.shape);
+              bob::io::rc4d(row_major, col_major, i, j, k, l, info.shape);
               row_major *= dsize;
               col_major *= dsize;
               std::memcpy(&dst[col_major], &src[row_major], dsize);
@@ -97,12 +94,12 @@ void io::row_to_col_order(const void* src_, void* dst_,
       break;
 
     default:
-      throw io::DimensionError(info.nd, BOB_MAX_DIM);
+      throw bob::io::DimensionError(info.nd, BOB_MAX_DIM);
   }
 }
   
-void io::col_to_row_order(const void* src_, void* dst_, 
-    const ca::typeinfo& info) {
+void bob::io::col_to_row_order(const void* src_, void* dst_, 
+    const bob::core::array::typeinfo& info) {
 
   size_t dsize = info.item_size();
 
@@ -120,7 +117,7 @@ void io::col_to_row_order(const void* src_, void* dst_,
       for (size_t i=0; i<info.shape[0]; ++i)
         for (size_t j=0; j<info.shape[1]; ++j) {
           size_t row_major, col_major;
-          io::rc2d(row_major, col_major, i, j, info.shape);
+          bob::io::rc2d(row_major, col_major, i, j, info.shape);
           row_major *= dsize;
           col_major *= dsize;
           std::memcpy(&dst[row_major], &src[col_major], dsize);
@@ -132,7 +129,7 @@ void io::col_to_row_order(const void* src_, void* dst_,
         for (size_t j=0; j<info.shape[1]; ++j)
           for (size_t k=0; k<info.shape[2]; ++k) {
             size_t row_major, col_major;
-            io::rc3d(row_major, col_major, i, j, k, info.shape);
+            bob::io::rc3d(row_major, col_major, i, j, k, info.shape);
             row_major *= dsize;
             col_major *= dsize;
             std::memcpy(&dst[row_major], &src[col_major], dsize);
@@ -145,7 +142,7 @@ void io::col_to_row_order(const void* src_, void* dst_,
           for (size_t k=0; k<info.shape[2]; ++k)
             for (size_t l=0; l<info.shape[3]; ++l) {
               size_t row_major, col_major;
-              io::rc4d(row_major, col_major, i, j, k, l, info.shape);
+              bob::io::rc4d(row_major, col_major, i, j, k, l, info.shape);
               row_major *= dsize;
               col_major *= dsize;
               std::memcpy(&dst[row_major], &src[col_major], dsize);
@@ -153,12 +150,12 @@ void io::col_to_row_order(const void* src_, void* dst_,
       break;
 
     default:
-      throw io::DimensionError(info.nd, BOB_MAX_DIM);
+      throw bob::io::DimensionError(info.nd, BOB_MAX_DIM);
   }
 }
 
-void io::row_to_col_order_complex(const void* src_, void* dst_re_,
-    void* dst_im_, const ca::typeinfo& info) {
+void bob::io::row_to_col_order_complex(const void* src_, void* dst_re_,
+    void* dst_im_, const bob::core::array::typeinfo& info) {
 
   size_t dsize = info.item_size();
   size_t dsize2 = dsize/2; ///< size of each complex component (real, imaginary)
@@ -181,7 +178,7 @@ void io::row_to_col_order_complex(const void* src_, void* dst_re_,
       for (size_t i=0; i<info.shape[0]; ++i)
         for (size_t j=0; j<info.shape[1]; ++j) {
           size_t row_major, col_major;
-          io::rc2d(row_major, col_major, i, j, info.shape);
+          bob::io::rc2d(row_major, col_major, i, j, info.shape);
           row_major *= dsize;
           col_major *= dsize2;
           std::memcpy(&dst_re[col_major], &src[row_major]       , dsize2);
@@ -194,7 +191,7 @@ void io::row_to_col_order_complex(const void* src_, void* dst_re_,
         for (size_t j=0; j<info.shape[1]; ++j)
           for (size_t k=0; k<info.shape[2]; ++k) {
             size_t row_major, col_major;
-            io::rc3d(row_major, col_major, i, j, k, info.shape);
+            bob::io::rc3d(row_major, col_major, i, j, k, info.shape);
             row_major *= dsize;
             col_major *= dsize2;
             std::memcpy(&dst_re[col_major], &src[row_major]       , dsize2);
@@ -208,7 +205,7 @@ void io::row_to_col_order_complex(const void* src_, void* dst_re_,
           for (size_t k=0; k<info.shape[2]; ++k)
             for (size_t l=0; l<info.shape[3]; ++l) {
               size_t row_major, col_major;
-              io::rc4d(row_major, col_major, i, j, k, l, info.shape);
+              bob::io::rc4d(row_major, col_major, i, j, k, l, info.shape);
               row_major *= dsize;
               col_major *= dsize2;
               std::memcpy(&dst_re[col_major], &src[row_major]       , dsize2);
@@ -217,12 +214,12 @@ void io::row_to_col_order_complex(const void* src_, void* dst_re_,
       break;
 
     default:
-      throw io::DimensionError(info.nd, BOB_MAX_DIM);
+      throw bob::io::DimensionError(info.nd, BOB_MAX_DIM);
   }
 }
   
-void io::col_to_row_order_complex(const void* src_re_, const void* src_im_,
-    void* dst_, const ca::typeinfo& info) {
+void bob::io::col_to_row_order_complex(const void* src_re_, const void* src_im_,
+    void* dst_, const bob::core::array::typeinfo& info) {
 
   size_t dsize = info.item_size();
   size_t dsize2 = dsize/2; ///< size of each complex component (real, imaginary)
@@ -245,7 +242,7 @@ void io::col_to_row_order_complex(const void* src_re_, const void* src_im_,
       for (size_t i=0; i<info.shape[0]; ++i)
         for (size_t j=0; j<info.shape[1]; ++j) {
           size_t row_major, col_major;
-          io::rc2d(row_major, col_major, i, j, info.shape);
+          bob::io::rc2d(row_major, col_major, i, j, info.shape);
           row_major *= dsize;
           col_major *= dsize2;
           std::memcpy(&dst[row_major],        &src_re[col_major], dsize2);
@@ -258,7 +255,7 @@ void io::col_to_row_order_complex(const void* src_re_, const void* src_im_,
         for (size_t j=0; j<info.shape[1]; ++j)
           for (size_t k=0; k<info.shape[2]; ++k) {
             size_t row_major, col_major;
-            io::rc3d(row_major, col_major, i, j, k, info.shape);
+            bob::io::rc3d(row_major, col_major, i, j, k, info.shape);
             row_major *= dsize;
             col_major *= dsize2;
             std::memcpy(&dst[row_major]       , &src_re[col_major], dsize2); 
@@ -272,7 +269,7 @@ void io::col_to_row_order_complex(const void* src_re_, const void* src_im_,
           for (size_t k=0; k<info.shape[2]; ++k)
             for (size_t l=0; l<info.shape[3]; ++l) {
               size_t row_major, col_major;
-              io::rc4d(row_major, col_major, i, j, k, l, info.shape);
+              bob::io::rc4d(row_major, col_major, i, j, k, l, info.shape);
               row_major *= dsize;
               col_major *= dsize2;
               std::memcpy(&dst[row_major]       , &src_re[col_major], dsize2); 
@@ -281,7 +278,7 @@ void io::col_to_row_order_complex(const void* src_re_, const void* src_im_,
       break;
 
     default:
-      throw io::DimensionError(info.nd, BOB_MAX_DIM);
+      throw bob::io::DimensionError(info.nd, BOB_MAX_DIM);
   }
 }
   

@@ -22,17 +22,14 @@
 
 #include <boost/make_shared.hpp>
 
-#include "bob/io/BinFile.h"
-#include "bob/io/CodecRegistry.h"
+#include <bob/io/BinFile.h>
+#include <bob/io/CodecRegistry.h>
 
-namespace io = bob::io;
-namespace ca = bob::core::array;
-
-class BinaryArrayFile: public io::File {
+class BinaryArrayFile: public bob::io::File {
 
   public: //api
 
-    BinaryArrayFile(const std::string& path, io::BinFile::openmode mode):
+    BinaryArrayFile(const std::string& path, bob::io::BinFile::openmode mode):
       m_file(path, mode),
       m_filename(path) {
         if (m_file.size()) m_type.set(m_file.getElementType(), 
@@ -45,11 +42,11 @@ class BinaryArrayFile: public io::File {
       return m_filename;
     }
 
-    virtual const ca::typeinfo& type () const {
+    virtual const bob::core::array::typeinfo& type () const {
       return m_type;
     }
 
-    virtual const ca::typeinfo& type_all () const {
+    virtual const bob::core::array::typeinfo& type_all () const {
       return m_type;
     }
 
@@ -61,7 +58,7 @@ class BinaryArrayFile: public io::File {
       return s_codecname;
     }
 
-    virtual void read(ca::interface& buffer, size_t index) {
+    virtual void read(bob::core::array::interface& buffer, size_t index) {
 
       if(!m_file)
         throw std::runtime_error("uninitialized binary file cannot be read");
@@ -70,7 +67,7 @@ class BinaryArrayFile: public io::File {
 
     }
 
-    virtual void read_all(ca::interface& buffer) {
+    virtual void read_all(bob::core::array::interface& buffer) {
 
       if(!m_file)
         throw std::runtime_error("uninitialized binary file cannot be read");
@@ -79,7 +76,7 @@ class BinaryArrayFile: public io::File {
 
     }
 
-    virtual size_t append (const ca::interface& buffer) {
+    virtual size_t append (const bob::core::array::interface& buffer) {
 
       m_file.write(buffer);
 
@@ -89,7 +86,7 @@ class BinaryArrayFile: public io::File {
 
     }
     
-    virtual void write (const ca::interface& buffer) {
+    virtual void write (const bob::core::array::interface& buffer) {
 
       //we don't have a special way to treat write()'s like in HDF5.
       append(buffer);
@@ -98,8 +95,8 @@ class BinaryArrayFile: public io::File {
 
   private: //representation
 
-    io::BinFile m_file;
-    ca::typeinfo m_type;
+    bob::io::BinFile m_file;
+    bob::core::array::typeinfo m_type;
     std::string m_filename;
 
     static std::string s_codecname;
@@ -134,13 +131,13 @@ std::string BinaryArrayFile::s_codecname = "bob.binary";
  *
  * @note: This method can be static.
  */
-static boost::shared_ptr<io::File> 
+static boost::shared_ptr<bob::io::File> 
 make_file (const std::string& path, char mode) {
 
-  io::BinFile::openmode _mode;
-  if (mode == 'r') _mode = io::BinFile::in;
-  else if (mode == 'w') _mode = io::BinFile::out;
-  else if (mode == 'a') _mode = io::BinFile::append;
+  bob::io::BinFile::openmode _mode;
+  if (mode == 'r') _mode = bob::io::BinFile::in;
+  else if (mode == 'w') _mode = bob::io::BinFile::out;
+  else if (mode == 'a') _mode = bob::io::BinFile::append;
   else throw std::invalid_argument("unsupported binary (.bin) file opening mode");
 
   return boost::make_shared<BinaryArrayFile>(path, _mode);
@@ -152,8 +149,8 @@ make_file (const std::string& path, char mode) {
  */
 static bool register_codec() {
 
-  boost::shared_ptr<io::CodecRegistry> instance =
-    io::CodecRegistry::instance();
+  boost::shared_ptr<bob::io::CodecRegistry> instance =
+    bob::io::CodecRegistry::instance();
   
   instance->registerExtension(".bin", "bob alpha binary data format (DEPRECATED)", &make_file);
 

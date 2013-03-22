@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/io/utils.h"
-#include "bob/io/CodecRegistry.h"
+#include <bob/io/utils.h>
+#include <bob/io/CodecRegistry.h>
 
 boost::shared_ptr<bob::io::File> bob::io::open (const std::string& filename, 
     char mode, const std::string& pretend_extension) {

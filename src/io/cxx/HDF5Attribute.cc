@@ -21,14 +21,11 @@
  */
 
 #include <boost/format.hpp>
-#include "bob/io/HDF5Attribute.h"
-#include "bob/io/HDF5Exception.h"
-#include "bob/core/logging.h"
+#include <bob/io/HDF5Attribute.h>
+#include <bob/io/HDF5Exception.h>
+#include <bob/core/logging.h>
 
-namespace h5 = bob::io::detail::hdf5;
-namespace io = bob::io;
-
-bool h5::has_attribute(const boost::shared_ptr<hid_t> location,
+bool bob::io::detail::hdf5::has_attribute(const boost::shared_ptr<hid_t> location,
     const std::string& name) {
   return H5Aexists(*location, name.c_str());
 }
@@ -47,10 +44,10 @@ static void delete_h5dataspace (hid_t* p) {
   delete p;
 }
 
-static boost::shared_ptr<hid_t> open_memspace(const io::HDF5Shape& s) {
+static boost::shared_ptr<hid_t> open_memspace(const bob::io::HDF5Shape& s) {
   boost::shared_ptr<hid_t> retval(new hid_t(-1), std::ptr_fun(delete_h5dataspace));
   *retval = H5Screate_simple(s.n(), s.get(), 0);
-  if (*retval < 0) throw io::HDF5StatusError("H5Screate_simple", *retval);
+  if (*retval < 0) throw bob::io::HDF5StatusError("H5Screate_simple", *retval);
   return retval;
 }
 
@@ -60,7 +57,7 @@ static boost::shared_ptr<hid_t> open_memspace(const io::HDF5Shape& s) {
 static boost::shared_ptr<hid_t> get_memspace(hid_t attr) {
   boost::shared_ptr<hid_t> retval(new hid_t(-1), std::ptr_fun(delete_h5dataspace));
   *retval = H5Aget_space(attr);
-  if (*retval < 0) throw io::HDF5StatusError("H5Aget_space", *retval);
+  if (*retval < 0) throw bob::io::HDF5StatusError("H5Aget_space", *retval);
   return retval;
 }
 
@@ -84,20 +81,20 @@ static void delete_h5type (hid_t* p) {
 static boost::shared_ptr<hid_t> get_type(hid_t attr) {
   boost::shared_ptr<hid_t> retval(new hid_t(-1), std::ptr_fun(delete_h5type));
   *retval = H5Aget_type(attr);
-  if (*retval < 0) throw io::HDF5StatusError("H5Aget_type", *retval);
+  if (*retval < 0) throw bob::io::HDF5StatusError("H5Aget_type", *retval);
   return retval;
 }
 
 /**
  * Figures out the extents of an attribute
  */
-static io::HDF5Shape get_extents(hid_t space) {
+static bob::io::HDF5Shape get_extents(hid_t space) {
   int rank = H5Sget_simple_extent_ndims(space);
-  if (rank < 0) throw io::HDF5StatusError("H5Sget_simple_extent_ndims", rank);
+  if (rank < 0) throw bob::io::HDF5StatusError("H5Sget_simple_extent_ndims", rank);
   //is at least a list of scalars, but could be a list of arrays
-  io::HDF5Shape shape(rank);
+  bob::io::HDF5Shape shape(rank);
   herr_t status = H5Sget_simple_extent_dims(space, shape.get(), 0);
-  if (status < 0) throw io::HDF5StatusError("H5Sget_simple_extent_dims",status);
+  if (status < 0) throw bob::io::HDF5StatusError("H5Sget_simple_extent_dims",status);
   return shape;
 }
 
@@ -117,17 +114,17 @@ static void delete_h5attribute (hid_t* p) {
 
 static boost::shared_ptr<hid_t> open_attribute
 (const boost::shared_ptr<hid_t> location, const std::string& name,
- const io::HDF5Type& t) {
+ const bob::io::HDF5Type& t) {
 
   boost::shared_ptr<hid_t> retval(new hid_t(-1),
       std::ptr_fun(delete_h5attribute));
 
   *retval = H5Aopen(*location, name.c_str(), H5P_DEFAULT);
 
-  if (*retval < 0) throw io::HDF5StatusError("H5Aopen", *retval);
+  if (*retval < 0) throw bob::io::HDF5StatusError("H5Aopen", *retval);
 
   //checks if the opened attribute is compatible w/ the expected type
-  io::HDF5Type expected;
+  bob::io::HDF5Type expected;
   boost::shared_ptr<hid_t> atype = get_type(*retval);
   if (H5Tget_class(*atype) == H5T_STRING) {
     expected = bob::io::HDF5Type(atype);
@@ -147,29 +144,29 @@ static boost::shared_ptr<hid_t> open_attribute
   return retval;
 }
 
-void h5::delete_attribute (boost::shared_ptr<hid_t> location,
+void bob::io::detail::hdf5::delete_attribute (boost::shared_ptr<hid_t> location,
     const std::string& name) {
   herr_t err = H5Adelete(*location, name.c_str());
-  if (err < 0) throw io::HDF5StatusError("H5Adelete", err);
+  if (err < 0) throw bob::io::HDF5StatusError("H5Adelete", err);
 }
 
-void h5::read_attribute (const boost::shared_ptr<hid_t> location,
+void bob::io::detail::hdf5::read_attribute (const boost::shared_ptr<hid_t> location,
     const std::string& name, const bob::io::HDF5Type& dest,
     void* buffer) {
   boost::shared_ptr<hid_t> attribute = open_attribute(location, name, dest);
   herr_t err = H5Aread(*attribute, *dest.htype(), buffer);
-  if (err < 0) throw io::HDF5StatusError("H5Aread", err);
+  if (err < 0) throw bob::io::HDF5StatusError("H5Aread", err);
 }
 
-void h5::gettype_attribute (const boost::shared_ptr<hid_t> location,
-    const std::string& name, io::HDF5Type& type) {
+void bob::io::detail::hdf5::gettype_attribute (const boost::shared_ptr<hid_t> location,
+    const std::string& name, bob::io::HDF5Type& type) {
 
   boost::shared_ptr<hid_t> attr(new hid_t(-1),
       std::ptr_fun(delete_h5attribute));
 
   *attr = H5Aopen(*location, name.c_str(), H5P_DEFAULT);
 
-  if (*attr < 0) throw io::HDF5StatusError("H5Aopen", *attr);
+  if (*attr < 0) throw bob::io::HDF5StatusError("H5Aopen", *attr);
 
   boost::shared_ptr<hid_t> atype = get_type(*attr);
   if (H5Tget_class(*atype) == H5T_STRING) {
@@ -183,7 +180,7 @@ void h5::gettype_attribute (const boost::shared_ptr<hid_t> location,
 }
 
 static boost::shared_ptr<hid_t> create_attribute(boost::shared_ptr<hid_t> loc,
-    const std::string& name, const io::HDF5Type& t,
+    const std::string& name, const bob::io::HDF5Type& t,
     boost::shared_ptr<hid_t> space) {
 
   boost::shared_ptr<hid_t> retval(new hid_t(-1),
@@ -192,11 +189,11 @@ static boost::shared_ptr<hid_t> create_attribute(boost::shared_ptr<hid_t> loc,
   *retval = H5Acreate2(*loc, name.c_str(), *t.htype(), *space, H5P_DEFAULT,
       H5P_DEFAULT);
 
-  if (*retval < 0) throw io::HDF5StatusError("H5Acreate", *retval);
+  if (*retval < 0) throw bob::io::HDF5StatusError("H5Acreate", *retval);
   return retval;
 }
 
-void h5::write_attribute (boost::shared_ptr<hid_t> location,
+void bob::io::detail::hdf5::write_attribute (boost::shared_ptr<hid_t> location,
     const std::string& name, const bob::io::HDF5Type& dest, const void* buffer)
 {
   boost::shared_ptr<hid_t> dataspace; 
@@ -210,26 +207,26 @@ void h5::write_attribute (boost::shared_ptr<hid_t> location,
     dataspace = open_memspace(dest.shape());
   }
 
-  if (h5::has_attribute(location, name)) h5::delete_attribute(location, name);
+  if (bob::io::detail::hdf5::has_attribute(location, name)) bob::io::detail::hdf5::delete_attribute(location, name);
   boost::shared_ptr<hid_t> attribute =
     create_attribute(location, name, dest, dataspace);
 
   /* Write the attribute data. */
   herr_t err = H5Awrite(*attribute, *dest.htype(), buffer);
-  if (err < 0) throw io::HDF5StatusError("H5Awrite", err);
+  if (err < 0) throw bob::io::HDF5StatusError("H5Awrite", err);
 }
 
 static herr_t attr_iterator (hid_t obj, const char* name, const H5A_info_t*, 
     void* cookie) {
-  std::map<std::string, io::HDF5Type>& dict =
-    *static_cast<std::map<std::string, io::HDF5Type>*>(cookie);
+  std::map<std::string, bob::io::HDF5Type>& dict =
+    *static_cast<std::map<std::string, bob::io::HDF5Type>*>(cookie);
 
   boost::shared_ptr<hid_t> attr(new hid_t(-1),
       std::ptr_fun(delete_h5attribute));
 
   *attr = H5Aopen(obj, name, H5P_DEFAULT);
 
-  if (*attr < 0) throw io::HDF5StatusError("H5Aopen", *attr);
+  if (*attr < 0) throw bob::io::HDF5StatusError("H5Aopen", *attr);
 
   boost::shared_ptr<hid_t> atype = get_type(*attr);
   if (H5Tget_class(*atype) == H5T_STRING) {
@@ -244,7 +241,7 @@ static herr_t attr_iterator (hid_t obj, const char* name, const H5A_info_t*,
   return 0;
 }
 
-void h5::list_attributes(boost::shared_ptr<hid_t> location,
+void bob::io::detail::hdf5::list_attributes(boost::shared_ptr<hid_t> location,
     std::map<std::string, bob::io::HDF5Type>& attributes) {
   hsize_t offset=0;
   H5Aiterate2(*location, H5_INDEX_NAME, H5_ITER_NATIVE, &offset, attr_iterator, 

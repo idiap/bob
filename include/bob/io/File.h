@@ -29,14 +29,26 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "bob/core/array.h"
-#include "bob/core/blitz_array.h"
+#include <bob/core/array.h>
+#include <bob/core/blitz_array.h>
 
-namespace bob { namespace io {
+/**
+ * @addtogroup IO io 
+ * @brief I/O module API
+ */
+namespace bob { 
+/**
+ * @ingroup IO
+ */
+namespace io {
+  /**
+   * @ingroup IO
+   * @{
+   */
       
   /**
-   * Files deal with reading and writing multiple (homogeneous) array data to
-   * and from files.
+   * @brief Files deal with reading and writing multiple (homogeneous) array
+   * data to and from files.
    */
   class File {
 
@@ -175,9 +187,9 @@ namespace bob { namespace io {
   };
 
   /**
-   * This defines the factory method F that can create codecs. Your task, as a
-   * codec developer is to create one of such methods for each of your codecs
-   * and statically register them to the codec registry.
+   * @brief This defines the factory method F that can create codecs. Your 
+   * task, as a codec developer is to create one of such methods for each of 
+   * your codecs and statically register them to the codec registry.
    *
    * Here are the meanings of the mode flag that should be respected by your
    * factory implementation:
@@ -197,6 +209,9 @@ namespace bob { namespace io {
   typedef boost::shared_ptr<File> (*file_factory_t)
     (const std::string& filename, char mode);
 
+  /**
+   * @}
+   */
 }}
 
 #endif /* BOB_IO_FILE_H */

@@ -21,11 +21,8 @@
  */
 
 #include <boost/make_shared.hpp>
-#include "bob/io/HDF5Utils.h"
-#include "bob/core/logging.h"
-
-namespace h5 = bob::io::detail::hdf5;
-namespace io = bob::io;
+#include <bob/io/HDF5Utils.h>
+#include <bob/core/logging.h>
 
 /**
  * Opens/Creates an "auto-destructible" HDF5 file
@@ -63,21 +60,21 @@ static boost::shared_ptr<hid_t> open_file(const boost::filesystem::path& path,
 
   if (!boost::filesystem::exists(path) && flags == H5F_ACC_RDONLY) {
     //file was opened for reading, but does not exist... Raise
-    throw io::FileNotReadable(path.string());
+    throw bob::io::FileNotReadable(path.string());
   }
 
   if (boost::filesystem::exists(path) && flags != H5F_ACC_TRUNC) { //open
     *retval = H5Fopen(path.string().c_str(), flags, H5P_DEFAULT);
-    if (*retval < 0) throw io::HDF5StatusError("H5Fopen", *retval);
+    if (*retval < 0) throw bob::io::HDF5StatusError("H5Fopen", *retval);
     //replaces the file create list properties with the one from the file
     fcpl = boost::shared_ptr<hid_t>(new hid_t(-1), std::ptr_fun(delete_h5p));
     *fcpl = H5Fget_create_plist(*retval);
-    if (*fcpl < 0) throw io::HDF5StatusError("H5Fget_create_list", *fcpl);
+    if (*fcpl < 0) throw bob::io::HDF5StatusError("H5Fget_create_list", *fcpl);
   }
   else { //file needs to be created or truncated (can set user block)
     *retval = H5Fcreate(path.string().c_str(), H5F_ACC_TRUNC,
         *fcpl, H5P_DEFAULT);
-    if (*retval < 0) throw io::HDF5StatusError("H5Fcreate", *retval);
+    if (*retval < 0) throw bob::io::HDF5StatusError("H5Fcreate", *retval);
   }
   return retval;
 }
@@ -87,13 +84,13 @@ static boost::shared_ptr<hid_t> create_fcpl(hsize_t userblock_size) {
   //otherwise we have to go through the settings
   boost::shared_ptr<hid_t> retval(new hid_t(-1), std::ptr_fun(delete_h5p));
   *retval = H5Pcreate(H5P_FILE_CREATE);
-  if (*retval < 0) throw io::HDF5StatusError("H5Pcreate", *retval);
+  if (*retval < 0) throw bob::io::HDF5StatusError("H5Pcreate", *retval);
   herr_t err = H5Pset_userblock(*retval, userblock_size);
-  if (err < 0) throw io::HDF5StatusError("H5Pset_userblock", err);
+  if (err < 0) throw bob::io::HDF5StatusError("H5Pset_userblock", err);
   return retval;
 }
 
-h5::File::File(const boost::filesystem::path& path, unsigned int flags,
+bob::io::detail::hdf5::File::File(const boost::filesystem::path& path, unsigned int flags,
     size_t userblock_size):
   m_path(path),
   m_flags(flags),
@@ -102,36 +99,36 @@ h5::File::File(const boost::filesystem::path& path, unsigned int flags,
 {
 }
 
-h5::File::~File() {
+bob::io::detail::hdf5::File::~File() {
 }
 
-boost::shared_ptr<h5::RootGroup> h5::File::root() {
+boost::shared_ptr<bob::io::detail::hdf5::RootGroup> bob::io::detail::hdf5::File::root() {
   if (!m_root) {
-    m_root = boost::make_shared<h5::RootGroup>(shared_from_this());
+    m_root = boost::make_shared<bob::io::detail::hdf5::RootGroup>(shared_from_this());
     m_root->open_recursively();
   }
   return m_root;
 }
 
-void h5::File::reset() {
+void bob::io::detail::hdf5::File::reset() {
   m_root.reset();
 }
 
-bool h5::File::writeable() const {
+bool bob::io::detail::hdf5::File::writeable() const {
   return (m_flags != H5F_ACC_RDONLY);
 }
 
-size_t h5::File::userblock_size() const {
+size_t bob::io::detail::hdf5::File::userblock_size() const {
   hsize_t retval;
   herr_t err = H5Pget_userblock(*m_fcpl, &retval);
-  if (err < 0) throw io::HDF5StatusError("H5Pget_create_plist", err);
+  if (err < 0) throw bob::io::HDF5StatusError("H5Pget_create_plist", err);
   return retval;
 }
 
-void h5::File::get_userblock(std::string& data) const {
+void bob::io::detail::hdf5::File::get_userblock(std::string& data) const {
   //TODO
 }
 
-void h5::File::set_userblock(const std::string& data) {
+void bob::io::detail::hdf5::File::set_userblock(const std::string& data) {
   //TODO
 }

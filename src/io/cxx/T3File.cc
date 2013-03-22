@@ -41,14 +41,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "bob/core/check.h"
-#include "bob/core/blitz_array.h"
-#include "bob/io/CodecRegistry.h"
-#include "bob/io/Exception.h"
-
-namespace fs = boost::filesystem;
-namespace io = bob::io;
-namespace ca = bob::core::array;
+#include <bob/core/check.h>
+#include <bob/core/blitz_array.h>
+#include <bob/io/CodecRegistry.h>
+#include <bob/io/Exception.h>
 
 static inline size_t get_filesize(const std::string& filename) {
   struct stat filestatus;
@@ -56,7 +52,7 @@ static inline size_t get_filesize(const std::string& filename) {
   return filestatus.st_size;
 }
 
-class T3File: public io::File {
+class T3File: public bob::io::File {
 
   public: //api
 
@@ -64,14 +60,14 @@ class T3File: public io::File {
       m_filename(path),
       m_newfile(true),
       m_length(0) {
-        if ( mode == 'r' || (mode == 'a' && fs::exists(path) ) ) { // try peek
+        if ( mode == 'r' || (mode == 'a' && boost::filesystem::exists(path) ) ) { // try peek
           size_t fsize = get_filesize(path);
           fsize -= 8; // remove the first two entries
           // read the first two 4-byte integers in the file, convert to unsigned
           
           std::fstream s(path.c_str(), std::ios::binary|std::ios::in);
 
-          if (!s) throw io::FileNotReadable(path);
+          if (!s) throw bob::io::FileNotReadable(path);
           
           uint32_t nsamples, framesize;
           nsamples = framesize = 0;
@@ -82,12 +78,12 @@ class T3File: public io::File {
           
           // are those floats or doubles?
           if (fsize == (nsamples*framesize*sizeof(float))) {
-            m_type_array.dtype = ca::t_float32;
-            m_type_arrayset.dtype = ca::t_float32;
+            m_type_array.dtype = bob::core::array::t_float32;
+            m_type_arrayset.dtype = bob::core::array::t_float32;
           }
           else if (fsize == (nsamples*framesize*sizeof(double))) {
-            m_type_array.dtype = ca::t_float64;
-            m_type_arrayset.dtype = ca::t_float64;
+            m_type_array.dtype = bob::core::array::t_float64;
+            m_type_arrayset.dtype = bob::core::array::t_float64;
           }
           else { 
             boost::format s("Cannot read file '%s', mode = '%c': fsize (%d) != %d*%d*sizeof(float32) nor *sizeof(float64)");
@@ -109,11 +105,11 @@ class T3File: public io::File {
       return m_filename;
     }
 
-    virtual const ca::typeinfo& type_all () const {
+    virtual const bob::core::array::typeinfo& type_all () const {
       return m_type_array;
     }
 
-    virtual const ca::typeinfo& type () const {
+    virtual const bob::core::array::typeinfo& type () const {
       return m_type_arrayset;
     }
 
@@ -125,7 +121,7 @@ class T3File: public io::File {
       return s_codecname;
     }
 
-    virtual void read_all(ca::interface& buffer) {
+    virtual void read_all(bob::core::array::interface& buffer) {
 
       if (m_newfile) {
         boost::format f("cannot read uninitialized t3 binary file at '%s'");
@@ -144,7 +140,7 @@ class T3File: public io::File {
 
     }
 
-    virtual void read(ca::interface& buffer, size_t index) {
+    virtual void read(bob::core::array::interface& buffer, size_t index) {
 
       if (m_newfile) {
         boost::format f("cannot read uninitialized t3 binary file at '%s'");
@@ -152,7 +148,7 @@ class T3File: public io::File {
         throw std::runtime_error(f.str());
       }
 
-      const ca::typeinfo& type = buffer.type();
+      const bob::core::array::typeinfo& type = buffer.type();
 
       if (!buffer.type().is_compatible(m_type_arrayset)) buffer.set(m_type_arrayset);
 
@@ -165,9 +161,9 @@ class T3File: public io::File {
 
     }
 
-    virtual size_t append (const ca::interface& buffer) {
+    virtual size_t append (const bob::core::array::interface& buffer) {
 
-      const ca::typeinfo& info = buffer.type();
+      const bob::core::array::typeinfo& info = buffer.type();
 
       if (!m_newfile && !info.is_compatible(m_type_arrayset)) {
         boost::format f("input buffer of type %s cannot be appended to already initialized torch3vision binary file of type %s");
@@ -179,13 +175,13 @@ class T3File: public io::File {
       if (m_newfile) {
         
         //can only save uni-dimensional data, so throw if that is not the case
-        if (info.nd != 1) throw io::DimensionError(info.nd, 1);
+        if (info.nd != 1) throw bob::io::DimensionError(info.nd, 1);
 
         //can only save float32 or float64, otherwise, throw.
-        if ((info.dtype != ca::t_float32) && 
-            (info.dtype != ca::t_float64)) {
+        if ((info.dtype != bob::core::array::t_float32) && 
+            (info.dtype != bob::core::array::t_float64)) {
           boost::format f("cannot have T3 bindata files with type %s - only float32 or float64");
-          f % ca::stringize(info.dtype);
+          f % bob::core::array::stringize(info.dtype);
           throw std::invalid_argument(f.str());
         }
         
@@ -236,10 +232,10 @@ class T3File: public io::File {
      * matrix. In this last case, vectors are formed from the rows of the given
      * matrix.
      */
-    virtual void write (const ca::interface& buffer) {
+    virtual void write (const bob::core::array::interface& buffer) {
 
       m_newfile = true; //force file re-setting
-      const ca::typeinfo& info = buffer.type();
+      const bob::core::array::typeinfo& info = buffer.type();
 
       if (info.nd == 1) {//just do a normal append
         append(buffer);
@@ -248,11 +244,11 @@ class T3File: public io::File {
       else if (info.nd == 2) { //append every array individually
 
         const uint8_t* ptr = static_cast<const uint8_t*>(buffer.ptr());
-        ca::typeinfo slice_info(info.dtype, static_cast<size_t>(1), 
+        bob::core::array::typeinfo slice_info(info.dtype, static_cast<size_t>(1), 
             &info.shape[1]);
         for (size_t k=0; k<info.shape[0]; ++k) {
           const void* slice_ptr=static_cast<const void*>(ptr+k*slice_info.buffer_size());
-          ca::blitz_array slice(const_cast<void*>(slice_ptr), slice_info);
+          bob::core::array::blitz_array slice(const_cast<void*>(slice_ptr), slice_info);
           append(slice);
         }
 
@@ -270,8 +266,8 @@ class T3File: public io::File {
 
     std::string m_filename;
     bool m_newfile;
-    ca::typeinfo m_type_array;
-    ca::typeinfo m_type_arrayset;
+    bob::core::array::typeinfo m_type_array;
+    bob::core::array::typeinfo m_type_arrayset;
     size_t m_length;
 
     static std::string s_codecname;
@@ -306,7 +302,7 @@ std::string T3File::s_codecname = "torch3.binary";
  *
  * @note: This method can be static.
  */
-static boost::shared_ptr<io::File> 
+static boost::shared_ptr<bob::io::File> 
 make_file (const std::string& path, char mode) {
 
   return boost::make_shared<T3File>(path, mode);
@@ -318,8 +314,8 @@ make_file (const std::string& path, char mode) {
  */
 static bool register_codec() {
 
-  boost::shared_ptr<io::CodecRegistry> instance =
-    io::CodecRegistry::instance();
+  boost::shared_ptr<bob::io::CodecRegistry> instance =
+    bob::io::CodecRegistry::instance();
   
   instance->registerExtension(".bindata", "torch3 binary data format", &make_file);
 

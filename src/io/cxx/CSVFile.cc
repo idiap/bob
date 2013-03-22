@@ -33,16 +33,12 @@
 #include <boost/shared_array.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include "bob/io/CodecRegistry.h"
-#include "bob/io/Exception.h"
+#include <bob/io/CodecRegistry.h>
+#include <bob/io/Exception.h>
 
-namespace fs = boost::filesystem;
-namespace io = bob::io;
-namespace ca = bob::core::array;
-  
 typedef boost::tokenizer<boost::escaped_list_separator<char> > Tokenizer;
 
-class CSVFile: public io::File {
+class CSVFile: public bob::io::File {
 
   public: //api
 
@@ -96,7 +92,7 @@ class CSVFile: public io::File {
       m_filename(path),
       m_newfile(false) {
 
-        if (mode == 'r' || (mode == 'a' && fs::exists(path))) { //try peeking
+        if (mode == 'r' || (mode == 'a' && boost::filesystem::exists(path))) { //try peeking
           
           if (mode == 'r') 
             m_file.open(m_filename.c_str(), std::ios::in);
@@ -134,11 +130,11 @@ class CSVFile: public io::File {
       return m_filename;
     }
 
-    virtual const ca::typeinfo& type() const {
+    virtual const bob::core::array::typeinfo& type() const {
       return m_arrayset_type;
     }
 
-    virtual const ca::typeinfo& type_all() const {
+    virtual const bob::core::array::typeinfo& type_all() const {
       return m_array_type;
     }
 
@@ -150,7 +146,7 @@ class CSVFile: public io::File {
       return s_codecname;
     }
 
-    virtual void read_all(ca::interface& buffer) {
+    virtual void read_all(bob::core::array::interface& buffer) {
       if (m_newfile)
         throw std::runtime_error("uninitialized CSV file cannot be read");
 
@@ -169,7 +165,7 @@ class CSVFile: public io::File {
       }
     }
 
-    virtual void read(ca::interface& buffer, size_t index) {
+    virtual void read(bob::core::array::interface& buffer, size_t index) {
 
       if (m_newfile)
         throw std::runtime_error("uninitialized CSV file cannot be read");
@@ -200,9 +196,9 @@ class CSVFile: public io::File {
 
     }
 
-    virtual size_t append (const ca::interface& buffer) {
+    virtual size_t append (const bob::core::array::interface& buffer) {
 
-      const ca::typeinfo& type = buffer.type();
+      const bob::core::array::typeinfo& type = buffer.type();
 
       if (m_newfile) {
         if (type.nd != 1 || type.dtype != bob::core::array::t_float64) {
@@ -238,9 +234,9 @@ class CSVFile: public io::File {
 
     }
 
-    virtual void write (const ca::interface& buffer) {
+    virtual void write (const bob::core::array::interface& buffer) {
 
-      const ca::typeinfo& type = buffer.type();
+      const bob::core::array::typeinfo& type = buffer.type();
 
       if (m_newfile) {
         if (type.nd != 2 || type.dtype != bob::core::array::t_float64) {
@@ -274,8 +270,8 @@ class CSVFile: public io::File {
     std::fstream m_file;
     std::string m_filename;
     bool m_newfile;
-    ca::typeinfo m_array_type;
-    ca::typeinfo m_arrayset_type;
+    bob::core::array::typeinfo m_array_type;
+    bob::core::array::typeinfo m_arrayset_type;
     std::vector<std::streampos> m_pos; ///< dictionary of line starts
 
     static std::string s_codecname;
@@ -310,7 +306,7 @@ std::string CSVFile::s_codecname = "bob.csv";
  *
  * @note: This method can be static.
  */
-static boost::shared_ptr<io::File> 
+static boost::shared_ptr<bob::io::File> 
 make_file (const std::string& path, char mode) {
   return boost::make_shared<CSVFile>(path, mode);
 
@@ -321,8 +317,8 @@ make_file (const std::string& path, char mode) {
  */
 static bool register_codec() {
 
-  boost::shared_ptr<io::CodecRegistry> instance =
-    io::CodecRegistry::instance();
+  boost::shared_ptr<bob::io::CodecRegistry> instance =
+    bob::io::CodecRegistry::instance();
   
   instance->registerExtension(".csv", "Comma-Separated Values", &make_file);
   instance->registerExtension(".txt", "Comma-Separated Values", &make_file);

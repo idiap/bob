@@ -29,8 +29,8 @@
 #include <boost/algorithm/string.hpp>
 #include <string>
 
-#include "bob/io/CodecRegistry.h"
-#include "bob/io/Exception.h"
+#include <bob/io/CodecRegistry.h>
+#include <bob/io/Exception.h>
 
 extern "C" {
 // This header must come last, as it brings a lot of global stuff that messes up other headers...

@@ -20,10 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/config.h"
-#include "bob/core/python/ndarray.h"
+#include <bob/config.h>
+#include <bob/core/python/ndarray.h>
 #include <boost/python.hpp>
-#include "bob/io/CodecRegistry.h"
+#include <bob/io/CodecRegistry.h>
 
 static bool get_ignore_double_registration() {
   return bob::io::CodecRegistry::instance()->ignoreDoubleRegistration();

@@ -18,8 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/io/File.h"
+#include <bob/io/File.h>
 
-namespace io = bob::io;
-
-io::File::~File() { }
+bob::io::File::~File() { }

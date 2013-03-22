@@ -20,12 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/io/HDF5File.h"
+#include <bob/io/HDF5File.h>
 
-namespace io = bob::io;
-namespace ca = bob::core::array;
-
-static unsigned int getH5Access (io::HDF5File::mode_t v) {
+static unsigned int getH5Access (bob::io::HDF5File::mode_t v) {
   switch(v)
   {
     case 0: return H5F_ACC_RDONLY;
@@ -33,41 +30,41 @@ static unsigned int getH5Access (io::HDF5File::mode_t v) {
     case 2: return H5F_ACC_TRUNC;
     case 4: return H5F_ACC_EXCL;
     default:
-      throw io::HDF5InvalidFileAccessModeError(v);
+      throw bob::io::HDF5InvalidFileAccessModeError(v);
   }
 }
 
-io::HDF5File::HDF5File(const std::string& filename, mode_t mode):
-  m_file(new io::detail::hdf5::File(filename, getH5Access(mode))),
+bob::io::HDF5File::HDF5File(const std::string& filename, mode_t mode):
+  m_file(new bob::io::detail::hdf5::File(filename, getH5Access(mode))),
   m_cwd(m_file->root()) ///< we start by looking at the root directory
 {
 }
 
-io::HDF5File::HDF5File(const io::HDF5File& other_file):
+bob::io::HDF5File::HDF5File(const bob::io::HDF5File& other_file):
   m_file(other_file.m_file),
   m_cwd(other_file.m_cwd)
 {
 }
 
-io::HDF5File::~HDF5File() {
+bob::io::HDF5File::~HDF5File() {
 }
 
-io::HDF5File& io::HDF5File::operator =(const io::HDF5File& other_file){
+bob::io::HDF5File& bob::io::HDF5File::operator =(const bob::io::HDF5File& other_file){
   m_file = other_file.m_file;
   m_cwd = other_file.m_cwd;
   return *this;
 }
 
 
-void io::HDF5File::cd(const std::string& path) {
+void bob::io::HDF5File::cd(const std::string& path) {
   m_cwd = m_cwd->cd(path);
 }
 
-bool io::HDF5File::hasGroup(const std::string& path) {
+bool bob::io::HDF5File::hasGroup(const std::string& path) {
   return m_cwd->has_group(path);
 }
 
-void io::HDF5File::createGroup(const std::string& path) {
+void bob::io::HDF5File::createGroup(const std::string& path) {
   if (!m_file->writeable()) {
     boost::format m("cannot create group '%s' at path '%s' of file '%s' because it is not writeable");
     m % path % m_cwd->path() % m_file->filename();
@@ -76,20 +73,20 @@ void io::HDF5File::createGroup(const std::string& path) {
   m_cwd->create_group(path);
 }
 
-std::string io::HDF5File::cwd() const {
+std::string bob::io::HDF5File::cwd() const {
   return m_cwd->path();
 }
 
-bool io::HDF5File::contains (const std::string& path) const {
+bool bob::io::HDF5File::contains (const std::string& path) const {
   return m_cwd->has_dataset(path);
 }
 
-const std::vector<io::HDF5Descriptor>& io::HDF5File::describe
+const std::vector<bob::io::HDF5Descriptor>& bob::io::HDF5File::describe
 (const std::string& path) const {
   return (*m_cwd)[path]->m_descr;
 }
 
-void io::HDF5File::unlink (const std::string& path) {
+void bob::io::HDF5File::unlink (const std::string& path) {
   if (!m_file->writeable()) {
     boost::format m("cannot remove dataset at path '%s' of file '%s' because it is not writeable");
     m % path % m_cwd->path() % m_file->filename();
@@ -98,7 +95,7 @@ void io::HDF5File::unlink (const std::string& path) {
   m_cwd->remove_dataset(path);
 }
 
-void io::HDF5File::rename (const std::string& from, const std::string& to) {
+void bob::io::HDF5File::rename (const std::string& from, const std::string& to) {
   if (!m_file->writeable()) {
     boost::format m("cannot rename dataset '%s' -> '%s' at path '%s' of file '%s' because it is not writeable");
     m % from % to % m_cwd->path() % m_file->filename();
@@ -111,7 +108,7 @@ void io::HDF5File::rename (const std::string& from, const std::string& to) {
   m_cwd = m_cwd->cd(current_path); //go back to the path we were before
 }
 
-void io::HDF5File::copy (HDF5File& other) {
+void bob::io::HDF5File::copy (HDF5File& other) {
   if (!m_file->writeable()) {
     boost::format m("cannot copy data of file '%s' to path '%s' of file '%s' because it is not writeable");
     m % other.filename() % m_cwd->path() % m_file->filename();
@@ -119,7 +116,7 @@ void io::HDF5File::copy (HDF5File& other) {
   }
 
   //groups
-  typedef std::map<std::string, boost::shared_ptr<io::detail::hdf5::Group> > group_map_type;
+  typedef std::map<std::string, boost::shared_ptr<bob::io::detail::hdf5::Group> > group_map_type;
   const group_map_type& group_map = other.m_file->root()->groups();
   for (group_map_type::const_iterator it=group_map.begin();
       it != group_map.end(); ++it) {
@@ -127,7 +124,7 @@ void io::HDF5File::copy (HDF5File& other) {
   }
 
   //datasets
-  typedef std::map<std::string, boost::shared_ptr<io::detail::hdf5::Dataset> > dataset_map_type;
+  typedef std::map<std::string, boost::shared_ptr<bob::io::detail::hdf5::Dataset> > dataset_map_type;
   const dataset_map_type& dataset_map = other.m_file->root()->datasets();
   for (dataset_map_type::const_iterator it=dataset_map.begin();
       it != dataset_map.end(); ++it) {
@@ -135,7 +132,7 @@ void io::HDF5File::copy (HDF5File& other) {
   }
 }
 
-void io::HDF5File::create (const std::string& path, const io::HDF5Type& type,
+void bob::io::HDF5File::create (const std::string& path, const bob::io::HDF5Type& type,
     bool list, size_t compression) {
   if (!m_file->writeable()) {
     boost::format m("cannot create dataset '%s' at path '%s' of file '%s' because it is not writeable");
@@ -146,13 +143,13 @@ void io::HDF5File::create (const std::string& path, const io::HDF5Type& type,
   else (*m_cwd)[path]->size(type);
 }
 
-void io::HDF5File::read_buffer (const std::string& path, size_t pos,
-    const io::HDF5Type& type, void* buffer) const {
+void bob::io::HDF5File::read_buffer (const std::string& path, size_t pos,
+    const bob::io::HDF5Type& type, void* buffer) const {
   (*m_cwd)[path]->read_buffer(pos, type, buffer);
 }
 
-void io::HDF5File::write_buffer (const std::string& path,
-    size_t pos, const io::HDF5Type& type, const void* buffer) {
+void bob::io::HDF5File::write_buffer (const std::string& path,
+    size_t pos, const bob::io::HDF5Type& type, const void* buffer) {
   if (!m_file->writeable()) {
     boost::format m("cannot write to object '%s' at path '%s' of file '%s' because it is not writeable");
     m % path % m_cwd->path() % m_file->filename();
@@ -161,8 +158,8 @@ void io::HDF5File::write_buffer (const std::string& path,
   (*m_cwd)[path]->write_buffer(pos, type, buffer);
 }
 
-void io::HDF5File::extend_buffer(const std::string& path,
-    const io::HDF5Type& type, const void* buffer) {
+void bob::io::HDF5File::extend_buffer(const std::string& path,
+    const bob::io::HDF5Type& type, const void* buffer) {
   if (!m_file->writeable()) {
     boost::format m("cannot extend object '%s' at path '%s' of file '%s' because the file is not writeable");
     m % path % m_cwd->path() % m_file->filename();
@@ -171,7 +168,7 @@ void io::HDF5File::extend_buffer(const std::string& path,
   (*m_cwd)[path]->extend_buffer(type, buffer);
 }
 
-bool io::HDF5File::hasAttribute(const std::string& path,
+bool bob::io::HDF5File::hasAttribute(const std::string& path,
     const std::string& name) const {
   if (m_cwd->has_dataset(path)) {
     return (*m_cwd)[path]->has_attribute(name);
@@ -182,7 +179,7 @@ bool io::HDF5File::hasAttribute(const std::string& path,
   return false;
 }
 
-void io::HDF5File::getAttributeType(const std::string& path,
+void bob::io::HDF5File::getAttributeType(const std::string& path,
     const std::string& name, HDF5Type& type) const {
   if (m_cwd->has_dataset(path)) {
     (*m_cwd)[path]->gettype_attribute(name, type);
@@ -197,7 +194,7 @@ void io::HDF5File::getAttributeType(const std::string& path,
   }
 }
 
-void io::HDF5File::deleteAttribute(const std::string& path,
+void bob::io::HDF5File::deleteAttribute(const std::string& path,
     const std::string& name) {
   if (m_cwd->has_dataset(path)) {
     (*m_cwd)[path]->delete_attribute(name);
@@ -212,7 +209,7 @@ void io::HDF5File::deleteAttribute(const std::string& path,
   }
 }
 
-void io::HDF5File::listAttributes(const std::string& path,
+void bob::io::HDF5File::listAttributes(const std::string& path,
     std::map<std::string, bob::io::HDF5Type>& attributes) const {
   if (m_cwd->has_dataset(path)) {
     (*m_cwd)[path]->list_attributes(attributes);
@@ -227,7 +224,7 @@ void io::HDF5File::listAttributes(const std::string& path,
   }
 }
 
-void io::HDF5File::read_attribute(const std::string& path, 
+void bob::io::HDF5File::read_attribute(const std::string& path, 
     const std::string& name, const bob::io::HDF5Type& type, void* buffer) const {
   if (m_cwd->has_dataset(path)) {
     (*m_cwd)[path]->read_attribute(name, type, buffer);
@@ -242,7 +239,7 @@ void io::HDF5File::read_attribute(const std::string& path,
   }
 }
 
-void io::HDF5File::write_attribute(const std::string& path,
+void bob::io::HDF5File::write_attribute(const std::string& path,
     const std::string& name, const bob::io::HDF5Type& type, const void* buffer) {
   if (m_cwd->has_dataset(path)) {
     (*m_cwd)[path]->write_attribute(name, type, buffer);

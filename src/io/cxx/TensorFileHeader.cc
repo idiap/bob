@@ -21,10 +21,10 @@
  */
 
 #include <boost/format.hpp>
-#include "bob/core/logging.h"
+#include <bob/core/logging.h>
 
-#include "bob/io/TensorFileHeader.h"
-#include "bob/io/Exception.h"
+#include <bob/io/TensorFileHeader.h>
+#include <bob/io/Exception.h>
 
 bob::io::detail::TensorFileHeader::TensorFileHeader()
   : m_tensor_type(bob::io::Char),

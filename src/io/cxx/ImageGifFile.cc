@@ -29,8 +29,8 @@
 #include <boost/algorithm/string.hpp>
 #include <string>
 
-#include "bob/io/CodecRegistry.h"
-#include "bob/io/Exception.h"
+#include <bob/io/CodecRegistry.h>
+#include <bob/io/Exception.h>
 
 extern "C" {
 #include <gif_lib.h>

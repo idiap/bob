@@ -20,10 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/core/logging.h"
-#include "bob/core/array_type.h"
+#include <bob/core/logging.h>
+#include <bob/core/array_type.h>
 
-#include "bob/io/BinFile.h"
+#include <bob/io/BinFile.h>
 
 bob::io::BinFile::BinFile(const std::string& filename, bob::io::BinFile::openmode flag):
   m_header_init(false),

@@ -26,7 +26,7 @@
 
 #include <fstream>
 #include <blitz/array.h>
-#include "bob/core/array_type.h"
+#include <bob/core/array_type.h>
 
 namespace bob { namespace io { namespace detail {
 

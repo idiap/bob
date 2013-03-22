@@ -23,12 +23,16 @@
 #ifndef BOB_IO_BINFILE_H
 #define BOB_IO_BINFILE_H
 
-#include "bob/core/cast.h"
-#include "bob/core/array.h"
-#include "bob/io/BinFileHeader.h"
-#include "bob/io/Exception.h"
+#include <bob/core/cast.h>
+#include <bob/core/array.h>
+#include <bob/io/BinFileHeader.h>
+#include <bob/io/Exception.h>
 
 namespace bob { namespace io {
+  /**
+   * @ingroup IO
+   * @{
+   */
 
   /**
    * Defines the flags that might be used when loading/storing a file
@@ -235,6 +239,9 @@ namespace bob { namespace io {
     return _BinFileFlag(~static_cast<int>(a)); 
   }
 
+  /**
+   * @}
+   */
 }}
 
 #endif /* BOB_IO_BINFILE_H */

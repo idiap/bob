@@ -25,13 +25,9 @@
 #include <boost/format.hpp>
 #include <algorithm>
 
-#include "bob/io/MatUtils.h"
-#include "bob/io/CodecRegistry.h"
-#include "bob/io/Exception.h"
-
-namespace fs = boost::filesystem;
-namespace io = bob::io;
-namespace ca = bob::core::array;
+#include <bob/io/MatUtils.h>
+#include <bob/io/CodecRegistry.h>
+#include <bob/io/Exception.h>
 
 /**
  * TODO:
@@ -39,24 +35,24 @@ namespace ca = bob::core::array;
  * an array_read() is issued. What we do, presently, is just to read the first
  * variable.
  */
-class MatFile: public io::File {
+class MatFile: public bob::io::File {
 
   public: //api
 
     MatFile(const std::string& path, char mode):
       m_filename(path),
       m_mode( (mode=='r')? MAT_ACC_RDONLY : MAT_ACC_RDWR ),
-      m_map(new std::map<size_t, std::pair<std::string, ca::typeinfo> >()),
+      m_map(new std::map<size_t, std::pair<std::string, bob::core::array::typeinfo> >()),
       m_size(0) {
         if (mode == 'r' || mode == 'a') try_reload_map();
-        if (mode == 'w' && fs::exists(path)) fs::remove(path);
+        if (mode == 'w' && boost::filesystem::exists(path)) boost::filesystem::remove(path);
       }
 
     virtual ~MatFile() { }
 
     void try_reload_map () {
-      if (fs::exists(m_filename)) {
-        m_map = io::detail::list_variables(m_filename);
+      if (boost::filesystem::exists(m_filename)) {
+        m_map = bob::io::detail::list_variables(m_filename);
         m_type = m_map->begin()->second.second;
         m_size = m_map->size();
         m_id.reserve(m_size);
@@ -68,9 +64,9 @@ class MatFile: public io::File {
 
         //double checks some parameters
         if (m_type.nd == 0 || m_type.nd > 4) 
-          throw io::DimensionError(m_type.nd, BOB_MAX_DIM);
+          throw bob::io::DimensionError(m_type.nd, BOB_MAX_DIM);
         if (m_type.dtype == bob::core::array::t_unknown) 
-          throw io::UnsupportedTypeError(m_type.dtype);
+          throw bob::io::UnsupportedTypeError(m_type.dtype);
       }
     }
 
@@ -78,11 +74,11 @@ class MatFile: public io::File {
       return m_filename;
     }
 
-    virtual const ca::typeinfo& type_all () const {
+    virtual const bob::core::array::typeinfo& type_all () const {
       return m_type;
     }
 
-    virtual const ca::typeinfo& type () const {
+    virtual const bob::core::array::typeinfo& type () const {
       return m_type;
     }
 
@@ -94,14 +90,14 @@ class MatFile: public io::File {
       return s_codecname;
     }
 
-    virtual void read_all(ca::interface& buffer) {
+    virtual void read_all(bob::core::array::interface& buffer) {
       
       //do we need to reload the file?
       if (!m_type.is_valid()) try_reload_map();
 
       //now open it for reading
       boost::shared_ptr<mat_t> mat = 
-        io::detail::make_matfile(m_filename, m_mode);
+        bob::io::detail::make_matfile(m_filename, m_mode);
 
       if (!mat) {
         boost::format f("uninitialized matlab file (%s) cannot be read");
@@ -109,18 +105,18 @@ class MatFile: public io::File {
         throw std::runtime_error(f.str());
       }
 
-      io::detail::read_array(mat, buffer);
+      bob::io::detail::read_array(mat, buffer);
 
     }
 
-    virtual void read(ca::interface& buffer, size_t index) {
+    virtual void read(bob::core::array::interface& buffer, size_t index) {
       
       //do we need to reload the file?
       if (!m_type.is_valid()) try_reload_map();
 
       //now open it for reading
       boost::shared_ptr<mat_t> mat = 
-        io::detail::make_matfile(m_filename, m_mode);
+        bob::io::detail::make_matfile(m_filename, m_mode);
 
       if (!mat) {
         boost::format f("uninitialized matlab file (%s) cannot be read");
@@ -128,18 +124,18 @@ class MatFile: public io::File {
         throw std::runtime_error(f.str());
       }
 
-      io::detail::read_array(mat, buffer, (*m_map)[m_id[index]].first);
+      bob::io::detail::read_array(mat, buffer, (*m_map)[m_id[index]].first);
 
     }
 
-    virtual size_t append (const ca::interface& buffer) {
+    virtual size_t append (const bob::core::array::interface& buffer) {
 
       //do we need to reload the file?
       if (!m_type.is_valid()) try_reload_map();
 
       //now open it for writing.
       boost::shared_ptr<mat_t> mat =
-        io::detail::make_matfile(m_filename, m_mode);
+        bob::io::detail::make_matfile(m_filename, m_mode);
 
       if (!mat) {
         boost::format f("cannot open matlab file at '%s' for writing");
@@ -162,7 +158,7 @@ class MatFile: public io::File {
       std::ostringstream varname("array_");
       varname << next_index;
 
-      io::detail::write_array(mat, varname.str(), buffer);
+      bob::io::detail::write_array(mat, varname.str(), buffer);
 
       mat.reset(); ///< force data flushing
 
@@ -177,15 +173,15 @@ class MatFile: public io::File {
       return m_size-1;
     }
     
-    virtual void write (const ca::interface& buffer) {
+    virtual void write (const bob::core::array::interface& buffer) {
 
       static std::string varname("array");
 
       //this file is supposed to hold a single array. delete it if it exists
-      fs::path path (m_filename);
-      if (fs::exists(m_filename)) fs::remove(m_filename);
+      boost::filesystem::path path (m_filename);
+      if (boost::filesystem::exists(m_filename)) boost::filesystem::remove(m_filename);
 
-      boost::shared_ptr<mat_t> mat = io::detail::make_matfile(m_filename, 
+      boost::shared_ptr<mat_t> mat = bob::io::detail::make_matfile(m_filename, 
           m_mode);
       if (!mat) {
         boost::format f("cannot open matlab file at '%s' for writing");
@@ -193,7 +189,7 @@ class MatFile: public io::File {
         throw std::runtime_error(f.str());
       }
 
-      io::detail::write_array(mat, varname, buffer);
+      bob::io::detail::write_array(mat, varname, buffer);
 
       mat.reset(); ///< forces data flushing (not really required here...)
 
@@ -206,12 +202,12 @@ class MatFile: public io::File {
 
   private: //representation
 
-    typedef std::map<size_t, std::pair<std::string, ca::typeinfo> > map_type;
+    typedef std::map<size_t, std::pair<std::string, bob::core::array::typeinfo> > map_type;
 
     std::string m_filename;
     enum mat_acc m_mode;
     boost::shared_ptr<map_type> m_map;
-    ca::typeinfo m_type;
+    bob::core::array::typeinfo m_type;
     size_t       m_size;
     std::vector<size_t> m_id;
 
@@ -247,7 +243,7 @@ std::string MatFile::s_codecname = "bob.matlab";
  *
  * @note: This method can be static.
  */
-static boost::shared_ptr<io::File> 
+static boost::shared_ptr<bob::io::File> 
 make_file (const std::string& path, char mode) {
 
   return boost::make_shared<MatFile>(path, mode);
@@ -259,8 +255,8 @@ make_file (const std::string& path, char mode) {
  */
 static bool register_codec() {
 
-  boost::shared_ptr<io::CodecRegistry> instance =
-    io::CodecRegistry::instance();
+  boost::shared_ptr<bob::io::CodecRegistry> instance =
+    bob::io::CodecRegistry::instance();
   
   instance->registerExtension(".mat", "Matlab binary files (v4 and superior)", &make_file);
 
