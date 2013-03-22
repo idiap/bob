@@ -24,8 +24,8 @@
 #ifndef BOB_IO_VIDEOWRITER_H
 #define BOB_IO_VIDEOWRITER_H
 
-#include "bob/core/array.h"
-#include "bob/io/VideoUtilities.h"
+#include <bob/core/array.h>
+#include <bob/io/VideoUtilities.h>
 
 namespace bob { namespace io {
 

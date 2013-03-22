@@ -21,49 +21,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/io/VideoReader.h"
+#include <bob/io/VideoReader.h>
 
 #include <stdexcept>
 #include <boost/format.hpp>
 #include <boost/preprocessor.hpp>
 #include <limits>
 
-#include "bob/core/check.h"
-#include "bob/core/blitz_array.h"
-#include "bob/core/logging.h"
+#include <bob/core/check.h>
+#include <bob/core/blitz_array.h>
+#include <bob/core/logging.h>
 
 #ifndef AV_PIX_FMT_RGB24
 #define AV_PIX_FMT_RGB24 PIX_FMT_RGB24
 #endif
 
-namespace io = bob::io;
-namespace ffmpeg = bob::io::detail::ffmpeg;
-
-io::VideoReader::VideoReader(const std::string& filename, bool check) {
+bob::io::VideoReader::VideoReader(const std::string& filename, bool check) {
   open(filename, check);
 }
 
-io::VideoReader::VideoReader(const io::VideoReader& other) {
+bob::io::VideoReader::VideoReader(const bob::io::VideoReader& other) {
   *this = other;
 }
 
-io::VideoReader& io::VideoReader::operator= (const io::VideoReader& other) {
+bob::io::VideoReader& bob::io::VideoReader::operator= (const bob::io::VideoReader& other) {
   open(other.filename(), other.m_check);
   return *this;
 }
 
-void io::VideoReader::open(const std::string& filename, bool check) {
+void bob::io::VideoReader::open(const std::string& filename, bool check) {
   m_filepath = filename;
 
   boost::shared_ptr<AVFormatContext> format_ctxt =
-    ffmpeg::make_input_format_context(m_filepath);
+    bob::io::detail::ffmpeg::make_input_format_context(m_filepath);
 
   m_formatname = format_ctxt->iformat->name;
   m_formatname_long = format_ctxt->iformat->long_name;
 
-  int stream_index = ffmpeg::find_video_stream(m_filepath, format_ctxt);
+  int stream_index = bob::io::detail::ffmpeg::find_video_stream(m_filepath, format_ctxt);
 
-  AVCodec* codec = ffmpeg::find_decoder(m_filepath, format_ctxt, stream_index);
+  AVCodec* codec = bob::io::detail::ffmpeg::find_decoder(m_filepath, format_ctxt, stream_index);
   
   m_codecname = codec->name;
   m_codecname_long = codec->long_name;
@@ -72,12 +69,12 @@ void io::VideoReader::open(const std::string& filename, bool check) {
    * Runs a format/codec check on user request
    */
   if (check) {
-    if (!ffmpeg::iformat_is_supported(m_formatname)) {
+    if (!bob::io::detail::ffmpeg::iformat_is_supported(m_formatname)) {
       boost::format s("The detected format (`%s' = `%s') of the input video file `%s' is not currently supported by this version of Bob. Convert the video file to a supported wrapping format or disable the `check' flag on the VideoReader object (if you are sure of what you are doing).");
       s % m_formatname % m_formatname_long % m_filepath;
       throw std::runtime_error(s.str());
     }
-    if (!ffmpeg::codec_is_supported(m_codecname)) {
+    if (!bob::io::detail::ffmpeg::codec_is_supported(m_codecname)) {
       boost::format s("The detected decoder (`%s' = `%s') for the video stream on the input video file `%s' is not currently supported by this version of Bob. Convert the video file to a supported codec or disable the `check' flag on the VideoReader object (if you are sure of what you are doing).");
       s % m_codecname % m_codecname_long % m_filepath;
       throw std::runtime_error(s.str());
@@ -85,7 +82,7 @@ void io::VideoReader::open(const std::string& filename, bool check) {
   }
 
   boost::shared_ptr<AVCodecContext> codec_ctxt = 
-    ffmpeg::make_codec_context(m_filepath, 
+    bob::io::detail::ffmpeg::make_codec_context(m_filepath, 
         format_ctxt->streams[stream_index], codec);
 
   /**
@@ -141,16 +138,16 @@ void io::VideoReader::open(const std::string& filename, bool check) {
 
 }
 
-io::VideoReader::~VideoReader() {
+bob::io::VideoReader::~VideoReader() {
 }
 
-size_t io::VideoReader::load(blitz::Array<uint8_t,4>& data, 
+size_t bob::io::VideoReader::load(blitz::Array<uint8_t,4>& data, 
   bool throw_on_error, void (*check)(void)) const {
   bob::core::array::blitz_array tmp(data);
   return load(tmp, throw_on_error, check);
 }
 
-size_t io::VideoReader::load(bob::core::array::interface& b, 
+size_t bob::io::VideoReader::load(bob::core::array::interface& b, 
   bool throw_on_error, void (*check)(void)) const {
 
   //checks if the output array shape conforms to the video specifications,
@@ -178,29 +175,29 @@ size_t io::VideoReader::load(bob::core::array::interface& b,
   return frames_read;
 }
 
-io::VideoReader::const_iterator io::VideoReader::begin() const {
-  return io::VideoReader::const_iterator(this);
+bob::io::VideoReader::const_iterator bob::io::VideoReader::begin() const {
+  return bob::io::VideoReader::const_iterator(this);
 }
 
-io::VideoReader::const_iterator io::VideoReader::end() const {
-  return io::VideoReader::const_iterator();
+bob::io::VideoReader::const_iterator bob::io::VideoReader::end() const {
+  return bob::io::VideoReader::const_iterator();
 }
 
-io::VideoReader::const_iterator::const_iterator(const io::VideoReader* parent) :
+bob::io::VideoReader::const_iterator::const_iterator(const bob::io::VideoReader* parent) :
   m_parent(parent),
   m_current_frame(std::numeric_limits<size_t>::max())
 {
   init();
 }
 
-io::VideoReader::const_iterator::const_iterator():
+bob::io::VideoReader::const_iterator::const_iterator():
   m_parent(0),
   m_current_frame(std::numeric_limits<size_t>::max())
 {
 }
 
-io::VideoReader::const_iterator::const_iterator
-(const io::VideoReader::const_iterator& other) :
+bob::io::VideoReader::const_iterator::const_iterator
+(const bob::io::VideoReader::const_iterator& other) :
   m_parent(other.m_parent),
   m_current_frame(std::numeric_limits<size_t>::max())
 {
@@ -208,11 +205,11 @@ io::VideoReader::const_iterator::const_iterator
   (*this) += other.m_current_frame;
 }
 
-io::VideoReader::const_iterator::~const_iterator() {
+bob::io::VideoReader::const_iterator::~const_iterator() {
   reset();
 }
 
-io::VideoReader::const_iterator& io::VideoReader::const_iterator::operator= (const io::VideoReader::const_iterator& other) {
+bob::io::VideoReader::const_iterator& bob::io::VideoReader::const_iterator::operator= (const bob::io::VideoReader::const_iterator& other) {
   reset();
   m_parent = other.m_parent;
   init();
@@ -220,18 +217,18 @@ io::VideoReader::const_iterator& io::VideoReader::const_iterator::operator= (con
   return *this;
 }
 
-void io::VideoReader::const_iterator::init() {
+void bob::io::VideoReader::const_iterator::init() {
 
   //ffmpeg initialization
   const std::string& filename = m_parent->filename();
-  m_format_context = ffmpeg::make_input_format_context(filename);
-  m_stream_index = ffmpeg::find_video_stream(filename, m_format_context);
-  m_codec = ffmpeg::find_decoder(filename, m_format_context, m_stream_index);
-  m_codec_context = ffmpeg::make_codec_context(filename, 
+  m_format_context = bob::io::detail::ffmpeg::make_input_format_context(filename);
+  m_stream_index = bob::io::detail::ffmpeg::find_video_stream(filename, m_format_context);
+  m_codec = bob::io::detail::ffmpeg::find_decoder(filename, m_format_context, m_stream_index);
+  m_codec_context = bob::io::detail::ffmpeg::make_codec_context(filename, 
         m_format_context->streams[m_stream_index], m_codec);
-  m_swscaler = ffmpeg::make_scaler(filename, m_codec_context,
+  m_swscaler = bob::io::detail::ffmpeg::make_scaler(filename, m_codec_context,
       m_codec_context->pix_fmt, PIX_FMT_RGB24);
-  m_context_frame = ffmpeg::make_empty_frame(filename);
+  m_context_frame = bob::io::detail::ffmpeg::make_empty_frame(filename);
   m_rgb_array.reference(blitz::Array<uint8_t,3>(m_codec_context->height, 
       m_codec_context->width, 3));
 
@@ -246,7 +243,7 @@ void io::VideoReader::const_iterator::init() {
 
 }
 
-void io::VideoReader::const_iterator::reset() {
+void bob::io::VideoReader::const_iterator::reset() {
   m_context_frame.reset();
   m_swscaler.reset();
   m_codec_context.reset();
@@ -256,13 +253,13 @@ void io::VideoReader::const_iterator::reset() {
   m_parent = 0;
 }
 
-bool io::VideoReader::const_iterator::read(blitz::Array<uint8_t,3>& data,
+bool bob::io::VideoReader::const_iterator::read(blitz::Array<uint8_t,3>& data,
   bool throw_on_error) {
   bob::core::array::blitz_array tmp(data);
   return read(tmp, throw_on_error);
 }
 
-bool io::VideoReader::const_iterator::read(bob::core::array::interface& data,
+bool bob::io::VideoReader::const_iterator::read(bob::core::array::interface& data,
   bool throw_on_error) {
 
   if (!m_parent) {
@@ -294,7 +291,7 @@ bool io::VideoReader::const_iterator::read(bob::core::array::interface& data,
   }
 
   //we are going to need another copy step - use our internal array
-  bool ok = ffmpeg::read_video_frame(m_parent->m_filepath, m_current_frame,
+  bool ok = bob::io::detail::ffmpeg::read_video_frame(m_parent->m_filepath, m_current_frame,
       m_stream_index, m_format_context, m_codec_context, m_swscaler,
       m_context_frame, m_rgb_array.data(), throw_on_error);
 
@@ -321,7 +318,7 @@ bool io::VideoReader::const_iterator::read(bob::core::array::interface& data,
  * This method does essentially the same as read(), except it skips a few
  * operations to get a better performance.
  */
-io::VideoReader::const_iterator& io::VideoReader::const_iterator::operator++ () {
+bob::io::VideoReader::const_iterator& bob::io::VideoReader::const_iterator::operator++ () {
   if (!m_parent) {
     //we are already past the end of the stream
     throw std::runtime_error("video iterator for file has already reached its end and was reset");
@@ -335,7 +332,7 @@ io::VideoReader::const_iterator& io::VideoReader::const_iterator::operator++ () 
 
   //we are going to need another copy step - use our internal array
   try {
-    bool ok = ffmpeg::skip_video_frame(m_parent->m_filepath, m_current_frame,
+    bool ok = bob::io::detail::ffmpeg::skip_video_frame(m_parent->m_filepath, m_current_frame,
         m_stream_index, m_format_context, m_codec_context, m_context_frame,
         true);
     if (ok) ++m_current_frame;
@@ -347,15 +344,15 @@ io::VideoReader::const_iterator& io::VideoReader::const_iterator::operator++ () 
   return *this;
 }
 
-io::VideoReader::const_iterator& io::VideoReader::const_iterator::operator+= (size_t frames) {
+bob::io::VideoReader::const_iterator& bob::io::VideoReader::const_iterator::operator+= (size_t frames) {
   for (size_t i=0; i<frames; ++i) ++(*this);
   return *this;
 }
 
-bool io::VideoReader::const_iterator::operator== (const const_iterator& other) {
+bool bob::io::VideoReader::const_iterator::operator== (const const_iterator& other) {
   return (this->m_parent == other.m_parent) && (this->m_current_frame == other.m_current_frame);
 }
 
-bool io::VideoReader::const_iterator::operator!= (const const_iterator& other) {
+bool bob::io::VideoReader::const_iterator::operator!= (const const_iterator& other) {
   return !(*this == other);
 }

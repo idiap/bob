@@ -34,9 +34,9 @@ extern "C" {
 #include <libavutil/mathematics.h>
 }
 
-#include "bob/io/VideoUtilities.h"
-#include "bob/core/logging.h"
-#include "bob/config.h"
+#include <bob/io/VideoUtilities.h>
+#include <bob/core/logging.h>
+#include <bob/config.h>
 
 /**
  * Some code to account for older versions of ffmpeg
@@ -60,8 +60,6 @@ typedef CodecID AVCodecID;
 #if LIBAVCODEC_VERSION_INT < 0x347a00 //52.122.0 @ ffmpeg-0.7
 #define AVMEDIA_TYPE_VIDEO CODEC_TYPE_VIDEO
 #endif
-
-namespace ffmpeg = bob::io::detail::ffmpeg;
 
 static bool FFMPEG_INITIALIZED = false;
 
@@ -158,7 +156,7 @@ static void check_iformat_support(std::map<std::string, AVInputFormat*>& retval)
 
   for (AVInputFormat* it = av_iformat_next(0); it != 0; it = av_iformat_next(it) ) {
     std::vector<std::string> names;
-    ffmpeg::tokenize_csv(it->name, names);
+    bob::io::detail::ffmpeg::tokenize_csv(it->name, names);
     for (auto k = names.begin(); k != names.end(); ++k) {
       if (wishlist.find(*k) == wishlist.end()) continue; ///< ignore this format
       auto exists = retval.find(*k);
@@ -193,7 +191,7 @@ static void check_oformat_support(std::map<std::string, AVOutputFormat*>& retval
 
   for (AVOutputFormat* it = av_oformat_next(0); it != 0; it = av_oformat_next(it) ) {
     std::vector<std::string> names;
-    ffmpeg::tokenize_csv(it->name, names);
+    bob::io::detail::ffmpeg::tokenize_csv(it->name, names);
     for (auto k = names.begin(); k != names.end(); ++k) {
       if (wishlist.find(*k) == wishlist.end()) continue; ///< ignore this format
       auto exists = retval.find(*k);
@@ -255,7 +253,7 @@ static void define_output_support_map(std::map<AVOutputFormat*, std::vector<cons
   }
 }
 
-void ffmpeg::tokenize_csv(const char* what, std::vector<std::string>& values) {
+void bob::io::detail::ffmpeg::tokenize_csv(const char* what, std::vector<std::string>& values) {
   if (!what) return;
   boost::char_separator<char> sep(",");
   std::string w(what);
@@ -263,7 +261,7 @@ void ffmpeg::tokenize_csv(const char* what, std::vector<std::string>& values) {
   for (auto k = tok.begin(); k != tok.end(); ++k) values.push_back(*k);
 }
 
-void ffmpeg::codecs_installed (std::map<std::string, const AVCodec*>& installed) {
+void bob::io::detail::ffmpeg::codecs_installed (std::map<std::string, const AVCodec*>& installed) {
   for (AVCodec* it = av_codec_next(0); it != 0; it = av_codec_next(it) ) {
     if (it->type == AVMEDIA_TYPE_VIDEO) {
       /**
@@ -278,35 +276,35 @@ void ffmpeg::codecs_installed (std::map<std::string, const AVCodec*>& installed)
   }
 }
 
-void ffmpeg::codecs_supported (std::map<std::string, const AVCodec*>& installed) {
+void bob::io::detail::ffmpeg::codecs_supported (std::map<std::string, const AVCodec*>& installed) {
   check_codec_support(installed);
 }
 
-bool ffmpeg::codec_is_supported (const std::string& name) {
+bool bob::io::detail::ffmpeg::codec_is_supported (const std::string& name) {
   std::map<std::string, const AVCodec*> cdict;
-  ffmpeg::codecs_supported(cdict);
+  bob::io::detail::ffmpeg::codecs_supported(cdict);
   return (cdict.find(name) != cdict.end());
 }
 
-void ffmpeg::iformats_supported (std::map<std::string, AVInputFormat*>& installed) {
+void bob::io::detail::ffmpeg::iformats_supported (std::map<std::string, AVInputFormat*>& installed) {
   check_iformat_support(installed);
 }
 
-bool ffmpeg::iformat_is_supported (const std::string& name) {
+bool bob::io::detail::ffmpeg::iformat_is_supported (const std::string& name) {
   std::map<std::string, AVInputFormat*> idict;
-  ffmpeg::iformats_supported(idict);
+  bob::io::detail::ffmpeg::iformats_supported(idict);
   std::vector<std::string> names;
-  ffmpeg::tokenize_csv(name.c_str(), names);
+  bob::io::detail::ffmpeg::tokenize_csv(name.c_str(), names);
   for (auto k = names.begin(); k != names.end(); ++k) {
     if (idict.find(*k) != idict.end()) return true;
   }
   return false;
 }
 
-void ffmpeg::iformats_installed (std::map<std::string, AVInputFormat*>& installed) {
+void bob::io::detail::ffmpeg::iformats_installed (std::map<std::string, AVInputFormat*>& installed) {
   for (AVInputFormat* it = av_iformat_next(0); it != 0; it = av_iformat_next(it) ) {
     std::vector<std::string> names;
-    ffmpeg::tokenize_csv(it->name, names);
+    bob::io::detail::ffmpeg::tokenize_csv(it->name, names);
     for (auto k = names.begin(); k != names.end(); ++k) {
       auto exists = installed.find(*k);
       if (exists != installed.end()) {
@@ -320,26 +318,26 @@ void ffmpeg::iformats_installed (std::map<std::string, AVInputFormat*>& installe
   }
 }
 
-void ffmpeg::oformats_supported (std::map<std::string, AVOutputFormat*>& installed) {
+void bob::io::detail::ffmpeg::oformats_supported (std::map<std::string, AVOutputFormat*>& installed) {
   check_oformat_support(installed);
 }
 
-bool ffmpeg::oformat_is_supported (const std::string& name) {
+bool bob::io::detail::ffmpeg::oformat_is_supported (const std::string& name) {
   std::map<std::string, AVOutputFormat*> odict;
-  ffmpeg::oformats_supported(odict);
+  bob::io::detail::ffmpeg::oformats_supported(odict);
   std::vector<std::string> names;
-  ffmpeg::tokenize_csv(name.c_str(), names);
+  bob::io::detail::ffmpeg::tokenize_csv(name.c_str(), names);
   for (auto k = names.begin(); k != names.end(); ++k) {
     if (odict.find(*k) != odict.end()) return true;
   }
   return false;
 }
 
-void ffmpeg::oformats_installed (std::map<std::string, AVOutputFormat*>& installed) {
+void bob::io::detail::ffmpeg::oformats_installed (std::map<std::string, AVOutputFormat*>& installed) {
   for (AVOutputFormat* it = av_oformat_next(0); it != 0; it = av_oformat_next(it) ) {
     if (!it->video_codec) continue;
     std::vector<std::string> names;
-    ffmpeg::tokenize_csv(it->name, names);
+    bob::io::detail::ffmpeg::tokenize_csv(it->name, names);
     for (auto k = names.begin(); k != names.end(); ++k) {
       auto exists = installed.find(*k);
       if (exists != installed.end()) {
@@ -353,12 +351,12 @@ void ffmpeg::oformats_installed (std::map<std::string, AVOutputFormat*>& install
   }
 }
 
-void ffmpeg::oformat_supported_codecs (const std::string& name,
+void bob::io::detail::ffmpeg::oformat_supported_codecs (const std::string& name,
     std::vector<const AVCodec*>& installed) {
   std::map<AVOutputFormat*, std::vector<const AVCodec*> > format2codec;
   define_output_support_map(format2codec);
   std::map<std::string, AVOutputFormat*> odict;
-  ffmpeg::oformats_supported(odict);
+  bob::io::detail::ffmpeg::oformats_supported(odict);
   auto it = odict.find(name);
   if (it == odict.end()) {
     boost::format f("output format `%s' is not supported by this build");
@@ -368,7 +366,7 @@ void ffmpeg::oformat_supported_codecs (const std::string& name,
   installed = format2codec[it->second];
 }
 
-bool ffmpeg::oformat_supports_codec (const std::string& name,
+bool bob::io::detail::ffmpeg::oformat_supports_codec (const std::string& name,
     const std::string& codecname) {
   std::vector<const AVCodec*> codecs;
   oformat_supported_codecs(name, codecs);
@@ -384,7 +382,7 @@ static std::string ffmpeg_error(int num) {
   char message[ERROR_SIZE];
   int ok = av_strerror(num, message, ERROR_SIZE);
   if (ok < 0) {
-    throw std::runtime_error("ffmpeg::av_strerror() failed to report - maybe you have a memory issue?");
+    throw std::runtime_error("bob::io::detail::ffmpeg::av_strerror() failed to report - maybe you have a memory issue?");
   }
   return std::string(message);
 #else
@@ -404,7 +402,7 @@ static void deallocate_input_format_context(AVFormatContext* c) {
 # endif
 }
 
-boost::shared_ptr<AVFormatContext> ffmpeg::make_input_format_context(
+boost::shared_ptr<AVFormatContext> bob::io::detail::ffmpeg::make_input_format_context(
     const std::string& filename) {
 
   AVFormatContext* retval = 0;
@@ -413,7 +411,7 @@ boost::shared_ptr<AVFormatContext> ffmpeg::make_input_format_context(
   
   int ok = avformat_open_input(&retval, filename.c_str(), 0, 0);
   if (ok != 0) {
-    boost::format m("ffmpeg::avformat_open_input(filename=`%s') failed: ffmpeg reported %d == `%s'");
+    boost::format m("bob::io::detail::ffmpeg::avformat_open_input(filename=`%s') failed: ffmpeg reported %d == `%s'");
     m % filename % ok % ffmpeg_error(ok);
     throw std::runtime_error(m.str());
   }
@@ -422,7 +420,7 @@ boost::shared_ptr<AVFormatContext> ffmpeg::make_input_format_context(
   
   int ok = av_open_input_file(&retval, filename.c_str(), 0, 0, 0);
   if (ok != 0) {
-    boost::format m("ffmpeg::av_open_input_file(filename=`%s') failed: ffmpeg reported %d == `%s'");
+    boost::format m("bob::io::detail::ffmpeg::av_open_input_file(filename=`%s') failed: ffmpeg reported %d == `%s'");
     m % filename % ok % ffmpeg_error(ok);
     throw std::runtime_error(m.str());
   }
@@ -439,7 +437,7 @@ boost::shared_ptr<AVFormatContext> ffmpeg::make_input_format_context(
   ok = avformat_find_stream_info(retval, 0);
   
   if (ok < 0) {
-    boost::format m("ffmpeg::avformat_find_stream_info(filename=`%s') failed: ffmpeg reported %d == `%s'");
+    boost::format m("bob::io::detail::ffmpeg::avformat_find_stream_info(filename=`%s') failed: ffmpeg reported %d == `%s'");
     m % filename % ok % ffmpeg_error(ok);
     throw std::runtime_error(m.str());
   }
@@ -449,7 +447,7 @@ boost::shared_ptr<AVFormatContext> ffmpeg::make_input_format_context(
   ok = av_find_stream_info(retval);
 
   if (ok < 0) {
-    boost::format m("ffmpeg::av_find_stream_info(filename=`%s') failed: ffmpeg reported %d == `%s'");
+    boost::format m("bob::io::detail::ffmpeg::av_find_stream_info(filename=`%s') failed: ffmpeg reported %d == `%s'");
     m % filename % ok % ffmpeg_error(ok);
     throw std::runtime_error(m.str());
   }
@@ -459,7 +457,7 @@ boost::shared_ptr<AVFormatContext> ffmpeg::make_input_format_context(
   return shared_retval;
 }
   
-int ffmpeg::find_video_stream(const std::string& filename, boost::shared_ptr<AVFormatContext> format_context) {
+int bob::io::detail::ffmpeg::find_video_stream(const std::string& filename, boost::shared_ptr<AVFormatContext> format_context) {
 
 # if LIBAVFORMAT_VERSION_INT >= 0x346e00 //52.110.0 @ ffmpeg-0.7
 
@@ -467,7 +465,7 @@ int ffmpeg::find_video_stream(const std::string& filename, boost::shared_ptr<AVF
       -1, -1, 0, 0);
 
   if (retval < 0) {
-    boost::format m("ffmpeg::av_find_stream_info(`%s') failed: cannot find any video streams on this file - ffmpeg reports error %d == `%s'");
+    boost::format m("bob::io::detail::ffmpeg::av_find_stream_info(`%s') failed: cannot find any video streams on this file - ffmpeg reports error %d == `%s'");
     m % filename % retval % ffmpeg_error(retval);
     throw std::runtime_error(m.str());
   }
@@ -498,13 +496,13 @@ int ffmpeg::find_video_stream(const std::string& filename, boost::shared_ptr<AVF
 
 }
   
-AVCodec* ffmpeg::find_decoder(const std::string& filename,
+AVCodec* bob::io::detail::ffmpeg::find_decoder(const std::string& filename,
     boost::shared_ptr<AVFormatContext> format_context, int stream_index) {
 
   AVCodec* retval = avcodec_find_decoder(format_context->streams[stream_index]->codec->codec_id);
 
   if (!retval) {
-    boost::format m("ffmpeg::avcodec_find_decoder(0x%x) failed: cannot find a suitable codec to read stream %d of file `%s'");
+    boost::format m("bob::io::detail::ffmpeg::avcodec_find_decoder(0x%x) failed: cannot find a suitable codec to read stream %d of file `%s'");
     m % format_context->streams[stream_index]->codec->codec_id 
       % stream_index % filename;
     throw std::runtime_error(m.str());
@@ -594,7 +592,7 @@ static void deallocate_output_format_context(AVFormatContext* f) {
   if (f) av_free(f);
 }
 
-boost::shared_ptr<AVFormatContext> ffmpeg::make_output_format_context(
+boost::shared_ptr<AVFormatContext> bob::io::detail::ffmpeg::make_output_format_context(
     const std::string& filename, const std::string& formatname) {
 
   AVFormatContext* retval;
@@ -605,7 +603,7 @@ boost::shared_ptr<AVFormatContext> ffmpeg::make_output_format_context(
     int ok = avformat_alloc_output_context2(&retval, 0, formatname_c, 
         filename_c);
     if (ok < 0) {
-      boost::format m("ffmpeg::avformat_alloc_output_context2() failed: could not allocate output context based on format name == `%s', filename == `%s' - ffmpeg reports error %d == `%s'");
+      boost::format m("bob::io::detail::ffmpeg::avformat_alloc_output_context2() failed: could not allocate output context based on format name == `%s', filename == `%s' - ffmpeg reports error %d == `%s'");
       m % formatname_c % filename_c % ok % ffmpeg_error(ok);
       throw std::runtime_error(m.str());
     }
@@ -613,7 +611,7 @@ boost::shared_ptr<AVFormatContext> ffmpeg::make_output_format_context(
   else {
     int ok = avformat_alloc_output_context2(&retval, 0, 0, filename_c);
     if (ok < 0) {
-      boost::format m("ffmpeg::avformat_alloc_output_context2() failed: could not allocate output context based only on filename == `%s' - ffmpeg reports error %d == `%s'");
+      boost::format m("bob::io::detail::ffmpeg::avformat_alloc_output_context2() failed: could not allocate output context based only on filename == `%s' - ffmpeg reports error %d == `%s'");
       m % formatname_c % filename_c % ok % ffmpeg_error(ok);
       throw std::runtime_error(m.str());
     }
@@ -622,7 +620,7 @@ boost::shared_ptr<AVFormatContext> ffmpeg::make_output_format_context(
   return boost::shared_ptr<AVFormatContext>(retval, std::ptr_fun(deallocate_output_format_context));
 }
 
-AVCodec* ffmpeg::find_encoder(const std::string& filename,
+AVCodec* bob::io::detail::ffmpeg::find_encoder(const std::string& filename,
     boost::shared_ptr<AVFormatContext> fmtctxt, const std::string& codecname) {
 
   AVCodec* retval = 0;
@@ -632,7 +630,7 @@ AVCodec* ffmpeg::find_encoder(const std::string& filename,
     retval = avcodec_find_encoder_by_name(codecname.c_str());
     if (!retval) retval = try_find_through_decoder(codecname.c_str());
     if (!retval) {
-      boost::format m("ffmpeg::avcodec_find_encoder_by_name(`%s') failed: could not find a suitable codec for encoding video file `%s' using the output format `%s' == `%s'");
+      boost::format m("bob::io::detail::ffmpeg::avcodec_find_encoder_by_name(`%s') failed: could not find a suitable codec for encoding video file `%s' using the output format `%s' == `%s'");
       m % codecname % filename % fmtctxt->oformat->name 
         % fmtctxt->oformat->long_name;
       throw std::runtime_error(m.str());
@@ -647,7 +645,7 @@ AVCodec* ffmpeg::find_encoder(const std::string& filename,
     retval = avcodec_find_encoder(fmtctxt->oformat->video_codec);
 
     if (!retval) {
-      boost::format m("ffmpeg::avcodec_find_encoder(0x%x) failed: could not find encoder for codec with identifier for encoding video file `%s' using the output format `%s' == `%s'");
+      boost::format m("bob::io::detail::ffmpeg::avcodec_find_encoder(0x%x) failed: could not find encoder for codec with identifier for encoding video file `%s' using the output format `%s' == `%s'");
       m % fmtctxt->oformat->video_codec % filename
         % fmtctxt->oformat->name % fmtctxt->oformat->long_name;
       throw std::runtime_error(m.str());
@@ -664,7 +662,7 @@ static void deallocate_stream(AVStream* s) {
   }
 }
 
-boost::shared_ptr<AVStream> ffmpeg::make_stream(
+boost::shared_ptr<AVStream> bob::io::detail::ffmpeg::make_stream(
     const std::string& filename,
     boost::shared_ptr<AVFormatContext> fmtctxt,
     const std::string& codecname,
@@ -677,7 +675,7 @@ boost::shared_ptr<AVStream> ffmpeg::make_stream(
   AVStream* retval = avformat_new_stream(fmtctxt.get(), codec);
 
   if (!retval) {
-    boost::format m("ffmpeg::avformat_new_stream(format=`%s' == `%s', codec=`%s[0x%x]' == `%s') failed: could not allocate video stream container for encoding video to file `%s'");
+    boost::format m("bob::io::detail::ffmpeg::avformat_new_stream(format=`%s' == `%s', codec=`%s[0x%x]' == `%s') failed: could not allocate video stream container for encoding video to file `%s'");
     m % fmtctxt->oformat->name % fmtctxt->oformat->long_name 
       % codec->id % codec->name % codec->long_name % filename;
     throw std::runtime_error(m.str());
@@ -691,7 +689,7 @@ boost::shared_ptr<AVStream> ffmpeg::make_stream(
   AVStream* retval = av_new_stream(fmtctxt.get(), 0);
 
   if (!retval) {
-    boost::format m("ffmpeg::av_new_stream(format=`%s' == `%s') failed: could not allocate video stream container for encoding video to file `%s'");
+    boost::format m("bob::io::detail::ffmpeg::av_new_stream(format=`%s' == `%s') failed: could not allocate video stream container for encoding video to file `%s'");
     m % fmtctxt->oformat->name % fmtctxt->oformat->long_name % filename;
     throw std::runtime_error(m.str());
   }
@@ -766,13 +764,13 @@ static void deallocate_frame(AVFrame* f) {
   }
 }
 
-boost::shared_ptr<AVFrame> ffmpeg::make_frame(const std::string& filename,
+boost::shared_ptr<AVFrame> bob::io::detail::ffmpeg::make_frame(const std::string& filename,
     boost::shared_ptr<AVCodecContext> codec, PixelFormat pixfmt) {
 
   /* allocate and init a re-usable frame */
   AVFrame* retval = avcodec_alloc_frame();
   if (!retval) {
-    boost::format m("ffmpeg::avcodec_alloc_frame() failed: cannot allocate frame to start encoding video file `%s'");
+    boost::format m("bob::io::detail::ffmpeg::avcodec_alloc_frame() failed: cannot allocate frame to start encoding video file `%s'");
     m % filename;
     throw std::runtime_error(m.str());
   }
@@ -783,7 +781,7 @@ boost::shared_ptr<AVFrame> ffmpeg::make_frame(const std::string& filename,
 
   if (!picture_buf) {
     av_free(retval);
-    boost::format m("ffmpeg::av_malloc(size=%d) failed: cannot picture buffer to start reading or writing video file `%s'");
+    boost::format m("bob::io::detail::ffmpeg::av_malloc(size=%d) failed: cannot picture buffer to start reading or writing video file `%s'");
     m % size % filename;
     throw std::runtime_error(m.str());
   }
@@ -813,10 +811,10 @@ static void deallocate_empty_frame(AVFrame* f) {
   if (f) av_free(f);
 }
 
-boost::shared_ptr<AVFrame> ffmpeg::make_empty_frame(const std::string& filename) {
+boost::shared_ptr<AVFrame> bob::io::detail::ffmpeg::make_empty_frame(const std::string& filename) {
   AVFrame* retval = avcodec_alloc_frame();
   if (!retval) {
-    boost::format m("ffmpeg::avcodec_alloc_frame() failed: cannot allocate (empty) frame to start reading video file `%s'");
+    boost::format m("bob::io::detail::ffmpeg::avcodec_alloc_frame() failed: cannot allocate (empty) frame to start reading video file `%s'");
     m % filename;
     throw std::runtime_error(m.str());
   }
@@ -827,7 +825,7 @@ static void deallocate_swscaler(SwsContext* s) {
   if (s) sws_freeContext(s);
 }
 
-boost::shared_ptr<SwsContext> ffmpeg::make_scaler
+boost::shared_ptr<SwsContext> bob::io::detail::ffmpeg::make_scaler
 (const std::string& filename, boost::shared_ptr<AVCodecContext> ctxt,
  PixelFormat source_pixel_format, PixelFormat dest_pixel_format) {
 
@@ -844,7 +842,7 @@ boost::shared_ptr<SwsContext> ffmpeg::make_scaler
       SWS_BICUBIC, 0, 0, 0);
 
   if (!retval) {
-    boost::format m("ffmpeg::sws_getContext(src_width=%d, src_height=%d, src_pix_format=`%s', dest_width=%d, dest_height=%d, dest_pix_format=`%s', flags=SWS_BICUBIC, 0, 0, 0) failed: cannot get software scaler context to start encoding or decoding video file `%s'");
+    boost::format m("bob::io::detail::ffmpeg::sws_getContext(src_width=%d, src_height=%d, src_pix_format=`%s', dest_width=%d, dest_height=%d, dest_pix_format=`%s', flags=SWS_BICUBIC, 0, 0, 0) failed: cannot get software scaler context to start encoding or decoding video file `%s'");
     m % ctxt->width % ctxt->height % 
 #if LIBAVUTIL_VERSION_INT >= 0x320f01 //50.15.1 @ ffmpeg-0.6
 	av_get_pix_fmt_name(source_pixel_format)
@@ -867,7 +865,7 @@ static void deallocate_buffer(uint8_t* p) {
   if (p) av_free(p);
 }
 
-boost::shared_array<uint8_t> ffmpeg::make_buffer
+boost::shared_array<uint8_t> bob::io::detail::ffmpeg::make_buffer
 (boost::shared_ptr<AVFormatContext> format_context, size_t size) {
 
   uint8_t* retval=0;
@@ -884,7 +882,7 @@ boost::shared_array<uint8_t> ffmpeg::make_buffer
     retval = reinterpret_cast<uint8_t*>(av_malloc(size));
 
     if (!retval) {
-      boost::format m("ffmpeg::av_malloc(%d) failed: could not allocate video output buffer for encoding");
+      boost::format m("bob::io::detail::ffmpeg::av_malloc(%d) failed: could not allocate video output buffer for encoding");
       m % size;
       throw std::runtime_error(m.str());
     }
@@ -919,7 +917,7 @@ static void image_to_context(const blitz::Array<uint8_t,3>& data,
   int ok = sws_scale(scaler.get(), const_cast<uint8_t**>(planes), linesize, 0, height, output_frame->data, output_frame->linesize);
 #endif
   if (ok < 0) {
-    boost::format m("ffmpeg::sws_scale() failed: could not scale frame while encoding - ffmpeg reports error %d");
+    boost::format m("bob::io::detail::ffmpeg::sws_scale() failed: could not scale frame while encoding - ffmpeg reports error %d");
     m % ok;
     throw std::runtime_error(m.str());
   }
@@ -948,7 +946,7 @@ static void image_to_context(const blitz::Array<uint8_t,3>& data,
   int ok = sws_scale(scaler.get(), tmp_frame->data, tmp_frame->linesize,
 		  0, height, output_frame->data, output_frame->linesize);
   if (ok < 0) {
-    boost::format m("ffmpeg::sws_scale() failed: could not scale frame while encoding - ffmpeg reports error %d");
+    boost::format m("bob::io::detail::ffmpeg::sws_scale() failed: could not scale frame while encoding - ffmpeg reports error %d");
     m % ok;
     throw std::runtime_error(m.str());
   }
@@ -957,11 +955,11 @@ static void image_to_context(const blitz::Array<uint8_t,3>& data,
 static void deallocate_codec_context(AVCodecContext* c) {
   int ok = avcodec_close(c);
   if (ok < 0) {
-    bob::core::warn << "ffmpeg::avcodec_close() failed: cannot close codec context to stop reading or writing video file (ffmpeg error " << ok << ")" << std::endl;
+    bob::core::warn << "bob::io::detail::ffmpeg::avcodec_close() failed: cannot close codec context to stop reading or writing video file (ffmpeg error " << ok << ")" << std::endl;
   }
 }
 
-boost::shared_ptr<AVCodecContext> ffmpeg::make_codec_context(
+boost::shared_ptr<AVCodecContext> bob::io::detail::ffmpeg::make_codec_context(
     const std::string& filename, AVStream* stream, AVCodec* codec) {
 
   AVCodecContext* retval = stream->codec;
@@ -975,7 +973,7 @@ boost::shared_ptr<AVCodecContext> ffmpeg::make_codec_context(
 
   int ok = avcodec_open(retval, codec);
   if (ok < 0) {
-    boost::format m("ffmpeg::avcodec_open(codec=`%s'(0x%x) == `%s') failed: cannot open codec context to start reading or writing video file `%s' - ffmpeg reports error %d == `%s'");
+    boost::format m("bob::io::detail::ffmpeg::avcodec_open(codec=`%s'(0x%x) == `%s') failed: cannot open codec context to start reading or writing video file `%s' - ffmpeg reports error %d == `%s'");
     m % codec->name % codec->id % codec->long_name % filename
       % ok % ffmpeg_error(ok);
     throw std::runtime_error(m.str());
@@ -985,7 +983,7 @@ boost::shared_ptr<AVCodecContext> ffmpeg::make_codec_context(
 
   int ok = avcodec_open2(retval, codec, 0);
   if (ok < 0) {
-    boost::format m("ffmpeg::avcodec_open2(codec=`%s'(0x%x) == `%s') failed: cannot open codec context to start reading or writing video file `%s' - ffmpeg reports error %d == `%s'");
+    boost::format m("bob::io::detail::ffmpeg::avcodec_open2(codec=`%s'(0x%x) == `%s') failed: cannot open codec context to start reading or writing video file `%s' - ffmpeg reports error %d == `%s'");
     m % codec->name % codec->id % codec->long_name % filename
       % ok % ffmpeg_error(ok);
     throw std::runtime_error(m.str());
@@ -997,14 +995,14 @@ boost::shared_ptr<AVCodecContext> ffmpeg::make_codec_context(
       std::ptr_fun(deallocate_codec_context));
 }
 
-void ffmpeg::open_output_file(const std::string& filename,
+void bob::io::detail::ffmpeg::open_output_file(const std::string& filename,
     boost::shared_ptr<AVFormatContext> format_context) {
 
 # if LIBAVFORMAT_VERSION_INT < 0x346e00
   // sets the output parameters (must be done even if no parameters).
   int ok = av_set_parameters(format_context.get(), 0);
   if (ok < 0) {
-    boost::format m("ffmpeg::av_set_parameters() failed while opening file `%s' for writing: ffmpeg returned error code %d: %s");
+    boost::format m("bob::io::detail::ffmpeg::av_set_parameters() failed while opening file `%s' for writing: ffmpeg returned error code %d: %s");
     m % filename % ok % ffmpeg_error(ok);
     throw std::runtime_error(m.str());
   }
@@ -1023,7 +1021,7 @@ void ffmpeg::open_output_file(const std::string& filename,
     if (url_fopen(&format_context->pb, filename.c_str(), URL_WRONLY) < 0) 
 #   endif
     {
-      boost::format m("ffmpeg::avio_open(filename=`%s', AVIO_FLAG_WRITE) failed: cannot open output file for writing");
+      boost::format m("bob::io::detail::ffmpeg::avio_open(filename=`%s', AVIO_FLAG_WRITE) failed: cannot open output file for writing");
       m % filename.c_str();
       throw std::runtime_error(m.str());
     }
@@ -1036,13 +1034,13 @@ void ffmpeg::open_output_file(const std::string& filename,
   int error = av_write_header(format_context.get());
 # endif
   if (error < 0) {
-    boost::format m("ffmpeg::avformat_write_header(filename=`%s') failed: cannot write header to output file for some reason - ffmpeg reports error %d == `%s'");
+    boost::format m("bob::io::detail::ffmpeg::avformat_write_header(filename=`%s') failed: cannot write header to output file for some reason - ffmpeg reports error %d == `%s'");
     m % filename.c_str() % error % ffmpeg_error(error);
     throw std::runtime_error(m.str());
   }
 }
 
-void ffmpeg::close_output_file(const std::string& filename,
+void bob::io::detail::ffmpeg::close_output_file(const std::string& filename,
     boost::shared_ptr<AVFormatContext> format_context) {
 
   /* Write the trailer, if any. The trailer must be written before you
@@ -1051,7 +1049,7 @@ void ffmpeg::close_output_file(const std::string& filename,
    * av_codec_close(). */
   int error = av_write_trailer(format_context.get());
   if (error < 0) {
-    boost::format m("ffmpeg::av_write_trailer(filename=`%s') failed: cannot write trailer to output file for some reason - ffmpeg reports error %d == `%s')");
+    boost::format m("bob::io::detail::ffmpeg::av_write_trailer(filename=`%s') failed: cannot write trailer to output file for some reason - ffmpeg reports error %d == `%s')");
     m % filename % error % ffmpeg_error(error);
     throw std::runtime_error(m.str());
   }
@@ -1083,7 +1081,7 @@ static boost::shared_ptr<AVPacket> make_packet() {
       std::ptr_fun(deallocate_packet));
 }
 
-void ffmpeg::flush_encoder (const std::string& filename,
+void bob::io::detail::ffmpeg::flush_encoder (const std::string& filename,
     boost::shared_ptr<AVFormatContext> format_context,
     boost::shared_ptr<AVStream> stream, AVCodec* codec,
     boost::shared_array<uint8_t> buffer,
@@ -1104,7 +1102,7 @@ void ffmpeg::flush_encoder (const std::string& filename,
     int ok = avcodec_encode_video2(stream->codec, pkt.get(), 0, &got_output);
 
     if (ok < 0) {
-      boost::format m("ffmpeg::avcodec_encode_video2() failed: failed to encode video frame while writing to file `%s' -- ffmpeg reports error %d == `%s'");
+      boost::format m("bob::io::detail::ffmpeg::avcodec_encode_video2() failed: failed to encode video frame while writing to file `%s' -- ffmpeg reports error %d == `%s'");
       m % filename % ok % ffmpeg_error(ok);
       throw std::runtime_error(m.str());
     }
@@ -1117,7 +1115,7 @@ void ffmpeg::flush_encoder (const std::string& filename,
       /* Write the compressed frame to the media file. */
       ok = av_interleaved_write_frame(format_context.get(), pkt.get());
       if (ok && (ok != AVERROR(EINVAL))) {
-        boost::format m("ffmpeg::av_interleaved_write_frame() failed: failed to encode video frame while flushing remaining frames to file `%s' -- ffmpeg reports error %d == `%s'");
+        boost::format m("bob::io::detail::ffmpeg::av_interleaved_write_frame() failed: failed to encode video frame while flushing remaining frames to file `%s' -- ffmpeg reports error %d == `%s'");
         m % filename % ok % ffmpeg_error(ok);
         throw std::runtime_error(m.str());
       }
@@ -1139,7 +1137,7 @@ void ffmpeg::flush_encoder (const std::string& filename,
         buffer.get(), buffer_size, 0);
 
     if (out_size < 0) {
-      boost::format m("ffmpeg::avcodec_encode_video() failed: failed to encode video frame while writing to file `%s' -- ffmpeg reports error %d == `%s'");
+      boost::format m("bob::io::detail::ffmpeg::avcodec_encode_video() failed: failed to encode video frame while writing to file `%s' -- ffmpeg reports error %d == `%s'");
       m % filename % out_size % ffmpeg_error(out_size);
       throw std::runtime_error(m.str());
     }
@@ -1164,7 +1162,7 @@ void ffmpeg::flush_encoder (const std::string& filename,
       /* Write the compressed frame to the media file. */
       int ok = av_interleaved_write_frame(format_context.get(), &pkt);
       if (ok && (ok != AVERROR(EINVAL))) {
-        boost::format m("ffmpeg::av_interleaved_write_frame() failed: failed to write video frame while encoding file `%s' - ffmpeg reports error %d == `%s'");
+        boost::format m("bob::io::detail::ffmpeg::av_interleaved_write_frame() failed: failed to write video frame while encoding file `%s' - ffmpeg reports error %d == `%s'");
         m % filename % ok % ffmpeg_error(ok);
         throw std::runtime_error(m.str());
       }
@@ -1180,7 +1178,7 @@ void ffmpeg::flush_encoder (const std::string& filename,
 
 }
 
-void ffmpeg::write_video_frame (const blitz::Array<uint8_t,3>& data,
+void bob::io::detail::ffmpeg::write_video_frame (const blitz::Array<uint8_t,3>& data,
     const std::string& filename,
     boost::shared_ptr<AVFormatContext> format_context,
     boost::shared_ptr<AVStream> stream,
@@ -1208,7 +1206,7 @@ void ffmpeg::write_video_frame (const blitz::Array<uint8_t,3>& data,
 
     int ok = av_interleaved_write_frame(format_context.get(), &pkt);
     if (ok && (ok != AVERROR(EINVAL))) {
-      boost::format m("ffmpeg::av_interleaved_write_frame() failed: failed to write video frame while encoding file `%s' - ffmpeg reports error %d == `%s'");
+      boost::format m("bob::io::detail::ffmpeg::av_interleaved_write_frame() failed: failed to write video frame while encoding file `%s' - ffmpeg reports error %d == `%s'");
       m % filename % ok % ffmpeg_error(ok);
       throw std::runtime_error(m.str());
     }
@@ -1226,7 +1224,7 @@ void ffmpeg::write_video_frame (const blitz::Array<uint8_t,3>& data,
     int got_output;
     int ok = avcodec_encode_video2(stream->codec, pkt.get(), context_frame.get(), &got_output);
     if (ok < 0) {
-      boost::format m("ffmpeg::avcodec_encode_video2() failed: failed to encode video frame while writing to file `%s' - ffmpeg reports error %d == `%s'");
+      boost::format m("bob::io::detail::ffmpeg::avcodec_encode_video2() failed: failed to encode video frame while writing to file `%s' - ffmpeg reports error %d == `%s'");
       m % filename % ok % ffmpeg_error(ok);
       throw std::runtime_error(m.str());
     }
@@ -1239,7 +1237,7 @@ void ffmpeg::write_video_frame (const blitz::Array<uint8_t,3>& data,
       /* Write the compressed frame to the media file. */
       ok = av_interleaved_write_frame(format_context.get(), pkt.get());
       if (ok != 0) {
-        boost::format m("ffmpeg::av_interleaved_write_frame() failed: failed to write video frame while encoding file `%s' - ffmpeg reports error %d == `%s'");
+        boost::format m("bob::io::detail::ffmpeg::av_interleaved_write_frame() failed: failed to write video frame while encoding file `%s' - ffmpeg reports error %d == `%s'");
         m % filename % ok % ffmpeg_error(ok);
         throw std::runtime_error(m.str());
       }
@@ -1265,7 +1263,7 @@ void ffmpeg::write_video_frame (const blitz::Array<uint8_t,3>& data,
         buffer.get(), buffer_size, context_frame.get());
 
     if (out_size < 0) {
-      boost::format m("ffmpeg::avcodec_encode_video() failed: failed to encode video frame while writing to file `%s' -- ffmpeg reports error %d == `%s'");
+      boost::format m("bob::io::detail::ffmpeg::avcodec_encode_video() failed: failed to encode video frame while writing to file `%s' -- ffmpeg reports error %d == `%s'");
       m % filename % out_size % ffmpeg_error(out_size);
       throw std::runtime_error(m.str());
     }
@@ -1291,7 +1289,7 @@ void ffmpeg::write_video_frame (const blitz::Array<uint8_t,3>& data,
       int ok = av_interleaved_write_frame(format_context.get(), &pkt);
       av_free_packet(&pkt);
       if (ok && (ok != AVERROR(EINVAL))) {
-        boost::format m("ffmpeg::av_interleaved_write_frame() failed: failed to write video frame while encoding file `%s' - ffmpeg reports error %d == `%s'");
+        boost::format m("bob::io::detail::ffmpeg::av_interleaved_write_frame() failed: failed to write video frame while encoding file `%s' - ffmpeg reports error %d == `%s'");
         m % filename % ok % ffmpeg_error(ok);
         throw std::runtime_error(m.str());
       }
@@ -1333,7 +1331,7 @@ static int decode_frame (const std::string& filename, int current_frame,
 #endif
 
   if (ok < 0 && throw_on_error) {
-    boost::format m("ffmpeg::avcodec_decode_video/2() failed: could not decode frame %d of file `%s' - ffmpeg reports error %d == `%s'");
+    boost::format m("bob::io::detail::ffmpeg::avcodec_decode_video/2() failed: could not decode frame %d of file `%s' - ffmpeg reports error %d == `%s'");
     m % current_frame % filename % ok % ffmpeg_error(ok);
     throw std::runtime_error(m.str());
   }
@@ -1352,7 +1350,7 @@ static int decode_frame (const std::string& filename, int current_frame,
     if (conv_height < 0) {
 
       if (throw_on_error) {
-        boost::format m("ffmpeg::sws_scale() failed: could not scale frame %d of file `%s' - ffmpeg reports error %d");
+        boost::format m("bob::io::detail::ffmpeg::sws_scale() failed: could not scale frame %d of file `%s' - ffmpeg reports error %d");
         m % current_frame % filename % conv_height;
         throw std::runtime_error(m.str());
       }
@@ -1365,7 +1363,7 @@ static int decode_frame (const std::string& filename, int current_frame,
   return ok;
 }
 
-bool ffmpeg::read_video_frame (const std::string& filename, 
+bool bob::io::detail::ffmpeg::read_video_frame (const std::string& filename, 
     int current_frame, int stream_index,
     boost::shared_ptr<AVFormatContext> format_context,
     boost::shared_ptr<AVCodecContext> codec_context,
@@ -1391,7 +1389,7 @@ bool ffmpeg::read_video_frame (const std::string& filename,
 #if LIBAVCODEC_VERSION_INT >= 0x344802 //52.72.2 @ ffmpeg-0.6
   if (ok < 0 && ok != (int)AVERROR_EOF) {
     if (throw_on_error) {
-      boost::format m("ffmpeg::av_read_frame() failed: on file `%s' - ffmpeg reports error %d == `%s'");
+      boost::format m("bob::io::detail::ffmpeg::av_read_frame() failed: on file `%s' - ffmpeg reports error %d == `%s'");
       m % filename % ok % ffmpeg_error(ok);
       throw std::runtime_error(m.str());
     }
@@ -1413,7 +1411,7 @@ bool ffmpeg::read_video_frame (const std::string& filename,
       --iteration_counter;
       if (iteration_counter == 0) {
         if (throw_on_error) {
-          boost::format m("ffmpeg::decode_frame() failed: on file `%s' - I've been iterating for over %d times and I cannot find a new frame: this codec (%s) must be buggy!");
+          boost::format m("bob::io::detail::ffmpeg::decode_frame() failed: on file `%s' - I've been iterating for over %d times and I cannot find a new frame: this codec (%s) must be buggy!");
           m % filename % MAX_FLUSH_ITERATIONS % codec_context->codec->name; 
           throw std::runtime_error(m.str());
         }
@@ -1453,7 +1451,7 @@ static int dummy_decode_frame (const std::string& filename, int current_frame,
 #endif
 
   if (ok < 0 && throw_on_error) {
-    boost::format m("ffmpeg::avcodec_decode_video/2() failed: could not skip frame %d of file `%s' - ffmpeg reports error %d == `%s'");
+    boost::format m("bob::io::detail::ffmpeg::avcodec_decode_video/2() failed: could not skip frame %d of file `%s' - ffmpeg reports error %d == `%s'");
     m % current_frame % filename % ok % ffmpeg_error(ok);
     throw std::runtime_error(m.str());
   }
@@ -1461,7 +1459,7 @@ static int dummy_decode_frame (const std::string& filename, int current_frame,
   return ok;
 }
 
-bool ffmpeg::skip_video_frame (const std::string& filename,
+bool bob::io::detail::ffmpeg::skip_video_frame (const std::string& filename,
     int current_frame, int stream_index,
     boost::shared_ptr<AVFormatContext> format_context,
     boost::shared_ptr<AVCodecContext> codec_context,
@@ -1485,7 +1483,7 @@ bool ffmpeg::skip_video_frame (const std::string& filename,
 #if LIBAVCODEC_VERSION_INT >= 0x344802 //52.72.2 @ ffmpeg-0.6
   if (ok < 0 && ok != (int)AVERROR_EOF) {
     if (throw_on_error) {
-      boost::format m("ffmpeg::av_read_frame() failed: on file `%s' - ffmpeg reports error %d == `%s'");
+      boost::format m("bob::io::detail::ffmpeg::av_read_frame() failed: on file `%s' - ffmpeg reports error %d == `%s'");
       m % filename % ok % ffmpeg_error(ok);
       throw std::runtime_error(m.str());
     }
@@ -1506,7 +1504,7 @@ bool ffmpeg::skip_video_frame (const std::string& filename,
       --iteration_counter;
       if (iteration_counter == 0) {
         if (throw_on_error) {
-          boost::format m("ffmpeg::decode_frame() failed: on file `%s' - I've been iterating for over %d times and I cannot find a new frame: this codec (%s) must be buggy!");
+          boost::format m("bob::io::detail::ffmpeg::decode_frame() failed: on file `%s' - I've been iterating for over %d times and I cannot find a new frame: this codec (%s) must be buggy!");
           m % filename % MAX_FLUSH_ITERATIONS % codec_context->codec->name; 
           throw std::runtime_error(m.str());
         }

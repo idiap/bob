@@ -28,8 +28,8 @@
 #include <blitz/array.h>
 #include <stdint.h>
 
-#include "bob/core/array.h"
-#include "bob/io/VideoUtilities.h"
+#include <bob/core/array.h>
+#include <bob/io/VideoUtilities.h>
 
 namespace bob { namespace io {
 

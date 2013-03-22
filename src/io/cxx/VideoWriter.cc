@@ -23,7 +23,7 @@
 
 #include <boost/format.hpp>
 #include <boost/preprocessor.hpp>
-#include "bob/io/VideoWriter.h"
+#include <bob/io/VideoWriter.h>
 
 #if LIBAVFORMAT_VERSION_INT < 0x361764 /* 54.23.100 @ ffmpeg-0.11 */
 #define FFMPEG_VIDEO_BUFFER_SIZE 200000
@@ -34,8 +34,6 @@
 #ifndef AV_PIX_FMT_RGB24
 #define AV_PIX_FMT_RGB24 PIX_FMT_RGB24
 #endif
-
-namespace ffmpeg = bob::io::detail::ffmpeg;
 
 bob::io::VideoWriter::VideoWriter(
     const std::string& filename,
@@ -49,19 +47,19 @@ bob::io::VideoWriter::VideoWriter(
     bool check) :
   m_filename(filename),
   m_opened(false),
-  m_format_context(ffmpeg::make_output_format_context(filename, format)),
-  m_codec(ffmpeg::find_encoder(filename, m_format_context, codec)),
-  m_stream(ffmpeg::make_stream(filename, m_format_context, codec, height,
+  m_format_context(bob::io::detail::ffmpeg::make_output_format_context(filename, format)),
+  m_codec(bob::io::detail::ffmpeg::find_encoder(filename, m_format_context, codec)),
+  m_stream(bob::io::detail::ffmpeg::make_stream(filename, m_format_context, codec, height,
         width, framerate, bitrate, gop, m_codec)),
-  m_codec_context(ffmpeg::make_codec_context(filename, m_stream.get(), m_codec)),
-  m_context_frame(ffmpeg::make_frame(filename, m_codec_context, m_stream->codec->pix_fmt)),
+  m_codec_context(bob::io::detail::ffmpeg::make_codec_context(filename, m_stream.get(), m_codec)),
+  m_context_frame(bob::io::detail::ffmpeg::make_frame(filename, m_codec_context, m_stream->codec->pix_fmt)),
 #if LIBAVCODEC_VERSION_INT >= 0x352a00 //53.42.0 @ ffmpeg-0.9
-  m_swscaler(ffmpeg::make_scaler(filename, m_codec_context, PIX_FMT_GBRP, m_stream->codec->pix_fmt)),
+  m_swscaler(bob::io::detail::ffmpeg::make_scaler(filename, m_codec_context, PIX_FMT_GBRP, m_stream->codec->pix_fmt)),
 #else
-  m_rgb24_frame(ffmpeg::make_frame(filename, m_codec_context, AV_PIX_FMT_RGB24)),
-  m_swscaler(ffmpeg::make_scaler(filename, m_codec_context, AV_PIX_FMT_RGB24, m_stream->codec->pix_fmt)),
+  m_rgb24_frame(bob::io::detail::ffmpeg::make_frame(filename, m_codec_context, AV_PIX_FMT_RGB24)),
+  m_swscaler(bob::io::detail::ffmpeg::make_scaler(filename, m_codec_context, AV_PIX_FMT_RGB24, m_stream->codec->pix_fmt)),
 #endif
-  m_buffer(ffmpeg::make_buffer(m_format_context, FFMPEG_VIDEO_BUFFER_SIZE)),
+  m_buffer(bob::io::detail::ffmpeg::make_buffer(m_format_context, FFMPEG_VIDEO_BUFFER_SIZE)),
   m_height(height),
   m_width(width),
   m_framerate(framerate),
@@ -73,24 +71,24 @@ bob::io::VideoWriter::VideoWriter(
 {
   //runs a codec/format check if the user asked so
   if (check) {
-    if (!ffmpeg::oformat_is_supported(formatName())) {
+    if (!bob::io::detail::ffmpeg::oformat_is_supported(formatName())) {
       boost::format s("The detected format (`%s' = `%s') of the output video file `%s' is not currently supported by this version of Bob. Choose one of the supported formats or disable the `check' flag on the VideoWriter object (if you are sure of what you are doing).");
       s % formatName() % formatLongName() % filename;
       throw std::runtime_error(s.str());
     }
-    if (!ffmpeg::codec_is_supported(codecName())) {
+    if (!bob::io::detail::ffmpeg::codec_is_supported(codecName())) {
       boost::format s("The detected encoder (`%s' = `%s') for the video stream on the output video file `%s' is not currently supported by this version of Bob. Choose a supported codec or disable the `check' flag on the VideoWriter object (if you are sure of what you are doing).");
       s % codecName() % codecLongName() % filename;
       throw std::runtime_error(s.str());
     }
-    if (!ffmpeg::oformat_supports_codec(formatName(), codecName())) {
+    if (!bob::io::detail::ffmpeg::oformat_supports_codec(formatName(), codecName())) {
       boost::format s("The detected pair of format (%s) and codec (%s) chosen for video file `%s' is not currently supported by this version of Bob. Choose a supported combination of formats and codecs or disable the `check' flag on the VideoWriter object (if you are sure of what you are doing).");
       s % formatName() % codecName() % filename;
       throw std::runtime_error(s.str());
     }
   }
 
-  ffmpeg::open_output_file(m_filename, m_format_context);
+  bob::io::detail::ffmpeg::open_output_file(m_filename, m_format_context);
 
   //sets up the io layer typeinfo
   m_typeinfo_video.dtype = m_typeinfo_frame.dtype = bob::core::array::t_uint8;
@@ -119,9 +117,9 @@ void bob::io::VideoWriter::close() {
 
   if (!m_opened) return;
 
-  ffmpeg::flush_encoder(m_filename, m_format_context, m_stream, m_codec,
+  bob::io::detail::ffmpeg::flush_encoder(m_filename, m_format_context, m_stream, m_codec,
       m_buffer, FFMPEG_VIDEO_BUFFER_SIZE);
-  ffmpeg::close_output_file(m_filename, m_format_context);
+  bob::io::detail::ffmpeg::close_output_file(m_filename, m_format_context);
 
   /* Destroyes resources in an orderly fashion */
   m_codec_context.reset();
@@ -176,7 +174,7 @@ void bob::io::VideoWriter::append(const blitz::Array<uint8_t,4>& data) {
 
   blitz::Range a = blitz::Range::all();
   for(int i=data.lbound(0); i<(data.extent(0)+data.lbound(0)); ++i) {
-    ffmpeg::write_video_frame(data(i, a, a, a), m_filename, m_format_context,
+    bob::io::detail::ffmpeg::write_video_frame(data(i, a, a, a), m_filename, m_format_context,
         m_stream, m_context_frame, m_rgb24_frame, m_swscaler, m_buffer,
         FFMPEG_VIDEO_BUFFER_SIZE);
     ++m_current_frame;
@@ -200,7 +198,7 @@ void bob::io::VideoWriter::append(const blitz::Array<uint8_t,3>& data) {
     throw std::runtime_error(m.str());
   }
 
-  ffmpeg::write_video_frame(data, m_filename, m_format_context,
+  bob::io::detail::ffmpeg::write_video_frame(data, m_filename, m_format_context,
       m_stream, m_context_frame, m_rgb24_frame, m_swscaler, m_buffer,
       FFMPEG_VIDEO_BUFFER_SIZE);
   ++m_current_frame;
@@ -236,7 +234,7 @@ void bob::io::VideoWriter::append(const bob::core::array::interface& data) {
     shape = 3, m_height, m_width;
     blitz::Array<uint8_t,3> tmp(const_cast<uint8_t*>(static_cast<const uint8_t*>(data.ptr())), shape,
         blitz::neverDeleteData);
-    ffmpeg::write_video_frame(tmp, m_filename, m_format_context,
+    bob::io::detail::ffmpeg::write_video_frame(tmp, m_filename, m_format_context,
         m_stream, m_context_frame, m_rgb24_frame, m_swscaler, m_buffer,
         FFMPEG_VIDEO_BUFFER_SIZE);
     ++m_current_frame;
@@ -260,7 +258,7 @@ void bob::io::VideoWriter::append(const bob::core::array::interface& data) {
 
     for(size_t i=0; i<type.shape[0]; ++i) {
       blitz::Array<uint8_t,3> tmp(ptr, shape, blitz::neverDeleteData);
-      ffmpeg::write_video_frame(tmp, m_filename, m_format_context,
+      bob::io::detail::ffmpeg::write_video_frame(tmp, m_filename, m_format_context,
           m_stream, m_context_frame, m_rgb24_frame, m_swscaler, m_buffer,
           FFMPEG_VIDEO_BUFFER_SIZE);
       ++m_current_frame;
