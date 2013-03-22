@@ -26,10 +26,10 @@
 #include <dlfcn.h>
 
 #define bob_IMPORT_ARRAY
-#include "bob/core/python/ndarray.h"
+#include <bob/core/python/ndarray.h>
 #undef bob_IMPORT_ARRAY
 
-#include "bob/core/logging.h"
+#include <bob/core/logging.h>
 
 #define TP_ARRAY(x) ((PyArrayObject*)x.ptr())
 #define TP_OBJECT(x) (x.ptr())

@@ -5,10 +5,9 @@
  * @brief Implementation of Python GIL C++ locking
  */
 
-#include <iostream>
 #include <pthread.h>
 #include <boost/python.hpp>
-#include "bob/core/python/gil.h"
+#include <bob/core/python/gil.h>
 
 bob::python::gil::gil () 
   : m_lock(PyGILState_Ensure())
