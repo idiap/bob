@@ -23,25 +23,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/core/blitz_compat.h"
-#include "bob/math/eig.h"
-#include "bob/math/linear.h"
-#include "bob/trainer/Exception.h"
-#include "bob/trainer/FisherLDATrainer.h"
+#include ,bob/core/blitz_compat.h>
+#include <bob/math/eig.h>
+#include <bob/math/linear.h>
+#include <bob/trainer/Exception.h>
+#include <bob/trainer/FisherLDATrainer.h>
 
-namespace train = bob::trainer;
-namespace mach = bob::machine;
-namespace io = bob::io;
+bob::trainer::FisherLDATrainer::FisherLDATrainer() { }
 
-train::FisherLDATrainer::FisherLDATrainer() { }
-
-train::FisherLDATrainer::FisherLDATrainer(const train::FisherLDATrainer& other)
+bob::trainer::FisherLDATrainer::FisherLDATrainer(const bob::trainer::FisherLDATrainer& other)
 { }
 
-train::FisherLDATrainer::~FisherLDATrainer() {}
+bob::trainer::FisherLDATrainer::~FisherLDATrainer() {}
 
-train::FisherLDATrainer& train::FisherLDATrainer::operator=
-(const train::FisherLDATrainer& other) {
+bob::trainer::FisherLDATrainer& bob::trainer::FisherLDATrainer::operator=
+(const bob::trainer::FisherLDATrainer& other) {
   return *this;
 }
 
@@ -166,12 +162,12 @@ static void evalScatters (const std::vector<blitz::Array<double, 2> >& data,
   (void)evalTotalScatter; //< silences gcc, does nothing.
 }
 
-void train::FisherLDATrainer::train(mach::LinearMachine& machine,
+void bob::trainer::FisherLDATrainer::train(bob::machine::LinearMachine& machine,
     blitz::Array<double,1>& eigen_values,
     const std::vector<blitz::Array<double, 2> >& data) const {
 
   // if #classes < 2, then throw
-  if (data.size() < 2) throw train::WrongNumberOfClasses(data.size());
+  if (data.size() < 2) throw bob::trainer::WrongNumberOfClasses(data.size());
 
   // checks for arrayset data type and shape once
   int n_features = data[0].extent(1);
@@ -219,7 +215,7 @@ void train::FisherLDATrainer::train(mach::LinearMachine& machine,
   machine.setBiases(0.0);
 }
 
-void train::FisherLDATrainer::train(mach::LinearMachine& machine,
+void bob::trainer::FisherLDATrainer::train(bob::machine::LinearMachine& machine,
     const std::vector<blitz::Array<double,2> >& data) const {
   blitz::Array<double,1> throw_away;
   train(machine, throw_away, data);

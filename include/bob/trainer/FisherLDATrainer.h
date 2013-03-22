@@ -23,16 +23,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_TRAINER_FISHER_LDA_TRAINER_H
-#define BOB5SPRO_TRAINER_FISHER_LDA_TRAINER_H
+#ifndef BOB_TRAINER_FISHER_LDA_TRAINER_H
+#define BOB_TRAINER_FISHER_LDA_TRAINER_H
 
 #include <vector>
 
-#include "bob/trainer/Trainer.h"
-#include "bob/machine/LinearMachine.h"
+#include <bob/trainer/Trainer.h>
+#include <bob/machine/LinearMachine.h>
 
-namespace bob { namespace trainer {
-  
+namespace bob { namespace trainer { 
+  /**
+   * @ingroup TRAINER
+   * @{
+   */
+
   /**
    * Sets a linear machine to perform the Fisher/LDA decomposition. References:
    *
@@ -98,6 +102,9 @@ namespace bob { namespace trainer {
 
   };
 
+  /**
+   * @}
+   */
 } }
 
-#endif /* BOB5SPRO_TRAINER_FISHER_LDA_TRAINER_H */
+#endif /* BOB_TRAINER_FISHER_LDA_TRAINER_H */
