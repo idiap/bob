@@ -27,9 +27,13 @@
 #include <bob/core/assert.h>
 
 namespace bob { namespace math {
+/**
+ * @ingroup MATH
+ * @{
+ */
 
     /**
-     * Computes the scatter matrix of a 2D array considering data is
+     * @brief Computes the scatter matrix of a 2D array considering data is
      * organized column-wise (each sample is a column, each feature is a row).
      * Outputs the sample mean M and the scatter matrix S.
      *
@@ -58,7 +62,7 @@ namespace bob { namespace math {
     }
 
     /**
-     * Computes the scatter matrix of a 2D array considering data is
+     * @brief Computes the scatter matrix of a 2D array considering data is
      * organized column-wise (each sample is a column, each feature is a row).
      * Outputs the sample mean M and the scatter matrix S.
      *
@@ -82,7 +86,7 @@ namespace bob { namespace math {
     }
 
     /**
-     * Computes the scatter matrix of a 2D array considering data is
+     * @brief Computes the scatter matrix of a 2D array considering data is
      * organized column-wise (each sample is a column, each feature is a row).
      * Outputs the sample scatter matrix S.
      *
@@ -99,7 +103,7 @@ namespace bob { namespace math {
     }
 
     /**
-     * Computes the scatter matrix of a 2D array considering data is
+     * @brief Computes the scatter matrix of a 2D array considering data is
      * organized column-wise (each sample is a column, each feature is a row).
      * Outputs the sample scatter matrix S.
      *
@@ -115,6 +119,9 @@ namespace bob { namespace math {
       scatter<T>(A, S, M);
     }
 
+/**
+ * @}
+ */
 }}
 
 #endif /* BOB_MATH_STATS_H */

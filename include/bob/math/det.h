@@ -26,25 +26,27 @@
 
 #include <blitz/array.h>
 
-namespace bob {
+namespace bob { namespace math {
 /**
- * \ingroup libmath_api
+ * @ingroup MATH
  * @{
- *
  */
-  namespace math {
 
-    /**
-      * @brief Function which computes the determinant of a square matrix
-      * @param A The A matrix to consider (size NxN)
-      */
-    double det(const blitz::Array<double,2>& A);
-    double det_(const blitz::Array<double,2>& A);
+/**
+ * @brief Function which computes the determinant of a square matrix
+ * @param A The A matrix to consider (size NxN)
+ */
+double det(const blitz::Array<double,2>& A);
+/**
+ * @brief Function which computes the determinant of a square matrix
+ * @param A The A matrix to consider (size NxN)
+ * @warning Does not check the input matrix
+ */
+double det_(const blitz::Array<double,2>& A);
 
-  }
 /**
  * @}
  */
-}
+}}
 
 #endif /* BOB_MATH_DET_H */

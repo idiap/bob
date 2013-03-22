@@ -27,6 +27,7 @@
 namespace bob { namespace math {
 
 /**
+ * @ingroup MATH
  * @brief Some logarithm constants and functions inherited from Torch3. 
  *   It seems that the 'magic' threshold MINUS_LOG_THRESHOLD is also 
  *   defined in a similar way in the PLearn library 

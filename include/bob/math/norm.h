@@ -25,13 +25,11 @@
 
 #include <blitz/array.h>
 
-namespace bob {
+namespace bob { namespace math {
 /**
- * \ingroup libmath_api
+ * @ingroup MATH
  * @{
- *
  */
-namespace math {
 
 /**
  * @brief Function which implements the Frobenius of a matrix, that is
@@ -43,10 +41,9 @@ double frobenius(const blitz::Array<T,2>& A)
   return sqrt(blitz::sum(blitz::pow2(A)));
 }
 
-}
 /**
  * @}
  */
-}
+}}
 
 #endif /* BOB_MATH_NORM_H */

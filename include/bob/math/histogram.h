@@ -30,8 +30,11 @@
 #include <functional>
 #include <cmath>
 
-namespace bob{
-  namespace math{
+namespace bob{ namespace math{
+/**
+ * @ingroup MATH
+ * @{
+ */
 
     template <class T>
       // wrapper for the std::min function (required to be compilable under OsX)
@@ -189,6 +192,9 @@ namespace bob{
         return sum;
       }
 
+/**
+ * @}
+ */
   } // namespace math
 } // namespace bob
 

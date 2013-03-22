@@ -26,13 +26,11 @@
 
 #include <blitz/array.h>
 
-namespace bob {
+namespace bob { namespace math {
 /**
- * \ingroup libmath_api
+ * @ingroup MATH
  * @{
- *
  */
-namespace math {
 
 /**
  * @brief Base class to solve a linear program using interior 
@@ -569,10 +567,9 @@ class LPInteriorPointLongstep: public LPInteriorPoint
     double m_sigma;
 };
 
-}
 /**
  * @}
  */
-}
+}}
 
 #endif /* BOB_MATH_INTERIOR_POINT_LP_H */

@@ -25,30 +25,29 @@
 
 #include <blitz/array.h>
 
-namespace bob {
+namespace bob { namespace math {
 /**
- * \ingroup libmath_api
+ * @ingroup MATH
  * @{
  *
  */
-  namespace math {
 
     /**
-      * @brief Function which performs a LU decomposition of a real
-      *   matrix, using the dgetrf LAPACK function: A = P*L*U
-      * @param A The A matrix to decompose (size NxN)
-      * @param L The L lower-triangular matrix of the decomposition (size Mxmin(M,N)) 
-      * @param U The U upper-triangular matrix of the decomposition (size min(M,N)xN) 
-      * @param P The P permutation matrix of the decomposition (size min(M,N)xmin(M,N))
-      */
+     * @brief Function which performs a LU decomposition of a real
+     *   matrix, using the dgetrf LAPACK function: A = P*L*U
+     * @param A The A matrix to decompose (size NxN)
+     * @param L The L lower-triangular matrix of the decomposition (size Mxmin(M,N)) 
+     * @param U The U upper-triangular matrix of the decomposition (size min(M,N)xN) 
+     * @param P The P permutation matrix of the decomposition (size min(M,N)xmin(M,N))
+     */
     void lu(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
       blitz::Array<double,2>& U, blitz::Array<double,2>& P);
     void lu_(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
       blitz::Array<double,2>& U, blitz::Array<double,2>& P);
-  }
+
 /**
  * @}
  */
-}
+}}
 
 #endif /* BOB_MATH_LU_H */

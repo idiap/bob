@@ -27,7 +27,14 @@
 #include <bob/core/Exception.h>
 
 namespace bob { namespace math {
+  /**
+   * @ingroup MATH
+   * @{
+   */
 
+  /**
+   * @brief Generic math exception
+   */
   class Exception: public bob::core::Exception {
     public:
       Exception() throw();
@@ -67,8 +74,8 @@ namespace bob { namespace math {
   };
 
   /**
-   * Raised when a sample distance parameter of the gradient computation is
-   * not strictly positive.
+   * @brief Raised when a sample distance parameter of the gradient
+   * computation is not strictly positive.
    */
   class GradientNonPositiveSampleDistance: public Exception {
     public:
@@ -82,6 +89,9 @@ namespace bob { namespace math {
       mutable std::string m_message;
   };
 
+  /**
+   * @}
+   */
 }}
 
 #endif /* BOB_MATH_EXCEPTION_H */

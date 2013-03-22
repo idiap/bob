@@ -27,10 +27,22 @@
 #include <blitz/array.h>
 #include <bob/core/assert.h>
 
-namespace bob { namespace math {
+/**
+ * @addtogroup MATH math
+ * @brief Math module API
+ */
+namespace bob {
+/**
+ * @ingroup MATH
+ */
+namespace math {
+  /**
+   * @ingroup MATH
+   * @{
+   */
 
   /**
-   * Performs the matrix multiplication C=A*B
+   * @brief Performs the matrix multiplication C=A*B
    *
    * @warning No checks are performed on the array sizes and is recommended
    * only in scenarios where you have previously checked conformity and is
@@ -50,7 +62,7 @@ namespace bob { namespace math {
     }
 
   /**
-   * Performs the matrix multiplication C=A*B
+   * @brief Performs the matrix multiplication C=A*B
    *
    * The input and output data have their sizes checked and this method will
    * raise an appropriate exception if that is not cased. If you know that the
@@ -77,7 +89,7 @@ namespace bob { namespace math {
     }
 
   /**
-   * Performs the matrix-vector multiplication c=A*b
+   * @brief Performs the matrix-vector multiplication c=A*b
    *
    * @warning No checks are performed on the array sizes and is recommended
    * only in scenarios where you have previously checked conformity and is
@@ -96,7 +108,7 @@ namespace bob { namespace math {
     }
 
   /**
-   * Performs the matrix-vector multiplication c=A*b
+   * @brief Performs the matrix-vector multiplication c=A*b
    *
    * The input and output data have their sizes checked and this method will
    * raise an appropriate exception if that is not cased. If you know that the
@@ -122,7 +134,7 @@ namespace bob { namespace math {
     }
 
   /**
-   * Performs the vector-matrix multiplication c=a*B
+   * @brief Performs the vector-matrix multiplication c=a*B
    *
    * @warning No checks are performed on the array sizes and is recommended
    * only in scenarios where you have previously checked conformity and is
@@ -141,7 +153,7 @@ namespace bob { namespace math {
     }
 
   /**
-   * Performs the vector-matrix multiplication c=a*B
+   * @brief Performs the vector-matrix multiplication c=a*B
    *
    * The input and output data have their sizes checked and this method will
    * raise an appropriate exception if that is not cased. If you know that the
@@ -167,7 +179,7 @@ namespace bob { namespace math {
     }
 
   /**
-   * Performs the outer product between two vectors generating a matrix.
+   * @brief Performs the outer product between two vectors generating a matrix.
    *
    * @warning No checks are performed on the array sizes and is recommended
    * only in scenarios where you have previously checked conformity and is
@@ -186,7 +198,7 @@ namespace bob { namespace math {
     }
 
   /**
-   * Performs the outer product between two vectors generating a matrix.
+   * @brief Performs the outer product between two vectors generating a matrix.
    *
    * The input and output data have their sizes checked and this method will
    * raise an appropriate exception if that is not cased. If you know that the
@@ -212,7 +224,7 @@ namespace bob { namespace math {
     }
 
   /**
-   * Function which computes the dot product <a,b> between two 1D blitz
+   * @brief Function which computes the dot product <a,b> between two 1D blitz
    * array.
    *
    * @warning No checks are performed on the array sizes and is recommended
@@ -228,7 +240,7 @@ namespace bob { namespace math {
     }
 
   /**
-   * Function which computes the dot product <a,b> between two 1D blitz
+   * @brief Function which computes the dot product <a,b> between two 1D blitz
    * array.
    *
    * The input data have their sizes checked and this method will raise an
@@ -249,8 +261,8 @@ namespace bob { namespace math {
     }
 
   /**
-   * Computes the trace of a square matrix (the sum of all elements in the main
-   * diagonal).
+   * @brief Computes the trace of a square matrix (the sum of all elements in
+   * the main diagonal).
    *
    * @warning No checks are performed on the array extent sizes and is
    * recommended only in scenarios where you have previously checked conformity
@@ -264,8 +276,8 @@ namespace bob { namespace math {
   }
 
   /**
-   * Computes the trace of a square matrix (the sum of all elements in the main
-   * diagonal).
+   * @brief Computes the trace of a square matrix (the sum of all elements in
+   * the main diagonal).
    *
    * The input matrix is checked for "square-ness" and raises an appropriate
    * exception if that is not cased. If you know that the input matrix
@@ -282,14 +294,14 @@ namespace bob { namespace math {
   }
 
   /**
-   * Computes the euclidean norm of a vector
+   * @brief Computes the euclidean norm of a vector
    */
   template<typename T> inline double norm(const blitz::Array<T,1>& array) {
     return std::sqrt(blitz::sum(blitz::pow2(array)));
   }
 
   /**
-   * Normalizes a vector 'i' and outputs the normalized vector in 'o'.
+   * @brief Normalizes a vector 'i' and outputs the normalized vector in 'o'.
    *
    * @warning This version of the normalize() method does not check for length
    * consistencies and is given as an API for cases in which you have done
@@ -301,7 +313,8 @@ namespace bob { namespace math {
   }
 
   /**
-   * Normalizes a vector 'i' and outputs the normalized vector in itself.
+   * @brief Normalizes a vector 'i' and outputs the normalized vector in
+   * itself.
    *
    * @note This method receives an array by *value* and not by reference as in
    * many cases we iterate over the vectors in a matrix and we cannot get a
@@ -312,7 +325,7 @@ namespace bob { namespace math {
   }
 
   /**
-   * Normalizes a vector 'i' and outputs the normalized vector in 'o'.
+   * @brief Normalizes a vector 'i' and outputs the normalized vector in 'o'.
    *
    * Both vectors are checked to make sure they have the same length. If you
    * want to use an unchecked version, please use normalize_.
@@ -325,8 +338,8 @@ namespace bob { namespace math {
   }
 
   /**
-   * Generates an eye 2D matrix. If the matrix is squared, then it returns the 
-   * identity matrix.
+   * @brief Generates an eye 2D matrix. If the matrix is squared, then it
+   * returns the identity matrix.
    *
    * @warning No checks are performed on the array and is recommended
    * only in scenarios where you have previously checked conformity and is
@@ -342,8 +355,8 @@ namespace bob { namespace math {
     }
 
   /**
-   * Generates an eye 2D matrix. If the matrix is squared, then it returns the 
-   * identity matrix.
+   * @brief Generates an eye 2D matrix. If the matrix is squared, then it
+   * returns the identity matrix.
    *
    * @param A The 2D destination matrix (size MxN)
    */
@@ -354,7 +367,7 @@ namespace bob { namespace math {
     }
 
   /**
-   * Generates a 2D square diagonal matrix from a 1D vector.
+   * @brief Generates a 2D square diagonal matrix from a 1D vector.
    *
    * @warning No checks are performed on the array sizes and is recommended
    * only in scenarios where you have previously checked conformity and is
@@ -371,7 +384,7 @@ namespace bob { namespace math {
     }
 
   /**
-   * Generates a 2D square diagonal matrix from a 1D vector.
+   * @brief Generates a 2D square diagonal matrix from a 1D vector.
    *
    * @param d The 1D vector which contains the diagonal (size N)
    * @param A The 2D destination matrix (size MxN)

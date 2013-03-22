@@ -26,13 +26,11 @@
 
 #include <blitz/array.h>
 
-namespace bob {
+namespace bob { namespace math {
 /**
- * \ingroup libmath_api
+ * @ingroup MATH
  * @{
- *
  */
-  namespace math {
 
     /**
       * @brief Function which computes the (unique) square root of a real 
@@ -44,10 +42,9 @@ namespace bob {
     void sqrtSymReal(const blitz::Array<double,2>& A, blitz::Array<double,2>& B); 
     void sqrtSymReal_(const blitz::Array<double,2>& A, blitz::Array<double,2>& B);
 
-  }
 /**
  * @}
  */
-}
+}}
 
 #endif /* BOB_MATH_SQRTM_H */
