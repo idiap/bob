@@ -25,7 +25,6 @@
 #ifndef BOB_CORE_ARRAY_REPMAT_H
 #define BOB_CORE_ARRAY_REPMAT_H
 
-#include <limits>
 #include <blitz/array.h>
 #include <bob/core/array_exception.h>
 #include <bob/core/assert.h>

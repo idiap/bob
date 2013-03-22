@@ -25,6 +25,8 @@
 #include <algorithm>
 #include <complex>
 #include <blitz/array.h>
+#include <vector>
+#include <map>
 
 #include <bob/config.h>
 #if !defined (HAVE_BLITZ_TINYVEC2_H)
@@ -391,6 +393,97 @@ bool isClose(const blitz::Array<std::complex<T>,4>& left,
 }
 
 /**
+ * @brief Checks that two vectors of blitz arrays are close, also checking 
+ * that the shapes of each pair of blitz arrays are the same.
+ */
+template <typename T, int D>
+bool isClose(const std::vector<blitz::Array<T,D> >& left,
+  std::vector<blitz::Array<T,D> >& right,
+  const T& r_epsilon=1e-5, const T& a_epsilon=1e-8)
+{
+  if (left.size() != right.size())
+    return false;
+
+  typename std::vector<blitz::Array<T,D> >::const_iterator itl, itr;
+  for (itl = left.begin(), itr = right.begin(); 
+       itl != left.end(), itr != right.end(); ++itl, ++itr)
+    if (!isClose(*itl, *itr, r_epsilon, a_epsilon))
+      return false;
+
+  return true;
+}
+
+/**
+ * @brief Checks that two maps of blitz arrays are close, also checking 
+ * that the shapes of each pair of blitz arrays are the same.
+ */
+template <typename K, typename T, int D>
+bool isClose(const std::map<K, blitz::Array<T,D> >& left, 
+  const std::map<K, blitz::Array<T,D> >& right,
+  const T& r_epsilon=1e-5, const T& a_epsilon=1e-8)
+{
+  if (left.size() != right.size())
+    return false;
+
+  typename std::map<K, blitz::Array<T,D> >::const_iterator it, temp;
+  for (it = left.begin(); it != left.end(); ++it)
+  {
+    temp = right.find(it->first);
+    if (temp == right.end()) return false;
+    if (!isClose(it->second, temp->second, r_epsilon, a_epsilon)) return false;
+  }
+
+  return true;
+}
+
+/**
+ * @brief Checks that two vectors of (complex floating point) blitz arrays 
+ * are close, also checking that the shapes of each pair of blitz arrays are 
+ * the same.
+ */
+template <typename T, int D>
+bool isClose(const std::vector<blitz::Array<std::complex<T>,D> >& left,
+  std::vector<blitz::Array<std::complex<T>,D> >& right,
+  const T& r_epsilon=1e-5, const T& a_epsilon=1e-8)
+{
+  if (left.size() != right.size())
+    return false;
+
+  typename std::vector<blitz::Array<std::complex<T>,D> >::const_iterator itl, itr;
+  for (itl = left.begin(), itr = right.begin(); 
+       itl != left.end(), itr != right.end(); ++itl, ++itr)
+    if (!isClose(*itl, *itr, r_epsilon, a_epsilon))
+      return false;
+
+  return true;
+}
+
+/**
+ * @brief Checks that two maps of (complex floating point) blitz arrays 
+ * are close, also checking that the shapes of each pair of blitz arrays are 
+ * the same.
+ */
+template <typename K, typename T, int D>
+bool isClose(const std::map<K, blitz::Array<std::complex<T>,D> >& left, 
+  const std::map<K, blitz::Array<std::complex<T>,D> >& right,
+  const T& r_epsilon=1e-5, const T& a_epsilon=1e-8)
+{
+  if (left.size() != right.size())
+    return false;
+
+  typename std::map<K, blitz::Array<std::complex<T>,D> >::const_iterator it, temp;
+  for (it = left.begin(); it != left.end(); ++it)
+  {
+    temp = right.find(it->first);
+    if (temp == right.end()) return false;
+    if (!isClose(it->second, temp->second, r_epsilon, a_epsilon)) return false;
+  }
+
+  return true;
+}
+
+
+/**
  * @brief Checks that two blitz arrays are equal, also checking that the shapes
  * are the same.
  */
@@ -402,6 +495,49 @@ bool isEqual(const blitz::Array<T,D>& left, const blitz::Array<T,D>& right)
 
   return !(blitz::any(left != right));
 }
+
+/**
+ * @brief Checks that two vectors of blitz arrays are equal, also checking 
+ * that the shapes of each pair of blitz arrays are the same.
+ */
+template <typename T, int D>
+bool isEqual(const std::vector<blitz::Array<T,D> >& left,
+  std::vector<blitz::Array<T,D> >& right)
+{
+  if (left.size() != right.size())
+    return false;
+
+  typename std::vector<blitz::Array<T,D> >::const_iterator itl, itr;
+  for (itl = left.begin(), itr = right.begin(); 
+       itl != left.end(), itr != right.end(); ++itl, ++itr)
+    if (!isEqual(*itl, *itr))
+      return false;
+
+  return true;
+}
+
+/**
+ * @brief Checks that two maps of blitz arrays are equal, also checking 
+ * that the shapes of each pair of blitz arrays are the same.
+ */
+template <typename K, typename T, int D>
+bool isEqual(const std::map<K, blitz::Array<T,D> >& left, 
+  const std::map<K, blitz::Array<T,D> >& right)
+{
+  if (left.size() != right.size())
+    return false;
+
+  typename std::map<K, blitz::Array<T,D> >::const_iterator it, temp;
+  for (it = left.begin(); it != left.end(); ++it)
+  {
+    temp = right.find(it->first);
+    if (temp == right.end()) return false;
+    if (!isEqual(it->second, temp->second)) return false;
+  }
+
+  return true;
+}
+
 
 /**
  * @}

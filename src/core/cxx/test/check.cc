@@ -26,9 +26,11 @@
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
 #include <iostream>
-#include <bob/core/logging.h>
+#include <bob/core/array_copy.h>
 #include <bob/core/check.h>
 #include <bob/core/cast.h>
+#include <vector>
+#include <map>
 
 struct T {
   double x, y;
@@ -105,8 +107,15 @@ void checkBlitzEqual( blitz::Array<T,4>& t1, blitz::Array<U,4>& t2)
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
-/*************************** ALLOCATION TESTS ******************************/
-BOOST_AUTO_TEST_CASE( test_check )
+BOOST_AUTO_TEST_CASE( test_check_equal )
+{
+  // Integer arrays
+  BOOST_CHECK(  bob::core::array::isEqual( g, h) );
+  BOOST_CHECK( !bob::core::array::isEqual( g, i) );
+  BOOST_CHECK( !bob::core::array::isEqual( g, j) );
+}
+
+BOOST_AUTO_TEST_CASE( test_check_close )
 {
   // Floating point scalars
   BOOST_CHECK(  bob::core::isClose( x, y, 1e-5, 1e-8) );
@@ -123,11 +132,148 @@ BOOST_AUTO_TEST_CASE( test_check )
   BOOST_CHECK(  bob::core::array::isClose( d, e, 1e-5, 1e-8) );
   BOOST_CHECK( !bob::core::array::isClose( d, f, 1e-5, 1e-8) );
   BOOST_CHECK( !bob::core::array::isClose( e, f, 1e-5, 1e-8) );
+}
   
-  // Integer arrays
-  BOOST_CHECK(  bob::core::array::isEqual( g, h) );
-  BOOST_CHECK( !bob::core::array::isEqual( g, i) );
-  BOOST_CHECK( !bob::core::array::isEqual( g, j) );
+BOOST_AUTO_TEST_CASE( test_check_equal_vector_map )
+{
+  blitz::Array<uint8_t,1> x1a(4);
+  x1a = 1, 2, 3, 4;
+  blitz::Array<uint8_t,1> x1b(4);
+  x1b = 1, 2, 3, 4;
+  blitz::Array<uint8_t,1> x2a(5);
+  x2a = 1, 2, 3, 4, 5;
+  blitz::Array<uint8_t,1> x2b(5);
+  x2b = 1, 2, 3, 4, 5;
+  blitz::Array<uint8_t,1> x3a(5);
+  x3a = 1, 2, 3, 4, 6;
+  blitz::Array<uint8_t,1> x3b(5);
+  x3b = 1, 2, 3, 4, 7;
+
+  // Vectors
+  std::vector<blitz::Array<uint8_t,1> > vec_a, vec_b;
+  BOOST_CHECK( bob::core::array::isEqual( vec_a, vec_b) );
+  vec_a.push_back(x1a);
+  vec_b.push_back(x1b);
+  BOOST_CHECK( bob::core::array::isEqual( vec_a, vec_b) );
+  vec_a.push_back(x2a);
+  vec_b.push_back(x2b);
+  BOOST_CHECK( bob::core::array::isEqual( vec_a, vec_b) );
+  vec_a.push_back(x3a);
+  BOOST_CHECK( !bob::core::array::isEqual( vec_a, vec_b) );
+  vec_b.push_back(x3a);
+  BOOST_CHECK( bob::core::array::isEqual( vec_a, vec_b) );
+  vec_a.push_back(x3a);
+  vec_b.push_back(x3b);
+  BOOST_CHECK( !bob::core::array::isEqual( vec_a, vec_b) );
+
+  // Maps
+  std::map<int, blitz::Array<uint8_t,1> > map_a, map_b;
+  BOOST_CHECK( bob::core::array::isEqual( map_a, map_b) );
+  map_a[0].reference(bob::core::array::ccopy(x1a));
+  map_b[1].reference(bob::core::array::ccopy(x1b));
+  BOOST_CHECK( !bob::core::array::isEqual( map_a, map_b) );
+  map_a.clear();
+  map_b.clear();
+  map_a[0].reference(bob::core::array::ccopy(x1a));
+  map_b[0].reference(bob::core::array::ccopy(x1b));
+  BOOST_CHECK( bob::core::array::isEqual( map_a, map_b) );
+  map_a[37].reference(bob::core::array::ccopy(x2a));
+  map_b[37].reference(bob::core::array::ccopy(x2b));
+  BOOST_CHECK( bob::core::array::isEqual( map_a, map_b) );
+  map_a[73].reference(bob::core::array::ccopy(x3a));
+  BOOST_CHECK( !bob::core::array::isEqual( map_a, map_b) );
+  map_b[73].reference(bob::core::array::ccopy(x3a));
+  BOOST_CHECK( bob::core::array::isEqual( map_a, map_b) );
+  map_b[73].reference(bob::core::array::ccopy(x3b));
+  BOOST_CHECK( !bob::core::array::isEqual( map_a, map_b) );
+}
+
+
+BOOST_AUTO_TEST_CASE( test_check_close_vector_map )
+{
+  blitz::Array<double,1> x1a(4);
+  x1a = 1, 2, 3, 4.0000000001;
+  blitz::Array<double,1> x1b(4);
+  x1b = 1, 2, 3, 4;
+  blitz::Array<double,1> x2a(5);
+  x2a = 1, 2, 3, 4, 5.0000000001;
+  blitz::Array<double,1> x2b(5);
+  x2b = 1, 2, 3, 4, 5;
+  blitz::Array<double,1> x3a(5);
+  x3a = 1, 2, 3, 4, 6.;
+  blitz::Array<double,1> x3b(5);
+  x3b = 1, 2, 3, 4, 7.;
+
+  // Vectors
+  std::vector<blitz::Array<double,1> > vec_a, vec_b;
+  BOOST_CHECK( bob::core::array::isClose( vec_a, vec_b) );
+  vec_a.push_back(x1a);
+  vec_b.push_back(x1b);
+  BOOST_CHECK( bob::core::array::isClose( vec_a, vec_b) );
+  BOOST_CHECK( !bob::core::array::isClose( vec_a, vec_b, 1e-15, 1e-15) );
+  vec_a.push_back(x2a);
+  vec_b.push_back(x2b);
+  BOOST_CHECK( bob::core::array::isClose( vec_a, vec_b) );
+  vec_a.push_back(x3a);
+  BOOST_CHECK( !bob::core::array::isClose( vec_a, vec_b) );
+  vec_b.push_back(x3a);
+  BOOST_CHECK( bob::core::array::isClose( vec_a, vec_b) );
+  vec_a.push_back(x3a);
+  vec_b.push_back(x3b);
+  BOOST_CHECK( !bob::core::array::isClose( vec_a, vec_b) );
+
+  // Maps
+  std::map<int, blitz::Array<double,1> > map_a, map_b;
+  BOOST_CHECK( bob::core::array::isClose( map_a, map_b) );
+  map_a[0].reference(bob::core::array::ccopy(x1a));
+  map_b[1].reference(bob::core::array::ccopy(x1b));
+  BOOST_CHECK( !bob::core::array::isClose( map_a, map_b) );
+  map_a.clear();
+  map_b.clear();
+  map_a[0].reference(bob::core::array::ccopy(x1a));
+  map_b[0].reference(bob::core::array::ccopy(x1b));
+  BOOST_CHECK( bob::core::array::isClose( map_a, map_b) );
+  BOOST_CHECK( !bob::core::array::isClose( map_a, map_b, 1e-15, 1e-15) );
+  map_a[37].reference(bob::core::array::ccopy(x2a));
+  map_b[37].reference(bob::core::array::ccopy(x2b));
+  BOOST_CHECK( bob::core::array::isClose( map_a, map_b) );
+  map_a[73].reference(bob::core::array::ccopy(x3a));
+  BOOST_CHECK( !bob::core::array::isClose( map_a, map_b) );
+  map_b[73].reference(bob::core::array::ccopy(x3a));
+  BOOST_CHECK( bob::core::array::isClose( map_a, map_b) );
+  map_b[73].reference(bob::core::array::ccopy(x3b));
+  BOOST_CHECK( !bob::core::array::isClose( map_a, map_b) );
+}
+
+BOOST_AUTO_TEST_CASE( test_check_close_vector_map_complex )
+{
+  blitz::Array<std::complex<double>,1> x1a(2);
+  x1a(0) = std::complex<double>(1., 0.);
+  x1a(1) = std::complex<double>(0., 1.);
+  blitz::Array<std::complex<double>,1> x1b(2);
+  x1b(0) = std::complex<double>(1., 0.);
+  x1b(1) = std::complex<double>(0., 1.0000000001);
+
+  // Vectors
+  std::vector<blitz::Array<std::complex<double>,1> > vec_a, vec_b;
+  BOOST_CHECK( bob::core::array::isClose( vec_a, vec_b) );
+  vec_a.push_back(x1a);
+  vec_b.push_back(x1b);
+  BOOST_CHECK( bob::core::array::isClose( vec_a, vec_b) );
+  BOOST_CHECK( !bob::core::array::isClose( vec_a, vec_b, 1e-15, 1e-15) );
+ 
+  // Maps
+  std::map<int, blitz::Array<std::complex<double>,1> > map_a, map_b;
+  BOOST_CHECK( bob::core::array::isClose( map_a, map_b) );
+  map_a[0].reference(bob::core::array::ccopy(x1a));
+  map_b[1].reference(bob::core::array::ccopy(x1b));
+  BOOST_CHECK( !bob::core::array::isClose( map_a, map_b) );
+  map_a.clear();
+  map_b.clear();
+  map_a[0].reference(bob::core::array::ccopy(x1a));
+  map_b[0].reference(bob::core::array::ccopy(x1b));
+  BOOST_CHECK( bob::core::array::isClose( map_a, map_b) );
+  BOOST_CHECK( !bob::core::array::isClose( map_a, map_b, 1e-15, 1e-15) );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
