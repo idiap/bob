@@ -159,7 +159,6 @@ namespace bob { namespace core { namespace array {
   };
 
   /**
-   * @ingroup CORE_ARRAY
    * @brief Here is the 4D specializations that do compile.
    */
   template <typename T> struct copy__<T,4> {
