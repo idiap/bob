@@ -43,7 +43,7 @@ static tuple call_shuffler2(bob::trainer::DataShuffler& s, boost::mt19937& rng,
   return make_tuple(data, target);
 }
 
-static void call_shuffler3(bob::trainer::DataShuffler& s, bob::tp::ndarray d, bob::tp::ndarray t)
+static void call_shuffler3(bob::trainer::DataShuffler& s, bob::python::ndarray d, bob::python::ndarray t)
 {
   blitz::Array<double,2> data_ = d.bz<double,2>();
   blitz::Array<double,2> target_ = t.bz<double,2>();
@@ -60,13 +60,13 @@ static tuple stdnorm(bob::trainer::DataShuffler& s) {
 static boost::shared_ptr<bob::trainer::DataShuffler> shuffler_from_arrays
 (object data, object target) {
   //data
-  stl_input_iterator<bob::tp::const_ndarray> vdata(data), dend;
+  stl_input_iterator<bob::python::const_ndarray> vdata(data), dend;
   std::vector<blitz::Array<double,2> > vdata_ref;
   vdata_ref.reserve(len(data));
   for (; vdata != dend; ++vdata) vdata_ref.push_back((*vdata).bz<double,2>());
 
   //target
-  stl_input_iterator<bob::tp::const_ndarray> vtarget(target), tend;
+  stl_input_iterator<bob::python::const_ndarray> vtarget(target), tend;
   std::vector<blitz::Array<double,1> > vtarget_ref;
   vtarget_ref.reserve(len(target));
   for (; vtarget != tend; ++vtarget) 
@@ -82,7 +82,7 @@ static boost::shared_ptr<bob::trainer::DataShuffler> shuffler_from_arraysets
   std::vector<blitz::Array<double,2> > vdata_ref(dbegin, dend);
 
   //target
-  stl_input_iterator<bob::tp::const_ndarray> vtarget(target), tend;
+  stl_input_iterator<bob::python::const_ndarray> vtarget(target), tend;
   std::vector<blitz::Array<double,1> > vtarget_ref;
   vtarget_ref.reserve(len(target));
   for (; vtarget != tend; ++vtarget) 
