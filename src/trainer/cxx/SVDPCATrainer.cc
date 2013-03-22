@@ -2,6 +2,7 @@
  * @file trainer/cxx/SVDPCATrainer.cc
  * @date Tue Jan 18 17:07:26 2011 +0100
  * @author André Anjos <andre.anjos@idiap.ch>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Principal Component Analysis implemented with Singular Value
  * Decomposition (lapack). Implementation.
@@ -21,38 +22,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vector>
-#include <algorithm>
+#include <bob/trainer/SVDPCATrainer.h>
+#include <bob/math/svd.h>
 
-#include "bob/trainer/SVDPCATrainer.h"
-#include "bob/math/svd.h"
-#include "bob/io/Exception.h"
-#include "bob/core/array_type.h"
+bob::trainer::SVDPCATrainer::SVDPCATrainer()
+{
+}
 
-namespace io = bob::io;
-namespace mach = bob::machine;
-namespace train = bob::trainer;
+bob::trainer::SVDPCATrainer::SVDPCATrainer(const bob::trainer::SVDPCATrainer& other)
+{
+}
 
-train::SVDPCATrainer::SVDPCATrainer()
-  {
-  }
+bob::trainer::SVDPCATrainer::~SVDPCATrainer() {}
 
-train::SVDPCATrainer::SVDPCATrainer(const train::SVDPCATrainer& other)
-  {
-  }
-
-train::SVDPCATrainer::~SVDPCATrainer() {}
-
-train::SVDPCATrainer& train::SVDPCATrainer::operator=
-(const train::SVDPCATrainer& other) {
+bob::trainer::SVDPCATrainer& bob::trainer::SVDPCATrainer::operator=
+(const bob::trainer::SVDPCATrainer& other) 
+{
   if(this != &other)
   {
   }
   return *this;
 }
 
-void train::SVDPCATrainer::train(bob::machine::LinearMachine& machine, 
-    blitz::Array<double,1>& eigen_values, const blitz::Array<double,2>& ar) const {
+void bob::trainer::SVDPCATrainer::train(bob::machine::LinearMachine& machine, 
+  blitz::Array<double,1>& eigen_values, const blitz::Array<double,2>& ar) const 
+{
 
   // data is checked now and conforms, just proceed w/o any further checks.
   size_t n_samples = ar.extent(0);
@@ -103,8 +97,9 @@ void train::SVDPCATrainer::train(bob::machine::LinearMachine& machine,
   eigen_values = blitz::pow2(sigma)/(n_samples-1);
 }
 
-void train::SVDPCATrainer::train(bob::machine::LinearMachine& machine, 
-    const blitz::Array<double,2>& ar) const {
+void bob::trainer::SVDPCATrainer::train(bob::machine::LinearMachine& machine, 
+  const blitz::Array<double,2>& ar) const 
+{
   blitz::Array<double,1> throw_away;
   train(machine, throw_away, ar);
 }

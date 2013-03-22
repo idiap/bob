@@ -2,6 +2,7 @@
  * @file bob/trainer/SVDPCATrainer.h
  * @date Tue Jan 18 17:07:26 2011 +0100
  * @author André Anjos <andre.anjos@idiap.ch>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Principal Component Analysis implemented with Singular Value
  * Decomposition (lapack)
@@ -24,14 +25,19 @@
 #ifndef BOB_TRAINER_SVDPCA_TRAINER_H
 #define BOB_TRAINER_SVDPCA_TRAINER_H
 
-#include "bob/machine/LinearMachine.h"
+#include <bob/machine/LinearMachine.h>
 
 namespace bob { namespace trainer {
+  /**
+   * @ingroup TRAINER
+   * @{
+   */
   
   /**
-   * Sets a linear machine to perform the Karhunen-Loève Transform (KLT) on a
-   * given dataset using Singular Value Decomposition (SVD). References:
+   * @brief Sets a linear machine to perform the Karhunen-Loève Transform 
+   * (KLT) on a given dataset using Singular Value Decomposition (SVD). 
    *
+   * References:
    * 1. Eigenfaces for Recognition, Turk & Pentland, Journal of Cognitive
    *    Neuroscience (1991) Volume: 3, Issue: 1, Publisher: MIT Press, 
    *    Pages: 71-86
@@ -90,6 +96,9 @@ namespace bob { namespace trainer {
 
   };
 
+  /**
+   * @}
+   */
 }}
 
 #endif /* BOB_TRAINER_SVDPCA_TRAINER_H */

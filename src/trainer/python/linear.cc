@@ -20,40 +20,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/core/python/ndarray.h"
+#include <bob/core/python/ndarray.h>
 #include <boost/python/stl_iterator.hpp>
-#include "bob/trainer/SVDPCATrainer.h"
-#include "bob/trainer/FisherLDATrainer.h"
+#include <bob/trainer/SVDPCATrainer.h>
+#include <bob/trainer/FisherLDATrainer.h>
 
 using namespace boost::python;
-namespace io = bob::io;
-namespace mach = bob::machine;
-namespace train = bob::trainer;
 
-tuple eig_train1 (const train::SVDPCATrainer& t, const blitz::Array<double,2>& data) {
+tuple eig_train1 (const bob::trainer::SVDPCATrainer& t, const blitz::Array<double,2>& data) {
   blitz::Array<double,1> eig_val(data.extent(1));
-  mach::LinearMachine m;
+  bob::machine::LinearMachine m;
   t.train(m, eig_val, data);
   return make_tuple(m, eig_val);
 }
 
-object eig_train2 (const train::SVDPCATrainer& t, mach::LinearMachine& m,
+object eig_train2 (const bob::trainer::SVDPCATrainer& t, bob::machine::LinearMachine& m,
     const blitz::Array<double,2>& data) {
   blitz::Array<double,1> eig_val(data.extent(1));
   t.train(m, eig_val, data);
   return object(eig_val);
 }
 
-tuple lda_train1 (const train::FisherLDATrainer& t, object data) {
+tuple lda_train1 (const bob::trainer::FisherLDATrainer& t, object data) {
   stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
   std::vector<blitz::Array<double,2> > vdata(dbegin, dend);
   blitz::Array<double,1> eig_val(vdata[0].extent(1));
-  mach::LinearMachine m;
+  bob::machine::LinearMachine m;
   t.train(m, eig_val, vdata);
   return make_tuple(m, eig_val);
 }
 
-object lda_train2 (const train::FisherLDATrainer& t, mach::LinearMachine& m,
+object lda_train2 (const bob::trainer::FisherLDATrainer& t, bob::machine::LinearMachine& m,
     object data) {
   stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
   std::vector<blitz::Array<double,2> > vdata(dbegin, dend);
@@ -64,12 +61,14 @@ object lda_train2 (const train::FisherLDATrainer& t, mach::LinearMachine& m,
 
 void bind_trainer_linear() {
 
-  class_<train::SVDPCATrainer>("SVDPCATrainer", "Sets a linear machine to perform the Karhunen-Loeve Transform (KLT) on a given dataset using Singular Value Decomposition (SVD). References:\n\n 1. Eigenfaces for Recognition, Turk & Pentland, Journal of Cognitive Neuroscience (1991) Volume: 3, Issue: 1, Publisher: MIT Press, Pages: 71-86\n 2. http://en.wikipedia.org/wiki/Singular_value_decomposition\n 3. http://en.wikipedia.org/wiki/Principal_component_analysis\n\nTests are executed against the Matlab printcomp output for correctness.", init<>("Initializes a new SVD/PCD trainer. The training stage will place the resulting principal components in the linear machine and set it up to extract the variable means automatically. As an option, you may preset the trainer so that the normalization performed by the resulting linear machine also divides the variables by the standard deviation of each variable ensemble."))
+  class_<bob::trainer::SVDPCATrainer>("SVDPCATrainer", "Sets a linear machine to perform the Karhunen-Loeve Transform (KLT) on a given dataset using Singular Value Decomposition (SVD). References:\n\n 1. Eigenfaces for Recognition, Turk & Pentland, Journal of Cognitive Neuroscience (1991) Volume: 3, Issue: 1, Publisher: MIT Press, Pages: 71-86\n 2. http://en.wikipedia.org/wiki/Singular_value_decomposition\n 3. http://en.wikipedia.org/wiki/Principal_component_analysis\n\nTests are executed against the Matlab printcomp output for correctness.", init<>("Initializes a new SVD/PCD trainer. The training stage will place the resulting principal components in the linear machine and set it up to extract the variable means automatically. As an option, you may preset the trainer so that the normalization performed by the resulting linear machine also divides the variables by the standard deviation of each variable ensemble."))
+    .def(init<const bob::trainer::SVDPCATrainer&>(args("other")))
     .def("train", &eig_train1, (arg("self"), arg("data")), "Trains a LinearMachine to perform the KLT. The resulting machine will have the eigen-vectors of the covariance matrix arranged by decreasing energy automatically. You don't need to sort the results. This method returns a tuple containing the resulting linear machine and the eigen values in a 1D array.")
     .def("train", &eig_train2, (arg("self"), arg("machine"), arg("data")), "Trains the LinearMachine to perform the KLT. The resulting machine will have the eigen-vectors of the covariance matrix arranged by decreasing energy automatically. You don't need to sort the results. This method returns the eigen values in a 1D array.")
     ;
 
-  class_<train::FisherLDATrainer>("FisherLDATrainer", "Implements a multi-class Fisher/LDA linear machine Training using Singular Value Decomposition (SVD). For more information on Linear Machines and associated methods, please consult Bishop, Machine Learning and Pattern Recognition chapter 4.", init<>())
+  class_<bob::trainer::FisherLDATrainer>("FisherLDATrainer", "Implements a multi-class Fisher/LDA linear machine Training using Singular Value Decomposition (SVD). For more information on Linear Machines and associated methods, please consult Bishop, Machine Learning and Pattern Recognition chapter 4.", init<>())
+    .def(init<const bob::trainer::FisherLDATrainer&>(args("other")))
     .def("train", &lda_train1, (arg("self"), arg("data")), "Creates a LinearMachine that performs Fisher/LDA discrimination. The resulting machine will have the eigen-vectors of the Sigma-1 * Sigma_b product, arranged by decreasing 'energy'. Each input arrayset represents data from a given input class. This method returns a tuple containing the resulting linear machine and the eigen values in a 1D array. This way you can reset the machine as you see fit.\n\nNote we set only the N-1 eigen vectors in the linear machine since the last eigen value should be zero anyway. You can compress the machine output further using resize() if necessary.")
     .def("train", &lda_train2, (arg("self"), arg("machine"), arg("data")), "Trains a given LinearMachine to perform Fisher/LDA discrimination. After this method has been called, the input machine will have the eigen-vectors of the Sigma-1 * Sigma_b product, arranged by decreasing 'energy'. Each input arrayset represents data from a given input class. This method also returns the eigen values allowing you to implement your own compression scheme.\n\nNote we set only the N-1 eigen vectors in the linear machine since the last eigen value should be zero anyway. You can compress the machine output further using resize() if necessary.")
   ;
