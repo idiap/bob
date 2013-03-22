@@ -18,33 +18,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/trainer/ML_GMMTrainer.h"
-
+#include <bob/trainer/ML_GMMTrainer.h>
 #include <algorithm>
 
-namespace train = bob::trainer;
-namespace mach = bob::machine;
-namespace io = bob::io;
-
-train::ML_GMMTrainer::ML_GMMTrainer(bool update_means, bool update_variances, 
+bob::trainer::ML_GMMTrainer::ML_GMMTrainer(bool update_means, bool update_variances, 
     bool update_weights, double mean_var_update_responsibilities_threshold): 
-  train::GMMTrainer(update_means, update_variances, update_weights, mean_var_update_responsibilities_threshold) {
+  bob::trainer::GMMTrainer(update_means, update_variances, update_weights, mean_var_update_responsibilities_threshold) {
 
 }
 
-train::ML_GMMTrainer::~ML_GMMTrainer() {
+bob::trainer::ML_GMMTrainer::~ML_GMMTrainer() {
   
 }
 
-void train::ML_GMMTrainer::initialization(mach::GMMMachine& gmm, const blitz::Array<double,2>& data) {
-  train::GMMTrainer::initialization(gmm, data);
+void bob::trainer::ML_GMMTrainer::initialization(bob::machine::GMMMachine& gmm, const blitz::Array<double,2>& data) {
+  bob::trainer::GMMTrainer::initialization(gmm, data);
   // Allocate cache
   size_t n_gaussians = gmm.getNGaussians();
   m_cache_ss_n_thresholded.resize(n_gaussians);
 }
 
 
-void train::ML_GMMTrainer::mStep(mach::GMMMachine& gmm, const blitz::Array<double,2>& data) {
+void bob::trainer::ML_GMMTrainer::mStep(bob::machine::GMMMachine& gmm, const blitz::Array<double,2>& data) {
   // Read options and variables
   size_t n_gaussians = gmm.getNGaussians();
 

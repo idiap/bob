@@ -24,11 +24,15 @@
 #ifndef BOB_TRAINER_ML_GMMTRAINER_H
 #define BOB_TRAINER_ML_GMMTRAINER_H
 
-#include "GMMTrainer.h"
+#include <bob/trainer/GMMTrainer.h>
 #include <limits>
 
-namespace bob {
-namespace trainer {
+namespace bob { namespace trainer {
+/**
+ * @ingroup TRAINER
+ * @{
+ */
+
 /**
  * @brief This class implements the maximum likelihood M-step of the expectation-maximisation algorithm for a GMM Machine.
  * @details See Section 9.2.2 of Bishop, "Pattern recognition and machine learning", 2006
@@ -65,6 +69,9 @@ class ML_GMMTrainer : public GMMTrainer {
     mutable blitz::Array<double,1> m_cache_ss_n_thresholded;
 };
 
+/**
+ * @}
+ */
 }}
 
 #endif

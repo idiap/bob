@@ -17,27 +17,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "bob/trainer/MAP_GMMTrainer.h"
-#include "bob/trainer/Exception.h"
 
-namespace train = bob::trainer;
-namespace mach = bob::machine;
-namespace io = bob::io;
+#include <bob/trainer/MAP_GMMTrainer.h>
+#include <bob/trainer/Exception.h>
 
-train::MAP_GMMTrainer::MAP_GMMTrainer(double relevance_factor, bool update_means, bool update_variances, 
+bob::trainer::MAP_GMMTrainer::MAP_GMMTrainer(double relevance_factor, bool update_means, bool update_variances, 
     bool update_weights, double mean_var_update_responsibilities_threshold): 
   GMMTrainer(update_means, update_variances, update_weights, mean_var_update_responsibilities_threshold), 
-  relevance_factor(relevance_factor), m_prior_gmm(boost::shared_ptr<mach::GMMMachine>()), m_T3_alpha(0.), m_T3_adaptation(false) {
-  
+  relevance_factor(relevance_factor), m_prior_gmm(boost::shared_ptr<bob::machine::GMMMachine>()), m_T3_alpha(0.), m_T3_adaptation(false) 
+{  
 }
 
-train::MAP_GMMTrainer::~MAP_GMMTrainer() {
-  
+bob::trainer::MAP_GMMTrainer::~MAP_GMMTrainer() 
+{  
 }
 
-void train::MAP_GMMTrainer::initialization(mach::GMMMachine& gmm, const blitz::Array<double,2>& data) {
+void bob::trainer::MAP_GMMTrainer::initialization(bob::machine::GMMMachine& gmm, const blitz::Array<double,2>& data) {
   // Allocate memory for the sufficient statistics and initialise
-  train::GMMTrainer::initialization(gmm, data);
+  bob::trainer::GMMTrainer::initialization(gmm, data);
 
   size_t n_gaussians = gmm.getNGaussians();
   // TODO: check size?
@@ -53,13 +50,13 @@ void train::MAP_GMMTrainer::initialization(mach::GMMMachine& gmm, const blitz::A
   m_cache_ml_weights.resize(n_gaussians);
 }
 
-bool train::MAP_GMMTrainer::setPriorGMM(boost::shared_ptr<bob::machine::GMMMachine> prior_gmm) {
+bool bob::trainer::MAP_GMMTrainer::setPriorGMM(boost::shared_ptr<bob::machine::GMMMachine> prior_gmm) {
   if(!prior_gmm) return false;
   m_prior_gmm = prior_gmm;
   return true;
 }
 
-void train::MAP_GMMTrainer::mStep(mach::GMMMachine& gmm, const blitz::Array<double,2>& data) {
+void bob::trainer::MAP_GMMTrainer::mStep(bob::machine::GMMMachine& gmm, const blitz::Array<double,2>& data) {
   // Read options and variables
   double n_gaussians = gmm.getNGaussians();
   

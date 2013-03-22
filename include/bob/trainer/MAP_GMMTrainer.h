@@ -24,12 +24,15 @@
 #ifndef BOB_TRAINER_MAP_GMMTRAINER_H
 #define BOB_TRAINER_MAP_GMMTRAINER_H
 
-#include "GMMTrainer.h"
+#include <bob/trainer/GMMTrainer.h>
 #include <limits>
-#include "bob/core/Exception.h"
+#include <bob/core/Exception.h>
 
-namespace bob {
-namespace trainer {
+namespace bob { namespace trainer {
+/**
+ * @ingroup TRAINER
+ * @{
+ */
 
 /**
  * @brief This class implements the maximum a posteriori M-step of the expectation-maximisation algorithm for a GMM Machine. The prior parameters are encoded in the form of a GMM (e.g. a universal background model). The EM algorithm thus performs GMM adaptation.
@@ -106,6 +109,9 @@ class MAP_GMMTrainer : public GMMTrainer {
     mutable blitz::Array<double,1> m_cache_ml_weights;
 };
 
+/**
+ * @}
+ */
 }}
 
 #endif

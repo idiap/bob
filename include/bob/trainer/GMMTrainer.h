@@ -24,13 +24,16 @@
 #ifndef BOB_TRAINER_GMMTRAINER_H
 #define BOB_TRAINER_GMMTRAINER_H
 
-#include "bob/trainer/EMTrainer.h"
-#include "bob/machine/GMMMachine.h"
-#include "bob/machine/GMMStats.h"
+#include <bob/trainer/EMTrainer.h>
+#include <bob/machine/GMMMachine.h>
+#include <bob/machine/GMMStats.h>
 #include <limits>
 
-namespace bob {
-namespace trainer {
+namespace bob { namespace trainer {
+/**
+ * @ingroup TRAINER
+ * @{
+ */
 
 /**
  * @brief This class implements the E-step of the expectation-maximisation algorithm for a GMM Machine.
@@ -117,6 +120,9 @@ class GMMTrainer : public EMTrainer<bob::machine::GMMMachine, blitz::Array<doubl
     double m_mean_var_update_responsibilities_threshold;
 };
 
-}
-}
+/**
+ * @}
+ */
+}}
+
 #endif
