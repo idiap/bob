@@ -28,9 +28,13 @@
 #include <vector>
 #include <boost/function.hpp>
 
-#include "bob/machine/MLP.h"
+#include <bob/machine/MLP.h>
 
 namespace bob { namespace trainer {
+  /**
+   * @ingroup TRAINER
+   * @{
+   */
 
   /**
    * Sets an MLP to perform discrimination based on vanilla error
@@ -237,6 +241,9 @@ namespace bob { namespace trainer {
       std::vector<blitz::Array<double,2> > m_output; ///< layer output
   };
 
+  /**
+   * @}
+   */
 } }
 
 #endif /* BOB_TRAINER_MLPBACKPROPTRAINER_H */
