@@ -18,11 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/trainer/LLRTrainer.h"
-#include "bob/core/array_type.h"
-#include "bob/math/linear.h"
-
-#include "bob/core/logging.h"
+#include <bob/trainer/LLRTrainer.h>
+#include <bob/math/linear.h>
+#include <bob/core/logging.h>
 
 #include <limits>
 

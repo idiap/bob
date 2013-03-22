@@ -20,9 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/core/python/ndarray.h"
-#include <boost/python/stl_iterator.hpp>
-#include "bob/trainer/LLRTrainer.h"
+#include <bob/core/python/ndarray.h>
+#include <bob/trainer/LLRTrainer.h>
 
 using namespace boost::python;
 
