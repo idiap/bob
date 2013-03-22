@@ -21,9 +21,13 @@
 #ifndef BOB_TRAINER_BICTRAINER_H
 #define BOB_TRAINER_BICTRAINER_H
 
-#include "bob/machine/BICMachine.h"
+#include <bob/machine/BICMachine.h>
 
 namespace bob { namespace trainer {
+  /**
+   * @ingroup TRAINER
+   * @{
+   */
 
   class BICTrainer {
     public:
@@ -48,6 +52,9 @@ namespace bob { namespace trainer {
       int m_M_I, m_M_E;
   };
 
+  /**
+   * @}
+   */
 }}
 
 

@@ -18,9 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/core/array_exception.h"
-#include "bob/trainer/BICTrainer.h"
-#include "bob/trainer/SVDPCATrainer.h"
+#include <bob/core/array_exception.h>
+#include <bob/trainer/BICTrainer.h>
+#include <bob/trainer/SVDPCATrainer.h>
 
 static double sqr(const double& x){
   return x*x;
