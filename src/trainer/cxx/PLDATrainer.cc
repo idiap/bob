@@ -25,12 +25,12 @@
 #include <vector>
 #include <limits>
 
-#include "bob/trainer/PLDATrainer.h"
-#include "bob/core/array_copy.h"
-#include "bob/math/linear.h"
-#include "bob/math/inv.h"
-#include "bob/math/svd.h"
-#include "bob/trainer/Exception.h"
+#include <bob/trainer/PLDATrainer.h>
+#include <bob/core/array_copy.h>
+#include <bob/math/linear.h>
+#include <bob/math/inv.h>
+#include <bob/math/svd.h>
+#include <bob/trainer/Exception.h>
 
 
 bob::trainer::PLDABaseTrainer::PLDABaseTrainer(double convergence_threshold, 

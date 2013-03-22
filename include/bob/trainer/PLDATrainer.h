@@ -27,19 +27,26 @@
 #include <blitz/array.h>
 #include <map>
 #include <vector>
-#include "bob/trainer/EMTrainer.h"
-#include "bob/machine/PLDAMachine.h"
+#include <bob/trainer/EMTrainer.h>
+#include <bob/machine/PLDAMachine.h>
 
-namespace bob { namespace trainer {
-  
+namespace bob { namespace trainer { 
+/**
+ * @ingroup TRAINER
+ * @{
+ */
+
 /**
  * @brief This class can be used to train the \f$F\f$, \f$G\f$ and 
  * \f$\Sigma\f$ matrices and the mean vector \f$\mu\f$ of a PLDA model.\n
  * References:\n
- * 1. 'Probabilistic Linear Discriminant Analysis for Inference About 
+ * 1. 'A Scalable Formulation of Probabilistic Linear Discriminant Analysis: 
+ *     Applied to Face Recognition', Laurent El Shafey, Chris McCool, 
+ *     Roy Wallace, Sebastien Marcel, TPAMI 2013
+ * 2. 'Probabilistic Linear Discriminant Analysis for Inference About 
  *     Identity', Prince and Elder, ICCV'2007\n
- * 2. 'Probabilistic Models for Inference about Identity', Li, Fu, Mohammed, 
- *     Elder and Prince, PAMI'2012
+ * 3. 'Probabilistic Models for Inference about Identity', Li, Fu, Mohammed, 
+ *     Elder and Prince, TPAMI'2012
  */
 class PLDABaseTrainer: public EMTrainer<bob::machine::PLDABaseMachine, 
                                         std::vector<blitz::Array<double,2> > >
@@ -292,7 +299,17 @@ class PLDABaseTrainer: public EMTrainer<bob::machine::PLDABaseMachine,
 };
 
 
-
+/**
+ * @brief This class can be used to enrol a PLDA model for a specific class\n
+ * References:\n
+ * 1. 'A Scalable Formulation of Probabilistic Linear Discriminant Analysis: 
+ *     Applied to Face Recognition', Laurent El Shafey, Chris McCool, 
+ *     Roy Wallace, Sebastien Marcel, TPAMI 2013
+ * 2. 'Probabilistic Linear Discriminant Analysis for Inference About 
+ *     Identity', Prince and Elder, ICCV'2007\n
+ * 3. 'Probabilistic Models for Inference about Identity', Li, Fu, Mohammed, 
+ *     Elder and Prince, TPAMI'2012
+ */
 class PLDATrainer 
 {
   public:
@@ -329,6 +346,9 @@ class PLDATrainer
     mutable blitz::Array<double,1> m_cache_nf_1; ///< Cache vector of dimension dim_f
 };
 
+/**
+ * @}
+ */
 }}
 
 #endif /* BOB_TRAINER_PLDA_TRAINER_H */

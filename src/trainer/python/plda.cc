@@ -22,8 +22,8 @@
  */
 
 #include <boost/python.hpp>
-#include "bob/machine/PLDAMachine.h"
-#include "bob/trainer/PLDATrainer.h"
+#include <bob/machine/PLDAMachine.h>
+#include <bob/trainer/PLDATrainer.h>
 
 using namespace boost::python;
 
@@ -150,7 +150,7 @@ void bind_trainer_plda()
     .value("VARIANCE_DATA", bob::trainer::PLDABaseTrainer::VARIANCE_DATA)
     ;
 
-  class_<bob::trainer::PLDABaseTrainer, boost::noncopyable, bases<EMTrainerPLDABase> >("PLDABaseTrainer", "Creates a trainer for a PLDABaseMachine.", init<optional<double,double,bool,bool> >((arg("convergence_threshold")=0.001, arg("max_iterations")=10, arg("compute_likelihood")=false, arg("use_sum_second_order")=true),"Initializes a new PLDABaseTrainer."))
+  class_<bob::trainer::PLDABaseTrainer, boost::noncopyable, bases<EMTrainerPLDABase> >("PLDABaseTrainer", "A trainer for a PLDABaseMachine.\nReference:\n'A Scalable Formulation of Probabilistic Linear Discriminant Analysis: Applied to Face Recognition', Laurent El Shafey, Chris McCool, Roy Wallace, Sebastien Marcel, IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI 2013).", init<optional<double,double,bool,bool> >((arg("convergence_threshold")=0.001, arg("max_iterations")=10, arg("compute_likelihood")=false, arg("use_sum_second_order")=true),"Initializes a new PLDABaseTrainer."))
     .def(init<const bob::trainer::PLDABaseTrainer&>((arg("trainer")), "Copy constructs a PLDABaseTrainer"))
     .add_property("seed", &bob::trainer::PLDABaseTrainer::getSeed, &bob::trainer::PLDABaseTrainer::setSeed, "The seed used for the random initialization of F, G and sigma.")
     .add_property("use_sum_second_order", &bob::trainer::PLDABaseTrainer::getUseSumSecondOrder, &bob::trainer::PLDABaseTrainer::setUseSumSecondOrder, "Tells whether the second order statistics are stored during the training procedure, or only their sum.")
@@ -170,7 +170,7 @@ void bind_trainer_plda()
     .def("finalization", &plda_finalization, (arg("self"), arg("machine"), arg("list_arraysets")), "Calls the finalization method of the training procedure.")
     ;
 
-  class_<bob::trainer::PLDATrainer, boost::noncopyable>("PLDATrainer", "Create a trainer for the PLDA.", init<>("Initializes a new PLDATrainer."))
+  class_<bob::trainer::PLDATrainer, boost::noncopyable>("PLDATrainer", "A trainer for a PLDAMachine.\nReference:\n'A Scalable Formulation of Probabilistic Linear Discriminant Analysis: Applied to Face Recognition', Laurent El Shafey, Chris McCool, Roy Wallace, Sebastien Marcel, IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI 2013).", init<>("Initializes a new PLDATrainer."))
     .def(init<const bob::trainer::PLDATrainer&>((arg("trainer")), "Copy constructs a PLDATrainer"))
     .def("enrol", &bob::trainer::PLDATrainer::enrol, (arg("self"), arg("plda_machine"), arg("arrayset")), "Call the enrollment procedure.")
     ;
