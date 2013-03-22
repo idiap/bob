@@ -63,10 +63,11 @@ typedef double lbfgsfloatval_t;
 
 
 /** 
- * \addtogroup liblbfgs_api libLBFGS API
+ * @addtogroup LBFGS lbfgs
+ * @brief Lbfgs module API
  * @{
  *
- *  The libLBFGS API.
+ *  The LBFGS API.
  */
 
 /**
@@ -527,7 +528,7 @@ void lbfgs_free(lbfgsfloatval_t *x);
 
 
 /**
-@page libLBFGS L-BFGS: a library of Limited-memory Broyden-Fletcher-Goldfarb-Shanno
+@page LBFGS L-BFGS: a library of Limited-memory Broyden-Fletcher-Goldfarb-Shanno
 
 @section intro Introduction
 
@@ -681,7 +682,7 @@ libLBFGS is distributed under the term of the
 
 @section api Documentation
 
-- @ref liblbfgs_api "libLBFGS API"
+- @ref LBFGS "LBFGS API"
 
 @section ack Acknowledgements
 
