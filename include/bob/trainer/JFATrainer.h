@@ -27,11 +27,11 @@
 #include <map>
 #include <vector>
 #include <string>
-#include "bob/core/array_copy.h"
-#include "bob/machine/JFAMachine.h"
+#include <bob/core/array_copy.h>
+#include <bob/machine/JFAMachine.h>
 #include <boost/shared_ptr.hpp>
 
-#include "bob/core/logging.h"
+#include <bob/core/logging.h>
 
 namespace bob { namespace trainer { namespace jfa {
 
