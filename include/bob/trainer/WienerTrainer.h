@@ -20,18 +20,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_TRAINER_WIENER_TRAINER_H
-#define BOB5SPRO_TRAINER_WIENER_TRAINER_H
+#ifndef BOB_TRAINER_WIENER_TRAINER_H
+#define BOB_TRAINER_WIENER_TRAINER_H
 
-#include "bob/machine/WienerMachine.h"
+#include <bob/machine/WienerMachine.h>
 
 namespace bob { namespace trainer {
-  
   /**
-   * Sets a Wiener machine to perform a Wiener filtering, using the Fourier
-   * statistics of a given dataset.
+   * @ingroup TRAINER
+   * @{
+   */
+
+  /**
+   * @brief Sets a Wiener machine to perform a Wiener filtering, using the
+   * Fourier statistics of a given dataset.
    *
-   * Computer Vision: Algorithms and Applications, Richard Szeliski
+   * Reference:
+   * "Computer Vision: Algorithms and Applications", Richard Szeliski
    * (Part 3.4.3)
    */
   class WienerTrainer {
@@ -39,28 +44,28 @@ namespace bob { namespace trainer {
     public: //api
 
       /**
-       * Default constructor
+       * @brief Default constructor
        * Initializes a new Wiener trainer. 
        */
       WienerTrainer();
 
       /**
-       * Copy construction.
+       * @brief Copy constructor
        */
       WienerTrainer(const WienerTrainer& other);
 
       /**
-       * Destructor virtualisation
+       * @brief Destructor virtualisation
        */
       virtual ~WienerTrainer();
 
       /**
-       * Copy operator
+       * @brief Assignment operator
        */
       WienerTrainer& operator=(const WienerTrainer& other);
 
       /**
-       * Trains the WienerMachine to perform the filtering. 
+       * @brief Trains the WienerMachine to perform the filtering. 
        */
       virtual void train(bob::machine::WienerMachine& machine, 
           const blitz::Array<double,3>& data) const;
@@ -69,6 +74,9 @@ namespace bob { namespace trainer {
 
   };
 
+  /**
+   * @}
+   */
 }}
 
-#endif /* BOB5SPRO_TRAINER_WIENER_TRAINER_H */
+#endif /* BOB_TRAINER_WIENER_TRAINER_H */

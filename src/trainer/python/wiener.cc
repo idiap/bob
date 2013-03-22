@@ -22,29 +22,28 @@
 
 #include <boost/python.hpp>
 #include <boost/shared_ptr.hpp>
-#include "bob/trainer/WienerTrainer.h"
+#include <bob/trainer/WienerTrainer.h>
 
 using namespace boost::python;
-namespace io = bob::io;
-namespace mach = bob::machine;
-namespace train = bob::trainer;
 
-boost::shared_ptr<mach::WienerMachine> wiener_train1 (const train::WienerTrainer& t, const blitz::Array<double,3>& data) {
-  boost::shared_ptr<mach::WienerMachine> m;
+boost::shared_ptr<bob::machine::WienerMachine> 
+wiener_train1(const bob::trainer::WienerTrainer& t, const blitz::Array<double,3>& data) {
+  boost::shared_ptr<bob::machine::WienerMachine> m;
   t.train(*m, data);
   return m;
 }
 
-void wiener_train2 (const train::WienerTrainer& t, mach::WienerMachine& m,
+void wiener_train2(const bob::trainer::WienerTrainer& t, bob::machine::WienerMachine& m,
     const blitz::Array<double,3>& data) {
   t.train(m, data);
 }
 
 void bind_trainer_wiener() {
 
-  class_<train::WienerTrainer>("WienerTrainer", "Sets a Wiener machine and train it on a given dataset.", init<>("Initializes a new Wiener Trainer."))
-    .def("train", &wiener_train1, (arg("self"), arg("data")), "Trains a WienerMachine to perform the filtering. This method returns a tuple containing the resulting Wiener machine in a 2D array.")
-    .def("train", &wiener_train2, (arg("self"), arg("machine"), arg("data")), "Trains the provided WienerMachine.")
+  class_<bob::trainer::WienerTrainer>("WienerTrainer", "Sets a WienerMachine and train it on a given dataset.\nReference:\n'Computer Vision: Algorithms and Applications', Richard Szeliski\n(Part 3.4.3)", init<>("Initializes a new WienerTrainer."))
+    .def(init<const bob::trainer::WienerTrainer&>(args("other")))
+    .def("train", &wiener_train1, (arg("self"), arg("data")), "Trains a WienerMachine using the given dataset to perform the filtering. This method returns the trained WienerMachine.")
+    .def("train", &wiener_train2, (arg("self"), arg("machine"), arg("data")), "Trains the provided WienerMachine with the given dataset.")
     ;
 
 }

@@ -18,44 +18,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vector>
-#include <algorithm>
+#include <bob/trainer/WienerTrainer.h>
+#include <bob/core/cast.h>
+#include <bob/sp/FFT2D.h>
+#include <complex>
 
-#include "bob/trainer/WienerTrainer.h"
-#include "bob/io/Exception.h"
-#include "bob/core/array_type.h"
-#include "bob/core/cast.h"
-#include "bob/sp/FFT2D.h"
-
-namespace io = bob::io;
-namespace mach = bob::machine;
-namespace train = bob::trainer;
-
-train::WienerTrainer::WienerTrainer()
+bob::trainer::WienerTrainer::WienerTrainer()
 {
 }
 
-train::WienerTrainer::WienerTrainer(const train::WienerTrainer& other)
+bob::trainer::WienerTrainer::WienerTrainer(const bob::trainer::WienerTrainer& other)
 {
 }
 
-train::WienerTrainer::~WienerTrainer() 
+bob::trainer::WienerTrainer::~WienerTrainer() 
 {
 }
 
-train::WienerTrainer& train::WienerTrainer::operator=
-(const train::WienerTrainer& other) 
+bob::trainer::WienerTrainer& bob::trainer::WienerTrainer::operator=
+(const bob::trainer::WienerTrainer& other) 
 {
   return *this;
 }
 
-void train::WienerTrainer::train(bob::machine::WienerMachine& machine, 
+void bob::trainer::WienerTrainer::train(bob::machine::WienerMachine& machine, 
     const blitz::Array<double,3>& ar) const 
 {
   // Data is checked now and conforms, just proceed w/o any further checks.
-  size_t n_samples = ar.extent(0);
-  size_t height = ar.extent(1);
-  size_t width = ar.extent(0);
+  const size_t n_samples = ar.extent(0);
+  const size_t height = ar.extent(1);
+  const size_t width = ar.extent(0);
 
   // FFT2D
   bob::sp::FFT2D fft2d(height, width);
@@ -84,9 +76,7 @@ void train::WienerTrainer::train(bob::machine::WienerMachine& machine,
   // Sums to get the variance
   tmp = blitz::sum(data,k) / n_samples;
 
-  /**
-   * sets the Wiener machine with the results:
-   */
+  // sets the Wiener machine with the results:
   machine.resize(height,width);
   machine.setPs(tmp);
 }
