@@ -30,6 +30,10 @@
 #include <boost/random.hpp>
 
 namespace bob { namespace trainer {
+  /**
+   * @ingroup TRAINER
+   * @{
+   */
 
   /**
    * A data shuffler is capable of being populated with data from one or
@@ -137,6 +141,9 @@ namespace bob { namespace trainer {
 
   };
 
+  /**
+   * @}
+   */
 }}
 
 #endif /* BOB_TRAINER_DATASHUFFLER_H */

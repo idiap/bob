@@ -21,15 +21,12 @@
  */
 
 #include <sys/time.h>
-#include "bob/core/assert.h"
-#include "bob/core/array_copy.h"
-#include "bob/trainer/Exception.h"
-#include "bob/trainer/DataShuffler.h"
+#include <bob/core/assert.h>
+#include <bob/core/array_copy.h>
+#include <bob/trainer/Exception.h>
+#include <bob/trainer/DataShuffler.h>
 
-namespace array = bob::core::array;
-namespace train = bob::trainer;
-
-train::DataShuffler::DataShuffler
+bob::trainer::DataShuffler::DataShuffler
 (const std::vector<blitz::Array<double,2> >& data,
  const std::vector<blitz::Array<double,1> >& target):
   m_data(data.size()),
@@ -39,17 +36,17 @@ train::DataShuffler::DataShuffler
   m_mean(),
   m_stddev()
 {
-  if (data.size() == 0) throw train::WrongNumberOfClasses(0);
-  if (target.size() == 0) throw train::WrongNumberOfClasses(0);
+  if (data.size() == 0) throw bob::trainer::WrongNumberOfClasses(0);
+  if (target.size() == 0) throw bob::trainer::WrongNumberOfClasses(0);
   
-  array::assertSameDimensionLength(data.size(), target.size());
+  bob::core::array::assertSameDimensionLength(data.size(), target.size());
   
   // checks shapes, minimum number of examples
   for (size_t k=0; k<data.size(); ++k) {
     if (data[k].size() == 0) throw WrongNumberOfFeatures(0, 1, k);
     //this may also trigger if I cannot get doubles from the Arrayset
-    array::assertSameDimensionLength(data[0].extent(1), data[k].extent(1));
-    array::assertSameShape(target[0], target[k]);
+    bob::core::array::assertSameDimensionLength(data[0].extent(1), data[k].extent(1));
+    bob::core::array::assertSameShape(target[0], target[k]);
   }
 
   // set save values for the mean and stddev (even if not used at start)
@@ -70,7 +67,7 @@ train::DataShuffler::DataShuffler
   }
 }
 
-train::DataShuffler::DataShuffler(const train::DataShuffler& other):
+bob::trainer::DataShuffler::DataShuffler(const bob::trainer::DataShuffler& other):
   m_data(other.m_data.size()),
   m_target(other.m_target.size()),
   m_range(other.m_range),
@@ -84,9 +81,9 @@ train::DataShuffler::DataShuffler(const train::DataShuffler& other):
   }
 }
 
-train::DataShuffler::~DataShuffler() { }
+bob::trainer::DataShuffler::~DataShuffler() { }
 
-train::DataShuffler& train::DataShuffler::operator=(const train::DataShuffler& other) {
+bob::trainer::DataShuffler& bob::trainer::DataShuffler::operator=(const bob::trainer::DataShuffler& other) {
 
   m_data.resize(other.m_data.size());
   m_target.resize(other.m_target.size());
@@ -157,7 +154,7 @@ void invertApplyStdNormParameters(std::vector<blitz::Array<double,2> >& data,
   }
 }
 
-void train::DataShuffler::setAutoStdNorm(bool s) {
+void bob::trainer::DataShuffler::setAutoStdNorm(bool s) {
   if (s && !m_do_stdnorm) {
     evaluateStdNormParameters(m_data, m_mean, m_stddev);
     applyStdNormParameters(m_data, m_mean, m_stddev);
@@ -170,7 +167,7 @@ void train::DataShuffler::setAutoStdNorm(bool s) {
   m_do_stdnorm = s;
 }
 
-void train::DataShuffler::getStdNorm(blitz::Array<double,1>& mean,
+void bob::trainer::DataShuffler::getStdNorm(blitz::Array<double,1>& mean,
     blitz::Array<double,1>& stddev) const {
   if (m_do_stdnorm) {
     mean.reference(bob::core::array::ccopy(m_mean));
@@ -181,10 +178,10 @@ void train::DataShuffler::getStdNorm(blitz::Array<double,1>& mean,
   }
 }
 
-void train::DataShuffler::operator() (boost::mt19937& rng, 
+void bob::trainer::DataShuffler::operator() (boost::mt19937& rng, 
     blitz::Array<double,2>& data, blitz::Array<double,2>& target) {
   
-  array::assertSameDimensionLength(data.extent(0), target.extent(0));
+  bob::core::array::assertSameDimensionLength(data.extent(0), target.extent(0));
 
   size_t counter = 0;
   size_t max = data.extent(0);
@@ -202,7 +199,7 @@ void train::DataShuffler::operator() (boost::mt19937& rng,
 
 }
 
-void train::DataShuffler::operator() (blitz::Array<double,2>& data,
+void bob::trainer::DataShuffler::operator() (blitz::Array<double,2>& data,
     blitz::Array<double,2>& target) {
   struct timeval tv;
   gettimeofday(&tv, 0);
