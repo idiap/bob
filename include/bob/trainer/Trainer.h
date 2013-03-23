@@ -20,7 +20,15 @@
 #ifndef BOB_TRAINER_TRAINER_H
 #define BOB_TRAINER_TRAINER_H
 
-namespace bob { namespace trainer {
+/**
+ * @addtogroup TRAINER trainer
+ * @brief Trainer module API
+ */
+namespace bob {
+/**
+ * @ingroup TRAINER
+ */
+namespace trainer {
 /**
  * @ingroup TRAINER
  * @{
