@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/config.h"
-#include "bob/core/python/ndarray.h"
+#include <bob/config.h>
+#include <bob/core/python/ndarray.h>
 
 void bind_machine_base();
 void bind_machine_bic();

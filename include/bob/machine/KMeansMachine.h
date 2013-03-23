@@ -24,10 +24,14 @@
 #include <blitz/array.h>
 #include <cfloat>
 
-#include "bob/io/HDF5File.h"
-#include "bob/machine/Machine.h"
+#include <bob/io/HDF5File.h>
+#include <bob/machine/Machine.h>
 
 namespace bob { namespace machine {
+/**
+ * @ingroup MACHINE
+ * @{
+ */
 
 /**
  * @brief This class implements a k-means classifier.
@@ -247,5 +251,8 @@ class KMeansMachine: public Machine<blitz::Array<double,1>, double> {
     mutable blitz::Array<double,2> m_cache_means;
 };
 
+/**
+ * @}
+ */
 }}
 #endif

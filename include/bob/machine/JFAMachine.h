@@ -24,14 +24,18 @@
 #ifndef BOB_MACHINE_JFAMACHINE_H
 #define BOB_MACHINE_JFAMACHINE_H
 
-#include "bob/io/HDF5File.h"
-#include "bob/machine/GMMMachine.h"
-#include "bob/machine/JFAMachineException.h"
-#include "bob/machine/LinearScoring.h"
+#include <bob/io/HDF5File.h>
+#include <bob/machine/GMMMachine.h>
+#include <bob/machine/JFAMachineException.h>
+#include <bob/machine/LinearScoring.h>
 
 #include <boost/shared_ptr.hpp>
 
 namespace bob { namespace machine {
+/**
+ * @ingroup MACHINE
+ * @{
+ */
   
 /**
  * A JFA Base machine which contains U, V and D matrices
@@ -476,7 +480,9 @@ class JFAMachine
     mutable blitz::Array<double,2> m_tmp_ruCD;
 };
 
-
+/**
+ * @}
+ */
 }}
 
 #endif

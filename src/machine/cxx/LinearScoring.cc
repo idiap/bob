@@ -17,11 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "bob/machine/LinearScoring.h"
-#include "bob/math/linear.h"
-
-namespace ca = bob::core::array;
-
+#include <bob/machine/LinearScoring.h>
+#include <bob/math/linear.h>
 
 namespace bob { namespace machine {
 
@@ -42,8 +39,8 @@ namespace detail {
     int Tm = models.size();
 
     // Check output size
-    ca::assertSameDimensionLength(scores.extent(0), models.size());
-    ca::assertSameDimensionLength(scores.extent(1), test_stats.size());
+    bob::core::array::assertSameDimensionLength(scores.extent(0), models.size());
+    bob::core::array::assertSameDimensionLength(scores.extent(1), test_stats.size());
 
     blitz::Array<double,2> A(Tm, CD);
     blitz::Array<double,2> B(CD, Tt);
@@ -61,10 +58,10 @@ namespace detail {
           B(s, t) = test_stats[t]->sumPx(s/D, s%D) - (ubm_mean(s) * test_stats[t]->n(s/D));
     }
     else {
-      ca::assertSameDimensionLength((*test_channelOffset).size(), Tt);
+      bob::core::array::assertSameDimensionLength((*test_channelOffset).size(), Tt);
       
       for(int t=0; t<Tt; ++t) {
-        ca::assertSameDimensionLength((*test_channelOffset)[t].extent(0), CD);
+        bob::core::array::assertSameDimensionLength((*test_channelOffset)[t].extent(0), CD);
         for(int s=0; s<CD; ++s) 
           B(s, t) = test_stats[t]->sumPx(s/D, s%D) - (test_stats[t]->n(s/D) * (ubm_mean(s) + (*test_channelOffset)[t](s)));
       }

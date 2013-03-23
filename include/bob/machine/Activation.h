@@ -23,8 +23,13 @@
 #ifndef BOB_MACHINE_ACTIVATION_H 
 #define BOB_MACHINE_ACTIVATION_H
 
+#include <cmath>
 
 namespace bob { namespace machine {
+  /**
+   * @ingroup MACHINE
+   * @{
+   */
 
   typedef enum Activation {
     LINEAR = 0, //Linear: y = x [this is the default]
@@ -51,6 +56,9 @@ namespace bob { namespace machine {
   inline double tanh_derivative(double x) { return 1-(x*x); }
   inline double logistic_derivative(double x) { return x*(1-x); }
 
+  /**
+   * @}
+   */
 }}
       
 #endif /* BOB_MACHINE_ACTIVATION_H */

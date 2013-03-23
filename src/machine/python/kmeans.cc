@@ -19,9 +19,9 @@
  */
 #include <boost/python.hpp>
 #include <boost/concept_check.hpp>
-#include "bob/machine/KMeansMachine.h"
+#include <bob/machine/KMeansMachine.h>
 
-#include "bob/core/python/ndarray.h"
+#include <bob/core/python/ndarray.h>
 
 using namespace boost::python;
 

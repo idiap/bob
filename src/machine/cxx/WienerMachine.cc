@@ -20,15 +20,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/core/array_copy.h"
-#include "bob/core/cast.h"
-#include "bob/machine/WienerMachine.h"
-#include "bob/machine/Exception.h"
+#include <bob/core/array_copy.h>
+#include <bob/core/cast.h>
+#include <bob/machine/WienerMachine.h>
+#include <bob/machine/Exception.h>
 #include <complex>
 
-namespace mach = bob::machine;
-
-mach::WienerMachine::WienerMachine(const blitz::Array<double,2>& Ps, const double Pn,
+bob::machine::WienerMachine::WienerMachine(const blitz::Array<double,2>& Ps, const double Pn,
     const double variance_threshold):
   m_Ps(bob::core::array::ccopy(Ps)),
   m_variance_threshold(variance_threshold),
@@ -42,7 +40,7 @@ mach::WienerMachine::WienerMachine(const blitz::Array<double,2>& Ps, const doubl
   computeW();
 }
 
-mach::WienerMachine::WienerMachine():
+bob::machine::WienerMachine::WienerMachine():
   m_Ps(0,0),
   m_variance_threshold(1e-8),
   m_Pn(0),
@@ -53,7 +51,7 @@ mach::WienerMachine::WienerMachine():
 {
 }
 
-mach::WienerMachine::WienerMachine(size_t height, size_t width, const double Pn,
+bob::machine::WienerMachine::WienerMachine(size_t height, size_t width, const double Pn,
     const double variance_threshold):
   m_Ps(height,width),
   m_variance_threshold(variance_threshold),
@@ -67,7 +65,7 @@ mach::WienerMachine::WienerMachine(size_t height, size_t width, const double Pn,
   m_W = 0.;
 }
 
-mach::WienerMachine::WienerMachine(const mach::WienerMachine& other):
+bob::machine::WienerMachine::WienerMachine(const bob::machine::WienerMachine& other):
   m_Ps(bob::core::array::ccopy(other.m_Ps)),
   m_variance_threshold(other.m_variance_threshold),
   m_Pn(other.m_Pn),
@@ -79,14 +77,14 @@ mach::WienerMachine::WienerMachine(const mach::WienerMachine& other):
 {
 }
 
-mach::WienerMachine::WienerMachine (bob::io::HDF5File& config) {
+bob::machine::WienerMachine::WienerMachine (bob::io::HDF5File& config) {
   load(config);
 }
 
-mach::WienerMachine::~WienerMachine() {}
+bob::machine::WienerMachine::~WienerMachine() {}
 
-mach::WienerMachine& mach::WienerMachine::operator=
-(const mach::WienerMachine& other) {
+bob::machine::WienerMachine& bob::machine::WienerMachine::operator=
+(const bob::machine::WienerMachine& other) {
   m_Ps.reference(bob::core::array::ccopy(other.m_Ps));
   m_Pn = other.m_Pn;
   m_variance_threshold = other.m_variance_threshold;
@@ -98,7 +96,7 @@ mach::WienerMachine& mach::WienerMachine::operator=
   return *this;
 }
 
-void mach::WienerMachine::load (bob::io::HDF5File& config) {
+void bob::machine::WienerMachine::load (bob::io::HDF5File& config) {
   //reads all data directly into the member variables
   m_Ps.reference(config.readArray<double,2>("Ps"));
   m_Pn = config.read<double>("Pn");
@@ -110,7 +108,7 @@ void mach::WienerMachine::load (bob::io::HDF5File& config) {
   m_buffer2.resize(m_Ps.extent(0),m_Ps.extent(1));
 }
 
-void mach::WienerMachine::resize (size_t height, size_t width) {
+void bob::machine::WienerMachine::resize (size_t height, size_t width) {
   m_Ps.resizeAndPreserve(height,width);
   m_W.resizeAndPreserve(height,width);
   m_fft.reset(new bob::sp::FFT2D(height,width));
@@ -119,14 +117,14 @@ void mach::WienerMachine::resize (size_t height, size_t width) {
   m_buffer2.resizeAndPreserve(height,width);
 }
 
-void mach::WienerMachine::save (bob::io::HDF5File& config) const {
+void bob::machine::WienerMachine::save (bob::io::HDF5File& config) const {
   config.setArray("Ps", m_Ps);
   config.set("Pn", m_Pn);
   config.set("variance_threshold", m_variance_threshold);
   config.setArray("W", m_W);
 }
 
-void mach::WienerMachine::computeW () {
+void bob::machine::WienerMachine::computeW () {
   m_W = m_Ps;
   // Apply variance flooring threshold
   blitz::Array<bool,2> isTooSmall(m_W.shape());
@@ -137,7 +135,7 @@ void mach::WienerMachine::computeW () {
 }
 
 
-void mach::WienerMachine::forward_
+void bob::machine::WienerMachine::forward_
 (const blitz::Array<double,2>& input, blitz::Array<double,2>& output) const {
   m_fft->operator()(bob::core::array::cast<std::complex<double> >(input), m_buffer1);
   m_buffer1 *= m_W;
@@ -145,29 +143,29 @@ void mach::WienerMachine::forward_
   output = blitz::abs(m_buffer2);
 }
 
-void mach::WienerMachine::forward
+void bob::machine::WienerMachine::forward
 (const blitz::Array<double,2>& input, blitz::Array<double,2>& output) const {
   if (m_W.extent(0) != input.extent(0)) //checks input
-    throw mach::NInputsMismatch(m_W.extent(0),
+    throw bob::machine::NInputsMismatch(m_W.extent(0),
         input.extent(0));
   if (m_W.extent(1) != input.extent(1)) //checks input
-    throw mach::NInputsMismatch(m_W.extent(1),
+    throw bob::machine::NInputsMismatch(m_W.extent(1),
         input.extent(1));
   if (m_W.extent(0) != output.extent(0)) //checks output
-    throw mach::NOutputsMismatch(m_W.extent(0),
+    throw bob::machine::NOutputsMismatch(m_W.extent(0),
         output.extent(0));
   if (m_W.extent(1) != output.extent(1)) //checks output
-    throw mach::NOutputsMismatch(m_W.extent(1),
+    throw bob::machine::NOutputsMismatch(m_W.extent(1),
         output.extent(1));
   forward_(input, output);
 }
 
-void mach::WienerMachine::setPs(const blitz::Array<double,2>& Ps) { 
+void bob::machine::WienerMachine::setPs(const blitz::Array<double,2>& Ps) { 
   if (m_Ps.extent(0) != Ps.extent(0)) {
-    throw mach::NInputsMismatch(m_Ps.extent(0), Ps.extent(0));
+    throw bob::machine::NInputsMismatch(m_Ps.extent(0), Ps.extent(0));
   }
   if (m_Ps.extent(1) != Ps.extent(1)) {
-    throw mach::NInputsMismatch(m_Ps.extent(1), Ps.extent(0));
+    throw bob::machine::NInputsMismatch(m_Ps.extent(1), Ps.extent(0));
   }
   m_Ps = bob::core::array::ccopy(Ps);
   computeW(); 

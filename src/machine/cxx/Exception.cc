@@ -21,29 +21,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/machine/Exception.h"
+#include <bob/machine/Exception.h>
 #include <boost/format.hpp>
 
-namespace machine = bob::machine;
-
-machine::Exception::Exception() throw() {
+bob::machine::Exception::Exception() throw() {
 }
 
-machine::Exception::~Exception() throw() {
+bob::machine::Exception::~Exception() throw() {
 }
 
-const char* machine::Exception::what() const throw() {
- static const char* what_string = "Generic machine::Exception: user specialization has not overwritten what() or is throwing an object of this class (in which case, please fix it!)";
+const char* bob::machine::Exception::what() const throw() {
+ static const char* what_string = "Generic bob::machine::Exception: user specialization has not overwritten what() or is throwing an object of this class (in which case, please fix it!)";
  return what_string;
 }
 
-machine::NInputsMismatch::NInputsMismatch(const int n1, const int n2) throw(): m_n_inputs1(n1), m_n_inputs2(n2) {
+bob::machine::NInputsMismatch::NInputsMismatch(const int n1, const int n2) throw(): m_n_inputs1(n1), m_n_inputs2(n2) {
 }
 
-machine::NInputsMismatch::~NInputsMismatch() throw() {
+bob::machine::NInputsMismatch::~NInputsMismatch() throw() {
 }
 
-const char* machine::NInputsMismatch::what() const throw() {
+const char* bob::machine::NInputsMismatch::what() const throw() {
   try {
     boost::format message("Mismatch in the number of inputs: '%d' vs '%d'.");
     message % m_n_inputs1;
@@ -51,18 +49,18 @@ const char* machine::NInputsMismatch::what() const throw() {
     m_message = message.str();
     return m_message.c_str();
   } catch (...) {
-    static const char* emergency = "machine::NInputsMismatch: cannot format, exception raised";
+    static const char* emergency = "bob::machine::NInputsMismatch: cannot format, exception raised";
     return emergency;
   }
 }
 
-machine::NOutputsMismatch::NOutputsMismatch(const int n1, const int n2) throw(): m_n_outputs1(n1), m_n_outputs2(n2) {
+bob::machine::NOutputsMismatch::NOutputsMismatch(const int n1, const int n2) throw(): m_n_outputs1(n1), m_n_outputs2(n2) {
 }
 
-machine::NOutputsMismatch::~NOutputsMismatch() throw() {
+bob::machine::NOutputsMismatch::~NOutputsMismatch() throw() {
 }
 
-const char* machine::NOutputsMismatch::what() const throw() {
+const char* bob::machine::NOutputsMismatch::what() const throw() {
   try {
     boost::format message("Mismatch in the number of outputs: '%d' vs '%d'.");
     message % m_n_outputs1;
@@ -70,7 +68,7 @@ const char* machine::NOutputsMismatch::what() const throw() {
     m_message = message.str();
     return m_message.c_str();
   } catch (...) {
-    static const char* emergency = "machine::NOutputsMismatch: cannot format, exception raised";
+    static const char* emergency = "bob::machine::NOutputsMismatch: cannot format, exception raised";
     return emergency;
   }
 }

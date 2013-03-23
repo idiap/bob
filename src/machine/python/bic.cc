@@ -18,11 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/core/python/ndarray.h"
+#include <bob/core/python/ndarray.h>
 #include <boost/python.hpp>
-#include "bob/machine/BICMachine.h"
-#include "bob/io/HDF5File.h"
-#include "bob/core/python/exception.h"
+#include <bob/machine/BICMachine.h>
+#include <bob/io/HDF5File.h>
+#include <bob/core/python/exception.h>
 
 
 static void bic_forward_(const bob::machine::BICMachine& machine, bob::python::const_ndarray input, bob::python::ndarray output){

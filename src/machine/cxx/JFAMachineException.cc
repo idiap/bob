@@ -20,20 +20,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/machine/JFAMachineException.h"
+#include <bob/machine/JFAMachineException.h>
 #include <boost/format.hpp>
 
-namespace machine = bob::machine;
-
-machine::JFABaseNoUBMSet::JFABaseNoUBMSet() throw()
+bob::machine::JFABaseNoUBMSet::JFABaseNoUBMSet() throw()
 {
 }
 
-machine::JFABaseNoUBMSet::~JFABaseNoUBMSet() throw() 
+bob::machine::JFABaseNoUBMSet::~JFABaseNoUBMSet() throw() 
 {
 }
 
-const char* machine::JFABaseNoUBMSet::what() const throw() 
+const char* bob::machine::JFABaseNoUBMSet::what() const throw() 
 {
   try 
   {
@@ -42,20 +40,20 @@ const char* machine::JFABaseNoUBMSet::what() const throw()
     return m_message.c_str();
   } catch (...) 
   {
-    static const char* emergency = "machine::JFABaseNoUBMSet: cannot format, exception raised";
+    static const char* emergency = "bob::machine::JFABaseNoUBMSet: cannot format, exception raised";
     return emergency;
   }
 }
 
-machine::JFAMachineNoJFABaseSet::JFAMachineNoJFABaseSet() throw()
+bob::machine::JFAMachineNoJFABaseSet::JFAMachineNoJFABaseSet() throw()
 {
 }
 
-machine::JFAMachineNoJFABaseSet::~JFAMachineNoJFABaseSet() throw() 
+bob::machine::JFAMachineNoJFABaseSet::~JFAMachineNoJFABaseSet() throw() 
 {
 }
 
-const char* machine::JFAMachineNoJFABaseSet::what() const throw() 
+const char* bob::machine::JFAMachineNoJFABaseSet::what() const throw() 
 {
   try 
   {
@@ -64,7 +62,7 @@ const char* machine::JFAMachineNoJFABaseSet::what() const throw()
     return m_message.c_str();
   } catch (...) 
   {
-    static const char* emergency = "machine::JFAMachineNoJFABaseSet: cannot format, exception raised";
+    static const char* emergency = "bob::machine::JFAMachineNoJFABaseSet: cannot format, exception raised";
     return emergency;
   }
 }

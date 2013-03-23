@@ -20,19 +20,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/core/assert.h"
-#include "bob/core/array_copy.h"
-#include "bob/machine/Exception.h"
-#include "bob/machine/PLDAMachine.h"
-#include "bob/math/linear.h"
-#include "bob/math/det.h"
-#include "bob/math/inv.h"
+#include <bob/core/assert.h>
+#include <bob/core/array_copy.h>
+#include <bob/machine/Exception.h>
+#include <bob/machine/PLDAMachine.h>
+#include <bob/math/linear.h>
+#include <bob/math/det.h>
+#include <bob/math/inv.h>
 
 #include <cmath>
 #include <boost/lexical_cast.hpp>
 #include <string>
 
-#include "bob/core/logging.h"
+#include <bob/core/logging.h>
 
 bob::machine::PLDABaseMachine::PLDABaseMachine()
 {

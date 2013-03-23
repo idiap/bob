@@ -28,7 +28,7 @@
 #include <boost/shared_array.hpp>
 #include <blitz/array.h>
 #include <fstream>
-#include "bob/io/HDF5File.h"
+#include <bob/io/HDF5File.h>
 
 // We need to declare the svm_model type for libsvm < 3.0.0. The next bit of
 // code was cut and pasted from version 2.9.1 of libsvm, file svm.cpp.
@@ -55,6 +55,10 @@ struct svm_model {
 #endif
 
 namespace bob { namespace machine {
+  /**
+   * @ingroup MACHINE
+   * @{
+   */
 
   /**
    * Loads a given libsvm data file. The data file format, as defined on the
@@ -383,6 +387,9 @@ namespace bob { namespace machine {
 
   };
 
+  /**
+   * @}
+   */
 }}
 
 #endif /* BOB_MACHINE_SVM_H */

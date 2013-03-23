@@ -21,44 +21,42 @@
  */
 
 #include <boost/format.hpp>
-#include "bob/machine/MLPException.h"
+#include <bob/machine/MLPException.h>
 
-namespace mach = bob::machine;
-
-mach::InvalidShape::InvalidShape() throw() {
+bob::machine::InvalidShape::InvalidShape() throw() {
 }
 
-mach::InvalidShape::~InvalidShape() throw() {
+bob::machine::InvalidShape::~InvalidShape() throw() {
 }
 
-const char* mach::InvalidShape::what() const throw() {
+const char* bob::machine::InvalidShape::what() const throw() {
  static const char* what_string = "Trying to setup an MLP with a shape containing only 1 entry. You have to provide at least 2.";
  return what_string;
 }
 
-mach::NumberOfLayersMismatch::NumberOfLayersMismatch(size_t expected,
+bob::machine::NumberOfLayersMismatch::NumberOfLayersMismatch(size_t expected,
     size_t got) throw():
   m_expected(expected),
   m_got(got)
 {
 }
 
-mach::NumberOfLayersMismatch::~NumberOfLayersMismatch() throw() {
+bob::machine::NumberOfLayersMismatch::~NumberOfLayersMismatch() throw() {
 }
 
-const char* mach::NumberOfLayersMismatch::what() const throw() {
+const char* bob::machine::NumberOfLayersMismatch::what() const throw() {
   try {
     boost::format message("Mismatch in the number of layers. I expected %d, but you are trying to set %d.");
     message % m_expected % m_got;
     m_message = message.str();
     return m_message.c_str();
   } catch (...) {
-    static const char* emergency = "mach::NumberOfLayersMismatch: cannot format, exception raised";
+    static const char* emergency = "bob::machine::NumberOfLayersMismatch: cannot format, exception raised";
     return emergency;
   }
 }
 
-mach::WeightShapeMismatch::WeightShapeMismatch(size_t layer, 
+bob::machine::WeightShapeMismatch::WeightShapeMismatch(size_t layer, 
     const blitz::TinyVector<int,2>& expected,
     const blitz::TinyVector<int,2>& given) throw():
   m_layer(layer),
@@ -67,10 +65,10 @@ mach::WeightShapeMismatch::WeightShapeMismatch(size_t layer,
 {
 }
 
-mach::WeightShapeMismatch::~WeightShapeMismatch() throw() {
+bob::machine::WeightShapeMismatch::~WeightShapeMismatch() throw() {
 }
 
-const char* mach::WeightShapeMismatch::what() const throw() {
+const char* bob::machine::WeightShapeMismatch::what() const throw() {
   try {
     boost::format message("Mismatch in the expected shape for the weights in layer %d. I got (%d,%d) but I was expecting (%d,%d).");
     message % m_layer;
@@ -79,12 +77,12 @@ const char* mach::WeightShapeMismatch::what() const throw() {
     m_message = message.str();
     return m_message.c_str();
   } catch (...) {
-    static const char* emergency = "mach::WeightShapeMismatch: cannot format, exception raised";
+    static const char* emergency = "bob::machine::WeightShapeMismatch: cannot format, exception raised";
     return emergency;
   }
 }
 
-mach::BiasShapeMismatch::BiasShapeMismatch(size_t layer, 
+bob::machine::BiasShapeMismatch::BiasShapeMismatch(size_t layer, 
     size_t expected, size_t given) throw():
   m_layer(layer),
   m_expected(expected),
@@ -92,10 +90,10 @@ mach::BiasShapeMismatch::BiasShapeMismatch(size_t layer,
 {
 }
 
-mach::BiasShapeMismatch::~BiasShapeMismatch() throw() {
+bob::machine::BiasShapeMismatch::~BiasShapeMismatch() throw() {
 }
 
-const char* mach::BiasShapeMismatch::what() const throw() {
+const char* bob::machine::BiasShapeMismatch::what() const throw() {
   try {
     boost::format message("Mismatch in the expected shape for the bias in layer %d. I got shape (%d) but I was expecting (%d).");
     message % m_layer;
@@ -103,28 +101,28 @@ const char* mach::BiasShapeMismatch::what() const throw() {
     m_message = message.str();
     return m_message.c_str();
   } catch (...) {
-    static const char* emergency = "mach::BiasShapeMismatch: cannot format, exception raised";
+    static const char* emergency = "bob::machine::BiasShapeMismatch: cannot format, exception raised";
     return emergency;
   }
 }
 
-mach::UnsupportedActivation::UnsupportedActivation(mach::Activation act) 
+bob::machine::UnsupportedActivation::UnsupportedActivation(bob::machine::Activation act) 
   throw():
   m_act(act)
 {
 }
 
-mach::UnsupportedActivation::~UnsupportedActivation() throw() {
+bob::machine::UnsupportedActivation::~UnsupportedActivation() throw() {
 }
 
-const char* mach::UnsupportedActivation::what() const throw() {
+const char* bob::machine::UnsupportedActivation::what() const throw() {
   try {
     boost::format message("Object does not support use of activation function %d.");
     message % (unsigned)m_act;
     m_message = message.str();
     return m_message.c_str();
   } catch (...) {
-    static const char* emergency = "mach::UnsupportedActivation: cannot format, exception raised";
+    static const char* emergency = "bob::machine::UnsupportedActivation: cannot format, exception raised";
     return emergency;
   }
 }

@@ -20,13 +20,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_MACHINE_EIGENMACHINEEXCEPTION_H 
-#define BOB5SPRO_MACHINE_EIGENMACHINEEXCEPTION_H
+#ifndef BOB_MACHINE_EIGENMACHINEEXCEPTION_H 
+#define BOB_MACHINE_EIGENMACHINEEXCEPTION_H
 
 #include <cstdlib>
-#include "bob/machine/Exception.h"
+#include <bob/machine/Exception.h>
 
 namespace bob { namespace machine {
+  /**
+   * @ingroup MACHINE
+   * @{
+   */
 
   class EigenMachineNOutputsTooLarge: public Exception {
     public:
@@ -40,6 +44,9 @@ namespace bob { namespace machine {
       mutable std::string m_message;
   };
 
+  /**
+   * @}
+   */
 }}
 
-#endif /* BOB5SPRO_MACHINE_EIGENMACHINEEXCEPTION_H */
+#endif /* BOB_MACHINE_EIGENMACHINEEXCEPTION_H */

@@ -19,11 +19,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/machine/KMeansMachine.h"
+#include <bob/machine/KMeansMachine.h>
 
-#include "bob/core/assert.h"
-#include "bob/core/array_copy.h"
-#include "bob/machine/Exception.h"
+#include <bob/core/assert.h>
+#include <bob/core/array_copy.h>
+#include <bob/machine/Exception.h>
 #include <limits>
 
 bob::machine::KMeansMachine::KMeansMachine(): 

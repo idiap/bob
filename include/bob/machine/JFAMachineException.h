@@ -24,9 +24,13 @@
 #define BOB_MACHINE_JFAMACHINEEXCEPTION_H
 
 #include <cstdlib>
-#include "bob/machine/Exception.h"
+#include <bob/machine/Exception.h>
 
 namespace bob { namespace machine {
+  /**
+   * @ingroup MACHINE
+   * @{
+   */
 
   class JFABaseNoUBMSet: public Exception {
     public:
@@ -48,6 +52,9 @@ namespace bob { namespace machine {
       mutable std::string m_message;
   };
 
+  /**
+   * @}
+   */
 }}
 
-#endif 
+#endif // BOB_MACHINE_JFAMACHINEEXCEPTION_H

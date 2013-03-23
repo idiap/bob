@@ -20,13 +20,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_MACHINE_EXCEPTION_H 
-#define BOB5SPRO_MACHINE_EXCEPTION_H
+#ifndef BOB_MACHINE_EXCEPTION_H 
+#define BOB_MACHINE_EXCEPTION_H
 
 #include <cstdlib>
-#include "bob/core/Exception.h"
+#include <bob/core/Exception.h>
 
 namespace bob { namespace machine {
+  /**
+   * @ingroup MACHINE
+   * @{
+   */
 
   class Exception: public bob::core::Exception {
 
@@ -61,6 +65,9 @@ namespace bob { namespace machine {
       mutable std::string m_message;
   };
 
+  /**
+   * @}
+   */
 }}
 
-#endif /* BOB5SPRO_MACHINE_EXCEPTION_H */
+#endif /* BOB_MACHINE_EXCEPTION_H */

@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/machine/GaborGraphMachine.h"
+#include <bob/machine/GaborGraphMachine.h>
 #include <complex>
 
 /**

@@ -19,8 +19,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/machine/ZTNorm.h"
-#include "bob/core/assert.h"
+#include <bob/machine/ZTNorm.h>
+#include <bob/core/assert.h>
 #include <limits>
 
 namespace bob { 

@@ -31,10 +31,14 @@
 #define BOB_MACHINE_LINEARMACHINE_H
 
 #include <blitz/array.h>
-#include "bob/io/HDF5File.h"
-#include "bob/machine/Activation.h"
+#include <bob/io/HDF5File.h>
+#include <bob/machine/Activation.h>
 
 namespace bob { namespace machine {
+  /**
+   * @ingroup MACHINE
+   * @{
+   */
 
   /**
    * A linear classifier. See C. M. Bishop, "Pattern Recognition and Machine
@@ -269,6 +273,9 @@ namespace bob { namespace machine {
   
   };
 
+  /**
+   * @}
+   */
 }}
 
 #endif /* BOB_MACHINE_LINEARMACHINE_H */

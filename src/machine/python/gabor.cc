@@ -22,12 +22,12 @@
 
 
 #include <boost/python.hpp>
-#include "bob/core/python/ndarray.h"
+#include <bob/core/python/ndarray.h>
 
-#include "bob/ip/GaborWaveletTransform.h"
-#include "bob/machine/GaborGraphMachine.h"
-#include "bob/machine/GaborJetSimilarities.h"
-#include "bob/core/array_exception.h"
+#include <bob/ip/GaborWaveletTransform.h>
+#include <bob/machine/GaborGraphMachine.h>
+#include <bob/machine/GaborJetSimilarities.h>
+#include <bob/core/array_exception.h>
 
 
 static void bob_extract(bob::machine::GaborGraphMachine& self, bob::python::const_ndarray input_jet_image, bob::python::ndarray output_graph){

@@ -20,21 +20,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB5SPRO_MACHINE_TWODPCAMACHINE_H
-#define BOB5SPRO_MACHINE_TWODPCAMACHINE_H
+#ifndef BOB_MACHINE_TWODPCAMACHINE_H
+#define BOB_MACHINE_TWODPCAMACHINE_H
 
 #include <blitz/array.h>
-#include "bob/machine/Machine.h"
+#include <bob/machine/Machine.h>
 
 namespace bob {
-/**
-  * \ingroup libmachine_api
-  * @{
-  *
-  */
   namespace machine {
-  
-  
+    /**
+     * @ingroup MACHINE
+     * @{
+     */
+   
     /**
       * @brief Class which implements subspace projection.
       */
@@ -120,6 +118,9 @@ namespace bob {
         blitz::Array<double,2> m_pre_mean;
     };
 
+    /**
+     * @}
+     */
   }
 }
 

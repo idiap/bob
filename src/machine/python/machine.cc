@@ -20,23 +20,21 @@
 #include <boost/python.hpp>
 #include <boost/concept_check.hpp>
 #include <blitz/array.h>
-#include "bob/machine/Machine.h"
+#include <bob/machine/Machine.h>
 
-#include "bob/core/python/ndarray.h"
+#include <bob/core/python/ndarray.h>
 
 using namespace boost::python;
-namespace mach = bob::machine;
-namespace bp = bob::python;
 
-static double forward(const mach::Machine<blitz::Array<double,1>, double>& m,
-    bp::const_ndarray input) {
+static double forward(const bob::machine::Machine<blitz::Array<double,1>, double>& m,
+    bob::python::const_ndarray input) {
   double output;
   m.forward(input.bz<double,1>(), output);
   return output;
 }
 
-static double forward_(const mach::Machine<blitz::Array<double,1>, double>& m,
-    bp::const_ndarray input) {
+static double forward_(const bob::machine::Machine<blitz::Array<double,1>, double>& m,
+    bob::python::const_ndarray input) {
   double output;
   m.forward_(input.bz<double,1>(), output);
   return output;
@@ -44,7 +42,7 @@ static double forward_(const mach::Machine<blitz::Array<double,1>, double>& m,
 
 void bind_machine_base() 
 {
-  class_<mach::Machine<blitz::Array<double,1>, double>, boost::noncopyable>("MachineDoubleBase", 
+  class_<bob::machine::Machine<blitz::Array<double,1>, double>, boost::noncopyable>("MachineDoubleBase", 
       "Root class for all Machine<blitz::Array<double,1>, double>", no_init)
     .def("__call__", &forward_, (arg("self"), arg("input")), "Executes the machine on the given 1D numpy array of float64, and returns the output. NO CHECK is performed.")
     .def("forward", &forward, (arg("self"), arg("input")), "Executes the machine on the given 1D numpy array of float64, and returns the output.")

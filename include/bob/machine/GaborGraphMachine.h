@@ -23,14 +23,18 @@
 #ifndef BOB_MACHINE_GABOR_GRAPH_MACHINE_H
 #define BOB_MACHINE_GABOR_GRAPH_MACHINE_H
 
-#include "bob/ip/GaborWaveletTransform.h"
-#include "bob/machine/GaborJetSimilarities.h"
-#include "bob/io/HDF5File.h"
-#include "bob/machine/Exception.h"
+#include <bob/ip/GaborWaveletTransform.h>
+#include <bob/machine/GaborJetSimilarities.h>
+#include <bob/io/HDF5File.h>
+#include <bob/machine/Exception.h>
 
 #include <sstream>
 
 namespace bob{ namespace machine {
+  /**
+   * @ingroup MACHINE
+   * @{
+   */
 
   //! \brief This exception is thrown when the image size is smaller than the graph that should be extracted.
   class ImageTooSmallException : public Exception{
@@ -144,5 +148,9 @@ namespace bob{ namespace machine {
       // temporary complex vector of Gabor jet averages
       mutable blitz::Array<std::complex<double>,1> m_averages;
   };
+  
+  /**
+   * @}
+   */
 } }
 #endif // BOB_MACHINE_GABOR_GRAPH_MACHINE_H

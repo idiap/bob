@@ -25,10 +25,10 @@
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
-#include "bob/machine/SVM.h"
-#include "bob/machine/MLPException.h"
-#include "bob/core/check.h"
-#include "bob/core/logging.h"
+#include <bob/machine/SVM.h>
+#include <bob/machine/MLPException.h>
+#include <bob/core/check.h>
+#include <bob/core/logging.h>
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
@@ -36,12 +36,9 @@
 #include <sys/stat.h>
 #include <algorithm>
 
-namespace mach = bob::machine;
-namespace array = bob::core::array;
-
 static bool is_colon(char i) { return i == ':'; }
 
-mach::SVMFile::SVMFile (const std::string& filename):
+bob::machine::SVMFile::SVMFile (const std::string& filename):
   m_filename(filename),
   m_file(m_filename.c_str()),
   m_shape(0),
@@ -87,15 +84,15 @@ mach::SVMFile::SVMFile (const std::string& filename):
   m_file.seekg(0, std::ios_base::beg);
 }
 
-mach::SVMFile::~SVMFile() {
+bob::machine::SVMFile::~SVMFile() {
 }
 
-void mach::SVMFile::reset() {
+void bob::machine::SVMFile::reset() {
   m_file.close();
   m_file.open(m_filename.c_str());
 }
 
-bool mach::SVMFile::read(int& label, blitz::Array<double,1>& values) {
+bool bob::machine::SVMFile::read(int& label, blitz::Array<double,1>& values) {
   if ((size_t)values.extent(0) != m_shape) {
     boost::format s("file '%s' contains %d entries per sample, but you gave me an array with only %d positions");
     s % m_filename % m_shape % values.extent(0);
@@ -106,7 +103,7 @@ bool mach::SVMFile::read(int& label, blitz::Array<double,1>& values) {
   return read_(label, values);
 }
 
-bool mach::SVMFile::read_(int& label, blitz::Array<double,1>& values) {
+bool bob::machine::SVMFile::read_(int& label, blitz::Array<double,1>& values) {
   
   //if the file is at the end, just raise, you should have checked
   if (!m_file.good()) return false;
@@ -147,7 +144,7 @@ static void svm_model_free(svm_model*& m) {
 #endif
 }
 
-blitz::Array<uint8_t,1> mach::svm_pickle
+blitz::Array<uint8_t,1> bob::machine::svm_pickle
 (const boost::shared_ptr<svm_model> model)
 {
   //use a re-entrant version of tmpnam...
@@ -190,7 +187,7 @@ static boost::shared_ptr<svm_model> make_model(const char* filename) {
 /**
  * Reverts the pickling process, returns the model
  */
-boost::shared_ptr<svm_model> mach::svm_unpickle
+boost::shared_ptr<svm_model> bob::machine::svm_unpickle
 (const blitz::Array<uint8_t,1>& buffer) {
   //use a re-entrant version of tmpnam...
   char tmp_filename[L_tmpnam];
@@ -217,7 +214,7 @@ boost::shared_ptr<svm_model> mach::svm_unpickle
   return retval;
 }
 
-void mach::SupportVector::reset() {
+void bob::machine::SupportVector::reset() {
   //gets the expected size for the input from the SVM
   m_input_size = 0;
   for (int k=0; k<m_model->l; ++k) {
@@ -237,7 +234,7 @@ void mach::SupportVector::reset() {
   m_input_div = 1.0;
 }
 
-mach::SupportVector::SupportVector(const std::string& model_file):
+bob::machine::SupportVector::SupportVector(const std::string& model_file):
   m_model(make_model(model_file.c_str()))
 {
   if (!m_model) {
@@ -248,7 +245,7 @@ mach::SupportVector::SupportVector(const std::string& model_file):
   reset();
 }
 
-mach::SupportVector::SupportVector(bob::io::HDF5File& config):
+bob::machine::SupportVector::SupportVector(bob::io::HDF5File& config):
   m_model()
 {
   uint64_t version = 0;
@@ -259,13 +256,13 @@ mach::SupportVector::SupportVector(bob::io::HDF5File& config):
     m % config.filename() % config.cwd() % version % LIBSVM_VERSION;
     bob::core::warn << m.str() << std::endl;
   }
-  m_model = mach::svm_unpickle(config.readArray<uint8_t,1>("svm_model"));
+  m_model = bob::machine::svm_unpickle(config.readArray<uint8_t,1>("svm_model"));
   reset(); ///< note: has to be done before reading scaling parameters
   config.readArray("input_subtract", m_input_sub);
   config.readArray("input_divide", m_input_div);
 }
 
-mach::SupportVector::SupportVector(boost::shared_ptr<svm_model> model)
+bob::machine::SupportVector::SupportVector(boost::shared_ptr<svm_model> model)
   : m_model(model)
 {
   if (!m_model) {
@@ -274,26 +271,26 @@ mach::SupportVector::SupportVector(boost::shared_ptr<svm_model> model)
   reset();
 }
 
-mach::SupportVector::~SupportVector() { }
+bob::machine::SupportVector::~SupportVector() { }
 
-bool mach::SupportVector::supportsProbability() const {
+bool bob::machine::SupportVector::supportsProbability() const {
   return svm_check_probability_model(m_model.get());
 }
 
-size_t mach::SupportVector::inputSize() const {
+size_t bob::machine::SupportVector::inputSize() const {
   return m_input_size;
 }
 
-size_t mach::SupportVector::outputSize() const {
+size_t bob::machine::SupportVector::outputSize() const {
   size_t retval = svm_get_nr_class(m_model.get());
   return (retval == 2)? 1 : retval;
 }
 
-size_t mach::SupportVector::numberOfClasses() const {
+size_t bob::machine::SupportVector::numberOfClasses() const {
   return svm_get_nr_class(m_model.get());
 }
 
-int mach::SupportVector::classLabel(size_t i) const {
+int bob::machine::SupportVector::classLabel(size_t i) const {
 
   if (i >= (size_t)svm_get_nr_class(m_model.get())) {
     boost::format s("request for label of class %d in SVM with %d classes is not legal");
@@ -304,36 +301,36 @@ int mach::SupportVector::classLabel(size_t i) const {
 
 }
 
-mach::SupportVector::svm_t mach::SupportVector::machineType() const {
+bob::machine::SupportVector::svm_t bob::machine::SupportVector::machineType() const {
   return (svm_t)svm_get_svm_type(m_model.get());
 }
 
-mach::SupportVector::kernel_t mach::SupportVector::kernelType() const {
+bob::machine::SupportVector::kernel_t bob::machine::SupportVector::kernelType() const {
   return (kernel_t)m_model->param.kernel_type;
 }
 
-int mach::SupportVector::polynomialDegree() const {
+int bob::machine::SupportVector::polynomialDegree() const {
   return m_model->param.degree;
 }
 
-double mach::SupportVector::gamma() const {
+double bob::machine::SupportVector::gamma() const {
   return m_model->param.gamma;
 }
 
-double mach::SupportVector::coefficient0() const {
+double bob::machine::SupportVector::coefficient0() const {
   return m_model->param.coef0;
 }
 
-void mach::SupportVector::setInputSubtraction(const blitz::Array<double,1>& v) {
+void bob::machine::SupportVector::setInputSubtraction(const blitz::Array<double,1>& v) {
   if (inputSize() != (size_t)v.extent(0)) {
-    throw mach::NInputsMismatch(inputSize(), v.extent(0));
+    throw bob::machine::NInputsMismatch(inputSize(), v.extent(0));
   }
   m_input_sub.reference(bob::core::array::ccopy(v));
 }
 
-void mach::SupportVector::setInputDivision(const blitz::Array<double,1>& v) {
+void bob::machine::SupportVector::setInputDivision(const blitz::Array<double,1>& v) {
   if (inputSize() != (size_t)v.extent(0)) {
-    throw mach::NInputsMismatch(inputSize(), v.extent(0));
+    throw bob::machine::NInputsMismatch(inputSize(), v.extent(0));
   }
   m_input_div.reference(bob::core::array::ccopy(v));
 }
@@ -359,14 +356,14 @@ static inline void copy(const blitz::Array<double,1>& input,
   cache[cur].index = -1; //libsvm detects end of input if index==-1
 }
 
-int mach::SupportVector::predictClass_
+int bob::machine::SupportVector::predictClass_
 (const blitz::Array<double,1>& input) const {
   copy(input, m_input_cache, m_input_sub, m_input_div);
   int retval = round(svm_predict(m_model.get(), m_input_cache.get()));
   return retval;
 }
 
-int mach::SupportVector::predictClass
+int bob::machine::SupportVector::predictClass
 (const blitz::Array<double,1>& input) const {
 
   if ((size_t)input.extent(0) != inputSize()) {
@@ -378,7 +375,7 @@ int mach::SupportVector::predictClass
   return predictClass_(input); 
 }
 
-int mach::SupportVector::predictClassAndScores_
+int bob::machine::SupportVector::predictClassAndScores_
 (const blitz::Array<double,1>& input,
  blitz::Array<double,1>& scores) const {
   copy(input, m_input_cache, m_input_sub, m_input_div);
@@ -391,7 +388,7 @@ int mach::SupportVector::predictClassAndScores_
   return retval;
 }
 
-int mach::SupportVector::predictClassAndScores
+int bob::machine::SupportVector::predictClassAndScores
 (const blitz::Array<double,1>& input,
  blitz::Array<double,1>& scores) const {
    
@@ -401,7 +398,7 @@ int mach::SupportVector::predictClassAndScores
     throw std::invalid_argument(s.str());
   }
 
-  if (!array::isCContiguous(scores)) {
+  if (!bob::core::array::isCContiguous(scores)) {
     throw std::invalid_argument("scores output array should be C-style contiguous and what you provided is not");
   }
 
@@ -414,7 +411,7 @@ int mach::SupportVector::predictClassAndScores
   return predictClassAndScores_(input, scores);
 }
 
-int mach::SupportVector::predictClassAndProbabilities_
+int bob::machine::SupportVector::predictClassAndProbabilities_
 (const blitz::Array<double,1>& input,
  blitz::Array<double,1>& probabilities) const {
   copy(input, m_input_cache, m_input_sub, m_input_div);
@@ -422,7 +419,7 @@ int mach::SupportVector::predictClassAndProbabilities_
   return retval;
 }
 
-int mach::SupportVector::predictClassAndProbabilities
+int bob::machine::SupportVector::predictClassAndProbabilities
 (const blitz::Array<double,1>& input,
  blitz::Array<double,1>& probabilities) const {
    
@@ -436,7 +433,7 @@ int mach::SupportVector::predictClassAndProbabilities
     throw std::runtime_error("this SVM does not support probabilities");
   }
 
-  if (!array::isCContiguous(probabilities)) {
+  if (!bob::core::array::isCContiguous(probabilities)) {
     throw std::invalid_argument("probabilities output array should be C-style contiguous and what you provided is not");
   }
 
@@ -449,7 +446,7 @@ int mach::SupportVector::predictClassAndProbabilities
   return predictClassAndProbabilities_(input, probabilities);
 }
 
-void mach::SupportVector::save(const std::string& filename) const {
+void bob::machine::SupportVector::save(const std::string& filename) const {
   if (svm_save_model(filename.c_str(), m_model.get())) {
     boost::format s("cannot save SVM model to file '%s'");
     s % filename;
@@ -457,8 +454,8 @@ void mach::SupportVector::save(const std::string& filename) const {
   }
 }
 
-void mach::SupportVector::save(bob::io::HDF5File& config) const {
-  config.setArray("svm_model", mach::svm_pickle(m_model));
+void bob::machine::SupportVector::save(bob::io::HDF5File& config) const {
+  config.setArray("svm_model", bob::machine::svm_pickle(m_model));
   config.setArray("input_subtract", m_input_sub);
   config.setArray("input_divide", m_input_div);
   uint64_t version = LIBSVM_VERSION;

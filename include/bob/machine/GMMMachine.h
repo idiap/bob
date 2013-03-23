@@ -25,15 +25,19 @@
 #ifndef BOB_MACHINE_GMMMACHINE_H
 #define BOB_MACHINE_GMMMACHINE_H
 
-#include "bob/machine/Machine.h"
-#include "bob/machine/Gaussian.h"
-#include "bob/machine/GMMStats.h"
-#include "bob/io/HDF5File.h"
+#include <bob/machine/Machine.h>
+#include <bob/machine/Gaussian.h>
+#include <bob/machine/GMMStats.h>
+#include <bob/io/HDF5File.h>
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 #include <vector>
 
 namespace bob { namespace machine {
+/**
+ * @ingroup MACHINE
+ * @{
+ */
 
 /**
  * @brief This class implements a multivariate diagonal Gaussian distribution.
@@ -381,6 +385,9 @@ class GMMMachine: public Machine<blitz::Array<double,1>, double>
 
 };
 
+/**
+ * @}
+ */
 }}
 
 #endif

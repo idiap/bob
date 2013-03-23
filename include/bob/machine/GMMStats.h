@@ -23,9 +23,13 @@
 #define BOB_MACHINE_GMMSTATS_H
 
 #include <blitz/array.h>
-#include "bob/io/HDF5File.h"
+#include <bob/io/HDF5File.h>
 
 namespace bob { namespace machine {
+/**
+ * @ingroup MACHINE
+ * @{
+ */
 
 /**
  * @brief A container for GMM statistics.
@@ -143,6 +147,9 @@ class GMMStats {
     void copy(const GMMStats&);
 };
 
+/**
+ * @}
+ */
 }}
 
 #endif 

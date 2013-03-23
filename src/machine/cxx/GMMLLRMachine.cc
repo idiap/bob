@@ -17,8 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "bob/machine/GMMLLRMachine.h"
-#include "bob/machine/Exception.h"
+
+#include <bob/machine/GMMLLRMachine.h>
+#include <bob/machine/Exception.h>
 
 bob::machine::GMMLLRMachine::GMMLLRMachine(bob::io::HDF5File& config) {
   load(config);

@@ -24,10 +24,14 @@
 #define BOB_MACHINE_MLPEXCEPTION_H
 
 #include <blitz/array.h>
-#include "bob/machine/Exception.h"
-#include "bob/machine/Activation.h"
+#include <bob/machine/Exception.h>
+#include <bob/machine/Activation.h>
 
 namespace bob { namespace machine {
+  /**
+   * @ingroup MACHINE
+   * @{
+   */
 
   /**
    * Exception raised when the resizing shape has less than 2 components
@@ -106,6 +110,9 @@ namespace bob { namespace machine {
       mutable std::string m_message;
   };
 
+  /**
+   * @}
+   */
 }}
 
 #endif /* BOB_MACHINE_MLPEXCEPTION_H */

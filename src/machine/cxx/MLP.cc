@@ -24,23 +24,19 @@
 #include <cmath>
 #include <boost/format.hpp>
 
-#include "bob/core/check.h"
-#include "bob/core/array_copy.h"
-#include "bob/core/assert.h"
-#include "bob/machine/MLP.h"
-#include "bob/machine/MLPException.h"
-#include "bob/math/linear.h"
+#include <bob/core/check.h>
+#include <bob/core/array_copy.h>
+#include <bob/core/assert.h>
+#include <bob/machine/MLP.h>
+#include <bob/machine/MLPException.h>
+#include <bob/math/linear.h>
 
-namespace mach = bob::machine;
-namespace math = bob::math;
-namespace array = bob::core::array;
-
-mach::MLP::MLP (size_t input, size_t output):
+bob::machine::MLP::MLP (size_t input, size_t output):
   m_input_sub(input),
   m_input_div(input),
   m_weight(1),
   m_bias(1),
-  m_activation(mach::TANH),
+  m_activation(bob::machine::TANH),
   m_actfun(std::tanh),
   m_buffer(1)
 {
@@ -51,12 +47,12 @@ mach::MLP::MLP (size_t input, size_t output):
   setBiases(0);
 }
 
-mach::MLP::MLP (size_t input, size_t hidden, size_t output):
+bob::machine::MLP::MLP (size_t input, size_t hidden, size_t output):
   m_input_sub(input),
   m_input_div(input),
   m_weight(2),
   m_bias(2),
-  m_activation(mach::TANH),
+  m_activation(bob::machine::TANH),
   m_actfun(std::tanh),
   m_buffer(2)
 {
@@ -67,12 +63,12 @@ mach::MLP::MLP (size_t input, size_t hidden, size_t output):
   setBiases(0);
 }
 
-mach::MLP::MLP (size_t input, const std::vector<size_t>& hidden, size_t output):
+bob::machine::MLP::MLP (size_t input, const std::vector<size_t>& hidden, size_t output):
   m_input_sub(input),
   m_input_div(input),
   m_weight(hidden.size()+1),
   m_bias(hidden.size()+1),
-  m_activation(mach::TANH),
+  m_activation(bob::machine::TANH),
   m_actfun(std::tanh),
   m_buffer(hidden.size()+1)
 {
@@ -83,8 +79,8 @@ mach::MLP::MLP (size_t input, const std::vector<size_t>& hidden, size_t output):
   setBiases(0);
 }
 
-mach::MLP::MLP (const std::vector<size_t>& shape):
-  m_activation(mach::TANH),
+bob::machine::MLP::MLP (const std::vector<size_t>& shape):
+  m_activation(bob::machine::TANH),
   m_actfun(std::tanh)
 {
   resize(shape);
@@ -94,7 +90,7 @@ mach::MLP::MLP (const std::vector<size_t>& shape):
   setBiases(0);
 }
 
-mach::MLP::MLP (const mach::MLP& other):
+bob::machine::MLP::MLP (const bob::machine::MLP& other):
   m_input_sub(bob::core::array::ccopy(other.m_input_sub)),
   m_input_div(bob::core::array::ccopy(other.m_input_div)),
   m_weight(other.m_weight.size()),
@@ -110,13 +106,13 @@ mach::MLP::MLP (const mach::MLP& other):
   }
 }
 
-mach::MLP::MLP (bob::io::HDF5File& config) {
+bob::machine::MLP::MLP (bob::io::HDF5File& config) {
   load(config);
 }
 
-mach::MLP::~MLP() { }
+bob::machine::MLP::~MLP() { }
 
-mach::MLP& mach::MLP::operator= (const MLP& other) {
+bob::machine::MLP& bob::machine::MLP::operator= (const MLP& other) {
   m_input_sub.reference(bob::core::array::ccopy(other.m_input_sub));
   m_input_div.reference(bob::core::array::ccopy(other.m_input_div));
   m_weight.resize(other.m_weight.size());
@@ -132,7 +128,7 @@ mach::MLP& mach::MLP::operator= (const MLP& other) {
   return *this;
 }
 
-void mach::MLP::load (bob::io::HDF5File& config) {
+void bob::machine::MLP::load (bob::io::HDF5File& config) {
   uint8_t nhidden = config.read<uint8_t>("nhidden");
   m_weight.resize(nhidden+1);
   m_bias.resize(nhidden+1);
@@ -154,7 +150,7 @@ void mach::MLP::load (bob::io::HDF5File& config) {
 
   //reads the activation function
   uint32_t act = config.read<uint32_t>("activation");
-  setActivation(static_cast<mach::Activation>(act));
+  setActivation(static_cast<bob::machine::Activation>(act));
 
   //setup buffers: first, input
   m_buffer[0].reference(blitz::Array<double,1>(m_input_sub.shape()));
@@ -164,7 +160,7 @@ void mach::MLP::load (bob::io::HDF5File& config) {
   }
 }
 
-void mach::MLP::save (bob::io::HDF5File& config) const {
+void bob::machine::MLP::save (bob::io::HDF5File& config) const {
   config.setArray("input_sub", m_input_sub);
   config.setArray("input_div", m_input_div);
   config.set("nhidden", (uint8_t)(m_weight.size()-1));
@@ -180,7 +176,7 @@ void mach::MLP::save (bob::io::HDF5File& config) const {
   config.set("activation", static_cast<uint32_t>(m_activation));
 }
 
-void mach::MLP::forward_ (const blitz::Array<double,1>& input,
+void bob::machine::MLP::forward_ (const blitz::Array<double,1>& input,
     blitz::Array<double,1>& output) const {
 
   //doesn't check input, just computes
@@ -188,34 +184,34 @@ void mach::MLP::forward_ (const blitz::Array<double,1>& input,
 
   //input -> hidden[0]; hidden[0] -> hidden[1], ..., hidden[N-2] -> hidden[N-1]
   for (size_t j=1; j<m_weight.size(); ++j) {
-    math::prod_(m_buffer[j-1], m_weight[j-1], m_buffer[j]);
+    bob::math::prod_(m_buffer[j-1], m_weight[j-1], m_buffer[j]);
     for (int i=0; i<m_buffer[j].extent(0); ++i) {
       m_buffer[j](i) = m_actfun(m_buffer[j](i) + m_bias[j-1](i));
     }
   }
 
   //hidden[N-1] -> output
-  math::prod_(m_buffer.back(), m_weight.back(), output);
+  bob::math::prod_(m_buffer.back(), m_weight.back(), output);
   const blitz::Array<double,1>& last_bias = m_bias.back(); //opt. access
   for (int i=0; i<output.extent(0); ++i) {
     output(i) = m_actfun(output(i) + last_bias(i));
   }
 }
 
-void mach::MLP::forward (const blitz::Array<double,1>& input,
+void bob::machine::MLP::forward (const blitz::Array<double,1>& input,
     blitz::Array<double,1>& output) const {
 
   //checks input
   if (m_weight.front().extent(0) != input.extent(0)) //checks input
-    throw mach::NInputsMismatch(m_weight.front().extent(0),
+    throw bob::machine::NInputsMismatch(m_weight.front().extent(0),
         input.extent(0));
   if (m_weight.back().extent(1) != output.extent(0)) //checks output
-    throw mach::NOutputsMismatch(m_weight.back().extent(1),
+    throw bob::machine::NOutputsMismatch(m_weight.back().extent(1),
         output.extent(0));
   forward_(input, output); 
 }
 
-void mach::MLP::forward_ (const blitz::Array<double,2>& input,
+void bob::machine::MLP::forward_ (const blitz::Array<double,2>& input,
     blitz::Array<double,2>& output) const {
 
   blitz::Range all = blitz::Range::all();
@@ -226,22 +222,22 @@ void mach::MLP::forward_ (const blitz::Array<double,2>& input,
   }
 }
 
-void mach::MLP::forward (const blitz::Array<double,2>& input,
+void bob::machine::MLP::forward (const blitz::Array<double,2>& input,
     blitz::Array<double,2>& output) const {
 
   //checks input
   if (m_weight.front().extent(0) != input.extent(1)) //checks input
-    throw mach::NInputsMismatch(m_weight.front().extent(0),
+    throw bob::machine::NInputsMismatch(m_weight.front().extent(0),
         input.extent(1));
   if (m_weight.back().extent(1) != output.extent(1)) //checks output
-    throw mach::NOutputsMismatch(m_weight.back().extent(1),
+    throw bob::machine::NOutputsMismatch(m_weight.back().extent(1),
         output.extent(1));
   //checks output
-  array::assertSameDimensionLength(input.extent(0), output.extent(0));
+  bob::core::array::assertSameDimensionLength(input.extent(0), output.extent(0));
   forward_(input, output); 
 }
 
-void mach::MLP::resize (size_t input, size_t output) {
+void bob::machine::MLP::resize (size_t input, size_t output) {
   m_input_sub.resize(input);
   m_input_sub = 0;
   m_input_div.resize(input);
@@ -254,12 +250,12 @@ void mach::MLP::resize (size_t input, size_t output) {
   m_buffer[0].reference(blitz::Array<double,1>(input));
 }
 
-void mach::MLP::resize (size_t input, size_t hidden, size_t output) {
+void bob::machine::MLP::resize (size_t input, size_t hidden, size_t output) {
   std::vector<size_t> vhidden(1, hidden);
   resize(input, vhidden, output);
 }
 
-void mach::MLP::resize (size_t input, const std::vector<size_t>& hidden,
+void bob::machine::MLP::resize (size_t input, const std::vector<size_t>& hidden,
     size_t output) {
 
   if (hidden.size() == 0) {
@@ -293,9 +289,9 @@ void mach::MLP::resize (size_t input, const std::vector<size_t>& hidden,
   m_buffer.back().reference(blitz::Array<double,1>(hidden.back()));
 }
 
-void mach::MLP::resize (const std::vector<size_t>& shape) {
+void bob::machine::MLP::resize (const std::vector<size_t>& shape) {
 
-  if (shape.size() < 2) throw mach::InvalidShape();
+  if (shape.size() < 2) throw bob::machine::InvalidShape();
   
   if (shape.size() == 2) {
     resize(shape[0], shape[1]);
@@ -310,70 +306,70 @@ void mach::MLP::resize (const std::vector<size_t>& shape) {
   resize(input, vhidden, output);
 }
 
-void mach::MLP::setInputSubtraction(const blitz::Array<double,1>& v) {
+void bob::machine::MLP::setInputSubtraction(const blitz::Array<double,1>& v) {
   if (m_weight.front().extent(0) != v.extent(0)) {
-    throw mach::NInputsMismatch(m_weight.front().extent(0), v.extent(0));
+    throw bob::machine::NInputsMismatch(m_weight.front().extent(0), v.extent(0));
   }
   m_input_sub.reference(bob::core::array::ccopy(v));
 }
 
-void mach::MLP::setInputDivision(const blitz::Array<double,1>& v) {
+void bob::machine::MLP::setInputDivision(const blitz::Array<double,1>& v) {
   if (m_weight.front().extent(0) != v.extent(0)) {
-    throw mach::NInputsMismatch(m_weight.front().extent(0), v.extent(0));
+    throw bob::machine::NInputsMismatch(m_weight.front().extent(0), v.extent(0));
   }
   m_input_div.reference(bob::core::array::ccopy(v));
 }
 
-void mach::MLP::setWeights(const std::vector<blitz::Array<double,2> >& weight) {
+void bob::machine::MLP::setWeights(const std::vector<blitz::Array<double,2> >& weight) {
   if (m_weight.size() != weight.size()) 
-    throw mach::NumberOfLayersMismatch(m_weight.size(), weight.size());
+    throw bob::machine::NumberOfLayersMismatch(m_weight.size(), weight.size());
   for (size_t i=0; i<m_weight.size(); ++i) {
-    if (!array::hasSameShape(m_weight[i], weight[i])) {
-      throw mach::WeightShapeMismatch(i, weight[i].shape(), m_weight[i].shape());
+    if (!bob::core::array::hasSameShape(m_weight[i], weight[i])) {
+      throw bob::machine::WeightShapeMismatch(i, weight[i].shape(), m_weight[i].shape());
     }
   }
   //if you got to this point, the sizes are correct, just set
   for (size_t i=0; i<m_weight.size(); ++i) m_weight[i] = weight[i];
 }
 
-void mach::MLP::setWeights(double v) { 
+void bob::machine::MLP::setWeights(double v) { 
   for (size_t i=0; i<m_weight.size(); ++i) m_weight[i] = v;
 }
 
-void mach::MLP::setBiases(const std::vector<blitz::Array<double,1> >& bias) {
+void bob::machine::MLP::setBiases(const std::vector<blitz::Array<double,1> >& bias) {
   if (m_bias.size() != bias.size()) 
-    throw mach::NumberOfLayersMismatch(m_bias.size(), bias.size());
+    throw bob::machine::NumberOfLayersMismatch(m_bias.size(), bias.size());
   for (size_t i=0; i<m_bias.size(); ++i) {
-    if (!array::hasSameShape(m_bias[i], bias[i])) {
-      throw mach::BiasShapeMismatch(i, m_bias[i].shape()[0], bias[i].shape()[0]);
+    if (!bob::core::array::hasSameShape(m_bias[i], bias[i])) {
+      throw bob::machine::BiasShapeMismatch(i, m_bias[i].shape()[0], bias[i].shape()[0]);
     }
   }
   //if you got to this point, the sizes are correct, just set
   for (size_t i=0; i<m_bias.size(); ++i) m_bias[i] = bias[i];
 }
 
-void mach::MLP::setBiases(double v) {
+void bob::machine::MLP::setBiases(double v) {
   for (size_t i=0; i<m_bias.size(); ++i) m_bias[i] = v;
 }
 
-void mach::MLP::setActivation(mach::Activation a) {
+void bob::machine::MLP::setActivation(bob::machine::Activation a) {
   switch (a) {
-    case mach::LINEAR:
-      m_actfun = mach::linear;
+    case bob::machine::LINEAR:
+      m_actfun = bob::machine::linear;
       break;
-    case mach::TANH:
+    case bob::machine::TANH:
       m_actfun = std::tanh;
       break;
-    case mach::LOG:
-      m_actfun = mach::logistic;
+    case bob::machine::LOG:
+      m_actfun = bob::machine::logistic;
       break;
     default:
-      throw mach::UnsupportedActivation(a);
+      throw bob::machine::UnsupportedActivation(a);
   }
   m_activation = a;
 }
 
-void mach::MLP::randomize(boost::mt19937& rng, double lower_bound, double upper_bound) {
+void bob::machine::MLP::randomize(boost::mt19937& rng, double lower_bound, double upper_bound) {
   boost::uniform_real<double> draw(lower_bound, upper_bound);
 
   for (size_t k=0; k<m_weight.size(); ++k) {
@@ -386,7 +382,7 @@ void mach::MLP::randomize(boost::mt19937& rng, double lower_bound, double upper_
   }
 }
 
-void mach::MLP::randomize(double lower_bound, double upper_bound) {
+void bob::machine::MLP::randomize(double lower_bound, double upper_bound) {
   struct timeval tv;
   gettimeofday(&tv, 0);
   boost::mt19937 rng(tv.tv_sec + tv.tv_usec);

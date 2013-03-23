@@ -23,9 +23,13 @@
 #include <blitz/array.h>
 #include <boost/shared_ptr.hpp>
 #include <vector>
-#include "bob/machine/GMMMachine.h"
+#include <bob/machine/GMMMachine.h>
 
 namespace bob { namespace machine {
+/**
+ * @ingroup MACHINE
+ * @{
+ */
 
 /**
  * Compute a matrix of scores using linear scoring.
@@ -90,6 +94,9 @@ void linearScoring(const std::vector<boost::shared_ptr<const bob::machine::GMMMa
                    const bool frame_length_normalisation,
                    blitz::Array<double, 2>& scores);
 
+/**
+ * @}
+ */
 }}
 
 #endif // BOB_MACHINE_LINEARSCORING_H

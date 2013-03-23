@@ -19,10 +19,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/machine/Gaussian.h"
+#include <bob/machine/Gaussian.h>
 
-#include "bob/core/assert.h"
-#include "bob/math/log.h"
+#include <bob/core/assert.h>
+#include <bob/math/log.h>
 
 bob::machine::Gaussian::Gaussian() {
   resize(0);

@@ -23,12 +23,16 @@
 #ifndef BOB_MACHINE_GABOR_JET_SIMILARITY_H
 #define BOB_MACHINE_GABOR_JET_SIMILARITY_H
 
-#include "bob/core/assert.h"
+#include <bob/core/assert.h>
 #include <blitz/array.h>
 #include <numeric>
-#include "bob/ip/GaborWaveletTransform.h"
+#include <bob/ip/GaborWaveletTransform.h>
 
 namespace bob { namespace machine {
+  /**
+   * @ingroup MACHINE
+   * @{
+   */
 
   //! Class to compute Gabor jet similarities
   class GaborJetSimilarity{
@@ -86,6 +90,9 @@ namespace bob { namespace machine {
 
   }; // class GaborJetSimilarity
 
+  /**
+   * @}
+   */
 } } // namespaces
 
 #endif // BOB_MACHINE_GABOR_JET_SIMILARITY_H

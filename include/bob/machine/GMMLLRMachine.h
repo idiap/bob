@@ -24,15 +24,17 @@
 #ifndef BOB_MACHINE_GMMLLRMACHINE_H
 #define BOB_MACHINE_GMMLLRMACHINE_H
 
-#include "bob/machine/Machine.h"
-#include "bob/machine/GMMMachine.h"
-#include "bob/machine/GMMLLRMachine.h"
-#include "bob/io/HDF5File.h"
+#include <bob/machine/Machine.h>
+#include <bob/machine/GMMMachine.h>
+#include <bob/machine/GMMLLRMachine.h>
+#include <bob/io/HDF5File.h>
 #include <iostream>
 
 namespace bob { namespace machine {
-
-
+  /**
+   * @ingroup MACHINE
+   * @{
+   */
     
   class GMMLLRMachine : public Machine<blitz::Array<double,1>, double> {
     public:
@@ -89,6 +91,9 @@ namespace bob { namespace machine {
       GMMMachine *m_gmm_ubm;
   };
 
+  /** 
+   * @}
+   */
 }}
 
 #endif /* BOB_MACHINE_GMMLLRMACHINE_H */

@@ -20,19 +20,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/core/python/ndarray.h"
+#include <bob/core/python/ndarray.h>
 #include <boost/make_shared.hpp>
 #include <boost/python/stl_iterator.hpp>
-#include "bob/machine/MLP.h"
-#include "bob/machine/MLPException.h"
+#include <bob/machine/MLP.h>
+#include <bob/machine/MLPException.h>
 
 using namespace boost::python;
-namespace mach = bob::machine;
-namespace io = bob::io;
-namespace tp = bob::python;
-namespace ca = bob::core::array;
 
-static tuple get_shape(const mach::MLP& m) {
+static tuple get_shape(const bob::machine::MLP& m) {
   list retval;
   retval.append(m.inputSize());
   const std::vector<blitz::Array<double,1> >& bias = m.getBiases();
@@ -40,23 +36,23 @@ static tuple get_shape(const mach::MLP& m) {
   return tuple(retval);
 }
 
-static void set_shape(mach::MLP& m, object shape) {
+static void set_shape(bob::machine::MLP& m, object shape) {
   stl_input_iterator<size_t> begin(shape), end;
   std::vector<size_t> vshape(begin, end);
   m.resize(vshape);
 }
 
-static object forward1(const mach::MLP& m, tp::const_ndarray input) {
+static object forward1(const bob::machine::MLP& m, bob::python::const_ndarray input) {
 
-  const ca::typeinfo& info = input.type();
+  const bob::core::array::typeinfo& info = input.type();
 
-  if (info.dtype != ca::t_float64)
+  if (info.dtype != bob::core::array::t_float64)
     PYTHON_ERROR(TypeError, "cannot forward arrays of type '%s'", info.str().c_str());
 
   switch(info.nd) {
     case 1:
       {
-        tp::ndarray output(ca::t_float64, m.outputSize());
+        bob::python::ndarray output(bob::core::array::t_float64, m.outputSize());
         blitz::Array<double,1> output_ = output.bz<double,1>();
         m.forward(input.bz<double,1>(), output_);
         return output.self();
@@ -64,7 +60,7 @@ static object forward1(const mach::MLP& m, tp::const_ndarray input) {
       break;
     case 2:
       {
-        tp::ndarray output(ca::t_float64, input.type().shape[0],m.outputSize());
+        bob::python::ndarray output(bob::core::array::t_float64, input.type().shape[0],m.outputSize());
         blitz::Array<double,2> output_ = output.bz<double,2>();
         m.forward(input.bz<double,2>(), output_);
         return output.self();
@@ -75,11 +71,11 @@ static object forward1(const mach::MLP& m, tp::const_ndarray input) {
   }
 }
 
-static void forward2(const mach::MLP& m, tp::const_ndarray input,
-    tp::ndarray output) {
-  const ca::typeinfo& info = input.type();
+static void forward2(const bob::machine::MLP& m, bob::python::const_ndarray input,
+    bob::python::ndarray output) {
+  const bob::core::array::typeinfo& info = input.type();
 
-  if (info.dtype != ca::t_float64)
+  if (info.dtype != bob::core::array::t_float64)
     PYTHON_ERROR(TypeError, "cannot forward arrays of type '%s'", info.str().c_str());
 
   switch(info.nd) {
@@ -100,11 +96,11 @@ static void forward2(const mach::MLP& m, tp::const_ndarray input,
   }
 }
 
-static void forward2_(const mach::MLP& m, tp::const_ndarray input,
-    tp::ndarray output) {
-  const ca::typeinfo& info = input.type();
+static void forward2_(const bob::machine::MLP& m, bob::python::const_ndarray input,
+    bob::python::ndarray output) {
+  const bob::core::array::typeinfo& info = input.type();
 
-  if (info.dtype != ca::t_float64)
+  if (info.dtype != bob::core::array::t_float64)
     PYTHON_ERROR(TypeError, "cannot forward arrays of type '%s'", info.str().c_str());
 
   switch(info.nd) {
@@ -125,7 +121,7 @@ static void forward2_(const mach::MLP& m, tp::const_ndarray input,
   }
 }
 
-static void set_input_sub(mach::MLP& m, object o) {
+static void set_input_sub(bob::machine::MLP& m, object o) {
   extract<int> int_check(o);
   extract<double> float_check(o);
   if (int_check.check()) { //is int
@@ -141,7 +137,7 @@ static void set_input_sub(mach::MLP& m, object o) {
   }
 }
 
-static void set_input_div(mach::MLP& m, object o) {
+static void set_input_div(bob::machine::MLP& m, object o) {
   extract<int> int_check(o);
   extract<double> float_check(o);
   if (int_check.check()) { //is int
@@ -157,7 +153,7 @@ static void set_input_div(mach::MLP& m, object o) {
   }
 }
 
-static tuple get_weight(mach::MLP& m) {
+static tuple get_weight(bob::machine::MLP& m) {
   list retval;
   for (std::vector<blitz::Array<double,2> >::const_iterator
       it = m.getWeights().begin(); it != m.getWeights().end(); ++it) {
@@ -166,7 +162,7 @@ static tuple get_weight(mach::MLP& m) {
   return tuple(retval);
 }
 
-static void set_weight(mach::MLP& m, object o) {
+static void set_weight(bob::machine::MLP& m, object o) {
   extract<int> int_check(o);
   extract<double> float_check(o);
   if (int_check.check()) { //is int
@@ -183,7 +179,7 @@ static void set_weight(mach::MLP& m, object o) {
   }
 }
 
-static tuple get_bias(mach::MLP& m) {
+static tuple get_bias(bob::machine::MLP& m) {
   list retval;
   for (std::vector<blitz::Array<double,1> >::const_iterator
       it = m.getBiases().begin(); it != m.getBiases().end(); ++it) {
@@ -192,7 +188,7 @@ static tuple get_bias(mach::MLP& m) {
   return tuple(retval);
 }
 
-static void set_bias(mach::MLP& m, object o) {
+static void set_bias(bob::machine::MLP& m, object o) {
   extract<int> int_check(o);
   extract<double> float_check(o);
   if (int_check.check()) { //is int
@@ -227,24 +223,24 @@ static void random3(bob::machine::MLP& M,
   M.randomize(rng, lower_bound, upper_bound);
 }
 
-static boost::shared_ptr<mach::MLP> mlp_from_shape(object shape) {
+static boost::shared_ptr<bob::machine::MLP> mlp_from_shape(object shape) {
   stl_input_iterator<size_t> begin(shape), end;
   std::vector<size_t> vshape(begin, end);
-  return boost::make_shared<mach::MLP>(vshape);
+  return boost::make_shared<bob::machine::MLP>(vshape);
 }
 
 void bind_machine_mlp() {
-  class_<mach::MLP, boost::shared_ptr<mach::MLP> >("MLP", "An MLP object is a representation of a Multi-Layer Perceptron. This implementation is feed-forward and fully-connected. The implementation allows setting of input normalization values and a global activation function. References to fully-connected feed-forward networks: Bishop's Pattern Recognition and Machine Learning, Chapter 5. Figure 5.1 shows what we mean.\n\nMLPs normally are multi-layered systems, with 1 or more hidden layers. As a special case, this implementation also supports connecting the input directly to the output by means of a single weight matrix. This is equivalent of a LinearMachine, with the advantage it can be trained by MLP trainers.", no_init)
+  class_<bob::machine::MLP, boost::shared_ptr<bob::machine::MLP> >("MLP", "An MLP object is a representation of a Multi-Layer Perceptron. This implementation is feed-forward and fully-connected. The implementation allows setting of input normalization values and a global activation function. References to fully-connected feed-forward networks: Bishop's Pattern Recognition and Machine Learning, Chapter 5. Figure 5.1 shows what we mean.\n\nMLPs normally are multi-layered systems, with 1 or more hidden layers. As a special case, this implementation also supports connecting the input directly to the output by means of a single weight matrix. This is equivalent of a LinearMachine, with the advantage it can be trained by MLP trainers.", no_init)
     .def("__init__", make_constructor(&mlp_from_shape, default_call_policies(), (arg("shape"))), "Builds a new MLP with a shape containing the number of inputs (first element), number of outputs (last element) and the number of neurons in each hidden layer (elements between the first and last element of given tuple). The default activation function will be set to hyperbolic tangent.")
-    .def(init<io::HDF5File&>((arg("config")), "Constructs a new MLP from a configuration file. Both weights and biases have their dimensionalities checked between each other for consistency."))
-    .def(init<const mach::MLP&>((arg("machine")), "Copy constructs an MLP machine"))
-    .def("load", &mach::MLP::load, (arg("self"), arg("config")), "Loads the weights, biases and other configuration parameter sfrom a configuration file.")
-    .def("save", &mach::MLP::save, (arg("self"), arg("config")), "Saves the weights and biases to a configuration file.")
-    .add_property("input_subtract", make_function(&mach::MLP::getInputSubtraction, return_value_policy<copy_const_reference>()), &set_input_sub, "Input subtraction factor, before feeding data through the MLP. The subtraction is the first applied operation in the processing chain - by default, it is set to 0.0.")
-    .add_property("input_divide", make_function(&mach::MLP::getInputDivision, return_value_policy<copy_const_reference>()), &set_input_div, "Input division factor, before feeding data through the MLP. The division is applied just after subtraction - by default, it is set to 1.0")
+    .def(init<bob::io::HDF5File&>((arg("config")), "Constructs a new MLP from a configuration file. Both weights and biases have their dimensionalities checked between each other for consistency."))
+    .def(init<const bob::machine::MLP&>((arg("machine")), "Copy constructs an MLP machine"))
+    .def("load", &bob::machine::MLP::load, (arg("self"), arg("config")), "Loads the weights, biases and other configuration parameter sfrom a configuration file.")
+    .def("save", &bob::machine::MLP::save, (arg("self"), arg("config")), "Saves the weights and biases to a configuration file.")
+    .add_property("input_subtract", make_function(&bob::machine::MLP::getInputSubtraction, return_value_policy<copy_const_reference>()), &set_input_sub, "Input subtraction factor, before feeding data through the MLP. The subtraction is the first applied operation in the processing chain - by default, it is set to 0.0.")
+    .add_property("input_divide", make_function(&bob::machine::MLP::getInputDivision, return_value_policy<copy_const_reference>()), &set_input_div, "Input division factor, before feeding data through the MLP. The division is applied just after subtraction - by default, it is set to 1.0")
     .add_property("weights", &get_weight, &set_weight, "A set of weights for the synapses connecting each layer in the MLP. This is represented by a standard tuple containing the weights as 2D numpy.ndarray's of double-precision floating-point elements. Each of the ndarrays has the number of rows equals to the input received by that layer and the number of columns equals to the output fed to the next layer.")
     .add_property("biases", &get_bias, &set_bias, "A set of biases for each layer in the MLP. This is represented by a standard tuple containing the biases as 1D numpy.ndarray's of double-precision floating-point elements. Each of the ndarrays has the number of elements equals to the number of neurons in the respective layer. Note that, by definition, the input layer is not subject to biasing. If you need biasing on the input layer, use the input_subtract and input_divide attributes of this MLP.")
-    .add_property("activation", &mach::MLP::getActivation, &mach::MLP::setActivation, "The activation function - by default, the hyperbolic tangent function. The output provided by the activation function is passed, unchanged, to the user.")
+    .add_property("activation", &bob::machine::MLP::getActivation, &bob::machine::MLP::setActivation, "The activation function - by default, the hyperbolic tangent function. The output provided by the activation function is passed, unchanged, to the user.")
     .add_property("shape", &get_shape, &set_shape, "A tuple that represents the size of the input vector followed by the number of neurons in each hidden layer of the MLP and, finally, terminated by the size of the output vector in the format ``(input, hidden0, hidden1, ..., hiddenN, output)``. If you set this attribute, the network is automatically resized and should be considered uninitialized.")
     .def("__call__", &forward2, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output. You can either pass an input with 1 or 2 dimensions. If 2D, it is the same as running the 1D case many times considering as input to be every row in the input matrix.")
     .def("forward", &forward2, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output. You can either pass an input with 1 or 2 dimensions. If 2D, it is the same as running the 1D case many times considering as input to be every row in the input matrix.")

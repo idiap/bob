@@ -22,12 +22,16 @@
 #ifndef BOB_MACHINE_GAUSSIAN_H
 #define BOB_MACHINE_GAUSSIAN_H
 
-#include "bob/machine/Machine.h"
-#include "bob/io/HDF5File.h"
+#include <bob/machine/Machine.h>
+#include <bob/io/HDF5File.h>
 #include <blitz/array.h>
 #include <limits>
 
 namespace bob { namespace machine {
+/**
+ * @ingroup MACHINE
+ * @{
+ */
 
 /**
  * @brief This class implements a multivariate diagonal Gaussian distribution.
@@ -273,5 +277,8 @@ class Gaussian: public Machine<blitz::Array<double,1>, double>
     size_t m_n_inputs;
 };
 
+/**
+ * @}
+ */
 }}
 #endif

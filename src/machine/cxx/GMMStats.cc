@@ -18,9 +18,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "bob/machine/GMMStats.h"
-#include "bob/machine/Exception.h"
-#include "bob/core/logging.h"
+
+#include <bob/machine/GMMStats.h>
+#include <bob/machine/Exception.h>
+#include <bob/core/logging.h>
 
 bob::machine::GMMStats::GMMStats() {
   resize(0,0);

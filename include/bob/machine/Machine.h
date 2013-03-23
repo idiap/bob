@@ -23,7 +23,19 @@
 
 #include <cstring>
 
-namespace bob { namespace machine {
+/**
+ * @addtogroup MACHINE machine
+ * @brief Machine module API
+ */
+namespace bob {
+/**
+ * @ingroup MACHINE
+ */
+namespace machine {
+/**
+ * @ingroup MACHINE
+ * @{
+ */
 
 /**
  * Root class for all machines
@@ -53,5 +65,8 @@ class Machine
     virtual void forward_(const T_input& input, T_output& output) const = 0;
 };
 
+/**
+ * @}
+ */
 }}
 #endif 

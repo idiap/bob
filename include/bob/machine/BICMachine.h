@@ -23,12 +23,16 @@
 #define BOB_MACHINE_BICMACHINE_H
 
 #include <blitz/array.h>
-#include "bob/io/HDF5File.h"
+#include <bob/io/HDF5File.h>
 
-#include "bob/machine/Exception.h"
+#include <bob/machine/Exception.h>
 
 
 namespace bob { namespace machine {
+  /**
+   * @ingroup MACHINE
+   * @{
+   */
 
   /**
    * Exceptions of this class are thrown when eigenvalues are too small.
@@ -125,6 +129,10 @@ namespace bob { namespace machine {
       mutable blitz::Array<double, 1> m_proj_I, m_proj_E;
 
   };
+
+  /**
+   * @}
+   */
 }}
 
 #endif // BOB_MACHINE_BICMACHINE_H

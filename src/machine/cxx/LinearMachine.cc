@@ -22,10 +22,10 @@
 
 #include <cmath>
 
-#include "bob/core/array_copy.h"
-#include "bob/machine/LinearMachine.h"
-#include "bob/machine/Exception.h"
-#include "bob/math/linear.h"
+#include <bob/core/array_copy.h>
+#include <bob/machine/LinearMachine.h>
+#include <bob/machine/Exception.h>
+#include <bob/math/linear.h>
 
 bob::machine::LinearMachine::LinearMachine(const blitz::Array<double,2>& weight)
   : m_input_sub(weight.extent(0)),

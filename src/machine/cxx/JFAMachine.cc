@@ -19,12 +19,12 @@
  */
 
 
-#include "bob/machine/JFAMachine.h"
-#include "bob/core/array_copy.h"
-#include "bob/math/linear.h"
-#include "bob/math/inv.h"
-#include "bob/machine/Exception.h"
-#include "bob/machine/LinearScoring.h"
+#include <bob/machine/JFAMachine.h>
+#include <bob/core/array_copy.h>
+#include <bob/math/linear.h>
+#include <bob/math/inv.h>
+#include <bob/machine/Exception.h>
+#include <bob/machine/LinearScoring.h>
 #include <cmath>
 
 

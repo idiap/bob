@@ -23,10 +23,14 @@
 
 #include <blitz/array.h>
 #include <complex>
-#include "bob/io/HDF5File.h"
-#include "bob/sp/FFT2D.h"
+#include <bob/io/HDF5File.h>
+#include <bob/sp/FFT2D.h>
 
 namespace bob { namespace machine {
+  /**
+   * @ingroup MACHINE
+   * @{
+   */
 
   /**
    * A Wiener machine, which can be used to denoise a signal,
@@ -192,6 +196,9 @@ namespace bob { namespace machine {
   
   };
 
+  /**
+   * @}
+   */
 }}
 
 #endif /* BOB_MACHINE_WIENERMACHINE_H */

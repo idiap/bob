@@ -27,9 +27,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/machine/BICMachine.h"
-#include "bob/math/linear.h"
-#include "bob/core/assert.h"
+#include <bob/machine/BICMachine.h>
+#include <bob/math/linear.h>
+#include <bob/core/assert.h>
 
 static double sqr(const double& x){
   return x*x;

@@ -18,10 +18,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "bob/machine/GMMMachine.h"
-#include "bob/core/assert.h"
-#include "bob/machine/Exception.h"
-#include "bob/math/log.h"
+
+#include <bob/machine/GMMMachine.h>
+#include <bob/core/assert.h>
+#include <bob/machine/Exception.h>
+#include <bob/math/log.h>
 
 bob::machine::GMMMachine::GMMMachine(): m_gaussians(0) {
   resize(0,0);

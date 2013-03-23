@@ -19,12 +19,12 @@
  */
 #include <boost/python.hpp>
 #include <boost/concept_check.hpp>
-#include "bob/machine/GMMStats.h"
-#include "bob/machine/GMMMachine.h"
-#include "bob/machine/GMMLLRMachine.h"
+#include <bob/machine/GMMStats.h>
+#include <bob/machine/GMMMachine.h>
+#include <bob/machine/GMMLLRMachine.h>
 #include <blitz/array.h>
 
-#include "bob/core/python/ndarray.h"
+#include <bob/core/python/ndarray.h>
 
 using namespace boost::python;
 

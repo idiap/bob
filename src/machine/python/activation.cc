@@ -3,8 +3,6 @@
  * @date Thu Jul 7 16:49:35 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
- * @brief
- *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -21,16 +19,15 @@
  */
 
 #include <boost/python.hpp>
-#include "bob/machine/Activation.h"
+#include <bob/machine/Activation.h>
 
 using namespace boost::python;
-namespace mach = bob::machine;
 
 void bind_machine_activation() {
-  enum_<mach::Activation>("Activation")
-    .value("LINEAR", mach::LINEAR)
-    .value("TANH", mach::TANH)
-    .value("LOG", mach::LOG)
-    .value("SIGMOID", mach::LOG)
+  enum_<bob::machine::Activation>("Activation")
+    .value("LINEAR", bob::machine::LINEAR)
+    .value("TANH", bob::machine::TANH)
+    .value("LOG", bob::machine::LOG)
+    .value("SIGMOID", bob::machine::LOG)
     ;
 }

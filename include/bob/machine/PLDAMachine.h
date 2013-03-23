@@ -25,9 +25,13 @@
 #define BOB_MACHINE_PLDAMACHINE_H
 
 #include <blitz/array.h>
-#include "bob/io/HDF5File.h"
+#include <bob/io/HDF5File.h>
 
 namespace bob { namespace machine {
+/**
+ * @ingroup MACHINE
+ * @{
+ */
   
 /**
  * @brief This class is a container for the \f$F\f$, \f$G\f$ and \f$\Sigma\f$
@@ -689,7 +693,9 @@ class PLDAMachine
     void resize(const size_t dim_d, const size_t dim_f, const size_t dim_g);
 };
 
-
+/**
+ * @}
+ */
 }}
 
 #endif

@@ -26,10 +26,14 @@
 #include <boost/random.hpp>
 #include <blitz/array.h>
 
-#include "bob/io/HDF5File.h"
-#include "bob/machine/Activation.h"
+#include <bob/io/HDF5File.h>
+#include <bob/machine/Activation.h>
 
 namespace bob { namespace machine {
+  /**
+   * @ingroup MACHINE
+   * @{
+   */
 
   /**
    * An MLP object is a representation of a Multi-Layer Perceptron. This
@@ -343,6 +347,9 @@ namespace bob { namespace machine {
   
   };
 
+  /**
+   * @}
+   */
 }}
 
 #endif /* BOB_MACHINE_MLP_H */

@@ -20,20 +20,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/machine/EigenMachineException.h"
+#include <bob/machine/EigenMachineException.h>
 #include <boost/format.hpp>
 
-namespace machine = bob::machine;
 
-machine::EigenMachineNOutputsTooLarge::EigenMachineNOutputsTooLarge(const int n_outputs, const int n_outputs_max) throw(): 
+bob::machine::EigenMachineNOutputsTooLarge::EigenMachineNOutputsTooLarge(const int n_outputs, const int n_outputs_max) throw(): 
   m_n_outputs(n_outputs), m_n_outputs_max(n_outputs_max) 
 {
 }
 
-machine::EigenMachineNOutputsTooLarge::~EigenMachineNOutputsTooLarge() throw() {
+bob::machine::EigenMachineNOutputsTooLarge::~EigenMachineNOutputsTooLarge() throw() {
 }
 
-const char* machine::EigenMachineNOutputsTooLarge::what() const throw() {
+const char* bob::machine::EigenMachineNOutputsTooLarge::what() const throw() {
   try {
     boost::format message("Trying to set a too large number of outputs '%d', as only '%d' eigenvalues/eigenvectors have been set in the machine.");
     message % m_n_outputs;
@@ -41,7 +40,7 @@ const char* machine::EigenMachineNOutputsTooLarge::what() const throw() {
     m_message = message.str();
     return m_message.c_str();
   } catch (...) {
-    static const char* emergency = "machine::EigenMachineNOutputsTooLarge: cannot format, exception raised";
+    static const char* emergency = "bob::machine::EigenMachineNOutputsTooLarge: cannot format, exception raised";
     return emergency;
   }
 }

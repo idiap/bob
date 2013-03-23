@@ -25,6 +25,10 @@
 #include <blitz/array.h>
 
 namespace bob { namespace machine {
+/**
+ * @ingroup MACHINE
+ * @{
+ */
 
 /**
  * Normalise raw scores with ZT-Norm
@@ -97,6 +101,9 @@ void zNorm(const blitz::Array<double,2>& rawscores_probes_vs_models,
            const blitz::Array<double,2>& rawscores_zprobes_vs_models,
            blitz::Array<double,2>& normalizedscores);
 
+/**
+ * @}
+ */
 }}
 
 #endif /* BOB_MACHINE_ZTNORM_H */
