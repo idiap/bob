@@ -32,13 +32,10 @@
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
 
-#include "bob/core/python/ndarray.h"
+#include <bob/core/python/ndarray.h>
 
-#include "bob/visioner/model/mdecoder.h"
-#include "bob/visioner/model/sampler.h"
-
-namespace bp = boost::python;
-namespace tp = bob::python;
+#include <bob/visioner/model/mdecoder.h>
+#include <bob/visioner/model/sampler.h>
 
 /**
  * Determines if the input filename ends in ".gz"
@@ -105,55 +102,55 @@ static boost::shared_ptr<bob::visioner::Model> model_from_path(const std::string
 /**
  * Listings of implemented stuff
  */
-static bp::tuple available_losses() {
-  bp::list retval;
+static boost::python::tuple available_losses() {
+  boost::python::list retval;
   BOOST_FOREACH(const std::string& s, bob::visioner::available_losses_list()) retval.append(s);
-  return bp::tuple(retval);
+  return boost::python::tuple(retval);
 }
 
-static bp::tuple available_taggers() {
-  bp::list retval;
+static boost::python::tuple available_taggers() {
+  boost::python::list retval;
   BOOST_FOREACH(const std::string& s, bob::visioner::available_taggers_list()) retval.append(s);
-  return bp::tuple(retval);
+  return boost::python::tuple(retval);
 }
 
-static bp::tuple available_models() {
-  bp::list retval;
+static boost::python::tuple available_models() {
+  boost::python::list retval;
   BOOST_FOREACH(const std::string& s, bob::visioner::available_models_list()) retval.append(s);
-  return bp::tuple(retval);
+  return boost::python::tuple(retval);
 }
 
-static bp::tuple available_trainers() {
-  bp::list retval;
+static boost::python::tuple available_trainers() {
+  boost::python::list retval;
   BOOST_FOREACH(const std::string& s, bob::visioner::available_trainers_list()) retval.append(s);
-  return bp::tuple(retval);
+  return boost::python::tuple(retval);
 }
 
-static bp::tuple available_optimizations() {
-  bp::list retval;
+static boost::python::tuple available_optimizations() {
+  boost::python::list retval;
   BOOST_FOREACH(const std::string& s, bob::visioner::available_optimizations_list()) retval.append(s);
-  return bp::tuple(retval);
+  return boost::python::tuple(retval);
 }
 
-static bp::tuple available_sharings() {
-  bp::list retval;
+static boost::python::tuple available_sharings() {
+  boost::python::list retval;
   BOOST_FOREACH(const std::string& s, bob::visioner::available_sharings_list()) retval.append(s);
-  return bp::tuple(retval);
+  return boost::python::tuple(retval);
 }
 
-static void sampler_load(bob::visioner::Sampler& s, bp::object images,
-    bp::object gts) {
-  bp::stl_input_iterator<const char*> ibegin(images), iend;
+static void sampler_load(bob::visioner::Sampler& s, boost::python::object images,
+    boost::python::object gts) {
+  boost::python::stl_input_iterator<const char*> ibegin(images), iend;
   std::vector<std::string> i(ibegin, iend);
-    bp::stl_input_iterator<const char*> gbegin(gts), gend;
+    boost::python::stl_input_iterator<const char*> gbegin(gts), gend;
   std::vector<std::string> g(gbegin, gend);
   s.load(i, g);
 }
 
 static boost::shared_ptr<bob::visioner::Sampler> 
 sampler_from_files(const bob::visioner::param_t& param,
-    bob::visioner::Sampler::SamplerType type, bp::object images,
-    bp::object gts) {
+    bob::visioner::Sampler::SamplerType type, boost::python::object images,
+    boost::python::object gts) {
   boost::shared_ptr<bob::visioner::Sampler> retval(new bob::visioner::Sampler(param, type));
   sampler_load(*retval, images, gts);
   return retval;
@@ -161,28 +158,28 @@ sampler_from_files(const bob::visioner::param_t& param,
 
 static boost::shared_ptr<bob::visioner::Sampler> 
 sampler_from_files_2(const bob::visioner::param_t& param,
-    bob::visioner::Sampler::SamplerType type, bp::object images,
-    bp::object gts, size_t max_threads) {
+    bob::visioner::Sampler::SamplerType type, boost::python::object images,
+    boost::python::object gts, size_t max_threads) {
   boost::shared_ptr<bob::visioner::Sampler> retval(new bob::visioner::Sampler(param, type, max_threads));
   sampler_load(*retval, images, gts);
   return retval;
 }
 
-static bp::tuple param_get_labels(const bob::visioner::param_t& p) {
-  bp::list retval;
+static boost::python::tuple param_get_labels(const bob::visioner::param_t& p) {
+  boost::python::list retval;
   BOOST_FOREACH(const std::string& s, p.m_labels) retval.append(s);
-  return bp::tuple(retval);
+  return boost::python::tuple(retval);
 }
 
-static void param_set_labels(bob::visioner::param_t& p, bp::object iterable) {
-  bp::stl_input_iterator<const char*> ibegin(iterable), iend;
+static void param_set_labels(bob::visioner::param_t& p, boost::python::object iterable) {
+  boost::python::stl_input_iterator<const char*> ibegin(iterable), iend;
   p.m_labels.clear();
-  p.m_labels.reserve(bp::len(iterable));
+  p.m_labels.reserve(boost::python::len(iterable));
   p.m_labels.insert(p.m_labels.begin(), ibegin, iend);
 }
 
 void bind_visioner_train() {
-  bp::class_<bob::visioner::param_t>("param", "Various parameters useful for training boosted classifiers in the context of the Visioner", bp::init<bp::optional<uint64_t, uint64_t, const std::string&, double, const std::string&, const std::string&, uint64_t, const std::string&, const std::string&, uint64_t, double, uint64_t, const std::string&> >((bp::arg("rows")=24, bp::arg("cols")=20, bp::arg("loss")="diag_log", bp::arg("loss_parameter")=0.0, bp::arg("optimization_type")="ept", bp::arg("training_model")="gboost", bp::arg("num_of_bootstraps")=3, bp::arg("feature_type")="elbp", bp::arg("feature_sharing")="shared", bp::arg("feature_projections")=0, bp::arg("min_gt_overlap")=0.8, bp::arg("sliding_windows")=2, bp::arg("subwindow_labelling")="object_type"), "Default constructor. Note: The seed, number of training and validation samples, as well as the maximum number of boosting rounds is hard-coded."))
+  boost::python::class_<bob::visioner::param_t>("param", "Various parameters useful for training boosted classifiers in the context of the Visioner", boost::python::init<boost::python::optional<uint64_t, uint64_t, const std::string&, double, const std::string&, const std::string&, uint64_t, const std::string&, const std::string&, uint64_t, double, uint64_t, const std::string&> >((boost::python::arg("rows")=24, boost::python::arg("cols")=20, boost::python::arg("loss")="diag_log", boost::python::arg("loss_parameter")=0.0, boost::python::arg("optimization_type")="ept", boost::python::arg("training_model")="gboost", boost::python::arg("num_of_bootstraps")=3, boost::python::arg("feature_type")="elbp", boost::python::arg("feature_sharing")="shared", boost::python::arg("feature_projections")=0, boost::python::arg("min_gt_overlap")=0.8, boost::python::arg("sliding_windows")=2, boost::python::arg("subwindow_labelling")="object_type"), "Default constructor. Note: The seed, number of training and validation samples, as well as the maximum number of boosting rounds is hard-coded."))
     .def_readwrite("rows", &bob::visioner::param_t::m_rows, "Number of rows in pixels")
     .def_readwrite("cols", &bob::visioner::param_t::m_cols, "Number of columns in pixels")
     .def_readwrite("seed", &bob::visioner::param_t::m_seed, "Random seed used for sampling")
@@ -205,42 +202,42 @@ void bind_visioner_train() {
     .def_readwrite("subwindow_labelling", &bob::visioner::param_t::m_tagger, "Labelling sub-windows")
     ;
 
-  bp::enum_<bob::visioner::Sampler::SamplerType>("SamplerType")
+  boost::python::enum_<bob::visioner::Sampler::SamplerType>("SamplerType")
     .value("Train", bob::visioner::Sampler::TrainSampler)
     .value("Validation", bob::visioner::Sampler::ValidSampler)
     ;
 
-  bp::class_<bob::visioner::Sampler>("Sampler", "Object used for sampling uniformly, such that the same number of samples are obtained for distinct target values.", bp::init<bob::visioner::param_t, bob::visioner::Sampler::SamplerType, bp::optional<size_t> >((bp::arg("param"), bp::arg("type"), bp::arg("max_threads")=0), "Default constructor with parameters and the type of sampler this sampler will be. Set the maximum number of threads to zero if you want the job to be executed in the current thread, or to 1 or more if you would like to have more threads spawn. At this point, this parameter will only create as many random number generators as you specify (with a minimum of 1, if you set 0 there)."))
-    .def("__init__", make_constructor(&sampler_from_files, bp::default_call_policies(), (bp::arg("param"), bp::arg("type"), bp::arg("images"), bp::arg("ground_thruth"))), "Constructs a new (single-threaded) sampler with parameters, a type and a list of images and (associated) ground-thruth information. Note that if you specify the list of images and ground-thruth inside the parameters object, that list will be read, but discarded in favor of the discrete list provided with the two input parameters.")
-    .def("__init__", make_constructor(&sampler_from_files_2, bp::default_call_policies(), (bp::arg("param"), bp::arg("type"), bp::arg("images"), bp::arg("ground_thruth"), bp::arg("max_threads"))), "Constructs a new (multi-threaded) sampler with parameters, a type and a list of images and (associated) ground-thruth information. Note that if you specify the list of images and ground-thruth inside the parameters object, that list will be read, but discarded in favor of the discrete list provided with the two input parameters.")
+  boost::python::class_<bob::visioner::Sampler>("Sampler", "Object used for sampling uniformly, such that the same number of samples are obtained for distinct target values.", boost::python::init<bob::visioner::param_t, bob::visioner::Sampler::SamplerType, boost::python::optional<size_t> >((boost::python::arg("param"), boost::python::arg("type"), boost::python::arg("max_threads")=0), "Default constructor with parameters and the type of sampler this sampler will be. Set the maximum number of threads to zero if you want the job to be executed in the current thread, or to 1 or more if you would like to have more threads spawn. At this point, this parameter will only create as many random number generators as you specify (with a minimum of 1, if you set 0 there)."))
+    .def("__init__", make_constructor(&sampler_from_files, boost::python::default_call_policies(), (boost::python::arg("param"), boost::python::arg("type"), boost::python::arg("images"), boost::python::arg("ground_thruth"))), "Constructs a new (single-threaded) sampler with parameters, a type and a list of images and (associated) ground-thruth information. Note that if you specify the list of images and ground-thruth inside the parameters object, that list will be read, but discarded in favor of the discrete list provided with the two input parameters.")
+    .def("__init__", make_constructor(&sampler_from_files_2, boost::python::default_call_policies(), (boost::python::arg("param"), boost::python::arg("type"), boost::python::arg("images"), boost::python::arg("ground_thruth"), boost::python::arg("max_threads"))), "Constructs a new (multi-threaded) sampler with parameters, a type and a list of images and (associated) ground-thruth information. Note that if you specify the list of images and ground-thruth inside the parameters object, that list will be read, but discarded in favor of the discrete list provided with the two input parameters.")
     .add_property("num_of_images", &bob::visioner::Sampler::n_images)
     .add_property("num_of_samples", &bob::visioner::Sampler::n_samples)
     .add_property("num_of_outputs", &bob::visioner::Sampler::n_outputs)
     .add_property("num_of_types", &bob::visioner::Sampler::n_types)
     .add_property("type", &bob::visioner::Sampler::getType, "This sampler's type")
-    .def("load", &sampler_load, (bp::arg("self"), bp::arg("images"), bp::arg("ground_thruth")), "Resets the current contents of this sampler to use the image and (matching) ground-thruth files given. This method input lists or python iterables with the absolute or relative path of images and ground-thruth files you need to load.")
+    .def("load", &sampler_load, (boost::python::arg("self"), boost::python::arg("images"), boost::python::arg("ground_thruth")), "Resets the current contents of this sampler to use the image and (matching) ground-thruth files given. This method input lists or python iterables with the absolute or relative path of images and ground-thruth files you need to load.")
     ;
 
-  bp::class_<bob::visioner::Model, boost::shared_ptr<bob::visioner::Model>, boost::noncopyable>("Model", "Multivariate model as a linear combination of LUTs. NB: The ::preprocess() must be called before ::get() and ::score() functions.", bp::no_init)
-    .def("__init__", make_constructor(&bob::visioner::make_model, bp::default_call_policies(), (bp::arg("param"))), "Builds a new model from a parameter set.")
-    .def("__init__", make_constructor(&model_from_path, bp::default_call_policies(), (bp::arg("path"))), "Builds a new model from a description sitting on a file.")
-    .def("clone", &bob::visioner::Model::clone, (bp::arg("self")), "Clones the current model")
-    .def("reset", &bob::visioner::Model::reset, (bp::arg("self"), bp::arg("param")), "Resets to new parameters")
-    .def("project", &bob::visioner::Model::project, (bp::arg("self")), "Projects the selected features to a higher resolution")
-    .def("save", (bool(bob::visioner::Model::*)(const std::string&) const)&bob::visioner::Model::save, (bp::arg("self"), bp::arg("path")), "Saves the model to a file")
-    .def("get", &bob::visioner::Model::get, (bp::arg("self"), bp::arg("feature"), bp::arg("x"), bp::arg("y")), "Computes the value of the feature <f> at the (x, y) position")
+  boost::python::class_<bob::visioner::Model, boost::shared_ptr<bob::visioner::Model>, boost::noncopyable>("Model", "Multivariate model as a linear combination of LUTs. NB: The ::preprocess() must be called before ::get() and ::score() functions.", boost::python::no_init)
+    .def("__init__", make_constructor(&bob::visioner::make_model, boost::python::default_call_policies(), (boost::python::arg("param"))), "Builds a new model from a parameter set.")
+    .def("__init__", make_constructor(&model_from_path, boost::python::default_call_policies(), (boost::python::arg("path"))), "Builds a new model from a description sitting on a file.")
+    .def("clone", &bob::visioner::Model::clone, (boost::python::arg("self")), "Clones the current model")
+    .def("reset", &bob::visioner::Model::reset, (boost::python::arg("self"), boost::python::arg("param")), "Resets to new parameters")
+    .def("project", &bob::visioner::Model::project, (boost::python::arg("self")), "Projects the selected features to a higher resolution")
+    .def("save", (bool(bob::visioner::Model::*)(const std::string&) const)&bob::visioner::Model::save, (boost::python::arg("self"), boost::python::arg("path")), "Saves the model to a file")
+    .def("get", &bob::visioner::Model::get, (boost::python::arg("self"), boost::python::arg("feature"), boost::python::arg("x"), boost::python::arg("y")), "Computes the value of the feature <f> at the (x, y) position")
     .add_property("num_of_features", &bob::visioner::Model::n_features)
     .add_property("num_of_fvalues", &bob::visioner::Model::n_fvalues)
     .add_property("num_of_outputs", &bob::visioner::Model::n_outputs)
-    .def("num_of_luts", &bob::visioner::Model::n_luts, (bp::arg("self"), bp::arg("o")), "Number of LUTs")
-    .def("describe", &bob::visioner::Model::describe, (bp::arg("self"), bp::arg("feature")), "Describes a feature")
-    .def("train", &train_model, (bp::arg("self"), bp::arg("training_sampler"), bp::arg("validation_sampler"), bp::arg("threads")), "Trains the boosted classifier using training and validation samplers with the specified number of threads (0 to run in the current thread and 1 or more to spawn new worker threads).")
+    .def("num_of_luts", &bob::visioner::Model::n_luts, (boost::python::arg("self"), boost::python::arg("o")), "Number of LUTs")
+    .def("describe", &bob::visioner::Model::describe, (boost::python::arg("self"), boost::python::arg("feature")), "Describes a feature")
+    .def("train", &train_model, (boost::python::arg("self"), boost::python::arg("training_sampler"), boost::python::arg("validation_sampler"), boost::python::arg("threads")), "Trains the boosted classifier using training and validation samplers with the specified number of threads (0 to run in the current thread and 1 or more to spawn new worker threads).")
     ;
 
-  bp::scope().attr("LOSSES") = available_losses();
-  bp::scope().attr("TAGGERS") = available_taggers();
-  bp::scope().attr("MODELS") = available_models();
-  bp::scope().attr("TRAINERS") = available_trainers();
-  bp::scope().attr("OPTIMIZATIONS") = available_optimizations();
-  bp::scope().attr("SHARINGS") = available_sharings();
+  boost::python::scope().attr("LOSSES") = available_losses();
+  boost::python::scope().attr("TAGGERS") = available_taggers();
+  boost::python::scope().attr("MODELS") = available_models();
+  boost::python::scope().attr("TRAINERS") = available_trainers();
+  boost::python::scope().attr("OPTIMIZATIONS") = available_optimizations();
+  boost::python::scope().attr("SHARINGS") = available_sharings();
 }

@@ -24,17 +24,14 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 
-#include "bob/core/python/ndarray.h"
+#include <bob/core/python/ndarray.h>
 
-#include "bob/visioner/util/util.h"
-#include "bob/visioner/cv/cv_detector.h"
-#include "bob/visioner/cv/cv_localizer.h"
+#include <bob/visioner/util/util.h>
+#include <bob/visioner/cv/cv_detector.h>
+#include <bob/visioner/cv/cv_localizer.h>
 
-namespace bp = boost::python;
-namespace tp = bob::python;
-
-static bp::object detect_max(bob::visioner::CVDetector& det, 
-    tp::const_ndarray image) {
+static boost::python::object detect_max(bob::visioner::CVDetector& det, 
+    bob::python::const_ndarray image) {
 
   blitz::Array<uint8_t,2> bzimage = image.bz<uint8_t,2>();
   det.load(bzimage.data(), bzimage.rows(), bzimage.cols());
@@ -42,7 +39,7 @@ static bp::object detect_max(bob::visioner::CVDetector& det,
   det.scan(detections);
 
   if (detections.size() == 0) {
-    return bp::object();
+    return boost::python::object();
   }
 
   det.sort_desc(detections);
@@ -50,11 +47,11 @@ static bp::object detect_max(bob::visioner::CVDetector& det,
   // Returns a tuple containing the detection bbox
   qreal x, y, width, height;
   detections[0].second.first.getRect(&x, &y, &width, &height);
-  return bp::make_tuple(x, y, width, height, detections[0].first);
+  return boost::python::make_tuple(x, y, width, height, detections[0].first);
 }
 
-static bp::object detect(bob::visioner::CVDetector& det,
-    tp::const_ndarray image) {
+static boost::python::object detect(bob::visioner::CVDetector& det,
+    bob::python::const_ndarray image) {
   
   blitz::Array<uint8_t,2> bzimage = image.bz<uint8_t,2>();
   det.load(bzimage.data(), bzimage.rows(), bzimage.cols());
@@ -62,23 +59,23 @@ static bp::object detect(bob::visioner::CVDetector& det,
   det.scan(detections);
   
   if (detections.size() == 0) {
-    return bp::object();
+    return boost::python::object();
   }
 
   det.sort_desc(detections);
 
   // Returns a tuple containing all detections, with descending scores
-  bp::list tmp;
+  boost::python::list tmp;
   qreal x, y, width, height;
   for (size_t i=0; i<detections.size(); ++i) {
     detections[i].second.first.getRect(&x, &y, &width, &height);
-    tmp.append(bp::make_tuple(x, y, width, height, detections[i].first));
+    tmp.append(boost::python::make_tuple(x, y, width, height, detections[i].first));
   }
-  return bp::tuple(tmp);
+  return boost::python::tuple(tmp);
 }
 
-static bp::object locate(bob::visioner::CVLocalizer& loc,
-    bob::visioner::CVDetector& det, tp::const_ndarray image) {
+static boost::python::object locate(bob::visioner::CVLocalizer& loc,
+    bob::visioner::CVDetector& det, bob::python::const_ndarray image) {
 
   blitz::Array<uint8_t,2> bzimage = image.bz<uint8_t,2>();
   det.load(bzimage.data(), bzimage.rows(), bzimage.cols());
@@ -86,7 +83,7 @@ static bp::object locate(bob::visioner::CVLocalizer& loc,
   det.scan(detections);
   
   if (detections.size() == 0) {
-    return bp::object();
+    return boost::python::object();
   }
 
   det.sort_desc(detections);
@@ -105,42 +102,42 @@ static bp::object locate(bob::visioner::CVLocalizer& loc,
   // [1] => A tuple containing all points detected
   qreal x, y, width, height;
   detections[0].second.first.getRect(&x, &y, &width, &height);
-  bp::tuple bbox = bp::make_tuple(x, y, width, height);
+  boost::python::tuple bbox = boost::python::make_tuple(x, y, width, height);
   
-  bp::list tmp;
+  boost::python::list tmp;
   for (size_t i=0; i<dt_points.size(); ++i) {
-    tmp.append(bp::make_tuple(dt_points[i].x(), dt_points[i].y()));
+    tmp.append(boost::python::make_tuple(dt_points[i].x(), dt_points[i].y()));
   }
 
-  return bp::make_tuple(bbox, bp::tuple(tmp));
+  return boost::python::make_tuple(bbox, boost::python::tuple(tmp));
 }
 
 void bind_visioner_localize() {
-  bp::enum_<bob::visioner::CVDetector::Type>("DetectionMethod")
+  boost::python::enum_<bob::visioner::CVDetector::Type>("DetectionMethod")
     .value("Scanning", bob::visioner::CVDetector::Scanning)
     .value("GroundTruth", bob::visioner::CVDetector::GroundTruth)
     ;
 
-  bp::class_<bob::visioner::CVDetector>("CVDetector", "Object detector that processes a pyramid of images", bp::init<const std::string&, double, uint64_t, uint64_t, double, bob::visioner::CVDetector::Type>((bp::arg("model"), bp::arg("threshold")=0.0, bp::arg("scanning_levels")=0, bp::arg("scale_variation")=2, bp::arg("clustering")=0.05, bp::arg("method")=bob::visioner::CVDetector::GroundTruth), "Basic constructor with the following parameters:\n\nmodel\n  file containing the model to be loaded; **note**: Serialization will use a native text format by default. Files that have their names suffixed with '.gz' will be automatically decompressed. If the filename ends in '.vbin' or '.vbgz' the format used will be the native binary format.\n\nthreshold\n  object classification threshold\n\nscanning_levels\n  scanning levels (the more, the faster)\n\nscale_variation\n  scale variation in pixels\n\nclustering\n  overlapping threshold for clustering detections\n\nmethod\n  Scanning or GroundTruth"))
+  boost::python::class_<bob::visioner::CVDetector>("CVDetector", "Object detector that processes a pyramid of images", boost::python::init<const std::string&, double, uint64_t, uint64_t, double, bob::visioner::CVDetector::Type>((boost::python::arg("model"), boost::python::arg("threshold")=0.0, boost::python::arg("scanning_levels")=0, boost::python::arg("scale_variation")=2, boost::python::arg("clustering")=0.05, boost::python::arg("method")=bob::visioner::CVDetector::GroundTruth), "Basic constructor with the following parameters:\n\nmodel\n  file containing the model to be loaded; **note**: Serialization will use a native text format by default. Files that have their names suffixed with '.gz' will be automatically decompressed. If the filename ends in '.vbin' or '.vbgz' the format used will be the native binary format.\n\nthreshold\n  object classification threshold\n\nscanning_levels\n  scanning levels (the more, the faster)\n\nscale_variation\n  scale variation in pixels\n\nclustering\n  overlapping threshold for clustering detections\n\nmethod\n  Scanning or GroundTruth"))
     .def_readwrite("threshold", &bob::visioner::CVDetector::m_threshold, "Object classification threshold")
     .add_property("scanning_levels", &bob::visioner::CVDetector::get_scan_levels, &bob::visioner::CVDetector::set_scan_levels, "Levels (the more, the faster)")
     .def_readwrite("scale_variation", &bob::visioner::CVDetector::m_ds, "Scale variation in pixels")
     .def_readwrite("clustering", &bob::visioner::CVDetector::m_cluster, "Overlapping threshold for clustering detections")
     .def_readwrite("method", &bob::visioner::CVDetector::m_type, "Scanning or GroundTruth (default)")
-    .def("detect", &detect, (bp::arg("self"), bp::arg("image")), "Detects faces in the input (gray-scaled) image according to the current settings. The input image format should be a 2D array of dtype=uint8.")
-    .def("detect_max", &detect_max, (bp::arg("self"), bp::arg("image")), "Detects the most probable face in the input (gray-scaled) image according to the current settings")
-    .def("save", &bob::visioner::CVDetector::save, (bp::arg("self"), bp::arg("filename")), "Saves the model and parameters to a given file.\n\n**Note**: Serialization will use a native text format by default. Files that have their name suffixed with '.gz' will be automatically decompressed. If the filename ends in '.vbin' or '.vbgz' the format used will be the native binary format.")
+    .def("detect", &detect, (boost::python::arg("self"), boost::python::arg("image")), "Detects faces in the input (gray-scaled) image according to the current settings. The input image format should be a 2D array of dtype=uint8.")
+    .def("detect_max", &detect_max, (boost::python::arg("self"), boost::python::arg("image")), "Detects the most probable face in the input (gray-scaled) image according to the current settings")
+    .def("save", &bob::visioner::CVDetector::save, (boost::python::arg("self"), boost::python::arg("filename")), "Saves the model and parameters to a given file.\n\n**Note**: Serialization will use a native text format by default. Files that have their name suffixed with '.gz' will be automatically decompressed. If the filename ends in '.vbin' or '.vbgz' the format used will be the native binary format.")
     ;
 
-  bp::enum_<bob::visioner::CVLocalizer::Type>("LocalizationMethod")
+  boost::python::enum_<bob::visioner::CVLocalizer::Type>("LocalizationMethod")
     .value("SingleShot", bob::visioner::CVLocalizer::SingleShot)
     .value("MultipleShots_Average", bob::visioner::CVLocalizer::MultipleShots_Average)
     .value("MultipleShots_Median", bob::visioner::CVLocalizer::MultipleShots_Median)
     ;
 
-  bp::class_<bob::visioner::CVLocalizer>("CVLocalizer", "Keypoint localizer to be applied in tandem with ground-truth or detections from CVDetector", bp::init<const std::string&, bob::visioner::CVLocalizer::Type>((bp::arg("model"), bp::arg("method")=bob::visioner::CVLocalizer::MultipleShots_Median), "Basic constructor taking a model file and the localization method to use"))
+  boost::python::class_<bob::visioner::CVLocalizer>("CVLocalizer", "Keypoint localizer to be applied in tandem with ground-truth or detections from CVDetector", boost::python::init<const std::string&, bob::visioner::CVLocalizer::Type>((boost::python::arg("model"), boost::python::arg("method")=bob::visioner::CVLocalizer::MultipleShots_Median), "Basic constructor taking a model file and the localization method to use"))
       .def_readwrite("method", &bob::visioner::CVLocalizer::m_type, "SingleShot, MultipleShots_Average or MultipleShots_Median (default)")
-      .def("locate", &locate, (bp::arg("self"), bp::arg("detector"), bp::arg("image")), "Runs the keypoint localization on the first (highest scored) face location determined by the detector. The input image format should be a 2D array of dtype=uint8.")
-    .def("save", &bob::visioner::CVLocalizer::save, (bp::arg("self"), bp::arg("filename")), "Saves the model and parameters to a given file.\n\n**Note**: Serialization will use a native text format by default. Files that have their name suffixed with '.gz' will be automatically decompressed. If the filename ends in '.vbin' or '.vbgz' the format used will be the native binary format.")
+      .def("locate", &locate, (boost::python::arg("self"), boost::python::arg("detector"), boost::python::arg("image")), "Runs the keypoint localization on the first (highest scored) face location determined by the detector. The input image format should be a 2D array of dtype=uint8.")
+    .def("save", &bob::visioner::CVLocalizer::save, (boost::python::arg("self"), boost::python::arg("filename")), "Saves the model and parameters to a given file.\n\n**Note**: Serialization will use a native text format by default. Files that have their name suffixed with '.gz' will be automatically decompressed. If the filename ends in '.vbin' or '.vbgz' the format used will be the native binary format.")
     ;
 }

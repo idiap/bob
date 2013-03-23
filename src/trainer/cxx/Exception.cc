@@ -20,41 +20,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/trainer/Exception.h"
+#include <bob/trainer/Exception.h>
 #include <boost/format.hpp>
 
-namespace train = bob::trainer;
-
-train::Exception::Exception() throw() {
+bob::trainer::Exception::Exception() throw() {
 }
 
-train::Exception::~Exception() throw() {
+bob::trainer::Exception::~Exception() throw() {
 }
 
-const char* train::Exception::what() const throw() {
+const char* bob::trainer::Exception::what() const throw() {
  static const char* what_string = "Generic trainer::Exception: user specialization has not overwritten what() or is throwing an object of this class (in which case, please fix it!)";
  return what_string;
 }
 
 
-train::NoPriorGMM::NoPriorGMM() throw() {
+bob::trainer::NoPriorGMM::NoPriorGMM() throw() {
 }
 
-train::NoPriorGMM::~NoPriorGMM() throw() {
+bob::trainer::NoPriorGMM::~NoPriorGMM() throw() {
 }
 
-const char* train::NoPriorGMM::what() const throw() {
+const char* bob::trainer::NoPriorGMM::what() const throw() {
   return "MAP_GMMTrainer: Prior GMM has not been set";
 }
 
-train::WrongNumberOfClasses::WrongNumberOfClasses(size_t got) throw() :
+bob::trainer::WrongNumberOfClasses::WrongNumberOfClasses(size_t got) throw() :
   m_got(got)
 {
 }
 
-train::WrongNumberOfClasses::~WrongNumberOfClasses() throw() { }
+bob::trainer::WrongNumberOfClasses::~WrongNumberOfClasses() throw() { }
 
-const char* train::WrongNumberOfClasses::what() const throw() {
+const char* bob::trainer::WrongNumberOfClasses::what() const throw() {
   try {
     boost::format message("Cannot operate with '%u' classes");
     message % m_got;
@@ -66,7 +64,7 @@ const char* train::WrongNumberOfClasses::what() const throw() {
   }
 }
 
-train::WrongNumberOfFeatures::WrongNumberOfFeatures(size_t got,
+bob::trainer::WrongNumberOfFeatures::WrongNumberOfFeatures(size_t got,
     size_t expected, size_t classid) throw() :
   m_got(got),
   m_expected(expected),
@@ -74,9 +72,9 @@ train::WrongNumberOfFeatures::WrongNumberOfFeatures(size_t got,
 {
 }
 
-train::WrongNumberOfFeatures::~WrongNumberOfFeatures() throw() { }
+bob::trainer::WrongNumberOfFeatures::~WrongNumberOfFeatures() throw() { }
 
-const char* train::WrongNumberOfFeatures::what() const throw() {
+const char* bob::trainer::WrongNumberOfFeatures::what() const throw() {
   try {
     boost::format message("Number of features for class '%u' is not compatible with the remaining classes. Class '%u' has '%u' features and the previous classes have '%u' features.");
     message % m_classid % m_classid % m_got % m_expected;
@@ -88,24 +86,24 @@ const char* train::WrongNumberOfFeatures::what() const throw() {
   }
 }
 
-train::IncompatibleMachine::IncompatibleMachine() throw() {
+bob::trainer::IncompatibleMachine::IncompatibleMachine() throw() {
 }
 
-train::IncompatibleMachine::~IncompatibleMachine() throw() {
+bob::trainer::IncompatibleMachine::~IncompatibleMachine() throw() {
 }
 
-const char* train::IncompatibleMachine::what() const throw() {
+const char* bob::trainer::IncompatibleMachine::what() const throw() {
  static const char* what_string = "trainer::IncompatibleMachine: you are trying to provide a machine this trained was not tailored for";
  return what_string;
 }
 
-train::EmptyTrainingSet::EmptyTrainingSet() throw() {
+bob::trainer::EmptyTrainingSet::EmptyTrainingSet() throw() {
 }
 
-train::EmptyTrainingSet::~EmptyTrainingSet() throw() {
+bob::trainer::EmptyTrainingSet::~EmptyTrainingSet() throw() {
 }
 
-const char* train::EmptyTrainingSet::what() const throw() {
+const char* bob::trainer::EmptyTrainingSet::what() const throw() {
  static const char* what_string = "trainer::EmptyTrainingSet: you are trying to train a machine without any data";
  return what_string;
 }

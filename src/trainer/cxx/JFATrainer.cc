@@ -29,8 +29,6 @@
 #include <algorithm>
 #include <random/normal.h>
 
-namespace core = bob::core;
-
 void bob::trainer::jfa::updateEigen(const blitz::Array<double,3> &A, 
   const blitz::Array<double,2> &C, blitz::Array<double,2> &uv)
 {
