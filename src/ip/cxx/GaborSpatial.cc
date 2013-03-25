@@ -20,19 +20,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/ip/GaborSpatial.h"
-#include "bob/core/assert.h"
+#include <bob/ip/GaborSpatial.h>
+#include <bob/core/assert.h>
 
-namespace ca = bob::core::array;
-namespace ip = bob::ip;
-namespace sp = bob::sp;
-
-ip::GaborSpatial::GaborSpatial( const double f, const double theta, 
+bob::ip::GaborSpatial::GaborSpatial( const double f, const double theta, 
   const double gamma, const double eta, const int spatial_size, 
   const bool cancel_dc, 
-  const enum ip::Gabor::NormOption norm_opt,
-//  const enum sp::Convolution::SizeOption size_opt,
-  const enum sp::Extrapolation::BorderType border_type):
+  const enum bob::ip::Gabor::NormOption norm_opt,
+//  const enum bob::sp::Convolution::SizeOption size_opt,
+  const enum bob::sp::Extrapolation::BorderType border_type):
   m_f(f), m_theta(theta), m_gamma(gamma), m_eta(eta), 
   m_spatial_size(spatial_size), m_cancel_dc(cancel_dc),
   m_norm_opt(norm_opt), // m_size_opt(size_opt), 
@@ -41,39 +37,39 @@ ip::GaborSpatial::GaborSpatial( const double f, const double theta,
   computeFilter();
 }
 
-ip::GaborSpatial::~GaborSpatial() { }
+bob::ip::GaborSpatial::~GaborSpatial() { }
 
-void ip::GaborSpatial::operator()( 
+void bob::ip::GaborSpatial::operator()( 
   const blitz::Array<std::complex<double>,2>& src,
   blitz::Array<std::complex<double>,2>& dst)
 { 
   // Check input
-  ca::assertZeroBase(src);
+  bob::core::array::assertZeroBase(src);
 
   // Check output
-  ca::assertZeroBase(dst);
+  bob::core::array::assertZeroBase(dst);
   // TODO: size if different Conv::SizeOption
-  ca::assertSameShape(dst,src);
+  bob::core::array::assertSameShape(dst,src);
 
   // Convolution with the Gabor Filter
-  if(m_border_type == sp::Extrapolation::Zero)
-    sp::conv( src, m_kernel, dst, sp::Conv::Same); // m_size_opt
+  if(m_border_type == bob::sp::Extrapolation::Zero)
+    bob::sp::conv( src, m_kernel, dst, bob::sp::Conv::Same); // m_size_opt
   else
   {
     int h_tmp = src.extent(0)+m_spatial_size-1;
     int w_tmp = src.extent(1)+m_spatial_size-1;
     m_tmp.resize(h_tmp,w_tmp);
-    if(m_border_type == sp::Extrapolation::NearestNeighbour)
-      sp::extrapolateNearest(src, m_tmp);
-    else if(m_border_type == sp::Extrapolation::Circular)
-      sp::extrapolateCircular(src, m_tmp);
-    else if(m_border_type == sp::Extrapolation::Mirror)
-      sp::extrapolateMirror(src, m_tmp);
-    sp::conv( m_tmp, m_kernel, dst, sp::Conv::Valid); 
+    if(m_border_type == bob::sp::Extrapolation::NearestNeighbour)
+      bob::sp::extrapolateNearest(src, m_tmp);
+    else if(m_border_type == bob::sp::Extrapolation::Circular)
+      bob::sp::extrapolateCircular(src, m_tmp);
+    else if(m_border_type == bob::sp::Extrapolation::Mirror)
+      bob::sp::extrapolateMirror(src, m_tmp);
+    bob::sp::conv( m_tmp, m_kernel, dst, bob::sp::Conv::Valid); 
   }
 }
 
-void ip::GaborSpatial::computeFilter()
+void bob::ip::GaborSpatial::computeFilter()
 {
   // Compute some constant values used later
   const double pi2 = M_PI*M_PI;
@@ -109,11 +105,11 @@ void ip::GaborSpatial::computeFilter()
       (m_cancel_dc?exp_m_pi2_gamma2:0.));
 
   // Normalize the filter if required
-  if(m_norm_opt==ip::Gabor::SpatialFactor) {
+  if(m_norm_opt==bob::ip::Gabor::SpatialFactor) {
     const double norm_factor = f2 / ( M_PI * m_gamma * m_eta );
     m_kernel *= std::complex<double>(norm_factor,0.);
   }
-  else if(m_norm_opt==ip::Gabor::ZeroMeanUnitVar) {
+  else if(m_norm_opt==bob::ip::Gabor::ZeroMeanUnitVar) {
     int n_el = m_spatial_size*m_spatial_size;
     // Zero mean
     m_kernel -= ( sum(m_kernel) / std::complex<double>(n_el,0.) );

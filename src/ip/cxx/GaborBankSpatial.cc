@@ -20,17 +20,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/ip/GaborBankSpatial.h"
-#include "bob/core/assert.h"
+#include <bob/ip/GaborBankSpatial.h>
+#include <bob/core/assert.h>
 
-namespace ip = bob::ip;
-namespace ca = bob::core::array;
-
-ip::GaborBankSpatial::GaborBankSpatial( const int n_orient, const int n_freq,
+bob::ip::GaborBankSpatial::GaborBankSpatial( const int n_orient, const int n_freq,
   const double fmax, const bool orientation_full, const double k, 
   const double p, const double gamma, const double eta, 
   const int spatial_size, const bool cancel_dc, 
-  const enum ip::Gabor::NormOption norm_opt,
+  const enum bob::ip::Gabor::NormOption norm_opt,
   //  const enum sp::Convolution::SizeOption size_opt,
   const enum sp::Extrapolation::BorderType border_type):
   m_n_orient(n_orient), m_n_freq(n_freq), m_fmax(fmax), 
@@ -42,20 +39,20 @@ ip::GaborBankSpatial::GaborBankSpatial( const int n_orient, const int n_freq,
   computeFilters();
 }
 
-ip::GaborBankSpatial::~GaborBankSpatial() { }
+bob::ip::GaborBankSpatial::~GaborBankSpatial() { }
 
-void ip::GaborBankSpatial::operator()( 
+void bob::ip::GaborBankSpatial::operator()( 
   const blitz::Array<std::complex<double>,2>& src,
   blitz::Array<std::complex<double>,3>& dst)
 { 
   // Check input
-  ca::assertZeroBase(src);
+  bob::core::array::assertZeroBase(src);
 
   // Check and resize dst if required 
-  ca::assertZeroBase(dst);
+  bob::core::array::assertZeroBase(dst);
   const blitz::TinyVector<int,3> shape(m_n_freq*m_n_orient, src.extent(0),
     src.extent(1));
-  ca::assertSameShape(dst, shape);
+  bob::core::array::assertSameShape(dst, shape);
 
   // Filter using the filter bank
   for( int i=0; i<m_n_freq*m_n_orient; ++i) {
@@ -65,7 +62,7 @@ void ip::GaborBankSpatial::operator()(
   }
 }
 
-void ip::GaborBankSpatial::computeFreqs()
+void bob::ip::GaborBankSpatial::computeFreqs()
 {
   m_freqs.resize(m_n_freq);
   m_freqs(0) = m_fmax;
@@ -73,14 +70,14 @@ void ip::GaborBankSpatial::computeFreqs()
     m_freqs(i) = m_freqs(i-1) / m_k;
 }
 
-void ip::GaborBankSpatial::computeOrients()
+void bob::ip::GaborBankSpatial::computeOrients()
 {
   m_orients.resize(m_n_orient);
   for(int i=0; i<m_n_orient; ++i)
     m_orients(i) = ((m_orientation_full?2:1) * M_PI * i ) / m_n_orient;
 }
 
-void ip::GaborBankSpatial::computeFilters()
+void bob::ip::GaborBankSpatial::computeFilters()
 {
   // Compute the set of frequencies and orientations
   computeFreqs();
@@ -94,8 +91,8 @@ void ip::GaborBankSpatial::computeFilters()
     
     int f = i / m_n_orient;
     int o = i % m_n_orient;
-    boost::shared_ptr<ip::GaborSpatial> ptr( 
-      new ip::GaborSpatial( m_freqs(f), m_orients(o), m_gamma, m_eta, 
+    boost::shared_ptr<bob::ip::GaborSpatial> ptr( 
+      new bob::ip::GaborSpatial( m_freqs(f), m_orients(o), m_gamma, m_eta, 
         m_spatial_size,  m_cancel_dc, m_norm_opt, /*m_size_opt,*/ 
         m_border_type) );
     m_filters.push_back( ptr);

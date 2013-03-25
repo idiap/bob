@@ -20,22 +20,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/core/python/ndarray.h"
-#include "bob/ip/drawing.h"
+#include <bob/core/python/ndarray.h>
+#include <bob/ip/drawing.h>
 
 using namespace boost::python;
-namespace ip = bob::ip;
-namespace tp = bob::python;
-namespace ca = bob::core::array;
 
 template <typename T>
-static void inner_draw_point_ (tp::ndarray image, int x, int y, object color) {
+static void inner_draw_point_ (bob::python::ndarray image, int x, int y, object color) {
   switch (image.type().nd) {
     case 2: 
       {
         blitz::Array<T,2> image_ = image.bz<T,2>();
         T tcolor = extract<T>(color);
-        ip::draw_point_(image_, x, y, tcolor);
+        bob::ip::draw_point_(image_, x, y, tcolor);
       }
       break;
     case 3:
@@ -46,31 +43,31 @@ static void inner_draw_point_ (tp::ndarray image, int x, int y, object color) {
         T c1 = extract<T>(c[1]); 
         T c2 = extract<T>(c[2]);
         boost::tuple<T,T,T> tcolor(c0, c1, c2);
-        ip::draw_point_(image_, x, y, tcolor);
+        bob::ip::draw_point_(image_, x, y, tcolor);
       }
       break;
     default: PYTHON_ERROR(TypeError, "drawing operation does not support '%s'", image.type().str().c_str());
   }
 }
 
-static void draw_point_ (tp::ndarray image, int x, int y, object color) {
-  const ca::typeinfo& info = image.type();
+static void draw_point_ (bob::python::ndarray image, int x, int y, object color) {
+  const bob::core::array::typeinfo& info = image.type();
   switch(info.dtype) {
-    case ca::t_uint8: return inner_draw_point_<uint8_t>(image, x, y, color);
-    case ca::t_uint16: return inner_draw_point_<uint16_t>(image, x, y, color);
-    case ca::t_float64: return inner_draw_point_<double>(image, x, y, color);
+    case bob::core::array::t_uint8: return inner_draw_point_<uint8_t>(image, x, y, color);
+    case bob::core::array::t_uint16: return inner_draw_point_<uint16_t>(image, x, y, color);
+    case bob::core::array::t_float64: return inner_draw_point_<double>(image, x, y, color);
     default: PYTHON_ERROR(TypeError, "drawing operation does not support '%s'", info.str().c_str());
   }
 }
 
 template <typename T>
-static void inner_draw_point (tp::ndarray image, int x, int y, object color) {
+static void inner_draw_point (bob::python::ndarray image, int x, int y, object color) {
   switch (image.type().nd) {
     case 2: 
       {
         blitz::Array<T,2> image_ = image.bz<T,2>();
         T tcolor = extract<T>(color);
-        ip::draw_point(image_, x, y, tcolor);
+        bob::ip::draw_point(image_, x, y, tcolor);
       }
       break;
     case 3:
@@ -81,31 +78,31 @@ static void inner_draw_point (tp::ndarray image, int x, int y, object color) {
         T c1 = extract<T>(c[1]); 
         T c2 = extract<T>(c[2]);
         boost::tuple<T,T,T> tcolor(c0, c1, c2);
-        ip::draw_point(image_, x, y, tcolor);
+        bob::ip::draw_point(image_, x, y, tcolor);
       }
       break;
     default: PYTHON_ERROR(TypeError, "drawing operation does not support '%s'", image.type().str().c_str());
   }
 }
 
-static void draw_point (tp::ndarray image, int x, int y, object color) {
-  const ca::typeinfo& info = image.type();
+static void draw_point (bob::python::ndarray image, int x, int y, object color) {
+  const bob::core::array::typeinfo& info = image.type();
   switch(info.dtype) {
-    case ca::t_uint8: return inner_draw_point<uint8_t>(image, x, y, color);
-    case ca::t_uint16: return inner_draw_point<uint16_t>(image, x, y, color);
-    case ca::t_float64: return inner_draw_point<double>(image, x, y, color);
+    case bob::core::array::t_uint8: return inner_draw_point<uint8_t>(image, x, y, color);
+    case bob::core::array::t_uint16: return inner_draw_point<uint16_t>(image, x, y, color);
+    case bob::core::array::t_float64: return inner_draw_point<double>(image, x, y, color);
     default: PYTHON_ERROR(TypeError, "drawing operation does not support '%s'", info.str().c_str());
   }
 }
 
 template <typename T>
-static void inner_try_draw_point (tp::ndarray image, int x, int y, object color) {
+static void inner_try_draw_point (bob::python::ndarray image, int x, int y, object color) {
   switch (image.type().nd) {
     case 2: 
       {
         blitz::Array<T,2> image_ = image.bz<T,2>();
         T tcolor = extract<T>(color);
-        ip::try_draw_point(image_, x, y, tcolor);
+        bob::ip::try_draw_point(image_, x, y, tcolor);
       }
       break;
     case 3:
@@ -116,31 +113,31 @@ static void inner_try_draw_point (tp::ndarray image, int x, int y, object color)
         T c1 = extract<T>(c[1]); 
         T c2 = extract<T>(c[2]);
         boost::tuple<T,T,T> tcolor(c0, c1, c2);
-        ip::try_draw_point(image_, x, y, tcolor);
+        bob::ip::try_draw_point(image_, x, y, tcolor);
       }
       break;
     default: PYTHON_ERROR(TypeError, "drawing operation does not support '%s'", image.type().str().c_str());
   }
 }
 
-static void try_draw_point (tp::ndarray image, int x, int y, object color) {
-  const ca::typeinfo& info = image.type();
+static void try_draw_point (bob::python::ndarray image, int x, int y, object color) {
+  const bob::core::array::typeinfo& info = image.type();
   switch(info.dtype) {
-    case ca::t_uint8: return inner_try_draw_point<uint8_t>(image, x, y, color);
-    case ca::t_uint16: return inner_try_draw_point<uint16_t>(image, x, y, color);
-    case ca::t_float64: return inner_try_draw_point<double>(image, x, y, color);
+    case bob::core::array::t_uint8: return inner_try_draw_point<uint8_t>(image, x, y, color);
+    case bob::core::array::t_uint16: return inner_try_draw_point<uint16_t>(image, x, y, color);
+    case bob::core::array::t_float64: return inner_try_draw_point<double>(image, x, y, color);
     default: PYTHON_ERROR(TypeError, "drawing operation does not support '%s'", info.str().c_str());
   }
 }
 
 template <typename T>
-static void inner_draw_line (tp::ndarray image, int x1, int y1, int x2, int y2, object color) {
+static void inner_draw_line (bob::python::ndarray image, int x1, int y1, int x2, int y2, object color) {
   switch (image.type().nd) {
     case 2: 
       {
         blitz::Array<T,2> image_ = image.bz<T,2>();
         T tcolor = extract<T>(color);
-        ip::draw_line(image_, x1, y1, x2, y2, tcolor);
+        bob::ip::draw_line(image_, x1, y1, x2, y2, tcolor);
       }
       break;
     case 3:
@@ -151,31 +148,31 @@ static void inner_draw_line (tp::ndarray image, int x1, int y1, int x2, int y2, 
         T c1 = extract<T>(c[1]); 
         T c2 = extract<T>(c[2]);
         boost::tuple<T,T,T> tcolor(c0, c1, c2);
-        ip::draw_line(image_, x1, y1, x2, y2, tcolor);
+        bob::ip::draw_line(image_, x1, y1, x2, y2, tcolor);
       }
       break;
     default: PYTHON_ERROR(TypeError, "drawing operation does not support '%s'", image.type().str().c_str());
   }
 }
 
-static void draw_line (tp::ndarray image, int x1, int y1, int x2, int y2, object color) {
-  const ca::typeinfo& info = image.type();
+static void draw_line (bob::python::ndarray image, int x1, int y1, int x2, int y2, object color) {
+  const bob::core::array::typeinfo& info = image.type();
   switch(info.dtype) {
-    case ca::t_uint8: return inner_draw_line<uint8_t>(image, x1, y1, x2, y2, color);
-    case ca::t_uint16: return inner_draw_line<uint16_t>(image, x1, y1, x2, y2, color);
-    case ca::t_float64: return inner_draw_line<double>(image, x1, y1, x2, y2, color);
+    case bob::core::array::t_uint8: return inner_draw_line<uint8_t>(image, x1, y1, x2, y2, color);
+    case bob::core::array::t_uint16: return inner_draw_line<uint16_t>(image, x1, y1, x2, y2, color);
+    case bob::core::array::t_float64: return inner_draw_line<double>(image, x1, y1, x2, y2, color);
     default: PYTHON_ERROR(TypeError, "drawing operation does not support '%s'", info.str().c_str());
   }
 }
 
 template <typename T>
-static void inner_draw_cross (tp::ndarray image, int x, int y, int radius, object color) {
+static void inner_draw_cross (bob::python::ndarray image, int x, int y, int radius, object color) {
   switch (image.type().nd) {
     case 2: 
       {
         blitz::Array<T,2> image_ = image.bz<T,2>();
         T tcolor = extract<T>(color);
-        ip::draw_cross(image_, x, y, radius, tcolor);
+        bob::ip::draw_cross(image_, x, y, radius, tcolor);
       }
       break;
     case 3:
@@ -186,32 +183,32 @@ static void inner_draw_cross (tp::ndarray image, int x, int y, int radius, objec
         T c1 = extract<T>(c[1]); 
         T c2 = extract<T>(c[2]);
         boost::tuple<T,T,T> tcolor(c0, c1, c2);
-        ip::draw_cross(image_, x, y, radius, tcolor);
+        bob::ip::draw_cross(image_, x, y, radius, tcolor);
       }
       break;
     default: PYTHON_ERROR(TypeError, "drawing operation does not support '%s'", image.type().str().c_str());
   }
 }
 
-static void draw_cross (tp::ndarray image, int x, int y, int radius, 
+static void draw_cross (bob::python::ndarray image, int x, int y, int radius, 
     object color) {
-  const ca::typeinfo& info = image.type();
+  const bob::core::array::typeinfo& info = image.type();
   switch(info.dtype) {
-    case ca::t_uint8: return inner_draw_cross<uint8_t>(image, x, y, radius, color);
-    case ca::t_uint16: return inner_draw_cross<uint16_t>(image, x, y, radius, color);
-    case ca::t_float64: return inner_draw_cross<double>(image, x, y, radius, color);
+    case bob::core::array::t_uint8: return inner_draw_cross<uint8_t>(image, x, y, radius, color);
+    case bob::core::array::t_uint16: return inner_draw_cross<uint16_t>(image, x, y, radius, color);
+    case bob::core::array::t_float64: return inner_draw_cross<double>(image, x, y, radius, color);
     default: PYTHON_ERROR(TypeError, "drawing operation does not support '%s'", info.str().c_str());
   }
 }
 
 template <typename T>
-static void inner_draw_cross_plus (tp::ndarray image, int x, int y, int radius, object color) {
+static void inner_draw_cross_plus (bob::python::ndarray image, int x, int y, int radius, object color) {
   switch (image.type().nd) {
     case 2: 
       {
         blitz::Array<T,2> image_ = image.bz<T,2>();
         T tcolor = extract<T>(color);
-        ip::draw_cross_plus(image_, x, y, radius, tcolor);
+        bob::ip::draw_cross_plus(image_, x, y, radius, tcolor);
       }
       break;
     case 3:
@@ -222,32 +219,32 @@ static void inner_draw_cross_plus (tp::ndarray image, int x, int y, int radius, 
         T c1 = extract<T>(c[1]); 
         T c2 = extract<T>(c[2]);
         boost::tuple<T,T,T> tcolor(c0, c1, c2);
-        ip::draw_cross_plus(image_, x, y, radius, tcolor);
+        bob::ip::draw_cross_plus(image_, x, y, radius, tcolor);
       }
       break;
     default: PYTHON_ERROR(TypeError, "drawing operation does not support '%s'", image.type().str().c_str());
   }
 }
 
-static void draw_cross_plus (tp::ndarray image, int x, int y, int radius, 
+static void draw_cross_plus (bob::python::ndarray image, int x, int y, int radius, 
     object color) {
-  const ca::typeinfo& info = image.type();
+  const bob::core::array::typeinfo& info = image.type();
   switch(info.dtype) {
-    case ca::t_uint8: return inner_draw_cross_plus<uint8_t>(image, x, y, radius, color);
-    case ca::t_uint16: return inner_draw_cross_plus<uint16_t>(image, x, y, radius, color);
-    case ca::t_float64: return inner_draw_cross_plus<double>(image, x, y, radius, color);
+    case bob::core::array::t_uint8: return inner_draw_cross_plus<uint8_t>(image, x, y, radius, color);
+    case bob::core::array::t_uint16: return inner_draw_cross_plus<uint16_t>(image, x, y, radius, color);
+    case bob::core::array::t_float64: return inner_draw_cross_plus<double>(image, x, y, radius, color);
     default: PYTHON_ERROR(TypeError, "drawing operation does not support '%s'", info.str().c_str());
   }
 }
 
 template <typename T>
-static void inner_draw_box (tp::ndarray image, int x, int y, int w, int h, object color) {
+static void inner_draw_box (bob::python::ndarray image, int x, int y, int w, int h, object color) {
   switch (image.type().nd) {
     case 2: 
       {
         blitz::Array<T,2> image_ = image.bz<T,2>();
         T tcolor = extract<T>(color);
-        ip::draw_box(image_, x, y, w, h, tcolor);
+        bob::ip::draw_box(image_, x, y, w, h, tcolor);
       }
       break;
     case 3:
@@ -258,20 +255,20 @@ static void inner_draw_box (tp::ndarray image, int x, int y, int w, int h, objec
         T c1 = extract<T>(c[1]); 
         T c2 = extract<T>(c[2]);
         boost::tuple<T,T,T> tcolor(c0, c1, c2);
-        ip::draw_box(image_, x, y, w, h, tcolor);
+        bob::ip::draw_box(image_, x, y, w, h, tcolor);
       }
       break;
     default: PYTHON_ERROR(TypeError, "drawing operation does not support '%s'", image.type().str().c_str());
   }
 }
 
-static void draw_box (tp::ndarray image, int x, int y, int w, int h, 
+static void draw_box (bob::python::ndarray image, int x, int y, int w, int h, 
     object color) {
-  const ca::typeinfo& info = image.type();
+  const bob::core::array::typeinfo& info = image.type();
   switch(info.dtype) {
-    case ca::t_uint8: return inner_draw_box<uint8_t>(image, x, y, w, h, color);
-    case ca::t_uint16: return inner_draw_box<uint16_t>(image, x, y, w, h, color);
-    case ca::t_float64: return inner_draw_box<double>(image, x, y, w, h, color);
+    case bob::core::array::t_uint8: return inner_draw_box<uint8_t>(image, x, y, w, h, color);
+    case bob::core::array::t_uint16: return inner_draw_box<uint16_t>(image, x, y, w, h, color);
+    case bob::core::array::t_float64: return inner_draw_box<double>(image, x, y, w, h, color);
     default: PYTHON_ERROR(TypeError, "drawing operation does not support '%s'", info.str().c_str());
   }
 }

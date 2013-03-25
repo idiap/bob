@@ -21,24 +21,22 @@
  */
 
 #include <boost/make_shared.hpp>
-#include "bob/ip/LBP4R.h"
+#include <bob/ip/LBP4R.h>
 
-namespace ip = bob::ip;
-
-ip::LBP4R::LBP4R(const double R,
+bob::ip::LBP4R::LBP4R(const double R,
     const bool circular,
     const bool to_average,
     const bool add_average_bit,
     const bool uniform, 
     const bool rotation_invariant,
     const int eLBP_type): 
-  ip::LBP(4,R,R,circular,to_average,add_average_bit,uniform,rotation_invariant,
+  bob::ip::LBP(4,R,R,circular,to_average,add_average_bit,uniform,rotation_invariant,
       eLBP_type)
 {
   init_luts();
 }
 
-ip::LBP4R::LBP4R(const double R,
+bob::ip::LBP4R::LBP4R(const double R,
     const double R2,
     const bool circular,
     const bool to_average,
@@ -46,31 +44,31 @@ ip::LBP4R::LBP4R(const double R,
     const bool uniform, 
     const bool rotation_invariant,
     const int eLBP_type): 
-  ip::LBP(4,R,R2,circular,to_average,add_average_bit,uniform,rotation_invariant,
+  bob::ip::LBP(4,R,R2,circular,to_average,add_average_bit,uniform,rotation_invariant,
       eLBP_type)
 {
   init_luts();
 }
 
 
-ip::LBP4R::LBP4R(const ip::LBP4R& other): 
-  ip::LBP(other)
+bob::ip::LBP4R::LBP4R(const bob::ip::LBP4R& other): 
+  bob::ip::LBP(other)
 {
   init_luts();
 }
 
-ip::LBP4R::~LBP4R() { }
+bob::ip::LBP4R::~LBP4R() { }
 
-ip::LBP4R& ip::LBP4R::operator= (const ip::LBP4R& other) {
-  ip::LBP::operator=(other);
+bob::ip::LBP4R& bob::ip::LBP4R::operator= (const bob::ip::LBP4R& other) {
+  bob::ip::LBP::operator=(other);
   return *this;
 }
 
-boost::shared_ptr<ip::LBP> ip::LBP4R::clone() const {
-  return boost::make_shared<ip::LBP4R>(*this);
+boost::shared_ptr<bob::ip::LBP> bob::ip::LBP4R::clone() const {
+  return boost::make_shared<bob::ip::LBP4R>(*this);
 }
 
-int ip::LBP4R::getMaxLabel() const
+int bob::ip::LBP4R::getMaxLabel() const
 {
   return  (m_rotation_invariant ? 6 :
             (m_uniform ? 15 : // Uniform
@@ -80,7 +78,7 @@ int ip::LBP4R::getMaxLabel() const
           ); 
 }
 
-void ip::LBP4R::init_lut_RI()
+void bob::ip::LBP4R::init_lut_RI()
 {
   m_lut_RI.resize(16);
   // all 0's
@@ -108,7 +106,7 @@ void ip::LBP4R::init_lut_RI()
 }
 
 
-void ip::LBP4R::init_lut_U2()
+void bob::ip::LBP4R::init_lut_U2()
 {
   m_lut_U2.resize(16);
   // A) All non uniform patterns have a label of 0.
@@ -139,7 +137,7 @@ void ip::LBP4R::init_lut_U2()
   m_lut_U2(8+4+2+1) = 14;
 }
 
-void ip::LBP4R::init_lut_U2RI()
+void bob::ip::LBP4R::init_lut_U2RI()
 {
   m_lut_U2RI.resize(16);
   // A) All non uniform patterns have a label of 0.
@@ -170,14 +168,14 @@ void ip::LBP4R::init_lut_U2RI()
   m_lut_U2RI(15) = 5;
 }
 
-void ip::LBP4R::init_lut_add_average_bit()
+void bob::ip::LBP4R::init_lut_add_average_bit()
 {
   m_lut_add_average_bit.resize(32);
   blitz::firstIndex i;
   m_lut_add_average_bit = i;
 }
 
-void ip::LBP4R::init_lut_normal()
+void bob::ip::LBP4R::init_lut_normal()
 {
   m_lut_normal.resize(16);
   blitz::firstIndex i;

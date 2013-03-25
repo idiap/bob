@@ -21,11 +21,9 @@
  */
 
 #include <boost/make_shared.hpp>
-#include "bob/ip/LBP8R.h"
+#include <bob/ip/LBP8R.h>
 
-namespace ip = bob::ip;
-
-ip::LBP8R::LBP8R(const double R,
+bob::ip::LBP8R::LBP8R(const double R,
     const bool circular,
     const bool to_average,
     const bool add_average_bit,
@@ -38,7 +36,7 @@ ip::LBP8R::LBP8R(const double R,
 }
 
 
-ip::LBP8R::LBP8R(const double R,
+bob::ip::LBP8R::LBP8R(const double R,
     const double R2,
     const bool circular,
     const bool to_average,
@@ -52,24 +50,24 @@ ip::LBP8R::LBP8R(const double R,
 }
 
 
-ip::LBP8R::LBP8R(const ip::LBP8R& other):
-  ip::LBP(other)
+bob::ip::LBP8R::LBP8R(const bob::ip::LBP8R& other):
+  bob::ip::LBP(other)
 {
   init_luts();
 }
 
-ip::LBP8R::~LBP8R() { }
+bob::ip::LBP8R::~LBP8R() { }
 
-ip::LBP8R& ip::LBP8R::operator= (const ip::LBP8R& other) {
-  ip::LBP::operator=(other);
+bob::ip::LBP8R& bob::ip::LBP8R::operator= (const bob::ip::LBP8R& other) {
+  bob::ip::LBP::operator=(other);
   return *this;
 }
 
-boost::shared_ptr<ip::LBP> ip::LBP8R::clone() const {
-  return boost::make_shared<ip::LBP8R>(*this);
+boost::shared_ptr<bob::ip::LBP> bob::ip::LBP8R::clone() const {
+  return boost::make_shared<bob::ip::LBP8R>(*this);
 }
 
-int ip::LBP8R::getMaxLabel() const
+int bob::ip::LBP8R::getMaxLabel() const
 {
 return  (m_rotation_invariant ?
             (m_uniform ? 10 : // Rotation invariant + uniform
@@ -81,7 +79,7 @@ return  (m_rotation_invariant ?
         );
 }
 
-void ip::LBP8R::init_lut_RI()
+void bob::ip::LBP8R::init_lut_RI()
 {
   m_lut_RI.resize(256);
 
@@ -379,7 +377,7 @@ void ip::LBP8R::init_lut_RI()
 }
 
 
-void ip::LBP8R::init_lut_U2()
+void bob::ip::LBP8R::init_lut_U2()
 {
   m_lut_U2.resize(256);
   // A) all non uniform patterns have a label of 0.
@@ -462,7 +460,7 @@ void ip::LBP8R::init_lut_U2()
   m_lut_U2(128+64+32+16+8+4+2+1) = 58;
 }
 
-void ip::LBP8R::init_lut_U2RI()
+void bob::ip::LBP8R::init_lut_U2RI()
 {
   m_lut_U2RI.resize(256);
   // A) all non uniform patterns have a label of 0.
@@ -545,14 +543,14 @@ void ip::LBP8R::init_lut_U2RI()
   m_lut_U2RI(255) = 9;
 }
 
-void ip::LBP8R::init_lut_add_average_bit()
+void bob::ip::LBP8R::init_lut_add_average_bit()
 {
   m_lut_add_average_bit.resize(512);
   blitz::firstIndex i;
   m_lut_add_average_bit = i;
 }
 
-void ip::LBP8R::init_lut_normal()
+void bob::ip::LBP8R::init_lut_normal()
 {
   m_lut_normal.resize(256);
   blitz::firstIndex i;

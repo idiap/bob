@@ -25,12 +25,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/ip/LBPTop.h"
-#include "bob/ip/Exception.h"
+#include <bob/ip/LBPTop.h>
+#include <bob/ip/Exception.h>
 
-namespace ip = bob::ip;
-
-ip::LBPTop::LBPTop(const bob::ip::LBP& lbp_xy, 
+bob::ip::LBPTop::LBPTop(const bob::ip::LBP& lbp_xy, 
                    const bob::ip::LBP& lbp_xt, 
                    const bob::ip::LBP& lbp_yt)
 : m_lbp_xy(lbp_xy.clone()),
@@ -52,23 +50,23 @@ ip::LBPTop::LBPTop(const bob::ip::LBP& lbp_xy,
 
 }
 
-ip::LBPTop::LBPTop(const LBPTop& other)
+bob::ip::LBPTop::LBPTop(const LBPTop& other)
 : m_lbp_xy(other.m_lbp_xy->clone()),
   m_lbp_xt(other.m_lbp_xt->clone()),
   m_lbp_yt(other.m_lbp_yt->clone())
 {
 }
 
-ip::LBPTop::~LBPTop() { }
+bob::ip::LBPTop::~LBPTop() { }
 
-ip::LBPTop& ip::LBPTop::operator= (const LBPTop& other) {
+bob::ip::LBPTop& bob::ip::LBPTop::operator= (const LBPTop& other) {
   m_lbp_xy = other.m_lbp_xy->clone();
   m_lbp_xt = other.m_lbp_xt->clone();
   m_lbp_yt = other.m_lbp_yt->clone();
   return *this;
 }
 
-void ip::LBPTop::operator()(const blitz::Array<uint8_t,3>& src, 
+void bob::ip::LBPTop::operator()(const blitz::Array<uint8_t,3>& src, 
     blitz::Array<uint16_t,3>& xy,
     blitz::Array<uint16_t,3>& xt,
     blitz::Array<uint16_t,3>& yt) const
@@ -76,14 +74,14 @@ void ip::LBPTop::operator()(const blitz::Array<uint8_t,3>& src,
   process<uint8_t>(src, xy, xt, yt);
 }
 
-void ip::LBPTop::operator()(const blitz::Array<uint16_t,3>& src, 
+void bob::ip::LBPTop::operator()(const blitz::Array<uint16_t,3>& src, 
     blitz::Array<uint16_t,3>& xy,
     blitz::Array<uint16_t,3>& xt,
     blitz::Array<uint16_t,3>& yt) const
 { 
   process<uint16_t>(src, xy, xt, yt); 
 }
-void ip::LBPTop::operator()(const blitz::Array<double,3>& src, 
+void bob::ip::LBPTop::operator()(const blitz::Array<double,3>& src, 
     blitz::Array<uint16_t,3>& xy,
     blitz::Array<uint16_t,3>& xt,
     blitz::Array<uint16_t,3>& yt) const

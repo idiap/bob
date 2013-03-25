@@ -20,17 +20,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/core/assert.h"
-#include "bob/sp/conv.h"
-#include "bob/sp/extrapolate.h"
-#include "bob/ip/HornAndSchunckFlow.h"
-
-namespace of = bob::ip::optflow;
+#include <bob/core/assert.h>
+#include <bob/sp/conv.h>
+#include <bob/sp/extrapolate.h>
+#include <bob/ip/HornAndSchunckFlow.h>
 
 static const double LAPLACIAN_014_KERNEL_DATA[] = {0,.25,0,.25,0,.25,0,.25,0};
 static const blitz::Array<double,2> LAPLACIAN_014_KERNEL(const_cast<double*>(LAPLACIAN_014_KERNEL_DATA), blitz::shape(3,3), blitz::neverDeleteData);
 
-void of::laplacian_avg_hs_opencv(const blitz::Array<double,2>& input,
+void bob::ip::optflow::laplacian_avg_hs_opencv(const blitz::Array<double,2>& input,
     blitz::Array<double,2>& output) {
   blitz::Array<double,2> inputExtra(bob::sp::getConvOutputSize(input, LAPLACIAN_014_KERNEL, bob::sp::Conv::Full));
   bob::sp::extrapolateMirror(input, inputExtra);
@@ -43,14 +41,14 @@ static const double _6 = 1./6.;
 static const double LAPLACIAN_12_KERNEL_DATA[] = {_12,_6,_12,_6,0,_6,_12,_6,_12};
 static const blitz::Array<double,2> LAPLACIAN_12_KERNEL(const_cast<double*>(LAPLACIAN_12_KERNEL_DATA), blitz::shape(3,3), blitz::neverDeleteData);
 
-void of::laplacian_avg_hs(const blitz::Array<double,2>& input,
+void bob::ip::optflow::laplacian_avg_hs(const blitz::Array<double,2>& input,
     blitz::Array<double,2>& output) {
   blitz::Array<double,2> inputExtra(bob::sp::getConvOutputSize(input, LAPLACIAN_12_KERNEL, bob::sp::Conv::Full));
   bob::sp::extrapolateMirror(input, inputExtra);
   bob::sp::conv(input, LAPLACIAN_12_KERNEL, output,
       bob::sp::Conv::Valid);
 }
-of::VanillaHornAndSchunckFlow::VanillaHornAndSchunckFlow
+bob::ip::optflow::VanillaHornAndSchunckFlow::VanillaHornAndSchunckFlow
 (const blitz::TinyVector<int,2>& shape) :
   m_gradient(shape),
   m_ex(shape),
@@ -62,9 +60,9 @@ of::VanillaHornAndSchunckFlow::VanillaHornAndSchunckFlow
 {
 }
 
-of::VanillaHornAndSchunckFlow::~VanillaHornAndSchunckFlow() { }
+bob::ip::optflow::VanillaHornAndSchunckFlow::~VanillaHornAndSchunckFlow() { }
 
-void of::VanillaHornAndSchunckFlow::setShape
+void bob::ip::optflow::VanillaHornAndSchunckFlow::setShape
 (const blitz::TinyVector<int,2>& shape) {
   m_gradient.setShape(shape);
   m_ex.resize(shape);
@@ -75,7 +73,7 @@ void of::VanillaHornAndSchunckFlow::setShape
   m_cterm.resize(shape);
 }
 
-void of::VanillaHornAndSchunckFlow::operator() (double alpha,
+void bob::ip::optflow::VanillaHornAndSchunckFlow::operator() (double alpha,
     size_t iterations, const blitz::Array<double,2>& i1, 
     const blitz::Array<double,2>& i2, blitz::Array<double,2>& u0,
     blitz::Array<double,2>& v0) const {
@@ -88,8 +86,8 @@ void of::VanillaHornAndSchunckFlow::operator() (double alpha,
   m_gradient(i1, i2, m_ex, m_ey, m_et);
   double a2 = std::pow(alpha, 2);
   for (size_t i=0; i<iterations; ++i) {
-    of::laplacian_avg_hs(u0, m_u);
-    of::laplacian_avg_hs(v0, m_v);
+    bob::ip::optflow::laplacian_avg_hs(u0, m_u);
+    bob::ip::optflow::laplacian_avg_hs(v0, m_v);
     m_cterm = (m_ex*m_u + m_ey*m_v + m_et) / 
       (blitz::pow2(m_ex) + blitz::pow2(m_ey) + a2);
     u0 = m_u - m_ex*m_cterm;
@@ -97,7 +95,7 @@ void of::VanillaHornAndSchunckFlow::operator() (double alpha,
   }
 }
 
-void of::VanillaHornAndSchunckFlow::evalEc2
+void bob::ip::optflow::VanillaHornAndSchunckFlow::evalEc2
 (const blitz::Array<double,2>& u, const blitz::Array<double,2>& v,
  blitz::Array<double,2>& error) const {
   
@@ -111,7 +109,7 @@ void of::VanillaHornAndSchunckFlow::evalEc2
 
 }
 
-void of::VanillaHornAndSchunckFlow::evalEb
+void bob::ip::optflow::VanillaHornAndSchunckFlow::evalEb
 (const blitz::Array<double,2>& i1, const blitz::Array<double,2>& i2,
  const blitz::Array<double,2>& u, const blitz::Array<double,2>& v,
  blitz::Array<double,2>& error) const {
@@ -125,7 +123,7 @@ void of::VanillaHornAndSchunckFlow::evalEb
 
 }
 
-of::HornAndSchunckFlow::HornAndSchunckFlow
+bob::ip::optflow::HornAndSchunckFlow::HornAndSchunckFlow
 (const blitz::TinyVector<int,2>& shape) :
   m_gradient(shape),
   m_ex(shape),
@@ -137,9 +135,9 @@ of::HornAndSchunckFlow::HornAndSchunckFlow
 {
 }
 
-of::HornAndSchunckFlow::~HornAndSchunckFlow() { }
+bob::ip::optflow::HornAndSchunckFlow::~HornAndSchunckFlow() { }
 
-void of::HornAndSchunckFlow::setShape
+void bob::ip::optflow::HornAndSchunckFlow::setShape
 (const blitz::TinyVector<int,2>& shape) {
   m_gradient.setShape(shape);
   m_ex.resize(shape);
@@ -150,7 +148,7 @@ void of::HornAndSchunckFlow::setShape
   m_cterm.resize(shape);
 }
 
-void of::HornAndSchunckFlow::operator() (double alpha,
+void bob::ip::optflow::HornAndSchunckFlow::operator() (double alpha,
     size_t iterations, const blitz::Array<double,2>& i1,
     const blitz::Array<double,2>& i2, const blitz::Array<double,2>& i3,
     blitz::Array<double,2>& u0, blitz::Array<double,2>& v0) const {
@@ -164,8 +162,8 @@ void of::HornAndSchunckFlow::operator() (double alpha,
   m_gradient(i1, i2, i3, m_ex, m_ey, m_et);
   double a2 = std::pow(alpha, 2);
   for (size_t i=0; i<iterations; ++i) {
-    of::laplacian_avg_hs_opencv(u0, m_u);
-    of::laplacian_avg_hs_opencv(v0, m_v);
+    bob::ip::optflow::laplacian_avg_hs_opencv(u0, m_u);
+    bob::ip::optflow::laplacian_avg_hs_opencv(v0, m_v);
     m_cterm = (m_ex*m_u + m_ey*m_v + m_et) / 
       (blitz::pow2(m_ex) + blitz::pow2(m_ey) + a2);
     u0 = m_u - m_ex*m_cterm;
@@ -173,7 +171,7 @@ void of::HornAndSchunckFlow::operator() (double alpha,
   }
 }
 
-void of::HornAndSchunckFlow::evalEc2
+void bob::ip::optflow::HornAndSchunckFlow::evalEc2
 (const blitz::Array<double,2>& u, const blitz::Array<double,2>& v,
  blitz::Array<double,2>& error) const {
   
@@ -187,7 +185,7 @@ void of::HornAndSchunckFlow::evalEc2
 
 }
 
-void of::HornAndSchunckFlow::evalEb
+void bob::ip::optflow::HornAndSchunckFlow::evalEb
 (const blitz::Array<double,2>& i1, const blitz::Array<double,2>& i2,
  const blitz::Array<double,2>& i3, const blitz::Array<double,2>& u,
  const blitz::Array<double,2>& v, blitz::Array<double,2>& error) const {
@@ -203,7 +201,7 @@ void of::HornAndSchunckFlow::evalEb
 
 }
 
-void of::flowError (const blitz::Array<double,2>& i1,
+void bob::ip::optflow::flowError (const blitz::Array<double,2>& i1,
     const blitz::Array<double,2>& i2, const blitz::Array<double,2>& u, 
     const blitz::Array<double,2>& v, blitz::Array<double,2>& error) {
   bob::core::array::assertSameShape(i1, i2);

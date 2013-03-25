@@ -20,12 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/ip/LBP.h"
+#include <bob/ip/LBP.h>
 
-namespace ip = bob::ip;
-
-
-ip::LBP::LBP(const int P, const double R,const double R2 , const bool circular,
+bob::ip::LBP::LBP(const int P, const double R,const double R2 , const bool circular,
     const bool to_average,const bool add_average_bit, const bool uniform,
     const bool rotation_invariant, const int eLBP_type):
   m_P(P), 
@@ -50,7 +47,7 @@ ip::LBP::LBP(const int P, const double R,const double R2 , const bool circular,
 }
 
 
-ip::LBP::LBP(const ip::LBP& other):
+bob::ip::LBP::LBP(const bob::ip::LBP& other):
   m_P(other.m_P), 
   m_R(other.m_R), 
   m_R2(other.m_R2), 
@@ -72,9 +69,9 @@ ip::LBP::LBP(const ip::LBP& other):
   //init_luts(); 
 }
 
-ip::LBP::~LBP() { }
+bob::ip::LBP::~LBP() { }
 
-ip::LBP& ip::LBP::operator=(const ip::LBP& other) {
+bob::ip::LBP& bob::ip::LBP::operator=(const bob::ip::LBP& other) {
   m_P = other.m_P; 
   m_R = other.m_R;
   m_R2 = other.m_R2;  
@@ -95,13 +92,13 @@ ip::LBP& ip::LBP::operator=(const ip::LBP& other) {
   return *this;
 }
 
-unsigned ip::LBP::right_shift_circular(unsigned x, int L, int N) 
+unsigned bob::ip::LBP::right_shift_circular(unsigned x, int L, int N) 
 {
   unsigned lsbs = x & ((1 << L) - 1);
   return (x >> L) | (lsbs << (N-L));
 }
 
-void ip::LBP::init_lut_current()
+void bob::ip::LBP::init_lut_current()
 {
   // Reference to the current lookup table
   if(m_rotation_invariant)
@@ -125,7 +122,7 @@ void ip::LBP::init_lut_current()
   }
 }
 
-void ip::LBP::init_luts()
+void bob::ip::LBP::init_luts()
 {
   // Initialize the lookup tables
   init_lut_RI();

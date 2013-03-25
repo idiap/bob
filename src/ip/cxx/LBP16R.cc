@@ -21,23 +21,21 @@
  */
 
 #include <boost/make_shared.hpp>
-#include "bob/ip/LBP16R.h"
+#include <bob/ip/LBP16R.h>
 
-namespace ip = bob::ip;
-
-ip::LBP16R::LBP16R(const double R, 
+bob::ip::LBP16R::LBP16R(const double R, 
     const bool circular,
     const bool to_average,
     const bool add_average_bit,
     const bool uniform, 
     const bool rotation_invariant,
     const int eLBP_type): 
-  ip::LBP(16,R,R,circular,to_average,add_average_bit,uniform,rotation_invariant, eLBP_type)
+  bob::ip::LBP(16,R,R,circular,to_average,add_average_bit,uniform,rotation_invariant, eLBP_type)
 {
   init_luts();
 }
 
-ip::LBP16R::LBP16R(const double R,
+bob::ip::LBP16R::LBP16R(const double R,
     const double R2,
     const bool circular,
     const bool to_average,
@@ -45,30 +43,30 @@ ip::LBP16R::LBP16R(const double R,
     const bool uniform, 
     const bool rotation_invariant,
     const int eLBP_type): 
-  ip::LBP(16,R,R2,circular,to_average,add_average_bit,uniform,rotation_invariant, eLBP_type)
+  bob::ip::LBP(16,R,R2,circular,to_average,add_average_bit,uniform,rotation_invariant, eLBP_type)
 {
   init_luts();
 }
 
 
-ip::LBP16R::LBP16R(const ip::LBP16R& other):
-  ip::LBP(other)
+bob::ip::LBP16R::LBP16R(const bob::ip::LBP16R& other):
+  bob::ip::LBP(other)
 {
   init_luts();
 }
 
-ip::LBP16R::~LBP16R() { }
+bob::ip::LBP16R::~LBP16R() { }
 
-ip::LBP16R& ip::LBP16R::operator= (const ip::LBP16R& other) {
-  ip::LBP::operator=(other);
+bob::ip::LBP16R& bob::ip::LBP16R::operator= (const bob::ip::LBP16R& other) {
+  bob::ip::LBP::operator=(other);
   return *this;
 }
 
-boost::shared_ptr<ip::LBP> ip::LBP16R::clone() const {
-  return boost::make_shared<ip::LBP16R>(*this);
+boost::shared_ptr<bob::ip::LBP> bob::ip::LBP16R::clone() const {
+  return boost::make_shared<bob::ip::LBP16R>(*this);
 }
 
-int ip::LBP16R::getMaxLabel() const {
+int bob::ip::LBP16R::getMaxLabel() const {
   return  (m_rotation_invariant ?
       (m_uniform ? 18 : // Rotation invariant + uniform
        4116) // Rotation invariant
@@ -79,7 +77,7 @@ int ip::LBP16R::getMaxLabel() const {
     );
 }
 
-void ip::LBP16R::init_lut_RI()
+void bob::ip::LBP16R::init_lut_RI()
 {
   m_lut_RI.resize(65536);
   
@@ -97,7 +95,7 @@ void ip::LBP16R::init_lut_RI()
 }
 
 
-void ip::LBP16R::init_lut_U2()
+void bob::ip::LBP16R::init_lut_U2()
 {
   m_lut_U2.resize(65536);
   int counter = 0 ;
@@ -121,7 +119,7 @@ void ip::LBP16R::init_lut_U2()
   }
 }
 
-void ip::LBP16R::init_lut_U2RI()
+void bob::ip::LBP16R::init_lut_U2RI()
 {
   m_lut_U2RI.resize(65536);
   int counter = 0;
@@ -146,14 +144,14 @@ void ip::LBP16R::init_lut_U2RI()
 }
 
 
-void ip::LBP16R::init_lut_add_average_bit()
+void bob::ip::LBP16R::init_lut_add_average_bit()
 {
   m_lut_add_average_bit.resize(11072);
   blitz::firstIndex i;
   m_lut_add_average_bit = i;
 }
 
-void ip::LBP16R::init_lut_normal()
+void bob::ip::LBP16R::init_lut_normal()
 {
   m_lut_normal.resize(65536);
   blitz::firstIndex i;

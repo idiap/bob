@@ -22,12 +22,10 @@
  */
 
 #include <cmath>
-#include "bob/ip/SpatioTemporalGradient.h"
-#include "bob/sp/extrapolate.h"
-#include "bob/sp/conv.h"
-#include "bob/core/assert.h"
-
-namespace ip = bob::ip;
+#include <bob/ip/SpatioTemporalGradient.h>
+#include <bob/sp/extrapolate.h>
+#include <bob/sp/conv.h>
+#include <bob/core/assert.h>
 
 static inline void fastconv(const blitz::Array<double,2>& image,
     const blitz::Array<double,1>& kernel,
@@ -37,7 +35,7 @@ static inline void fastconv(const blitz::Array<double,2>& image,
   bob::sp::convSep(imageExtra, kernel, result, dimension, bob::sp::Conv::Valid);
 }
 
-ip::ForwardGradient::ForwardGradient(const blitz::Array<double,1>& diff_kernel,
+bob::ip::ForwardGradient::ForwardGradient(const blitz::Array<double,1>& diff_kernel,
     const blitz::Array<double,1>& avg_kernel,
     const blitz::TinyVector<int,2>& shape) :
   m_diff_kernel(diff_kernel.copy()),
@@ -50,7 +48,7 @@ ip::ForwardGradient::ForwardGradient(const blitz::Array<double,1>& diff_kernel,
   bob::core::array::assertSameShape(m_avg_kernel, required_shape);
 }
 
-ip::ForwardGradient::ForwardGradient(const ip::ForwardGradient& other) :
+bob::ip::ForwardGradient::ForwardGradient(const bob::ip::ForwardGradient& other) :
   m_diff_kernel(other.m_diff_kernel.copy()),
   m_avg_kernel(other.m_avg_kernel.copy()),
   m_buffer1(other.m_buffer1.shape()),
@@ -58,9 +56,9 @@ ip::ForwardGradient::ForwardGradient(const ip::ForwardGradient& other) :
 {
 }
 
-ip::ForwardGradient::~ForwardGradient() { }
+bob::ip::ForwardGradient::~ForwardGradient() { }
 
-ip::ForwardGradient& ip::ForwardGradient::operator= (const ip::ForwardGradient& other) {
+bob::ip::ForwardGradient& bob::ip::ForwardGradient::operator= (const bob::ip::ForwardGradient& other) {
   m_diff_kernel.reference(other.m_diff_kernel.copy());
   m_avg_kernel.reference(other.m_avg_kernel.copy());
   m_buffer1.resize(other.m_buffer1.shape());
@@ -68,22 +66,22 @@ ip::ForwardGradient& ip::ForwardGradient::operator= (const ip::ForwardGradient& 
   return *this;
 }
 
-void ip::ForwardGradient::setShape(const blitz::TinyVector<int,2>& shape) {
+void bob::ip::ForwardGradient::setShape(const blitz::TinyVector<int,2>& shape) {
   m_buffer1.resize(shape);
   m_buffer2.resize(shape);
 }
 
-void ip::ForwardGradient::setDiffKernel(const blitz::Array<double,1>& k) {
+void bob::ip::ForwardGradient::setDiffKernel(const blitz::Array<double,1>& k) {
   bob::core::array::assertSameDimensionLength(k.extent(0), 2);
   m_diff_kernel.reference(k.copy());
 }
 
-void ip::ForwardGradient::setAvgKernel(const blitz::Array<double,1>& k) {
+void bob::ip::ForwardGradient::setAvgKernel(const blitz::Array<double,1>& k) {
   bob::core::array::assertSameDimensionLength(k.extent(0), 2);
   m_avg_kernel.reference(k.copy());
 }
 
-void ip::ForwardGradient::operator()(const blitz::Array<double,2>& i1,
+void bob::ip::ForwardGradient::operator()(const blitz::Array<double,2>& i1,
     const blitz::Array<double,2>& i2, blitz::Array<double,2>& Ex, 
     blitz::Array<double,2>& Ey, blitz::Array<double,2>& Et) const {
 
@@ -136,14 +134,14 @@ static const blitz::Array<double,1> HS_DIFF_KERNEL(const_cast<double*>(HS_DIFF_K
 static const double HS_AVG_KERNEL_DATA[] = {+1., +1.};
 static const blitz::Array<double,1> HS_AVG_KERNEL(const_cast<double*>(HS_AVG_KERNEL_DATA), blitz::shape(2), blitz::neverDeleteData);
 
-ip::HornAndSchunckGradient::HornAndSchunckGradient(const blitz::TinyVector<int,2>& shape):
-  ip::ForwardGradient(HS_DIFF_KERNEL, HS_AVG_KERNEL, shape)
+bob::ip::HornAndSchunckGradient::HornAndSchunckGradient(const blitz::TinyVector<int,2>& shape):
+  bob::ip::ForwardGradient(HS_DIFF_KERNEL, HS_AVG_KERNEL, shape)
 {
 }
 
-ip::HornAndSchunckGradient::~HornAndSchunckGradient() { }
+bob::ip::HornAndSchunckGradient::~HornAndSchunckGradient() { }
 
-ip::CentralGradient::CentralGradient(const blitz::Array<double,1>& diff_kernel,
+bob::ip::CentralGradient::CentralGradient(const blitz::Array<double,1>& diff_kernel,
     const blitz::Array<double,1>& avg_kernel,
     const blitz::TinyVector<int,2>& shape) :
   m_diff_kernel(diff_kernel.copy()),
@@ -157,7 +155,7 @@ ip::CentralGradient::CentralGradient(const blitz::Array<double,1>& diff_kernel,
   bob::core::array::assertSameShape(m_avg_kernel, required_shape);
 }
 
-ip::CentralGradient::CentralGradient(const ip::CentralGradient& other) :
+bob::ip::CentralGradient::CentralGradient(const bob::ip::CentralGradient& other) :
   m_diff_kernel(other.m_diff_kernel.copy()),
   m_avg_kernel(other.m_avg_kernel.copy()),
   m_buffer1(other.m_buffer1.shape()),
@@ -166,9 +164,9 @@ ip::CentralGradient::CentralGradient(const ip::CentralGradient& other) :
 {
 }
 
-ip::CentralGradient::~CentralGradient() { }
+bob::ip::CentralGradient::~CentralGradient() { }
 
-ip::CentralGradient& ip::CentralGradient::operator= (const ip::CentralGradient& other) {
+bob::ip::CentralGradient& bob::ip::CentralGradient::operator= (const bob::ip::CentralGradient& other) {
   m_diff_kernel.reference(other.m_diff_kernel.copy());
   m_avg_kernel.reference(other.m_avg_kernel.copy());
   m_buffer1.resize(other.m_buffer1.shape());
@@ -177,23 +175,23 @@ ip::CentralGradient& ip::CentralGradient::operator= (const ip::CentralGradient& 
   return *this;
 }
 
-void ip::CentralGradient::setShape(const blitz::TinyVector<int,2>& shape) {
+void bob::ip::CentralGradient::setShape(const blitz::TinyVector<int,2>& shape) {
   m_buffer1.resize(shape);
   m_buffer2.resize(shape);
   m_buffer3.resize(shape);
 }
 
-void ip::CentralGradient::setDiffKernel(const blitz::Array<double,1>& k) {
+void bob::ip::CentralGradient::setDiffKernel(const blitz::Array<double,1>& k) {
   bob::core::array::assertSameDimensionLength(k.extent(0), 3);
   m_diff_kernel.reference(k.copy());
 }
 
-void ip::CentralGradient::setAvgKernel(const blitz::Array<double,1>& k) {
+void bob::ip::CentralGradient::setAvgKernel(const blitz::Array<double,1>& k) {
   bob::core::array::assertSameDimensionLength(k.extent(0), 3);
   m_avg_kernel.reference(k.copy());
 }
 
-void ip::CentralGradient::operator() (const blitz::Array<double,2>& i1,
+void bob::ip::CentralGradient::operator() (const blitz::Array<double,2>& i1,
     const blitz::Array<double,2>& i2, const blitz::Array<double,2>& i3,
     blitz::Array<double,2>& Ex, blitz::Array<double,2>& Ey,
     blitz::Array<double,2>& Et) const {
@@ -260,33 +258,33 @@ static const blitz::Array<double,1> SOBEL_DIFF_KERNEL(const_cast<double*>(SOBEL_
 static const double SOBEL_AVG_KERNEL_DATA[] = {+1., +2., +1};
 static const blitz::Array<double,1> SOBEL_AVG_KERNEL(const_cast<double*>(SOBEL_AVG_KERNEL_DATA), blitz::shape(3), blitz::neverDeleteData);
 
-ip::SobelGradient::SobelGradient(const blitz::TinyVector<int,2>& shape):
-  ip::CentralGradient(SOBEL_DIFF_KERNEL, SOBEL_AVG_KERNEL, shape)
+bob::ip::SobelGradient::SobelGradient(const blitz::TinyVector<int,2>& shape):
+  bob::ip::CentralGradient(SOBEL_DIFF_KERNEL, SOBEL_AVG_KERNEL, shape)
 {
 }
 
-ip::SobelGradient::~SobelGradient() { }
+bob::ip::SobelGradient::~SobelGradient() { }
 
 static const double PREWITT_DIFF_KERNEL_DATA[] = {+1., 0., -1.};
 static const blitz::Array<double,1> PREWITT_DIFF_KERNEL(const_cast<double*>(PREWITT_DIFF_KERNEL_DATA), blitz::shape(3), blitz::neverDeleteData);
 static const double PREWITT_AVG_KERNEL_DATA[] = {+1., +1., +1};
 static const blitz::Array<double,1> PREWITT_AVG_KERNEL(const_cast<double*>(PREWITT_AVG_KERNEL_DATA), blitz::shape(3), blitz::neverDeleteData);
 
-ip::PrewittGradient::PrewittGradient(const blitz::TinyVector<int,2>& shape):
-  ip::CentralGradient(PREWITT_DIFF_KERNEL, PREWITT_AVG_KERNEL, shape)
+bob::ip::PrewittGradient::PrewittGradient(const blitz::TinyVector<int,2>& shape):
+  bob::ip::CentralGradient(PREWITT_DIFF_KERNEL, PREWITT_AVG_KERNEL, shape)
 {
 }
 
-ip::PrewittGradient::~PrewittGradient() { }
+bob::ip::PrewittGradient::~PrewittGradient() { }
 
 static const double ISOTROPIC_DIFF_KERNEL_DATA[] = {+1., 0., -1.};
 static const blitz::Array<double,1> ISOTROPIC_DIFF_KERNEL(const_cast<double*>(ISOTROPIC_DIFF_KERNEL_DATA), blitz::shape(3), blitz::neverDeleteData);
 static const double ISOTROPIC_AVG_KERNEL_DATA[] = {+1., std::sqrt(2.), +1};
 static const blitz::Array<double,1> ISOTROPIC_AVG_KERNEL(const_cast<double*>(ISOTROPIC_AVG_KERNEL_DATA), blitz::shape(3), blitz::neverDeleteData);
 
-ip::IsotropicGradient::IsotropicGradient(const blitz::TinyVector<int,2>& shape):
-  ip::CentralGradient(ISOTROPIC_DIFF_KERNEL, ISOTROPIC_AVG_KERNEL, shape)
+bob::ip::IsotropicGradient::IsotropicGradient(const blitz::TinyVector<int,2>& shape):
+  bob::ip::CentralGradient(ISOTROPIC_DIFF_KERNEL, ISOTROPIC_AVG_KERNEL, shape)
 {
 }
 
-ip::IsotropicGradient::~IsotropicGradient() { }
+bob::ip::IsotropicGradient::~IsotropicGradient() { }
