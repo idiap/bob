@@ -24,17 +24,18 @@
 #define BOOST_TEST_MODULE math-linear Tests
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
-#include "bob/math/linear.h"
+#include <bob/math/linear.h>
 
 
 struct T {
   blitz::Array<double,2> A_24, A_43, A_23, Asol_44, Asol_eye_44, Asol_diag_44;
-  blitz::Array<double,1> b_4, b_2, b_5a, b_5b, n_b_4;
+  blitz::Array<double,1> b_4, b_2, b_5a, b_5b, n_b_4, dsol_diag_24, dsol_diag_43, dsol_diag_44;
   double b5_dot, tr_Asol_44, ned_b_4;
   double eps;
 
   T(): A_24(2,4), A_43(4,3), A_23(2,3), Asol_44(4,4), Asol_eye_44(4,4), Asol_diag_44(4,4),
        b_4(4), b_2(2), b_5a(5), b_5b(5), n_b_4(4), 
+       dsol_diag_24(2), dsol_diag_43(3), dsol_diag_44(4),
        b5_dot(99.), ned_b_4(5.4772), eps(1e-3)
   {
     A_24 = 1., 2., 3., 4., 5., 6., 7., 8.;
@@ -64,6 +65,10 @@ struct T {
                    0., 3., 0., 0.,
                    0., 0., 2., 0.,
                    0., 0., 0., 1.; 
+
+    dsol_diag_24 = 1., 6.;
+    dsol_diag_43 = 12., 8., 4.;
+    dsol_diag_44 = 16, 9., 4., 1.;
   }
 
   ~T() {}
@@ -167,6 +172,21 @@ BOOST_AUTO_TEST_CASE( test_diag )
   blitz::Array<double,2> sol(4,4);
   bob::math::diag(b_4, sol);
   checkBlitzClose( Asol_diag_44, sol, eps);
+}
+
+BOOST_AUTO_TEST_CASE( test_diag_bis )
+{
+  blitz::Array<double,1> sol2(2);
+  bob::math::diag(A_24, sol2);
+  checkBlitzClose(dsol_diag_24, sol2, eps);
+
+  blitz::Array<double,1> sol3(3);
+  bob::math::diag(A_43, sol3);
+  checkBlitzClose(dsol_diag_43, sol3, eps);
+
+  blitz::Array<double,1> sol4(4);
+  bob::math::diag(Asol_44, sol4);
+  checkBlitzClose(dsol_diag_44, sol4, eps);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -26,6 +26,7 @@
 
 #include <blitz/array.h>
 #include <bob/core/assert.h>
+#include <algorithm>
 
 /**
  * @addtogroup MATH math
@@ -396,6 +397,37 @@ namespace math {
       bob::core::array::assertSameDimensionLength(d.extent(0),A.extent(0));
       bob::core::array::assertSameDimensionLength(A.extent(0),A.extent(1));
       diag_(d, A);
+    }
+
+  /**
+   * @brief Extracts the 1D diagonal from a 2D matrix.
+   *
+   * @warning No checks are performed on the array sizes and is recommended
+   * only in scenarios where you have previously checked conformity and is
+   * focused only on speed.
+   *
+   * @param A The 2D matrix matrix (size NxM)
+   * @param d The 1D vector which will contain the diagonal (size min(M,N))
+   */
+  template<typename T>
+    void diag_(const blitz::Array<T,2>& A, blitz::Array<T,1>& d) {
+      blitz::firstIndex i;
+      d = A(i,i);
+    }
+
+  /**
+   * @brief Extracts the 1D diagonal from a 2D matrix.
+   *
+   * @param A The 2D matrix matrix (size NxM)
+   * @param d The 1D vector which will contain the diagonal (size min(M,N))
+   */
+  template<typename T>
+    void diag(const blitz::Array<T,2>& A, blitz::Array<T,1>& d) {
+      bob::core::array::assertZeroBase(A);
+      bob::core::array::assertZeroBase(d);
+      const int dim_d = std::min(A.extent(0),A.extent(1));
+      bob::core::array::assertSameDimensionLength(d.extent(0),dim_d);
+      diag_(A, d);
     }
 
 }}
