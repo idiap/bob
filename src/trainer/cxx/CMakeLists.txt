@@ -25,6 +25,7 @@ set(src
   "PLDATrainer.cc"
   "BICTrainer.cc"
   "LLRTrainer.cc"
+  "WhiteningTrainer.cc"
   )
 
 if(WITH_LIBSVM)

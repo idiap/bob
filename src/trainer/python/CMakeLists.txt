@@ -20,6 +20,7 @@ set(src
    "plda.cc"
    "bic.cc"
    "llr.cc"
+   "whitening.cc"
    "main.cc"
    )
 

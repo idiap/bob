@@ -35,6 +35,7 @@ void bind_trainer_wiener();
 void bind_trainer_empca();
 void bind_trainer_bic();
 void bind_trainer_llr();
+void bind_trainer_whitening();
 
 #if WITH_LIBSVM
 void bind_trainer_svm();
@@ -56,6 +57,7 @@ BOOST_PYTHON_MODULE(_trainer) {
   bind_trainer_empca();
   bind_trainer_bic();
   bind_trainer_llr();
+  bind_trainer_whitening();
 
 # if WITH_LIBSVM
   bind_trainer_svm();
