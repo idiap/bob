@@ -18,6 +18,7 @@ set(src
    "linearscoring.cc"
    "ztnorm.cc"
    "jfa.cc"
+   "ivector.cc"
    "wiener.cc"
    "plda.cc"
    "bic.cc"

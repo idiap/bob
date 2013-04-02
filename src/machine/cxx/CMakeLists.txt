@@ -22,6 +22,7 @@ set(src
   "ZTNorm.cc"
   "JFAMachine.cc"
   "JFAMachineException.cc"
+  "IVectorMachine.cc"
   "WienerMachine.cc"
   "PLDAMachine.cc"
   "GaborGraphMachine.cc"

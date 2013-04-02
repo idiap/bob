@@ -19,6 +19,7 @@ set(src
   "MLPRPropTrainer.cc"
   "MLPBackPropTrainer.cc"
   "JFATrainer.cc"
+  "IVectorTrainer.cc"
   "WienerTrainer.cc"
   "EMPCATrainer.cc"
   "PLDATrainer.cc"

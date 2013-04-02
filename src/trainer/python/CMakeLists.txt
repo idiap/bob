@@ -14,6 +14,7 @@ set(src
    "rprop.cc"
    "backprop.cc"
    "jfa.cc"
+   "ivector.cc"
    "wiener.cc"
    "empca.cc"
    "plda.cc"
