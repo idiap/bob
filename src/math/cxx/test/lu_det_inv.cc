@@ -26,22 +26,26 @@
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
 #include <stdint.h>
-#include "bob/math/lu.h"
-#include "bob/math/det.h"
-#include "bob/math/inv.h"
-#include "bob/math/linear.h"
+#include <bob/math/lu.h>
+#include <bob/math/det.h>
+#include <bob/math/inv.h>
+#include <bob/math/linear.h>
 
 
 struct T {
-  blitz::Array<double,2> A33_1, A24_1;
-  blitz::Array<double,2> L33_1, L24_1;
+  blitz::Array<double,2> A33_1, A24_1, A33_2;
+  blitz::Array<double,2> L33_1, L24_1, L33_2;
   blitz::Array<double,2> U33_1, U24_1;
   blitz::Array<double,2> P33_1, P24_1;
   blitz::Array<double,2> A33_1_inv, I33;
   double det_A33_1, eps;
 
-  T(): A33_1(3,3), A24_1(2,4), L33_1(3,3), L24_1(2,2), U33_1(3,3), U24_1(2,4), 
-    P33_1(3,3), P24_1(2,2), A33_1_inv(3,3), I33(3,3), det_A33_1(-0.2766), 
+  T(): A33_1(3,3), A24_1(2,4), A33_2(3,3), 
+    L33_1(3,3), L24_1(2,2), L33_2(3,3),
+    U33_1(3,3), U24_1(2,4), 
+    P33_1(3,3), P24_1(2,2), 
+    A33_1_inv(3,3), I33(3,3), 
+    det_A33_1(-0.2766), 
     eps(2e-4)
   {
     A33_1 = 0.8147, 0.9134, 0.2785, 0.9058, 0.6324, 0.5469, 0.1270, 0.0975, 
@@ -60,6 +64,9 @@ struct T {
                 -0.1322, 1.1283;
     I33 = 1., 0., 0., 0., 1., 0., 0., 0., 1.;
 
+    A33_2 = 2, -1, 0, -1, 2, -1, 0, -1, 2.;
+    L33_2 = 1.414213562373095, 0, 0, -0.707106781186547, 1.224744871391589, 0, 
+              0, -0.816496580927726, 1.154700538379251;
   }
 
   ~T() {}
@@ -118,6 +125,13 @@ BOOST_AUTO_TEST_CASE( test_lu_2x4 )
   checkBlitzClose(L, L24_1, eps);
   checkBlitzClose(U, U24_1, eps);
   checkBlitzClose(P, P24_1, eps);
+}
+
+BOOST_AUTO_TEST_CASE( test_chol_3x3 )
+{
+  blitz::Array<double,2> L(3,3);
+  bob::math::chol(A33_2, L);
+  checkBlitzClose(L, L33_2, eps);
 }
   
 BOOST_AUTO_TEST_CASE( test_det_3x3 )

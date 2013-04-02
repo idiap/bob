@@ -32,6 +32,9 @@
 // LU decomposition of a general matrix (dgetrf)
 extern "C" void dgetrf_( const int *M, const int *N, double *A, 
   const int *lda, int *ipiv, int *info);
+// Cholesky decomposition of a real symmetric definite-positive matrix (dpotrf)
+extern "C" void dpotrf_( const char *uplo, const int *N, double *A,
+  const int *lda, int *info);
 
 
 void bob::math::lu(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
@@ -110,5 +113,65 @@ void bob::math::lu_(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
   P = 0.;
   for (int j = 0; j<minMN; ++j)
     P(j,Pp(j)) = 1.;
+}
+
+
+void bob::math::chol(const blitz::Array<double,2>& A, 
+  blitz::Array<double,2>& L)
+{
+  // Size variable
+  const int M = A.extent(0);
+  const int N = A.extent(1);
+
+  // Check
+  bob::core::array::assertZeroBase(A);
+  bob::core::array::assertZeroBase(L);
+  bob::core::array::assertSameDimensionLength(M,N);
+  bob::core::array::assertSameShape(A,L);
+
+  bob::math::chol_(A, L);
+}
+
+void bob::math::chol_(const blitz::Array<double,2>& A, 
+  blitz::Array<double,2>& L)
+{
+  // Size variable
+  const int N = A.extent(0);
+
+  // Prepares to call LAPACK function
+  // Initialises LAPACK variables
+  int info = 0;  
+  const int lda = N;
+  const char uplo = 'L';
+
+  // Initialises LAPACK arrays
+  blitz::Array<double,2> A_blitz_lapack;
+  // Tries to use V directly
+  blitz::Array<double,2> Lt = L.transpose(1,0);
+  const bool Lt_direct_use = bob::core::array::isCZeroBaseContiguous(Lt);
+  if (Lt_direct_use) 
+  {
+    A_blitz_lapack.reference(Lt);
+    A_blitz_lapack = A;
+  }
+  else
+    A_blitz_lapack.reference(bob::core::array::ccopy(A));
+  double *A_lapack = A_blitz_lapack.data();
+
+  // Calls the LAPACK function 
+  dpotrf_( &uplo, &N, A_lapack, &lda, &info);
+ 
+  // Checks info variable
+  if (info != 0)
+    throw bob::math::LapackError("The LAPACK dpotrf function returned a non-zero value.");
+
+  // Copy result back to L if required
+  if (!Lt_direct_use)
+    Lt = A_blitz_lapack;
+
+  // Sets strictly upper triangular part to 0
+  blitz::firstIndex i;
+  blitz::secondIndex j;
+  L = blitz::where(i < j, 0, L);
 }
 
