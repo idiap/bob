@@ -25,9 +25,10 @@
 #ifndef BOB_TRAINER_EMTRAINER_H
 #define BOB_TRAINER_EMTRAINER_H
 
-#include <bob/trainer/Trainer.h>
+#include "Trainer.h"
 
 #include <limits>
+#include <bob/core/check.h>
 #include <bob/core/logging.h>
 
 
@@ -46,10 +47,13 @@ namespace bob { namespace trainer {
   class EMTrainer: virtual public Trainer<T_machine, T_sampler>
   {
   public:
+    /**
+     * @brief Destructor
+     */
     virtual ~EMTrainer() {}
    
     /**
-     * Assignment operator
+     * @brief Assignment operator
      */
     virtual EMTrainer& operator=(const EMTrainer& other)
     {
@@ -63,7 +67,7 @@ namespace bob { namespace trainer {
     }
 
     /**
-     * Equal to
+     * @brief Equal to
      */
     virtual bool operator==(const EMTrainer& b) const {
       return m_compute_likelihood == b.m_compute_likelihood &&
@@ -72,12 +76,26 @@ namespace bob { namespace trainer {
     }
 
     /**
-     * Not equal to
+     * @brief Not equal to
      */
     virtual bool operator!=(const EMTrainer& b) const {
       return !(this->operator==(b));
     }
  
+    /**
+     * @brief Similarity operator
+     */
+    virtual bool is_similar_to(const EMTrainer& b, 
+      const double r_epsilon=1e-5, const double a_epsilon=1e-8) const 
+    {
+      return m_compute_likelihood == b.m_compute_likelihood &&
+             bob::core::isClose(m_convergence_threshold, b.m_convergence_threshold, r_epsilon, a_epsilon) &&
+             m_max_iterations == b.m_max_iterations;
+    }
+
+    /**
+     * @brief The main method to train a machine using an EM-based algorithm
+     */
     virtual void train(T_machine& machine, const T_sampler& sampler) 
     {
       bob::core::info << "# EMTrainer:" << std::endl;
@@ -141,19 +159,20 @@ namespace bob { namespace trainer {
     }
 
     /**
-     * This method is called before the EM algorithm 
+     * @brief This method is called before the EM algorithm to initialize 
+     * variables.
      */
     virtual void initialization(T_machine& machine, const T_sampler& sampler) = 0;
     
     /**
-     * Updates the hidden variable distribution (or the sufficient statistics)
-     * given the Machine parameters.
+     * @brief Computes the hidden variable distribution (or the sufficient 
+     * statistics) given the Machine parameters.
      */
     virtual void eStep(T_machine& machine, const T_sampler& sampler) = 0;
     
     /**
-     * Update the Machine parameters given the hidden variable distribution 
-     * (or the sufficient statistics)
+     * @brief Updates the Machine parameters given the hidden variable 
+     * distribution (or the sufficient statistics).
      */
     virtual void mStep(T_machine& machine, const T_sampler& sampler) = 0;
 
@@ -165,59 +184,59 @@ namespace bob { namespace trainer {
     virtual double computeLikelihood(T_machine& machine) = 0;
 
     /**
-     * This method is called after the EM algorithm 
+     * @brief This method is called after the EM-loop
      */
     virtual void finalization(T_machine& machine, const T_sampler& sampler) = 0;
 
     /**
-     * Sets likelihood computation
+     * @brief Sets whether the likelihood is computed or not at each iteration
      */
     void setComputeLikelihood(bool compute) {
       m_compute_likelihood = compute;
     }
 
     /**
-     * Gets convergence threshold
+     * @brief Tells whether the likelihood is computed or not at each iteration
      */
     bool getComputeLikelihood() const {
       return m_compute_likelihood;
     }
 
     /**
-     * Sets convergence threshold
+     * @brief Sets the convergence threshold
      */
     void setConvergenceThreshold(double threshold) {
       m_convergence_threshold = threshold;
     }
 
     /**
-     * Gets convergence threshold
+     * @brief Gets the convergence threshold
      */
     double getConvergenceThreshold() const {
       return m_convergence_threshold;
     }
 
     /**
-     * Set max iterations
+     * @brief Sets the maximum number of EM iterations
      */
     void setMaxIterations(size_t max_iterations) {
       m_max_iterations = max_iterations;
     }
 
     /**
-     * Get max iterations
+     * @brief Gets the maximum number of EM iterations
      */
     size_t getMaxIterations() const {
       return m_max_iterations;
     }
 
   protected:
-    bool m_compute_likelihood;
-    double m_convergence_threshold;
-    size_t m_max_iterations;
+    bool m_compute_likelihood; ///< whether lilelihood is computed during the EM loop or not
+    double m_convergence_threshold; ///< convergence threshold
+    size_t m_max_iterations; ///< maximum number of EM iterations
 
     /**
-     * Protected constructor to be called in the constructor of derived 
+     * @brief Protected constructor to be called in the constructor of derived
      * classes
      */
     EMTrainer(double convergence_threshold = 0.001, 
