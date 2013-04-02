@@ -34,26 +34,26 @@ bob::trainer::WhiteningTrainer::WhiteningTrainer(const bob::trainer::WhiteningTr
 bob::trainer::WhiteningTrainer::~WhiteningTrainer() {}
 
 bob::trainer::WhiteningTrainer& bob::trainer::WhiteningTrainer::operator=
-(const bob::trainer::WhiteningTrainer& other) 
+(const bob::trainer::WhiteningTrainer& other)
 {
   return *this;
 }
 
 bool bob::trainer::WhiteningTrainer::operator==
-  (const bob::trainer::WhiteningTrainer& other)
+  (const bob::trainer::WhiteningTrainer& other) const
 {
   return true;
 }
 
-bool bob::trainer::WhiteningTrainer::operator==
-  (const bob::trainer::WhiteningTrainer& other)
+bool bob::trainer::WhiteningTrainer::operator!=
+  (const bob::trainer::WhiteningTrainer& other) const
 {
-  return !(this->operator!=(other);
+  return !(this->operator!=(other));
 }
 
 bool bob::trainer::WhiteningTrainer::is_similar_to
   (const bob::trainer::WhiteningTrainer& other, const double r_epsilon,
-   const double a_epsilon)
+   const double a_epsilon) const
 {
   return true;
 }
