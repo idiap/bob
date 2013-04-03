@@ -406,7 +406,7 @@ bool isClose(const std::vector<blitz::Array<T,D> >& left,
 
   typename std::vector<blitz::Array<T,D> >::const_iterator itl, itr;
   for (itl = left.begin(), itr = right.begin(); 
-       itl != left.end(), itr != right.end(); ++itl, ++itr)
+       itl != left.end() && itr != right.end(); ++itl, ++itr)
     if (!isClose(*itl, *itr, r_epsilon, a_epsilon))
       return false;
 
@@ -451,7 +451,7 @@ bool isClose(const std::vector<blitz::Array<std::complex<T>,D> >& left,
 
   typename std::vector<blitz::Array<std::complex<T>,D> >::const_iterator itl, itr;
   for (itl = left.begin(), itr = right.begin(); 
-       itl != left.end(), itr != right.end(); ++itl, ++itr)
+       itl != left.end() && itr != right.end(); ++itl, ++itr)
     if (!isClose(*itl, *itr, r_epsilon, a_epsilon))
       return false;
 
@@ -509,7 +509,7 @@ bool isEqual(const std::vector<blitz::Array<T,D> >& left,
 
   typename std::vector<blitz::Array<T,D> >::const_iterator itl, itr;
   for (itl = left.begin(), itr = right.begin(); 
-       itl != left.end(), itr != right.end(); ++itl, ++itr)
+       itl != left.end() && itr != right.end(); ++itl, ++itr)
     if (!isEqual(*itl, *itr))
       return false;
 
