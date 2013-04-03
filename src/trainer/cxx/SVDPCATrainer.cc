@@ -23,7 +23,10 @@
  */
 
 #include <bob/trainer/SVDPCATrainer.h>
+#include <bob/machine/Exception.h>
 #include <bob/math/svd.h>
+#include <algorithm>
+#include <blitz/array.h>
 
 bob::trainer::SVDPCATrainer::SVDPCATrainer()
 {
@@ -38,19 +41,48 @@ bob::trainer::SVDPCATrainer::~SVDPCATrainer() {}
 bob::trainer::SVDPCATrainer& bob::trainer::SVDPCATrainer::operator=
 (const bob::trainer::SVDPCATrainer& other) 
 {
-  if(this != &other)
-  {
-  }
   return *this;
 }
 
-void bob::trainer::SVDPCATrainer::train(bob::machine::LinearMachine& machine, 
-  blitz::Array<double,1>& eigen_values, const blitz::Array<double,2>& ar) const 
+bool bob::trainer::SVDPCATrainer::operator==
+  (const bob::trainer::SVDPCATrainer& other) const
 {
+  return true;
+}
 
+bool bob::trainer::SVDPCATrainer::operator!=
+  (const bob::trainer::SVDPCATrainer& other) const
+{
+  return !(this->operator==(other));
+}
+
+bool bob::trainer::SVDPCATrainer::is_similar_to
+  (const bob::trainer::SVDPCATrainer& other, const double r_epsilon,
+   const double a_epsilon) const
+{
+  return true;
+}
+
+void bob::trainer::SVDPCATrainer::train(bob::machine::LinearMachine& machine, 
+  blitz::Array<double,1>& eigen_values, const blitz::Array<double,2>& ar)
+{
   // data is checked now and conforms, just proceed w/o any further checks.
-  size_t n_samples = ar.extent(0);
-  size_t n_features = ar.extent(1);
+  const size_t n_samples = ar.extent(0);
+  const size_t n_features = ar.extent(1);
+  const int n_sigma = (int)std::min(n_features, n_samples);
+
+  // Checks that the dimensions are matching 
+  const size_t n_inputs = machine.inputSize();
+  const size_t n_outputs = machine.outputSize();
+  const int n_eigenvalues = eigen_values.extent(0);
+
+  // Checks that the dimensions are matching
+  if (n_inputs != n_features)
+    throw bob::machine::NInputsMismatch(n_inputs, n_features);
+  if (n_outputs != (size_t)n_sigma)
+    throw bob::machine::NOutputsMismatch(n_outputs, (size_t)n_sigma);
+  if (n_eigenvalues != n_sigma)
+    throw bob::machine::NOutputsMismatch(n_eigenvalues, n_sigma);
 
   // removes the empirical mean from the training data
   blitz::Array<double,2> data(n_features, n_samples);
@@ -72,7 +104,6 @@ void bob::trainer::SVDPCATrainer::train(bob::machine::LinearMachine& machine,
    * singular values in Sigma are organized by decreasing order of magnitude.
    * You **don't** need sorting after this.
    */
-  const int n_sigma = std::min(n_features, n_samples);
   blitz::Array<double,2> U(n_features, n_sigma);
   blitz::Array<double,1> sigma(n_sigma);
   bob::math::svd_(data, U, sigma);
@@ -93,13 +124,13 @@ void bob::trainer::SVDPCATrainer::train(bob::machine::LinearMachine& machine,
   //norm_factor = blitz::sum(blitz::pow2(V(all,i)))
 
   // finally, we set also the eigen values in this version
-  eigen_values.resize(n_sigma);
   eigen_values = blitz::pow2(sigma)/(n_samples-1);
 }
 
 void bob::trainer::SVDPCATrainer::train(bob::machine::LinearMachine& machine, 
-  const blitz::Array<double,2>& ar) const 
+  const blitz::Array<double,2>& ar)
 {
-  blitz::Array<double,1> throw_away;
+  const int n_sigma = std::min(ar.extent(0),ar.extent(1));
+  blitz::Array<double,1> throw_away(n_sigma);
   train(machine, throw_away, ar);
 }

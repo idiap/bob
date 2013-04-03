@@ -49,12 +49,21 @@ class LinearTest(unittest.TestCase):
     eig_val_correct = numpy.array([1.28402771, 0.0490834], 'float64')
     eig_vec_correct = numpy.array([[-0.6778734, -0.73517866], [-0.73517866, 0.6778734]], 'float64')
 
+    # Train method 1
     T = bob.trainer.SVDPCATrainer()
     machine, eig_vals = T.train(data)
 
     # Makes sure results are good
     self.assertTrue( (abs(machine.weights - eig_vec_correct) < 1e-6).all() )
     self.assertTrue( (abs(eig_vals - eig_val_correct) < 1e-6).all() )
+
+    # Train method 2
+    machine2 = bob.machine.LinearMachine(2, 2)
+    eig_vals2 = T.train(machine2, data)
+
+    # Makes sure results are good
+    self.assertTrue( (abs(machine2.weights - eig_vec_correct) < 1e-6).all() )
+    self.assertTrue( (abs(eig_vals2 - eig_val_correct) < 1e-6).all() )
 
   def test01b_pca_via_svd(self):
 
@@ -70,12 +79,39 @@ class LinearTest(unittest.TestCase):
     eig_val_correct = numpy.array([61.9870996, 9.49613738, 1.85009634, 0.],
         'float64')
 
+    # Train method 1
     T = bob.trainer.SVDPCATrainer()
     machine, eig_vals = T.train(data)
 
     # Makes sure results are good
     self.assertTrue( (abs(eig_vals - eig_val_correct) < 1e-6).all() )
     self.assertTrue( machine.weights.shape[0] == 5 and machine.weights.shape[1] == 4 )
+
+    # Train method 2
+    machine2 = bob.machine.LinearMachine(5, 4)
+    eig_vals2 = T.train(machine2, data)
+
+    # Makes sure results are good
+    self.assertTrue( (abs(eig_vals2 - eig_val_correct) < 1e-6).all() )
+    self.assertTrue( machine2.weights.shape[0] == 5 and machine2.weights.shape[1] == 4 )
+
+  def test01c_pca_via_svd_comparisons(self):
+
+    # Constructors and comparison operators
+    t1 = bob.trainer.SVDPCATrainer()
+    t2 = bob.trainer.SVDPCATrainer()
+    t3 = bob.trainer.SVDPCATrainer(t2)
+    t4 = t3
+    self.assertTrue( t1 == t2)
+    self.assertFalse( t1 != t2)
+    self.assertTrue( t1.is_similar_to(t2) )
+    self.assertTrue( t1 == t3)
+    self.assertFalse( t1 != t3)
+    self.assertTrue( t1.is_similar_to(t3) )
+    self.assertTrue( t1 == t4)
+    self.assertFalse( t1 != t4)
+    self.assertTrue( t1.is_similar_to(t4) )
+
 
   def test02a_fisher_lda(self):
 
