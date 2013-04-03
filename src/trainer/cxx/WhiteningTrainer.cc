@@ -19,6 +19,7 @@
  */
 
 #include <bob/trainer/WhiteningTrainer.h>
+#include <bob/machine/Exception.h>
 #include <bob/math/inv.h>
 #include <bob/math/lu.h>
 #include <bob/math/stats.h>
@@ -61,11 +62,18 @@ bool bob::trainer::WhiteningTrainer::is_similar_to
 void bob::trainer::WhiteningTrainer::train(bob::machine::LinearMachine& machine, 
   const blitz::Array<double,2>& ar)
 {
-  // TODO: check machine dimensionality
+  // training data dimensions
+  const size_t n_samples = ar.extent(0);
+  const size_t n_features = ar.extent(1);
+  // machine dimensions
+  const size_t n_inputs = machine.inputSize();
+  const size_t n_outputs = machine.outputSize();
 
-  // data is checked now and conforms, just proceed w/o any further checks.
-  size_t n_samples = ar.extent(0);
-  size_t n_features = ar.extent(1);
+  // Checks that the dimensions are matching
+  if (n_inputs != n_features)
+    throw bob::machine::NInputsMismatch(n_inputs, n_features);
+  if (n_outputs != n_features)
+    throw bob::machine::NOutputsMismatch(n_outputs, n_features);
 
   // 1. Computes the mean vector and the covariance matrix of the training set
   // ugly fix for old blitz versions

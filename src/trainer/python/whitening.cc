@@ -21,6 +21,7 @@
 #include <boost/python.hpp>
 #include <bob/core/python/ndarray.h>
 #include <bob/trainer/WhiteningTrainer.h>
+#include <bob/machine/LinearMachine.h>
 #include <boost/shared_ptr.hpp>
 
 using namespace boost::python;
@@ -34,7 +35,7 @@ void py_train(bob::trainer::WhiteningTrainer& t, bob::machine::LinearMachine& m,
 
 void bind_trainer_whitening() 
 {
-  class_<bob::trainer::WhiteningTrainer, boost::shared_ptr<bob::trainer::WhiteningTrainer> >("WhiteningTrainer", "Trains a linear machine to perform whitening.", init<>("Initializes a new Whitening trainer."))
+  class_<bob::trainer::WhiteningTrainer, boost::shared_ptr<bob::trainer::WhiteningTrainer> >("WhiteningTrainer", "Trains a linear machine to perform whitening.\nReference:\n'Independent component analysis: algorithms and applications', Aapo Hyvärinen, Erkki Oja, Neural Networks, 2000, vol. 13, p. 411--430\nGiven a training set X, this will compute the W matrix such that:\nW = cholesky(inv(cov(X_{n},X_{n}^{T}))), where X_{n} corresponds to the center data.", init<>("Initializes a new Whitening trainer."))
     .def(init<const bob::trainer::WhiteningTrainer&>(args("other"), "Copy constructs a WhiteningTrainer"))
     .def(self == self)
     .def(self != self)

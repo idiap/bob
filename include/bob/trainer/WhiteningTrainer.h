@@ -31,10 +31,16 @@ namespace bob { namespace trainer {
  */
 
 /**
- * @brief Sets a linear machine to perform a Whitening transform 
+ * @brief Sets a linear machine to perform a Whitening transform\n
  *
- * Reference:
- * TODO
+ * Reference:\n
+ * "Independent Component Analysis: Algorithms and Applications",
+ *   Aapo Hyvärinen, Erkki Oja,
+ *   Neural Networks, 2000, vol. 13, p. 411--430\n
+ * 
+ * Given a training set X, this will compute the W matrix such that:\n
+ *   \f$W = cholesky(inv(cov(X_{n},X_{n}^{T})))\f$, where \f$X_{n}\f$
+ *   corresponds to the center data
  */
 class WhiteningTrainer: public Trainer<bob::machine::LinearMachine, blitz::Array<double,2> >
 {
