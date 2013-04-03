@@ -191,7 +191,25 @@ class LinearTest(unittest.TestCase):
     self.assertTrue( abs(exp_llh2 - llh2) < 2e-4)
 
 
-  def test04_whitening(self):
+  def test04_whitening_initialization(self):
+
+    # Constructors and comparison operators
+    t1 = bob.trainer.WhiteningTrainer()
+    t2 = bob.trainer.WhiteningTrainer()
+    t3 = bob.trainer.WhiteningTrainer(t2)
+    t4 = t3
+    self.assertTrue( t1 == t2)
+    self.assertFalse( t1 != t2)
+    self.assertTrue( t1.is_similar_to(t2) )
+    self.assertTrue( t1 == t3)
+    self.assertFalse( t1 != t3)
+    self.assertTrue( t1.is_similar_to(t3) )
+    self.assertTrue( t1 == t4)
+    self.assertFalse( t1 != t4)
+    self.assertTrue( t1.is_similar_to(t4) )
+
+
+  def test05_whitening_train(self):
 
     # Tests our Whitening extractor.
     data = numpy.array([[ 1.2622, -1.6443, 0.1889],
@@ -220,7 +238,6 @@ class LinearTest(unittest.TestCase):
     self.assertTrue( numpy.allclose(m.input_subtract, mean_ref, eps, eps) )
     self.assertTrue( numpy.allclose(m.weights, whit_ref, eps, eps) )
     self.assertTrue( numpy.allclose(s, sample_whitened_ref, eps, eps) )
-
 
     # Runs whitening (second method)
     m2 = t.train(data)

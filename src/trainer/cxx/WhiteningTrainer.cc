@@ -49,7 +49,7 @@ bool bob::trainer::WhiteningTrainer::operator==
 bool bob::trainer::WhiteningTrainer::operator!=
   (const bob::trainer::WhiteningTrainer& other) const
 {
-  return !(this->operator!=(other));
+  return !(this->operator==(other));
 }
 
 bool bob::trainer::WhiteningTrainer::is_similar_to

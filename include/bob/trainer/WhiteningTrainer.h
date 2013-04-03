@@ -23,6 +23,7 @@
 
 #include "Trainer.h"
 #include <bob/machine/LinearMachine.h>
+#include <blitz/array.h>
 
 namespace bob { namespace trainer {
 /**
