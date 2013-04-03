@@ -223,13 +223,12 @@ class LinearTest(unittest.TestCase):
 
 
     # Runs whitening (second method)
-    t = bob.trainer.WhiteningTrainer()
-    m = t.train(data)
-    s = m.forward(sample)
+    m2 = t.train(data)
+    s2 = m2.forward(sample)
 
     # Makes sure results are good
     eps = 1e-4
-    self.assertTrue( numpy.allclose(m.input_subtract, mean_ref, eps, eps) )
-    self.assertTrue( numpy.allclose(m.weights, whit_ref, eps, eps) )
-    self.assertTrue( numpy.allclose(s, sample_whitened_ref, eps, eps) )
+    self.assertTrue( numpy.allclose(m2.input_subtract, mean_ref, eps, eps) )
+    self.assertTrue( numpy.allclose(m2.weights, whit_ref, eps, eps) )
+    self.assertTrue( numpy.allclose(s2, sample_whitened_ref, eps, eps) )
 

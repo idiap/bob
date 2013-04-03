@@ -27,7 +27,7 @@ import numpy, numpy.random
 import tempfile
 
 class WienerMachineTest(unittest.TestCase):
-  """Performs various LinearMachine tests."""
+  """Performs various WienerMachine tests."""
 
   def test01_initialization(self):
 

@@ -19,6 +19,7 @@
  */
 
 #include <bob/trainer/WienerTrainer.h>
+#include <bob/machine/Exception.h>
 #include <bob/core/cast.h>
 #include <bob/sp/FFT2D.h>
 #include <complex>
@@ -41,24 +42,51 @@ bob::trainer::WienerTrainer& bob::trainer::WienerTrainer::operator=
   return *this;
 }
 
+bool bob::trainer::WienerTrainer::operator==
+  (const bob::trainer::WienerTrainer& other) const
+{
+  return true;
+}
+
+bool bob::trainer::WienerTrainer::operator!=
+  (const bob::trainer::WienerTrainer& other) const
+{
+  return !(this->operator==(other));
+}
+
+bool bob::trainer::WienerTrainer::is_similar_to
+  (const bob::trainer::WienerTrainer& other, const double r_epsilon,
+   const double a_epsilon) const
+{
+  return true;
+}
+
 void bob::trainer::WienerTrainer::train(bob::machine::WienerMachine& machine, 
-    const blitz::Array<double,3>& ar) const 
+    const blitz::Array<double,3>& ar)
 {
   // Data is checked now and conforms, just proceed w/o any further checks.
   const size_t n_samples = ar.extent(0);
   const size_t height = ar.extent(1);
-  const size_t width = ar.extent(0);
+  const size_t width = ar.extent(2);
+  // machine dimensions
+  const size_t height_m = machine.getHeight();
+  const size_t width_m = machine.getWidth();
+
+  // Checks that the dimensions are matching
+  if (height != height_m)
+    throw bob::machine::NInputsMismatch(height, height_m);
+  if (width != width_m)
+    throw bob::machine::NInputsMismatch(width, width_m);
 
   // FFT2D
   bob::sp::FFT2D fft2d(height, width);
 
   // Loads the data
-  blitz::Range a = blitz::Range::all();
   blitz::Array<double,3> data(height, width, n_samples);
   blitz::Array<std::complex<double>,2> sample_fft(height, width);
   blitz::Range all = blitz::Range::all();
   for (size_t i=0; i<n_samples; ++i) {
-    blitz::Array<double,2> sample = ar(i,a,a);
+    blitz::Array<double,2> sample = ar(i,all,all);
     blitz::Array<std::complex<double>,2> sample_c = bob::core::array::cast<std::complex<double> >(sample);
     fft2d(sample_c, sample_fft);
     data(all,all,i) = blitz::abs(sample_fft);
@@ -77,6 +105,5 @@ void bob::trainer::WienerTrainer::train(bob::machine::WienerMachine& machine,
   tmp = blitz::sum(data,k) / n_samples;
 
   // sets the Wiener machine with the results:
-  machine.resize(height,width);
   machine.setPs(tmp);
 }

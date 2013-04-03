@@ -21,29 +21,40 @@
  */
 
 #include <boost/python.hpp>
-#include <boost/shared_ptr.hpp>
+#include <bob/core/python/ndarray.h>
 #include <bob/trainer/WienerTrainer.h>
+#include <bob/machine/WienerMachine.h>
+#include <boost/shared_ptr.hpp>
 
 using namespace boost::python;
 
-boost::shared_ptr<bob::machine::WienerMachine> 
-wiener_train1(const bob::trainer::WienerTrainer& t, const blitz::Array<double,3>& data) {
-  boost::shared_ptr<bob::machine::WienerMachine> m;
-  t.train(*m, data);
-  return m;
+void py_train1(bob::trainer::WienerTrainer& t, 
+  bob::machine::WienerMachine& m, bob::python::const_ndarray data)
+{
+  const blitz::Array<double,3> data_ = data.bz<double,3>();
+  t.train(m, data_);
 }
 
-void wiener_train2(const bob::trainer::WienerTrainer& t, bob::machine::WienerMachine& m,
-    const blitz::Array<double,3>& data) {
-  t.train(m, data);
+object py_train2(bob::trainer::WienerTrainer& t, 
+  bob::python::const_ndarray data)
+{
+  const blitz::Array<double,3> data_ = data.bz<double,3>();
+  const int height = data_.extent(1);
+  const int width = data_.extent(2);
+  bob::machine::WienerMachine m(height, width, 0.);
+  t.train(m, data_);
+  return object(m);
 }
 
 void bind_trainer_wiener() {
 
-  class_<bob::trainer::WienerTrainer>("WienerTrainer", "Sets a WienerMachine and train it on a given dataset.\nReference:\n'Computer Vision: Algorithms and Applications', Richard Szeliski\n(Part 3.4.3)", init<>("Initializes a new WienerTrainer."))
-    .def(init<const bob::trainer::WienerTrainer&>(args("other")))
-    .def("train", &wiener_train1, (arg("self"), arg("data")), "Trains a WienerMachine using the given dataset to perform the filtering. This method returns the trained WienerMachine.")
-    .def("train", &wiener_train2, (arg("self"), arg("machine"), arg("data")), "Trains the provided WienerMachine with the given dataset.")
+  class_<bob::trainer::WienerTrainer, boost::shared_ptr<bob::trainer::WienerTrainer> >("WienerTrainer", "Trains a WienerMachine on a given dataset.\nReference:\n'Computer Vision: Algorithms and Applications', Richard Szeliski\n(Part 3.4.3)", init<>("Initializes a new WienerTrainer."))
+    .def(init<const bob::trainer::WienerTrainer&>(args("other"), "Copy constructs a WienerTrainer"))
+    .def(self == self)
+    .def(self != self)
+    .def("is_similar_to", &bob::trainer::WienerTrainer::is_similar_to, (arg("self"), arg("other"), arg("r_epsilon")=1e-5, arg("a_epsilon")=1e-8), "Compares this WienerTrainer with the 'other' one to be approximately the same.")
+    .def("train", &py_train1, (arg("self"), arg("machine"), arg("data")), "Trains the provided WienerMachine with the given dataset.")
+    .def("train", &py_train2, (arg("self"), arg("data")), "Trains a WienerMachine using the given dataset to perform the filtering. This method returns the trained WienerMachine.")
     ;
 
 }

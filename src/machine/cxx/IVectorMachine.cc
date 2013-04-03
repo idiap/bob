@@ -104,7 +104,7 @@ bool bob::machine::IVectorMachine::operator==(const IVectorMachine& b) const
 
 bool bob::machine::IVectorMachine::operator!=(const bob::machine::IVectorMachine& b) const 
 {
-  return !(this->operator!=(b));
+  return !(this->operator==(b));
 }
 
 bool bob::machine::IVectorMachine::is_similar_to(const IVectorMachine& b,
