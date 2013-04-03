@@ -128,6 +128,11 @@ class DCT2D: public DCT2DAbstract
 {
   public:
     /**
+     * @brief Constructor
+     */ 
+    DCT2D();
+
+    /**
      * @brief Constructor: Initialize working arrays
      */ 
     DCT2D(const size_t height, const size_t width);
@@ -157,6 +162,11 @@ class DCT2D: public DCT2DAbstract
 class IDCT2D: public DCT2DAbstract
 {
   public:
+    /**
+     * @brief Constructor
+     */ 
+    IDCT2D();
+
     /**
      * @brief Constructor: Initialize working arrays
      */ 

@@ -71,6 +71,11 @@ void bob::sp::FFT1DAbstract::setLength(const size_t length)
 }
 
 
+bob::sp::FFT1D::FFT1D():
+  bob::sp::FFT1DAbstract(0)
+{
+}
+
 bob::sp::FFT1D::FFT1D(const size_t length):
   bob::sp::FFT1DAbstract(length)
 {
@@ -86,7 +91,7 @@ bob::sp::FFT1D::~FFT1D()
 }
 
 void bob::sp::FFT1D::operator()(const blitz::Array<std::complex<double>,1>& src, 
-  blitz::Array<std::complex<double>,1>& dst)
+  blitz::Array<std::complex<double>,1>& dst) const
 {
   // check input
   bob::core::array::assertCZeroBaseContiguous(src);
@@ -108,6 +113,11 @@ void bob::sp::FFT1D::operator()(const blitz::Array<std::complex<double>,1>& src,
 }
 
 
+bob::sp::IFFT1D::IFFT1D():
+  bob::sp::FFT1DAbstract(0)
+{
+}
+
 bob::sp::IFFT1D::IFFT1D(const size_t length):
   bob::sp::FFT1DAbstract(length)
 {
@@ -123,7 +133,7 @@ bob::sp::IFFT1D::~IFFT1D()
 }
 
 void bob::sp::IFFT1D::operator()(const blitz::Array<std::complex<double>,1>& src, 
-  blitz::Array<std::complex<double>,1>& dst)
+  blitz::Array<std::complex<double>,1>& dst) const
 {
   // check input
   bob::core::array::assertCZeroBaseContiguous(src);

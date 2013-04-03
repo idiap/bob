@@ -101,6 +101,11 @@ void bob::sp::DCT2DAbstract::initNormFactors()
 }
 
 
+bob::sp::DCT2D::DCT2D():
+  bob::sp::DCT2DAbstract(0, 0)
+{
+}
+
 bob::sp::DCT2D::DCT2D(const size_t height, const size_t width):
   bob::sp::DCT2DAbstract(height, width)
 {
@@ -142,6 +147,11 @@ void bob::sp::DCT2D::operator()(const blitz::Array<double,2>& src,
       dst(i,j) = dst(i,j)/4.*(i==0?m_sqrt_1h:m_sqrt_2h)*(j==0?m_sqrt_1w:m_sqrt_2w);
 }
 
+
+bob::sp::IDCT2D::IDCT2D():
+  bob::sp::DCT2DAbstract::DCT2DAbstract(0,0)
+{
+}
 
 bob::sp::IDCT2D::IDCT2D(const size_t height, const size_t width):
   bob::sp::DCT2DAbstract::DCT2DAbstract(height, width)

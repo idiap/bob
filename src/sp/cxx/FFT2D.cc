@@ -25,7 +25,6 @@
 #include <bob/core/assert.h>
 #include <fftw3.h>
 
-
 bob::sp::FFT2DAbstract::FFT2DAbstract(const size_t height, const size_t width):
   m_height(height), m_width(width)
 {
@@ -66,6 +65,10 @@ void bob::sp::FFT2DAbstract::reset(const size_t height, const size_t width)
   m_width = width;
 }
 
+bob::sp::FFT2D::FFT2D():
+  bob::sp::FFT2DAbstract(0,0)
+{
+}
 
 bob::sp::FFT2D::FFT2D(const size_t height, const size_t width):
   bob::sp::FFT2DAbstract(height, width)
@@ -82,7 +85,7 @@ bob::sp::FFT2D::~FFT2D()
 }
 
 void bob::sp::FFT2D::operator()(const blitz::Array<std::complex<double>,2>& src, 
-  blitz::Array<std::complex<double>,2>& dst)
+  blitz::Array<std::complex<double>,2>& dst) const
 {
   // check input
   bob::core::array::assertCZeroBaseContiguous(src);
@@ -104,7 +107,7 @@ void bob::sp::FFT2D::operator()(const blitz::Array<std::complex<double>,2>& src,
 }
 
 
-void bob::sp::FFT2D::operator()(blitz::Array<std::complex<double>,2>& src_dst)
+void bob::sp::FFT2D::operator()(blitz::Array<std::complex<double>,2>& src_dst) const
 {
   // check data
   bob::core::array::assertCZeroBaseContiguous(src_dst);
@@ -121,6 +124,11 @@ void bob::sp::FFT2D::operator()(blitz::Array<std::complex<double>,2>& src_dst)
 }
 
 
+bob::sp::IFFT2D::IFFT2D():
+  bob::sp::FFT2DAbstract(0,0)
+{
+}
+
 bob::sp::IFFT2D::IFFT2D(const size_t height, const size_t width):
   bob::sp::FFT2DAbstract(height, width)
 {
@@ -136,7 +144,7 @@ bob::sp::IFFT2D::~IFFT2D()
 }
 
 void bob::sp::IFFT2D::operator()(const blitz::Array<std::complex<double>,2>& src, 
-  blitz::Array<std::complex<double>,2>& dst)
+  blitz::Array<std::complex<double>,2>& dst) const
 {
   // check input
   bob::core::array::assertCZeroBaseContiguous(src);
@@ -161,7 +169,7 @@ void bob::sp::IFFT2D::operator()(const blitz::Array<std::complex<double>,2>& src
   dst /= static_cast<double>(m_width*m_height);
 }
 
-void bob::sp::IFFT2D::operator()(blitz::Array<std::complex<double>,2>& src_dst)
+void bob::sp::IFFT2D::operator()(blitz::Array<std::complex<double>,2>& src_dst) const
 {
   // check data
   bob::core::array::assertCZeroBaseContiguous(src_dst);

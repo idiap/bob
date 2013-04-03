@@ -75,7 +75,7 @@ class FFT1DAbstract
      * @brief process an array by applying the FFT
      */
     virtual void operator()(const blitz::Array<std::complex<double>,1>& src, 
-      blitz::Array<std::complex<double>,1>& dst) = 0;
+      blitz::Array<std::complex<double>,1>& dst) const = 0;
 
     /**
      * @brief Reset the FFT1D object for the given 1D shape
@@ -107,6 +107,11 @@ class FFT1D: public FFT1DAbstract
 {
   public:
     /**
+     * @brief Constructor
+     */ 
+    FFT1D();
+
+    /**
      * @brief Constructor: Initialize working arrays
      */ 
     FFT1D(const size_t length);
@@ -125,7 +130,7 @@ class FFT1D: public FFT1DAbstract
      * @brief process an array by applying the direct FFT
      */
     virtual void operator()(const blitz::Array<std::complex<double>,1>& src, 
-      blitz::Array<std::complex<double>,1>& dst);
+      blitz::Array<std::complex<double>,1>& dst) const;
 };
 
 
@@ -136,6 +141,11 @@ class FFT1D: public FFT1DAbstract
 class IFFT1D: public FFT1DAbstract
 {
   public:
+    /**
+     * @brief Constructor
+     */ 
+    IFFT1D();
+
     /**
      * @brief Constructor: Initialize working array
      */ 
@@ -155,7 +165,7 @@ class IFFT1D: public FFT1DAbstract
      * @brief process an array by applying the inverse FFT
      */
     virtual void operator()(const blitz::Array<std::complex<double>,1>& src, 
-      blitz::Array<std::complex<double>,1>& dst);
+      blitz::Array<std::complex<double>,1>& dst) const;
 };
 
 /**

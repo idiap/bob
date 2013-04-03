@@ -126,6 +126,11 @@ class DCT1D: public DCT1DAbstract
 {
   public:
     /**
+     * @brief Constructor
+     */ 
+    DCT1D();
+
+    /**
      * @brief Constructor: Initialize working arrays
      */ 
     DCT1D(const size_t length);
@@ -155,6 +160,11 @@ class DCT1D: public DCT1DAbstract
 class IDCT1D: public DCT1DAbstract
 {
   public:
+    /**
+     * @brief Constructor
+     */ 
+    IDCT1D();
+
     /**
      * @brief Constructor: Initialize working array
      */ 

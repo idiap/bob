@@ -74,12 +74,12 @@ class FFT2DAbstract
      * @brief process an array by applying the FFT
      */
     virtual void operator()(const blitz::Array<std::complex<double>,2>& src, 
-      blitz::Array<std::complex<double>,2>& dst) = 0;
+      blitz::Array<std::complex<double>,2>& dst) const = 0;
 
     /**
      * @brief process an array by applying the FFT inplace
      */
-    virtual void operator()(blitz::Array<std::complex<double>,2>& src_dst) = 0;
+    virtual void operator()(blitz::Array<std::complex<double>,2>& src_dst) const = 0;
 
     /**
      * @brief Reset the FFT2D object for the given 2D shape
@@ -115,6 +115,11 @@ class FFT2D: public FFT2DAbstract
 {
   public:
     /**
+     * @brief Constructor
+     */ 
+    FFT2D();
+
+    /**
      * @brief Constructor: Initialize working arrays
      */ 
     FFT2D(const size_t height, const size_t width);
@@ -133,12 +138,12 @@ class FFT2D: public FFT2DAbstract
      * @brief process an array by applying the direct FFT
      */
     virtual void operator()(const blitz::Array<std::complex<double>,2>& src, 
-      blitz::Array<std::complex<double>,2>& dst);
+      blitz::Array<std::complex<double>,2>& dst) const;
 
     /**
      * @brief process an array by applying the FFT inplace
      */
-    virtual void operator()(blitz::Array<std::complex<double>,2>& src_dst);
+    virtual void operator()(blitz::Array<std::complex<double>,2>& src_dst) const;
 };
 
 
@@ -149,6 +154,11 @@ class FFT2D: public FFT2DAbstract
 class IFFT2D: public FFT2DAbstract
 {
   public:
+    /**
+     * @brief Constructor
+     */ 
+    IFFT2D();
+
     /**
      * @brief Constructor: Initialize working arrays
      */ 
@@ -168,12 +178,12 @@ class IFFT2D: public FFT2DAbstract
      * @brief process an array by applying the inverse FFT
      */
     virtual void operator()(const blitz::Array<std::complex<double>,2>& src, 
-      blitz::Array<std::complex<double>,2>& dst);
+      blitz::Array<std::complex<double>,2>& dst) const;
 
     /**
      * @brief process an array by applying the inverse FFT inplace
      */
-    virtual void operator()(blitz::Array<std::complex<double>,2>& src_dst);
+    virtual void operator()(blitz::Array<std::complex<double>,2>& src_dst) const;
 };
 
 /**

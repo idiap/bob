@@ -92,6 +92,11 @@ void bob::sp::DCT1DAbstract::initNormFactors()
 }
 
 
+bob::sp::DCT1D::DCT1D():
+  bob::sp::DCT1DAbstract(0)
+{
+}
+
 bob::sp::DCT1D::DCT1D( const size_t length):
   bob::sp::DCT1DAbstract(length)
 {
@@ -135,6 +140,11 @@ void bob::sp::DCT1D::operator()(const blitz::Array<double,1>& src,
   }
 }
 
+
+bob::sp::IDCT1D::IDCT1D():
+  bob::sp::DCT1DAbstract(0)
+{
+}
 
 bob::sp::IDCT1D::IDCT1D(const size_t length):
   bob::sp::DCT1DAbstract(length)
