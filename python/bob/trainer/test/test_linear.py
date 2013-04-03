@@ -209,10 +209,22 @@ class LinearTest(unittest.TestCase):
                             [0.693459921529905,  0.571417184139332,  1.800117179839927]])
     sample_whitened_ref = numpy.array([5.942255453628436, 4.984316201643742, 4.739998188373740])
     
-    # Runs whitening
+    # Runs whitening (first method)
     t = bob.trainer.WhiteningTrainer()
     m = bob.machine.LinearMachine(3,3)
     t.train(m, data)
+    s = m.forward(sample)
+
+    # Makes sure results are good
+    eps = 1e-4
+    self.assertTrue( numpy.allclose(m.input_subtract, mean_ref, eps, eps) )
+    self.assertTrue( numpy.allclose(m.weights, whit_ref, eps, eps) )
+    self.assertTrue( numpy.allclose(s, sample_whitened_ref, eps, eps) )
+
+
+    # Runs whitening (second method)
+    t = bob.trainer.WhiteningTrainer()
+    m = t.train(data)
     s = m.forward(sample)
 
     # Makes sure results are good

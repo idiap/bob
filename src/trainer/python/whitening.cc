@@ -26,11 +26,21 @@
 
 using namespace boost::python;
 
-void py_train(bob::trainer::WhiteningTrainer& t, bob::machine::LinearMachine& m,
-  bob::python::const_ndarray data)
+void py_train1(bob::trainer::WhiteningTrainer& t, 
+  bob::machine::LinearMachine& m, bob::python::const_ndarray data)
 {
   const blitz::Array<double,2> data_ = data.bz<double,2>();
   t.train(m, data_);
+}
+
+object py_train2(bob::trainer::WhiteningTrainer& t, 
+  bob::python::const_ndarray data)
+{
+  const blitz::Array<double,2> data_ = data.bz<double,2>();
+  const int n_features = data_.extent(1);
+  bob::machine::LinearMachine m(n_features,n_features);
+  t.train(m, data_);
+  return object(m);
 }
 
 void bind_trainer_whitening() 
@@ -40,6 +50,7 @@ void bind_trainer_whitening()
     .def(self == self)
     .def(self != self)
     .def("is_similar_to", &bob::trainer::WhiteningTrainer::is_similar_to, (arg("self"), arg("other"), arg("r_epsilon")=1e-5, arg("a_epsilon")=1e-8), "Compares this WhiteningTrainer with the 'other' one to be approximately the same.")
-    .def("train", &py_train, (arg("self"), arg("machine"), arg("data")), "Trains the LinearMachine to perform the Whitening.")
+    .def("train", &py_train1, (arg("self"), arg("machine"), arg("data")), "Trains the LinearMachine to perform the Whitening, given a training set.")
+    .def("train", &py_train2, (arg("self"), arg("data")), "Allocates, trains and returns a LinearMachine to perform the Whitening, given a training set.")
   ;
 }
