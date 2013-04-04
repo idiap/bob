@@ -75,6 +75,93 @@ bool isClose(const std::complex<T>& left, const std::complex<T>& right,
   return (diff <= (a_epsilon + r_epsilon * min));
 }
 
+
+/**
+ * @brief Checks that two vectors of floating point values are close.
+ */
+template <typename T>
+bool isClose(const std::vector<T>& left, const std::vector<T>& right,
+  const T& r_epsilon=1e-5, const T& a_epsilon=1e-8)
+{
+  if (left.size() != right.size())
+    return false;
+
+  typename std::vector<T>::const_iterator itl, itr;
+  for (itl = left.begin(), itr = right.begin(); 
+       itl != left.end() && itr != right.end(); ++itl, ++itr)
+    if (!isClose(*itl, *itr, r_epsilon, a_epsilon))
+      return false;
+
+  return true;
+}
+
+/**
+ * @brief Checks that two vectors of complex floating point values are close.
+ */
+template <typename T>
+bool isClose(const std::vector<std::complex<T> >& left,
+  std::vector<std::complex<T> >& right,
+  const T& r_epsilon=1e-5, const T& a_epsilon=1e-8)
+{
+  if (left.size() != right.size())
+    return false;
+
+  typename std::vector<std::complex<T> >::const_iterator itl, itr;
+  for (itl = left.begin(), itr = right.begin(); 
+       itl != left.end() && itr != right.end(); ++itl, ++itr)
+    if (!isClose(*itl, *itr, r_epsilon, a_epsilon))
+      return false;
+
+  return true;
+}
+
+/**
+ * @brief Checks that two maps of floating point values are close. 
+ */
+template <typename K, typename T>
+bool isClose(const std::map<K,T>& left, 
+  const std::map<K,T>& right,
+  const T& r_epsilon=1e-5, const T& a_epsilon=1e-8)
+{
+  if (left.size() != right.size())
+    return false;
+
+  typename std::map<K,T>::const_iterator it, temp;
+  for (it = left.begin(); it != left.end(); ++it)
+  {
+    temp = right.find(it->first);
+    if (temp == right.end()) return false;
+    if (!isClose(it->second, temp->second, r_epsilon, a_epsilon)) return false;
+  }
+
+  return true;
+}
+
+
+/**
+ * @brief Checks that two maps of complex floating point values are close. 
+ */
+template <typename K, typename T>
+bool isClose(const std::map<K, std::complex<T> >& left, 
+  const std::map<K, std::complex<T> >& right,
+  const T& r_epsilon=1e-5, const T& a_epsilon=1e-8)
+{
+  if (left.size() != right.size())
+    return false;
+
+  typename std::map<K, std::complex<T> >::const_iterator it, temp;
+  for (it = left.begin(); it != left.end(); ++it)
+  {
+    temp = right.find(it->first);
+    if (temp == right.end()) return false;
+    if (!isClose(it->second, temp->second, r_epsilon, a_epsilon)) return false;
+  }
+
+  return true;
+}
+
+
+
 /**
  * @}
  */
@@ -398,7 +485,7 @@ bool isClose(const blitz::Array<std::complex<T>,4>& left,
  */
 template <typename T, int D>
 bool isClose(const std::vector<blitz::Array<T,D> >& left,
-  std::vector<blitz::Array<T,D> >& right,
+  const std::vector<blitz::Array<T,D> >& right,
   const T& r_epsilon=1e-5, const T& a_epsilon=1e-8)
 {
   if (left.size() != right.size())
@@ -443,7 +530,7 @@ bool isClose(const std::map<K, blitz::Array<T,D> >& left,
  */
 template <typename T, int D>
 bool isClose(const std::vector<blitz::Array<std::complex<T>,D> >& left,
-  std::vector<blitz::Array<std::complex<T>,D> >& right,
+  const std::vector<blitz::Array<std::complex<T>,D> >& right,
   const T& r_epsilon=1e-5, const T& a_epsilon=1e-8)
 {
   if (left.size() != right.size())
@@ -502,7 +589,7 @@ bool isEqual(const blitz::Array<T,D>& left, const blitz::Array<T,D>& right)
  */
 template <typename T, int D>
 bool isEqual(const std::vector<blitz::Array<T,D> >& left,
-  std::vector<blitz::Array<T,D> >& right)
+  const std::vector<blitz::Array<T,D> >& right)
 {
   if (left.size() != right.size())
     return false;

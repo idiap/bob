@@ -274,6 +274,33 @@ BOOST_AUTO_TEST_CASE( test_check_close_vector_map_complex )
   map_b[0].reference(bob::core::array::ccopy(x1b));
   BOOST_CHECK( bob::core::array::isClose( map_a, map_b) );
   BOOST_CHECK( !bob::core::array::isClose( map_a, map_b, 1e-15, 1e-15) );
+
+  // Vectors of scalars
+  std::vector<std::complex<double> > vec_aa, vec_bb;
+  BOOST_CHECK( bob::core::isClose( vec_aa, vec_bb) );
+  vec_aa.push_back(x1a(0));
+  vec_aa.push_back(x1a(1));
+  vec_bb.push_back(x1b(0));
+  vec_bb.push_back(x1b(1));
+  BOOST_CHECK( !bob::core::isClose( vec_aa, vec_bb, 1e-15, 1e-15) );
+  BOOST_CHECK( bob::core::isClose( vec_aa, vec_bb) );
+
+  // Maps of scalars
+  std::map<int, std::complex<double> > map_aa, map_bb;
+  BOOST_CHECK( bob::core::isClose( map_aa, map_bb) );
+  map_aa[0] = x1a(0);
+  map_aa[2] = x1a(1);
+  map_bb[1] = x1b(0);
+  map_bb[2] = x1b(1);
+  BOOST_CHECK( !bob::core::isClose( map_aa, map_bb) );
+  map_aa.clear();
+  map_bb.clear();
+  map_aa[0] = x1a(0);
+  map_aa[2] = x1a(1);
+  map_bb[0] = x1b(0);
+  map_bb[2] = x1b(1);
+  BOOST_CHECK( bob::core::isClose( map_aa, map_bb) );
+  BOOST_CHECK( !bob::core::isClose( map_aa, map_bb, 1e-15, 1e-15) );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
