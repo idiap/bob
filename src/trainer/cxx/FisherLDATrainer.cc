@@ -26,19 +26,45 @@
 #include <bob/core/blitz_compat.h>
 #include <bob/math/eig.h>
 #include <bob/math/linear.h>
+#include <bob/machine/Exception.h>
 #include <bob/trainer/Exception.h>
 #include <bob/trainer/FisherLDATrainer.h>
 
-bob::trainer::FisherLDATrainer::FisherLDATrainer() { }
+bob::trainer::FisherLDATrainer::FisherLDATrainer()
+{
+}
 
 bob::trainer::FisherLDATrainer::FisherLDATrainer(const bob::trainer::FisherLDATrainer& other)
-{ }
+{
+}
 
-bob::trainer::FisherLDATrainer::~FisherLDATrainer() {}
+bob::trainer::FisherLDATrainer::~FisherLDATrainer()
+{
+}
 
 bob::trainer::FisherLDATrainer& bob::trainer::FisherLDATrainer::operator=
-(const bob::trainer::FisherLDATrainer& other) {
+  (const bob::trainer::FisherLDATrainer& other)
+{
   return *this;
+}
+
+bool bob::trainer::FisherLDATrainer::operator==
+  (const bob::trainer::FisherLDATrainer& other) const
+{
+  return true;
+}
+
+bool bob::trainer::FisherLDATrainer::operator!=
+  (const bob::trainer::FisherLDATrainer& other) const
+{
+  return !(this->operator==(other));
+}
+
+bool bob::trainer::FisherLDATrainer::is_similar_to
+  (const bob::trainer::FisherLDATrainer& other, const double r_epsilon,
+   const double a_epsilon) const
+{
+  return true;
 }
 
 /**
@@ -46,10 +72,10 @@ bob::trainer::FisherLDATrainer& bob::trainer::FisherLDATrainer::operator=
  * class means 'm_k' and computes the total number of elements in each class
  * 'N'.
  */
-static void evalMeans (const std::vector<blitz::Array<double,2> >& data,
-    blitz::Array<double,1>& m, blitz::Array<double,2>& m_k,
-    blitz::Array<double,1>& N) {
-
+static void evalMeans(const std::vector<blitz::Array<double,2> >& data,
+  blitz::Array<double,1>& m, blitz::Array<double,2>& m_k,
+  blitz::Array<double,1>& N)
+{
   blitz::Range a = blitz::Range::all();
   for (size_t k=0; k<data.size(); ++k) { //class loop
     N(k) = data[k].extent(0);
@@ -74,9 +100,9 @@ static void evalMeans (const std::vector<blitz::Array<double,2> >& data,
  *
  * This code is useless out of a testing scenario.
  */
-static void evalTotalScatter (const std::vector<blitz::Array<double, 2> >& data,
-    blitz::Array<double,1>& m, blitz::Array<double,2>& St) {
-
+static void evalTotalScatter(const std::vector<blitz::Array<double, 2> >& data,
+    blitz::Array<double,1>& m, blitz::Array<double,2>& St)
+{
   int n_features = data[0].extent(1);
   blitz::Array<double,1> buffer(n_features);
 
@@ -115,10 +141,10 @@ static void evalTotalScatter (const std::vector<blitz::Array<double, 2> >& data,
  * This method was designed based on the previous design at bob3Vision 2.1,
  * by SM.
  */
-static void evalScatters (const std::vector<blitz::Array<double, 2> >& data,
-    blitz::Array<double,1>& m,
-    blitz::Array<double,2>& Sw, blitz::Array<double,2>& Sb) {
-  
+static void evalScatters(const std::vector<blitz::Array<double, 2> >& data,
+  blitz::Array<double,1>& m,
+  blitz::Array<double,2>& Sw, blitz::Array<double,2>& Sb)
+{  
   // checks for data shape should have been done before...
   int n_features = data[0].extent(1);
 
@@ -163,9 +189,9 @@ static void evalScatters (const std::vector<blitz::Array<double, 2> >& data,
 }
 
 void bob::trainer::FisherLDATrainer::train(bob::machine::LinearMachine& machine,
-    blitz::Array<double,1>& eigen_values,
-    const std::vector<blitz::Array<double, 2> >& data) const {
-
+  blitz::Array<double,1>& eigen_values,
+  const std::vector<blitz::Array<double, 2> >& data)
+{
   // if #classes < 2, then throw
   if (data.size() < 2) throw bob::trainer::WrongNumberOfClasses(data.size());
 
@@ -179,6 +205,19 @@ void bob::trainer::FisherLDATrainer::train(bob::machine::LinearMachine& machine,
     }
   }
 
+  // Checks that the dimensions are matching 
+  const int n_inputs = (int)machine.inputSize();
+  const int n_outputs = (int)machine.outputSize();
+  const int n_eigenvalues = eigen_values.extent(0);
+
+  // Checks that the dimensions are matching
+  if (n_inputs != n_features)
+    throw bob::machine::NInputsMismatch(n_inputs, n_features);
+  if (n_outputs != n_features-1)
+    throw bob::machine::NOutputsMismatch(n_outputs, n_features-1);
+  if (n_eigenvalues != n_features-1)
+    throw bob::machine::NOutputsMismatch(n_eigenvalues, n_features-1);
+
   blitz::Array<double,1> preMean(n_features);
   blitz::Array<double,2> Sw(n_features, n_features);
   blitz::Array<double,2> Sb(n_features, n_features);
@@ -187,17 +226,17 @@ void bob::trainer::FisherLDATrainer::train(bob::machine::LinearMachine& machine,
   // computes the generalized eigenvalue decomposition 
   // so to find the eigen vectors/values of Sw^(-1) * Sb
   blitz::Array<double,2> V(n_features, n_features);
-  eigen_values.resize(n_features);
+  blitz::Array<double,1> eigen_values_(n_features);
   // eigSym returned the eigen_values in chronological order
   // reverts the vector and matrix before and after calling eig
-  eigen_values.reverseSelf(0);
+  eigen_values_.reverseSelf(0);
   V.reverseSelf(1);
-  eigen_values = 0;
-  bob::math::eigSym(Sb, Sw, V, eigen_values);
+  eigen_values_ = 0;
+  bob::math::eigSym(Sb, Sw, V, eigen_values_);
   // Convert ascending order to descending order
-  eigen_values.reverseSelf(0);
+  eigen_values_.reverseSelf(0);
   V.reverseSelf(1);
-  eigen_values.resizeAndPreserve(n_features-1);
+  eigen_values = eigen_values_(blitz::Range(0,n_features-2));
 
   // updates the machine
   V.resizeAndPreserve(V.extent(0), V.extent(1)-1);
@@ -207,7 +246,6 @@ void bob::trainer::FisherLDATrainer::train(bob::machine::LinearMachine& machine,
     math::normalizeSelf(V(a,column));
   }
 
-  machine.resize(n_features, n_features-1);
   machine.setWeights(V);
   machine.setInputSubtraction(preMean);
   // also set input_div and biases to neutral values...
@@ -216,7 +254,8 @@ void bob::trainer::FisherLDATrainer::train(bob::machine::LinearMachine& machine,
 }
 
 void bob::trainer::FisherLDATrainer::train(bob::machine::LinearMachine& machine,
-    const std::vector<blitz::Array<double,2> >& data) const {
-  blitz::Array<double,1> throw_away;
+    const std::vector<blitz::Array<double,2> >& data)
+{
+  blitz::Array<double,1> throw_away(data[0].extent(1)-1);
   train(machine, throw_away, data);
 }

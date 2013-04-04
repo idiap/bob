@@ -186,6 +186,24 @@ class LinearTest(unittest.TestCase):
     self.assertTrue( (abs(eig_vals[0:1] - exp_val[0:1]) < 1e-6).all() )
     self.assertTrue( (abs(machine.weights[:,0] - exp_mach[:,0]) < 1e-6).all() )
 
+  def test02c_fisher_lda_comparisons(self):
+
+    # Constructors and comparison operators
+    t1 = bob.trainer.FisherLDATrainer()
+    t2 = bob.trainer.FisherLDATrainer()
+    t3 = bob.trainer.FisherLDATrainer(t2)
+    t4 = t3
+    self.assertTrue( t1 == t2)
+    self.assertFalse( t1 != t2)
+    self.assertTrue( t1.is_similar_to(t2) )
+    self.assertTrue( t1 == t3)
+    self.assertFalse( t1 != t3)
+    self.assertTrue( t1.is_similar_to(t3) )
+    self.assertTrue( t1 == t4)
+    self.assertFalse( t1 != t4)
+    self.assertTrue( t1.is_similar_to(t4) )
+
+
   def test03_ppca(self):
 
     # Tests our Probabilistic PCA trainer for linear machines for a simple 
@@ -202,8 +220,8 @@ class LinearTest(unittest.TestCase):
     exp_llh2 =  -30.8559
    
     # Do two iterations of EM to check the training procedure 
-    T = bob.trainer.EMPCATrainer(2)
-    m = bob.machine.LinearMachine()
+    T = bob.trainer.EMPCATrainer()
+    m = bob.machine.LinearMachine(3,2)
     # Initialization of the trainer
     T.initialization(m, ar)
     # Sets ('random') initialization values for test purposes
