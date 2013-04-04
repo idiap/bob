@@ -122,16 +122,6 @@ class IVectorTrainer: public bob::trainer::EMTrainer<bob::machine::IVectorMachin
     bool is_similar_to(const IVectorTrainer& b, const double r_epsilon=1e-5,
       const double a_epsilon=1e-8) const;
 
-    /** 
-     * @brief Sets the Random Number Generator
-     */
-    void setRng(const boost::shared_ptr<boost::mt19937> rng) { m_rng = rng; }
-
-    /** 
-     * @brief Gets the Random Number Generator
-     */
-    const boost::shared_ptr<boost::mt19937> getRng() const { return m_rng; }
-
     /**
      * @brief Getters for the accumulators
      */
@@ -164,7 +154,6 @@ class IVectorTrainer: public bob::trainer::EMTrainer<bob::machine::IVectorMachin
   protected:
     // Attributes
     bool m_update_sigma;
-    boost::shared_ptr<boost::mt19937> m_rng;
 
     // Acccumulators
     blitz::Array<double,3> m_acc_Nij_wij2;

@@ -30,6 +30,8 @@
 #include <limits>
 #include <bob/core/check.h>
 #include <bob/core/logging.h>
+#include <boost/shared_ptr.hpp>
+#include <boost/random.hpp>
 
 
 namespace bob { namespace trainer {
@@ -62,6 +64,7 @@ namespace bob { namespace trainer {
         m_compute_likelihood = other.m_compute_likelihood;
         m_convergence_threshold = other.m_convergence_threshold;
         m_max_iterations = other.m_max_iterations;
+        m_rng = other.m_rng;
       }
       return *this;
     }
@@ -72,7 +75,8 @@ namespace bob { namespace trainer {
     virtual bool operator==(const EMTrainer& b) const {
       return m_compute_likelihood == b.m_compute_likelihood &&
              m_convergence_threshold == b.m_convergence_threshold &&
-             m_max_iterations == b.m_max_iterations;
+             m_max_iterations == b.m_max_iterations &&
+             m_rng == b.m_rng;
     }
 
     /**
@@ -90,7 +94,8 @@ namespace bob { namespace trainer {
     {
       return m_compute_likelihood == b.m_compute_likelihood &&
              bob::core::isClose(m_convergence_threshold, b.m_convergence_threshold, r_epsilon, a_epsilon) &&
-             m_max_iterations == b.m_max_iterations;
+             m_max_iterations == b.m_max_iterations &&
+             m_rng == b.m_rng;
     }
 
     /**
@@ -230,10 +235,23 @@ namespace bob { namespace trainer {
       return m_max_iterations;
     }
 
+    /** 
+     * @brief Sets the Random Number Generator
+     */
+    void setRng(const boost::shared_ptr<boost::mt19937> rng)
+    { m_rng = rng; }
+
+    /** 
+     * @brief Gets the Random Number Generator
+     */
+    const boost::shared_ptr<boost::mt19937> getRng() const
+    { return m_rng; }
+
   protected:
     bool m_compute_likelihood; ///< whether lilelihood is computed during the EM loop or not
     double m_convergence_threshold; ///< convergence threshold
     size_t m_max_iterations; ///< maximum number of EM iterations
+    boost::shared_ptr<boost::mt19937> m_rng; ///< The random number generator for the inialization
 
     /**
      * @brief Protected constructor to be called in the constructor of derived
@@ -243,7 +261,8 @@ namespace bob { namespace trainer {
         size_t max_iterations = 10, bool compute_likelihood = true):
       m_compute_likelihood(compute_likelihood), 
       m_convergence_threshold(convergence_threshold), 
-      m_max_iterations(max_iterations) 
+      m_max_iterations(max_iterations),
+      m_rng(new boost::mt19937())
     {
     }
   };

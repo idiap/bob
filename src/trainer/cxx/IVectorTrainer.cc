@@ -36,15 +36,14 @@ bob::trainer::IVectorTrainer::IVectorTrainer(const bool update_sigma,
   bob::trainer::EMTrainer<bob::machine::IVectorMachine, 
     std::vector<bob::machine::GMMStats> >(convergence_threshold,
       max_iterations, compute_likelihood), 
-  m_update_sigma(update_sigma),
-  m_rng(boost::shared_ptr<boost::mt19937>(new boost::mt19937()))
+  m_update_sigma(update_sigma)
 {
 }
 
 bob::trainer::IVectorTrainer::IVectorTrainer(const bob::trainer::IVectorTrainer& other):
   bob::trainer::EMTrainer<bob::machine::IVectorMachine, 
     std::vector<bob::machine::GMMStats> >(other),
-  m_update_sigma(other.m_update_sigma), m_rng(other.m_rng)
+  m_update_sigma(other.m_update_sigma)
 {
   m_acc_Nij_wij2.reference(bob::core::array::ccopy(other.m_acc_Nij_wij2));
   m_acc_Fnormij_wij.reference(bob::core::array::ccopy(other.m_acc_Fnormij_wij));
@@ -214,7 +213,6 @@ bob::trainer::IVectorTrainer& bob::trainer::IVectorTrainer::operator=
     bob::trainer::EMTrainer<bob::machine::IVectorMachine,
       std::vector<bob::machine::GMMStats> >::operator=(other);
     m_update_sigma = other.m_update_sigma;
-    m_rng = other.m_rng;
 
     m_acc_Nij_wij2.reference(bob::core::array::ccopy(other.m_acc_Nij_wij2));
     m_acc_Fnormij_wij.reference(bob::core::array::ccopy(other.m_acc_Fnormij_wij));
@@ -239,7 +237,6 @@ bool bob::trainer::IVectorTrainer::operator==
   return bob::trainer::EMTrainer<bob::machine::IVectorMachine,
            std::vector<bob::machine::GMMStats> >::operator==(other) &&
         m_update_sigma == other.m_update_sigma &&
-        m_rng == other.m_rng &&
         bob::core::array::isEqual(m_acc_Nij_wij2, other.m_acc_Nij_wij2) &&
         bob::core::array::isEqual(m_acc_Fnormij_wij, other.m_acc_Fnormij_wij) &&
         bob::core::array::isEqual(m_acc_Nij, other.m_acc_Nij) &&
@@ -259,7 +256,6 @@ bool bob::trainer::IVectorTrainer::is_similar_to
   return bob::trainer::EMTrainer<bob::machine::IVectorMachine,
            std::vector<bob::machine::GMMStats> >::is_similar_to(other, r_epsilon, a_epsilon) &&
         m_update_sigma == other.m_update_sigma &&
-        m_rng == other.m_rng &&
         bob::core::array::isClose(m_acc_Nij_wij2, other.m_acc_Nij_wij2, r_epsilon, a_epsilon) &&
         bob::core::array::isClose(m_acc_Fnormij_wij, other.m_acc_Fnormij_wij, r_epsilon, a_epsilon) &&
         bob::core::array::isClose(m_acc_Nij, other.m_acc_Nij, r_epsilon, a_epsilon) &&

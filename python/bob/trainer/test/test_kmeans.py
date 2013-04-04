@@ -182,9 +182,10 @@ class KMeansTest(unittest.TestCase):
     # Check comparison operators
     trainer1 = bob.trainer.KMeansTrainer()
     trainer2 = bob.trainer.KMeansTrainer()
+    trainer1.rng = trainer2.rng
     self.assertTrue( trainer1 == trainer2)
     self.assertFalse( trainer1 != trainer2)
-    trainer1.seed = 1337
+    trainer1.max_iterations = 1337
     self.assertFalse( trainer1 == trainer2)
     self.assertTrue( trainer1 != trainer2)
 
