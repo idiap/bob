@@ -24,181 +24,187 @@
 #ifndef BOB_TRAINER_EMPCA_TRAINER_H
 #define BOB_TRAINER_EMPCA_TRAINER_H
 
-#include <blitz/array.h>
-#include <bob/trainer/EMTrainer.h>
+#include "EMTrainer.h"
 #include <bob/machine/LinearMachine.h>
+#include <blitz/array.h>
 
 namespace bob { namespace trainer {
-  /**
-   * @ingroup TRAINER
-   * @{
-   */
-  
-  /**
-    * Sets a linear machine to perform Expectation Maximization on a
-    * given dataset. References:
-    *  1. "Probabilistic Principal Component Analysis", 
-    *     Michael Tipping and Christopher Bishop,
-    *     Journal of the Royal Statistical Society,
-    *      Series B, 61, Part 3, pp. 611–622
-    *  2. "EM Algorithms for PCA and SPCA", 
-    *     Sam Roweis, Neural Information Processing Systems 10 (NIPS'97), 
-    *     pp.626-632 (Sensible Principal Component Analysis part)
-    *
-    * Notations used are the ones from reference 1.
-    * The probabilistic model is given by: t = W x + mu + epsilon
-    *  - t is the observed data (dimension f)
-    *  - W is a projection matrix (dimension f x d)
-    *  - x is the projected data (dimension d < f)
-    *  - mu is the mean of the data (dimension f)
-    *  - epsilon is the noise of the data (dimension f)
-    *      Gaussian with zero-mean and covariance matrix sigma^2 * Id
-    */
-  class EMPCATrainer: public EMTrainer<bob::machine::LinearMachine, 
-                                          blitz::Array<double,2> > 
-  {
-    public: //api
-      /**
-        * Initializes a new EM PCA trainer. The training stage will place the
-        * resulting components in the linear machine and set it up to
-        * extract the variable means automatically. 
-        */
-      EMPCATrainer(int dimensionality, double convergence_threshold=0.001, 
-        int max_iterations=10, bool compute_likelihood=true); 
+/**
+ * @ingroup TRAINER
+ * @{
+ */
 
-      /**
-        * Copy constructor
-        */
-      EMPCATrainer(const EMPCATrainer& other);
+/**
+ * @brief Trains a linear machine using an Expectation-Maximization algorithm
+ * on the given dataset.\n
+ * References:\n
+ *  1. "Probabilistic Principal Component Analysis", 
+ *     Michael Tipping and Christopher Bishop,
+ *     Journal of the Royal Statistical Society,
+ *      Series B, 61, Part 3, pp. 611–622\n
+ *  2. "EM Algorithms for PCA and SPCA", 
+ *     Sam Roweis, Neural Information Processing Systems 10 (NIPS'97), 
+ *     pp.626-632 (Sensible Principal Component Analysis part)\n
+ *
+ * Notations used are the ones from reference 1.\n
+ * The probabilistic model is given by: \f$t = W x + \mu + \epsilon\f$\n
+ *  - \f$t\f$ is the observed data (dimension \f$f\f$)\n
+ *  - \f$W\f$ is a  projection matrix (dimension \f$f \times d\f$)\n
+ *  - \f$x\f$ is the projected data (dimension \f$d < f\f$)\n
+ *  - \f$\mu\f$ is the mean of the data (dimension \f$f\f$)\n
+ *  - \f$\epsilon\f$ is the noise of the data (dimension \f$f\f$)
+ *      Gaussian with zero-mean and covariance matrix \f$\sigma^2 Id\f$
+ */
+class EMPCATrainer: public EMTrainer<bob::machine::LinearMachine, blitz::Array<double,2> >
+{
+  public: //api
+    /**
+     * @brief Initializes a new EM PCA trainer. The training stage will place the
+     * resulting components in the linear machine and set it up to
+     * extract the variable means automatically. 
+     */
+    EMPCATrainer(double convergence_threshold=0.001, 
+      size_t max_iterations=10, bool compute_likelihood=true); 
 
-      /**
-        * (virtual) Destructor
-        */
-      virtual ~EMPCATrainer();
+    /**
+     * @brief Copy constructor
+     */
+    EMPCATrainer(const EMPCATrainer& other);
 
-      /**
-        * Copy operator
-        */
-      EMPCATrainer& operator=(const EMPCATrainer& other);
+    /**
+     * @brief (virtual) Destructor
+     */
+    virtual ~EMPCATrainer();
 
-      /**
-        * This methods performs some initialization before the E- and M-steps.
-        */
-      virtual void initialization(bob::machine::LinearMachine& machine, 
-        const blitz::Array<double,2>& ar);
-      /**
-        * This methods performs some actions after the end of the E- and 
-        * M-steps.
-        */
-      virtual void finalization(bob::machine::LinearMachine& machine, 
-        const blitz::Array<double,2>& ar);
-      
-      /**
-        * Calculates and saves statistics across the dataset, and saves these 
-        * as m_z_{first,second}_order. 
-        * 
-        * The statistics will be used in the mStep() that follows.
-        */
-      virtual void eStep(bob::machine::LinearMachine& machine, 
-        const blitz::Array<double,2>& ar);
+    /**
+     * @brief Assignment operator
+     */
+    EMPCATrainer& operator=(const EMPCATrainer& other);
 
-      /**
-        * Performs a maximization step to update the parameters of the 
-        */
-      virtual void mStep(bob::machine::LinearMachine& machine,
-         const blitz::Array<double,2>& ar);
+    /**
+     * @brief Equal to
+     */
+    bool operator==(const EMPCATrainer& b) const;
 
-      /**
-        * Computes the average log likelihood using the current estimates of 
-        * the latent variables. 
-        */
-      virtual double computeLikelihood(bob::machine::LinearMachine& machine);
+    /**
+     * @brief Not equal to
+     */
+    bool operator!=(const EMPCATrainer& b) const;
 
-      /**
-        * Sets the seed used to generate pseudo-random numbers 
-        * Used to initialize sigma2 and the projection matrix W
-        */
-      inline void setSeed(int seed) { m_seed = seed; }
+    /**
+     * @brief Similar to
+     */
+    bool is_similar_to(const EMPCATrainer& b, const double r_epsilon=1e-5,
+      const double a_epsilon=1e-8) const;
 
-      /**
-        * Gets the seed
-        */
-      inline int getSeed() const { return m_seed; }
+    /**
+     * @brief This methods performs some initialization before the EM loop.
+     */
+    virtual void initialization(bob::machine::LinearMachine& machine, 
+      const blitz::Array<double,2>& ar);
+    /**
+     * @brief This methods performs some actions after the EM loop.
+      */
+   virtual void finalization(bob::machine::LinearMachine& machine, 
+      const blitz::Array<double,2>& ar);
+    
+    /**
+     * @brief Calculates and saves statistics across the dataset, and saves
+     * these as m_z_{first,second}_order.
+     * 
+     * The statistics will be used in the mStep() that follows.
+     */
+    virtual void eStep(bob::machine::LinearMachine& machine, 
+      const blitz::Array<double,2>& ar);
 
-      /**
-        * Sets sigma2 (Mostly for test purpose)
-        */
-      inline void setSigma2(double sigma2) { m_sigma2 = sigma2; }
+    /**
+     * @brief Performs a maximization step to update the parameters of the
+     * factor analysis model.
+     */
+    virtual void mStep(bob::machine::LinearMachine& machine,
+       const blitz::Array<double,2>& ar);
 
-      /**
-        * Gets sigma2 (Mostly for test purpose)
-        */
-      inline double getSigma2() const { return m_sigma2; }
+    /**
+     * @brief Computes the average log likelihood using the current estimates
+     * of the latent variables.
+     */
+    virtual double computeLikelihood(bob::machine::LinearMachine& machine);
 
-    private: //representation
-      double m_dimensionality; /// Dimensionality of the new/projected data
-      blitz::Array<double,2> m_S; /// Covariance of the training data (required only if we need to compute the log likelihood)
-      blitz::Array<double,2> m_z_first_order; /// Current mean of the z_{n} latent variable
-      blitz::Array<double,3> m_z_second_order; /// Current covariance of the z_{n} latent variable
-      blitz::Array<double,2> m_inW; /// The matrix product W^T.W
-      blitz::Array<double,2> m_invM; /// The matrix inv(M), where M = W^T.W + sigma2*Id
-      double m_sigma2; /// The variance sigma^2 of the noise epsilon of the probabilistic model
-      double m_f_log2pi; /// The constant n_features * log(2*PI) used during the likelihood computation
-      int m_seed; /// The seed for the random initialization of W and sigma2
+    /**
+     * @brief Sets \f$\sigma^2\f$ (Mostly for test purpose)
+     */
+    void setSigma2(double sigma2) { m_sigma2 = sigma2; }
 
-      // Cache
-      mutable blitz::Array<double,2> m_cache_dxf; /// Cache of size m_dimensionality x n_features
-      mutable blitz::Array<double,1> m_cache_d; /// Cache of size m_dimensionality
-      mutable blitz::Array<double,1> m_cache_f; /// Cache of size n_features
-      mutable blitz::Array<double,2> m_cache_dxd_1; /// Cache of size m_dimensionality x m_dimensionality
-      mutable blitz::Array<double,2> m_cache_dxd_2; /// Cache of size m_dimensionality x m_dimensionality
-      mutable blitz::Array<double,2> m_cache_fxd_1; /// Cache of size n_features x m_dimensionality 
-      mutable blitz::Array<double,2> m_cache_fxd_2; /// Cache of size n_features x m_dimensionality 
-      mutable blitz::Array<double,2> m_cache_fxf_1; /// Cache of size n_features x n_features
-      mutable blitz::Array<double,2> m_cache_fxf_2; /// Cache of size n_features x n_features
+    /**
+     * @brief Gets \f$\sigma^2\f$ (Mostly for test purpose)
+     */
+    double getSigma2() const { return m_sigma2; }
+
+  private: //representation
+    blitz::Array<double,2> m_S; /// Covariance of the training data (required only if we need to compute the log likelihood)
+    blitz::Array<double,2> m_z_first_order; /// Current mean of the \f$z_{n}\f$ latent variable
+    blitz::Array<double,3> m_z_second_order; /// Current covariance of the \f$z_{n}\f$ latent variable
+    blitz::Array<double,2> m_inW; /// The matrix product \f$W^T W\f$
+    blitz::Array<double,2> m_invM; /// The matrix \f$inv(M)\f$, where \f$M = W^T W + \sigma^2 Id\f$
+    double m_sigma2; /// The variance \f$sigma^2\f$ of the noise epsilon of the probabilistic model
+    double m_f_log2pi; /// The constant \f$n_{features} log(2*\pi)\f$ used during the likelihood computation
+
+    // Working arrays
+    mutable blitz::Array<double,2> m_tmp_dxf; /// size dimensionality x n_features
+    mutable blitz::Array<double,1> m_tmp_d; /// size dimensionality
+    mutable blitz::Array<double,1> m_tmp_f; /// size n_features
+    mutable blitz::Array<double,2> m_tmp_dxd_1; /// size dimensionality x dimensionality
+    mutable blitz::Array<double,2> m_tmp_dxd_2; /// size dimensionality x dimensionality
+    mutable blitz::Array<double,2> m_tmp_fxd_1; /// size n_features x dimensionality 
+    mutable blitz::Array<double,2> m_tmp_fxd_2; /// size n_features x dimensionality 
+    mutable blitz::Array<double,2> m_tmp_fxf_1; /// size n_features x n_features
+    mutable blitz::Array<double,2> m_tmp_fxf_2; /// size n_features x n_features
 
 
-      /**
-        * Initializes/resizes the (array) members
-        */
-      void initMembers(const blitz::Array<double,2>& ar);
-      /**
-        * Computes the mean and the variance (if required) of the training data
-        */
-      void computeMeanVariance(bob::machine::LinearMachine& machine, 
-        const blitz::Array<double,2>& ar);
-      /**
-        * Random initialization of W and sigma2
-        * W is the projection matrix (from the LinearMachine)
-        */
-      void initRandomWSigma2(bob::machine::LinearMachine& machine);
-      /**
-        * Computes the product W^T.W
-        * W is the projection matrix (from the LinearMachine)
-        */
-      void computeWtW(bob::machine::LinearMachine& machine);
-      /**
-        * Computes the inverse of M matrix, where M = W^T.W + sigma2.Id
-        * W is the projection matrix (from the LinearMachine)
-        */
-      void computeInvM();
-      /**
-        * M-Step (part 1): Computes the new estimate of W using the new 
-        * estimated statistics
-        */
-      void updateW(bob::machine::LinearMachine& machine,
-         const blitz::Array<double,2>& ar);
-      /**
-        * M-Step (part 2): Computes the new estimate of sigma2 using the new 
-        * estimated statistics
-        */
-      void updateSigma2(bob::machine::LinearMachine& machine,
-         const blitz::Array<double,2>& ar);
-  };
+    /**
+     * @brief Initializes/resizes the (array) members
+     */
+    void initMembers(const bob::machine::LinearMachine& machine, 
+      const blitz::Array<double,2>& ar);
+    /**
+     * @brief Computes the mean and the variance (if required) of the training
+     * data
+     */
+    void computeMeanVariance(bob::machine::LinearMachine& machine, 
+      const blitz::Array<double,2>& ar);
+    /**
+     * @brief Random initialization of \f$W\f$ and \f$sigma^2\f$. 
+     * W is the projection matrix (from the LinearMachine)
+     */
+    void initRandomWSigma2(bob::machine::LinearMachine& machine);
+    /**
+     * @brief Computes the product \f$W^T W\f$. 
+     * \f$W\f$ is the projection matrix (from the LinearMachine)
+     */
+    void computeWtW(bob::machine::LinearMachine& machine);
+    /**
+     * @brief Computes the inverse of \f$M\f$ matrix, where 
+     *   \f$M = W^T W + \sigma^2 Id\f$. 
+     *   \f$W\f$ is the projection matrix (from the LinearMachine)
+     */
+    void computeInvM();
+    /**
+     * @brief M-Step (part 1): Computes the new estimate of \f$W\f$ using the
+     * new estimated statistics.
+     */
+    void updateW(bob::machine::LinearMachine& machine,
+       const blitz::Array<double,2>& ar);
+    /**
+     * @brief M-Step (part 2): Computes the new estimate of \f$\sigma^2\f$ using
+     * the new estimated statistics.
+     */
+    void updateSigma2(bob::machine::LinearMachine& machine,
+       const blitz::Array<double,2>& ar);
+};
 
-  /**
-   * @}
-   */
+/**
+ * @}
+ */
 }}
 
 #endif /* BOB_TRAINER_EMPCA_TRAINER_H */

@@ -18,25 +18,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <boost/python.hpp>
-#include <bob/machine/LinearMachine.h>
+#include <bob/core/python/ndarray.h>
+#include <boost/shared_ptr.hpp>
 #include <bob/trainer/EMPCATrainer.h>
+#include <bob/machine/LinearMachine.h>
 
 using namespace boost::python;
 
-object ppca_train(bob::trainer::EMPCATrainer& t, const blitz::Array<double,2>& data) {
-  bob::machine::LinearMachine m;
-  t.train(m, data);
-  return object(m);
-}
+// TODO: python bindings with conversions ndarray's <-> blitz++ array's
 
-void bind_trainer_empca() {
-
+void bind_trainer_empca() 
+{
   typedef bob::trainer::EMTrainer<bob::machine::LinearMachine, blitz::Array<double,2> > EMTrainerLinearBase; 
 
   class_<EMTrainerLinearBase, boost::noncopyable>("EMTrainerLinear", "The base python class for all EM-based trainers.", no_init)
     .add_property("convergence_threshold", &EMTrainerLinearBase::getConvergenceThreshold, &EMTrainerLinearBase::setConvergenceThreshold, "Convergence threshold")
     .add_property("max_iterations", &EMTrainerLinearBase::getMaxIterations, &EMTrainerLinearBase::setMaxIterations, "Max iterations")
     .add_property("compute_likelihood_variable", &EMTrainerLinearBase::getComputeLikelihood, &EMTrainerLinearBase::setComputeLikelihood, "Indicates whether the log likelihood should be computed during EM or not")
+    .add_property("rng", &EMTrainerLinearBase::getRng, &EMTrainerLinearBase::setRng, "The Mersenne Twister mt19937 random generator used for the initialization of subspaces/arrays before the EM loop.")
     .def("train", &EMTrainerLinearBase::train, (arg("machine"), arg("data")), "Trains a machine using data")
     .def("initialization", &EMTrainerLinearBase::initialization, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
     .def("finalization", &EMTrainerLinearBase::finalization, (arg("machine"), arg("data")), "This method is called at the end of the EM algorithm")
@@ -48,10 +47,11 @@ void bind_trainer_empca() {
 
   class_<bob::trainer::EMPCATrainer, boost::noncopyable, bases<EMTrainerLinearBase> >("EMPCATrainer",
       "This class implements the EM algorithm for a Linear Machine (Probabilistic PCA).\n"
-      "See Section 12.2 of Bishop, \"Pattern recognition and machine learning\", 2006", init<int,optional<double,double,bool> >((arg("dimensionality"), arg("convergence_threshold"), arg("max_iterations"), arg("compute_likelihood"))))
-    .def("train", &ppca_train, (arg("self"), arg("data")), "Trains and returns a Linear machine using the provided data")
-    .add_property("seed", &bob::trainer::EMPCATrainer::getSeed, &bob::trainer::EMPCATrainer::setSeed, "The seed for the random initialization of W and sigma2")
+      "See Section 12.2 of Bishop, \"Pattern recognition and machine learning\", 2006", init<optional<double,size_t,bool> >((arg("convergence_threshold"), arg("max_iterations"), arg("compute_likelihood"))))
+    .def(init<const bob::trainer::EMPCATrainer&>((arg("trainer")), "Copy constructs an EMPCATrainer"))
+    .def(self == self)
+    .def(self != self)
+    .def("is_similar_to", &bob::trainer::EMPCATrainer::is_similar_to, (arg("self"), arg("other"), arg("r_epsilon")=1e-5, arg("a_epsilon")=1e-8), "Compares this EMPCATrainer with the 'other' one to be approximately the same.")
     .add_property("sigma2", &bob::trainer::EMPCATrainer::getSigma2, &bob::trainer::EMPCATrainer::setSigma2, "The noise sigma2 of the probabilistic model")
   ;
-
 }

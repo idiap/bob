@@ -169,6 +169,14 @@ namespace bob { namespace machine {
       void setInputSubtraction(const blitz::Array<double,1>& v);
 
       /**
+       * Returns the current input subtraction factor in order to be updated.
+       * @warning Use with care. Only trainers should use this function for
+       * efficiency reasons.
+       */
+      inline blitz::Array<double, 1>& updateInputSubtraction()  
+      { return m_input_sub; }
+
+      /**
        * Sets all input subtraction values to a specific value.
        */
       inline void setInputSubtraction(double v) { m_input_sub = v; }
