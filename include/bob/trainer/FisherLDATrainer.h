@@ -37,9 +37,10 @@ namespace bob { namespace trainer {
  */
 
 /**
- * Sets a linear machine to perform the Fisher/LDA decomposition. References:
+ * @brief Sets a linear machine to perform the Fisher/LDA decomposition.\n
  *
- * 1. Bishop, Machine Learning and Pattern Recognition chapter 4.
+ * References:\n
+ * 1. Bishop, Machine Learning and Pattern Recognition chapter 4.\n
  * 2. http://en.wikipedia.org/wiki/Linear_discriminant_analysis
  */
 class FisherLDATrainer: Trainer<bob::machine::LinearMachine, std::vector<blitz::Array<double,2> > >
