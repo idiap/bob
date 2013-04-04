@@ -36,6 +36,11 @@ a:hover, a:focus {
   border-top: 1px solid #555;
 }
 
+.last-separator {
+  border-top: 1px solid #555;
+  margin-top: 1.5em;
+}
+
 .narrower {
   width: 90%;
   margin-top: 0.8em;
@@ -58,4 +63,11 @@ p.credits {
 p.credits a {
   color: #69f;
   font-weight: normal;
+}
+
+pre.citation {
+  border: 1px solid #999;
+  padding: 10px;
+  background-color: #eee;
+  border-radius: 10px;
 }
