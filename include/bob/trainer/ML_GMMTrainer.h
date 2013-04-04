@@ -24,7 +24,7 @@
 #ifndef BOB_TRAINER_ML_GMMTRAINER_H
 #define BOB_TRAINER_ML_GMMTRAINER_H
 
-#include <bob/trainer/GMMTrainer.h>
+#include "GMMTrainer.h"
 #include <limits>
 
 namespace bob { namespace trainer {
@@ -34,37 +34,70 @@ namespace bob { namespace trainer {
  */
 
 /**
- * @brief This class implements the maximum likelihood M-step of the expectation-maximisation algorithm for a GMM Machine.
- * @details See Section 9.2.2 of Bishop, "Pattern recognition and machine learning", 2006
+ * @brief This class implements the maximum likelihood M-step of the 
+ *   expectation-maximisation algorithm for a GMM Machine.
+ * @details See Section 9.2.2 of Bishop, 
+ *  "Pattern recognition and machine learning", 2006
  */
-class ML_GMMTrainer : public GMMTrainer {
+class ML_GMMTrainer: public GMMTrainer {
   public:
     /**
-     * Default constructor
+     * @brief Default constructor
      */
-    ML_GMMTrainer(bool update_means = true, bool update_variances = false, bool update_weights = false,
-      double mean_var_update_responsibilities_threshold = std::numeric_limits<double>::epsilon());
+    ML_GMMTrainer(const bool update_means=true, 
+      const bool update_variances=false, const bool update_weights=false,
+      const double mean_var_update_responsibilities_threshold = 
+        std::numeric_limits<double>::epsilon());
 
     /**
-     * Destructor
+     * @brief Copy constructor
+     */
+    ML_GMMTrainer(const ML_GMMTrainer& other);
+
+    /**
+     * @brief Destructor
      */
     virtual ~ML_GMMTrainer();
 
     /**
-     * Initialisation before the EM steps
+     * @brief Initialisation before the EM steps
      */
-    virtual void initialization(bob::machine::GMMMachine& gmm, const blitz::Array<double,2>& data);
+    virtual void initialization(bob::machine::GMMMachine& gmm,
+      const blitz::Array<double,2>& data);
 
     /**
-     * Performs a maximum likelihood (ML) update of the GMM parameters
+     * @brief Performs a maximum likelihood (ML) update of the GMM parameters
      * using the accumulated statistics in m_ss
      * Implements EMTrainer::mStep()
      */
-    void mStep(bob::machine::GMMMachine& gmm, const blitz::Array<double,2>& data);
-  
+    virtual void mStep(bob::machine::GMMMachine& gmm,
+      const blitz::Array<double,2>& data);
+ 
+    /**
+     * @brief Assigns from a different ML_GMMTrainer
+     */
+    ML_GMMTrainer& operator=(const ML_GMMTrainer &other);
+
+    /**
+     * @brief Equal to
+     */
+    bool operator==(const ML_GMMTrainer& b) const;
+
+    /**
+     * @brief Not equal to
+     */
+    bool operator!=(const ML_GMMTrainer& b) const;
+
+    /**
+     * @brief Similar to
+     */
+    bool is_similar_to(const ML_GMMTrainer& b, const double r_epsilon=1e-5,
+      const double a_epsilon=1e-8) const;
+
+ 
   private:
     /**
-     * Add cache to avoid re-allocation at each iteration
+     * @brief Add cache to avoid re-allocation at each iteration
      */
     mutable blitz::Array<double,1> m_cache_ss_n_thresholded;
 };

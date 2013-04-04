@@ -360,6 +360,25 @@ public:
 };
 
 
+object py_gmmtrainer_get_gmmstats(const bob::trainer::GMMTrainer& t)
+{
+  bob::machine::GMMStats s(t.getGMMStats());
+  return object(s);
+}
+
+object py_ml_gmmtrainer_get_gmmstats(const bob::trainer::ML_GMMTrainer& t)
+{
+  bob::machine::GMMStats s(t.getGMMStats());
+  return object(s);
+}
+
+object py_map_gmmtrainer_get_gmmstats(const bob::trainer::MAP_GMMTrainer& t)
+{
+  bob::machine::GMMStats s(t.getGMMStats());
+  return object(s);
+}
+
+
 void bind_trainer_gmm_wrappers() {
 
   typedef bob::trainer::EMTrainer<bob::machine::GMMMachine, blitz::Array<double,2> > EMTrainerGMMBase; 
@@ -388,7 +407,7 @@ void bind_trainer_gmm_wrappers() {
       init<optional<bool, bool, bool, double> >((arg("update_means"), arg("update_variances"), arg("update_weights"), arg("mean_var_update_responsibilities_threshold"))))
     .add_property("convergence_threshold", &bob::trainer::GMMTrainer::getConvergenceThreshold, &bob::trainer::GMMTrainer::setConvergenceThreshold, "Convergence threshold")
     .add_property("max_iterations", &bob::trainer::GMMTrainer::getMaxIterations, &bob::trainer::GMMTrainer::setMaxIterations, "Max iterations")
-    .add_property("gmm_statistics", &bob::trainer::GMMTrainer::getGMMStats, &bob::trainer::GMMTrainer::setGMMStats, "The internal GMM statistics. Useful to parallelize the E-step.")
+    .add_property("gmm_statistics", &py_gmmtrainer_get_gmmstats, &bob::trainer::GMMTrainer::setGMMStats, "The internal GMM statistics. Useful to parallelize the E-step.")
     .def("train", &bob::trainer::GMMTrainer::train, &GMMTrainerWrapper::d_train, (arg("machine"), arg("data")), "Train a machine using some data")
     .def("initialization", &bob::trainer::GMMTrainer::initialization, &GMMTrainerWrapper::d_initialization, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
     .def("finalization", &bob::trainer::GMMTrainer::finalization, &GMMTrainerWrapper::d_finalization, (arg("machine"), arg("data")), "This method is called after the EM algorithm")
@@ -411,7 +430,7 @@ void bind_trainer_gmm_wrappers() {
       "also referred to as a \"world model\".")
     .add_property("convergence_threshold", &bob::trainer::MAP_GMMTrainer::getConvergenceThreshold, &bob::trainer::MAP_GMMTrainer::setConvergenceThreshold, "Convergence threshold")
     .add_property("max_iterations", &bob::trainer::MAP_GMMTrainer::getMaxIterations, &bob::trainer::MAP_GMMTrainer::setMaxIterations, "Max iterations")
-    .add_property("gmm_statistics", &bob::trainer::MAP_GMMTrainer::getGMMStats, &bob::trainer::MAP_GMMTrainer::setGMMStats, "The internal GMM statistics. Useful to parallelize the E-step.")
+    .add_property("gmm_statistics", &py_map_gmmtrainer_get_gmmstats, &bob::trainer::MAP_GMMTrainer::setGMMStats, "The internal GMM statistics. Useful to parallelize the E-step.")
     .def("train", &bob::trainer::MAP_GMMTrainer::train, &MAP_GMMTrainerWrapper::d_train, (arg("machine"), arg("data")), "Train a machine using some data")
     .def("initialization", &bob::trainer::MAP_GMMTrainer::initialization, &MAP_GMMTrainerWrapper::d_initialization, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
     .def("finalization", &bob::trainer::MAP_GMMTrainer::finalization, &MAP_GMMTrainerWrapper::d_finalization, (arg("machine"), arg("data")), "This method is called after the EM algorithm")
@@ -427,7 +446,7 @@ void bind_trainer_gmm_wrappers() {
       init<optional<bool, bool, bool, double> >((arg("update_means"), arg("update_variances"), arg("update_weights"), arg("mean_var_update_responsibilities_threshold"))))
     .add_property("convergence_threshold", &bob::trainer::ML_GMMTrainer::getConvergenceThreshold, &bob::trainer::ML_GMMTrainer::setConvergenceThreshold, "Convergence threshold")
     .add_property("max_iterations", &bob::trainer::ML_GMMTrainer::getMaxIterations, &bob::trainer::ML_GMMTrainer::setMaxIterations, "Max iterations")
-    .add_property("gmm_statistics", &bob::trainer::ML_GMMTrainer::getGMMStats, &bob::trainer::ML_GMMTrainer::setGMMStats, "The internal GMM statistics. Useful to parallelize the E-step.")
+    .add_property("gmm_statistics", &py_ml_gmmtrainer_get_gmmstats, &bob::trainer::ML_GMMTrainer::setGMMStats, "The internal GMM statistics. Useful to parallelize the E-step.")
     .def("train", &bob::trainer::ML_GMMTrainer::train, &ML_GMMTrainerWrapper::d_train, (arg("machine"), arg("data")), "Train a machine using some data")
     .def("initialization", &bob::trainer::ML_GMMTrainer::initialization, &ML_GMMTrainerWrapper::d_initialization, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
     .def("finalization", &bob::trainer::ML_GMMTrainer::finalization, &ML_GMMTrainerWrapper::d_finalization, (arg("machine"), arg("data")), "This method is called after the EM algorithm")

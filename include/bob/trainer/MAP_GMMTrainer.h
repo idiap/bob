@@ -38,42 +38,72 @@ namespace bob { namespace trainer {
  * @brief This class implements the maximum a posteriori M-step of the expectation-maximisation algorithm for a GMM Machine. The prior parameters are encoded in the form of a GMM (e.g. a universal background model). The EM algorithm thus performs GMM adaptation.
  * @details See Section 3.4 of Reynolds et al., "Speaker Verification Using Adapted Gaussian Mixture Models", Digital Signal Processing, 2000. We use a "single adaptation coefficient", alpha_i, and thus a single relevance factor, r.
  */
-class MAP_GMMTrainer : public GMMTrainer {
+class MAP_GMMTrainer: public GMMTrainer 
+{
   public:
-
     /**
-     * Default constructor
+     * @brief Default constructor
      */
-    MAP_GMMTrainer(double relevance_factor = 0, bool update_means = true, bool update_variances = false, 
-      bool update_weights = false, double mean_var_update_responsibilities_threshold = std::numeric_limits<double>::epsilon());
+    MAP_GMMTrainer(const double relevance_factor=0, const bool update_means=true, 
+      const bool update_variances=false, const bool update_weights=false, 
+      const double mean_var_update_responsibilities_threshold = 
+        std::numeric_limits<double>::epsilon());
 
     /**
-     * Destructor
+     * @brief Copy constructor
+     */
+    MAP_GMMTrainer(const MAP_GMMTrainer& other);
+
+    /**
+     * @brief Destructor
      */
     virtual ~MAP_GMMTrainer();
 
     /**
-     * Initialization
+     * @brief Initialization
      */
-    virtual void initialization(bob::machine::GMMMachine& gmm, const blitz::Array<double,2>& data);
+    virtual void initialization(bob::machine::GMMMachine& gmm,
+      const blitz::Array<double,2>& data);
 
     /**
-     * Set the GMM to use as a prior for MAP adaptation.
+     * @brief Assigns from a different MAP_GMMTrainer
+     */
+    MAP_GMMTrainer& operator=(const MAP_GMMTrainer &other);
+
+    /**
+     * @brief Equal to
+     */
+    bool operator==(const MAP_GMMTrainer& b) const;
+
+    /**
+     * @brief Not equal to
+     */
+    bool operator!=(const MAP_GMMTrainer& b) const;
+
+    /**
+     * @brief Similar to
+     */
+    bool is_similar_to(const MAP_GMMTrainer& b, const double r_epsilon=1e-5,
+      const double a_epsilon=1e-8) const;
+ 
+    /**
+     * @brief Set the GMM to use as a prior for MAP adaptation.
      * Generally, this is a "universal background model" (UBM),
      * also referred to as a "world model".
      */
     bool setPriorGMM(boost::shared_ptr<bob::machine::GMMMachine> prior_gmm);
 
     /**
-     * Performs a maximum a posteriori (MAP) update of the GMM parameters
-     * using the accumulated statistics in m_ss and the 
+     * @brief Performs a maximum a posteriori (MAP) update of the GMM
+     * parameters using the accumulated statistics in m_ss and the 
      * parameters of the prior model
      * Implements EMTrainer::mStep()
      */
-    void mStep(bob::machine::GMMMachine& gmm, const blitz::Array<double,2>& data);
+    void mStep(bob::machine::GMMMachine& gmm,
+      const blitz::Array<double,2>& data);
 
     /**
-     * Use a Torch3-like adaptation rule rather than Reynolds'one
+     * @brief Use a Torch3-like adaptation rule rather than Reynolds'one
      * In this case, alpha is a configuration variable rather than a function of the zeroth 
      * order statistics and a relevance factor (should be in range [0,1])
      */
@@ -85,7 +115,7 @@ class MAP_GMMTrainer : public GMMTrainer {
     /**
      * The relevance factor for MAP adaptation, r (see Reynolds et al., \"Speaker Verification Using Adapted Gaussian Mixture Models\", Digital Signal Processing, 2000).
      */
-    double relevance_factor;
+    double m_relevance_factor;
     
     /**
      * The GMM to use as a prior for MAP adaptation.

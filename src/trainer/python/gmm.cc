@@ -21,8 +21,15 @@
 #include <bob/trainer/GMMTrainer.h>
 #include <bob/trainer/MAP_GMMTrainer.h>
 #include <bob/trainer/ML_GMMTrainer.h>
+#include <bob/machine/GMMStats.h>
 
 using namespace boost::python;
+
+object py_gmmtrainer_get_gmmstats(const bob::trainer::GMMTrainer& t)
+{
+  bob::machine::GMMStats s(t.getGMMStats());
+  return object(s);
+}
 
 void bind_trainer_gmm() {
 
@@ -47,7 +54,7 @@ void bind_trainer_gmm() {
   class_<bob::trainer::GMMTrainer, boost::noncopyable, bases<EMTrainerGMMBase> >("GMMTrainer",
       "This class implements the E-step of the expectation-maximisation algorithm for a GMM Machine.\n"
       "See Section 9.2.2 of Bishop, \"Pattern recognition and machine learning\", 2006", no_init)
-    .add_property("gmm_statistics", &bob::trainer::GMMTrainer::getGMMStats, &bob::trainer::GMMTrainer::setGMMStats, "The internal GMM statistics. Useful to parallelize the E-step.")
+    .add_property("gmm_statistics", &py_gmmtrainer_get_gmmstats, &bob::trainer::GMMTrainer::setGMMStats, "The internal GMM statistics. Useful to parallelize the E-step.")
   ;
 
   class_<bob::trainer::MAP_GMMTrainer, boost::noncopyable, bases<bob::trainer::GMMTrainer> >("MAP_GMMTrainer",
@@ -56,7 +63,7 @@ void bind_trainer_gmm() {
       "The prior parameters are encoded in the form of a GMM (e.g. a universal background model). "
       "The EM algorithm thus performs GMM adaptation.\n"
       "See Section 3.4 of Reynolds et al., \"Speaker Verification Using Adapted Gaussian Mixture Models\", Digital Signal Processing, 2000. We use a \"single adaptation coefficient\", alpha_i, and thus a single relevance factor, r.",
-      init<optional<double, bool, bool, bool, double> >((arg("relevance_factor"), arg("update_means"), arg("update_variances"), arg("update_weights"), arg("responsibilities_threshold"))))
+      init<optional<const double, const bool, const bool, const bool, const double> >((arg("relevance_factor"), arg("update_means"), arg("update_variances"), arg("update_weights"), arg("responsibilities_threshold"))))
     .def("set_prior_gmm", &bob::trainer::MAP_GMMTrainer::setPriorGMM, 
       "Set the GMM to use as a prior for MAP adaptation. "
       "Generally, this is a \"universal background model\" (UBM), "
@@ -70,7 +77,6 @@ void bind_trainer_gmm() {
   class_<bob::trainer::ML_GMMTrainer, boost::noncopyable, bases<bob::trainer::GMMTrainer> >("ML_GMMTrainer",
       "This class implements the maximum likelihood M-step of the expectation-maximisation algorithm for a GMM Machine.\n"
       "See Section 9.2.2 of Bishop, \"Pattern recognition and machine learning\", 2006",
-      init<optional<bool, bool, bool, double> >((arg("update_means"), arg("update_variances"), arg("update_weights"), arg("responsibilities_threshold"))))
+      init<optional<const bool, const bool, const bool, const double> >((arg("update_means"), arg("update_variances"), arg("update_weights"), arg("responsibilities_threshold"))))
   ;
-
 }

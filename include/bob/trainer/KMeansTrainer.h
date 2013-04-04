@@ -87,6 +87,12 @@ class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, blitz::Array<
     bool operator!=(const KMeansTrainer& b) const;
  
     /**
+     * @brief Similar to
+     */
+    bool is_similar_to(const KMeansTrainer& b, const double r_epsilon=1e-5,
+      const double a_epsilon=1e-8) const;
+ 
+    /**
      * @brief Initialise the means randomly. 
      * Data is split into as many chunks as there are means, 
      * then each mean is set to a random example within each chunk.
@@ -159,9 +165,8 @@ class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, blitz::Array<
     void setFirstOrderStats(const blitz::Array<double,2>& firstOrderStats);
     void setAverageMinDistance(const double value) { m_average_min_distance = value; }
 
- 
-  protected:
 
+  protected:
     /**
      * @brief The initialization method
      * Check that there is no duplicated means during the random initialization

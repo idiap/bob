@@ -24,7 +24,7 @@
 #ifndef BOB_TRAINER_GMMTRAINER_H
 #define BOB_TRAINER_GMMTRAINER_H
 
-#include <bob/trainer/EMTrainer.h>
+#include "EMTrainer.h"
 #include <bob/machine/GMMMachine.h>
 #include <bob/machine/GMMStats.h>
 #include <limits>
@@ -36,30 +36,40 @@ namespace bob { namespace trainer {
  */
 
 /**
- * @brief This class implements the E-step of the expectation-maximisation algorithm for a GMM Machine.
- * @details See Section 9.2.2 of Bishop, "Pattern recognition and machine learning", 2006
+ * @brief This class implements the E-step of the expectation-maximisation 
+ * algorithm for a GMM Machine.
+ * @details See Section 9.2.2 of Bishop, 
+ *   "Pattern recognition and machine learning", 2006
  */
-class GMMTrainer : public EMTrainer<bob::machine::GMMMachine, blitz::Array<double,2> > {
+class GMMTrainer: public EMTrainer<bob::machine::GMMMachine, blitz::Array<double,2> >
+{
   public:
-
     /**
-     * Default constructor
+     * @brief Default constructor
      */
-    GMMTrainer(bool update_means = true, bool update_variances = false, bool update_weights = false,
-      double mean_var_update_responsibilities_threshold = std::numeric_limits<double>::epsilon());
+    GMMTrainer(const bool update_means=true, 
+      const bool update_variances=false, const bool update_weights=false,
+      const double mean_var_update_responsibilities_threshold =
+        std::numeric_limits<double>::epsilon());
     
     /**
-     * Destructor
+     * @brief Copy constructor
+     */
+    GMMTrainer(const GMMTrainer& other);
+
+    /**
+     * @brief Destructor
      */
     virtual ~GMMTrainer();
 
     /**
-     * Initialization before the EM steps
+     * @brief Initialization before the EM steps
      */
-    virtual void initialization(bob::machine::GMMMachine& gmm, const blitz::Array<double,2>& data);
+    virtual void initialization(bob::machine::GMMMachine& gmm,
+      const blitz::Array<double,2>& data);
     
     /**
-     * Calculates and saves statistics across the dataset, 
+     * @brief Calculates and saves statistics across the dataset,
      * and saves these as m_ss. Calculates the average
      * log likelihood of the observations given the GMM,
      * and returns this in average_log_likelihood.
@@ -67,29 +77,56 @@ class GMMTrainer : public EMTrainer<bob::machine::GMMMachine, blitz::Array<doubl
      * The statistics, m_ss, will be used in the mStep() that follows.
      * Implements EMTrainer::eStep(double &)
      */
-    virtual void eStep(bob::machine::GMMMachine& gmm, const blitz::Array<double,2>& data);
+    virtual void eStep(bob::machine::GMMMachine& gmm,
+      const blitz::Array<double,2>& data);
 
     /**
-     * Computes the likelihood using current estimates of the latent variables
+     * @brief Computes the likelihood using current estimates of the latent
+     * variables
      */
     virtual double computeLikelihood(bob::machine::GMMMachine& gmm);
 
     /**
-     * Finalization after the EM steps
+     * @brief Finalization after the EM steps
      */
-    virtual void finalization(bob::machine::GMMMachine& gmm, const blitz::Array<double,2>& data);
-   
+    virtual void finalization(bob::machine::GMMMachine& gmm,
+      const blitz::Array<double,2>& data);
+  
     /**
-     * Returns the internal GMM statistics. Useful to parallelize the E-step
+     * @brief Assigns from a different GMMTrainer
      */
-    const bob::machine::GMMStats getGMMStats() const { return m_ss; }
+    GMMTrainer& operator=(const GMMTrainer &other);
+
     /**
-     * Sets the internal GMM statistics. Useful to parallelize the E-step
+     * @brief Equal to
+     */
+    bool operator==(const GMMTrainer& b) const;
+
+    /**
+     * @brief Not equal to
+     */
+    bool operator!=(const GMMTrainer& b) const;
+
+    /**
+     * @brief Similar to
+     */
+    bool is_similar_to(const GMMTrainer& b, const double r_epsilon=1e-5,
+      const double a_epsilon=1e-8) const;
+ 
+    /**
+     * @brief Returns the internal GMM statistics. Useful to parallelize the 
+     * E-step
+     */
+    const bob::machine::GMMStats& getGMMStats() const
+    { return m_ss; }
+
+    /**
+     * @brief Sets the internal GMM statistics. Useful to parallelize the
+     * E-step
      */
     void setGMMStats(const bob::machine::GMMStats& stats); 
      
   protected:
-
     /**
      * These are the sufficient statistics, calculated during the
      * E-step and used during the M-step
@@ -99,17 +136,17 @@ class GMMTrainer : public EMTrainer<bob::machine::GMMMachine, blitz::Array<doubl
     /**
      * update means on each iteration
      */
-    bool update_means;
+    bool m_update_means;
     
     /**
      * update variances on each iteration
      */
-    bool update_variances;
+    bool m_update_variances;
     
     /**
      * update weights on each iteration
      */
-    bool update_weights;
+    bool m_update_weights;
 
     /**
      * threshold over the responsibilities of the Gaussians

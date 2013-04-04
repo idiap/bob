@@ -20,23 +20,37 @@
 
 #include <bob/trainer/MAP_GMMTrainer.h>
 #include <bob/trainer/Exception.h>
+#include <bob/core/check.h>
 
-bob::trainer::MAP_GMMTrainer::MAP_GMMTrainer(double relevance_factor, bool update_means, bool update_variances, 
-    bool update_weights, double mean_var_update_responsibilities_threshold): 
+bob::trainer::MAP_GMMTrainer::MAP_GMMTrainer(const double relevance_factor, 
+    const bool update_means, const bool update_variances, 
+    const bool update_weights, const double mean_var_update_responsibilities_threshold): 
   GMMTrainer(update_means, update_variances, update_weights, mean_var_update_responsibilities_threshold), 
-  relevance_factor(relevance_factor), m_prior_gmm(boost::shared_ptr<bob::machine::GMMMachine>()), m_T3_alpha(0.), m_T3_adaptation(false) 
+  m_relevance_factor(relevance_factor),
+  m_prior_gmm(boost::shared_ptr<bob::machine::GMMMachine>()),
+  m_T3_alpha(0.), m_T3_adaptation(false) 
 {  
+}
+
+bob::trainer::MAP_GMMTrainer::MAP_GMMTrainer(const bob::trainer::MAP_GMMTrainer& b):
+  bob::trainer::GMMTrainer(b),
+  m_relevance_factor(b.m_relevance_factor),
+  m_prior_gmm(b.m_prior_gmm),
+  m_T3_alpha(b.m_T3_alpha), m_T3_adaptation(b.m_T3_adaptation)
+{
 }
 
 bob::trainer::MAP_GMMTrainer::~MAP_GMMTrainer() 
 {  
 }
 
-void bob::trainer::MAP_GMMTrainer::initialization(bob::machine::GMMMachine& gmm, const blitz::Array<double,2>& data) {
+void bob::trainer::MAP_GMMTrainer::initialization(bob::machine::GMMMachine& gmm,
+  const blitz::Array<double,2>& data)
+{
   // Allocate memory for the sufficient statistics and initialise
   bob::trainer::GMMTrainer::initialization(gmm, data);
 
-  size_t n_gaussians = gmm.getNGaussians();
+  const size_t n_gaussians = gmm.getNGaussians();
   // TODO: check size?
   gmm.setWeights(m_prior_gmm->getWeights());
   for(size_t i=0; i<n_gaussians; ++i)
@@ -50,34 +64,36 @@ void bob::trainer::MAP_GMMTrainer::initialization(bob::machine::GMMMachine& gmm,
   m_cache_ml_weights.resize(n_gaussians);
 }
 
-bool bob::trainer::MAP_GMMTrainer::setPriorGMM(boost::shared_ptr<bob::machine::GMMMachine> prior_gmm) {
-  if(!prior_gmm) return false;
+bool bob::trainer::MAP_GMMTrainer::setPriorGMM(boost::shared_ptr<bob::machine::GMMMachine> prior_gmm)
+{
+  if (!prior_gmm) return false;
   m_prior_gmm = prior_gmm;
   return true;
 }
 
-void bob::trainer::MAP_GMMTrainer::mStep(bob::machine::GMMMachine& gmm, const blitz::Array<double,2>& data) {
+void bob::trainer::MAP_GMMTrainer::mStep(bob::machine::GMMMachine& gmm,
+  const blitz::Array<double,2>& data)
+{
   // Read options and variables
   double n_gaussians = gmm.getNGaussians();
   
   // Check that the prior GMM has been specified
-  if (!m_prior_gmm) {
+  if (!m_prior_gmm)
     throw NoPriorGMM();
-  }
 
   blitz::firstIndex i;
   blitz::secondIndex j;
 
   // Calculate the "data-dependent adaptation coefficient", alpha_i
   // TODO: check if required // m_cache_alpha.resize(n_gaussians);
-  if( m_T3_adaptation )
+  if (m_T3_adaptation)
     m_cache_alpha = m_T3_alpha;
   else
-    m_cache_alpha = m_ss.n(i) / (m_ss.n(i) + relevance_factor);
+    m_cache_alpha = m_ss.n(i) / (m_ss.n(i) + m_relevance_factor);
 
   // - Update weights if requested
   //   Equation 11 of Reynolds et al., "Speaker Verification Using Adapted Gaussian Mixture Models", Digital Signal Processing, 2000
-  if (update_weights) {
+  if (m_update_weights) {
     // Calculate the maximum likelihood weights
     m_cache_ml_weights = m_ss.n / static_cast<double>(m_ss.T); //cast req. for linux/32-bits & osx
 
@@ -99,12 +115,12 @@ void bob::trainer::MAP_GMMTrainer::mStep(bob::machine::GMMMachine& gmm, const bl
   // Update GMM parameters
   // - Update means if requested
   //   Equation 12 of Reynolds et al., "Speaker Verification Using Adapted Gaussian Mixture Models", Digital Signal Processing, 2000
-  if (update_means) {
+  if (m_update_means) {
     // Calculate new means
-    for(size_t i=0; i<n_gaussians; ++i) {
+    for (size_t i=0; i<n_gaussians; ++i) {
       const blitz::Array<double,1>& prior_means = m_prior_gmm->getGaussian(i)->getMean();
       blitz::Array<double,1>& means = gmm.updateGaussian(i)->updateMean();
-      if(m_ss.n(i) < m_mean_var_update_responsibilities_threshold) {
+      if (m_ss.n(i) < m_mean_var_update_responsibilities_threshold) {
         means = prior_means;
       }
       else {
@@ -116,14 +132,14 @@ void bob::trainer::MAP_GMMTrainer::mStep(bob::machine::GMMMachine& gmm, const bl
 
   // - Update variance if requested
   //   Equation 13 of Reynolds et al., "Speaker Verification Using Adapted Gaussian Mixture Models", Digital Signal Processing, 2000
-  if (update_variances) {
+  if (m_update_variances) {
     // Calculate new variances (equation 13)
-    for(size_t i=0; i<n_gaussians; ++i) {
+    for (size_t i=0; i<n_gaussians; ++i) {
       const blitz::Array<double,1>& prior_means = m_prior_gmm->getGaussian(i)->getMean();
       blitz::Array<double,1>& means = gmm.updateGaussian(i)->updateMean();
       const blitz::Array<double,1>& prior_variances = m_prior_gmm->getGaussian(i)->getVariance();
       blitz::Array<double,1>& variances = gmm.updateGaussian(i)->updateVariance();
-      if(m_ss.n(i) < m_mean_var_update_responsibilities_threshold) {
+      if (m_ss.n(i) < m_mean_var_update_responsibilities_threshold) {
         variances = (prior_variances + prior_means) - blitz::pow2(means);
       }
       else {
@@ -133,3 +149,47 @@ void bob::trainer::MAP_GMMTrainer::mStep(bob::machine::GMMMachine& gmm, const bl
     }
   }
 }
+
+bob::trainer::MAP_GMMTrainer& bob::trainer::MAP_GMMTrainer::operator=
+  (const bob::trainer::MAP_GMMTrainer &other)
+{
+  if (this != &other)
+  {
+    bob::trainer::GMMTrainer::operator=(other);
+    m_relevance_factor = other.m_relevance_factor;
+    m_prior_gmm = other.m_prior_gmm;
+    m_T3_alpha = other.m_T3_alpha;
+    m_T3_adaptation = other.m_T3_adaptation;
+    m_cache_alpha.resize(other.m_cache_alpha.extent(0));
+    m_cache_ml_weights.resize(other.m_cache_ml_weights.extent(0));
+  }
+  return *this;
+}
+
+bool bob::trainer::MAP_GMMTrainer::operator==
+  (const bob::trainer::MAP_GMMTrainer &other) const
+{
+  return bob::trainer::GMMTrainer::operator==(other) &&
+         m_relevance_factor == other.m_relevance_factor &&
+         m_prior_gmm == other.m_prior_gmm &&
+         m_T3_alpha == other.m_T3_alpha &&
+         m_T3_adaptation == other.m_T3_adaptation;
+}
+
+bool bob::trainer::MAP_GMMTrainer::operator!=
+  (const bob::trainer::MAP_GMMTrainer &other) const
+{
+  return !(this->operator==(other));
+}
+
+bool bob::trainer::MAP_GMMTrainer::is_similar_to
+  (const bob::trainer::MAP_GMMTrainer &other, const double r_epsilon, 
+   const double a_epsilon) const
+{
+  return bob::trainer::GMMTrainer::is_similar_to(other, r_epsilon, a_epsilon) &&
+         bob::core::isClose(m_relevance_factor, other.m_relevance_factor, r_epsilon, a_epsilon) &&
+         m_prior_gmm == other.m_prior_gmm &&
+         bob::core::isClose(m_T3_alpha, other.m_T3_alpha, r_epsilon, a_epsilon) &&
+         m_T3_adaptation == other.m_T3_adaptation;
+}
+
