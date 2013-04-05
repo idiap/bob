@@ -221,26 +221,26 @@ class PLDAMachineTest(unittest.TestCase):
       -0.000000012993151,  0.999999999999996], 'float64').reshape(C_dim_f, C_dim_f)
 
     # Constructor tests
-    m = bob.machine.PLDABaseMachine()
+    m = bob.machine.PLDABase()
     self.assertTrue(m.dim_d == 0)
     self.assertTrue(m.dim_f == 0)
     self.assertTrue(m.dim_g == 0)
     del m
-    m = bob.machine.PLDABaseMachine(C_dim_d, C_dim_f, C_dim_g)
+    m = bob.machine.PLDABase(C_dim_d, C_dim_f, C_dim_g)
     self.assertTrue(m.dim_d == C_dim_d)
     self.assertTrue(m.dim_f == C_dim_f)
     self.assertTrue(m.dim_g == C_dim_g)
-    self.assertTrue(equals(m.variance_thresholds, numpy.zeros((C_dim_d,),dtype=numpy.float64), 1e-10))
+    self.assertTrue( abs(m.variance_threshold - 0.) < 1e-10 )
     del m
-    m = bob.machine.PLDABaseMachine(C_dim_d, C_dim_f, C_dim_g, 1e-2)
+    m = bob.machine.PLDABase(C_dim_d, C_dim_f, C_dim_g, 1e-2)
     self.assertTrue(m.dim_d == C_dim_d)
     self.assertTrue(m.dim_f == C_dim_f)
     self.assertTrue(m.dim_g == C_dim_g)
-    self.assertTrue(equals(m.variance_thresholds, 1e-2*numpy.ones((C_dim_d,),dtype=numpy.float64), 1e-10))
+    self.assertTrue( abs(m.variance_threshold - 1e-2) < 1e-10 )
     del m
 
     # Defines base machine
-    m = bob.machine.PLDABaseMachine()
+    m = bob.machine.PLDABase()
     m.resize(C_dim_d, C_dim_f, C_dim_g)
     # Sets the current mu, F, G and sigma 
     m.mu = mu
@@ -272,7 +272,7 @@ class PLDAMachineTest(unittest.TestCase):
 
     # Defines base machine
     del m
-    m = bob.machine.PLDABaseMachine(C_dim_d, C_dim_f, C_dim_g)
+    m = bob.machine.PLDABase(C_dim_d, C_dim_f, C_dim_g)
     # Sets the current mu, F, G and sigma 
     m.mu = mu
     m.f = C_F
@@ -298,7 +298,7 @@ class PLDAMachineTest(unittest.TestCase):
     # Saves to file, loads and compares to original
     filename = str(tempfile.mkstemp(".hdf5")[1])
     m.save(bob.io.HDF5File(filename, 'w'))
-    m_loaded = bob.machine.PLDABaseMachine(bob.io.HDF5File(filename))
+    m_loaded = bob.machine.PLDABase(bob.io.HDF5File(filename))
 
     # Compares the values loaded with the former ones
     self.assertTrue(m_loaded == m)
@@ -321,7 +321,7 @@ class PLDAMachineTest(unittest.TestCase):
     self.assertTrue(abs(m_loaded.get_add_log_like_const_term(3) - constTerm3) < 1e-10)
 
     # Compares the values loaded with the former ones when copying
-    m_copy = bob.machine.PLDABaseMachine(m_loaded)
+    m_copy = bob.machine.PLDABase(m_loaded)
     self.assertTrue(m_loaded == m_copy)
     self.assertFalse(m_loaded != m_copy)
     # Test clear_maps method
@@ -333,20 +333,22 @@ class PLDAMachineTest(unittest.TestCase):
     
     # Check variance flooring thresholds-related methods
     v_zo = numpy.array([0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01])
+    v_zo_ = 0.01
     v_zzo = numpy.array([0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001])
-    m_copy.variance_thresholds = v_zo
+    v_zzo_ = 0.001
+    m_copy.variance_threshold = v_zo_
     self.assertFalse(m_loaded == m_copy)
     self.assertTrue(m_loaded != m_copy)
-    m_copy.variance_thresholds = v_zzo
+    m_copy.variance_threshold = v_zzo_
     m_copy.sigma = v_zo
     self.assertTrue(equals(m_copy.sigma, v_zo, 1e-10))
-    m_copy.variance_thresholds = v_zo
+    m_copy.variance_threshold = v_zo_
     m_copy.sigma = v_zzo
     self.assertTrue(equals(m_copy.sigma, v_zo, 1e-10))
-    m_copy.variance_thresholds = v_zzo
+    m_copy.variance_threshold = v_zzo_
     m_copy.sigma = v_zzo
     self.assertTrue(equals(m_copy.sigma, v_zzo, 1e-10))
-    m_copy.variance_thresholds = v_zo
+    m_copy.variance_threshold = v_zo_
     self.assertTrue(equals(m_copy.sigma, v_zo, 1e-10)) 
    
     # Clean-up
@@ -364,7 +366,7 @@ class PLDAMachineTest(unittest.TestCase):
     hi = numpy.array([-0.5, 0.5])
     wij = numpy.array([-0.1, 0.2, 0.3])
     
-    m = bob.machine.PLDABaseMachine(C_dim_d, C_dim_f, C_dim_g)
+    m = bob.machine.PLDABase(C_dim_d, C_dim_f, C_dim_g)
     # Sets the current mu, F, G and sigma 
     m.mu = mu
     m.f = C_F
@@ -384,7 +386,7 @@ class PLDAMachineTest(unittest.TestCase):
     mu.fill(0)
 
     # Defines base machine
-    mb = bob.machine.PLDABaseMachine(C_dim_d, C_dim_f, C_dim_g)
+    mb = bob.machine.PLDABase(C_dim_d, C_dim_f, C_dim_g)
     # Sets the current mu, F, G and sigma 
     mb.mu = mu
     mb.f = C_F
@@ -420,8 +422,7 @@ class PLDAMachineTest(unittest.TestCase):
     # Saves to file, loads and compares to original
     filename = str(tempfile.mkstemp(".hdf5")[1])
     m.save(bob.io.HDF5File(filename, 'w'))
-    m_loaded = bob.machine.PLDAMachine(bob.io.HDF5File(filename))
-    m_loaded.plda_base = mb
+    m_loaded = bob.machine.PLDAMachine(bob.io.HDF5File(filename), mb)
 
     # Compares the values loaded with the former ones
     self.assertTrue(m_loaded == m)
@@ -457,7 +458,7 @@ class PLDAMachineTest(unittest.TestCase):
     mu.fill(0)
 
     # Defines base machine
-    mb = bob.machine.PLDABaseMachine(C_dim_d, C_dim_f, C_dim_g)
+    mb = bob.machine.PLDABase(C_dim_d, C_dim_f, C_dim_g)
     # Sets the current mu, F, G and sigma 
     mb.mu = mu
     mb.f = C_F
@@ -515,7 +516,7 @@ class PLDAMachineTest(unittest.TestCase):
     mean_zero = numpy.zeros((D,), 'float64')
 
     # base machine
-    mb = bob.machine.PLDABaseMachine(D,nf,ng)
+    mb = bob.machine.PLDABase(D,nf,ng)
     mb.sigma = sigma_init
     mb.g = G_init
     mb.f = F_init

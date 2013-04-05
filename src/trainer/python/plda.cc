@@ -22,156 +22,115 @@
  */
 
 #include <boost/python.hpp>
+#include <bob/core/python/ndarray.h>
+#include <boost/python/stl_iterator.hpp>
 #include <bob/machine/PLDAMachine.h>
 #include <bob/trainer/PLDATrainer.h>
 
 using namespace boost::python;
 
-static void plda_train(bob::trainer::PLDABaseTrainer& t, bob::machine::PLDABaseMachine& m, list l_arraysets)
+typedef bob::trainer::EMTrainer<bob::machine::PLDABase, std::vector<blitz::Array<double,2> > > EMTrainerPLDA;
+
+static void plda_train(EMTrainerPLDA& t, bob::machine::PLDABase& m, object data)
 {
-  int n_ids = len(l_arraysets);
-  std::vector<blitz::Array<double,2> > v_arraysets;
-
-  // Extracts the vector of Arraysets from the python list of Arraysets
-  for(int id=0; id<n_ids; ++id) {
-    blitz::Array<double,2> ar = extract<blitz::Array<double,2> >(l_arraysets[id]);
-    v_arraysets.push_back(ar);
-  }
-
+  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
+  std::vector<blitz::Array<double,2> > vdata_ref(dbegin, dend);
   // Calls the train function
-  t.train(m, v_arraysets);
+  t.train(m, vdata_ref);
 }
 
-static void plda_initialization(bob::trainer::PLDABaseTrainer& t, bob::machine::PLDABaseMachine& m, list l_arraysets)
+static void plda_initialization(EMTrainerPLDA& t, bob::machine::PLDABase& m, object data)
 {
-  int n_ids = len(l_arraysets);
-  std::vector<blitz::Array<double,2> > v_arraysets;
-
-  // Extracts the vector of Arraysets from the python list of Arraysets
-  for(int id=0; id<n_ids; ++id) {
-    blitz::Array<double,2> ar = extract<blitz::Array<double,2> >(l_arraysets[id]);
-    v_arraysets.push_back(ar);
-  }
-
+  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
+  std::vector<blitz::Array<double,2> > vdata_ref(dbegin, dend);
   // Calls the initialization function
-  t.initialization(m, v_arraysets);
+  t.initialization(m, vdata_ref);
 }
 
-static void plda_eStep(bob::trainer::PLDABaseTrainer& t, bob::machine::PLDABaseMachine& m, list l_arraysets)
+static void plda_eStep(EMTrainerPLDA& t, bob::machine::PLDABase& m, object data)
 {
-  int n_ids = len(l_arraysets);
-  std::vector<blitz::Array<double,2> > v_arraysets;
-
-  // Extracts the vector of Arraysets from the python list of Arraysets
-  for(int id=0; id<n_ids; ++id) {
-    blitz::Array<double,2> ar = extract<blitz::Array<double,2> >(l_arraysets[id]);
-    v_arraysets.push_back(ar);
-  }
-
+  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
+  std::vector<blitz::Array<double,2> > vdata_ref(dbegin, dend);
   // Calls the eStep function
-  t.eStep(m, v_arraysets);
+  t.eStep(m, vdata_ref);
 }
 
-static void plda_mStep(bob::trainer::PLDABaseTrainer& t, bob::machine::PLDABaseMachine& m, list l_arraysets)
+static void plda_mStep(EMTrainerPLDA& t, bob::machine::PLDABase& m, object data)
 {
-  int n_ids = len(l_arraysets);
-  std::vector<blitz::Array<double,2> > v_arraysets;
-
-  // Extracts the vector of Arraysets from the python list of Arraysets
-  for(int id=0; id<n_ids; ++id) {
-    blitz::Array<double,2> ar = extract<blitz::Array<double,2> >(l_arraysets[id]);
-    v_arraysets.push_back(ar);
-  }
-
+  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
+  std::vector<blitz::Array<double,2> > vdata_ref(dbegin, dend);
   // Calls the mStep function
-  t.mStep(m, v_arraysets);
+  t.mStep(m, vdata_ref);
 }
 
-static void plda_finalization(bob::trainer::PLDABaseTrainer& t, bob::machine::PLDABaseMachine& m, list l_arraysets)
-{
-  int n_ids = len(l_arraysets);
-  std::vector<blitz::Array<double,2> > v_arraysets;
-
-  // Extracts the vector of Arraysets from the python list of Arraysets
-  for(int id=0; id<n_ids; ++id) {
-    blitz::Array<double,2> ar = extract<blitz::Array<double,2> >(l_arraysets[id]);
-    v_arraysets.push_back(ar);
-  }
-
+static void plda_finalization(EMTrainerPLDA& t, bob::machine::PLDABase& m, object data)
+{ 
+  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
+  std::vector<blitz::Array<double,2> > vdata_ref(dbegin, dend);
   // Calls the finalization function
-  t.finalization(m, v_arraysets);
+  t.finalization(m, vdata_ref);
 }
 
-static object get_z_first_order(bob::trainer::PLDABaseTrainer& m) {
+static object get_z_first_order(bob::trainer::PLDATrainer& m) {
   const std::vector<blitz::Array<double,2> >& v = m.getZFirstOrder();
   list retval;
   for (size_t k=0; k<v.size(); ++k) retval.append(v[k]); //copy
   return tuple(retval);
 }
 
-static object get_z_second_order(bob::trainer::PLDABaseTrainer& m) {
+static object get_z_second_order(bob::trainer::PLDATrainer& m) {
   const std::vector<blitz::Array<double,3> >& v = m.getZSecondOrder();
   list retval;
   for (size_t k=0; k<v.size(); ++k) retval.append(v[k]); //copy
   return tuple(retval);
 }
 
+
 void bind_trainer_plda() 
 {
-  typedef bob::trainer::EMTrainer<bob::machine::PLDABaseMachine, std::vector<blitz::Array<double,2> > > EMTrainerPLDABase; 
-
-  class_<EMTrainerPLDABase, boost::noncopyable>("EMTrainerPLDA", "The base python class for all EM/PLDA-based trainers.", no_init)
-    .add_property("convergence_threshold", &EMTrainerPLDABase::getConvergenceThreshold, &EMTrainerPLDABase::setConvergenceThreshold, "Convergence threshold")
-    .add_property("max_iterations", &EMTrainerPLDABase::getMaxIterations, &EMTrainerPLDABase::setMaxIterations, "Max iterations")
-    .add_property("compute_likelihood_variable", &EMTrainerPLDABase::getComputeLikelihood, &EMTrainerPLDABase::setComputeLikelihood, "Indicates whether the log likelihood should be computed during EM or not")
-    .def("train", &EMTrainerPLDABase::train, (arg("machine"), arg("data")), "Trains a machine using data")
-    .def("initialization", &EMTrainerPLDABase::initialization, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
-    .def("finalization", &EMTrainerPLDABase::finalization, (arg("machine"), arg("data")), "This method is called at the end of the EM algorithm")
-    .def("e_step", &EMTrainerPLDABase::eStep, (arg("machine"), arg("data")),
+  class_<EMTrainerPLDA, boost::noncopyable>("EMTrainerPLDA", "The base python class for all EM/PLDA-based trainers.", no_init)
+    .add_property("max_iterations", &EMTrainerPLDA::getMaxIterations, &EMTrainerPLDA::setMaxIterations, "Max iterations")
+    .add_property("rng", &EMTrainerPLDA::getRng, &EMTrainerPLDA::setRng, "The Mersenne Twister mt19937 random generator used for the initialization of subspaces/arrays before the EM loop.")
+    .def("train", &plda_train, (arg("self"), arg("machine"), arg("data")), "Trains a machine using data")
+    .def("initialization", &plda_initialization, (arg("self"), arg("machine"), arg("data")), "This method is called before the EM algorithm")
+    .def("finalization", &plda_finalization, (arg("self"), arg("machine"), arg("data")), "This method is called at the end of the EM algorithm")
+    .def("e_step", &plda_eStep, (arg("self"), arg("machine"), arg("data")),
        "Updates the hidden variable distribution (or the sufficient statistics) given the Machine parameters. ")
-    .def("m_step", &EMTrainerPLDABase::mStep, (arg("machine"), arg("data")), "Updates the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
-    .def("compute_likelihood", &EMTrainerPLDABase::computeLikelihood, (arg("machine"), arg("data")), "Computes the current log likelihood given the hidden variable distribution (or the sufficient statistics)")
+    .def("m_step", &plda_mStep, (arg("self"), arg("machine"), arg("data")), "Updates the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
   ;
 
-  enum_<bob::trainer::PLDABaseTrainer::InitFMethod>("init_f_method")
-    .value("RANDOM_F", bob::trainer::PLDABaseTrainer::RANDOM_F)
-    .value("BETWEEN_SCATTER", bob::trainer::PLDABaseTrainer::BETWEEN_SCATTER)
+  enum_<bob::trainer::PLDATrainer::InitFMethod>("init_f_method")
+    .value("RANDOM_F", bob::trainer::PLDATrainer::RANDOM_F)
+    .value("BETWEEN_SCATTER", bob::trainer::PLDATrainer::BETWEEN_SCATTER)
     ;   
 
-  enum_<bob::trainer::PLDABaseTrainer::InitGMethod>("init_g_method")
-    .value("RANDOM_G", bob::trainer::PLDABaseTrainer::RANDOM_G)
-    .value("WITHIN_SCATTER", bob::trainer::PLDABaseTrainer::WITHIN_SCATTER)
+  enum_<bob::trainer::PLDATrainer::InitGMethod>("init_g_method")
+    .value("RANDOM_G", bob::trainer::PLDATrainer::RANDOM_G)
+    .value("WITHIN_SCATTER", bob::trainer::PLDATrainer::WITHIN_SCATTER)
     ;
 
-  enum_<bob::trainer::PLDABaseTrainer::InitSigmaMethod>("init_sigma_method")
-    .value("RANDOM_SIGMA", bob::trainer::PLDABaseTrainer::RANDOM_SIGMA)
-    .value("VARIANCE_G", bob::trainer::PLDABaseTrainer::VARIANCE_G)
-    .value("CONSTANT", bob::trainer::PLDABaseTrainer::CONSTANT)
-    .value("VARIANCE_DATA", bob::trainer::PLDABaseTrainer::VARIANCE_DATA)
+  enum_<bob::trainer::PLDATrainer::InitSigmaMethod>("init_sigma_method")
+    .value("RANDOM_SIGMA", bob::trainer::PLDATrainer::RANDOM_SIGMA)
+    .value("VARIANCE_G", bob::trainer::PLDATrainer::VARIANCE_G)
+    .value("CONSTANT", bob::trainer::PLDATrainer::CONSTANT)
+    .value("VARIANCE_DATA", bob::trainer::PLDATrainer::VARIANCE_DATA)
     ;
 
-  class_<bob::trainer::PLDABaseTrainer, boost::noncopyable, bases<EMTrainerPLDABase> >("PLDABaseTrainer", "A trainer for a PLDABaseMachine.\nReference:\n'A Scalable Formulation of Probabilistic Linear Discriminant Analysis: Applied to Face Recognition', Laurent El Shafey, Chris McCool, Roy Wallace, Sebastien Marcel, IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI 2013).", init<optional<double,double,bool,bool> >((arg("convergence_threshold")=0.001, arg("max_iterations")=10, arg("compute_likelihood")=false, arg("use_sum_second_order")=true),"Initializes a new PLDABaseTrainer."))
-    .def(init<const bob::trainer::PLDABaseTrainer&>((arg("trainer")), "Copy constructs a PLDABaseTrainer"))
-    .add_property("seed", &bob::trainer::PLDABaseTrainer::getSeed, &bob::trainer::PLDABaseTrainer::setSeed, "The seed used for the random initialization of F, G and sigma.")
-    .add_property("use_sum_second_order", &bob::trainer::PLDABaseTrainer::getUseSumSecondOrder, &bob::trainer::PLDABaseTrainer::setUseSumSecondOrder, "Tells whether the second order statistics are stored during the training procedure, or only their sum.")
-    .add_property("init_f_method", &bob::trainer::PLDABaseTrainer::getInitFMethod, &bob::trainer::PLDABaseTrainer::setInitFMethod, "The method used for the initialization of F.")
-    .add_property("init_f_ratio", &bob::trainer::PLDABaseTrainer::getInitFRatio, &bob::trainer::PLDABaseTrainer::setInitFRatio, "The ratio used for the initialization of F.")
-    .add_property("init_g_method", &bob::trainer::PLDABaseTrainer::getInitGMethod, &bob::trainer::PLDABaseTrainer::setInitGMethod, "The method used for the initialization of G.")
-    .add_property("init_g_ratio", &bob::trainer::PLDABaseTrainer::getInitGRatio, &bob::trainer::PLDABaseTrainer::setInitGRatio, "The ratio used for the initialization of G.")
-    .add_property("init_sigma_method", &bob::trainer::PLDABaseTrainer::getInitSigmaMethod, &bob::trainer::PLDABaseTrainer::setInitSigmaMethod, "The method used for the initialization of sigma.")
-    .add_property("init_sigma_ratio", &bob::trainer::PLDABaseTrainer::getInitSigmaRatio, &bob::trainer::PLDABaseTrainer::setInitSigmaRatio, "The ratio used for the initialization of sigma.")
+  class_<bob::trainer::PLDATrainer, boost::noncopyable, bases<EMTrainerPLDA> >("PLDATrainer", "A trainer for PLDA modelling. The train() method will learn the mu, F, G and Sigma of the model, whereas the enrol() model, will store model information about the enrolment samples for a specific class.\nReferences:\n1. 'A Scalable Formulation of Probabilistic Linear Discriminant Analysis: Applied to Face Recognition', Laurent El Shafey, Chris McCool, Roy Wallace, Sebastien Marcel, TPAMI'2013\n2. 'Probabilistic Linear Discriminant Analysis for Inference About Identity', Prince and Elder, ICCV'2007.\n3. 'Probabilistic Models for Inference about Identity', Li, Fu, Mohammed, Elder and Prince, TPAMI'2012.", init<optional<const size_t, const bool> >((arg("max_iterations")=100, arg("use_sum_second_order")=true),"Initializes a new PLDATrainer."))
+    .def(init<const bob::trainer::PLDATrainer&>((arg("trainer")), "Copy constructs a PLDATrainer"))
+    .def(self == self)
+    .def(self != self)
+    .def("is_similar_to", &bob::trainer::PLDATrainer::is_similar_to, (arg("self"), arg("other"), arg("r_epsilon")=1e-5, arg("a_epsilon")=1e-8), "Compares this PLDATrainer with the 'other' one to be approximately the same.")
+    .add_property("use_sum_second_order", &bob::trainer::PLDATrainer::getUseSumSecondOrder, &bob::trainer::PLDATrainer::setUseSumSecondOrder, "Tells whether the second order statistics are stored during the training procedure, or only their sum.")
+    .add_property("init_f_method", &bob::trainer::PLDATrainer::getInitFMethod, &bob::trainer::PLDATrainer::setInitFMethod, "The method used for the initialization of F.")
+    .add_property("init_f_ratio", &bob::trainer::PLDATrainer::getInitFRatio, &bob::trainer::PLDATrainer::setInitFRatio, "The ratio used for the initialization of F.")
+    .add_property("init_g_method", &bob::trainer::PLDATrainer::getInitGMethod, &bob::trainer::PLDATrainer::setInitGMethod, "The method used for the initialization of G.")
+    .add_property("init_g_ratio", &bob::trainer::PLDATrainer::getInitGRatio, &bob::trainer::PLDATrainer::setInitGRatio, "The ratio used for the initialization of G.")
+    .add_property("init_sigma_method", &bob::trainer::PLDATrainer::getInitSigmaMethod, &bob::trainer::PLDATrainer::setInitSigmaMethod, "The method used for the initialization of sigma.")
+    .add_property("init_sigma_ratio", &bob::trainer::PLDATrainer::getInitSigmaRatio, &bob::trainer::PLDATrainer::setInitSigmaRatio, "The ratio used for the initialization of sigma.")
     .add_property("z_first_order", &get_z_first_order)
     .add_property("z_second_order", &get_z_second_order)
-    .add_property("z_second_order_sum", make_function(&bob::trainer::PLDABaseTrainer::getZSecondOrderSum, return_value_policy<copy_const_reference>()))
-    .def("train", &plda_train, (arg("self"), arg("machine"), arg("list_arraysets")), "Calls the training procedure. This will call initialization(), a loop of e_step() and m_step(), and finalization().")
-    .def("initialization", &plda_initialization, (arg("self"), arg("machine"), arg("list_arraysets")), "Calls the initialization method of the training procedure.")
-    .def("e_step", &plda_eStep, (arg("self"), arg("machine"), arg("list_arraysets")), "Calls the eStep method of the training procedure.")
-    .def("m_step", &plda_mStep, (arg("self"), arg("machine"), arg("list_arraysets")), "Calls the mStep method of the training procedure.")
-    .def("finalization", &plda_finalization, (arg("self"), arg("machine"), arg("list_arraysets")), "Calls the finalization method of the training procedure.")
-    ;
-
-  class_<bob::trainer::PLDATrainer, boost::noncopyable>("PLDATrainer", "A trainer for a PLDAMachine.\nReference:\n'A Scalable Formulation of Probabilistic Linear Discriminant Analysis: Applied to Face Recognition', Laurent El Shafey, Chris McCool, Roy Wallace, Sebastien Marcel, IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI 2013).", init<>("Initializes a new PLDATrainer."))
-    .def(init<const bob::trainer::PLDATrainer&>((arg("trainer")), "Copy constructs a PLDATrainer"))
-    .def("enrol", &bob::trainer::PLDATrainer::enrol, (arg("self"), arg("plda_machine"), arg("arrayset")), "Call the enrollment procedure.")
+    .add_property("z_second_order_sum", make_function(&bob::trainer::PLDATrainer::getZSecondOrderSum, return_value_policy<copy_const_reference>()))
+    .def("enrol", &bob::trainer::PLDATrainer::enrol, (arg("self"), arg("plda_machine"), arg("data")), "Call the enrollment procedure.")
     ;
 }

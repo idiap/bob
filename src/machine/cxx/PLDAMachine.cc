@@ -21,6 +21,7 @@
  */
 
 #include <bob/core/assert.h>
+#include <bob/core/check.h>
 #include <bob/core/array_copy.h>
 #include <bob/machine/Exception.h>
 #include <bob/machine/PLDAMachine.h>
@@ -32,21 +33,20 @@
 #include <boost/lexical_cast.hpp>
 #include <string>
 
-#include <bob/core/logging.h>
-
-bob::machine::PLDABaseMachine::PLDABaseMachine()
+bob::machine::PLDABase::PLDABase()
 {
   resizeNoInit(0, 0, 0);
 }
 
-bob::machine::PLDABaseMachine::PLDABaseMachine(const size_t dim_d, 
+bob::machine::PLDABase::PLDABase(const size_t dim_d, 
   const size_t dim_f, const size_t dim_g, const double variance_threshold)
 {
-  resize(dim_d, dim_f, dim_g, variance_threshold);
+  m_variance_threshold = variance_threshold;
+  resize(dim_d, dim_f, dim_g);
 }
 
 
-bob::machine::PLDABaseMachine::PLDABaseMachine(const bob::machine::PLDABaseMachine& other):
+bob::machine::PLDABase::PLDABase(const bob::machine::PLDABase& other):
   m_dim_d(other.m_dim_d),
   m_dim_f(other.m_dim_f),
   m_dim_g(other.m_dim_g),
@@ -54,36 +54,32 @@ bob::machine::PLDABaseMachine::PLDABaseMachine(const bob::machine::PLDABaseMachi
   m_G(bob::core::array::ccopy(other.m_G)), 
   m_sigma(bob::core::array::ccopy(other.m_sigma)), 
   m_mu(bob::core::array::ccopy(other.m_mu)),
-  m_variance_thresholds(bob::core::array::ccopy(other.m_variance_thresholds)),
-  m_isigma(bob::core::array::ccopy(other.m_isigma)), 
-  m_alpha(bob::core::array::ccopy(other.m_alpha)),
-  m_beta(bob::core::array::ccopy(other.m_beta)),
-  m_gamma(),
-  m_Ft_beta(bob::core::array::ccopy(other.m_Ft_beta)),
-  m_Gt_isigma(bob::core::array::ccopy(other.m_Gt_isigma)), 
-  m_logdet_alpha(other.m_logdet_alpha),
-  m_logdet_sigma(other.m_logdet_sigma),
-  m_loglike_constterm(other.m_loglike_constterm),
-  m_cache_d_1(bob::core::array::ccopy(other.m_cache_d_1)),
-  m_cache_d_2(bob::core::array::ccopy(other.m_cache_d_2)),
-  m_cache_d_ng_1(bob::core::array::ccopy(other.m_cache_d_ng_1)), 
-  m_cache_nf_nf_1(bob::core::array::ccopy(other.m_cache_nf_nf_1)), 
-  m_cache_ng_ng_1(bob::core::array::ccopy(other.m_cache_ng_ng_1))
+  m_variance_threshold(other.m_variance_threshold),
+  m_cache_isigma(bob::core::array::ccopy(other.m_cache_isigma)), 
+  m_cache_alpha(bob::core::array::ccopy(other.m_cache_alpha)),
+  m_cache_beta(bob::core::array::ccopy(other.m_cache_beta)),
+  m_cache_gamma(),
+  m_cache_Ft_beta(bob::core::array::ccopy(other.m_cache_Ft_beta)),
+  m_cache_Gt_isigma(bob::core::array::ccopy(other.m_cache_Gt_isigma)), 
+  m_cache_logdet_alpha(other.m_cache_logdet_alpha),
+  m_cache_logdet_sigma(other.m_cache_logdet_sigma),
+  m_cache_loglike_constterm(other.m_cache_loglike_constterm)
 {
-  bob::core::array::ccopy(other.m_gamma, m_gamma);
+  bob::core::array::ccopy(other.m_cache_gamma, m_cache_gamma);
+  resizeTmp();
 }
 
-bob::machine::PLDABaseMachine::PLDABaseMachine(bob::io::HDF5File& config) {
+bob::machine::PLDABase::PLDABase(bob::io::HDF5File& config) {
   load(config);
 }
 
-bob::machine::PLDABaseMachine::~PLDABaseMachine() {
+bob::machine::PLDABase::~PLDABase() {
 }
 
-bob::machine::PLDABaseMachine& bob::machine::PLDABaseMachine::operator=
-    (const bob::machine::PLDABaseMachine& other) 
+bob::machine::PLDABase& bob::machine::PLDABase::operator=
+    (const bob::machine::PLDABase& other) 
 {
-  if(this!=&other)
+  if (this != &other)
   {
     m_dim_d = other.m_dim_d;
     m_dim_f = other.m_dim_f;
@@ -92,84 +88,85 @@ bob::machine::PLDABaseMachine& bob::machine::PLDABaseMachine::operator=
     m_G.reference(bob::core::array::ccopy(other.m_G));
     m_sigma.reference(bob::core::array::ccopy(other.m_sigma));
     m_mu.reference(bob::core::array::ccopy(other.m_mu));
-    m_variance_thresholds.reference(bob::core::array::ccopy(other.m_variance_thresholds));
-    m_isigma.reference(bob::core::array::ccopy(other.m_isigma));
-    m_alpha.reference(bob::core::array::ccopy(other.m_alpha));
-    m_beta.reference(bob::core::array::ccopy(other.m_beta));
-    bob::core::array::ccopy(other.m_gamma, m_gamma);
-    m_Ft_beta.reference(bob::core::array::ccopy(other.m_Ft_beta));
-    m_Gt_isigma.reference(bob::core::array::ccopy(other.m_Gt_isigma));
-    m_logdet_alpha = other.m_logdet_alpha;
-    m_logdet_sigma = other.m_logdet_sigma;
-    m_loglike_constterm = other.m_loglike_constterm;
-    m_cache_d_1.reference(bob::core::array::ccopy(other.m_cache_d_1));
-    m_cache_d_2.reference(bob::core::array::ccopy(other.m_cache_d_2));
-    m_cache_d_ng_1.reference(bob::core::array::ccopy(other.m_cache_d_ng_1));
-    m_cache_nf_nf_1.reference(bob::core::array::ccopy(other.m_cache_nf_nf_1));
-    m_cache_ng_ng_1.reference(bob::core::array::ccopy(other.m_cache_ng_ng_1));
+    m_variance_threshold = other.m_variance_threshold;
+    m_cache_isigma.reference(bob::core::array::ccopy(other.m_cache_isigma));
+    m_cache_alpha.reference(bob::core::array::ccopy(other.m_cache_alpha));
+    m_cache_beta.reference(bob::core::array::ccopy(other.m_cache_beta));
+    bob::core::array::ccopy(other.m_cache_gamma, m_cache_gamma);
+    m_cache_Ft_beta.reference(bob::core::array::ccopy(other.m_cache_Ft_beta));
+    m_cache_Gt_isigma.reference(bob::core::array::ccopy(other.m_cache_Gt_isigma));
+    m_cache_logdet_alpha = other.m_cache_logdet_alpha;
+    m_cache_logdet_sigma = other.m_cache_logdet_sigma;
+    m_cache_loglike_constterm = other.m_cache_loglike_constterm;
+    resizeTmp();
   }
   return *this;
 }
 
-bool bob::machine::PLDABaseMachine::operator==
-    (const bob::machine::PLDABaseMachine& b) const
+bool bob::machine::PLDABase::operator==
+    (const bob::machine::PLDABase& b) const
 {
-  // Check dimensions
-  if(this->m_dim_d != b.m_dim_d || this->m_dim_f != b.m_dim_f ||
-     this->m_dim_g != b.m_dim_g)
+  if (!(m_dim_d == b.m_dim_d && m_dim_f == b.m_dim_f && 
+        m_dim_g == b.m_dim_g && 
+        bob::core::array::isEqual(m_F, b.m_F) &&
+        bob::core::array::isEqual(m_G, b.m_G) &&
+        bob::core::array::isEqual(m_sigma, b.m_sigma) &&
+        bob::core::array::isEqual(m_mu, b.m_mu) &&
+        m_variance_threshold == b.m_variance_threshold &&
+        bob::core::array::isEqual(m_cache_isigma, b.m_cache_isigma) &&
+        bob::core::array::isEqual(m_cache_alpha, b.m_cache_alpha) &&
+        bob::core::array::isEqual(m_cache_beta, b.m_cache_beta) && 
+        bob::core::array::isEqual(m_cache_gamma, b.m_cache_gamma) &&
+        bob::core::array::isEqual(m_cache_Ft_beta, b.m_cache_Ft_beta) &&
+        bob::core::array::isEqual(m_cache_Gt_isigma, b.m_cache_Gt_isigma) &&
+        m_cache_logdet_alpha == b.m_cache_logdet_alpha &&
+        m_cache_logdet_sigma == b.m_cache_logdet_sigma))
     return false;
 
-  // Check content
-  if(blitz::any(this->m_F != b.m_F) || blitz::any(this->m_G != b.m_G) || 
-     blitz::any(this->m_sigma != b.m_sigma) || blitz::any(this->m_mu != b.m_mu) ||
-     blitz::any(this->m_variance_thresholds != b.m_variance_thresholds))
-    return false;
-
-  // Check additional content
-  if(blitz::any(this->m_isigma != b.m_isigma) || blitz::any(this->m_alpha != b.m_alpha) || 
-     blitz::any(this->m_beta != b.m_beta) || blitz::any(this->m_Ft_beta != b.m_Ft_beta) ||
-     blitz::any(this->m_Gt_isigma != b.m_Gt_isigma) ||
-     this->m_logdet_alpha != b.m_logdet_alpha || this->m_logdet_sigma != b.m_logdet_sigma)
-    return false;
-
-  // Check additional maps
-  // 1. m_gamma
+  // m_cache_loglike_constterm
+  if (this->m_cache_loglike_constterm.size() != b.m_cache_loglike_constterm.size())
+    return false;  // differing sizes, they are not the same
+  std::map<size_t, double>::const_iterator i, j;
+  for (i = this->m_cache_loglike_constterm.begin(), j = b.m_cache_loglike_constterm.begin(); 
+    i != this->m_cache_loglike_constterm.end(); ++i, ++j)
   {
-    if(this->m_gamma.size() != b.m_gamma.size())
-      return false;  // differing sizes, they are not the same
-    std::map<size_t, blitz::Array<double,2> >::const_iterator i, j;
-    for(i = this->m_gamma.begin(), j = b.m_gamma.begin(); 
-      i != this->m_gamma.end(); ++i, ++j)
-    {
-      if(i->first != j->first || blitz::any(i->second != j->second))
-        return false;
-    }
-  }
-  // 2. m_loglike_constterm
-  {
-    if(this->m_loglike_constterm.size() != b.m_loglike_constterm.size())
-      return false;  // differing sizes, they are not the same
-    std::map<size_t, double>::const_iterator i, j;
-    for(i = this->m_loglike_constterm.begin(), j = b.m_loglike_constterm.begin(); 
-      i != this->m_loglike_constterm.end(); ++i, ++j)
-    {
-      if(i->first != j->first || i->second != j->second)
-        return false;
-    }
+    if (i->first != j->first || i->second != j->second)
+      return false;
   }
 
   return true;
 }
 
-bool bob::machine::PLDABaseMachine::operator!=
-    (const bob::machine::PLDABaseMachine& b) const 
+bool bob::machine::PLDABase::operator!=
+    (const bob::machine::PLDABase& b) const 
 {
   return !(this->operator==(b));
 }
 
-void bob::machine::PLDABaseMachine::load(bob::io::HDF5File& config) 
+bool bob::machine::PLDABase::is_similar_to(const bob::machine::PLDABase& b,
+  const double r_epsilon, const double a_epsilon) const
 {
-  if(!config.contains("dim_d"))
+  return (m_dim_d == b.m_dim_d && m_dim_f == b.m_dim_f && 
+          m_dim_g == b.m_dim_g && 
+          bob::core::array::isClose(m_F, b.m_F, r_epsilon, a_epsilon) &&
+          bob::core::array::isClose(m_G, b.m_G, r_epsilon, a_epsilon) &&
+          bob::core::array::isClose(m_sigma, b.m_sigma, r_epsilon, a_epsilon) &&
+          bob::core::array::isClose(m_mu, b.m_mu, r_epsilon, a_epsilon) &&
+          bob::core::isClose(m_variance_threshold, b.m_variance_threshold, r_epsilon, a_epsilon) &&
+          bob::core::array::isClose(m_cache_isigma, b.m_cache_isigma, r_epsilon, a_epsilon) &&
+          bob::core::array::isClose(m_cache_alpha, b.m_cache_alpha, r_epsilon, a_epsilon) &&
+          bob::core::array::isClose(m_cache_beta, b.m_cache_beta, r_epsilon, a_epsilon) && 
+          bob::core::array::isClose(m_cache_gamma, b.m_cache_gamma, r_epsilon, a_epsilon) &&
+          bob::core::array::isClose(m_cache_Ft_beta, b.m_cache_Ft_beta, r_epsilon, a_epsilon) &&
+          bob::core::array::isClose(m_cache_Gt_isigma, b.m_cache_Gt_isigma, r_epsilon, a_epsilon) &&
+          bob::core::isClose(m_cache_logdet_alpha, b.m_cache_logdet_alpha, r_epsilon, a_epsilon) &&
+          bob::core::isClose(m_cache_logdet_sigma, b.m_cache_logdet_sigma, r_epsilon, a_epsilon) &&
+          bob::core::isClose(m_cache_loglike_constterm, b.m_cache_loglike_constterm));
+}
+
+void bob::machine::PLDABase::load(bob::io::HDF5File& config) 
+{
+  if (!config.contains("dim_d"))
   {
     // Then the model was saved using bob < 1.2.0
     //reads all data directly into the member variables
@@ -180,29 +177,28 @@ void bob::machine::PLDABaseMachine::load(bob::io::HDF5File& config)
     m_dim_g = m_G.extent(1);
     m_sigma.reference(config.readArray<double,1>("sigma"));
     m_mu.reference(config.readArray<double,1>("mu"));
-    m_isigma.resize(m_dim_d);
+    m_cache_isigma.resize(m_dim_d);
     precomputeISigma();
-    m_variance_thresholds.resize(m_dim_d);
-    m_variance_thresholds = 0.; 
-    m_alpha.reference(config.readArray<double,2>("alpha"));
-    m_beta.reference(config.readArray<double,2>("beta"));
+    m_variance_threshold = 0.; 
+    m_cache_alpha.reference(config.readArray<double,2>("alpha"));
+    m_cache_beta.reference(config.readArray<double,2>("beta"));
     // gamma and log like constant term (a-dependent terms)
-    if(config.contains("a_indices"))
+    if (config.contains("a_indices"))
     {
       blitz::Array<uint32_t, 1> a_indices;
       a_indices.reference(config.readArray<uint32_t,1>("a_indices"));
-      for(int i=0; i<a_indices.extent(0); ++i)
+      for (int i=0; i<a_indices.extent(0); ++i)
       {
         std::string str1 = "gamma_" + boost::lexical_cast<std::string>(a_indices(i));
-        m_gamma[a_indices(i)].reference(config.readArray<double,2>(str1));
+        m_cache_gamma[a_indices(i)].reference(config.readArray<double,2>(str1));
         std::string str2 = "loglikeconstterm_" + boost::lexical_cast<std::string>(a_indices(i));
-        m_loglike_constterm[a_indices(i)] = config.read<double>(str2);
+        m_cache_loglike_constterm[a_indices(i)] = config.read<double>(str2);
       }
     }
-    m_Ft_beta.reference(config.readArray<double,2>("Ft_beta"));
-    m_Gt_isigma.reference(config.readArray<double,2>("Gt_isigma"));
-    m_logdet_alpha = config.read<double>("logdet_alpha");
-    m_logdet_sigma = config.read<double>("logdet_sigma");
+    m_cache_Ft_beta.reference(config.readArray<double,2>("Ft_beta"));
+    m_cache_Gt_isigma.reference(config.readArray<double,2>("Gt_isigma"));
+    m_cache_logdet_alpha = config.read<double>("logdet_alpha");
+    m_cache_logdet_sigma = config.read<double>("logdet_sigma");
   }
   else
   {
@@ -216,11 +212,18 @@ void bob::machine::PLDABaseMachine::load(bob::io::HDF5File& config)
     m_dim_g = config.read<uint64_t>("dim_g");
     m_sigma.reference(config.readArray<double,1>("sigma"));
     m_mu.reference(config.readArray<double,1>("mu"));
-    m_isigma.resize(m_dim_d);
+    m_cache_isigma.resize(m_dim_d);
     precomputeISigma();
-    m_variance_thresholds.reference(config.readArray<double,1>("variance_thresholds"));
-    m_alpha.reference(config.readArray<double,2>("alpha"));
-    m_beta.reference(config.readArray<double,2>("beta"));
+    if (config.contains("variance_threshold"))
+      m_variance_threshold = config.read<double>("variance_threshold");
+    else if (config.contains("variance_thresholds")) // In case 1.2.0 alpha/beta version has been used
+    {
+      blitz::Array<double,1> tmp;
+      tmp.reference(config.readArray<double,1>("variance_thresholds"));
+      m_variance_threshold = tmp(0);
+    }
+    m_cache_alpha.reference(config.readArray<double,2>("alpha"));
+    m_cache_beta.reference(config.readArray<double,2>("beta"));
     // gamma's (a-dependent terms)
     if(config.contains("a_indices_gamma"))
     {
@@ -229,7 +232,7 @@ void bob::machine::PLDABaseMachine::load(bob::io::HDF5File& config)
       for(int i=0; i<a_indices.extent(0); ++i)
       {
         std::string str = "gamma_" + boost::lexical_cast<std::string>(a_indices(i));
-        m_gamma[a_indices(i)].reference(config.readArray<double,2>(str));
+        m_cache_gamma[a_indices(i)].reference(config.readArray<double,2>(str));
       }
     }
     // log likelihood constant term's (a-dependent terms)
@@ -240,22 +243,18 @@ void bob::machine::PLDABaseMachine::load(bob::io::HDF5File& config)
       for(int i=0; i<a_indices.extent(0); ++i)
       {
         std::string str = "loglikeconstterm_" + boost::lexical_cast<std::string>(a_indices(i));
-        m_loglike_constterm[a_indices(i)] = config.read<double>(str);
+        m_cache_loglike_constterm[a_indices(i)] = config.read<double>(str);
       }
     }
-    m_Ft_beta.reference(config.readArray<double,2>("Ft_beta"));
-    m_Gt_isigma.reference(config.readArray<double,2>("Gt_isigma"));
-    m_logdet_alpha = config.read<double>("logdet_alpha");
-    m_logdet_sigma = config.read<double>("logdet_sigma");
+    m_cache_Ft_beta.reference(config.readArray<double,2>("Ft_beta"));
+    m_cache_Gt_isigma.reference(config.readArray<double,2>("Gt_isigma"));
+    m_cache_logdet_alpha = config.read<double>("logdet_alpha");
+    m_cache_logdet_sigma = config.read<double>("logdet_sigma");
   }
-  m_cache_d_1.resize(m_dim_d);
-  m_cache_d_2.resize(m_dim_d);
-  m_cache_d_ng_1.resize(m_dim_d,m_dim_g);
-  m_cache_nf_nf_1.resize(m_dim_f,m_dim_f);
-  m_cache_ng_ng_1.resize(m_dim_g,m_dim_g);
+  resizeTmp();
 }
 
-void bob::machine::PLDABaseMachine::save(bob::io::HDF5File& config) const 
+void bob::machine::PLDABase::save(bob::io::HDF5File& config) const 
 {
   config.set("dim_d", (uint64_t)m_dim_d);
   config.set("dim_f", (uint64_t)m_dim_f);
@@ -264,16 +263,16 @@ void bob::machine::PLDABaseMachine::save(bob::io::HDF5File& config) const
   config.setArray("G", m_G);
   config.setArray("sigma", m_sigma);
   config.setArray("mu", m_mu);
-  config.setArray("variance_thresholds", m_variance_thresholds);
-  config.setArray("alpha", m_alpha);
-  config.setArray("beta", m_beta);
+  config.set("variance_threshold", m_variance_threshold);
+  config.setArray("alpha", m_cache_alpha);
+  config.setArray("beta", m_cache_beta);
   // gamma's
-  if(m_gamma.size() > 0)
+  if(m_cache_gamma.size() > 0)
   {
-    blitz::Array<uint32_t, 1> a_indices(m_gamma.size());
+    blitz::Array<uint32_t, 1> a_indices(m_cache_gamma.size());
     int i = 0;
     for(std::map<size_t,blitz::Array<double,2> >::const_iterator 
-        it=m_gamma.begin(); it!=m_gamma.end(); ++it)
+        it=m_cache_gamma.begin(); it!=m_cache_gamma.end(); ++it)
     {
       a_indices(i) = it->first;
       std::string str = "gamma_" + boost::lexical_cast<std::string>(it->first);
@@ -283,12 +282,12 @@ void bob::machine::PLDABaseMachine::save(bob::io::HDF5File& config) const
     config.setArray("a_indices_gamma", a_indices);
   }
   // log likelihood constant terms
-  if(m_loglike_constterm.size() > 0)
+  if(m_cache_loglike_constterm.size() > 0)
   {
-    blitz::Array<uint32_t, 1> a_indices(m_loglike_constterm.size());
+    blitz::Array<uint32_t, 1> a_indices(m_cache_loglike_constterm.size());
     int i = 0;
     for(std::map<size_t,double>::const_iterator 
-        it=m_loglike_constterm.begin(); it!=m_loglike_constterm.end(); ++it)
+        it=m_cache_loglike_constterm.begin(); it!=m_cache_loglike_constterm.end(); ++it)
     {
       a_indices(i) = it->first;
       std::string str = "loglikeconstterm_" + boost::lexical_cast<std::string>(it->first);
@@ -298,46 +297,49 @@ void bob::machine::PLDABaseMachine::save(bob::io::HDF5File& config) const
     config.setArray("a_indices_loglikeconstterm", a_indices);
   }
 
-  config.setArray("Ft_beta", m_Ft_beta);
-  config.setArray("Gt_isigma", m_Gt_isigma);
-  config.set("logdet_alpha", m_logdet_alpha);
-  config.set("logdet_sigma", m_logdet_sigma);
+  config.setArray("Ft_beta", m_cache_Ft_beta);
+  config.setArray("Gt_isigma", m_cache_Gt_isigma);
+  config.set("logdet_alpha", m_cache_logdet_alpha);
+  config.set("logdet_sigma", m_cache_logdet_sigma);
 }
 
-void bob::machine::PLDABaseMachine::resizeNoInit(const size_t dim_d, const size_t dim_f, 
+void bob::machine::PLDABase::resizeNoInit(const size_t dim_d, const size_t dim_f, 
     const size_t dim_g) 
 {
   m_dim_d = dim_d;
   m_dim_f = dim_f;
   m_dim_g = dim_g;
-  m_F.resize(dim_d,dim_f);
-  m_G.resize(dim_d,dim_g);
+  m_F.resize(dim_d, dim_f);
+  m_G.resize(dim_d, dim_g);
   m_sigma.resize(dim_d);
   m_mu.resize(dim_d);
-  m_variance_thresholds.resize(dim_d);
-  m_alpha.resize(dim_g,dim_g);
-  m_beta.resize(dim_d,dim_d);
-  m_Ft_beta.resize(dim_f,dim_d);
-  m_Gt_isigma.resize(dim_g,dim_d);
-  m_gamma.clear();
-  m_isigma.resize(dim_d);
-  m_loglike_constterm.clear();
-  m_cache_d_1.resize(dim_d);
-  m_cache_d_2.resize(dim_d);
-  m_cache_d_ng_1.resize(dim_d,dim_g);
-  m_cache_nf_nf_1.resize(dim_f,dim_f);
-  m_cache_ng_ng_1.resize(dim_g,dim_g);
+  m_cache_alpha.resize(dim_g, dim_g);
+  m_cache_beta.resize(dim_d, dim_d);
+  m_cache_Ft_beta.resize(dim_f, dim_d);
+  m_cache_Gt_isigma.resize(dim_g, dim_d);
+  m_cache_gamma.clear();
+  m_cache_isigma.resize(dim_d);
+  m_cache_loglike_constterm.clear();
+  resizeTmp();
 }
 
-void bob::machine::PLDABaseMachine::resize(const size_t dim_d, const size_t dim_f, 
-    const size_t dim_g, const double variance_threshold) 
+void bob::machine::PLDABase::resizeTmp()
+{
+  m_tmp_d_1.resize(m_dim_d);
+  m_tmp_d_2.resize(m_dim_d);
+  m_tmp_d_ng_1.resize(m_dim_d, m_dim_g);
+  m_tmp_nf_nf_1.resize(m_dim_f, m_dim_f);
+  m_tmp_ng_ng_1.resize(m_dim_g, m_dim_g);
+}
+
+void bob::machine::PLDABase::resize(const size_t dim_d, const size_t dim_f, 
+    const size_t dim_g) 
 {
   resizeNoInit(dim_d, dim_f, dim_g);
-  m_variance_thresholds = variance_threshold;
   initMuFGSigma();
 }
 
-void bob::machine::PLDABaseMachine::setF(const blitz::Array<double,2>& F) 
+void bob::machine::PLDABase::setF(const blitz::Array<double,2>& F) 
 {
   bob::core::array::assertSameShape(F, m_F);
   m_F.reference(bob::core::array::ccopy(F));
@@ -345,7 +347,7 @@ void bob::machine::PLDABaseMachine::setF(const blitz::Array<double,2>& F)
   precompute();
 }
 
-void bob::machine::PLDABaseMachine::setG(const blitz::Array<double,2>& G) 
+void bob::machine::PLDABase::setG(const blitz::Array<double,2>& G) 
 {
   bob::core::array::assertSameShape(G, m_G);
   m_G.reference(bob::core::array::ccopy(G));
@@ -354,63 +356,53 @@ void bob::machine::PLDABaseMachine::setG(const blitz::Array<double,2>& G)
   precomputeLogDetAlpha();
 }
 
-void bob::machine::PLDABaseMachine::setSigma(const blitz::Array<double,1>& sigma) 
+void bob::machine::PLDABase::setSigma(const blitz::Array<double,1>& sigma) 
 {
   bob::core::array::assertSameShape(sigma, m_sigma);
   m_sigma.reference(bob::core::array::ccopy(sigma));
-  // Apply variance flooring thresholds: This will also
+  // Apply variance flooring threshold: This will also
   // call the precompute() and precomputeLogLike() methods!
-  applyVarianceThresholds();
+  applyVarianceThreshold();
 }
 
-void bob::machine::PLDABaseMachine::setMu(const blitz::Array<double,1>& mu) 
+void bob::machine::PLDABase::setMu(const blitz::Array<double,1>& mu) 
 {
   bob::core::array::assertSameShape(mu, m_mu);
   m_mu.reference(bob::core::array::ccopy(mu));
 }
 
-void bob::machine::PLDABaseMachine::setVarianceThresholds(const blitz::Array<double,1> &variance_thresholds) 
-{
-  // Check and set
-  bob::core::array::assertSameShape(m_variance_thresholds, variance_thresholds);
-  m_variance_thresholds = variance_thresholds;
-  // Apply variance flooring thresholds: This will also
-  // call the precompute() and precomputeLogLike() methods!
-  applyVarianceThresholds();
-}
-
-void bob::machine::PLDABaseMachine::setVarianceThresholds(const double value) 
+void bob::machine::PLDABase::setVarianceThreshold(const double value) 
 {
   // Variance flooring
-  m_variance_thresholds = value;
+  m_variance_threshold = value;
   // Apply variance flooring thresholds: This will also
   // call the precompute() and precomputeLogLike() methods!
-  applyVarianceThresholds();
+  applyVarianceThreshold();
 }
 
-void bob::machine::PLDABaseMachine::applyVarianceThresholds() 
+void bob::machine::PLDABase::applyVarianceThreshold() 
 {
    // Apply variance flooring threshold
-  m_sigma = blitz::where( m_sigma < m_variance_thresholds, m_variance_thresholds, m_sigma);
+  m_sigma = blitz::where( m_sigma < m_variance_threshold, m_variance_threshold, m_sigma);
   // Re-compute constants, because m_sigma has changed
   precompute();
   precomputeLogLike();
 }
 
-const blitz::Array<double,2>& bob::machine::PLDABaseMachine::getGamma(const size_t a)
+const blitz::Array<double,2>& bob::machine::PLDABase::getGamma(const size_t a) const
 {
   if(!hasGamma(a)) 
     throw std::runtime_error("Gamma for this number of samples is not currently in cache. You could use the getAddGamma() method instead");
-  return m_gamma[a];
+  return (m_cache_gamma.find(a))->second;
 }
 
-const blitz::Array<double,2>& bob::machine::PLDABaseMachine::getAddGamma(const size_t a)
+const blitz::Array<double,2>& bob::machine::PLDABase::getAddGamma(const size_t a)
 {
   if(!hasGamma(a)) precomputeGamma(a);
-  return m_gamma[a];
+  return m_cache_gamma[a];
 }
 
-void bob::machine::PLDABaseMachine::initMuFGSigma() 
+void bob::machine::PLDABase::initMuFGSigma() 
 {
   // To avoid problems related to precomputation
   m_mu = 0.;
@@ -422,112 +414,111 @@ void bob::machine::PLDABaseMachine::initMuFGSigma()
   precomputeLogLike();
 }
 
-void bob::machine::PLDABaseMachine::precompute() 
+void bob::machine::PLDABase::precompute() 
 {
   precomputeISigma();
   precomputeGtISigma();
   precomputeAlpha();
   precomputeBeta();
-  m_gamma.clear();
+  m_cache_gamma.clear();
   precomputeFtBeta();
-  m_loglike_constterm.clear();
+  m_cache_loglike_constterm.clear();
 }
 
-void bob::machine::PLDABaseMachine::precomputeLogLike() 
+void bob::machine::PLDABase::precomputeLogLike() 
 {
   precomputeLogDetAlpha();
   precomputeLogDetSigma();
 }
 
-void bob::machine::PLDABaseMachine::precomputeISigma() 
+void bob::machine::PLDABase::precomputeISigma() 
 {
   // Updates inverse of sigma
-  // TODO: check division by zero
-  m_isigma = 1. / m_sigma;
+  m_cache_isigma = 1. / m_sigma;
 }
 
-void bob::machine::PLDABaseMachine::precomputeGtISigma() 
+void bob::machine::PLDABase::precomputeGtISigma() 
 {
-  // m_Gt_isigma = G^T \Sigma^{-1}
+  // m_cache_Gt_isigma = G^T \Sigma^{-1}
   blitz::firstIndex i;
   blitz::secondIndex j;
   blitz::Array<double,2> Gt = m_G.transpose(1,0);
-  m_Gt_isigma = Gt(i,j) * m_isigma(j);
+  m_cache_Gt_isigma = Gt(i,j) * m_cache_isigma(j);
 }
 
-void bob::machine::PLDABaseMachine::precomputeAlpha() 
+void bob::machine::PLDABase::precomputeAlpha() 
 {
   // alpha = (Id + G^T.sigma^-1.G)^-1
 
-  // m_cache_ng_ng_1 = G^T.sigma^-1.G
-  bob::math::prod(m_Gt_isigma, m_G, m_cache_ng_ng_1);
-  // m_cache_ng_ng_1 = Id + G^T.sigma^-1.G
-  for(int i=0; i<m_cache_ng_ng_1.extent(0); ++i) m_cache_ng_ng_1(i,i) += 1;
-  // m_alpha = (Id + G^T.sigma^-1.G)^-1
-  bob::math::inv(m_cache_ng_ng_1, m_alpha);
+  // m_tmp_ng_ng_1 = G^T.sigma^-1.G
+  bob::math::prod(m_cache_Gt_isigma, m_G, m_tmp_ng_ng_1);
+  // m_tmp_ng_ng_1 = Id + G^T.sigma^-1.G
+  for(int i=0; i<m_tmp_ng_ng_1.extent(0); ++i) m_tmp_ng_ng_1(i,i) += 1;
+  // m_cache_alpha = (Id + G^T.sigma^-1.G)^-1
+  bob::math::inv(m_tmp_ng_ng_1, m_cache_alpha);
 }
 
-void bob::machine::PLDABaseMachine::precomputeBeta() 
+void bob::machine::PLDABase::precomputeBeta() 
 {
   // beta = (sigma + G.G^T)^-1
   // BUT, there is a more efficient computation (Woodbury identity):
   // beta = sigma^-1 - sigma^-1.G.(Id + G^T.sigma^-1.G)^-1.G^T.sigma^-1
   // beta =  sigma^-1 - sigma^-1.G.alpha.G^T.sigma^-1
   
-  blitz::Array<double,2> GtISigmaT = m_Gt_isigma.transpose(1,0);
-  // m_cache_d_ng_1 = sigma^-1.G.alpha
-  bob::math::prod(GtISigmaT, m_alpha, m_cache_d_ng_1);
-  // m_beta = -sigma^-1.G.alpha.G^T.sigma^-1
-  bob::math::prod(m_cache_d_ng_1, m_Gt_isigma, m_beta);
-  m_beta = -m_beta;
-  // m_beta = sigma^-1 - sigma^-1.G.alpha.G^T.sigma^-1
-  for(int i=0; i<m_beta.extent(0); ++i) m_beta(i,i) += m_isigma(i);
+  blitz::Array<double,2> GtISigmaT = m_cache_Gt_isigma.transpose(1,0);
+  // m_tmp_d_ng_1 = sigma^-1.G.alpha
+  bob::math::prod(GtISigmaT, m_cache_alpha, m_tmp_d_ng_1);
+  // m_cache_beta = -sigma^-1.G.alpha.G^T.sigma^-1
+  bob::math::prod(m_tmp_d_ng_1, m_cache_Gt_isigma, m_cache_beta);
+  m_cache_beta = -m_cache_beta;
+  // m_cache_beta = sigma^-1 - sigma^-1.G.alpha.G^T.sigma^-1
+  for(int i=0; i<m_cache_beta.extent(0); ++i) m_cache_beta(i,i) += m_cache_isigma(i);
 }
 
-void bob::machine::PLDABaseMachine::precomputeGamma(const size_t a)
+void bob::machine::PLDABase::precomputeGamma(const size_t a)
 {
   
   blitz::Array<double,2> gamma_a(getDimF(),getDimF());
-  m_gamma[a].reference(gamma_a);
+  m_cache_gamma[a].reference(gamma_a);
   computeGamma(a, gamma_a);
 }
 
-void bob::machine::PLDABaseMachine::precomputeFtBeta() 
+void bob::machine::PLDABase::precomputeFtBeta() 
 {
-  // m_Ft_beta = F^T.beta = F^T.(sigma + G.G^T)^-1 
+  // m_cache_Ft_beta = F^T.beta = F^T.(sigma + G.G^T)^-1 
   blitz::Array<double,2> Ft = m_F.transpose(1,0);
-  bob::math::prod(Ft, m_beta, m_Ft_beta);
+  bob::math::prod(Ft, m_cache_beta, m_cache_Ft_beta);
 }
 
-void bob::machine::PLDABaseMachine::computeGamma(const size_t a, 
+void bob::machine::PLDABase::computeGamma(const size_t a, 
   blitz::Array<double,2> res) const
 {
   // gamma = (Id + a.F^T.beta.F)^-1
 
   // Checks destination size
-  bob::core::array::assertSameShape(res, m_cache_nf_nf_1);
-  // m_cache_nf_nf_1 = F^T.beta.F
-  bob::math::prod(m_Ft_beta, m_F, m_cache_nf_nf_1);
-   // m_cache_nf_nf_1 = a.F^T.beta.F
-  m_cache_nf_nf_1 *= static_cast<double>(a);
-  // m_cache_nf_nf_1 = Id + a.F^T.beta.F
-  for(int i=0; i<m_cache_nf_nf_1.extent(0); ++i) m_cache_nf_nf_1(i,i) += 1;
+  bob::core::array::assertSameShape(res, m_tmp_nf_nf_1);
+  // m_tmp_nf_nf_1 = F^T.beta.F
+  bob::math::prod(m_cache_Ft_beta, m_F, m_tmp_nf_nf_1);
+   // m_tmp_nf_nf_1 = a.F^T.beta.F
+  m_tmp_nf_nf_1 *= static_cast<double>(a);
+  // m_tmp_nf_nf_1 = Id + a.F^T.beta.F
+  for(int i=0; i<m_tmp_nf_nf_1.extent(0); ++i) m_tmp_nf_nf_1(i,i) += 1;
 
   // res = (Id + a.F^T.beta.F)^-1
-  bob::math::inv(m_cache_nf_nf_1, res);
+  bob::math::inv(m_tmp_nf_nf_1, res);
 }
 
-void bob::machine::PLDABaseMachine::precomputeLogDetAlpha()
+void bob::machine::PLDABase::precomputeLogDetAlpha()
 {
-  m_logdet_alpha = log(fabs(bob::math::det(m_alpha)));
+  m_cache_logdet_alpha = log(fabs(bob::math::det(m_cache_alpha)));
 }
 
-void bob::machine::PLDABaseMachine::precomputeLogDetSigma()
+void bob::machine::PLDABase::precomputeLogDetSigma()
 {
-  m_logdet_sigma = blitz::sum(blitz::log(m_sigma));
+  m_cache_logdet_sigma = blitz::sum(blitz::log(m_sigma));
 }
 
-double bob::machine::PLDABaseMachine::computeLogLikeConstTerm(const size_t a,
+double bob::machine::PLDABase::computeLogLikeConstTerm(const size_t a,
   const blitz::Array<double,2>& gamma_a) const
 {
   // loglike_constterm[a] = a/2 * 
@@ -535,42 +526,42 @@ double bob::machine::PLDABaseMachine::computeLogLikeConstTerm(const size_t a,
   double logdet_gamma_a = log(fabs(bob::math::det(gamma_a)));
   double ah = static_cast<double>(a)/2.;
   double res = ( -ah*((double)m_dim_d)*log(2*M_PI) - 
-      ah*m_logdet_sigma + ah*m_logdet_alpha + logdet_gamma_a/2.);
+      ah*m_cache_logdet_sigma + ah*m_cache_logdet_alpha + logdet_gamma_a/2.);
   return res;
 }
 
-double bob::machine::PLDABaseMachine::computeLogLikeConstTerm(const size_t a)
+double bob::machine::PLDABase::computeLogLikeConstTerm(const size_t a)
 {
   const blitz::Array<double,2>& gamma_a = getAddGamma(a);
   return computeLogLikeConstTerm(a, gamma_a);
 }
 
-void bob::machine::PLDABaseMachine::precomputeLogLikeConstTerm(const size_t a)
+void bob::machine::PLDABase::precomputeLogLikeConstTerm(const size_t a)
 {
   double val = computeLogLikeConstTerm(a); 
-  m_loglike_constterm[a] = val;
+  m_cache_loglike_constterm[a] = val;
 }
 
-double bob::machine::PLDABaseMachine::getLogLikeConstTerm(const size_t a)
+double bob::machine::PLDABase::getLogLikeConstTerm(const size_t a) const
 {
   if(!hasLogLikeConstTerm(a))
     throw std::runtime_error("The LogLikelihood constant term for this number of samples is not currently in cache. You could use the getAddLogLikeConstTerm() method instead");
-  return m_loglike_constterm[a];
+  return (m_cache_loglike_constterm.find(a))->second;
 }
 
-double bob::machine::PLDABaseMachine::getAddLogLikeConstTerm(const size_t a)
+double bob::machine::PLDABase::getAddLogLikeConstTerm(const size_t a)
 {
   if(!hasLogLikeConstTerm(a)) precomputeLogLikeConstTerm(a);
-  return m_loglike_constterm[a];
+  return m_cache_loglike_constterm[a];
 }
 
-void bob::machine::PLDABaseMachine::clearMaps()
+void bob::machine::PLDABase::clearMaps()
 {
-  m_gamma.clear();
-  m_loglike_constterm.clear();
+  m_cache_gamma.clear();
+  m_cache_loglike_constterm.clear();
 }
 
-double bob::machine::PLDABaseMachine::computeLogLikelihoodPointEstimate(
+double bob::machine::PLDABase::computeLogLikelihoodPointEstimate(
   const blitz::Array<double,1>& xij, const blitz::Array<double,1>& hi, 
   const blitz::Array<double,1>& wij) const
 {
@@ -580,26 +571,26 @@ double bob::machine::PLDABaseMachine::computeLogLikelihoodPointEstimate(
   bob::core::array::assertSameDimensionLength(wij.extent(0), getDimG());
   // Computes: -D/2 log(2pi) -1/2 log(det(\Sigma)) 
   //   -1/2 {(x_{ij}-(\mu+Fh_{i}+Gw_{ij}))^{T}\Sigma^{-1}(x_{ij}-(\mu+Fh_{i}+Gw_{ij}))}
-  double res = -0.5*((double)m_dim_d)*log(2*M_PI) - 0.5*m_logdet_sigma;
-  // m_cache_d_1 = (x_{ij} - (\mu+Fh_{i}+Gw_{ij}))
-  m_cache_d_1 = xij - m_mu;
-  bob::math::prod(m_F, hi, m_cache_d_2);
-  m_cache_d_1 -= m_cache_d_2;
-  bob::math::prod(m_G, wij, m_cache_d_2);
-  m_cache_d_1 -= m_cache_d_2;
+  double res = -0.5*((double)m_dim_d)*log(2*M_PI) - 0.5*m_cache_logdet_sigma;
+  // m_tmp_d_1 = (x_{ij} - (\mu+Fh_{i}+Gw_{ij}))
+  m_tmp_d_1 = xij - m_mu;
+  bob::math::prod(m_F, hi, m_tmp_d_2);
+  m_tmp_d_1 -= m_tmp_d_2;
+  bob::math::prod(m_G, wij, m_tmp_d_2);
+  m_tmp_d_1 -= m_tmp_d_2;
   // add third term to res
-  res += -0.5*blitz::sum(blitz::pow2(m_cache_d_1) * m_isigma);
+  res += -0.5*blitz::sum(blitz::pow2(m_tmp_d_1) * m_cache_isigma);
   return res;
 }
 
 namespace bob{
   namespace machine{
     /**
-     * @brief Prints a PLDABaseMachine in the output stream. This will print
+     * @brief Prints a PLDABase in the output stream. This will print
      * the values of the parameters \f$\mu\f$, \f$F\f$, \f$G\f$ and 
      * \f$\Sigma\f$ of the PLDA model.
      */
-    std::ostream& operator<<(std::ostream& os, const PLDABaseMachine& m) {
+    std::ostream& operator<<(std::ostream& os, const PLDABase& m) {
       os << "mu = " << m.m_mu << std::endl;
       os << "sigma = " << m.m_sigma << std::endl;
       os << "F = " << m.m_F << std::endl;
@@ -611,20 +602,19 @@ namespace bob{
 
 
 bob::machine::PLDAMachine::PLDAMachine():
-  m_plda_base(boost::shared_ptr<bob::machine::PLDABaseMachine>()),
+  m_plda_base(),
   m_n_samples(0), m_nh_sum_xit_beta_xi(0), m_weighted_sum(0), 
-  m_loglikelihood(0), m_gamma(), m_loglike_constterm(),
-  m_cache_d_1(0), m_cache_d_2(0), m_cache_nf_1(0), m_cache_nf_2(0)
+  m_loglikelihood(0), m_cache_gamma(), m_cache_loglike_constterm(),
+  m_tmp_d_1(0), m_tmp_d_2(0), m_tmp_nf_1(0), m_tmp_nf_2(0), m_tmp_nf_nf_1(0,0)
 {
 }
 
-bob::machine::PLDAMachine::PLDAMachine(const boost::shared_ptr<bob::machine::PLDABaseMachine> plda_base): 
+bob::machine::PLDAMachine::PLDAMachine(const boost::shared_ptr<bob::machine::PLDABase> plda_base): 
   m_plda_base(plda_base),
   m_n_samples(0), m_nh_sum_xit_beta_xi(0), m_weighted_sum(plda_base->getDimF()),
-  m_loglikelihood(0), m_gamma(), m_loglike_constterm(),
-  m_cache_d_1(plda_base->getDimD()), m_cache_d_2(plda_base->getDimD()),
-  m_cache_nf_1(plda_base->getDimF()), m_cache_nf_2(plda_base->getDimF())
+  m_loglikelihood(0), m_cache_gamma(), m_cache_loglike_constterm()
 {
+  resizeTmp();
 }
 
 
@@ -633,18 +623,16 @@ bob::machine::PLDAMachine::PLDAMachine(const bob::machine::PLDAMachine& other):
   m_n_samples(other.m_n_samples), 
   m_nh_sum_xit_beta_xi(other.m_nh_sum_xit_beta_xi), 
   m_weighted_sum(bob::core::array::ccopy(other.m_weighted_sum)),
-  m_loglikelihood(other.m_loglikelihood), m_gamma(), 
-  m_loglike_constterm(other.m_loglike_constterm),
-  m_cache_d_1(bob::core::array::ccopy(other.m_cache_d_1)),
-  m_cache_d_2(bob::core::array::ccopy(other.m_cache_d_2)),
-  m_cache_nf_1(bob::core::array::ccopy(other.m_cache_nf_1)),
-  m_cache_nf_2(bob::core::array::ccopy(other.m_cache_nf_2))
+  m_loglikelihood(other.m_loglikelihood), m_cache_gamma(), 
+  m_cache_loglike_constterm(other.m_cache_loglike_constterm)
 {
-  bob::core::array::ccopy(other.m_gamma, m_gamma);
+  bob::core::array::ccopy(other.m_cache_gamma, m_cache_gamma);
+  resizeTmp();
 }
 
-bob::machine::PLDAMachine::PLDAMachine(bob::io::HDF5File& config):
-  m_plda_base(boost::shared_ptr<bob::machine::PLDABaseMachine>())
+bob::machine::PLDAMachine::PLDAMachine(bob::io::HDF5File& config,
+    const boost::shared_ptr<bob::machine::PLDABase> plda_base):
+  m_plda_base(plda_base)
 {
   load(config);
 }
@@ -662,12 +650,9 @@ bob::machine::PLDAMachine& bob::machine::PLDAMachine::operator=
     m_nh_sum_xit_beta_xi = other.m_nh_sum_xit_beta_xi; 
     m_weighted_sum.reference(bob::core::array::ccopy(other.m_weighted_sum));
     m_loglikelihood = other.m_loglikelihood;
-    bob::core::array::ccopy(other.m_gamma, m_gamma);
-    m_loglike_constterm = other.m_loglike_constterm;
-    m_cache_d_1.reference(bob::core::array::ccopy(other.m_cache_d_1));
-    m_cache_d_2.reference(bob::core::array::ccopy(other.m_cache_d_2));
-    m_cache_nf_1.reference(bob::core::array::ccopy(other.m_cache_nf_1));
-    m_cache_nf_2.reference(bob::core::array::ccopy(other.m_cache_nf_2));
+    bob::core::array::ccopy(other.m_cache_gamma, m_cache_gamma);
+    m_cache_loglike_constterm = other.m_cache_loglike_constterm;
+    resizeTmp();
   }
   return *this;
 }
@@ -675,40 +660,23 @@ bob::machine::PLDAMachine& bob::machine::PLDAMachine::operator=
 bool bob::machine::PLDAMachine::operator==
     (const bob::machine::PLDAMachine& b) const
 {
-  // Check PLDABaseMachine 
-  if(*(this->m_plda_base) != *(b.m_plda_base))
+  if (!((*(m_plda_base) == *(b.m_plda_base)) &&
+        m_n_samples == b.m_n_samples &&
+        m_nh_sum_xit_beta_xi ==b.m_nh_sum_xit_beta_xi &&
+        bob::core::array::isEqual(m_weighted_sum, b.m_weighted_sum) &&
+        m_loglikelihood == b.m_loglikelihood &&
+        bob::core::array::isEqual(m_cache_gamma, b.m_cache_gamma)))
     return false;
 
-  // Check content
-  if(this->m_n_samples != b.m_n_samples || this->m_nh_sum_xit_beta_xi != b.m_nh_sum_xit_beta_xi ||
-     blitz::any(this->m_weighted_sum != b.m_weighted_sum) || 
-     this->m_loglikelihood != b.m_loglikelihood)
-    return false;
-
-  // Check additional maps
-  // 1. m_gamma
+  // m_cache_loglike_constterm
+  if (this->m_cache_loglike_constterm.size() != b.m_cache_loglike_constterm.size())
+    return false;  // differing sizes, they are not the same
+  std::map<size_t, double>::const_iterator i, j;
+  for (i = this->m_cache_loglike_constterm.begin(), j = b.m_cache_loglike_constterm.begin(); 
+    i != this->m_cache_loglike_constterm.end(); ++i, ++j)
   {
-    if(this->m_gamma.size() != b.m_gamma.size())
-      return false;  // differing sizes, they are not the same
-    std::map<size_t, blitz::Array<double,2> >::const_iterator i, j;
-    for(i = this->m_gamma.begin(), j = b.m_gamma.begin(); 
-      i != this->m_gamma.end(); ++i, ++j)
-    {
-      if(i->first != j->first || blitz::any(i->second != j->second))
-        return false;
-    }
-  }
-  // 2. m_loglike_constterm
-  {
-    if(this->m_loglike_constterm.size() != b.m_loglike_constterm.size())
-      return false;  // differing sizes, they are not the same
-    std::map<size_t, double>::const_iterator i, j;
-    for(i = this->m_loglike_constterm.begin(), j = b.m_loglike_constterm.begin(); 
-      i != this->m_loglike_constterm.end(); ++i, ++j)
-    {
-      if(i->first != j->first || i->second != j->second)
-        return false;
-    }
+    if (i->first != j->first || i->second != j->second)
+      return false;
   }
 
   return true;
@@ -720,6 +688,18 @@ bool bob::machine::PLDAMachine::operator!=
   return !(this->operator==(b));
 }
 
+bool bob::machine::PLDAMachine::is_similar_to(
+  const bob::machine::PLDAMachine& b, const double r_epsilon, 
+  const double a_epsilon) const
+{
+  return (m_plda_base->is_similar_to(*(b.m_plda_base), r_epsilon, a_epsilon) &&
+          m_n_samples == b.m_n_samples &&
+          bob::core::isClose(m_nh_sum_xit_beta_xi, b.m_nh_sum_xit_beta_xi, r_epsilon, a_epsilon) &&
+          bob::core::array::isClose(m_weighted_sum, b.m_weighted_sum, r_epsilon, a_epsilon) &&
+          bob::core::isClose(m_loglikelihood, b.m_loglikelihood, r_epsilon, a_epsilon) &&
+          bob::core::array::isClose(m_cache_gamma, b.m_cache_gamma, r_epsilon, a_epsilon) &&
+          bob::core::isClose(m_cache_loglike_constterm, b.m_cache_loglike_constterm, r_epsilon, a_epsilon));
+}
 
 void bob::machine::PLDAMachine::load(bob::io::HDF5File& config) 
 {
@@ -729,6 +709,7 @@ void bob::machine::PLDAMachine::load(bob::io::HDF5File& config)
   m_weighted_sum.reference(config.readArray<double,1>("weighted_sum"));
   m_loglikelihood = config.read<double>("loglikelihood");
   // gamma and log like constant term (a-dependent terms)
+  clearMaps();
   if(config.contains("a_indices"))
   {
     blitz::Array<uint32_t, 1> a_indices;
@@ -736,11 +717,12 @@ void bob::machine::PLDAMachine::load(bob::io::HDF5File& config)
     for(int i=0; i<a_indices.extent(0); ++i)
     {
       std::string str1 = "gamma_" + boost::lexical_cast<std::string>(a_indices(i));
-      m_gamma[a_indices(i)].reference(config.readArray<double,2>(str1));
+      m_cache_gamma[a_indices(i)].reference(config.readArray<double,2>(str1));
       std::string str2 = "loglikeconstterm_" + boost::lexical_cast<std::string>(a_indices(i));
-      m_loglike_constterm[a_indices(i)] = config.read<double>(str2);
+      m_cache_loglike_constterm[a_indices(i)] = config.read<double>(str2);
     }
   }
+  resizeTmp();
 }
 
 void bob::machine::PLDAMachine::save(bob::io::HDF5File& config) const 
@@ -750,18 +732,18 @@ void bob::machine::PLDAMachine::save(bob::io::HDF5File& config) const
   config.setArray("weighted_sum", m_weighted_sum);
   config.set("loglikelihood", m_loglikelihood);
   // Gamma
-  if(m_gamma.size() > 0)
+  if(m_cache_gamma.size() > 0)
   {
-    blitz::Array<uint32_t, 1> a_indices(m_gamma.size());
+    blitz::Array<uint32_t, 1> a_indices(m_cache_gamma.size());
     int i = 0;
     for(std::map<size_t,blitz::Array<double,2> >::const_iterator 
-        it=m_gamma.begin(); it!=m_gamma.end(); ++it)
+        it=m_cache_gamma.begin(); it!=m_cache_gamma.end(); ++it)
     {
       a_indices(i) = it->first;
       std::string str1 = "gamma_" + boost::lexical_cast<std::string>(it->first);
       config.setArray(str1, it->second);
       std::string str2 = "loglikeconstterm_" + boost::lexical_cast<std::string>(it->first);
-      double v = m_loglike_constterm.find(it->first)->second;
+      double v = m_cache_loglike_constterm.find(it->first)->second;
       config.set(str2, v);
       ++i;
     }
@@ -769,182 +751,213 @@ void bob::machine::PLDAMachine::save(bob::io::HDF5File& config) const
   }
 }
 
-void bob::machine::PLDAMachine::resize(const size_t dim_d, const size_t dim_f, 
-  const size_t dim_g)
-{
-  m_weighted_sum.resizeAndPreserve(dim_f);
-  m_gamma.clear();
-  m_loglike_constterm.clear();
-  m_cache_d_1.resize(dim_d);
-  m_cache_d_2.resize(dim_d);
-  m_cache_nf_1.resize(dim_f);
-  m_cache_nf_2.resize(dim_f);
-}
-
-void bob::machine::PLDAMachine::setPLDABase(const boost::shared_ptr<bob::machine::PLDABaseMachine> plda_base) 
+void bob::machine::PLDAMachine::setPLDABase(const boost::shared_ptr<bob::machine::PLDABase> plda_base) 
 {
   m_plda_base = plda_base; 
   m_weighted_sum.resizeAndPreserve(getDimF());
-  m_cache_d_1.resize(getDimD());
-  m_cache_d_2.resize(getDimD());
-  m_cache_nf_1.resize(getDimF());
-  m_cache_nf_2.resize(getDimF());
-//  resize(getDimD(), getDimF(), getDimG());
+  clearMaps();
+  resizeTmp();
 }
 
 
-void bob::machine::PLDAMachine::setWeightedSum(const blitz::Array<double,1>& ws) {
-  if(ws.extent(0) != m_weighted_sum.extent(0)) { //checks dimension
+void bob::machine::PLDAMachine::setWeightedSum(const blitz::Array<double,1>& ws) 
+{
+  if(ws.extent(0) != m_weighted_sum.extent(0))
     throw bob::machine::NInputsMismatch(ws.extent(0), m_weighted_sum.extent(0));
-  }
   m_weighted_sum.reference(bob::core::array::ccopy(ws));
 }
 
-const blitz::Array<double,2>& bob::machine::PLDAMachine::getGamma(const size_t a)
+const blitz::Array<double,2>& bob::machine::PLDAMachine::getGamma(const size_t a) const
 {
   // Checks in both base machine and this machine
-  if(m_plda_base->hasGamma(a)) return m_plda_base->getGamma(a);
-  // TODO: specialized exception
-  else if(!hasGamma(a)) throw bob::machine::Exception();
-  return m_gamma[a];
+  if (m_plda_base->hasGamma(a)) return m_plda_base->getGamma(a);
+  else if (!hasGamma(a))
+    throw std::runtime_error("Gamma for this number of samples is not currently in cache. You could use the getAddGamma() method instead");
+  return (m_cache_gamma.find(a))->second;
 }
 
 const blitz::Array<double,2>& bob::machine::PLDAMachine::getAddGamma(const size_t a)
 {
-  if(m_plda_base->hasGamma(a)) return m_plda_base->getGamma(a);
-  else if(hasGamma(a)) return m_gamma[a];
+  if (m_plda_base->hasGamma(a)) return m_plda_base->getGamma(a);
+  else if (hasGamma(a)) return m_cache_gamma[a];
   // else computes it and adds it to this machine
   blitz::Array<double,2> gamma_a(getDimF(),getDimF());
-  m_gamma[a].reference(gamma_a);
+  m_cache_gamma[a].reference(gamma_a);
   m_plda_base->computeGamma(a, gamma_a);
-  return m_gamma[a];
+  return m_cache_gamma[a];
 }
 
-double bob::machine::PLDAMachine::getLogLikeConstTerm(const size_t a)
+double bob::machine::PLDAMachine::getLogLikeConstTerm(const size_t a) const
 {
   // Checks in both base machine and this machine
-  if(m_plda_base->hasLogLikeConstTerm(a)) return m_plda_base->getLogLikeConstTerm(a);
-  // TODO: specialized exception
-  else if(!hasLogLikeConstTerm(a)) throw bob::machine::Exception();
-  return m_loglike_constterm[a];
+  if (m_plda_base->hasLogLikeConstTerm(a)) return m_plda_base->getLogLikeConstTerm(a);
+  else if (!hasLogLikeConstTerm(a))
+    throw std::runtime_error("The LogLikelihood constant term for this number of samples is not currently in cache. You could use the getAddLogLikeConstTerm() method instead");
+  return (m_cache_loglike_constterm.find(a))->second;
 }
 
 double bob::machine::PLDAMachine::getAddLogLikeConstTerm(const size_t a)
 {
-  if(m_plda_base->hasLogLikeConstTerm(a)) return m_plda_base->getLogLikeConstTerm(a);
-  else if(hasLogLikeConstTerm(a)) return m_loglike_constterm[a];
+  if (m_plda_base->hasLogLikeConstTerm(a)) return m_plda_base->getLogLikeConstTerm(a);
+  else if (hasLogLikeConstTerm(a)) return m_cache_loglike_constterm[a];
   // else computes it and adds it to this machine
-  m_loglike_constterm[a] = 
+  m_cache_loglike_constterm[a] = 
         m_plda_base->computeLogLikeConstTerm(a, getAddGamma(a));
-  return m_loglike_constterm[a];
+  return m_cache_loglike_constterm[a];
 }
 
-double bob::machine::PLDAMachine::computeLogLikelihood(const blitz::Array<double,1>& sample,
-  bool enrol)
+void bob::machine::PLDAMachine::clearMaps()
 {
-  // Check dimensionality
-  bob::core::array::assertSameDimensionLength(sample.extent(0), getDimD());
-
-  int n_samples = 1 + (enrol?m_n_samples:0);
-  // 1/2/ Constant term of the log likelihood:
-  //      1/ First term of the likelihood: -Nsamples*D/2*log(2*PI)
-  //      2/ Second term of the likelihood: -1/2*log(det(SIGMA+A.A^T))
-  //        Efficient way: -Nsamples/2*log(det(sigma))-Nsamples/2*log(det(I+G^T.sigma^-1.G))
-  //       -1/2*log(det(I+aF^T.(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)*G^T*sigma^-1).F))
-  double log_likelihood = getAddLogLikeConstTerm(static_cast<size_t>(n_samples));
-
-  // 3/ Third term of the likelihood: -1/2*X^T*(SIGMA+A.A^T)^-1*X
-  //    Efficient way: -1/2*sum_i(xi^T.sigma^-1.xi - xi^T.sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1.xi
-  //      -1/2*sumWeighted^T*(I+aF^T.(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1).F)^-1*sumWeighted
-  //      where sumWeighted = sum_i(F^T*(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1)*xi)
-  const blitz::Array<double,2>& beta = getPLDABase()->getBeta();
-  const blitz::Array<double,2>& Ft_beta = getPLDABase()->getFtBeta();
-  const blitz::Array<double,1>& mu = getPLDABase()->getMu();
-  double terma = (enrol?m_nh_sum_xit_beta_xi:0.);
-  // sumWeighted
-  if(enrol && m_n_samples > 0) m_cache_nf_1 = m_weighted_sum;
-  else m_cache_nf_1 = 0;
-  
-  // terma += -1 / 2. * (xi^t*beta*xi)
-  m_cache_d_1 = sample - mu;
-  bob::math::prod(beta, m_cache_d_1, m_cache_d_2);
-  terma += -1 / 2. * (blitz::sum(m_cache_d_1*m_cache_d_2));
-    
-  // sumWeighted
-  bob::math::prod(Ft_beta, m_cache_d_1, m_cache_nf_2);
-  m_cache_nf_1 += m_cache_nf_2;
-
-  blitz::Array<double,2> gamma_a = getAddGamma(n_samples);
-  bob::math::prod(gamma_a, m_cache_nf_1, m_cache_nf_2);
-  double termb = 1 / 2. * (blitz::sum(m_cache_nf_1*m_cache_nf_2));
-  
-  log_likelihood += terma + termb;
-  return log_likelihood; 
+  m_cache_gamma.clear();
+  m_cache_loglike_constterm.clear();
 }
 
-double bob::machine::PLDAMachine::computeLogLikelihood(const blitz::Array<double,2>& samples,
-  bool enrol)
+void bob::machine::PLDAMachine::forward(const blitz::Array<double,1>& sample, double& score) const
 {
-  // Check dimensionality
-  bob::core::array::assertSameDimensionLength(samples.extent(1), getDimD());
-
-  int n_samples = samples.extent(0) + (enrol?m_n_samples:0);
-  // 1/2/ Constant term of the log likelihood:
-  //      1/ First term of the likelihood: -Nsamples*D/2*log(2*PI)
-  //      2/ Second term of the likelihood: -1/2*log(det(SIGMA+A.A^T))
-  //        Efficient way: -Nsamples/2*log(det(sigma))-Nsamples/2*log(det(I+G^T.sigma^-1.G))
-  //       -1/2*log(det(I+aF^T.(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)*G^T*sigma^-1).F))
-  double log_likelihood = getAddLogLikeConstTerm(static_cast<size_t>(n_samples));
-
-  // 3/ Third term of the likelihood: -1/2*X^T*(SIGMA+A.A^T)^-1*X
-  //    Efficient way: -1/2*sum_i(xi^T.sigma^-1.xi - xi^T.sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1.xi
-  //      -1/2*sumWeighted^T*(I+aF^T.(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1).F)^-1*sumWeighted
-  //      where sumWeighted = sum_i(F^T*(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1)*xi)
-  const blitz::Array<double,2>& beta = getPLDABase()->getBeta();
-  const blitz::Array<double,2>& Ft_beta = getPLDABase()->getFtBeta();
-  const blitz::Array<double,1>& mu = getPLDABase()->getMu();
-  double terma = (enrol?m_nh_sum_xit_beta_xi:0.);
-  // sumWeighted
-  if(enrol && m_n_samples > 0) m_cache_nf_1 = m_weighted_sum;
-  else m_cache_nf_1 = 0;
-  for(int k=0; k<samples.extent(0); ++k) 
-  {
-    blitz::Array<double,1> samp = samples(k,blitz::Range::all());
-    m_cache_d_1 = samp - mu;
-    // terma += -1 / 2. * (xi^t*beta*xi)
-    bob::math::prod(beta, m_cache_d_1, m_cache_d_2);
-    terma += -1 / 2. * (blitz::sum(m_cache_d_1*m_cache_d_2));
-    
-    // sumWeighted
-    bob::math::prod(Ft_beta, m_cache_d_1, m_cache_nf_2);
-    m_cache_nf_1 += m_cache_nf_2;
-  }
-
-  blitz::Array<double,2> gamma_a = getAddGamma(n_samples);
-  bob::math::prod(gamma_a, m_cache_nf_1, m_cache_nf_2);
-  double termb = 1 / 2. * (blitz::sum(m_cache_nf_1*m_cache_nf_2));
-
-  log_likelihood += terma + termb;
-  return log_likelihood;
+  forward_(sample,score);
 }
 
-void bob::machine::PLDAMachine::forward(const blitz::Array<double,1>& sample, double& score)
+void bob::machine::PLDAMachine::forward_(const blitz::Array<double,1>& sample, double& score) const
 {
   // Computes the log likelihood ratio
   score = computeLogLikelihood(sample, true) - // match
           (computeLogLikelihood(sample, false) + m_loglikelihood); // no match
 }
 
-void bob::machine::PLDAMachine::forward(const blitz::Array<double,2>& samples, double& score)
+void bob::machine::PLDAMachine::forward(const blitz::Array<double,2>& samples, double& score) const
 {
   // Computes the log likelihood ratio
   score = computeLogLikelihood(samples, true) - // match
           (computeLogLikelihood(samples, false) + m_loglikelihood); // no match
 }
 
-void bob::machine::PLDAMachine::clearMaps()
+double bob::machine::PLDAMachine::computeLogLikelihood(const blitz::Array<double,1>& sample,
+  bool enrol) const
 {
-  m_gamma.clear();
-  m_loglike_constterm.clear();
+  // Check dimensionality
+  bob::core::array::assertSameDimensionLength(sample.extent(0), getDimD());
+
+  int n_samples = 1 + (enrol?m_n_samples:0);
+
+  // 3/ Third term of the likelihood: -1/2*X^T*(SIGMA+A.A^T)^-1*X
+  //    Efficient way: -1/2*sum_i(xi^T.sigma^-1.xi - xi^T.sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1.xi
+  //      -1/2*sumWeighted^T*(I+aF^T.(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1).F)^-1*sumWeighted
+  //      where sumWeighted = sum_i(F^T*(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1)*xi)
+  const blitz::Array<double,2>& beta = getPLDABase()->getBeta();
+  const blitz::Array<double,2>& Ft_beta = getPLDABase()->getFtBeta();
+  const blitz::Array<double,1>& mu = getPLDABase()->getMu();
+  double terma = (enrol?m_nh_sum_xit_beta_xi:0.);
+  // sumWeighted
+  if (enrol && m_n_samples > 0) m_tmp_nf_1 = m_weighted_sum;
+  else m_tmp_nf_1 = 0;
+  
+  // terma += -1 / 2. * (xi^t*beta*xi)
+  m_tmp_d_1 = sample - mu;
+  bob::math::prod(beta, m_tmp_d_1, m_tmp_d_2);
+  terma += -1 / 2. * (blitz::sum(m_tmp_d_1*m_tmp_d_2));
+    
+  // sumWeighted
+  bob::math::prod(Ft_beta, m_tmp_d_1, m_tmp_nf_2);
+  m_tmp_nf_1 += m_tmp_nf_2;
+  blitz::Array<double,2> gamma_a;
+  if (hasGamma(n_samples) || m_plda_base->hasGamma(n_samples))
+    gamma_a.reference(getGamma(n_samples));
+  else
+  {
+    gamma_a.reference(m_tmp_nf_nf_1);
+    m_plda_base->computeGamma(n_samples, gamma_a);
+  }
+  bob::math::prod(gamma_a, m_tmp_nf_1, m_tmp_nf_2);
+  double termb = 1 / 2. * (blitz::sum(m_tmp_nf_1*m_tmp_nf_2));
+
+  // 1/2/ Constant term of the log likelihood:
+  //      1/ First term of the likelihood: -Nsamples*D/2*log(2*PI)
+  //      2/ Second term of the likelihood: -1/2*log(det(SIGMA+A.A^T))
+  //        Efficient way: -Nsamples/2*log(det(sigma))-Nsamples/2*log(det(I+G^T.sigma^-1.G))
+  //       -1/2*log(det(I+aF^T.(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)*G^T*sigma^-1).F))
+  double log_likelihood; // = getAddLogLikeConstTerm(static_cast<size_t>(n_samples));
+  if (hasLogLikeConstTerm(n_samples) || m_plda_base->hasLogLikeConstTerm(n_samples))
+    log_likelihood = getLogLikeConstTerm(n_samples);
+  else
+    log_likelihood = m_plda_base->computeLogLikeConstTerm(n_samples, gamma_a);
+  
+  log_likelihood += terma + termb;
+  return log_likelihood; 
 }
 
+double bob::machine::PLDAMachine::computeLogLikelihood(const blitz::Array<double,2>& samples,
+  bool enrol) const
+{
+  // Check dimensionality
+  bob::core::array::assertSameDimensionLength(samples.extent(1), getDimD());
+
+  int n_samples = samples.extent(0) + (enrol?m_n_samples:0);
+  // 3/ Third term of the likelihood: -1/2*X^T*(SIGMA+A.A^T)^-1*X
+  //    Efficient way: -1/2*sum_i(xi^T.sigma^-1.xi - xi^T.sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1.xi
+  //      -1/2*sumWeighted^T*(I+aF^T.(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1).F)^-1*sumWeighted
+  //      where sumWeighted = sum_i(F^T*(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1)*xi)
+  const blitz::Array<double,2>& beta = getPLDABase()->getBeta();
+  const blitz::Array<double,2>& Ft_beta = getPLDABase()->getFtBeta();
+  const blitz::Array<double,1>& mu = getPLDABase()->getMu();
+  double terma = (enrol?m_nh_sum_xit_beta_xi:0.);
+  // sumWeighted
+  if (enrol && m_n_samples > 0) m_tmp_nf_1 = m_weighted_sum;
+  else m_tmp_nf_1 = 0;
+  for (int k=0; k<samples.extent(0); ++k) 
+  {
+    blitz::Array<double,1> samp = samples(k,blitz::Range::all());
+    m_tmp_d_1 = samp - mu;
+    // terma += -1 / 2. * (xi^t*beta*xi)
+    bob::math::prod(beta, m_tmp_d_1, m_tmp_d_2);
+    terma += -1 / 2. * (blitz::sum(m_tmp_d_1*m_tmp_d_2));
+    
+    // sumWeighted
+    bob::math::prod(Ft_beta, m_tmp_d_1, m_tmp_nf_2);
+    m_tmp_nf_1 += m_tmp_nf_2;
+  }
+
+  blitz::Array<double,2> gamma_a;
+  if (hasGamma(n_samples) || m_plda_base->hasGamma(n_samples))
+    gamma_a.reference(getGamma(n_samples));
+  else
+  {
+    gamma_a.reference(m_tmp_nf_nf_1);
+    m_plda_base->computeGamma(n_samples, gamma_a);
+  }
+  bob::math::prod(gamma_a, m_tmp_nf_1, m_tmp_nf_2);
+  double termb = 1 / 2. * (blitz::sum(m_tmp_nf_1*m_tmp_nf_2));
+
+  // 1/2/ Constant term of the log likelihood:
+  //      1/ First term of the likelihood: -Nsamples*D/2*log(2*PI)
+  //      2/ Second term of the likelihood: -1/2*log(det(SIGMA+A.A^T))
+  //        Efficient way: -Nsamples/2*log(det(sigma))-Nsamples/2*log(det(I+G^T.sigma^-1.G))
+  //       -1/2*log(det(I+aF^T.(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)*G^T*sigma^-1).F))
+  double log_likelihood; // = getAddLogLikeConstTerm(static_cast<size_t>(n_samples));
+  if (hasLogLikeConstTerm(n_samples) || m_plda_base->hasLogLikeConstTerm(n_samples))
+    log_likelihood = getLogLikeConstTerm(n_samples);
+  else
+    log_likelihood = m_plda_base->computeLogLikeConstTerm(n_samples, gamma_a);
+
+  log_likelihood += terma + termb;
+  return log_likelihood;
+}
+
+void bob::machine::PLDAMachine::resize(const size_t dim_d, const size_t dim_f, 
+  const size_t dim_g)
+{
+  m_weighted_sum.resizeAndPreserve(dim_f);
+  clearMaps();
+  resizeTmp();
+}
+
+void bob::machine::PLDAMachine::resizeTmp()
+{
+  if (m_plda_base)
+  {
+    m_tmp_d_1.resize(getDimD());
+    m_tmp_d_2.resize(getDimD());
+    m_tmp_nf_1.resize(getDimF());
+    m_tmp_nf_2.resize(getDimF());
+    m_tmp_nf_nf_1.resize(getDimF(), getDimF());
+  }
+}

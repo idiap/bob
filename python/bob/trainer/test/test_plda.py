@@ -24,8 +24,8 @@ import sys, unittest
 import bob
 import numpy, numpy.linalg
 
-class PythonPLDABaseTrainer():
-  """A simplified (and slower) version of the PLDABaseTrainer"""
+class PythonPLDATrainer():
+  """A simplified (and slower) version of the PLDATrainer"""
 
   def __init__(self, convergence_threshold=0.001, max_iterations=10, 
       compute_likelihood=False, use_sum_second_order=True):
@@ -375,10 +375,10 @@ class PLDATrainerTest(unittest.TestCase):
 
     # Runs the PLDA trainer EM-steps (2 steps)
     # Defines base trainer and machine
-    t = bob.trainer.PLDABaseTrainer()
-    t_py = PythonPLDABaseTrainer()
-    m = bob.machine.PLDABaseMachine(D,nf,ng)
-    m_py = bob.machine.PLDABaseMachine(D,nf,ng)
+    t = bob.trainer.PLDATrainer(10)
+    t_py = PythonPLDATrainer()
+    m = bob.machine.PLDABase(D,nf,ng)
+    m_py = bob.machine.PLDABase(D,nf,ng)
 
     # Sets the same initialization methods
     t.init_f_method = bob.trainer.init_f_method.BETWEEN_SCATTER
@@ -528,17 +528,17 @@ class PLDATrainerTest(unittest.TestCase):
     # Runs the PLDA trainer EM-steps (2 steps)
     
     # Defines base trainer and machine
-    t = bob.trainer.PLDABaseTrainer()
-    t0 = bob.trainer.PLDABaseTrainer(t)
-    m = bob.machine.PLDABaseMachine(dim_d,dim_f,dim_g)
+    t = bob.trainer.PLDATrainer()
+    t0 = bob.trainer.PLDATrainer(t)
+    m = bob.machine.PLDABase(dim_d,dim_f,dim_g)
     t.initialization(m,l)
     m.sigma = sigma_init
     m.g = G_init
     m.f = F_init
 
     # Defines base trainer and machine (for Python implementation
-    t_py = PythonPLDABaseTrainer()
-    m_py = bob.machine.PLDABaseMachine(dim_d,dim_f,dim_g)
+    t_py = PythonPLDATrainer()
+    m_py = bob.machine.PLDABase(dim_d,dim_f,dim_g)
     t_py.initialization(m_py,l)
     m_py.sigma = sigma_init
     m_py.g = G_init
@@ -676,7 +676,7 @@ class PLDATrainerTest(unittest.TestCase):
     mean_zero = numpy.zeros((dim_d,), 'float64')
 
     # base machine
-    mb = bob.machine.PLDABaseMachine(dim_d,dim_f,dim_g)
+    mb = bob.machine.PLDABase(dim_d,dim_f,dim_g)
     mb.sigma = sigma_init
     mb.g = G_init
     mb.f = F_init
@@ -712,3 +712,35 @@ class PLDATrainerTest(unittest.TestCase):
       (m.compute_log_likelihood(numpy.array([x1,x2]), False) + m.compute_log_likelihood(numpy.array([x3]), False))
     self.assertTrue(abs(llr - llr_separate) < 1e-10)
 
+  def test04_plda_comparisons(self):
+    
+    t1 = bob.trainer.PLDATrainer()
+    t2 = bob.trainer.PLDATrainer()
+    t2.rng = t1.rng
+    self.assertTrue(  t1 == t2 )
+    self.assertFalse( t1 != t2 )
+    self.assertTrue(  t1.is_similar_to(t2) )
+
+    training_set = [numpy.array([[1,2,3,4]], numpy.float64), numpy.array([[3,4,3,4]], numpy.float64)]
+    m = bob.machine.PLDABase(4,1,1,1e-8)
+    t1.rng.seed(37)
+    t1.initialization(m, training_set)
+    t1.e_step(m, training_set)
+    t1.m_step(m, training_set)
+    self.assertFalse( t1 == t2 )
+    self.assertTrue(  t1 != t2 )
+    self.assertFalse( t1.is_similar_to(t2) )
+    t2.rng.seed(37)
+    t2.initialization(m, training_set)
+    t2.e_step(m, training_set)
+    t2.m_step(m, training_set)
+    self.assertTrue(  t1 == t2 )
+    self.assertFalse( t1 != t2 )
+    self.assertTrue(  t1.is_similar_to(t2) )
+    t2.rng.seed(77)
+    t2.initialization(m, training_set)
+    t2.e_step(m, training_set)
+    t2.m_step(m, training_set)
+    self.assertFalse( t1 == t2 )
+    self.assertTrue(  t1 != t2 )
+    self.assertFalse( t1.is_similar_to(t2) )
