@@ -57,7 +57,7 @@ namespace bob { namespace trainer {
     /**
      * @brief Assignment operator
      */
-    virtual EMTrainer& operator=(const EMTrainer& other)
+    EMTrainer& operator=(const EMTrainer& other)
     {
       if(this != &other)
       {
@@ -72,7 +72,7 @@ namespace bob { namespace trainer {
     /**
      * @brief Equal to
      */
-    virtual bool operator==(const EMTrainer& b) const {
+    bool operator==(const EMTrainer& b) const {
       return m_compute_likelihood == b.m_compute_likelihood &&
              m_convergence_threshold == b.m_convergence_threshold &&
              m_max_iterations == b.m_max_iterations &&
@@ -82,14 +82,14 @@ namespace bob { namespace trainer {
     /**
      * @brief Not equal to
      */
-    virtual bool operator!=(const EMTrainer& b) const {
+    bool operator!=(const EMTrainer& b) const {
       return !(this->operator==(b));
     }
  
     /**
      * @brief Similarity operator
      */
-    virtual bool is_similar_to(const EMTrainer& b, 
+    bool is_similar_to(const EMTrainer& b, 
       const double r_epsilon=1e-5, const double a_epsilon=1e-8) const 
     {
       return m_compute_likelihood == b.m_compute_likelihood &&
