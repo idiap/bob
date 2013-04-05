@@ -50,7 +50,7 @@ bool isClose(const T& left, const T& right, const T& r_epsilon=1e-5,
   const T& a_epsilon=1e-8) 
 {
   T diff = std::fabs(left - right);
-  T min = std::min(left, right);
+  T min = std::min(std::fabs(left), std::fabs(right));
   return (diff <= (a_epsilon + r_epsilon * min));
 }
 
@@ -67,11 +67,11 @@ bool isClose(const std::complex<T>& left, const std::complex<T>& right,
 {
   // Check real parts first
   T diff = std::fabs(left.real() - right.real());
-  T min = std::min(left.real(), right.real());
+  T min = std::min(std::fabs(left.real()), std::fabs(right.real()));
   if (!(diff <= (a_epsilon + r_epsilon * min))) return false;
   // Check imaginary parts
   diff = std::fabs(left.imag() - right.imag());
-  min = std::min(left.imag(), right.imag());
+  min = std::min(std::fabs(left.imag()), std::fabs(right.imag()));
   return (diff <= (a_epsilon + r_epsilon * min));
 }
 
