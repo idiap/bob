@@ -216,6 +216,8 @@ void bind_core_random () {
     .def("__init__", make_constructor(&make_with_seed<int64_t>, default_call_policies(), (arg("seed"))), "Builds a new generator with a specific seed")
     .def("__init__", make_constructor(&make_with_seed<double>, default_call_policies(), (arg("seed"))), "Builds a new generator with a specific seed")
     .def("seed", &set_seed<double>, "Sets my internal seed")
+    .def(self == self)
+    .def(self != self)
     ;
 
   uniform_int<int8_t, boost::mt19937>("int8");
