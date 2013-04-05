@@ -76,7 +76,7 @@ namespace bob { namespace trainer {
       return m_compute_likelihood == b.m_compute_likelihood &&
              m_convergence_threshold == b.m_convergence_threshold &&
              m_max_iterations == b.m_max_iterations &&
-             m_rng == b.m_rng;
+             *m_rng == *(b.m_rng);
     }
 
     /**
