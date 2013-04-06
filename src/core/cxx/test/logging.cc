@@ -39,32 +39,26 @@
 
 using namespace bob::core;
 
-/**
- * Generates a unique temporary filename
- */
-std::string temp_file() {
-  std::string tpl = bob::core::tmpdir();
-  tpl += "/bobtest_core_loggingXXXXXX";
-  boost::shared_array<char> char_tpl(new char[tpl.size()+1]);
-  strcpy(char_tpl.get(), tpl.c_str());
-  int fd = mkstemp(char_tpl.get());
-  close(fd);
-  boost::filesystem::remove(char_tpl.get());
-  return char_tpl.get();
-}
-
 //tests if the streams are correctly initialized and will work correctly
 BOOST_AUTO_TEST_CASE( test_basic )
 {
   TDEBUG1("NOT SUPPOSED TO BE PRINTED!");
+# if defined(_WIN32)
+  putenv("BOB_DEBUG=3");
+# else
   setenv("BOB_DEBUG", "3", 1); ///< after this, all messages should be printed
+# endif
   TDEBUG1("This is a debug message, level 1. " << "I can also stream!");
   TDEBUG2("This is a debug message, level 2. ");
   TDEBUG3("This is a debug message, level 3. ");
   info << "This is an info message." << std::endl;
   warn << "This is a warning message." << std::endl;
   error << "This is an error message." << std::endl;
+# if defined(_WIN32)
+  putenv("BOB_DEBUG=");
+# else
   unsetenv("BOB_DEBUG");
+# endif
 }
 
 /**
@@ -89,7 +83,7 @@ std::string get_contents(const std::string& fname) {
 //tests if I can easily switch streams 
 BOOST_AUTO_TEST_CASE( test_switch )
 {
-  std::string testfile = temp_file();
+  std::string testfile = bob::core::tmpfile("");
   std::string gztestfile = testfile + ".gz";
   std::string teststring = "** info test **";
 
@@ -116,7 +110,7 @@ BOOST_AUTO_TEST_CASE( test_switch )
 //tests if I can read from files
 BOOST_AUTO_TEST_CASE( test_input )
 {
-  std::string testfilename = temp_file();
+  std::string testfilename = bob::core::tmpfile("");
   bob::core::OutputStream ofile(testfilename);
   std::string testdata = "12345678,a_single_sentence";
   ofile << testdata << std::endl;
@@ -132,7 +126,7 @@ BOOST_AUTO_TEST_CASE( test_input )
 //tests if I can read from compressed files
 BOOST_AUTO_TEST_CASE( test_compressed_input )
 {
-  std::string testfilename = temp_file() + ".gz";
+  std::string testfilename = bob::core::tmpfile(".gz");
   bob::core::OutputStream ofile(testfilename);
   std::string testdata = "12345678,a_single_sentence";
   ofile << testdata << std::endl;

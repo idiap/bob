@@ -32,6 +32,11 @@
 
 #include <bob/core/array_type.h>
 
+/* MinGW flags */
+#ifdef _WIN32
+#undef interface
+#endif
+
 /**
  * @addtogroup CORE_ARRAY core_array
  * @brief Array submodule API of the core module

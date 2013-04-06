@@ -30,6 +30,10 @@
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/shared_array.hpp>
 
+#ifdef _WIN32
+#include <io.h> //definition of mktemp
+#endif
+
 /**
  * MT "lock" support was only introduced in Boost 1.35. Before copying this
  * very ugly hack, make sure we are still using Boost 1.34. This will no longer
@@ -274,12 +278,17 @@ std::string bob::core::tmpdir() {
 
 std::string bob::core::tmpfile(const std::string& extension) {
   boost::filesystem::path tpl = bob::core::tmpdir();
-  tpl /= std::string("bobtest_core_binformatXXXXXX") + extension;
+  tpl /= std::string("bob_tmpfile_XXXXXX");
   boost::shared_array<char> char_tpl(new char[tpl.string().size()+1]);
   strcpy(char_tpl.get(), tpl.string().c_str());
-  int fd = mkstemps(char_tpl.get(), extension.size());
+#ifdef _WIN32
+  mktemp(char_tpl.get());
+#else
+  int fd = mkstemp(char_tpl.get());
   close(fd);
   boost::filesystem::remove(char_tpl.get());
+#endif 
   std::string res = char_tpl.get();
+  res += extension;
   return res;
 }
