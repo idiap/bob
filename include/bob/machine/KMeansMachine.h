@@ -90,6 +90,12 @@ class KMeansMachine: public Machine<blitz::Array<double,1>, double> {
     bool operator!=(const KMeansMachine& b) const;
 
     /**
+     * @brief Similar to
+     */
+    bool is_similar_to(const KMeansMachine& b, const double r_epsilon=1e-5,
+      const double a_epsilon=1e-8) const;
+
+    /**
      * Loads data from an existing configuration object. Resets the current
      * state.
      */

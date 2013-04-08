@@ -22,6 +22,7 @@
 #include <bob/machine/KMeansMachine.h>
 
 #include <bob/core/assert.h>
+#include <bob/core/check.h>
 #include <bob/core/array_copy.h>
 #include <bob/machine/Exception.h>
 #include <limits>
@@ -74,13 +75,22 @@ bob::machine::KMeansMachine& bob::machine::KMeansMachine::operator=
   return *this;
 }
 
-bool bob::machine::KMeansMachine::operator==(const bob::machine::KMeansMachine& b) const {
+bool bob::machine::KMeansMachine::operator==(const bob::machine::KMeansMachine& b) const
+{
   return m_n_inputs == b.m_n_inputs && m_n_means == b.m_n_means &&
-         blitz::all(m_means == b.m_means);
+         bob::core::array::isEqual(m_means, b.m_means);
 }
 
-bool bob::machine::KMeansMachine::operator!=(const bob::machine::KMeansMachine& b) const {
+bool bob::machine::KMeansMachine::operator!=(const bob::machine::KMeansMachine& b) const
+{
   return !(this->operator==(b));
+}
+
+bool bob::machine::KMeansMachine::is_similar_to(const bob::machine::KMeansMachine& b,
+  const double r_epsilon, const double a_epsilon) const
+{
+  return m_n_inputs == b.m_n_inputs && m_n_means == b.m_n_means &&
+         bob::core::array::isClose(m_means, b.m_means, r_epsilon, a_epsilon);
 }
 
 void bob::machine::KMeansMachine::load(bob::io::HDF5File& config) 

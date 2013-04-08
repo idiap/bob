@@ -76,10 +76,12 @@ class KMeansMachineTest(unittest.TestCase):
     km2 = bob.machine.KMeansMachine(km)
     self.assertTrue( km2 == km)
     self.assertFalse( km2 != km)
+    self.assertTrue( km2.is_similar_to(km) )
     means2 = numpy.array([[3, 70, 0], [4, 72, 2]], 'float64')
     km2.means = means2
     self.assertFalse( km2 == km)
     self.assertTrue( km2 != km)
+    self.assertFalse( km2.is_similar_to(km) )
 
     # Clean-up
     os.unlink(filename)
