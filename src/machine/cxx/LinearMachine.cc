@@ -102,29 +102,28 @@ bob::machine::LinearMachine& bob::machine::LinearMachine::operator=
 bool 
 bob::machine::LinearMachine::operator==(const bob::machine::LinearMachine& b) const
 {
-  // Check dimensions
-  if(this->m_input_sub.extent(0) != b.m_input_sub.extent(0) || 
-     this->m_input_div.extent(0) != b.m_input_div.extent(0) ||
-     this->m_weight.extent(0) != b.m_weight.extent(0) ||
-     this->m_weight.extent(1) != b.m_weight.extent(1) ||
-     this->m_bias.extent(0) != b.m_bias.extent(0))
-    return false;
-
-  // Check content
-  if(blitz::any(this->m_input_sub != b.m_input_sub) ||
-     blitz::any(this->m_input_div != b.m_input_div) ||
-     blitz::any(this->m_weight != b.m_weight) ||
-     blitz::any(this->m_bias != b.m_bias) ||
-     this->m_activation != b.m_activation)
-    return false;
-
-  return true;
+  return (bob::core::array::isEqual(m_input_sub, b.m_input_sub) &&
+          bob::core::array::isEqual(m_input_div, b.m_input_div) &&
+          bob::core::array::isEqual(m_weight, b.m_weight) &&
+          bob::core::array::isEqual(m_bias, b.m_bias) &&
+          m_activation == b.m_activation);
 }
 
 bool 
 bob::machine::LinearMachine::operator!=(const bob::machine::LinearMachine& b) const
 {
   return !(this->operator==(b));
+}
+
+bool 
+bob::machine::LinearMachine::is_similar_to(const bob::machine::LinearMachine& b,
+  const double r_epsilon, const double a_epsilon) const
+{
+  return (bob::core::array::isClose(m_input_sub, b.m_input_sub, r_epsilon, a_epsilon) &&
+          bob::core::array::isClose(m_input_div, b.m_input_div, r_epsilon, a_epsilon) &&
+          bob::core::array::isClose(m_weight, b.m_weight, r_epsilon, a_epsilon) &&
+          bob::core::array::isClose(m_bias, b.m_bias, r_epsilon, a_epsilon) &&
+          m_activation == b.m_activation);
 }
 
 void bob::machine::LinearMachine::load (bob::io::HDF5File& config) {
