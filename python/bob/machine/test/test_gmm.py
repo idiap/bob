@@ -175,14 +175,19 @@ class GMMMachineTest(unittest.TestCase):
 
     self.assertTrue( gmm == gmm2)
     self.assertFalse( gmm != gmm2)
+    self.assertTrue( gmm.is_similar_to(gmm2) )
     self.assertTrue( gmm != gmm3)
     self.assertFalse( gmm == gmm3)
+    self.assertFalse( gmm.is_similar_to(gmm3) )
     self.assertTrue( gmm != gmm4)
     self.assertFalse( gmm == gmm4)
+    self.assertFalse( gmm.is_similar_to(gmm4) )
     self.assertTrue( gmm != gmm5)
     self.assertFalse( gmm == gmm5)
+    self.assertFalse( gmm.is_similar_to(gmm5) )
     self.assertTrue( gmm != gmm6)
     self.assertFalse( gmm == gmm6)
+    self.assertFalse( gmm.is_similar_to(gmm6) )
 
   def test03_GMMMachine(self):
     """Test a GMMMachine (statistics)"""

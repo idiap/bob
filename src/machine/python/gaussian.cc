@@ -95,7 +95,7 @@ void bind_machine_gaussian()
     .def(init<bob::io::HDF5File&>(args("config")))
     .def(self == self)
     .def(self != self)
-    .def("is_similar_to", &bob::machine::Gaussian::is_similar_to, (arg("self"), arg("other"), arg("epsilon") = 1e-8), "Compares this Gaussian with the 'other' one to be approximately the same; each parameter might differ maximal with the given epsilon.")
+    .def("is_similar_to", &bob::machine::Gaussian::is_similar_to, (arg("self"), arg("other"), arg("r_epsilon")=1e-5, arg("a_epsilon")=1e-8), "Compares this Gaussian with the 'other' one to be approximately the same.")
     .add_property("dim_d", &bob::machine::Gaussian::getNInputs, &bob::machine::Gaussian::setNInputs,
       "Dimensionality of the input feature space")
     .add_property("mean", &py_getMean, &py_setMean, "Mean of the Gaussian")

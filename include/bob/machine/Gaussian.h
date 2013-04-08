@@ -78,11 +78,11 @@ class Gaussian: public Machine<blitz::Array<double,1>, double>
      * Not equal to
      */
     bool operator!=(const Gaussian& b) const;
-
     /**
-     * Similar to
+     * @brief Similar to
      */
-    bool is_similar_to(const Gaussian& b, const double epsilon=1e-8) const;
+    bool is_similar_to(const Gaussian& b, const double r_epsilon=1e-5,
+      const double a_epsilon=1e-8) const;
 
     /**
      * Set the input dimensionality, reset the mean to zero

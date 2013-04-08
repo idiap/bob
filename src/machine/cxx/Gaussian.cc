@@ -50,40 +50,23 @@ bob::machine::Gaussian& bob::machine::Gaussian::operator=(const bob::machine::Ga
   return *this;
 }
 
-bool bob::machine::Gaussian::operator==(const bob::machine::Gaussian& b) const {
-  // Check dimensions
-  if(this->m_mean.extent(0) != b.m_mean.extent(0) ||
-     this->m_variance.extent(0) != b.m_variance.extent(0) ||
-     this->m_variance_thresholds.extent(0) != b.m_variance_thresholds.extent(0))
-    return false;
-
-  // Check content
-  if(this->m_n_inputs != b.m_n_inputs || blitz::any(this->m_mean != b.m_mean) ||
-     blitz::any(this->m_variance != b.m_variance) ||
-     blitz::any(this->m_variance_thresholds != b.m_variance_thresholds))
-    return false;
-
-  return true;
+bool bob::machine::Gaussian::operator==(const bob::machine::Gaussian& b) const
+{
+  return (bob::core::array::isEqual(m_mean, b.m_mean) &&
+          bob::core::array::isEqual(m_variance, b.m_variance) &&
+          bob::core::array::isEqual(m_variance_thresholds, b.m_variance_thresholds));
 }
 
 bool bob::machine::Gaussian::operator!=(const bob::machine::Gaussian& b) const {
   return !(this->operator==(b));
 }
 
-bool bob::machine::Gaussian::is_similar_to(const bob::machine::Gaussian& b, const double epsilon) const {
-  // Check dimensions
-  if (m_mean.extent(0) != b.m_mean.extent(0) ||
-      m_variance.extent(0) != b.m_variance.extent(0) ||
-      m_variance_thresholds.extent(0) != b.m_variance_thresholds.extent(0))
-    return false;
-
-  // Check content
-  if (m_n_inputs != b.m_n_inputs || blitz::any(blitz::abs(m_mean - b.m_mean) > epsilon) ||
-      blitz::any(blitz::abs(m_variance - b.m_variance) > epsilon) ||
-      blitz::any(blitz::abs(m_variance_thresholds - b.m_variance_thresholds) > epsilon))
-    return false;
-
-  return true;
+bool bob::machine::Gaussian::is_similar_to(const bob::machine::Gaussian& b,
+  const double r_epsilon, const double a_epsilon) const
+{
+  return (bob::core::array::isClose(m_mean, b.m_mean, r_epsilon, a_epsilon) &&
+          bob::core::array::isClose(m_variance, b.m_variance, r_epsilon, a_epsilon) &&
+          bob::core::array::isClose(m_variance_thresholds, b.m_variance_thresholds, r_epsilon, a_epsilon));
 }
 
 void bob::machine::Gaussian::copy(const bob::machine::Gaussian& other) {

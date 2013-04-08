@@ -55,17 +55,16 @@ bob::machine::GMMMachine& bob::machine::GMMMachine::operator=(const bob::machine
   return *this;
 }
 
-bool bob::machine::GMMMachine::operator==(const bob::machine::GMMMachine& b) const {
-  if(m_n_gaussians != b.m_n_gaussians || m_n_inputs != b.m_n_inputs)
+bool bob::machine::GMMMachine::operator==(const bob::machine::GMMMachine& b) const
+{
+  if (m_n_gaussians != b.m_n_gaussians || m_n_inputs != b.m_n_inputs ||
+      !bob::core::array::isEqual(m_weights, b.m_weights))
     return false;
 
   for(size_t i=0; i<m_n_gaussians; ++i) {
     if(!(*(m_gaussians[i]) == *(b.m_gaussians[i])))
       return false;
   }
-
-  if(blitz::any(m_weights != b.m_weights))
-    return false;
 
   return true;
 }
@@ -74,17 +73,16 @@ bool bob::machine::GMMMachine::operator!=(const bob::machine::GMMMachine& b) con
   return !(this->operator==(b));
 }
 
-bool bob::machine::GMMMachine::is_similar_to(const bob::machine::GMMMachine& b, const double epsilon) const {
-  if (m_n_gaussians != b.m_n_gaussians ||
-      m_n_inputs != b.m_n_inputs)
+bool bob::machine::GMMMachine::is_similar_to(const bob::machine::GMMMachine& b,
+  const double r_epsilon, const double a_epsilon) const
+{
+  if (m_n_gaussians != b.m_n_gaussians || m_n_inputs != b.m_n_inputs ||
+      !bob::core::array::isClose(m_weights, b.m_weights, r_epsilon, a_epsilon))
     return false;
 
   for (size_t i = 0; i < m_n_gaussians; ++i)
-    if (!m_gaussians[i]->is_similar_to(*b.m_gaussians[i], epsilon))
+    if (!m_gaussians[i]->is_similar_to(*b.m_gaussians[i], r_epsilon, a_epsilon))
       return false;
-
-  if (blitz::any(blitz::abs(m_weights - b.m_weights) > epsilon))
-    return false;
 
   return true;
 }
