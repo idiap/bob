@@ -82,6 +82,12 @@ class GMMStats {
     bool operator!=(const GMMStats& b) const;
 
     /**
+     * @brief Similar to
+     */
+    bool is_similar_to(const GMMStats& b, const double r_epsilon=1e-5,
+      const double a_epsilon=1e-8) const;
+
+    /**
      * Updates a GMMStats with another GMMStats
      */
     void operator+=(const GMMStats& b);

@@ -22,6 +22,7 @@
 #include <bob/machine/GMMStats.h>
 #include <bob/machine/Exception.h>
 #include <bob/core/logging.h>
+#include <bob/core/check.h>
 
 bob::machine::GMMStats::GMMStats() {
   resize(0,0);
@@ -45,7 +46,7 @@ bob::machine::GMMStats::~GMMStats() {
 bob::machine::GMMStats& 
 bob::machine::GMMStats::operator=(const bob::machine::GMMStats& other) {
   // protect against invalid self-assignment
-  if(this != &other) 
+  if (this != &other) 
     copy(other);
   
   // by convention, always return *this
@@ -54,18 +55,10 @@ bob::machine::GMMStats::operator=(const bob::machine::GMMStats& other) {
 
 bool bob::machine::GMMStats::operator==(const bob::machine::GMMStats& b) const 
 {
-  // Check dimensions
-  if(n.extent(0) != b.n.extent(0) || 
-      sumPx.extent(0) != b.sumPx.extent(0) || sumPx.extent(1) != b.sumPx.extent(1) ||
-      sumPxx.extent(0) != b.sumPxx.extent(0) || sumPxx.extent(1) != b.sumPxx.extent(1))
-    return false;
-  
-  // Check content
-  if(T != b.T || log_likelihood != b.log_likelihood || blitz::any(n != b.n) || 
-      blitz::any(sumPx != b.sumPx) || blitz::any(sumPxx != b.sumPxx))
-    return false;
-  
-  return true;
+  return (T == b.T && log_likelihood == b.log_likelihood &&
+          bob::core::array::isEqual(n, b.n) &&
+          bob::core::array::isEqual(sumPx, b.sumPx) &&
+          bob::core::array::isEqual(sumPxx, b.sumPxx));
 } 
 
 bool 
@@ -73,6 +66,16 @@ bob::machine::GMMStats::operator!=(const bob::machine::GMMStats& b) const
 {
   return !(this->operator==(b));
 }
+
+bool bob::machine::GMMStats::is_similar_to(const bob::machine::GMMStats& b,
+  const double r_epsilon, const double a_epsilon) const 
+{
+  return (T == b.T && log_likelihood == b.log_likelihood &&
+          bob::core::array::isClose(n, b.n, r_epsilon, a_epsilon) &&
+          bob::core::array::isClose(sumPx, b.sumPx, r_epsilon, a_epsilon) &&
+          bob::core::array::isClose(sumPxx, b.sumPxx, r_epsilon, a_epsilon));
+} 
+
 
 void bob::machine::GMMStats::operator+=(const bob::machine::GMMStats& b) {
   // Check dimensions

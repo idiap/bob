@@ -60,10 +60,13 @@ class GMMMachineTest(unittest.TestCase):
     gs.save(bob.io.HDF5File(filename, 'w'))
     gs_loaded = bob.machine.GMMStats(bob.io.HDF5File(filename))
     self.assertTrue( gs == gs_loaded )
+    self.assertFalse( gs != gs_loaded )
+    self.assertTrue( gs.is_similar_to(gs_loaded) )
     # Makes them different
     gs_loaded.t = 58
     self.assertFalse( gs == gs_loaded )
     self.assertTrue( gs != gs_loaded )
+    self.assertFalse( gs.is_similar_to(gs_loaded) )
     # Accumulates from another GMMStats
     gs2 = bob.machine.GMMStats(2,3)
     gs2.log_likelihood = log_likelihood
