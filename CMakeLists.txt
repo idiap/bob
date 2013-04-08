@@ -62,9 +62,11 @@ message(STATUS "Bob version '${BOB_VERSION}' (${BOB_PLATFORM_STR})")
 
 # For both C and C++
 set(COMMON_FLAGS "-pedantic -Wall")
-if (NOT CYGWIN)
+if (WIN32)
+  set(COMMON_FLAGS "-D_WIN32_WINNT=0x501") # Set min. Windows version to XP
+else(WIN32)
   set(COMMON_FLAGS "${COMMON_FLAGS} -pthread")
-endif (NOT CYGWIN)
+endif (WIN32)
 if (NOT CMAKE_COMPILER_IS_GNUCC)
   # Then, it must be clang/clang++
   set(COMMON_FLAGS "${COMMON_FLAGS} -Qunused-arguments")
@@ -81,7 +83,7 @@ endif(APPLE)
 # For both RELEASE and DEBUG builds
 if(APPLE AND CMAKE_COMPILER_IS_GNUCC)
   set(COMMON_FLAGS "${COMMON_FLAGS} -Wno-long-long -Wno-variadic-macros")
-elseif(CYGWIN)
+elseif(WIN32)
   set(COMMON_CXX_FLAGS "-std=gnu++0x")
   set(COMMON_C_FLAGS "-std=gnu99")
 else()
@@ -140,7 +142,7 @@ set(BUILD_SHARED_LIBS "ON" CACHE BOOL "Build shared libs")
 # Install libraries and executables
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
-if(CYGWIN)
+if(WIN32)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
 else()
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR})

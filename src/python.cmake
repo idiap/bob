@@ -52,7 +52,11 @@ find_python_module(sqlalchemy REQUIRED)
 find_python_module(scipy REQUIRED)
 find_python_module(sphinx REQUIRED)
 find_python_module(nose REQUIRED)
-find_python_module(PIL REQUIRED)
+if(WIN32)
+  find_python_module(Image REQUIRED)
+else()
+  find_python_module(PIL REQUIRED)
+endif()
 
 # A trick, to make FindPythonLibs work in the expected way in the presence of
 # externally compiled python versions.

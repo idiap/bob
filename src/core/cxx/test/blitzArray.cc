@@ -32,9 +32,11 @@
 #include <map>
 #include <vector>
 
-#ifdef __APPLE__
+#if defined(__APPLE__)
 # include <sys/types.h>
 # include <sys/sysctl.h>
+#elif defined(_WIN32)
+# include <windows.h>
 #else
 # include <unistd.h>
 #endif
@@ -49,12 +51,17 @@ struct T {
  * This method will work in UN*X based platforms
  */
 size_t maxRAMInMegabytes () {
-#ifdef __APPLE__
+#if defined(__APPLE__)
   int64_t memsize;
   size_t len = sizeof(memsize);
   int mib[] = { CTL_HW, HW_MEMSIZE };
   if (sysctl(mib, 2, &memsize, &len, 0, 0) != 0) return 1024; //returns 1G
   return memsize / (1024 * 1024);
+#elif defined(_WIN32) 
+  MEMORYSTATUSEX statex;
+  statex.dwLength = sizeof(statex);
+  GlobalMemoryStatusEx(&statex);
+  return statex.ullTotalPhys/(1024*1024*1024);
 #else
   return sysconf(_SC_PHYS_PAGES) * sysconf(_SC_PAGESIZE) / (1024 * 1024);
 #endif
