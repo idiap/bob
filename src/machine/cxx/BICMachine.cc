@@ -121,7 +121,8 @@ bool bob::machine::BICMachine::operator!=(const BICMachine& other) const
  * Compares the given machine with this for similarity
  *
  * @param  other  The BICMachine to compare with
- * @param  epsilon  The smallest value any parameter might differ between the two machines
+ * @param  r_epsilon  The largest value any parameter might relatively differ between the two machines
+ * @param  a_epsilon  The largest value any parameter might absolutely differ between the two machines
 
  * @return true if both machines are approximately equal, otherwise false
  */
