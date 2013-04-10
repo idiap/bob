@@ -298,8 +298,7 @@ void bob::machine::BICMachine::save(bob::io::HDF5File& config) const{
  * @param  input  A vector (of difference values) to compute the BIC or IEC score for.
  * @param  output The one-element array that will contain the score afterwards.
  */
-void bob::machine::BICMachine::forward_(const blitz::Array<double,1>& input, blitz::Array<double,1>& output) const{
-  double& res = output(0) = 0.;
+void bob::machine::BICMachine::forward_(const blitz::Array<double,1>& input, double& output) const{
   if (m_project_data){
     // subtract mean
     m_diff_I = input - m_mu_I;
@@ -309,17 +308,17 @@ void bob::machine::BICMachine::forward_(const blitz::Array<double,1>& input, bli
     bob::math::prod(m_diff_E, m_Phi_E, m_proj_E);
 
     // compute Mahalanobis distance
-    res = blitz::sum(blitz::pow2(m_proj_E) / m_lambda_E - blitz::pow2(m_proj_I) / m_lambda_I);
+    output = blitz::sum(blitz::pow2(m_proj_E) / m_lambda_E - blitz::pow2(m_proj_I) / m_lambda_I);
 
     // add the DFFS?
     if (m_use_DFFS){
-      res += blitz::sum(   (blitz::pow2(m_diff_E) - blitz::pow2(m_proj_E)) / m_rho_E
+      output += blitz::sum(   (blitz::pow2(m_diff_E) - blitz::pow2(m_proj_E)) / m_rho_E
                          - (blitz::pow2(m_diff_I) - blitz::pow2(m_proj_I)) / m_rho_I);
     }
-    res /= (m_proj_E.shape()[0] + m_proj_I.shape()[0]);
+    output /= (m_proj_E.shape()[0] + m_proj_I.shape()[0]);
   } else {
     // forward without projection
-    res += blitz::mean(   blitz::pow2(input - m_mu_E) / m_lambda_E
+    output = blitz::mean(   blitz::pow2(input - m_mu_E) / m_lambda_E
                         - blitz::pow2(input - m_mu_I) / m_lambda_I);
   }
 }
@@ -332,10 +331,9 @@ void bob::machine::BICMachine::forward_(const blitz::Array<double,1>& input, bli
  * @param  input  A vector (of difference values) to compute the BIC or IEC score for.
  * @param  output The one-element array that will contain the score afterwards.
  */
-void bob::machine::BICMachine::forward(const blitz::Array<double,1>& input, blitz::Array<double,1>& output) const{
+void bob::machine::BICMachine::forward(const blitz::Array<double,1>& input, double& output) const{
   // perform some checks
   bob::core::array::assertSameShape(input, m_mu_E);
-  bob::core::array::assertSameShape(output, blitz::TinyVector<int,1>(1));
 
   // call the actual method
   forward_(input, output);

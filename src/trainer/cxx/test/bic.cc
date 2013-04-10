@@ -58,21 +58,22 @@ BOOST_AUTO_TEST_CASE( test_iec )
   // train machine only with intrapersonal data
   trainer.train(machine, intra_data, intra_data);
   // => all projection results MUST be 0.
-  blitz::Array<double,1> data(5), output(1);
+  blitz::Array<double,1> data(5);
   data = 10.;
+  double output;
   machine.forward(data, output);
-  BOOST_CHECK_SMALL(output(0), epsilon);
+  BOOST_CHECK_SMALL(output, epsilon);
 
   // now, re-train machine with both data
   trainer.train(machine, intra_data, extra_data);
   // hmm... the result should now (at least) be greater than 0
   machine.forward(data, output);
-  BOOST_CHECK_GT(output(0), 0.);
+  BOOST_CHECK_GT(output, 0.);
 
   // due to the training data, input 0 should return in a 0 output
   data = 0.;
   machine.forward(data, output);
-  BOOST_CHECK_SMALL(output(0), epsilon);
+  BOOST_CHECK_SMALL(output, epsilon);
 }
 
 BOOST_AUTO_TEST_CASE( test_bic )
@@ -84,21 +85,22 @@ BOOST_AUTO_TEST_CASE( test_bic )
   trainer.train(machine, intra_data, intra_data);
 
   // => all projection results MUST be 0.
-  blitz::Array<double,1> data(5), output(1);
+  blitz::Array<double,1> data(5);
   data = 10.;
+  double output;
   machine.forward(data, output);
-  BOOST_CHECK_SMALL(output(0), epsilon);
+  BOOST_CHECK_SMALL(output, epsilon);
 
   // now, re-train machine with both data
   trainer.train(machine, intra_data, extra_data);
   // hmm... the result should now (at least) be greater than 0
   machine.forward(data, output);
-  BOOST_CHECK_GT(output(0), 0.);
+  BOOST_CHECK_GT(output, 0.);
 
   // due to the training data, input 0 should return in a 0 output
   data = 0.;
   machine.forward(data, output);
-  BOOST_CHECK_SMALL(output(0), epsilon);
+  BOOST_CHECK_SMALL(output, epsilon);
 }
 
 

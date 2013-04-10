@@ -25,20 +25,16 @@
 #include <bob/core/python/exception.h>
 
 
-static void bic_forward_(const bob::machine::BICMachine& machine, bob::python::const_ndarray input, bob::python::ndarray output){
-  blitz::Array<double,1> o = output.bz<double,1>();
+static double bic_call_(const bob::machine::BICMachine& machine, bob::python::const_ndarray input){
+  double o;
   machine.forward_(input.bz<double,1>(), o);
-}
-
-static void bic_forward(const bob::machine::BICMachine& machine, bob::python::const_ndarray input, bob::python::ndarray output){
-  blitz::Array<double,1> o = output.bz<double,1>();
-  machine.forward(input.bz<double,1>(), o);
+  return o;
 }
 
 static double bic_call(const bob::machine::BICMachine& machine, bob::python::const_ndarray input){
-  blitz::Array<double,1> o(1);
+  double o;
   machine.forward(input.bz<double,1>(), o);
-  return o(0);
+  return o;
 }
 
 void bind_machine_bic(){
@@ -98,20 +94,6 @@ void bind_machine_bic(){
       "Saves the configuration parameters to an hdf5 file."
     )
 
-
-    .def(
-      "__call__",
-      &bic_forward_,
-      (
-          boost::python::arg("self"),
-          boost::python::arg("input"),
-          boost::python::arg("output")
-      ),
-      "Computes the BIC or IEC score for the given input vector, which results of a comparison of two (facial) images. "
-      "The score itself is the log-likelihood score of the given input vector belonging to the intrapersonal class. "
-      "No sanity checks of input and output are performed."
-    )
-
     .def(
       "__call__",
       &bic_call,
@@ -127,28 +109,26 @@ void bind_machine_bic(){
 
     .def(
       "forward_",
-      &bic_forward_,
+      &bic_call_,
       (
           boost::python::arg("self"),
-          boost::python::arg("input"),
-          boost::python::arg("output")
+          boost::python::arg("input")
       ),
       "Computes the BIC or IEC score for the given input vector, which results of a comparison of two (facial) images. "
       "The score itself is the log-likelihood score of the given input vector belonging to the intrapersonal class. "
-      "No sanity checks of input and output are performed."
+      "No sanity checks of input are performed."
     )
 
     .def(
       "forward",
-      &bic_forward,
+      &bic_call,
       (
           boost::python::arg("self"),
-          boost::python::arg("input"),
-          boost::python::arg("output")
+          boost::python::arg("input")
       ),
       "Computes the BIC or IEC score for the given input vector, which results of a comparison of two (facial) images. "
       "The score itself is the log-likelihood score of the given input vector belonging to the intrapersonal class. "
-      "Sanity checks of input and output shape are performed."
+      "Sanity checks of input shape are performed."
     )
 
     .add_property(

@@ -24,8 +24,8 @@
 
 #include <blitz/array.h>
 #include <bob/io/HDF5File.h>
-
-#include <bob/machine/Exception.h>
+#include "Machine.h"
+#include "Exception.h"
 
 
 namespace bob { namespace machine {
@@ -62,7 +62,8 @@ namespace bob { namespace machine {
    * using Mahalanobis(-like) distance measures.
    *
    */
-  class BICMachine {
+  class BICMachine: public Machine<blitz::Array<double,1>, double>
+  {
     public:
       //! generates an empty BIC machine
       BICMachine(bool use_DFFS = false);
@@ -83,10 +84,10 @@ namespace bob { namespace machine {
       bool is_similar_to(const BICMachine& other, const double r_epsilon=1e-5, const double a_epsilon=1e-8) const;
 
       //! computes the BIC probability score for the given input difference vector
-      void forward_(const blitz::Array<double,1>& input, blitz::Array<double,1>& output) const;
+      void forward_(const blitz::Array<double,1>& input, double& output) const;
 
       //! performs some checks before calling the forward_ method
-      void forward (const blitz::Array<double,1>& input, blitz::Array<double,1>& output) const;
+      void forward (const blitz::Array<double,1>& input, double& output) const;
 
       //! sets the IEC vectors of the given class
       void setIEC(bool clazz, const blitz::Array<double,1>& mean, const blitz::Array<double,1>& variances, bool copy_data = false);
