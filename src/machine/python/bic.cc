@@ -80,8 +80,8 @@ void bind_machine_bic(){
     .def(
       "is_similar_to",
       &bob::machine::BICMachine::is_similar_to,
-      (boost::python::arg("self"), boost::python::arg("other"), boost::python::arg("epsilon") = 1e-8),
-      "Compares this BICMachine with the 'other' one to be approximately the same; each parameter might differ maximal with the given epsilon."
+      (boost::python::arg("self"), boost::python::arg("other"), boost::python::arg("r_epsilon") = 1e-5, boost::python::arg("a_epsilon") = 1e-8),
+      "Compares this BICMachine with the 'other' one to be approximately the same."
     )
 
     .def(

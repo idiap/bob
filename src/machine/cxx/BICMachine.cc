@@ -30,14 +30,7 @@
 #include <bob/machine/BICMachine.h>
 #include <bob/math/linear.h>
 #include <bob/core/assert.h>
-
-static double sqr(const double& x){
-  return x*x;
-}
-
-static double sqr_norm(const blitz::Array<double,1> array){
-  return blitz::sum(blitz::pow2(array));
-}
+#include <bob/core/check.h>
 
 /**
  * Initializes an empty BIC Machine
@@ -76,16 +69,19 @@ bob::machine::BICMachine::BICMachine(const BICMachine& other)
  * @param  other  The other BICMachine to get a deep copy of
  * @return a reference to *this
  */
-bob::machine::BICMachine& bob::machine::BICMachine::operator =(const BICMachine& other)
+bob::machine::BICMachine& bob::machine::BICMachine::operator=(const BICMachine& other)
 {
-  if (other.m_project_data){
-    m_use_DFFS = other.m_use_DFFS;
-    setBIC(false, other.m_mu_I, other.m_lambda_I, other.m_Phi_I, other.m_rho_I, true);
-    setBIC(true , other.m_mu_E, other.m_lambda_E, other.m_Phi_E, other.m_rho_E, true);
-  } else {
-    m_use_DFFS = false;
-    setIEC(false, other.m_mu_I, other.m_lambda_I, true);
-    setIEC(true , other.m_mu_E, other.m_lambda_E, true);
+  if (this != &other)
+  {
+    if (other.m_project_data){
+      m_use_DFFS = other.m_use_DFFS;
+      setBIC(false, other.m_mu_I, other.m_lambda_I, other.m_Phi_I, other.m_rho_I, true);
+      setBIC(true , other.m_mu_E, other.m_lambda_E, other.m_Phi_E, other.m_rho_E, true);
+    } else {
+      m_use_DFFS = false;
+      setIEC(false, other.m_mu_I, other.m_lambda_I, true);
+      setIEC(true , other.m_mu_E, other.m_lambda_E, true);
+    }
   }
   return *this;
 }
@@ -94,34 +90,31 @@ bob::machine::BICMachine& bob::machine::BICMachine::operator =(const BICMachine&
  * Compares if this machine and the given one are identical
  *
  * @param  other  The BICMachine to compare with
-
  * @return true if both machines are identical, i.e., have exactly the same parameters, otherwise false
  */
-bool bob::machine::BICMachine::operator ==(const BICMachine& other) const
+bool bob::machine::BICMachine::operator==(const BICMachine& other) const
 {
-  // basic tests
-  if (m_project_data != other.m_project_data) return false;
-  if (m_project_data && m_use_DFFS != other.m_use_DFFS) return false;
+  return (m_project_data == other.m_project_data &&
+          (!m_project_data || m_use_DFFS == other.m_use_DFFS) &&
+          bob::core::array::isEqual(m_mu_I, other.m_mu_I) && 
+          bob::core::array::isEqual(m_mu_E, other.m_mu_E) &&
+          bob::core::array::isEqual(m_lambda_I, other.m_lambda_I) &&
+          bob::core::array::isEqual(m_lambda_E, other.m_lambda_E) &&
+          (!m_project_data || 
+              (bob::core::array::isEqual(m_Phi_I, other.m_Phi_I) && 
+               bob::core::array::isEqual(m_Phi_E, other.m_Phi_E) &&
+               (!m_use_DFFS || (m_rho_I == other.m_rho_I && m_rho_E == other.m_rho_E)))));
+}
 
-  // compare the data that is common for both approaches
-  if (not bob::core::array::hasSameShape(m_mu_I, other.m_mu_I)) return false;
-  if (not bob::core::array::hasSameShape(m_mu_E, other.m_mu_E)) return false;
-  if (not bob::core::array::hasSameShape(m_lambda_I, other.m_lambda_I)) return false;
-  if (not bob::core::array::hasSameShape(m_lambda_E, other.m_lambda_E)) return false;
-  if (blitz::any(m_mu_I != other.m_mu_I)) return false;
-  if (blitz::any(m_mu_E != other.m_mu_E)) return false;
-  if (blitz::any(m_lambda_I != other.m_lambda_I)) return false;
-  if (blitz::any(m_lambda_E != other.m_lambda_E)) return false;
-
-  if (m_project_data){
-    // compare data
-    if (not bob::core::array::hasSameShape(m_Phi_I, other.m_Phi_I)) return false;
-    if (not bob::core::array::hasSameShape(m_Phi_E, other.m_Phi_E)) return false;
-    if (blitz::any(m_Phi_I != other.m_Phi_I)) return false;
-    if (blitz::any(m_Phi_E != other.m_Phi_E)) return false;
-    if (m_use_DFFS && (m_rho_I != other.m_rho_I || m_rho_I != other.m_rho_I)) return false;
-  }
-  return true;
+/**
+ * Checks if this machine and the given one are different
+ *
+ * @param  other  The BICMachine to compare with
+ * @return false if both machines are identical, i.e., have exactly the same parameters, otherwise true
+ */
+bool bob::machine::BICMachine::operator!=(const BICMachine& other) const
+{
+  return !(this->operator==(other));
 }
 
 /**
@@ -132,42 +125,20 @@ bool bob::machine::BICMachine::operator ==(const BICMachine& other) const
 
  * @return true if both machines are approximately equal, otherwise false
  */
-bool bob::machine::BICMachine::is_similar_to(const BICMachine& other, const double epsilon) const
+bool bob::machine::BICMachine::is_similar_to(const BICMachine& other, 
+  const double r_epsilon, const double a_epsilon) const
 {
-  // basic tests
-  if (m_project_data != other.m_project_data) return false;
-  if (m_project_data && m_use_DFFS != other.m_use_DFFS) return false;
-
-  // compare the data that is common for both approaches
-  if (not bob::core::array::hasSameShape(m_mu_I, other.m_mu_I)) return false;
-  if (not bob::core::array::hasSameShape(m_mu_E, other.m_mu_E)) return false;
-  if (not bob::core::array::hasSameShape(m_lambda_I, other.m_lambda_I)) return false;
-  if (not bob::core::array::hasSameShape(m_lambda_E, other.m_lambda_E)) return false;
-  if (blitz::any(blitz::abs(m_mu_I - other.m_mu_I) > epsilon )) return false;
-  if (blitz::any(blitz::abs(m_mu_E - other.m_mu_E) > epsilon )) return false;
-  if (blitz::any(blitz::abs(m_lambda_I - other.m_lambda_I) > epsilon )) return false;
-  if (blitz::any(blitz::abs(m_lambda_E - other.m_lambda_E) > epsilon )) return false;
-
-  if (m_project_data){
-    // compare data
-    if (not bob::core::array::hasSameShape(m_Phi_I, other.m_Phi_I)) return false;
-    if (not bob::core::array::hasSameShape(m_Phi_E, other.m_Phi_E)) return false;
-    // check that the projection matrices are close,
-    // but allow that eigen vectors might have opposite directions
-    // (i.e., they are either identical -> difference is 0, or opposite -> sum is zero)
-    for (int i = m_Phi_I.shape()[1]; i--;){
-      const blitz::Array<double,1>& sub1 = m_Phi_I(blitz::Range::all(), i);
-      const blitz::Array<double,1>& sub2 = other.m_Phi_I(blitz::Range::all(), i);
-      if (blitz::any(blitz::abs(sub1 - sub2) > epsilon) && blitz::any(blitz::abs(sub1 + sub2) > epsilon)) return false;
-    }
-    for (int i = m_Phi_E.shape()[1]; i--;){
-      const blitz::Array<double,1>& sub1 = m_Phi_E(blitz::Range::all(), i);
-      const blitz::Array<double,1>& sub2 = other.m_Phi_E(blitz::Range::all(), i);
-      if (blitz::any(blitz::abs(sub1 - sub2) > epsilon) && blitz::any(blitz::abs(sub1 + sub2) > epsilon)) return false;
-    }
-    if (m_use_DFFS && (std::abs(m_rho_I - other.m_rho_I) > epsilon || std::abs(m_rho_I - other.m_rho_I) > epsilon)) return false;
-  }
-  return true;
+  return (m_project_data == other.m_project_data &&
+          (!m_project_data || m_use_DFFS == other.m_use_DFFS) &&
+          bob::core::array::isClose(m_mu_I, other.m_mu_I, r_epsilon, a_epsilon) && 
+          bob::core::array::isClose(m_mu_E, other.m_mu_E, r_epsilon, a_epsilon) &&
+          bob::core::array::isClose(m_lambda_I, other.m_lambda_I, r_epsilon, a_epsilon) &&
+          bob::core::array::isClose(m_lambda_E, other.m_lambda_E, r_epsilon, a_epsilon) &&
+          (!m_project_data || 
+              (bob::core::array::isClose(m_Phi_I, other.m_Phi_I, r_epsilon, a_epsilon) && 
+               bob::core::array::isClose(m_Phi_E, other.m_Phi_E, r_epsilon, a_epsilon) &&
+               (!m_use_DFFS || (bob::core::isClose(m_rho_I, other.m_rho_I, r_epsilon, a_epsilon) &&
+                                bob::core::isClose(m_rho_E, other.m_rho_E))))));
 }
 
 
@@ -338,24 +309,18 @@ void bob::machine::BICMachine::forward_(const blitz::Array<double,1>& input, bli
     bob::math::prod(m_diff_E, m_Phi_E, m_proj_E);
 
     // compute Mahalanobis distance
-    for (int i = m_proj_E.shape()[0]; i--;)
-      res += sqr(m_proj_E(i)) / m_lambda_E(i);
-    for (int i = m_proj_I.shape()[0]; i--;)
-      res -= sqr(m_proj_I(i)) / m_lambda_I(i);
+    res = blitz::sum(blitz::pow2(m_proj_E) / m_lambda_E - blitz::pow2(m_proj_I) / m_lambda_I);
 
     // add the DFFS?
     if (m_use_DFFS){
-      res += (sqr_norm(m_diff_E) - sqr_norm(m_proj_E)) / m_rho_E
-          -  (sqr_norm(m_diff_I) - sqr_norm(m_proj_I)) / m_rho_I;
+      res += blitz::sum(   (blitz::pow2(m_diff_E) - blitz::pow2(m_proj_E)) / m_rho_E
+                         - (blitz::pow2(m_diff_I) - blitz::pow2(m_proj_I)) / m_rho_I);
     }
     res /= (m_proj_E.shape()[0] + m_proj_I.shape()[0]);
   } else {
     // forward without projection
-    for (int i = input.shape()[0]; i--;){
-      res += sqr(input(i) - m_mu_E(i)) / m_lambda_E(i)
-          -  sqr(input(i) - m_mu_I(i)) / m_lambda_I(i);
-    }
-    res /= input.shape()[0];
+    res += blitz::mean(   blitz::pow2(input - m_mu_E) / m_lambda_E
+                        - blitz::pow2(input - m_mu_I) / m_lambda_I);
   }
 }
 
