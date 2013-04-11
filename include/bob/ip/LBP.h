@@ -32,7 +32,7 @@
 
 #include <blitz/array.h>
 
-#include <bob/core/Exception.h>
+#include <bob/ip/Exception.h>
 #include <bob/core/assert.h>
 #include <bob/sp/interpolate.h>
 
@@ -107,7 +107,7 @@ namespace bob { namespace ip {
       /**
        * Accessors
        */
-      double getRadius() const { if (m_R_y != m_R_x) throw bob::core::Exception("Horizontal and vertical radii are not identical. Please use the radii function instead"); return m_R_y;}
+      double getRadius() const { if (m_R_y != m_R_x) throw bob::ip::LBPRadiusDoesNotMatch("R_y", "R_x"); return m_R_y;}
       blitz::TinyVector<double,2> getRadii() const { return blitz::TinyVector<double,2>(m_R_y, m_R_x); }
       int getNNeighbours() const { return m_P; }
       bool getCircular() const { return m_circular; }

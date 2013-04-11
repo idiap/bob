@@ -68,18 +68,29 @@ bob::ip::LBPRadiusDoesNotMatch::LBPRadiusDoesNotMatch(const std::string& axis,co
 {
 }
 
+bob::ip::LBPRadiusDoesNotMatch::LBPRadiusDoesNotMatch(const std::string& radius1,const std::string& radius2) throw():
+    m_axis(), m_plane1(radius1), m_plane2(radius2)
+{
+}
+
+
 bob::ip::LBPRadiusDoesNotMatch::~LBPRadiusDoesNotMatch() throw(){
 }
 
 
 const char* bob::ip::LBPRadiusDoesNotMatch::what() const throw() {
-   boost::format message(
-   "The radius in '%s' direction does not match in planes %s and %s ");
-   message % m_axis;
-   message % m_plane1;
-   message % m_plane2;
-   return message.str().c_str();
-
+  if (m_axis.empty()){
+    boost::format message("The radii '%s' and '%s' are not identical.");
+    message % m_plane1;
+    message % m_plane2;
+    return message.str().c_str();
+  }else{
+     boost::format message("The radius in '%s' direction does not match in planes %s and %s ");
+     message % m_axis;
+     message % m_plane1;
+     message % m_plane2;
+     return message.str().c_str();
+  }
 }
 
 

@@ -43,8 +43,6 @@ namespace bob { namespace ip {
       virtual ~UnknownScalingAlgorithm() throw();
       virtual const char* what() const throw();
 
-    private:
-      mutable std::string m_message;
   };
 
   class UnknownRotatingAlgorithm: public Exception {
@@ -53,8 +51,6 @@ namespace bob { namespace ip {
       virtual ~UnknownRotatingAlgorithm() throw();
       virtual const char* what() const throw();
 
-    private:
-      mutable std::string m_message;
   };
 
 
@@ -64,6 +60,7 @@ namespace bob { namespace ip {
   class LBPRadiusDoesNotMatch: public Exception {
     public:
       LBPRadiusDoesNotMatch(const std::string& axis,const std::string& plane1,const std::string& plane2) throw();
+      LBPRadiusDoesNotMatch(const std::string& radius1,const std::string& radius2) throw();
       virtual ~LBPRadiusDoesNotMatch() throw();
       virtual const char* what() const throw();
 

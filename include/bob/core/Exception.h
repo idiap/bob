@@ -56,7 +56,7 @@ namespace bob {
       /**
        * @brief C'tor
        */
-      Exception(const std::string& reason = "Generic core::Exception: user specialization has not overwritten what() or is throwing an object of this class (in which case, please fix it!)") throw();
+      Exception() throw();
 
       /**
        * @brief Copy c'tor
@@ -74,10 +74,6 @@ namespace bob {
        * @brief Returns a string representation of myself.
        */
       virtual const char* what() const throw();
-
-      private:
-
-      const std::string& m_reason;
 
     };
 
