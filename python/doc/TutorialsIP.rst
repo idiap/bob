@@ -1,28 +1,28 @@
 .. vim: set fileencoding=utf-8 :
 .. Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
 .. Wed Mar 14 12:31:35 2012 +0100
-.. 
+..
 .. Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
-.. 
+..
 .. This program is free software: you can redistribute it and/or modify
 .. it under the terms of the GNU General Public License as published by
 .. the Free Software Foundation, version 3 of the License.
-.. 
+..
 .. This program is distributed in the hope that it will be useful,
 .. but WITHOUT ANY WARRANTY; without even the implied warranty of
 .. MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 .. GNU General Public License for more details.
-.. 
+..
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 .. testsetup:: iptest
-  
+
   import bob
   import numpy
   import math
   import os
-    
+
   def F(m, f):
     from pkg_resources import resource_filename
     return resource_filename('bob.%s.test' % m, os.path.join('data', f))
@@ -64,7 +64,7 @@ The signal processing unit of |project| is not very large by now. Currently, bas
 Simple image processing
 =======================
 
-The basic operations on images are the affine image conversions like image scaling, rotation, and cutting. 
+The basic operations on images are the affine image conversions like image scaling, rotation, and cutting.
 
 
 Scaling images
@@ -75,7 +75,7 @@ below an image is up-scaled by first creating the image and then initialising th
 
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
-  
+
   >>> A = numpy.array( [ [1, 2, 3], [4, 5, 6] ], dtype = numpy.uint8 ) # A small image of size 2x3
   >>> print A
   [[1 2 3]
@@ -86,18 +86,18 @@ the scale function of |project| is then called to up-scale the image:
 
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
-  
+
   >>> bob.ip.scale( A, B )
   >>> print B
   [[ 1.   1.5  2.   2.5  3. ]
    [ 2.5  3.   3.5  4.   4.5]
    [ 4.   4.5  5.   5.5  6. ]]
-  
+
 which bi-linearly interpolates image A to image B. Of course, scaling factors can be different in horizontal and vertical direction:
 
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
-  
+
   >>> C = numpy.ndarray( (2, 5), dtype = numpy.float64 )
   >>> bob.ip.scale( A, C )
   >>> print C
@@ -112,7 +112,7 @@ The rotation of an image is slightly more difficult since the resulting image si
 
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
-  
+
   >>> A = numpy.array( [ [1, 2, 3], [4, 5, 6] ], dtype = numpy.uint8 ) # A small image of size 3x3
   >>> print A
   [[1 2 3]
@@ -120,12 +120,12 @@ The rotation of an image is slightly more difficult since the resulting image si
   >>> rotated_shape = bob.ip.get_rotated_output_shape( A, 90 )
   >>> print rotated_shape
   (3, 2)
-   
+
 After the creation of the image in the desired size, the :py:func:`bob.ip.rotate` function can be executed:
-  
+
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
-  
+
   >>> A_rotated = numpy.ndarray( rotated_shape, dtype = numpy.float64 ) # A small image of rotated size
   >>> bob.ip.rotate(A, A_rotated, 90)      # execute the rotation
   >>> print A_rotated
@@ -137,13 +137,13 @@ After the creation of the image in the desired size, the :py:func:`bob.ip.rotate
 Color type conversion
 ~~~~~~~~~~~~~~~~~~~~~
 
-When dealing with color images, sometimes different parts of the color image are required. Many image processing 
-algorithms require the images to be gray scale. To assure that the image that is loaded is actually a gray level 
+When dealing with color images, sometimes different parts of the color image are required. Many image processing
+algorithms require the images to be gray scale. To assure that the image that is loaded is actually a gray level
 image, the conversion from color to gray scale images can be applied:
 
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
-  
+
   >>> # set up 'color_image_path' to point to any kind of image
   >>> image = bob.io.load( color_image_path )
   >>> if image.ndim == 3:                    # Test if the loaded image is a color image
@@ -155,7 +155,7 @@ Converting a colored RGB image to YUV is just as straightforward:
 
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
-  
+
   >>> rgb_image = bob.io.load( color_image_path )
   >>> yuv_image = numpy.ndarray( rgb_image.shape, dtype = rgb_image.dtype )
   >>> bob.ip.rgb_to_yuv( rgb_image, yuv_image )
@@ -177,12 +177,12 @@ One simple example of image filtering is to apply a Gaussian blur filter to an i
   :options: +NORMALIZE_WHITESPACE
 
   >>> filter = bob.ip.Gaussian( radius_y = 1, radius_x = 1, sigma_y = math.sqrt(0.3*0.5), sigma_x = math.sqrt(0.3*0.5))
-  
+
 Now, let's see what happens to a small test image:
 
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
-  
+
   >>> test_image = numpy.array([[1, 0, 0, 0, 1], [0, 1, 0, 1, 0], [0, 0, 1, 0, 0], [0, 1, 0, 1, 0], [1, 0, 0, 0, 1]], dtype = numpy.float64)
   >>> filtered_image = numpy.ndarray(test_image.shape, dtype = numpy.float64)
   >>> filter(test_image, filtered_image)
@@ -191,7 +191,7 @@ Now, let's see what happens to a small test image:
    [ 0.063  0.873  0.093  0.873  0.063]
    [ 0.002  0.093  0.876  0.093  0.002]
    [ 0.063  0.873  0.093  0.873  0.063]
-   [ 0.936  0.063  0.002  0.063  0.936]] 
+   [ 0.936  0.063  0.002  0.063  0.936]]
 
 The image of the cross has now been nicely smoothed.
 
@@ -199,7 +199,7 @@ Another filter you might want to use is a Gabor filter. Gabor filters can be app
 
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
-  
+
   >>> kernel = bob.ip.GaborKernel(image.shape[-2:], (1,0))
   >>> filtered_image = numpy.ndarray(image.shape[-2:], dtype = numpy.complex128)
   >>> kernel(image, filtered_image)
@@ -208,14 +208,14 @@ or simply:
 
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
-  
+
   >>> filtered_image = kernel(image)
-  
+
 To compute the absolute and phase parts of the responses (as is the case for the extended local Gabor binary pattern (ELGBP)) you can simply use the `NumPy`_ functions on the resulting image:
 
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
-  
+
   >>> abs_image = numpy.abs(filtered_image)
   >>> phase_image = numpy.angle(filtered_image)
 
@@ -224,21 +224,21 @@ Normalizing images according to eye positions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For many biometric applications, for instance face recognition, the images are geometrically normalized according to the eye positions.
-In such a case, the first thing to do is to create an object of the class defining the image properties of the geometrically normalized 
+In such a case, the first thing to do is to create an object of the class defining the image properties of the geometrically normalized
 image (that will be generated when applying the object):
 
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
-  
+
   >>> face_eyes_norm = bob.ip.FaceEyesNorm(eyes_distance = 65, crop_height = 128, crop_width = 128, crop_eyecenter_offset_h = 32, crop_eyecenter_offset_w = 63.5)
 
-Now, we have set up our object to generate images of size (128, 128) that will put the left eye at the pixel position (32, 31) and the right eye at the 
-position (32, 96). Afterwards, this object is used to geometrically normalize the face, given the eye positions in the original face image. 
+Now, we have set up our object to generate images of size (128, 128) that will put the left eye at the pixel position (32, 31) and the right eye at the
+position (32, 96). Afterwards, this object is used to geometrically normalize the face, given the eye positions in the original face image.
 Note that the left eye usually has a higher x-coordinate than the right eye:
 
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
-  
+
   >>> face_image = bob.io.load( image_path )
   >>> cropped_image = numpy.ndarray( (128, 128), dtype = numpy.float64 )
   >>> face_eyes_norm( face_image, cropped_image, re_y = 67, re_x = 47, le_y = 62, le_x = 71)
@@ -247,28 +247,28 @@ Note that the left eye usually has a higher x-coordinate than the right eye:
 Simple feature extraction
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Some simple feature extraction functionality is also included in the :py:mod:`bob.ip` module, for more complex features please refer to :doc:`TutorialsMachine`. Here is some simple example, how to extract local binary patterns (LBP) from an image:
+Some simple feature extraction functionality is also included in the :py:mod:`bob.ip` module, for more complex features please refer to :doc:`TutorialsMachine`. Here is some simple example, how to extract local binary patterns (LBP) with 8 neighbors from an image:
 
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
-  
-  >>> lbp_extractor = bob.ip.LBP8R()
-  
+
+  >>> lbp_extractor = bob.ip.LBP(8)
+
 You can either get the LBP feature for a single point by specifying the position:
 
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
-  
+
   >>> lbp_local = lbp_extractor ( cropped_image, 69, 62 )
   >>> # print the binary representation of the LBP
   >>> print bin ( lbp_local )
   0b11110000
-  
+
 or you can extract the LBP features for all pixels in the image. In this case you need to get the required shape of the output image:
 
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
-  
+
   >>> lbp_output_image_shape = lbp_extractor.get_lbp_shape(cropped_image)
   >>> print lbp_output_image_shape
   (126, 126)
@@ -284,24 +284,24 @@ Gabor jets can be extracted from an image. Simply use the :py:class:`bob.ip.Gabo
 
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
-  
+
   >>> gabor_wavelet_transform = bob.ip.GaborWaveletTransform()
-  
+
 Gabor jets can be extracted either with or without phases. The structure of the resulting image without phases is 3-dimensional, whereas the structure with phases is 4-dimensional:
 
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
-  
+
   >>> jet_image_without_phases = gabor_wavelet_transform.empty_jet_image ( cropped_image, include_phases = False )
   >>> jet_image_with_phases = gabor_wavelet_transform.empty_jet_image ( cropped_image, include_phases = True )
   >>> print jet_image_without_phases.shape, jet_image_with_phases.shape
   (128, 128, 40) (128, 128, 2, 40)
-  
+
 Now, we can fill the Gabor jets:
 
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
-  
+
   >>> gabor_wavelet_transform.compute_jets ( cropped_image, jet_image_with_phases )
   >>> print jet_image_with_phases [ 32, 32 ].shape
   (2, 40)
