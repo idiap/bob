@@ -7,16 +7,16 @@
  * bob.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -63,7 +63,7 @@ const char* bob::ip::UnknownRotatingAlgorithm::what() const throw() {
   return what_string;
 }
 
-bob::ip::LBPRadiusDoesNotMatch::LBPRadiusDoesNotMatch(const std::string& axis,const std::string& plane1,const std::string& plane2) throw(): 
+bob::ip::LBPRadiusDoesNotMatch::LBPRadiusDoesNotMatch(const std::string& axis,const std::string& plane1,const std::string& plane2) throw():
     m_axis(axis), m_plane1(plane1), m_plane2(plane2)
 {
 }
@@ -78,15 +78,14 @@ const char* bob::ip::LBPRadiusDoesNotMatch::what() const throw() {
    message % m_axis;
    message % m_plane1;
    message % m_plane2;
-   m_message = message.str();
-   return m_message.c_str();
+   return message.str().c_str();
 
 }
 
 
 
 bob::ip::LBPUnsupportedNNeighbours::LBPUnsupportedNNeighbours(
-  const int N) throw(): 
+  const int N) throw():
     m_n_neighbours(N)
 {
 }
