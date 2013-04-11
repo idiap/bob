@@ -96,12 +96,12 @@ bool bob::machine::BICMachine::operator==(const BICMachine& other) const
 {
   return (m_project_data == other.m_project_data &&
           (!m_project_data || m_use_DFFS == other.m_use_DFFS) &&
-          bob::core::array::isEqual(m_mu_I, other.m_mu_I) && 
+          bob::core::array::isEqual(m_mu_I, other.m_mu_I) &&
           bob::core::array::isEqual(m_mu_E, other.m_mu_E) &&
           bob::core::array::isEqual(m_lambda_I, other.m_lambda_I) &&
           bob::core::array::isEqual(m_lambda_E, other.m_lambda_E) &&
-          (!m_project_data || 
-              (bob::core::array::isEqual(m_Phi_I, other.m_Phi_I) && 
+          (!m_project_data ||
+              (bob::core::array::isEqual(m_Phi_I, other.m_Phi_I) &&
                bob::core::array::isEqual(m_Phi_E, other.m_Phi_E) &&
                (!m_use_DFFS || (m_rho_I == other.m_rho_I && m_rho_E == other.m_rho_E)))));
 }
@@ -126,20 +126,39 @@ bool bob::machine::BICMachine::operator!=(const BICMachine& other) const
 
  * @return true if both machines are approximately equal, otherwise false
  */
-bool bob::machine::BICMachine::is_similar_to(const BICMachine& other, 
+bool bob::machine::BICMachine::is_similar_to(const BICMachine& other,
   const double r_epsilon, const double a_epsilon) const
 {
+  if (m_project_data){
+    // compare data
+    if (not bob::core::array::hasSameShape(m_Phi_I, other.m_Phi_I)) return false;
+    if (not bob::core::array::hasSameShape(m_Phi_E, other.m_Phi_E)) return false;
+    // check that the projection matrices are close,
+    // but allow that eigen vectors might have opposite directions
+    // (i.e., they are either identical -> difference is 0, or opposite -> sum is zero)
+    for (int i = m_Phi_I.extent(1); i--;){
+      const blitz::Array<double,1>& sub1 = m_Phi_I(blitz::Range::all(), i);
+      const blitz::Array<double,1>& sub2 = other.m_Phi_I(blitz::Range::all(), i);
+      blitz::Array<double,1> sub2_negative(-sub2);
+      if (!bob::core::array::isClose(sub1, sub2, r_epsilon, a_epsilon) && !bob::core::array::isClose(sub1, sub2_negative, r_epsilon, a_epsilon)) return false;
+    }
+    for (int i = m_Phi_E.shape()[1]; i--;){
+      const blitz::Array<double,1>& sub1 = m_Phi_E(blitz::Range::all(), i);
+      const blitz::Array<double,1>& sub2 = other.m_Phi_E(blitz::Range::all(), i);
+      blitz::Array<double,1> sub2_negative(-sub2);
+      if (!bob::core::array::isClose(sub1, sub2, r_epsilon, a_epsilon) && !bob::core::array::isClose(sub1, sub2_negative, r_epsilon, a_epsilon)) return false;
+    }
+  }
+
   return (m_project_data == other.m_project_data &&
           (!m_project_data || m_use_DFFS == other.m_use_DFFS) &&
-          bob::core::array::isClose(m_mu_I, other.m_mu_I, r_epsilon, a_epsilon) && 
+          bob::core::array::isClose(m_mu_I, other.m_mu_I, r_epsilon, a_epsilon) &&
           bob::core::array::isClose(m_mu_E, other.m_mu_E, r_epsilon, a_epsilon) &&
           bob::core::array::isClose(m_lambda_I, other.m_lambda_I, r_epsilon, a_epsilon) &&
           bob::core::array::isClose(m_lambda_E, other.m_lambda_E, r_epsilon, a_epsilon) &&
-          (!m_project_data || 
-              (bob::core::array::isClose(m_Phi_I, other.m_Phi_I, r_epsilon, a_epsilon) && 
-               bob::core::array::isClose(m_Phi_E, other.m_Phi_E, r_epsilon, a_epsilon) &&
+          (!m_project_data ||
                (!m_use_DFFS || (bob::core::isClose(m_rho_I, other.m_rho_I, r_epsilon, a_epsilon) &&
-                                bob::core::isClose(m_rho_E, other.m_rho_E))))));
+                                bob::core::isClose(m_rho_E, other.m_rho_E, r_epsilon, a_epsilon)))));
 }
 
 
@@ -309,17 +328,17 @@ void bob::machine::BICMachine::forward_(const blitz::Array<double,1>& input, dou
     bob::math::prod(m_diff_E, m_Phi_E, m_proj_E);
 
     // compute Mahalanobis distance
-    output = blitz::sum(blitz::pow2(m_proj_E) / m_lambda_E - blitz::pow2(m_proj_I) / m_lambda_I);
+    output = blitz::sum(blitz::pow2(m_proj_E) / m_lambda_E) - blitz::sum(blitz::pow2(m_proj_I) / m_lambda_I);
 
     // add the DFFS?
     if (m_use_DFFS){
-      output += blitz::sum(   (blitz::pow2(m_diff_E) - blitz::pow2(m_proj_E)) / m_rho_E
-                         - (blitz::pow2(m_diff_I) - blitz::pow2(m_proj_I)) / m_rho_I);
+      output += blitz::sum(blitz::pow2(m_diff_E) - blitz::pow2(m_proj_E)) / m_rho_E;
+      output -= blitz::sum(blitz::pow2(m_diff_I) - blitz::pow2(m_proj_I)) / m_rho_I;
     }
-    output /= (m_proj_E.shape()[0] + m_proj_I.shape()[0]);
+    output /= (m_proj_E.extent(0) + m_proj_I.extent(0));
   } else {
     // forward without projection
-    output = blitz::mean(   blitz::pow2(input - m_mu_E) / m_lambda_E
+    output = blitz::mean( blitz::pow2(input - m_mu_E) / m_lambda_E
                         - blitz::pow2(input - m_mu_I) / m_lambda_I);
   }
 }
