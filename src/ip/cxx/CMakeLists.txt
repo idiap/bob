@@ -22,9 +22,6 @@ set(src
    "BlockCellGradientDescriptors.cc"
    "HOG.cc"
    "LBP.cc"
-   "LBP4R.cc"
-   "LBP8R.cc"
-   "LBP16R.cc"
    "LBPTop.cc"
    "GLCM.cc"
    "GLCMProp.cc"
@@ -43,7 +40,7 @@ set(src
 if(WITH_VLFEAT)
   list(APPEND incdir "${VLFEAT_INCLUDE_DIR}")
   list(APPEND shared "${VLFEAT_LIBRARY}")
-  list(APPEND src 
+  list(APPEND src
     "VLSIFT.cc"
     "VLDSIFT.cc"
     )
