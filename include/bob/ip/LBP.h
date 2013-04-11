@@ -29,6 +29,7 @@
 
 #include <math.h>
 #include <stdint.h>
+#include <numeric>
 
 #include <blitz/array.h>
 
