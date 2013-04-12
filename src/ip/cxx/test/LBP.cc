@@ -38,7 +38,7 @@ struct T {
            lbp_8_a1, lbp_8_a2, lbp_8_a1_u2, lbp_8_a2_u2, lbp_8_ri, lbp_8_ur,
            lbp_16_a1, lbp_16_a2, lbp_16_a1_u2, lbp_16_a2_u2, lbp_16_ri, lbp_16_ur,
 
-           lbp_4_a1_d, lbp_4_a2_d, lbp_8_a1_d, lbp_8_a2_d, lbp_16_a1_d, lbp_16_a2_d,
+           lbp_4_d, lbp_8_d, lbp_16_d,
            lbp_4_a1_t, lbp_4_a2_t, lbp_8_a1_t, lbp_8_a2_t, lbp_16_a1_t, lbp_16_a2_t;
 
   T(): a1(3,3), a2(3,3)
@@ -76,12 +76,9 @@ struct T {
     lbp_16_ur = 9;
 
     // direction coded LBP
-    lbp_4_a1_d = 10;
-    lbp_4_a2_d = 10;
-    lbp_8_a1_d = 42;
-    lbp_8_a2_d = 162;
-    lbp_16_a1_d = 10410;
-    lbp_16_a2_d = 34858;
+    lbp_4_d = 10;
+    lbp_8_d = 170;
+    lbp_16_d = 43690;
 
     // transitional LBP
     lbp_4_a1_t = 3;
@@ -147,7 +144,7 @@ BOOST_AUTO_TEST_CASE( test_lbp4_1_uint8 )
   BOOST_CHECK_EQUAL( lbp_4_a2, lbp(a2,1,1) );
   BOOST_CHECK_EQUAL( 16, lbp.getMaxLabel() );
 
-  // add average bit
+  // add average bit; for our test patterns, the average bit is always added
   lbp = bob::ip::LBP(4, 1., true, true, true);
   BOOST_CHECK_EQUAL( lbp_4_a1*2+1, lbp(a1,1,1) );
   BOOST_CHECK_EQUAL( lbp_4_a2*2+1, lbp(a2,1,1) );
@@ -194,7 +191,7 @@ BOOST_AUTO_TEST_CASE( test_lbp8_1_uint8 )
   BOOST_CHECK_EQUAL( lbp_8_a2, lbp(a2,1,1) );
   BOOST_CHECK_EQUAL( 256, lbp.getMaxLabel() );
 
-  // add average bit
+  // add average bit; for our test patterns, the average bit is always added
   lbp = bob::ip::LBP(8, 1., true, true, true);
   BOOST_CHECK_EQUAL( lbp_8_a1*2+1, lbp(a1,1,1) );
   BOOST_CHECK_EQUAL( lbp_8_a2*2+1, lbp(a2,1,1) );
@@ -276,16 +273,16 @@ BOOST_AUTO_TEST_CASE( test_lbp_image )
 
 BOOST_AUTO_TEST_CASE( test_lbp_other )
 {
-  // direction-coded LBP
+  // direction-coded LBP; should be identical for both test patterns
   bob::ip::LBP lbp(4, 1., true, false, false, false, false, bob::ip::ELBP_DIRECTION_CODED);
-  BOOST_CHECK_EQUAL( lbp_4_a1_d, lbp(a1,1,1) );
-  BOOST_CHECK_EQUAL( lbp_4_a2_d, lbp(a2,1,1) );
+  BOOST_CHECK_EQUAL( lbp_4_d, lbp(a1,1,1) );
+  BOOST_CHECK_EQUAL( lbp_4_d, lbp(a2,1,1) );
   lbp = bob::ip::LBP(8, 1., true, false, false, false, false, bob::ip::ELBP_DIRECTION_CODED);
-  BOOST_CHECK_EQUAL( lbp_8_a1_d, lbp(a1,1,1) );
-  BOOST_CHECK_EQUAL( lbp_8_a2_d, lbp(a2,1,1) );
+  BOOST_CHECK_EQUAL( lbp_8_d, lbp(a1,1,1) );
+  BOOST_CHECK_EQUAL( lbp_8_d, lbp(a2,1,1) );
   lbp = bob::ip::LBP(16, 1., true, false, false, false, false, bob::ip::ELBP_DIRECTION_CODED);
-  BOOST_CHECK_EQUAL( lbp_16_a1_d, lbp(a1,1,1) );
-  BOOST_CHECK_EQUAL( lbp_16_a2_d, lbp(a2,1,1) );
+  BOOST_CHECK_EQUAL( lbp_16_d, lbp(a1,1,1) );
+  BOOST_CHECK_EQUAL( lbp_16_d, lbp(a2,1,1) );
 
   // transitional LBP
   lbp = bob::ip::LBP(4, 1., true, false, false, false, false, bob::ip::ELBP_TRANSITIONAL);

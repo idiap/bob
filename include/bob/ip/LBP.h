@@ -258,12 +258,12 @@ namespace bob { namespace ip {
       case ELBP_REGULAR:{
         for (int p = 0; p < m_P; ++p){
           lbp_code <<= 1;
-          if (pixels[p] >= cmp_point) ++lbp_code;
+          if (pixels[p] > cmp_point || bob::core::isClose(pixels[p], cmp_point)) ++lbp_code;
         }
         if (m_add_average_bit && !m_rotation_invariant && !m_uniform)
         {
           lbp_code <<= 1;
-          if (center >= cmp_point) ++lbp_code;
+          if (center > cmp_point || bob::core::isClose(center, cmp_point)) ++lbp_code;
         }
         break;
       }
@@ -271,7 +271,7 @@ namespace bob { namespace ip {
       case ELBP_TRANSITIONAL:{
         for (int p = 0; p < m_P; ++p){
           lbp_code <<= 1;
-          if (pixels[p] >= pixels[(p+1)%m_P]) ++lbp_code;
+          if (pixels[p] > pixels[(p+1)%m_P] || bob::core::isClose(pixels[p], pixels[(p+1)%m_P])) ++lbp_code;
         }
         break;
       }
@@ -281,7 +281,8 @@ namespace bob { namespace ip {
         for (int p = 0; p < p_half; ++p){
           lbp_code <<= 2;
           if ((pixels[p] - cmp_point) * (pixels[p+p_half] - cmp_point) >= 0.) lbp_code += 1;
-          if (std::abs(pixels[p] - cmp_point) >= std::abs(pixels[p+p_half] - cmp_point)) lbp_code += 2;
+          double p1 = std::abs(pixels[p] - cmp_point), p2 = std::abs(pixels[p+p_half] - cmp_point);
+          if ( p1 > p2 || bob::core::isClose(p1, p2) ) lbp_code += 2;
         }
         break;
       }

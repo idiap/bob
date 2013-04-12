@@ -26,6 +26,8 @@
 
 #include <bob/ip/LBP.h>
 
+#include <boost/math/constants/constants.hpp>
+
 bob::ip::LBP::LBP(const int P, const double R_y, const double R_x , const bool circular,
     const bool to_average, const bool add_average_bit, const bool uniform,
     const bool rotation_invariant, const bob::ip::ELBPType eLBP_type):
@@ -127,10 +129,11 @@ void bob::ip::LBP::init()
   // initialize the positions
   m_positions.resize(m_P,2);
   if (m_circular){
+    double PI = boost::math::constants::pi<double>();
     // compute angle offset since LBP codes do not start at the x axis
-    double angle_offset = m_P == 4 ? - 0.5 * M_PI : - 0.75 * M_PI;
+    double angle_offset = m_P == 4 ? - 0.5 * PI : - 0.75 * PI;
     for (int p = 0; p < m_P; ++p){
-      double angle = angle_offset + 2. * M_PI * p / m_P;
+      double angle = angle_offset + 2. * PI * p / m_P;
       m_positions(p,0) = m_R_y * sin(angle);
       m_positions(p,1) = m_R_x * cos(angle);
     }
