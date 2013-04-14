@@ -82,9 +82,8 @@ namespace bob { namespace trainer {
     /**
      * @brief Not equal to
      */
-    bool operator!=(const EMTrainer& b) const {
-      return !(this->operator==(b));
-    }
+    bool operator!=(const EMTrainer& b) const
+    { return !(this->operator==(b)); }
  
     /**
      * @brief Similarity operator
@@ -95,7 +94,7 @@ namespace bob { namespace trainer {
       return m_compute_likelihood == b.m_compute_likelihood &&
              bob::core::isClose(m_convergence_threshold, b.m_convergence_threshold, r_epsilon, a_epsilon) &&
              m_max_iterations == b.m_max_iterations &&
-             m_rng == b.m_rng;
+             *m_rng == *(b.m_rng);
     }
 
     /**
@@ -196,44 +195,38 @@ namespace bob { namespace trainer {
     /**
      * @brief Sets whether the likelihood is computed or not at each iteration
      */
-    void setComputeLikelihood(bool compute) {
-      m_compute_likelihood = compute;
-    }
+    void setComputeLikelihood(bool compute)
+    { m_compute_likelihood = compute; } 
 
     /**
      * @brief Tells whether the likelihood is computed or not at each iteration
      */
-    bool getComputeLikelihood() const {
-      return m_compute_likelihood;
-    }
+    bool getComputeLikelihood() const
+    { return m_compute_likelihood; }
 
     /**
      * @brief Sets the convergence threshold
      */
-    void setConvergenceThreshold(double threshold) {
-      m_convergence_threshold = threshold;
-    }
+    void setConvergenceThreshold(double threshold)
+    { m_convergence_threshold = threshold; }
 
     /**
      * @brief Gets the convergence threshold
      */
-    double getConvergenceThreshold() const {
-      return m_convergence_threshold;
-    }
+    double getConvergenceThreshold() const
+    { return m_convergence_threshold; }
 
     /**
      * @brief Sets the maximum number of EM iterations
      */
-    void setMaxIterations(size_t max_iterations) {
-      m_max_iterations = max_iterations;
-    }
+    void setMaxIterations(size_t max_iterations)
+    { m_max_iterations = max_iterations; }
 
     /**
      * @brief Gets the maximum number of EM iterations
      */
-    size_t getMaxIterations() const {
-      return m_max_iterations;
-    }
+    size_t getMaxIterations() const 
+    { return m_max_iterations; }
 
     /** 
      * @brief Sets the Random Number Generator
@@ -257,8 +250,8 @@ namespace bob { namespace trainer {
      * @brief Protected constructor to be called in the constructor of derived
      * classes
      */
-    EMTrainer(double convergence_threshold = 0.001, 
-        size_t max_iterations = 10, bool compute_likelihood = true):
+    EMTrainer(const double convergence_threshold = 0.001, 
+        const size_t max_iterations = 10, const bool compute_likelihood = true):
       m_compute_likelihood(compute_likelihood), 
       m_convergence_threshold(convergence_threshold), 
       m_max_iterations(max_iterations),
