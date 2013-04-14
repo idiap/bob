@@ -910,7 +910,7 @@ class JFAMachine: public Machine<bob::machine::GMMStats, double>
     * @brief Execute the machine
     *
     * @param input input data used by the machine
-    * @param output value computed by the machine
+    * @param score value computed by the machine
     * @warning Inputs are checked
     */
     void forward(const bob::machine::GMMStats& input, double& score) const;
@@ -925,7 +925,7 @@ class JFAMachine: public Machine<bob::machine::GMMStats, double>
      * @brief Execute the machine
      *
      * @param input input data used by the machine
-     * @param output value computed by the machine
+     * @param score value computed by the machine
      * @warning Inputs are NOT checked
      */
     void forward_(const bob::machine::GMMStats& input, double& score) const;
@@ -1113,7 +1113,7 @@ class ISVMachine: public Machine<bob::machine::GMMStats, double>
     * @brief Execute the machine
     *
     * @param input input data used by the machine
-    * @param output value computed by the machine
+    * @param score value computed by the machine
     * @warning Inputs are checked
     */
     void forward(const bob::machine::GMMStats& input, double& score) const;
@@ -1128,7 +1128,7 @@ class ISVMachine: public Machine<bob::machine::GMMStats, double>
      * @brief Execute the machine
      *
      * @param input input data used by the machine
-     * @param output value computed by the machine
+     * @param score value computed by the machine
      * @warning Inputs are NOT checked
      */
     void forward_(const bob::machine::GMMStats& input, double& score) const;
