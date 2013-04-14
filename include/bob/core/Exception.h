@@ -37,7 +37,7 @@ namespace bob {
     /**
      * @brief The stock bob exception class should be used as a base of any
      * other exception type in bob. There are no input parameters you can
-     * specify and that is on purpose. If you need to be specific about a 
+     * specify and that is on purpose. If you need to be specific about a
      * problem, derive from this one.
      *
      * Example: My filter only accepts gray-scaled images.
@@ -111,13 +111,13 @@ namespace bob {
     };
 
     /**
-     * @brief An InvalidArgumentException is raised when a function receives a 
+     * @brief An InvalidArgumentException is raised when a function receives a
      * parameter that it cannot handle.
      */
     class InvalidArgumentException: public Exception {
 
       public:
-        /** 
+        /**
          * @brief Create exception with a self-chosen error message
          * @param  reason  The reason why the exception was thrown
          */
@@ -135,7 +135,7 @@ namespace bob {
             m_reason = s.str();
           }
 
-        /** 
+        /**
          * @brief Create exception with a default error message
          * @param  parameter_name  The name of the parameter that was incorrect
          * @param  value  The value of the parameter that was incorrect

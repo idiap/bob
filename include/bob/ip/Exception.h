@@ -6,21 +6,21 @@
  * @brief Exceptions used throughout the IP subsystem of bob
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB_IP_EXCEPTION_H 
+#ifndef BOB_IP_EXCEPTION_H
 #define BOB_IP_EXCEPTION_H
 
 #include <cstdlib>
@@ -43,8 +43,6 @@ namespace bob { namespace ip {
       virtual ~UnknownScalingAlgorithm() throw();
       virtual const char* what() const throw();
 
-    private:
-      mutable std::string m_message;
   };
 
   class UnknownRotatingAlgorithm: public Exception {
@@ -53,8 +51,6 @@ namespace bob { namespace ip {
       virtual ~UnknownRotatingAlgorithm() throw();
       virtual const char* what() const throw();
 
-    private:
-      mutable std::string m_message;
   };
 
 
@@ -64,6 +60,7 @@ namespace bob { namespace ip {
   class LBPRadiusDoesNotMatch: public Exception {
     public:
       LBPRadiusDoesNotMatch(const std::string& axis,const std::string& plane1,const std::string& plane2) throw();
+      LBPRadiusDoesNotMatch(const std::string& radius1,const std::string& radius2) throw();
       virtual ~LBPRadiusDoesNotMatch() throw();
       virtual const char* what() const throw();
 
@@ -71,11 +68,10 @@ namespace bob { namespace ip {
       std::string m_axis;
       std::string m_plane1;
       std::string m_plane2;
-      mutable std::string m_message;
 
   };
 
-  
+
   /**
     * This exception is thrown when using a LBP with a non-common number
     * of neighbours ( != 4 && != 8)

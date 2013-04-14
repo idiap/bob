@@ -11,16 +11,16 @@
  * Pietikäinen, IEEE Trans. on PAMI, 2007). This is the implementation file.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -28,22 +28,22 @@
 #include <bob/ip/LBPTop.h>
 #include <bob/ip/Exception.h>
 
-bob::ip::LBPTop::LBPTop(const bob::ip::LBP& lbp_xy, 
-                   const bob::ip::LBP& lbp_xt, 
+bob::ip::LBPTop::LBPTop(const bob::ip::LBP& lbp_xy,
+                   const bob::ip::LBP& lbp_xt,
                    const bob::ip::LBP& lbp_yt)
-: m_lbp_xy(lbp_xy.clone()),
-  m_lbp_xt(lbp_xt.clone()),
-  m_lbp_yt(lbp_yt.clone())
+: m_lbp_xy(lbp_xy),
+  m_lbp_xt(lbp_xt),
+  m_lbp_yt(lbp_yt)
 {
  /*Checking the inputs. The radius in XY,XT and YT must be the same*/
 
-  if(lbp_xy.getRadius()!=lbp_xt.getRadius())
+  if(lbp_xy.getRadii()[0]!=lbp_xt.getRadii()[0])
     throw LBPRadiusDoesNotMatch("X","XY","XT");
 
-  if(lbp_xy.getRadius2()!=lbp_yt.getRadius())
+  if(lbp_xy.getRadii()[1]!=lbp_yt.getRadii()[0])
     throw LBPRadiusDoesNotMatch("Y","XY","YT");
 
-  if(lbp_xt.getRadius2()!=lbp_yt.getRadius2())
+  if(lbp_xt.getRadii()[1]!=lbp_yt.getRadii()[0])
     throw LBPRadiusDoesNotMatch("T","XT","YT");
 
 
@@ -51,22 +51,22 @@ bob::ip::LBPTop::LBPTop(const bob::ip::LBP& lbp_xy,
 }
 
 bob::ip::LBPTop::LBPTop(const LBPTop& other)
-: m_lbp_xy(other.m_lbp_xy->clone()),
-  m_lbp_xt(other.m_lbp_xt->clone()),
-  m_lbp_yt(other.m_lbp_yt->clone())
+: m_lbp_xy(other.m_lbp_xy),
+  m_lbp_xt(other.m_lbp_xt),
+  m_lbp_yt(other.m_lbp_yt)
 {
 }
 
 bob::ip::LBPTop::~LBPTop() { }
 
 bob::ip::LBPTop& bob::ip::LBPTop::operator= (const LBPTop& other) {
-  m_lbp_xy = other.m_lbp_xy->clone();
-  m_lbp_xt = other.m_lbp_xt->clone();
-  m_lbp_yt = other.m_lbp_yt->clone();
+  m_lbp_xy = other.m_lbp_xy;
+  m_lbp_xt = other.m_lbp_xt;
+  m_lbp_yt = other.m_lbp_yt;
   return *this;
 }
 
-void bob::ip::LBPTop::operator()(const blitz::Array<uint8_t,3>& src, 
+void bob::ip::LBPTop::operator()(const blitz::Array<uint8_t,3>& src,
     blitz::Array<uint16_t,3>& xy,
     blitz::Array<uint16_t,3>& xt,
     blitz::Array<uint16_t,3>& yt) const
@@ -74,17 +74,17 @@ void bob::ip::LBPTop::operator()(const blitz::Array<uint8_t,3>& src,
   process<uint8_t>(src, xy, xt, yt);
 }
 
-void bob::ip::LBPTop::operator()(const blitz::Array<uint16_t,3>& src, 
+void bob::ip::LBPTop::operator()(const blitz::Array<uint16_t,3>& src,
     blitz::Array<uint16_t,3>& xy,
     blitz::Array<uint16_t,3>& xt,
     blitz::Array<uint16_t,3>& yt) const
-{ 
-  process<uint16_t>(src, xy, xt, yt); 
+{
+  process<uint16_t>(src, xy, xt, yt);
 }
-void bob::ip::LBPTop::operator()(const blitz::Array<double,3>& src, 
+void bob::ip::LBPTop::operator()(const blitz::Array<double,3>& src,
     blitz::Array<uint16_t,3>& xy,
     blitz::Array<uint16_t,3>& xt,
     blitz::Array<uint16_t,3>& yt) const
-{ 
-  process<double>(src, xy, xt, yt); 
+{
+  process<double>(src, xy, xt, yt);
 }

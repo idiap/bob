@@ -25,18 +25,20 @@
 #include <boost/format.hpp>
 #include <bob/core/Exception.h>
 
-bob::core::Exception::Exception() throw() {
+bob::core::Exception::Exception() throw()
+{
 }
 
-bob::core::Exception::Exception(const bob::core::Exception&) throw() {
+bob::core::Exception::Exception(const bob::core::Exception& other) throw()
+{
 }
 
 bob::core::Exception::~Exception() throw() {
 }
 
 const char* bob::core::Exception::what() const throw() {
- static const char* what_string = "Generic core::Exception: user specialization has not overwritten what() or is throwing an object of this class (in which case, please fix it!)";
- return what_string;
+  static const char* const what_string = "Generic core::Exception: user specialization has not overwritten what() or is throwing an object of this class (in which case, please fix it!)";
+  return what_string;
 }
 
 bob::core::DeprecationError::DeprecationError(const std::string& op) throw():
