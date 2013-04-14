@@ -43,7 +43,6 @@ bob_add_library(${PROJECT_NAME} "${src}")
 target_link_libraries(${PROJECT_NAME} ${shared})
 
 # Defines tests for this package
-bob_add_test(${PROJECT_NAME} jfa test/jfa.cc)
 bob_add_test(${PROJECT_NAME} bic test/bic.cc)
 
 # Pkg-Config generator

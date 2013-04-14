@@ -27,279 +27,453 @@
 
 using namespace boost::python;
 
-static void update_eigen(bob::python::const_ndarray A, bob::python::const_ndarray C, 
-    bob::python::ndarray uv) {
-  blitz::Array<double,2> uv_ = uv.bz<double,2>();
-  bob::trainer::jfa::updateEigen(A.bz<double,3>(), C.bz<double,2>(), uv_);
-}
 
-static void estimate_xandu(bob::python::const_ndarray F, bob::python::const_ndarray N,
-    bob::python::const_ndarray m, bob::python::const_ndarray E,
-    bob::python::const_ndarray d, bob::python::const_ndarray v,
-    bob::python::const_ndarray u, bob::python::const_ndarray z,
-    bob::python::const_ndarray y, bob::python::ndarray x,
-    bob::python::const_ndarray spk_ids) {
-  blitz::Array<double,2> x_ = x.bz<double,2>();
-  bob::trainer::jfa::estimateXandU(F.bz<double,2>(), N.bz<double,2>(),
-      m.bz<double,1>(), E.bz<double,1>(), d.bz<double,1>(), v.bz<double,2>(),
-      u.bz<double,2>(), z.bz<double,2>(), y.bz<double,2>(), x_,
-      spk_ids.bz<uint32_t,1>());
-}
-
-static void estimate_yandv(bob::python::const_ndarray F, bob::python::const_ndarray N,
-  bob::python::const_ndarray m, bob::python::const_ndarray E, 
-  bob::python::const_ndarray d, bob::python::const_ndarray v, 
-  bob::python::const_ndarray u, bob::python::const_ndarray z, 
-  bob::python::ndarray y, bob::python::const_ndarray x, bob::python::const_ndarray spk_ids) {
-  blitz::Array<double,2> y_ = y.bz<double,2>();
-  bob::trainer::jfa::estimateYandV(F.bz<double,2>(), N.bz<double,2>(),
-      m.bz<double,1>(), E.bz<double,1>(), d.bz<double,1>(), v.bz<double,2>(),
-      u.bz<double,2>(), z.bz<double,2>(), y_, x.bz<double,2>(), 
-      spk_ids.bz<uint32_t,1>());
-}
-
-static void estimate_zandd(bob::python::const_ndarray F, bob::python::const_ndarray N,
-  bob::python::const_ndarray m, bob::python::const_ndarray E,
-  bob::python::const_ndarray d, bob::python::const_ndarray v,
-  bob::python::const_ndarray u, bob::python::ndarray z,
-  bob::python::const_ndarray y, bob::python::const_ndarray x,
-  bob::python::const_ndarray spk_ids) {
-  blitz::Array<double,2> z_ = z.bz<double,2>();
-  bob::trainer::jfa::estimateZandD(F.bz<double,2>(), N.bz<double,2>(),
-      m.bz<double,1>(), E.bz<double,1>(), d.bz<double,1>(), v.bz<double,2>(),
-      u.bz<double,2>(), z_, y.bz<double,2>(), x.bz<double,2>(),
-      spk_ids.bz<uint32_t,1>());
-}
-
-static void extractGMMStatsVectors(list list_stats, 
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > >& gmm_stats)
+static object vector_as_list(const std::vector<blitz::Array<double,1> >& vec) 
 {
-  const size_t n_ids = len(list_stats);
-  // Extracts the vector of vector of pointers from the python list of lists
-  for(size_t id=0; id<n_ids; ++id) {
-    list list_stats_id = extract<list>(list_stats[id]);
-    size_t n_samples = len(list_stats_id);
-    std::vector<boost::shared_ptr<const bob::machine::GMMStats> > gmm_stats_id;
-    for(size_t s=0; s<n_samples; ++s) {
-      boost::shared_ptr<bob::machine::GMMStats> gs = extract<boost::shared_ptr<bob::machine::GMMStats> >(list_stats_id[s]);
-      gmm_stats_id.push_back(gs);
-    }
-    gmm_stats.push_back(gmm_stats_id);
-  }
-}
-
-static void jfa_train(bob::trainer::JFABaseTrainer& t, list list_stats, const size_t n_iter)
-{
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
-  extractGMMStatsVectors(list_stats, gmm_stats);
-  // Calls the train function
-  t.train(gmm_stats, n_iter);
-}
-
-static void jfa_train_noinit(bob::trainer::JFABaseTrainer& t, list list_stats, const size_t n_iter)
-{
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
-  extractGMMStatsVectors(list_stats, gmm_stats);
-  // Calls the train function
-  t.trainNoInit(gmm_stats, n_iter);
-}
-
-
-static void jfa_train_ISV(bob::trainer::JFABaseTrainer& t, list list_stats, 
-  const size_t n_iter, const double relevance_factor)
-{
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
-  extractGMMStatsVectors(list_stats, gmm_stats);
-  // Calls the train function
-  t.trainISV(gmm_stats, n_iter, relevance_factor);
-}
-
-static void jfa_train_ISV_noinit(bob::trainer::JFABaseTrainer& t, list list_stats, 
-  const size_t n_iter, const double relevance_factor)
-{
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
-  extractGMMStatsVectors(list_stats, gmm_stats);
-  // Calls the train function
-  t.trainISVNoInit(gmm_stats, n_iter, relevance_factor);
-}
-
-static void jfa_enrol(bob::trainer::JFATrainer& t, list stats, const size_t n_iter)
-{
-  int n_samples = len(stats);
-  std::vector<boost::shared_ptr<const bob::machine::GMMStats> > gmm_stats;
-  for(int s=0; s<n_samples; ++s)
-  {
-    boost::shared_ptr<bob::machine::GMMStats> gs = extract<boost::shared_ptr<bob::machine::GMMStats> >(stats[s]);  
-    gmm_stats.push_back(gs);
-  }
-
-  // Calls the enrol function
-  t.enrol(gmm_stats, n_iter);
-}
-
-
-template <typename T, int N>
-tuple as_tuple (const std::vector<blitz::Array<T,N> >& obj) {
   list retval;
-  for (size_t k=0; k<obj.size(); ++k) retval.append(obj[k]); //copy
-  return tuple(retval);
-}
-
-static tuple get_x (const bob::trainer::JFABaseTrainerBase& obj) {
-  return as_tuple(obj.getX());
-}
-
-static tuple get_y (const bob::trainer::JFABaseTrainerBase& obj) {
-  return as_tuple(obj.getY());
-}
-
-static tuple get_z (const bob::trainer::JFABaseTrainerBase& obj) {
-  return as_tuple(obj.getZ());
-}
-
-static void jfa_set_speaker_factors(bob::trainer::JFABaseTrainerBase& t, 
-    object x, object y, object z) {
-  //x
-  stl_input_iterator<bob::python::const_ndarray> it(x), end;
-  std::vector<blitz::Array<double,2> > xref;
-  xref.reserve(len(x));
-  for (; it != end; ++it) xref.push_back((*it).bz<double,2>());
-
-  //y
-  stl_input_iterator<bob::python::const_ndarray> it2(y);
-  std::vector<blitz::Array<double,1> > yref;
-  yref.reserve(len(y));
-  for (; it2 != end; ++it2) yref.push_back((*it2).bz<double,1>());
-
-  //z
-  stl_input_iterator<bob::python::const_ndarray> it3(z);
-  std::vector<blitz::Array<double,1> > zref;
-  zref.reserve(len(z));
-  for (; it3 != end; ++it3) zref.push_back((*it3).bz<double,1>());
-
-  t.setSpeakerFactors(xref, yref, zref);
-}
-
-static void jfa_initNid(bob::trainer::JFABaseTrainerBase& t, object o)
-{
-  size_t Nid;
-  extract<int> int_check(o);
-  extract<double> float_check(o);
-  if(int_check.check()) { //is int
-    Nid = int_check();
+  for(size_t k=0; k<vec.size(); ++k) 
+  {
+    const blitz::Array<double,1>& array = vec[k];
+    bob::python::ndarray a(bob::core::array::t_float64, array.extent(0));
+    blitz::Array<double,1> a_ = a.bz<double,1>();
+    a_ = array;
+    retval.append(a); //copy
   }
-  else if(float_check.check()) { //is float
-    Nid = static_cast<size_t>(float_check());
+  return retval;
+}
+
+static object vector_as_list(const std::vector<blitz::Array<double,2> >& vec) 
+{
+  list retval;
+  for(size_t k=0; k<vec.size(); ++k) 
+  {
+    const blitz::Array<double,2>& array = vec[k];
+    bob::python::ndarray a(bob::core::array::t_float64, array.extent(0), array.extent(1));
+    blitz::Array<double,2> a_ = a.bz<double,2>();
+    a_ = array;
+    retval.append(a); //copy
   }
-  else {
-    Nid = len(o);
+  return retval;
+}
+
+
+static void extract_GMMStats(object data, 
+  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& training_data)
+{
+  stl_input_iterator<object> dbegin(data), dend;
+  std::vector<object> vvdata(dbegin, dend);
+  for (size_t i=0; i<vvdata.size(); ++i)
+  {
+    stl_input_iterator<boost::shared_ptr<bob::machine::GMMStats> > dlbegin(vvdata[i]), dlend;
+    training_data.push_back(std::vector<boost::shared_ptr<bob::machine::GMMStats> >(dlbegin, dlend));
   }
-  t.initNid(Nid);
 }
 
-
-static void jfa_precomputeN(bob::trainer::JFABaseTrainerBase& t, list list_stats)
+static void isv_train(bob::trainer::ISVTrainer& t, bob::machine::ISVBase& m, object data)
 {
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
-  extractGMMStatsVectors(list_stats, gmm_stats);
+  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > training_data;
+  extract_GMMStats(data, training_data);
   // Calls the train function
-  t.precomputeSumStatisticsN(gmm_stats);
+  t.train(m, training_data);
 }
 
-static void jfa_precomputeF(bob::trainer::JFABaseTrainerBase& t, list list_stats)
+static void isv_initialization(bob::trainer::ISVTrainer& t, bob::machine::ISVBase& m, object data)
 {
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
-  extractGMMStatsVectors(list_stats, gmm_stats);
-  // Calls the train function
-  t.precomputeSumStatisticsF(gmm_stats);
+  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > training_data;
+  extract_GMMStats(data, training_data);
+  // Calls the initialization function
+  t.initialization(m, training_data);
 }
 
-static void jfa_updateX(bob::trainer::JFABaseTrainer& t, list list_stats)
+static void isv_estep(bob::trainer::ISVTrainer& t, bob::machine::ISVBase& m, object data)
 {
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
-  extractGMMStatsVectors(list_stats, gmm_stats);
-  // Calls the train function
-  t.updateX(gmm_stats);
+  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > training_data;
+  extract_GMMStats(data, training_data);
+  // Calls the E-Step function
+  t.eStep(m, training_data);
 }
 
-static void jfa_updateY(bob::trainer::JFABaseTrainer& t, list list_stats)
+static void isv_mstep(bob::trainer::ISVTrainer& t, bob::machine::ISVBase& m, object data)
 {
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
-  extractGMMStatsVectors(list_stats, gmm_stats);
-  // Calls the train function
-  t.updateY(gmm_stats);
+  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > training_data;
+  extract_GMMStats(data, training_data);
+  // Calls the M-Step function
+  t.mStep(m, training_data);
 }
 
-static void jfa_updateZ(bob::trainer::JFABaseTrainer& t, list list_stats)
+static void isv_finalization(bob::trainer::ISVTrainer& t, bob::machine::ISVBase& m, object data)
 {
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
-  extractGMMStatsVectors(list_stats, gmm_stats);
-  // Calls the train function
-  t.updateZ(gmm_stats);
+  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > training_data;
+  extract_GMMStats(data, training_data);
+  // Calls the finalization function
+  t.finalization(m, training_data);
 }
 
-static void jfa_updateU(bob::trainer::JFABaseTrainer& t, list list_stats)
+static void isv_enrol(bob::trainer::ISVTrainer& t, bob::machine::ISVMachine& m, object data, const size_t n_iter)
 {
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
-  extractGMMStatsVectors(list_stats, gmm_stats);
-  // Calls the train function
-  t.updateU(gmm_stats);
+  stl_input_iterator<boost::shared_ptr<bob::machine::GMMStats> > dlbegin(data), dlend;
+  std::vector<boost::shared_ptr<bob::machine::GMMStats> > vdata(dlbegin, dlend);
+  // Calls the enrol function
+  t.enrol(m, vdata, n_iter);
 }
 
-static void jfa_updateV(bob::trainer::JFABaseTrainer& t, list list_stats)
+static object isv_get_x(const bob::trainer::ISVTrainer& t)
 {
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
-  extractGMMStatsVectors(list_stats, gmm_stats);
-  // Calls the train function
-  t.updateV(gmm_stats);
+  return vector_as_list(t.getX());
 }
 
-static void jfa_updateD(bob::trainer::JFABaseTrainer& t, list list_stats)
+static object isv_get_z(const bob::trainer::ISVTrainer& t)
 {
-  std::vector<std::vector<boost::shared_ptr<const bob::machine::GMMStats> > > gmm_stats;
-  extractGMMStatsVectors(list_stats, gmm_stats);
-  // Calls the train function
-  t.updateD(gmm_stats);
+  return vector_as_list(t.getZ());
 }
 
-void bind_trainer_jfa() {
-  def("jfa_update_eigen", &update_eigen, (arg("a"), arg("c"), arg("uv")), "Updates eigenchannels (or eigenvoices) from accumulators a and c.");
-  def("jfa_estimate_x_and_u", &estimate_xandu, (arg("f"), arg("n"), arg("m"), arg("e"), arg("d"), arg("v"), arg("u"), arg("z"), arg("y"), arg("x"), arg("spk_ids")), "Estimates the channel factors.");
-  def("jfa_estimate_y_and_v", &estimate_yandv, (arg("f"), arg("n"), arg("m"), arg("e"), arg("d"), arg("v"), arg("u"), arg("z"), arg("y"), arg("x"), arg("spk_ids")), "Estimates the speaker factors y.");
-  def("jfa_estimate_z_and_d", &estimate_zandd, (arg("f"), arg("n"), arg("m"), arg("e"), arg("d"), arg("v"), arg("u"), arg("z"), arg("y"), arg("x"), arg("spk_ids")), "Estimates the speaker factors z.");
+static void isv_set_x(bob::trainer::ISVTrainer& t, object data)
+{
+  stl_input_iterator<bob::python::const_ndarray> vdata(data), dend;
+  std::vector<blitz::Array<double,2> > vdata_ref;
+  vdata_ref.reserve(len(data));
+  for (; vdata != dend; ++vdata) vdata_ref.push_back((*vdata).bz<double,2>());
+  t.setX(vdata_ref);
+}
 
-  class_<bob::trainer::JFABaseTrainerBase, boost::noncopyable>("JFABaseTrainerBase", "Create a trainer for the JFA.", init<bob::machine::JFABaseMachine&>((arg("jfa_base")),"Initializes a new JFABaseTrainerBase."))
-    .add_property("__X__", &get_x, &bob::trainer::JFABaseTrainerBase::setX)
-    .add_property("__Y__", &get_y, &bob::trainer::JFABaseTrainerBase::setY)
-    .add_property("__Z__", &get_z, &bob::trainer::JFABaseTrainerBase::setZ)
-    .def("__setSpeakerFactors__", &jfa_set_speaker_factors, (arg("self"), arg("x"), arg("y"), arg("z")), "Set the speaker factors.")
-    .def("__initializeRandomU__", &bob::trainer::JFABaseTrainerBase::initializeRandomU, (arg("self")), "Initializes randomly U.")
-    .def("__initializeRandomV__", &bob::trainer::JFABaseTrainerBase::initializeRandomV, (arg("self")), "Initializes randomly V.")
-    .def("__initializeRandomD__", &bob::trainer::JFABaseTrainerBase::initializeRandomD, (arg("self")), "Initializes randomly D.")
-    .def("__initializeUVD__", &bob::trainer::JFABaseTrainerBase::initializeUVD, (arg("self")), "Initializes randomly U, V and D.")
-    .def("__initNid__", &jfa_initNid, (arg("self"), arg("stats")), "Initializes the number of identities.")
-    .def("__precomputeSumStatisticsN__", &jfa_precomputeN, (arg("self"), arg("stats")), "Precomputes zeroth order statistics over sessions.")
-    .def("__precomputeSumStatisticsF__", &jfa_precomputeF, (arg("self"), arg("stats")), "Precomputes first order statistics over sessions.")
+static void isv_set_z(bob::trainer::ISVTrainer& t, object data)
+{
+  stl_input_iterator<bob::python::const_ndarray> vdata(data), dend;
+  std::vector<blitz::Array<double,1> > vdata_ref;
+  vdata_ref.reserve(len(data));
+  for (; vdata != dend; ++vdata) vdata_ref.push_back((*vdata).bz<double,1>());
+  t.setZ(vdata_ref);
+}
+
+
+static object isv_get_accUA1(const bob::trainer::ISVTrainer& trainer)
+{
+  const blitz::Array<double,3>& acc_ref = trainer.getAccUA1();
+  bob::python::ndarray acc(bob::core::array::t_float64, acc_ref.extent(0), acc_ref.extent(1), acc_ref.extent(2));
+  blitz::Array<double,3> acc_ = acc.bz<double,3>();
+  acc_ = acc_ref;
+  return acc.self();
+}
+
+static void isv_set_accUA1(bob::trainer::ISVTrainer& trainer, 
+  bob::python::const_ndarray acc)
+{
+  const blitz::Array<double,3> acc_ = acc.bz<double,3>();
+  trainer.setAccUA1(acc_);
+}
+
+static object isv_get_accUA2(const bob::trainer::ISVTrainer& trainer)
+{
+  const blitz::Array<double,2>& acc_ref = trainer.getAccUA2();
+  bob::python::ndarray acc(bob::core::array::t_float64, acc_ref.extent(0), acc_ref.extent(1));
+  blitz::Array<double,2> acc_ = acc.bz<double,2>();
+  acc_ = acc_ref;
+  return acc.self();
+}
+
+static void isv_set_accUA2(bob::trainer::ISVTrainer& trainer, 
+  bob::python::const_ndarray acc)
+{
+  const blitz::Array<double,2> acc_ = acc.bz<double,2>();
+  trainer.setAccUA2(acc_);
+}
+
+
+
+static void jfa_train(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, object data)
+{
+  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > training_data;
+  extract_GMMStats(data, training_data);
+  // Calls the train function
+  t.train(m, training_data);
+}
+
+static void jfa_initialization(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, object data)
+{
+  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > training_data;
+  extract_GMMStats(data, training_data);
+  // Calls the initialization function
+  t.initialization(m, training_data);
+}
+
+static void jfa_estep1(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, object data)
+{
+  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > training_data;
+  extract_GMMStats(data, training_data);
+  // Calls the E-Step function
+  t.eStep1(m, training_data);
+}
+
+static void jfa_mstep1(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, object data)
+{
+  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > training_data;
+  extract_GMMStats(data, training_data);
+  // Calls the M-Step function
+  t.mStep1(m, training_data);
+}
+
+static void jfa_finalization1(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, object data)
+{
+  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > training_data;
+  extract_GMMStats(data, training_data);
+  // Calls the finalization function
+  t.finalization1(m, training_data);
+}
+
+static void jfa_estep2(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, object data)
+{
+  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > training_data;
+  extract_GMMStats(data, training_data);
+  // Calls the E-Step function
+  t.eStep2(m, training_data);
+}
+
+static void jfa_mstep2(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, object data)
+{
+  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > training_data;
+  extract_GMMStats(data, training_data);
+  // Calls the M-Step function
+  t.mStep2(m, training_data);
+}
+
+static void jfa_finalization2(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, object data)
+{
+  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > training_data;
+  extract_GMMStats(data, training_data);
+  // Calls the finalization function
+  t.finalization2(m, training_data);
+}
+
+static void jfa_estep3(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, object data)
+{
+  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > training_data;
+  extract_GMMStats(data, training_data);
+  // Calls the E-Step function
+  t.eStep3(m, training_data);
+}
+
+static void jfa_mstep3(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, object data)
+{
+  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > training_data;
+  extract_GMMStats(data, training_data);
+  // Calls the M-Step function
+  t.mStep3(m, training_data);
+}
+
+static void jfa_finalization3(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, object data)
+{
+  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > training_data;
+  extract_GMMStats(data, training_data);
+  // Calls the finalization function
+  t.finalization3(m, training_data);
+}
+
+static void jfa_train_loop(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, object data)
+{
+  std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > training_data;
+  extract_GMMStats(data, training_data);
+  // Calls the initialization function
+  t.train_loop(m, training_data);
+}
+
+static void jfa_enrol(bob::trainer::JFATrainer& t, bob::machine::JFAMachine& m, object data, const size_t n_iter)
+{
+  stl_input_iterator<boost::shared_ptr<bob::machine::GMMStats> > dlbegin(data), dlend;
+  std::vector<boost::shared_ptr<bob::machine::GMMStats> > vdata(dlbegin, dlend);
+  // Calls the enrol function
+  t.enrol(m, vdata, n_iter);
+}
+
+static object jfa_get_x(const bob::trainer::JFATrainer& t)
+{
+  return vector_as_list(t.getX());
+}
+
+static object jfa_get_y(const bob::trainer::JFATrainer& t)
+{
+  return vector_as_list(t.getY());
+}
+
+static object jfa_get_z(const bob::trainer::JFATrainer& t)
+{
+  return vector_as_list(t.getZ());
+}
+
+static void jfa_set_x(bob::trainer::JFATrainer& t, object data)
+{
+  stl_input_iterator<bob::python::const_ndarray> vdata(data), dend;
+  std::vector<blitz::Array<double,2> > vdata_ref;
+  vdata_ref.reserve(len(data));
+  for (; vdata != dend; ++vdata) vdata_ref.push_back((*vdata).bz<double,2>());
+  t.setX(vdata_ref);
+}
+
+static void jfa_set_y(bob::trainer::JFATrainer& t, object data)
+{
+  stl_input_iterator<bob::python::const_ndarray> vdata(data), dend;
+  std::vector<blitz::Array<double,1> > vdata_ref;
+  vdata_ref.reserve(len(data));
+  for (; vdata != dend; ++vdata) vdata_ref.push_back((*vdata).bz<double,1>());
+  t.setY(vdata_ref);
+}
+
+static void jfa_set_z(bob::trainer::JFATrainer& t, object data)
+{
+  stl_input_iterator<bob::python::const_ndarray> vdata(data), dend;
+  std::vector<blitz::Array<double,1> > vdata_ref;
+  vdata_ref.reserve(len(data));
+  for (; vdata != dend; ++vdata) vdata_ref.push_back((*vdata).bz<double,1>());
+  t.setZ(vdata_ref);
+}
+
+
+static object jfa_get_accUA1(const bob::trainer::JFATrainer& trainer)
+{
+  const blitz::Array<double,3>& acc_ref = trainer.getAccUA1();
+  bob::python::ndarray acc(bob::core::array::t_float64, acc_ref.extent(0), acc_ref.extent(1), acc_ref.extent(2));
+  blitz::Array<double,3> acc_ = acc.bz<double,3>();
+  acc_ = acc_ref;
+  return acc.self();
+}
+
+static void jfa_set_accUA1(bob::trainer::JFATrainer& trainer, 
+  bob::python::const_ndarray acc)
+{
+  const blitz::Array<double,3> acc_ = acc.bz<double,3>();
+  trainer.setAccUA1(acc_);
+}
+
+static object jfa_get_accUA2(const bob::trainer::JFATrainer& trainer)
+{
+  const blitz::Array<double,2>& acc_ref = trainer.getAccUA2();
+  bob::python::ndarray acc(bob::core::array::t_float64, acc_ref.extent(0), acc_ref.extent(1));
+  blitz::Array<double,2> acc_ = acc.bz<double,2>();
+  acc_ = acc_ref;
+  return acc.self();
+}
+
+static void jfa_set_accUA2(bob::trainer::JFATrainer& trainer, 
+  bob::python::const_ndarray acc)
+{
+  const blitz::Array<double,2> acc_ = acc.bz<double,2>();
+  trainer.setAccUA2(acc_);
+}
+
+static object jfa_get_accVA1(const bob::trainer::JFATrainer& trainer)
+{
+  const blitz::Array<double,3>& acc_ref = trainer.getAccVA1();
+  bob::python::ndarray acc(bob::core::array::t_float64, acc_ref.extent(0), acc_ref.extent(1), acc_ref.extent(2));
+  blitz::Array<double,3> acc_ = acc.bz<double,3>();
+  acc_ = acc_ref;
+  return acc.self();
+}
+
+static void jfa_set_accVA1(bob::trainer::JFATrainer& trainer, 
+  bob::python::const_ndarray acc)
+{
+  const blitz::Array<double,3> acc_ = acc.bz<double,3>();
+  trainer.setAccVA1(acc_);
+}
+
+static object jfa_get_accVA2(const bob::trainer::JFATrainer& trainer)
+{
+  const blitz::Array<double,2>& acc_ref = trainer.getAccVA2();
+  bob::python::ndarray acc(bob::core::array::t_float64, acc_ref.extent(0), acc_ref.extent(1));
+  blitz::Array<double,2> acc_ = acc.bz<double,2>();
+  acc_ = acc_ref;
+  return acc.self();
+}
+
+static void jfa_set_accVA2(bob::trainer::JFATrainer& trainer, 
+  bob::python::const_ndarray acc)
+{
+  const blitz::Array<double,2> acc_ = acc.bz<double,2>();
+  trainer.setAccVA2(acc_);
+}
+
+static object jfa_get_accDA1(const bob::trainer::JFATrainer& trainer)
+{
+  const blitz::Array<double,1>& acc_ref = trainer.getAccDA1();
+  bob::python::ndarray acc(bob::core::array::t_float64, acc_ref.extent(0));
+  blitz::Array<double,1> acc_ = acc.bz<double,1>();
+  acc_ = acc_ref;
+  return acc.self();
+}
+
+static void jfa_set_accDA1(bob::trainer::JFATrainer& trainer, 
+  bob::python::const_ndarray acc)
+{
+  const blitz::Array<double,1> acc_ = acc.bz<double,1>();
+  trainer.setAccDA1(acc_);
+}
+
+static object jfa_get_accDA2(const bob::trainer::JFATrainer& trainer)
+{
+  const blitz::Array<double,1>& acc_ref = trainer.getAccDA2();
+  bob::python::ndarray acc(bob::core::array::t_float64, acc_ref.extent(0));
+  blitz::Array<double,1> acc_ = acc.bz<double,1>();
+  acc_ = acc_ref;
+  return acc.self();
+}
+
+static void jfa_set_accDA2(bob::trainer::JFATrainer& trainer, 
+  bob::python::const_ndarray acc)
+{
+  const blitz::Array<double,1> acc_ = acc.bz<double,1>();
+  trainer.setAccDA2(acc_);
+}
+
+
+
+void bind_trainer_jfa() 
+{
+  class_<bob::trainer::ISVTrainer, boost::noncopyable >("ISVTrainer", "Create a trainer for the ISV.", init<optional<const size_t, const double> >((arg("max_iterations")=10, arg("relevance_factor")=4.),"Initializes a new ISVTrainer."))
+    .def(init<const bob::trainer::ISVTrainer&>((arg("other")), "Copy constructs an ISVTrainer"))
+    .add_property("max_iterations", &bob::trainer::ISVTrainer::getMaxIterations, &bob::trainer::ISVTrainer::setMaxIterations, "Max iterations")
+    .add_property("rng", &bob::trainer::ISVTrainer::getRng, &bob::trainer::ISVTrainer::setRng, "The Mersenne Twister mt19937 random generator used for the initialization of subspaces/arrays before the EM loop.")
+    .add_property("__X__", &isv_get_x, &isv_set_x)
+    .add_property("__Z__", &isv_get_z, &isv_set_z)
+    .def(self == self)
+    .def(self != self)
+    .def("is_similar_to", &bob::trainer::ISVTrainer::is_similar_to, (arg("self"), arg("other"), arg("r_epsilon")=1e-5, arg("a_epsilon")=1e-8), "Compares this ISVTrainer with the 'other' one to be approximately the same.")
+    .def("train", &isv_train, (arg("self"), arg("isv_base"), arg("gmm_stats")), "Call the training procedure.")
+    .def("initialization", &isv_initialization, (arg("self"), arg("isv_base"), arg("gmm_stats")), "Call the initialization procedure.")
+    .def("e_step", &isv_estep, (arg("self"), arg("isv_base"), arg("gmm_stats")), "Call the e-step procedure.")
+    .def("m_step", &isv_mstep, (arg("self"), arg("isv_base"), arg("gmm_stats")), "Call the m-step procedure.")
+    .def("finalization", &isv_finalization, (arg("self"), arg("isv_base"), arg("gmm_stats")), "Call the finalization procedure.")
+    .def("enrol", &isv_enrol, (arg("self"), arg("isv_machine"), arg("gmm_stats"), arg("n_iter")), "Call the enrolment procedure.")
+    .add_property("acc_u_a1", &isv_get_accUA1, &isv_set_accUA1, "Accumulator updated during the E-step")
+    .add_property("acc_u_a2", &isv_get_accUA2, &isv_set_accUA2, "Accumulator updated during the E-step")
   ;
 
-
-  class_<bob::trainer::JFABaseTrainer, boost::noncopyable, bases<bob::trainer::JFABaseTrainerBase> >("JFABaseTrainer", "Create a trainer for the JFA.", init<bob::machine::JFABaseMachine&>((arg("jfa_base")),"Initializes a new JFABaseTrainer."))
-    .def("train", &jfa_train, (arg("self"), arg("gmm_stats"), arg("n_iter")), "Call the training procedure.")
-    .def("train_no_init", &jfa_train_noinit, (arg("self"), arg("gmm_stats"), arg("n_iter")), "Call the training procedure.")
-    .def("train_isv", &jfa_train_ISV, (arg("self"), arg("gmm_stats"), arg("n_iter"), arg("relevance")), "Call the ISV training procedure.")
-    .def("train_isv_no_init", &jfa_train_ISV_noinit, (arg("self"), arg("gmm_stats"), arg("n_iter"), arg("relevance")), "Call the ISV training procedure.")
-    .def("__initializeVD_ISV__", &bob::trainer::JFABaseTrainer::initializeVD_ISV, (arg("self"), arg("relevance factor")), "Initializes V=0 and D=sqrt(var(UBM)/r) (for ISV).")
-    .def("__updateY__", &jfa_updateY, (arg("self"), arg("stats")), "Updates Y.")
-    .def("__updateV__", &jfa_updateV, (arg("self"), arg("stats")), "Updates V.")
-    .def("__updateX__", &jfa_updateX, (arg("self"), arg("stats")), "Updates X.")
-    .def("__updateU__", &jfa_updateU, (arg("self"), arg("stats")), "Updates U.")
-    .def("__updateZ__", &jfa_updateZ, (arg("self"), arg("stats")), "Updates Z.")
-    .def("__updateD__", &jfa_updateD, (arg("self"), arg("stats")), "Updates D.")
-    ;
-
-  class_<bob::trainer::JFATrainer, boost::noncopyable>("JFATrainer", "Create a trainer for the JFA.", init<bob::machine::JFAMachine&, bob::trainer::JFABaseTrainer&>((arg("jfa"), arg("base_trainer")),"Initializes a new JFATrainer."))
-    .def("enrol", &jfa_enrol, (arg("self"), arg("gmm_stats"), arg("n_iter")), "Call the training procedure.")
-    ;
-
-
+  class_<bob::trainer::JFATrainer, boost::noncopyable >("JFATrainer", "Create a trainer for the ISV.", init<optional<const size_t> >((arg("max_iterations")=10),"Initializes a new JFATrainer."))
+    .def(init<const bob::trainer::JFATrainer&>((arg("other")), "Copy constructs an JFATrainer"))
+    .add_property("max_iterations", &bob::trainer::JFATrainer::getMaxIterations, &bob::trainer::JFATrainer::setMaxIterations, "Max iterations")
+    .add_property("rng", &bob::trainer::JFATrainer::getRng, &bob::trainer::JFATrainer::setRng, "The Mersenne Twister mt19937 random generator used for the initialization of subspaces/arrays before the EM loop.")
+    .add_property("__X__", &jfa_get_x, &jfa_set_x)
+    .add_property("__Y__", &jfa_get_y, &jfa_set_y)
+    .add_property("__Z__", &jfa_get_z, &jfa_set_z)
+    .def(self == self)
+    .def(self != self)
+    .def("is_similar_to", &bob::trainer::JFATrainer::is_similar_to, (arg("self"), arg("other"), arg("r_epsilon")=1e-5, arg("a_epsilon")=1e-8), "Compares this JFATrainer with the 'other' one to be approximately the same.")
+    .def("train", &jfa_train, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the training procedure.")
+    .def("initialization", &jfa_initialization, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the initialization procedure.")
+    .def("train_loop", &jfa_train_loop, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the training procedure (without the initialization). This will train the three subspaces U, V and d.")
+    .def("e_step1", &jfa_estep1, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the 1st e-step procedure (for the V subspace).")
+    .def("m_step1", &jfa_mstep1, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the 1st m-step procedure (for the V subspace).")
+    .def("finalization1", &jfa_finalization1, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the 1st finalization procedure (for the V subspace).")
+    .def("e_step2", &jfa_estep2, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the 2nd e-step procedure (for the U subspace).")
+    .def("m_step2", &jfa_mstep2, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the 2nd m-step procedure (for the U subspace).")
+    .def("finalization2", &jfa_finalization2, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the 2nd finalization procedure (for the U subspace).")
+    .def("e_step3", &jfa_estep3, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the 3rd e-step procedure (for the d subspace).")
+    .def("m_step3", &jfa_mstep3, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the 3rd m-step procedure (for the d subspace).")
+    .def("finalization3", &jfa_finalization3, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the 3rd finalization procedure (for the d subspace).")
+    .def("enrol", &jfa_enrol, (arg("self"), arg("jfa_machine"), arg("gmm_stats"), arg("n_iter")), "Call the enrolment procedure.")
+    .add_property("acc_v_a1", &jfa_get_accVA1, &jfa_set_accVA1, "Accumulator updated during the E-step")
+    .add_property("acc_v_a2", &jfa_get_accVA2, &jfa_set_accVA2, "Accumulator updated during the E-step")
+    .add_property("acc_u_a1", &jfa_get_accUA1, &jfa_set_accUA1, "Accumulator updated during the E-step")
+    .add_property("acc_u_a2", &jfa_get_accUA2, &jfa_set_accUA2, "Accumulator updated during the E-step")
+    .add_property("acc_d_a1", &jfa_get_accDA1, &jfa_set_accDA1, "Accumulator updated during the E-step")
+    .add_property("acc_d_a2", &jfa_get_accDA2, &jfa_set_accDA2, "Accumulator updated during the E-step")
+  ;
 }
