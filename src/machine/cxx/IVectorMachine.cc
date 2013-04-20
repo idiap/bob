@@ -207,7 +207,8 @@ void bob::machine::IVectorMachine::resizeCache()
 
 void bob::machine::IVectorMachine::resizeTmp()
 {
-  m_tmp_d.resize(m_ubm->getNInputs());
+  if (m_ubm)
+    m_tmp_d.resize(m_ubm->getNInputs());
   m_tmp_t1.resize(m_rt);
   m_tmp_t2.resize(m_rt);
   m_tmp_tt.resize(m_rt, m_rt);
