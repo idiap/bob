@@ -43,7 +43,7 @@ namespace bob { namespace ip {
   typedef enum{
     ELBP_REGULAR = 0,
     ELBP_TRANSITIONAL = 1,
-    ELBP_DIRECTION_CODED = 2,
+    ELBP_DIRECTION_CODED = 2
   } ELBPType;
 
   /**

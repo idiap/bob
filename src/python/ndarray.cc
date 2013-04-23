@@ -231,8 +231,6 @@ template <> int bob::python::ctype_to_num<int64_t>(void)
 { return NPY_INT64; }
 template <> int bob::python::ctype_to_num<uint64_t>(void)
 { return NPY_UINT64; }
-//! @endcond SKIP_DOXYGEN_WARNINGS
-
 template <> int bob::python::ctype_to_num<float>(void)
 { return NPY_FLOAT32; }
 template <> int bob::python::ctype_to_num<double>(void) 
@@ -249,6 +247,7 @@ template <> int bob::python::ctype_to_num<std::complex<double> >(void)
 template <> int bob::python::ctype_to_num<std::complex<long double> >(void) 
 { return NPY_COMPLEX256; }
 #endif
+//! @endcond SKIP_DOXYGEN_WARNINGS
 
 bob::core::array::ElementType bob::python::array_to_type(const boost::python::numeric::array& a) {
   return bob::python::num_to_type(TP_ARRAY(a)->descr->type_num);

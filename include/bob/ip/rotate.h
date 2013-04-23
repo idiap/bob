@@ -561,7 +561,7 @@ template <typename T>
   * @return A TinyVector with the shape of the rotated image
   */
 template<typename T>
-  inline const blitz::TinyVector<int,2> bob::ip::getRotatedShape( 
+  inline static const blitz::TinyVector<int,2> bob::ip::getRotatedShape( 
     const blitz::Array<T,2>& src, 
     const double angle
 ) 
@@ -607,7 +607,7 @@ template<typename T>
   * @return A TinyVector with the shape of the rotated image
   */
 template<typename T>
-  inline const blitz::TinyVector<int,3> bob::ip::getRotatedShape( 
+  inline static const blitz::TinyVector<int,3> bob::ip::getRotatedShape( 
     const blitz::Array<T,3>& src, 
     const double angle
 ) 
