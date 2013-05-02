@@ -14,7 +14,6 @@ set(src
   "MAP_GMMTrainer.cc"
   "ML_GMMTrainer.cc"
   "Exception.cc"
-  "TwoDPCATrainer.cc"
   "DataShuffler.cc"
   "MLPRPropTrainer.cc"
   "MLPBackPropTrainer.cc"

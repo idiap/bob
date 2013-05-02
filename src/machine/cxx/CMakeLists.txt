@@ -14,7 +14,6 @@ set(src
   "GMMLLRMachine.cc"
   "GMMStats.cc"
   "EigenMachineException.cc"
-  "TwoDPCAMachine.cc"
   "LinearMachine.cc"
   "MLP.cc"
   "MLPException.cc"
