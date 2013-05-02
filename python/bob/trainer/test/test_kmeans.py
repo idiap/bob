@@ -93,7 +93,7 @@ class KMeansTest(unittest.TestCase):
       # C++ implementation
       machine = bob.machine.KMeansMachine(dim_c, dim_d)
       trainer = bob.trainer.KMeansTrainer()
-      trainer.seed = seed
+      trainer.rng = bob.core.random.mt19937(seed)
       trainer.initialization_method = bob.trainer.KMeansTrainer.KMEANS_PLUS_PLUS
       trainer.initialization(machine, data)
 
@@ -111,7 +111,7 @@ class KMeansTest(unittest.TestCase):
     # Defines machine and trainer
     machine = bob.machine.KMeansMachine(dim_c, dim_d)
     trainer = bob.trainer.KMeansTrainer()
-    trainer.seed = seed
+    trainer.rng = bob.core.random.mt19937(seed)
     trainer.initialization_method = bob.trainer.KMeansTrainer.RANDOM_NO_DUPLICATE
     trainer.initialization(machine, data)
     # Makes sure that the two initial mean vectors selected are different
