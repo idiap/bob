@@ -132,15 +132,17 @@ class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, blitz::Array<
      */
     bool resetAccumulators(bob::machine::KMeansMachine& kMeansMachine);
 
-    /**
-     * @brief Set the seed used to genrated pseudo-random numbers
+    /** 
+     * @brief Sets the Random Number Generator
      */
-    void setSeed(int seed);
+    void setRng(const boost::shared_ptr<boost::mt19937> rng)
+    { m_rng = rng; }
 
-    /**
-     * @brief Get the seed
+    /** 
+     * @brief Gets the Random Number Generator
      */
-    int getSeed() const { return m_seed; }
+    const boost::shared_ptr<boost::mt19937> getRng() const
+    { return m_rng; }
 
     /**
      * @brief Sets the initialization method used to generate the initial means
@@ -174,9 +176,9 @@ class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, blitz::Array<
     InitializationMethod m_initialization_method;
 
     /**
-     * @brief Seed used to generate pseudo-random numbers
+     * @brief The random number generator for the inialization
      */
-    int m_seed;
+    boost::shared_ptr<boost::mt19937> m_rng;
    
     /**
      * @brief Average min (Square Euclidean) distance

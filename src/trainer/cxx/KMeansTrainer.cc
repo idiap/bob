@@ -33,7 +33,7 @@ bob::trainer::KMeansTrainer::KMeansTrainer(double convergence_threshold,
   bob::trainer::EMTrainer<bob::machine::KMeansMachine, blitz::Array<double,2> >(
     convergence_threshold, max_iterations, compute_likelihood), 
   m_initialization_method(i_m),
-  m_seed(-1), m_average_min_distance(0),
+  m_rng(new boost::mt19937()), m_average_min_distance(0),
   m_zeroethOrderStats(0), m_firstOrderStats(0,0)
 {
 }
@@ -42,7 +42,7 @@ bob::trainer::KMeansTrainer::KMeansTrainer(const bob::trainer::KMeansTrainer& ot
   bob::trainer::EMTrainer<bob::machine::KMeansMachine, blitz::Array<double,2> >(
     other.m_convergence_threshold, other.m_max_iterations, other.m_compute_likelihood), 
   m_initialization_method(other.m_initialization_method),
-  m_seed(other.m_seed), m_average_min_distance(other.m_average_min_distance),
+  m_rng(other.m_rng), m_average_min_distance(other.m_average_min_distance),
   m_zeroethOrderStats(bob::core::array::ccopy(other.m_zeroethOrderStats)), 
   m_firstOrderStats(bob::core::array::ccopy(other.m_firstOrderStats))
 {
@@ -55,7 +55,7 @@ bob::trainer::KMeansTrainer& bob::trainer::KMeansTrainer::operator=
   {
     EMTrainer<bob::machine::KMeansMachine, blitz::Array<double,2> >::operator=(other);
     m_initialization_method = other.m_initialization_method;
-    m_seed = other.m_seed;
+    m_rng = other.m_rng;
     m_average_min_distance = other.m_average_min_distance;
     m_zeroethOrderStats.reference(bob::core::array::ccopy(other.m_zeroethOrderStats));
     m_firstOrderStats.reference(bob::core::array::ccopy(other.m_firstOrderStats));
@@ -66,7 +66,7 @@ bob::trainer::KMeansTrainer& bob::trainer::KMeansTrainer::operator=
 bool bob::trainer::KMeansTrainer::operator==(const bob::trainer::KMeansTrainer& b) const {
   return EMTrainer<bob::machine::KMeansMachine, blitz::Array<double,2> >::operator==(b) &&
          m_initialization_method == b.m_initialization_method &&
-         m_seed == b.m_seed && m_average_min_distance == b.m_average_min_distance &&
+         *m_rng == *(b.m_rng) && m_average_min_distance == b.m_average_min_distance &&
          bob::core::array::hasSameShape(m_zeroethOrderStats, b.m_zeroethOrderStats) &&
          bob::core::array::hasSameShape(m_firstOrderStats, b.m_firstOrderStats) &&
          blitz::all(m_zeroethOrderStats == b.m_zeroethOrderStats) &&
@@ -83,9 +83,6 @@ void bob::trainer::KMeansTrainer::initialization(bob::machine::KMeansMachine& km
   // split data into as many chunks as there are means
   size_t n_data = ar.extent(0);
  
-  boost::mt19937 rng;
-  if(m_seed != -1) rng.seed((uint32_t)m_seed);
-  
   // assign the i'th mean to a random example within the i'th chunk
   blitz::Range a = blitz::Range::all();
 #if BOOST_VERSION >= 104700
@@ -101,7 +98,7 @@ void bob::trainer::KMeansTrainer::initialization(bob::machine::KMeansMachine& km
     for(size_t i=0; i<kmeans.getNMeans(); ++i) 
     {
       boost::uniform_int<> range(i*n_chunk, (i+1)*n_chunk-1);
-      boost::variate_generator<boost::mt19937&, boost::uniform_int<> > die(rng, range);
+      boost::variate_generator<boost::mt19937&, boost::uniform_int<> > die(*m_rng, range);
       
       // get random index within chunk
       unsigned int index = die();
@@ -146,7 +143,7 @@ void bob::trainer::KMeansTrainer::initialization(bob::machine::KMeansMachine& km
   {
     // 1.a. Selects one sample randomly
     boost::uniform_int<> range(0, n_data-1);
-    boost::variate_generator<boost::mt19937&, boost::uniform_int<> > die(rng, range);
+    boost::variate_generator<boost::mt19937&, boost::uniform_int<> > die(*m_rng, range);
     //   Gets the example at a random index
     blitz::Array<double,1> mean = ar(die(),a);
     kmeans.setMean(0, mean);
@@ -175,7 +172,7 @@ void bob::trainer::KMeansTrainer::initialization(bob::machine::KMeansMachine& km
       // Blitz iterators is fine as the weights array should be C-style contiguous
       bob::core::array::assertCContiguous(weights);
       boost::random::discrete_distribution<> die2(weights.begin(), weights.end());
-      blitz::Array<double,1> new_mean = ar(die2(rng),a); 
+      blitz::Array<double,1> new_mean = ar(die2(*m_rng),a); 
       kmeans.setMean(m, new_mean);
     }
   }
@@ -237,10 +234,6 @@ bool bob::trainer::KMeansTrainer::resetAccumulators(bob::machine::KMeansMachine&
   m_zeroethOrderStats = 0;
   m_firstOrderStats = 0;
   return true;
-}
-
-void bob::trainer::KMeansTrainer::setSeed(int seed) {
-  m_seed = seed;
 }
 
 void bob::trainer::KMeansTrainer::setZeroethOrderStats(const blitz::Array<double,1>& zeroethOrderStats)
