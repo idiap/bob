@@ -40,10 +40,13 @@
 
 namespace bob { namespace ip {
 
+  /**
+   * Different ways to extract LBP codes: regular, transitional or direction coded (see Cosmin's thesis)
+   */
   typedef enum{
-    ELBP_REGULAR = 0,
-    ELBP_TRANSITIONAL = 1,
-    ELBP_DIRECTION_CODED = 2
+    ELBP_REGULAR = 0,       //!< regular LBP codes: each pixel value is compared to the center
+    ELBP_TRANSITIONAL = 1,  //!< transitional LBP codes: instead of comparing to the center, the pixel value is compared to the next neighbor
+    ELBP_DIRECTION_CODED = 2//!< direction coded LBP: each three pixel values in a row define a two bit codes, which are then connected
   } ELBPType;
 
   /**
@@ -54,13 +57,28 @@ namespace bob { namespace ip {
    *     A. Hadid and M. Pietikainen
    *     in the proceedings of the European Conference on Computer Vision
    *     (ECCV'2004), p. 469-481
+   *
+   *   All implemented variants are listed in the thesis of Cosmin Atanasoaei
+   *   "Multivariate Boosting with Look-Up Tables for Face Processing"
+   *   http://publications.idiap.ch/index.php/publications/show/2315
+   *
    */
   class LBP {
 
     public: //api
 
       /**
-       * Complete constructor with two radii. This will permit elliptical and rectangular navigation.
+       * Complete constructor with two radii. This will permit extraction of elliptical and rectangular LBP codes.
+       *
+       * @param P     number of neighbors
+       * @param R_y   radius in vertical direction
+       * @param R_x   radius in horizontal direction
+       * @param circular  circular or rectangular LBP
+       * @param to_average  compare to average value or to central pixel value
+       * @param add_average_bit  if to_average: also add a bit for the comparison of the central bit with the average
+       * @param uniform  compute LBP^u2 uniform LBP's (see paper listed above)
+       * @param rotation_invariant  compute rotation invariant LBP's
+       * @param eLBP_type  The extended type of LBP: regular, transitional or direction coded (see Cosmin's thesis)
        */
       LBP(const int P,
           const double R_y,
@@ -73,7 +91,17 @@ namespace bob { namespace ip {
           const bob::ip::ELBPType eLBP_type=ELBP_REGULAR);
 
       /**
-       * Complete constructor with one radius. This will permit circular (round) and square navigation.
+       * Complete constructor with one radius. This will permit extraction of round and square LBP codes.
+       * This constructor implements the default behavior of both papers mentioned above.
+       *
+       * @param P     number of neighbors
+       * @param R     radius in both horizontal and vertical direction
+       * @param circular  circular or rectangular LBP
+       * @param to_average  compare to average value or to central pixel value
+       * @param add_average_bit  if to_average: also add a bit for the comparison of the central bit with the average
+       * @param uniform  compute LBP^u2 uniform LBP's (see paper listed above)
+       * @param rotation_invariant  compute rotation invariant LBP's
+       * @param eLBP_type  The extended type of LBP: REGULAR, TRANSITIONAL or DIRECTION_CODED (see Cosmins thesis)
        */
       LBP(const int P,
           const double R=1.,
@@ -252,7 +280,7 @@ namespace bob { namespace ip {
     if (m_to_average)
       cmp_point = std::accumulate(pixels.begin(), pixels.end(), center) / (m_P + 1); // /(P+1) since (averaged over P+1 points)
 
-    // the formulas are implemented from the thesis: "Multivariate Boosting with Look-Up Tables for Face Processing" from Cosmin Atanasoaei
+    // the formulas are implemented from Cosmin's thesis
     uint16_t lbp_code = 0;
     switch (m_eLBP_type){
       case ELBP_REGULAR:{
