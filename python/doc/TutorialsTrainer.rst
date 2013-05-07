@@ -412,10 +412,8 @@ The training of the U, V and D matrix is done using the training set of the GMM 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
    
-   >>> F1 = numpy.array( [0.3833, 0.4516, 0.6173, 0.2277, 0.5755, 0.8044, 0.5301,
-                       0.9861, 0.2751, 0.0300, 0.2486, 0.5357]).reshape((6,2))
-   >>> F2 = numpy.array( [0.0871, 0.6838, 0.8021, 0.7837, 0.9891, 0.5341, 0.0669,
-                       0.8854, 0.9394, 0.8990, 0.0182, 0.6259]).reshape((6,2))
+   >>> F1 = numpy.array( [0.3833, 0.4516, 0.6173, 0.2277, 0.5755, 0.8044, 0.5301, 0.9861, 0.2751, 0.0300, 0.2486, 0.5357]).reshape((6,2))
+   >>> F2 = numpy.array( [0.0871, 0.6838, 0.8021, 0.7837, 0.9891, 0.5341, 0.0669, 0.8854, 0.9394, 0.8990, 0.0182, 0.6259]).reshape((6,2))
    >>> F=[F1, F2]
 
    >>> N1 = numpy.array([0.1379, 0.1821, 0.2178, 0.0418]).reshape((2,2))
@@ -444,10 +442,8 @@ Let's then initialize the JFABase machine:
    :options: +NORMALIZE_WHITESPACE
    
     >>> jfa_base = bob.machine.JFABase(gmm, 2, 2) # the dimensions of U and V are both equal to 2
-    >>> jfa_base.u = numpy.array( [0.5118, 0.3464, 0.0826, 0.8865, 0.7196, 0.4547, 0.9962,
-                                   0.4134, 0.3545, 0.2177, 0.9713, 0.1257]).reshape((6,2))
-    >>> jfa_base.v = numpy.array( [0.3367, 0.4116, 0.6624, 0.6026, 0.2442, 0.7505, 0.2955,
-                                   0.5835, 0.6802, 0.5518, 0.5278,0.5836]).reshape((6,2))
+    >>> jfa_base.u = numpy.array( [0.5118, 0.3464, 0.0826, 0.8865, 0.7196, 0.4547, 0.9962, 0.4134, 0.3545, 0.2177, 0.9713, 0.1257]).reshape((6,2))
+    >>> jfa_base.v = numpy.array( [0.3367, 0.4116, 0.6624, 0.6026, 0.2442, 0.7505, 0.2955, 0.5835, 0.6802, 0.5518, 0.5278,0.5836]).reshape((6,2))
     >>> jfa_base.d = numpy.array([0.4106, 0.9843, 0.9456, 0.6766, 0.9883, 0.7668])
 
 
@@ -457,14 +453,14 @@ Now, let's initialize the JFA Trainer:
    :options: +NORMALIZE_WHITESPACE
 
    >>> jfa_trainer = bob.trainer.JFATrainer(10) # 10 is the number of iterations
-   >>> jfa_trainer.initialization(mb, TRAINING_STATS)
+   >>> jfa_trainer.initialization(jfa_base, TRAINING_STATS)
    
 The training is done as follows:
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
 
-   >>> jfa_trainer.train_loop(mb, TRAINING_STATS)
+   >>> jfa_trainer.train_loop(jfa_base, TRAINING_STATS)
    
 Once the training is finished (i.e. the matrices U, V and D are estimated), one wants to enroll a special client (or subject). Let's suppose the following GMM stats of the subject:
 
@@ -486,7 +482,7 @@ The enrolment is then perfomed as follows:
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
 
-   >>> m = bob.machine.JFAMachine(mb)
+   >>> m = bob.machine.JFAMachine(jfa_base)
    >>> jfa_trainer.enrol(m, gse, 5) # where 5 is the number of iterations
       
 
@@ -499,8 +495,7 @@ Let's first initialize the ISVBase machine:
    :options: +NORMALIZE_WHITESPACE
    
     >>> isv_base = bob.machine.ISVBase(gmm, 2) # the dimensions of U is equal to 2
-    >>> isv_base.u = numpy.array( [0.5118, 0.3464, 0.0826, 0.8865, 0.7196, 0.4547, 0.9962,
-                                   0.4134, 0.3545, 0.2177, 0.9713, 0.1257]).reshape((6,2))
+    >>> isv_base.u = numpy.array( [0.5118, 0.3464, 0.0826, 0.8865, 0.7196, 0.4547, 0.9962, 0.4134, 0.3545, 0.2177, 0.9713, 0.1257]).reshape((6,2))
     >>> isv_base.d = numpy.array([0.4106, 0.9843, 0.9456, 0.6766, 0.9883, 0.7668])
 
 
@@ -510,21 +505,21 @@ Now, let's initialize the ISV Trainer:
    :options: +NORMALIZE_WHITESPACE
 
    >>> isv_trainer = bob.trainer.ISVTrainer(10, 4.) # 10 is the number of iterations, and 4 is the relevance factor
-   >>> isv_trainer.initialization(mb, TRAINING_STATS)
+   >>> isv_trainer.initialization(isv_base, TRAINING_STATS)
    
 The training is done as follows:
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
 
-   >>> isv_trainer.train_isv(mb, TRAINING_STATS)
+   >>> isv_trainer.train_isv(isv_base, TRAINING_STATS)
    
 Once the training is finished (i.e. the matrices U, V and D are estimated), the enrolment is perfomed as follows:
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
 
-   >>> m = bob.machine.ISVMachine(mb)
+   >>> m = bob.machine.ISVMachine(isv_base)
    >>> isv_trainer.enrol(m, gse, 5) # where 5 is the number of iterations
    
 
@@ -578,12 +573,7 @@ Let's consider a 2D array of data used to train the withening, and a sample to b
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
    
-   >>> data = numpy.array([[ 1.2622, -1.6443, 0.1889],
-                        [ 0.4286, -0.8922, 1.3020],
-                        [-0.6613,  0.0430, 0.6377],
-                        [-0.8718, -0.4788, 0.3988],
-                        [-0.0098, -0.3121,-0.1807],
-                        [ 0.4301,  0.4886, -0.1456]])
+   >>> data = numpy.array([[ 1.2622, -1.6443, 0.1889], [ 0.4286, -0.8922, 1.3020], [-0.6613,  0.0430, 0.6377], [-0.8718, -0.4788, 0.3988], [-0.0098, -0.3121,-0.1807],  [ 0.4301,  0.4886, -0.1456]])
    >>> sample = numpy.array([1, 2, 3.])
     
 The initialisation of the trainer, the machine is:
