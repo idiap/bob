@@ -404,6 +404,228 @@ set.
    >>> print gmmAdapted # doctest: +SKIP
 
 
+Joint Factor Analysis
+=====================
+
+The training of the U, V and D matrix is done using the training set of the GMM stats, for example:
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+   
+   >>> F1 = numpy.array( [0.3833, 0.4516, 0.6173, 0.2277, 0.5755, 0.8044, 0.5301,
+                       0.9861, 0.2751, 0.0300, 0.2486, 0.5357]).reshape((6,2))
+   >>> F2 = numpy.array( [0.0871, 0.6838, 0.8021, 0.7837, 0.9891, 0.5341, 0.0669,
+                       0.8854, 0.9394, 0.8990, 0.0182, 0.6259]).reshape((6,2))
+   >>> F=[F1, F2]
+
+   >>> N1 = numpy.array([0.1379, 0.1821, 0.2178, 0.0418]).reshape((2,2))
+   >>> N2 = numpy.array([0.1069, 0.9397, 0.6164, 0.3545]).reshape((2,2))
+   >>> N=[N1, N2]
+
+   >>> gs11 = bob.machine.GMMStats(2,3)
+   >>> gs11.n = N1[:,0]
+   >>> gs11.sum_px = F1[:,0].reshape(2,3)
+   >>> gs12 = bob.machine.GMMStats(2,3)
+   >>> gs12.n = N1[:,1]
+   >>> gs12.sum_px = F1[:,1].reshape(2,3)
+
+   >>> gs21 = bob.machine.GMMStats(2,3)
+   >>> gs21.n = N2[:,0]
+   >>> gs21.sum_px = F2[:,0].reshape(2,3)
+   >>> gs22 = bob.machine.GMMStats(2,3)
+   >>> gs22.n = N2[:,1]
+   >>> gs22.sum_px = F2[:,1].reshape(2,3)
+
+   >>> TRAINING_STATS = [[gs11, gs12], [gs21, gs22]]
+
+Let's then initialize the JFABase machine:
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+   
+    >>> jfa_base = bob.machine.JFABase(gmm, 2, 2) # the dimensions of U and V are both equal to 2
+    >>> jfa_base.u = numpy.array( [0.5118, 0.3464, 0.0826, 0.8865, 0.7196, 0.4547, 0.9962,
+                                   0.4134, 0.3545, 0.2177, 0.9713, 0.1257]).reshape((6,2))
+    >>> jfa_base.v = numpy.array( [0.3367, 0.4116, 0.6624, 0.6026, 0.2442, 0.7505, 0.2955,
+                                   0.5835, 0.6802, 0.5518, 0.5278,0.5836]).reshape((6,2))
+    >>> jfa_base.d = numpy.array([0.4106, 0.9843, 0.9456, 0.6766, 0.9883, 0.7668])
+
+
+Now, let's initialize the JFA Trainer:
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+
+   >>> jfa_trainer = bob.trainer.JFATrainer(10) # 10 is the number of iterations
+   >>> jfa_trainer.initialization(mb, TRAINING_STATS)
+   
+The training is done as follows:
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+
+   >>> jfa_trainer.train_loop(mb, TRAINING_STATS)
+   
+Once the training is finished (i.e. the matrices U, V and D are estimated), one wants to enroll a special client (or subject). Let's suppose the following GMM stats of the subject:
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+
+   >>> Ne = numpy.array([0.1579, 0.9245, 0.1323, 0.2458]).reshape((2,2))
+   >>> Fe = numpy.array([0.1579, 0.1925, 0.3242, 0.1234, 0.2354, 0.2734, 0.2514, 0.5874, 0.3345, 0.2463, 0.4789, 0.5236]).reshape((6,2))
+   >>> gse1 = bob.machine.GMMStats(2,3)
+   >>> gse1.n = Ne[:,0]
+   >>> gse1.sum_px = Fe[:,0].reshape(2,3)
+   >>> gse2 = bob.machine.GMMStats(2,3)
+   >>> gse2.n = Ne[:,1]
+   >>> gse2.sum_px = Fe[:,1].reshape(2,3)
+   >>> gse = [gse1, gse2]
+    
+The enrolment is then perfomed as follows:
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+
+   >>> m = bob.machine.JFAMachine(mb)
+   >>> jfa_trainer.enrol(m, gse, 5) # where 5 is the number of iterations
+      
+
+Inter-Session Variability
+=========================
+
+Let's first initialize the ISVBase machine:
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+   
+    >>> isv_base = bob.machine.ISVBase(gmm, 2) # the dimensions of U is equal to 2
+    >>> isv_base.u = numpy.array( [0.5118, 0.3464, 0.0826, 0.8865, 0.7196, 0.4547, 0.9962,
+                                   0.4134, 0.3545, 0.2177, 0.9713, 0.1257]).reshape((6,2))
+    >>> isv_base.d = numpy.array([0.4106, 0.9843, 0.9456, 0.6766, 0.9883, 0.7668])
+
+
+Now, let's initialize the ISV Trainer:
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+
+   >>> isv_trainer = bob.trainer.ISVTrainer(10, 4.) # 10 is the number of iterations, and 4 is the relevance factor
+   >>> isv_trainer.initialization(mb, TRAINING_STATS)
+   
+The training is done as follows:
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+
+   >>> isv_trainer.train_isv(mb, TRAINING_STATS)
+   
+Once the training is finished (i.e. the matrices U, V and D are estimated), the enrolment is perfomed as follows:
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+
+   >>> m = bob.machine.ISVMachine(mb)
+   >>> isv_trainer.enrol(m, gse, 5) # where 5 is the number of iterations
+   
+
+
+Total Variability (i-vectors)
+=============================
+
+Let's first initialize the machine:
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+    
+    >>> m = bob.machine.IVectorMachine(gmm, 2)
+    >>> m.variance_threshold = 1e-5
+    >>> m.t = numpy.array([[1.,2],[4,1],[0,3],[5,8],[7,10],[11,1]]) # Initialise the total variability matrix T
+    >>> m.sigma = numpy.array([1.,2.,1.,3.,2.,4.])  # Initialise the covariance sigma
+
+
+Now, let's initialize the trainer:
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+    
+    >>> ivec_trainer = bob.trainer.IVectorTrainer(update_sigma=True, max_iterations=10)
+    >>> ivec_trainer.initialization(m, TRAINING_STATS)
+    
+       
+The training is then done as follows:
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+    
+   >>> ivec_trainer.train(m, TRAINING_STATS) 
+   
+The extraction of an i-vector is done as follows:
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+    
+    w_ij=m.forward(gse)   
+   
+
+
+Whitening
+==========
+
+This is generally used for i-vector preprocessing.
+
+Let's consider a 2D array of data used to train the withening, and a sample to be whitened:
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+   
+   >>> data = numpy.array([[ 1.2622, -1.6443, 0.1889],
+                        [ 0.4286, -0.8922, 1.3020],
+                        [-0.6613,  0.0430, 0.6377],
+                        [-0.8718, -0.4788, 0.3988],
+                        [-0.0098, -0.3121,-0.1807],
+                        [ 0.4301,  0.4886, -0.1456]])
+   >>> sample = numpy.array([1, 2, 3.])
+    
+The initialisation of the trainer, the machine is:
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+   
+   >>> t = bob.trainer.WhiteningTrainer()
+   >>> m = bob.machine.LinearMachine(3,3)
+   
+Then, the training and projection are done as follows:   
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+   
+   >>> t.train(m, data)
+   >>> withened_sample = m.forward(sample)
+    
+    
+Within-Class Covariance Normalisation
+=====================================
+
+This can also be used for i-vector preprocessing.
+
+The initialisation of the trainer, the machine is:
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+   
+   >>> t = bob.trainer.WCCNTrainer()
+   >>> m = bob.machine.LinearMachine(3,3)
+   
+Then, the training and projection are done as follows:   
+
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+   
+   >>> t.train(m, data)
+   >>> wccn_sample = m.forward(sample)
+    
+
+       
 Probabilistic Linear Discriminant Analysis (PLDA)
 =================================================
 
@@ -495,6 +717,11 @@ ratio will be computed, which is defined in more formal way by:
   
    >>> s1 = plda1(sample)
    >>> s2 = plda2(sample)
+
+
+
+
+
 
 .. Place here your external references
 
