@@ -435,6 +435,7 @@ The training of the U, V and D matrix is done using the training set of the GMM 
    >>> gs22.sum_px = F2[:,1].reshape(2,3)
 
    >>> TRAINING_STATS = [[gs11, gs12], [gs21, gs22]]
+   
 
 Let's then initialize the JFABase machine:
 
@@ -512,7 +513,7 @@ The training is done as follows:
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
 
-   >>> isv_trainer.train_isv(isv_base, TRAINING_STATS)
+   >>> isv_trainer.train(isv_base, TRAINING_STATS)
    
 Once the training is finished (i.e. the matrices U, V and D are estimated), the enrolment is perfomed as follows:
 
@@ -543,8 +544,9 @@ Now, let's initialize the trainer:
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
     
-    >>> ivec_trainer = bob.trainer.IVectorTrainer(update_sigma=True, max_iterations=10)
-    >>> ivec_trainer.initialization(m, TRAINING_STATS)
+   >>> ivec_trainer = bob.trainer.IVectorTrainer(update_sigma=True, max_iterations=10)
+   >>> TRAINING_STATS_flatten = [gs11, gs12, gs21, gs22]
+   >>> ivec_trainer.initialization(m, TRAINING_STATS_flatten)
     
        
 The training is then done as follows:
@@ -552,14 +554,14 @@ The training is then done as follows:
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
     
-   >>> ivec_trainer.train(m, TRAINING_STATS) 
+   >>> ivec_trainer.train(m, TRAINING_STATS_flatten) 
    
 The extraction of an i-vector is done as follows:
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
-    
-    w_ij=m.forward(gse)   
+
+   >>> w_ij=m.forward(gse1)   
    
 
 
@@ -576,7 +578,7 @@ Let's consider a 2D array of data used to train the withening, and a sample to b
    >>> data = numpy.array([[ 1.2622, -1.6443, 0.1889], [ 0.4286, -0.8922, 1.3020], [-0.6613,  0.0430, 0.6377], [-0.8718, -0.4788, 0.3988], [-0.0098, -0.3121,-0.1807],  [ 0.4301,  0.4886, -0.1456]])
    >>> sample = numpy.array([1, 2, 3.])
     
-The initialisation of the trainer, the machine is:
+The initialisation of the trainer and the machine:
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -596,22 +598,27 @@ Then, the training and projection are done as follows:
 Within-Class Covariance Normalisation
 =====================================
 
-This can also be used for i-vector preprocessing.
+This can also be used for i-vector preprocessing. Let's first put the training data into list of numpy arrays.
 
-The initialisation of the trainer, the machine is:
+.. doctest::
+   :options: +NORMALIZE_WHITESPACE
+   
+   >>> data = [numpy.array([[ 1.2622, -1.6443, 0.1889], [ 0.4286, -0.8922, 1.3020]]), numpy.array([[-0.6613,  0.0430, 0.6377], [-0.8718, -0.4788, 0.3988]]), numpy.array([[-0.0098, -0.3121,-0.1807],  [ 0.4301,  0.4886, -0.1456]])]
+
+
+The initialisation of the trainer is done as follows:
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
    
    >>> t = bob.trainer.WCCNTrainer()
-   >>> m = bob.machine.LinearMachine(3,3)
    
 Then, the training and projection are done as follows:   
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
    
-   >>> t.train(m, data)
+   >>> m = t.train(data)
    >>> wccn_sample = m.forward(sample)
     
 
