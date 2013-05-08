@@ -119,10 +119,16 @@ class Spectrogram: public Energy
     double getPreEmphasisCoeff() const
     { return m_pre_emphasis_coeff; }
     /**
-     * @brief Tells whether we used the energy or not
+     * @brief Tells whether we used the energy or the square root of the energy
      */
     bool getEnergyFilter() const
     { return m_energy_filter; }
+    /**
+     * @brief Tells whether we used the log triangular filter or the triangular
+     * filter
+     */
+    bool getLogFilter() const
+    { return m_log_filter; }
 
     /** 
      * @brief Sets the sampling frequency/frequency rate
@@ -167,10 +173,16 @@ class Spectrogram: public Energy
      */
     virtual void setMelScale(bool mel_scale);
     /**
-     * @brief Sets whether we used the energy or not
+     * @brief Sets whether we used the energy or the square root of the energy
      */
     virtual void setEnergyFilter(bool energy_filter)
     { m_energy_filter = energy_filter; }
+    /**
+     * @brief Sets whether we used the log triangular filter or the triangular
+     * filter
+     */
+    virtual void setLogFilter(bool log_filter)
+    { m_log_filter = log_filter; }
 
 
   protected:
@@ -241,6 +253,7 @@ class Spectrogram: public Energy
     bool m_mel_scale;
     double m_fb_out_floor;
     bool m_energy_filter;
+    bool m_log_filter;
     double m_log_fb_out_floor;
 
     blitz::Array<double,2> m_dct_kernel;

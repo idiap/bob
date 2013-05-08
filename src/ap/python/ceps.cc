@@ -126,7 +126,8 @@ void bind_ap_ceps()
     .add_property("f_max", &bob::ap::Spectrogram::getFMax, &bob::ap::Spectrogram::setFMax, "The maximal frequency of the filter bank")
     .add_property("mel_scale", &bob::ap::Spectrogram::getMelScale, &bob::ap::Spectrogram::setMelScale, "Tells whether cepstral features are extracted on a linear (LFCC) or Mel (MFCC) scale")
     .add_property("pre_emphasis_coeff", &bob::ap::Spectrogram::getPreEmphasisCoeff, &bob::ap::Spectrogram::setPreEmphasisCoeff, "The coefficient used for the pre-emphasis")
-    .add_property("energy_filter", &bob::ap::Spectrogram::getEnergyFilter, &bob::ap::Spectrogram::setEnergyFilter, "Tells whether the energy is used before using the triangular filter or not")
+    .add_property("energy_filter", &bob::ap::Spectrogram::getEnergyFilter, &bob::ap::Spectrogram::setEnergyFilter, "Tells whether we use the energy or the square root of the energy")
+    .add_property("log_filter", &bob::ap::Spectrogram::getLogFilter, &bob::ap::Spectrogram::setLogFilter, "Tells whether we use the log triangular filter or the triangular filter")
     .def("__call__", &py_spectrogram_call, (arg("input")), "Computes the spectrogram")
   ;
 

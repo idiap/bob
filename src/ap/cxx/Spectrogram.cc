@@ -32,7 +32,8 @@ bob::ap::Spectrogram::Spectrogram(const double sampling_frequency,
   bob::ap::Energy(sampling_frequency, win_length_ms, win_shift_ms),
   m_n_filters(n_filters), m_f_min(f_min), m_f_max(f_max), 
   m_pre_emphasis_coeff(pre_emphasis_coeff), m_mel_scale(mel_scale),
-  m_fb_out_floor(1.), m_energy_filter(false), m_fft(1)
+  m_fb_out_floor(1.), m_energy_filter(false), m_log_filter(true),
+  m_fft(1)
 {
   // Check pre-emphasis coefficient
   if (pre_emphasis_coeff < 0. || pre_emphasis_coeff > 1.)
@@ -54,7 +55,8 @@ bob::ap::Spectrogram::Spectrogram(const Spectrogram& other):
   m_f_min(other.m_f_min), m_f_max(other.m_f_max),
   m_pre_emphasis_coeff(other.m_pre_emphasis_coeff),
   m_mel_scale(other.m_mel_scale), m_fb_out_floor(other.m_fb_out_floor),
-  m_energy_filter(other.m_energy_filter), m_fft(other.m_fft)
+  m_energy_filter(other.m_energy_filter), m_log_filter(other.m_log_filter),
+  m_fft(other.m_fft)
 {
   // Initialization
   initWinLength();
@@ -78,6 +80,7 @@ bob::ap::Spectrogram& bob::ap::Spectrogram::operator=(const bob::ap::Spectrogram
     m_mel_scale = other.m_mel_scale;
     m_fb_out_floor = other.m_fb_out_floor;
     m_energy_filter = other.m_energy_filter;
+    m_log_filter = other.m_log_filter;
     m_fft = other.m_fft;
 
     // Initialization
@@ -100,7 +103,8 @@ bool bob::ap::Spectrogram::operator==(const bob::ap::Spectrogram& other) const
           m_pre_emphasis_coeff == other.m_pre_emphasis_coeff &&
           m_mel_scale == other.m_mel_scale &&
           m_fb_out_floor == other.m_fb_out_floor &&
-          m_energy_filter == other.m_energy_filter); 
+          m_energy_filter == other.m_energy_filter &&
+          m_log_filter == other.m_log_filter); 
 }
 
 bool bob::ap::Spectrogram::operator!=(const bob::ap::Spectrogram& other) const
@@ -303,14 +307,13 @@ void bob::ap::Spectrogram::filterBank(blitz::Array<double,1>& x)
   blitz::Array<double,1> x_half(x(r));
   blitz::Array<std::complex<double>,1> complex_half(m_cache_frame_c2(r));
   x_half = blitz::abs(complex_half);
-
   if (m_energy_filter) // Apply the filter bank to the energy
-  {
     x_half = blitz::pow2(x_half);
-    triangularFilterBank(x);
-  }
-  else // Apply the Triangular filter bank to this power spectrum and take the log
+
+  if (m_log_filter) // Apply the log triangular filter bank
     logTriangularFilterBank(x);
+  else // Apply the triangular filter ban
+    triangularFilterBank(x);
 }
 
 void bob::ap::Spectrogram::logTriangularFilterBank(blitz::Array<double,1>& data) const
