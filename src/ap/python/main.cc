@@ -20,12 +20,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/core/python/ndarray.h"
+#include <boost/python.hpp>
+#include <bob/core/python/ndarray.h>
 
 void bind_ap_ceps();
 
-BOOST_PYTHON_MODULE(_ap) {
-
+BOOST_PYTHON_MODULE(_ap)
+{
   bob::python::setup_python("bob audio processing classes and sub-classes");
 
   bind_ap_ceps();

@@ -7,6 +7,9 @@ set(incdir ${cxx_incdir})
 
 # This defines the list of source files inside this package.
 set(src 
+    "FrameExtractor.cc"
+    "Energy.cc"
+    "Spectrogram.cc"
     "Ceps.cc"
     )
 

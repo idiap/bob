@@ -2,6 +2,7 @@
  * @file bob/ap/Ceps.h
  * @date Wed Jan 11:10:20 2013 +0200
  * @author Elie Khoury <Elie.Khoury@idiap.ch>
+ * @auhtor Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Implement Linear and Mel Frequency Cepstral Coefficients
  * functions (MFCC and LFCC)
@@ -26,56 +27,59 @@
 #define BOB_AP_CEPS_H
 
 #include <blitz/array.h>
-#include <vector>
-#include <bob/sp/FFT1D.h>
-#include <bob/core/Exception.h>
-
-/**
- * @addtogroup AP ap
- * @brief Audio Processing module API
- */
+#include "Spectrogram.h"
 
 namespace bob {
 /**
- * @ingroup AP 
+ * \ingroup libap_api
+ * @{
+ *
  */
 namespace ap {
 
-class CepsTest;
+/**
+ * @brief This class is used to test the Ceps class (private methods)
+ */
+//class CepsTest;
 
 /**
- * @ingroup AP
  * @brief This class allows the extraction of features from raw audio data.
  * References:
  *  1. SPro tools (http://www.irisa.fr/metiss/guig/spro/spro-4.0.1/spro.html)
  *  2. Wikipedia (http://en.wikipedia.org/wiki/Mel-frequency_cepstrum).
  */
-class Ceps
+class Ceps: public Spectrogram
 {
   public:
     /**
      * @brief Constructor. Initializes working arrays
      */
-    Ceps(double sampling_frequency, double win_length_ms=20., double win_shift_ms=10.,
-      size_t n_filters=24, size_t n_ceps=19, double f_min=0., 
-      double f_max=4000., size_t delta_win=2, double pre_emphasis_coef=0.95,
-      bool mel_scale=true, bool dct_norm=false);
+    Ceps(const double sampling_frequency, const double win_length_ms=20.,
+      const double win_shift_ms=10., const size_t n_filters=24,
+      const size_t n_ceps=19, const double f_min=0., 
+      const double f_max=4000., const size_t delta_win=2,
+      const double pre_emphasis_coef=0.95, const bool mel_scale=true,
+      const bool dct_norm=false);
 
     /**
-     * @brief Copy constructor
+     * @brief Copy constructor.
      */
     Ceps(const Ceps& other);
 
-    /**
-     * @brief Gets the Cepstral features shape for a given input/input length
+    /** 
+     * @brief Assignment operator
      */
-    blitz::TinyVector<int,2> getCepsShape(const size_t input_length) const;
-    blitz::TinyVector<int,2> getCepsShape(const blitz::Array<double,1>& input) const;
+    Ceps& operator=(const Ceps& other);
 
-    /**
-     * @brief Computes Cepstral features
+    /** 
+     * @brief Equal to
      */
-    void operator()(const blitz::Array<double,1>& input, blitz::Array<double,2>& output);
+    bool operator==(const Ceps& other) const;
+
+    /** 
+     * @brief Not equal to
+     */
+    bool operator!=(const Ceps& other) const;
 
     /**
      * @brief Destructor
@@ -83,18 +87,15 @@ class Ceps
     virtual ~Ceps();
 
     /**
-     * @brief Assigns from a different class instance
+     * @brief Gets the Cepstral features shape for a given input/input length
      */
-    Ceps& operator=(const Ceps& other);
+    blitz::TinyVector<int,2> getShape(const size_t input_length) const;
+    blitz::TinyVector<int,2> getShape(const blitz::Array<double,1>& input) const;
 
     /**
-      * @brief Equal to
-      */
-    bool operator==(const Ceps& b) const;
-    /**
-      * @brief Not equal to
-      */
-    bool operator!=(const Ceps& b) const; 
+     * @brief Computes Cepstral features
+     */
+    void operator()(const blitz::Array<double,1>& input, blitz::Array<double,2>& output);
 
     /**
      * @brief Returns the sampling frequency/frequency rate
@@ -102,64 +103,16 @@ class Ceps
     double getSamplingFrequency() const
     { return m_sampling_frequency; }
     /**
-     * @brief Returns the window length in miliseconds
-     */
-    double getWinLengthMs() const
-    { return m_win_length_ms; }
-    /**
-     * @brief Returns the window length in number of samples
-     */
-    size_t getWinLength() const
-    { return m_win_length; }
-    /**
-     * @brief Returns the window shift in miliseconds
-     */
-    double getWinShiftMs() const
-    { return m_win_shift_ms; }
-    /**
-     * @brief Returns the window shift in number of samples
-     */
-    size_t getWinShift() const
-    { return m_win_shift; }
-    /**
-     * @brief Returns the number of filters used in the filter bank.
-     */
-    size_t getNFilters() const
-    { return m_n_filters; }
-    /**
      * @brief Returns the number of cepstral coefficient to keep
      */
     size_t getNCeps() const
     { return m_n_ceps; }
-    /**
-     * @brief Returns the frequency of the lowest triangular filter in the
-     * filter bank
-     */
-    double getFMin() const
-    { return m_f_min; }
-    /**
-     * @brief Returns the frequency of the highest triangular filter in the
-     * filter bank
-     */
-    double getFMax() const
-    { return m_f_max; }
-    /**
-     * @brief Tells whether the frequencies of the filters in the filter bank
-     * are taken from the linear or the Mel scale
-     */
-    bool getMelScale() const
-    { return m_mel_scale; }
     /**
      * @brief Rerturns the size of the window used to compute first and second
      * order derivatives
      */
     size_t getDeltaWin() const
     { return m_delta_win; }
-    /**
-     * @brief Returns the pre-emphasis coefficient.
-     */
-    double getPreEmphasisCoeff() const
-    { return m_pre_emphasis_coeff; }
     /**
      * @brief Tells whether the DCT coefficients are normalized or not
      */
@@ -185,59 +138,23 @@ class Ceps
     { return m_with_delta_delta; }
 
     /**
-     * @brief Sets the sampling frequency/frequency rate
+     * @brief Returns the number of filters to keep
      */
-    void setSamplingFrequency(const double sampling_frequency);
-    /**
-     * @brief Sets the window length in miliseconds
-     */
-    void setWinLengthMs(double win_length_ms);
-    /**
-     * @brief Sets the window shift in miliseconds
-     */
-    void setWinShiftMs(double win_shift_ms);
-    /**
-     * @brief Sets the number of filters used in the filter bank.
-     */
-    void setNFilters(size_t n_filters);
+    virtual void setNFilters(size_t n_ceps);
     /**
      * @brief Returns the number of cepstral coefficient to keep
      */
-    void setNCeps(size_t n_ceps);
+    virtual void setNCeps(size_t n_ceps);
     /**
      * @brief Sets the size of the window used to compute first and second
      * order derivatives
      */
-    inline void setDeltaWin(size_t delta_win)
+    virtual void setDeltaWin(size_t delta_win)
     { m_delta_win = delta_win; } 
-    /**
-     * @brief Sets the pre-emphasis coefficient. It should be a value in the 
-     * range [0,1].
-     */
-    inline void setPreEmphasisCoeff(double pre_emphasis_coeff)
-    { if (pre_emphasis_coeff < 0. || pre_emphasis_coeff > 1.)
-        throw bob::core::InvalidArgumentException("pre_emphasis_coeff", 
-          pre_emphasis_coeff, 0., 1.);
-      m_pre_emphasis_coeff = pre_emphasis_coeff; }
-    /**
-     * @brief Returns the frequency of the lowest triangular filter in the
-     * filter bank
-     */
-    void setFMin(double f_min);
-    /**
-     * @brief Returns the frequency of the highest triangular filter in the
-     * filter bank
-     */
-    void setFMax(double f_max);
-    /**
-     * @brief Sets whether the frequencies of the filters in the filter bank
-     * are taken from the linear or the Mel scale
-     */
-    void setMelScale(bool mel_scale);
     /**
      * @brief Sets whether the DCT coefficients are normalized or not
      */
-    void setDctNorm(bool dct_norm);
+    virtual void setDctNorm(bool dct_norm);
     /**
      * @brief Sets whether the energy is added to the cepstral coefficients 
      * or not
@@ -249,7 +166,7 @@ class Ceps
      * cepstral coefficients or not
      */
     void setWithDelta(bool with_delta)
-    { if(!with_delta) m_with_delta_delta = false;
+    { if (!with_delta) m_with_delta_delta = false;
       m_with_delta = with_delta; }
     /**
      * @brief Sets whether the first order derivatives are added to the 
@@ -257,7 +174,7 @@ class Ceps
      * automatically enabled as well.
      */
     void setWithDeltaDelta(bool with_delta_delta)
-    { if(with_delta_delta) m_with_delta = true;
+    { if (with_delta_delta) m_with_delta = true;
       m_with_delta_delta = with_delta_delta; }
 
   private:
@@ -267,50 +184,12 @@ class Ceps
      */
     void addDerivative(const blitz::Array<double,2>& input, blitz::Array<double,2>& output) const;
     /**
-     * @brief Converts a frequency in Herz to the corresponding one in Mel
-     */
-    static double herzToMel(double f);
-    /**
-     * @brief Converts a frequency in Mel to the corresponding one in Herz
-     */
-    static double melToHerz(double f);
-    /**
-     * @brief Pre-emphasises the signal by applying the first order equation
-     * \f$data_{n} := data_{n} − a*data_{n−1}\f$
-     */
-    void pre_emphasis(blitz::Array<double,1> &data) const;
-    /**
-     * @brief Applies the Hamming window to the signal
-     */
-    void hammingWindow(blitz::Array<double,1> &data) const;
-
-    /**
-     * @brief Computes the power-spectrum of the FFT of the input frame and
-     * applies the triangular filter bank
-     */
-    void logFilterBank(blitz::Array<double,1>& x);
-    /**
-     * @brief Applies the triangular filter bank to the input array and 
-     * returns the logarithm of the energy in each band.
-     */
-    void logTriangularFilterBank(blitz::Array<double,1>& data) const;
-    /**
-     * @brief Computes the logarithm of the energy
-     */
-    double logEnergy(blitz::Array<double,1> &data) const;
-    /**
      * @brief Applies the DCT to the cepstral features:
      * \f$out[i]=sqrt(2/N)*sum_{j=1}^{N} (in[j]cos(M_PI*i*(j-0.5)/N)\f$
      */
     void applyDct(blitz::Array<double,1>& ceps_row) const;
 
-    void initWinSize();
-    void initWinLength();
-    void initWinShift();
-
-    void initCacheHammingKernel();
     void initCacheDctKernel();
-    void initCacheFilterBank();
     /**
      * @brief Initialize the table m_p_index, which contains the indices of
      * the cut-off frequencies of the triangular filters.. It looks like:
@@ -330,46 +209,18 @@ class Ceps
     void initCachePIndex();
     void initCacheFilters();
 
-    double m_sampling_frequency; ///< The sampling frequency
-    double m_win_length_ms; ///< The window length in miliseconds 
-    size_t m_win_length;
-    double m_win_shift_ms;
-    size_t m_win_shift;
-    size_t m_win_size;
-    size_t m_n_filters;
     size_t m_n_ceps;
-    double m_f_min;
-    double m_f_max;
     size_t m_delta_win;
-    double m_pre_emphasis_coeff;
-    bool m_mel_scale;
     bool m_dct_norm;
     bool m_with_energy;
     bool m_with_delta;
     bool m_with_delta_delta;
-    double m_energy_floor;
-    double m_fb_out_floor;
-    double m_log_energy_floor;
-    double m_log_fb_out_floor;
 
     blitz::Array<double,2> m_dct_kernel;
-    blitz::Array<double,1> m_hamming_kernel;
-    blitz::Array<int,1>  m_p_index;
-    std::vector<blitz::Array<double,1> > m_filter_bank;
-    bob::sp::FFT1D m_fft;
 
-    mutable blitz::Array<double,1> m_cache_frame_d;
-    mutable blitz::Array<std::complex<double>,1>  m_cache_frame_c1;
-    mutable blitz::Array<std::complex<double>,1>  m_cache_frame_c2;
-    mutable blitz::Array<double,1> m_cache_filters;
-
-    friend class TestCeps;
+//    friend class TestCeps;
 };
-
-/**
- * @ingroup AP
- * @brief This class is used to test the Ceps class (private methods)
- */
+/*
 class TestCeps
 {
   public:
@@ -381,23 +232,28 @@ class TestCeps
     double melToHerz(double f) { return m_ceps.melToHerz(f); }
     blitz::TinyVector<int,2> getCepsShape(const size_t input_length) const
     { return m_ceps.getCepsShape(input_length); }
+
     blitz::TinyVector<int,2> getCepsShape(const blitz::Array<double,1>& input) const
     { return m_ceps.getCepsShape(input); }
     blitz::Array<double,1> getFilterOutput() { return m_ceps.m_cache_filters; }
 
     void operator()(const blitz::Array<double,1>& input, blitz::Array<double,2>& ceps_2D)
     { m_ceps(input, ceps_2D);}
+    void spectrogram(const blitz::Array<double,1>& input, blitz::Array<double,2>& spectrogram_matrix)
+    {m_ceps.spectrogram(input, spectrogram_matrix);}
+    void energyBands(const blitz::Array<double,1>& input,blitz::Array<double,2>& energy_matrix)
+    {m_ceps.energyBands(input, energy_matrix);}
     void hammingWindow(blitz::Array<double,1>& data){ m_ceps.hammingWindow(data); }
     void pre_emphasis(blitz::Array<double,1>& data){ m_ceps.pre_emphasis(data); }
     void logFilterBank(blitz::Array<double,1>& x){ m_ceps.logFilterBank(x); }
     void logTriangularFilterBank(blitz::Array<double,1>& data){ m_ceps.logTriangularFilterBank(data); }
+    void energyFilterBank(blitz::Array<double,1>& data) { m_ceps.energyFilterBank(data); }
     double logEnergy(blitz::Array<double,1> &data){ return m_ceps.logEnergy(data); }
     void applyDct(blitz::Array<double,1>& ceps_row) { m_ceps.applyDct(ceps_row); }
+    void energy(const blitz::Array<double,1>& input, blitz::Array<double,1>& energy_array) {m_ceps.energy(input, energy_array);}
 };
+*/
+}
+}
 
-/**
- * @}
- */
-}}
-
-#endif /* BOB_AP_CEPS_H */
+#endif /* BOB_AP_CEPS2_H */
