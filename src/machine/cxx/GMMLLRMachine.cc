@@ -64,17 +64,8 @@ bob::machine::GMMLLRMachine & bob::machine::GMMLLRMachine::operator= (const GMML
 }
 
 bool bob::machine::GMMLLRMachine::operator==(const bob::machine::GMMLLRMachine& b) const {
-  if(m_n_inputs != b.m_n_inputs) {
-    return false;
-  }
-
-  if(m_gmm_client != b.m_gmm_client)
-    return false;
-
-  if(m_gmm_ubm != b.m_gmm_ubm)
-    return false;
-
-  return true;
+  return (m_n_inputs == b.m_n_inputs && m_gmm_client == b.m_gmm_client && 
+          m_gmm_ubm == b.m_gmm_ubm);
 }
 
 void bob::machine::GMMLLRMachine::copy(const GMMLLRMachine& other) {
