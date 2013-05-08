@@ -1,7 +1,9 @@
 .. vim: set fileencoding=utf-8 :
 .. Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
 .. Wed Mar 14 12:31:35 2012 +0100
-.. 
+.. modified by Elie Khoury <elie.khoury@idiap.ch>
+.. Mon May 06 15:50:20 2013 +0100
+..
 .. Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
 .. 
 .. This program is free software: you can redistribute it and/or modify
@@ -470,10 +472,12 @@ or :py:attr:`bob.machine.GMMMachine.weights`.
 .. doctest::
   :options: +NORMALIZE_WHITESPACE
 
-  >>> gmm.means = numpy.array([[5., 5., 5.], [5., 5., -5.]], 'float64')
+  >>> gmm.weights = numpy.array([0.4, 0.6], 'float64')
+  >>> gmm.means = numpy.array([[1, 6, 2], [4, 3, 2]], 'float64')
+  >>> gmm.variances = numpy.array([[1, 2, 1], [2, 1, 2]], 'float64')
   >>> gmm.means
-  array([[ 5., 5., 5.], 
-         [ 5., 5., -5.]])
+  array([[ 1.,  6.,  2.],
+       [ 4.,  3.,  2.]])
 
 Once the :py:class:`bob.machine.GMMMachine` has been set, you can use it to
 estimate the log-likelihood of an input feature vector with a matching
@@ -485,6 +489,125 @@ number of dimensions:
 
 As with other machines you can save and re-load machines of this type using
 :py:meth:`bob.machine.GMMMachine.save` and the class constructor respectively.
+
+
+Gaussian mixture models Statistics
+==================================
+
+The :py:class:`bob.machine.GMMStats` is a container for GMM statistics. 
+
+.. doctest::
+  :options: +NORMALIZE_WHITESPACE
+  
+  >>> gs = bob.machine.GMMStats(2,3)
+  >>> log_likelihood = -3.
+  >>> T = 1
+  >>> n = numpy.array([0.4, 0.6], 'float64')
+  >>> sumpx = numpy.array([[1., 2., 3.], [4., 5., 6.]], 'float64')
+  >>> sumpxx = numpy.array([[10., 20., 30.], [40., 50., 60.]], 'float64')
+  >>> gs.log_likelihood = log_likelihood
+  >>> gs.t = T
+  >>> gs.n = n
+  >>> gs.sum_px = sumpx
+  >>> gs.sum_pxx = sumpxx
+
+
+Joint Factor Analysis
+=======================
+The :py:class:`bob.machine.JFAMachine` carries information about the speaker factors y and z, whereas a :py:class:`bob.machine.JFABase` carries information about the matrices U, V and D.
+
+First, to create and initialize a JFA Base:
+
+.. doctest::
+  :options: +NORMALIZE_WHITESPACE
+  
+  >>> jfa_base = bob.machine.JFABase(gmm,2,2) # dimensions of U and V are both equal to 2 
+  >>> U = numpy.array([[1, 2], [3, 4], [5, 6], [7, 8], [9, 10], [11, 12]], 'float64')
+  >>> V = numpy.array([[6, 5], [4, 3], [2, 1], [1, 2], [3, 4], [5, 6]], 'float64')
+  >>> d = numpy.array([0, 1, 0, 1, 0, 1], 'float64')
+  >>> jfa_base.u = U
+  >>> jfa_base.v = V
+  >>> jfa_base.d = d
+
+Then, to create and initialize a JFA Machine:
+
+.. doctest::
+  :options: +NORMALIZE_WHITESPACE
+  
+  >>> m = bob.machine.JFAMachine(jfa_base)
+  >>> m.y = numpy.array([1,2], 'float64')
+  >>> m.z = numpy.array([3,4,1,2,0,1], 'float64')
+
+
+Once the :py:class:`bob.machine.JFAMachine` has been set, you can use it to
+estimate the log-likelihood (score) of an input gmm stats:
+
+.. doctest::
+  :options: +NORMALIZE_WHITESPACE
+  
+  >>> score = m.forward(gs)
+  
+As with other machines you can save and re-load machines of this type using
+:py:meth:`bob.machine.JFAMachine.save` and the class constructor respectively.
+
+
+Inter-Session Variability
+=========================
+The :py:class:`bob.machine.ISVMachine` carries information about the speaker factor z, whereas a :py:class:`bob.machine.JFABase` carries information about the matrices U and D.
+
+First, to create and initialize a ISV Base:
+
+.. doctest::
+  :options: +NORMALIZE_WHITESPACE
+  
+  >>> isv_base = bob.machine.ISVBase(gmm,2) # dimension of U is equal to 2 
+  >>> isv_base.u = U
+  >>> isv_base.d = d
+
+Then, to create and initialize an ISV Machine:
+
+.. doctest::
+  :options: +NORMALIZE_WHITESPACE
+  
+  >>> m = bob.machine.ISVMachine(isv_base)
+  >>> m.z = numpy.array([3,4,1,2,0,1], 'float64')
+
+Once the :py:class:`bob.machine.JFAMachine` has been set, you can use it to
+estimate the log-likelihood (score) of an input gmm stats:
+
+.. doctest::
+  :options: +NORMALIZE_WHITESPACE
+  
+  >>> score = m.forward(gs)
+
+As with other machines you can save and re-load machines of this type using
+:py:meth:`bob.machine.ISVMachine.save` and the class constructor respectively.
+
+
+Total Variability (i-vectors)
+=============================
+The :py:class:`bob.machine.IVectorMachine` carries information about the matrix T used to extract i-vectors.
+
+First, to create and initialize an i-vector machine:
+
+.. doctest::
+  :options: +NORMALIZE_WHITESPACE
+  
+  >>> m = bob.machine.IVectorMachine(gmm, 2)
+  >>> m.t = numpy.array([[1.,2],[4,1],[0,3],[5,8],[7,10],[11,1]])
+  >>> m.sigma = numpy.array([1.,2.,1.,3.,2.,4.])
+
+
+Once the :py:class:`bob.machine.IVectorMachine` has been set, you can use it to
+extract the i-vector (w_ij) of an input gmm stats:
+
+.. doctest::
+  :options: +NORMALIZE_WHITESPACE
+  
+  >>> w_ij = m.forward(gs)
+
+As with other machines you can save and re-load machines of this type using
+:py:meth:`bob.machine.IVectorMachine.save` and the class constructor respectively.
 
 
 .. testcleanup:: *

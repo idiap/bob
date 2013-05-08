@@ -21,6 +21,7 @@ set(src
    "bic.cc"
    "llr.cc"
    "whitening.cc"
+   "wccn.cc"
    "main.cc"
    )
 
