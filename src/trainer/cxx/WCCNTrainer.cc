@@ -120,7 +120,7 @@ static void evalMeans(const std::vector<blitz::Array<double,2> >& data,
 static void evalTotalScatter(const std::vector<blitz::Array<double, 2> >& data,
     blitz::Array<double,1>& m, blitz::Array<double,2>& St)
 {
-  int n_features = data[0].extent(1);
+  const int n_features = data[0].extent(1);
   blitz::Array<double,1> buffer(n_features);
 
   blitz::firstIndex i;
@@ -142,7 +142,7 @@ static void evalScatters(const std::vector<blitz::Array<double, 2> >& data,
   blitz::Array<double,2>& Sw, blitz::Array<double,2>& Sb)
 {
   // checks for data shape should have been done before...
-  int n_features = data[0].extent(1);
+  const int n_features = data[0].extent(1);
 
   m = 0; //overall mean
   blitz::Array<double,2> m_k(n_features, data.size());
@@ -188,12 +188,12 @@ static void evalScatters(const std::vector<blitz::Array<double, 2> >& data,
 void bob::trainer::WCCNTrainer::train(bob::machine::LinearMachine& machine,
     const std::vector<blitz::Array<double, 2> >& data)
 {
-  int n_classes = data.size();
+  const size_t n_classes = data.size();
   // if #classes < 2, then throw
   if (n_classes < 2) throw bob::trainer::WrongNumberOfClasses(data.size());
 
   // checks for data type and shape once
-  const size_t n_features = data[0].extent(1);
+  const int n_features = data[0].extent(1);
 
   for (size_t cl=0; cl<n_classes; ++cl) {
     if (data[cl].extent(1) != n_features) {
@@ -207,9 +207,9 @@ void bob::trainer::WCCNTrainer::train(bob::machine::LinearMachine& machine,
   const size_t n_outputs = machine.outputSize();
 
   // Checks that the dimensions are matching
-  if (n_inputs != n_features)
+  if ((int)n_inputs != n_features)
     throw bob::machine::NInputsMismatch(n_inputs, n_features);
-  if (n_outputs != n_features)
+  if ((int)n_outputs != n_features)
     throw bob::machine::NOutputsMismatch(n_outputs, n_features);
 
   // 1. Computes the mean vector and the Scatter matrix Sw and Sb
@@ -217,9 +217,6 @@ void bob::trainer::WCCNTrainer::train(bob::machine::LinearMachine& machine,
   blitz::Array<double,2> Sw(n_features, n_features);
   blitz::Array<double,2> Sb(n_features, n_features);
   evalScatters(data, preMean, Sw, Sb);
-
-
-
 
   // 2. Computes the inverse of (1/N * Sw), Sw is the within-class covariance matrix
   Sw /= n_classes;
