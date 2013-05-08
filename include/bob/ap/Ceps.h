@@ -2,7 +2,7 @@
  * @file bob/ap/Ceps.h
  * @date Wed Jan 11:10:20 2013 +0200
  * @author Elie Khoury <Elie.Khoury@idiap.ch>
- * @auhtor Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Implement Linear and Mel Frequency Cepstral Coefficients
  * functions (MFCC and LFCC)
