@@ -128,6 +128,7 @@ void bind_ap_ceps()
     .add_property("pre_emphasis_coeff", &bob::ap::Spectrogram::getPreEmphasisCoeff, &bob::ap::Spectrogram::setPreEmphasisCoeff, "The coefficient used for the pre-emphasis")
     .add_property("energy_filter", &bob::ap::Spectrogram::getEnergyFilter, &bob::ap::Spectrogram::setEnergyFilter, "Tells whether we use the energy or the square root of the energy")
     .add_property("log_filter", &bob::ap::Spectrogram::getLogFilter, &bob::ap::Spectrogram::setLogFilter, "Tells whether we use the log triangular filter or the triangular filter")
+    .add_property("energy_bands", &bob::ap::Spectrogram::getEnergyBands, &bob::ap::Spectrogram::setEnergyBands, "Tells whether we compute a spectrogram or energy bands")
     .def("__call__", &py_spectrogram_call, (arg("input")), "Computes the spectrogram")
   ;
 

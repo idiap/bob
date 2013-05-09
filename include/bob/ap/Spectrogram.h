@@ -129,6 +129,11 @@ class Spectrogram: public Energy
      */
     bool getLogFilter() const
     { return m_log_filter; }
+    /**
+     * @brief Tells whether we compute a spectrogram or energy bands
+     */
+    bool getEnergyBands() const
+    { return m_energy_bands; }
 
     /** 
      * @brief Sets the sampling frequency/frequency rate
@@ -183,6 +188,11 @@ class Spectrogram: public Energy
      */
     virtual void setLogFilter(bool log_filter)
     { m_log_filter = log_filter; }
+    /**
+     * @brief Sets whether we compute a spectrogram or energy bands
+     */
+    virtual void setEnergyBands(bool energy_bands)
+    { m_energy_bands = energy_bands; }
 
 
   protected:
@@ -205,8 +215,11 @@ class Spectrogram: public Energy
     void hammingWindow(blitz::Array<double,1> &data) const;
 
     /**
-     * @brief Computes the power-spectrum of the FFT of the input frame and
-     * applies the triangular filter bank
+     * @brief Computes the power-spectrum of the FFT of the input frame
+     */
+    void powerSpectrumFFT(blitz::Array<double,1>& x);
+    /**
+     * @brief Applies the triangular filter bank
      */
     void filterBank(blitz::Array<double,1>& x);
     /**
@@ -254,6 +267,7 @@ class Spectrogram: public Energy
     double m_fb_out_floor;
     bool m_energy_filter;
     bool m_log_filter;
+    bool m_energy_bands;
     double m_log_fb_out_floor;
 
     blitz::Array<double,2> m_dct_kernel;

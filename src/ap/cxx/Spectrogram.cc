@@ -33,7 +33,7 @@ bob::ap::Spectrogram::Spectrogram(const double sampling_frequency,
   m_n_filters(n_filters), m_f_min(f_min), m_f_max(f_max), 
   m_pre_emphasis_coeff(pre_emphasis_coeff), m_mel_scale(mel_scale),
   m_fb_out_floor(1.), m_energy_filter(false), m_log_filter(true),
-  m_fft(1)
+  m_energy_bands(false), m_fft(1)
 {
   // Check pre-emphasis coefficient
   if (pre_emphasis_coeff < 0. || pre_emphasis_coeff > 1.)
@@ -56,7 +56,7 @@ bob::ap::Spectrogram::Spectrogram(const Spectrogram& other):
   m_pre_emphasis_coeff(other.m_pre_emphasis_coeff),
   m_mel_scale(other.m_mel_scale), m_fb_out_floor(other.m_fb_out_floor),
   m_energy_filter(other.m_energy_filter), m_log_filter(other.m_log_filter),
-  m_fft(other.m_fft)
+  m_energy_bands(other.m_energy_bands), m_fft(other.m_fft)
 {
   // Initialization
   initWinLength();
@@ -81,6 +81,7 @@ bob::ap::Spectrogram& bob::ap::Spectrogram::operator=(const bob::ap::Spectrogram
     m_fb_out_floor = other.m_fb_out_floor;
     m_energy_filter = other.m_energy_filter;
     m_log_filter = other.m_log_filter;
+    m_energy_bands = other.m_energy_bands;
     m_fft = other.m_fft;
 
     // Initialization
@@ -104,7 +105,8 @@ bool bob::ap::Spectrogram::operator==(const bob::ap::Spectrogram& other) const
           m_mel_scale == other.m_mel_scale &&
           m_fb_out_floor == other.m_fb_out_floor &&
           m_energy_filter == other.m_energy_filter &&
-          m_log_filter == other.m_log_filter); 
+          m_log_filter == other.m_log_filter &&
+          m_energy_bands == other.m_energy_bands);
 }
 
 bool bob::ap::Spectrogram::operator!=(const bob::ap::Spectrogram& other) const
@@ -126,7 +128,7 @@ bob::ap::Spectrogram::getShape(const size_t input_size) const
   res(0) = 1+((input_size-m_win_length)/m_win_shift);
 
   // 2. Dimension of the feature vector
-  res(1) = m_win_length;
+  res(1) = (m_energy_bands? m_n_filters : m_win_size/2 + 1);
 
   return res;
 }
@@ -296,7 +298,7 @@ void bob::ap::Spectrogram::hammingWindow(blitz::Array<double,1> &data) const
   data(r) *= m_hamming_kernel;
 }
 
-void bob::ap::Spectrogram::filterBank(blitz::Array<double,1>& x)
+void bob::ap::Spectrogram::powerSpectrumFFT(blitz::Array<double,1>& x)
 {
   // Apply the FFT
   m_cache_frame_c1 = bob::core::array::cast<std::complex<double> >(x);
@@ -309,7 +311,10 @@ void bob::ap::Spectrogram::filterBank(blitz::Array<double,1>& x)
   x_half = blitz::abs(complex_half);
   if (m_energy_filter) // Apply the filter bank to the energy
     x_half = blitz::pow2(x_half);
+}
 
+void bob::ap::Spectrogram::filterBank(blitz::Array<double,1>& x)
+{
   if (m_log_filter) // Apply the log triangular filter bank
     logTriangularFilterBank(x);
   else // Apply the triangular filter ban
@@ -345,7 +350,9 @@ void bob::ap::Spectrogram::operator()(const blitz::Array<double,1>& input,
   int n_frames=spectrogram_shape(0);
 
   // Computes the center of the cut-off frequencies
-  blitz::Range r1(0,m_win_size/2);
+  blitz::Range r1 = blitz::Range(0,m_win_size/2);
+  if (m_energy_bands)
+    r1 = blitz::Range(0,m_n_filters-1);
   for (int i=0; i<n_frames; ++i)
   {
     // Extract and normalize frame
@@ -355,11 +362,18 @@ void bob::ap::Spectrogram::operator()(const blitz::Array<double,1>& input,
     pre_emphasis(m_cache_frame_d);
     // Apply the Hamming window
     hammingWindow(m_cache_frame_d);
+    // Take the power spectrum of the first part of the FFT
+    powerSpectrumFFT(m_cache_frame_d);
+
     // Filter with the triangular filter bank (either in linear or Mel domain)
-    filterBank(m_cache_frame_d);
+    if (m_energy_bands)
+      filterBank(m_cache_frame_d);
 
     blitz::Array<double,1> spec_matrix_row(spectrogram_matrix(i,r1));
-    spec_matrix_row = m_cache_frame_d(r1).copy();
+    if (m_energy_bands)
+      spec_matrix_row = m_cache_filters(r1);
+    else
+      spec_matrix_row = m_cache_frame_d(r1);
   }
 }
 

@@ -36,6 +36,7 @@ bob::ap::Ceps::Ceps(const double sampling_frequency,
   m_n_ceps(n_ceps), m_delta_win(delta_win), m_dct_norm(dct_norm),
   m_with_energy(false), m_with_delta(false), m_with_delta_delta(false)
 {
+  setEnergyBands(true);
   initCacheDctKernel();
 }
 
@@ -167,6 +168,8 @@ void bob::ap::Ceps::operator()(const blitz::Array<double,1>& input,
     pre_emphasis(m_cache_frame_d);
     // Apply the Hamming window
     hammingWindow(m_cache_frame_d);
+    // Take the power spectrum of the first part of the FFT
+    powerSpectrumFFT(m_cache_frame_d);
     // Filter with the triangular filter bank (either in linear or Mel domain)
     filterBank(m_cache_frame_d);
     // Apply DCT kernel and update the output 
