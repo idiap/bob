@@ -20,7 +20,7 @@
  */
 
 #include <bob/ap/Energy.h>
-#include <bob/core/array_assert.h>
+#include <bob/core/assert.h>
 
 bob::ap::Energy::Energy(const double sampling_frequency, const double win_length_ms,
     const double win_shift_ms):
