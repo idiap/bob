@@ -86,6 +86,18 @@ class PythonBackProp:
       backward = linear_bwd
     else:
       raise RuntimeError, "Cannot deal with activation %s" % machine.activation
+
+    if machine.output_activation == bob.machine.Activation.TANH:
+      output_forward = tanh
+      output_backward = tanh_bwd
+    elif machine.output_activation == bob.machine.Activation.LOG:
+      output_forward = logistic
+      output_backward = logistic_bwd
+    elif machine.output_activation == bob.machine.Activation.LINEAR:
+      output_forward = linear
+      output_backward = linear_bwd
+    else:
+      raise RuntimeError, "Cannot deal with activation %s" % machine.activation
     
     #simulated bias input...
     BI = [numpy.zeros((input.shape[0],), 'float64') for k in B]
@@ -108,10 +120,11 @@ class PythonBackProp:
       O[k+1] = numpy.dot(O[k], W[k])
       for sample in range(O[k+1].shape[0]):
         O[k+1][sample,:] += B[k]
-      O[k+1] = forward(O[k+1])
+      if (k == len(W) - 1): O[k+1] = output_forward(O[k+1])
+      else: O[k+1] = forward(O[k+1])
 
     # Feeds backward
-    E[-1] = backward(O[-1]) * (target - O[-1]) #last layer
+    E[-1] = output_backward(O[-1]) * (target - O[-1]) #last layer
     for k in reversed(range(len(W)-1)): #for all remaining layers
       E[k] = backward(O[k+1]) * numpy.dot(E[k+1], W[k+1].transpose(1,0))
 
@@ -141,6 +154,7 @@ class BackPropTest(unittest.TestCase):
     # with the proposed API.
     machine = bob.machine.MLP((4, 1))
     machine.activation = bob.machine.Activation.LINEAR
+    machine.output_activation = bob.machine.Activation.LINEAR
     B = 10
     trainer = bob.trainer.MLPBackPropTrainer(machine, B)
     self.assertEqual( trainer.batch_size, B )
@@ -160,6 +174,7 @@ class BackPropTest(unittest.TestCase):
     # as the trainer should do using python.
     machine = bob.machine.MLP((2, 2, 1))
     machine.activation = bob.machine.Activation.LOG
+    machine.output_activation = bob.machine.Activation.LOG
     machine.biases = 0
     w0 = numpy.array([[.23, .1],[-0.79, 0.21]])
     w1 = numpy.array([[-.12], [-0.88]])
@@ -187,6 +202,7 @@ class BackPropTest(unittest.TestCase):
 
     machine = bob.machine.MLP((4, 4, 3))
     machine.activation = bob.machine.Activation.TANH
+    machine.output_activation = bob.machine.Activation.TANH
     machine.randomize()
     trainer = bob.trainer.MLPBackPropTrainer(machine, N)
     trainer.train_biases = True
@@ -231,6 +247,7 @@ class BackPropTest(unittest.TestCase):
 
     machine = bob.machine.MLP((4, 3, 3, 1))
     machine.activation = bob.machine.Activation.TANH
+    machine.output_activation = bob.machine.Activation.TANH
     machine.randomize()
     trainer = bob.trainer.MLPBackPropTrainer(machine, N)
     trainer.train_biases = True
@@ -274,7 +291,7 @@ class BackPropTest(unittest.TestCase):
     N = 50
 
     machine = bob.machine.MLP((4, 3, 3, 1))
-    machine.activation = bob.machine.Activation.TANH
+    machine.output_activation = bob.machine.Activation.TANH
     machine.randomize()
     trainer = bob.trainer.MLPBackPropTrainer(machine, N)
     trainer.train_biases = True

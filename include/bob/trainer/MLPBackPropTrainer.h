@@ -233,7 +233,9 @@ namespace bob { namespace trainer {
       std::vector<blitz::Array<double,1> > m_prev_delta_bias; ///< prev. bias ds
 
       bob::machine::MLP::actfun_t m_actfun; ///< activation function
+      bob::machine::MLP::actfun_t m_output_actfun; ///< output activation function
       bob::machine::MLP::actfun_t m_bwdfun; ///< (back) activation function
+      bob::machine::MLP::actfun_t m_output_bwdfun; ///< output (back) activation function
   
       /// buffers that are dependent on the batch_size
       blitz::Array<double,2> m_target; ///< target vectors

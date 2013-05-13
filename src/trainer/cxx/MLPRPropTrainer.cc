@@ -41,7 +41,9 @@ bob::trainer::MLPRPropTrainer::MLPRPropTrainer(const bob::machine::MLP& machine,
   m_prev_deriv(m_H + 1),
   m_prev_deriv_bias(m_H + 1),
   m_actfun(machine.getActivationFunction()),
+  m_output_actfun(machine.getOutputActivationFunction()),
   m_bwdfun(),
+  m_output_bwdfun(),
   m_target(),
   m_error(m_H + 1),
   m_output(m_H + 2)
@@ -76,6 +78,20 @@ bob::trainer::MLPRPropTrainer::MLPRPropTrainer(const bob::machine::MLP& machine,
       throw bob::machine::UnsupportedActivation(machine.getActivation());
   }
 
+  switch (machine.getOutputActivation()) {
+    case bob::machine::LINEAR:
+      m_output_bwdfun = bob::machine::linear_derivative;
+      break;
+    case bob::machine::TANH:
+      m_output_bwdfun = bob::machine::tanh_derivative;
+      break;
+    case bob::machine::LOG:
+      m_output_bwdfun = bob::machine::logistic_derivative;
+      break;
+    default:
+      throw bob::machine::UnsupportedActivation(machine.getOutputActivation());
+  }
+
   setBatchSize(batch_size);
 }
 
@@ -93,7 +109,9 @@ bob::trainer::MLPRPropTrainer::MLPRPropTrainer(const MLPRPropTrainer& other):
   m_prev_deriv(m_H + 1),
   m_prev_deriv_bias(m_H + 1),
   m_actfun(other.m_actfun),
+  m_output_actfun(other.m_output_actfun),
   m_bwdfun(other.m_bwdfun),
+  m_output_bwdfun(other.m_output_bwdfun),
   m_target(bob::core::array::ccopy(other.m_target)),
   m_error(m_H + 1),
   m_output(m_H + 2)
@@ -124,7 +142,9 @@ bob::trainer::MLPRPropTrainer& bob::trainer::MLPRPropTrainer::operator=
   m_prev_deriv.resize(m_H + 1);
   m_prev_deriv_bias.resize(m_H + 1);
   m_actfun = other.m_actfun;
+  m_output_actfun = other.m_output_actfun;
   m_bwdfun = other.m_bwdfun;
+  m_output_bwdfun = other.m_output_bwdfun;
   m_target.reference(bob::core::array::ccopy(other.m_target));
   m_error.resize(m_H + 1);
   m_output.resize(m_H + 2);
@@ -195,9 +215,11 @@ void bob::trainer::MLPRPropTrainer::forward_step() {
   size_t batch_size = m_target.extent(0);
   for (size_t k=0; k<m_weight_ref.size(); ++k) { //for all layers
     bob::math::prod_(m_output[k], m_weight_ref[k], m_output[k+1]);
+    bob::machine::MLP::actfun_t actfun = 
+      (k == (m_weight_ref.size()-1) ? m_output_actfun : m_actfun );
     for (int i=0; i<(int)batch_size; ++i) { //for every example
       for (int j=0; j<m_output[k+1].extent(1); ++j) { //for all variables
-        m_output[k+1](i,j) = m_actfun(m_output[k+1](i,j) + m_bias_ref[k](j));
+        m_output[k+1](i,j) = actfun(m_output[k+1](i,j) + m_bias_ref[k](j));
       }
     }
   }
@@ -209,7 +231,7 @@ void bob::trainer::MLPRPropTrainer::backward_step() {
   m_error[m_H] = m_output.back() - m_target;
   for (int i=0; i<(int)batch_size; ++i) { //for every example
     for (int j=0; j<m_error[m_H].extent(1); ++j) { //for all variables
-      m_error[m_H](i,j) *= m_bwdfun(m_output[m_H+1](i,j));
+      m_error[m_H](i,j) *= m_output_bwdfun(m_output[m_H+1](i,j));
     }
   }
 
