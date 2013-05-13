@@ -2,6 +2,7 @@
  * @file bob/machine/MLP.h
  * @date Tue Jan 18 17:07:26 2011 +0100
  * @author André Anjos <andre.anjos@idiap.ch>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief The representation of a Multi-Layer Perceptron (MLP).
  *
@@ -138,7 +139,7 @@ namespace bob { namespace machine {
        * is your responsibility to do it.
        */
       void forward_ (const blitz::Array<double,1>& input,
-          blitz::Array<double,1>& output) const;
+          blitz::Array<double,1>& output);
 
       /**
        * Forwards data through the network, outputs the values of each output
@@ -148,7 +149,7 @@ namespace bob { namespace machine {
        * forward method is applied.
        */
       void forward (const blitz::Array<double,1>& input,
-          blitz::Array<double,1>& output) const;
+          blitz::Array<double,1>& output);
 
       /**
        * Forwards data through the network, outputs the values of each output
@@ -160,7 +161,7 @@ namespace bob { namespace machine {
        * is your responsibility to do it.
        */
       void forward_ (const blitz::Array<double,2>& input,
-          blitz::Array<double,2>& output) const;
+          blitz::Array<double,2>& output);
 
       /**
        * Forwards data through the network, outputs the values of each output
@@ -172,7 +173,7 @@ namespace bob { namespace machine {
        * forward method is applied.
        */
       void forward (const blitz::Array<double,2>& input,
-          blitz::Array<double,2>& output) const;
+          blitz::Array<double,2>& output);
 
       /**
        * Resizes the machine. This causes this MLP to be completely
@@ -313,6 +314,22 @@ namespace bob { namespace machine {
       inline actfun_t getActivationFunction() const { return m_actfun; }
 
       /**
+       * Returns the currently set output activation function
+       */
+      inline Activation getOutputActivation() const { return m_output_activation; }
+
+      /**
+       * Sets the output activation function for the outputs of the last layer..
+       */
+      void setOutputActivation(Activation a);
+
+      /**
+       * A pointer to the actual output activation function
+       */
+      inline actfun_t getOutputActivationFunction() const { return m_output_actfun; }
+
+
+      /**
        * Reset all weights and biases. You can (optionally) specify the
        * lower and upper bound for the uniform distribution that will be used
        * to draw values from. The default values are the ones recommended by
@@ -334,6 +351,28 @@ namespace bob { namespace machine {
        */
       void randomize(double lower_bound=-0.1, double upper_bound=+0.1);
 
+      /**
+       * Returns the outputs of each layer (hidden ones and output one) before
+       * applying the activation function.
+       */
+      inline const std::vector<blitz::Array<double, 1> >& getZ() const 
+      { return m_z; }
+
+      /**
+       * Returns the outputs of each layer ([normalized] input one hidden ones)
+       * after applying the activation function (for the hidden ones).
+       */
+      inline const std::vector<blitz::Array<double, 1> >& getA() const 
+      { return m_a; }
+
+      /**
+       * Returns the outputs of each layer when performing backward
+       * propagation.
+       */
+      inline const std::vector<blitz::Array<double, 1> >& getB() const 
+      { return m_b; }
+
+
     private: //representation
 
       blitz::Array<double, 1> m_input_sub; ///< input subtraction
@@ -342,8 +381,12 @@ namespace bob { namespace machine {
       std::vector<blitz::Array<double, 1> > m_bias; ///< biases for the output
       Activation m_activation; ///< currently set activation type
       actfun_t m_actfun; ///< currently set activation function
+      Activation m_output_activation; ///< currently set activation type for the output layer
+      actfun_t m_output_actfun; ///< currently set activation function for the output layer
 
-      mutable std::vector<blitz::Array<double, 1> > m_buffer; ///< a buffer for speed
+      std::vector<blitz::Array<double, 1> > m_z; ///< output of each layer (before activation)
+      std::vector<blitz::Array<double, 1> > m_a; ///< output of each layer (after activation)
+      std::vector<blitz::Array<double, 1> > m_b; ///< output of each layer (for backward propagation)
   
   };
 

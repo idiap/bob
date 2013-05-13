@@ -42,7 +42,7 @@ static void set_shape(bob::machine::MLP& m, object shape) {
   m.resize(vshape);
 }
 
-static object forward1(const bob::machine::MLP& m, bob::python::const_ndarray input) {
+static object forward1(bob::machine::MLP& m, bob::python::const_ndarray input) {
 
   const bob::core::array::typeinfo& info = input.type();
 
@@ -71,7 +71,7 @@ static object forward1(const bob::machine::MLP& m, bob::python::const_ndarray in
   }
 }
 
-static void forward2(const bob::machine::MLP& m, bob::python::const_ndarray input,
+static void forward2(bob::machine::MLP& m, bob::python::const_ndarray input,
     bob::python::ndarray output) {
   const bob::core::array::typeinfo& info = input.type();
 
@@ -96,7 +96,7 @@ static void forward2(const bob::machine::MLP& m, bob::python::const_ndarray inpu
   }
 }
 
-static void forward2_(const bob::machine::MLP& m, bob::python::const_ndarray input,
+static void forward2_(bob::machine::MLP& m, bob::python::const_ndarray input,
     bob::python::ndarray output) {
   const bob::core::array::typeinfo& info = input.type();
 
@@ -179,7 +179,7 @@ static void set_weight(bob::machine::MLP& m, object o) {
   }
 }
 
-static tuple get_bias(bob::machine::MLP& m) {
+static tuple get_bias(const bob::machine::MLP& m) {
   list retval;
   for (std::vector<blitz::Array<double,1> >::const_iterator
       it = m.getBiases().begin(); it != m.getBiases().end(); ++it) {
@@ -203,6 +203,33 @@ static void set_bias(bob::machine::MLP& m, object o) {
     std::vector<blitz::Array<double,1> > vec(begin, end);
     m.setBiases(vec);
   }
+}
+
+static tuple get_z(const bob::machine::MLP& m) {
+  list retval;
+  for (std::vector<blitz::Array<double,1> >::const_iterator
+      it = m.getZ().begin(); it != m.getZ().end(); ++it) {
+    retval.append(*it);
+  }
+  return tuple(retval);
+}
+
+static tuple get_a(const bob::machine::MLP& m) {
+  list retval;
+  for (std::vector<blitz::Array<double,1> >::const_iterator
+      it = m.getA().begin(); it != m.getA().end(); ++it) {
+    retval.append(*it);
+  }
+  return tuple(retval);
+}
+
+static tuple get_b(const bob::machine::MLP& m) {
+  list retval;
+  for (std::vector<blitz::Array<double,1> >::const_iterator
+      it = m.getB().begin(); it != m.getB().end(); ++it) {
+    retval.append(*it);
+  }
+  return tuple(retval);
 }
 
 static void random0(bob::machine::MLP& M) {
@@ -240,7 +267,11 @@ void bind_machine_mlp() {
     .add_property("input_divide", make_function(&bob::machine::MLP::getInputDivision, return_value_policy<copy_const_reference>()), &set_input_div, "Input division factor, before feeding data through the MLP. The division is applied just after subtraction - by default, it is set to 1.0")
     .add_property("weights", &get_weight, &set_weight, "A set of weights for the synapses connecting each layer in the MLP. This is represented by a standard tuple containing the weights as 2D numpy.ndarray's of double-precision floating-point elements. Each of the ndarrays has the number of rows equals to the input received by that layer and the number of columns equals to the output fed to the next layer.")
     .add_property("biases", &get_bias, &set_bias, "A set of biases for each layer in the MLP. This is represented by a standard tuple containing the biases as 1D numpy.ndarray's of double-precision floating-point elements. Each of the ndarrays has the number of elements equals to the number of neurons in the respective layer. Note that, by definition, the input layer is not subject to biasing. If you need biasing on the input layer, use the input_subtract and input_divide attributes of this MLP.")
-    .add_property("activation", &bob::machine::MLP::getActivation, &bob::machine::MLP::setActivation, "The activation function - by default, the hyperbolic tangent function. The output provided by the activation function is passed, unchanged, to the user.")
+    .add_property("z", &get_z, "The outputs of each (hidden ones and output one) layer before applying the activation function, after using the forward propagation. This is represented by a standard tuple containing the biases as 1D numpy.ndarray's of double-precision floating-point elements. Each of the ndarrays has the number of elements equals to the number of neurons in the respective layer.")
+    .add_property("a", &get_a, "The outputs of each (input one and hidden ones) layer after applying the activation function, after using the forward propagation. This is represented by a standard tuple containing the biases as 1D numpy.ndarray's of double-precision floating-point elements. Each of the ndarrays has the number of elements equals to the number of neurons in the respective layer.")
+    .add_property("b", &get_b, "The outputs of each (hidden ones and output one) layer before applying the activation function, after using the backward propagation. This is represented by a standard tuple containing the biases as 1D numpy.ndarray's of double-precision floating-point elements. Each of the ndarrays has the number of elements equals to the number of neurons in the respective layer.")
+    .add_property("activation", &bob::machine::MLP::getActivation, &bob::machine::MLP::setActivation, "The activation function (for all hidden layers) - by default, the hyperbolic tangent function. The output provided by the activation function is passed, unchanged, to the user.")
+    .add_property("output_activation", &bob::machine::MLP::getOutputActivation, &bob::machine::MLP::setOutputActivation, "The output activation function (only for the last output layer) - by default, the hyperbolic tangent function. The output provided by the activation function is passed, unchanged, to the user.")
     .add_property("shape", &get_shape, &set_shape, "A tuple that represents the size of the input vector followed by the number of neurons in each hidden layer of the MLP and, finally, terminated by the size of the output vector in the format ``(input, hidden0, hidden1, ..., hiddenN, output)``. If you set this attribute, the network is automatically resized and should be considered uninitialized.")
     .def("__call__", &forward2, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output. You can either pass an input with 1 or 2 dimensions. If 2D, it is the same as running the 1D case many times considering as input to be every row in the input matrix.")
     .def("forward", &forward2, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output. You can either pass an input with 1 or 2 dimensions. If 2D, it is the same as running the 1D case many times considering as input to be every row in the input matrix.")

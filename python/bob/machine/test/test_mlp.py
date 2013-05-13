@@ -61,6 +61,7 @@ class MLPTest(unittest.TestCase):
     self.assertEqual(m.biases[0].shape, (1,))
     self.assertTrue((m.biases[0] == 0.0).all())
     self.assertEqual(m.activation, bob.machine.Activation.TANH)
+    self.assertEqual(m.output_activation, bob.machine.Activation.TANH)
 
     # 1 hidden layer
     m = bob.machine.MLP((2,3,1))
@@ -78,6 +79,7 @@ class MLPTest(unittest.TestCase):
     self.assertEqual(m.biases[1].shape, (1,))
     self.assertTrue((m.biases[1] == 0.0).all())
     self.assertEqual(m.activation, bob.machine.Activation.TANH)
+    self.assertEqual(m.output_activation, bob.machine.Activation.TANH)
 
     # 2+ hidden layers, different activation
     m = bob.machine.MLP((2,3,5,1))
@@ -100,10 +102,12 @@ class MLPTest(unittest.TestCase):
     self.assertEqual(m.biases[2].shape, (1,))
     self.assertTrue((m.biases[2] == 0.0).all())
     self.assertEqual(m.activation, bob.machine.Activation.LOG)
+    self.assertEqual(m.output_activation, bob.machine.Activation.TANH)
 
     # A resize should make the last machine look, structurally,
     # like the first again
     m.shape = (2,1)
+    m.output_activation = bob.machine.Activation.LOG
     self.assertEqual(m.shape, (2,1))
     self.assertEqual(m.input_divide.shape[0], 2)
     self.assertEqual(m.input_subtract.shape[0], 2)
@@ -112,6 +116,7 @@ class MLPTest(unittest.TestCase):
     self.assertEqual(len(m.biases), 1)
     self.assertEqual(m.biases[0].shape, (1,))
     self.assertEqual(m.activation, bob.machine.Activation.LOG)
+    self.assertEqual(m.output_activation, bob.machine.Activation.LOG)
 
   def test02_Checks(self):
 
@@ -183,11 +188,13 @@ class MLPTest(unittest.TestCase):
     mlinear.biases = numpy.array([-.7])
 
     mlp = bob.machine.MLP((2,1))
-    mlp.activation = bob.machine.Activation.LOG
+    mlp.output_activation = bob.machine.Activation.LOG
     mlp.weights = [numpy.array([[.3], [-.42]])]
     mlp.biases = [numpy.array([-.7])]
 
     self.assertTrue( (mlinear(i) == mlp(i)).all() )
+    self.assertTrue( (numpy.fabs(mlp(i) - (1. / (1. + numpy.exp(- mlp.z[-1])))) < 1e-8).all() )
+    self.assertTrue( ((i - mlp.a[0]) < 1e-8).all() )
     os.unlink(MACHINE)
 
   def test05_ComplicatedCorrectness(self):
@@ -205,6 +212,7 @@ class MLPTest(unittest.TestCase):
     data = bob.io.HDF5File(COMPLICATED_NOBIAS_OUTPUT)
     for pattern, expected in zip(data.lread("pattern"), data.lread("result")):
       self.assertTrue(abs(m(pattern)[0] - expected) < 1e-8)
+    self.assertTrue( ((m(pattern) -numpy.tanh(m.z[-1])) < 1e-8).all() )
 
   def test05a_ComplicatedCorrectness(self):
 

@@ -38,7 +38,11 @@ bob::machine::MLP::MLP (size_t input, size_t output):
   m_bias(1),
   m_activation(bob::machine::TANH),
   m_actfun(std::tanh),
-  m_buffer(1)
+  m_output_activation(bob::machine::TANH),
+  m_output_actfun(std::tanh),
+  m_z(1),
+  m_a(1),
+  m_b(1)
 {
   resize(input, output);
   m_input_sub = 0;
@@ -54,7 +58,11 @@ bob::machine::MLP::MLP (size_t input, size_t hidden, size_t output):
   m_bias(2),
   m_activation(bob::machine::TANH),
   m_actfun(std::tanh),
-  m_buffer(2)
+  m_output_activation(bob::machine::TANH),
+  m_output_actfun(std::tanh),
+  m_z(2),
+  m_a(2),
+  m_b(2)
 {
   resize(input, hidden, output);
   m_input_sub = 0;
@@ -70,7 +78,11 @@ bob::machine::MLP::MLP (size_t input, const std::vector<size_t>& hidden, size_t 
   m_bias(hidden.size()+1),
   m_activation(bob::machine::TANH),
   m_actfun(std::tanh),
-  m_buffer(hidden.size()+1)
+  m_output_activation(bob::machine::TANH),
+  m_output_actfun(std::tanh),
+  m_z(hidden.size()+1),
+  m_a(hidden.size()+1),
+  m_b(hidden.size()+1)
 {
   resize(input, hidden, output);
   m_input_sub = 0;
@@ -81,7 +93,9 @@ bob::machine::MLP::MLP (size_t input, const std::vector<size_t>& hidden, size_t 
 
 bob::machine::MLP::MLP (const std::vector<size_t>& shape):
   m_activation(bob::machine::TANH),
-  m_actfun(std::tanh)
+  m_actfun(std::tanh),
+  m_output_activation(bob::machine::TANH),
+  m_output_actfun(std::tanh)
 {
   resize(shape);
   m_input_sub = 0;
@@ -97,12 +111,18 @@ bob::machine::MLP::MLP (const bob::machine::MLP& other):
   m_bias(other.m_bias.size()),
   m_activation(other.m_activation),
   m_actfun(other.m_actfun),
-  m_buffer(other.m_buffer.size())
+  m_output_activation(other.m_output_activation),
+  m_output_actfun(other.m_output_actfun),
+  m_z(other.m_z.size()),
+  m_a(other.m_a.size()),
+  m_b(other.m_b.size())
 {
   for (size_t i=0; i<other.m_weight.size(); ++i) {
     m_weight[i].reference(bob::core::array::ccopy(other.m_weight[i]));
     m_bias[i].reference(bob::core::array::ccopy(other.m_bias[i]));
-    m_buffer[i].reference(bob::core::array::ccopy(other.m_buffer[i]));
+    m_z[i].reference(bob::core::array::ccopy(other.m_z[i]));
+    m_a[i].reference(bob::core::array::ccopy(other.m_a[i]));
+    m_b[i].reference(bob::core::array::ccopy(other.m_b[i]));
   }
 }
 
@@ -119,11 +139,17 @@ bob::machine::MLP& bob::machine::MLP::operator= (const MLP& other) {
   m_bias.resize(other.m_bias.size());
   m_activation = other.m_activation;
   m_actfun = other.m_actfun;
-  m_buffer.resize(other.m_buffer.size());
+  m_output_activation = other.m_output_activation;
+  m_output_actfun = other.m_output_actfun;
+  m_z.resize(other.m_z.size());
+  m_a.resize(other.m_a.size());
+  m_b.resize(other.m_b.size());
   for (size_t i=0; i<other.m_weight.size(); ++i) {
     m_weight[i].reference(bob::core::array::ccopy(other.m_weight[i]));
     m_bias[i].reference(bob::core::array::ccopy(other.m_bias[i]));
-    m_buffer[i].reference(bob::core::array::ccopy(other.m_buffer[i]));
+    m_z[i].reference(bob::core::array::ccopy(other.m_z[i]));
+    m_a[i].reference(bob::core::array::ccopy(other.m_a[i]));
+    m_b[i].reference(bob::core::array::ccopy(other.m_b[i]));
   }
   return *this;
 }
@@ -132,7 +158,9 @@ void bob::machine::MLP::load (bob::io::HDF5File& config) {
   uint8_t nhidden = config.read<uint8_t>("nhidden");
   m_weight.resize(nhidden+1);
   m_bias.resize(nhidden+1);
-  m_buffer.resize(nhidden+1);
+  m_z.resize(nhidden+1);
+  m_a.resize(nhidden+1);
+  m_b.resize(nhidden+1);
 
   //configures the input
   m_input_sub.reference(config.readArray<double,1>("input_sub"));
@@ -151,13 +179,24 @@ void bob::machine::MLP::load (bob::io::HDF5File& config) {
   //reads the activation function
   uint32_t act = config.read<uint32_t>("activation");
   setActivation(static_cast<bob::machine::Activation>(act));
+  if (config.contains("output_activation"))
+  {
+    uint32_t out_act = config.read<uint32_t>("output_activation");
+    setOutputActivation(static_cast<bob::machine::Activation>(out_act));
+  }
+  else
+    setOutputActivation(static_cast<bob::machine::Activation>(act));
 
   //setup buffers: first, input
-  m_buffer[0].reference(blitz::Array<double,1>(m_input_sub.shape()));
+  m_a[0].reference(blitz::Array<double,1>(m_input_sub.shape()));
   for (size_t i=1; i<m_weight.size(); ++i) {
     //buffers have to be sized the same as the input for the next layer
-    m_buffer[i].reference(blitz::Array<double,1>(m_weight[i].extent(0)));
+    m_z[i-1].reference(blitz::Array<double,1>(m_weight[i].extent(0)));
+    m_a[i].reference(blitz::Array<double,1>(m_weight[i].extent(0)));
+    m_b[i-1].reference(blitz::Array<double,1>(m_weight[i].extent(0)));
   }
+  m_z.back().reference(blitz::Array<double,1>(m_bias.back().shape()));
+  m_b.back().reference(blitz::Array<double,1>(m_bias.back().shape()));
 }
 
 void bob::machine::MLP::save (bob::io::HDF5File& config) const {
@@ -174,32 +213,34 @@ void bob::machine::MLP::save (bob::io::HDF5File& config) const {
   }
   //bob's hdf5 implementation does not support enumerations yet...
   config.set("activation", static_cast<uint32_t>(m_activation));
+  config.set("output_activation", static_cast<uint32_t>(m_output_activation));
 }
 
 void bob::machine::MLP::forward_ (const blitz::Array<double,1>& input,
-    blitz::Array<double,1>& output) const {
+    blitz::Array<double,1>& output) {
 
   //doesn't check input, just computes
-  m_buffer[0] = (input - m_input_sub) / m_input_div;
+  m_a[0] = (input - m_input_sub) / m_input_div;
 
   //input -> hidden[0]; hidden[0] -> hidden[1], ..., hidden[N-2] -> hidden[N-1]
   for (size_t j=1; j<m_weight.size(); ++j) {
-    bob::math::prod_(m_buffer[j-1], m_weight[j-1], m_buffer[j]);
-    for (int i=0; i<m_buffer[j].extent(0); ++i) {
-      m_buffer[j](i) = m_actfun(m_buffer[j](i) + m_bias[j-1](i));
+    bob::math::prod_(m_a[j-1], m_weight[j-1], m_z[j-1]);
+    m_z[j-1] += m_bias[j-1];
+    for (int i=0; i<m_a[j].extent(0); ++i) {
+      m_a[j](i) = m_actfun(m_z[j-1](i));
     }
   }
 
   //hidden[N-1] -> output
-  bob::math::prod_(m_buffer.back(), m_weight.back(), output);
-  const blitz::Array<double,1>& last_bias = m_bias.back(); //opt. access
+  bob::math::prod_(m_a.back(), m_weight.back(), m_z.back());
+  m_z.back() += m_bias.back();
   for (int i=0; i<output.extent(0); ++i) {
-    output(i) = m_actfun(output(i) + last_bias(i));
+    output(i) = m_output_actfun(m_z.back()(i));
   }
 }
 
 void bob::machine::MLP::forward (const blitz::Array<double,1>& input,
-    blitz::Array<double,1>& output) const {
+    blitz::Array<double,1>& output) {
 
   //checks input
   if (m_weight.front().extent(0) != input.extent(0)) //checks input
@@ -212,7 +253,7 @@ void bob::machine::MLP::forward (const blitz::Array<double,1>& input,
 }
 
 void bob::machine::MLP::forward_ (const blitz::Array<double,2>& input,
-    blitz::Array<double,2>& output) const {
+    blitz::Array<double,2>& output) {
 
   blitz::Range all = blitz::Range::all();
   for (int i=0; i<input.extent(0); ++i) {
@@ -223,7 +264,7 @@ void bob::machine::MLP::forward_ (const blitz::Array<double,2>& input,
 }
 
 void bob::machine::MLP::forward (const blitz::Array<double,2>& input,
-    blitz::Array<double,2>& output) const {
+    blitz::Array<double,2>& output) {
 
   //checks input
   if (m_weight.front().extent(0) != input.extent(1)) //checks input
@@ -246,8 +287,12 @@ void bob::machine::MLP::resize (size_t input, size_t output) {
   m_weight[0].reference(blitz::Array<double,2>(input, output));
   m_bias.resize(1);
   m_bias[0].reference(blitz::Array<double,1>(output));
-  m_buffer.resize(1);
-  m_buffer[0].reference(blitz::Array<double,1>(input));
+  m_z.resize(1);
+  m_z[0].reference(blitz::Array<double,1>(output));
+  m_a.resize(1);
+  m_a[0].reference(blitz::Array<double,1>(input));
+  m_b.resize(1);
+  m_b[0].reference(blitz::Array<double,1>(output));
 }
 
 void bob::machine::MLP::resize (size_t input, size_t hidden, size_t output) {
@@ -269,24 +314,33 @@ void bob::machine::MLP::resize (size_t input, const std::vector<size_t>& hidden,
   m_input_div = 1;
   m_weight.resize(hidden.size()+1);
   m_bias.resize(hidden.size()+1);
-  m_buffer.resize(hidden.size()+1);
+  m_z.resize(hidden.size()+1);
+  m_a.resize(hidden.size()+1);
+  m_b.resize(hidden.size()+1);
   
   //initializes first layer
   m_weight[0].reference(blitz::Array<double,2>(input, hidden[0]));
   m_bias[0].reference(blitz::Array<double,1>(hidden[0]));
-  m_buffer[0].reference(blitz::Array<double,1>(input));
+  m_a[0].reference(blitz::Array<double,1>(input));
 
   //initializes hidden layers
-  for (size_t i=0; i<(hidden.size()-1); ++i) {
+  const size_t NH1 = hidden.size()-1;
+  for (size_t i=0; i<NH1; ++i) {
     m_weight[i+1].reference(blitz::Array<double,2>(hidden[i], hidden[i+1]));
     m_bias[i+1].reference(blitz::Array<double,1>(hidden[i+1]));
-    m_buffer[i+1].reference(blitz::Array<double,1>(hidden[i]));
+    m_z[i].reference(blitz::Array<double,1>(hidden[i]));
+    m_a[i+1].reference(blitz::Array<double,1>(hidden[i]));
+    m_b[i].reference(blitz::Array<double,1>(hidden[i]));
   }
+  m_z[NH1].reference(blitz::Array<double,1>(hidden[NH1]));
+  m_b[NH1].reference(blitz::Array<double,1>(hidden[NH1]));
 
   //initializes the last layer
   m_weight.back().reference(blitz::Array<double,2>(hidden.back(), output));
   m_bias.back().reference(blitz::Array<double,1>(output));
-  m_buffer.back().reference(blitz::Array<double,1>(hidden.back()));
+  m_z.back().reference(blitz::Array<double,1>(output));
+  m_a.back().reference(blitz::Array<double,1>(hidden.back()));
+  m_b.back().reference(blitz::Array<double,1>(output));
 }
 
 void bob::machine::MLP::resize (const std::vector<size_t>& shape) {
@@ -368,6 +422,24 @@ void bob::machine::MLP::setActivation(bob::machine::Activation a) {
   }
   m_activation = a;
 }
+
+void bob::machine::MLP::setOutputActivation(bob::machine::Activation a) {
+  switch (a) {
+    case bob::machine::LINEAR:
+      m_output_actfun = bob::machine::linear;
+      break;
+    case bob::machine::TANH:
+      m_output_actfun = std::tanh;
+      break;
+    case bob::machine::LOG:
+      m_output_actfun = bob::machine::logistic;
+      break;
+    default:
+      throw bob::machine::UnsupportedActivation(a);
+  }
+  m_output_activation = a;
+}
+
 
 void bob::machine::MLP::randomize(boost::mt19937& rng, double lower_bound, double upper_bound) {
   boost::uniform_real<double> draw(lower_bound, upper_bound);
