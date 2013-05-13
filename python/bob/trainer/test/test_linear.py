@@ -303,3 +303,58 @@ class LinearTest(unittest.TestCase):
     self.assertTrue( numpy.allclose(m2.weights, whit_ref, eps, eps) )
     self.assertTrue( numpy.allclose(s2, sample_whitened_ref, eps, eps) )
 
+
+
+  def test06_wccn_initialization(self):
+
+    # Constructors and comparison operators
+    t1 = bob.trainer.WCCNTrainer()
+    t2 = bob.trainer.WCCNTrainer()
+    t3 = bob.trainer.WCCNTrainer(t2)
+    t4 = t3
+    self.assertTrue( t1 == t2)
+    self.assertFalse( t1 != t2)
+    self.assertTrue( t1.is_similar_to(t2) )
+    self.assertTrue( t1 == t3)
+    self.assertFalse( t1 != t3)
+    self.assertTrue( t1.is_similar_to(t3) )
+    self.assertTrue( t1 == t4)
+    self.assertFalse( t1 != t4)
+    self.assertTrue( t1.is_similar_to(t4) )
+
+  def test07_wccn_train(self):
+
+    # Tests our Whitening extractor.
+    data = [numpy.array([[ 1.2622, -1.6443, 0.1889], [ 0.4286, -0.8922, 1.3020]]), 
+            numpy.array([[-0.6613,  0.0430, 0.6377], [-0.8718, -0.4788, 0.3988]]), 
+            numpy.array([[-0.0098, -0.3121,-0.1807],  [ 0.4301,  0.4886, -0.1456]])]
+    sample = numpy.array([1, 2, 3.])
+
+    # Expected results 
+    mean_ref = numpy.array([ 0.,  0.,  0.])
+    weight_ref = numpy.array([[ 35.43171442,   0.        ,   0.        ],
+                              [-24.13763022,   6.43858174,   0.        ],
+                              [ 41.9656786 ,  -4.91307273,   4.80884688]])
+    sample_wccn_ref = numpy.array([ 113.05348978,   -1.8620547 ,   14.42654064])
+    
+    # Runs WCCN (first method)
+    t = bob.trainer.WCCNTrainer()
+    m = bob.machine.LinearMachine(3,3)
+    t.train(m, data)
+    s = m.forward(sample)
+    
+    # Makes sure results are good
+    eps = 1e-4
+    self.assertTrue( numpy.allclose(m.input_subtract, mean_ref, eps, eps) )
+    self.assertTrue( numpy.allclose(m.weights, weight_ref, eps, eps) )
+    self.assertTrue( numpy.allclose(s, sample_wccn_ref, eps, eps) )
+
+    # Runs WCCN (second method)
+    m2 = t.train(data)
+    s2 = m2.forward(sample)
+    
+    # Makes sure results are good
+    eps = 1e-4
+    self.assertTrue( numpy.allclose(m2.input_subtract, mean_ref, eps, eps) )
+    self.assertTrue( numpy.allclose(m2.weights, weight_ref, eps, eps) )
+    self.assertTrue( numpy.allclose(s2, sample_wccn_ref, eps, eps) )
