@@ -134,6 +134,17 @@ namespace bob { namespace trainer {
       void backward_step();
 
       /**
+       * @brief Initialize the training procedure by:
+       *   1. setting m_output[0] of the trainer equal to input
+       *   2. setting m_target of the trainer equal to target
+       *   3. initializing the references to the weights and the biases of 
+       *      the machine
+       */
+      void init_train(const bob::machine::MLP& machine,
+        const blitz::Array<double,2>& input,
+        const blitz::Array<double,2>& target);
+
+      /**
        * @brief Returns the target
        */
       const blitz::Array<double,2>& getTarget() const { return m_target; }

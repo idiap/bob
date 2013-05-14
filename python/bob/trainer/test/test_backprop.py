@@ -148,7 +148,7 @@ class PythonBackProp:
 
 
 class MyBackPropTrainer(bob.trainer.MLPBaseTrainer):
-  """Simple example of python trainer: """
+  """Simple example of python trainer that inherits from the MLPBaseTrainer: """
   def __init__(self, machine, batch_size, train_biases=True, learning_rate=0.1, momentum=0.0):
     bob.trainer.MLPBaseTrainer.__init__(self, machine, batch_size)
     # Our state
@@ -167,6 +167,48 @@ class MyBackPropTrainer(bob.trainer.MLPBaseTrainer):
     self.DB = None
     self.PDW = None
     self.PDB = None
+
+  def train(self, machine, input, target):
+
+    self.init_train(machine, input, target)
+    
+    W = machine.weights #weights
+    B = machine.biases #biases
+
+    #simulated bias input...
+    BI = [numpy.zeros((input.shape[0],), 'float64') for k in B]
+    for k in BI: k.fill(1)
+
+    #state
+    if self.DW is None: #first run or just after a reset()
+      self.PDW = [numpy.empty_like(k) for k in W]
+      for k in self.PDW: k.fill(0)
+      self.PDB = [numpy.empty_like(k) for k in B]
+      for k in self.PDB: k.fill(0)
+
+    # Call forward and backward from the C++ MLPBaseTrainer class
+    self.forward_step()
+    #self.backward_step()
+
+    E = self.error
+    O = self.output
+
+    # Calculates partial derivatives, accumulate
+    batch_size = E[-1].shape[0]
+    self.DW = [numpy.dot(O[k].transpose(1,0), E[k]) for k in range(len(W))]
+    for k in self.DW: k *= (self.learning_rate / batch_size)
+    self.DB = [numpy.dot(BI[k], E[k]) for k in range(len(W))]
+    for k in self.DB: k *= (self.learning_rate / batch_size)
+
+    # Updates weights and biases
+    machine.weights = [W[k] + (((1-self.momentum)*self.DW[k]) + (self.momentum*self.PDW[k])) for k in range(len(W))]
+    self.PDW = self.DW
+
+    if self.train_biases:
+      machine.biases = [B[k] + (((1-self.momentum)*self.DB[k]) + (self.momentum*self.PDB[k])) for k in range(len(W))]
+      self.PDB = self.DB
+    else:
+      machine.biases = 0
 
 
 class BackPropTest(unittest.TestCase):
@@ -366,3 +408,28 @@ class BackPropTest(unittest.TestCase):
     self.assertTrue( len(t.error)   == n_hidden_layers+1 )
     self.assertTrue( len(t.output)  == n_hidden_layers+2 )
 
+  def test07_MyTrainer_TwoLayersNoBiasControlled(self):
+
+    # Trains a simple network with one single step, verifies
+    # the training works as expected by calculating the same
+    # as the trainer should do using python.
+    machine = bob.machine.MLP((2, 2, 1))
+    machine.activation = bob.machine.Activation.LOG
+    machine.output_activation = bob.machine.Activation.LOG
+    machine.biases = 0
+    w0 = numpy.array([[.23, .1],[-0.79, 0.21]])
+    w1 = numpy.array([[-.12], [-0.88]])
+    machine.weights = [w0, w1]
+    trainer = bob.trainer.MLPBackPropTrainer(machine, 1)
+    trainer.train_biases = False
+    d0 = numpy.array([[.3, .7]])
+    t0 = numpy.array([[.0]])
+
+    # trains in python first
+    pytrainer = MyBackPropTrainer(machine, 1, train_biases=trainer.train_biases)
+    pymachine = bob.machine.MLP(machine) #a copy
+    pytrainer.train(pymachine, d0, t0)
+
+    # trains with our C++ implementation
+    trainer.train_(machine, d0, t0)
+    self.assertTrue( numpy.array_equal(pymachine.weights[0], machine.weights[0]) )

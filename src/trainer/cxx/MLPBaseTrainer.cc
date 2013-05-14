@@ -211,6 +211,20 @@ void bob::trainer::MLPBaseTrainer::backward_step() {
   }
 }
 
+void bob::trainer::MLPBaseTrainer::init_train(const bob::machine::MLP& machine,
+  const blitz::Array<double,2>& input, const blitz::Array<double,2>& target)
+{
+  m_output[0].reference(input);
+  m_target.reference(target);
+
+  // We refer to the machine's weights and biases
+  for (size_t k=0;k<m_weight_ref.size();++k)
+    m_weight_ref[k].reference(machine.getWeights()[k]);
+  for (size_t k=0;k<m_bias_ref.size();++k)
+    m_bias_ref[k].reference(machine.getBiases()[k]);
+}
+
+
 void bob::trainer::MLPBaseTrainer::setTarget(const blitz::Array<double,2>& target) {
   bob::core::array::assertSameShape(target, m_target);
   m_target = target;

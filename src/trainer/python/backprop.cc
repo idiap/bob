@@ -85,10 +85,15 @@ static void mlpbase_set_output(bob::trainer::MLPBaseTrainer& t,
 static void mlpbase_set_output2(bob::trainer::MLPBaseTrainer& t, 
   bob::python::const_ndarray v, const size_t k)
 {
-  const blitz::Array<double,2> v_ = v.bz<double,2>();
-  t.setOutput(v_, k);
+  t.setOutput(v.bz<double,2>(), k);
 }
 
+static void mlpbase_init_train(bob::trainer::MLPBaseTrainer& t,
+  const bob::machine::MLP& m, bob::python::const_ndarray input,
+  bob::python::const_ndarray target)
+{
+  t.init_train(m, input.bz<double,2>(), target.bz<double,2>());
+}
 
 void bind_trainer_backprop() {
   class_<bob::trainer::MLPBaseTrainer, boost::shared_ptr<bob::trainer::MLPBaseTrainer>, boost::noncopyable>("MLPBaseTrainer", "The base python class for MLP trainers.", init<const bob::machine::MLP&, size_t>((arg("machine"), arg("batch_size"))))
@@ -97,6 +102,7 @@ void bind_trainer_backprop() {
     .def("is_compatible", &bob::trainer::MLPBaseTrainer::isCompatible, (arg("self"), arg("machine")), "Checks if a given machine is compatible with my inner settings")
     .def("forward_step", &bob::trainer::MLPBaseTrainer::forward_step, (arg("self")), "Forward step -- Forwards a batch of data through the MLP and updates the internal buffers.")
     .def("backward_step", &bob::trainer::MLPBaseTrainer::backward_step, (arg("self")), "Backward step -- Backwards a batch of data through the MLP and updates the internal buffers.")
+    .def("init_train", &mlpbase_init_train, (arg("self"), arg("mlp"), arg("input"), arg("target")), "Initialize the training process.")
     .add_property("target", &mlpbase_get_target, &mlpbase_set_target)
     .add_property("error", &mlpbase_get_error, &mlpbase_set_error)
     .def("set_error", &mlpbase_set_error2, (arg("self"), arg("array"), arg("k")), "Sets the error for a given index.")

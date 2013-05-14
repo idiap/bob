@@ -127,14 +127,8 @@ void bob::trainer::MLPBackPropTrainer::train_(bob::machine::MLP& machine,
     const blitz::Array<double,2>& input,
     const blitz::Array<double,2>& target) {
 
-  m_output[0].reference(input);
-  m_target.reference(target);
-
-  // We refer to the machine's weights and biases
-  for (size_t k=0;k<m_weight_ref.size();++k)
-    m_weight_ref[k].reference(machine.getWeights()[k]);
-  for (size_t k=0;k<m_bias_ref.size();++k)
-    m_bias_ref[k].reference(machine.getBiases()[k]);
+  // Initialize the training
+  init_train(machine, input, target);
 
   // To be called in this sequence for a general backprop algorithm
   forward_step();
