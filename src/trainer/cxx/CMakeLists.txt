@@ -15,6 +15,7 @@ set(src
   "ML_GMMTrainer.cc"
   "Exception.cc"
   "DataShuffler.cc"
+  "MLPBaseTrainer.cc"
   "MLPRPropTrainer.cc"
   "MLPBackPropTrainer.cc"
   "JFATrainer.cc"

@@ -2,6 +2,7 @@
  * @file bob/trainer/MLPBackPropTrainer.h
  * @date Mon Jul 18 18:11:22 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief A MLP trainer based on vanilla back-propagation. You can get an
  * overview of this method at "Pattern Recognition and Machine Learning"
@@ -30,6 +31,8 @@
 
 #include <bob/machine/MLP.h>
 
+#include "MLPBaseTrainer.h"
+
 namespace bob { namespace trainer {
   /**
    * @ingroup TRAINER
@@ -41,7 +44,7 @@ namespace bob { namespace trainer {
    * back-propagation as defined in "Pattern Recognition and Machine Learning"
    * by C.M. Bishop, chapter 5.
    */
-  class MLPBackPropTrainer {
+  class MLPBackPropTrainer: public MLPBaseTrainer {
 
     public: //api
 
@@ -104,16 +107,6 @@ namespace bob { namespace trainer {
       void reset();
 
       /**
-       * Gets the batch size
-       */
-      size_t getBatchSize() const { return m_target.extent(0); }
-
-      /**
-       * Sets the batch size
-       */
-      void setBatchSize(size_t batch_size);
-
-      /**
        * Gets the current learning rate
        */
       double getLearningRate() const { return m_learning_rate; }
@@ -132,21 +125,6 @@ namespace bob { namespace trainer {
        * Sets the current momentum
        */
       void setMomentum(double v) { m_momentum = v; }
-
-      /**
-       * Gets the current settings for bias training (defaults to true)
-       */
-      inline bool getTrainBiases() const { return m_train_bias; }
-
-      /**
-       * Sets the bias training option
-       */
-      inline void setTrainBiases(bool v) { m_train_bias = v; }
-
-      /**
-       * Checks if a given machine is compatible with my inner settings.
-       */
-      bool isCompatible(const bob::machine::MLP& machine) const;
 
       /**
        * Trains the MLP to perform discrimination. The training is executed
@@ -184,30 +162,6 @@ namespace bob { namespace trainer {
           const blitz::Array<double,2>& target);
 
     private: //useful methods
-
-      /**
-       * Forward step -- this is a second implementation of that used on the
-       * MLP itself to allow access to some internal buffers. In our current
-       * setup, we keep the "m_output"'s of every individual layer separately
-       * as we are going to need them for the weight update.
-       *
-       * Another factor is the normalization normally applied at MLPs. We
-       * ignore that here as the DataShuffler should be capable of handling
-       * this in a more efficient way. You should make sure that the final MLP
-       * does have the standard normalization settings applied if it was set to
-       * automatically apply the standard normalization before giving me the
-       * data.
-       */
-      void forward_step();
-
-      /**
-       * Backward step -- back-propagates the calculated error up to each
-       * neuron on the first layer. This is explained on Bishop's formula 5.55
-       * and 5.56, at page 244 (see also figure 5.7 for a graphical
-       * representation).
-       */
-      void backward_step();
-
       /**
        * Weight update -- calculates the weight-update using derivatives as
        * required by back-prop.
@@ -220,27 +174,8 @@ namespace bob { namespace trainer {
       double m_learning_rate;
       double m_momentum; 
 
-      bool m_train_bias; ///< shall we be training biases? (default: true)
-      size_t m_H; ///< number of hidden layers on the target machine
-
-      std::vector<blitz::Array<double,2> > m_weight_ref; ///< machine weights
-      std::vector<blitz::Array<double,1> > m_bias_ref; ///< machine biases
-      
-      std::vector<blitz::Array<double,2> > m_delta; ///< weight deltas
-      std::vector<blitz::Array<double,1> > m_delta_bias; ///< bias deltas
-
       std::vector<blitz::Array<double,2> > m_prev_delta; ///< prev.weight deltas
       std::vector<blitz::Array<double,1> > m_prev_delta_bias; ///< prev. bias ds
-
-      bob::machine::MLP::actfun_t m_actfun; ///< activation function
-      bob::machine::MLP::actfun_t m_output_actfun; ///< output activation function
-      bob::machine::MLP::actfun_t m_bwdfun; ///< (back) activation function
-      bob::machine::MLP::actfun_t m_output_bwdfun; ///< output (back) activation function
-  
-      /// buffers that are dependent on the batch_size
-      blitz::Array<double,2> m_target; ///< target vectors
-      std::vector<blitz::Array<double,2> > m_error; ///< error (+deltas)
-      std::vector<blitz::Array<double,2> > m_output; ///< layer output
   };
 
   /**

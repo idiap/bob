@@ -124,7 +124,7 @@ class PythonBackProp:
       else: O[k+1] = forward(O[k+1])
 
     # Feeds backward
-    E[-1] = output_backward(O[-1]) * (target - O[-1]) #last layer
+    E[-1] = output_backward(O[-1]) * (O[-1] - target) #last layer
     for k in reversed(range(len(W)-1)): #for all remaining layers
       E[k] = backward(O[k+1]) * numpy.dot(E[k+1], W[k+1].transpose(1,0))
 

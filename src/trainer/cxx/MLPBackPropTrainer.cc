@@ -2,6 +2,7 @@
  * @file trainer/cxx/MLPBackPropTrainer.cc
  * @date Mon Jul 18 18:11:22 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Implementation of the BackProp algorithm for MLP training.
  *
@@ -29,23 +30,11 @@
 
 bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(const bob::machine::MLP& machine,
     size_t batch_size):
+  bob::trainer::MLPBaseTrainer(machine, batch_size),
   m_learning_rate(0.1),
   m_momentum(0.0),
-  m_train_bias(true),
-  m_H(machine.numOfHiddenLayers()), ///< handy!
-  m_weight_ref(m_H + 1),
-  m_bias_ref(m_H + 1),
-  m_delta(m_H + 1),
-  m_delta_bias(m_H + 1),
   m_prev_delta(m_H + 1),
-  m_prev_delta_bias(m_H + 1),
-  m_actfun(machine.getActivationFunction()),
-  m_output_actfun(machine.getOutputActivationFunction()),
-  m_bwdfun(),
-  m_output_bwdfun(),
-  m_target(),
-  m_error(m_H + 1),
-  m_output(m_H + 2)
+  m_prev_delta_bias(m_H + 1)
 {
   const std::vector<blitz::Array<double,2> >& machine_weight =
     machine.getWeights();
@@ -53,108 +42,43 @@ bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(const bob::machine::MLP& ma
     machine.getBiases();
 
   for (size_t k=0; k<(m_H + 1); ++k) {
-    m_delta[k].reference(blitz::Array<double,2>(machine_weight[k].shape()));
-    m_delta_bias[k].reference(blitz::Array<double,1>(machine_bias[k].shape()));
     m_prev_delta[k].reference(blitz::Array<double,2>(machine_weight[k].shape()));
     m_prev_delta_bias[k].reference(blitz::Array<double,1>(machine_bias[k].shape()));
   }
 
   reset();
-
-  switch (machine.getActivation()) {
-    case bob::machine::LINEAR:
-      m_bwdfun = bob::machine::linear_derivative;
-      break;
-    case bob::machine::TANH:
-      m_bwdfun = bob::machine::tanh_derivative;
-      break;
-    case bob::machine::LOG:
-      m_bwdfun = bob::machine::logistic_derivative;
-      break;
-    default:
-      throw bob::machine::UnsupportedActivation(machine.getActivation());
-  }
-
-  switch (machine.getOutputActivation()) {
-    case bob::machine::LINEAR:
-      m_output_bwdfun = bob::machine::linear_derivative;
-      break;
-    case bob::machine::TANH:
-      m_output_bwdfun = bob::machine::tanh_derivative;
-      break;
-    case bob::machine::LOG:
-      m_output_bwdfun = bob::machine::logistic_derivative;
-      break;
-    default:
-      throw bob::machine::UnsupportedActivation(machine.getOutputActivation());
-  }
-
-
-  setBatchSize(batch_size);
 }
 
 bob::trainer::MLPBackPropTrainer::~MLPBackPropTrainer() { }
 
 bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(const MLPBackPropTrainer& other):
+  bob::trainer::MLPBaseTrainer(other),
   m_learning_rate(other.m_learning_rate),
   m_momentum(other.m_momentum),
-  m_train_bias(other.m_train_bias),
-  m_H(other.m_H),
-  m_weight_ref(m_H + 1),
-  m_bias_ref(m_H + 1),
-  m_delta(m_H + 1),
-  m_delta_bias(m_H + 1),
   m_prev_delta(m_H + 1),
-  m_prev_delta_bias(m_H + 1),
-  m_actfun(other.m_actfun),
-  m_output_actfun(other.m_output_actfun),
-  m_bwdfun(other.m_bwdfun),
-  m_output_bwdfun(other.m_output_bwdfun),
-  m_target(bob::core::array::ccopy(other.m_target)),
-  m_error(m_H + 1),
-  m_output(m_H + 2)
+  m_prev_delta_bias(m_H + 1)
 {
   for (size_t k=0; k<(m_H + 1); ++k) {
-    m_delta[k].reference(bob::core::array::ccopy(other.m_delta[k]));
-    m_delta_bias[k].reference(bob::core::array::ccopy(other.m_delta_bias[k]));
     m_prev_delta[k].reference(bob::core::array::ccopy(other.m_prev_delta[k]));
     m_prev_delta_bias[k].reference(bob::core::array::ccopy(other.m_prev_delta_bias[k]));
-    m_error[k].reference(bob::core::array::ccopy(other.m_error[k]));
-    m_output[k].reference(bob::core::array::ccopy(other.m_output[k]));
   }
-  m_output[m_H + 1].reference(bob::core::array::ccopy(other.m_output[m_H + 1]));
 }
 
 bob::trainer::MLPBackPropTrainer& bob::trainer::MLPBackPropTrainer::operator=
 (const bob::trainer::MLPBackPropTrainer& other) {
-  m_learning_rate = other.m_learning_rate;
-  m_momentum = other.m_momentum;
-  m_train_bias = other.m_train_bias;
-  m_H = other.m_H;
-  m_weight_ref.resize(m_H + 1);
-  m_bias_ref.resize(m_H + 1);
-  m_delta.resize(m_H + 1);
-  m_delta_bias.resize(m_H + 1);
-  m_prev_delta.resize(m_H + 1);
-  m_prev_delta_bias.resize(m_H + 1);
-  m_actfun = other.m_actfun;
-  m_output_actfun = other.m_output_actfun;
-  m_bwdfun = other.m_bwdfun;
-  m_output_bwdfun = other.m_output_bwdfun;
-  m_target.reference(bob::core::array::ccopy(other.m_target));
-  m_error.resize(m_H + 1);
-  m_output.resize(m_H + 2);
+  if (this != &other)
+  {
+    bob::trainer::MLPBaseTrainer::operator=(other);
+    m_learning_rate = other.m_learning_rate;
+    m_momentum = other.m_momentum;
+    m_prev_delta.resize(m_H + 1);
+    m_prev_delta_bias.resize(m_H + 1);
 
-  for (size_t k=0; k<(m_H + 1); ++k) {
-    m_delta[k].reference(bob::core::array::ccopy(other.m_delta[k]));
-    m_delta_bias[k].reference(bob::core::array::ccopy(other.m_delta_bias[k]));
-    m_prev_delta[k].reference(bob::core::array::ccopy(other.m_prev_delta[k]));
-    m_prev_delta_bias[k].reference(bob::core::array::ccopy(other.m_prev_delta_bias[k]));
-    m_error[k].reference(bob::core::array::ccopy(other.m_error[k]));
-    m_output[k].reference(bob::core::array::ccopy(other.m_output[k]));
+    for (size_t k=0; k<(m_H + 1); ++k) {
+      m_prev_delta[k].reference(bob::core::array::ccopy(other.m_prev_delta[k]));
+      m_prev_delta_bias[k].reference(bob::core::array::ccopy(other.m_prev_delta_bias[k]));
+    }
   }
-  m_output[m_H + 1].reference(bob::core::array::ccopy(other.m_output[m_H + 1]));
-
   return *this;
 }
 
@@ -162,77 +86,6 @@ void bob::trainer::MLPBackPropTrainer::reset() {
   for (size_t k=0; k<(m_H + 1); ++k) {
     m_prev_delta[k] = 0;
     m_prev_delta_bias[k] = 0;
-  }
-}
-
-void bob::trainer::MLPBackPropTrainer::setBatchSize (size_t batch_size) {
-  // m_output: values after the activation function; note that "output" will
-  //           accomodate the input to ease on the calculations
-  // m_target: sampled target values
-  // m_error: error values;
-  
-  m_target.resize(batch_size, m_delta.back().extent(1));
-
-  m_output[0].resize(batch_size, m_delta[0].extent(0));
-
-  for (size_t k=1; k<m_output.size(); ++k) {
-    m_output[k].resize(batch_size, m_delta[k-1].extent(1));
-  }
-
-  for (size_t k=0; k<m_error.size(); ++k) {
-    m_error[k].resize(batch_size, m_delta[k].extent(1));
-  }
-}
-
-bool bob::trainer::MLPBackPropTrainer::isCompatible(const bob::machine::MLP& machine) const 
-{
-  if (m_H != machine.numOfHiddenLayers()) return false;
-  
-  if (m_target.extent(1) != (int)machine.outputSize()) return false;
-
-  if (m_output[0].extent(1) != (int)machine.inputSize()) return false;
-
-  //also, each layer should be of the same size
-  for (size_t k=0; k<(m_H + 1); ++k) {
-    if (!bob::core::array::hasSameShape(m_delta[k], machine.getWeights()[k])) return false;
-  }
-
-  //if you get to this point, you can only return true
-  return true;
-}
-
-void bob::trainer::MLPBackPropTrainer::forward_step() {
-  size_t batch_size = m_target.extent(0);
-  for (size_t k=0; k<m_weight_ref.size(); ++k) { //for all layers
-    bob::math::prod_(m_output[k], m_weight_ref[k], m_output[k+1]);
-    bob::machine::MLP::actfun_t actfun = 
-      (k == (m_weight_ref.size()-1) ? m_output_actfun : m_actfun );
-    for (int i=0; i<(int)batch_size; ++i) { //for every example
-      for (int j=0; j<m_output[k+1].extent(1); ++j) { //for all variables
-        m_output[k+1](i,j) = actfun(m_output[k+1](i,j) + m_bias_ref[k](j));
-      }
-    }
-  }
-}
-
-void bob::trainer::MLPBackPropTrainer::backward_step() {
-  size_t batch_size = m_target.extent(0);
-  //last layer
-  m_error[m_H] = m_target - m_output.back();
-  for (int i=0; i<(int)batch_size; ++i) { //for every example
-    for (int j=0; j<m_error[m_H].extent(1); ++j) { //for all variables
-      m_error[m_H](i,j) *= m_output_bwdfun(m_output[m_H+1](i,j));
-    }
-  }
-
-  //all other layers
-  for (size_t k=m_H; k>0; --k) {
-    bob::math::prod_(m_error[k], m_weight_ref[k].transpose(1,0), m_error[k-1]);
-    for (int i=0; i<(int)batch_size; ++i) { //for every example
-      for (int j=0; j<m_error[k-1].extent(1); ++j) { //for all variables
-        m_error[k-1](i,j) *= m_bwdfun(m_output[k](i,j));
-      }
-    }
   }
 }
 
