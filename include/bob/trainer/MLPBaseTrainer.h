@@ -23,7 +23,6 @@
 #define BOB_TRAINER_MLPBASETRAINER_H
 
 #include <vector>
-#include <boost/function.hpp>
 
 #include <bob/machine/MLP.h>
 
@@ -34,27 +33,20 @@ namespace bob { namespace trainer {
    */
 
   /**
-   * Sets an MLP to perform discrimination based on vanilla error
-   * back-propagation as defined in "Pattern Recognition and Machine Learning"
-   * by C.M. Bishop, chapter 5.
+   * @brief Base class for training MLP. This provides forward and backward
+   * functions over a batch of samples, as well as accessors to the internal
+   * states of the networks.
    */
   class MLPBaseTrainer {
 
     public: //api
 
       /**
-       * Initializes a new MLPBaseTrainer trainer according to a given
+       * @brief Initializes a new MLPBaseTrainer trainer according to a given
        * machine settings and a training batch size.
        *
-       * Good values for batch sizes are tens of samples. BackProp is not
-       * necessarily a "batch" training algorithm, but performs in a smoother
-       * if the batch size is larger. This may also affect the convergence.
-       *
-       * You can also change default values for the learning rate and momentum.
-       * By default we train w/o any momenta.
-       *
-       * If you want to adjust a potential learning rate decay, you can and
-       * should do it outside the scope of this trainer, in your own way.
+       * Good values for batch sizes are tens of samples. This may affect the 
+       * convergence.
        *
        * Here is an overview of the backprop algorithm executed by this
        * trainer:
@@ -79,47 +71,47 @@ namespace bob { namespace trainer {
       MLPBaseTrainer(const bob::machine::MLP& machine, size_t batch_size);
 
       /**
-       * Destructor virtualisation
+       * @brief Destructor virtualisation
        */
       virtual ~MLPBaseTrainer();
       
       /**
-       * Copy construction.
+       * @brief Copy construction.
        */
       MLPBaseTrainer(const MLPBaseTrainer& other);
 
       /**
-       * Copy operator
+       * @brief Copy operator
        */
       MLPBaseTrainer& operator=(const MLPBaseTrainer& other);
 
       /**
-       * Gets the batch size
+       * @brief Gets the batch size
        */
       size_t getBatchSize() const { return m_target.extent(0); }
 
       /**
-       * Sets the batch size
+       * @brief Sets the batch size
        */
       void setBatchSize(size_t batch_size);
 
       /**
-       * Gets the current settings for bias training (defaults to true)
+       * @brief Gets the current settings for bias training (defaults to true)
        */
       inline bool getTrainBiases() const { return m_train_bias; }
 
       /**
-       * Sets the bias training option
+       * @brief Sets the bias training option
        */
       inline void setTrainBiases(bool v) { m_train_bias = v; }
 
       /**
-       * Checks if a given machine is compatible with my inner settings.
+       * @brief Checks if a given machine is compatible with my inner settings.
        */
       bool isCompatible(const bob::machine::MLP& machine) const;
 
       /**
-       * Forward step -- this is a second implementation of that used on the
+       * @brief Forward step -- this is a second implementation of that used on the
        * MLP itself to allow access to some internal buffers. In our current
        * setup, we keep the "m_output"'s of every individual layer separately
        * as we are going to need them for the weight update.
@@ -134,12 +126,47 @@ namespace bob { namespace trainer {
       void forward_step();
 
       /**
-       * Backward step -- back-propagates the calculated error up to each
+       * @brief Backward step -- back-propagates the calculated error up to each
        * neuron on the first layer. This is explained on Bishop's formula 5.55
        * and 5.56, at page 244 (see also figure 5.7 for a graphical
        * representation).
        */
       void backward_step();
+
+      /**
+       * @brief Returns the target
+       */
+      const blitz::Array<double,2>& getTarget() const { return m_target; }
+      /**
+       * @brief Returns the errors
+       */
+      const std::vector<blitz::Array<double,2> >& getError() const { return m_error; }
+      /**
+       * @brief Returns the outputs
+       */
+      const std::vector<blitz::Array<double,2> >& getOutput() const { return m_output; }
+      /**
+       * @brief Sets the target
+       */
+      void setTarget(const blitz::Array<double,2>& target);
+      /**
+       * @brief Sets the error
+       */
+      void setError(const std::vector<blitz::Array<double,2> >& error);
+      /**
+       * @brief Sets the error of a given index
+       */
+      void setError(const blitz::Array<double,2>& error, const size_t index);
+      /**
+       * @brief Sets the outputs
+       */
+      void setOutput(const std::vector<blitz::Array<double,2> >& output);
+      /**
+       * @brief Sets the output of a given index
+       */
+      void setOutput(const blitz::Array<double,2>& output, const size_t index);
+
+
 
     protected: //representation
 

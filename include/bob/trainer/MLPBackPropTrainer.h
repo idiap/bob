@@ -40,7 +40,7 @@ namespace bob { namespace trainer {
    */
 
   /**
-   * Sets an MLP to perform discrimination based on vanilla error
+   * @brief Sets an MLP to perform discrimination based on vanilla error
    * back-propagation as defined in "Pattern Recognition and Machine Learning"
    * by C.M. Bishop, chapter 5.
    */
@@ -49,8 +49,8 @@ namespace bob { namespace trainer {
     public: //api
 
       /**
-       * Initializes a new MLPBackPropTrainer trainer according to a given
-       * machine settings and a training batch size.
+       * @brief Initializes a new MLPBackPropTrainer trainer according to a
+       * given machine settings and a training batch size.
        *
        * Good values for batch sizes are tens of samples. BackProp is not
        * necessarily a "batch" training algorithm, but performs in a smoother
@@ -85,53 +85,53 @@ namespace bob { namespace trainer {
       MLPBackPropTrainer(const bob::machine::MLP& machine, size_t batch_size);
 
       /**
-       * Destructor virtualisation
+       * @brief Destructor virtualisation
        */
       virtual ~MLPBackPropTrainer();
       
       /**
-       * Copy construction.
+       * @brief Copy construction.
        */
       MLPBackPropTrainer(const MLPBackPropTrainer& other);
 
       /**
-       * Copy operator
+       * @brief Copy operator
        */
       MLPBackPropTrainer& operator=(const MLPBackPropTrainer& other);
 
       /**
-       * Re-initializes the whole training apparatus to start training a new
+       * @brief Re-initializes the whole training apparatus to start training a new
        * machine. This will effectively reset all Delta matrices to their
        * intial values and set the previous derivatives to zero.
        */
       void reset();
 
       /**
-       * Gets the current learning rate
+       * @brief Gets the current learning rate
        */
       double getLearningRate() const { return m_learning_rate; }
 
       /**
-       * Sets the current learning rate
+       * @brief Sets the current learning rate
        */
       void setLearningRate(double v) { m_learning_rate = v; }
 
       /**
-       * Gets the current momentum
+       * @brief Gets the current momentum
        */
       double getMomentum() const { return m_momentum; }
 
       /**
-       * Sets the current momentum
+       * @brief Sets the current momentum
        */
       void setMomentum(double v) { m_momentum = v; }
 
       /**
-       * Trains the MLP to perform discrimination. The training is executed
-       * outside the machine context, but uses all the current machine layout.
-       * The given machine is updated with new weights and biases on the end of
-       * the training that is performed a single time. Iterate as much as you
-       * want to refine the training.
+       * @brief Trains the MLP to perform discrimination. The training is
+       * executed outside the machine context, but uses all the current 
+       * machine layout. The given machine is updated with new weights and 
+       * biases on the end of the training that is performed a single time.
+       * Iterate as much as you want to refine the training.
        *
        * The machine given as input is checked for compatibility with the
        * current initialized settings. If the two are not compatible, an
@@ -154,7 +154,7 @@ namespace bob { namespace trainer {
           const blitz::Array<double,2>& target);
 
       /**
-       * This is a version of the train() method above, which does no
+       * @brief This is a version of the train() method above, which does no
        * compatibility check on the input machine.
        */
       void train_(bob::machine::MLP& machine, 

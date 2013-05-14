@@ -20,7 +20,9 @@
  */
 
 #include <algorithm>
+#include <bob/core/assert.h>
 #include <bob/core/check.h>
+#include <bob/core/Exception.h>
 #include <bob/math/linear.h>
 #include <bob/machine/MLPException.h>
 #include <bob/trainer/Exception.h>
@@ -80,7 +82,6 @@ bob::trainer::MLPBaseTrainer::MLPBaseTrainer(const bob::machine::MLP& machine,
       throw bob::machine::UnsupportedActivation(machine.getOutputActivation());
   }
 
-
   setBatchSize(batch_size);
 }
 
@@ -112,28 +113,30 @@ bob::trainer::MLPBaseTrainer::MLPBaseTrainer(const MLPBaseTrainer& other):
 
 bob::trainer::MLPBaseTrainer& bob::trainer::MLPBaseTrainer::operator=
 (const bob::trainer::MLPBaseTrainer& other) {
-  m_train_bias = other.m_train_bias;
-  m_H = other.m_H;
-  m_weight_ref.resize(m_H + 1);
-  m_bias_ref.resize(m_H + 1);
-  m_delta.resize(m_H + 1);
-  m_delta_bias.resize(m_H + 1);
-  m_actfun = other.m_actfun;
-  m_output_actfun = other.m_output_actfun;
-  m_bwdfun = other.m_bwdfun;
-  m_output_bwdfun = other.m_output_bwdfun;
-  m_target.reference(bob::core::array::ccopy(other.m_target));
-  m_error.resize(m_H + 1);
-  m_output.resize(m_H + 2);
+  if (this != &other)
+  {
+    m_train_bias = other.m_train_bias;
+    m_H = other.m_H;
+    m_weight_ref.resize(m_H + 1);
+    m_bias_ref.resize(m_H + 1);
+    m_delta.resize(m_H + 1);
+    m_delta_bias.resize(m_H + 1);
+    m_actfun = other.m_actfun;
+    m_output_actfun = other.m_output_actfun;
+    m_bwdfun = other.m_bwdfun;
+    m_output_bwdfun = other.m_output_bwdfun;
+    m_target.reference(bob::core::array::ccopy(other.m_target));
+    m_error.resize(m_H + 1);
+    m_output.resize(m_H + 2);
 
-  for (size_t k=0; k<(m_H + 1); ++k) {
-    m_delta[k].reference(bob::core::array::ccopy(other.m_delta[k]));
-    m_delta_bias[k].reference(bob::core::array::ccopy(other.m_delta_bias[k]));
-    m_error[k].reference(bob::core::array::ccopy(other.m_error[k]));
-    m_output[k].reference(bob::core::array::ccopy(other.m_output[k]));
+    for (size_t k=0; k<(m_H + 1); ++k) {
+      m_delta[k].reference(bob::core::array::ccopy(other.m_delta[k]));
+      m_delta_bias[k].reference(bob::core::array::ccopy(other.m_delta_bias[k]));
+      m_error[k].reference(bob::core::array::ccopy(other.m_error[k]));
+      m_output[k].reference(bob::core::array::ccopy(other.m_output[k]));
+    }
+    m_output[m_H + 1].reference(bob::core::array::ccopy(other.m_output[m_H + 1]));
   }
-  m_output[m_H + 1].reference(bob::core::array::ccopy(other.m_output[m_H + 1]));
-
   return *this;
 }
 
@@ -208,3 +211,41 @@ void bob::trainer::MLPBaseTrainer::backward_step() {
   }
 }
 
+void bob::trainer::MLPBaseTrainer::setTarget(const blitz::Array<double,2>& target) {
+  bob::core::array::assertSameShape(target, m_target);
+  m_target = target;
+}
+
+void bob::trainer::MLPBaseTrainer::setError(const std::vector<blitz::Array<double,2> >& error) {
+  bob::core::array::assertSameDimensionLength(error.size(), m_error.size());
+  for (size_t k=0; k<error.size(); ++k)
+  {
+    bob::core::array::assertSameShape(error[k], m_error[k]);
+    m_error[k] = error[k];
+  }
+}
+
+void bob::trainer::MLPBaseTrainer::setError(const blitz::Array<double,2>& error, const size_t id) {
+  if (id >= m_error.size())
+    throw bob::core::InvalidArgumentException("MLPBaseTrainer: Index in error array",
+      (int)id, 0, (int)(m_error.size()-1));
+  bob::core::array::assertSameShape(error, m_error[id]);
+  m_error[id] = error;
+}
+
+void bob::trainer::MLPBaseTrainer::setOutput(const std::vector<blitz::Array<double,2> >& output) {
+  bob::core::array::assertSameDimensionLength(output.size(), m_output.size());
+  for (size_t k=0; k<output.size(); ++k)
+  {
+    bob::core::array::assertSameShape(output[k], m_output[k]);
+    m_output[k] = output[k];
+  }
+}
+
+void bob::trainer::MLPBaseTrainer::setOutput(const blitz::Array<double,2>& output, const size_t id) {
+  if (id >= m_output.size())
+    throw bob::core::InvalidArgumentException("MLPBaseTrainer: Index in output array", 
+      (int)id, 0, (int)(m_output.size()-1));
+  bob::core::array::assertSameShape(output, m_output[id]);
+  m_output[id] = output;
+}

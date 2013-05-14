@@ -41,18 +41,18 @@ namespace bob { namespace trainer {
    */
 
   /**
-   * Sets an MLP to perform discrimination based on RProp: A Direct Adaptive
-   * Method for Faster Backpropagation Learning: The RPROP Algorithm, by Martin
-   * Riedmiller and Heinrich Braun on IEEE International Conference on Neural
-   * Networks, pp. 586--591, 1993.
+   * @brief Sets an MLP to perform discrimination based on RProp: A Direct 
+   * Adaptive Method for Faster Backpropagation Learning: The RPROP Algorithm,
+   * by Martin Riedmiller and Heinrich Braun on IEEE International Conference 
+   * on Neural Networks, pp. 586--591, 1993.
    */
   class MLPRPropTrainer: public MLPBaseTrainer {
 
     public: //api
 
       /**
-       * Initializes a new MLPRPropTrainer trainer according to a given machine
-       * settings and a training batch size. 
+       * @brief Initializes a new MLPRPropTrainer trainer according to a given
+       * machine settings and a training batch size. 
        *
        * Good values for batch sizes are tens of samples. RProp is a "batch"
        * training algorithm. Do not try to set batch_size to a too-low value.
@@ -60,34 +60,34 @@ namespace bob { namespace trainer {
       MLPRPropTrainer(const bob::machine::MLP& machine, size_t batch_size);
 
       /**
-       * Destructor virtualisation
+       * @brief Destructor virtualisation
        */
       virtual ~MLPRPropTrainer();
       
       /**
-       * Copy construction.
+       * @brief Copy construction.
        */
       MLPRPropTrainer(const MLPRPropTrainer& other);
 
       /**
-       * Copy operator
+       * @brief Copy operator
        */
       MLPRPropTrainer& operator=(const MLPRPropTrainer& other);
 
       /**
-       * Re-initializes the whole training apparatus to start training a new
-       * machine. This will effectively reset all Delta matrices to their
+       * @brief Re-initializes the whole training apparatus to start training
+       * a new machine. This will effectively reset all Delta matrices to their
        * intial values and set the previous derivatives to zero as described on
        * the section II.C of the RProp paper.
        */
       void reset();
 
       /**
-       * Trains the MLP to perform discrimination. The training is executed
-       * outside the machine context, but uses all the current machine layout.
-       * The given machine is updated with new weights and biases on the end of
-       * the training that is performed a single time. Iterate as much as you
-       * want to refine the training.
+       * @brief Trains the MLP to perform discrimination. The training is
+       * executed outside the machine context, but uses all the current machine
+       * layout. The given machine is updated with new weights and biases on
+       * the end of the training that is performed a single time. Iterate as 
+       * much as you want to refine the training.
        *
        * The machine given as input is checked for compatibility with the
        * current initialized settings. If the two are not compatible, an
@@ -110,7 +110,7 @@ namespace bob { namespace trainer {
           const blitz::Array<double,2>& target);
 
       /**
-       * This is a version of the train() method above, which does no
+       * @brief This is a version of the train() method above, which does no
        * compatibility check on the input machine.
        */
       void train_(bob::machine::MLP& machine, 

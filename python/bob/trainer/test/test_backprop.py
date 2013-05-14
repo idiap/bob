@@ -145,6 +145,30 @@ class PythonBackProp:
     else:
       machine.biases = 0
 
+
+
+class MyBackPropTrainer(bob.trainer.MLPBaseTrainer):
+  """Simple example of python trainer: """
+  def __init__(self, machine, batch_size, train_biases=True, learning_rate=0.1, momentum=0.0):
+    bob.trainer.MLPBaseTrainer.__init__(self, machine, batch_size)
+    # Our state
+    self.learning_rate = learning_rate
+    self.momentum = momentum
+    self.DW = None #delta matrixes for weights
+    self.DB = None #delta matrixes for biases
+    self.PDW = None #previous delta matrices for weights
+    self.PDB = None #previous delta matrices for biases
+    self.train_biases = train_biases
+
+  def reset(self):
+    """Resets our internal state"""
+
+    self.DW = None
+    self.DB = None
+    self.PDW = None
+    self.PDB = None
+
+
 class BackPropTest(unittest.TestCase):
   """Performs various BackProp MLP training tests."""
 
@@ -328,3 +352,17 @@ class BackPropTest(unittest.TestCase):
         self.assertTrue( (abs(w-machine.weights[i]) < 1e-10).all() )
       for i, b in enumerate(pymachine.biases):
         self.assertTrue( (abs(b-machine.biases[i]) < 1e-10).all() )
+
+  def test06_MyTrainer(self):
+
+    # Check that MLPBaseTrainer class
+
+    n_output = 2 
+    machine = bob.machine.MLP((12, 7, 5, n_output))
+    n_hidden_layers = len(machine.shape) - 2 
+    batch_size = 70
+    t = MyBackPropTrainer(machine, batch_size)
+    self.assertTrue( t.target.shape == (batch_size, n_output) )
+    self.assertTrue( len(t.error)   == n_hidden_layers+1 )
+    self.assertTrue( len(t.output)  == n_hidden_layers+2 )
+
