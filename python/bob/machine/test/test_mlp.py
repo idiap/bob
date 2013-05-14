@@ -164,6 +164,9 @@ class MLPTest(unittest.TestCase):
     # creates a file that will be used in the next test!
     m.save(bob.io.HDF5File(MACHINE, 'w'))
     m2 = bob.machine.MLP(bob.io.HDF5File(MACHINE))
+    self.assertTrue( m == m2 )
+    self.assertTrue( m.is_similar_to(m2) )
+    self.assertFalse( m != m2 )
     
     self.assertEqual(m.shape, m2.shape)
     self.assertTrue((m.input_subtract == m2.input_subtract).all())
@@ -193,8 +196,6 @@ class MLPTest(unittest.TestCase):
     mlp.biases = [numpy.array([-.7])]
 
     self.assertTrue( (mlinear(i) == mlp(i)).all() )
-    self.assertTrue( (numpy.fabs(mlp(i) - (1. / (1. + numpy.exp(- mlp.z[-1])))) < 1e-8).all() )
-    self.assertTrue( ((i - mlp.a[0]) < 1e-8).all() )
     os.unlink(MACHINE)
 
   def test05_ComplicatedCorrectness(self):
@@ -212,7 +213,6 @@ class MLPTest(unittest.TestCase):
     data = bob.io.HDF5File(COMPLICATED_NOBIAS_OUTPUT)
     for pattern, expected in zip(data.lread("pattern"), data.lread("result")):
       self.assertTrue(abs(m(pattern)[0] - expected) < 1e-8)
-    self.assertTrue( ((m(pattern) -numpy.tanh(m.z[-1])) < 1e-8).all() )
 
   def test05a_ComplicatedCorrectness(self):
 

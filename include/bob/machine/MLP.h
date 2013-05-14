@@ -121,6 +121,23 @@ namespace bob { namespace machine {
       MLP& operator= (const MLP& other);
 
       /**
+       * @brief Equal to
+       */
+      bool operator== (const MLP& other) const;
+
+      /**
+       * @brief Not equal to
+       */
+      bool operator!= (const MLP& other) const;
+
+      /**
+       * @brief Similar to
+       */
+      bool is_similar_to(const MLP& other, const double r_epsilon=1e-5,
+        const double a_epsilon=1e-8) const;
+
+
+      /**
        * Loads data from an existing configuration object. Resets the current
        * state.
        */
@@ -351,28 +368,6 @@ namespace bob { namespace machine {
        */
       void randomize(double lower_bound=-0.1, double upper_bound=+0.1);
 
-      /**
-       * Returns the outputs of each layer (hidden ones and output one) before
-       * applying the activation function.
-       */
-      inline const std::vector<blitz::Array<double, 1> >& getZ() const 
-      { return m_z; }
-
-      /**
-       * Returns the outputs of each layer ([normalized] input one hidden ones)
-       * after applying the activation function (for the hidden ones).
-       */
-      inline const std::vector<blitz::Array<double, 1> >& getA() const 
-      { return m_a; }
-
-      /**
-       * Returns the outputs of each layer when performing backward
-       * propagation.
-       */
-      inline const std::vector<blitz::Array<double, 1> >& getB() const 
-      { return m_b; }
-
-
     private: //representation
 
       blitz::Array<double, 1> m_input_sub; ///< input subtraction
@@ -384,9 +379,7 @@ namespace bob { namespace machine {
       Activation m_output_activation; ///< currently set activation type for the output layer
       actfun_t m_output_actfun; ///< currently set activation function for the output layer
 
-      std::vector<blitz::Array<double, 1> > m_z; ///< output of each layer (before activation)
-      std::vector<blitz::Array<double, 1> > m_a; ///< output of each layer (after activation)
-      std::vector<blitz::Array<double, 1> > m_b; ///< output of each layer (for backward propagation)
+      mutable std::vector<blitz::Array<double, 1> > m_buffer; ///< buffer for the outputs of each layer
   
   };
 
