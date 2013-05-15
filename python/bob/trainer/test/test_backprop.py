@@ -147,10 +147,10 @@ class PythonBackProp:
 
 
 
-class MyBackPropTrainer(bob.trainer.MLPBaseTrainer):
+class MyBackPropTrainer(bob.trainer.overload.MLPBaseTrainer):
   """Simple example of python trainer that inherits from the MLPBaseTrainer: """
   def __init__(self, machine, batch_size, train_biases=True, learning_rate=0.1, momentum=0.0):
-    bob.trainer.MLPBaseTrainer.__init__(self, machine, batch_size)
+    bob.trainer.overload.MLPBaseTrainer.__init__(self, machine, batch_size)
     # Our state
     self.learning_rate = learning_rate
     self.momentum = momentum
@@ -167,6 +167,10 @@ class MyBackPropTrainer(bob.trainer.MLPBaseTrainer):
     self.DB = None
     self.PDW = None
     self.PDB = None
+
+  def initialize(self, machine):
+    bob.trainer.overload.MLPBaseTrainer.initialize(self, machine)
+    self.reset()
 
   def train(self, machine, input, target):
 
@@ -429,6 +433,18 @@ class BackPropTest(unittest.TestCase):
     pytrainer = MyBackPropTrainer(machine, 1, train_biases=trainer.train_biases)
     pymachine = bob.machine.MLP(machine) #a copy
     pytrainer.reset()
+    pytrainer.train(pymachine, d0, t0)
+
+    # trains with our C++ implementation
+    trainer.train_(machine, d0, t0)
+    self.assertTrue( numpy.array_equal(pymachine.weights[0], machine.weights[0]) )
+
+    # Do the same but additionally using the initialize() method
+    machine2 = bob.machine.MLP((4, 5, 3))
+    # trains in python first
+    pytrainer = MyBackPropTrainer(machine2, 1, train_biases=trainer.train_biases)
+    pymachine = bob.machine.MLP(machine) #a copy
+    pytrainer.initialize(pymachine) # try to reinitialize
     pytrainer.train(pymachine, d0, t0)
 
     # trains with our C++ implementation

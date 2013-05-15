@@ -33,6 +33,7 @@ endif()
 set(ccsrc_overload
    "src/kmeans_wrappers.cc"
    "src/gmm_wrappers.cc"
+   "src/mlp_wrappers.cc"
    "src/main_overload.cc"
    )
 

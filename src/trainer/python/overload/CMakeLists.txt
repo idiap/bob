@@ -8,6 +8,7 @@ set(incdir ${py_incdir})
 set(src
    "kmeans_wrappers.cc"
    "gmm_wrappers.cc"
+   "mlp_wrappers.cc"
    "main.cc"
    )
 

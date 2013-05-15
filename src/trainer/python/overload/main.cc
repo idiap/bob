@@ -20,10 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/core/python/ndarray.h"
+#include <bob/core/python/ndarray.h>
 
 void bind_trainer_kmeans_wrappers();
 void bind_trainer_gmm_wrappers();
+void bind_trainer_mlp_wrappers();
 
 BOOST_PYTHON_MODULE(_trainer_overload) {
 
@@ -31,4 +32,5 @@ BOOST_PYTHON_MODULE(_trainer_overload) {
   
   bind_trainer_kmeans_wrappers();
   bind_trainer_gmm_wrappers();
+  bind_trainer_mlp_wrappers();
 }

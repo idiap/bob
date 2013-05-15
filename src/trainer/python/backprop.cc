@@ -86,8 +86,7 @@ static void mlpbase_backward_step(bob::trainer::MLPBaseTrainer& t,
 
 
 void bind_trainer_backprop() {
-  class_<bob::trainer::MLPBaseTrainer, boost::shared_ptr<bob::trainer::MLPBaseTrainer>, boost::noncopyable>("MLPBaseTrainer", "The base python class for MLP trainers.", init<const bob::machine::MLP&, size_t>((arg("machine"), arg("batch_size"))))
-    .def(init<size_t>((arg("batch_size")), "Creates a base trainer"))
+  class_<bob::trainer::MLPBaseTrainer, boost::shared_ptr<bob::trainer::MLPBaseTrainer>, boost::noncopyable>("MLPBaseTrainer", "The base python class for MLP trainers.", no_init)
     .add_property("batch_size", &bob::trainer::MLPBaseTrainer::getBatchSize, &bob::trainer::MLPBaseTrainer::setBatchSize)
     .add_property("train_biases", &bob::trainer::MLPBaseTrainer::getTrainBiases, &bob::trainer::MLPBaseTrainer::setTrainBiases)
     .def("is_compatible", &bob::trainer::MLPBaseTrainer::isCompatible, (arg("self"), arg("machine")), "Checks if a given machine is compatible with my inner settings")
