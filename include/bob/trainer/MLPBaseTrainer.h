@@ -88,7 +88,7 @@ namespace bob { namespace trainer {
       /**
        * @brief Gets the batch size
        */
-      size_t getBatchSize() const { return m_target.extent(0); }
+      size_t getBatchSize() const { return m_batch_size; }
 
       /**
        * @brief Sets the batch size
@@ -123,7 +123,7 @@ namespace bob { namespace trainer {
        * automatically apply the standard normalization before giving me the
        * data.
        */
-      void forward_step();
+      void forward_step(const blitz::Array<double,2>& input);
 
       /**
        * @brief Backward step -- back-propagates the calculated error up to each
@@ -131,23 +131,17 @@ namespace bob { namespace trainer {
        * and 5.56, at page 244 (see also figure 5.7 for a graphical
        * representation).
        */
-      void backward_step();
+      void backward_step(const blitz::Array<double,2>& target);
 
       /**
        * @brief Initialize the training procedure by:
-       *   1. setting m_output[0] of the trainer equal to input
-       *   2. setting m_target of the trainer equal to target
-       *   3. initializing the references to the weights and the biases of 
+       *   1. initializing the references to the weights and the biases of 
        *      the machine
        */
       void init_train(const bob::machine::MLP& machine,
         const blitz::Array<double,2>& input,
         const blitz::Array<double,2>& target);
 
-      /**
-       * @brief Returns the target
-       */
-      const blitz::Array<double,2>& getTarget() const { return m_target; }
       /**
        * @brief Returns the errors
        */
@@ -156,10 +150,6 @@ namespace bob { namespace trainer {
        * @brief Returns the outputs
        */
       const std::vector<blitz::Array<double,2> >& getOutput() const { return m_output; }
-      /**
-       * @brief Sets the target
-       */
-      void setTarget(const blitz::Array<double,2>& target);
       /**
        * @brief Sets the error
        */
@@ -182,6 +172,7 @@ namespace bob { namespace trainer {
     protected: //representation
 
       /// training parameters:
+      size_t m_batch_size; ///< the batch size
       bool m_train_bias; ///< shall we be training biases? (default: true)
       size_t m_H; ///< number of hidden layers on the target machine
 
@@ -197,7 +188,6 @@ namespace bob { namespace trainer {
       bob::machine::MLP::actfun_t m_output_bwdfun; ///< output (back) activation function
   
       /// buffers that are dependent on the batch_size
-      blitz::Array<double,2> m_target; ///< target vectors
       std::vector<blitz::Array<double,2> > m_error; ///< error (+deltas)
       std::vector<blitz::Array<double,2> > m_output; ///< layer output
   };

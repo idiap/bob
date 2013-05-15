@@ -166,7 +166,7 @@ namespace bob { namespace trainer {
        * Weight update -- calculates the weight-update using derivatives as
        * required by back-prop.
        */
-      void backprop_weight_update();
+      void backprop_weight_update(const blitz::Array<double,2>& input);
 
     private: //representation
 

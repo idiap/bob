@@ -187,15 +187,16 @@ class MyBackPropTrainer(bob.trainer.MLPBaseTrainer):
       for k in self.PDB: k.fill(0)
 
     # Call forward and backward from the C++ MLPBaseTrainer class
-    self.forward_step()
-    self.backward_step()
+    self.forward_step(input)
+    self.backward_step(target)
 
     E = self.error
     O = self.output
 
     # Calculates partial derivatives, accumulate
     batch_size = E[-1].shape[0]
-    self.DW = [numpy.dot(O[k].transpose(1,0), E[k]) for k in range(len(W))]
+    self.DW = [numpy.dot(input.transpose(1,0), E[0])]
+    self.DW.extend([numpy.dot(O[k].transpose(1,0), E[k+1]) for k in range(len(W)-1)])
     for k in self.DW: k *= (self.learning_rate / batch_size)
     self.DB = [numpy.dot(BI[k], E[k]) for k in range(len(W))]
     for k in self.DB: k *= (self.learning_rate / batch_size)
@@ -404,9 +405,8 @@ class BackPropTest(unittest.TestCase):
     n_hidden_layers = len(machine.shape) - 2 
     batch_size = 70
     t = MyBackPropTrainer(machine, batch_size)
-    self.assertTrue( t.target.shape == (batch_size, n_output) )
     self.assertTrue( len(t.error)   == n_hidden_layers+1 )
-    self.assertTrue( len(t.output)  == n_hidden_layers+2 )
+    self.assertTrue( len(t.output)  == n_hidden_layers+1 )
 
   def test07_MyTrainer_TwoLayersNoBiasControlled(self):
 

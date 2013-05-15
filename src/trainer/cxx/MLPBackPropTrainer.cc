@@ -89,10 +89,11 @@ void bob::trainer::MLPBackPropTrainer::reset() {
   }
 }
 
-void bob::trainer::MLPBackPropTrainer::backprop_weight_update() {
-  size_t batch_size = m_target.extent(0);
+void bob::trainer::MLPBackPropTrainer::backprop_weight_update(const blitz::Array<double,2>& input) {
+  size_t batch_size = getBatchSize();
   for (size_t k=0; k<m_weight_ref.size(); ++k) { //for all layers
-    bob::math::prod_(m_output[k].transpose(1,0), m_error[k], m_delta[k]);
+    if (k == 0) bob::math::prod_(input.transpose(1,0), m_error[k], m_delta[k]);
+    else bob::math::prod_(m_output[k-1].transpose(1,0), m_error[k], m_delta[k]);
     m_delta[k] *= m_learning_rate / batch_size;
     m_weight_ref[k] += ((1-m_momentum)*m_delta[k]) + 
       (m_momentum*m_prev_delta[k]);
@@ -131,7 +132,7 @@ void bob::trainer::MLPBackPropTrainer::train_(bob::machine::MLP& machine,
   init_train(machine, input, target);
 
   // To be called in this sequence for a general backprop algorithm
-  forward_step();
-  backward_step();
-  backprop_weight_update();
+  forward_step(input);
+  backward_step(target);
+  backprop_weight_update(input);
 }
