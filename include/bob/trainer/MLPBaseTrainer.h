@@ -43,6 +43,12 @@ namespace bob { namespace trainer {
 
       /**
        * @brief Initializes a new MLPBaseTrainer trainer according to a given
+       * training batch size.
+       */
+      MLPBaseTrainer(size_t batch_size);
+
+      /**
+       * @brief Initializes a new MLPBaseTrainer trainer according to a given
        * machine settings and a training batch size.
        *
        * Good values for batch sizes are tens of samples. This may affect the 
@@ -136,13 +142,9 @@ namespace bob { namespace trainer {
         const blitz::Array<double,2>& target);
 
       /**
-       * @brief Initialize the training procedure by:
-       *   1. initializing the references to the weights and the biases of 
-       *      the machine
+       * @brief Initialize the internal buffers for the current machine
        */
-      void init_train(const bob::machine::MLP& machine,
-        const blitz::Array<double,2>& input,
-        const blitz::Array<double,2>& target);
+      virtual void initialize(const bob::machine::MLP& machine);
 
       /**
        * @brief Returns the errors
@@ -172,6 +174,17 @@ namespace bob { namespace trainer {
 
     protected: //representation
 
+      /**
+       * @brief Returns the derivative of a given activation function
+       */
+      static bob::machine::MLP::actfun_t 
+      getDerivative(bob::machine::Activation f);
+
+      /**
+       * @brief Resets the buffer to 0 value
+       */
+      void reset();
+
       /// training parameters:
       size_t m_batch_size; ///< the batch size
       bool m_train_bias; ///< shall we be training biases? (default: true)
@@ -180,11 +193,6 @@ namespace bob { namespace trainer {
       std::vector<blitz::Array<double,2> > m_delta; ///< weight deltas
       std::vector<blitz::Array<double,1> > m_delta_bias; ///< bias deltas
 
-      bob::machine::MLP::actfun_t m_actfun; ///< activation function
-      bob::machine::MLP::actfun_t m_output_actfun; ///< output activation function
-      bob::machine::MLP::actfun_t m_bwdfun; ///< (back) activation function
-      bob::machine::MLP::actfun_t m_output_bwdfun; ///< output (back) activation function
-  
       /// buffers that are dependent on the batch_size
       std::vector<blitz::Array<double,2> > m_error; ///< error (+deltas)
       std::vector<blitz::Array<double,2> > m_output; ///< layer output

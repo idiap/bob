@@ -72,13 +72,6 @@ static void mlpbase_set_output2(bob::trainer::MLPBaseTrainer& t,
   t.setOutput(v.bz<double,2>(), k);
 }
 
-static void mlpbase_init_train(bob::trainer::MLPBaseTrainer& t,
-  const bob::machine::MLP& m, bob::python::const_ndarray input,
-  bob::python::const_ndarray target)
-{
-  t.init_train(m, input.bz<double,2>(), target.bz<double,2>());
-}
-
 static void mlpbase_forward_step(bob::trainer::MLPBaseTrainer& t, 
   const bob::machine::MLP& m, bob::python::const_ndarray input)
 {
@@ -94,10 +87,11 @@ static void mlpbase_backward_step(bob::trainer::MLPBaseTrainer& t,
 
 void bind_trainer_backprop() {
   class_<bob::trainer::MLPBaseTrainer, boost::shared_ptr<bob::trainer::MLPBaseTrainer>, boost::noncopyable>("MLPBaseTrainer", "The base python class for MLP trainers.", init<const bob::machine::MLP&, size_t>((arg("machine"), arg("batch_size"))))
+    .def(init<size_t>((arg("batch_size")), "Creates a base trainer"))
     .add_property("batch_size", &bob::trainer::MLPBaseTrainer::getBatchSize, &bob::trainer::MLPBaseTrainer::setBatchSize)
     .add_property("train_biases", &bob::trainer::MLPBaseTrainer::getTrainBiases, &bob::trainer::MLPBaseTrainer::setTrainBiases)
     .def("is_compatible", &bob::trainer::MLPBaseTrainer::isCompatible, (arg("self"), arg("machine")), "Checks if a given machine is compatible with my inner settings")
-    .def("init_train", &mlpbase_init_train, (arg("self"), arg("mlp"), arg("input"), arg("target")), "Initialize the training process.")
+    .def("initialize", &bob::trainer::MLPBaseTrainer::initialize, (arg("self"), arg("mlp")), "Initialize the training process.")
     .def("forward_step", &mlpbase_forward_step, (arg("self"), arg("mlp"), arg("input")), "Forward step -- Forwards a batch of data through the MLP and updates the internal buffers.")
     .def("backward_step", &mlpbase_backward_step, (arg("self"), arg("mlp"), arg("target")), "Backward step -- Backwards a batch of data through the MLP and updates the internal buffers.")
     .add_property("error", &mlpbase_get_error, &mlpbase_set_error)
@@ -107,6 +101,7 @@ void bind_trainer_backprop() {
   ;
 
   class_<bob::trainer::MLPBackPropTrainer, boost::shared_ptr<bob::trainer::MLPBackPropTrainer>, bases<bob::trainer::MLPBaseTrainer> >("MLPBackPropTrainer", "Sets an MLP to perform discrimination based on vanilla error back-propagation as defined in 'Pattern Recognition and Machine Learning' by C.M. Bishop, chapter 5 or else, 'Pattern Classification' by Duda, Hart and Stork, chapter 6.", init<const bob::machine::MLP&, size_t>((arg("machine"), arg("batch_size")), "Initializes a new MLPBackPropTrainer trainer according to a given machine settings and a training batch size.\n\nGood values for batch sizes are tens of samples. BackProp is not necessarily a 'batch' training algorithm, but performs in a smoother if the batch size is larger. This may also affect the convergence.\n\n You can also change default values for the learning rate and momentum. By default we train w/o any momenta.\n\nIf you want to adjust a potential learning rate decay, you can and should do it outside the scope of this trainer, in your own way."))
+    .def(init<size_t>((arg("batch_size")), "Creates a MLPBackPropTrainer."))
     .def("reset", &bob::trainer::MLPBackPropTrainer::reset, (arg("self")), "Re-initializes the whole training apparatus to start training a new machine. This will effectively reset all Delta matrices to their initial values and set the previous derivatives to zero.")
     .add_property("learning_rate", &bob::trainer::MLPBackPropTrainer::getLearningRate, &bob::trainer::MLPBackPropTrainer::setLearningRate)
     .add_property("momentum", &bob::trainer::MLPBackPropTrainer::getMomentum, &bob::trainer::MLPBackPropTrainer::setMomentum)

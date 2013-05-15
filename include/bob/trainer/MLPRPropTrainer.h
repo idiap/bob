@@ -52,6 +52,13 @@ namespace bob { namespace trainer {
 
       /**
        * @brief Initializes a new MLPRPropTrainer trainer according to a given
+       * training batch size. 
+       */
+      MLPRPropTrainer(size_t batch_size);
+
+
+      /**
+       * @brief Initializes a new MLPRPropTrainer trainer according to a given
        * machine settings and a training batch size. 
        *
        * Good values for batch sizes are tens of samples. RProp is a "batch"
@@ -81,6 +88,8 @@ namespace bob { namespace trainer {
        * the section II.C of the RProp paper.
        */
       void reset();
+
+      virtual void initialize(const bob::machine::MLP& machine);
 
       /**
        * @brief Trains the MLP to perform discrimination. The training is

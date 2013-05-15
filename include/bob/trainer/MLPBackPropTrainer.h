@@ -50,6 +50,12 @@ namespace bob { namespace trainer {
 
       /**
        * @brief Initializes a new MLPBackPropTrainer trainer according to a
+       * given training batch size.
+       */
+      MLPBackPropTrainer(size_t batch_size);
+
+      /**
+       * @brief Initializes a new MLPBackPropTrainer trainer according to a
        * given machine settings and a training batch size.
        *
        * Good values for batch sizes are tens of samples. BackProp is not
@@ -125,6 +131,8 @@ namespace bob { namespace trainer {
        * @brief Sets the current momentum
        */
       void setMomentum(double v) { m_momentum = v; }
+
+      virtual void initialize(const bob::machine::MLP& machine);
 
       /**
        * @brief Trains the MLP to perform discrimination. The training is

@@ -264,8 +264,9 @@ class RPropTest(unittest.TestCase):
     machine.output_activation = bob.machine.Activation.LINEAR
     machine.randomize()
     machine.biases = 0
-    trainer = bob.trainer.MLPRPropTrainer(machine, N)
+    trainer = bob.trainer.MLPRPropTrainer(N)
     trainer.train_biases = False
+    trainer.initialize(machine)
 
     # A helper to select and shuffle the data
     targets = [ #we choose the approximate Fisher response!

@@ -28,6 +28,21 @@
 #include <bob/trainer/Exception.h>
 #include <bob/trainer/MLPBackPropTrainer.h>
 
+bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(size_t batch_size):
+  bob::trainer::MLPBaseTrainer(batch_size),
+  m_learning_rate(0.1),
+  m_momentum(0.0),
+  m_prev_delta(m_H + 1),
+  m_prev_delta_bias(m_H + 1)
+{
+  for (size_t k=0; k<(m_H + 1); ++k) {
+    m_prev_delta[k].reference(blitz::Array<double,2>(0,0));
+    m_prev_delta_bias[k].reference(blitz::Array<double,1>(0));
+  }
+
+  reset();
+}
+
 bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(const bob::machine::MLP& machine,
     size_t batch_size):
   bob::trainer::MLPBaseTrainer(machine, batch_size),
@@ -54,14 +69,10 @@ bob::trainer::MLPBackPropTrainer::~MLPBackPropTrainer() { }
 bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(const MLPBackPropTrainer& other):
   bob::trainer::MLPBaseTrainer(other),
   m_learning_rate(other.m_learning_rate),
-  m_momentum(other.m_momentum),
-  m_prev_delta(m_H + 1),
-  m_prev_delta_bias(m_H + 1)
+  m_momentum(other.m_momentum)
 {
-  for (size_t k=0; k<(m_H + 1); ++k) {
-    m_prev_delta[k].reference(bob::core::array::ccopy(other.m_prev_delta[k]));
-    m_prev_delta_bias[k].reference(bob::core::array::ccopy(other.m_prev_delta_bias[k]));
-  }
+  bob::core::array::ccopy(other.m_prev_delta, m_prev_delta);
+  bob::core::array::ccopy(other.m_prev_delta_bias, m_prev_delta_bias);
 }
 
 bob::trainer::MLPBackPropTrainer& bob::trainer::MLPBackPropTrainer::operator=
@@ -71,13 +82,9 @@ bob::trainer::MLPBackPropTrainer& bob::trainer::MLPBackPropTrainer::operator=
     bob::trainer::MLPBaseTrainer::operator=(other);
     m_learning_rate = other.m_learning_rate;
     m_momentum = other.m_momentum;
-    m_prev_delta.resize(m_H + 1);
-    m_prev_delta_bias.resize(m_H + 1);
 
-    for (size_t k=0; k<(m_H + 1); ++k) {
-      m_prev_delta[k].reference(bob::core::array::ccopy(other.m_prev_delta[k]));
-      m_prev_delta_bias[k].reference(bob::core::array::ccopy(other.m_prev_delta_bias[k]));
-    }
+    bob::core::array::ccopy(other.m_prev_delta, m_prev_delta);
+    bob::core::array::ccopy(other.m_prev_delta_bias, m_prev_delta_bias);
   }
   return *this;
 }
@@ -120,6 +127,25 @@ void bob::trainer::MLPBackPropTrainer::backprop_weight_update(bob::machine::MLP&
   }
 }
 
+void bob::trainer::MLPBackPropTrainer::initialize(const bob::machine::MLP& machine)
+{
+  bob::trainer::MLPBaseTrainer::initialize(machine);
+
+  const std::vector<blitz::Array<double,2> >& machine_weight =
+    machine.getWeights();
+  const std::vector<blitz::Array<double,1> >& machine_bias =
+    machine.getBiases();
+
+  m_prev_delta.resize(m_H + 1);
+  m_prev_delta_bias.resize(m_H + 1);
+  for (size_t k=0; k<(m_H + 1); ++k) {
+    m_prev_delta[k].reference(blitz::Array<double,2>(machine_weight[k].shape()));
+    m_prev_delta_bias[k].reference(blitz::Array<double,1>(machine_bias[k].shape()));
+  }
+
+  reset();
+}
+
 void bob::trainer::MLPBackPropTrainer::train(bob::machine::MLP& machine,
     const blitz::Array<double,2>& input,
     const blitz::Array<double,2>& target) {
@@ -132,10 +158,6 @@ void bob::trainer::MLPBackPropTrainer::train(bob::machine::MLP& machine,
 void bob::trainer::MLPBackPropTrainer::train_(bob::machine::MLP& machine,
     const blitz::Array<double,2>& input,
     const blitz::Array<double,2>& target) {
-
-  // Initialize the training
-  init_train(machine, input, target);
-
   // To be called in this sequence for a general backprop algorithm
   forward_step(machine, input);
   backward_step(machine, target);

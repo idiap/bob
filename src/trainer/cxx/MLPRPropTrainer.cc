@@ -29,6 +29,24 @@
 #include <bob/trainer/Exception.h>
 #include <bob/trainer/MLPRPropTrainer.h>
 
+bob::trainer::MLPRPropTrainer::MLPRPropTrainer(size_t batch_size):
+  bob::trainer::MLPBaseTrainer(batch_size),
+  m_deriv(m_H + 1),
+  m_deriv_bias(m_H + 1),
+  m_prev_deriv(m_H + 1),
+  m_prev_deriv_bias(m_H + 1)
+{
+  for (size_t k=0; k<(m_H + 1); ++k) {
+    m_deriv[k].reference(blitz::Array<double,2>(0,0));
+    m_deriv_bias[k].reference(blitz::Array<double,1>(0));
+    m_prev_deriv[k].reference(blitz::Array<double,2>(0,0));
+    m_prev_deriv_bias[k].reference(blitz::Array<double,1>(0));
+  }
+
+  reset();
+}
+
+
 bob::trainer::MLPRPropTrainer::MLPRPropTrainer(const bob::machine::MLP& machine,
     size_t batch_size):
   bob::trainer::MLPBaseTrainer(machine, batch_size),
@@ -61,12 +79,10 @@ bob::trainer::MLPRPropTrainer::MLPRPropTrainer(const MLPRPropTrainer& other):
   m_prev_deriv(m_H + 1),
   m_prev_deriv_bias(m_H + 1)
 {
-  for (size_t k=0; k<(m_H + 1); ++k) {
-    m_deriv[k].reference(bob::core::array::ccopy(other.m_deriv[k]));
-    m_deriv_bias[k].reference(bob::core::array::ccopy(other.m_deriv_bias[k]));
-    m_prev_deriv[k].reference(bob::core::array::ccopy(other.m_prev_deriv[k]));
-    m_prev_deriv_bias[k].reference(bob::core::array::ccopy(other.m_prev_deriv_bias[k]));
-  }
+  bob::core::array::ccopy(other.m_deriv, m_deriv);
+  bob::core::array::ccopy(other.m_deriv_bias, m_deriv_bias);
+  bob::core::array::ccopy(other.m_prev_deriv, m_prev_deriv);
+  bob::core::array::ccopy(other.m_prev_deriv_bias, m_prev_deriv_bias);
 }
 
 bob::trainer::MLPRPropTrainer& bob::trainer::MLPRPropTrainer::operator=
@@ -74,17 +90,11 @@ bob::trainer::MLPRPropTrainer& bob::trainer::MLPRPropTrainer::operator=
   if (this != &other)
   {
     bob::trainer::MLPBaseTrainer::operator=(other);
-    m_deriv.resize(m_H + 1);
-    m_deriv_bias.resize(m_H + 1);
-    m_prev_deriv.resize(m_H + 1);
-    m_prev_deriv_bias.resize(m_H + 1);
 
-    for (size_t k=0; k<(m_H + 1); ++k) {
-      m_deriv[k].reference(bob::core::array::ccopy(other.m_deriv[k]));
-      m_deriv_bias[k].reference(bob::core::array::ccopy(other.m_deriv_bias[k]));
-      m_prev_deriv[k].reference(bob::core::array::ccopy(other.m_prev_deriv[k]));
-      m_prev_deriv_bias[k].reference(bob::core::array::ccopy(other.m_prev_deriv_bias[k]));
-    }
+    bob::core::array::ccopy(other.m_deriv, m_deriv);
+    bob::core::array::ccopy(other.m_deriv_bias, m_deriv_bias);
+    bob::core::array::ccopy(other.m_prev_deriv, m_prev_deriv);
+    bob::core::array::ccopy(other.m_prev_deriv_bias, m_prev_deriv_bias);
   }
   return *this;
 }
@@ -184,6 +194,25 @@ void bob::trainer::MLPRPropTrainer::rprop_weight_update(bob::machine::MLP& machi
   }
 }
 
+void bob::trainer::MLPRPropTrainer::initialize(const bob::machine::MLP& machine)
+{
+  bob::trainer::MLPBaseTrainer::initialize(machine);
+
+  const std::vector<blitz::Array<double,2> >& machine_weight =
+    machine.getWeights();
+  const std::vector<blitz::Array<double,1> >& machine_bias =
+    machine.getBiases();
+
+  for (size_t k=0; k<(m_H + 1); ++k) {
+    m_deriv[k].reference(blitz::Array<double,2>(machine_weight[k].shape()));
+    m_deriv_bias[k].reference(blitz::Array<double,1>(machine_bias[k].shape()));
+    m_prev_deriv[k].reference(blitz::Array<double,2>(machine_weight[k].shape()));
+    m_prev_deriv_bias[k].reference(blitz::Array<double,1>(machine_bias[k].shape()));
+  }
+
+  reset();
+}
+
 void bob::trainer::MLPRPropTrainer::train(bob::machine::MLP& machine,
     const blitz::Array<double,2>& input,
     const blitz::Array<double,2>& target) {
@@ -197,9 +226,6 @@ void bob::trainer::MLPRPropTrainer::train_(bob::machine::MLP& machine,
     const blitz::Array<double,2>& input,
     const blitz::Array<double,2>& target) {
 
-  // Initialize the training
-  init_train(machine, input, target);
- 
   // To be called in this sequence for a general backprop algorithm
   forward_step(machine, input);
   backward_step(machine, target);

@@ -170,8 +170,6 @@ class MyBackPropTrainer(bob.trainer.MLPBaseTrainer):
 
   def train(self, machine, input, target):
 
-    self.init_train(machine, input, target)
-    
     W = machine.weights #weights
     B = machine.biases #biases
 
@@ -246,8 +244,9 @@ class BackPropTest(unittest.TestCase):
     w0 = numpy.array([[.23, .1],[-0.79, 0.21]])
     w1 = numpy.array([[-.12], [-0.88]])
     machine.weights = [w0, w1]
-    trainer = bob.trainer.MLPBackPropTrainer(machine, 1)
+    trainer = bob.trainer.MLPBackPropTrainer(1)
     trainer.train_biases = False
+    trainer.initialize(machine)
     d0 = numpy.array([[.3, .7]])
     t0 = numpy.array([[.0]])
 
@@ -316,8 +315,9 @@ class BackPropTest(unittest.TestCase):
     machine.activation = bob.machine.Activation.TANH
     machine.output_activation = bob.machine.Activation.TANH
     machine.randomize()
-    trainer = bob.trainer.MLPBackPropTrainer(machine, N)
+    trainer = bob.trainer.MLPBackPropTrainer(N)
     trainer.train_biases = True
+    trainer.initialize(machine)
 
     # A helper to select and shuffle the data
     targets = [ #we choose the approximate Fisher response!
@@ -428,6 +428,7 @@ class BackPropTest(unittest.TestCase):
     # trains in python first
     pytrainer = MyBackPropTrainer(machine, 1, train_biases=trainer.train_biases)
     pymachine = bob.machine.MLP(machine) #a copy
+    pytrainer.reset()
     pytrainer.train(pymachine, d0, t0)
 
     # trains with our C++ implementation
