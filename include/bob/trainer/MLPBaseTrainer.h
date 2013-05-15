@@ -123,7 +123,8 @@ namespace bob { namespace trainer {
        * automatically apply the standard normalization before giving me the
        * data.
        */
-      void forward_step(const blitz::Array<double,2>& input);
+      void forward_step(const bob::machine::MLP& machine,
+        const blitz::Array<double,2>& input);
 
       /**
        * @brief Backward step -- back-propagates the calculated error up to each
@@ -131,7 +132,8 @@ namespace bob { namespace trainer {
        * and 5.56, at page 244 (see also figure 5.7 for a graphical
        * representation).
        */
-      void backward_step(const blitz::Array<double,2>& target);
+      void backward_step(const bob::machine::MLP& machine,
+        const blitz::Array<double,2>& target);
 
       /**
        * @brief Initialize the training procedure by:
@@ -168,7 +170,6 @@ namespace bob { namespace trainer {
       void setOutput(const blitz::Array<double,2>& output, const size_t index);
 
 
-
     protected: //representation
 
       /// training parameters:
@@ -176,9 +177,6 @@ namespace bob { namespace trainer {
       bool m_train_bias; ///< shall we be training biases? (default: true)
       size_t m_H; ///< number of hidden layers on the target machine
 
-      std::vector<blitz::Array<double,2> > m_weight_ref; ///< machine weights
-      std::vector<blitz::Array<double,1> > m_bias_ref; ///< machine biases
-      
       std::vector<blitz::Array<double,2> > m_delta; ///< weight deltas
       std::vector<blitz::Array<double,1> > m_delta_bias; ///< bias deltas
 

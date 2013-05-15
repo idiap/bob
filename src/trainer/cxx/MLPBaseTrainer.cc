@@ -33,12 +33,10 @@ bob::trainer::MLPBaseTrainer::MLPBaseTrainer(const bob::machine::MLP& machine,
   m_batch_size(batch_size),
   m_train_bias(true),
   m_H(machine.numOfHiddenLayers()), ///< handy!
-  m_weight_ref(m_H + 1),
-  m_bias_ref(m_H + 1),
   m_delta(m_H + 1),
   m_delta_bias(m_H + 1),
-  m_actfun(machine.getActivationFunction()),
-  m_output_actfun(machine.getOutputActivationFunction()),
+  m_actfun(),
+  m_output_actfun(),
   m_bwdfun(),
   m_output_bwdfun(),
   m_error(m_H + 1),
@@ -91,8 +89,6 @@ bob::trainer::MLPBaseTrainer::MLPBaseTrainer(const MLPBaseTrainer& other):
   m_batch_size(other.m_batch_size),
   m_train_bias(other.m_train_bias),
   m_H(other.m_H),
-  m_weight_ref(m_H + 1),
-  m_bias_ref(m_H + 1),
   m_delta(m_H + 1),
   m_delta_bias(m_H + 1),
   m_actfun(other.m_actfun),
@@ -117,8 +113,6 @@ bob::trainer::MLPBaseTrainer& bob::trainer::MLPBaseTrainer::operator=
     m_batch_size = other.m_batch_size;
     m_train_bias = other.m_train_bias;
     m_H = other.m_H;
-    m_weight_ref.resize(m_H + 1);
-    m_bias_ref.resize(m_H + 1);
     m_delta.resize(m_H + 1);
     m_delta_bias.resize(m_H + 1);
     m_actfun = other.m_actfun;
@@ -171,21 +165,33 @@ bool bob::trainer::MLPBaseTrainer::isCompatible(const bob::machine::MLP& machine
   return true;
 }
 
-void bob::trainer::MLPBaseTrainer::forward_step(const blitz::Array<double,2>& input) {
-  for (size_t k=0; k<m_weight_ref.size(); ++k) { //for all layers
-    if (k == 0) bob::math::prod_(input, m_weight_ref[k], m_output[k]);
-    else bob::math::prod_(m_output[k-1], m_weight_ref[k], m_output[k]);
+void bob::trainer::MLPBaseTrainer::forward_step(const bob::machine::MLP& machine, 
+  const blitz::Array<double,2>& input)
+{
+  const std::vector<blitz::Array<double,2> >& machine_weight =
+    machine.getWeights();
+  const std::vector<blitz::Array<double,1> >& machine_bias =
+    machine.getBiases();
+
+  for (size_t k=0; k<machine_weight.size(); ++k) { //for all layers
+    if (k == 0) bob::math::prod_(input, machine_weight[k], m_output[k]);
+    else bob::math::prod_(m_output[k-1], machine_weight[k], m_output[k]);
     bob::machine::MLP::actfun_t actfun = 
-      (k == (m_weight_ref.size()-1) ? m_output_actfun : m_actfun );
+      (k == (machine_weight.size()-1) ? m_output_actfun : m_actfun );
     for (int i=0; i<(int)m_batch_size; ++i) { //for every example
       for (int j=0; j<m_output[k].extent(1); ++j) { //for all variables
-        m_output[k](i,j) = actfun(m_output[k](i,j) + m_bias_ref[k](j));
+        m_output[k](i,j) = actfun(m_output[k](i,j) + machine_bias[k](j));
       }
     }
   }
 }
 
-void bob::trainer::MLPBaseTrainer::backward_step(const blitz::Array<double,2>& target) {
+void bob::trainer::MLPBaseTrainer::backward_step(const bob::machine::MLP& machine,
+  const blitz::Array<double,2>& target)
+{
+  const std::vector<blitz::Array<double,2> >& machine_weight =
+    machine.getWeights();
+
   //last layer
   m_error[m_H] = m_output.back() - target;
   for (int i=0; i<(int)m_batch_size; ++i) { //for every example
@@ -196,7 +202,7 @@ void bob::trainer::MLPBaseTrainer::backward_step(const blitz::Array<double,2>& t
 
   //all other layers
   for (size_t k=m_H; k>0; --k) {
-    bob::math::prod_(m_error[k], m_weight_ref[k].transpose(1,0), m_error[k-1]);
+    bob::math::prod_(m_error[k], machine_weight[k].transpose(1,0), m_error[k-1]);
     for (int i=0; i<(int)m_batch_size; ++i) { //for every example
       for (int j=0; j<m_error[k-1].extent(1); ++j) { //for all variables
         m_error[k-1](i,j) *= m_bwdfun(m_output[k-1](i,j));
@@ -208,11 +214,36 @@ void bob::trainer::MLPBaseTrainer::backward_step(const blitz::Array<double,2>& t
 void bob::trainer::MLPBaseTrainer::init_train(const bob::machine::MLP& machine,
   const blitz::Array<double,2>& input, const blitz::Array<double,2>& target)
 {
-  // We refer to the machine's weights and biases
-  for (size_t k=0;k<m_weight_ref.size();++k)
-    m_weight_ref[k].reference(machine.getWeights()[k]);
-  for (size_t k=0;k<m_bias_ref.size();++k)
-    m_bias_ref[k].reference(machine.getBiases()[k]);
+  m_actfun = machine.getActivationFunction();
+  m_output_actfun = machine.getOutputActivationFunction();
+
+  switch (machine.getActivation()) {
+    case bob::machine::LINEAR:
+      m_bwdfun = bob::machine::linear_derivative;
+      break;
+    case bob::machine::TANH:
+      m_bwdfun = bob::machine::tanh_derivative;
+      break;
+    case bob::machine::LOG:
+      m_bwdfun = bob::machine::logistic_derivative;
+      break;
+    default:
+      throw bob::machine::UnsupportedActivation(machine.getActivation());
+  }
+
+  switch (machine.getOutputActivation()) {
+    case bob::machine::LINEAR:
+      m_output_bwdfun = bob::machine::linear_derivative;
+      break;
+    case bob::machine::TANH:
+      m_output_bwdfun = bob::machine::tanh_derivative;
+      break;
+    case bob::machine::LOG:
+      m_output_bwdfun = bob::machine::logistic_derivative;
+      break;
+    default:
+      throw bob::machine::UnsupportedActivation(machine.getOutputActivation());
+  }
 }
 
 void bob::trainer::MLPBaseTrainer::setError(const std::vector<blitz::Array<double,2> >& error) {

@@ -80,15 +80,15 @@ static void mlpbase_init_train(bob::trainer::MLPBaseTrainer& t,
 }
 
 static void mlpbase_forward_step(bob::trainer::MLPBaseTrainer& t, 
-  bob::python::const_ndarray input)
+  const bob::machine::MLP& m, bob::python::const_ndarray input)
 {
-  t.forward_step(input.bz<double,2>());
+  t.forward_step(m, input.bz<double,2>());
 }
 
 static void mlpbase_backward_step(bob::trainer::MLPBaseTrainer& t, 
-  bob::python::const_ndarray target)
+  const bob::machine::MLP& m, bob::python::const_ndarray target)
 {
-  t.backward_step(target.bz<double,2>());
+  t.backward_step(m, target.bz<double,2>());
 }
 
 
@@ -98,8 +98,8 @@ void bind_trainer_backprop() {
     .add_property("train_biases", &bob::trainer::MLPBaseTrainer::getTrainBiases, &bob::trainer::MLPBaseTrainer::setTrainBiases)
     .def("is_compatible", &bob::trainer::MLPBaseTrainer::isCompatible, (arg("self"), arg("machine")), "Checks if a given machine is compatible with my inner settings")
     .def("init_train", &mlpbase_init_train, (arg("self"), arg("mlp"), arg("input"), arg("target")), "Initialize the training process.")
-    .def("forward_step", &mlpbase_forward_step, (arg("self"), arg("input")), "Forward step -- Forwards a batch of data through the MLP and updates the internal buffers.")
-    .def("backward_step", &mlpbase_backward_step, (arg("self"), arg("target")), "Backward step -- Backwards a batch of data through the MLP and updates the internal buffers.")
+    .def("forward_step", &mlpbase_forward_step, (arg("self"), arg("mlp"), arg("input")), "Forward step -- Forwards a batch of data through the MLP and updates the internal buffers.")
+    .def("backward_step", &mlpbase_backward_step, (arg("self"), arg("mlp"), arg("target")), "Backward step -- Backwards a batch of data through the MLP and updates the internal buffers.")
     .add_property("error", &mlpbase_get_error, &mlpbase_set_error)
     .def("set_error", &mlpbase_set_error2, (arg("self"), arg("array"), arg("k")), "Sets the error for a given index.")
     .add_property("output", &mlpbase_get_output, &mlpbase_set_output)

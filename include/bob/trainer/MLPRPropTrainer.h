@@ -131,7 +131,8 @@ namespace bob { namespace trainer {
        * Description and Implementation Details" by Martin Riedmiller, 1994.
        * Just browse the internet for it. Keep it under your pillow ;-)
        */
-      void rprop_weight_update(const blitz::Array<double,2>& input);
+      void rprop_weight_update(bob::machine::MLP& machine,
+        const blitz::Array<double,2>& input);
 
     private: //representation
 

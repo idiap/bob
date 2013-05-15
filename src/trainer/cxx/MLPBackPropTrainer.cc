@@ -89,13 +89,18 @@ void bob::trainer::MLPBackPropTrainer::reset() {
   }
 }
 
-void bob::trainer::MLPBackPropTrainer::backprop_weight_update(const blitz::Array<double,2>& input) {
-  size_t batch_size = getBatchSize();
-  for (size_t k=0; k<m_weight_ref.size(); ++k) { //for all layers
+void bob::trainer::MLPBackPropTrainer::backprop_weight_update(bob::machine::MLP& machine,
+  const blitz::Array<double,2>& input)
+{
+  std::vector<blitz::Array<double,2> >& machine_weight =
+    machine.updateWeights();
+  std::vector<blitz::Array<double,1> >& machine_bias =
+    machine.updateBiases();
+  for (size_t k=0; k<machine_weight.size(); ++k) { //for all layers
     if (k == 0) bob::math::prod_(input.transpose(1,0), m_error[k], m_delta[k]);
     else bob::math::prod_(m_output[k-1].transpose(1,0), m_error[k], m_delta[k]);
-    m_delta[k] *= m_learning_rate / batch_size;
-    m_weight_ref[k] += ((1-m_momentum)*m_delta[k]) + 
+    m_delta[k] *= m_learning_rate / m_batch_size;
+    machine_weight[k] += ((1-m_momentum)*m_delta[k]) + 
       (m_momentum*m_prev_delta[k]);
     m_prev_delta[k] = m_delta[k];
 
@@ -109,7 +114,7 @@ void bob::trainer::MLPBackPropTrainer::backprop_weight_update(const blitz::Array
     blitz::secondIndex J;
     m_delta_bias[k] = m_learning_rate * 
       blitz::mean(m_error[k].transpose(1,0), J);
-    m_bias_ref[k] += ((1-m_momentum)*m_delta_bias[k]) + 
+    machine_bias[k] += ((1-m_momentum)*m_delta_bias[k]) + 
       (m_momentum*m_prev_delta_bias[k]);
     m_prev_delta_bias[k] = m_delta_bias[k];
   }
@@ -132,7 +137,7 @@ void bob::trainer::MLPBackPropTrainer::train_(bob::machine::MLP& machine,
   init_train(machine, input, target);
 
   // To be called in this sequence for a general backprop algorithm
-  forward_step(input);
-  backward_step(target);
-  backprop_weight_update(input);
+  forward_step(machine, input);
+  backward_step(machine, target);
+  backprop_weight_update(machine, input);
 }

@@ -109,14 +109,21 @@ static int8_t sign (double x) {
   return (x == 0)? 0 : -1;
 }
 
-void bob::trainer::MLPRPropTrainer::rprop_weight_update(const blitz::Array<double,2>& input) {
+void bob::trainer::MLPRPropTrainer::rprop_weight_update(bob::machine::MLP& machine,
+  const blitz::Array<double,2>& input) 
+{
   // constants taken from the paper.
   static const double ETA_MINUS = 0.5;
   static const double ETA_PLUS = 1.2;
   static const double DELTA_MAX = 50.0;
   static const double DELTA_MIN = 1e-6;
 
-  for (size_t k=0; k<m_weight_ref.size(); ++k) { //for all layers
+  std::vector<blitz::Array<double,2> >& machine_weight =
+    machine.updateWeights();
+  std::vector<blitz::Array<double,1> >& machine_bias =
+    machine.updateBiases();
+
+  for (size_t k=0; k<machine_weight.size(); ++k) { //for all layers
     if (k == 0) bob::math::prod_(input.transpose(1,0), m_error[k], m_deriv[k]);
     else bob::math::prod_(m_output[k-1].transpose(1,0), m_error[k], m_deriv[k]);
 
@@ -134,7 +141,7 @@ void bob::trainer::MLPRPropTrainer::rprop_weight_update(const blitz::Array<doubl
         // Implementations equations (4-6) on the RProp paper:
         if (M > 0) {
           m_delta[k](i,j) = std::min(m_delta[k](i,j)*ETA_PLUS, DELTA_MAX); 
-          m_weight_ref[k](i,j) -= sign(m_deriv[k](i,j)) * m_delta[k](i,j); 
+          machine_weight[k](i,j) -= sign(m_deriv[k](i,j)) * m_delta[k](i,j); 
           m_prev_deriv[k](i,j) = m_deriv[k](i,j);
         }
         else if (M < 0) {
@@ -142,7 +149,7 @@ void bob::trainer::MLPRPropTrainer::rprop_weight_update(const blitz::Array<doubl
           m_prev_deriv[k](i,j) = 0;
         }
         else { //M == 0
-          m_weight_ref[k](i,j) -= sign(m_deriv[k](i,j)) * m_delta[k](i,j);
+          machine_weight[k](i,j) -= sign(m_deriv[k](i,j)) * m_delta[k](i,j);
           m_prev_deriv[k](i,j) = m_deriv[k](i,j);
         }
       }
@@ -162,7 +169,7 @@ void bob::trainer::MLPRPropTrainer::rprop_weight_update(const blitz::Array<doubl
       // Implementations equations (4-6) on the RProp paper:
       if (M > 0) {
         m_delta_bias[k](i) = std::min(m_delta_bias[k](i)*ETA_PLUS, DELTA_MAX); 
-        m_bias_ref[k](i) -= sign(m_deriv_bias[k](i)) * m_delta_bias[k](i); 
+        machine_bias[k](i) -= sign(m_deriv_bias[k](i)) * m_delta_bias[k](i); 
         m_prev_deriv_bias[k](i) = m_deriv_bias[k](i);
       }
       else if (M < 0) {
@@ -170,7 +177,7 @@ void bob::trainer::MLPRPropTrainer::rprop_weight_update(const blitz::Array<doubl
         m_prev_deriv_bias[k](i) = 0;
       }
       else { //M == 0
-        m_bias_ref[k](i) -= sign(m_deriv_bias[k](i)) * m_delta_bias[k](i);
+        machine_bias[k](i) -= sign(m_deriv_bias[k](i)) * m_delta_bias[k](i);
         m_prev_deriv_bias[k](i) = m_deriv_bias[k](i);
       }
     }
@@ -194,7 +201,7 @@ void bob::trainer::MLPRPropTrainer::train_(bob::machine::MLP& machine,
   init_train(machine, input, target);
  
   // To be called in this sequence for a general backprop algorithm
-  forward_step(input);
-  backward_step(target);
-  rprop_weight_update(input);
+  forward_step(machine, input);
+  backward_step(machine, target);
+  rprop_weight_update(machine, input);
 }
