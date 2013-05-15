@@ -89,6 +89,9 @@ namespace bob { namespace trainer {
        */
       void reset();
 
+      /**
+       * @brief Initialize the internal buffers for the current machine
+       */
       virtual void initialize(const bob::machine::MLP& machine);
 
       /**
@@ -126,8 +129,7 @@ namespace bob { namespace trainer {
           const blitz::Array<double,2>& input,
           const blitz::Array<double,2>& target);
 
-    private: //useful methods
-
+    protected:
       /**
        * Weight update -- calculates the weight-update using derivatives as
        * explained in Bishop's formula 5.53, page 243.
@@ -142,8 +144,6 @@ namespace bob { namespace trainer {
        */
       void rprop_weight_update(bob::machine::MLP& machine,
         const blitz::Array<double,2>& input);
-
-    private: //representation
 
       std::vector<blitz::Array<double,2> > m_deriv; ///< weight derivatives
       std::vector<blitz::Array<double,1> > m_deriv_bias; ///< bias derivatives

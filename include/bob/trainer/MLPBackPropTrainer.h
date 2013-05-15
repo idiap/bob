@@ -132,6 +132,9 @@ namespace bob { namespace trainer {
        */
       void setMomentum(double v) { m_momentum = v; }
 
+      /**
+       * @brief Initialize the internal buffers for the current machine
+       */
       virtual void initialize(const bob::machine::MLP& machine);
 
       /**
@@ -169,15 +172,13 @@ namespace bob { namespace trainer {
           const blitz::Array<double,2>& input,
           const blitz::Array<double,2>& target);
 
-    private: //useful methods
+    protected:
       /**
        * Weight update -- calculates the weight-update using derivatives as
        * required by back-prop.
        */
       void backprop_weight_update(bob::machine::MLP& machine,
         const blitz::Array<double,2>& input);
-
-    private: //representation
 
       /// training parameters:
       double m_learning_rate;
