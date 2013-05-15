@@ -284,6 +284,13 @@ namespace bob { namespace machine {
       { return m_weight; }
 
       /**
+       * @brief Returns the weights of all layers in order to be updated.
+       * This method should only be used by trainers.
+       */
+      inline std::vector<blitz::Array<double, 2> >& updateWeights()
+      { return m_weight; }
+
+      /**
        * Sets weights for all layers. The number of inputs, outputs and total
        * number of weights should be the same as set before, or this method
        * will raise.  If you would like to set this MLP to a different weight
@@ -301,6 +308,14 @@ namespace bob { namespace machine {
        * output layer we have.
        */
       inline const std::vector<blitz::Array<double, 1> >& getBiases() const 
+      { return m_bias; }
+
+      /**
+       * @brief Returns the biases of this classifier, for every hidden layer
+       * and output layer we have, in order to be updated.
+       * This method should only be used by trainers.
+       */
+      inline std::vector<blitz::Array<double, 1> >& updateBiases()
       { return m_bias; }
 
       /**
