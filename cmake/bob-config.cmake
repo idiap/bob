@@ -5,5 +5,5 @@
 
 get_filename_component(SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 include(${SELF_DIR}/bob-targets.cmake)
-get_filename_component(bob_INCLUDE_DIRS "${SELF_DIR}/../../include" ABSOLUTE)
-get_filename_component(bob_LIBRARY_DIRS "${SELF_DIR}/../../lib" ABSOLUTE)
+get_filename_component(bob_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include" ABSOLUTE)
+get_filename_component(bob_LIBRARY_DIRS "${CMAKE_INSTALL_LIBDIR}" ABSOLUTE)
