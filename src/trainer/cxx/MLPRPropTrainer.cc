@@ -203,6 +203,10 @@ void bob::trainer::MLPRPropTrainer::initialize(const bob::machine::MLP& machine)
   const std::vector<blitz::Array<double,1> >& machine_bias =
     machine.getBiases();
 
+  m_deriv.resize(m_H + 1);
+  m_deriv_bias.resize(m_H + 1);
+  m_prev_deriv.resize(m_H + 1);
+  m_prev_deriv_bias.resize(m_H + 1);
   for (size_t k=0; k<(m_H + 1); ++k) {
     m_deriv[k].reference(blitz::Array<double,2>(machine_weight[k].shape()));
     m_deriv_bias[k].reference(blitz::Array<double,1>(machine_bias[k].shape()));
