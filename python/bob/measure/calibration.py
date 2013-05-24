@@ -59,8 +59,14 @@ def min_cllr(negatives, positives):
   popt = numpy.ndarray(ideal.shape, dtype=numpy.float)
   pavx(ideal, popt)
 
+  # disable runtime warnings for a short time since log(0) will raise a warning
+  old_warn_setup = numpy.seterr(divide='ignore')
+  # ... compute logs
   posterior_log_odds = numpy.log(popt)-numpy.log(1.-popt);
   log_prior_odds = math.log(float(P)/float(N));
+  # ... activate old warnings
+  numpy.seterr(**old_warn_setup)
+
 
   llrs = posterior_log_odds - log_prior_odds;
 
