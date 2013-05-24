@@ -247,3 +247,30 @@ class ErrorTest(unittest.TestCase):
     self.assertEqual(rr, desired_rr)
     cmc = bob.measure.cmc(data)
     self.assertTrue((cmc == desired_cmc).all())
+
+  def test07_calibration(self):
+    # Tests the cllr and min_cllr measures...
+    # This test set is separable.
+    positives = bob.io.load(F('linsep-positives.hdf5'))
+    negatives = bob.io.load(F('linsep-negatives.hdf5'))
+
+    cllr = bob.measure.calibration.cllr(negatives, positives)
+    min_cllr = bob.measure.calibration.min_cllr(negatives, positives)
+
+    self.assertTrue(min_cllr <= cllr)
+    self.assertAlmostEqual(cllr, 1.2097942129)
+    # Since the test set is separable, the min_cllr needs to be zero
+    self.assertAlmostEqual(min_cllr, 0.)
+
+    # This test set is not separable.
+    positives = bob.io.load(F('nonsep-positives.hdf5'))
+    negatives = bob.io.load(F('nonsep-negatives.hdf5'))
+
+    cllr = bob.measure.calibration.cllr(negatives, positives)
+    min_cllr = bob.measure.calibration.min_cllr(negatives, positives)
+
+    self.assertTrue(min_cllr <= cllr)
+    self.assertAlmostEqual(cllr, 3.61833457)
+    self.assertAlmostEqual(min_cllr, 0.337364136)
+
+

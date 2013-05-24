@@ -2,6 +2,7 @@ from ..core import __from_extension_import__
 __from_extension_import__('._measure', __package__, locals())
 from . import plot
 from . import load
+from . import calibration
 import numpy
 
 def mse (estimation, target):
