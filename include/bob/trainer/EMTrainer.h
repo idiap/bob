@@ -116,12 +116,15 @@ namespace bob { namespace trainer {
       // Initialization
       initialization(machine, sampler);
       // Do the Expectation-Maximization algorithm
-      double average_output_previous = - std::numeric_limits<double>::max();
+      double average_output_previous;
       double average_output = - std::numeric_limits<double>::max();
       
       // - eStep
       eStep(machine, sampler);
    
+      if(m_compute_likelihood)
+        average_output = computeLikelihood(machine);
+
       // - iterates...
       for(size_t iter=0; ; ++iter) {
         
