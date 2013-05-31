@@ -264,12 +264,12 @@ namespace bob { namespace machine {
       /**
        * Returns the currently set activation function
        */
-      inline Activation getActivation() const { return m_activation; }
+      inline boost::shared_ptr<Activation> getActivation() const { return m_activation; }
 
       /**
        * Sets the activation function for each of the outputs.
        */
-      void setActivation(Activation a);
+      void setActivation(boost::shared_ptr<Activation> a);
 
     private: //representation
 
@@ -279,8 +279,7 @@ namespace bob { namespace machine {
       blitz::Array<double, 1> m_input_div; ///< input division
       blitz::Array<double, 2> m_weight; ///< weights
       blitz::Array<double, 1> m_bias; ///< biases for the output
-      Activation m_activation; ///< currently set activation type
-      actfun_t m_actfun; ///< currently set activation function
+      boost::shared_ptr<Activation> m_activation; ///< currently set activation type
 
       mutable blitz::Array<double, 1> m_buffer; ///< a buffer for speed
   

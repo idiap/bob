@@ -25,6 +25,7 @@
 #define BOB_MACHINE_MLP_H
 
 #include <boost/random.hpp>
+#include <boost/shared_ptr.hpp>
 #include <blitz/array.h>
 
 #include <bob/io/HDF5File.h>
@@ -53,8 +54,6 @@ namespace bob { namespace machine {
   class MLP {
     
     public: //api
-
-      typedef double (*actfun_t)(double); ///< activation function type
 
       /**
        * Constructor, builds a new MLP. Internal values are uninitialized. In
@@ -331,35 +330,30 @@ namespace bob { namespace machine {
       void setBiases(double v);
 
       /**
-       * Returns the currently set activation function
+       * Returns the currently set activation function for the hidden layers
        */
-      inline Activation getActivation() const { return m_activation; }
+      inline boost::shared_ptr<Activation> getHiddenActivation() const 
+      { return m_hidden_activation; }
 
       /**
-       * Sets the activation function for each of the outputs.
+       * Sets the activation function for each of the hidden layers.
        */
-      void setActivation(Activation a);
-
-      /**
-       * A pointer to the actual activation function
-       */
-      inline actfun_t getActivationFunction() const { return m_actfun; }
+      void setHiddenActivation(boost::shared_ptr<Activation> a) {
+        m_hidden_activation = a;
+      }
 
       /**
        * Returns the currently set output activation function
        */
-      inline Activation getOutputActivation() const { return m_output_activation; }
+      inline boost::shared_ptr<Activation> getOutputActivation() const 
+      { return m_output_activation; }
 
       /**
-       * Sets the output activation function for the outputs of the last layer..
+       * Sets the activation function for the outputs of the last layer.
        */
-      void setOutputActivation(Activation a);
-
-      /**
-       * A pointer to the actual output activation function
-       */
-      inline actfun_t getOutputActivationFunction() const { return m_output_actfun; }
-
+      void setOutputActivation(boost::shared_ptr<Activation> a) {
+        m_output_activation = a;
+      }
 
       /**
        * Reset all weights and biases. You can (optionally) specify the
@@ -389,11 +383,8 @@ namespace bob { namespace machine {
       blitz::Array<double, 1> m_input_div; ///< input division
       std::vector<blitz::Array<double, 2> > m_weight; ///< weights
       std::vector<blitz::Array<double, 1> > m_bias; ///< biases for the output
-      Activation m_activation; ///< currently set activation type
-      actfun_t m_actfun; ///< currently set activation function
-      Activation m_output_activation; ///< currently set activation type for the output layer
-      actfun_t m_output_actfun; ///< currently set activation function for the output layer
-
+      boost::shared_ptr<Activation> m_hidden_activation; ///< currently set activation type
+      boost::shared_ptr<Activation> m_output_activation; ///< currently set activation type
       mutable std::vector<blitz::Array<double, 1> > m_buffer; ///< buffer for the outputs of each layer
   
   };

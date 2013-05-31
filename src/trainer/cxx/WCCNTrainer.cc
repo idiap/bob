@@ -19,6 +19,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/make_shared.hpp>
+
 #include <bob/trainer/WCCNTrainer.h>
 #include <bob/machine/Exception.h>
 #include <bob/trainer/Exception.h>
@@ -232,5 +234,5 @@ void bob::trainer::WCCNTrainer::train(bob::machine::LinearMachine& machine,
   machine.setInputDivision(1.);
   machine.setWeights(B);
   machine.setBiases(0);
-  machine.setActivation(bob::machine::LINEAR);
+  machine.setActivation(boost::make_shared<bob::machine::IdentityActivation>());
 }

@@ -91,8 +91,6 @@ BOOST_AUTO_TEST_CASE( test_initialization )
   idiv = 0.5, 1.0, 1.0;
   M.setInputDivision(idiv);
 
-  M.setActivation(bob::machine::TANH);
-  
   //now load the same machine from the file and compare
   char *testdata_cpath = getenv("BOB_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
@@ -110,7 +108,7 @@ BOOST_AUTO_TEST_CASE( test_initialization )
   BOOST_CHECK( blitz::all(M.getBiases() == N.getBiases()) );
   BOOST_CHECK( blitz::all(M.getInputSubtraction() == N.getInputSubtraction()) );
   BOOST_CHECK( blitz::all(M.getInputDivision() == N.getInputDivision()) );
-  BOOST_CHECK_EQUAL( M.getActivation(), N.getActivation() );
+  BOOST_CHECK_EQUAL( M.getActivation()->str(), N.getActivation()->str() );
 }
 
 BOOST_AUTO_TEST_CASE( test_error_check )

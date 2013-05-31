@@ -91,25 +91,25 @@ class PythonRProp:
     W = machine.weights #weights
     B = machine.biases #biases
 
-    if machine.activation == bob.machine.Activation.TANH:
+    if machine.activation == bob.machine.HyperbolicTangentActivation():
       forward = tanh
       backward = tanh_bwd
-    elif machine.activation == bob.machine.Activation.LOG:
+    elif machine.activation == bob.machine.LogisticActivation():
       forward = logistic
       backward = logistic_bwd
-    elif machine.activation == bob.machine.Activation.LINEAR:
+    elif machine.activation == bob.machine.IdentityActivation():
       forward = linear
       backward = linear_bwd
     else:
       raise RuntimeError, "Cannot deal with activation %s" % machine.activation
 
-    if machine.output_activation == bob.machine.Activation.TANH:
+    if machine.output_activation == bob.machine.HyperbolicTangentActivation()
       output_forward = tanh
       output_backward = tanh_bwd
-    elif machine.output_activation == bob.machine.Activation.LOG:
+    elif machine.output_activation == bob.machine.LogisticActivation()
       output_forward = logistic
       output_backward = logistic_bwd
-    elif machine.output_activation == bob.machine.Activation.LINEAR:
+    elif machine.output_activation == bob.machine.IdentityActivation()
       output_forward = linear
       output_backward = linear_bwd
     else:
@@ -342,8 +342,8 @@ class RPropTest(unittest.TestCase):
     N = 50
 
     machine = bob.machine.MLP((4, 4, 3))
-    machine.activation = bob.machine.Activation.TANH
-    machine.output_activation = bob.machine.Activation.TANH
+    machine.hidden_activation = bob.machine.HyperbolicTangentActivation()
+    machine.output_activation = bob.machine.HyperbolicTangentActivation()
     machine.randomize()
     trainer = bob.trainer.MLPRPropTrainer(machine, N)
     trainer.train_biases = True
@@ -384,8 +384,8 @@ class RPropTest(unittest.TestCase):
     N = 50
 
     machine = bob.machine.MLP((4, 3, 3, 1))
-    machine.activation = bob.machine.Activation.TANH
-    machine.output_activation = bob.machine.Activation.TANH
+    machine.hidden_activation = bob.machine.HyperbolicTangentActivation()
+    machine.output_activation = bob.machine.HyperbolicTangentActivation()
     machine.randomize()
     trainer = bob.trainer.MLPRPropTrainer(machine, N)
     trainer.train_biases = True

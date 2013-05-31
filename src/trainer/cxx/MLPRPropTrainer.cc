@@ -25,7 +25,6 @@
 #include <bob/core/check.h>
 #include <bob/core/array_copy.h>
 #include <bob/math/linear.h>
-#include <bob/machine/MLPException.h>
 #include <bob/trainer/Exception.h>
 #include <bob/trainer/MLPRPropTrainer.h>
 

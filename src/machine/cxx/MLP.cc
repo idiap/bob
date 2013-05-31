@@ -23,12 +23,12 @@
 #include <sys/time.h>
 #include <cmath>
 #include <boost/format.hpp>
+#include <boost/make_shared.hpp>
 
 #include <bob/core/check.h>
 #include <bob/core/array_copy.h>
 #include <bob/core/assert.h>
 #include <bob/machine/MLP.h>
-#include <bob/machine/MLPException.h>
 #include <bob/math/linear.h>
 
 bob::machine::MLP::MLP (size_t input, size_t output):
@@ -36,10 +36,8 @@ bob::machine::MLP::MLP (size_t input, size_t output):
   m_input_div(input),
   m_weight(1),
   m_bias(1),
-  m_activation(bob::machine::TANH),
-  m_actfun(std::tanh),
-  m_output_activation(bob::machine::TANH),
-  m_output_actfun(std::tanh),
+  m_hidden_activation(boost::make_shared<bob::machine::HyperbolicTangentActivation>()),
+  m_output_activation(m_hidden_activation),
   m_buffer(1)
 {
   resize(input, output);
@@ -54,10 +52,8 @@ bob::machine::MLP::MLP (size_t input, size_t hidden, size_t output):
   m_input_div(input),
   m_weight(2),
   m_bias(2),
-  m_activation(bob::machine::TANH),
-  m_actfun(std::tanh),
-  m_output_activation(bob::machine::TANH),
-  m_output_actfun(std::tanh),
+  m_hidden_activation(boost::make_shared<bob::machine::HyperbolicTangentActivation>()),
+  m_output_activation(m_hidden_activation),
   m_buffer(2)
 {
   resize(input, hidden, output);
@@ -72,10 +68,8 @@ bob::machine::MLP::MLP (size_t input, const std::vector<size_t>& hidden, size_t 
   m_input_div(input),
   m_weight(hidden.size()+1),
   m_bias(hidden.size()+1),
-  m_activation(bob::machine::TANH),
-  m_actfun(std::tanh),
-  m_output_activation(bob::machine::TANH),
-  m_output_actfun(std::tanh),
+  m_hidden_activation(boost::make_shared<bob::machine::HyperbolicTangentActivation>()),
+  m_output_activation(m_hidden_activation),
   m_buffer(hidden.size()+1)
 {
   resize(input, hidden, output);
@@ -86,10 +80,8 @@ bob::machine::MLP::MLP (size_t input, const std::vector<size_t>& hidden, size_t 
 }
 
 bob::machine::MLP::MLP (const std::vector<size_t>& shape):
-  m_activation(bob::machine::TANH),
-  m_actfun(std::tanh),
-  m_output_activation(bob::machine::TANH),
-  m_output_actfun(std::tanh)
+  m_hidden_activation(boost::make_shared<bob::machine::HyperbolicTangentActivation>()),
+  m_output_activation(m_hidden_activation)
 {
   resize(shape);
   m_input_sub = 0;
@@ -103,10 +95,8 @@ bob::machine::MLP::MLP (const bob::machine::MLP& other):
   m_input_div(bob::core::array::ccopy(other.m_input_div)),
   m_weight(other.m_weight.size()),
   m_bias(other.m_bias.size()),
-  m_activation(other.m_activation),
-  m_actfun(other.m_actfun),
-  m_output_activation(other.m_output_activation),
-  m_output_actfun(other.m_output_actfun),
+  m_hidden_activation(boost::make_shared<bob::machine::HyperbolicTangentActivation>()),
+  m_output_activation(m_hidden_activation),
   m_buffer(other.m_buffer.size())
 {
   for (size_t i=0; i<other.m_weight.size(); ++i) {
@@ -129,10 +119,8 @@ bob::machine::MLP& bob::machine::MLP::operator= (const MLP& other) {
     m_input_div.reference(bob::core::array::ccopy(other.m_input_div));
     m_weight.resize(other.m_weight.size());
     m_bias.resize(other.m_bias.size());
-    m_activation = other.m_activation;
-    m_actfun = other.m_actfun;
+    m_hidden_activation = other.m_hidden_activation;
     m_output_activation = other.m_output_activation;
-    m_output_actfun = other.m_output_actfun;
     m_buffer.resize(other.m_buffer.size());
     for (size_t i=0; i<other.m_weight.size(); ++i) {
       m_weight[i].reference(bob::core::array::ccopy(other.m_weight[i]));
@@ -148,8 +136,8 @@ bool bob::machine::MLP::operator== (const MLP& other) const {
           bob::core::array::isEqual(m_input_div, other.m_input_div) &&
           bob::core::array::isEqual(m_weight, other.m_weight) &&
           bob::core::array::isEqual(m_bias, other.m_bias) &&
-          m_activation == other.m_activation &&
-          m_output_activation == other.m_output_activation);
+          m_hidden_activation->str() == other.m_hidden_activation->str() &&
+          m_output_activation->str() == other.m_output_activation->str());
 }
 
 bool bob::machine::MLP::operator!= (const MLP& other) const {
@@ -163,8 +151,8 @@ bool bob::machine::MLP::is_similar_to(const bob::machine::MLP& other,
           bob::core::array::isClose(m_input_div, other.m_input_div, r_epsilon, a_epsilon) &&
           bob::core::array::isClose(m_weight, other.m_weight, r_epsilon, a_epsilon) &&
           bob::core::array::isClose(m_bias, other.m_bias, r_epsilon, a_epsilon) &&
-          m_activation == other.m_activation &&
-          m_output_activation == other.m_output_activation);
+          m_hidden_activation->str() == other.m_hidden_activation->str() &&
+          m_output_activation->str() == other.m_output_activation->str());
 }
 
 
@@ -188,16 +176,19 @@ void bob::machine::MLP::load (bob::io::HDF5File& config) {
     m_bias[i].reference(config.readArray<double,1>(bias.str()));
   }
 
-  //reads the activation function
-  uint32_t act = config.read<uint32_t>("activation");
-  setActivation(static_cast<bob::machine::Activation>(act));
-  if (config.contains("output_activation"))
-  {
-    uint32_t out_act = config.read<uint32_t>("output_activation");
-    setOutputActivation(static_cast<bob::machine::Activation>(out_act));
+  //switch between different versions - support for version 2
+  if (config.hasAttribute(".", "version")) { //new version
+    config.cd("hidden_activation");
+    m_hidden_activation = bob::machine::load_activation(config);
+    config.cd("../output_activation");
+    m_output_activation = bob::machine::load_activation(config);
+    config.cd("..");
   }
-  else
-    setOutputActivation(static_cast<bob::machine::Activation>(act));
+  else { //old version
+    uint32_t act = config.read<uint32_t>("activation");
+    m_hidden_activation = bob::machine::make_deprecated_activation(act);
+    m_output_activation = m_hidden_activation;
+  }
 
   //setup buffers: first, input
   m_buffer[0].reference(blitz::Array<double,1>(m_input_sub.shape()));
@@ -208,6 +199,7 @@ void bob::machine::MLP::load (bob::io::HDF5File& config) {
 }
 
 void bob::machine::MLP::save (bob::io::HDF5File& config) const {
+  config.setAttribute(".", "version", 1);
   config.setArray("input_sub", m_input_sub);
   config.setArray("input_div", m_input_div);
   config.set("nhidden", (uint8_t)(m_weight.size()-1));
@@ -219,9 +211,14 @@ void bob::machine::MLP::save (bob::io::HDF5File& config) const {
     config.setArray(weight.str(), m_weight[i]);
     config.setArray(bias.str(), m_bias[i]);
   }
-  //bob's hdf5 implementation does not support enumerations yet...
-  config.set("activation", static_cast<uint32_t>(m_activation));
-  config.set("output_activation", static_cast<uint32_t>(m_output_activation));
+  config.createGroup("hidden_activation");
+  config.cd("hidden_activation");
+  m_hidden_activation->save(config);
+  config.cd("..");
+  config.createGroup("output_activation");
+  config.cd("output_activation");
+  m_output_activation->save(config);
+  config.cd("..");
 }
 
 void bob::machine::MLP::forward_ (const blitz::Array<double,1>& input,
@@ -235,7 +232,7 @@ void bob::machine::MLP::forward_ (const blitz::Array<double,1>& input,
     bob::math::prod_(m_buffer[j-1], m_weight[j-1], m_buffer[j]);
     m_buffer[j] += m_bias[j-1];
     for (int i=0; i<m_buffer[j].extent(0); ++i) {
-      m_buffer[j](i) = m_actfun(m_buffer[j](i));
+      m_buffer[j](i) = m_hidden_activation->f(m_buffer[j](i));
     }
   }
 
@@ -243,7 +240,7 @@ void bob::machine::MLP::forward_ (const blitz::Array<double,1>& input,
   bob::math::prod_(m_buffer.back(), m_weight.back(), output);
   output += m_bias.back();
   for (int i=0; i<output.extent(0); ++i) {
-    output(i) = m_output_actfun(output(i));
+    output(i) = m_output_activation->f(output(i));
   }
 }
 
@@ -251,12 +248,16 @@ void bob::machine::MLP::forward (const blitz::Array<double,1>& input,
     blitz::Array<double,1>& output) {
 
   //checks input
-  if (m_weight.front().extent(0) != input.extent(0)) //checks input
-    throw bob::machine::NInputsMismatch(m_weight.front().extent(0),
-        input.extent(0));
-  if (m_weight.back().extent(1) != output.extent(0)) //checks output
-    throw bob::machine::NOutputsMismatch(m_weight.back().extent(1),
-        output.extent(0));
+  if (m_weight.front().extent(0) != input.extent(0)) {//checks input
+    boost::format m("mismatch on the input dimension: expected a vector with %d positions, but you input %d");
+    m % m_weight.front().extent(0) % input.extent(0);
+    throw std::runtime_error(m.str());
+  }
+  if (m_weight.back().extent(1) != output.extent(0)) {//checks output
+    boost::format m("mismatch on the output dimension: expected a vector with %d positions, but you input %d");
+    m % m_weight.back().extent(1) % output.extent(0);
+    throw std::runtime_error(m.str());
+  }
   forward_(input, output); 
 }
 
@@ -275,12 +276,16 @@ void bob::machine::MLP::forward (const blitz::Array<double,2>& input,
     blitz::Array<double,2>& output) {
 
   //checks input
-  if (m_weight.front().extent(0) != input.extent(1)) //checks input
-    throw bob::machine::NInputsMismatch(m_weight.front().extent(0),
-        input.extent(1));
-  if (m_weight.back().extent(1) != output.extent(1)) //checks output
-    throw bob::machine::NOutputsMismatch(m_weight.back().extent(1),
-        output.extent(1));
+  if (m_weight.front().extent(0) != input.extent(1)) {//checks input
+    boost::format m("mismatch on the input dimension: expected a vector with %d positions, but you input %d");
+    m % m_weight.front().extent(0) % input.extent(1);
+    throw std::runtime_error(m.str());
+  }
+  if (m_weight.back().extent(1) != output.extent(1)) {//checks output
+    boost::format m("mismatch on the output dimension: expected a vector with %d positions, but you input %d");
+    m % m_weight.back().extent(1) % output.extent(1);
+    throw std::runtime_error(m.str());
+  }
   //checks output
   bob::core::array::assertSameDimensionLength(input.extent(0), output.extent(0));
   forward_(input, output); 
@@ -341,7 +346,11 @@ void bob::machine::MLP::resize (size_t input, const std::vector<size_t>& hidden,
 
 void bob::machine::MLP::resize (const std::vector<size_t>& shape) {
 
-  if (shape.size() < 2) throw bob::machine::InvalidShape();
+  if (shape.size() < 2) {
+    boost::format m("invalid shape for MLP: %d");
+    m % shape.size();
+    throw std::runtime_error(m.str());
+  }
   
   if (shape.size() == 2) {
     resize(shape[0], shape[1]);
@@ -358,24 +367,32 @@ void bob::machine::MLP::resize (const std::vector<size_t>& shape) {
 
 void bob::machine::MLP::setInputSubtraction(const blitz::Array<double,1>& v) {
   if (m_weight.front().extent(0) != v.extent(0)) {
-    throw bob::machine::NInputsMismatch(m_weight.front().extent(0), v.extent(0));
+    boost::format m("mismatch on the input subtraction dimension: expected a vector with %d positions, but you input %d");
+    m % m_weight.front().extent(0) % v.extent(0);
+    throw std::runtime_error(m.str());
   }
   m_input_sub.reference(bob::core::array::ccopy(v));
 }
 
 void bob::machine::MLP::setInputDivision(const blitz::Array<double,1>& v) {
   if (m_weight.front().extent(0) != v.extent(0)) {
-    throw bob::machine::NInputsMismatch(m_weight.front().extent(0), v.extent(0));
+    boost::format m("mismatch on the input division dimension: expected a vector with %d positions, but you input %d");
+    m % m_weight.front().extent(0) % v.extent(0);
+    throw std::runtime_error(m.str());
   }
   m_input_div.reference(bob::core::array::ccopy(v));
 }
 
 void bob::machine::MLP::setWeights(const std::vector<blitz::Array<double,2> >& weight) {
-  if (m_weight.size() != weight.size()) 
-    throw bob::machine::NumberOfLayersMismatch(m_weight.size(), weight.size());
+  if (m_weight.size() != weight.size()) {
+    boost::format m("mismatch on the number of weight layers to set: expected %d layers, but you input %d");
+    m % m_weight.size() % weight.size();
+  }
   for (size_t i=0; i<m_weight.size(); ++i) {
     if (!bob::core::array::hasSameShape(m_weight[i], weight[i])) {
-      throw bob::machine::WeightShapeMismatch(i, weight[i].shape(), m_weight[i].shape());
+      boost::format m("mismatch on the shape of weight layer %d");
+      m % i;
+      throw std::runtime_error(m.str());
     }
   }
   //if you got to this point, the sizes are correct, just set
@@ -387,11 +404,16 @@ void bob::machine::MLP::setWeights(double v) {
 }
 
 void bob::machine::MLP::setBiases(const std::vector<blitz::Array<double,1> >& bias) {
-  if (m_bias.size() != bias.size()) 
-    throw bob::machine::NumberOfLayersMismatch(m_bias.size(), bias.size());
+  if (m_bias.size() != bias.size()) {
+    boost::format m("mismatch on the number of bias layers to set: expected %d layers, but you input %d");
+    m % m_bias.size() % bias.size();
+    throw std::runtime_error(m.str());
+  }
   for (size_t i=0; i<m_bias.size(); ++i) {
     if (!bob::core::array::hasSameShape(m_bias[i], bias[i])) {
-      throw bob::machine::BiasShapeMismatch(i, m_bias[i].shape()[0], bias[i].shape()[0]);
+      boost::format m("mismatch on the shape of bias layer %d: expected a vector with length %d, but you input %d");
+      m % i % m_bias[i].shape()[0] % bias[i].shape()[0];
+      throw std::runtime_error(m.str());
     }
   }
   //if you got to this point, the sizes are correct, just set
@@ -401,41 +423,6 @@ void bob::machine::MLP::setBiases(const std::vector<blitz::Array<double,1> >& bi
 void bob::machine::MLP::setBiases(double v) {
   for (size_t i=0; i<m_bias.size(); ++i) m_bias[i] = v;
 }
-
-void bob::machine::MLP::setActivation(bob::machine::Activation a) {
-  switch (a) {
-    case bob::machine::LINEAR:
-      m_actfun = bob::machine::linear;
-      break;
-    case bob::machine::TANH:
-      m_actfun = std::tanh;
-      break;
-    case bob::machine::LOG:
-      m_actfun = bob::machine::logistic;
-      break;
-    default:
-      throw bob::machine::UnsupportedActivation(a);
-  }
-  m_activation = a;
-}
-
-void bob::machine::MLP::setOutputActivation(bob::machine::Activation a) {
-  switch (a) {
-    case bob::machine::LINEAR:
-      m_output_actfun = bob::machine::linear;
-      break;
-    case bob::machine::TANH:
-      m_output_actfun = std::tanh;
-      break;
-    case bob::machine::LOG:
-      m_output_actfun = bob::machine::logistic;
-      break;
-    default:
-      throw bob::machine::UnsupportedActivation(a);
-  }
-  m_output_activation = a;
-}
-
 
 void bob::machine::MLP::randomize(boost::mt19937& rng, double lower_bound, double upper_bound) {
   boost::uniform_real<double> draw(lower_bound, upper_bound);
