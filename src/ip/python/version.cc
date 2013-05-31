@@ -26,7 +26,6 @@
 #include <boost/python.hpp>
 
 extern "C" {
-#include <numpy/arrayobject.h>
 #if WITH_VLFEAT
 #include <vl/generic.h>
 #endif
