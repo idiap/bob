@@ -59,7 +59,7 @@ def create_machine(data, training_steps):
   """Creates the machine given the training data"""
 
   mlp = bob.machine.MLP((4, 4, len(data)))
-  mlp.activation = bob.machine.Activation.TANH
+  mlp.activation = bob.machine.HyperbolicTangentActivation()
   mlp.randomize() #reset weights and biases to a value between -0.1 and +0.1
   BATCH = 50
   trainer = bob.trainer.MLPRPropTrainer(mlp, BATCH)

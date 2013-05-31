@@ -40,9 +40,9 @@ def acttext_to_enum(s):
   if s.lower() == 'tanh':
     return bob.machine.HyperbolicTangentActivation()
   elif s.lower() == 'sigmoid':
-    return bob.machine.Activation.LogisticActivation()
+    return bob.machine.LogisticActivation()
   elif s.lower() == 'linear':
-    return bob.machine.Activation.IdentityActivation()
+    return bob.machine.IdentityActivation()
   else:
     raise RuntimeError, "unsupported activation %s" % s
 
@@ -84,8 +84,8 @@ def set_hidden(mach, hidden, verbose):
       mach.activation = activation
       if verbose: print "  Activation set to %s" % mach.activation
     else:
-      if activation != acttext_to_enum(actfun):
-        raise RuntimeError, "mixed activation in hidden neuron %d" % identity
+      if str(activation) != str(acttext_to_enum(actfun)):
+        raise RuntimeError, "mixed activation in hidden neuron %d: %s != %s" % (identity, activation, acttext_to_enum(actfun))
     identities.append(identity)
     if verbose:
       print "  Hidden %d, act: %s" % (identity, activation)
@@ -108,8 +108,8 @@ def set_output(mach, outputs, activation, verbose):
       mach.activation = activation
       if verbose: print "  Activation set to %s" % mach.activation
     else:
-      if activation != acttext_to_enum(actfun):
-        raise RuntimeError, "mixed activation in output neuron %d" % identity
+      if str(activation) != str(acttext_to_enum(actfun)):
+        raise RuntimeError, "mixed activation in hidden neuron %d: %s != %s" % (identity, activation, acttext_to_enum(actfun))
     identities.append(identity)
     if verbose:
       print "  Output %d, act: %s" % (identity, activation)
