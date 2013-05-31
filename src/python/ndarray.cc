@@ -34,6 +34,7 @@
 #define TP_ARRAY(x) ((PyArrayObject*)x.ptr())
 #define TP_OBJECT(x) (x.ptr())
 
+#define NUMPY17_API 0x00000007
 #define NUMPY16_API 0x00000006
 #define NUMPY14_API 0x00000004
 
