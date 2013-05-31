@@ -87,13 +87,13 @@ class PythonBackProp:
     else:
       raise RuntimeError, "Cannot deal with activation %s" % machine.activation
 
-    if machine.output_activation == bob.machine.HyperbolicTangentActivation()
+    if machine.output_activation == bob.machine.HyperbolicTangentActivation():
       output_forward = tanh
       output_backward = tanh_bwd
-    elif machine.output_activation == bob.machine.LogisticActivation()
+    elif machine.output_activation == bob.machine.LogisticActivation():
       output_forward = logistic
       output_backward = logistic_bwd
-    elif machine.output_activation == bob.machine.IdentityActivation()
+    elif machine.output_activation == bob.machine.IdentityActivation():
       output_forward = linear
       output_backward = linear_bwd
     else:
