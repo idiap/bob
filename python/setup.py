@@ -19,6 +19,14 @@ EXTRA_REQUIREMENTS = []
 if sys.version_info[:2] < (2, 7) or ((3,0) <= sys.version_info[:2] < (3,2)):
   EXTRA_REQUIREMENTS.append('argparse')
 
+# Check if python-imaging means pil or pillow
+try:
+  import pkg_resources
+  pkg_resources.require('pillow')
+  EXTRA_REQUIREMENTS.append('pillow')
+except pkg_resources.DistributionNotFound, e:
+  EXTRA_REQUIREMENTS.append('pil')
+
 # Installing in a caged environment
 DESTDIR = os.environ.get('DESTDIR', '')
 
