@@ -117,10 +117,10 @@ namespace bob { namespace trainer {
       bool isCompatible(const bob::machine::MLP& machine) const;
 
       /**
-       * @brief Forward step -- this is a second implementation of that used on the
-       * MLP itself to allow access to some internal buffers. In our current
-       * setup, we keep the "m_output"'s of every individual layer separately
-       * as we are going to need them for the weight update.
+       * @brief Forward step -- this is a second implementation of that used on
+       * the MLP itself to allow access to some internal buffers. In our
+       * current setup, we keep the "m_output"'s of every individual layer
+       * separately as we are going to need them for the weight update.
        *
        * Another factor is the normalization normally applied at MLPs. We
        * ignore that here as the DataShuffler should be capable of handling
@@ -173,12 +173,6 @@ namespace bob { namespace trainer {
 
 
     protected: //representation
-
-      /**
-       * @brief Returns the derivative of a given activation function
-       */
-      static bob::machine::MLP::actfun_t 
-      getDerivative(bob::machine::Activation f);
 
       /**
        * @brief Resets the buffer to 0 value

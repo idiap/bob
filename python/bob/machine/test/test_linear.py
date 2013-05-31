@@ -54,13 +54,15 @@ class MachineTest(unittest.TestCase):
     m.input_subtract = isub
     m.input_divide = idiv
     m.biases = b
-    m.activation = bob.machine.Activation.TANH
+    m.hidden_activation = bob.machine.HyperbolicTangentActivation()
+    m.output_activation = bob.machine.HyperbolicTangentActivation()
 
     self.assertTrue( (m.input_subtract == isub).all() )
     self.assertTrue( (m.input_divide == idiv).all() )
     self.assertTrue( (m.weights == w).all() )
     self.assertTrue( (m.biases == b). all() )
-    self.assertEqual(m.activation, bob.machine.Activation.TANH)
+    self.assertEqual(m.hidden_activation,
+        bob.machine.HyperbolicTangentActivation())
     # Save to file
     # c = bob.io.HDF5File("bla.hdf5", 'w')
     # m.save(c)
@@ -175,44 +177,44 @@ class MachineTest(unittest.TestCase):
     m1.input_subtract = isub1
     m1.input_divide = idiv1
     m1.biases = b1
-    m1.activation = bob.machine.Activation.TANH
+    m1.activation = bob.machine.HyperbolicTangentActivation()
 
     m1b = bob.machine.LinearMachine(m1)
     m1c = bob.machine.LinearMachine(w1)
     m1c.input_subtract = isub1
     m1c.input_divide = idiv1
     m1c.biases = b1
-    m1c.activation = bob.machine.Activation.TANH
+    m1c.activation = bob.machine.HyperbolicTangentActivation()
 
     m2 = bob.machine.LinearMachine(w2)
     m2.input_subtract = isub1
     m2.input_divide = idiv1
     m2.biases = b1
-    m2.activation = bob.machine.Activation.TANH
+    m2.activation = bob.machine.HyperbolicTangentActivation()
 
     m3 = bob.machine.LinearMachine(w1)
     m3.input_subtract = isub2
     m3.input_divide = idiv1
     m3.biases = b1
-    m3.activation = bob.machine.Activation.TANH
+    m3.activation = bob.machine.HyperbolicTangentActivation()
 
     m4 = bob.machine.LinearMachine(w1)
     m4.input_subtract = isub1
     m4.input_divide = idiv2
     m4.biases = b1
-    m4.activation = bob.machine.Activation.TANH
+    m4.activation = bob.machine.HyperbolicTangentActivation()
 
     m5 = bob.machine.LinearMachine(w1)
     m5.input_subtract = isub1
     m5.input_divide = idiv1
     m5.biases = b2
-    m5.activation = bob.machine.Activation.TANH
+    m5.activation = bob.machine.HyperbolicTangentActivation()
 
     m6 = bob.machine.LinearMachine(w1)
     m6.input_subtract = isub1
     m6.input_divide = idiv1
     m6.biases = b1
-    m6.activation = bob.machine.Activation.LINEAR
+    m6.activation = bob.machine.IdentityActivation()
 
     # Compares them using the overloaded operators == and !=
     self.assertTrue( m1 == m1b )

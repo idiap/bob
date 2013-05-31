@@ -26,7 +26,6 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <bob/machine/SVM.h>
-#include <bob/machine/MLPException.h>
 #include <bob/core/check.h>
 #include <bob/core/logging.h>
 #include <cstdio>
@@ -323,14 +322,18 @@ double bob::machine::SupportVector::coefficient0() const {
 
 void bob::machine::SupportVector::setInputSubtraction(const blitz::Array<double,1>& v) {
   if (inputSize() != (size_t)v.extent(0)) {
-    throw bob::machine::NInputsMismatch(inputSize(), v.extent(0));
+    boost::format m("mismatch on the input subtraction dimension: expected a vector with %d positions, but you input %d");
+    m % inputSize() % v.extent(0);
+    throw std::runtime_error(m.str());
   }
   m_input_sub.reference(bob::core::array::ccopy(v));
 }
 
 void bob::machine::SupportVector::setInputDivision(const blitz::Array<double,1>& v) {
   if (inputSize() != (size_t)v.extent(0)) {
-    throw bob::machine::NInputsMismatch(inputSize(), v.extent(0));
+    boost::format m("mismatch on the input division dimension: expected a vector with %d positions, but you input %d");
+    m % inputSize() % v.extent(0);
+    throw std::runtime_error(m.str());
   }
   m_input_div.reference(bob::core::array::ccopy(v));
 }

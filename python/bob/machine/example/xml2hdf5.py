@@ -38,11 +38,11 @@ def acttext_to_enum(s):
   """Converts the XML activation representation to a bob value"""
   
   if s.lower() == 'tanh':
-    return bob.machine.Activation.TANH
+    return bob.machine.HyperbolicTangentActivation()
   elif s.lower() == 'sigmoid':
-    return bob.machine.Activation.LOG
+    return bob.machine.Activation.LogisticActivation()
   elif s.lower() == 'linear':
-    return bob.machine.Activation.LINEAR
+    return bob.machine.Activation.IdentityActivation()
   else:
     raise RuntimeError, "unsupported activation %s" % s
 

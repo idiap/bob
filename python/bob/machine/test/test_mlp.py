@@ -60,8 +60,10 @@ class MLPTest(unittest.TestCase):
     self.assertEqual(len(m.biases), 1)
     self.assertEqual(m.biases[0].shape, (1,))
     self.assertTrue((m.biases[0] == 0.0).all())
-    self.assertEqual(m.activation, bob.machine.Activation.TANH)
-    self.assertEqual(m.output_activation, bob.machine.Activation.TANH)
+    self.assertEqual(m.hidden_activation,
+        bob.machine.HyperbolicTangentActivation())
+    self.assertEqual(m.output_activation,
+        bob.machine.HyperbolicTangentActivation())
 
     # 1 hidden layer
     m = bob.machine.MLP((2,3,1))
@@ -78,12 +80,14 @@ class MLPTest(unittest.TestCase):
     self.assertTrue((m.biases[0] == 0.0).all())
     self.assertEqual(m.biases[1].shape, (1,))
     self.assertTrue((m.biases[1] == 0.0).all())
-    self.assertEqual(m.activation, bob.machine.Activation.TANH)
-    self.assertEqual(m.output_activation, bob.machine.Activation.TANH)
+    self.assertEqual(m.hidden_activation,
+        bob.machine.HyperbolicTangentActivation())
+    self.assertEqual(m.output_activation,
+        bob.machine.HyperbolicTangentActivation())
 
     # 2+ hidden layers, different activation
     m = bob.machine.MLP((2,3,5,1))
-    m.activation = bob.machine.Activation.LOG
+    m.hidden_activation = bob.machine.LogisticActivation()
     self.assertEqual(m.shape, (2,3,5,1))
     self.assertEqual(m.input_divide.shape[0], 2)
     self.assertEqual(m.input_subtract.shape[0], 2)
@@ -101,13 +105,16 @@ class MLPTest(unittest.TestCase):
     self.assertTrue((m.biases[1] == 0.0).all())
     self.assertEqual(m.biases[2].shape, (1,))
     self.assertTrue((m.biases[2] == 0.0).all())
-    self.assertEqual(m.activation, bob.machine.Activation.LOG)
-    self.assertEqual(m.output_activation, bob.machine.Activation.TANH)
+    self.assertEqual(m.hidden_activation,
+        bob.machine.LogisticActivation())
+    self.assertEqual(m.output_activation,
+        bob.machine.HyperbolicTangentActivation())
 
     # A resize should make the last machine look, structurally,
     # like the first again
     m.shape = (2,1)
-    m.output_activation = bob.machine.Activation.LOG
+    m.hidden_activation = bob.machine.LogisticActivation()
+    m.output_activation = bob.machine.LogisticActivation()
     self.assertEqual(m.shape, (2,1))
     self.assertEqual(m.input_divide.shape[0], 2)
     self.assertEqual(m.input_subtract.shape[0], 2)
@@ -115,8 +122,8 @@ class MLPTest(unittest.TestCase):
     self.assertEqual(m.weights[0].shape, (2,1))
     self.assertEqual(len(m.biases), 1)
     self.assertEqual(m.biases[0].shape, (1,))
-    self.assertEqual(m.activation, bob.machine.Activation.LOG)
-    self.assertEqual(m.output_activation, bob.machine.Activation.LOG)
+    self.assertEqual(m.hidden_activation, bob.machine.LogisticActivation())
+    self.assertEqual(m.output_activation, bob.machine.LogisticActivation())
 
   def test02_Checks(self):
 
@@ -164,7 +171,6 @@ class MLPTest(unittest.TestCase):
     # creates a file that will be used in the next test!
     m.save(bob.io.HDF5File(MACHINE, 'w'))
     m2 = bob.machine.MLP(bob.io.HDF5File(MACHINE))
-    self.assertTrue( m == m2 )
     self.assertTrue( m.is_similar_to(m2) )
     self.assertFalse( m != m2 )
     
@@ -186,12 +192,12 @@ class MLPTest(unittest.TestCase):
 
     # compares a simple (logistic activation, 1 layer) MLP with a LinearMachine
     mlinear = bob.machine.LinearMachine(2,1)
-    mlinear.activation = bob.machine.Activation.LOG
+    mlinear.activation = bob.machine.LogisticActivation()
     mlinear.weights = numpy.array([[.3], [-.42]])
     mlinear.biases = numpy.array([-.7])
 
     mlp = bob.machine.MLP((2,1))
-    mlp.output_activation = bob.machine.Activation.LOG
+    mlp.output_activation = bob.machine.LogisticActivation()
     mlp.weights = [numpy.array([[.3], [-.42]])]
     mlp.biases = [numpy.array([-.7])]
 

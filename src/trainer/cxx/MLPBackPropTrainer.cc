@@ -24,7 +24,6 @@
 #include <algorithm>
 #include <bob/core/check.h>
 #include <bob/math/linear.h>
-#include <bob/machine/MLPException.h>
 #include <bob/trainer/Exception.h>
 #include <bob/trainer/MLPBackPropTrainer.h>
 

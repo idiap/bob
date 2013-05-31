@@ -75,29 +75,29 @@ class PythonBackProp:
     W = machine.weights #weights
     B = machine.biases #biases
 
-    if machine.activation == bob.machine.Activation.TANH:
+    if machine.activation == bob.machine.HyperbolicTangentActivation():
       forward = tanh
       backward = tanh_bwd
-    elif machine.activation == bob.machine.Activation.LOG:
+    elif machine.activation == bob.machine.LogisticActivation():
       forward = logistic
       backward = logistic_bwd
-    elif machine.activation == bob.machine.Activation.LINEAR:
+    elif machine.activation == bob.machine.IdentityActivation():
       forward = linear
       backward = linear_bwd
     else:
       raise RuntimeError, "Cannot deal with activation %s" % machine.activation
 
-    if machine.output_activation == bob.machine.Activation.TANH:
+    if machine.output_activation == bob.machine.HyperbolicTangentActivation()
       output_forward = tanh
       output_backward = tanh_bwd
-    elif machine.output_activation == bob.machine.Activation.LOG:
+    elif machine.output_activation == bob.machine.LogisticActivation()
       output_forward = logistic
       output_backward = logistic_bwd
-    elif machine.output_activation == bob.machine.Activation.LINEAR:
+    elif machine.output_activation == bob.machine.IdentityActivation()
       output_forward = linear
       output_backward = linear_bwd
     else:
-      raise RuntimeError, "Cannot deal with activation %s" % machine.activation
+      raise RuntimeError, "Cannot deal with activation %s" % machine.output_activation
     
     #simulated bias input...
     BI = [numpy.zeros((input.shape[0],), 'float64') for k in B]
@@ -271,8 +271,8 @@ class BackPropTest(unittest.TestCase):
     N = 50
 
     machine = bob.machine.MLP((4, 4, 3))
-    machine.activation = bob.machine.Activation.TANH
-    machine.output_activation = bob.machine.Activation.TANH
+    machine.hidden_activation = bob.machine.HyperbolicTangentActivation()
+    machine.output_activation = bob.machine.HyperbolicTangentActivation()
     machine.randomize()
     trainer = bob.trainer.MLPBackPropTrainer(machine, N)
     trainer.train_biases = True
@@ -316,8 +316,8 @@ class BackPropTest(unittest.TestCase):
     N = 50
 
     machine = bob.machine.MLP((4, 3, 3, 1))
-    machine.activation = bob.machine.Activation.TANH
-    machine.output_activation = bob.machine.Activation.TANH
+    machine.hidden_activation = bob.machine.HyperbolicTangentActivation()
+    machine.output_activation = bob.machine.HyperbolicTangentActivation()
     machine.randomize()
     trainer = bob.trainer.MLPBackPropTrainer(N)
     trainer.train_biases = True
@@ -362,7 +362,8 @@ class BackPropTest(unittest.TestCase):
     N = 50
 
     machine = bob.machine.MLP((4, 3, 3, 1))
-    machine.output_activation = bob.machine.Activation.TANH
+    machine.hidden_activation = bob.machine.HyperbolicTangentActivation()
+    machine.output_activation = bob.machine.HyperbolicTangentActivation()
     machine.randomize()
     trainer = bob.trainer.MLPBackPropTrainer(machine, N)
     trainer.train_biases = True
@@ -418,8 +419,8 @@ class BackPropTest(unittest.TestCase):
     # the training works as expected by calculating the same
     # as the trainer should do using python.
     machine = bob.machine.MLP((2, 2, 1))
-    machine.activation = bob.machine.Activation.LOG
-    machine.output_activation = bob.machine.Activation.LOG
+    machine.hidden_activation = bob.machine.LogisticActivation()
+    machine.output_activation = bob.machine.LogisticActivation()
     machine.biases = 0
     w0 = numpy.array([[.23, .1],[-0.79, 0.21]])
     w1 = numpy.array([[-.12], [-0.88]])

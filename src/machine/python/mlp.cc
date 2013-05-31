@@ -24,7 +24,6 @@
 #include <boost/make_shared.hpp>
 #include <boost/python/stl_iterator.hpp>
 #include <bob/machine/MLP.h>
-#include <bob/machine/MLPException.h>
 
 using namespace boost::python;
 
@@ -243,7 +242,7 @@ void bind_machine_mlp() {
     .add_property("input_divide", make_function(&bob::machine::MLP::getInputDivision, return_value_policy<copy_const_reference>()), &set_input_div, "Input division factor, before feeding data through the MLP. The division is applied just after subtraction - by default, it is set to 1.0")
     .add_property("weights", &get_weight, &set_weight, "A set of weights for the synapses connecting each layer in the MLP. This is represented by a standard tuple containing the weights as 2D numpy.ndarray's of double-precision floating-point elements. Each of the ndarrays has the number of rows equals to the input received by that layer and the number of columns equals to the output fed to the next layer.")
     .add_property("biases", &get_bias, &set_bias, "A set of biases for each layer in the MLP. This is represented by a standard tuple containing the biases as 1D numpy.ndarray's of double-precision floating-point elements. Each of the ndarrays has the number of elements equals to the number of neurons in the respective layer. Note that, by definition, the input layer is not subject to biasing. If you need biasing on the input layer, use the input_subtract and input_divide attributes of this MLP.")
-    .add_property("activation", &bob::machine::MLP::getActivation, &bob::machine::MLP::setActivation, "The activation function (for all hidden layers) - by default, the hyperbolic tangent function. The output provided by the activation function is passed, unchanged, to the user.")
+    .add_property("hidden_activation", &bob::machine::MLP::getHiddenActivation, &bob::machine::MLP::setHiddenActivation, "The activation function (for all hidden layers) - by default, the hyperbolic tangent function. The output provided by the activation function is passed, unchanged, to the user.")
     .add_property("output_activation", &bob::machine::MLP::getOutputActivation, &bob::machine::MLP::setOutputActivation, "The output activation function (only for the last output layer) - by default, the hyperbolic tangent function. The output provided by the activation function is passed, unchanged, to the user.")
     .add_property("shape", &get_shape, &set_shape, "A tuple that represents the size of the input vector followed by the number of neurons in each hidden layer of the MLP and, finally, terminated by the size of the output vector in the format ``(input, hidden0, hidden1, ..., hiddenN, output)``. If you set this attribute, the network is automatically resized and should be considered uninitialized.")
     .def("__call__", &forward2, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output. You can either pass an input with 1 or 2 dimensions. If 2D, it is the same as running the 1D case many times considering as input to be every row in the input matrix.")

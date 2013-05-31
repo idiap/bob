@@ -21,6 +21,7 @@
  */
 
 #include <cmath>
+#include <boost/make_shared.hpp>
 
 #include <bob/core/array_copy.h>
 #include <bob/machine/LinearMachine.h>
@@ -31,8 +32,7 @@ bob::machine::LinearMachine::LinearMachine(const blitz::Array<double,2>& weight)
   : m_input_sub(weight.extent(0)),
     m_input_div(weight.extent(0)),
     m_bias(weight.extent(1)),
-    m_activation(bob::machine::LINEAR),
-    m_actfun(linear),
+    m_activation(boost::make_shared<bob::machine::IdentityActivation>()),
     m_buffer(weight.extent(0))
 {
   m_input_sub = 0.0;
@@ -46,8 +46,7 @@ bob::machine::LinearMachine::LinearMachine():
   m_input_div(0),
   m_weight(0, 0),
   m_bias(0),
-  m_activation(bob::machine::LINEAR),
-  m_actfun(linear),
+  m_activation(boost::make_shared<bob::machine::IdentityActivation>()),
   m_buffer(0)
 {
 }
@@ -57,8 +56,7 @@ bob::machine::LinearMachine::LinearMachine(size_t n_input, size_t n_output):
   m_input_div(n_input),
   m_weight(n_input, n_output),
   m_bias(n_output),
-  m_activation(bob::machine::LINEAR),
-  m_actfun(linear),
+  m_activation(boost::make_shared<bob::machine::IdentityActivation>()),
   m_buffer(n_input)
 {
   m_input_sub = 0.0;
@@ -73,7 +71,6 @@ bob::machine::LinearMachine::LinearMachine(const bob::machine::LinearMachine& ot
   m_weight(bob::core::array::ccopy(other.m_weight)),
   m_bias(bob::core::array::ccopy(other.m_bias)),
   m_activation(other.m_activation),
-  m_actfun(other.m_actfun),
   m_buffer(m_input_sub.shape())
 {
 }
@@ -93,7 +90,6 @@ bob::machine::LinearMachine& bob::machine::LinearMachine::operator=
     m_weight.reference(bob::core::array::ccopy(other.m_weight));
     m_bias.reference(bob::core::array::ccopy(other.m_bias));
     m_activation = other.m_activation;
-    m_actfun = other.m_actfun;
     m_buffer.resize(m_input_sub.shape());
   }
   return *this;
@@ -106,7 +102,7 @@ bob::machine::LinearMachine::operator==(const bob::machine::LinearMachine& b) co
           bob::core::array::isEqual(m_input_div, b.m_input_div) &&
           bob::core::array::isEqual(m_weight, b.m_weight) &&
           bob::core::array::isEqual(m_bias, b.m_bias) &&
-          m_activation == b.m_activation);
+          m_activation->str() == b.m_activation->str());
 }
 
 bool 
@@ -123,7 +119,7 @@ bob::machine::LinearMachine::is_similar_to(const bob::machine::LinearMachine& b,
           bob::core::array::isClose(m_input_div, b.m_input_div, r_epsilon, a_epsilon) &&
           bob::core::array::isClose(m_weight, b.m_weight, r_epsilon, a_epsilon) &&
           bob::core::array::isClose(m_bias, b.m_bias, r_epsilon, a_epsilon) &&
-          m_activation == b.m_activation);
+          m_activation->str() == b.m_activation->str());
 }
 
 void bob::machine::LinearMachine::load (bob::io::HDF5File& config) {
@@ -134,9 +130,16 @@ void bob::machine::LinearMachine::load (bob::io::HDF5File& config) {
   m_bias.reference(config.readArray<double,1>("biases"));
   m_buffer.resize(m_input_sub.extent(0));
 
-  //reads the activation function
-  uint32_t act = config.read<uint32_t>("activation");
-  setActivation(static_cast<bob::machine::Activation>(act));
+  //switch between different versions - support for version 1
+  if (config.hasAttribute(".", "version")) { //new version
+    config.cd("activation");
+    m_activation = bob::machine::load_activation(config);
+    config.cd("..");
+  }
+  else { //old version
+    uint32_t act = config.read<uint32_t>("activation");
+    m_activation = bob::machine::make_deprecated_activation(act);
+  }
 }
 
 void bob::machine::LinearMachine::resize (size_t input, size_t output) {
@@ -148,12 +151,15 @@ void bob::machine::LinearMachine::resize (size_t input, size_t output) {
 }
 
 void bob::machine::LinearMachine::save (bob::io::HDF5File& config) const {
+  config.setAttribute(".", "version", 1);
   config.setArray("input_sub", m_input_sub);
   config.setArray("input_div", m_input_div);
   config.setArray("weights", m_weight);
   config.setArray("biases", m_bias);
-  //bob's hdf5 implementation does not support enumerations yet...
-  config.set("activation", static_cast<uint32_t>(m_activation));
+  config.createGroup("activation");
+  config.cd("activation");
+  m_activation->save(config);
+  config.cd("..");
 }
 
 void bob::machine::LinearMachine::forward_
@@ -161,7 +167,7 @@ void bob::machine::LinearMachine::forward_
   m_buffer = (input - m_input_sub) / m_input_div;
   bob::math::prod_(m_buffer, m_weight, output);
   for (int i=0; i<m_weight.extent(1); ++i)
-    output(i) = m_actfun(output(i) + m_bias(i));
+    output(i) = m_activation->f(output(i) + m_bias(i));
 }
 
 void bob::machine::LinearMachine::forward
@@ -210,17 +216,6 @@ void bob::machine::LinearMachine::setInputDivision
   m_input_div.reference(bob::core::array::ccopy(v));
 }
 
-void bob::machine::LinearMachine::setActivation (bob::machine::Activation a) {
-  switch (a) {
-    case bob::machine::LINEAR:
-      m_actfun = bob::machine::linear;
-      break;
-    case bob::machine::TANH:
-      m_actfun = std::tanh;
-      break;
-    case bob::machine::LOG:
-      m_actfun = bob::machine::logistic;
-      break;
-  }
+void bob::machine::LinearMachine::setActivation (boost::shared_ptr<bob::machine::Activation> a) {
   m_activation = a;
 }

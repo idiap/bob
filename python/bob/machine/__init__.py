@@ -3,7 +3,7 @@ __from_extension_import__('._machine', __package__, locals())
 
 def linearmachine_repr(self):
   """A funky way to display a bob Linear Machine"""
-  if self.activation == Activation.LINEAR:
+  if self.activation == IdentityActivation():
     return '<LinearMachine %s@%s>' % (self.weights.dtype, self.weights.shape)
   else:
     return '<LinearMachine %s@%s [act: %s]>' % (self.weights.dtype, self.weights.shape, self.activation)
@@ -13,7 +13,7 @@ del linearmachine_repr
 def linearmachine_str(self):
   """A funky way to print a bob Linear Machine"""
   act = ""
-  if self.activation != Activation.LINEAR:
+  if self.activation != IdentityActivation():
     act = " [act: %s]" % self.activation
   sub = ""
   if not (self.input_subtract == 0.0).all():
@@ -36,13 +36,19 @@ def mlp_repr(self):
   bias = False
   for i, k in enumerate(self.biases): 
     if not (k == 0.0).all(): bias = True
-  return '<MLP %s@%s [bias: %s][act: %s]>' % (self.weights[0].dtype, self.shape, str(bias).lower(), self.activation)
+  if self.hidden_activation != self.output_activation:
+    return '<MLP %s@%s [bias: %s][act: {hidden}%s/{output}%s]>' % (self.weights[0].dtype, self.shape, str(bias).lower(), self.hidden_activation, self.output_activation)
+  else:
+    return '<MLP %s@%s [bias: %s][act: %s]>' % (self.weights[0].dtype, self.shape, str(bias).lower(), self.hidden_activation)
 MLP.__repr__ = mlp_repr
 del mlp_repr
 
 def mlp_str(self):
   """A funky way to print a bob MLP"""
-  act = "[act: %s]" % self.activation
+  if self.hidden_activation != self.output_activation:
+    act = "[act: {hidden}%s/{output}%s]" % (self.hidden_activation, self.output_activation)
+  else:
+    act = "[act: %s]" % self.hidden_activation
   sub = ""
   if not (self.input_subtract == 0.0).all():
     sub = "\n subtract: %s" % self.input_subtract
