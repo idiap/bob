@@ -251,11 +251,11 @@ template <> int bob::python::ctype_to_num<std::complex<long double> >(void)
 #endif
 
 bob::core::array::ElementType bob::python::array_to_type(const boost::python::numeric::array& a) {
-  return bob::python::num_to_type(TP_ARRAY(a)->descr->type_num);
+  return bob::python::num_to_type(PyArray_DESCR(TP_ARRAY(a))->type_num);
 }
 
 size_t bob::python::array_to_ndim(const boost::python::numeric::array& a) {
-  return PyArray_NDIM(a.ptr());
+  return PyArray_NDIM(TP_ARRAY(a));
 }
 
 #define TP_DESCR(x) ((PyArray_Descr*)x.ptr())
@@ -337,9 +337,8 @@ std::string bob::python::dtype::cxx_str() const {
 void bob::python::typeinfo_ndarray_ (const boost::python::object& o, bob::core::array::typeinfo& i) {
   PyArrayObject* npy = TP_ARRAY(o);
   npy_intp strides[NPY_MAXDIMS];
-  for (int k=0; k<npy->nd; ++k) strides[k] = npy->strides[k]/npy->descr->elsize;
-  i.set<npy_intp>(bob::python::num_to_type(npy->descr->type_num), npy->nd,
-      npy->dimensions, strides);
+  for (int k=0; k<PyArray_NDIM(npy); ++k) strides[k] = PyArray_STRIDES(npy)[k]/PyArray_DESCR(npy)->elsize;
+  i.set<npy_intp>(bob::python::num_to_type(PyArray_DESCR(npy)->type_num), PyArray_NDIM(npy), PyArray_DIMS(npy), strides);
 }
 
 void bob::python::typeinfo_ndarray (const boost::python::object& o, bob::core::array::typeinfo& i) {
@@ -367,9 +366,9 @@ static int _GetArrayParamsFromObject(PyObject* op,
     
     PyArrayObject* arr = reinterpret_cast<PyArrayObject*>(op);
 
-    if (requested_dtype && !PyArray_EquivTypes(arr->descr, requested_dtype)) {
+    if (requested_dtype && !PyArray_EquivTypes(PyArray_DESCR(arr), requested_dtype)) {
 
-      if (PyArray_CanCastTo(arr->descr, requested_dtype)) {
+      if (PyArray_CanCastTo(PyArray_DESCR(arr), requested_dtype)) {
         (*out_arr) = 0;
         (*out_dtype) = PyArray_DESCR(arr);
         (*out_ndim) = PyArray_NDIM(arr);
@@ -450,7 +449,7 @@ bob::python::convert_t bob::python::convertible(boost::python::object array_like
     //checks behavior.
     if (behaved && !PyArray_ISCARRAY_RO(arr)) retval = bob::python::WITHARRAYCOPY;
 
-    info.set<npy_intp>(bob::python::num_to_type(arr->descr->type_num),
+    info.set<npy_intp>(bob::python::num_to_type(PyArray_DESCR(arr)->type_num),
         PyArray_NDIM(arr), PyArray_DIMS(arr));
 
     Py_XDECREF(arr);
@@ -705,7 +704,7 @@ bob::python::py_array::py_array(boost::python::object o, boost::python::object _
   m_data = shared_from_ndarray(mine);
 
   //set-up the C-style pointer to this data
-  m_ptr = static_cast<void*>(TP_ARRAY(mine)->data);
+  m_ptr = static_cast<void*>(PyArray_DATA(TP_ARRAY(mine)));
 }
 
 bob::python::py_array::py_array(const bob::core::array::interface& other) {
@@ -774,7 +773,7 @@ static boost::python::object make_ndarray(int nd, npy_intp* dims, int type) {
  */
 static boost::python::object copy_array (const boost::python::object& array) {
   PyArrayObject* _p = TP_ARRAY(array);
-  boost::python::object retval = make_ndarray(_p->nd, _p->dimensions, _p->descr->type_num);
+  boost::python::object retval = make_ndarray(PyArray_NDIM(_p), PyArray_DIMS(_p), PyArray_DESCR(_p)->type_num);
   PyArray_CopyInto(TP_ARRAY(retval), TP_ARRAY(array));
   return retval;
 }
@@ -802,7 +801,7 @@ void bob::python::py_array::set(const bob::core::array::interface& other) {
   m_data = shared_from_ndarray(mine);
 
   //set-up the C-style pointer to this data
-  m_ptr = static_cast<void*>(TP_ARRAY(mine)->data);
+  m_ptr = static_cast<void*>(PyArray_DATA(TP_ARRAY(mine)));
 
   m_is_numpy = true;
 }
@@ -846,7 +845,7 @@ void bob::python::py_array::set (const bob::core::array::typeinfo& req) {
   m_data = shared_from_ndarray(mine);
 
   //set-up the C-style pointer to this data
-  m_ptr = static_cast<void*>(TP_ARRAY(mine)->data);
+  m_ptr = static_cast<void*>(PyArray_DATA(TP_ARRAY(mine)));
 
   m_is_numpy = true;
 }
@@ -881,7 +880,11 @@ static boost::python::object make_readonly (const void* data, const bob::core::a
     PYTHON_ERROR(RuntimeError, "could not allocate space for deallocation object in read-only array::interface wrapping");
   }
 
+# if NPY_FEATURE_VERSION >= NUMPY17_API /* NumPy C-API version >= 1.7 */
+  PyArray_SetBaseObject(TP_ARRAY(retval), py_sharedptr);
+# else
   TP_ARRAY(retval)->base = py_sharedptr;
+# endif
 
   return retval;
 }

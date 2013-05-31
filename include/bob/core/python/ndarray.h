@@ -41,6 +41,9 @@
 #define NO_IMPORT_ARRAY
 #endif
 
+// Define the numpy C-API we are compatible with
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+
 // Finally, we include numpy's arrayobject header. Not before!
 #include <numpy/arrayobject.h>
 // ============================================================================

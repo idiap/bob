@@ -105,9 +105,9 @@ template <typename T, int N> struct bz_from_npy {
     // but, if the user passed an array of the right type, but we still need to
     // copy, warn the user as this is a tricky case to debug.
     PyArrayObject* arr = reinterpret_cast<PyArrayObject*>(obj_ptr);
-    if (result == tp::WITHARRAYCOPY && 
-        tp::ctype_to_num<T>() == arr->descr->type_num) {
-      PYTHON_ERROR(RuntimeError, "The bindings you are trying to use to this C++ method require a numpy.ndarray -> blitz::Array<%s,%d> conversion, but the array you passed, despite the correct type, is not C-style contiguous and/or properly aligned, so I cannot automatically wrap it. You can check this by yourself by printing the flags on such a variable with the command 'print(<varname>.flags)'. The only way to circumvent this problem, from python, is to create a copy the variable by issuing '<varname>.copy()' before calling the bound method. Otherwise, if you wish the copy to be executed automatically, you have to re-bind the method to use our custom 'const_ndarray' type.", ca::stringize<T>(), N);
+    if (result == bob::python::WITHARRAYCOPY && 
+        bob::python::ctype_to_num<T>() == PyArray_DESCR(arr)->type_num) {
+      PYTHON_ERROR(RuntimeError, "The bindings you are trying to use to this C++ method require a numpy.ndarray -> blitz::Array<%s,%d> conversion, but the array you passed, despite the correct type, is not C-style contiguous and/or properly aligned, so I cannot automatically wrap it. You can check this by yourself by printing the flags on such a variable with the command 'print(<varname>.flags)'. The only way to circumvent this problem, from python, is to create a copy the variable by issuing '<varname>.copy()' before calling the bound method. Otherwise, if you wish the copy to be executed automatically, you have to re-bind the method to use our custom 'const_ndarray' type.", bob::core::array::stringize<T>(), N);
     }
 
     return 0;
@@ -130,10 +130,10 @@ template <typename T, int N> struct bz_from_npy {
     shape_type shape;
     shape_type stride;
     for (int k=0; k<N; ++k) {
-      shape[k] = arr->dimensions[k];
-      stride[k] = (arr->strides[k]/sizeof(T));
+      shape[k] = PyArray_DIMS(arr)[k];
+      stride[k] = (PyArray_STRIDES(arr)[k]/sizeof(T));
     }
-    new (storage) array_type((T*)arr->data, shape, stride,
+    new (storage) array_type((T*)PyArray_DATA(arr), shape, stride,
         blitz::neverDeleteData); //place operator
     data->convertible = storage;
 
@@ -166,10 +166,10 @@ template <typename T, int N> struct bz_to_npy {
 
     //wrap new PyArray in a blitz layer and then copy the data
     shape_type shape=0;
-    for (int k=0; k<retval->nd; ++k) shape[k] = retval->dimensions[k];
+    for (int k=0; k<PyArray_NDIM(retval); ++k) shape[k] = PyArray_DIMS(retval)[k];
     shape_type stride=0;
-    for (int k=0; k<retval->nd; ++k) stride[k] = (retval->strides[k]/sizeof(T));
-    array_type bzdest((T*)retval->data, shape, stride, blitz::neverDeleteData);
+    for (int k=0; k<PyArray_NDIM(retval); ++k) stride[k] = (PyArray_STRIDES(retval)[k]/sizeof(T));
+    array_type bzdest((T*)PyArray_DATA(retval), shape, stride, blitz::neverDeleteData);
     bzdest = tv;
 
     return reinterpret_cast<PyObject*>(retval);
