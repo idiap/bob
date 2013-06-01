@@ -46,10 +46,10 @@ namespace bob { namespace machine {
       virtual double f (double z) const =0;
 
       /**
-       * Computes the derivative of the activated value, given the activation
-       * value used to compute the activated value originally.
+       * Computes the derivative of the activated value, given the activated
+       * value - that is, the output of Activation::f() above.
        */
-      virtual double f_prime (double z) const =0;
+      virtual double f_prime (double a) const =0;
 
       /**
        * Saves itself to an HDF5File
@@ -119,7 +119,7 @@ namespace bob { namespace machine {
       LinearActivation(double C=1.);
       virtual ~LinearActivation();
       virtual double f (double z) const;
-      virtual double f_prime (double z) const;
+      virtual double f_prime (double a) const;
       double C() const;
       virtual void save(bob::io::HDF5File& f) const;
       virtual void load(bob::io::HDF5File&);
@@ -140,7 +140,7 @@ namespace bob { namespace machine {
     public: // api
 
       virtual double f (double z) const;
-      virtual double f_prime (double z) const;
+      virtual double f_prime (double a) const;
       virtual void save(bob::io::HDF5File& f) const;
       virtual void load(bob::io::HDF5File&);
       virtual std::string unique_identifier() const;
@@ -149,7 +149,7 @@ namespace bob { namespace machine {
   };
 
   /**
-   * Implements the activation function f(z) = C*std::tanh(M*z)
+   * Implements the activation function f(z) = C*tanh(M*z)
    */
   class MultipliedHyperbolicTangentActivation: public Activation {
 
@@ -158,7 +158,7 @@ namespace bob { namespace machine {
       MultipliedHyperbolicTangentActivation(double C=1., double M=1.);
       virtual ~MultipliedHyperbolicTangentActivation();
       virtual double f (double z) const;
-      virtual double f_prime (double z) const; 
+      virtual double f_prime (double a) const; 
       double C() const;
       double M() const;
       virtual void save(bob::io::HDF5File& f) const;
@@ -181,7 +181,7 @@ namespace bob { namespace machine {
     public: // api
 
       virtual double f (double z) const;
-      virtual double f_prime (double z) const;
+      virtual double f_prime (double a) const;
       virtual void save(bob::io::HDF5File& f) const;
       virtual void load(bob::io::HDF5File&);
       virtual std::string unique_identifier() const;
