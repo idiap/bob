@@ -38,8 +38,8 @@ class PythonBackProp:
     # Our state
     self.learning_rate = learning_rate
     self.momentum = momentum
-    self.DW = None #delta matrixes for weights
-    self.DB = None #delta matrixes for biases
+    self.DW = None #delta matrices for weights
+    self.DB = None #delta matrices for biases
     self.PDW = None #previous delta matrices for weights
     self.PDB = None #previous delta matrices for biases
     self.train_biases = train_biases
@@ -75,13 +75,13 @@ class PythonBackProp:
     W = machine.weights #weights
     B = machine.biases #biases
 
-    if machine.activation == bob.machine.HyperbolicTangentActivation():
+    if machine.hidden_activation == bob.machine.HyperbolicTangentActivation():
       forward = tanh
       backward = tanh_bwd
-    elif machine.activation == bob.machine.LogisticActivation():
+    elif machine.hidden_activation == bob.machine.LogisticActivation():
       forward = logistic
       backward = logistic_bwd
-    elif machine.activation == bob.machine.IdentityActivation():
+    elif machine.hidden_activation == bob.machine.IdentityActivation():
       forward = linear
       backward = linear_bwd
     else:
@@ -149,8 +149,8 @@ class PythonBackProp:
 
 class MyBackPropTrainer(bob.trainer.overload.MLPBaseTrainer):
   """Simple example of python trainer that inherits from the MLPBaseTrainer: """
-  def __init__(self, machine, batch_size, train_biases=True, learning_rate=0.1, momentum=0.0):
-    bob.trainer.overload.MLPBaseTrainer.__init__(self, machine, batch_size)
+  def __init__(self, batch_size, cost, machine, train_biases=True, learning_rate=0.1, momentum=0.0):
+    bob.trainer.overload.MLPBaseTrainer.__init__(self, batch_size, cost, machine)
     # Our state
     self.learning_rate = learning_rate
     self.momentum = momentum
@@ -222,10 +222,10 @@ class BackPropTest(unittest.TestCase):
     # Initializes an MLPBackPropTrainer and checks all seems consistent
     # with the proposed API.
     machine = bob.machine.MLP((4, 1))
-    machine.activation = bob.machine.Activation.LINEAR
-    machine.output_activation = bob.machine.Activation.LINEAR
+    machine.hidden_activation = bob.machine.IdentityActivation()
+    machine.output_activation = bob.machine.IdentityActivation()
     B = 10
-    trainer = bob.trainer.MLPBackPropTrainer(machine, B)
+    trainer = bob.trainer.MLPBackPropTrainer(B, bob.trainer.SquareError(), machine)
     self.assertEqual( trainer.batch_size, B )
     self.assertTrue ( trainer.is_compatible(machine) )
     self.assertTrue ( trainer.train_biases )
@@ -242,13 +242,13 @@ class BackPropTest(unittest.TestCase):
     # the training works as expected by calculating the same
     # as the trainer should do using python.
     machine = bob.machine.MLP((2, 2, 1))
-    machine.activation = bob.machine.Activation.LOG
-    machine.output_activation = bob.machine.Activation.LOG
+    machine.hidden_activation = bob.machine.LogisticActivation()
+    machine.output_activation = bob.machine.LogisticActivation()
     machine.biases = 0
     w0 = numpy.array([[.23, .1],[-0.79, 0.21]])
     w1 = numpy.array([[-.12], [-0.88]])
     machine.weights = [w0, w1]
-    trainer = bob.trainer.MLPBackPropTrainer(1)
+    trainer = bob.trainer.MLPBackPropTrainer(1, bob.trainer.SquareError())
     trainer.train_biases = False
     trainer.initialize(machine)
     d0 = numpy.array([[.3, .7]])
@@ -261,7 +261,7 @@ class BackPropTest(unittest.TestCase):
 
     # trains with our C++ implementation
     trainer.train_(machine, d0, t0)
-    self.assertTrue( numpy.array_equal(pymachine.weights[0], machine.weights[0]) )
+    self.assertTrue(numpy.array_equal(pymachine.weights[0], machine.weights[0]))
 
   def test03_FisherWithOneHiddenLayer(self):
 
@@ -274,7 +274,7 @@ class BackPropTest(unittest.TestCase):
     machine.hidden_activation = bob.machine.HyperbolicTangentActivation()
     machine.output_activation = bob.machine.HyperbolicTangentActivation()
     machine.randomize()
-    trainer = bob.trainer.MLPBackPropTrainer(machine, N)
+    trainer = bob.trainer.MLPBackPropTrainer(N, bob.trainer.SquareError(), machine)
     trainer.train_biases = True
 
     # A helper to select and shuffle the data
@@ -319,7 +319,7 @@ class BackPropTest(unittest.TestCase):
     machine.hidden_activation = bob.machine.HyperbolicTangentActivation()
     machine.output_activation = bob.machine.HyperbolicTangentActivation()
     machine.randomize()
-    trainer = bob.trainer.MLPBackPropTrainer(N)
+    trainer = bob.trainer.MLPBackPropTrainer(N, bob.trainer.SquareError())
     trainer.train_biases = True
     trainer.initialize(machine)
 
@@ -365,7 +365,7 @@ class BackPropTest(unittest.TestCase):
     machine.hidden_activation = bob.machine.HyperbolicTangentActivation()
     machine.output_activation = bob.machine.HyperbolicTangentActivation()
     machine.randomize()
-    trainer = bob.trainer.MLPBackPropTrainer(machine, N)
+    trainer = bob.trainer.MLPBackPropTrainer(N, bob.trainer.SquareError(), machine)
     trainer.train_biases = True
     trainer.momentum = 0.99
 
@@ -409,7 +409,7 @@ class BackPropTest(unittest.TestCase):
     machine = bob.machine.MLP((12, 7, 5, n_output))
     n_hidden_layers = len(machine.shape) - 2 
     batch_size = 70
-    t = MyBackPropTrainer(machine, batch_size)
+    t = MyBackPropTrainer(batch_size, bob.trainer.SquareError(), machine)
     self.assertTrue( len(t.error)   == n_hidden_layers+1 )
     self.assertTrue( len(t.output)  == n_hidden_layers+1 )
 
@@ -425,13 +425,13 @@ class BackPropTest(unittest.TestCase):
     w0 = numpy.array([[.23, .1],[-0.79, 0.21]])
     w1 = numpy.array([[-.12], [-0.88]])
     machine.weights = [w0, w1]
-    trainer = bob.trainer.MLPBackPropTrainer(machine, 1)
+    trainer = bob.trainer.MLPBackPropTrainer(1, bob.trainer.SquareError(), machine)
     trainer.train_biases = False
     d0 = numpy.array([[.3, .7]])
     t0 = numpy.array([[.0]])
 
     # trains in python first
-    pytrainer = MyBackPropTrainer(machine, 1, train_biases=trainer.train_biases)
+    pytrainer = MyBackPropTrainer(1, bob.trainer.SquareError(), machine, train_biases=trainer.train_biases)
     pymachine = bob.machine.MLP(machine) #a copy
     pytrainer.reset()
     pytrainer.train(pymachine, d0, t0)
@@ -443,7 +443,7 @@ class BackPropTest(unittest.TestCase):
     # Do the same but additionally using the initialize() method
     machine2 = bob.machine.MLP((4, 5, 3))
     # trains in python first
-    pytrainer = MyBackPropTrainer(machine2, 1, train_biases=trainer.train_biases)
+    pytrainer = MyBackPropTrainer(1, bob.trainer.SquareError(), machine2, train_biases=trainer.train_biases)
     pymachine = bob.machine.MLP(machine) #a copy
     pytrainer.initialize(pymachine) # try to reinitialize
     pytrainer.train(pymachine, d0, t0)

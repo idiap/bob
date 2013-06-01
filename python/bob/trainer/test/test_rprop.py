@@ -91,13 +91,13 @@ class PythonRProp:
     W = machine.weights #weights
     B = machine.biases #biases
 
-    if machine.activation == bob.machine.HyperbolicTangentActivation():
+    if machine.hidden_activation == bob.machine.HyperbolicTangentActivation():
       forward = tanh
       backward = tanh_bwd
-    elif machine.activation == bob.machine.LogisticActivation():
+    elif machine.hidden_activation == bob.machine.LogisticActivation():
       forward = logistic
       backward = logistic_bwd
-    elif machine.activation == bob.machine.IdentityActivation():
+    elif machine.hidden_activation == bob.machine.IdentityActivation():
       forward = linear
       backward = linear_bwd
     else:
@@ -198,8 +198,8 @@ class RPropTest(unittest.TestCase):
     # Initializes an MLPRPropTrainer and checks all seems consistent
     # with the proposed API.
     machine = bob.machine.MLP((4, 1))
-    machine.activation = bob.machine.Activation.LINEAR
-    machine.output_activation = bob.machine.Activation.LINEAR
+    machine.hidden_activation = bob.machine.IdentityActivation()
+    machine.output_activation = bob.machine.IdentityActivation()
     B = 10
     trainer = bob.trainer.MLPRPropTrainer(B, bob.trainer.SquareError(), machine)
     self.assertEqual( trainer.batch_size, B )
@@ -218,8 +218,8 @@ class RPropTest(unittest.TestCase):
     # the training works as expected by calculating the same
     # as the trainer should do using python.
     machine = bob.machine.MLP((4, 1))
-    machine.activation = bob.machine.Activation.LINEAR
-    machine.output_activation = bob.machine.Activation.LINEAR
+    machine.hidden_activation = bob.machine.IdentityActivation()
+    machine.output_activation = bob.machine.IdentityActivation()
     machine.biases = 0
     w0 = numpy.array([[.1],[.2],[-.1],[-.05]])
     machine.weights = [w0]
@@ -260,8 +260,8 @@ class RPropTest(unittest.TestCase):
     N = 60
 
     machine = bob.machine.MLP((4, 1))
-    machine.activation = bob.machine.Activation.LINEAR
-    machine.output_activation = bob.machine.Activation.LINEAR
+    machine.hidden_activation = bob.machine.IdentityActivation()
+    machine.output_activation = bob.machine.IdentityActivation()
     machine.randomize()
     machine.biases = 0
     trainer = bob.trainer.MLPRPropTrainer(N, bob.trainer.SquareError())
@@ -302,8 +302,8 @@ class RPropTest(unittest.TestCase):
     N = 60
 
     machine = bob.machine.MLP((4, 1))
-    machine.activation = bob.machine.Activation.LINEAR
-    machine.output_activation = bob.machine.Activation.LINEAR
+    machine.hidden_activation = bob.machine.IdentityActivation()
+    machine.output_activation = bob.machine.IdentityActivation()
     machine.randomize()
     trainer = bob.trainer.MLPRPropTrainer(N, bob.trainer.SquareError(), machine)
     trainer.train_biases = True
