@@ -23,8 +23,10 @@
 #define BOB_TRAINER_MLPBASETRAINER_H
 
 #include <vector>
+#include <boost/shared_ptr.hpp>
 
 #include <bob/machine/MLP.h>
+#include <bob/trainer/Cost.h>
 
 namespace bob { namespace trainer {
   /**
@@ -36,6 +38,28 @@ namespace bob { namespace trainer {
    * @brief Base class for training MLP. This provides forward and backward
    * functions over a batch of samples, as well as accessors to the internal
    * states of the networks.
+   * 
+   * Here is an overview of the backprop algorithm executed by this trainer:
+   *
+   * -# Take the <em>local gradient</em> of a neuron
+   *    @f[ b^{(l)} @f]
+   *
+   * -# Multiply that value by the <em>output</em> of the previous layer;
+   *    @f[
+   *    b^{(l)} \times a^{(l-1)}
+   *    @f]
+   *
+   * -# Multiply the result of the previous step by the learning rate;
+   *    @f[
+   *    \eta \times b^{(l)} \times a^{(l-1)}
+   *    @f]
+   *
+   * -# Add the result of the previous setup to the current weight,
+   *    possibly weighting the sum with a momentum ponderator.
+   *    @f[
+   *    w_{n+1} = (1-\mu) \times (w_{n} + \eta \times b^{(l)} 
+   *    \times a^{(l-1)}) + (\mu) \times w_{n-1}
+   *    @f]
    */
   class MLPBaseTrainer {
 
@@ -44,37 +68,45 @@ namespace bob { namespace trainer {
       /**
        * @brief Initializes a new MLPBaseTrainer trainer according to a given
        * training batch size.
+       *
+       * @param batch_size The number of examples passed at each iteration. If
+       * you set this to 1, then you are implementing stochastic training.
+       *
+       * @param cost This is the cost function to use for the current training.
+       *
+       * @note Good values for batch sizes are tens of samples. This may affect
+       * the convergence.
        */
-      MLPBaseTrainer(size_t batch_size);
+      MLPBaseTrainer(size_t batch_size,
+          boost::shared_ptr<bob::trainer::Cost> cost);
 
       /**
        * @brief Initializes a new MLPBaseTrainer trainer according to a given
        * machine settings and a training batch size.
        *
-       * Good values for batch sizes are tens of samples. This may affect the 
-       * convergence.
+       * @param batch_size The number of examples passed at each iteration. If
+       * you set this to 1, then you are implementing stochastic training.
        *
-       * Here is an overview of the backprop algorithm executed by this
-       * trainer:
+       * @param cost This is the cost function to use for the current training.
        *
-       * -# Take the <em>local gradient</em> of a neuron
-       *    @f[ l^{(l)} @f]
-       * -# Multiply that value by the <em>output</em> of the previous layer;
-       *    @f[
-       *    l^{(l)} \times y^{(l-1)}
-       *    @f]
-       * -# Multiply the result of the previous step by the learning rate;
-       *    @f[
-       *    \eta \times l^{(l)} \times y^{(l-1)}
-       *    @f]
-       * -# Add the result of the previous setup to the current weight,
-       *    possibly weighting the sum with a momentum ponderator.
-       *    @f[
-       *    w_{n+1} = (1-\mu) \times (w_{n} + \eta \times l^{(l)} 
-       *    \times y^{(l-1)}) + (\mu) \times w_{n-1}
-       *    @f]
+       * @param machine Clone this machine weights and prepare the trainer
+       * internally mirroring machine properties.
+       *
+       * @note Good values for batch sizes are tens of samples. This may affect
+       * the convergence.
        */
-      MLPBaseTrainer(const bob::machine::MLP& machine, size_t batch_size);
+      MLPBaseTrainer(size_t batch_size, 
+          boost::shared_ptr<bob::trainer::Cost> cost,
+          const bob::machine::MLP& machine);
+
+      /**
+       * @brief Initializes a new MLPBaseTrainer trainer according to a given
+       * machine settings, a training batch size and a cost function.
+       *
+       * @note Good values for batch sizes are tens of samples. This may affect
+       * the convergence.
+       */
+      MLPBaseTrainer(size_t batch_size, const bob::machine::MLP& machine);
 
       /**
        * @brief Destructor virtualisation
@@ -100,6 +132,16 @@ namespace bob { namespace trainer {
        * @brief Sets the batch size
        */
       void setBatchSize(size_t batch_size);
+
+      /**
+       * @brief Gets the cost to be minimized
+       */
+      boost::shared_ptr<Cost> getCost() const { return m_cost; }
+
+      /**
+       * @brief Sets the cost to be minimized
+       */
+      void setCost(boost::shared_ptr<Cost>& cost) { m_cost = cost; }
 
       /**
        * @brief Gets the current settings for bias training (defaults to true)
@@ -142,6 +184,22 @@ namespace bob { namespace trainer {
         const blitz::Array<double,2>& target);
 
       /**
+       * @brief Calculates the (average) cost for a given target. This
+       * method assumes you have already called forward_step() before. If that
+       * is not the case, use the next variant.
+       */
+      double average_cost(const blitz::Array<double,2>& target) const;
+
+      /**
+       * @brief Calculates the (average) cost for a given target. This
+       * method also calls forward_step(), so you can call backward_step() just
+       * after it, if you wish to do so.
+       */
+      double average_cost(const bob::machine::MLP& machine,
+        const blitz::Array<double,2>& input,
+        const blitz::Array<double,2>& target);
+
+      /**
        * @brief Initialize the internal buffers for the current machine
        */
       virtual void initialize(const bob::machine::MLP& machine);
@@ -171,7 +229,6 @@ namespace bob { namespace trainer {
        */
       void setOutput(const blitz::Array<double,2>& output, const size_t index);
 
-
     protected: //representation
 
       /**
@@ -181,6 +238,7 @@ namespace bob { namespace trainer {
 
       /// training parameters:
       size_t m_batch_size; ///< the batch size
+      boost::shared_ptr<bob::trainer::Cost> m_cost; ///< cost function to be minimized
       bool m_train_bias; ///< shall we be training biases? (default: true)
       size_t m_H; ///< number of hidden layers on the target machine
 

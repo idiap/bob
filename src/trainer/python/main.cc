@@ -37,6 +37,7 @@ void bind_trainer_bic();
 void bind_trainer_llr();
 void bind_trainer_whitening();
 void bind_trainer_wccn();
+void bind_trainer_cost();
 
 #if WITH_LIBSVM
 void bind_trainer_svm();
@@ -60,6 +61,7 @@ BOOST_PYTHON_MODULE(_trainer) {
   bind_trainer_llr();
   bind_trainer_whitening();
   bind_trainer_wccn();
+  bind_trainer_cost();
 # if WITH_LIBSVM
   bind_trainer_svm();
 # endif

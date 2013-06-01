@@ -28,8 +28,9 @@
 #include <bob/trainer/Exception.h>
 #include <bob/trainer/MLPRPropTrainer.h>
 
-bob::trainer::MLPRPropTrainer::MLPRPropTrainer(size_t batch_size):
-  bob::trainer::MLPBaseTrainer(batch_size),
+bob::trainer::MLPRPropTrainer::MLPRPropTrainer(size_t batch_size,
+    boost::shared_ptr<bob::trainer::Cost> cost):
+  bob::trainer::MLPBaseTrainer(batch_size, cost),
   m_deriv(m_H + 1),
   m_deriv_bias(m_H + 1),
   m_prev_deriv(m_H + 1),
@@ -46,9 +47,10 @@ bob::trainer::MLPRPropTrainer::MLPRPropTrainer(size_t batch_size):
 }
 
 
-bob::trainer::MLPRPropTrainer::MLPRPropTrainer(const bob::machine::MLP& machine,
-    size_t batch_size):
-  bob::trainer::MLPBaseTrainer(machine, batch_size),
+bob::trainer::MLPRPropTrainer::MLPRPropTrainer(size_t batch_size, 
+    boost::shared_ptr<bob::trainer::Cost> cost,
+    const bob::machine::MLP& machine):
+  bob::trainer::MLPBaseTrainer(batch_size, cost, machine),
   m_deriv(m_H + 1),
   m_deriv_bias(m_H + 1),
   m_prev_deriv(m_H + 1),

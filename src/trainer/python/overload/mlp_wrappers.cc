@@ -31,11 +31,11 @@ class MLPBaseTrainerWrapper: public bob::trainer::MLPBaseTrainer,
                              public wrapper<bob::trainer::MLPBaseTrainer> 
 {
 public:
-  MLPBaseTrainerWrapper(size_t batch_size):
-    bob::trainer::MLPBaseTrainer(batch_size) {}
+  MLPBaseTrainerWrapper(size_t batch_size, boost::shared_ptr<bob::trainer::Cost> cost):
+    bob::trainer::MLPBaseTrainer(batch_size, cost) {}
 
-  MLPBaseTrainerWrapper(const bob::machine::MLP& machine, size_t batch_size):
-    bob::trainer::MLPBaseTrainer(machine, batch_size) {}
+  MLPBaseTrainerWrapper(size_t batch_size, boost::shared_ptr<bob::trainer::Cost> cost, const bob::machine::MLP& machine):
+    bob::trainer::MLPBaseTrainer(batch_size, cost, machine) {}
 
   virtual ~MLPBaseTrainerWrapper() {}
  
@@ -57,11 +57,11 @@ class MLPBackPropTrainerWrapper: public bob::trainer::MLPBackPropTrainer,
                                  public wrapper<bob::trainer::MLPBackPropTrainer> 
 {
 public:
-  MLPBackPropTrainerWrapper(size_t batch_size):
-    bob::trainer::MLPBackPropTrainer(batch_size) {}
+  MLPBackPropTrainerWrapper(size_t batch_size, boost::shared_ptr<bob::trainer::Cost> cost):
+    bob::trainer::MLPBackPropTrainer(batch_size, cost) {}
 
-  MLPBackPropTrainerWrapper(const bob::machine::MLP& machine, size_t batch_size):
-    bob::trainer::MLPBackPropTrainer(machine, batch_size) {}
+  MLPBackPropTrainerWrapper(size_t batch_size, boost::shared_ptr<bob::trainer::Cost> cost, const bob::machine::MLP& machine):
+    bob::trainer::MLPBackPropTrainer(batch_size, cost, machine) {}
 
   virtual ~MLPBackPropTrainerWrapper() {}
  
@@ -83,11 +83,11 @@ class MLPRPropTrainerWrapper: public bob::trainer::MLPRPropTrainer,
                               public wrapper<bob::trainer::MLPRPropTrainer> 
 {
 public:
-  MLPRPropTrainerWrapper(size_t batch_size):
-    bob::trainer::MLPRPropTrainer(batch_size) {}
+  MLPRPropTrainerWrapper(size_t batch_size, boost::shared_ptr<bob::trainer::Cost> cost):
+    bob::trainer::MLPRPropTrainer(batch_size, cost) {}
 
-  MLPRPropTrainerWrapper(const bob::machine::MLP& machine, size_t batch_size):
-    bob::trainer::MLPRPropTrainer(machine, batch_size) {}
+  MLPRPropTrainerWrapper(size_t batch_size, boost::shared_ptr<bob::trainer::Cost> cost, const bob::machine::MLP& machine):
+    bob::trainer::MLPRPropTrainer(batch_size, cost, machine) {}
 
   virtual ~MLPRPropTrainerWrapper() {}
  
@@ -105,6 +105,21 @@ public:
   }
 };
 
+static double mlpbase_average_cost1(bob::trainer::MLPBaseTrainer& t, 
+  bob::python::const_ndarray target)
+{
+  const blitz::Array<double,2> target_ = target.bz<double,2>();
+  return t.average_cost(target_);
+}
+
+static double mlpbase_average_cost2(bob::trainer::MLPBaseTrainer& t,
+  const bob::machine::MLP& m, bob::python::const_ndarray input,
+  bob::python::const_ndarray target)
+{
+  const blitz::Array<double,2> input_ = input.bz<double,2>();
+  const blitz::Array<double,2> target_ = target.bz<double,2>();
+  return t.average_cost(m, input_, target_);
+}
 
 static object mlpbase_get_error(const bob::trainer::MLPBaseTrainer& t) {
   const std::vector<blitz::Array<double,2> >& v = t.getError();
@@ -165,22 +180,25 @@ static void mlpbase_backward_step(bob::trainer::MLPBaseTrainer& t,
 void bind_trainer_mlp_wrappers() {
 
   class_<MLPBaseTrainerWrapper, boost::noncopyable >("MLPBaseTrainer", no_init)
-    .def(init<const bob::machine::MLP&, size_t>((arg("mlp"), arg("batch_size")), "Creates a MLPBaseTrainer."))
-    .def(init<size_t>((arg("batch_size")), "Creates a MLPBaseTrainer."))
+    .def(init<size_t, boost::shared_ptr<bob::trainer::Cost>, const bob::machine::MLP&>((arg("self"), arg("batch_size"), arg("cost"), arg("mlp")), "Creates a MLPBaseTrainer."))
+    .def(init<size_t, boost::shared_ptr<bob::trainer::Cost> >((arg("self"), arg("batch_size"), arg("cost")), "Creates a MLPBaseTrainer."))
     .def("initialize", &bob::trainer::MLPBaseTrainer::initialize, &MLPBaseTrainerWrapper::d_initialize, (arg("self"), arg("mlp")), "Initialize the training process.")
     .add_property("batch_size", &bob::trainer::MLPBaseTrainer::getBatchSize, &bob::trainer::MLPBaseTrainer::setBatchSize)
+    .add_property("cost", &bob::trainer::MLPBaseTrainer::getCost, &bob::trainer::MLPBaseTrainer::setCost)
     .add_property("train_biases", &bob::trainer::MLPBaseTrainer::getTrainBiases, &bob::trainer::MLPBaseTrainer::setTrainBiases)
     .def("is_compatible", &bob::trainer::MLPBaseTrainer::isCompatible, (arg("self"), arg("machine")), "Checks if a given machine is compatible with my inner settings")
     .def("forward_step", &mlpbase_forward_step, (arg("self"), arg("mlp"), arg("input")), "Forward step -- Forwards a batch of data through the MLP and updates the internal buffers.")
     .def("backward_step", &mlpbase_backward_step, (arg("self"), arg("mlp"), arg("target")), "Backward step -- Backwards a batch of data through the MLP and updates the internal buffers.")
+    .def("average_cost", &mlpbase_average_cost1, (arg("self"), arg("target")), "Calculates the (average) cost for a given target - this variant assumes you have called forward_step() before.")
+    .def("average_cost", &mlpbase_average_cost2, (arg("self"), arg("machine"), arg("input"), arg("target")), "Calculates the (average) cost for a given target, first calling ``forward_step``. After this, you can call ``backward_step`` to train the machine.")
     .add_property("error", &mlpbase_get_error, &mlpbase_set_error)
     .def("set_error", &mlpbase_set_error2, (arg("self"), arg("array"), arg("k")), "Sets the error for a given index.")
     .add_property("output", &mlpbase_get_output, &mlpbase_set_output)
     .def("set_output", &mlpbase_set_output2, (arg("self"), arg("array"), arg("k")), "Sets the output for a given index.")
   ;
 
-  class_<MLPBackPropTrainerWrapper, boost::noncopyable >("MLPBackPropTrainer", "Sets an MLP to perform discrimination based on vanilla error back-propagation as defined in 'Pattern Recognition and Machine Learning' by C.M. Bishop, chapter 5 or else, 'Pattern Classification' by Duda, Hart and Stork, chapter 6.", init<const bob::machine::MLP&, size_t>((arg("machine"), arg("batch_size")), "Initializes a new MLPBackPropTrainer trainer according to a given machine settings and a training batch size.\n\nGood values for batch sizes are tens of samples. BackProp is not necessarily a 'batch' training algorithm, but performs in a smoother if the batch size is larger. This may also affect the convergence.\n\n You can also change default values for the learning rate and momentum. By default we train w/o any momenta.\n\nIf you want to adjust a potential learning rate decay, you can and should do it outside the scope of this trainer, in your own way."))
-    .def(init<size_t>((arg("batch_size")), "Creates a MLPBackPropTrainer."))
+  class_<MLPBackPropTrainerWrapper, boost::noncopyable >("MLPBackPropTrainer", "Sets an MLP to perform discrimination based on vanilla error back-propagation as defined in 'Pattern Recognition and Machine Learning' by C.M. Bishop, chapter 5 or else, 'Pattern Classification' by Duda, Hart and Stork, chapter 6.", init<size_t, boost::shared_ptr<bob::trainer::Cost>, const bob::machine::MLP&>((arg("self"), arg("batch_size"), arg("cost"), arg("machine")), "Initializes a new MLPBackPropTrainer trainer according to a given machine settings and a training batch size.\n\nGood values for batch sizes are tens of samples. BackProp is not necessarily a 'batch' training algorithm, but performs in a smoother if the batch size is larger. This may also affect the convergence.\n\n You can also change default values for the learning rate and momentum. By default we train w/o any momenta.\n\nIf you want to adjust a potential learning rate decay, you can and should do it outside the scope of this trainer, in your own way."))
+    .def(init<size_t, boost::shared_ptr<bob::trainer::Cost> >((arg("self"), arg("batch_size"), arg("cost")), "Creates a MLPBackPropTrainer."))
     .add_property("batch_size", &bob::trainer::MLPBaseTrainer::getBatchSize, &bob::trainer::MLPBaseTrainer::setBatchSize)
     .add_property("train_biases", &bob::trainer::MLPBaseTrainer::getTrainBiases, &bob::trainer::MLPBaseTrainer::setTrainBiases)
     .def("is_compatible", &bob::trainer::MLPBaseTrainer::isCompatible, (arg("self"), arg("machine")), "Checks if a given machine is compatible with my inner settings")
@@ -198,8 +216,8 @@ void bind_trainer_mlp_wrappers() {
     .def("train_", &bob::trainer::MLPBackPropTrainer::train_, (arg("self"), arg("machine"), arg("input"), arg("target")), "This is a version of the train() method above, which does no compatibility check on the input machine.")
   ;
 
-  class_<MLPRPropTrainerWrapper, boost::noncopyable >("MLPRPropTrainer", "Sets an MLP to perform discrimination based on RProp: A Direct Adaptive Method for Faster Backpropagation Learning: The RPROP Algorithm, by Martin Riedmiller and Heinrich Braun on IEEE International Conference on Neural Networks, pp. 586--591, 1993.", init<const bob::machine::MLP&, size_t>((arg("machine"), arg("batch_size")), "Initializes a new MLPRPropTrainer trainer according to a given machine settings and a training batch size. Good values for batch sizes are tens of samples. RProp is a 'batch' training algorithm. Do not try to set batch_size to a too-low value."))
-    .def(init<size_t>((arg("batch_size")), "Creates a MLPRPropTrainer."))
+  class_<MLPRPropTrainerWrapper, boost::noncopyable >("MLPRPropTrainer", "Sets an MLP to perform discrimination based on RProp: A Direct Adaptive Method for Faster Backpropagation Learning: The RPROP Algorithm, by Martin Riedmiller and Heinrich Braun on IEEE International Conference on Neural Networks, pp. 586--591, 1993.", init<size_t, boost::shared_ptr<bob::trainer::Cost>, const bob::machine::MLP&>((arg("self"), arg("batch_size"), arg("cost"), arg("machine")), "Initializes a new MLPRPropTrainer trainer according to a given machine settings and a training batch size. Good values for batch sizes are tens of samples. RProp is a 'batch' training algorithm. Do not try to set batch_size to a too-low value."))
+    .def(init<size_t, boost::shared_ptr<bob::trainer::Cost> >((arg("self"), arg("batch_size"), arg("cost")), "Creates a MLPRPropTrainer."))
     .add_property("batch_size", &bob::trainer::MLPBaseTrainer::getBatchSize, &bob::trainer::MLPBaseTrainer::setBatchSize)
     .add_property("train_biases", &bob::trainer::MLPBaseTrainer::getTrainBiases, &bob::trainer::MLPBaseTrainer::setTrainBiases)
     .def("is_compatible", &bob::trainer::MLPBaseTrainer::isCompatible, (arg("self"), arg("machine")), "Checks if a given machine is compatible with my inner settings")

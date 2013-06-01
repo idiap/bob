@@ -201,7 +201,7 @@ class RPropTest(unittest.TestCase):
     machine.activation = bob.machine.Activation.LINEAR
     machine.output_activation = bob.machine.Activation.LINEAR
     B = 10
-    trainer = bob.trainer.MLPRPropTrainer(machine, B)
+    trainer = bob.trainer.MLPRPropTrainer(B, bob.trainer.SquareError(), machine)
     self.assertEqual( trainer.batch_size, B )
     self.assertTrue ( trainer.is_compatible(machine) )
     self.assertTrue ( trainer.train_biases )
@@ -223,7 +223,7 @@ class RPropTest(unittest.TestCase):
     machine.biases = 0
     w0 = numpy.array([[.1],[.2],[-.1],[-.05]])
     machine.weights = [w0]
-    trainer = bob.trainer.MLPRPropTrainer(machine, 1)
+    trainer = bob.trainer.MLPRPropTrainer(1, bob.trainer.SquareError(), machine)
     trainer.train_biases = False
     d0 = numpy.array([[1., 2., 0., 2.]])
     t0 = numpy.array([[1.]])
@@ -264,7 +264,7 @@ class RPropTest(unittest.TestCase):
     machine.output_activation = bob.machine.Activation.LINEAR
     machine.randomize()
     machine.biases = 0
-    trainer = bob.trainer.MLPRPropTrainer(N)
+    trainer = bob.trainer.MLPRPropTrainer(N, bob.trainer.SquareError())
     trainer.train_biases = False
     trainer.initialize(machine)
 
@@ -305,7 +305,7 @@ class RPropTest(unittest.TestCase):
     machine.activation = bob.machine.Activation.LINEAR
     machine.output_activation = bob.machine.Activation.LINEAR
     machine.randomize()
-    trainer = bob.trainer.MLPRPropTrainer(machine, N)
+    trainer = bob.trainer.MLPRPropTrainer(N, bob.trainer.SquareError(), machine)
     trainer.train_biases = True
 
     # A helper to select and shuffle the data
@@ -345,7 +345,7 @@ class RPropTest(unittest.TestCase):
     machine.hidden_activation = bob.machine.HyperbolicTangentActivation()
     machine.output_activation = bob.machine.HyperbolicTangentActivation()
     machine.randomize()
-    trainer = bob.trainer.MLPRPropTrainer(machine, N)
+    trainer = bob.trainer.MLPRPropTrainer(N, bob.trainer.SquareError(), machine)
     trainer.train_biases = True
 
     # A helper to select and shuffle the data
@@ -387,7 +387,7 @@ class RPropTest(unittest.TestCase):
     machine.hidden_activation = bob.machine.HyperbolicTangentActivation()
     machine.output_activation = bob.machine.HyperbolicTangentActivation()
     machine.randomize()
-    trainer = bob.trainer.MLPRPropTrainer(machine, N)
+    trainer = bob.trainer.MLPRPropTrainer(N, bob.trainer.SquareError(), machine)
     trainer.train_biases = True
 
     # A helper to select and shuffle the data

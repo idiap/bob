@@ -27,6 +27,8 @@ set(src
   "LLRTrainer.cc"
   "WhiteningTrainer.cc"
   "WCCNTrainer.cc"
+  "SquareError.cc"
+  "CrossEntropyLoss.cc"
   )
 
 if(WITH_LIBSVM)

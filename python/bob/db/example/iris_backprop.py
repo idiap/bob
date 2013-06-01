@@ -62,7 +62,7 @@ def create_machine(data, training_steps):
   mlp.activation = bob.machine.HyperbolicTangentActivation()
   mlp.randomize() #reset weights and biases to a value between -0.1 and +0.1
   BATCH = 50 
-  trainer = bob.trainer.MLPBackPropTrainer(mlp, BATCH)
+  trainer = bob.trainer.MLPBackPropTrainer(BATCH, bob.trainer.SquareError(), mlp)
   trainer.trainBiases = True #this is the default, but just to clarify!
   trainer.momentum = 0.1 #some momenta
 

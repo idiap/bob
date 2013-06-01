@@ -27,8 +27,10 @@
 #include <bob/trainer/Exception.h>
 #include <bob/trainer/MLPBaseTrainer.h>
 
-bob::trainer::MLPBaseTrainer::MLPBaseTrainer(size_t batch_size):
+bob::trainer::MLPBaseTrainer::MLPBaseTrainer(size_t batch_size,
+    boost::shared_ptr<bob::trainer::Cost> cost):
   m_batch_size(batch_size),
+  m_cost(cost),
   m_train_bias(true),
   m_H(0), ///< handy!
   m_delta(1),
@@ -44,9 +46,11 @@ bob::trainer::MLPBaseTrainer::MLPBaseTrainer(size_t batch_size):
   reset();
 }
 
-bob::trainer::MLPBaseTrainer::MLPBaseTrainer(const bob::machine::MLP& machine,
-    size_t batch_size):
+bob::trainer::MLPBaseTrainer::MLPBaseTrainer(size_t batch_size, 
+    boost::shared_ptr<bob::trainer::Cost> cost,
+    const bob::machine::MLP& machine):
   m_batch_size(batch_size),
+  m_cost(cost),
   m_train_bias(true),
   m_H(machine.numOfHiddenLayers()), ///< handy!
   m_delta(m_H + 1),
@@ -73,6 +77,7 @@ bob::trainer::MLPBaseTrainer::~MLPBaseTrainer() { }
 
 bob::trainer::MLPBaseTrainer::MLPBaseTrainer(const MLPBaseTrainer& other):
   m_batch_size(other.m_batch_size),
+  m_cost(other.m_cost),
   m_train_bias(other.m_train_bias),
   m_H(other.m_H)
 {
@@ -87,6 +92,7 @@ bob::trainer::MLPBaseTrainer& bob::trainer::MLPBaseTrainer::operator=
   if (this != &other)
   {
     m_batch_size = other.m_batch_size;
+    m_cost = other.m_cost;
     m_train_bias = other.m_train_bias;
     m_H = other.m_H;
 
@@ -161,10 +167,9 @@ void bob::trainer::MLPBaseTrainer::backward_step(const bob::machine::MLP& machin
 
   //last layer
   boost::shared_ptr<bob::machine::Activation> output_actfun = machine.getOutputActivation();
-  m_error[m_H] = m_output.back() - target;
   for (int i=0; i<(int)m_batch_size; ++i) { //for every example
     for (int j=0; j<m_error[m_H].extent(1); ++j) { //for all variables
-      m_error[m_H](i,j) *= output_actfun->f_prime(m_output[m_H](i,j));
+      m_error[m_H](i,j) = m_cost->error(m_output[m_H](i,j), target(i,j), output_actfun);
     }
   }
 
@@ -178,6 +183,28 @@ void bob::trainer::MLPBaseTrainer::backward_step(const bob::machine::MLP& machin
       }
     }
   }
+}
+
+double bob::trainer::MLPBaseTrainer::average_cost
+(const blitz::Array<double,2>& target) const {
+  bob::core::array::assertSameShape(m_output[m_H], target);
+  uint64_t counter = 0;
+  double retval = 0.0;
+  for (int i=0; i<target.extent(0); ++i) { //for every example
+    for (int j=0; j<target.extent(1); ++j) { //for all variables
+      retval += m_cost->f(m_output[m_H](i,j), target(i,j));
+      ++counter;
+    }
+  }
+  return retval / counter;
+}
+
+double bob::trainer::MLPBaseTrainer::average_cost
+(const bob::machine::MLP& machine, const blitz::Array<double,2>& input,
+ const blitz::Array<double,2>& target) {
+  forward_step(machine, input);
+  backward_step(machine, target);
+  return average_cost(target);
 }
 
 void bob::trainer::MLPBaseTrainer::initialize(const bob::machine::MLP& machine)
@@ -244,4 +271,3 @@ void bob::trainer::MLPBaseTrainer::reset() {
     m_output[k] = 0.;
   }
 }
-

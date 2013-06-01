@@ -27,8 +27,9 @@
 #include <bob/trainer/Exception.h>
 #include <bob/trainer/MLPBackPropTrainer.h>
 
-bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(size_t batch_size):
-  bob::trainer::MLPBaseTrainer(batch_size),
+bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(size_t batch_size,
+    boost::shared_ptr<bob::trainer::Cost> cost):
+  bob::trainer::MLPBaseTrainer(batch_size, cost),
   m_learning_rate(0.1),
   m_momentum(0.0),
   m_prev_delta(m_H + 1),
@@ -42,9 +43,10 @@ bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(size_t batch_size):
   reset();
 }
 
-bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(const bob::machine::MLP& machine,
-    size_t batch_size):
-  bob::trainer::MLPBaseTrainer(machine, batch_size),
+bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(size_t batch_size, 
+    boost::shared_ptr<bob::trainer::Cost> cost,
+    const bob::machine::MLP& machine):
+  bob::trainer::MLPBaseTrainer(batch_size, cost, machine),
   m_learning_rate(0.1),
   m_momentum(0.0),
   m_prev_delta(m_H + 1),

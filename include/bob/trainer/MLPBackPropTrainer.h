@@ -51,14 +51,31 @@ namespace bob { namespace trainer {
       /**
        * @brief Initializes a new MLPBackPropTrainer trainer according to a
        * given training batch size.
+       *
+       * @param batch_size The number of examples passed at each iteration. If
+       * you set this to 1, then you are implementing stochastic training.
+       *
+       * @param cost This is the cost function to use for the current training.
+       *
+       * @note Good values for batch sizes are tens of samples. This may affect
+       * the convergence.
        */
-      MLPBackPropTrainer(size_t batch_size);
+      MLPBackPropTrainer(size_t batch_size,
+          boost::shared_ptr<bob::trainer::Cost> cost);
 
       /**
        * @brief Initializes a new MLPBackPropTrainer trainer according to a
        * given machine settings and a training batch size.
        *
-       * Good values for batch sizes are tens of samples. BackProp is not
+       * @param batch_size The number of examples passed at each iteration. If
+       * you set this to 1, then you are implementing stochastic training.
+       *
+       * @param cost This is the cost function to use for the current training.
+       *
+       * @param machine Clone this machine weights and prepare the trainer
+       * internally mirroring machine properties.
+       *
+       * @note Good values for batch sizes are tens of samples. BackProp is not
        * necessarily a "batch" training algorithm, but performs in a smoother
        * if the batch size is larger. This may also affect the convergence.
        *
@@ -67,28 +84,10 @@ namespace bob { namespace trainer {
        *
        * If you want to adjust a potential learning rate decay, you can and
        * should do it outside the scope of this trainer, in your own way.
-       *
-       * Here is an overview of the backprop algorithm executed by this
-       * trainer:
-       *
-       * -# Take the <em>local gradient</em> of a neuron
-       *    @f[ l^{(l)} @f]
-       * -# Multiply that value by the <em>output</em> of the previous layer;
-       *    @f[
-       *    l^{(l)} \times y^{(l-1)}
-       *    @f]
-       * -# Multiply the result of the previous step by the learning rate;
-       *    @f[
-       *    \eta \times l^{(l)} \times y^{(l-1)}
-       *    @f]
-       * -# Add the result of the previous setup to the current weight,
-       *    possibly weighting the sum with a momentum ponderator.
-       *    @f[
-       *    w_{n+1} = (1-\mu) \times (w_{n} + \eta \times l^{(l)} 
-       *    \times y^{(l-1)}) + (\mu) \times w_{n-1}
-       *    @f]
        */
-      MLPBackPropTrainer(const bob::machine::MLP& machine, size_t batch_size);
+      MLPBackPropTrainer(size_t batch_size, 
+          boost::shared_ptr<bob::trainer::Cost> cost,
+          const bob::machine::MLP& machine);
 
       /**
        * @brief Destructor virtualisation
@@ -106,8 +105,8 @@ namespace bob { namespace trainer {
       MLPBackPropTrainer& operator=(const MLPBackPropTrainer& other);
 
       /**
-       * @brief Re-initializes the whole training apparatus to start training a new
-       * machine. This will effectively reset all Delta matrices to their
+       * @brief Re-initializes the whole training apparatus to start training a
+       * new machine. This will effectively reset all Delta matrices to their
        * intial values and set the previous derivatives to zero.
        */
       void reset();
