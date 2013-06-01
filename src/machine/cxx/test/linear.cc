@@ -25,6 +25,7 @@
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/make_shared.hpp>
 #include <blitz/array.h>
 #include <stdint.h>
 
@@ -90,6 +91,8 @@ BOOST_AUTO_TEST_CASE( test_initialization )
   blitz::Array<double,1> idiv(3);
   idiv = 0.5, 1.0, 1.0;
   M.setInputDivision(idiv);
+
+  M.setActivation(boost::make_shared<bob::machine::HyperbolicTangentActivation>());
 
   //now load the same machine from the file and compare
   char *testdata_cpath = getenv("BOB_TESTDATA_DIR");
