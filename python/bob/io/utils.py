@@ -19,7 +19,12 @@ DEFAULT_FONT = pkg_resources.resource_filename(__name__,
 def estimate_fontsize(height, width, format):
   """Estimates the best fontsize to fit into a image that is (height, width)"""
 
-  import Image, ImageFont, ImageDraw
+  try:
+    # if PIL is installed this works:
+    import Image, ImageFont, ImageDraw
+  except ImportError:
+    # if Pillow is installed, this works better:
+    from PIL import Image, ImageFont, ImageDraw
 
   best_size = min(height, width)
   fit = False
@@ -38,7 +43,12 @@ def print_numbers(frame, counter, format, fontsize):
   """Generates an image that serves as a test pattern for encoding/decoding and
   accuracy tests."""
 
-  import Image, ImageFont, ImageDraw
+  try:
+    # if PIL is installed this works:
+    import Image, ImageFont, ImageDraw
+  except ImportError:
+    # if Pillow is installed, this works better:
+    from PIL import Image, ImageFont, ImageDraw
 
   _, height, width = frame.shape
 
@@ -49,7 +59,7 @@ def print_numbers(frame, counter, format, fontsize):
   (text_width, text_height) = font.getsize(text)
   x_pos = (width - text_width) / 2
   y_pos = (height - text_height) / 2
-  # this is buggy in Pillow-2.0.0
+  # this is buggy in Pillow-2.0.0, so we do it manually
   #img = Image.fromarray(frame.transpose(1,2,0))
   img = Image.fromstring('RGB', (frame.shape[1], frame.shape[2]), frame.transpose(1,2,0).tostring())
   draw = ImageDraw.Draw(img)
