@@ -63,7 +63,7 @@ static const char SQUARE_ERROR_DOC[] = \
   "is defined as follows:\n" \
   "\n" \
   ".. math::\n" \
-  "   J = \frac{(\\hat{y} - y)^2}{2}\n" \
+  "   J = \\frac{(\\hat{y} - y)^2}{2}\n" \
   "\n" \
   "where :math:`\\hat{y}` is the output estimated by your machine and\n" \
   ":math:`y` is the expected output.\n";
@@ -90,7 +90,7 @@ static const char CROSS_ENTROPY_LOSS_CONSTRUCTOR_DOC[] = \
   "But, for the cross-entropy loss: \n" \
   "\n" \
   ".. math::\n" \
-  "   \\delta = \\frac{\\hat{y} - y}{\\hat{y}(1 - \\hat{y}}\n" \
+  "   \\delta = \\frac{\\hat{y} - y}{\\hat{y}(1 - \\hat{y})}\n" \
   "\n" \
   "and :math:`\\varphi'(z) = \\hat{y} - (1 - \\hat{y})`, so:\n" \
   "\n" \

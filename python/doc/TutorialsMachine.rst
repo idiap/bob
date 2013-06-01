@@ -208,8 +208,8 @@ example:
 
 .. doctest::
 
-  >>> mlp.activation = bob.machine.Activation.LINEAR
-  >>> mlp.output_activation = bob.machine.Activation.LINEAR
+  >>> mlp.hidden_activation = bob.machine.IdentityActivation()
+  >>> mlp.output_activation = bob.machine.IdentityActivation()
 
 Once the network weights and biases are set, we can feed forward an example
 through this machine. This is done using the ``()`` operator, like for

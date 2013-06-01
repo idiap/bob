@@ -136,7 +136,7 @@ As described in :doc:`TutorialsMachine`, an MLP can be created as follows:
    :options: +NORMALIZE_WHITESPACE
    
    >>> machine = bob.machine.MLP((2, 2, 1)) # Creates a MLP with 2 inputs, 2 neurons in each hidden layer ad 1 output
-   >>> machine.activation = bob.machine.Activation.LOG # Uses a log() activation function
+   >>> machine.activation = bob.machine.LogisticActivation()
    >>> machine.biases = 0 # Set the biases to 0
    >>> w0 = numpy.array([[.23, .1],[-0.79, 0.21]])
    >>> w1 = numpy.array([[-.12], [-0.88]])
@@ -161,7 +161,7 @@ The class used to train a MLP [3]_ with backpropagation [4]_ is
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
    
-   >>> trainer = bob.trainer.MLPBackPropTrainer(machine, 1) #  Creates a BackProp trainer with a batch size of 1
+   >>> trainer = bob.trainer.MLPBackPropTrainer(1, bob.trainer.SquareError(), machine) #  Creates a BackProp trainer with a batch size of 1
    >>> trainer.train_biases = False # Do not train the bias
    >>> trainer.train(machine, d0, t0) # Performs the Back Propagation
 
@@ -175,7 +175,7 @@ overall training procedure remains identical.
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
  
-   >>> trainer = bob.trainer.MLPRPropTrainer(machine, 1)
+   >>> trainer = bob.trainer.MLPRPropTrainer(1, bob.trainer.SquareError(), machine)
    >>> trainer.train_biases = False
    >>> trainer.train(machine, d0, t0) 
 
