@@ -95,8 +95,8 @@ bob::machine::MLP::MLP (const bob::machine::MLP& other):
   m_input_div(bob::core::array::ccopy(other.m_input_div)),
   m_weight(other.m_weight.size()),
   m_bias(other.m_bias.size()),
-  m_hidden_activation(boost::make_shared<bob::machine::HyperbolicTangentActivation>()),
-  m_output_activation(m_hidden_activation),
+  m_hidden_activation(other.m_hidden_activation),
+  m_output_activation(other.m_output_activation),
   m_buffer(other.m_buffer.size())
 {
   for (size_t i=0; i<other.m_weight.size(); ++i) {
