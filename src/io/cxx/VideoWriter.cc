@@ -397,10 +397,14 @@ AVStream* io::VideoWriter::add_video_stream() {
   c->time_base.num = 1;
   c->gop_size = m_gop; // emit one intra frame every N frames at most
   c->pix_fmt = PIX_FMT_YUV420P;
+
+#if LIBAVCODEC_VERSION_INT >= 0x344802 //52.72.2 @ ffmpeg-0.6
   if (c->codec_id == CODEC_ID_MJPEG) {
     // mjpeg needs special encoding settings
     c->color_range = AVCOL_RANGE_JPEG;
   }
+#endif
+
   if (c->codec_id == CODEC_ID_MPEG2VIDEO) {
     // just for testing, we also add B frames
     c->max_b_frames = 2;
