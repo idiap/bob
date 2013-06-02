@@ -163,7 +163,6 @@ namespace bob {
       m_list_first_col.clear();
       m_list_current.clear();
       typedef struct bob::ip::detail::Pixel<T> Pix;
-      typedef typename std::list<boost::shared_ptr<Pix> >::iterator ListIterator;
       for(int j=0; j<2*m_radius_y+1; ++j)
         for(int i=0; i<2*m_radius_x+1; ++i)
         {
