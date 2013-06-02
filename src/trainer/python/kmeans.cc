@@ -57,6 +57,11 @@ static void py_setFirstOrderStats(bob::trainer::KMeansTrainer& op, bob::python::
   op.setFirstOrderStats(stats.bz<double,2>());
 }
 
+static void py_train(bob::trainer::EMTrainer<bob::machine::KMeansMachine, blitz::Array<double,2> >& trainer, bob::machine::KMeansMachine& machine, bob::python::const_ndarray sample)
+{
+  trainer.train(machine, sample.bz<double,2>());
+}
+
 void bind_trainer_kmeans() 
 {
   typedef bob::trainer::EMTrainer<bob::machine::KMeansMachine, blitz::Array<double,2> > EMTrainerKMeansBase; 
@@ -68,7 +73,7 @@ void bind_trainer_kmeans()
     .add_property("rng", &EMTrainerKMeansBase::getRng, &EMTrainerKMeansBase::setRng, "The Mersenne Twister mt19937 random generator used for the initialization of subspaces/arrays before the EM loop.")
     .def(self == self)
     .def(self != self)
-    .def("train", &EMTrainerKMeansBase::train, (arg("machine"), arg("data")), "Train a machine using data")
+    .def("train", &py_train, (arg("machine"), arg("data")), "Train a machine using data")
     .def("initialization", &EMTrainerKMeansBase::initialization, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
     .def("e_step", &EMTrainerKMeansBase::eStep, (arg("machine"), arg("data")),
        "Update the hidden variable distribution (or the sufficient statistics) given the Machine parameters. "

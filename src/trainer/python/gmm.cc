@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <boost/python.hpp>
+#include <bob/core/python/ndarray.h>
 #include <bob/trainer/GMMTrainer.h>
 #include <bob/trainer/MAP_GMMTrainer.h>
 #include <bob/trainer/ML_GMMTrainer.h>
@@ -31,6 +32,11 @@ object py_gmmtrainer_get_gmmstats(const bob::trainer::GMMTrainer& t)
   return object(s);
 }
 
+static void py_train(bob::trainer::EMTrainer<bob::machine::GMMMachine, blitz::Array<double,2> >& trainer, bob::machine::GMMMachine& machine, bob::python::const_ndarray sample)
+{
+  trainer.train(machine, sample.bz<double,2>());
+}
+
 void bind_trainer_gmm() {
 
   typedef bob::trainer::EMTrainer<bob::machine::GMMMachine, blitz::Array<double,2> > EMTrainerGMMBase; 
@@ -38,7 +44,7 @@ void bind_trainer_gmm() {
   class_<EMTrainerGMMBase, boost::noncopyable>("EMTrainerGMM", "The base python class for all EM-based trainers.", no_init)
     .add_property("convergence_threshold", &EMTrainerGMMBase::getConvergenceThreshold, &EMTrainerGMMBase::setConvergenceThreshold, "Convergence threshold")
     .add_property("max_iterations", &EMTrainerGMMBase::getMaxIterations, &EMTrainerGMMBase::setMaxIterations, "Max iterations")
-    .def("train", &EMTrainerGMMBase::train, (arg("machine"), arg("data")), "Train a machine using data")
+    .def("train", &py_train, (arg("machine"), arg("data")), "Train a machine using data")
     .def("initialization", &EMTrainerGMMBase::initialization, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
     .def("finalization", &EMTrainerGMMBase::finalization, (arg("machine"), arg("data")), "This method is called after the EM algorithm")
     .def("e_step", &EMTrainerGMMBase::eStep, (arg("machine"), arg("data")),

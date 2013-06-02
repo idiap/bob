@@ -299,6 +299,11 @@ namespace bob { namespace python {
       inline boost::python::object self() const { return m_self; }
 
       /**
+       * @brief Returns a borrowed reference to my PyArray_Descr* object.
+       */
+      inline PyArray_Descr* descr();
+
+      /**
        * @brief Returns the bp::str() object for myself
        */
       boost::python::str str() const;

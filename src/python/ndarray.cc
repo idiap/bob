@@ -330,6 +330,10 @@ std::string bob::python::dtype::cxx_str() const {
   return boost::python::extract<std::string>(this->str());
 }
 
+PyArray_Descr* bob::python::dtype::descr() {
+  return (PyArray_Descr*)m_self.ptr();
+}
+
 /****************************************************************************
  * Free methods                                                             *
  ****************************************************************************/
@@ -368,7 +372,11 @@ static int _GetArrayParamsFromObject(PyObject* op,
 
     if (requested_dtype && !PyArray_EquivTypes(PyArray_DESCR(arr), requested_dtype)) {
 
+#if NPY_FEATURE_VERSION >= NUMPY16_API /* NumPy C-API version >= 1.6 */
+      if (PyArray_CanCastTypeTo(PyArray_DESCR(arr), requested_dtype, NPY_SAFE_CASTING)) {
+#else
       if (PyArray_CanCastTo(PyArray_DESCR(arr), requested_dtype)) {
+#endif
         (*out_arr) = 0;
         (*out_dtype) = PyArray_DESCR(arr);
         (*out_ndim) = PyArray_NDIM(arr);
@@ -479,14 +487,14 @@ bob::python::convert_t bob::python::convertible_to (boost::python::object array_
 #else
     _GetArrayParamsFromObject
 #endif
-    (array_like.ptr(),           //input object pointer
-     TP_DESCR(req_dtype.self()), //requested dtype (if need to enforce)
-     writeable,                  //writeable?
-     &dtype,                     //dtype assessment
-     &ndim,                      //assessed number of dimensions
-     dims,                       //assessed shape
-     &arr,                       //if obj_ptr is ndarray, return it here
-     0)                          //context?
+    (array_like.ptr(),  //input object pointer
+     req_dtype.descr(), //requested dtype (if need to enforce)
+     writeable,         //writeable?
+     &dtype,            //dtype assessment
+     &ndim,             //assessed number of dimensions
+     dims,              //assessed shape
+     &arr,              //if obj_ptr is ndarray, return it here
+     0)                 //context?
     ;
 
   if (not_convertible) return bob::python::IMPOSSIBLE;
@@ -500,12 +508,30 @@ bob::python::convert_t bob::python::convertible_to (boost::python::object array_
         Py_XDECREF(arr);
         return bob::python::IMPOSSIBLE;
       }
-      if (info.has_valid_shape())
+      if (info.has_valid_shape()) {
         for (size_t i=0; i<info.nd; ++i)
           if ((int)info.shape[i] != PyArray_DIM(arr,i)) {
             Py_XDECREF(arr);
             return bob::python::IMPOSSIBLE;
           }
+      }
+    }
+
+    //checks dtype
+    if (PyArray_DESCR(arr)->type_num != req_dtype.descr()->type_num) {
+      //well... we would need to cast, but maybe possible - check with NumPy
+#if NPY_FEATURE_VERSION >= NUMPY16_API /* NumPy C-API version >= 1.6 */
+      if (PyArray_CanCastTypeTo(PyArray_DESCR(arr), req_dtype.descr(), NPY_SAFE_CASTING)) {
+#else
+      if (PyArray_CanCastTo(PyArray_DESCR(arr), req_dtype.descr())) {
+#endif
+        retval = bob::python::WITHARRAYCOPY;
+      }
+      else {
+        //we cannot cast from current to desired type, sorry...
+        Py_XDECREF(arr);
+        return bob::python::IMPOSSIBLE;
+      }
     }
 
     //checks behavior.
@@ -515,20 +541,34 @@ bob::python::convert_t bob::python::convertible_to (boost::python::object array_
     
     Py_XDECREF(arr);
 
-    return retval;
-
   }
 
   else { //the passed object is not an array
 
-     if (info.nd) { //check number of dimensions and shape
+    retval = bob::python::WITHCOPY;
+
+    if (info.nd) { //check number of dimensions and shape
       if (ndim != (int)info.nd) return bob::python::IMPOSSIBLE;
       for (size_t i=0; i<info.nd; ++i) 
         if (info.shape[i] && 
-            (int)info.shape[i] != dims[i]) return bob::python::WITHCOPY;
-     }
+            (int)info.shape[i] != dims[i]) return bob::python::IMPOSSIBLE;
+    }
 
-     retval = bob::python::WITHCOPY;
+    //checks dtype
+    if (dtype->type_num != req_dtype.descr()->type_num) {
+      //well... we would need to cast, but maybe possible - check with NumPy
+      if (
+#if NPY_FEATURE_VERSION >= NUMPY16_API /* NumPy C-API version >= 1.6 */
+          !PyArray_CanCastTypeTo(dtype, req_dtype.descr(), NPY_SAFE_CASTING)
+#else
+          !PyArray_CanCastTo(dtype, req_dtype.descr())
+#endif
+         ) 
+      {
+        return bob::python::IMPOSSIBLE;
+      }
+
+    }
 
   }
 
@@ -551,14 +591,14 @@ bob::python::convert_t bob::python::convertible_to(boost::python::object array_l
 #else
     _GetArrayParamsFromObject
 #endif
-    (array_like.ptr(),           //input object pointer
-     TP_DESCR(req_dtype.self()), //requested dtype (if need to enforce)
-     writeable,                  //writeable?
-     &dtype,                     //dtype assessment
-     &ndim,                      //assessed number of dimensions
-     dims,                       //assessed shape
-     &arr,                       //if obj_ptr is ndarray, return it here
-     0)                          //context?
+    (array_like.ptr(),  //input object pointer
+     req_dtype.descr(), //requested dtype (if need to enforce)
+     writeable,         //writeable?
+     &dtype,            //dtype assessment
+     &ndim,             //assessed number of dimensions
+     dims,              //assessed shape
+     &arr,              //if obj_ptr is ndarray, return it here
+     0)                 //context?
     ;
 
   if (not_convertible) return bob::python::IMPOSSIBLE;
@@ -566,6 +606,27 @@ bob::python::convert_t bob::python::convertible_to(boost::python::object array_l
   convert_t retval = bob::python::BYREFERENCE;
     
   if (arr) { //the passed object is an array -- check compatibility
+
+    //checks dtype
+    if (PyArray_DESCR(arr)->type_num != req_dtype.descr()->type_num) {
+      //well... we would need to cast, but maybe possible - check with NumPy
+
+      if (
+#if NPY_FEATURE_VERSION >= NUMPY16_API /* NumPy C-API version >= 1.6 */
+          PyArray_CanCastTypeTo(PyArray_DESCR(arr), req_dtype.descr(), NPY_SAFE_CASTING)
+#else
+          PyArray_CanCastTo(PyArray_DESCR(arr), req_dtype.descr())
+#endif
+         )
+      {
+        retval = bob::python::WITHARRAYCOPY;
+      }
+      else {
+        //we cannot cast from current to desired type, sorry...
+        Py_XDECREF(arr);
+        return bob::python::IMPOSSIBLE;
+      }
+    }
 
     //checks behavior.
     if (behaved) {
@@ -578,7 +639,23 @@ bob::python::convert_t bob::python::convertible_to(boost::python::object array_l
 
   else { //the passed object is not an array
 
-     retval = bob::python::WITHCOPY;
+    retval = bob::python::WITHCOPY;
+
+    //checks dtype
+    if (dtype->type_num != req_dtype.descr()->type_num) {
+      //well... we would need to cast, but maybe possible - check with NumPy
+      if (
+#if NPY_FEATURE_VERSION >= NUMPY16_API /* NumPy C-API version >= 1.6 */
+          !PyArray_CanCastTypeTo(dtype, req_dtype.descr(), NPY_SAFE_CASTING)
+#else
+          !PyArray_CanCastTo(dtype, req_dtype.descr())
+#endif
+         ) 
+      {
+        return bob::python::IMPOSSIBLE;
+      }
+
+    }
 
   }
 
