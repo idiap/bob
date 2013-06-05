@@ -76,8 +76,8 @@ namespace detail {
     bob::core::array::assertSameDimensionLength(scores.extent(1), size_enrol);
 
     // Declare needed IndexPlaceholder
-    blitz::firstIndex i;
-    blitz::secondIndex j;
+    blitz::firstIndex ii;
+    blitz::secondIndex jj;
 
     // Constant to check if the std is close to 0. 
     const double eps = std::numeric_limits<double>::min();
@@ -87,18 +87,18 @@ namespace detail {
     if (B && size_znorm > 0) {
       // Znorm  -->      zA  = (A - mean(B) ) / std(B)    [znorm on oringinal scores]
       // mean(B)
-      blitz::Array<double,1> mean_B(blitz::mean(*B, j));
+      blitz::Array<double,1> mean_B(blitz::mean(*B, jj));
       // std(B)
       blitz::Array<double,2> B2n(B->shape());
-      B2n = blitz::pow2((*B)(i, j) - mean_B(i));
+      B2n = blitz::pow2((*B)(ii, jj) - mean_B(ii));
       blitz::Array<double,1> std_B(B->extent(0));
       if(size_znorm>1)
-        std_B = blitz::sqrt(blitz::sum(B2n, j) / (size_znorm - 1));
+        std_B = blitz::sqrt(blitz::sum(B2n, jj) / (size_znorm - 1));
       else // 1 single value -> std = 0
         std_B = 0; 
       std_B = blitz::where( std_B <= eps, 1., std_B);
 
-      zA = (A(i, j) - mean_B(i)) / std_B(i);
+      zA = (A(ii, jj) - mean_B(ii)) / std_B(ii);
     }
     else
       zA = A;
@@ -134,7 +134,7 @@ namespace detail {
 
       // zC  = (C - mean(D)) / std(D)     [znorm the tnorm scores]
       std_Dimp = blitz::where( std_Dimp <= eps, 1., std_Dimp);
-      zC = ((*C)(i, j) - mean_Dimp(i)) / std_Dimp(i);
+      zC = ((*C)(ii, jj) - mean_Dimp(ii)) / std_Dimp(ii);
     }
     else if (C && size_tnorm > 0)
       zC = *C;
@@ -145,15 +145,15 @@ namespace detail {
       blitz::Array<double,1> std_zC(size_enrol);
       
       // ztA = (zA - mean(zC)) / std(zC)  [ztnorm on eval scores]
-      mean_zC = blitz::mean(zC(j, i), j);
+      mean_zC = blitz::mean(zC(jj, ii), jj);
       if (size_tnorm > 1)
-        std_zC = sqrt(blitz::sum(pow(zC(j, i) - mean_zC(i), 2) , j) / (size_tnorm - 1));
+        std_zC = sqrt(blitz::sum(pow(zC(jj, ii) - mean_zC(ii), 2) , jj) / (size_tnorm - 1));
       else // 1 single value -> std = 0
         std_zC = 0;
       std_zC = blitz::where( std_zC <= eps, 1., std_zC);
 
       // Normalised scores
-      scores = (zA(i, j) - mean_zC(j)) /  std_zC(j);
+      scores = (zA(ii, jj) - mean_zC(jj)) /  std_zC(jj);
     }
     else
       scores = zA;
