@@ -39,7 +39,7 @@ namespace bob { namespace trainer {
 
   double SquareError::error (double output, double target,
       const boost::shared_ptr<bob::machine::Activation>& actfun) const {
-    return actfun->f_prime(output) * f_prime(output, target);
+    return actfun->f_prime_from_f(output) * f_prime(output, target);
   }
 
   std::string SquareError::str() const {

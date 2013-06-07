@@ -139,5 +139,5 @@ def test_multiplied_tanh_derivative():
  
   # tries to estimate the gradient and check
   for k in x:
-    absdiff = abs(op.f_prime(k)-gradient.estimate(op.f,k,1e-6))
+    absdiff = abs(op.f_prime(k)-gradient.estimate(op.f,k))
     assert absdiff < 1e-4, 'MultipliedHyperbolicTangentActivation derivative and estimation do not match to 10^-4: |%g-%g| = %g' % (op.f_prime(k), gradient.estimate(op.f,k), absdiff)

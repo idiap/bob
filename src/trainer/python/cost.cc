@@ -58,6 +58,32 @@ static const char COST_F_PRIME_DOC[] = \
   "\n" \
   "Returns the calculated error\n";
 
+static const char COST_ERROR_DOC[] = \
+  "Computes the back-propagated error for a given MLP **output**\n" \
+  "layer, given its activation function and outputs - i.e., the\n" \
+  "error back-propagated through the last layer neuron up to the\n" \
+  "synapse connecting the last hidden layer to the output layer.\n" \
+  "\n" \
+  "This entry point allows for optimization in the calculation of the\n" \
+  "back-propagated errors in cases where there is a possibility of\n" \
+  "mathematical simplification when using a certain combination of\n" \
+  "cost-function and activation. For example, using a ML-cost and a\n" \
+  "logistic activation function.\n" \
+  "\n" \
+  "Keyword arguments:\n" \
+  "\n" \
+  "output\n" \
+  "  Real output from the linear machine or MLP\n" \
+  "\n" \
+  "target\n" \
+  "  Target output you are training to achieve\n" \
+  "\n" \
+  "actfun\n" \
+  "  The activation function object used at the last layer\n" \
+  "\n" \
+  "Returns the calculated error, back-propagated to before the output\n" \
+  "neuron.\n";
+
 static const char SQUARE_ERROR_DOC[] = \
   "Calculates the Square-Error between output and target. The square error\n" \
   "is defined as follows:\n" \
@@ -103,6 +129,7 @@ void bind_trainer_cost() {
     .def("f", &bob::trainer::Cost::f, (arg("self"), arg("output"), arg("target")), COST_F_DOC)
     .def("__call__", &bob::trainer::Cost::f, (arg("self"), arg("output"), arg("arget")), COST_F_DOC)
     .def("f_prime", &bob::trainer::Cost::f_prime, (arg("self"), arg("output"), arg("target")), COST_F_PRIME_DOC)
+    .def("error", &bob::trainer::Cost::error, (arg("self"), arg("output"), arg("target"), arg("actfun")), COST_ERROR_DOC)
     .def("__str__", &bob::machine::Activation::str)
     .def("__eq__", &cost_is_equal)
     ;
