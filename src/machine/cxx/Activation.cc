@@ -29,6 +29,8 @@ namespace bob { namespace machine {
   double IdentityActivation::f (double z) const { return z; }
 
   double IdentityActivation::f_prime (double) const { return 1.; }
+  
+  double IdentityActivation::f_prime_from_f (double) const { return 1.; }
 
   void IdentityActivation::save(bob::io::HDF5File& f) const {
     f.set("id", unique_identifier());
@@ -52,6 +54,8 @@ namespace bob { namespace machine {
   double LinearActivation::f (double z) const { return m_C * z; }
 
   double LinearActivation::f_prime (double z) const { return m_C; }
+  
+  double LinearActivation::f_prime_from_f (double a) const { return m_C; }
 
   double LinearActivation::C() const { return m_C; }
 
@@ -76,7 +80,9 @@ namespace bob { namespace machine {
 
   double HyperbolicTangentActivation::f (double z) const { return std::tanh(z); }
 
-  double HyperbolicTangentActivation::f_prime (double a) const { return (1. - (a*a)); }
+  double HyperbolicTangentActivation::f_prime (double z) const { return f_prime_from_f(f(z)); }
+
+  double HyperbolicTangentActivation::f_prime_from_f (double a) const { return (1. - (a*a)); }
 
   void HyperbolicTangentActivation::save(bob::io::HDF5File& f) const {
     f.set("id", unique_identifier());
@@ -99,8 +105,11 @@ namespace bob { namespace machine {
 
   double MultipliedHyperbolicTangentActivation::f (double z) const { return m_C * std::tanh(m_M * z); }
 
-  double MultipliedHyperbolicTangentActivation::f_prime (double a) const
-  { return m_C * m_M * (1. - std::pow(m_M*a,2)); }
+  double MultipliedHyperbolicTangentActivation::f_prime (double z) const
+  { return f_prime_from_f(f(z)); }
+
+  double MultipliedHyperbolicTangentActivation::f_prime_from_f (double a) const
+  { return m_C * m_M * (1. - std::pow(a/m_C,2)); }
 
   double MultipliedHyperbolicTangentActivation::C() const { return m_C; }
 
@@ -130,7 +139,9 @@ namespace bob { namespace machine {
   double LogisticActivation::f (double z) const 
   { return 1. / ( 1. + std::exp(-z) ); }
 
-  double LogisticActivation::f_prime (double a) const { return a * (1. - a); }
+  double LogisticActivation::f_prime (double z) const { return f_prime_from_f(f(z)); }
+
+  double LogisticActivation::f_prime_from_f (double a) const { return a * (1. - a); }
 
   void LogisticActivation::save(bob::io::HDF5File& f) const {
     f.set("id", unique_identifier());

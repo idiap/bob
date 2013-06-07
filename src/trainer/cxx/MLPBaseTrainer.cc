@@ -179,7 +179,7 @@ void bob::trainer::MLPBaseTrainer::backward_step(const bob::machine::MLP& machin
     bob::math::prod_(m_error[k], machine_weight[k].transpose(1,0), m_error[k-1]);
     for (int i=0; i<(int)m_batch_size; ++i) { //for every example
       for (int j=0; j<m_error[k-1].extent(1); ++j) { //for all variables
-        m_error[k-1](i,j) *= hidden_actfun->f_prime(m_output[k-1](i,j));
+        m_error[k-1](i,j) *= hidden_actfun->f_prime_from_f(m_output[k-1](i,j));
       }
     }
   }

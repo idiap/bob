@@ -37,6 +37,8 @@ void bind_machine_activation() {
     .def("__call__", &bob::machine::Activation::f, (arg("self"), arg("z")), 
         "Computes activated value, given an input ``z``")
     .def("f_prime", &bob::machine::Activation::f_prime, 
+        (arg("z")), "Computes the derivative of the activated value.")
+    .def("f_prime_from_f", &bob::machine::Activation::f_prime_from_f, 
         (arg("z")), "Computes the derivative of the activated value, given **the activation used to compute the activated value originally**.")
     .def("save", &bob::machine::Activation::save, (arg("self"), arg("h5f")), 
        "Saves itself to a :py:class:`bob.io.HDF5File`")
