@@ -169,7 +169,7 @@ void bob::trainer::MLPBaseTrainer::backward_step(const bob::machine::MLP& machin
   boost::shared_ptr<bob::machine::Activation> output_actfun = machine.getOutputActivation();
   for (int i=0; i<(int)m_batch_size; ++i) { //for every example
     for (int j=0; j<m_error[m_H].extent(1); ++j) { //for all variables
-      m_error[m_H](i,j) = m_cost->error(m_output[m_H](i,j), target(i,j), output_actfun);
+      m_error[m_H](i,j) = m_cost->error(m_output[m_H](i,j), target(i,j));
     }
   }
 

@@ -46,9 +46,9 @@ namespace bob { namespace trainer {
     public:
 
       /**
-       * Default constructor
+       * Builds a SquareError functor with an existing activation function.
        */
-      SquareError();
+      SquareError(boost::shared_ptr<bob::machine::Activation> actfun);
 
       /**
        * Virtualized destructor
@@ -92,18 +92,20 @@ namespace bob { namespace trainer {
        *
        * @param output Real output from the linear machine or MLP
        * @param target Target output you are training to achieve
-       * @param actfun The function that implements the activation
        *
        * @return The calculated error, backpropagated to before the output
        * neuron.
        */
-      virtual double error (double output, double target,
-          const boost::shared_ptr<bob::machine::Activation>& actfun) const;
+      virtual double error (double output, double target) const;
 
       /**
        * Returns a stringified representation for this Cost function
        */
       virtual std::string str() const;
+
+    private: //representation
+
+      boost::shared_ptr<bob::machine::Activation> m_actfun; //act. function
 
   };
 

@@ -14,7 +14,7 @@ from ...machine import LogisticActivation, IdentityActivation
 
 def test_square_error():
   
-  op = SquareError()
+  op = SquareError(IdentityActivation())
   x = numpy.random.rand(10) #10 random numbers between 0 and 1
   y = numpy.random.rand(10) #10 random numbers between 0 and 1
 
@@ -25,7 +25,7 @@ def test_square_error():
 
 def test_square_error_derivative():
   
-  op = SquareError()
+  op = SquareError(IdentityActivation())
   x = numpy.random.rand(10) #10 random numbers between 0 and 1
   y = numpy.random.rand(10) #10 random numbers between 0 and 1
 
@@ -41,19 +41,19 @@ def test_square_error_derivative():
 
 def test_square_error_error():
   
-  op = SquareError()
+  act = LogisticActivation()
+  op = SquareError(act)
   x = numpy.random.rand(10) #10 random numbers between 0 and 1
   y = numpy.random.rand(10) #10 random numbers between 0 and 1
-  act = LogisticActivation()
 
   # go for an exact match
   for p,q in zip(x,y):
     expected = p*(1-p)*(p-q)
-    assert op.error(p,q,act) == expected, 'SquareError error does not perform as expected %g != %g' % (op.error(p,q,act), expected)
+    assert op.error(p,q) == expected, 'SquareError error does not perform as expected %g != %g' % (op.error(p,q), expected)
 
 def test_cross_entropy():
   
-  op = CrossEntropyLoss()
+  op = CrossEntropyLoss(LogisticActivation())
   x = numpy.random.rand(10) #10 random numbers between 0 and 1
   y = numpy.random.rand(10) #10 random numbers between 0 and 1
 
@@ -64,7 +64,7 @@ def test_cross_entropy():
 
 def test_cross_entropy_derivative():
   
-  op = CrossEntropyLoss()
+  op = CrossEntropyLoss(LogisticActivation())
   x = numpy.random.rand(10) #10 random numbers between 0 and 1
   y = numpy.random.rand(10) #10 random numbers between 0 and 1
 
@@ -80,38 +80,46 @@ def test_cross_entropy_derivative():
 
 def test_square_error_equality():
 
-  op1 = SquareError()
-  op2 = SquareError()
+  op1 = SquareError(IdentityActivation())
+  op2 = SquareError(IdentityActivation())
 
   assert op1 == op2
 
 def test_cross_entropy_equality():
 
-  op1 = CrossEntropyLoss()
-  op2 = CrossEntropyLoss()
+  op1 = CrossEntropyLoss(IdentityActivation())
+  op2 = CrossEntropyLoss(IdentityActivation())
 
   assert op1 == op2
 
 def test_cross_entropy_error_with_logistic():
   
-  op = CrossEntropyLoss()
+  act = LogisticActivation()
+  op = CrossEntropyLoss(act)
   x = numpy.random.rand(10) #10 random numbers between 0 and 1
   y = numpy.random.rand(10) #10 random numbers between 0 and 1
-  act = LogisticActivation()
 
   # go for an exact match
   for p,q in zip(x,y):
     expected = p-q
-    assert op.error(p,q,act) == expected, 'CrossEntropyLoss+LogisticActivation error does not perform as expected %g != %g' % (op.error(p,q,act), expected)
+    assert op.error(p,q) == expected, 'CrossEntropyLoss+LogisticActivation error does not perform as expected %g != %g' % (op.error(p,q), expected)
 
 def test_cross_entropy_error_without_logistic():
   
-  op = CrossEntropyLoss(logistic_activation=False)
+  act = IdentityActivation()
+  op = CrossEntropyLoss(act)
   x = numpy.random.rand(10) #10 random numbers between 0 and 1
   y = numpy.random.rand(10) #10 random numbers between 0 and 1
-  act = IdentityActivation()
 
   # go for an exact match
   for p,q in zip(x,y):
     expected = (p-q)/(p*(1-p))
-    assert op.error(p,q,act) == expected, 'CrossEntropyLoss+IdentityActivation error does not perform as expected %g != %g' % (op.error(p,q,act), expected)
+    assert op.error(p,q) == expected, 'CrossEntropyLoss+IdentityActivation error does not perform as expected %g != %g' % (op.error(p,q), expected)
+
+def test_cross_entropy_activation_detection():
+
+  op = CrossEntropyLoss(LogisticActivation())
+  assert op.logistic_activation
+
+  op = CrossEntropyLoss(IdentityActivation())
+  assert op.logistic_activation == False

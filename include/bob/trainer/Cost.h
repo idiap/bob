@@ -79,13 +79,10 @@ namespace bob { namespace trainer {
        *
        * @param target Target output you are training to achieve
        *
-       * @param actfun The function that implements the activation
-       *
        * @return The calculated error, backpropagated to before the output
        * neuron.
        */
-      virtual double error (double output, double target,
-          const boost::shared_ptr<bob::machine::Activation>& actfun) const =0;
+      virtual double error (double output, double target) const =0;
 
       /**
        * Returns a stringified representation for this Activation function

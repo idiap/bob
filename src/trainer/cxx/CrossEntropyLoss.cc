@@ -23,8 +23,9 @@
 
 namespace bob { namespace trainer {
 
-  CrossEntropyLoss::CrossEntropyLoss(bool logistic_activation)
-    : m_logistic_activation(logistic_activation) {}
+  CrossEntropyLoss::CrossEntropyLoss(boost::shared_ptr<bob::machine::Activation> actfun)
+    : m_actfun(actfun),
+      m_logistic_activation(m_actfun->unique_identifier() == "bob.machine.Activation.Logistic") {}
 
   CrossEntropyLoss::~CrossEntropyLoss() {}
 
@@ -36,9 +37,8 @@ namespace bob { namespace trainer {
     return (output-target) / (output * (1-output));
   }
 
-  double CrossEntropyLoss::error (double output, double target,
-      const boost::shared_ptr<bob::machine::Activation>& actfun) const {
-    return m_logistic_activation? (output - target) : actfun->f_prime_from_f(output) * f_prime(output, target);
+  double CrossEntropyLoss::error (double output, double target) const {
+    return m_logistic_activation? (output - target) : m_actfun->f_prime_from_f(output) * f_prime(output, target);
   }
 
   std::string CrossEntropyLoss::str() const {

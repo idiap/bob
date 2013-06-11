@@ -48,11 +48,12 @@ namespace bob { namespace trainer {
       /**
        * Constructor
        *
-       * @param logistic_activation If set to 'true', then assume this cost
-       * fucntion is being used with an output layer that is activated using
-       * the logistic function. In this case, a mathematical simplification is
-       * possible in which error() can benefit increasing the numerical
-       * stability of the training process. The simplification goes as follows:
+       * @param actfun Sets the underlying activation function used for error
+       * calculation. A special case is foreseen for using this loss function
+       * with a logistic activation. In this case, a mathematical
+       * simplification is possible in which error() can benefit increasing the
+       * numerical stability of the training process. The simplification goes
+       * as follows:
        *
        * \f[
        *    b = \delta \cdot \varphi'(z)
@@ -70,7 +71,7 @@ namespace bob { namespace trainer {
        *    b = \hat{y} - y
        * \f]
        */
-      CrossEntropyLoss(bool logistic_activation=true);
+      CrossEntropyLoss(boost::shared_ptr<bob::machine::Activation> actfun);
 
       /**
        * Virtualized destructor
@@ -120,13 +121,11 @@ namespace bob { namespace trainer {
        *
        * @param output Real output from the linear machine or MLP
        * @param target Target output you are training to achieve
-       * @param actfun The function that implements the activation
        *
        * @return The calculated error, backpropagated to before the output
        * neuron.
        */
-      virtual double error (double output, double target,
-          const boost::shared_ptr<bob::machine::Activation>& actfun) const;
+      virtual double error (double output, double target) const;
 
       /**
        * Returns a stringified representation for this Cost function
@@ -135,7 +134,9 @@ namespace bob { namespace trainer {
 
     private: //representation
 
+      boost::shared_ptr<bob::machine::Activation> m_actfun; //act. function
       bool m_logistic_activation; ///< if 'true', simplify backprop_error()
+
   };
 
   /**

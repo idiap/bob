@@ -78,9 +78,6 @@ static const char COST_ERROR_DOC[] = \
   "target\n" \
   "  Target output you are training to achieve\n" \
   "\n" \
-  "actfun\n" \
-  "  The activation function object used at the last layer\n" \
-  "\n" \
   "Returns the calculated error, back-propagated to before the output\n" \
   "neuron.\n";
 
@@ -92,7 +89,11 @@ static const char SQUARE_ERROR_DOC[] = \
   "   J = \\frac{(\\hat{y} - y)^2}{2}\n" \
   "\n" \
   "where :math:`\\hat{y}` is the output estimated by your machine and\n" \
-  ":math:`y` is the expected output.\n";
+  ":math:`y` is the expected output.\n\n" \
+  "Keyword arguments:\n" \
+  "actfun\n" \
+  "  The activation function object used at the last layer\n" \
+  "\n";
 
 static const char CROSS_ENTROPY_LOSS_DOC[] = \
   "Calculates the Cross-Entropy Loss between output and target. The cross\n" \
@@ -107,8 +108,8 @@ static const char CROSS_ENTROPY_LOSS_DOC[] = \
 static const char CROSS_ENTROPY_LOSS_CONSTRUCTOR_DOC[] = \
   "Keyword arguments:\n" \
   "\n" \
-  "logistic_activation\n" \
-  "  If set to ``True``, then assume this cost fucntion is being used with an output layer that is activated using the logistic function. In this case, a mathematical simplification is possible in which backprop_error() can benefit increasing the numerical stability of the training process. The simplification goes as follows:\n" \
+  "actfun\n" \
+  "  The activation function object used at the last layer. If you set this to :py:class:`bob.machine.LogisticActivation`, a mathematical simplification is possible in which backprop_error() can benefit increasing the numerical stability of the training process. The simplification goes as follows:\n" \
   "\n" \
   ".. math::\n" \
   "   b = \\delta \\cdot \\varphi'(z)\n" \
@@ -129,15 +130,15 @@ void bind_trainer_cost() {
     .def("f", &bob::trainer::Cost::f, (arg("self"), arg("output"), arg("target")), COST_F_DOC)
     .def("__call__", &bob::trainer::Cost::f, (arg("self"), arg("output"), arg("arget")), COST_F_DOC)
     .def("f_prime", &bob::trainer::Cost::f_prime, (arg("self"), arg("output"), arg("target")), COST_F_PRIME_DOC)
-    .def("error", &bob::trainer::Cost::error, (arg("self"), arg("output"), arg("target"), arg("actfun")), COST_ERROR_DOC)
+    .def("error", &bob::trainer::Cost::error, (arg("self"), arg("output"), arg("target")), COST_ERROR_DOC)
     .def("__str__", &bob::machine::Activation::str)
     .def("__eq__", &cost_is_equal)
     ;
 
-  class_<bob::trainer::SquareError, boost::shared_ptr<bob::trainer::SquareError>, bases<bob::trainer::Cost> >("SquareError", SQUARE_ERROR_DOC, init<>((arg("self"))))
+  class_<bob::trainer::SquareError, boost::shared_ptr<bob::trainer::SquareError>, bases<bob::trainer::Cost> >("SquareError", SQUARE_ERROR_DOC, init<boost::shared_ptr<bob::machine::Activation> >((arg("self"), arg("actfun")), "Builds a new SquareError object with the specified activation function."))
     ;
 
-  class_<bob::trainer::CrossEntropyLoss, boost::shared_ptr<bob::trainer::CrossEntropyLoss>, bases<bob::trainer::Cost> >("CrossEntropyLoss", CROSS_ENTROPY_LOSS_DOC, init<optional<bool> >((arg("self"), arg("logistic_activation")=true), CROSS_ENTROPY_LOSS_CONSTRUCTOR_DOC))
+  class_<bob::trainer::CrossEntropyLoss, boost::shared_ptr<bob::trainer::CrossEntropyLoss>, bases<bob::trainer::Cost> >("CrossEntropyLoss", CROSS_ENTROPY_LOSS_DOC, init<boost::shared_ptr<bob::machine::Activation> >((arg("self"), arg("actfun")), CROSS_ENTROPY_LOSS_CONSTRUCTOR_DOC))
     .add_property("logistic_activation", &bob::trainer::CrossEntropyLoss::logistic_activation, "If set to True, will calculate the error using the simplification explained in the class documentation")
     ;
 }
