@@ -19,6 +19,8 @@
  */
 
 #include <boost/python.hpp>
+#include <boost/function.hpp>
+#include <bob/core/python/ndarray.h>
 #include <bob/machine/Activation.h>
 #include <bob/machine/ActivationRegistry.h>
 
@@ -29,17 +31,97 @@ static bool activation_is_equal(boost::shared_ptr<bob::machine::Activation> a,
   return a->str() == b->str();
 }
 
+/**
+ * Maps all elements of arr through function() into retval
+ */
+static void apply(boost::function<double (double)> function, bob::python::const_ndarray arr, bob::python::ndarray retval) {
+
+  const bob::core::array::typeinfo& info = arr.type();
+
+  if (!info.is_compatible(retval.type())) {
+    PYTHON_ERROR(RuntimeError, "input and output arrays are incompatible - input = %s; output = %s", info.str().c_str(), retval.type().str().c_str());
+  }
+
+  if (info.nd == 1) {
+    blitz::Array<double,1> arr_ = arr.bz<double,1>();
+    blitz::Array<double,1> retval_ = retval.bz<double,1>();
+    for (int k=0; k<arr_.extent(0); ++k) 
+      retval_(k) = function(arr_(k));
+  } 
+  else if (info.nd == 2) {
+    blitz::Array<double,2> arr_ = arr.bz<double,2>();
+    blitz::Array<double,2> retval_ = retval.bz<double,2>();
+    for (int k=0; k<arr_.extent(0); ++k) 
+      for (int l=0; l<arr_.extent(1); ++l)
+        retval_(k,l) = function(arr_(k,l));
+  }
+  else if (info.nd == 3) {
+    blitz::Array<double,3> arr_ = arr.bz<double,3>();
+    blitz::Array<double,3> retval_ = retval.bz<double,3>();
+    for (int k=0; k<arr_.extent(0); ++k) 
+      for (int l=0; l<arr_.extent(1); ++l)
+        for (int m=0; m<arr_.extent(2); ++m)
+          retval_(k,l,m) = function(arr_(k,l,m));
+  }
+  else if (info.nd == 4) {
+    blitz::Array<double,4> arr_ = arr.bz<double,4>();
+    blitz::Array<double,4> retval_ = retval.bz<double,4>();
+    for (int k=0; k<arr_.extent(0); ++k) 
+      for (int l=0; l<arr_.extent(1); ++l)
+        for (int m=0; m<arr_.extent(2); ++m)
+          for (int n=0; n<arr_.extent(3); ++n)
+            retval_(k,l,m,n) = function(arr_(k,l,m,n));
+  }
+  else {
+    PYTHON_ERROR(RuntimeError, "function only accepts 1, 2, 3 or 4-dimensional double arrays (not %dD arrays)", (int)info.nd);
+  }
+}
+
+static void activation_f_ndarray_1(boost::shared_ptr<bob::machine::Activation> a, bob::python::const_ndarray arr, bob::python::ndarray retval) {
+  apply(boost::bind(&bob::machine::Activation::f, a, _1), arr, retval);
+}
+
+static object activation_f_ndarray_2(boost::shared_ptr<bob::machine::Activation> a, bob::python::const_ndarray arr) {
+  bob::python::ndarray retval(arr.type());
+  activation_f_ndarray_1(a, arr, retval);
+  return retval.self();
+}
+
+static void activation_f_prime_ndarray_1(boost::shared_ptr<bob::machine::Activation> a, bob::python::const_ndarray arr, bob::python::ndarray retval) {
+  apply(boost::bind(&bob::machine::Activation::f_prime, a, _1), arr, retval);
+}
+
+static object activation_f_prime_ndarray_2(boost::shared_ptr<bob::machine::Activation> a, bob::python::const_ndarray arr) {
+  bob::python::ndarray retval(arr.type());
+  activation_f_prime_ndarray_1(a, arr, retval);
+  return retval.self();
+}
+
+static void activation_f_prime_from_f_ndarray_1(boost::shared_ptr<bob::machine::Activation> a, bob::python::const_ndarray arr, bob::python::ndarray retval) {
+  apply(boost::bind(&bob::machine::Activation::f_prime_from_f, a, _1), arr, retval);
+}
+
+static object activation_f_prime_from_f_ndarray_2(boost::shared_ptr<bob::machine::Activation> a, bob::python::const_ndarray arr) {
+  bob::python::ndarray retval(arr.type());
+  activation_f_prime_from_f_ndarray_1(a, arr, retval);
+  return retval.self();
+}
+
 void bind_machine_activation() {
   class_<bob::machine::Activation, boost::shared_ptr<bob::machine::Activation>, boost::noncopyable>("Activation", 
       "Base class for activation functions", no_init)
-    .def("f", &bob::machine::Activation::f, (arg("self"), arg("z")),
-        "Computes activated value, given an input ``z``")
-    .def("__call__", &bob::machine::Activation::f, (arg("self"), arg("z")), 
-        "Computes activated value, given an input ``z``")
-    .def("f_prime", &bob::machine::Activation::f_prime, 
-        (arg("z")), "Computes the derivative of the activated value.")
-    .def("f_prime_from_f", &bob::machine::Activation::f_prime_from_f, 
-        (arg("z")), "Computes the derivative of the activated value, given **the activation used to compute the activated value originally**.")
+    .def("f", &bob::machine::Activation::f, (arg("self"), arg("z")), "Computes activated value, given an input ``z``") 
+    .def("f", &activation_f_ndarray_1, (arg("self"), arg("z"), arg("res")), "Computes activated value, given an input array ``z``, placing results in ``res``")
+    .def("f", &activation_f_ndarray_2, (arg("self"), arg("z")), "Computes activated value, given an input array ``z``. Returns a newly allocated array with the answers")
+    .def("__call__", &bob::machine::Activation::f, (arg("self"), arg("z")), "Computes activated value, given an input ``z``") 
+    .def("__call__", &activation_f_ndarray_1, (arg("self"), arg("z"), arg("res")), "Computes activated value, given an input array ``z``, placing results in ``res``")
+    .def("__call__", &activation_f_ndarray_2, (arg("self"), arg("z")), "Computes activated value, given an input array ``z``. Returns a newly allocated array with the same size as ``z``")
+    .def("f_prime", &bob::machine::Activation::f_prime, (arg("self"), arg("z")), "Computes the derivative of the activated value.")
+    .def("f_prime", &activation_f_prime_ndarray_1, (arg("self"), arg("z"), arg("res")), "Computes the derivative of the activated value, placing results in ``res``")
+    .def("f_prime", &activation_f_prime_ndarray_2, (arg("self"), arg("z")), "Computes the derivative of the activated value, given an input array ``z``. Returns a newly allocated array with the same size as ``z``")
+    .def("f_prime_from_f", &bob::machine::Activation::f_prime_from_f, (arg("self"), arg("a")), "Computes the derivative of the activation value, given **the activated value** ``a``.")
+    .def("f_prime_from_f", &activation_f_prime_from_f_ndarray_1, (arg("self"), arg("a"), arg("res")), "Computes the derivative of the activated value, given **the activated value** ``a``, placing results in ``res``")
+    .def("f_prime_from_f", &activation_f_prime_from_f_ndarray_2, (arg("self"), arg("z")), "Computes the derivative of the activated value, given **the activated value** ``a``. Returns a newly allocated array with the same size as ``a`` with the answer.")
     .def("save", &bob::machine::Activation::save, (arg("self"), arg("h5f")), 
        "Saves itself to a :py:class:`bob.io.HDF5File`")
     .def("load", &bob::machine::Activation::load, (arg("self"), arg("h5f")), 
