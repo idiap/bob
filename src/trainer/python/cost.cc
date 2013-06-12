@@ -32,7 +32,7 @@ static bool cost_is_equal(boost::shared_ptr<bob::trainer::Cost> a,
 }
 
 static const char COST_F_DOC[] = \
-  "Computes cost, given the current output of the linear machine or MLP\n" \
+  "Computes the cost, given the current output of the linear machine or MLP\n" \
   "and the expected output.\n" \
   "\n" \
   "Keyword arguments:\n" \
@@ -89,8 +89,10 @@ static const char SQUARE_ERROR_DOC[] = \
   "   J = \\frac{(\\hat{y} - y)^2}{2}\n" \
   "\n" \
   "where :math:`\\hat{y}` is the output estimated by your machine and\n" \
-  ":math:`y` is the expected output.\n\n" \
+  ":math:`y` is the expected output.\n" \
+  "\n" \
   "Keyword arguments:\n" \
+  "\n" \
   "actfun\n" \
   "  The activation function object used at the last layer\n" \
   "\n";

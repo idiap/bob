@@ -136,7 +136,8 @@ As described in :doc:`TutorialsMachine`, an MLP can be created as follows:
    :options: +NORMALIZE_WHITESPACE
    
    >>> machine = bob.machine.MLP((2, 2, 1)) # Creates a MLP with 2 inputs, 2 neurons in each hidden layer ad 1 output
-   >>> machine.activation = bob.machine.LogisticActivation()
+   >>> machine.hidden_activation = bob.machine.LogisticActivation()
+   >>> machine.output_activation = machine.hidden_activation
    >>> machine.biases = 0 # Set the biases to 0
    >>> w0 = numpy.array([[.23, .1],[-0.79, 0.21]])
    >>> w1 = numpy.array([[-.12], [-0.88]])
@@ -161,21 +162,22 @@ The class used to train a MLP [3]_ with backpropagation [4]_ is
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
    
-   >>> trainer = bob.trainer.MLPBackPropTrainer(1, bob.trainer.SquareError(), machine) #  Creates a BackProp trainer with a batch size of 1
+   >>> trainer = bob.trainer.MLPBackPropTrainer(1, bob.trainer.SquareError(machine.output_activation), machine) #  Creates a BackProp trainer with a batch size of 1
    >>> trainer.train_biases = False # Do not train the bias
    >>> trainer.train(machine, d0, t0) # Performs the Back Propagation
 
-Backpropagation [4]_ requires a learning rate to be set. In the previous 
+Backpropagation [4]_ requires a learning rate to be set. In the previous
 example, the default value 0.1 has been used. This might be updated using the
-:py:attr:`bob.trainer.MLPBackPropTrainer.learningRate` attribute. Another alternative exists 
-referred to as **resilient propagation** (Rprop) [5]_, which dynamically computes an optimal 
-learning rate. The corresponding class is :py:class:`bob.trainer.MLPRPropTrainer`, and the 
-overall training procedure remains identical.
+:py:attr:`bob.trainer.MLPBackPropTrainer.learningRate` attribute. Another
+alternative exists referred to as **resilient propagation** (Rprop) [5]_, which
+dynamically computes an optimal learning rate. The corresponding class is
+:py:class:`bob.trainer.MLPRPropTrainer`, and the overall training procedure
+remains identical.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
  
-   >>> trainer = bob.trainer.MLPRPropTrainer(1, bob.trainer.SquareError(), machine)
+   >>> trainer = bob.trainer.MLPRPropTrainer(1, bob.trainer.SquareError(machine.output_activation), machine)
    >>> trainer.train_biases = False
    >>> trainer.train(machine, d0, t0) 
 
@@ -196,9 +198,9 @@ such a `machine` and use it for classification.
 
 The training set for such a machine consists of a list of 2D `NumPy` arrays,
 one for each class. The first dimension of each 2D `NumPy` array is the number
-of training samples for the given class and the second dimension is the dimensionality
-of the feature. For instance, let's consider the following training set for a two 
-class problem.
+of training samples for the given class and the second dimension is the
+dimensionality of the feature. For instance, let's consider the following
+training set for a two class problem.
 
 .. ifconfig:: has_libsvm
 
