@@ -30,6 +30,8 @@
 
 #cmakedefine HAVE_BLITZ_TINYVEC2_H 1
 
+#cmakedefine HAVE_GIFLIB_QUANTIZE_BUFFER 1 
+
 #cmakedefine01 WITH_FFMPEG
 
 #define FFMPEG_VERSION "@FFMPEG_VERSION@"

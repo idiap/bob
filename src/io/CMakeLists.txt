@@ -30,7 +30,15 @@ endif()
 
 #giflib
 include(FindGIF)
-if(NOT GIF_FOUND)
+if(GIF_FOUND)
+  include(CheckCSourceCompiles)
+  set(CMAKE_REQUIRED_INCLUDES "${GIF_INCLUDE_DIR}")
+  set(CMAKE_REQUIRED_LIBRARIES "${GIF_LIBRARIES}")
+  CHECK_C_SOURCE_COMPILES("#include <gif_lib.h>
+  int main() { QuantizeBuffer(10, 10, NULL, NULL, NULL, NULL, NULL, NULL); }" HAVE_GIFLIB_QUANTIZE_BUFFER)
+  set(CMAKE_REQUIRED_LIBRARIES)
+  set(CMAKE_REQUIRED_INCLUDES)
+else()
   message(FATAL_ERROR "giflib has not been found.")
 endif()
 

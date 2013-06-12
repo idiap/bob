@@ -31,13 +31,14 @@
 
 #include <bob/io/CodecRegistry.h>
 #include <bob/io/Exception.h>
+#include <bob/config.h>
 
 extern "C" {
 #include <gif_lib.h>
 }
 
 // (Ugly) copy of QuantizeBuffer function definition that was inlined (only) in giflib 4.2
-#if defined(GIFLIB_MAJOR) && defined(GIFLIB_MINOR) && GIFLIB_MAJOR == 4 && GIFLIB_MINOR == 2
+#if !defined(HAVE_GIFLIB_QUANTIZE_BUFFER) && (defined(GIF_LIB_VERSION) || (defined(GIFLIB_MAJOR) && GIFLIB_MAJOR < 5))
 
 #define ABS(x)    ((x) > 0 ? (x) : (-(x)))
 #define COLOR_ARRAY_SIZE 32768
