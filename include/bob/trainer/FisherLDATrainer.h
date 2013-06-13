@@ -9,16 +9,16 @@
  * Recognition chapter 4.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -30,7 +30,7 @@
 #include <bob/machine/LinearMachine.h>
 #include <vector>
 
-namespace bob { namespace trainer { 
+namespace bob { namespace trainer {
 /**
  * @ingroup TRAINER
  * @{
@@ -51,14 +51,20 @@ class FisherLDATrainer: Trainer<bob::machine::LinearMachine, std::vector<blitz::
      * @brief Initializes a new Fisher/LDA trainer. The training stage will
      * place the resulting fisher components in the linear machine and set it
      * up to extract the variable means automatically.
+     *
+     * @param number_of_kept_lda_dimensions  Specifies the number of dimensions of the LDA matrix that are kept.
+     *        Possible values:
+     *        -  0: The theoretical limit of dimensions is kept, i.e., the number of classes -1 (this is the default)
+     *        - -1: All dimensions are kept
+     *        - >0: The given number of dimensions are kept; can be at most the number of input dimensions
      */
-    FisherLDATrainer();
+    FisherLDATrainer(int number_of_kept_lda_dimensions = 0);
 
     /**
      * @brief Destructor
      */
     virtual ~FisherLDATrainer();
-    
+
     /**
      * @brief Copy constructor.
      */
@@ -85,7 +91,7 @@ class FisherLDATrainer: Trainer<bob::machine::LinearMachine, std::vector<blitz::
 
     /**
      * @brief Trains the LinearMachine to perform Fisher/LDA discrimination.
-     * The resulting machine will have the eigen-vectors of the 
+     * The resulting machine will have the eigen-vectors of the
      * Sigma-1 * Sigma_b product, arranged by decreasing energy.
      *
      * Each input arrayset represents data from a given input class.
@@ -94,14 +100,14 @@ class FisherLDATrainer: Trainer<bob::machine::LinearMachine, std::vector<blitz::
      * last eigen value should be zero anyway. You can compress the machine
      * output further using resize() if necessary.
      */
-    virtual void train(bob::machine::LinearMachine& machine, 
+    virtual void train(bob::machine::LinearMachine& machine,
         const std::vector<blitz::Array<double,2> >& data);
 
     /**
      * @brief Trains the LinearMachine to perform Fisher/LDA discrimination.
-     * The resulting machine will have the eigen-vectors of the 
+     * The resulting machine will have the eigen-vectors of the
      * Sigma-1 * Sigma_b product, arranged by decreasing energy. You don't
-     * need to sort the results. Also returns the eigen values of the 
+     * need to sort the results. Also returns the eigen values of the
      * covariance matrix product so you can use that to choose which
      * components to keep.
      *
@@ -115,6 +121,17 @@ class FisherLDATrainer: Trainer<bob::machine::LinearMachine, std::vector<blitz::
         blitz::Array<double,1>& eigen_values,
         const std::vector<blitz::Array<double,2> >& data);
 
+
+    /**
+     * @brief Returns the number of LDA dimensions, i.e.,
+     *   the output dimension of the LDA projection matrix and the number of eigenvalues
+     *   that will be generated during training.
+     */
+    virtual int lda_dimensions(const std::vector<blitz::Array<double,2> >& data) const;
+
+  private:
+    /** The number of kept LDA dimensions */
+    int m_lda_dimensions;
 };
 
 /**

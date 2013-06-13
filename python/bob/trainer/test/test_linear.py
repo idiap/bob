@@ -4,16 +4,16 @@
 # Fri Jun 10 16:43:41 2011 +0200
 #
 # Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 3 of the License.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -28,7 +28,7 @@ import numpy
 
 class LinearTest(unittest.TestCase):
   """Performs various trainer tests for the LinearMachine."""
-  
+
   def test01a_pca_via_svd(self):
 
     # Tests our SVD/PCA extractor.
@@ -136,11 +136,11 @@ class LinearTest(unittest.TestCase):
 
     # Expected results
     exp_trans_data = [
-        [1.0019, 3.1205, 0.9405, 2.4962, 2.2949], 
+        [1.0019, 3.1205, 0.9405, 2.4962, 2.2949],
         [-2.9042, -1.3179, -2.0172, -0.7720, -2.8428]
         ]
     exp_mean = numpy.array([1.8100, 1.9100])
-    exp_val = numpy.array([24.27536526])
+    exp_val = numpy.array([5.394526])
     exp_mach = numpy.array([[-0.291529], [0.956562]])
 
     T = bob.trainer.FisherLDATrainer()
@@ -172,12 +172,12 @@ class LinearTest(unittest.TestCase):
           ], dtype='float64'),
         ]
 
-    # Expected results
+    # Expected results after resizing
     exp_mean = numpy.array([0.59, 0.73, 0.64])
-    exp_val = numpy.array([1.52746000e+02, 1.91783967e-13])
-    exp_mach = numpy.array([[0.14322439, 0.03851495], [-0.98379062, 0.69764105], [0.10790173, -0.71541147]])
+    exp_val = numpy.array([33.9435556])
+    exp_mach = numpy.array([[0.14322439], [-0.98379062], [0.10790173]])
 
-    T = bob.trainer.FisherLDATrainer()
+    T = bob.trainer.FisherLDATrainer(-1)
     machine, eig_vals = T.train(data)
 
     # Makes sure results are good
@@ -206,7 +206,7 @@ class LinearTest(unittest.TestCase):
 
   def test03_ppca(self):
 
-    # Tests our Probabilistic PCA trainer for linear machines for a simple 
+    # Tests our Probabilistic PCA trainer for linear machines for a simple
     # problem:
     ar=numpy.array([
       [1, 2, 3],
@@ -214,12 +214,12 @@ class LinearTest(unittest.TestCase):
       [3, 6, 5],
       [4, 8, 13],
       ], dtype='float64')
-    
+
     # Expected llh 1 and 2 (Reference values)
     exp_llh1 =  -32.8443
     exp_llh2 =  -30.8559
-   
-    # Do two iterations of EM to check the training procedure 
+
+    # Do two iterations of EM to check the training procedure
     T = bob.trainer.EMPCATrainer()
     m = bob.machine.LinearMachine(3,2)
     # Initialization of the trainer
@@ -232,7 +232,7 @@ class LinearTest(unittest.TestCase):
     T.sigma2 = sigma2_init
     # Checks that the log likehood matches the reference one
     # This should be sufficient to check everything as it requires to use
-    # the new value of W and sigma2 
+    # the new value of W and sigma2
     # This does an E-Step, M-Step, computes the likelihood, and compares it to
     # the reference value obtained using matlab
     T.e_step(m, ar)
@@ -280,7 +280,7 @@ class LinearTest(unittest.TestCase):
                             [1.079813355720326,  1.411083365535711,                  0],
                             [0.693459921529905,  0.571417184139332,  1.800117179839927]])
     sample_whitened_ref = numpy.array([5.942255453628436, 4.984316201643742, 4.739998188373740])
-    
+
     # Runs whitening (first method)
     t = bob.trainer.WhiteningTrainer()
     m = bob.machine.LinearMachine(3,3)
@@ -325,24 +325,24 @@ class LinearTest(unittest.TestCase):
   def test07_wccn_train(self):
 
     # Tests our Whitening extractor.
-    data = [numpy.array([[ 1.2622, -1.6443, 0.1889], [ 0.4286, -0.8922, 1.3020]]), 
-            numpy.array([[-0.6613,  0.0430, 0.6377], [-0.8718, -0.4788, 0.3988]]), 
+    data = [numpy.array([[ 1.2622, -1.6443, 0.1889], [ 0.4286, -0.8922, 1.3020]]),
+            numpy.array([[-0.6613,  0.0430, 0.6377], [-0.8718, -0.4788, 0.3988]]),
             numpy.array([[-0.0098, -0.3121,-0.1807],  [ 0.4301,  0.4886, -0.1456]])]
     sample = numpy.array([1, 2, 3.])
 
-    # Expected results 
+    # Expected results
     mean_ref = numpy.array([ 0.,  0.,  0.])
     weight_ref = numpy.array([[ 35.43171442,   0.        ,   0.        ],
                               [-24.13763022,   6.43858174,   0.        ],
                               [ 41.9656786 ,  -4.91307273,   4.80884688]])
     sample_wccn_ref = numpy.array([ 113.05348978,   -1.8620547 ,   14.42654064])
-    
+
     # Runs WCCN (first method)
     t = bob.trainer.WCCNTrainer()
     m = bob.machine.LinearMachine(3,3)
     t.train(m, data)
     s = m.forward(sample)
-    
+
     # Makes sure results are good
     eps = 1e-4
     self.assertTrue( numpy.allclose(m.input_subtract, mean_ref, eps, eps) )
@@ -352,7 +352,7 @@ class LinearTest(unittest.TestCase):
     # Runs WCCN (second method)
     m2 = t.train(data)
     s2 = m2.forward(sample)
-    
+
     # Makes sure results are good
     eps = 1e-4
     self.assertTrue( numpy.allclose(m2.input_subtract, mean_ref, eps, eps) )
