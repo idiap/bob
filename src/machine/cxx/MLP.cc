@@ -302,6 +302,8 @@ void bob::machine::MLP::resize (size_t input, size_t output) {
   m_bias[0].reference(blitz::Array<double,1>(output));
   m_buffer.resize(1);
   m_buffer[0].reference(blitz::Array<double,1>(input));
+  setWeights(0);
+  setBiases(0);
 }
 
 void bob::machine::MLP::resize (size_t input, size_t hidden, size_t output) {
@@ -342,6 +344,9 @@ void bob::machine::MLP::resize (size_t input, const std::vector<size_t>& hidden,
   m_weight.back().reference(blitz::Array<double,2>(hidden.back(), output));
   m_bias.back().reference(blitz::Array<double,1>(output));
   m_buffer.back().reference(blitz::Array<double,1>(hidden.back()));
+  
+  setWeights(0);
+  setBiases(0);
 }
 
 void bob::machine::MLP::resize (const std::vector<size_t>& shape) {

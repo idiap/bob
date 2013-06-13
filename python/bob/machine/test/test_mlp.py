@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
 # Andre Anjos <andre.anjos@idiap.ch>
-# Fri Jul 8 09:40:22 2011 +0200
+# Thu 13 Jun 2013 16:58:21 CEST
 #
 # Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
 # 
@@ -20,261 +20,270 @@
 """Tests on the MLP infrastructure.
 """
 
-import os, sys
-import unittest
-import math
 import numpy
-import bob
-import tempfile
-import pkg_resources
+import nose.tools
+from .. import MLP, HyperbolicTangentActivation, LogisticActivation
+from . import mlp as pymlp
+from ... import io
+from ...test import utils as test_utils
 
-def F(f):
-  """Returns the test file on the "data" subdirectory"""
-  return pkg_resources.resource_filename(__name__, os.path.join('data', f))
+def test_2in_1out():
 
-def tempname(suffix, prefix='bobtest_'):
-  (fd, name) = tempfile.mkstemp(suffix, prefix)
-  os.close(fd)
-  os.unlink(name)
-  return name
+  m = MLP((2,1))
+  assert m.shape == (2,1)
+  assert m.input_divide.shape == (2,)
+  assert m.input_subtract.shape == (2,)
+  assert len(m.weights) == 1
+  assert m.weights[0].shape == (2,1)
+  assert numpy.allclose(m.weights[0], 0., rtol=1e-10, atol=1e-15)
+  assert len(m.biases) == 1
+  assert m.biases[0].shape == (1,)
+  assert m.biases[0] == 0.
+  assert m.hidden_activation == HyperbolicTangentActivation()
+  assert m.output_activation == HyperbolicTangentActivation()
 
-MACHINE = tempname(".hdf5")
-COMPLICATED = F('mlp-big.hdf5')
-COMPLICATED_OUTPUT = F('network.hdf5')
-COMPLICATED_NOBIAS = F('mlp-big-nobias.hdf5')
-COMPLICATED_NOBIAS_OUTPUT = F('network-without-bias.hdf5')
+  # calculate and match
+  weights = [numpy.random.rand(2,1)]
+  biases = [numpy.random.rand(1)]
 
-class MLPTest(unittest.TestCase):
-  """Performs various MLP tests."""
+  m.weights = weights
+  m.biases = biases
 
-  def test01_Initialization(self):
+  pymac = pymlp.Machine(biases, weights, m.hidden_activation, m.output_activation)
 
-    # Two inputs and 1 output
-    m = bob.machine.MLP((2,1))
-    self.assertEqual(m.shape, (2,1))
-    self.assertEqual(m.input_divide.shape[0], 2)
-    self.assertEqual(m.input_subtract.shape[0], 2)
-    self.assertEqual(len(m.weights), 1)
-    self.assertEqual(m.weights[0].shape, (2,1))
-    self.assertTrue((m.weights[0] == 0.0).all())
-    self.assertEqual(len(m.biases), 1)
-    self.assertEqual(m.biases[0].shape, (1,))
-    self.assertTrue((m.biases[0] == 0.0).all())
-    self.assertEqual(m.hidden_activation,
-        bob.machine.HyperbolicTangentActivation())
-    self.assertEqual(m.output_activation,
-        bob.machine.HyperbolicTangentActivation())
+  X = numpy.random.rand(10,2)
+  assert numpy.allclose(m(X), pymac.forward(X), rtol=1e-10, atol=1e-15)
 
-    # 1 hidden layer
-    m = bob.machine.MLP((2,3,1))
-    self.assertEqual(m.shape, (2,3,1))
-    self.assertEqual(m.input_divide.shape[0], 2)
-    self.assertEqual(m.input_subtract.shape[0], 2)
-    self.assertEqual(len(m.weights), 2)
-    self.assertEqual(m.weights[0].shape, (2,3))
-    self.assertTrue((m.weights[0] == 0.0).all())
-    self.assertEqual(m.weights[1].shape, (3,1))
-    self.assertTrue((m.weights[1] == 0.0).all())
-    self.assertEqual(len(m.biases), 2)
-    self.assertEqual(m.biases[0].shape, (3,))
-    self.assertTrue((m.biases[0] == 0.0).all())
-    self.assertEqual(m.biases[1].shape, (1,))
-    self.assertTrue((m.biases[1] == 0.0).all())
-    self.assertEqual(m.hidden_activation,
-        bob.machine.HyperbolicTangentActivation())
-    self.assertEqual(m.output_activation,
-        bob.machine.HyperbolicTangentActivation())
-
-    # 2+ hidden layers, different activation
-    m = bob.machine.MLP((2,3,5,1))
-    m.hidden_activation = bob.machine.LogisticActivation()
-    self.assertEqual(m.shape, (2,3,5,1))
-    self.assertEqual(m.input_divide.shape[0], 2)
-    self.assertEqual(m.input_subtract.shape[0], 2)
-    self.assertEqual(len(m.weights), 3)
-    self.assertEqual(m.weights[0].shape, (2,3))
-    self.assertTrue((m.weights[0] == 0.0).all())
-    self.assertEqual(m.weights[1].shape, (3,5))
-    self.assertTrue((m.weights[1] == 0.0).all())
-    self.assertEqual(m.weights[2].shape, (5,1))
-    self.assertTrue((m.weights[2] == 0.0).all())
-    self.assertEqual(len(m.biases), 3)
-    self.assertEqual(m.biases[0].shape, (3,))
-    self.assertTrue((m.biases[0] == 0.0).all())
-    self.assertEqual(m.biases[1].shape, (5,))
-    self.assertTrue((m.biases[1] == 0.0).all())
-    self.assertEqual(m.biases[2].shape, (1,))
-    self.assertTrue((m.biases[2] == 0.0).all())
-    self.assertEqual(m.hidden_activation,
-        bob.machine.LogisticActivation())
-    self.assertEqual(m.output_activation,
-        bob.machine.HyperbolicTangentActivation())
-
-    # A resize should make the last machine look, structurally,
-    # like the first again
-    m.shape = (2,1)
-    m.hidden_activation = bob.machine.LogisticActivation()
-    m.output_activation = bob.machine.LogisticActivation()
-    self.assertEqual(m.shape, (2,1))
-    self.assertEqual(m.input_divide.shape[0], 2)
-    self.assertEqual(m.input_subtract.shape[0], 2)
-    self.assertEqual(len(m.weights), 1)
-    self.assertEqual(m.weights[0].shape, (2,1))
-    self.assertEqual(len(m.biases), 1)
-    self.assertEqual(m.biases[0].shape, (1,))
-    self.assertEqual(m.hidden_activation, bob.machine.LogisticActivation())
-    self.assertEqual(m.output_activation, bob.machine.LogisticActivation())
-
-  def test02_Checks(self):
-
-    # tests if MLPs check wrong settings
-    m = bob.machine.MLP((2,1))
-
-    # the MLP shape cannot have a single entry
-    self.assertRaises(RuntimeError, setattr, m, 'shape', (5,))
-
-    # you cannot set the weights vector with the wrong size
-    self.assertRaises(RuntimeError,
-        setattr, m, 'weights', [numpy.zeros((3,1), 'float64')])
-
-    # the same for the bias
-    self.assertRaises(RuntimeError,
-        setattr, m, 'biases', [numpy.zeros((5,), 'float64')])
+def test_2in_3_1out():
     
-    # it works though if the sizes are correct
-    new_weights = [numpy.zeros((2,1), 'float64')]
-    new_weights[0].fill(3.14)
-    m.weights = new_weights
-    self.assertEqual(len(m.weights), 1)
-    self.assertTrue( (m.weights[0] == new_weights[0]).all() )
+  m = MLP((2,3,1))
+  assert m.shape == (2,3,1)
+  assert m.input_divide.shape == (2,)
+  assert m.input_subtract.shape == (2,)
+  assert len(m.weights) == 2
+  assert m.weights[0].shape == (2,3)
+  assert numpy.allclose(m.weights[0], 0., rtol=1e-10, atol=1e-15)
+  assert m.weights[1].shape == (3,1)
+  assert numpy.allclose(m.weights[1], 0., rtol=1e-10, atol=1e-15)
+  assert len(m.biases) == 2
+  assert m.biases[0].shape == (3,)
+  assert numpy.allclose(m.biases[0], 0., rtol=1e-10, atol=1e-15)
+  assert m.biases[1].shape == (1,)
+  assert numpy.allclose(m.biases[1], 0., rtol=1e-10, atol=1e-15)
+  assert m.hidden_activation == HyperbolicTangentActivation()
+  assert m.output_activation == HyperbolicTangentActivation()
 
-    new_biases = [numpy.zeros((1,), 'float64')]
-    new_biases[0].fill(5.71)
-    m.biases = new_biases
-    self.assertEqual(len(m.biases), 1)
-    self.assertTrue( (m.biases[0] == new_biases[0]).all() )
+  # calculate and match
+  weights = [numpy.random.rand(2,3), numpy.random.rand(3,1)]
+  biases = [numpy.random.rand(3), numpy.random.rand(1)]
 
-  def test03_LoadingAndSaving(self):
+  m.weights = weights
+  m.biases = biases
 
-    # make shure we can save an load an MLP machine
-    weights = []
-    weights.append(numpy.array([[.2, -.1, .2], [.2, .3, .9]]))
-    weights.append(numpy.array([[.1, .5], [-.1, .2], [-.1, 1.1]])) 
-    biases = []
-    biases.append(numpy.array([-.1, .3, .1]))
-    biases.append(numpy.array([.2, -.1]))
+  pymac = pymlp.Machine(biases, weights, m.hidden_activation, m.output_activation)
+
+  X = numpy.random.rand(10,2)
+  assert numpy.allclose(m(X), pymac.forward(X), rtol=1e-10, atol=1e-15)
+
+def test_2in_3_5_1out():
     
-    m = bob.machine.MLP((2,3,2))
-    m.weights = weights
-    m.biases = biases
+  m = MLP((2,3,5,1))
+  assert m.shape == (2,3,5,1)
+  assert m.input_divide.shape == (2,)
+  assert m.input_subtract.shape == (2,)
+  assert len(m.weights) == 3
+  assert m.weights[0].shape == (2,3)
+  assert numpy.allclose(m.weights[0], 0., rtol=1e-10, atol=1e-15)
+  assert m.weights[1].shape == (3,5)
+  assert numpy.allclose(m.weights[1], 0., rtol=1e-10, atol=1e-15)
+  assert m.weights[2].shape == (5,1)
+  assert numpy.allclose(m.weights[2], 0., rtol=1e-10, atol=1e-15)
+  assert len(m.biases) == 3
+  assert m.biases[0].shape == (3,)
+  assert numpy.allclose(m.biases[0], 0., rtol=1e-10, atol=1e-15)
+  assert m.biases[1].shape == (5,)
+  assert numpy.allclose(m.biases[1], 0., rtol=1e-10, atol=1e-15)
+  assert m.biases[2].shape == (1,)
+  assert numpy.allclose(m.biases[2], 0., rtol=1e-10, atol=1e-15)
+  assert m.hidden_activation == HyperbolicTangentActivation()
+  assert m.output_activation == HyperbolicTangentActivation()
 
-    # creates a file that will be used in the next test!
-    m.save(bob.io.HDF5File(MACHINE, 'w'))
-    m2 = bob.machine.MLP(bob.io.HDF5File(MACHINE))
-    self.assertTrue( m.is_similar_to(m2) )
-    self.assertFalse( m != m2 )
+  # calculate and match
+  weights = [
+      numpy.random.rand(2,3), 
+      numpy.random.rand(3,5),
+      numpy.random.rand(5,1)
+      ]
+  biases = [
+      numpy.random.rand(3), 
+      numpy.random.rand(5), 
+      numpy.random.rand(1),
+      ]
+
+  m.weights = weights
+  m.biases = biases
+
+  pymac = pymlp.Machine(biases, weights, m.hidden_activation, m.output_activation)
+
+  X = numpy.random.rand(10,2)
+  assert numpy.allclose(m(X), pymac.forward(X), rtol=1e-10, atol=1e-15)
+
+def test_100in_100_10_4out():
     
-    self.assertEqual(m.shape, m2.shape)
-    self.assertTrue((m.input_subtract == m2.input_subtract).all())
-    self.assertTrue((m.input_divide == m2.input_divide).all())
-    for i in range(len(m.weights)):
-      self.assertTrue((m.weights[i] == m2.weights[i]).all())
-      self.assertTrue((m.biases[i] == m2.biases[i]).all())
+  m = MLP((100,100,10,4))
 
-  def test04_Correctness(self):
+  # calculate and match
+  weights = [
+      numpy.random.rand(100,100), 
+      numpy.random.rand(100,10),
+      numpy.random.rand(10,4)
+      ]
+  biases = [
+      numpy.random.rand(100), 
+      numpy.random.rand(10), 
+      numpy.random.rand(4),
+      ]
 
-    # makes sure the outputs of the MLP are correct
-    m = bob.machine.MLP(bob.io.HDF5File(MACHINE))
-    i = numpy.array([.1, .7])
-    y = m(i)
-    y_exp = numpy.array([0.09596993, 0.6175601])
-    self.assertTrue( (abs(y - y_exp) < 1e-6).all() )
+  m.weights = weights
+  m.biases = biases
 
-    # compares a simple (logistic activation, 1 layer) MLP with a LinearMachine
-    mlinear = bob.machine.LinearMachine(2,1)
-    mlinear.activation = bob.machine.LogisticActivation()
-    mlinear.weights = numpy.array([[.3], [-.42]])
-    mlinear.biases = numpy.array([-.7])
+  pymac = pymlp.Machine(biases, weights, m.hidden_activation, m.output_activation)
 
-    mlp = bob.machine.MLP((2,1))
-    mlp.output_activation = bob.machine.LogisticActivation()
-    mlp.weights = [numpy.array([[.3], [-.42]])]
-    mlp.biases = [numpy.array([-.7])]
+  X = numpy.random.rand(20,100)
+  assert numpy.allclose(m(X), pymac.forward(X), rtol=1e-10, atol=1e-15)
+def test_resize():
+    
+  m = MLP((2,3,5,1))
+  m.shape = (2,1)
+  m.hidden_activation = LogisticActivation()
+  m.output_activation = LogisticActivation()
 
-    self.assertTrue( (mlinear(i) == mlp(i)).all() )
-    os.unlink(MACHINE)
+  assert m.shape == (2,1)
+  assert m.input_divide.shape == (2,)
+  assert m.input_subtract.shape == (2,)
+  assert len(m.weights) == 1
+  assert m.weights[0].shape == (2,1)
+  assert numpy.allclose(m.weights[0], 0., rtol=1e-10, atol=1e-15)
+  assert len(m.biases) == 1
+  assert m.biases[0].shape == (1,)
+  assert m.biases[0] == 0.
+  assert m.hidden_activation == LogisticActivation()
+  assert m.output_activation == LogisticActivation()
 
-  def test05_ComplicatedCorrectness(self):
+  # calculate and match
+  weights = [numpy.random.rand(2,1)]
+  biases = [numpy.random.rand(1)]
 
-    # this test is about importing an already create neural network from
-    # NeuralLab and trying it with bob clothes. Results generated by bob
-    # are verified for correctness using a pre-generated sample.
+  m.weights = weights
+  m.biases = biases
 
-    m = bob.machine.MLP(bob.io.HDF5File(COMPLICATED))
-    data = bob.io.HDF5File(COMPLICATED_OUTPUT)
-    for pattern, expected in zip(data.lread("pattern"), data.lread("result")):
-      self.assertTrue(abs(m(pattern)[0] - expected) < 1e-8)
+  pymac = pymlp.Machine(biases, weights, m.hidden_activation, m.output_activation)
 
-    m = bob.machine.MLP(bob.io.HDF5File(COMPLICATED_NOBIAS))
-    data = bob.io.HDF5File(COMPLICATED_NOBIAS_OUTPUT)
-    for pattern, expected in zip(data.lread("pattern"), data.lread("result")):
-      self.assertTrue(abs(m(pattern)[0] - expected) < 1e-8)
+  X = numpy.random.rand(10,2)
+  assert numpy.allclose(m(X), pymac.forward(X), rtol=1e-10, atol=1e-15)
 
-  def test05a_ComplicatedCorrectness(self):
+def test_checks():
 
-    # the same as test05, but with a single pass using the MLP's matrix input
+  # tests if MLPs check wrong settings
+  m = MLP((2,1))
 
-    m = bob.machine.MLP(bob.io.HDF5File(COMPLICATED))
-    data = bob.io.HDF5File(COMPLICATED_OUTPUT)
-    pat_descr = data.describe('pattern')[0]
-    input = numpy.zeros((pat_descr.size, pat_descr.type.shape()[0]), 'float64')
-    res_descr = data.describe('result')[0]
-    target = numpy.zeros((res_descr.size, res_descr.type.shape()[0]), 'float64')
-    for i, (pattern, expected) in enumerate(zip(data.lread("pattern"), data.lread("result"))):
-      input[i,:] = pattern
-      target[i,:] = expected
-    output = m(input)
-    self.assertTrue ( (abs(output - target) < 1e-8).all() )
+  # the MLP shape cannot have a single entry
+  nose.tools.assert_raises(RuntimeError, setattr, m, 'shape', (5,))
 
-  def test06_Randomization(self):
+  # you cannot set the weights vector with the wrong size
+  nose.tools.assert_raises(RuntimeError,
+      setattr, m, 'weights', [numpy.zeros((3,1), 'float64')])
 
-    # this test makes sure randomization is working as expected on MLPs
+  # the same for the bias
+  nose.tools.assert_raises(RuntimeError,
+      setattr, m, 'biases', [numpy.zeros((5,), 'float64')])
+  
+  # it works though if the sizes are correct
+  new_weights = [numpy.zeros((2,1), 'float64')]
+  new_weights[0].fill(3.14)
+  m.weights = new_weights
 
-    m1 = bob.machine.MLP((2,3,2))
-    m1.randomize()
+  assert len(m.weights) == 1
 
-    for k in m1.weights:
-      self.assertTrue( (abs(k) <= 0.1).all() )
-      self.assertTrue( (k != 0).any() )
-    for k in m1.biases:
-      self.assertTrue( (abs(k) <= 0.1).all() )
-      self.assertTrue( (k != 0).any() )
+  assert (m.weights[0] == new_weights[0]).all()
 
-    for k in range(10): 
-      m2 = bob.machine.MLP((2,3,2))
-      m2.randomize()
-      for w1, w2 in zip(m1.weights, m2.weights):
-        self.assertFalse( (w1 == w2).all() )
-      for b1, b2 in zip(m1.biases, m2.biases):
-        self.assertFalse( (b1 == b2).all() )
-      for k in m2.weights:
-        self.assertTrue( (abs(k) <= 0.1).all() )
-        self.assertTrue( (k != 0).any() )
-      for k in m2.biases:
-        self.assertTrue( (abs(k) <= 0.1).all() )
-        self.assertTrue( (k != 0).any() )
+  new_biases = [numpy.zeros((1,), 'float64')]
+  new_biases[0].fill(5.71)
+  m.biases = new_biases
 
-    # we can also reset the margins for randomization
-    for k in range(10): 
-      m2 = bob.machine.MLP((2,3,2))
-      m2.randomize(-0.001, 0.001)
-      for w1, w2 in zip(m1.weights, m2.weights):
-        self.assertFalse( (w1 == w2).all() )
-      for b1, b2 in zip(m1.biases, m2.biases):
-        self.assertFalse( (b1 == b2).all() )
-      for k in m2.weights:
-        self.assertTrue( (abs(k) <= 0.001).all() )
-        self.assertTrue( (k != 0).any() )
-      for k in m2.biases:
-        self.assertTrue( (abs(k) <= 0.001).all() )
-        self.assertTrue( (k != 0).any() )
+  assert len(m.biases) == 1
+
+  assert (m.biases[0] == new_biases[0]).all()
+
+def test_persistence():
+
+  # make shure we can save an load an MLP machine
+  weights = []
+  weights.append(numpy.array([[.2, -.1, .2], [.2, .3, .9]]))
+  weights.append(numpy.array([[.1, .5], [-.1, .2], [-.1, 1.1]])) 
+  biases = []
+  biases.append(numpy.array([-.1, .3, .1]))
+  biases.append(numpy.array([.2, -.1]))
+  
+  m = MLP((2,3,2))
+  m.weights = weights
+  m.biases = biases
+
+  # creates a file that will be used in the next test!
+  machine_file = test_utils.temporary_filename()
+  m.save(io.HDF5File(machine_file, 'w'))
+  m2 = MLP(io.HDF5File(machine_file))
+  
+  assert m.is_similar_to(m2)
+  assert m == m2
+  assert m.shape == m2.shape
+  assert (m.input_subtract == m2.input_subtract).all()
+  assert (m.input_divide == m2.input_divide).all()
+  
+  for i in range(len(m.weights)):
+    assert (m.weights[i] == m2.weights[i]).all()
+    assert (m.biases[i] == m2.biases[i]).all()
+
+def test_randomization():
+
+  m = MLP((2,3,2))
+  m.randomize()
+
+  for k in m.weights:
+    assert (abs(k) <= 0.1).all()
+    assert (k != 0).any()
+
+  for k in m.biases:
+    assert (abs(k) <= 0.1).all()
+    assert (k != 0).any()
+
+def test_randomization_margins():
+
+  # we can also reset the margins for randomization
+  for k in range(10):
+
+    m = MLP((2,3,2))
+    m.randomize(-0.001, 0.001)
+
+    for k in m.weights:
+      assert (abs(k) <= 0.001).all()
+      assert (k != 0).any()
+
+    for k in m.biases:
+      assert (abs(k) <= 0.001).all()
+      assert (k != 0).any()
+
+def test_randomness():
+
+  m1 = MLP((2,3,2))
+  m1.randomize()
+
+  for k in range(10):
+    m2 = MLP((2,3,2))
+    m2.randomize()
+
+    for w1, w2 in zip(m1.weights, m2.weights):
+      assert (w1 == w2).all() == False
+
+    for b1, b2 in zip(m1.biases, m2.biases):
+      assert (b1 == b2).all() == False
