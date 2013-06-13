@@ -123,20 +123,19 @@ anything. Here is how to go from nothing to everything:
 .. code-block:: sh
 
   $ python bootstrap.py
-    Downloading http://pypi.python.org/packages/2.6/s/setuptools/setuptools-0.6c11-py2.6.egg
-    Creating directory '/Users/andre/Projects/bob.project.example/bin'.
-    Creating directory '/Users/andre/Projects/bob.project.example/parts'.
-    Creating directory '/Users/andre/Projects/bob.project.example/eggs'.
-    Creating directory '/Users/andre/Projects/bob.project.example/develop-eggs'.
-    Getting distribution for 'setuptools'.
-    Got setuptools 0.6c12dev-r88846.
-    Generated script '/Users/andre/Projects/bob.project.example/bin/buildout'.
+  Creating directory '/home/user/work/tmp/bob.project.example/bin'.
+  Creating directory '/home/user/work/tmp/bob.project.example/parts'.
+  Creating directory '/home/user/work/tmp/bob.project.example/eggs'.
+  Creating directory '/home/user/work/tmp/bob.project.example/develop-eggs'.
+  Generated script '/home/user/work/tmp/bob.project.example/bin/buildout'.
   $ ./bin/buildout
-    Develop: '/Users/andre/Projects/bob.project.example/.'
-    Installing python.
-    Generated script '/Users/andre/Projects/bob.project.example/bin/version.py'.
-    Generated interpreter '/Users/andre/Projects/bob.project.example/bin/python'.
-    ...
+  Develop: '/remote/filer.gx/user.active/aanjos/work/tmp/bob.project.example/.'
+  Getting distribution for 'xbob.buildout'.
+  Got xbob.buildout 0.2.13.
+  Getting distribution for 'zc.recipe.egg>=2.0.0a3'.
+  Got zc.recipe.egg 2.0.0.
+  Installing scripts.
+  ...
 
 .. note::
 
@@ -155,7 +154,14 @@ You should now be able to execute ``./bin/version.py``:
 .. code-block:: sh
 
   $ ./bin/version.py 
-    The installed version of Bob is '1.0.2'
+  The installed version of bob is 1.1.1
+  bob is installed at: /usr/lib/python2.7/dist-packages
+  bob depends on the following Python packages:
+   * nose: 1.1.2 (/usr/lib/python2.7/dist-packages)
+   * scipy: 0.10.1 (/usr/lib/python2.7/dist-packages)
+   * sqlalchemy: 0.7.8 (/usr/lib/python2.7/dist-packages)
+   * matplotlib: 1.1.1 (/usr/lib/pymodules/python2.7)
+   * numpy: 1.6.2 (/usr/lib/python2.7/dist-packages)
 
 Everything is now setup for you to continue the development of this package.
 Modify all required files to setup your own package name, description and
@@ -177,10 +183,10 @@ your setup or check which API changes will affect your released code. In such
 cases, you will need to tell ``zc.buildout`` what is the base build directory
 **or** installation prefix for |project|.
 
-To do that, alter the entry ``prefixes`` in ``buildout.cfg`` and replace or
-add directories (one per line) in which buildout will search for |project|
-python eggs (compiled and distributed with |project| builds). Here is an
-example:
+To do that, alter or add the entry ``prefixes`` at the ``[buildout]`` section
+of ``buildout.cfg`` and replace or add directories (one per line) in which
+buildout will search for |project| python eggs (compiled and distributed with
+|project| builds). Here is an example:
 
 .. code-block:: ini
 
