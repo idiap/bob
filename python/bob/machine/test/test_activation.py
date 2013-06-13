@@ -15,7 +15,7 @@ from .. import IdentityActivation, \
     MultipliedHyperbolicTangentActivation, \
     LogisticActivation
 
-from ...trainer import gradient
+from ...trainer.test import gradient
 
 def test_identity():
   
@@ -135,7 +135,7 @@ def test_multiplied_tanh_derivative():
   # go for an exact match
   for k in x:
     precise = C*M*(1-math.pow(math.tanh(M*k),2))
-    assert op.f_prime(k) == precise, 'MultipliedHyperbolicTangentActivation derivative does not match expected value: %g != %g' % (op.f_prime(k), precise)
+    assert abs(op.f_prime(k)-precise) < 1e-12, 'MultipliedHyperbolicTangentActivation derivative does not match expected value: %g != %g' % (op.f_prime(k), precise)
  
   # tries to estimate the gradient and check
   for k in x:

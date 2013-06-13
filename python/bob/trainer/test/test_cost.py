@@ -9,8 +9,9 @@
 import numpy
 import math
 
-from .. import SquareError, CrossEntropyLoss, gradient
+from .. import SquareError, CrossEntropyLoss
 from ...machine import LogisticActivation, IdentityActivation
+from . import gradient
 
 def test_square_error():
   
