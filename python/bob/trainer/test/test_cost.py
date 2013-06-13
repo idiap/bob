@@ -123,3 +123,119 @@ def test_cross_entropy_activation_detection():
 
   op = CrossEntropyLoss(IdentityActivation())
   assert op.logistic_activation == False
+
+def test_1d_ndarray():
+
+  C = numpy.random.rand()
+  op = SquareError(IdentityActivation())
+  O = numpy.random.rand(10) #10 random numbers between 0 and 1
+  T = numpy.random.rand(10) #10 random numbers between 0 and 1
+
+  Y = op(O,T)
+  assert Y.shape == O.shape
+  assert Y.dtype == numpy.dtype(float)
+
+  Y_f = op.f(O,T)
+  assert Y_f.shape == O.shape
+  assert Y.dtype == numpy.dtype(float)
+
+  Y_f_prime = op.f_prime(O,T)
+  assert Y_f_prime.shape == O.shape
+  assert Y.dtype == numpy.dtype(float)
+
+  Y_error = op.error(O,T)
+  assert Y_error.shape == O.shape
+  assert Y.dtype == numpy.dtype(float)
+
+  for k,(o,t) in enumerate(zip(O,T)):
+    assert op(o,t) == Y[k]
+    assert op.f(o,t) == Y_f[k]
+    assert op.f_prime(o,t) == Y_f_prime[k]
+    assert op.error(o,t) == Y_error[k]
+
+def test_2d_ndarray():
+
+  C = numpy.random.rand()
+  op = SquareError(IdentityActivation())
+  O = numpy.random.rand(3,3)
+  T = numpy.random.rand(3,3)
+
+  Y = op(O,T)
+  assert Y.shape == O.shape
+  assert Y.dtype == numpy.dtype(float)
+
+  Y_f = op.f(O,T)
+  assert Y_f.shape == O.shape
+  assert Y.dtype == numpy.dtype(float)
+
+  Y_f_prime = op.f_prime(O,T)
+  assert Y_f_prime.shape == O.shape
+  assert Y.dtype == numpy.dtype(float)
+
+  Y_error = op.error(O,T)
+  assert Y_error.shape == O.shape
+  assert Y.dtype == numpy.dtype(float)
+
+  for k,(o,t) in enumerate(zip(O.flat,T.flat)):
+    assert op(o,t) == Y.flat[k]
+    assert op.f(o,t) == Y_f.flat[k]
+    assert op.f_prime(o,t) == Y_f_prime.flat[k]
+    assert op.error(o,t) == Y_error.flat[k]
+
+def test_3d_ndarray():
+
+  C = numpy.random.rand()
+  op = SquareError(IdentityActivation())
+  O = numpy.random.rand(3,3,3)
+  T = numpy.random.rand(3,3,3)
+
+  Y = op(O,T)
+  assert Y.shape == O.shape
+  assert Y.dtype == numpy.dtype(float)
+
+  Y_f = op.f(O,T)
+  assert Y_f.shape == O.shape
+  assert Y.dtype == numpy.dtype(float)
+
+  Y_f_prime = op.f_prime(O,T)
+  assert Y_f_prime.shape == O.shape
+  assert Y.dtype == numpy.dtype(float)
+
+  Y_error = op.error(O,T)
+  assert Y_error.shape == O.shape
+  assert Y.dtype == numpy.dtype(float)
+
+  for k,(o,t) in enumerate(zip(O.flat,T.flat)):
+    assert op(o,t) == Y.flat[k]
+    assert op.f(o,t) == Y_f.flat[k]
+    assert op.f_prime(o,t) == Y_f_prime.flat[k]
+    assert op.error(o,t) == Y_error.flat[k]
+
+def test_4d_ndarray():
+
+  C = numpy.random.rand()
+  op = SquareError(IdentityActivation())
+  O = numpy.random.rand(2,2,2,2)
+  T = numpy.random.rand(2,2,2,2)
+
+  Y = op(O,T)
+  assert Y.shape == O.shape
+  assert Y.dtype == numpy.dtype(float)
+
+  Y_f = op.f(O,T)
+  assert Y_f.shape == O.shape
+  assert Y.dtype == numpy.dtype(float)
+
+  Y_f_prime = op.f_prime(O,T)
+  assert Y_f_prime.shape == O.shape
+  assert Y.dtype == numpy.dtype(float)
+
+  Y_error = op.error(O,T)
+  assert Y_error.shape == O.shape
+  assert Y.dtype == numpy.dtype(float)
+
+  for k,(o,t) in enumerate(zip(O.flat,T.flat)):
+    assert op(o,t) == Y.flat[k]
+    assert op.f(o,t) == Y_f.flat[k]
+    assert op.f_prime(o,t) == Y_f_prime.flat[k]
+    assert op.error(o,t) == Y_error.flat[k]
