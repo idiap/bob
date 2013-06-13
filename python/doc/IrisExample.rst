@@ -1,18 +1,18 @@
 .. vim: set fileencoding=utf-8 :
 .. Andre Anjos <andre.anjos@idiap.ch>
-.. Fri 23 Mar 2012 11:41:00 CET 
-.. 
+.. Fri 23 Mar 2012 11:41:00 CET
+..
 .. Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
-.. 
+..
 .. This program is free software: you can redistribute it and/or modify
 .. it under the terms of the GNU General Public License as published by
 .. the Free Software Foundation, version 3 of the License.
-.. 
+..
 .. This program is distributed in the hope that it will be useful,
 .. but WITHOUT ANY WARRANTY; without even the implied warranty of
 .. MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 .. GNU General Public License for more details.
-.. 
+..
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -35,7 +35,7 @@ In this example, we collect bits and pieces of the previous tutorials and build
 a complete example that discriminates Iris species based on |project|.
 
 .. note::
-  
+
   This example will consider all 3 classes for the LDA training. This is *not*
   what Fisher did in his paper entitled "The Use of Multiple Measurements in
   Taxonomic Problems", Annals of Eugenics, pp. 179-188, 1936. In that work
@@ -99,7 +99,7 @@ Analysis on the Iris dataset involves using the
   >>> trainer = bob.trainer.FisherLDATrainer()
   >>> machine, unused_eigen_values = trainer.train(data.values())
   >>> machine
-  <LinearMachine float64@(4, 3)>
+  <LinearMachine float64@(4, 2)>
 
 That is it! The returned :py:class:`bob.machine.LinearMachine` is now setup to
 perform LDA on the Iris dataset. A few things should be noted:
@@ -198,7 +198,7 @@ threshold "t":
 .. doctest:: iris
 
   >>> sum(true_rejects)
-  98 
+  98
   >>> sum(true_accepts)
   49
 
