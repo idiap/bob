@@ -141,3 +141,115 @@ def test_multiplied_tanh_derivative():
   for k in x:
     absdiff = abs(op.f_prime(k)-gradient.estimate(op.f,k))
     assert absdiff < 1e-4, 'MultipliedHyperbolicTangentActivation derivative and estimation do not match to 10^-4: |%g-%g| = %g' % (op.f_prime(k), gradient.estimate(op.f,k), absdiff)
+
+def test_1d_ndarray():
+
+  C = numpy.random.rand()
+  op = LinearActivation(C)
+  X = numpy.random.rand(10) #10 random numbers between 0 and 1
+
+  Y = op(X)
+  assert Y.shape == X.shape
+  assert Y.dtype == numpy.dtype(float)
+
+  Y_f = op.f(X)
+  assert Y_f.shape == X.shape
+  assert Y.dtype == numpy.dtype(float)
+
+  Y_f_prime = op.f_prime(X)
+  assert Y_f_prime.shape == X.shape
+  assert Y.dtype == numpy.dtype(float)
+
+  Y_f_prime_from_f = op.f_prime_from_f(X)
+  assert Y_f_prime_from_f.shape == X.shape
+  assert Y.dtype == numpy.dtype(float)
+
+  for k,x in enumerate(X):
+    assert op(x) == Y[k]
+    assert op.f(x) == Y_f[k]
+    assert op.f_prime(x) == Y_f_prime[k]
+    assert op.f_prime_from_f(x) == Y_f_prime_from_f[k]
+
+def test_2d_ndarray():
+
+  C = numpy.random.rand()
+  op = LinearActivation(C)
+  X = numpy.random.rand(4, 4)
+
+  Y = op(X)
+  assert Y.shape == X.shape
+  assert Y.dtype == numpy.dtype(float)
+
+  Y_f = op.f(X)
+  assert Y_f.shape == X.shape
+  assert Y_f.dtype == numpy.dtype(float)
+
+  Y_f_prime = op.f_prime(X)
+  assert Y_f_prime.shape == X.shape
+  assert Y_f_prime.dtype == numpy.dtype(float)
+
+  Y_f_prime_from_f = op.f_prime_from_f(X)
+  assert Y_f_prime_from_f.shape == X.shape
+  assert Y_f_prime_from_f.dtype == numpy.dtype(float)
+
+  for k,x in enumerate(X.flat):
+    assert op(x) == Y.flat[k]
+    assert op.f(x) == Y_f.flat[k]
+    assert op.f_prime(x) == Y_f_prime.flat[k]
+    assert op.f_prime_from_f(x) == Y_f_prime_from_f.flat[k]
+
+def test_3d_ndarray():
+
+  C = numpy.random.rand()
+  op = LinearActivation(C)
+  X = numpy.random.rand(3, 3, 3)
+
+  Y = op(X)
+  assert Y.shape == X.shape
+  assert Y.dtype == numpy.dtype(float)
+
+  Y_f = op.f(X)
+  assert Y_f.shape == X.shape
+  assert Y_f.dtype == numpy.dtype(float)
+
+  Y_f_prime = op.f_prime(X)
+  assert Y_f_prime.shape == X.shape
+  assert Y_f_prime.dtype == numpy.dtype(float)
+
+  Y_f_prime_from_f = op.f_prime_from_f(X)
+  assert Y_f_prime_from_f.shape == X.shape
+  assert Y_f_prime_from_f.dtype == numpy.dtype(float)
+
+  for k,x in enumerate(X.flat):
+    assert op(x) == Y.flat[k]
+    assert op.f(x) == Y_f.flat[k]
+    assert op.f_prime(x) == Y_f_prime.flat[k]
+    assert op.f_prime_from_f(x) == Y_f_prime_from_f.flat[k]
+
+def test_4d_ndarray():
+
+  C = numpy.random.rand()
+  op = LinearActivation(C)
+  X = numpy.random.rand(2, 2, 2, 2)
+
+  Y = op(X)
+  assert Y.shape == X.shape
+  assert Y.dtype == numpy.dtype(float)
+
+  Y_f = op.f(X)
+  assert Y_f.shape == X.shape
+  assert Y_f.dtype == numpy.dtype(float)
+
+  Y_f_prime = op.f_prime(X)
+  assert Y_f_prime.shape == X.shape
+  assert Y_f_prime.dtype == numpy.dtype(float)
+
+  Y_f_prime_from_f = op.f_prime_from_f(X)
+  assert Y_f_prime_from_f.shape == X.shape
+  assert Y_f_prime_from_f.dtype == numpy.dtype(float)
+
+  for k,x in enumerate(X.flat):
+    assert op(x) == Y.flat[k]
+    assert op.f(x) == Y_f.flat[k]
+    assert op.f_prime(x) == Y_f_prime.flat[k]
+    assert op.f_prime_from_f(x) == Y_f_prime_from_f.flat[k]
