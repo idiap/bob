@@ -77,3 +77,13 @@ def estimate(f, x, epsilon=1e-4, args=()):
      
   else: # x is scalar
     return (f(x+epsilon, *args) - f(x-epsilon, *args)) / (2*epsilon)
+
+def estimate_for_machine(machine, cost, target):
+
+  def func(x, i):
+    old = machine.roll(x)
+    average_cost = cost.f(machine.forward(i), target).mean()
+    machine.weights = old
+
+  x = machine.unroll()
+  return estimate 
