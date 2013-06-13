@@ -77,49 +77,49 @@ static void apply(boost::function<double (double)> function, bob::python::const_
   }
 }
 
-static void activation_f_ndarray_1(boost::shared_ptr<bob::machine::Activation> a, bob::python::const_ndarray arr, bob::python::ndarray retval) {
+static object activation_f_ndarray_1(boost::shared_ptr<bob::machine::Activation> a, bob::python::const_ndarray arr, bob::python::ndarray retval) {
   apply(boost::bind(&bob::machine::Activation::f, a, _1), arr, retval);
+  return retval.self();
 }
 
 static object activation_f_ndarray_2(boost::shared_ptr<bob::machine::Activation> a, bob::python::const_ndarray arr) {
   bob::python::ndarray retval(arr.type());
-  activation_f_ndarray_1(a, arr, retval);
-  return retval.self();
+  return activation_f_ndarray_1(a, arr, retval);
 }
 
-static void activation_f_prime_ndarray_1(boost::shared_ptr<bob::machine::Activation> a, bob::python::const_ndarray arr, bob::python::ndarray retval) {
+static object activation_f_prime_ndarray_1(boost::shared_ptr<bob::machine::Activation> a, bob::python::const_ndarray arr, bob::python::ndarray retval) {
   apply(boost::bind(&bob::machine::Activation::f_prime, a, _1), arr, retval);
+  return retval.self();
 }
 
 static object activation_f_prime_ndarray_2(boost::shared_ptr<bob::machine::Activation> a, bob::python::const_ndarray arr) {
   bob::python::ndarray retval(arr.type());
-  activation_f_prime_ndarray_1(a, arr, retval);
-  return retval.self();
+  return activation_f_prime_ndarray_1(a, arr, retval);
 }
 
-static void activation_f_prime_from_f_ndarray_1(boost::shared_ptr<bob::machine::Activation> a, bob::python::const_ndarray arr, bob::python::ndarray retval) {
+static object activation_f_prime_from_f_ndarray_1(boost::shared_ptr<bob::machine::Activation> a, bob::python::const_ndarray arr, bob::python::ndarray retval) {
   apply(boost::bind(&bob::machine::Activation::f_prime_from_f, a, _1), arr, retval);
+  return retval.self();
 }
 
 static object activation_f_prime_from_f_ndarray_2(boost::shared_ptr<bob::machine::Activation> a, bob::python::const_ndarray arr) {
   bob::python::ndarray retval(arr.type());
-  activation_f_prime_from_f_ndarray_1(a, arr, retval);
-  return retval.self();
+  return activation_f_prime_from_f_ndarray_1(a, arr, retval);
 }
 
 void bind_machine_activation() {
   class_<bob::machine::Activation, boost::shared_ptr<bob::machine::Activation>, boost::noncopyable>("Activation", 
       "Base class for activation functions", no_init)
-    .def("f", &activation_f_ndarray_1, (arg("self"), arg("z"), arg("res")), "Computes activated value, given an input array ``z``, placing results in ``res``")
-    .def("f", &activation_f_ndarray_2, (arg("self"), arg("z")), "Computes activated value, given an input array ``z``. Returns a newly allocated array with the answers")
-    .def("f", &bob::machine::Activation::f, (arg("self"), arg("z")), "Computes activated value, given an input ``z``") 
-    .def("__call__", &activation_f_ndarray_1, (arg("self"), arg("z"), arg("res")), "Computes activated value, given an input array ``z``, placing results in ``res``")
-    .def("__call__", &activation_f_ndarray_2, (arg("self"), arg("z")), "Computes activated value, given an input array ``z``. Returns a newly allocated array with the same size as ``z``")
-    .def("__call__", &bob::machine::Activation::f, (arg("self"), arg("z")), "Computes activated value, given an input ``z``") 
-    .def("f_prime", &activation_f_prime_ndarray_1, (arg("self"), arg("z"), arg("res")), "Computes the derivative of the activated value, placing results in ``res``")
+    .def("f", &activation_f_ndarray_1, (arg("self"), arg("z"), arg("res")), "Computes the activated value, given an input array ``z``, placing results in ``res`` (and returning it)")
+    .def("f", &activation_f_ndarray_2, (arg("self"), arg("z")), "Computes the activated value, given an input array ``z``. Returns a newly allocated array with the answers")
+    .def("f", &bob::machine::Activation::f, (arg("self"), arg("z")), "Computes the activated value, given an input ``z``") 
+    .def("__call__", &activation_f_ndarray_1, (arg("self"), arg("z"), arg("res")), "Computes the activated value, given an input array ``z``, placing results in ``res`` (and returning it)")
+    .def("__call__", &activation_f_ndarray_2, (arg("self"), arg("z")), "Computes the activated value, given an input array ``z``. Returns a newly allocated array with the same size as ``z``")
+    .def("__call__", &bob::machine::Activation::f, (arg("self"), arg("z")), "Computes the activated value, given an input ``z``") 
+    .def("f_prime", &activation_f_prime_ndarray_1, (arg("self"), arg("z"), arg("res")), "Computes the derivative of the activated value, placing results in ``res`` (and returning it)")
     .def("f_prime", &activation_f_prime_ndarray_2, (arg("self"), arg("z")), "Computes the derivative of the activated value, given an input array ``z``. Returns a newly allocated array with the same size as ``z``")
     .def("f_prime", &bob::machine::Activation::f_prime, (arg("self"), arg("z")), "Computes the derivative of the activated value.")
-    .def("f_prime_from_f", &activation_f_prime_from_f_ndarray_1, (arg("self"), arg("a"), arg("res")), "Computes the derivative of the activated value, given **the activated value** ``a``, placing results in ``res``")
+    .def("f_prime_from_f", &activation_f_prime_from_f_ndarray_1, (arg("self"), arg("a"), arg("res")), "Computes the derivative of the activated value, given **the activated value** ``a``, placing results in ``res`` (and returning it)")
     .def("f_prime_from_f", &activation_f_prime_from_f_ndarray_2, (arg("self"), arg("z")), "Computes the derivative of the activated value, given **the activated value** ``a``. Returns a newly allocated array with the same size as ``a`` with the answer.")
     .def("f_prime_from_f", &bob::machine::Activation::f_prime_from_f, (arg("self"), arg("a")), "Computes the derivative of the activation value, given **the activated value** ``a``.")
     .def("save", &bob::machine::Activation::save, (arg("self"), arg("h5f")), 
