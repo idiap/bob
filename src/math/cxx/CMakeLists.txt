@@ -33,6 +33,7 @@ set(src
   "lu.cc"
   "det.cc"
   "inv.cc"
+  "pinv.cc"
   "sqrtm.cc"
   "svd.cc"
   "LPInteriorPoint.cc"
@@ -55,6 +56,7 @@ bob_add_test(${PROJECT_NAME} linsolve test/linsolve.cc)
 bob_add_test(${PROJECT_NAME} lu_det_inv test/lu_det_inv.cc)
 bob_add_test(${PROJECT_NAME} norm test/norm.cc)
 bob_add_test(${PROJECT_NAME} norminv test/norminv.cc)
+bob_add_test(${PROJECT_NAME} pinv test/pinv.cc)
 bob_add_test(${PROJECT_NAME} sqrtm test/sqrtm.cc)
 bob_add_test(${PROJECT_NAME} svd test/svd.cc)
 bob_add_test(${PROJECT_NAME} LPInteriorPoint test/LPInteriorPoint.cc)
