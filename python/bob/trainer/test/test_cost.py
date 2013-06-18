@@ -13,27 +13,45 @@ from .. import SquareError, CrossEntropyLoss
 from ...machine import LogisticActivation, IdentityActivation
 from . import gradient
 
+def is_close(x, y, eps=1e-10):
+  return (abs(x - y) < eps)
+
+def rand_safe0(eps=2e-4):
+  return numpy.random.rand()*(1-4e-4)+2e-4
+
+def rand_safe(n, eps=2e-4):
+  return numpy.random.rand(n)*(1-4e-4)+2e-4
+
+def rand_safe2(n, p, eps=2e-4):
+  return numpy.random.rand(n,p)*(1-4e-4)+2e-4
+
+def rand_safe3(n, p, q, eps=2e-4):
+  return numpy.random.rand(n,p,q)*(1-4e-4)+2e-4
+
+def rand_safe4(n, p, q, r, eps=2e-4):
+  return numpy.random.rand(n,p,q,r)*(1-4e-4)+2e-4
+
 def test_square_error():
   
   op = SquareError(IdentityActivation())
-  x = numpy.random.rand(10) #10 random numbers between 0 and 1
-  y = numpy.random.rand(10) #10 random numbers between 0 and 1
+  x = rand_safe(10) #10 random numbers between 0 and 1
+  y = rand_safe(10) #10 random numbers between 0 and 1
 
   # go for an exact match
   for p,q in zip(x,y):
     expected = 0.5*math.pow(p-q,2)
-    assert op.f(p,q) == expected, 'SquareError does not perform as expected %g != %g' % (op.f(p,q), expected)
+    assert is_close(op.f(p,q), expected), 'SquareError does not perform as expected %g != %g' % (op.f(p,q), expected)
 
 def test_square_error_derivative():
   
   op = SquareError(IdentityActivation())
-  x = numpy.random.rand(10) #10 random numbers between 0 and 1
-  y = numpy.random.rand(10) #10 random numbers between 0 and 1
+  x = rand_safe(10) #10 random numbers between 0 and 1
+  y = rand_safe(10) #10 random numbers between 0 and 1
 
   # go for an exact match
   for p,q in zip(x,y):
     expected = p-q
-    assert op.f_prime(p,q) == expected, 'SquareError derivative does not perform as expected %g != %g' % (op.f(p,q), expected)
+    assert is_close(op.f_prime(p,q), expected), 'SquareError derivative does not perform as expected %g != %g' % (op.f(p,q), expected)
 
   # go for approximation
   for p,q in zip(x,y):
@@ -44,35 +62,35 @@ def test_square_error_error():
   
   act = LogisticActivation()
   op = SquareError(act)
-  x = numpy.random.rand(10) #10 random numbers between 0 and 1
-  y = numpy.random.rand(10) #10 random numbers between 0 and 1
+  x = rand_safe(10) #10 random numbers between 0 and 1
+  y = rand_safe(10) #10 random numbers between 0 and 1
 
   # go for an exact match
   for p,q in zip(x,y):
     expected = p*(1-p)*(p-q)
-    assert op.error(p,q) == expected, 'SquareError error does not perform as expected %g != %g' % (op.error(p,q), expected)
+    assert is_close(op.error(p,q), expected), 'SquareError error does not perform as expected %g != %g' % (op.error(p,q), expected)
 
 def test_cross_entropy():
   
   op = CrossEntropyLoss(LogisticActivation())
-  x = numpy.random.rand(10) #10 random numbers between 0 and 1
-  y = numpy.random.rand(10) #10 random numbers between 0 and 1
+  x = rand_safe(10) #10 random numbers between 0 and 1
+  y = rand_safe(10) #10 random numbers between 0 and 1
 
   # go for an exact match
   for p,q in zip(x,y):
     expected = -q*math.log(p) - (1-q)*math.log(1-p)
-    assert op.f(p,q) == expected, 'CrossEntropyLoss does not perform as expected %g != %g' % (op.f(p,q), expected)
+    assert is_close(op.f(p,q), expected), 'CrossEntropyLoss does not perform as expected %g != %g' % (op.f(p,q), expected)
 
 def test_cross_entropy_derivative():
   
   op = CrossEntropyLoss(LogisticActivation())
-  x = numpy.random.rand(10) #10 random numbers between 0 and 1
-  y = numpy.random.rand(10) #10 random numbers between 0 and 1
+  x = rand_safe(10) #10 random numbers between 0 and 1
+  y = rand_safe(10) #10 random numbers between 0 and 1
 
   # go for an exact match
   for p,q in zip(x,y):
     expected = (p-q)/(p*(1-p))
-    assert op.f_prime(p,q) == expected, 'CrossEntropyLoss derivative does not perform as expected %g != %g' % (op.f(p,q), expected)
+    assert is_close(op.f_prime(p,q), expected), 'CrossEntropyLoss derivative does not perform as expected %g != %g' % (op.f(p,q), expected)
 
   # go for approximation
   for p,q in zip(x,y):
@@ -97,25 +115,25 @@ def test_cross_entropy_error_with_logistic():
   
   act = LogisticActivation()
   op = CrossEntropyLoss(act)
-  x = numpy.random.rand(10) #10 random numbers between 0 and 1
-  y = numpy.random.rand(10) #10 random numbers between 0 and 1
+  x = rand_safe(10) #10 random numbers between 0 and 1
+  y = rand_safe(10) #10 random numbers between 0 and 1
 
   # go for an exact match
   for p,q in zip(x,y):
     expected = p-q
-    assert op.error(p,q) == expected, 'CrossEntropyLoss+LogisticActivation error does not perform as expected %g != %g' % (op.error(p,q), expected)
+    assert is_close(op.error(p,q), expected), 'CrossEntropyLoss+LogisticActivation error does not perform as expected %g != %g' % (op.error(p,q), expected)
 
 def test_cross_entropy_error_without_logistic():
   
   act = IdentityActivation()
   op = CrossEntropyLoss(act)
-  x = numpy.random.rand(10) #10 random numbers between 0 and 1
-  y = numpy.random.rand(10) #10 random numbers between 0 and 1
+  x = rand_safe(10) #10 random numbers between 0 and 1
+  y = rand_safe(10) #10 random numbers between 0 and 1
 
   # go for an exact match
   for p,q in zip(x,y):
     expected = (p-q)/(p*(1-p))
-    assert op.error(p,q) == expected, 'CrossEntropyLoss+IdentityActivation error does not perform as expected %g != %g' % (op.error(p,q), expected)
+    assert is_close(op.error(p,q), expected), 'CrossEntropyLoss+IdentityActivation error does not perform as expected %g != %g' % (op.error(p,q), expected)
 
 def test_cross_entropy_activation_detection():
 
@@ -127,10 +145,10 @@ def test_cross_entropy_activation_detection():
 
 def test_1d_ndarray():
 
-  C = numpy.random.rand()
+  C = rand_safe0()
   op = SquareError(IdentityActivation())
-  O = numpy.random.rand(10) #10 random numbers between 0 and 1
-  T = numpy.random.rand(10) #10 random numbers between 0 and 1
+  O = rand_safe(10) #10 random numbers between 0 and 1
+  T = rand_safe(10) #10 random numbers between 0 and 1
 
   Y = op(O,T)
   assert Y.shape == O.shape
@@ -149,17 +167,17 @@ def test_1d_ndarray():
   assert Y.dtype == numpy.dtype(float)
 
   for k,(o,t) in enumerate(zip(O,T)):
-    assert op(o,t) == Y[k]
-    assert op.f(o,t) == Y_f[k]
-    assert op.f_prime(o,t) == Y_f_prime[k]
-    assert op.error(o,t) == Y_error[k]
+    assert is_close(op(o,t), Y[k])
+    assert is_close(op.f(o,t), Y_f[k])
+    assert is_close(op.f_prime(o,t), Y_f_prime[k])
+    assert is_close(op.error(o,t), Y_error[k])
 
 def test_2d_ndarray():
 
-  C = numpy.random.rand()
+  C = rand_safe0()
   op = SquareError(IdentityActivation())
-  O = numpy.random.rand(3,3)
-  T = numpy.random.rand(3,3)
+  O = rand_safe2(3,3)
+  T = rand_safe2(3,3)
 
   Y = op(O,T)
   assert Y.shape == O.shape
@@ -178,17 +196,17 @@ def test_2d_ndarray():
   assert Y.dtype == numpy.dtype(float)
 
   for k,(o,t) in enumerate(zip(O.flat,T.flat)):
-    assert op(o,t) == Y.flat[k]
-    assert op.f(o,t) == Y_f.flat[k]
-    assert op.f_prime(o,t) == Y_f_prime.flat[k]
-    assert op.error(o,t) == Y_error.flat[k]
+    assert is_close(op(o,t), Y.flat[k])
+    assert is_close(op.f(o,t), Y_f.flat[k])
+    assert is_close(op.f_prime(o,t), Y_f_prime.flat[k])
+    assert is_close(op.error(o,t), Y_error.flat[k])
 
 def test_3d_ndarray():
 
-  C = numpy.random.rand()
+  C = rand_safe0()
   op = SquareError(IdentityActivation())
-  O = numpy.random.rand(3,3,3)
-  T = numpy.random.rand(3,3,3)
+  O = rand_safe3(3,3,3)
+  T = rand_safe3(3,3,3)
 
   Y = op(O,T)
   assert Y.shape == O.shape
@@ -207,17 +225,17 @@ def test_3d_ndarray():
   assert Y.dtype == numpy.dtype(float)
 
   for k,(o,t) in enumerate(zip(O.flat,T.flat)):
-    assert op(o,t) == Y.flat[k]
-    assert op.f(o,t) == Y_f.flat[k]
-    assert op.f_prime(o,t) == Y_f_prime.flat[k]
-    assert op.error(o,t) == Y_error.flat[k]
+    assert is_close(op(o,t), Y.flat[k])
+    assert is_close(op.f(o,t), Y_f.flat[k])
+    assert is_close(op.f_prime(o,t), Y_f_prime.flat[k])
+    assert is_close(op.error(o,t), Y_error.flat[k])
 
 def test_4d_ndarray():
 
-  C = numpy.random.rand()
+  C = rand_safe0()
   op = SquareError(IdentityActivation())
-  O = numpy.random.rand(2,2,2,2)
-  T = numpy.random.rand(2,2,2,2)
+  O = rand_safe4(2,2,2,2)
+  T = rand_safe4(2,2,2,2)
 
   Y = op(O,T)
   assert Y.shape == O.shape
@@ -236,7 +254,7 @@ def test_4d_ndarray():
   assert Y.dtype == numpy.dtype(float)
 
   for k,(o,t) in enumerate(zip(O.flat,T.flat)):
-    assert op(o,t) == Y.flat[k]
-    assert op.f(o,t) == Y_f.flat[k]
-    assert op.f_prime(o,t) == Y_f_prime.flat[k]
-    assert op.error(o,t) == Y_error.flat[k]
+    assert is_close(op(o,t), Y.flat[k])
+    assert is_close(op.f(o,t), Y_f.flat[k])
+    assert is_close(op.f_prime(o,t), Y_f_prime.flat[k])
+    assert is_close(op.error(o,t), Y_error.flat[k])
