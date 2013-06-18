@@ -17,6 +17,9 @@ from .. import IdentityActivation, \
 
 from ...trainer.test import gradient
 
+def is_close(x, y, eps=1e-10):
+  return (abs(x - y) < eps)
+
 def test_identity():
   
   op = IdentityActivation()
@@ -24,7 +27,7 @@ def test_identity():
 
   # go for an exact match
   for k in x:
-    assert op.f(k) == k, 'IdentityActivation does not perform identity %g != %g' % (op.f(k), k)
+    assert is_close(op.f(k), k), 'IdentityActivation does not perform identity %g != %g' % (op.f(k), k)
 
 def test_identity_derivative():
   
@@ -33,7 +36,7 @@ def test_identity_derivative():
 
   # go for an exact match
   for k in x:
-    assert op.f_prime(k) == 1., 'IdentityActivation derivative is not equal to 1.: %g != 1.' % (op.f_prime(k),)
+    assert is_close(op.f_prime(k), 1.), 'IdentityActivation derivative is not equal to 1.: %g != 1.' % (op.f_prime(k),)
 
   # tries to estimate the gradient and check
   for k in x:
@@ -48,7 +51,7 @@ def test_linear():
 
   # go for an exact match
   for k in x:
-    assert op.f(k) == (C*k), 'LinearActivation does not match expected value: %g != %g' % (op.f(k), C*k)
+    assert is_close(op.f(k), (C*k)), 'LinearActivation does not match expected value: %g != %g' % (op.f(k), C*k)
 
 def test_linear_derivative():
  
@@ -58,7 +61,7 @@ def test_linear_derivative():
 
   # go for an exact match
   for k in x:
-    assert op.f_prime(k) == C, 'LinearActivation derivative does not match expected value: %g != %g' % (op.f_prime(k), k)
+    assert is_close(op.f_prime(k), C), 'LinearActivation derivative does not match expected value: %g != %g' % (op.f_prime(k), k)
   
   # tries to estimate the gradient and check
   for k in x:
@@ -72,7 +75,7 @@ def test_hyperbolic_tangent():
 
   # go for an exact match
   for k in x:
-    assert op.f(k) == math.tanh(k), 'HyperbolicTangentActivation does not match expected value: %g != %g' % (op.f(k), math.tanh(k))
+    assert is_close(op.f(k), math.tanh(k)), 'HyperbolicTangentActivation does not match expected value: %g != %g' % (op.f(k), math.tanh(k))
 
 def test_hyperbolic_tangent_derivative():
  
@@ -82,7 +85,7 @@ def test_hyperbolic_tangent_derivative():
   # go for an exact match
   for k in x:
     precise = 1 - op.f(k)**2
-    assert op.f_prime(k) == precise, 'HyperbolicTangentActivation derivative does not match expected value: %g != %g' % (op.f_prime(k), precise)
+    assert is_close(op.f_prime(k), precise), 'HyperbolicTangentActivation derivative does not match expected value: %g != %g' % (op.f_prime(k), precise)
   
   # tries to estimate the gradient and check
   for k in x:
@@ -97,7 +100,7 @@ def test_logistic():
   # go for an exact match
   for k in x:
     precise = 1. / (1. + math.exp(-k))
-    assert op.f(k) == precise, 'LogisticActivation does not match expected value: %g != %g' % (op.f(k), precise)
+    assert is_close(op.f(k), precise), 'LogisticActivation does not match expected value: %g != %g' % (op.f(k), precise)
 
 def test_logistic_derivative():
  
@@ -107,7 +110,7 @@ def test_logistic_derivative():
   # go for an exact match
   for k in x:
     precise = op.f(k) * (1 - op.f(k))
-    assert op.f_prime(k) == precise, 'LogisticActivation derivative does not match expected value: %g != %g' % (op.f_prime(k), precise)
+    assert is_close(op.f_prime(k), precise), 'LogisticActivation derivative does not match expected value: %g != %g' % (op.f_prime(k), precise)
   
   # tries to estimate the gradient and check
   for k in x:
@@ -123,7 +126,7 @@ def test_multiplied_tanh():
 
   # go for an exact match
   for k in x:
-    assert op.f(k) == C*math.tanh(M*k), 'MultipliedHyperbolicTangentActivation does not match expected value: %g != %g' % (op.f(k), C*math.tanh(M*k))
+    assert is_close(op.f(k), C*math.tanh(M*k)), 'MultipliedHyperbolicTangentActivation does not match expected value: %g != %g' % (op.f(k), C*math.tanh(M*k))
 
 def test_multiplied_tanh_derivative():
  
@@ -135,7 +138,7 @@ def test_multiplied_tanh_derivative():
   # go for an exact match
   for k in x:
     precise = C*M*(1-math.pow(math.tanh(M*k),2))
-    assert abs(op.f_prime(k)-precise) < 1e-12, 'MultipliedHyperbolicTangentActivation derivative does not match expected value: %g != %g' % (op.f_prime(k), precise)
+    assert is_close(op.f_prime(k),precise), 'MultipliedHyperbolicTangentActivation derivative does not match expected value: %g != %g' % (op.f_prime(k), precise)
  
   # tries to estimate the gradient and check
   for k in x:
@@ -165,10 +168,10 @@ def test_1d_ndarray():
   assert Y.dtype == numpy.dtype(float)
 
   for k,x in enumerate(X):
-    assert op(x) == Y[k]
-    assert op.f(x) == Y_f[k]
-    assert op.f_prime(x) == Y_f_prime[k]
-    assert op.f_prime_from_f(x) == Y_f_prime_from_f[k]
+    assert is_close(op(x), Y[k])
+    assert is_close(op.f(x), Y_f[k])
+    assert is_close(op.f_prime(x), Y_f_prime[k])
+    assert is_close(op.f_prime_from_f(x), Y_f_prime_from_f[k])
 
 def test_2d_ndarray():
 
@@ -193,10 +196,10 @@ def test_2d_ndarray():
   assert Y_f_prime_from_f.dtype == numpy.dtype(float)
 
   for k,x in enumerate(X.flat):
-    assert op(x) == Y.flat[k]
-    assert op.f(x) == Y_f.flat[k]
-    assert op.f_prime(x) == Y_f_prime.flat[k]
-    assert op.f_prime_from_f(x) == Y_f_prime_from_f.flat[k]
+    assert is_close(op(x), Y.flat[k])
+    assert is_close(op.f(x), Y_f.flat[k])
+    assert is_close(op.f_prime(x), Y_f_prime.flat[k])
+    assert is_close(op.f_prime_from_f(x), Y_f_prime_from_f.flat[k])
 
 def test_3d_ndarray():
 
@@ -221,10 +224,10 @@ def test_3d_ndarray():
   assert Y_f_prime_from_f.dtype == numpy.dtype(float)
 
   for k,x in enumerate(X.flat):
-    assert op(x) == Y.flat[k]
-    assert op.f(x) == Y_f.flat[k]
-    assert op.f_prime(x) == Y_f_prime.flat[k]
-    assert op.f_prime_from_f(x) == Y_f_prime_from_f.flat[k]
+    assert is_close(op(x), Y.flat[k])
+    assert is_close(op.f(x), Y_f.flat[k])
+    assert is_close(op.f_prime(x), Y_f_prime.flat[k])
+    assert is_close(op.f_prime_from_f(x), Y_f_prime_from_f.flat[k])
 
 def test_4d_ndarray():
 
@@ -249,7 +252,7 @@ def test_4d_ndarray():
   assert Y_f_prime_from_f.dtype == numpy.dtype(float)
 
   for k,x in enumerate(X.flat):
-    assert op(x) == Y.flat[k]
-    assert op.f(x) == Y_f.flat[k]
-    assert op.f_prime(x) == Y_f_prime.flat[k]
-    assert op.f_prime_from_f(x) == Y_f_prime_from_f.flat[k]
+    assert is_close(op(x), Y.flat[k])
+    assert is_close(op.f(x), Y_f.flat[k])
+    assert is_close(op.f_prime(x), Y_f_prime.flat[k])
+    assert is_close(op.f_prime_from_f(x), Y_f_prime_from_f.flat[k])
