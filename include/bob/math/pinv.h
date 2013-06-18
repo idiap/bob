@@ -38,6 +38,9 @@ namespace bob { namespace math {
  *   size, with zero base index. Checks are performed.
  * @param A The A matrix to decompose (size MxN)
  * @param B The pseudo-inverse of the matrix A (size NxM)
+ * @param rcond Cutoff for small singular values. Singular values smaller 
+ *   (in modulus) than rcond * largest_singular_value (again, in modulus)
+ *   are set to zero.
  */
 void pinv(const blitz::Array<double,2>& A, blitz::Array<double,2>& B,
   const double rcond=1e-15); 
@@ -47,6 +50,9 @@ void pinv(const blitz::Array<double,2>& A, blitz::Array<double,2>& B,
  *   size, with zero base index. Checks are NOT performed.
  * @param A The A matrix to decompose (size MxN)
  * @param B The pseudo-inverse of the matrix A (size NxM)
+ * @param rcond Cutoff for small singular values. Singular values smaller 
+ *   (in modulus) than rcond * largest_singular_value (again, in modulus)
+ *   are set to zero.
  */
 void pinv_(const blitz::Array<double,2>& A, blitz::Array<double,2>& B,
   const double rcond=1e-15); 
