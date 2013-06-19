@@ -17,19 +17,19 @@ def is_close(x, y, eps=1e-10):
   return (abs(x - y) < eps)
 
 def rand_safe0(eps=2e-4):
-  return numpy.random.rand()*(1-4e-4)+2e-4
+  return numpy.random.rand()*(1-2*eps)+eps
 
 def rand_safe(n, eps=2e-4):
-  return numpy.random.rand(n)*(1-4e-4)+2e-4
+  return numpy.random.rand(n)*(1-2*eps)+eps
 
 def rand_safe2(n, p, eps=2e-4):
-  return numpy.random.rand(n,p)*(1-4e-4)+2e-4
+  return numpy.random.rand(n,p)*(1-2*eps)+eps
 
 def rand_safe3(n, p, q, eps=2e-4):
-  return numpy.random.rand(n,p,q)*(1-4e-4)+2e-4
+  return numpy.random.rand(n,p,q)*(1-2*eps)+eps
 
 def rand_safe4(n, p, q, r, eps=2e-4):
-  return numpy.random.rand(n,p,q,r)*(1-4e-4)+2e-4
+  return numpy.random.rand(n,p,q,r)*(1-2*eps)+eps
 
 def test_square_error():
   
