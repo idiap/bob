@@ -1,6 +1,6 @@
 .. vim: set fileencoding=utf-8 :
 .. Andre Anjos <andre.anjos@idiap.ch>
-.. Sun Apr 3 19:18:37 2011 +0200
+.. Tue 18 Jun 19:26:21 2013 CEST 
 .. 
 .. Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
 .. 
@@ -16,31 +16,16 @@
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-.. Index file for the Python bob::core bindings
+.. Index file for the Python bob::core::convert bindings
 
-======
- Core
-======
+bob.core.array
+==============
 
-The ``core`` module contains a variety of utilities to handle random number
-generation (w.r.t. |project|'s machines), array data conversion and error
-reporting and logging.
+.. module:: bob.core.array
 
-.. toctree::
-   :maxdepth: 2
-
-   ErrorReportingAndLogging
-   ArrayNote
-
-Reference Manual
-----------------
-
-.. currentmodule:: bob.core
-   
-.. rubric:: Submodules
+.. rubric:: Functions
 
 .. autosummary::
-   :toctree: 
+   :toctree: generated/
 
-   array
-   random
+   convert

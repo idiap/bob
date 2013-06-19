@@ -31,7 +31,7 @@ void bind_sp_convolution();
 void bind_sp_quantization();
 
 BOOST_PYTHON_MODULE(_sp) {
-
+  boost::python::docstring_options docopt(true, true, false);
   bob::python::setup_python("bob signal processing classes and sub-classes");
 
   bind_sp_version();

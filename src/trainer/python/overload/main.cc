@@ -27,7 +27,7 @@ void bind_trainer_gmm_wrappers();
 void bind_trainer_mlp_wrappers();
 
 BOOST_PYTHON_MODULE(_trainer_overload) {
-
+  boost::python::docstring_options docopt(true, true, false);
   bob::python::setup_python("bob classes and sub-classes for overloading trainers");
   
   bind_trainer_kmeans_wrappers();

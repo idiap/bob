@@ -40,15 +40,11 @@
 
 void bob::python::setup_python(const char* module_docstring) {
 
+  // Documentation options
+  if (module_docstring) boost::python::scope().attr("__doc__") = module_docstring;
+
   // Required for logging C++ <-> Python interaction
   if (!PyEval_ThreadsInitialized()) PyEval_InitThreads();
-
-  // Documentation options
-  boost::python::docstring_options docopt;
-# if !defined(BOB_DEBUG)
-  docopt.disable_cpp_signatures();
-# endif
-  if (module_docstring) boost::python::scope().attr("__doc__") = module_docstring;
 
   // Gets the current dlopenflags and save it
   PyThreadState* tstate = PyThreadState_Get();

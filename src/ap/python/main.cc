@@ -27,6 +27,7 @@ void bind_ap_ceps();
 
 BOOST_PYTHON_MODULE(_ap)
 {
+  boost::python::docstring_options docopt(true, true, false);
   bob::python::setup_python("bob audio processing classes and sub-classes");
 
   bind_ap_ceps();

@@ -39,6 +39,7 @@ void bind_core_profiler();
 #endif
 
 BOOST_PYTHON_MODULE(_core) {
+  boost::python::docstring_options docopt(true, true, false);
   bob::python::setup_python("bob core classes and sub-classes");
 
   bind_core_version();

@@ -17,9 +17,9 @@
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-=================================
- Note on Supported Element Types
-=================================
+=================================================
+ Note on Supported Array Data Types (``dtypes``)
+=================================================
 
 Because `Blitz++`_ arrays (and :py:class:`numpy.ndarray`) are template types,
 we must fix the set of supported combinations of element type and number of

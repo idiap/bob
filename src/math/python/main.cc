@@ -30,7 +30,7 @@ void bind_math_histogram();
 void bind_math_pavx();
 
 BOOST_PYTHON_MODULE(_math) {
-
+  boost::python::docstring_options docopt(true, true, false);
   bob::python::setup_python("bob mathematical classes and sub-classes");
 
   bind_math_lp_interiorpoint();

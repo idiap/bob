@@ -19,6 +19,7 @@
 
 import os
 import sys
+import glob
 import pkg_resources
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -53,6 +54,9 @@ if sphinx.__version__ >= "1.0":
 
 # Always includes todos
 todo_include_todos = True
+
+# Auto generate new summary pages
+autosummary_generate = glob.glob('*/*.rst')
 
 # If we are on OSX, the 'dvipng' path maybe different
 dvipng_osx = '/opt/local/libexec/texlive/binaries/dvipng'

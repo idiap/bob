@@ -45,7 +45,7 @@ void bind_io_video();
 #endif
 
 BOOST_PYTHON_MODULE(_io) {
-
+  boost::python::docstring_options docopt(true, true, false);
   bob::python::setup_python("bob classes and sub-classes for io access");
 
   bind_io_version();

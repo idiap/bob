@@ -44,7 +44,7 @@ void bind_trainer_svm();
 #endif
 
 BOOST_PYTHON_MODULE(_trainer) {
-
+  boost::python::docstring_options docopt(true, true, false);
   bob::python::setup_python("bob classes and sub-classes for trainers");
   
   bind_trainer_linear();

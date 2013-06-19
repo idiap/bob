@@ -1,3 +1,5 @@
+"""Utilities to handle bounded range conversions across different data types"""
+
 from .. import convert as __private_convert__
 import warnings
 
