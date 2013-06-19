@@ -229,25 +229,24 @@ class MyBackPropTrainer(bob.trainer.overload.MLPBaseTrainer):
     # Call forward and backward from the C++ MLPBaseTrainer class
     self.forward_step(machine, input)
     self.backward_step(machine, target)
+    self.cost_derivatives_step(machine, input)
 
     E = self.error
     O = self.output
+    DW = self.deriv
+    DB = self.deriv_bias
 
     # Calculates partial derivatives, accumulate
-    batch_size = E[-1].shape[0]
-    self.DW = [numpy.dot(input.transpose(1,0), E[0])]
-    self.DW.extend([numpy.dot(O[k].transpose(1,0), E[k+1]) for k in range(len(W)-1)])
-    for k in self.DW: k *= (self.learning_rate / batch_size)
-    self.DB = [numpy.dot(BI[k], E[k]) for k in range(len(W))]
-    for k in self.DB: k *= (self.learning_rate / batch_size)
+    for k in DW: k *= self.learning_rate
+    for k in DB: k *= self.learning_rate
 
     # Updates weights and biases
-    machine.weights = [W[k] + (((1-self.momentum)*self.DW[k]) + (self.momentum*self.PDW[k])) for k in range(len(W))]
-    self.PDW = self.DW
+    machine.weights = [W[k] + (((1-self.momentum)*DW[k]) + (self.momentum*self.PDW[k])) for k in range(len(W))]
+    self.PDW = DW
 
     if self.train_biases:
-      machine.biases = [B[k] + (((1-self.momentum)*self.DB[k]) + (self.momentum*self.PDB[k])) for k in range(len(W))]
-      self.PDB = self.DB
+      machine.biases = [B[k] + (((1-self.momentum)*DB[k]) + (self.momentum*self.PDB[k])) for k in range(len(W))]
+      self.PDB = DB
     else:
       machine.biases = 0
 

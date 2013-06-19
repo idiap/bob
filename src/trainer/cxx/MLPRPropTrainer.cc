@@ -31,14 +31,14 @@
 bob::trainer::MLPRPropTrainer::MLPRPropTrainer(size_t batch_size,
     boost::shared_ptr<bob::trainer::Cost> cost):
   bob::trainer::MLPBaseTrainer(batch_size, cost),
-  m_deriv(m_H + 1),
-  m_deriv_bias(m_H + 1),
+  m_delta(m_H + 1),
+  m_delta_bias(m_H + 1),
   m_prev_deriv(m_H + 1),
   m_prev_deriv_bias(m_H + 1)
 {
   for (size_t k=0; k<(m_H + 1); ++k) {
-    m_deriv[k].reference(blitz::Array<double,2>(0,0));
-    m_deriv_bias[k].reference(blitz::Array<double,1>(0));
+    m_delta[k].reference(blitz::Array<double,2>(0,0));
+    m_delta_bias[k].reference(blitz::Array<double,1>(0));
     m_prev_deriv[k].reference(blitz::Array<double,2>(0,0));
     m_prev_deriv_bias[k].reference(blitz::Array<double,1>(0));
   }
@@ -51,8 +51,8 @@ bob::trainer::MLPRPropTrainer::MLPRPropTrainer(size_t batch_size,
     boost::shared_ptr<bob::trainer::Cost> cost,
     const bob::machine::MLP& machine):
   bob::trainer::MLPBaseTrainer(batch_size, cost, machine),
-  m_deriv(m_H + 1),
-  m_deriv_bias(m_H + 1),
+  m_delta(m_H + 1),
+  m_delta_bias(m_H + 1),
   m_prev_deriv(m_H + 1),
   m_prev_deriv_bias(m_H + 1)
 {
@@ -62,8 +62,8 @@ bob::trainer::MLPRPropTrainer::MLPRPropTrainer(size_t batch_size,
     machine.getBiases();
 
   for (size_t k=0; k<(m_H + 1); ++k) {
-    m_deriv[k].reference(blitz::Array<double,2>(machine_weight[k].shape()));
-    m_deriv_bias[k].reference(blitz::Array<double,1>(machine_bias[k].shape()));
+    m_delta[k].reference(blitz::Array<double,2>(machine_weight[k].shape()));
+    m_delta_bias[k].reference(blitz::Array<double,1>(machine_bias[k].shape()));
     m_prev_deriv[k].reference(blitz::Array<double,2>(machine_weight[k].shape()));
     m_prev_deriv_bias[k].reference(blitz::Array<double,1>(machine_bias[k].shape()));
   }
@@ -75,13 +75,13 @@ bob::trainer::MLPRPropTrainer::~MLPRPropTrainer() { }
 
 bob::trainer::MLPRPropTrainer::MLPRPropTrainer(const MLPRPropTrainer& other):
   bob::trainer::MLPBaseTrainer(other),
-  m_deriv(m_H + 1),
-  m_deriv_bias(m_H + 1),
+  m_delta(m_H + 1),
+  m_delta_bias(m_H + 1),
   m_prev_deriv(m_H + 1),
   m_prev_deriv_bias(m_H + 1)
 {
-  bob::core::array::ccopy(other.m_deriv, m_deriv);
-  bob::core::array::ccopy(other.m_deriv_bias, m_deriv_bias);
+  bob::core::array::ccopy(other.m_delta, m_delta);
+  bob::core::array::ccopy(other.m_delta_bias, m_delta_bias);
   bob::core::array::ccopy(other.m_prev_deriv, m_prev_deriv);
   bob::core::array::ccopy(other.m_prev_deriv_bias, m_prev_deriv_bias);
 }
@@ -92,8 +92,8 @@ bob::trainer::MLPRPropTrainer& bob::trainer::MLPRPropTrainer::operator=
   {
     bob::trainer::MLPBaseTrainer::operator=(other);
 
-    bob::core::array::ccopy(other.m_deriv, m_deriv);
-    bob::core::array::ccopy(other.m_deriv_bias, m_deriv_bias);
+    bob::core::array::ccopy(other.m_delta, m_delta);
+    bob::core::array::ccopy(other.m_delta_bias, m_delta_bias);
     bob::core::array::ccopy(other.m_prev_deriv, m_prev_deriv);
     bob::core::array::ccopy(other.m_prev_deriv_bias, m_prev_deriv_bias);
   }
@@ -135,14 +135,6 @@ void bob::trainer::MLPRPropTrainer::rprop_weight_update(bob::machine::MLP& machi
     machine.updateBiases();
 
   for (size_t k=0; k<machine_weight.size(); ++k) { //for all layers
-    if (k == 0) bob::math::prod_(input.transpose(1,0), m_error[k], m_deriv[k]);
-    else bob::math::prod_(m_output[k-1].transpose(1,0), m_error[k], m_deriv[k]);
-
-    // Note that we don't need to estimate the mean since we are only
-    // interested in the sign of the derivative and dividing by the mean makes
-    // no difference on the final result as 'batch_size' is always > 0!
-    // deriv[k] /= batch_size; //estimates the mean for the batch
-
     // Calculates the sign change as prescribed on the RProp paper. Depending
     // on the sign change, we update the "weight_update" matrix and apply the
     // updates on the respective weights.
@@ -173,8 +165,6 @@ void bob::trainer::MLPRPropTrainer::rprop_weight_update(bob::machine::MLP& machi
     // considered as input neurons connecting the respective layers, with a
     // fixed input = +1. This means we only need to probe for the error at
     // layer k.
-    blitz::secondIndex J;
-    m_deriv_bias[k] = blitz::sum(m_error[k].transpose(1,0), J);
     for (int i=0; i<m_deriv_bias[k].extent(0); ++i) {
       int8_t M = sign(m_deriv_bias[k](i) * m_prev_deriv_bias[k](i));
       // Implementations equations (4-6) on the RProp paper:
@@ -204,13 +194,13 @@ void bob::trainer::MLPRPropTrainer::initialize(const bob::machine::MLP& machine)
   const std::vector<blitz::Array<double,1> >& machine_bias =
     machine.getBiases();
 
-  m_deriv.resize(m_H + 1);
-  m_deriv_bias.resize(m_H + 1);
+  m_delta.resize(m_H + 1);
+  m_delta_bias.resize(m_H + 1);
   m_prev_deriv.resize(m_H + 1);
   m_prev_deriv_bias.resize(m_H + 1);
   for (size_t k=0; k<(m_H + 1); ++k) {
-    m_deriv[k].reference(blitz::Array<double,2>(machine_weight[k].shape()));
-    m_deriv_bias[k].reference(blitz::Array<double,1>(machine_bias[k].shape()));
+    m_delta[k].reference(blitz::Array<double,2>(machine_weight[k].shape()));
+    m_delta_bias[k].reference(blitz::Array<double,1>(machine_bias[k].shape()));
     m_prev_deriv[k].reference(blitz::Array<double,2>(machine_weight[k].shape()));
     m_prev_deriv_bias[k].reference(blitz::Array<double,1>(machine_bias[k].shape()));
   }
@@ -234,5 +224,6 @@ void bob::trainer::MLPRPropTrainer::train_(bob::machine::MLP& machine,
   // To be called in this sequence for a general backprop algorithm
   forward_step(machine, input);
   backward_step(machine, target);
+  cost_derivatives_step(machine, input);
   rprop_weight_update(machine, input);
 }

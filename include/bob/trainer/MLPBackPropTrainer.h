@@ -183,8 +183,8 @@ namespace bob { namespace trainer {
       double m_learning_rate;
       double m_momentum; 
 
-      std::vector<blitz::Array<double,2> > m_prev_delta; ///< prev.weight deltas
-      std::vector<blitz::Array<double,1> > m_prev_delta_bias; ///< prev. bias ds
+      std::vector<blitz::Array<double,2> > m_prev_deriv; ///< prev.weight derivs
+      std::vector<blitz::Array<double,1> > m_prev_deriv_bias; ///< prev. bias derivs
   };
 
   /**

@@ -163,8 +163,8 @@ namespace bob { namespace trainer {
       void rprop_weight_update(bob::machine::MLP& machine,
         const blitz::Array<double,2>& input);
 
-      std::vector<blitz::Array<double,2> > m_deriv; ///< weight derivatives
-      std::vector<blitz::Array<double,1> > m_deriv_bias; ///< bias derivatives
+      std::vector<blitz::Array<double,2> > m_delta; ///< R-prop weights deltas
+      std::vector<blitz::Array<double,1> > m_delta_bias; ///< R-prop biases deltas
 
       std::vector<blitz::Array<double,2> > m_prev_deriv; ///< prev.weight deriv.
       std::vector<blitz::Array<double,1> > m_prev_deriv_bias; ///< pr.bias der.

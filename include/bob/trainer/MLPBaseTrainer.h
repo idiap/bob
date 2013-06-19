@@ -184,6 +184,13 @@ namespace bob { namespace trainer {
         const blitz::Array<double,2>& target);
 
       /**
+       * @brief Computes the cost derivatives from the buffers generated after
+       * calling forward_step() and backward_step().
+       */
+      void cost_derivatives_step(const bob::machine::MLP& machine,
+        const blitz::Array<double,2>& input);
+
+      /**
        * @brief Calculates the (average) cost for a given target. This
        * method assumes you have already called forward_step() before. If that
        * is not the case, use the next variant.
@@ -213,6 +220,14 @@ namespace bob { namespace trainer {
        */
       const std::vector<blitz::Array<double,2> >& getOutput() const { return m_output; }
       /**
+       * @brief Returns the derivatives of the cost wrt. the weights
+       */
+      const std::vector<blitz::Array<double,2> >& getDeriv() const { return m_deriv; }
+      /**
+       * @brief Returns the derivatives of the cost wrt. the biases
+       */
+      const std::vector<blitz::Array<double,1> >& getDerivBias() const { return m_deriv_bias; }
+      /**
        * @brief Sets the error
        */
       void setError(const std::vector<blitz::Array<double,2> >& error);
@@ -228,6 +243,22 @@ namespace bob { namespace trainer {
        * @brief Sets the output of a given index
        */
       void setOutput(const blitz::Array<double,2>& output, const size_t index);
+      /**
+       * @brief Sets the derivatives of the cost
+       */
+      void setDeriv(const std::vector<blitz::Array<double,2> >& deriv);
+      /**
+       * @brief Sets the derivatives of the cost of a given index
+       */
+      void setDeriv(const blitz::Array<double,2>& deriv, const size_t index);
+      /**
+       * @brief Sets the derivatives of the cost (biases)
+       */
+      void setDerivBias(const std::vector<blitz::Array<double,1> >& deriv_bias);
+      /**
+       * @brief Sets the derivatives of the cost (biases) of a given index
+       */
+      void setDerivBias(const blitz::Array<double,1>& deriv_bias, const size_t index);
 
     protected: //representation
 
@@ -242,8 +273,8 @@ namespace bob { namespace trainer {
       bool m_train_bias; ///< shall we be training biases? (default: true)
       size_t m_H; ///< number of hidden layers on the target machine
 
-      std::vector<blitz::Array<double,2> > m_delta; ///< weight deltas
-      std::vector<blitz::Array<double,1> > m_delta_bias; ///< bias deltas
+      std::vector<blitz::Array<double,2> > m_deriv; ///< derivatives of the cost wrt. the weights
+      std::vector<blitz::Array<double,1> > m_deriv_bias; ///< derivatives of the cost wrt. the biases
 
       /// buffers that are dependent on the batch_size
       std::vector<blitz::Array<double,2> > m_error; ///< error (+deltas)

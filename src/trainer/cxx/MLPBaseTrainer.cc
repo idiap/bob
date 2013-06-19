@@ -33,13 +33,13 @@ bob::trainer::MLPBaseTrainer::MLPBaseTrainer(size_t batch_size,
   m_cost(cost),
   m_train_bias(true),
   m_H(0), ///< handy!
-  m_delta(1),
-  m_delta_bias(1),
+  m_deriv(1),
+  m_deriv_bias(1),
   m_error(1),
   m_output(1)
 {
-  m_delta[0].reference(blitz::Array<double,2>(0,0));
-  m_delta_bias[0].reference(blitz::Array<double,1>(0));
+  m_deriv[0].reference(blitz::Array<double,2>(0,0));
+  m_deriv_bias[0].reference(blitz::Array<double,1>(0));
   m_error[0].reference(blitz::Array<double,2>(0,0));
   m_output[0].reference(blitz::Array<double,2>(0,0));
 
@@ -53,8 +53,8 @@ bob::trainer::MLPBaseTrainer::MLPBaseTrainer(size_t batch_size,
   m_cost(cost),
   m_train_bias(true),
   m_H(machine.numOfHiddenLayers()), ///< handy!
-  m_delta(m_H + 1),
-  m_delta_bias(m_H + 1),
+  m_deriv(m_H + 1),
+  m_deriv_bias(m_H + 1),
   m_error(m_H + 1),
   m_output(m_H + 1)
 {
@@ -64,8 +64,8 @@ bob::trainer::MLPBaseTrainer::MLPBaseTrainer(size_t batch_size,
     machine.getBiases();
 
   for (size_t k=0; k<(m_H + 1); ++k) {
-    m_delta[k].reference(blitz::Array<double,2>(machine_weight[k].shape()));
-    m_delta_bias[k].reference(blitz::Array<double,1>(machine_bias[k].shape()));
+    m_deriv[k].reference(blitz::Array<double,2>(machine_weight[k].shape()));
+    m_deriv_bias[k].reference(blitz::Array<double,1>(machine_bias[k].shape()));
   }
 
   reset();
@@ -81,8 +81,8 @@ bob::trainer::MLPBaseTrainer::MLPBaseTrainer(const MLPBaseTrainer& other):
   m_train_bias(other.m_train_bias),
   m_H(other.m_H)
 {
-  bob::core::array::ccopy(other.m_delta, m_delta);
-  bob::core::array::ccopy(other.m_delta_bias, m_delta_bias);
+  bob::core::array::ccopy(other.m_deriv, m_deriv);
+  bob::core::array::ccopy(other.m_deriv_bias, m_deriv_bias);
   bob::core::array::ccopy(other.m_error, m_error);
   bob::core::array::ccopy(other.m_output, m_output);
 }
@@ -96,8 +96,8 @@ bob::trainer::MLPBaseTrainer& bob::trainer::MLPBaseTrainer::operator=
     m_train_bias = other.m_train_bias;
     m_H = other.m_H;
 
-    bob::core::array::ccopy(other.m_delta, m_delta);
-    bob::core::array::ccopy(other.m_delta_bias, m_delta_bias);
+    bob::core::array::ccopy(other.m_deriv, m_deriv);
+    bob::core::array::ccopy(other.m_deriv_bias, m_deriv_bias);
     bob::core::array::ccopy(other.m_error, m_error);
     bob::core::array::ccopy(other.m_output, m_output);
   }
@@ -111,12 +111,12 @@ void bob::trainer::MLPBaseTrainer::setBatchSize (size_t batch_size) {
   m_batch_size = batch_size;
    
   for (size_t k=0; k<m_output.size(); ++k) {
-    m_output[k].resize(batch_size, m_delta[k].extent(1));
+    m_output[k].resize(batch_size, m_deriv[k].extent(1));
     m_output[k] = 0.;
   }
 
   for (size_t k=0; k<m_error.size(); ++k) {
-    m_error[k].resize(batch_size, m_delta[k].extent(1));
+    m_error[k].resize(batch_size, m_deriv[k].extent(1));
     m_error[k] = 0.;
   }
 }
@@ -125,13 +125,13 @@ bool bob::trainer::MLPBaseTrainer::isCompatible(const bob::machine::MLP& machine
 {
   if (m_H != machine.numOfHiddenLayers()) return false;
   
-  if (m_delta.back().extent(1) != (int)machine.outputSize()) return false;
+  if (m_deriv.back().extent(1) != (int)machine.outputSize()) return false;
 
-  if (m_delta[0].extent(0) != (int)machine.inputSize()) return false;
+  if (m_deriv[0].extent(0) != (int)machine.inputSize()) return false;
 
   //also, each layer should be of the same size
   for (size_t k=0; k<(m_H + 1); ++k) {
-    if (!bob::core::array::hasSameShape(m_delta[k], machine.getWeights()[k])) return false;
+    if (!bob::core::array::hasSameShape(m_deriv[k], machine.getWeights()[k])) return false;
   }
 
   //if you get to this point, you can only return true
@@ -185,6 +185,23 @@ void bob::trainer::MLPBaseTrainer::backward_step(const bob::machine::MLP& machin
   }
 }
 
+void bob::trainer::MLPBaseTrainer::cost_derivatives_step(const bob::machine::MLP& machine, 
+  const blitz::Array<double,2>& input)
+{
+  const std::vector<blitz::Array<double,2> >& machine_weight =
+    machine.getWeights();
+
+  for (size_t k=0; k<machine_weight.size(); ++k) { //for all layers
+    // For the weights
+    if (k == 0) bob::math::prod_(input.transpose(1,0), m_error[k], m_deriv[k]);
+    else bob::math::prod_(m_output[k-1].transpose(1,0), m_error[k], m_deriv[k]);
+    m_deriv[k] /= m_batch_size;
+    // For the biases
+    blitz::secondIndex bj;
+    m_deriv_bias[k] = blitz::mean(m_error[k].transpose(1,0), bj);
+  }
+}
+
 double bob::trainer::MLPBaseTrainer::average_cost
 (const blitz::Array<double,2>& target) const {
   bob::core::array::assertSameShape(m_output[m_H], target);
@@ -215,15 +232,15 @@ void bob::trainer::MLPBaseTrainer::initialize(const bob::machine::MLP& machine)
     machine.getBiases();
 
   m_H = machine.numOfHiddenLayers();
-  m_delta.resize(m_H + 1);
-  m_delta_bias.resize(m_H + 1);
+  m_deriv.resize(m_H + 1);
+  m_deriv_bias.resize(m_H + 1);
   m_output.resize(m_H + 1);
   m_error.resize(m_H + 1);
   for (size_t k=0; k<(m_H + 1); ++k) {
-    m_delta[k].reference(blitz::Array<double,2>(machine_weight[k].shape()));
-    m_delta_bias[k].reference(blitz::Array<double,1>(machine_bias[k].shape()));
-    m_output[k].resize(m_batch_size, m_delta[k].extent(1));
-    m_error[k].resize(m_batch_size, m_delta[k].extent(1));
+    m_deriv[k].reference(blitz::Array<double,2>(machine_weight[k].shape()));
+    m_deriv_bias[k].reference(blitz::Array<double,1>(machine_bias[k].shape()));
+    m_output[k].resize(m_batch_size, m_deriv[k].extent(1));
+    m_error[k].resize(m_batch_size, m_deriv[k].extent(1));
   }
 
   reset();
@@ -263,10 +280,44 @@ void bob::trainer::MLPBaseTrainer::setOutput(const blitz::Array<double,2>& outpu
   m_output[id] = output;
 }
 
+void bob::trainer::MLPBaseTrainer::setDeriv(const std::vector<blitz::Array<double,2> >& deriv) {
+  bob::core::array::assertSameDimensionLength(deriv.size(), m_deriv.size());
+  for (size_t k=0; k<deriv.size(); ++k)
+  {
+    bob::core::array::assertSameShape(deriv[k], m_deriv[k]);
+    m_deriv[k] = deriv[k];
+  }
+}
+
+void bob::trainer::MLPBaseTrainer::setDeriv(const blitz::Array<double,2>& deriv, const size_t id) {
+  if (id >= m_deriv.size())
+    throw bob::core::InvalidArgumentException("MLPBaseTrainer: Index in deriv array", 
+      (int)id, 0, (int)(m_deriv.size()-1));
+  bob::core::array::assertSameShape(deriv, m_deriv[id]);
+  m_deriv[id] = deriv;
+}
+
+void bob::trainer::MLPBaseTrainer::setDerivBias(const std::vector<blitz::Array<double,1> >& deriv_bias) {
+  bob::core::array::assertSameDimensionLength(deriv_bias.size(), m_deriv_bias.size());
+  for (size_t k=0; k<deriv_bias.size(); ++k)
+  {
+    bob::core::array::assertSameShape(deriv_bias[k], m_deriv_bias[k]);
+    m_deriv_bias[k] = deriv_bias[k];
+  }
+}
+
+void bob::trainer::MLPBaseTrainer::setDerivBias(const blitz::Array<double,1>& deriv_bias, const size_t id) {
+  if (id >= m_deriv_bias.size())
+    throw bob::core::InvalidArgumentException("MLPBaseTrainer: Index in deriv_bias array", 
+      (int)id, 0, (int)(m_deriv_bias.size()-1));
+  bob::core::array::assertSameShape(deriv_bias, m_deriv_bias[id]);
+  m_deriv_bias[id] = deriv_bias;
+}
+
 void bob::trainer::MLPBaseTrainer::reset() {
   for (size_t k=0; k<(m_H + 1); ++k) {
-    m_delta[k] = 0.;
-    m_delta_bias[k] = 0.;
+    m_deriv[k] = 0.;
+    m_deriv_bias[k] = 0.;
     m_error[k] = 0.;
     m_output[k] = 0.;
   }

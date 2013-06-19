@@ -57,12 +57,25 @@ static object mlpbase_get_output(const bob::trainer::MLPBaseTrainer& t) {
   return tuple(retval);
 }
 
+static object mlpbase_get_deriv(const bob::trainer::MLPBaseTrainer& t) {
+  const std::vector<blitz::Array<double,2> >& v = t.getDeriv();
+  list retval;
+  for (size_t k=0; k<v.size(); ++k) retval.append(v[k]); //copy
+  return tuple(retval);
+}
+
+static object mlpbase_get_deriv_bias(const bob::trainer::MLPBaseTrainer& t) {
+  const std::vector<blitz::Array<double,1> >& v = t.getDerivBias();
+  list retval;
+  for (size_t k=0; k<v.size(); ++k) retval.append(v[k]); //copy
+  return tuple(retval);
+}
+
 static void mlpbase_set_error(bob::trainer::MLPBaseTrainer& t, 
   object data)
 {
   stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
   std::vector<blitz::Array<double,2> > vdata_ref(dbegin, dend);
-  // Calls the initialization function
   t.setError(vdata_ref);
 }
 
@@ -78,7 +91,6 @@ static void mlpbase_set_output(bob::trainer::MLPBaseTrainer& t,
 {
   stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
   std::vector<blitz::Array<double,2> > vdata_ref(dbegin, dend);
-  // Calls the initialization function
   t.setOutput(vdata_ref);
 }
 
@@ -86,6 +98,34 @@ static void mlpbase_set_output2(bob::trainer::MLPBaseTrainer& t,
   bob::python::const_ndarray v, const size_t k)
 {
   t.setOutput(v.bz<double,2>(), k);
+}
+
+static void mlpbase_set_deriv(bob::trainer::MLPBaseTrainer& t, 
+  object data)
+{
+  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
+  std::vector<blitz::Array<double,2> > vdata_ref(dbegin, dend);
+  t.setDeriv(vdata_ref);
+}
+
+static void mlpbase_set_deriv2(bob::trainer::MLPBaseTrainer& t, 
+  bob::python::const_ndarray v, const size_t k)
+{
+  t.setDeriv(v.bz<double,2>(), k);
+}
+
+static void mlpbase_set_deriv_bias(bob::trainer::MLPBaseTrainer& t, 
+  object data)
+{
+  stl_input_iterator<blitz::Array<double,1> > dbegin(data), dend;
+  std::vector<blitz::Array<double,1> > vdata_ref(dbegin, dend);
+  t.setDerivBias(vdata_ref);
+}
+
+static void mlpbase_set_deriv_bias2(bob::trainer::MLPBaseTrainer& t, 
+  bob::python::const_ndarray v, const size_t k)
+{
+  t.setDerivBias(v.bz<double,1>(), k);
 }
 
 static void mlpbase_forward_step(bob::trainer::MLPBaseTrainer& t, 
@@ -100,6 +140,11 @@ static void mlpbase_backward_step(bob::trainer::MLPBaseTrainer& t,
   t.backward_step(m, target.bz<double,2>());
 }
 
+static void mlpbase_cost_derivatives_step(bob::trainer::MLPBaseTrainer& t, 
+  const bob::machine::MLP& m, bob::python::const_ndarray input)
+{
+  t.cost_derivatives_step(m, input.bz<double,2>());
+}
 
 void bind_trainer_backprop() {
   class_<bob::trainer::MLPBaseTrainer, boost::shared_ptr<bob::trainer::MLPBaseTrainer>, boost::noncopyable>("MLPBaseTrainer", "The base python class for MLP trainers.", no_init)
@@ -110,12 +155,17 @@ void bind_trainer_backprop() {
     .def("initialize", &bob::trainer::MLPBaseTrainer::initialize, (arg("self"), arg("mlp")), "Initialize the training process.")
     .def("forward_step", &mlpbase_forward_step, (arg("self"), arg("mlp"), arg("input")), "Forward step -- Forwards a batch of data through the MLP and updates the internal buffers.")
     .def("backward_step", &mlpbase_backward_step, (arg("self"), arg("mlp"), arg("target")), "Backward step -- Backwards a batch of data through the MLP and updates the internal buffers.")
+    .def("cost_derivatives_step", &mlpbase_cost_derivatives_step, (arg("self"), arg("mlp"), arg("input")), "Cost derivatives step -- Computes the derivatives of the cost wrt. the weights, given the buffer in cache obtained after calling forward_step() and backward_step()")
     .def("average_cost", &mlpbase_average_cost1, (arg("self"), arg("target")), "Calculates the (average) cost for a given target - this variant assumes you have called forward_step() before.")
     .def("average_cost", &mlpbase_average_cost2, (arg("self"), arg("machine"), arg("input"), arg("target")), "Calculates the (average) cost for a given target, first calling ``forward_step``. After this, you can call ``backward_step`` to train the machine.")
     .add_property("error", &mlpbase_get_error, &mlpbase_set_error)
     .def("set_error", &mlpbase_set_error2, (arg("self"), arg("array"), arg("k")), "Sets the error for a given index.")
     .add_property("output", &mlpbase_get_output, &mlpbase_set_output)
     .def("set_output", &mlpbase_set_output2, (arg("self"), arg("array"), arg("k")), "Sets the output for a given index.")
+    .add_property("deriv", &mlpbase_get_deriv, &mlpbase_set_deriv)
+    .def("set_deriv", &mlpbase_set_deriv2, (arg("self"), arg("array"), arg("k")), "Sets the cost derivatives for a given index.")
+    .add_property("deriv_bias", &mlpbase_get_deriv_bias, &mlpbase_set_deriv_bias)
+    .def("set_deriv_bias", &mlpbase_set_deriv_bias2, (arg("self"), arg("array"), arg("k")), "Sets the cost derivatives for a given index.")
   ;
 
   class_<bob::trainer::MLPBackPropTrainer, boost::shared_ptr<bob::trainer::MLPBackPropTrainer>, bases<bob::trainer::MLPBaseTrainer> >("MLPBackPropTrainer", "Sets an MLP to perform discrimination based on vanilla error back-propagation as defined in 'Pattern Recognition and Machine Learning' by C.M. Bishop, chapter 5 or else, 'Pattern Classification' by Duda, Hart and Stork, chapter 6.", init<size_t, boost::shared_ptr<bob::trainer::Cost>, const bob::machine::MLP&>((arg("self"), arg("batch_size"), arg("cost"), arg("machine")), "Initializes a new MLPBackPropTrainer trainer according to a given machine settings and a training batch size.\n\nGood values for batch sizes are tens of samples. BackProp is not necessarily a 'batch' training algorithm, but performs in a smoother if the batch size is larger. This may also affect the convergence.\n\n You can also change default values for the learning rate and momentum. By default we train w/o any momenta.\n\nIf you want to adjust a potential learning rate decay, you can and should do it outside the scope of this trainer, in your own way."))
