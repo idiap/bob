@@ -112,9 +112,6 @@ incorporate a call to the Visioner detection system in 3-ways on your script:
         
    Look at the user manual using :py:func:`help()` for operational details.
 
-Applications
-------------
-
 We provide 2 applications that are shipped with |project|:
 
 * visioner_facebox.py: This application takes as input either a video or image
@@ -134,12 +131,11 @@ an output video or image with the face bounding box and localized keypoints
 drawn, for debugging purposes. Look at their help message for more instructions
 and examples.
 
-Reference Manual
-----------------
-
 .. ifconfig:: has_visioner
 
   .. module:: bob.visioner
+
+  .. rubric:: Visioner Resources
 
   .. autosummary::
      :toctree: generated/
@@ -151,6 +147,9 @@ Reference Manual
      Localizer
 
 .. ifconfig:: not has_visioner
+
+  Visioner NOT AVAILABLE
+  ======================
 
   The ``visioner`` extension was not compiled with this version of |project|, 
   possibly because you don't have Qt4 installed (an optional dependence).
