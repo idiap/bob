@@ -116,5 +116,3 @@ def test_python_100in_100_10_5out_nobias():
 
   python_check_rolling(machine, False)
   python_check_gradient(machine, cost, False, BATCH_SIZE)
-
-def test
