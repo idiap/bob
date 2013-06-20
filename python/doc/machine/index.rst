@@ -22,4 +22,56 @@
  Machines
 ==========
 
-.. automodule:: bob.machine
+Resources for projecting, estimating probabilities or classifying data.
+
+.. module:: bob.machine
+   
+.. rubric:: Functions
+
+.. autosummary::
+   :toctree: generated/
+
+   linear_scoring
+   tnorm
+   znorm
+   ztnorm
+   ztnorm_same_value
+
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree: generated/
+
+   Activation
+   BICMachine
+   GMMLLRMachine
+   GMMMachine
+   GMMStats
+   GaborGraphMachine
+   GaborJetSimilarity
+   Gaussian
+   HyperbolicTangentActivation
+   ISVBase
+   ISVMachine
+   IVectorMachine
+   IdentityActivation
+   JFABase
+   JFAMachine
+   KMeansMachine
+   LinearActivation
+   LinearMachine
+   LogisticActivation
+   MLP
+   MachineDoubleBase
+   MachineGMMStatsA1DBase
+   MachineGMMStatsScalarBase
+   MultipliedHyperbolicTangentActivation
+   PLDABase
+   PLDAMachine
+   SVMFile
+   SupportVector
+   WienerMachine
+   gabor_jet_similarity_type
+   svm_kernel_type
+   svm_type
+

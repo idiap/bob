@@ -22,4 +22,46 @@
  Signal Processing
 ===================
 
-.. automodule:: bob.sp
+Signal processing utilities.
+
+.. module:: bob.sp
+
+.. rubric:: Functions
+
+.. autosummary::
+   :toctree: generated/
+
+   dct
+   extrapolate
+   extrapolate_circular
+   extrapolate_constant
+   extrapolate_mirror
+   extrapolate_nearest
+   extrapolate_zero
+   fft
+   fftshift
+   idct
+   ifft
+   ifftshift
+
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree: generated/
+
+   BorderType
+   DCT1D
+   DCT1DAbstract
+   DCT2D
+   DCT2DAbstract
+   FFT1D
+   FFT1DAbstract
+   FFT2D
+   FFT2DAbstract
+   IDCT1D
+   IDCT2D
+   IFFT1D
+   IFFT2D
+   Quantization
+   SizeOption
+   quantization_type

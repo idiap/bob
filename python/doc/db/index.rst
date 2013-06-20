@@ -33,19 +33,49 @@ package <https://github.com/idiap/bob/wiki/Satellite-Packages>`_. For examples
 and details, have a look at our `satellite package portal
 <https://github.com/idiap/bob/wiki/Satellite-Packages>`_.
 
-.. automodule:: bob.db
+.. module:: bob.db.utils
+   
+.. rubric:: Core Utilities
 
-General Utilities
-=================
+.. autosummary::
 
-.. automodule:: bob.db.utils
+   apsw_is_available
+   connection_string
+   create_engine_try_nolock
+   makedirs_safe
+   session
+   session_try_nolock
+   session_try_readonly
 
-Central Database Manager API
-============================
+.. rubric:: Classes
 
-.. automodule:: bob.db.driver
+.. autosummary::
+   :toctree: generated/
 
-Iris Flower Dataset
-===================
+   SQLiteConnector
+   null
 
-.. automodule:: bob.db.iris
+.. module:: bob.db.driver
+   
+.. rubric:: Database Driver API
+
+.. autosummary::
+   :toctree: generated/
+
+   Interface
+   dbshell
+   dbshell_command
+   files_command
+   makedirs_safe
+   print_files
+   version
+   version_command
+
+.. module:: bob.db.iris
+   
+.. rubric:: The (Fisher) Iris Flower Dataset
+
+.. autosummary::
+   :toctree: generated/
+   
+   data

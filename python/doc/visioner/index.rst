@@ -139,11 +139,16 @@ Reference Manual
 
 .. ifconfig:: has_visioner
 
-  .. autodata:: bob.visioner.DEFAULT_DETECTION_MODEL
-  .. autodata:: bob.visioner.DEFAULT_LOCALIZATION_MODEL
-  .. autoclass:: bob.visioner.MaxDetector
-  .. autoclass:: bob.visioner.Detector
-  .. autoclass:: bob.visioner.Localizer
+  .. module:: bob.visioner
+
+  .. autosummary::
+     :toctree: generated/
+
+     DEFAULT_DETECTION_MODEL
+     DEFAULT_LOCALIZATION_MODEL
+     MaxDetector
+     Detector
+     Localizer
 
 .. ifconfig:: not has_visioner
 

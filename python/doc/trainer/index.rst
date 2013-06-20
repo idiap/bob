@@ -22,4 +22,44 @@
  Trainer
 =========
 
-.. automodule:: bob.trainer
+Utilities for training projections, density estimators and classifiers.
+
+.. module:: bob.trainer
+
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree: generated/
+
+   BICTrainer
+   Cost
+   CrossEntropyLoss
+   DataShuffler
+   EMPCATrainer
+   EMTrainerGMM
+   EMTrainerIVector
+   EMTrainerKMeans
+   EMTrainerLinear
+   EMTrainerPLDA
+   FisherLDATrainer
+   GMMTrainer
+   ISVTrainer
+   IVectorTrainer
+   JFATrainer
+   KMeansTrainer
+   LLRTrainer
+   MAP_GMMTrainer
+   MLPBackPropTrainer
+   MLPBaseTrainer
+   MLPRPropTrainer
+   ML_GMMTrainer
+   PLDATrainer
+   SVDPCATrainer
+   SVMTrainer
+   SquareError
+   WCCNTrainer
+   WhiteningTrainer
+   WienerTrainer
+   init_f_method
+   init_g_method
+   init_sigma_method

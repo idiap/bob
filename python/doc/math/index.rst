@@ -25,4 +25,39 @@
 This module binds math functions of |project| to python when there is no numpy
 equivalent.
 
-.. automodule:: bob.math
+.. module:: bob.math
+
+.. rubric:: Functions
+
+.. autosummary::
+   :toctree: generated/
+
+   chi_square
+   euclidean_distance
+   histogram_intersection
+   kullback_leibler
+   linsolve
+   linsolve_
+   linsolve_cg_sympos
+   linsolve_cg_sympos_
+   linsolve_sympos
+   linsolve_sympos_
+   normalized_scalar_product
+   norminv
+   normsinv
+   pavx
+   pavx_
+   pavxWidth
+   pavxWidthHeight
+   scatter
+   scatter_
+
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree: generated/
+
+   LPInteriorPoint
+   LPInteriorPointLongstep
+   LPInteriorPointPredictorCorrector
+   LPInteriorPointShortstep

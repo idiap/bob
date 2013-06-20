@@ -22,4 +22,16 @@
  Audio Processing
 ==================
 
-.. automodule:: bob.ap
+Specialized audio processing resources.
+
+.. module:: bob.ap
+   
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree: generated/
+
+   Ceps
+   Energy
+   FrameExtractor
+   Spectrogram

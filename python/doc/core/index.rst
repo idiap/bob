@@ -32,15 +32,58 @@ reporting and logging.
    ErrorReportingAndLogging
    ArrayNote
 
-Reference Manual
-----------------
+.. module:: bob.core.array
 
-.. currentmodule:: bob.core
-   
-.. rubric:: Submodules
+.. rubric:: Range conversion utilities
 
 .. autosummary::
-   :toctree: 
+   :toctree: generated/
 
-   array
-   random
+   convert
+
+.. module:: bob.core.random
+
+.. rubric:: Random Number Generators (RNG)
+
+.. autosummary::
+   :toctree: generated/
+
+   mt19937
+
+.. rubric:: RNG Helpers
+   
+.. autosummary::
+   :toctree: generated/
+
+   variate_generator
+
+.. rubric:: Probability Distributions
+
+.. autosummary::
+   :toctree: generated/
+
+   binomial_float32
+   binomial_float64
+   discrete_int16
+   discrete_int32
+   discrete_int64
+   discrete_int8
+   discrete_uint16
+   discrete_uint32
+   discrete_uint64
+   discrete_uint8
+   gamma_float32
+   gamma_float64
+   lognormal_float32
+   lognormal_float64
+   normal_float32
+   normal_float64
+   uniform_float32
+   uniform_float64
+   uniform_int16
+   uniform_int32
+   uniform_int64
+   uniform_int8
+   uniform_uint16
+   uniform_uint32
+   uniform_uint64

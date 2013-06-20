@@ -22,17 +22,58 @@
  Metrics
 =========
 
-Core
-----
+.. module:: bob.measure
 
-.. automodule:: bob.measure
+.. rubric:: Module utilities
 
-Plotting
---------
+.. autosummary::
+   :toctree: generated/
 
-.. automodule:: bob.measure.plot
+   cmc
+   correctly_classified_negatives
+   correctly_classified_positives
+   det
+   eer_rocch
+   eer_threshold
+   epc
+   far_threshold
+   farfrr
+   frr_threshold
+   min_hter_threshold
+   min_weighted_error_rate_threshold
+   mse
+   ppndf
+   recognition_rate
+   relevance
+   rmse
+   roc
+   roc_for_far
+   rocch
+   rocch2eer
 
-File Parsing and Loading
-------------------------
+.. module:: bob.measure.plot
 
-.. automodule:: bob.measure.load
+.. rubric:: Plotting
+
+.. autosummary::
+   :toctree: generated/
+
+   cmc
+   det
+   det_axis
+   epc
+   roc
+
+.. module:: bob.measure.load
+
+.. rubric:: File Parsing and Loading
+
+.. autosummary::
+   :toctree: generated/
+
+   cmc_five_column
+   cmc_four_column
+   five_column
+   four_column
+   split_five_column
+   split_four_column
