@@ -71,7 +71,12 @@ Resources for projecting, estimating probabilities or classifying data.
    SVMFile
    SupportVector
    WienerMachine
+
+.. rubric:: Enumerations
+
+.. autosummary::
+   :toctree: generated/
+
    gabor_jet_similarity_type
    svm_kernel_type
    svm_type
-

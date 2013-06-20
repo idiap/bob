@@ -148,6 +148,6 @@ void bind_machine_activation() {
     .add_property("M", &bob::machine::MultipliedHyperbolicTangentActivation::M, "The inner multiplication factor for the argument")
     ;
 
-  class_<bob::machine::LogisticActivation, boost::shared_ptr<bob::machine::LogisticActivation>, bases<bob::machine::Activation> >("LogisticActivation", "Computes the so-called logistic function: :math:`f(z) = 1. / (1. + e^{-z})` as activation function", init<>((arg("self"))))
+  class_<bob::machine::LogisticActivation, boost::shared_ptr<bob::machine::LogisticActivation>, bases<bob::machine::Activation> >("LogisticActivation", "Computes :math:`f(z)=1/(1+ e^{-z})` as activation function", init<>((arg("self"))))
     ;
 }
