@@ -63,11 +63,10 @@ class Machine(BaseMachine):
     """Roll-up the parameters again, undoes ``unroll()`` above."""
   
     retval = []
-    marks = numpy.cumsum([k.size() for k in self.weights])
+    marks = list(numpy.cumsum([k.size for k in self.weights]))
     marks.insert(0, 0)
-
+    
     for k,w in enumerate(self.weights):
-      retval.append(w) #save old weights and return to the user
-      self.weights[k] = v[marks[k]:marks[k+1]].reshape(w)
+      retval.append(v[marks[k]:marks[k+1]].reshape(w.shape))
 
     return retval

@@ -20,7 +20,8 @@ class Machine:
     bias
       A list of 1D numpy.ndarray's with 64-bit floating-point numbers
       representing the biases for each layer of the MLP. Each ndarray must have
-      as many entries as neurons in that particular layer.
+      as many entries as neurons in that particular layer. If set to `None`,
+      disables the use of biases.
 
     weights
       A list of 2D numpy.ndarray's with 64-bit floating-point numbers
@@ -40,7 +41,13 @@ class Machine:
       :py:class:`bob.machine.Activation`.
     """
 
-    self.weights = [numpy.vstack([bias[k], weights[k]]) for k in range(len(bias))]
+    if bias is None:
+      self.weights = weights
+      self.has_bias = False
+    else:
+      self.weights = [numpy.vstack([bias[k], weights[k]]) for k in range(len(bias))]
+      self.has_bias = True
+
     self.hidden_activation = hidden_activation
     self.output_activation = output_activation
 
@@ -72,13 +79,18 @@ class Machine:
     self.z
       Activations for every input X on given layer. z1 = a0 * w1
     """
-    self.a = [numpy.hstack([numpy.ones((len(X),1)), X])]
+    if self.has_bias:
+      self.a = [numpy.hstack([numpy.ones((len(X),1)), X])]
+    else:
+      self.a = [X]
+
     self.z = []
 
     for w in self.weights[:-1]:
       self.z.append(numpy.dot(self.a[-1], w))
       self.a.append(self.hidden_activation(self.z[-1]))
-      self.a[-1] = numpy.hstack([numpy.ones((len(self.a[-1]),1)), self.a[-1]])
+      if self.has_bias:
+        self.a[-1] = numpy.hstack([numpy.ones((len(self.a[-1]),1)), self.a[-1]])
 
     self.z.append(numpy.dot(self.a[-1], self.weights[-1]))
     self.a.append(self.output_activation(self.z[-1]))

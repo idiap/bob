@@ -26,44 +26,6 @@ import unittest
 import bob
 import numpy
 
-from .mlp import Machine
-from . import gradient
-
-def xtest_twolayer_training_nobias():
-
-  # Trains a simple network with one single step, verifies
-  # the training works as expected by calculating the same
-  # as the trainer should do using python.
-
-  machine = bob.machine.MLP((2, 2, 1))
-  machine.randomize()
-  machine.hidden_activation = bob.machine.LogisticActivation()
-  machine.output_activation = bob.machine.LogisticActivation()
-  machine.biases = 0
-
-  pymac = Machine(machine.biases, machine.weights, machine.hidden_activation,
-      machine.output_activation)
-
-  BATCH_SIZE = 1
-
-  cost = bob.trainer.SquareError(machine.output_activation)
-  trainer = bob.trainer.MLPBackPropTrainer(BATCH_SIZE, cost)
-  trainer.train_biases = False
-  trainer.initialize(machine)
-
-  X = numpy.random.rand(BATCH_SIZE, 2)
-  T = numpy.zeros((1,1))
-
-  b = cost.error(pymac.forward(X), T)
-  deriv = pymac.backward(b)
-  for k,x in enumerate(X):
-    estimated = gradient.estimate(pymac.forward, x)
-    assert (abs(estimated - deriv) < 1e-4).all()
-
-  # trains with our C++ implementation
-  trainer.train_(machine, d0, t0)
-  self.assertTrue(numpy.array_equal(pymachine.weights[0], machine.weights[0]))
-
 class PythonBackProp:
   """A simplified (and slower) version of BackProp training written in python.
   
@@ -468,6 +430,7 @@ class BackPropTest(unittest.TestCase):
     t0 = numpy.array([[.0]])
 
     # trains in python first
+    pytrainer = MyBackPropTrainer(1, bob.trainer.SquareError(machine.output_activation), machine, train_biases=trainer.train_biases)
     pytrainer = MyBackPropTrainer(1, bob.trainer.SquareError(machine.output_activation), machine, train_biases=trainer.train_biases)
     pymachine = bob.machine.MLP(machine) #a copy
     pytrainer.reset()

@@ -202,26 +202,23 @@ void bob::trainer::MLPBaseTrainer::cost_derivatives_step(const bob::machine::MLP
   }
 }
 
-double bob::trainer::MLPBaseTrainer::average_cost
+double bob::trainer::MLPBaseTrainer::cost
 (const blitz::Array<double,2>& target) const {
   bob::core::array::assertSameShape(m_output[m_H], target);
-  uint64_t counter = 0;
   double retval = 0.0;
   for (int i=0; i<target.extent(0); ++i) { //for every example
     for (int j=0; j<target.extent(1); ++j) { //for all variables
       retval += m_cost->f(m_output[m_H](i,j), target(i,j));
-      ++counter;
     }
   }
-  return retval / counter;
+  return retval / target.extent(0);
 }
 
-double bob::trainer::MLPBaseTrainer::average_cost
+double bob::trainer::MLPBaseTrainer::cost
 (const bob::machine::MLP& machine, const blitz::Array<double,2>& input,
  const blitz::Array<double,2>& target) {
   forward_step(machine, input);
-  backward_step(machine, target);
-  return average_cost(target);
+  return cost(target);
 }
 
 void bob::trainer::MLPBaseTrainer::initialize(const bob::machine::MLP& machine)

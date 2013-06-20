@@ -27,20 +27,20 @@
 
 using namespace boost::python;
 
-static double mlpbase_average_cost1(bob::trainer::MLPBaseTrainer& t, 
+static double mlpbase_cost1(bob::trainer::MLPBaseTrainer& t, 
   bob::python::const_ndarray target)
 {
   const blitz::Array<double,2> target_ = target.bz<double,2>();
-  return t.average_cost(target_);
+  return t.cost(target_);
 }
 
-static double mlpbase_average_cost2(bob::trainer::MLPBaseTrainer& t,
+static double mlpbase_cost2(bob::trainer::MLPBaseTrainer& t,
   const bob::machine::MLP& m, bob::python::const_ndarray input,
   bob::python::const_ndarray target)
 {
   const blitz::Array<double,2> input_ = input.bz<double,2>();
   const blitz::Array<double,2> target_ = target.bz<double,2>();
-  return t.average_cost(m, input_, target_);
+  return t.cost(m, input_, target_);
 }
 
 static object mlpbase_get_error(const bob::trainer::MLPBaseTrainer& t) {
@@ -155,9 +155,23 @@ void bind_trainer_backprop() {
     .def("initialize", &bob::trainer::MLPBaseTrainer::initialize, (arg("self"), arg("mlp")), "Initialize the training process.")
     .def("forward_step", &mlpbase_forward_step, (arg("self"), arg("mlp"), arg("input")), "Forward step -- Forwards a batch of data through the MLP and updates the internal buffers.")
     .def("backward_step", &mlpbase_backward_step, (arg("self"), arg("mlp"), arg("target")), "Backward step -- Backwards a batch of data through the MLP and updates the internal buffers.")
-    .def("cost_derivatives_step", &mlpbase_cost_derivatives_step, (arg("self"), arg("mlp"), arg("input")), "Cost derivatives step -- Computes the derivatives of the cost wrt. the weights, given the buffer in cache obtained after calling forward_step() and backward_step()")
-    .def("average_cost", &mlpbase_average_cost1, (arg("self"), arg("target")), "Calculates the (average) cost for a given target - this variant assumes you have called forward_step() before.")
-    .def("average_cost", &mlpbase_average_cost2, (arg("self"), arg("machine"), arg("input"), arg("target")), "Calculates the (average) cost for a given target, first calling ``forward_step``. After this, you can call ``backward_step`` to train the machine.")
+    .def("cost_derivatives_step", &mlpbase_cost_derivatives_step, (arg("self"), arg("mlp"), arg("input")), "Cost derivatives step\n\nComputes the derivatives of the cost w.r.t. the weights, given the buffer in cache obtained after calling ``forward_step()`` and ``backward_step()``")
+    .def("cost", &mlpbase_cost1, (arg("self"), arg("target")), 
+        "Calculates the cost for a given target\n" \
+        "\n" \
+        "The cost for a given target is defined as the sum of individual costs for every output in the current network, averaged over all the examples.\n" \
+        "\n" \
+        ".. note::\n" \
+        "\n" \
+        "   This variant assumes you have called forward_step() before.")
+    .def("cost", &mlpbase_cost2, (arg("self"), arg("machine"), arg("input"), arg("target")),
+        "Calculates the cost for a given target\n" \
+        "\n" \
+        "The cost for a given target is defined as the sum of individual costs for every output in the current network, averaged over all the examples.\n" \
+        "\n" \
+        ".. note::\n" \
+        "\n" \
+        "   This variant will call the forward_step() before calculating the cost. After returning, you can directly call ``cost_derivatives_step()`` to evaluate the derivatives w.r.t. the cost, if you wish to do so.")
     .add_property("error", &mlpbase_get_error, &mlpbase_set_error)
     .def("set_error", &mlpbase_set_error2, (arg("self"), arg("array"), arg("k")), "Sets the error for a given index.")
     .add_property("output", &mlpbase_get_output, &mlpbase_set_output)

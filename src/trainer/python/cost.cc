@@ -40,11 +40,11 @@ static void apply(boost::function<double (double, double)> function, bob::python
   const bob::core::array::typeinfo& info = output.type();
 
   if (!info.is_compatible(target.type())) {
-    PYTHON_ERROR(RuntimeError, "output and target arrays are incompatible - input = %s; output = %s", info.str().c_str(), target.type().str().c_str());
+    PYTHON_ERROR(RuntimeError, "output and target arrays are incompatible - output = %s; target = %s", info.str().c_str(), target.type().str().c_str());
   }
 
   if (!info.is_compatible(retval.type())) {
-    PYTHON_ERROR(RuntimeError, "output/target and return arrays are incompatible - input = %s; output = %s", info.str().c_str(), retval.type().str().c_str());
+    PYTHON_ERROR(RuntimeError, "output/target and return arrays are incompatible - output/target = %s; res = %s", info.str().c_str(), retval.type().str().c_str());
   }
 
   if (info.nd == 1) {

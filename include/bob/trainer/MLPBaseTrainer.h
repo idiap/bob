@@ -191,18 +191,30 @@ namespace bob { namespace trainer {
         const blitz::Array<double,2>& input);
 
       /**
-       * @brief Calculates the (average) cost for a given target. This
-       * method assumes you have already called forward_step() before. If that
-       * is not the case, use the next variant.
+       * @brief Calculates the cost for a given target. 
+       *
+       * The cost for a given target is the sum of the individually calculated
+       * costs for every output, averaged for all examples.
+       *
+       * This method assumes you have already called forward_step() before. If
+       * that is not the case, use the next variant.
+       *
+       * @return The cost averaged over all targets
        */
-      double average_cost(const blitz::Array<double,2>& target) const;
+      double cost(const blitz::Array<double,2>& target) const;
 
       /**
-       * @brief Calculates the (average) cost for a given target. This
-       * method also calls forward_step(), so you can call backward_step() just
-       * after it, if you wish to do so.
+       * @brief Calculates the cost for a given target. 
+       *
+       * The cost for a given target is the sum of the individually calculated
+       * costs for every output, averaged for all examples.
+       *
+       * This method also calls forward_step(), so you can call backward_step()
+       * just after it, if you wish to do so.
+       *
+       * @return The cost averaged over all targets
        */
-      double average_cost(const bob::machine::MLP& machine,
+      double cost(const bob::machine::MLP& machine,
         const blitz::Array<double,2>& input,
         const blitz::Array<double,2>& target);
 

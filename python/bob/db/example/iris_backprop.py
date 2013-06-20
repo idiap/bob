@@ -196,7 +196,7 @@ def makemovie(machines, data, filename=None):
     orows = 2*(refimage.shape[1]/2)
     ocols = 2*(refimage.shape[2]/2)
     output = bob.io.VideoWriter(filename, orows, ocols, 5) #5 Hz
-    print "Saving %d frames to to %s" % (len(machines), filename)
+    print "Saving %d frames to %s" % (len(machines), filename)
 
   for i, k in enumerate(machines):
     # test output size
