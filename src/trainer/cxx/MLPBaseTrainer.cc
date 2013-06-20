@@ -160,8 +160,9 @@ void bob::trainer::MLPBaseTrainer::forward_step(const bob::machine::MLP& machine
   }
 }
 
-void bob::trainer::MLPBaseTrainer::backward_step(const bob::machine::MLP& machine,
-  const blitz::Array<double,2>& target)
+void bob::trainer::MLPBaseTrainer::backward_step
+(const bob::machine::MLP& machine,
+ const blitz::Array<double,2>& input, const blitz::Array<double,2>& target)
 {
   const std::vector<blitz::Array<double,2> >& machine_weight = machine.getWeights();
 
@@ -183,14 +184,8 @@ void bob::trainer::MLPBaseTrainer::backward_step(const bob::machine::MLP& machin
       }
     }
   }
-}
 
-void bob::trainer::MLPBaseTrainer::cost_derivatives_step(const bob::machine::MLP& machine, 
-  const blitz::Array<double,2>& input)
-{
-  const std::vector<blitz::Array<double,2> >& machine_weight =
-    machine.getWeights();
-
+  //calculate the derivatives of the cost w.r.t. the weights and biases
   for (size_t k=0; k<machine_weight.size(); ++k) { //for all layers
     // For the weights
     if (k == 0) bob::math::prod_(input.transpose(1,0), m_error[k], m_deriv[k]);

@@ -190,8 +190,7 @@ class MyBackPropTrainer(bob.trainer.overload.MLPBaseTrainer):
 
     # Call forward and backward from the C++ MLPBaseTrainer class
     self.forward_step(machine, input)
-    self.backward_step(machine, target)
-    self.cost_derivatives_step(machine, input)
+    self.backward_step(machine, input, target)
 
     E = self.error
     O = self.output

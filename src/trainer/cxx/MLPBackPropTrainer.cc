@@ -157,7 +157,6 @@ void bob::trainer::MLPBackPropTrainer::train_(bob::machine::MLP& machine,
     const blitz::Array<double,2>& target) {
   // To be called in this sequence for a general backprop algorithm
   forward_step(machine, input);
-  backward_step(machine, target);
-  cost_derivatives_step(machine, input);
+  backward_step(machine, input, target);
   backprop_weight_update(machine, input);
 }

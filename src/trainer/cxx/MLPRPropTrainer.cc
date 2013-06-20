@@ -223,7 +223,6 @@ void bob::trainer::MLPRPropTrainer::train_(bob::machine::MLP& machine,
 
   // To be called in this sequence for a general backprop algorithm
   forward_step(machine, input);
-  backward_step(machine, target);
-  cost_derivatives_step(machine, input);
+  backward_step(machine, input, target);
   rprop_weight_update(machine, input);
 }

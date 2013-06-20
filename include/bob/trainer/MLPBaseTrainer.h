@@ -176,19 +176,14 @@ namespace bob { namespace trainer {
 
       /**
        * @brief Backward step -- back-propagates the calculated error up to each
-       * neuron on the first layer. This is explained on Bishop's formula 5.55
-       * and 5.56, at page 244 (see also figure 5.7 for a graphical
+       * neuron on the first layer and calculates the cost w.r.t. to each
+       * weight and bias on the network. This is explained on Bishop's formula
+       * 5.55 and 5.56, at page 244 (see also figure 5.7 for a graphical
        * representation).
        */
       void backward_step(const bob::machine::MLP& machine,
+        const blitz::Array<double,2>& input,
         const blitz::Array<double,2>& target);
-
-      /**
-       * @brief Computes the cost derivatives from the buffers generated after
-       * calling forward_step() and backward_step().
-       */
-      void cost_derivatives_step(const bob::machine::MLP& machine,
-        const blitz::Array<double,2>& input);
 
       /**
        * @brief Calculates the cost for a given target. 

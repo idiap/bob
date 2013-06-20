@@ -135,15 +135,10 @@ static void mlpbase_forward_step(bob::trainer::MLPBaseTrainer& t,
 }
 
 static void mlpbase_backward_step(bob::trainer::MLPBaseTrainer& t, 
-  const bob::machine::MLP& m, bob::python::const_ndarray target)
+  const bob::machine::MLP& m, bob::python::const_ndarray input, 
+  bob::python::const_ndarray target)
 {
-  t.backward_step(m, target.bz<double,2>());
-}
-
-static void mlpbase_cost_derivatives_step(bob::trainer::MLPBaseTrainer& t, 
-  const bob::machine::MLP& m, bob::python::const_ndarray input)
-{
-  t.cost_derivatives_step(m, input.bz<double,2>());
+  t.backward_step(m, input.bz<double,2>(), target.bz<double,2>());
 }
 
 void bind_trainer_backprop() {
@@ -153,9 +148,8 @@ void bind_trainer_backprop() {
     .add_property("train_biases", &bob::trainer::MLPBaseTrainer::getTrainBiases, &bob::trainer::MLPBaseTrainer::setTrainBiases)
     .def("is_compatible", &bob::trainer::MLPBaseTrainer::isCompatible, (arg("self"), arg("machine")), "Checks if a given machine is compatible with my inner settings")
     .def("initialize", &bob::trainer::MLPBaseTrainer::initialize, (arg("self"), arg("mlp")), "Initialize the training process.")
-    .def("forward_step", &mlpbase_forward_step, (arg("self"), arg("mlp"), arg("input")), "Forward step -- Forwards a batch of data through the MLP and updates the internal buffers.")
-    .def("backward_step", &mlpbase_backward_step, (arg("self"), arg("mlp"), arg("target")), "Backward step -- Backwards a batch of data through the MLP and updates the internal buffers.")
-    .def("cost_derivatives_step", &mlpbase_cost_derivatives_step, (arg("self"), arg("mlp"), arg("input")), "Cost derivatives step\n\nComputes the derivatives of the cost w.r.t. the weights, given the buffer in cache obtained after calling ``forward_step()`` and ``backward_step()``")
+    .def("forward_step", &mlpbase_forward_step, (arg("self"), arg("mlp"), arg("input")), "Forwards a batch of data through the MLP and updates the internal buffers.")
+    .def("backward_step", &mlpbase_backward_step, (arg("self"), arg("mlp"), arg("input"), arg("target")), "Backwards a batch of data through the MLP and updates the internal buffers (errors and derivatives).")
     .def("cost", &mlpbase_cost1, (arg("self"), arg("target")), 
         "Calculates the cost for a given target\n" \
         "\n" \
@@ -171,7 +165,7 @@ void bind_trainer_backprop() {
         "\n" \
         ".. note::\n" \
         "\n" \
-        "   This variant will call the forward_step() before calculating the cost. After returning, you can directly call ``cost_derivatives_step()`` to evaluate the derivatives w.r.t. the cost, if you wish to do so.")
+        "   This variant will call the forward_step() before calculating the cost. After returning, you can directly call ``backward_step()`` to evaluate the derivatives w.r.t. the cost, if you wish to do so.")
     .add_property("error", &mlpbase_get_error, &mlpbase_set_error)
     .def("set_error", &mlpbase_set_error2, (arg("self"), arg("array"), arg("k")), "Sets the error for a given index.")
     .add_property("output", &mlpbase_get_output, &mlpbase_set_output)
