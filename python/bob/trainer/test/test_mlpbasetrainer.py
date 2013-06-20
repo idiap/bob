@@ -53,7 +53,7 @@ def python_check_gradient(machine, cost, bias_training, batch_size):
   derived = pymac.backward(b)
   estimated = gradient.estimate_for_machine(pymac, X, cost, T)
 
-  expected_precision = 1e-4
+  expected_precision = 1e-3
 
   for k,d in enumerate(derived):
     absdiff = abs((d-estimated[k])/d)
