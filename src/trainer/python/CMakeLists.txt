@@ -11,6 +11,7 @@ set(src
    "linear.cc"
    "kmeans.cc"
    "gmm.cc"
+   "mlpbase.cc"
    "rprop.cc"
    "backprop.cc"
    "jfa.cc"

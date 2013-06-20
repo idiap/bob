@@ -44,9 +44,15 @@ class Machine(BaseMachine):
 
     self.b = [b]
 
+    # calculate the estimated errors on each layer ($\delta$)
     for k,w in reversed(list(enumerate(self.weights[1:]))):
-      delta = numpy.dot(self.b[0], w.T)
-      self.b.insert(0, delta*self.hidden_activation.f_prime_from_f(self.a[k+1]))
+      if self.has_bias:
+        delta = numpy.dot(self.b[0], w[1:].T)
+        act = self.a[k+1][:,1:]
+      else:
+        delta = numpy.dot(self.b[0], w.T)
+        act = self.a[k+1]
+      self.b.insert(0, delta*self.hidden_activation.f_prime_from_f(act))
 
     self.d = []
     for a,b in zip(self.a[:-1], self.b):

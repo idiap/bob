@@ -100,15 +100,6 @@ namespace bob { namespace trainer {
           const bob::machine::MLP& machine);
 
       /**
-       * @brief Initializes a new MLPBaseTrainer trainer according to a given
-       * machine settings, a training batch size and a cost function.
-       *
-       * @note Good values for batch sizes are tens of samples. This may affect
-       * the convergence.
-       */
-      MLPBaseTrainer(size_t batch_size, const bob::machine::MLP& machine);
-
-      /**
        * @brief Destructor virtualisation
        */
       virtual ~MLPBaseTrainer();
