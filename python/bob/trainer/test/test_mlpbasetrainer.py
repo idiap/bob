@@ -71,15 +71,20 @@ def cxx_vs_python_check_gradient(machine, cost, bias_training, batch_size):
   T = numpy.zeros((batch_size, machine.weights[-1].shape[1]))
 
   # use the pythonic (tested) infrastructure to calculate the gradient
-  b = cost.error(pymac.forward(X), T)
+  py_out = pymac.forward(X)
+  py_cost = pymac.cost(cost, T)
+  b = cost.error(py_out, T)
   pythonic = pymac.backward(b)
 
   # use the C++ infrastructure to calculate the gradient
   trainer = MLPBaseTrainer(batch_size, cost, machine)
-  trainer.forward_step(machine, X)
+  cxx_cost = trainer.cost(machine, X, T)
   trainer.backward_step(machine, X, T)
 
   expected_precision = 1e-10
+
+  cost_diff = abs((py_cost - cxx_cost)/py_cost)
+  assert cost_diff < expected_precision, "The maximum relative difference between the python cost and the C++ one is > %g: python = %g - C++ = %g" % (expected_precision, py_cost, cxx_cost)
 
   for k,(dw,db) in enumerate(zip(trainer.deriv, trainer.deriv_bias)):
     if bias_training: dw = numpy.vstack((db, dw))
@@ -175,3 +180,49 @@ def test_20in_10_5_3out():
   python_check_rolling(machine, True)
   python_check_gradient(machine, cost, True, BATCH_SIZE)
   cxx_vs_python_check_gradient(machine, cost, True, BATCH_SIZE)
+
+def test_cost_setup():
+  
+  machine = MLP((1, 2))
+  batch_size = 10
+  cost = SquareError(machine.output_activation)
+
+  trainer = MLPBaseTrainer(batch_size, cost, machine)
+
+  assert trainer.cost_object == cost
+
+  # change it intentionally
+  cost2 = CrossEntropyLoss(machine.output_activation)
+  trainer.cost_object = cost2
+  assert trainer.cost_object == cost2
+
+def test_machine_compatibility():
+
+  machine = MLP((1, 2))
+  batch_size = 10
+  cost = SquareError(machine.output_activation)
+
+  trainer = MLPBaseTrainer(batch_size, cost, machine)
+
+  assert trainer.is_compatible(machine)
+
+  machine2 = MLP((2, 1))
+  assert not trainer.is_compatible(machine2)
+
+  trainer.initialize(machine2)
+  assert trainer.is_compatible(machine2)
+
+def test_batch_size_setup():
+
+  machine = MLP((1, 2))
+  batch_size = 10
+  cost = SquareError(machine.output_activation)
+
+  trainer = MLPBaseTrainer(batch_size, cost, machine)
+
+  assert trainer.batch_size == batch_size
+
+  batch_size = 20
+  trainer.batch_size = batch_size
+
+  assert trainer.batch_size == batch_size

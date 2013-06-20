@@ -132,7 +132,7 @@ namespace bob { namespace trainer {
       /**
        * @brief Sets the cost to be minimized
        */
-      void setCost(boost::shared_ptr<Cost>& cost) { m_cost = cost; }
+      void setCost(boost::shared_ptr<Cost> cost) { m_cost = cost; }
 
       /**
        * @brief Gets the current settings for bias training (defaults to true)

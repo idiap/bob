@@ -222,11 +222,11 @@ static void mlpbase_backward_step(bob::trainer::MLPBaseTrainer& t,
 void bind_trainer_mlp_wrappers() {
 
   class_<MLPBaseTrainerWrapper, boost::noncopyable >("MLPBaseTrainer", no_init)
-    .def(init<size_t, boost::shared_ptr<bob::trainer::Cost>, const bob::machine::MLP&>((arg("self"), arg("batch_size"), arg("cost"), arg("mlp")), "Creates a MLPBaseTrainer."))
-    .def(init<size_t, boost::shared_ptr<bob::trainer::Cost> >((arg("self"), arg("batch_size"), arg("cost")), "Creates a MLPBaseTrainer."))
+    .def(init<size_t, boost::shared_ptr<bob::trainer::Cost>, const bob::machine::MLP&>((arg("self"), arg("batch_size"), arg("cost_object"), arg("mlp")), "Creates a MLPBaseTrainer."))
+    .def(init<size_t, boost::shared_ptr<bob::trainer::Cost> >((arg("self"), arg("batch_size"), arg("cost_object")), "Creates a MLPBaseTrainer."))
     .def("initialize", &bob::trainer::MLPBaseTrainer::initialize, &MLPBaseTrainerWrapper::d_initialize, (arg("self"), arg("mlp")), "Initialize the training process.")
     .add_property("batch_size", &bob::trainer::MLPBaseTrainer::getBatchSize, &bob::trainer::MLPBaseTrainer::setBatchSize)
-    .add_property("cost", &bob::trainer::MLPBaseTrainer::getCost, &bob::trainer::MLPBaseTrainer::setCost)
+    .add_property("cost_object", &bob::trainer::MLPBaseTrainer::getCost, &bob::trainer::MLPBaseTrainer::setCost)
     .add_property("train_biases", &bob::trainer::MLPBaseTrainer::getTrainBiases, &bob::trainer::MLPBaseTrainer::setTrainBiases)
     .def("is_compatible", &bob::trainer::MLPBaseTrainer::isCompatible, (arg("self"), arg("machine")), "Checks if a given machine is compatible with my inner settings")
     .def("forward_step", &mlpbase_forward_step, (arg("self"), arg("mlp"), arg("input")), "Forwards a batch of data through the MLP and updates the internal buffers.")

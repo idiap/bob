@@ -59,6 +59,14 @@ class Machine(BaseMachine):
       self.d.append(numpy.dot(a.T, b) / len(b))
 
     return self.d
+  
+  def cost(self, cost_object, target):
+    """Calculates the cost given the target.
+
+    This method must be called after `forward` has been called.
+    """
+  
+    return cost_object.f(self.a[-1], target).mean(axis=0).sum()
 
   def unroll(self):
     """Unroll its own parameters so it becomes a linear vector"""
