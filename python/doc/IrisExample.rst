@@ -107,7 +107,7 @@ perform LDA on the Iris dataset. A few things should be noted:
 1. The returned :py:class:`bob.machine.LinearMachine` represents the linear
    projection of the input features to a new 3D space which maximizes the
    between-class scatter and minimizes the within-class scatter. In other
-   words, the internal matrix :math:`\mathbf{W}` is 4-by-3. The projections are
+   words, the internal matrix :math:`\mathbf{W}` is 4-by-2. The projections are
    calculated internally using `Singular Value Decomposition
    <http://en.wikipedia.org/wiki/Singular_value_decomposition>`_ (SVD). The
    first projection (first row of :math:`\mathbf{W}` corresponds to the highest
