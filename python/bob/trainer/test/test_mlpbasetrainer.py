@@ -85,7 +85,7 @@ def cxx_vs_python_check_gradient(machine, cost, bias_training, batch_size):
   cost_diff = abs((py_cost - cxx_cost)/py_cost)
   assert cost_diff < expected_precision, "The maximum relative difference between the python cost and the C++ one is > %g: python = %g - C++ = %g" % (expected_precision, py_cost, cxx_cost)
 
-  for k,(dw,db) in enumerate(zip(trainer.deriv, trainer.deriv_bias)):
+  for k,(dw,db) in enumerate(zip(trainer.derivatives, trainer.bias_derivatives)):
     if bias_training: dw = numpy.vstack((db, dw))
     absdiff = abs((pythonic[k]-dw)/dw)
     pos = absdiff.argmax()

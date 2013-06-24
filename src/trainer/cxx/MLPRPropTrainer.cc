@@ -227,3 +227,65 @@ void bob::trainer::MLPRPropTrainer::train_(bob::machine::MLP& machine,
   backward_step(machine, input, target);
   rprop_weight_update(machine, input);
 }
+
+void bob::trainer::MLPRPropTrainer::setPreviousDerivatives(const std::vector<blitz::Array<double,2> >& v) {
+  bob::core::array::assertSameDimensionLength(v.size(), m_prev_deriv.size());
+  for (size_t k=0; k<v.size(); ++k) {
+    bob::core::array::assertSameShape(v[k], m_prev_deriv[k]);
+    m_prev_deriv[k] = v[k];
+  }
+}
+
+void bob::trainer::MLPRPropTrainer::setPreviousDerivative(const blitz::Array<double,2>& v, const size_t k) {
+  if (k >= m_prev_deriv.size())
+    throw bob::core::InvalidArgumentException("MLPRPropTrainer: Index in deriv array", (int)k, 0, (int)(m_prev_deriv.size()-1));
+  bob::core::array::assertSameShape(v, m_prev_deriv[k]);
+  m_prev_deriv[k] = v;
+}
+
+void bob::trainer::MLPRPropTrainer::setPreviousBiasDerivatives(const std::vector<blitz::Array<double,1> >& v) {
+  bob::core::array::assertSameDimensionLength(v.size(), m_prev_deriv_bias.size());
+  for (size_t k=0; k<v.size(); ++k)
+  {
+    bob::core::array::assertSameShape(v[k], m_prev_deriv_bias[k]);
+    m_prev_deriv_bias[k] = v[k];
+  }
+}
+
+void bob::trainer::MLPRPropTrainer::setPreviousBiasDerivative(const blitz::Array<double,1>& v, const size_t k) {
+  if (k >= m_prev_deriv_bias.size())
+    throw bob::core::InvalidArgumentException("MLPRPropTrainer: Index in deriv_bias array", (int)k, 0, (int)(m_prev_deriv_bias.size()-1));
+  bob::core::array::assertSameShape(v, m_prev_deriv_bias[k]);
+  m_prev_deriv_bias[k] = v;
+}
+
+void bob::trainer::MLPRPropTrainer::setDeltas(const std::vector<blitz::Array<double,2> >& v) {
+  bob::core::array::assertSameDimensionLength(v.size(), m_delta.size());
+  for (size_t k=0; k<v.size(); ++k) {
+    bob::core::array::assertSameShape(v[k], m_delta[k]);
+    m_delta[k] = v[k];
+  }
+}
+
+void bob::trainer::MLPRPropTrainer::setDelta(const blitz::Array<double,2>& v, const size_t k) {
+  if (k >= m_delta.size())
+    throw bob::core::InvalidArgumentException("MLPRPropTrainer: Index in delta array", (int)k, 0, (int)(m_delta.size()-1));
+  bob::core::array::assertSameShape(v, m_delta[k]);
+  m_delta[k] = v;
+}
+
+void bob::trainer::MLPRPropTrainer::setBiasDeltas(const std::vector<blitz::Array<double,1> >& v) {
+  bob::core::array::assertSameDimensionLength(v.size(), m_delta_bias.size());
+  for (size_t k=0; k<v.size(); ++k)
+  {
+    bob::core::array::assertSameShape(v[k], m_delta_bias[k]);
+    m_delta_bias[k] = v[k];
+  }
+}
+
+void bob::trainer::MLPRPropTrainer::setBiasDelta(const blitz::Array<double,1>& v, const size_t k) {
+  if (k >= m_delta_bias.size())
+    throw bob::core::InvalidArgumentException("MLPRPropTrainer: Index in delta_bias array", (int)k, 0, (int)(m_delta_bias.size()-1));
+  bob::core::array::assertSameShape(v, m_delta_bias[k]);
+  m_delta_bias[k] = v;
+}

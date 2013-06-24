@@ -147,6 +147,67 @@ namespace bob { namespace trainer {
           const blitz::Array<double,2>& input,
           const blitz::Array<double,2>& target);
 
+      /**
+       * @brief Returns the deltas
+       */
+      const std::vector<blitz::Array<double,2> >& getDeltas() const { return m_prev_deriv; }
+
+      /**
+       * @brief Returns the deltas
+       */
+      const std::vector<blitz::Array<double,1> >& getBiasDeltas() const { return m_prev_deriv_bias; }
+
+      /**
+       * @brief Sets the deltas
+       */
+      void setDeltas(const std::vector<blitz::Array<double,2> >& v);
+
+      /**
+       * @brief Sets the deltas for a given index
+       */
+      void setDelta(const blitz::Array<double,2>& v, const size_t index);
+
+      /**
+       * @brief Sets the bias deltas
+       */
+      void setBiasDeltas(const std::vector<blitz::Array<double,1> >& v);
+
+      /**
+       * @brief Sets the bias deltas for a given index
+       */
+      void setBiasDelta(const blitz::Array<double,1>& v, const size_t index);
+
+      /**
+       * @brief Returns the derivatives of the cost wrt. the weights
+       */
+      const std::vector<blitz::Array<double,2> >& getPreviousDerivatives() const { return m_prev_deriv; }
+
+      /**
+       * @brief Returns the derivatives of the cost wrt. the biases
+       */
+      const std::vector<blitz::Array<double,1> >& getPreviousBiasDerivatives() const { return m_prev_deriv_bias; }
+
+      /**
+       * @brief Sets the previous derivatives of the cost
+       */
+      void setPreviousDerivatives(const std::vector<blitz::Array<double,2> >& v);
+
+      /**
+       * @brief Sets the previous derivatives of the cost of a given index
+       */
+      void setPreviousDerivative(const blitz::Array<double,2>& v, const size_t index);
+
+      /**
+       * @brief Sets the previous derivatives of the cost (biases)
+       */
+      void setPreviousBiasDerivatives(const std::vector<blitz::Array<double,1> >& v);
+
+      /**
+       * @brief Sets the previous derivatives of the cost (biases) of a given
+       * index
+       */
+      void setPreviousBiasDerivative(const blitz::Array<double,1>& v, const size_t index);
+
     private: //representation
 
       /**

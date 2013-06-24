@@ -27,21 +27,21 @@
 
 using namespace boost::python;
 
-static object mlpbase_get_prev_deriv(const bob::trainer::MLPBackPropTrainer& t) {
+static object backprop_get_prev_deriv(const bob::trainer::MLPBackPropTrainer& t) {
   const std::vector<blitz::Array<double,2> >& v = t.getPreviousDerivatives();
   list retval;
   for (size_t k=0; k<v.size(); ++k) retval.append(v[k]); //copy
   return tuple(retval);
 }
 
-static object mlpbase_get_prev_deriv_bias(const bob::trainer::MLPBackPropTrainer& t) {
+static object backprop_get_prev_deriv_bias(const bob::trainer::MLPBackPropTrainer& t) {
   const std::vector<blitz::Array<double,1> >& v = t.getPreviousBiasDerivatives();
   list retval;
   for (size_t k=0; k<v.size(); ++k) retval.append(v[k]); //copy
   return tuple(retval);
 }
 
-static void mlpbase_set_prev_deriv(bob::trainer::MLPBackPropTrainer& t, 
+static void backprop_set_prev_deriv(bob::trainer::MLPBackPropTrainer& t, 
   object data)
 {
   stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
@@ -49,13 +49,13 @@ static void mlpbase_set_prev_deriv(bob::trainer::MLPBackPropTrainer& t,
   t.setPreviousDerivatives(vdata_ref);
 }
 
-static void mlpbase_set_prev_deriv2(bob::trainer::MLPBackPropTrainer& t, 
+static void backprop_set_prev_deriv2(bob::trainer::MLPBackPropTrainer& t, 
   bob::python::const_ndarray v, const size_t k)
 {
   t.setPreviousDerivative(v.bz<double,2>(), k);
 }
 
-static void mlpbase_set_prev_deriv_bias(bob::trainer::MLPBackPropTrainer& t, 
+static void backprop_set_prev_deriv_bias(bob::trainer::MLPBackPropTrainer& t, 
   object data)
 {
   stl_input_iterator<blitz::Array<double,1> > dbegin(data), dend;
@@ -63,7 +63,7 @@ static void mlpbase_set_prev_deriv_bias(bob::trainer::MLPBackPropTrainer& t,
   t.setPreviousBiasDerivatives(vdata_ref);
 }
 
-static void mlpbase_set_prev_deriv_bias2(bob::trainer::MLPBackPropTrainer& t, 
+static void backprop_set_prev_deriv_bias2(bob::trainer::MLPBackPropTrainer& t, 
   bob::python::const_ndarray v, const size_t k)
 {
   t.setPreviousBiasDerivative(v.bz<double,1>(), k);
@@ -207,9 +207,9 @@ void bind_trainer_backprop() {
         )
     .def("train_", &bob::trainer::MLPBackPropTrainer::train_, (arg("self"), arg("machine"), arg("input"), arg("target")), "This is a version of the train() method above, which does no compatibility check on the input machine and can be faster.")
     
-    .add_property("previous_derivatives", &mlpbase_get_prev_deriv, &mlpbase_set_prev_deriv)
-    .def("set_previous_derivative", &mlpbase_set_prev_deriv2, (arg("self"), arg("array"), arg("k")), "Sets the previous cost derivative for a given weight layer (index).")
-    .add_property("previous_bias_derivatives", &mlpbase_get_prev_deriv_bias, &mlpbase_set_prev_deriv_bias)
-    .def("set_previous_bias_derivative", &mlpbase_set_prev_deriv_bias2, (arg("self"), arg("array"), arg("k")), "Sets the cost bias derivative for a given bias layer (index).")
+    .add_property("previous_derivatives", &backprop_get_prev_deriv, &backprop_set_prev_deriv)
+    .def("set_previous_derivative", &backprop_set_prev_deriv2, (arg("self"), arg("array"), arg("k")), "Sets the previous cost derivative for a given weight layer (index).")
+    .add_property("previous_bias_derivatives", &backprop_get_prev_deriv_bias, &backprop_set_prev_deriv_bias)
+    .def("set_previous_bias_derivative", &backprop_set_prev_deriv_bias2, (arg("self"), arg("array"), arg("k")), "Sets the cost bias derivative for a given bias layer (index).")
   ;
 }

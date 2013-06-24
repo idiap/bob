@@ -29,6 +29,7 @@ void bind_trainer_kmeans();
 void bind_trainer_mlpbase();
 void bind_trainer_backprop();
 void bind_trainer_rprop();
+void bind_trainer_shuffler();
 void bind_trainer_jfa();
 void bind_trainer_ivector();
 void bind_trainer_plda();
@@ -54,6 +55,7 @@ BOOST_PYTHON_MODULE(_trainer) {
   bind_trainer_mlpbase();
   bind_trainer_backprop();
   bind_trainer_rprop();
+  bind_trainer_shuffler();
   bind_trainer_jfa();
   bind_trainer_ivector();
   bind_trainer_plda();
