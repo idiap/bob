@@ -55,9 +55,6 @@ if sphinx.__version__ >= "1.0":
 # Always includes todos
 todo_include_todos = True
 
-# Auto generate new summary pages
-autosummary_generate = glob.glob('*/*.rst')
-
 # If we are on OSX, the 'dvipng' path maybe different
 dvipng_osx = '/opt/local/libexec/texlive/binaries/dvipng'
 if os.path.exists(dvipng_osx): pngmath_dvipng = dvipng_osx
@@ -299,6 +296,12 @@ autodoc_default_flags = ['members', 'undoc-members', 'special-members', 'inherit
 # Used to filter some documentation in/out
 bob_modules = dir(__import__('bob'))
 has_libsvm = hasattr(__import__('bob').machine, 'SupportVector')
+has_new_boost = __import__('bob').core.version['Boost'] > '1.40.0'
+if has_new_boost:
+  # Auto generate new summary pages
+  autosummary_generate = glob.glob('*/*.rst')
+else:
+  autosummary_generate = False
 try:
   __import__('bob.visioner')
   has_visioner = True
@@ -359,3 +362,4 @@ def setup(app):
   app.add_config_value('bob_modules', bob_modules, True)
   app.add_config_value('has_libsvm', has_libsvm, True)
   app.add_config_value('has_visioner', has_visioner, True)
+  app.add_config_value('has_new_boost', has_new_boost, True)
