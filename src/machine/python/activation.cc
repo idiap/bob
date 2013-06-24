@@ -20,7 +20,7 @@
 
 #include <boost/python.hpp>
 #include <boost/function.hpp>
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 #include <bob/machine/Activation.h>
 #include <bob/machine/ActivationRegistry.h>
 

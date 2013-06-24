@@ -21,7 +21,7 @@
  */
 
 #include <boost/python.hpp>
-#include "bob/core/python/ndarray.h"
+#include "bob/python/ndarray.h"
 #include "bob/core/cast.h"
 #include "bob/ip/HOG.h"
 

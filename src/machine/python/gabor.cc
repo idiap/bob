@@ -22,7 +22,7 @@
 
 
 #include <boost/python.hpp>
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 
 #include <bob/ip/GaborWaveletTransform.h>
 #include <bob/machine/GaborGraphMachine.h>

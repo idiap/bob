@@ -21,7 +21,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 
 #include <bob/sp/FFT1D.h>
 #include <bob/sp/FFT2D.h>

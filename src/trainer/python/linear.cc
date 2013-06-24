@@ -21,7 +21,7 @@
  */
 
 #include <boost/python.hpp>
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/python/stl_iterator.hpp>
 #include <bob/trainer/SVDPCATrainer.h>

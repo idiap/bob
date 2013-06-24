@@ -21,7 +21,7 @@
  */
 
 #include <boost/python.hpp>
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 #include <bob/machine/WienerMachine.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>

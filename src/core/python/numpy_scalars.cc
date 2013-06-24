@@ -6,7 +6,7 @@
  * @brief Declares from-python converters to some numpy scalar types
  */
 
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 
 template<typename T> bool checker(PyObject* o) {
   PYTHON_ERROR(TypeError, "Type '%s' is not supported as a numpy scalar to C++ conversion", typeid(T).name());

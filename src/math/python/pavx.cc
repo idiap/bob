@@ -22,7 +22,7 @@
 
 #include "bob/math/pavx.h"
 
-#include "bob/core/python/ndarray.h"
+#include "bob/python/ndarray.h"
 #include "bob/core/cast.h"
 
 using namespace boost::python;

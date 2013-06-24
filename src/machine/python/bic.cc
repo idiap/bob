@@ -18,11 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 #include <boost/python.hpp>
 #include <bob/machine/BICMachine.h>
 #include <bob/io/HDF5File.h>
-#include <bob/core/python/exception.h>
+#include <bob/python/exception.h>
 
 
 static double bic_call_(const bob::machine::BICMachine& machine, bob::python::const_ndarray input){

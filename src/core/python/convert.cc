@@ -22,7 +22,7 @@
 
 #include <boost/version.hpp>
 
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 #include <bob/core/array_convert.h>
 
 using namespace boost::python;

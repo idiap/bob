@@ -21,7 +21,7 @@
  */
 
 #include <bob/config.h>
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 #include <boost/python.hpp>
 #include <bob/io/CodecRegistry.h>
 

@@ -32,7 +32,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
 
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 
 #include <bob/visioner/model/mdecoder.h>
 #include <bob/visioner/model/sampler.h>

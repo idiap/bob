@@ -26,7 +26,7 @@
 #include <bob/ap/Energy.h>
 #include <bob/ap/Spectrogram.h>
 #include <bob/ap/Ceps.h>
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 
 using namespace boost::python;
 

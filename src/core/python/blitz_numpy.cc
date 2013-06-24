@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 
 template<typename T, int N>
 void npy_copy_cast(blitz::Array<T,N>& bz, PyArrayObject* arrobj) {

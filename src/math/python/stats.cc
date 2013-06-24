@@ -23,7 +23,7 @@
 #include <boost/python.hpp>
 #include <boost/format.hpp>
 #include "bob/math/stats.h"
-#include "bob/core/python/ndarray.h"
+#include "bob/python/ndarray.h"
 
 using namespace boost::python;
 

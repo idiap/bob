@@ -1,5 +1,5 @@
 /**
- * @file bob/core/python/ndarray.h
+ * @file bob/python/ndarray.h
  * @date Tue Jan 18 17:07:26 2011 +0100
  * @author André Anjos <andre.anjos@idiap.ch>
  *
@@ -48,7 +48,7 @@
 #include <numpy/arrayobject.h>
 // ============================================================================
 
-#include <bob/core/python/exception.h>
+#include <bob/python/exception.h>
 #include <bob/core/array.h>
 #include <bob/core/cast.h>
 #include <bob/core/Exception.h>

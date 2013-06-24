@@ -21,7 +21,7 @@
  */
 
 #include "bob/config.h"
-#include "bob/core/python/ndarray.h"
+#include "bob/python/ndarray.h"
 
 void bind_ip_version();
 void bind_ip_color();

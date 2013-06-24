@@ -22,7 +22,7 @@
  */
 
 #include <boost/python.hpp>
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 #include <boost/python/stl_iterator.hpp>
 #include <bob/machine/PLDAMachine.h>
 #include <bob/trainer/PLDATrainer.h>

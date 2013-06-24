@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <boost/python.hpp>
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 #include <boost/shared_ptr.hpp>
 #include <bob/trainer/EMPCATrainer.h>
 #include <bob/machine/LinearMachine.h>

@@ -21,7 +21,7 @@
  */
 
 #include <boost/python.hpp>
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 #include <boost/python/stl_iterator.hpp>
 #include <bob/trainer/MLPBackPropTrainer.h>
 

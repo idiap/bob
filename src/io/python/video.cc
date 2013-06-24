@@ -27,9 +27,9 @@
 #include <bob/io/VideoWriter.h>
 
 #include <bob/io/VideoUtilities.h>
-#include <bob/core/python/exception.h>
-#include <bob/core/python/ndarray.h>
-#include <bob/core/python/gil.h>
+#include <bob/python/exception.h>
+#include <bob/python/ndarray.h>
+#include <bob/python/gil.h>
 
 extern "C" {
 #if LIBAVUTIL_VERSION_INT >= 0x320f01 //50.15.1 @ ffmpeg-0.6

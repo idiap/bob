@@ -19,9 +19,9 @@
 */
 
 #include <boost/python.hpp>
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 #include <boost/shared_ptr.hpp>
-#include <bob/core/python/exception.h>
+#include <bob/python/exception.h>
 #include <bob/machine/IVectorMachine.h>
 
 using namespace boost::python;

@@ -21,7 +21,7 @@
  */
 
 #include "bob/config.h"
-#include "bob/core/python/ndarray.h"
+#include "bob/python/ndarray.h"
 
 void bind_trainer_linear();
 void bind_trainer_gmm();

@@ -22,7 +22,7 @@
 
 #include "bob/ip/GLCMProp.h"
 
-#include "bob/core/python/ndarray.h"
+#include "bob/python/ndarray.h"
 #include <boost/make_shared.hpp>
 
 using namespace boost::python;

@@ -20,9 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 #include <boost/shared_ptr.hpp>
-#include <bob/core/python/exception.h>
+#include <bob/python/exception.h>
 #include <bob/machine/PLDAMachine.h>
 
 using namespace boost::python;

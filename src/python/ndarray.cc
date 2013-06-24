@@ -26,7 +26,7 @@
 #include <dlfcn.h>
 
 #define bob_IMPORT_ARRAY
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 #undef bob_IMPORT_ARRAY
 
 #include <bob/core/logging.h>

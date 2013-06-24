@@ -25,7 +25,7 @@
 #include <bob/io/File.h>
 #include <bob/io/utils.h>
 
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 
 using namespace boost::python;
 

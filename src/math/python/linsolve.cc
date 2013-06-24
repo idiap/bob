@@ -22,7 +22,7 @@
 
 #include "bob/math/linsolve.h"
 
-#include "bob/core/python/ndarray.h"
+#include "bob/python/ndarray.h"
 
 using namespace boost::python;
 

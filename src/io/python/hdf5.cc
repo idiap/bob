@@ -24,8 +24,8 @@
 #include <boost/make_shared.hpp>
 #include <boost/format.hpp>
 
-#include <bob/core/python/exception.h>
-#include <bob/core/python/ndarray.h>
+#include <bob/python/exception.h>
+#include <bob/python/ndarray.h>
 
 #include <bob/io/HDF5File.h>
 

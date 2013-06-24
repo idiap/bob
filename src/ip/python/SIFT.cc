@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 #include <bob/ip/SIFT.h>
 
 #include <boost/python/stl_iterator.hpp>

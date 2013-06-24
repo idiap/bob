@@ -23,8 +23,8 @@
 #include <pthread.h>
 #include <boost/python.hpp>
 
-#include <bob/core/python/ndarray.h>
-#include <bob/core/python/gil.h>
+#include <bob/python/ndarray.h>
+#include <bob/python/gil.h>
 #include <bob/core/logging.h>
 
 using namespace boost::python;

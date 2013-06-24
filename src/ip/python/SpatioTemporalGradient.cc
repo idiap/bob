@@ -22,7 +22,7 @@
 
 #include <bob/ip/SpatioTemporalGradient.h>
 #include <bob/core/cast.h>
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 
 using namespace boost::python;
 

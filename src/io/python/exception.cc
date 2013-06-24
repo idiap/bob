@@ -21,7 +21,7 @@
  */
 
 #include <bob/io/Exception.h>
-#include <bob/core/python/exception.h>
+#include <bob/python/exception.h>
 
 using namespace bob::python;
 

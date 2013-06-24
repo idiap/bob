@@ -19,7 +19,7 @@
  */
 
 #include <boost/python.hpp>
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 #include <bob/trainer/WhiteningTrainer.h>
 #include <bob/machine/LinearMachine.h>
 #include <boost/shared_ptr.hpp>

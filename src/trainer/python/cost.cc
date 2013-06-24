@@ -20,7 +20,7 @@
 
 #include <boost/python.hpp>
 
-#include "bob/core/python/ndarray.h"
+#include "bob/python/ndarray.h"
 #include "bob/trainer/Cost.h"
 #include "bob/trainer/SquareError.h"
 #include "bob/trainer/CrossEntropyLoss.h"

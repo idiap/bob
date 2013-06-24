@@ -23,8 +23,8 @@
 #include <boost/python.hpp>
 #include <boost/make_shared.hpp>
 
-#include <bob/core/python/ndarray.h>
-#include <bob/core/python/exception.h>
+#include <bob/python/ndarray.h>
+#include <bob/python/exception.h>
 
 #include <bob/io/HDF5File.h>
 

@@ -22,7 +22,7 @@
  */
 
 #include <bob/config.h>
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 
 void bind_machine_base();
 void bind_machine_bic();

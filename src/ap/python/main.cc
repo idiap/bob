@@ -21,7 +21,7 @@
  */
 
 #include <boost/python.hpp>
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 
 void bind_ap_ceps();
 

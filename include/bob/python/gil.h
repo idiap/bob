@@ -6,8 +6,8 @@
  * C++-Python bindings.
  */
 
-#ifndef BOB_CORE_PYTHON_GIL_H 
-#define BOB_CORE_PYTHON_GIL_H
+#ifndef BOB_PYTHON_GIL_H 
+#define BOB_PYTHON_GIL_H
 
 #include <Python.h>
 
@@ -70,4 +70,4 @@ namespace bob { namespace python {
 
 }}
 
-#endif /* BOB_CORE_PYTHON_GIL_H */
+#endif /* BOB_PYTHON_GIL_H */

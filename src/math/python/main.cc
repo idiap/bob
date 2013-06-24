@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/core/python/ndarray.h"
+#include "bob/python/ndarray.h"
 
 void bind_math_lp_interiorpoint();
 void bind_math_linsolve();

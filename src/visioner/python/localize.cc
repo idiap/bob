@@ -24,7 +24,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 
 #include <bob/visioner/util/util.h>
 #include <bob/visioner/cv/cv_detector.h>

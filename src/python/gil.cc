@@ -7,7 +7,7 @@
 
 #include <pthread.h>
 #include <boost/python.hpp>
-#include <bob/core/python/gil.h>
+#include <bob/python/gil.h>
 
 bob::python::gil::gil () 
   : m_lock(PyGILState_Ensure())

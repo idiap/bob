@@ -19,7 +19,7 @@
 */
 
 #include <boost/python.hpp>
-#include <bob/core/python/ndarray.h>
+#include <bob/python/ndarray.h>
 #include <boost/shared_ptr.hpp>
 #include <bob/trainer/IVectorTrainer.h>
 #include <bob/machine/IVectorMachine.h>

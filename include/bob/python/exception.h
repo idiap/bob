@@ -1,5 +1,5 @@
 /**
- * @file bob/core/python/exception.h
+ * @file bob/python/exception.h
  * @date Fri Mar 25 15:21:36 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB_PYTHON_CORE_EXCEPTION_H 
-#define BOB_PYTHON_CORE_EXCEPTION_H
+#ifndef BOB_PYTHON_EXCEPTION_H 
+#define BOB_PYTHON_EXCEPTION_H
 
 #include <boost/python.hpp>
 
@@ -100,4 +100,4 @@ namespace bob { namespace python {
 
 }}
 
-#endif /* BOB_PYTHON_CORE_EXCEPTION_H */
+#endif /* BOB_PYTHON_EXCEPTION_H */
