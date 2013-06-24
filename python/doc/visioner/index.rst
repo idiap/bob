@@ -148,8 +148,7 @@ and examples.
 
 .. ifconfig:: not has_visioner
 
-  Visioner NOT AVAILABLE
-  ======================
+  **Visioner NOT AVAILABLE**
 
   The ``visioner`` extension was not compiled with this version of |project|, 
   possibly because you don't have Qt4 installed (an optional dependence).
