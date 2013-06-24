@@ -57,18 +57,6 @@ class MyTrainer1(bob.trainer.KMeansTrainer):
     a[1, :] = data[2]
     machine.means = a
 
-
-class MyTrainer2(bob.trainer.overload.KMeansTrainer):
-  """Simple example of python trainer: """
-  def __init__(self):
-    bob.trainer.overload.KMeansTrainer.__init__(self)
- 
-  def initialization(self, machine, data):
-    print "Called by C++ method train()"
-    bob.trainer.overload.KMeansTrainer.initialization(self, machine, data)
-    print "Leaving initialization(), back into C++"
-
-
 class GMMTest(unittest.TestCase):
   """Performs various trainer tests."""
       
@@ -272,33 +260,3 @@ class GMMTest(unittest.TestCase):
     
     for i in range(0, 2):
       self.assertTrue((ar[i+1] == machine.means[i, :]).all())
-
-  def test08_custom_initialization(self):
-
-    ar = bob.io.load(F("faithful.torch3_f64.hdf5"))
-    
-    mytrainer = MyTrainer2()
-
-    machine = bob.machine.KMeansMachine(2, 2)
-    mytrainer.train(machine, ar)
-
-  def test09_overload_initialization(self):
-    """Test introduces after ticket #87"""
-    
-    machine = bob.machine.KMeansMachine(2,1)
-    data = numpy.array([[-3],[-2],[-1],[0.],[1.],[2.],[3.]])
-
-    class MyKMeansTrainer(bob.trainer.overload.KMeansTrainer):
-      """Simple example of python trainer: """
-      def __init__(self):
-        bob.trainer.overload.KMeansTrainer.__init__(self)
- 
-      def initialization(self, machine, data):
-        bob.trainer.overload.KMeansTrainer.initialization(self, machine, data)
-        machine.means = numpy.array([[-0.5], [ 0.5]])
-
-    trainer = MyKMeansTrainer()
-    trainer.convergence_threshold = 0.0005
-    trainer.max_iterations = 1;
-    trainer.train(machine, data) # After the initialization the means are still [0.,0.] (at the C++ level)
-    self.assertFalse( numpy.isnan(machine.means).any())
