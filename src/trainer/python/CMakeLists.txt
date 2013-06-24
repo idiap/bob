@@ -1,7 +1,5 @@
 project(bob_trainer_py${PYVER})
 
-add_subdirectory(overload)
-
 # This defines the dependencies of this package
 set(bob_deps "bob_trainer;bob_python")
 set(shared "${bob_deps}")
@@ -31,13 +29,6 @@ if(WITH_LIBSVM)
   list(APPEND incdir ${LIBSVM_INCLUDE_DIR})
   list(APPEND src "svm.cc")
 endif()
-
-set(ccsrc_overload
-   "src/kmeans_wrappers.cc"
-   "src/gmm_wrappers.cc"
-   "src/mlp_wrappers.cc"
-   "src/main_overload.cc"
-   )
 
 # Define the library, compilation and linkage options
 bob_sort_headers(incdir)

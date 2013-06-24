@@ -146,7 +146,7 @@ void bind_trainer_mlpbase() {
     .def(init<size_t, boost::shared_ptr<bob::trainer::Cost> >((arg("self"), arg("batch_size"), arg("cost_object")),
             "Initializes a the MLPBaseTrainer with a batch size and a cost\n" \
             "\n" \
-            "Using this constructor, you must call :py:meth:`~bob.trainer.MLPBaseTrainer.initialize`, passing your own machine later on, so to resize the internal buffers correctly. In double, always check machine compatibility with an initialized trainer using :py:meth:`~bob.trainer.MLPBaseTrainer.is_compatible`.\n" \
+            "Using this constructor, you must call :py:meth:`~bob.trainer.MLPBaseTrainer.initialize`, passing your own machine later on, so to resize the internal buffers correctly. In doubt, always check machine compatibility with an initialized trainer using :py:meth:`~bob.trainer.MLPBaseTrainer.is_compatible`.\n" \
             "\n" \
             "Keyword parameters:\n" \
             "\n" \
@@ -182,6 +182,31 @@ void bind_trainer_mlpbase() {
             "machine\n" \
             "\n" \
             "  A :py:class:`bob.machine.MLP` object that will be used as a basis for this trainer's internal properties."
+            ))
+    .def(init<size_t, boost::shared_ptr<bob::trainer::Cost>, const bob::machine::MLP&, bool>((arg("self"), arg("batch_size"), arg("cost_object"), arg("machine"), arg("train_biases")),
+            "Initializes a the MLPBaseTrainer with a batch size and a cost\n" \
+            "\n" \
+            "Keyword parameters:\n" \
+            "\n" \
+            "batch_size\n" \
+            "\n" \
+            "  The size of each batch used for the forward and backward steps, so to speed-up the training\n" \
+            "\n" \
+            "cost_object\n" \
+            "\n" \
+            "  An object from a derived class of :py:class:`bob.trainer.Cost` that can calculate the cost at every iteration. If you set this to ``1``, then you are implementing stochastic training.\n"
+            "\n" \
+            "  .. note::\n"
+            "  \n" \
+            "     Good values for batch sizes are tens of samples. This may affect the convergence.\n" \
+            "\n" \
+            "machine\n" \
+            "\n" \
+            "  A :py:class:`bob.machine.MLP` object that will be used as a basis for this trainer's internal properties." \
+            "\n" \
+            "train_biases\n" \
+            "\n" \
+            "  A boolean indicating if we should train the biases weights (set it to ``True``) or not (set it to ``False``)."
             ))
     .add_property("batch_size", &bob::trainer::MLPBaseTrainer::getBatchSize, &bob::trainer::MLPBaseTrainer::setBatchSize)
     .add_property("cost_object", &bob::trainer::MLPBaseTrainer::getCost, &bob::trainer::MLPBaseTrainer::setCost)

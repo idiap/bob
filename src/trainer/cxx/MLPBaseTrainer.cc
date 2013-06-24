@@ -73,6 +73,34 @@ bob::trainer::MLPBaseTrainer::MLPBaseTrainer(size_t batch_size,
   setBatchSize(batch_size);
 }
 
+bob::trainer::MLPBaseTrainer::MLPBaseTrainer(size_t batch_size, 
+    boost::shared_ptr<bob::trainer::Cost> cost,
+    const bob::machine::MLP& machine, 
+    bool train_biases):
+  m_batch_size(batch_size),
+  m_cost(cost),
+  m_train_bias(train_biases),
+  m_H(machine.numOfHiddenLayers()), ///< handy!
+  m_deriv(m_H + 1),
+  m_deriv_bias(m_H + 1),
+  m_error(m_H + 1),
+  m_output(m_H + 1)
+{
+  const std::vector<blitz::Array<double,2> >& machine_weight =
+    machine.getWeights();
+  const std::vector<blitz::Array<double,1> >& machine_bias =
+    machine.getBiases();
+
+  for (size_t k=0; k<(m_H + 1); ++k) {
+    m_deriv[k].reference(blitz::Array<double,2>(machine_weight[k].shape()));
+    m_deriv_bias[k].reference(blitz::Array<double,1>(machine_bias[k].shape()));
+  }
+
+  reset();
+
+  setBatchSize(batch_size);
+}
+
 bob::trainer::MLPBaseTrainer::~MLPBaseTrainer() { }
 
 bob::trainer::MLPBaseTrainer::MLPBaseTrainer(const MLPBaseTrainer& other):

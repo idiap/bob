@@ -31,7 +31,6 @@ from ...machine import MLP, LogisticActivation, HyperbolicTangentActivation
 
 def python_check_rolling(machine, bias_training):
 
-
   pymac = PythonMachine(machine.biases if bias_training else None,
       machine.weights, machine.hidden_activation, machine.output_activation)
 
@@ -226,3 +225,32 @@ def test_batch_size_setup():
   trainer.batch_size = batch_size
 
   assert trainer.batch_size == batch_size
+
+def test_bias_training():
+
+  machine = MLP((1, 2))
+  batch_size = 10
+  cost = SquareError(machine.output_activation)
+
+  trainer = MLPBaseTrainer(batch_size, cost, machine)
+
+  assert trainer.train_biases
+
+  trainer.train_biases = False
+
+  assert not trainer.train_biases
+  
+  trainer = MLPBaseTrainer(batch_size, cost, machine, False)
+  
+  assert not trainer.train_biases
+
+  trainer.train_biases = True
+  
+  assert trainer.train_biases
+  
+  trainer = MLPBaseTrainer(batch_size, cost, machine, False)
+
+  trainer_copy = MLPBaseTrainer(trainer)
+
+  assert not trainer_copy.train_biases
+  

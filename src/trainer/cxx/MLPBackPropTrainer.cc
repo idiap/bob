@@ -27,22 +27,6 @@
 #include <bob/trainer/Exception.h>
 #include <bob/trainer/MLPBackPropTrainer.h>
 
-bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(size_t batch_size,
-    boost::shared_ptr<bob::trainer::Cost> cost):
-  bob::trainer::MLPBaseTrainer(batch_size, cost),
-  m_learning_rate(0.1),
-  m_momentum(0.0),
-  m_prev_deriv(m_H + 1),
-  m_prev_deriv_bias(m_H + 1)
-{
-  for (size_t k=0; k<(m_H + 1); ++k) {
-    m_prev_deriv[k].reference(blitz::Array<double,2>(0,0));
-    m_prev_deriv_bias[k].reference(blitz::Array<double,1>(0));
-  }
-
-  reset();
-}
-
 bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(size_t batch_size, 
     boost::shared_ptr<bob::trainer::Cost> cost,
     const bob::machine::MLP& machine):

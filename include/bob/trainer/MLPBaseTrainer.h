@@ -74,6 +74,13 @@ namespace bob { namespace trainer {
        *
        * @param cost This is the cost function to use for the current training.
        *
+       * @note Using this constructor, the internals of the trainer remain
+       * uninitialized. You must call <code>initialize()</code> with a proper
+       * bob::machine::MLP to initialize the trainer before using it.
+       *
+       * @note Using this constructor, you set biases training to
+       * <code>true</code>
+       *
        * @note Good values for batch sizes are tens of samples. This may affect
        * the convergence.
        */
@@ -92,12 +99,38 @@ namespace bob { namespace trainer {
        * @param machine Clone this machine weights and prepare the trainer
        * internally mirroring machine properties.
        *
+       * @note Using this constructor, you set biases training to
+       * <code>true</code>
+       *
        * @note Good values for batch sizes are tens of samples. This may affect
        * the convergence.
        */
       MLPBaseTrainer(size_t batch_size, 
           boost::shared_ptr<bob::trainer::Cost> cost,
           const bob::machine::MLP& machine);
+
+      /**
+       * @brief Initializes a new MLPBaseTrainer trainer according to a given
+       * machine settings and a training batch size.
+       *
+       * @param batch_size The number of examples passed at each iteration. If
+       * you set this to 1, then you are implementing stochastic training.
+       *
+       * @param cost This is the cost function to use for the current training.
+       *
+       * @param machine Clone this machine weights and prepare the trainer
+       * internally mirroring machine properties.
+       *
+       * @param train_biases A boolean, indicating if we need to train the
+       * biases or not.
+       *
+       * @note Good values for batch sizes are tens of samples. This may affect
+       * the convergence.
+       */
+      MLPBaseTrainer(size_t batch_size, 
+          boost::shared_ptr<bob::trainer::Cost> cost,
+          const bob::machine::MLP& machine, 
+          bool train_biases);
 
       /**
        * @brief Destructor virtualisation

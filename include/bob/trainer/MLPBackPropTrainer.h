@@ -50,21 +50,6 @@ namespace bob { namespace trainer {
 
       /**
        * @brief Initializes a new MLPBackPropTrainer trainer according to a
-       * given training batch size.
-       *
-       * @param batch_size The number of examples passed at each iteration. If
-       * you set this to 1, then you are implementing stochastic training.
-       *
-       * @param cost This is the cost function to use for the current training.
-       *
-       * @note Good values for batch sizes are tens of samples. This may affect
-       * the convergence.
-       */
-      MLPBackPropTrainer(size_t batch_size,
-          boost::shared_ptr<bob::trainer::Cost> cost);
-
-      /**
-       * @brief Initializes a new MLPBackPropTrainer trainer according to a
        * given machine settings and a training batch size.
        *
        * @param batch_size The number of examples passed at each iteration. If
