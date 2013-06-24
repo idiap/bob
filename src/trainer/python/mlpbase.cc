@@ -58,14 +58,14 @@ static object mlpbase_get_output(const bob::trainer::MLPBaseTrainer& t) {
 }
 
 static object mlpbase_get_deriv(const bob::trainer::MLPBaseTrainer& t) {
-  const std::vector<blitz::Array<double,2> >& v = t.getDeriv();
+  const std::vector<blitz::Array<double,2> >& v = t.getDerivatives();
   list retval;
   for (size_t k=0; k<v.size(); ++k) retval.append(v[k]); //copy
   return tuple(retval);
 }
 
 static object mlpbase_get_deriv_bias(const bob::trainer::MLPBaseTrainer& t) {
-  const std::vector<blitz::Array<double,1> >& v = t.getDerivBias();
+  const std::vector<blitz::Array<double,1> >& v = t.getBiasDerivatives();
   list retval;
   for (size_t k=0; k<v.size(); ++k) retval.append(v[k]); //copy
   return tuple(retval);
@@ -105,13 +105,13 @@ static void mlpbase_set_deriv(bob::trainer::MLPBaseTrainer& t,
 {
   stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
   std::vector<blitz::Array<double,2> > vdata_ref(dbegin, dend);
-  t.setDeriv(vdata_ref);
+  t.setDerivatives(vdata_ref);
 }
 
 static void mlpbase_set_deriv2(bob::trainer::MLPBaseTrainer& t, 
   bob::python::const_ndarray v, const size_t k)
 {
-  t.setDeriv(v.bz<double,2>(), k);
+  t.setDerivative(v.bz<double,2>(), k);
 }
 
 static void mlpbase_set_deriv_bias(bob::trainer::MLPBaseTrainer& t, 
@@ -119,13 +119,13 @@ static void mlpbase_set_deriv_bias(bob::trainer::MLPBaseTrainer& t,
 {
   stl_input_iterator<blitz::Array<double,1> > dbegin(data), dend;
   std::vector<blitz::Array<double,1> > vdata_ref(dbegin, dend);
-  t.setDerivBias(vdata_ref);
+  t.setBiasDerivatives(vdata_ref);
 }
 
 static void mlpbase_set_deriv_bias2(bob::trainer::MLPBaseTrainer& t, 
   bob::python::const_ndarray v, const size_t k)
 {
-  t.setDerivBias(v.bz<double,1>(), k);
+  t.setBiasDerivative(v.bz<double,1>(), k);
 }
 
 static void mlpbase_forward_step(bob::trainer::MLPBaseTrainer& t, 
@@ -143,6 +143,9 @@ static void mlpbase_backward_step(bob::trainer::MLPBaseTrainer& t,
 
 void bind_trainer_mlpbase() {
   class_<bob::trainer::MLPBaseTrainer, boost::shared_ptr<bob::trainer::MLPBaseTrainer> >("MLPBaseTrainer", "The base python class for MLP trainers based on cost derivatives.\n\nYou should use this class when you want to create your own MLP trainers and re-use the base infrastructured provided by this class, such as the computation of partial derivatives (using the ``backward_step()`` method).", no_init)
+
+    .def(init<const bob::trainer::MLPBaseTrainer&>((arg("self"), arg("other")), "Initializes a **new** MLPBaseTrainer copying data from another instance"))
+
     .def(init<size_t, boost::shared_ptr<bob::trainer::Cost> >((arg("self"), arg("batch_size"), arg("cost_object")),
             "Initializes a the MLPBaseTrainer with a batch size and a cost\n" \
             "\n" \
@@ -181,7 +184,7 @@ void bind_trainer_mlpbase() {
             "\n" \
             "machine\n" \
             "\n" \
-            "  A :py:class:`bob.machine.MLP` object that will be used as a basis for this trainer's internal properties."
+            "  A :py:class:`bob.machine.MLP` object that will be used as a basis for this trainer's internal properties.\n"
             ))
     .def(init<size_t, boost::shared_ptr<bob::trainer::Cost>, const bob::machine::MLP&, bool>((arg("self"), arg("batch_size"), arg("cost_object"), arg("machine"), arg("train_biases")),
             "Initializes a the MLPBaseTrainer with a batch size and a cost\n" \
@@ -202,11 +205,11 @@ void bind_trainer_mlpbase() {
             "\n" \
             "machine\n" \
             "\n" \
-            "  A :py:class:`bob.machine.MLP` object that will be used as a basis for this trainer's internal properties." \
+            "  A :py:class:`bob.machine.MLP` object that will be used as a basis for this trainer's internal properties.\n" \
             "\n" \
             "train_biases\n" \
             "\n" \
-            "  A boolean indicating if we should train the biases weights (set it to ``True``) or not (set it to ``False``)."
+            "  A boolean indicating if we should train the biases weights (set it to ``True``) or not (set it to ``False``).\n"
             ))
     .add_property("batch_size", &bob::trainer::MLPBaseTrainer::getBatchSize, &bob::trainer::MLPBaseTrainer::setBatchSize)
     .add_property("cost_object", &bob::trainer::MLPBaseTrainer::getCost, &bob::trainer::MLPBaseTrainer::setCost)
@@ -235,9 +238,11 @@ void bind_trainer_mlpbase() {
     .def("set_error", &mlpbase_set_error2, (arg("self"), arg("array"), arg("k")), "Sets the error for a given index.")
     .add_property("output", &mlpbase_get_output, &mlpbase_set_output)
     .def("set_output", &mlpbase_set_output2, (arg("self"), arg("array"), arg("k")), "Sets the output for a given index.")
-    .add_property("deriv", &mlpbase_get_deriv, &mlpbase_set_deriv)
-    .def("set_deriv", &mlpbase_set_deriv2, (arg("self"), arg("array"), arg("k")), "Sets the cost derivatives for a given index.")
-    .add_property("deriv_bias", &mlpbase_get_deriv_bias, &mlpbase_set_deriv_bias)
-    .def("set_deriv_bias", &mlpbase_set_deriv_bias2, (arg("self"), arg("array"), arg("k")), "Sets the cost derivatives for a given index.")
+    .add_property("derivatives", &mlpbase_get_deriv, &mlpbase_set_deriv)
+    .def("set_derivative", &mlpbase_set_deriv2, (arg("self"), arg("array"), arg("k")), "Sets the cost derivative for a given weight layer (index).")
+    .add_property("bias_derivatives", &mlpbase_get_deriv_bias, &mlpbase_set_deriv_bias)
+    .def("set_bias_derivative", &mlpbase_set_deriv_bias2, (arg("self"), arg("array"), arg("k")), "Sets the cost bias derivative for a given bias layer (index).")
+    .def("hidden_layers", &bob::trainer::MLPBaseTrainer::numberOfHiddenLayers,
+        "The number of hidden layers on the target machine.")
   ;
 }

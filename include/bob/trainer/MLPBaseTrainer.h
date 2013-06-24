@@ -183,6 +183,11 @@ namespace bob { namespace trainer {
       bool isCompatible(const bob::machine::MLP& machine) const;
 
       /**
+       * @brief Returns the number of hidden layers on the target machine
+       */
+      size_t numberOfHiddenLayers() const { return m_H; }
+
+      /**
        * @brief Forward step -- this is a second implementation of that used on
        * the MLP itself to allow access to some internal buffers. In our
        * current setup, we keep the "m_output"'s of every individual layer
@@ -253,11 +258,11 @@ namespace bob { namespace trainer {
       /**
        * @brief Returns the derivatives of the cost wrt. the weights
        */
-      const std::vector<blitz::Array<double,2> >& getDeriv() const { return m_deriv; }
+      const std::vector<blitz::Array<double,2> >& getDerivatives() const { return m_deriv; }
       /**
        * @brief Returns the derivatives of the cost wrt. the biases
        */
-      const std::vector<blitz::Array<double,1> >& getDerivBias() const { return m_deriv_bias; }
+      const std::vector<blitz::Array<double,1> >& getBiasDerivatives() const { return m_deriv_bias; }
       /**
        * @brief Sets the error
        */
@@ -277,21 +282,21 @@ namespace bob { namespace trainer {
       /**
        * @brief Sets the derivatives of the cost
        */
-      void setDeriv(const std::vector<blitz::Array<double,2> >& deriv);
+      void setDerivatives(const std::vector<blitz::Array<double,2> >& deriv);
       /**
        * @brief Sets the derivatives of the cost of a given index
        */
-      void setDeriv(const blitz::Array<double,2>& deriv, const size_t index);
+      void setDerivative(const blitz::Array<double,2>& deriv, const size_t index);
       /**
        * @brief Sets the derivatives of the cost (biases)
        */
-      void setDerivBias(const std::vector<blitz::Array<double,1> >& deriv_bias);
+      void setBiasDerivatives(const std::vector<blitz::Array<double,1> >& deriv_bias);
       /**
        * @brief Sets the derivatives of the cost (biases) of a given index
        */
-      void setDerivBias(const blitz::Array<double,1>& deriv_bias, const size_t index);
+      void setBiasDerivative(const blitz::Array<double,1>& deriv_bias, const size_t index);
 
-    protected: //representation
+    private: //representation
 
       /**
        * @brief Resets the buffer to 0 value

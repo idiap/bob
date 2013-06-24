@@ -52,6 +52,59 @@ namespace bob { namespace trainer {
        * @brief Initializes a new MLPBackPropTrainer trainer according to a
        * given machine settings and a training batch size.
        *
+       * @param cost This is the cost function to use for the current training.
+       *
+       * @note Using this constructor, the internals of the trainer remain
+       * uninitialized. You must call <code>initialize()</code> with a proper
+       * bob::machine::MLP to initialize the trainer before using it.
+       *
+       * @note Using this constructor, you set biases training to
+       * <code>true</code>
+       *
+       * @note Good values for batch sizes are tens of samples. This may affect
+       * the convergence.
+       *
+       * You can also change default values for the learning rate and momentum.
+       * By default we train w/o any momenta.
+       *
+       * If you want to adjust a potential learning rate decay, you can and
+       * should do it outside the scope of this trainer, in your own way.
+       */
+      MLPBackPropTrainer(size_t batch_size,
+          boost::shared_ptr<bob::trainer::Cost> cost);
+
+      /**
+       * @brief Initializes a new MLPBackPropTrainer trainer according to a
+       * given machine settings and a training batch size.
+       *
+       * @param batch_size The number of examples passed at each iteration. If
+       * you set this to 1, then you are implementing stochastic training.
+       *
+       * @param cost This is the cost function to use for the current training.
+       *
+       * @param machine Clone this machine weights and prepare the trainer
+       * internally mirroring machine properties.
+       *
+       * @note Using this constructor, you set biases training to
+       * <code>true</code>
+       *
+       * @note Good values for batch sizes are tens of samples. This may affect
+       * the convergence.
+       *
+       * You can also change default values for the learning rate and momentum.
+       * By default we train w/o any momenta.
+       *
+       * If you want to adjust a potential learning rate decay, you can and
+       * should do it outside the scope of this trainer, in your own way.
+       */
+      MLPBackPropTrainer(size_t batch_size, 
+          boost::shared_ptr<bob::trainer::Cost> cost,
+          const bob::machine::MLP& machine);
+
+      /**
+       * @brief Initializes a new MLPBackPropTrainer trainer according to a
+       * given machine settings and a training batch size.
+       *
        * @param batch_size The number of examples passed at each iteration. If
        * you set this to 1, then you are implementing stochastic training.
        *
@@ -64,6 +117,9 @@ namespace bob { namespace trainer {
        * necessarily a "batch" training algorithm, but performs in a smoother
        * if the batch size is larger. This may also affect the convergence.
        *
+       * @param train_biases A boolean, indicating if we need to train the
+       * biases or not.
+       *
        * You can also change default values for the learning rate and momentum.
        * By default we train w/o any momenta.
        *
@@ -72,7 +128,8 @@ namespace bob { namespace trainer {
        */
       MLPBackPropTrainer(size_t batch_size, 
           boost::shared_ptr<bob::trainer::Cost> cost,
-          const bob::machine::MLP& machine);
+          const bob::machine::MLP& machine,
+          bool train_biases);
 
       /**
        * @brief Destructor virtualisation
@@ -117,6 +174,37 @@ namespace bob { namespace trainer {
       void setMomentum(double v) { m_momentum = v; }
 
       /**
+       * @brief Returns the derivatives of the cost wrt. the weights
+       */
+      const std::vector<blitz::Array<double,2> >& getPreviousDerivatives() const { return m_prev_deriv; }
+
+      /**
+       * @brief Returns the derivatives of the cost wrt. the biases
+       */
+      const std::vector<blitz::Array<double,1> >& getPreviousBiasDerivatives() const { return m_prev_deriv_bias; }
+
+      /**
+       * @brief Sets the previous derivatives of the cost
+       */
+      void setPreviousDerivatives(const std::vector<blitz::Array<double,2> >& v);
+
+      /**
+       * @brief Sets the previous derivatives of the cost of a given index
+       */
+      void setPreviousDerivative(const blitz::Array<double,2>& v, const size_t index);
+
+      /**
+       * @brief Sets the previous derivatives of the cost (biases)
+       */
+      void setPreviousBiasDerivatives(const std::vector<blitz::Array<double,1> >& v);
+
+      /**
+       * @brief Sets the previous derivatives of the cost (biases) of a given
+       * index
+       */
+      void setPreviousBiasDerivative(const blitz::Array<double,1>& v, const size_t index);
+
+      /**
        * @brief Initialize the internal buffers for the current machine
        */
       virtual void initialize(const bob::machine::MLP& machine);
@@ -156,7 +244,7 @@ namespace bob { namespace trainer {
           const blitz::Array<double,2>& input,
           const blitz::Array<double,2>& target);
 
-    protected:
+    private:
       /**
        * Weight update -- calculates the weight-update using derivatives as
        * required by back-prop.

@@ -14,7 +14,7 @@ def mlp_repr(self):
   for i, k in enumerate(self.biases): 
     if not (k == 0.0).all(): bias = True
   if self.hidden_activation != self.output_activation:
-    return '<MLP %s@%s [bias: %s][act: {hidden}%s/{output}%s]>' % (self.weights[0].dtype, self.shape, str(bias).lower(), self.hidden_activation, self.output_activation)
+    return '<MLP %s@%s [bias: %s][act: {hidden}%s | {output}%s]>' % (self.weights[0].dtype, self.shape, str(bias).lower(), self.hidden_activation, self.output_activation)
   else:
     return '<MLP %s@%s [bias: %s][act: %s]>' % (self.weights[0].dtype, self.shape, str(bias).lower(), self.hidden_activation)
 MLP.__repr__ = mlp_repr
@@ -23,7 +23,7 @@ del mlp_repr
 def mlp_str(self):
   """A funky way to print a bob MLP"""
   if self.hidden_activation != self.output_activation:
-    act = "[act: {hidden}%s/{output}%s]" % (self.hidden_activation, self.output_activation)
+    act = "[act: {hidden}%s | {output}%s]" % (self.hidden_activation, self.output_activation)
   else:
     act = "[act: %s]" % self.hidden_activation
   sub = ""

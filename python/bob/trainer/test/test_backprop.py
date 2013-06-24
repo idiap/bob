@@ -25,8 +25,8 @@ import math
 import unittest
 import numpy
 
-from .. import MLPBaseTrainer, CrossEntropyLoss, SquareError
-from ...machine import HyperbolicTangentActivation, LogisticActivation, IdentityActivation
+from .. import MLPBaseTrainer, MLPBackPropTrainer, CrossEntropyLoss, SquareError
+from ...machine import HyperbolicTangentActivation, LogisticActivation, IdentityActivation, MLP
 
 class PythonBackProp(MLPBaseTrainer):
   """A simple version of the vanilla BackProp algorithm written in Python
@@ -35,9 +35,12 @@ class PythonBackProp(MLPBaseTrainer):
   def __init__(self, batch_size, cost, machine, train_biases, 
       learning_rate=0.1, momentum=0.0):
     
-    super(self, PythonBackProp).__init__(batch_size, cost, machine, train_biases)
-    self.prev_deriv = [numpy.zeros(k.shape, dtype=float) for k in machine.weights]
-    self.prev_deriv_bias = [numpy.zeros(k.shape, dtype=float) for k in machine.biases]
+    super(PythonBackProp, self).__init__(batch_size, cost, machine, train_biases)
+    self.previous_derivatives = [numpy.zeros(k.shape, dtype=float) for k in machine.weights]
+    self.previous_bias_derivatives = [numpy.zeros(k.shape, dtype=float) for k in machine.biases]
+
+    self.learning_rate = learning_rate
+    self.momentum = momentum
 
   def train(self, machine, input, target):
 
@@ -46,174 +49,154 @@ class PythonBackProp(MLPBaseTrainer):
     self.backward_step(machine, input, target)
 
     # Updates weights and biases
-    new_weights = machine.weights
+    new_weights = list(machine.weights)
     for k,W in enumerate(new_weights):
-      new_weights[k] = W + (((1-self.momentum)*self.deriv[k]) + (self.momentum*self.prev_deriv[k])) for k in range(len(W))]
-    self.prev_deriv = self.deriv
+      new_weights[k] = W - (((1-self.momentum)*self.learning_rate*self.derivatives[k]) + (self.momentum*self.previous_derivatives[k]))
+    self.previous_derivatives = [self.learning_rate*k for k in self.derivatives]
     machine.weights = new_weights
 
     if self.train_biases:
-      new_biases = machine.biases
+      new_biases = list(machine.biases)
       for k,B in enumerate(new_biases):
-        new_biases[k] = [B[k] + (((1-self.momentum)*self.deriv_bias[k]) + (self.momentum*self.prev_deriv_bias[k])) for k in range(len(W))]
-      self.prev_deriv_bias = self.deriv_bias
+        new_biases[k] = B - (((1-self.momentum)*self.learning_rate*self.bias_derivatives[k]) + (self.momentum*self.previous_bias_derivatives[k]))
+      self.previous_bias_derivatives = [self.learning_rate*k for k in self.bias_derivatives]
       machine.biases = new_biases
 
-def test_2in_1out_nobias():
+    return prev_cost, self.cost(machine, input, target)
 
-  machine = bob.machine.MLP((2, 1))
+def check_training(machine, cost, bias_training, batch_size, learning_rate,
+    momentum):
+
+  python_machine = MLP(machine)
+  
+  X = numpy.random.rand(batch_size, machine.weights[0].shape[0])
+  T = numpy.zeros((batch_size, machine.weights[-1].shape[1]))
+
+  python_trainer = PythonBackProp(batch_size, cost, machine, bias_training,
+      learning_rate, momentum)
+  cxx_trainer = MLPBackPropTrainer(batch_size, cost, machine, bias_training)
+  cxx_trainer.learning_rate = learning_rate
+  cxx_trainer.momentum = momentum
+
+  # checks previous state matches
+  for k,D in enumerate(cxx_trainer.previous_derivatives):
+    assert numpy.allclose(D, python_trainer.previous_derivatives[k])
+  for k,D in enumerate(cxx_trainer.previous_bias_derivatives):
+    assert numpy.allclose(D, python_trainer.previous_bias_derivatives[k])
+  for k,W in enumerate(machine.weights):
+    assert numpy.allclose(W, python_machine.weights[k])
+  for k,B in enumerate(machine.biases):
+    assert numpy.allclose(B, python_machine.biases[k])
+  assert numpy.alltrue(machine.input_subtract == python_machine.input_subtract)
+  assert numpy.alltrue(machine.input_divide == python_machine.input_divide)
+
+  prev_cost, cost = python_trainer.train(python_machine, X, T)
+  assert cost <= prev_cost #this should always be true for a fixed dataset
+  cxx_trainer.train(machine, X, T)
+
+  # checks each component of machine and trainer, make sure they match
+  for k,D in enumerate(cxx_trainer.derivatives):
+    assert numpy.allclose(D, python_trainer.derivatives[k])
+  for k,D in enumerate(cxx_trainer.bias_derivatives):
+    assert numpy.allclose(D, python_trainer.bias_derivatives[k])
+  for k,W in enumerate(machine.weights):
+    assert numpy.allclose(W, python_machine.weights[k])
+  for k,B in enumerate(machine.biases):
+    assert numpy.allclose(B, python_machine.biases[k])
+  assert numpy.alltrue(machine.input_subtract == python_machine.input_subtract)
+  assert numpy.alltrue(machine.input_divide == python_machine.input_divide)
+
+def test_2in_1out_nobias():
+  
+  machine = MLP((2, 1))
   machine.randomize()
+  machine.hidden_activation = LogisticActivation()
+  machine.output_activation = LogisticActivation()
   machine.biases = 0
 
-  cxx_trainer = bob.trainer.MLPBackPropTrainer(1, bob.trainer.SquareError(machine.output_activation))
-  trainer.train_biases = False
-  trainer.initialize(machine)
-  d0 = numpy.array([[.3, .7]])
-  t0 = numpy.array([[.0]])
+  BATCH_SIZE = 10
+  cost = CrossEntropyLoss(machine.output_activation)
 
-  # trains in python first
-  pytrainer = PythonBackProp(train_biases=trainer.train_biases)
-  pymachine = bob.machine.MLP(machine) #a copy
-  pytrainer.train(pymachine, d0, t0)
+  for k in range(10):
+    check_training(machine, cost, False, BATCH_SIZE, 0.1, 0.0)
 
-  # trains with our C++ implementation
-  trainer.train_(machine, d0, t0)
-  self.assertTrue(numpy.array_equal(pymachine.weights[0], machine.weights[0]))
+def test_1in_2out_nobias():
 
-def test03_FisherWithOneHiddenLayer(self):
-
-  # Trains a multilayer biased MLP to perform discrimination on the Fisher
-  # data set.
-
-  N = 50
-
-  machine = bob.machine.MLP((4, 4, 3))
-  machine.hidden_activation = bob.machine.HyperbolicTangentActivation()
-  machine.output_activation = bob.machine.HyperbolicTangentActivation()
+  machine = MLP((1, 2))
   machine.randomize()
-  trainer = bob.trainer.MLPBackPropTrainer(N, bob.trainer.SquareError(machine.output_activation), machine)
-  trainer.train_biases = True
+  machine.hidden_activation = LogisticActivation()
+  machine.output_activation = LogisticActivation()
+  machine.biases = 0
 
-  # A helper to select and shuffle the data
-  targets = [ #we choose the approximate Fisher response!
-      numpy.array([+1., -1., -1.]), #setosa
-      numpy.array([-1., +1., -1.]), #versicolor
-      numpy.array([-1., -1., +1.]), #virginica
-      ]
-  # Associate the data to targets, by setting the arrayset order explicetly
-  data = bob.db.iris.data()
-  datalist = [data['setosa'], data['versicolor'], data['virginica']]
+  BATCH_SIZE = 10
+  cost = CrossEntropyLoss(machine.output_activation)
 
-  S = bob.trainer.DataShuffler(datalist, targets)
+  for k in range(10):
+    check_training(machine, cost, False, BATCH_SIZE, 0.1, 0.0)
 
-  # trains in python first
-  pytrainer = PythonBackProp(train_biases=trainer.train_biases)
-  pymachine = bob.machine.MLP(machine) #a copy
+def test_2in_3_1out_nobias():
 
-  # We now iterate for several steps, look for the convergence
-  for k in range(50):
-    input, target = S(N)
-    pytrainer.train(pymachine, input, target)
-    trainer.train_(machine, input, target)
-    #print "[Python] |RMSE|@%d:" % k, numpy.linalg.norm(bob.measure.rmse(pymachine(input), target))
-    #print "[C++] |RMSE|@%d:" % k, numpy.linalg.norm(bob.measure.rmse(machine(input), target))
-    # Note we will face precision problems when comparing to the Pythonic
-    # implementation. So, let's not be too demanding here. If all values are
-    # approximately equal to 1e-10, we consider this is OK.
-    for i, w in enumerate(pymachine.weights):
-      self.assertTrue( (abs(w-machine.weights[i]) < 1e-10).all() )
-    for i, b in enumerate(pymachine.biases):
-      self.assertTrue( (abs(b-machine.biases[i]) < 1e-10).all() )
-
-def test04_FisherMultiLayer(self):
-
-  # Trains a multilayer biased MLP to perform discrimination on the Fisher
-  # data set.
-
-  N = 50
-
-  machine = bob.machine.MLP((4, 3, 3, 1))
-  machine.hidden_activation = bob.machine.HyperbolicTangentActivation()
-  machine.output_activation = bob.machine.HyperbolicTangentActivation()
+  machine = MLP((2, 3, 1))
   machine.randomize()
-  trainer = bob.trainer.MLPBackPropTrainer(N, bob.trainer.SquareError(machine.output_activation))
-  trainer.train_biases = True
-  trainer.initialize(machine)
+  machine.hidden_activation = HyperbolicTangentActivation()
+  machine.output_activation = HyperbolicTangentActivation()
+  machine.biases = 0
 
-  # A helper to select and shuffle the data
-  targets = [ #we choose the approximate Fisher response!
-      numpy.array([-1.0]), #setosa
-      numpy.array([0.5]), #versicolor
-      numpy.array([+1.0]), #virginica
-      ]
-  # Associate the data to targets, by setting the arrayset order explicetly
-  data = bob.db.iris.data()
-  datalist = [data['setosa'], data['versicolor'], data['virginica']]
+  BATCH_SIZE = 10
+  cost = SquareError(machine.output_activation)
 
-  S = bob.trainer.DataShuffler(datalist, targets)
+  for k in range(10):
+    check_training(machine, cost, False, BATCH_SIZE, 0.1, 0.0)
 
-  # trains in python first
-  pytrainer = PythonBackProp(train_biases=trainer.train_biases)
-  pymachine = bob.machine.MLP(machine) #a copy
+def test_100in_10_10_5out_nobias():
 
-  # We now iterate for several steps, look for the convergence
-  for k in range(50):
-    input, target = S(N)
-    pytrainer.train(pymachine, input, target)
-    trainer.train_(machine, input, target)
-    #print "[Python] MSE:", bob.measure.mse(pymachine(input), target).sqrt()
-    #print "[C++] MSE:", bob.measure.mse(machine(input), target).sqrt()
-    # Note we will face precision problems when comparing to the Pythonic
-    # implementation. So, let's not be too demanding here. If all values are
-    # approximately equal to 1e-10, we consider this is OK.
-    for i, w in enumerate(pymachine.weights):
-      self.assertTrue( (abs(w-machine.weights[i]) < 1e-10).all() )
-    for i, b in enumerate(pymachine.biases):
-      self.assertTrue( (abs(b-machine.biases[i]) < 1e-10).all() )
-
-def test05_FisherMultiLayerWithMomentum(self):
-
-  # Trains a multilayer biased MLP to perform discrimination on the Fisher
-  # data set.
-
-  N = 50
-
-  machine = bob.machine.MLP((4, 3, 3, 1))
-  machine.hidden_activation = bob.machine.HyperbolicTangentActivation()
-  machine.output_activation = bob.machine.HyperbolicTangentActivation()
+  machine = MLP((100, 10, 10, 5))
   machine.randomize()
-  trainer = bob.trainer.MLPBackPropTrainer(N, bob.trainer.SquareError(machine.output_activation), machine)
-  trainer.train_biases = True
-  trainer.momentum = 0.99
+  machine.hidden_activation = HyperbolicTangentActivation()
+  machine.output_activation = HyperbolicTangentActivation()
+  machine.biases = 0
 
-  # A helper to select and shuffle the data
-  targets = [ #we choose the approximate Fisher response!
-      numpy.array([-1.0]), #setosa
-      numpy.array([0.5]), #versicolor
-      numpy.array([+1.0]), #virginica
-      ]
-  # Associate the data to targets, by setting the arrayset order explicetly
-  data = bob.db.iris.data()
-  datalist = [data['setosa'], data['versicolor'], data['virginica']]
+  BATCH_SIZE = 10
+  cost = SquareError(machine.output_activation)
 
-  S = bob.trainer.DataShuffler(datalist, targets)
+  for k in range(10):
+    check_training(machine, cost, False, BATCH_SIZE, 0.1, 0.0)
 
-  # trains in python first
-  pytrainer = PythonBackProp(train_biases=trainer.train_biases)
-  pymachine = bob.machine.MLP(machine) #a copy
-  pytrainer.momentum = 0.99
+def test_2in_3_1out():
 
-  # We now iterate for several steps, look for the convergence
-  for k in range(50):
-    input, target = S(N)
-    pytrainer.train(pymachine, input, target)
-    trainer.train_(machine, input, target)
-    #print "[Python] MSE:", bob.measure.mse(pymachine(input), target).sqrt()
-    #print "[C++] MSE:", bob.measure.mse(machine(input), target).sqrt()
-    # Note we will face precision problems when comparing to the Pythonic
-    # implementation. So, let's not be too demanding here. If all values are
-    # approximately equal to 1e-10, we consider this is OK.
-    for i, w in enumerate(pymachine.weights):
-      self.assertTrue( (abs(w-machine.weights[i]) < 1e-10).all() )
-    for i, b in enumerate(pymachine.biases):
-      self.assertTrue( (abs(b-machine.biases[i]) < 1e-10).all() )
+  machine = MLP((2, 3, 1))
+  machine.randomize()
+  machine.hidden_activation = HyperbolicTangentActivation()
+  machine.output_activation = HyperbolicTangentActivation()
+
+  BATCH_SIZE = 10
+  cost = SquareError(machine.output_activation)
+
+  for k in range(10):
+    check_training(machine, cost, True, BATCH_SIZE, 0.1, 0.0)
+
+def test_20in_10_5_3out():
+
+  machine = MLP((20, 10, 5, 3))
+  machine.randomize()
+  machine.hidden_activation = HyperbolicTangentActivation()
+  machine.output_activation = HyperbolicTangentActivation()
+
+  BATCH_SIZE = 10
+  cost = SquareError(machine.output_activation)
+
+  for k in range(10):
+    check_training(machine, cost, True, BATCH_SIZE, 0.1, 0.0)
+
+def test_20in_10_5_3out_with_momentum():
+
+  machine = MLP((20, 10, 5, 3))
+  machine.randomize()
+  machine.hidden_activation = HyperbolicTangentActivation()
+  machine.output_activation = HyperbolicTangentActivation()
+
+  BATCH_SIZE = 10
+  cost = SquareError(machine.output_activation)
+
+  for k in range(10):
+    check_training(machine, cost, True, BATCH_SIZE, 0.1, 0.1)

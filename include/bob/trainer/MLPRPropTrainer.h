@@ -147,7 +147,8 @@ namespace bob { namespace trainer {
           const blitz::Array<double,2>& input,
           const blitz::Array<double,2>& target);
 
-    protected:
+    private: //representation
+
       /**
        * Weight update -- calculates the weight-update using derivatives as
        * explained in Bishop's formula 5.53, page 243.

@@ -300,7 +300,7 @@ void bob::trainer::MLPBaseTrainer::setOutput(const blitz::Array<double,2>& outpu
   m_output[id] = output;
 }
 
-void bob::trainer::MLPBaseTrainer::setDeriv(const std::vector<blitz::Array<double,2> >& deriv) {
+void bob::trainer::MLPBaseTrainer::setDerivatives(const std::vector<blitz::Array<double,2> >& deriv) {
   bob::core::array::assertSameDimensionLength(deriv.size(), m_deriv.size());
   for (size_t k=0; k<deriv.size(); ++k)
   {
@@ -309,7 +309,7 @@ void bob::trainer::MLPBaseTrainer::setDeriv(const std::vector<blitz::Array<doubl
   }
 }
 
-void bob::trainer::MLPBaseTrainer::setDeriv(const blitz::Array<double,2>& deriv, const size_t id) {
+void bob::trainer::MLPBaseTrainer::setDerivative(const blitz::Array<double,2>& deriv, const size_t id) {
   if (id >= m_deriv.size())
     throw bob::core::InvalidArgumentException("MLPBaseTrainer: Index in deriv array", 
       (int)id, 0, (int)(m_deriv.size()-1));
@@ -317,7 +317,7 @@ void bob::trainer::MLPBaseTrainer::setDeriv(const blitz::Array<double,2>& deriv,
   m_deriv[id] = deriv;
 }
 
-void bob::trainer::MLPBaseTrainer::setDerivBias(const std::vector<blitz::Array<double,1> >& deriv_bias) {
+void bob::trainer::MLPBaseTrainer::setBiasDerivatives(const std::vector<blitz::Array<double,1> >& deriv_bias) {
   bob::core::array::assertSameDimensionLength(deriv_bias.size(), m_deriv_bias.size());
   for (size_t k=0; k<deriv_bias.size(); ++k)
   {
@@ -326,7 +326,7 @@ void bob::trainer::MLPBaseTrainer::setDerivBias(const std::vector<blitz::Array<d
   }
 }
 
-void bob::trainer::MLPBaseTrainer::setDerivBias(const blitz::Array<double,1>& deriv_bias, const size_t id) {
+void bob::trainer::MLPBaseTrainer::setBiasDerivative(const blitz::Array<double,1>& deriv_bias, const size_t id) {
   if (id >= m_deriv_bias.size())
     throw bob::core::InvalidArgumentException("MLPBaseTrainer: Index in deriv_bias array", 
       (int)id, 0, (int)(m_deriv_bias.size()-1));
