@@ -22,11 +22,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <bob/trainer/SVDPCATrainer.h>
-#include <bob/machine/Exception.h>
-#include <bob/math/svd.h>
 #include <algorithm>
 #include <blitz/array.h>
+#include <boost/format.hpp>
+#include <bob/math/svd.h>
+#include <bob/trainer/SVDPCATrainer.h>
 
 bob::trainer::SVDPCATrainer::SVDPCATrainer()
 {
@@ -77,12 +77,21 @@ void bob::trainer::SVDPCATrainer::train(bob::machine::LinearMachine& machine,
   const int n_eigenvalues = eigen_values.extent(0);
 
   // Checks that the dimensions are matching
-  if (n_inputs != n_features)
-    throw bob::machine::NInputsMismatch(n_inputs, n_features);
-  if (n_outputs != (size_t)n_sigma)
-    throw bob::machine::NOutputsMismatch(n_outputs, (size_t)n_sigma);
-  if (n_eigenvalues != n_sigma)
-    throw bob::machine::NOutputsMismatch(n_eigenvalues, n_sigma);
+  if (n_inputs != n_features) {
+    boost::format m("Number of features at input data set (%d columns) does not match machine input size (%d)");
+    m % n_features % n_inputs;
+    throw std::runtime_error(m.str());
+  }
+  if (n_outputs != (size_t)n_sigma) {
+    boost::format m("Number of outputs (%d) does not match min(#features, #samples) = min(%d, %d) = %d");
+    m % n_outputs % n_features % n_samples % n_sigma;
+    throw std::runtime_error(m.str());
+  }
+  if (n_eigenvalues != n_sigma) {
+    boost::format m("Number of eigenvalues (%d) does not match min(#features, #samples) = min(%d, %d) = %d");
+    m % n_eigenvalues % n_features % n_samples % n_sigma;
+    throw std::runtime_error(m.str());
+  }
 
   // removes the empirical mean from the training data
   blitz::Array<double,2> data(n_features, n_samples);
@@ -114,7 +123,6 @@ void bob::trainer::SVDPCATrainer::train(bob::machine::LinearMachine& machine,
    * note: eigen values are sigma^2/n_samples diagonal
    *       eigen vectors are the rows of U
    */
-  machine.resize(n_features, n_sigma);
   machine.setInputSubtraction(mean);
   machine.setInputDivision(1.0);
   machine.setBiases(0.0);

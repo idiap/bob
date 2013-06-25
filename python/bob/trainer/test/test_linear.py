@@ -20,98 +20,131 @@
 """Test trainers for the LinearMachine
 """
 
-import os, sys
-import unittest
-import bob
-import random
+import os
+import sys
 import numpy
+import unittest
+
+from ...machine import LinearMachine
+from .. import CovMatrixPCATrainer, SVDPCATrainer, FisherLDATrainer, WhiteningTrainer, EMPCATrainer, WCCNTrainer
+
+def test_pca_versus_matlab_princomp():
+
+  # Tests our SVD/PCA extractor.
+  data = numpy.array([
+      [2.5, 2.4],
+      [0.5, 0.7],
+      [2.2, 2.9],
+      [1.9, 2.2],
+      [3.1, 3.0],
+      [2.3, 2.7],
+      [2., 1.6],
+      [1., 1.1],
+      [1.5, 1.6],
+      [1.1, 0.9],
+      ], dtype='float64')
+
+  # Expected results (from Matlab's princomp) - a good ground truth?
+  eig_val_correct = numpy.array([1.28402771, 0.0490834], 'float64')
+  eig_vec_correct = numpy.array([[-0.6778734, -0.73517866], [-0.73517866, 0.6778734]], 'float64')
+
+  T_svd = SVDPCATrainer()
+  machine_svd, eig_vals_svd = T_svd.train(data)
+
+  assert numpy.allclose(abs(machine_svd.weights/eig_vec_correct), 1.0)
+  assert numpy.allclose(eig_vals_svd, eig_val_correct)
+  assert machine_svd.weights.shape == (2,2)
+  
+  T_cov = CovMatrixPCATrainer()
+  machine_cov, eig_vals_cov = T_cov.train(data)
+
+  assert numpy.allclose(abs(machine_cov.weights/eig_vec_correct), 1.0)
+  assert numpy.allclose(eig_vals_cov, eig_val_correct)
+  assert machine_cov.weights.shape == (2,2)
+
+def test_pca_versus_matlab_princomp_2():
+
+  # Tests our SVD/PCA extractor.
+  data = numpy.array([
+    [1,2, 3,5,7],
+    [2,4,19,0,2],
+    [3,6, 5,3,3],
+    [4,8,13,4,2],
+    ], dtype='float64')
+
+  # Expected results (from Matlab's princomp) - a good ground truth?
+  eig_val_correct = numpy.array([61.9870996, 9.49613738, 1.85009634, 0.],
+      'float64')
+
+  # Train method 1
+  T_svd = SVDPCATrainer()
+  machine_svd, eig_vals_svd = T_svd.train(data)
+  
+  assert numpy.allclose(eig_vals_svd, eig_val_correct)
+  assert machine_svd.weights.shape == (5,4)
+
+  T_cov = CovMatrixPCATrainer()
+  machine_cov, eig_vals_cov = T_cov.train(data)
+
+  assert numpy.allclose(eig_vals_cov, eig_val_correct)
+  assert machine_cov.weights.shape == (5,4)
+
+def test_pca_trainer_comparisons():
+
+  # Constructors and comparison operators
+  t1 = SVDPCATrainer()
+  t2 = SVDPCATrainer()
+  t3 = SVDPCATrainer(t2)
+  t4 = t3
+  assert t1 == t2
+  assert t1.is_similar_to(t2)
+  assert t1 == t3
+  assert t1.is_similar_to(t3)
+  assert t1 == t4
+  assert t1.is_similar_to(t4)
+
+  t5 = CovMatrixPCATrainer()
+  t6 = CovMatrixPCATrainer()
+  assert t5 == t6
+  assert t5.is_similar_to(t6)
+  assert t5 != t1
+
+def test_pca_svd_vs_cov_random_1():
+
+  # Tests our SVD/PCA extractor.
+  data = numpy.random.rand(1000,4)
+
+  # Train method 1
+  T_svd = SVDPCATrainer()
+  machine_svd, eig_vals_svd = T_svd.train(data)
+  T_cov = CovMatrixPCATrainer()
+  machine_cov, eig_vals_cov = T_cov.train(data)
+  
+  assert numpy.allclose(eig_vals_svd, eig_vals_cov)
+  assert machine_svd.weights.shape == (4,4)
+  assert numpy.allclose(machine_svd.input_subtract, machine_cov.input_subtract)
+  assert numpy.allclose(machine_svd.input_divide, machine_cov.input_divide)
+  assert numpy.allclose(abs(machine_svd.weights/machine_cov.weights), 1.0)
+
+def test_pca_svd_vs_cov_random_2():
+
+  # Tests our SVD/PCA extractor.
+  data = numpy.random.rand(15,60)
+
+  # Train method 1
+  T_svd = SVDPCATrainer()
+  machine_svd, eig_vals_svd = T_svd.train(data)
+  T_cov = CovMatrixPCATrainer()
+  machine_cov, eig_vals_cov = T_cov.train(data)
+  
+  assert numpy.allclose(eig_vals_svd, eig_vals_cov)
+  assert machine_svd.weights.shape == (60,15)
+  assert numpy.allclose(machine_svd.input_subtract, machine_cov.input_subtract)
+  assert numpy.allclose(machine_svd.input_divide, machine_cov.input_divide)
+  assert numpy.allclose(abs(machine_svd.weights[:,:-1]/machine_cov.weights[:,:-1]), 1.0)
 
 class LinearTest(unittest.TestCase):
   """Performs various trainer tests for the LinearMachine."""
-
-  def test01a_pca_via_svd(self):
-
-    # Tests our SVD/PCA extractor.
-    data = numpy.array([
-        [2.5, 2.4],
-        [0.5, 0.7],
-        [2.2, 2.9],
-        [1.9, 2.2],
-        [3.1, 3.0],
-        [2.3, 2.7],
-        [2., 1.6],
-        [1., 1.1],
-        [1.5, 1.6],
-        [1.1, 0.9],
-        ], dtype='float64')
-
-    # Expected results
-    eig_val_correct = numpy.array([1.28402771, 0.0490834], 'float64')
-    eig_vec_correct = numpy.array([[-0.6778734, -0.73517866], [-0.73517866, 0.6778734]], 'float64')
-
-    # Train method 1
-    T = bob.trainer.SVDPCATrainer()
-    machine, eig_vals = T.train(data)
-
-    # Makes sure results are good
-    self.assertTrue( (abs(machine.weights - eig_vec_correct) < 1e-6).all() )
-    self.assertTrue( (abs(eig_vals - eig_val_correct) < 1e-6).all() )
-
-    # Train method 2
-    machine2 = bob.machine.LinearMachine(2, 2)
-    eig_vals2 = T.train(machine2, data)
-
-    # Makes sure results are good
-    self.assertTrue( (abs(machine2.weights - eig_vec_correct) < 1e-6).all() )
-    self.assertTrue( (abs(eig_vals2 - eig_val_correct) < 1e-6).all() )
-
-  def test01b_pca_via_svd(self):
-
-    # Tests our SVD/PCA extractor.
-    data = numpy.array([
-      [1,2, 3,5,7],
-      [2,4,19,0,2],
-      [3,6, 5,3,3],
-      [4,8,13,4,2],
-      ], dtype='float64')
-
-    # Expected results
-    eig_val_correct = numpy.array([61.9870996, 9.49613738, 1.85009634, 0.],
-        'float64')
-
-    # Train method 1
-    T = bob.trainer.SVDPCATrainer()
-    machine, eig_vals = T.train(data)
-
-    # Makes sure results are good
-    self.assertTrue( (abs(eig_vals - eig_val_correct) < 1e-6).all() )
-    self.assertTrue( machine.weights.shape[0] == 5 and machine.weights.shape[1] == 4 )
-
-    # Train method 2
-    machine2 = bob.machine.LinearMachine(5, 4)
-    eig_vals2 = T.train(machine2, data)
-
-    # Makes sure results are good
-    self.assertTrue( (abs(eig_vals2 - eig_val_correct) < 1e-6).all() )
-    self.assertTrue( machine2.weights.shape[0] == 5 and machine2.weights.shape[1] == 4 )
-
-  def test01c_pca_via_svd_comparisons(self):
-
-    # Constructors and comparison operators
-    t1 = bob.trainer.SVDPCATrainer()
-    t2 = bob.trainer.SVDPCATrainer()
-    t3 = bob.trainer.SVDPCATrainer(t2)
-    t4 = t3
-    self.assertTrue( t1 == t2)
-    self.assertFalse( t1 != t2)
-    self.assertTrue( t1.is_similar_to(t2) )
-    self.assertTrue( t1 == t3)
-    self.assertFalse( t1 != t3)
-    self.assertTrue( t1.is_similar_to(t3) )
-    self.assertTrue( t1 == t4)
-    self.assertFalse( t1 != t4)
-    self.assertTrue( t1.is_similar_to(t4) )
-
 
   def test02a_fisher_lda(self):
 
@@ -143,7 +176,7 @@ class LinearTest(unittest.TestCase):
     exp_val = numpy.array([5.394526])
     exp_mach = numpy.array([[-0.291529], [0.956562]])
 
-    T = bob.trainer.FisherLDATrainer()
+    T = FisherLDATrainer()
     machine, eig_vals = T.train(data)
 
     # Makes sure results are good
@@ -177,7 +210,7 @@ class LinearTest(unittest.TestCase):
     exp_val = numpy.array([33.9435556])
     exp_mach = numpy.array([[0.14322439], [-0.98379062], [0.10790173]])
 
-    T = bob.trainer.FisherLDATrainer(-1)
+    T = FisherLDATrainer(-1)
     machine, eig_vals = T.train(data)
 
     # Makes sure results are good
@@ -189,9 +222,9 @@ class LinearTest(unittest.TestCase):
   def test02c_fisher_lda_comparisons(self):
 
     # Constructors and comparison operators
-    t1 = bob.trainer.FisherLDATrainer()
-    t2 = bob.trainer.FisherLDATrainer()
-    t3 = bob.trainer.FisherLDATrainer(t2)
+    t1 = FisherLDATrainer()
+    t2 = FisherLDATrainer()
+    t3 = FisherLDATrainer(t2)
     t4 = t3
     self.assertTrue( t1 == t2)
     self.assertFalse( t1 != t2)
@@ -220,8 +253,8 @@ class LinearTest(unittest.TestCase):
     exp_llh2 =  -30.8559
 
     # Do two iterations of EM to check the training procedure
-    T = bob.trainer.EMPCATrainer()
-    m = bob.machine.LinearMachine(3,2)
+    T = EMPCATrainer()
+    m = LinearMachine(3,2)
     # Initialization of the trainer
     T.initialization(m, ar)
     # Sets ('random') initialization values for test purposes
@@ -248,9 +281,9 @@ class LinearTest(unittest.TestCase):
   def test04_whitening_initialization(self):
 
     # Constructors and comparison operators
-    t1 = bob.trainer.WhiteningTrainer()
-    t2 = bob.trainer.WhiteningTrainer()
-    t3 = bob.trainer.WhiteningTrainer(t2)
+    t1 = WhiteningTrainer()
+    t2 = WhiteningTrainer()
+    t3 = WhiteningTrainer(t2)
     t4 = t3
     self.assertTrue( t1 == t2)
     self.assertFalse( t1 != t2)
@@ -282,8 +315,8 @@ class LinearTest(unittest.TestCase):
     sample_whitened_ref = numpy.array([5.942255453628436, 4.984316201643742, 4.739998188373740])
 
     # Runs whitening (first method)
-    t = bob.trainer.WhiteningTrainer()
-    m = bob.machine.LinearMachine(3,3)
+    t = WhiteningTrainer()
+    m = LinearMachine(3,3)
     t.train(m, data)
     s = m.forward(sample)
 
@@ -308,9 +341,9 @@ class LinearTest(unittest.TestCase):
   def test06_wccn_initialization(self):
 
     # Constructors and comparison operators
-    t1 = bob.trainer.WCCNTrainer()
-    t2 = bob.trainer.WCCNTrainer()
-    t3 = bob.trainer.WCCNTrainer(t2)
+    t1 = WCCNTrainer()
+    t2 = WCCNTrainer()
+    t3 = WCCNTrainer(t2)
     t4 = t3
     self.assertTrue( t1 == t2)
     self.assertFalse( t1 != t2)
@@ -338,8 +371,8 @@ class LinearTest(unittest.TestCase):
     sample_wccn_ref = numpy.array([ 113.05348978,   -1.8620547 ,   14.42654064])
 
     # Runs WCCN (first method)
-    t = bob.trainer.WCCNTrainer()
-    m = bob.machine.LinearMachine(3,3)
+    t = WCCNTrainer()
+    m = LinearMachine(3,3)
     t.train(m, data)
     s = m.forward(sample)
 

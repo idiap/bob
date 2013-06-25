@@ -25,95 +25,98 @@
 #ifndef BOB_TRAINER_SVDPCA_TRAINER_H
 #define BOB_TRAINER_SVDPCA_TRAINER_H
 
-#include "Trainer.h"
-#include <bob/machine/LinearMachine.h>
 #include <blitz/array.h>
+#include <bob/machine/LinearMachine.h>
 
 namespace bob { namespace trainer {
-/**
- * @ingroup TRAINER
- * @{
- */
 
-/**
- * @brief Sets a linear machine to perform the Karhunen-Loève Transform 
- * (KLT) on a given dataset using Singular Value Decomposition (SVD). 
- *
- * References:
- * 1. Eigenfaces for Recognition, Turk & Pentland, Journal of Cognitive
- *    Neuroscience (1991) Volume: 3, Issue: 1, Publisher: MIT Press, 
- *    Pages: 71-86
- * 2. http://en.wikipedia.org/wiki/Singular_value_decomposition
- * 3. http://en.wikipedia.org/wiki/Principal_component_analysis
- */
-class SVDPCATrainer: public Trainer<bob::machine::LinearMachine, blitz::Array<double,2> >
-{
-  public: //api
+  /**
+   * @ingroup TRAINER
+   * @{
+   */
 
-    /**
-     * @brief Initializes a new SVD/PCD trainer. The training stage will place
-     * the resulting principal components in the linear machine and set it up
-     * to extract the variable means automatically. As an option, you may 
-     * preset the trainer so that the normalization performed by the resulting
-     * linear machine also divides the variables by the standard deviation of
-     * each variable ensemble.
-     */
-    SVDPCATrainer();
+  /**
+   * @brief Sets a linear machine to perform the Karhunen-Loève Transform 
+   * (KLT) on a given dataset using Singular Value Decomposition (SVD). 
+   *
+   * References:
+   * 1. Eigenfaces for Recognition, Turk & Pentland, Journal of Cognitive
+   *    Neuroscience (1991) Volume: 3, Issue: 1, Publisher: MIT Press, 
+   *    Pages: 71-86
+   * 2. http://en.wikipedia.org/wiki/Singular_value_decomposition
+   * 3. http://en.wikipedia.org/wiki/Principal_component_analysis
+   */
+  class SVDPCATrainer {
 
-    /**
-     * @brief Copy constructor
-     */
-    SVDPCATrainer(const SVDPCATrainer& other);
+    public: //api
 
-    /**
-     * @brief Destructor
-     */
-    virtual ~SVDPCATrainer();
+      /**
+       * @brief Initializes a new SVD/PCD trainer. The training stage will place
+       * the resulting principal components in the linear machine and set it up
+       * to extract the variable means automatically. As an option, you may 
+       * preset the trainer so that the normalization performed by the resulting
+       * linear machine also divides the variables by the standard deviation of
+       * each variable ensemble.
+       */
+      SVDPCATrainer();
 
-    /**
-     * @brief Assignment operator
-     */
-    SVDPCATrainer& operator=(const SVDPCATrainer& other);
+      /**
+       * @brief Copy constructor
+       */
+      SVDPCATrainer(const SVDPCATrainer& other);
 
-    /**
-     * @brief Equal to
-     */
-    bool operator==(const SVDPCATrainer& other) const;
-    /**
-     * @brief Not equal to
-     */
-    bool operator!=(const SVDPCATrainer& other) const;
-   /**
-     * @brief Similar to
-     */
-    bool is_similar_to(const SVDPCATrainer& other, const double r_epsilon=1e-5,
-      const double a_epsilon=1e-8) const;
+      /**
+       * @brief Destructor
+       */
+      virtual ~SVDPCATrainer();
 
-    /**
-     * @brief Trains the LinearMachine to perform the KLT. The resulting
-     * machine will have the eigen-vectors of the covariance matrix arranged
-     * by decreasing energy automatically. You don't need to sort the results.
-     */
-    virtual void train(bob::machine::LinearMachine& machine, 
-        const blitz::Array<double,2>& data);
+      /**
+       * @brief Assignment operator
+       */
+      SVDPCATrainer& operator=(const SVDPCATrainer& other);
 
-    /**
-     * @brief Trains the LinearMachine to perform the KLT. The resulting
-     * machien will have the eigen-vectors of the covariance matrix arranged
-     * by decreasing energy automatically. You don't need to sort the results.
-     * Also returns the eigen values of the covariance matrix so you can use
-     * that to choose which components to keep.
-     */
-    virtual void train(bob::machine::LinearMachine& machine,
-        blitz::Array<double,1>& eigen_values,
-        const blitz::Array<double,2>& data);
+      /**
+       * @brief Equal to
+       */
+      bool operator==(const SVDPCATrainer& other) const;
 
-  private: //representation
-};
+      /**
+       * @brief Not equal to
+       */
+      bool operator!=(const SVDPCATrainer& other) const;
 
-/**
- * @}
- */
+      /**
+       * @brief Similar to
+       */
+      bool is_similar_to(const SVDPCATrainer& other,
+          const double r_epsilon=1e-5, const double a_epsilon=1e-8) const;
+
+      /**
+       * @brief Trains the LinearMachine to perform the KLT. The resulting
+       * machine will have the eigen-vectors of the covariance matrix arranged
+       * by decreasing energy automatically. You don't need to sort the results.
+       */
+      virtual void train(bob::machine::LinearMachine& machine, 
+          const blitz::Array<double,2>& data);
+
+      /**
+       * @brief Trains the LinearMachine to perform the KLT. The resulting
+       * machien will have the eigen-vectors of the covariance matrix arranged
+       * by decreasing energy automatically. You don't need to sort the results.
+       * Also returns the eigen values of the covariance matrix so you can use
+       * that to choose which components to keep.
+       */
+      virtual void train(bob::machine::LinearMachine& machine,
+          blitz::Array<double,1>& eigen_values,
+          const blitz::Array<double,2>& data);
+
+    private: //representation
+
+  };
+
+  /**
+   * @}
+   */
 }}
 
 #endif /* BOB_TRAINER_SVDPCA_TRAINER_H */

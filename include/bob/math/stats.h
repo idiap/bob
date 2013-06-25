@@ -42,7 +42,6 @@ namespace bob { namespace math {
      * focused only on speed.
      *
      * This version of the method also returns the sample mean of the array.
-     * The resulting arrays (M and S) will be resized if required.
      */
     template<typename T>
     void scatter_(const blitz::Array<T,2>& A, blitz::Array<T,2>& S, 
@@ -71,7 +70,6 @@ namespace bob { namespace math {
      * the input and output matrices conform, use the scatter_() variant.
      *
      * This version of the method also returns the sample mean of the array.
-     * The resulting arrays (M and S) will be resized if required.
      */
     template<typename T>
     void scatter(const blitz::Array<T,2>& A, blitz::Array<T,2>& S, 
