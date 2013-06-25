@@ -161,9 +161,9 @@ void bind_trainer_backprop() {
  
     .def("reset", &bob::trainer::MLPBackPropTrainer::reset, (arg("self")), "Re-initializes the whole training apparatus to start training a new machine. This will effectively reset previous derivatives to zero.")
     
-    .add_property("learning_rate", &bob::trainer::MLPBackPropTrainer::getLearningRate, &bob::trainer::MLPBackPropTrainer::setLearningRate, "The learning rate (:math:`\\alpha`) to be used for the back-propagation.")
+    .add_property("learning_rate", &bob::trainer::MLPBackPropTrainer::getLearningRate, &bob::trainer::MLPBackPropTrainer::setLearningRate, "The learning rate (:math:`\\alpha`) to be used for the back-propagation (defaults to 0.1).")
     
-    .add_property("momentum", &bob::trainer::MLPBackPropTrainer::getMomentum, &bob::trainer::MLPBackPropTrainer::setMomentum, "The momentum (:math:`\\mu`) to be used for the back-propagation. This value allows for some *memory* on previous weight updates to be used for the next update.")
+    .add_property("momentum", &bob::trainer::MLPBackPropTrainer::getMomentum, &bob::trainer::MLPBackPropTrainer::setMomentum, "The momentum (:math:`\\mu`) to be used for the back-propagation. This value allows for some *memory* on previous weight updates to be used for the next update (defaults to 0.0).")
 
     .def("train", &bob::trainer::MLPBackPropTrainer::train, (arg("self"), arg("machine"), arg("input"), arg("target")), 
         "Trains the MLP to perform discrimination using error back-propagation with (optional) momentum.\n" \
@@ -207,9 +207,12 @@ void bind_trainer_backprop() {
         )
     .def("train_", &bob::trainer::MLPBackPropTrainer::train_, (arg("self"), arg("machine"), arg("input"), arg("target")), "This is a version of the train() method above, which does no compatibility check on the input machine and can be faster.")
     
-    .add_property("previous_derivatives", &backprop_get_prev_deriv, &backprop_set_prev_deriv)
+    .add_property("previous_derivatives", &backprop_get_prev_deriv, &backprop_set_prev_deriv, "The previous set of weight derivatives calculated by the base trainer. We keep those in case the momentum :math:`\\mu\\neq0.0`")
+
     .def("set_previous_derivative", &backprop_set_prev_deriv2, (arg("self"), arg("array"), arg("k")), "Sets the previous cost derivative for a given weight layer (index).")
-    .add_property("previous_bias_derivatives", &backprop_get_prev_deriv_bias, &backprop_set_prev_deriv_bias)
+
+    .add_property("previous_bias_derivatives", &backprop_get_prev_deriv_bias, &backprop_set_prev_deriv_bias, "The previous set of bias derivatives calculated by the base trainer. We keep those in case the momentum :math:`\\mu\\neq0.0`")
+
     .def("set_previous_bias_derivative", &backprop_set_prev_deriv_bias2, (arg("self"), arg("array"), arg("k")), "Sets the cost bias derivative for a given bias layer (index).")
   ;
 }

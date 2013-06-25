@@ -54,8 +54,10 @@ namespace bob { namespace trainer {
        * @brief Initializes a new MLPRPropTrainer trainer according to a given
        * training batch size. 
        *
-       * @param batch_size The number of examples passed at each iteration. If
-       * you set this to 1, then you are implementing stochastic training.
+       * @param batch_size The number of examples passed at each iteration.
+       * This should be a big number (tens of samples) - Resilient
+       * Back-propagation is a <b>batch</b> algorithm, it requires large sample
+       * sizes
        *
        * @param cost This is the cost function to use for the current training.
        *
@@ -69,8 +71,10 @@ namespace bob { namespace trainer {
        * @brief Initializes a new MLPRPropTrainer trainer according to a given
        * machine settings and a training batch size. 
        *
-       * @param batch_size The number of examples passed at each iteration. If
-       * you set this to 1, then you are implementing stochastic training.
+       * @param batch_size The number of examples passed at each iteration.
+       * This should be a big number (tens of samples) - Resilient
+       * Back-propagation is a <b>batch</b> algorithm, it requires large sample
+       * sizes
        *
        * @param cost This is the cost function to use for the current training.
        *
@@ -83,6 +87,38 @@ namespace bob { namespace trainer {
       MLPRPropTrainer(size_t batch_size, 
           boost::shared_ptr<bob::trainer::Cost> cost,
           const bob::machine::MLP& machine);
+
+      /**
+       * @brief Initializes a new MLPRPropTrainer trainer according to a
+       * given machine settings and a training batch size.
+       *
+       * @param batch_size The number of examples passed at each iteration.
+       * This should be a big number (tens of samples) - Resilient
+       * Back-propagation is a <b>batch</b> algorithm, it requires large sample
+       * sizes
+       *
+       * @param cost This is the cost function to use for the current training.
+       *
+       * @param machine Clone this machine weights and prepare the trainer
+       * internally mirroring machine properties.
+       *
+       * @note Good values for batch sizes are tens of samples. BackProp is not
+       * necessarily a "batch" training algorithm, but performs in a smoother
+       * if the batch size is larger. This may also affect the convergence.
+       *
+       * @param train_biases A boolean, indicating if we need to train the
+       * biases or not.
+       *
+       * You can also change default values for the learning rate and momentum.
+       * By default we train w/o any momenta.
+       *
+       * If you want to adjust a potential learning rate decay, you can and
+       * should do it outside the scope of this trainer, in your own way.
+       */
+      MLPRPropTrainer(size_t batch_size, 
+          boost::shared_ptr<bob::trainer::Cost> cost,
+          const bob::machine::MLP& machine,
+          bool train_biases);
 
       /**
        * @brief Destructor virtualisation
@@ -148,14 +184,68 @@ namespace bob { namespace trainer {
           const blitz::Array<double,2>& target);
 
       /**
-       * @brief Returns the deltas
+       * Accessors for algorithm parameters
        */
-      const std::vector<blitz::Array<double,2> >& getDeltas() const { return m_prev_deriv; }
+
+      /**
+       * @brief Gets the de-enforcement parameter (default is 0.5)
+       */
+      double getEtaMinus() const { return m_eta_minus; }
+
+      /**
+       * @brief Sets the de-enforcement parameter (default is 0.5)
+       */
+      void setEtaMinus(double v) { m_eta_minus = v;    }
+
+      /**
+       * @brief Gets the enforcement parameter (default is 1.2)
+       */
+      double getEtaPlus() const { return m_eta_plus; }
+
+      /**
+       * @brief Sets the enforcement parameter (default is 1.2)
+       */
+      void setEtaPlus(double v) { m_eta_plus = v;    }
+      
+      /**
+       * @brief Gets the initial weight update (default is 0.1)
+       */
+      double getDeltaZero() const { return m_delta_zero; }
+      
+      /**
+       * @brief Sets the initial weight update (default is 0.1)
+       */
+      void setDeltaZero(double v) { m_delta_zero = v;    }
+
+      /**
+       * @brief Gets the minimal weight update (default is 1e-6)
+       */
+      double getDeltaMin() const { return m_delta_min; }
+      
+      /**
+       * @brief Sets the minimal weight update (default is 1e-6)
+       */
+      void setDeltaMin(double v) { m_delta_min = v;    }
+
+      /**
+       * @brief Gets the maximal weight update (default is 50.0)
+       */
+      double getDeltaMax() const { return m_delta_max; }
+
+      /**
+       * @brief Sets the maximal weight update (default is 50.0)
+       */
+      void setDeltaMax(double v) { m_delta_max = v;    }
 
       /**
        * @brief Returns the deltas
        */
-      const std::vector<blitz::Array<double,1> >& getBiasDeltas() const { return m_prev_deriv_bias; }
+      const std::vector<blitz::Array<double,2> >& getDeltas() const { return m_delta; }
+
+      /**
+       * @brief Returns the deltas
+       */
+      const std::vector<blitz::Array<double,1> >& getBiasDeltas() const { return m_delta_bias; }
 
       /**
        * @brief Sets the deltas
@@ -224,6 +314,12 @@ namespace bob { namespace trainer {
        */
       void rprop_weight_update(bob::machine::MLP& machine,
         const blitz::Array<double,2>& input);
+
+      double m_eta_minus; ///< de-enforcement parameter (0.5)
+      double m_eta_plus;  ///< enforcement parameter (1.2)
+      double m_delta_zero;///< initial value for the weight change (0.1)
+      double m_delta_min; ///< minimum value for the weight change (1e-6)
+      double m_delta_max; ///< maximum value for the weight change (50.0)
 
       std::vector<blitz::Array<double,2> > m_delta; ///< R-prop weights deltas
       std::vector<blitz::Array<double,1> > m_delta_bias; ///< R-prop biases deltas

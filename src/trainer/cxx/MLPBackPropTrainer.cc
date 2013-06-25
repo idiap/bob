@@ -47,17 +47,7 @@ bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(size_t batch_size,
   m_prev_deriv(numberOfHiddenLayers() + 1),
   m_prev_deriv_bias(numberOfHiddenLayers() + 1)
 {
-  const std::vector<blitz::Array<double,2> >& machine_weight =
-    machine.getWeights();
-  const std::vector<blitz::Array<double,1> >& machine_bias =
-    machine.getBiases();
-
-  for (size_t k=0; k<(numberOfHiddenLayers() + 1); ++k) {
-    m_prev_deriv[k].reference(blitz::Array<double,2>(machine_weight[k].shape()));
-    m_prev_deriv_bias[k].reference(blitz::Array<double,1>(machine_bias[k].shape()));
-  }
-
-  reset();
+  initialize(machine);
 }
 
 bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(size_t batch_size, 
@@ -69,17 +59,7 @@ bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(size_t batch_size,
   m_prev_deriv(numberOfHiddenLayers() + 1),
   m_prev_deriv_bias(numberOfHiddenLayers() + 1)
 {
-  const std::vector<blitz::Array<double,2> >& machine_weight =
-    machine.getWeights();
-  const std::vector<blitz::Array<double,1> >& machine_bias =
-    machine.getBiases();
-
-  for (size_t k=0; k<(numberOfHiddenLayers() + 1); ++k) {
-    m_prev_deriv[k].reference(blitz::Array<double,2>(machine_weight[k].shape()));
-    m_prev_deriv_bias[k].reference(blitz::Array<double,1>(machine_bias[k].shape()));
-  }
-
-  reset();
+  initialize(machine);
 }
 
 bob::trainer::MLPBackPropTrainer::~MLPBackPropTrainer() { }

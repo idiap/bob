@@ -20,9 +20,6 @@
 """Tests for BackProp MLP training.
 """
 
-import os, sys
-import math
-import unittest
 import numpy
 
 from .. import MLPBaseTrainer, MLPBackPropTrainer, CrossEntropyLoss, SquareError

@@ -42,7 +42,6 @@ bob::trainer::MLPBaseTrainer::MLPBaseTrainer(size_t batch_size,
   m_deriv_bias[0].reference(blitz::Array<double,1>(0));
   m_error[0].reference(blitz::Array<double,2>(0,0));
   m_output[0].reference(blitz::Array<double,2>(0,0));
-
   reset();
 }
 
@@ -58,19 +57,7 @@ bob::trainer::MLPBaseTrainer::MLPBaseTrainer(size_t batch_size,
   m_error(m_H + 1),
   m_output(m_H + 1)
 {
-  const std::vector<blitz::Array<double,2> >& machine_weight =
-    machine.getWeights();
-  const std::vector<blitz::Array<double,1> >& machine_bias =
-    machine.getBiases();
-
-  for (size_t k=0; k<(m_H + 1); ++k) {
-    m_deriv[k].reference(blitz::Array<double,2>(machine_weight[k].shape()));
-    m_deriv_bias[k].reference(blitz::Array<double,1>(machine_bias[k].shape()));
-  }
-
-  reset();
-
-  setBatchSize(batch_size);
+  initialize(machine);
 }
 
 bob::trainer::MLPBaseTrainer::MLPBaseTrainer(size_t batch_size, 
@@ -86,19 +73,7 @@ bob::trainer::MLPBaseTrainer::MLPBaseTrainer(size_t batch_size,
   m_error(m_H + 1),
   m_output(m_H + 1)
 {
-  const std::vector<blitz::Array<double,2> >& machine_weight =
-    machine.getWeights();
-  const std::vector<blitz::Array<double,1> >& machine_bias =
-    machine.getBiases();
-
-  for (size_t k=0; k<(m_H + 1); ++k) {
-    m_deriv[k].reference(blitz::Array<double,2>(machine_weight[k].shape()));
-    m_deriv_bias[k].reference(blitz::Array<double,1>(machine_bias[k].shape()));
-  }
-
-  reset();
-
-  setBatchSize(batch_size);
+  initialize(machine);
 }
 
 bob::trainer::MLPBaseTrainer::~MLPBaseTrainer() { }
@@ -140,12 +115,10 @@ void bob::trainer::MLPBaseTrainer::setBatchSize (size_t batch_size) {
    
   for (size_t k=0; k<m_output.size(); ++k) {
     m_output[k].resize(batch_size, m_deriv[k].extent(1));
-    m_output[k] = 0.;
   }
 
   for (size_t k=0; k<m_error.size(); ++k) {
     m_error[k].resize(batch_size, m_deriv[k].extent(1));
-    m_error[k] = 0.;
   }
 }
 

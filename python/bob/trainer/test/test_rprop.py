@@ -20,400 +20,227 @@
 """Tests for RProp MLP training.
 """
 
-import os, sys
-import unittest
-import bob
 import numpy
 
-epsilon=1e-10 # Epsilon value tolerance when checking correctness
+from .. import MLPBaseTrainer, MLPRPropTrainer, CrossEntropyLoss, SquareError
+from ...machine import HyperbolicTangentActivation, LogisticActivation, IdentityActivation, MLP
 
-class PythonRProp:
-  """A simplified (and slower) version of RProp training written in python.
-  
-  This version of the code is probably easier to understand than the C++
-  version. Both algorithms should, essentially, be the same, except for the
-  performance for obvious reasons.
+def sign(x):
+  """A handy sign function"""
+  if (x == 0): return 0
+  if (x < 0) : return -1
+  return +1
+
+class PythonRProp(MLPBaseTrainer):
+  """A simple version of the R-Prop algorithm written in Python
   """
 
-  def __init__(self, train_biases=True):
-    # Our state
-    self.DW = None #delta matrixes for weights
-    self.DB = None #delta matrixes for biases
-    self.PDW = None #partial derivatives for weights
-    self.PDB = None #partial derivatives for biases
-    self.PPDW = None #previous partial derivatives for weights
-    self.PPDB = None #previous partial derivatives for biases
-    self.train_biases = train_biases
+  def __init__(self, batch_size, cost, machine, train_biases):
+    
+    super(PythonRProp, self).__init__(batch_size, cost, machine, train_biases)
 
-  def reset(self):
-    """Resets our internal state"""
+    # some constants for RProp
+    self.DELTA0 = 0.1
+    self.DELTA_MIN = 1e-6
+    self.DELTA_MAX = 50
+    self.ETA_MINUS = 0.5
+    self.ETA_PLUS = 1.2
 
-    self.DW = None #delta matrixes for weights
-    self.DB = None #delta matrixes for biases
-    self.PDW = None #partial derivatives for weights
-    self.PDB = None #partial derivatives for biases
-    self.PPDW = None #previous partial derivatives for weights
-    self.PPDB = None #previous partial derivatives for biases
+    # initial derivatives
+    self.previous_derivatives = [numpy.zeros(k.shape, dtype=float) for k in machine.weights]
+    self.previous_bias_derivatives = [numpy.zeros(k.shape, dtype=float) for k in machine.biases]
+
+    # initial deltas
+    self.deltas = [self.DELTA0*numpy.ones(k.shape, dtype=float) for k in machine.weights]
+    self.bias_deltas = [self.DELTA0*numpy.ones(k.shape, dtype=float) for k in machine.biases]
 
   def train(self, machine, input, target):
 
-    def sign(x):
-      """A handy sign function"""
-      if (x == 0): return 0
-      if (x < 0) : return -1
-      return +1
-
-    def logistic(x):
-      return 1 / (1 + numpy.exp(-x))
-
-    def logistic_bwd(x):
-      return x * (1-x)
-
-    def tanh(x):
-      return numpy.tanh(x)
-
-    def tanh_bwd(x):
-      return (1 - x**2)
-
-    def linear(x):
-      return x
-
-    def linear_bwd(x):
-      return 1
-    
-    # some constants for RProp
-    DELTA0 = 0.1
-    DELTA_MIN = 1e-6
-    DELTA_MAX = 50
-    ETA_MINUS = 0.5
-    ETA_PLUS = 1.2
-
-    W = machine.weights #weights
-    B = machine.biases #biases
-
-    if machine.hidden_activation == bob.machine.HyperbolicTangentActivation():
-      forward = tanh
-      backward = tanh_bwd
-    elif machine.hidden_activation == bob.machine.LogisticActivation():
-      forward = logistic
-      backward = logistic_bwd
-    elif machine.hidden_activation == bob.machine.IdentityActivation():
-      forward = linear
-      backward = linear_bwd
-    else:
-      raise RuntimeError, "Cannot deal with activation %s" % machine.activation
-
-    if machine.output_activation == bob.machine.HyperbolicTangentActivation():
-      output_forward = tanh
-      output_backward = tanh_bwd
-    elif machine.output_activation == bob.machine.LogisticActivation():
-      output_forward = logistic
-      output_backward = logistic_bwd
-    elif machine.output_activation == bob.machine.IdentityActivation():
-      output_forward = linear
-      output_backward = linear_bwd
-    else:
-      raise RuntimeError, "Cannot deal with activation %s" % machine.output_activation
-    
-    #simulated bias input...
-    BI = [numpy.zeros((input.shape[0],), 'float64') for k in B]
-    for k in BI: k.fill(1)
-
-    #state
-    if self.DW is None: #first run or just after a reset()
-      self.DW = [numpy.empty_like(k) for k in W]
-      for k in self.DW: k.fill(DELTA0)
-      self.DB = [numpy.empty_like(k) for k in B]
-      for k in self.DB: k.fill(DELTA0)
-      self.PPDW = [numpy.empty_like(k) for k in W]
-      for k in self.PPDW: k.fill(0)
-      self.PPDB = [numpy.empty_like(k) for k in B]
-      for k in self.PPDB: k.fill(0)
-
-    # Instantiate partial outputs and errors
-    O = [None for k in B]
-    O.insert(0, input) # an extra slot for the input
-    E = [None for k in B]
-
-    # Feeds forward
-    for k in range(len(W)):
-      O[k+1] = numpy.dot(O[k], W[k])
-      for sample in range(O[k+1].shape[0]):
-        O[k+1][sample,:] += B[k]
-      if (k == len(W) - 1): O[k+1] = output_forward(O[k+1])
-      else: O[k+1] = forward(O[k+1])
-
-    # Feeds backward
-    E[-1] = output_backward(O[-1]) * (O[-1] - target) #last layer
-    for k in reversed(range(len(W)-1)): #for all remaining layers
-      E[k] = backward(O[k+1]) * numpy.dot(E[k+1], W[k+1].transpose(1,0))
-
-    # Calculates partial derivatives, accumulate
-    self.PDW = [numpy.dot(O[k].transpose(1,0), E[k]) for k in range(len(W))]
-    self.PDB = [numpy.dot(BI[k], E[k]) for k in range(len(W))]
+    # Run dataset through
+    prev_cost = self.cost(machine, input, target)
+    self.backward_step(machine, input, target)
 
     # Updates weights and biases
-    WUP = [i * j for (i,j) in zip(self.PPDW, self.PDW)]
-    BUP = [i * j for (i,j) in zip(self.PPDB, self.PDB)]
+    weight_updates = [i * j for (i,j) in zip(self.previous_derivatives, self.derivatives)]
 
     # Iterate over each weight and bias and see what to do:
-    for k, up in enumerate(WUP):
+    new_weights = machine.weights
+    for k, up in enumerate(weight_updates):
       for i in range(up.shape[0]):
         for j in range(up.shape[1]):
           if up[i,j] > 0:
-            self.DW[k][i,j] = min(self.DW[k][i,j]*ETA_PLUS, DELTA_MAX)
-            W[k][i,j] -= sign(self.PDW[k][i,j]) * self.DW[k][i,j]
-            self.PPDW[k][i,j] = self.PDW[k][i,j]
+            self.deltas[k][i,j] = min(self.deltas[k][i,j]*ETA_PLUS, DELTA_MAX)
+            new_weights[k][i,j] -= sign(self.derivatives[k][i,j]) * self.deltas[k][i,j]
+            self.previous_derivatives[k][i,j] = self.derivatives[k][i,j]
           elif up[i,j] < 0:
-            self.DW[k][i,j] = max(self.DW[k][i,j]*ETA_MINUS, DELTA_MIN)
-            self.PPDW[k][i,j] = 0
-          elif up[i,j] == 0:
-            W[k][i,j] -= sign(self.PDW[k][i,j]) * self.DW[k][i,j]
-            self.PPDW[k][i,j] = self.PDW[k][i,j]
-    machine.weights = W
+            self.deltas[k][i,j] = max(self.deltas[k][i,j]*ETA_MINUS, DELTA_MIN)
+            new_weights[k][i,j] -= self.deltas[k][i,j]
+            self.previous_derivatives[k][i,j] = 0
+          else:
+            new_weights[k][i,j] -= sign(self.derivatives[k][i,j]) * self.deltas[k][i,j]
+            self.previous_derivatives[k][i,j] = self.derivatives[k][i,j]
+    machine.weights = new_weights
 
     if self.train_biases:
-      for k, up in enumerate(BUP):
+      bias_updates = [i * j for (i,j) in zip(self.previous_bias_derivatives, self.bias_derivatives)]
+      new_biases = machine.biases
+      for k, up in enumerate(bias_updates):
         for i in range(up.shape[0]):
           if up[i] > 0:
-            self.DB[k][i] = min(self.DB[k][i]*ETA_PLUS, DELTA_MAX)
-            B[k][i] -= sign(self.PDB[k][i]) * self.DB[k][i]
-            self.PPDB[k][i] = self.PDB[k][i]
+            self.bias_deltas[k][i] = min(self.bias_deltas[k][i]*ETA_PLUS, DELTA_MAX)
+            new_biases[k][i] -= sign(self.bias_derivatives[k][i]) * self.bias_deltas[k][i]
+            self.previous_bias_derivatives[k][i] = self.bias_derivatives[k][i]
           elif up[i] < 0:
-            self.DB[k][i] = max(self.DB[k][i]*ETA_MINUS, DELTA_MIN)
-            self.PPDB[k][i] = 0
-          elif up[i] == 0:
-            B[k][i] -= sign(self.PDB[k][i]) * self.DB[k][i]
-            self.PPDB[k][i] = self.PDB[k][i]
-      machine.biases = B
+            self.bias_deltas[k][i] = max(self.bias_deltas[k][i]*ETA_MINUS, DELTA_MIN)
+            new_biases[k][i] -= self.bias_deltas[k][i]
+            self.previous_bias_derivatives[k][i] = 0
+          else:
+            new_biases[k][i] -= sign(self.bias_derivatives[k][i]) * self.bias_deltas[k][i]
+            self.previous_bias_derivatives[k][i] = self.bias_derivatives[k][i]
+      machine.biases = new_biases
 
     else:
       machine.biases = 0
 
-class RPropTest(unittest.TestCase):
-  """Performs various RProp MLP training tests."""
+    return prev_cost, self.cost(machine, input, target)
 
-  def test01_Initialization(self):
+def check_training(machine, cost, bias_training, batch_size):
 
-    # Initializes an MLPRPropTrainer and checks all seems consistent
-    # with the proposed API.
-    machine = bob.machine.MLP((4, 1))
-    machine.hidden_activation = bob.machine.IdentityActivation()
-    machine.output_activation = bob.machine.IdentityActivation()
-    B = 10
-    trainer = bob.trainer.MLPRPropTrainer(B, bob.trainer.SquareError(machine.output_activation), machine)
-    self.assertEqual( trainer.batch_size, B )
-    self.assertTrue ( trainer.is_compatible(machine) )
-    self.assertTrue ( trainer.train_biases )
+  python_machine = MLP(machine)
+  
+  X = numpy.random.rand(batch_size, machine.weights[0].shape[0])
+  T = numpy.zeros((batch_size, machine.weights[-1].shape[1]))
 
-    machine = bob.machine.MLP((7, 2))
-    self.assertFalse ( trainer.is_compatible(machine) )
+  python_trainer = PythonRProp(batch_size, cost, machine, bias_training)
+  cxx_trainer = MLPRPropTrainer(batch_size, cost, machine, bias_training)
 
-    trainer.train_biases = False
-    self.assertFalse ( trainer.train_biases )
+  # checks previous state matches
+  for k,D in enumerate(cxx_trainer.deltas):
+    assert numpy.allclose(D, python_trainer.deltas[k])
+  for k,D in enumerate(cxx_trainer.bias_deltas):
+    assert numpy.allclose(D, python_trainer.bias_deltas[k])
+  for k,D in enumerate(cxx_trainer.previous_derivatives):
+    assert numpy.allclose(D, python_trainer.previous_derivatives[k])
+  for k,D in enumerate(cxx_trainer.previous_bias_derivatives):
+    assert numpy.allclose(D, python_trainer.previous_bias_derivatives[k])
+  for k,W in enumerate(machine.weights):
+    assert numpy.allclose(W, python_machine.weights[k])
+  for k,B in enumerate(machine.biases):
+    assert numpy.allclose(B, python_machine.biases[k])
+  assert numpy.alltrue(machine.input_subtract == python_machine.input_subtract)
+  assert numpy.alltrue(machine.input_divide == python_machine.input_divide)
 
-  def test02_SingleLayerNoBiasControlled(self):
+  prev_cost, cost = python_trainer.train(python_machine, X, T)
+  #assert cost <= prev_cost #not true for R-Prop
+  cxx_trainer.train(machine, X, T)
 
-    # Trains a simple network with one single step, verifies
-    # the training works as expected by calculating the same
-    # as the trainer should do using python.
-    machine = bob.machine.MLP((4, 1))
-    machine.hidden_activation = bob.machine.IdentityActivation()
-    machine.output_activation = bob.machine.IdentityActivation()
-    machine.biases = 0
-    w0 = numpy.array([[.1],[.2],[-.1],[-.05]])
-    machine.weights = [w0]
-    trainer = bob.trainer.MLPRPropTrainer(1, bob.trainer.SquareError(machine.output_activation), machine)
-    trainer.train_biases = False
-    d0 = numpy.array([[1., 2., 0., 2.]])
-    t0 = numpy.array([[1.]])
+  # checks each component of machine and trainer, make sure they match
+  for k,D in enumerate(cxx_trainer.deltas):
+    assert numpy.allclose(D, python_trainer.deltas[k])
+  for k,D in enumerate(cxx_trainer.bias_deltas):
+    assert numpy.allclose(D, python_trainer.bias_deltas[k])
+  for k,D in enumerate(cxx_trainer.derivatives):
+    assert numpy.allclose(D, python_trainer.derivatives[k])
+  for k,D in enumerate(cxx_trainer.bias_derivatives):
+    assert numpy.allclose(D, python_trainer.bias_derivatives[k])
+  for k,W in enumerate(machine.weights):
+    assert numpy.allclose(W, python_machine.weights[k])
+  for k,B in enumerate(machine.biases):
+    assert numpy.allclose(B, python_machine.biases[k])
+  assert numpy.alltrue(machine.input_subtract == python_machine.input_subtract)
+  assert numpy.alltrue(machine.input_divide == python_machine.input_divide)
 
-    # trains in python first
-    pytrainer = PythonRProp(train_biases=trainer.train_biases)
-    pymachine = bob.machine.MLP(machine) #a copy
-    pytrainer.train(pymachine, d0, t0)
+def test_2in_1out_nobias():
+  
+  machine = MLP((2, 1))
+  machine.randomize()
+  machine.hidden_activation = LogisticActivation()
+  machine.output_activation = LogisticActivation()
+  machine.biases = 0
 
-    # trains with our C++ implementation
-    trainer.train_(machine, d0, t0)
-    self.assertTrue( numpy.allclose(pymachine.weights[0], machine.weights[0], epsilon) )
+  BATCH_SIZE = 10
+  cost = CrossEntropyLoss(machine.output_activation)
 
-    # a second passage
-    d0 = numpy.array([[4., 0., -3., 1.]])
-    t0 = numpy.array([[2.]])
-    pytrainer.train(pymachine, d0, t0)
-    trainer.train_(machine, d0, t0)
-    self.assertTrue( numpy.allclose(pymachine.weights[0], machine.weights[0], epsilon) )
+  for k in range(10):
+    check_training(machine, cost, False, BATCH_SIZE)
 
-    # a third passage
-    d0 = numpy.array([[-0.5, -9.0, 2.0, 1.1]])
-    t0 = numpy.array([[3.]])
-    pytrainer.train(pymachine, d0, t0)
-    trainer.train_(machine, d0, t0)
-    self.assertTrue( numpy.allclose(pymachine.weights[0], machine.weights[0], epsilon) )
+def test_1in_2out_nobias():
 
-  def test03_FisherNoBias(self):
-    
-    # Trains single layer MLP to discriminate the iris plants from
-    # Fisher's paper. Checks we get a performance close to the one on
-    # that paper.
+  machine = MLP((1, 2))
+  machine.randomize()
+  machine.hidden_activation = LogisticActivation()
+  machine.output_activation = LogisticActivation()
+  machine.biases = 0
 
-    N = 60
+  BATCH_SIZE = 10
+  cost = CrossEntropyLoss(machine.output_activation)
 
-    machine = bob.machine.MLP((4, 1))
-    machine.hidden_activation = bob.machine.IdentityActivation()
-    machine.output_activation = bob.machine.IdentityActivation()
-    machine.randomize()
-    machine.biases = 0
-    trainer = bob.trainer.MLPRPropTrainer(N, bob.trainer.SquareError(machine.output_activation))
-    trainer.train_biases = False
-    trainer.initialize(machine)
+  for k in range(10):
+    check_training(machine, cost, False, BATCH_SIZE)
 
-    # A helper to select and shuffle the data
-    targets = [ #we choose the approximate Fisher response!
-        numpy.array([-2.0]), #setosa
-        numpy.array([1.5]), #versicolor
-        numpy.array([0.5]), #virginica
-        ]
-    # Associate the data to targets, by setting the arrayset order explicetly
-    data = bob.db.iris.data()
-    datalist = [data['setosa'], data['versicolor'], data['virginica']]
+def test_2in_3_1out_nobias():
 
-    S = bob.trainer.DataShuffler(datalist, targets)
+  machine = MLP((2, 3, 1))
+  machine.randomize()
+  machine.hidden_activation = HyperbolicTangentActivation()
+  machine.output_activation = HyperbolicTangentActivation()
+  machine.biases = 0
 
-    # trains in python first
-    pytrainer = PythonRProp(train_biases=trainer.train_biases)
-    pymachine = bob.machine.MLP(machine) #a copy
+  BATCH_SIZE = 10
+  cost = SquareError(machine.output_activation)
 
-    # We now iterate for several steps, look for the convergence
-    for k in range(100):
-      input, target = S(N)
-      pytrainer.train(pymachine, input, target)
-      trainer.train_(machine, input, target)
-      #print "[Python] MSE:", bob.measure.mse(pymachine(input), target).sqrt()
-      #print "[C++] MSE:", bob.measure.mse(machine(input), target).sqrt()
-      self.assertTrue( numpy.allclose(pymachine.weights[0], machine.weights[0], epsilon) )
+  for k in range(10):
+    check_training(machine, cost, False, BATCH_SIZE)
 
-  def test04_Fisher(self):
-    
-    # Trains single layer MLP to discriminate the iris plants from
-    # Fisher's paper. Checks we get a performance close to the one on
-    # that paper.
+def test_100in_10_10_5out_nobias():
 
-    N = 60
+  machine = MLP((100, 10, 10, 5))
+  machine.randomize()
+  machine.hidden_activation = HyperbolicTangentActivation()
+  machine.output_activation = HyperbolicTangentActivation()
+  machine.biases = 0
 
-    machine = bob.machine.MLP((4, 1))
-    machine.hidden_activation = bob.machine.IdentityActivation()
-    machine.output_activation = bob.machine.IdentityActivation()
-    machine.randomize()
-    trainer = bob.trainer.MLPRPropTrainer(N, bob.trainer.SquareError(machine.output_activation), machine)
-    trainer.train_biases = True
+  BATCH_SIZE = 10
+  cost = SquareError(machine.output_activation)
 
-    # A helper to select and shuffle the data
-    targets = [ #we choose the approximate Fisher response!
-        numpy.array([-2.0]), #setosa
-        numpy.array([1.5]), #versicolor
-        numpy.array([0.5]), #virginica
-        ]
-    # Associate the data to targets, by setting the arrayset order explicetly
-    data = bob.db.iris.data()
-    datalist = [data['setosa'], data['versicolor'], data['virginica']]
+  for k in range(10):
+    check_training(machine, cost, False, BATCH_SIZE)
 
-    S = bob.trainer.DataShuffler(datalist, targets)
+def test_2in_3_1out():
 
-    # trains in python first
-    pytrainer = PythonRProp(train_biases=trainer.train_biases)
-    pymachine = bob.machine.MLP(machine) #a copy
+  machine = MLP((2, 3, 1))
+  machine.randomize()
+  machine.hidden_activation = HyperbolicTangentActivation()
+  machine.output_activation = HyperbolicTangentActivation()
 
-    # We now iterate for several steps, look for the convergence
-    for k in range(100):
-      input, target = S(N)
-      pytrainer.train(pymachine, input, target)
-      trainer.train_(machine, input, target)
-      #print "[Python] MSE:", bob.measure.mse(pymachine(input), target).sqrt()
-      #print "[C++] MSE:", bob.measure.mse(machine(input), target).sqrt()
-      self.assertTrue( numpy.allclose(pymachine.weights[0], machine.weights[0], epsilon) )
-      self.assertTrue( numpy.allclose(pymachine.biases[0], machine.biases[0], epsilon) )
+  BATCH_SIZE = 10
+  cost = SquareError(machine.output_activation)
 
-  def test05_FisherWithOneHiddenLayer(self):
+  for k in range(10):
+    check_training(machine, cost, True, BATCH_SIZE)
 
-    # Trains a multilayer biased MLP to perform discrimination on the Fisher
-    # data set.
+def test_20in_10_5_3out():
 
-    N = 50
+  machine = MLP((20, 10, 5, 3))
+  machine.randomize()
+  machine.hidden_activation = HyperbolicTangentActivation()
+  machine.output_activation = HyperbolicTangentActivation()
 
-    machine = bob.machine.MLP((4, 4, 3))
-    machine.hidden_activation = bob.machine.HyperbolicTangentActivation()
-    machine.output_activation = bob.machine.HyperbolicTangentActivation()
-    machine.randomize()
-    trainer = bob.trainer.MLPRPropTrainer(N, bob.trainer.SquareError(machine.output_activation), machine)
-    trainer.train_biases = True
+  BATCH_SIZE = 10
+  cost = SquareError(machine.output_activation)
 
-    # A helper to select and shuffle the data
-    targets = [ #we choose the approximate Fisher response!
-        numpy.array([+1., -1., -1.]), #setosa
-        numpy.array([-1., +1., -1.]), #versicolor
-        numpy.array([-1., -1., +1.]), #virginica
-        ]
-    # Associate the data to targets, by setting the arrayset order explicetly
-    data = bob.db.iris.data()
-    datalist = [data['setosa'], data['versicolor'], data['virginica']]
+  for k in range(10):
+    check_training(machine, cost, True, BATCH_SIZE)
 
-    S = bob.trainer.DataShuffler(datalist, targets)
+def test_20in_10_5_3out_with_momentum():
 
-    # trains in python first
-    pytrainer = PythonRProp(train_biases=trainer.train_biases)
-    pymachine = bob.machine.MLP(machine) #a copy
+  machine = MLP((20, 10, 5, 3))
+  machine.randomize()
+  machine.hidden_activation = HyperbolicTangentActivation()
+  machine.output_activation = HyperbolicTangentActivation()
 
-    # We now iterate for several steps, look for the convergence
-    for k in range(50):
-      input, target = S(N)
-      pytrainer.train(pymachine, input, target)
-      trainer.train_(machine, input, target)
-      #print "[Python] |RMSE|:", numpy.linalg.norm(bob.measure.rmse(pymachine(input), target))
-      #print "[C++] |RMSE|:", numpy.linalg.norm(bob.measure.rmse(machine(input), target))
-      for i, w in enumerate(pymachine.weights):
-        self.assertTrue( numpy.allclose(w, machine.weights[i], epsilon) )
-      for i, b in enumerate(pymachine.biases):
-        self.assertTrue( numpy.allclose(b, machine.biases[i], epsilon) )
+  BATCH_SIZE = 10
+  cost = SquareError(machine.output_activation)
 
-  def test06_FisherMultiLayer(self):
-
-    # Trains a multilayer biased MLP to perform discrimination on the Fisher
-    # data set.
-
-    N = 50
-
-    machine = bob.machine.MLP((4, 3, 3, 1))
-    machine.hidden_activation = bob.machine.HyperbolicTangentActivation()
-    machine.output_activation = bob.machine.HyperbolicTangentActivation()
-    machine.randomize()
-    trainer = bob.trainer.MLPRPropTrainer(N, bob.trainer.SquareError(machine.output_activation), machine)
-    trainer.train_biases = True
-
-    # A helper to select and shuffle the data
-    targets = [ #we choose the approximate Fisher response!
-        numpy.array([-1.0]), #setosa
-        numpy.array([0.5]), #versicolor
-        numpy.array([+1.0]), #virginica
-        ]
-    # Associate the data to targets, by setting the arrayset order explicetly
-    data = bob.db.iris.data()
-    datalist = [data['setosa'], data['versicolor'], data['virginica']]
-
-    S = bob.trainer.DataShuffler(datalist, targets)
-
-    # trains in python first
-    pytrainer = PythonRProp(train_biases=trainer.train_biases)
-    pymachine = bob.machine.MLP(machine) #a copy
-
-    # We now iterate for several steps, look for the convergence
-    for k in range(50):
-      input, target = S(N)
-      pytrainer.train(pymachine, input, target)
-      trainer.train_(machine, input, target)
-      #print "[Python] MSE:", bob.measure.mse(pymachine(input), target).sqrt()
-      #print "[C++] MSE:", bob.measure.mse(machine(input), target).sqrt()
-      for i, w in enumerate(pymachine.weights):
-        self.assertTrue( numpy.allclose(w, machine.weights[i], epsilon) )
-      for i, b in enumerate(pymachine.biases):
-        self.assertTrue( numpy.allclose(b, machine.biases[i], epsilon) )
+  for k in range(10):
+    check_training(machine, cost, True, BATCH_SIZE)

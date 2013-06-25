@@ -31,18 +31,16 @@
 bob::trainer::MLPRPropTrainer::MLPRPropTrainer(size_t batch_size,
     boost::shared_ptr<bob::trainer::Cost> cost):
   bob::trainer::MLPBaseTrainer(batch_size, cost),
+  m_eta_minus(0.5),
+  m_eta_plus(1.2),
+  m_delta_zero(0.1),
+  m_delta_min(1e-6),
+  m_delta_max(50.0),
   m_delta(numberOfHiddenLayers() + 1),
   m_delta_bias(numberOfHiddenLayers() + 1),
   m_prev_deriv(numberOfHiddenLayers() + 1),
   m_prev_deriv_bias(numberOfHiddenLayers() + 1)
 {
-  for (size_t k=0; k<(numberOfHiddenLayers() + 1); ++k) {
-    m_delta[k].reference(blitz::Array<double,2>(0,0));
-    m_delta_bias[k].reference(blitz::Array<double,1>(0));
-    m_prev_deriv[k].reference(blitz::Array<double,2>(0,0));
-    m_prev_deriv_bias[k].reference(blitz::Array<double,1>(0));
-  }
-
   reset();
 }
 
@@ -51,30 +49,46 @@ bob::trainer::MLPRPropTrainer::MLPRPropTrainer(size_t batch_size,
     boost::shared_ptr<bob::trainer::Cost> cost,
     const bob::machine::MLP& machine):
   bob::trainer::MLPBaseTrainer(batch_size, cost, machine),
+  m_eta_minus(0.5),
+  m_eta_plus(1.2),
+  m_delta_zero(0.1),
+  m_delta_min(1e-6),
+  m_delta_max(50.0),
   m_delta(numberOfHiddenLayers() + 1),
   m_delta_bias(numberOfHiddenLayers() + 1),
   m_prev_deriv(numberOfHiddenLayers() + 1),
   m_prev_deriv_bias(numberOfHiddenLayers() + 1)
 {
-  const std::vector<blitz::Array<double,2> >& machine_weight =
-    machine.getWeights();
-  const std::vector<blitz::Array<double,1> >& machine_bias =
-    machine.getBiases();
+  initialize(machine);
+}
 
-  for (size_t k=0; k<(numberOfHiddenLayers() + 1); ++k) {
-    m_delta[k].reference(blitz::Array<double,2>(machine_weight[k].shape()));
-    m_delta_bias[k].reference(blitz::Array<double,1>(machine_bias[k].shape()));
-    m_prev_deriv[k].reference(blitz::Array<double,2>(machine_weight[k].shape()));
-    m_prev_deriv_bias[k].reference(blitz::Array<double,1>(machine_bias[k].shape()));
-  }
-
-  reset();
+bob::trainer::MLPRPropTrainer::MLPRPropTrainer(size_t batch_size, 
+    boost::shared_ptr<bob::trainer::Cost> cost,
+    const bob::machine::MLP& machine,
+    bool train_biases):
+  bob::trainer::MLPBaseTrainer(batch_size, cost, machine, train_biases),
+  m_eta_minus(0.5),
+  m_eta_plus(1.2),
+  m_delta_zero(0.1),
+  m_delta_min(1e-6),
+  m_delta_max(50.0),
+  m_delta(numberOfHiddenLayers() + 1),
+  m_delta_bias(numberOfHiddenLayers() + 1),
+  m_prev_deriv(numberOfHiddenLayers() + 1),
+  m_prev_deriv_bias(numberOfHiddenLayers() + 1)
+{
+  initialize(machine);
 }
 
 bob::trainer::MLPRPropTrainer::~MLPRPropTrainer() { }
 
 bob::trainer::MLPRPropTrainer::MLPRPropTrainer(const MLPRPropTrainer& other):
   bob::trainer::MLPBaseTrainer(other),
+  m_eta_minus(other.m_eta_minus),
+  m_eta_plus(other.m_eta_plus),
+  m_delta_zero(other.m_delta_zero),
+  m_delta_min(other.m_delta_min),
+  m_delta_max(other.m_delta_max),
   m_delta(numberOfHiddenLayers() + 1),
   m_delta_bias(numberOfHiddenLayers() + 1),
   m_prev_deriv(numberOfHiddenLayers() + 1),
@@ -92,6 +106,12 @@ bob::trainer::MLPRPropTrainer& bob::trainer::MLPRPropTrainer::operator=
   {
     bob::trainer::MLPBaseTrainer::operator=(other);
 
+    m_eta_minus = other.m_eta_minus;
+    m_eta_plus = other.m_eta_plus;
+    m_delta_zero = other.m_delta_zero;
+    m_delta_min = other.m_delta_min;
+    m_delta_max = other.m_delta_max;
+
     bob::core::array::ccopy(other.m_delta, m_delta);
     bob::core::array::ccopy(other.m_delta_bias, m_delta_bias);
     bob::core::array::ccopy(other.m_prev_deriv, m_prev_deriv);
@@ -101,11 +121,9 @@ bob::trainer::MLPRPropTrainer& bob::trainer::MLPRPropTrainer::operator=
 }
 
 void bob::trainer::MLPRPropTrainer::reset() {
-  static const double DELTA0 = 0.1; ///< taken from the paper, section II.C
-
   for (size_t k=0; k<(numberOfHiddenLayers() + 1); ++k) {
-    m_delta[k] = DELTA0;
-    m_delta_bias[k] = DELTA0;
+    m_delta[k] = m_delta_zero;
+    m_delta_bias[k] = m_delta_zero;
     m_prev_deriv[k] = 0;
     m_prev_deriv_bias[k] = 0;
   }
@@ -123,12 +141,6 @@ static int8_t sign (double x) {
 void bob::trainer::MLPRPropTrainer::rprop_weight_update(bob::machine::MLP& machine,
   const blitz::Array<double,2>& input) 
 {
-  // constants taken from the paper.
-  static const double ETA_MINUS = 0.5;
-  static const double ETA_PLUS = 1.2;
-  static const double DELTA_MAX = 50.0;
-  static const double DELTA_MIN = 1e-6;
-
   std::vector<blitz::Array<double,2> >& machine_weight = machine.updateWeights();
   std::vector<blitz::Array<double,1> >& machine_bias = machine.updateBiases();
   const std::vector<blitz::Array<double,2> >& deriv = getDerivatives();
@@ -142,12 +154,12 @@ void bob::trainer::MLPRPropTrainer::rprop_weight_update(bob::machine::MLP& machi
         int8_t M = sign(deriv[k](i,j) * m_prev_deriv[k](i,j));
         // Implementations equations (4-6) on the RProp paper:
         if (M > 0) {
-          m_delta[k](i,j) = std::min(m_delta[k](i,j)*ETA_PLUS, DELTA_MAX); 
+          m_delta[k](i,j) = std::min(m_delta[k](i,j)*m_eta_plus, m_delta_max); 
           machine_weight[k](i,j) -= sign(deriv[k](i,j)) * m_delta[k](i,j); 
           m_prev_deriv[k](i,j) = deriv[k](i,j);
         }
         else if (M < 0) {
-          m_delta[k](i,j) = std::max(m_delta[k](i,j)*ETA_MINUS, DELTA_MIN);
+          m_delta[k](i,j) = std::max(m_delta[k](i,j)*m_eta_minus, m_delta_min);
           m_prev_deriv[k](i,j) = 0;
         }
         else { //M == 0
@@ -170,12 +182,12 @@ void bob::trainer::MLPRPropTrainer::rprop_weight_update(bob::machine::MLP& machi
       int8_t M = sign(deriv_bias[k](i) * m_prev_deriv_bias[k](i));
       // Implementations equations (4-6) on the RProp paper:
       if (M > 0) {
-        m_delta_bias[k](i) = std::min(m_delta_bias[k](i)*ETA_PLUS, DELTA_MAX); 
+        m_delta_bias[k](i) = std::min(m_delta_bias[k](i)*m_eta_plus, m_delta_max); 
         machine_bias[k](i) -= sign(deriv_bias[k](i)) * m_delta_bias[k](i); 
         m_prev_deriv_bias[k](i) = deriv_bias[k](i);
       }
       else if (M < 0) {
-        m_delta_bias[k](i) = std::max(m_delta_bias[k](i)*ETA_MINUS, DELTA_MIN);
+        m_delta_bias[k](i) = std::max(m_delta_bias[k](i)*m_eta_minus, m_delta_min);
         m_prev_deriv_bias[k](i) = 0;
       }
       else { //M == 0
