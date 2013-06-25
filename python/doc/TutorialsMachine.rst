@@ -22,17 +22,17 @@
  Machines
 **********
 
-Machines are one of the core components of |project|. 
-They represent statistical models or other functions defined by parameters that
-can be learnt or set by using :doc:`TutorialsTrainer`.
-Two examples of machines are multi-layer perceptrons (MLPs) and Gaussian mixture
-models (GMMs). The operation you normally expect
-from a machine is to be able to feed a feature vector and extract the machine
-response or output for that input vector. It works, in many ways, similarly to
-signal processing blocks. Different types of machines will give you a different
-type of output. In this tutorial we examine a few of the machines available in
-|project| and how to make use of them. Let's start with the simplest of the
-machines: a :py:class:`bob.machine.LinearMachine`.
+Machines are one of the core components of |project|. They represent
+statistical models or other functions defined by parameters that can be learnt
+or set by using :doc:`TutorialsTrainer`.  Two examples of machines are
+multi-layer perceptrons (MLPs) and Gaussian mixture models (GMMs). The
+operation you normally expect from a machine is to be able to feed a feature
+vector and extract the machine response or output for that input vector. It
+works, in many ways, similarly to signal processing blocks. Different types of
+machines will give you a different type of output. In this tutorial we examine
+a few of the machines available in |project| and how to make use of them. Let's
+start with the simplest of the machines: a
+:py:class:`bob.machine.LinearMachine`.
 
 .. testsetup:: *
 
@@ -140,19 +140,19 @@ so they can do something useful for you at :doc:`TutorialsTrainer`.
 Neural networks: multi-layer perceptrons (MLP)
 ==============================================
 
-A `multi-layer perceptron <http://en.wikipedia.org/wiki/Multilayer_perceptron>`_ (MLP)
-is a neural network architecture that has some well-defined characteristics
-such as a feed-forward structure. You can create a new MLP using one of the
-trainers described at :doc:`TutorialsTrainer`. In this tutorial, we show only
-how to use an MLP.  To instantiate a new (uninitialized)
-:py:class:`bob.machine.MLP` pass a shape descriptor as a :py:func:`tuple`. The
-shape parameter should contain the input size as the first parameter and the
-output size as the last parameter.  The parameters in between define the number
-of neurons in the hidden layers of the MLP. For example ``(3, 3, 1)`` defines
-an MLP with 3 inputs, 1 single hidden layer with 3 neurons and 1 output,
-whereas a shape like ``(10, 5, 3, 2)`` defines an MLP with 10 inputs, 5 neurons
-in the first hidden layer, 3 neurons in the second hidden layer and 2 outputs.
-Here is an example:
+A `multi-layer perceptron
+<http://en.wikipedia.org/wiki/Multilayer_perceptron>`_ (MLP) is a neural
+network architecture that has some well-defined characteristics such as a
+feed-forward structure. You can create a new MLP using one of the trainers
+described at :doc:`TutorialsTrainer`. In this tutorial, we show only how to use
+an MLP.  To instantiate a new (uninitialized) :py:class:`bob.machine.MLP` pass
+a shape descriptor as a :py:func:`tuple`. The shape parameter should contain
+the input size as the first parameter and the output size as the last
+parameter.  The parameters in between define the number of neurons in the
+hidden layers of the MLP. For example ``(3, 3, 1)`` defines an MLP with 3
+inputs, 1 single hidden layer with 3 neurons and 1 output, whereas a shape like
+``(10, 5, 3, 2)`` defines an MLP with 10 inputs, 5 neurons in the first hidden
+layer, 3 neurons in the second hidden layer and 2 outputs.  Here is an example:
 
 .. doctest::
 
@@ -196,15 +196,17 @@ At this point, a few things should be noted:
    to many (or many to 1). You can use the NumPy_ ``reshape()`` array method
    for this purpose as shown above
 2. Biases should **always** be 1D arrays.
-3. By default, MLPs use the `hyperbolic tangent <http://mathworld.wolfram.com/HyperbolicTangent.html>`_ as the activation function.
-   There are currently 2 other activation functions avialble in |project|:
+3. By default, MLPs use the :py:class:bob.machine.HyperbolicTangentActivation`
+   as activation function. There are currently 4 other activation functions
+   available in |project|:
 
-   * The identity function: :py:const:`bob.machine.Activation.LINEAR`
-   * The sigmoid function (also known as the `logistic function <http://mathworld.wolfram.com/SigmoidFunction.html>`_ function): :py:const:`bob.machine.Activation.SIGMOID` or 
-     :py:const:`bob.machine.Activation.LOG`.
+   * The identity function: :py:class:`bob.machine.IdentityActivation`;
+   * The sigmoid function (also known as the `logistic function <http://mathworld.wolfram.com/SigmoidFunction.html>`_ function): :py:class:`bob.machine.LogisticActivation`;
+   * A scaled version of the hyperbolic tangent function: :py:class:`bob.machine.MultipliedHyperbolicTangentActivation`; and
+   * A scaled version of the identity activation: :py:class:`bob.machine.LinearActivation`
 
-Let's try changing all of the activation functions to a simpler one, just for this
-example:
+Let's try changing all of the activation functions to a simpler one, just for
+this example:
 
 .. doctest::
 
@@ -212,8 +214,8 @@ example:
   >>> mlp.output_activation = bob.machine.IdentityActivation()
 
 Once the network weights and biases are set, we can feed forward an example
-through this machine. This is done using the ``()`` operator, like for
-a :py:class:`bob.machine.LinearMachine`:
+through this machine. This is done using the ``()`` operator, like for a
+:py:class:`bob.machine.LinearMachine`:
 
 .. doctest::
 

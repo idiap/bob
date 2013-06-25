@@ -135,7 +135,7 @@ As described in :doc:`TutorialsMachine`, an MLP can be created as follows:
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
    
-   >>> machine = bob.machine.MLP((2, 2, 1)) # Creates a MLP with 2 inputs, 2 neurons in each hidden layer ad 1 output
+   >>> machine = bob.machine.MLP((2, 2, 1)) # Creates an MLP with 2 inputs, 2 neurons in each hidden layer ad 1 output
    >>> machine.hidden_activation = bob.machine.LogisticActivation()
    >>> machine.output_activation = machine.hidden_activation
    >>> machine.biases = 0 # Set the biases to 0
@@ -162,13 +162,23 @@ The class used to train a MLP [3]_ with backpropagation [4]_ is
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
    
-   >>> trainer = bob.trainer.MLPBackPropTrainer(1, bob.trainer.SquareError(machine.output_activation), machine) #  Creates a BackProp trainer with a batch size of 1
-   >>> trainer.train_biases = False # Do not train the bias
+   >>> trainer = bob.trainer.MLPBackPropTrainer(1, bob.trainer.SquareError(machine.output_activation), machine, train_biases=False) #  Creates a BackProp trainer with a batch size of 1
    >>> trainer.train(machine, d0, t0) # Performs the Back Propagation
 
+.. note::
+
+  The second parameter of the trainer defines the cost function to be used for
+  the training. You can use two different types of pre-programmed costs in
+  |project|: :py:class:`bob.trainer.SquareError`, like before, or
+  :py:class:`bob.trainer.CrossEntropyLoss` (normally in association with
+  :py:class:`bob.machine.LogisticActivation`). You can implement your own
+  cost/loss functions. Nevertheless, to do so, you must do it using our C++ API
+  and then bind it to Python in your own :doc:`Satellite Package
+  <OrganizeYourCode>`.
+
 Backpropagation [4]_ requires a learning rate to be set. In the previous
-example, the default value 0.1 has been used. This might be updated using the
-:py:attr:`bob.trainer.MLPBackPropTrainer.learningRate` attribute. Another
+example, the default value ``0.1`` has been used. This might be updated using
+the :py:attr:`bob.trainer.MLPBackPropTrainer.learning_rate` attribute. Another
 alternative exists referred to as **resilient propagation** (Rprop) [5]_, which
 dynamically computes an optimal learning rate. The corresponding class is
 :py:class:`bob.trainer.MLPRPropTrainer`, and the overall training procedure
@@ -177,10 +187,12 @@ remains identical.
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
  
-   >>> trainer = bob.trainer.MLPRPropTrainer(1, bob.trainer.SquareError(machine.output_activation), machine)
-   >>> trainer.train_biases = False
+   >>> trainer = bob.trainer.MLPRPropTrainer(1, bob.trainer.SquareError(machine.output_activation), machine, train_biases=False)
    >>> trainer.train(machine, d0, t0) 
 
+The trainers are **not** re-initialized when you call it several times. This is
+done so as to allow you to implement your own stopping criteria. To reset an
+MLP trainer, use their ``reset`` method.
 
 Support vector machines
 =======================
