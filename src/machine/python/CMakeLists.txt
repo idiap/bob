@@ -22,6 +22,7 @@ set(src
    "wiener.cc"
    "plda.cc"
    "bic.cc"
+   "roll.cc"
    "version.cc"
    "main.cc"
    )

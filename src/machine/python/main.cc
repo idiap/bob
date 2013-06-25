@@ -38,6 +38,7 @@ void bind_machine_ztnorm();
 void bind_machine_jfa();
 void bind_machine_ivector();
 void bind_machine_plda();
+void bind_machine_roll();
 void bind_machine_wiener();
 void bind_machine_version();
 
@@ -63,6 +64,7 @@ BOOST_PYTHON_MODULE(_machine) {
   bind_machine_jfa();
   bind_machine_ivector();
   bind_machine_plda();
+  bind_machine_roll();
   bind_machine_wiener();
   bind_machine_version();
 
