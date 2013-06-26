@@ -33,6 +33,7 @@ Utilities for training projections, density estimators and classifiers.
 
    BICTrainer
    Cost
+   CovMatrixPCATrainer
    CrossEntropyLoss
    DataShuffler
    EMPCATrainer
