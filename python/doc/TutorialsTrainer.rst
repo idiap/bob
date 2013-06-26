@@ -75,9 +75,9 @@ note that the concepts remains very similar for most of the other
    >>> trainer = bob.trainer.SVDPCATrainer() # Creates a PCA trainer
    >>> [machine, eig_vals] = trainer.train(data)  # Trains the machine with the given data
    >>> print machine.weights  # The weights of the returned LinearMachine after the training procedure
-   [[ 0.002 -0.706]
-    [-0.002  0.708]
-    [-1.    -0.003]]
+   [[ 0.002 -0.706 -0.708]
+    [-0.002  0.708 -0.706]
+    [-1.    -0.003 -0.   ]]
 
 Next, input data can be projected using this learned projection matrix 
 :math:`W`.
@@ -87,7 +87,7 @@ Next, input data can be projected using this learned projection matrix
 
    >>> e = numpy.array([3.2,-3.3,-10], 'float64')
    >>> print machine(e)
-   [ 9.999 0.47 ]
+   [ 9.999 0.47 0.092]
 
 
 Linear discriminant analysis
