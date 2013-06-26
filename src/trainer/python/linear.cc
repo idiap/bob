@@ -116,7 +116,7 @@ void bind_trainer_linear()
         (arg("self"), arg("data")), 
         "Trains a LinearMachine to perform the KLT.\n" \
         "\n" \
-        "The resulting machine will have the same number of inputs as columns in ``data`` and :math:`K-1` eigen-vectors, where :math:`K=\\min{(S,F)}`, with :mat:`S` being the number of rows in ``data`` (samples) and :math:`F` the number of columns (or features). The vectors are arranged by decreasing eigen-value automatically. You don't need to sort the results.\n"
+        "The resulting machine will have the same number of inputs as columns in ``data`` and :math:`K-1` eigen-vectors, where :math:`K=\\min{(S,F)}`, with :math:`S` being the number of rows in ``data`` (samples) and :math:`F` the number of columns (or features). The vectors are arranged by decreasing eigen-value automatically. You don't need to sort the results.\n"
         "\n" \
         "This method returns a tuple containing the resulting linear machine and the eigen values in a 1D array."
         )
@@ -125,7 +125,7 @@ void bind_trainer_linear()
         (arg("self"), arg("machine"), arg("data")),
         "Trains a LinearMachine to perform the KLT.\n" \
         "\n" \
-        "The resulting machine will have the same number of inputs as columns in ``data`` and :math:`K-1` eigen-vectors, where :math:`K=\\min{(S,F)}`, with :mat:`S` being the number of rows in ``data`` (samples) and :math:`F` the number of columns (or features). The vectors are arranged by decreasing eigen-value automatically. You don't need to sort the results.\n"
+        "The resulting machine will have the same number of inputs as columns in ``data`` and :math:`K-1` eigen-vectors, where :math:`K=\\min{(S,F)}`, with :math:`S` being the number of rows in ``data`` (samples) and :math:`F` the number of columns (or features). The vectors are arranged by decreasing eigen-value automatically. You don't need to sort the results.\n"
         "\n" \
         "This method returns a tuple containing the resulting linear machine and the eigen values in a 1D array."
         )
@@ -148,7 +148,7 @@ void bind_trainer_linear()
     .def("train", &svd_pca_train1, (arg("self"), arg("data")), 
         "Trains a LinearMachine to perform the KLT.\n" \
         "\n" \
-        "The resulting machine will have the same number of inputs as columns in ``data`` and :math:`K-1` eigen-vectors, where :math:`K=\\min{(S,F)}`, with :mat:`S` being the number of rows in ``data`` (samples) and :math:`F` the number of columns (or features). The vectors are arranged by decreasing eigen-value automatically. You don't need to sort the results.\n"
+        "The resulting machine will have the same number of inputs as columns in ``data`` and :math:`K-1` eigen-vectors, where :math:`K=\\min{(S,F)}`, with :math:`S` being the number of rows in ``data`` (samples) and :math:`F` the number of columns (or features). The vectors are arranged by decreasing eigen-value automatically. You don't need to sort the results.\n"
         "\n" \
         "This method returns a tuple containing the resulting linear machine and the eigen values in a 1D array."
         )
@@ -156,7 +156,7 @@ void bind_trainer_linear()
     .def("train", &svd_pca_train2, (arg("self"), arg("machine"), arg("data")),
         "Trains a LinearMachine to perform the KLT.\n" \
         "\n" \
-        "The resulting machine will have the same number of inputs as columns in ``data`` and :math:`K-1` eigen-vectors, where :math:`K=\\min{(S,F)}`, with :mat:`S` being the number of rows in ``data`` (samples) and :math:`F` the number of columns (or features). The vectors are arranged by decreasing eigen-value automatically. You don't need to sort the results.\n"
+        "The resulting machine will have the same number of inputs as columns in ``data`` and :math:`K-1` eigen-vectors, where :math:`K=\\min{(S,F)}`, with :math:`S` being the number of rows in ``data`` (samples) and :math:`F` the number of columns (or features). The vectors are arranged by decreasing eigen-value automatically. You don't need to sort the results.\n"
         "\n" \
         "This method returns a tuple containing the resulting linear machine and the eigen values in a 1D array."
         )
