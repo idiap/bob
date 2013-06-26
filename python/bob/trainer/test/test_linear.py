@@ -42,22 +42,22 @@ def test_pca_versus_matlab_princomp():
       ], dtype='float64')
 
   # Expected results (from Matlab's princomp) - a good ground truth?
-  eig_val_correct = numpy.array([1.28402771], 'float64')
-  eig_vec_correct = numpy.array([[-0.6778734], [-0.73517866]], 'float64')
+  eig_val_correct = numpy.array([1.28402771, 0.0490834], 'float64')
+  eig_vec_correct = numpy.array([[-0.6778734, -0.73517866], [-0.73517866, 0.6778734]], 'float64')
 
   T_svd = SVDPCATrainer()
   machine_svd, eig_vals_svd = T_svd.train(data)
 
   assert numpy.allclose(abs(machine_svd.weights/eig_vec_correct), 1.0)
   assert numpy.allclose(eig_vals_svd, eig_val_correct)
-  assert machine_svd.weights.shape == (2,1)
+  assert machine_svd.weights.shape == (2,2)
   
   T_cov = CovMatrixPCATrainer()
   machine_cov, eig_vals_cov = T_cov.train(data)
 
   assert numpy.allclose(abs(machine_cov.weights/eig_vec_correct), 1.0)
   assert numpy.allclose(eig_vals_cov, eig_val_correct)
-  assert machine_cov.weights.shape == (2,1)
+  assert machine_cov.weights.shape == (2,2)
 
 def test_pca_versus_matlab_princomp_2():
 
@@ -117,7 +117,7 @@ def test_pca_svd_vs_cov_random_1():
   machine_cov, eig_vals_cov = T_cov.train(data)
   
   assert numpy.allclose(eig_vals_svd, eig_vals_cov)
-  assert machine_svd.weights.shape == (4,3)
+  assert machine_svd.weights.shape == (4,4)
   assert numpy.allclose(machine_svd.input_subtract, machine_cov.input_subtract)
   assert numpy.allclose(machine_svd.input_divide, machine_cov.input_divide)
   assert numpy.allclose(abs(machine_svd.weights/machine_cov.weights), 1.0)
