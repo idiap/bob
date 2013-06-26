@@ -30,12 +30,17 @@ class RollTest(unittest.TestCase):
   def test01_roll(self):
     m = bob.machine.MLP((10,3,8,5))
     m.randomize()
+
     vec = bob.machine.unroll(m)
     m2 = bob.machine.MLP((10,3,8,5))
     bob.machine.roll(m2, vec)
-
     self.assertTrue( m == m2 )
 
+    m3 = bob.machine.MLP((10,3,8,5))
+    vec = bob.machine.unroll(m.weights, m.biases)
+    bob.machine.roll(m3, vec)
+    self.assertTrue( m == m3 )
+    
   def test02_roll(self):
     w = [numpy.array([[2,3.]]), numpy.array([[2,3,4.],[5,6,7]])]
     b = [numpy.array([5.,]), numpy.array([7,8.])]

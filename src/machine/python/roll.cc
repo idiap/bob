@@ -50,6 +50,19 @@ static void unroll2(object w, object b, bob::python::ndarray vec)
   bob::machine::unroll(w_, b_, vec_);
 }
 
+static object unroll3(object w, object b)
+{
+  stl_input_iterator<blitz::Array<double,2> > wbegin(w), wend;
+  std::vector<blitz::Array<double,2> > w_(wbegin, wend);
+  stl_input_iterator<blitz::Array<double,1> > bbegin(b), bend;
+  std::vector<blitz::Array<double,1> > b_(bbegin, bend);
+  bob::python::ndarray vec(bob::core::array::t_float64, 
+    bob::machine::detail::getNbParameters(w_, b_));
+  blitz::Array<double,1> vec_ = vec.bz<double,1>();
+  bob::machine::unroll(w_, b_, vec_);
+  return vec.self();
+}
+
 static void roll1(bob::machine::MLP& m, bob::python::const_ndarray vec)
 {
   blitz::Array<double,1> vec_ = vec.bz<double,1>();
@@ -67,6 +80,7 @@ static void roll2(list w, list b, bob::python::const_ndarray vec)
 
 void bind_machine_roll() {
   def("unroll", &unroll0, (arg("MLP")), "Unroll the parameters of an MLP into a single 1D numpy array");
+  def("unroll", &unroll3, (arg("weights"), arg("biases")), "Unroll the parameters (weights and biases) into a single 1D numpy array.");
   def("unroll", &unroll1, (arg("MLP"), arg("vec")), "Unroll the parameters of an MLP into the 1D numpy array 'vec'. 'vec' should be allocated with the correct size.");
   def("unroll", &unroll2, (arg("weights"), arg("biases"), arg("vec")), "Unroll the parameters (weights and biases) into the 1D numpy array 'vec'. 'vec' should be allocated with the correct size.");
 
