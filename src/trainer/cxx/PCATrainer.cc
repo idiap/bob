@@ -66,28 +66,7 @@ bool bob::trainer::PCATrainer::is_similar_to
   (const bob::trainer::PCATrainer& other, const double r_epsilon,
    const double a_epsilon) const
 {
-  return m_use_svd == other.m_use_svd;
-}
-
-/**
- * Returns the indexes for sorting a given blitz::Array<double,1>
- */
-struct compare_1d_blitz {
-  const blitz::Array<double,1>& v_;
-  compare_1d_blitz(const blitz::Array<double,1>& v): v_(v) { }
-  bool operator() (size_t i, size_t j) { return v_(i) >= v_(j); }
-};
-
-static std::vector<size_t> sort_indexes(const blitz::Array<double,1>& v) {
-
-  // initialize original index locations
-  std::vector<size_t> idx(v.size());
-  for (size_t i = 0; i != idx.size(); ++i) idx[i] = i;
-
-  // sort indexes based on comparing values in v
-  std::sort(idx.begin(), idx.end(), compare_1d_blitz(v));
-
-  return idx;
+  return this->operator==(other);
 }
 
 /**
@@ -112,19 +91,8 @@ static void pca_via_covmat(
   blitz::Array<double,2> U(X.extent(1), X.extent(1));
   blitz::Array<double,1> e(X.extent(1));
   bob::math::eigSym_(Sigma, U, e);
-
-  /**
-   * sorts eigenvectors using a decreasing eigen value priority
-   */
-  blitz::Array<double,2> SortedU(X.extent(1), rank);
-  blitz::Range a = blitz::Range::all();
-  std::vector<size_t> order = sort_indexes(e);
-  size_t j = 0;
-  for (int i=0; i<rank; ++i) {
-    eigen_values(j) = e(order[i]);
-    SortedU(a,j) = U(a,order[i]);
-    ++j;
-  }
+  e.reverseSelf(0);
+  U.reverseSelf(1);
 
   /**
    * sets the linear machine with the results:
@@ -132,7 +100,14 @@ static void pca_via_covmat(
   machine.setInputSubtraction(mean);
   machine.setInputDivision(1.0);
   machine.setBiases(0.0);
-  machine.setWeights(SortedU);
+  if (e.size() == eigen_values.size()) {
+    eigen_values = e;
+    machine.setWeights(U);
+  }
+  else {
+    eigen_values = e(blitz::Range(0,rank-1));
+    machine.setWeights(U(blitz::Range::all(), blitz::Range(0,rank-1)));
+  }
 }
 
 /**
@@ -202,12 +177,12 @@ void bob::trainer::PCATrainer::train(bob::machine::LinearMachine& machine,
     throw std::runtime_error(m.str());
   }
   if (machine.outputSize() != (size_t)rank) {
-    boost::format m("Number of outputs (%d) does not match the maximum covariance rank, i.e., min(#samples-1,#features) = min(%d, %d) = %d");
+    boost::format m("Number of outputs of the given machine (%d) does not match the maximum covariance rank, i.e., min(#samples-1,#features) = min(%d, %d) = %d");
     m % machine.outputSize() % (X.extent(0)-1) % X.extent(1) % rank;
     throw std::runtime_error(m.str());
   }
   if (eigen_values.extent(0) != rank) {
-    boost::format m("Number of eigenvalues placeholder (%d) does not match the maximum covariance rank, i.e., min(#samples-1,#features) = min(%d,%d) = %d");
+    boost::format m("Number of eigenvalues on the given 1D array (%d) does not match the maximum covariance rank, i.e., min(#samples-1,#features) = min(%d,%d) = %d");
     m % eigen_values.extent(0) % (X.extent(0)-1) % X.extent(1) % rank;
     throw std::runtime_error(m.str());
   }
