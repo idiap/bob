@@ -23,7 +23,8 @@
 #include "bob/config.h"
 #include "bob/python/ndarray.h"
 
-void bind_trainer_linear();
+void bind_trainer_pca();
+void bind_trainer_lda();
 void bind_trainer_gmm();
 void bind_trainer_kmeans();
 void bind_trainer_mlpbase();
@@ -49,7 +50,8 @@ BOOST_PYTHON_MODULE(_trainer) {
   boost::python::docstring_options docopt(true, true, false);
   bob::python::setup_python("bob classes and sub-classes for trainers");
   
-  bind_trainer_linear();
+  bind_trainer_pca();
+  bind_trainer_lda();
   bind_trainer_gmm();
   bind_trainer_kmeans();
   bind_trainer_mlpbase();

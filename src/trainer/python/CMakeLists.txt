@@ -6,7 +6,8 @@ set(shared "${bob_deps}")
 set(incdir ${py_incdir})
 
 set(src
-   "linear.cc"
+   "pca.cc"
+   "lda.cc"
    "kmeans.cc"
    "gmm.cc"
    "mlpbase.cc"
