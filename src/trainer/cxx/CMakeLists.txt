@@ -24,7 +24,7 @@ set(src
   "EMPCATrainer.cc"
   "PLDATrainer.cc"
   "BICTrainer.cc"
-  "LLRTrainer.cc"
+  "CGLogRegTrainer.cc"
   "WhiteningTrainer.cc"
   "WCCNTrainer.cc"
   "SquareError.cc"

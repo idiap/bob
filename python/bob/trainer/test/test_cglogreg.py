@@ -26,10 +26,10 @@ import bob
 import random
 import numpy
 
-class LLRTest(unittest.TestCase):
+class CGLogRegTest(unittest.TestCase):
   """Performs various tests for Linear Logistic Regression."""
   
-  def test01_llr(self):
+  def test01_cglogreg(self):
 
     # Tests our LLR Trainer.
     ar1 = numpy.array([
@@ -69,7 +69,7 @@ class LLRTest(unittest.TestCase):
 
   
     # Trains a machine (method 1)
-    T = bob.trainer.LLRTrainer(0.5, 1e-5, 30)
+    T = bob.trainer.CGLogRegTrainer(0.5, 1e-5, 30)
     machine1 = T.train(ar1,ar2)
 
     # Makes sure results are good
@@ -94,7 +94,7 @@ class LLRTest(unittest.TestCase):
     bias_ref = numpy.array([0.27897])
 
     # Trains a machine (method 1)
-    T = bob.trainer.LLRTrainer(0.5, 1e-5, 30, 1.)
+    T = bob.trainer.CGLogRegTrainer(0.5, 1e-5, 30, 1.)
     machine1 = T.train(ar1,ar2)
 
     # Makes sure results are good

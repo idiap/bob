@@ -108,21 +108,21 @@ const char* bob::trainer::EmptyTrainingSet::what() const throw() {
  return what_string;
 }
 
-bob::trainer::LLRPriorNotInRange::LLRPriorNotInRange(const double got) throw() :
+bob::trainer::LogRegPriorNotInRange::LogRegPriorNotInRange(const double got) throw() :
   m_got(got)
 {
 }
 
-bob::trainer::LLRPriorNotInRange::~LLRPriorNotInRange() throw() { }
+bob::trainer::LogRegPriorNotInRange::~LogRegPriorNotInRange() throw() { }
 
-const char* bob::trainer::LLRPriorNotInRange::what() const throw() {
+const char* bob::trainer::LogRegPriorNotInRange::what() const throw() {
   try {
     boost::format message("Cannot set prior to '%f', as it should be in the range ]0.,1.[.");
     message % m_got;
     m_message = message.str();
     return m_message.c_str();
   } catch (...) {
-    static const char* emergency = "bob::trainer::LLRPriorNotInRange: cannot format, exception raised";
+    static const char* emergency = "bob::trainer::LogRegPriorNotInRange: cannot format, exception raised";
     return emergency;
   }
 }

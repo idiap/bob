@@ -47,7 +47,7 @@ Utilities for training projections, density estimators and classifiers.
    IVectorTrainer
    JFATrainer
    KMeansTrainer
-   LLRTrainer
+   CGLogRegTrainer
    MAP_GMMTrainer
    MLPBackPropTrainer
    MLPBaseTrainer

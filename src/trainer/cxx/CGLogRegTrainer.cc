@@ -1,5 +1,5 @@
 /**
- * @file trainer/cxx/LLRTrainer.cc
+ * @file trainer/cxx/CGLogRegTrainer.cc
  * @date Sat Sep 1 19:26:00 2012 +0100
  * @author Laurent El Shafey <laurent.el-shafey@idiap.ch>
  *
@@ -18,23 +18,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <bob/trainer/LLRTrainer.h>
+#include <bob/trainer/CGLogRegTrainer.h>
 #include <bob/math/linear.h>
 #include <bob/core/logging.h>
 
 #include <limits>
 
-bob::trainer::LLRTrainer::LLRTrainer(const double prior, 
+bob::trainer::CGLogRegTrainer::CGLogRegTrainer(const double prior, 
   const double convergence_threshold, const size_t max_iterations,
   const double lambda):
     m_prior(prior), m_convergence_threshold(convergence_threshold), 
     m_max_iterations(max_iterations), m_lambda(lambda)
 {
   if(prior<=0. || prior>=1.) 
-    throw bob::trainer::LLRPriorNotInRange(prior);
+    throw bob::trainer::LogRegPriorNotInRange(prior);
 }
 
-bob::trainer::LLRTrainer::LLRTrainer(const bob::trainer::LLRTrainer& other):
+bob::trainer::CGLogRegTrainer::CGLogRegTrainer(const bob::trainer::CGLogRegTrainer& other):
   m_prior(other.m_prior),
   m_convergence_threshold(other.m_convergence_threshold), 
   m_max_iterations(other.m_max_iterations),
@@ -42,10 +42,10 @@ bob::trainer::LLRTrainer::LLRTrainer(const bob::trainer::LLRTrainer& other):
 {
 }
 
-bob::trainer::LLRTrainer::~LLRTrainer() {}
+bob::trainer::CGLogRegTrainer::~CGLogRegTrainer() {}
 
-bob::trainer::LLRTrainer& bob::trainer::LLRTrainer::operator=
-(const bob::trainer::LLRTrainer& other) 
+bob::trainer::CGLogRegTrainer& bob::trainer::CGLogRegTrainer::operator=
+(const bob::trainer::CGLogRegTrainer& other) 
 {
   if(this != &other)
   {
@@ -58,7 +58,7 @@ bob::trainer::LLRTrainer& bob::trainer::LLRTrainer::operator=
 }
 
 bool 
-bob::trainer::LLRTrainer::operator==(const bob::trainer::LLRTrainer& b) const
+bob::trainer::CGLogRegTrainer::operator==(const bob::trainer::CGLogRegTrainer& b) const
 {
   return (this->m_prior == b.m_prior &&
           this->m_convergence_threshold == b.m_convergence_threshold &&
@@ -67,12 +67,12 @@ bob::trainer::LLRTrainer::operator==(const bob::trainer::LLRTrainer& b) const
 }
 
 bool 
-bob::trainer::LLRTrainer::operator!=(const bob::trainer::LLRTrainer& b) const
+bob::trainer::CGLogRegTrainer::operator!=(const bob::trainer::CGLogRegTrainer& b) const
 {
   return !(this->operator==(b));
 }
 
-void bob::trainer::LLRTrainer::train(bob::machine::LinearMachine& machine, 
+void bob::trainer::CGLogRegTrainer::train(bob::machine::LinearMachine& machine, 
   const blitz::Array<double,2>& ar1, const blitz::Array<double,2>& ar2) const 
 {
   // Checks for arraysets data type and shape once
@@ -175,7 +175,7 @@ void bob::trainer::LLRTrainer::train(bob::machine::LinearMachine& machine,
     // Terminates if uhu is close to zero
     if(fabs(uhu) < ten_epsilon)
     {
-      bob::core::info << "# LLR Training terminated: convergence after " << iter << " iterations (u^T H u == 0)." << std::endl;
+      bob::core::info << "# CGLogReg Training terminated: convergence after " << iter << " iterations (u^T H u == 0)." << std::endl;
       break;
     }
     // c. Compute w = w_old - (g^T u)/(u^T H u) u
@@ -184,13 +184,13 @@ void bob::trainer::LLRTrainer::train(bob::machine::LinearMachine& machine,
     // Terminates if convergence has been reached
     if(blitz::max(blitz::fabs(w-w_old)) <= m_convergence_threshold) 
     {
-      bob::core::info << "# LLR Training terminated: convergence after " << iter << " iterations." << std::endl;
+      bob::core::info << "# CGLogReg Training terminated: convergence after " << iter << " iterations." << std::endl;
       break;
     }
     // Terminates if maximum number of iterations has been reached
     if(m_max_iterations > 0 && iter+1 >= m_max_iterations) 
     {
-      bob::core::info << "# EM terminated: maximum number of iterations (" << m_max_iterations << ") reached." << std::endl;
+      bob::core::info << "# CGLogReg terminated: maximum number of iterations (" << m_max_iterations << ") reached." << std::endl;
       break;
     }
 

@@ -1,5 +1,5 @@
 /**
- * @file bob/trainer/LLRTrainer.h
+ * @file bob/trainer/CGLogRegTrainer.h
  * @date Sat Sep 1 19:16:00 2012 +0100
  * @author Laurent El Shafey <laurent.el-shafey@idiap.ch>
  *
@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB_TRAINER_LLRTRAINER_H
-#define BOB_TRAINER_LLRTRAINER_H
+#ifndef BOB_TRAINER_CGLOGREGTRAINER_H
+#define BOB_TRAINER_CGLOGREGTRAINER_H
 
 #include <bob/machine/LinearMachine.h>
 #include <bob/trainer/Exception.h>
@@ -45,7 +45,7 @@ namespace bob { namespace trainer {
    *   http://research.microsoft.com/en-us/um/people/minka/papers/logreg/
    *   2/ FoCal, http://www.dsp.sun.ac.za/~nbrummer/focal/
    */
-  class LLRTrainer 
+  class CGLogRegTrainer 
   {
     public: //api
 
@@ -56,34 +56,35 @@ namespace bob { namespace trainer {
        *           of the iterative conjugate gradient algorithm
        * @param max_iterations The maximum number of iterations of the 
        *           iterative conjugate gradient algorithm (0 <-> infinity)
+       * @param lambda The regularization factor
        */
-      LLRTrainer(const double prior=0.5, 
+      CGLogRegTrainer(const double prior=0.5, 
         const double convergence_threshold=1e-5,
         const size_t max_iterations=10000, const double lambda=0.);
 
       /**
        * Copy constructor
        */
-      LLRTrainer(const LLRTrainer& other);
+      CGLogRegTrainer(const CGLogRegTrainer& other);
 
       /**
        * Destructor
        */
-      virtual ~LLRTrainer();
+      virtual ~CGLogRegTrainer();
 
       /**
        * Assignment operator
        */
-      LLRTrainer& operator=(const LLRTrainer& other);
+      CGLogRegTrainer& operator=(const CGLogRegTrainer& other);
 
       /**
        * @brief Equal to
        */
-      bool operator==(const LLRTrainer& b) const;
+      bool operator==(const CGLogRegTrainer& b) const;
       /**
        * @brief Not equal to
        */
-      bool operator!=(const LLRTrainer& b) const; 
+      bool operator!=(const CGLogRegTrainer& b) const; 
 
       /**
        * Getters
@@ -97,7 +98,7 @@ namespace bob { namespace trainer {
        * Setters
        */
       void setPrior(const double prior) 
-      { if(prior<=0. || prior>=1.) throw bob::trainer::LLRPriorNotInRange(prior);
+      { if(prior<=0. || prior>=1.) throw bob::trainer::LogRegPriorNotInRange(prior);
         m_prior = prior; }
       void setConvergenceThreshold(const double convergence_threshold)
       { m_convergence_threshold = convergence_threshold; }
@@ -125,4 +126,4 @@ namespace bob { namespace trainer {
    */
 }}
 
-#endif /* BOB_TRAINER_LLRTRAINER_H */
+#endif /* BOB_TRAINER_CGLOGREGTRAINER_H */

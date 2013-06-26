@@ -20,7 +20,7 @@ set(src
    "empca.cc"
    "plda.cc"
    "bic.cc"
-   "llr.cc"
+   "cglogreg.cc"
    "whitening.cc"
    "wccn.cc"
    "cost.cc"

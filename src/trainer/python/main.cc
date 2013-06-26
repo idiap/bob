@@ -37,7 +37,7 @@ void bind_trainer_plda();
 void bind_trainer_wiener();
 void bind_trainer_empca();
 void bind_trainer_bic();
-void bind_trainer_llr();
+void bind_trainer_cglogreg();
 void bind_trainer_whitening();
 void bind_trainer_wccn();
 void bind_trainer_cost();
@@ -64,7 +64,7 @@ BOOST_PYTHON_MODULE(_trainer) {
   bind_trainer_wiener();
   bind_trainer_empca();
   bind_trainer_bic();
-  bind_trainer_llr();
+  bind_trainer_cglogreg();
   bind_trainer_whitening();
   bind_trainer_wccn();
   bind_trainer_cost();

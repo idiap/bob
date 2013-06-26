@@ -102,10 +102,10 @@ namespace bob { namespace trainer {
   /**
    * Raised when an invalid prior for the Linear Logistic Regression is set.
    */
-  class LLRPriorNotInRange: public Exception {
+  class LogRegPriorNotInRange: public Exception {
     public:
-      LLRPriorNotInRange(const double got) throw();
-      virtual ~LLRPriorNotInRange() throw();
+      LogRegPriorNotInRange(const double got) throw();
+      virtual ~LogRegPriorNotInRange() throw();
       virtual const char* what() const throw();
 
     private:
