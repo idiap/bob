@@ -25,9 +25,10 @@
 #include <limits>
 
 bob::trainer::LLRTrainer::LLRTrainer(const double prior, 
-  const double convergence_threshold, const size_t max_iterations):
+  const double convergence_threshold, const size_t max_iterations,
+  const double lambda):
     m_prior(prior), m_convergence_threshold(convergence_threshold), 
-    m_max_iterations(max_iterations)
+    m_max_iterations(max_iterations), m_lambda(lambda)
 {
   if(prior<=0. || prior>=1.) 
     throw bob::trainer::LLRPriorNotInRange(prior);
@@ -36,7 +37,8 @@ bob::trainer::LLRTrainer::LLRTrainer(const double prior,
 bob::trainer::LLRTrainer::LLRTrainer(const bob::trainer::LLRTrainer& other):
   m_prior(other.m_prior),
   m_convergence_threshold(other.m_convergence_threshold), 
-  m_max_iterations(other.m_max_iterations)
+  m_max_iterations(other.m_max_iterations),
+  m_lambda(other.m_lambda)
 {
 }
 
@@ -50,6 +52,7 @@ bob::trainer::LLRTrainer& bob::trainer::LLRTrainer::operator=
     m_prior = other.m_prior;
     m_convergence_threshold = other.m_convergence_threshold;
     m_max_iterations = other.m_max_iterations;
+    m_lambda = other.m_lambda;
   }
   return *this;
 }
@@ -59,7 +62,8 @@ bob::trainer::LLRTrainer::operator==(const bob::trainer::LLRTrainer& b) const
 {
   return (this->m_prior == b.m_prior &&
           this->m_convergence_threshold == b.m_convergence_threshold &&
-          this->m_max_iterations == b.m_max_iterations);
+          this->m_max_iterations == b.m_max_iterations &&
+          this->m_lambda == b.m_lambda);
 }
 
 bool 
@@ -141,6 +145,7 @@ void bob::trainer::LLRTrainer::train(bob::machine::LinearMachine& machine,
     tmp_n = s1 * weights;
     // 3. Gradient g of this weighted likelihood wrt. the weight vector w
     bob::math::prod(x, tmp_n, g);
+    g -= m_lambda * w; // Regularization
 
     // 4. Conjugate gradient step
     if(iter == 0) 
@@ -165,8 +170,8 @@ void bob::trainer::LLRTrainer::train(bob::machine::LinearMachine& machine,
     // a. Compute ux
     bob::math::prod(u,x,tmp_n);
     // b. Compute u^T H u 
-    //      = sum_{i} weights(i) sigmoid(w^T x_i) [1-sigmoid(w^T x_i)] (u^T x_i)
-    double uhu = blitz::sum(blitz::pow2(tmp_n) * weights * s1 * (1.-s1));
+    //      = sum_{i} weights(i) sigmoid(w^T x_i) [1-sigmoid(w^T x_i)] (u^T x_i) + lambda u^T u
+    double uhu = blitz::sum(blitz::pow2(tmp_n) * weights * s1 * (1.-s1)) + m_lambda*blitz::sum(blitz::pow2(u));
     // Terminates if uhu is close to zero
     if(fabs(uhu) < ten_epsilon)
     {

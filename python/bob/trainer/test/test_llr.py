@@ -73,8 +73,6 @@ class LLRTest(unittest.TestCase):
     machine1 = T.train(ar1,ar2)
 
     # Makes sure results are good
-    print machine1.weights
-    print machine1.biases
     self.assertTrue( (abs(machine1.weights - weights_ref) < 2e-4).all() )
     self.assertTrue( (abs(machine1.biases - bias_ref) < 2e-4).all() )
     self.assertTrue( abs(machine1(feat1) - out1) < 2e-4 )
@@ -89,3 +87,16 @@ class LLRTest(unittest.TestCase):
     self.assertTrue( (abs(machine2.biases - bias_ref) < 2e-4).all() )
     self.assertTrue( abs(machine2(feat1) - out1) < 2e-4 )
     self.assertTrue( abs(machine2(feat2) - out2) < 2e-4 )
+
+
+    # Expected trained machine (with regularization)
+    weights_ref= numpy.array([[0.54926], [0.58304], [0.06558]])
+    bias_ref = numpy.array([0.27897])
+
+    # Trains a machine (method 1)
+    T = bob.trainer.LLRTrainer(0.5, 1e-5, 30, 1.)
+    machine1 = T.train(ar1,ar2)
+
+    # Makes sure results are good
+    self.assertTrue( (abs(machine1.weights - weights_ref) < 2e-4).all() )
+    self.assertTrue( (abs(machine1.biases - bias_ref) < 2e-4).all() )

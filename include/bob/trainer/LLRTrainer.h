@@ -59,7 +59,7 @@ namespace bob { namespace trainer {
        */
       LLRTrainer(const double prior=0.5, 
         const double convergence_threshold=1e-5,
-        const size_t max_iterations=10000);
+        const size_t max_iterations=10000, const double lambda=0.);
 
       /**
        * Copy constructor
@@ -91,6 +91,7 @@ namespace bob { namespace trainer {
       double getPrior() const { return m_prior; }
       double getConvergenceThreshold() const { return m_convergence_threshold; }
       size_t getMaxIterations() const { return m_max_iterations; }
+      double getLambda() const { return m_lambda; }
 
       /**
        * Setters
@@ -102,6 +103,8 @@ namespace bob { namespace trainer {
       { m_convergence_threshold = convergence_threshold; }
       void setMaxIterations(const size_t max_iterations) 
       { m_max_iterations = max_iterations; }
+      void setLambda(const double lambda) 
+      { m_lambda = lambda; }
 
       /**
        * Trains the LinearMachine to perform Linear Logistic Regression
@@ -114,6 +117,7 @@ namespace bob { namespace trainer {
       double m_prior;
       double m_convergence_threshold;
       size_t m_max_iterations;
+      double m_lambda;
   };
 
   /**
