@@ -32,7 +32,9 @@ Resources for projecting, estimating probabilities or classifying data.
    :toctree: generated/
 
    linear_scoring
+   roll
    tnorm
+   unroll
    znorm
    ztnorm
    ztnorm_same_value
