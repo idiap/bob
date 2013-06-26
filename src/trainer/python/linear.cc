@@ -34,42 +34,39 @@ using namespace boost::python;
 tuple covmat_pca_train1(bob::trainer::CovMatrixPCATrainer& t, bob::python::const_ndarray data)
 {
   const blitz::Array<double,2> data_ = data.bz<double,2>();
-  const int n_eigs = std::min(data_.extent(0), data_.extent(1));
-  blitz::Array<double,1> eig_val(n_eigs);
+  const int n_eigs = std::min(data_.extent(0), data_.extent(1)) - 1;
   bob::machine::LinearMachine m(data_.extent(1), n_eigs);
+  blitz::Array<double,1> eig_val(n_eigs);
   t.train(m, eig_val, data_);
-  return make_tuple(m, eig_val);
+  return make_tuple(m, object(eig_val));
 }
 
-object covmat_pca_train2(bob::trainer::CovMatrixPCATrainer& t, bob::machine::LinearMachine& m,
-  bob::python::const_ndarray data)
+object covmat_pca_train2(bob::trainer::CovMatrixPCATrainer& t, bob::machine::LinearMachine& m, bob::python::const_ndarray data)
 {
   const blitz::Array<double,2> data_ = data.bz<double,2>();
-  const int n_eigs = std::min(data_.extent(0), data_.extent(1));
-  bob::python::ndarray eig_val(bob::core::array::t_float64, n_eigs);
-  blitz::Array<double,1> eig_val_ = eig_val.bz<double,1>();
-  t.train(m, eig_val_, data_);
-  return eig_val.self();
+  const int n_eigs = std::min(data_.extent(0), data_.extent(1)) - 1;
+  blitz::Array<double,1> eig_val(n_eigs);
+  t.train(m, eig_val, data_);
+  return object(eig_val);
 }
 
 tuple svd_pca_train1(bob::trainer::SVDPCATrainer& t, bob::python::const_ndarray data)
 {
   const blitz::Array<double,2> data_ = data.bz<double,2>();
-  const int n_eigs = std::min(data_.extent(0), data_.extent(1));
-  blitz::Array<double,1> eig_val(n_eigs);
+  const int n_eigs = std::min(data_.extent(0), data_.extent(1)) - 1;
   bob::machine::LinearMachine m(data_.extent(1), n_eigs);
+  blitz::Array<double,1> eig_val(n_eigs);
   t.train(m, eig_val, data_);
-  return make_tuple(m, eig_val);
+  return make_tuple(m, object(eig_val));
 }
 
 object svd_pca_train2(bob::trainer::SVDPCATrainer& t, bob::machine::LinearMachine& m, bob::python::const_ndarray data)
 {
   const blitz::Array<double,2> data_ = data.bz<double,2>();
-  const int n_eigs = std::min(data_.extent(0), data_.extent(1));
-  bob::python::ndarray eig_val(bob::core::array::t_float64, n_eigs);
-  blitz::Array<double,1> eig_val_ = eig_val.bz<double,1>();
-  t.train(m, eig_val_, data_);
-  return eig_val.self();
+  const int n_eigs = std::min(data_.extent(0), data_.extent(1)) - 1;
+  blitz::Array<double,1> eig_val(n_eigs);
+  t.train(m, eig_val, data_);
+  return object(eig_val);
 }
 
 tuple lda_train1(bob::trainer::FisherLDATrainer& t, object data)
@@ -115,9 +112,23 @@ void bind_trainer_linear()
     
     .def("is_similar_to", &bob::trainer::CovMatrixPCATrainer::is_similar_to, (arg("self"), arg("other"), arg("r_epsilon")=1e-5, arg("a_epsilon")=1e-8), "Compares this CovMatrixPCATrainer with the 'other' one to be approximately the same.")
 
-    .def("train", &covmat_pca_train1, (arg("self"), arg("data")), "Trains a LinearMachine to perform the KLT. The resulting machine will have the eigen-vectors of the covariance matrix arranged by decreasing energy automatically. You don't need to sort the results. This method returns a tuple containing the resulting linear machine and the eigen values in a 1D array.")
+    .def("train", &covmat_pca_train1, 
+        (arg("self"), arg("data")), 
+        "Trains a LinearMachine to perform the KLT.\n" \
+        "\n" \
+        "The resulting machine will have the same number of inputs as columns in ``data`` and :math:`K-1` eigen-vectors, where :math:`K=\\min{(S,F)}`, with :mat:`S` being the number of rows in ``data`` (samples) and :math:`F` the number of columns (or features). The vectors are arranged by decreasing eigen-value automatically. You don't need to sort the results.\n"
+        "\n" \
+        "This method returns a tuple containing the resulting linear machine and the eigen values in a 1D array."
+        )
     
-    .def("train", &covmat_pca_train2, (arg("self"), arg("machine"), arg("data")), "Trains the LinearMachine to perform the KLT. The resulting machine will have the eigen-vectors of the covariance matrix arranged by decreasing energy automatically. You don't need to sort the results. This method returns the eigen values in a 1D array.")
+    .def("train", &covmat_pca_train2, 
+        (arg("self"), arg("machine"), arg("data")),
+        "Trains a LinearMachine to perform the KLT.\n" \
+        "\n" \
+        "The resulting machine will have the same number of inputs as columns in ``data`` and :math:`K-1` eigen-vectors, where :math:`K=\\min{(S,F)}`, with :mat:`S` being the number of rows in ``data`` (samples) and :math:`F` the number of columns (or features). The vectors are arranged by decreasing eigen-value automatically. You don't need to sort the results.\n"
+        "\n" \
+        "This method returns a tuple containing the resulting linear machine and the eigen values in a 1D array."
+        )
     ;
 
   class_<bob::trainer::SVDPCATrainer, boost::shared_ptr<bob::trainer::SVDPCATrainer> >("SVDPCATrainer", "Sets a linear machine to perform the Karhunen-Loeve Transform (KLT) on a given dataset using Singular Value Decomposition (SVD). References:\n\n 1. Eigenfaces for Recognition, Turk & Pentland, Journal of Cognitive Neuroscience (1991) Volume: 3, Issue: 1, Publisher: MIT Press, Pages: 71-86\n 2. http://en.wikipedia.org/wiki/Singular_value_decomposition\n 3. http://en.wikipedia.org/wiki/Principal_component_analysis", no_init)
@@ -134,9 +145,21 @@ void bind_trainer_linear()
     
     .def("is_similar_to", &bob::trainer::SVDPCATrainer::is_similar_to, (arg("self"), arg("other"), arg("r_epsilon")=1e-5, arg("a_epsilon")=1e-8), "Compares this SVDPCATrainer with the 'other' one to be approximately the same.")
 
-    .def("train", &svd_pca_train1, (arg("self"), arg("data")), "Trains a LinearMachine to perform the KLT. The resulting machine will have the eigen-vectors of the covariance matrix arranged by decreasing energy automatically. You don't need to sort the results. This method returns a tuple containing the resulting linear machine and the eigen values in a 1D array.")
+    .def("train", &svd_pca_train1, (arg("self"), arg("data")), 
+        "Trains a LinearMachine to perform the KLT.\n" \
+        "\n" \
+        "The resulting machine will have the same number of inputs as columns in ``data`` and :math:`K-1` eigen-vectors, where :math:`K=\\min{(S,F)}`, with :mat:`S` being the number of rows in ``data`` (samples) and :math:`F` the number of columns (or features). The vectors are arranged by decreasing eigen-value automatically. You don't need to sort the results.\n"
+        "\n" \
+        "This method returns a tuple containing the resulting linear machine and the eigen values in a 1D array."
+        )
 
-    .def("train", &svd_pca_train2, (arg("self"), arg("machine"), arg("data")), "Trains the LinearMachine to perform the KLT. The resulting machine will have the eigen-vectors of the covariance matrix arranged by decreasing energy automatically. You don't need to sort the results. This method returns the eigen values in a 1D array.")
+    .def("train", &svd_pca_train2, (arg("self"), arg("machine"), arg("data")),
+        "Trains a LinearMachine to perform the KLT.\n" \
+        "\n" \
+        "The resulting machine will have the same number of inputs as columns in ``data`` and :math:`K-1` eigen-vectors, where :math:`K=\\min{(S,F)}`, with :mat:`S` being the number of rows in ``data`` (samples) and :math:`F` the number of columns (or features). The vectors are arranged by decreasing eigen-value automatically. You don't need to sort the results.\n"
+        "\n" \
+        "This method returns a tuple containing the resulting linear machine and the eigen values in a 1D array."
+        )
     ;
 
   class_<bob::trainer::FisherLDATrainer, boost::shared_ptr<bob::trainer::FisherLDATrainer> >("FisherLDATrainer", "Implements a multi-class Fisher/LDA linear machine Training using Singular Value Decomposition (SVD). For more information on Linear Machines and associated methods, please consult Bishop, Machine Learning and Pattern Recognition chapter 4. The number of LDA dimensions can be: 0: The theoretical limit (#classes-1) is kept; -1: all dimensions are kept (also the ones with zero eigenvalue); >0: The given number of dimensions are kept (can be at most the input dimension)", init<int>(args("number_of_kept_lda_dimensions")=0))
