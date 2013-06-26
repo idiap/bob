@@ -20,7 +20,7 @@
 
 #include <bob/core/array_exception.h>
 #include <bob/trainer/BICTrainer.h>
-#include <bob/trainer/SVDPCATrainer.h>
+#include <bob/trainer/PCATrainer.h>
 
 static double sqr(const double& x){
   return x*x;
@@ -44,8 +44,8 @@ void bob::trainer::BICTrainer::train_single(bool clazz, bob::machine::BICMachine
     // train the class using BIC
 
     // Compute PCA on the given dataset
-    bob::trainer::SVDPCATrainer trainer;
-    const int n_eigs = std::min(data_count-1, input_dim);
+    bob::trainer::PCATrainer trainer;
+    const int n_eigs = trainer.max_covariance_rank(differences);
     bob::machine::LinearMachine pca(input_dim, n_eigs);
     blitz::Array<double,1> variances(n_eigs);
     trainer.train(pca, variances, differences);

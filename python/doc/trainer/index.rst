@@ -33,7 +33,6 @@ Utilities for training projections, density estimators and classifiers.
 
    BICTrainer
    Cost
-   CovMatrixPCATrainer
    CrossEntropyLoss
    DataShuffler
    EMPCATrainer
@@ -54,8 +53,8 @@ Utilities for training projections, density estimators and classifiers.
    MLPBaseTrainer
    MLPRPropTrainer
    ML_GMMTrainer
+   PCATrainer
    PLDATrainer
-   SVDPCATrainer
    SVMTrainer
    SquareError
    WCCNTrainer

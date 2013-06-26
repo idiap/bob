@@ -23,7 +23,19 @@
 import numpy
 
 from ...machine import LinearMachine
-from .. import CovMatrixPCATrainer, SVDPCATrainer, FisherLDATrainer, WhiteningTrainer, EMPCATrainer, WCCNTrainer
+from .. import PCATrainer, FisherLDATrainer, WhiteningTrainer, EMPCATrainer, WCCNTrainer
+
+def test_pca_settings():
+
+  T = PCATrainer()
+  assert T.use_svd == True
+  T.use_svd = False
+  assert T.use_svd == False
+
+  T = PCATrainer(False)
+  assert T.use_svd == False
+  T.use_svd = True
+  assert T.use_svd == True
 
 def test_pca_versus_matlab_princomp():
 
@@ -45,15 +57,15 @@ def test_pca_versus_matlab_princomp():
   eig_val_correct = numpy.array([1.28402771, 0.0490834], 'float64')
   eig_vec_correct = numpy.array([[-0.6778734, -0.73517866], [-0.73517866, 0.6778734]], 'float64')
 
-  T_svd = SVDPCATrainer()
-  machine_svd, eig_vals_svd = T_svd.train(data)
+  T = PCATrainer()
+  machine_svd, eig_vals_svd = T.train(data)
 
   assert numpy.allclose(abs(machine_svd.weights/eig_vec_correct), 1.0)
   assert numpy.allclose(eig_vals_svd, eig_val_correct)
   assert machine_svd.weights.shape == (2,2)
-  
-  T_cov = CovMatrixPCATrainer()
-  machine_cov, eig_vals_cov = T_cov.train(data)
+ 
+  T.use_svd = False #make it use the covariance method
+  machine_cov, eig_vals_cov = T.train(data)
 
   assert numpy.allclose(abs(machine_cov.weights/eig_vec_correct), 1.0)
   assert numpy.allclose(eig_vals_cov, eig_val_correct)
@@ -73,14 +85,14 @@ def test_pca_versus_matlab_princomp_2():
   eig_val_correct = numpy.array([61.9870996, 9.49613738, 1.85009634], 'float64')
 
   # Train method 1
-  T_svd = SVDPCATrainer()
-  machine_svd, eig_vals_svd = T_svd.train(data)
+  T = PCATrainer()
+  machine_svd, eig_vals_svd = T.train(data)
   
   assert numpy.allclose(eig_vals_svd, eig_val_correct)
   assert machine_svd.weights.shape == (5,3)
 
-  T_cov = CovMatrixPCATrainer()
-  machine_cov, eig_vals_cov = T_cov.train(data)
+  T.use_svd = False #make it use the covariance method
+  machine_cov, eig_vals_cov = T.train(data)
 
   assert numpy.allclose(eig_vals_cov, eig_val_correct)
   assert machine_cov.weights.shape == (5,3)
@@ -88,9 +100,9 @@ def test_pca_versus_matlab_princomp_2():
 def test_pca_trainer_comparisons():
 
   # Constructors and comparison operators
-  t1 = SVDPCATrainer()
-  t2 = SVDPCATrainer()
-  t3 = SVDPCATrainer(t2)
+  t1 = PCATrainer()
+  t2 = PCATrainer()
+  t3 = PCATrainer(t2)
   t4 = t3
   assert t1 == t2
   assert t1.is_similar_to(t2)
@@ -99,8 +111,8 @@ def test_pca_trainer_comparisons():
   assert t1 == t4
   assert t1.is_similar_to(t4)
 
-  t5 = CovMatrixPCATrainer()
-  t6 = CovMatrixPCATrainer()
+  t5 = PCATrainer(False)
+  t6 = PCATrainer(False)
   assert t5 == t6
   assert t5.is_similar_to(t6)
   assert t5 != t1
@@ -111,10 +123,10 @@ def test_pca_svd_vs_cov_random_1():
   data = numpy.random.rand(1000,4)
 
   # Train method 1
-  T_svd = SVDPCATrainer()
-  machine_svd, eig_vals_svd = T_svd.train(data)
-  T_cov = CovMatrixPCATrainer()
-  machine_cov, eig_vals_cov = T_cov.train(data)
+  T = PCATrainer()
+  machine_svd, eig_vals_svd = T.train(data)
+  T.use_svd = False #make it use the covariance method
+  machine_cov, eig_vals_cov = T.train(data)
   
   assert numpy.allclose(eig_vals_svd, eig_vals_cov)
   assert machine_svd.weights.shape == (4,4)
@@ -128,10 +140,10 @@ def test_pca_svd_vs_cov_random_2():
   data = numpy.random.rand(15,60)
 
   # Train method 1
-  T_svd = SVDPCATrainer()
-  machine_svd, eig_vals_svd = T_svd.train(data)
-  T_cov = CovMatrixPCATrainer()
-  machine_cov, eig_vals_cov = T_cov.train(data)
+  T = PCATrainer()
+  machine_svd, eig_vals_svd = T.train(data)
+  T.use_svd = False #make it use the covariance method
+  machine_cov, eig_vals_cov = T.train(data)
   
   assert numpy.allclose(eig_vals_svd, eig_vals_cov)
   assert machine_svd.weights.shape == (60,14)

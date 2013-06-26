@@ -45,7 +45,7 @@ Principal component analysis
 ============================
 
 **PCA** [1]_ is one way to train a :py:class:`bob.machine.LinearMachine`. The
-associated |project| class is :py:class:`bob.trainer.SVDPCATrainer` as the 
+associated |project| class is :py:class:`bob.trainer.PCATrainer` as the 
 training procedure mainly relies on a singular value decomposition.
 
 **PCA** belongs to the category of `unsupervised` learning algorithms, which
@@ -65,14 +65,14 @@ this container is a 2D :py:class:`numpy.ndarray`.
 
 Once the training set has been defined, the overall procedure to train a 
 :py:class:`bob.machine.LinearMachine` with a 
-:py:class:`bob.trainer.SVDPCATrainer` is simple and shown below. Please 
+:py:class:`bob.trainer.PCATrainer` is simple and shown below. Please 
 note that the concepts remains very similar for most of the other 
 `trainers` and `machines`.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
 
-   >>> trainer = bob.trainer.SVDPCATrainer() # Creates a PCA trainer
+   >>> trainer = bob.trainer.PCATrainer() # Creates a PCA trainer
    >>> [machine, eig_vals] = trainer.train(data)  # Trains the machine with the given data
    >>> print machine.weights  # The weights of the returned LinearMachine after the training procedure
    [[ 0.002 -0.706 -0.708]

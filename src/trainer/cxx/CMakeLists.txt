@@ -7,8 +7,7 @@ set(incdir ${cxx_incdir})
 
 # This defines the list of source files inside this package.
 set(src
-  "CovMatrixPCATrainer.cc"
-  "SVDPCATrainer.cc"
+  "PCATrainer.cc"
   "FisherLDATrainer.cc"
   "KMeansTrainer.cc"
   "GMMTrainer.cc"
