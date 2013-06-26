@@ -20,9 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/shared_ptr.hpp>
 #include <boost/python.hpp>
 #include <boost/python/stl_iterator.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <bob/python/ndarray.h>
 #include <bob/trainer/CovMatrixPCATrainer.h>
