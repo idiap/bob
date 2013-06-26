@@ -8,16 +8,16 @@
  * Decomposition (lapack). Implementation.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -41,7 +41,7 @@ bob::trainer::CovMatrixPCATrainer::CovMatrixPCATrainer(const bob::trainer::CovMa
 bob::trainer::CovMatrixPCATrainer::~CovMatrixPCATrainer() {}
 
 bob::trainer::CovMatrixPCATrainer& bob::trainer::CovMatrixPCATrainer::operator=
-(const bob::trainer::CovMatrixPCATrainer& other) 
+(const bob::trainer::CovMatrixPCATrainer& other)
 {
   return *this;
 }
@@ -93,7 +93,7 @@ void bob::trainer::CovMatrixPCATrainer::train(bob::machine::LinearMachine& machi
   const size_t n_features = ar.extent(1);
   const int n_sigma = (int)std::min(n_samples-1, n_features);
 
-  // Checks that the dimensions are matching 
+  // Checks that the dimensions are matching
   const size_t n_inputs = machine.inputSize();
   const size_t n_outputs = machine.outputSize();
   const int n_eigenvalues = eigen_values.extent(0);
@@ -105,13 +105,13 @@ void bob::trainer::CovMatrixPCATrainer::train(bob::machine::LinearMachine& machi
     throw std::runtime_error(m.str());
   }
   if (n_outputs != (size_t)n_sigma) {
-    boost::format m("Number of outputs (%d) does not match min(#features-1,#samples) = min(%d, %d) = %d");
-    m % n_outputs % n_features % n_samples % n_sigma;
+    boost::format m("Number of outputs (%d) does not match min(#features,#samples-1) = min(%d, %d) = %d");
+    m % n_outputs % n_features % (n_samples-1) % n_sigma;
     throw std::runtime_error(m.str());
   }
   if (n_eigenvalues != n_sigma) {
-    boost::format m("Number of eigenvalues placeholder (%d) does not match min(#features-1,#samples) = min(%d,%d) = %d");
-    m % n_eigenvalues % n_features % n_samples % n_sigma;
+    boost::format m("Number of eigenvalues placeholder (%d) does not match min(#features,#samples-1) = min(%d,%d) = %d");
+    m % n_eigenvalues % n_features % (n_samples-1) % n_sigma;
     throw std::runtime_error(m.str());
   }
 
@@ -151,7 +151,7 @@ void bob::trainer::CovMatrixPCATrainer::train(bob::machine::LinearMachine& machi
   machine.setWeights(SortedU);
 }
 
-void bob::trainer::CovMatrixPCATrainer::train(bob::machine::LinearMachine& machine, 
+void bob::trainer::CovMatrixPCATrainer::train(bob::machine::LinearMachine& machine,
   const blitz::Array<double,2>& ar)
 {
   const int n_sigma = std::min(ar.extent(0),ar.extent(1));
