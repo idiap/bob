@@ -45,7 +45,7 @@ void bob::trainer::BICTrainer::train_single(bool clazz, bob::machine::BICMachine
 
     // Compute PCA on the given dataset
     bob::trainer::SVDPCATrainer trainer;
-    const int n_eigs = std::min(input_dim, data_count);
+    const int n_eigs = std::min(input_dim, data_count)-1;
     bob::machine::LinearMachine pca(input_dim, n_eigs);
     blitz::Array<double,1> variances(n_eigs);
     trainer.train(pca, variances, differences);
