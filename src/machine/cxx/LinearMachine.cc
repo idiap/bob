@@ -22,10 +22,10 @@
 
 #include <cmath>
 #include <boost/make_shared.hpp>
+#include <boost/format.hpp>
 
 #include <bob/core/array_copy.h>
 #include <bob/machine/LinearMachine.h>
-#include <bob/machine/Exception.h>
 #include <bob/math/linear.h>
 
 bob::machine::LinearMachine::LinearMachine(const blitz::Array<double,2>& weight)
@@ -172,22 +172,30 @@ void bob::machine::LinearMachine::forward_
 
 void bob::machine::LinearMachine::forward
 (const blitz::Array<double,1>& input, blitz::Array<double,1>& output) const {
-  if (m_weight.extent(0) != input.extent(0)) //checks input
-    throw bob::machine::NInputsMismatch(m_weight.extent(0),
-        input.extent(0));
-  if (m_weight.extent(1) != output.extent(0)) //checks output
-    throw bob::machine::NOutputsMismatch(m_weight.extent(1),
-        output.extent(0));
+  if (m_weight.extent(0) != input.extent(0)) { //checks input dimension
+    boost::format m("mismatch on the input dimension: expected a vector of size %d, but you input one with size = %d instead");
+    m % m_weight.extent(0) % input.extent(0);
+    throw std::runtime_error(m.str());
+  }
+  if (m_weight.extent(1) != output.extent(0)) { //checks output dimension
+    boost::format m("mismatch on the output dimension: expected a vector of size %d, but you input one with size = %d instead");
+    m % m_weight.extent(1) % output.extent(0);
+    throw std::runtime_error(m.str());
+  }
   forward_(input, output);
 }
 
 void bob::machine::LinearMachine::setWeights
 (const blitz::Array<double,2>& weight) {
-  if (weight.extent(0) != m_input_sub.extent(0)) { //checks input
-    throw bob::machine::NInputsMismatch(weight.extent(0), m_input_sub.extent(0));
+  if (weight.extent(0) != m_input_sub.extent(0)) { //checks 1st dimension
+    boost::format m("mismatch on the weight shape (number of rows): expected a weight matrix with %d row(s), but you input one with %d row(s) instead");
+    m % m_input_sub.extent(0) % weight.extent(0);
+    throw std::runtime_error(m.str());
   }
-  if (weight.extent(1) != m_bias.extent(0)) { //checks output
-    throw bob::machine::NOutputsMismatch(weight.extent(1), m_bias.extent(0));
+  if (weight.extent(1) != m_bias.extent(0)) { //checks 2nd dimension
+    boost::format m("mismatch on the weight shape (number of columns): expected a weight matrix with %d column(s), but you input one with %d column(s) instead");
+    m % m_bias.extent(0) % weight.extent(1);
+    throw std::runtime_error(m.str());
   }
   m_weight.reference(bob::core::array::ccopy(weight));
 }
@@ -195,7 +203,9 @@ void bob::machine::LinearMachine::setWeights
 void bob::machine::LinearMachine::setBiases
 (const blitz::Array<double,1>& bias) {
   if (m_weight.extent(1) != bias.extent(0)) {
-    throw bob::machine::NOutputsMismatch(m_weight.extent(1), bias.extent(0));
+    boost::format m("mismatch on the bias shape: expected a vector of size %d, but you input one with size = %d instead");
+    m % m_weight.extent(1) % bias.extent(0);
+    throw std::runtime_error(m.str());
   }
   m_bias.reference(bob::core::array::ccopy(bias));
 }
@@ -203,7 +213,9 @@ void bob::machine::LinearMachine::setBiases
 void bob::machine::LinearMachine::setInputSubtraction
 (const blitz::Array<double,1>& v) {
   if (m_weight.extent(0) != v.extent(0)) {
-    throw bob::machine::NInputsMismatch(m_weight.extent(0), v.extent(0));
+    boost::format m("mismatch on the input subtraction shape: expected a vector of size %d, but you input one with size = %d instead");
+    m % m_weight.extent(0) % v.extent(0);
+    throw std::runtime_error(m.str());
   }
   m_input_sub.reference(bob::core::array::ccopy(v));
 }
@@ -211,7 +223,9 @@ void bob::machine::LinearMachine::setInputSubtraction
 void bob::machine::LinearMachine::setInputDivision
 (const blitz::Array<double,1>& v) {
   if (m_weight.extent(0) != v.extent(0)) {
-    throw bob::machine::NInputsMismatch(m_weight.extent(0), v.extent(0));
+    boost::format m("mismatch on the input division shape: expected a vector of size %d, but you input one with size = %d instead");
+    m % m_weight.extent(0) % v.extent(0);
+    throw std::runtime_error(m.str());
   }
   m_input_div.reference(bob::core::array::ccopy(v));
 }
