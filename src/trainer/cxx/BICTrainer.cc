@@ -45,7 +45,7 @@ void bob::trainer::BICTrainer::train_single(bool clazz, bob::machine::BICMachine
 
     // Compute PCA on the given dataset
     bob::trainer::PCATrainer trainer;
-    const int n_eigs = trainer.max_covariance_rank(differences);
+    const int n_eigs = trainer.output_size(differences);
     bob::machine::LinearMachine pca(input_dim, n_eigs);
     blitz::Array<double,1> variances(n_eigs);
     trainer.train(pca, variances, differences);

@@ -151,6 +151,25 @@ def test_pca_svd_vs_cov_random_2():
   assert numpy.allclose(machine_svd.input_divide, machine_cov.input_divide)
   assert numpy.allclose(abs(machine_svd.weights/machine_cov.weights), 1.0)
 
+def test_fisher_settings():
+
+  t = FisherLDATrainer()
+  assert t.use_pinv == False
+  assert t.strip_to_rank == True
+
+  t.use_pinv = True
+  assert t.use_pinv
+  t.strip_to_rank = False
+  assert t.strip_to_rank == False
+
+  t = FisherLDATrainer(use_pinv=True)
+  assert t.use_pinv
+  assert t.strip_to_rank
+  
+  t = FisherLDATrainer(strip_to_rank=False)
+  assert t.use_pinv == False
+  assert t.strip_to_rank == False
+
 def test_fisher_lda():
 
   # Tests our Fisher/LDA trainer for linear machines for a simple 2-class
@@ -189,6 +208,15 @@ def test_fisher_lda():
   assert numpy.alltrue(abs(machine.weights - exp_mach) < 1e-6)
   assert numpy.alltrue(abs(eig_vals - exp_val) < 1e-6)
 
+  # Use the pseudo-inverse method
+  T.use_pinv = True
+  machine_pinv, eig_vals_pinv = T.train(data)
+
+  # Makes sure results are good
+  #assert numpy.alltrue(abs(machine_pinv.input_subtract - exp_mean) < 1e-6)
+  #assert numpy.alltrue(abs(machine_pinv.weights - exp_mach) < 1e-6)
+  #assert numpy.alltrue(abs(eig_vals_pinv - exp_val) < 1e-6)
+
 def test_fisher_lda_bis():
 
   # Tests our Fisher/LDA trainer for linear machines for a simple 2-class
@@ -215,7 +243,7 @@ def test_fisher_lda_bis():
   exp_val = numpy.array([33.9435556])
   exp_mach = numpy.array([[0.14322439], [-0.98379062], [0.10790173]])
 
-  T = FisherLDATrainer(-1)
+  T = FisherLDATrainer()
   machine, eig_vals = T.train(data)
 
   # Makes sure results are good
@@ -223,6 +251,16 @@ def test_fisher_lda_bis():
   assert numpy.alltrue(abs(machine.input_subtract - exp_mean) < 1e-6)
   assert numpy.alltrue(abs(eig_vals[0:1] - exp_val[0:1]) < 1e-6)
   assert numpy.alltrue(abs(machine.weights[:,0] - exp_mach[:,0]) < 1e-6)
+
+  # Use the pseudo-inverse method
+  T.use_pinv = True
+  machine_pinv, eig_vals_pinv = T.train(data)
+
+  # Makes sure results are good
+  #machine_pinv.resize(3,1) # eigenvalue close to 0 are not significant (just keep the first one)
+  #assert numpy.alltrue(abs(machine_pinv.input_subtract - exp_mean) < 1e-6)
+  #assert numpy.alltrue(abs(machine_pinv.weights[:,0] - exp_mach[:,0]) < 1e-6)
+  #assert numpy.alltrue(abs(eig_vals_pinv[0:1] - exp_val[0:1]) < 1e-6)
 
 def test_fisher_lda_comparisons():
 
@@ -237,6 +275,13 @@ def test_fisher_lda_comparisons():
   assert t1.is_similar_to(t3)
   assert t1 == t4
   assert t1.is_similar_to(t4)
+  
+  t3 = FisherLDATrainer(use_pinv=True)
+  t4 = FisherLDATrainer(use_pinv=True)
+  assert t3 == t4
+  assert t3.is_similar_to(t4)
+  assert t3 != t1
+  assert not t3.is_similar_to(t2)
 
 def test_ppca():
 
