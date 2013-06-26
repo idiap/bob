@@ -23,21 +23,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/format.hpp>
+
 #include <bob/core/blitz_compat.h>
+#include <bob/math/pinv.h>
 #include <bob/math/eig.h>
 #include <bob/math/linear.h>
-#include <bob/machine/Exception.h>
 #include <bob/machine/EigenMachineException.h>
 #include <bob/trainer/Exception.h>
 #include <bob/trainer/FisherLDATrainer.h>
 
-bob::trainer::FisherLDATrainer::FisherLDATrainer(int number_of_kept_lda_dimensions)
-: m_lda_dimensions(number_of_kept_lda_dimensions)
+bob::trainer::FisherLDATrainer::FisherLDATrainer
+  (bool use_pinv, bool strip_to_rank)
+: m_use_pinv(use_pinv),
+  m_strip_to_rank(strip_to_rank)
 {
 }
 
-bob::trainer::FisherLDATrainer::FisherLDATrainer(const bob::trainer::FisherLDATrainer& other)
-: m_lda_dimensions(other.m_lda_dimensions)
+bob::trainer::FisherLDATrainer::FisherLDATrainer
+  (const bob::trainer::FisherLDATrainer& other)
+: m_use_pinv(other.m_use_pinv),
+  m_strip_to_rank(other.m_strip_to_rank)
 {
 }
 
@@ -48,14 +54,16 @@ bob::trainer::FisherLDATrainer::~FisherLDATrainer()
 bob::trainer::FisherLDATrainer& bob::trainer::FisherLDATrainer::operator=
   (const bob::trainer::FisherLDATrainer& other)
 {
-  m_lda_dimensions = other.m_lda_dimensions;
+  m_use_pinv = other.m_use_pinv;
+  m_strip_to_rank = other.m_strip_to_rank;
   return *this;
 }
 
 bool bob::trainer::FisherLDATrainer::operator==
   (const bob::trainer::FisherLDATrainer& other) const
 {
-  return m_lda_dimensions == other.m_lda_dimensions;
+  return m_use_pinv == other.m_use_pinv && \
+                     m_strip_to_rank == other.m_strip_to_rank;
 }
 
 bool bob::trainer::FisherLDATrainer::operator!=
@@ -68,7 +76,7 @@ bool bob::trainer::FisherLDATrainer::is_similar_to
   (const bob::trainer::FisherLDATrainer& other, const double r_epsilon,
    const double a_epsilon) const
 {
-  return m_lda_dimensions == other.m_lda_dimensions;
+  return this->operator==(other);
 }
 
 /**
@@ -190,36 +198,46 @@ static void evalScatters(const std::vector<blitz::Array<double, 2> >& data,
   (void)evalTotalScatter; //< silences gcc, does nothing.
 }
 
-void bob::trainer::FisherLDATrainer::train(bob::machine::LinearMachine& machine,
-  blitz::Array<double,1>& eigen_values,
-  const std::vector<blitz::Array<double, 2> >& data)
+void bob::trainer::FisherLDATrainer::train
+(bob::machine::LinearMachine& machine, blitz::Array<double,1>& eigen_values,
+  const std::vector<blitz::Array<double, 2> >& data) const
 {
   // if #classes < 2, then throw
-  if (data.size() < 2) throw bob::trainer::WrongNumberOfClasses(data.size());
+  if (data.size() < 2) {
+    boost::format m("The number of arrays in the input data == %d whereas for LDA you should provide at least 2");
+    m % data.size();
+    throw std::runtime_error(m.str());
+  }
 
   // checks for arrayset data type and shape once
   int n_features = data[0].extent(1);
 
   for (size_t cl=0; cl<data.size(); ++cl) {
     if (data[cl].extent(1) != n_features) {
-      throw bob::trainer::WrongNumberOfFeatures(data[cl].extent(1),
-          n_features, cl);
+      boost::format m("The number of features/columns (%d) in array at position %d of your input differs from that of array at position 0 (%d)");
+      m % data[cl].extent(1) % n_features;
+      throw std::runtime_error(m.str());
     }
   }
 
-  // Checks that the dimensions are matching
-  const int n_inputs = (int)machine.inputSize();
-  const int n_outputs = (int)machine.outputSize();
-  const int n_eigenvalues = eigen_values.extent(0);
-  const int output_dimension = lda_dimensions(data);
+  int osize = output_size(data);
 
   // Checks that the dimensions are matching
-  if (n_inputs != n_features)
-    throw bob::machine::NInputsMismatch(n_inputs, n_features);
-  if (n_outputs != output_dimension)
-    throw bob::machine::NOutputsMismatch(n_outputs, output_dimension);
-  if (n_eigenvalues != output_dimension)
-    throw bob::machine::NOutputsMismatch(n_eigenvalues, output_dimension);
+  if (machine.inputSize() != (size_t)data[0].extent(1)) {
+    boost::format m("Number of features at input data set (%d columns) does not match machine input size (%d)");
+    m % data[0].extent(1) % machine.inputSize();
+    throw std::runtime_error(m.str());
+  }
+  if (machine.outputSize() != (size_t)osize) {
+    boost::format m("Number of outputs of the given machine (%d) does not match the expected number of outputs calculated by this trainer = %d");
+    m % machine.outputSize() % osize;
+    throw std::runtime_error(m.str());
+  }
+  if (eigen_values.extent(0) != osize) {
+    boost::format m("Number of eigenvalues on the given 1D array (%d) does not match the expected number of outputs calculated by this trainer = %d");
+    m % eigen_values.extent(0) % osize;
+    throw std::runtime_error(m.str());
+  }
 
   blitz::Array<double,1> preMean(n_features);
   blitz::Array<double,2> Sw(n_features, n_features);
@@ -230,26 +248,39 @@ void bob::trainer::FisherLDATrainer::train(bob::machine::LinearMachine& machine,
   // so to find the eigen vectors/values of Sw^(-1) * Sb
   blitz::Array<double,2> V(n_features, n_features);
   blitz::Array<double,1> eigen_values_(n_features);
+
   // eigSym returned the eigen_values in chronological order
   // reverts the vector and matrix before and after calling eig
   eigen_values_.reverseSelf(0);
   V.reverseSelf(1);
   eigen_values_ = 0;
-  bob::math::eigSym(Sb, Sw, V, eigen_values_);
+
+  if (m_use_pinv) {
+    blitz::Array<double,2> Sw_inv(Sw.shape());
+    bob::math::pinv(Sw, Sw_inv);
+    blitz::Array<double,2> prod(Sb.shape());
+    bob::math::prod(Sw_inv, Sb, prod);
+    bob::math::eigSym(prod, V, eigen_values_);
+  }
+  else {
+    bob::math::eigSym(Sb, Sw, V, eigen_values_);
+  }
+
   // Convert ascending order to descending order
   eigen_values_.reverseSelf(0);
   V.reverseSelf(1);
 
   // limit the dimensions of the resulting projection matrix and eigen values
-  eigen_values = eigen_values_(blitz::Range(0,output_dimension-1));
-  V.resizeAndPreserve(V.extent(0), output_dimension);
+  eigen_values = eigen_values_(blitz::Range(0,osize-1));
+  V.resizeAndPreserve(V.extent(0), osize);
 
-  // updates the machine
-  blitz::Range a = blitz::Range::all();
   // normalizes the eigen vectors so they have unit length
+  blitz::Range a = blitz::Range::all();
   for (int column=0; column<V.extent(1); ++column) {
     math::normalizeSelf(V(a,column));
   }
+
+  // updates the machine
   machine.setWeights(V);
   machine.setInputSubtraction(preMean);
 
@@ -259,20 +290,11 @@ void bob::trainer::FisherLDATrainer::train(bob::machine::LinearMachine& machine,
 }
 
 void bob::trainer::FisherLDATrainer::train(bob::machine::LinearMachine& machine,
-    const std::vector<blitz::Array<double,2> >& data)
-{
-  blitz::Array<double,1> throw_away(lda_dimensions(data));
+    const std::vector<blitz::Array<double,2> >& data) const {
+  blitz::Array<double,1> throw_away(output_size(data));
   train(machine, throw_away, data);
 }
 
-int bob::trainer::FisherLDATrainer::lda_dimensions(const std::vector<blitz::Array<double,2> >& data) const{
-  int feature_length = data[0].extent(1);
-  if (m_lda_dimensions > feature_length)
-    throw bob::machine::EigenMachineNOutputsTooLarge(m_lda_dimensions, feature_length);
-
-  if (m_lda_dimensions > 0)
-    return m_lda_dimensions;
-  if (m_lda_dimensions == 0)
-    return data.size() - 1; // the number of classes - 1
-  return feature_length; // the feature length, i.e., all dimensions are kept
+size_t bob::trainer::FisherLDATrainer::output_size(const std::vector<blitz::Array<double,2> >& data) const {
+  return m_strip_to_rank? (data.size()-1) : data[0].extent(1);
 }

@@ -168,7 +168,7 @@ void bob::trainer::PCATrainer::train(bob::machine::LinearMachine& machine,
   blitz::Array<double,1>& eigen_values, const blitz::Array<double,2>& X) const
 {
   // data is checked now and conforms, just proceed w/o any further checks.
-  const int rank = max_covariance_rank(X);
+  const int rank = output_size(X);
 
   // Checks that the dimensions are matching
   if (machine.inputSize() != (size_t)X.extent(1)) {
@@ -194,11 +194,11 @@ void bob::trainer::PCATrainer::train(bob::machine::LinearMachine& machine,
 void bob::trainer::PCATrainer::train(bob::machine::LinearMachine& machine,
   const blitz::Array<double,2>& X) const
 {
-  blitz::Array<double,1> throw_away_eigen_values(max_covariance_rank(X));
+  blitz::Array<double,1> throw_away_eigen_values(output_size(X));
   train(machine, throw_away_eigen_values, X);
 }
 
-size_t bob::trainer::PCATrainer::max_covariance_rank
+size_t bob::trainer::PCATrainer::output_size
 (const blitz::Array<double,2>& X) const{
   return (size_t)std::min(X.extent(0)-1,X.extent(1));
 }
