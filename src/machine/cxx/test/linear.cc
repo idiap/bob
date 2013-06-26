@@ -30,7 +30,6 @@
 #include <stdint.h>
 
 #include "bob/machine/LinearMachine.h"
-#include "bob/machine/Exception.h"
 #include "bob/core/logging.h"
 #include "bob/core/array_copy.h"
 #include "bob/io/HDF5File.h"
@@ -135,10 +134,10 @@ BOOST_AUTO_TEST_CASE( test_error_check )
   blitz::Array<double,1> X(5);
   X = 0.3, -3.0, 2.7, -18, 52;
 
-  BOOST_CHECK_THROW(M.setWeights(W), bob::machine::NInputsMismatch);
-  BOOST_CHECK_THROW(M.setBiases(X), bob::machine::NOutputsMismatch);
-  BOOST_CHECK_THROW(M.setInputSubtraction(X), bob::machine::NInputsMismatch);
-  BOOST_CHECK_THROW(M.setInputDivision(X), bob::machine::NInputsMismatch);
+  BOOST_CHECK_THROW(M.setWeights(W), std::runtime_error);
+  BOOST_CHECK_THROW(M.setBiases(X), std::runtime_error);
+  BOOST_CHECK_THROW(M.setInputSubtraction(X), std::runtime_error);
+  BOOST_CHECK_THROW(M.setInputDivision(X), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE( test_correctness )
