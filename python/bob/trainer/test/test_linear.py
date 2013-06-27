@@ -151,7 +151,7 @@ def test_pca_svd_vs_cov_random_2():
   assert numpy.allclose(machine_svd.input_divide, machine_cov.input_divide)
   assert numpy.allclose(abs(machine_svd.weights/machine_cov.weights), 1.0)
 
-def test_fisher_settings():
+def test_fisher_lda_settings():
 
   t = FisherLDATrainer()
   assert t.use_pinv == False
@@ -213,9 +213,13 @@ def test_fisher_lda():
   machine_pinv, eig_vals_pinv = T.train(data)
 
   # Makes sure results are good
-  #assert numpy.alltrue(abs(machine_pinv.input_subtract - exp_mean) < 1e-6)
-  #assert numpy.alltrue(abs(machine_pinv.weights - exp_mach) < 1e-6)
-  #assert numpy.alltrue(abs(eig_vals_pinv - exp_val) < 1e-6)
+  assert numpy.alltrue(abs(machine_pinv.input_subtract - exp_mean) < 1e-6)
+  assert numpy.alltrue(abs(eig_vals_pinv - exp_val) < 1e-6)
+
+  # Eigen vectors could be off by a constant
+  weight_ratio = machine_pinv.weights[0] / machine.weights[0]
+  normalized_weights = (machine_pinv.weights.T/weight_ratio).T
+  assert numpy.allclose(machine.weights, normalized_weights)
 
 def test_fisher_lda_bis():
 
@@ -257,10 +261,14 @@ def test_fisher_lda_bis():
   machine_pinv, eig_vals_pinv = T.train(data)
 
   # Makes sure results are good
-  #machine_pinv.resize(3,1) # eigenvalue close to 0 are not significant (just keep the first one)
-  #assert numpy.alltrue(abs(machine_pinv.input_subtract - exp_mean) < 1e-6)
-  #assert numpy.alltrue(abs(machine_pinv.weights[:,0] - exp_mach[:,0]) < 1e-6)
-  #assert numpy.alltrue(abs(eig_vals_pinv[0:1] - exp_val[0:1]) < 1e-6)
+  machine_pinv.resize(3,1) # eigenvalue close to 0 are not significant (just keep the first one)
+  assert numpy.alltrue(abs(machine_pinv.input_subtract - exp_mean) < 1e-6)
+  assert numpy.alltrue(abs(eig_vals_pinv[0:1] - exp_val[0:1]) < 1e-6)
+
+  # Eigen vectors could be off by a constant
+  weight_ratio = machine_pinv.weights[0] / machine.weights[0]
+  normalized_weights = (machine_pinv.weights.T/weight_ratio).T
+  assert numpy.allclose(machine.weights, normalized_weights)
 
 def test_fisher_lda_comparisons():
 

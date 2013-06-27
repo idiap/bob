@@ -28,6 +28,7 @@
 #include <stdint.h>
 #include "bob/math/eig.h"
 #include "bob/math/inv.h"
+#include "bob/math/det.h"
 #include "bob/math/linear.h"
 #include <algorithm>
 
@@ -107,6 +108,67 @@ BOOST_AUTO_TEST_CASE( test_eigSymGen_3x3 )
 
   // Check eigenvalues
   checkBlitzClose(S3_2, S, eps);
+}
+
+/**
+ * Returns the indexes for sorting a given blitz::Array<double,1>
+ */
+struct compare_1d_blitz {
+  const blitz::Array<double,1>& v_;
+  compare_1d_blitz(const blitz::Array<double,1>& v): v_(v) { }
+  bool operator() (size_t i, size_t j) { return v_(i) < v_(j); }
+};
+
+static std::vector<size_t> sort_indexes(const blitz::Array<double,1>& v) {
+
+  // initialize original index locations
+  std::vector<size_t> idx(v.size());
+  for (size_t i = 0; i != idx.size(); ++i) idx[i] = i;
+
+  // sort indexes based on comparing values in v
+  std::sort(idx.begin(), idx.end(), compare_1d_blitz(v));
+
+  return idx;
+}
+
+BOOST_AUTO_TEST_CASE( test_eigCompare_3x3 )
+{
+  blitz::Array<double,2> VGen(3,3);
+  blitz::Array<double,1> SGen(3);
+
+  // Calls eigenvalue decomposition function
+  bob::math::eigSym(A33_1, B33_1, VGen, SGen);
+
+  // Calls the eigen decomposition (simple)
+  blitz::Array<std::complex<double>,2> V(3,3);
+  blitz::Array<std::complex<double>,1> S(3);
+  blitz::Array<double,2> P(3,3);
+  blitz::Array<double,2> I(3,3);
+  bob::math::inv_(B33_1, I);
+  bob::math::prod_(I, A33_1, P);
+  bob::math::eig_(P, V, S);
+
+  // Note symmetric problem => only real eigen-values and vectors
+  blitz::Array<double,1> SR(blitz::real(S));
+  blitz::Array<double,2> VR(blitz::real(V));
+
+  // Sorts eigen values
+  blitz::Array<double,1> SR2(SR.shape());
+  blitz::Array<double,2> VR2(VR.shape());
+  std::vector<size_t> order = sort_indexes(SR);
+  blitz::Range a = blitz::Range::all();
+  for (int i=0; i<order.size(); ++i) {
+    SR2(i) = SR(order[i]);
+    VR2(a,i) = VR(a,order[i]);
+  }
+
+  // Check eigen values
+  checkBlitzClose(SGen, SR2, eps);
+
+  // Check that eigen-vectors are identical, except for a constant factor
+  blitz::Array<double,1> multiplier(VR2(0,a)/VGen(0,a));
+  for (int i=0; i<order.size(); ++i) VR2(a,i) /= multiplier(i);
+  checkBlitzClose(VGen, VR2, eps);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

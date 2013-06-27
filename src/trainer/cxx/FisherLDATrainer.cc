@@ -198,6 +198,27 @@ static void evalScatters(const std::vector<blitz::Array<double, 2> >& data,
   (void)evalTotalScatter; //< silences gcc, does nothing.
 }
 
+/**
+ * Returns the indexes for sorting a given blitz::Array<double,1>
+ */
+struct compare_1d_blitz {
+  const blitz::Array<double,1>& v_;
+  compare_1d_blitz(const blitz::Array<double,1>& v): v_(v) { }
+  bool operator() (size_t i, size_t j) { return v_(i) < v_(j); }
+};
+
+static std::vector<size_t> sort_indexes(const blitz::Array<double,1>& v) {
+
+  // initialize original index locations
+  std::vector<size_t> idx(v.size());
+  for (size_t i = 0; i != idx.size(); ++i) idx[i] = i;
+
+  // sort indexes based on comparing values in v
+  std::sort(idx.begin(), idx.end(), compare_1d_blitz(v));
+
+  return idx;
+}
+
 void bob::trainer::FisherLDATrainer::train
 (bob::machine::LinearMachine& machine, blitz::Array<double,1>& eigen_values,
   const std::vector<blitz::Array<double, 2> >& data) const
@@ -246,24 +267,29 @@ void bob::trainer::FisherLDATrainer::train
 
   // computes the generalized eigenvalue decomposition
   // so to find the eigen vectors/values of Sw^(-1) * Sb
-  blitz::Array<double,2> V(n_features, n_features);
+  blitz::Array<double,2> V(Sw.shape());
   blitz::Array<double,1> eigen_values_(n_features);
 
-  // eigSym returned the eigen_values in chronological order
-  // reverts the vector and matrix before and after calling eig
-  eigen_values_.reverseSelf(0);
-  V.reverseSelf(1);
-  eigen_values_ = 0;
-
   if (m_use_pinv) {
-    blitz::Array<double,2> Sw_inv(Sw.shape());
-    bob::math::pinv(Sw, Sw_inv);
-    blitz::Array<double,2> prod(Sb.shape());
-    bob::math::prod(Sw_inv, Sb, prod);
-    bob::math::eigSym(prod, V, eigen_values_);
+    
+    //note: misuse V and Sw as temporary place holders for data
+    bob::math::pinv_(Sw, V); //V now contains Sw^-1
+    bob::math::prod_(V, Sb, Sw); //Sw now contains Sw^-1*Sb
+    blitz::Array<std::complex<double>,1> Dtemp(eigen_values_.shape());
+    blitz::Array<std::complex<double>,2> Vtemp(V.shape());
+    bob::math::eig_(Sw, Vtemp, Dtemp); //V now contains eigen-vectors
+    
+    //sorting: we know this problem on has real eigen-values
+    blitz::Range a = blitz::Range::all();
+    blitz::Array<double,1> Dunordered(blitz::real(Dtemp));
+    std::vector<size_t> order = sort_indexes(Dunordered);
+    for (int i=0; i<n_features; ++i) {
+      eigen_values_(i) = Dunordered(order[i]);
+      V(a,i) = blitz::real(Vtemp(a,order[i]));
+    }
   }
   else {
-    bob::math::eigSym(Sb, Sw, V, eigen_values_);
+    bob::math::eigSym_(Sb, Sw, V, eigen_values_);
   }
 
   // Convert ascending order to descending order
