@@ -113,7 +113,7 @@ void bind_trainer_lda()
           "\n" \
           "use_pinv (bool) - defaults to ``False``\n" \
           "   \n" \
-          "   If set to ``True``, use the pseudo-inverse to calculate :math:`S_w^{-1} S_b` and then perform (symmetric) eigen value decomposition instead of using (more numerically stable) LAPACK's ``dsyvg`` to solve the generalized symmetric-definite eigenproblem of the form :math:`S_b v=(\\lambda) S_w v`\n" \
+          "   If set to ``True``, use the pseudo-inverse to calculate :math:`S_w^{-1} S_b` and then perform eigen value decomposition (using LAPACK's ``dgeev``) instead of using (the more numerically stable) LAPACK's ``dsyvgd`` to solve the generalized symmetric-definite eigenproblem of the form :math:`S_b v=(\\lambda) S_w v`\n" \
           "   \n" \
           "   .. note::\n" \
           "     \n" \
@@ -159,7 +159,7 @@ void bind_trainer_lda()
        )
 
     .add_property("use_pinv", &bob::trainer::FisherLDATrainer::getUsePseudoInverse, &bob::trainer::FisherLDATrainer::setUsePseudoInverse,
-        "If ``True``, use the pseudo-inverse to calculate :math:`S_w^{-1} S_b` and then perform (symmetric) eigen value decomposition instead of using (more numerically stable) LAPACK's ``dsyvg`` to solve the generalized symmetric-definite eigenproblem of the form :math:`S_b v=(\\lambda) S_w v`")
+        "If ``True``, use the pseudo-inverse to calculate :math:`S_w^{-1} S_b` and then perform the eigen value decomposition (using LAPACK's ``dgeev``) instead of using (the more numerically stable) LAPACK's ``dsyvgd`` to solve the generalized symmetric-definite eigenproblem of the form :math:`S_b v=(\\lambda) S_w v`")
 
     .add_property("strip_to_rank", &bob::trainer::FisherLDATrainer::getStripToRank, &bob::trainer::FisherLDATrainer::setStripToRank,
         "Specifies how to calculate the final size of the to-be-trained :py:class:`bob.machine.LinearMachine`. The default setting (``True``), makes the trainer return only the K-1 eigen-values/vectors limiting the output to the rank of :math:`S_w^{-1} S_b`. If you set this value to ``False``, the it returns all eigen-values/vectors of :math:`S_w^{-1} Sb`, including the ones that are supposed to be zero.")
