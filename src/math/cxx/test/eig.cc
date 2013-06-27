@@ -157,7 +157,7 @@ BOOST_AUTO_TEST_CASE( test_eigCompare_3x3 )
   blitz::Array<double,2> VR2(VR.shape());
   std::vector<size_t> order = sort_indexes(SR);
   blitz::Range a = blitz::Range::all();
-  for (int i=0; i<order.size(); ++i) {
+  for (int i=0; i<(int)order.size(); ++i) {
     SR2(i) = SR(order[i]);
     VR2(a,i) = VR(a,order[i]);
   }
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE( test_eigCompare_3x3 )
 
   // Check that eigen-vectors are identical, except for a constant factor
   blitz::Array<double,1> multiplier(VR2(0,a)/VGen(0,a));
-  for (int i=0; i<order.size(); ++i) VR2(a,i) /= multiplier(i);
+  for (int i=0; i<(int)order.size(); ++i) VR2(a,i) /= multiplier(i);
   checkBlitzClose(VGen, VR2, eps);
 }
 
