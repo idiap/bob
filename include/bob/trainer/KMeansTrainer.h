@@ -93,6 +93,11 @@ class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, blitz::Array<
       const double a_epsilon=1e-8) const;
  
     /**
+     * @brief The name for this trainer
+     */
+    virtual std::string name() const { return "KMeansTrainer"; }
+   
+    /**
      * @brief Initialise the means randomly. 
      * Data is split into as many chunks as there are means, 
      * then each mean is set to a random example within each chunk.

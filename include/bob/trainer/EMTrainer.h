@@ -53,7 +53,7 @@ namespace bob { namespace trainer {
      * @brief Destructor
      */
     virtual ~EMTrainer() {}
-   
+
     /**
      * @brief Assignment operator
      */
@@ -98,11 +98,16 @@ namespace bob { namespace trainer {
     }
 
     /**
+     * @brief The name for this trainer
+     */
+    virtual std::string name() const { return "EMTrainer"; }
+   
+    /**
      * @brief The main method to train a machine using an EM-based algorithm
      */
     virtual void train(T_machine& machine, const T_sampler& sampler) 
     {
-      bob::core::info << "# EMTrainer:" << std::endl;
+      bob::core::info << "# " << name() << ":" << std::endl;
       
       /*
       // Check that the machine and dataset have the same feature dimensionality
