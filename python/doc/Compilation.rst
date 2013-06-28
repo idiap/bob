@@ -42,23 +42,24 @@ checkout and build yourself as explained further below.
   :doc:`Dependencies`, prior to compiling and using |project|.
 
 Grab a release tarball and change into the directory of your choice, let's say
-``mybob``:
+``workdir``:
 
 .. code-block:: sh
 
   $ mkdir workdir
   $ cd workdir
-  # getting version 1.0.5 as a tarball
-  $ wget http://www.idiap.ch/software/bob/packages/bob-1.0.5.tar.gz
-  $ tar xvfz bob-1.0.5.tar.gz
-  $ cd bob-1.0.5
+  # getting version 1.1.4 as a tarball
+  $ wget http://www.idiap.ch/software/bob/packages/bob-1.1.4.tar.gz
+  $ tar xvfz bob-1.1.4.tar.gz
+  $ cd bob-1.1.4
 
 .. _section-checkout:
 
 Cloning |project|
 -----------------
 
-To checkout |project|, do the following at your shell prompt:
+If you decide to checkout the latest sources from our git repository, do the
+following at your shell prompt:
 
 .. code-block:: sh
 
