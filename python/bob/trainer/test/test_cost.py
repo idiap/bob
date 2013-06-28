@@ -84,8 +84,8 @@ def test_cross_entropy():
 def test_cross_entropy_derivative():
   
   op = CrossEntropyLoss(LogisticActivation())
-  x = rand_safe(10, eps=1e-3) #10 random numbers between 0 and 1
-  y = rand_safe(10, eps=1e-3) #10 random numbers between 0 and 1
+  x = rand_safe(10, eps=0.2) #10 random numbers between 0 and 1
+  y = rand_safe(10, eps=0.2) #10 random numbers between 0 and 1
 
   # go for an exact match
   for p,q in zip(x,y):
