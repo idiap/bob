@@ -278,6 +278,7 @@ add_subdirectory(python)
 add_subdirectory(doc)
 
 # Produce the config.h file
+execute_process(COMMAND ${WITH_PYTHON} ${CMAKE_SOURCE_DIR}/bin/apiversion.py ${BOB_VERSION} OUTPUT_VARIABLE BOB_API_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 configure_file(${CMAKE_SOURCE_DIR}/include/bob/config.h.in ${CMAKE_BINARY_DIR}/include/bob/config.h @ONLY)
 install(FILES ${CMAKE_BINARY_DIR}/include/bob/config.h DESTINATION include/bob)
 
