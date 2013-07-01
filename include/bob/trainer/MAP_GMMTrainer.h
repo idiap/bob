@@ -62,7 +62,7 @@ class MAP_GMMTrainer: public GMMTrainer
     /**
      * @brief Initialization
      */
-    virtual void initialization(bob::machine::GMMMachine& gmm,
+    virtual void initialize(bob::machine::GMMMachine& gmm,
       const blitz::Array<double,2>& data);
 
     /**

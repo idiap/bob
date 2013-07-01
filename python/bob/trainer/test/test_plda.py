@@ -152,7 +152,7 @@ class PythonPLDATrainer():
     self.__init_g__(machine, data)
     self.__init_sigma__(machine, data)
 
-  def initialization(self, machine, data):
+  def initialize(self, machine, data):
     self.__check_training_data__(data)
     n_features = data[0].shape[1]
     if(machine.dim_d != n_features):
@@ -306,11 +306,11 @@ class PythonPLDATrainer():
     self.__update_sigma__(machine, data)
     machine.__precompute__()
 
-  def finalization(self, machine, data):
+  def finalize(self, machine, data):
     machine.__precompute_log_like__()
 
   def train(self, machine, data):
-    self.initialization(machine, data)
+    self.initialize(machine, data)
     average_output_previous = -sys.maxint
     average_output = -sys.maxint
     self.e_step(machine, data)
@@ -531,7 +531,7 @@ class PLDATrainerTest(unittest.TestCase):
     t = bob.trainer.PLDATrainer()
     t0 = bob.trainer.PLDATrainer(t)
     m = bob.machine.PLDABase(dim_d,dim_f,dim_g)
-    t.initialization(m,l)
+    t.initialize(m,l)
     m.sigma = sigma_init
     m.g = G_init
     m.f = F_init
@@ -539,7 +539,7 @@ class PLDATrainerTest(unittest.TestCase):
     # Defines base trainer and machine (for Python implementation
     t_py = PythonPLDATrainer()
     m_py = bob.machine.PLDABase(dim_d,dim_f,dim_g)
-    t_py.initialization(m_py,l)
+    t_py.initialize(m_py,l)
     m_py.sigma = sigma_init
     m_py.g = G_init
     m_py.f = F_init
@@ -597,11 +597,11 @@ class PLDATrainerTest(unittest.TestCase):
     # Calls the initialization methods and resets randomly initialized values
     # to new reference ones (to make the tests deterministic)
     t.use_sum_second_order = False
-    t.initialization(m,l)
+    t.initialize(m,l)
     m.sigma = sigma_init
     m.g = G_init
     m.f = F_init
-    t_py.initialization(m_py,l)
+    t_py.initialize(m_py,l)
     m_py.sigma = sigma_init
     m_py.g = G_init
     m_py.f = F_init
@@ -724,21 +724,21 @@ class PLDATrainerTest(unittest.TestCase):
     training_set = [numpy.array([[1,2,3,4]], numpy.float64), numpy.array([[3,4,3,4]], numpy.float64)]
     m = bob.machine.PLDABase(4,1,1,1e-8)
     t1.rng.seed(37)
-    t1.initialization(m, training_set)
+    t1.initialize(m, training_set)
     t1.e_step(m, training_set)
     t1.m_step(m, training_set)
     self.assertFalse( t1 == t2 )
     self.assertTrue(  t1 != t2 )
     self.assertFalse( t1.is_similar_to(t2) )
     t2.rng.seed(37)
-    t2.initialization(m, training_set)
+    t2.initialize(m, training_set)
     t2.e_step(m, training_set)
     t2.m_step(m, training_set)
     self.assertTrue(  t1 == t2 )
     self.assertFalse( t1 != t2 )
     self.assertTrue(  t1.is_similar_to(t2) )
     t2.rng.seed(77)
-    t2.initialization(m, training_set)
+    t2.initialize(m, training_set)
     t2.e_step(m, training_set)
     t2.m_step(m, training_set)
     self.assertFalse( t1 == t2 )

@@ -43,7 +43,7 @@ bob::trainer::GMMTrainer::~GMMTrainer()
 {
 }
 
-void bob::trainer::GMMTrainer::initialization(bob::machine::GMMMachine& gmm,
+void bob::trainer::GMMTrainer::initialize(bob::machine::GMMMachine& gmm,
   const blitz::Array<double,2>& data)
 {
   // Allocate memory for the sufficient statistics and initialise
@@ -63,7 +63,7 @@ double bob::trainer::GMMTrainer::computeLikelihood(bob::machine::GMMMachine& gmm
   return m_ss.log_likelihood / m_ss.T;
 }
 
-void bob::trainer::GMMTrainer::finalization(bob::machine::GMMMachine& gmm,
+void bob::trainer::GMMTrainer::finalize(bob::machine::GMMMachine& gmm,
   const blitz::Array<double,2>& data)
 {
 }

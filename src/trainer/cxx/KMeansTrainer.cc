@@ -77,7 +77,7 @@ bool bob::trainer::KMeansTrainer::operator!=(const bob::trainer::KMeansTrainer& 
   return !(this->operator==(b));
 }
  
-void bob::trainer::KMeansTrainer::initialization(bob::machine::KMeansMachine& kmeans,
+void bob::trainer::KMeansTrainer::initialize(bob::machine::KMeansMachine& kmeans,
   const blitz::Array<double,2>& ar) 
 {
   // split data into as many chunks as there are means
@@ -223,7 +223,7 @@ double bob::trainer::KMeansTrainer::computeLikelihood(bob::machine::KMeansMachin
   return m_average_min_distance;
 }
 
-void bob::trainer::KMeansTrainer::finalization(bob::machine::KMeansMachine& kmeans,
+void bob::trainer::KMeansTrainer::finalize(bob::machine::KMeansMachine& kmeans,
   const blitz::Array<double,2>& ar) 
 {
 }

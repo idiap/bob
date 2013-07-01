@@ -100,12 +100,12 @@ class EMPCATrainer: public EMTrainer<bob::machine::LinearMachine, blitz::Array<d
     /**
      * @brief This methods performs some initialization before the EM loop.
      */
-    virtual void initialization(bob::machine::LinearMachine& machine, 
+    virtual void initialize(bob::machine::LinearMachine& machine, 
       const blitz::Array<double,2>& ar);
     /**
      * @brief This methods performs some actions after the EM loop.
       */
-   virtual void finalization(bob::machine::LinearMachine& machine, 
+   virtual void finalize(bob::machine::LinearMachine& machine, 
       const blitz::Array<double,2>& ar);
     
     /**

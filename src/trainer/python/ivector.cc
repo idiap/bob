@@ -37,12 +37,12 @@ static void py_train(bob::trainer::IVectorTrainer& trainer,
   trainer.train(machine, vdata);
 }
 
-static void py_initialization(bob::trainer::IVectorTrainer& trainer, 
+static void py_initialize(bob::trainer::IVectorTrainer& trainer, 
   bob::machine::IVectorMachine& machine, object data)
 {
   stl_input_iterator<bob::machine::GMMStats> dbegin(data), dend;
   std::vector<bob::machine::GMMStats> vdata(dbegin, dend);
-  trainer.initialization(machine, vdata);
+  trainer.initialize(machine, vdata);
 }
 
 static void py_eStep(bob::trainer::IVectorTrainer& trainer, 
@@ -61,12 +61,12 @@ static void py_mStep(bob::trainer::IVectorTrainer& trainer,
   trainer.mStep(machine, vdata);
 }
 
-static void py_finalization(bob::trainer::IVectorTrainer& trainer, 
+static void py_finalize(bob::trainer::IVectorTrainer& trainer, 
   bob::machine::IVectorMachine& machine, object data)
 {
   stl_input_iterator<bob::machine::GMMStats> dbegin(data), dend;
   std::vector<bob::machine::GMMStats> vdata(dbegin, dend);
-  trainer.finalization(machine, vdata);
+  trainer.finalize(machine, vdata);
 }
 
 static object py_get_AccNijWij2(const bob::trainer::IVectorTrainer& trainer)
@@ -143,8 +143,8 @@ void bind_trainer_ivector()
     .add_property("compute_likelihood_variable", &EMTrainerIVectorBase::getComputeLikelihood, &EMTrainerIVectorBase::setComputeLikelihood, "Indicates whether the log likelihood should be computed during EM or not")
     .add_property("rng", &EMTrainerIVectorBase::getRng, &EMTrainerIVectorBase::setRng, "The Mersenne Twister mt19937 random generator used for the initialization of subspaces/arrays before the EM loop.")
     .def("train", &EMTrainerIVectorBase::train, (arg("machine"), arg("data")), "Trains a machine using data")
-    .def("initialization", &EMTrainerIVectorBase::initialization, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
-    .def("finalization", &EMTrainerIVectorBase::finalization, (arg("machine"), arg("data")), "This method is called at the end of the EM algorithm")
+    .def("initialize", &EMTrainerIVectorBase::initialize, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
+    .def("finalize", &EMTrainerIVectorBase::finalize, (arg("machine"), arg("data")), "This method is called at the end of the EM algorithm")
     .def("e_step", &EMTrainerIVectorBase::eStep, (arg("machine"), arg("data")),
        "Updates the hidden variable distribution (or the sufficient statistics) given the Machine parameters. ")
     .def("m_step", &EMTrainerIVectorBase::mStep, (arg("machine"), arg("data")), "Updates the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
@@ -158,11 +158,11 @@ void bind_trainer_ivector()
     .def(self != self)
     .def("is_similar_to", &bob::trainer::IVectorTrainer::is_similar_to, (arg("self"), arg("other"), arg("r_epsilon")=1e-5, arg("a_epsilon")=1e-8), "Compares this IVectorTrainer with the 'other' one to be approximately the same.")
     .def("train", &py_train, (arg("self"), arg("machine"), arg("data")), "Trains a machine using data")
-    .def("initialization", &py_initialization, (arg("self"), arg("machine"), arg("data")), "This method is called before the EM loop")
+    .def("initialize", &py_initialize, (arg("self"), arg("machine"), arg("data")), "This method is called before the EM loop")
     .def("e_step", &py_eStep, (arg("self"), arg("machine"), arg("data")),
        "Updates the hidden variable distribution (or the sufficient statistics) given the Machine parameters. ")
     .def("m_step", &py_mStep, (arg("self"), arg("machine"), arg("data")), "Updates the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
-    .def("finalization", &py_finalization, (arg("self"), arg("machine"), arg("data")), "This method is called after the EM loop")
+    .def("finalize", &py_finalize, (arg("self"), arg("machine"), arg("data")), "This method is called after the EM loop")
     .add_property("acc_nij_wij2", &py_get_AccNijWij2, &py_set_AccNijWij2, "Accumulator updated during the E-step")
     .add_property("acc_fnormij_wij", &py_get_AccFnormijWij, &py_set_AccFnormijWij, "Accumulator updated during the E-step")
     .add_property("acc_nij", &py_get_AccNij, &py_set_AccNij, "Accumulator updated during the E-step")

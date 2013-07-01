@@ -421,7 +421,7 @@ class JFATrainer
     /**
      * @brief This methods performs some initialization before the EM loop.
      */
-    virtual void initialization(bob::machine::JFABase& machine, 
+    virtual void initialize(bob::machine::JFABase& machine, 
       const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& ar);
 
     /**
@@ -438,7 +438,7 @@ class JFATrainer
      * @brief This methods performs the finalization after training the first 
      * subspace V
      */
-    virtual void finalization1(bob::machine::JFABase& machine, 
+    virtual void finalize1(bob::machine::JFABase& machine, 
       const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& ar);
     /**
      * @brief This methods performs the e-Step to train the second subspace U
@@ -454,7 +454,7 @@ class JFATrainer
      * @brief This methods performs the finalization after training the second 
      * subspace U
      */
-    virtual void finalization2(bob::machine::JFABase& machine, 
+    virtual void finalize2(bob::machine::JFABase& machine, 
       const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& ar);
     /**
      * @brief This methods performs the e-Step to train the third subspace d
@@ -470,7 +470,7 @@ class JFATrainer
      * @brief This methods performs the finalization after training the third
      * subspace d
      */
-    virtual void finalization3(bob::machine::JFABase& machine, 
+    virtual void finalize3(bob::machine::JFABase& machine, 
       const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& ar);
 
     /**
@@ -618,12 +618,12 @@ class ISVTrainer: public EMTrainer<bob::machine::ISVBase, std::vector<std::vecto
     /**
      * @brief This methods performs some initialization before the EM loop.
      */
-    virtual void initialization(bob::machine::ISVBase& machine, 
+    virtual void initialize(bob::machine::ISVBase& machine, 
       const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& ar);
     /**
      * @brief This methods performs some actions after the EM loop.
      */
-    virtual void finalization(bob::machine::ISVBase& machine, 
+    virtual void finalize(bob::machine::ISVBase& machine, 
       const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& ar);
     
     /**

@@ -66,7 +66,7 @@ class IVectorTrainer: public bob::trainer::EMTrainer<bob::machine::IVectorMachin
     /**
      * @brief Initialization before the EM loop
      */
-    virtual void initialization(bob::machine::IVectorMachine& ivector, 
+    virtual void initialize(bob::machine::IVectorMachine& ivector, 
       const std::vector<bob::machine::GMMStats>& data);
     
     /**
@@ -98,7 +98,7 @@ class IVectorTrainer: public bob::trainer::EMTrainer<bob::machine::IVectorMachin
     /**
      * @brief Finalization after the EM loop
      */
-    virtual void finalization(bob::machine::IVectorMachine& ivector, 
+    virtual void finalize(bob::machine::IVectorMachine& ivector, 
       const std::vector<bob::machine::GMMStats>& data);
 
     /**

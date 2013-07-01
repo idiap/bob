@@ -135,7 +135,7 @@ bool bob::trainer::EMPCATrainer::is_similar_to
         bob::core::isClose(m_f_log2pi, other.m_f_log2pi, r_epsilon, a_epsilon);
 }
 
-void bob::trainer::EMPCATrainer::initialization(bob::machine::LinearMachine& machine,
+void bob::trainer::EMPCATrainer::initialize(bob::machine::LinearMachine& machine,
   const blitz::Array<double,2>& ar) 
 {
   // reinitializes array members and checks dimensionality
@@ -153,7 +153,7 @@ void bob::trainer::EMPCATrainer::initialization(bob::machine::LinearMachine& mac
   computeInvM();
 }
 
-void bob::trainer::EMPCATrainer::finalization(bob::machine::LinearMachine& machine,
+void bob::trainer::EMPCATrainer::finalize(bob::machine::LinearMachine& machine,
   const blitz::Array<double,2>& ar) 
 {
 }

@@ -624,7 +624,7 @@ bool bob::trainer::ISVTrainer::is_similar_to(const bob::trainer::ISVTrainer& b,
           m_relevance_factor == b.m_relevance_factor;
 }
 
-void bob::trainer::ISVTrainer::initialization(bob::machine::ISVBase& machine,
+void bob::trainer::ISVTrainer::initialize(bob::machine::ISVBase& machine,
   const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& ar)
 {
   m_base_trainer.initUbmNidSumStatistics(machine.getBase(), ar);
@@ -642,7 +642,7 @@ void bob::trainer::ISVTrainer::initializeD(bob::machine::ISVBase& machine) const
   d = sqrt(machine.getBase().getUbmVariance() / m_relevance_factor);
 }
 
-void bob::trainer::ISVTrainer::finalization(bob::machine::ISVBase& machine,
+void bob::trainer::ISVTrainer::finalize(bob::machine::ISVBase& machine,
   const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& ar)
 {
 }
@@ -737,7 +737,7 @@ bool bob::trainer::JFATrainer::is_similar_to(const bob::trainer::JFATrainer& b,
   return m_max_iterations == b.m_max_iterations && *m_rng == *(b.m_rng);
 }
 
-void bob::trainer::JFATrainer::initialization(bob::machine::JFABase& machine,
+void bob::trainer::JFATrainer::initialize(bob::machine::JFABase& machine,
   const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& ar)
 {
   m_base_trainer.initUbmNidSumStatistics(machine.getBase(), ar);
@@ -764,7 +764,7 @@ void bob::trainer::JFATrainer::mStep1(bob::machine::JFABase& machine,
   m_base_trainer.updateV(V);
 }
 
-void bob::trainer::JFATrainer::finalization1(bob::machine::JFABase& machine,
+void bob::trainer::JFATrainer::finalize1(bob::machine::JFABase& machine,
   const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& ar)
 {
   const bob::machine::FABase& base = machine.getBase();
@@ -788,7 +788,7 @@ void bob::trainer::JFATrainer::mStep2(bob::machine::JFABase& machine,
   machine.precompute();
 }
 
-void bob::trainer::JFATrainer::finalization2(bob::machine::JFABase& machine,
+void bob::trainer::JFATrainer::finalize2(bob::machine::JFABase& machine,
   const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& ar)
 {
   const bob::machine::FABase& base = machine.getBase();
@@ -811,7 +811,7 @@ void bob::trainer::JFATrainer::mStep3(bob::machine::JFABase& machine,
   m_base_trainer.updateD(d);
 }
 
-void bob::trainer::JFATrainer::finalization3(bob::machine::JFABase& machine,
+void bob::trainer::JFATrainer::finalize3(bob::machine::JFABase& machine,
   const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& ar)
 {
 }
@@ -824,25 +824,25 @@ void bob::trainer::JFATrainer::train_loop(bob::machine::JFABase& machine,
     eStep1(machine, ar);
     mStep1(machine, ar);
   }
-  finalization1(machine, ar);
+  finalize1(machine, ar);
   // U subspace
   for (size_t i=0; i<m_max_iterations; ++i) {
     eStep2(machine, ar);
     mStep2(machine, ar);
   }
-  finalization2(machine, ar);
+  finalize2(machine, ar);
   // d subspace
   for (size_t i=0; i<m_max_iterations; ++i) {
     eStep3(machine, ar);
     mStep3(machine, ar);
   }
-  finalization3(machine, ar);
+  finalize3(machine, ar);
 }
 
 void bob::trainer::JFATrainer::train(bob::machine::JFABase& machine,
   const std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& ar)
 {
-  initialization(machine, ar);
+  initialize(machine, ar);
   train_loop(machine, ar);
 }
 

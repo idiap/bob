@@ -95,7 +95,7 @@ class KMeansTest(unittest.TestCase):
       trainer = bob.trainer.KMeansTrainer()
       trainer.rng = bob.core.random.mt19937(seed)
       trainer.initialization_method = bob.trainer.KMeansTrainer.KMEANS_PLUS_PLUS
-      trainer.initialization(machine, data)
+      trainer.initialize(machine, data)
 
       # Python implementation
       py_machine = bob.machine.KMeansMachine(dim_c, dim_d)
@@ -113,7 +113,7 @@ class KMeansTest(unittest.TestCase):
     trainer = bob.trainer.KMeansTrainer()
     trainer.rng = bob.core.random.mt19937(seed)
     trainer.initialization_method = bob.trainer.KMeansTrainer.RANDOM_NO_DUPLICATE
-    trainer.initialization(machine, data)
+    trainer.initialize(machine, data)
     # Makes sure that the two initial mean vectors selected are different
     self.assertFalse(equals(machine.get_mean(0), machine.get_mean(1), 1e-8))
  

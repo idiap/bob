@@ -74,7 +74,7 @@ void bind_trainer_kmeans()
     .def(self == self)
     .def(self != self)
     .def("train", &py_train, (arg("machine"), arg("data")), "Train a machine using data")
-    .def("initialization", &EMTrainerKMeansBase::initialization, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
+    .def("initialize", &EMTrainerKMeansBase::initialize, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
     .def("e_step", &EMTrainerKMeansBase::eStep, (arg("machine"), arg("data")),
        "Update the hidden variable distribution (or the sufficient statistics) given the Machine parameters. "
        "Also, calculate the average output of the Machine given these parameters.\n"
@@ -83,7 +83,7 @@ void bind_trainer_kmeans()
        "is less than the convergence_threshold.")
     .def("m_step", &EMTrainerKMeansBase::mStep, (arg("machine"), arg("data")), "Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
     .def("compute_likelihood", &EMTrainerKMeansBase::computeLikelihood, (arg("machine")), "Returns the average min (square Euclidean) distance")
-    .def("finalization", &EMTrainerKMeansBase::finalization, (arg("machine"), arg("data")), "This method is called after the EM algorithm")
+    .def("finalize", &EMTrainerKMeansBase::finalize, (arg("machine"), arg("data")), "This method is called after the EM algorithm")
   ;
 
   // Starts binding the KMeansTrainer

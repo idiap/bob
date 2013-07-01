@@ -65,7 +65,7 @@ class GMMTrainer: public EMTrainer<bob::machine::GMMMachine, blitz::Array<double
     /**
      * @brief Initialization before the EM steps
      */
-    virtual void initialization(bob::machine::GMMMachine& gmm,
+    virtual void initialize(bob::machine::GMMMachine& gmm,
       const blitz::Array<double,2>& data);
     
     /**
@@ -89,7 +89,7 @@ class GMMTrainer: public EMTrainer<bob::machine::GMMMachine, blitz::Array<double
     /**
      * @brief Finalization after the EM steps
      */
-    virtual void finalization(bob::machine::GMMMachine& gmm,
+    virtual void finalize(bob::machine::GMMMachine& gmm,
       const blitz::Array<double,2>& data);
   
     /**

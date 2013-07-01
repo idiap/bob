@@ -35,7 +35,7 @@ class IVectorTrainerPy():
     self.m_sigma_update = sigma_update
     self.m_variance_floor = variance_floor
 
-  def initialization(self, machine, data):
+  def initialize(self, machine, data):
     ubm = machine.ubm
     self.m_dim_c = ubm.dim_c
     self.m_dim_d = ubm.dim_d
@@ -130,11 +130,11 @@ class IVectorTrainerPy():
       sigma[sigma < self.m_variance_floor] = self.m_variance_floor
       machine.sigma = sigma
 
-  def finalization(self, machine, data):
+  def finalize(self, machine, data):
     pass
 
   def train(self, machine, data):
-    self.initialization(machine, data)
+    self.initialize(machine, data)
     average_output_previous   = -sys.maxint
     average_output            = -sys.maxint
     self.e_step(machine, data)
@@ -217,7 +217,7 @@ class IVectorTests(unittest.TestCase):
 
     # Initialization
     trainer = IVectorTrainerPy()
-    trainer.initialization(m, data)
+    trainer.initialize(m, data)
     m.t = t
     m.sigma = sigma
     for it in range(2):
@@ -240,7 +240,7 @@ class IVectorTests(unittest.TestCase):
 
     # Initialization
     trainer = bob.trainer.IVectorTrainer()
-    trainer.initialization(m, data)
+    trainer.initialize(m, data)
     m.t = t 
     m.sigma = sigma
     for it in range(2):
@@ -329,7 +329,7 @@ class IVectorTests(unittest.TestCase):
 
     # Initialization
     trainer = IVectorTrainerPy(sigma_update=True)
-    trainer.initialization(m, data)
+    trainer.initialize(m, data)
     m.t = t
     m.sigma = sigma
     for it in range(2):
@@ -355,7 +355,7 @@ class IVectorTests(unittest.TestCase):
 
     # Initialization
     trainer = bob.trainer.IVectorTrainer(update_sigma=True)
-    trainer.initialization(m, data)
+    trainer.initialize(m, data)
     m.t = t 
     m.sigma = sigma
     for it in range(2):

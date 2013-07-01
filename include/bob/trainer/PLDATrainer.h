@@ -93,12 +93,12 @@ class PLDATrainer: public EMTrainer<bob::machine::PLDABase,
     /**
      * @brief Performs some initialization before the E- and M-steps.
      */
-    virtual void initialization(bob::machine::PLDABase& machine, 
+    virtual void initialize(bob::machine::PLDABase& machine, 
       const std::vector<blitz::Array<double,2> >& v_ar);
     /**
      * @brief Performs some actions after the end of the E- and M-steps.
       */
-    virtual void finalization(bob::machine::PLDABase& machine, 
+    virtual void finalize(bob::machine::PLDABase& machine, 
       const std::vector<blitz::Array<double,2> >& v_ar);
     
     /**

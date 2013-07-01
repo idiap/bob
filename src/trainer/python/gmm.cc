@@ -45,8 +45,8 @@ void bind_trainer_gmm() {
     .add_property("convergence_threshold", &EMTrainerGMMBase::getConvergenceThreshold, &EMTrainerGMMBase::setConvergenceThreshold, "Convergence threshold")
     .add_property("max_iterations", &EMTrainerGMMBase::getMaxIterations, &EMTrainerGMMBase::setMaxIterations, "Max iterations")
     .def("train", &py_train, (arg("machine"), arg("data")), "Train a machine using data")
-    .def("initialization", &EMTrainerGMMBase::initialization, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
-    .def("finalization", &EMTrainerGMMBase::finalization, (arg("machine"), arg("data")), "This method is called after the EM algorithm")
+    .def("initialize", &EMTrainerGMMBase::initialize, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
+    .def("finalize", &EMTrainerGMMBase::finalize, (arg("machine"), arg("data")), "This method is called after the EM algorithm")
     .def("e_step", &EMTrainerGMMBase::eStep, (arg("machine"), arg("data")),
        "Update the hidden variable distribution (or the sufficient statistics) given the Machine parameters. "
        "Also, calculate the average output of the Machine given these parameters.\n"

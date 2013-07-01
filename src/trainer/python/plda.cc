@@ -39,12 +39,12 @@ static void plda_train(EMTrainerPLDA& t, bob::machine::PLDABase& m, object data)
   t.train(m, vdata_ref);
 }
 
-static void plda_initialization(EMTrainerPLDA& t, bob::machine::PLDABase& m, object data)
+static void plda_initialize(EMTrainerPLDA& t, bob::machine::PLDABase& m, object data)
 {
   stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
   std::vector<blitz::Array<double,2> > vdata_ref(dbegin, dend);
   // Calls the initialization function
-  t.initialization(m, vdata_ref);
+  t.initialize(m, vdata_ref);
 }
 
 static void plda_eStep(EMTrainerPLDA& t, bob::machine::PLDABase& m, object data)
@@ -63,12 +63,12 @@ static void plda_mStep(EMTrainerPLDA& t, bob::machine::PLDABase& m, object data)
   t.mStep(m, vdata_ref);
 }
 
-static void plda_finalization(EMTrainerPLDA& t, bob::machine::PLDABase& m, object data)
+static void plda_finalize(EMTrainerPLDA& t, bob::machine::PLDABase& m, object data)
 { 
   stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
   std::vector<blitz::Array<double,2> > vdata_ref(dbegin, dend);
   // Calls the finalization function
-  t.finalization(m, vdata_ref);
+  t.finalize(m, vdata_ref);
 }
 
 static object get_z_first_order(bob::trainer::PLDATrainer& m) {
@@ -92,8 +92,8 @@ void bind_trainer_plda()
     .add_property("max_iterations", &EMTrainerPLDA::getMaxIterations, &EMTrainerPLDA::setMaxIterations, "Max iterations")
     .add_property("rng", &EMTrainerPLDA::getRng, &EMTrainerPLDA::setRng, "The Mersenne Twister mt19937 random generator used for the initialization of subspaces/arrays before the EM loop.")
     .def("train", &plda_train, (arg("self"), arg("machine"), arg("data")), "Trains a PLDABase using data (mu, F, G and sigma are learnt).")
-    .def("initialization", &plda_initialization, (arg("self"), arg("machine"), arg("data")), "This method is called before the EM algorithm")
-    .def("finalization", &plda_finalization, (arg("self"), arg("machine"), arg("data")), "This method is called at the end of the EM algorithm")
+    .def("initialize", &plda_initialize, (arg("self"), arg("machine"), arg("data")), "This method is called before the EM algorithm")
+    .def("finalize", &plda_finalize, (arg("self"), arg("machine"), arg("data")), "This method is called at the end of the EM algorithm")
     .def("e_step", &plda_eStep, (arg("self"), arg("machine"), arg("data")),
        "Updates the hidden variable distribution (or the sufficient statistics) given the Machine parameters. ")
     .def("m_step", &plda_mStep, (arg("self"), arg("machine"), arg("data")), "Updates the Machine parameters given the hidden variable distribution (or the sufficient statistics)")

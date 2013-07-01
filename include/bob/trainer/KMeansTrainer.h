@@ -102,7 +102,7 @@ class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, blitz::Array<
      * Data is split into as many chunks as there are means, 
      * then each mean is set to a random example within each chunk.
      */
-    virtual void initialization(bob::machine::KMeansMachine& kMeansMachine,
+    virtual void initialize(bob::machine::KMeansMachine& kMeansMachine,
       const blitz::Array<double,2>& sampler);
     
     /**
@@ -129,7 +129,7 @@ class KMeansTrainer: public EMTrainer<bob::machine::KMeansMachine, blitz::Array<
     /**
      * @brief Function called at the end of the training 
      */
-    virtual void finalization(bob::machine::KMeansMachine& kMeansMachine, const blitz::Array<double,2>& sampler);
+    virtual void finalize(bob::machine::KMeansMachine& kMeansMachine, const blitz::Array<double,2>& sampler);
 
     /**
      * @brief Reset the statistics accumulators

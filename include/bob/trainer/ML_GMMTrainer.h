@@ -62,7 +62,7 @@ class ML_GMMTrainer: public GMMTrainer {
     /**
      * @brief Initialisation before the EM steps
      */
-    virtual void initialization(bob::machine::GMMMachine& gmm,
+    virtual void initialize(bob::machine::GMMMachine& gmm,
       const blitz::Array<double,2>& data);
 
     /**

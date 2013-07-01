@@ -310,7 +310,7 @@ def test_ppca():
   T = EMPCATrainer()
   m = LinearMachine(3,2)
   # Initialization of the trainer
-  T.initialization(m, ar)
+  T.initialize(m, ar)
   # Sets ('random') initialization values for test purposes
   w_init = numpy.array([1.62945, 0.270954, 1.81158, 1.67002, 0.253974,
     1.93774], 'float64').reshape(3,2)

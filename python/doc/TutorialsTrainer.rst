@@ -468,7 +468,7 @@ Now, let's initialize the JFA Trainer:
    :options: +NORMALIZE_WHITESPACE
 
    >>> jfa_trainer = bob.trainer.JFATrainer(10) # 10 is the number of iterations
-   >>> jfa_trainer.initialization(jfa_base, TRAINING_STATS)
+   >>> jfa_trainer.initialize(jfa_base, TRAINING_STATS)
    
 The training is done as follows:
 
@@ -520,7 +520,7 @@ Now, let's initialize the ISV Trainer:
    :options: +NORMALIZE_WHITESPACE
 
    >>> isv_trainer = bob.trainer.ISVTrainer(10, 4.) # 10 is the number of iterations, and 4 is the relevance factor
-   >>> isv_trainer.initialization(isv_base, TRAINING_STATS)
+   >>> isv_trainer.initialize(isv_base, TRAINING_STATS)
    
 The training is done as follows:
 
@@ -560,7 +560,7 @@ Now, let's initialize the trainer:
     
    >>> ivec_trainer = bob.trainer.IVectorTrainer(update_sigma=True, max_iterations=10)
    >>> TRAINING_STATS_flatten = [gs11, gs12, gs21, gs22]
-   >>> ivec_trainer.initialization(m, TRAINING_STATS_flatten)
+   >>> ivec_trainer.initialize(m, TRAINING_STATS_flatten)
     
        
 The training is then done as follows:

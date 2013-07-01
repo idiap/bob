@@ -64,7 +64,7 @@ bob::trainer::IVectorTrainer::~IVectorTrainer()
 {
 }
 
-void bob::trainer::IVectorTrainer::initialization(
+void bob::trainer::IVectorTrainer::initialize(
   bob::machine::IVectorMachine& machine,
   const std::vector<bob::machine::GMMStats>& data)
 {
@@ -199,7 +199,7 @@ double bob::trainer::IVectorTrainer::computeLikelihood(
   return 0;
 }
 
-void bob::trainer::IVectorTrainer::finalization(
+void bob::trainer::IVectorTrainer::finalize(
   bob::machine::IVectorMachine& machine,
   const std::vector<bob::machine::GMMStats>& data)
 {

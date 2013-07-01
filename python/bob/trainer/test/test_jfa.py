@@ -97,7 +97,7 @@ class FATrainerTest(unittest.TestCase):
     ubm.variance_supervector = UBM_VAR
     m = bob.machine.JFABase(ubm,2,2)
     t = bob.trainer.JFATrainer(10)
-    t.initialization(m, TRAINING_STATS)
+    t.initialize(m, TRAINING_STATS)
     m.u = M_u
     m.v = M_v
     m.d = M_d
@@ -131,7 +131,7 @@ class FATrainerTest(unittest.TestCase):
     ubm.variance_supervector = UBM_VAR
     m = bob.machine.JFABase(ubm,2,2)
     t = bob.trainer.JFATrainer(10)
-    t.initialization(m, TRAINING_STATS)
+    t.initialize(m, TRAINING_STATS)
     m.u = M_u
     m.v = M_v
     m.d = M_d
@@ -164,7 +164,7 @@ class FATrainerTest(unittest.TestCase):
     ubm.variance_supervector = UBM_VAR
     m = bob.machine.JFABase(ubm,2,2)
     t = bob.trainer.JFATrainer(10)
-    t.initialization(m, TRAINING_STATS)
+    t.initialize(m, TRAINING_STATS)
     m.u = M_u
     m.v = M_v
     m.d = M_d
@@ -189,7 +189,7 @@ class FATrainerTest(unittest.TestCase):
     ubm.variance_supervector = UBM_VAR
     mb = bob.machine.JFABase(ubm, 2, 2)
     t = bob.trainer.JFATrainer(10)
-    t.initialization(mb, TRAINING_STATS)
+    t.initialize(mb, TRAINING_STATS)
     mb.u = M_u
     mb.v = M_v
     mb.d = M_d
@@ -242,12 +242,12 @@ class FATrainerTest(unittest.TestCase):
     mb = bob.machine.ISVBase(ubm,2)
     t = bob.trainer.ISVTrainer(10, 4.)
     #t.train(mb, TRAINING_STATS)
-    t.initialization(mb, TRAINING_STATS)
+    t.initialize(mb, TRAINING_STATS)
     mb.u = M_u
     for i in range(10):
       t.e_step(mb, TRAINING_STATS)
       t.m_step(mb, TRAINING_STATS)
-    t.finalization(mb, TRAINING_STATS)
+    t.finalize(mb, TRAINING_STATS)
 
     self.assertTrue( numpy.allclose(mb.d, d_ref, eps) )
     self.assertTrue( numpy.allclose(mb.u, u_ref, eps) )

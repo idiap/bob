@@ -77,12 +77,12 @@ static void isv_train(bob::trainer::ISVTrainer& t, bob::machine::ISVBase& m, obj
   t.train(m, training_data);
 }
 
-static void isv_initialization(bob::trainer::ISVTrainer& t, bob::machine::ISVBase& m, object data)
+static void isv_initialize(bob::trainer::ISVTrainer& t, bob::machine::ISVBase& m, object data)
 {
   std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > training_data;
   extract_GMMStats(data, training_data);
-  // Calls the initialization function
-  t.initialization(m, training_data);
+  // Calls the initialize function
+  t.initialize(m, training_data);
 }
 
 static void isv_estep(bob::trainer::ISVTrainer& t, bob::machine::ISVBase& m, object data)
@@ -101,12 +101,12 @@ static void isv_mstep(bob::trainer::ISVTrainer& t, bob::machine::ISVBase& m, obj
   t.mStep(m, training_data);
 }
 
-static void isv_finalization(bob::trainer::ISVTrainer& t, bob::machine::ISVBase& m, object data)
+static void isv_finalize(bob::trainer::ISVTrainer& t, bob::machine::ISVBase& m, object data)
 {
   std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > training_data;
   extract_GMMStats(data, training_data);
   // Calls the finalization function
-  t.finalization(m, training_data);
+  t.finalize(m, training_data);
 }
 
 static void isv_enrol(bob::trainer::ISVTrainer& t, bob::machine::ISVMachine& m, object data, const size_t n_iter)
@@ -188,12 +188,12 @@ static void jfa_train(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, obj
   t.train(m, training_data);
 }
 
-static void jfa_initialization(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, object data)
+static void jfa_initialize(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, object data)
 {
   std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > training_data;
   extract_GMMStats(data, training_data);
-  // Calls the initialization function
-  t.initialization(m, training_data);
+  // Calls the initialize function
+  t.initialize(m, training_data);
 }
 
 static void jfa_estep1(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, object data)
@@ -212,12 +212,12 @@ static void jfa_mstep1(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, ob
   t.mStep1(m, training_data);
 }
 
-static void jfa_finalization1(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, object data)
+static void jfa_finalize1(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, object data)
 {
   std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > training_data;
   extract_GMMStats(data, training_data);
   // Calls the finalization function
-  t.finalization1(m, training_data);
+  t.finalize1(m, training_data);
 }
 
 static void jfa_estep2(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, object data)
@@ -236,12 +236,12 @@ static void jfa_mstep2(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, ob
   t.mStep2(m, training_data);
 }
 
-static void jfa_finalization2(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, object data)
+static void jfa_finalize2(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, object data)
 {
   std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > training_data;
   extract_GMMStats(data, training_data);
   // Calls the finalization function
-  t.finalization2(m, training_data);
+  t.finalize2(m, training_data);
 }
 
 static void jfa_estep3(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, object data)
@@ -260,19 +260,19 @@ static void jfa_mstep3(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, ob
   t.mStep3(m, training_data);
 }
 
-static void jfa_finalization3(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, object data)
+static void jfa_finalize3(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, object data)
 {
   std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > training_data;
   extract_GMMStats(data, training_data);
   // Calls the finalization function
-  t.finalization3(m, training_data);
+  t.finalize3(m, training_data);
 }
 
 static void jfa_train_loop(bob::trainer::JFATrainer& t, bob::machine::JFABase& m, object data)
 {
   std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > > training_data;
   extract_GMMStats(data, training_data);
-  // Calls the initialization function
+  // Calls the main loop function
   t.train_loop(m, training_data);
 }
 
@@ -437,10 +437,10 @@ void bind_trainer_jfa()
     .def(self != self)
     .def("is_similar_to", &bob::trainer::ISVTrainer::is_similar_to, (arg("self"), arg("other"), arg("r_epsilon")=1e-5, arg("a_epsilon")=1e-8), "Compares this ISVTrainer with the 'other' one to be approximately the same.")
     .def("train", &isv_train, (arg("self"), arg("isv_base"), arg("gmm_stats")), "Call the training procedure.")
-    .def("initialization", &isv_initialization, (arg("self"), arg("isv_base"), arg("gmm_stats")), "Call the initialization procedure.")
+    .def("initialize", &isv_initialize, (arg("self"), arg("isv_base"), arg("gmm_stats")), "Call the initialization procedure.")
     .def("e_step", &isv_estep, (arg("self"), arg("isv_base"), arg("gmm_stats")), "Call the e-step procedure.")
     .def("m_step", &isv_mstep, (arg("self"), arg("isv_base"), arg("gmm_stats")), "Call the m-step procedure.")
-    .def("finalization", &isv_finalization, (arg("self"), arg("isv_base"), arg("gmm_stats")), "Call the finalization procedure.")
+    .def("finalize", &isv_finalize, (arg("self"), arg("isv_base"), arg("gmm_stats")), "Call the finalization procedure.")
     .def("enrol", &isv_enrol, (arg("self"), arg("isv_machine"), arg("gmm_stats"), arg("n_iter")), "Call the enrolment procedure.")
     .add_property("acc_u_a1", &isv_get_accUA1, &isv_set_accUA1, "Accumulator updated during the E-step")
     .add_property("acc_u_a2", &isv_get_accUA2, &isv_set_accUA2, "Accumulator updated during the E-step")
@@ -457,17 +457,17 @@ void bind_trainer_jfa()
     .def(self != self)
     .def("is_similar_to", &bob::trainer::JFATrainer::is_similar_to, (arg("self"), arg("other"), arg("r_epsilon")=1e-5, arg("a_epsilon")=1e-8), "Compares this JFATrainer with the 'other' one to be approximately the same.")
     .def("train", &jfa_train, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the training procedure.")
-    .def("initialization", &jfa_initialization, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the initialization procedure.")
+    .def("initialize", &jfa_initialize, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the initialization procedure.")
     .def("train_loop", &jfa_train_loop, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the training procedure (without the initialization). This will train the three subspaces U, V and d.")
     .def("e_step1", &jfa_estep1, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the 1st e-step procedure (for the V subspace).")
     .def("m_step1", &jfa_mstep1, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the 1st m-step procedure (for the V subspace).")
-    .def("finalization1", &jfa_finalization1, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the 1st finalization procedure (for the V subspace).")
+    .def("finalize1", &jfa_finalize1, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the 1st finalization procedure (for the V subspace).")
     .def("e_step2", &jfa_estep2, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the 2nd e-step procedure (for the U subspace).")
     .def("m_step2", &jfa_mstep2, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the 2nd m-step procedure (for the U subspace).")
-    .def("finalization2", &jfa_finalization2, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the 2nd finalization procedure (for the U subspace).")
+    .def("finalize2", &jfa_finalize2, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the 2nd finalization procedure (for the U subspace).")
     .def("e_step3", &jfa_estep3, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the 3rd e-step procedure (for the d subspace).")
     .def("m_step3", &jfa_mstep3, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the 3rd m-step procedure (for the d subspace).")
-    .def("finalization3", &jfa_finalization3, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the 3rd finalization procedure (for the d subspace).")
+    .def("finalize3", &jfa_finalize3, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the 3rd finalization procedure (for the d subspace).")
     .def("enrol", &jfa_enrol, (arg("self"), arg("jfa_machine"), arg("gmm_stats"), arg("n_iter")), "Call the enrolment procedure.")
     .add_property("acc_v_a1", &jfa_get_accVA1, &jfa_set_accVA1, "Accumulator updated during the E-step")
     .add_property("acc_v_a2", &jfa_get_accVA2, &jfa_set_accVA2, "Accumulator updated during the E-step")

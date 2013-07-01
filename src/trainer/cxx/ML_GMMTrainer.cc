@@ -38,10 +38,10 @@ bob::trainer::ML_GMMTrainer::~ML_GMMTrainer()
 {  
 }
 
-void bob::trainer::ML_GMMTrainer::initialization(bob::machine::GMMMachine& gmm,
+void bob::trainer::ML_GMMTrainer::initialize(bob::machine::GMMMachine& gmm,
   const blitz::Array<double,2>& data)
 {
-  bob::trainer::GMMTrainer::initialization(gmm, data);
+  bob::trainer::GMMTrainer::initialize(gmm, data);
   // Allocate cache
   size_t n_gaussians = gmm.getNGaussians();
   m_cache_ss_n_thresholded.resize(n_gaussians);

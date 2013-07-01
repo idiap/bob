@@ -180,7 +180,7 @@ bool bob::trainer::PLDATrainer::is_similar_to
          bob::core::array::isClose(m_cache_iota, other.m_cache_iota, r_epsilon, a_epsilon);
 }
 
-void bob::trainer::PLDATrainer::initialization(bob::machine::PLDABase& machine,
+void bob::trainer::PLDATrainer::initialize(bob::machine::PLDABase& machine,
   const std::vector<blitz::Array<double,2> >& v_ar) 
 {
   // Checks training data
@@ -204,7 +204,7 @@ void bob::trainer::PLDATrainer::initialization(bob::machine::PLDABase& machine,
   initFGSigma(machine, v_ar);
 }
 
-void bob::trainer::PLDATrainer::finalization(bob::machine::PLDABase& machine,
+void bob::trainer::PLDATrainer::finalize(bob::machine::PLDABase& machine,
   const std::vector<blitz::Array<double,2> >& v_ar) 
 {
   // Precomputes constant parts of the log likelihood and (gamma_a)

@@ -60,6 +60,3 @@ Utilities for training projections, density estimators and classifiers.
    WCCNTrainer
    WhiteningTrainer
    WienerTrainer
-   init_f_method
-   init_g_method
-   init_sigma_method

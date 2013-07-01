@@ -43,7 +43,7 @@ namespace bob { namespace trainer {
   /**
    * @brief This class implements the general Expectation-maximization algorithm.
    * @details See Section 9.3 of Bishop, "Pattern recognition and machine learning", 2006
-   * Derived classes must implement the initialization(), eStep(), mStep() and finalization() methods.
+   * Derived classes must implement the initialize(), eStep(), mStep() and finalize() methods.
    */
   template<class T_machine, class T_sampler>
   class EMTrainer: virtual public Trainer<T_machine, T_sampler>
@@ -119,7 +119,7 @@ namespace bob { namespace trainer {
       */
       
       // Initialization
-      initialization(machine, sampler);
+      initialize(machine, sampler);
       // Do the Expectation-Maximization algorithm
       double average_output_previous;
       double average_output = - std::numeric_limits<double>::max();
@@ -167,14 +167,14 @@ namespace bob { namespace trainer {
       }
 
       // Finalization
-      finalization(machine, sampler);
+      finalize(machine, sampler);
     }
 
     /**
      * @brief This method is called before the EM algorithm to initialize 
      * variables.
      */
-    virtual void initialization(T_machine& machine, const T_sampler& sampler) = 0;
+    virtual void initialize(T_machine& machine, const T_sampler& sampler) = 0;
     
     /**
      * @brief Computes the hidden variable distribution (or the sufficient 
@@ -198,7 +198,7 @@ namespace bob { namespace trainer {
     /**
      * @brief This method is called after the EM-loop
      */
-    virtual void finalization(T_machine& machine, const T_sampler& sampler) = 0;
+    virtual void finalize(T_machine& machine, const T_sampler& sampler) = 0;
 
     /**
      * @brief Sets whether the likelihood is computed or not at each iteration

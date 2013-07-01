@@ -44,11 +44,11 @@ bob::trainer::MAP_GMMTrainer::~MAP_GMMTrainer()
 {  
 }
 
-void bob::trainer::MAP_GMMTrainer::initialization(bob::machine::GMMMachine& gmm,
+void bob::trainer::MAP_GMMTrainer::initialize(bob::machine::GMMMachine& gmm,
   const blitz::Array<double,2>& data)
 {
   // Allocate memory for the sufficient statistics and initialise
-  bob::trainer::GMMTrainer::initialization(gmm, data);
+  bob::trainer::GMMTrainer::initialize(gmm, data);
 
   const size_t n_gaussians = gmm.getNGaussians();
   // TODO: check size?
