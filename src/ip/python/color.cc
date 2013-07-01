@@ -6,16 +6,16 @@
  * @brief Binds color converters to python
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -25,104 +25,248 @@
 
 using namespace boost::python;
 
-template <typename T> static tuple rgb_to_hsv_one_python(T r, T g, T b) {
-  T h, s, v;
-  bob::ip::rgb_to_hsv_one(r, g, b, h, s, v);
-  return make_tuple(h, s, v);
+// RGB -> gray and vice versa
+static object rgb_to_gray(const object& r, const object& g, const object& b, const object& dtype){
+  bob::python::dtype d(dtype);
+  switch (d.eltype()) {
+    case bob::core::array::t_uint8:
+      {
+        uint8_t y;
+        bob::ip::rgb_to_gray_one((uint8_t)extract<uint8_t>(r), (uint8_t)extract<uint8_t>(g), (uint8_t)extract<uint8_t>(b), y);
+        return object(y);
+      }
+    case bob::core::array::t_uint16:
+      {
+        uint16_t y;
+        bob::ip::rgb_to_gray_one((uint16_t)extract<uint16_t>(r), (uint16_t)extract<uint16_t>(g), (uint16_t)extract<uint16_t>(b), y);
+        return object(y);
+      }
+    case bob::core::array::t_float64:
+      {
+        double y;
+        bob::ip::rgb_to_gray_one((double)extract<double>(r), (double)extract<double>(g), (double)extract<double>(b), y);
+        return object(y);
+      }
+    default:
+      PYTHON_ERROR(TypeError,
+        "color conversion operator is not supported for date type '%s'",
+        d.cxx_str().c_str());
+      return object(NULL);
+  }
 }
 
-template <> tuple rgb_to_hsv_one_python(uint8_t r, uint8_t g, uint8_t b) {
-  uint8_t h, s, v;
-  bob::ip::rgb_to_hsv_one(r, g, b, h, s, v);
-  return make_tuple((uint32_t)h, (uint32_t)s, (uint32_t)v);
+static object gray_to_rgb(const object& y, const object& dtype){
+  bob::python::dtype d(dtype);
+  switch (d.eltype()) {
+    case bob::core::array::t_uint8:
+      {
+        uint8_t r, g, b;
+        bob::ip::gray_to_rgb_one((uint8_t)extract<uint8_t>(y), r, g, b);
+        return make_tuple(r, g, b);
+      }
+    case bob::core::array::t_uint16:
+      {
+        uint16_t r, g, b;
+        bob::ip::gray_to_rgb_one((uint16_t)extract<uint8_t>(y), r, g, b);
+        return make_tuple(r, g, b);
+      }
+    case bob::core::array::t_float64:
+      {
+        double r, g, b;
+        bob::ip::gray_to_rgb_one((double)extract<uint8_t>(y), r, g, b);
+        return make_tuple(r, g, b);
+      }
+    default:
+      PYTHON_ERROR(TypeError,
+        "color conversion operator is not supported for date type '%s'",
+        d.cxx_str().c_str());
+      return object(NULL);
+  }
 }
 
-template <typename T> static tuple hsv_to_rgb_one_python(T h, T s, T v) {
-  T r, g, b;
-  bob::ip::hsv_to_rgb_one(h, s, v, r, g, b);
-  return make_tuple(r, g, b);
+
+// RGB to HSV and vice versa
+static object rgb_to_hsv(const object& r, const object& g, const object& b, const object& dtype){
+  bob::python::dtype d(dtype);
+  switch (d.eltype()) {
+    case bob::core::array::t_uint8:
+      {
+        uint8_t h, s, v;
+        bob::ip::rgb_to_hsv_one((uint8_t)extract<uint8_t>(r), (uint8_t)extract<uint8_t>(g), (uint8_t)extract<uint8_t>(b), h, s, v);
+        return make_tuple(h, s, v);
+      }
+    case bob::core::array::t_uint16:
+      {
+        uint16_t h, s, v;
+        bob::ip::rgb_to_hsv_one((uint16_t)extract<uint16_t>(r), (uint16_t)extract<uint16_t>(g), (uint16_t)extract<uint16_t>(b), h, s, v);
+        return make_tuple(h, s, v);
+      }
+    case bob::core::array::t_float64:
+      {
+        double h, s, v;
+        bob::ip::rgb_to_hsv_one((double)extract<double>(r), (double)extract<double>(g), (double)extract<double>(b), h, s, v);
+        return make_tuple(h, s, v);
+      }
+    default:
+      PYTHON_ERROR(TypeError,
+        "color conversion operator is not supported for date type '%s'",
+        d.cxx_str().c_str());
+      return object(NULL);
+  }
 }
 
-template <> tuple hsv_to_rgb_one_python(uint8_t h, uint8_t s, uint8_t v) {
-  uint8_t r, g, b;
-  bob::ip::hsv_to_rgb_one(h, s, v, r, g, b);
-  return make_tuple((uint32_t)r, (uint32_t)g, (uint32_t)b);
+static object hsv_to_rgb(const object& h, const object& s, const object& v, const object& dtype){
+  bob::python::dtype d(dtype);
+  switch (d.eltype()) {
+    case bob::core::array::t_uint8:
+      {
+        uint8_t r, g, b;
+        bob::ip::hsv_to_rgb_one((uint8_t)extract<uint8_t>(h), (uint8_t)extract<uint8_t>(s), (uint8_t)extract<uint8_t>(v), r, g, b);
+        return make_tuple(r, g, b);
+      }
+    case bob::core::array::t_uint16:
+      {
+        uint16_t r, g, b;
+        bob::ip::hsv_to_rgb_one((uint16_t)extract<uint16_t>(h), (uint16_t)extract<uint16_t>(s), (uint16_t)extract<uint16_t>(v), r, g, b);
+        return make_tuple(r, g, b);
+      }
+    case bob::core::array::t_float64:
+      {
+        double r, g, b;
+        bob::ip::hsv_to_rgb_one((double)extract<double>(h), (double)extract<double>(s), (double)extract<double>(v), r, g, b);
+        return make_tuple(r, g, b);
+      }
+    default:
+      PYTHON_ERROR(TypeError,
+        "color conversion operator is not supported for date type '%s'",
+        d.cxx_str().c_str());
+      return object(NULL);
+  }
 }
 
-template <typename T> static tuple rgb_to_hsl_one_python(T r, T g, T b) {
-  T h, s, l;
-  bob::ip::rgb_to_hsl_one(r, g, b, h, s, l);
-  return make_tuple(h, s, l);
+
+// RGB to HSL and vice versa
+static object rgb_to_hsl(const object& r, const object& g, const object& b, const object& dtype){
+  bob::python::dtype d(dtype);
+  switch (d.eltype()) {
+    case bob::core::array::t_uint8:
+      {
+        uint8_t h, s, l;
+        bob::ip::rgb_to_hsl_one((uint8_t)extract<uint8_t>(r), (uint8_t)extract<uint8_t>(g), (uint8_t)extract<uint8_t>(b), h, s, l);
+        return make_tuple(h, s, l);
+      }
+    case bob::core::array::t_uint16:
+      {
+        uint16_t h, s, l;
+        bob::ip::rgb_to_hsl_one((uint16_t)extract<uint16_t>(r), (uint16_t)extract<uint16_t>(g), (uint16_t)extract<uint16_t>(b), h, s, l);
+        return make_tuple(h, s, l);
+      }
+    case bob::core::array::t_float64:
+      {
+        double h, s, l;
+        bob::ip::rgb_to_hsl_one((double)extract<double>(r), (double)extract<double>(g), (double)extract<double>(b), h, s, l);
+        return make_tuple(h, s, l);
+      }
+    default:
+      PYTHON_ERROR(TypeError,
+        "color conversion operator is not supported for date type '%s'",
+        d.cxx_str().c_str());
+      return object(NULL);
+  }
 }
 
-template <> tuple rgb_to_hsl_one_python(uint8_t r, uint8_t g, uint8_t b) {
-  uint8_t h, s, l;
-  bob::ip::rgb_to_hsl_one(r, g, b, h, s, l);
-  return make_tuple((uint32_t)h, (uint32_t)s, (uint32_t)l);
+static object hsl_to_rgb(const object& h, const object& s, const object& l, const object& dtype){
+  bob::python::dtype d(dtype);
+  switch (d.eltype()) {
+    case bob::core::array::t_uint8:
+      {
+        uint8_t r, g, b;
+        bob::ip::hsl_to_rgb_one((uint8_t)extract<uint8_t>(h), (uint8_t)extract<uint8_t>(s), (uint8_t)extract<uint8_t>(l), r, g, b);
+        return make_tuple(r, g, b);
+      }
+    case bob::core::array::t_uint16:
+      {
+        uint16_t r, g, b;
+        bob::ip::hsl_to_rgb_one((uint16_t)extract<uint16_t>(h), (uint16_t)extract<uint16_t>(s), (uint16_t)extract<uint16_t>(l), r, g, b);
+        return make_tuple(r, g, b);
+      }
+    case bob::core::array::t_float64:
+      {
+        double r, g, b;
+        bob::ip::hsl_to_rgb_one((double)extract<double>(h), (double)extract<double>(s), (double)extract<double>(l), r, g, b);
+        return make_tuple(r, g, b);
+      }
+    default:
+      PYTHON_ERROR(TypeError,
+        "color conversion operator is not supported for date type '%s'",
+        d.cxx_str().c_str());
+      return object(NULL);
+  }
 }
 
-template <typename T> static tuple hsl_to_rgb_one_python(T h, T s, T l) {
-  T r, g, b;
-  bob::ip::hsl_to_rgb_one(h, s, l, r, g, b);
-  return make_tuple(r, g, b);
+
+// RGB to YUV and vice versa
+static object rgb_to_yuv(const object& r, const object& g, const object& b, const object& dtype){
+  bob::python::dtype d(dtype);
+  switch (d.eltype()) {
+    case bob::core::array::t_uint8:
+      {
+        uint8_t y, u, v;
+        bob::ip::rgb_to_yuv_one((uint8_t)extract<uint8_t>(r), (uint8_t)extract<uint8_t>(g), (uint8_t)extract<uint8_t>(b), y, u, v);
+        return make_tuple(y, u, v);
+      }
+    case bob::core::array::t_uint16:
+      {
+        uint16_t y, u, v;
+        bob::ip::rgb_to_yuv_one((uint16_t)extract<uint16_t>(r), (uint16_t)extract<uint16_t>(g), (uint16_t)extract<uint16_t>(b), y, u, v);
+        return make_tuple(y, u, v);
+      }
+    case bob::core::array::t_float64:
+      {
+        double y, u, v;
+        bob::ip::rgb_to_yuv_one((double)extract<double>(r), (double)extract<double>(g), (double)extract<double>(b), y, u, v);
+        return make_tuple(y, u, v);
+      }
+    default:
+      PYTHON_ERROR(TypeError,
+        "color conversion operator is not supported for date type '%s'",
+        d.cxx_str().c_str());
+      return object(NULL);
+  }
 }
 
-template <> tuple hsl_to_rgb_one_python(uint8_t h, uint8_t s, uint8_t l) {
-  uint8_t r, g, b;
-  bob::ip::hsl_to_rgb_one(h, s, l, r, g, b);
-  return make_tuple((uint32_t)r, (uint32_t)g, (uint32_t)b);
+static object yuv_to_rgb(const object& y, const object& u, const object& v, const object& dtype){
+  bob::python::dtype d(dtype);
+  switch (d.eltype()) {
+    case bob::core::array::t_uint8:
+      {
+        uint8_t r, g, b;
+        bob::ip::yuv_to_rgb_one((uint8_t)extract<uint8_t>(y), (uint8_t)extract<uint8_t>(u), (uint8_t)extract<uint8_t>(v), r, g, b);
+        return make_tuple(r, g, b);
+      }
+    case bob::core::array::t_uint16:
+      {
+        uint16_t r, g, b;
+        bob::ip::yuv_to_rgb_one((uint16_t)extract<uint16_t>(y), (uint16_t)extract<uint16_t>(u), (uint16_t)extract<uint16_t>(v), r, g, b);
+        return make_tuple(r, g, b);
+      }
+    case bob::core::array::t_float64:
+      {
+        double r, g, b;
+        bob::ip::yuv_to_rgb_one((double)extract<double>(y), (double)extract<double>(u), (double)extract<double>(v), r, g, b);
+        return make_tuple(r, g, b);
+      }
+    default:
+      PYTHON_ERROR(TypeError,
+        "color conversion operator is not supported for date type '%s'",
+        d.cxx_str().c_str());
+      return object(NULL);
+  }
 }
 
-template <typename T> static tuple rgb_to_yuv_one_python(T r, T g, T b) {
-  T y, u, v;
-  bob::ip::rgb_to_yuv_one(r, g, b, y, u, v);
-  return make_tuple(y, u, v);
-}
-
-template <> tuple rgb_to_yuv_one_python(uint8_t r, uint8_t g, uint8_t b) {
-  uint8_t y, u, v;
-  bob::ip::rgb_to_yuv_one(r, g, b, y, u, v);
-  return make_tuple((uint32_t)y, (uint32_t)u, (uint32_t)v);
-}
-
-template <typename T> static tuple yuv_to_rgb_one_python(T y, T u, T v) {
-  T r, g, b;
-  bob::ip::yuv_to_rgb_one(y, u, v, r, g, b);
-  return make_tuple(r, g, b);
-}
-
-template <> tuple yuv_to_rgb_one_python(uint8_t y, uint8_t u, uint8_t v) {
-  uint8_t r, g, b;
-  bob::ip::yuv_to_rgb_one(y, u, v, r, g, b);
-  return make_tuple((uint32_t)r, (uint32_t)g, (uint32_t)b);
-}
-
-template <typename T> static object rgb_to_gray_one_python(T r, T g, T b) {
-  T y;
-  bob::ip::rgb_to_gray_one(r, g, b, y);
-  return object(y);
-}
-
-template <> object rgb_to_gray_one_python(uint8_t r, uint8_t g, uint8_t b) {
-  uint8_t y;
-  bob::ip::rgb_to_gray_one(r, g, b, y);
-  return object((uint32_t)y);
-}
-
-template <typename T> static tuple gray_to_rgb_one_python(T y) {
-  T r, g, b;
-  bob::ip::gray_to_rgb_one(y, r, g, b);
-  return make_tuple(r, g, b);
-}
-
-template <> tuple gray_to_rgb_one_python(uint8_t y) {
-  uint8_t r, g, b;
-  bob::ip::gray_to_rgb_one(y, r, g, b);
-  return make_tuple((uint32_t)r, (uint32_t)g, (uint32_t)b);
-}
 
 //a few methods to return a dynamically allocated converted object
-static 
+static
 void py_rgb_to_hsv (bob::python::const_ndarray from, bob::python::ndarray to)
 {
   switch (from.type().dtype) {
@@ -145,8 +289,8 @@ void py_rgb_to_hsv (bob::python::const_ndarray from, bob::python::ndarray to)
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, 
-        "color conversion operator does not support array with type '%s'", 
+      PYTHON_ERROR(TypeError,
+        "color conversion operator does not support array with type '%s'",
         from.type().str().c_str());
   }
 }
@@ -158,7 +302,7 @@ static object py_rgb_to_hsv2 (bob::python::const_ndarray from) {
   return to.self();
 }
 
-static 
+static
 void py_hsv_to_rgb (bob::python::const_ndarray from, bob::python::ndarray to)
 {
   switch (from.type().dtype) {
@@ -181,8 +325,8 @@ void py_hsv_to_rgb (bob::python::const_ndarray from, bob::python::ndarray to)
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, 
-        "color conversion operator does not support array with type '%s'", 
+      PYTHON_ERROR(TypeError,
+        "color conversion operator does not support array with type '%s'",
         from.type().str().c_str());
   }
 }
@@ -194,7 +338,7 @@ static object py_hsv_to_rgb2 (bob::python::const_ndarray from) {
   return to.self();
 }
 
-static 
+static
 void py_rgb_to_hsl (bob::python::const_ndarray from, bob::python::ndarray to)
 {
   switch (from.type().dtype) {
@@ -217,8 +361,8 @@ void py_rgb_to_hsl (bob::python::const_ndarray from, bob::python::ndarray to)
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, 
-        "color conversion operator does not support array with type '%s'", 
+      PYTHON_ERROR(TypeError,
+        "color conversion operator does not support array with type '%s'",
         from.type().str().c_str());
   }
 }
@@ -230,7 +374,7 @@ static object py_rgb_to_hsl2 (bob::python::const_ndarray from) {
   return to.self();
 }
 
-static 
+static
 void py_hsl_to_rgb (bob::python::const_ndarray from, bob::python::ndarray to)
 {
   switch (from.type().dtype) {
@@ -253,8 +397,8 @@ void py_hsl_to_rgb (bob::python::const_ndarray from, bob::python::ndarray to)
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, 
-        "color conversion operator does not support array with type '%s'", 
+      PYTHON_ERROR(TypeError,
+        "color conversion operator does not support array with type '%s'",
         from.type().str().c_str());
   }
 }
@@ -266,8 +410,8 @@ static object py_hsl_to_rgb2 (bob::python::const_ndarray from) {
   return to.self();
 }
 
-static 
-void py_rgb_to_yuv (bob::python::const_ndarray from, bob::python::ndarray to) 
+static
+void py_rgb_to_yuv (bob::python::const_ndarray from, bob::python::ndarray to)
 {
   switch (from.type().dtype) {
     case bob::core::array::t_uint8:
@@ -289,8 +433,8 @@ void py_rgb_to_yuv (bob::python::const_ndarray from, bob::python::ndarray to)
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, 
-        "color conversion operator does not support array with type '%s'", 
+      PYTHON_ERROR(TypeError,
+        "color conversion operator does not support array with type '%s'",
         from.type().str().c_str());
   }
 }
@@ -302,7 +446,7 @@ static object py_rgb_to_yuv2 (bob::python::const_ndarray from) {
   return to.self();
 }
 
-static 
+static
 void py_yuv_to_rgb (bob::python::const_ndarray from, bob::python::ndarray to)
 {
   switch (from.type().dtype) {
@@ -325,8 +469,8 @@ void py_yuv_to_rgb (bob::python::const_ndarray from, bob::python::ndarray to)
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, 
-        "color conversion operator does not support array with type '%s'", 
+      PYTHON_ERROR(TypeError,
+        "color conversion operator does not support array with type '%s'",
         from.type().str().c_str());
   }
 }
@@ -338,7 +482,7 @@ static object py_yuv_to_rgb2 (bob::python::const_ndarray from) {
   return to.self();
 }
 
-static 
+static
 void py_rgb_to_gray (bob::python::const_ndarray from, bob::python::ndarray to)
 {
   switch (from.type().dtype) {
@@ -361,8 +505,8 @@ void py_rgb_to_gray (bob::python::const_ndarray from, bob::python::ndarray to)
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, 
-        "color conversion operator does not support array with type '%s'", 
+      PYTHON_ERROR(TypeError,
+        "color conversion operator does not support array with type '%s'",
         from.type().str().c_str());
   }
 }
@@ -370,8 +514,8 @@ void py_rgb_to_gray (bob::python::const_ndarray from, bob::python::ndarray to)
 static object py_rgb_to_gray2 (bob::python::const_ndarray from) {
   const bob::core::array::typeinfo& info = from.type();
   if (info.nd != 3) {
-    PYTHON_ERROR(TypeError, 
-      "input type must have at least 3 dimensions, but you gave me '%s'", 
+    PYTHON_ERROR(TypeError,
+      "input type must have at least 3 dimensions, but you gave me '%s'",
       info.str().c_str());
   }
   bob::python::ndarray to(info.dtype, info.shape[1], info.shape[2]);
@@ -380,7 +524,7 @@ static object py_rgb_to_gray2 (bob::python::const_ndarray from) {
 }
 
 
-static 
+static
 void py_gray_to_rgb (bob::python::const_ndarray from, bob::python::ndarray to)
 {
   switch (from.type().dtype) {
@@ -403,8 +547,8 @@ void py_gray_to_rgb (bob::python::const_ndarray from, bob::python::ndarray to)
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, 
-        "color conversion operator does not support array with type '%s'", 
+      PYTHON_ERROR(TypeError,
+        "color conversion operator does not support array with type '%s'",
         from.type().str().c_str());
   }
 }
@@ -415,6 +559,7 @@ static object py_gray_to_rgb2 (bob::python::const_ndarray from) {
   py_gray_to_rgb(from, to);
   return to.self();
 }
+
 
 static const char* rgb_to_hsv_doc = "Takes a 3-dimensional array encoded as RGB and sets the second array with HSV equivalents as determined by rgb_to_hsv_one(). The array must be organized in such a way that the color bands are represented by the first dimension. Its shape should be something like (3, width, height) or (3, height, width). The output array has to have the required size for the conversion otherwise an exception is raised (except for versions allocating the returned arrays). WARNING: As of this time only C-style storage arrays are supported.";
 static const char* hsv_to_rgb_doc = "Takes a 3-dimensional array encoded as HSV and sets the second array with RGB equivalents as determined by hsv_to_rgb_one(). The array must be organized in such a way that the color bands are represented by the first dimension.  Its shape should be something like (3, width, height) or (3, height, width). The output array has to have the required size for the conversion otherwise an exception is raised (except for versions allocating the returned arrays). WARNING: As of this time only C-style storage arrays are supported.";
@@ -427,33 +572,17 @@ static const char* gray_to_rgb_doc = "Takes a 2-dimensional array encoded as gra
 
 void bind_ip_color()
 {
-  //Single pixel conversions
-  def("rgb_to_hsv_u8", &rgb_to_hsv_one_python<uint8_t>, (arg("red"), arg("green"), arg("blue")), "Converts a RGB color-pixel (each band with 256 gray levels) to HSV as defined in http://en.wikipedia.org/wiki/HSL_and_HSV. Returns a tuple with (h,s,v) values.");
-  def("rgb_to_hsv_u16", &rgb_to_hsv_one_python<uint16_t>, (arg("red"), arg("green"), arg("blue")), "Converts a RGB color-pixel (each band with 65535 gray levels) to HSV as defined in http://en.wikipedia.org/wiki/HSL_and_HSV. Returns a tuple with (h,s,v) values.");
-  def("rgb_to_hsv_f", &rgb_to_hsv_one_python<double>, (arg("red"), arg("green"), arg("blue")), "Converts a RGB color-pixel (each band using a float between 0 and 1) to HSV as defined in http://en.wikipedia.org/wiki/HSL_and_HSV. Returns a tuple with (h,s,v) values.");
-  def("hsv_to_rgb_u8", &hsv_to_rgb_one_python<uint8_t>, (arg("hue"), arg("saturation"), arg("value")), "Converts a HSV color-pixel (each band with 256 gray levels) to RGB as defined in http://en.wikipedia.org/wiki/HSL_and_HSV. Returns a tuple with (r,g,b) values.");
-  def("hsv_to_rgb_u16", &hsv_to_rgb_one_python<uint16_t>, (arg("hue"), arg("saturation"), arg("value")), "Converts a HSV color-pixel (each band with 65535 gray levels) to RGB as defined in http://en.wikipedia.org/wiki/HSL_and_HSV. Returns a tuple with (r,g,b) values.");
-  def("hsv_to_rgb_f", &hsv_to_rgb_one_python<double>, (arg("hue"), arg("saturation"), arg("value")), "Converts a HSV color-pixel (each band using a float between 0 and 1) to RGB as defined in http://en.wikipedia.org/wiki/HSL_and_HSV. Returns a tuple with (r,g,b) values.");
-  def("rgb_to_hsl_u8", &rgb_to_hsl_one_python<uint8_t>, (arg("red"), arg("green"), arg("blue")), "Converts a RGB color-pixel (each band with 256 gray levels) to HSL as defined in http://en.wikipedia.org/wiki/HSL_and_HSV. Returns a tuple with (h,s,l) values.");
-  def("rgb_to_hsl_u16", &rgb_to_hsl_one_python<uint16_t>, (arg("red"), arg("green"), arg("blue")), "Converts a RGB color-pixel (each band with 65535 gray levels) to HSL as defined in http://en.wikipedia.org/wiki/HSL_and_HSV. Returns a tuple with (h,s,l) values.");
-  def("rgb_to_hsl_f", &rgb_to_hsl_one_python<double>, (arg("red"), arg("green"), arg("blue")), "Converts a RGB color-pixel (each band using a float between 0 and 1) to HSL as defined in http://en.wikipedia.org/wiki/HSL_and_HSV. Returns a tuple with (h,s,l) values.");
-  def("hsl_to_rgb_u8", &hsl_to_rgb_one_python<uint8_t>, (arg("hue"), arg("saturation"), arg("lightness")), "Converts a HSL color-pixel (each band with 256 gray levels) to RGB as defined in http://en.wikipedia.org/wiki/HSL_and_HSV. Returns a tuple with (r,g,b) values.");
-  def("hsl_to_rgb_u16", &hsl_to_rgb_one_python<uint16_t>, (arg("hue"), arg("saturation"), arg("lightness")), "Converts a HSL color-pixel (each band with 65535 gray levels) to RGB as defined in http://en.wikipedia.org/wiki/HSL_and_HSV. Returns a tuple with (r,g,b) values.");
-  def("hsl_to_rgb_f", &hsl_to_rgb_one_python<double>, (arg("hue"), arg("saturation"), arg("lightness")), "Converts a HSL color-pixel (each band using a float between 0 and 1) to RGB as defined in http://en.wikipedia.org/wiki/HSL_and_HSV. Returns a tuple with (r,g,b) values.");
-  def("rgb_to_yuv_u8", &rgb_to_yuv_one_python<uint8_t>, (arg("red"), arg("green"), arg("blue")), "Converts a RGB color-coded pixel (3-bands each with 256 levels of gray) to YUV (Y'CbCr) using the CCIR 601 (Kb = 0.114, Kr = 0.299) norm as discussed here: http://en.wikipedia.org/wiki/YCbCr and here: http://www.fourcc.org/fccyvrgb.php. Returns a tuple with (y,u,v) values.");
-  def("rgb_to_yuv_u16", &rgb_to_yuv_one_python<uint16_t>, (arg("red"), arg("green"), arg("blue")), "Converts a RGB color-coded pixel (3-bands each with 65535 levels of gray) to YUV (Y'CbCr) using the CCIR 601 (Kb = 0.114, Kr = 0.299) norm as discussed here: http://en.wikipedia.org/wiki/YCbCr and here: http://www.fourcc.org/fccyvrgb.php. Returns a tuple with (y,u,v) values.");
-  def("rgb_to_yuv_f", &rgb_to_yuv_one_python<double>, (arg("red"), arg("green"), arg("blue")), "Converts a RGB color-coded pixel (3-bands of floats between 0 and 1) to YUV (Y'CbCr) using the CCIR 601 (Kb = 0.114, Kr = 0.299) norm as discussed here: http://en.wikipedia.org/wiki/YCbCr and here: http://www.fourcc.org/fccyvrgb.php. Returns a tuple with (y,u,v) values. WARNING: This implementation returns U and V values varying from 0 to 1 for mapping norm ranges [-0.5, 0.5] into a more standard setting.");
-  def("yuv_to_rgb_u8", &yuv_to_rgb_one_python<uint8_t>, (arg("y"), arg("u"), arg("v")), "Converts a YUV (Y'CbCr) color-coded pixel (3-bands each with 256 levels of gray) to RGB using the CCIR 601 (Kb = 0.114, Kr = 0.299) norm as discussed here: http://en.wikipedia.org/wiki/YCbCr and here: http://www.fourcc.org/fccyvrgb.php. Returns a tuple with (r,g,b) values.");
-  def("yuv_to_rgb_u16", &yuv_to_rgb_one_python<uint16_t>, (arg("y"), arg("u"), arg("v")), "Converts a YUV (Y'CbCr) color-coded pixel (3-bands each with 65535 levels of gray) to RGB using the CCIR 601 (Kb = 0.114, Kr = 0.299) norm as discussed here: http://en.wikipedia.org/wiki/YCbCr and here: http://www.fourcc.org/fccyvrgb.php. Returns a tuple with (r,g,b) values.");
-  def("yuv_to_rgb_f", &yuv_to_rgb_one_python<double>, (arg("y"), arg("u"), arg("v")), "Converts a YUV (Y'CbCr) color-coded pixel (3-bands of floats between 0 and 1) to RGB using the CCIR 601 (Kb = 0.114, Kr = 0.299) norm as discussed here: http://en.wikipedia.org/wiki/YCbCr and here: http://www.fourcc.org/fccyvrgb.php. Returns a tuple with (r,g,b) values.");
-  def("rgb_to_gray_u8", &rgb_to_gray_one_python<uint8_t>, (arg("red"), arg("green"), arg("blue")), "Converts a RGB color-coded pixel (3-bands each with 256 levels of gray) to Grayscale using the CCIR 601 (Kb = 0.114, Kr = 0.299) norm as discussed here: http://www.fourcc.org/fccyvrgb.php. Returns only the gray value (Y component). This method is more efficient than calling rgb_to_yuv*() methods just to extract the Y component. Returns the grayscale value quantized to 256 levels of gray.");
-  def("rgb_to_gray_u16", &rgb_to_gray_one_python<uint16_t>, (arg("red"), arg("green"), arg("blue")), "Converts a RGB color-coded pixel (3-bands each with 65535 levels of gray) to Grayscale using the CCIR 601 (Kb = 0.114, Kr = 0.299) norm as discussed here: http://www.fourcc.org/fccyvrgb.php. Returns only the gray value (Y component). This method is more efficient than calling rgb_to_yuv*() methods just to extract the Y component. Returns the grayscale value quantized to 256 levels of gray.");
-  def("rgb_to_gray_f", &rgb_to_gray_one_python<double>, (arg("red"), arg("green"), arg("blue")), "Converts a RGB color-coded pixel (3-bands each using a float between 0 and 1) to Grayscale using the CCIR 601 (Kb = 0.114, Kr = 0.299) norm as discussed here: http://www.fourcc.org/fccyvrgb.php. Returns only the gray value (Y component). This method is more efficient than calling rgb_to_yuv*() methods just to extract the Y component. Returns the grayscale value quantized to 256 levels of gray.");
-  def("gray_to_rgb_u8", &gray_to_rgb_one_python<uint8_t>, (arg("y")), "Converts a grayscale color-coded pixel (with 256 levels of gray) to RGB by copying the gray value to all 3 bands. Returns a tuple with (r,g,b) values. This method is just here for convenience.");
-  def("gray_to_rgb_u16", &gray_to_rgb_one_python<uint16_t>, (arg("y")), "Converts a grayscale color-coded pixel (with 65535 levels of gray) to RGB by copying the gray value to all 3 bands. Returns a tuple with (r,g,b) values. This method is just here for convenience.");
-  def("gray_to_rgb_f", &gray_to_rgb_one_python<double>, (arg("y")), "Converts a grayscale color-coded pixel (float between 0 and 1) to RGB by copying the gray value to all 3 bands. Returns a tuple with (r,g,b) values. This method is just here for convenience.");
+  // Single pixel conversions
+  def("rgb_to_hsv", &rgb_to_hsv, (arg("red"), arg("green"), arg("blue"), arg("dtype")), "Converts a RGB color-pixel to HSV as defined in http://en.wikipedia.org/wiki/HSL_and_HSV. Returns a tuple with (h,s,v) values.\n Depending on the dtype parameter, different types of data is expected:\n\n - 'float': float values between 0 and 1\n - 'uint8': integers between 0 and 255\n - 'uint16': integers between 0 and 65535");
+  def("hsv_to_rgb", &hsv_to_rgb, (arg("hue"), arg("saturation"), arg("value"), arg("dtype")), "Converts a HSV color-pixel to RGB as defined in http://en.wikipedia.org/wiki/HSL_and_HSV. Returns a tuple with (r,g,b) values.\n Depending on the dtype parameter, different types of data is expected:\n\n - 'float': float values between 0 and 1\n - 'uint8': integers between 0 and 255\n - 'uint16': integers between 0 and 65535");
+  def("rgb_to_hsl", &rgb_to_hsl, (arg("red"), arg("green"), arg("blue"), arg("dtype")), "Converts a RGB color-pixel to HSL as defined in http://en.wikipedia.org/wiki/HSL_and_HSV. Returns a tuple with (h,s,l) values.\n Depending on the dtype parameter, different types of data is expected:\n\n - 'float': float values between 0 and 1\n - 'uint8': integers between 0 and 255\n - 'uint16': integers between 0 and 65535");
+  def("hsl_to_rgb", &hsl_to_rgb, (arg("hue"), arg("saturation"), arg("lightness"), arg("dtype")), "Converts a HSL color-pixel to RGB as defined in http://en.wikipedia.org/wiki/HSL_and_HSV. Returns a tuple with (r,g,b) values.\n Depending on the dtype parameter, different types of data is expected:\n\n - 'float': float values between 0 and 1\n - 'uint8': integers between 0 and 255\n - 'uint16': integers between 0 and 65535");
+  def("rgb_to_yuv", &rgb_to_yuv, (arg("red"), arg("green"), arg("blue"), arg("dtype")), "Converts a RGB color-coded pixel to YUV (Y'CbCr) using the CCIR 601 (Kb = 0.114, Kr = 0.299) norm as discussed here: http://en.wikipedia.org/wiki/YCbCr and here: http://www.fourcc.org/fccyvrgb.php. Returns a tuple with (y,u,v) values.\n\n Depending on the dtype parameter, different types of data is expected:\n\n - 'float': float values between 0 and 1\n - 'uint8': integers between 0 and 255\n - 'uint16': integers between 0 and 65535");
+  def("yuv_to_rgb", &yuv_to_rgb, (arg("y"), arg("u"), arg("v"), arg("dtype")), "Converts a YUV (Y'CbCr) color-coded pixel to RGB using the CCIR 601 (Kb = 0.114, Kr = 0.299) norm as discussed here: http://en.wikipedia.org/wiki/YCbCr and here: http://www.fourcc.org/fccyvrgb.php. Returns a tuple with (r,g,b) values.\n\n Depending on the dtype parameter, different types of data is expected:\n\n - 'float': float values between 0 and 1\n - 'uint8': integers between 0 and 255\n - 'uint16': integers between 0 and 65535");
+  def("rgb_to_gray", &rgb_to_gray, (arg("red"), arg("green"), arg("blue"), arg("dtype")), "Converts a RGB color-coded pixel to Grayscale using the CCIR 601 (Kb = 0.114, Kr = 0.299) norm as discussed here: http://www.fourcc.org/fccyvrgb.php. Returns only the gray value (Y component) in the desired data format. This method is more efficient than calling rgb_to_yuv() method just to extract the Y component.\n\n Depending on the dtype parameter, different types of data is expected:\n - 'float': float values between 0 and 1\n - 'uint8': integers between 0 and 255\n - 'uint16': integers between 0 and 65535");
+  def("gray_to_rgb", &gray_to_rgb, (arg("y"), arg("dtype")), "Converts a grayscale pixel to RGB by copying the gray value to all 3 bands. Returns a tuple with (r,g,b) values. This method is just here for convenience.\n Depending on the dtype parameter, different types of data is expected:\n\n - 'float': float values between 0 and 1\n - 'uint8': integers between 0 and 255\n - 'uint16': integers between 0 and 65535");
 
-  //more pythonic versions that return a dynamically allocated result
+  // image conversions from source to target image
   def("rgb_to_hsv", &py_rgb_to_hsv, (arg("rgb"), arg("hsv")), rgb_to_hsv_doc);
   def("hsv_to_rgb", &py_hsv_to_rgb, (arg("hsv"), arg("rgb")), hsv_to_rgb_doc);
   def("rgb_to_hsl", &py_rgb_to_hsl, (arg("rgb"), arg("hsl")), rgb_to_hsl_doc);
@@ -463,6 +592,7 @@ void bind_ip_color()
   def("rgb_to_gray", &py_rgb_to_gray, (arg("rgb"), arg("gray")), rgb_to_gray_doc);
   def("gray_to_rgb", &py_gray_to_rgb, (arg("gray"), arg("rgb")), gray_to_rgb_doc);
 
+  // more pythonic versions that return a dynamically allocated result
   def("rgb_to_hsv", &py_rgb_to_hsv2, (arg("rgb")), rgb_to_hsv_doc);
   def("hsv_to_rgb", &py_hsv_to_rgb2, (arg("hsv")), hsv_to_rgb_doc);
   def("rgb_to_hsl", &py_rgb_to_hsl2, (arg("rgb")), rgb_to_hsl_doc);
