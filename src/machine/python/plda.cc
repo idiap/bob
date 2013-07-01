@@ -43,8 +43,7 @@ static void py_set_dim_g(bob::machine::PLDABase& machine, const size_t dim_g)
 // Set and Get methods that uses blitz::Arrays
 static object py_get_mu(const bob::machine::PLDABase& machine) 
 {
-  const size_t dim_d = machine.getDimD();
-  bob::python::ndarray mu(bob::core::array::t_float64, dim_d);
+  bob::python::ndarray mu(bob::core::array::t_float64, machine.getDimD());
   blitz::Array<double,1> mu_ = mu.bz<double,1>();
   mu_ = machine.getMu();
   return mu.self();
@@ -53,8 +52,7 @@ static object py_get_mu(const bob::machine::PLDABase& machine)
 static void py_set_mu(bob::machine::PLDABase& machine, 
   bob::python::const_ndarray mu) 
 {
-  const blitz::Array<double,1> mu_ = mu.bz<double,1>();
-  machine.setMu(mu_);
+  machine.setMu(mu.bz<double,1>());
 }
 
 static object py_get_f(const bob::machine::PLDABase& machine) 
@@ -70,8 +68,7 @@ static object py_get_f(const bob::machine::PLDABase& machine)
 static void py_set_f(bob::machine::PLDABase& machine, 
   bob::python::const_ndarray f) 
 {
-  const blitz::Array<double,2> f_ = f.bz<double,2>();
-  machine.setF(f_);
+  machine.setF(f.bz<double,2>());
 }
 
 static object py_get_g(const bob::machine::PLDABase& machine) 
@@ -87,8 +84,7 @@ static object py_get_g(const bob::machine::PLDABase& machine)
 static void py_set_g(bob::machine::PLDABase& machine, 
   bob::python::const_ndarray g) 
 {
-  const blitz::Array<double,2> g_ = g.bz<double,2>();
-  machine.setG(g_);
+  machine.setG(g.bz<double,2>());
 }
 
 static object py_get_sigma(const bob::machine::PLDABase& machine) 
@@ -103,31 +99,26 @@ static object py_get_sigma(const bob::machine::PLDABase& machine)
 static void py_set_sigma(bob::machine::PLDABase& machine, 
   bob::python::const_ndarray sigma) 
 {
-  const blitz::Array<double,1> sigma_ = sigma.bz<double,1>();
-  machine.setSigma(sigma_);
+  machine.setSigma(sigma.bz<double,1>());
 }
 
 
 static double computeLogLikelihood1(bob::machine::PLDAMachine& plda, 
-  const blitz::Array<double, 1>& sample, bool with_enrolled_samples=true)
+  const blitz::Array<double,1>& sample, bool with_enrolled_samples=true)
 {
   return plda.computeLogLikelihood(sample, with_enrolled_samples);
 }
 
 static double computeLogLikelihood2(bob::machine::PLDAMachine& plda, 
-  const blitz::Array<double, 2>& samples, bool with_enrolled_samples=true)
+  const blitz::Array<double,2>& samples, bool with_enrolled_samples=true)
 {
   return plda.computeLogLikelihood(samples, with_enrolled_samples);
 }
 
 static double plda_forward_sample(bob::machine::PLDAMachine& m, 
-    bob::python::const_ndarray samples) {
+  bob::python::const_ndarray samples) 
+{
   const bob::core::array::typeinfo& info = samples.type();
-
-  if (info.dtype != bob::core::array::t_float64) 
-    PYTHON_ERROR(TypeError, "PLDA forwarding does not accept type '%s'",
-        info.str().c_str());
-
   switch (info.nd) {
     case 1:
       {
@@ -146,8 +137,8 @@ static double plda_forward_sample(bob::machine::PLDAMachine& m,
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "PLDA forwarding does not accept type '%s'",
-          info.str().c_str());
+      PYTHON_ERROR(TypeError, "PLDA forwarding does not accept input array with '%ld' dimensions (only 1D or 2D arrays)",
+          info.nd);
   }
 }
 
@@ -161,24 +152,40 @@ static double py_log_likelihood_point_estimate(bob::machine::PLDABase& plda,
   return plda.computeLogLikelihoodPointEstimate(xij_, hi_, wij_);
 }
 
-static object pldabase_getAddGamma(bob::machine::PLDABase& m, const size_t a) {
-  blitz::Array<double,2> res = m.getAddGamma(a).copy();
-  return object(res);
+static object pldabase_getAddGamma(bob::machine::PLDABase& m, const size_t a)
+{ 
+  const size_t dim_f = m.getDimF();
+  bob::python::ndarray gamma(bob::core::array::t_float64, dim_f, dim_f);
+  blitz::Array<double,2> gamma_ = gamma.bz<double,2>();
+  gamma_ = m.getAddGamma(a);
+  return gamma.self();
 }
 
-static object pldabase_getGamma(bob::machine::PLDABase& m, const size_t a) {
-  blitz::Array<double,2> res = m.getGamma(a).copy();
-  return object(res);
+static object pldabase_getGamma(bob::machine::PLDABase& m, const size_t a)
+{
+  const size_t dim_f = m.getDimF();
+  bob::python::ndarray gamma(bob::core::array::t_float64, dim_f, dim_f);
+  blitz::Array<double,2> gamma_ = gamma.bz<double,2>();
+  gamma_ = m.getGamma(a);
+  return gamma.self();
 }
 
-static object plda_getAddGamma(bob::machine::PLDAMachine& m, const size_t a) {
-  blitz::Array<double,2> res = m.getAddGamma(a).copy();
-  return object(res);
+static object plda_getAddGamma(bob::machine::PLDAMachine& m, const size_t a)
+{
+  const size_t dim_f = m.getDimF();
+  bob::python::ndarray gamma(bob::core::array::t_float64, dim_f, dim_f);
+  blitz::Array<double,2> gamma_ = gamma.bz<double,2>();
+  gamma_ = m.getAddGamma(a);
+  return gamma.self();
 }
 
-static object plda_getGamma(bob::machine::PLDAMachine& m, const size_t a) {
-  blitz::Array<double,2> res = m.getGamma(a).copy();
-  return object(res);
+static object plda_getGamma(bob::machine::PLDAMachine& m, const size_t a)
+{
+  const size_t dim_f = m.getDimF();
+  bob::python::ndarray gamma(bob::core::array::t_float64, dim_f, dim_f);
+  blitz::Array<double,2> gamma_ = gamma.bz<double,2>();
+  gamma_ = m.getGamma(a);
+  return gamma.self();
 }
 
 BOOST_PYTHON_FUNCTION_OVERLOADS(computeLogLikelihood1_overloads, computeLogLikelihood1, 2, 3)
@@ -186,10 +193,10 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(computeLogLikelihood2_overloads, computeLogLikel
 
 void bind_machine_plda() 
 {
-  class_<bob::machine::PLDABase, boost::shared_ptr<bob::machine::PLDABase> >("PLDABase", "A PLDABase can be seen as a container for F, G, sigma and mu when performing Probabilistic Linear Discriminant Analysis (PLDA).\nReferences:\n1. 'A Scalable Formulation of Probabilistic Linear Discriminant Analysis: Applied to Face Recognition', Laurent El Shafey, Chris McCool, Roy Wallace, Sebastien Marcel, TPAMI'2013\n2. 'Probabilistic Linear Discriminant Analysis for Inference About Identity', Prince and Elder, ICCV'2007.\n3. 'Probabilistic Models for Inference about Identity', Li, Fu, Mohammed, Elder and Prince, TPAMI'2012.", init<const size_t, const size_t, const size_t, optional<const double> >((arg("dim_d"), arg("dim_f"), arg("dim_g"), arg("variance_flooring")=0.), "Builds a new PLDABase. dim_d is the dimensionality of the input features, dim_f is the dimensionality of the F subspace and dim_g the dimensionality of the G subspace. The variance flooring threshold is the minimum value that the variance sigma can reach, as this diagonal matrix is inverted."))
-    .def(init<>("Constructs a new empty PLDABase."))
-    .def(init<bob::io::HDF5File&>((arg("config")), "Constructs a new PLDABase from a configuration file."))
-    .def(init<const bob::machine::PLDABase&>((arg("machine")), "Copy constructs a PLDABase"))
+  class_<bob::machine::PLDABase, boost::shared_ptr<bob::machine::PLDABase> >("PLDABase", "A PLDABase can be seen as a container for the subspaces F, G, the diagonal covariance matrix sigma (stored as a 1D array) and the mean vector mu when performing Probabilistic Linear Discriminant Analysis (PLDA). PLDA is a probabilistic model that incorporates components describing both between-class and within-class variations. A PLDABase can be shared between several PLDAMachine that contains class-specific information (information about the enrolment samples).\n\nReferences:\n1. 'A Scalable Formulation of Probabilistic Linear Discriminant Analysis: Applied to Face Recognition', Laurent El Shafey, Chris McCool, Roy Wallace, Sebastien Marcel, TPAMI'2013\n2. 'Probabilistic Linear Discriminant Analysis for Inference About Identity', Prince and Elder, ICCV'2007.\n3. 'Probabilistic Models for Inference about Identity', Li, Fu, Mohammed, Elder and Prince, TPAMI'2012.", init<const size_t, const size_t, const size_t, optional<const double> >((arg("self"), arg("dim_d"), arg("dim_f"), arg("dim_g"), arg("variance_flooring")=0.), "Builds a new PLDABase. dim_d is the dimensionality of the input features, dim_f is the dimensionality of the F subspace and dim_g the dimensionality of the G subspace. The variance flooring threshold is the minimum value that the variance sigma can reach, as this diagonal matrix is inverted."))
+    .def(init<>((arg("self")), "Constructs a new empty PLDABase."))
+    .def(init<bob::io::HDF5File&>((arg("self"), arg("config")), "Constructs a new PLDABase from a configuration file."))
+    .def(init<const bob::machine::PLDABase&>((arg("self"), arg("machine")), "Copy constructs a PLDABase"))
     .def(self == self)
     .def(self != self)
     .def("is_similar_to", &bob::machine::PLDABase::is_similar_to, (arg("self"), arg("other"), arg("r_epsilon")=1e-5, arg("a_epsilon")=1e-8), "Compares this PLDABase with the 'other' one to be approximately the same.")
@@ -228,10 +235,10 @@ void bind_machine_plda()
     .def("__precompute_log_like__", &bob::machine::PLDABase::precomputeLogLike, (arg("self")), "Precomputes useful values for log-likelihood computations.")
   ;
 
-  class_<bob::machine::PLDAMachine, boost::shared_ptr<bob::machine::PLDAMachine> >("PLDAMachine", "A PLDAMachine", init<boost::shared_ptr<bob::machine::PLDABase> >((arg("plda_base")), "Builds a new PLDAMachine. An attached PLDABase should be provided, containing the PLDA model (F, G and Sigma). The PLDAMachine only carries information about the enrolled samples.\nReferences:\n1. 'A Scalable Formulation of Probabilistic Linear Discriminant Analysis: Applied to Face Recognition', Laurent El Shafey, Chris McCool, Roy Wallace, Sebastien Marcel, TPAMI'2013\n2. 'Probabilistic Linear Discriminant Analysis for Inference About Identity', Prince and Elder, ICCV'2007.\n3. 'Probabilistic Models for Inference about Identity', Li, Fu, Mohammed, Elder and Prince, TPAMI'2012."))
+  class_<bob::machine::PLDAMachine, boost::shared_ptr<bob::machine::PLDAMachine> >("PLDAMachine", "A PLDAMachine contains class-specific information (from the enrolment samples) when performing Probabilistic Linear Discriminant Analysis (PLDA). It should be attached to a PLDABase that contains information such as the subspaces F and G.\n\nReferences:\n1. 'A Scalable Formulation of Probabilistic Linear Discriminant Analysis: Applied to Face Recognition', Laurent El Shafey, Chris McCool, Roy Wallace, Sebastien Marcel, TPAMI'2013\n2. 'Probabilistic Linear Discriminant Analysis for Inference About Identity', Prince and Elder, ICCV'2007.\n3. 'Probabilistic Models for Inference about Identity', Li, Fu, Mohammed, Elder and Prince, TPAMI'2012.", init<boost::shared_ptr<bob::machine::PLDABase> >((arg("self"), arg("plda_base")), "Builds a new PLDAMachine. An attached PLDABase should be provided, that can be shared by several PLDAMachine."))
     .def(init<>("Constructs a new empty PLDAMachine."))
-    .def(init<bob::io::HDF5File&, boost::shared_ptr<bob::machine::PLDABase> >((arg("config"), arg("plda_base")), "Constructs a new PLDAMachine from a configuration file (and a PLDABase object)."))
-    .def(init<const bob::machine::PLDAMachine&>((arg("machine")), "Copy constructs a PLDAMachine"))
+    .def(init<bob::io::HDF5File&, boost::shared_ptr<bob::machine::PLDABase> >((arg("self"), arg("config"), arg("plda_base")), "Constructs a new PLDAMachine from a configuration file (and a PLDABase object)."))
+    .def(init<const bob::machine::PLDAMachine&>((arg("self"), arg("machine")), "Copy constructs a PLDAMachine"))
     .def(self == self)
     .def(self != self)
     .def("load", &bob::machine::PLDAMachine::load, (arg("self"), arg("config")), "Loads the configuration parameters from a configuration file.")
@@ -240,7 +247,7 @@ void bind_machine_plda()
     .add_property("dim_d", &bob::machine::PLDAMachine::getDimD, "Dimensionality of the input feature vectors")
     .add_property("dim_f", &bob::machine::PLDAMachine::getDimF, "Dimensionality of the F subspace/matrix of the PLDA model")
     .add_property("dim_g", &bob::machine::PLDAMachine::getDimG, "Dimensionality of the G subspace/matrix of the PLDA model")
-    .add_property("n_samples", &bob::machine::PLDAMachine::getNSamples, &bob::machine::PLDAMachine::setNSamples)
+    .add_property("n_samples", &bob::machine::PLDAMachine::getNSamples, &bob::machine::PLDAMachine::setNSamples, "Number of enrolled samples")
     .add_property("w_sum_xit_beta_xi", &bob::machine::PLDAMachine::getWSumXitBetaXi, &bob::machine::PLDAMachine::setWSumXitBetaXi)
     .add_property("weighted_sum", make_function(&bob::machine::PLDAMachine::getWeightedSum, return_value_policy<copy_const_reference>()), &bob::machine::PLDAMachine::setWeightedSum)
     .add_property("log_likelihood", &bob::machine::PLDAMachine::getLogLikelihood, &bob::machine::PLDAMachine::setLogLikelihood)
@@ -250,10 +257,10 @@ void bind_machine_plda()
     .def("has_log_like_const_term", &bob::machine::PLDAMachine::hasLogLikeConstTerm, (arg("self"), arg("a")), "Tells if the log likelihood constant term for the given number of samples has already been computed.")
     .def("get_add_log_like_const_term", &bob::machine::PLDAMachine::getAddLogLikeConstTerm, (arg("self"), arg("a")), "Computes the log likelihood constant term for the given number of samples, and adds it to the machine (as well as gamma), if it does not already exist.")
     .def("get_log_like_const_term", &bob::machine::PLDAMachine::getLogLikeConstTerm, (arg("self"), arg("a")), "Returns the log likelihood constant term for the given number of samples if it has already been put in cache. Throws an exception otherwise.")
-    .def("clear_maps", &bob::machine::PLDAMachine::clearMaps, (arg("self")), "Clear the maps containing the gamma's as well as the log likelihood constant term for few number of samples. These maps are used to make likelihood computations faster.")
-    .def("compute_log_likelihood", &computeLogLikelihood1, computeLogLikelihood1_overloads((arg("self"), arg("sample"), arg("use_enrolled_samples")=true), "Computes the likelihood considering only the probe sample or jointly the probe sample and the enrolled samples."))
-    .def("compute_log_likelihood", &computeLogLikelihood2, computeLogLikelihood2_overloads((arg("self"), arg("samples"), arg("use_enrolled_samples")=true), "Computes the likelihood considering only the probe samples or jointly the probes samples and the enrolled samples."))
-    .def("__call__", &plda_forward_sample, (arg("self"), arg("sample")), "Processes a sample and returns a score.")
-    .def("forward", &plda_forward_sample, (arg("self"), arg("sample")), "Processes a sample and returns a score.")
+    .def("clear_maps", &bob::machine::PLDAMachine::clearMaps, (arg("self")), "Clears the maps containing the gamma's as well as the log likelihood constant term for few number of samples. These maps are used to make likelihood computations faster.")
+    .def("compute_log_likelihood", &computeLogLikelihood1, computeLogLikelihood1_overloads((arg("self"), arg("sample"), arg("use_enrolled_samples")=true), "Computes the log-likelihood considering only the probe sample or jointly the probe sample and the enrolled samples."))
+    .def("compute_log_likelihood", &computeLogLikelihood2, computeLogLikelihood2_overloads((arg("self"), arg("samples"), arg("use_enrolled_samples")=true), "Computes the log-likelihood considering only the probe samples or jointly the probes samples and the enrolled samples."))
+    .def("__call__", &plda_forward_sample, (arg("self"), arg("sample")), "Processes a sample and returns a log-likelihood ratio score.")
+    .def("forward", &plda_forward_sample, (arg("self"), arg("sample")), "Processes a sample and returns a log-likelihood ratio score.")
   ;
 }

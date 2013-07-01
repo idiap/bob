@@ -381,9 +381,9 @@ class PLDATrainerTest(unittest.TestCase):
     m_py = bob.machine.PLDABase(D,nf,ng)
 
     # Sets the same initialization methods
-    t.init_f_method = bob.trainer.init_f_method.BETWEEN_SCATTER
-    t.init_g_method = bob.trainer.init_g_method.WITHIN_SCATTER
-    t.init_sigma_method = bob.trainer.init_sigma_method.VARIANCE_DATA
+    t.init_f_method = bob.trainer.PLDATrainer.BETWEEN_SCATTER
+    t.init_g_method = bob.trainer.PLDATrainer.WITHIN_SCATTER
+    t.init_sigma_method = bob.trainer.PLDATrainer.VARIANCE_DATA
 
     t.train(m, l)
     t_py.train(m_py, l)
