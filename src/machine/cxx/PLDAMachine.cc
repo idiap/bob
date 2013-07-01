@@ -33,15 +33,16 @@
 #include <boost/lexical_cast.hpp>
 #include <string>
 
-bob::machine::PLDABase::PLDABase()
+bob::machine::PLDABase::PLDABase():
+  m_variance_threshold(0.)
 {
   resizeNoInit(0, 0, 0);
 }
 
-bob::machine::PLDABase::PLDABase(const size_t dim_d, 
-  const size_t dim_f, const size_t dim_g, const double variance_threshold)
+bob::machine::PLDABase::PLDABase(const size_t dim_d, const size_t dim_f,
+    const size_t dim_g, const double variance_threshold):
+  m_variance_threshold(0.)
 {
-  m_variance_threshold = variance_threshold;
   resize(dim_d, dim_f, dim_g);
 }
 
