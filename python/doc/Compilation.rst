@@ -48,10 +48,10 @@ Grab a release tarball and change into the directory of your choice, let's say
 
   $ mkdir workdir
   $ cd workdir
-  # getting version 1.1.4 as a tarball
-  $ wget http://www.idiap.ch/software/bob/packages/bob-1.1.4.tar.gz
-  $ tar xvfz bob-1.1.4.tar.gz
-  $ cd bob-1.1.4
+  # getting version 1.2.0 as a tarball
+  $ wget http://www.idiap.ch/software/bob/packages/bob-1.2.0.tar.gz
+  $ tar xvfz bob-1.2.0.tar.gz
+  $ cd bob-1.2.0
 
 .. _section-checkout:
 
@@ -140,6 +140,12 @@ Some variables that may be handy:
  * `WITH_MKL`: tries to compile against the Intel MKL instead of the standard
    BLAS/LAPACK installation. You should provide the path to the MKL such as
    `-DWITH_MKL=/PATH/TO/MKL/LIB`.
+ * `WITH_QT4`: makes Qt4 detection obligatory.
+ * `WITH_LIBSVM`: makes LibSVM detection obligatory.
+ * `WITH_VLFEAT`: makes VLFeat detection obligatory.
+ * `WITH_MATIO`: makes MatIO detection obligatory.
+ * `WITH_FFMPEG`: makes FFmpeg detection obligatory.
+ * `WITH_PERFTOOLS`: makes Google Perftools detection obligatory.
 
 Troubleshooting compilation
 ===========================
