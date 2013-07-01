@@ -51,6 +51,7 @@ option(WITH_VLFEAT "Make VLFEAT detection obligatory" ON)
 option(WITH_MATIO "Make Matio detection obligatory" ON)
 option(WITH_FFMPEG "Make FFmpeg detection obligatory" ON)
 option(WITH_PERFTOOLS "Make Google Perftools detection obligatory" OFF)
+option(WITH_MKL "Compile against the Intel MKL" OFF)
 
 message(STATUS "Bob version '${BOB_VERSION}' (${BOB_PLATFORM_STR})")
 

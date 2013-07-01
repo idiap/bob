@@ -137,6 +137,9 @@ Some variables that may be handy:
    variable is useful **only** for local installations of |project| in with a
    non-default Python interpreter in which you want to facilitate the end-user
    setup. It is `OFF` by default.
+ * `WITH_MKL`: tries to compile against the Intel MKL instead of the standard
+   BLAS/LAPACK installation. You should provide the path to the MKL such as
+   `-DWITH_MKL=/PATH/TO/MKL/LIB`.
 
 Troubleshooting compilation
 ===========================

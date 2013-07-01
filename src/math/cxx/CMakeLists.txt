@@ -1,8 +1,14 @@
 PROJECT(bob_math)
 
-set(suffixes sse2)
-find_library(lapack_LIBRARY NAMES lapack PATH_SUFFIXES ${suffixes}) 
-find_library(blas_LIBRARY NAMES cblas blas PATH_SUFFIXES ${suffixes})
+if(WITH_MKL)
+  find_library(blas_LIBRARY NAMES mkl PATHS ${WITH_MKL})
+  find_library(lapack_LIBRARY NAMES mkl_lapack64 PATHS ${WITH_MKL})
+else()
+  set(suffixes sse2)
+  find_library(lapack_LIBRARY NAMES lapack PATH_SUFFIXES ${suffixes}) 
+  find_library(blas_LIBRARY NAMES cblas blas PATH_SUFFIXES ${suffixes})
+endif()
+
 set(lapack_LIBRARIES ${lapack_LIBRARY};${blas_LIBRARY})
 list(REMOVE_DUPLICATES lapack_LIBRARIES)
 set(lapack_LIBRARIES ${lapack_LIBRARIES} CACHE INTERNAL "libraries")

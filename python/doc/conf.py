@@ -247,8 +247,9 @@ rst_epilog = """
 .. Some variables
 .. |project| replace:: Bob
 .. |bobweb| replace:: https://www.idiap.ch/software/bob
-.. |current-year| date:: %Y
-"""
+.. |current-year| date:: %%Y
+.. |version| replace:: %s
+""" % (version,)
 
 # -- Options for manual page output --------------------------------------------
 
