@@ -343,6 +343,12 @@ void bob::trainer::PLDATrainer::initF(bob::machine::PLDABase& machine,
   // 1: between-class scatter
   if (m_initF_method == bob::trainer::PLDATrainer::BETWEEN_SCATTER) 
   {
+    if (machine.getDimF() > v_ar.size()) {
+      boost::format m("The rank of the matrix F ('%ld') can't be larger than the number of classes in the training set ('%ld')");
+      m % machine.getDimF() % v_ar.size();
+      throw std::runtime_error(m.str());
+    }
+
     // a/ Computes between-class scatter matrix
     blitz::firstIndex bi;
     blitz::secondIndex bj;
