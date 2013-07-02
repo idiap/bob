@@ -671,8 +671,8 @@ Learning a PLDA model can be performed by instantiating the class
 
 .. doctest::
 
-   ### This creates a PLDABase container for input feature of dimensionality 3,
-   ### and with subspaces F and G of rank 1 and 2 respectively.
+   >>> ### This creates a PLDABase container for input feature of dimensionality 3,
+   >>> ### and with subspaces F and G of rank 1 and 2 respectively.
    >>> pldabase = bob.machine.PLDABase(3,1,2)
 
    >>> trainer = bob.trainer.PLDATrainer()
@@ -728,10 +728,6 @@ ratio will be computed, which is defined in more formal way by:
   
    >>> s1 = plda1(sample)
    >>> s2 = plda2(sample)
-
-
-
-
 
 
 .. Place here your external references
