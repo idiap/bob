@@ -7,7 +7,7 @@ soversion=@BOB_SOVERSION@
 
 Name: bob
 Description: Bob is a free signal-processing and machine learning toolbox
-URL: http://idiap.github.com/bob
+URL: http://idiap.github.io/bob
 Version: @BOB_VERSION@
 Requires:@BOB_PACKAGES@
 Libs:

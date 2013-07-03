@@ -5,7 +5,7 @@ includedir=@BOB_CMAKE_INSTALL_PREFIX@/include
 
 Name: @BOB_PACKAGE_NAME@
 Description: Bob is a free signal-processing and machine learning toolbox
-URL: http://idiap.github.com/bob
+URL: http://idiap.github.io/bob
 Version: @BOB_VERSION@
 Requires: @BOB_PACKAGE_REQUIRES@
 Libs: -L${libdir} -l@BOB_PACKAGE_LIBRARY@
