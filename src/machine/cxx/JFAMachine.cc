@@ -581,21 +581,9 @@ void bob::machine::JFAMachine::forward(const bob::machine::GMMStats& gmm_stats,
   // Checks that a Base machine has been set
   if (!m_jfa_base) throw bob::machine::JFAMachineNoJFABaseSet();
 
-  std::vector<boost::shared_ptr<const bob::machine::GMMStats> > stats;
-  stats.push_back(boost::shared_ptr<const bob::machine::GMMStats>(new bob::machine::GMMStats(gmm_stats)));
-  std::vector<blitz::Array<double,1> > channelOffset;
-  channelOffset.push_back(Ux);
-
-  // m + Vy + Dz
-  std::vector<blitz::Array<double,1> > models;
-  models.push_back(m_cache_mVyDz);
-
-  // Linear scoring
-  blitz::Array<double,2> scores(1,1);
-  bob::machine::linearScoring(models,
-    m_jfa_base->getUbm()->getMeanSupervector(), m_jfa_base->getUbm()->getVarianceSupervector(),
-    stats, channelOffset, true, scores);
-  score = scores(0,0);
+  score = bob::machine::linearScoring(m_cache_mVyDz, 
+            m_jfa_base->getUbm()->getMeanSupervector(), m_jfa_base->getUbm()->getVarianceSupervector(),
+            gmm_stats, Ux, true);
 }
 
 void bob::machine::JFAMachine::forward_(const bob::machine::GMMStats& input, 
@@ -606,23 +594,11 @@ void bob::machine::JFAMachine::forward_(const bob::machine::GMMStats& input,
 
   // Ux and GMMStats
   estimateX(input, m_cache_x);
-  std::vector<boost::shared_ptr<const bob::machine::GMMStats> > stats;
-  stats.push_back(boost::shared_ptr<const bob::machine::GMMStats>(new bob::machine::GMMStats(input)));
-
   bob::math::prod(m_jfa_base->getU(), m_cache_x, m_tmp_Ux);
-  std::vector<blitz::Array<double,1> > channelOffset;
-  channelOffset.push_back(m_tmp_Ux);
 
-  // m + Vy + Dz
-  std::vector<blitz::Array<double,1> > models;
-  models.push_back(m_cache_mVyDz);
-
-  // Linear scoring
-  blitz::Array<double,2> scores(1,1);
-  bob::machine::linearScoring(models,
-    m_jfa_base->getUbm()->getMeanSupervector(), m_jfa_base->getUbm()->getVarianceSupervector(),
-    stats, channelOffset, true, scores);
-  score = scores(0,0);
+  score = bob::machine::linearScoring(m_cache_mVyDz, 
+            m_jfa_base->getUbm()->getMeanSupervector(), m_jfa_base->getUbm()->getVarianceSupervector(),
+            input, m_tmp_Ux, true);
 }
 
 
@@ -772,21 +748,9 @@ void bob::machine::ISVMachine::forward(const bob::machine::GMMStats& gmm_stats,
   // Checks that a Base machine has been set
   if (!m_isv_base) throw bob::machine::JFAMachineNoJFABaseSet();
 
-  std::vector<boost::shared_ptr<const bob::machine::GMMStats> > stats;
-  stats.push_back(boost::shared_ptr<const bob::machine::GMMStats>(new bob::machine::GMMStats(gmm_stats)));
-  std::vector<blitz::Array<double,1> > channelOffset;
-  channelOffset.push_back(Ux);
-
-  // m + Dz
-  std::vector<blitz::Array<double,1> > models;
-  models.push_back(m_cache_mDz);
-
-  // Linear scoring
-  blitz::Array<double,2> scores(1,1);
-  bob::machine::linearScoring(models,
-    m_isv_base->getUbm()->getMeanSupervector(), m_isv_base->getUbm()->getVarianceSupervector(),
-    stats, channelOffset, true, scores);
-  score = scores(0,0);
+  score = bob::machine::linearScoring(m_cache_mDz, 
+            m_isv_base->getUbm()->getMeanSupervector(), m_isv_base->getUbm()->getVarianceSupervector(),
+            gmm_stats, Ux, true);
 }
 
 void bob::machine::ISVMachine::forward_(const bob::machine::GMMStats& input, 
@@ -797,22 +761,10 @@ void bob::machine::ISVMachine::forward_(const bob::machine::GMMStats& input,
 
   // Ux and GMMStats
   estimateX(input, m_cache_x);
-  std::vector<boost::shared_ptr<const bob::machine::GMMStats> > stats;
-  stats.push_back(boost::shared_ptr<const bob::machine::GMMStats>(new bob::machine::GMMStats(input)));
-
   bob::math::prod(m_isv_base->getU(), m_cache_x, m_tmp_Ux);
-  std::vector<blitz::Array<double,1> > channelOffset;
-  channelOffset.push_back(m_tmp_Ux);
 
-  // m + Dz
-  std::vector<blitz::Array<double,1> > models;
-  models.push_back(m_cache_mDz);
-
-  // Linear scoring
-  blitz::Array<double,2> scores(1,1);
-  bob::machine::linearScoring(models,
-    m_isv_base->getUbm()->getMeanSupervector(), m_isv_base->getUbm()->getVarianceSupervector(),
-    stats, channelOffset, true, scores);
-  score = scores(0,0);
+  score = bob::machine::linearScoring(m_cache_mDz, 
+            m_isv_base->getUbm()->getMeanSupervector(), m_isv_base->getUbm()->getVarianceSupervector(),
+            input, m_tmp_Ux, true);
 }
 
