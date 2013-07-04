@@ -6,16 +6,16 @@
  * @brief Bindings for i/o files.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -72,7 +72,7 @@ static dict extensions() {
 }
 
 void bind_io_file() {
-  
+
   class_<bob::io::File, boost::shared_ptr<bob::io::File>, boost::noncopyable>("File", "Abstract base class for all Array/Arrayset i/o operations", no_init)
     .def("__init__", make_constructor(string_open1, default_call_policies(), (arg("filename"), arg("mode"))), "Opens a (supported) file for reading arrays. The mode is a **single** character which takes one of the following values: 'r' - opens the file for read-only operations; 'w' - truncates the file and open it for reading and writing; 'a' - opens the file for reading and writing w/o truncating it.")
     .def("__init__", make_constructor(string_open2, default_call_policies(), (arg("filename"), arg("mode"), arg("pretend_extension"))), "Opens a (supported) file for reading arrays but pretends its extension is as given by the last parameter - this way you can, potentially, override the default encoder/decoder used to read and write on the file. The mode is a **single** character which takes one of the following values: 'r' - opens the file for read-only operations; 'w' - truncates the file and open it for reading and writing; 'a' - opens the file for reading and writing w/o truncating it.")

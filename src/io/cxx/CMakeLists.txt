@@ -14,7 +14,7 @@ set(src
     "File.cc"
     "CodecRegistry.cc"
     "utils.cc"
-    
+
     "HDF5Exception.cc"
     "HDF5Types.cc"
     "HDF5Utils.cc"
@@ -23,16 +23,12 @@ set(src
     "HDF5Attribute.cc"
     "HDF5File.cc"
 
-    "BinFileHeader.cc"
-    "BinFile.cc"
-
     "TensorFileHeader.cc"
     "TensorFile.cc"
 
     # File implementations
     "HDF5ArrayFile.cc"
     "CSVFile.cc"
-    "BinaryArrayFile.cc"
     "TensorArrayFile.cc"
     "T3File.cc"
     "ImageBmpFile.cc"
@@ -41,7 +37,7 @@ set(src
 # If we have matio installed, enable the compilation of relevant modules
 if(WITH_MATIO)
   list(APPEND shared "${matio_RESOLVED_LIBRARIES}")
-  list(APPEND src 
+  list(APPEND src
     "MatUtils.cc"
     "MatFile.cc"
     )
