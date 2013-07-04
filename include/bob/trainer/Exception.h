@@ -100,20 +100,6 @@ namespace bob { namespace trainer {
   };
 
   /**
-   * Raised when an invalid prior for the Linear Logistic Regression is set.
-   */
-  class LogRegPriorNotInRange: public Exception {
-    public:
-      LogRegPriorNotInRange(const double got) throw();
-      virtual ~LogRegPriorNotInRange() throw();
-      virtual const char* what() const throw();
-
-    private:
-      double m_got;
-      mutable std::string m_message;
-  };
-
-  /**
    * Raised when the K-means initialization fails.
    */
   class KMeansInitializationFailure: public Exception {

@@ -25,7 +25,7 @@
 #define BOB_TRAINER_CGLOGREGTRAINER_H
 
 #include <bob/machine/LinearMachine.h>
-#include <bob/trainer/Exception.h>
+#include <boost/format.hpp>
 
 namespace bob { namespace trainer {
   /**
@@ -98,7 +98,12 @@ namespace bob { namespace trainer {
        * Setters
        */
       void setPrior(const double prior) 
-      { if(prior<=0. || prior>=1.) throw bob::trainer::LogRegPriorNotInRange(prior);
+      { if(prior<=0. || prior>=1.) 
+        {
+          boost::format m("Prior (%f) not in the range ]0,1[.");
+          m % prior;
+          throw std::runtime_error(m.str());
+        }
         m_prior = prior; }
       void setConvergenceThreshold(const double convergence_threshold)
       { m_convergence_threshold = convergence_threshold; }
@@ -111,7 +116,7 @@ namespace bob { namespace trainer {
        * Trains the LinearMachine to perform Linear Logistic Regression
        */
       virtual void train(bob::machine::LinearMachine& machine, 
-          const blitz::Array<double,2>& data1, const blitz::Array<double,2>& data2) const;
+          const blitz::Array<double,2>& negatives, const blitz::Array<double,2>& positives) const;
 
     private: 
       // Attributes

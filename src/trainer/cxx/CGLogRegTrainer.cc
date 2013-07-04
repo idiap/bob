@@ -21,7 +21,6 @@
 #include <bob/trainer/CGLogRegTrainer.h>
 #include <bob/math/linear.h>
 #include <bob/core/logging.h>
-
 #include <limits>
 
 bob::trainer::CGLogRegTrainer::CGLogRegTrainer(const double prior, 
@@ -31,7 +30,11 @@ bob::trainer::CGLogRegTrainer::CGLogRegTrainer(const double prior,
     m_max_iterations(max_iterations), m_lambda(lambda)
 {
   if(prior<=0. || prior>=1.) 
-    throw bob::trainer::LogRegPriorNotInRange(prior);
+  {
+    boost::format m("Prior (%f) not in the range ]0,1[.");
+    m % prior;
+    throw std::runtime_error(m.str());
+  }
 }
 
 bob::trainer::CGLogRegTrainer::CGLogRegTrainer(const bob::trainer::CGLogRegTrainer& other):
@@ -73,17 +76,16 @@ bob::trainer::CGLogRegTrainer::operator!=(const bob::trainer::CGLogRegTrainer& b
 }
 
 void bob::trainer::CGLogRegTrainer::train(bob::machine::LinearMachine& machine, 
-  const blitz::Array<double,2>& ar1, const blitz::Array<double,2>& ar2) const 
+  const blitz::Array<double,2>& negatives, const blitz::Array<double,2>& positives) const 
 {
   // Checks for arraysets data type and shape once
-  if(ar1.extent(1) != ar2.extent(1)) 
-    throw bob::io::DimensionError(ar1.extent(1), ar2.extent(1));
+  bob::core::array::assertSameDimensionLength(negatives.extent(1), positives.extent(1));
 
   // Data is checked now and conforms, just proceed w/o any further checks.
-  size_t n_samples1 = ar1.extent(0);
-  size_t n_samples2 = ar2.extent(0);
+  size_t n_samples1 = positives.extent(0);
+  size_t n_samples2 = negatives.extent(0);
   size_t n_samples = n_samples1 + n_samples2;
-  size_t n_features = ar1.extent(1);
+  size_t n_features = positives.extent(1);
 
   // Defines useful ranges  
   blitz::Range rall = blitz::Range::all();
@@ -92,15 +94,15 @@ void bob::trainer::CGLogRegTrainer::train(bob::machine::LinearMachine& machine,
   blitz::Range r2 = blitz::Range(n_samples1,n_samples-1);
 
   // Creates a large blitz::Array containing the samples
-  // x = |ar1 -ar2|, of size (n_features+1,n_samples1+n_samples2)
+  // x = |positives - negatives|, of size (n_features+1,n_samples1+n_samples2)
   //     |1.  -1. |
   blitz::Array<double,2> x(n_features+1, n_samples);
   x(n_features,r1) = 1.;
   x(n_features,r2) = -1.;
   for(size_t i=0; i<n_samples1; ++i)
-    x(rd,i) = ar1(i,rall);
+    x(rd,i) = positives(i,rall);
   for(size_t i=0; i<n_samples2; ++i)
-    x(rd,i+n_samples1) = -ar2(i,rall);
+    x(rd,i+n_samples1) = -negatives(i,rall);
 
   // Ratio between the two classes and weights vector
   double prop = (double)n_samples1 / (double)n_samples;

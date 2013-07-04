@@ -32,7 +32,7 @@ class CGLogRegTest(unittest.TestCase):
   def test01_cglogreg(self):
 
     # Tests our LLR Trainer.
-    ar1 = numpy.array([
+    positives = numpy.array([
       [1.,1.2,-1.],
       [2.,2.1,2.2],
       [3.,2.9,3.1],
@@ -42,7 +42,7 @@ class CGLogRegTest(unittest.TestCase):
       [7.,7.,7.3],
       ], dtype='float64')
 
-    ar2 = numpy.array([
+    negatives = numpy.array([
       [-10.,-9.2,-1.],
       [-5.,-4.1,-0.5],
       [-10.,-9.9,-1.8],
@@ -70,7 +70,7 @@ class CGLogRegTest(unittest.TestCase):
   
     # Trains a machine (method 1)
     T = bob.trainer.CGLogRegTrainer(0.5, 1e-5, 30)
-    machine1 = T.train(ar1,ar2)
+    machine1 = T.train(negatives,positives)
 
     # Makes sure results are good
     self.assertTrue( (abs(machine1.weights - weights_ref) < 2e-4).all() )
@@ -80,7 +80,7 @@ class CGLogRegTest(unittest.TestCase):
 
     # Trains a machine (method 2)
     machine2 = bob.machine.LinearMachine()
-    T.train(machine2, ar1, ar2)
+    T.train(machine2, negatives, positives)
 
     # Makes sure results are good
     self.assertTrue( (abs(machine2.weights - weights_ref) < 2e-4).all() )
@@ -95,7 +95,7 @@ class CGLogRegTest(unittest.TestCase):
 
     # Trains a machine (method 1)
     T = bob.trainer.CGLogRegTrainer(0.5, 1e-5, 30, 1.)
-    machine1 = T.train(ar1,ar2)
+    machine1 = T.train(negatives, positives)
 
     # Makes sure results are good
     self.assertTrue( (abs(machine1.weights - weights_ref) < 2e-4).all() )

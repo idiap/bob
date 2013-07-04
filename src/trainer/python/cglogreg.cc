@@ -59,7 +59,7 @@ void bind_trainer_cglogreg()
     .add_property("convergence_threshold", &bob::trainer::CGLogRegTrainer::getConvergenceThreshold, &bob::trainer::CGLogRegTrainer::setConvergenceThreshold, "The convergence threshold for the conjugate gradient algorithm")
     .add_property("max_iterations", &bob::trainer::CGLogRegTrainer::getMaxIterations, &bob::trainer::CGLogRegTrainer::setMaxIterations, "The maximum number of iterations for the conjugate gradient algorithm")
     .add_property("lambda", &bob::trainer::CGLogRegTrainer::getLambda, &bob::trainer::CGLogRegTrainer::setLambda, "The regularization factor lambda")
-    .def("train", &train1, (arg("self"), arg("data1"), arg("data2")), "Trains a LinearMachine to perform the Linear Logistic Regression, using two arraysets for training, one for each of the two classes (target vs. non-target). The trained LinearMachine is returned.")
-    .def("train", &train2, (arg("self"), arg("machine"), arg("data1"), arg("data2")), "Trains a LinearMachine to perform the Linear Logistic Regression, using two arraysets for training, one for each of the two classes (target vs. non-target).")
+    .def("train", &train1, (arg("self"), arg("negatives"), arg("positives")), "Trains a LinearMachine to perform the Linear Logistic Regression, using two arraysets for training, one for each of the two classes (negatives vs. positives). The trained LinearMachine is returned.")
+    .def("train", &train2, (arg("self"), arg("machine"), arg("negatives"), arg("positives")), "Trains a LinearMachine to perform the Linear Logistic Regression, using two arraysets for training, one for each of the two classes (negatives vs. positives).")
     ;
 }
