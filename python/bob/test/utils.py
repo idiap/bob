@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
 # Andre Anjos <andre.anjos@idiap.ch>
-# Thu Feb  7 09:58:22 2013 
+# Thu Feb  7 09:58:22 2013
 
 """Re-usable decorators and utilities for Bob test code
 """
@@ -22,22 +22,22 @@ def datafile(f, module=None, path='data'):
     This is the filename of the file you want to retrieve. Something like
     ``'movie.avi'``.
 
-  package: module, optional
+  package: string, optional
     This is the python-style package name of the module you want to retrieve
-    the data from. This should be something like ``...io.test``. Note this is
-    **not** a string, but the module object. If you can reach it already, you
-    must import it first.
+    the data from. This should be something like ``bob.io.test``, but you
+    normally refer it using the ``__name__`` property of the module you want to
+    find the path relative to.
 
   path: str, optional
     This is the subdirectory where the datafile will be taken from inside the
     module. Normally (the default) ``data``. It can be set to ``None`` if it
     should be taken from the module path root (where the ``__init__.py`` file
     sits).
- 
+
   Returns the full path of the file.
   """
-  
-  resource = __name__ if module is None else module.__name__
+
+  resource = __name__ if module is None else module
   final_path = f if path is None else os.path.join(path, f)
   return pkg_resources.resource_filename(resource, final_path)
 
@@ -74,7 +74,7 @@ def ffmpeg_version_lessthan(v):
 
 def ffmpeg_found(version_geq=None):
   '''Decorator to check if a codec is available before enabling a test
-  
+
   To use this, decorate your test routine with something like:
 
   .. code-block:: python
@@ -154,3 +154,20 @@ def libsvm_available(test):
       raise SkipTest("The visioner module is not available")
 
   return wrapper
+
+def extension_available(extension):
+  '''Decorator to check if a extension is available before enabling a test'''
+
+  def test_wrapper(test):
+
+    @functools.wraps(test)
+    def wrapper(*args, **kwargs):
+      from ..io import extensions
+      if extensions().has_key(extension):
+        return test(*args, **kwargs)
+      else:
+        raise SkipTest('Extension to handle "%s" files was not available at compile time' % extension)
+
+    return wrapper
+
+  return test_wrapper

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
 # Andre Anjos <andre.dos.anjos@gmail.com>
-# Thu 14 Mar 17:53:16 2013 
+# Thu 14 Mar 17:53:16 2013
 
 """This program can run manual tests using any video codec available in Bob. It
 can report standard distortion figures and build video test sequences for
@@ -28,7 +28,7 @@ from .. import utils, create_directories_save
 from ... import version
 from .. import save as save_to_file
 from ...test import utils as test_utils
-from ...io import test as io_test
+from .. import test as io_test
 
 CODECS = supported_video_codecs()
 ALL_CODECS = available_video_codecs()
@@ -136,7 +136,7 @@ def user_video(original, max_frames, format, codec, filename):
   from .. import VideoReader, VideoWriter
   vreader = VideoReader(original, check=True)
   orig = vreader[:max_frames]
-  
+
   # rounding frame rate - some older codecs do not accept random frame rates
   framerate = vreader.frame_rate
   if codec in ('mpegvideo', 'mpeg1video', 'mpeg2video'):
@@ -150,7 +150,7 @@ def user_video(original, max_frames, format, codec, filename):
   return orig, framerate, VideoReader(filename, check=False)
 
 def summarize(function, shape, framerate, format, codec, output=None):
-  """Summarizes distortion patterns for a given set of video settings and 
+  """Summarizes distortion patterns for a given set of video settings and
   for a given input function.
 
   Keyword parameters:
@@ -165,12 +165,12 @@ def summarize(function, shape, framerate, format, codec, output=None):
     The codec to be used for the output file
 
   output
-    If set, the video is not created on the temporary directory, but it is 
+    If set, the video is not created on the temporary directory, but it is
     saved on the advised location. This must be a filename.
 
-  Returns a single a single string summarizing the distortion results 
+  Returns a single a single string summarizing the distortion results
   """
-  
+
   length, height, width = shape
 
   if output:
@@ -181,8 +181,8 @@ def summarize(function, shape, framerate, format, codec, output=None):
   retval = "did not run"
 
   try:
-    # Width and height should be powers of 2 as the encoded image is going 
-    # to be approximated to the closest one, would not not be the case. 
+    # Width and height should be powers of 2 as the encoded image is going
+    # to be approximated to the closest one, would not not be the case.
     # In this case, the encoding is subject to more noise as the filtered,
     # final image that is encoded will contain added noise on the extra
     # borders.
@@ -214,7 +214,7 @@ def summarize(function, shape, framerate, format, codec, output=None):
     return retval
 
 def detail(function, shape, framerate, format, codec, outdir):
-  """Summarizes distortion patterns for a given set of video settings and 
+  """Summarizes distortion patterns for a given set of video settings and
   for a given input function.
 
   Keyword parameters:
@@ -231,17 +231,17 @@ def detail(function, shape, framerate, format, codec, outdir):
   outdir
     We will save all analysis for this sequence on the given output directory.
 
-  Returns a single a single string summarizing the distortion results. 
+  Returns a single a single string summarizing the distortion results.
   """
 
   length, height, width = shape
-  
+
   text_format = "%%0%dd" % len(str(length-1))
 
   output = os.path.join(outdir, "video." + format)
-  retval, orig, encoded = summarize(function, shape, framerate, 
+  retval, orig, encoded = summarize(function, shape, framerate,
       format, codec, output)
-  
+
   length, _, height, width = orig.shape
 
   # save original, reloaded and difference images on output directories
@@ -272,9 +272,9 @@ def main(user_input=None):
       'user',
       ]
 
-  parser.add_argument("test", metavar='TEST', type=str, nargs='*', 
+  parser.add_argument("test", metavar='TEST', type=str, nargs='*',
       default=test_choices, help="The name of the test or tests you want to run. Choose between `%s'. If none given, run through all." % ('|'.join(test_choices)))
- 
+
   supported_codecs = sorted(CODECS.keys())
   available_codecs = sorted(ALL_CODECS.keys())
 
@@ -284,7 +284,7 @@ def main(user_input=None):
       help="List all supported codecs and exits")
   parser.add_argument("--list-all-codecs", action="store_true", default=False,
       help="List all available codecs and exits")
-  
+
   supported_formats = sorted(FORMATS.keys())
   available_formats = sorted(ALL_FORMATS.keys())
   parser.add_argument("-f", "--format", metavar='FORMAT', type=str, nargs='*',
@@ -297,13 +297,13 @@ def main(user_input=None):
   parser.add_argument("-F", "--force", action="store_true", default=False,
       help="Force command execution (possibly generating an error) even if the format or the combination of format+codec is not supported. This flag is needed in case you need to test new formats or combinations of formats and codecs which are unsupported by the build")
 
-  parser.add_argument("-t", "--height", metavar="INT", type=int, 
+  parser.add_argument("-t", "--height", metavar="INT", type=int,
       default=128, help="Height of the test video (defaults to %(default)s pixels). Note this number has to be even.")
-  
-  parser.add_argument("-w", "--width", metavar="INT", type=int, 
+
+  parser.add_argument("-w", "--width", metavar="INT", type=int,
       default=128, help="Width of the test video (defaults to %(default)s pixels). Note this number has to be even.")
 
-  parser.add_argument("-l", "--length", metavar="INT", type=int, 
+  parser.add_argument("-l", "--length", metavar="INT", type=int,
       default=30, help="Length of the test sequence (defaults to %(default)s frames). The longer, the more accurate the test becomes.")
 
   parser.add_argument("-r", "--framerate", metavar="FLOAT", type=float,
@@ -327,15 +327,15 @@ def main(user_input=None):
 
   if not args.test: args.test = test_choices
 
-  if args.list_codecs: 
+  if args.list_codecs:
     print list_codecs()
     sys.exit(0)
 
-  if args.list_all_codecs: 
+  if args.list_all_codecs:
     print list_all_codecs()
     sys.exit(0)
 
-  if args.list_formats: 
+  if args.list_formats:
     print list_formats()
     sys.exit(0)
 
@@ -345,7 +345,7 @@ def main(user_input=None):
 
   if 'user' in args.test and args.user_video is None:
     # in this case, take our standard video test
-    args.user_video = test_utils.datafile("test.mov", io_test)
+    args.user_video = test_utils.datafile('test.mov', io_test.__name__)
 
   def wrap_user_function(shape, framerate, format, codec, filename):
     return user_video(args.user_video, args.user_frames, format, codec, filename)
@@ -414,14 +414,14 @@ def main(user_input=None):
               continue
 
         if args.output:
-  
+
           size = '%dx%dx%d@%gHz' % (args.length, args.height, args.width,
               args.framerate)
           outdir = os.path.join(args.output, test, codec, size, format)
           create_directories_save(outdir)
 
           try:
-            result = detail(f, (args.length, args.height, args.width), 
+            result = detail(f, (args.length, args.height, args.width),
                 args.framerate, format, codec, outdir)
             sys.stdout.write(code)
             sys.stdout.flush()
@@ -435,7 +435,7 @@ def main(user_input=None):
         else:
 
           try:
-            result = summarize(f, (args.length, args.height, args.width), 
+            result = summarize(f, (args.length, args.height, args.width),
                 args.framerate, format, codec)
             sys.stdout.write(code)
             sys.stdout.flush()
