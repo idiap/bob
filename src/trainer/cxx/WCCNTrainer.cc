@@ -26,7 +26,6 @@
 #include <bob/trainer/Exception.h>
 #include <bob/math/inv.h>
 #include <bob/math/lu.h>
-#include <bob/math/stats.h>
 
 bob::trainer::WCCNTrainer::WCCNTrainer()
 {

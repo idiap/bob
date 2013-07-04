@@ -27,17 +27,17 @@
 
 using namespace boost::python;
 
-static const char* SCATTER_DOC1 = "Computes the scatter matrix of a 2D array considering data is organized column-wise (each sample is a column, each feature is a row). The resulting matrix 's' has to be square with extents equal to the number of rows in a.";
+static const char* SCATTER_DOC1 = "Computes the scatter matrix of a 2D array considering data is organized row-wise (each sample is a row, each feature is a column). The resulting matrix 's' has to be square with extents equal to the number of columns in a.";
 
-static const char* SCATTER_DOC2 = "Computes the scatter matrix of a 2D array considering data is organized column-wise (each sample is a column, each feature is a row). This variant also returns the sample means in 'm'. The resulting arrays 'm' and 's' have to have the correct sizes (s should be square with extents equal to the number of rows in a and m should be a 1D vector with extents equal to the number of rows in a).";
+static const char* SCATTER_DOC2 = "Computes the scatter matrix of a 2D array considering data is organized row-wise (each sample is a row, each feature is a column). This variant also returns the sample means in 'm'. The resulting arrays 'm' and 's' have to have the correct sizes (s should be square with extents equal to the number of columns in a and m should be a 1D vector with extents equal to the number of columns in a).";
 
-static const char* SCATTER_DOC3 = "Computes the scatter matrix of a 2D array considering data is organized column-wise (each sample is a column, each feature is a row). This variant returns the sample means and the scatter matrix in a tuple. If you are looking for efficiency, prefer the variants that receive the output variable as one of the input parameters. This version will allocate the resulting arrays 'm' and 's' internally every time it is called.";
+static const char* SCATTER_DOC3 = "Computes the scatter matrix of a 2D array considering data is organized row-wise (each sample is a row, each feature is a column). This variant returns the sample means and the scatter matrix in a tuple. If you are looking for efficiency, prefer the variants that receive the output variable as one of the input parameters. This version will allocate the resulting arrays 'm' and 's' internally every time it is called.";
 
 template <typename T> static tuple scatter_inner(bob::python::const_ndarray A) {
   const bob::core::array::typeinfo& info = A.type();
-  bob::python::ndarray S(info.dtype, info.shape[0], info.shape[0]);
+  bob::python::ndarray S(info.dtype, info.shape[1], info.shape[1]);
   blitz::Array<T,2> S_ = S.bz<T,2>();
-  bob::python::ndarray M(info.dtype, info.shape[0]);
+  bob::python::ndarray M(info.dtype, info.shape[1]);
   blitz::Array<T,1> M_ = M.bz<T,1>();
   bob::math::scatter(A.bz<T,2>(), S_, M_);
   return make_tuple(S,M);

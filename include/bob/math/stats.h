@@ -34,7 +34,7 @@ namespace bob { namespace math {
 
     /**
      * @brief Computes the scatter matrix of a 2D array considering data is
-     * organized column-wise (each sample is a column, each feature is a row).
+     * organized row-wise (each sample is a row, each feature is a column).
      * Outputs the sample mean M and the scatter matrix S.
      *
      * @warning No checks are performed on the array sizes and is recommended
@@ -50,19 +50,19 @@ namespace bob { namespace math {
       blitz::secondIndex j;
       blitz::Range a = blitz::Range::all();
 
-      M = blitz::mean(A,j);
+      M = blitz::mean(A(j,i),j);
       S = 0;
 
-      blitz::Array<T,1> buffer(A.extent(0));
-      for (int z=0; z<A.extent(1); ++z) {
-        buffer = A(a,z) - M;
+      blitz::Array<T,1> buffer(A.extent(1));
+      for (int z=0; z<A.extent(0); ++z) {
+        buffer = A(z,a) - M;
         S += buffer(i) * buffer(j); //outer product
       }
     }
 
     /**
      * @brief Computes the scatter matrix of a 2D array considering data is
-     * organized column-wise (each sample is a column, each feature is a row).
+     * organized row-wise (each sample is a row, each feature is a column).
      * Outputs the sample mean M and the scatter matrix S.
      *
      * The input and output data have their sizes checked and this method will
@@ -76,16 +76,16 @@ namespace bob { namespace math {
         blitz::Array<T,1>& M) {
 
       // Check output
-      bob::core::array::assertSameDimensionLength(A.extent(0), M.extent(0));
-      bob::core::array::assertSameDimensionLength(A.extent(0), S.extent(0));
-      bob::core::array::assertSameDimensionLength(A.extent(0), S.extent(1));
+      bob::core::array::assertSameDimensionLength(A.extent(1), M.extent(0));
+      bob::core::array::assertSameDimensionLength(A.extent(1), S.extent(0));
+      bob::core::array::assertSameDimensionLength(A.extent(1), S.extent(1));
 
       scatter_<T>(A, S, M);
     }
 
     /**
      * @brief Computes the scatter matrix of a 2D array considering data is
-     * organized column-wise (each sample is a column, each feature is a row).
+     * organized row-wise (each sample is a row, each feature is a column).
      * Outputs the sample scatter matrix S.
      *
      * @warning No checks are performed on the array sizes and is recommended
@@ -102,7 +102,7 @@ namespace bob { namespace math {
 
     /**
      * @brief Computes the scatter matrix of a 2D array considering data is
-     * organized column-wise (each sample is a column, each feature is a row).
+     * organized row-wise (each sample is a row, each feature is a column).
      * Outputs the sample scatter matrix S.
      *
      * The input and output data have their sizes checked and this method will

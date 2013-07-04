@@ -78,11 +78,9 @@ void bob::trainer::WhiteningTrainer::train(bob::machine::LinearMachine& machine,
     throw bob::machine::NOutputsMismatch(n_outputs, n_features);
 
   // 1. Computes the mean vector and the covariance matrix of the training set
-  // ugly fix for old blitz versions
-  const blitz::Array<double,2> art = const_cast<blitz::Array<double,2>&>(ar).transpose(1,0);
   blitz::Array<double,1> mean(n_features);
   blitz::Array<double,2> cov(n_features,n_features);
-  bob::math::scatter(art, cov, mean);
+  bob::math::scatter(ar, cov, mean);
   cov /= (double)(n_samples-1);
 
   // 2. Computes the inverse of the covariance matrix

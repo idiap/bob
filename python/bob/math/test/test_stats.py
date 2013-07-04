@@ -35,7 +35,7 @@ class StatsTest(unittest.TestCase):
   def test01_scatter(self):
 
     # This test demonstrates how to use the scatter matrix function of bob.
-    S, M = bob.math.scatter(self.data)
+    S, M = bob.math.scatter(self.data.T)
     S /= (self.data.shape[1]-1)
 
     # Do the same with numpy and compare. Note that with numpy we are computing

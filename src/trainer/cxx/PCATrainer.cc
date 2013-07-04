@@ -85,7 +85,7 @@ static void pca_via_covmat(
    */
   blitz::Array<double,1> mean(X.extent(1));
   blitz::Array<double,2> Sigma(X.extent(1), X.extent(1));
-  bob::math::scatter_(X.transpose(1,0), Sigma, mean);
+  bob::math::scatter_(X, Sigma, mean);
   Sigma /= (X.extent(0)-1); //unbiased variance estimator
 
   blitz::Array<double,2> U(X.extent(1), X.extent(1));

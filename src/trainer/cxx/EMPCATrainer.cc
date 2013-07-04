@@ -217,12 +217,8 @@ void bob::trainer::EMPCATrainer::computeMeanVariance(bob::machine::LinearMachine
   blitz::Range all = blitz::Range::all();
   if (m_compute_likelihood) 
   {
-    // loads all the data in a single shot - required for scatter
-    blitz::Array<double,2> data(n_features, n_samples);
-    for (size_t i=0; i<n_samples; ++i)
-      data(all,i) = ar(i,all);
     // Mean and scatter computation
-    bob::math::scatter(data, m_S, mu);
+    bob::math::scatter(ar, m_S, mu);
     // divides scatter by N-1
     m_S /= static_cast<double>(n_samples-1);
   }
