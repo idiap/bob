@@ -6,16 +6,16 @@
  * @brief Implements the Exceptions related to the blitz++ multidimensional arrays
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -23,9 +23,9 @@
 #include <boost/format.hpp>
 #include <bob/core/array_exception.h>
 
-bob::core::array::NonZeroBaseError::NonZeroBaseError( const int dim, 
-  const int base) throw(): 
-    m_dim(dim), m_base(base) 
+bob::core::array::NonZeroBaseError::NonZeroBaseError( const int dim,
+  const int base) throw():
+    m_dim(dim), m_base(base)
 {
 }
 
@@ -48,9 +48,9 @@ const char* bob::core::array::NonZeroBaseError::what() const throw() {
 }
 
 
-bob::core::array::NonOneBaseError::NonOneBaseError( const int dim, 
-  const int base) throw(): 
-    m_dim(dim), m_base(base) 
+bob::core::array::NonOneBaseError::NonOneBaseError( const int dim,
+  const int base) throw():
+    m_dim(dim), m_base(base)
 {
 }
 
@@ -213,9 +213,9 @@ const char* bob::core::array::ConvertInputBelowMinRange::what() const throw() {
 }
 
 
-bob::core::array::RepmatNonMultipleLength::RepmatNonMultipleLength( 
-  const int src_dim, const int dst_dim) throw(): 
-    m_src_dim(src_dim), m_dst_dim(dst_dim) 
+bob::core::array::RepmatNonMultipleLength::RepmatNonMultipleLength(
+  const int src_dim, const int dst_dim) throw():
+    m_src_dim(src_dim), m_dst_dim(dst_dim)
 {
 }
 
@@ -241,9 +241,9 @@ const char* bob::core::array::RepmatNonMultipleLength::what() const throw() {
 }
 
 
-bob::core::array::ReshapeDifferentNumberOfElements::ReshapeDifferentNumberOfElements( 
-  const int expected, const int got) throw(): 
-    m_expected(expected), m_got(got) 
+bob::core::array::ReshapeDifferentNumberOfElements::ReshapeDifferentNumberOfElements(
+  const int expected, const int got) throw():
+    m_expected(expected), m_got(got)
 {
 }
 

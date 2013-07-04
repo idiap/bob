@@ -6,16 +6,16 @@
  * @brief A base class for Joint Factor Analysis-like machines
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -23,9 +23,10 @@
 #ifndef BOB_MACHINE_FABASE_H
 #define BOB_MACHINE_FABASE_H
 
+#include <stdexcept>
+
 #include "Machine.h"
 #include "GMMMachine.h"
-#include "JFAMachineException.h"
 #include "LinearScoring.h"
 
 #include <bob/io/HDF5File.h>
@@ -61,7 +62,7 @@ class FABase
      * @param rv size of U (CD x rv)
      * @warning ru and rv SHOULD BE  >= 1. Just set U/V/D to zero if you want
      *   to ignore one subspace. This is the case for ISV.
-     */ 
+     */
     FABase(const boost::shared_ptr<bob::machine::GMMMachine> ubm, const size_t ru=1, const size_t rv=1);
 
     /**
@@ -72,7 +73,7 @@ class FABase
     /**
      * @brief Just to virtualise the destructor
      */
-    virtual ~FABase(); 
+    virtual ~FABase();
 
     /**
      * @brief Assigns from a different JFA machine
@@ -92,121 +93,121 @@ class FABase
     /**
      * @brief Similar to
      */
-    bool is_similar_to(const FABase& b, const double r_epsilon=1e-5, 
-      const double a_epsilon=1e-8) const; 
+    bool is_similar_to(const FABase& b, const double r_epsilon=1e-5,
+      const double a_epsilon=1e-8) const;
 
     /**
      * @brief Returns the UBM
      */
-    const boost::shared_ptr<bob::machine::GMMMachine> getUbm() const 
+    const boost::shared_ptr<bob::machine::GMMMachine> getUbm() const
     { return m_ubm; }
 
     /**
      * @brief Returns the U matrix
      */
-    const blitz::Array<double,2>& getU() const 
+    const blitz::Array<double,2>& getU() const
     { return m_U; }
 
     /**
      * @brief Returns the V matrix
      */
-    const blitz::Array<double,2>& getV() const 
+    const blitz::Array<double,2>& getV() const
     { return m_V; }
 
     /**
      * @brief Returns the diagonal matrix diag(d) (as a 1D vector)
      */
-    const blitz::Array<double,1>& getD() const 
+    const blitz::Array<double,1>& getD() const
     { return m_d; }
 
     /**
      * @brief Returns the UBM mean supervector (as a 1D vector)
      */
-    const blitz::Array<double,1>& getUbmMean() const 
+    const blitz::Array<double,1>& getUbmMean() const
     { return m_cache_mean; }
 
     /**
      * @brief Returns the UBM variance supervector (as a 1D vector)
      */
-    const blitz::Array<double,1>& getUbmVariance() const 
+    const blitz::Array<double,1>& getUbmVariance() const
     { return m_cache_sigma; }
 
     /**
      * @brief Returns the number of Gaussian components C
-     * @warning An exception is thrown if no Universal Background Model has 
+     * @warning An exception is thrown if no Universal Background Model has
      *   been set yet.
      */
-    const size_t getDimC() const 
-    { if(!m_ubm) throw bob::machine::JFABaseNoUBMSet(); 
+    const size_t getDimC() const
+    { if(!m_ubm) throw std::runtime_error("No UBM was set in the JFA machine.");
       return m_ubm->getNGaussians(); }
 
     /**
      * @brief Returns the feature dimensionality D
-     * @warning An exception is thrown if no Universal Background Model has 
+     * @warning An exception is thrown if no Universal Background Model has
      *   been set yet.
      */
-    const size_t getDimD() const 
-    { if(!m_ubm) throw bob::machine::JFABaseNoUBMSet();
+    const size_t getDimD() const
+    { if(!m_ubm) throw std::runtime_error("No UBM was set in the JFA machine.");
       return m_ubm->getNInputs(); }
 
     /**
      * @brief Returns the supervector length CD
      * (CxD: Number of Gaussian components by the feature dimensionality)
-     * @warning An exception is thrown if no Universal Background Model has 
+     * @warning An exception is thrown if no Universal Background Model has
      *   been set yet.
      */
-    const size_t getDimCD() const 
-    { if(!m_ubm) throw bob::machine::JFABaseNoUBMSet(); 
+    const size_t getDimCD() const
+    { if(!m_ubm) throw std::runtime_error("No UBM was set in the JFA machine.");
       return m_ubm->getNInputs()*m_ubm->getNGaussians(); }
 
     /**
      * @brief Returns the size/rank ru of the U matrix
      */
-    const size_t getDimRu() const 
+    const size_t getDimRu() const
     { return m_ru; }
 
     /**
      * @brief Returns the size/rank rv of the V matrix
      */
-    const size_t getDimRv() const 
+    const size_t getDimRv() const
     { return m_rv; }
 
     /**
      * @brief Resets the dimensionality of the subspace U and V
      * U and V are hence uninitialized.
-     */ 
+     */
     void resize(const size_t ru, const size_t rv);
 
     /**
      * @brief Resets the dimensionality of the subspace U and V,
      * assuming that no UBM has yet been set
      * U and V are hence uninitialized.
-     */ 
+     */
     void resize(const size_t ru, const size_t rv, const size_t cd);
 
     /**
      * @brief Returns the U matrix in order to update it
-     * @warning Should only be used by the trainer for efficiency reason, 
+     * @warning Should only be used by the trainer for efficiency reason,
      *   or for testing purpose.
      */
-    blitz::Array<double,2>& updateU() 
+    blitz::Array<double,2>& updateU()
     { return m_U; }
 
     /**
      * @brief Returns the V matrix in order to update it
-     * @warning Should only be used by the trainer for efficiency reason, 
+     * @warning Should only be used by the trainer for efficiency reason,
      *   or for testing purpose.
      */
-    blitz::Array<double,2>& updateV() 
+    blitz::Array<double,2>& updateV()
     { return m_V; }
 
     /**
      * @brief Returns the diagonal matrix diag(d) (as a 1D vector) in order
      * to update it
-     * @warning Should only be used by the trainer for efficiency reason, 
+     * @warning Should only be used by the trainer for efficiency reason,
      *   or for testing purpose.
      */
-    blitz::Array<double,1>& updateD() 
+    blitz::Array<double,1>& updateD()
     { return m_d; }
 
 
@@ -227,14 +228,14 @@ class FABase
     void setV(const blitz::Array<double,2>& V);
 
     /**
-     * @brief Sets the diagonal matrix diag(d) 
+     * @brief Sets the diagonal matrix diag(d)
      * (a 1D vector is expected as an argument)
      */
     void setD(const blitz::Array<double,1>& d);
 
 
     /**
-     * @brief Estimates x from the GMM statistics considering the LPT 
+     * @brief Estimates x from the GMM statistics considering the LPT
      * assumption, that is the latent session variable x is approximated
      * using the UBM
      */
@@ -242,7 +243,7 @@ class FABase
 
     /**
      * @brief Compute and put U^{T}.Sigma^{-1} matrix in cache
-     * @warning Should only be used by the trainer for efficiency reason, 
+     * @warning Should only be used by the trainer for efficiency reason,
      *   or for testing purpose.
      */
     void updateCacheUbmUVD();
@@ -262,10 +263,10 @@ class FABase
      */
     void resizeTmp();
     /**
-     * @brief Computes (Id + U^T.Sigma^-1.U.N_{i,h}.U)^-1 = 
+     * @brief Computes (Id + U^T.Sigma^-1.U.N_{i,h}.U)^-1 =
      *   (Id + sum_{c=1..C} N_{i,h}.U_{c}^T.Sigma_{c}^-1.U_{c})^-1
      */
-    void computeIdPlusUSProdInv(const bob::machine::GMMStats& gmm_stats, 
+    void computeIdPlusUSProdInv(const bob::machine::GMMStats& gmm_stats,
       blitz::Array<double,2>& out) const;
     /**
      * @brief Computes Fn_x = sum_{sessions h}(N*(o - m))
@@ -274,7 +275,7 @@ class FABase
     void computeFn_x(const bob::machine::GMMStats& gmm_stats,
       blitz::Array<double,1>& out) const;
     /**
-     * @brief Estimates the value of x from the passed arguments 
+     * @brief Estimates the value of x from the passed arguments
      * (IdPlusUSProdInv and Fn_x), considering the LPT assumption
      */
     void estimateX(const blitz::Array<double,2>& IdPlusUSProdInv,
@@ -292,7 +293,7 @@ class FABase
     // D is assumed to be diagonal, and only the diagonal is stored
     blitz::Array<double,2> m_U;
     blitz::Array<double,2> m_V;
-    blitz::Array<double,1> m_d; 
+    blitz::Array<double,1> m_d;
 
     // Vectors/Matrices precomputed in cache
     blitz::Array<double,1> m_cache_mean;
@@ -330,7 +331,7 @@ class JFABase
      * @param ru size of U (CD x ru)
      * @param rv size of U (CD x rv)
      * @warning ru and rv SHOULD BE  >= 1.
-     */ 
+     */
     JFABase(const boost::shared_ptr<bob::machine::GMMMachine> ubm, const size_t ru=1, const size_t rv=1);
 
     /**
@@ -346,7 +347,7 @@ class JFABase
     /**
      * @brief Just to virtualise the destructor
      */
-    virtual ~JFABase(); 
+    virtual ~JFABase();
 
     /**
      * @brief Assigns from a different JFA machine
@@ -368,7 +369,7 @@ class JFABase
     /**
      * @brief Similar to
      */
-    bool is_similar_to(const JFABase& b, const double r_epsilon=1e-5, 
+    bool is_similar_to(const JFABase& b, const double r_epsilon=1e-5,
       const double a_epsilon=1e-8) const
     { return m_base.is_similar_to(b.m_base, r_epsilon, a_epsilon); }
 
@@ -386,94 +387,94 @@ class JFABase
     /**
      * @brief Returns the UBM
      */
-    const boost::shared_ptr<bob::machine::GMMMachine> getUbm() const 
+    const boost::shared_ptr<bob::machine::GMMMachine> getUbm() const
     { return m_base.getUbm(); }
 
     /**
      * @brief Returns the U matrix
      */
-    const blitz::Array<double,2>& getU() const 
+    const blitz::Array<double,2>& getU() const
     { return m_base.getU(); }
 
     /**
      * @brief Returns the V matrix
      */
-    const blitz::Array<double,2>& getV() const 
+    const blitz::Array<double,2>& getV() const
     { return m_base.getV(); }
 
     /**
      * @brief Returns the diagonal matrix diag(d) (as a 1D vector)
      */
-    const blitz::Array<double,1>& getD() const 
+    const blitz::Array<double,1>& getD() const
     { return m_base.getD(); }
 
     /**
      * @brief Returns the number of Gaussian components C
-     * @warning An exception is thrown if no Universal Background Model has 
+     * @warning An exception is thrown if no Universal Background Model has
      *   been set yet.
      */
-    const size_t getDimC() const 
+    const size_t getDimC() const
     { return m_base.getDimC(); }
 
     /**
      * @brief Returns the feature dimensionality D
-     * @warning An exception is thrown if no Universal Background Model has 
+     * @warning An exception is thrown if no Universal Background Model has
      *   been set yet.
      */
-    const size_t getDimD() const 
+    const size_t getDimD() const
     { return m_base.getDimD(); }
 
     /**
      * @brief Returns the supervector length CD
      * (CxD: Number of Gaussian components by the feature dimensionality)
-     * @warning An exception is thrown if no Universal Background Model has 
+     * @warning An exception is thrown if no Universal Background Model has
      *   been set yet.
      */
-    const size_t getDimCD() const 
+    const size_t getDimCD() const
     { return m_base.getDimCD(); }
 
     /**
      * @brief Returns the size/rank ru of the U matrix
      */
-    const size_t getDimRu() const 
+    const size_t getDimRu() const
     { return m_base.getDimRu(); }
 
     /**
      * @brief Returns the size/rank rv of the V matrix
      */
-    const size_t getDimRv() const 
+    const size_t getDimRv() const
     { return m_base.getDimRv(); }
 
     /**
      * @brief Resets the dimensionality of the subspace U and V
      * U and V are hence uninitialized.
-     */ 
+     */
     void resize(const size_t ru, const size_t rv)
     { m_base.resize(ru, rv); }
 
     /**
      * @brief Returns the U matrix in order to update it
-     * @warning Should only be used by the trainer for efficiency reason, 
+     * @warning Should only be used by the trainer for efficiency reason,
      *   or for testing purpose.
      */
-    blitz::Array<double,2>& updateU() 
+    blitz::Array<double,2>& updateU()
     { return m_base.updateU(); }
 
     /**
      * @brief Returns the V matrix in order to update it
-     * @warning Should only be used by the trainer for efficiency reason, 
+     * @warning Should only be used by the trainer for efficiency reason,
      *   or for testing purpose.
      */
-    blitz::Array<double,2>& updateV() 
+    blitz::Array<double,2>& updateV()
     { return m_base.updateV(); }
 
     /**
      * @brief Returns the diagonal matrix diag(d) (as a 1D vector) in order
      * to update it
-     * @warning Should only be used by the trainer for efficiency reason, 
+     * @warning Should only be used by the trainer for efficiency reason,
      *   or for testing purpose.
      */
-    blitz::Array<double,1>& updateD() 
+    blitz::Array<double,1>& updateD()
     { return m_base.updateD(); }
 
 
@@ -497,14 +498,14 @@ class JFABase
     { m_base.setV(V); }
 
     /**
-     * @brief Sets the diagonal matrix diag(d) 
+     * @brief Sets the diagonal matrix diag(d)
      * (a 1D vector is expected as an argument)
      */
     void setD(const blitz::Array<double,1>& d)
     { m_base.setD(d); }
 
     /**
-     * @brief Estimates x from the GMM statistics considering the LPT 
+     * @brief Estimates x from the GMM statistics considering the LPT
      * assumption, that is the latent session variable x is approximated
      * using the UBM
      */
@@ -513,7 +514,7 @@ class JFABase
 
     /**
      * @brief Precompute (put U^{T}.Sigma^{-1} matrix in cache)
-     * @warning Should only be used by the trainer for efficiency reason, 
+     * @warning Should only be used by the trainer for efficiency reason,
      *   or for testing purpose.
      */
     void precompute()
@@ -554,7 +555,7 @@ class ISVBase
      * @param ubm The Universal Background Model
      * @param ru size of U (CD x ru)
      * @warning ru SHOULD BE >= 1.
-     */ 
+     */
     ISVBase(const boost::shared_ptr<bob::machine::GMMMachine> ubm, const size_t ru=1);
 
     /**
@@ -570,7 +571,7 @@ class ISVBase
     /**
      * @brief Just to virtualise the destructor
      */
-    virtual ~ISVBase(); 
+    virtual ~ISVBase();
 
     /**
      * @brief Assigns from a different JFA machine
@@ -592,7 +593,7 @@ class ISVBase
     /**
      * @brief Similar to
      */
-    bool is_similar_to(const ISVBase& b, const double r_epsilon=1e-5, 
+    bool is_similar_to(const ISVBase& b, const double r_epsilon=1e-5,
       const double a_epsilon=1e-8) const
     { return m_base.is_similar_to(b.m_base, r_epsilon, a_epsilon); }
 
@@ -610,77 +611,77 @@ class ISVBase
     /**
      * @brief Returns the UBM
      */
-    const boost::shared_ptr<bob::machine::GMMMachine> getUbm() const 
+    const boost::shared_ptr<bob::machine::GMMMachine> getUbm() const
     { return m_base.getUbm(); }
 
     /**
      * @brief Returns the U matrix
      */
-    const blitz::Array<double,2>& getU() const 
+    const blitz::Array<double,2>& getU() const
     { return m_base.getU(); }
 
     /**
      * @brief Returns the diagonal matrix diag(d) (as a 1D vector)
      */
-    const blitz::Array<double,1>& getD() const 
+    const blitz::Array<double,1>& getD() const
     { return m_base.getD(); }
 
     /**
      * @brief Returns the number of Gaussian components C
-     * @warning An exception is thrown if no Universal Background Model has 
+     * @warning An exception is thrown if no Universal Background Model has
      *   been set yet.
      */
-    const size_t getDimC() const 
+    const size_t getDimC() const
     { return m_base.getDimC(); }
 
     /**
      * @brief Returns the feature dimensionality D
-     * @warning An exception is thrown if no Universal Background Model has 
+     * @warning An exception is thrown if no Universal Background Model has
      *   been set yet.
      */
-    const size_t getDimD() const 
+    const size_t getDimD() const
     { return m_base.getDimD(); }
 
     /**
      * @brief Returns the supervector length CD
      * (CxD: Number of Gaussian components by the feature dimensionality)
-     * @warning An exception is thrown if no Universal Background Model has 
+     * @warning An exception is thrown if no Universal Background Model has
      *   been set yet.
      */
-    const size_t getDimCD() const 
+    const size_t getDimCD() const
     { return m_base.getDimCD(); }
 
     /**
      * @brief Returns the size/rank ru of the U matrix
      */
-    const size_t getDimRu() const 
+    const size_t getDimRu() const
     { return m_base.getDimRu(); }
 
     /**
      * @brief Resets the dimensionality of the subspace U and V
      * U and V are hence uninitialized.
-     */ 
+     */
     void resize(const size_t ru)
-    { m_base.resize(ru, 1); 
+    { m_base.resize(ru, 1);
       blitz::Array<double,2>& V = m_base.updateV();
       V = 0;
      }
 
     /**
      * @brief Returns the U matrix in order to update it
-     * @warning Should only be used by the trainer for efficiency reason, 
+     * @warning Should only be used by the trainer for efficiency reason,
      *   or for testing purpose.
      */
-    blitz::Array<double,2>& updateU() 
+    blitz::Array<double,2>& updateU()
     { return m_base.updateU(); }
 
     /**
      * @brief Returns the diagonal matrix diag(d) (as a 1D vector) in order
      * to update it
-     * @warning Should only be used by the trainer for efficiency reason, 
+     * @warning Should only be used by the trainer for efficiency reason,
      *   or for testing purpose.
      */
-    blitz::Array<double,1>& updateD() 
+    blitz::Array<double,1>& updateD()
     { return m_base.updateD(); }
 
 
@@ -698,14 +699,14 @@ class ISVBase
     { m_base.setU(U); }
 
     /**
-     * @brief Sets the diagonal matrix diag(d) 
+     * @brief Sets the diagonal matrix diag(d)
      * (a 1D vector is expected as an argument)
      */
     void setD(const blitz::Array<double,1>& d)
     { m_base.setD(d); }
 
     /**
-     * @brief Estimates x from the GMM statistics considering the LPT 
+     * @brief Estimates x from the GMM statistics considering the LPT
      * assumption, that is the latent session variable x is approximated
      * using the UBM
      */
@@ -714,7 +715,7 @@ class ISVBase
 
     /**
      * @brief Precompute (put U^{T}.Sigma^{-1} matrix in cache)
-     * @warning Should only be used by the trainer for efficiency reason, 
+     * @warning Should only be used by the trainer for efficiency reason,
      *   or for testing purpose.
      */
     void precompute()
@@ -734,8 +735,8 @@ class ISVBase
 
 
 /**
- * @brief A JFAMachine which is associated to a JFABase that contains 
- *   U, V and D matrices. The JFAMachine describes the identity part 
+ * @brief A JFAMachine which is associated to a JFABase that contains
+ *   U, V and D matrices. The JFAMachine describes the identity part
  *   (latent variables y and z)
  * TODO: add a reference to the journal articles
  */
@@ -753,7 +754,7 @@ class JFAMachine: public Machine<bob::machine::GMMStats, double>
      * @brief Constructor. Builds a new JFAMachine.
      *
      * @param jfa_base The JFABase associated with this machine
-     */ 
+     */
     JFAMachine(const boost::shared_ptr<bob::machine::JFABase> jfa_base);
 
     /**
@@ -769,7 +770,7 @@ class JFAMachine: public Machine<bob::machine::GMMStats, double>
     /**
      * @brief Just to virtualise the destructor
      */
-    virtual ~JFAMachine(); 
+    virtual ~JFAMachine();
 
     /**
      * @brief Assigns from a different JFA machine
@@ -789,7 +790,7 @@ class JFAMachine: public Machine<bob::machine::GMMStats, double>
     /**
      * @brief Similar to
      */
-    bool is_similar_to(const JFAMachine& b, const double r_epsilon=1e-5, 
+    bool is_similar_to(const JFAMachine& b, const double r_epsilon=1e-5,
       const double a_epsilon=1e-8) const;
 
     /**
@@ -805,63 +806,63 @@ class JFAMachine: public Machine<bob::machine::GMMStats, double>
 
     /**
      * @brief Returns the number of Gaussian components C
-     * @warning An exception is thrown if no Universal Background Model has 
+     * @warning An exception is thrown if no Universal Background Model has
      *   been set yet.
      */
-    const size_t getDimC() const 
+    const size_t getDimC() const
     { return m_jfa_base->getDimC(); }
 
     /**
      * @brief Returns the feature dimensionality D
-     * @warning An exception is thrown if no Universal Background Model has 
+     * @warning An exception is thrown if no Universal Background Model has
      *   been set yet.
      */
-    const size_t getDimD() const 
+    const size_t getDimD() const
     { return m_jfa_base->getDimD(); }
 
     /**
      * @brief Returns the supervector length CD
      * (CxD: Number of Gaussian components by the feature dimensionality)
-     * @warning An exception is thrown if no Universal Background Model has 
+     * @warning An exception is thrown if no Universal Background Model has
      *   been set yet.
      */
-    const size_t getDimCD() const 
+    const size_t getDimCD() const
     { return m_jfa_base->getDimCD(); }
 
     /**
      * @brief Returns the size/rank ru of the U matrix
      */
-    const size_t getDimRu() const 
+    const size_t getDimRu() const
     { return m_jfa_base->getDimRu(); }
 
     /**
      * @brief Returns the size/rank rv of the V matrix
      */
-    const size_t getDimRv() const 
+    const size_t getDimRv() const
     { return m_jfa_base->getDimRv(); }
 
     /**
      * @brief Returns the x session factor
      */
-    const blitz::Array<double,1>& getX() const 
+    const blitz::Array<double,1>& getX() const
     { return m_cache_x; }
 
     /**
      * @brief Returns the y speaker factor
      */
-    const blitz::Array<double,1>& getY() const 
+    const blitz::Array<double,1>& getY() const
     { return m_y; }
 
     /**
      * @brief Returns the z speaker factor
      */
-    const blitz::Array<double,1>& getZ() const 
+    const blitz::Array<double,1>& getZ() const
     { return m_z; }
 
     /**
      * @brief Returns the y speaker factors in order to update it
      */
-    blitz::Array<double,1>& updateY() 
+    blitz::Array<double,1>& updateY()
     { return m_y; }
 
     /**
@@ -893,7 +894,7 @@ class JFAMachine: public Machine<bob::machine::GMMStats, double>
 
 
     /**
-     * @brief Estimates x from the GMM statistics considering the LPT 
+     * @brief Estimates x from the GMM statistics considering the LPT
      * assumption, that is the latent session variable x is approximated
      * using the UBM
      */
@@ -915,10 +916,10 @@ class JFAMachine: public Machine<bob::machine::GMMStats, double>
     */
     void forward(const bob::machine::GMMStats& input, double& score) const;
     /**
-     * @brief Computes a score for the given UBM statistics and given the 
+     * @brief Computes a score for the given UBM statistics and given the
      * Ux vector
      */
-    void forward(const bob::machine::GMMStats& gmm_stats, 
+    void forward(const bob::machine::GMMStats& gmm_stats,
       const blitz::Array<double,1>& Ux, double& score) const;
 
     /**
@@ -933,7 +934,7 @@ class JFAMachine: public Machine<bob::machine::GMMStats, double>
   protected:
     /**
      * @brief Resize latent variable according to the JFABase
-     */ 
+     */
     void resize();
     /**
      * @brief Resize working arrays
@@ -960,8 +961,8 @@ class JFAMachine: public Machine<bob::machine::GMMStats, double>
 };
 
 /**
- * @brief A ISVMachine which is associated to a ISVBase that contains 
- *   U D matrices. 
+ * @brief A ISVMachine which is associated to a ISVBase that contains
+ *   U D matrices.
  * TODO: add a reference to the journal articles
  */
 class ISVMachine: public Machine<bob::machine::GMMStats, double>
@@ -978,7 +979,7 @@ class ISVMachine: public Machine<bob::machine::GMMStats, double>
      * @brief Constructor. Builds a new ISVMachine.
      *
      * @param isv_base The ISVBase associated with this machine
-     */ 
+     */
     ISVMachine(const boost::shared_ptr<bob::machine::ISVBase> isv_base);
 
     /**
@@ -994,7 +995,7 @@ class ISVMachine: public Machine<bob::machine::GMMStats, double>
     /**
      * @brief Just to virtualise the destructor
      */
-    virtual ~ISVMachine(); 
+    virtual ~ISVMachine();
 
     /**
      * @brief Assigns from a different ISV machine
@@ -1014,7 +1015,7 @@ class ISVMachine: public Machine<bob::machine::GMMStats, double>
     /**
      * @brief Similar to
      */
-    bool is_similar_to(const ISVMachine& b, const double r_epsilon=1e-5, 
+    bool is_similar_to(const ISVMachine& b, const double r_epsilon=1e-5,
       const double a_epsilon=1e-8) const;
 
     /**
@@ -1031,45 +1032,45 @@ class ISVMachine: public Machine<bob::machine::GMMStats, double>
 
     /**
      * @brief Returns the number of Gaussian components C
-     * @warning An exception is thrown if no Universal Background Model has 
+     * @warning An exception is thrown if no Universal Background Model has
      *   been set yet.
      */
-    const size_t getDimC() const 
+    const size_t getDimC() const
     { return m_isv_base->getDimC(); }
 
     /**
      * @brief Returns the feature dimensionality D
-     * @warning An exception is thrown if no Universal Background Model has 
+     * @warning An exception is thrown if no Universal Background Model has
      *   been set yet.
      */
-    const size_t getDimD() const 
+    const size_t getDimD() const
     { return m_isv_base->getDimD(); }
 
     /**
      * @brief Returns the supervector length CD
      * (CxD: Number of Gaussian components by the feature dimensionality)
-     * @warning An exception is thrown if no Universal Background Model has 
+     * @warning An exception is thrown if no Universal Background Model has
      *   been set yet.
      */
-    const size_t getDimCD() const 
+    const size_t getDimCD() const
     { return m_isv_base->getDimCD(); }
 
     /**
      * @brief Returns the size/rank ru of the U matrix
      */
-    const size_t getDimRu() const 
+    const size_t getDimRu() const
     { return m_isv_base->getDimRu(); }
 
     /**
      * @brief Returns the x session factor
      */
-    const blitz::Array<double,1>& getX() const 
+    const blitz::Array<double,1>& getX() const
     { return m_cache_x; }
 
     /**
      * @brief Returns the z speaker factor
      */
-    const blitz::Array<double,1>& getZ() const 
+    const blitz::Array<double,1>& getZ() const
     { return m_z; }
 
     /**
@@ -1096,7 +1097,7 @@ class ISVMachine: public Machine<bob::machine::GMMStats, double>
 
 
     /**
-     * @brief Estimates x from the GMM statistics considering the LPT 
+     * @brief Estimates x from the GMM statistics considering the LPT
      * assumption, that is the latent session variable x is approximated
      * using the UBM
      */
@@ -1118,10 +1119,10 @@ class ISVMachine: public Machine<bob::machine::GMMStats, double>
     */
     void forward(const bob::machine::GMMStats& input, double& score) const;
     /**
-     * @brief Computes a score for the given UBM statistics and given the 
+     * @brief Computes a score for the given UBM statistics and given the
      * Ux vector
      */
-    void forward(const bob::machine::GMMStats& gmm_stats, 
+    void forward(const bob::machine::GMMStats& gmm_stats,
       const blitz::Array<double,1>& Ux, double& score) const;
 
     /**
@@ -1136,7 +1137,7 @@ class ISVMachine: public Machine<bob::machine::GMMStats, double>
   protected:
     /**
      * @brief Resize latent variable according to the ISVBase
-     */ 
+     */
     void resize();
     /**
      * @ Update cache

@@ -6,16 +6,16 @@
  * @brief A few helpers to handle HDF5 datasets in a more abstract way.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -152,7 +152,7 @@ namespace bob { namespace io {
        */
       template <typename T> HDF5Shape(const size_t n, const T* values):
         m_n(n), m_shape() {
-          if (n > MAX_HDF5SHAPE_SIZE) 
+          if (n > MAX_HDF5SHAPE_SIZE)
             throw std::length_error("maximum number of dimensions exceeded");
           for (size_t i=0; i<n; ++i) m_shape[i] = values[i];
         }
@@ -162,7 +162,7 @@ namespace bob { namespace io {
        */
       template <int N> HDF5Shape(const blitz::TinyVector<int,N>& vec):
         m_n(N), m_shape() {
-          if (N > MAX_HDF5SHAPE_SIZE) 
+          if (N > MAX_HDF5SHAPE_SIZE)
             throw std::length_error("maximum number of dimensions exceeded");
           for (size_t i=0; i<N; ++i) m_shape[i] = vec[i];
         }
@@ -210,7 +210,7 @@ namespace bob { namespace io {
        * if it is bigger, will copy up to my number of positions.
        */
       void copy(const HDF5Shape& other);
-      
+
       /**
        * Sets a TinyVector with the contents of this shape. If the tinyvector
        * shape is smaller, will copy up to the number of positions in the
@@ -218,7 +218,7 @@ namespace bob { namespace io {
        * positions
        */
       template <int N> void set (blitz::TinyVector<int,N>& v) const {
-        if (N >= m_n) for (size_t i=0; i<m_n; ++i) v[i] = m_shape[i]; 
+        if (N >= m_n) for (size_t i=0; i<m_n; ++i) v[i] = m_shape[i];
         else for (size_t i=0; i<N; ++i) v[i] = m_shape[i];
       }
 
@@ -513,6 +513,12 @@ namespace bob { namespace io {
       HDF5Shape hyperslab_count; ///< count for read/write operations
 
   };
+
+  /**
+   * Format and returns the current HDF5 error stack. It also clears the stack
+   * before returning.
+   */
+  std::string format_hdf5_error();
 
 }}
 

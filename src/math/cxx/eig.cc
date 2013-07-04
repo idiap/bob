@@ -5,22 +5,22 @@
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdexcept>
 #include <bob/math/eig.h>
-#include <bob/math/Exception.h>
 #include <bob/core/assert.h>
 #include <bob/core/check.h>
 #include <bob/core/array_copy.h>
@@ -35,7 +35,7 @@
 //   (dgeev)
 extern "C" void dgeev_( const char *jobvl, const char *jobvr,
   const int *N, double *A, const int *lda, double *wr, double *wi,
-  double *vl, const int *ldvl, double *vr, const int *ldvr, 
+  double *vl, const int *ldvl, double *vr, const int *ldvr,
   double *work, const int *lwork, int *info);
 
 // Declaration of the external LAPACK functions
@@ -46,15 +46,15 @@ extern "C" void dsyevd_( const char *jobz, const char *uplo, const int *N,
   int *iwork, const int *liwork, int *info);
 
 // Generalized eigenvalue decomposition of a real symmetric definite matrix
-//   (dsygvd) 
+//   (dsygvd)
 //   (Divide and conquer version which is supposed to be faster than dsygv)
 extern "C" void dsygvd_( const int *itype, const char *jobz, const char *uplo,
-  const int *N, double *A, const int *lda, double *B, const int *ldb, 
-  double *W, double *work, const int *lwork, const int *iwork, 
+  const int *N, double *A, const int *lda, double *B, const int *ldb,
+  double *W, double *work, const int *lwork, const int *iwork,
   const int *liwork, int *info);
 
-void bob::math::eig(const blitz::Array<double,2>& A, 
-  blitz::Array<std::complex<double>,2>& V, 
+void bob::math::eig(const blitz::Array<double,2>& A,
+  blitz::Array<std::complex<double>,2>& V,
   blitz::Array<std::complex<double>,1>& D)
 {
   // Size variable
@@ -75,7 +75,7 @@ void bob::math::eig(const blitz::Array<double,2>& A,
 }
 
 void bob::math::eig_(const blitz::Array<double,2>& A,
-  blitz::Array<std::complex<double>,2>& V, 
+  blitz::Array<std::complex<double>,2>& V,
   blitz::Array<std::complex<double>,1>& D)
 {
   // Size variable
@@ -99,7 +99,7 @@ void bob::math::eig_(const blitz::Array<double,2>& A,
   blitz::Array<double,1> WI(D.shape()); //imaginary part
   blitz::Array<double,2> VR(A.shape()); //right eigen-vectors
 
-  // Calls the LAPACK function 
+  // Calls the LAPACK function
   // A/ Queries the optimal size of the working arrays
   const int lwork_query = -1;
   double work_query;
@@ -111,10 +111,10 @@ void bob::math::eig_(const blitz::Array<double,2>& A,
   boost::shared_array<double> work(new double[lwork]);
   dgeev_( &jobvl, &jobvr, &N, A_lapack.data(), &lda, WR.data(), WI.data(),
       &VL, &ldvl, VR.data(), &ldvr, work.get(), &lwork, &info);
- 
+
   // Checks info variable
   if (info != 0) {
-    throw bob::math::LapackError("the QR algorithm failed to compute all the eigenvalues, and no eigenvectors have been computed.");
+    throw std::runtime_error("the QR algorithm failed to compute all the eigenvalues, and no eigenvectors have been computed.");
   }
 
   // Copy results back from WR, WI => D
@@ -124,7 +124,7 @@ void bob::math::eig_(const blitz::Array<double,2>& A,
   // Copy results back from VR => V, with two rules:
   // 1) If the j-th eigenvalue is real, then v(j) = VR(:,j), the j-th column of
   //    VR.
-  // 2) If the j-th and (j+1)-st eigenvalues form a complex conjugate pair, 
+  // 2) If the j-th and (j+1)-st eigenvalues form a complex conjugate pair,
   // then v(j) = VR(:,j) + i*VR(:,j+1) and v(j+1) = VR(:,j) - i*VR(:,j+1).
   blitz::Range a = blitz::Range::all();
   int i=0;
@@ -144,7 +144,7 @@ void bob::math::eig_(const blitz::Array<double,2>& A,
   }
 }
 
-void bob::math::eigSym(const blitz::Array<double,2>& A, 
+void bob::math::eigSym(const blitz::Array<double,2>& A,
   blitz::Array<double,2>& V, blitz::Array<double,1>& D)
 {
   // Size variable
@@ -164,7 +164,7 @@ void bob::math::eigSym(const blitz::Array<double,2>& A,
   bob::math::eigSym_(A, V, D);
 }
 
-void bob::math::eigSym_(const blitz::Array<double,2>& A, 
+void bob::math::eigSym_(const blitz::Array<double,2>& A,
   blitz::Array<double,2>& V, blitz::Array<double,1>& D)
 {
   // Size variable
@@ -174,7 +174,7 @@ void bob::math::eigSym_(const blitz::Array<double,2>& A,
   // Initialises LAPACK variables
   const char jobz = 'V'; // Get both the eigenvalues and the eigenvectors
   const char uplo = 'U';
-  int info = 0;  
+  int info = 0;
   const int lda = N;
 
   // Initialises LAPACK arrays
@@ -182,7 +182,7 @@ void bob::math::eigSym_(const blitz::Array<double,2>& A,
   // Tries to use V directly
   blitz::Array<double,2> Vt = V.transpose(1,0);
   const bool V_direct_use = bob::core::array::isCZeroBaseContiguous(Vt);
-  if (V_direct_use) 
+  if (V_direct_use)
   {
     A_blitz_lapack.reference(Vt);
     // Ugly fix for non-const transpose
@@ -200,14 +200,14 @@ void bob::math::eigSym_(const blitz::Array<double,2>& A,
   else
     D_blitz_lapack.resize(D.shape());
   double *D_lapack = D_blitz_lapack.data();
- 
-  // Calls the LAPACK function 
+
+  // Calls the LAPACK function
   // A/ Queries the optimal size of the working arrays
   const int lwork_query = -1;
   double work_query;
   const int liwork_query = -1;
   int iwork_query;
-  dsyevd_( &jobz, &uplo, &N, A_lapack, &lda, D_lapack, &work_query, 
+  dsyevd_( &jobz, &uplo, &N, A_lapack, &lda, D_lapack, &work_query,
     &lwork_query, &iwork_query, &liwork_query, &info);
   // B/ Computes the eigenvalue decomposition
   const int lwork = static_cast<int>(work_query);
@@ -216,10 +216,10 @@ void bob::math::eigSym_(const blitz::Array<double,2>& A,
   boost::shared_array<int> iwork(new int[liwork]);
   dsyevd_( &jobz, &uplo, &N, A_lapack, &lda, D_lapack, work.get(), &lwork,
     iwork.get(), &liwork, &info);
- 
+
   // Checks info variable
   if (info != 0)
-    throw bob::math::LapackError("The LAPACK function 'dsyevd' returned a non-zero value.");
+    throw std::runtime_error("The LAPACK function 'dsyevd' returned a non-zero value.");
 
   // Copy singular vectors back to V if required
   if (!V_direct_use)
@@ -262,7 +262,7 @@ void bob::math::eigSym_(const blitz::Array<double,2>& A, const blitz::Array<doub
   const int itype = 1;
   const char jobz = 'V'; // Get both the eigenvalues and the eigenvectors
   const char uplo = 'U';
-  int info = 0;  
+  int info = 0;
   const int lda = N;
   const int ldb = N;
 
@@ -271,7 +271,7 @@ void bob::math::eigSym_(const blitz::Array<double,2>& A, const blitz::Array<doub
   // Tries to use V directly
   blitz::Array<double,2> Vt = V.transpose(1,0);
   const bool V_direct_use = bob::core::array::isCZeroBaseContiguous(Vt);
-  if (V_direct_use) 
+  if (V_direct_use)
   {
     A_blitz_lapack.reference(Vt);
     // Ugly fix for non-const transpose
@@ -293,8 +293,8 @@ void bob::math::eigSym_(const blitz::Array<double,2>& A, const blitz::Array<doub
   else
     D_blitz_lapack.resize(D.shape());
   double *D_lapack = D_blitz_lapack.data();
- 
-  // Calls the LAPACK function 
+
+  // Calls the LAPACK function
   // A/ Queries the optimal size of the working arrays
   const int lwork_query = -1;
   double work_query;
@@ -307,13 +307,13 @@ void bob::math::eigSym_(const blitz::Array<double,2>& A, const blitz::Array<doub
   boost::shared_array<double> work(new double[lwork]);
   const int liwork = static_cast<int>(iwork_query);
   boost::shared_array<int> iwork(new int[liwork]);
-  dsygvd_( &itype, &jobz, &uplo, &N, A_lapack, &lda, B_lapack, &ldb, D_lapack, 
+  dsygvd_( &itype, &jobz, &uplo, &N, A_lapack, &lda, B_lapack, &ldb, D_lapack,
     work.get(), &lwork, iwork.get(), &liwork, &info);
 
   // Checks info variable
   if (info != 0)
-    throw bob::math::LapackError("The LAPACK function 'dsygvd' returned a non-zero value. This might be caused by a non-positive definite B matrix.");
- 
+    throw std::runtime_error("The LAPACK function 'dsygvd' returned a non-zero value. This might be caused by a non-positive definite B matrix.");
+
   // Copy singular vectors back to V if required
   if (!V_direct_use)
     V = A_blitz_lapack.transpose(1,0);

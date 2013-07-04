@@ -6,16 +6,16 @@
  * @brief Implements an image format reader/writer for BMP files.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -30,42 +30,41 @@
 #include <string>
 
 #include <bob/io/CodecRegistry.h>
-#include <bob/io/Exception.h>
 #include <bob/core/logging.h>
 
-// The following documentation is mostly coming from wikipedia: 
+// The following documentation is mostly coming from wikipedia:
 // http://en.wikipedia.org/wiki/BMP_file_format
 
 // BMP header (14 bytes)
 typedef struct {
-  // 1. The header field used to identify the BMP & DIB file is 0x42 0x4D in 
-  //    hexadecimal, same as BM in ASCII. The following entries are possible: 
+  // 1. The header field used to identify the BMP & DIB file is 0x42 0x4D in
+  //    hexadecimal, same as BM in ASCII. The following entries are possible:
   //      BM – Windows 3.1x, 95, NT, ... etc.
   //      BA – OS/2 struct Bitmap Array
   //      CI – OS/2 struct Color Icon
   //      CP – OS/2 const Color Pointer
   //      IC – OS/2 struct Icon
   //      PT – OS/2 Pointer
-  uint8_t signature[2];  
+  uint8_t signature[2];
   // 2. The size of the BMP file in bytes
   uint32_t file_size;
   // 3. Reserved; actual value depends on the application that creates the image
   uint16_t reserved1;
   // 4. Reserved; actual value depends on the application that creates the image
   uint16_t reserved2;
-  // 5. The offset, i.e. starting address, of the byte where the bitmap image 
+  // 5. The offset, i.e. starting address, of the byte where the bitmap image
   //    data (pixel array) can be found
   uint32_t offset;
 } bmp_header_t;
 
 // DIB header (bitmap information header)
 // "This block of bytes tells the application detailed information about the
-//  image, which will be used to display the image on the screen. The block 
+//  image, which will be used to display the image on the screen. The block
 //  also matches the header used internally by Windows and OS/2 and has several
-//  different variants. All of them contain a dword (32 bit) field, specifying 
-//  their size, so that an application can easily determine which header is 
+//  different variants. All of them contain a dword (32 bit) field, specifying
+//  their size, so that an application can easily determine which header is
 //  used in the image."
-//   - BITMAPCOREHEADER/OS21XBITMAPHEADER (12 bytes): 
+//   - BITMAPCOREHEADER/OS21XBITMAPHEADER (12 bytes):
 //      -> OS/2 and also all Windows versions since Windows 3.0
 //   - BITMAPCOREHEADER2/OS22XBITMAPHEADER (64 bytes):
 //      -> OS/2
@@ -93,10 +92,10 @@ typedef struct {
   // 5. The number of bits per pixel, which is the color depth of the image.
   //    Typical values are 1, 4, 8, 16, 24 and 32.
   uint16_t depth;
-  // 6. The compression method being used. See the next table for a list of 
+  // 6. The compression method being used. See the next table for a list of
   //    possible values.
   uint32_t compression_type;
-  // 7. The image size. This is the size of the raw bitmap data (see below), 
+  // 7. The image size. This is the size of the raw bitmap data (see below),
   //    and should not be confused with the file size.
   uint32_t image_size;
   // 8. The horizontal resolution of the image. (pixel per meter, signed integer)
@@ -105,7 +104,7 @@ typedef struct {
   int32_t vres;
   // 10. The number of colors in the color palette, or 0 to default to 2^n
   uint32_t n_colors;
-  // 11. The number of important colors used, or 0 when every color is 
+  // 11. The number of important colors used, or 0 when every color is
   //     important; generally ignored.
   uint32_t n_impcolors;
 
@@ -140,7 +139,7 @@ typedef enum {
   BI_RGB=0, // none. Most common
   BI_RLE8, // RLE 8-bit/pixel. Can be used only with 8-bit/pixel bitmaps
   BI_RLE4, // RLE 4-bit/pixel. Can be used only with 4-bit/pixel bitmaps
-  BI_BITFIELDS, //  Bit field or Huffman 1D compression for BITMAPCOREHEADER2. 
+  BI_BITFIELDS, //  Bit field or Huffman 1D compression for BITMAPCOREHEADER2.
                 //  Pixel format defined by bit masks or Huffman 1D compressed bitmap for BITMAPCOREHEADER2
   BI_JPEG, // JPEG or RLE-24 compression for BITMAPCOREHEADER2.
            // The bitmap contains a JPEG image or RLE-24 compressed bitmap for BITMAPCOREHEADER2
@@ -239,7 +238,7 @@ bmp_print_dib_header(bmp_dib_header_t *hdr)
   std::cout << " g_bitmask=" << g << std::endl;
   std::bitset<32> b(hdr->b_bitmask);
   std::cout << " b_bitmask=" << b << std::endl;
-  
+
   switch(hdr->header_type)
   {
     case WINV1:
@@ -270,9 +269,9 @@ bmp_print_dib_header(bmp_dib_header_t *hdr)
 
 // Read the 14 bytes header from the current FILE position
 // The FILE pointer is increased of 14 bytes
-static void 
+static void
 bmp_read_bmp_header(FILE * const input_file, bmp_header_t *hdr)
-{ 
+{
   if(fread(&hdr->signature[0], sizeof(uint8_t), 2, input_file) != 2)
     throw std::runtime_error("bmp: error while reading bmp header (signature)");
   if(fread(&hdr->file_size, sizeof(uint32_t), 1, input_file) != 1)
@@ -318,7 +317,7 @@ static void bmp_update_bitmask_structure(uint32_t r, uint32_t g, uint32_t b, bmp
   bm->r_shift = bmp_firstone_index(r);
   bm->g_shift = bmp_firstone_index(g);
   bm->b_shift = bmp_firstone_index(b);
-  
+
   // Mask
   bm->r_mask =  (1 << (bmp_lastone_index(r) - bm->r_shift + 1)) -1;
   bm->g_mask =  (1 << (bmp_lastone_index(g) - bm->g_shift + 1)) -1;
@@ -340,9 +339,9 @@ static void bmp_read_bitmask_win_dib_header(FILE * const input_file, bmp_dib_hea
 }
 
 // Read the Winv1 DIB header from the current FILE position
-// The FILE pointer is increased according to the size of the DIB header 
+// The FILE pointer is increased according to the size of the DIB header
 //  (if DIB type is supported)
-static void 
+static void
 bmp_read_winv1_dib_header(FILE * const input_file, bmp_dib_header_t *dib_hdr, const bool winv1=true)
 {
   if(fread(&dib_hdr->dib_header.win.width, sizeof(int32_t), 1, input_file) != 1)
@@ -355,7 +354,7 @@ bmp_read_winv1_dib_header(FILE * const input_file, bmp_dib_header_t *dib_hdr, co
     throw std::runtime_error("bmp: error while reading bmp DIB header (depth)");
   if(fread(&dib_hdr->dib_header.win.compression_type, sizeof(uint32_t), 1, input_file) != 1)
     throw std::runtime_error("bmp: error while reading bmp DIB header (compression type)");
-  if(dib_hdr->dib_header.win.compression_type != BI_RGB && 
+  if(dib_hdr->dib_header.win.compression_type != BI_RGB &&
      dib_hdr->dib_header.win.compression_type != BI_BITFIELDS)
     throw std::runtime_error("bmp: unsupported compression type in header");
   if(fread(&dib_hdr->dib_header.win.image_size, sizeof(uint32_t), 1, input_file) != 1)
@@ -369,14 +368,14 @@ bmp_read_winv1_dib_header(FILE * const input_file, bmp_dib_header_t *dib_hdr, co
   if(fread(&dib_hdr->dib_header.win.n_impcolors, sizeof(uint32_t), 1, input_file) != 1)
     throw std::runtime_error("bmp: error while reading bmp DIB header (number of important colors)");
 
-  // Update "standard" DIB attributes 
+  // Update "standard" DIB attributes
   dib_hdr->bottom_up = (dib_hdr->dib_header.win.height > 0);
   dib_hdr->height = (dib_hdr->dib_header.win.height > 0 ? dib_hdr->dib_header.win.height : -dib_hdr->dib_header.win.height);
   dib_hdr->width = (dib_hdr->dib_header.win.width > 0 ? dib_hdr->dib_header.win.width : -dib_hdr->dib_header.win.width);
   dib_hdr->depth = dib_hdr->dib_header.win.depth;
 
   // Update color map size attribute
-  if(dib_hdr->depth <= 8) 
+  if(dib_hdr->depth <= 8)
   {
     uint16_t n_colors = dib_hdr->dib_header.win.n_colors;
     if(n_colors != 0) {
@@ -384,10 +383,10 @@ bmp_read_winv1_dib_header(FILE * const input_file, bmp_dib_header_t *dib_hdr, co
         throw std::runtime_error("bmp: error while reading bmp DIB header (Colormap).");
       else
         dib_hdr->cmap_size = n_colors;
-    } 
+    }
     else
       dib_hdr->cmap_size = (1 << dib_hdr->depth);
-  } 
+  }
   else if (dib_hdr->depth == 24 || dib_hdr->depth == 16 || dib_hdr->depth == 32)
     dib_hdr->cmap_size = 0;
   else
@@ -397,13 +396,13 @@ bmp_read_winv1_dib_header(FILE * const input_file, bmp_dib_header_t *dib_hdr, co
   if(winv1 && dib_hdr->dib_header.win.compression_type == BI_BITFIELDS)
     bmp_read_bitmask_win_dib_header(input_file, dib_hdr);
   else
-    dib_hdr->has_bitmask = false; 
+    dib_hdr->has_bitmask = false;
 }
 
 // Read the Winv4 DIB header part from the current FILE position
-// The FILE pointer is increased according to the size of the DIB header 
+// The FILE pointer is increased according to the size of the DIB header
 //  (if DIB type is supported)
-static void 
+static void
 bmp_read_winv4_dib_header(FILE * const input_file, bmp_dib_header_t *dib_hdr)
 {
   // 1. RGBA bitmask
@@ -429,9 +428,9 @@ bmp_read_winv4_dib_header(FILE * const input_file, bmp_dib_header_t *dib_hdr)
 }
 
 // Read the Winv5 DIB header part from the current FILE position
-// The FILE pointer is increased according to the size of the DIB header 
+// The FILE pointer is increased according to the size of the DIB header
 //  (if DIB type is supported)
-static void 
+static void
 bmp_read_winv5_dib_header(FILE * const input_file, bmp_dib_header_t *dib_hdr)
 {
   // 1. Intent
@@ -449,9 +448,9 @@ bmp_read_winv5_dib_header(FILE * const input_file, bmp_dib_header_t *dib_hdr)
 }
 
 // Read the OS2v1 DIB header from the current FILE position
-// The FILE pointer is increased according to the size of the DIB header 
+// The FILE pointer is increased according to the size of the DIB header
 //  (if DIB type is supported)
-static void 
+static void
 bmp_read_os2v1_dib_header(FILE * const input_file, bmp_dib_header_t *dib_hdr)
 {
   // Read the OS2v1 DIB header
@@ -464,7 +463,7 @@ bmp_read_os2v1_dib_header(FILE * const input_file, bmp_dib_header_t *dib_hdr)
   if(fread(&dib_hdr->dib_header.os2v1.depth, sizeof(uint16_t), 1, input_file) != 1)
     throw std::runtime_error("bmp: error while reading bmp DIB header (depth)");
 
-  // Update "standard" DIB attributes 
+  // Update "standard" DIB attributes
   dib_hdr->bottom_up = true;
   dib_hdr->height = dib_hdr->dib_header.os2v1.height;
   dib_hdr->width = dib_hdr->dib_header.os2v1.width;
@@ -480,9 +479,9 @@ bmp_read_os2v1_dib_header(FILE * const input_file, bmp_dib_header_t *dib_hdr)
 }
 
 // Read the DIB header from the current FILE position
-// The FILE pointer is increased according to the size of the DIB header 
+// The FILE pointer is increased according to the size of the DIB header
 //  (if DIB type is supported)
-static void 
+static void
 bmp_read_dib_header(FILE * const input_file, bmp_dib_header_t *dib_hdr)
 {
   uint32_t dib_hdr_size;
@@ -519,7 +518,7 @@ bmp_read_dib_header(FILE * const input_file, bmp_dib_header_t *dib_hdr)
       // Read the windows WINV1 DIB header
       bmp_read_winv1_dib_header(input_file, dib_hdr);
       break;
-    
+
     case WINV4:
       // Read the windows WINV1 DIB header part
       bmp_read_winv1_dib_header(input_file, dib_hdr, false);
@@ -547,10 +546,10 @@ bmp_read_dib_header(FILE * const input_file, bmp_dib_header_t *dib_hdr)
 }
 
 // Read the colormap
-static void 
+static void
 bmp_read_colormap(FILE * const input_file, pixel_t *color_map, size_t cmap_size, bmp_dib_header_type hdr_type)
 {
-  for(size_t i=0; i<cmap_size; ++i) 
+  for(size_t i=0; i<cmap_size; ++i)
   {
     /* From Netpbm: There is a document that says the bytes are ordered R,G,B,Z,
        but in practice it appears to be the following instead:
@@ -574,7 +573,7 @@ bmp_read_colormap(FILE * const input_file, pixel_t *color_map, size_t cmap_size,
       if(fread(&r, s_el, 1, input_file) != 1)
         throw std::runtime_error("bmp: error while reading color map");
     }
-  }    
+  }
 }
 
 // Allocate buffer for raster
@@ -584,17 +583,17 @@ static size_t bmp_get_nbytes_per_row(const bmp_dib_header_t *dib_hdr)
 }
 
 // Read the raster data
-static void 
+static void
 bmp_read_raster(FILE * const input_file, const bmp_dib_header_t *dib_hdr, size_t n_bytes_per_row, uint8_t *data)
 {
   if(dib_hdr->bottom_up)
-    for(size_t i=0; i<dib_hdr->height; ++i) 
+    for(size_t i=0; i<dib_hdr->height; ++i)
     {
       if(fread(&data[(dib_hdr->height-1-i)*n_bytes_per_row], 1, n_bytes_per_row, input_file) != n_bytes_per_row)
         throw std::runtime_error("bmp: error while reading raster data");
     }
   else
-    for(size_t i=0; i<dib_hdr->height; ++i) 
+    for(size_t i=0; i<dib_hdr->height; ++i)
     {
       if(fread(&data[i*n_bytes_per_row], 1, n_bytes_per_row, input_file) != n_bytes_per_row)
         throw std::runtime_error("bmp: error while reading raster data");
@@ -604,7 +603,11 @@ bmp_read_raster(FILE * const input_file, const bmp_dib_header_t *dib_hdr, size_t
 static boost::shared_ptr<std::FILE> make_cfile(const char *filename, const char *flags)
 {
   std::FILE* fp = std::fopen(filename, flags);
-  if(fp == 0) throw bob::io::FileNotReadable(filename);
+  if(fp == 0) {
+    boost::format m("could not open file `%s'");
+    m % filename;
+    throw std::runtime_error(m.str());
+  }
   return boost::shared_ptr<std::FILE>(fp, std::fclose);
 }
 
@@ -615,7 +618,7 @@ static void im_peek(const std::string& path, bob::core::array::typeinfo& info) {
   // 1. BMP structures
   bmp_header_t bmp_hdr;
   bmp_dib_header_t bmp_dib_hdr;
-  
+
   // 2. BMP file opening
   boost::shared_ptr<std::FILE> in_file = make_cfile(path.c_str(), "rb");
 
@@ -643,7 +646,7 @@ static void im_load(const std::string& filename, bob::core::array::interface& b)
   // 1. BMP structures
   bmp_header_t bmp_hdr;
   bmp_dib_header_t bmp_dib_hdr;
-  
+
   // 2. BMP file opening
   boost::shared_ptr<std::FILE> in_file = make_cfile(filename.c_str(), "rb");
 
@@ -661,8 +664,8 @@ static void im_load(const std::string& filename, bob::core::array::interface& b)
   bmp_read_raster(in_file.get(), &bmp_dib_hdr, n_bytes_per_row, rasterdata.get());
 
   // 6. Convert data using the color map and put it in the RGB buffer
-  const bob::core::array::typeinfo& info = b.type(); 
-  long unsigned int frame_size = info.shape[1] * info.shape[2]; 
+  const bob::core::array::typeinfo& info = b.type();
+  long unsigned int frame_size = info.shape[1] * info.shape[2];
   uint8_t *element_r = static_cast<uint8_t*>(b.ptr());
   uint8_t *element_g = element_r+frame_size;
   uint8_t *element_b = element_g+frame_size;
@@ -753,10 +756,10 @@ static void im_load(const std::string& filename, bob::core::array::interface& b)
       }
     }
   }
-  else if(bmp_dib_hdr.depth == 8) 
+  else if(bmp_dib_hdr.depth == 8)
   {
     if(bmp_dib_hdr.has_bitmask)
-      throw std::runtime_error("bmp: usage of bitfields is currently restricted to 16bits depth images."); 
+      throw std::runtime_error("bmp: usage of bitfields is currently restricted to 16bits depth images.");
     pixel_t v;
     for(size_t i=0; i<bmp_dib_hdr.height; ++i)
     {
@@ -768,11 +771,11 @@ static void im_load(const std::string& filename, bob::core::array::interface& b)
         *element_r++ = v.r;
       }
     }
-  } 
-  else if(bmp_dib_hdr.depth < 8) 
+  }
+  else if(bmp_dib_hdr.depth < 8)
   {
     if(bmp_dib_hdr.has_bitmask)
-      throw std::runtime_error("bmp: usage of bitfields is currently restricted to 16bits depth images."); 
+      throw std::runtime_error("bmp: usage of bitfields is currently restricted to 16bits depth images.");
     // It's a bit field color index
     const uint8_t mask = (1 << bmp_dib_hdr.depth) - 1;
     pixel_t v;
@@ -845,12 +848,12 @@ static void bmp_write_dib_header(FILE * out_file, size_t height, size_t width)
   v16 = 24;
   if(fwrite(&v16, sizeof(uint16_t), 1, out_file) != 1)
     throw std::runtime_error("bmp: error while writing bmp DIB header (number of bits per pixel)");
-  // 6. The compression method being used. See the next table for a list of 
+  // 6. The compression method being used. See the next table for a list of
   //    possible values.
   v32 = 0; // No compression
   if(fwrite(&v32, sizeof(uint32_t), 1, out_file) != 1)
     throw std::runtime_error("bmp: error while writing bmp DIB header (compression type)");
-  // 7. The image size. This is the size of the raw bitmap data (see below), 
+  // 7. The image size. This is the size of the raw bitmap data (see below),
   //    and should not be confused with the file size.
   v32 = height * width;
   if(fwrite(&v32, sizeof(uint32_t), 1, out_file) != 1)
@@ -866,14 +869,14 @@ static void bmp_write_dib_header(FILE * out_file, size_t height, size_t width)
   v32 = 0;
   if(fwrite(&v32, sizeof(uint32_t), 1, out_file) != 1)
     throw std::runtime_error("bmp: error while writing bmp DIB header (number of colors)");
-  // 11. The number of important colors used, or 0 when every color is 
+  // 11. The number of important colors used, or 0 when every color is
   //     important; generally ignored.
   if(fwrite(&v32, sizeof(uint32_t), 1, out_file) != 1)
     throw std::runtime_error("bmp: error while writing bmp DIB header (number of important colors)");
 }
 
 // Save images in Windows V1 format with a 24 bits depth (without color map)
-static void im_save_color(const bob::core::array::interface& b, FILE * out_file) 
+static void im_save_color(const bob::core::array::interface& b, FILE * out_file)
 {
   const bob::core::array::typeinfo& info = b.type();
 
@@ -911,7 +914,7 @@ static void im_save_color(const bob::core::array::interface& b, FILE * out_file)
     for(size_t j=0; j<offset_per_row; ++j)
       if(fwrite(&zero, sizeof(uint8_t), 1, out_file) != 1)
         throw std::runtime_error("bmp: error while writing bmp raster data");
-      
+
   }
 }
 
@@ -927,9 +930,17 @@ static void im_save(const std::string& filename, const bob::core::array::interfa
       if(info.shape[0] != 3) throw std::runtime_error("color image does not have 3 planes on 1st. dimension");
       im_save_color(array, out_file.get());
     }
-    else throw bob::io::ImageUnsupportedDimension(info.nd); 
+    else {
+      boost::format m("the image in file `%s' has a number of dimensions for which this bmp codec has no support for: %s");
+      m % info.str();
+      throw std::runtime_error(m.str());
+    }
   }
-  else throw bob::io::ImageUnsupportedType();
+  else {
+    boost::format m("the image in file `%s' has a data type this jpeg codec has no support for: %s");
+    m % info.str();
+    throw std::runtime_error(m.str());
+  }
 }
 
 class ImageBmpFile: public bob::io::File {
@@ -988,7 +999,7 @@ class ImageBmpFile: public bob::io::File {
     }
 
     virtual void read(bob::core::array::interface& buffer, size_t index) {
-      if (m_newfile) 
+      if (m_newfile)
         throw std::runtime_error("uninitialized image file cannot be read");
 
       if (!buffer.type().is_compatible(m_type)) buffer.set(m_type);
@@ -1042,7 +1053,7 @@ std::string ImageBmpFile::s_codecname = "bob.image_bmp";
 
 /**
  * This defines the factory method F that can create codecs of this type.
- * 
+ *
  * Here are the meanings of the mode flag that should be respected by your
  * factory implementation:
  *
@@ -1050,8 +1061,8 @@ std::string ImageBmpFile::s_codecname = "bob.image_bmp";
  *      error to open a file that does not exist for read-only operations.
  * 'w': opens for reading and writing, but truncates the file if it
  *      exists; it is not an error to open files that do not exist with
- *      this flag. 
- * 'a': opens for reading and writing - any type of modification can 
+ *      this flag.
+ * 'a': opens for reading and writing - any type of modification can
  *      occur. If the file does not exist, this flag is effectively like
  *      'w'.
  *
@@ -1061,7 +1072,7 @@ std::string ImageBmpFile::s_codecname = "bob.image_bmp";
  * @note: This method can be static.
  */
 
-static boost::shared_ptr<bob::io::File> 
+static boost::shared_ptr<bob::io::File>
 make_file (const std::string& path, char mode) {
   return boost::make_shared<ImageBmpFile>(path, mode);
 }

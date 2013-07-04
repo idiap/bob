@@ -37,7 +37,6 @@
 #include <bob/core/array_copy.h>
 
 #include <bob/io/HDF5Attribute.h>
-#include <bob/io/HDF5Exception.h>
 #include <bob/io/HDF5Types.h>
 
 namespace bob { namespace io { namespace detail { namespace hdf5 {
@@ -235,8 +234,9 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
               return retval;
             }
           }
-          throw bob::io::HDF5IncompatibleIO(url(),
-              m_descr[0].type.str(), "dynamic shape unknown");
+          boost::format m("trying to read or write `%s' at `%s' that only accepts `%s'");
+          m % "unknown dynamic shape" % url() % m_descr[0].type.str();
+          throw std::runtime_error(m.str());
         }
 
       /**
@@ -504,7 +504,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
        * Reads an attribute into a user buffer. It is the user's responsibility
        * to have a buffer that represents the given type.
        */
-      void read_attribute (const std::string& name, 
+      void read_attribute (const std::string& name,
           const bob::io::HDF5Type& dest, void* buffer) const;
 
       /**
@@ -537,7 +537,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
       boost::shared_ptr<hid_t> m_memspace; ///< read/write space
 
   };
-      
+
   /**
    * std::string specialization
    */

@@ -7,16 +7,16 @@
  * arrays.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -24,8 +24,8 @@
 #ifndef BOB_SP_EXTRAPOLATE_H
 #define BOB_SP_EXTRAPOLATE_H
 
+#include <stdexcept>
 #include <blitz/array.h>
-#include <bob/sp/Exception.h>
 #include <bob/core/assert.h>
 
 namespace bob { namespace sp {
@@ -51,7 +51,7 @@ namespace Extrapolation {
  * @brief Extrapolates a 1D array, padding with a constant
  */
 template<typename T>
-void extrapolateConstant(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst, 
+void extrapolateConstant(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst,
   const T value)
 {
   // Checks zero base
@@ -59,7 +59,7 @@ void extrapolateConstant(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst,
   bob::core::array::assertZeroBase(dst);
 
   if (src.extent(0) > dst.extent(0))
-    throw ExtrapolationDstTooSmall();
+    throw std::runtime_error("the destination array is smaller than the source input array");
 
   // Sets value everywhere
   dst = value;
@@ -75,7 +75,7 @@ void extrapolateConstant(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst,
  * @brief Extrapolates a 2D array, padding with a constant
  */
 template<typename T>
-void extrapolateConstant(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst, 
+void extrapolateConstant(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst,
   const T value)
 {
   // Checks zero base
@@ -83,9 +83,9 @@ void extrapolateConstant(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst,
   bob::core::array::assertZeroBase(dst);
 
   if (src.extent(0) > dst.extent(0) || src.extent(1) > dst.extent(1))
-    throw ExtrapolationDstTooSmall();
+    throw std::runtime_error("the destination array is smaller than the source input array");
 
-  // Sets value everywhere 
+  // Sets value everywhere
   // TODO: avoid this using the 9 blocks division as described below
   dst = value;
   // Computes offsets and ranges
@@ -124,8 +124,8 @@ void extrapolateZero(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
 
 /**
  * @brief Extrapolates a 1D array, using nearest neighbour
- *   This code is longer than the simple algorithm which uses 
- *   a single loop to set the values of dst, but much 
+ *   This code is longer than the simple algorithm which uses
+ *   a single loop to set the values of dst, but much
  *   faster when working with large arrays.
  */
 template<typename T>
@@ -136,25 +136,25 @@ void extrapolateNearest(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
   bob::core::array::assertZeroBase(dst);
 
   if (src.extent(0) > dst.extent(0))
-    throw ExtrapolationDstTooSmall();
+    throw std::runtime_error("the destination array is smaller than the source input array");
 
   // Computes offsets
   int offset = (dst.extent(0) - src.extent(0)) / 2;
 
   // Left part
-  if (offset>0) 
+  if (offset>0)
     dst(blitz::Range(0,offset-1)) = src(0);
   // Middle part
   dst(blitz::Range(offset, offset+src.extent(0)-1)) = src;
   // Right part
-  if (offset+src.extent(0)<dst.extent(0)) 
+  if (offset+src.extent(0)<dst.extent(0))
     dst(blitz::Range(offset+src.extent(0),dst.extent(0)-1)) = src(src.extent(0)-1);
 }
 
 /**
  * @brief Extrapolates a 2D array, using nearest neighbour
- *   This code is longer the simple algorithm which uses 
- *   two imbricated loops to set the values of dst, but much 
+ *   This code is longer the simple algorithm which uses
+ *   two imbricated loops to set the values of dst, but much
  *   faster when working with large arrays.
  */
 template<typename T>
@@ -165,12 +165,12 @@ void extrapolateNearest(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
   bob::core::array::assertZeroBase(dst);
 
   if (src.extent(0) > dst.extent(0) || src.extent(1) > dst.extent(1))
-    throw ExtrapolationDstTooSmall();
+    throw std::runtime_error("the destination array is smaller than the source input array");
 
   // Computes offsets
   int offset_y = (dst.extent(0) - src.extent(0)) / 2;
   int offset_x = (dst.extent(1) - src.extent(1)) / 2;
-  
+
   // Defines some useful ranges
   blitz::Range r_all = blitz::Range::all();
   blitz::Range ry_middle(offset_y,offset_y+src.extent(0)-1);
@@ -180,7 +180,7 @@ void extrapolateNearest(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
   blitz::Range rx_right;
   if (offset_x>0) rx_right = blitz::Range(offset_x+src.extent(1),dst.extent(1)-1);
 
-  // Performs the extrapolation considering the 9 blocks around 
+  // Performs the extrapolation considering the 9 blocks around
   // the middle region which is set equal to src
   // Upper part
   if (offset_y>0)
@@ -244,11 +244,11 @@ namespace detail {
 
     // Left part
     if (offset_left!=offset)
-      dst(blitz::Range(offset_left,offset-1)) = 
+      dst(blitz::Range(offset_left,offset-1)) =
         src(blitz::Range(src.extent(0)-(offset-offset_left),src.extent(0)-1));
     // Right part
     if (offset+src.extent(0)<=offset_right)
-      dst(blitz::Range(offset+src.extent(0), offset_right)) = 
+      dst(blitz::Range(offset+src.extent(0), offset_right)) =
         src(blitz::Range(0,offset_right-(offset+src.extent(0))));
 
     // Calls this recursively if required
@@ -283,7 +283,7 @@ namespace detail {
     // Defines some useful ranges
     blitz::Range r_all = blitz::Range::all();
 
-    // Performs the extrapolation considering the 9 blocks around 
+    // Performs the extrapolation considering the 9 blocks around
     // the middle region which is set equal to src
     // Upper part
     if (offset_y>0)
@@ -292,7 +292,7 @@ namespace detail {
       blitz::Range ry_src_down(src.extent(0)-(offset_y-offset_y_up),src.extent(0)-1);
       // Left part
       if (offset_x>0)
-        dst(ry_up, blitz::Range(offset_x_left,offset_x-1)) = 
+        dst(ry_up, blitz::Range(offset_x_left,offset_x-1)) =
           src(ry_src_down, blitz::Range(src.extent(1)-(offset_x-offset_x_left),src.extent(1)-1));
       // Middle part
       for (int j=offset_y_up; j<offset_y; ++j)
@@ -307,7 +307,7 @@ namespace detail {
     blitz::Range ry_mid(offset_y,offset_y+src.extent(0)-1);
     //  Left part
     if (offset_x>0)
-      dst(ry_mid, blitz::Range(offset_x_left,offset_x-1)) = 
+      dst(ry_mid, blitz::Range(offset_x_left,offset_x-1)) =
         src(r_all, blitz::Range(src.extent(1)-(offset_x-offset_x_left),src.extent(1)-1));
     //  Right part
     if (offset_x+src.extent(1)<dst.extent(1))
@@ -321,7 +321,7 @@ namespace detail {
       blitz::Range ry_src_up(0,offset_y_low-offset_y-src.extent(0));
       // Left part
       if (offset_x>0)
-        dst(ry_low, blitz::Range(offset_x_left,offset_x-1)) = 
+        dst(ry_low, blitz::Range(offset_x_left,offset_x-1)) =
           src(ry_src_up, blitz::Range(src.extent(1)-(offset_x-offset_x_left),src.extent(1)-1));
       // Middle part
       for (int j=offset_y+src.extent(0); j<=offset_y_low; ++j)
@@ -356,12 +356,12 @@ namespace detail {
     }
 
     // Left part
-    if (offset_left!=offset) 
-      dst(blitz::Range(offset_left,offset-1)) = 
+    if (offset_left!=offset)
+      dst(blitz::Range(offset_left,offset-1)) =
         src(blitz::Range((offset-1-offset_left),0,-1));
     // Right part
     if (offset+src.extent(0)<=offset_right)
-      dst(blitz::Range(offset+src.extent(0), offset_right)) = 
+      dst(blitz::Range(offset+src.extent(0), offset_right)) =
         src(blitz::Range(src.extent(0)-1,2*src.extent(0)-offset_right+offset-1,-1));
 
     // Call this recursively if required
@@ -396,7 +396,7 @@ namespace detail {
     // Defines some useful ranges
     blitz::Range r_all = blitz::Range::all();
 
-    // Performs the extrapolation considering the 9 blocks around 
+    // Performs the extrapolation considering the 9 blocks around
     // the middle region which is set equal to src
     // Upper part
     if (offset_y>0)
@@ -405,7 +405,7 @@ namespace detail {
       blitz::Range ry_src_upr(offset_y-1-offset_y_up,0,-1);
       // Left part
       if (offset_x>0)
-        dst(ry_up, blitz::Range(offset_x_left,offset_x-1)) = 
+        dst(ry_up, blitz::Range(offset_x_left,offset_x-1)) =
           src(ry_src_upr, blitz::Range(offset_x-1-offset_x_left,0,-1));
       // Middle part
       for (int j=offset_y_up; j<offset_y; ++j)
@@ -420,7 +420,7 @@ namespace detail {
     blitz::Range ry_mid(offset_y,offset_y+src.extent(0)-1);
     //  Left part
     if (offset_x>0)
-      dst(ry_mid, blitz::Range(offset_x_left,offset_x-1)) = 
+      dst(ry_mid, blitz::Range(offset_x_left,offset_x-1)) =
         src(r_all, blitz::Range(offset_x-1-offset_x_left,0,-1));
     //  Right part
     if (offset_x+src.extent(1)<dst.extent(1))
@@ -434,7 +434,7 @@ namespace detail {
       blitz::Range ry_src_lowr(src.extent(0)-1,2*src.extent(0)-offset_y_low+offset_y-1,-1);
       // Left part
       if (offset_x>0)
-        dst(ry_low, blitz::Range(offset_x_left,offset_x-1)) = 
+        dst(ry_low, blitz::Range(offset_x_left,offset_x-1)) =
           src(ry_src_lowr, blitz::Range(offset_x-1-offset_x_left,0,-1));
       // Middle part
       for (int j=offset_y+src.extent(0); j<=offset_y_low; ++j)
@@ -462,8 +462,8 @@ namespace detail {
 
 /**
  * @brief Extrapolates a 1D array, using circular extrapolation
- *   This code is longer than the simple algorithm which uses 
- *   a single loop to set the values of dst, but much 
+ *   This code is longer than the simple algorithm which uses
+ *   a single loop to set the values of dst, but much
  *   faster when working with large arrays.
  */
 template<typename T>
@@ -474,7 +474,7 @@ void extrapolateCircular(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
   bob::core::array::assertZeroBase(dst);
 
   if (src.extent(0) > dst.extent(0))
-    throw ExtrapolationDstTooSmall();
+    throw std::runtime_error("the destination array is smaller than the source input array");
 
   // Computes offset
   int offset = (dst.extent(0) - src.extent(0)) / 2;
@@ -486,8 +486,8 @@ void extrapolateCircular(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
 
 /**
  * @brief Extrapolates a 2D array, using circular extrapolation
- *   This code is longer than the simple algorithm which uses 
- *   a single loop to set the values of dst, but much 
+ *   This code is longer than the simple algorithm which uses
+ *   a single loop to set the values of dst, but much
  *   faster when working with large arrays.
  */
 template<typename T>
@@ -498,7 +498,7 @@ void extrapolateCircular(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
   bob::core::array::assertZeroBase(dst);
 
   if (src.extent(0) > dst.extent(0) || src.extent(1) > dst.extent(1))
-    throw ExtrapolationDstTooSmall();
+    throw std::runtime_error("the destination array is smaller than the source input array");
 
   // Computes offset
   int offset_y = (dst.extent(0) - src.extent(0)) / 2;
@@ -512,8 +512,8 @@ void extrapolateCircular(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
 
 /**
  * @brief Extrapolates a 1D array, using mirroring
- *   This code is longer than the simple algorithm which uses 
- *   a single loop to set the values of dst, but much 
+ *   This code is longer than the simple algorithm which uses
+ *   a single loop to set the values of dst, but much
  *   faster when working with large arrays.
  */
 template<typename T>
@@ -524,7 +524,7 @@ void extrapolateMirror(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
   bob::core::array::assertZeroBase(dst);
 
   if(src.extent(0) > dst.extent(0))
-    throw ExtrapolationDstTooSmall();
+    throw std::runtime_error("the destination array is smaller than the source input array");
 
   // Computes offset
   int offset = (dst.extent(0) - src.extent(0)) / 2;
@@ -536,8 +536,8 @@ void extrapolateMirror(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
 
 /**
  * @brief Extrapolates a 2D array, using mirroring
- *   This code is longer than the simple algorithm which uses 
- *   a single loop to set the values of dst, but much 
+ *   This code is longer than the simple algorithm which uses
+ *   a single loop to set the values of dst, but much
  *   faster when working with large arrays.
  */
 template<typename T>
@@ -548,7 +548,7 @@ void extrapolateMirror(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
   bob::core::array::assertZeroBase(dst);
 
   if (src.extent(0) > dst.extent(0) || src.extent(1) > dst.extent(1))
-    throw ExtrapolationDstTooSmall();
+    throw std::runtime_error("the destination array is smaller than the source input array");
 
   // Computes offsets
   int offset_y = (dst.extent(0) - src.extent(0)) / 2;
@@ -561,8 +561,8 @@ void extrapolateMirror(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
 }
 
 template<typename T>
-void extrapolate(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst, 
-  const Extrapolation::BorderType border_type = Extrapolation::Zero, 
+void extrapolate(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst,
+  const Extrapolation::BorderType border_type = Extrapolation::Zero,
   const T value=0)
 {
   switch(border_type)
@@ -586,14 +586,14 @@ void extrapolate(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst,
 }
 
 template<typename T>
-void extrapolate(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst, 
-  const Extrapolation::BorderType border_type = Extrapolation::Zero, 
+void extrapolate(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst,
+  const Extrapolation::BorderType border_type = Extrapolation::Zero,
   const T value=0)
 {
   switch(border_type)
   {
     case Extrapolation::NearestNeighbour:
-      extrapolateNearest(src, dst); 
+      extrapolateNearest(src, dst);
       break;
     case Extrapolation::Circular:
       extrapolateCircular(src, dst);

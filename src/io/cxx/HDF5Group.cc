@@ -48,7 +48,11 @@ static boost::shared_ptr<hid_t> create_new_group(boost::shared_ptr<hid_t> p,
   boost::shared_ptr<hid_t> retval(new hid_t(-1), std::ptr_fun(delete_h5g));
   *retval = H5Gcreate2(*p, name.c_str(), H5P_DEFAULT, H5P_DEFAULT,
       H5P_DEFAULT);
-  if (*retval < 0) throw bob::io::HDF5StatusError("H5Gcreate", *retval);
+  if (*retval < 0) {
+    boost::format m("call to HDF5 C-function H5Gcreate2() returned error %d. HDF5 error statck follows:\n%s");
+    m % *retval % bob::io::format_hdf5_error();
+    throw std::runtime_error(m.str());
+  }
   return retval;
 }
 
@@ -56,7 +60,11 @@ static boost::shared_ptr<hid_t> open_group(boost::shared_ptr<hid_t> g,
     const char* name) {
   boost::shared_ptr<hid_t> retval(new hid_t(-1), std::ptr_fun(delete_h5g));
   *retval = H5Gopen2(*g, name, H5P_DEFAULT);
-  if (*retval < 0) throw bob::io::HDF5StatusError("H5Gopen", *retval);
+  if (*retval < 0) {
+    boost::format m("call to HDF5 C-function H5Gopen2() returned error %d. HDF5 error statck follows:\n%s");
+    m % *retval % bob::io::format_hdf5_error();
+    throw std::runtime_error(m.str());
+  }
   return retval;
 }
 
@@ -89,7 +97,11 @@ herr_t bob::io::detail::hdf5::Group::iterate_callback(hid_t self, const char *na
   // Get information about the HDF5 object
   H5O_info_t obj_info;
   herr_t status = H5Oget_info_by_name(self, name, &obj_info, H5P_DEFAULT);
-  if (status < 0) throw bob::io::HDF5StatusError("H5Oget_info_by_name", status);
+  if (status < 0) {
+    boost::format m("call to HDF5 C-function H5Oget_info_by_name() returned error %d. HDF5 error statck follows:\n%s");
+    m % status % bob::io::format_hdf5_error();
+    throw std::runtime_error(m.str());
+  }
 
   switch(obj_info.type) {
     case H5O_TYPE_GROUP:
@@ -127,7 +139,11 @@ void bob::io::detail::hdf5::Group::open_recursively() {
   //iterates over this group only and instantiates what needs to be instantiated
   herr_t status = H5Literate(*m_id, H5_INDEX_NAME,
       H5_ITER_NATIVE, 0, group_iterate_callback, static_cast<void*>(this));
-  if (status < 0) throw bob::io::HDF5StatusError("H5Literate", status);
+  if (status < 0) {
+    boost::format m("Call to HDF5 C-function H5Literate() returned error %d. HDF5 error statck follows:\n%s");
+    m % status % bob::io::format_hdf5_error();
+    throw std::runtime_error(m.str());
+  }
 }
 
 bob::io::detail::hdf5::Group::Group(boost::shared_ptr<File> parent):
@@ -278,7 +294,11 @@ void bob::io::detail::hdf5::Group::remove_group(const std::string& dir) {
   std::string::size_type pos = dir.find_last_of('/');
   if (pos == std::string::npos) { //copy on the current group
     herr_t status = H5Ldelete(*m_id, dir.c_str(), H5P_DEFAULT);
-    if (status < 0) throw bob::io::HDF5StatusError("H5Ldelete", status);
+    if (status < 0) {
+      boost::format m("Call to HDF5 C-function H5Ldelete() returned error %d. HDF5 error statck follows:\n%s");
+      m % status % bob::io::format_hdf5_error();
+      throw std::runtime_error(m.str());
+    }
     typedef std::map<std::string, boost::shared_ptr<bob::io::detail::hdf5::Group> > map_type;
     map_type::iterator it = m_groups.find(dir);
     m_groups.erase(it);
@@ -313,7 +333,9 @@ static boost::shared_ptr<hid_t> open_plist(hid_t classid) {
   boost::shared_ptr<hid_t> retval(new hid_t(-1), std::ptr_fun(delete_h5plist));
   *retval = H5Pcreate(classid);
   if (*retval < 0) {
-    throw bob::io::HDF5StatusError("H5Pcreate", *retval);
+    boost::format m("call to HDF5 C-function H5Pcreate() returned error %d. HDF5 error statck follows:\n%s");
+    m % *retval % bob::io::format_hdf5_error();
+    throw std::runtime_error(m.str());
   }
   return retval;
 }
@@ -323,7 +345,11 @@ void bob::io::detail::hdf5::Group::rename_group(const std::string& from, const s
   H5Pset_create_intermediate_group(*create_props, 1);
   herr_t status = H5Lmove(*m_id, from.c_str(), H5L_SAME_LOC, to.c_str(),
       *create_props, H5P_DEFAULT);
-  if (status < 0) throw bob::io::HDF5StatusError("H5Lmove", status);
+  if (status < 0) {
+    boost::format m("Call to HDF5 C-function H5Lmove() returned error %d. HDF5 error statck follows:\n%s");
+    m % status % bob::io::format_hdf5_error();
+    throw std::runtime_error(m.str());
+  }
 }
 
 void bob::io::detail::hdf5::Group::copy_group(const boost::shared_ptr<Group> other,
@@ -333,7 +359,11 @@ void bob::io::detail::hdf5::Group::copy_group(const boost::shared_ptr<Group> oth
     const char* use_name = dir.size()?dir.c_str():other->name().c_str();
     herr_t status = H5Ocopy(*other->parent()->location(),
         other->name().c_str(), *m_id, use_name, H5P_DEFAULT, H5P_DEFAULT);
-    if (status < 0) throw bob::io::HDF5StatusError("H5Ocopy", status);
+    if (status < 0) {
+      boost::format m("call to HDF5 C-function H5Ocopy() returned error %d. HDF5 error statck follows:\n%s");
+      m % status % bob::io::format_hdf5_error();
+      throw std::runtime_error(m.str());
+    }
 
     //read new group contents
     boost::shared_ptr<bob::io::detail::hdf5::Group> copied =
@@ -406,7 +436,11 @@ void bob::io::detail::hdf5::Group::remove_dataset(const std::string& dir) {
   std::string::size_type pos = dir.find_last_of('/');
   if (pos == std::string::npos) { //removes on the current group
     herr_t status = H5Ldelete(*m_id, dir.c_str(), H5P_DEFAULT);
-    if (status < 0) throw bob::io::HDF5StatusError("H5Ldelete", status);
+    if (status < 0) {
+      boost::format m("Call to HDF5 C-function H5Ldelete() returned error %d. HDF5 error statck follows:\n%s");
+      m % status % bob::io::format_hdf5_error();
+      throw std::runtime_error(m.str());
+    }
     typedef std::map<std::string, boost::shared_ptr<bob::io::detail::hdf5::Dataset> > map_type;
     map_type::iterator it = m_datasets.find(dir);
     m_datasets.erase(it);
@@ -428,7 +462,11 @@ void bob::io::detail::hdf5::Group::rename_dataset(const std::string& from, const
   H5Pset_create_intermediate_group(*create_props, 1);
   herr_t status = H5Lmove(*m_id, from.c_str(), H5L_SAME_LOC, to.c_str(),
       *create_props, H5P_DEFAULT);
-  if (status < 0) throw bob::io::HDF5StatusError("H5Ldelete", status);
+  if (status < 0) {
+    boost::format m("Call to HDF5 C-function H5Ldelete() returned error %d. HDF5 error statck follows:\n%s");
+    m % status % bob::io::format_hdf5_error();
+    throw std::runtime_error(m.str());
+  }
 }
 
 void bob::io::detail::hdf5::Group::copy_dataset(const boost::shared_ptr<Dataset> other,
@@ -439,7 +477,11 @@ void bob::io::detail::hdf5::Group::copy_dataset(const boost::shared_ptr<Dataset>
     const char* use_name = dir.size()?dir.c_str():other->name().c_str();
     herr_t status = H5Ocopy(*other->parent()->location(),
         other->name().c_str(), *m_id, use_name, H5P_DEFAULT, H5P_DEFAULT);
-    if (status < 0) throw bob::io::HDF5StatusError("H5Ocopy", status);
+    if (status < 0) {
+      boost::format m("Call to HDF5 C-function H5Ocopy() returned error %d. HDF5 error statck follows:\n%s");
+      m % status % bob::io::format_hdf5_error();
+      throw std::runtime_error(m.str());
+    }
     //read new group contents
     m_datasets[use_name] = boost::make_shared<bob::io::detail::hdf5::Dataset>(shared_from_this(), use_name);
     return;

@@ -6,16 +6,16 @@
  *
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -30,15 +30,17 @@ bob::ap::Spectrogram::Spectrogram(const double sampling_frequency,
     const size_t n_filters, const double f_min, const double f_max,
     const double pre_emphasis_coeff, const bool mel_scale):
   bob::ap::Energy(sampling_frequency, win_length_ms, win_shift_ms),
-  m_n_filters(n_filters), m_f_min(f_min), m_f_max(f_max), 
+  m_n_filters(n_filters), m_f_min(f_min), m_f_max(f_max),
   m_pre_emphasis_coeff(pre_emphasis_coeff), m_mel_scale(mel_scale),
   m_fb_out_floor(1.), m_energy_filter(false), m_log_filter(true),
   m_energy_bands(false), m_fft(1)
 {
   // Check pre-emphasis coefficient
-  if (pre_emphasis_coeff < 0. || pre_emphasis_coeff > 1.)
-    throw bob::core::InvalidArgumentException("pre_emphasis_coeff", 
-      pre_emphasis_coeff, 0., 1.);
+  if (pre_emphasis_coeff < 0. || pre_emphasis_coeff > 1.) {
+    boost::format m("the argument for `pre_emphasis_coeff' cannot take the value %f - the value must be in the interval [0.,1.]");
+    m % pre_emphasis_coeff;
+    throw std::runtime_error(m.str());
+  }
 
   // Initialization
   initWinLength();
@@ -51,7 +53,7 @@ bob::ap::Spectrogram::Spectrogram(const double sampling_frequency,
 }
 
 bob::ap::Spectrogram::Spectrogram(const Spectrogram& other):
-  bob::ap::Energy(other), m_n_filters(other.m_n_filters), 
+  bob::ap::Energy(other), m_n_filters(other.m_n_filters),
   m_f_min(other.m_f_min), m_f_max(other.m_f_max),
   m_pre_emphasis_coeff(other.m_pre_emphasis_coeff),
   m_mel_scale(other.m_mel_scale), m_fb_out_floor(other.m_fb_out_floor),
@@ -98,9 +100,9 @@ bob::ap::Spectrogram& bob::ap::Spectrogram::operator=(const bob::ap::Spectrogram
 
 bool bob::ap::Spectrogram::operator==(const bob::ap::Spectrogram& other) const
 {
-  return (bob::ap::Energy::operator==(other) && 
+  return (bob::ap::Energy::operator==(other) &&
           m_n_filters == other.m_n_filters && m_f_min == other.m_f_min &&
-          m_f_max == other.m_f_max && 
+          m_f_max == other.m_f_max &&
           m_pre_emphasis_coeff == other.m_pre_emphasis_coeff &&
           m_mel_scale == other.m_mel_scale &&
           m_fb_out_floor == other.m_fb_out_floor &&
@@ -118,7 +120,7 @@ bob::ap::Spectrogram::~Spectrogram()
 {
 }
 
-blitz::TinyVector<int,2> 
+blitz::TinyVector<int,2>
 bob::ap::Spectrogram::getShape(const size_t input_size) const
 {
   // Res will contain the number of frames x the dimension of the feature vector
@@ -159,28 +161,28 @@ void bob::ap::Spectrogram::setWinShiftMs(const double win_shift_ms)
 }
 
 void bob::ap::Spectrogram::setNFilters(size_t n_filters)
-{ 
-  m_n_filters = n_filters; 
-  m_cache_filters.resize(m_n_filters); 
-  initCacheFilterBank(); 
+{
+  m_n_filters = n_filters;
+  m_cache_filters.resize(m_n_filters);
+  initCacheFilterBank();
 }
 
 void bob::ap::Spectrogram::setFMin(double f_min)
-{ 
-  m_f_min = f_min; 
-  initCacheFilterBank(); 
+{
+  m_f_min = f_min;
+  initCacheFilterBank();
 }
 
 void bob::ap::Spectrogram::setFMax(double f_max)
-{ 
-  m_f_max = f_max; 
+{
+  m_f_max = f_max;
   initCacheFilterBank();
 }
 
 void bob::ap::Spectrogram::setMelScale(bool mel_scale)
-{ 
+{
   m_mel_scale = mel_scale;
-  initCacheFilterBank(); 
+  initCacheFilterBank();
 }
 
 double bob::ap::Spectrogram::herzToMel(double f)
@@ -243,7 +245,7 @@ void bob::ap::Spectrogram::initCacheFilters()
   blitz::firstIndex ii;
   for (int i=0; i<(int)m_n_filters; ++i)
   {
-    // Integer indices of the boundary of the triangular filter in the 
+    // Integer indices of the boundary of the triangular filter in the
     // Fourier domain
     int li = m_p_index(i);
     int mi = m_p_index(i+1);
@@ -265,10 +267,10 @@ void bob::ap::Spectrogram::initCacheFilters()
 }
 
 void bob::ap::Spectrogram::initWinLength()
-{ 
+{
   bob::ap::Energy::initWinLength();
-  initCacheHammingKernel(); 
-  initCacheFilterBank(); 
+  initCacheHammingKernel();
+  initCacheFilterBank();
 }
 
 void bob::ap::Spectrogram::initWinSize()
@@ -282,11 +284,11 @@ void bob::ap::Spectrogram::initWinSize()
 void bob::ap::Spectrogram::pre_emphasis(blitz::Array<double,1> &data) const
 {
   if (m_pre_emphasis_coeff != 0.)
-  { 
+  {
     // Pre-emphasise the signal by applying the first order equation
     // \f$data_{n} := data_{n} − a*data_{n−1}\f$
-    blitz::Range r0((int)m_win_length-2,0,-1); 
-    blitz::Range r1((int)m_win_length-1,1,-1); 
+    blitz::Range r0((int)m_win_length-2,0,-1);
+    blitz::Range r1((int)m_win_length-1,1,-1);
     data(r1) -= m_pre_emphasis_coeff * data(r0); // Apply first order equation
     data(0) *= 1. - m_pre_emphasis_coeff; // Update first element
   }

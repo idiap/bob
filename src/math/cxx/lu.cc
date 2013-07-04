@@ -4,22 +4,22 @@
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdexcept>
 #include <bob/math/lu.h>
-#include <bob/math/Exception.h>
 #include <bob/core/assert.h>
 #include <bob/core/array_copy.h>
 #if !defined (HAVE_BLITZ_TINYVEC2_H)
@@ -30,7 +30,7 @@
 
 // Declaration of the external LAPACK functions
 // LU decomposition of a general matrix (dgetrf)
-extern "C" void dgetrf_( const int *M, const int *N, double *A, 
+extern "C" void dgetrf_( const int *M, const int *N, double *A,
   const int *lda, int *ipiv, int *info);
 // Cholesky decomposition of a real symmetric definite-positive matrix (dpotrf)
 extern "C" void dpotrf_( const char *uplo, const int *N, double *A,
@@ -73,7 +73,7 @@ void bob::math::lu_(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
   // Prepares to call LAPACK function
 
   // Initialises LAPACK variables
-  int info = 0;  
+  int info = 0;
   const int lda = M;
 
   // Initialises LAPACK arrays
@@ -82,12 +82,12 @@ void bob::math::lu_(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
   double *A_lapack = A_blitz_lapack.data();
   boost::shared_array<int> ipiv(new int[minMN]);
 
-  // Calls the LAPACK function 
+  // Calls the LAPACK function
   dgetrf_( &M, &N, A_lapack, &lda, ipiv.get(), &info);
- 
+
   // Checks info variable
   if (info != 0)
-    throw bob::math::LapackError("The LAPACK dgetrf function returned a non-zero value.");
+    throw std::runtime_error("The LAPACK dgetrf function returned a non-zero value.");
 
   // Copy result back to L and U
   blitz::firstIndex bi;
@@ -98,7 +98,7 @@ void bob::math::lu_(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
   L = blitz::where(bi==bj, 1., L);
   U = blitz::where(bi<=bj, A_blitz_lapack_t(blitz::Range(0,minMN-1),rall), 0.);
 
-  // Converts weird permutation format returned by LAPACK into a permutation 
+  // Converts weird permutation format returned by LAPACK into a permutation
   // function
   blitz::Array<int,1> Pp(minMN);
   Pp = bi;
@@ -116,7 +116,7 @@ void bob::math::lu_(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
 }
 
 
-void bob::math::chol(const blitz::Array<double,2>& A, 
+void bob::math::chol(const blitz::Array<double,2>& A,
   blitz::Array<double,2>& L)
 {
   // Size variable
@@ -132,7 +132,7 @@ void bob::math::chol(const blitz::Array<double,2>& A,
   bob::math::chol_(A, L);
 }
 
-void bob::math::chol_(const blitz::Array<double,2>& A, 
+void bob::math::chol_(const blitz::Array<double,2>& A,
   blitz::Array<double,2>& L)
 {
   // Size variable
@@ -140,7 +140,7 @@ void bob::math::chol_(const blitz::Array<double,2>& A,
 
   // Prepares to call LAPACK function
   // Initialises LAPACK variables
-  int info = 0;  
+  int info = 0;
   const int lda = N;
   const char uplo = 'L';
 
@@ -149,7 +149,7 @@ void bob::math::chol_(const blitz::Array<double,2>& A,
   // Tries to use V directly
   blitz::Array<double,2> Lt = L.transpose(1,0);
   const bool Lt_direct_use = bob::core::array::isCZeroBaseContiguous(Lt);
-  if (Lt_direct_use) 
+  if (Lt_direct_use)
   {
     A_blitz_lapack.reference(Lt);
     A_blitz_lapack = A;
@@ -158,12 +158,12 @@ void bob::math::chol_(const blitz::Array<double,2>& A,
     A_blitz_lapack.reference(bob::core::array::ccopy(A));
   double *A_lapack = A_blitz_lapack.data();
 
-  // Calls the LAPACK function 
+  // Calls the LAPACK function
   dpotrf_( &uplo, &N, A_lapack, &lda, &info);
- 
+
   // Checks info variable
   if (info != 0)
-    throw bob::math::LapackError("The LAPACK dpotrf function returned a non-zero value.");
+    throw std::runtime_error("The LAPACK dpotrf function returned a non-zero value.");
 
   // Copy result back to L if required
   if (!Lt_direct_use)

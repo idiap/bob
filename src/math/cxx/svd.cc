@@ -4,29 +4,29 @@
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdexcept>
 #include <bob/math/svd.h>
-#include <bob/math/Exception.h>
 #include <bob/core/assert.h>
 #include <bob/core/check.h>
 #include <bob/core/array_copy.h>
 #include <boost/shared_array.hpp>
 
 // Declaration of the external LAPACK function (Divide and conquer SVD)
-extern "C" void dgesdd_( const char *jobz, const int *M, const int *N, 
+extern "C" void dgesdd_( const char *jobz, const int *M, const int *N,
   double *A, const int *lda, double *S, double *U, const int* ldu, double *VT,
   const int *ldvt, double *work, const int *lwork, int *iwork, int *info);
 
@@ -63,13 +63,13 @@ void bob::math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
 
   // Prepares to call LAPACK function:
   // We will decompose A^T rather than A to reduce the required number of copy
-  // We recall that FORTRAN/LAPACK is column-major order whereas blitz arrays 
+  // We recall that FORTRAN/LAPACK is column-major order whereas blitz arrays
   // are row-major order by default.
   // If A = U.S.V^T, then A^T = V.S.U^T
 
   // Initialises LAPACK variables
   const char jobz = 'A'; // Get All left singular vectors
-  int info = 0;  
+  int info = 0;
   const int lda = N;
   const int ldu = N;
   const int ldvt = M;
@@ -108,18 +108,18 @@ void bob::math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   // A/ Queries the optimal size of the working array
   const int lwork_query = -1;
   double work_query;
-  dgesdd_( &jobz, &N, &M, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
+  dgesdd_( &jobz, &N, &M, A_lapack, &lda, S_lapack, U_lapack, &ldu,
     VT_lapack, &ldvt, &work_query, &lwork_query, iwork.get(), &info );
   // B/ Computes
   const int lwork = static_cast<int>(work_query);
   boost::shared_array<double> work(new double[lwork]);
-  dgesdd_( &jobz, &N, &M, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
+  dgesdd_( &jobz, &N, &M, A_lapack, &lda, S_lapack, U_lapack, &ldu,
     VT_lapack, &ldvt, work.get(), &lwork, iwork.get(), &info );
- 
+
   // Check info variable
-  if (info != 0)
-    throw bob::math::LapackError("The LAPACK dgesdd function returned a non-zero\
-       value.");
+  if (info != 0) {
+    throw std::runtime_error("The LAPACK dgesdd function returned a non-zero value.");
+  }
 
   // Copy singular vectors back to U, V and sigma if required
   if (!U_direct_use)  Vt = U_blitz_lapack;
@@ -144,7 +144,7 @@ void bob::math::svd(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   bob::core::array::assertSameDimensionLength(U.extent(0), M);
   bob::core::array::assertSameDimensionLength(U.extent(1), nb_singular);
   bob::core::array::assertSameDimensionLength(sigma.extent(0), nb_singular);
- 
+
   bob::math::svd_(A, U, sigma);
 }
 
@@ -160,7 +160,7 @@ void bob::math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
 
   // Initialises LAPACK variables
   const char jobz = 'S'; // Get first min(M,N) columns of U
-  int info = 0;  
+  int info = 0;
   const int lda = M;
   const int ldu = M;
   const int ldvt = std::min(M,N);
@@ -196,18 +196,18 @@ void bob::math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   // A/ Queries the optimal size of the working array
   const int lwork_query = -1;
   double work_query;
-  dgesdd_( &jobz, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
+  dgesdd_( &jobz, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu,
     VT_lapack.get(), &ldvt, &work_query, &lwork_query, iwork.get(), &info );
   // B/ Computes
   const int lwork = static_cast<int>(work_query);
   boost::shared_array<double> work(new double[lwork]);
-  dgesdd_( &jobz, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
+  dgesdd_( &jobz, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu,
     VT_lapack.get(), &ldvt, work.get(), &lwork, iwork.get(), &info );
- 
+
   // Check info variable
   if (info != 0)
-    throw bob::math::LapackError("The LAPACK dgesdd function returned a non-zero value.");
-  
+    throw std::runtime_error("The LAPACK dgesdd function returned a non-zero value.");
+
   // Copy singular vectors back to U, V and sigma if required
   if (!U_direct_use) Ut = U_blitz_lapack;
   if (!sigma_direct_use) sigma = S_blitz_lapack;
@@ -226,7 +226,7 @@ void bob::math::svd(const blitz::Array<double,2>& A, blitz::Array<double,1>& sig
   bob::core::array::assertZeroBase(sigma);
   // Checks and resizes if required
   bob::core::array::assertSameDimensionLength(sigma.extent(0), nb_singular);
- 
+
   bob::math::svd_(A, sigma);
 }
 
@@ -241,7 +241,7 @@ void bob::math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,1>& si
 
   // Initialises LAPACK variables
   const char jobz = 'N'; // Get first min(M,N) columns of U
-  int info = 0;  
+  int info = 0;
   const int lda = M;
   const int ldu = M;
   const int ldvt = std::min(M,N);
@@ -272,17 +272,17 @@ void bob::math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,1>& si
   // A/ Queries the optimal size of the working array
   const int lwork_query = -1;
   double work_query;
-  dgesdd_( &jobz, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
+  dgesdd_( &jobz, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu,
     VT_lapack, &ldvt, &work_query, &lwork_query, iwork.get(), &info );
   // B/ Computes
   const int lwork = static_cast<int>(work_query);
   boost::shared_array<double> work(new double[lwork]);
-  dgesdd_( &jobz, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
+  dgesdd_( &jobz, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu,
     VT_lapack, &ldvt, work.get(), &lwork, iwork.get(), &info );
- 
+
   // Check info variable
   if (info != 0)
-    throw bob::math::LapackError("The LAPACK dgesdd function returned a non-zero value.");
+    throw std::runtime_error("The LAPACK dgesdd function returned a non-zero value.");
 
   // Copy singular vectors back to U, V and sigma if required
   if (!sigma_direct_use) sigma = S_blitz_lapack;

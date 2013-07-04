@@ -7,31 +7,31 @@
  *        linear program (LP).
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdexcept>
 #include <bob/math/LPInteriorPoint.h>
 #include <bob/math/linear.h>
 #include <bob/math/linsolve.h>
-#include <bob/math/Exception.h>
 #include <bob/core/array_copy.h>
 #include <bob/core/assert.h>
 #include <bob/core/check.h>
 #include <limits>
 
 
-bob::math::LPInteriorPoint::LPInteriorPoint(const size_t M, const size_t N, 
+bob::math::LPInteriorPoint::LPInteriorPoint(const size_t M, const size_t N,
     const double epsilon):
   m_M(M), m_N(N), m_epsilon(epsilon), m_lambda(M), m_mu(N)
 {
@@ -42,7 +42,7 @@ bob::math::LPInteriorPoint::LPInteriorPoint(const size_t M, const size_t N,
 
 bob::math::LPInteriorPoint::LPInteriorPoint(
   const bob::math::LPInteriorPoint &other):
-  m_M(other.m_M), m_N(other.m_N), m_epsilon(other.m_epsilon), 
+  m_M(other.m_M), m_N(other.m_N), m_epsilon(other.m_epsilon),
   m_lambda(bob::core::array::ccopy(other.m_lambda)),
   m_mu(bob::core::array::ccopy(other.m_mu))
 {
@@ -82,7 +82,7 @@ bob::math::LPInteriorPoint& bob::math::LPInteriorPoint::operator=(
 bool bob::math::LPInteriorPoint::operator==(
   const bob::math::LPInteriorPoint& other) const
 {
-  return (m_M == other.m_M && m_N == other.m_N && 
+  return (m_M == other.m_M && m_N == other.m_N &&
           m_epsilon == other.m_epsilon &&
           bob::core::array::isEqual(m_lambda, other.m_lambda) &&
           bob::core::array::isEqual(m_mu, other.m_mu));
@@ -133,15 +133,15 @@ bool bob::math::LPInteriorPoint::isFeasible(const blitz::Array<double,2>& A,
 
   // A'*lambda + mu = c (abs(A'*lambda+mu-c)<=epsilon)
   // ugly fix for old blitz version
-  const blitz::Array<double,2> A_t = 
-    const_cast<blitz::Array<double,2>&>(A).transpose(1,0); 
+  const blitz::Array<double,2> A_t =
+    const_cast<blitz::Array<double,2>&>(A).transpose(1,0);
   bob::math::prod(A_t, lambda, m_cache_N);
   m_cache_N += mu - c;
   return (!blitz::any(blitz::fabs(m_cache_N) > m_epsilon));
 }
 
 
-bool bob::math::LPInteriorPoint::isInV(const blitz::Array<double,1>& x, 
+bool bob::math::LPInteriorPoint::isInV(const blitz::Array<double,1>& x,
   const blitz::Array<double,1>& mu, const double theta) const
 {
   // Check
@@ -180,7 +180,7 @@ void bob::math::LPInteriorPoint::gradientLogBarrierLP(
   const blitz::Array<double,2>& A, const blitz::Array<double,1>& c)
 {
   // ugly fix for old blitz versions
-  const blitz::Array<double,2> A_t = 
+  const blitz::Array<double,2> A_t =
     const_cast<blitz::Array<double,2>&>(A).transpose(1,0);
   bob::math::prod( A_t, m_lambda, m_cache_N);
   m_cache_N = c - m_cache_N; // c-transpose(A)*lambda
@@ -201,7 +201,7 @@ void bob::math::LPInteriorPoint::initializeDualLambdaMu(
   bob::core::array::assertSameDimensionLength(c.extent(0), m_N);
 
   // Ugly fix for old blitz version
-  const blitz::Array<double,2> A_t = 
+  const blitz::Array<double,2> A_t =
     const_cast<blitz::Array<double,2>&>(A).transpose(1,0);
 
   // Loop until we find a tuple (lambda,mu) which satisfies the constraint:
@@ -217,13 +217,13 @@ void bob::math::LPInteriorPoint::initializeDualLambdaMu(
     {
       // Compute the gradient vector/direction d
       gradientLogBarrierLP( A, c);
-      
+
       // Move lambda towards the d direction
       m_lambda += alpha * m_cache_gradient;
-      
+
       // Compute the new value of the barrier
       double f_new = logBarrierLP( A_t, c);
-    
+
       // Break if the value of the barrier decreases
       if (f_new < f_old)
         break;
@@ -235,7 +235,7 @@ void bob::math::LPInteriorPoint::initializeDualLambdaMu(
     // Update mu (= c - transpose(A)*lambda )
     bob::math::prod( A_t, m_lambda, m_cache_N);
     m_mu = c - m_cache_N; // c-transpose(A)*lambda
-    
+
     // break if all the mu_i are positive
     if (blitz::all(m_mu >= 0.))
       break;
@@ -243,7 +243,7 @@ void bob::math::LPInteriorPoint::initializeDualLambdaMu(
 }
 
 
-void bob::math::LPInteriorPoint::centeringV(const blitz::Array<double,2>& A, 
+void bob::math::LPInteriorPoint::centeringV(const blitz::Array<double,2>& A,
   const double theta, blitz::Array<double,1>& x)
 {
   // Get dimensions from the A matrix
@@ -254,7 +254,7 @@ void bob::math::LPInteriorPoint::centeringV(const blitz::Array<double,2>& A,
 
   initializeLargeSystem(A);
 
-  int k=0;  
+  int k=0;
   while (true)
   {
     // 1) Stopping criterion
@@ -273,7 +273,7 @@ void bob::math::LPInteriorPoint::centeringV(const blitz::Array<double,2>& A,
       m_cache_mu = m_mu + alpha * m_cache_x_large(r_n+m+n);
       alpha /= 2.;
       if (alpha < 2*std::numeric_limits<double>::epsilon())
-        throw bob::math::Exception();
+        throw std::runtime_error("alpha is smaller than 2*epsilon<double>");
     } while ( !(blitz::all(m_cache_x >= 0.) && blitz::all(m_cache_mu >= 0.)) );
     // Move content back
     m_lambda = m_cache_lambda;
@@ -295,7 +295,7 @@ void bob::math::LPInteriorPoint::initializeLargeSystem(
 
   // 'Compute' transpose(A)
   // ugly fix for old blitz version
-  const blitz::Array<double,2> A_t = 
+  const blitz::Array<double,2> A_t =
     const_cast<blitz::Array<double,2>&>(A).transpose(1,0);
 
   // Initialize
@@ -315,12 +315,12 @@ void bob::math::LPInteriorPoint::initializeLargeSystem(
   m_cache_b_large = 0.;
 }
 
-void bob::math::LPInteriorPoint::updateLargeSystem(const blitz::Array<double,1>& x, 
+void bob::math::LPInteriorPoint::updateLargeSystem(const blitz::Array<double,1>& x,
   const double sigma, const int m) const
 {
   // Get dimensions from the A matrix
   const int n = x.extent(0);
- 
+
   // Compute nu*sigma
   double nu_sigma = sigma * bob::math::dot(x, m_mu) / n;
 
@@ -340,8 +340,8 @@ void bob::math::LPInteriorPoint::updateLargeSystem(const blitz::Array<double,1>&
 bob::math::LPInteriorPointShortstep::LPInteriorPointShortstep(
     const size_t M, const size_t N,
     const double theta, const double epsilon):
-  bob::math::LPInteriorPoint(M, N, epsilon), 
-  m_theta(theta) 
+  bob::math::LPInteriorPoint(M, N, epsilon),
+  m_theta(theta)
 {
 }
 
@@ -352,7 +352,7 @@ bob::math::LPInteriorPointShortstep::LPInteriorPointShortstep(
 {
 }
 
-bob::math::LPInteriorPointShortstep& 
+bob::math::LPInteriorPointShortstep&
 bob::math::LPInteriorPointShortstep::operator=(
     const bob::math::LPInteriorPointShortstep& other)
 {
@@ -377,9 +377,9 @@ bool bob::math::LPInteriorPointShortstep::operator!=(
   return !(this->operator==(other));
 }
 
-void bob::math::LPInteriorPointShortstep::solve(const blitz::Array<double,2>& A, 
+void bob::math::LPInteriorPointShortstep::solve(const blitz::Array<double,2>& A,
   const blitz::Array<double,1>& b, const blitz::Array<double,1>& c,
-  blitz::Array<double,1>& x, const blitz::Array<double,1>& lambda, 
+  blitz::Array<double,1>& x, const blitz::Array<double,1>& lambda,
   const blitz::Array<double,1>& mu)
 {
   // Check
@@ -406,7 +406,7 @@ void bob::math::LPInteriorPointShortstep::solve(const blitz::Array<double,2>& A,
   m_lambda = lambda;
   m_mu = mu;
 
-  int k=0;  
+  int k=0;
   while(true)
   {
     // 1) nu = 1/n <x,mu>
@@ -457,7 +457,7 @@ void bob::math::LPInteriorPointShortstep::solve(const blitz::Array<double,2>& A,
 bob::math::LPInteriorPointPredictorCorrector::LPInteriorPointPredictorCorrector(
     const size_t M, const size_t N,
     const double theta_pred, const double theta_corr, const double epsilon):
-  bob::math::LPInteriorPoint(M, N, epsilon), 
+  bob::math::LPInteriorPoint(M, N, epsilon),
   m_theta_pred(theta_pred), m_theta_corr(theta_corr)
 {
 }
@@ -470,7 +470,7 @@ bob::math::LPInteriorPointPredictorCorrector::LPInteriorPointPredictorCorrector(
 {
 }
 
-bob::math::LPInteriorPointPredictorCorrector& 
+bob::math::LPInteriorPointPredictorCorrector&
 bob::math::LPInteriorPointPredictorCorrector::operator=(
     const bob::math::LPInteriorPointPredictorCorrector& other)
 {
@@ -499,7 +499,7 @@ bool bob::math::LPInteriorPointPredictorCorrector::operator!=(
 
 void bob::math::LPInteriorPointPredictorCorrector::solve(const blitz::Array<double,2>& A,
   const blitz::Array<double,1>& b, const blitz::Array<double,1>& c,
-  blitz::Array<double,1>& x, const blitz::Array<double,1>& lambda, 
+  blitz::Array<double,1>& x, const blitz::Array<double,1>& lambda,
   const blitz::Array<double,1>& mu)
 {
   // Check
@@ -525,7 +525,7 @@ void bob::math::LPInteriorPointPredictorCorrector::solve(const blitz::Array<doub
   m_lambda = lambda;
   m_mu = mu;
 
-  int k=0;  
+  int k=0;
   while (true)
   {
     /////////////////////////////
@@ -542,7 +542,7 @@ void bob::math::LPInteriorPointPredictorCorrector::solve(const blitz::Array<doub
 
     // 3) alpha=1
     double alpha = 1.;
- 
+
     // 4) Find alpha and update x, lamda and mu
     do {
       m_cache_lambda = m_lambda + alpha * m_cache_x_large(r_m+n);
@@ -550,7 +550,7 @@ void bob::math::LPInteriorPointPredictorCorrector::solve(const blitz::Array<doub
       m_cache_mu = m_mu + alpha * m_cache_x_large(r_n+m+n);
       alpha /= 2.;
       if (alpha<2*std::numeric_limits<double>::epsilon())
-        throw bob::math::Exception();
+        throw std::runtime_error("alpha is smaller than 2*epsilon<double>");
     } while (!isInVS(A, b, c, m_cache_x, m_cache_lambda, m_cache_mu, m_theta_pred));
     // Move content back
     m_lambda = m_cache_lambda;
@@ -580,10 +580,10 @@ void bob::math::LPInteriorPointPredictorCorrector::solve(const blitz::Array<doub
 
     // 9) k = k + 1
     ++k;
-  } 
+  }
 }
 
-void bob::math::LPInteriorPointPredictorCorrector::solve(const blitz::Array<double,2>& A, 
+void bob::math::LPInteriorPointPredictorCorrector::solve(const blitz::Array<double,2>& A,
   const blitz::Array<double,1>& b, const blitz::Array<double,1>& c,
   blitz::Array<double,1>& x)
 {
@@ -611,7 +611,7 @@ void bob::math::LPInteriorPointPredictorCorrector::solve(const blitz::Array<doub
 bob::math::LPInteriorPointLongstep::LPInteriorPointLongstep(
     const size_t M, const size_t N,
     const double gamma, const double sigma, const double epsilon):
-  bob::math::LPInteriorPoint(M, N, epsilon), 
+  bob::math::LPInteriorPoint(M, N, epsilon),
   m_gamma(gamma), m_sigma(sigma)
 {
 }
@@ -624,7 +624,7 @@ bob::math::LPInteriorPointLongstep::LPInteriorPointLongstep(
 {
 }
 
-bob::math::LPInteriorPointLongstep& 
+bob::math::LPInteriorPointLongstep&
 bob::math::LPInteriorPointLongstep::operator=(
     const bob::math::LPInteriorPointLongstep& other)
 {
@@ -663,9 +663,9 @@ bool bob::math::LPInteriorPointLongstep::isInV(const blitz::Array<double,1>& x,
   return (!blitz::any(x*mu < gamma*nu));
 }
 
-void bob::math::LPInteriorPointLongstep::solve(const blitz::Array<double,2>& A, 
+void bob::math::LPInteriorPointLongstep::solve(const blitz::Array<double,2>& A,
   const blitz::Array<double,1>& b, const blitz::Array<double,1>& c,
-  blitz::Array<double,1>& x, const blitz::Array<double,1>& lambda, 
+  blitz::Array<double,1>& x, const blitz::Array<double,1>& lambda,
   const blitz::Array<double,1>& mu)
 {
   // Check
@@ -690,7 +690,7 @@ void bob::math::LPInteriorPointLongstep::solve(const blitz::Array<double,2>& A,
   m_lambda = lambda;
   m_mu = mu;
 
-  int k=0;  
+  int k=0;
   while(true)
   {
     // 1) nu = 1/n <x,mu>
@@ -713,7 +713,7 @@ void bob::math::LPInteriorPointLongstep::solve(const blitz::Array<double,2>& A,
       m_cache_mu = m_mu + alpha * m_cache_x_large(r_n+m+n);
       alpha /= 2.;
       if (alpha < 2*std::numeric_limits<double>::epsilon())
-        throw bob::math::Exception();
+        throw std::runtime_error("alpha is smaller than 2*epsilon<double>");
     } while (!isInVS(A, b, c, m_cache_x, m_cache_lambda, m_cache_mu, m_gamma));
     // Move content back
     m_lambda = m_cache_lambda;
@@ -726,7 +726,7 @@ void bob::math::LPInteriorPointLongstep::solve(const blitz::Array<double,2>& A,
 }
 
 
-void bob::math::LPInteriorPointLongstep::solve(const blitz::Array<double,2>& A, 
+void bob::math::LPInteriorPointLongstep::solve(const blitz::Array<double,2>& A,
   const blitz::Array<double,1>& b, const blitz::Array<double,1>& c,
   blitz::Array<double,1>& x)
 {

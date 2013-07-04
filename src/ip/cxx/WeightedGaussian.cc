@@ -3,24 +3,26 @@
  * @date Thu July 19 12:27:15 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * @brief This file provides a class to process images with a weighted 
+ * @brief This file provides a class to process images with a weighted
  *        Gaussian kernel (Used by the Self Quotient Image)
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/format.hpp>
+#include <stdexcept>
 #include "bob/ip/WeightedGaussian.h"
 
 void bob::ip::WeightedGaussian::computeKernel()
@@ -30,16 +32,16 @@ void bob::ip::WeightedGaussian::computeKernel()
   // Computes the kernel
   const double inv_sigma2_y = 1.0 / m_sigma2_y;
   const double inv_sigma2_x = 1.0 / m_sigma2_x;
-  for (int i = -(int)m_radius_y; i <= (int)m_radius_y; ++i) 
+  for (int i = -(int)m_radius_y; i <= (int)m_radius_y; ++i)
     for (int j = -(int)m_radius_x; j <= (int)m_radius_x; ++j)
-      m_kernel(i + (int)m_radius_y, j + (int)m_radius_x) = 
+      m_kernel(i + (int)m_radius_y, j + (int)m_radius_x) =
         exp( -0.5 * (inv_sigma2_y * (i * i) + inv_sigma2_x * (j * j)));
   // Normalizes the kernel
   m_kernel /= blitz::sum(m_kernel);
 }
 
 void bob::ip::WeightedGaussian::reset(const size_t radius_y, const size_t radius_x,
-  const double sigma2_y, const double sigma2_x, 
+  const double sigma2_y, const double sigma2_x,
   const bob::sp::Extrapolation::BorderType border_type)
 {
   m_radius_y = radius_y;
@@ -50,7 +52,7 @@ void bob::ip::WeightedGaussian::reset(const size_t radius_y, const size_t radius
   computeKernel();
 }
 
-bob::ip::WeightedGaussian& 
+bob::ip::WeightedGaussian&
 bob::ip::WeightedGaussian::operator=(const bob::ip::WeightedGaussian& other)
 {
   if (this != &other)
@@ -65,15 +67,15 @@ bob::ip::WeightedGaussian::operator=(const bob::ip::WeightedGaussian& other)
   return *this;
 }
 
-bool 
+bool
 bob::ip::WeightedGaussian::operator==(const bob::ip::WeightedGaussian& b) const
 {
-  return (this->m_radius_y == b.m_radius_y && this->m_radius_x == b.m_radius_x && 
-          this->m_sigma2_y == b.m_sigma2_y && this->m_sigma2_x == b.m_sigma2_x && 
+  return (this->m_radius_y == b.m_radius_y && this->m_radius_x == b.m_radius_x &&
+          this->m_sigma2_y == b.m_sigma2_y && this->m_sigma2_x == b.m_sigma2_x &&
           this->m_conv_border == b.m_conv_border);
 }
 
-bool 
+bool
 bob::ip::WeightedGaussian::operator!=(const bob::ip::WeightedGaussian& b) const
 {
   return !(this->operator==(b));
@@ -87,10 +89,16 @@ void bob::ip::WeightedGaussian::operator()<double>(
   bob::core::array::assertZeroBase(src);
   bob::core::array::assertZeroBase(dst);
   bob::core::array::assertSameShape(src, dst);
-  if(src.extent(0)<m_kernel.extent(0))
-    throw bob::sp::ConvolutionKernelTooLarge(0, src.extent(0), m_kernel.extent(0));
-  if(src.extent(1)<m_kernel.extent(1))
-    throw bob::sp::ConvolutionKernelTooLarge(1, src.extent(0), m_kernel.extent(0));
+  if(src.extent(0)<m_kernel.extent(0)) {
+    boost::format m("The convolutional kernel has the first dimension larger than the corresponding one of the array to process (%d > %d). Our convolution code does not allows. You could try to revert the order of the two arrays.");
+    m % src.extent(0) % m_kernel.extent(0);
+    throw std::runtime_error(m.str());
+  }
+  if(src.extent(1)<m_kernel.extent(1)) {
+    boost::format m("The convolutional kernel has the second dimension larger than the corresponding one of the array to process (%d > %d). Our convolution code does not allows. You could try to revert the order of the two arrays.");
+    m % src.extent(1) % m_kernel.extent(1);
+    throw std::runtime_error(m.str());
+  }
 
   // 1/ Extrapolation of src
   // Resize temporary extrapolated src array
@@ -98,7 +106,7 @@ void bob::ip::WeightedGaussian::operator()<double>(
   shape(0) += 2 * (int)m_radius_y;
   shape(1) += 2 * (int)m_radius_x;
   m_src_extra.resize(shape);
-  
+
   // Extrapolate
   if(m_conv_border == bob::sp::Extrapolation::Zero)
     bob::sp::extrapolateZero(src, m_src_extra);
@@ -123,9 +131,9 @@ void bob::ip::WeightedGaussian::operator()<double>(
       // Integral image is used to speed up the process
       blitz::Array<double,2> src_slice = m_src_extra(
         blitz::Range(y,y+2*(int)m_radius_y), blitz::Range(x,x+2*(int)m_radius_x));
-      double threshold = (m_src_integral(y,x) + 
-          m_src_integral(y+2*(int)m_radius_y+1,x+2*(int)m_radius_x+1) - 
-          m_src_integral(y,x+2*(int)m_radius_x+1) - 
+      double threshold = (m_src_integral(y,x) +
+          m_src_integral(y+2*(int)m_radius_y+1,x+2*(int)m_radius_x+1) -
+          m_src_integral(y,x+2*(int)m_radius_x+1) -
           m_src_integral(y+2*(int)m_radius_y+1,x)
         ) / n_elem;
       // Computes the weighted Gaussian kernel at this location

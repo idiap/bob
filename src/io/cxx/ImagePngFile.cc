@@ -6,16 +6,16 @@
  * @brief Implements an image format reader/writer using libpng.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -48,14 +48,18 @@ extern "C" {
 static boost::shared_ptr<std::FILE> make_cfile(const char *filename, const char *flags)
 {
   std::FILE* fp = std::fopen(filename, flags);
-  if(fp == 0) throw bob::io::FileNotReadable(filename);
+  if(fp == 0) {
+    boost::format m("the file `%s' could not be opened - verify permissions and availability");
+    m % filename;
+    throw std::runtime_error(m.str());
+  }
   return boost::shared_ptr<std::FILE>(fp, std::fclose);
 }
 
 /**
  * LOADING
  */
-static void im_peek(const std::string& path, bob::core::array::typeinfo& info) 
+static void im_peek(const std::string& path, bob::core::array::typeinfo& info)
 {
   // 1. PNG structure declarations
   png_structp png_ptr;
@@ -65,15 +69,15 @@ static void im_peek(const std::string& path, bob::core::array::typeinfo& info)
   boost::shared_ptr<std::FILE> in_file = make_cfile(path.c_str(), "rb");
 
   // 3. Create and initialize the png_struct. The compiler header file version
-  //    is supplied, so that we know if the application was compiled with a 
+  //    is supplied, so that we know if the application was compiled with a
   //    compatible version of the library.
   png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
   if(png_ptr == NULL) throw std::runtime_error("PNG: error while creating read png structure (function png_create_read_struct())");
 
   // Allocate/initialize the memory for image information.
   info_ptr = png_create_info_struct(png_ptr);
-  if(info_ptr == NULL) { 
-    png_destroy_read_struct(&png_ptr, NULL, NULL); 
+  if(info_ptr == NULL) {
+    png_destroy_read_struct(&png_ptr, NULL, NULL);
     throw std::runtime_error("PNG: error while creating info png structure (function png_create_info_struct())");
   }
 
@@ -108,8 +112,9 @@ static void im_peek(const std::string& path, bob::core::array::typeinfo& info)
     info.nd = 2;
   else if (color_type == PNG_COLOR_TYPE_RGB)
     info.nd = 3;
-  else // Unsupported color type
-    throw bob::io::ImageUnsupportedColorspace();
+  else {// Unsupported color type
+    throw std::runtime_error("png codec does not support images with color spaces different than GRAY or RGB");
+  }
   if(info.nd == 2)
   {
     info.shape[0] = height;
@@ -125,18 +130,18 @@ static void im_peek(const std::string& path, bob::core::array::typeinfo& info)
 }
 
 template <typename T> static
-void im_load_gray(png_structp png_ptr, bob::core::array::interface& b) 
+void im_load_gray(png_structp png_ptr, bob::core::array::interface& b)
 {
   const bob::core::array::typeinfo& info = b.type();
   const size_t height = info.shape[0];
   const size_t width = info.shape[1];
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED
-  // Turn on interlace handling.  
+  // Turn on interlace handling.
   int number_passes = png_set_interlace_handling(png_ptr);
 #else
   int number_passes = 1;
-#endif // PNG_READ_INTERLACING_SUPPORTED 
+#endif // PNG_READ_INTERLACING_SUPPORTED
 
   // Read the image (one row at a time)
   // This can deal with interlacing
@@ -144,7 +149,7 @@ void im_load_gray(png_structp png_ptr, bob::core::array::interface& b)
   for(int pass=0; pass<number_passes; ++pass)
   {
     // Loop over the rows
-    for(size_t y=0; y<height; ++y) 
+    for(size_t y=0; y<height; ++y)
     {
       ptr = reinterpret_cast<png_bytep>(reinterpret_cast<T*>(b.ptr())+y*width);
       png_read_row(png_ptr, ptr, NULL);
@@ -153,9 +158,9 @@ void im_load_gray(png_structp png_ptr, bob::core::array::interface& b)
 }
 
 template <typename T> static
-void imbuffer_to_rgb(const size_t size, const T* im, T* r, T* g, T* b) 
+void imbuffer_to_rgb(const size_t size, const T* im, T* r, T* g, T* b)
 {
-  for(size_t k=0; k<size; ++k) 
+  for(size_t k=0; k<size; ++k)
   {
     r[k] = im[3*k];
     g[k] = im[3*k +1];
@@ -164,7 +169,7 @@ void imbuffer_to_rgb(const size_t size, const T* im, T* r, T* g, T* b)
 }
 
 template <typename T> static
-void im_load_color(png_structp png_ptr, bob::core::array::interface& b) 
+void im_load_color(png_structp png_ptr, bob::core::array::interface& b)
 {
   const bob::core::array::typeinfo& info = b.type();
   const size_t height = info.shape[1];
@@ -174,14 +179,14 @@ void im_load_color(png_structp png_ptr, bob::core::array::interface& b)
 
   // Allocate array to contains a row of RGB-like pixels
   boost::shared_array<T> row(new T[3*width]);
-  png_bytep row_pointer = reinterpret_cast<png_bytep>(row.get()); 
+  png_bytep row_pointer = reinterpret_cast<png_bytep>(row.get());
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED
-  // Turn on interlace handling.  
+  // Turn on interlace handling.
   int number_passes = png_set_interlace_handling(png_ptr);
 #else
   int number_passes = 1;
-#endif // PNG_READ_INTERLACING_SUPPORTED 
+#endif // PNG_READ_INTERLACING_SUPPORTED
 
   // Read the image (one row at a time)
   // This can deal with interlacing
@@ -205,7 +210,7 @@ void im_load_color(png_structp png_ptr, bob::core::array::interface& b)
   }
 }
 
-static void im_load(const std::string& filename, bob::core::array::interface& b) 
+static void im_load(const std::string& filename, bob::core::array::interface& b)
 {
   // 1. PNG structure declarations
   png_structp png_ptr;
@@ -215,15 +220,15 @@ static void im_load(const std::string& filename, bob::core::array::interface& b)
   boost::shared_ptr<std::FILE> in_file = make_cfile(filename.c_str(), "rb");
 
   // 3. Create and initialize the png_struct with the desired error handler
-  // functions. The compiler header file version is supplied, so that we 
+  // functions. The compiler header file version is supplied, so that we
   // know if the application was compiled with a compatible version of the library.
   png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
   if(png_ptr == NULL) throw std::runtime_error("PNG: error while creating read png structure (function png_create_read_struct())");
 
   // Allocate/initialize the memory for image informatio
   info_ptr = png_create_info_struct(png_ptr);
-  if(info_ptr == NULL) { 
-    png_destroy_read_struct(&png_ptr, NULL, NULL); 
+  if(info_ptr == NULL) {
+    png_destroy_read_struct(&png_ptr, NULL, NULL);
     throw std::runtime_error("PNG: error while creating info png structure (function png_create_info_struct())");
   }
 
@@ -258,30 +263,37 @@ static void im_load(const std::string& filename, bob::core::array::interface& b)
     png_set_expand_gray_1_2_4_to_8(png_ptr);
 
   // We currently only support grayscale and rgb images
-  if(color_type != PNG_COLOR_TYPE_GRAY && color_type != PNG_COLOR_TYPE_RGB)
-    throw bob::io::ImageUnsupportedColorspace();
+  if(color_type != PNG_COLOR_TYPE_GRAY && color_type != PNG_COLOR_TYPE_RGB) {
+    throw std::runtime_error("png codec does not support images with color spaces different than GRAY or RGB");
+  }
 
   // 7. Read content
   const bob::core::array::typeinfo& info = b.type();
   if(info.dtype == bob::core::array::t_uint8) {
     if(info.nd == 2) im_load_gray<uint8_t>(png_ptr, b);
-    else if( info.nd == 3) im_load_color<uint8_t>(png_ptr, b); 
-    else { 
-      png_destroy_read_struct(&png_ptr, &info_ptr, NULL); 
-      throw bob::io::ImageUnsupportedDimension(info.nd);
+    else if( info.nd == 3) im_load_color<uint8_t>(png_ptr, b);
+    else {
+      png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+      boost::format m("the image in file `%s' has a number of dimensions for which this png codec has no support for: %s");
+      m % info.str();
+      throw std::runtime_error(m.str());
     }
   }
   else if(info.dtype == bob::core::array::t_uint16) {
     if(info.nd == 2) im_load_gray<uint16_t>(png_ptr, b);
-    else if( info.nd == 3) im_load_color<uint16_t>(png_ptr, b); 
-    else { 
-      png_destroy_read_struct(&png_ptr, &info_ptr, NULL); 
-      throw bob::io::ImageUnsupportedDimension(info.nd);
+    else if( info.nd == 3) im_load_color<uint16_t>(png_ptr, b);
+    else {
+      png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+      boost::format m("the image in file `%s' has a number of dimensions for which this png codec has no support for: %s");
+      m % info.str();
+      throw std::runtime_error(m.str());
     }
   }
   else {
-    png_destroy_read_struct(&png_ptr, &info_ptr, NULL); 
-    throw bob::io::ImageUnsupportedType();
+    png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+    boost::format m("the image in file `%s' has a data type this png codec has no support for: %s");
+    m % info.str();
+    throw std::runtime_error(m.str());
   }
 
   // 8. Clean up after the read, and free any memory allocated
@@ -295,17 +307,17 @@ static void im_load(const std::string& filename, bob::core::array::interface& b)
  * SAVING
  */
 template <typename T>
-static void im_save_gray(const bob::core::array::interface& b, png_structp png_ptr) 
+static void im_save_gray(const bob::core::array::interface& b, png_structp png_ptr)
 {
   const bob::core::array::typeinfo& info = b.type();
   const size_t height = info.shape[0];
-  const size_t width = info.shape[1];  
+  const size_t width = info.shape[1];
 
   const T* row_pointer = reinterpret_cast<const T*>(b.ptr());
   png_bytep row_pointer_;
 
   // Save one row at a time
-  for(size_t y=0; y<height; ++y) 
+  for(size_t y=0; y<height; ++y)
   {
     row_pointer_ = reinterpret_cast<png_bytep>(const_cast<T*>(row_pointer));
     png_write_row(png_ptr, row_pointer_);
@@ -314,9 +326,9 @@ static void im_save_gray(const bob::core::array::interface& b, png_structp png_p
 }
 
 template <typename T> static
-void rgb_to_imbuffer(const size_t size, const T* r, const T* g, const T* b, T* im) 
+void rgb_to_imbuffer(const size_t size, const T* r, const T* g, const T* b, T* im)
 {
-  for (size_t k=0; k<size; ++k) 
+  for (size_t k=0; k<size; ++k)
   {
     im[3*k]   = r[k];
     im[3*k+1] = g[k];
@@ -325,7 +337,7 @@ void rgb_to_imbuffer(const size_t size, const T* r, const T* g, const T* b, T* i
 }
 
 template <typename T>
-static void im_save_color(const bob::core::array::interface& b, png_structp png_ptr) 
+static void im_save_color(const bob::core::array::interface& b, png_structp png_ptr)
 {
   const bob::core::array::typeinfo& info = b.type();
   const size_t height = info.shape[1];
@@ -335,13 +347,13 @@ static void im_save_color(const bob::core::array::interface& b, png_structp png_
 
   // Allocate array for a row as an RGB-like array
   boost::shared_array<T> row(new T[3*width]);
-  png_bytep array_ptr = reinterpret_cast<png_bytep>(row.get()); 
+  png_bytep array_ptr = reinterpret_cast<png_bytep>(row.get());
 
   // pointer to a single row (png_bytep is a typedef to unsigned char or char)
   const T *element_r = static_cast<const T*>(b.ptr());
   const T *element_g = element_r + frame_size;
   const T *element_b = element_g + frame_size;
-  for(size_t y=0; y<height; ++y) 
+  for(size_t y=0; y<height; ++y)
   {
     rgb_to_imbuffer(row_color_stride, element_r, element_g, element_b, reinterpret_cast<T*>(array_ptr));
     png_write_row(png_ptr, array_ptr);
@@ -351,7 +363,7 @@ static void im_save_color(const bob::core::array::interface& b, png_structp png_
   }
 }
 
-static void im_save(const std::string& filename, const bob::core::array::interface& array) 
+static void im_save(const std::string& filename, const bob::core::array::interface& array)
 {
   // 1. PNG structures
   png_structp png_ptr;
@@ -371,8 +383,8 @@ static void im_save(const std::string& filename, const bob::core::array::interfa
     throw std::runtime_error("PNG: error while creating info png structure (function png_create_info_struct())");
   }
 
-  // 4. Set error handling. 
-  // REQUIRED when an error handling function is not passed in in the 
+  // 4. Set error handling.
+  // REQUIRED when an error handling function is not passed in in the
   //  png_create_write_struct() call.
   if(setjmp(png_jmpbuf(png_ptr)))
   {
@@ -395,11 +407,11 @@ static void im_save(const std::string& filename, const bob::core::array::interfa
   png_uint_32 height = (info.nd == 2 ? info.shape[0] : info.shape[1]);
   png_uint_32 width = (info.nd == 2 ? info.shape[1] : info.shape[2]);
   int bit_depth = (info.dtype == bob::core::array::t_uint8 ? 8 : 16);
-  png_set_IHDR(png_ptr, info_ptr, width, height, bit_depth, 
+  png_set_IHDR(png_ptr, info_ptr, width, height, bit_depth,
     (info.nd == 2 ? PNG_COLOR_TYPE_GRAY : PNG_COLOR_TYPE_RGB),
     PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 
-  // Write the file header information. 
+  // Write the file header information.
   png_write_info(png_ptr, info_ptr);
 
   // Pack pixels into bytes
@@ -409,23 +421,25 @@ static void im_save(const std::string& filename, const bob::core::array::interfa
   if(info.dtype == bob::core::array::t_uint8) {
     if(info.nd == 2) im_save_gray<uint8_t>(array, png_ptr);
     else if(info.nd == 3) {
-      if(info.shape[0] != 3) 
+      if(info.shape[0] != 3)
       {
         png_destroy_write_struct(&png_ptr, &info_ptr);
         throw std::runtime_error("color image does not have 3 planes on 1st. dimension");
       }
       im_save_color<uint8_t>(array, png_ptr);
     }
-    else 
+    else
     {
       png_destroy_write_struct(&png_ptr, &info_ptr);
-      throw bob::io::ImageUnsupportedDimension(info.nd); 
+      boost::format m("the image in file `%s' has a number of dimensions for which this jpeg codec has no support for: %s");
+      m % filename % info.str();
+      throw std::runtime_error(m.str());
     }
   }
   else if(info.dtype == bob::core::array::t_uint16) {
     if(info.nd == 2) im_save_gray<uint16_t>(array, png_ptr);
     else if(info.nd == 3) {
-      if(info.shape[0] != 3) 
+      if(info.shape[0] != 3)
       {
       png_destroy_write_struct(&png_ptr, &info_ptr);
         throw std::runtime_error("color image does not have 3 planes on 1st. dimension");
@@ -435,13 +449,16 @@ static void im_save(const std::string& filename, const bob::core::array::interfa
     else
     {
       png_destroy_write_struct(&png_ptr, &info_ptr);
-      throw bob::io::ImageUnsupportedDimension(info.nd);
+      boost::format m("the image in file `%s' has a number of dimensions for which this jpeg codec has no support for: %s");
+      m % filename % info.str();
+      throw std::runtime_error(m.str());
     }
   }
-  else 
-  {
+  else {
     png_destroy_write_struct(&png_ptr, &info_ptr);
-    throw bob::io::ImageUnsupportedType();
+    boost::format m("the image in file `%s' has a data type this jpeg codec has no support for: %s");
+    m % filename % info.str();
+    throw std::runtime_error(m.str());
   }
 
   // It is REQUIRED to call this to finish writing the rest of the file
@@ -461,7 +478,7 @@ class ImagePngFile: public bob::io::File {
 
         //checks if file exists
         if (mode == 'r' && !boost::filesystem::exists(path)) {
-          boost::format m("file '%s' is not readable");
+          boost::format m("file `%s' is not readable");
           m % path;
           throw std::runtime_error(m.str());
         }
@@ -507,7 +524,7 @@ class ImagePngFile: public bob::io::File {
     }
 
     virtual void read(bob::core::array::interface& buffer, size_t index) {
-      if (m_newfile) 
+      if (m_newfile)
         throw std::runtime_error("uninitialized image file cannot be read");
 
       if (!buffer.type().is_compatible(m_type)) buffer.set(m_type);
@@ -561,7 +578,7 @@ std::string ImagePngFile::s_codecname = "bob.image_png";
 
 /**
  * This defines the factory method F that can create codecs of this type.
- * 
+ *
  * Here are the meanings of the mode flag that should be respected by your
  * factory implementation:
  *
@@ -569,8 +586,8 @@ std::string ImagePngFile::s_codecname = "bob.image_png";
  *      error to open a file that does not exist for read-only operations.
  * 'w': opens for reading and writing, but truncates the file if it
  *      exists; it is not an error to open files that do not exist with
- *      this flag. 
- * 'a': opens for reading and writing - any type of modification can 
+ *      this flag.
+ * 'a': opens for reading and writing - any type of modification can
  *      occur. If the file does not exist, this flag is effectively like
  *      'w'.
  *
@@ -580,7 +597,7 @@ std::string ImagePngFile::s_codecname = "bob.image_png";
  * @note: This method can be static.
  */
 
-static boost::shared_ptr<bob::io::File> 
+static boost::shared_ptr<bob::io::File>
 make_file (const std::string& path, char mode) {
   return boost::make_shared<ImagePngFile>(path, mode);
 }

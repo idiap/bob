@@ -6,16 +6,16 @@
  * @brief Implements the HDF5 (.hdf5) array codec
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -27,7 +27,6 @@
 #include <bob/io/CodecRegistry.h>
 
 #include <bob/io/HDF5File.h>
-#include <bob/io/HDF5Exception.h>
 
 #include <bob/core/logging.h>
 
@@ -39,15 +38,15 @@ class HDF5ArrayFile: public bob::io::File {
   public:
 
     HDF5ArrayFile (const std::string& filename, bob::io::HDF5File::mode_t mode):
-      m_file(filename, mode), 
+      m_file(filename, mode),
       m_filename(filename),
       m_size_arrayset(0),
-      m_newfile(true) { 
+      m_newfile(true) {
 
         //tries to update the current descriptors
         std::vector<std::string> paths;
         m_file.paths(paths);
-        
+
         if (paths.size()) { //file contains data, read it and establish defaults
           m_path = paths[0]; ///< locks on a path name from now on...
           m_newfile = false; ///< blocks re-initialization
@@ -166,7 +165,7 @@ class HDF5ArrayFile: public bob::io::File {
     }
 
   private: //representation
-    
+
     bob::io::HDF5File m_file;
     std::string  m_filename;
     bob::core::array::typeinfo m_type_array;    ///< type for reading all data at once
@@ -189,7 +188,7 @@ std::string HDF5ArrayFile::s_codecname = "bob.hdf5";
 
 /**
  * This defines the factory method F that can create codecs of this type.
- * 
+ *
  * Here are the meanings of the mode flag that should be respected by your
  * factory implementation:
  *
@@ -197,8 +196,8 @@ std::string HDF5ArrayFile::s_codecname = "bob.hdf5";
  *      error to open a file that does not exist for read-only operations.
  * 'w': opens for reading and writing, but truncates the file if it
  *      exists; it is not an error to open files that do not exist with
- *      this flag. 
- * 'a': opens for reading and writing - any type of modification can 
+ *      this flag.
+ * 'a': opens for reading and writing - any type of modification can
  *      occur. If the file does not exist, this flag is effectively like
  *      'w'.
  *
@@ -207,7 +206,7 @@ std::string HDF5ArrayFile::s_codecname = "bob.hdf5";
  *
  * @note: This method can be static.
  */
-static boost::shared_ptr<bob::io::File> 
+static boost::shared_ptr<bob::io::File>
 make_file (const std::string& path, char mode) {
 
   bob::io::HDF5File::mode_t h5mode;
@@ -228,7 +227,7 @@ static bool register_codec() {
 
   boost::shared_ptr<bob::io::CodecRegistry> instance =
     bob::io::CodecRegistry::instance();
-  
+
   instance->registerExtension(".h5", description, &make_file);
   instance->registerExtension(".hdf5", description, &make_file);
   instance->registerExtension(".hdf", description, &make_file);

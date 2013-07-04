@@ -6,16 +6,16 @@
  * @brief Binds our C++ HDF5 interface to python
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -47,13 +47,6 @@ static bool hdf5type_compatible(const bob::io::HDF5Type& t, numeric::array a) {
 }
 
 void bind_io_hdf5_extras() {
-
-  //specific exceptions that require special bindings
-  bob::python::register_exception_translator<bob::io::HDF5Exception>(PyExc_RuntimeError);
-  bob::python::register_exception_translator<bob::io::HDF5UnsupportedCxxTypeError>(PyExc_TypeError);
-  bob::python::register_exception_translator<bob::io::HDF5UnsupportedTypeError>(PyExc_TypeError);
-  bob::python::register_exception_translator<bob::io::HDF5IndexError>(PyExc_IndexError);
-  bob::python::register_exception_translator<bob::io::HDF5IncompatibleIO>(PyExc_IOError);
 
   //this class describes an HDF5 type
   class_<bob::io::HDF5Type, boost::shared_ptr<bob::io::HDF5Type> >("HDF5Type", "Support to compare data types, convert types into runtime equivalents and make our life easier when deciding what to input and output.", no_init)

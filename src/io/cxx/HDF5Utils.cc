@@ -20,6 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/format.hpp>
 #include <boost/make_shared.hpp>
 #include <bob/io/HDF5Utils.h>
 #include <bob/core/logging.h>
@@ -60,21 +61,35 @@ static boost::shared_ptr<hid_t> open_file(const boost::filesystem::path& path,
 
   if (!boost::filesystem::exists(path) && flags == H5F_ACC_RDONLY) {
     //file was opened for reading, but does not exist... Raise
-    throw bob::io::FileNotReadable(path.string());
+    boost::format m("cannot open file `%s'");
+    m % path.string();
+    throw std::runtime_error(m.str());
   }
 
   if (boost::filesystem::exists(path) && flags != H5F_ACC_TRUNC) { //open
     *retval = H5Fopen(path.string().c_str(), flags, H5P_DEFAULT);
-    if (*retval < 0) throw bob::io::HDF5StatusError("H5Fopen", *retval);
+    if (*retval < 0) {
+      boost::format m("call to HDF5 C-function H5Fopen() returned error %d. HDF5 error statck follows:\n%s");
+      m % *retval % bob::io::format_hdf5_error();
+      throw std::runtime_error(m.str());
+    }
     //replaces the file create list properties with the one from the file
     fcpl = boost::shared_ptr<hid_t>(new hid_t(-1), std::ptr_fun(delete_h5p));
     *fcpl = H5Fget_create_plist(*retval);
-    if (*fcpl < 0) throw bob::io::HDF5StatusError("H5Fget_create_list", *fcpl);
+    if (*fcpl < 0) {
+      boost::format m("call to HDF5 C-function H5Fget_create_list() returned error %d. HDF5 error statck follows:\n%s");
+      m % *fcpl % bob::io::format_hdf5_error();
+      throw std::runtime_error(m.str());
+    }
   }
   else { //file needs to be created or truncated (can set user block)
     *retval = H5Fcreate(path.string().c_str(), H5F_ACC_TRUNC,
         *fcpl, H5P_DEFAULT);
-    if (*retval < 0) throw bob::io::HDF5StatusError("H5Fcreate", *retval);
+    if (*retval < 0) {
+      boost::format m("call to HDF5 C-function H5Fcreate() returned error %d. HDF5 error statck follows:\n%s");
+      m % *retval % bob::io::format_hdf5_error();
+      throw std::runtime_error(m.str());
+    }
   }
   return retval;
 }
@@ -84,9 +99,17 @@ static boost::shared_ptr<hid_t> create_fcpl(hsize_t userblock_size) {
   //otherwise we have to go through the settings
   boost::shared_ptr<hid_t> retval(new hid_t(-1), std::ptr_fun(delete_h5p));
   *retval = H5Pcreate(H5P_FILE_CREATE);
-  if (*retval < 0) throw bob::io::HDF5StatusError("H5Pcreate", *retval);
+  if (*retval < 0) {
+    boost::format m("call to HDF5 C-function H5Pcreate() returned error %d. HDF5 error statck follows:\n%s");
+    m % *retval % bob::io::format_hdf5_error();
+    throw std::runtime_error(m.str());
+  }
   herr_t err = H5Pset_userblock(*retval, userblock_size);
-  if (err < 0) throw bob::io::HDF5StatusError("H5Pset_userblock", err);
+  if (err < 0) {
+    boost::format m("call to HDF5 C-function H5Pset_userblock() returned error %d. HDF5 error statck follows:\n%s");
+    m % err % bob::io::format_hdf5_error();
+    throw std::runtime_error(m.str());
+  }
   return retval;
 }
 
@@ -121,7 +144,11 @@ bool bob::io::detail::hdf5::File::writeable() const {
 size_t bob::io::detail::hdf5::File::userblock_size() const {
   hsize_t retval;
   herr_t err = H5Pget_userblock(*m_fcpl, &retval);
-  if (err < 0) throw bob::io::HDF5StatusError("H5Pget_create_plist", err);
+  if (err < 0) {
+    boost::format m("Call to HDF5 C-function H5Pget_create_plist() returned error %d. HDF5 error statck follows:\n%s");
+    m % err % bob::io::format_hdf5_error();
+    throw std::runtime_error(m.str());
+  }
   return retval;
 }
 

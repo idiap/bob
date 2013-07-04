@@ -23,9 +23,9 @@
 #include <stdexcept>
 #include <algorithm>
 #include <limits>
+#include <boost/format.hpp>
 #include <bob/measure/error.h>
 #include <bob/core/blitz_compat.h>
-#include <bob/core/Exception.h>
 #include <bob/core/assert.h>
 #include <bob/core/cast.h>
 #include <bob/math/pavx.h>
@@ -60,12 +60,13 @@ double bob::measure::eerRocch(const blitz::Array<double,1>& negatives,
 double bob::measure::farThreshold(const blitz::Array<double,1>& negatives,
   const blitz::Array<double,1>&, double far_value) {
   // check the parameters are valid
-  if (far_value < 0. || far_value > 1.){
-    std::ostringstream s;
-    throw bob::core::InvalidArgumentException("far_value", far_value, 0., 1.);
+  if (far_value < 0. || far_value > 1.) {
+    boost::format m("the argument for `far_value' cannot take the value %f - the value must be in the interval [0.,1.]");
+    m % far_value;
+    throw std::runtime_error(m.str());
   }
-  if (negatives.size() < 2){
-    throw bob::core::InvalidArgumentException("The number of negatives must at least be two!");
+  if (negatives.size() < 2) {
+    throw std::runtime_error("the number of negative scores must be at least 2");
   }
 
   // sort negative scores ascendingly
@@ -99,12 +100,13 @@ double bob::measure::frrThreshold(const blitz::Array<double,1>&,
   const blitz::Array<double,1>& positives, double frr_value) {
 
   // check the parameters are valid
-  if (frr_value < 0. || frr_value > 1.){
-    std::ostringstream s;
-    throw bob::core::InvalidArgumentException("frr_value", frr_value, 0., 1.);
+  if (frr_value < 0. || frr_value > 1.) {
+    boost::format m("the argument for `frr_value' cannot take the value %f - the value must be in the interval [0.,1.]");
+    m % frr_value;
+    throw std::runtime_error(m.str());
   }
-  if (positives.size() < 2){
-    throw bob::core::InvalidArgumentException("The number of positives must at least be two!");
+  if (positives.size() < 2) {
+    throw std::runtime_error("the number of positive scores must be at least 2");
   }
 
   // sort positive scores descendingly
@@ -181,24 +183,24 @@ blitz::Array<double,2> bob::measure::roc(const blitz::Array<double,1>& negatives
 /**
   * Structure for getting permutations when sorting an array
   */
-struct ComparePairs 
+struct ComparePairs
 {
-  ComparePairs(const blitz::Array<double,1> &v): 
-    m_v(v) 
+  ComparePairs(const blitz::Array<double,1> &v):
+    m_v(v)
   {
   }
 
   bool operator()(size_t a, size_t b)
-  { 
-    return m_v(a) < m_v(b); 
+  {
+    return m_v(a) < m_v(b);
   }
 
   blitz::Array<double,1> m_v;
 };
 
-ComparePairs CreateComparePairs(const blitz::Array<double,1>& v) 
-{ 
-  return ComparePairs(v); 
+ComparePairs CreateComparePairs(const blitz::Array<double,1>& v)
+{
+  return ComparePairs(v);
 }
 
 /**
@@ -215,7 +217,7 @@ void sortWithPermutation(const blitz::Array<double,1>& values, std::vector<size_
 }
 
 blitz::Array<double,2> bob::measure::rocch(const blitz::Array<double,1>& negatives,
- const blitz::Array<double,1>& positives) 
+ const blitz::Array<double,1>& positives)
 {
   // Number of positive and negative scores
   size_t Nt = positives.extent(0);
@@ -271,20 +273,20 @@ blitz::Array<double,2> bob::measure::rocch(const blitz::Array<double,1>& negativ
   return retval;
 }
 
-double bob::measure::rocch2eer(const blitz::Array<double,2>& pmiss_pfa) 
+double bob::measure::rocch2eer(const blitz::Array<double,2>& pmiss_pfa)
 {
   bob::core::array::assertSameDimensionLength(2, pmiss_pfa.extent(0));
-  const int N = pmiss_pfa.extent(1);  
+  const int N = pmiss_pfa.extent(1);
 
   double eer = 0.;
   blitz::Array<double,2> XY(2,2);
   blitz::Array<double,1> one(2);
   one = 1.;
   blitz::Array<double,1> seg(2);
-  double& XY00 = XY(0,0); 
-  double& XY01 = XY(0,1); 
-  double& XY10 = XY(1,0); 
-  double& XY11 = XY(1,1); 
+  double& XY00 = XY(0,0);
+  double& XY01 = XY(0,1);
+  double& XY10 = XY(1,0);
+  double& XY11 = XY(1,1);
 
   double eerseg = 0.;
   for(int i=0; i<N-1; ++i)
@@ -307,9 +309,9 @@ double bob::measure::rocch2eer(const blitz::Array<double,2>& pmiss_pfa)
       // Find line coefficients seg s.t. XY.seg = 1,
       bob::math::linsolve_(XY, seg, one);
       // Candidate for the EER (to be compared to current value)
-      eerseg = 1. / blitz::sum(seg); 
+      eerseg = 1. / blitz::sum(seg);
     }
-  
+
     eer = std::max(eer, eerseg);
   }
 

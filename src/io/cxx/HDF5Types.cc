@@ -6,16 +6,16 @@
  * @brief A few helpers to handle HDF5 datasets in a more abstract way.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -39,11 +39,10 @@
 
 #include <bob/core/logging.h>
 #include <bob/io/HDF5Types.h>
-#include <bob/io/HDF5Exception.h>
 
 const char* bob::io::stringize (hdf5type t) {
   switch (t) {
-    case bob::io::s: 
+    case bob::io::s:
       return "string";
     case bob::io::b:
       return "bool";
@@ -132,8 +131,11 @@ bob::io::HDF5Shape::HDF5Shape (size_t n):
   m_n(n),
   m_shape()
 {
-  if (n > MAX_HDF5SHAPE_SIZE) 
-    throw std::length_error("maximum number of dimensions exceeded");
+  if (n > MAX_HDF5SHAPE_SIZE) {
+    boost::format m("cannot create shape with %u dimensions, exceeding the maximum number of dimensions supported by this API (%u)");
+    m % n % MAX_HDF5SHAPE_SIZE;
+    throw std::runtime_error(m.str());
+  }
   for (size_t i=0; i<n; ++i) m_shape[i] = 0;
 }
 
@@ -181,8 +183,11 @@ bob::io::HDF5Shape& bob::io::HDF5Shape::operator <<= (size_t pos) {
 
 bob::io::HDF5Shape& bob::io::HDF5Shape::operator >>= (size_t pos) {
   if (!pos) return *this;
-  if ( (m_n + pos) > MAX_HDF5SHAPE_SIZE) 
-    throw std::length_error("maximum number of dimensions will exceed");
+  if ( (m_n + pos) > MAX_HDF5SHAPE_SIZE) {
+    boost::format m("if you shift right this shape by %u positions, you will exceed the maximum number of dimensions supported by this API (%u)");
+    m % pos % MAX_HDF5SHAPE_SIZE;
+    throw std::runtime_error(m.str());
+  }
   for (size_t i=(m_n+pos-1); i>(pos-1); --i) m_shape[i] = m_shape[i-1];
   for (size_t i=0; i<pos; ++i) m_shape[i] = 1;
   m_n += pos;
@@ -218,13 +223,13 @@ std::string bob::io::HDF5Shape::str () const {
  */
 static void delete_h5datatype (hid_t* p) {
   if (*p >= 0) {
-    herr_t err = H5Tclose(*p); 
+    herr_t err = H5Tclose(*p);
     if (err < 0) {
       bob::core::error << "H5Tclose() exited with an error (" << err << "). The stack trace follows:" << std::endl;
       bob::core::error << bob::io::format_hdf5_error() << std::endl;
     }
   }
-  delete p; 
+  delete p;
 }
 
 /**
@@ -232,7 +237,7 @@ static void delete_h5datatype (hid_t* p) {
  * hdf5type equivalent or raises.
  */
 static bob::io::hdf5type equivctype(const boost::shared_ptr<hid_t>& dt) {
-  if (H5Tget_nmembers(*dt) != 2) throw bob::io::HDF5UnsupportedTypeError(dt);
+  if (H5Tget_nmembers(*dt) != 2) throw std::runtime_error("the internal HDF5 type is not supported by our HDF5 interface");
 
   //members have to:
   // 1. have names "real" and "imag"
@@ -240,21 +245,21 @@ static bob::io::hdf5type equivctype(const boost::shared_ptr<hid_t>& dt) {
   // 3. have equal size
   // 4. have a size of 4, 8 or 16 bytes
 
-  // 1. 
+  // 1.
   int real = H5Tget_member_index(*dt, "real");
   if (real < 0) {
-    throw bob::io::HDF5UnsupportedTypeError(dt);
+    throw std::runtime_error("the complex member index for `real' is not present on this HDF5 type");
   }
   int imag = H5Tget_member_index(*dt, "imag");
   if (imag < 0) {
-    throw bob::io::HDF5UnsupportedTypeError(dt);
+    throw std::runtime_error("the complex member index for `imag' is not present on this HDF5 type");
   }
 
   // 2.
-  if (H5Tget_member_class(*dt, real) != H5T_FLOAT) 
-    throw bob::io::HDF5UnsupportedTypeError(dt);
+  if (H5Tget_member_class(*dt, real) != H5T_FLOAT)
+    throw std::runtime_error("the raw type for member `real' on complex structure in HDF5 is not H5T_FLOAT as expected");
   if (H5Tget_member_class(*dt, imag) != H5T_FLOAT)
-    throw bob::io::HDF5UnsupportedTypeError(dt);
+    throw std::runtime_error("the raw type for member `imag' on complex structure in HDF5 is not H5T_FLOAT as expected");
 
   // 3.
   boost::shared_ptr<hid_t> realid(new hid_t(-1), std::ptr_fun(delete_h5datatype));
@@ -264,7 +269,7 @@ static bob::io::hdf5type equivctype(const boost::shared_ptr<hid_t>& dt) {
   size_t realsize = H5Tget_size(*realid);
   size_t imagsize = H5Tget_size(*imagid);
   if (realsize != imagsize) {
-    throw bob::io::HDF5UnsupportedTypeError(dt);
+    throw std::runtime_error("the sizes of the real and imaginary parts on HDF5 complex struct are not the same");
   }
 
   // 4.
@@ -279,7 +284,7 @@ static bob::io::hdf5type equivctype(const boost::shared_ptr<hid_t>& dt) {
       break;
   }
 
-  throw bob::io::HDF5UnsupportedTypeError(dt);
+  throw std::runtime_error("could not find the equivalent internal type for (supposedly) complex HDF5 structure");
 }
 
 /**
@@ -287,20 +292,34 @@ static bob::io::hdf5type equivctype(const boost::shared_ptr<hid_t>& dt) {
  */
 static void checkbool(const boost::shared_ptr<hid_t>& dt) {
 
-  if (H5Tget_nmembers(*dt) != 2) throw bob::io::HDF5UnsupportedTypeError(dt);
-  
+  if (H5Tget_nmembers(*dt) != 2) {
+    throw std::runtime_error("the number of enumeration members for the locally installed boolean type is not 2");
+  }
+
   int8_t value;
   herr_t status = H5Tget_member_value(*dt, 0, &value);
-  if (status < 0) throw bob::io::HDF5StatusError("H5Tget_member_value", status);
+  if (status < 0) {
+    boost::format m("call to HDF5 C-function H5Tget_member_value() returned error %d. HDF5 error statck follows:\n%s");
+    m % status % bob::io::format_hdf5_error();
+    throw std::runtime_error(m.str());
+  }
   bool next_is_false = false;
   if (value != 0) next_is_false = true;
   status = H5Tget_member_value(*dt, 1, &value);
-  if (status < 0) throw bob::io::HDF5StatusError("H5Tget_member_value", status);
+  if (status < 0) {
+    boost::format m("call to HDF5 C-function H5Tget_member_value() returned error %d. HDF5 error statck follows:\n%s");
+    m % status % bob::io::format_hdf5_error();
+    throw std::runtime_error(m.str());
+  }
   if (next_is_false) {
-    if (value != 0) throw bob::io::HDF5UnsupportedTypeError(dt);
+    if (value != 0) {
+      throw std::runtime_error("the attribution of false(0) or true(1) is messed up on the current data type, which is supposed to be a boolean");
+    }
   }
   else {
-    if (value == 0) throw bob::io::HDF5UnsupportedTypeError(dt);
+    if (value == 0) {
+      throw std::runtime_error("the attribution of false(0) or true(1) is messed up on the current data type, which is supposed to be a boolean");
+    }
   }
 }
 
@@ -310,28 +329,32 @@ static void checkbool(const boost::shared_ptr<hid_t>& dt) {
 static bob::io::hdf5type get_datatype
 (const boost::shared_ptr<hid_t>& dt) {
   H5T_class_t classtype = H5Tget_class(*dt);
-    
+
   if (classtype == H5T_STRING) return bob::io::s; //no need to check further
 
   size_t typesize = H5Tget_size(*dt); ///< element size
   H5T_sign_t signtype = H5Tget_sign(*dt);
-  
+
   //we only support little-endian byte-ordering
   H5T_order_t ordertype = H5Tget_order(*dt);
 
   //please note that checking compound types for hdf5 < 1.8.6 does not work.
 # if H5_VERSION_GE(1,8,6)
-  if (ordertype < 0) throw bob::io::HDF5StatusError("H5Tget_order", ordertype);
+  if (ordertype < 0) {
+    boost::format m("call to HDF5 C-function H5Tget_order returned error %d. HDF5 error statck follows:\n%s");
+    m % ordertype % bob::io::format_hdf5_error();
+    throw std::runtime_error(m.str());
+  }
 
   if (ordertype != H5T_ORDER_LE) {
-    throw bob::io::HDF5UnsupportedTypeError(dt);
+    throw std::runtime_error("The endianness of datatype is not little-endian");
   }
 # else
   if ((ordertype >= 0) && (ordertype != H5T_ORDER_LE)) {
-    throw bob::io::HDF5UnsupportedTypeError(dt);
+    throw std::runtime_error("The endianness of datatype is not little-endian");
   }
 # endif
-  
+
   switch (classtype) {
     case H5T_ENUM:
       checkbool(dt);
@@ -345,7 +368,7 @@ static bob::io::hdf5type get_datatype
             case H5T_SGN_2: //two's complement == "is signed" ;-)
               return bob::io::i8;
             default:
-              throw bob::io::HDF5UnsupportedTypeError(dt);
+              throw std::runtime_error("HDF5 1-byte integer datatype (read from file) cannot be mapped into a C++ type supported by this API");
           }
           break;
         case 2: //int16 or uint16
@@ -355,7 +378,7 @@ static bob::io::hdf5type get_datatype
             case H5T_SGN_2: //two's complement == "is signed" ;-)
               return bob::io::i16;
             default:
-              throw bob::io::HDF5UnsupportedTypeError(dt);
+              throw std::runtime_error("HDF5 2-byte integer datatype (read from file) cannot be mapped into a C++ type supported by this API");
           }
           break;
         case 4: //int32 or uint32
@@ -365,7 +388,7 @@ static bob::io::hdf5type get_datatype
             case H5T_SGN_2: //two's complement == "is signed" ;-)
               return bob::io::i32;
             default:
-              throw bob::io::HDF5UnsupportedTypeError(dt);
+              throw std::runtime_error("HDF5 4-byte integer datatype (read from file) cannot be mapped into a C++ type supported by this API");
           }
           break;
         case 8: //int64 or uint64
@@ -375,7 +398,7 @@ static bob::io::hdf5type get_datatype
             case H5T_SGN_2: //two's complement == "is signed" ;-)
               return bob::io::i64;
             default:
-              throw bob::io::HDF5UnsupportedTypeError(dt);
+              throw std::runtime_error("HDF5 8-byte integer datatype (read from file) cannot be mapped into a C++ type supported by this API");
           }
           break;
         default:
@@ -399,7 +422,8 @@ static bob::io::hdf5type get_datatype
     default:
       break;
   }
-  throw bob::io::HDF5UnsupportedTypeError(dt);
+
+  throw std::runtime_error("cannot handle HDF5 datatype on file using one of the native types supported by this API");
 }
 
 bool bob::io::HDF5Type::compatible (const bob::core::array::typeinfo& value) const
@@ -417,11 +441,19 @@ boost::shared_ptr<hid_t> bob::io::HDF5Type::htype() const {
         boost::shared_ptr<hid_t> retval(new hid_t(-1),
             std::ptr_fun(delete_h5datatype));
         *retval = H5Tcopy(H5T_C_S1);
-        if (*retval < 0) throw bob::io::HDF5StatusError("H5Tcopy", *retval);
+        if (*retval < 0) {
+          boost::format m("call to HDF5 C-function H5Tcopy() returned error %d. HDF5 error statck follows:\n%s");
+          m % *retval % bob::io::format_hdf5_error();
+          throw std::runtime_error(m.str());
+        }
 
         //set string size
         herr_t status = H5Tset_size(*retval, m_shape[0]);
-        if (status < 0) throw bob::io::HDF5StatusError("H5Tset_size", status);
+        if (status < 0) {
+          boost::format m("Call to HDF5 C-function H5Tset_size() returned error %d. HDF5 error statck follows:\n%s");
+          m % status % bob::io::format_hdf5_error();
+          throw std::runtime_error(m.str());
+        }
 
         return retval;
       }
@@ -433,19 +465,31 @@ boost::shared_ptr<hid_t> bob::io::HDF5Type::htype() const {
         boost::shared_ptr<hid_t> retval(new hid_t(-1),
             std::ptr_fun(delete_h5datatype));
         *retval = H5Tenum_create(H5T_NATIVE_INT8);
-        if (*retval < 0) throw bob::io::HDF5StatusError("H5Tenum_create", *retval);
+        if (*retval < 0) {
+          boost::format m("call to HDF5 C-function H5Tenum_create() returned error %d. HDF5 error statck follows:\n%s");
+          m % *retval % bob::io::format_hdf5_error();
+          throw std::runtime_error(m.str());
+        }
         int8_t val;
         herr_t status;
-       
+
         //defines false
         val = 0;
         status = H5Tenum_insert(*retval, "false", &val);
-        if (status < 0) throw bob::io::HDF5StatusError("H5Tenum_insert", status);
+        if (status < 0) {
+          boost::format m("call to HDF5 C-function H5Tenum_insert() returned error %d. HDF5 error statck follows:\n%s");
+          m % status % bob::io::format_hdf5_error();
+          throw std::runtime_error(m.str());
+        }
 
         //defines true
         val = 1;
         status = H5Tenum_insert(*retval, "true",  &val);
-        if (*retval < 0) throw bob::io::HDF5StatusError("H5Tenum_insert", status);
+        if (*retval < 0) {
+          boost::format m("call to HDF5 C-function H5Tenum_insert() returned error %d. HDF5 error statck follows:\n%s");
+          m % *retval % bob::io::format_hdf5_error();
+          throw std::runtime_error(m.str());
+        }
 
         return retval;
       }
@@ -476,23 +520,47 @@ boost::shared_ptr<hid_t> bob::io::HDF5Type::htype() const {
         boost::shared_ptr<hid_t> retval(new hid_t(-1),
             std::ptr_fun(delete_h5datatype));
         *retval = H5Tcreate(H5T_COMPOUND, 2*sizeof(float));
-        if (*retval < 0) throw bob::io::HDF5StatusError("H5Tcreate", *retval);
+        if (*retval < 0) {
+          boost::format m("call to HDF5 C-function H5Tcreate() returned error %d. HDF5 error statck follows:\n%s");
+          m % *retval % bob::io::format_hdf5_error();
+          throw std::runtime_error(m.str());
+        }
         herr_t status = H5Tinsert(*retval, "real", 0, H5T_NATIVE_FLOAT);
-        if (status < 0) throw bob::io::HDF5StatusError("H5Tinsert", status);
+        if (status < 0) {
+          boost::format m("call to HDF5 C-function H5Tinsert() returned error %d. HDF5 error statck follows:\n%s");
+          m % status % bob::io::format_hdf5_error();
+          throw std::runtime_error(m.str());
+        }
         status = H5Tinsert(*retval, "imag", sizeof(float), H5T_NATIVE_FLOAT);
-        if (status < 0) throw bob::io::HDF5StatusError("H5Tinsert", status);
+        if (status < 0) {
+          boost::format m("call to HDF5 C-function H5Tinsert() returned error %d. HDF5 error statck follows:\n%s");
+          m % status % bob::io::format_hdf5_error();
+          throw std::runtime_error(m.str());
+        }
         return retval;
       }
-    case bob::io::c128: 
+    case bob::io::c128:
       {
         boost::shared_ptr<hid_t> retval(new hid_t(-1),
             std::ptr_fun(delete_h5datatype));
         *retval = H5Tcreate(H5T_COMPOUND, 2*sizeof(double));
-        if (*retval < 0) throw bob::io::HDF5StatusError("H5Tcreate", *retval);
+        if (*retval < 0) {
+          boost::format m("call to HDF5 C-function H5Tcreate() returned error %d. HDF5 error statck follows:\n%s");
+          m % *retval % bob::io::format_hdf5_error();
+          throw std::runtime_error(m.str());
+        }
         herr_t status = H5Tinsert(*retval, "real", 0, H5T_NATIVE_DOUBLE);
-        if (status < 0) throw bob::io::HDF5StatusError("H5Tinsert", status);
+        if (status < 0) {
+          boost::format m("call to HDF5 C-function H5Tinsert() returned error %d. HDF5 error statck follows:\n%s");
+          m % status % bob::io::format_hdf5_error();
+          throw std::runtime_error(m.str());
+        }
         status = H5Tinsert(*retval, "imag", sizeof(double), H5T_NATIVE_DOUBLE);
-        if (status < 0) throw bob::io::HDF5StatusError("H5Tinsert", status);
+        if (status < 0) {
+          boost::format m("call to HDF5 C-function H5Tinsert() returned error %d. HDF5 error statck follows:\n%s");
+          m % status % bob::io::format_hdf5_error();
+          throw std::runtime_error(m.str());
+        }
         return retval;
       }
     case bob::io::c256:
@@ -500,19 +568,31 @@ boost::shared_ptr<hid_t> bob::io::HDF5Type::htype() const {
         boost::shared_ptr<hid_t> retval(new hid_t(-1),
             std::ptr_fun(delete_h5datatype));
         *retval = H5Tcreate(H5T_COMPOUND, 2*sizeof(long double));
-        if (*retval < 0) throw bob::io::HDF5StatusError("H5Tcreate", *retval);
+        if (*retval < 0) {
+          boost::format m("call to HDF5 C-function H5Tcreate() returned error %d. HDF5 error statck follows:\n%s");
+          m % *retval % bob::io::format_hdf5_error();
+          throw std::runtime_error(m.str());
+        }
         herr_t status = H5Tinsert(*retval, "real", 0, H5T_NATIVE_LDOUBLE);
-        if (status < 0) throw bob::io::HDF5StatusError("H5Tinsert", status);
+        if (status < 0) {
+          boost::format m("call to HDF5 C-function H5Tinsert() returned error %d. HDF5 error statck follows:\n%s");
+          m % status % bob::io::format_hdf5_error();
+          throw std::runtime_error(m.str());
+        }
         status = H5Tinsert(*retval, "imag", sizeof(long double), H5T_NATIVE_LDOUBLE);
-        if (status < 0) throw bob::io::HDF5StatusError("H5Tinsert", status);
+        if (status < 0) {
+          boost::format m("call to HDF5 C-function H5Tinsert() returned error %d. HDF5 error statck follows:\n%s");
+          m % status % bob::io::format_hdf5_error();
+          throw std::runtime_error(m.str());
+        }
         return retval;
       }
     default:
       break;
   }
-  throw bob::io::HDF5UnsupportedTypeError();
+  throw std::runtime_error("the C++ type you are trying to convert into a native HDF5 type is not supported by this API");
 }
-  
+
 #define DEFINE_SUPPORT(T,E) bob::io::HDF5Type::HDF5Type(const T& value): \
     m_type(E), m_shape(1) { m_shape[0] = 1; }
 DEFINE_SUPPORT(bool,bob::io::b)
@@ -532,10 +612,10 @@ DEFINE_SUPPORT(std::complex<double>,bob::io::c128)
 DEFINE_SUPPORT(std::complex<long double>,bob::io::c256)
 #undef DEFINE_SUPPORT
 
-bob::io::HDF5Type::HDF5Type(const std::string& value): 
-  m_type(bob::io::s), 
-  m_shape(1) 
-{ 
+bob::io::HDF5Type::HDF5Type(const std::string& value):
+  m_type(bob::io::s),
+  m_shape(1)
+{
   m_shape[0] = value.size();
 }
 
@@ -543,8 +623,11 @@ bob::io::HDF5Type::HDF5Type(const std::string& value):
     (const blitz::Array<T,N>& value): \
       m_type(E), \
       m_shape(value.shape()) { \
-        if (N > bob::core::array::N_MAX_DIMENSIONS_ARRAY) \
-        throw bob::io::HDF5UnsupportedDimensionError(N); \
+        if (N > bob::core::array::N_MAX_DIMENSIONS_ARRAY) {\
+          boost::format m("you passed an array with %d dimensions, but this HDF5 API only supports arrays with up to %d dimensions"); \
+          m % N % bob::core::array::N_MAX_DIMENSIONS_ARRAY; \
+          throw std::runtime_error(m.str()); \
+        } \
       }
 
 #define DEFINE_BZ_SUPPORT(T,E) \
@@ -570,7 +653,7 @@ DEFINE_BZ_SUPPORT(std::complex<double>,bob::io::c128)
 DEFINE_BZ_SUPPORT(std::complex<long double>,bob::io::c256)
 #undef DEFINE_BZ_SUPPORT
 #undef DEFINE_SUPPORT
-      
+
 bob::io::HDF5Type::HDF5Type():
   m_type(bob::io::unsupported),
   m_shape()
@@ -628,14 +711,14 @@ static bob::io::hdf5type array_to_hdf5 (bob::core::array::ElementType eltype) {
   throw std::runtime_error("unsupported dtype <=> hdf5 type conversion -- FIXME");
 }
 
-bob::io::HDF5Type::HDF5Type(const bob::core::array::typeinfo& ti): 
+bob::io::HDF5Type::HDF5Type(const bob::core::array::typeinfo& ti):
   m_type(array_to_hdf5(ti.dtype)),
   m_shape(ti.nd, ti.shape)
 {
 }
 
-bob::io::HDF5Type::HDF5Type(bob::core::array::ElementType eltype, 
-    const HDF5Shape& extents): 
+bob::io::HDF5Type::HDF5Type(bob::core::array::ElementType eltype,
+    const HDF5Shape& extents):
   m_type(array_to_hdf5(eltype)),
   m_shape(extents)
 {
@@ -650,7 +733,7 @@ bob::io::HDF5Type::HDF5Type(const boost::shared_ptr<hid_t>& type,
 
 bob::io::HDF5Type::HDF5Type(const boost::shared_ptr<hid_t>& type):
   m_type(get_datatype(type)),
-  m_shape(1) 
+  m_shape(1)
 {
   //strings have to be treated slightly differently
   if (H5Tget_class(*type) == H5T_STRING) m_shape[0] = H5Tget_size(*type);
@@ -737,10 +820,10 @@ void bob::io::HDF5Type::copy_to (bob::core::array::typeinfo& ti) const {
   for (size_t i=0; i<ti.nd; ++i) ti.shape[i] = shape()[i];
   ti.update_strides();
 }
-      
-bob::io::HDF5Descriptor::HDF5Descriptor(const HDF5Type& type, size_t size, 
+
+bob::io::HDF5Descriptor::HDF5Descriptor(const HDF5Type& type, size_t size,
           bool expand):
-  type(type), 
+  type(type),
   size(size),
   expandable(expand),
   hyperslab_start(type.shape().n()),
@@ -774,4 +857,15 @@ bob::io::HDF5Descriptor& bob::io::HDF5Descriptor::subselect() {
   hyperslab_count >>= 1;
   hyperslab_count[0] = 1;
   return *this;
+}
+
+std::string bob::io::format_hdf5_error() {
+  const std::vector<std::string>& stack = bob::io::DefaultHDF5ErrorStack->get();
+  std::ostringstream retval;
+  std::string prefix(" ");
+  if (stack.size()) retval << prefix << stack[0];
+  for (size_t i=1; i<stack.size(); ++i)
+    retval << std::endl << prefix << stack[i];
+  bob::io::DefaultHDF5ErrorStack->clear();
+  return retval.str();
 }

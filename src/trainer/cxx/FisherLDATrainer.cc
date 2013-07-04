@@ -29,7 +29,6 @@
 #include <bob/math/pinv.h>
 #include <bob/math/eig.h>
 #include <bob/math/linear.h>
-#include <bob/machine/EigenMachineException.h>
 #include <bob/trainer/Exception.h>
 #include <bob/trainer/FisherLDATrainer.h>
 
@@ -271,14 +270,14 @@ void bob::trainer::FisherLDATrainer::train
   blitz::Array<double,1> eigen_values_(n_features);
 
   if (m_use_pinv) {
-    
+
     //note: misuse V and Sw as temporary place holders for data
     bob::math::pinv_(Sw, V); //V now contains Sw^-1
     bob::math::prod_(V, Sb, Sw); //Sw now contains Sw^-1*Sb
     blitz::Array<std::complex<double>,1> Dtemp(eigen_values_.shape());
     blitz::Array<std::complex<double>,2> Vtemp(V.shape());
     bob::math::eig_(Sw, Vtemp, Dtemp); //V now contains eigen-vectors
-    
+
     //sorting: we know this problem on has real eigen-values
     blitz::Range a = blitz::Range::all();
     blitz::Array<double,1> Dunordered(blitz::real(Dtemp));

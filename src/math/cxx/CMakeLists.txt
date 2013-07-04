@@ -31,7 +31,6 @@ set(shared "${bob_deps};${lapack_LIBRARIES}")
 set(incdir ${cxx_incdir})
 
 set(src
-  "Exception.cc"
   "norminv.cc"
   "log.cc"
   "eig.cc"

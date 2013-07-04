@@ -20,17 +20,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/format.hpp>
 #include <bob/io/HDF5File.h>
 
 static unsigned int getH5Access (bob::io::HDF5File::mode_t v) {
-  switch(v)
-  {
+  switch(v) {
     case 0: return H5F_ACC_RDONLY;
     case 1: return H5F_ACC_RDWR;
     case 2: return H5F_ACC_TRUNC;
     case 4: return H5F_ACC_EXCL;
     default:
-      throw bob::io::HDF5InvalidFileAccessModeError(v);
+            {
+              boost::format m("Trying to use an undefined access mode '%d'");
+              m % v;
+              throw std::runtime_error(m.str());
+            }
   }
 }
 
@@ -224,7 +228,7 @@ void bob::io::HDF5File::listAttributes(const std::string& path,
   }
 }
 
-void bob::io::HDF5File::read_attribute(const std::string& path, 
+void bob::io::HDF5File::read_attribute(const std::string& path,
     const std::string& name, const bob::io::HDF5Type& type, void* buffer) const {
   if (m_cwd->has_dataset(path)) {
     (*m_cwd)[path]->read_attribute(name, type, buffer);

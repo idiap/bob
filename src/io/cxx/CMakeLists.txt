@@ -15,7 +15,6 @@ set(src
     "CodecRegistry.cc"
     "utils.cc"
 
-    "HDF5Exception.cc"
     "HDF5Types.cc"
     "HDF5Utils.cc"
     "HDF5Group.cc"

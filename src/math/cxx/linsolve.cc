@@ -4,22 +4,22 @@
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdexcept>
 #include <bob/math/linsolve.h>
-#include <bob/math/Exception.h>
 #include <bob/math/linear.h>
 #include <bob/core/assert.h>
 #include <bob/core/check.h>
@@ -27,9 +27,9 @@
 #include <boost/shared_array.hpp>
 
 // Declaration of the external LAPACK function (Linear system solvers)
-extern "C" void dgesv_( const int *N, const int *NRHS, double *A, 
+extern "C" void dgesv_( const int *N, const int *NRHS, double *A,
   const int *lda, int *ipiv, double *B, const int *ldb, int *info);
-extern "C" void dposv_( const char* uplo, const int *N, const int *NRHS, 
+extern "C" void dposv_( const char* uplo, const int *N, const int *NRHS,
   double *A, const int *lda, double *B, const int *ldb, int *info);
 
 void bob::math::linsolve(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
@@ -39,7 +39,7 @@ void bob::math::linsolve(const blitz::Array<double,2>& A, blitz::Array<double,1>
   bob::core::array::assertZeroBase(x);
   bob::core::array::assertZeroBase(b);
   bob::core::array::assertSameDimensionLength(x.extent(0), b.extent(0));
-  
+
   // Check A
   bob::core::array::assertZeroBase(A);
   bob::core::array::assertSameDimensionLength(A.extent(0), A.extent(1));
@@ -59,13 +59,13 @@ void bob::math::linsolve_(const blitz::Array<double,2>& A, blitz::Array<double,1
   boost::shared_array<int> ipiv(new int[N]);
   // Transpose (C: row major order, Fortran: column major)
   // Ugly fix for old blitz version support
-  blitz::Array<double,2> A_blitz_lapack( 
+  blitz::Array<double,2> A_blitz_lapack(
     bob::core::array::ccopy(const_cast<blitz::Array<double,2>&>(A).transpose(1,0)));
   double* A_lapack = A_blitz_lapack.data();
   // Tries to use X directly
   bool x_direct_use = bob::core::array::isCZeroBaseContiguous(x);
   blitz::Array<double,1> x_blitz_lapack;
-  if (x_direct_use) 
+  if (x_direct_use)
   {
     x_blitz_lapack.reference(x);
     x_blitz_lapack = b;
@@ -74,17 +74,17 @@ void bob::math::linsolve_(const blitz::Array<double,2>& A, blitz::Array<double,1
     x_blitz_lapack.reference(bob::core::array::ccopy(b));
   double *x_lapack = x_blitz_lapack.data();
   // Remaining variables
-  int info = 0;  
+  int info = 0;
   const int lda = N;
   const int ldb = N;
   const int NRHS = 1;
- 
+
   // Calls the LAPACK function (dgesv(
   dgesv_( &N, &NRHS, A_lapack, &lda, ipiv.get(), x_lapack, &ldb, &info );
- 
+
   // Check info variable
   if (info != 0)
-    throw bob::math::LapackError("The LAPACK dgesv function returned a non-zero value.");
+    throw std::runtime_error("The LAPACK dgesv function returned a non-zero value.");
 
   // Copy result back to x if required
   if (!x_direct_use)
@@ -111,7 +111,7 @@ void bob::math::linsolve_(const blitz::Array<double,2>& A, blitz::Array<double,2
   const blitz::Array<double,2>& B)
 {
   // Defines dimensionality variables
-  const int N = A.extent(0); 
+  const int N = A.extent(0);
   const int P = X.extent(1);
 
   // Prepares to call LAPACK function (dgesv)
@@ -119,14 +119,14 @@ void bob::math::linsolve_(const blitz::Array<double,2>& A, blitz::Array<double,2
   boost::shared_array<int> ipiv(new int[N]);
   // Transpose (C: row major order, Fortran: column major)
   // Ugly fix for old blitz version support
-  blitz::Array<double,2> A_blitz_lapack( 
+  blitz::Array<double,2> A_blitz_lapack(
     bob::core::array::ccopy(const_cast<blitz::Array<double,2>&>(A).transpose(1,0)));
   double* A_lapack = A_blitz_lapack.data();
   // Tries to use X directly
   blitz::Array<double,2> Xt = X.transpose(1,0);
   bool X_direct_use = bob::core::array::isCZeroBaseContiguous(Xt);
   blitz::Array<double,2> X_blitz_lapack;
-  if (X_direct_use) 
+  if (X_direct_use)
   {
     X_blitz_lapack.reference(Xt);
     // Ugly fix for old blitz version support
@@ -137,17 +137,17 @@ void bob::math::linsolve_(const blitz::Array<double,2>& A, blitz::Array<double,2
       bob::core::array::ccopy(const_cast<blitz::Array<double,2>&>(B).transpose(1,0)));
   double *X_lapack = X_blitz_lapack.data();
   // Remaining variables
-  int info = 0;  
+  int info = 0;
   const int lda = N;
   const int ldb = N;
   const int NRHS = P;
- 
+
   // Calls the LAPACK function (dgesv)
   dgesv_( &N, &NRHS, A_lapack, &lda, ipiv.get(), X_lapack, &ldb, &info );
- 
+
   // Checks info variable
   if (info != 0)
-    throw bob::math::LapackError("The LAPACK dgesv function returned a non-zero value.");
+    throw std::runtime_error("The LAPACK dgesdd function returned a non-zero value.");
 
   // Copy result back to X if required
   if (!X_direct_use )
@@ -157,14 +157,14 @@ void bob::math::linsolve_(const blitz::Array<double,2>& A, blitz::Array<double,2
 
 
 
-void bob::math::linsolveSympos(const blitz::Array<double,2>& A, 
+void bob::math::linsolveSympos(const blitz::Array<double,2>& A,
   blitz::Array<double,1>& x, const blitz::Array<double,1>& b)
 {
   // Check x and b
   bob::core::array::assertZeroBase(x);
   bob::core::array::assertZeroBase(b);
   bob::core::array::assertSameDimensionLength(x.extent(0), b.extent(0));
-  
+
   // Check A
   bob::core::array::assertZeroBase(A);
   bob::core::array::assertSameDimensionLength(A.extent(0), A.extent(1));
@@ -173,7 +173,7 @@ void bob::math::linsolveSympos(const blitz::Array<double,2>& A,
   bob::math::linsolveSympos_(A, x, b);
 }
 
-void bob::math::linsolveSympos_(const blitz::Array<double,2>& A, 
+void bob::math::linsolveSympos_(const blitz::Array<double,2>& A,
   blitz::Array<double,1>& x, const blitz::Array<double,1>& b)
 {
   // Defines dimensionality variables
@@ -183,13 +183,13 @@ void bob::math::linsolveSympos_(const blitz::Array<double,2>& A,
   // Initialises LAPACK arrays
   // Transpose (C: row major order, Fortran: column major)
   // Ugly fix for old blitz version support
-  blitz::Array<double,2> A_blitz_lapack( 
+  blitz::Array<double,2> A_blitz_lapack(
     bob::core::array::ccopy(const_cast<blitz::Array<double,2>&>(A).transpose(1,0)));
   double* A_lapack = A_blitz_lapack.data();
   // Tries to use X directly
   bool x_direct_use = bob::core::array::isCZeroBaseContiguous(x);
   blitz::Array<double,1> x_blitz_lapack;
-  if (x_direct_use) 
+  if (x_direct_use)
   {
     x_blitz_lapack.reference(x);
     x_blitz_lapack = b;
@@ -198,18 +198,18 @@ void bob::math::linsolveSympos_(const blitz::Array<double,2>& A,
     x_blitz_lapack.reference(bob::core::array::ccopy(b));
   double *x_lapack = x_blitz_lapack.data();
   // Remaining variables
-  int info = 0;  
+  int info = 0;
   const char uplo = 'U';
   const int lda = N;
   const int ldb = N;
   const int NRHS = 1;
- 
+
   // Calls the LAPACK function (dposv)
   dposv_( &uplo, &N, &NRHS, A_lapack, &lda, x_lapack, &ldb, &info );
- 
+
   // Check info variable
   if (info != 0)
-    throw bob::math::LapackError("The LAPACK dposv function returned a \
+    throw std::runtime_error("The LAPACK dposv function returned a \
       non-zero value. This might be caused by a non-symmetric definite \
       positive matrix.");
 
@@ -237,21 +237,21 @@ void bob::math::linsolveSympos_(const blitz::Array<double,2>& A, blitz::Array<do
   const blitz::Array<double,2>& B)
 {
   // Defines dimensionality variables
-  const int N = A.extent(0); 
+  const int N = A.extent(0);
   const int P = X.extent(1);
 
   // Prepares to call LAPACK function (dposv)
   // Initialises LAPACK arrays
   // Transpose (C: row major order, Fortran: column major)
   // Ugly fix for old blitz version support
-  blitz::Array<double,2> A_blitz_lapack( 
+  blitz::Array<double,2> A_blitz_lapack(
     bob::core::array::ccopy(const_cast<blitz::Array<double,2>&>(A).transpose(1,0)));
   double* A_lapack = A_blitz_lapack.data();
   // Tries to use X directly
   blitz::Array<double,2> Xt = X.transpose(1,0);
   bool X_direct_use = bob::core::array::isCZeroBaseContiguous(Xt);
   blitz::Array<double,2> X_blitz_lapack;
-  if (X_direct_use) 
+  if (X_direct_use)
   {
     X_blitz_lapack.reference(Xt);
     // Ugly fix for old blitz version support
@@ -262,18 +262,18 @@ void bob::math::linsolveSympos_(const blitz::Array<double,2>& A, blitz::Array<do
       bob::core::array::ccopy(const_cast<blitz::Array<double,2>&>(B).transpose(1,0)));
   double *X_lapack = X_blitz_lapack.data();
   // Remaining variables
-  int info = 0;  
+  int info = 0;
   const char uplo = 'U';
   const int lda = N;
   const int ldb = N;
   const int NRHS = P;
- 
+
   // Calls the LAPACK function (dposv)
   dposv_( &uplo, &N, &NRHS, A_lapack, &lda, X_lapack, &ldb, &info );
- 
+
   // Check info variable
   if (info != 0)
-    throw bob::math::LapackError("The LAPACK dposv function returned a \
+    throw std::runtime_error("The LAPACK dposv function returned a \
       non-zero value. This might be caused by a non-symmetric definite \
       positive matrix.");
 
@@ -295,7 +295,7 @@ void bob::math::linsolveCGSympos(const blitz::Array<double,2>& A, blitz::Array<d
   bob::core::array::assertZeroBase(x);
   bob::core::array::assertZeroBase(b);
   bob::core::array::assertSameDimensionLength(x.extent(0), N);
-  
+
   // Check A
   bob::core::array::assertZeroBase(A);
   bob::core::array::assertSameDimensionLength(A.extent(0), N);
@@ -338,7 +338,7 @@ void bob::math::linsolveCGSympos_(const blitz::Array<double,2>& A, blitz::Array<
     }
     else
       r = r - alpha * q;
-      
+
     double delta_old = delta;
     delta = bob::math::dot(r,r);
     double beta = delta / delta_old;

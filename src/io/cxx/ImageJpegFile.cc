@@ -7,16 +7,16 @@
  * This codec is only able to work with 3D input/output.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -31,7 +31,6 @@
 #include <string>
 
 #include <bob/io/CodecRegistry.h>
-#include <bob/io/Exception.h>
 #include <bob/core/logging.h>
 
 #include <jpeglib.h>
@@ -42,7 +41,11 @@ static int s_jpeg_quality = 92;
 static boost::shared_ptr<std::FILE> make_cfile(const char *filename, const char *flags)
 {
   std::FILE* fp = std::fopen(filename, flags);
-  if(fp == 0) throw bob::io::FileNotReadable(filename);
+  if(fp == 0) {
+    boost::format m("the file `%s' could not be opened - verify permissions and availability");
+    m % filename;
+    throw std::runtime_error(m.str());
+  }
   return boost::shared_ptr<std::FILE>(fp, std::fclose);
 }
 
@@ -120,8 +123,8 @@ void imbuffer_to_rgb(size_t size, const T* im, T* r, T* g, T* b) {
 template <typename T> static
 void im_load_color(struct jpeg_decompress_struct *cinfo, bob::core::array::interface& b) {
   const bob::core::array::typeinfo& info = b.type();
-  
-  long unsigned int frame_size = info.shape[1] * info.shape[2]; 
+
+  long unsigned int frame_size = info.shape[1] * info.shape[2];
   T *element_r = static_cast<T*>(b.ptr());
   T *element_g = element_r+frame_size;
   T *element_b = element_g+frame_size;
@@ -130,7 +133,7 @@ void im_load_color(struct jpeg_decompress_struct *cinfo, bob::core::array::inter
   JSAMPROW buffer_pptr[1];
   boost::shared_array<JSAMPLE> buffer(new JSAMPLE[row_stride]);
   buffer_pptr[0] = buffer.get();
-  while (cinfo->output_scanline < cinfo->output_height) {    
+  while (cinfo->output_scanline < cinfo->output_height) {
     jpeg_read_scanlines(cinfo, buffer_pptr, 1);
     imbuffer_to_rgb<T>(info.shape[2], reinterpret_cast<T*>(buffer_pptr[0]), element_r, element_g, element_b);
     element_r += cinfo->output_width;
@@ -162,11 +165,18 @@ static void im_load(const std::string& filename, bob::core::array::interface& b)
   const bob::core::array::typeinfo& info = b.type();
   if(info.dtype == bob::core::array::t_uint8) {
     if(info.nd == 2) im_load_gray<uint8_t>(&cinfo, b);
-    else if( info.nd == 3) im_load_color<uint8_t>(&cinfo, b); 
-    else throw bob::io::ImageUnsupportedDimension(info.nd);
+    else if( info.nd == 3) im_load_color<uint8_t>(&cinfo, b);
+    else {
+      boost::format m("the image in file `%s' has a number of dimensions this jpeg codec has no support for: %s");
+      m % filename % info.str();
+      throw std::runtime_error(m.str());
+    }
   }
-  else throw bob::io::ImageUnsupportedType();
-  
+  else {
+    boost::format m("the image in file `%s' has a data type this jpeg codec has no support for: %s");
+    m % filename % info.str();
+    throw std::runtime_error(m.str());
+  }
 
   // 7. Finish decompression
   jpeg_finish_decompress(&cinfo);
@@ -185,8 +195,8 @@ static void im_save_gray(const bob::core::array::interface& b, struct jpeg_compr
   const T* element = static_cast<const T*>(b.ptr());
 
   // pointer to a single row  (JSAMPLE is a typedef to unsigned char or char)
-  JSAMPROW row_pointer[1];  
-  int row_stride = info.shape[1]; // JSAMPLEs per row in image_buffer 
+  JSAMPROW row_pointer[1];
+  int row_stride = info.shape[1]; // JSAMPLEs per row in image_buffer
   while(cinfo->next_scanline < cinfo->image_height) {
     row_pointer[0] = const_cast<T*>(element);
     jpeg_write_scanlines(cinfo, row_pointer, 1);
@@ -215,10 +225,10 @@ static void im_save_color(const bob::core::array::interface& b, struct jpeg_comp
 
   // pointer to a single row  (JSAMPLE is a typedef to unsigned char or char)
   boost::shared_array<JSAMPLE> row(new JSAMPLE[3*info.shape[2]]);
-  JSAMPROW array_ptr[1]; 
+  JSAMPROW array_ptr[1];
   array_ptr[0] = row.get();
-  int row_color_stride = info.shape[2]; // JSAMPLEs per row in image_buffer 
-  while(cinfo->next_scanline < cinfo->image_height) { 
+  int row_color_stride = info.shape[2]; // JSAMPLEs per row in image_buffer
+  while(cinfo->next_scanline < cinfo->image_height) {
     rgb_to_imbuffer(row_color_stride, element_r, element_g, element_b, reinterpret_cast<T*>(array_ptr[0]));
     jpeg_write_scanlines(cinfo, array_ptr, 1);
     element_r += row_color_stride;
@@ -248,9 +258,9 @@ static void im_save (const std::string& filename, const bob::core::array::interf
   jpeg_set_defaults(&cinfo);
   jpeg_set_quality(&cinfo, s_jpeg_quality, TRUE);
 
-  // 4. 
+  // 4.
   jpeg_start_compress(&cinfo, true);
-  
+
   // Writes content
   if(info.dtype == bob::core::array::t_uint8) {
 
@@ -259,9 +269,17 @@ static void im_save (const std::string& filename, const bob::core::array::interf
       if(info.shape[0] != 3) throw std::runtime_error("color image does not have 3 planes on 1st. dimension");
       im_save_color<uint8_t>(array, &cinfo);
     }
-    else throw bob::io::ImageUnsupportedDimension(info.nd); 
+    else {
+      boost::format m("the image array to be written at file `%s' has a number of dimensions this jpeg codec has no support for: %s");
+      m % filename % info.str();
+      throw std::runtime_error(m.str());
+    }
   }
-  else throw bob::io::ImageUnsupportedType();
+  else {
+    boost::format m("the image array to be written at file `%s' has a data type this jpeg codec has no support for: %s");
+    m % filename % info.str();
+    throw std::runtime_error(m.str());
+  }
 
   // 6.
   jpeg_finish_compress(&cinfo);
@@ -327,7 +345,7 @@ class ImageJpegFile: public bob::io::File {
     }
 
     virtual void read(bob::core::array::interface& buffer, size_t index) {
-      if (m_newfile) 
+      if (m_newfile)
         throw std::runtime_error("uninitialized image file cannot be read");
 
       if (!buffer.type().is_compatible(m_type)) buffer.set(m_type);
@@ -381,7 +399,7 @@ std::string ImageJpegFile::s_codecname = "bob.image_jpeg";
 
 /**
  * This defines the factory method F that can create codecs of this type.
- * 
+ *
  * Here are the meanings of the mode flag that should be respected by your
  * factory implementation:
  *
@@ -389,8 +407,8 @@ std::string ImageJpegFile::s_codecname = "bob.image_jpeg";
  *      error to open a file that does not exist for read-only operations.
  * 'w': opens for reading and writing, but truncates the file if it
  *      exists; it is not an error to open files that do not exist with
- *      this flag. 
- * 'a': opens for reading and writing - any type of modification can 
+ *      this flag.
+ * 'a': opens for reading and writing - any type of modification can
  *      occur. If the file does not exist, this flag is effectively like
  *      'w'.
  *
@@ -400,7 +418,7 @@ std::string ImageJpegFile::s_codecname = "bob.image_jpeg";
  * @note: This method can be static.
  */
 
-static boost::shared_ptr<bob::io::File> 
+static boost::shared_ptr<bob::io::File>
 make_file (const std::string& path, char mode) {
   return boost::make_shared<ImageJpegFile>(path, mode);
 }
@@ -418,7 +436,7 @@ static bool register_codec() {
     instance->registerExtension(".jpeg", "JPEG, compressed (libjpeg)", &make_file);
   }
   else
-    bob::core::warn << "LibJPEG compiled with " << BITS_IN_JSAMPLE << 
+    bob::core::warn << "LibJPEG compiled with " << BITS_IN_JSAMPLE <<
       " bits depth (instead of 8). JPEG images are hence not supported." << std::endl;
 
   return true;

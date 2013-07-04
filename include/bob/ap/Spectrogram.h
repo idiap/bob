@@ -7,16 +7,16 @@
  * @brief Implement spectrogram
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -25,11 +25,14 @@
 #ifndef BOB_AP_SPECTROGRAM_H
 #define BOB_AP_SPECTROGRAM_H
 
-#include <blitz/array.h>
 #include <vector>
-#include "Energy.h"
-#include <bob/core/Exception.h>
+#include <stdexcept>
+#include <blitz/array.h>
+#include <boost/format.hpp>
+
 #include <bob/sp/FFT1D.h>
+
+#include "Energy.h"
 
 namespace bob {
 /**
@@ -48,16 +51,16 @@ class Spectrogram: public Energy
     /**
      * @brief Constructor. Initializes working arrays
      */
-    Spectrogram(const double sampling_frequency, 
+    Spectrogram(const double sampling_frequency,
       const double win_length_ms=20., const double win_shift_ms=10.,
-      const size_t n_filters=24, const double f_min=0., 
+      const size_t n_filters=24, const double f_min=0.,
       const double f_max=4000., const double pre_emphasis_coeff=0.95,
       bool mel_scale=true);
 
     /**
      * @brief Copy Constructor
      */
-    Spectrogram(const Spectrogram& other); 
+    Spectrogram(const Spectrogram& other);
 
     /**
      * @brief Assignment operator
@@ -135,15 +138,15 @@ class Spectrogram: public Energy
     bool getEnergyBands() const
     { return m_energy_bands; }
 
-    /** 
+    /**
      * @brief Sets the sampling frequency/frequency rate
      */
     virtual void setSamplingFrequency(const double sampling_frequency);
-    /** 
+    /**
      * @brief Sets the window length in miliseconds
      */
     virtual void setWinLengthMs(const double win_length_ms);
-    /** 
+    /**
      * @brief Sets the window shift in miliseconds
      */
     virtual void setWinShiftMs(const double win_shift_ms);
@@ -153,15 +156,18 @@ class Spectrogram: public Energy
      */
     virtual void setNFilters(size_t n_filters);
     /**
-     * @brief Sets the pre-emphasis coefficient. It should be a value in the 
+     * @brief Sets the pre-emphasis coefficient. It should be a value in the
      * range [0,1].
      */
     virtual void setPreEmphasisCoeff(double pre_emphasis_coeff)
     {
-      if (pre_emphasis_coeff < 0. || pre_emphasis_coeff > 1.)
-        throw bob::core::InvalidArgumentException("pre_emphasis_coeff",
-          pre_emphasis_coeff, 0., 1.);
-      m_pre_emphasis_coeff = pre_emphasis_coeff; }
+      if (pre_emphasis_coeff < 0. || pre_emphasis_coeff > 1.) {
+        boost::format m("the argument for `pre_emphasis_coeff' cannot take the value %f - the value must be in the interval [0.,1.]");
+        m % pre_emphasis_coeff;
+        throw std::runtime_error(m.str());
+      }
+      m_pre_emphasis_coeff = pre_emphasis_coeff;
+    }
     /**
      * @brief Returns the frequency of the lowest triangular filter in the
      * filter bank
@@ -223,12 +229,12 @@ class Spectrogram: public Energy
      */
     void filterBank(blitz::Array<double,1>& x);
     /**
-     * @brief Applies the triangular filter bank to the input array and 
+     * @brief Applies the triangular filter bank to the input array and
      * returns the logarithm of the magnitude in each band.
      */
     void logTriangularFilterBank(blitz::Array<double,1>& data) const;
     /**
-     * @brief Applies the triangular filter bank to the input array and 
+     * @brief Applies the triangular filter bank to the input array and
      * returns the magnitude in each band.
      */
     void triangularFilterBank(blitz::Array<double,1>& data) const;

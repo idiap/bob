@@ -6,23 +6,23 @@
  * @brief Implementation of row-major/column-major reordering
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/format.hpp>
 #include <cstring> //for memcpy
 #include <bob/io/reorder.h>
-#include <bob/io/Exception.h>
 
 void bob::io::rc2d(size_t& row, size_t& col, const size_t i, const size_t j,
     const size_t* shape) {
@@ -94,11 +94,15 @@ void bob::io::row_to_col_order(const void* src_, void* dst_,
       break;
 
     default:
-      throw bob::io::DimensionError(info.nd, BOB_MAX_DIM);
+      {
+        boost::format m("row_to_col_order() can only flip arrays with up to %u dimensions - you passed one with %u dimensions");
+        m % BOB_MAX_DIM % info.nd;
+        throw std::runtime_error(m.str());
+      }
   }
 }
-  
-void bob::io::col_to_row_order(const void* src_, void* dst_, 
+
+void bob::io::col_to_row_order(const void* src_, void* dst_,
     const bob::core::array::typeinfo& info) {
 
   size_t dsize = info.item_size();
@@ -150,7 +154,11 @@ void bob::io::col_to_row_order(const void* src_, void* dst_,
       break;
 
     default:
-      throw bob::io::DimensionError(info.nd, BOB_MAX_DIM);
+      {
+        boost::format m("col_to_row_order() can only flip arrays with up to %u dimensions - you passed one with %u dimensions");
+        m % BOB_MAX_DIM % info.nd;
+        throw std::runtime_error(m.str());
+      }
   }
 }
 
@@ -214,10 +222,14 @@ void bob::io::row_to_col_order_complex(const void* src_, void* dst_re_,
       break;
 
     default:
-      throw bob::io::DimensionError(info.nd, BOB_MAX_DIM);
+      {
+        boost::format m("row_to_col_order_complex() can only flip arrays with up to %u dimensions - you passed one with %u dimensions");
+        m % BOB_MAX_DIM % info.nd;
+        throw std::runtime_error(m.str());
+      }
   }
 }
-  
+
 void bob::io::col_to_row_order_complex(const void* src_re_, const void* src_im_,
     void* dst_, const bob::core::array::typeinfo& info) {
 
@@ -258,8 +270,8 @@ void bob::io::col_to_row_order_complex(const void* src_re_, const void* src_im_,
             bob::io::rc3d(row_major, col_major, i, j, k, info.shape);
             row_major *= dsize;
             col_major *= dsize2;
-            std::memcpy(&dst[row_major]       , &src_re[col_major], dsize2); 
-            std::memcpy(&dst[row_major]+dsize2, &src_im[col_major], dsize2); 
+            std::memcpy(&dst[row_major]       , &src_re[col_major], dsize2);
+            std::memcpy(&dst[row_major]+dsize2, &src_im[col_major], dsize2);
           }
       break;
 
@@ -272,13 +284,17 @@ void bob::io::col_to_row_order_complex(const void* src_re_, const void* src_im_,
               bob::io::rc4d(row_major, col_major, i, j, k, l, info.shape);
               row_major *= dsize;
               col_major *= dsize2;
-              std::memcpy(&dst[row_major]       , &src_re[col_major], dsize2); 
-              std::memcpy(&dst[row_major]+dsize2, &src_im[col_major], dsize2); 
+              std::memcpy(&dst[row_major]       , &src_re[col_major], dsize2);
+              std::memcpy(&dst[row_major]+dsize2, &src_im[col_major], dsize2);
             }
       break;
 
     default:
-      throw bob::io::DimensionError(info.nd, BOB_MAX_DIM);
+      {
+        boost::format m("col_to_row_order_complex() can only flip arrays with up to %u dimensions - you passed one with %u dimensions");
+        m % BOB_MAX_DIM % info.nd;
+        throw std::runtime_error(m.str());
+      }
   }
 }
-  
+

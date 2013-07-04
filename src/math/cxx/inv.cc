@@ -4,23 +4,23 @@
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdexcept>
 #include <bob/math/inv.h>
 #include <bob/math/linear.h>
-#include <bob/math/Exception.h>
 #include <bob/core/assert.h>
 #include <bob/core/check.h>
 #include <bob/core/array_copy.h>
@@ -31,10 +31,10 @@
 
 // Declaration of the external LAPACK function
 // LU decomposition of a general matrix (dgetrf)
-extern "C" void dgetrf_( const int *M, const int *N, double *A, const int *lda, 
+extern "C" void dgetrf_( const int *M, const int *N, double *A, const int *lda,
   int *ipiv, int *info);
 // Inverse of a general matrix (dgetri)
-extern "C" void dgetri_( const int *N, double *A, const int *lda, 
+extern "C" void dgetri_( const int *N, double *A, const int *lda,
   const int *ipiv, double *work, const int *lwork, int *info);
 
 void bob::math::inv(const blitz::Array<double,2>& A, blitz::Array<double,2>& B)
@@ -59,19 +59,19 @@ void bob::math::inv_(const blitz::Array<double,2>& A, blitz::Array<double,2>& B)
   //////////////////////////////////////
   // Prepares to call LAPACK functions
   // Initializes LAPACK variables
-  int info = 0;  
+  int info = 0;
   const int lda = N;
 
   // Initializes LAPACK arrays
   boost::shared_array<int> ipiv(new int[N]);
 
-  // Tries to use B directly if possible 
+  // Tries to use B directly if possible
   //   Input and output arrays are both column-major order.
   //   Hence, we can ignore the problem of column- and row-major order
   //   conversions.
   bool B_direct_use = bob::core::array::isCZeroBaseContiguous(B);
   blitz::Array<double,2> A_blitz_lapack;
-  if (B_direct_use) 
+  if (B_direct_use)
   {
     A_blitz_lapack.reference(B);
     A_blitz_lapack = A;
@@ -83,13 +83,13 @@ void bob::math::inv_(const blitz::Array<double,2>& A, blitz::Array<double,2>& B)
 
   // Calls the LAPACK functions
   // 1/ Computes the LU decomposition
-  dgetrf_( &N, &N, A_lapack, &lda, ipiv.get(), &info); 
+  dgetrf_( &N, &N, A_lapack, &lda, ipiv.get(), &info);
   // Checks the info variable
   if (info != 0)
-    throw bob::math::LapackError("The LAPACK dgetrf function returned a non-zero value.");
+    throw std::runtime_error("The LAPACK dgetrf function returned a non-zero value.");
 
   // TODO: We might consider adding a real invertibility test as described in
-  // this thread (Btw, this is what matlab does): 
+  // this thread (Btw, this is what matlab does):
   // http://icl.cs.utk.edu/lapack-forum/archives/lapack/msg00778.html
 
   // 2/ Computes the inverse matrix
@@ -103,7 +103,7 @@ void bob::math::inv_(const blitz::Array<double,2>& A, blitz::Array<double,2>& B)
   dgetri_( &N, A_lapack, &lda, ipiv.get(), work.get(), &lwork, &info);
   // Checks info variable
   if (info != 0)
-    throw bob::math::LapackError("The LAPACK dgetri function returned a non-zero value. The matrix might not be invertible.");
+    throw std::runtime_error("The LAPACK dgetri function returned a non-zero value. The matrix might not be invertible.");
 
   // Copy back content to B if required
   if (!B_direct_use)

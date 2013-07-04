@@ -6,8 +6,7 @@ set(shared "${bob_deps};${FFTW3_LIBRARY}")
 set(incdir ${cxx_incdir};${FFT3_INCLUDE_DIR})
 
 # This defines the list of source files inside this package.
-set(src 
-    "Exception.cc"
+set(src
     "FFT1D.cc"
     "FFT1DNaive.cc"
     "FFT2D.cc"

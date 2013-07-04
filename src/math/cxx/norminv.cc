@@ -7,23 +7,24 @@
  *   function
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <bob/math/norminv.h>
-#include <bob/core/Exception.h>
 #include <cmath>
+#include <stdexcept>
+#include <boost/format.hpp>
+#include <bob/math/norminv.h>
 
 double bob::math::norminv(const double p, const double mu, const double sigma)
 {
@@ -67,8 +68,11 @@ double bob::math::normsinv(const double p)
   double x = 0.;
 
   // Error p should be between 0 and 1
-  if (p < 0. || p > 1.)
-    throw bob::core::InvalidArgumentException("p", p, 0., 1.); 
+  if (p < 0. || p > 1.) {
+    boost::format m("invalid value for parameter `p' (%f) - it should be reside the interval [0.,1.]");
+    m % p;
+    throw std::runtime_error(m.str());
+  }
   // Rational approximation for lower region.
   else if (0. < p && p < p_low)
   {
@@ -90,13 +94,13 @@ double bob::math::normsinv(const double p)
   }
 
   // This block just improves accuracy and can eventually be commented.
-  // The relative error of the approximation has  absolute value less than 
-  // 1.15 × 10−9.  One iteration of Halley’s rational method (third order) 
+  // The relative error of the approximation has  absolute value less than
+  // 1.15 × 10−9.  One iteration of Halley’s rational method (third order)
   // gives full machine precision.
   double e = 0.5 * erfc(-x/sqrt(2)) - p;
   double u = e * sqrt(2*M_PI) * exp(x*x/2);
   x = x - u/(1 + x*u/2);
 
-  return x; 
+  return x;
 }
 

@@ -6,16 +6,16 @@
  * @brief Computes the gradient of a signal
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -23,10 +23,11 @@
 #ifndef BOB_MATH_GRADIENT_H
 #define BOB_MATH_GRADIENT_H
 
+#include <stdexcept>
+#include <boost/format.hpp>
 #include <bob/core/assert.h>
-#include <bob/math/Exception.h>
 
-namespace bob { namespace math {   
+namespace bob { namespace math {
 /**
  * @ingroup MATH
  * @{
@@ -39,7 +40,7 @@ namespace bob { namespace math {
  *   Similar to NumPy and MATLAB gradient function
  * @param input The input blitz array
  * @param g The output blitz array for the gradient
- * @param dx The sample distance along the x-axis 
+ * @param dx The sample distance along the x-axis
  * @warning Does not check that g has the same size as input
  */
 template <typename T, typename U>
@@ -48,10 +49,18 @@ void gradient_(const blitz::Array<T,1>& input, blitz::Array<U,1>& g,
 {
   const int M=input.extent(0);
   // Check input
-  if (M<2) throw bob::math::GradientDimTooSmall(0, M);
-  if (!dx>0.) throw bob::math::GradientNonPositiveSampleDistance(0,dx);
-  bob::core::array::assertZeroBase(input);      
-  bob::core::array::assertZeroBase(g);      
+  if (M<2) {
+    boost::format m("the dimension %d is of length %d, strictly smaller than 2 - no gradient can be computed");
+    m % 0 % M;
+    throw std::runtime_error(m.str());
+  }
+  if (!dx>0.) {
+    boost::format m("the sample distance %f for dimension %d is NOT strictly positive - no gradient can be computed");
+    m % dx % 0;
+    throw std::runtime_error(m.str());
+  }
+  bob::core::array::assertZeroBase(input);
+  bob::core::array::assertZeroBase(g);
 
   // Uncentered gradient at the boundaries
   g(0) = input(1) - input(0);
@@ -68,7 +77,7 @@ void gradient_(const blitz::Array<T,1>& input, blitz::Array<U,1>& g,
 
   // Update scaling if required
   if (dx!=1.) g *= (1./dx);
-} 
+}
 
 /**
  * @brief Function which computes the gradient of a 1D signal
@@ -76,7 +85,7 @@ void gradient_(const blitz::Array<T,1>& input, blitz::Array<U,1>& g,
  *   and first differences at the boundaries.
  *   Similar to NumPy and MATLAB gradient function
  * @param input The input blitz array
- * @param dx The sample distance along the x-axis 
+ * @param dx The sample distance along the x-axis
  * @param g The output blitz array for the gradient
  */
 template <typename T, typename U>
@@ -96,8 +105,8 @@ void gradient(const blitz::Array<T,1>& input, blitz::Array<U,1>& g,
  * @param input The input blitz array
  * @param gy The output blitz array for the gradient along the y-axis
  * @param gx The output blitz array for the gradient along the x-axis
- * @param dy The sample distance along the y-axis 
- * @param dx The sample distance along the x-axis 
+ * @param dy The sample distance along the y-axis
+ * @param dx The sample distance along the x-axis
  * @warning Does not check that gx and gy have the same size as input
  */
 template <typename T, typename U>
@@ -107,13 +116,29 @@ void gradient_(const blitz::Array<T,2>& input, blitz::Array<U,2>& gy,
   const int M=input.extent(0);
   const int N=input.extent(1);
   // Check input
-  if (M<2) throw bob::math::GradientDimTooSmall(0, M);
-  if (N<2) throw bob::math::GradientDimTooSmall(1, N);
-  if (!dy>0.) throw bob::math::GradientNonPositiveSampleDistance(0,dy);
-  if (!dx>0.) throw bob::math::GradientNonPositiveSampleDistance(1,dx);
+  if (M<2) {
+    boost::format m("the dimension %d is of length %d, strictly smaller than 2 - no gradient can be computed");
+    m % 0 % M;
+    throw std::runtime_error(m.str());
+  }
+  if (N<2) {
+    boost::format m("the dimension %d is of length %d, strictly smaller than 2 - no gradient can be computed");
+    m % 1 % N;
+    throw std::runtime_error(m.str());
+  }
+  if (!dy>0.) {
+    boost::format m("the sample distance %f for dimension %d is NOT strictly positive - no gradient can be computed");
+    m % dy % 0;
+    throw std::runtime_error(m.str());
+  }
+  if (!dx>0.) {
+    boost::format m("the sample distance %f for dimension %d is NOT strictly positive - no gradient can be computed");
+    m % dx % 1;
+    throw std::runtime_error(m.str());
+  }
   bob::core::array::assertZeroBase(input);
   bob::core::array::assertZeroBase(gy);
-  bob::core::array::assertZeroBase(gx); 
+  bob::core::array::assertZeroBase(gx);
 
   // Defines 'full' range
   blitz::Range rall = blitz::Range::all();
@@ -152,8 +177,8 @@ void gradient_(const blitz::Array<T,2>& input, blitz::Array<U,2>& gy,
  * @param input The input blitz array
  * @param gy The output blitz array for the gradient along the y-axis
  * @param gx The output blitz array for the gradient along the x-axis
- * @param dy The sample distance along the y-axis 
- * @param dx The sample distance along the x-axis 
+ * @param dy The sample distance along the y-axis
+ * @param dx The sample distance along the x-axis
  */
 template <typename T, typename U>
 void gradient(const blitz::Array<T,2>& input, blitz::Array<U,2>& gy,
@@ -174,9 +199,9 @@ void gradient(const blitz::Array<T,2>& input, blitz::Array<U,2>& gy,
  * @param gz The output blitz array for the gradient along the z-axis
  * @param gy The output blitz array for the gradient along the y-axis
  * @param gx The output blitz array for the gradient along the x-axis
- * @param dz The sample distance along the z-axis 
- * @param dy The sample distance along the y-axis 
- * @param dx The sample distance along the x-axis 
+ * @param dz The sample distance along the z-axis
+ * @param dy The sample distance along the y-axis
+ * @param dx The sample distance along the x-axis
  * @warning Does not check that gx and gy have the same size as input
  */
 template <typename T, typename U>
@@ -188,16 +213,40 @@ void gradient_(const blitz::Array<T,3>& input, blitz::Array<U,3>& gz,
   const int N=input.extent(1);
   const int P=input.extent(2);
   // Check input
-  if (M<2) throw bob::math::GradientDimTooSmall(0, M);
-  if (N<2) throw bob::math::GradientDimTooSmall(1, N);
-  if (P<2) throw bob::math::GradientDimTooSmall(2, P);
-  if (!dz>0.) throw bob::math::GradientNonPositiveSampleDistance(0,dz);
-  if (!dy>0.) throw bob::math::GradientNonPositiveSampleDistance(1,dy);
-  if (!dx>0.) throw bob::math::GradientNonPositiveSampleDistance(2,dx);
+  if (M<2) {
+    boost::format m("the dimension %d is of length %d, strictly smaller than 2 - no gradient can be computed");
+    m % 0 % M;
+    throw std::runtime_error(m.str());
+  }
+  if (N<2) {
+    boost::format m("the dimension %d is of length %d, strictly smaller than 2 - no gradient can be computed");
+    m % 1 % N;
+    throw std::runtime_error(m.str());
+  }
+  if (P<2) {
+    boost::format m("the dimension %d is of length %d, strictly smaller than 2 - no gradient can be computed");
+    m % 2 % P;
+    throw std::runtime_error(m.str());
+  }
+  if (!dz>0.) {
+    boost::format m("the sample distance %f for dimension %d is NOT strictly positive - no gradient can be computed");
+    m % dz % 0;
+    throw std::runtime_error(m.str());
+  }
+  if (!dy>0.) {
+    boost::format m("the sample distance %f for dimension %d is NOT strictly positive - no gradient can be computed");
+    m % dy % 1;
+    throw std::runtime_error(m.str());
+  }
+  if (!dx>0.) {
+    boost::format m("the sample distance %f for dimension %d is NOT strictly positive - no gradient can be computed");
+    m % dx % 2;
+    throw std::runtime_error(m.str());
+  }
   bob::core::array::assertZeroBase(input);
   bob::core::array::assertZeroBase(gz);
   bob::core::array::assertZeroBase(gy);
-  bob::core::array::assertZeroBase(gx); 
+  bob::core::array::assertZeroBase(gx);
 
   // Defines 'full' range
   blitz::Range rall = blitz::Range::all();
@@ -232,7 +281,7 @@ void gradient_(const blitz::Array<T,3>& input, blitz::Array<U,3>& gz,
     blitz::Range rxm(0,P-3);
     gx(rall,rall,rx) = (input(rall,rall,rxp) - input(rall,rall,rxm)) / 2.;
   }
-  
+
   // Update scaling if required
   if (dz!=1.) gz *= (1./dz);
   if (dy!=1.) gy *= (1./dy);
@@ -247,9 +296,9 @@ void gradient_(const blitz::Array<T,3>& input, blitz::Array<U,3>& gz,
  * @param gz The output blitz array for the gradient along the z-axis
  * @param gy The output blitz array for the gradient along the y-axis
  * @param gx The output blitz array for the gradient along the x-axis
- * @param dz The sample distance along the z-axis 
- * @param dy The sample distance along the y-axis 
- * @param dx The sample distance along the x-axis 
+ * @param dz The sample distance along the z-axis
+ * @param dy The sample distance along the y-axis
+ * @param dx The sample distance along the x-axis
  */
 template <typename T, typename U>
 void gradient(const blitz::Array<T,3>& input, blitz::Array<U,3>& gz,

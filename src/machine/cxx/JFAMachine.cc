@@ -32,7 +32,7 @@
 //////////////////// FABase ////////////////////
 bob::machine::FABase::FABase():
   m_ubm(boost::shared_ptr<bob::machine::GMMMachine>()), m_ru(1), m_rv(1),
-  m_U(0,1), m_V(0,1), m_d(0) 
+  m_U(0,1), m_V(0,1), m_d(0)
 {
 }
 
@@ -42,16 +42,16 @@ bob::machine::FABase::FABase(const boost::shared_ptr<bob::machine::GMMMachine> u
   m_U(getDimCD(),ru), m_V(getDimCD(),rv), m_d(getDimCD())
 {
   if (ru < 1)
-    throw bob::core::InvalidArgumentException("ru", (int)ru, 1, std::numeric_limits<int>::max()); 
+    throw bob::core::InvalidArgumentException("ru", (int)ru, 1, std::numeric_limits<int>::max());
   if (rv < 1)
-    throw bob::core::InvalidArgumentException("rv", (int)rv, 1, std::numeric_limits<int>::max()); 
+    throw bob::core::InvalidArgumentException("rv", (int)rv, 1, std::numeric_limits<int>::max());
   updateCache();
 }
 
 bob::machine::FABase::FABase(const bob::machine::FABase& other):
   m_ubm(other.m_ubm), m_ru(other.m_ru), m_rv(other.m_rv),
-  m_U(bob::core::array::ccopy(other.m_U)), 
-  m_V(bob::core::array::ccopy(other.m_V)), 
+  m_U(bob::core::array::ccopy(other.m_U)),
+  m_V(bob::core::array::ccopy(other.m_V)),
   m_d(bob::core::array::ccopy(other.m_d))
 {
   updateCache();
@@ -61,7 +61,7 @@ bob::machine::FABase::~FABase() {
 }
 
 bob::machine::FABase& bob::machine::FABase::operator=
-(const bob::machine::FABase& other) 
+(const bob::machine::FABase& other)
 {
   if (this != &other)
   {
@@ -71,31 +71,31 @@ bob::machine::FABase& bob::machine::FABase::operator=
     m_U.reference(bob::core::array::ccopy(other.m_U));
     m_V.reference(bob::core::array::ccopy(other.m_V));
     m_d.reference(bob::core::array::ccopy(other.m_d));
-  
+
     updateCache();
   }
   return *this;
 }
 
-bool bob::machine::FABase::operator==(const bob::machine::FABase& b) const 
+bool bob::machine::FABase::operator==(const bob::machine::FABase& b) const
 {
   return ( (((m_ubm && b.m_ubm) && *m_ubm == *(b.m_ubm)) || (!m_ubm && !b.m_ubm)) &&
           m_ru == b.m_ru && m_rv == b.m_rv &&
-          bob::core::array::isEqual(m_U, b.m_U) && 
+          bob::core::array::isEqual(m_U, b.m_U) &&
           bob::core::array::isEqual(m_V, b.m_V) &&
           bob::core::array::isEqual(m_d, b.m_d));
 }
 
-bool bob::machine::FABase::operator!=(const bob::machine::FABase& b) const 
+bool bob::machine::FABase::operator!=(const bob::machine::FABase& b) const
 {
   return !(this->operator==(b));
 }
 
-bool bob::machine::FABase::is_similar_to(const bob::machine::FABase& b, 
-    const double r_epsilon, const double a_epsilon) const 
+bool bob::machine::FABase::is_similar_to(const bob::machine::FABase& b,
+    const double r_epsilon, const double a_epsilon) const
 {
   // TODO: update is_similar_to of the GMMMachine with the 2 epsilon's
-  return (( ((m_ubm && b.m_ubm) && m_ubm->is_similar_to(*(b.m_ubm), a_epsilon)) || 
+  return (( ((m_ubm && b.m_ubm) && m_ubm->is_similar_to(*(b.m_ubm), a_epsilon)) ||
             (!m_ubm && !b.m_ubm) ) &&
           m_ru == b.m_ru && m_rv == b.m_rv &&
           bob::core::array::isClose(m_U, b.m_U, r_epsilon, a_epsilon) &&
@@ -106,9 +106,9 @@ bool bob::machine::FABase::is_similar_to(const bob::machine::FABase& b,
 void bob::machine::FABase::resize(const size_t ru, const size_t rv)
 {
   if (ru < 1)
-    throw bob::core::InvalidArgumentException("ru", (int)ru, 1, std::numeric_limits<int>::max()); 
+    throw bob::core::InvalidArgumentException("ru", (int)ru, 1, std::numeric_limits<int>::max());
   if (rv < 1)
-    throw bob::core::InvalidArgumentException("rv", (int)rv, 1, std::numeric_limits<int>::max()); 
+    throw bob::core::InvalidArgumentException("rv", (int)rv, 1, std::numeric_limits<int>::max());
 
   m_ru = ru;
   m_rv = rv;
@@ -121,9 +121,9 @@ void bob::machine::FABase::resize(const size_t ru, const size_t rv)
 void bob::machine::FABase::resize(const size_t ru, const size_t rv, const size_t cd)
 {
   if (ru < 1)
-    throw bob::core::InvalidArgumentException("ru", (int)ru, 1, std::numeric_limits<int>::max()); 
+    throw bob::core::InvalidArgumentException("ru", (int)ru, 1, std::numeric_limits<int>::max());
   if (rv < 1)
-    throw bob::core::InvalidArgumentException("rv", (int)rv, 1, std::numeric_limits<int>::max()); 
+    throw bob::core::InvalidArgumentException("rv", (int)rv, 1, std::numeric_limits<int>::max());
 
   if (!m_ubm || (m_ubm && getDimCD() == cd))
   {
@@ -136,7 +136,7 @@ void bob::machine::FABase::resize(const size_t ru, const size_t rv, const size_t
     updateCacheUbmUVD();
   }
   else
-    throw bob::core::InvalidArgumentException("cd", cd, getDimCD(), getDimCD()); 
+    throw bob::core::InvalidArgumentException("cd", cd, getDimCD(), getDimCD());
 }
 
 void bob::machine::FABase::setUbm(const boost::shared_ptr<bob::machine::GMMMachine> ubm)
@@ -226,7 +226,7 @@ void bob::machine::FABase::updateCacheUbmUVD()
 void bob::machine::FABase::computeIdPlusUSProdInv(const bob::machine::GMMStats& gmm_stats,
   blitz::Array<double,2>& output) const
 {
-  // Computes (Id + U^T.Sigma^-1.U.N_{i,h}.U)^-1 = 
+  // Computes (Id + U^T.Sigma^-1.U.N_{i,h}.U)^-1 =
   // (Id + sum_{c=1..C} N_{i,h}.U_{c}^T.Sigma_{c}^-1.U_{c})^-1
 
   // Blitz compatibility: ugly fix (const_cast, as old blitz version does not
@@ -257,7 +257,7 @@ void bob::machine::FABase::computeIdPlusUSProdInv(const bob::machine::GMMStats& 
 }
 
 
-void bob::machine::FABase::computeFn_x(const bob::machine::GMMStats& gmm_stats, 
+void bob::machine::FABase::computeFn_x(const bob::machine::GMMStats& gmm_stats,
   blitz::Array<double,1>& output) const
 {
   // Compute Fn_x = sum_{sessions h}(N*(o - m) (Normalised first order statistics)
@@ -284,7 +284,7 @@ void bob::machine::FABase::estimateX(const blitz::Array<double,2>& IdPlusUSProdI
 
 void bob::machine::FABase::estimateX(const bob::machine::GMMStats& gmm_stats, blitz::Array<double,1>& x) const
 {
-  if (!m_ubm) throw bob::machine::JFABaseNoUBMSet();
+  if (!m_ubm) throw std::runtime_error("No UBM was set in the JFA machine.");
   computeIdPlusUSProdInv(gmm_stats, m_tmp_IdPlusUSProdInv); // Computes first term
   computeFn_x(gmm_stats, m_tmp_Fn_x); // Computes last term
   estimateX(m_tmp_IdPlusUSProdInv, m_tmp_Fn_x, x); // Estimates the value of x
@@ -297,7 +297,7 @@ bob::machine::JFABase::JFABase()
 {
 }
 
-bob::machine::JFABase::JFABase(const boost::shared_ptr<bob::machine::GMMMachine> ubm, 
+bob::machine::JFABase::JFABase(const boost::shared_ptr<bob::machine::GMMMachine> ubm,
     const size_t ru, const size_t rv):
   m_base(ubm, ru, rv)
 {
@@ -324,15 +324,15 @@ void bob::machine::JFABase::save(bob::io::HDF5File& config) const
   config.setArray("d", m_base.getD());
 }
 
-void bob::machine::JFABase::load(bob::io::HDF5File& config) 
+void bob::machine::JFABase::load(bob::io::HDF5File& config)
 {
-  //reads all data directly into the member variables 
+  //reads all data directly into the member variables
   blitz::Array<double,2> U = config.readArray<double,2>("U");
   blitz::Array<double,2> V = config.readArray<double,2>("V");
   blitz::Array<double,1> d = config.readArray<double,1>("d");
   const int ru = U.extent(1);
   const int rv = V.extent(1);
-  if (!m_base.getUbm()) 
+  if (!m_base.getUbm())
     m_base.resize(ru, rv, U.extent(0));
   else
     m_base.resize(ru, rv);
@@ -341,8 +341,8 @@ void bob::machine::JFABase::load(bob::io::HDF5File& config)
   m_base.setD(d);
 }
 
-bob::machine::JFABase& 
-bob::machine::JFABase::operator=(const bob::machine::JFABase& other) 
+bob::machine::JFABase&
+bob::machine::JFABase::operator=(const bob::machine::JFABase& other)
 {
   if (this != &other)
   {
@@ -357,7 +357,7 @@ bob::machine::ISVBase::ISVBase()
 {
 }
 
-bob::machine::ISVBase::ISVBase(const boost::shared_ptr<bob::machine::GMMMachine> ubm, 
+bob::machine::ISVBase::ISVBase(const boost::shared_ptr<bob::machine::GMMMachine> ubm,
     const size_t ru):
   m_base(ubm, ru, 1)
 {
@@ -385,13 +385,13 @@ void bob::machine::ISVBase::save(bob::io::HDF5File& config) const
   config.setArray("d", m_base.getD());
 }
 
-void bob::machine::ISVBase::load(bob::io::HDF5File& config) 
+void bob::machine::ISVBase::load(bob::io::HDF5File& config)
 {
-  //reads all data directly into the member variables 
+  //reads all data directly into the member variables
   blitz::Array<double,2> U = config.readArray<double,2>("U");
   blitz::Array<double,1> d = config.readArray<double,1>("d");
   const int ru = U.extent(1);
-  if (!m_base.getUbm()) 
+  if (!m_base.getUbm())
     m_base.resize(ru, 1, U.extent(0));
   else
     m_base.resize(ru, 1);
@@ -401,8 +401,8 @@ void bob::machine::ISVBase::load(bob::io::HDF5File& config)
   V = 0;
 }
 
-bob::machine::ISVBase& 
-bob::machine::ISVBase::operator=(const bob::machine::ISVBase& other) 
+bob::machine::ISVBase&
+bob::machine::ISVBase::operator=(const bob::machine::ISVBase& other)
 {
   if (this != &other)
   {
@@ -424,8 +424,7 @@ bob::machine::JFAMachine::JFAMachine(const boost::shared_ptr<bob::machine::JFABa
   m_jfa_base(jfa_base),
   m_y(jfa_base->getDimRv()), m_z(jfa_base->getDimCD())
 {
-  if (!m_jfa_base->getUbm())
-    throw bob::machine::JFABaseNoUBMSet();
+  if (!m_jfa_base->getUbm()) throw std::runtime_error("No UBM was set in the JFA machine.");
   updateCache();
   resizeTmp();
 }
@@ -433,7 +432,7 @@ bob::machine::JFAMachine::JFAMachine(const boost::shared_ptr<bob::machine::JFABa
 
 bob::machine::JFAMachine::JFAMachine(const bob::machine::JFAMachine& other):
   m_jfa_base(other.m_jfa_base),
-  m_y(bob::core::array::ccopy(other.m_y)), 
+  m_y(bob::core::array::ccopy(other.m_y)),
   m_z(bob::core::array::ccopy(other.m_z))
 {
   updateCache();
@@ -448,14 +447,14 @@ bob::machine::JFAMachine::JFAMachine(bob::io::HDF5File& config)
 bob::machine::JFAMachine::~JFAMachine() {
 }
 
-bob::machine::JFAMachine& 
-bob::machine::JFAMachine::operator=(const bob::machine::JFAMachine& other) 
+bob::machine::JFAMachine&
+bob::machine::JFAMachine::operator=(const bob::machine::JFAMachine& other)
 {
   if (this != &other)
   {
     m_jfa_base = other.m_jfa_base;
     m_y.reference(bob::core::array::ccopy(other.m_y));
-    m_z.reference(bob::core::array::ccopy(other.m_z));  
+    m_z.reference(bob::core::array::ccopy(other.m_z));
   }
   return *this;
 }
@@ -467,14 +466,14 @@ bool bob::machine::JFAMachine::operator==(const bob::machine::JFAMachine& other)
           bob::core::array::isEqual(m_z, other.m_z));
 }
 
-bool bob::machine::JFAMachine::operator!=(const bob::machine::JFAMachine& b) const 
+bool bob::machine::JFAMachine::operator!=(const bob::machine::JFAMachine& b) const
 {
   return !(this->operator==(b));
 }
 
 
-bool bob::machine::JFAMachine::is_similar_to(const bob::machine::JFAMachine& b, 
-    const double r_epsilon, const double a_epsilon) const 
+bool bob::machine::JFAMachine::is_similar_to(const bob::machine::JFAMachine& b,
+    const double r_epsilon, const double a_epsilon) const
 {
   return (m_jfa_base->is_similar_to(*(b.m_jfa_base), r_epsilon, a_epsilon) &&
           bob::core::array::isClose(m_y, b.m_y, r_epsilon, a_epsilon) &&
@@ -487,9 +486,9 @@ void bob::machine::JFAMachine::save(bob::io::HDF5File& config) const
   config.setArray("z", m_z);
 }
 
-void bob::machine::JFAMachine::load(bob::io::HDF5File& config) 
+void bob::machine::JFAMachine::load(bob::io::HDF5File& config)
 {
-  //reads all data directly into the member variables 
+  //reads all data directly into the member variables
   blitz::Array<double,1> y = config.readArray<double,1>("y");
   blitz::Array<double,1> z = config.readArray<double,1>("z");
   if (!m_jfa_base)
@@ -528,7 +527,7 @@ void bob::machine::JFAMachine::setZ(const blitz::Array<double,1>& z)
 void bob::machine::JFAMachine::setJFABase(const boost::shared_ptr<bob::machine::JFABase> jfa_base)
 {
   if (!jfa_base->getUbm())
-    throw bob::machine::JFABaseNoUBMSet();
+    throw std::runtime_error("No UBM was set in the JFA machine.");
   m_jfa_base = jfa_base;
   // Resize variables
   resize();
@@ -569,7 +568,7 @@ void bob::machine::JFAMachine::estimateUx(const bob::machine::GMMStats& gmm_stat
   bob::math::prod(m_jfa_base->getU(), m_cache_x, Ux);
 }
 
-void bob::machine::JFAMachine::forward(const bob::machine::GMMStats& input, 
+void bob::machine::JFAMachine::forward(const bob::machine::GMMStats& input,
   double& score) const
 {
   forward_(input, score);
@@ -579,24 +578,24 @@ void bob::machine::JFAMachine::forward(const bob::machine::GMMStats& gmm_stats,
   const blitz::Array<double,1>& Ux, double& score) const
 {
   // Checks that a Base machine has been set
-  if (!m_jfa_base) throw bob::machine::JFAMachineNoJFABaseSet();
+  if (!m_jfa_base) throw std::runtime_error("No UBM was set in the JFA machine.");
 
-  score = bob::machine::linearScoring(m_cache_mVyDz, 
+  score = bob::machine::linearScoring(m_cache_mVyDz,
             m_jfa_base->getUbm()->getMeanSupervector(), m_jfa_base->getUbm()->getVarianceSupervector(),
             gmm_stats, Ux, true);
 }
 
-void bob::machine::JFAMachine::forward_(const bob::machine::GMMStats& input, 
+void bob::machine::JFAMachine::forward_(const bob::machine::GMMStats& input,
   double& score) const
 {
   // Checks that a Base machine has been set
-  if (!m_jfa_base) throw bob::machine::JFAMachineNoJFABaseSet();
+  if (!m_jfa_base) throw std::runtime_error("No UBM was set in the JFA machine.");
 
   // Ux and GMMStats
   estimateX(input, m_cache_x);
   bob::math::prod(m_jfa_base->getU(), m_cache_x, m_tmp_Ux);
 
-  score = bob::machine::linearScoring(m_cache_mVyDz, 
+  score = bob::machine::linearScoring(m_cache_mVyDz,
             m_jfa_base->getUbm()->getMeanSupervector(), m_jfa_base->getUbm()->getVarianceSupervector(),
             input, m_tmp_Ux, true);
 }
@@ -615,7 +614,7 @@ bob::machine::ISVMachine::ISVMachine(const boost::shared_ptr<bob::machine::ISVBa
   m_z(isv_base->getDimCD())
 {
   if (!m_isv_base->getUbm())
-    throw bob::machine::JFABaseNoUBMSet();
+    throw std::runtime_error("No UBM was set in the JFA machine.");
   updateCache();
   resizeTmp();
 }
@@ -637,13 +636,13 @@ bob::machine::ISVMachine::ISVMachine(bob::io::HDF5File& config)
 bob::machine::ISVMachine::~ISVMachine() {
 }
 
-bob::machine::ISVMachine& 
-bob::machine::ISVMachine::operator=(const bob::machine::ISVMachine& other) 
+bob::machine::ISVMachine&
+bob::machine::ISVMachine::operator=(const bob::machine::ISVMachine& other)
 {
   if (this != &other)
   {
     m_isv_base = other.m_isv_base;
-    m_z.reference(bob::core::array::ccopy(other.m_z));  
+    m_z.reference(bob::core::array::ccopy(other.m_z));
   }
   return *this;
 }
@@ -654,14 +653,14 @@ bool bob::machine::ISVMachine::operator==(const bob::machine::ISVMachine& other)
           bob::core::array::isEqual(m_z, other.m_z));
 }
 
-bool bob::machine::ISVMachine::operator!=(const bob::machine::ISVMachine& b) const 
+bool bob::machine::ISVMachine::operator!=(const bob::machine::ISVMachine& b) const
 {
   return !(this->operator==(b));
 }
 
 
-bool bob::machine::ISVMachine::is_similar_to(const bob::machine::ISVMachine& b, 
-    const double r_epsilon, const double a_epsilon) const 
+bool bob::machine::ISVMachine::is_similar_to(const bob::machine::ISVMachine& b,
+    const double r_epsilon, const double a_epsilon) const
 {
   return (m_isv_base->is_similar_to(*(b.m_isv_base), r_epsilon, a_epsilon) &&
           bob::core::array::isClose(m_z, b.m_z, r_epsilon, a_epsilon));
@@ -672,9 +671,9 @@ void bob::machine::ISVMachine::save(bob::io::HDF5File& config) const
   config.setArray("z", m_z);
 }
 
-void bob::machine::ISVMachine::load(bob::io::HDF5File& config) 
+void bob::machine::ISVMachine::load(bob::io::HDF5File& config)
 {
-  //reads all data directly into the member variables 
+  //reads all data directly into the member variables
   blitz::Array<double,1> z = config.readArray<double,1>("z");
   if (!m_isv_base)
     m_z.resize(z.extent(0));
@@ -697,7 +696,7 @@ void bob::machine::ISVMachine::setZ(const blitz::Array<double,1>& z)
 void bob::machine::ISVMachine::setISVBase(const boost::shared_ptr<bob::machine::ISVBase> isv_base)
 {
   if (!isv_base->getUbm())
-    throw bob::machine::JFABaseNoUBMSet();
+    throw std::runtime_error("No UBM was set in the JFA machine.");
   m_isv_base = isv_base;
   // Resize variables
   resize();
@@ -736,7 +735,7 @@ void bob::machine::ISVMachine::estimateUx(const bob::machine::GMMStats& gmm_stat
   bob::math::prod(m_isv_base->getU(), m_cache_x, Ux);
 }
 
-void bob::machine::ISVMachine::forward(const bob::machine::GMMStats& input, 
+void bob::machine::ISVMachine::forward(const bob::machine::GMMStats& input,
   double& score) const
 {
   forward_(input, score);
@@ -746,24 +745,24 @@ void bob::machine::ISVMachine::forward(const bob::machine::GMMStats& gmm_stats,
   const blitz::Array<double,1>& Ux, double& score) const
 {
   // Checks that a Base machine has been set
-  if (!m_isv_base) throw bob::machine::JFAMachineNoJFABaseSet();
+  if (!m_isv_base) throw std::runtime_error("No UBM was set in the JFA machine.");
 
-  score = bob::machine::linearScoring(m_cache_mDz, 
+  score = bob::machine::linearScoring(m_cache_mDz,
             m_isv_base->getUbm()->getMeanSupervector(), m_isv_base->getUbm()->getVarianceSupervector(),
             gmm_stats, Ux, true);
 }
 
-void bob::machine::ISVMachine::forward_(const bob::machine::GMMStats& input, 
+void bob::machine::ISVMachine::forward_(const bob::machine::GMMStats& input,
   double& score) const
 {
   // Checks that a Base machine has been set
-  if(!m_isv_base) throw bob::machine::JFAMachineNoJFABaseSet();
+  if(!m_isv_base) throw std::runtime_error("No UBM was set in the JFA machine.");
 
   // Ux and GMMStats
   estimateX(input, m_cache_x);
   bob::math::prod(m_isv_base->getU(), m_cache_x, m_tmp_Ux);
 
-  score = bob::machine::linearScoring(m_cache_mDz, 
+  score = bob::machine::linearScoring(m_cache_mDz,
             m_isv_base->getUbm()->getMeanSupervector(), m_isv_base->getUbm()->getVarianceSupervector(),
             input, m_tmp_Ux, true);
 }
