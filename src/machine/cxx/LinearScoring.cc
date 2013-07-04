@@ -148,4 +148,39 @@ void linearScoring(const std::vector<boost::shared_ptr<const bob::machine::GMMMa
   detail::linearScoring(models_b, ubm_mean, ubm_variance, test_stats, &test_channelOffset, frame_length_normalisation, scores);
 }
 
+
+
+double linearScoring(const blitz::Array<double,1>& models,
+                     const blitz::Array<double,1>& ubm_mean, const blitz::Array<double,1>& ubm_variance,
+                     const bob::machine::GMMStats& test_stats,
+                     const blitz::Array<double,1>& test_channelOffset,
+                     const bool frame_length_normalisation)
+{
+  int C = test_stats.sumPx.extent(0);
+  int D = test_stats.sumPx.extent(1);
+  int CD = C*D;
+
+
+  blitz::Array<double,1> A(CD);
+  blitz::Array<double,1> B(CD);
+
+  // 1) Compute A
+  A = (models - ubm_mean) / ubm_variance;
+
+  // 2) Compute B
+  for (int s=0; s<CD; ++s) 
+    B(s) = test_stats.sumPx(s/D, s%D) - (test_stats.n(s/D) * (ubm_mean(s) + test_channelOffset(s)));
+
+  // Apply the normalisation if needed
+  if (frame_length_normalisation) {
+    double sum_N = test_stats.T;
+    if (sum_N == 0)
+      B = 0;
+    else 
+      B /= sum_N;
+  }
+
+  return blitz::sum(A * B);
+}
+
 }}

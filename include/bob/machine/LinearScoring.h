@@ -50,12 +50,12 @@ void linearScoring(const std::vector<blitz::Array<double,1> >& models,
                    const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& test_stats,
                    const std::vector<blitz::Array<double, 1> >& test_channelOffset,
                    const bool frame_length_normalisation,
-                   blitz::Array<double, 2>& scores);
+                   blitz::Array<double,2>& scores);
 void linearScoring(const std::vector<blitz::Array<double,1> >& models,
                    const blitz::Array<double,1>& ubm_mean, const blitz::Array<double,1>& ubm_variance,
                    const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& test_stats,
                    const bool frame_length_normalisation,
-                   blitz::Array<double, 2>& scores);
+                   blitz::Array<double,2>& scores);
 
 /**
  * Compute a matrix of scores using linear scoring.
@@ -73,7 +73,7 @@ void linearScoring(const std::vector<boost::shared_ptr<const bob::machine::GMMMa
                    const bob::machine::GMMMachine& ubm,
                    const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& test_stats,
                    const bool frame_length_normalisation,
-                   blitz::Array<double, 2>& scores);
+                   blitz::Array<double,2>& scores);
 /**
  * Compute a matrix of scores using linear scoring.
  *
@@ -92,7 +92,23 @@ void linearScoring(const std::vector<boost::shared_ptr<const bob::machine::GMMMa
                    const std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& test_stats,
                    const std::vector<blitz::Array<double, 1> >& test_channelOffset,
                    const bool frame_length_normalisation,
-                   blitz::Array<double, 2>& scores);
+                   blitz::Array<double,2>& scores);
+
+/**
+ * Compute a score using linear scoring.
+ *
+ * @param model         mean supervector for the client model
+ * @param ubm_mean      mean supervector of the world model
+ * @param ubm_variance  variance supervector of the world model
+ * @param test_stats    accumulate statistics of the test trial
+ * @param test_channelOffset  channel offset
+ * @param frame_length_normalisation   perform a normalisation by the number of feature vectors
+ */
+double linearScoring(const blitz::Array<double,1>& model,
+                   const blitz::Array<double,1>& ubm_mean, const blitz::Array<double,1>& ubm_variance,
+                   const bob::machine::GMMStats& test_stats,
+                   const blitz::Array<double,1>& test_channelOffset,
+                   const bool frame_length_normalisation);
 
 /**
  * @}

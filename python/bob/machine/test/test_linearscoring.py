@@ -105,3 +105,32 @@ class LinearScoringTest(unittest.TestCase):
     # 2/d/ With test_channelOffset, with frame-length normalisation
     scores = bob.machine.linear_scoring([model1.mean_supervector, model2.mean_supervector], ubm.mean_supervector, ubm.variance_supervector, [stats1, stats2, stats3], test_channeloffset, True)
     self.assertTrue((abs(scores - ref_scores_11) < 1e-7).all())
+
+    # 3/ Using single model/sample
+    # 3/a/ without frame-length normalisation
+    score = bob.machine.linear_scoring(model1.mean_supervector, ubm.mean_supervector, ubm.variance_supervector, stats1, test_channeloffset[0])
+    self.assertTrue(abs(score - ref_scores_10[0,0]) < 1e-7)
+    score = bob.machine.linear_scoring(model1.mean_supervector, ubm.mean_supervector, ubm.variance_supervector, stats2, test_channeloffset[1])
+    self.assertTrue(abs(score - ref_scores_10[0,1]) < 1e-7)
+    score = bob.machine.linear_scoring(model1.mean_supervector, ubm.mean_supervector, ubm.variance_supervector, stats3, test_channeloffset[2])
+    self.assertTrue(abs(score - ref_scores_10[0,2]) < 1e-7)
+    score = bob.machine.linear_scoring(model2.mean_supervector, ubm.mean_supervector, ubm.variance_supervector, stats1, test_channeloffset[0])
+    self.assertTrue(abs(score - ref_scores_10[1,0]) < 1e-7)
+    score = bob.machine.linear_scoring(model2.mean_supervector, ubm.mean_supervector, ubm.variance_supervector, stats2, test_channeloffset[1])
+    self.assertTrue(abs(score - ref_scores_10[1,1]) < 1e-7)
+    score = bob.machine.linear_scoring(model2.mean_supervector, ubm.mean_supervector, ubm.variance_supervector, stats3, test_channeloffset[2])
+    self.assertTrue(abs(score - ref_scores_10[1,2]) < 1e-7)
+
+    # 3/b/ without frame-length normalisation
+    score = bob.machine.linear_scoring(model1.mean_supervector, ubm.mean_supervector, ubm.variance_supervector, stats1, test_channeloffset[0], True)
+    self.assertTrue(abs(score - ref_scores_11[0,0]) < 1e-7)
+    score = bob.machine.linear_scoring(model1.mean_supervector, ubm.mean_supervector, ubm.variance_supervector, stats2, test_channeloffset[1], True)
+    self.assertTrue(abs(score - ref_scores_11[0,1]) < 1e-7)
+    score = bob.machine.linear_scoring(model1.mean_supervector, ubm.mean_supervector, ubm.variance_supervector, stats3, test_channeloffset[2], True)
+    self.assertTrue(abs(score - ref_scores_11[0,2]) < 1e-7)
+    score = bob.machine.linear_scoring(model2.mean_supervector, ubm.mean_supervector, ubm.variance_supervector, stats1, test_channeloffset[0], True)
+    self.assertTrue(abs(score - ref_scores_11[1,0]) < 1e-7)
+    score = bob.machine.linear_scoring(model2.mean_supervector, ubm.mean_supervector, ubm.variance_supervector, stats2, test_channeloffset[1], True)
+    self.assertTrue(abs(score - ref_scores_11[1,1]) < 1e-7)
+    score = bob.machine.linear_scoring(model2.mean_supervector, ubm.mean_supervector, ubm.variance_supervector, stats3, test_channeloffset[2], True)
+    self.assertTrue(abs(score - ref_scores_11[1,2]) < 1e-7)

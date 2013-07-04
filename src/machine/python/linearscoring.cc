@@ -107,8 +107,18 @@ static blitz::Array<double, 2> linearScoring2(list models,
   return ret;
 }
 
+static double linearScoring3(bob::python::const_ndarray model,
+  bob::python::const_ndarray ubm_mean, bob::python::const_ndarray ubm_var,
+  const bob::machine::GMMStats& test_stats, bob::python::const_ndarray test_channelOffset,
+  const bool frame_length_normalisation = false)
+{
+  return bob::machine::linearScoring(model.bz<double,1>(), ubm_mean.bz<double,1>(),
+          ubm_var.bz<double,1>(), test_stats, test_channelOffset.bz<double,1>(), frame_length_normalisation);
+}
+
 BOOST_PYTHON_FUNCTION_OVERLOADS(linearScoring1_overloads, linearScoring1, 4, 6)
 BOOST_PYTHON_FUNCTION_OVERLOADS(linearScoring2_overloads, linearScoring2, 3, 5)
+BOOST_PYTHON_FUNCTION_OVERLOADS(linearScoring3_overloads, linearScoring3, 5, 6)
 
 void bind_machine_linear_scoring() {
   def("linear_scoring", linearScoring1, linearScoring1_overloads(args("models", "ubm_mean", "ubm_variance", "test_stats", "test_channelOffset", "frame_length_normalisation"),
@@ -135,5 +145,15 @@ void bind_machine_linear_scoring() {
     "test_stats  -- list of accumulate statistics for each test trial\n"
     "test_channel_offset -- \n"
     "frame_length_normlisation -- perform a normalisation by the number of feature vectors\n"
-  ));
+    ));
+  def("linear_scoring", linearScoring3, linearScoring3_overloads(args("model", "ubm_mean", "ubm_variance", "test_stats", "test_channelOffset", "frame_length_normalisation"),
+    "Compute a score using linear scoring.\n"
+    "\n"
+    "model        -- mean supervectors for the client model\n"
+    "ubm_mean     -- mean supervector for the world model\n"
+    "ubm_variance -- variance supervector for the world model\n"
+    "test_stats   -- accumulate statistics for each test trial\n"
+    "test_channelOffset -- \n"
+    "frame_length_normlisation -- perform a normalisation by the number of feature vectors\n"
+    ));
 }
