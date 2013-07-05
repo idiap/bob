@@ -7,16 +7,16 @@
  * This codec is only able to work with 2D and 3D input.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -44,7 +44,11 @@ static boost::shared_ptr<std::FILE> make_cfile(const char *filename, const char 
     fp = pm_openr(filename);
   else // write
     fp = pm_openw(filename);
-  if(fp == 0) throw bob::io::FileNotReadable(filename);
+  if(fp == 0) {
+    boost::format m("cannot open file `%s'");
+    m % filename;
+    throw std::runtime_error(m.str());
+  }
   return boost::shared_ptr<std::FILE>(fp, pm_close);
 }
 
@@ -55,7 +59,7 @@ static void im_peek(const std::string& path, bob::core::array::typeinfo& info) {
 
   struct pam in_pam;
   boost::shared_ptr<std::FILE> in_file = make_cfile(path.c_str(), "r");
-#ifdef PAM_STRUCT_SIZE 
+#ifdef PAM_STRUCT_SIZE
   // For version >= 10.23
   pnm_readpaminit(in_file.get(), &in_pam, PAM_STRUCT_SIZE(tuple_type));
 #else
@@ -108,7 +112,7 @@ void im_load_gray(struct pam *in_pam, bob::core::array::interface& b) {
       ++element;
     }
   }
-  pnm_freepamrow(tuplerow);  
+  pnm_freepamrow(tuplerow);
 }
 
 template <typename T> static
@@ -123,13 +127,13 @@ void imbuffer_to_rgb(size_t size, const tuple* tuplerow, T* r, T* g, T* b) {
 template <typename T> static
 void im_load_color(struct pam *in_pam, bob::core::array::interface& b) {
   const bob::core::array::typeinfo& info = b.type();
-  
-  long unsigned int frame_size = info.shape[2] * info.shape[1]; 
+
+  long unsigned int frame_size = info.shape[2] * info.shape[1];
   T *element_r = static_cast<T*>(b.ptr());
   T *element_g = element_r+frame_size;
   T *element_b = element_g+frame_size;
 
-  int row_color_stride = info.shape[2]; // row_stride for each component 
+  int row_color_stride = info.shape[2]; // row_stride for each component
   tuple *tuplerow = pnm_allocpamrow(in_pam);
   for(size_t y=0; y<info.shape[1]; ++y)
   {
@@ -139,14 +143,14 @@ void im_load_color(struct pam *in_pam, bob::core::array::interface& b) {
     element_g += row_color_stride;
     element_b += row_color_stride;
   }
-  pnm_freepamrow(tuplerow);  
+  pnm_freepamrow(tuplerow);
 }
 
 static void im_load (const std::string& filename, bob::core::array::interface& b) {
 
   struct pam in_pam;
   boost::shared_ptr<std::FILE> in_file = make_cfile(filename.c_str(), "r");
-#ifdef PAM_STRUCT_SIZE 
+#ifdef PAM_STRUCT_SIZE
   // For version >= 10.23
   pnm_readpaminit(in_file.get(), &in_pam, PAM_STRUCT_SIZE(tuple_type));
 #else
@@ -157,17 +161,29 @@ static void im_load (const std::string& filename, bob::core::array::interface& b
 
   if (info.dtype == bob::core::array::t_uint8) {
     if(info.nd == 2) im_load_gray<uint8_t>(&in_pam, b);
-    else if( info.nd == 3) im_load_color<uint8_t>(&in_pam, b); 
-    else throw bob::io::ImageUnsupportedDimension(info.nd);
+    else if( info.nd == 3) im_load_color<uint8_t>(&in_pam, b);
+    else {
+      boost::format m("(netpbm) unsupported image type found in file `%s': %s");
+      m % filename % info.str();
+      throw std::runtime_error(m.str());
+    }
   }
 
   else if (info.dtype == bob::core::array::t_uint16) {
     if(info.nd == 2) im_load_gray<uint16_t>(&in_pam, b);
-    else if( info.nd == 3) im_load_color<uint16_t>(&in_pam, b); 
-    else throw bob::io::ImageUnsupportedDimension(info.nd);
+    else if( info.nd == 3) im_load_color<uint16_t>(&in_pam, b);
+    else {
+      boost::format m("(netpbm) unsupported image type found in file `%s': %s");
+      m % filename % info.str();
+      throw std::runtime_error(m.str());
+    }
   }
 
-  else throw bob::io::ImageUnsupportedType();
+  else {
+    boost::format m("(netpbm) unsupported image type found in file `%s': %s");
+    m % filename % info.str();
+    throw std::runtime_error(m.str());
+  }
 }
 
 /**
@@ -208,11 +224,11 @@ static void im_save_color(const bob::core::array::interface& b, struct pam *out_
   const T *element_g = element_r + frame_size;
   const T *element_b = element_g + frame_size;
 
-  int row_color_stride = info.shape[2]; // row_stride for each component 
+  int row_color_stride = info.shape[2]; // row_stride for each component
   tuple *tuplerow = pnm_allocpamrow(out_pam);
   for(size_t y=0; y<info.shape[1]; ++y) {
     rgb_to_imbuffer(row_color_stride, element_r, element_g, element_b, tuplerow);
-    pnm_writepamrow(out_pam, tuplerow); 
+    pnm_writepamrow(out_pam, tuplerow);
     element_r += row_color_stride;
     element_g += row_color_stride;
     element_b += row_color_stride;
@@ -232,7 +248,7 @@ static void im_save (const std::string& filename, const bob::core::array::interf
 
   // Sets the parameters of the pam structure according to the bca::interface properties
   out_pam.size = sizeof(out_pam);
-#ifdef PAM_STRUCT_SIZE 
+#ifdef PAM_STRUCT_SIZE
   // For version >= 10.23
   out_pam.len = PAM_STRUCT_SIZE(tuple_type);
 #else
@@ -246,18 +262,18 @@ static void im_save (const std::string& filename, const bob::core::array::interf
   out_pam.maxval = (bob::core::array::t_uint8 ? 255 : 65535);
   out_pam.bytes_per_sample = (info.dtype == bob::core::array::t_uint8 ? 1 : 2);
   out_pam.format = PAM_FORMAT;
-  if( ext.compare(".pbm") == 0) 
+  if( ext.compare(".pbm") == 0)
   {
     out_pam.maxval = 1;
     out_pam.format = PBM_FORMAT;
     strcpy(out_pam.tuple_type, PAM_PBM_TUPLETYPE);
   }
-  else if( ext.compare(".pgm") == 0) 
+  else if( ext.compare(".pgm") == 0)
   {
     out_pam.format = PGM_FORMAT;
     strcpy(out_pam.tuple_type, PAM_PGM_TUPLETYPE);
   }
-  else 
+  else
   {
     out_pam.format = PPM_FORMAT;
     strcpy(out_pam.tuple_type, PAM_PPM_TUPLETYPE);
@@ -278,7 +294,11 @@ static void im_save (const std::string& filename, const bob::core::array::interf
       if(info.shape[0] != 3) throw std::runtime_error("color image does not have 3 planes on 1st. dimension");
       im_save_color<uint8_t>(array, &out_pam);
     }
-    else throw bob::io::ImageUnsupportedDimension(info.nd);
+    else {
+      boost::format m("(netpbm) cannot write object of type `%s' to file `%s'");
+      m % info.str() % filename;
+      throw std::runtime_error(m.str());
+    }
 
   }
 
@@ -289,11 +309,19 @@ static void im_save (const std::string& filename, const bob::core::array::interf
       if(info.shape[0] != 3) throw std::runtime_error("color image does not have 3 planes on 1st. dimension");
       im_save_color<uint16_t>(array, &out_pam);
     }
-    else throw bob::io::ImageUnsupportedDimension(info.nd); 
+    else {
+      boost::format m("(netpbm) cannot write object of type `%s' to file `%s'");
+      m % info.str() % filename;
+      throw std::runtime_error(m.str());
+    }
 
   }
 
-  else throw bob::io::ImageUnsupportedType();
+  else {
+    boost::format m("(netpbm) cannot write object of type `%s' to file `%s'");
+    m % info.str() % filename;
+    throw std::runtime_error(m.str());
+  }
 }
 
 
@@ -354,7 +382,7 @@ class ImageNetpbmFile: public bob::io::File {
 
     virtual void read(bob::core::array::interface& buffer, size_t index) {
 
-      if (m_newfile) 
+      if (m_newfile)
         throw std::runtime_error("uninitialized image file cannot be read");
 
       if (!buffer.type().is_compatible(m_type)) buffer.set(m_type);
@@ -408,7 +436,7 @@ std::string ImageNetpbmFile::s_codecname = "bob.image_netpbm";
 
 /**
  * This defines the factory method F that can create codecs of this type.
- * 
+ *
  * Here are the meanings of the mode flag that should be respected by your
  * factory implementation:
  *
@@ -416,8 +444,8 @@ std::string ImageNetpbmFile::s_codecname = "bob.image_netpbm";
  *      error to open a file that does not exist for read-only operations.
  * 'w': opens for reading and writing, but truncates the file if it
  *      exists; it is not an error to open files that do not exist with
- *      this flag. 
- * 'a': opens for reading and writing - any type of modification can 
+ *      this flag.
+ * 'a': opens for reading and writing - any type of modification can
  *      occur. If the file does not exist, this flag is effectively like
  *      'w'.
  *
@@ -426,7 +454,7 @@ std::string ImageNetpbmFile::s_codecname = "bob.image_netpbm";
  *
  * @note: This method can be static.
  */
-static boost::shared_ptr<bob::io::File> 
+static boost::shared_ptr<bob::io::File>
 make_file (const std::string& path, char mode) {
   return boost::make_shared<ImageNetpbmFile>(path, mode);
 }
@@ -438,7 +466,7 @@ static bool register_codec() {
   boost::shared_ptr<bob::io::CodecRegistry> instance =
     bob::io::CodecRegistry::instance();
 
-  pm_init("bob",0); 
+  pm_init("bob",0);
   instance->registerExtension(".pbm", "PBM, indexed (libnetpbm)", &make_file);
   instance->registerExtension(".pgm", "PGM, indexed (libnetpbm)", &make_file);
   instance->registerExtension(".ppm", "PPM, indexed (libnetpbm)", &make_file);

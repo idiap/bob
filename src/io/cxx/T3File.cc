@@ -17,16 +17,16 @@
  * single-dimension input.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -44,7 +44,6 @@
 #include <bob/core/check.h>
 #include <bob/core/blitz_array.h>
 #include <bob/io/CodecRegistry.h>
-#include <bob/io/Exception.h>
 
 static inline size_t get_filesize(const std::string& filename) {
   struct stat filestatus;
@@ -64,18 +63,22 @@ class T3File: public bob::io::File {
           size_t fsize = get_filesize(path);
           fsize -= 8; // remove the first two entries
           // read the first two 4-byte integers in the file, convert to unsigned
-          
+
           std::fstream s(path.c_str(), std::ios::binary|std::ios::in);
 
-          if (!s) throw bob::io::FileNotReadable(path);
-          
+          if (!s) {
+            boost::format m("cannot open file `%s'");
+            m % path;
+            throw std::runtime_error(m.str());
+          }
+
           uint32_t nsamples, framesize;
           nsamples = framesize = 0;
           s.read((char*)&nsamples, sizeof(uint32_t));
           s.read((char*)&framesize, sizeof(uint32_t));
 
           m_length = nsamples;
-          
+
           // are those floats or doubles?
           if (fsize == (nsamples*framesize*sizeof(float))) {
             m_type_array.dtype = bob::core::array::t_float32;
@@ -85,7 +88,7 @@ class T3File: public bob::io::File {
             m_type_array.dtype = bob::core::array::t_float64;
             m_type_arrayset.dtype = bob::core::array::t_float64;
           }
-          else { 
+          else {
             boost::format s("Cannot read file '%s', mode = '%c': fsize (%d) != %d*%d*sizeof(float32) nor *sizeof(float64)");
             s % path % mode % fsize % nsamples % framesize;
             throw std::invalid_argument(s.str());
@@ -173,18 +176,22 @@ class T3File: public bob::io::File {
 
       std::ofstream ofile;
       if (m_newfile) {
-        
+
         //can only save uni-dimensional data, so throw if that is not the case
-        if (info.nd != 1) throw bob::io::DimensionError(info.nd, 1);
+        if (info.nd != 1) {
+          boost::format m("codec for torch3vision binary files can only save uni-dimensional data, but you passed: %s");
+          m % info.str();
+          throw std::runtime_error(m.str());
+        }
 
         //can only save float32 or float64, otherwise, throw.
-        if ((info.dtype != bob::core::array::t_float32) && 
+        if ((info.dtype != bob::core::array::t_float32) &&
             (info.dtype != bob::core::array::t_float64)) {
           boost::format f("cannot have T3 bindata files with type %s - only float32 or float64");
           f % bob::core::array::stringize(info.dtype);
           throw std::invalid_argument(f.str());
         }
-        
+
         ofile.open(m_filename.c_str(), std::ios::binary|std::ios::out|std::ios::trunc);
 
         //header writing...
@@ -197,7 +204,7 @@ class T3File: public bob::io::File {
         m_type_array.dtype = info.dtype;
         m_newfile = false; ///< block re-initialization
         m_length = 0;
-        
+
       }
       else {
         //only open the file, the rest is setup already
@@ -224,7 +231,7 @@ class T3File: public bob::io::File {
       ofile.write((const char*)&nsamples, sizeof(uint32_t));
       ofile.flush();
       return m_length-1;
-      
+
     }
 
     /**
@@ -244,7 +251,7 @@ class T3File: public bob::io::File {
       else if (info.nd == 2) { //append every array individually
 
         const uint8_t* ptr = static_cast<const uint8_t*>(buffer.ptr());
-        bob::core::array::typeinfo slice_info(info.dtype, static_cast<size_t>(1), 
+        bob::core::array::typeinfo slice_info(info.dtype, static_cast<size_t>(1),
             &info.shape[1]);
         for (size_t k=0; k<info.shape[0]; ++k) {
           const void* slice_ptr=static_cast<const void*>(ptr+k*slice_info.buffer_size());
@@ -284,7 +291,7 @@ std::string T3File::s_codecname = "torch3.binary";
 
 /**
  * This defines the factory method F that can create codecs of this type.
- * 
+ *
  * Here are the meanings of the mode flag that should be respected by your
  * factory implementation:
  *
@@ -292,8 +299,8 @@ std::string T3File::s_codecname = "torch3.binary";
  *      error to open a file that does not exist for read-only operations.
  * 'w': opens for reading and writing, but truncates the file if it
  *      exists; it is not an error to open files that do not exist with
- *      this flag. 
- * 'a': opens for reading and writing - any type of modification can 
+ *      this flag.
+ * 'a': opens for reading and writing - any type of modification can
  *      occur. If the file does not exist, this flag is effectively like
  *      'w'.
  *
@@ -302,7 +309,7 @@ std::string T3File::s_codecname = "torch3.binary";
  *
  * @note: This method can be static.
  */
-static boost::shared_ptr<bob::io::File> 
+static boost::shared_ptr<bob::io::File>
 make_file (const std::string& path, char mode) {
 
   return boost::make_shared<T3File>(path, mode);
@@ -316,7 +323,7 @@ static bool register_codec() {
 
   boost::shared_ptr<bob::io::CodecRegistry> instance =
     bob::io::CodecRegistry::instance();
-  
+
   instance->registerExtension(".bindata", "torch3 binary data format", &make_file);
 
   return true;

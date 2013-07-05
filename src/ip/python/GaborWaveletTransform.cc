@@ -23,7 +23,6 @@
 
 #include <boost/python.hpp>
 #include "bob/python/ndarray.h"
-#include "bob/core/array_exception.h"
 #include "bob/core/array_type.h"
 
 #include "bob/ip/GaborWaveletTransform.h"
@@ -34,7 +33,7 @@
 #include "bob/ip/color.h"
 
 
-template <class T> 
+template <class T>
 static inline const blitz::Array<std::complex<double>,2> complex_cast (bob::python::const_ndarray input){
   blitz::Array<T,2> gray(input.type().shape[1],input.type().shape[2]);
   bob::ip::rgb_to_gray(input.bz<T,3>(), gray);
@@ -48,7 +47,7 @@ static inline const blitz::Array<std::complex<double>, 2> convert_image(bob::pyt
       case bob::core::array::t_uint8: return complex_cast<uint8_t>(input);
       case bob::core::array::t_uint16: return complex_cast<uint16_t>(input);
       case bob::core::array::t_float64: return complex_cast<double>(input);
-      default: throw bob::core::Exception();
+      default: throw std::runtime_error("unsupported input data type");
     }
   } else {
     switch (input.type().dtype){
@@ -56,7 +55,7 @@ static inline const blitz::Array<std::complex<double>, 2> convert_image(bob::pyt
       case bob::core::array::t_uint16: return bob::core::array::cast<std::complex<double> >(input.bz<uint16_t,2>());
       case bob::core::array::t_float64: return bob::core::array::cast<std::complex<double> >(input.bz<double,2>());
       case bob::core::array::t_complex128: return input.bz<std::complex<double>,2>();
-      default: throw bob::core::Exception();
+      default: throw std::runtime_error("unsupported input data type");
     }
   }
 }
@@ -68,7 +67,7 @@ static inline void transform (bob::ip::GaborKernel& kernel, blitz::Array<std::co
 
   // apply the kernel in frequency domain
   kernel.transform(input, output);
-  
+
   // perform ifft on the result
   bob::sp::IFFT2D ifft(output.extent(0), output.extent(1));
   ifft(output);
@@ -88,10 +87,10 @@ static blitz::Array<std::complex<double>,2> gabor_wavelet_transform_2 (bob::ip::
   blitz::Array<std::complex<double>,2> input = convert_image(input_image);
   // allocate output array
   blitz::Array<std::complex<double>,2> output(input.extent(0), input.extent(1));
-  
+
   // transform input to output
   transform(kernel, input, output);
-  
+
   // return the nd array
   return output;
 }
@@ -134,7 +133,11 @@ static void compute_jets_1(bob::ip::GaborWaveletTransform& gwt, bob::python::con
   } else if (output_jet_image.type().nd == 4){
     blitz::Array<double,4> jet_image = output_jet_image.bz<double,4>();
     gwt.computeJetImage(image, jet_image, normalized);
-  } else throw bob::core::array::UnexpectedShapeError();
+  } else {
+    boost::format m("parameter `output_jet_image' has an unexpected shape: %s");
+    m % output_jet_image.type().str();
+    throw std::runtime_error(m.str());
+  }
 }
 
 static bob::python::ndarray compute_jets_2(bob::ip::GaborWaveletTransform& gwt, bob::python::const_ndarray input_image, bool include_phases, bool normalized){
@@ -151,7 +154,11 @@ static void normalize_gabor_jet(bob::python::ndarray gabor_jet){
   } else if (gabor_jet.type().nd == 2){
     blitz::Array<double,2> jet(gabor_jet.bz<double,2>());
     bob::ip::normalizeGaborJet(jet);
-  } else throw bob::core::array::UnexpectedShapeError();
+  } else {
+    boost::format m("parameter `gabor_jet' has an unexpected shape: %s");
+    m % gabor_jet.type().str();
+    throw std::runtime_error(m.str());
+  }
 }
 
 void bind_ip_gabor_wavelet_transform() {
@@ -161,7 +168,7 @@ void bind_ip_gabor_wavelet_transform() {
     "This class can be used to filter an image with a single Gabor wavelet.",
     boost::python::no_init
   )
-  
+
   .def(
     boost::python::init< const blitz::TinyVector<int,2>&, const blitz::TinyVector<double,2>&, boost::python::optional <const double, const double, const bool, const double> >(
       (
@@ -193,7 +200,7 @@ void bind_ip_gabor_wavelet_transform() {
     (boost::python::arg("self"), boost::python::arg("input_image")),
     "This function Gabor-filters the given input_image, which can be of any type. The output image is of complex type. It will be automatically generated and returned."
   );
-    
+
 
   // declare GWT class
   boost::python::class_<bob::ip::GaborWaveletTransform, boost::shared_ptr<bob::ip::GaborWaveletTransform> >(

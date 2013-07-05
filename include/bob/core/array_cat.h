@@ -8,21 +8,21 @@
  * copying.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB_CORE_ARRAY_CAT_H 
+#ifndef BOB_CORE_ARRAY_CAT_H
 #define BOB_CORE_ARRAY_CAT_H
 
 
@@ -32,7 +32,6 @@
 #include <blitz/tinyvec-et.h>
 #endif
 #include <vector>
-#include <bob/core/Exception.h>
 
 namespace bob { namespace core { namespace array {
   /**
@@ -54,7 +53,7 @@ namespace bob { namespace core { namespace array {
    * concatenated along the given dimension.
    */
   template <typename T, int N>
-    void dcopy_(const blitz::Array<T,N>& source, blitz::Array<T,N>& dest, 
+    void dcopy_(const blitz::Array<T,N>& source, blitz::Array<T,N>& dest,
         int D, int pos) {
       blitz::RectDomain<N> domain = dest.domain();
       domain.lbound(D) = pos;
@@ -67,7 +66,7 @@ namespace bob { namespace core { namespace array {
    * position and a dimension along which the copy will take place.
    *
    * Requires: Arrays have the same shape, except for the concatenation
-   * dimension. 
+   * dimension.
    *
    * Requires: The destination array should have enough space allocated.
    *
@@ -78,14 +77,14 @@ namespace bob { namespace core { namespace array {
     void dcopy(const blitz::Array<T,N>& source, blitz::Array<T,N>& dest,
         int D, int pos) {
 
-      if ( D >= N ) 
+      if ( D >= N )
         throw std::range_error("Copy dimension greater or equal total number of dimensions");
 
       //checks arrays are compatible
       blitz::TinyVector<int,N> v1 = source.shape();
       blitz::TinyVector<int,N> v2 = dest.shape();
       v1(D) = v2(D) = 0;
-      if ( blitz::any(v1 != v2) ) 
+      if ( blitz::any(v1 != v2) )
         throw std::runtime_error("Arrays are not compatible for copy along the given dimension");
 
       //checks destination has enough room
@@ -186,7 +185,7 @@ namespace bob { namespace core { namespace array {
 
   /**
    * @brief Copies the data of "source" along the given dimension of "dest".
-   * Special case: source has dimension N-1. Does not check any of the 
+   * Special case: source has dimension N-1. Does not check any of the
    * requirements (trust the user).
    *
    * Requires: Arrays have the same shape, except for the copy dimension.
@@ -213,7 +212,7 @@ namespace bob { namespace core { namespace array {
    * concatenated along the given dimension.
    */
   template <typename T, int N>
-    void dcopy(const blitz::Array<T,N-1>& source, blitz::Array<T,N>& dest, 
+    void dcopy(const blitz::Array<T,N-1>& source, blitz::Array<T,N>& dest,
         int D, int pos) {
 
       if ( D >= N )

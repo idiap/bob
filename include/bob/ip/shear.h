@@ -10,16 +10,16 @@
  * The notes of Tobin Fricke about this article might also be of interest.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -30,7 +30,6 @@
 #include <blitz/array.h>
 #include "bob/core/assert.h"
 #include "bob/core/cast.h"
-#include "bob/ip/Exception.h"
 #include "bob/ip/common.h"
 
 namespace bob {
@@ -60,7 +59,7 @@ namespace bob {
       template<typename T, bool mask>
       void shearXNoCheck(
         const blitz::Array<T,2>& src, const blitz::Array<bool,2>& src_mask,
-        blitz::Array<double,2>& dst, blitz::Array<bool,2>& dst_mask, 
+        blitz::Array<double,2>& dst, blitz::Array<bool,2>& dst_mask,
         const double shear, const bool antialias)
       {
         // Compute center coordinates in src and dst image
@@ -70,8 +69,8 @@ namespace bob {
 
         // If shear is equal to zero, we just need to do a simple copy
         if(shear == 0.) {
-          for( int y=0; y<src.extent(0); ++y) 
-            for( int x=0; x<src.extent(1); ++x) 
+          for( int y=0; y<src.extent(0); ++y)
+            for( int x=0; x<src.extent(1); ++x)
               dst(y,x) = bob::core::cast<double>(src(y,x));
           if(mask)
             detail::copyNoCheck(src_mask,dst_mask);
@@ -112,14 +111,14 @@ namespace bob {
               double residual;
               if( antialias )
                 residual = pixel * skew_f;
-              else 
+              else
                 residual = 0.;
               pixel = (pixel - residual) + old_residual;
               // Determine x-location on dst row
               int x_dst = ceil(x - x_c_src + x_c_dst - skew_i-0.5);
               if( x_dst >= 0 && x_dst < dst.extent(1) ) {
                 dst(y,x_dst) = pixel;
-                if(mask) 
+                if(mask)
                   dst_mask(y,x_dst) = ( x==src.extent(1)-1 ?
                       (antialias && skew_f !=0. ? false : src_mask(y,x))
                     : src_mask(y,x) && src_mask(y,x+1));
@@ -130,7 +129,7 @@ namespace bob {
             double next_ind = -x_c_src + x_c_dst - skew_i - 1 - 0.5;
             if( ceil(next_ind) >= 0) {
               dst(y,(int)ceil(next_ind)) = old_residual;
-              if(mask) 
+              if(mask)
                 dst_mask(y,(int)ceil(next_ind)) = false;
             }
           }
@@ -142,29 +141,29 @@ namespace bob {
               double residual;
               if( antialias )
                 residual = pixel * skew_f;
-              else 
+              else
                 residual = 0.;
               pixel = (pixel - residual) + old_residual;
               int x_dst = ceil(x - x_c_src + x_c_dst + skew_i-0.5);
               if( x_dst >= 0 && x_dst < dst.extent(1) ) {
                 dst(y,x_dst) = pixel;
-                if(mask) 
-                  dst_mask(y,x_dst) = (x==0 ? 
+                if(mask)
+                  dst_mask(y,x_dst) = (x==0 ?
                       (antialias && skew_f !=0. ? false : src_mask(y,x))
                     : src_mask(y,x) && src_mask(y,x-1));
               }
               old_residual = residual;
             }
             // Add remaining residual if possible
-            double next_ind = 
+            double next_ind =
               -x_c_src + x_c_dst + skew_i + src.extent(1) - 0.5;
             if( ceil(next_ind) < dst.extent(1)) {
               dst(y,(int)ceil(next_ind)) = old_residual;
-              if(mask) 
+              if(mask)
                 dst_mask(y,(int)ceil(next_ind)) = false;
             }
-          } 
-        }    
+          }
+        }
       }
 
     }
@@ -172,13 +171,13 @@ namespace bob {
 
     /**
       * @brief Return the shape of the output image/array, when performing
-      * a shearing along the X-axis, with the given input image/array and 
+      * a shearing along the X-axis, with the given input image/array and
       * shear parameter.
       * @param src the input array
       * @param shear The shear parameter in the matrix [1 shear; 0 1]
       */
     template <typename T>
-    const blitz::TinyVector<int,2> getShearXShape( 
+    const blitz::TinyVector<int,2> getShearXShape(
       const blitz::Array<T,2>& src, const double shear)
     {
       // Compute the required output size when applying shearX
@@ -190,13 +189,13 @@ namespace bob {
 
     /**
       * @brief Return the shape of the output image/array, when performing
-      * a shearing along the Y-axis, with the given input image/array and 
+      * a shearing along the Y-axis, with the given input image/array and
       * shear parameter.
       * @param src the input array
       * @param shear The shear parameter in the matrix [1 shear; 0 1]
       */
     template <typename T>
-    const blitz::TinyVector<int,2> getShearYShape( 
+    const blitz::TinyVector<int,2> getShearYShape(
       const blitz::Array<T,2>& src, const double shear)
     {
       // Compute the required output size when applying shearX
@@ -215,22 +214,22 @@ namespace bob {
       * @param src The input blitz array
       * @param dst The output blitz array
       * @param shear The shear parameter in the matrix [1 shear; 0 1]
-      * @param antialias Whether antialiasing should be used or not 
+      * @param antialias Whether antialiasing should be used or not
       */
     template<typename T>
-    void shearX(const blitz::Array<T,2>& src, blitz::Array<double,2>& dst, 
+    void shearX(const blitz::Array<T,2>& src, blitz::Array<double,2>& dst,
       const double shear, const bool antialias=true)
     {
       // Check input
       bob::core::array::assertZeroBase(src);
       // Check output
       bob::core::array::assertZeroBase(dst);
-      const blitz::TinyVector<int,2> shape = getShearXShape(src, shear); 
+      const blitz::TinyVector<int,2> shape = getShearXShape(src, shear);
       bob::core::array::assertSameShape(dst, shape);
 
       // Call the shearXNoCheck function
       blitz::Array<bool,2> src_mask, dst_mask;
-      detail::shearXNoCheck<T,false>( src, src_mask, dst, dst_mask, shear, 
+      detail::shearXNoCheck<T,false>( src, src_mask, dst, dst_mask, shear,
         antialias);
     }
 
@@ -246,10 +245,10 @@ namespace bob {
       * @param dst_mask The output blitz array mask, specifying the valid
       *   pixels of dst.
       * @param shear The shear parameter in the matrix [1 shear; 0 1]
-      * @param antialias Whether antialiasing should be used or not 
+      * @param antialias Whether antialiasing should be used or not
       */
     template<typename T>
-    void shearX(const blitz::Array<T,2>& src, 
+    void shearX(const blitz::Array<T,2>& src,
       const blitz::Array<bool,2>& src_mask,
       blitz::Array<double,2>& dst, blitz::Array<bool,2>& dst_mask,
       const double shear, const bool antialias=true)
@@ -262,11 +261,11 @@ namespace bob {
       bob::core::array::assertZeroBase(dst);
       bob::core::array::assertZeroBase(dst_mask);
       bob::core::array::assertSameShape(dst, dst_mask);
-      const blitz::TinyVector<int,2> shape = getShearXShape(src, shear); 
+      const blitz::TinyVector<int,2> shape = getShearXShape(src, shear);
       bob::core::array::assertSameShape(dst, shape);
 
       // Call the shearXNoCheck function
-      detail::shearXNoCheck<T,true>( src, src_mask, dst, dst_mask, shear, 
+      detail::shearXNoCheck<T,true>( src, src_mask, dst, dst_mask, shear,
         antialias);
     }
 
@@ -278,17 +277,17 @@ namespace bob {
       * @param src The input blitz array
       * @param dst The output blitz array
       * @param shear The shear parameter in the matrix [1 0; shear 1]
-      * @param antialias Whether antialiasing should be used or not 
+      * @param antialias Whether antialiasing should be used or not
       */
     template<typename T>
-    void shearY(const blitz::Array<T,2>& src, blitz::Array<double,2>& dst, 
+    void shearY(const blitz::Array<T,2>& src, blitz::Array<double,2>& dst,
       const double shear, const bool antialias=true)
     {
       // Check input
       bob::core::array::assertZeroBase(src);
       // Check output
       bob::core::array::assertZeroBase(dst);
-      const blitz::TinyVector<int,2> shape = getShearYShape(src, shear); 
+      const blitz::TinyVector<int,2> shape = getShearYShape(src, shear);
       bob::core::array::assertSameShape(dst, shape);
 
       // Create transposed view arrays for both src and dst
@@ -296,7 +295,7 @@ namespace bob {
       blitz::Array<double,2> dst_transpose = dst.transpose(1,0);
 
       // Call the shearXNoCheck function
-      blitz::Array<bool,2> src_mask_transpose, dst_mask_transpose; 
+      blitz::Array<bool,2> src_mask_transpose, dst_mask_transpose;
       detail::shearXNoCheck<T,false>( src_transpose, src_mask_transpose,
         dst_transpose, dst_mask_transpose, shear, antialias);
     }
@@ -313,7 +312,7 @@ namespace bob {
       * @param dst_mask The output blitz array mask, specifying the valid
       *   pixels of dst.
       * @param shear The shear parameter in the matrix [1 0; shear 1]
-      * @param antialias Whether antialiasing should be used or not 
+      * @param antialias Whether antialiasing should be used or not
       */
     template<typename T>
     void shearY(const blitz::Array<T,2>& src, const blitz::Array<bool,2>& src_mask,
@@ -328,18 +327,18 @@ namespace bob {
       bob::core::array::assertZeroBase(dst);
       bob::core::array::assertZeroBase(dst_mask);
       bob::core::array::assertSameShape(dst, dst_mask);
-      const blitz::TinyVector<int,2> shape = getShearYShape(src, shear); 
+      const blitz::TinyVector<int,2> shape = getShearYShape(src, shear);
       bob::core::array::assertSameShape(dst, shape);
 
       // Create transposed view arrays for both src and dst
       const blitz::Array<T,2> src_transpose = (src.copy()).transpose(1,0);
-      const blitz::Array<bool,2> src_mask_transpose = 
+      const blitz::Array<bool,2> src_mask_transpose =
         (src_mask.copy()).transpose(1,0);
       blitz::Array<double,2> dst_transpose = dst.transpose(1,0);
       blitz::Array<bool,2> dst_mask_transpose = dst_mask.transpose(1,0);
 
       // Call the shearXNoCheck function
-      detail::shearXNoCheck<T,true>( src_transpose, src_mask_transpose, 
+      detail::shearXNoCheck<T,true>( src_transpose, src_mask_transpose,
         dst_transpose, dst_mask_transpose, shear, antialias);
     }
 

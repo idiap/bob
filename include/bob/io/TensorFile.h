@@ -6,16 +6,16 @@
  * @brief This class can be used to load and store arrays from/to .tensor files
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -23,9 +23,11 @@
 #ifndef BOB_IO_TENSORFILE_H
 #define BOB_IO_TENSORFILE_H
 
+#include <boost/format.hpp>
+#include <stdexcept>
+
 #include <bob/core/blitz_array.h>
 #include <bob/io/TensorFileHeader.h>
-#include <bob/io/Exception.h>
 
 namespace bob { namespace io {
 
@@ -54,7 +56,7 @@ namespace bob { namespace io {
       typedef _TensorFileFlag openmode;
       static const openmode append  = _append;
       static const openmode in      = _in;
-      static const openmode out     = _out; 
+      static const openmode out     = _out;
 
       /**
        * Constructor
@@ -76,7 +78,7 @@ namespace bob { namespace io {
        */
       void close();
 
-      /** 
+      /**
        * Puts an Array of a given type into the output stream/file. If the
        * type/shape have not yet been set, it is set according to the type
        * and shape given in the blitz array, otherwise the type/shape should
@@ -94,7 +96,7 @@ namespace bob { namespace io {
        * Reads the file data into a bob::core::array::interface - this variant reads the next
        * variable. The bob::core::array::interface size will be reset if required.
        */
-      void read(bob::core::array::interface& data); 
+      void read(bob::core::array::interface& data);
 
       /**
        * Reads the file data into a bob::core::array::interface - this variant allows the
@@ -113,7 +115,7 @@ namespace bob { namespace io {
        *
        * @warning An exception is thrown if nothing was written so far
        */
-      inline size_t size() const { 
+      inline size_t size() const {
         return (m_header_init)? m_n_arrays_written : 0;
       }
 
@@ -122,9 +124,9 @@ namespace bob { namespace io {
        *
        * @warning An exception is thrown if nothing was written so far
        */
-      inline size_t getNElements() const { 
-        headerInitialized(); 
-        return m_header.getNElements(); 
+      inline size_t getNElements() const {
+        headerInitialized();
+        return m_header.getNElements();
       }
 
       /**
@@ -132,9 +134,9 @@ namespace bob { namespace io {
        *
        * @warning An exception is thrown if nothing was written so far
        */
-      inline size_t getSize(size_t dim_index) const { 
-        headerInitialized(); 
-        return m_header.m_type.shape[dim_index]; 
+      inline size_t getSize(size_t dim_index) const {
+        headerInitialized();
+        return m_header.m_type.shape[dim_index];
       }
 
       /**
@@ -150,16 +152,21 @@ namespace bob { namespace io {
        * Checks if the end of the tensor file is reached
        */
       inline void endOfFile() {
-        if(m_current_array >= m_header.m_n_samples ) 
-          throw IndexError(m_current_array);
+        if(m_current_array >= m_header.m_n_samples ) {
+          boost::format m("TensorFile::endOfFile(): current array index == %d is outside the bounds of declared object with size %d");
+          m % m_current_array % m_header.m_n_samples;
+          throw std::runtime_error(m.str());
+        }
       }
 
-      /** 
+      /**
        * Checks that the header has been initialized, and raise an
        * exception if not
        */
-      inline void headerInitialized() const { 
-        if (!m_header_init) throw Uninitialized();
+      inline void headerInitialized() const {
+        if (!m_header_init) {
+          throw std::runtime_error("TensorFile: header is not initialized");
+        }
       }
 
       /**
@@ -181,7 +188,7 @@ namespace bob { namespace io {
        * @warning: Please convert your files to HDF5, this format is
        * deprecated starting on 16.04.2011 - AA
        */
-      template <typename T, int D> 
+      template <typename T, int D>
         inline void write(blitz::Array<T,D>& bz) {
           write(bob::core::array::blitz_array(bz));
         }
@@ -199,7 +206,7 @@ namespace bob { namespace io {
       }
 
       template <typename T, int D> inline blitz::Array<T,D> read(size_t
-          index) { 
+          index) {
         bob::core::array::typeinfo info;
         peek(info);
         bob::core::array::blitz_array buf(info);
@@ -215,35 +222,35 @@ namespace bob { namespace io {
       std::fstream m_stream;
       detail::TensorFileHeader m_header;
       openmode m_openmode;
-      boost::shared_ptr<void> m_buffer; 
+      boost::shared_ptr<void> m_buffer;
   };
 
-  inline _TensorFileFlag operator&(_TensorFileFlag a, _TensorFileFlag b) { 
-    return _TensorFileFlag(static_cast<int>(a) & static_cast<int>(b)); 
+  inline _TensorFileFlag operator&(_TensorFileFlag a, _TensorFileFlag b) {
+    return _TensorFileFlag(static_cast<int>(a) & static_cast<int>(b));
   }
 
-  inline _TensorFileFlag operator|(_TensorFileFlag a, _TensorFileFlag b) { 
-    return _TensorFileFlag(static_cast<int>(a) | static_cast<int>(b)); 
+  inline _TensorFileFlag operator|(_TensorFileFlag a, _TensorFileFlag b) {
+    return _TensorFileFlag(static_cast<int>(a) | static_cast<int>(b));
   }
 
-  inline _TensorFileFlag operator^(_TensorFileFlag a, _TensorFileFlag b) { 
-    return _TensorFileFlag(static_cast<int>(a) ^ static_cast<int>(b)); 
+  inline _TensorFileFlag operator^(_TensorFileFlag a, _TensorFileFlag b) {
+    return _TensorFileFlag(static_cast<int>(a) ^ static_cast<int>(b));
   }
 
-  inline _TensorFileFlag& operator|=(_TensorFileFlag& a, _TensorFileFlag b) { 
-    return a = a | b; 
+  inline _TensorFileFlag& operator|=(_TensorFileFlag& a, _TensorFileFlag b) {
+    return a = a | b;
   }
 
-  inline _TensorFileFlag& operator&=(_TensorFileFlag& a, _TensorFileFlag b) { 
-    return a = a & b; 
+  inline _TensorFileFlag& operator&=(_TensorFileFlag& a, _TensorFileFlag b) {
+    return a = a & b;
   }
 
-  inline _TensorFileFlag& operator^=(_TensorFileFlag& a, _TensorFileFlag b) { 
-    return a = a ^ b; 
+  inline _TensorFileFlag& operator^=(_TensorFileFlag& a, _TensorFileFlag b) {
+    return a = a ^ b;
   }
 
-  inline _TensorFileFlag operator~(_TensorFileFlag a) { 
-    return _TensorFileFlag(~static_cast<int>(a)); 
+  inline _TensorFileFlag operator~(_TensorFileFlag a) {
+    return _TensorFileFlag(~static_cast<int>(a));
   }
 
 } }

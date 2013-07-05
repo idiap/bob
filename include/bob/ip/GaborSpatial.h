@@ -7,16 +7,16 @@
  * filter in the spatial domain.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -24,7 +24,6 @@
 #ifndef BOB_IP_GABOR_SPATIAL_H
 #define BOB_IP_GABOR_SPATIAL_H
 
-#include "bob/ip/Exception.h"
 #include "bob/sp/conv.h"
 #include "bob/sp/extrapolate.h"
 
@@ -51,10 +50,10 @@ namespace bob {
      * @brief This class can be used to perform Gabor filtering in the
      * spatial domain. Please refer to the following article for more
      * information:
-     *   "Invariance properties of Gabor filter-based features-overview and 
-     *   applications ", J.K. Kamarainen, V. Kyrki, H. Kalviainen, 
-     *   in IEEE Transactions on Image Procesing, vol. 15, Issue 5, 
-     *   pp. 1088-1099 
+     *   "Invariance properties of Gabor filter-based features-overview and
+     *   applications ", J.K. Kamarainen, V. Kyrki, H. Kalviainen,
+     *   in IEEE Transactions on Image Procesing, vol. 15, Issue 5,
+     *   pp. 1088-1099
      */
     // TODO: Deal with the SizeOption for convolution?
     class GaborSpatial
@@ -64,9 +63,9 @@ namespace bob {
         /**
          * @brief Constructor: generates the Gabor filter
          */
-        GaborSpatial(const double f=0.25, const double theta=0., 
+        GaborSpatial(const double f=0.25, const double theta=0.,
           const double gamma=1., const double eta=1., const int spatial_size=35,
-          const bool cancel_dc=false, 
+          const bool cancel_dc=false,
           const enum ip::Gabor::NormOption norm_opt=ip::Gabor::SpatialFactor,
           const enum sp::Extrapolation::BorderType border_type=sp::Extrapolation::Mirror);
 
@@ -100,22 +99,22 @@ namespace bob {
         /**
           * @brief Mutator functions
           */
-        inline void setF(const double f) 
+        inline void setF(const double f)
           { m_f = f; computeFilter(); }
-        inline void setTheta(const double theta) 
+        inline void setTheta(const double theta)
           { m_theta = theta; computeFilter(); }
-        inline void setGamma(const double gamma) 
+        inline void setGamma(const double gamma)
           { m_gamma = gamma; computeFilter(); }
-        inline void setEta(const double eta) 
+        inline void setEta(const double eta)
           { m_eta = eta; computeFilter(); }
-        inline void setSpatialSize(const double spatial_size) 
+        inline void setSpatialSize(const double spatial_size)
           { m_spatial_size = spatial_size; computeFilter(); }
-        inline void setCancelDc(const bool cancel_dc) 
+        inline void setCancelDc(const bool cancel_dc)
           { m_cancel_dc = cancel_dc; computeFilter(); }
         inline void setNormOption(const enum ip::Gabor::NormOption norm_opt)
           { m_norm_opt = norm_opt; computeFilter(); }
-        inline void setBorderType( const enum sp::Extrapolation::BorderType 
-            border_type) 
+        inline void setBorderType( const enum sp::Extrapolation::BorderType
+            border_type)
           { m_border_type = border_type; }
 
       private:

@@ -51,7 +51,6 @@
 #include <bob/python/exception.h>
 #include <bob/core/array.h>
 #include <bob/core/cast.h>
-#include <bob/core/Exception.h>
 
 #include <blitz/array.h>
 #include <stdint.h>
@@ -77,7 +76,7 @@
 namespace bob { namespace python {
 
   /**
-   * @brief Initializes numpy and boost bindings. Should be called once per 
+   * @brief Initializes numpy and boost bindings. Should be called once per
    * module.
    *
    * Pass to it the module doc string and it will also update the module
@@ -86,7 +85,7 @@ namespace bob { namespace python {
   void setup_python(const char* module_docstring);
 
   /**
-   * @brief A generic method to convert from ndarray type_num to bob's 
+   * @brief A generic method to convert from ndarray type_num to bob's
    * ElementType
    */
   bob::core::array::ElementType num_to_type(int num);
@@ -162,8 +161,8 @@ namespace bob { namespace python {
       bob::core::array::typeinfo& i);
 
   /**
-   * @brief Checks if an array-like object is convertible to become a NumPy 
-   * ndarray (boost::python::numeric::array). If so, write the typeinfo 
+   * @brief Checks if an array-like object is convertible to become a NumPy
+   * ndarray (boost::python::numeric::array). If so, write the typeinfo
    * information that such array would have upon automatic conversion to "info".
    *
    * Optionally, you can specify you do *not* want writeable or behavior to be
@@ -239,9 +238,9 @@ namespace bob { namespace python {
       dtype (boost::python::object dtype_like);
 
       /**
-       * @brief Builds a new dtype object from a PyArray_Descr object that 
-       * will have its own reference counting increased internally. So, the 
-       * object is *not* stolen and you can Py_(X)DECREF() it when done if 
+       * @brief Builds a new dtype object from a PyArray_Descr object that
+       * will have its own reference counting increased internally. So, the
+       * object is *not* stolen and you can Py_(X)DECREF() it when done if
        * you so wish.
        */
       dtype (PyArray_Descr* descr);
@@ -293,7 +292,7 @@ namespace bob { namespace python {
       int type_num() const;
 
       /**
-       * @brief Returns a boost::python representation of this object - maybe 
+       * @brief Returns a boost::python representation of this object - maybe
        * None.
        */
       inline boost::python::object self() const { return m_self; }
@@ -342,7 +341,7 @@ namespace bob { namespace python {
       py_array(const bob::core::array::interface& buffer);
 
       /**
-       * @brief Builds a new array by referring to the data of an existing 
+       * @brief Builds a new array by referring to the data of an existing
        * buffer.
        */
       py_array(boost::shared_ptr<bob::core::array::interface> buffer);
@@ -395,7 +394,7 @@ namespace bob { namespace python {
       virtual void set(boost::shared_ptr<bob::core::array::interface> buffer);
 
       /**
-       * @brief Re-allocates this buffer taking into consideration new 
+       * @brief Re-allocates this buffer taking into consideration new
        * requirements. The internal memory should be considered uninitialized.
        */
       virtual void set (const bob::core::array::typeinfo& req);
@@ -406,9 +405,9 @@ namespace bob { namespace python {
       virtual const bob::core::array::typeinfo& type() const { return m_type; }
 
       /**
-       * @brief Borrows a reference from the underlying memory. This means 
-       * this object continues to be responsible for deleting the memory and 
-       * you should make sure that it outlives the usage of the returned 
+       * @brief Borrows a reference from the underlying memory. This means
+       * this object continues to be responsible for deleting the memory and
+       * you should make sure that it outlives the usage of the returned
        * pointer.
        */
       virtual void* ptr() { return m_ptr; }
@@ -580,7 +579,7 @@ namespace bob { namespace python {
     public: //api
 
       /**
-       * @brief Builds a new array from an array-like object but coerces to a 
+       * @brief Builds a new array from an array-like object but coerces to a
        * certain type.
        *
        * @param array_like An ndarray object, inherited type or any object that
@@ -596,7 +595,7 @@ namespace bob { namespace python {
 
       /**
        * @brief Returns a temporary blitz::Array<> skin over this const_ndarray,
-       * if possible, otherwise it will COPY the array to the requested type 
+       * if possible, otherwise it will COPY the array to the requested type
        * and returns the copy.
        *
        * Attention: If you use this method, you have to make sure that this
@@ -644,8 +643,8 @@ namespace bob { namespace python {
           case bob::core::array::t_complex64: return bob::core::array::cast<T>(bz<std::complex<float>,N>());
           case bob::core::array::t_complex128: return bob::core::array::cast<T>(bz<std::complex<double>,N>());
           case bob::core::array::t_complex256: return bob::core::array::cast<T>(bz<std::complex<long double>,N>());
-          
-          default: throw bob::core::NotImplementedError();
+
+          default: throw std::runtime_error("cast to the given (unknown) data type is not possible yet");
         }
       }
 

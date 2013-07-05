@@ -6,16 +6,16 @@
  * @brief Implements an image format reader/writer using giflib.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -63,11 +63,11 @@ typedef struct NewColorMapType {
 
 // Routine called by qsort to compare two entries.
 static int
-SortCmpRtn(const void *Entry1, const void *Entry2) 
+SortCmpRtn(const void *Entry1, const void *Entry2)
 {
   return (*((QuantizedColorType **) Entry1))->RGB[SortRGBAxis] -
     (*((QuantizedColorType **) Entry2))->RGB[SortRGBAxis];
-} 
+}
 
 // Routine to subdivide the RGB space recursively using median cut in each
 // axes alternatingly until ColorMapSize different cubes exists.
@@ -172,10 +172,10 @@ SubdivColorMap(NewColorMapType * NewColorSubdiv,
 // real size before returning.
 // Also non of the parameter are allocated by this routine.
 // This function returns GIF_OK if succesfull, GIF_ERROR otherwise.
-static int 
+static int
 QuantizeBuffer(unsigned int Width, unsigned int Height, int *ColorMapSize,
-  GifByteType * RedInput, GifByteType * GreenInput, GifByteType * BlueInput, 
-  GifByteType * OutputBuffer, GifColorType * OutputColorMap) 
+  GifByteType * RedInput, GifByteType * GreenInput, GifByteType * BlueInput,
+  GifByteType * OutputBuffer, GifColorType * OutputColorMap)
 {
   unsigned int Index, NumOfEntries;
   int i, j, MaxRGBError[3];
@@ -287,7 +287,7 @@ QuantizeBuffer(unsigned int Width, unsigned int Height, int *ColorMapSize,
 #undef ABS
 #undef COLOR_ARRAY_SIZE
 #undef BITS_PER_PRIM_COLOR
-#undef MAX_PRIM_COLOR 
+#undef MAX_PRIM_COLOR
 #endif // End of ugly QuantizeBuffer definition for giflib 4.2
 
 
@@ -299,7 +299,11 @@ static boost::shared_ptr<GifFileType> make_dfile(const char *filename)
   int error;
   GifFileType* fp = DGifOpenFileName(filename, &error);
 #endif
-  if(fp == 0) throw bob::io::FileNotReadable(filename);
+  if(fp == 0) {
+    boost::format m("cannot open file `%s'");
+    m % filename;
+    throw std::runtime_error(m.str());
+  }
   return boost::shared_ptr<GifFileType>(fp, DGifCloseFile);
 }
 
@@ -311,14 +315,18 @@ static boost::shared_ptr<GifFileType> make_efile(const char *filename)
   int error;
   GifFileType* fp = EGifOpenFileName(filename, false, &error);
 #endif
-  if(fp == 0) throw bob::io::FileNotReadable(filename);
+  if(fp == 0) {
+    boost::format m("cannot open file `%s'");
+    m % filename;
+    throw std::runtime_error(m.str());
+  }
   return boost::shared_ptr<GifFileType>(fp, EGifCloseFile);
 }
 
 /**
  * LOADING
  */
-static void im_peek(const std::string& path, bob::core::array::typeinfo& info) 
+static void im_peek(const std::string& path, bob::core::array::typeinfo& info)
 {
   // 1. GIF file opening
   boost::shared_ptr<GifFileType> in_file = make_dfile(path.c_str());
@@ -332,17 +340,17 @@ static void im_peek(const std::string& path, bob::core::array::typeinfo& info)
   info.update_strides();
 }
 
-static void im_load_color(boost::shared_ptr<GifFileType> in_file, bob::core::array::interface& b) 
-{ 
+static void im_load_color(boost::shared_ptr<GifFileType> in_file, bob::core::array::interface& b)
+{
   const bob::core::array::typeinfo& info = b.type();
   const size_t height0 = info.shape[1];
   const size_t width0 = info.shape[2];
   const size_t frame_size = height0*width0;
- 
+
   // The following piece of code is based on the giflib utility called gif2rgb
   // Allocate the screen as vector of column of rows. Note this
   // screen is device independent - it's the screen defined by the
-  // GIF file parameters. 
+  // GIF file parameters.
   std::vector<boost::shared_array<GifPixelType> > screen_buffer;
 
   // Size in bytes one row.
@@ -354,22 +362,22 @@ static void im_load_color(boost::shared_ptr<GifFileType> in_file, bob::core::arr
   for(int i=0; i<in_file->SWidth; ++i)
     screen_buffer[0][i] = in_file->SBackGroundColor;
   for(int i=1; i<in_file->SHeight; ++i) {
-    // Allocate the other rows, and set their color to background too: 
+    // Allocate the other rows, and set their color to background too:
     screen_buffer.push_back(boost::shared_array<GifPixelType>(new GifPixelType[in_file->SWidth]));
     memcpy(screen_buffer[i].get(), screen_buffer[0].get(), size);
   }
 
-  // Scan the content of the GIF file and load the image(s) in: 
+  // Scan the content of the GIF file and load the image(s) in:
   GifRecordType record_type;
   GifByteType *extension;
   int InterlacedOffset[] = { 0, 4, 2, 1 }; // The way Interlaced image should.
   int InterlacedJumps[] = { 8, 8, 4, 2 }; // be read - offsets and jumps...
   int row, col, width, height, count, ext_code;
-  if(DGifGetRecordType(in_file.get(), &record_type) == GIF_ERROR) 
+  if(DGifGetRecordType(in_file.get(), &record_type) == GIF_ERROR)
     throw std::runtime_error("GIF: error in DGifGetRecordType().");
   switch(record_type) {
     case IMAGE_DESC_RECORD_TYPE:
-      if(DGifGetImageDesc(in_file.get()) == GIF_ERROR) 
+      if(DGifGetImageDesc(in_file.get()) == GIF_ERROR)
         throw std::runtime_error("GIF: error in DGifGetImageDesc().");
 
       row = in_file->Image.Top; // Image Position relative to Screen.
@@ -377,12 +385,12 @@ static void im_load_color(boost::shared_ptr<GifFileType> in_file, bob::core::arr
       width = in_file->Image.Width;
       height = in_file->Image.Height;
       if(in_file->Image.Left + in_file->Image.Width > in_file->SWidth ||
-        in_file->Image.Top + in_file->Image.Height > in_file->SHeight) 
+        in_file->Image.Top + in_file->Image.Height > in_file->SHeight)
       {
         throw std::runtime_error("GIF: the dimensions of image larger than the dimensions of the canvas.");
       }
       if(in_file->Image.Interlace) {
-        // Need to perform 4 passes on the images: 
+        // Need to perform 4 passes on the images:
         for(int i=count=0; i<4; ++i)
           for(int j=row+InterlacedOffset[i]; j<row+height; j+=InterlacedJumps[i]) {
             ++count;
@@ -400,7 +408,7 @@ static void im_load_color(boost::shared_ptr<GifFileType> in_file, bob::core::arr
       }
       break;
     case EXTENSION_RECORD_TYPE:
-      // Skip any extension blocks in file: 
+      // Skip any extension blocks in file:
       if(DGifGetExtension(in_file.get(), &ext_code, &extension) == GIF_ERROR) {
         throw std::runtime_error("GIF: error in DGifGetExtension().");
       }
@@ -438,7 +446,7 @@ static void im_load_color(boost::shared_ptr<GifFileType> in_file, bob::core::arr
   }
 }
 
-static void im_load(const std::string& filename, bob::core::array::interface& b) 
+static void im_load(const std::string& filename, bob::core::array::interface& b)
 {
   // 1. GIF file opening
   boost::shared_ptr<GifFileType> in_file = make_dfile(filename.c_str());
@@ -446,13 +454,17 @@ static void im_load(const std::string& filename, bob::core::array::interface& b)
   // 2. Read content
   const bob::core::array::typeinfo& info = b.type();
   if(info.dtype == bob::core::array::t_uint8) {
-    if( info.nd == 3) im_load_color(in_file, b); 
-    else { 
-      throw bob::io::ImageUnsupportedDimension(info.nd);
+    if( info.nd == 3) im_load_color(in_file, b);
+    else {
+      boost::format m("GIF: cannot read object of type `%s' from file `%s'");
+      m % info.str() % filename;
+      throw std::runtime_error(m.str());
     }
   }
   else {
-    throw bob::io::ImageUnsupportedType();
+    boost::format m("GIF: cannot read object of type `%s' from file `%s'");
+    m % info.str() % filename;
+    throw std::runtime_error(m.str());
   }
 }
 
@@ -499,7 +511,7 @@ static void im_save_color(const bob::core::array::interface& b, boost::shared_pt
 
   if(EGifPutScreenDesc(out_file.get(), width, height, ExpNumOfColors, 0, OutputColorMap) == GIF_ERROR)
     throw std::runtime_error("GIF: error in EGifPutScreenDesc().");
- 
+
   if(EGifPutImageDesc(out_file.get(), 0, 0, width, height, false, NULL) == GIF_ERROR)
     throw std::runtime_error("GIF: error in EGifPutImageDesc().");
 
@@ -518,7 +530,7 @@ static void im_save_color(const bob::core::array::interface& b, boost::shared_pt
 #endif
 }
 
-static void im_save(const std::string& filename, const bob::core::array::interface& array) 
+static void im_save(const std::string& filename, const bob::core::array::interface& array)
 {
   // 1. GIF file opening
   boost::shared_ptr<GifFileType> out_file = make_efile(filename.c_str());
@@ -529,15 +541,21 @@ static void im_save(const std::string& filename, const bob::core::array::interfa
   // 3. Writes content
   if(info.dtype == bob::core::array::t_uint8) {
     if(info.nd == 3) {
-      if(info.shape[0] != 3) 
+      if(info.shape[0] != 3)
         throw std::runtime_error("color image does not have 3 planes on 1st. dimension");
       im_save_color(array, out_file);
     }
-    else 
-      throw bob::io::ImageUnsupportedDimension(info.nd); 
+    else {
+      boost::format m("GIF: cannot save object of type `%s' to file `%s'");
+      m % info.str() % filename;
+      throw std::runtime_error(m.str());
+    }
   }
-  else 
-    throw bob::io::ImageUnsupportedType();
+  else {
+    boost::format m("GIF: cannot save object of type `%s' to file `%s'");
+    m % info.str() % filename;
+    throw std::runtime_error(m.str());
+  }
 }
 
 
@@ -597,7 +615,7 @@ class ImageGifFile: public bob::io::File {
     }
 
     virtual void read(bob::core::array::interface& buffer, size_t index) {
-      if (m_newfile) 
+      if (m_newfile)
         throw std::runtime_error("uninitialized image file cannot be read");
 
       if (!buffer.type().is_compatible(m_type)) buffer.set(m_type);
@@ -652,7 +670,7 @@ std::string ImageGifFile::s_codecname = "bob.image_gif";
 
 /**
  * This defines the factory method F that can create codecs of this type.
- * 
+ *
  * Here are the meanings of the mode flag that should be respected by your
  * factory implementation:
  *
@@ -660,8 +678,8 @@ std::string ImageGifFile::s_codecname = "bob.image_gif";
  *      error to open a file that does not exist for read-only operations.
  * 'w': opens for reading and writing, but truncates the file if it
  *      exists; it is not an error to open files that do not exist with
- *      this flag. 
- * 'a': opens for reading and writing - any type of modification can 
+ *      this flag.
+ * 'a': opens for reading and writing - any type of modification can
  *      occur. If the file does not exist, this flag is effectively like
  *      'w'.
  *
@@ -671,7 +689,7 @@ std::string ImageGifFile::s_codecname = "bob.image_gif";
  * @note: This method can be static.
  */
 
-static boost::shared_ptr<bob::io::File> 
+static boost::shared_ptr<bob::io::File>
 make_file (const std::string& path, char mode) {
   return boost::make_shared<ImageGifFile>(path, mode);
 }

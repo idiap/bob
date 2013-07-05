@@ -13,7 +13,6 @@ endif()
 
 # This defines the list of source files inside this package.
 set(src
-    "Exception.cc"
     "logging.cc"
     "array_exception.cc"
     "array_type.cc"

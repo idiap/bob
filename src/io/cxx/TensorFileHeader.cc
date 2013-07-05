@@ -6,16 +6,16 @@
  * This class defines an header for storing multiarrays into .tensor files.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -52,12 +52,12 @@ void bob::io::detail::TensorFileHeader::read(std::istream& str) {
 
   str.read( reinterpret_cast<char*>(&val), sizeof(int));
   m_n_samples = (size_t)val;
-  
+
   int nd;
   str.read(reinterpret_cast<char*>(&nd), sizeof(int));
 
   int shape[BOB_MAX_DIM];
-  
+
   str.read( reinterpret_cast<char*>(&val), sizeof(int));
   shape[0] = (size_t)val;
   str.read( reinterpret_cast<char*>(&val), sizeof(int));
@@ -109,11 +109,15 @@ void bob::io::detail::TensorFileHeader::header_ok()
       break;
     // error
     default:
-      throw bob::io::UnsupportedTypeError(bob::core::array::t_unknown);
+      throw std::runtime_error("unsupported data type found while scanning header of tensor file");
   }
 
   // Check the number of samples and dimensions
-  if( m_type.nd < 1 || m_type.nd > 4) throw bob::io::DimensionError(m_type.nd,4);
+  if( m_type.nd < 1 || m_type.nd > 4) {
+    boost::format m("header for tensor file indicates an unsupported type: %s");
+    m % m_type.str();
+    throw std::runtime_error(m.str());
+  }
 
   // OK
   update();
@@ -131,7 +135,7 @@ void bob::io::detail::TensorFileHeader::update()
     case bob::io::Float:   base_size = sizeof(float); break;
     case bob::io::Double:  base_size = sizeof(double); break;
     default:
-      throw bob::io::UnsupportedTypeError(bob::core::array::t_unknown);
+      throw std::runtime_error("unsupported data type found while updating tensor file");
   }
 
   size_t tsize = 1;
@@ -158,10 +162,10 @@ bob::io::TensorType bob::io::arrayTypeToTensorType(bob::core::array::ElementType
     case bob::core::array::t_float64:
       return bob::io::Double;
     default:
-      throw bob::io::UnsupportedTypeError(bob::core::array::t_unknown);
+      throw std::runtime_error("unsupported data type found while converting array type to tensor type");
   }
 }
-  
+
 bob::core::array::ElementType bob::io::tensorTypeToArrayType(bob::io::TensorType tensortype)
 {
   switch(tensortype)
@@ -179,6 +183,6 @@ bob::core::array::ElementType bob::io::tensorTypeToArrayType(bob::io::TensorType
     case bob::io::Double:
       return bob::core::array::t_float64;
     default:
-      throw bob::io::UnsupportedTypeError(bob::core::array::t_unknown);
+      throw std::runtime_error("unsupported data type found while converting tensor type to array type");
   }
 }

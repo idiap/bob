@@ -23,7 +23,6 @@
 #include <boost/python.hpp>
 #include "bob/math/histogram.h"
 #include "bob/python/ndarray.h"
-#include "bob/core/array_exception.h"
 
 static boost::python::object histogram_intersection(bob::python::const_ndarray h1, bob::python::const_ndarray h2){
   switch(h1.type().dtype){

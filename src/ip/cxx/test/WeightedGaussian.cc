@@ -6,16 +6,16 @@
  * @brief Test the Weighted Gaussian smoothing on 2D images
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -45,35 +45,35 @@ struct T {
   T(): eps(1e-4), a(3,4), a_ref(3,4)
   {
     a = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12;
-    a_ref = 1.21194, 2, 3, 3.78806, 3.79444, 7.45636, 
+    a_ref = 1.21194, 2, 3, 3.78806, 3.79444, 7.45636,
             8.45636, 9.20556, 9.21194, 10, 11, 11.7881;
   }
 
   ~T() {}
 };
 
-template<typename T, typename U, int d>  
-void check_dimensions( blitz::Array<T,d>& t1, blitz::Array<U,d>& t2) 
+template<typename T, typename U, int d>
+void check_dimensions( blitz::Array<T,d>& t1, blitz::Array<U,d>& t2)
 {
   BOOST_REQUIRE_EQUAL(t1.dimensions(), t2.dimensions());
   for( int i=0; i<t1.dimensions(); ++i)
     BOOST_CHECK_EQUAL(t1.extent(i), t2.extent(i));
 }
 
-template<typename T>  
-void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<T,2>& t2, 
+template<typename T>
+void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<T,2>& t2,
   const double eps )
 {
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
-    for( int j=0; j<t2.extent(1); ++j) 
+    for( int j=0; j<t2.extent(1); ++j)
       BOOST_CHECK_SMALL( fabs(t1(i,j)-t2(i,j)), eps);
 }
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
 BOOST_AUTO_TEST_CASE( test_gaussianSmoothing_2d_array )
-{ 
+{
   bob::ip::WeightedGaussian g_filter(1,1,0.5,0.5);
   blitz::Array<double,2> a_out(3,4);
   g_filter(a,a_out);
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE( test_gaussianSmoothing_2d_image )
     bob::core::error << "Environment variable $BOB_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw bob::core::Exception();
+    throw std::runtime_error("test failed");
   }
 
   // Load original image

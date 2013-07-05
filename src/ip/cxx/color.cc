@@ -6,63 +6,23 @@
  * @brief Implements many sorts of color transformations using standards
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <cmath>
 #include <limits>
-#include <boost/format.hpp>
 #include "bob/ip/color.h"
-
-bob::ip::UnsupportedTypeForColorConversion::UnsupportedTypeForColorConversion(bob::core::array::ElementType eltype) throw(): m_eltype(eltype) {
-}
-
-bob::ip::UnsupportedTypeForColorConversion::~UnsupportedTypeForColorConversion() throw() {
-}
-
-const char* bob::ip::UnsupportedTypeForColorConversion::what() const throw() {
-  try {
-    boost::format message("Color conversion for type '%s' is not supported");
-    message % bob::core::array::stringize(m_eltype);
-    m_message = message.str();
-    return m_message.c_str();
-  } catch (...) {
-    static const char* emergency = "bob::ip::UnsupportedTypeForColorConversion: cannot format, exception raised";
-    return emergency;
-  }
-}
-
-bob::ip::UnsupportedRowExtent::UnsupportedRowExtent(int expected, int got) throw(): 
-  m_expected(expected),
-  m_got(got)
-{
-}
-
-bob::ip::UnsupportedRowExtent::~UnsupportedRowExtent() throw() {
-}
-
-const char* bob::ip::UnsupportedRowExtent::what() const throw() {
-  try {
-    boost::format message("Color conversion requires an array with %d rows, but I got %d instead");
-    message % m_expected % m_got;
-    m_message = message.str();
-    return m_message.c_str();
-  } catch (...) {
-    static const char* emergency = "bob::ip::UnsupportedRowExtent: cannot format, exception raised";
-    return emergency;
-  }
-}
 
 /**
  * This method will scale and cast to integer a single double value, using the
@@ -132,12 +92,12 @@ template <> void bob::ip::rgb_to_hsv_one (uint16_t r, uint16_t g, uint16_t b,
 template <> void bob::ip::rgb_to_hsv_one (double r, double g, double b,
     double& h, double& s, double& v) {
   v = tmax(r, g, b); //value
-  
+
   // Define a threshold to avoid division by zero
   static const double thrd = 10*std::numeric_limits<double>::epsilon();
 
   //if the Value is (almost) 0, then we also set the other values to zero
-  if (v < thrd) { 
+  if (v < thrd) {
     h = s = v;
     return;
   }
@@ -176,17 +136,17 @@ template <> void bob::ip::hsv_to_rgb_one (uint8_t h, uint8_t s, uint8_t v,
   hsv_to_rgb_one(normalize(h), normalize(s), normalize(v), R, G, B);
   r = scale<uint8_t>(R); g = scale<uint8_t>(G); b = scale<uint8_t>(B);
 }
-  
+
 template <> void bob::ip::hsv_to_rgb_one (uint16_t h, uint16_t s, uint16_t v,
     uint16_t& r, uint16_t& g, uint16_t& b) {
   double R, G, B;
   hsv_to_rgb_one(normalize(h), normalize(s), normalize(v), R, G, B);
   r = scale<uint16_t>(R); g = scale<uint16_t>(G); b = scale<uint16_t>(B);
 }
-  
+
 template <> void bob::ip::hsv_to_rgb_one (double h, double s, double v,
     double& r, double& g, double& b) {
-  
+
   if(s == 0) { // achromatic (gray)
     r = g = b = v;
     return;
@@ -257,9 +217,9 @@ template <> void bob::ip::rgb_to_hsl_one (double r, double g, double b,
   const double M = tmax(r, g, b);
   const double m = tmin(r, g, b);
   l = 0.5 * (M+m);
-  
+
   //if the lightness is 0, then we also set the other values to zero
-  if (l == 0) { 
+  if (l == 0) {
     h = s = l;
     return;
   }
@@ -271,7 +231,7 @@ template <> void bob::ip::rgb_to_hsl_one (double r, double g, double b,
   if (delta < thrd)
     s = 0;
   else
-    s = clamp(C / delta); 
+    s = clamp(C / delta);
 
   //if the chroma value C is (almost) zero, set Hue to zero and return
   if (C < thrd) {
@@ -303,20 +263,20 @@ template <> void bob::ip::hsl_to_rgb_one (uint8_t h, uint8_t s, uint8_t l,
   hsl_to_rgb_one(normalize(h), normalize(s), normalize(l), R, G, B);
   r = scale<uint8_t>(R); g = scale<uint8_t>(G); b = scale<uint8_t>(B);
 }
-  
+
 template <> void bob::ip::hsl_to_rgb_one (uint16_t h, uint16_t s, uint16_t l,
     uint16_t& r, uint16_t& g, uint16_t& b) {
   double R, G, B;
   hsl_to_rgb_one(normalize(h), normalize(s), normalize(l), R, G, B);
   r = scale<uint16_t>(R); g = scale<uint16_t>(G); b = scale<uint16_t>(B);
 }
-  
+
 template <> void bob::ip::hsl_to_rgb_one (double h, double s, double l,
     double& r, double& g, double& b) {
-  
+
   double C = s*(1-fabsf(2*l - 1)); //Chroma [0,1]
   const double v = (2*l + C)/2; //Value [0,1]
-  
+
   if(v == 0.) { // achromatic (gray)
     r = g = b = v; //Value
     return;
@@ -393,14 +353,14 @@ template <> void bob::ip::yuv_to_rgb_one (uint8_t y, uint8_t u, uint8_t v,
   yuv_to_rgb_one(normalize(y), normalize(u), normalize(v), R, G, B);
   r = scale<uint8_t>(R); g = scale<uint8_t>(G); b = scale<uint8_t>(B);
 }
-  
+
 template <> void bob::ip::yuv_to_rgb_one (uint16_t y, uint16_t u, uint16_t v,
     uint16_t& r, uint16_t& g, uint16_t& b) {
   double R, G, B;
   yuv_to_rgb_one(normalize(y), normalize(u), normalize(v), R, G, B);
   r = scale<uint16_t>(R); g = scale<uint16_t>(G); b = scale<uint16_t>(B);
 }
-  
+
 /**
  * We are doing the inverse of the rgb_to_yuv_one() method above
  */
@@ -428,7 +388,7 @@ template <> void bob::ip::rgb_to_gray_one (uint16_t r, uint16_t g, uint16_t b,
 /**
  * Y = 0.299R+0.587G+0.114B
  */
-template <> void bob::ip::rgb_to_gray_one (double r, double g, double b, 
+template <> void bob::ip::rgb_to_gray_one (double r, double g, double b,
     double& gray) {
   gray = clamp(0.299*r + 0.587*g + 0.114*b);
 }

@@ -6,27 +6,27 @@
  * @brief This file provides a class to perform Tan and Triggs preprocessing.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "bob/ip/TanTriggs.h"
 
-bob::ip::TanTriggs::TanTriggs( const double gamma, const double sigma0, 
-    const double sigma1, const size_t radius, const double threshold, 
-    const double alpha, 
-    const bob::sp::Extrapolation::BorderType border_type): 
-  m_gamma(gamma), m_sigma0(sigma0), m_sigma1(sigma1), m_radius(radius), 
+bob::ip::TanTriggs::TanTriggs( const double gamma, const double sigma0,
+    const double sigma1, const size_t radius, const double threshold,
+    const double alpha,
+    const bob::sp::Extrapolation::BorderType border_type):
+  m_gamma(gamma), m_sigma0(sigma0), m_sigma1(sigma1), m_radius(radius),
   m_threshold(threshold), m_alpha(alpha), m_border_type(border_type)
 {
   //m_size = 2*floor( 3*m_sigma1)+1;
@@ -34,7 +34,7 @@ bob::ip::TanTriggs::TanTriggs( const double gamma, const double sigma0,
 }
 
 void bob::ip::TanTriggs::reset(const double gamma, const double sigma0,
-  const double sigma1, const size_t radius, const double threshold, 
+  const double sigma1, const size_t radius, const double threshold,
   const double alpha,  const bob::sp::Extrapolation::BorderType border_type)
 {
   m_gamma = gamma;
@@ -47,7 +47,7 @@ void bob::ip::TanTriggs::reset(const double gamma, const double sigma0,
   computeDoG( m_sigma0, m_sigma1, 2*m_radius+1);
 }
 
-bob::ip::TanTriggs& 
+bob::ip::TanTriggs&
 bob::ip::TanTriggs::operator=(const bob::ip::TanTriggs& other)
 {
   if (this != &other)
@@ -67,8 +67,8 @@ bob::ip::TanTriggs::operator=(const bob::ip::TanTriggs& other)
 bool bob::ip::TanTriggs::operator==(const bob::ip::TanTriggs& b) const
 {
   return (this->m_gamma == b.m_gamma && this->m_sigma0 == b.m_sigma0 &&
-          this->m_sigma1 == b.m_sigma1 && this->m_radius == b.m_radius && 
-          this->m_threshold == b.m_threshold && this->m_alpha == b.m_alpha && 
+          this->m_sigma1 == b.m_sigma1 && this->m_radius == b.m_radius &&
+          this->m_threshold == b.m_threshold && this->m_alpha == b.m_alpha &&
           this->m_border_type == b.m_border_type);
 }
 
@@ -77,7 +77,7 @@ bool bob::ip::TanTriggs::operator!=(const bob::ip::TanTriggs& b) const
   return !(this->operator==(b));
 }
 
-void 
+void
 bob::ip::TanTriggs::performContrastEqualization(blitz::Array<double,2>& dst)
 {
   const double inv_alpha = 1./m_alpha;
@@ -86,17 +86,17 @@ bob::ip::TanTriggs::performContrastEqualization(blitz::Array<double,2>& dst)
   // first step: I:=I/mean(abs(I)^a)^(1/a)
   blitz::Range dst_y( dst.lbound(0), dst.ubound(0)),
                dst_x( dst.lbound(1), dst.ubound(1));
-  double norm_fact = 
+  double norm_fact =
     pow( sum( pow( fabs(dst(dst_y,dst_x)), m_alpha)) / wxh, inv_alpha);
   dst(dst_y,dst_x) /= norm_fact;
 
   // Second step: I:=I/mean(min(threshold,abs(I))^a)^(1/a)
   const double threshold_alpha = pow( m_threshold, m_alpha );
-  norm_fact =  pow( sum( min( threshold_alpha, 
+  norm_fact =  pow( sum( min( threshold_alpha,
     pow( fabs(dst(dst_y,dst_x)), m_alpha))) / wxh, inv_alpha);
   dst(dst_y,dst_x) /= norm_fact;
 
-  // Last step: I:= threshold * tanh( I / threshold ) 
+  // Last step: I:= threshold * tanh( I / threshold )
   dst(dst_y,dst_x) = m_threshold * tanh( dst(dst_y,dst_x) / m_threshold );
 }
 

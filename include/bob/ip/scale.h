@@ -6,16 +6,16 @@
  * @brief This file defines a function to rescale a 2D or 3D array/image.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -23,10 +23,12 @@
 #ifndef BOB_IP_SCALE_H
 #define BOB_IP_SCALE_H
 
+#include <stdexcept>
+#include <boost/format.hpp>
+
 #include "bob/core/assert.h"
 #include "bob/core/array_index.h"
 #include "bob/core/cast.h"
-#include "bob/ip/Exception.h"
 #include "bob/ip/common.h"
 
 namespace bob {
@@ -39,7 +41,7 @@ namespace bob {
 
     namespace detail {
       /**
-        * @brief Function which rescales a 2D blitz::array/image of a given 
+        * @brief Function which rescales a 2D blitz::array/image of a given
         *   type, using bilinear interpolation.
         *   The first dimension is the height (y-axis), whereas the second
         *   one is the width (x-axis).
@@ -50,7 +52,7 @@ namespace bob {
         * @param dst_mask The output blitz boolean mask array
         */
       template<typename T, bool mask>
-      void scaleNoCheck2D_BI(const blitz::Array<T,2>& src, 
+      void scaleNoCheck2D_BI(const blitz::Array<T,2>& src,
         const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst,
         blitz::Array<bool,2>& dst_mask)
       {
@@ -104,7 +106,7 @@ namespace bob {
       * @param alg The algorithm used for rescaling.
       */
     template<typename T>
-    void scale(const blitz::Array<T,2>& src, blitz::Array<double,2>& dst, 
+    void scale(const blitz::Array<T,2>& src, blitz::Array<double,2>& dst,
       const Rescale::Algorithm alg=Rescale::BilinearInterp)
     {
       // Check and resize src if required
@@ -118,13 +120,17 @@ namespace bob {
       const int width = dst.extent(1);
 
       // Check parameters and throw exception if required
-      if (height < 1)
-        throw bob::core::InvalidArgumentException("height", height,
-          1, std::numeric_limits<int>::max());
-      if (width < 1)
-        throw bob::core::InvalidArgumentException("width", width,
-          1, std::numeric_limits<int>::max());
-  
+      if (height < 1) {
+        boost::format m("parameter `height' was set to %d, but should be greater or equal 1");
+        m % height;
+        throw std::runtime_error(m.str());
+      }
+      if (width < 1) {
+        boost::format m("parameter `width' was set to %d, but should be greater or equal 1");
+        m % width;
+        throw std::runtime_error(m.str());
+      }
+
       // If src and dst have the same shape, do a simple copy
       if( height==src.extent(0) && width==src.extent(1)) {
         for( int y=0; y<src.extent(0); ++y)
@@ -133,7 +139,7 @@ namespace bob {
       }
       // Otherwise, do the rescaling
       else
-      {    
+      {
         // Rescale the 2D array
         switch(alg)
         {
@@ -145,7 +151,7 @@ namespace bob {
             }
             break;
           default:
-            throw bob::ip::UnknownScalingAlgorithm();
+            throw std::runtime_error("the given scaling algorithm is not valid");
         }
       }
     }
@@ -181,23 +187,27 @@ namespace bob {
       const int width = dst.extent(1);
 
       // Check parameters and throw exception if required
-      if (height < 1)
-        throw bob::core::InvalidArgumentException("height", height,
-          1, std::numeric_limits<int>::max());
-      if (width < 1)
-        throw bob::core::InvalidArgumentException("width", width,
-          1, std::numeric_limits<int>::max());
-  
+      if (height < 1) {
+        boost::format m("parameter `height' was set to %d, but should be greater or equal 1");
+        m % height;
+        throw std::runtime_error(m.str());
+      }
+      if (width < 1) {
+        boost::format m("parameter `width' was set to %d, but should be greater or equal 1");
+        m % width;
+        throw std::runtime_error(m.str());
+      }
+
       // If src and dst have the same shape, do a simple copy
       if( height==src.extent(0) && width==src.extent(1)) {
         for( int y=0; y<src.extent(0); ++y)
           for( int x=0; x<src.extent(1); ++x)
             dst(y,x) = bob::core::cast<double>(src(y,x));
-        detail::copyNoCheck(src_mask,dst_mask); 
+        detail::copyNoCheck(src_mask,dst_mask);
       }
       // Otherwise, do the rescaling
       else
-      {    
+      {
         // Rescale the 2D array
         switch(alg)
         {
@@ -208,31 +218,31 @@ namespace bob {
             }
             break;
           default:
-            throw bob::ip::UnknownScalingAlgorithm();
+            throw std::runtime_error("the given scaling algorithm is not valid");
         }
       }
     }
 
-    template <typename T> 
-    void scale(const blitz::Array<T,3>& src, blitz::Array<double,3>& dst, 
+    template <typename T>
+    void scale(const blitz::Array<T,3>& src, blitz::Array<double,3>& dst,
       const Rescale::Algorithm alg=Rescale::BilinearInterp)
     {
       // Check number of planes
       bob::core::array::assertSameDimensionLength(src.extent(0), dst.extent(0));
 
-      for( int p=0; p<dst.extent(0); ++p) 
+      for( int p=0; p<dst.extent(0); ++p)
         {
-        const blitz::Array<T,2> src_slice = 
+        const blitz::Array<T,2> src_slice =
           src( p, blitz::Range::all(), blitz::Range::all() );
-        blitz::Array<double,2> dst_slice = 
+        blitz::Array<double,2> dst_slice =
           dst( p, blitz::Range::all(), blitz::Range::all() );
-        
+
         // Process one plane
         scale(src_slice, dst_slice, alg);
       }
     }
- 
-    template <typename T> 
+
+    template <typename T>
     void scale(const blitz::Array<T,3>& src, const blitz::Array<bool,3>& src_mask,
       blitz::Array<double,3>& dst, blitz::Array<bool,3>& dst_mask,
       const Rescale::Algorithm alg=Rescale::BilinearInterp)
@@ -242,36 +252,36 @@ namespace bob {
       bob::core::array::assertSameDimensionLength(src.extent(0), src_mask.extent(0));
       bob::core::array::assertSameDimensionLength(src_mask.extent(0), dst_mask.extent(0));
 
-      for( int p=0; p<dst.extent(0); ++p) 
+      for( int p=0; p<dst.extent(0); ++p)
         {
-        const blitz::Array<T,2> src_slice = 
+        const blitz::Array<T,2> src_slice =
           src( p, blitz::Range::all(), blitz::Range::all() );
-        const blitz::Array<bool,2> src_mask_slice = 
+        const blitz::Array<bool,2> src_mask_slice =
           src_mask( p, blitz::Range::all(), blitz::Range::all() );
-        blitz::Array<double,2> dst_slice = 
+        blitz::Array<double,2> dst_slice =
           dst( p, blitz::Range::all(), blitz::Range::all() );
-        blitz::Array<bool,2> dst_mask_slice = 
+        blitz::Array<bool,2> dst_mask_slice =
           dst_mask( p, blitz::Range::all(), blitz::Range::all() );
-        
+
         // Process one plane
         scale(src_slice, src_mask_slice, dst_slice, dst_mask_slice, alg);
       }
     }
 
     template <typename T>
-      blitz::Array<T,2> 
+      blitz::Array<T,2>
       scaleAs(const blitz::Array<T,2>& original, const double scale_factor)
       {
-        blitz::TinyVector<int, 2> new_shape = 
+        blitz::TinyVector<int, 2> new_shape =
           blitz::floor(original.shape() * scale_factor + 0.5);
         return blitz::Array<T,2>(new_shape);
       }
 
     template <typename T>
-      blitz::Array<T,3> 
-      scaleAs(const blitz::Array<T,3>& original, const double scale_factor) 
+      blitz::Array<T,3>
+      scaleAs(const blitz::Array<T,3>& original, const double scale_factor)
       {
-        // With 3D Blitz arrays (e.g, color image) we do not want 
+        // With 3D Blitz arrays (e.g, color image) we do not want
         // to scale the number of planes :)
         blitz::TinyVector<int, 3> new_shape = original.shape();
         new_shape(1) = floor(new_shape(1) * scale_factor + 0.5);

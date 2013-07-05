@@ -4,23 +4,23 @@
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef BOB_TRAINER_EXCEPTION_H
 #define BOB_TRAINER_EXCEPTION_H
 
-#include <bob/core/Exception.h>
+#include <stdexcept>
 
 namespace bob { namespace trainer {
   /**
@@ -28,19 +28,10 @@ namespace bob { namespace trainer {
    * @{
    */
 
-  class Exception: public bob::core::Exception {
-
-    public:
-      Exception() throw();
-      virtual ~Exception() throw();
-      virtual const char* what() const throw();
-
-  };
-
   /**
    * Raised when some computations need a prior GMM and no one is set
    */
-  class NoPriorGMM: public Exception {
+  class NoPriorGMM: public std::runtime_error {
     public:
       NoPriorGMM() throw();
       virtual ~NoPriorGMM() throw();
@@ -50,7 +41,7 @@ namespace bob { namespace trainer {
   /**
    * Raised when the number of classes is insufficient.
    */
-  class WrongNumberOfClasses: public Exception {
+  class WrongNumberOfClasses: public std::runtime_error {
     public:
       WrongNumberOfClasses(size_t got) throw();
       virtual ~WrongNumberOfClasses() throw();
@@ -64,7 +55,7 @@ namespace bob { namespace trainer {
   /**
    * Raised when the number of features is different between classes
    */
-  class WrongNumberOfFeatures: public Exception {
+  class WrongNumberOfFeatures: public std::runtime_error {
     public:
       WrongNumberOfFeatures(size_t got, size_t expected,
           size_t classid) throw();
@@ -82,7 +73,7 @@ namespace bob { namespace trainer {
    * Raised when the given machine is incompatible with the current settings
    * for a given trainer.
    */
-  class IncompatibleMachine: public Exception {
+  class IncompatibleMachine: public std::runtime_error {
     public:
       IncompatibleMachine() throw();
       virtual ~IncompatibleMachine() throw();
@@ -92,7 +83,7 @@ namespace bob { namespace trainer {
   /**
    * Raised when the training set is empty.
    */
-  class EmptyTrainingSet: public Exception {
+  class EmptyTrainingSet: public std::runtime_error {
     public:
       EmptyTrainingSet() throw();
       virtual ~EmptyTrainingSet() throw();
@@ -102,7 +93,7 @@ namespace bob { namespace trainer {
   /**
    * Raised when the K-means initialization fails.
    */
-  class KMeansInitializationFailure: public Exception {
+  class KMeansInitializationFailure: public std::runtime_error {
     public:
       KMeansInitializationFailure() throw();
       virtual ~KMeansInitializationFailure() throw();

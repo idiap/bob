@@ -6,16 +6,16 @@
  * @brief Binds simple drawing primitives
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -28,7 +28,7 @@ using namespace boost::python;
 template <typename T>
 static void inner_draw_point_ (bob::python::ndarray image, int x, int y, object color) {
   switch (image.type().nd) {
-    case 2: 
+    case 2:
       {
         blitz::Array<T,2> image_ = image.bz<T,2>();
         T tcolor = extract<T>(color);
@@ -39,8 +39,8 @@ static void inner_draw_point_ (bob::python::ndarray image, int x, int y, object 
       {
         blitz::Array<T,3> image_ = image.bz<T,3>();
         tuple c = extract<tuple>(color);
-        T c0 = extract<T>(c[0]); 
-        T c1 = extract<T>(c[1]); 
+        T c0 = extract<T>(c[0]);
+        T c1 = extract<T>(c[1]);
         T c2 = extract<T>(c[2]);
         boost::tuple<T,T,T> tcolor(c0, c1, c2);
         bob::ip::draw_point_(image_, x, y, tcolor);
@@ -63,7 +63,7 @@ static void draw_point_ (bob::python::ndarray image, int x, int y, object color)
 template <typename T>
 static void inner_draw_point (bob::python::ndarray image, int x, int y, object color) {
   switch (image.type().nd) {
-    case 2: 
+    case 2:
       {
         blitz::Array<T,2> image_ = image.bz<T,2>();
         T tcolor = extract<T>(color);
@@ -74,8 +74,8 @@ static void inner_draw_point (bob::python::ndarray image, int x, int y, object c
       {
         blitz::Array<T,3> image_ = image.bz<T,3>();
         tuple c = extract<tuple>(color);
-        T c0 = extract<T>(c[0]); 
-        T c1 = extract<T>(c[1]); 
+        T c0 = extract<T>(c[0]);
+        T c1 = extract<T>(c[1]);
         T c2 = extract<T>(c[2]);
         boost::tuple<T,T,T> tcolor(c0, c1, c2);
         bob::ip::draw_point(image_, x, y, tcolor);
@@ -98,7 +98,7 @@ static void draw_point (bob::python::ndarray image, int x, int y, object color) 
 template <typename T>
 static void inner_try_draw_point (bob::python::ndarray image, int x, int y, object color) {
   switch (image.type().nd) {
-    case 2: 
+    case 2:
       {
         blitz::Array<T,2> image_ = image.bz<T,2>();
         T tcolor = extract<T>(color);
@@ -109,8 +109,8 @@ static void inner_try_draw_point (bob::python::ndarray image, int x, int y, obje
       {
         blitz::Array<T,3> image_ = image.bz<T,3>();
         tuple c = extract<tuple>(color);
-        T c0 = extract<T>(c[0]); 
-        T c1 = extract<T>(c[1]); 
+        T c0 = extract<T>(c[0]);
+        T c1 = extract<T>(c[1]);
         T c2 = extract<T>(c[2]);
         boost::tuple<T,T,T> tcolor(c0, c1, c2);
         bob::ip::try_draw_point(image_, x, y, tcolor);
@@ -133,7 +133,7 @@ static void try_draw_point (bob::python::ndarray image, int x, int y, object col
 template <typename T>
 static void inner_draw_line (bob::python::ndarray image, int x1, int y1, int x2, int y2, object color) {
   switch (image.type().nd) {
-    case 2: 
+    case 2:
       {
         blitz::Array<T,2> image_ = image.bz<T,2>();
         T tcolor = extract<T>(color);
@@ -144,8 +144,8 @@ static void inner_draw_line (bob::python::ndarray image, int x1, int y1, int x2,
       {
         blitz::Array<T,3> image_ = image.bz<T,3>();
         tuple c = extract<tuple>(color);
-        T c0 = extract<T>(c[0]); 
-        T c1 = extract<T>(c[1]); 
+        T c0 = extract<T>(c[0]);
+        T c1 = extract<T>(c[1]);
         T c2 = extract<T>(c[2]);
         boost::tuple<T,T,T> tcolor(c0, c1, c2);
         bob::ip::draw_line(image_, x1, y1, x2, y2, tcolor);
@@ -168,7 +168,7 @@ static void draw_line (bob::python::ndarray image, int x1, int y1, int x2, int y
 template <typename T>
 static void inner_draw_cross (bob::python::ndarray image, int x, int y, int radius, object color) {
   switch (image.type().nd) {
-    case 2: 
+    case 2:
       {
         blitz::Array<T,2> image_ = image.bz<T,2>();
         T tcolor = extract<T>(color);
@@ -179,8 +179,8 @@ static void inner_draw_cross (bob::python::ndarray image, int x, int y, int radi
       {
         blitz::Array<T,3> image_ = image.bz<T,3>();
         tuple c = extract<tuple>(color);
-        T c0 = extract<T>(c[0]); 
-        T c1 = extract<T>(c[1]); 
+        T c0 = extract<T>(c[0]);
+        T c1 = extract<T>(c[1]);
         T c2 = extract<T>(c[2]);
         boost::tuple<T,T,T> tcolor(c0, c1, c2);
         bob::ip::draw_cross(image_, x, y, radius, tcolor);
@@ -190,7 +190,7 @@ static void inner_draw_cross (bob::python::ndarray image, int x, int y, int radi
   }
 }
 
-static void draw_cross (bob::python::ndarray image, int x, int y, int radius, 
+static void draw_cross (bob::python::ndarray image, int x, int y, int radius,
     object color) {
   const bob::core::array::typeinfo& info = image.type();
   switch(info.dtype) {
@@ -204,7 +204,7 @@ static void draw_cross (bob::python::ndarray image, int x, int y, int radius,
 template <typename T>
 static void inner_draw_cross_plus (bob::python::ndarray image, int x, int y, int radius, object color) {
   switch (image.type().nd) {
-    case 2: 
+    case 2:
       {
         blitz::Array<T,2> image_ = image.bz<T,2>();
         T tcolor = extract<T>(color);
@@ -215,8 +215,8 @@ static void inner_draw_cross_plus (bob::python::ndarray image, int x, int y, int
       {
         blitz::Array<T,3> image_ = image.bz<T,3>();
         tuple c = extract<tuple>(color);
-        T c0 = extract<T>(c[0]); 
-        T c1 = extract<T>(c[1]); 
+        T c0 = extract<T>(c[0]);
+        T c1 = extract<T>(c[1]);
         T c2 = extract<T>(c[2]);
         boost::tuple<T,T,T> tcolor(c0, c1, c2);
         bob::ip::draw_cross_plus(image_, x, y, radius, tcolor);
@@ -226,7 +226,7 @@ static void inner_draw_cross_plus (bob::python::ndarray image, int x, int y, int
   }
 }
 
-static void draw_cross_plus (bob::python::ndarray image, int x, int y, int radius, 
+static void draw_cross_plus (bob::python::ndarray image, int x, int y, int radius,
     object color) {
   const bob::core::array::typeinfo& info = image.type();
   switch(info.dtype) {
@@ -240,7 +240,7 @@ static void draw_cross_plus (bob::python::ndarray image, int x, int y, int radiu
 template <typename T>
 static void inner_draw_box (bob::python::ndarray image, int x, int y, int w, int h, object color) {
   switch (image.type().nd) {
-    case 2: 
+    case 2:
       {
         blitz::Array<T,2> image_ = image.bz<T,2>();
         T tcolor = extract<T>(color);
@@ -251,8 +251,8 @@ static void inner_draw_box (bob::python::ndarray image, int x, int y, int w, int
       {
         blitz::Array<T,3> image_ = image.bz<T,3>();
         tuple c = extract<tuple>(color);
-        T c0 = extract<T>(c[0]); 
-        T c1 = extract<T>(c[1]); 
+        T c0 = extract<T>(c[0]);
+        T c1 = extract<T>(c[1]);
         T c2 = extract<T>(c[2]);
         boost::tuple<T,T,T> tcolor(c0, c1, c2);
         bob::ip::draw_box(image_, x, y, w, h, tcolor);
@@ -262,7 +262,7 @@ static void inner_draw_box (bob::python::ndarray image, int x, int y, int w, int
   }
 }
 
-static void draw_box (bob::python::ndarray image, int x, int y, int w, int h, 
+static void draw_box (bob::python::ndarray image, int x, int y, int w, int h,
     object color) {
   const bob::core::array::typeinfo& info = image.type();
   switch(info.dtype) {
@@ -275,7 +275,7 @@ static void draw_box (bob::python::ndarray image, int x, int y, int w, int h,
 
 void bind_ip_drawing() {
   def("draw_point_", &draw_point_, (arg("image"), arg("x"), arg("y"), arg("color")), "Draws a point in an image. No checks, if you try to access an area outside the image using this method, you may trigger a segmentation fault. This method supports both grayscale (2D) or color RGB (3D) images. Depending on your image type, select an appropriate color value: a single gray value for 2D grayscale images or a 3-tuple containing the RGB color to set during drawing.");
-  def("draw_point", &draw_point, (arg("image"), arg("x"), arg("y"), arg("color")), "Draws a point in the given image. Trying to access outside the image range will trigger an IndexError. This method supports both grayscale (2D) or color RGB (3D) images. Depending on your image type, select an appropriate color value: a single gray value for 2D grayscale images or a 3-tuple containing the RGB color to set during drawing.");
+  def("draw_point", &draw_point, (arg("image"), arg("x"), arg("y"), arg("color")), "Draws a point in the given image. Trying to access outside the image range will raise an exception. This method supports both grayscale (2D) or color RGB (3D) images. Depending on your image type, select an appropriate color value: a single gray value for 2D grayscale images or a 3-tuple containing the RGB color to set during drawing.");
   def("try_draw_point", try_draw_point, (arg("image"), arg("x"), arg("y"), arg("color")), "Tries to draw a point at the given image. If the point is out of range, just ignores the request. This is what is used for drawing lines. This method supports both grayscale (2D) or color RGB (3D) images. Depending on your image type, select an appropriate color value: a single gray value for 2D grayscale images or a 3-tuple containing the RGB color to set during drawing.");
   def("draw_line", &draw_line, (arg("image"), arg("x1"), arg("y1"), arg("x2"), arg("y2"), arg("color")), "Draws a line between two points p1(x1,y1) and p2(x2,y2).  This function is based on the Bresenham's line algorithm and is highly optimized to be able to draw lines very quickly. There is no floating point arithmetic nor multiplications and divisions involved. Only addition, subtraction and bit shifting are used.\n\nThe line may go out of the image bounds in which case such points (lying outside the image boundary are ignored).\n\nReferences: http://en.wikipedia.org/wiki/Bresenham's_line_algorithm. This method supports both grayscale (2D) or color RGB (3D) images. Depending on your image type, select an appropriate color value: a single gray value for 2D grayscale images or a 3-tuple containing the RGB color to set during drawing.");
   def("draw_cross", &draw_cross, (arg("image"), arg("x"), arg("y"), arg("radius"), arg("color")), "Draws a cross with a given radius and color at the image. Uses the draw_line() primitive above. The cross will look like an 'x' and not like a '+'. To get a '+' sign, use the draw_cross_plus() variant. This method supports both grayscale (2D) or color RGB (3D) images. Depending on your image type, select an appropriate color value: a single gray value for 2D grayscale images or a 3-tuple containing the RGB color to set during drawing.");

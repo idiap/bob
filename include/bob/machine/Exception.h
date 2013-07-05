@@ -6,25 +6,25 @@
   * @brief Exceptions used throughout the machine subsystem of bob
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB_MACHINE_EXCEPTION_H 
+#ifndef BOB_MACHINE_EXCEPTION_H
 #define BOB_MACHINE_EXCEPTION_H
 
+#include <stdexcept>
 #include <cstdlib>
-#include <bob/core/Exception.h>
 
 namespace bob { namespace machine {
   /**
@@ -32,16 +32,7 @@ namespace bob { namespace machine {
    * @{
    */
 
-  class Exception: public bob::core::Exception {
-
-    public:
-      Exception() throw();
-      virtual ~Exception() throw();
-      virtual const char* what() const throw();
-
-  };
-
-  class NInputsMismatch: public Exception {
+  class NInputsMismatch: public std::runtime_error {
     public:
       NInputsMismatch(const int n_inputs1, const int n_inputs2) throw();
       virtual ~NInputsMismatch() throw();
@@ -53,7 +44,7 @@ namespace bob { namespace machine {
       mutable std::string m_message;
   };
 
-  class NOutputsMismatch: public Exception {
+  class NOutputsMismatch: public std::runtime_error {
     public:
       NOutputsMismatch(const int n_outputs1, const int n_outputs2) throw();
       virtual ~NOutputsMismatch() throw();

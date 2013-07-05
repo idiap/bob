@@ -23,8 +23,6 @@
  */
 
 #include <Python.h>
-#include <bob/core/Exception.h>
-#include <bob/core/array_exception.h>
 #include <bob/python/exception.h>
 
 using namespace bob::python;
@@ -33,7 +31,7 @@ using namespace bob::python;
  * This method is only useful to test exception throwing in Python code.
  */
 static void throw_exception(void) {
-  throw bob::core::Exception();
+  throw std::runtime_error("test exception");
 }
 
 void bind_core_exception() {
@@ -50,10 +48,6 @@ void bind_core_exception() {
   register_exception_translator<std::range_error>(PyExc_IndexError);
   register_exception_translator<std::overflow_error>(PyExc_OverflowError);
   register_exception_translator<std::underflow_error>(PyExc_ArithmeticError);
-
-  register_exception_translator<bob::core::Exception>(PyExc_RuntimeError);
-  register_exception_translator<bob::core::NotImplementedError>(PyExc_NotImplementedError);
-  register_exception_translator<bob::core::InvalidArgumentException>(PyExc_ValueError);
 
   // note: only register exceptions to which you need specific behavior not
   // covered by catching RuntimeError

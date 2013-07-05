@@ -6,16 +6,16 @@
  * @brief Implements an image format reader/writer using libtiff.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -39,14 +39,18 @@ extern "C" {
 static boost::shared_ptr<TIFF> make_cfile(const char *filename, const char *flags)
 {
   TIFF* fp = TIFFOpen(filename, flags);
-  if(fp == 0) throw bob::io::FileNotReadable(filename);
+  if(fp == 0) {
+    boost::format m("TIFFOpen(): cannot open file `%s' with flags `%s'");
+    m % filename % flags;
+    throw std::runtime_error(m.str());
+  }
   return boost::shared_ptr<TIFF>(fp, TIFFClose);
 }
 
 /**
  * LOADING
  */
-static void im_peek(const std::string& path, bob::core::array::typeinfo& info) 
+static void im_peek(const std::string& path, bob::core::array::typeinfo& info)
 {
   // 1. TIFF file opening
   boost::shared_ptr<TIFF> in_file = make_cfile(path.c_str(), "r");
@@ -68,8 +72,11 @@ static void im_peek(const std::string& path, bob::core::array::typeinfo& info)
     info.nd = 2;
   else if (spp == 3)
     info.nd = 3;
-  else // Unsupported color type
-    throw bob::io::ImageUnsupportedColorspace();
+  else { // Unsupported color type
+    boost::format m("TIFF: found unsupported object of type `%s' at file `%s': unsupported color type");
+    m % info.str() % path;
+    throw std::runtime_error(m.str());
+  }
   if(info.nd == 2)
   {
     info.shape[0] = height;
@@ -85,7 +92,7 @@ static void im_peek(const std::string& path, bob::core::array::typeinfo& info)
 }
 
 template <typename T> static
-void im_load_gray(boost::shared_ptr<TIFF> in_file, bob::core::array::interface& b) 
+void im_load_gray(boost::shared_ptr<TIFF> in_file, bob::core::array::interface& b)
 {
   const bob::core::array::typeinfo& info = b.type();
   const size_t height = info.shape[0];
@@ -94,15 +101,15 @@ void im_load_gray(boost::shared_ptr<TIFF> in_file, bob::core::array::interface& 
   // Read in the possibly multiple strips
   tsize_t strip_size = TIFFStripSize(in_file.get());
   tstrip_t n_strips = TIFFNumberOfStrips(in_file.get());
-  
+
   unsigned long buffer_size = n_strips * strip_size;
   boost::shared_array<unsigned char> buffer_(new unsigned char[buffer_size]);
   unsigned char* buffer = buffer_.get();
   if(buffer == 0) throw std::runtime_error("TIFF: error while getting the color buffer");
-  
+
   tsize_t result;
   tsize_t image_offset = 0;
-  for(tstrip_t strip_count=0; strip_count<n_strips; ++strip_count) 
+  for(tstrip_t strip_count=0; strip_count<n_strips; ++strip_count)
   {
     if((result = TIFFReadEncodedStrip(in_file.get(), strip_count, buffer+image_offset, strip_size)) == -1)
       throw std::runtime_error("TIFF: error in function TIFFReadEncodedStrip()");
@@ -114,7 +121,7 @@ void im_load_gray(boost::shared_ptr<TIFF> in_file, bob::core::array::interface& 
   if(TIFFGetField(in_file.get(), TIFFTAG_PHOTOMETRIC, &photo) == 0 || (photo != PHOTOMETRIC_MINISBLACK && photo != PHOTOMETRIC_MINISWHITE))
     throw std::runtime_error("TIFF: error in function TIFFGetField()");
 
-  if(photo != PHOTOMETRIC_MINISBLACK) 
+  if(photo != PHOTOMETRIC_MINISBLACK)
   {
     // Flip bits
     for(unsigned long count=0; count<buffer_size; ++count)
@@ -124,7 +131,7 @@ void im_load_gray(boost::shared_ptr<TIFF> in_file, bob::core::array::interface& 
   // Deal with fillorder
   uint16 fillorder = FILLORDER_MSB2LSB;
   TIFFGetField(in_file.get(), TIFFTAG_FILLORDER, &fillorder);
-  
+
   if(fillorder != FILLORDER_MSB2LSB) {
     // We need to swap bits -- ABCDEFGH becomes HGFEDCBA
     for(unsigned long count=0; count<buffer_size; ++count)
@@ -149,9 +156,9 @@ void im_load_gray(boost::shared_ptr<TIFF> in_file, bob::core::array::interface& 
 }
 
 template <typename T> static
-void imbuffer_to_rgb(const size_t size, const T* im, T* r, T* g, T* b) 
+void imbuffer_to_rgb(const size_t size, const T* im, T* r, T* g, T* b)
 {
-  for(size_t k=0; k<size; ++k) 
+  for(size_t k=0; k<size; ++k)
   {
     r[k] = im[3*k];
     g[k] = im[3*k +1];
@@ -160,7 +167,7 @@ void imbuffer_to_rgb(const size_t size, const T* im, T* r, T* g, T* b)
 }
 
 template <typename T> static
-void im_load_color(boost::shared_ptr<TIFF> in_file, bob::core::array::interface& b) 
+void im_load_color(boost::shared_ptr<TIFF> in_file, bob::core::array::interface& b)
 {
   const bob::core::array::typeinfo& info = b.type();
   const size_t height = info.shape[1];
@@ -172,15 +179,15 @@ void im_load_color(boost::shared_ptr<TIFF> in_file, bob::core::array::interface&
   // Read in the possibly multiple strips
   tsize_t strip_size = TIFFStripSize(in_file.get());
   tstrip_t n_strips = TIFFNumberOfStrips(in_file.get());
-  
+
   unsigned long buffer_size = n_strips * strip_size;
   boost::shared_array<unsigned char> buffer_(new unsigned char[buffer_size]);
   unsigned char* buffer = buffer_.get();
   if(buffer == 0) throw std::runtime_error("TIFF: error while getting the color buffer");
-  
+
   tsize_t result;
   tsize_t image_offset = 0;
-  for(tstrip_t strip_count=0; strip_count<n_strips; ++strip_count) 
+  for(tstrip_t strip_count=0; strip_count<n_strips; ++strip_count)
   {
     if((result = TIFFReadEncodedStrip(in_file.get(), strip_count, buffer+image_offset, strip_size)) == -1)
       throw std::runtime_error("TIFF: error in function TIFFReadEncodedStrip()");
@@ -196,7 +203,7 @@ void im_load_color(boost::shared_ptr<TIFF> in_file, bob::core::array::interface&
   // Deal with fillorder
   uint16 fillorder = FILLORDER_MSB2LSB;
   TIFFGetField(in_file.get(), TIFFTAG_FILLORDER, &fillorder);
-  
+
   if(fillorder != FILLORDER_MSB2LSB) {
     // We need to swap bits -- ABCDEFGH becomes HGFEDCBA
     for(unsigned long count=0; count<(unsigned long)image_offset; ++count)
@@ -231,7 +238,7 @@ void im_load_color(boost::shared_ptr<TIFF> in_file, bob::core::array::interface&
   }
 }
 
-static void im_load(const std::string& filename, bob::core::array::interface& b) 
+static void im_load(const std::string& filename, bob::core::array::interface& b)
 {
   // 1. TIFF file opening
   boost::shared_ptr<TIFF> in_file = make_cfile(filename.c_str(), "r");
@@ -240,20 +247,26 @@ static void im_load(const std::string& filename, bob::core::array::interface& b)
   const bob::core::array::typeinfo& info = b.type();
   if(info.dtype == bob::core::array::t_uint8) {
     if(info.nd == 2) im_load_gray<uint8_t>(in_file, b);
-    else if( info.nd == 3) im_load_color<uint8_t>(in_file, b); 
-    else { 
-      throw bob::io::ImageUnsupportedDimension(info.nd);
+    else if( info.nd == 3) im_load_color<uint8_t>(in_file, b);
+    else {
+      boost::format m("TIFF: cannot read object of type `%s' from file `%s'");
+      m % info.str() % filename;
+      throw std::runtime_error(m.str());
     }
   }
   else if(info.dtype == bob::core::array::t_uint16) {
     if(info.nd == 2) im_load_gray<uint16_t>(in_file, b);
-    else if( info.nd == 3) im_load_color<uint16_t>(in_file, b); 
-    else { 
-      throw bob::io::ImageUnsupportedDimension(info.nd);
+    else if( info.nd == 3) im_load_color<uint16_t>(in_file, b);
+    else {
+      boost::format m("TIFF: cannot read object of type `%s' from file `%s'");
+      m % info.str() % filename;
+      throw std::runtime_error(m.str());
     }
   }
   else {
-    throw bob::io::ImageUnsupportedType();
+    boost::format m("TIFF: cannot read object of type `%s' from file `%s'");
+    m % info.str() % filename;
+    throw std::runtime_error(m.str());
   }
 }
 
@@ -262,11 +275,11 @@ static void im_load(const std::string& filename, bob::core::array::interface& b)
  * SAVING
  */
 template <typename T>
-static void im_save_gray(const bob::core::array::interface& b, boost::shared_ptr<TIFF> out_file) 
+static void im_save_gray(const bob::core::array::interface& b, boost::shared_ptr<TIFF> out_file)
 {
   const bob::core::array::typeinfo& info = b.type();
   const size_t height = info.shape[0];
-  const size_t width = info.shape[1];  
+  const size_t width = info.shape[1];
 
   unsigned char* row_pointer = const_cast<unsigned char*>(reinterpret_cast<const unsigned char*>(b.ptr()));
   const size_t data_size = height * width * sizeof(T);
@@ -276,9 +289,9 @@ static void im_save_gray(const bob::core::array::interface& b, boost::shared_ptr
 }
 
 template <typename T> static
-void rgb_to_imbuffer(const size_t size, const T* r, const T* g, const T* b, T* im) 
+void rgb_to_imbuffer(const size_t size, const T* r, const T* g, const T* b, T* im)
 {
-  for (size_t k=0; k<size; ++k) 
+  for (size_t k=0; k<size; ++k)
   {
     im[3*k]   = r[k];
     im[3*k+1] = g[k];
@@ -309,7 +322,7 @@ static void im_save_color(const bob::core::array::interface& b, boost::shared_pt
   TIFFWriteEncodedStrip(out_file.get(), 0, row_pointer, data_size);
 }
 
-static void im_save(const std::string& filename, const bob::core::array::interface& array) 
+static void im_save(const std::string& filename, const bob::core::array::interface& array)
 {
   // 1. Open the file
   boost::shared_ptr<TIFF> out_file = make_cfile(filename.c_str(), "w");
@@ -333,25 +346,34 @@ static void im_save(const std::string& filename, const bob::core::array::interfa
   if(info.dtype == bob::core::array::t_uint8) {
     if(info.nd == 2) im_save_gray<uint8_t>(array, out_file);
     else if(info.nd == 3) {
-      if(info.shape[0] != 3) 
+      if(info.shape[0] != 3)
         throw std::runtime_error("color image does not have 3 planes on 1st. dimension");
       im_save_color<uint8_t>(array, out_file);
     }
-    else 
-      throw bob::io::ImageUnsupportedDimension(info.nd); 
+    else {
+      boost::format m("TIFF: cannot write object of type `%s' to file `%s'");
+      m % info.str() % filename;
+      throw std::runtime_error(m.str());
+    }
   }
   else if(info.dtype == bob::core::array::t_uint16) {
     if(info.nd == 2) im_save_gray<uint16_t>(array, out_file);
     else if(info.nd == 3) {
-      if(info.shape[0] != 3) 
+      if(info.shape[0] != 3)
         throw std::runtime_error("color image does not have 3 planes on 1st. dimension");
       im_save_color<uint16_t>(array, out_file);
     }
-    else
-      throw bob::io::ImageUnsupportedDimension(info.nd);
+    else {
+      boost::format m("TIFF: cannot write object of type `%s' to file `%s'");
+      m % info.str() % filename;
+      throw std::runtime_error(m.str());
+    }
   }
-  else 
-    throw bob::io::ImageUnsupportedType();
+  else {
+    boost::format m("TIFF: cannot write object of type `%s' to file `%s'");
+    m % info.str() % filename;
+    throw std::runtime_error(m.str());
+  }
 }
 
 class ImageTiffFile: public bob::io::File {
@@ -410,7 +432,7 @@ class ImageTiffFile: public bob::io::File {
     }
 
     virtual void read(bob::core::array::interface& buffer, size_t index) {
-      if (m_newfile) 
+      if (m_newfile)
         throw std::runtime_error("uninitialized image file cannot be read");
 
       if (!buffer.type().is_compatible(m_type)) buffer.set(m_type);
@@ -464,7 +486,7 @@ std::string ImageTiffFile::s_codecname = "bob.image_tiff";
 
 /**
  * This defines the factory method F that can create codecs of this type.
- * 
+ *
  * Here are the meanings of the mode flag that should be respected by your
  * factory implementation:
  *
@@ -472,8 +494,8 @@ std::string ImageTiffFile::s_codecname = "bob.image_tiff";
  *      error to open a file that does not exist for read-only operations.
  * 'w': opens for reading and writing, but truncates the file if it
  *      exists; it is not an error to open files that do not exist with
- *      this flag. 
- * 'a': opens for reading and writing - any type of modification can 
+ *      this flag.
+ * 'a': opens for reading and writing - any type of modification can
  *      occur. If the file does not exist, this flag is effectively like
  *      'w'.
  *
@@ -483,7 +505,7 @@ std::string ImageTiffFile::s_codecname = "bob.image_tiff";
  * @note: This method can be static.
  */
 
-static boost::shared_ptr<bob::io::File> 
+static boost::shared_ptr<bob::io::File>
 make_file (const std::string& path, char mode) {
   return boost::make_shared<ImageTiffFile>(path, mode);
 }

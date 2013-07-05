@@ -6,16 +6,16 @@
  * @brief Test the rescaling function for 2D and 3D arrays/images
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -48,27 +48,27 @@ struct T {
     img_44 = 0;
     img_22 = 0;
 
-    img_m44 = false, false, true, true, 
+    img_m44 = false, false, true, true,
               false, false, true, true,
-              true, true, true, true, 
+              true, true, true, true,
               true, true, true, true;
-    
-    img_m22  = false, true, 
+
+    img_m22  = false, true,
                true, true;
   }
 
   ~T() {}
 };
 
-template<typename T, typename U, int d>  
-void check_dimensions( blitz::Array<T,d>& t1, blitz::Array<U,d>& t2) 
+template<typename T, typename U, int d>
+void check_dimensions( blitz::Array<T,d>& t1, blitz::Array<U,d>& t2)
 {
   BOOST_REQUIRE_EQUAL(t1.dimensions(), t2.dimensions());
   for( int i=0; i<t1.dimensions(); ++i)
     BOOST_CHECK_EQUAL(t1.extent(i), t2.extent(i));
 }
 
-template<typename T, typename U>  
+template<typename T, typename U>
 void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
 {
   check_dimensions( t1, t2);
@@ -77,8 +77,8 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
       BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
-template<typename T, typename U>  
-void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2, 
+template<typename T, typename U>
+void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2,
   const double eps )
 {
   int y_min = std::min( t1.extent(0), t2.extent(0));
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
     bob::core::error << "Environment variable $BOB_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw bob::core::Exception();
+    throw std::runtime_error("test failed");
   }
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
   // Scale original image and compare with ImageMagick reference image
 
   // 137x137
-  img_processed.resize(137,137); 
+  img_processed.resize(137,137);
   bob::ip::scale( img, img_processed, bob::ip::Rescale::BilinearInterp);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_s137x137.pgm";
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
 #endif // REGENERATE_REFERENCE_IMAGES
 
   // 77x77
-  img_processed.resize(77,77); 
+  img_processed.resize(77,77);
   bob::ip::scale( img, img_processed, bob::ip::Rescale::BilinearInterp);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_s77x77.pgm";
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
 #endif // REGENERATE_REFERENCE_IMAGES
 
   // 100x100
-  img_processed.resize(100,100); 
+  img_processed.resize(100,100);
   bob::ip::scale( img, img_processed, bob::ip::Rescale::BilinearInterp);
   checkBlitzClose( img, img_processed, eps);
 }

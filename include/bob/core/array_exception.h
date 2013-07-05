@@ -6,24 +6,24 @@
  * @brief Defines exceptions related to multidimensional arrays
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB_CORE_ARRAY_EXCEPTION_H 
+#ifndef BOB_CORE_ARRAY_EXCEPTION_H
 #define BOB_CORE_ARRAY_EXCEPTION_H
 
-#include <bob/core/Exception.h>
+#include <stdexcept>
 
 namespace bob { namespace core { namespace array {
     /**
@@ -33,11 +33,11 @@ namespace bob { namespace core { namespace array {
 
     /**
      * @brief The non-zero base error exception occurs when some function,
-     * which requires blitz Arrays to have zero base indices (for efficiency 
-     * purpose), is used with an array which does not fulfill this 
+     * which requires blitz Arrays to have zero base indices (for efficiency
+     * purpose), is used with an array which does not fulfill this
      * requirement.
      */
-    class NonZeroBaseError: public Exception {
+    class NonZeroBaseError: public std::runtime_error {
       public:
         NonZeroBaseError(const int dim, const int base) throw();
         virtual ~NonZeroBaseError() throw();
@@ -52,11 +52,11 @@ namespace bob { namespace core { namespace array {
 
     /**
      * @brief The non-one base error exception occurs when some function,
-     * which requires blitz Arrays to have one base indices (for efficiency 
-     * purpose), is used with an array which does not fulfill this 
+     * which requires blitz Arrays to have one base indices (for efficiency
+     * purpose), is used with an array which does not fulfill this
      * requirement.
      */
-    class NonOneBaseError: public Exception {
+    class NonOneBaseError: public std::runtime_error {
       public:
         NonOneBaseError(const int dim, const int base) throw();
         virtual ~NonOneBaseError() throw();
@@ -71,10 +71,10 @@ namespace bob { namespace core { namespace array {
 
     /**
      * @brief The non-C contiguous error exception occurs when some function,
-     * which requires blitz Arrays to be stored contiguously in memory, is 
+     * which requires blitz Arrays to be stored contiguously in memory, is
      * used with an array which does not fulfill this requirement.
      */
-    class NonCContiguousError: public Exception {
+    class NonCContiguousError: public std::runtime_error {
       public:
         NonCContiguousError() throw();
         virtual ~NonCContiguousError() throw();
@@ -87,10 +87,10 @@ namespace bob { namespace core { namespace array {
 
     /**
      * @brief The non-Fortran contiguous error exception occurs when some
-     * function, which requires blitz Arrays to be stored contiguously in 
+     * function, which requires blitz Arrays to be stored contiguously in
      * memory, is used with an array which does not fulfill this requirement.
      */
-    class NonFortranContiguousError: public Exception {
+    class NonFortranContiguousError: public std::runtime_error {
       public:
         NonFortranContiguousError() throw();
         virtual ~NonFortranContiguousError() throw();
@@ -101,10 +101,10 @@ namespace bob { namespace core { namespace array {
     };
 
     /**
-     * @brief The UnexpectedShapeError exception occurs when a blitz array 
+     * @brief The UnexpectedShapeError exception occurs when a blitz array
      * does not have the expected size.
      */
-    class UnexpectedShapeError: public Exception {
+    class UnexpectedShapeError: public std::runtime_error {
       public:
         UnexpectedShapeError() throw();
         virtual ~UnexpectedShapeError() throw();
@@ -115,10 +115,10 @@ namespace bob { namespace core { namespace array {
     };
 
     /**
-     * @brief The DifferentBaseError exception occurs when two blitz arrays 
+     * @brief The DifferentBaseError exception occurs when two blitz arrays
      * do not have the same base indices, whereas this is required.
      */
-    class DifferentBaseError: public Exception {
+    class DifferentBaseError: public std::runtime_error {
       public:
         DifferentBaseError() throw();
         virtual ~DifferentBaseError() throw();
@@ -132,7 +132,7 @@ namespace bob { namespace core { namespace array {
      * @brief A ConvertZeroInputRange is thrown when the specified input range
      * is empty
      */
-    class ConvertZeroInputRange: public Exception {
+    class ConvertZeroInputRange: public std::runtime_error {
 
       public:
         ConvertZeroInputRange() throw();
@@ -144,10 +144,10 @@ namespace bob { namespace core { namespace array {
     };
 
     /**
-     * @brief A ConvertInputAboveMaxRange is thrown when an input value is 
+     * @brief A ConvertInputAboveMaxRange is thrown when an input value is
      * above the maximum of the given input range.
      */
-    class ConvertInputAboveMaxRange: public Exception {
+    class ConvertInputAboveMaxRange: public std::runtime_error {
 
       public:
         ConvertInputAboveMaxRange(const double v, const double m) throw();
@@ -161,10 +161,10 @@ namespace bob { namespace core { namespace array {
     };
 
     /**
-     * @brief A ConvertInputBelowMinRange is thrown when an input value is 
+     * @brief A ConvertInputBelowMinRange is thrown when an input value is
      * below the minimum of the given input range.
      */
-    class ConvertInputBelowMinRange: public Exception {
+    class ConvertInputBelowMinRange: public std::runtime_error {
 
       public:
         ConvertInputBelowMinRange(const double v, const double m) throw();
@@ -179,10 +179,10 @@ namespace bob { namespace core { namespace array {
 
     /**
      * @brief The NonMultipleLength exception occurs when a dimension of the
-     * 2D dst array of the repmat() function is not a multiple of the 
+     * 2D dst array of the repmat() function is not a multiple of the
      * corresponding dimension in the 2D src array.
      */
-    class RepmatNonMultipleLength: public Exception {
+    class RepmatNonMultipleLength: public std::runtime_error {
       public:
         RepmatNonMultipleLength(const int src_dim, const int dst_dim) throw();
         virtual ~RepmatNonMultipleLength() throw();
@@ -195,11 +195,11 @@ namespace bob { namespace core { namespace array {
     };
 
     /**
-     * @brief The DifferentNumberOfElements exception occurs when the 2D dst 
-     * array of the reshape() functions does not contain the same number of 
+     * @brief The DifferentNumberOfElements exception occurs when the 2D dst
+     * array of the reshape() functions does not contain the same number of
      * elements as the 2D src array.
      */
-    class ReshapeDifferentNumberOfElements: public Exception {
+    class ReshapeDifferentNumberOfElements: public std::runtime_error {
       public:
         ReshapeDifferentNumberOfElements(const int expected, const int got) throw();
         virtual ~ReshapeDifferentNumberOfElements() throw();

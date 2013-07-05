@@ -4,38 +4,37 @@
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "bob/ip/BlockCellGradientDescriptors.h"
-#include "bob/ip/Exception.h"
 #include "bob/core/assert.h"
 
-bob::ip::GradientMaps::GradientMaps(const size_t height, 
+bob::ip::GradientMaps::GradientMaps(const size_t height,
     const size_t width, const GradientMagnitudeType mag_type):
   m_gy(height, width), m_gx(height, width), m_mag_type(mag_type)
 {
 }
 
 bob::ip::GradientMaps::GradientMaps(const bob::ip::GradientMaps& other):
-  m_gy(other.m_gy.extent(0), other.m_gy.extent(1)), 
-  m_gx(other.m_gx.extent(0), other.m_gx.extent(1)), 
+  m_gy(other.m_gy.extent(0), other.m_gy.extent(1)),
+  m_gx(other.m_gx.extent(0), other.m_gx.extent(1)),
   m_mag_type(other.m_mag_type)
 {
 }
 
-bob::ip::GradientMaps& 
+bob::ip::GradientMaps&
 bob::ip::GradientMaps::operator=(const bob::ip::GradientMaps& other)
 {
   if (this != &other)
@@ -47,7 +46,7 @@ bob::ip::GradientMaps::operator=(const bob::ip::GradientMaps& other)
   return *this;
 }
 
-bool 
+bool
 bob::ip::GradientMaps::operator==(const bob::ip::GradientMaps& b) const
 {
   return (this->m_gy.extent(0) == b.m_gy.extent(0) &&
@@ -57,7 +56,7 @@ bob::ip::GradientMaps::operator==(const bob::ip::GradientMaps& b) const
           this->m_mag_type == b.m_mag_type);
 }
 
-bool 
+bool
 bob::ip::GradientMaps::operator!=(const bob::ip::GradientMaps& b) const
 {
   return !(this->operator==(b));

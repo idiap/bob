@@ -25,7 +25,6 @@
 #define BOB_IP_LBPHS_FEATURES_H
 
 #include "bob/core/cast.h"
-#include "bob/ip/Exception.h"
 #include "bob/ip/block.h"
 #include "bob/ip/histo.h"
 #include "bob/ip/LBP.h"

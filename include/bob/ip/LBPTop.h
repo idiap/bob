@@ -33,7 +33,6 @@
 #include <algorithm>
 #include <limits>
 #include "bob/ip/LBP.h"
-#include "bob/ip/Exception.h"
 
 namespace bob { namespace ip {
 
@@ -191,9 +190,11 @@ namespace bob { namespace ip {
 
       /**** Get XT plane (Intersect in one point is enough) ****/
       int limitT = ceil(2*radius_t + 1);
-      if( Tlength < limitT )
-        throw bob::core::InvalidArgumentException("t_radius", Tlength, limitT,
-                std::numeric_limits<int>::max());
+      if( Tlength < limitT ) {
+        boost::format m("t_radius (%d) cannot be smaller than %d");
+        m % Tlength % limitT;
+        throw std::runtime_error(m.str());
+      }
 
 
       /***** Checking the outputs *****/
@@ -204,28 +205,55 @@ namespace bob { namespace ip {
       int limitTime   = Tlength-2*max_radius;
 
       /*Checking XY*/
-      if( xy.extent(0) != limitTime)
-        throw bob::core::InvalidArgumentException("Time parameter in  XY ", xy.extent(0), limitTime, limitTime);
-      if( xy.extent(1) != limitHeight)
-        throw bob::core::InvalidArgumentException("Height parameter in  XY ", xy.extent(1), limitHeight, limitHeight);
-      if( xy.extent(2) != limitWidth)
-        throw bob::core::InvalidArgumentException("Width parameter in  XY ", xy.extent(2), limitWidth, limitWidth);
+      if( xy.extent(0) != limitTime) {
+        boost::format m("time parameter in direction XY (%d) has to be %d");
+        m % xy.extent(0) % limitTime;
+        throw std::runtime_error(m.str());
+      }
+      if( xy.extent(1) != limitHeight) {
+        boost::format m("height parameter in direction XY = %d has to be %d");
+        m % xy.extent(1) % limitHeight;
+        throw std::runtime_error(m.str());
+      }
+      if( xy.extent(2) != limitWidth) {
+        boost::format m("width parameter in direction XY = %d has to be %d");
+        m % xy.extent(2) % limitWidth;
+        throw std::runtime_error(m.str());
+      }
 
       /*Checking XT*/
-      if( xt.extent(0) != limitTime)
-        throw bob::core::InvalidArgumentException("Time parameter in  XT ", xt.extent(0), limitTime, limitTime);
-      if( xt.extent(1) != limitHeight)
-        throw bob::core::InvalidArgumentException("Height parameter in  XT ", xt.extent(1), limitHeight, limitHeight);
-      if( xt.extent(2) != limitWidth)
-        throw bob::core::InvalidArgumentException("Width parameter in  XT ", xt.extent(2), limitWidth, limitWidth);
+      if( xt.extent(0) != limitTime) {
+        boost::format m("time parameter in direction XT = %d has to be %d");
+        m % xt.extent(0) % limitTime;
+        throw std::runtime_error(m.str());
+      }
+      if( xt.extent(1) != limitHeight) {
+        boost::format m("height parameter in direction XT = %d has to be %d");
+        m % xt.extent(1) % limitHeight;
+        throw std::runtime_error(m.str());
+      }
+      if( xt.extent(2) != limitWidth) {
+        boost::format m("width parameter in direction XT = %d has to be %d");
+        m % xt.extent(2) % limitWidth;
+        throw std::runtime_error(m.str());
+      }
 
       /*Checking YT*/
-      if( yt.extent(0) != limitTime)
-        throw bob::core::InvalidArgumentException("Time parameter in  YT ", yt.extent(0), limitTime, limitTime);
-      if( yt.extent(1) != limitHeight)
-        throw bob::core::InvalidArgumentException("Height parameter in  YT ", yt.extent(1), limitHeight, limitHeight);
-      if( yt.extent(2) != limitWidth)
-        throw bob::core::InvalidArgumentException("Width parameter in  YT ", yt.extent(2), limitWidth, limitWidth);
+      if( yt.extent(0) != limitTime) {
+        boost::format m("time parameter in direction YT = %d has to be %d");
+        m % yt.extent(0) % limitTime;
+        throw std::runtime_error(m.str());
+      }
+      if( yt.extent(1) != limitHeight) {
+        boost::format m("height parameter in direction YT = %d has to be %d");
+        m % yt.extent(1) % limitHeight;
+        throw std::runtime_error(m.str());
+      }
+      if( yt.extent(2) != limitWidth) {
+        boost::format m("width parameter in direction YT = %d has to be %d");
+        m % yt.extent(2) % limitWidth;
+        throw std::runtime_error(m.str());
+      }
 
 
       //for each element in time domain (the simplest way to see what is happening)

@@ -5,16 +5,16 @@
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -40,50 +40,50 @@ bob::machine::GMMStats::GMMStats(const bob::machine::GMMStats& other) {
   copy(other);
 }
 
-bob::machine::GMMStats::~GMMStats() { 
+bob::machine::GMMStats::~GMMStats() {
 }
 
-bob::machine::GMMStats& 
+bob::machine::GMMStats&
 bob::machine::GMMStats::operator=(const bob::machine::GMMStats& other) {
   // protect against invalid self-assignment
-  if (this != &other) 
+  if (this != &other)
     copy(other);
-  
+
   // by convention, always return *this
   return *this;
 }
 
-bool bob::machine::GMMStats::operator==(const bob::machine::GMMStats& b) const 
+bool bob::machine::GMMStats::operator==(const bob::machine::GMMStats& b) const
 {
   return (T == b.T && log_likelihood == b.log_likelihood &&
           bob::core::array::isEqual(n, b.n) &&
           bob::core::array::isEqual(sumPx, b.sumPx) &&
           bob::core::array::isEqual(sumPxx, b.sumPxx));
-} 
+}
 
-bool 
+bool
 bob::machine::GMMStats::operator!=(const bob::machine::GMMStats& b) const
 {
   return !(this->operator==(b));
 }
 
 bool bob::machine::GMMStats::is_similar_to(const bob::machine::GMMStats& b,
-  const double r_epsilon, const double a_epsilon) const 
+  const double r_epsilon, const double a_epsilon) const
 {
   return (T == b.T && log_likelihood == b.log_likelihood &&
           bob::core::array::isClose(n, b.n, r_epsilon, a_epsilon) &&
           bob::core::array::isClose(sumPx, b.sumPx, r_epsilon, a_epsilon) &&
           bob::core::array::isClose(sumPxx, b.sumPxx, r_epsilon, a_epsilon));
-} 
+}
 
 
 void bob::machine::GMMStats::operator+=(const bob::machine::GMMStats& b) {
   // Check dimensions
-  if(n.extent(0) != b.n.extent(0) || 
+  if(n.extent(0) != b.n.extent(0) ||
       sumPx.extent(0) != b.sumPx.extent(0) || sumPx.extent(1) != b.sumPx.extent(1) ||
       sumPxx.extent(0) != b.sumPxx.extent(0) || sumPxx.extent(1) != b.sumPxx.extent(1))
     // TODO: add a specialized exception
-    throw bob::machine::Exception();
+    throw std::runtime_error("if you see this exception, fill a bug report");
 
   // Update GMMStats object with the content of the other one
   T += b.T;
@@ -139,12 +139,12 @@ void bob::machine::GMMStats::load(bob::io::HDF5File& config) {
   int64_t n_gaussians = config.read<int64_t>("n_gaussians");
   int64_t n_inputs = config.read<int64_t>("n_inputs");
   T = static_cast<size_t>(config.read<int64_t>("T"));
-  
+
   //resize arrays to prepare for HDF5 readout
   n.resize(n_gaussians);
   sumPx.resize(n_gaussians, n_inputs);
   sumPxx.resize(n_gaussians, n_inputs);
-  
+
   //load data
   config.readArray("n", n);
   config.readArray("sumPx", sumPx);
@@ -159,7 +159,7 @@ namespace bob {
       os << "n = " << g.n;
       os << "sumPx = " << g.sumPx;
       os << "sumPxx = " << g.sumPxx;
-      
+
       return os;
     }
   }

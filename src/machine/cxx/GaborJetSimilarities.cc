@@ -71,7 +71,7 @@ double bob::machine::GaborJetSimilarity::operator()(const blitz::Array<double,1>
       return sim / size;
     }
     default:
-      throw bob::core::NotImplementedError("Disparity similarity (and its derivatives) need Gabor jets including phases");
+      throw std::runtime_error("Disparity similarity (and its derivatives) need Gabor jets including phases");
   }
 }
 
@@ -128,7 +128,7 @@ double bob::machine::GaborJetSimilarity::operator()(const blitz::Array<double,2>
 
     default:
       // this should never happen
-      throw bob::core::NotImplementedError("This should not have happened. Please check the implementation of the similarity() functions.");
+      throw std::runtime_error("This should not have happened. Please check the implementation of the similarity() functions.");
   }
 }
 

@@ -26,7 +26,6 @@
 #include <bob/ip/GaborWaveletTransform.h>
 #include <bob/machine/GaborJetSimilarities.h>
 #include <bob/io/HDF5File.h>
-#include <bob/machine/Exception.h>
 
 #include <sstream>
 
@@ -37,10 +36,10 @@ namespace bob{ namespace machine {
    */
 
   //! \brief This exception is thrown when the image size is smaller than the graph that should be extracted.
-  class ImageTooSmallException : public Exception{
+  class ImageTooSmallException : public std::runtime_error {
     public:
       //! Constructor
-      ImageTooSmallException(int height, int width, int y_pos, int x_pos) throw() : h(height), w(width), y(y_pos), x(x_pos) {}
+      ImageTooSmallException(int height, int width, int y_pos, int x_pos) throw() : std::runtime_error(""), h(height), w(width), y(y_pos), x(x_pos) {}
       virtual const char* what() const throw(){std::ostringstream s; s << "The position (" << y << ", " << x << ") is out of the image boundaries " << h << " x " << w << "!"; return s.str().c_str();}
     private:
       int h,w,y,x;
@@ -148,7 +147,7 @@ namespace bob{ namespace machine {
       // temporary complex vector of Gabor jet averages
       mutable blitz::Array<std::complex<double>,1> m_averages;
   };
-  
+
   /**
    * @}
    */

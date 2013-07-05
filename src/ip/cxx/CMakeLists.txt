@@ -9,7 +9,6 @@ set(incdir ${cxx_incdir})
 set(src
    "block.cc"
    "color.cc"
-   "Exception.cc"
    "HornAndSchunckFlow.cc"
    "crop.cc"
    "shift.cc"
@@ -18,7 +17,6 @@ set(src
    "maxRectInMask.cc"
    "FaceEyesNorm.cc"
    "GaborWaveletTransform.cc"
-   "histo.cc"
    "BlockCellGradientDescriptors.cc"
    "HOG.cc"
    "LBP.cc"

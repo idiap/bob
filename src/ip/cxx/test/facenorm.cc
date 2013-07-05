@@ -6,16 +6,16 @@
  * @brief Test the geometric normalization function for 2D arrays/images
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -45,15 +45,15 @@ struct T {
   ~T() {}
 };
 
-template<typename T, typename U, int d>  
-void check_dimensions( blitz::Array<T,d>& t1, blitz::Array<U,d>& t2) 
+template<typename T, typename U, int d>
+void check_dimensions( blitz::Array<T,d>& t1, blitz::Array<U,d>& t2)
 {
   BOOST_REQUIRE_EQUAL(t1.dimensions(), t2.dimensions());
   for( int i=0; i<t1.dimensions(); ++i)
     BOOST_CHECK_EQUAL(t1.extent(i), t2.extent(i));
 }
 
-template<typename T>  
+template<typename T>
 void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<T,2>& t2,
   const double eps )
 {
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE( test_facenorm )
     bob::core::error << "Environment variable $BOB_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw bob::core::Exception();
+    throw std::runtime_error("test failed");
   }
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE( test_facenorm )
   boost::shared_ptr<bob::io::File> image_file = bob::io::open(testdata_path_img.string(), 'r');
   blitz::Array<uint8_t,2> img = image_file->read_all<uint8_t,2>();
   blitz::Array<double,2> img_processed_d(40,40);
-  
+
 
   bob::ip::FaceEyesNorm facenorm(20,40,40,5/19.*40,20);
 
@@ -117,14 +117,14 @@ BOOST_AUTO_TEST_CASE( test_facenorm2 )
     bob::core::error << "Environment variable $BOB_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw bob::core::Exception();
+    throw std::runtime_error("test failed");
   }
   // Load original image
   boost::filesystem::path testdata_path_image(testdata_cpath);
   testdata_path_image /= "Nicolas_Cage_0001.pgm";
   boost::shared_ptr<bob::io::File> image_file = bob::io::open(testdata_path_image.string(), 'r');
   blitz::Array<double,2> processed_image(80,64);
-  
+
   bob::ip::FaceEyesNorm facenorm(33,80,64,16,31.5);
 
   // Process giving the coordinates of the eyes
@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE( test_facenorm2 )
   BOOST_CHECK_CLOSE(new_left_eye(0), 16., 1e-8);
   BOOST_CHECK_CLOSE(new_left_eye(1), 48., 1e-8);
 }
- 
+
 BOOST_AUTO_TEST_CASE( test_facenorm3 )
 {
   // Get path to the XML Schema definition
@@ -158,14 +158,14 @@ BOOST_AUTO_TEST_CASE( test_facenorm3 )
     bob::core::error << "Environment variable $BOB_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw bob::core::Exception();
+    throw std::runtime_error("test failed");
   }
   // Load original image
   boost::filesystem::path testdata_path_image(testdata_cpath);
   testdata_path_image /= "Nicolas_Cage_0001.pgm";
   boost::shared_ptr<bob::io::File> image_file = bob::io::open(testdata_path_image.string(), 'r');
   blitz::Array<double,2> processed_image(80,64);
-  
+
   bob::ip::FaceEyesNorm facenorm(80,64,16,15,16,48);
 
   // Process giving the coordinates of the eyes

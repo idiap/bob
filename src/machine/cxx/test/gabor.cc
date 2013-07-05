@@ -30,9 +30,7 @@
 
 #include "bob/machine/GaborGraphMachine.h"
 #include "bob/machine/GaborJetSimilarities.h"
-#include "bob/machine/Exception.h"
 
-#include "bob/core/Exception.h"
 #include "bob/core/logging.h"
 #include "bob/io/utils.h"
 
@@ -70,7 +68,7 @@ BOOST_AUTO_TEST_CASE( test_gabor_graph_machine )
   if (!data){
     bob::core::error << "Environment variable $BOB_TESTDATA_DIR "
         "is not set. Have you setup your working environment correctly?" << std::endl;
-    throw bob::core::Exception();
+    throw std::runtime_error("test failed");
   }
   std::string data_dir(data);
 

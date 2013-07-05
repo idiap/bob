@@ -6,16 +6,16 @@
  * @brief Implements the matlab (.mat) array codec using matio
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -63,10 +63,16 @@ class MatFile: public bob::io::File {
         std::sort(m_id.begin(), m_id.end()); //get the right order...
 
         //double checks some parameters
-        if (m_type.nd == 0 || m_type.nd > 4) 
-          throw bob::io::DimensionError(m_type.nd, BOB_MAX_DIM);
-        if (m_type.dtype == bob::core::array::t_unknown) 
-          throw bob::io::UnsupportedTypeError(m_type.dtype);
+        if (m_type.nd == 0 || m_type.nd > 4) {
+          boost::format m("number of dimensions for object at file `%s' (%u) exceeds the maximum supported (%u)");
+          m % m_filename % m_type.nd % BOB_MAX_DIM;
+          throw std::runtime_error(m.str());
+        }
+        if (m_type.dtype == bob::core::array::t_unknown) {
+          boost::format m("unsupported data type while loading matlab file `%s': %s");
+          m % m_filename % m_type.str();
+          throw std::runtime_error(m.str());
+        }
       }
     }
 
@@ -91,12 +97,12 @@ class MatFile: public bob::io::File {
     }
 
     virtual void read_all(bob::core::array::interface& buffer) {
-      
+
       //do we need to reload the file?
       if (!m_type.is_valid()) try_reload_map();
 
       //now open it for reading
-      boost::shared_ptr<mat_t> mat = 
+      boost::shared_ptr<mat_t> mat =
         bob::io::detail::make_matfile(m_filename, m_mode);
 
       if (!mat) {
@@ -110,12 +116,12 @@ class MatFile: public bob::io::File {
     }
 
     virtual void read(bob::core::array::interface& buffer, size_t index) {
-      
+
       //do we need to reload the file?
       if (!m_type.is_valid()) try_reload_map();
 
       //now open it for reading
-      boost::shared_ptr<mat_t> mat = 
+      boost::shared_ptr<mat_t> mat =
         bob::io::detail::make_matfile(m_filename, m_mode);
 
       if (!mat) {
@@ -150,7 +156,7 @@ class MatFile: public bob::io::File {
         throw std::invalid_argument(f.str());
       }
 
-      //all is good at this point, just write it. 
+      //all is good at this point, just write it.
 
       //choose variable name
       size_t next_index = 0;
@@ -169,10 +175,10 @@ class MatFile: public bob::io::File {
         (*m_map)[next_index] = std::make_pair(varname.str(), buffer.type());
         m_id.push_back(next_index);
       }
-      
+
       return m_size-1;
     }
-    
+
     virtual void write (const bob::core::array::interface& buffer) {
 
       static std::string varname("array");
@@ -181,7 +187,7 @@ class MatFile: public bob::io::File {
       boost::filesystem::path path (m_filename);
       if (boost::filesystem::exists(m_filename)) boost::filesystem::remove(m_filename);
 
-      boost::shared_ptr<mat_t> mat = bob::io::detail::make_matfile(m_filename, 
+      boost::shared_ptr<mat_t> mat = bob::io::detail::make_matfile(m_filename,
           m_mode);
       if (!mat) {
         boost::format f("cannot open matlab file at '%s' for writing");
@@ -225,7 +231,7 @@ std::string MatFile::s_codecname = "bob.matlab";
 
 /**
  * This defines the factory method F that can create codecs of this type.
- * 
+ *
  * Here are the meanings of the mode flag that should be respected by your
  * factory implementation:
  *
@@ -233,8 +239,8 @@ std::string MatFile::s_codecname = "bob.matlab";
  *      error to open a file that does not exist for read-only operations.
  * 'w': opens for reading and writing, but truncates the file if it
  *      exists; it is not an error to open files that do not exist with
- *      this flag. 
- * 'a': opens for reading and writing - any type of modification can 
+ *      this flag.
+ * 'a': opens for reading and writing - any type of modification can
  *      occur. If the file does not exist, this flag is effectively like
  *      'w'.
  *
@@ -243,7 +249,7 @@ std::string MatFile::s_codecname = "bob.matlab";
  *
  * @note: This method can be static.
  */
-static boost::shared_ptr<bob::io::File> 
+static boost::shared_ptr<bob::io::File>
 make_file (const std::string& path, char mode) {
 
   return boost::make_shared<MatFile>(path, mode);
@@ -257,7 +263,7 @@ static bool register_codec() {
 
   boost::shared_ptr<bob::io::CodecRegistry> instance =
     bob::io::CodecRegistry::instance();
-  
+
   instance->registerExtension(".mat", "Matlab binary files (v4 and superior)", &make_file);
 
   return true;

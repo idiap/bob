@@ -7,16 +7,16 @@
  *   on a 2D array/image.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -24,11 +24,13 @@
 #ifndef BOB_IP_GAMMA_CORRECTION_H
 #define BOB_IP_GAMMA_CORRECTION_H
 
-#include <blitz/array.h>
 #include <cmath>
 #include <limits>
+#include <stdexcept>
+#include <boost/format.hpp>
+#include <blitz/array.h>
+
 #include "bob/core/assert.h"
-#include "bob/core/Exception.h"
 
 namespace bob {
 /**
@@ -40,7 +42,7 @@ namespace bob {
 
     namespace detail {
       /**
-        * @brief Function which performs a gamma correction on a 2D 
+        * @brief Function which performs a gamma correction on a 2D
         *   blitz::array/image of a given type.
         *   The first dimension is the height (y-axis), whereas the second
         *   one is the width (x-axis).
@@ -50,7 +52,7 @@ namespace bob {
         * @param gamma The gamma value for power-law gamma correction
         */
       template<typename T>
-      void gammaCorrectionNoCheck(const blitz::Array<T,2>& src, 
+      void gammaCorrectionNoCheck(const blitz::Array<T,2>& src,
         blitz::Array<double,2>& dst, const double gamma)
       {
         dst = blitz::pow( src, gamma);
@@ -60,7 +62,7 @@ namespace bob {
 
 
     /**
-      * @brief Function which performs a gamma correction on a 2D 
+      * @brief Function which performs a gamma correction on a 2D
       *   blitz::array/image of a given type.
       *   The first dimension is the height (y-axis), whereas the second
       *   one is the width (x-axis).
@@ -69,19 +71,21 @@ namespace bob {
       * @param gamma The gamma value for power-law gamma correction
       */
     template<typename T>
-    void gammaCorrection(const blitz::Array<T,2>& src, 
+    void gammaCorrection(const blitz::Array<T,2>& src,
       blitz::Array<double,2>& dst, const double gamma)
     {
       // Check input/output
       bob::core::array::assertZeroBase(src);
       bob::core::array::assertZeroBase(dst);
-      bob::core::array::assertSameShape(dst, src); 
+      bob::core::array::assertSameShape(dst, src);
 
       // Check parameters and throw exception if required
-      if( gamma < 0.) 
-        throw bob::core::InvalidArgumentException("gamma", gamma, 0.,
-                std::numeric_limits<double>::max());
-    
+      if( gamma < 0.) {
+        boost::format m("parameter `gamma' was set to %f, but should be greater or equal zero");
+        m % gamma;
+        throw std::runtime_error(m.str());
+      }
+
       // Perform gamma correction for the 2D array
       detail::gammaCorrectionNoCheck(src, dst, gamma);
     }

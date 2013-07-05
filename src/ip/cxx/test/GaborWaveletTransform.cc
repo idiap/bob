@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE( test_gwt_io )
   if (!data){
     bob::core::error << "Environment variable $BOB_TESTDATA_DIR "
         "is not set. Have you setup your working environment correctly?" << std::endl;
-    throw bob::core::Exception();
+    throw std::runtime_error("test failed");
   }
   boost::filesystem::path file_path = boost::filesystem::path(data) / "temp_gwt.hdf5";
   bob::io::HDF5File file(file_path.string(), bob::io::HDF5File::trunc);
@@ -182,7 +182,7 @@ BOOST_AUTO_TEST_CASE( test_GWT_output )
   if (!data){
     bob::core::error << "Environment variable $BOB_TESTDATA_DIR "
         "is not set. Have you setup your working environment correctly?" << std::endl;
-    throw bob::core::Exception();
+    throw std::runtime_error("test failed");
   }
   std::string data_dir(data);
 

@@ -6,16 +6,16 @@
  * @brief This file provides a class to process images with the Sobel operator
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -23,9 +23,11 @@
 #ifndef BOB_IP_SOBEL_H
 #define BOB_IP_SOBEL_H
 
+#include <stdexcept>
+#include <boost/format.hpp>
+
 #include "bob/core/assert.h"
 #include "bob/core/cast.h"
-#include "bob/ip/Exception.h"
 #include "bob/sp/conv.h"
 #include "bob/sp/extrapolate.h"
 
@@ -47,9 +49,9 @@ namespace bob {
       /**
         * @brief Constructor: generates the Sobel kernel
         */
-      Sobel(const bool up_positive=false, const bool left_positive=false, 
+      Sobel(const bool up_positive=false, const bool left_positive=false,
         const bob::sp::Conv::SizeOption size_opt=bob::sp::Conv::Same,
-        const bob::sp::Extrapolation::BorderType 
+        const bob::sp::Extrapolation::BorderType
           border_type=bob::sp::Extrapolation::Mirror);
 
       /**
@@ -74,7 +76,7 @@ namespace bob {
       /**
        * @brief Not equal to
        */
-      bool operator!=(const Sobel& b) const; 
+      bool operator!=(const Sobel& b) const;
 
       /**
        * @brief Getters
@@ -82,7 +84,7 @@ namespace bob {
       bool getUpPositive() const { return m_up_positive; }
       bool getLeftPositive() const { return m_left_positive; }
       bob::sp::Conv::SizeOption getSizeOption() const { return m_size_opt; }
-      bob::sp::Extrapolation::BorderType getConvBorder() const 
+      bob::sp::Extrapolation::BorderType getConvBorder() const
       { return m_border_type; }
       const blitz::Array<double, 2>& getKernelY() const { return m_kernel_y; }
       const blitz::Array<double, 2>& getKernelX() const { return m_kernel_x; }
@@ -94,9 +96,9 @@ namespace bob {
       { m_up_positive = up_positive; computeKernels(); }
       void setLeftPositive(const bool left_positive)
       { m_left_positive = left_positive; computeKernels(); }
-      void setSizeOption(const bob::sp::Conv::SizeOption size_opt) 
+      void setSizeOption(const bob::sp::Conv::SizeOption size_opt)
       { m_size_opt = size_opt; }
-      void setConvBorder(const bob::sp::Extrapolation::BorderType border_type) 
+      void setConvBorder(const bob::sp::Extrapolation::BorderType border_type)
       { m_border_type = border_type; }
 
       /**
@@ -106,7 +108,7 @@ namespace bob {
         *     - The second one for the convolution with the x-kernel
         * @warning The selected type should be signed (e.g. int64_t or double)
         */
-      template <typename T> void operator()(const blitz::Array<T,2>& src, 
+      template <typename T> void operator()(const blitz::Array<T,2>& src,
         blitz::Array<T,3>& dst);
 
     private:
@@ -124,12 +126,15 @@ namespace bob {
       bob::sp::Extrapolation::BorderType m_border_type;
   };
 
-  template <typename T> 
+  template <typename T>
   void Sobel::operator()(const blitz::Array<T,2>& src, blitz::Array<T,3>& dst)
-  { 
+  {
     // Check that dst has two planes
-    if( dst.extent(0) != 2 )
-      throw bob::ip::Exception();
+    if( dst.extent(0) != 2 ) {
+      boost::format m("destination array extent for the first dimension (0) is not 2, but %d");
+      m % dst.extent(0);
+      throw std::runtime_error(m.str());
+    }
     // Check that dst has zero bases
     bob::core::array::assertZeroBase(dst);
 

@@ -24,12 +24,13 @@
 #ifndef BOB_IP_GABOR_WAVELET_TRANSFORM_H
 #define BOB_IP_GABOR_WAVELET_TRANSFORM_H
 
-#include <blitz/array.h>
-#include "bob/core/Exception.h"
-#include "bob/io/HDF5File.h"
-#include "bob/sp/FFT2D.h"
 #include <vector>
 #include <utility>
+#include <stdexcept>
+#include <blitz/array.h>
+
+#include "bob/io/HDF5File.h"
+#include "bob/sp/FFT2D.h"
 
 namespace bob {
 
@@ -114,7 +115,7 @@ namespace bob {
         void generateKernels(blitz::TinyVector<unsigned,2> resolution);
 
         //! Returns the Gabor kernel for the given index
-        const bob::ip::GaborKernel& getKernel(unsigned index) {if (index < m_gabor_kernels.size()) return m_gabor_kernels[index]; else throw bob::core::Exception();}
+        const bob::ip::GaborKernel& getKernel(unsigned index) {if (index < m_gabor_kernels.size()) return m_gabor_kernels[index]; else throw std::runtime_error("index is out of bounds");}
 
         //! generates the frequency kernels as images
         blitz::Array<double,3> kernelImages() const;

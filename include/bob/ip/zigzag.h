@@ -11,16 +11,16 @@
  *   IEEE International Conference on Image Processing 2002.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -28,8 +28,9 @@
 #ifndef BOB_IP_ZIGZAG_H
 #define BOB_IP_ZIGZAG_H
 
+#include <stdexcept>
+#include <boost/format.hpp>
 #include "bob/core/assert.h"
-#include "bob/core/Exception.h"
 
 namespace bob {
   /**
@@ -43,16 +44,16 @@ namespace bob {
       /**
         * @brief Extract the zigzag pattern from a 2D blitz::array, as
         * described in:
-        *   "Polynomial Features for Robust Face Authentication", 
-        *   from C. Sanderson and K. Paliwal, in the proceedings of the 
+        *   "Polynomial Features for Robust Face Authentication",
+        *   from C. Sanderson and K. Paliwal, in the proceedings of the
         *   IEEE International Conference on Image Processing 2002.
         * @param src The input blitz array
         * @param dst The output blitz array
-        * @param right_first Set to true to reverse the initial zigzag order. 
+        * @param right_first Set to true to reverse the initial zigzag order.
         *   By default, the direction is left-to-right for the first diagonal.
         */
       template<typename T>
-      void zigzagNoCheck(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst, 
+      void zigzagNoCheck(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst,
         const bool right_first)
       {
         // Number of coefficients to keep
@@ -70,11 +71,11 @@ namespace bob {
         // Length of the current diagonal
         int diagonal_length = 1;
 
-        // Get all required coefficients 
+        // Get all required coefficients
         for(int ind=0; ind < n_coef_kept; ++ind ) {
           int x, y;
-       
-          // Conditions used to determine the coordinates (x,y) in the 2D 
+
+          // Conditions used to determine the coordinates (x,y) in the 2D
           // array given the 1D index in the zigzag
           if(diagonal_left_to_right_p) {
             if( current_diagonal>src.extent(0)-1 ) {
@@ -106,9 +107,9 @@ namespace bob {
             // Increment current diagonal
             ++current_diagonal;
             // Reverse the direction in the diagonal
-            diagonal_left_to_right_p = !diagonal_left_to_right_p; 
+            diagonal_left_to_right_p = !diagonal_left_to_right_p;
             // Reset the offset in the diagonal to 0
-            diagonal_offset = 0; 
+            diagonal_offset = 0;
             // Determine the new size of the diagonal
             if( current_diagonal<min_dim )
               ++diagonal_length;
@@ -120,19 +121,19 @@ namespace bob {
     }
 
     /**
-      * @brief Extract the zigzag pattern from a 2D blitz::array, as described 
+      * @brief Extract the zigzag pattern from a 2D blitz::array, as described
       * in:
-      *   "Polynomial Features for Robust Face Authentication", 
-      *   from C. Sanderson and K. Paliwal, in the proceedings of the 
+      *   "Polynomial Features for Robust Face Authentication",
+      *   from C. Sanderson and K. Paliwal, in the proceedings of the
       *   IEEE International Conference on Image Processing 2002.
       * @param src The input 2D blitz array
       * @param dst The output 1D blitz array. The number of coefficients kept is
       *            given by the length of this array.
-      * @param right_first Set to true to reverse the initial zigzag order. 
+      * @param right_first Set to true to reverse the initial zigzag order.
       *   By default, the direction is left-to-right for the first diagonal.
       */
     template<typename T>
-    void zigzag(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst, 
+    void zigzag(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst,
       const bool right_first = false)
     {
       // Checks that the src and dst arrays have zero base indices
@@ -144,9 +145,11 @@ namespace bob {
       const int n_coef_kept = dst.extent(0);
 
       // Check that we ask to keep a valid number of coefficients
-      if( n_coef_kept < 1 || n_coef_kept > max_n_coef )
-        throw bob::core::InvalidArgumentException("n_coef_kept", n_coef_kept,
-          1, n_coef_kept);
+      if( n_coef_kept < 1 || n_coef_kept > max_n_coef ) {
+        boost::format m("parameter `n_coef_kept' was set to %d, but should be in the range [1,%d]");
+        m % n_coef_kept % max_n_coef;
+        throw std::runtime_error(m.str());
+      }
 
       // Apply the zigzag function
       detail::zigzagNoCheck( src, dst, right_first);

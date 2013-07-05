@@ -4,26 +4,25 @@
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "bob/ip/HOG.h"
-#include "bob/ip/Exception.h"
 #include "bob/core/assert.h"
 
-void bob::ip::hogComputeHistogram(const blitz::Array<double,2>& mag, 
-  const blitz::Array<double,2>& ori, blitz::Array<double,1>& hist, 
+void bob::ip::hogComputeHistogram(const blitz::Array<double,2>& mag,
+  const blitz::Array<double,2>& ori, blitz::Array<double,1>& hist,
   const bool init_hist, const bool full_orientation)
 {
   // Checks input arrays
@@ -33,8 +32,8 @@ void bob::ip::hogComputeHistogram(const blitz::Array<double,2>& mag,
   bob::ip::hogComputeHistogram_(mag, ori, hist, init_hist, full_orientation);
 }
 
-void bob::ip::hogComputeHistogram_(const blitz::Array<double,2>& mag, 
-  const blitz::Array<double,2>& ori, blitz::Array<double,1>& hist, 
+void bob::ip::hogComputeHistogram_(const blitz::Array<double,2>& mag,
+  const blitz::Array<double,2>& ori, blitz::Array<double,1>& hist,
   const bool init_hist, const bool full_orientation)
 {
   static const double range_orientation = (full_orientation? 2*M_PI : M_PI);
@@ -51,7 +50,7 @@ void bob::ip::hogComputeHistogram_(const blitz::Array<double,2>& mag,
 
       // Computes "real" value of the closest bin
       double bin = orientation / range_orientation * nb_bins;
-      // Computes the value of the "inferior" bin 
+      // Computes the value of the "inferior" bin
       // ("superior" bin corresponds to the one after the inferior bin)
       int bin_index1 = floor(bin);
       // Computes the weight for the "inferior" bin
@@ -60,9 +59,9 @@ void bob::ip::hogComputeHistogram_(const blitz::Array<double,2>& mag,
       // Computes integer indices in the range [0,nb_bins-1]
       bin_index1 = bin_index1 % nb_bins;
       // Additional check, because bin can be negative (hence bin_index1 as well, as an integer remainder)
-      if(bin_index1<0) bin_index1+=nb_bins; 
+      if(bin_index1<0) bin_index1+=nb_bins;
       // bin_index1 and nb_bins are positive. Thus, bin_index2 (integer remainder) as well!
-      int bin_index2 = (bin_index1+1) % nb_bins; 
+      int bin_index2 = (bin_index1+1) % nb_bins;
 
       // Updates the histogram (bilinearly)
       hist(bin_index1) += weight * energy;

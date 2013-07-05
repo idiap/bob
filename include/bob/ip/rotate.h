@@ -10,16 +10,16 @@
  * The notes of Tobin Fricke about this article might also be of interest.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -30,7 +30,6 @@
 #include <blitz/array.h>
 #include "bob/core/assert.h"
 #include "bob/core/cast.h"
-#include "bob/ip/Exception.h"
 #include "bob/ip/shear.h"
 #include "bob/ip/crop.h"
 
@@ -44,7 +43,7 @@ namespace bob {
   namespace ip {
     namespace detail {
     }
-    
+
     namespace Rotate {
       /**
         * @brief Internal enumeration of the possible algorithms
@@ -55,22 +54,22 @@ namespace bob {
       } Algorithm;
 
     }
-    
+
     //! Returns the shape the given image will be rotated into when using the specified angle in degrees.
     template<typename T>
-      static const blitz::TinyVector<int,2> getRotatedShape( 
-        const blitz::Array<T,2>& src, 
+      static const blitz::TinyVector<int,2> getRotatedShape(
+        const blitz::Array<T,2>& src,
         const double angle
       );
-      
+
     //! Returns the shape the given image will be rotated into when using the specified angle in degrees.
     template<typename T>
-      static const blitz::TinyVector<int,3> getRotatedShape( 
-        const blitz::Array<T,3>& src, 
+      static const blitz::TinyVector<int,3> getRotatedShape(
+        const blitz::Array<T,3>& src,
         const double angle
       );
-      
-    
+
+
     //! Rotates the given input image to the given output image with the given angle in degrees.
     template <class T>
       void rotate(
@@ -79,8 +78,8 @@ namespace bob {
         const double angle,
         const bob::ip::Rotate::Algorithm algorithm = bob::ip::Rotate::Shearing
       );
-      
-    //! Rotates the given input image to the given output image 
+
+    //! Rotates the given input image to the given output image
     template <class T>
       void rotate(
         const blitz::Array<T,2>& src,
@@ -100,7 +99,7 @@ namespace bob {
         const double angle,
         const bob::ip::Rotate::Algorithm algorithm = bob::ip::Rotate::Shearing
       );
-      
+
     //! Rotates the given input image to the given output image using the specified mask.
     template <class T>
       void rotate(
@@ -114,12 +113,12 @@ namespace bob {
 
     //! Computes the angle between the line of the two given points and the horizontal line
     double getAngleToHorizontal(
-      const double left_y, 
+      const double left_y,
       const double left_x,
-      const double right_y, 
+      const double right_y,
       const double right_x
     );
-    
+
 
   } // namespace ip$
 /**
@@ -143,12 +142,12 @@ namespace bob {
   */
 template<typename T, bool mask>
   static inline void rotateNoCheck_0(
-    const blitz::Array<T,2>& src, 
-    const blitz::Array<bool,2>& src_mask, 
+    const blitz::Array<T,2>& src,
+    const blitz::Array<bool,2>& src_mask,
     blitz::Array<double,2>& dst,
     blitz::Array<bool,2>& dst_mask
 )
-{ 
+{
   for( int y=0; y<dst.extent(0); ++y)
     for( int x=0; x<dst.extent(1); ++x)
       dst(y,x) = bob::core::cast<double>(src(y,x));
@@ -170,12 +169,12 @@ template<typename T, bool mask>
   */
 template<typename T, bool mask>
   static inline void rotateNoCheck_90(
-    const blitz::Array<T,2>& src, 
-    const blitz::Array<bool,2>& src_mask, 
+    const blitz::Array<T,2>& src,
+    const blitz::Array<bool,2>& src_mask,
     blitz::Array<double,2>& dst,
     blitz::Array<bool,2>& dst_mask
 )
-{ 
+{
   for( int y=0; y<dst.extent(0); ++y)
     for( int x=0; x<dst.extent(1); ++x)
       dst(y,x) = bob::core::cast<double>(src( x, (src.extent(1)-1-y) ));
@@ -198,12 +197,12 @@ template<typename T, bool mask>
   */
 template<typename T, bool mask>
   static inline void rotateNoCheck_180(
-  const blitz::Array<T,2>& src, 
-  const blitz::Array<bool,2>& src_mask, 
+  const blitz::Array<T,2>& src,
+  const blitz::Array<bool,2>& src_mask,
   blitz::Array<double,2>& dst,
   blitz::Array<bool,2>& dst_mask
 )
-{ 
+{
   for( int y=0; y<dst.extent(0); ++y)
     for( int x=0; x<dst.extent(1); ++x)
       dst(y,x) = bob::core::cast<double>(src( (src.extent(0)-1-y),
@@ -212,7 +211,7 @@ template<typename T, bool mask>
     for( int y=0; y<dst.extent(0); ++y)
       for( int x=0; x<dst.extent(1); ++x)
         dst_mask(y,x) = bob::core::cast<double>(
-                          src_mask( (src.extent(0)-1-y), 
+                          src_mask( (src.extent(0)-1-y),
                                     (src.extent(1)-1-x) ));
   }
 }
@@ -229,11 +228,11 @@ template<typename T, bool mask>
 template<typename T, bool mask>
   static inline void rotateNoCheck_270(
   const blitz::Array<T,2>& src,
-  const blitz::Array<bool,2>& src_mask, 
+  const blitz::Array<bool,2>& src_mask,
   blitz::Array<double,2>& dst,
   blitz::Array<bool,2>& dst_mask
 )
-{ 
+{
   for( int y=0; y<dst.extent(0); ++y)
     for( int x=0; x<dst.extent(1); ++x)
       dst(y,x) = bob::core::cast<double>(src( (src.extent(0)-1-x), y ));
@@ -258,13 +257,13 @@ template<typename T, bool mask>
   */
 template<typename T, bool mask>
   static inline void rotateShearingNoCheck(
-    const blitz::Array<T,2>& src, 
-    const blitz::Array<bool,2>& src_mask, 
+    const blitz::Array<T,2>& src,
+    const blitz::Array<bool,2>& src_mask,
     blitz::Array<double,2>& dst,
-    blitz::Array<bool,2>& dst_mask, 
+    blitz::Array<bool,2>& dst_mask,
     const double angle
   )
-{ 
+{
   // Determine the quadrant of the original angle:
   //   0:[-45,45] -- 1:[45,135] -- 2:[135,225] -- 3:[225,315(i.e. -45)]
   double angle_norm = angle;
@@ -273,7 +272,7 @@ template<typename T, bool mask>
     angle_norm -= 90.;
   quadrant %= 4;
 
-  // Compute useful values 
+  // Compute useful values
   double rad_angle = angle_norm * M_PI / 180.;
 
   // declare temporary arrays used for rotation
@@ -318,9 +317,9 @@ template<typename T, bool mask>
   if(mask){
     mask_int2.resize( s1 );
     bob::ip::shearX( dst_int1, mask_int1, dst_int2, mask_int2, shear_x, true);
-  }else 
+  }else
     bob::ip::shearX( dst_int1, dst_int2, shear_x, true);
-    
+
   // Perform second shear (shearY)
   const blitz::TinyVector<int,2> s2 = bob::ip::getShearYShape(dst_int2, shear_y);
   dst_int3.resize(s2);
@@ -329,7 +328,7 @@ template<typename T, bool mask>
     bob::ip::shearY( dst_int2, mask_int2, dst_int3, mask_int3, shear_y, true);
   }else
     bob::ip::shearY( dst_int2, dst_int3, shear_y, true);
-    
+
   // Perform third shear (shearX)
   const blitz::TinyVector<int,2> s3 = bob::ip::getShearXShape(dst_int3, shear_x);
   dst_int4.resize(s3);
@@ -347,34 +346,34 @@ template<typename T, bool mask>
   if(mask)
     bob::ip::crop( dst_int4, mask_int4, dst, dst_mask, crop_y, crop_x,
         crop_d(0), crop_d(1), true, true);
-  else 
+  else
     bob::ip::crop( dst_int4, dst, crop_y, crop_x, crop_d(0), crop_d(1),
         true, true);
 }
 
 
 /**
-  * @brief Function which rotates a 2D blitz::array/image 
+  * @brief Function which rotates a 2D blitz::array/image
   * @warning No check is performed on the dst blitz::array/image.
   * @param src The input blitz array
   * @param src_mask The mask for the input image
   * @param dst The output blitz array
   * @param dst_mask The mask for the output image (that will be generated)
   * @param angle The angle of the rotation (in degrees)
-  * @param algo The algorithm which should be used to perform the 
+  * @param algo The algorithm which should be used to perform the
   *   rotation.
   */
 template<typename T, bool mask>
   static inline void rotateNoCheck(
-    const blitz::Array<T,2>& src, 
-    const blitz::Array<bool,2>& src_mask, 
+    const blitz::Array<T,2>& src,
+    const blitz::Array<bool,2>& src_mask,
     blitz::Array<double,2>& dst,
     blitz::Array<bool,2>& dst_mask,
     const double angle,
     const bob::ip::Rotate::Algorithm algo
   )
-{ 
-  // Force the angle to be in range [-45,315] 
+{
+  // Force the angle to be in range [-45,315]
   double angle_norm = angle;
   while(angle_norm < -45.)
     angle_norm += 360.;
@@ -407,7 +406,7 @@ template<typename T, bool mask>
       rotateShearingNoCheck<T,mask>(src, src_mask, dst, dst_mask, angle_norm);
       break;
     default:
-      throw bob::ip::UnknownRotatingAlgorithm();
+      throw std::runtime_error("unknown rotation algorithm");
   }
 }
 
@@ -417,16 +416,16 @@ template<typename T, bool mask>
 //// public API of the rotate functions. /////////////////////////////////////////////
 
 /**
-  * Rotate the given 2D input image to the given output image. 
+  * Rotate the given 2D input image to the given output image.
   * The size of the output image must be identical to the size returned by bob::ip::getRotatedShape(src,angle).
   * @param src  The source image to rotate.
   * @param dst  The destination image that will hold the rotated image
   * @param angle  The angle in degrees the input image is rotated
   * @param algo  The algorithm used for image interpolation.
 */
-template <typename T> 
+template <typename T>
   inline void bob::ip::rotate(
-    const blitz::Array<T,2>& src, 
+    const blitz::Array<T,2>& src,
     blitz::Array<double,2>& dst,
     const double angle,
     const bob::ip::Rotate::Algorithm algo
@@ -455,11 +454,11 @@ template <typename T>
   * @param angle  The angle in degrees the input image is rotated
   * @param algo  The algorithm used for image interpolation.
 */
-template <typename T> 
+template <typename T>
   inline void bob::ip::rotate(
-    const blitz::Array<T,2>& src, 
-    const blitz::Array<bool,2>& src_mask, 
-    blitz::Array<double,2>& dst, 
+    const blitz::Array<T,2>& src,
+    const blitz::Array<bool,2>& src_mask,
+    blitz::Array<double,2>& dst,
     blitz::Array<bool,2>& dst_mask,
     const double angle,
     const bob::ip::Rotate::Algorithm algo
@@ -481,16 +480,16 @@ template <typename T>
 }
 
 /**
-  * Rotate the given 3D (e.g. colored) input image to the given output image. 
+  * Rotate the given 3D (e.g. colored) input image to the given output image.
   * The size of the output image must be identical to the size returned by bob::ip::getRotatedShape(src,angle).
   * @param src  The source image to rotate.
   * @param dst  The destination image that will hold the rotated image
   * @param angle  The angle in degrees the input image is rotated
   * @param algo  The algorithm used for image interpolation.
 */
-template <typename T> 
+template <typename T>
   inline void bob::ip::rotate(
-    const blitz::Array<T,3>& src, 
+    const blitz::Array<T,3>& src,
     blitz::Array<double,3>& dst,
     const double angle,
     const bob::ip::Rotate::Algorithm algo
@@ -525,11 +524,11 @@ template <typename T>
   * @param angle  The angle in degrees the input image is rotated
   * @param algo  The algorithm used for image interpolation.
 */
-template <typename T> 
+template <typename T>
   inline void bob::ip::rotate(
-    const blitz::Array<T,3>& src, 
-    const blitz::Array<bool,2>& src_mask, 
-    blitz::Array<double,3>& dst, 
+    const blitz::Array<T,3>& src,
+    const blitz::Array<bool,2>& src_mask,
+    blitz::Array<double,3>& dst,
     blitz::Array<bool,2>& dst_mask,
     const double angle,
     const bob::ip::Rotate::Algorithm algo
@@ -553,7 +552,7 @@ template <typename T>
 
 
 /**
-  * This function returns the shape of a rotated image, given an input 2D blitz array and an angle (in degrees). 
+  * This function returns the shape of a rotated image, given an input 2D blitz array and an angle (in degrees).
   * Please notice that the returned shape only depends on the shape of the image
   * and on the angle, but not on its content.
   * @param src The input 2D blitz array
@@ -561,10 +560,10 @@ template <typename T>
   * @return A TinyVector with the shape of the rotated image
   */
 template<typename T>
-  inline static const blitz::TinyVector<int,2> bob::ip::getRotatedShape( 
-    const blitz::Array<T,2>& src, 
+  inline static const blitz::TinyVector<int,2> bob::ip::getRotatedShape(
+    const blitz::Array<T,2>& src,
     const double angle
-) 
+)
 {
   // Initialize TinyVector
   blitz::TinyVector<int,2> dim;
@@ -599,7 +598,7 @@ template<typename T>
 }
 
 /**
-  * This function returns the shape of a rotated image, given an input 3D blitz array and an angle (in degrees). 
+  * This function returns the shape of a rotated image, given an input 3D blitz array and an angle (in degrees).
   * Please note that the returned shape only depends on the shape of the image
   * and of the angle, but not on its content.
   * @param src The input 3D blitz array
@@ -607,16 +606,16 @@ template<typename T>
   * @return A TinyVector with the shape of the rotated image
   */
 template<typename T>
-  inline static const blitz::TinyVector<int,3> bob::ip::getRotatedShape( 
-    const blitz::Array<T,3>& src, 
+  inline static const blitz::TinyVector<int,3> bob::ip::getRotatedShape(
+    const blitz::Array<T,3>& src,
     const double angle
-) 
+)
 {
   // Initialize TinyVector
   blitz::TinyVector<int,3> dim;
-  dim(0) = src.extent(0); 
+  dim(0) = src.extent(0);
 
-  // Call the getShapeRotated for the 2D case       
+  // Call the getShapeRotated for the 2D case
   blitz::Array<T,2> src_int = src(src.lbound(0), blitz::Range::all(), blitz::Range::all());
   const blitz::TinyVector<int,2> res_int = bob::ip::getRotatedShape(src_int, angle);
   dim(1) = res_int(0);
@@ -635,15 +634,15 @@ template<typename T>
  * @return The angle (in degrees).
  */
 inline double bob::ip::getAngleToHorizontal(
-  const double left_y, 
+  const double left_y,
   const double left_x,
-  const double right_y, 
+  const double right_y,
   const double right_x
 )
 {
   static const double RAD_TO_DEGREES   = 180. / M_PI;
   return std::atan2(right_y - left_y, right_x - left_x)
-    * 
+    *
     RAD_TO_DEGREES;
 }
 

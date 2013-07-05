@@ -44,8 +44,9 @@ bob::ip::LBP::LBP(const int P, const double R_y, const double R_x , const bool c
   m_positions(0,0)
 {
   // sanity check
-  if (m_eLBP_type == ELBP_DIRECTION_CODED && m_P%2)
-    throw bob::core::InvalidArgumentException("Direction coded LBP types require an even number of neighbors.");
+  if (m_eLBP_type == ELBP_DIRECTION_CODED && m_P%2) {
+    throw std::runtime_error("Direction coded LBP types require an even number of neighbors.");
+  }
   init();
 }
 
@@ -65,8 +66,9 @@ bob::ip::LBP::LBP(const int P, const double R, const bool circular,
   m_positions(0,0)
 {
   // sanity check
-  if (m_eLBP_type == ELBP_DIRECTION_CODED && m_P%2)
-    throw bob::core::InvalidArgumentException("Direction coded LBP types require an even number of neighbors.");
+  if (m_eLBP_type == ELBP_DIRECTION_CODED && m_P%2) {
+    throw std::runtime_error("Direction coded LBP types require an even number of neighbors.");
+  }
   init();
 }
 
@@ -85,8 +87,9 @@ bob::ip::LBP::LBP(const bob::ip::LBP& other):
   m_positions(0,0)
 {
   // sanity check
-  if (m_eLBP_type == ELBP_DIRECTION_CODED && m_P%2)
-    throw bob::core::InvalidArgumentException("Direction coded LBP types require an even number of neighbors.");
+  if (m_eLBP_type == ELBP_DIRECTION_CODED && m_P%2) {
+    throw std::runtime_error("Direction coded LBP types require an even number of neighbors.");
+  }
   init();
 }
 
@@ -114,16 +117,16 @@ uint16_t bob::ip::LBP::right_shift_circular(uint16_t pattern, int spaces)
 void bob::ip::LBP::init()
 {
   if (m_P < 4)
-    throw bob::core::NotImplementedError("LBP16 codes with less than 4 bits are not supported.");
+    throw std::runtime_error("LBP16 codes with less than 4 bits are not supported.");
   // check that the parameters are something useful, what we can handle
   if (m_P != 4 && m_P != 8 && m_P != 16 &&
       (m_uniform || m_rotation_invariant || (m_add_average_bit && m_to_average)))
-    throw bob::core::NotImplementedError("Special LBP types are only implemented for 4, 8, or 16 neighbors.");
+    throw std::runtime_error("Special LBP types are only implemented for 4, 8, or 16 neighbors.");
   if (m_P == 16 && m_add_average_bit && m_to_average){
-    throw bob::core::NotImplementedError("LBP16 codes with average bit require 17 bits, but our representation is UINT16.");
+    throw std::runtime_error("LBP16 codes with average bit require 17 bits, but our representation is UINT16.");
   }
   if (m_P > 16){
-    throw bob::core::NotImplementedError("LBP codes with more than 16 neighbors are not supported since our representation is UINT16.");
+    throw std::runtime_error("LBP codes with more than 16 neighbors are not supported since our representation is UINT16.");
   }
 
   // initialize the positions
@@ -154,10 +157,10 @@ void bob::ip::LBP::init()
       }
       case 16:
         // 16 neighbors: ...
-        throw bob::core::NotImplementedError("Rectangular LBP16 codes are not yet implemented.");
+        throw std::runtime_error("Rectangular LBP16 codes are not yet implemented.");
       default:
         // any other number of neighbors is not supported
-        throw bob::core::NotImplementedError("Rectangular LBP's with other than 4 and 8 neighbors are not supported.");
+        throw std::runtime_error("Rectangular LBP's with other than 4 and 8 neighbors are not supported.");
     }
     // fill the positions
     for (int p = 0; p < m_P; ++p){

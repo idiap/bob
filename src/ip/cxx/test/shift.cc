@@ -6,16 +6,16 @@
  * @brief Test the shift function for 2D and 3D arrays/images
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -28,7 +28,6 @@
 #include <stdint.h>
 #include "bob/core/cast.h"
 #include "bob/ip/shift.h"
-#include "bob/core/Exception.h"
 
 struct T {
   blitz::Array<uint32_t,2> a2, a2s_1, a2s_2;
@@ -77,15 +76,15 @@ struct T {
   ~T() {}
 };
 
-template<typename T, typename U, int d>  
-void check_dimensions( blitz::Array<T,d>& t1, blitz::Array<U,d>& t2) 
+template<typename T, typename U, int d>
+void check_dimensions( blitz::Array<T,d>& t1, blitz::Array<U,d>& t2)
 {
   BOOST_REQUIRE_EQUAL(t1.dimensions(), t2.dimensions());
   for( int i=0; i<t1.dimensions(); ++i)
     BOOST_CHECK_EQUAL(t1.extent(i), t2.extent(i));
 }
 
-template<typename T, typename U>  
+template<typename T, typename U>
 void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
 {
   check_dimensions( t1, t2);
@@ -94,8 +93,8 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
       BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
-template<typename T, typename U>  
-void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2) 
+template<typename T, typename U>
+void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
 {
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
@@ -111,31 +110,29 @@ BOOST_AUTO_TEST_CASE( test_shift_2d_uint8 )
   blitz::Array<uint32_t,2> b2(a2.shape());
   // "No" shift +0 +0
   bob::ip::shift(a2, b2, 0, 0);
-  checkBlitzEqual(a2, b2); 
+  checkBlitzEqual(a2, b2);
 
   // Shift fully out and check exception
-  BOOST_CHECK_THROW( bob::ip::shift(a2, b2, 4, 0),
-    bob::core::InvalidArgumentException );
+  BOOST_CHECK_THROW( bob::ip::shift(a2, b2, 4, 0), std::runtime_error );
 
   // Shift +2y +1x (fill with zero)
   bob::ip::shift(a2, b2, 2, 1, false, true);
-  checkBlitzEqual(a2s_1, b2); 
+  checkBlitzEqual(a2s_1, b2);
 
   // Shift +2y +1x (fill with closest neighbour)
   bob::ip::shift(a2, b2, 2, 1);
-  checkBlitzEqual(a2s_2, b2); 
+  checkBlitzEqual(a2s_2, b2);
 }
-  
+
 BOOST_AUTO_TEST_CASE( test_shift_3d_uint8 )
 {
   blitz::Array<uint32_t,3> b3(a3.shape());
-  // "No" shift +0 +0 
+  // "No" shift +0 +0
   bob::ip::shift(a3, b3, 0, 0);
-  checkBlitzEqual(a3, b3); 
+  checkBlitzEqual(a3, b3);
 
   // Shift fully out and check exception
-  BOOST_CHECK_THROW( bob::ip::shift(a3, b3, 4, 0),
-    bob::core::InvalidArgumentException );
+  BOOST_CHECK_THROW( bob::ip::shift(a3, b3, 4, 0), std::runtime_error );
 
   // Shift +2y +1x (fill with zero)
   bob::ip::shift(a3, b3, 2, 1, false, true);
@@ -143,7 +140,7 @@ BOOST_AUTO_TEST_CASE( test_shift_3d_uint8 )
 
   // Shift +2y +1x (fill with closest neighbour)
   bob::ip::shift(a3, b3, 2, 1);
-  checkBlitzEqual(a3s_2, b3); 
+  checkBlitzEqual(a3s_2, b3);
 }
 
 BOOST_AUTO_TEST_CASE( test_shift_2d_mask_uint8 )
@@ -152,8 +149,8 @@ BOOST_AUTO_TEST_CASE( test_shift_2d_mask_uint8 )
   blitz::Array<bool,2> b2_mask(b2.shape());
   // Shift +2y +1x (fill with zero)
   bob::ip::shift(a2, a2_m1, b2, b2_mask, 2, 1, false, true);
-  checkBlitzEqual(a2s_1, b2); 
-  checkBlitzEqual(a2_m2, b2); 
+  checkBlitzEqual(a2s_1, b2);
+  checkBlitzEqual(a2_m2, b2);
 }
-  
+
 BOOST_AUTO_TEST_SUITE_END()

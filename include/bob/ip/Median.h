@@ -6,16 +6,16 @@
  * @brief This file provides a class to filter an image with a median filter
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -23,11 +23,11 @@
 #ifndef BOB_IP_MEDIAN_H
 #define BOB_IP_MEDIAN_H
 
+#include <stdexcept>
 #include <boost/shared_ptr.hpp>
 #include <list>
 #include "bob/core/assert.h"
 #include "bob/core/cast.h"
-#include "bob/ip/Exception.h"
 
 namespace bob {
 
@@ -49,7 +49,7 @@ namespace bob {
       };
 
       template <typename T>
-      void listInsertPixel(const boost::shared_ptr<Pixel<T> > p, 
+      void listInsertPixel(const boost::shared_ptr<Pixel<T> > p,
                            std::list<boost::shared_ptr<Pixel<T> > >& l)
       {
         typename std::list<boost::shared_ptr<Pixel<T> > >::iterator it=l.begin();
@@ -59,16 +59,16 @@ namespace bob {
       }
 
       template <typename T>
-      T listGetValueAtPosition(const int pos, 
+      T listGetValueAtPosition(const int pos,
         const std::list<boost::shared_ptr<Pixel<T> > >& l)
-      { 
+      {
         typename std::list<boost::shared_ptr<Pixel<T> > >::const_iterator it=l.begin();
         int c=0;
         for( ; it!=l.end(); ++it, ++c)
           if( c==pos) return (*it)->value;
-        throw bob::ip::Exception();
+        throw std::runtime_error("reached the end of method w/o returning");
       }
-    
+
       template <typename T>
       void printList(const std::list<boost::shared_ptr<Pixel<T> > >& l)
       {
@@ -84,7 +84,7 @@ namespace bob {
     /**
       * @brief This class allows to filter an image with a median filter
       */
-    template <typename T> 
+    template <typename T>
     class Median
     {
       public:
@@ -93,13 +93,13 @@ namespace bob {
          * @param radius_y The radius of the kernel along the y-axis (height=2*radius_y+1)
          * @param radius_x The radius of the kernel along the x-axis (width=2*radius_x+1)
          */
-        Median(const size_t radius_y=1, const size_t radius_x=1): 
+        Median(const size_t radius_y=1, const size_t radius_x=1):
           m_radius_y(radius_y), m_radius_x(radius_x),
           m_median_pos((2*radius_y+1)*(2*radius_x+1)/2)
         {
         }
 
-        virtual ~Median() 
+        virtual ~Median()
         {
         }
 
@@ -118,7 +118,7 @@ namespace bob {
          * @param src The 2D input blitz array
          * @param dst The 2D input blitz array
          */
-        void operator()(const blitz::Array<T,2>& src, 
+        void operator()(const blitz::Array<T,2>& src,
           blitz::Array<T,2>& dst);
 
         /**
@@ -126,7 +126,7 @@ namespace bob {
          * @param src The 3D input blitz array
          * @param dst The 3D input blitz array
          */
-        void operator()(const blitz::Array<T,3>& src, 
+        void operator()(const blitz::Array<T,3>& src,
           blitz::Array<T,3>& dst);
 
 
@@ -138,16 +138,16 @@ namespace bob {
         /**
           * @brief Efficiently updates the ordered lists
           */
-        void listRemoveAddColumn(const int j, const int i, 
-                const blitz::Array<T,2>& src, 
+        void listRemoveAddColumn(const int j, const int i,
+                const blitz::Array<T,2>& src,
                 std::list<boost::shared_ptr<struct detail::Pixel<T> > >& l);
-        void listRemoveAddRow(const int j, const int i, 
-                const blitz::Array<T,2>& src, 
+        void listRemoveAddRow(const int j, const int i,
+                const blitz::Array<T,2>& src,
                 std::list<boost::shared_ptr<struct detail::Pixel<T> > >& l);
 
         /**
          * @brief Attributes
-         */  
+         */
         int m_radius_y;
         int m_radius_x;
         int m_median_pos;
@@ -200,7 +200,7 @@ namespace bob {
                   const blitz::Array<T,2>& src,
                   std::list<boost::shared_ptr<struct detail::Pixel<T> > >& l)
     {
-      // Erases elements from row j 
+      // Erases elements from row j
       typename std::list<boost::shared_ptr<struct detail::Pixel<T> > >::iterator it=l.begin();
       for( ; it!=l.end(); )
       {
@@ -217,8 +217,8 @@ namespace bob {
       }
     }
 
-    template <typename T> 
-    void bob::ip::Median<T>::operator()(const blitz::Array<T,2>& src, 
+    template <typename T>
+    void bob::ip::Median<T>::operator()(const blitz::Array<T,2>& src,
       blitz::Array<T,2>& dst)
     {
       // Checks
@@ -252,16 +252,16 @@ namespace bob {
       }
     }
 
-    template <typename T> 
-    void bob::ip::Median<T>::operator()(const blitz::Array<T,3>& src, 
+    template <typename T>
+    void bob::ip::Median<T>::operator()(const blitz::Array<T,3>& src,
       blitz::Array<T,3>& dst)
     {
       for( int p=0; p<dst.extent(0); ++p) {
-        const blitz::Array<T,2> src_slice = 
+        const blitz::Array<T,2> src_slice =
           src( p, blitz::Range::all(), blitz::Range::all() );
-        blitz::Array<T,2> dst_slice = 
+        blitz::Array<T,2> dst_slice =
           dst( p, blitz::Range::all(), blitz::Range::all() );
-        
+
         // Apply median filter to the plane
         operator()(src_slice, dst_slice);
       }

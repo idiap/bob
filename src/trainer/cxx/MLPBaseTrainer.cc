@@ -5,16 +5,16 @@
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -22,7 +22,6 @@
 #include <algorithm>
 #include <bob/core/assert.h>
 #include <bob/core/check.h>
-#include <bob/core/Exception.h>
 #include <bob/math/linear.h>
 #include <bob/trainer/Exception.h>
 #include <bob/trainer/MLPBaseTrainer.h>
@@ -45,7 +44,7 @@ bob::trainer::MLPBaseTrainer::MLPBaseTrainer(size_t batch_size,
   reset();
 }
 
-bob::trainer::MLPBaseTrainer::MLPBaseTrainer(size_t batch_size, 
+bob::trainer::MLPBaseTrainer::MLPBaseTrainer(size_t batch_size,
     boost::shared_ptr<bob::trainer::Cost> cost,
     const bob::machine::MLP& machine):
   m_batch_size(batch_size),
@@ -60,9 +59,9 @@ bob::trainer::MLPBaseTrainer::MLPBaseTrainer(size_t batch_size,
   initialize(machine);
 }
 
-bob::trainer::MLPBaseTrainer::MLPBaseTrainer(size_t batch_size, 
+bob::trainer::MLPBaseTrainer::MLPBaseTrainer(size_t batch_size,
     boost::shared_ptr<bob::trainer::Cost> cost,
-    const bob::machine::MLP& machine, 
+    const bob::machine::MLP& machine,
     bool train_biases):
   m_batch_size(batch_size),
   m_cost(cost),
@@ -110,9 +109,9 @@ bob::trainer::MLPBaseTrainer& bob::trainer::MLPBaseTrainer::operator=
 void bob::trainer::MLPBaseTrainer::setBatchSize (size_t batch_size) {
   // m_output: values after the activation function
   // m_error: error values;
- 
+
   m_batch_size = batch_size;
-   
+
   for (size_t k=0; k<m_output.size(); ++k) {
     m_output[k].resize(batch_size, m_deriv[k].extent(1));
   }
@@ -122,10 +121,10 @@ void bob::trainer::MLPBaseTrainer::setBatchSize (size_t batch_size) {
   }
 }
 
-bool bob::trainer::MLPBaseTrainer::isCompatible(const bob::machine::MLP& machine) const 
+bool bob::trainer::MLPBaseTrainer::isCompatible(const bob::machine::MLP& machine) const
 {
   if (m_H != machine.numOfHiddenLayers()) return false;
-  
+
   if (m_deriv.back().extent(1) != (int)machine.outputSize()) return false;
 
   if (m_deriv[0].extent(0) != (int)machine.inputSize()) return false;
@@ -139,7 +138,7 @@ bool bob::trainer::MLPBaseTrainer::isCompatible(const bob::machine::MLP& machine
   return true;
 }
 
-void bob::trainer::MLPBaseTrainer::forward_step(const bob::machine::MLP& machine, 
+void bob::trainer::MLPBaseTrainer::forward_step(const bob::machine::MLP& machine,
   const blitz::Array<double,2>& input)
 {
   const std::vector<blitz::Array<double,2> >& machine_weight = machine.getWeights();
@@ -151,7 +150,7 @@ void bob::trainer::MLPBaseTrainer::forward_step(const bob::machine::MLP& machine
   for (size_t k=0; k<machine_weight.size(); ++k) { //for all layers
     if (k == 0) bob::math::prod_(input, machine_weight[k], m_output[k]);
     else bob::math::prod_(m_output[k-1], machine_weight[k], m_output[k]);
-    boost::shared_ptr<bob::machine::Activation> cur_actfun = 
+    boost::shared_ptr<bob::machine::Activation> cur_actfun =
       (k == (machine_weight.size()-1) ? output_actfun : hidden_actfun );
     for (int i=0; i<(int)m_batch_size; ++i) { //for every example
       for (int j=0; j<m_output[k].extent(1); ++j) { //for all variables
@@ -249,9 +248,11 @@ void bob::trainer::MLPBaseTrainer::setError(const std::vector<blitz::Array<doubl
 }
 
 void bob::trainer::MLPBaseTrainer::setError(const blitz::Array<double,2>& error, const size_t id) {
-  if (id >= m_error.size())
-    throw bob::core::InvalidArgumentException("MLPBaseTrainer: Index in error array",
-      (int)id, 0, (int)(m_error.size()-1));
+  if (id >= m_error.size()) {
+    boost::format m("MLPBaseTrainer: index for setting error array %lu is not on the expected range of [0, %lu]");
+    m % id % (m_error.size()-1);
+    throw std::runtime_error(m.str());
+  }
   bob::core::array::assertSameShape(error, m_error[id]);
   m_error[id] = error;
 }
@@ -266,9 +267,11 @@ void bob::trainer::MLPBaseTrainer::setOutput(const std::vector<blitz::Array<doub
 }
 
 void bob::trainer::MLPBaseTrainer::setOutput(const blitz::Array<double,2>& output, const size_t id) {
-  if (id >= m_output.size())
-    throw bob::core::InvalidArgumentException("MLPBaseTrainer: Index in output array", 
-      (int)id, 0, (int)(m_output.size()-1));
+  if (id >= m_output.size()) {
+    boost::format m("MLPBaseTrainer: index for setting output array %lu is not on the expected range of [0, %lu]");
+    m % id % (m_output.size()-1);
+    throw std::runtime_error(m.str());
+  }
   bob::core::array::assertSameShape(output, m_output[id]);
   m_output[id] = output;
 }
@@ -283,9 +286,11 @@ void bob::trainer::MLPBaseTrainer::setDerivatives(const std::vector<blitz::Array
 }
 
 void bob::trainer::MLPBaseTrainer::setDerivative(const blitz::Array<double,2>& deriv, const size_t id) {
-  if (id >= m_deriv.size())
-    throw bob::core::InvalidArgumentException("MLPBaseTrainer: Index in deriv array", 
-      (int)id, 0, (int)(m_deriv.size()-1));
+  if (id >= m_deriv.size()) {
+    boost::format m("MLPBaseTrainer: index for setting derivative array %lu is not on the expected range of [0, %lu]");
+    m % id % (m_deriv.size()-1);
+    throw std::runtime_error(m.str());
+  }
   bob::core::array::assertSameShape(deriv, m_deriv[id]);
   m_deriv[id] = deriv;
 }
@@ -300,9 +305,11 @@ void bob::trainer::MLPBaseTrainer::setBiasDerivatives(const std::vector<blitz::A
 }
 
 void bob::trainer::MLPBaseTrainer::setBiasDerivative(const blitz::Array<double,1>& deriv_bias, const size_t id) {
-  if (id >= m_deriv_bias.size())
-    throw bob::core::InvalidArgumentException("MLPBaseTrainer: Index in deriv_bias array", 
-      (int)id, 0, (int)(m_deriv_bias.size()-1));
+  if (id >= m_deriv_bias.size()) {
+    boost::format m("MLPBaseTrainer: index for setting bias derivative array %lu is not on the expected range of [0, %lu]");
+    m % id % (m_deriv_bias.size()-1);
+    throw std::runtime_error(m.str());
+  }
   bob::core::array::assertSameShape(deriv_bias, m_deriv_bias[id]);
   m_deriv_bias[id] = deriv_bias;
 }

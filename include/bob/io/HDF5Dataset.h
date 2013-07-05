@@ -32,7 +32,6 @@
 #endif
 #include <hdf5.h>
 
-#include <bob/core/Exception.h>
 #include <bob/core/assert.h>
 #include <bob/core/array_copy.h>
 

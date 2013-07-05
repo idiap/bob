@@ -6,16 +6,16 @@
  * @brief Tests linear machine loading/unloading and execution
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -40,7 +40,7 @@
  */
 static blitz::Array<double,1> presumed (const blitz::Array<double,1>& input) {
   blitz::Array<double,1> buffer(bob::core::array::ccopy(input));
-  
+
   blitz::Array<double,2> weights(3,2);
   weights = 0.4, 0.1, 0.4, 0.2, 0.2, 0.7;
   blitz::Array<double,1> biases(weights.extent(1));
@@ -49,7 +49,7 @@ static blitz::Array<double,1> presumed (const blitz::Array<double,1>& input) {
   isub = 0, 0.5, 0.5;
   blitz::Array<double,1> idiv(weights.extent(0));
   idiv = 0.5, 1.0, 1.0;
-  
+
   buffer -= isub;
   buffer /= idiv;
 
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE( test_initialization )
     bob::core::error << "Environment variable $BOB_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw bob::core::Exception();
+    throw std::runtime_error("test failed");
   }
   boost::filesystem::path testdata(testdata_cpath);
   testdata /= "linear-test.hdf5";
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE( test_error_check )
     bob::core::error << "Environment variable $BOB_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw bob::core::Exception();
+    throw std::runtime_error("test failed");
   }
   boost::filesystem::path testdata(testdata_cpath);
   testdata /= "linear-test.hdf5";
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE( test_correctness )
     bob::core::error << "Environment variable $BOB_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw bob::core::Exception();
+    throw std::runtime_error("test failed");
   }
   boost::filesystem::path testdata(testdata_cpath);
   testdata /= "linear-test.hdf5";
@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE( test_correctness )
   bob::machine::LinearMachine M(config);
 
   blitz::Array<double,2> in(4,3);
-  in = 1, 1, 1, 
+  in = 1, 1, 1,
        0.5, 0.2, 200,
        -27, 35.77, 0,
        12, 0, 0;

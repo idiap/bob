@@ -23,7 +23,6 @@
 #include <bob/core/array_copy.h>
 #include <bob/math/linear.h>
 #include <bob/math/inv.h>
-#include <bob/core/Exception.h>
 #include <bob/machine/Exception.h>
 #include <bob/machine/LinearScoring.h>
 #include <limits>
@@ -41,10 +40,16 @@ bob::machine::FABase::FABase(const boost::shared_ptr<bob::machine::GMMMachine> u
   m_ubm(ubm), m_ru(ru), m_rv(rv),
   m_U(getDimCD(),ru), m_V(getDimCD(),rv), m_d(getDimCD())
 {
-  if (ru < 1)
-    throw bob::core::InvalidArgumentException("ru", (int)ru, 1, std::numeric_limits<int>::max());
-  if (rv < 1)
-    throw bob::core::InvalidArgumentException("rv", (int)rv, 1, std::numeric_limits<int>::max());
+  if (ru < 1) {
+    boost::format m("value for parameter `ru' (%lu) cannot be smaller than 1");
+    m % ru;
+    throw std::runtime_error(m.str());
+  }
+  if (rv < 1) {
+    boost::format m("value for parameter `rv' (%lu) cannot be smaller than 1");
+    m % ru;
+    throw std::runtime_error(m.str());
+  }
   updateCache();
 }
 
@@ -105,10 +110,16 @@ bool bob::machine::FABase::is_similar_to(const bob::machine::FABase& b,
 
 void bob::machine::FABase::resize(const size_t ru, const size_t rv)
 {
-  if (ru < 1)
-    throw bob::core::InvalidArgumentException("ru", (int)ru, 1, std::numeric_limits<int>::max());
-  if (rv < 1)
-    throw bob::core::InvalidArgumentException("rv", (int)rv, 1, std::numeric_limits<int>::max());
+  if (ru < 1) {
+    boost::format m("value for parameter `ru' (%lu) cannot be smaller than 1");
+    m % ru;
+    throw std::runtime_error(m.str());
+  }
+  if (rv < 1) {
+    boost::format m("value for parameter `rv' (%lu) cannot be smaller than 1");
+    m % ru;
+    throw std::runtime_error(m.str());
+  }
 
   m_ru = ru;
   m_rv = rv;
@@ -120,10 +131,16 @@ void bob::machine::FABase::resize(const size_t ru, const size_t rv)
 
 void bob::machine::FABase::resize(const size_t ru, const size_t rv, const size_t cd)
 {
-  if (ru < 1)
-    throw bob::core::InvalidArgumentException("ru", (int)ru, 1, std::numeric_limits<int>::max());
-  if (rv < 1)
-    throw bob::core::InvalidArgumentException("rv", (int)rv, 1, std::numeric_limits<int>::max());
+  if (ru < 1) {
+    boost::format m("value for parameter `ru' (%lu) cannot be smaller than 1");
+    m % ru;
+    throw std::runtime_error(m.str());
+  }
+  if (rv < 1) {
+    boost::format m("value for parameter `rv' (%lu) cannot be smaller than 1");
+    m % ru;
+    throw std::runtime_error(m.str());
+  }
 
   if (!m_ubm || (m_ubm && getDimCD() == cd))
   {
@@ -135,8 +152,11 @@ void bob::machine::FABase::resize(const size_t ru, const size_t rv, const size_t
 
     updateCacheUbmUVD();
   }
-  else
-    throw bob::core::InvalidArgumentException("cd", cd, getDimCD(), getDimCD());
+  else {
+    boost::format m("value for parameter `cd' (%lu) is not set to %lu");
+    m % cd % getDimCD();
+    throw std::runtime_error(m.str());
+  }
 }
 
 void bob::machine::FABase::setUbm(const boost::shared_ptr<bob::machine::GMMMachine> ubm)

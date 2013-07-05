@@ -357,15 +357,17 @@ void bob::machine::GMMMachine::accStatisticsInternal(const blitz::Array<double, 
 }
 
 boost::shared_ptr<const bob::machine::Gaussian> bob::machine::GMMMachine::getGaussian(const size_t i) const {
-  if (i>=m_n_gaussians)
-    throw bob::machine::Exception();
+  if (i>=m_n_gaussians) {
+    throw std::runtime_error("getGaussian(): index out of bounds");
+  }
   boost::shared_ptr<const bob::machine::Gaussian> res = m_gaussians[i];
   return res;
 }
 
 boost::shared_ptr<bob::machine::Gaussian> bob::machine::GMMMachine::updateGaussian(const size_t i) {
-  if (i>=m_n_gaussians)
-    throw bob::machine::Exception();
+  if (i>=m_n_gaussians) {
+    throw std::runtime_error("updateGaussian(): index out of bounds");
+  }
   return m_gaussians[i];
 }
 

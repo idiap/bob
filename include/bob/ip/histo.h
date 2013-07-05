@@ -21,37 +21,24 @@
 #define BOB5SPRO_IP_HISTO_H
 
 #include <stdint.h>
-#include <blitz/array.h>
 #include <algorithm>
+#include <stdexcept>
+#include <boost/format.hpp>
+#include <blitz/array.h>
 
 #include "bob/core/assert.h"
 #include "bob/core/array_type.h"
-#include "bob/core/Exception.h"
 
 namespace tca = bob::core::array;
 namespace bob {
   namespace ip {
-    /**
-     * This exception is thrown when the histogram computation for a particular type is not implemented in bob
-     */
-    class UnsupportedTypeForHistogram: public bob::core::Exception {
-    public:
-      UnsupportedTypeForHistogram(bob::core::array::ElementType elementType)  throw();
-      UnsupportedTypeForHistogram(const UnsupportedTypeForHistogram& other) throw();
-
-      virtual ~UnsupportedTypeForHistogram() throw();
-      virtual const char* what() const throw();
-    private:
-      bob::core::array::ElementType elementType;
-      char description[500];
-    };
 
     namespace detail {
 
       /**
        * Return the histogram size for a given type T
        * @warning This function works only for uint8_t and uint16_t,
-       *          otherwise it raises UnsupportedTypeForHistogram exception
+       *          otherwise it raises std::runtime_error exception
        */
       template<typename T>
       int getHistoSize() {
@@ -65,8 +52,11 @@ namespace bob {
             histo_size = 65536;
             break;
           default:
-            throw UnsupportedTypeForHistogram(element_type);
-            break;
+            {
+              boost::format m("data type `%s' cannot be histogrammed");
+              m % bob::core::array::stringize<T>();
+              throw std::runtime_error(m.str());
+            }
         }
 
         return histo_size;
@@ -155,7 +145,7 @@ namespace bob {
      * Compute an histogram of a 2D array.
      *
      * @warning This function only accepts arrays of @c uint8_t or @c uint16_t.
-     *          Any other type raises a UnsupportedTypeForHistogram exception
+     *          Any other type raises a std::runtime_error exception
      *
      * @param src source 2D array
      * @param histo result of the function. This array must have 256 elements
@@ -184,7 +174,7 @@ namespace bob {
      * @warning This function only accepts arrays of int or float (int8, int16,
      *          int32, int64, uint8, uint16, uint32, float32, float64
      *          and float128)
-     *          Any other type raises a UnsupportedTypeForHistogram exception
+     *          Any other type raises a std::runtime_error exception
      * @warning You must have @c min <= @c src(i,j) <= @c max, for every i and j
      * @warning If @c min >= @c max or @c nb_bins == 0, a
      *
@@ -217,15 +207,20 @@ namespace bob {
           break;
         default:
           // Invalid type
-          throw UnsupportedTypeForHistogram(element_type);
-          break;
+          {
+            boost::format m("data type `%s' cannot be histogrammed");
+            m % bob::core::array::stringize<T>();
+            throw std::runtime_error(m.str());
+          }
       }
 
-      if (max <= min){
-        throw bob::core::InvalidArgumentException("The max value must be larger than the min value!");
+      if (max <= min) {
+        std::ostringstream oss;
+        oss << "the `max' value (" << max << ") should be larger than the `min' value (" << min << ")";
+        throw std::runtime_error(oss.str());
       }
       if (nb_bins == 0) {
-        throw bob::core::InvalidArgumentException("nb_bins", 0);
+        throw std::runtime_error("the parameter `nb_bins' cannot be zero");
       }
 
       tca::assertSameShape<uint64_t, 1>(histo, blitz::shape(nb_bins));
@@ -268,7 +263,7 @@ namespace bob {
      *
      * @warning This function only accepts source arrays of int (int8, int16, int32, uint8, uint16, uint32)
      *          and target arrays of type int (see above) or float(float32, float64, float128).
-     *          Any other type raises a UnsupportedTypeForHistogram exception
+     *          Any other type raises a std::runtime_error exception
      *
      * If the given target image is of integral type, the values will be spread out to fill the complete range of that type.
      * If the target is of type float, the values will be spread out to fill the range of the **source** type.
@@ -298,8 +293,11 @@ namespace bob {
           break;
         default:
           // Invalid type
-          throw UnsupportedTypeForHistogram(element_type);
-          break;
+          {
+            boost::format m("data type `%s' cannot be histogrammed");
+            m % bob::core::array::stringize<T1>();
+            throw std::runtime_error(m.str());
+          }
       }
 
       // range of the desired type
@@ -329,8 +327,11 @@ namespace bob {
           break;
         default:
           // Invalid type
-          throw UnsupportedTypeForHistogram(element_type);
-          break;
+          {
+            boost::format m("data type `%s' cannot be histogrammed");
+            m % bob::core::array::stringize<T2>();
+            throw std::runtime_error(m.str());
+          }
       }
 
       bob::core::array::assertSameShape(src, dst);

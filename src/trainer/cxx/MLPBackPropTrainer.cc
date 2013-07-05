@@ -7,16 +7,16 @@
  * @brief Implementation of the BackProp algorithm for MLP training.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -27,7 +27,7 @@
 #include <bob/trainer/Exception.h>
 #include <bob/trainer/MLPBackPropTrainer.h>
 
-bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(size_t batch_size, 
+bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(size_t batch_size,
     boost::shared_ptr<bob::trainer::Cost> cost):
   bob::trainer::MLPBaseTrainer(batch_size, cost),
   m_learning_rate(0.1),
@@ -38,7 +38,7 @@ bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(size_t batch_size,
   reset();
 }
 
-bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(size_t batch_size, 
+bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(size_t batch_size,
     boost::shared_ptr<bob::trainer::Cost> cost,
     const bob::machine::MLP& machine):
   bob::trainer::MLPBaseTrainer(batch_size, cost, machine),
@@ -50,7 +50,7 @@ bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(size_t batch_size,
   initialize(machine);
 }
 
-bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(size_t batch_size, 
+bob::trainer::MLPBackPropTrainer::MLPBackPropTrainer(size_t batch_size,
     boost::shared_ptr<bob::trainer::Cost> cost,
     const bob::machine::MLP& machine, bool train_biases):
   bob::trainer::MLPBaseTrainer(batch_size, cost, machine, train_biases),
@@ -115,7 +115,7 @@ void bob::trainer::MLPBackPropTrainer::backprop_weight_update(bob::machine::MLP&
     // considered as input neurons connecting the respective layers, with a
     // fixed input = +1. This means we only need to probe for the error at
     // layer k.
-    machine_bias[k] -= (((1-m_momentum)*m_learning_rate*deriv_bias[k]) + 
+    machine_bias[k] -= (((1-m_momentum)*m_learning_rate*deriv_bias[k]) +
       (m_momentum*m_prev_deriv_bias[k]));
     m_prev_deriv_bias[k] = m_learning_rate*deriv_bias[k];
   }
@@ -130,8 +130,11 @@ void bob::trainer::MLPBackPropTrainer::setPreviousDerivatives(const std::vector<
 }
 
 void bob::trainer::MLPBackPropTrainer::setPreviousDerivative(const blitz::Array<double,2>& v, const size_t k) {
-  if (k >= m_prev_deriv.size())
-    throw bob::core::InvalidArgumentException("MLPBackPropTrainer: Index in deriv array", (int)k, 0, (int)(m_prev_deriv.size()-1));
+  if (k >= m_prev_deriv.size()) {
+    boost::format m("MLPRPropTrainer: index for setting previous derivative array %lu is not on the expected range of [0, %lu]");
+    m % k % (m_prev_deriv.size()-1);
+    throw std::runtime_error(m.str());
+  }
   bob::core::array::assertSameShape(v, m_prev_deriv[k]);
   m_prev_deriv[k] = v;
 }
@@ -146,8 +149,11 @@ void bob::trainer::MLPBackPropTrainer::setPreviousBiasDerivatives(const std::vec
 }
 
 void bob::trainer::MLPBackPropTrainer::setPreviousBiasDerivative(const blitz::Array<double,1>& v, const size_t k) {
-  if (k >= m_prev_deriv_bias.size())
-    throw bob::core::InvalidArgumentException("MLPBackPropTrainer: Index in deriv_bias array", (int)k, 0, (int)(m_prev_deriv_bias.size()-1));
+  if (k >= m_prev_deriv_bias.size()) {
+    boost::format m("MLPRPropTrainer: index for setting previous bias derivative array %lu is not on the expected range of [0, %lu]");
+    m % k % (m_prev_deriv_bias.size()-1);
+    throw std::runtime_error(m.str());
+  }
   bob::core::array::assertSameShape(v, m_prev_deriv_bias[k]);
   m_prev_deriv_bias[k] = v;
 }

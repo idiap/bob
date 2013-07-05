@@ -18,7 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <bob/core/array_exception.h>
 #include <bob/trainer/BICTrainer.h>
 #include <bob/trainer/PCATrainer.h>
 

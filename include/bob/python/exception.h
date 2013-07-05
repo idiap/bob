@@ -7,21 +7,21 @@
  * to python.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB_PYTHON_EXCEPTION_H 
+#ifndef BOB_PYTHON_EXCEPTION_H
 #define BOB_PYTHON_EXCEPTION_H
 
 #include <boost/python.hpp>
@@ -46,9 +46,9 @@
 namespace bob { namespace python {
 
   /**
-   * @brief This is a generalized exception translator for boost python. It 
-   * simplifies translation declaration for as long as you provide a what() 
-   * method in your exception classes that return a const char* with the 
+   * @brief This is a generalized exception translator for boost python. It
+   * simplifies translation declaration for as long as you provide a what()
+   * method in your exception classes that return a const char* with the
    * exception description.
    *
    * If you follow that protocol, you should be able to do something like:
@@ -82,8 +82,8 @@ namespace bob { namespace python {
 
   /**
    * @brief A thin wrapper to call the translator and escape the variable
-   * naming issue when declaring multiple ExceptionTranslator's on the same 
-   * module. 
+   * naming issue when declaring multiple ExceptionTranslator's on the same
+   * module.
    *
    * If you think about it, it would have to look like this:
    *

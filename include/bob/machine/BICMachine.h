@@ -25,8 +25,6 @@
 #include <blitz/array.h>
 #include <bob/io/HDF5File.h>
 #include "Machine.h"
-#include "Exception.h"
-
 
 namespace bob { namespace machine {
   /**
@@ -37,9 +35,9 @@ namespace bob { namespace machine {
   /**
    * Exceptions of this class are thrown when eigenvalues are too small.
    */
-  class ZeroEigenvalueException : public Exception{
+  class ZeroEigenvalueException : public std::runtime_error {
     public:
-      ZeroEigenvalueException() throw(){}
+      ZeroEigenvalueException() throw(): std::runtime_error("") {}
       virtual ~ZeroEigenvalueException() throw(){}
       virtual const char* what() const throw(){return "One given/read/calculated eigenvalue is close to zero. Use a smaller number of kept eigenvalues!";}
   };

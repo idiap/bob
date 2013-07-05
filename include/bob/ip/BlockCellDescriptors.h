@@ -7,16 +7,16 @@
  *   (or an image patch) into a set of cells, and blocks.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -25,7 +25,6 @@
 #define BOB_IP_CELL_BLOCK_DESCRIPTORS_H
 
 #include "bob/core/assert.h"
-#include "bob/ip/Exception.h"
 #include "bob/ip/block.h"
 #include <boost/shared_ptr.hpp>
 
@@ -41,7 +40,7 @@ namespace bob {
         * Vectorizes an array and multiply values by a constant factor
         */
       template <typename T>
-      void vectorizeMultArray(const blitz::Array<T,3> in, 
+      void vectorizeMultArray(const blitz::Array<T,3> in,
         blitz::Array<T,1> out, const T factor=1)
       {
         int n_cells_y = in.extent(0);
@@ -59,7 +58,7 @@ namespace bob {
       }
 
       template <typename T>
-      void vectorizeMultArray(const blitz::Array<T,2> in, 
+      void vectorizeMultArray(const blitz::Array<T,2> in,
         blitz::Array<T,1> out, const T factor=1)
       {
         int n_cells = in.extent(0);
@@ -75,7 +74,7 @@ namespace bob {
       }
 
       template <typename T>
-      void vectorizeMultArray(const blitz::Array<T,1> in, 
+      void vectorizeMultArray(const blitz::Array<T,1> in,
         blitz::Array<T,1> out, const T factor=1)
       {
         out = in * factor;
@@ -96,21 +95,21 @@ namespace bob {
 
 
     /**
-      * @brief Function which normalizes a set of cells, and returns the 
+      * @brief Function which normalizes a set of cells, and returns the
       *   corresponding 1D block descriptor.
-      * @param descr The input descriptor (first two dimensions are for the 
-      *   spatial location of the cell, whereas the length of the last 
+      * @param descr The input descriptor (first two dimensions are for the
+      *   spatial location of the cell, whereas the length of the last
       *   dimension corresponds to the dimensionality of the cell descriptor).
       * @param norm_descr The output 1D normalized block descriptor
-      * @param block_norm The norm used by the procedure 
-      * @param eps The epsilon used for the block normalization 
-      *   (to avoid division by zero norm) 
+      * @param block_norm The norm used by the procedure
+      * @param eps The epsilon used for the block normalization
+      *   (to avoid division by zero norm)
       * @param threshold The threshold used for the block normalization
-      *   This is only used with the L2Hys norm, for the clipping of large 
+      *   This is only used with the L2Hys norm, for the clipping of large
       *   values.
       * @warning Does not check that input and output arrays have the same
       *   number of elements.
-      */ 
+      */
     template <typename U, int D>
     void normalizeBlock_(const blitz::Array<U,D>& descr,
       blitz::Array<U,1>& norm_descr, const BlockNorm block_norm=L2,
@@ -129,7 +128,7 @@ namespace bob {
                               eps*eps);
           detail::vectorizeMultArray(descr, norm_descr, sumInv);
           // Clips values above threshold
-          norm_descr = blitz::where(blitz::abs(norm_descr) <= threshold, 
+          norm_descr = blitz::where(blitz::abs(norm_descr) <= threshold,
                                     norm_descr, threshold);
           // Normalizes to unit length (using L2)
           sumInv = 1. / sqrt(blitz::sum(blitz::pow2(blitz::abs(norm_descr))) +
@@ -158,19 +157,19 @@ namespace bob {
     }
 
     /**
-      * @brief Function which normalizes a set of cells, and returns the 
+      * @brief Function which normalizes a set of cells, and returns the
       *   corresponding 1D block descriptor.
-      * @param descr The input descriptor (first two dimensions are for the 
-      *   spatial location of the cell, whereas the length of the last 
+      * @param descr The input descriptor (first two dimensions are for the
+      *   spatial location of the cell, whereas the length of the last
       *   dimension corresponds to the dimensionality of the cell descriptor).
       * @param norm_descr The output 1D normalized block descriptor
-      * @param block_norm The norm used by the procedure 
-      * @param eps The epsilon used for the block normalization 
-      *   (to avoid division by zero norm) 
+      * @param block_norm The norm used by the procedure
+      * @param eps The epsilon used for the block normalization
+      *   (to avoid division by zero norm)
       * @param threshold The threshold used for the block normalization
-      *   This is only used with the L2Hys norm, for the clipping of large 
+      *   This is only used with the L2Hys norm, for the clipping of large
       *   values.
-      */ 
+      */
     template <typename U, int D>
     void normalizeBlock(const blitz::Array<U,D>& descr,
       blitz::Array<U,1>& norm_descr, const BlockNorm block_norm=L2,
@@ -179,7 +178,7 @@ namespace bob {
       // Checks input/output arrays
       int ndescr=1;
       for(int d=0; d<D; ++d) ndescr *= descr.extent(d);
-      bob::core::array::assertSameDimensionLength(ndescr, 
+      bob::core::array::assertSameDimensionLength(ndescr,
         norm_descr.extent(0));
 
       // Normalizes
@@ -198,11 +197,11 @@ namespace bob {
         /**
           * Constructor
           */
-        BlockCellDescriptors(const size_t height, const size_t width, 
-          const size_t cell_dim=8, 
-          const size_t cell_y=4, const size_t cell_x=4, 
+        BlockCellDescriptors(const size_t height, const size_t width,
+          const size_t cell_dim=8,
+          const size_t cell_y=4, const size_t cell_x=4,
           const size_t cell_ov_y=0, const size_t cell_ov_x=0,
-          const size_t block_y=4, const size_t block_x=4, 
+          const size_t block_y=4, const size_t block_x=4,
           const size_t block_ov_y=0, const size_t block_ov_x=0);
 
         /**
@@ -227,13 +226,13 @@ namespace bob {
         /**
           * @brief Not equal to
           */
-        bool operator!=(const BlockCellDescriptors& b) const; 
- 
+        bool operator!=(const BlockCellDescriptors& b) const;
+
         /**
           * Resizes the cache
           */
         void resize(const size_t height, const size_t width);
- 
+
         /**
           * Getters
           */
@@ -284,29 +283,29 @@ namespace bob {
         { m_block_norm_threshold = block_norm_threshold; }
 
         /**
-          * Disable block normalization. This is performed by setting 
+          * Disable block normalization. This is performed by setting
           * parameters such that the cells are not further processed, that is
-          * block_y=1, block_x=1, block_ov_y=0, block_ov_x=0, and 
+          * block_y=1, block_x=1, block_ov_y=0, block_ov_x=0, and
           * block_norm=None.
           */
         void disableBlockNormalization();
 
         /**
           * Gets the descriptor output size given the current parameters and
-          * size. (number of blocks along Y x number of block along X x number 
+          * size. (number of blocks along Y x number of block along X x number
           *       of bins)
           */
         const blitz::TinyVector<int,3> getOutputShape() const;
 
         /**
           * Processes an input array. This extracts HOG descriptors from the
-          * input image. The output is 3D, the first two dimensions being the 
+          * input image. The output is 3D, the first two dimensions being the
           * y- and x- indices of the block, and the last one the index of the
           * bin (among the concatenated cell histograms for this block).
           */
-        virtual void forward_(const blitz::Array<T,2>& input, 
+        virtual void forward_(const blitz::Array<T,2>& input,
           blitz::Array<U,3>& output) = 0;
-        virtual void forward(const blitz::Array<T,2>& input, 
+        virtual void forward(const blitz::Array<T,2>& input,
           blitz::Array<U,3>& output) = 0;
 
         /**
@@ -352,17 +351,17 @@ namespace bob {
     };
 
     template <typename T, typename U>
-    BlockCellDescriptors<T,U>::BlockCellDescriptors(const size_t height, 
-        const size_t width, const size_t cell_dim, 
-        const size_t cell_y, const size_t cell_x, 
+    BlockCellDescriptors<T,U>::BlockCellDescriptors(const size_t height,
+        const size_t width, const size_t cell_dim,
+        const size_t cell_y, const size_t cell_x,
         const size_t cell_ov_y, const size_t cell_ov_x,
-        const size_t block_y, const size_t block_x, 
+        const size_t block_y, const size_t block_x,
         const size_t block_ov_y, const size_t block_ov_x):
       m_height(height), m_width(width),
-      m_cell_dim(cell_dim), m_cell_y(cell_y), m_cell_x(cell_x), 
-      m_cell_ov_y(cell_ov_y), m_cell_ov_x(cell_ov_x), 
-      m_block_y(block_y), m_block_x(block_x), 
-      m_block_ov_y(block_ov_y), m_block_ov_x(block_ov_x), 
+      m_cell_dim(cell_dim), m_cell_y(cell_y), m_cell_x(cell_x),
+      m_cell_ov_y(cell_ov_y), m_cell_ov_x(cell_ov_x),
+      m_block_y(block_y), m_block_x(block_x),
+      m_block_ov_y(block_ov_y), m_block_ov_x(block_ov_x),
       m_block_norm(L2), m_block_norm_eps(1e-10), m_block_norm_threshold(0.2)
     {
       resizeCache();
@@ -415,31 +414,31 @@ namespace bob {
     }
 
     template <typename T, typename U>
-    bool 
+    bool
     BlockCellDescriptors<T,U>::operator==(const BlockCellDescriptors& b) const
     {
       return (m_height == b.m_height && m_width == b.m_width &&
-              m_cell_dim == b.m_cell_dim && 
-              m_cell_y == b.m_cell_y && m_cell_x == b.m_cell_x && 
-              m_cell_ov_y == b.m_cell_ov_y && 
-              m_cell_ov_x == b.m_cell_ov_x && 
-              m_block_y == b.m_block_y && m_block_x == b.m_block_x && 
-              m_block_ov_y == b.m_block_ov_y && 
-              m_block_ov_x == b.m_block_ov_x && 
-              m_block_norm == b.m_block_norm && 
-              m_block_norm_eps == b.m_block_norm_eps && 
+              m_cell_dim == b.m_cell_dim &&
+              m_cell_y == b.m_cell_y && m_cell_x == b.m_cell_x &&
+              m_cell_ov_y == b.m_cell_ov_y &&
+              m_cell_ov_x == b.m_cell_ov_x &&
+              m_block_y == b.m_block_y && m_block_x == b.m_block_x &&
+              m_block_ov_y == b.m_block_ov_y &&
+              m_block_ov_x == b.m_block_ov_x &&
+              m_block_norm == b.m_block_norm &&
+              m_block_norm_eps == b.m_block_norm_eps &&
               m_block_norm_threshold == b.m_block_norm_threshold);
     }
 
     template <typename T, typename U>
-    bool 
+    bool
     BlockCellDescriptors<T,U>::operator!=(const BlockCellDescriptors& b) const
     {
       return !(this->operator==(b));
     }
 
     template <typename T, typename U>
-    void 
+    void
     BlockCellDescriptors<T,U>::resize(const size_t height, const size_t width)
     {
       m_height = height;
@@ -461,11 +460,11 @@ namespace bob {
       const blitz::TinyVector<int,4> nb_cells = getBlock4DOutputShape(
           m_height, m_width, m_cell_y, m_cell_x, m_cell_ov_y, m_cell_ov_x);
       m_cell_descriptor.resize(nb_cells(0), nb_cells(1), m_cell_dim);
-      
+
       // Updates the class members
       m_nb_cells_y = nb_cells(0);
       m_nb_cells_x = nb_cells(1);
-      
+
       // Number of blocks should be updated
       resizeBlockCache();
     }
@@ -475,7 +474,7 @@ namespace bob {
     {
       // Determines the number of blocks per row and column
       blitz::TinyVector<int,4> nb_blocks = getBlock4DOutputShape(
-        m_nb_cells_y, m_nb_cells_x, m_block_y, m_block_x, m_block_ov_y, 
+        m_nb_cells_y, m_nb_cells_x, m_block_y, m_block_x, m_block_ov_y,
         m_block_ov_x);
 
       // Updates the class members
@@ -484,7 +483,7 @@ namespace bob {
     }
 
     template <typename T, typename U>
-    const blitz::TinyVector<int,3> 
+    const blitz::TinyVector<int,3>
     BlockCellDescriptors<T,U>::getOutputShape() const
     {
       // Returns results
@@ -508,7 +507,7 @@ namespace bob {
 
     template <typename T, typename U>
     void BlockCellDescriptors<T,U>::normalizeBlocks(blitz::Array<U,3>& output)
-    { 
+    {
       blitz::Range rall = blitz::Range::all();
       // Normalizes by block
       for(size_t by=0; by<m_nb_blocks_y; ++by)
@@ -518,7 +517,7 @@ namespace bob {
           blitz::Range rx(bx,bx+m_block_x-1);
           blitz::Array<double,3> cells_block = m_cell_descriptor(ry,rx,rall);
           blitz::Array<double,1> block = output(by,bx,rall);
-          normalizeBlock_(cells_block, block, m_block_norm, 
+          normalizeBlock_(cells_block, block, m_block_norm,
             m_block_norm_eps, m_block_norm_threshold);
         }
     }

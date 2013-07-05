@@ -25,6 +25,7 @@
 
 bob::core::array::NonZeroBaseError::NonZeroBaseError( const int dim,
   const int base) throw():
+    std::runtime_error("exception not set yet"),
     m_dim(dim), m_base(base)
 {
 }
@@ -50,6 +51,7 @@ const char* bob::core::array::NonZeroBaseError::what() const throw() {
 
 bob::core::array::NonOneBaseError::NonOneBaseError( const int dim,
   const int base) throw():
+    std::runtime_error("exception not set yet"),
     m_dim(dim), m_base(base)
 {
 }
@@ -73,7 +75,9 @@ const char* bob::core::array::NonOneBaseError::what() const throw() {
 }
 
 
-bob::core::array::NonCContiguousError::NonCContiguousError() throw() {
+bob::core::array::NonCContiguousError::NonCContiguousError() throw():
+  std::runtime_error("exception not set yet")
+{
 }
 
 bob::core::array::NonCContiguousError::~NonCContiguousError() throw() {
@@ -93,7 +97,8 @@ const char* bob::core::array::NonCContiguousError::what() const throw() {
 }
 
 
-bob::core::array::NonFortranContiguousError::NonFortranContiguousError() throw() {
+bob::core::array::NonFortranContiguousError::NonFortranContiguousError() throw(): std::runtime_error("exception not set yet")
+{
 }
 
 bob::core::array::NonFortranContiguousError::~NonFortranContiguousError() throw() {
@@ -113,7 +118,9 @@ const char* bob::core::array::NonFortranContiguousError::what() const throw() {
 }
 
 
-bob::core::array::UnexpectedShapeError::UnexpectedShapeError() throw() {
+bob::core::array::UnexpectedShapeError::UnexpectedShapeError() throw():
+  std::runtime_error("exception not set yet")
+{
 }
 
 bob::core::array::UnexpectedShapeError::~UnexpectedShapeError() throw() {
@@ -133,7 +140,9 @@ const char* bob::core::array::UnexpectedShapeError::what() const throw() {
 }
 
 
-bob::core::array::DifferentBaseError::DifferentBaseError() throw() {
+bob::core::array::DifferentBaseError::DifferentBaseError() throw():
+  std::runtime_error("exception not set yet")
+{
 }
 
 bob::core::array::DifferentBaseError::~DifferentBaseError() throw() {
@@ -153,7 +162,9 @@ const char* bob::core::array::DifferentBaseError::what() const throw() {
 }
 
 
-bob::core::array::ConvertZeroInputRange::ConvertZeroInputRange() throw() {
+bob::core::array::ConvertZeroInputRange::ConvertZeroInputRange() throw():
+  std::runtime_error("exception not set yet")
+{
 }
 
 bob::core::array::ConvertZeroInputRange::~ConvertZeroInputRange() throw() {
@@ -171,6 +182,7 @@ const char* bob::core::array::ConvertZeroInputRange::what() const throw() {
 }
 
 bob::core::array::ConvertInputAboveMaxRange::ConvertInputAboveMaxRange(const double v, const double m) throw():
+  std::runtime_error("exception not set yet"),
   m_val(v), m_max(m)
 {
 }
@@ -192,6 +204,7 @@ const char* bob::core::array::ConvertInputAboveMaxRange::what() const throw() {
 }
 
 bob::core::array::ConvertInputBelowMinRange::ConvertInputBelowMinRange(const double v, const double m) throw():
+  std::runtime_error("exception not set yet"),
   m_val(v), m_min(m)
 {
 }
@@ -215,6 +228,7 @@ const char* bob::core::array::ConvertInputBelowMinRange::what() const throw() {
 
 bob::core::array::RepmatNonMultipleLength::RepmatNonMultipleLength(
   const int src_dim, const int dst_dim) throw():
+    std::runtime_error("exception not set yet"),
     m_src_dim(src_dim), m_dst_dim(dst_dim)
 {
 }
@@ -243,6 +257,7 @@ const char* bob::core::array::RepmatNonMultipleLength::what() const throw() {
 
 bob::core::array::ReshapeDifferentNumberOfElements::ReshapeDifferentNumberOfElements(
   const int expected, const int got) throw():
+    std::runtime_error("exception not set yet"),
     m_expected(expected), m_got(got)
 {
 }

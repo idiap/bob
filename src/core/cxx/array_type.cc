@@ -6,22 +6,21 @@
  * @brief Some type-related array utilities
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <bob/core/array_type.h>
-#include <bob/core/Exception.h>
 #include <boost/format.hpp>
 
 static const char* t_bool_string = "bool";
@@ -84,7 +83,7 @@ size_t bob::core::array::getElementSize(ElementType t) {
 
 const char* bob::core::array::stringize(ElementType t) {
   switch(t) {
-    case bob::core::array::t_bool: 
+    case bob::core::array::t_bool:
       return t_bool_string;
     case bob::core::array::t_int8:
       return t_int8_string;

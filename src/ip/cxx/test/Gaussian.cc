@@ -6,16 +6,16 @@
  * @brief Test the Gaussian smoothing on 2D images
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -46,15 +46,15 @@ struct T {
   ~T() {}
 };
 
-template<typename T, typename U, int d>  
-void check_dimensions( blitz::Array<T,d>& t1, blitz::Array<U,d>& t2) 
+template<typename T, typename U, int d>
+void check_dimensions( blitz::Array<T,d>& t1, blitz::Array<U,d>& t2)
 {
   BOOST_REQUIRE_EQUAL(t1.dimensions(), t2.dimensions());
   for( int i=0; i<t1.dimensions(); ++i)
     BOOST_CHECK_EQUAL(t1.extent(i), t2.extent(i));
 }
 
-template<typename T, typename U>  
+template<typename T, typename U>
 void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
 {
   check_dimensions( t1, t2);
@@ -63,8 +63,8 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
       BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
-template<typename T, typename U>  
-void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2) 
+template<typename T, typename U>
+void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
 {
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
@@ -74,8 +74,8 @@ void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
 }
 
 
-template<typename T>  
-void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<T,2>& t2, 
+template<typename T>
+void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<T,2>& t2,
   const double eps )
 {
   int y_min = std::min( t1.extent(0), t2.extent(0));
@@ -86,13 +86,13 @@ void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<T,2>& t2,
   for( int i=0; i<y_min; ++i)
     for( int j=0; j<x_min; ++j)
       diff += abs( t1(i,j) - t2(i,j) );
-  diff = (diff/(y_min*x_min)) / 
+  diff = (diff/(y_min*x_min)) /
     (std::numeric_limits<T>::max()-std::numeric_limits<T>::min()+1);
   BOOST_CHECK_SMALL( diff, eps );
 }
 
-template<typename T>  
-void checkBlitzClose( blitz::Array<T,3>& t1, blitz::Array<T,3>& t2, 
+template<typename T>
+void checkBlitzClose( blitz::Array<T,3>& t1, blitz::Array<T,3>& t2,
   const double eps )
 {
   int p_min = std::min( t1.extent(0), t2.extent(0));
@@ -106,7 +106,7 @@ void checkBlitzClose( blitz::Array<T,3>& t1, blitz::Array<T,3>& t2,
     for( int j=0; j<y_min; ++j)
       for( int k=0; k<x_min; ++k)
         diff += abs( t1(i,j,k) - t2(i,j,k) );
-  diff = (diff/(y_min*x_min*p_min)) / 
+  diff = (diff/(y_min*x_min*p_min)) /
     (std::numeric_limits<T>::max()-std::numeric_limits<T>::min()+1);
   BOOST_CHECK_SMALL( diff, eps );
 }
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE( test_gaussianSmoothing_2d )
     bob::core::error << "Environment variable $BOB_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw bob::core::Exception();
+    throw std::runtime_error("test failed");
   }
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);

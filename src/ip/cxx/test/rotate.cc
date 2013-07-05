@@ -191,7 +191,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
     bob::core::error << "Environment variable $BOB_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw bob::core::Exception();
+    throw std::runtime_error("test failed");
   }
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
@@ -272,7 +272,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_3d_generic_uint32 )
     bob::core::error << "Environment variable $BOB_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw bob::core::Exception();
+    throw std::runtime_error("test failed");
   }
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);

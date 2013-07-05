@@ -6,16 +6,16 @@
  * Implementation of trainer exceptions
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -23,19 +23,7 @@
 #include <bob/trainer/Exception.h>
 #include <boost/format.hpp>
 
-bob::trainer::Exception::Exception() throw() {
-}
-
-bob::trainer::Exception::~Exception() throw() {
-}
-
-const char* bob::trainer::Exception::what() const throw() {
- static const char* what_string = "Generic trainer::Exception: user specialization has not overwritten what() or is throwing an object of this class (in which case, please fix it!)";
- return what_string;
-}
-
-
-bob::trainer::NoPriorGMM::NoPriorGMM() throw() {
+bob::trainer::NoPriorGMM::NoPriorGMM() throw(): std::runtime_error("") {
 }
 
 bob::trainer::NoPriorGMM::~NoPriorGMM() throw() {
@@ -46,7 +34,7 @@ const char* bob::trainer::NoPriorGMM::what() const throw() {
 }
 
 bob::trainer::WrongNumberOfClasses::WrongNumberOfClasses(size_t got) throw() :
-  m_got(got)
+  std::runtime_error(""), m_got(got)
 {
 }
 
@@ -66,6 +54,7 @@ const char* bob::trainer::WrongNumberOfClasses::what() const throw() {
 
 bob::trainer::WrongNumberOfFeatures::WrongNumberOfFeatures(size_t got,
     size_t expected, size_t classid) throw() :
+  std::runtime_error(""),
   m_got(got),
   m_expected(expected),
   m_classid(classid)
@@ -86,7 +75,9 @@ const char* bob::trainer::WrongNumberOfFeatures::what() const throw() {
   }
 }
 
-bob::trainer::IncompatibleMachine::IncompatibleMachine() throw() {
+bob::trainer::IncompatibleMachine::IncompatibleMachine() throw():
+  std::runtime_error("")
+{
 }
 
 bob::trainer::IncompatibleMachine::~IncompatibleMachine() throw() {
@@ -97,7 +88,9 @@ const char* bob::trainer::IncompatibleMachine::what() const throw() {
  return what_string;
 }
 
-bob::trainer::EmptyTrainingSet::EmptyTrainingSet() throw() {
+bob::trainer::EmptyTrainingSet::EmptyTrainingSet() throw():
+  std::runtime_error("")
+{
 }
 
 bob::trainer::EmptyTrainingSet::~EmptyTrainingSet() throw() {
@@ -108,7 +101,7 @@ const char* bob::trainer::EmptyTrainingSet::what() const throw() {
  return what_string;
 }
 
-bob::trainer::KMeansInitializationFailure::KMeansInitializationFailure() throw() {
+bob::trainer::KMeansInitializationFailure::KMeansInitializationFailure() throw(): std::runtime_error("") {
 }
 
 bob::trainer::KMeansInitializationFailure::~KMeansInitializationFailure() throw() {

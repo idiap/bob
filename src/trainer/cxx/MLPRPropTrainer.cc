@@ -7,16 +7,16 @@
  * @brief Implementation of the RProp algorithm for MLP training.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -45,7 +45,7 @@ bob::trainer::MLPRPropTrainer::MLPRPropTrainer(size_t batch_size,
 }
 
 
-bob::trainer::MLPRPropTrainer::MLPRPropTrainer(size_t batch_size, 
+bob::trainer::MLPRPropTrainer::MLPRPropTrainer(size_t batch_size,
     boost::shared_ptr<bob::trainer::Cost> cost,
     const bob::machine::MLP& machine):
   bob::trainer::MLPBaseTrainer(batch_size, cost, machine),
@@ -62,7 +62,7 @@ bob::trainer::MLPRPropTrainer::MLPRPropTrainer(size_t batch_size,
   initialize(machine);
 }
 
-bob::trainer::MLPRPropTrainer::MLPRPropTrainer(size_t batch_size, 
+bob::trainer::MLPRPropTrainer::MLPRPropTrainer(size_t batch_size,
     boost::shared_ptr<bob::trainer::Cost> cost,
     const bob::machine::MLP& machine,
     bool train_biases):
@@ -139,7 +139,7 @@ static int8_t sign (double x) {
 }
 
 void bob::trainer::MLPRPropTrainer::rprop_weight_update(bob::machine::MLP& machine,
-  const blitz::Array<double,2>& input) 
+  const blitz::Array<double,2>& input)
 {
   std::vector<blitz::Array<double,2> >& machine_weight = machine.updateWeights();
   std::vector<blitz::Array<double,1> >& machine_bias = machine.updateBiases();
@@ -154,8 +154,8 @@ void bob::trainer::MLPRPropTrainer::rprop_weight_update(bob::machine::MLP& machi
         int8_t M = sign(deriv[k](i,j) * m_prev_deriv[k](i,j));
         // Implementations equations (4-6) on the RProp paper:
         if (M > 0) {
-          m_delta[k](i,j) = std::min(m_delta[k](i,j)*m_eta_plus, m_delta_max); 
-          machine_weight[k](i,j) -= sign(deriv[k](i,j)) * m_delta[k](i,j); 
+          m_delta[k](i,j) = std::min(m_delta[k](i,j)*m_eta_plus, m_delta_max);
+          machine_weight[k](i,j) -= sign(deriv[k](i,j)) * m_delta[k](i,j);
           m_prev_deriv[k](i,j) = deriv[k](i,j);
         }
         else if (M < 0) {
@@ -171,7 +171,7 @@ void bob::trainer::MLPRPropTrainer::rprop_weight_update(bob::machine::MLP& machi
 
     // Here we decide if we should train the biases or not
     if (!getTrainBiases()) continue;
-  
+
     const std::vector<blitz::Array<double,1> >& deriv_bias = getBiasDerivatives();
 
     // We do the same for the biases, with the exception that biases can be
@@ -182,8 +182,8 @@ void bob::trainer::MLPRPropTrainer::rprop_weight_update(bob::machine::MLP& machi
       int8_t M = sign(deriv_bias[k](i) * m_prev_deriv_bias[k](i));
       // Implementations equations (4-6) on the RProp paper:
       if (M > 0) {
-        m_delta_bias[k](i) = std::min(m_delta_bias[k](i)*m_eta_plus, m_delta_max); 
-        machine_bias[k](i) -= sign(deriv_bias[k](i)) * m_delta_bias[k](i); 
+        m_delta_bias[k](i) = std::min(m_delta_bias[k](i)*m_eta_plus, m_delta_max);
+        machine_bias[k](i) -= sign(deriv_bias[k](i)) * m_delta_bias[k](i);
         m_prev_deriv_bias[k](i) = deriv_bias[k](i);
       }
       else if (M < 0) {
@@ -249,8 +249,11 @@ void bob::trainer::MLPRPropTrainer::setPreviousDerivatives(const std::vector<bli
 }
 
 void bob::trainer::MLPRPropTrainer::setPreviousDerivative(const blitz::Array<double,2>& v, const size_t k) {
-  if (k >= m_prev_deriv.size())
-    throw bob::core::InvalidArgumentException("MLPRPropTrainer: Index in deriv array", (int)k, 0, (int)(m_prev_deriv.size()-1));
+  if (k >= m_prev_deriv.size()) {
+    boost::format m("MLPRPropTrainer: index for setting derivative array %lu is not on the expected range of [0, %lu]");
+    m % k % (m_prev_deriv.size()-1);
+    throw std::runtime_error(m.str());
+  }
   bob::core::array::assertSameShape(v, m_prev_deriv[k]);
   m_prev_deriv[k] = v;
 }
@@ -265,8 +268,11 @@ void bob::trainer::MLPRPropTrainer::setPreviousBiasDerivatives(const std::vector
 }
 
 void bob::trainer::MLPRPropTrainer::setPreviousBiasDerivative(const blitz::Array<double,1>& v, const size_t k) {
-  if (k >= m_prev_deriv_bias.size())
-    throw bob::core::InvalidArgumentException("MLPRPropTrainer: Index in deriv_bias array", (int)k, 0, (int)(m_prev_deriv_bias.size()-1));
+  if (k >= m_prev_deriv_bias.size()) {
+    boost::format m("MLPRPropTrainer: index for setting derivative bias array %lu is not on the expected range of [0, %lu]");
+    m % k % (m_prev_deriv_bias.size()-1);
+    throw std::runtime_error(m.str());
+  }
   bob::core::array::assertSameShape(v, m_prev_deriv_bias[k]);
   m_prev_deriv_bias[k] = v;
 }
@@ -280,8 +286,11 @@ void bob::trainer::MLPRPropTrainer::setDeltas(const std::vector<blitz::Array<dou
 }
 
 void bob::trainer::MLPRPropTrainer::setDelta(const blitz::Array<double,2>& v, const size_t k) {
-  if (k >= m_delta.size())
-    throw bob::core::InvalidArgumentException("MLPRPropTrainer: Index in delta array", (int)k, 0, (int)(m_delta.size()-1));
+  if (k >= m_delta.size()) {
+    boost::format m("MLPRPropTrainer: index for setting delta array %lu is not on the expected range of [0, %lu]");
+    m % k % (m_delta.size()-1);
+    throw std::runtime_error(m.str());
+  }
   bob::core::array::assertSameShape(v, m_delta[k]);
   m_delta[k] = v;
 }
@@ -296,8 +305,11 @@ void bob::trainer::MLPRPropTrainer::setBiasDeltas(const std::vector<blitz::Array
 }
 
 void bob::trainer::MLPRPropTrainer::setBiasDelta(const blitz::Array<double,1>& v, const size_t k) {
-  if (k >= m_delta_bias.size())
-    throw bob::core::InvalidArgumentException("MLPRPropTrainer: Index in delta_bias array", (int)k, 0, (int)(m_delta_bias.size()-1));
+  if (k >= m_delta_bias.size()) {
+    boost::format m("MLPRPropTrainer: index for setting delta bias array %lu is not on the expected range of [0, %lu]");
+    m % k % (m_delta_bias.size()-1);
+    throw std::runtime_error(m.str());
+  }
   bob::core::array::assertSameShape(v, m_delta_bias[k]);
   m_delta_bias[k] = v;
 }

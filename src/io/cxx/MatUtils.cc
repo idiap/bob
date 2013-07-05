@@ -6,16 +6,16 @@
  * @brief Implementation of MatUtils (handling of matlab .mat files)
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -49,7 +49,7 @@ static boost::shared_ptr<matvar_t> make_matvar(boost::shared_ptr<mat_t>& file) {
  * This is essentially like make_matvar(), but uses VarReadNextInfo() instead
  * of VarReadNext(), so it does not load the data, but it is faster.
  */
-static boost::shared_ptr<matvar_t> 
+static boost::shared_ptr<matvar_t>
 make_matvar_info(boost::shared_ptr<mat_t>& file) {
 
   return boost::shared_ptr<matvar_t>(Mat_VarReadNextInfo(file.get()), std::ptr_fun(Mat_VarFree));
@@ -59,7 +59,9 @@ make_matvar_info(boost::shared_ptr<mat_t>& file) {
 static boost::shared_ptr<matvar_t> make_matvar(boost::shared_ptr<mat_t>& file,
    const std::string& varname) {
 
-  if (!varname.size()) throw bob::io::Uninitialized();
+  if (!varname.size()) {
+    throw std::runtime_error("empty variable name - cannot lookup the file this way");
+  }
   return boost::shared_ptr<matvar_t>(Mat_VarRead(file.get(), const_cast<char*>(varname.c_str())), std::ptr_fun(Mat_VarFree));
 
 }
@@ -69,21 +71,21 @@ static boost::shared_ptr<matvar_t> make_matvar(boost::shared_ptr<mat_t>& file,
  */
 static enum matio_classes mio_class_type (bob::core::array::ElementType i) {
   switch (i) {
-    case bob::core::array::t_int8: 
+    case bob::core::array::t_int8:
       return MAT_C_INT8;
-    case bob::core::array::t_int16: 
+    case bob::core::array::t_int16:
       return MAT_C_INT16;
-    case bob::core::array::t_int32: 
+    case bob::core::array::t_int32:
       return MAT_C_INT32;
-    case bob::core::array::t_int64: 
+    case bob::core::array::t_int64:
       return MAT_C_INT64;
-    case bob::core::array::t_uint8: 
+    case bob::core::array::t_uint8:
       return MAT_C_UINT8;
-    case bob::core::array::t_uint16: 
+    case bob::core::array::t_uint16:
       return MAT_C_UINT16;
-    case bob::core::array::t_uint32: 
+    case bob::core::array::t_uint32:
       return MAT_C_UINT32;
-    case bob::core::array::t_uint64: 
+    case bob::core::array::t_uint64:
       return MAT_C_UINT64;
     case bob::core::array::t_float32:
       return MAT_C_SINGLE;
@@ -107,21 +109,21 @@ static enum matio_classes mio_class_type (bob::core::array::ElementType i) {
  */
 static enum matio_types mio_data_type (bob::core::array::ElementType i) {
   switch (i) {
-    case bob::core::array::t_int8: 
+    case bob::core::array::t_int8:
       return MAT_T_INT8;
-    case bob::core::array::t_int16: 
+    case bob::core::array::t_int16:
       return MAT_T_INT16;
-    case bob::core::array::t_int32: 
+    case bob::core::array::t_int32:
       return MAT_T_INT32;
-    case bob::core::array::t_int64: 
+    case bob::core::array::t_int64:
       return MAT_T_INT64;
-    case bob::core::array::t_uint8: 
+    case bob::core::array::t_uint8:
       return MAT_T_UINT8;
-    case bob::core::array::t_uint16: 
+    case bob::core::array::t_uint16:
       return MAT_T_UINT16;
-    case bob::core::array::t_uint32: 
+    case bob::core::array::t_uint32:
       return MAT_T_UINT32;
-    case bob::core::array::t_uint64: 
+    case bob::core::array::t_uint64:
       return MAT_T_UINT64;
     case bob::core::array::t_float32:
       return MAT_T_SINGLE;
@@ -150,10 +152,10 @@ static bob::core::array::ElementType bob_element_type (int mio_type, bool is_com
 
   switch(mio_type) {
 
-    case(MAT_T_INT8): 
+    case(MAT_T_INT8):
       eltype = bob::core::array::t_int8;
       break;
-    case(MAT_T_INT16): 
+    case(MAT_T_INT16):
       eltype = bob::core::array::t_int16;
       break;
     case(MAT_T_INT32):
@@ -190,7 +192,7 @@ static bob::core::array::ElementType bob_element_type (int mio_type, bool is_com
     else if (eltype == bob::core::array::t_float64) return bob::core::array::t_complex128;
     else return bob::core::array::t_unknown;
   }
-  
+
   return eltype;
 }
 
@@ -199,7 +201,7 @@ boost::shared_ptr<matvar_t> make_matvar
 
   const bob::core::array::typeinfo& info = buf.type();
   void* fdata = static_cast<void*>(new char[info.buffer_size()]);
-  
+
   //matio gets dimensions as integers
 # if HAVE_MATIO_OLD_COMPLEXSPLIT == 1
   int mio_dims[BOB_MAX_DIM];
@@ -216,7 +218,7 @@ boost::shared_ptr<matvar_t> make_matvar
         //special treatment for complex arrays
         uint8_t* real = static_cast<uint8_t*>(fdata);
         uint8_t* imag = real + (info.buffer_size()/2);
-        bob::io::row_to_col_order_complex(buf.ptr(), real, imag, info); 
+        bob::io::row_to_col_order_complex(buf.ptr(), real, imag, info);
 #       if HAVE_MATIO_OLD_COMPLEXSPLIT == 1
         ComplexSplit mio_complex = {real, imag};
 #       else
@@ -272,12 +274,16 @@ void bob::io::detail::read_array (boost::shared_ptr<mat_t> file, bob::core::arra
   boost::shared_ptr<matvar_t> matvar;
   if (varname.size()) matvar = make_matvar(file, varname);
   else matvar = make_matvar(file);
-  if (!matvar) throw bob::io::Uninitialized();
+  if (!matvar) {
+    boost::format m("mat file variable could not be created - error while reading object `%s'");
+    m % varname;
+    throw std::runtime_error(m.str());
+  }
   assign_array(matvar, buf);
 
 }
 
-void bob::io::detail::write_array(boost::shared_ptr<mat_t> file, 
+void bob::io::detail::write_array(boost::shared_ptr<mat_t> file,
     const std::string& varname, const bob::core::array::interface& buf) {
 
   boost::shared_ptr<matvar_t> matvar = make_matvar(varname, buf);
@@ -305,7 +311,11 @@ static void get_var_info(boost::shared_ptr<const matvar_t> matvar,
 void bob::io::detail::mat_peek(const std::string& filename, bob::core::array::typeinfo& info) {
 
   boost::shared_ptr<mat_t> mat = bob::io::detail::make_matfile(filename, MAT_ACC_RDONLY);
-  if (!mat) throw bob::io::FileNotReadable(filename);
+  if (!mat) {
+    boost::format m("cannot open file `%s'");
+    m % filename;
+    throw std::runtime_error(m.str());
+  }
   boost::shared_ptr<matvar_t> matvar = make_matvar(mat); //gets the first var.
   get_var_info(matvar, info);
 
@@ -313,7 +323,11 @@ void bob::io::detail::mat_peek(const std::string& filename, bob::core::array::ty
 
 void bob::io::detail::mat_peek_set(const std::string& filename, bob::core::array::typeinfo& info) {
   boost::shared_ptr<mat_t> mat = bob::io::detail::make_matfile(filename, MAT_ACC_RDONLY);
-  if (!mat) throw bob::io::FileNotReadable(filename);
+  if (!mat) {
+    boost::format m("cannot open file `%s'");
+    m % filename;
+    throw std::runtime_error(m.str());
+  }
   boost::shared_ptr<matvar_t> matvar = make_matvar(mat); //gets the first var.
   get_var_info(matvar, info);
 }
@@ -324,11 +338,15 @@ bob::io::detail::list_variables(const std::string& filename) {
   boost::shared_ptr<std::map<size_t, std::pair<std::string, bob::core::array::typeinfo> > > retval(new std::map<size_t, std::pair<std::string, bob::core::array::typeinfo> >());
 
   boost::shared_ptr<mat_t> mat = bob::io::detail::make_matfile(filename, MAT_ACC_RDONLY);
-  if (!mat) throw bob::io::FileNotReadable(filename);
+  if (!mat) {
+    boost::format m("cannot open file `%s'");
+    m % filename;
+    throw std::runtime_error(m.str());
+  }
   boost::shared_ptr<matvar_t> matvar = make_matvar(mat); //gets the first var.
 
   size_t id = 0;
- 
+
   //now that we have found a variable, fill the array
   //properties taking that variable as basis
   (*retval)[id] = std::make_pair(matvar->name, bob::core::array::typeinfo());
@@ -336,7 +354,9 @@ bob::io::detail::list_variables(const std::string& filename) {
   const bob::core::array::typeinfo& type_cache = (*retval)[id].second;
 
   if ((*retval)[id].second.dtype == bob::core::array::t_unknown) {
-    throw bob::io::TypeError((*retval)[id].second.dtype, bob::core::array::t_float32);
+    boost::format m("unknown data type (%s) for object named `%s' at file `%s'");
+    m % (*retval)[id].second.str() % id % filename;
+    throw std::runtime_error(m.str());
   }
 
   //if we got here, just continue counting the variables inside. we

@@ -6,25 +6,27 @@
  * @brief Methods to convert between color spaces
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB_IP_COLOR_H 
+#ifndef BOB_IP_COLOR_H
 #define BOB_IP_COLOR_H
 
+#include <stdexcept>
 #include <stdint.h>
 #include <boost/tuple/tuple.hpp>
+#include <boost/format.hpp>
 
 #include "bob/core/array_type.h"
 #include "bob/core/assert.h"
@@ -34,42 +36,7 @@
 #include <blitz/tinyvec-et.h>
 #endif
 
-#include "bob/ip/Exception.h"
-
 namespace bob { namespace ip {
-
-  /**
-   * This exception is thrown when the color conversion for a particular type
-   * is not implemented in bob
-   */
-  class UnsupportedTypeForColorConversion: public ip::Exception {
-    public:
-      UnsupportedTypeForColorConversion(bob::core::array::ElementType eltype) throw(); 
-      virtual ~UnsupportedTypeForColorConversion() throw();
-      virtual const char* what() const throw();
-
-    private:
-
-      bob::core::array::ElementType m_eltype;
-      mutable std::string m_message;
-  };
-
-  /**
-   * This exception is thrown when the input matrix does not conform to the
-   * method specifications in number of rows.
-   */
-  class UnsupportedRowExtent: public ip::Exception {
-    public:
-      UnsupportedRowExtent(int expected, int got) throw(); 
-      virtual ~UnsupportedRowExtent() throw();
-      virtual const char* what() const throw();
-
-    private:
-
-      int m_expected; ///< expected size for the number of rows
-      int m_got; ///< the number of rows of the matrix I got
-      mutable std::string m_message;
-  };
 
   /** ------------------- **/
   /** HSV TO RGB AND BACK **/
@@ -83,7 +50,9 @@ namespace bob { namespace ip {
    * implementations in this file to understand supported types.
    */
   template <typename T> void rgb_to_hsv_one (T r, T g, T b, T& h, T& s, T& v) {
-    throw UnsupportedTypeForColorConversion(bob::core::array::getElementType<T>());
+    boost::format m("rgb_to_hsv_one(): color conversion for type `%s' is not supported");
+    m % bob::core::array::stringize<T>();
+    throw std::runtime_error(m.str());
   }
 
   /**
@@ -118,7 +87,9 @@ namespace bob { namespace ip {
    * implementations in this file to understand supported types.
    */
   template <typename T> void hsv_to_rgb_one (T h, T s, T v, T& r, T& g, T& b) {
-    throw UnsupportedTypeForColorConversion(bob::core::array::getElementType<T>());
+    boost::format m("hsv_to_rgb_one(): color conversion for type `%s' is not supported");
+    m % bob::core::array::stringize<T>();
+    throw std::runtime_error(m.str());
   }
 
   /**
@@ -154,7 +125,9 @@ namespace bob { namespace ip {
    * implementations in this file to understand supported types.
    */
   template <typename T> void rgb_to_hsl_one (T r, T g, T b, T& h, T& s, T& l) {
-    throw UnsupportedTypeForColorConversion(bob::core::array::getElementType<T>());
+    boost::format m("rgb_to_hsl_one(): color conversion for type `%s' is not supported");
+    m % bob::core::array::stringize<T>();
+    throw std::runtime_error(m.str());
   }
 
   /**
@@ -186,9 +159,11 @@ namespace bob { namespace ip {
    * implementations in this file to understand supported types.
    */
   template <typename T> void hsl_to_rgb_one (T h, T s, T l, T& r, T& g, T& b) {
-    throw UnsupportedTypeForColorConversion(bob::core::array::getElementType<T>());
+    boost::format m("hsl_to_rgb_one(): color conversion for type `%s' is not supported");
+    m % bob::core::array::stringize<T>();
+    throw std::runtime_error(m.str());
   }
-  
+
   /**
    * Converts a HSL color-pixel (256 gray levels) to RGB as defined in:
    * http://en.wikipedia.org/wiki/HSL_and_HSV
@@ -223,7 +198,9 @@ namespace bob { namespace ip {
    * implementations in this file to understand supported types.
    */
   template <typename T> void rgb_to_yuv_one (T r, T g, T b, T& y, T& u, T& v) {
-    throw UnsupportedTypeForColorConversion(bob::core::array::getElementType<T>());
+    boost::format m("rgb_to_yuv_one(): color conversion for type `%s' is not supported");
+    m % bob::core::array::stringize<T>();
+    throw std::runtime_error(m.str());
   }
 
   /**
@@ -273,9 +250,11 @@ namespace bob { namespace ip {
    * implementations in this file to understand supported types.
    */
   template <typename T> void yuv_to_rgb_one (T y, T u, T v, T& r, T& g, T& b) {
-    throw UnsupportedTypeForColorConversion(bob::core::array::getElementType<T>());
+    boost::format m("yuv_to_rgb_one(): color conversion for type `%s' is not supported");
+    m % bob::core::array::stringize<T>();
+    throw std::runtime_error(m.str());
   }
-  
+
   /**
    * Converts a YUV (Y'CbCr) color-coded pixel (3-bands each with 256 levels of
    * gray) using the CCIR 601 (Kb = 0.114, Kr = 0.299) to RGB as discussed
@@ -315,9 +294,11 @@ namespace bob { namespace ip {
    * implementations in this file to understand supported types.
    */
   template <typename T> void rgb_to_gray_one (T r, T g, T b, T& gray) {
-    throw UnsupportedTypeForColorConversion(bob::core::array::getElementType<T>());
+    boost::format m("rgb_to_gray_one(): color conversion for type `%s' is not supported");
+    m % bob::core::array::stringize<T>();
+    throw std::runtime_error(m.str());
   }
-  
+
   /**
    * Converts a RGB color-coded pixel (256 levels of gray) to grayscale using
    * the CCIR 601 (Kb = 0.114, Kr = 0.299) "Y'" (luma) component conversion as
@@ -363,11 +344,15 @@ namespace bob { namespace ip {
    */
   template <typename T> void rgb_to_hsv (const blitz::Array<T,3>& from,
       blitz::Array<T,3>& to) {
-    if (from.extent(0) != 3) throw UnsupportedRowExtent(3, from.extent(0));
+    if (from.extent(0) != 3) {
+      boost::format m("color conversion requires an array with size 3 on the first dimension, but I got one with size %d instead");
+      m % from.extent(0);
+      throw std::runtime_error(m.str());
+    }
     bob::core::array::assertSameShape(from, to);
-    for (int j=0; j<from.extent(1); ++j) 
+    for (int j=0; j<from.extent(1); ++j)
       for (int k=0; k<from.extent(2); ++k)
-        rgb_to_hsv_one(from(0,j,k), from(1,j,k), from(2,j,k), 
+        rgb_to_hsv_one(from(0,j,k), from(1,j,k), from(2,j,k),
                        to(0,j,k), to(1,j,k), to(2,j,k));
   }
 
@@ -382,11 +367,15 @@ namespace bob { namespace ip {
    */
   template <typename T> void hsv_to_rgb (const blitz::Array<T,3>& from,
       blitz::Array<T,3>& to) {
-    if (from.extent(0) != 3) throw UnsupportedRowExtent(3, from.extent(0));
+    if (from.extent(0) != 3) {
+      boost::format m("color conversion requires an array with size 3 on the first dimension, but I got one with size %d instead");
+      m % from.extent(0);
+      throw std::runtime_error(m.str());
+    }
     bob::core::array::assertSameShape(from, to);
-    for (int j=0; j<from.extent(1); ++j) 
+    for (int j=0; j<from.extent(1); ++j)
       for (int k=0; k<from.extent(2); ++k)
-        hsv_to_rgb_one(from(0,j,k), from(1,j,k), from(2,j,k), 
+        hsv_to_rgb_one(from(0,j,k), from(1,j,k), from(2,j,k),
                        to(0,j,k), to(1,j,k), to(2,j,k));
   }
 
@@ -401,11 +390,15 @@ namespace bob { namespace ip {
    */
   template <typename T> void rgb_to_hsl (const blitz::Array<T,3>& from,
       blitz::Array<T,3>& to) {
-    if (from.extent(0) != 3) throw UnsupportedRowExtent(3, from.extent(0));
+    if (from.extent(0) != 3) {
+      boost::format m("color conversion requires an array with size 3 on the first dimension, but I got one with size %d instead");
+      m % from.extent(0);
+      throw std::runtime_error(m.str());
+    }
     bob::core::array::assertSameShape(from, to);
-    for (int j=0; j<from.extent(1); ++j) 
+    for (int j=0; j<from.extent(1); ++j)
       for (int k=0; k<from.extent(2); ++k)
-        rgb_to_hsl_one(from(0,j,k), from(1,j,k), from(2,j,k), 
+        rgb_to_hsl_one(from(0,j,k), from(1,j,k), from(2,j,k),
                        to(0,j,k), to(1,j,k), to(2,j,k));
   }
 
@@ -420,11 +413,15 @@ namespace bob { namespace ip {
    */
   template <typename T> void hsl_to_rgb (const blitz::Array<T,3>& from,
       blitz::Array<T,3>& to) {
-    if (from.extent(0) != 3) throw UnsupportedRowExtent(3, from.extent(0));
+    if (from.extent(0) != 3) {
+      boost::format m("color conversion requires an array with size 3 on the first dimension, but I got one with size %d instead");
+      m % from.extent(0);
+      throw std::runtime_error(m.str());
+    }
     bob::core::array::assertSameShape(from, to);
-    for (int j=0; j<from.extent(1); ++j) 
+    for (int j=0; j<from.extent(1); ++j)
       for (int k=0; k<from.extent(2); ++k)
-        hsl_to_rgb_one(from(0,j,k), from(1,j,k), from(2,j,k), 
+        hsl_to_rgb_one(from(0,j,k), from(1,j,k), from(2,j,k),
                        to(0,j,k), to(1,j,k), to(2,j,k));
   }
 
@@ -440,11 +437,15 @@ namespace bob { namespace ip {
    */
   template <typename T> void rgb_to_yuv (const blitz::Array<T,3>& from,
       blitz::Array<T,3>& to) {
-    if (from.extent(0) != 3) throw UnsupportedRowExtent(3, from.extent(0));
+    if (from.extent(0) != 3) {
+      boost::format m("color conversion requires an array with size 3 on the first dimension, but I got one with size %d instead");
+      m % from.extent(0);
+      throw std::runtime_error(m.str());
+    }
     bob::core::array::assertSameShape(from, to);
-    for (int j=0; j<from.extent(1); ++j) 
+    for (int j=0; j<from.extent(1); ++j)
       for (int k=0; k<from.extent(2); ++k)
-        rgb_to_yuv_one(from(0,j,k), from(1,j,k), from(2,j,k), 
+        rgb_to_yuv_one(from(0,j,k), from(1,j,k), from(2,j,k),
                        to(0,j,k), to(1,j,k), to(2,j,k));
   }
 
@@ -460,11 +461,15 @@ namespace bob { namespace ip {
    */
   template <typename T> void yuv_to_rgb (const blitz::Array<T,3>& from,
       blitz::Array<T,3>& to) {
-    if (from.extent(0) != 3) throw UnsupportedRowExtent(3, from.extent(0));
+    if (from.extent(0) != 3) {
+      boost::format m("color conversion requires an array with size 3 on the first dimension, but I got one with size %d instead");
+      m % from.extent(0);
+      throw std::runtime_error(m.str());
+    }
     bob::core::array::assertSameShape(from, to);
-    for (int j=0; j<from.extent(1); ++j) 
+    for (int j=0; j<from.extent(1); ++j)
       for (int k=0; k<from.extent(2); ++k)
-        yuv_to_rgb_one(from(0,j,k), from(1,j,k), from(2,j,k), 
+        yuv_to_rgb_one(from(0,j,k), from(1,j,k), from(2,j,k),
                        to(0,j,k), to(1,j,k), to(2,j,k));
   }
 
@@ -480,7 +485,11 @@ namespace bob { namespace ip {
    */
   template <typename T> void rgb_to_gray (const blitz::Array<T,3>& from,
       blitz::Array<T,2>& to) {
-    if (from.extent(0) != 3) throw UnsupportedRowExtent(3, from.extent(0));
+    if (from.extent(0) != 3) {
+      boost::format m("color conversion requires an array with size 3 on the first dimension, but I got one with size %d instead");
+      m % from.extent(0);
+      throw std::runtime_error(m.str());
+    }
     bob::core::array::assertSameDimensionLength(from.extent(1), to.extent(0));
     bob::core::array::assertSameDimensionLength(from.extent(2), to.extent(1));
     for (int j=0; j<from.extent(1); ++j)
@@ -497,10 +506,14 @@ namespace bob { namespace ip {
    */
   template <typename T> void gray_to_rgb (const blitz::Array<T,2>& from,
       blitz::Array<T,3>& to) {
-    if (to.extent(0) != 3) throw UnsupportedRowExtent(3, to.extent(0));
+    if (to.extent(0) != 3) {
+      boost::format m("color conversion requires an array with size 3 on the first dimension, but I got one with size %d instead");
+      m % to.extent(0);
+      throw std::runtime_error(m.str());
+    }
     bob::core::array::assertSameDimensionLength(to.extent(1), from.extent(0));
     bob::core::array::assertSameDimensionLength(to.extent(2), from.extent(1));
-    for (int j=0; j<from.extent(1); ++j) 
+    for (int j=0; j<from.extent(1); ++j)
       for (int k=0; k<from.extent(2); ++k)
         gray_to_rgb_one(from(j,k), to(0,j,k), to(1,j,k), to(2,j,k));
   }

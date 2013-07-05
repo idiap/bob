@@ -6,16 +6,16 @@
  * @brief Test the crop function for 2D and 3D arrays/images
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -29,8 +29,6 @@
 
 #include "bob/core/cast.h"
 #include "bob/ip/crop.h"
-#include "bob/core/Exception.h"
-
 
 struct T {
   blitz::Array<uint32_t,2> a2, a2c_1, a2c_2, a2c_3, a2c_4;
@@ -70,7 +68,7 @@ struct T {
             0, 20, 21, 22, 23, 0,
             0, 24, 25, 26, 27, 0,
             0, 36, 37, 38, 39, 0,
-            0, 40, 41, 42, 43, 0; 
+            0, 40, 41, 42, 43, 0;
 
     a3c_3 = 4, 4, 5, 6, 7, 7,
             8, 8, 9, 10, 11, 11,
@@ -89,15 +87,15 @@ struct T {
   ~T() {}
 };
 
-template<typename T, typename U, int d>  
-void check_dimensions( blitz::Array<T,d>& t1, blitz::Array<U,d>& t2) 
+template<typename T, typename U, int d>
+void check_dimensions( blitz::Array<T,d>& t1, blitz::Array<U,d>& t2)
 {
   BOOST_REQUIRE_EQUAL(t1.dimensions(), t2.dimensions());
   for( int i=0; i<t1.dimensions(); ++i)
     BOOST_CHECK_EQUAL(t1.extent(i), t2.extent(i));
 }
 
-template<typename T, typename U>  
+template<typename T, typename U>
 void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
 {
   check_dimensions( t1, t2);
@@ -106,8 +104,8 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
       BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
-template<typename T, typename U>  
-void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2) 
+template<typename T, typename U>
+void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
 {
   check_dimensions( t1, t2);
   for( int i=0; i<t1.extent(0); ++i)
@@ -123,51 +121,49 @@ BOOST_AUTO_TEST_CASE( test_crop_2d_uint8 )
   blitz::Array<uint32_t,2> b2(4,4);
   // Full crop
   bob::ip::crop(a2, b2, 0, 0, 4, 4);
-  checkBlitzEqual(a2, b2); 
+  checkBlitzEqual(a2, b2);
 
   // Crop the middle part
   b2.resize(2,2);
   bob::ip::crop(a2, b2, 1, 1, 2, 2);
-  checkBlitzEqual(a2c_1, b2); 
+  checkBlitzEqual(a2c_1, b2);
 
   // Crop the middle part with out of boundary and check exception
   b2.resize(2,6);
-  BOOST_CHECK_THROW( bob::ip::crop(a2, b2, 1, -1, 2, 6), 
-    bob::core::InvalidArgumentException );
+  BOOST_CHECK_THROW( bob::ip::crop(a2, b2, 1, -1, 2, 6), std::runtime_error );
 
   // Crop the middle part with out of boundary (fill with zero)
   bob::ip::crop(a2, b2, 1, -1, 2, 6, true, true);
-  checkBlitzEqual(a2c_2, b2); 
+  checkBlitzEqual(a2c_2, b2);
 
   // Crop the middle part with out of boundary (fill with closest neighbour)
   bob::ip::crop(a2, b2, 1, -1, 2, 6, true);
-  checkBlitzEqual(a2c_3, b2); 
+  checkBlitzEqual(a2c_3, b2);
 }
-  
+
 BOOST_AUTO_TEST_CASE( test_crop_3d_uint8 )
 {
   blitz::Array<uint32_t,3> b3(3,4,4);
   // Full crop
   bob::ip::crop(a3, b3, 0, 0, 4, 4);
-  checkBlitzEqual(a3, b3); 
+  checkBlitzEqual(a3, b3);
 
   // Crop the middle part
   b3.resize(3,2,2);
   bob::ip::crop(a3, b3, 1, 1, 2, 2);
-  checkBlitzEqual(a3c_1, b3); 
+  checkBlitzEqual(a3c_1, b3);
 
   // Crop the middle part with out of boundary and check exception
   b3.resize(3,2,6);
-  BOOST_CHECK_THROW( bob::ip::crop(a3, b3, 1, -1, 2, 6), 
-    bob::core::InvalidArgumentException );
+  BOOST_CHECK_THROW( bob::ip::crop(a3, b3, 1, -1, 2, 6), std::runtime_error );
 
   // Crop the middle part with out of boundary (fill with zero)
   bob::ip::crop(a3, b3, 1, -1, 2, 6, true, true);
-  checkBlitzEqual(a3c_2, b3); 
+  checkBlitzEqual(a3c_2, b3);
 
   // Crop the middle part with out of boundary (fill with closest neighbour)
   bob::ip::crop(a3, b3, 1, -1, 2, 6, true);
-  checkBlitzEqual(a3c_3, b3); 
+  checkBlitzEqual(a3c_3, b3);
 }
 
 BOOST_AUTO_TEST_CASE( test_crop_2d_ref )
@@ -175,11 +171,11 @@ BOOST_AUTO_TEST_CASE( test_crop_2d_ref )
   blitz::Array<uint32_t,2> b2;
   // Full crop
   bob::ip::cropReference(a2, b2, 0, 0, 4, 4);
-  checkBlitzEqual(a2, b2); 
+  checkBlitzEqual(a2, b2);
 
   // Crop the middle part
   bob::ip::cropReference(a2, b2, 1, 1, 2, 2);
-  checkBlitzEqual(a2c_1, b2); 
+  checkBlitzEqual(a2c_1, b2);
 }
 
 BOOST_AUTO_TEST_CASE( test_crop_2d_mask_uint8 )
@@ -188,15 +184,15 @@ BOOST_AUTO_TEST_CASE( test_crop_2d_mask_uint8 )
   blitz::Array<bool,2> b2_mask(4,4);
   // Full crop
   bob::ip::crop(a2, a2_m44, b2, b2_mask, 0, 0, 4, 4);
-  checkBlitzEqual(a2, b2); 
-  checkBlitzEqual(a2_m44, b2_mask); 
+  checkBlitzEqual(a2, b2);
+  checkBlitzEqual(a2_m44, b2_mask);
 
   // Crop the middle part
   b2.resize(2,2);
   b2_mask.resize(2,2);
   bob::ip::crop(a2, a2_m44, b2, b2_mask, 1, 1, 2, 2);
-  checkBlitzEqual(a2c_1, b2); 
-  checkBlitzEqual(a2_m22, b2_mask); 
+  checkBlitzEqual(a2c_1, b2);
+  checkBlitzEqual(a2_m22, b2_mask);
 
   // Crop the upper left part
   b2.resize(3,3);

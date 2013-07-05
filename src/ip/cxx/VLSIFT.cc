@@ -6,30 +6,31 @@
  * @brief SIFT implementation
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "bob/ip/VLSIFT.h"
 
+#include <stdexcept>
+#include <boost/format.hpp>
 #include <vl/pgm.h>
 #include "bob/core/assert.h"
-#include "bob/ip/Exception.h"
 
-bob::ip::VLSIFT::VLSIFT(const size_t height, const size_t width, 
+bob::ip::VLSIFT::VLSIFT(const size_t height, const size_t width,
     const size_t n_intervals, const size_t n_octaves, const int octave_min,
     const double peak_thres, const double edge_thres, const double magnif):
-  m_height(height), m_width(width), m_n_intervals(n_intervals), 
+  m_height(height), m_width(width), m_n_intervals(n_intervals),
   m_n_octaves(n_octaves), m_octave_min(octave_min),
   m_peak_thres(peak_thres), m_edge_thres(edge_thres), m_magnif(magnif)
 {
@@ -38,9 +39,9 @@ bob::ip::VLSIFT::VLSIFT(const size_t height, const size_t width,
 }
 
 bob::ip::VLSIFT::VLSIFT(const VLSIFT& other):
-  m_height(other.m_height), m_width(other.m_width), 
-  m_n_intervals(other.m_n_intervals), m_n_octaves(other.m_n_octaves), 
-  m_octave_min(other.m_octave_min), m_peak_thres(other.m_peak_thres), 
+  m_height(other.m_height), m_width(other.m_width),
+  m_n_intervals(other.m_n_intervals), m_n_octaves(other.m_n_octaves),
+  m_octave_min(other.m_octave_min), m_peak_thres(other.m_peak_thres),
   m_edge_thres(other.m_edge_thres), m_magnif(other.m_magnif)
 {
   // Allocates buffers and filter, and set filter properties
@@ -54,12 +55,12 @@ bob::ip::VLSIFT& bob::ip::VLSIFT::operator=(const bob::ip::VLSIFT& other)
     m_height = other.m_height;
     m_width = other.m_width;
     m_n_intervals = other.m_n_intervals;
-    m_n_octaves = other.m_n_octaves; 
+    m_n_octaves = other.m_n_octaves;
     m_octave_min = other.m_octave_min;
     m_peak_thres = other.m_peak_thres;
     m_edge_thres = other.m_edge_thres;
     m_magnif = other.m_magnif;
-  
+
     // Allocates buffers and filter, and set filter properties
     allocateAndSet();
   }
@@ -68,11 +69,11 @@ bob::ip::VLSIFT& bob::ip::VLSIFT::operator=(const bob::ip::VLSIFT& other)
 
 bool bob::ip::VLSIFT::operator==(const bob::ip::VLSIFT& b) const
 {
-  return (this->m_height == b.m_height && this->m_width == b.m_width && 
-          this->m_n_intervals == b.m_n_intervals && 
-          this->m_n_octaves == b.m_n_octaves && 
-          this->m_octave_min == b.m_octave_min && 
-          this->m_peak_thres == b.m_peak_thres && 
+  return (this->m_height == b.m_height && this->m_width == b.m_width &&
+          this->m_n_intervals == b.m_n_intervals &&
+          this->m_n_octaves == b.m_n_octaves &&
+          this->m_octave_min == b.m_octave_min &&
+          this->m_peak_thres == b.m_peak_thres &&
           this->m_edge_thres == b.m_edge_thres &&
           this->m_magnif == b.m_magnif);
 }
@@ -82,7 +83,7 @@ bool bob::ip::VLSIFT::operator!=(const bob::ip::VLSIFT& b) const
   return !(this->operator==(b));
 }
 
-void bob::ip::VLSIFT::operator()(const blitz::Array<uint8_t,2>& src, 
+void bob::ip::VLSIFT::operator()(const blitz::Array<uint8_t,2>& src,
   std::vector<blitz::Array<double,1> >& dst)
 {
   // Clears the vector
@@ -90,27 +91,27 @@ void bob::ip::VLSIFT::operator()(const blitz::Array<uint8_t,2>& src,
   vl_bool err=VL_ERR_OK;
 
   // Copies data
-  for(unsigned int q=0; q<(unsigned)(m_width * m_height); ++q) 
+  for(unsigned int q=0; q<(unsigned)(m_width * m_height); ++q)
     m_data[q] = src((int)(q/m_width), (int)(q%m_width));
   // Converts data type
-  for(unsigned int q=0; q<(unsigned)(m_width * m_height); ++q) 
+  for(unsigned int q=0; q<(unsigned)(m_width * m_height); ++q)
     m_fdata[q] = m_data[q];
 
   // Processes each octave
   int i=0;
   bool first=true;
-  while(1) 
+  while(1)
   {
     VlSiftKeypoint const *keys = 0;
     int nkeys;
 
     // Calculates the GSS for the next octave
-    if(first) 
+    if(first)
     {
       first = false;
       err = vl_sift_process_first_octave(m_filt, m_fdata);
-    } 
-    else 
+    }
+    else
       err = vl_sift_process_next_octave(m_filt);
 
     if(err)
@@ -124,7 +125,7 @@ void bob::ip::VLSIFT::operator()(const blitz::Array<uint8_t,2>& src,
     keys = vl_sift_get_keypoints(m_filt);
     nkeys = vl_sift_get_nkeypoints(m_filt);
     i = 0;
-    
+
     // Loops over the keypoint
     for(; i < nkeys ; ++i) {
       double angles[4];
@@ -159,35 +160,38 @@ void bob::ip::VLSIFT::operator()(const blitz::Array<uint8_t,2>& src,
 
 }
 
-void bob::ip::VLSIFT::operator()(const blitz::Array<uint8_t,2>& src, 
+void bob::ip::VLSIFT::operator()(const blitz::Array<uint8_t,2>& src,
   const blitz::Array<double,2>& keypoints,
   std::vector<blitz::Array<double,1> >& dst)
 {
-  if(keypoints.extent(1) != 3 && keypoints.extent(1) != 4)
-    throw bob::ip::Exception();
- 
+  if(keypoints.extent(1) != 3 && keypoints.extent(1) != 4) {
+    boost::format m("extent for dimension 1 of keypoints is %d where it should be either 3 or 4");
+    m % keypoints.extent(1);
+    throw std::runtime_error(m.str());
+  }
+
   // Clears the vector
   dst.clear();
   vl_bool err=VL_ERR_OK;
 
   // Copies data
-  for(unsigned int q=0; q<(unsigned)(m_width * m_height); ++q) 
+  for(unsigned int q=0; q<(unsigned)(m_width * m_height); ++q)
     m_data[q] = src((int)(q/m_width), (int)(q%m_width));
   // Converts data type
-  for(unsigned int q=0; q<(unsigned)(m_width * m_height); ++q) 
+  for(unsigned int q=0; q<(unsigned)(m_width * m_height); ++q)
     m_fdata[q] = m_data[q];
 
   // Processes each octave
   bool first=true;
-  while(1) 
+  while(1)
   {
     // Calculates the GSS for the next octave
-    if(first) 
+    if(first)
     {
       first = false;
       err = vl_sift_process_first_octave(m_filt, m_fdata);
-    } 
-    else 
+    }
+    else
       err = vl_sift_process_next_octave(m_filt);
 
     if(err)
@@ -203,7 +207,7 @@ void bob::ip::VLSIFT::operator()(const blitz::Array<uint8_t,2>& src,
       VlSiftKeypoint ik;
       VlSiftKeypoint const *k;
 
-      // Obtain keypoint orientations 
+      // Obtain keypoint orientations
       vl_sift_keypoint_init(m_filt, &ik,
         keypoints(i,1), keypoints(i,0), keypoints(i,2)); // x, y, sigma
 
@@ -250,7 +254,7 @@ void bob::ip::VLSIFT::allocateBuffers()
 {
   const size_t npixels = m_height * m_width;
   // Allocates buffers
-  m_data  = (vl_uint8*)malloc(npixels * sizeof(vl_uint8)); 
+  m_data  = (vl_uint8*)malloc(npixels * sizeof(vl_uint8));
   m_fdata = (vl_sift_pix*)malloc(npixels * sizeof(vl_sift_pix));
   // TODO: deals with allocation error?
 }

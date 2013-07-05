@@ -8,7 +8,6 @@ set(libdir "")
 
 # This defines the list of source files inside this package.
 set(src
-    "Exception.cc"
     "reorder.cc"
 
     "File.cc"

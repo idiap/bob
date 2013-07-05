@@ -30,10 +30,11 @@
 #include <math.h>
 #include <stdint.h>
 #include <numeric>
+#include <stdexcept>
+#include <boost/format.hpp>
 
 #include <blitz/array.h>
 
-#include <bob/ip/Exception.h>
 #include <bob/core/assert.h>
 #include <bob/sp/interpolate.h>
 
@@ -136,7 +137,14 @@ namespace bob { namespace ip {
       /**
        * Accessors
        */
-      double getRadius() const { if (m_R_y != m_R_x) throw bob::ip::LBPRadiusDoesNotMatch("R_y", "R_x"); return m_R_y;}
+      double getRadius() const {
+        if (m_R_x != m_R_y) {
+          boost::format m("the radii R_x (%f) and R_y (%f) do not match");
+          m % m_R_x % m_R_y;
+          throw std::runtime_error(m.str());
+        }
+        return m_R_x;
+      }
       blitz::TinyVector<double,2> getRadii() const { return blitz::TinyVector<double,2>(m_R_y, m_R_x); }
       int getNNeighbours() const { return m_P; }
       bool getCircular() const { return m_circular; }
@@ -159,7 +167,8 @@ namespace bob { namespace ip {
       void setAddAverageBit(const bool add_average_bit){ m_add_average_bit = add_average_bit; init(); }
       void setUniform(const bool uniform){ m_uniform = uniform; init(); }
       void setRotationInvariant(const bool rotation_invariant){ m_rotation_invariant = rotation_invariant; init(); }
-      void set_eLBP(bob::ip::ELBPType eLBP_type){ m_eLBP_type = eLBP_type; if (eLBP_type == ELBP_DIRECTION_CODED && m_P%2) throw bob::core::InvalidArgumentException("Direction coded LBP types require an even number of neighbors.");}
+      void set_eLBP(bob::ip::ELBPType eLBP_type){ m_eLBP_type = eLBP_type; if (eLBP_type == ELBP_DIRECTION_CODED && m_P%2) { throw std::runtime_error("direction coded LBP types require an even number of neighbors.");}
+      }
       void setLookUpTable(const blitz::Array<uint16_t,1>& new_lut){m_lut = new_lut;}
 
       /**
@@ -257,8 +266,16 @@ namespace bob { namespace ip {
     bob::core::array::assertZeroBase(src);
     // offset in the source image
     const int r_y = (int)ceil(m_R_y), r_x = (int)ceil(m_R_x);
-    if (y < r_y || y >= src.extent(0)-r_y) throw bob::core::InvalidArgumentException("y", y, r_y, src.extent(0)-r_y-1);
-    if (x < r_x || x >= src.extent(1)-r_x) throw bob::core::InvalidArgumentException("x", x, r_x, src.extent(0)-r_x-1);
+    if (y < r_y || y >= src.extent(0)-r_y) {
+      boost::format m("argument `y' = %d is set outside the expected range [%d, %d]");
+      m % y % r_y % (src.extent(0)-r_y-1);
+      throw std::runtime_error(m.str());
+    }
+    if (x < r_x || x >= src.extent(1)-r_x) {
+      boost::format m("argument `x' = %d is set outside the expected range [%d, %d]");
+      m % x % r_x % (src.extent(1)-r_x-1);
+      throw std::runtime_error(m.str());
+    }
     // return LBP code
     return lbp_code(src, y, x);
   }

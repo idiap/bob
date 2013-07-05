@@ -25,8 +25,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdexcept>
+#include <boost/format.hpp>
 #include <bob/ip/LBPTop.h>
-#include <bob/ip/Exception.h>
 
 bob::ip::LBPTop::LBPTop(const bob::ip::LBP& lbp_xy,
                    const bob::ip::LBP& lbp_xt,
@@ -35,18 +36,26 @@ bob::ip::LBPTop::LBPTop(const bob::ip::LBP& lbp_xy,
   m_lbp_xt(lbp_xt),
   m_lbp_yt(lbp_yt)
 {
- /*Checking the inputs. The radius in XY,XT and YT must be the same*/
+  /*
+   * Checking the inputs. The radius in XY,XT and YT must be the same
+   */
+  if(lbp_xy.getRadii()[0]!=lbp_xt.getRadii()[0]) {
+    boost::format m("the radii R_xy[0] (%f) and R_xt[0] (%f) do not match");
+    m % lbp_xy.getRadii()[0] % lbp_xt.getRadii()[0];
+    throw std::runtime_error(m.str());
+  }
 
-  if(lbp_xy.getRadii()[0]!=lbp_xt.getRadii()[0])
-    throw LBPRadiusDoesNotMatch("X","XY","XT");
+  if(lbp_xy.getRadii()[1]!=lbp_yt.getRadii()[0]) {
+    boost::format m("the radii R_xy[1] (%f) and R_yt[0] (%f) do not match");
+    m % lbp_xy.getRadii()[1] % lbp_yt.getRadii()[0];
+    throw std::runtime_error(m.str());
+  }
 
-  if(lbp_xy.getRadii()[1]!=lbp_yt.getRadii()[0])
-    throw LBPRadiusDoesNotMatch("Y","XY","YT");
-
-  if(lbp_xt.getRadii()[1]!=lbp_yt.getRadii()[0])
-    throw LBPRadiusDoesNotMatch("T","XT","YT");
-
-
+  if(lbp_xt.getRadii()[1]!=lbp_yt.getRadii()[0]) {
+    boost::format m("the radii R_xt[1] (%f) and R_yt[0] (%f) do not match");
+    m % lbp_xt.getRadii()[1] % lbp_yt.getRadii()[0];
+    throw std::runtime_error(m.str());
+  }
 
 }
 

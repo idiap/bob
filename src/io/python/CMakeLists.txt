@@ -8,7 +8,6 @@ set(shared "${bob_deps}")
 # This defines the list of source files inside this package.
 set(src
    "version.cc"
-   "exception.cc"
    "file.cc"
    "hdf5_extras.cc"
    "hdf5.cc"

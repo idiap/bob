@@ -6,16 +6,16 @@
  * @brief Test the geometric normalization function for 2D arrays/images
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -44,15 +44,15 @@ struct T {
   ~T() {}
 };
 
-template<typename T, typename U, int d>  
-void check_dimensions( blitz::Array<T,d> t1, blitz::Array<U,d> t2) 
+template<typename T, typename U, int d>
+void check_dimensions( blitz::Array<T,d> t1, blitz::Array<U,d> t2)
 {
   BOOST_REQUIRE_EQUAL(t1.dimensions(), t2.dimensions());
   for( int i=0; i<t1.dimensions(); ++i)
     BOOST_CHECK_EQUAL(t1.extent(i), t2.extent(i));
 }
 
-template<typename T, typename U>  
+template<typename T, typename U>
 void checkBlitzEqual( blitz::Array<T,2> t1, blitz::Array<U,2> t2)
 {
   check_dimensions( t1, t2);
@@ -61,8 +61,8 @@ void checkBlitzEqual( blitz::Array<T,2> t1, blitz::Array<U,2> t2)
       BOOST_CHECK_EQUAL(t1(i,j), bob::core::cast<T>(t2(i,j)));
 }
 
-template<typename T>  
-void checkBlitzClose( blitz::Array<T,2> t1, blitz::Array<T,2> t2, 
+template<typename T>
+void checkBlitzClose( blitz::Array<T,2> t1, blitz::Array<T,2> t2,
   const double eps )
 {
   check_dimensions( t1, t2);
@@ -82,19 +82,19 @@ BOOST_AUTO_TEST_CASE( test_geomnorm )
     bob::core::error << "Environment variable $BOB_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw bob::core::Exception();
+    throw std::runtime_error("test failed");
   }
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "image_r10.pgm";
   blitz::Array<uint8_t,2> img = bob::io::load<uint8_t,2>(testdata_path_img.string());
   blitz::Array<double,2> img_processed_d(40,40);
-  
-  // Define a Geometric normalizer 
+
+  // Define a Geometric normalizer
   // * rotation angle: 10 degrees
   // * scaling factor: 0.65
   // * Cropping area: 40x40
-  // * No final cropping offset (i.e. used the provided upper left corner when calling 
+  // * No final cropping offset (i.e. used the provided upper left corner when calling
   //   the operator() method)
   bob::ip::GeomNorm geomnorm(-10., 0.65, 40, 40, 0, 0);
 
@@ -116,20 +116,20 @@ BOOST_AUTO_TEST_CASE( test_geomnorm_with_mask )
     bob::core::error << "Environment variable $BOB_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
-    throw bob::core::Exception();
+    throw std::runtime_error("test failed");
   }
   // Load original image
   boost::filesystem::path testdata_path(testdata_cpath);
   testdata_path /= "image_r70.pgm";
   blitz::Array<uint8_t,2> input_image = bob::io::load<uint8_t,2>(testdata_path.string());
   blitz::Array<double,2> output_image(160,160);
-  
+
   blitz::Array<bool,2> input_mask(input_image.shape()[0],input_image.shape()[1]);
   // estimate the input mask from the black pixels of the input image
   input_mask = input_image != 0;
   blitz::Array<bool,2> output_mask(output_image.shape()[0], output_image.shape()[1]);
-  
-  // Define a Geometric normalizer 
+
+  // Define a Geometric normalizer
   // * rotation angle: 70 degrees
   // * scaling factor: 1.2
   // * Cropping area: 160x160
@@ -138,14 +138,14 @@ BOOST_AUTO_TEST_CASE( test_geomnorm_with_mask )
 
   // Process giving the masks and the center of the eye positions
   geomnorm(input_image, input_mask, output_image, output_mask, 64, 69);
-  
+
   // check that the image is close to the reference image
   blitz::Array<uint8_t,2> output_image_uint8 = bob::core::array::convertFromRange<uint8_t>(output_image, 0., 255.);
   testdata_path = testdata_cpath;
   testdata_path /= "image_r70_geomnorm.pgm";
 //  bob::io::open(testdata_path.string(), 'w')->write(output_image_uint8); // Re-generate reference data
   checkBlitzClose( output_image_uint8, bob::io::load<uint8_t,2>(testdata_path.string()), eps);
-  
+
   // check that the mask is identical to the reference mask
   blitz::Array<uint8_t,2> output_mask_uint8 = bob::core::array::convertFromRange<uint8_t>(output_mask, false, true);
   testdata_path = testdata_cpath;
