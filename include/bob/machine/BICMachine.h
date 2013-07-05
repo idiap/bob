@@ -33,16 +33,6 @@ namespace bob { namespace machine {
    */
 
   /**
-   * Exceptions of this class are thrown when eigenvalues are too small.
-   */
-  class ZeroEigenvalueException : public std::runtime_error {
-    public:
-      ZeroEigenvalueException() throw(): std::runtime_error("") {}
-      virtual ~ZeroEigenvalueException() throw(){}
-      virtual const char* what() const throw(){return "One given/read/calculated eigenvalue is close to zero. Use a smaller number of kept eigenvalues!";}
-  };
-
-  /**
    * This class computes the Bayesian Intrapersonal/Extrapersonal Classifier (BIC),
    * (see "Beyond Eigenfaces: Probabilistic Matching for Face Recognition" from Moghaddam, Wahid and Pentland)
    * which estimates the posterior probability that the given <b>image difference vector</b>

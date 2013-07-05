@@ -28,12 +28,12 @@ void bob::ip::detail::shiftParameterCheck( const int shift_y, const int shift_x,
   // Check parameters and throw exception if required
   if (shift_y <= -(int)src_height || shift_y >= (int)src_height) {
     boost::format m("setting `shift_y' to %d is outside the expected range [%d, %d]");
-    m % shift_y % -((int)src_height+1), ((int)src_height-1);
+    m % shift_y % -((int)src_height+1) % ((int)src_height-1);
     throw std::runtime_error(m.str());
   }
   if (shift_x <= -(int)src_width || shift_x >= (int)src_width) {
     boost::format m("setting `shift_x' to %d is outside the expected range [%d, %d]");
-    m % shift_x % -((int)src_width+1), ((int)src_width-1);
+    m % shift_x % -((int)src_width+1) % ((int)src_width-1);
     throw std::runtime_error(m.str());
   }
 }

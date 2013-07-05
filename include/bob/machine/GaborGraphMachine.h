@@ -35,16 +35,6 @@ namespace bob{ namespace machine {
    * @{
    */
 
-  //! \brief This exception is thrown when the image size is smaller than the graph that should be extracted.
-  class ImageTooSmallException : public std::runtime_error {
-    public:
-      //! Constructor
-      ImageTooSmallException(int height, int width, int y_pos, int x_pos) throw() : std::runtime_error(""), h(height), w(width), y(y_pos), x(x_pos) {}
-      virtual const char* what() const throw(){std::ostringstream s; s << "The position (" << y << ", " << x << ") is out of the image boundaries " << h << " x " << w << "!"; return s.str().c_str();}
-    private:
-      int h,w,y,x;
-  };
-
   //! \brief This machine computes graphs labeled with Gabor jets (so-called Gabor graphs) from a Gabor jet image.
   //! Currently, only the extraction of grid-like graph structures is supported.
   //! Furthermore, this class provides functionalities to compare two Gabor graphs (of the same topology) using a specified Gabor jet similarity function.

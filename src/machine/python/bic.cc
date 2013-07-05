@@ -39,9 +39,6 @@ static double bic_call(const bob::machine::BICMachine& machine, bob::python::con
 
 void bind_machine_bic(){
 
-  // bind exception
-  bob::python::register_exception_translator<bob::machine::ZeroEigenvalueException>(PyExc_ZeroDivisionError);
-
   // bind BICMachine
   boost::python::class_<bob::machine::BICMachine, boost::shared_ptr<bob::machine::BICMachine> > (
       "BICMachine",

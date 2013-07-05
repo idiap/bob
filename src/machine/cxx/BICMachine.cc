@@ -242,7 +242,7 @@ void bob::machine::BICMachine::setBIC(
   rho_ = rho;
 
   // check that rho has a reasonable value (if it is used)
-  if (m_use_DFFS && rho_ < 1e-12) throw bob::machine::ZeroEigenvalueException();
+  if (m_use_DFFS && rho_ < 1e-12) throw std::runtime_error("The given average eigenvalue (rho) is too close to zero");
 
   // initialize temporaries
   initialize(clazz, Phi.shape()[0], Phi.shape()[1]);
@@ -255,7 +255,7 @@ void bob::machine::BICMachine::setBIC(
  */
 void bob::machine::BICMachine::use_DFFS(bool use_DFFS){
   m_use_DFFS = use_DFFS;
-  if (m_project_data && m_use_DFFS && (m_rho_E < 1e-12 || m_rho_I < 1e-12)) throw bob::machine::ZeroEigenvalueException();
+  if (m_project_data && m_use_DFFS && (m_rho_E < 1e-12 || m_rho_I < 1e-12)) std::runtime_error("The average eigenvalue (rho) is too close to zero, so using DFFS will not work");
 }
 
 /**
@@ -283,7 +283,7 @@ void bob::machine::BICMachine::load(bob::io::HDF5File& config){
     m_rho_E = config.read<double>("extra_rho");
   }
   // check that rho has reasonable values
-  if (m_project_data && m_use_DFFS && (m_rho_E < 1e-12 || m_rho_I < 1e-12)) throw bob::machine::ZeroEigenvalueException();
+  if (m_project_data && m_use_DFFS && (m_rho_E < 1e-12 || m_rho_I < 1e-12)) throw std::runtime_error("The loaded average eigenvalue (rho) is too close to zero");
 
 }
 

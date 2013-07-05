@@ -51,22 +51,24 @@ void bob::trainer::BICTrainer::train_single(bool clazz, bob::machine::BICMachine
 
     // compute rho
     double rho = 0.;
-    int non_null_eigenvalues = std::min(input_dim, data_count) - 1;
+    int non_zero_eigenvalues = std::min(input_dim, data_count-1);
     // assert that the number of kept eigenvalues is not chosen to big
-    if (subspace_dim >= non_null_eigenvalues) throw bob::machine::ZeroEigenvalueException();
+    if (subspace_dim >= non_zero_eigenvalues)
+      throw std::runtime_error((boost::format("The chosen subspace dimension %d is larger than the theoretical number of nonzero eigenvalues %d")%subspace_dim%non_zero_eigenvalues).str());
     // compute the average of the reminding eigenvalues
-    for (int i = subspace_dim; i < non_null_eigenvalues; ++i){
+    for (int i = subspace_dim; i < non_zero_eigenvalues; ++i){
       rho += variances(i);
     }
-    rho /= non_null_eigenvalues - subspace_dim;
+    rho /= non_zero_eigenvalues - subspace_dim;
 
     // limit dimensionalities
     pca.resize(input_dim, subspace_dim);
     variances.resizeAndPreserve(subspace_dim);
 
     // check that all variances are meaningful
-    for (int i = subspace_dim; i--;){
-      if (variances(i) < 1e-12) throw bob::machine::ZeroEigenvalueException();
+    for (int i = 0; i < subspace_dim; ++i){
+      if (variances(i) < 1e-12)
+        throw std::runtime_error((boost::format("The chosen subspace dimension is %d, but the %dth eigenvalue is already to small")%subspace_dim%i).str());
     }
 
     // initialize the machine
@@ -90,11 +92,12 @@ void bob::trainer::BICTrainer::train_single(bool clazz, bob::machine::BICMachine
       }
     }
     // normalize mean and variances
-    for (int i = input_dim; i--;){
+    for (int i = 0; i < input_dim; ++i){
       // intrapersonal
       variance(i) = (variance(i) - sqr(mean(i)) / data_count) / (data_count - 1.);
       mean(i) /= data_count;
-      if (variance(i) < 1e-12) throw bob::machine::ZeroEigenvalueException();
+      if (variance(i) < 1e-12)
+        throw std::runtime_error((boost::format("The variance of the %dth dimension is too small. Check your data!")%i).str());
     }
 
     // set the results to the machine

@@ -140,7 +140,7 @@ void bob::machine::GaborGraphMachine::checkPositions(int height, int width) cons
   for (int i = m_node_positions.extent(0); i--;){
     if (m_node_positions(i,0) < 0 || m_node_positions(i,0) >= height ||
         m_node_positions(i,1) < 0 || m_node_positions(i,1) >= width)
-      throw ImageTooSmallException(height, width, m_node_positions(i,0), m_node_positions(i,1));
+      throw std::runtime_error((boost::format("The position (%i,%i) is out of the image boundaries %i x %i")%height%width%m_node_positions(i,0)%m_node_positions(i,1)).str());
   }
 }
 
