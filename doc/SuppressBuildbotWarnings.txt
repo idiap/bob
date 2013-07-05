@@ -1,0 +1,4 @@
+# Warnings that should be suppressed at Buildbot - no solution for those...
+.* : .*arg is not a Python function.*
+.* : .*forbids casting between pointer-to-function and pointer-to-object.*
+.* : ^\s*1.*This is a warning message.*

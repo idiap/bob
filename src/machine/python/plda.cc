@@ -6,16 +6,16 @@
  * @brief Python bindings for the PLDABase/PLDAMachine
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -41,7 +41,7 @@ static void py_set_dim_g(bob::machine::PLDABase& machine, const size_t dim_g)
 }
 
 // Set and Get methods that uses blitz::Arrays
-static object py_get_mu(const bob::machine::PLDABase& machine) 
+static object py_get_mu(const bob::machine::PLDABase& machine)
 {
   bob::python::ndarray mu(bob::core::array::t_float64, machine.getDimD());
   blitz::Array<double,1> mu_ = mu.bz<double,1>();
@@ -49,13 +49,13 @@ static object py_get_mu(const bob::machine::PLDABase& machine)
   return mu.self();
 }
 
-static void py_set_mu(bob::machine::PLDABase& machine, 
-  bob::python::const_ndarray mu) 
+static void py_set_mu(bob::machine::PLDABase& machine,
+  bob::python::const_ndarray mu)
 {
   machine.setMu(mu.bz<double,1>());
 }
 
-static object py_get_f(const bob::machine::PLDABase& machine) 
+static object py_get_f(const bob::machine::PLDABase& machine)
 {
   const size_t dim_d = machine.getDimD();
   const size_t dim_f = machine.getDimF();
@@ -65,13 +65,13 @@ static object py_get_f(const bob::machine::PLDABase& machine)
   return f.self();
 }
 
-static void py_set_f(bob::machine::PLDABase& machine, 
-  bob::python::const_ndarray f) 
+static void py_set_f(bob::machine::PLDABase& machine,
+  bob::python::const_ndarray f)
 {
   machine.setF(f.bz<double,2>());
 }
 
-static object py_get_g(const bob::machine::PLDABase& machine) 
+static object py_get_g(const bob::machine::PLDABase& machine)
 {
   const size_t dim_d = machine.getDimD();
   const size_t dim_g = machine.getDimG();
@@ -81,13 +81,13 @@ static object py_get_g(const bob::machine::PLDABase& machine)
   return g.self();
 }
 
-static void py_set_g(bob::machine::PLDABase& machine, 
-  bob::python::const_ndarray g) 
+static void py_set_g(bob::machine::PLDABase& machine,
+  bob::python::const_ndarray g)
 {
   machine.setG(g.bz<double,2>());
 }
 
-static object py_get_sigma(const bob::machine::PLDABase& machine) 
+static object py_get_sigma(const bob::machine::PLDABase& machine)
 {
   const size_t dim_d = machine.getDimD();
   bob::python::ndarray sigma(bob::core::array::t_float64, dim_d);
@@ -96,27 +96,27 @@ static object py_get_sigma(const bob::machine::PLDABase& machine)
   return sigma.self();
 }
 
-static void py_set_sigma(bob::machine::PLDABase& machine, 
-  bob::python::const_ndarray sigma) 
+static void py_set_sigma(bob::machine::PLDABase& machine,
+  bob::python::const_ndarray sigma)
 {
   machine.setSigma(sigma.bz<double,1>());
 }
 
 
-static double computeLogLikelihood1(bob::machine::PLDAMachine& plda, 
+static double computeLogLikelihood1(bob::machine::PLDAMachine& plda,
   const blitz::Array<double,1>& sample, bool with_enrolled_samples=true)
 {
   return plda.computeLogLikelihood(sample, with_enrolled_samples);
 }
 
-static double computeLogLikelihood2(bob::machine::PLDAMachine& plda, 
+static double computeLogLikelihood2(bob::machine::PLDAMachine& plda,
   const blitz::Array<double,2>& samples, bool with_enrolled_samples=true)
 {
   return plda.computeLogLikelihood(samples, with_enrolled_samples);
 }
 
-static double plda_forward_sample(bob::machine::PLDAMachine& m, 
-  bob::python::const_ndarray samples) 
+static double plda_forward_sample(bob::machine::PLDAMachine& m,
+  bob::python::const_ndarray samples)
 {
   const bob::core::array::typeinfo& info = samples.type();
   switch (info.nd) {
@@ -137,13 +137,12 @@ static double plda_forward_sample(bob::machine::PLDAMachine& m,
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "PLDA forwarding does not accept input array with '%ld' dimensions (only 1D or 2D arrays)",
-          info.nd);
+      PYTHON_ERROR(TypeError, "PLDA forwarding does not accept input array with '%u' dimensions (only 1D or 2D arrays)", info.nd);
   }
 }
 
-static double py_log_likelihood_point_estimate(bob::machine::PLDABase& plda, 
-  bob::python::const_ndarray xij, bob::python::const_ndarray hi, 
+static double py_log_likelihood_point_estimate(bob::machine::PLDABase& plda,
+  bob::python::const_ndarray xij, bob::python::const_ndarray hi,
   bob::python::const_ndarray wij)
 {
   const blitz::Array<double,1> xij_ = xij.bz<double,1>();
@@ -153,7 +152,7 @@ static double py_log_likelihood_point_estimate(bob::machine::PLDABase& plda,
 }
 
 static object pldabase_getAddGamma(bob::machine::PLDABase& m, const size_t a)
-{ 
+{
   const size_t dim_f = m.getDimF();
   bob::python::ndarray gamma(bob::core::array::t_float64, dim_f, dim_f);
   blitz::Array<double,2> gamma_ = gamma.bz<double,2>();
@@ -191,7 +190,7 @@ static object plda_getGamma(bob::machine::PLDAMachine& m, const size_t a)
 BOOST_PYTHON_FUNCTION_OVERLOADS(computeLogLikelihood1_overloads, computeLogLikelihood1, 2, 3)
 BOOST_PYTHON_FUNCTION_OVERLOADS(computeLogLikelihood2_overloads, computeLogLikelihood2, 2, 3)
 
-void bind_machine_plda() 
+void bind_machine_plda()
 {
   class_<bob::machine::PLDABase, boost::shared_ptr<bob::machine::PLDABase> >("PLDABase", "A PLDABase can be seen as a container for the subspaces F, G, the diagonal covariance matrix sigma (stored as a 1D array) and the mean vector mu when performing Probabilistic Linear Discriminant Analysis (PLDA). PLDA is a probabilistic model that incorporates components describing both between-class and within-class variations. A PLDABase can be shared between several PLDAMachine that contains class-specific information (information about the enrolment samples).\n\nReferences:\n1. 'A Scalable Formulation of Probabilistic Linear Discriminant Analysis: Applied to Face Recognition', Laurent El Shafey, Chris McCool, Roy Wallace, Sebastien Marcel, TPAMI'2013\n2. 'Probabilistic Linear Discriminant Analysis for Inference About Identity', Prince and Elder, ICCV'2007.\n3. 'Probabilistic Models for Inference about Identity', Li, Fu, Mohammed, Elder and Prince, TPAMI'2012.", init<const size_t, const size_t, const size_t, optional<const double> >((arg("self"), arg("dim_d"), arg("dim_f"), arg("dim_g"), arg("variance_flooring")=0.), "Builds a new PLDABase. dim_d is the dimensionality of the input features, dim_f is the dimensionality of the F subspace and dim_g the dimensionality of the G subspace. The variance flooring threshold is the minimum value that the variance sigma can reach, as this diagonal matrix is inverted."))
     .def(init<>((arg("self")), "Constructs a new empty PLDABase."))

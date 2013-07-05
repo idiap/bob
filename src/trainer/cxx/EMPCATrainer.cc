@@ -4,16 +4,16 @@
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -36,11 +36,11 @@
 
 bob::trainer::EMPCATrainer::EMPCATrainer(double convergence_threshold,
     size_t max_iterations, bool compute_likelihood):
-  EMTrainer<bob::machine::LinearMachine, blitz::Array<double,2> >(convergence_threshold, 
-    max_iterations, compute_likelihood), 
+  EMTrainer<bob::machine::LinearMachine, blitz::Array<double,2> >(convergence_threshold,
+    max_iterations, compute_likelihood),
   m_S(0,0),
   m_z_first_order(0,0), m_z_second_order(0,0,0),
-  m_inW(0,0), m_invM(0,0), m_sigma2(0), m_f_log2pi(0), 
+  m_inW(0,0), m_invM(0,0), m_sigma2(0), m_f_log2pi(0),
   m_tmp_dxf(0,0), m_tmp_d(0), m_tmp_f(0),
   m_tmp_dxd_1(0,0), m_tmp_dxd_2(0,0),
   m_tmp_fxd_1(0,0), m_tmp_fxd_2(0,0),
@@ -49,11 +49,11 @@ bob::trainer::EMPCATrainer::EMPCATrainer(double convergence_threshold,
 }
 
 bob::trainer::EMPCATrainer::EMPCATrainer(const bob::trainer::EMPCATrainer& other):
-  EMTrainer<bob::machine::LinearMachine, blitz::Array<double,2> >(other.m_convergence_threshold, 
+  EMTrainer<bob::machine::LinearMachine, blitz::Array<double,2> >(other.m_convergence_threshold,
     other.m_max_iterations, other.m_compute_likelihood),
   m_S(bob::core::array::ccopy(other.m_S)),
-  m_z_first_order(bob::core::array::ccopy(other.m_z_first_order)), 
-  m_z_second_order(bob::core::array::ccopy(other.m_z_second_order)), 
+  m_z_first_order(bob::core::array::ccopy(other.m_z_first_order)),
+  m_z_second_order(bob::core::array::ccopy(other.m_z_second_order)),
   m_inW(bob::core::array::ccopy(other.m_inW)),
   m_invM(bob::core::array::ccopy(other.m_invM)),
   m_sigma2(other.m_sigma2), m_f_log2pi(other.m_f_log2pi),
@@ -74,7 +74,7 @@ bob::trainer::EMPCATrainer::~EMPCATrainer()
 }
 
 bob::trainer::EMPCATrainer& bob::trainer::EMPCATrainer::operator=
-  (const bob::trainer::EMPCATrainer& other) 
+  (const bob::trainer::EMPCATrainer& other)
 {
   if (this != &other)
   {
@@ -121,7 +121,7 @@ bool bob::trainer::EMPCATrainer::operator!=
 }
 
 bool bob::trainer::EMPCATrainer::is_similar_to
-  (const bob::trainer::EMPCATrainer &other, const double r_epsilon, 
+  (const bob::trainer::EMPCATrainer &other, const double r_epsilon,
    const double a_epsilon) const
 {
   return bob::trainer::EMTrainer<bob::machine::LinearMachine,
@@ -136,7 +136,7 @@ bool bob::trainer::EMPCATrainer::is_similar_to
 }
 
 void bob::trainer::EMPCATrainer::initialize(bob::machine::LinearMachine& machine,
-  const blitz::Array<double,2>& ar) 
+  const blitz::Array<double,2>& ar)
 {
   // reinitializes array members and checks dimensionality
   initMembers(machine, ar);
@@ -154,7 +154,7 @@ void bob::trainer::EMPCATrainer::initialize(bob::machine::LinearMachine& machine
 }
 
 void bob::trainer::EMPCATrainer::finalize(bob::machine::LinearMachine& machine,
-  const blitz::Array<double,2>& ar) 
+  const blitz::Array<double,2>& ar)
 {
 }
 
@@ -166,7 +166,7 @@ void bob::trainer::EMPCATrainer::initMembers(
   const size_t n_samples = ar.extent(0);
   const size_t n_features = ar.extent(1);
 
-  // Checks that the dimensions are matching 
+  // Checks that the dimensions are matching
   const size_t n_inputs = machine.inputSize();
   const size_t n_outputs = machine.outputSize();
 
@@ -179,7 +179,7 @@ void bob::trainer::EMPCATrainer::initMembers(
     m_S.resize(n_features,n_features);
   else
     m_S.resize(0,0);
-  m_z_first_order.resize(n_samples, n_outputs);  
+  m_z_first_order.resize(n_samples, n_outputs);
   m_z_second_order.resize(n_samples, n_outputs, n_outputs);
   m_inW.resize(n_outputs, n_outputs);
   m_invM.resize(n_outputs, n_outputs);
@@ -194,35 +194,34 @@ void bob::trainer::EMPCATrainer::initMembers(
   m_tmp_dxd_2.resize(n_outputs, n_outputs);
   m_tmp_fxd_1.resize(n_features, n_outputs);
   m_tmp_fxd_2.resize(n_features, n_outputs);
-  // The following large cache matrices are only required to compute the 
+  // The following large cache matrices are only required to compute the
   // log likelihood.
-  if (m_compute_likelihood) 
-  { 
+  if (m_compute_likelihood)
+  {
     m_tmp_fxf_1.resize(n_features, n_features);
     m_tmp_fxf_2.resize(n_features, n_features);
   }
-  else 
+  else
   {
     m_tmp_fxf_1.resize(0,0);
     m_tmp_fxf_2.resize(0,0);
   }
 }
 
-void bob::trainer::EMPCATrainer::computeMeanVariance(bob::machine::LinearMachine& machine, 
-  const blitz::Array<double,2>& ar) 
+void bob::trainer::EMPCATrainer::computeMeanVariance(bob::machine::LinearMachine& machine,
+  const blitz::Array<double,2>& ar)
 {
   size_t n_samples = ar.extent(0);
-  size_t n_features = ar.extent(1);
   blitz::Array<double,1> mu = machine.updateInputSubtraction();
   blitz::Range all = blitz::Range::all();
-  if (m_compute_likelihood) 
+  if (m_compute_likelihood)
   {
     // Mean and scatter computation
     bob::math::scatter(ar, m_S, mu);
     // divides scatter by N-1
     m_S /= static_cast<double>(n_samples-1);
   }
-  else 
+  else
   {
     // computes the mean and updates mu
     mu = 0.;
@@ -232,12 +231,12 @@ void bob::trainer::EMPCATrainer::computeMeanVariance(bob::machine::LinearMachine
   }
 }
 
-void bob::trainer::EMPCATrainer::initRandomWSigma2(bob::machine::LinearMachine& machine) 
+void bob::trainer::EMPCATrainer::initRandomWSigma2(bob::machine::LinearMachine& machine)
 {
   // Initializes the random number generator
   boost::uniform_01<> range01;
   boost::variate_generator<boost::mt19937&, boost::uniform_01<> > die(*m_rng, range01);
-    
+
   // W initialization (TODO: add method in core)
   blitz::Array<double,2> W = machine.updateWeights();
   double ratio = 2.; /// Follows matlab implementation using a ratio of 2
@@ -248,26 +247,26 @@ void bob::trainer::EMPCATrainer::initRandomWSigma2(bob::machine::LinearMachine& 
   m_sigma2 = die() * ratio;
 }
 
-void bob::trainer::EMPCATrainer::computeWtW(bob::machine::LinearMachine& machine) 
+void bob::trainer::EMPCATrainer::computeWtW(bob::machine::LinearMachine& machine)
 {
   const blitz::Array<double,2> W = machine.getWeights();
   const blitz::Array<double,2> Wt = W.transpose(1,0);
   bob::math::prod(Wt, W, m_inW);
 }
 
-void bob::trainer::EMPCATrainer::computeInvM() 
+void bob::trainer::EMPCATrainer::computeInvM()
 {
   // Compute inverse(M), where M = W^T * W + sigma2 * Id
   bob::math::eye(m_tmp_dxd_1); // m_tmp_dxd_1 = Id
   m_tmp_dxd_1 *= m_sigma2; // m_tmp_dxd_1 = sigma2 * Id
   m_tmp_dxd_1 += m_inW; // m_tmp_dxd_1 = M = W^T * W + sigma2 * Id
-  bob::math::inv(m_tmp_dxd_1, m_invM); // m_invM = inv(M)  
+  bob::math::inv(m_tmp_dxd_1, m_invM); // m_invM = inv(M)
 }
- 
 
 
-void bob::trainer::EMPCATrainer::eStep(bob::machine::LinearMachine& machine, const blitz::Array<double,2>& ar) 
-{  
+
+void bob::trainer::EMPCATrainer::eStep(bob::machine::LinearMachine& machine, const blitz::Array<double,2>& ar)
+{
   // Gets mu and W from the machine
   const blitz::Array<double,1>& mu = machine.getInputSubtraction();
   const blitz::Array<double,2>& W = machine.getWeights();
@@ -286,7 +285,7 @@ void bob::trainer::EMPCATrainer::eStep(bob::machine::LinearMachine& machine, con
     // z_first_order_i = inv(M) * W^T * (t - mu)
     bob::math::prod(m_tmp_dxf, m_tmp_f, z_first_order_i);
 
-    /// 2/ Second order statistics: 
+    /// 2/ Second order statistics:
     ///     z_second_order_i = sigma2 * inv(M) + z_first_order_i * z_first_order_i^T
     blitz::Array<double,2> z_second_order_i = m_z_second_order(i,blitz::Range::all(),blitz::Range::all());
     // m_tmp_dxd = z_first_order_i * z_first_order_i^T
@@ -299,7 +298,7 @@ void bob::trainer::EMPCATrainer::eStep(bob::machine::LinearMachine& machine, con
   }
 }
 
-void bob::trainer::EMPCATrainer::mStep(bob::machine::LinearMachine& machine, const blitz::Array<double,2>& ar) 
+void bob::trainer::EMPCATrainer::mStep(bob::machine::LinearMachine& machine, const blitz::Array<double,2>& ar)
 {
   // 1/ New estimate of W
   updateW(machine, ar);
@@ -389,13 +388,13 @@ double bob::trainer::EMPCATrainer::computeLikelihood(bob::machine::LinearMachine
 
   // 1/ Compute det(C), where C = sigma2.I + W.W^T
   //            det(C) = det(sigma2 * C / sigma2) = det(sigma2 * Id) * det(C / sigma2)
-  //    We are using Sylvester's determinant theorem to compute a dxd 
+  //    We are using Sylvester's determinant theorem to compute a dxd
   //    determinant rather than a fxf one: det(I + A.B) = det(I + B.A)
   //            det(C) = sigma2^n_features * det(I + W.W^T/sigma2)
   //                   = sigma2^n_features * det(I + W^T.W/sigma2) (cf. Bishop Appendix C)
   // detC = det( eye(n_features) * sigma2 )
 
-  // detC = sigma2^n_features 
+  // detC = sigma2^n_features
   double detC = pow(m_sigma2, n_features);
   // m_tmp_dxd_1 = Id
   bob::math::eye(m_tmp_dxd_1);
@@ -415,7 +414,7 @@ double bob::trainer::EMPCATrainer::computeLikelihood(bob::machine::LinearMachine
 
   // Compute inverse(M), where M = Wt * W + sigma2 * Id
   computeInvM();
-  // m_tmp_fxf_1 = I = eye(n_features) 
+  // m_tmp_fxf_1 = I = eye(n_features)
   bob::math::eye(m_tmp_fxf_1);
   // m_tmp_fxd_1 = W * inv(M)
   bob::math::prod(W, m_invM, m_tmp_fxd_1);
@@ -430,8 +429,8 @@ double bob::trainer::EMPCATrainer::computeLikelihood(bob::machine::LinearMachine
 
   // 4/ Use previous values to compute the log likelihood:
   // Log likelihood =  - N/2*{ d*ln(2*PI) + ln |detC| + tr(C^-1.S) }
-  double llh = - static_cast<double>(m_z_first_order.extent(0)) / 2. * 
-    ( m_f_log2pi + log(fabs(detC)) + bob::math::trace(m_tmp_fxf_2) ); 
+  double llh = - static_cast<double>(m_z_first_order.extent(0)) / 2. *
+    ( m_f_log2pi + log(fabs(detC)) + bob::math::trace(m_tmp_fxf_2) );
 
   return llh;
 }
