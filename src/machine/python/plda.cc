@@ -137,7 +137,7 @@ static double plda_forward_sample(bob::machine::PLDAMachine& m,
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "PLDA forwarding does not accept input array with '%u' dimensions (only 1D or 2D arrays)", info.nd);
+      PYTHON_ERROR(TypeError, "PLDA forwarding does not accept input array with '%lu' dimensions (only 1D or 2D arrays)", info.nd);
   }
 }
 
