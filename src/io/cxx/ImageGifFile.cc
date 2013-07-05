@@ -30,7 +30,6 @@
 #include <string>
 
 #include <bob/io/CodecRegistry.h>
-#include <bob/io/Exception.h>
 #include <bob/config.h>
 
 extern "C" {

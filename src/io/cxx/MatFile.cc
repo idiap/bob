@@ -27,7 +27,6 @@
 
 #include <bob/io/MatUtils.h>
 #include <bob/io/CodecRegistry.h>
-#include <bob/io/Exception.h>
 
 /**
  * TODO:

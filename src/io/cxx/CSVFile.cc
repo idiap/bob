@@ -34,7 +34,6 @@
 #include <boost/algorithm/string.hpp>
 
 #include <bob/io/CodecRegistry.h>
-#include <bob/io/Exception.h>
 
 typedef boost::tokenizer<boost::escaped_list_separator<char> > Tokenizer;
 
