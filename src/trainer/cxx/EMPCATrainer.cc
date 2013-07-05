@@ -24,7 +24,6 @@
 #include <cmath>
 
 #include <bob/trainer/EMPCATrainer.h>
-#include <bob/io/Exception.h>
 #include <bob/core/array_copy.h>
 #include <bob/core/array_type.h>
 #include <bob/core/check.h>
