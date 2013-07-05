@@ -33,7 +33,6 @@
 #include <string>
 
 #include <bob/core/array.h>
-#include <bob/io/Exception.h>
 
 namespace bob { namespace io { namespace detail {
 
