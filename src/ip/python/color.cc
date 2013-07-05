@@ -51,7 +51,6 @@ static object rgb_to_gray(const object& r, const object& g, const object& b, con
       PYTHON_ERROR(TypeError,
         "color conversion operator is not supported for date type '%s'",
         d.cxx_str().c_str());
-      return object(NULL);
   }
 }
 
@@ -80,7 +79,6 @@ static object gray_to_rgb(const object& y, const object& dtype){
       PYTHON_ERROR(TypeError,
         "color conversion operator is not supported for date type '%s'",
         d.cxx_str().c_str());
-      return object(NULL);
   }
 }
 
@@ -111,7 +109,6 @@ static object rgb_to_hsv(const object& r, const object& g, const object& b, cons
       PYTHON_ERROR(TypeError,
         "color conversion operator is not supported for date type '%s'",
         d.cxx_str().c_str());
-      return object(NULL);
   }
 }
 
@@ -140,7 +137,6 @@ static object hsv_to_rgb(const object& h, const object& s, const object& v, cons
       PYTHON_ERROR(TypeError,
         "color conversion operator is not supported for date type '%s'",
         d.cxx_str().c_str());
-      return object(NULL);
   }
 }
 
@@ -171,7 +167,6 @@ static object rgb_to_hsl(const object& r, const object& g, const object& b, cons
       PYTHON_ERROR(TypeError,
         "color conversion operator is not supported for date type '%s'",
         d.cxx_str().c_str());
-      return object(NULL);
   }
 }
 
@@ -200,7 +195,6 @@ static object hsl_to_rgb(const object& h, const object& s, const object& l, cons
       PYTHON_ERROR(TypeError,
         "color conversion operator is not supported for date type '%s'",
         d.cxx_str().c_str());
-      return object(NULL);
   }
 }
 
@@ -231,7 +225,6 @@ static object rgb_to_yuv(const object& r, const object& g, const object& b, cons
       PYTHON_ERROR(TypeError,
         "color conversion operator is not supported for date type '%s'",
         d.cxx_str().c_str());
-      return object(NULL);
   }
 }
 
@@ -260,7 +253,6 @@ static object yuv_to_rgb(const object& y, const object& u, const object& v, cons
       PYTHON_ERROR(TypeError,
         "color conversion operator is not supported for date type '%s'",
         d.cxx_str().c_str());
-      return object(NULL);
   }
 }
 
