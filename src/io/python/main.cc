@@ -6,16 +6,16 @@
  * @brief Combines all modules to make up the complete bindings
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -34,7 +34,6 @@ static void set_ignore_double_registration(bool v) {
 }
 
 void bind_io_version();
-void bind_io_exception();
 void bind_io_file();
 void bind_io_hdf5();
 void bind_io_hdf5_extras();
@@ -49,7 +48,6 @@ BOOST_PYTHON_MODULE(_io) {
   bob::python::setup_python("bob classes and sub-classes for io access");
 
   bind_io_version();
-  bind_io_exception();
   bind_io_file();
   bind_io_hdf5();
   bind_io_hdf5_extras();
