@@ -95,7 +95,7 @@ bool bob::machine::SVMFile::read(int& label, blitz::Array<double,1>& values) {
   if ((size_t)values.extent(0) != m_shape) {
     boost::format s("file '%s' contains %d entries per sample, but you gave me an array with only %d positions");
     s % m_filename % m_shape % values.extent(0);
-    throw std::invalid_argument(s.str());
+    throw std::runtime_error(s.str());
   }
 
   //read the data.
@@ -294,7 +294,7 @@ int bob::machine::SupportVector::classLabel(size_t i) const {
   if (i >= (size_t)svm_get_nr_class(m_model.get())) {
     boost::format s("request for label of class %d in SVM with %d classes is not legal");
     s % (int)i % svm_get_nr_class(m_model.get());
-    throw std::invalid_argument(s.str());
+    throw std::runtime_error(s.str());
   }
   return m_model->label[i];
 
@@ -372,7 +372,7 @@ int bob::machine::SupportVector::predictClass
   if ((size_t)input.extent(0) != inputSize()) {
     boost::format s("input for this SVM should have %d components, but you provided an array with %d elements instead");
     s % inputSize() % input.extent(0);
-    throw std::invalid_argument(s.str());
+    throw std::runtime_error(s.str());
   }
 
   return predictClass_(input); 
@@ -398,17 +398,17 @@ int bob::machine::SupportVector::predictClassAndScores
   if ((size_t)input.extent(0) != inputSize()) {
     boost::format s("input for this SVM should have %d components, but you provided an array with %d elements instead");
     s % inputSize() % input.extent(0);
-    throw std::invalid_argument(s.str());
+    throw std::runtime_error(s.str());
   }
 
   if (!bob::core::array::isCContiguous(scores)) {
-    throw std::invalid_argument("scores output array should be C-style contiguous and what you provided is not");
+    throw std::runtime_error("scores output array should be C-style contiguous and what you provided is not");
   }
 
   if ((size_t)scores.extent(0) != outputSize()) {
     boost::format s("output scores for this SVM should have %d components, but you provided an array with %d elements instead");
     s % outputSize() % scores.extent(0);
-    throw std::invalid_argument(s.str());
+    throw std::runtime_error(s.str());
   }
 
   return predictClassAndScores_(input, scores);
@@ -429,7 +429,7 @@ int bob::machine::SupportVector::predictClassAndProbabilities
   if ((size_t)input.extent(0) != inputSize()) {
     boost::format s("input for this SVM should have %d components, but you provided an array with %d elements instead");
     s % inputSize() % input.extent(0);
-    throw std::invalid_argument(s.str());
+    throw std::runtime_error(s.str());
   }
 
   if (!supportsProbability()) {
@@ -437,13 +437,13 @@ int bob::machine::SupportVector::predictClassAndProbabilities
   }
 
   if (!bob::core::array::isCContiguous(probabilities)) {
-    throw std::invalid_argument("probabilities output array should be C-style contiguous and what you provided is not");
+    throw std::runtime_error("probabilities output array should be C-style contiguous and what you provided is not");
   }
 
   if ((size_t)probabilities.extent(0) != outputSize()) {
     boost::format s("output probabilities for this SVM should have %d components, but you provided an array with %d elements instead");
     s % outputSize() % probabilities.extent(0);
-    throw std::invalid_argument(s.str());
+    throw std::runtime_error(s.str());
   }
 
   return predictClassAndProbabilities_(input, probabilities);

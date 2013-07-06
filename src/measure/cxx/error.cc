@@ -453,7 +453,7 @@ static double _ppndf(double p) {
   else {
     //r = sqrt (log (0.5 - abs(q)));
     double r = (q > 0.0  ?  1.0 - p : p);
-    if (r <= 0.0) throw std::underflow_error("measure::ppndf(): r <= 0.0!");
+    if (r <= 0.0) throw std::runtime_error("measure::ppndf(): r <= 0.0!");
     r = sqrt ((-1.0) * log (r));
     retval = (((C3 * r + C2) * r + C1) * r + C0) / ((D2 * r + D1) * r + 1.0);
     if (q < 0) retval *= -1.0;

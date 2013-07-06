@@ -109,7 +109,7 @@ class VideoFile: public bob::io::File {
       const bob::core::array::typeinfo& type = buffer.type();
   
       if (type.nd != 3 and type.nd != 4)
-        throw std::invalid_argument("input buffer for videos must have 3 or 4 dimensions");
+        throw std::runtime_error("input buffer for videos must have 3 or 4 dimensions");
 
       if(m_newfile) {
         size_t height = (type.nd==3)? type.shape[1]:type.shape[2];

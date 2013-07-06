@@ -343,7 +343,7 @@ void bob::python::typeinfo_ndarray_ (const boost::python::object& o, bob::core::
 
 void bob::python::typeinfo_ndarray (const boost::python::object& o, bob::core::array::typeinfo& i) {
   if (!PyArray_Check(o.ptr())) {
-    throw std::invalid_argument("invalid input: cannot extract typeinfo object from anything else than ndarray");
+    throw std::runtime_error("invalid input: cannot extract typeinfo object from anything else than ndarray");
   }
   bob::python::typeinfo_ndarray_(o, i);
 }

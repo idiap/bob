@@ -155,7 +155,7 @@ size_t bob::io::VideoReader::load(bob::core::array::interface& b,
   if (!m_typeinfo_video.is_compatible(b.type())) {
     boost::format s("input buffer (%s) does not conform to the video size specifications (%s)");
     s % b.type().str() % m_typeinfo_video.str();
-    throw std::invalid_argument(s.str());
+    throw std::runtime_error(s.str());
   }
 
   unsigned long int frame_size = m_typeinfo_frame.buffer_size();
@@ -287,7 +287,7 @@ bool bob::io::VideoReader::const_iterator::read(bob::core::array::interface& dat
   if (!info.is_compatible(m_parent->m_typeinfo_frame)) {
     boost::format s("input buffer (%s) does not conform to the video frame size specifications (%s)");
     s % info.str() % m_parent->m_typeinfo_frame.str();
-    throw std::invalid_argument(s.str());
+    throw std::runtime_error(s.str());
   }
 
   //we are going to need another copy step - use our internal array

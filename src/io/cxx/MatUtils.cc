@@ -99,7 +99,7 @@ static enum matio_classes mio_class_type (bob::core::array::ElementType i) {
       {
         boost::format f("data type '%s' is not supported by matio backend");
         f % bob::core::array::stringize(i);
-        throw std::invalid_argument(f.str());
+        throw std::runtime_error(f.str());
       }
   }
 }
@@ -137,7 +137,7 @@ static enum matio_types mio_data_type (bob::core::array::ElementType i) {
       {
         boost::format f("data type '%s' is not supported by matio backend");
         f % bob::core::array::stringize(i);
-        throw std::invalid_argument(f.str());
+        throw std::runtime_error(f.str());
       }
   }
 }

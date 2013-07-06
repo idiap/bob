@@ -135,7 +135,7 @@ make_file (const std::string& path, char mode) {
   if (mode == 'r') _mode = bob::io::TensorFile::in;
   else if (mode == 'w') _mode = bob::io::TensorFile::out;
   else if (mode == 'a') _mode = bob::io::TensorFile::append;
-  else throw std::invalid_argument("unsupported tensor file opening mode");
+  else throw std::runtime_error("unsupported tensor file opening mode");
 
   return boost::make_shared<TensorArrayFile>(path, _mode);
 

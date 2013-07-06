@@ -213,7 +213,7 @@ make_file (const std::string& path, char mode) {
   if (mode == 'r') h5mode = bob::io::HDF5File::in;
   else if (mode == 'w') h5mode = bob::io::HDF5File::trunc;
   else if (mode == 'a') h5mode = bob::io::HDF5File::inout;
-  else throw std::invalid_argument("unsupported file opening mode");
+  else throw std::runtime_error("unsupported file opening mode");
 
   return boost::make_shared<HDF5ArrayFile>(path, h5mode);
 

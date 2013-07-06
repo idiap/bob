@@ -152,7 +152,7 @@ class MatFile: public bob::io::File {
       if (m_type.is_valid() && !m_type.is_compatible(buffer.type())) {
         boost::format f("cannot append with different buffer type (%s) than the one already initialized (%s)");
         f % buffer.type().str() % m_type.str();
-        throw std::invalid_argument(f.str());
+        throw std::runtime_error(f.str());
       }
 
       //all is good at this point, just write it.

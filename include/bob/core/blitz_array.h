@@ -170,12 +170,12 @@ namespace bob { namespace core { namespace array {
         void set(boost::shared_ptr<blitz::Array<T,N> > data) {
           
           if (getElementType<T>() == t_unknown)
-            throw std::invalid_argument("unsupported element type on blitz::Array<>");
+            throw std::runtime_error("unsupported element type on blitz::Array<>");
           if (N > BOB_MAX_DIM) 
-            throw std::invalid_argument("unsupported number of dimensions on blitz::Array<>");
+            throw std::runtime_error("unsupported number of dimensions on blitz::Array<>");
 
           if (!isCContiguous(*data.get()))
-            throw std::invalid_argument("cannot buffer'ize non-c contiguous array");
+            throw std::runtime_error("cannot buffer'ize non-c contiguous array");
 
           m_type.set(data);
 

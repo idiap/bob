@@ -39,7 +39,9 @@ static void bob_extract(bob::machine::GaborGraphMachine& self, bob::python::cons
     const blitz::Array<double,4> jet_image = input_jet_image.bz<double,4>();
     blitz::Array<double,3> graph = output_graph.bz<double,3>();
     self.extract(jet_image, graph);
-  } else throw bob::core::array::UnexpectedShapeError();
+  } else {
+    throw bob::core::array::UnexpectedShapeError();
+  }
 }
 
 static bob::python::ndarray bob_extract2(bob::machine::GaborGraphMachine& self, bob::python::const_ndarray input_jet_image){

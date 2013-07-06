@@ -82,7 +82,7 @@ void bob::core::array::typeinfo::update_strides() {
     default:
       break;
   }
-  throw std::invalid_argument("unsupported number of dimensions");
+  throw std::runtime_error("unsupported number of dimensions");
 }
 
 size_t bob::core::array::typeinfo::size() const {

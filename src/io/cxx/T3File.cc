@@ -91,7 +91,7 @@ class T3File: public bob::io::File {
           else {
             boost::format s("Cannot read file '%s', mode = '%c': fsize (%d) != %d*%d*sizeof(float32) nor *sizeof(float64)");
             s % path % mode % fsize % nsamples % framesize;
-            throw std::invalid_argument(s.str());
+            throw std::runtime_error(s.str());
           }
 
           size_t shape[2] = {nsamples, framesize};
@@ -171,7 +171,7 @@ class T3File: public bob::io::File {
       if (!m_newfile && !info.is_compatible(m_type_arrayset)) {
         boost::format f("input buffer of type %s cannot be appended to already initialized torch3vision binary file of type %s");
         f % info.str() % m_type_arrayset.str();
-        throw std::invalid_argument(f.str());
+        throw std::runtime_error(f.str());
       }
 
       std::ofstream ofile;
@@ -189,7 +189,7 @@ class T3File: public bob::io::File {
             (info.dtype != bob::core::array::t_float64)) {
           boost::format f("cannot have T3 bindata files with type %s - only float32 or float64");
           f % bob::core::array::stringize(info.dtype);
-          throw std::invalid_argument(f.str());
+          throw std::runtime_error(f.str());
         }
 
         ofile.open(m_filename.c_str(), std::ios::binary|std::ios::out|std::ios::trunc);
@@ -264,7 +264,7 @@ class T3File: public bob::io::File {
       else {
         boost::format f("cannot do single write of torch3vision .bindata file with array with type '%s' - only supports 1D or 2D arrays of types float32 or float64");
         f % info.str();
-        throw std::invalid_argument(f.str());
+        throw std::runtime_error(f.str());
       }
 
     }

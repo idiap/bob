@@ -146,7 +146,7 @@ namespace array {
      */
     template <typename T> void set_shape(T nd_, const T* shape_) {
       if (nd_ > (BOB_MAX_DIM+1))
-        throw std::invalid_argument("unsupported number of dimensions");
+        throw std::runtime_error("unsupported number of dimensions");
       nd = nd_;
       for (size_t k=0; k<nd; ++k) shape[k] = shape_[k];
       update_strides();

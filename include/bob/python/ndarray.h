@@ -538,14 +538,14 @@ namespace bob { namespace python {
           boost::format mesg("cannot wrap numpy.ndarray(%s,%d) as blitz::Array<%s,%s> - dimensions do not match");
           mesg % bob::core::array::stringize(info.dtype) % info.nd;
           mesg % bob::core::array::stringize<T>() % N;
-          throw std::invalid_argument(mesg.str().c_str());
+          throw std::runtime_error(mesg.str().c_str());
         }
 
         if (info.dtype != bob::core::array::getElementType<T>()) {
           boost::format mesg("cannot wrap numpy.ndarray(%s,%d) as blitz::Array<%s,%s> - data type does not match");
           mesg % bob::core::array::stringize(info.dtype) % info.nd;
           mesg % bob::core::array::stringize<T>() % N;
-          throw std::invalid_argument(mesg.str().c_str());
+          throw std::runtime_error(mesg.str().c_str());
         }
 
         shape_type shape;
@@ -608,7 +608,7 @@ namespace bob { namespace python {
           boost::format mesg("cannot wrap numpy.ndarray(%s,%d) as blitz::Array<%s,%s> - dimensions do not match");
           mesg % bob::core::array::stringize(info.dtype) % info.nd;
           mesg % bob::core::array::stringize<T>() % N;
-          throw std::invalid_argument(mesg.str().c_str());
+          throw std::runtime_error(mesg.str().c_str());
         }
 
         if (info.dtype == bob::core::array::getElementType<T>()) {
