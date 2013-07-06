@@ -21,7 +21,6 @@
 #include <boost/make_shared.hpp>
 
 #include <bob/trainer/WhiteningTrainer.h>
-#include <bob/machine/Exception.h>
 #include <bob/math/inv.h>
 #include <bob/math/lu.h>
 #include <bob/math/stats.h>
@@ -72,10 +71,16 @@ void bob::trainer::WhiteningTrainer::train(bob::machine::LinearMachine& machine,
   const size_t n_outputs = machine.outputSize();
 
   // Checks that the dimensions are matching
-  if (n_inputs != n_features)
-    throw bob::machine::NInputsMismatch(n_inputs, n_features);
-  if (n_outputs != n_features)
-    throw bob::machine::NOutputsMismatch(n_outputs, n_features);
+  if (n_inputs != n_features) {
+    boost::format m("machine input size (%u) does not match the number of columns in input array (%d)");
+    m % n_inputs % n_features;
+    throw std::runtime_error(m.str());
+  }
+  if (n_outputs != n_features) {
+    boost::format m("machine output size (%u) does not match the number of columns in output array (%d)");
+    m % n_outputs % n_features;
+    throw std::runtime_error(m.str());
+  }
 
   // 1. Computes the mean vector and the covariance matrix of the training set
   blitz::Array<double,1> mean(n_features);

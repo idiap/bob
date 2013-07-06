@@ -175,18 +175,26 @@ void bob::machine::WienerMachine::forward_(const blitz::Array<double,2>& input,
 void bob::machine::WienerMachine::forward(const blitz::Array<double,2>& input,
   blitz::Array<double,2>& output) const
 {
-  if (m_W.extent(0) != input.extent(0)) //checks input
-    throw bob::machine::NInputsMismatch(m_W.extent(0),
-        input.extent(0));
-  if (m_W.extent(1) != input.extent(1)) //checks input
-    throw bob::machine::NInputsMismatch(m_W.extent(1),
-        input.extent(1));
-  if (m_W.extent(0) != output.extent(0)) //checks output
-    throw bob::machine::NOutputsMismatch(m_W.extent(0),
-        output.extent(0));
-  if (m_W.extent(1) != output.extent(1)) //checks output
-    throw bob::machine::NOutputsMismatch(m_W.extent(1),
-        output.extent(1));
+  if (m_W.extent(0) != input.extent(0)) { //checks input
+    boost::format m("number of input rows (%d) is not compatible with internal weight matrix (%d)");
+    m % input.extent(0) % m_W.extent(0);
+    throw std::runtime_error(m.str());
+  }
+  if (m_W.extent(1) != input.extent(1)) { //checks input
+    boost::format m("number of input columns (%d) is not compatible with internal weight matrix (%d)");
+    m % input.extent(1) % m_W.extent(1);
+    throw std::runtime_error(m.str());
+  }
+  if (m_W.extent(0) != output.extent(0)) { //checks output
+    boost::format m("number of output rows (%d) is not compatible with internal weight matrix (%d)");
+    m % output.extent(0) % m_W.extent(0);
+    throw std::runtime_error(m.str());
+  }
+  if (m_W.extent(1) != output.extent(1)) { //checks output
+    boost::format m("number of output columns (%d) is not compatible with internal weight matrix (%d)");
+    m % output.extent(1) % m_W.extent(1);
+    throw std::runtime_error(m.str());
+  }
   forward_(input, output);
 }
 
@@ -200,10 +208,16 @@ void bob::machine::WienerMachine::setVarianceThreshold(
 
 void bob::machine::WienerMachine::setPs(const blitz::Array<double,2>& Ps)
 {
-  if (m_Ps.extent(0) != Ps.extent(0))
-    throw bob::machine::NInputsMismatch(m_Ps.extent(0), Ps.extent(0));
-  if (m_Ps.extent(1) != Ps.extent(1))
-    throw bob::machine::NInputsMismatch(m_Ps.extent(1), Ps.extent(0));
+  if (m_Ps.extent(0) != Ps.extent(0)) {
+    boost::format m("number of rows (%d) for input `Ps' does not match the expected (internal) size (%d)");
+    m % Ps.extent(0) % m_Ps.extent(0);
+    throw std::runtime_error(m.str());
+  }
+  if (m_Ps.extent(1) != Ps.extent(1)) {
+    boost::format m("number of columns (%d) for input `Ps' does not match the expected (internal) size (%d)");
+    m % Ps.extent(1) % m_Ps.extent(1);
+    throw std::runtime_error(m.str());
+  }
   m_Ps = bob::core::array::ccopy(Ps);
   computeW(); 
 }
