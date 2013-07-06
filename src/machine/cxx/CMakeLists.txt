@@ -7,7 +7,6 @@ set(incdir ${cxx_incdir})
 
 # This defines the list of source files inside this package.
 set(src
-  "Exception.cc"
   "KMeansMachine.cc"
   "Gaussian.cc"
   "GMMMachine.cc"

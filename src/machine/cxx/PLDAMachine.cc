@@ -23,7 +23,6 @@
 #include <bob/core/assert.h>
 #include <bob/core/check.h>
 #include <bob/core/array_copy.h>
-#include <bob/machine/Exception.h>
 #include <bob/machine/PLDAMachine.h>
 #include <bob/math/linear.h>
 #include <bob/math/det.h>
@@ -763,8 +762,11 @@ void bob::machine::PLDAMachine::setPLDABase(const boost::shared_ptr<bob::machine
 
 void bob::machine::PLDAMachine::setWeightedSum(const blitz::Array<double,1>& ws) 
 {
-  if(ws.extent(0) != m_weighted_sum.extent(0))
-    throw bob::machine::NInputsMismatch(ws.extent(0), m_weighted_sum.extent(0));
+  if(ws.extent(0) != m_weighted_sum.extent(0)) {
+    boost::format m("size of parameter `ws' (%d) does not match the expected size (%d)");
+    m % ws.extent(0) % m_weighted_sum.extent(0);
+    throw std::runtime_error(m.str());
+  }
   m_weighted_sum.reference(bob::core::array::ccopy(ws));
 }
 

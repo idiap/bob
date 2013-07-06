@@ -24,7 +24,6 @@
 #include <bob/core/assert.h>
 #include <bob/core/check.h>
 #include <bob/core/array_copy.h>
-#include <bob/machine/Exception.h>
 #include <limits>
 
 bob::machine::KMeansMachine::KMeansMachine():
@@ -243,7 +242,9 @@ void bob::machine::KMeansMachine::getVariancesAndWeightsForEachCluster(const bli
 void bob::machine::KMeansMachine::forward(const blitz::Array<double,1>& input, double& output) const
 {
   if(static_cast<size_t>(input.extent(0)) != m_n_inputs) {
-    throw NInputsMismatch(m_n_inputs, input.extent(0));
+    boost::format m("machine input size (%u) does not match the size of input array (%d)");
+    m % m_n_inputs % input.extent(0);
+    throw std::runtime_error(m.str());
   }
   forward_(input,output);
 }

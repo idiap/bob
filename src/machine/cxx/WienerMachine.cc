@@ -23,7 +23,6 @@
 #include <bob/core/array_copy.h>
 #include <bob/core/cast.h>
 #include <bob/machine/WienerMachine.h>
-#include <bob/machine/Exception.h>
 #include <bob/sp/FFT2D.h>
 #include <complex>
 

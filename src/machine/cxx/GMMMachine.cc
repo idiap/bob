@@ -21,7 +21,6 @@
 
 #include <bob/machine/GMMMachine.h>
 #include <bob/core/assert.h>
-#include <bob/machine/Exception.h>
 #include <bob/math/log.h>
 
 bob::machine::GMMMachine::GMMMachine(): m_gaussians(0) {
@@ -272,7 +271,9 @@ double bob::machine::GMMMachine::logLikelihood_(const blitz::Array<double, 1> &x
 
 void bob::machine::GMMMachine::forward(const blitz::Array<double,1>& input, double& output) const {
   if(static_cast<size_t>(input.extent(0)) != m_n_inputs) {
-    throw NInputsMismatch(m_n_inputs, input.extent(0));
+    boost::format m("expected input size (%u) does not match the size of input array (%d)");
+    m % m_n_inputs % input.extent(0);
+    throw std::runtime_error(m.str());
   }
 
   forward_(input,output);

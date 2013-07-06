@@ -25,7 +25,6 @@
 #define BOB5SPRO_IP_GABOR_BANK_SPATIAL_H 
 
 #include "bob/core/cast.h"
-#include "bob/ip/Exception.h"
 #include "bob/ip/GaborSpatial.h"
 #include <boost/shared_ptr.hpp>
 #include <vector>

@@ -19,7 +19,6 @@
  */
 
 #include <bob/trainer/WienerTrainer.h>
-#include <bob/machine/Exception.h>
 #include <bob/core/cast.h>
 #include <bob/sp/FFT2D.h>
 #include <complex>
@@ -73,10 +72,16 @@ void bob::trainer::WienerTrainer::train(bob::machine::WienerMachine& machine,
   const size_t width_m = machine.getWidth();
 
   // Checks that the dimensions are matching
-  if (height != height_m)
-    throw bob::machine::NInputsMismatch(height, height_m);
-  if (width != width_m)
-    throw bob::machine::NInputsMismatch(width, width_m);
+  if (height != height_m) {
+    boost::format m("number of inputs (height) for machine (%u) does not match number of columns at input parameter (%u)");
+    m % height_m % height;
+    throw std::runtime_error(m.str());
+  }
+  if (width != width_m) {
+    boost::format m("number of inputs (width) for machine (%u) does not match number of depths at input parameter (%u)");
+    m % width_m % width;
+    throw std::runtime_error(m.str());
+  }
 
   // FFT2D
   bob::sp::FFT2D fft2d(height, width);

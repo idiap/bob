@@ -27,7 +27,6 @@
 #include <bob/core/array_copy.h>
 #include <bob/core/array_type.h>
 #include <bob/core/check.h>
-#include <bob/machine/Exception.h>
 #include <bob/math/linear.h>
 #include <bob/math/det.h>
 #include <bob/math/inv.h>
@@ -170,8 +169,11 @@ void bob::trainer::EMPCATrainer::initMembers(
   const size_t n_outputs = machine.outputSize();
 
   // Checks that the dimensions are matching
-  if (n_inputs != n_features)
-    throw bob::machine::NInputsMismatch(n_inputs, n_features);
+  if (n_inputs != n_features) {
+    boost::format m("number of inputs (%u) does not match the number of features (%u)");
+    m % n_inputs % n_features;
+    throw std::runtime_error(m.str());
+  }
 
   // Covariance matrix S is only required to compute the log likelihood
   if (m_compute_likelihood)

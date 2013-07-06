@@ -19,7 +19,6 @@
  */
 
 #include <bob/machine/GMMLLRMachine.h>
-#include <bob/machine/Exception.h>
 
 bob::machine::GMMLLRMachine::GMMLLRMachine(bob::io::HDF5File& config) {
   load(config);
@@ -32,15 +31,21 @@ bob::machine::GMMLLRMachine::GMMLLRMachine(bob::io::HDF5File& client, bob::io::H
   m_gmm_ubm->load(ubm);
 
   // check and assign n_inputs
-  if(m_gmm_client->getNInputs() != m_gmm_ubm->getNInputs())
-    throw NInputsMismatch(m_gmm_client->getNInputs(), m_gmm_ubm->getNInputs());
+  if(m_gmm_client->getNInputs() != m_gmm_ubm->getNInputs()) {
+    boost::format m("number of inputs in client specific GMM is not the same as in UBM");
+    m % m_gmm_client->getNInputs() % m_gmm_ubm->getNInputs();
+    throw std::runtime_error(m.str());
+  }
   m_n_inputs = m_gmm_client->getNInputs();
 }
 
 bob::machine::GMMLLRMachine::GMMLLRMachine(const bob::machine::GMMMachine& client, const bob::machine::GMMMachine& ubm) {
   // check and assign n_inputs
-  if(client.getNInputs() != ubm.getNInputs())
-    throw NInputsMismatch(client.getNInputs(), ubm.getNInputs());
+  if(client.getNInputs() != ubm.getNInputs()) {
+    boost::format m("number of inputs in client specific GMM is not the same as in UBM");
+    m % m_gmm_client->getNInputs() % m_gmm_ubm->getNInputs();
+    throw std::runtime_error(m.str());
+  }
   m_n_inputs = client.getNInputs();
 
   m_gmm_client = new GMMMachine();
@@ -87,7 +92,9 @@ int bob::machine::GMMLLRMachine::getNInputs() const {
 
 void bob::machine::GMMLLRMachine::forward(const blitz::Array<double,1>& input, double& output) const {
   if (input.extent(0) != m_n_inputs) {
-    throw NInputsMismatch(m_n_inputs, input.extent(0));
+    boost::format m("expected input size (%u) does not match the size of input array (%d)");
+    m % m_n_inputs % input.extent(0);
+    throw std::runtime_error(m.str());
   }
   forward_(input,output);
 }

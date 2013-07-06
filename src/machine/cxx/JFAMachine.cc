@@ -23,7 +23,6 @@
 #include <bob/core/array_copy.h>
 #include <bob/math/linear.h>
 #include <bob/math/inv.h>
-#include <bob/machine/Exception.h>
 #include <bob/machine/LinearScoring.h>
 #include <limits>
 
@@ -172,10 +171,14 @@ void bob::machine::FABase::setUbm(const boost::shared_ptr<bob::machine::GMMMachi
 void bob::machine::FABase::setU(const blitz::Array<double,2>& U)
 {
   if(U.extent(0) != m_U.extent(0)) { //checks dimension
-    throw bob::machine::NInputsMismatch(U.extent(0), m_U.extent(0));
+    boost::format m("number of rows in parameter `U' (%d) does not match the expected size (%d)");
+    m % U.extent(0) % m_U.extent(0);
+    throw std::runtime_error(m.str());
   }
   if(U.extent(1) != m_U.extent(1)) { //checks dimension
-    throw bob::machine::NInputsMismatch(U.extent(1), m_U.extent(1));
+    boost::format m("number of columns in parameter `U' (%d) does not match the expected size (%d)");
+    m % U.extent(1) % m_U.extent(1);
+    throw std::runtime_error(m.str());
   }
   m_U.reference(bob::core::array::ccopy(U));
 
@@ -186,10 +189,14 @@ void bob::machine::FABase::setU(const blitz::Array<double,2>& U)
 void bob::machine::FABase::setV(const blitz::Array<double,2>& V)
 {
   if(V.extent(0) != m_V.extent(0)) { //checks dimension
-    throw bob::machine::NInputsMismatch(V.extent(0), m_V.extent(0));
+    boost::format m("number of rows in parameter `V' (%d) does not match the expected size (%d)");
+    m % V.extent(0) % m_V.extent(0);
+    throw std::runtime_error(m.str());
   }
   if(V.extent(1) != m_V.extent(1)) { //checks dimension
-    throw bob::machine::NInputsMismatch(V.extent(1), m_V.extent(1));
+    boost::format m("number of columns in parameter `V' (%d) does not match the expected size (%d)");
+    m % V.extent(1) % m_V.extent(1);
+    throw std::runtime_error(m.str());
   }
   m_V.reference(bob::core::array::ccopy(V));
 }
@@ -197,7 +204,9 @@ void bob::machine::FABase::setV(const blitz::Array<double,2>& V)
 void bob::machine::FABase::setD(const blitz::Array<double,1>& d)
 {
   if(d.extent(0) != m_d.extent(0)) { //checks dimension
-    throw bob::machine::NInputsMismatch(d.extent(0), m_d.extent(0));
+    boost::format m("size of input vector `d' (%d) does not match the expected size (%d)");
+    m % d.extent(0) % m_d.extent(0);
+    throw std::runtime_error(m.str());
   }
   m_d.reference(bob::core::array::ccopy(d));
 }
@@ -527,7 +536,9 @@ void bob::machine::JFAMachine::load(bob::io::HDF5File& config)
 void bob::machine::JFAMachine::setY(const blitz::Array<double,1>& y)
 {
   if(y.extent(0) != m_y.extent(0)) { //checks dimension
-    throw bob::machine::NInputsMismatch(y.extent(0), m_y.extent(0));
+    boost::format m("size of input vector `y' (%d) does not match the expected size (%d)");
+    m % y.extent(0) % m_y.extent(0);
+    throw std::runtime_error(m.str());
   }
   m_y.reference(bob::core::array::ccopy(y));
   // update cache
@@ -537,7 +548,9 @@ void bob::machine::JFAMachine::setY(const blitz::Array<double,1>& y)
 void bob::machine::JFAMachine::setZ(const blitz::Array<double,1>& z)
 {
   if(z.extent(0) != m_z.extent(0)) { //checks dimension
-    throw bob::machine::NInputsMismatch(z.extent(0), m_z.extent(0));
+    boost::format m("size of input vector `z' (%d) does not match the expected size (%d)");
+    m % z.extent(0) % m_z.extent(0);
+    throw std::runtime_error(m.str());
   }
   m_z.reference(bob::core::array::ccopy(z));
   // update cache
@@ -706,7 +719,9 @@ void bob::machine::ISVMachine::load(bob::io::HDF5File& config)
 void bob::machine::ISVMachine::setZ(const blitz::Array<double,1>& z)
 {
   if(z.extent(0) != m_z.extent(0)) { //checks dimension
-    throw bob::machine::NInputsMismatch(z.extent(0), m_z.extent(0));
+    boost::format m("size of input vector `z' (%d) does not match the expected size (%d)");
+    m % z.extent(0) % m_z.extent(0);
+    throw std::runtime_error(m.str());
   }
   m_z.reference(bob::core::array::ccopy(z));
   // update cache

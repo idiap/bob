@@ -20,7 +20,6 @@
  */
 
 #include <bob/machine/GMMStats.h>
-#include <bob/machine/Exception.h>
 #include <bob/core/logging.h>
 #include <bob/core/check.h>
 

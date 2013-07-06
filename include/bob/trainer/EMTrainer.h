@@ -113,7 +113,7 @@ namespace bob { namespace trainer {
       // Check that the machine and dataset have the same feature dimensionality
       if (!checkForDimensionalityMatch()) 
       {
-        bob::core::error << "Mismatch in dimensionality of dataset and machine" << endl;
+        bob::core::error << "mismatch in dimensionality of dataset and machine" << endl;
         return false;
       }
       */
