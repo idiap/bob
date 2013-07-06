@@ -27,8 +27,6 @@
 #include <bob/ip/GaborWaveletTransform.h>
 #include <bob/machine/GaborGraphMachine.h>
 #include <bob/machine/GaborJetSimilarities.h>
-#include <bob/core/array_exception.h>
-
 
 static void bob_extract(bob::machine::GaborGraphMachine& self, bob::python::const_ndarray input_jet_image, bob::python::ndarray output_graph){
   if (output_graph.type().nd == 2){
@@ -40,7 +38,7 @@ static void bob_extract(bob::machine::GaborGraphMachine& self, bob::python::cons
     blitz::Array<double,3> graph = output_graph.bz<double,3>();
     self.extract(jet_image, graph);
   } else {
-    throw bob::core::array::UnexpectedShapeError();
+    PYTHON_ERROR(RuntimeError, "parameter `output_graph' should be 2 or 3 dimensional, but you passed %s", output_graph.type().str().c_str());
   }
 }
 
@@ -57,7 +55,9 @@ static bob::python::ndarray bob_extract2(bob::machine::GaborGraphMachine& self, 
     blitz::Array<double,3> graph = output_graph.bz<double,3>();
     self.extract(jet_image, graph);
     return output_graph;
-  } else throw bob::core::array::UnexpectedShapeError();
+  } else {
+    PYTHON_ERROR(RuntimeError, "parameter `input_jet_image' should be 3 or 4 dimensional, but you passed %s", input_jet_image.type().str().c_str());
+  }
 }
 
 static void bob_average(bob::machine::GaborGraphMachine& self, bob::python::const_ndarray many_graph_jets, bob::python::ndarray averaged_graph_jets){
@@ -80,7 +80,7 @@ static double bob_similarity(bob::machine::GaborGraphMachine& self, bob::python:
           return self.similarity(model, probe, similarity_function);
         }
         default:
-          throw bob::core::array::UnexpectedShapeError();
+          PYTHON_ERROR(RuntimeError, "parameter `model_graph' should be 2 or 3 dimensional (because `probe_graph' is 2D), but you passed %s", model_graph.type().str().c_str());
       }
     }
 
@@ -96,12 +96,12 @@ static double bob_similarity(bob::machine::GaborGraphMachine& self, bob::python:
           return self.similarity(model, probe, similarity_function);
         }
         default:
-          throw bob::core::array::UnexpectedShapeError();
+          PYTHON_ERROR(RuntimeError, "parameter `model_graph' should be 3 or 4 dimensional (because `probe_graph' is 3D), but you passed %s", model_graph.type().str().c_str());
       }
     }
 
     default: // unknown graph shape
-      throw bob::core::array::UnexpectedShapeError();
+      PYTHON_ERROR(RuntimeError, "parameter `probe_graph' should be 2 or 3 dimensional, but you passed %s", probe_graph.type().str().c_str());
   }
 }
 
@@ -116,7 +116,7 @@ static double bob_jet_sim(const bob::machine::GaborJetSimilarity& self, bob::pyt
       return self(j1, j2);
     }
     default:
-      throw bob::core::array::UnexpectedShapeError();
+      PYTHON_ERROR(RuntimeError, "parameter `jet1' should be 1 or 2 dimensional, but you passed %s", jet1.type().str().c_str());
   }
 }
 
