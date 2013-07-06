@@ -23,7 +23,6 @@
 
 #include <bob/trainer/WCCNTrainer.h>
 #include <bob/machine/Exception.h>
-#include <bob/trainer/Exception.h>
 #include <bob/math/inv.h>
 #include <bob/math/lu.h>
 
@@ -191,15 +190,20 @@ void bob::trainer::WCCNTrainer::train(bob::machine::LinearMachine& machine,
 {
   const size_t n_classes = data.size();
   // if #classes < 2, then throw
-  if (n_classes < 2) throw bob::trainer::WrongNumberOfClasses(data.size());
+  if (n_classes < 2) {
+    boost::format m("number of classes should be >= 2, but you passed %u");
+    m % n_classes;
+    throw std::runtime_error(m.str());
+  }
 
   // checks for data type and shape once
   const int n_features = data[0].extent(1);
 
   for (size_t cl=0; cl<n_classes; ++cl) {
     if (data[cl].extent(1) != n_features) {
-      throw bob::trainer::WrongNumberOfFeatures(data[cl].extent(1),
-          n_features, cl);
+      boost::format m("number of features (columns) of array for class %u (%d) does not match that of array for class 0 (%d)");
+      m % cl % data[cl].extent(1) % n_features;
+      throw std::runtime_error(m.str());
     }
   }
 

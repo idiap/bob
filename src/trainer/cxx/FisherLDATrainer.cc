@@ -29,7 +29,6 @@
 #include <bob/math/pinv.h>
 #include <bob/math/eig.h>
 #include <bob/math/linear.h>
-#include <bob/trainer/Exception.h>
 #include <bob/trainer/FisherLDATrainer.h>
 
 bob::trainer::FisherLDATrainer::FisherLDATrainer

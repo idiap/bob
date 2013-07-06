@@ -25,7 +25,6 @@
 #include <bob/core/check.h>
 #include <bob/core/array_copy.h>
 #include <bob/math/linear.h>
-#include <bob/trainer/Exception.h>
 #include <bob/trainer/MLPRPropTrainer.h>
 
 bob::trainer::MLPRPropTrainer::MLPRPropTrainer(size_t batch_size,
@@ -224,7 +223,9 @@ void bob::trainer::MLPRPropTrainer::initialize(const bob::machine::MLP& machine)
 void bob::trainer::MLPRPropTrainer::train(bob::machine::MLP& machine,
     const blitz::Array<double,2>& input,
     const blitz::Array<double,2>& target) {
-  if (!isCompatible(machine)) throw bob::trainer::IncompatibleMachine();
+  if (!isCompatible(machine)) {
+    throw std::runtime_error("input machine is incompatible with this trainer");
+  }
   bob::core::array::assertSameDimensionLength(getBatchSize(), input.extent(0));
   bob::core::array::assertSameDimensionLength(getBatchSize(), target.extent(0));
   train_(machine, input, target);

@@ -23,7 +23,6 @@
 #include <boost/format.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/algorithm/string.hpp>
-#include <bob/trainer/Exception.h>
 #include <bob/trainer/SVMTrainer.h>
 #include <bob/core/blitz_compat.h>
 #include <bob/core/logging.h>
@@ -234,7 +233,9 @@ boost::shared_ptr<bob::machine::SupportVector> bob::trainer::SVMTrainer::train
 
   for (size_t cl=0; cl<data.size(); ++cl) {
     if (data[cl].extent(blitz::secondDim) != n_features) {
-      throw bob::trainer::WrongNumberOfFeatures(data[cl].extent(blitz::secondDim), n_features, cl);
+      boost::format m("number of features (columns) of array for class %u (%d) does not match that of array for class 0 (%d)");
+      m % cl % data[cl].extent(blitz::secondDim) % n_features;
+      throw std::runtime_error(m.str());
     }
   }
 

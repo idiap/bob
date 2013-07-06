@@ -26,7 +26,6 @@
 #include <bob/math/linear.h>
 #include <bob/math/inv.h>
 #include <bob/math/svd.h>
-#include <bob/trainer/Exception.h>
 #include <algorithm>
 #include <boost/random.hpp>
 #include <vector>
@@ -217,16 +216,20 @@ void bob::trainer::PLDATrainer::finalize(bob::machine::PLDABase& machine,
 void bob::trainer::PLDATrainer::checkTrainingData(const std::vector<blitz::Array<double,2> >& v_ar)
 {
   // Checks that the vector of Arraysets is not empty
-  if (v_ar.size() == 0)
-    throw bob::trainer::EmptyTrainingSet();
+  if (v_ar.size() == 0) {
+    throw std::runtime_error("input training set is empty");
+  }
 
   // Gets dimension (first Arrayset)
   int n_features = v_ar[0].extent(1);
   // Checks dimension consistency
   for (size_t i=0; i<v_ar.size(); ++i) {
-    if (v_ar[i].extent(1) != n_features)
-      throw bob::trainer::WrongNumberOfFeatures(v_ar[i].extent(1), n_features, i);
-  } 
+    if (v_ar[i].extent(1) != n_features) {
+      boost::format m("number of features (columns) of array for class %u (%d) does not match that of array for class 0 (%d)");
+      m % i % v_ar[0].extent(1) % n_features;
+      throw std::runtime_error(m.str());
+    }
+  }
 }
 
 void bob::trainer::PLDATrainer::initMembers(const std::vector<blitz::Array<double,2> >& v_ar)
@@ -771,8 +774,11 @@ void bob::trainer::PLDATrainer::enrol(bob::machine::PLDAMachine& plda_machine,
   const int n_samples = ar.extent(0);  
   // Compare the dimensionality from the base trainer/machine with the one
   // of the enrollment samples
-  if (plda_machine.getDimD() != dim_d)
-    throw bob::trainer::WrongNumberOfFeatures(plda_machine.getDimD(), dim_d, 0);
+  if (plda_machine.getDimD() != dim_d) {
+    boost::format m("the extent of the D dimension of the input machine (%u) does not match the input sample (%u)");
+    m % plda_machine.getDimD() % dim_d;
+    throw std::runtime_error(m.str());
+  }
   const size_t dim_f = plda_machine.getDimF();
  
   // Resize working arrays

@@ -19,7 +19,6 @@
  */
 
 #include <bob/trainer/MAP_GMMTrainer.h>
-#include <bob/trainer/Exception.h>
 #include <bob/core/check.h>
 
 bob::trainer::MAP_GMMTrainer::MAP_GMMTrainer(const double relevance_factor, 
@@ -78,8 +77,9 @@ void bob::trainer::MAP_GMMTrainer::mStep(bob::machine::GMMMachine& gmm,
   double n_gaussians = gmm.getNGaussians();
   
   // Check that the prior GMM has been specified
-  if (!m_prior_gmm)
-    throw NoPriorGMM();
+  if (!m_prior_gmm) {
+    throw std::runtime_error("MAP_GMMTrainer: Prior GMM has not been set");
+  }
 
   blitz::firstIndex i;
   blitz::secondIndex j;

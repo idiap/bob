@@ -23,7 +23,6 @@
 #include <bob/core/assert.h>
 #include <bob/core/check.h>
 #include <bob/math/linear.h>
-#include <bob/trainer/Exception.h>
 #include <bob/trainer/MLPBaseTrainer.h>
 
 bob::trainer::MLPBaseTrainer::MLPBaseTrainer(size_t batch_size,

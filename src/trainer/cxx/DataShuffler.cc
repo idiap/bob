@@ -23,7 +23,6 @@
 #include <sys/time.h>
 #include <bob/core/assert.h>
 #include <bob/core/array_copy.h>
-#include <bob/trainer/Exception.h>
 #include <bob/trainer/DataShuffler.h>
 
 bob::trainer::DataShuffler::DataShuffler
@@ -36,14 +35,20 @@ bob::trainer::DataShuffler::DataShuffler
   m_mean(),
   m_stddev()
 {
-  if (data.size() == 0) throw bob::trainer::WrongNumberOfClasses(0);
-  if (target.size() == 0) throw bob::trainer::WrongNumberOfClasses(0);
+  if (data.size() == 0) 
+    throw std::runtime_error("data vector cannot be empty");
+  if (target.size() == 0) 
+    throw std::runtime_error("target vector cannot be empty");
   
   bob::core::array::assertSameDimensionLength(data.size(), target.size());
   
   // checks shapes, minimum number of examples
   for (size_t k=0; k<data.size(); ++k) {
-    if (data[k].size() == 0) throw WrongNumberOfFeatures(0, 1, k);
+    if (data[k].size() == 0) {
+      boost::format m("class %u has no samples");
+      m % k;
+      throw std::runtime_error(m.str());
+    }
     //this may also trigger if I cannot get doubles from the Arrayset
     bob::core::array::assertSameDimensionLength(data[0].extent(1), data[k].extent(1));
     bob::core::array::assertSameShape(target[0], target[k]);

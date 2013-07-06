@@ -13,7 +13,6 @@ set(src
   "GMMTrainer.cc"
   "MAP_GMMTrainer.cc"
   "ML_GMMTrainer.cc"
-  "Exception.cc"
   "DataShuffler.cc"
   "MLPBaseTrainer.cc"
   "MLPRPropTrainer.cc"

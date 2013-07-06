@@ -21,7 +21,6 @@
 
 #include <bob/trainer/KMeansTrainer.h>
 #include <bob/core/array_copy.h>
-#include <bob/trainer/Exception.h>
 #include <boost/random.hpp>
 
 #if BOOST_VERSION >= 104700
@@ -130,8 +129,11 @@ void bob::trainer::KMeansTrainer::initialize(bob::machine::KMeansMachine& kmeans
           }
         }
         // Initialization fails
-        if(count >= n_max_trials)
-          throw bob::trainer::KMeansInitializationFailure();
+        if(count >= n_max_trials) {
+          boost::format m("initialization failure: surpassed the maximum number of trials (%u)");
+          m % n_max_trials;
+          throw std::runtime_error(m.str());
+        }
       }
       
       // set the mean
