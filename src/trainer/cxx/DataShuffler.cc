@@ -20,7 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdexcept>
 #include <sys/time.h>
+#include <boost/format.hpp>
+
 #include <bob/core/assert.h>
 #include <bob/core/array_copy.h>
 #include <bob/trainer/DataShuffler.h>
