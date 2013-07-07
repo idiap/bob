@@ -195,23 +195,6 @@ namespace bob { namespace core { namespace array {
     };
 
     /**
-     * @brief The DifferentNumberOfElements exception occurs when the 2D dst
-     * array of the reshape() functions does not contain the same number of
-     * elements as the 2D src array.
-     */
-    class ReshapeDifferentNumberOfElements: public std::runtime_error {
-      public:
-        ReshapeDifferentNumberOfElements(const int expected, const int got) throw();
-        virtual ~ReshapeDifferentNumberOfElements() throw();
-        virtual const char* what() const throw();
-
-      private:
-        int m_expected;
-        int m_got;
-        mutable std::string m_message;
-    };
-
-    /**
      * @}
      */
 }}}

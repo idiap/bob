@@ -73,10 +73,12 @@ void repmat(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
 {
   bob::core::array::assertZeroBase(src);
   bob::core::array::assertZeroBase(dst);
-  if(dst.extent(0) % src.extent(0) != 0)
+  if(dst.extent(0) % src.extent(0) != 0) {
     throw bob::core::array::RepmatNonMultipleLength(src.extent(0), dst.extent(0));
-  if(dst.extent(1) % src.extent(1) != 0)
+  }
+  if(dst.extent(1) % src.extent(1) != 0) {
     throw bob::core::array::RepmatNonMultipleLength(src.extent(1), dst.extent(1));
+  }
   repmat_(src, dst);
 }
 
@@ -139,13 +141,15 @@ void repmat(const blitz::Array<T,1>& src, blitz::Array<T,2>& dst,
   // Check dst length
   if(row_vector_src)
   {
-    if(dst.extent(1) % src.extent(0) != 0)
+    if(dst.extent(1) % src.extent(0) != 0) {
       throw bob::core::array::RepmatNonMultipleLength(src.extent(0), dst.extent(1));
+    }
   }
   else // src is a column vector
   {
-    if(dst.extent(0) % src.extent(0) != 0)
+    if(dst.extent(0) % src.extent(0) != 0) {
       throw bob::core::array::RepmatNonMultipleLength(src.extent(0), dst.extent(0));
+    }
   }
   repmat_(src, dst, row_vector_src);
 }
@@ -184,8 +188,9 @@ void repvec(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
 {
   bob::core::array::assertZeroBase(src);
   bob::core::array::assertZeroBase(dst);
-  if(dst.extent(0) % src.extent(0) != 0)
+  if(dst.extent(0) % src.extent(0) != 0) {
     throw bob::core::array::RepmatNonMultipleLength(src.extent(0), dst.extent(0));
+  }
   repvec_(src,dst);
 }
 
@@ -225,8 +230,9 @@ void repelem(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
 {
   bob::core::array::assertZeroBase(src);
   bob::core::array::assertZeroBase(dst);
-  if(dst.extent(0) % src.extent(0) != 0)
+  if(dst.extent(0) % src.extent(0) != 0) {
     throw bob::core::array::RepmatNonMultipleLength(src.extent(0), dst.extent(0));
+  }
   repelem_(src,dst);
 }
 

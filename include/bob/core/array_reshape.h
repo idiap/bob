@@ -25,6 +25,8 @@
 #ifndef BOB_CORE_ARRAY_RESHAPE_H
 #define BOB_CORE_ARRAY_RESHAPE_H
 
+#include <stdexcept>
+#include <boost/format.hpp>
 #include <blitz/array.h>
 #include <bob/core/assert.h>
 #include <bob/core/array_exception.h>
@@ -80,7 +82,11 @@ void reshape(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
   bob::core::array::assertZeroBase(dst);
   const int d0 = src.extent(0)*src.extent(1);
   const int d1 = dst.extent(0)*dst.extent(1);
-  if(d0 != d1) throw bob::core::array::ReshapeDifferentNumberOfElements(d0, d1);
+  if(d0 != d1) {
+    boost::format m("size of destination array (%d) does not match that of source (%d)");
+    m % d1 % d0;
+    throw std::runtime_error(m.str());
+  }
   reshape_(src, dst);
 }
 
@@ -120,7 +126,11 @@ void reshape(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst)
   bob::core::array::assertZeroBase(dst);
   const int d0 = src.extent(0)*src.extent(1);
   const int d1 = dst.extent(0);
-  if(d0 != d1) throw bob::core::array::ReshapeDifferentNumberOfElements(d0, d1);
+  if(d0 != d1) {
+    boost::format m("size of destination vector (%d) does not match that of source array (%d)");
+    m % d1 % d0;
+    throw std::runtime_error(m.str());
+  }
   reshape_(src, dst);
 }
 
@@ -160,7 +170,11 @@ void reshape(const blitz::Array<T,1>& src, blitz::Array<T,2>& dst)
   bob::core::array::assertZeroBase(dst);
   const int d0 = src.extent(0);
   const int d1 = dst.extent(0)*dst.extent(1);
-  if(d0 != d1) throw bob::core::array::ReshapeDifferentNumberOfElements(d0, d1);
+  if(d0 != d1) {
+    boost::format m("size of destination array (%d) does not match that of source vector (%d)");
+    m % d1 % d0;
+    throw std::runtime_error(m.str());
+  }
   reshape_(src, dst);
 }
 

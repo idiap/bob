@@ -253,30 +253,3 @@ const char* bob::core::array::RepmatNonMultipleLength::what() const throw() {
     return emergency;
   }
 }
-
-
-bob::core::array::ReshapeDifferentNumberOfElements::ReshapeDifferentNumberOfElements(
-  const int expected, const int got) throw():
-    std::runtime_error("exception not set yet"),
-    m_expected(expected), m_got(got)
-{
-}
-
-bob::core::array::ReshapeDifferentNumberOfElements::~ReshapeDifferentNumberOfElements() throw() {
-}
-
-const char* bob::core::array::ReshapeDifferentNumberOfElements::what() const throw() {
-  try {
-    boost::format message(
-      "The 2D dst array has '%d' elements whereas tje 2D src array as '%d' elements.");
-    message % m_got;
-    message % m_expected;
-    m_message = message.str();
-    return m_message.c_str();
-  } catch (...) {
-    static const char* emergency = "core::DifferentNumberOfElements: cannot \
-      format, exception raised";
-    return emergency;
-  }
-}
-
