@@ -133,7 +133,7 @@ def test_torch3_binary():
 
   array_readwrite('.bindata', a1)
   array_readwrite(".bindata", a2)
-  nose.tools.assert_raises(TypeError, array_readwrite, ".bindata", a3)
+  nose.tools.assert_raises(RuntimeError, array_readwrite, ".bindata", a3)
 
   # arrayset writing tests
   a1 = []
@@ -150,7 +150,7 @@ def test_torch3_binary():
   arrayset_readwrite(".bindata", a2)
 
   # checks we raise if we don't suppport a type
-  nose.tools.assert_raises(TypeError, arrayset_readwrite, ".bindata", a3)
+  nose.tools.assert_raises(RuntimeError, arrayset_readwrite, ".bindata", a3)
   nose.tools.assert_raises(RuntimeError, arrayset_readwrite, ".bindata", a4)
 
   # complete transcoding test
