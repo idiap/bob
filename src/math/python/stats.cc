@@ -143,10 +143,13 @@ static void scatter_M_check(bob::python::const_ndarray A, bob::python::ndarray S
 
 
 template <typename T> 
-static tuple scatters_inner(object data, const bob::core::array::typeinfo& info) 
+static tuple scatters_inner(std::vector<bob::python::const_ndarray>& data) 
 {
-  stl_input_iterator<blitz::Array<T,2> > dbegin(data), dend;
-  std::vector<blitz::Array<T,2> > vdata(dbegin, dend);
+  std::vector<blitz::Array<T,2> > vdata;
+  for(std::vector<bob::python::const_ndarray>::iterator it=data.begin(); 
+      it!=data.end(); ++it)
+    vdata.push_back(it->bz<T,2>());
+  const bob::core::array::typeinfo& info = data[0].type();
   bob::python::ndarray Sb(info.dtype, info.shape[1], info.shape[1]);
   blitz::Array<T,2> Sb_ = Sb.bz<T,2>();
   bob::python::ndarray Sw(info.dtype, info.shape[1], info.shape[1]);
@@ -158,139 +161,132 @@ static tuple scatters_inner(object data, const bob::core::array::typeinfo& info)
 }
 
 static tuple scatters(object data) {
-  extract<bob::python::const_ndarray> v(data[0]);
-  const bob::core::array::typeinfo& info = v().type();
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata(dbegin, dend);
+  const bob::core::array::typeinfo& info = vdata[0].type();
   switch (info.dtype) {
     case bob::core::array::t_float32:
-      return scatters_inner<float>(data, info);
+      return scatters_inner<float>(vdata);
     case bob::core::array::t_float64:
-      return scatters_inner<double>(data, info);
+      return scatters_inner<double>(vdata);
     default:
       PYTHON_ERROR(TypeError, "scatters matrix computation does not support '%s'", info.str().c_str());
   }
 }
 
 template <typename T>
-static void scatters_nocheck_inner(const std::vector<blitz::Array<T,2> >& data,
+static void scatters_nocheck_inner(std::vector<bob::python::const_ndarray>& data,
   bob::python::ndarray Sw, bob::python::ndarray Sb)
 {
+  std::vector<blitz::Array<T,2> > vdata;
+  for(std::vector<bob::python::const_ndarray>::iterator it=data.begin(); 
+      it!=data.end(); ++it)
+    vdata.push_back(it->bz<T,2>());
   blitz::Array<T,2> Sw_ = Sw.bz<T,2>();
   blitz::Array<T,2> Sb_ = Sb.bz<T,2>();
-  bob::math::scatters_<T>(data, Sw_, Sb_);
+  bob::math::scatters_<T>(vdata, Sw_, Sb_);
 }
 
 static void scatters_nocheck(object data, bob::python::ndarray Sw,
     bob::python::ndarray Sb)
 {
-  const bob::core::array::typeinfo& info = Sw.type();
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata(dbegin, dend);
+  const bob::core::array::typeinfo& info = vdata[0].type();
   switch (info.dtype) {
     case bob::core::array::t_float32:
-    {  
-      stl_input_iterator<blitz::Array<float,2> > dbegin(data), dend;
-      std::vector<blitz::Array<float,2> > vdata(dbegin, dend);
       return scatters_nocheck_inner<float>(vdata, Sw, Sb);
-    }
     case bob::core::array::t_float64:
-    {  
-      stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
-      std::vector<blitz::Array<double,2> > vdata(dbegin, dend);
       return scatters_nocheck_inner<double>(vdata, Sw, Sb);
-    }
     default:
       PYTHON_ERROR(TypeError, "(unchecked) scatters matrix computation does not support '%s'", info.str().c_str());
   }
 }
 
 template <typename T>
-static void scatters_check_inner(const std::vector<blitz::Array<T,2> >& data,
+static void scatters_check_inner(std::vector<bob::python::const_ndarray>& data,
   bob::python::ndarray Sw, bob::python::ndarray Sb)
 {
+  std::vector<blitz::Array<T,2> > vdata;
+  for(std::vector<bob::python::const_ndarray>::iterator it=data.begin(); 
+      it!=data.end(); ++it)
+    vdata.push_back(it->bz<T,2>());
   blitz::Array<T,2> Sw_ = Sw.bz<T,2>();
   blitz::Array<T,2> Sb_ = Sb.bz<T,2>();
-  bob::math::scatters<T>(data, Sw_, Sb_);
+  bob::math::scatters<T>(vdata, Sw_, Sb_);
 }
 
 static void scatters_check(object data, bob::python::ndarray Sw,
     bob::python::ndarray Sb)
 {
-  const bob::core::array::typeinfo& info = Sw.type();
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata(dbegin, dend);
+  const bob::core::array::typeinfo& info = vdata[0].type();
   switch (info.dtype) {
     case bob::core::array::t_float32:
-    {  
-      stl_input_iterator<blitz::Array<float,2> > dbegin(data), dend;
-      std::vector<blitz::Array<float,2> > vdata(dbegin, dend);
       return scatters_check_inner<float>(vdata, Sw, Sb);
-    }
     case bob::core::array::t_float64:
-    {  
-      stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
-      std::vector<blitz::Array<double,2> > vdata(dbegin, dend);
       return scatters_check_inner<double>(vdata, Sw, Sb);
-    }
     default:
       PYTHON_ERROR(TypeError, "scatters matrix computation does not support '%s'", info.str().c_str());
   }
 }
 
 template <typename T>
-static void scatters_M_nocheck_inner(const std::vector<blitz::Array<T,2> >& data, 
+static void scatters_M_nocheck_inner(std::vector<bob::python::const_ndarray>& data, 
   bob::python::ndarray Sw, bob::python::ndarray Sb, bob::python::ndarray M)
 {
+  std::vector<blitz::Array<T,2> > vdata;
+  for(std::vector<bob::python::const_ndarray>::iterator it=data.begin(); 
+      it!=data.end(); ++it)
+    vdata.push_back(it->bz<T,2>());
   blitz::Array<T,2> Sw_ = Sw.bz<T,2>();
   blitz::Array<T,2> Sb_ = Sb.bz<T,2>();
   blitz::Array<T,1> M_ = M.bz<T,1>();
-  bob::math::scatters_<T>(data, Sw_, Sb_, M_);
+  bob::math::scatters_<T>(vdata, Sw_, Sb_, M_);
 }
 
 static void scatters_M_nocheck(object data, bob::python::ndarray Sw,
     bob::python::ndarray Sb, bob::python::ndarray M)
 {
-  const bob::core::array::typeinfo& info = Sw.type();
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata(dbegin, dend);
+  const bob::core::array::typeinfo& info = vdata[0].type();
   switch (info.dtype) {
     case bob::core::array::t_float32:
-    {  
-      stl_input_iterator<blitz::Array<float,2> > dbegin(data), dend;
-      std::vector<blitz::Array<float,2> > vdata(dbegin, dend);
       return scatters_M_nocheck_inner<float>(vdata, Sw, Sb, M);
-    }
     case bob::core::array::t_float64:
-    {  
-      stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
-      std::vector<blitz::Array<double,2> > vdata(dbegin, dend);
       return scatters_M_nocheck_inner<double>(vdata, Sw, Sb, M);
-    }
     default:
       PYTHON_ERROR(TypeError, "(unchecked) scatters matrix computation does not support '%s'", info.str().c_str());
   }
 }
 
 template <typename T>
-static void scatters_M_check_inner(const std::vector<blitz::Array<T,2> >& data,
+static void scatters_M_check_inner(std::vector<bob::python::const_ndarray>& data,
   bob::python::ndarray Sw, bob::python::ndarray Sb, bob::python::ndarray M)
 {
+  std::vector<blitz::Array<T,2> > vdata;
+  for(std::vector<bob::python::const_ndarray>::iterator it=data.begin(); 
+      it!=data.end(); ++it)
+    vdata.push_back(it->bz<T,2>());
   blitz::Array<T,2> Sw_ = Sw.bz<T,2>();
   blitz::Array<T,2> Sb_ = Sb.bz<T,2>();
   blitz::Array<T,1> M_ = M.bz<T,1>();
-  bob::math::scatters<T>(data, Sw_, Sb_, M_);
+  bob::math::scatters<T>(vdata, Sw_, Sb_, M_);
 }
 
 static void scatters_M_check(object data, bob::python::ndarray Sw,
   bob::python::ndarray Sb, bob::python::ndarray M)
 {
-  const bob::core::array::typeinfo& info = Sw.type();
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata(dbegin, dend);
+  const bob::core::array::typeinfo& info = vdata[0].type();
   switch (info.dtype) {
     case bob::core::array::t_float32:
-    {  
-      stl_input_iterator<blitz::Array<float,2> > dbegin(data), dend;
-      std::vector<blitz::Array<float,2> > vdata(dbegin, dend);
       return scatters_M_check_inner<float>(vdata, Sw, Sb, M);
-    }
     case bob::core::array::t_float64:
-    {  
-      stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
-      std::vector<blitz::Array<double,2> > vdata(dbegin, dend);
       return scatters_M_check_inner<double>(vdata, Sw, Sb, M);
-    }
     default:
       PYTHON_ERROR(TypeError, "scatters matrix computation does not support '%s'", info.str().c_str());
   }
@@ -298,6 +294,7 @@ static void scatters_M_check(object data, bob::python::ndarray Sw,
 
 
 void bind_math_stats() {
+  // Scatter of a matrix
   def("scatter_", &scatter_nocheck, (arg("a"), arg("s")), SCATTER_DOC1);
   def("scatter", &scatter_check, (arg("a"), arg("s")), SCATTER_DOC1);
   
@@ -306,6 +303,7 @@ void bind_math_stats() {
 
   def("scatter", &scatter, (arg("a")), SCATTER_DOC3);
 
+  // Between-class and within-class scatter matrices of a set of matrices
   def("scatters_", &scatters_nocheck, (arg("data"), arg("sw"), arg("sb")), SCATTERS_DOC1);
   def("scatters", &scatters_check, (arg("data"), arg("sw"), arg("sb")), SCATTERS_DOC1);
   
