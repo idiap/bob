@@ -409,10 +409,10 @@ def test_wccn_train():
 
   # Expected results
   mean_ref = numpy.array([ 0.,  0.,  0.])
-  weight_ref = numpy.array([[ 35.43171442,   0.        ,   0.        ],
-                            [-24.13763022,   6.43858174,   0.        ],
-                            [ 41.9656786 ,  -4.91307273,   4.80884688]])
-  sample_wccn_ref = numpy.array([ 113.05348978,   -1.8620547 ,   14.42654064])
+  weight_ref = numpy.array([[ 15.8455444 ,  0.        ,  0.       ],
+                            [-10.7946764 ,  2.87942129,  0.       ],
+                            [ 18.76762201, -2.19719292,  2.1505817]])
+  sample_wccn_ref = numpy.array([50.55905765, -0.83273618, 6.45174511])
 
   # Runs WCCN (first method)
   t = WCCNTrainer()

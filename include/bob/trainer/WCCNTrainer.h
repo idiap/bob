@@ -1,4 +1,3 @@
-
 /**
  * @file bob/trainer/WCCNTrainer.h
  * @date Tue Apr 9 22:10:00 2013 +0200
@@ -40,7 +39,7 @@ namespace bob { namespace trainer {
  * "Within-class covariance normalization for SVM-based speaker recognition",
  *   Andrew O. Hatch, Sachin Kajarekar, and Andreas Stolcke,
  *   ICSLP, 2006\n
- *Reference 2:\n
+ * Reference 2:\n
  * "N. Dehah, P. Kenny, R. Dehak, P. Dumouchel, P. Ouellet",
  *   Front-end factor analysis for speaker verification,
  *   IEEE TASLP, 2011\n
